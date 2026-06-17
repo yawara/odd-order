@@ -7161,8 +7161,9 @@ run for `H`; the partner data for `H` is produced internally (`exists_partner`, 
 theorem exists_zTilde_conjClass_gt_half_of_isTypeP [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) {H : Subgroup G}
     (hHmax : H ∈ maximalSubgroups G) (hHP : IsTypeP H) :
-    ∃ L Lstar : Subgroup G, L ≤ H ∧ Ch03.IsHallSubgroup (kappa H) (L.subgroupOf H) ∧
+    ∃ L Lstar Uu : Subgroup G, L ≤ H ∧ Ch03.IsHallSubgroup (kappa H) (L.subgroupOf H) ∧
       Lstar = OddOrder.BG.Ch3.S10.Msigma H ⊓ Subgroup.centralizer (L : Set G) ∧
+      Ch03.IsHallSubgroup ((kappa H ∪ OddOrder.BG.Ch3.S10.sigma H)ᶜ) (Uu.subgroupOf H) ∧
       Nat.card G < 2 * (conjClassSet (zTilde L Lstar)).ncard := by
   classical
   haveI : IsSolvable ↥H := hG.solvable_of_mem_maximalSubgroups hHmax
@@ -7184,7 +7185,7 @@ theorem exists_zTilde_conjClass_gt_half_of_isTypeP [Finite G]
   -- Partner data for `H`, then the density bound.
   obtain ⟨Hstar, hHstarne, hHstarmem, hpart⟩ :=
     exists_partner hG (dummySigmaDecomposition G) hHmax hHP hLH hL hLstar hU
-  exact ⟨L, Lstar, hLH, hL, hLstar,
+  exact ⟨L, Lstar, U'.map H.subtype, hLH, hL, hLstar, hU,
     typeP_zTilde_conjClass_gt_half hG hHmax hHP hLH hL hLstar hU hHstarmem hHstarne hpart⟩
 
 /-- Dual of `isPiElementCompl_mem_left_of_commute`: a `π`-element of `Z = A ⊔ B` (with `A` a
@@ -7376,6 +7377,135 @@ theorem typeP_partner_centralizer_singleton [Finite G] (hG : OddOrder.BG.IsMinim
       ((U'.map Mstar.subtype).subgroupOf Mstar) := by rw [hUeq]; exact hU'
   exact (typeP_structure hG hMstarmax hMstarP hKstarMstar hKstar_hall hK_eq hU_Mstar).2.2.2.2.2
     p Fact.out Y hY hYK
+
+/-- **BG Theorem 14.7(7), the covering** (mmd L4053): every type-`P` maximal subgroup `H` is
+conjugate to `M` or to its partner `M*`.
+
+Proof: both `Ẑ_M` and `Ẑ_H` have conjugacy saturation `> ½|G|`
+(`typeP_zTilde_conjClass_gt_half`, `exists_zTilde_conjClass_gt_half_of_isTypeP`), so the
+saturations meet (`ncard_inter_nonempty_of_two_mul_gt`); a common element gives `t ∈ Ẑ_M`,
+`s ∈ Ẑ_H` with `t = c • s`.  The `σ`-part matching (`exists_inf_ne_bot_of_mem_zTilde_inter`) then
+yields a nontrivial `L*ᶜ ⊓ K` or `L*ᶜ ⊓ K*` (here `L*ᶜ = c • L*`); a line `Y` in it satisfies
+`ℳ(C_G(Y)) = {M}` (Proposition 14.2(c), `K*`-case) or `{M*}` (`typeP_partner_centralizer_singleton`,
+`K`-case), while `c⁻¹ • Y ∈ ℰ¹(L*)` gives `ℳ(C_G(c⁻¹•Y)) = {H}` (Proposition 14.2(c) for `H`).
+Transporting by `c` shows `c • H` is a maximal subgroup over `C_G(Y)`, so `c • H = M` or `M*`. -/
+theorem typeP_covering [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    {M K Kstar U Mstar : Subgroup G} (hM : M ∈ maximalSubgroups G) (hP : IsTypeP M) (hKM : K ≤ M)
+    (hK : Ch03.IsHallSubgroup (kappa M) (K.subgroupOf M))
+    (hKstar : Kstar = OddOrder.BG.Ch3.S10.Msigma M ⊓ Subgroup.centralizer (K : Set G))
+    (hU : Ch03.IsHallSubgroup ((kappa M ∪ OddOrder.BG.Ch3.S10.sigma M)ᶜ) (U.subgroupOf M))
+    (hMstarmem : IsZFamilyMember M K Mstar) (hMstarne : Mstar ≠ M)
+    (hpart : ∀ N : Subgroup G, IsZFamilyMember M K N → N = M ∨ N = Mstar)
+    {H : Subgroup G} (hHmax : H ∈ maximalSubgroups G) (hHP : IsTypeP H) :
+    IsConjugateSubgroup H M ∨ IsConjugateSubgroup H Mstar := by
+  classical
+  have hMbound := typeP_zTilde_conjClass_gt_half hG hM hP hKM hK hKstar hU hMstarmem hMstarne hpart
+  obtain ⟨L, Lstar, Uu, hLH, hL_hall, hLstar_eq, hU_H, hHbound⟩ :=
+    exists_zTilde_conjClass_gt_half_of_isTypeP hG hHmax hHP
+  obtain ⟨u, huM, huH⟩ := ncard_inter_nonempty_of_two_mul_gt hMbound hHbound
+  obtain ⟨t, htM, a, hat⟩ := huM
+  obtain ⟨s, hsH, b, hbs⟩ := huH
+  simp only [zTilde, Set.mem_diff, Set.mem_union, SetLike.mem_coe, not_or] at htM hsH
+  obtain ⟨htZ, htK, htKstar⟩ := htM
+  obtain ⟨hsZ, hsL, hsLstar⟩ := hsH
+  set c := a⁻¹ * b with hc_def
+  -- `t = c • s`.
+  have htcs : MulAut.conj c • s = t := by
+    have key : b * s * b⁻¹ = a * t * a⁻¹ := hbs.trans hat.symm
+    rw [MulAut.smul_def, MulAut.conj_apply, hc_def, mul_inv_rev, inv_inv]
+    calc a⁻¹ * b * s * (b⁻¹ * a)
+        = a⁻¹ * (b * s * b⁻¹) * a := by group
+      _ = a⁻¹ * (a * t * a⁻¹) * a := by rw [key]
+      _ = t := by group
+  have hcancel1 : ∀ X : Subgroup G, MulAut.conj c⁻¹ • (MulAut.conj c • X) = X := fun X => by
+    rw [← mul_smul, ← map_mul, inv_mul_cancel, map_one, one_smul]
+  have hcancel2 : ∀ X : Subgroup G, MulAut.conj c • (MulAut.conj c⁻¹ • X) = X := fun X => by
+    rw [← mul_smul, ← map_mul, mul_inv_cancel, map_one, one_smul]
+  -- Matching inputs.
+  have hcardL : Nat.card ↥(MulAut.conj c • L) = Nat.card ↥L :=
+    Subgroup.card_map_of_injective (MulAut.conj c).injective
+  have hcardLstar : Nat.card ↥(MulAut.conj c • Lstar) = Nat.card ↥Lstar :=
+    Subgroup.card_map_of_injective (MulAut.conj c).injective
+  have hKπ : Subgroup.IsPiSubgroup (OddOrder.BG.Ch3.S10.sigma M)ᶜ K :=
+    kappaHall_isPiSubgroup_sigmaCompl hKM hK
+  have hKstarπ : Subgroup.IsPiSubgroup (OddOrder.BG.Ch3.S10.sigma M) Kstar :=
+    Kstar_isPiSubgroup_sigma hKstar
+  have hKcent : Kstar ≤ Subgroup.centralizer (K : Set G) := hKstar ▸ inf_le_right
+  have hcLπ : Subgroup.IsPiSubgroup (OddOrder.BG.Ch3.S10.sigma H)ᶜ (MulAut.conj c • L) := by
+    intro q hq
+    rw [hcardL] at hq
+    exact kappa_subset_sigmaCompl
+      (hL_hall.1 q (by rwa [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hLH).toEquiv]))
+  have hcLstarπ :
+      Subgroup.IsPiSubgroup (OddOrder.BG.Ch3.S10.sigma H) (MulAut.conj c • Lstar) := by
+    intro q hq
+    rw [hcardLstar] at hq
+    exact OddOrder.BG.Ch3.S10.Msigma_isPiGroup H q (Nat.mem_primeFactors.mpr
+      ⟨(Nat.mem_primeFactors.mp hq).1, (Nat.dvd_of_mem_primeFactors hq).trans
+        (Subgroup.card_dvd_of_le (hLstar_eq ▸ inf_le_left)), Nat.card_pos.ne'⟩)
+  have hcLcent : MulAut.conj c • Lstar ≤ Subgroup.centralizer ((MulAut.conj c • L : Subgroup G)) := by
+    rw [← centralizer_conj_smul]
+    exact Subgroup.pointwise_smul_le_pointwise_smul_iff.mpr (hLstar_eq ▸ inf_le_right)
+  have htnL : t ∉ MulAut.conj c • L := fun ht =>
+    hsL (Subgroup.smul_mem_pointwise_smul_iff.mp (htcs.symm ▸ ht))
+  have htZ' : t ∈ (MulAut.conj c • L) ⊔ (MulAut.conj c • Lstar) := by
+    rw [← htcs, ← Subgroup.smul_sup]
+    exact Subgroup.smul_mem_pointwise_smul s (MulAut.conj c) (L ⊔ Lstar) hsZ
+  have hmatch := exists_inf_ne_bot_of_mem_zTilde_inter (πM := OddOrder.BG.Ch3.S10.sigma M)
+    (πH := OddOrder.BG.Ch3.S10.sigma H) hKπ hKstarπ hKcent hcLπ hcLstarπ hcLcent htZ htnL htZ'
+  -- Common tail: a line `Y ≤ c • L*` with `ℳ(C_G(Y)) = {N}` gives `H ~ N`.
+  have hfinish : ∀ {N : Subgroup G} {p : ℕ}, p.Prime → ∀ {Y : Subgroup G},
+      Y ∈ elemAbelianOfRank G p 1 → Y ≤ MulAut.conj c • Lstar →
+      maximalSubgroupsContaining (Subgroup.centralizer (Y : Set G)) = {N} →
+      IsConjugateSubgroup H N := by
+    intro N p hp Y hYea hYcL hN_sing
+    have hcY : MulAut.conj c⁻¹ • Y ≤ Lstar := by
+      have h1 := Subgroup.pointwise_smul_le_pointwise_smul_iff
+        (a := MulAut.conj c⁻¹) |>.mpr hYcL
+      rwa [hcancel1 Lstar] at h1
+    have hcYea : MulAut.conj c⁻¹ • Y ∈ elemAbelianOfRank G p 1 :=
+      conj_smul_mem_elemAbelianOfRank c⁻¹ hYea
+    have hH_sing := (typeP_structure hG hHmax hHP hLH hL_hall hLstar_eq hU_H).2.2.2.2.2
+      p hp _ hcYea hcY
+    have hCle : Subgroup.centralizer ((MulAut.conj c⁻¹ • Y : Subgroup G) : Set G) ≤ H :=
+      (mem_maximalSubgroupsContaining.mp (hH_sing.symm ▸ Set.mem_singleton H)).2
+    have hCYle : Subgroup.centralizer (Y : Set G) ≤ MulAut.conj c • H := by
+      have h1 := Subgroup.pointwise_smul_le_pointwise_smul_iff (a := MulAut.conj c) |>.mpr hCle
+      rwa [centralizer_conj_smul, hcancel2 Y] at h1
+    have hcHN : MulAut.conj c • H = N := by
+      have hmem : MulAut.conj c • H ∈ maximalSubgroupsContaining (Subgroup.centralizer (Y : Set G)) :=
+        mem_maximalSubgroupsContaining.mpr ⟨isCoatom_conj_smul (mem_maximalSubgroups.mp hHmax), hCYle⟩
+      rw [hN_sing] at hmem; exact Set.eq_of_mem_singleton hmem
+    exact ⟨c, hcHN⟩
+  -- Extract a line `Y` from the nontrivial intersection and finish.
+  rcases hmatch with hne | hne
+  · obtain ⟨p, hp, hpd⟩ := Nat.exists_prime_and_dvd
+      (fun h => hne (Subgroup.eq_bot_of_card_eq _ h))
+    haveI : Fact p.Prime := ⟨hp⟩
+    obtain ⟨y, hyord⟩ := exists_prime_orderOf_dvd_card' p hpd
+    have hyord' : orderOf (y : G) = p :=
+      (orderOf_injective _ (MulAut.conj c • Lstar ⊓ K).subtype_injective y).trans hyord
+    have hYcard : Nat.card ↥(Subgroup.zpowers (y : G)) = p := by rw [Nat.card_zpowers, hyord']
+    have hYea : Subgroup.zpowers (y : G) ∈ elemAbelianOfRank G p 1 :=
+      ⟨Subgroup.IsElementaryAbelian.of_card_prime hYcard, by rw [hYcard, pow_one]⟩
+    have hYS : Subgroup.zpowers (y : G) ≤ MulAut.conj c • Lstar ⊓ K :=
+      Subgroup.zpowers_le.mpr y.2
+    exact Or.inr (hfinish hp hYea (hYS.trans inf_le_left)
+      (typeP_partner_centralizer_singleton hG hM hP hKM hK hKstar hU hMstarmem hMstarne hpart
+        hYea (hYS.trans inf_le_right)))
+  · obtain ⟨p, hp, hpd⟩ := Nat.exists_prime_and_dvd
+      (fun h => hne (Subgroup.eq_bot_of_card_eq _ h))
+    haveI : Fact p.Prime := ⟨hp⟩
+    obtain ⟨y, hyord⟩ := exists_prime_orderOf_dvd_card' p hpd
+    have hyord' : orderOf (y : G) = p :=
+      (orderOf_injective _ (MulAut.conj c • Lstar ⊓ Kstar).subtype_injective y).trans hyord
+    have hYcard : Nat.card ↥(Subgroup.zpowers (y : G)) = p := by rw [Nat.card_zpowers, hyord']
+    have hYea : Subgroup.zpowers (y : G) ∈ elemAbelianOfRank G p 1 :=
+      ⟨Subgroup.IsElementaryAbelian.of_card_prime hYcard, by rw [hYcard, pow_one]⟩
+    have hYS : Subgroup.zpowers (y : G) ≤ MulAut.conj c • Lstar ⊓ Kstar :=
+      Subgroup.zpowers_le.mpr y.2
+    exact Or.inl (hfinish hp hYea (hYS.trans inf_le_left)
+      ((typeP_structure hG hM hP hKM hK hKstar hU).2.2.2.2.2 p hp _ hYea (hYS.trans inf_le_right)))
 
 /-- **BG Theorem 14.7** (mmd L3890): type-P duality and the `Z_tilde` TI-set.
 
