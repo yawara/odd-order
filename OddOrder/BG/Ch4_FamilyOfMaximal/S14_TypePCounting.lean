@@ -6856,6 +6856,83 @@ theorem isTypeP2_or_isTypeP2_partner [Finite G] (hG : OddOrder.BG.IsMinimalSimpl
   · subst h; exact Or.inl hNP2
   · subst h; exact Or.inr hNP2
 
+/-- **BG Theorem 14.7, `π(K) ⊆ σ(M*)`** (mmd L3987): every prime `p` dividing `|K|` lies in
+`σ(M*)`, for the partner `M*`.  For a line `X ∈ ℰ_p¹(K)`, the maximal subgroup over `N_G(X)` is a
+type-`P` family member nonconjugate to `M` (`exists_typeP_partner`), hence `= M*` (the only other
+member), and `X ≤ M*_σ` gives `p ∈ σ(M*)`.  This is the half forcing `K ≤ M*_σ` in the partner
+structure `Z ⊓ M*_σ = K`. -/
+theorem kappaHall_primes_subset_sigma_partner [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M K Kstar U Mstar : Subgroup G}
+    (hM : M ∈ maximalSubgroups G) (hP : IsTypeP M) (hKM : K ≤ M)
+    (hK : Ch03.IsHallSubgroup (kappa M) (K.subgroupOf M))
+    (hKstar : Kstar = OddOrder.BG.Ch3.S10.Msigma M ⊓ Subgroup.centralizer (K : Set G))
+    (hU : Ch03.IsHallSubgroup ((kappa M ∪ OddOrder.BG.Ch3.S10.sigma M)ᶜ) (U.subgroupOf M))
+    (hpart : ∀ N : Subgroup G, IsZFamilyMember M K N → N = M ∨ N = Mstar)
+    {p : ℕ} (hp : p.Prime) (hpK : p ∣ Nat.card ↥K) :
+    p ∈ OddOrder.BG.Ch3.S10.sigma Mstar := by
+  classical
+  haveI : Fact p.Prime := ⟨hp⟩
+  obtain ⟨x, hx⟩ := exists_prime_orderOf_dvd_card' p hpK
+  have hxord : orderOf (x : G) = p := (orderOf_injective K.subtype K.subtype_injective x).trans hx
+  have hXcard : Nat.card ↥(Subgroup.zpowers (x : G)) = p := by rw [Nat.card_zpowers, hxord]
+  have hXelem : Subgroup.zpowers (x : G) ∈ elemAbelianOfRank G p 1 :=
+    ⟨Subgroup.IsElementaryAbelian.of_card_prime hXcard, by rw [hXcard, pow_one]⟩
+  have hXK : Subgroup.zpowers (x : G) ≤ K := Subgroup.zpowers_le.mpr x.2
+  obtain ⟨N, hNmem, hnc, -, hXNσ, -, -⟩ :=
+    exists_typeP_partner hG hM hP hKM hK hKstar hU hXelem hXK
+  have hNfam : IsZFamilyMember M K N :=
+    Or.inr ⟨p, Subgroup.zpowers (x : G), hp, hXelem, hXK, hNmem⟩
+  have hNM : N ≠ M :=
+    fun h => hnc (h ▸ (⟨1, by rw [map_one, one_smul]⟩ : IsConjugateSubgroup M M))
+  have hNMstar : N = Mstar := (hpart N hNfam).resolve_left hNM
+  rw [← hNMstar]
+  exact OddOrder.BG.Ch3.S10.Msigma_isPiGroup N p (Nat.mem_primeFactors.mpr
+    ⟨hp, (dvd_of_eq hXcard.symm).trans (Subgroup.card_dvd_of_le hXNσ), Nat.card_pos.ne'⟩)
+
+/-- **BG Theorem 14.7, the partner canonical factor** (mmd L3995): `Z ⊓ M*_σ = K`.  In the swap
+`Z = M*'s K* × M*'s κ-Hall`, the partner's canonical factor `Z ⊓ M*_σ` equals `K` (the original
+`M`'s Hall `κ`-subgroup).  Two inclusions: `Z ⊓ M*_σ` is a `σ(M)′`-subgroup of the direct product
+`Z = K × K*` (`σ(M*) ∩ σ(M) = ∅`), so it lies in the `σ(M)′`-Hall factor `K`
+(`isPiSubgroup_le_left_of_commute`); conversely `K ≤ M*_σ` because every prime of `K` lies in
+`σ(M*)` (`kappaHall_primes_subset_sigma_partner`).  This is the structural fact that turns the
+family's `T = Z − ⋃ Kᵢ*` into `Ẑ = Z − (K ∪ K*)`. -/
+theorem partner_canonical_eq [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    {M K Kstar U Mstar : Subgroup G} (hM : M ∈ maximalSubgroups G) (hP : IsTypeP M) (hKM : K ≤ M)
+    (hK : Ch03.IsHallSubgroup (kappa M) (K.subgroupOf M))
+    (hKstar : Kstar = OddOrder.BG.Ch3.S10.Msigma M ⊓ Subgroup.centralizer (K : Set G))
+    (hU : Ch03.IsHallSubgroup ((kappa M ∪ OddOrder.BG.Ch3.S10.sigma M)ᶜ) (U.subgroupOf M))
+    (hMstarmem : IsZFamilyMember M K Mstar) (hMstarne : Mstar ≠ M)
+    (hpart : ∀ N : Subgroup G, IsZFamilyMember M K N → N = M ∨ N = Mstar) :
+    (K ⊔ Kstar) ⊓ OddOrder.BG.Ch3.S10.Msigma Mstar = K := by
+  classical
+  have hMstarmax : Mstar ∈ maximalSubgroups G :=
+    (typeP_family_member_data hG hM hP hKM hK hKstar hU hMstarmem).1
+  have hZMstar : K ⊔ Kstar ≤ Mstar :=
+    (typeP_family_member_data hG hM hP hKM hK hKstar hU hMstarmem).2.2.1
+  have hnc : ¬ IsConjugateSubgroup M Mstar :=
+    typeP_family_pairwise_nonconjugate hG hM hP hKM hK hKstar hU (Or.inl rfl) hMstarmem
+      (Ne.symm hMstarne)
+  have hσdisj : Disjoint (OddOrder.BG.Ch3.S10.sigma M) (OddOrder.BG.Ch3.S10.sigma Mstar) :=
+    sigma_disjoint_of_nonconjugate hG hM hMstarmax hnc
+  refine le_antisymm ?_ (le_inf le_sup_left ?_)
+  · -- `Z ⊓ M*_σ ≤ K`: it is a `σ(M)′`-subgroup of `Z = K × K*`
+    refine isPiSubgroup_le_left_of_commute (π := OddOrder.BG.Ch3.S10.sigma M) rfl
+      (hKstar ▸ inf_le_right) (kappaHall_isPiSubgroup_sigmaCompl hKM hK) (fun q hq => ?_)
+      inf_le_left (fun q hq => ?_)
+    · exact OddOrder.BG.Ch3.S10.Msigma_isPiGroup M q (Nat.mem_primeFactors.mpr
+        ⟨(Nat.mem_primeFactors.mp hq).1, (Nat.dvd_of_mem_primeFactors hq).trans
+          (Subgroup.card_dvd_of_le (hKstar.le.trans inf_le_left)), Nat.card_pos.ne'⟩)
+    · have hqσMstar : q ∈ OddOrder.BG.Ch3.S10.sigma Mstar :=
+        OddOrder.BG.Ch3.S10.Msigma_isPiGroup Mstar q (Nat.mem_primeFactors.mpr
+          ⟨(Nat.mem_primeFactors.mp hq).1, (Nat.dvd_of_mem_primeFactors hq).trans
+            (Subgroup.card_dvd_of_le inf_le_right), Nat.card_pos.ne'⟩)
+      exact fun hqσM => Set.disjoint_left.mp hσdisj hqσM hqσMstar
+  · -- `K ≤ M*_σ`: every prime of `K` lies in `σ(M*)`
+    refine OddOrder.BG.Ch3.S10.sigma_subgroup_le_Msigma_of_isHall
+      (OddOrder.BG.Ch3.S10.Msigma_isHall hG hMstarmax) (le_sup_left.trans hZMstar) (fun q hq => ?_)
+    exact kappaHall_primes_subset_sigma_partner hG hM hP hKM hK hKstar hU hpart
+      (Nat.prime_of_mem_primeFactors hq) (Nat.dvd_of_mem_primeFactors hq)
+
 /-- **BG Theorem 14.7** (mmd L3890): type-P duality and the `Z_tilde` TI-set.
 
 For a type-P maximal subgroup `M`, there is a unique nonconjugate type-P partner
