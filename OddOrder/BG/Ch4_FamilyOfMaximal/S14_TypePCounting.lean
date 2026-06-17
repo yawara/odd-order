@@ -5504,6 +5504,33 @@ theorem typeP_family_Kstar_disjoint [Finite G] (hG : OddOrder.BG.IsMinimalSimple
         (Nat.mem_primeFactors.mpr ⟨hr, hr₂, Nat.card_pos.ne'⟩))
   exact le_bot_iff.mp (le_trans (inf_le_inf inf_le_right inf_le_right) (le_of_eq hMσdisj))
 
+/-- **BG 14.7, the family `Kᵢ*` have pairwise coprime order** (mmd L4009): for distinct members
+`N₁ ≠ N₂`, `|Kᵢ*| = |Z ⊓ M_σ(Nᵢ)|` are coprime — each `Kᵢ*` is a `σ(Nᵢ)`-group and the `σ(Nᵢ)` are
+pairwise disjoint (Theorem 13.9 via `typeP_family_pairwise_nonconjugate`).  This is the
+coprime-orders input to `card_iSup_of_pairwise_commute_coprime` for `z = ∏ kᵢ*`. -/
+theorem typeP_family_Kstar_coprime [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    {M K Kstar U : Subgroup G} (hM : M ∈ maximalSubgroups G) (hP : IsTypeP M) (hKM : K ≤ M)
+    (hK : Ch03.IsHallSubgroup (kappa M) (K.subgroupOf M))
+    (hKstar : Kstar = OddOrder.BG.Ch3.S10.Msigma M ⊓ Subgroup.centralizer (K : Set G))
+    (hU : Ch03.IsHallSubgroup ((kappa M ∪ OddOrder.BG.Ch3.S10.sigma M)ᶜ) (U.subgroupOf M))
+    {N₁ N₂ : Subgroup G} (hN₁ : IsZFamilyMember M K N₁) (hN₂ : IsZFamilyMember M K N₂)
+    (hne : N₁ ≠ N₂) :
+    Nat.Coprime (Nat.card ↥((K ⊔ Kstar) ⊓ OddOrder.BG.Ch3.S10.Msigma N₁))
+      (Nat.card ↥((K ⊔ Kstar) ⊓ OddOrder.BG.Ch3.S10.Msigma N₂)) := by
+  obtain ⟨hN₁max, _, _, _⟩ := typeP_family_member_data hG hM hP hKM hK hKstar hU hN₁
+  obtain ⟨hN₂max, _, _, _⟩ := typeP_family_member_data hG hM hP hKM hK hKstar hU hN₂
+  have hnc := typeP_family_pairwise_nonconjugate hG hM hP hKM hK hKstar hU hN₁ hN₂ hne
+  have hσdisj := OddOrder.BG.Ch3.S13.sigma_disjoint_of_nonconjugate hG hN₁max hN₂max hnc
+  refine coprime_of_forall_prime_not_dvd ?_
+  intro r hr hr₁ hr₂
+  exact Set.disjoint_left.mp hσdisj
+    (OddOrder.BG.Ch3.S10.Msigma_isPiGroup N₁ r
+      (Nat.mem_primeFactors.mpr
+        ⟨hr, hr₁.trans (Subgroup.card_dvd_of_le inf_le_right), Nat.card_pos.ne'⟩))
+    (OddOrder.BG.Ch3.S10.Msigma_isPiGroup N₂ r
+      (Nat.mem_primeFactors.mpr
+        ⟨hr, hr₂.trans (Subgroup.card_dvd_of_le inf_le_right), Nat.card_pos.ne'⟩))
+
 /-- **BG 14.7, the type-`P` family as a `Finset`** (mmd L4003): `{N | IsZFamilyMember M K N}`
 collected as a `Finset` (finite since `Subgroup G` is finite). -/
 noncomputable def ZFamilyFinset [Finite G] (M K : Subgroup G) : Finset (Subgroup G) :=
@@ -5536,6 +5563,227 @@ theorem typeP_family_T_count [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
   intro N₁ hN₁ N₂ hN₂ hne
   exact typeP_family_Kstar_disjoint hG hM hP hKM hK hKstar hU
     (mem_ZFamilyFinset.mp hN₁) (mem_ZFamilyFinset.mp hN₂) hne
+
+/-- **BG 14.7, each family factor `Kᵢ* ◁ Z`** (mmd L3995 "`N_{M_i}(X*) = K_i × K_i*`"): every member
+`N` of the type-`P` family has its canonical factor `Z ⊓ M_σ(N)` normalised by all of `Z = K ⊔ K*`.
+For `N = M` this is `typeP_self_member`; for a neighbour it is the normality clause of
+`exists_neighbor_full`.  Feeds the `Z`-stability of `T` (`hstab` for the TI count). -/
+theorem typeP_family_member_normal [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    {M K Kstar U : Subgroup G} (hM : M ∈ maximalSubgroups G) (hP : IsTypeP M) (hKM : K ≤ M)
+    (hK : Ch03.IsHallSubgroup (kappa M) (K.subgroupOf M))
+    (hKstar : Kstar = OddOrder.BG.Ch3.S10.Msigma M ⊓ Subgroup.centralizer (K : Set G))
+    (hU : Ch03.IsHallSubgroup ((kappa M ∪ OddOrder.BG.Ch3.S10.sigma M)ᶜ) (U.subgroupOf M))
+    {N : Subgroup G} (hN : IsZFamilyMember M K N) :
+    K ⊔ Kstar ≤ Subgroup.normalizer
+      (((K ⊔ Kstar) ⊓ OddOrder.BG.Ch3.S10.Msigma N : Subgroup G) : Set G) := by
+  rcases hN with hNM | ⟨p, X, hp, hX, hXK, hN⟩
+  · rw [hNM]; exact (typeP_self_member hG hM hP hKM hK hKstar hU).2.2.1
+  · haveI : Fact p.Prime := ⟨hp⟩
+    have hCX : OddOrder.BG.Ch3.S10.Msigma M ⊓ Subgroup.centralizer (X : Set G) ≠ ⊥ := by
+      intro hbot
+      refine (typeP_structure hG hM hP hKM hK hKstar hU).2.1 (le_bot_iff.mp ?_)
+      rw [hKstar]
+      calc OddOrder.BG.Ch3.S10.Msigma M ⊓ Subgroup.centralizer (K : Set G)
+          ≤ OddOrder.BG.Ch3.S10.Msigma M ⊓ Subgroup.centralizer (X : Set G) :=
+            inf_le_inf_left _ (Subgroup.centralizer_le (SetLike.coe_subset_coe.mpr hXK))
+        _ = ⊥ := hbot
+    obtain ⟨_, _, _, _, hnorm, _, _⟩ :=
+      exists_neighbor_full hG hM hP hKM hK hKstar hU hX hXK hCX hN
+    exact hnorm
+
+/-- **BG 14.7, the family `Kᵢ*` pairwise commute** (mmd L4009): for distinct members `N₁ ≠ N₂`, the
+canonical factors `Z ⊓ M_σ(Nᵢ)` centralise each other — both are normalised by `Z`
+(`typeP_family_member_normal`) and meet trivially (`typeP_family_Kstar_disjoint`), so their
+commutator lies in their (trivial) intersection.  The commute input to
+`card_iSup_of_pairwise_commute_coprime` for `z = ∏ kᵢ*`. -/
+theorem typeP_family_Kstar_commute [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    {M K Kstar U : Subgroup G} (hM : M ∈ maximalSubgroups G) (hP : IsTypeP M) (hKM : K ≤ M)
+    (hK : Ch03.IsHallSubgroup (kappa M) (K.subgroupOf M))
+    (hKstar : Kstar = OddOrder.BG.Ch3.S10.Msigma M ⊓ Subgroup.centralizer (K : Set G))
+    (hU : Ch03.IsHallSubgroup ((kappa M ∪ OddOrder.BG.Ch3.S10.sigma M)ᶜ) (U.subgroupOf M))
+    {N₁ N₂ : Subgroup G} (hN₁ : IsZFamilyMember M K N₁) (hN₂ : IsZFamilyMember M K N₂)
+    (hne : N₁ ≠ N₂) :
+    ∀ x ∈ (K ⊔ Kstar) ⊓ OddOrder.BG.Ch3.S10.Msigma N₁,
+      ∀ y ∈ (K ⊔ Kstar) ⊓ OddOrder.BG.Ch3.S10.Msigma N₂, Commute x y :=
+  commute_of_le_normalizer_of_disjoint inf_le_left inf_le_left
+    (typeP_family_member_normal hG hM hP hKM hK hKstar hU hN₁)
+    (typeP_family_member_normal hG hM hP hKM hK hKstar hU hN₂)
+    (typeP_family_Kstar_disjoint hG hM hP hKM hK hKstar hU hN₁ hN₂ hne)
+
+/-- **BG 14.7, `Z` normalises `T`** (mmd L4029, "`N_G(T) = Z`" half — the easy `Z ≤ N_G(T)` part):
+conjugation by any `l ∈ Z = K ⊔ K*` fixes the set `T = Z − ⋃_{N} (Z ⊓ M_σ(N))`, because `l`
+normalises `Z` (self-normalisation) and each canonical factor `Z ⊓ M_σ(N)`
+(`typeP_family_member_normal`).  This is the `hstab` hypothesis of
+`ncard_conjClassSet_of_isTISubset` once `T` is shown to be a TI-subset. -/
+theorem typeP_family_Z_normalizes_T [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    {M K Kstar U : Subgroup G} (hM : M ∈ maximalSubgroups G) (hP : IsTypeP M) (hKM : K ≤ M)
+    (hK : Ch03.IsHallSubgroup (kappa M) (K.subgroupOf M))
+    (hKstar : Kstar = OddOrder.BG.Ch3.S10.Msigma M ⊓ Subgroup.centralizer (K : Set G))
+    (hU : Ch03.IsHallSubgroup ((kappa M ∪ OddOrder.BG.Ch3.S10.sigma M)ᶜ) (U.subgroupOf M)) :
+    ∀ l ∈ K ⊔ Kstar, MulAut.conj l •
+        (((K ⊔ Kstar : Subgroup G) : Set G) \
+          ⋃ N ∈ ZFamilyFinset M K,
+            (((K ⊔ Kstar) ⊓ OddOrder.BG.Ch3.S10.Msigma N : Subgroup G) : Set G))
+      = ((K ⊔ Kstar : Subgroup G) : Set G) \
+          ⋃ N ∈ ZFamilyFinset M K,
+            (((K ⊔ Kstar) ⊓ OddOrder.BG.Ch3.S10.Msigma N : Subgroup G) : Set G) := by
+  intro l hl
+  rw [Set.smul_set_sdiff, Set.smul_set_iUnion₂]
+  congr 1
+  · rw [← Subgroup.coe_pointwise_smul,
+      conj_smul_eq_self_of_mem_normalizer (Subgroup.le_normalizer hl)]
+  · refine Set.iUnion₂_congr (fun N hN => ?_)
+    rw [← Subgroup.coe_pointwise_smul,
+      conj_smul_eq_self_of_mem_normalizer
+        (typeP_family_member_normal hG hM hP hKM hK hKstar hU (mem_ZFamilyFinset.mp hN) hl)]
+
+/-- **BG Proposition 14.2(d), second assertion** (mmd L3827): for a type-`P` maximal `M` with Hall
+`κ(M)`-subgroup `K` and `K* = C_{M_σ}(K)`, every `g ∈ M − (K ⊔ K*)` satisfies `K ∩ K^g = 1`.
+
+BG: "the second assertion follows easily from (b1) since `K` is a Z-group."  Lean proof: a
+nontrivial element of `K ∩ K^g` gives a rank-one `X = ⟨x⟩ ≤ K` of prime order `p` and its conjugate
+`Y = ⟨g⁻¹ x g⟩ ≤ K`.  By Proposition 14.2(b1) (`typeP_structure`), `N_G(X) ⊓ M = N_G(Y) ⊓ M = Z`, so
+`K` normalises both.  Since `g ∈ M` but `g ∉ Z`, `g ∉ N_G(X)`, hence `MulAut.conj g⁻¹ • X ≠ X`,
+i.e. `X ≠ Y`.  Two distinct normal rank-one subgroups of `K` generate an elementary abelian `p²`
+inside `M`, forcing `pRank_M(p) ≥ 2` — contradicting `pRank_M(p) = 1` (`p ∈ π(K) ⊆ κ(M) ⊆ τ₁ ∪ τ₃`).
+This is the `(d)`-clause the TI-argument of Theorem 14.7 invokes (`g ∈ K_i × K_i*`). -/
+theorem typeP_kappaHall_inf_conj_eq_bot [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    {M K Kstar U : Subgroup G} (hM : M ∈ maximalSubgroups G) (hP : IsTypeP M) (hKM : K ≤ M)
+    (hK : Ch03.IsHallSubgroup (kappa M) (K.subgroupOf M))
+    (hKstar : Kstar = OddOrder.BG.Ch3.S10.Msigma M ⊓ Subgroup.centralizer (K : Set G))
+    (hU : Ch03.IsHallSubgroup ((kappa M ∪ OddOrder.BG.Ch3.S10.sigma M)ᶜ) (U.subgroupOf M))
+    {g : G} (hgM : g ∈ M) (hgZ : g ∉ K ⊔ Kstar) :
+    K ⊓ (MulAut.conj g • K) = ⊥ := by
+  classical
+  by_contra hne
+  -- A prime `p ∣ |K ∩ K^g|` and an order-`p` element `x ∈ K ∩ K^g`.
+  have hcard_ne : Nat.card ↥(K ⊓ (MulAut.conj g • K)) ≠ 1 :=
+    fun h => hne (Subgroup.eq_bot_of_card_eq _ h)
+  obtain ⟨p, hp_prime, hp_dvd⟩ := Nat.exists_prime_and_dvd hcard_ne
+  haveI : Fact p.Prime := ⟨hp_prime⟩
+  obtain ⟨x, hxord⟩ := exists_prime_orderOf_dvd_card' p hp_dvd
+  have hxmem : (x : G) ∈ K ⊓ (MulAut.conj g • K) := x.2
+  have hxK : (x : G) ∈ K := (Subgroup.mem_inf.mp hxmem).1
+  have hxKg : (x : G) ∈ MulAut.conj g • K := (Subgroup.mem_inf.mp hxmem).2
+  have hxord' : orderOf (x : G) = p :=
+    (orderOf_injective (K ⊓ (MulAut.conj g • K)).subtype
+      (K ⊓ (MulAut.conj g • K)).subtype_injective x).trans hxord
+  have hxne1 : (x : G) ≠ 1 := fun h => hp_prime.ne_one (by rw [← hxord', h, orderOf_one])
+  -- `X = ⟨x⟩ ≤ K`, rank-one.
+  set X := Subgroup.zpowers (x : G) with hXdef
+  have hXcard : Nat.card ↥X = p := by rw [hXdef, Nat.card_zpowers, hxord']
+  have hXea : X ∈ elemAbelianOfRank G p 1 :=
+    ⟨Subgroup.IsElementaryAbelian.of_card_prime hXcard, by rw [hXcard, pow_one]⟩
+  have hXleK : X ≤ K := Subgroup.zpowers_le.mpr hxK
+  -- `Y = ⟨g⁻¹ x g⟩ ≤ K`, rank-one (`g⁻¹ x g ∈ K` since `x ∈ K^g`).
+  have hgxgK : g⁻¹ * (x : G) * g ∈ K := by
+    rw [Subgroup.mem_pointwise_smul_iff_inv_smul_mem] at hxKg
+    simpa [MulAut.smul_def] using hxKg
+  set y₀ := g⁻¹ * (x : G) * g with hy₀def
+  have hy₀conj : y₀ = (MulAut.conj g⁻¹).toMonoidHom (x : G) := by
+    rw [hy₀def, MulEquiv.coe_toMonoidHom, MulAut.conj_apply]; group
+  have hy₀ord : orderOf y₀ = p := by
+    rw [hy₀conj, orderOf_injective (MulAut.conj g⁻¹).toMonoidHom (MulAut.conj g⁻¹).injective]
+    exact hxord'
+  set Y := Subgroup.zpowers y₀ with hYdef
+  have hYcard : Nat.card ↥Y = p := by rw [hYdef, Nat.card_zpowers, hy₀ord]
+  have hYea : Y ∈ elemAbelianOfRank G p 1 :=
+    ⟨Subgroup.IsElementaryAbelian.of_card_prime hYcard, by rw [hYcard, pow_one]⟩
+  have hYleK : Y ≤ K := Subgroup.zpowers_le.mpr hgxgK
+  -- (b1): `N_G(X) ⊓ M = N_G(Y) ⊓ M = Z`, so `K` normalises both.
+  have hb1 := (typeP_structure hG hM hP hKM hK hKstar hU).2.2.1
+  have hNX : Subgroup.normalizer (X : Set G) ⊓ M = K ⊔ Kstar := hb1 p hp_prime X hXea hXleK
+  have hNY : Subgroup.normalizer (Y : Set G) ⊓ M = K ⊔ Kstar := hb1 p hp_prime Y hYea hYleK
+  have hKNX : K ≤ Subgroup.normalizer (X : Set G) :=
+    le_trans (le_trans le_sup_left hNX.ge) inf_le_left
+  have hKNY : K ≤ Subgroup.normalizer (Y : Set G) :=
+    le_trans (le_trans le_sup_left hNY.ge) inf_le_left
+  -- `X ≠ Y`: else `MulAut.conj g⁻¹ • X = Y = X`, so `g ∈ N_G(X) ⊓ M = Z`, against `g ∉ Z`.
+  have hXneY : X ≠ Y := by
+    intro hXeqY
+    have hsmulXY : MulAut.conj g⁻¹ • X = Y := by
+      rw [hXdef, hYdef, hy₀conj,
+        show MulAut.conj g⁻¹ • Subgroup.zpowers (x : G)
+          = (Subgroup.zpowers (x : G)).map (MulAut.conj g⁻¹).toMonoidHom from rfl,
+        MonoidHom.map_zpowers]
+    have hginvNX : g⁻¹ ∈ Subgroup.normalizer (X : Set G) :=
+      mem_normalizer_of_conj_smul_eq_self (hsmulXY.trans hXeqY.symm)
+    have hgNX : g ∈ Subgroup.normalizer (X : Set G) := by
+      simpa using (Subgroup.normalizer (X : Set G)).inv_mem hginvNX
+    exact hgZ (hNX ▸ Subgroup.mem_inf.mpr ⟨hgNX, hgM⟩)
+  -- `X ⊓ Y = ⊥` (distinct rank-one subgroups of prime order `p`).
+  have hXYbot : X ⊓ Y = ⊥ := by
+    by_contra hb
+    have hdvd : Nat.card ↥(X ⊓ Y) ∣ p := hXcard ▸ Subgroup.card_dvd_of_le inf_le_left
+    have hne1 : Nat.card ↥(X ⊓ Y) ≠ 1 := fun h => hb (Subgroup.eq_bot_of_card_eq _ h)
+    have hpeq : Nat.card ↥(X ⊓ Y) = p := ((Nat.dvd_prime hp_prime).mp hdvd).resolve_left hne1
+    have hXY_eq_X : X ⊓ Y = X :=
+      Subgroup.eq_of_le_of_card_ge inf_le_left (hXcard.le.trans hpeq.ge)
+    exact hXneY (Subgroup.eq_of_le_of_card_ge (hXY_eq_X ▸ inf_le_right)
+      (hYcard.le.trans hXcard.ge))
+  -- `X`, `Y` commute (both normal in `K`, trivial meet), so `X ⊔ Y` is elementary abelian `p²`.
+  have hcomm : ∀ a ∈ X, ∀ b ∈ Y, Commute a b :=
+    commute_of_le_normalizer_of_disjoint hXleK hYleK hKNX hKNY hXYbot
+  have hXcentY : X ≤ Subgroup.centralizer (Y : Set G) := fun a ha =>
+    (Subgroup.mem_centralizer_iff).mpr fun b hb => (hcomm a ha b hb).symm
+  have hsupea : (X ⊔ Y).IsElementaryAbelian p :=
+    Subgroup.IsElementaryAbelian.sup_of_le_centralizer hXea.1 hYea.1 hXcentY
+  have hsupcard : Nat.card ↥(X ⊔ Y) = p ^ 2 := by
+    rw [card_sup_of_commute_of_disjoint hcomm hXYbot, hXcard, hYcard]; ring
+  -- `X ⊔ Y ≤ M`, witnessing `pRank_M(p) ≥ 2`.
+  have hsupM : X ⊔ Y ≤ M := sup_le (hXleK.trans hKM) (hYleK.trans hKM)
+  have hsubea : ((X ⊔ Y).subgroupOf M).IsElementaryAbelian p :=
+    IsElementaryAbelian.of_mulEquiv (Subgroup.subgroupOfEquivOfLe hsupM).symm hsupea
+  have hsubcard : Nat.card ↥((X ⊔ Y).subgroupOf M) = p ^ 2 := by
+    rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hsupM).toEquiv, hsupcard]
+  have hle := le_pRank ((X ⊔ Y).subgroupOf M) hsubea
+  rw [hsubcard, Nat.log_pow hp_prime.one_lt] at hle
+  -- but `pRank_M(p) = 1` since `p ∈ π(K) ⊆ κ(M) ⊆ τ₁ ∪ τ₃`.
+  have hp_kappa : p ∈ kappa M := by
+    apply hK.1 p
+    rw [Nat.mem_primeFactors]
+    refine ⟨hp_prime, ?_, Nat.card_pos.ne'⟩
+    rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hKM).toEquiv]
+    exact hp_dvd.trans (Subgroup.card_dvd_of_le inf_le_left)
+  have hpRank1 : pRank ↥M p = 1 := by
+    rcases kappa_subset_tau1_union_tau3 hp_kappa with h | h
+    · exact tau1_pRank_eq_one h
+    · exact tau3_pRank_eq_one h
+  omega
+
+/-- **BG 14.7, the family `σ(Nᵢ)` cover `π(z)`** (mmd L4007 "each `X ∈ ℰ¹(Z)` lies in some `Kᵢ*`"):
+every prime `p ∣ |Z|` lies in `σ(N)` for some family member `N`.  For `p ∣ |K*|` it is the base
+member `M` (`K* ≤ M_σ`, `Kstar_isPiSubgroup_sigma`); for `p ∣ |K|` (`p ∈ κ(M)`) a line
+`X ∈ ℰ_p¹(K)` has a type-`P` partner `N ∈ 𝓜(N_G(X))` — a family member — with `X ⊆ M_σ(N)`, so
+`p ∈ σ(N)`.  This coverage forces `⋂ᵢ Kᵢ = 1`, i.e. the `t = yy'` characterisation of `T`. -/
+theorem typeP_family_sigma_covers [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    {M K Kstar U : Subgroup G} (hM : M ∈ maximalSubgroups G) (hP : IsTypeP M) (hKM : K ≤ M)
+    (hK : Ch03.IsHallSubgroup (kappa M) (K.subgroupOf M))
+    (hKstar : Kstar = OddOrder.BG.Ch3.S10.Msigma M ⊓ Subgroup.centralizer (K : Set G))
+    (hU : Ch03.IsHallSubgroup ((kappa M ∪ OddOrder.BG.Ch3.S10.sigma M)ᶜ) (U.subgroupOf M))
+    {p : ℕ} (hp : p.Prime) (hpZ : p ∣ Nat.card ↥(K ⊔ Kstar)) :
+    ∃ N : Subgroup G, IsZFamilyMember M K N ∧ p ∈ OddOrder.BG.Ch3.S10.sigma N := by
+  classical
+  rw [card_kappaHall_sup_Kstar hKM hK hKstar] at hpZ
+  rcases hp.dvd_mul.mp hpZ with hpK | hpKstar
+  · -- `p ∣ k`: a line `X ∈ ℰ_p¹(K)` and its type-`P` partner is a family member.
+    haveI : Fact p.Prime := ⟨hp⟩
+    obtain ⟨x, hx⟩ := exists_prime_orderOf_dvd_card' p hpK
+    have hxord : orderOf (x : G) = p :=
+      (orderOf_injective K.subtype K.subtype_injective x).trans hx
+    have hXcard : Nat.card ↥(Subgroup.zpowers (x : G)) = p := by rw [Nat.card_zpowers, hxord]
+    have hXelem : Subgroup.zpowers (x : G) ∈ elemAbelianOfRank G p 1 :=
+      ⟨Subgroup.IsElementaryAbelian.of_card_prime hXcard, by rw [hXcard, pow_one]⟩
+    have hXK : Subgroup.zpowers (x : G) ≤ K := Subgroup.zpowers_le.mpr x.2
+    obtain ⟨N, hNmem, _, _, hXNσ, _, _⟩ :=
+      exists_typeP_partner hG hM hP hKM hK hKstar hU hXelem hXK
+    refine ⟨N, Or.inr ⟨p, Subgroup.zpowers (x : G), hp, hXelem, hXK, hNmem⟩, ?_⟩
+    exact OddOrder.BG.Ch3.S10.Msigma_isPiGroup N p (Nat.mem_primeFactors.mpr
+      ⟨hp, (by rw [hXcard] : p ∣ Nat.card ↥(Subgroup.zpowers (x : G))).trans
+        (Subgroup.card_dvd_of_le hXNσ), Nat.card_pos.ne'⟩)
+  · -- `p ∣ k*`: the base member `M` itself, since `K* ≤ M_σ`.
+    exact ⟨M, Or.inl rfl, Kstar_isPiSubgroup_sigma hKstar p
+      (Nat.mem_primeFactors.mpr ⟨hp, hpKstar, Nat.card_pos.ne'⟩)⟩
 
 /-- **BG Theorem 14.7** (mmd L3890): type-P duality and the `Z_tilde` TI-set.
 
