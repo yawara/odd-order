@@ -1,0 +1,189 @@
+/-
+Copyright (c) 2026 Yawara Ishida. All rights reserved.
+Released under Apache 2.0 license as described in the file LICENSE.
+Authors: Yawara Ishida
+-/
+import Mathlib.GroupTheory.GroupAction.Quotient
+import Mathlib.GroupTheory.GroupAction.Basic
+import Mathlib.GroupTheory.Index
+import Mathlib.SetTheory.Cardinal.Finite
+import Mathlib.Data.Set.Card
+import Mathlib.Algebra.Order.BigOperators.Group.Finset
+import Mathlib.Algebra.BigOperators.Ring.Finset
+
+/-!
+# Free-action orbit count
+
+For Peterfalvi (9.1)'s kernel-FPF count (†) (step 3d.3a), the orbit-count Brauer equality transfers
+"`⟨e⟩` free on the nontrivial classes" to the simples as a bare orbit *count* `1 + (n−1)/d`; we must
+recover from that count alone that the action on the simples is again free off a single fixed point.
+
+This file proves that purely combinatorial fact:
+
+`orbit_trivial_or_free_of_card_orbits` — a finite group `Γ` of order `d > 1` acting on a finite
+nonempty type `S` of size `n` with exactly `1 + (n−1)/d` orbits (and `d ∣ n−1`) has **every orbit of
+size `1` or `d`**, and **at most one fixed point**.
+
+The argument needs no primality of `d`.  Writing `sω` for the orbit sizes (`sω ∣ d`, `∑ sω = n`),
+the "defect sum" is `∑ω (d − sω) = d·#orbits − n = d − 1`.  Every *proper* divisor of `d` satisfies
+`2·sω ≤ d`, so each nonzero defect is `≥ d/2`, i.e. `2·(d − sω) ≥ d`; summing, `#{proper}·d ≤ 2(d−1)
+< 2d`, forcing at most one proper orbit — which must then have `d − sω = d − 1`, i.e. exactly one
+orbit of size `1`, all others of size `d`.
+-/
+
+open MulAction
+
+namespace OddOrder.GroupTheory.FreeActionOrbitCount
+
+variable {Γ S : Type*} [Group Γ] [Finite Γ] [Finite S] [MulAction Γ S]
+
+omit [Finite Γ] [Finite S] in
+/-- Each orbit's cardinality divides the group order (orbit–stabiliser). -/
+theorem card_orbit_dvd_card_group (x : S) : Nat.card (orbit Γ x) ∣ Nat.card Γ := by
+  rw [Nat.card_congr (orbitEquivQuotientStabilizer Γ x)]
+  exact (stabilizer Γ x).index_dvd_card
+
+/-- A proper divisor `s` of `d` satisfies `2 * s ≤ d` (its cofactor is `≥ 2`). -/
+theorem two_mul_le_of_dvd_of_lt {s d : ℕ} (hdvd : s ∣ d) (_hpos : 0 < s) (hlt : s < d) :
+    2 * s ≤ d := by
+  obtain ⟨k, rfl⟩ := hdvd
+  have hk : 2 ≤ k := by
+    by_contra hk
+    have : k = 0 ∨ k = 1 := by omega
+    rcases this with rfl | rfl
+    · simp at hlt
+    · simp at hlt
+  calc 2 * s ≤ k * s := by gcongr
+    _ = s * k := mul_comm k s
+
+omit [Finite Γ] [Finite S] in
+/-- A fixed point has a singleton orbit. -/
+theorem orbit_eq_singleton_of_mem_fixedPoints {x : S} (hx : x ∈ fixedPoints Γ S) :
+    orbit Γ x = {x} := by
+  ext w
+  simp only [Set.mem_singleton_iff, mem_orbit_iff]
+  constructor
+  · rintro ⟨g, rfl⟩; exact (mem_fixedPoints.mp hx) g
+  · rintro rfl; exact ⟨1, one_smul _ _⟩
+
+omit [Finite Γ] in
+/-- **Free-action orbit count.**  If a finite group `Γ` of order `d > 1` acts on a finite nonempty
+type `S` of size `n`, with exactly `1 + (n − 1) / d` orbits and `d ∣ n − 1`, then every orbit has
+size `1` or `d`, and there is at most one fixed point.  (For Peterfalvi (9.1): the count carried
+over from the free-on-nontrivial-classes side forces freeness on the nontrivial simples.) -/
+theorem orbit_trivial_or_free_of_card_orbits [Nonempty S]
+    (hd : 1 < Nat.card Γ)
+    (horb : Nat.card (orbitRel.Quotient Γ S) = 1 + (Nat.card S - 1) / Nat.card Γ)
+    (hdvd : Nat.card Γ ∣ Nat.card S - 1) :
+    (∀ x : S, Nat.card (orbit Γ x) = 1 ∨ Nat.card (orbit Γ x) = Nat.card Γ) ∧
+      (∀ x y : S, x ∈ fixedPoints Γ S → y ∈ fixedPoints Γ S → x = y) := by
+  classical
+  set d := Nat.card Γ with hd_def
+  haveI : Fintype (orbitRel.Quotient Γ S) := Fintype.ofFinite _
+  have hn_pos : 1 ≤ Nat.card S := Nat.card_pos
+  -- per-orbit cardinality facts.
+  have hs_dvd : ∀ ω : orbitRel.Quotient Γ S, Nat.card ω.orbit ∣ d := by
+    intro ω
+    obtain ⟨a, rfl⟩ := Quotient.mk''_surjective ω
+    rw [orbitRel.Quotient.orbit_mk]
+    exact card_orbit_dvd_card_group a
+  have hs_pos : ∀ ω : orbitRel.Quotient Γ S, 0 < Nat.card ω.orbit := by
+    intro ω
+    obtain ⟨a, rfl⟩ := Quotient.mk''_surjective ω
+    rw [orbitRel.Quotient.orbit_mk]
+    haveI : Nonempty (orbit Γ a) := ⟨⟨a, mem_orbit_self a⟩⟩
+    haveI : Finite (orbit Γ a) := Set.finite_coe_iff.mpr (Set.toFinite _)
+    exact Nat.card_pos
+  have hs_le : ∀ ω : orbitRel.Quotient Γ S, Nat.card ω.orbit ≤ d :=
+    fun ω => Nat.le_of_dvd (by omega) (hs_dvd ω)
+  -- the partition sum and the count hypothesis give the defect sum `∑ (d - sω) = d - 1`.
+  have hsum : ∑ ω : orbitRel.Quotient Γ S, Nat.card ω.orbit = Nat.card S := by
+    haveI : ∀ ω : orbitRel.Quotient Γ S, Finite ω.orbit :=
+      fun ω => Set.finite_coe_iff.mpr (Set.toFinite _)
+    rw [← Nat.card_sigma]
+    exact Nat.card_congr (selfEquivSigmaOrbits' Γ S).symm
+  have hdm : d * Nat.card (orbitRel.Quotient Γ S) = Nat.card S + (d - 1) := by
+    have hc : d * ((Nat.card S - 1) / d) = Nat.card S - 1 := Nat.mul_div_cancel' hdvd
+    rw [horb, mul_add, mul_one, hc]; omega
+  have hdefect : ∑ ω : orbitRel.Quotient Γ S, (d - Nat.card ω.orbit) = d - 1 := by
+    have h1 : ∑ ω : orbitRel.Quotient Γ S, ((d - Nat.card ω.orbit) + Nat.card ω.orbit)
+        = ∑ _ω : orbitRel.Quotient Γ S, d :=
+      Finset.sum_congr rfl fun ω _ => Nat.sub_add_cancel (hs_le ω)
+    rw [Finset.sum_add_distrib, hsum, Finset.sum_const, Finset.card_univ, smul_eq_mul,
+      ← Nat.card_eq_fintype_card, mul_comm, hdm] at h1
+    omega
+  -- the "proper" orbits (size `< d`).
+  set P : Finset (orbitRel.Quotient Γ S) := Finset.univ.filter (fun ω => Nat.card ω.orbit < d)
+    with hP_def
+  have hmem_P : ∀ ω, ω ∈ P ↔ Nat.card ω.orbit < d := by intro ω; rw [hP_def]; simp
+  -- defects vanish off `P`; the defect sum restricts to `P`.
+  have hdefect_P : ∑ ω ∈ P, (d - Nat.card ω.orbit) = d - 1 := by
+    rw [← hdefect]
+    apply Finset.sum_subset (Finset.subset_univ P)
+    intro ω _ hω
+    have hnlt : ¬ Nat.card ω.orbit < d := by rwa [hmem_P] at hω
+    have : Nat.card ω.orbit = d := le_antisymm (hs_le ω) (by omega)
+    omega
+  -- each proper orbit contributes a defect with `2 * defect ≥ d`.
+  have hbig : ∀ ω ∈ P, d ≤ 2 * (d - Nat.card ω.orbit) := by
+    intro ω hω
+    have hlt : Nat.card ω.orbit < d := (hmem_P ω).mp hω
+    have := two_mul_le_of_dvd_of_lt (hs_dvd ω) (hs_pos ω) hlt
+    omega
+  -- `#P * d ≤ 2 * (d - 1) < 2 * d`, forcing `#P ≤ 1`.
+  have hPcard : P.card ≤ 1 := by
+    by_contra h
+    have h2 : 2 ≤ P.card := by omega
+    have hsum_big : P.card * d ≤ 2 * (d - 1) := by
+      calc P.card * d = ∑ _ω ∈ P, d := by rw [Finset.sum_const, smul_eq_mul]
+        _ ≤ ∑ ω ∈ P, 2 * (d - Nat.card ω.orbit) := Finset.sum_le_sum hbig
+        _ = 2 * ∑ ω ∈ P, (d - Nat.card ω.orbit) := by rw [Finset.mul_sum]
+        _ = 2 * (d - 1) := by rw [hdefect_P]
+    have hge : 2 * d ≤ P.card * d := Nat.mul_le_mul_right d h2
+    omega
+  -- `#P ≥ 1`: the defect sum `d - 1 ≥ 1` is nonzero, so some orbit is proper.
+  have hP_pos : 1 ≤ P.card := by
+    rcases Nat.eq_zero_or_pos P.card with h0 | h
+    · rw [Finset.card_eq_zero] at h0
+      rw [h0, Finset.sum_empty] at hdefect_P
+      omega
+    · exact h
+  have hPcard1 : P.card = 1 := le_antisymm hPcard hP_pos
+  obtain ⟨ω₀, hω₀⟩ := Finset.card_eq_one.mp hPcard1
+  -- the unique proper orbit `ω₀` has size `1`.
+  have hω₀_one : Nat.card ω₀.orbit = 1 := by
+    rw [hω₀, Finset.sum_singleton] at hdefect_P
+    have := hs_pos ω₀; have := hs_le ω₀; omega
+  -- a proper orbit must be `ω₀`.
+  have hproper : ∀ ω : orbitRel.Quotient Γ S, Nat.card ω.orbit < d → ω = ω₀ := by
+    intro ω hlt
+    have : ω ∈ P := (hmem_P ω).mpr hlt
+    rw [hω₀] at this
+    exact Finset.mem_singleton.mp this
+  -- bridge: the orbit of `x` is the quotient-orbit of `⟦x⟧`.
+  have horbeq : ∀ x : S, Nat.card (orbit Γ x)
+      = Nat.card (orbitRel.Quotient.orbit (Quotient.mk'' x : orbitRel.Quotient Γ S)) :=
+    fun x => by rw [orbitRel.Quotient.orbit_mk]
+  -- (A): every orbit has size `1` or `d`.
+  have hA : ∀ x : S, Nat.card (orbit Γ x) = 1 ∨ Nat.card (orbit Γ x) = d := by
+    intro x
+    rcases lt_or_ge (Nat.card (orbit Γ x)) d with hlt | hge
+    · have hmkω₀ : (Quotient.mk'' x : orbitRel.Quotient Γ S) = ω₀ := hproper _ (horbeq x ▸ hlt)
+      left; rw [horbeq x, hmkω₀]; exact hω₀_one
+    · exact Or.inr (le_antisymm (by rw [horbeq x]; exact hs_le _) hge)
+  refine ⟨hA, ?_⟩
+  -- (B): at most one fixed point (two fixed points lie in the unique size-`1` orbit `ω₀`).
+  intro x y hx hy
+  have hfix1 : ∀ z : S, z ∈ fixedPoints Γ S → (Quotient.mk'' z : orbitRel.Quotient Γ S) = ω₀ := by
+    intro z hz
+    apply hproper
+    rw [← horbeq z, orbit_eq_singleton_of_mem_fixedPoints hz, Nat.card_coe_set_eq,
+      Set.ncard_singleton]
+    omega
+  have hxy : (Quotient.mk'' x : orbitRel.Quotient Γ S) = Quotient.mk'' y := by
+    rw [hfix1 x hx, hfix1 y hy]
+  have hmem : x ∈ orbit Γ y := Quotient.eq''.mp hxy
+  rw [orbit_eq_singleton_of_mem_fixedPoints hy] at hmem
+  exact Set.mem_singleton_iff.mp hmem
+
+end OddOrder.GroupTheory.FreeActionOrbitCount
