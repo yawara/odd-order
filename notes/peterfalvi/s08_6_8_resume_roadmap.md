@@ -87,13 +87,38 @@ per-member で `certainTypeMemberDecomposition` / `memberExtensionDecomposition`
 `mc i = ⟨χmem i, χmem i⟩.re`、orthogonality は coherent set の member 間直交 + `certainTypeR_…orthogonal`)。
 **ゼロからの新証明でなく既存 green producer の結線** ⟹ scope は当初見積より縮小(ただし multi-hundred LOC)。
 
-### 次の coding action (確定)
+### 次の coding action — 精密設計 (2026-06-17 確定, coding-ready)
 
-1. `exists_sMemberOrthogonalFamilyW`(新 lemma, S08_CoherenceWeighted.lean)を `exists_sMemberOrthonormalFamily`
-   を template に書く。member dispatch = `certainTypeMemberDecomposition`(reducible)/
-   `memberExtensionDecomposition`(irreducible)。leaf build で increment。
-2. → `xSum_le_two_psi_caseB`(counting を `sum_div_normSq_induce_kernelFilter_eq` に差替)。
-3. → c2 endgame → 3-way dispatch を S08:59 に。
+**brick 1 (committable green, 最初に書く): per-member Dmem dispatcher `caseB_member_psiDecomposition`**
+入力 = case-B coherent `hS₁coh : IsCoherent hyp.tau S₁ A`(A = supportInSubgroup (sharpImage H) L)、
+`x ∈ S₁`、`x.conj ∈ S₁`、`hνZ : hS₁coh.extension x ∈ ZIrr G`。出力 = `CharacterPsiDecomposition hyp.tau x 0`。
+本体 = `caseB_S_member_column_or_irreducible hyp h46 hHK (hS₁sub hxS₁)`(`S08_CaseBAssembly:1949`)で分岐:
+- **column 枝** (`∃ χ₂≠1, columnSum h46 χ₂ = x`): `certainTypeMemberDecomposition h46 hχ₂ hdeg hagree hS₁coh
+  hμ_S1 hμbar_S1 hνZ hdiffsupported`(`S06_CertainTypeCoherence:740`)。
+  - `hdeg`(column 次数等式)= 既存 `columnDecompositionTau` 系の caller が供給する形(`S08_CaseBCoherence2:1757`
+    と同型)。`hagree`/`hmapagree`(μ_j−μ̄_j 上で hyp.tau = certain-type Dade map)= `columnRFamilyTau`
+    (`S08_CaseBCoherence2:1791`)が使う `hmapagree` と同源(H^#-supported + c2 K=H で両 map 一致)。
+  - 必要 instance: `[NeZero (Nat.card h46.W1)] [Invertible (Nat.card ↥h46.K : ℂ)]
+    [Fintype ↥(h46.W1 ⊔ h46.W2)] [Invertible …] [Fintype (S06.ticVdiff h46).W] [Invertible …]`。
+- **irreducible 枝** (`IsIrreducibleCharacter x`): `memberExtensionDecomposition hyp.dade hyp.hconj hS₁coh
+  ⟨x,hirr⟩ hreal hdiffsupp hx_S1 hxbar_S1 hνZ hχχbar`(`S08_CoherenceCorePart1:1585`)。
+  - ⚠ `hyp.tau = dadeIntegralCharacterMap hyp.dade (hyp.dade.fullDadeIsometryData hyp.hconj)`(`CorePart2:31`)
+    なので memberExtensionDecomposition の τ と一致(defeq 確認要)。
+  - `hreal`/`hdiffsupp`/`hχχbar` = case-B 用の member-fact から(Frobenius 専用の `sMember_characterFacts`/
+    `sMember_diffSupport hF` は使えない ⟹ case-B 版 member-fact を特定 or 導出する小補題が要る。これが
+    irreducible 枝の唯一の未確認点)。
+
+**brick 2: weighted enumerator `exists_sMemberOrthogonalFamilyW`** = `exists_sMemberOrthonormalFamily`
+(`CorePart2:2464`)を template に、`χmem : Fin k → ClassFunction ↥L ℂ`(IrreducibleCharacter 制約を外す)、
+`mc i := (ClassFunction.inner (χmem i) (χmem i)).re`、`Dmem` = brick 1、`hortho_mem` =
+`certainTypeR_imageSet_orthogonal_dadeOfDiff`(`S08_CaseBHortho:44`, column)+ irreducible 版、
+`htau1Dmem` = rfl(両 producer とも tau1 = hS₁.extension)、member 間 orthogonality は coherent set の直交。
+
+**brick 3-4**: `xSum_le_two_psi_caseB`(brick 2 + counting `sum_div_normSq_induce_kernelFilter_eq`)→
+c2 endgame `false_of_coherentXunionYset_caseB_of_not_coherentS` → S08:59 の 3-way dispatch。
+
+⚠ 唯一の未確認点 = brick 1 irreducible 枝の case-B member-fact(`hreal`/`hdiffsupp`)の供給元。
+column 枝・instance・classification・engine 側はすべて確認済。
 
 ## (6.5) p-group reduction — 完備 (Plan agent の「未形式化」は誤り)
 
