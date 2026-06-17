@@ -94,4 +94,102 @@ theorem exists_central_phi_data
     exact_mod_cast hdpos.ne'
   · rw [htrans]; exact hres
 
+/-- **Central character nontriviality** from the master restriction equation.  If
+`Res^H_N θ = θ(1)·χ` (the [Is] 2.27 form, `χ = compHom e φ_θ`) and `θ` is **not** constant on `N`
+(some `w ∈ N` with `θ(w) ≠ θ(1)`, i.e. `N ⊄ ker θ`), then the central character `χ` is nontrivial.
+Indeed `χ = trivial` would force `θ(w) = θ(1)·1 = θ(1)` for every `w ∈ N`. -/
+theorem compHom_phi_ne_trivial_of_restrict
+    {N : Subgroup ↥H} {θ : ClassFunction ↥H ℂ} {χ : ClassFunction ↥N ℂ}
+    (hres : ClassFunction.restrict N θ = θ 1 • χ)
+    (hne : ∃ w : ↥N, θ (w : ↥H) ≠ θ 1) :
+    χ ≠ trivialClassFunction ↥N := by
+  obtain ⟨w, hw⟩ := hne
+  intro htriv
+  apply hw
+  have hval := congrFun (congrArg (fun f : ClassFunction ↥N ℂ => (f : ↥N → ℂ)) hres) w
+  rw [htriv] at hval
+  simpa [ClassFunction.restrict_apply, ClassFunction.smul_apply, trivialClassFunction_apply,
+    smul_eq_mul] using hval
+
+/-- **(6.8.2.3) per-column anchored image** — the core integration.
+
+For a certain-type column `χ₂` whose underlying irreducible `θ = Res^H μ_{0,χ₂}` is **nontrivial on
+`W₂`** (`hWne`, i.e. `W₂ ⊄ ker θ`, the defining `X = S − S(W₂)` property), the Sibley–Dade map sends
+the anchored difference `columnSum χ₂ − a·η₁` to `X − a·η₁^{τ₁}` for some virtual `X` and a `Y`-side
+coherence `cY`, with `a = θ(1)` (the constituent weight).
+
+Assembles the per-`θ` central character (`exists_central_phi_data`), the `(6.8.2.2)` aggregate
+(`exists_decomposition_caseB`), the column/irreducible bundles
+(`caseB_hcol`/`caseB_hirr`/`caseB_hirrAnc`, with non-linearity `caseB_hnonlin`), and the per-`φ`
+anchored producer (`caseB_per_phi_anchored_fromYset`), then rewrites `Ind^L_H θ = columnSum χ₂`
+(`columnSum_eq_induce_H`).  This is the `(6.8.2.3)` per-column anchored image `hXanchored` (modulo the
+uniform `a₀` and the `Ximg` packaging, handled at the `∀`-column assembly). -/
+theorem caseB_column_anchored_image
+    (hyp : SibleyDadeHypothesis G L H) [H.Normal] [Fintype ↥H]
+    (h46 : OddOrder.Peterfalvi.S06.Hypothesis46 (sharpImage H) L) (hHK : h46.K = H)
+    (hW1 : h46.W1 = hyp.W1)
+    [NeZero (Nat.card h46.W1)] [Invertible (Nat.card ↥h46.K : ℂ)]
+    [Fintype ↥(h46.W1 ⊔ h46.W2)] [Invertible (Nat.card ↥(h46.W1 ⊔ h46.W2) : ℂ)]
+    [Fintype (OddOrder.Peterfalvi.S06.ticVdiff h46).W]
+    [Invertible (Nat.card (OddOrder.Peterfalvi.S06.ticVdiff h46).W : ℂ)]
+    [h46.W2.Normal] [Invertible (Nat.card ↥h46.W2 : ℂ)]
+    [Fintype ↥(h46.W2.subgroupOf H)] [Invertible (Nat.card ↥(h46.W2.subgroupOf H) : ℂ)]
+    (hW2H : h46.W2 ≤ H)
+    (hcen : h46.W2.subgroupOf H ≤ Subgroup.center ↥H)
+    (hderiv : h46.W2.subgroupOf H ≤ commutator ↥H)
+    (hcop : Nat.Coprime (Nat.card ↥H) (Nat.card hyp.W1))
+    {p : ℕ} (hp : p.Prime) (hHp : IsPGroup p ↥H)
+    (hprime : (Nat.card h46.W2).Prime) (hW2comm : h46.W2 ≤ ⁅H, H⁆)
+    (hW2cenL : h46.W2 ≤ Subgroup.center ↥L)
+    (hc2 : 2 ≤ (h46.W2.subgroupOf H).index)
+    (hFPF : (h46.W2.index : ℤ) < ((h46.W2.subgroupOf H).index : ℤ) ^ 2)
+    {η₁ : ClassFunction ↥L ℂ} (hη₁ : η₁ ∈ hyp.Yset)
+    (χ₂ : (h46.W2.subgroupOf (h46.W1 ⊔ h46.W2)) →* ℂˣ)
+    (hWne : ∃ w : ↥(h46.W2.subgroupOf H),
+      (ClassFunction.restrict H ((h46.columnFamily χ₂).mu 0 : ClassFunction ↥L ℂ)) (w : ↥H)
+        ≠ (ClassFunction.restrict H ((h46.columnFamily χ₂).mu 0 : ClassFunction ↥L ℂ)) 1) :
+    ∃ (X : ClassFunction G ℂ) (cY : OddOrder.Peterfalvi.S07.IsCoherent hyp.tau hyp.Yset
+        (OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L)) (a : ℕ),
+      hyp.tau (OddOrder.Peterfalvi.S06.columnSum h46 χ₂ - a • η₁)
+        = X - (a : ℂ) • cY.extension η₁ := by
+  classical
+  haveI : Fintype ↥h46.W2 := Fintype.ofFinite _
+  have hθirr : IsIrreducibleCharacter
+      (ClassFunction.restrict H ((h46.columnFamily χ₂).mu 0 : ClassFunction ↥L ℂ)) := by
+    have h := h46.certainTypeRestrict_isIrreducible χ₂; rwa [hHK] at h
+  set θ : IrreducibleCharacter ↥H :=
+    ⟨ClassFunction.restrict H ((h46.columnFamily χ₂).mu 0 : ClassFunction ↥L ℂ), hθirr⟩ with hθdef
+  have hθval : (θ : ClassFunction ↥H ℂ)
+      = ClassFunction.restrict H ((h46.columnFamily χ₂).mu 0 : ClassFunction ↥L ℂ) := by
+    rw [hθdef]
+  obtain ⟨φ, hφ', hφirr, hφ1, hweight, hreseq⟩ := exists_central_phi_data hW2H hcen θ
+  rw [hθval] at hreseq
+  have hφne : ClassFunction.compHom (Subgroup.subgroupOfEquivOfLe hW2H).toMonoidHom φ
+      ≠ trivialClassFunction ↥(h46.W2.subgroupOf H) :=
+    compHom_phi_ne_trivial_of_restrict hreseq hWne
+  have hφneIrr : (⟨φ, hφirr⟩ : IrreducibleCharacter ↥h46.W2)
+      ≠ trivialIrreducibleCharacter ↥h46.W2 := by
+    intro heq
+    apply hφne
+    have hφtriv : φ = trivialClassFunction ↥h46.W2 := by
+      have h := congrArg (fun c : IrreducibleCharacter ↥h46.W2 => (c : ClassFunction ↥h46.W2 ℂ)) heq
+      simpa using h
+    rw [hφtriv]
+    ext x
+    simp [ClassFunction.compHom_apply, trivialClassFunction_apply]
+  obtain ⟨cY, Xagg, hXaggorth, hXZ, hdecomp⟩ :=
+    hyp.exists_decomposition_caseB hcop hp hHp hprime hW2comm hW2cenL hη₁
+      (⟨φ, hφirr⟩ : IrreducibleCharacter ↥h46.W2) hφ1 hφneIrr hc2 hFPF
+  simp only [IrreducibleCharacter.coe_mk] at hdecomp
+  have hnonlin := caseB_hnonlin hW2H hderiv hφ' hφne
+  have hcol := caseB_hcol hyp h46 hHK hW1 hW2H hcen hφ' hη₁
+  have hirr := caseB_hirr hyp h46 hHK hW2H hcen hφ' hη₁ hnonlin
+  have hirrAnc := caseB_hirrAnc hyp h46 hHK hW2H hφ' hη₁ hnonlin
+  have hanc := caseB_per_phi_anchored_fromYset hyp h46 hHK hW2H hcen hφ' cY hη₁
+    hcol hirr hirrAnc (hXaggorth η₁ hη₁) hdecomp ⟨θ, hweight⟩
+  refine ⟨(caseB_phi_family hyp h46 hW2H hφ' hcol hirr ⟨θ, hweight⟩).X, cY,
+    constituentWeight hφ' θ, ?_⟩
+  rw [columnSum_eq_induce_H h46 hHK χ₂, ← hθval]
+  exact hanc
+
 end OddOrder.Peterfalvi.S08
