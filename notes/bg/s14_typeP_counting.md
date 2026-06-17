@@ -1746,3 +1746,25 @@ working tree clean。typeP_duality 本体 (FT consume sorry) は**未 discharge*
 - building blocks 在: `E_complement`/`isComplement'_subgroupOf`/`card_Msigma_mul_card_E` (S12_ECore:192/229/243), `exists_subgroupESetup_with_le` (K≤E), `commutator_eq_self_of_isComplement'_le_commutator` (S06)。
 - **摩擦点**: (i) 与えられた K (Hall κ)・U (Hall(κ∪σ)') を E-setup の E₁・E₂E₃ に matching (typeP_structure の proof が前例)、(ii) case split (κ∩τ₃ vs κ⊆τ₁) を mirror、(iii) coprime `[A,N]=N`、(iv) normal complement → IsComplement' API。**~150-250 行、multi-step。**
 - 正本=この節。次セッション = part(h) 構築 (`derivedInG_eq_U_sup_Msigma` を核 lemma に切り出すのが推奨)。
+
+### ✅✅✅✅ part(h) COMPLETE — typeP_duality fully proved + axiom-clean (2026-06-18 lane-h 再開³, commit `5272515f`)
+
+**§14 long pole 完遂。`typeP_duality` の唯一残 sorry (part(h)) を埋め、`#print axioms` で `[propext, Classical.choice, Quot.sound]` のみ確認。full build green 3838 jobs、AxiomsCheck に 4 新エントリ登録・全通過。**
+
+**🎯 設計の鍵 = 既存補題 2 本の発見**（LOOP GATE の「crux `[U,K]=U` 補題未発見」は誤りだった）:
+1. **`OddOrder.BG.Ch2.S08.le_commutator_of_coprime_inf_centralizer_eq_bot`** (S08:1424): coprime FPF action `B≤N(Y)`, `Coprime|B||Y|`, `Y⊓C(B)=⊥` ⟹ `Y ≤ ⁅B,Y⁆`。これが `U=[K,U]` を与える(`sigma_eq_beta_and_prime_card_E1_of_caseTau1` S14:1521-1530 に `U≤derivedInG E` のパターン完成済だった)。
+2. **`commutator_eq_sup_commutator_of_isComplement'`** (S14:79, 既存): `N◁H` complement `E`, `N≤commutator H` ⟹ `commutator H = N ⊔ ⁅E,E⁆`。統一補題そのもの。
+
+**実装 (3 新補題、すべて sorry-free + axiom-clean、typeP_duality 直前に配置)**:
+- **`derivedInG_eq_Msigma_sup_derivedInG_complement`** (統一, case-free): 任意 E-setup で `M' = M_σ ⊔ E'`。⊇ = `Msigma_le_derived`+`commutator_mono`; ⊆ = `↥M` 内で `x=a·b` 分解 (`a∈M_σ`,`b∈E`)、`b=a⁻¹x∈M'`、`b∈E⊓M' ≤ E'` (`inf_derivedInG_le_derivedInG` S12_ECore:318 = `E⊓M'≤E'`、quotient 論法済)。**`inf_derivedInG_le_derivedInG` が ⊆ を一撃で clean 化。**
+- **`typeP_derivedInG_complement_of_eq_complement`**: 退化 `K=E` case (Prop 14.2(a) で U=1)。`IsCyclic K ⟹ E'=⊥ ⟹ M'=M_σ`、`h.isComplement'_subgroupOf` で締め。
+- **`typeP_derivedInG_isComplement_kappaHall`** (part(h) 核、`[IsCyclic K]` 仮説): E-setup → `by_cases (κ∩τ₃).Nonempty`。
+  - κ∩τ₃≠∅: typeP_structure の machinery (`E3_not_regular…`/`hEpi`/`hEdvdK`) を mirror → `K=E` → 退化 sub-lemma。
+  - κ⊆τ₁: typeP_structure と同じく共役 (`exists_conj_eq_of_isHall_subgroupOf`) で `K=E₁'`。`by_cases Ebar₂⊔Ebar₃=⊥`:
+    - =⊥: `Ebar=K` (eq_sup) → 退化 sub-lemma。
+    - ≠⊥: Frobenius (`isFrobeniusGroup_E_of_caseTau1`)。`hfrob.isComplement` で `U⋊K=Ebar`、`hfrob.coprime_card_kernel_complement` で coprime。`U≤derivedInG Ebar` (le_commutator) + `commutator_eq_sup…` + K cyclic ⟹ `derivedInG Ebar = U`。`M'=M_σ⊔U`。complement = `isComplement'_of_disjoint_and_mul_eq_univ`: disjoint は `M'⊓K ≤ E'⊓K = U⊓K = ⊥` (coprime, `inf_derivedInG`)、univ は `M'` normal (`= commutator ↥M`) + `normal_mul` + `M'⊔K=M` (`U⊔K=Ebar`, `M_σ⊔Ebar=M`)。**card 積を完全に回避** (disjoint+univ 経路)。
+
+**typeP_duality 配線**: `IsCyclic K` は counting collapse 由来 — `exists_partner`→`typeP_Z_isCyclic` (`IsCyclic(K⊔K*)`)→`Subgroup.subgroupOfEquivOfLe(le_sup_left).isCyclic.mp inferInstance` で K へ降下 (subgroup of cyclic は instance `Subgroup.isCyclic`)。
+
+**⟹ §14 Type-P duality long pole DONE。§15/§16 (Lane G) の `typeP_duality` cite 群 (S15_MF:785/795/2170, S16:530) が実証明上に。** 残 S14 sorry = Cor 14.8 (`typeP1_conjugate_and_typeP_twoClasses`, 14.7(f)(g) から従う・未着手)、Cor 14.9 (faithful には gated M̃ 要・"do not prove as-is")、Cor 14.10 (`exists_sigmaDecomposition_length_le_two` = ℓ_σ≤2、**σ-decomposition theory [BG §1, 未形式化] が必須前提**)、Lem 14.11/Cor 14.12 (§13 gated)。**いずれも part(h) 経路外**; Cor 14.10 は FT-critical だが σ-decomp gate で別の大物。
+- ⚠ **再調査するな**: crux `[U,K]=U` は `le_commutator_of_coprime_inf_centralizer_eq_bot` (S08) で既存。統一補題は `commutator_eq_sup_commutator_of_isComplement'` (S14) で既存。両方とも repo 内既出だった。
