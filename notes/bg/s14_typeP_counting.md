@@ -1686,3 +1686,15 @@ working tree clean。typeP_duality 本体 (FT consume sorry) は**未 discharge*
 - **要 equivariance 配線 (5)**: `conj_smul_mem_elemAbelianOfRank`(public✓) / `centralizer_conj_smul`(✓) / `isCoatom_conj_smul`(✓) / `mem_maximalSubgroups_of_isConjugateSubgroup`(✓) / **card_conj_smul (private×2 → inline 再証明要: `Nat.card_congr (L.equivMapOfInjective (conj c).toMonoidHom (conj c).injective)`)** + maximalSubgroupsContaining conj-singleton は inline (mem + isCoatom + centralizer_conj_smul で)。
 - **IsConjugateSubgroup A B = ∃g, conj g•B=A** (g=1 で refl, line 6131)。c•H=M ⟹ H=c⁻¹•M ⟹ ∃g=c⁻¹, conj g•M=H ⟹ IsConjugateSubgroup H M。
 - 正本 = この節。**partner symmetry 突破済 ⟹ typeP_covering は機械的 assembly のみ**。次セッションで完遂可。
+
+### ✅✅✅✅ covering 14.7(7) COMPLETE (2026-06-18, commit `90651d52`) — ユーザー指示「3 sub-step」全完遂
+
+**`typeP_covering` (BG 14.7(7)): ∀ H type-P, H~M ∨ H~Mstar。sorry-free + axiom-clean + AxiomsCheck。** step 1+2+3 を一気に assemble (新数学ゼロ、conjugation 配線のみ)。covering ボトルネックだった partner symmetry を先に突破済ゆえ機械的に完遂。
+- 両 Ẑ の >½|G| (M-bound + `exists_zTilde_…of_isTypeP` [U も返すよう拡張]) → `ncard_inter_nonempty_of_two_mul_gt` → 共通元 → **t=c•s** (`MulAut.conj`/group tactic で c=a⁻¹b)。
+- matching (`exists_inf_ne_bot_of_mem_zTilde_inter`, πM=σ(M)/πH=σ(H)) → Y≤c•Lstar が K/Kstar に当たる。
+- double singleton: Y≤Kstar→{M} (14.2(c)); Y≤K→{Mstar} (14.7(1)); c⁻¹•Y∈ℰ¹(Lstar)→{H} (14.2(c)/H) → **c•H=M∨Mstar → H~M∨Mstar**。
+- equivariance: `conj_smul_mem_elemAbelianOfRank`(public) / `centralizer_conj_smul` / `isCoatom_conj_smul` / `Subgroup.card_map_of_injective (conj c).injective` (=card_conj_smul inline) / cancel 補題 `conj c⁻¹•(conj c•X)=X` (`← map_mul`+inv_mul_cancel+map_one+one_smul、map_inv が LHS も書き換える罠を回避)。
+- **🔑 技法**: `IsConjugateSubgroup M N = ∃g, conj g•M=N` (向き注意; `⟨c, hcHN⟩` 直接、conj c•H=N がそのまま witness)。`mem_maximalSubgroupsContaining.mp (hsing.symm ▸ Set.mem_singleton H)` で H∈𝓜 抽出。
+
+**🛑 STOP — GATE「残 2 設計判断到達で停止」に到達**: typeP_duality ∃! bundle の covering/Hall κ(Mstar)/TI/P2/¬conj conjunct は全て in hand。残り typeP_duality 完成 = **(1) IsCyclic(K⊔Kstar) [Ω₁(Sylow) helper] (2) part(h) [Prop 14.2(a) UM_σ packaging]** の 2 設計判断のみ + uniqueness 組立。これらは原 AskUserQuestion の残 2 obligation でユーザー裁可待ち。
+- **§14 funnel 進捗サマリ (2026-06-18)**: density bound + 14.7(e)(f) + partner symmetry 14.7(1)(2)(3) + **covering 14.7(7)** 全 landing。残 = 14.7(d) cyclic + 14.7(8) part(h) → typeP_duality close → §15/§16 unblock。正本 = この節。
