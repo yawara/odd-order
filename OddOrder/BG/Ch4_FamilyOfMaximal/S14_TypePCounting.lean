@@ -5924,7 +5924,7 @@ theorem typeP_family_member_dData [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOd
     (hKstar : Kstar = OddOrder.BG.Ch3.S10.Msigma M ⊓ Subgroup.centralizer (K : Set G))
     (hU : Ch03.IsHallSubgroup ((kappa M ∪ OddOrder.BG.Ch3.S10.sigma M)ᶜ) (U.subgroupOf M))
     {N : Subgroup G} (hN : IsZFamilyMember M K N) :
-    ∃ KN : Subgroup G, KN ≤ N ∧
+    ∃ KN : Subgroup G, KN ≤ N ∧ Ch03.IsHallSubgroup (kappa N) (KN.subgroupOf N) ∧
       K ⊔ Kstar = KN ⊔ ((K ⊔ Kstar) ⊓ OddOrder.BG.Ch3.S10.Msigma N) ∧
       ((K ⊔ Kstar) ⊓ OddOrder.BG.Ch3.S10.Msigma N) ≤ Subgroup.centralizer (KN : Set G) ∧
       Subgroup.IsPiSubgroup (OddOrder.BG.Ch3.S10.sigma N)ᶜ KN ∧
@@ -5941,7 +5941,7 @@ theorem typeP_family_member_dData [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOd
     Subgroup.comap_map_eq_self_of_injective N.subtype_injective U'
   have hUN : Ch03.IsHallSubgroup ((kappa N ∪ OddOrder.BG.Ch3.S10.sigma N)ᶜ)
       ((U'.map N.subtype).subgroupOf N) := by rw [hUeq]; exact hU'
-  refine ⟨KN, hKNN, hswap.trans (by rw [hcanon]), hcanon ▸ inf_le_right,
+  refine ⟨KN, hKNN, hKN, hswap.trans (by rw [hcanon]), hcanon ▸ inf_le_right,
     kappaHall_isPiSubgroup_sigmaCompl hKNN hKN, ?_, ?_⟩
   · intro g hgN
     have hd := (typeP_structure hG hNmax hPN hKNN hKN rfl hUN).2.2.2.1
@@ -6018,7 +6018,7 @@ theorem typeP_family_T_isTI [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     exists_isPiElement_mul (OddOrder.BG.Ch3.S10.sigma N) t
   have hyZ : y ∈ K ⊔ Kstar := (Subgroup.zpowers_le.mpr htZ') hyz
   have hy'Z : y' ∈ K ⊔ Kstar := (Subgroup.zpowers_le.mpr htZ') hy'z
-  obtain ⟨KN, hKNN, hswap, hcent, hAπc, hdfirst, hdsecond⟩ :=
+  obtain ⟨KN, hKNN, _, hswap, hcent, hAπc, hdfirst, hdsecond⟩ :=
     typeP_family_member_dData hG hM hP hKM hK hKstar hU hN
   have hBπ : Subgroup.IsPiSubgroup (OddOrder.BG.Ch3.S10.sigma N)
       ((K ⊔ Kstar) ⊓ OddOrder.BG.Ch3.S10.Msigma N) := by
@@ -6232,6 +6232,95 @@ theorem mem_Mtilde_imp_form [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
   obtain ⟨x, hx, x', hx', rfl⟩ := hg
   rw [sigmaSharp, sharpSubgroup, Set.mem_diff, Set.mem_singleton_iff, SetLike.mem_coe] at hx
   exact ⟨x, x', rfl, (D.length_one_iff x).mpr ⟨hx.2, ⟨M, hM, hx.1⟩⟩, hx'⟩
+
+/-- **BG 14.7, elements of `T` have the `not_type1_of_type2` "type-1 form"** (mmd L4021): for
+`t ∈ T = Z − ⋃ Kᵢ*`, there is a family member `N` and `t = y·y'` with `y ∈ M_σ(N)^#`, `y'` a
+nonidentity `κ(N)`-element of `N` centralising `y`.  Extracted exactly as in the TI-of-`T` proof:
+the splitting member `N` (`typeP_family_exists_sigmaPart`), `π`-decompose `t = y·y'`
+(`exists_isPiElement_mul`), `y ∈ Kᵢ* ≤ M_σ(N)` (`…isPiElement_mem_Kstar`) and `y' ∈ K_N` (a Hall
+`κ(N)`-subgroup, `isPiElementCompl_mem_left_of_commute`), both nontrivial.  Feeds Lemma 14.6
+(`not_type1_of_type2`) for the `𝒞_G(T) ⊥ 𝒞_G(M̃ᵢ)` disjointness. -/
+theorem typeP_family_T_form [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    {M K Kstar U : Subgroup G} (hM : M ∈ maximalSubgroups G) (hP : IsTypeP M) (hKM : K ≤ M)
+    (hK : Ch03.IsHallSubgroup (kappa M) (K.subgroupOf M))
+    (hKstar : Kstar = OddOrder.BG.Ch3.S10.Msigma M ⊓ Subgroup.centralizer (K : Set G))
+    (hU : Ch03.IsHallSubgroup ((kappa M ∪ OddOrder.BG.Ch3.S10.sigma M)ᶜ) (U.subgroupOf M))
+    {t : G} (htT : t ∈ ((K ⊔ Kstar : Subgroup G) : Set G) \
+        ⋃ N ∈ ZFamilyFinset M K,
+          (((K ⊔ Kstar) ⊓ OddOrder.BG.Ch3.S10.Msigma N : Subgroup G) : Set G)) :
+    ∃ N : Subgroup G, N ∈ maximalSubgroups G ∧ ∃ y y' : G, t = y * y' ∧ Commute y y' ∧
+      y ∈ sigmaSharp N ∧ y' ≠ 1 ∧ y' ∈ N ∧ y' ∈ Subgroup.centralizer ({y} : Set G) ∧
+      ∀ p ∈ piSet (Subgroup.closure ({y'} : Set G)), p ∈ kappa N := by
+  classical
+  obtain ⟨htZ, htnot⟩ := htT
+  have ht1 : t ≠ 1 := fun h => htnot
+    (Set.mem_biUnion (mem_ZFamilyFinset.mpr (Or.inl rfl)) (h ▸ one_mem _))
+  obtain ⟨N, hN, hσpart⟩ := typeP_family_exists_sigmaPart hG hM hP hKM hK hKstar hU htZ ht1
+  obtain ⟨y, y', hyy', hcomm, hyπ, hy'π, hyz, hy'z⟩ :=
+    exists_isPiElement_mul (OddOrder.BG.Ch3.S10.sigma N) t
+  have hyZ : y ∈ K ⊔ Kstar := (Subgroup.zpowers_le.mpr htZ) hyz
+  have hy'Z : y' ∈ K ⊔ Kstar := (Subgroup.zpowers_le.mpr htZ) hy'z
+  obtain ⟨KN, hKNN, hKN, hswap, hcent, hAπc, -, -⟩ :=
+    typeP_family_member_dData hG hM hP hKM hK hKstar hU hN
+  have hBπ : Subgroup.IsPiSubgroup (OddOrder.BG.Ch3.S10.sigma N)
+      ((K ⊔ Kstar) ⊓ OddOrder.BG.Ch3.S10.Msigma N) := by
+    intro p hp
+    obtain ⟨hpp, hpd, -⟩ := Nat.mem_primeFactors.mp hp
+    exact OddOrder.BG.Ch3.S10.Msigma_isPiGroup N p (Nat.mem_primeFactors.mpr
+      ⟨hpp, hpd.trans (Subgroup.card_dvd_of_le inf_le_right), Nat.card_pos.ne'⟩)
+  have hyKstar : y ∈ (K ⊔ Kstar) ⊓ OddOrder.BG.Ch3.S10.Msigma N :=
+    typeP_family_isPiElement_mem_Kstar hG hM hP hKM hK hKstar hU hN hyZ hyπ
+  have hy'KN : y' ∈ KN := isPiElementCompl_mem_left_of_commute hswap hcent hAπc hBπ hy'Z hy'π
+  have hy1 : y ≠ 1 := fun h =>
+    hσpart (by rw [show t = y' from by rw [← hyy', h, one_mul]]; exact hy'π)
+  have hy'1 : y' ≠ 1 := fun h => htnot (Set.mem_biUnion (mem_ZFamilyFinset.mpr hN)
+    (show t ∈ ((K ⊔ Kstar) ⊓ OddOrder.BG.Ch3.S10.Msigma N : Subgroup G) from by
+      rw [show t = y from by rw [← hyy', h, mul_one]]; exact hyKstar))
+  obtain ⟨hNmax, -, -, -⟩ := typeP_family_member_data hG hM hP hKM hK hKstar hU hN
+  refine ⟨N, hNmax, y, y', hyy'.symm, hcomm, ?_, hy'1, hKNN hy'KN, ?_, ?_⟩
+  · rw [sigmaSharp, sharpSubgroup, Set.mem_diff, Set.mem_singleton_iff, SetLike.mem_coe]
+    exact ⟨(inf_le_right :
+      (K ⊔ Kstar) ⊓ OddOrder.BG.Ch3.S10.Msigma N ≤ _) hyKstar, hy1⟩
+  · rw [Subgroup.mem_centralizer_iff]
+    intro w hw; rw [Set.mem_singleton_iff] at hw; subst hw; exact hcomm
+  · intro p hp
+    simp only [piSet, Set.mem_setOf_eq] at hp
+    obtain ⟨hpp, hpdc, -⟩ := Nat.mem_primeFactors.mp hp
+    have hpKN : p ∣ Nat.card ↥KN := hpdc.trans (Subgroup.card_dvd_of_le
+      (by rw [← Subgroup.zpowers_eq_closure]; exact Subgroup.zpowers_le.mpr hy'KN))
+    apply hKN.1 p
+    rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hKNN).toEquiv]
+    exact Nat.mem_primeFactors.mpr ⟨hpp, hpKN, Nat.card_pos.ne'⟩
+
+/-- **BG 14.7, `𝒞_G(T)` is disjoint from each `𝒞_G(M̃ᵢ)`** (mmd L4025): the TI-set's conjugacy
+saturation meets no `𝒞_G(M̃ᵢ)`.  A common `z = g₁tg₁⁻¹ = g₂sg₂⁻¹` (`t ∈ T`, `s ∈ M̃ᵢ`) makes
+`t = (g₁⁻¹g₂)·s·(g₁⁻¹g₂)⁻¹` a conjugate of `s ∈ M̃ᵢ`, so `t ∈ M̃(Mᵢ^{g₁⁻¹g₂})` (`Mtilde_conj_smul`)
+has the type-2 form (`mem_Mtilde_imp_form`); but `t ∈ T` has the type-1 form
+(`typeP_family_T_form`), contradicting Lemma 14.6 (`not_type1_of_type2`).  The last disjointness
+needed for the density inequality. -/
+theorem conjClassSet_T_Mtilde_disjoint [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (D : SigmaDecompositionData G) {M K Kstar U : Subgroup G} (hM : M ∈ maximalSubgroups G)
+    (hP : IsTypeP M) (hKM : K ≤ M) (hK : Ch03.IsHallSubgroup (kappa M) (K.subgroupOf M))
+    (hKstar : Kstar = OddOrder.BG.Ch3.S10.Msigma M ⊓ Subgroup.centralizer (K : Set G))
+    (hU : Ch03.IsHallSubgroup ((kappa M ∪ OddOrder.BG.Ch3.S10.sigma M)ᶜ) (U.subgroupOf M))
+    {Mi : Subgroup G} (hMi : Mi ∈ maximalSubgroups G) :
+    Disjoint (conjClassSet (((K ⊔ Kstar : Subgroup G) : Set G) \
+        ⋃ N ∈ ZFamilyFinset M K,
+          (((K ⊔ Kstar) ⊓ OddOrder.BG.Ch3.S10.Msigma N : Subgroup G) : Set G)))
+      (conjClassSet (Mtilde hG D Mi)) := by
+  rw [Set.disjoint_left]
+  rintro z ⟨t, htT, g₁, rfl⟩ ⟨s, hsM, g₂, hz₂⟩
+  obtain ⟨N, hNmax, y, y', hgyy', hcomm, hy, hy'1, hy'N, hy'C, hy'κ⟩ :=
+    typeP_family_T_form hG hM hP hKM hK hKstar hU htT
+  have heq : t = MulAut.conj (g₁⁻¹ * g₂) • s := by
+    rw [MulAut.smul_def, MulAut.conj_apply,
+      show (g₁⁻¹ * g₂) * s * (g₁⁻¹ * g₂)⁻¹ = g₁⁻¹ * (g₂ * s * g₂⁻¹) * g₁ from by group, hz₂]
+    group
+  have htM : t ∈ Mtilde hG D (MulAut.conj (g₁⁻¹ * g₂) • Mi) := by
+    rw [← Mtilde_conj_smul, heq]; exact Set.smul_mem_smul_set hsM
+  obtain ⟨x, x'', htxx, hlenx, hx''R⟩ := mem_Mtilde_imp_form hG D
+    (mem_maximalSubgroups_of_isConjugateSubgroup hMi ⟨g₁⁻¹ * g₂, rfl⟩) htM
+  exact not_type1_of_type2 hG D hNmax hy hgyy' hcomm hy'1 hy'N hy'C hy'κ ⟨x, x'', htxx, hlenx, hx''R⟩
 
 /-- **BG Theorem 14.7** (mmd L3890): type-P duality and the `Z_tilde` TI-set.
 
