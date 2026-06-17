@@ -26,6 +26,7 @@ import OddOrder.GroupTheory.RepresentationTheory.CenterOrbitCount
 import OddOrder.GroupTheory.RepresentationTheory.PiAlgebraAut
 import OddOrder.GroupTheory.RepresentationTheory.CenterSplitting
 import OddOrder.GroupTheory.RepresentationTheory.CenterSimplesOrbit
+import OddOrder.GroupTheory.RepresentationTheory.CenterOrbitFree
 import OddOrder.GroupTheory.RepresentationTheory.CharacterCompleteness
 import OddOrder.GroupTheory.RepresentationTheory.CharacterConjugate
 import OddOrder.GroupTheory.RepresentationTheory.CharacterCount
