@@ -24,11 +24,12 @@ This leaf assembles `hXanchored` from the per-`φ` anchored-image producer
 (6.8.2.3), verified gap analysis): the columns do **not** all lie over a single source character `φ`;
 each column's underlying irreducible `θ_{χ₂} = Res^H μ_{0,χ₂}` lies over its **own** central linear
 character `φ_θ` ([Is] Lemma 2.27, `Res^H_{W₂} θ = θ(1)·φ_θ` with `W₂ ≤ Z(H)`).  The first piece is
-therefore the per-`θ` central-character positivity:
+therefore the per-`θ` central-character data:
 
-* `exists_central_phi_pos_weight` — for every irreducible `θ` of `H`, the central linear character
-  `φ_θ` is a **positive-weight** constituent (`0 < constituentWeight`), so the per-`φ` machinery
-  applies with `φ = φ_θ`.
+* `exists_central_phi_data` — for every irreducible `θ` of `H`, the central linear character `φ_θ`
+  packages: irreducibility in both forms (`compHom e φ` on `W₂.subgroupOf H` for the per-`φ`
+  producer; `φ` on `W₂` for the aggregate), linearity `φ_θ(1) = 1`, and positivity
+  `0 < constituentWeight` (so `θ` is a positive-weight constituent of `φ_θ`).
 -/
 
 namespace OddOrder.Peterfalvi.S08
@@ -40,18 +41,25 @@ variable {G : Type*} [Group G] [Fintype G] [Invertible (Nat.card G : ℂ)]
 variable {L : Subgroup G} [Fintype ↥L] [Invertible (Nat.card ↥L : ℂ)]
 variable {H : Subgroup ↥L} [Invertible (Nat.card ↥H : ℂ)]
 
-/-- **(6.8.2.3) per-column central-character positivity** (the Q1 "central gap").
+/-- **(6.8.2.3) per-column central-character data** (the Q1 "central gap").
 
 For any irreducible character `θ` of `H` and a central subgroup `W₂ ≤ Z(H)`, the central **linear**
 character `φ_θ` of `θ` ([Is] Lemma 2.27 `exists_central_linear_restriction`,
 `Res^H_{W₂} θ = θ(1)·φ_θ`), transported from `W₂.subgroupOf H` to the ambient `L`-subgroup `W₂` via
-`subgroupOfEquivOfLe`, is a **positive-weight** constituent: `0 < constituentWeight hφ' θ`.
+`subgroupOfEquivOfLe`, packages every datum the per-`φ` machinery needs:
 
-This exhibits, per `θ`, the source character `φ_θ` that `caseB_per_phi_anchored_fromYset` is applied
-with.  It resolves the fixed-`φ` mismatch of the naive reading: the certain-type columns each lie
-over their **own** central `φ_θ` (read off from `θ` via the central restriction), not over a single
+* `hφ' : IsIrreducibleCharacter (compHom e φ)` — irreducibility on `W₂.subgroupOf H`, the form
+  consumed by `caseB_per_phi_anchored_fromYset` / `caseB_hcol` / `caseB_hirr`;
+* `IsIrreducibleCharacter φ` (on the `L`-subgroup `W₂`, via `compHom_of_surjective`) and `φ 1 = 1`
+  (linearity) — the form consumed by the `(6.8.2.2)` aggregate `exists_decomposition_caseB`
+  (`φ : IrreducibleCharacter ↥W₂`, `φ(1) = 1`);
+* `0 < constituentWeight hφ' θ` — positivity (`= θ(1)`), so `θ` is a positive-weight constituent of
+  `φ_θ`.
+
+This resolves the fixed-`φ` mismatch of the naive reading: the certain-type columns each lie over
+their **own** central `φ_θ` (read off from `θ` via the central restriction), not over a single
 shared `φ`.  Positivity is immediate from `⟨φ_θ, Res θ⟩ = θ(1)·⟨φ_θ,φ_θ⟩ = θ(1) ≠ 0`. -/
-theorem exists_central_phi_pos_weight
+theorem exists_central_phi_data
     {W2 : Subgroup ↥L} (hW2H : W2 ≤ H) [Fintype ↥(W2.subgroupOf H)]
     [Invertible (Nat.card ↥(W2.subgroupOf H) : ℂ)] [Fintype ↥H]
     (hcen : W2.subgroupOf H ≤ Subgroup.center ↥H)
@@ -59,7 +67,7 @@ theorem exists_central_phi_pos_weight
     ∃ (φ : ClassFunction ↥W2 ℂ)
       (hφ' : IsIrreducibleCharacter
         (ClassFunction.compHom (Subgroup.subgroupOfEquivOfLe hW2H).toMonoidHom φ)),
-      0 < constituentWeight hφ' θ := by
+      IsIrreducibleCharacter φ ∧ φ 1 = 1 ∧ 0 < constituentWeight hφ' θ := by
   obtain ⟨φN, hφNirr, hφN1, hres, _⟩ :=
     θ.2.exists_central_linear_restriction (W2.subgroupOf H) hcen
   set e := Subgroup.subgroupOfEquivOfLe hW2H with he
@@ -67,15 +75,17 @@ theorem exists_central_phi_pos_weight
       (ClassFunction.compHom e.symm.toMonoidHom φN) = φN := by
     ext x
     simp only [ClassFunction.compHom_apply, MulEquiv.coe_toMonoidHom, MulEquiv.symm_apply_apply]
-  refine ⟨ClassFunction.compHom e.symm.toMonoidHom φN, by rw [htrans]; exact hφNirr, ?_⟩
-  rw [constituentWeight_pos_iff, htrans, hres, OddOrder.RepresentationTheory.inner_smul_right]
-  obtain ⟨d, hdpos, hd⟩ := irreducibleCharacter_apply_one_eq_pos_natCast θ
-  have hself : ClassFunction.inner φN φN = 1 := by
-    have h := irreducibleCharacter_inner_eq_ite
-      (⟨φN, hφNirr⟩ : IrreducibleCharacter ↥(W2.subgroupOf H))
-      (⟨φN, hφNirr⟩ : IrreducibleCharacter ↥(W2.subgroupOf H))
-    rwa [if_pos rfl] at h
-  rw [hself, mul_one, star_ne_zero, hd]
-  exact_mod_cast hdpos.ne'
+  refine ⟨ClassFunction.compHom e.symm.toMonoidHom φN, by rw [htrans]; exact hφNirr,
+    IsIrreducibleCharacter.compHom_of_surjective e.symm.surjective hφNirr, ?_, ?_⟩
+  · rw [ClassFunction.compHom_apply, map_one]; exact hφN1
+  · rw [constituentWeight_pos_iff, htrans, hres, OddOrder.RepresentationTheory.inner_smul_right]
+    obtain ⟨d, hdpos, hd⟩ := irreducibleCharacter_apply_one_eq_pos_natCast θ
+    have hself : ClassFunction.inner φN φN = 1 := by
+      have h := irreducibleCharacter_inner_eq_ite
+        (⟨φN, hφNirr⟩ : IrreducibleCharacter ↥(W2.subgroupOf H))
+        (⟨φN, hφNirr⟩ : IrreducibleCharacter ↥(W2.subgroupOf H))
+      rwa [if_pos rfl] at h
+    rw [hself, mul_one, star_ne_zero, hd]
+    exact_mod_cast hdpos.ne'
 
 end OddOrder.Peterfalvi.S08
