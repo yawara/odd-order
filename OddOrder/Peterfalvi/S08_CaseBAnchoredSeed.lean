@@ -54,7 +54,9 @@ character `φ_θ` of `θ` ([Is] Lemma 2.27 `exists_central_linear_restriction`,
   (linearity) — the form consumed by the `(6.8.2.2)` aggregate `exists_decomposition_caseB`
   (`φ : IrreducibleCharacter ↥W₂`, `φ(1) = 1`);
 * `0 < constituentWeight hφ' θ` — positivity (`= θ(1)`), so `θ` is a positive-weight constituent of
-  `φ_θ`.
+  `φ_θ`;
+* `Res^H_{W₂} θ = θ(1)·(compHom e φ_θ)` — the master central-restriction equation ([Is] 2.27), from
+  which nontriviality (`φ_θ ≠ 1 ⟺ W₂ ⊄ ker θ`) is downstream-derivable.
 
 This resolves the fixed-`φ` mismatch of the naive reading: the certain-type columns each lie over
 their **own** central `φ_θ` (read off from `θ` via the central restriction), not over a single
@@ -67,7 +69,10 @@ theorem exists_central_phi_data
     ∃ (φ : ClassFunction ↥W2 ℂ)
       (hφ' : IsIrreducibleCharacter
         (ClassFunction.compHom (Subgroup.subgroupOfEquivOfLe hW2H).toMonoidHom φ)),
-      IsIrreducibleCharacter φ ∧ φ 1 = 1 ∧ 0 < constituentWeight hφ' θ := by
+      IsIrreducibleCharacter φ ∧ φ 1 = 1 ∧ 0 < constituentWeight hφ' θ ∧
+      ClassFunction.restrict (W2.subgroupOf H) (θ : ClassFunction ↥H ℂ)
+        = (θ : ClassFunction ↥H ℂ) 1 •
+          ClassFunction.compHom (Subgroup.subgroupOfEquivOfLe hW2H).toMonoidHom φ := by
   obtain ⟨φN, hφNirr, hφN1, hres, _⟩ :=
     θ.2.exists_central_linear_restriction (W2.subgroupOf H) hcen
   set e := Subgroup.subgroupOfEquivOfLe hW2H with he
@@ -76,7 +81,7 @@ theorem exists_central_phi_data
     ext x
     simp only [ClassFunction.compHom_apply, MulEquiv.coe_toMonoidHom, MulEquiv.symm_apply_apply]
   refine ⟨ClassFunction.compHom e.symm.toMonoidHom φN, by rw [htrans]; exact hφNirr,
-    IsIrreducibleCharacter.compHom_of_surjective e.symm.surjective hφNirr, ?_, ?_⟩
+    IsIrreducibleCharacter.compHom_of_surjective e.symm.surjective hφNirr, ?_, ?_, ?_⟩
   · rw [ClassFunction.compHom_apply, map_one]; exact hφN1
   · rw [constituentWeight_pos_iff, htrans, hres, OddOrder.RepresentationTheory.inner_smul_right]
     obtain ⟨d, hdpos, hd⟩ := irreducibleCharacter_apply_one_eq_pos_natCast θ
@@ -87,5 +92,6 @@ theorem exists_central_phi_data
       rwa [if_pos rfl] at h
     rw [hself, mul_one, star_ne_zero, hd]
     exact_mod_cast hdpos.ne'
+  · rw [htrans]; exact hres
 
 end OddOrder.Peterfalvi.S08
