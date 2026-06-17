@@ -70,6 +70,25 @@ is fine, only `invariants centerRep` explodes). **Fix = carrier synonym** `Cente
 Reusable technique: [[lean-type-synonym-fixes-instance-diamond]]. **⟹ the same synonym de-risks the
 idempotent-side cornerstone application (step 3).**
 
+### Step (3) — idempotent basis: crux DONE, Wedderburn transport remains
+**σ-permutation crux ✅** (`PiAlgebraAut.lean`, commit `afa21d09`, self-contained + upstreamable):
+`algEquiv_permutes_single : (ψ : (ι → k) ≃ₐ[k] (ι → k)) → ∃ π : Equiv.Perm ι,
+∀ i, ψ (Pi.single i 1) = Pi.single (π i) 1`.  ⚠ The char-`p` pitfall: the column sum `∑ᵢ εᵢ j = 1`
+does NOT force a unique nonzero entry (in char `p`, `p+1` ones also sum to `1`).  **Orthogonality**
+(`εᵢ * εᵢ' = 0`) is what gives at-most-one nonzero per coordinate; supports are then pairwise
+disjoint, cover `ι` (family sums to `1`), and `|ι|` nonempty disjoint covering sets are singletons
+(`Finset.card` double-count).  This is the `hρ`-on-simples ingredient.
+
+**Remaining step (3) = the Wedderburn center transport** `Z(𝔽̄_p[U]) ≃ₐ[k] (Fin N → k)` (plumbing,
+mathlib lemmas all located): apply `IsSemisimpleRing.exists_algEquiv_pi_matrix_of_isAlgClosed` to
+`k[U]` (instances `IsSemisimpleRing`/`FiniteDimensional` confirmed to resolve under
+`[NeZero (Nat.card U : k)]`) giving `k[U] ≃ₐ ∏ᵢ Mat_{dᵢ}(k)`; transport the centre via
+`AlgEquiv.map_mem_center` + center-of-Pi (`∏ Z(Matᵢ)`) + `Matrix.subalgebraCenter_eq_scalarAlgHom_map`
+(`Z(Mat) = scalars ≅ k`) ⟹ `Z ≃ₐ (Fin N → k)`.  Then: idempotent basis = pullback of `Pi.basisFun`
+along this equiv; `σ`-permutation = transport `σ` to `(Fin N → k)` and apply `algEquiv_permutes_single`;
+apply the cornerstone through the `CenterCarrier` synonym (de-risked) ⟹ `dim Z^σ = #(σ-orbits on
+simples)`.  Then equate with the class-sum count (step 4) + the counting bridge ⟹ (†).
+
 ## Decision (2026-06-17, user): NO axioms — build everything bottom-up
 
 The full (9.1) splits into a **qualitative** half (corollary (i)) and a **counting**
