@@ -13,6 +13,10 @@
   Brauer lemma is fully assembled at the abstract level — `CenterSimplesOrbit.exists_fixed_simple`
   (3d.3b), `card_simples_eq_card_classes` (N=Ncl), `FreeActionOrbitCount.dvd_card_sub_one_of_free_…`,
   `CenterOrbitFree.gamma_free_off_trivial_simple` (3d.3c). All sorry-free + axiom-clean. See resume⁵.
+- ✅ **Abstract free-(†) ENGINE COMPLETE** (2026-06-18, resume⁵): `WielandtCounting`
+  `finrank_eq_card_mul_finrank_invariants_of_free` (`FreeOrbitModuleCount.lean`) — `V = ⊕ Aᵢ`, `G`
+  free on `ι` permuting summands ⟹ `dim V = |G|·dim Vᴳ` (sorry-free, axiom-clean). Plus I-4 core
+  `Module.finrank_baseChange` confirmed in mathlib (base change is **not** a wall).
 - ❌ **Main `wielandt_fixedPoint_frobenius` = the sole remaining sorry.** Next = carrier-level wiring
   of 3d.3c + (†) [I-2 isotypic + I-4 base change + I-3] + I-5; a DESIGN phase (see resume⁵ "NEXT").
 
@@ -244,11 +248,15 @@ Quot.sound}), so the **Teichmüller-free orbit-count Brauer lemma is complete at
    `L = U ⋊ E`; `ψ = E → MulAut U` (conjugation, each nonid FPF by Frobenius + coprime); splitting
    `φ : Z(𝔽̄_p[U]) ≃ₐ (Fin N → 𝔽̄_p)` from `exists_center_algEquiv_pi` (needs `IsAlgClosed`,
    `char ∤ |U|`); `compHom` actions on classes / `Fin N`.
-2. **(†)** `W^U = 0 ⟹ dim W = |E|·dim W^E`: I-2 isotypic decomposition of `𝔽̄_p[U]`-module `W`
-   (mathlib `IsSemisimpleModule`/Maschke), drop trivial isotypic (= `W^U = 0`), `E` permutes the rest
-   freely (3d.3c) ⟹ per-orbit I-3 (`finrank_eq_card_mul_finrank_invariants`).
-3. **I-4 base change** `𝔽_p → 𝔽̄_p` (chief factors live over `𝔽_p`). **Likely the real hard wall now**;
-   repo/mathlib coverage TBD.
+2. **(†)** `W^U = 0 ⟹ dim W = |E|·dim W^E`: **the abstract engine
+   `finrank_eq_card_mul_finrank_invariants_of_free` is DONE** (resume⁵). Remaining = *wire the module*:
+   take `A i := (idemBasis φ i) · W` (idempotent projections = I-2 isotypic comps, internal since the
+   `idemBasis` are a complete orthogonal idempotent family of `Z(𝔽̄_p[U])`); show `E` permutes them by
+   `simplesAction φ` (conjugation permutes central idempotents — the bridge to 3d.3c); `W^U = 0 ⟹`
+   trivial comp `A i₀ = ⊥`, so restrict to `ι = {i ≠ i₀}` where `E` is free (3d.3c) ⟹ apply the engine.
+3. **I-4 base change** `𝔽_p → 𝔽̄_p` (chief factors live over `𝔽_p`). **NOT a wall**: `dim` is preserved
+   by `Module.finrank_baseChange`; invariants commute with base change via the coprime averaging
+   idempotent (`𝔽̄_p` free over `𝔽_p`). Build the `(𝔽̄_p ⊗ W)^E ≅ 𝔽̄_p ⊗ Wᴱ` finrank identity.
 4. **(I-5)** chief-series multiplicativity `|C_H(X)| = ∏ |C_{V_i}(X)|` (keystone Cor 3.28 exists).
 5. assembly → `wielandt_fixedPoint_frobenius` (`CoprimeAction.lean` sole sorry).
 
