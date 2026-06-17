@@ -4,6 +4,62 @@
 > `s08_6_8_assembly_plan.md`(458KB)/`s08_6_8_3_gap_resolution.md` のうち本 note と矛盾する記述は本 note を優先。
 > 上位方針・FT 接続の文脈 = 記憶 [[ft-path-policy]] の 2026-06-17 検証訂正ブロック。
 
+## ✅✅✅ 2026-06-17 セッション更新 — brick 3 COMPLETE (norm-weighted member-family bound)
+
+**3 結果着地** (`S08_CaseBEnumeration.lean`、全 build-green、axiom-clean
+`[propext, Classical.choice, Quot.sound]`、full build 3850 jobs/78s):
+
+1. **`caseB_breakChar_fields`** — break-character ψ の 8 fact(`sBreakPair_fields` の case-B 類似)。
+   非実性(`caseB_irr_nonreal`)・self/cross Kronecker(`irreducibleCharacter_inner_eq_ite` +
+   `caseB_irr_conj_inner`)・conj-diff 支持(`caseB_irr_conj_diff_support`)・**ψ⊥S₁/ψ̄⊥S₁**。
+   case-B 固有点 = S₁ が reducible column を含むので column への直交は degree-mod|W₁|
+   (`caseB_inner_irr_columnSum_eq_zero`)、irreducible への直交は Kronecker で dispatch。
+2. **`sMember_degreeSqNormBound_of_not_coherent`**(brick 3 core)= weighted degree-ratio bound
+   `∑ⱼ (degⱼ)²/mcⱼ ≤ 2a`。enumerator(brick 2 `exists_sMemberOrthogonalFamilyW`)+ per-member
+   coupled datum(`caseB_member_orthoDatum`)+ degree data(`sMember_charValue_one_eq_mul_anchor`)+
+   break fields + 生成 bridge(`…_scaledDiffs`/`…_anchorGeneration`)を組んで engine
+   `coherentDegreeSqNormBound_of_not_coherentW` に投入。**anchor `i₁` = Yset member**(`Yset_apply_one`
+   で degree |W₁|、irreducible ゆえ `mc i₁=1`)。
+3. **`sMember_degreeSqNormReBound_of_not_coherent`**(real-part scaling)= `∑ⱼ (χⱼ(1).re)²/mcⱼ ≤
+   2ψ(1).re·η(1).re`(`sMember_degreeSqReBound_of_not_coherent` mirror、anchor degree |W₁| で rescale)。
+
+**実装で確定した知見(再調査不要)**:
+- `hψeq : ψ = induce H θ`(S_eq の等式は χ=induce、左辺 χ)→ 内在 fact は `rw [hψeq]`、`hψirr' := hψeq ▸ hψirr`。
+- anchor の ZIrr(`htau1ψ`)は `scaledDiff_dadeImage_mem_ZIrr (χ₁ := ⟨χmem i₁, hanchorIrr⟩)` で
+  **anchor を直接 IrreducibleCharacter 化**(η 経由の `rw [hi₁eq]` は motive-not-type-correct で失敗)。
+- brick 2 enumerator の Gram は `instDecidableEqFin`、engine は `Classical.propDecidable` → engine の
+  `hmemortho` 引数は `by rw [hmemortho i j]; rcases eq_or_ne i j with h | h <;> simp [h]` で正規化(template 流)。
+- `exists_sMemberOrthogonalFamilyW`/`caseB_breakChar_fields` は plain `S08` namespace ゆえ **dot 記法不可**
+  (`exists_sMemberOrthogonalFamilyW hyp …`)。`hyp.sMember_*`/`hyp.Yset_*` 等は SibleyDadeHypothesis method で dot 可。
+- `hνZ`(member の coherent extension ∈ ZIrr)= `hS₁coh.extension_mem_ZIrr (χmem i) (Submodule.subset_span …)`
+  (`IsCoherent` 構造体フィールド)。
+
+### ▶▶ 次 = brick 4 = c2 endgame（**新 leaf 必須**、scope 確定 2026-06-17）
+
+**⚠ leaf 配置**: `S08_CaseBEndgame.lean` は `S08_CaseBCoherence2` のみ import し **brick 3
+(`S08_CaseBEnumeration`)を見ない**。brick 4 は `S08_CaseBEnumeration` + `S08_CaseBEndgame` 両方を
+import する**新 leaf `S08_CaseBWeightedEndgame.lean`** に置く（FPF spine + brick 3 + X∪Y seed が揃う）。
+
+unweighted endgame `false_of_coherentXunionYset_of_not_coherentS`(`CorePart2:3439`)+ `xSum_le_two_psi`
+(`:3229`)を mirror。4 sub-piece:
+
+1. **`sum_div_normSq_Xset_eq`**(weighted Xset 恒等式、~30 行、**case-B 仮説不要**)= `sum_re_sq_Xset_eq`
+   (`CorePart2:2837`)の重み付き版。summand を `(χ1).re²/(⟨χ,χ⟩).re`、`sum_div_normSq_induce_kernelFilter_eq`
+   (`CorePart1:2526`, **複素** `χ1²/⟨χ,χ⟩` 形, irreducibility 不要)の A=⊥ と A=W₂ を `Finset.sum_sdiff` で差。
+   real 変換は `sum_re_sq_induce_kernelFilter_eq`(`:2789`)の `hsummand`/`Complex.ofReal_inj` パターン
+   (χ1 実正・⟨χ,χ⟩ 実正ゆえ `χ1²/⟨χ,χ⟩ = ((χ1).re²/(⟨χ,χ⟩).re:ℂ)`)。→ `|L:H|·(|H|-|H:W₂|)`。
+2. **`xSum_le_two_psi_caseB`**(bridge、~50 行)= `xSum_le_two_psi`(`:3229`)の重み付き版。brick 3
+   `sMember_degreeSqNormReBound_of_not_coherent` + (1) + `Xdiff ⊆ (range χmem).toFinset` +
+   `sum_toFinset_range_eq` で `|L:H|·(|H|-|H:W₂|) ≤ 2ψ(1).re·η(1).re`。**summand 一致**: index 側
+   `(χmem j 1).re²/mc j`(mc=(⟨χmem,χmem⟩).re)、set 側 `(χ1).re²/(⟨χ,χ⟩).re`。
+3. **`false_of_coherentXunionYset_caseB_of_not_coherentS`**(endgame、~90 行)= `:3439` mirror。X∪Y
+   coherence seed を **hypothesis** で取り(`exists_coherentBreakPair` で break pair)、(2) →
+   `hbreak : w1·hZ·(cZ-1) ≤ 2·w1²·d` に整形 → `false_of_caseB_break_of_bounds`(`CaseBEndgame:384`、proved)。
+   case-B 構造仮説 = `caseB_fpf_bound`(`:338`)の署名(hW2cen/hcop/hMgt/hWMgt)+ Cor 2.30 `d²≤|H:W₂|`。
+4. **`S08_CoherenceTheorems:59` の c2-math-B dispatch**: X∪Y seed を **構成**（`coherentXunionYset_caseB_of_glued`
+   `CaseBCoherence2:1616`）— ここで `hXanchored`（§6 certain-type structure theory gap）が要求され
+   **ユーザー直接管理ゆえ loop では閉じない**（LAUNCH stop 条件）。(1)-(3) は閉じられる、(4) で gate。
+
 ## ✅✅ 2026-06-17 セッション更新 — brick 2 COMPLETE (coupled producer + pairwise + enumerator)
 
 **3 結果着地** (`S08_CaseBEnumeration.lean`、全 build-green 3629 jobs・axiom-clean、commits
