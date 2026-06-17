@@ -4,6 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
 import OddOrder.GroupTheory.RepresentationTheory.CenterOrbitCount
+import Mathlib.Algebra.Central.Matrix
 
 /-!
 # Transporting the centre along an algebra isomorphism
@@ -77,5 +78,32 @@ def centerPiEquiv :
     ((centerPiEquiv f i : C i)) = (f : ∀ i, C i) i := rfl
 
 end Pi
+
+section Matrix
+
+variable {k n : Type*} [Field k] [Fintype n] [DecidableEq n]
+
+/-- The centre of a matrix algebra over a field is the range of the scalar embedding. -/
+theorem matrix_center_eq_range :
+    Subalgebra.center k (Matrix n n k) = (Matrix.scalarAlgHom n k).range := by
+  rw [Matrix.subalgebraCenter_eq_scalarAlgHom_map, Subalgebra.center_eq_top, Algebra.map_top]
+
+/-- The scalar embedding `k →ₐ Matrix n n k` is injective when `n` is nonempty. -/
+theorem scalarAlgHom_injective [Nonempty n] :
+    Function.Injective (Matrix.scalarAlgHom n k : k →ₐ[k] Matrix n n k) := by
+  intro a b hab
+  rw [Matrix.scalarAlgHom_apply, Matrix.scalarAlgHom_apply, Matrix.scalar_apply,
+    Matrix.scalar_apply] at hab
+  obtain ⟨i⟩ := ‹Nonempty n›
+  simpa [Matrix.diagonal_apply_eq] using congrFun (congrFun hab i) i
+
+/-- **The centre of a matrix algebra over a field is `k`** (scalar matrices), as an algebra
+isomorphism `Z(Matrix n n k) ≃ₐ[k] k` (for `n` nonempty). -/
+noncomputable def matrixCenterEquiv [Nonempty n] :
+    Subalgebra.center k (Matrix n n k) ≃ₐ[k] k :=
+  (Subalgebra.equivOfEq _ _ matrix_center_eq_range).trans
+    (AlgEquiv.ofInjective (Matrix.scalarAlgHom n k) scalarAlgHom_injective).symm
+
+end Matrix
 
 end OddOrder.GroupTheory.CenterSplitting
