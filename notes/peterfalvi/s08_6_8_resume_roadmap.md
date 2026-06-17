@@ -4,7 +4,7 @@
 > `s08_6_8_assembly_plan.md`(458KB)/`s08_6_8_3_gap_resolution.md` のうち本 note と矛盾する記述は本 note を優先。
 > 上位方針・FT 接続の文脈 = 記憶 [[ft-path-policy]] の 2026-06-17 検証訂正ブロック。
 
-## 🔨🔨 2026-06-18 cont.³ — hXanchored: core integration + cY-uniformity COMPLETE (自走)
+## 🔨🔨🔨 2026-06-18 cont.³ — hXanchored: ALL hard math done (core+cY-unif+R1+R2) (自走)
 
 `S08_CaseBAnchoredSeed.lean` に着地した順に(全 build-green 3629 jobs・axiom-clean):
 1. **`exists_central_phi_data`** — per-θ 中心線形指標 φ_θ([Is] 2.27)を **両形式**(compHom e φ on
@@ -19,21 +19,35 @@
    `hyp.coherentYset`** に対して出力(opaque existential cY でない)。good case の `coeff_eq_neg_or_edge_caseB`
    witness が hyp.coherentYset そのもの、edge は |𝒴|=2 ゆえ hYcard で排除。**⟹ ∀-column が単一 anchor 共有**。
 
-**🎯 最難 3 ピース達成**: central gap(#1)・core integration(#3)・cY-uniformity(#4)。
-commits: `b4820084`/`d2f2ddb6`(#1)/`a5736e47`(#2,#3)/`d9e2c246`(#4)。
+**🎯🎯 全ハード math 解決**: central gap(#1)・core integration(#3)・cY-uniformity(#4)・**(R1) §6
+中心指標非自明性**・**(R2) degree 関係**。commits: `b4820084`/`d2f2ddb6`(#1)/`a5736e47`(#2,#3)/
+`d9e2c246`(#4)/`cdb98ca7`(R1)/`0b0e25ee`(R2)。
 
-**▶ 残 = ∀-column 組立 + 2 つの certain-type 構造事実**:
-- **(R1) hWne 導出**: `columnSum χ₂ ∈ certainTypeSet h46 k`(= ∃χ₂'≠1, degree-match ∧ columnSum χ₂=columnSum χ₂')
-  から **χ₂'≠1 ⟹ W₂.subgroupOf H ⊄ ker(Res_H μ_{0,χ₂'})**(中心指標非自明性)。**§6 certain-type 構造事実**
-   — χ₂' の W₂-central char が χ₂'|_{W₂}(≠1)であることに依存。要 §6 API 精査(`certainTypeRestrict`/columnFamily
-  の central char と χ₂ の対応)。⚠ ここが残る唯一の非自明 math 依存(rabbit-hole 注意)。
-- **(R2) 均一 a₀**: degree-match `∑ᵢ μ_{i,χ₂'}(1) = ∑ᵢ μ_{i,k}(1)` + `∑ᵢ μ_{i}(1) = |W₁|·θ(1)`
-  (per-column degree decomposition)⟹ θ_{χ₂'}(1) = θ_k(1) =: a₀ 一定。degree 算術。
-- **(R3) Ximg + ∀-column**: `Ximg χ₂ := choice (caseB_column_anchored_image …).X`、membership 展開して
-  per-column lemma 適用、a₀ 固定で hXanchored 組立。
-- **(R4) seed 配線**: hXanchored → `certainTypeSet_isCoherent_via_anchoredImages` →(xChain glue)→ cX →
-  `coherentXunionYset_caseB_of_glued` → hXYcoh → `nonempty_coherent_S_caseB`(brick 4.4)→ S08:59。
-**正本 leaf = `S08_CaseBAnchoredSeed.lean`。** 次の一手 = (R1) の §6 central-char 非自明性 API 精査。
+**✅ (R1) 解決(rabbit-hole でなかった)**: `caseB_column_W2_nonconstant`(χ₂≠1 ⟹ ∃w∈W₂.subgroupOf H,
+θ(w)≠θ(1))= Pf (4.7) `Hypothesis.not_subset_characterKernel_chiRestrict_of_ne_one`(W₂⊄ker chiRestrict)
+を K=H で existential 形に repack(値は L-レベル μ_{0,χ₂} に落として K↔H dependent-transport 回避)。
+**⟹ `caseB_column_anchored_image` は今 `hχ₂ : χ₂ ≠ 1` を直接取る**(hWne を内部導出)。
+**✅ (R2) 解決**: per-column lemma が degree 関係 `columnSum χ₂(1) = (a:ℂ)·η₁(1)`(a=θ(1))も出力
+(induce_apply_one + index_H_eq_card_W1 + constituentWeight_eq_apply_one)。
+
+**現 per-column lemma `caseB_column_anchored_image`**(完成形): χ₂≠1 + |𝒴|≠2 ⟹
+`∃ X a, (columnSum χ₂(1) = a·η₁(1)) ∧ τ(columnSum χ₂ − a•η₁) = X − a•hyp.coherentYset.ext η₁`。
+
+**▶ 残 = (6.8.2.3) seed 組立(機械的・math gate なし)**:
+- **(R3) certainTypeSet coherence** = `certainTypeSet_isCoherent_via_anchoredImages`(`S08_CaseBXChiCoherence:246`)
+  に 3 obligation 供給:
+  - **hXanchored**(∀-column): membership `columnSum χ₂∈certainTypeSet h46 k`(= ∃χ₂'≠1 degree-match ∧
+    columnSum χ₂=columnSum χ₂')展開 → per-column lemma を χ₂' に適用 → degree-match で a=a₀(均一)を導出。
+    **Ximg χ₂ := Classical.choose**(membership witness χ₂' → per-column X)。a₀=参照列 k の θ(1)。
+  - **hXinner**(★ 新認識の obligation): `∀χ₂χ₂', inner(Ximg χ₂)(Ximg χ₂') = inner(columnSum χ₂)(columnSum χ₂')`
+    = **Ximg の等長性(cross-column 内積保存)**。`ind_cross_inner_eq_zero`(`S06_CertainTypeCharacters:448`、
+    χ₂≠χ₂' で直交)+ within-column(Dade 等長)で。中規模。
+  - **hXzirr**: `Ximg χ₂ ∈ ZIrr`(= `(caseB_phi_family …).X` は Dade image、容易)。
+- **(R4) seed 配線**: certainTypeSet coherence →(irreducible-X chain `xChainCoherent` と glue)→ cX
+  (`IsCoherent (Xset W₂)`)→ `coherentXunionYset_caseB_of_glued` → hXYcoh → `nonempty_coherent_S_caseB`
+  (brick 4.4)→ S08:59。**この cX glue(certainTypeSet ⊔ irreducible-X = Xset W₂)も中規模 assembly**。
+**正本 leaf = `S08_CaseBAnchoredSeed.lean`。次の一手 = (R3) ∀-column hXanchored + hXinner(Ximg 等長)。**
+**⚠ math gate は全消滅**(R1-R2 で);残は choice-Ximg + 等長 + seed glue の機械的 wiring。
 
 ## 🔨 2026-06-18 cont.² — hXanchored 着手: central-char bridge 完成 + integration マップ確定
 
