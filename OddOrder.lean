@@ -5,6 +5,7 @@ import OddOrder.GroupTheory.ChiefFactor
 import OddOrder.GroupTheory.ConjClassSet
 import OddOrder.GroupTheory.CoprimeAction
 import OddOrder.GroupTheory.CoprimeAbelianPGroup
+import OddOrder.GroupTheory.CoprimeFrobeniusKernel
 import OddOrder.GroupTheory.CriticalSubgroup
 import OddOrder.GroupTheory.ElementaryAbelian
 import OddOrder.GroupTheory.ElementaryAbelianFamily
