@@ -111,15 +111,68 @@ theorem compHom_phi_ne_trivial_of_restrict
   simpa [ClassFunction.restrict_apply, ClassFunction.smul_apply, trivialClassFunction_apply,
     smul_eq_mul] using hval
 
+/-- **(6.8.2.2) aggregate for the canonical `Y`-coherence** (good-case form).  The variant of
+`exists_decomposition_caseB` that returns the decomposition against the **canonical** Sibley
+`Y`-coherence `hyp.coherentYset` (not an opaque existential `cY`): in the good case the witness of
+`coeff_eq_neg_or_edge_caseB` *is* `hyp.coherentYset`, and the edge case requires `|𝒴| = 2`, excluded
+by `hYcard`.  This is what makes the `∀`-column `hXanchored` use a **single uniform** anchor
+`hyp.coherentYset.extension η₁` across all columns. -/
+theorem exists_decomposition_caseB_coherentYset
+    (hyp : SibleyDadeHypothesis G L H) [H.Normal]
+    (hcop : Nat.Coprime (Nat.card ↥H) (Nat.card hyp.W1))
+    {p : ℕ} (hp : p.Prime) (hHp : IsPGroup p ↥H)
+    {W2 : Subgroup ↥L} [W2.Normal] [Invertible (Nat.card ↥W2 : ℂ)]
+    (hprime : (Nat.card W2).Prime) (hW2comm : W2 ≤ ⁅H, H⁆)
+    (hW2cen : W2 ≤ Subgroup.center ↥L)
+    {η₁ : ClassFunction ↥L ℂ} (hη₁ : η₁ ∈ hyp.Yset)
+    (φ : IrreducibleCharacter ↥W2) (hφ1 : (φ : ClassFunction ↥W2 ℂ) 1 = 1)
+    (hφ : φ ≠ trivialIrreducibleCharacter ↥W2)
+    (hc2 : 2 ≤ (W2.subgroupOf H).index)
+    (hFPF : (W2.index : ℤ) < ((W2.subgroupOf H).index : ℤ) ^ 2)
+    (hYcard : hyp.Yset.ncard ≠ 2) :
+    ∃ X : ClassFunction G ℂ,
+      (∀ η ∈ hyp.Yset, ClassFunction.inner X (hyp.coherentYset.extension η) = 0)
+        ∧ X ∈ ZIrr G
+        ∧ hyp.tau (ClassFunction.induce W2 (φ : ClassFunction ↥W2 ℂ)
+            - ((W2.subgroupOf H).index : ℂ) • η₁)
+          = X - ((W2.subgroupOf H).index : ℂ) • hyp.coherentYset.extension η₁ := by
+  haveI : Fintype ↥W2 := Fintype.ofFinite _
+  have hW2H : W2 ≤ H := by
+    have hle : ⁅H, H⁆ ≤ H := by
+      rw [Subgroup.commutator_le]; intro a ha b hb; rw [commutatorElement_def]
+      exact H.mul_mem (H.mul_mem (H.mul_mem ha hb) (H.inv_mem ha)) (H.inv_mem hb)
+    exact hW2comm.trans hle
+  have h1 : ClassFunction.induce W2 (φ : ClassFunction ↥W2 ℂ) 1
+      = ((W2.subgroupOf H).index : ℂ) * η₁ 1 := by
+    rw [ClassFunction.induce_apply_one, hφ1, mul_one, hyp.Yset_apply_one hη₁]
+    have hidx : W2.index = (W2.subgroupOf H).index * H.index :=
+      (Subgroup.relIndex_mul_index hW2H).symm
+    rw [hidx, hyp.index_H_eq_card_W1]; push_cast; ring
+  have hgood : ClassFunction.inner (hyp.tau (ClassFunction.induce W2 (φ : ClassFunction ↥W2 ℂ)
+      - ((W2.subgroupOf H).index : ℂ) • η₁)) (hyp.coherentYset.extension η₁)
+      = -((W2.subgroupOf H).index : ℂ) := by
+    rcases hyp.coeff_eq_neg_or_edge_caseB hcop hp hHp hprime hW2comm hW2cen hη₁ φ hφ1 hφ hc2 hFPF
+      with h | ⟨hm2, _⟩
+    · exact h
+    · exact absurd hm2 hYcard
+  obtain ⟨horth, hXZ⟩ :=
+    hyp.orthogonal_tau_indW2_add_extension_general_caseB hW2H hW2comm hyp.coherentYset hη₁ φ hφ1 h1
+      hgood
+  refine ⟨hyp.tau (ClassFunction.induce W2 (φ : ClassFunction ↥W2 ℂ)
+      - ((W2.subgroupOf H).index : ℂ) • η₁)
+      + ((W2.subgroupOf H).index : ℂ) • hyp.coherentYset.extension η₁, horth, hXZ, ?_⟩
+  abel
+
 /-- **(6.8.2.3) per-column anchored image** — the core integration.
 
 For a certain-type column `χ₂` whose underlying irreducible `θ = Res^H μ_{0,χ₂}` is **nontrivial on
-`W₂`** (`hWne`, i.e. `W₂ ⊄ ker θ`, the defining `X = S − S(W₂)` property), the Sibley–Dade map sends
-the anchored difference `columnSum χ₂ − a·η₁` to `X − a·η₁^{τ₁}` for some virtual `X` and a `Y`-side
-coherence `cY`, with `a = θ(1)` (the constituent weight).
+`W₂`** (`hWne`, i.e. `W₂ ⊄ ker θ`, the defining `X = S − S(W₂)` property), and with `|𝒴| ≠ 2`
+(`hYcard`, excluding the relabel edge), the Sibley–Dade map sends the anchored difference
+`columnSum χ₂ − a·η₁` to `X − a·η₁^{τ₁}` for some virtual `X` against the **canonical** `Y`-coherence
+`hyp.coherentYset`, with `a = θ(1)` (the constituent weight).
 
 Assembles the per-`θ` central character (`exists_central_phi_data`), the `(6.8.2.2)` aggregate
-(`exists_decomposition_caseB`), the column/irreducible bundles
+against `hyp.coherentYset` (`exists_decomposition_caseB_coherentYset`), the column/irreducible bundles
 (`caseB_hcol`/`caseB_hirr`/`caseB_hirrAnc`, with non-linearity `caseB_hnonlin`), and the per-`φ`
 anchored producer (`caseB_per_phi_anchored_fromYset`), then rewrites `Ind^L_H θ = columnSum χ₂`
 (`columnSum_eq_induce_H`).  This is the `(6.8.2.3)` per-column anchored image `hXanchored` (modulo the
@@ -147,11 +200,11 @@ theorem caseB_column_anchored_image
     (χ₂ : (h46.W2.subgroupOf (h46.W1 ⊔ h46.W2)) →* ℂˣ)
     (hWne : ∃ w : ↥(h46.W2.subgroupOf H),
       (ClassFunction.restrict H ((h46.columnFamily χ₂).mu 0 : ClassFunction ↥L ℂ)) (w : ↥H)
-        ≠ (ClassFunction.restrict H ((h46.columnFamily χ₂).mu 0 : ClassFunction ↥L ℂ)) 1) :
-    ∃ (X : ClassFunction G ℂ) (cY : OddOrder.Peterfalvi.S07.IsCoherent hyp.tau hyp.Yset
-        (OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L)) (a : ℕ),
+        ≠ (ClassFunction.restrict H ((h46.columnFamily χ₂).mu 0 : ClassFunction ↥L ℂ)) 1)
+    (hYcard : hyp.Yset.ncard ≠ 2) :
+    ∃ (X : ClassFunction G ℂ) (a : ℕ),
       hyp.tau (OddOrder.Peterfalvi.S06.columnSum h46 χ₂ - a • η₁)
-        = X - (a : ℂ) • cY.extension η₁ := by
+        = X - (a : ℂ) • hyp.coherentYset.extension η₁ := by
   classical
   haveI : Fintype ↥h46.W2 := Fintype.ofFinite _
   have hθirr : IsIrreducibleCharacter
@@ -177,17 +230,17 @@ theorem caseB_column_anchored_image
     rw [hφtriv]
     ext x
     simp [ClassFunction.compHom_apply, trivialClassFunction_apply]
-  obtain ⟨cY, Xagg, hXaggorth, hXZ, hdecomp⟩ :=
-    hyp.exists_decomposition_caseB hcop hp hHp hprime hW2comm hW2cenL hη₁
-      (⟨φ, hφirr⟩ : IrreducibleCharacter ↥h46.W2) hφ1 hφneIrr hc2 hFPF
+  obtain ⟨Xagg, hXaggorth, hXZ, hdecomp⟩ :=
+    exists_decomposition_caseB_coherentYset hyp hcop hp hHp hprime hW2comm hW2cenL hη₁
+      (⟨φ, hφirr⟩ : IrreducibleCharacter ↥h46.W2) hφ1 hφneIrr hc2 hFPF hYcard
   simp only [IrreducibleCharacter.coe_mk] at hdecomp
   have hnonlin := caseB_hnonlin hW2H hderiv hφ' hφne
   have hcol := caseB_hcol hyp h46 hHK hW1 hW2H hcen hφ' hη₁
   have hirr := caseB_hirr hyp h46 hHK hW2H hcen hφ' hη₁ hnonlin
   have hirrAnc := caseB_hirrAnc hyp h46 hHK hW2H hφ' hη₁ hnonlin
-  have hanc := caseB_per_phi_anchored_fromYset hyp h46 hHK hW2H hcen hφ' cY hη₁
+  have hanc := caseB_per_phi_anchored_fromYset hyp h46 hHK hW2H hcen hφ' hyp.coherentYset hη₁
     hcol hirr hirrAnc (hXaggorth η₁ hη₁) hdecomp ⟨θ, hweight⟩
-  refine ⟨(caseB_phi_family hyp h46 hW2H hφ' hcol hirr ⟨θ, hweight⟩).X, cY,
+  refine ⟨(caseB_phi_family hyp h46 hW2H hφ' hcol hirr ⟨θ, hweight⟩).X,
     constituentWeight hφ' θ, ?_⟩
   rw [columnSum_eq_induce_H h46 hHK χ₂, ← hθval]
   exact hanc
