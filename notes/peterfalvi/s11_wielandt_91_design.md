@@ -169,7 +169,11 @@ Completed the loop handoff's steps 1-4 in `CenterSimplesOrbit.lean` (`f26fd70c`,
    `glauberman_fixed_point_exists` (Isaacs 3.24(a)) on `Ω = {y // mk y = C}` (transitive `G`-conj
    set; `⟨β⟩` acts via `β`, compatible); the `β`-fixed element is in `Fix(β) = {1}`. `⟨β⟩` solvable
    via `isSolvable_of_comm` + `mul_comm'` (zpowers `IsMulCommutative`). sorry-free, axiom-clean.
-3. **NEXT — (3d.3) transfer to simples** (3 sub-pieces):
+3. **(3d.3) transfer to simples** — **abstract backbone COMPLETE** (3d.1/3d.2/3d.3a/forward-count
+   all sorry-free + axiom-clean); remaining = the rep-theory `i₀` identification + concrete wiring.
+   - ✅ **forward-count DONE (`9b64a344`)** — `FreeActionOrbitCount.card_orbits_eq_of_free_off_unique_fixed`
+     (unique fixed point + free elsewhere ⟹ `#orbits = 1 + (n−1)/d`; 3d.3a's converse, defect sum via
+     `Finset.sum_eq_single`). The class side feeds this (Γ=E, x₀=trivial class, free-off-trivial by 3d.2).
    - ✅ **(3d.3a) DONE (`9ec8db73`)** — `FreeActionOrbitCount.orbit_trivial_or_free_of_card_orbits`:
      finite `Γ` (order `d > 1`) on finite nonempty `S` with `#orbits = 1 + (n−1)/d` and `d ∣ n−1` ⟹
      **every orbit size `1` or `d`, at most one fixed point**. The divisor argument went through as
