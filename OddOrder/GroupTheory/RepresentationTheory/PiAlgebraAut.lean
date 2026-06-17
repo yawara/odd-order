@@ -136,4 +136,35 @@ theorem algEquiv_permutes_single (ψ : (ι → k) ≃ₐ[k] (ι → k)) :
     exact hd rfl
   exact ⟨Equiv.ofBijective π ⟨hinj, Finite.surjective_of_injective hinj⟩, fun i => hπeq i⟩
 
+/-- Standard idempotents in `ι → k` are determined by their index. -/
+theorem single_one_inj {i j : ι} (h : (Pi.single i (1 : k) : ι → k) = Pi.single j 1) : i = j := by
+  by_contra hij
+  have hc := congrFun h i
+  rw [Pi.single_eq_same, Pi.single_eq_of_ne hij] at hc
+  exact one_ne_zero hc
+
+open scoped Classical in
+/-- The coordinate permutation underlying an algebra automorphism of `ι → k`, as a **monoid
+homomorphism** `((ι → k) ≃ₐ[k] (ι → k)) →* Equiv.Perm ι`.  The underlying permutation is the (unique)
+`π` with `ψ (Pi.single i 1) = Pi.single (π i) 1`; multiplicativity is forced by that uniqueness.
+This makes `MulAut`-actions on the index set (the simples of a group algebra) genuine group actions. -/
+noncomputable def algAutPerm : ((ι → k) ≃ₐ[k] (ι → k)) →* Equiv.Perm ι where
+  toFun ψ := Classical.choose (algEquiv_permutes_single ψ)
+  map_one' := by
+    ext i
+    refine single_one_inj (k := k) ?_
+    rw [← Classical.choose_spec (algEquiv_permutes_single (1 : (ι → k) ≃ₐ[k] (ι → k))) i,
+      AlgEquiv.one_apply, Equiv.Perm.one_apply]
+  map_mul' ψ₁ ψ₂ := by
+    ext i
+    refine single_one_inj (k := k) ?_
+    rw [← Classical.choose_spec (algEquiv_permutes_single (ψ₁ * ψ₂)) i, AlgEquiv.mul_apply,
+      Classical.choose_spec (algEquiv_permutes_single ψ₂) i,
+      Classical.choose_spec (algEquiv_permutes_single ψ₁) _, Equiv.Perm.mul_apply]
+
+/-- Defining property of `algAutPerm`: `ψ` sends `Pi.single i 1` to `Pi.single (algAutPerm ψ i) 1`. -/
+theorem algAutPerm_apply_single (ψ : (ι → k) ≃ₐ[k] (ι → k)) (i : ι) :
+    ψ (Pi.single i (1 : k)) = Pi.single (algAutPerm ψ i) 1 := by
+  classical exact Classical.choose_spec (algEquiv_permutes_single ψ) i
+
 end OddOrder.GroupTheory.PiAlgebraAut
