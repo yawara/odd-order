@@ -5926,6 +5926,8 @@ theorem typeP_family_member_dData [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOd
     {N : Subgroup G} (hN : IsZFamilyMember M K N) :
     ∃ KN : Subgroup G, KN ≤ N ∧
       K ⊔ Kstar = KN ⊔ ((K ⊔ Kstar) ⊓ OddOrder.BG.Ch3.S10.Msigma N) ∧
+      ((K ⊔ Kstar) ⊓ OddOrder.BG.Ch3.S10.Msigma N) ≤ Subgroup.centralizer (KN : Set G) ∧
+      Subgroup.IsPiSubgroup (OddOrder.BG.Ch3.S10.sigma N)ᶜ KN ∧
       (∀ g : G, g ∉ N →
         ((K ⊔ Kstar) ⊓ OddOrder.BG.Ch3.S10.Msigma N) ⊓ (MulAut.conj g • N) = ⊥) ∧
       (∀ g : G, g ∈ N → g ∉ K ⊔ Kstar → KN ⊓ (MulAut.conj g • KN) = ⊥) := by
@@ -5939,7 +5941,8 @@ theorem typeP_family_member_dData [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOd
     Subgroup.comap_map_eq_self_of_injective N.subtype_injective U'
   have hUN : Ch03.IsHallSubgroup ((kappa N ∪ OddOrder.BG.Ch3.S10.sigma N)ᶜ)
       ((U'.map N.subtype).subgroupOf N) := by rw [hUeq]; exact hU'
-  refine ⟨KN, hKNN, hswap.trans (by rw [hcanon]), ?_, ?_⟩
+  refine ⟨KN, hKNN, hswap.trans (by rw [hcanon]), hcanon ▸ inf_le_right,
+    kappaHall_isPiSubgroup_sigmaCompl hKNN hKN, ?_, ?_⟩
   · intro g hgN
     have hd := (typeP_structure hG hNmax hPN hKNN hKN rfl hUN).2.2.2.1
     rw [hcanon] at hd
