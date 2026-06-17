@@ -5911,21 +5911,28 @@ theorem isPiElementCompl_mem_left_of_commute [Finite G] {A B Z : Subgroup G} {π
     Subgroup.mem_subgroupOf.mpr (Subgroup.mem_zpowers b)
   exact Subgroup.mem_subgroupOf.mp (hbZsub hbmem)
 
-/-- **BG 14.7, Proposition 14.2(d)-first for family members** (mmd L3827, the `K* ∩ Mᵍ = 1` clause):
-for a family member `N` and `g ∉ N`, the canonical factor `Kᵢ* = Z ⊓ M_σ(N)` meets the conjugate
-`Nᵍ` trivially.  Builds the type-`P` data of `N` (its Hall `κ(N)`-subgroup from
-`typeP_family_member_data`, a Hall `(κ(N) ∪ σ(N))′`-subgroup `U` via `hall_E_exists` since `N` is
-solvable) and reads off conjunct (d)-first of `typeP_structure`, transported to the canonical
-`Kᵢ*` via `hcanon`.  Used in the TI-of-`T` step to force `g ∈ N` from `yᵍ ∈ Kᵢ* ∩ Nᵍ`. -/
-theorem typeP_family_dFirst [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+/-- **BG 14.7, the family member's `(d)`-data bundle** (mmd L3827, both clauses of Prop 14.2(d)):
+for a family member `N`, the chosen Hall `κ(N)`-subgroup `K_N` together with the swap
+`Z = K_N ⊔ Kᵢ*` and both conjugacy clauses — (d)-first `Kᵢ* ⊓ Nᵍ = 1` (`g ∉ N`) and (d)-second
+`K_N ⊓ K_Nᵍ = 1` (`g ∈ N`, `g ∉ Z`).  Builds `N`'s Hall `(κ∪σ)′`-subgroup once
+(`hall_E_exists`, `N` solvable) and feeds it to `typeP_structure` (d-first) and
+`typeP_kappaHall_inf_conj_eq_bot` (d-second).  The TI-of-`T` proof obtains this once per chosen
+member and conjugates the `σ`/`σ′`-parts of `t` through the two clauses to force `g ∈ Z`. -/
+theorem typeP_family_member_dData [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     {M K Kstar U : Subgroup G} (hM : M ∈ maximalSubgroups G) (hP : IsTypeP M) (hKM : K ≤ M)
     (hK : Ch03.IsHallSubgroup (kappa M) (K.subgroupOf M))
     (hKstar : Kstar = OddOrder.BG.Ch3.S10.Msigma M ⊓ Subgroup.centralizer (K : Set G))
     (hU : Ch03.IsHallSubgroup ((kappa M ∪ OddOrder.BG.Ch3.S10.sigma M)ᶜ) (U.subgroupOf M))
-    {N : Subgroup G} (hN : IsZFamilyMember M K N) {g : G} (hgN : g ∉ N) :
-    ((K ⊔ Kstar) ⊓ OddOrder.BG.Ch3.S10.Msigma N) ⊓ (MulAut.conj g • N) = ⊥ := by
+    {N : Subgroup G} (hN : IsZFamilyMember M K N) :
+    ∃ KN : Subgroup G, KN ≤ N ∧
+      K ⊔ Kstar = KN ⊔ ((K ⊔ Kstar) ⊓ OddOrder.BG.Ch3.S10.Msigma N) ∧
+      ((K ⊔ Kstar) ⊓ OddOrder.BG.Ch3.S10.Msigma N) ≤ Subgroup.centralizer (KN : Set G) ∧
+      Subgroup.IsPiSubgroup (OddOrder.BG.Ch3.S10.sigma N)ᶜ KN ∧
+      (∀ g : G, g ∉ N →
+        ((K ⊔ Kstar) ⊓ OddOrder.BG.Ch3.S10.Msigma N) ⊓ (MulAut.conj g • N) = ⊥) ∧
+      (∀ g : G, g ∈ N → g ∉ K ⊔ Kstar → KN ⊓ (MulAut.conj g • KN) = ⊥) := by
   classical
-  obtain ⟨hNmax, hPN, _, KN, hKNN, hKN, _, hcanon, _⟩ :=
+  obtain ⟨hNmax, hPN, _, KN, hKNN, hKN, hswap, hcanon, _⟩ :=
     typeP_family_member_data hG hM hP hKM hK hKstar hU hN
   haveI : IsSolvable ↥N := hG.solvable_of_mem_maximalSubgroups hNmax
   obtain ⟨U', hU'⟩ := Ch03.hall_E_exists (G := ↥N)
@@ -5934,9 +5941,136 @@ theorem typeP_family_dFirst [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     Subgroup.comap_map_eq_self_of_injective N.subtype_injective U'
   have hUN : Ch03.IsHallSubgroup ((kappa N ∪ OddOrder.BG.Ch3.S10.sigma N)ᶜ)
       ((U'.map N.subtype).subgroupOf N) := by rw [hUeq]; exact hU'
-  have hd := (typeP_structure hG hNmax hPN hKNN hKN rfl hUN).2.2.2.1
-  rw [hcanon] at hd
-  exact hd g hgN
+  refine ⟨KN, hKNN, hswap.trans (by rw [hcanon]), hcanon ▸ inf_le_right,
+    kappaHall_isPiSubgroup_sigmaCompl hKNN hKN, ?_, ?_⟩
+  · intro g hgN
+    have hd := (typeP_structure hG hNmax hPN hKNN hKN rfl hUN).2.2.2.1
+    rw [hcanon] at hd
+    exact hd g hgN
+  · intro g hgN hgZ
+    exact typeP_kappaHall_inf_conj_eq_bot hG hNmax hPN hKNN hKN rfl hUN hgN (hswap ▸ hgZ)
+
+/-- **BG 14.7, every nontrivial `t ∈ Z` has a nontrivial `σ`-part** (mmd L4015, `z = ∏ xᵢ` is the
+`σ`-decomposition): for `t ∈ Z`, `t ≠ 1`, some family member `N` has `t` *not* a `σ(N)′`-element
+(equivalently its `σ(N)`-part is nontrivial).  Else every prime of `ord(t)` avoids every `σ(N)`,
+contradicting the coverage `⋃ σ(Nᵢ) ⊇ π(z)` (`typeP_family_sigma_covers`) since `ord(t) ∣ |Z|`.
+This is the half of the `t = yy'` characterisation that finds the splitting member. -/
+theorem typeP_family_exists_sigmaPart [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    {M K Kstar U : Subgroup G} (hM : M ∈ maximalSubgroups G) (hP : IsTypeP M) (hKM : K ≤ M)
+    (hK : Ch03.IsHallSubgroup (kappa M) (K.subgroupOf M))
+    (hKstar : Kstar = OddOrder.BG.Ch3.S10.Msigma M ⊓ Subgroup.centralizer (K : Set G))
+    (hU : Ch03.IsHallSubgroup ((kappa M ∪ OddOrder.BG.Ch3.S10.sigma M)ᶜ) (U.subgroupOf M))
+    {t : G} (htZ : t ∈ K ⊔ Kstar) (ht1 : t ≠ 1) :
+    ∃ N : Subgroup G, IsZFamilyMember M K N ∧
+      ¬ IsPiElement (OddOrder.BG.Ch3.S10.sigma N)ᶜ t := by
+  by_contra hcon
+  push_neg at hcon
+  -- `ord(t) ≠ 1` has a prime factor `p`, and `p ∣ |Z|`.
+  have hordne : orderOf t ≠ 1 := by rw [Ne, orderOf_eq_one_iff]; exact ht1
+  obtain ⟨p, hp, hpord⟩ := Nat.exists_prime_and_dvd hordne
+  have hpz : p ∣ Nat.card ↥(K ⊔ Kstar) := by
+    refine hpord.trans ?_
+    have := Subgroup.card_dvd_of_le (Subgroup.zpowers_le.mpr htZ)
+    rwa [Nat.card_zpowers] at this
+  obtain ⟨N, hN, hpσN⟩ := typeP_family_sigma_covers hG hM hP hKM hK hKstar hU hp hpz
+  exact hcon N hN p (Nat.mem_primeFactors.mpr ⟨hp, hpord, (orderOf_pos t).ne'⟩) hpσN
+
+/-- **BG 14.7, `T` is a TI-subset of `G` with normalizer `Z`** (mmd L4027-4029): `T = Z − ⋃ Kᵢ*`
+satisfies `IsTISubset T Z`.  Given `t ∈ T` and `g` with `tᵍ ∈ T ⊆ Z`: pick a member `N` whose
+`σ(N)`-part of `t` is nontrivial (`typeP_family_exists_sigmaPart`), `π`-decompose `t = y·y'`
+(`exists_isPiElement_mul`, `π = σ(N)`) with `y ∈ Kᵢ*` (`…isPiElement_mem_Kstar`) and `y' ∈ K_N`
+(`isPiElementCompl_mem_left_of_commute`), both nontrivial (`y` by choice of `N`, `y'` since
+`t ∉ Kᵢ*`).  Conjugates `yᵍ, y'ᵍ` are powers of `tᵍ ∈ Z`, so `yᵍ ∈ Kᵢ*`, `y'ᵍ ∈ K_N`; then
+`yᵍ ∈ Kᵢ* ∩ Nᵍ` forces `g ∈ N` (Prop 14.2(d)-first) and `y'ᵍ ∈ K_N ∩ K_Nᵍ` forces `g ∈ Z`
+(d-second).  The structural core converting `|T|` to `|𝒞_G(T)| = |T|·[G:Z]`. -/
+theorem typeP_family_T_isTI [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    {M K Kstar U : Subgroup G} (hM : M ∈ maximalSubgroups G) (hP : IsTypeP M) (hKM : K ≤ M)
+    (hK : Ch03.IsHallSubgroup (kappa M) (K.subgroupOf M))
+    (hKstar : Kstar = OddOrder.BG.Ch3.S10.Msigma M ⊓ Subgroup.centralizer (K : Set G))
+    (hU : Ch03.IsHallSubgroup ((kappa M ∪ OddOrder.BG.Ch3.S10.sigma M)ᶜ) (U.subgroupOf M)) :
+    OddOrder.GroupTheory.IsTISubset
+      (((K ⊔ Kstar : Subgroup G) : Set G) \
+        ⋃ N ∈ ZFamilyFinset M K,
+          (((K ⊔ Kstar) ⊓ OddOrder.BG.Ch3.S10.Msigma N : Subgroup G) : Set G))
+      (K ⊔ Kstar) := by
+  classical
+  rintro g ⟨t, ⟨htZ, htnot⟩, ⟨htgZ, -⟩⟩
+  -- `t ∈ Z`, `t ∉ ⋃ Kⱼ*`, `g t g⁻¹ ∈ Z`.
+  have htZ' : t ∈ K ⊔ Kstar := htZ
+  have htgZ' : g * t * g⁻¹ ∈ K ⊔ Kstar := htgZ
+  have ht1 : t ≠ 1 := fun h => htnot
+    (Set.mem_biUnion (mem_ZFamilyFinset.mpr (Or.inl rfl)) (h ▸ one_mem _))
+  -- Conjugation by `g` keeps powers of `t` inside `Z` and preserves `π`-element-ness.
+  have hconjZ : ∀ a : G, a ∈ Subgroup.zpowers t → g * a * g⁻¹ ∈ K ⊔ Kstar := by
+    intro a ha
+    refine (Subgroup.zpowers_le.mpr htgZ') ?_
+    have h1 := Subgroup.mem_map_of_mem (MulAut.conj g).toMonoidHom ha
+    rw [MonoidHom.map_zpowers] at h1
+    simpa [MulAut.conj_apply] using h1
+  have hordeq : ∀ a : G, orderOf (g * a * g⁻¹) = orderOf a := fun a => by
+    rw [show g * a * g⁻¹ = (MulAut.conj g).toMonoidHom a by simp [MulAut.conj_apply]]
+    exact orderOf_injective (MulAut.conj g).toMonoidHom (MulAut.conj g).injective a
+  have hpiconj : ∀ {π : Set ℕ} {a : G}, IsPiElement π a → IsPiElement π (g * a * g⁻¹) :=
+    fun {π a} ha p hp => ha p (by rwa [hordeq a] at hp)
+  -- Pick a member `N` with nontrivial `σ(N)`-part, and `π`-decompose `t`.
+  obtain ⟨N, hN, hσpart⟩ := typeP_family_exists_sigmaPart hG hM hP hKM hK hKstar hU htZ' ht1
+  obtain ⟨y, y', hyy', hcomm, hyπ, hy'π, hyz, hy'z⟩ :=
+    exists_isPiElement_mul (OddOrder.BG.Ch3.S10.sigma N) t
+  have hyZ : y ∈ K ⊔ Kstar := (Subgroup.zpowers_le.mpr htZ') hyz
+  have hy'Z : y' ∈ K ⊔ Kstar := (Subgroup.zpowers_le.mpr htZ') hy'z
+  obtain ⟨KN, hKNN, hswap, hcent, hAπc, hdfirst, hdsecond⟩ :=
+    typeP_family_member_dData hG hM hP hKM hK hKstar hU hN
+  have hBπ : Subgroup.IsPiSubgroup (OddOrder.BG.Ch3.S10.sigma N)
+      ((K ⊔ Kstar) ⊓ OddOrder.BG.Ch3.S10.Msigma N) := by
+    intro p hp
+    obtain ⟨hpp, hpd, _⟩ := Nat.mem_primeFactors.mp hp
+    exact OddOrder.BG.Ch3.S10.Msigma_isPiGroup N p (Nat.mem_primeFactors.mpr
+      ⟨hpp, hpd.trans (Subgroup.card_dvd_of_le inf_le_right), Nat.card_pos.ne'⟩)
+  -- `y ∈ Kᵢ*`, `y' ∈ K_N`; both nontrivial.
+  have hyKstar : y ∈ (K ⊔ Kstar) ⊓ OddOrder.BG.Ch3.S10.Msigma N :=
+    typeP_family_isPiElement_mem_Kstar hG hM hP hKM hK hKstar hU hN hyZ hyπ
+  have hy'KN : y' ∈ KN := isPiElementCompl_mem_left_of_commute hswap hcent hAπc hBπ hy'Z hy'π
+  have hy1 : y ≠ 1 := by
+    rintro rfl; exact hσpart (by rw [show t = y' from by rw [← hyy', one_mul]]; exact hy'π)
+  have hy'1 : y' ≠ 1 := by
+    rintro rfl
+    exact htnot (Set.mem_biUnion (mem_ZFamilyFinset.mpr hN)
+      (show t ∈ ((K ⊔ Kstar) ⊓ OddOrder.BG.Ch3.S10.Msigma N : Subgroup G) from
+        by rw [show t = y from by rw [← hyy', mul_one]]; exact hyKstar))
+  -- `yᵍ ∈ Kᵢ*` (a `σ(N)`-element of `Z`), `yᵍ ≠ 1`; force `g ∈ N` via (d)-first.
+  have hygZ : g * y * g⁻¹ ∈ K ⊔ Kstar := hconjZ y hyz
+  have hygKstar : g * y * g⁻¹ ∈ (K ⊔ Kstar) ⊓ OddOrder.BG.Ch3.S10.Msigma N :=
+    typeP_family_isPiElement_mem_Kstar hG hM hP hKM hK hKstar hU hN hygZ (hpiconj hyπ)
+  have hyg1 : g * y * g⁻¹ ≠ 1 := fun h =>
+    hy1 ((map_eq_one_iff _ (MulAut.conj g).injective).mp (by rw [MulAut.conj_apply]; exact h))
+  have hgN : g ∈ N := by
+    by_contra hgnot
+    have hbot := hdfirst g hgnot
+    have hmem : g * y * g⁻¹ ∈ ((K ⊔ Kstar) ⊓ OddOrder.BG.Ch3.S10.Msigma N) ⊓ (MulAut.conj g • N) := by
+      refine Subgroup.mem_inf.mpr ⟨hygKstar, ?_⟩
+      have hyN : y ∈ N := (inf_le_right.trans (OddOrder.BG.Ch3.S10.Msigma_le N)) hyKstar
+      rw [show (MulAut.conj g • N : Subgroup G) = N.map (MulAut.conj g).toMonoidHom from rfl,
+        show g * y * g⁻¹ = (MulAut.conj g).toMonoidHom y from by
+          rw [MulEquiv.coe_toMonoidHom, MulAut.conj_apply]]
+      exact Subgroup.mem_map_of_mem _ hyN
+    rw [hbot] at hmem
+    exact hyg1 (Subgroup.mem_bot.mp hmem)
+  -- `y'ᵍ ∈ K_N ∩ K_Nᵍ`, `y'ᵍ ≠ 1`; force `g ∈ Z` via (d)-second.
+  have hy'gZ : g * y' * g⁻¹ ∈ K ⊔ Kstar := hconjZ y' hy'z
+  have hy'gKN : g * y' * g⁻¹ ∈ KN :=
+    isPiElementCompl_mem_left_of_commute hswap hcent hAπc hBπ hy'gZ (hpiconj hy'π)
+  have hy'g1 : g * y' * g⁻¹ ≠ 1 := fun h =>
+    hy'1 ((map_eq_one_iff _ (MulAut.conj g).injective).mp (by rw [MulAut.conj_apply]; exact h))
+  by_contra hgZ
+  have hbot := hdsecond g hgN hgZ
+  have hmem : g * y' * g⁻¹ ∈ KN ⊓ (MulAut.conj g • KN) := by
+    refine Subgroup.mem_inf.mpr ⟨hy'gKN, ?_⟩
+    rw [show (MulAut.conj g • KN : Subgroup G) = KN.map (MulAut.conj g).toMonoidHom from rfl,
+      show g * y' * g⁻¹ = (MulAut.conj g).toMonoidHom y' from by
+        rw [MulEquiv.coe_toMonoidHom, MulAut.conj_apply]]
+    exact Subgroup.mem_map_of_mem _ hy'KN
+  rw [hbot] at hmem
+  exact hy'g1 (Subgroup.mem_bot.mp hmem)
 
 /-- **BG Theorem 14.7** (mmd L3890): type-P duality and the `Z_tilde` TI-set.
 
