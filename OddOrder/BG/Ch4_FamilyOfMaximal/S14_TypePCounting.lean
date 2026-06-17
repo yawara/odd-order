@@ -5924,7 +5924,7 @@ theorem typeP_family_member_dData [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOd
     (hKstar : Kstar = OddOrder.BG.Ch3.S10.Msigma M ⊓ Subgroup.centralizer (K : Set G))
     (hU : Ch03.IsHallSubgroup ((kappa M ∪ OddOrder.BG.Ch3.S10.sigma M)ᶜ) (U.subgroupOf M))
     {N : Subgroup G} (hN : IsZFamilyMember M K N) :
-    ∃ KN : Subgroup G, KN ≤ N ∧
+    ∃ KN : Subgroup G, KN ≤ N ∧ Ch03.IsHallSubgroup (kappa N) (KN.subgroupOf N) ∧
       K ⊔ Kstar = KN ⊔ ((K ⊔ Kstar) ⊓ OddOrder.BG.Ch3.S10.Msigma N) ∧
       ((K ⊔ Kstar) ⊓ OddOrder.BG.Ch3.S10.Msigma N) ≤ Subgroup.centralizer (KN : Set G) ∧
       Subgroup.IsPiSubgroup (OddOrder.BG.Ch3.S10.sigma N)ᶜ KN ∧
@@ -5941,7 +5941,7 @@ theorem typeP_family_member_dData [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOd
     Subgroup.comap_map_eq_self_of_injective N.subtype_injective U'
   have hUN : Ch03.IsHallSubgroup ((kappa N ∪ OddOrder.BG.Ch3.S10.sigma N)ᶜ)
       ((U'.map N.subtype).subgroupOf N) := by rw [hUeq]; exact hU'
-  refine ⟨KN, hKNN, hswap.trans (by rw [hcanon]), hcanon ▸ inf_le_right,
+  refine ⟨KN, hKNN, hKN, hswap.trans (by rw [hcanon]), hcanon ▸ inf_le_right,
     kappaHall_isPiSubgroup_sigmaCompl hKNN hKN, ?_, ?_⟩
   · intro g hgN
     have hd := (typeP_structure hG hNmax hPN hKNN hKN rfl hUN).2.2.2.1
@@ -6018,7 +6018,7 @@ theorem typeP_family_T_isTI [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     exists_isPiElement_mul (OddOrder.BG.Ch3.S10.sigma N) t
   have hyZ : y ∈ K ⊔ Kstar := (Subgroup.zpowers_le.mpr htZ') hyz
   have hy'Z : y' ∈ K ⊔ Kstar := (Subgroup.zpowers_le.mpr htZ') hy'z
-  obtain ⟨KN, hKNN, hswap, hcent, hAπc, hdfirst, hdsecond⟩ :=
+  obtain ⟨KN, hKNN, _, hswap, hcent, hAπc, hdfirst, hdsecond⟩ :=
     typeP_family_member_dData hG hM hP hKM hK hKstar hU hN
   have hBπ : Subgroup.IsPiSubgroup (OddOrder.BG.Ch3.S10.sigma N)
       ((K ⊔ Kstar) ⊓ OddOrder.BG.Ch3.S10.Msigma N) := by
