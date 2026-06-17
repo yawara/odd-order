@@ -181,7 +181,15 @@ Completed the loop handoff's steps 1-4 in `CenterSimplesOrbit.lean` (`f26fd70c`,
      `2sᵢ ≤ d`), so `#{proper}·d ≤ 2(d−1) < 2d ⟹ ≤ 1` proper orbit, of size `1`. Helpers
      `card_orbit_dvd_card_group` (orbit-stabiliser `index_dvd_card`), `two_mul_le_of_dvd_of_lt`,
      `orbit_eq_singleton_of_mem_fixedPoints`. sorry-free, axiom-clean.
-   - **(3d.3b) the trivial simple is `MulAut G`-fixed** [identification]. The trivial central
+   - **(3d.3b) the trivial simple is `MulAut G`-fixed** — **crux infra ✅ DONE (`cf2c9387`)**:
+     `PiAlgebraAut.algHom_pi_eq_eval` (an algebra hom `(ι→k)→ₐ[k] k` is a coordinate evaluation `i₀`,
+     via the orthogonal-idempotent technique). **Remaining assembly**: the trivial central character is
+     the augmentation `aug : Z(k[U]) →ₐ[k] k`; apply `algHom_pi_eq_eval` to `aug ∘ φ.symm` ⟹
+     `∃ i₀, ∀ z, aug z = φ z i₀`. `aug` is automorphism-invariant (`aug (centerRep α z) = aug z`, as `α`
+     permutes `G`), and `φ ∘ centerRep α` permutes coordinates by `simplesAction φ α`
+     (`centerRep_apply_symm_single`), so `simplesAction φ α i₀ = i₀` — `i₀` is the fixed simple.
+     ⚑ This **supersedes** the earlier "symmetriser idempotent is primitive" route (no block theory).
+     [OLD route, for reference:] The trivial central
      idempotent `t = (1/|U|) ∑_{g} single g 1 ∈ Z(k[U])` is `MulAut`-fixed (`α(∑ g) = ∑ g`) and is a
      primitive idempotent, so `t = idemBasis φ i₀` for some `i₀`; `centerRep_apply_symm_single` then
      forces `simplesAction φ α i₀ = i₀`, so `i₀ ∈ fixedPoints`.

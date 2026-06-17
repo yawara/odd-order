@@ -98,12 +98,14 @@ B `(6.8)`）に gated で STANDBY だった。hub の実コード再検証で両
       （`#orbits=1+(n−1)/d ⟹ 各軌道 size 1 or d + 固定点≤1`; ∑(d−sᵢ)=d−1 & 真の約数≤d/2 で defect 1 個に
       強制、素数性不要、sorry-free・axiom-clean）+ (forward-count) ✅ **DONE (`9b64a344`)**
       `card_orbits_eq_of_free_off_unique_fixed`（一意固定点+残り自由 ⟹ #orbits=1+(n−1)/d; 3d.3a の逆、
-      defect 和 `sum_eq_single` で単一固定軌道に集約）→ **(3d.3) 残（抽象 backbone 完成、残は具体配線）**:
-      (3d.3b) trivial simple は MulAut-fixed（対称化冪等元 `e₀=(1/|U|)∑g` が primitive central idempotent
-      = `idemBasis φ i₀`、rep-theory 要 ~50-80 行）+ (N=Ncl) `idemBasis`/`centerBasis` 両基底の index 等濃
-      （finrank 経由）+ (3d.3c) **CoprimeAction carrier の E/U/共役作用へ配線**（Γ=E で 3d.1 Brauer +
-      forward-count[classes, 3d.2 で free-off-trivial] + N=Ncl + 3d.3a ⟹ E free off ≤1 fixed; 3d.3b で
-      その fixed=trivial ⟹ E free on 非自明 simples）→ (†) [I-2 isotypic + I-4 base change + per-orbit I-3]。
+      defect 和 `sum_eq_single` で単一固定軌道に集約）→ **(3d.3) 残（抽象 backbone + 3d.3b crux 完成）**:
+      (3d.3b) trivial simple は MulAut-fixed — **crux infra ✅ DONE (`cf2c9387`)**
+      `PiAlgebraAut.algHom_pi_eq_eval`（代数準同型 `(ι→k)→ₐk` は座標 eval; 直交冪等元技法、新インフラ）。
+      **残 assembly**: 拡大 `aug:Z(k[U])→ₐk` に適用 → `∃ i₀, ∀ z, aug z = φ z i₀`; aug 不変性 +
+      permutation 関係 ⟹ `simplesAction φ α i₀ = i₀`（~50-70 行; 対称化冪等元 primitive 経路は不要に）。
+      + (N=Ncl) 両基底 index 等濃（finrank）+ (3d.3c) **CoprimeAction carrier の E/U/共役作用へ配線**
+      （Γ=E で 3d.1 + forward-count[3d.2 で free-off-trivial] + N=Ncl + 3d.3a ⟹ E free off ≤1 fixed;
+      3d.3b で fixed=trivial ⟹ E free on 非自明 simples）→ (†) [I-2 isotypic + I-4 base change + I-3]。
       正本 = design notes「2026-06-17 (resume⁴)」(詳細・約数論法込み)。
 - [ ] (†) kernel-FPF count + (I-4) base change `𝔽_p→𝔽̄_p`
 - [ ] (I-5) chief-series coprime — **keystone `coprime_fixedPoints_quotient` は既存**（Isaacs Cor 3.28）。
