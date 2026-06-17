@@ -1385,3 +1385,45 @@ integration helper は全て landing、残りは族 Finset 上の counting 統�
 6. **covering** (half_lt 交差) + **part(h)** (Prop14.2(a) + K cyclic)。
 
 ⚠ endgame は helper grinding と違い相互依存・σ-decomposition が subtle。loop で進めるが blocker は document。
+
+### ✅ counting endgame foundations: |T| fix + hstab + Prop 14.2(d)-second (2026-06-17 lane-h, 3 commits)
+
+**全 green + axiom-clean (`#print axioms` = `[propext, Classical.choice, Quot.sound]`)。** 本セッションは
+TI-of-T への土台 3 件を landing:
+
+1. **🐛 `typeP_family_T_count` の broken state を修正 (commit 645cb2c4)**: 前 loop の未コミット版は
+   build-RED だった。原因 = **⋃ の body の coercion バグ** — `((K⊔Kstar)⊓Msigma N : Set G)` という型注釈が
+   式全体を `Set G` レベルで解釈させ `⊔`/`⊓` が **Set 演算**化 (`(↑K ∪ ↑Kstar) ∩ ↑(Msigma N)`、部分群 join ≠
+   集合和ゆえ別物)。修正 = `(((K⊔Kstar)⊓Msigma N : Subgroup G) : Set G)`。加えて `refine` の `isDefEq`
+   heartbeat timeout を `(s:=)(Z:=)(S:=)` named-arg pin で解消。⚠ **教訓: `(expr : Set G)` で部分群演算を
+   書くと Set-lattice に落ちる — 必ず `((expr : Subgroup G) : Set G)`。**
+2. **`typeP_family_member_normal` + `typeP_family_Z_normalizes_T` (commit a3f9d1a1)** = TI count の `hstab`:
+   各メンバーの canonical factor `Z⊓Msigma N ◁ Z` (case N=M=`typeP_self_member` / neighbor=`exists_neighbor_full`)
+   → conj l (l∈Z) が `T=Z−⋃K_i*` を固定 (`Set.smul_set_sdiff`/`smul_set_iUnion₂` + `conj_smul_eq_self_of_mem_normalizer`)。
+   ⟹ `ncard_conjClassSet_of_isTISubset` の 2nd hyp。
+3. **🔑 `typeP_kappaHall_inf_conj_eq_bot` = Prop 14.2(d) 第2主張 (commit f4af9259)**: `K∩K^g=1 for g∈M−Z`。
+
+**🔑🔑 TI-of-T の正確な依存が確定 (mmd L4027 精読)**: BG の "by Prop 14.2(d), g∈K_i×K_i*" は
+**(d)-first AND (d)-second の両方**を使う:
+- (d)-first `K*∩M^g=1 (g∉M)` = `typeP_structure` conjunct 4 (`.2.2.2.1`) で**既存**。
+  → `y^g∈K_i*` から `g∈M_i`。
+- (d)-second `K∩K^g=1 (g∈M−Z)` = **本セッションで landing**。→ `y'^g∈K_i` から `g∈Z`。
+- repo `typeP_structure` には (d)-first しか無く (d)-second は**欠落していた**。これが TI-of-T の隠れた前提。
+
+**(d)-second の証明レシピ** (BG「K is a Z-group ゆえ容易」を `IsZGroup K` パッケージ無しで):
+nontrivial `x∈K∩K^g` (order p) → `X=⟨x⟩≤K`, `Y=⟨g⁻¹xg⟩≤K` (ℰ¹) → (b1) で `N_G(X)⊓M=N_G(Y)⊓M=Z`
+ゆえ K が両方を正規化 → `g∈M ∧ g∉Z ⟹ g∉N_G(X) ⟹ conj g⁻¹•X≠X ⟹ X≠Y` → 異なる正規 order-p 2 個は
+`X⊔Y=ℤ/p×ℤ/p ≤M` 生成 → `pRank ↥M p≥2` (`le_pRank` + subgroupOf transport)、しかし
+`p∈π(K)⊆κ(M)⊆τ₁∪τ₃` で `pRank ↥M p=1` (`tau1/tau3_pRank_eq_one`) 矛盾。
+鍵 API: `mem_normalizer_of_conj_smul_eq_self`, `commute_of_le_normalizer_of_disjoint`,
+`IsElementaryAbelian.sup_of_le_centralizer`, `card_sup_of_commute_of_disjoint`,
+`MonoidHom.map_zpowers` (conj smul of zpowers), `Nat.log_pow`。
+
+**▶ TI-of-T の残り唯一の hard core = σ-decomposition coverage**:
+`t∈T ⟺ ∃i, t=yy' (y∈K_i*#, y'∈K_i#)` の ⟹ 方向に `Z=∏K_i*` (= `⋃σ(M_i)⊇π(z)`) が要る。
+理由: t∈Z=K_i×K_i* (swap, per-i) で t=a_i·b_i (a_i∈K_i, b_i∈K_i*)。t∉⋃K_j* ⟹ ∀i, a_i≠1。
+∃i,b_i≠1 を出すには「b_i=1 ∀i ⟹ t∈⋂K_i={1}」が要り、⋂K_i={1} ⟺ ⋃σ(M_i) が z の全素数を覆う (coverage)。
+coverage 素材は **既存**: `exists_typeP_neighbor_mem_sigma` (p|K→neighbor with p∈σ(N)) + p|K*→p∈σ(M)。
+組立 = Fintype on Finset + Hall-part 算術 (`card_iSup_of_pairwise_commute_coprime`済) で `⊔K_i*=Z`。これが次の主タスク。
+⟹ 揃えば TI-of-T (hstab済 + (d)both済 + coverage) → `ncard_conjClassSet_of_isTISubset` で |𝒞_G(T)| →
+density 不等式 (|T| count済 + 14.5c済 + 14.6済) → n=1 collapse → covering → part(h)。
