@@ -5785,6 +5785,87 @@ theorem typeP_family_sigma_covers [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOd
     exact ⟨M, Or.inl rfl, Kstar_isPiSubgroup_sigma hKstar p
       (Nat.mem_primeFactors.mpr ⟨hp, hpKstar, Nat.card_pos.ne'⟩)⟩
 
+/-- **BG 14.7, `Kᵢ*` is the `σ(Nᵢ)`-Hall of `Z`** (mmd L4007): for a family member `N` and a prime
+`p ∈ σ(N)`, the full `p`-part of `|Z|` divides `|Kᵢ*| = |Z ⊓ M_σ(N)|`.  From the swap
+`|Z| = |K_N|·|Kᵢ*|` (`card_kappaHall_sup_Kstar` on `N`'s data), `K_N` a `σ(N)'`-group
+(`kappaHall_isPiSubgroup_sigmaCompl`), so `p ∤ |K_N|` and `pᵏ ∣ |Z|` forces `pᵏ ∣ |Kᵢ*|`.  Feeds
+the σ-decomposition `⊔ Kᵢ* = Z`. -/
+theorem typeP_family_prime_pow_dvd_Kstar [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    {M K Kstar U : Subgroup G} (hM : M ∈ maximalSubgroups G) (hP : IsTypeP M) (hKM : K ≤ M)
+    (hK : Ch03.IsHallSubgroup (kappa M) (K.subgroupOf M))
+    (hKstar : Kstar = OddOrder.BG.Ch3.S10.Msigma M ⊓ Subgroup.centralizer (K : Set G))
+    (hU : Ch03.IsHallSubgroup ((kappa M ∪ OddOrder.BG.Ch3.S10.sigma M)ᶜ) (U.subgroupOf M))
+    {N : Subgroup G} (hN : IsZFamilyMember M K N) {p k : ℕ} (hp : p.Prime)
+    (hpσ : p ∈ OddOrder.BG.Ch3.S10.sigma N) (hpk : p ^ k ∣ Nat.card ↥(K ⊔ Kstar)) :
+    p ^ k ∣ Nat.card ↥((K ⊔ Kstar) ⊓ OddOrder.BG.Ch3.S10.Msigma N) := by
+  obtain ⟨_, _, _, KN, hKNN, hKN, hswap, hcanon, _⟩ :=
+    typeP_family_member_data hG hM hP hKM hK hKstar hU hN
+  -- `|Z| = |K_N| · |Kᵢ*|`.
+  have hZcard : Nat.card ↥(K ⊔ Kstar)
+      = Nat.card ↥KN * Nat.card ↥((K ⊔ Kstar) ⊓ OddOrder.BG.Ch3.S10.Msigma N) := by
+    have h := card_kappaHall_sup_Kstar hKNN hKN
+      (rfl : OddOrder.BG.Ch3.S10.Msigma N ⊓ Subgroup.centralizer (KN : Set G)
+        = OddOrder.BG.Ch3.S10.Msigma N ⊓ Subgroup.centralizer (KN : Set G))
+    rw [← hswap, hcanon] at h
+    exact h
+  -- `p ∤ |K_N|` (a `σ(N)'`-group), so `pᵏ` is coprime to `|K_N|`.
+  have hpKN : ¬ p ∣ Nat.card ↥KN := fun hd =>
+    kappaHall_isPiSubgroup_sigmaCompl hKNN hKN p
+      (Nat.mem_primeFactors.mpr ⟨hp, hd, Nat.card_pos.ne'⟩) hpσ
+  have hcop : Nat.Coprime (p ^ k) (Nat.card ↥KN) :=
+    (hp.coprime_iff_not_dvd.mpr hpKN).pow_left k
+  exact hcop.dvd_of_dvd_mul_left (hZcard ▸ hpk)
+
+/-- **BG 14.7, the σ-decomposition `⊔ Kᵢ* = Z`** (mmd L4009): the canonical factors of the family
+join to all of `Z`.  `⊔ Kᵢ* ≤ Z` is clear; for `Z ≤ ⊔ Kᵢ*` it suffices that `|Z| ∣ |⊔ Kᵢ*|`, which
+holds prime-power-wise: for `pᵏ ∣ |Z|` the prime `p` lies in some `σ(N)`
+(`typeP_family_sigma_covers`), and then `pᵏ ∣ |Kᵢ*|` (`typeP_family_prime_pow_dvd_Kstar`) `∣ |⊔ Kᵢ*|`.
+With `⊔ Kᵢ* ≤ Z` this gives equality.  The structural heart of the TI-of-`T` step. -/
+theorem typeP_family_iSup_Kstar_eq [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    {M K Kstar U : Subgroup G} (hM : M ∈ maximalSubgroups G) (hP : IsTypeP M) (hKM : K ≤ M)
+    (hK : Ch03.IsHallSubgroup (kappa M) (K.subgroupOf M))
+    (hKstar : Kstar = OddOrder.BG.Ch3.S10.Msigma M ⊓ Subgroup.centralizer (K : Set G))
+    (hU : Ch03.IsHallSubgroup ((kappa M ∪ OddOrder.BG.Ch3.S10.sigma M)ᶜ) (U.subgroupOf M)) :
+    ⨆ N ∈ ZFamilyFinset M K, ((K ⊔ Kstar) ⊓ OddOrder.BG.Ch3.S10.Msigma N) = K ⊔ Kstar := by
+  have hsuple : (⨆ N ∈ ZFamilyFinset M K, ((K ⊔ Kstar) ⊓ OddOrder.BG.Ch3.S10.Msigma N))
+      ≤ K ⊔ Kstar := iSup₂_le fun _ _ => inf_le_left
+  have hdvd : Nat.card ↥(K ⊔ Kstar)
+      ∣ Nat.card ↥(⨆ N ∈ ZFamilyFinset M K, ((K ⊔ Kstar) ⊓ OddOrder.BG.Ch3.S10.Msigma N)) := by
+    rw [Nat.dvd_iff_prime_pow_dvd_dvd]
+    intro p k hp hpk
+    rcases Nat.eq_zero_or_pos k with rfl | hkpos
+    · simp
+    · have hpZ : p ∣ Nat.card ↥(K ⊔ Kstar) := (dvd_pow_self p hkpos.ne').trans hpk
+      obtain ⟨N, hN, hpσ⟩ := typeP_family_sigma_covers hG hM hP hKM hK hKstar hU hp hpZ
+      exact (typeP_family_prime_pow_dvd_Kstar hG hM hP hKM hK hKstar hU hN hp hpσ hpk).trans
+        (Subgroup.card_dvd_of_le
+          (le_iSup₂ (f := fun N _ => (K ⊔ Kstar) ⊓ OddOrder.BG.Ch3.S10.Msigma N) N
+            (mem_ZFamilyFinset.mpr hN)))
+  exact Subgroup.eq_of_le_of_card_ge hsuple (Nat.le_of_dvd Nat.card_pos hdvd)
+
+/-- **BG 14.7, `σ(N)`-elements of `Z` lie in `Kᵢ*`** (mmd L4019, the `σ`-part lands in `Kᵢ*`): for a
+family member `N`, every `σ(N)`-element `a ∈ Z` lies in `Kᵢ* = Z ⊓ M_σ(N)`.  Since `a ∈ Z ≤ N`, the
+cyclic `⟨a⟩` is a `σ(N)`-subgroup of `N`, hence `⟨a⟩ ≤ M_σ(N)`
+(`sigma_subgroup_le_Msigma_of_isHall`); combined with `a ∈ Z` this gives `a ∈ Z ⊓ M_σ(N)`.  This
+places the `σ(N)`-part of any `t ∈ Z` into `Kᵢ*` — half of the `t = yy'` characterisation of `T`. -/
+theorem typeP_family_isPiElement_mem_Kstar [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    {M K Kstar U : Subgroup G} (hM : M ∈ maximalSubgroups G) (hP : IsTypeP M) (hKM : K ≤ M)
+    (hK : Ch03.IsHallSubgroup (kappa M) (K.subgroupOf M))
+    (hKstar : Kstar = OddOrder.BG.Ch3.S10.Msigma M ⊓ Subgroup.centralizer (K : Set G))
+    (hU : Ch03.IsHallSubgroup ((kappa M ∪ OddOrder.BG.Ch3.S10.sigma M)ᶜ) (U.subgroupOf M))
+    {N : Subgroup G} (hN : IsZFamilyMember M K N) {a : G} (haZ : a ∈ K ⊔ Kstar)
+    (hapi : IsPiElement (OddOrder.BG.Ch3.S10.sigma N) a) :
+    a ∈ (K ⊔ Kstar) ⊓ OddOrder.BG.Ch3.S10.Msigma N := by
+  obtain ⟨hNmax, _, hZN, _⟩ := typeP_family_member_data hG hM hP hKM hK hKstar hU hN
+  refine Subgroup.mem_inf.mpr ⟨haZ, ?_⟩
+  have hpi : Ch03.Subgroup.IsPiGroup (OddOrder.BG.Ch3.S10.sigma N) (Subgroup.zpowers a) := by
+    intro p hp
+    rw [Nat.card_zpowers] at hp
+    exact hapi p hp
+  exact OddOrder.BG.Ch3.S10.sigma_subgroup_le_Msigma_of_isHall
+    (OddOrder.BG.Ch3.S10.Msigma_isHall hG hNmax)
+    (Subgroup.zpowers_le.mpr (hZN haZ)) hpi (Subgroup.mem_zpowers a)
+
 /-- **BG Theorem 14.7** (mmd L3890): type-P duality and the `Z_tilde` TI-set.
 
 For a type-P maximal subgroup `M`, there is a unique nonconjugate type-P partner
