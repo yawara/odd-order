@@ -4,6 +4,27 @@
 > `s08_6_8_assembly_plan.md`(458KB)/`s08_6_8_3_gap_resolution.md` のうち本 note と矛盾する記述は本 note を優先。
 > 上位方針・FT 接続の文脈 = 記憶 [[ft-path-policy]] の 2026-06-17 検証訂正ブロック。
 
+## 🚨🚨 2026-06-18 cont.⁴ — anchoredImages route の必要性に疑問 (継続前に必ず読む)
+
+**cont.³ で組んだ anchoredImages route (hXanchored, `S08_CaseBAnchoredSeed.lean` 8 commit) が seed の
+critical path 上か不確実と判明**。記憶 [[pf-s08-caseb-seed-route-uncertain]] が正本。要点:
+
+1. **certainTypeSet coherence は既に FREE**: `certainTypeSet_isCoherent_tau_canonical`(`S08_CaseBAssembly:170`)
+   UNCONDITIONAL・sorry-free。anchoredImages はこの同じ集合を Ximg 拡張で別構成しているだけ。
+2. **endgame seed = 全 X-set** `IsCoherent (Xset h46.W2 ∪ Yset)`。anchoredImages の
+   `coherentCertainTypeSet_union_Yset_via_anchoredImages` は `certainTypeSet ∪ Y`(1 次数列 ⊊ Xset W2、
+   `certainTypeSet_subset_Xset` `S08_CaseBCoherence2:2069`)⟹ **seed に不足**。
+3. **実 cX = `xChainCoherentW`**(`S08_CaseBEnumeration:120`: base S₀=certainTypeSet, X=Xset W2、base は
+   canonical 使用 `S08_CoherenceWeighted:545`)= certainTypeSet (canonical free) + irreducible 対 chain。
+
+**未解決の核心**: `coherentXunionYset_caseB_of_glued`(`S08_CaseBCoherence2:1616`)の **hmixed
+(X-image ⊥ Y-image = seam 直交)** を canonical certainTypeSet 拡張が満たすか? **満たせば anchoredImages 不要**
+(残務 = canonical certainTypeSet + irreducible xChain → cX → Y-glue)。満たさねば私の Ximg 直交拡張が seam に必要
+(ただし全 Xset W2 を Ximg 化要)。⚠ roadmap 旧記述「hXanchored = 唯一の gate」は session-48 anchoredImages 由来で
+現 codebase (canonical+xChain) と乖離の疑い。**次の一手 = anchoredImages を盲目継続せず、まず hmixed が
+canonical 拡張で成立するか精査 → route 確定**。cont.³ の 8 commit は全 sorry-free・健全(中心指標等は汎用 §6 事実)
+だが seed 未 close。
+
 ## 🔨🔨🔨 2026-06-18 cont.³ — hXanchored: ALL hard math done (core+cY-unif+R1+R2) (自走)
 
 `S08_CaseBAnchoredSeed.lean` に着地した順に(全 build-green 3629 jobs・axiom-clean):
