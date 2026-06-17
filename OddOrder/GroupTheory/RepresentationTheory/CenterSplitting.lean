@@ -41,4 +41,41 @@ def _root_.AlgEquiv.centerCongr (e : A ≃ₐ[R] B) :
 @[simp] theorem centerCongr_apply (e : A ≃ₐ[R] B) (x : Subalgebra.center R A) :
     (e.centerCongr x : B) = e (x : A) := rfl
 
+section Pi
+
+variable {ι : Type*} [DecidableEq ι] {C : ι → Type*} [∀ i, Semiring (C i)] [∀ i, Algebra R (C i)]
+
+/-- An element of a product algebra is central iff each component is central. -/
+theorem mem_center_pi {f : ∀ i, C i} :
+    f ∈ Subalgebra.center R (∀ i, C i) ↔ ∀ i, f i ∈ Subalgebra.center R (C i) := by
+  rw [Subalgebra.mem_center_iff]
+  constructor
+  · intro h i
+    rw [Subalgebra.mem_center_iff]
+    intro a
+    have hc := congrFun (h (Pi.single i a)) i
+    simpa [Pi.mul_apply, Pi.single_apply] using hc
+  · intro h g
+    simp only [Subalgebra.mem_center_iff] at h
+    funext i
+    show g i * f i = f i * g i
+    exact h i (g i)
+
+/-- **The centre of a product algebra is the product of the centres**, as an `R`-algebra
+isomorphism `Z(∏ᵢ Cᵢ) ≃ₐ[R] ∏ᵢ Z(Cᵢ)`. -/
+def centerPiEquiv :
+    Subalgebra.center R (∀ i, C i) ≃ₐ[R] (∀ i, Subalgebra.center R (C i)) where
+  toFun f i := ⟨f.1 i, (mem_center_pi.mp f.2) i⟩
+  invFun g := ⟨fun i => (g i).1, mem_center_pi.mpr fun i => (g i).2⟩
+  left_inv f := by apply Subtype.ext; funext i; rfl
+  right_inv g := by funext i; apply Subtype.ext; rfl
+  map_mul' f f' := by funext i; apply Subtype.ext; rfl
+  map_add' f f' := by funext i; apply Subtype.ext; rfl
+  commutes' r := by funext i; apply Subtype.ext; rfl
+
+@[simp] theorem centerPiEquiv_apply (f : Subalgebra.center R (∀ i, C i)) (i : ι) :
+    ((centerPiEquiv f i : C i)) = (f : ∀ i, C i) i := rfl
+
+end Pi
+
 end OddOrder.GroupTheory.CenterSplitting
