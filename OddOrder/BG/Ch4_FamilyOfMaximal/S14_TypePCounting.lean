@@ -5504,6 +5504,33 @@ theorem typeP_family_Kstar_disjoint [Finite G] (hG : OddOrder.BG.IsMinimalSimple
         (Nat.mem_primeFactors.mpr ⟨hr, hr₂, Nat.card_pos.ne'⟩))
   exact le_bot_iff.mp (le_trans (inf_le_inf inf_le_right inf_le_right) (le_of_eq hMσdisj))
 
+/-- **BG 14.7, the family `Kᵢ*` have pairwise coprime order** (mmd L4009): for distinct members
+`N₁ ≠ N₂`, `|Kᵢ*| = |Z ⊓ M_σ(Nᵢ)|` are coprime — each `Kᵢ*` is a `σ(Nᵢ)`-group and the `σ(Nᵢ)` are
+pairwise disjoint (Theorem 13.9 via `typeP_family_pairwise_nonconjugate`).  This is the
+coprime-orders input to `card_iSup_of_pairwise_commute_coprime` for `z = ∏ kᵢ*`. -/
+theorem typeP_family_Kstar_coprime [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    {M K Kstar U : Subgroup G} (hM : M ∈ maximalSubgroups G) (hP : IsTypeP M) (hKM : K ≤ M)
+    (hK : Ch03.IsHallSubgroup (kappa M) (K.subgroupOf M))
+    (hKstar : Kstar = OddOrder.BG.Ch3.S10.Msigma M ⊓ Subgroup.centralizer (K : Set G))
+    (hU : Ch03.IsHallSubgroup ((kappa M ∪ OddOrder.BG.Ch3.S10.sigma M)ᶜ) (U.subgroupOf M))
+    {N₁ N₂ : Subgroup G} (hN₁ : IsZFamilyMember M K N₁) (hN₂ : IsZFamilyMember M K N₂)
+    (hne : N₁ ≠ N₂) :
+    Nat.Coprime (Nat.card ↥((K ⊔ Kstar) ⊓ OddOrder.BG.Ch3.S10.Msigma N₁))
+      (Nat.card ↥((K ⊔ Kstar) ⊓ OddOrder.BG.Ch3.S10.Msigma N₂)) := by
+  obtain ⟨hN₁max, _, _, _⟩ := typeP_family_member_data hG hM hP hKM hK hKstar hU hN₁
+  obtain ⟨hN₂max, _, _, _⟩ := typeP_family_member_data hG hM hP hKM hK hKstar hU hN₂
+  have hnc := typeP_family_pairwise_nonconjugate hG hM hP hKM hK hKstar hU hN₁ hN₂ hne
+  have hσdisj := OddOrder.BG.Ch3.S13.sigma_disjoint_of_nonconjugate hG hN₁max hN₂max hnc
+  refine coprime_of_forall_prime_not_dvd ?_
+  intro r hr hr₁ hr₂
+  exact Set.disjoint_left.mp hσdisj
+    (OddOrder.BG.Ch3.S10.Msigma_isPiGroup N₁ r
+      (Nat.mem_primeFactors.mpr
+        ⟨hr, hr₁.trans (Subgroup.card_dvd_of_le inf_le_right), Nat.card_pos.ne'⟩))
+    (OddOrder.BG.Ch3.S10.Msigma_isPiGroup N₂ r
+      (Nat.mem_primeFactors.mpr
+        ⟨hr, hr₂.trans (Subgroup.card_dvd_of_le inf_le_right), Nat.card_pos.ne'⟩))
+
 /-- **BG 14.7, the type-`P` family as a `Finset`** (mmd L4003): `{N | IsZFamilyMember M K N}`
 collected as a `Finset` (finite since `Subgroup G` is finite). -/
 noncomputable def ZFamilyFinset [Finite G] (M K : Subgroup G) : Finset (Subgroup G) :=
