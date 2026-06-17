@@ -5843,6 +5843,29 @@ theorem typeP_family_iSup_Kstar_eq [Finite G] (hG : OddOrder.BG.IsMinimalSimpleO
             (mem_ZFamilyFinset.mpr hN)))
   exact Subgroup.eq_of_le_of_card_ge hsuple (Nat.le_of_dvd Nat.card_pos hdvd)
 
+/-- **BG 14.7, `σ(N)`-elements of `Z` lie in `Kᵢ*`** (mmd L4019, the `σ`-part lands in `Kᵢ*`): for a
+family member `N`, every `σ(N)`-element `a ∈ Z` lies in `Kᵢ* = Z ⊓ M_σ(N)`.  Since `a ∈ Z ≤ N`, the
+cyclic `⟨a⟩` is a `σ(N)`-subgroup of `N`, hence `⟨a⟩ ≤ M_σ(N)`
+(`sigma_subgroup_le_Msigma_of_isHall`); combined with `a ∈ Z` this gives `a ∈ Z ⊓ M_σ(N)`.  This
+places the `σ(N)`-part of any `t ∈ Z` into `Kᵢ*` — half of the `t = yy'` characterisation of `T`. -/
+theorem typeP_family_isPiElement_mem_Kstar [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    {M K Kstar U : Subgroup G} (hM : M ∈ maximalSubgroups G) (hP : IsTypeP M) (hKM : K ≤ M)
+    (hK : Ch03.IsHallSubgroup (kappa M) (K.subgroupOf M))
+    (hKstar : Kstar = OddOrder.BG.Ch3.S10.Msigma M ⊓ Subgroup.centralizer (K : Set G))
+    (hU : Ch03.IsHallSubgroup ((kappa M ∪ OddOrder.BG.Ch3.S10.sigma M)ᶜ) (U.subgroupOf M))
+    {N : Subgroup G} (hN : IsZFamilyMember M K N) {a : G} (haZ : a ∈ K ⊔ Kstar)
+    (hapi : IsPiElement (OddOrder.BG.Ch3.S10.sigma N) a) :
+    a ∈ (K ⊔ Kstar) ⊓ OddOrder.BG.Ch3.S10.Msigma N := by
+  obtain ⟨hNmax, _, hZN, _⟩ := typeP_family_member_data hG hM hP hKM hK hKstar hU hN
+  refine Subgroup.mem_inf.mpr ⟨haZ, ?_⟩
+  have hpi : Ch03.Subgroup.IsPiGroup (OddOrder.BG.Ch3.S10.sigma N) (Subgroup.zpowers a) := by
+    intro p hp
+    rw [Nat.card_zpowers] at hp
+    exact hapi p hp
+  exact OddOrder.BG.Ch3.S10.sigma_subgroup_le_Msigma_of_isHall
+    (OddOrder.BG.Ch3.S10.Msigma_isHall hG hNmax)
+    (Subgroup.zpowers_le.mpr (hZN haZ)) hpi (Subgroup.mem_zpowers a)
+
 /-- **BG Theorem 14.7** (mmd L3890): type-P duality and the `Z_tilde` TI-set.
 
 For a type-P maximal subgroup `M`, there is a unique nonconjugate type-P partner
