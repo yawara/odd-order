@@ -4,7 +4,7 @@
 leaf を特定する。`feitThompson` 還元 (commit 0dfe816) 完成後の「次手の地図」。コード変更なしの監査。
 
 正本: 本ノート。関連 = `feitthompson_critical_path_2026_06_03.md` / `scaffold_opaque_prop_convention.md` /
-`notes/bg/appC_final_contradiction.md` / `notes/peterfalvi/s16_nonexistence_g.md`。
+`notes/bg/appC_final_contradiction.md` / `notes/peterfalvi/s16_nonexistence_g.md (削除済, git履歴)`。
 
 ## 配線は honest (laundering 無)
 

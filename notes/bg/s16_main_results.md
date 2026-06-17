@@ -615,7 +615,7 @@ structure TheoremA_Structure (M : Subgroup G) where
 
 | 節 | 파일 | 상관관계 |
 |----|------|---------|
-| §10 | notes/peterfalvi/s10_structure_minimal_simple.md | **직접 input** (8.11)-(8.13) ≡ Thm A-E |
+| §10 | notes/peterfalvi/s10_structure_minimal_simple.md (削除済, git履歴) | **직접 input** (8.11)-(8.13) ≡ Thm A-E |
 | §11-§15 | notes/peterfalvi/s11-s15_type_analysis.md (예정) | §16 Theorem I,II 입력 |
 | §9 | notes/peterfalvi/s09_non_existence.md | App.C 통합 |
 

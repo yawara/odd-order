@@ -21,7 +21,7 @@ and let `T ⊴ U` be a *cyclic normal* subgroup acting *irreducibly* on `E`.
 
 This file establishes the *core* of part (a), stated over an abstract finite simple module `M`
 over the group algebra `k[T]` of a commutative group `T` over a finite field `k` (so as to keep
-the `k[T]`-module instances honest — see `notes/peterfalvi/appendices.md` session 5 for the
+the `k[T]`-module instances honest — see `notes/peterfalvi/appendices.md (削除済, git履歴)` session 5 for the
 instance gotchas that force this abstraction).  The endomorphism ring `D = End_{k[T]}(M)` is:
 
 * a **field** (Schur's Lemma `⟹` division ring, finite `⟹` Wedderburn), `endField`;
