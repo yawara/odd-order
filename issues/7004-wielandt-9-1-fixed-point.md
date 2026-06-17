@@ -64,6 +64,12 @@ B `(6.8)`）に gated で STANDBY だった。hub の実コード再検証で両
       → (3) split-ss `Z≅𝔽̄_p^N` 冪等元基底
       （mathlib `IsSemisimpleRing.exists_algEquiv_pi_matrix_of_isAlgClosed`）→ (4) cornerstone を 2 基底
       に適用し #orbits 一致 + Glauberman free-on-classes + counting。
+      **(3) σ-置換の核心 ✅ COMPLETE** (`PiAlgebraAut.lean` `afa21d09`): `algEquiv_permutes_single` =
+      「`(ι→k)` の代数自己同型は標準冪等元 `Pi.single i 1` を置換」(自己完結・upstream 可)。⚠ char p の
+      罠（列和=1 では p+1 個も和=1）を **orthogonality（各座標高々1個）** で回避、support disjoint+cover
+      の Finset 数え上げ。残 (3) = **`Z(𝔽̄_p[U]) ≅ (Fin N → k)` の Wedderburn center transport**（plumbing:
+      `exists_algEquiv_pi_matrix_of_isAlgClosed` + center-of-Pi + `Matrix.subalgebraCenter_eq_scalarAlgHom_map`)
+      → 冪等元基底 = 標準基底の pullback、σ-置換 = `algEquiv_permutes_single`、cornerstone 適用（synonym で de-risk 済）。
       **(4) class-sum 側 ✅✅ FULLY COMPLETE** (`CenterOrbitCount.lean` `cab132a7`+`faeb1bc8`):
       `MulAction (MulAut G) (ConjClasses G)` (`ConjClasses.map`) + `centerRep : Representation k
       (MulAut G) ↥center` (`domCongr α` を中心へ制限) + compatibility `centerRep_apply_centerBasis`
