@@ -1,0 +1,81 @@
+/-
+Copyright (c) 2026 The Odd Order Project. All rights reserved.
+Released under Apache 2.0 license as described in the file LICENSE.
+-/
+import OddOrder.Peterfalvi.S08_CaseBAssembly
+import OddOrder.Peterfalvi.S08_CaseBXChiCoherence
+
+/-!
+# Peterfalvi §6.8.2 case-(B) — per-column anchored seed (`hXanchored`)
+
+**Peterfalvi**, _Character Theory for the Odd Order Theorem_ (LMS LNS 272, 2000), §6, (6.8.2.3).
+
+The case-(B) coherence seed `IsCoherent hyp.tau (Xset W₂ ∪ Yset)` (consumed by the (6.8.3) endgame
+`false_of_coherentXunionYset_caseB_of_not_coherentS`) is built by gluing the certain-type column
+coherence `certainTypeSet_isCoherent_via_anchoredImages` (`S08_CaseBXChiCoherence`) with the
+irreducible-`X` chain and the `Y`-coherence.  The remaining input to the column coherence is the
+**`(6.8.2.3)` anchored-image identity** `hXanchored`:
+
+  `∀ χ₂, columnSum h46 χ₂ ∈ certainTypeSet h46 k →`
+  `  τ(columnSum χ₂ − a₀·η₁) = Ximg χ₂ − a₀·η₁^{τ₁}`.
+
+This leaf assembles `hXanchored` from the per-`φ` anchored-image producer
+`caseB_per_phi_anchored_fromYset` (`S08_CaseBAssembly`).  The key structural point (Peterfalvi
+(6.8.2.3), verified gap analysis): the columns do **not** all lie over a single source character `φ`;
+each column's underlying irreducible `θ_{χ₂} = Res^H μ_{0,χ₂}` lies over its **own** central linear
+character `φ_θ` ([Is] Lemma 2.27, `Res^H_{W₂} θ = θ(1)·φ_θ` with `W₂ ≤ Z(H)`).  The first piece is
+therefore the per-`θ` central-character positivity:
+
+* `exists_central_phi_pos_weight` — for every irreducible `θ` of `H`, the central linear character
+  `φ_θ` is a **positive-weight** constituent (`0 < constituentWeight`), so the per-`φ` machinery
+  applies with `φ = φ_θ`.
+-/
+
+namespace OddOrder.Peterfalvi.S08
+
+open OddOrder.RepresentationTheory
+open scoped Classical
+
+variable {G : Type*} [Group G] [Fintype G] [Invertible (Nat.card G : ℂ)]
+variable {L : Subgroup G} [Fintype ↥L] [Invertible (Nat.card ↥L : ℂ)]
+variable {H : Subgroup ↥L} [Invertible (Nat.card ↥H : ℂ)]
+
+/-- **(6.8.2.3) per-column central-character positivity** (the Q1 "central gap").
+
+For any irreducible character `θ` of `H` and a central subgroup `W₂ ≤ Z(H)`, the central **linear**
+character `φ_θ` of `θ` ([Is] Lemma 2.27 `exists_central_linear_restriction`,
+`Res^H_{W₂} θ = θ(1)·φ_θ`), transported from `W₂.subgroupOf H` to the ambient `L`-subgroup `W₂` via
+`subgroupOfEquivOfLe`, is a **positive-weight** constituent: `0 < constituentWeight hφ' θ`.
+
+This exhibits, per `θ`, the source character `φ_θ` that `caseB_per_phi_anchored_fromYset` is applied
+with.  It resolves the fixed-`φ` mismatch of the naive reading: the certain-type columns each lie
+over their **own** central `φ_θ` (read off from `θ` via the central restriction), not over a single
+shared `φ`.  Positivity is immediate from `⟨φ_θ, Res θ⟩ = θ(1)·⟨φ_θ,φ_θ⟩ = θ(1) ≠ 0`. -/
+theorem exists_central_phi_pos_weight
+    {W2 : Subgroup ↥L} (hW2H : W2 ≤ H) [Fintype ↥(W2.subgroupOf H)]
+    [Invertible (Nat.card ↥(W2.subgroupOf H) : ℂ)] [Fintype ↥H]
+    (hcen : W2.subgroupOf H ≤ Subgroup.center ↥H)
+    (θ : IrreducibleCharacter ↥H) :
+    ∃ (φ : ClassFunction ↥W2 ℂ)
+      (hφ' : IsIrreducibleCharacter
+        (ClassFunction.compHom (Subgroup.subgroupOfEquivOfLe hW2H).toMonoidHom φ)),
+      0 < constituentWeight hφ' θ := by
+  obtain ⟨φN, hφNirr, hφN1, hres, _⟩ :=
+    θ.2.exists_central_linear_restriction (W2.subgroupOf H) hcen
+  set e := Subgroup.subgroupOfEquivOfLe hW2H with he
+  have htrans : ClassFunction.compHom e.toMonoidHom
+      (ClassFunction.compHom e.symm.toMonoidHom φN) = φN := by
+    ext x
+    simp only [ClassFunction.compHom_apply, MulEquiv.coe_toMonoidHom, MulEquiv.symm_apply_apply]
+  refine ⟨ClassFunction.compHom e.symm.toMonoidHom φN, by rw [htrans]; exact hφNirr, ?_⟩
+  rw [constituentWeight_pos_iff, htrans, hres, OddOrder.RepresentationTheory.inner_smul_right]
+  obtain ⟨d, hdpos, hd⟩ := irreducibleCharacter_apply_one_eq_pos_natCast θ
+  have hself : ClassFunction.inner φN φN = 1 := by
+    have h := irreducibleCharacter_inner_eq_ite
+      (⟨φN, hφNirr⟩ : IrreducibleCharacter ↥(W2.subgroupOf H))
+      (⟨φN, hφNirr⟩ : IrreducibleCharacter ↥(W2.subgroupOf H))
+    rwa [if_pos rfl] at h
+  rw [hself, mul_one, star_ne_zero, hd]
+  exact_mod_cast hdpos.ne'
+
+end OddOrder.Peterfalvi.S08
