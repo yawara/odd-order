@@ -7530,6 +7530,94 @@ theorem isCyclic_kappaHall_of_le_nilpotent [Finite G] (hG : OddOrder.BG.IsMinima
   · by_contra hcon
     exact hpK (OddOrder.BG.Ch2.S09.mem_primeFactors_card_of_pos_pRank (by omega))
 
+/-- For a type-`P₂` maximal subgroup `M`, the `σ`-core `M_σ` is nilpotent.  Since `κ(M)` always
+satisfies `κ(M) ⊆ π(M) ∖ σ(M)` and `IsTypeP2` makes this inclusion *proper*, there is a prime
+`p ∈ π(M) ∖ (σ(M) ∪ κ(M))`; a maximal-rank elementary abelian `p`-subgroup `A ≤ M` then meets the
+hypotheses of Lemma 14.1 (`msigma_structure_of_notMem_sigma_kappa`: `p ∈ π(M)`, `p ∉ σ(M)`,
+`p ∉ κ(M)`, `A ∈ ℰ_p^{r_p(M)}`), whose third conclusion is `IsNilpotent M_σ`.  This drives the
+cyclicity of `Z = K ⊔ K*` in `typeP_Z_isCyclic` (BG 14.7(d)). -/
+theorem msigma_isNilpotent_of_isTypeP2 [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    {M : Subgroup G} (hM : M ∈ maximalSubgroups G) (hP2 : IsTypeP2 M) :
+    Group.IsNilpotent ↥(OddOrder.BG.Ch3.S10.Msigma M) := by
+  classical
+  -- `κ(M) ⊆ π(M) ∖ σ(M)`: every prime in `κ(M)` divides `|M|` (a rank-one witness `P ≤ M` has
+  -- order `p`) and avoids `σ(M)` (`κ ⊆ σ′`).  `IsTypeP2` makes the inclusion proper.
+  have hsub : kappa M ⊆ sigmaComplementPrimes M := by
+    intro p hp
+    obtain ⟨hp_prime, _, P, hPelem, hPM, _⟩ := id hp
+    have hPcard : Nat.card ↥P = p := by rw [(mem_elemAbelianOfRank.mp hPelem).2, pow_one]
+    refine ⟨Nat.mem_primeFactors.mpr ⟨hp_prime, ?_, Nat.card_pos.ne'⟩, kappa_subset_sigmaCompl hp⟩
+    rw [← hPcard]; exact Subgroup.card_dvd_of_le hPM
+  obtain ⟨p, hpπ, hpκ⟩ := Set.exists_of_ssubset (ssubset_of_subset_of_ne hsub hP2.2)
+  obtain ⟨hpM, hpσ⟩ := hpπ
+  have hp : p.Prime := Nat.prime_of_mem_primeFactors hpM
+  haveI : Fact p.Prime := ⟨hp⟩
+  -- A maximal-rank elementary abelian `p`-subgroup `A = B.map M.subtype ≤ M`.
+  obtain ⟨B, hBea, hBlog⟩ :=
+    exists_isElementaryAbelian_log_card_ge_of_pos_le_pRank (G := ↥M) (p := p)
+      (n := pRank ↥M p) (one_le_pRank_of_mem_primeFactors hpM) (le_refl _)
+  obtain ⟨j, hj⟩ := hBea.isPGroup.exists_card_eq
+  have hjeq : j = pRank ↥M p := by
+    have hsq := le_antisymm (le_pRank B hBea) hBlog
+    rwa [hj, Nat.log_pow hp.one_lt] at hsq
+  have hAmem : B.map M.subtype ∈ elemAbelianOfRank G p (pRank ↥M p) := by
+    refine ⟨Subgroup.IsElementaryAbelian.map M.subtype_injective hBea, ?_⟩
+    rw [Subgroup.card_map_of_injective M.subtype_injective, hj, hjeq]
+  exact (msigma_structure_of_notMem_sigma_kappa hG hM hpM hpσ hpκ hAmem
+    (Subgroup.map_subtype_le _)).2.2
+
+/-- **BG Theorem 14.7, cyclicity of `Z = K ⊔ K*`** (mmd L4041, conjunct (d)): for a type-`P`
+maximal `M` with its nonconjugate partner `M*` (the unique other member of the `Z`-family), the
+group `Z = K ⊔ K*` is cyclic.  By `isTypeP2_or_isTypeP2_partner` one of `M`, `M*` is type-`P₂`;
+in either case the Hall `κ`-factor of the `P₂` member has prime order (cyclic, `typeP_structure`
+clause (g)), while the other factor is a Hall `κ`-subgroup of the partner lying inside the
+*nilpotent* `σ`-core of the `P₂` member (`msigma_isNilpotent_of_isTypeP2` +
+`isCyclic_kappaHall_of_le_nilpotent`, whose Hall-witness `N` and nilpotent ambient `W` differ).
+Two coprime cyclic factors give `Z` cyclic (`isCyclic_kappaHall_sup_Kstar_of_cyclic`). -/
+theorem typeP_Z_isCyclic [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (D : SigmaDecompositionData G) {M K Kstar U Mstar : Subgroup G}
+    (hM : M ∈ maximalSubgroups G) (hP : IsTypeP M) (hKM : K ≤ M)
+    (hK : Ch03.IsHallSubgroup (kappa M) (K.subgroupOf M))
+    (hKstar : Kstar = OddOrder.BG.Ch3.S10.Msigma M ⊓ Subgroup.centralizer (K : Set G))
+    (hU : Ch03.IsHallSubgroup ((kappa M ∪ OddOrder.BG.Ch3.S10.sigma M)ᶜ) (U.subgroupOf M))
+    (hMstarmem : IsZFamilyMember M K Mstar) (hMstarne : Mstar ≠ M)
+    (hpart : ∀ N : Subgroup G, IsZFamilyMember M K N → N = M ∨ N = Mstar) :
+    IsCyclic ↥(K ⊔ Kstar) := by
+  classical
+  -- Partner symmetry: `K*` is Hall `κ(M*)` of `M*`, and `K = C_{M*_σ}(K*)`.
+  obtain ⟨hMstarmax, hMstarP, hKstarMstar, hKstar_hall, hKeq⟩ :=
+    typeP_partner_structure hG hM hP hKM hK hKstar hU hMstarmem hMstarne hpart
+  rcases isTypeP2_or_isTypeP2_partner hG D hM hP hKM hK hKstar hU hpart with hM2 | hMstar2
+  · -- `M` is type-`P₂`: `|K|` prime ⟹ `K` cyclic; `K* ≤ M_σ` (nilpotent) ⟹ `K*` cyclic.
+    obtain ⟨q, hq, hKq, -⟩ := ((typeP_structure hG hM hP hKM hK hKstar hU).2.2.2.2.1 hM2).2
+    haveI : Fact q.Prime := ⟨hq⟩
+    haveI : IsCyclic ↥K := isCyclic_of_prime_card hKq
+    haveI : Group.IsNilpotent ↥(OddOrder.BG.Ch3.S10.Msigma M) :=
+      msigma_isNilpotent_of_isTypeP2 hG hM hM2
+    haveI : IsCyclic ↥Kstar :=
+      isCyclic_kappaHall_of_le_nilpotent hG hKstarMstar hKstar_hall (hKstar.le.trans inf_le_left)
+    exact isCyclic_kappaHall_sup_Kstar_of_cyclic hKM hK hKstar
+  · -- `M*` is type-`P₂`: `|K*|` prime ⟹ `K*` cyclic; `K ≤ M*_σ` (nilpotent) ⟹ `K` cyclic.
+    haveI : IsSolvable ↥Mstar := hG.solvable_of_mem_maximalSubgroups hMstarmax
+    obtain ⟨U', hU'⟩ := Ch03.hall_E_exists (G := ↥Mstar)
+      ((kappa Mstar ∪ OddOrder.BG.Ch3.S10.sigma Mstar)ᶜ)
+    have hUeq : (U'.map Mstar.subtype).subgroupOf Mstar = U' :=
+      Subgroup.comap_map_eq_self_of_injective Mstar.subtype_injective U'
+    have hUstar : Ch03.IsHallSubgroup ((kappa Mstar ∪ OddOrder.BG.Ch3.S10.sigma Mstar)ᶜ)
+        ((U'.map Mstar.subtype).subgroupOf Mstar) := by rw [hUeq]; exact hU'
+    obtain ⟨q, hq, hKstarq, -⟩ :=
+      ((typeP_structure hG hMstarmax hMstarP hKstarMstar hKstar_hall hKeq hUstar).2.2.2.2.1
+        hMstar2).2
+    haveI : Fact q.Prime := ⟨hq⟩
+    haveI : IsCyclic ↥Kstar := isCyclic_of_prime_card hKstarq
+    haveI : Group.IsNilpotent ↥(OddOrder.BG.Ch3.S10.Msigma Mstar) :=
+      msigma_isNilpotent_of_isTypeP2 hG hMstarmax hMstar2
+    haveI : IsCyclic ↥K :=
+      isCyclic_kappaHall_of_le_nilpotent hG hKM hK (hKeq.le.trans inf_le_left)
+    have hcyc : IsCyclic ↥(Kstar ⊔ K) :=
+      isCyclic_kappaHall_sup_Kstar_of_cyclic hKstarMstar hKstar_hall hKeq
+    rw [sup_comm]; exact hcyc
+
 /-- **BG Theorem 14.7** (mmd L3890): type-P duality and the `Z_tilde` TI-set.
 
 For a type-P maximal subgroup `M`, there is a unique nonconjugate type-P partner
