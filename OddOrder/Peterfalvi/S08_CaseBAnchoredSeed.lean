@@ -163,11 +163,40 @@ theorem exists_decomposition_caseB_coherentYset
       + ((W2.subgroupOf H).index : ℂ) • hyp.coherentYset.extension η₁, horth, hXZ, ?_⟩
   abel
 
+/-- **(6.8.2.3) certain-type column is nonconstant on `W₂`** (`hWne` provider, the `(R1)` §6 fact).
+For a nontrivial column `χ₂ ≠ 1`, the underlying irreducible `θ = Res^H μ_{0,χ₂}` is **not constant
+on `W₂.subgroupOf H`** (`∃ w, θ(w) ≠ θ(1)`, i.e. `W₂ ⊄ ker θ`).  This is Peterfalvi (4.7)
+`not_subset_characterKernel_chiRestrict_of_ne_one` (`χ_j = Res_K μ_{0j}` has `W₂ ⊄ ker`), repackaged
+to the existential form at `H = K` and reduced to the underlying `L`-values of `μ_{0,χ₂}`. -/
+theorem caseB_column_W2_nonconstant
+    (h46 : OddOrder.Peterfalvi.S06.Hypothesis46 (sharpImage H) L) (hHK : h46.K = H)
+    [NeZero (Nat.card h46.W1)] [Invertible (Nat.card ↥h46.K : ℂ)]
+    [Fintype ↥(h46.W1 ⊔ h46.W2)] [Invertible (Nat.card ↥(h46.W1 ⊔ h46.W2) : ℂ)]
+    {χ₂ : (h46.W2.subgroupOf (h46.W1 ⊔ h46.W2)) →* ℂˣ} (hχ₂ : χ₂ ≠ 1) :
+    ∃ w : ↥(h46.W2.subgroupOf H),
+      (ClassFunction.restrict H ((h46.columnFamily χ₂).mu 0 : ClassFunction ↥L ℂ)) (w : ↥H)
+        ≠ (ClassFunction.restrict H ((h46.columnFamily χ₂).mu 0 : ClassFunction ↥L ℂ)) 1 := by
+  classical
+  by_contra hc
+  push_neg at hc
+  refine OddOrder.Peterfalvi.S06.Hypothesis.not_subset_characterKernel_chiRestrict_of_ne_one
+    h46.toCertainTypeHypothesis.toHypothesis hχ₂ ?_
+  intro g hg
+  rw [OddOrder.Peterfalvi.S03.mem_characterKernel, OddOrder.Peterfalvi.S03.characterDegree_def,
+    OddOrder.Peterfalvi.S06.Hypothesis.coe_chiRestrict, ClassFunction.restrict_apply,
+    ClassFunction.restrict_apply]
+  have hW2H : h46.W2 ≤ H := h46.W2_le_K.trans (le_of_eq hHK)
+  have hgW2 : (g : ↥L) ∈ h46.W2 := Subgroup.mem_subgroupOf.mp hg
+  have hgH : (g : ↥L) ∈ H := hW2H hgW2
+  have hval := hc ⟨⟨(g : ↥L), hgH⟩, Subgroup.mem_subgroupOf.mpr hgW2⟩
+  rw [ClassFunction.restrict_apply, ClassFunction.restrict_apply] at hval
+  simpa using hval
+
 /-- **(6.8.2.3) per-column anchored image** — the core integration.
 
-For a certain-type column `χ₂` whose underlying irreducible `θ = Res^H μ_{0,χ₂}` is **nontrivial on
-`W₂`** (`hWne`, i.e. `W₂ ⊄ ker θ`, the defining `X = S − S(W₂)` property), and with `|𝒴| ≠ 2`
-(`hYcard`, excluding the relabel edge), the Sibley–Dade map sends the anchored difference
+For a **nontrivial** certain-type column `χ₂ ≠ 1` (`hχ₂`; its underlying irreducible
+`θ = Res^H μ_{0,χ₂}` is then nonconstant on `W₂` by `caseB_column_W2_nonconstant`), and with
+`|𝒴| ≠ 2` (`hYcard`, excluding the relabel edge), the Sibley–Dade map sends the anchored difference
 `columnSum χ₂ − a·η₁` to `X − a·η₁^{τ₁}` for some virtual `X` against the **canonical** `Y`-coherence
 `hyp.coherentYset`, with `a = θ(1)` (the constituent weight).
 
@@ -197,16 +226,14 @@ theorem caseB_column_anchored_image
     (hc2 : 2 ≤ (h46.W2.subgroupOf H).index)
     (hFPF : (h46.W2.index : ℤ) < ((h46.W2.subgroupOf H).index : ℤ) ^ 2)
     {η₁ : ClassFunction ↥L ℂ} (hη₁ : η₁ ∈ hyp.Yset)
-    (χ₂ : (h46.W2.subgroupOf (h46.W1 ⊔ h46.W2)) →* ℂˣ)
-    (hWne : ∃ w : ↥(h46.W2.subgroupOf H),
-      (ClassFunction.restrict H ((h46.columnFamily χ₂).mu 0 : ClassFunction ↥L ℂ)) (w : ↥H)
-        ≠ (ClassFunction.restrict H ((h46.columnFamily χ₂).mu 0 : ClassFunction ↥L ℂ)) 1)
+    {χ₂ : (h46.W2.subgroupOf (h46.W1 ⊔ h46.W2)) →* ℂˣ} (hχ₂ : χ₂ ≠ 1)
     (hYcard : hyp.Yset.ncard ≠ 2) :
     ∃ (X : ClassFunction G ℂ) (a : ℕ),
       hyp.tau (OddOrder.Peterfalvi.S06.columnSum h46 χ₂ - a • η₁)
         = X - (a : ℂ) • hyp.coherentYset.extension η₁ := by
   classical
   haveI : Fintype ↥h46.W2 := Fintype.ofFinite _
+  have hWne := caseB_column_W2_nonconstant h46 hHK hχ₂
   have hθirr : IsIrreducibleCharacter
       (ClassFunction.restrict H ((h46.columnFamily χ₂).mu 0 : ClassFunction ↥L ℂ)) := by
     have h := h46.certainTypeRestrict_isIrreducible χ₂; rwa [hHK] at h
