@@ -5076,6 +5076,23 @@ axiom-clean. -/
 
 #assert_only_allowed_axioms OddOrder.BG.Ch4.S14.isCyclic_kappaHall_of_le_nilpotent
 
+/-! **BG Theorem 14.7(d), `M_σ` nilpotent for type-`P₂`** (`S14_TypePCounting`,
+`msigma_isNilpotent_of_isTypeP2`): for a type-`P₂` maximal `M`, `M_σ` is nilpotent.  `IsTypeP2`
+makes `κ(M) ⊊ π(M) ∖ σ(M)` proper, yielding `p ∈ π(M) ∖ (σ(M) ∪ κ(M))`; a maximal-rank elementary
+abelian `p`-subgroup `A ≤ M` feeds Lemma 14.1, whose third conclusion is `IsNilpotent M_σ`.
+Fully unconditional, axiom-clean. -/
+
+#assert_only_allowed_axioms OddOrder.BG.Ch4.S14.msigma_isNilpotent_of_isTypeP2
+
+/-! **BG Theorem 14.7(d), cyclicity of `Z = K ⊔ K*`** (`S14_TypePCounting`, `typeP_Z_isCyclic`):
+`Z = K ⊔ K*` is cyclic.  One of `M`, `M*` is type-`P₂` (`isTypeP2_or_isTypeP2_partner`); the `P₂`
+member's Hall `κ`-factor is prime-order (cyclic), the other factor is a Hall `κ`-subgroup of the
+partner inside the nilpotent `σ`-core of the `P₂` member (`msigma_isNilpotent_of_isTypeP2` +
+`isCyclic_kappaHall_of_le_nilpotent`); two coprime cyclic factors give `Z` cyclic.  Fully
+unconditional, axiom-clean. -/
+
+#assert_only_allowed_axioms OddOrder.BG.Ch4.S14.typeP_Z_isCyclic
+
 /-! **BG Theorem E, `σ(Mᵢ)`-disjointness conjunct** (`S16_MainResults`,
 `sigma_reps_pairwise_disjoint`): distinct conjugacy-class representatives of maximal subgroups
 have disjoint `σ`-sets.  This is the one currently-unconditional conjunct of BG Theorem E — the
