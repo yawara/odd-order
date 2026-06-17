@@ -5591,6 +5591,25 @@ theorem typeP_family_member_normal [Finite G] (hG : OddOrder.BG.IsMinimalSimpleO
       exists_neighbor_full hG hM hP hKM hK hKstar hU hX hXK hCX hN
     exact hnorm
 
+/-- **BG 14.7, the family `Kᵢ*` pairwise commute** (mmd L4009): for distinct members `N₁ ≠ N₂`, the
+canonical factors `Z ⊓ M_σ(Nᵢ)` centralise each other — both are normalised by `Z`
+(`typeP_family_member_normal`) and meet trivially (`typeP_family_Kstar_disjoint`), so their
+commutator lies in their (trivial) intersection.  The commute input to
+`card_iSup_of_pairwise_commute_coprime` for `z = ∏ kᵢ*`. -/
+theorem typeP_family_Kstar_commute [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    {M K Kstar U : Subgroup G} (hM : M ∈ maximalSubgroups G) (hP : IsTypeP M) (hKM : K ≤ M)
+    (hK : Ch03.IsHallSubgroup (kappa M) (K.subgroupOf M))
+    (hKstar : Kstar = OddOrder.BG.Ch3.S10.Msigma M ⊓ Subgroup.centralizer (K : Set G))
+    (hU : Ch03.IsHallSubgroup ((kappa M ∪ OddOrder.BG.Ch3.S10.sigma M)ᶜ) (U.subgroupOf M))
+    {N₁ N₂ : Subgroup G} (hN₁ : IsZFamilyMember M K N₁) (hN₂ : IsZFamilyMember M K N₂)
+    (hne : N₁ ≠ N₂) :
+    ∀ x ∈ (K ⊔ Kstar) ⊓ OddOrder.BG.Ch3.S10.Msigma N₁,
+      ∀ y ∈ (K ⊔ Kstar) ⊓ OddOrder.BG.Ch3.S10.Msigma N₂, Commute x y :=
+  commute_of_le_normalizer_of_disjoint inf_le_left inf_le_left
+    (typeP_family_member_normal hG hM hP hKM hK hKstar hU hN₁)
+    (typeP_family_member_normal hG hM hP hKM hK hKstar hU hN₂)
+    (typeP_family_Kstar_disjoint hG hM hP hKM hK hKstar hU hN₁ hN₂ hne)
+
 /-- **BG 14.7, `Z` normalises `T`** (mmd L4029, "`N_G(T) = Z`" half — the easy `Z ≤ N_G(T)` part):
 conjugation by any `l ∈ Z = K ⊔ K*` fixes the set `T = Z − ⋃_{N} (Z ⊓ M_σ(N))`, because `l`
 normalises `Z` (self-normalisation) and each canonical factor `Z ⊓ M_σ(N)`
