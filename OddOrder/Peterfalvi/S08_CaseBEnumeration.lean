@@ -421,4 +421,149 @@ noncomputable def caseB_member_orthoDatum
     exact dadeOrthonormalCharacterImageFamilyOfDiff_orthogonal hyp.dade hyp.hconj
       hreal hdiffsupp hrealχ hdiffsuppχ hxχ hxχbar hxbarχ hxbarχbar
 
+/-- **Peterfalvi (6.8.2) case-(B): the `X(W₂) ∪ Y` coherent set is pairwise orthogonal.**
+
+For distinct members `x ≠ y` of `X(W₂) ∪ Y` (the case-(B) `X ∪ Y` coherent seed), `⟨x, y⟩ = 0`.
+This is the off-diagonal of the weighted Gram matrix `hmemortho` that the norm-weighted (5.6) engine
+consumes — the genuinely new structural fact case (B) needs, because the members are no longer all
+irreducible: `X(W₂)` contains the reducible certain-type columns `columnSum h46 χ₂`.
+
+The four membership cases (each `X`-member splits, by `caseB_S_member_column_or_irreducible`, into a
+nontrivial column or an irreducible):
+
+* **column vs column** — distinct columns (`χ₂ ≠ χ₂'`, forced by `x ≠ y`) are orthogonal by
+  `inner_columnSum_cross_eq_zero` (Peterfalvi (4.1) grid cross-orthogonality);
+* **column vs irreducible** / **irreducible vs column** — a column `columnSum h46 χ₂` and an
+  irreducible `Ind^L_H θ` are orthogonal by `caseB_inner_irr_columnSum_eq_zero` (the degree-`mod |W₁|`
+  argument: grid degrees are `≡ ±1`, induced degrees `≡ 0`), one order via conjugate symmetry;
+* **irreducible vs irreducible** — distinct irreducibles are orthogonal (`irreducibleCharacter_inner_
+  eq_ite`);
+* **`X` vs `Y`** / **`Y` vs `X`** — `caseB_Xset_orthogonal_Yset` (one order via conjugate symmetry);
+* **`Y` vs `Y`** — distinct irreducible `Y`-members (`isIrreducibleCharacter_of_mem_Yset`). -/
+theorem caseB_Sunion_pairwise_orthogonal
+    (hyp : SibleyDadeHypothesis G L H) [H.Normal]
+    (h46 : OddOrder.Peterfalvi.S06.Hypothesis46 (sharpImage H) L) (hHK : h46.K = H)
+    (hW1 : h46.W1 = hyp.W1)
+    [NeZero (Nat.card h46.W1)] [Invertible (Nat.card ↥h46.K : ℂ)]
+    [Fintype ↥(h46.W1 ⊔ h46.W2)] [Invertible (Nat.card ↥(h46.W1 ⊔ h46.W2) : ℂ)]
+    {W2 : Subgroup ↥L} (hW2comm : W2 ≤ ⁅H, H⁆) :
+    ∀ x ∈ hyp.Xset W2 ∪ hyp.Yset, ∀ y ∈ hyp.Xset W2 ∪ hyp.Yset, x ≠ y →
+      ClassFunction.inner x y = 0 := by
+  classical
+  haveI : Fintype ↥H := Fintype.ofFinite _
+  -- helper: an irreducible `S`-member is orthogonal to every certain-type column.
+  have hirr_col : ∀ z, IsIrreducibleCharacter z → z ∈ hyp.S →
+      ∀ χ₂ : (h46.W2.subgroupOf (h46.W1 ⊔ h46.W2)) →* ℂˣ,
+      ClassFunction.inner z (OddOrder.Peterfalvi.S06.columnSum h46 χ₂) = 0 := by
+    intro z hzirr hzS χ₂
+    rw [hyp.S_eq, Set.mem_setOf_eq] at hzS
+    obtain ⟨θ, hθne, rfl⟩ := hzS
+    exact caseB_inner_irr_columnSum_eq_zero hyp h46 hW1 hzirr χ₂
+  intro x hx y hy hxy
+  rcases hx with hxX | hxY
+  · rcases hy with hyX | hyY
+    · -- both in `X(W₂)`
+      rcases caseB_S_member_column_or_irreducible hyp h46 hHK (hyp.Xset_subset_S hxX) with
+        ⟨χ₂, hχ₂, hcolx⟩ | hirrx
+      · rcases caseB_S_member_column_or_irreducible hyp h46 hHK (hyp.Xset_subset_S hyX) with
+          ⟨χ₂', hχ₂', hcoly⟩ | hirry
+        · -- column vs column
+          have hne : χ₂ ≠ χ₂' := fun h => hxy (by subst h; exact hcolx.symm.trans hcoly)
+          exact hcolx ▸ hcoly ▸ inner_columnSum_cross_eq_zero h46 hne
+        · -- column vs irreducible (conjugate symmetry of irreducible vs column)
+          refine hcolx ▸ ?_
+          rw [inner_conj_symm y (OddOrder.Peterfalvi.S06.columnSum h46 χ₂),
+            hirr_col y hirry (hyp.Xset_subset_S hyX) χ₂, star_zero]
+      · rcases caseB_S_member_column_or_irreducible hyp h46 hHK (hyp.Xset_subset_S hyX) with
+          ⟨χ₂', hχ₂', hcoly⟩ | hirry
+        · -- irreducible vs column
+          exact hcoly ▸ hirr_col x hirrx (hyp.Xset_subset_S hxX) χ₂'
+        · -- irreducible vs irreducible
+          have h := irreducibleCharacter_inner_eq_ite
+            (⟨x, hirrx⟩ : IrreducibleCharacter ↥L) ⟨y, hirry⟩
+          rwa [if_neg (fun he => hxy (congrArg Subtype.val he))] at h
+    · -- `X(W₂)` vs `Y`
+      exact caseB_Xset_orthogonal_Yset hyp h46 hHK hW1 hW2comm x hxX y hyY
+  · rcases hy with hyX | hyY
+    · -- `Y` vs `X(W₂)` (conjugate symmetry)
+      rw [inner_conj_symm y x, caseB_Xset_orthogonal_Yset hyp h46 hHK hW1 hW2comm y hyX x hxY,
+        star_zero]
+    · -- both in `Y`: distinct irreducibles
+      have h := irreducibleCharacter_inner_eq_ite
+        (⟨x, hyp.isIrreducibleCharacter_of_mem_Yset hxY⟩ : IrreducibleCharacter ↥L)
+        ⟨y, hyp.isIrreducibleCharacter_of_mem_Yset hyY⟩
+      rwa [if_neg (fun he => hxy (congrArg Subtype.val he))] at h
+
+/-- **Peterfalvi (6.8.2) case-(B) norm-weighted member-family enumerator** (brick 2): the
+ψ-independent data of the norm-weighted (5.6) member family for the `X(W₂) ∪ Y` coherent seed.
+
+Enumerates `S₁ = X(W₂) ∪ Y` (finite, by `exists_finEnum_general` — *not*
+`exists_finEnum_irreducible`, since case (B) members include the reducible certain-type columns) as
+an injective `Fin k`-family `χmem : Fin k → ClassFunction ↥L ℂ`, together with:
+
+* the per-member squared norms `mc j = (⟨χmem j, χmem j⟩).re`, all positive (`|W₁|` for the columns,
+  `1` for the irreducibles);
+* the **weighted Gram identity** `⟨χmem i, χmem j⟩ = if i = j then (mc i : ℂ) else 0` — diagonal the
+  real squared norm (`inner_self_eq_realCast`), off-diagonal `0` by the pairwise orthogonality
+  `caseB_Sunion_pairwise_orthogonal`.
+
+This is exactly the `χmem`/`mc`/`hmempos`/`hmemortho` block the engine
+`coherentDegreeSqNormBound_of_not_coherentW` consumes; the χ-dependent per-member data
+(`Dmem`/`hortho_mem`/`htau1Dmem`, supplied by `caseB_member_orthoDatum`) and the degree data are
+layered on in the (6.8.3) bound (brick 3). -/
+theorem exists_sMemberOrthogonalFamilyW
+    (hyp : SibleyDadeHypothesis G L H) [H.Normal]
+    (h46 : OddOrder.Peterfalvi.S06.Hypothesis46 (sharpImage H) L) (hHK : h46.K = H)
+    (hW1 : h46.W1 = hyp.W1)
+    [NeZero (Nat.card h46.W1)] [Invertible (Nat.card ↥h46.K : ℂ)]
+    [Fintype ↥(h46.W1 ⊔ h46.W2)] [Invertible (Nat.card ↥(h46.W1 ⊔ h46.W2) : ℂ)]
+    {W2 : Subgroup ↥L} (hW2comm : W2 ≤ ⁅H, H⁆) :
+    ∃ (k : ℕ) (χmem : Fin k → ClassFunction ↥L ℂ) (mc : Fin k → ℝ),
+      Function.Injective χmem ∧
+      Set.range χmem = hyp.Xset W2 ∪ hyp.Yset ∧
+      (∀ j, χmem j ∈ hyp.Xset W2 ∪ hyp.Yset) ∧
+      (∀ j, 0 < mc j) ∧
+      (∀ i j, ClassFunction.inner (χmem i) (χmem j) = if i = j then (mc i : ℂ) else 0) := by
+  classical
+  haveI : Fintype ↥H := Fintype.ofFinite _
+  have hfin : (hyp.Xset W2 ∪ hyp.Yset).Finite := (hyp.Xset_finite W2).union hyp.Yset_finite
+  obtain ⟨k, χmem, hinj, hrange⟩ := exists_finEnum_general hfin
+  have hmemS1 : ∀ j, χmem j ∈ hyp.Xset W2 ∪ hyp.Yset := fun j => hrange ▸ Set.mem_range_self j
+  refine ⟨k, χmem, fun j => (ClassFunction.inner (χmem j) (χmem j)).re,
+    hinj, hrange, hmemS1, ?_, ?_⟩
+  · -- `mc j > 0`: column members have `‖μ_j‖² = |W₁|`, irreducibles have `‖χ‖² = 1`.
+    intro j
+    change (0 : ℝ) < (ClassFunction.inner (χmem j) (χmem j)).re
+    rcases hmemS1 j with hX | hY
+    · rcases caseB_S_member_column_or_irreducible hyp h46 hHK (hyp.Xset_subset_S hX) with
+        ⟨χ₂, hχ₂, hcol⟩ | hirr
+      · have hval := OddOrder.Peterfalvi.S06.columnFamily_mu_sum_inner h46 χ₂ χ₂
+        rw [if_pos rfl] at hval
+        simp only [← OddOrder.Peterfalvi.S06.columnSum_def] at hval
+        rw [hcol] at hval
+        rw [hval, Complex.natCast_re]
+        exact_mod_cast Nat.card_pos
+      · have hval : ClassFunction.inner (χmem j) (χmem j) = 1 := by
+          have h := irreducibleCharacter_inner_eq_ite
+            (⟨χmem j, hirr⟩ : IrreducibleCharacter ↥L) ⟨χmem j, hirr⟩
+          rwa [if_pos rfl] at h
+        rw [hval]; norm_num
+    · have hirr := hyp.isIrreducibleCharacter_of_mem_Yset hY
+      have hval : ClassFunction.inner (χmem j) (χmem j) = 1 := by
+        have h := irreducibleCharacter_inner_eq_ite
+          (⟨χmem j, hirr⟩ : IrreducibleCharacter ↥L) ⟨χmem j, hirr⟩
+        rwa [if_pos rfl] at h
+      rw [hval]; norm_num
+  · -- weighted Gram: diagonal the real squared norm, off-diagonal `0`.
+    intro i j
+    by_cases hij : i = j
+    · subst hij
+      rw [if_pos rfl]
+      change ClassFunction.inner (χmem i) (χmem i)
+        = (((ClassFunction.inner (χmem i) (χmem i)).re : ℝ) : ℂ)
+      rw [inner_self_eq_realCast (χmem i), Complex.ofReal_re]
+    · rw [if_neg hij]
+      exact caseB_Sunion_pairwise_orthogonal hyp h46 hHK hW1 hW2comm
+        (χmem i) (hmemS1 i) (χmem j) (hmemS1 j) (fun h => hij (hinj h))
+
 end OddOrder.Peterfalvi.S08

@@ -4,6 +4,64 @@
 > `s08_6_8_assembly_plan.md`(458KB)/`s08_6_8_3_gap_resolution.md` のうち本 note と矛盾する記述は本 note を優先。
 > 上位方針・FT 接続の文脈 = 記憶 [[ft-path-policy]] の 2026-06-17 検証訂正ブロック。
 
+## ✅✅ 2026-06-17 セッション更新 — brick 2 COMPLETE (coupled producer + pairwise + enumerator)
+
+**3 結果着地** (`S08_CaseBEnumeration.lean`、全 build-green 3629 jobs・axiom-clean、commits
+`1faf9aec`/`9edad451`/`00450f56`):
+
+1. **`caseB_member_orthoDatum`** (brick 2 core, the genuine hard core): per-member coupled datum
+   producer. 入力 = member `x ∈ S₁`, 固定 break char `χ`(+ realness/`H^#`-support)+ member⊥break
+   facts `hxχ`/`hxχbar`/`hxbarχ`/`hxbarχbar`。出力 = subtype `{ D : CharacterPsiDecomposition hyp.tau x 0
+   // D.imageFamily.Orthogonal (R(χ)) ∧ D.tau1 x = hS₁coh.extension x }`。**= brick 1
+   `caseB_member_psiDecomposition` を `hortho`+`htau1` で coupling した版**。
+   - **🔑 設計確定 (workflow `scope:enum` agent と私が独立に同結論)**: engine の `Dmem`/`hortho_mem`/
+     `htau1Dmem` は **coupled triple**(`hortho_mem` は `(Dmem i).imageFamily` についての主張)。brick 1 を
+     black-box で `Dmem` に使い `hortho`/`htau1` を別途証明する経路は **失敗する**(column 枝の `hcol ▸`
+     transport + `by_cases` が opaque 化し `htau1=rfl` と imageSet 同定を阻む)。**唯一の正解 = strategy (B):
+     1 個の透明な `by_cases` で D・hortho・htau1 を同時生成**。これを実装したのが `caseB_member_orthoDatum`。
+   - **`hortho` は ψ-依存だが ψ-universal でない**: column 枝 = `certainTypeR_imageSet_orthogonal_dadeOfDiff`
+     (χ の realness/support のみ要、member⊥break 不要、V-vanishing)、irr 枝 =
+     `dadeOrthonormalCharacterImageFamilyOfDiff_orthogonal`(**member⊥break facts を消費**)。⟹ `hortho_mem`
+     は **brick 3 で**(break ψ が判明し break⊥S₁ から member⊥break が出る所で)`caseB_member_orthoDatum`
+     を呼んで作る。**roadmap 旧記述「brick 2 が hortho_mem を出す」は ψ-依存性ゆえ誤り、brick 3 の仕事**。
+
+2. **`caseB_Sunion_pairwise_orthogonal`**: `X(W₂) ∪ Y` の相異 2 元は直交(weighted Gram off-diagonal)。
+   6 case dispatch(`caseB_S_member_column_or_irreducible` で X-member を column/irr に割る): col⊥col
+   (`inner_columnSum_cross_eq_zero`)/col⊥irr(`caseB_inner_irr_columnSum_eq_zero`, deg mod |W₁|)/irr⊥irr
+   (Kronecker)/X⊥Y(`caseB_Xset_orthogonal_Yset`)/Y⊥Y、非対称順は conj 対称 `inner_conj_symm` で。
+
+3. **`exists_sMemberOrthogonalFamilyW`** (brick 2, the ψ-independent enumerator): `S₁ = X(W₂) ∪ Y` を
+   `exists_finEnum_general`(reducible 込み)で `χmem : Fin k → ClassFunction` に列挙 + `mc j =
+   (⟨χmem j,χmem j⟩).re`(>0: col=|W₁|, irr=1)+ weighted Gram `⟨χmem i,χmem j⟩ = if i=j then (mc i:ℂ) else 0`
+   (diagonal=`inner_self_eq_realCast`, off-diag=pairwise lemma)。**= engine の `χmem`/`mc`/`hmempos`/`hmemortho`
+   block**。⚠ tactic 罠: `mc i` は `(fun j=>…) i` で未 beta — goal は `change` で reduce。column 自己 Gram は
+   `columnFamily_mu_sum_inner h46 χ₂ χ₂` を hypothesis 化 → `simp only [← columnSum_def] at` で fold(forward
+   `rw` は pattern 不一致)。
+
+### ▶▶ 次 = brick 3 = `sMember_degreeSqNormBound_of_not_coherent`(weighted bound assembly)
+
+unweighted テンプレート `sMember_degreeSumBound_of_not_coherent`(`CorePart2:2650`, 8 step)を mirror、step 8 で
+engine `coherentDegreeSqNormBound_of_not_coherentW`(`S08_CoherenceWeighted:475`)。差分:
+- **enumerator** = brick 2 `exists_sMemberOrthogonalFamilyW`(unweighted は `exists_sMemberOrthonormalFamily`)。
+- **anchor** `i₁` = `Yset` member(degree |W₁| 全員、`Yset_apply_one`; irr `isIrreducibleCharacter_of_mem_Yset`;
+  `mc i₁=1`)。`Yset` 非空 + `χmem i₁ ∈ Yset ∩ range` を locate。`ha1: deg i₁=1`。
+- **degree data**: `sMember_charValue_one_eq_mul_anchor`/`sMember_scaledDiffSupport_of_charValue_eq` は
+  `χ ∈ hyp.S`(ClassFunction)で述べられ ClassFunction-typed member にそのまま適用可(workflow `scope:assembly`
+  確認)。`deg`/`hmemdegdiffsupp` を per-member で。
+- **Dmem/hortho_mem/htau1Dmem** = per-member `caseB_member_orthoDatum hyp h46 hHK … χmem_i hνZ_i χ=ψ hrealψ
+  hdiffsuppψ (member⊥break ×4)`。member⊥break ×4 は break-pair fields(`sBreakPair_fields` の weighted 類似 or
+  break⊥S₁ + conj 対称 + member∈S₁)から。
+- **break pair ψ**: `exists_coherentBreakPair` 系(ψ∉S₁, ψ̄∉S₁)。`hdiffasuppχ`/`htau1_memaχ` =
+  `sMember_scaledDiffSupport_of_charValue_eq`/`scaledDiff_dadeImage_mem_ZIrr`。
+- **hSgen/hgen** = `span_subset_span_zSupportedSpan_union_anchor_of_scaledDiffs` /
+  `zSupportedSpan_adjoinPair_subset_span_of_anchorGeneration`(weighting 非依存、verbatim 流用; workflow 確認)。
+- 結論 = `∑ (deg j)²/mc j ≤ 2a`、real-part scaling で `∑ (χ(1).re)²/mc ≤ 2ψ(1)χ₁(1)`
+  (`sMember_degreeSqReBound_of_not_coherent` mirror)。
+
+その後 brick 4 = c2 endgame `false_of_coherentXunionYset_caseB_of_not_coherentS`(counting
+`sum_div_normSq_induce_kernelFilter_eq` + FPF `false_of_caseB_break_of_bounds`)→ S08:59 の 3-way dispatch。
+正本詳細 = この note 以下 + workflow `scope:assembly`/`scope:seed` result(transcript wulxxqn5y）。
+
 ## ✅ 2026-06-17 セッション更新 — brick 1 COMPLETE (`caseB_member_psiDecomposition`)
 
 **brick 1 = 着地** (`S08_CaseBEnumeration.lean` 末尾、build-green 3628 jobs・axiom-clean `[propext,
