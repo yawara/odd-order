@@ -6933,6 +6933,45 @@ theorem partner_canonical_eq [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     exact kappaHall_primes_subset_sigma_partner hG hM hP hKM hK hKstar hU hpart
       (Nat.prime_of_mem_primeFactors hq) (Nat.dvd_of_mem_primeFactors hq)
 
+/-- **BG Theorem 14.7(e), `Ẑ` is a TI-subset** (mmd L4051): with the family `{M, M*}`, the
+union `⋃_{N} (Z ⊓ N_σ)` collapses to `K ∪ K*` (`Z ⊓ M_σ = K*` by `typeP_self_member`, `Z ⊓ M*_σ = K`
+by `partner_canonical_eq`), so the family TI-set `T = Z − ⋃ (Z ⊓ N_σ)` equals `Ẑ = Z − (K ∪ K*)`.
+Hence `Ẑ` inherits the TI property from `typeP_family_T_isTI`.  A conjunct of the `∃! Mstar`. -/
+theorem typeP_zTilde_isTI [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    {M K Kstar U Mstar : Subgroup G} (hM : M ∈ maximalSubgroups G) (hP : IsTypeP M) (hKM : K ≤ M)
+    (hK : Ch03.IsHallSubgroup (kappa M) (K.subgroupOf M))
+    (hKstar : Kstar = OddOrder.BG.Ch3.S10.Msigma M ⊓ Subgroup.centralizer (K : Set G))
+    (hU : Ch03.IsHallSubgroup ((kappa M ∪ OddOrder.BG.Ch3.S10.sigma M)ᶜ) (U.subgroupOf M))
+    (hMstarmem : IsZFamilyMember M K Mstar) (hMstarne : Mstar ≠ M)
+    (hpart : ∀ N : Subgroup G, IsZFamilyMember M K N → N = M ∨ N = Mstar) :
+    OddOrder.GroupTheory.IsTISubset (zTilde K Kstar) (K ⊔ Kstar) := by
+  classical
+  have hcanonM : (K ⊔ Kstar) ⊓ OddOrder.BG.Ch3.S10.Msigma M = Kstar :=
+    (typeP_self_member hG hM hP hKM hK hKstar hU).1
+  have hcanonMstar : (K ⊔ Kstar) ⊓ OddOrder.BG.Ch3.S10.Msigma Mstar = K :=
+    partner_canonical_eq hG hM hP hKM hK hKstar hU hMstarmem hMstarne hpart
+  have hunion : (⋃ N ∈ ZFamilyFinset M K,
+      (((K ⊔ Kstar) ⊓ OddOrder.BG.Ch3.S10.Msigma N : Subgroup G) : Set G))
+      = ((K : Set G) ∪ (Kstar : Set G)) := by
+    apply Set.Subset.antisymm
+    · rintro x hx
+      rw [Set.mem_iUnion₂] at hx
+      obtain ⟨N, hN, hxN⟩ := hx
+      rcases hpart N (mem_ZFamilyFinset.mp hN) with rfl | rfl
+      · rw [hcanonM] at hxN; exact Or.inr hxN
+      · rw [hcanonMstar] at hxN; exact Or.inl hxN
+    · rintro x (hxK | hxKstar)
+      · exact Set.mem_iUnion₂.mpr ⟨Mstar, mem_ZFamilyFinset.mpr hMstarmem,
+          by rw [hcanonMstar]; exact hxK⟩
+      · exact Set.mem_iUnion₂.mpr ⟨M, mem_ZFamilyFinset.mpr (Or.inl rfl),
+          by rw [hcanonM]; exact hxKstar⟩
+  have hzeq : zTilde K Kstar = ((K ⊔ Kstar : Subgroup G) : Set G) \
+      ⋃ N ∈ ZFamilyFinset M K,
+        (((K ⊔ Kstar) ⊓ OddOrder.BG.Ch3.S10.Msigma N : Subgroup G) : Set G) := by
+    simp only [zTilde]; rw [hunion]
+  rw [hzeq]
+  exact typeP_family_T_isTI hG hM hP hKM hK hKstar hU
+
 /-- **BG Theorem 14.7** (mmd L3890): type-P duality and the `Z_tilde` TI-set.
 
 For a type-P maximal subgroup `M`, there is a unique nonconjugate type-P partner

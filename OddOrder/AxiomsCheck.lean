@@ -4976,6 +4976,13 @@ line→partner argument).  This is the structural keystone turning `T = Z − �
 #assert_only_allowed_axioms OddOrder.BG.Ch4.S14.kappaHall_primes_subset_sigma_partner
 #assert_only_allowed_axioms OddOrder.BG.Ch4.S14.partner_canonical_eq
 
+/-! **BG Theorem 14.7(e), `Ẑ` is a TI-subset** (`S14_TypePCounting`, `typeP_zTilde_isTI`): with the
+family `{M, M*}` the union `⋃ (Z ⊓ N_σ)` collapses to `K ∪ K*` (via `partner_canonical_eq` and
+`typeP_self_member`), so `Ẑ = Z − (K ∪ K*)` equals the family TI-set and inherits TI-ness from
+`typeP_family_T_isTI`.  A conjunct of the `∃! Mstar`.  Fully unconditional, axiom-clean. -/
+
+#assert_only_allowed_axioms OddOrder.BG.Ch4.S14.typeP_zTilde_isTI
+
 /-! **BG Theorem E, `σ(Mᵢ)`-disjointness conjunct** (`S16_MainResults`,
 `sigma_reps_pairwise_disjoint`): distinct conjugacy-class representatives of maximal subgroups
 have disjoint `σ`-sets.  This is the one currently-unconditional conjunct of BG Theorem E — the
