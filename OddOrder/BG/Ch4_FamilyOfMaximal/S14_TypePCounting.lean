@@ -6072,6 +6072,27 @@ theorem typeP_family_T_isTI [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
   rw [hbot] at hmem
   exact hy'g1 (Subgroup.mem_bot.mp hmem)
 
+/-- **BG 14.7, `|𝒞_G(T)| = |T|·[G:Z]`** (mmd L4031): the conjugacy-saturation count of the TI-set
+`T = Z − ⋃ Kᵢ*`.  Direct composition of `ncard_conjClassSet_of_isTISubset` with the TI property
+(`typeP_family_T_isTI`) and the `Z`-stability `hstab` (`typeP_family_Z_normalizes_T`).  With
+`|T| = z + n − ∑ kᵢ*` (`typeP_family_T_count`) this is BG's `(1 + n/z − ∑ 1/kᵢ)|G|`, the left
+summand of the density inequality. -/
+theorem typeP_family_conjClass_T_count [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    {M K Kstar U : Subgroup G} (hM : M ∈ maximalSubgroups G) (hP : IsTypeP M) (hKM : K ≤ M)
+    (hK : Ch03.IsHallSubgroup (kappa M) (K.subgroupOf M))
+    (hKstar : Kstar = OddOrder.BG.Ch3.S10.Msigma M ⊓ Subgroup.centralizer (K : Set G))
+    (hU : Ch03.IsHallSubgroup ((kappa M ∪ OddOrder.BG.Ch3.S10.sigma M)ᶜ) (U.subgroupOf M)) :
+    (conjClassSet (((K ⊔ Kstar : Subgroup G) : Set G) \
+        ⋃ N ∈ ZFamilyFinset M K,
+          (((K ⊔ Kstar) ⊓ OddOrder.BG.Ch3.S10.Msigma N : Subgroup G) : Set G))).ncard
+      = (((K ⊔ Kstar : Subgroup G) : Set G) \
+          ⋃ N ∈ ZFamilyFinset M K,
+            (((K ⊔ Kstar) ⊓ OddOrder.BG.Ch3.S10.Msigma N : Subgroup G) : Set G)).ncard
+        * (K ⊔ Kstar).index :=
+  ncard_conjClassSet_of_isTISubset
+    (typeP_family_T_isTI hG hM hP hKM hK hKstar hU)
+    (typeP_family_Z_normalizes_T hG hM hP hKM hK hKstar hU)
+
 /-- **BG Theorem 14.7** (mmd L3890): type-P duality and the `Z_tilde` TI-set.
 
 For a type-P maximal subgroup `M`, there is a unique nonconjugate type-P partner
