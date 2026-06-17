@@ -7187,6 +7187,63 @@ theorem exists_zTilde_conjClass_gt_half_of_isTypeP [Finite G]
   exact ⟨L, Lstar, hLH, hL, hLstar,
     typeP_zTilde_conjClass_gt_half hG hHmax hHP hLH hL hLstar hU hHstarmem hHstarne hpart⟩
 
+/-- Dual of `isPiElementCompl_mem_left_of_commute`: a `π`-element of `Z = A ⊔ B` (with `A` a
+`πᶜ`-group, `B` a `π`-group commuting with `A`) lies in `B`.  (Swap the roles of `A`, `B` and
+`π`, `πᶜ`.) -/
+theorem isPiElement_mem_right_of_commute [Finite G] {A B Z : Subgroup G} {π : Set ℕ}
+    (hswap : Z = A ⊔ B) (hcent : B ≤ Subgroup.centralizer (A : Set G))
+    (hAπc : Subgroup.IsPiSubgroup πᶜ A) (hBπ : Subgroup.IsPiSubgroup π B)
+    {b : G} (hbZ : b ∈ Z) (hbπ : IsPiElement π b) : b ∈ B := by
+  have hAcent : A ≤ Subgroup.centralizer (B : Set G) := fun a ha => by
+    rw [Subgroup.mem_centralizer_iff]
+    exact fun c hc => (Subgroup.mem_centralizer_iff.mp (hcent hc) a ha).symm
+  exact isPiElementCompl_mem_left_of_commute (A := B) (B := A) (π := πᶜ)
+    (by rw [hswap, sup_comm]) hAcent (by rwa [compl_compl]) hAπc hbZ (by rwa [compl_compl])
+
+/-- **BG Theorem 14.7 covering, the `σ`-part matching** (mmd L4053): if `t` lies in both
+`Ẑ_M = (K ⊔ K*) − (K ∪ K*)` (with `K` a `σ(M)′`-group, `K*` a `σ(M)`-group commuting with `K`) and
+in `L ⊔ L*` but not in `L` (with `L` a `σ(H)′`-group, `L*` a `σ(H)`-group commuting with `L`), then
+`L*` meets one of `K`, `K*` nontrivially.  Proof: the `σ(H)`-part `w` of `t` is a nontrivial
+element of `L*` (else `t = (σ(H)′-part) ∈ L`), and `w ∈ ⟨t⟩ ⊆ K ⊔ K*`; its `σ(M)`- and
+`σ(M)′`-parts are powers of `w` (so in `L*`) lying in `K*` resp. `K`, and at least one is
+nontrivial.  This realizes BG's "`T ∩ S ≠ ∅ ⟹ L* ∩ Kᵢ* ≠ 1`". -/
+theorem exists_inf_ne_bot_of_mem_zTilde_inter [Finite G] {K Kstar L Lstar : Subgroup G}
+    {πM πH : Set ℕ}
+    (hKπ : Subgroup.IsPiSubgroup πMᶜ K) (hKstarπ : Subgroup.IsPiSubgroup πM Kstar)
+    (hKcent : Kstar ≤ Subgroup.centralizer (K : Set G))
+    (hLπ : Subgroup.IsPiSubgroup πHᶜ L) (hLstarπ : Subgroup.IsPiSubgroup πH Lstar)
+    (hLcent : Lstar ≤ Subgroup.centralizer (L : Set G))
+    {t : G} (htZ : t ∈ K ⊔ Kstar) (htnL : t ∉ L) (htZ' : t ∈ L ⊔ Lstar) :
+    Lstar ⊓ K ≠ ⊥ ∨ Lstar ⊓ Kstar ≠ ⊥ := by
+  classical
+  -- `σ(H)`-decompose `t = w * v`; `v ∈ L`, `w ∈ L*`, and `w ≠ 1`.
+  obtain ⟨w, v, hwv, -, hwπ, hvπ, hwz, hvz⟩ := exists_isPiElement_mul πH t
+  have hvL : v ∈ L := isPiElementCompl_mem_left_of_commute rfl hLcent hLπ hLstarπ
+    ((Subgroup.zpowers_le.mpr htZ') hvz) hvπ
+  have hwLstar : w ∈ Lstar := isPiElement_mem_right_of_commute rfl hLcent hLπ hLstarπ
+    ((Subgroup.zpowers_le.mpr htZ') hwz) hwπ
+  have hw1 : w ≠ 1 := fun hw => htnL (by rw [show t = v by rw [← hwv, hw, one_mul]]; exact hvL)
+  -- `σ(M)`-decompose `w = a * b`; `a ∈ K*`, `b ∈ K`, both powers of `w` (so in `L*`).
+  have hwZ : w ∈ K ⊔ Kstar := (Subgroup.zpowers_le.mpr htZ) hwz
+  obtain ⟨a, b, hab, -, haπ, hbπ, haz, hbz⟩ := exists_isPiElement_mul πM w
+  have haKstar : a ∈ Kstar := isPiElement_mem_right_of_commute rfl hKcent hKπ hKstarπ
+    ((Subgroup.zpowers_le.mpr hwZ) haz) haπ
+  have hbK : b ∈ K := isPiElementCompl_mem_left_of_commute rfl hKcent hKπ hKstarπ
+    ((Subgroup.zpowers_le.mpr hwZ) hbz) hbπ
+  have haLstar : a ∈ Lstar := (Subgroup.zpowers_le.mpr hwLstar) haz
+  have hbLstar : b ∈ Lstar := (Subgroup.zpowers_le.mpr hwLstar) hbz
+  -- `w = a * b ≠ 1`, so one factor is nontrivial.
+  have hor : a ≠ 1 ∨ b ≠ 1 := by
+    by_contra h; push_neg at h
+    exact hw1 (by rw [← hab, h.1, h.2, mul_one])
+  rcases hor with ha1 | hb1
+  · exact Or.inr fun hbot => ha1 (by
+      have : a ∈ Lstar ⊓ Kstar := Subgroup.mem_inf.mpr ⟨haLstar, haKstar⟩
+      rwa [hbot, Subgroup.mem_bot] at this)
+  · exact Or.inl fun hbot => hb1 (by
+      have : b ∈ Lstar ⊓ K := Subgroup.mem_inf.mpr ⟨hbLstar, hbK⟩
+      rwa [hbot, Subgroup.mem_bot] at this)
+
 /-- **BG Theorem 14.7** (mmd L3890): type-P duality and the `Z_tilde` TI-set.
 
 For a type-P maximal subgroup `M`, there is a unique nonconjugate type-P partner
