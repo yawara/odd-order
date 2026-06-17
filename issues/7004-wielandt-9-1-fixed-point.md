@@ -64,13 +64,15 @@ B `(6.8)`）に gated で STANDBY だった。hub の実コード再検証で両
       → (3) split-ss `Z≅𝔽̄_p^N` 冪等元基底
       （mathlib `IsSemisimpleRing.exists_algEquiv_pi_matrix_of_isAlgClosed`）→ (4) cornerstone を 2 基底
       に適用し #orbits 一致 + Glauberman free-on-classes + counting。
-      **(4) class-sum 側 wiring ✅ COMPLETE** (`CenterOrbitCount.lean` `cab132a7`):
+      **(4) class-sum 側 ✅✅ FULLY COMPLETE** (`CenterOrbitCount.lean` `cab132a7`+`faeb1bc8`):
       `MulAction (MulAut G) (ConjClasses G)` (`ConjClasses.map`) + `centerRep : Representation k
-      (MulAut G) ↥center` (`domCongr α` を中心へ制限) + **compatibility `centerRep_apply_centerBasis`
-      = cornerstone の `hρ`**。⚠ 最終 1 行 `finrank ↥(invariants centerRep) = #orbits` は **Lean の
-      isDefEq/whnf 爆発で block** (`↥(Subalgebra.center k (MonoidAlgebra k G))` の coercion tower、
-      1M heartbeats 超・`irreducible` 無効; math は完成・elaboration 性能問題)。fix 候補 = 中心の
-      type synonym。**残 hard core = (3) 冪等元基底**（Wedderburn-Artin + center of product, 新規）。
+      (MulAut G) ↥center` (`domCongr α` を中心へ制限) + compatibility `centerRep_apply_centerBasis`
+      = cornerstone の `hρ` + **capstone `finrank_centerRep_invariants_eq_card_orbits`:
+      `finrank ↥(invariants centerRep') = #(MulAut G-orbits on classes)`**。⚠ isDefEq/whnf 爆発
+      (`↥(Subalgebra.center k …)` の Module instance diamond) は **carrier type synonym `CenterCarrier`
+      + inferInstanceAs で正準化して解消** ([[lean-type-synonym-fixes-instance-diamond]])。
+      **残 hard core = (3) 冪等元基底**（Wedderburn-Artin + center of product, 新規; 同 cornerstone を
+      synonym 経由で適用すれば #orbits-on-simples が出る = (4) で de-risk 済）。
       ⚠ repo `ClassSumAlgebra.lean` は **ℂ 専用**だったので (2) は新規に k-一般化済。
       正本 = design notes「2026-06-17 (resume²)」「(resume³)」。
 - [ ] (†) kernel-FPF count + (I-4) base change `𝔽_p→𝔽̄_p`

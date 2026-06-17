@@ -21,7 +21,7 @@ This file builds the ingredients:
 -/
 
 open scoped MonoidAlgebra
-open Module
+open Module MulAction
 
 namespace ConjClasses
 
@@ -118,17 +118,42 @@ theorem centerRep_apply_centerBasis (α : MulAut G) (C : ConjClasses G) :
       = classSum (k := k) (ConjClasses.map (α : G →* G) C)
   exact domCongr_classSum α C
 
-/-
-**TODO (next): the cornerstone application.**  The orbit count
-`finrank k ↥(Representation.invariants centerRep) = Nat.card (orbitRel.Quotient (MulAut G) (ConjClasses G))`
-is exactly `PermutationInvariants.finrank_invariants_eq_card_orbits centerBasis centerRep
-centerRep_apply_centerBasis`.  The mathematics is complete — `centerRep_apply_centerBasis` is the
-compatibility hypothesis the cornerstone requires.  What blocks it is a Lean elaboration blowup: even
-*stating* `↥(Representation.invariants centerRep)` over the heavy coercion tower
-`↥(Subalgebra.center k (MonoidAlgebra k G))` loops at `isDefEq`/`whnf` past 1M heartbeats (marking
-`centerEnd`/`centerRep` `irreducible` does not help — the cost is in the subalgebra/coe instances, not
-in unfolding the defs).  Likely resolution: introduce a type synonym (or `Module`-level wrapper) for
-the centre so the coercion tower is opaque, then apply the cornerstone through it.
--/
+/-! ### The cornerstone applied to the class-sum basis
+
+Applying `finrank_invariants_eq_card_orbits` to `centerRep` directly trips an instance-diamond
+`isDefEq` blowup: even *stating* `↥(Representation.invariants centerRep)` loops past 1M heartbeats,
+because the `Module k`-instance on `↥(Subalgebra.center k (MonoidAlgebra k G))` gets re-derived and
+defeq-checked against the one baked into `centerRep`.  Routing the representation and basis through a
+**carrier synonym** that pins a single `Module k`-instance dissolves the diamond. -/
+
+/-- A carrier synonym for the centre `Z(k[G])` that pins one canonical `Module k`-instance, so that
+cornerstone applications do not trip the instance-diamond `isDefEq` blowup. -/
+def CenterCarrier (k G : Type*) [Field k] [Group G] : Type _ :=
+  ↥(Subalgebra.center k (MonoidAlgebra k G))
+
+noncomputable instance : AddCommGroup (CenterCarrier k G) :=
+  inferInstanceAs (AddCommGroup ↥(Subalgebra.center k (MonoidAlgebra k G)))
+noncomputable instance : Module k (CenterCarrier k G) :=
+  inferInstanceAs (Module k ↥(Subalgebra.center k (MonoidAlgebra k G)))
+
+/-- `centerRep` retyped over the carrier synonym. -/
+noncomputable def centerRep' : Representation k (MulAut G) (CenterCarrier k G) := centerRep
+
+/-- `centerBasis` retyped over the carrier synonym. -/
+noncomputable def centerBasis' : Basis (ConjClasses G) k (CenterCarrier k G) := centerBasis
+
+theorem centerRep'_apply_centerBasis' (α : MulAut G) (C : ConjClasses G) :
+    centerRep' (k := k) α (centerBasis' (k := k) C) = centerBasis' (k := k) (α • C) :=
+  centerRep_apply_centerBasis α C
+
+/-- **Orbit count via the class-sum basis.**  The dimension of the `MulAut G`-invariants of
+`Z(k[G])` equals the number of orbits of `MulAut G` on conjugacy classes.  (One of the two
+computations in Peterfalvi (9.1)'s orbit-count Brauer lemma; the other, to follow, is via the
+primitive-idempotent basis.) -/
+theorem finrank_centerRep_invariants_eq_card_orbits :
+    finrank k ↥(Representation.invariants (centerRep' (k := k) (G := G)))
+      = Nat.card (orbitRel.Quotient (MulAut G) (ConjClasses G)) :=
+  PermutationInvariants.finrank_invariants_eq_card_orbits centerBasis' centerRep'
+    centerRep'_apply_centerBasis'
 
 end OddOrder.GroupTheory.CenterClassSum

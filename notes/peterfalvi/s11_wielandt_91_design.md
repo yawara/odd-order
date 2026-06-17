@@ -59,16 +59,16 @@ cyclic subgroup when wiring the Brauer count). Landed: `ConjClasses.map_id`/`map
 preserve the centre), `centerEnd`/`centerRep` (the representation, `show`-based structure-field
 proofs), and the keystone **`centerRep_apply_centerBasis : centerRep α (centerBasis C) = centerBasis
 (α • C)`** (= the cornerstone's `hρ`, via `domCongr_classSum`).
-⚠ **BLOCKER on the one-line capstone** `finrank k ↥(invariants centerRep) = Nat.card (orbits)`: even
-*stating* `↥(Representation.invariants centerRep)` triggers an `isDefEq`/`whnf` blowup over the
-`↥(Subalgebra.center k (MonoidAlgebra k G))` coercion tower (>1M heartbeats; `irreducible` on
-`centerEnd`/`centerRep` does not help — the cost is the subalgebra/coe instance resolution, not def
-unfolding). `centerRep_apply_centerBasis` itself (which also mentions both) compiles fine, so it is
-specifically `invariants centerRep` that explodes (likely the `k[MulAut G]`-module / `asModule`
-structure it forces on the heavy `V`). **Fix to try next**: a `def`-`irreducible` type synonym (or a
-plain `Module k`-wrapper) for `Z(k[G])` so the coercion tower is opaque, then apply the cornerstone
-through it; alternatively restate the cornerstone to take the fixed space as `LinearMap.ker (ρ g − 1)`
-for a generator rather than `Representation.invariants`.
+✅ **Capstone DONE** (`faeb1bc8`): `finrank_centerRep_invariants_eq_card_orbits :
+finrank k ↥(invariants centerRep') = Nat.card (orbitRel.Quotient (MulAut G) (ConjClasses G))`.
+The blocker was a **`Module k`-instance diamond** on `↥(Subalgebra.center k (MonoidAlgebra k G))`:
+the instance baked into `centerRep` got defeq-checked against a re-derived one, exploding `isDefEq`
+past 1M heartbeats (diagnosed via statement-only `… := by sorry` timeouts; bare `finrank k ↥center`
+is fine, only `invariants centerRep` explodes). **Fix = carrier synonym** `CenterCarrier k G :=
+↥(Subalgebra.center k (MonoidAlgebra k G))` with one pinned `Module k`-instance (`inferInstanceAs`);
+`centerRep'`/`centerBasis'` retype through it definitionally and the cornerstone applies in ms.
+Reusable technique: [[lean-type-synonym-fixes-instance-diamond]]. **⟹ the same synonym de-risks the
+idempotent-side cornerstone application (step 3).**
 
 ## Decision (2026-06-17, user): NO axioms — build everything bottom-up
 
