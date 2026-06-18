@@ -106,38 +106,53 @@ and it depends on §13/§15 producers (see "Remaining" below).
 that **bottoms out in the sorried §13/§15 producers** (`basic_structure`, `c_eq_one`, the (14.7)
 case arithmetic) — i.e. the same §13 character/structure theory that gates `exists_L/MHypothesis`.
 
-## σ-bridge construction plan (step 4, scoped 2026-06-18 — ungated, intricate frozen-Core)
+## ✅✅ DONE: σ-bridge (step 4) — `fieldNormalizerData_of_repr` (2026-06-18, commits `aee72713`/`410471ea`/`d948ce69`)
 
+`OddOrder/Peterfalvi/S16_NonExistenceG.lean`, all sorry-free + axiom-clean + AxiomsCheck-registered.
 The σ-bridge takes the (14.2)(a) iso as *input* (so it is ungated) and builds `FieldNormalizerData`.
-Target shape:
-```
-theorem fieldNormalizerData_of_repr (hyp : Hypothesis (G := G))
-    (e  : Additive ↥hyp.base.P ≃+ GaloisField hyp.base.p hyp.base.q)
-    (μ  : ↥hyp.base.U →* (GaloisField hyp.base.p hyp.base.q)ˣ) (hμinj : Injective μ)
-    (hμrange : μ.range = normOneUnits …)                       -- image = U*
-    (hcompat : e (Additive.ofMul (conj u • x)) = μ u • e x)    -- (14.2)(a) compat
-    (partB …) : Nonempty (FieldNormalizerData hyp)
-```
-Core facts (all in `OddOrder/BG/AppC_NormSet.lean`, frozen — *use*, don't modify):
-* `normOneFrobeniusGroup p q = additiveFieldGroup p q ⋊[normOneMulAction] normOneUnits p q`,
-  `additiveFieldGroup = Multiplicative (GaloisField p q)`, complement `normOneUnits` = norm-one
-  subgroup of `GF^×` (order `(p^q-1)/(p-1)` = `U*`).
-* `normOneFrobenius_conj_inl` : conjugation of an `inl`-kernel point by `inr u` = field-mult by `u`
-  — this is exactly the `SemidirectProduct.lift` compatibility, fed by `hcompat`.
-Construction:
-1. `f_N : Multiplicative (GF) →* G`, `ofAdd s ↦ ↑(e.symm s)` (uses `Additive`/`Multiplicative`
-   adjunction: `↥P` multiplicative in `G` ↔ `Additive ↥P` the `F_p`-space `e` lives on).
-   `map_mul` ⟸ `e.symm` additive + `↑(x+y : Additive ↥P) = ↑x * ↑y` in `G`. range `f_N = P`.
-2. `f_U : normOneUnits →* G`, `u* ↦ ↑(μ.symm-onto-range u*)` (via `hμrange`, `U* ≃ U`). range `= U`.
-3. `sigma := SemidirectProduct.lift f_N f_U <compat from normOneFrobenius_conj_inl + hcompat>`.
-4. Properties: `sigma_P_eq_P`/`sigma_U_eq_U` from `range f_N = P`/`range f_U = U` + `lift_inl`/`lift_inr`;
-   `sigma_P0_eq_W2` from `e`(prime line `F_p ⊆ GF`) `= W₂` (needs `e` to send the prime field to `W₂`
-   — extra `hcompat`-style hypothesis on the prime line); `sigma_injective` from `f_N`,`f_U` inj +
-   kernel∩complement = ⊥ (`fieldNormalizerKernel_inf_complement_eq_bot`, already in Core).
-⚠ The `Additive`/`Multiplicative` bookkeeping (steps 1-2) is the main friction. Estimate ~150-250
-lines. Then `field_normalizer_of_U_characteristic` = `fieldNormalizerData_of_repr` ∘
-(`exists_galoisField_repr` applied to `Additive ↥P` as `F_p[U]`-module via conjugation) — the latter
-needs `|P|=p^q` (`basic_structure`), `|U|=u`, `c=1` (`c_eq_one`): **the §13 gate**.
+
+* **`fieldNormalizerKernelTransport` (fN)**: from `e : Additive ↥P ≃+ 𝔽_{p^q}`, the hom
+  `𝔽_{p^q} →* G`, `s ↦ ↑(Additive.toMul (e.symm s))`. + `_apply`/`_injective`/`_range` (= P).
+* **`fieldNormalizerComplementTransport` (fU)**: from `μ : U →* 𝔽_{p^q}ˣ` (inj, range = normOneUnits),
+  the hom `U* →* G` inverting μ + including back (`U.subtype ∘ (corestrict μ).symm`). +
+  `_exists` (each `u*` has `v∈U` with `μ v = u*`, `fU u* = ↑v`) / `_injective` / `_range` (= U).
+* **`fieldNormalizerData_of_repr`**: `σ := SemidirectProduct.lift fN fU hcompatLift`, glued by the
+  (14.2)(a) `U`-equivariance.  Final signature (the actual landed interface):
+  ```
+  (e : Additive ↥P ≃+ GaloisField p q) (μ : ↥U →* (GaloisField p q)ˣ) (hμ_inj) (hμ_range)
+  (hUP : ∀ v x, (v:G)*(x:G)*(v:G)⁻¹ ∈ P)                       -- U normalizes P
+  (hcompat : ∀ v x, e (ofMul ⟨(v:G)*(x:G)*(v:G)⁻¹, hUP v x⟩) = (μ v : GF) * e (ofMul x))
+  (hW2 : (span_{ZMod p}{1}).toAddSubgroup.toSubgroup.map fN = W₂)  -- prime line ↦ W₂
+  (hPU_disj : P ⊓ U = ⊥) (hcyclotomic : Coprime ((p^q-1)/(p-1)) (p-1))
+  (hQ_elemAb …)(hW2_norm_Q …)(yQ)(hyQ_mem …)(hW2_conj_y …)                 -- part (14.2)(b)
+  : Nonempty (FieldNormalizerData hyp)
+  ```
+  Properties: `sigma_injective` via `ker = ⊥` (kernel meets complement trivially, `P ∩ U = 1`);
+  `sigma_P_eq_P`/`sigma_U_eq_U` via `range_eq_map`+`map_map`+`lift_comp_inl/inr`+transport ranges;
+  `sigma_P0_eq_W2` via the prime-line = `inl`-image of `span{1}` reduction to `hW2`.
+
+**Lean gotchas hit** (recorded for reuse): `Multiplicative.toAdd s` infers the *unfolded*
+`GaloisField`-as-`SplittingField` type → `HMul` fails against folded `GaloisField` (instance diamond);
+fix = annotate `(… : GaloisField p q)` + `set t : GaloisField p q := …`.  TypeTags cancellation
+lemmas are **root-namespace** (`toAdd_ofAdd`/`ofAdd_toAdd`/`toMul_ofMul`/`ofMul_toMul`), not
+`Multiplicative.*`/`Additive.*`.  `mul_eq_one_iff_eq_inv.mp` for `a*b=1 ⟹ a=b⁻¹`.  The lift
+compatibility goal is reached defeq via `show fN (φ u s) = fU u * fN s * (fU u)⁻¹` (avoids fragile
+`simp only [comp_apply, …]`).
+
+## Remaining road (step 3 + part b — §13-gated, Lane B)
+
+`field_normalizer_of_U_characteristic` still bottoms out on building the (14.2)(a)/(b) model that
+`fieldNormalizerData_of_repr` consumes:
+1. **step 3** — make `Additive ↥P` an `𝔽_p[U]`-module via conjugation (ungated machinery), then apply
+   `exists_galoisField_repr` to get `e`, `μ`, `hcompat`.  This needs `Nat.card ↥P = p^q`
+   (`S15.basic_structure`, **sorried §13**) and `U` faithful (`S15.c_eq_one`, **sorried §13**).
+2. **part (14.2)(b)** — `Q` elem abelian, `W₂` normalizes `Q`, `∃ y∈Q` via (13.2.b)/(14.5) (**§13**).
+3. `hPU_disj`/`hW2`/`hcyclotomic` are standing/arithmetic facts (the last via
+   `cyclotomic_quotient_coprime_of_not_dvd`, given `q ∤ (p-1)` from the case branch).
+
+The genuinely-novel/ungated math of (14.2)(a) **and** the σ-bridge are now both DONE.  What is left is
+the §13 character/structure theory (Lane B) that supplies the numeric inputs — the same gate as
+`exists_L/MHypothesis`.
 
 `exists_LHypothesis`/`exists_MHypothesis` (14.3/14.10) and the case-B cascade remain Dade-gated
 (Lane B's §3-13 character theory), independent of the above.

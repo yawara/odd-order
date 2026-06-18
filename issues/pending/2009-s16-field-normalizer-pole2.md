@@ -77,6 +77,23 @@ exists_L/MHypothesis (14.3/14.10) + caseB cascade は依然 Dade gate (Lane B)�
   sorried producers (`basic_structure`(13.2 で |P|=p^q), `c_eq_one`(faithful), (14.7) case 算術) に
   bottom-out** = exists_L/MHypothesis と同じ §13 char theory gate。正本 = notes/peterfalvi/s16_14_7_field_construction.md。
 
+### ✅✅✅ 2026-06-18 再開⁴ σ-bridge (step 4) COMPLETE (commits `aee72713`/`410471ea`/`d948ce69`/`3d2fe09a`)
+
+**step 4 (σ assembly) を実装** — `OddOrder/Peterfalvi/S16_NonExistenceG.lean`、sorry-free + axiom-clean
++ AxiomsCheck 登録:
+- **`fieldNormalizerKernelTransport` (fN)**: `e : Additive ↥P ≃+ 𝔽_{p^q}` から `𝔽_{p^q} →* G`
+  (`s ↦ ↑(toMul (e.symm s))`)。+ `_apply`/`_injective`/`_range`(= P)。
+- **`fieldNormalizerComplementTransport` (fU)**: `μ : U →* 𝔽_{p^q}ˣ` (inj, range=normOneUnits) から
+  `U* →* G` (μ を corestrict した全単射の逆 + U.subtype)。+ `_exists`/`_injective`/`_range`(= U)。
+- **`fieldNormalizerData_of_repr`**: `σ := SemidirectProduct.lift fN fU hcompatLift` + 5 properties
+  (`sigma_injective` via ker=⊥ + P∩U=1、`sigma_P_eq_P`/`sigma_U_eq_U`/`sigma_P0_eq_W2`)。crux =
+  `hcompatLift` (hcompat の U-同変性を G-conjugation に変換)。(14.2)(a) iso を**入力**に取るゆえ ungated。
+
+**⟹ step 4 DONE。POLE-2 の ungated leaf (step 1/2/4) はすべて出し尽くした。**残務 = step 3 の
+module-setup → `exists_galoisField_repr` 適用 (|P|=p^q `basic_structure` + faithful `c_eq_one` = §13)
++ part(b) (13.2.b/14.5 = §13)。`field_normalizer_of_U_characteristic` の docstring に reduction を明示。
+full build 3860 jobs ~12.6s green、real sorry 140 不変 (σ-bridge は reduction lemma、新 sorry 無し)。
+
 ## 完了条件
 
 `field_normalizer_structure` の `sorry` が消え、`lake build OddOrder OddOrder.AxiomsCheck` 緑。
