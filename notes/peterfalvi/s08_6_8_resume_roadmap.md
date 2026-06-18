@@ -43,6 +43,50 @@
 **⟹ S08:59 を閉じる残務は case-B seed work でなく overarching dispatch + 未形式化の (6.5) 還元。**
 **FT 文脈不変**: (6.8) は [[ft-path-policy]] で orphaned (deferred-payoff) — 閉じても feitThompson sorry は今は減らない。
 
+## 🔨 2026-06-18 cont.¹⁴ — (6.5) p-群還元に着手 (ユーザー裁可): (6.5)(b) 適用 DONE、残ゲート = (6.3)+(6.4.c)
+
+**(6.5) Theorem 精読** (`04.8:50-74`): (6.4) Hypothesis + ¬coherent(S(M)) ⟹ (a) K/H₁ chief factor +
+`|K:H₁| ≤ 4|L:K|²+1` / (b) K/M 非可換 p-群 / (c) |L:K| ∤ p−1。**(6.8) は M=1,K=H で適用**し by_contra で
+¬coherent を供給 (`04.8:150`「By (6.5), we may assume H is a non-abelian p-group」)。
+
+**🎉 (6.5)(b) の group-theory core は repo に既存・形式化済み** (`S08_CoherenceCorePart1`):
+- `isPGroup_of_isFrobeniusGroup_of_card_le` (`:3120`) = (6.8)(c1) Frobenius 版。
+- `isPGroup_of_isNilpotent_of_coprime_fixedPoints_le_commutator` (`:3159`) = (6.8)(c2) certain-type 版。
+- 両方 **`hbound : |Abelianization H| ≤ 4|W₁|²+1` を唯一の非自明入力**に取る (内部で chief-factor + nilpotent
+  ⟹ p-群 を処理 = `isPGroup_of_isNilpotent_of_isFrobeniusAction_abelianization` `:3097`)。
+
+**✅ cont.¹⁴ 成果 (R1, `057fab18`、新 leaf `S08_PGroupReduction.lean`、sorry-free+axiom-clean)**:
+- odd 側条件 `card_W1_odd`/`card_H_odd`/`card_abelianization_H_odd` (|L| 奇から)。
+- **`exists_isPGroup_H_of_frobenius_of_card_le`** = (c1) 適用 (hyp.cases.inl + odd + hbound → H p-群)。
+- **`exists_isPGroup_H_of_c2_of_card_le`** = (c2) 適用 (W₁-共役 action 構築 + explicit-conj hfix を smul 形へ
+  bridge + hcop + hbound → H p-群)。
+- ⟹ **(6.5)(b) 適用は両ケース完了**。残ゲート 2 本を named 仮説として isolate。
+
+**▶ 残ゲート (cont.¹⁴ で確定、(6.5) 還元の本体)**:
+1. **hbound = Theorem (6.3) の対偶** = 真の bottleneck。(6.3) (`04.8:24`): [H/M nilpotent ∧ S(H₁) coherent ∧
+   |H:H₁|>4|L:K|²+1] ⟹ S(M) coherent。**未 assembled**: arithmetic core (`degreeBound_le_of_sqrt_bound`
+   `:2798`) + nilpotency central step (`isNilpotent_normal_inf_center_ne_bot` `:1100` /
+   `exists_maximal_normal_between` `:1149` / `normal_central_of_maximal_normal_below` `:1175`) は在庫だが、
+   **minimal-A induction の assembly + (6.2) degree bound (`2|L:C|√|C:D| ≥ |K:A|−1`、(5.6) coherence-break
+   sum) が未**。(6.2) 部品 = `theta_degree_le_index_mul_sqrt_index` (`:557`) + break sum (case-B の
+   `sum_re_div_normSq_Xset_eq` を一般 S(A) へ)。**= 大型 (~2-3 session)**。
+   (6.8) M=1 適用: ¬coherent(S) + H nilpotent + S(⁅H,H⁆)=Y coherent (hyp.coherentYset) ⟹ |H:⁅H,H⁆|≤4|W₁|²+1。
+2. **hfix (c2 のみ) = (6.4.c)** = W₁-共役固定点 ⊆ ⁅H,H⁆ (= L/⁅H,H⁆ が kernel H/⁅H,H⁆ の Frobenius)。
+   h46 の (4.2)/(4.6) 構造から導出要。c1 は Frobenius 構造から自動。
+
+**▶ dispatch 全体構造** (S08:59、`(nonempty…).some` で Type 化):
+```
+by_contra hncoh  -- ¬Nonempty(IsCoherent S)
+rcases hyp.cases with hF | ⟨h46,…⟩
+· -- c1: hbound(6.3) → exists_isPGroup_H_of_frobenius → p≥3(odd)+nonabelian(hXe)
+  --     → nonempty_coherent_S_caseA_of_frobenius (既存 unconditional) → contra
+· -- c2: hbound(6.3)+hfix(6.4.c) → exists_isPGroup_H_of_c2 → p-群
+  --     → math A/B split (eq_bot_or_eq_of_le_of_card_prime) →
+  --       A: case-A producer / B: nonempty_coherent_S_caseB_of_structure (cont.¹³) → contra
+```
+非可換 = hXe (Xset ⁅H,H⁆ nonempty ⟹ ⁅H,H⁆≠⊥ via `SsubFiltration_bot` ⟹ commutator ↥H≠⊥)。
+p≥3 = p∣|H|∣|L| 奇 ⟹ p 奇。**⟹ 次の本丸 = Theorem (6.3) assembly ((6.2) break bound + minimal-A induction)**。
+
 ## 🚨🚨 2026-06-18 cont.¹² — 重大訂正: 「真の gate = hDeg = (6.6)」は **誤り**。(6.8.2) は anchored-image で chain/hDeg 不要
 
 **教科書 04.8 の (6.8) proof を直接精読(L140-235)して判明。cont.⁸/⁹/¹⁰ の「case-B X-coherence の真の gate =
