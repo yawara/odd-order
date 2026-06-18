@@ -4514,6 +4514,40 @@ theorem coprime_card_kappaHall_Kstar [Finite G] {M K Kstar : Subgroup G} (hKM : 
   exact hpσc (Kstar_isPiSubgroup_sigma hKstar p
     (Nat.mem_primeFactors.mpr ⟨hp, hpKstar, Nat.card_pos.ne'⟩))
 
+/-- **BG 14.7, `|K| > 1`**: the κ-Hall factor of a type-`P` maximal subgroup is nontrivial.  Some
+prime `p ∈ κ(M)` divides `|K|`: `p` divides `|M|` (it is the order of an elementary abelian
+`p`-subgroup of `M`, by the definition of `κ`), and is coprime to the Hall index `[M : K]`, so it
+divides the Hall order `|K|`. -/
+theorem card_kappaHall_ne_one [Finite G] {M K : Subgroup G} (hP : IsTypeP M) (hKM : K ≤ M)
+    (hK : Ch03.IsHallSubgroup (kappa M) (K.subgroupOf M)) :
+    Nat.card ↥K ≠ 1 := by
+  obtain ⟨p, hpκ⟩ := hP
+  have hpprime : p.Prime := hpκ.1
+  obtain ⟨P, hPelem, hPM, -⟩ := hpκ.2.2
+  have hpcardP : Nat.card ↥P = p := by obtain ⟨_, hc⟩ := hPelem; rwa [pow_one] at hc
+  have hpM : p ∣ Nat.card ↥M := hpcardP ▸ Subgroup.card_dvd_of_le hPM
+  have hpK : p ∣ Nat.card ↥K := by
+    have hlag : Nat.card ↥K * (K.subgroupOf M).index = Nat.card ↥M := by
+      rw [← Nat.card_congr (Subgroup.subgroupOfEquivOfLe hKM).toEquiv]
+      exact Subgroup.card_mul_index (K.subgroupOf M)
+    have hpidx : ¬ p ∣ (K.subgroupOf M).index := fun hd =>
+      hK.2 p (Nat.mem_primeFactors.mpr ⟨hpprime, hd, Subgroup.index_ne_zero_of_finite⟩) hpκ
+    exact (hpprime.dvd_mul.mp (hlag.symm ▸ hpM)).resolve_right hpidx
+  exact fun h => hpprime.ne_one (Nat.dvd_one.mp (h ▸ hpK))
+
+/-- **BG 14.7, `|K| ≠ |K*|`**: the two κ-Hall factors of a type-`P` dual pair have distinct orders.
+They are coprime (`coprime_card_kappaHall_Kstar`) and `|K| > 1` (`card_kappaHall_ne_one`), so equality
+would force `|K| = 1`. -/
+theorem card_kappaHall_ne_card_Kstar [Finite G] {M K Kstar : Subgroup G} (hP : IsTypeP M)
+    (hKM : K ≤ M) (hK : Ch03.IsHallSubgroup (kappa M) (K.subgroupOf M))
+    (hKstar : Kstar = OddOrder.BG.Ch3.S10.Msigma M ⊓ Subgroup.centralizer (K : Set G)) :
+    Nat.card ↥K ≠ Nat.card ↥Kstar := by
+  intro heq
+  have hcop : Nat.Coprime (Nat.card ↥K) (Nat.card ↥Kstar) :=
+    coprime_card_kappaHall_Kstar hKM hK hKstar
+  rw [← heq, Nat.Coprime, Nat.gcd_self] at hcop
+  exact card_kappaHall_ne_one hP hKM hK hcop
+
 /-- **BG 14.7, `K ⊓ K* = 1`**: the coprime factors meet trivially. -/
 theorem kappaHall_inf_Kstar_eq_bot [Finite G] {M K Kstar : Subgroup G} (hKM : K ≤ M)
     (hK : Ch03.IsHallSubgroup (kappa M) (K.subgroupOf M))
@@ -7098,21 +7132,8 @@ theorem typeP_zTilde_conjClass_gt_half [Finite G] (hG : OddOrder.BG.IsMinimalSim
   have hKodd : Odd (Nat.card ↥K) := hG.odd.of_dvd_nat (Subgroup.card_subgroup_dvd_card K)
   have hKstarodd : Odd (Nat.card ↥Kstar) :=
     hG.odd.of_dvd_nat (Subgroup.card_subgroup_dvd_card Kstar)
-  -- `k > 1`: a prime `p ∈ κ(M)` divides `|K|`.
-  have hKne1 : Nat.card ↥K ≠ 1 := by
-    obtain ⟨p, hpκ⟩ := hP
-    have hpprime : p.Prime := hpκ.1
-    obtain ⟨P, hPelem, hPM, -⟩ := hpκ.2.2
-    have hpcardP : Nat.card ↥P = p := by obtain ⟨_, hc⟩ := hPelem; rwa [pow_one] at hc
-    have hpM : p ∣ Nat.card ↥M := hpcardP ▸ Subgroup.card_dvd_of_le hPM
-    have hpK : p ∣ Nat.card ↥K := by
-      have hlag : Nat.card ↥K * (K.subgroupOf M).index = Nat.card ↥M := by
-        rw [← Nat.card_congr (Subgroup.subgroupOfEquivOfLe hKM).toEquiv]
-        exact Subgroup.card_mul_index (K.subgroupOf M)
-      have hpidx : ¬ p ∣ (K.subgroupOf M).index := fun hd =>
-        hK.2 p (Nat.mem_primeFactors.mpr ⟨hpprime, hd, Subgroup.index_ne_zero_of_finite⟩) hpκ
-      exact (hpprime.dvd_mul.mp (hlag.symm ▸ hpM)).resolve_right hpidx
-    exact fun h => hpprime.ne_one (Nat.dvd_one.mp (h ▸ hpK))
+  -- `k > 1`: a prime `p ∈ κ(M)` divides `|K|` (`card_kappaHall_ne_one`).
+  have hKne1 : Nat.card ↥K ≠ 1 := card_kappaHall_ne_one hP hKM hK
   -- `k* > 1`: `K* ≠ ⊥` (Proposition 14.2's second conjunct).
   have hKstarne1 : Nat.card ↥Kstar ≠ 1 :=
     fun h => (typeP_structure hG hM hP hKM hK hKstar hU).2.1 (Subgroup.eq_bot_of_card_eq _ h)
