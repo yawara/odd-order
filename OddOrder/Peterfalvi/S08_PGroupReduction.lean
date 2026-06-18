@@ -256,4 +256,72 @@ theorem caseAB_split_of_c2 [H.Normal] [Finite ↥H]
   · exact Subgroup.card_eq_one.mp h1
   · exact absurd (inf_eq_left.mp (Subgroup.eq_of_le_of_card_ge inf_le_left hfull.ge)) hB
 
+/-- **(6.8) case-B: `W₂ ≤ Z(L)`** (helper for the case-B structure-data discharge).
+In case (B), `W₂ ⊆ Z(H)` (`hcen`) so `W₂` commutes with all of `H`; and `W₂` commutes with `W₁` by
+the certain-type centralizer datum (`commute_of_mem_W1_of_mem_W2`).  Since `L = H ⋊ W₁`
+(`H ⊔ W₁ = ⊤`), `W₂` commutes with every element of `L` (by closure induction), i.e. `W₂ ≤ Z(L)`. -/
+theorem caseB_W2_le_center_L (hyp : SibleyDadeHypothesis G L H) [H.Normal]
+    (h46 : OddOrder.Peterfalvi.S06.Hypothesis46 (sharpImage H) L)
+    (hW1 : h46.W1 = hyp.W1) (hW2H : h46.W2 ≤ H)
+    (hcen : h46.W2.subgroupOf H ≤ Subgroup.center ↥H) :
+    h46.W2 ≤ Subgroup.center ↥L := by
+  intro w hw
+  have hwZH : (⟨w, hW2H hw⟩ : ↥H) ∈ Subgroup.center ↥H :=
+    hcen (Subgroup.mem_subgroupOf.mpr hw)
+  rw [Subgroup.mem_center_iff] at hwZH
+  rw [Subgroup.mem_center_iff]
+  intro g
+  have hg : g ∈ Subgroup.closure ((H : Set ↥L) ∪ (hyp.W1 : Set ↥L)) := by
+    rw [Subgroup.closure_union, Subgroup.closure_eq, Subgroup.closure_eq, hyp.split.sup_eq_top]
+    exact Subgroup.mem_top g
+  have hcomm : Commute g w := by
+    induction hg using Subgroup.closure_induction with
+    | mem x hx =>
+      rcases hx with hxH | hxW1
+      · have h3 : ((⟨x, hxH⟩ * ⟨w, hW2H hw⟩ : ↥H) : ↥L) =
+            ((⟨w, hW2H hw⟩ * ⟨x, hxH⟩ : ↥H) : ↥L) := congrArg _ (hwZH ⟨x, hxH⟩)
+        rw [Subgroup.coe_mul, Subgroup.coe_mul] at h3
+        exact h3
+      · exact h46.commute_of_mem_W1_of_mem_W2 (by rw [hW1]; exact hxW1) hw
+    | one => exact Commute.one_left w
+    | mul x y _ _ ihx ihy => exact ihx.mul_left ihy
+    | inv x _ ihx => exact ihx.inv_left
+  exact hcomm
+
+/-- **Peterfalvi (6.8) case-B coherence from c2 data** (discharges `hcaseB` of the dispatch skeleton).
+Given the case-B math condition `W₂ ⊆ Z(H)` (`hcen`) and the `p`-group structure, derive the
+structural inputs `hderiv` (W₂ ⊆ commutator via `commutator_subgroupOf_self`), `hcZ` (`|W₂|` prime),
+and `hW2cenL` (`caseB_W2_le_center_L`), then feed `nonempty_coherent_S_caseB_of_structure` (cont.¹³).
+The FPF index data (`hc2`/`hfpf`/`hFPF`) and the X/Y-cardinality conditions (`hYcard`/`hXne`) remain
+as named hypotheses, to be discharged separately (`hfpf` via `caseB_fpf_bound`, the rest from the
+final `S08:59` wiring). -/
+theorem nonempty_coherent_S_caseB_of_c2_data (hyp : SibleyDadeHypothesis G L H)
+    [H.Normal] [Fintype ↥H]
+    (h46 : OddOrder.Peterfalvi.S06.Hypothesis46 (sharpImage H) L) (hHK : h46.K = H)
+    (hW1 : h46.W1 = hyp.W1)
+    [NeZero (Nat.card h46.W1)] [Invertible (Nat.card ↥h46.K : ℂ)]
+    [Fintype ↥(h46.W1 ⊔ h46.W2)] [Invertible (Nat.card ↥(h46.W1 ⊔ h46.W2) : ℂ)]
+    [Fintype (OddOrder.Peterfalvi.S06.ticVdiff h46).W]
+    [Invertible (Nat.card (OddOrder.Peterfalvi.S06.ticVdiff h46).W : ℂ)]
+    [h46.W2.Normal] [Invertible (Nat.card ↥h46.W2 : ℂ)]
+    [Fintype ↥(h46.W2.subgroupOf H)] [Invertible (Nat.card ↥(h46.W2.subgroupOf H) : ℂ)]
+    (hW2H : h46.W2 ≤ H) (hcop : Nat.Coprime (Nat.card ↥H) (Nat.card hyp.W1))
+    {p : ℕ} (hp : p.Prime) (hHp : IsPGroup p ↥H)
+    (hprime : (Nat.card h46.W2).Prime) (hW2comm : h46.W2 ≤ ⁅H, H⁆)
+    (hcen : h46.W2.subgroupOf H ≤ Subgroup.center ↥H)
+    (hc2 : 2 ≤ (h46.W2.subgroupOf H).index)
+    (hfpf : (2 * Nat.card hyp.W1 + 1) ^ 2 ≤ Nat.card (↥H ⧸ h46.W2.subgroupOf H))
+    (hFPF : (h46.W2.index : ℤ) < ((h46.W2.subgroupOf H).index : ℤ) ^ 2)
+    (hYcard : hyp.Yset.ncard ≠ 2) (hXne : (hyp.Xset h46.W2).Nonempty) :
+    Nonempty (OddOrder.Peterfalvi.S07.IsCoherent hyp.tau hyp.S
+      (OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L)) := by
+  have hderiv : h46.W2.subgroupOf H ≤ commutator ↥H := by
+    rw [← commutator_subgroupOf_self]
+    exact fun x hx => Subgroup.mem_subgroupOf.mpr (hW2comm (Subgroup.mem_subgroupOf.mp hx))
+  have hcZ : 2 ≤ Nat.card ↥(h46.W2.subgroupOf H) := by
+    rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hW2H).toEquiv]; exact hprime.two_le
+  have hW2cenL : h46.W2 ≤ Subgroup.center ↥L := caseB_W2_le_center_L hyp h46 hW1 hW2H hcen
+  exact nonempty_coherent_S_caseB_of_structure hyp h46 hHK hW1 hW2H hcen hderiv hcop hp hHp
+    hprime hW2comm hW2cenL hc2 hFPF hcZ hfpf hYcard hXne
+
 end OddOrder.Peterfalvi.S08
