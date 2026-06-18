@@ -339,3 +339,29 @@ named lane-b 定理 ((10.11) `theorem88_caseB_prime_orders` 等) そのもの。
 2. **U-side complement** (BG-side, 非 char): K-invariant complement U to M_F in M' (coprime action;
    mathlib は `exists_right_complement'_of_coprime` のみ、invariant 版は要構成)。
 3. これらを揃えても ordering が gated ゆえ producer は sorry-free 化せず → **真の gate = lane-b §10-12**。
+
+---
+
+## 🤝 引き継ぎ (2026-06-19) — primes cite 済、残 = ordering swap + U-side complement
+
+**producer 現状** (`section16TypePStructure_of_isMinimalSimpleOdd`, `FeitThompson.lean`): honest
+gated-endpoint-skeleton。W-side discharge 済 (`typeP_pair_W_structure`)、primes cite 済
+(Pf (10.11) `theorem88_caseB_prime_orders`, `70296d47`)。唯一 residual = `Nonempty(Σ' U V, M'=M_F⊔U
+∧ M'(T)=M_F(T)⊔V ∧ K≤N(U) ∧ Kstar≤N(V) ∧ |K|<|Kstar|)`。
+
+**残 step 1 = ordering** (`|mp.K|<|mp.Kstar|`, ⚠ honesty 必須):
+- `Section16MaximalPair` (`FeitThompson.lean`) に `K_lt_Kstar : Nat.card ↥K < Nat.card ↥Kstar` 追加。
+- `exists_section16MaximalPair_data` (同) で確立: `|K|≠|Kstar|` を coprime + `Kstar≠⊥` + `|K|>1` で示し、
+  `rcases lt_or_gt_of_ne` で S↔T **swap**（dual witness は typeP_duality の対称出力 +
+  `IsConjugateSubgroup.symm`/`Or.symm`/`sup_comm`）。bullet を `have` 化して 2 case 共有すると簡潔。
+- mp producer に `K_lt_Kstar := h.<proj>` 追加、tp producer の `hlt := mp.K_lt_Kstar`（residual から除去）。
+- ※ cite でなく enrich+swap。count 不変だが residual を honest 化（現状は labeling 次第で偽）。
+
+**残 step 2 = U-side** (`∃U, M'=M_F⊔U ∧ K≤N(U)`, S/T 両側) = Pf (13.1.b):
+- K-invariant complement to `M_F` in `M'` (coprime action / Schur-Zassenhaus)。mathlib は
+  `Subgroup.exists_right_complement'_of_coprime` のみ → invariant 版要構成（または §12 SubgroupESetup の
+  `E₂⊔E₃` 経由を検討、但し M_F vs Msigma の差異注意: type III/IV で M_F≠Msigma）。
+- **これで producer 自前 sorry 消滅 → count 140→139**（残依存は named (10.11) のみ = lane-b）。
+
+**終端 gate** = lane-b Pf §10-12 char theory ((10.11)/(10.10)/(13.2))。ordering+U-side 完了でも
+primes は (10.11)[sorry] 依存ゆえ axiom-clean 化は lane-b 待ち。
