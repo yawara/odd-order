@@ -4,6 +4,57 @@
 > `s08_6_8_assembly_plan.md`(458KB)/`s08_6_8_3_gap_resolution.md` のうち本 note と矛盾する記述は本 note を優先。
 > 上位方針・FT 接続の文脈 = 記憶 [[ft-path-policy]] の 2026-06-17 検証訂正ブロック。
 
+## ✅✅✅ 2026-06-18 cont.¹¹ — BASE COHERENCE 完成: `IsCoherent (certainTypeSet ∪ Y)` を unconditional 化 + trap 除去
+
+cont.¹⁰ viable route の **(B1) base = `certainTypeSet ∪ Y` coherence** を **UNCONDITIONAL** で landing
+(case-B 構造仮説 hW2H/hcen/hderiv/hcop/hp/hHp/hprime/hW2comm/hW2cenL/hc2/hFPF を取るが、これらは
+case-B の**実事実**で satisfiable — norm-1 anchor のような構造的不能ではない)。長年の **「hXanchored gap」は
+完全に解消** = 全 obligation が dischargeable と実証。3 commit:
+
+1. **`caseB_anchoredImage_seam_all_Yset`**(`44eb562a`, sorry-free・axiom-clean): per-column anchored
+   `X` ⊥ **全** `cY.ext y`(anchor η₁ だけでない)。導出 = `⟨X,ν_y⟩ = ⟨X,cY(y−η₁)⟩ + ⟨X,ν₁⟩`、
+   後者 = hmix=0、前者 = τ Dade 等長 + cY 等長で `a₀(1−c)+a₀(c−1)=0`(c=⟨η₁,y⟩ 相殺、convention-robust)。
+   = 旧 cont.⁷「irreducible seam」を **全 Y・raw-image レベル**に一般化した uniform hXmixed。
+2. **`coherentCertainTypeSet_union_Yset_caseB`**(`e6c367ce`, **unconditional**, sorry-free・axiom-clean):
+   `coherentCertainTypeSet_union_Yset_via_anchoredImages` の全 obligation を discharge:
+   - **Ximg χ₂ := τ(columnSum χ₂ − a₀•η₁) + a₀•ν₁**(certainTypeSet columns 上、他は 0)⟹ hXanchored は
+     gated で **trivial 整理**。
+   - **hXinner** = `xchi_inner_eq_of_anchored`(per-member、support は bundle 由来)。
+   - **hXzirr** = bundle(non-column は 0∈ZIrr)。
+   - **hXmixed** = `caseB_anchoredImage_seam_all_Yset`(全 Y)。
+   - **uniform a₀** = 参照列 k の weight、certainTypeSet membership の等次数(`columnSum_apply_one`)が全列を a₀ に強制。
+   - 補助 `caseB_column_anchored_full`(per-column 完全 bundle: X,a,deg,anchored,seam,ZIrr,support)、
+     `caseB_member_anchored_image` に `X∈ZIrr` 追加。
+   - **a₀ は `Exists.choose` で取り出す**(goal `IsCoherent` が Type ゆえ `obtain` で ∃ から data 取得不可)。
+3. **GATING FIX(trap 除去)**: `hXinner` は両 anchoredImages lemma で **ungated(∀ χ₂ χ₂')** だったが、
+   実際は span_induction₂ generator(= certainTypeSet member)でしか使われず、**non-member 列には
+   discharge 不能**(support 無 ⟹ τ-等長不成立)= [[scaffold-sorry-free-not-done]] の潜在 trap。member に gate して除去。
+
+**✅ full build 3858 jobs / 26.9s、AxiomsCheck OK。** ⟹ base coherence(B1)完了。
+
+**▶ 残り = (B2) chain + (B3) seed 配線**(cont.¹⁰ の通り、ただし **真の gate = hDeg = (6.6) hard §6 degree theory**):
+- **(B2) chain** = `xChainCoherentW`(`S08_CoherenceWeighted:556`)を base=`coherentCertainTypeSet_union_Yset_caseB`、
+  X-target=`Xset W2 ∪ Y`、cover=irreducible X-pair に fold → `IsCoherent (Xset W2 ∪ Y)` = seed。
+  - **⚠ cover gap 確認済(2026-06-18)**: `caseB_Xset_conjugatePairCover` の仮説 `hnonS₀_irr`(非-certainType 列は
+    全 irreducible)は **一般には成立しない**。`S08_CaseBEnumeration:36-42` docstring の通り、**degree class k 以外の
+    reducible 列**は `certainTypeSet h46 k` に入らず irreducible でもない ⟹ `Xset W2` を base=`certainTypeSet h46 k`
+    (単一 class)+ irreducible chain で **cover しきれない**(norm-1 anchor とは別の構造 gap)。成立は
+    「`certainTypeSet h46 k` が全 reducible X-member を捕捉する regime(= 単一 degree class)」のみ。
+    ⟹ full seed には **(i) case-B で reducible 列が単一 class と示す**(6.8.2 構造)か **(ii) base を全 class の
+    reducible 列(`certainTypeSet` の class 横断和)に拡張**が要。**= (6.8.2) degree-class 構造理論**(hDeg と別の gate)。
+    私の `coherentCertainTypeSet_union_Yset_caseB`(単一 class k)は正しい building block だが full seed には不足。
+  - **per-step `XAdjoinStepInputW`**: anchor=η∈Y(`‖η‖²=1`、hanchorNorm 満足 ✅)、core field
+    (Dmem/hortho/htau1)=brick 2 `caseB_member_orthoDatum`、bound assembly=brick 3 `sMember_degreeSqNormBound`
+    (Y-anchor で再利用可)。**真の gate = `hDeg : 2a < ∑ deg²/mc`**(=(6.6) degree inequality、FPF bound から、
+    大型 §6 degree theory、multi-session、user-managed)。
+- **(B3)** = seed(B2)+ hW2cen/hcZ/hfpf を `nonempty_coherent_S_caseB`(`S08_CaseBWeightedEndgame:372`, DONE skeleton)に
+  → `IsCoherent S` → S08:59 case-B 枝。
+
+**FT 文脈(不変)**: (6.8) は [[ft-path-policy]] で FT carrier から **orphaned (deferred-payoff)** — base coherence を
+landing しても feitThompson の sorry は今は減らない。(B2) chain の hDeg gate に着手するかは「(6.8) 完全 close」価値 vs
+on-path piece(§14 counting=lane-H 等)の優先度判断を要する。本セッション成果 = **base coherence の unconditional 化
++ trap 除去**(seam という長年の難所を含む)。
+
 ## ✅✅ 2026-06-18 cont.⁵ — ROUTE RESOLVED: anchoredImages は (6.8.2.3) の正準ツール (cont.⁴ の疑問を解消)
 
 > ⚠ **cont.⁶ で精緻化**: 下記「canonical cX 説は誤り / cX は xChiExtension 必須」は **OVERSTATED**。

@@ -322,7 +322,8 @@ theorem caseB_member_anchored_image
       ((ClassFunction.induce H (θ : ClassFunction ↥H ℂ) : ClassFunction ↥L ℂ) 1 = (a : ℂ) * η₁ 1) ∧
       hyp.tau (ClassFunction.induce H (θ : ClassFunction ↥H ℂ) - a • η₁)
         = X - (a : ℂ) • hyp.coherentYset.extension η₁ ∧
-      ClassFunction.inner X (hyp.coherentYset.extension η₁) = 0 := by
+      ClassFunction.inner X (hyp.coherentYset.extension η₁) = 0 ∧
+      X ∈ ZIrr G := by
   classical
   haveI : Fintype ↥h46.W2 := Fintype.ofFinite _
   obtain ⟨φ, hφ', hφirr, hφ1, hweight, hreseq⟩ := exists_central_phi_data hW2H hcen θ
@@ -373,9 +374,90 @@ theorem caseB_member_anchored_image
     (hyp.coherentYset.extension_mem_ZIrr η₁ (Submodule.subset_span hη₁)) hee hconj hη₁irr.conj hee
     hsupp (hirrAnc ⟨θ, hweight⟩)
   refine ⟨(caseB_phi_family hyp h46 hW2H hφ' hcol hirr ⟨θ, hweight⟩).X,
-    constituentWeight hφ' θ, ?_, hanc, hXorth⟩
+    constituentWeight hφ' θ, ?_, hanc, hXorth,
+    characterPsiDecomposition_X_mem_ZIrr _⟩
   rw [ClassFunction.induce_apply_one, hyp.index_H_eq_card_W1, hyp.Yset_apply_one hη₁,
     constituentWeight_eq_apply_one hW2H hcen hφ' hweight]
+  ring
+
+/-- **(6.8.2.3) anchored image ⊥ the whole `Y`-image.**  The per-column anchored `X` (from the
+anchored image `τ(μ − a₀·η₁) = X − a₀·ν₁`, `hanc`, where `μ = columnSum χ₂`, `ν₁ = η₁^{τ₁}`) is
+orthogonal to `cY.extension y` for **every** `y ∈ Y`, not only the anchor `η₁`.
+
+Writing `⟨X, ν_y⟩ = ⟨X, ν_y − ν₁⟩ + ⟨X, ν₁⟩`, the anchor term is `hmix = 0` and the difference term
+`⟨X, cY.ext(y − η₁)⟩ = ⟨X, τ(y − η₁)⟩` (`cY` extends `τ` on the `H^#`-supported `y − η₁`) vanishes by
+the Dade isometry of `τ` and the `Y`-isometry of `cY`: with `X = τ(μ − a₀η₁) + a₀·ν₁`,
+`⟨X, τ(y − η₁)⟩ = ⟨μ − a₀η₁, y − η₁⟩ + a₀·⟨η₁, y − η₁⟩ = a₀(1 − c) + a₀(c − 1) = 0`
+(`c = ⟨η₁, y⟩`, the columns being orthogonal to `Y`).  This is the uniform `hXmixed` content for the
+case-(B) `certainTypeSet ∪ Y` coherence (Peterfalvi (6.8.2.3) "`X₁ ⊥ Y^{τ₁}`"). -/
+theorem caseB_anchoredImage_seam_all_Yset
+    (hyp : SibleyDadeHypothesis G L H) [H.Normal]
+    (h46 : OddOrder.Peterfalvi.S06.Hypothesis46 (sharpImage H) L) (hW1 : h46.W1 = hyp.W1)
+    [NeZero (Nat.card h46.W1)] [Fintype ↥(h46.W1 ⊔ h46.W2)]
+    [Invertible (Nat.card ↥(h46.W1 ⊔ h46.W2) : ℂ)]
+    {η₁ : ClassFunction ↥L ℂ} (hη₁ : η₁ ∈ hyp.Yset) {a₀ : ℕ}
+    {X : ClassFunction G ℂ}
+    {χ₂ : (h46.W2.subgroupOf (h46.W1 ⊔ h46.W2)) →* ℂˣ}
+    (hanc : hyp.tau (OddOrder.Peterfalvi.S06.columnSum h46 χ₂ - a₀ • η₁)
+      = X - a₀ • hyp.coherentYset.extension η₁)
+    (hmix : ClassFunction.inner X (hyp.coherentYset.extension η₁) = 0)
+    (hsupp : (OddOrder.Peterfalvi.S06.columnSum h46 χ₂ - a₀ • η₁).support ⊆
+      OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L)
+    {y : ClassFunction ↥L ℂ} (hy : y ∈ hyp.Yset) :
+    ClassFunction.inner X (hyp.coherentYset.extension y) = 0 := by
+  classical
+  -- `y − η₁` is `H^#`-supported (equal degree `|W₁|`) and lies in the `Y`-span.
+  have hydeg : y (1 : ↥L) = η₁ (1 : ↥L) :=
+    (hyp.Yset_apply_one hy).trans (hyp.Yset_apply_one hη₁).symm
+  have hysupp : (y - η₁).support ⊆
+      OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L :=
+    hyp.sMember_diffSupport_of_charValue_eq (hyp.Yset_subset_S hy) (hyp.Yset_subset_S hη₁) hydeg
+  have hymemZ : y - η₁ ∈ OddOrder.Peterfalvi.S07.zSpan (L := ↥L) hyp.Yset :=
+    Submodule.sub_mem _ (Submodule.subset_span hy) (Submodule.subset_span hη₁)
+  have hη₁memZ : η₁ ∈ OddOrder.Peterfalvi.S07.zSpan (L := ↥L) hyp.Yset :=
+    Submodule.subset_span hη₁
+  -- `cY` extends `τ` on the supported `y − η₁`.
+  have hcYext : hyp.coherentYset.extension (y - η₁) = hyp.tau (y - η₁) :=
+    hyp.coherentYset.extends_on_supported (y - η₁) ⟨hymemZ, hysupp⟩
+  -- `X = τ(μ − a₀η₁) + a₀·ν₁`.
+  have hX : X = hyp.tau (OddOrder.Peterfalvi.S06.columnSum h46 χ₂ - a₀ • η₁)
+      + (a₀ : ℂ) • hyp.coherentYset.extension η₁ := by
+    rw [hanc, ← Nat.cast_smul_eq_nsmul ℂ a₀ (hyp.coherentYset.extension η₁)]; abel
+  -- split `⟨X, ν_y⟩ = ⟨X, cY(y − η₁)⟩ + ⟨X, ν₁⟩` and discharge the anchor term by `hmix`.
+  have hsplit : ClassFunction.inner X (hyp.coherentYset.extension y)
+      = ClassFunction.inner X (hyp.coherentYset.extension (y - η₁))
+        + ClassFunction.inner X (hyp.coherentYset.extension η₁) := by
+    rw [map_sub, ClassFunction.inner_sub_right]; ring
+  rw [hsplit, hmix, add_zero, hcYext]
+  -- the Dade isometry of `τ` on the supported pair `{μ − a₀η₁, y − η₁}`.
+  have hiso : ClassFunction.inner
+        (hyp.tau (OddOrder.Peterfalvi.S06.columnSum h46 χ₂ - a₀ • η₁)) (hyp.tau (y - η₁))
+      = ClassFunction.inner (OddOrder.Peterfalvi.S06.columnSum h46 χ₂ - a₀ • η₁) (y - η₁) :=
+    OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap_inner_eq_on_supported_span hyp.dade hyp.hconj
+      (S := ({OddOrder.Peterfalvi.S06.columnSum h46 χ₂ - a₀ • η₁, y - η₁}
+        : Set (ClassFunction ↥L ℂ)))
+      (by intro s hs; simp only [Set.mem_insert_iff, Set.mem_singleton_iff] at hs
+          rcases hs with rfl | rfl; exacts [hsupp, hysupp])
+      (Submodule.subset_span (Set.mem_insert _ _))
+      (Submodule.subset_span (Set.mem_insert_of_mem _ rfl))
+  -- the `Y`-isometry of `cY`: `⟨ν₁, τ(y − η₁)⟩ = ⟨η₁, y − η₁⟩`.
+  have hcYiso : ClassFunction.inner (hyp.coherentYset.extension η₁) (hyp.tau (y - η₁))
+      = ClassFunction.inner η₁ (y - η₁) := by
+    rw [← hcYext, hyp.coherentYset.extension_inner_eq η₁ (y - η₁) hη₁memZ hymemZ]
+  -- the columns are orthogonal to `Y`.
+  have hμy : ClassFunction.inner (OddOrder.Peterfalvi.S06.columnSum h46 χ₂) y = 0 :=
+    inner_columnSum_Yset_eq_zero hyp h46 hW1 hy χ₂
+  have hμη : ClassFunction.inner (OddOrder.Peterfalvi.S06.columnSum h46 χ₂) η₁ = 0 :=
+    inner_columnSum_Yset_eq_zero hyp h46 hW1 hη₁ χ₂
+  have hηirr : IsIrreducibleCharacter η₁ := hyp.isIrreducibleCharacter_of_mem_Yset hη₁
+  have hηη : ClassFunction.inner η₁ η₁ = 1 := by
+    have h := irreducibleCharacter_inner_eq_ite (⟨η₁, hηirr⟩ : IrreducibleCharacter ↥L)
+      (⟨η₁, hηirr⟩ : IrreducibleCharacter ↥L)
+    rwa [if_pos rfl] at h
+  -- assemble: the `c = ⟨η₁, y⟩` terms cancel.
+  rw [hX, ClassFunction.inner_add_left, hiso, ClassFunction.inner_smul_left, hcYiso]
+  simp only [← Nat.cast_smul_eq_nsmul ℂ a₀ η₁, ClassFunction.inner_sub_left,
+    ClassFunction.inner_sub_right, ClassFunction.inner_smul_left, star_natCast, hμy, hμη, hηη]
   ring
 
 /-- **(6.8.2.3) seam for an irreducible `X`-member** — `⟨χ^{τ₂}, η^{τ₁}⟩ = 0` for an irreducible
@@ -528,6 +610,184 @@ theorem caseB_hmixed
       (Xset_hasNoRealCharacters_caseB hyp h46 hHK).not_mem_of_isReal (heq.symm : x.IsReal) hx
     exact inner_extension_caseB_Xset_Yset_eq_zero_of_irreducible hyp cX hyp.coherentYset hpair
       hx hirr hχconj hχne hy
+
+/-- **(6.8.2.3) per-column anchored image — full bundle.**  For a nontrivial certain-type column
+`χ₂ ≠ 1`, packages every datum the case-(B) `certainTypeSet ∪ Y` coherence needs: the degree
+`columnSum χ₂(1) = a·η₁(1)`, the anchored image `τ(columnSum χ₂ − a·η₁) = X − a·ν₁`, the anchor
+seam `⟨X, ν₁⟩ = 0`, `X ∈ ZIrr`, and the `H^#`-support of the anchored difference.
+
+Extracts `θ = Res^H μ_{0,χ₂}` (irreducible by `certainTypeRestrict_isIrreducible`, nonconstant on
+`W₂` by `caseB_column_W2_nonconstant`), feeds it to `caseB_member_anchored_image`, transports
+`Ind^L_H θ = columnSum χ₂` (`columnSum_eq_induce_H`), and derives the support from the equal-degree
+`sMember_smulDiffSupport_of_charValue_eq`. -/
+theorem caseB_column_anchored_full
+    (hyp : SibleyDadeHypothesis G L H) [H.Normal] [Fintype ↥H]
+    (h46 : OddOrder.Peterfalvi.S06.Hypothesis46 (sharpImage H) L) (hHK : h46.K = H)
+    (hW1 : h46.W1 = hyp.W1)
+    [NeZero (Nat.card h46.W1)] [Invertible (Nat.card ↥h46.K : ℂ)]
+    [Fintype ↥(h46.W1 ⊔ h46.W2)] [Invertible (Nat.card ↥(h46.W1 ⊔ h46.W2) : ℂ)]
+    [Fintype (OddOrder.Peterfalvi.S06.ticVdiff h46).W]
+    [Invertible (Nat.card (OddOrder.Peterfalvi.S06.ticVdiff h46).W : ℂ)]
+    [h46.W2.Normal] [Invertible (Nat.card ↥h46.W2 : ℂ)]
+    [Fintype ↥(h46.W2.subgroupOf H)] [Invertible (Nat.card ↥(h46.W2.subgroupOf H) : ℂ)]
+    (hW2H : h46.W2 ≤ H)
+    (hcen : h46.W2.subgroupOf H ≤ Subgroup.center ↥H)
+    (hderiv : h46.W2.subgroupOf H ≤ commutator ↥H)
+    (hcop : Nat.Coprime (Nat.card ↥H) (Nat.card hyp.W1))
+    {p : ℕ} (hp : p.Prime) (hHp : IsPGroup p ↥H)
+    (hprime : (Nat.card h46.W2).Prime) (hW2comm : h46.W2 ≤ ⁅H, H⁆)
+    (hW2cenL : h46.W2 ≤ Subgroup.center ↥L)
+    (hc2 : 2 ≤ (h46.W2.subgroupOf H).index)
+    (hFPF : (h46.W2.index : ℤ) < ((h46.W2.subgroupOf H).index : ℤ) ^ 2)
+    {η₁ : ClassFunction ↥L ℂ} (hη₁ : η₁ ∈ hyp.Yset)
+    {χ₂ : (h46.W2.subgroupOf (h46.W1 ⊔ h46.W2)) →* ℂˣ} (hχ₂ : χ₂ ≠ 1)
+    (hYcard : hyp.Yset.ncard ≠ 2) :
+    ∃ (X : ClassFunction G ℂ) (a : ℕ),
+      ((OddOrder.Peterfalvi.S06.columnSum h46 χ₂ : ClassFunction ↥L ℂ) 1 = (a : ℂ) * η₁ 1) ∧
+      hyp.tau (OddOrder.Peterfalvi.S06.columnSum h46 χ₂ - a • η₁)
+        = X - (a : ℂ) • hyp.coherentYset.extension η₁ ∧
+      ClassFunction.inner X (hyp.coherentYset.extension η₁) = 0 ∧
+      X ∈ ZIrr G ∧
+      (OddOrder.Peterfalvi.S06.columnSum h46 χ₂ - a • η₁).support ⊆
+        OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L := by
+  classical
+  have hWne := caseB_column_W2_nonconstant h46 hHK hχ₂
+  have hθirr : IsIrreducibleCharacter
+      (ClassFunction.restrict H ((h46.columnFamily χ₂).mu 0 : ClassFunction ↥L ℂ)) := by
+    have h := h46.certainTypeRestrict_isIrreducible χ₂; rwa [hHK] at h
+  set θ : IrreducibleCharacter ↥H :=
+    ⟨ClassFunction.restrict H ((h46.columnFamily χ₂).mu 0 : ClassFunction ↥L ℂ), hθirr⟩ with hθdef
+  have hθval : (θ : ClassFunction ↥H ℂ)
+      = ClassFunction.restrict H ((h46.columnFamily χ₂).mu 0 : ClassFunction ↥L ℂ) := by rw [hθdef]
+  have hθne : ∃ w : ↥(h46.W2.subgroupOf H),
+      (θ : ClassFunction ↥H ℂ) (w : ↥H) ≠ (θ : ClassFunction ↥H ℂ) 1 := by rw [hθval]; exact hWne
+  obtain ⟨X, a, hdeg, hanc, hmix, hXZ⟩ :=
+    caseB_member_anchored_image hyp h46 hHK hW1 hW2H hcen hderiv hcop hp hHp hprime hW2comm
+      hW2cenL hc2 hFPF hη₁ θ hθne hYcard
+  have hcsum : ClassFunction.induce H (θ : ClassFunction ↥H ℂ)
+      = OddOrder.Peterfalvi.S06.columnSum h46 χ₂ := by
+    rw [hθval]; exact (columnSum_eq_induce_H h46 hHK χ₂).symm
+  rw [hcsum] at hdeg hanc
+  have hsupp : (OddOrder.Peterfalvi.S06.columnSum h46 χ₂ - a • η₁).support ⊆
+      OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L := by
+    have h := hyp.sMember_smulDiffSupport_of_charValue_eq
+      (hyp.columnSum_mem_S h46 hHK hχ₂) (hyp.Yset_subset_S hη₁)
+      (m := 1) (n := a) (by rw [Nat.cast_one, one_mul]; exact hdeg)
+    rwa [one_smul] at h
+  exact ⟨X, a, hdeg, hanc, hmix, hXZ, hsupp⟩
+
+/-- **Peterfalvi (6.8.2) — case-(B) `certainTypeSet ∪ Y` coherence (unconditional base).**
+
+The viable-route base (roadmap cont.¹⁰): under the case-(B) structural hypotheses, `hyp.tau` is
+coherent on `certainTypeSet h46 k ∪ Yset` — the seed onto which the irreducible-`X` weighted chain
+(`xChainCoherentW`, `Y`-anchored, `‖η‖² = 1`) is folded to build `IsCoherent (Xset W₂ ∪ Y)`.
+
+All anchored-image obligations of `coherentCertainTypeSet_union_Yset_via_anchoredImages` are
+discharged from the per-column full bundle `caseB_column_anchored_full`:
+* `Ximg χ₂ := τ(columnSum χ₂ − a₀·η₁) + a₀·ν₁` on the certain-type columns (`0` elsewhere), so the
+  gated `hXanchored` is the rearranged anchored image;
+* `hXinner` from `xchi_inner_eq_of_anchored` (per-member, supports from the bundle);
+* `hXzirr` from the bundle (`0 ∈ ZIrr` off the columns);
+* `hXmixed` from `caseB_anchoredImage_seam_all_Yset` (the `X ⊥ Y^{τ₁}` content, all of `Y`).
+The uniform anchor weight `a₀` is the reference column `k`'s weight; the equal degree built into
+`certainTypeSet` membership (`columnSum_apply_one`) forces every column's weight to `a₀`. -/
+noncomputable def coherentCertainTypeSet_union_Yset_caseB
+    (hyp : SibleyDadeHypothesis G L H) [H.Normal] [Fintype ↥H]
+    (h46 : OddOrder.Peterfalvi.S06.Hypothesis46 (sharpImage H) L) (hHK : h46.K = H)
+    (hW1 : h46.W1 = hyp.W1)
+    [NeZero (Nat.card h46.W1)] [Invertible (Nat.card ↥h46.K : ℂ)]
+    [Fintype ↥(h46.W1 ⊔ h46.W2)] [Invertible (Nat.card ↥(h46.W1 ⊔ h46.W2) : ℂ)]
+    [Fintype (OddOrder.Peterfalvi.S06.ticVdiff h46).W]
+    [Invertible (Nat.card (OddOrder.Peterfalvi.S06.ticVdiff h46).W : ℂ)]
+    [h46.W2.Normal] [Invertible (Nat.card ↥h46.W2 : ℂ)]
+    [Fintype ↥(h46.W2.subgroupOf H)] [Invertible (Nat.card ↥(h46.W2.subgroupOf H) : ℂ)]
+    (hW2H : h46.W2 ≤ H)
+    (hcen : h46.W2.subgroupOf H ≤ Subgroup.center ↥H)
+    (hderiv : h46.W2.subgroupOf H ≤ commutator ↥H)
+    (hcop : Nat.Coprime (Nat.card ↥H) (Nat.card hyp.W1))
+    {p : ℕ} (hp : p.Prime) (hHp : IsPGroup p ↥H)
+    (hprime : (Nat.card h46.W2).Prime) (hW2comm : h46.W2 ≤ ⁅H, H⁆)
+    (hW2cenL : h46.W2 ≤ Subgroup.center ↥L)
+    (hc2 : 2 ≤ (h46.W2.subgroupOf H).index)
+    (hFPF : (h46.W2.index : ℤ) < ((h46.W2.subgroupOf H).index : ℤ) ^ 2)
+    {k : (h46.W2.subgroupOf (h46.W1 ⊔ h46.W2)) →* ℂˣ} (hk : k ≠ 1)
+    {η₁ : ClassFunction ↥L ℂ} (hη₁ : η₁ ∈ hyp.Yset) (hYcard : hyp.Yset.ncard ≠ 2) :
+    OddOrder.Peterfalvi.S07.IsCoherent hyp.tau
+      (OddOrder.Peterfalvi.S06.certainTypeSet h46 k ∪ hyp.Yset)
+      (OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L) := by
+  classical
+  -- the reference column `k` and its anchor weight `a₀` (data — extracted via `Exists.choose`, not
+  -- `obtain`, since the goal `IsCoherent` lives in `Type`).
+  have hkfull := caseB_column_anchored_full hyp h46 hHK hW1 hW2H hcen hderiv hcop hp hHp hprime
+    hW2comm hW2cenL hc2 hFPF hη₁ hk hYcard
+  set a₀ : ℕ := hkfull.choose_spec.choose with ha₀def
+  have hdegk : (OddOrder.Peterfalvi.S06.columnSum h46 k) 1 = (a₀ : ℂ) * η₁ 1 :=
+    hkfull.choose_spec.choose_spec.1
+  have hk0mem : OddOrder.Peterfalvi.S06.columnSum h46 k
+      ∈ OddOrder.Peterfalvi.S06.certainTypeSet h46 k := ⟨k, hk, rfl, rfl⟩
+  -- `η₁(1) ≠ 0` (irreducible degree).
+  have hηirr : IsIrreducibleCharacter η₁ := hyp.isIrreducibleCharacter_of_mem_Yset hη₁
+  have hη0 : η₁ (1 : ↥L) ≠ 0 := by
+    obtain ⟨dη, hdη_pos, hdη_eq⟩ :=
+      irreducibleCharacter_apply_one_eq_pos_natCast (⟨η₁, hηirr⟩ : IrreducibleCharacter ↥L)
+    simp only [IrreducibleCharacter.coe_mk] at hdη_eq
+    rw [hdη_eq]; exact_mod_cast hdη_pos.ne'
+  -- the textbook image `Ximg` (rearranged anchored image on columns, `0` elsewhere).
+  set Ximg : ((h46.W2.subgroupOf (h46.W1 ⊔ h46.W2)) →* ℂˣ) → ClassFunction G ℂ :=
+    fun χ₂ => if OddOrder.Peterfalvi.S06.columnSum h46 χ₂
+        ∈ OddOrder.Peterfalvi.S06.certainTypeSet h46 k
+      then hyp.tau (OddOrder.Peterfalvi.S06.columnSum h46 χ₂ - a₀ • η₁)
+        + a₀ • hyp.coherentYset.extension η₁
+      else 0 with hXimg
+  -- per-member data, with the weight forced to the uniform `a₀`.
+  have key : ∀ χ₂ : (h46.W2.subgroupOf (h46.W1 ⊔ h46.W2)) →* ℂˣ,
+      OddOrder.Peterfalvi.S06.columnSum h46 χ₂ ∈ OddOrder.Peterfalvi.S06.certainTypeSet h46 k →
+      (hyp.tau (OddOrder.Peterfalvi.S06.columnSum h46 χ₂ - a₀ • η₁)
+          = Ximg χ₂ - a₀ • hyp.coherentYset.extension η₁) ∧
+        ClassFunction.inner (Ximg χ₂) (hyp.coherentYset.extension η₁) = 0 ∧
+        Ximg χ₂ ∈ ZIrr G ∧
+        (OddOrder.Peterfalvi.S06.columnSum h46 χ₂ - a₀ • η₁).support ⊆
+          OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L := by
+    intro χ₂ hmem
+    obtain ⟨χ₂', hne', hdegm', hcseq⟩ := hmem
+    obtain ⟨X', a', hdeg', hanc', hmix', hXZ', hsupp'⟩ :=
+      caseB_column_anchored_full hyp h46 hHK hW1 hW2H hcen hderiv hcop hp hHp hprime hW2comm
+        hW2cenL hc2 hFPF hη₁ hne' hYcard
+    -- the weight is uniform: `a' = a₀`.
+    have hcs1 : (OddOrder.Peterfalvi.S06.columnSum h46 χ₂') 1
+        = (OddOrder.Peterfalvi.S06.columnSum h46 k) 1 := by
+      rw [OddOrder.Peterfalvi.S06.columnSum_apply_one,
+        OddOrder.Peterfalvi.S06.columnSum_apply_one]; exact hdegm'
+    have ha' : a' = a₀ := by
+      have h1 : (a' : ℂ) * η₁ 1 = (a₀ : ℂ) * η₁ 1 := by rw [← hdeg', hcs1, hdegk]
+      exact_mod_cast mul_right_cancel₀ hη0 h1
+    subst ha'
+    rw [← hcseq] at hanc' hsupp'
+    -- align the smul convention: the bundle uses `(a₀ : ℂ) •`, the union lemma uses `a₀ •` (`ℕ`).
+    rw [Nat.cast_smul_eq_nsmul ℂ a₀ (hyp.coherentYset.extension η₁)] at hanc'
+    have hmem2 : OddOrder.Peterfalvi.S06.columnSum h46 χ₂
+        ∈ OddOrder.Peterfalvi.S06.certainTypeSet h46 k := ⟨χ₂', hne', hdegm', hcseq⟩
+    have hXimgeq : Ximg χ₂ = X' := by
+      simp only [hXimg, if_pos hmem2]; rw [hanc']; abel
+    exact ⟨by rw [hXimgeq]; exact hanc', by rw [hXimgeq]; exact hmix',
+      by rw [hXimgeq]; exact hXZ', hsupp'⟩
+  refine coherentCertainTypeSet_union_Yset_via_anchoredImages hyp h46 hHK hW1 hk hη₁
+    hk0mem hdegk Ximg (fun χ₂ hmem => (key χ₂ hmem).1) (fun χ₂ χ₂' hmem hmem' => ?_)
+    (fun χ₂ => ?_) (fun χ₂ y hy => ?_)
+  · -- `hXinner` (gated to members).
+    exact xchi_inner_eq_of_anchored hyp h46 hW1 hη₁ (key χ₂ hmem).1 (key χ₂' hmem').1
+      (key χ₂ hmem).2.1 (key χ₂' hmem').2.1 (key χ₂ hmem).2.2.2 (key χ₂' hmem').2.2.2
+  · -- `hXzirr` (ungated; `0 ∈ ZIrr` off the columns).
+    by_cases hmem : OddOrder.Peterfalvi.S06.columnSum h46 χ₂
+        ∈ OddOrder.Peterfalvi.S06.certainTypeSet h46 k
+    · exact (key χ₂ hmem).2.2.1
+    · rw [hXimg]; simp only [if_neg hmem]; exact Submodule.zero_mem _
+  · -- `hXmixed` (ungated; `⟨0, ·⟩ = 0` off the columns, seam-for-all-`y` on the columns).
+    by_cases hmem : OddOrder.Peterfalvi.S06.columnSum h46 χ₂
+        ∈ OddOrder.Peterfalvi.S06.certainTypeSet h46 k
+    · exact caseB_anchoredImage_seam_all_Yset hyp h46 hW1 hη₁ (key χ₂ hmem).1
+        (key χ₂ hmem).2.1 (key χ₂ hmem).2.2.2 hy
+    · rw [hXimg]; simp only [if_neg hmem]; rw [ClassFunction.inner_zero_left]
 
 /-- **⚠ NON-VIABLE base (kept as a structural record).**  The map convention here is correct
 (`hyp.tau = dadeIntegralCharacterMap hyp.dade (hyp.dade.fullDadeIsometryData hyp.hconj)` defeq, so

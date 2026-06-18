@@ -256,6 +256,8 @@ noncomputable def certainTypeSet_isCoherent_via_anchoredImages
       hyp.tau (OddOrder.Peterfalvi.S06.columnSum h46 χ₂ - a₀ • η₁)
         = Ximg χ₂ - a₀ • hyp.coherentYset.extension η₁)
     (hXinner : ∀ χ₂ χ₂' : (h46.W2.subgroupOf (h46.W1 ⊔ h46.W2)) →* ℂˣ,
+      OddOrder.Peterfalvi.S06.columnSum h46 χ₂ ∈ OddOrder.Peterfalvi.S06.certainTypeSet h46 k →
+      OddOrder.Peterfalvi.S06.columnSum h46 χ₂' ∈ OddOrder.Peterfalvi.S06.certainTypeSet h46 k →
       ClassFunction.inner (Ximg χ₂) (Ximg χ₂')
         = ClassFunction.inner (OddOrder.Peterfalvi.S06.columnSum h46 χ₂)
             (OddOrder.Peterfalvi.S06.columnSum h46 χ₂'))
@@ -270,10 +272,10 @@ noncomputable def certainTypeSet_isCoherent_via_anchoredImages
     rw [OddOrder.Peterfalvi.S07.zSpan] at hφ hψ
     induction hφ, hψ using Submodule.span_induction₂ with
     | mem_mem u v hu hv =>
-        obtain ⟨χ₂, -, -, rfl⟩ := hu
-        obtain ⟨χ₂', -, -, rfl⟩ := hv
+        obtain ⟨χ₂, hne₂, hdeg₂, rfl⟩ := hu
+        obtain ⟨χ₂', hne₂', hdeg₂', rfl⟩ := hv
         rw [xChiExtension_columnSum, xChiExtension_columnSum]
-        exact hXinner χ₂ χ₂'
+        exact hXinner χ₂ χ₂' ⟨χ₂, hne₂, hdeg₂, rfl⟩ ⟨χ₂', hne₂', hdeg₂', rfl⟩
     | zero_left v _ => rw [map_zero, ClassFunction.inner_zero_left, ClassFunction.inner_zero_left]
     | zero_right u _ => rw [map_zero, ClassFunction.inner_zero_right, ClassFunction.inner_zero_right]
     | add_left u₁ u₂ v _ _ _ ih₁ ih₂ =>
@@ -405,6 +407,8 @@ noncomputable def coherentCertainTypeSet_union_Yset_via_anchoredImages
       hyp.tau (OddOrder.Peterfalvi.S06.columnSum h46 χ₂ - a₀ • η₁)
         = Ximg χ₂ - a₀ • hyp.coherentYset.extension η₁)
     (hXinner : ∀ χ₂ χ₂' : (h46.W2.subgroupOf (h46.W1 ⊔ h46.W2)) →* ℂˣ,
+      OddOrder.Peterfalvi.S06.columnSum h46 χ₂ ∈ OddOrder.Peterfalvi.S06.certainTypeSet h46 k →
+      OddOrder.Peterfalvi.S06.columnSum h46 χ₂' ∈ OddOrder.Peterfalvi.S06.certainTypeSet h46 k →
       ClassFunction.inner (Ximg χ₂) (Ximg χ₂')
         = ClassFunction.inner (OddOrder.Peterfalvi.S06.columnSum h46 χ₂)
             (OddOrder.Peterfalvi.S06.columnSum h46 χ₂'))
