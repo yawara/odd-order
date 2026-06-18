@@ -145,6 +145,25 @@ hμ_range=`mu_range_eq_normOneUnits`✓ / e,μ,hcompat=`exists_pu_field_repr`✓
 （(13.15)二分 + W₂^y FPF、part(b) 依存）③ hW2（generic e を W₂-respecting に scaling）④ `[IsCyclic ↥U]` の §13
 producer ⑤ partB → ⑥ assembly。これらは clean な standalone でなく real argument 要（FPF 構造・scaling）。
 
+### 🛑 2026-06-19 /loop 停止（depletion）— 残る全ピースが §13/§14-gated と確定
+
+ユーザー指示で `/loop` 起動 → 残 ungated runway を精査した結果、**clean な ungated piece は出し尽くし**た:
+- **hW2 scaling**（generic e を W₂-respecting 化）は ungated **に見えたが** `W₂ ≤ P` を前提に要する。
+  これは S15.Hypothesis の field でなく **§13-structural fact**（hW2 = `(span{1}).map fN = W2` で
+  `fN.range = P` ゆえ `W₂ ⊆ P` 必須）。⟹ `W₂≤P` を仮説に取れば scaling 自体は ungated だが、closure に §13 が入る。
+- **scaling 設計**（次セッション用、`W₂≤P` 仮説下で実装）: `exists_pu_field_repr` の generic `e₀` を取り、
+  `w₀ ∈ W₂` (≠1, W₂ nontrivial since |W₂|=p≥5)、`c := e₀(ofMul ⟨↑w₀,hW2_le_P⟩) ≠ 0`、
+  `e := e₀.trans (DistribMulAction.toAddEquiv₀ GF c⁻¹ hc)`（c⁻¹ 乗算 AddEquiv）。conclusion: ① μ inj 同じ
+  ② compat = `c⁻¹*(μv*e₀ x)=μv*(c⁻¹*e₀ x)`（可換、ring）③ hW2: W₂=⟨w₀⟩ (prime order) ⟹ `e₀(W₂)=span{c}`
+  ⟹ `e(W₂)=span{1}` ⟹ `.map fN = W₂`（membership ↔ then le_antisymm）。~70 行、submodule/AddEquiv bookkeeping。
+- **value-argument** `u=full`+`q∤(p-1)`: (13.15) 二分 + W₂^y の U への FPF `u≡1 mod p`（part(b) の y 依存 = §14-structural、未形式化）。
+- **`[IsCyclic ↥U]`**: standing §13（field 構造から導けない=循環: exists_pu_field_repr が要求）。
+- **partB**: (13.2.b)/(14.5) cite（§13）。
+
+**⟹ ungated runway 枯渇 = /loop 停止（depletion、policy 準拠）。** 全 proven コンポーネント（σ-bridge / 体モデル /
+hUP / hPU_disj / hμ_range）は committed・green。次セッション = scaling（W₂≤P §13 入力下、~70 行）+ §13/§14 pieces
+（value-arg FPF / IsCyclic / partB / W₂≤P）+ assembly。
+
 ## 完了条件
 
 `field_normalizer_structure` の `sorry` が消え、`lake build OddOrder OddOrder.AxiomsCheck` 緑。
