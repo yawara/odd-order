@@ -196,4 +196,64 @@ theorem fixedPoints_W1_subset_commutator_of_c2 (hyp : SibleyDadeHypothesis G L H
   rw [← commutator_subgroupOf_self]
   exact Subgroup.mem_subgroupOf.mpr (hW2 hxW2)
 
+/-- **Peterfalvi (6.8) — certain-type case (6.8)(c2): `S` is coherent (dispatch skeleton).**
+
+The (6.8)(c2) branch of `sibleySetup_is_coherent`, assembled from the certain-type data `h46` of
+`hyp.cases.inr`.  By contradiction-free assembly: the (6.5) reduction
+(`exists_isPGroup_H_of_c2_of_card_le`, fed `hfix` from `fixedPoints_W1_subset_commutator_of_c2` and
+the (6.3) index bound `hbound`) makes `H` a `p`-group, then the math case split (6.8.A/B) on whether
+`W₂ ⊆ Z(H)` routes to the case-A coherence producer (`Z(H) ∩ W₂ = 1`) or the case-B one
+(`1 ≠ W₂ ⊆ Z(H)`, `nonempty_coherent_S_caseB_of_structure`, cont.¹³).
+
+This is the [[gated-endpoint-skeleton]] form: the three genuine residual obligations are isolated as
+named hypotheses — `hbound` (Theorem (6.3) c2, the main remaining work, via the reducible-break
+norm-weighted (5.6) engine), `hcaseA` (the case-A `_of_c2_caseA` → `S` bootstrap), and `hcaseB` (the
+case-B structure-data discharge feeding `nonempty_coherent_S_caseB_of_structure`).  The A/B split
+itself (`hsplit`, prime-order `W₂.subgroupOf H` ⟹ `⊥` or all in `Z(H)`) is also named, to be
+discharged separately.  Wiring this into `S08_CoherenceTheorems:59` (the c2 branch) follows once the
+three obligations are filled. -/
+theorem nonempty_coherent_S_of_c2_of_branches (hyp : SibleyDadeHypothesis G L H)
+    [H.Normal] [Finite ↥H]
+    (h46 : OddOrder.Peterfalvi.S06.Hypothesis46 (sharpImage H) L)
+    (hHK : h46.K = H) (hW1 : h46.W1 = hyp.W1) (hW2comm : h46.W2 ≤ ⁅H, H⁆)
+    (hcop : Nat.Coprime (Nat.card ↥H) (Nat.card hyp.W1))
+    (hbound : Nat.card (Abelianization ↥H) ≤ 4 * Nat.card ↥hyp.W1 ^ 2 + 1)
+    (hsplit : h46.W2.subgroupOf H ≤ Subgroup.center ↥H ∨
+      Disjoint (h46.W2.subgroupOf H) (Subgroup.center ↥H))
+    (hcaseA : ∀ {p : ℕ}, p.Prime → IsPGroup p ↥H →
+      Disjoint (h46.W2.subgroupOf H) (Subgroup.center ↥H) →
+      Nonempty (OddOrder.Peterfalvi.S07.IsCoherent hyp.tau hyp.S
+        (OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L)))
+    (hcaseB : ∀ {p : ℕ}, p.Prime → IsPGroup p ↥H →
+      h46.W2.subgroupOf H ≤ Subgroup.center ↥H →
+      Nonempty (OddOrder.Peterfalvi.S07.IsCoherent hyp.tau hyp.S
+        (OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L))) :
+    Nonempty (OddOrder.Peterfalvi.S07.IsCoherent hyp.tau hyp.S
+      (OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L)) := by
+  have hfix := fixedPoints_W1_subset_commutator_of_c2 hyp h46.toCertainTypeHypothesis hHK hW1 hW2comm
+  obtain ⟨p, hp, hHp⟩ := exists_isPGroup_H_of_c2_of_card_le hyp hcop hfix hbound
+  rcases hsplit with hB | hA
+  · exact hcaseB hp hHp hB
+  · exact hcaseA hp hHp hA
+
+/-- **(6.8) case A/B split** (discharges `hsplit` of `nonempty_coherent_S_of_c2_of_branches`).
+Since `W₂ ≤ H` is of prime order, `W₂.subgroupOf H` has prime order too, so the subgroup
+`(W₂.subgroupOf H) ⊓ Z(H)` is either trivial (case A: `Z(H) ∩ W₂ = 1`) or all of `W₂.subgroupOf H`
+(case B: `1 ≠ W₂ ⊆ Z(H)`).  This is Peterfalvi (6.8)'s two-case dichotomy (04.8:152-154). -/
+theorem caseAB_split_of_c2 [H.Normal] [Finite ↥H]
+    (h46 : OddOrder.Peterfalvi.S06.Hypothesis46 (sharpImage H) L)
+    (hW2H : h46.W2 ≤ H) (hprime : (Nat.card h46.W2).Prime) :
+    h46.W2.subgroupOf H ≤ Subgroup.center ↥H ∨
+    Disjoint (h46.W2.subgroupOf H) (Subgroup.center ↥H) := by
+  by_cases hB : h46.W2.subgroupOf H ≤ Subgroup.center ↥H
+  · exact Or.inl hB
+  refine Or.inr (disjoint_iff.mpr ?_)
+  have hWprime : (Nat.card ↥(h46.W2.subgroupOf H)).Prime := by
+    rwa [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hW2H).toEquiv]
+  have hdvd : Nat.card ↥(h46.W2.subgroupOf H ⊓ Subgroup.center ↥H) ∣
+      Nat.card ↥(h46.W2.subgroupOf H) := Subgroup.card_dvd_of_le inf_le_left
+  rcases (Nat.dvd_prime hWprime).mp hdvd with h1 | hfull
+  · exact Subgroup.card_eq_one.mp h1
+  · exact absurd (inf_eq_left.mp (Subgroup.eq_of_le_of_card_ge inf_le_left hfull.ge)) hB
+
 end OddOrder.Peterfalvi.S08
