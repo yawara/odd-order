@@ -38,6 +38,7 @@ namespace OddOrder
 
 open OddOrder.BG
 open OddOrder.GroupTheory
+open OddOrder.Isaacs
 open OddOrder.RepresentationTheory
 open scoped Pointwise
 
@@ -185,6 +186,24 @@ structure Section16MaximalPair (G : Type*) [Group G] [Finite G] where
     ∀ M : Subgroup G, M ∈ maximalSubgroups G →
       IsTypeI M ∨ (∃ g : G, MulAut.conj g • M = S) ∨
         (∃ g : G, MulAut.conj g • M = T)
+  /-- The κ-Hall factor `K` of `S` and its dual `K* = C_{S_σ}(K)`. -/
+  K : Subgroup G
+  Kstar : Subgroup G
+  /-- **Canonical partner witness** (BG Theorem 14.7 / `typeP_duality`): `T` is the *canonical*
+  type-`P` partner of `S`, not merely some maximal in its conjugacy class.  These fields pin the
+  pairing `S ∩ T = K ⊔ K*` (the `theorem88_caseB` covering alone fixes the partner only up to
+  conjugacy, which would leave `Section16TypePStructure` an empty type).  Supplied by
+  `exists_section16MaximalPair_data`. -/
+  K_le_S : K ≤ S
+  K_hall : Ch03.IsHallSubgroup (BG.Ch4.S14.kappa S) (K.subgroupOf S)
+  Kstar_eq : Kstar = BG.Ch3.S10.Msigma S ⊓ Subgroup.centralizer (K : Set G)
+  S_typeP : BG.Ch4.S14.IsTypeP S
+  T_typeP : BG.Ch4.S14.IsTypeP T
+  S_T_not_conj : ¬ BG.Ch4.S14.IsConjugateSubgroup S T
+  Kstar_le_T : Kstar ≤ T
+  Kstar_hall : Ch03.IsHallSubgroup (BG.Ch4.S14.kappa T) (Kstar.subgroupOf T)
+  K_eq : K = BG.Ch3.S10.Msigma T ⊓ Subgroup.centralizer (Kstar : Set G)
+  Z_cyclic : IsCyclic ↥(K ⊔ Kstar)
 
 /-- **BG §14 type-P duality / cyclic-counting output** — *owned by lane-f*.
 
@@ -260,6 +279,81 @@ structure Section16CharacterData {G : Type*} [Group G] [Finite G]
           (omega i j - omega i ⟨0, tp.p_prime.pos⟩))
       = (deltaPrime i : ℂ) • (nu i j - nu i ⟨0, tp.p_prime.pos⟩)
 
+/-- **Canonical type-`P` maximal pair data** (issue 7005): for a minimal simple group of odd order,
+there is a type-`P` dual pair `S, T` together with the full κ-Hall witness data of BG Theorem 14.7
+(`typeP_duality`).  This is the data an *enriched* `Section16MaximalPair` carries so the type-`P`
+structure producer can discharge the pairing `S ∩ T = K × K*`: the intrinsic covering axiom
+(`theorem88_caseB`) fixes the partner only up to conjugacy, so an arbitrary maximal pair need not
+have `S ∩ T` a cyclic product (the type-emptiness obstruction of the bare producer).
+
+Mirrors the dichotomy branch of `theoremI_nilpotentHall_conjugacy_and_type_dichotomy`, additionally
+exposing the canonical partner `T = Mstar` and its κ-Hall factors `K, K*` (dropped by the
+dichotomy).  Case (a) of (8.8) (every maximal Type I) is excluded by Peterfalvi (12.17). -/
+theorem exists_section16MaximalPair_data {G : Type*} [Group G] [Finite G]
+    (hG : IsMinimalSimpleOdd G) :
+    ∃ S T K Kstar : Subgroup G,
+      S ∈ maximalSubgroups G ∧ T ∈ maximalSubgroups G ∧ S ≠ T ∧
+      IsTypeNonI S ∧ IsTypeNonI T ∧ (IsTypeII S ∨ IsTypeII T) ∧
+      (∀ M : Subgroup G, M ∈ maximalSubgroups G →
+        IsTypeI M ∨ (∃ g : G, MulAut.conj g • M = S) ∨ (∃ g : G, MulAut.conj g • M = T)) ∧
+      K ≤ S ∧ Ch03.IsHallSubgroup (BG.Ch4.S14.kappa S) (K.subgroupOf S) ∧
+      Kstar = BG.Ch3.S10.Msigma S ⊓ Subgroup.centralizer (K : Set G) ∧
+      BG.Ch4.S14.IsTypeP S ∧ BG.Ch4.S14.IsTypeP T ∧ ¬ BG.Ch4.S14.IsConjugateSubgroup S T ∧
+      Kstar ≤ T ∧ Ch03.IsHallSubgroup (BG.Ch4.S14.kappa T) (Kstar.subgroupOf T) ∧
+      K = BG.Ch3.S10.Msigma T ⊓ Subgroup.centralizer (Kstar : Set G) ∧
+      IsCyclic ↥(K ⊔ Kstar) := by
+  classical
+  have notTypeI_imp_typeP : ∀ N : Subgroup G, N ∈ maximalSubgroups G →
+      ¬ IsTypeI N → BG.Ch4.S14.IsTypeP N := by
+    intro N hN hnotI
+    have hiff := (BG.Ch4.S16.proposition_type_classification hG hN).1
+    have hnotF : ¬ BG.Ch4.S14.IsTypeF N := fun hF => hnotI (hiff.mpr hF)
+    rw [BG.Ch4.S14.IsTypeP, Set.nonempty_iff_ne_empty]
+    exact fun he => hnotF he
+  have typeP_imp_nonI : ∀ N : Subgroup G, N ∈ maximalSubgroups G →
+      BG.Ch4.S14.IsTypeP N → IsTypeNonI N := by
+    intro N hN hP
+    obtain ⟨_, hbII, hcIII_IV, hdV, _, _⟩ := BG.Ch4.S16.proposition_type_classification hG hN
+    by_cases hk : BG.Ch4.S14.kappa N = BG.Ch4.S14.sigmaComplementPrimes N
+    · have hP1 : BG.Ch4.S14.IsTypeP1 N := ⟨hP, hk⟩
+      by_cases hMF : BG.Ch4.S15.MF N = BG.Ch3.S10.Msigma N
+      · exact Or.inr (Or.inr (Or.inr (hdV.mpr ⟨hP1, hMF⟩)))
+      · rcases hcIII_IV.mpr ⟨hP1, hMF⟩ with hIII | hIV
+        · exact Or.inr (Or.inl hIII)
+        · exact Or.inr (Or.inr (Or.inl hIV))
+    · exact Or.inl (hbII.mpr ⟨hP, hk⟩)
+  by_cases hall : ∀ M : Subgroup G, M ∈ maximalSubgroups G → IsTypeI M
+  · obtain ⟨cb⟩ := Peterfalvi.S14.theorem88_caseB_holds hG
+    exact absurd (hall cb.S cb.S_maximal)
+      (BG.Ch4.S16.not_isTypeI_of_isTypeNonI hG cb.S_maximal cb.S_nonI)
+  · push_neg at hall
+    obtain ⟨S, hS, hSnotI⟩ := hall
+    have hSP : BG.Ch4.S14.IsTypeP S := notTypeI_imp_typeP S hS hSnotI
+    haveI : IsSolvable ↥S := hG.solvable_of_mem_maximalSubgroups hS
+    obtain ⟨K', hK'⟩ := Ch03.hall_E_exists (G := ↥S) (BG.Ch4.S14.kappa S)
+    set K : Subgroup G := K'.map S.subtype with hKdef
+    have hKeq : K.subgroupOf S = K' :=
+      Subgroup.comap_map_eq_self_of_injective S.subtype_injective K'
+    have hK : Ch03.IsHallSubgroup (BG.Ch4.S14.kappa S) (K.subgroupOf S) := by
+      rw [hKeq]; exact hK'
+    set Kstar : Subgroup G :=
+      BG.Ch3.S10.Msigma S ⊓ Subgroup.centralizer (K : Set G) with hKstardef
+    obtain ⟨_, _, Mstar, ⟨hMstarMem, hMstarP, hSnconjMstar,
+        ⟨hKstarMstar, hKstar_hall, hK_eq⟩, hcyc, _, hP2disj, hcover⟩, _⟩ :=
+      BG.Ch4.S14.typeP_duality hG hS hSP (Subgroup.map_subtype_le K') hK hKstardef
+    refine ⟨S, Mstar, K, Kstar, hS, hMstarMem, ?_, typeP_imp_nonI S hS hSP,
+      typeP_imp_nonI Mstar hMstarMem hMstarP, ?_, ?_, Subgroup.map_subtype_le K', hK, hKstardef,
+      hSP, hMstarP, hSnconjMstar, hKstarMstar, hKstar_hall, hK_eq, hcyc⟩
+    · rintro rfl
+      exact hSnconjMstar (BG.Ch4.S14.IsConjugateSubgroup.refl S)
+    · rcases hP2disj with hP2S | hP2M
+      · exact Or.inl ((BG.Ch4.S16.proposition_type_classification hG hS).2.1.mpr hP2S)
+      · exact Or.inr ((BG.Ch4.S16.proposition_type_classification hG hMstarMem).2.1.mpr hP2M)
+    · intro M hM
+      by_cases hMI : IsTypeI M
+      · exact Or.inl hMI
+      · exact Or.inr (hcover M hM (notTypeI_imp_typeP M hM hMI))
+
 /-- **BG §16 maximal-pair producer** — *lane-g* (BG §16 main results).
 Constructs the maximal pair `S, T`, their type classification, and the case-(b)
 trichotomy of (8.8) from a minimal simple group of odd order.
@@ -274,32 +368,32 @@ maximal subgroup is Type I" via the type-exclusivity corollary of Proposition 16
 (`not_isTypeI_of_isTypeNonI`). -/
 noncomputable def section16MaximalPair_of_isMinimalSimpleOdd {G : Type*} [Group G] [Finite G]
     (hG : IsMinimalSimpleOdd G) : Section16MaximalPair G :=
-  -- First establish case (b) of (8.8) *as a proposition*: the type-P pair exists.
-  -- (`Or`/`Exists` live in `Prop`, so the witnesses must be extracted by choice — the
-  -- dichotomy cannot be `rcases`'d directly into the `Type`-valued structure goal.)
-  have hex : ∃ S T : Subgroup G,
-      S ∈ maximalSubgroups G ∧ T ∈ maximalSubgroups G ∧ S ≠ T ∧
-        IsTypeNonI S ∧ IsTypeNonI T ∧ (IsTypeII S ∨ IsTypeII T) ∧
-          ∀ M : Subgroup G, M ∈ maximalSubgroups G →
-            IsTypeI M ∨ (∃ g : G, MulAut.conj g • M = S) ∨ (∃ g : G, MulAut.conj g • M = T) := by
-    rcases Peterfalvi.S10.maximalSubgroup_type_dichotomy hG with hAllI | hpair
-    · -- Case (a) — every maximal subgroup is Type I — is ruled out by (12.17): its
-      -- case-(b) data is a non-Type-I maximal subgroup `cb.S`.
-      obtain ⟨cb⟩ := Peterfalvi.S14.theorem88_caseB_holds hG
-      exact absurd (hAllI cb.S cb.S_maximal)
-        (BG.Ch4.S16.not_isTypeI_of_isTypeNonI hG cb.S_maximal cb.S_nonI)
-    · exact hpair
-  -- Case (b) holds, so the type-P pair `S, T` is exactly the maximal-pair output.
-  have h := hex.choose_spec.choose_spec
-  { S := hex.choose
-    T := hex.choose_spec.choose
+  -- `exists_section16MaximalPair_data` supplies the canonical pair `S, T = Mstar` with the full
+  -- κ-Hall witness data (`Or`/`Exists` live in `Prop`, so the witnesses are extracted by choice —
+  -- the existential cannot be `rcases`'d directly into the `Type`-valued structure goal).
+  let e := exists_section16MaximalPair_data hG
+  have h := e.choose_spec.choose_spec.choose_spec.choose_spec
+  { S := e.choose
+    T := e.choose_spec.choose
+    K := e.choose_spec.choose_spec.choose
+    Kstar := e.choose_spec.choose_spec.choose_spec.choose
     S_maximal := h.1
     T_maximal := h.2.1
     S_ne_T := h.2.2.1
     S_nonI := h.2.2.2.1
     T_nonI := h.2.2.2.2.1
     one_typeII := h.2.2.2.2.2.1
-    theorem88_caseB := h.2.2.2.2.2.2 }
+    theorem88_caseB := h.2.2.2.2.2.2.1
+    K_le_S := h.2.2.2.2.2.2.2.1
+    K_hall := h.2.2.2.2.2.2.2.2.1
+    Kstar_eq := h.2.2.2.2.2.2.2.2.2.1
+    S_typeP := h.2.2.2.2.2.2.2.2.2.2.1
+    T_typeP := h.2.2.2.2.2.2.2.2.2.2.2.1
+    S_T_not_conj := h.2.2.2.2.2.2.2.2.2.2.2.2.1
+    Kstar_le_T := h.2.2.2.2.2.2.2.2.2.2.2.2.2.1
+    Kstar_hall := h.2.2.2.2.2.2.2.2.2.2.2.2.2.2.1
+    K_eq := h.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.1
+    Z_cyclic := h.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2 }
 
 /-- **Type-P structure engine from the type data** (`sorry`-free, gated-endpoint skeleton).
 
