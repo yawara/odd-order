@@ -256,4 +256,36 @@ theorem caseAB_split_of_c2 [H.Normal] [Finite ↥H]
   · exact Subgroup.card_eq_one.mp h1
   · exact absurd (inf_eq_left.mp (Subgroup.eq_of_le_of_card_ge inf_le_left hfull.ge)) hB
 
+/-- **(6.8) case-B: `W₂ ≤ Z(L)`** (helper for the case-B structure-data discharge).
+In case (B), `W₂ ⊆ Z(H)` (`hcen`) so `W₂` commutes with all of `H`; and `W₂` commutes with `W₁` by
+the certain-type centralizer datum (`commute_of_mem_W1_of_mem_W2`).  Since `L = H ⋊ W₁`
+(`H ⊔ W₁ = ⊤`), `W₂` commutes with every element of `L` (by closure induction), i.e. `W₂ ≤ Z(L)`. -/
+theorem caseB_W2_le_center_L (hyp : SibleyDadeHypothesis G L H) [H.Normal]
+    (h46 : OddOrder.Peterfalvi.S06.Hypothesis46 (sharpImage H) L)
+    (hW1 : h46.W1 = hyp.W1) (hW2H : h46.W2 ≤ H)
+    (hcen : h46.W2.subgroupOf H ≤ Subgroup.center ↥H) :
+    h46.W2 ≤ Subgroup.center ↥L := by
+  intro w hw
+  have hwZH : (⟨w, hW2H hw⟩ : ↥H) ∈ Subgroup.center ↥H :=
+    hcen (Subgroup.mem_subgroupOf.mpr hw)
+  rw [Subgroup.mem_center_iff] at hwZH
+  rw [Subgroup.mem_center_iff]
+  intro g
+  have hg : g ∈ Subgroup.closure ((H : Set ↥L) ∪ (hyp.W1 : Set ↥L)) := by
+    rw [Subgroup.closure_union, Subgroup.closure_eq, Subgroup.closure_eq, hyp.split.sup_eq_top]
+    exact Subgroup.mem_top g
+  have hcomm : Commute g w := by
+    induction hg using Subgroup.closure_induction with
+    | mem x hx =>
+      rcases hx with hxH | hxW1
+      · have h3 : ((⟨x, hxH⟩ * ⟨w, hW2H hw⟩ : ↥H) : ↥L) =
+            ((⟨w, hW2H hw⟩ * ⟨x, hxH⟩ : ↥H) : ↥L) := congrArg _ (hwZH ⟨x, hxH⟩)
+        rw [Subgroup.coe_mul, Subgroup.coe_mul] at h3
+        exact h3
+      · exact h46.commute_of_mem_W1_of_mem_W2 (by rw [hW1]; exact hxW1) hw
+    | one => exact Commute.one_left w
+    | mul x y _ _ ihx ihy => exact ihx.mul_left ihy
+    | inv x _ ihx => exact ihx.inv_left
+  exact hcomm
+
 end OddOrder.Peterfalvi.S08
