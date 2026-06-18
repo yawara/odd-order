@@ -62,7 +62,6 @@ structure LHypothesis (hyp : Hypothesis (G := G)) where
   betaL_formula : Prop
   betaL_formula_holds : betaL_formula
   L_semidirect_formula : G → Prop
-  U_characteristic_in_H : Prop
   typeI_data : OddOrder.Peterfalvi.S15.TypeIOverNormalizerData hyp.base
   typeI_data_L_eq : typeI_data.L = L
   typeI_data_H_eq : typeI_data.H = H
@@ -199,7 +198,8 @@ theorem caseB_for_S [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
 field-normalizer configuration (14.2) holds. -/
 theorem field_normalizer_of_U_characteristic [Finite G]
     (_hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
-    (Ldata : LHypothesis hyp) (hchar : Ldata.U_characteristic_in_H) :
+    (Ldata : LHypothesis hyp)
+    (hchar : (hyp.base.U.subgroupOf Ldata.H).Characteristic) :
     Nonempty (FieldNormalizerData hyp) := by
   sorry
 
@@ -1981,12 +1981,16 @@ theorem exists_MHypothesis [Finite G]
   sorry
 
 /-- **Peterfalvi (14.16)**→(14.7) bridge: if the Fitting kernel `H` of `L`
-coincides with `U`, then `U` is characteristic in `H` (it is `H` itself).  This
-is what lets the non-conjugate case `H = U` of (14.16) feed back into (14.7). -/
+coincides with `U`, then `U` is characteristic in `H` — it is the whole of `H`,
+and `⊤` is characteristic.  This is what lets the non-conjugate case `H = U` of
+(14.16) feed back into (14.7). -/
 theorem U_characteristic_of_H_eq_U {hyp : Hypothesis (G := G)}
     (Ldata : LHypothesis hyp) (hHU : Ldata.H = hyp.base.U) :
-    Ldata.U_characteristic_in_H := by
-  sorry
+    (hyp.base.U.subgroupOf Ldata.H).Characteristic := by
+  have htop : hyp.base.U.subgroupOf Ldata.H = ⊤ :=
+    Subgroup.subgroupOf_eq_top.mpr (le_of_eq hHU)
+  rw [htop]
+  exact Subgroup.topCharacteristic
 
 /-- **Peterfalvi (14.2)**: the field-normalizer configuration follows from the
 Section 16 hypotheses.
@@ -2006,7 +2010,7 @@ theorem field_normalizer_structure [Finite G]
     (_hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G)) :
     Nonempty (FieldNormalizerData hyp) := by
   obtain ⟨Ldata⟩ := exists_LHypothesis _hG hyp
-  by_cases hchar : Ldata.U_characteristic_in_H
+  by_cases hchar : (hyp.base.U.subgroupOf Ldata.H).Characteristic
   · exact field_normalizer_of_U_characteristic _hG hyp Ldata hchar
   · obtain ⟨Mdata⟩ := exists_MHypothesis _hG hyp
     by_cases hconj : ∃ g : G, MulAut.conj g • Ldata.L = Mdata.M
