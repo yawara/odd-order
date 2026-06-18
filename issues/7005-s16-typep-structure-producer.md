@@ -104,3 +104,54 @@ hub REASSIGN #2 (option 1「難所に正面」) を受け、**逆包含 `M ⊓ M
 - standing hypothesis: `references/peterfalvi/04.15_pp_75_86_The_Subgroups_S_and_T.mmd:5` ((13.1)(a)(b))
 - 関連: 8014 (maximalPair, lane-g, 上流) / 1004 (character_data, lane-b, 下流) / 2009 (POLE-2, lane-h)
 - 旧タスク Wielandt (9.1) `CoprimeAction.lean` は orphaned 判定で park (issue 7004 は据え置き)
+
+---
+
+## フィージビリティ監査 + 部分 landing (2026-06-18 lane-f 再開, hub REASSIGN #3 を受けて)
+
+LAUNCH REASSIGN #3 の option-1 チェーン（②enrich + ③tp discharge）に着手。Explore 全域監査
+（§14/§15/§16/Pf S15）+ 確認 grep で、**③ tp producer は現 repo 理論で sorry-free 化不能**と確定。
+LAUNCH step 3 の「残（U/V 導来分解・counting・normalizer）は §14 既存補題 + Lagrange」は**過大評価**。
+
+### ① 各 field の feeder 監査（FORMALIZED / ABSENT）
+
+| field | 状態 | 根拠 |
+|---|---|---|
+| `W_eq_inter : W = S ⊓ T` | ✅ FORMALIZED | gap B `typeP_pair_inf_eq` (S16_PairIntersection) |
+| `W_cyclic` | ✅ FORMALIZED | `typeP_Z_isCyclic` (S14:7585) |
+| `W_eq_join`(W=W1⊔W2, W1=K/W2=K*) `W1_inf_W2_eq_bot` `W1_commutes` | ✅ (K⊔K* cyclic から) | 同上 |
+| `S_deriv_eq_PU` `T_deriv_eq_QV` | ✅ FORMALIZED | `derivedInG_eq_Msigma_sup_derivedInG_complement` (S14:7720) + `typeP_derivedInG_isComplement_kappaHall` (S14:7785) |
+| `q_prime`/`p_prime` + `q_eq_card_W1`/`p_eq_card_W2`（**対の両側素数位数**） | ⚠ **PARTIAL** | `isTypeP2_kappaHall_prime` (S14:1555) は **type-P₂ 側のみ**（Thm 3.10(a) Frobenius complement 経由）。`hP2disj : IsTypeP2 S ∨ IsTypeP2 Mstar` は OR ゆえ片側のみ保証。**P₁ partner の κ-Hall 素数位数は ABSENT** |
+| `q_lt_p` | ❌ **ABSENT** | §14/§15 に prover 無し（Pf (13.2)(a) 由来＝(10.10)/(11.9.b,c) char-theoretic） |
+| `W1_normalizes_U` `W2_normalizes_V` + U/V の (13.1)(b) semidirect 構成 | ❌ **ABSENT** | Pf (13.1)(b)「by the remark following Definition (8.4)」＝§8 構造論、未形式化 |
+
+### ② 構造変更（enrich）は obstruction を**移動するだけ・解消しない**（重要）
+
+`Section16TypePStructure mp` は `W = W₁ × W₂`（**両素数**, q<p）+ U/V semidirect を要求。
+`Section16MaximalPair` を W/W_eq_inter/W_cyclic（または K/K* witness）で enrich しても、
+tp が要求する**素数位数分解**は「W cyclic」より真に強い ⟹ enrich field を mp producer
+(`section16MaximalPair_of_isMinimalSimpleOdd`) が構成する段で**同じ absent theory**（対の素数位数・
+W₁-normalizes-U）に bottom-out。情報は構造境界で失われるのでなく、**そもそも repo に無い**。
+∴ memory [[s16-typep-producer-unfillable]] の「fix=構造変更必須」は不完全 — 構造変更**かつ**
+absent §13/§14 理論の両方が要る（どちらか一方では不可）。
+
+### ③ S15.Hypothesis は repo のどこからも CONSTRUCT されない
+
+Explore 確認: `Peterfalvi.S15.Hypothesis` は全参照が `hyp :` パラメータ消費のみ、producer ゼロ。
+下流 `basic_structure` (S15_SAndT:236) / `S_coherent` (:263) も依然 sorry。tp producer はこの
+未構成 (13.1) データ束の BG 側構造部分に相当 ⟹ 同根の gate。
+
+### 部分 landing（feasible な faithful 進捗）— `536974a9`
+
+gap B を terminal にせず BG **Theorem I clause (2)** に配線:
+`theoremI_nilpotentHall_conjugacy_and_type_dichotomy` の type-P-pair 枝に `S ⊓ T = W` を復活
+（`typeP_pair_inf_eq` 適用、sorry-free、full build 3860 green、consumer `maximalSubgroup_type_dichotomy`
+透過）。tp producer の sorry は**減らない**（absent theory ゆえ）。
+
+### 推奨（hub 判断）— option (C) 寄り
+
+tp producer を honest localized sorry のまま据え置き、lane-f を re-task。理由:
+- 真の gate = (a) 対の素数位数 P₁ 側、(b) q<p（**char-theoretic ＝ lane-b 上流**）、(c) W₁-normalizes-U（§8）。
+- (b) は (10.10)/(11.9) ＝ §10/§11 character/structure に依存 ＝ lane-f 単独の clean win でない。
+- (a)(c) は深い BG §8/§14 構造論。やるなら独立タスクとして scope（issue 化）すべきで、
+  「enrich すれば producer が落ちる」という LAUNCH の前提は不成立。
