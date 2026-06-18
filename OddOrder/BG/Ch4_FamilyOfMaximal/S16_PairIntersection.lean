@@ -193,4 +193,35 @@ theorem card_kappaHall_eq_derived_index [Finite G] (hG : OddOrder.BG.IsMinimalSi
   rw [← Nat.card_congr (Subgroup.subgroupOfEquivOfLe hKM).toEquiv,
     ← (typeP_derivedInG_isComplement_kappaHall hG hM hP hKM hK).symm.index_eq_card]
 
+/-- **BG Theorem 14.7(4)(5), the `W`-side structure of the type-`P` dual pair** (mmd L3967):
+the full cyclic-product structure of `S ∩ T = W = W₁ × W₂`, bundling the intersection identity
+(`typeP_pair_inf_eq`), the cyclicity of `S ∩ T` (BG 14.7(4)), and that `K, K*` form a *direct*
+product inside it (`K ⊓ K* = 1`, `K`/`K*` commute — BG 14.7's `Z = K × K*`).
+
+These are exactly the `Section16TypePStructure` fields `W_eq_inter`/`W_cyclic`/`W1_inf_W2_eq_bot`/
+`W1_commutes_W2` for the κ-Hall presentation `W₁ = K`, `W₂ = K*`.  They are sourced from the
+canonical `typeP_duality` witnesses, which an *enriched* `Section16MaximalPair` must carry for the
+producer to discharge the pairing (the intrinsic `Section16MaximalPair` axioms fix the partner only
+up to conjugacy, so `S ∩ T` need not be this cyclic product without the enrichment). -/
+theorem typeP_pair_W_structure [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    {M K Kstar U Mstar : Subgroup G}
+    (hM : M ∈ maximalSubgroups G) (hP : S14.IsTypeP M) (hKM : K ≤ M)
+    (hK : Ch03.IsHallSubgroup (kappa M) (K.subgroupOf M))
+    (hKstar : Kstar = OddOrder.BG.Ch3.S10.Msigma M ⊓ Subgroup.centralizer (K : Set G))
+    (hU : Ch03.IsHallSubgroup ((kappa M ∪ OddOrder.BG.Ch3.S10.sigma M)ᶜ) (U.subgroupOf M))
+    (hMstar : Mstar ∈ maximalSubgroups G) (hPstar : S14.IsTypeP Mstar)
+    (hnc : ¬ IsConjugateSubgroup M Mstar)
+    (hKstarMstar : Kstar ≤ Mstar)
+    (hKstar_hall : Ch03.IsHallSubgroup (kappa Mstar) (Kstar.subgroupOf Mstar))
+    (hZcyc : IsCyclic ↥(K ⊔ Kstar))
+    (hK_eq : K = OddOrder.BG.Ch3.S10.Msigma Mstar ⊓ Subgroup.centralizer (Kstar : Set G)) :
+    M ⊓ Mstar = K ⊔ Kstar ∧ IsCyclic ↥(M ⊓ Mstar) ∧ K ⊓ Kstar = ⊥ ∧
+      (∀ x ∈ K, ∀ y ∈ Kstar, Commute x y) := by
+  have heq : M ⊓ Mstar = K ⊔ Kstar :=
+    typeP_pair_inf_eq hG hM hP hKM hK hKstar hU hMstar hPstar hnc hKstarMstar hKstar_hall hZcyc hK_eq
+  refine ⟨heq, heq ▸ hZcyc, kappaHall_inf_Kstar_eq_bot hKM hK hKstar, fun x hx y hy => ?_⟩
+  letI : CommGroup ↥(K ⊔ Kstar) := IsCyclic.commGroup
+  exact congrArg Subtype.val
+    (mul_comm (⟨x, Subgroup.mem_sup_left hx⟩ : ↥(K ⊔ Kstar)) ⟨y, Subgroup.mem_sup_right hy⟩)
+
 end OddOrder.BG.Ch4.S16

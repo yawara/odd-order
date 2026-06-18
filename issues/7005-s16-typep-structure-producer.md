@@ -237,3 +237,44 @@ producer の唯一 sorry = 上記 `Nonempty (Σ' …)` の構成。中身:
 3. **primes**: II–IV は `TypePNontrivialCore` + bridge (1)(2); Type-V は type-II partner (BG Thm C)。
 4. **normalizer** W₁ ≤ N(U): Pf (13.1.b)「remark following Def (8.4)」。
 5. **q<p**: 両 prime 後 relabel (S/T ラベル設計)。
+
+---
+
+## ⚠⚠ 重要訂正 (2026-06-18 lane-f, Step 3 深掘り) — type-emptiness は real、enrich 必須を再確認
+
+Step 3 (residual 構成) に入って判明: 上の「tp は tractable」評価は S の**内在構造**には正しいが、
+**pairing は arbitrary mp では構成不能**(= 当初の type-emptiness 診断が正しい)。
+
+**論証**: producer は `(mp : Section16MaximalPair G) → Section16TypePStructure mp` で **任意の mp**
+を取る。`Section16MaximalPair` 公理 (`theorem88_caseB` = covering) は partner を**共役までしか固定
+しない**。canonical partner を `Mstar`、`mp.T := Mstar^g`(g が N(S)∩N(Mstar) 外)とすると:
+maximal ✓ / ≠S ✓ / IsTypeNonI ✓(共役不変)/ one_typeII ✓ / covering ✓(共役類同一)を全て満たすが、
+`S ⊓ Mstar^g` は一般に位数 pq cyclic でない ⟹ `Section16TypePStructure mp` が**空型** ⟹ residual
+`Nonempty(Σ' …, S∩T=W₁⊔W₂ cyclic)` は pathological mp で**偽** ⟹ honestly dischargeable でない。
+
+∴ **producer の sorry は Section16MaximalPair を enrich しない限り honest に埋まらない**(canonical
+partner witness を carry させ、mp.T = Mstar を強制)。これは **gap A / LAUNCH step 2 / issue 7006** が
+当初から指摘していた通り。「type data で tractable」は **S 内在構造のみ**で、pairing は別問題。
+
+### enrich の entanglement (深掘りで判明)
+
+mp producer `section16MaximalPair_of_isMinimalSimpleOdd` を canonical partner (typeP_duality 経由) で
+再構成するには `S14.IsTypeP S`(typeP_duality 入力)が要るが、`IsTypeNonI S → S14.IsTypeP S` の橋は
+`proposition_type_classification`(S16:894, **sorry**)に entangle。現 mp producer も既にこれに推移
+依存(syntactically sorry-free だが scaffold)。⟹ enrich は §16 sorry'd type-bridge と絡む大きな change。
+
+### 本セッション landing (Step 3 infrastructure)
+
+`typeP_pair_W_structure`(`S16_PairIntersection`): canonical pair の W-side 完全構造
+(`S∩T=K⊔Kstar` ∧ cyclic ∧ `K⊓Kstar=⊥` ∧ commute) を gap B + §14 API から組立。enrich 後の tp producer
+が pairing 4 field をこれで discharge。
+
+### 正しい次手 (Step 3 本体)
+
+1. **Section16MaximalPair を enrich**: canonical partner witness(K/Kstar/Hall/eq/types/nonconj/
+   `IsCyclic(K⊔Kstar)` = `typeP_pair_inf_eq` 入力一式、issue 7006 の field 群)。1 ∃-field でも可。
+2. **mp producer 再構成**: typeP_duality 経由で S, Mstar=T を canonical に構成
+   (theoremI assembly `S16_MainResults:1047-1078` が template、§16 type-bridge に entangle)。
+3. **tp producer discharge**: enriched mp.K/Kstar から `typeP_pair_W_structure` で pairing、
+   bridge 補題で prime(II–IV)、type data + coprime 構成で U-side、(14.1)/(13.2) で q<p。
+   engine `section16TypePStructure_of_typeData` が assemble(既 sorry-free)。
