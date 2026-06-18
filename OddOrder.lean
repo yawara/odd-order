@@ -179,6 +179,7 @@ import OddOrder.Peterfalvi.S08_CaseBEnumeration
 import OddOrder.Peterfalvi.S08_CoherenceWeighted
 import OddOrder.Peterfalvi.S08_CaseBWeightedEndgame
 import OddOrder.Peterfalvi.S08_CaseBAnchoredSeed
+import OddOrder.Peterfalvi.S08_CaseBSeedGlue
 import OddOrder.Peterfalvi.S09_NonexistenceCertain
 import OddOrder.Peterfalvi.S10_CoherenceWiring
 import OddOrder.Peterfalvi.S10_MinimalSimpleStructure
