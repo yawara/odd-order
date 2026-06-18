@@ -4,6 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 -/
 import OddOrder.Peterfalvi.S08_CaseBAssembly
 import OddOrder.Peterfalvi.S08_CaseBXChiCoherence
+import OddOrder.Peterfalvi.S08_CaseBEnumeration
 
 /-!
 # Peterfalvi §6.8.2 case-(B) — per-column anchored seed (`hXanchored`)
@@ -480,5 +481,52 @@ theorem inner_extension_caseB_Xset_Yset_eq_zero_of_irreducible
     (by rw [hYeq]; exact extension_apply_one_eq_zero_of_supported hyp.dade hyp.hconj cY hy_supp)
     (by rw [hXeq]; exact extension_apply_one_eq_zero_of_supported hyp.dade hyp.hconj cX hx_supp)
   rw [inner_conj_symm (cY.extension η) (cX.extension χ), hconcl.1, star_zero]
+
+/-- **(6.8.2) case-(B) `X ∪ Y` glue `hmixed`** — the seam orthogonality
+`⟨ν x, ν y⟩ = ⟨x, y⟩` of `coherentXunionYset_caseB_of_glued`, reduced to the single `cX`-construction
+obligation `hcolAgree` (`cX.extension μ_j = certainTypeExtension μ_j` on the certain-type columns, a
+property of the canonical `xChainCoherentW` base).
+
+Since `X(W₂) ⊥ Y` (`caseB_Xset_orthogonal_Yset`) both sides vanish; the image side splits by
+`caseB_S_member_column_or_irreducible`:
+
+* reducible certain-type column `x = μ_j`: `⟨cX.extension μ_j, η^{τ₁}⟩ = 0` by `hcolAgree` + the
+  column-`Y` seam `inner_certainTypeExtension_columnSum_coherentYset_extension_eq_zero`;
+* irreducible `x = Ind^L_H θ`: `⟨cX.extension χ, η^{τ₁}⟩ = 0` by the (4.1) seam
+  `inner_extension_caseB_Xset_Yset_eq_zero_of_irreducible` (reference `χ̄`).
+
+This is the `hmixed` input of `coherentXunionYset_caseB_of_glued`; only `cX` and `hcolAgree` remain
+(supplied by the canonical `xChainCoherentW` `X`-coherence construction). -/
+theorem caseB_hmixed
+    (hyp : SibleyDadeHypothesis G L H) [H.Normal]
+    (h46 : OddOrder.Peterfalvi.S06.Hypothesis46 (sharpImage H) L) (hHK : h46.K = H)
+    (hW1 : h46.W1 = hyp.W1)
+    [NeZero (Nat.card h46.W1)] [Invertible (Nat.card ↥h46.K : ℂ)]
+    [Fintype ↥(h46.W1 ⊔ h46.W2)] [Invertible (Nat.card ↥(h46.W1 ⊔ h46.W2) : ℂ)]
+    [Fintype (OddOrder.Peterfalvi.S06.ticVdiff h46).W]
+    [Invertible (Nat.card (OddOrder.Peterfalvi.S06.ticVdiff h46).W : ℂ)]
+    (hW2comm : h46.W2 ≤ ⁅H, H⁆)
+    (cX : OddOrder.Peterfalvi.S07.IsCoherent hyp.tau (hyp.Xset h46.W2)
+      (OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L))
+    (hcolAgree : ∀ χ₂ : (h46.W2.subgroupOf (h46.W1 ⊔ h46.W2)) →* ℂˣ, χ₂ ≠ 1 →
+      cX.extension (OddOrder.Peterfalvi.S06.columnSum h46 χ₂)
+        = OddOrder.Peterfalvi.S06.certainTypeExtension h46
+            (OddOrder.Peterfalvi.S06.columnSum h46 χ₂)) :
+    ∀ x ∈ hyp.Xset h46.W2, ∀ y ∈ hyp.Yset,
+      ClassFunction.inner (cX.extension x) (hyp.coherentYset.extension y)
+        = ClassFunction.inner x y := by
+  have hpair := caseB_Xset_orthogonal_Yset hyp h46 hHK hW1 hW2comm
+  intro x hx y hy
+  rw [hpair x hx y hy]
+  rcases caseB_S_member_column_or_irreducible hyp h46 hHK (hyp.Xset_subset_S hx) with
+    ⟨χ₂, hχ₂, hcol⟩ | hirr
+  · rw [← hcol, hcolAgree χ₂ hχ₂]
+    exact inner_certainTypeExtension_columnSum_coherentYset_extension_eq_zero hyp h46 hHK hy χ₂
+  · have hχconj : x.conj ∈ hyp.Xset h46.W2 :=
+      hyp.Xset_closedUnderConjugate_unconditional h46.W2 hx
+    have hχne : x ≠ x.conj := fun heq =>
+      (Xset_hasNoRealCharacters_caseB hyp h46 hHK).not_mem_of_isReal (heq.symm : x.IsReal) hx
+    exact inner_extension_caseB_Xset_Yset_eq_zero_of_irreducible hyp cX hyp.coherentYset hpair
+      hx hirr hχconj hχne hy
 
 end OddOrder.Peterfalvi.S08
