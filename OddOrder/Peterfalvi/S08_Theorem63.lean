@@ -98,4 +98,62 @@ theorem exists_SsubFiltration_member_degree_index (hyp : SibleyDadeHypothesis G 
     hyp.mem_SsubFiltration.mpr ⟨θ, hθne, hθker, rfl⟩,
     by rw [ClassFunction.induce_apply_one, hθdeg, mul_one]⟩
 
+/-- **(6.2) `S(A)`-sum bound, case (c2).**  The norm-weighted Peterfalvi (5.6) inequality for a
+filtration set: if `S₁` (coherent, `S(A) ⊆ S₁ ⊆ S`) cannot be extended by the break pair
+`{ψ, ψ̄}`, then the degree-square count over `S(A)` is bounded:
+`|L:K|·(|K:A| − 1) ≤ 2·ψ(1).re·η(1).re` for the degree-`|L:K|` anchor `η ∈ Yset ∩ S₁`.
+
+This is the filtration analogue of `xSum_le_two_psi_caseB`: the brick-3 family bound
+`sMember_degreeSqNormReBound_of_not_coherent` (case (c2), `h46`-supplied) bounds the enumerated
+`S₁`-family sum, into which the `S(A)` degree-square identity `sum_re_div_normSq_SsubFiltration_eq`
+injects `∑_{χ∈S(A)} χ(1)²/‖χ‖²` (`S(A) ⊆ S₁`, nonnegative weighted summands). -/
+theorem sSubFiltration_sum_le_two_psi_caseB
+    (hyp : SibleyDadeHypothesis G L H) [H.Normal]
+    (h46 : OddOrder.Peterfalvi.S06.Hypothesis46 (sharpImage H) L) (hHK : h46.K = H)
+    (hW1 : h46.W1 = hyp.W1)
+    [NeZero (Nat.card h46.W1)] [Invertible (Nat.card ↥h46.K : ℂ)]
+    [Fintype ↥(h46.W1 ⊔ h46.W2)] [Invertible (Nat.card ↥(h46.W1 ⊔ h46.W2) : ℂ)]
+    [Fintype (OddOrder.Peterfalvi.S06.ticVdiff h46).W]
+    [Invertible (Nat.card (OddOrder.Peterfalvi.S06.ticVdiff h46).W : ℂ)]
+    {A : Subgroup ↥L} [A.Normal]
+    {S₁ : Set (ClassFunction ↥L ℂ)} (hS₁sub : S₁ ⊆ hyp.S)
+    (hS₁conj : OddOrder.Peterfalvi.S03.ClosedUnderConjugate S₁) (hS₁fin : S₁.Finite)
+    (hS₁coh : OddOrder.Peterfalvi.S07.IsCoherent hyp.tau S₁
+      (OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L))
+    (hSAsub : hyp.SsubFiltration A ⊆ S₁)
+    {η : ClassFunction ↥L ℂ} (hηY : η ∈ hyp.Yset) (hηS₁ : η ∈ S₁)
+    {ψ : ClassFunction ↥L ℂ} (hψS : ψ ∈ hyp.S) (hψirr : IsIrreducibleCharacter ψ)
+    (hψnotS1 : ψ ∉ S₁) (hψcnotS1 : ψ.conj ∉ S₁)
+    (hnc : ¬ Nonempty (OddOrder.Peterfalvi.S07.IsCoherent hyp.tau
+      (S₁ ∪ {ψ, ψ.conj})
+      (OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L))) :
+    (H.index : ℝ) * ((Nat.card (↥H ⧸ A.subgroupOf H) : ℝ) - 1)
+      ≤ 2 * (ψ 1).re * (η 1).re := by
+  classical
+  obtain ⟨k, χmem, mc, hinj, hrange, hmemS1, hmcpos, hmcnorm, hfambound⟩ :=
+    sMember_degreeSqNormReBound_of_not_coherent hyp h46 hHK hW1 hS₁sub hS₁conj hS₁fin hS₁coh hηY
+      hηS₁ hψS hψirr hψnotS1 hψcnotS1 hnc
+  have hSAsum := sum_re_div_normSq_SsubFiltration_eq hyp (A := A)
+  set SAfilt := (Finset.univ.filter (fun θ : IrreducibleCharacter ↥H =>
+          (↑(A.subgroupOf H) : Set ↥H) ⊆ OddOrder.Peterfalvi.S03.characterKernel
+              (θ : ClassFunction ↥H ℂ) ∧ θ ≠ trivialIrreducibleCharacter ↥H)).image
+          (fun θ => ClassFunction.induce H θ.toClassFunction) with hSAdef
+  have hsub : SAfilt ⊆ (Set.range χmem).toFinset := by
+    intro χ hχ
+    rw [Set.mem_toFinset, hrange]
+    rw [hSAdef] at hχ
+    obtain ⟨θ, hθ, rfl⟩ := Finset.mem_image.mp hχ
+    obtain ⟨-, hker, hne⟩ := Finset.mem_filter.mp hθ
+    exact hSAsub (hyp.mem_SsubFiltration.mpr ⟨θ, hne, hker, rfl⟩)
+  rw [← hSAsum]
+  calc ∑ χ ∈ SAfilt, ((χ 1).re) ^ 2 / (ClassFunction.inner χ χ).re
+      ≤ ∑ χ ∈ (Set.range χmem).toFinset, ((χ 1).re) ^ 2 / (ClassFunction.inner χ χ).re :=
+        Finset.sum_le_sum_of_subset_of_nonneg hsub
+          (fun χ _ _ => div_nonneg (sq_nonneg _) (inner_self_re_nonneg χ))
+    _ = ∑ j : Fin k, ((χmem j 1).re) ^ 2 / (ClassFunction.inner (χmem j) (χmem j)).re :=
+        sum_toFinset_range_eq hinj (fun χ => ((χ 1).re) ^ 2 / (ClassFunction.inner χ χ).re)
+    _ = ∑ j : Fin k, ((χmem j 1).re) ^ 2 / mc j := by
+        refine Finset.sum_congr rfl (fun j _ => ?_); rw [hmcnorm j, Complex.ofReal_re]
+    _ ≤ 2 * (ψ 1).re * (η 1).re := hfambound
+
 end OddOrder.Peterfalvi.S08
