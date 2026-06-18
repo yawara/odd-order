@@ -164,6 +164,32 @@ producer ⑤ partB → ⑥ assembly。これらは clean な standalone でな�
 hUP / hPU_disj / hμ_range）は committed・green。次セッション = scaling（W₂≤P §13 入力下、~70 行）+ §13/§14 pieces
 （value-arg FPF / IsCyclic / partB / W₂≤P）+ assembly。
 
+### ✅✅ 2026-06-19 再開⁸ — hW2 scaling COMPLETE + assembly engine（`b2564baf`）
+
+前回 depletion で「次セッションに残した」唯一の ungated piece = **hW2 scaling を完遂**。さらに組み立て全体を
+literal-`sorry`-free な engine で検証。3 本 landing（full build 3863 jobs ~32s green、real sorry 140 不変）:
+
+- **`field_repr_rescale_to_W2`（axiom-clean = `[propext, Classical.choice, Quot.sound]`、§13 cite なし）**:
+  generic な体モデル `e₀` を `W₂≤P` 仮説下で rescale。`w₀∈W₂`（≠1）, `c := e₀(ofMul w₀) ≠ 0`,
+  `e := e₀.trans (×c⁻¹ の AddEquiv)`。`e(ofMul w₀)=1` ⟹ prime line `span 𝔽_p{1}` を `W₂` に正確に運ぶ。
+  証明核 = `Span = zpowers(ofAdd 1)`（ZMod p-線形性は `r•x = r.val•x` で nsmul 還元）→ `MonoidHom.map_zpowers`
+  → `zpowers(↑w₀) = W₂`（素数位数 `|W₂|=p`）。compat は体の可換性で survive。
+- **`exists_pu_field_repr_W2`（§13-cite）**: `exists_pu_field_repr` + 上記 rescaling を chain し、
+  `fieldNormalizerData_of_repr` が要求する `(e, μ, hμ_inj, hcompat, hW2)` 完全パッケージを産出。
+- **`field_normalizer_of_U_characteristic_of_inputs`（literal-sorry-free）**: §13/§14-gated facts を
+  明示仮説（`hu_full` / `IsCyclic ↥U` / `W₂≤P` / cyclotomic coprime / part(b)）に取り、`FieldNormalizerData`
+  を組み立てる engine。**σ-bridge 全体が typecheck することを検証**。gate は cite 先の §13 producer
+  (`basic_structure`/`c_eq_one`, Lane B) のみ。
+
+**⟹ (14.7) は named §13/§14 obligations に reduce 済**（docstring に recipe 明記）。**ungated field-algebra は
+完全に出し尽くした**。残務はすべて純 §13/§14:
+1. **`hu_full`+cyclotomic coprime**（value-arg, §14 FPF: `p≡1 mod q` 枝を W₂^y on U で除外）
+2. **`[IsCyclic ↥U]`**（§13 standing）
+3. **`W₂≤P`**（§13-structural; `FieldNormalizerData` の `W2_le_P` は data 入力ゆえ循環、独立供給要）
+4. **part(b)**（Q elem abelian / W₂◁Q / ∃y∈Q with W₂^y◁U = (13.2.b)/(14.5)）
+→ 5. これらを `_of_inputs` に渡して `field_normalizer_of_U_characteristic` を close。
+これらは exists_L/MHypothesis（14.3/14.10）+ case-B cascade と同じ Dade/§13 char theory gate（Lane B）。
+
 ## 完了条件
 
 `field_normalizer_structure` の `sorry` が消え、`lake build OddOrder OddOrder.AxiomsCheck` 緑。
