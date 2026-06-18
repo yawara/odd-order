@@ -301,6 +301,66 @@ noncomputable def section16MaximalPair_of_isMinimalSimpleOdd {G : Type*} [Group 
     one_typeII := h.2.2.2.2.2.1
     theorem88_caseB := h.2.2.2.2.2.2 }
 
+/-- **Type-P structure engine from the type data** (`sorry`-free, gated-endpoint skeleton).
+
+Given the Peterfalvi type data (`TypePData`) of both members of the maximal pair, this assembles
+the full `Section16TypePStructure` with the pairing factors `W₁ = S`'s cyclic complement,
+`W₂ = T`'s cyclic complement, `U, V` the type-data complements, and `W = S ∩ T`.  The fields that
+are *intrinsic to a single member* are discharged directly from the type data:
+
+* `S_deriv_eq_PU`/`T_deriv_eq_QV` from `TypePData.derivedInG_eq_fitting_sup_U` (`M' = M_F ⊔ U`);
+* `q_prime`/`p_prime` from the supplied primality of `|W₁(S)|`, `|W₁(T)|` (carried by
+  `TypePNontrivialCore` for type II–IV);
+* the counting identities `|U| = u·c`, `|V| = v·d` by Lagrange (`C = U ∩ C_G(M_F) ≤ U`).
+
+The *genuinely cross-member* facts — that `S ∩ T` is exactly the cyclic product
+`W₁(S) × W₁(T)` (BG §16 / Peterfalvi (8.9) pairing), the normalization `W₁ ≤ N_G(U)`
+(Peterfalvi (13.1.b), "remark following Def (8.4)"), and the ordering `q < p` — remain explicit
+hypotheses.  Discharging them for the canonical pair is the residual obligation of the producer
+`section16TypePStructure_of_isMinimalSimpleOdd` (issue 7005). -/
+noncomputable def section16TypePStructure_of_typeData {G : Type*} [Group G] [Finite G]
+    {mp : Section16MaximalPair G} (dataS : TypePData mp.S) (dataT : TypePData mp.T)
+    (hSprime : (Nat.card ↥dataS.W1).Prime) (hTprime : (Nat.card ↥dataT.W1).Prime)
+    (hWjoin : mp.S ⊓ mp.T = dataS.W1 ⊔ dataT.W1)
+    (hWcyc : IsCyclic ↥(mp.S ⊓ mp.T))
+    (hbot : dataS.W1 ⊓ dataT.W1 = ⊥)
+    (hcomm : ∀ x ∈ dataS.W1, ∀ y ∈ dataT.W1, Commute x y)
+    (hSnorm : dataS.W1 ≤ Subgroup.normalizer (dataS.U : Set G))
+    (hTnorm : dataT.W1 ≤ Subgroup.normalizer (dataT.U : Set G))
+    (hlt : Nat.card ↥dataS.W1 < Nat.card ↥dataT.W1) :
+    Section16TypePStructure mp where
+  W1 := dataS.W1
+  W2 := dataT.W1
+  W := mp.S ⊓ mp.T
+  U := dataS.U
+  V := dataT.U
+  W_eq_inter := rfl
+  W_eq_join := hWjoin
+  W1_inf_W2_eq_bot := hbot
+  W1_commutes_W2 := hcomm
+  W_cyclic := hWcyc
+  S_deriv_eq_PU := dataS.derivedInG_eq_fitting_sup_U
+  T_deriv_eq_QV := dataT.derivedInG_eq_fitting_sup_U
+  W1_normalizes_U := hSnorm
+  W2_normalizes_V := hTnorm
+  q := Nat.card ↥dataS.W1
+  p := Nat.card ↥dataT.W1
+  q_prime := hSprime
+  p_prime := hTprime
+  q_eq_card_W1 := rfl
+  p_eq_card_W2 := rfl
+  u := Nat.card ↥dataS.U /
+    Nat.card ↥(dataS.U ⊓ Subgroup.centralizer (maxNilpotentNormalHall mp.S : Set G))
+  v := Nat.card ↥dataT.U /
+    Nat.card ↥(dataT.U ⊓ Subgroup.centralizer (maxNilpotentNormalHall mp.T : Set G))
+  c := Nat.card ↥(dataS.U ⊓ Subgroup.centralizer (maxNilpotentNormalHall mp.S : Set G))
+  d := Nat.card ↥(dataT.U ⊓ Subgroup.centralizer (maxNilpotentNormalHall mp.T : Set G))
+  c_eq_card_C := rfl
+  d_eq_card_D := rfl
+  card_U_eq_uc := (Nat.div_mul_cancel (Subgroup.card_dvd_of_le inf_le_left)).symm
+  card_V_eq_vd := (Nat.div_mul_cancel (Subgroup.card_dvd_of_le inf_le_left)).symm
+  q_lt_p := hlt
+
 /-- **BG §14 type-P duality producer** (`sorry`) — *lane-f* (BG §14 `typeP_duality`).
 Given the maximal pair, constructs the cyclic structure `W = W₁W₂`, the complements
 `U, V`, the primes `p, q`, and the counting parameters. -/
