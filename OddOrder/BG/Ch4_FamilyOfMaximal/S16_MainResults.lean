@@ -4,6 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
 import OddOrder.BG.Ch4_FamilyOfMaximal.S15_MF
+import OddOrder.BG.Ch4_FamilyOfMaximal.S16_PairIntersection
 import OddOrder.GroupTheory.MaximalSubgroupType
 
 /-!
@@ -977,7 +978,7 @@ theorem theoremI_nilpotentHall_conjugacy_and_type_dichotomy [Finite G]
       ((∀ M : Subgroup G, M ∈ maximalSubgroups G → OddOrder.GroupTheory.IsTypeI M) ∨
         ∃ S T W1 W2 W : Subgroup G,
           S ∈ maximalSubgroups G ∧ T ∈ maximalSubgroups G ∧ S ≠ T ∧
-          W = W1 ⊔ W2 ∧ IsCyclic ↥W ∧
+          W = W1 ⊔ W2 ∧ IsCyclic ↥W ∧ S ⊓ T = W ∧
           OddOrder.GroupTheory.IsTypeNonI S ∧ OddOrder.GroupTheory.IsTypeNonI T ∧
           (OddOrder.GroupTheory.IsTypeII S ∨ OddOrder.GroupTheory.IsTypeII T) ∧
           ∀ M : Subgroup G, M ∈ maximalSubgroups G →
@@ -1057,12 +1058,26 @@ theorem theoremI_nilpotentHall_conjugacy_and_type_dichotomy [Finite G]
       set Kstar : Subgroup G :=
         OddOrder.BG.Ch3.S10.Msigma S ⊓ Subgroup.centralizer (K : Set G) with hKstardef
       -- Theorem 14.7 (`typeP_duality`): the dual pair `S, T := Mstar`, with covering.
-      obtain ⟨_, _, Mstar, ⟨hMstarMem, hMstarP, hSnconjMstar, _, hcyc, _, hP2disj, hcover⟩, _⟩ :=
+      obtain ⟨_, _, Mstar, ⟨hMstarMem, hMstarP, hSnconjMstar,
+          ⟨hKstarMstar, hKstar_hall, hK_eq⟩, hcyc, _, hP2disj, hcover⟩, _⟩ :=
         typeP_duality hG hS hSP (Subgroup.map_subtype_le K') hK hKstardef
-      refine Or.inr ⟨S, Mstar, K, Kstar, K ⊔ Kstar, hS, hMstarMem, ?_, rfl, hcyc, ?_, ?_, ?_, ?_⟩
+      -- A Hall `(κ(S) ∪ σ(S))'`-subgroup `U` of `S` (Hall's theorem in the solvable `S`), needed
+      -- to invoke `typeP_pair_inf_eq` (the reverse inclusion `S ∩ Mstar ≤ K ⊔ K*`).
+      obtain ⟨U', hU'⟩ :=
+        Ch03.hall_E_exists (G := ↥S) ((S14.kappa S ∪ OddOrder.BG.Ch3.S10.sigma S)ᶜ)
+      have hUeq : (U'.map S.subtype).subgroupOf S = U' :=
+        Subgroup.comap_map_eq_self_of_injective S.subtype_injective U'
+      have hU : Ch03.IsHallSubgroup ((S14.kappa S ∪ OddOrder.BG.Ch3.S10.sigma S)ᶜ)
+          ((U'.map S.subtype).subgroupOf S) := by rw [hUeq]; exact hU'
+      refine Or.inr ⟨S, Mstar, K, Kstar, K ⊔ Kstar, hS, hMstarMem, ?_, rfl, hcyc, ?_, ?_, ?_, ?_, ?_⟩
       · -- `S ≠ Mstar`: else `S` would be conjugate to itself `= Mstar`, against `¬conj S Mstar`.
         rintro rfl
         exact hSnconjMstar (S14.IsConjugateSubgroup.refl S)
+      · -- `S ∩ Mstar = W = K ⊔ K*`: **BG Theorem I clause (2)** (= Theorem 14.7(4) / C(6)).  The
+        -- forward inclusion is immediate; the reverse `S ∩ Mstar ≤ K ⊔ K*` is the genuine §16
+        -- structural content, proved in `S16_PairIntersection` as `typeP_pair_inf_eq`.
+        exact typeP_pair_inf_eq hG hS hSP (Subgroup.map_subtype_le K') hK hKstardef hU
+          hMstarMem hMstarP hSnconjMstar hKstarMstar hKstar_hall hcyc hK_eq
       · -- `IsTypeNonI S`: `S` is type P.
         exact typeP_imp_nonI S hS hSP
       · -- `IsTypeNonI Mstar`: `Mstar` is type P.
