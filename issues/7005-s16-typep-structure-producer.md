@@ -310,3 +310,32 @@ derivedInG T = M_F(T) ⊔ V ∧ |K| prime ∧ |Kstar| prime ∧ K ≤ N(U) ∧ K
   (`card_kappaHall_eq_derived_index`+`card_W1_eq_derived_index`+型データ common); Type-V は partner 論。
   ⚠ BG 14.7(6) は片側のみ prime 保証 → 両 prime は (13.1)/(8.9) の subtle argument。
 - **q<p**: (13.2.a)。
+
+---
+
+## ⛔ U-side residual は Pf §10–12 char theory (lane-b) に gated — loop 診断 (2026-06-19)
+
+`/loop` で U-side residual 攻略を継続 → **primes + ordering は lane-b の char theory に bottom-out**と確定:
+
+- **both-prime** (`|mp.K|`/`|mp.Kstar|` prime) = **Peterfalvi (10.11)** = `theorem88_caseB_prime_orders`
+  (`S12_MaximalIII_IV_V.lean:246`, **sorry**)。`Theorem88CaseBData` (W1/W2/W cyclic + S/T nonI + one_typeII)
+  から `(|W1|).Prime ∧ (|W2|).Prime` を与える。mp から CaseBData 構成可 (W1=mp.K, W2=mp.Kstar,
+  W_cyclic=mp.Z_cyclic) ゆえ **cite 可能だが §12 sorry**。
+- **type-V 除外** = **Peterfalvi (10.10)** = `no_typeV_maximal` (`S12:224`, **sorry**)。BG 14.7(6) は片側
+  prime のみ保証ゆえ、両 prime は type-V 除外 (III/IV なら型定義 (T7)(1) で prime) に依存。
+- **ordering** (`|mp.K| < |mp.Kstar|`) = (13.2.a) "if q<p then S type II" ← (10.10)/(11.9) §10/§11。
+  + labeling 問題 (exists_section16MaximalPair_data が κ-Hall size で S/T を選ぶ必要、両 prime 前提で循環的)。
+- §10/§11/§12 char files は sorry 多数 (S10_BGInterface 5 / S10_CoherenceWiring 6 /
+  S10_MinimalSimpleStructure 13 / S11 9 / S12 10) = lane-b 領域。
+
+### 結論
+**tp producer の残 sorry は lane-f では reduce 不能** (primes/ordering は lane-b の §10-12 char theory)。
+lane-f は BG 側で producer を限界まで前進させた (type-emptiness 解消 + W-side discharge)。残 residual =
+named lane-b 定理 ((10.11) `theorem88_caseB_prime_orders` 等) そのもの。
+
+### lane-f-doable な次手 (count は減らないが residual を精密化)
+1. **primes を (10.11) に wire**: mp→`Theorem88CaseBData`→`theorem88_caseB_prime_orders` cite
+   (S12 import 要; 依存が lane-b (10.11) に明示化、lane-b landing で auto-resolve)。
+2. **U-side complement** (BG-side, 非 char): K-invariant complement U to M_F in M' (coprime action;
+   mathlib は `exists_right_complement'_of_coprime` のみ、invariant 版は要構成)。
+3. これらを揃えても ordering が gated ゆえ producer は sorry-free 化せず → **真の gate = lane-b §10-12**。
