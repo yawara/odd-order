@@ -39,6 +39,31 @@ per-φ aggregation を全 X に展開(中心 φ_θ 被覆 + Classical.choose で
 ⚠ **「user-managed ChatGPT gap」では無くなった**(hard math 済) — Lean assembly のみ。ただし大型 multi-step。
 **↓ 以下 cont.⁴ は履歴 (point 3 canonical 説は上記で訂正済)。**
 
+## 🔨 2026-06-18 cont.⁶ — (S1) 着手: 一般 per-member anchored image 着地 + cX 構成の分解
+
+**✅ landed `caseB_member_anchored_image`** (`S08_CaseBAnchoredSeed.lean`, commit `dc94d1aa`,
+sorry-free・axiom-clean): `caseB_column_anchored_image` を**任意 irreducible θ** (W₂ 上非定数 `hθne`
+= `Ind^L_H θ∈X`) に一般化し、**seam 直交 `⟨X, η₁^{τ₁}⟩=0`** も同時出力
+(`caseB_constituentDecomposition_X_orthogonal`)。出力 =
+`∃ X a, (Ind θ)(1)=a·η₁(1) ∧ τ(Ind θ−a•η₁)=X−a•cY.ext η₁ ∧ ⟨X,cY.ext η₁⟩=0`。
+**⟹ (6.8.2.3) hXanchored + hXmixed を全 χ∈X 一様に供給する基盤** (reducible column / irreducible 不問)。
+
+**cX = `IsCoherent hyp.tau (Xset W2)` (extension=X(θ)) の構成 = 残 (S1) 本体。分解**:
+- **(P1) scaled-diff 純代数** (trivial): 2 member の anchored image から `τ(χᵢ−d•χ₁)=Xᵢ−d•X₁`
+  (η₁ 項相殺 ∵ `aᵢ=d·a₁`, d=χᵢ(1)/χ₁(1)∈ℕ ← H が p-group)。`caseB_member_anchored_image` ×2 + map_sub/nsmul。
+- **(P2) scaled-diff span 特徴付け** (本命の work): `zSupportedSpan(Xset W2)` が `{χᵢ−dᵢ•χ₁}` で張られる。
+  column 版 `mem_span_columnDiff_of_mem_zSupportedSpan`(`S06_CertainTypeCoherence:377`)は**等次数**ゆえ
+  unscaled `μⱼ−μₖ`。Xset W2 は次数バラバラ ⟹ scaled 版要。S07 に汎用エンジン候補:
+  `span_subset_span_zSupportedSpan_union_anchor_of_scaledDiffs`(`S07_Coherence:172`)・
+  `coherentOfPairChainCover`(`:4841`、xChainCoherentW が使用)。
+
+**⚠ 次の一手の前に決すべき設計 sub-question** (cX を最小労力で得る分岐):
+**`xChainCoherentW` の canonical chain-cX は hmixed を満たすか?** = `certainTypeSet_isCoherent_tau_canonical`
+の extension が column で X(θ) に一致するか? (一致すれば chain image=anchored image で **cX は xChainCoherentW で
+FREE**、残務は hmixed を `cX.ext χ = X(θ)` 経由で証明するのみ ⟹ P2 自作不要。不一致なら anchoredImages-cX を
+P2 で自作)。Peterfalvi では certain-type coherence image = (6.8.2.3) の X(θ) **のはず**だが未確認。
+**次セッション = この一致を `certainType_isCoherent` の extension 定義で精査 → cX 経路確定 (chain-free vs P2 自作)**。
+
 ## 🗂 (履歴・訂正済) 2026-06-18 cont.⁴ — anchoredImages route の必要性に疑問
 
 > ⚠ 本 block の疑問は cont.⁵ で解決済 (anchoredImages = ON-PATH/CORE)。point 3「canonical cX」は誤りと判明。
