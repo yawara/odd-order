@@ -87,6 +87,27 @@ rcases hyp.cases with hF | ⟨h46,…⟩
 非可換 = hXe (Xset ⁅H,H⁆ nonempty ⟹ ⁅H,H⁆≠⊥ via `SsubFiltration_bot` ⟹ commutator ↥H≠⊥)。
 p≥3 = p∣|H|∣|L| 奇 ⟹ p 奇。**⟹ 次の本丸 = Theorem (6.3) assembly ((6.2) break bound + minimal-A induction)**。
 
+### 🔨 cont.¹⁴ 進捗² — (6.3) 着手: (6.2) foundational 2 ピース landed、残 = (6.2) break bound (case-intertwined)
+
+新 leaf `S08_Theorem63.lean` (sorry-free):
+- **`sum_re_div_normSq_SsubFiltration_eq`** (`068ab98c`) = (6.2) の S(A) 次数二乗和
+  `∑_{χ∈S(A)} χ(1)²/‖χ‖² = |L:K|(|K:A|−1)` (case-B `sum_re_div_normSq_Xset_eq` を単一フィルタ簡約)。
+- **`exists_SsubFiltration_member_degree_index`** (`b0df4345`) = (6.2) の degree-|L:K| anchor
+  (A⊊K ⟹ degree-1 char inflate+Ind、divisibility |L:K|∣ψ(1) の源)。
+
+**▶ 残 = (6.2) break bound `|K:A|−1 ≤ 2|L:C|√|C:D|`** = 大型・**case-intertwined**:
+- 部品: break pair `exists_coherentBreakPair_general` (`:1035`) + (5.6) family bound + 上記 sum + theta bound
+  `theta_degree_le_index_mul_sqrt_index` (`:557`)。
+- **🚨 重要発見 (再調査不要)**: (5.6) family bound `sMember_degreeSqNormReBound_of_not_coherent`
+  (`S08_CaseBEnumeration:741`) は **h46 依存** (no-real / 列 Gram は case-B 固有)。break pair も
+  `HasNoRealCharacters Sb` を要求するが **S(A)/S(B) の no-real は c1/c2 で別証明** (c2=列/既約 dichotomy h46
+  依存、c1=Frobenius、既約は odd order)。⟹ **「general (6.2)」は naive に作れない** — (6.2)/(6.3) は (6.8) の
+  c1/c2 case 構造と絡む。raw engine `coherentDegreeSumBound_of_not_coherent` (`:2451`, h46 非依存) から
+  case 別に組むか、(6.8) M=1 適用を c1/c2 で分けて (6.2) を各々具体化する設計判断要。
+- minimal-A induction の部品は在庫 (`exists_maximal_normal_between`/`isNilpotent_normal_inf_center_ne_bot`/
+  `normal_central_of_maximal_normal_below`/`degreeBound_le_of_sqrt_bound`)。
+- **見積 ~1-2 session**。次着手 = (6.2) break bound を c1/c2 case 別 or raw-engine 一般で組む設計を確定 → 実装。
+
 ## 🚨🚨 2026-06-18 cont.¹² — 重大訂正: 「真の gate = hDeg = (6.6)」は **誤り**。(6.8.2) は anchored-image で chain/hDeg 不要
 
 **教科書 04.8 の (6.8) proof を直接精読(L140-235)して判明。cont.⁸/⁹/¹⁰ の「case-B X-coherence の真の gate =
