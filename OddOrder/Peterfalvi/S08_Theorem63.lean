@@ -80,4 +80,22 @@ theorem sum_re_div_normSq_SsubFiltration_eq (hyp : SibleyDadeHypothesis G L H)
     push_cast; ring
   exact Complex.ofReal_inj.mp key
 
+/-- **(6.2) degree-`|L:K|` anchor in `S(A)`.**  When `A ⊊ K` (here `K = H`), the nontrivial
+quotient `H/A` is (nilpotent, hence) of nontrivial abelianization, so it carries a degree-one
+irreducible character; inflated to `H` and induced to `L` this gives an `S(A)`-member of degree
+`|L:H| = |L:K|`.  This is the "`S(A)` contains a character of degree `|L:K|`" step of the (6.2)
+proof (mmd 04.8 L14), the source of the divisibility `|L:K| ∣ ψ(1)`. -/
+theorem exists_SsubFiltration_member_degree_index (hyp : SibleyDadeHypothesis G L H)
+    {A : Subgroup ↥L} [A.Normal]
+    (hAne : commutator (↥H ⧸ A.subgroupOf H) ≠ ⊤) :
+    ∃ φ ∈ hyp.SsubFiltration A, φ (1 : ↥L) = (H.index : ℂ) := by
+  letI : H.Normal := hyp.H_normal
+  haveI : (A.subgroupOf H).Normal := (inferInstance : A.Normal).subgroupOf H
+  obtain ⟨θ, hθne, hθker, hθdeg⟩ :=
+    exists_irreducibleCharacter_ne_trivial_subset_kernel_of_commutator_ne_top
+      (A.subgroupOf H) hAne
+  exact ⟨ClassFunction.induce H (θ : ClassFunction ↥H ℂ),
+    hyp.mem_SsubFiltration.mpr ⟨θ, hθne, hθker, rfl⟩,
+    by rw [ClassFunction.induce_apply_one, hθdeg, mul_one]⟩
+
 end OddOrder.Peterfalvi.S08
