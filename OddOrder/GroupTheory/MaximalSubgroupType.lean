@@ -159,6 +159,16 @@ structure TypePData (M : Subgroup G) where
 def IsTypeP (M : Subgroup G) : Prop :=
   Nonempty (TypePData M)
 
+/-- **Peterfalvi (8.8.b1) / BG (T6)(2)**: the cyclic factor `W₁` of a type-`P` maximal subgroup
+has order `|M : M'|` — it complements the derived subgroup `M' = [M,M]` in `M` (the `M_complement`
+field, mirroring `M = M' ⋊ W₁`).  This is the order that BG Theorem C(10) (type II–IV) shows to be
+prime; `TypePNontrivialCore` carries that primality.  Both this `W₁` and any Hall `κ(M)`-subgroup
+`K` of `M` complement `M'`, so they share this order — the bridge to BG §14 `typeP_duality`. -/
+theorem TypePData.card_W1_eq_derived_index {M : Subgroup G} (data : TypePData M) :
+    Nat.card ↥data.W1 = ((derivedInG M).subgroupOf M).index := by
+  rw [← Nat.card_congr (Subgroup.subgroupOfEquivOfLe data.W1_le).toEquiv,
+    ← data.M_complement.symm.index_eq_card]
+
 /-- Common type II--IV hypotheses from Peterfalvi (8.6). -/
 def TypePNontrivialCore (M : Subgroup G) (data : TypePData M) : Prop :=
   data.U ≠ ⊥ ∧ (Nat.card ↥data.W1).Prime ∧
