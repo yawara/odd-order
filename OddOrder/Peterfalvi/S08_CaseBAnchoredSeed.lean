@@ -982,6 +982,110 @@ theorem grid_mu_notMem_Xset
     · rw [hs] at hdvd; exact (dvd_neg).mp hdvd
   exact hw1 (Nat.dvd_one.mp (by exact_mod_cast hdvd1))
 
+/-- **(6.8.2) the dichotomy extension function** for the full `Xset W₂` coherence.  On the basis
+`Irr L`: an irreducible `X`-member `ω ∈ Xset W₂` maps to its anchored image `Ximg ω`; everything
+else falls back to the column extension `xChiExtensionFun` (which sends a grid `0`-row member
+`μ_{0χ₂}` to `Ximg (columnSum χ₂)`, other grid members to `0`).  By `grid_mu_notMem_Xset` the two
+branches never collide on the grid, so each column `columnSum χ₂` maps to `Ximg (columnSum χ₂)`. -/
+noncomputable def caseBXsetExtensionFun
+    (hyp : SibleyDadeHypothesis G L H)
+    (h46 : OddOrder.Peterfalvi.S06.Hypothesis46 (sharpImage H) L)
+    [NeZero (Nat.card h46.W1)] [Fintype ↥(h46.W1 ⊔ h46.W2)]
+    [Invertible (Nat.card ↥(h46.W1 ⊔ h46.W2) : ℂ)]
+    (Ximg : ClassFunction ↥L ℂ → ClassFunction G ℂ) :
+    IrreducibleCharacter ↥L → ClassFunction G ℂ :=
+  fun ω => if (ω : ClassFunction ↥L ℂ) ∈ hyp.Xset h46.W2 then Ximg (ω : ClassFunction ↥L ℂ)
+    else xChiExtensionFun h46 (fun χ₂ => Ximg (OddOrder.Peterfalvi.S06.columnSum h46 χ₂)) ω
+
+/-- The dichotomy extension `ν` (the case-(B) `τ₂` on the full `X`-set): the global `ℤ`-linear
+`CF(L) → CF(G)` built from `caseBXsetExtensionFun` on the basis `Irr L`. -/
+noncomputable def caseBXsetExtension
+    (hyp : SibleyDadeHypothesis G L H)
+    (h46 : OddOrder.Peterfalvi.S06.Hypothesis46 (sharpImage H) L)
+    [NeZero (Nat.card h46.W1)] [Fintype ↥(h46.W1 ⊔ h46.W2)]
+    [Invertible (Nat.card ↥(h46.W1 ⊔ h46.W2) : ℂ)]
+    (Ximg : ClassFunction ↥L ℂ → ClassFunction G ℂ) :
+    OddOrder.Peterfalvi.S07.IntegralCharacterMap ↥L G :=
+  ((OddOrder.Peterfalvi.S05.irreducibleCharacterBasis (G := ↥L)).constr ℂ
+    (caseBXsetExtensionFun hyp h46 Ximg)).restrictScalars ℤ
+
+/-- On a grid member `μ_{iχ₂}` (not an `X`-member, `grid_mu_notMem_Xset`) the dichotomy extension
+agrees with the column extension `xChiExtension`. -/
+theorem caseBXsetExtension_grid
+    (hyp : SibleyDadeHypothesis G L H) [H.Normal]
+    (h46 : OddOrder.Peterfalvi.S06.Hypothesis46 (sharpImage H) L) (hW1 : h46.W1 = hyp.W1)
+    [NeZero (Nat.card h46.W1)] [Fintype ↥(h46.W1 ⊔ h46.W2)]
+    [Invertible (Nat.card ↥(h46.W1 ⊔ h46.W2) : ℂ)]
+    (Ximg : ClassFunction ↥L ℂ → ClassFunction G ℂ)
+    (χ₂ : (h46.W2.subgroupOf (h46.W1 ⊔ h46.W2)) →* ℂˣ) (i : Fin (Nat.card h46.W1)) :
+    caseBXsetExtension hyp h46 Ximg ((h46.columnFamily χ₂).mu i : ClassFunction ↥L ℂ)
+      = xChiExtension h46 (fun χ₂ => Ximg (OddOrder.Peterfalvi.S06.columnSum h46 χ₂))
+          ((h46.columnFamily χ₂).mu i) := by
+  classical
+  rw [caseBXsetExtension, LinearMap.restrictScalars_apply]
+  conv_lhs => rw [← OddOrder.Peterfalvi.S05.irreducibleCharacterBasis_apply (G := ↥L)
+    ((h46.columnFamily χ₂).mu i)]
+  rw [(OddOrder.Peterfalvi.S05.irreducibleCharacterBasis (G := ↥L)).constr_basis ℂ _
+    ((h46.columnFamily χ₂).mu i), caseBXsetExtensionFun,
+    if_neg (grid_mu_notMem_Xset hyp h46 hW1 χ₂ i),
+    xChiExtension, LinearMap.restrictScalars_apply]
+  conv_rhs => rw [← OddOrder.Peterfalvi.S05.irreducibleCharacterBasis_apply (G := ↥L)
+    ((h46.columnFamily χ₂).mu i)]
+  rw [(OddOrder.Peterfalvi.S05.irreducibleCharacterBasis (G := ↥L)).constr_basis ℂ _
+    ((h46.columnFamily χ₂).mu i)]
+
+/-- On a certain-type column `columnSum χ₂` the dichotomy extension sends it to `Ximg (columnSum χ₂)`:
+every grid member maps via the column extension (`caseBXsetExtension_grid`), and only the `0`-row
+survives (`xChiExtension_columnSum`). -/
+theorem caseBXsetExtension_columnSum
+    (hyp : SibleyDadeHypothesis G L H) [H.Normal]
+    (h46 : OddOrder.Peterfalvi.S06.Hypothesis46 (sharpImage H) L) (hW1 : h46.W1 = hyp.W1)
+    [NeZero (Nat.card h46.W1)] [Fintype ↥(h46.W1 ⊔ h46.W2)]
+    [Invertible (Nat.card ↥(h46.W1 ⊔ h46.W2) : ℂ)]
+    (Ximg : ClassFunction ↥L ℂ → ClassFunction G ℂ)
+    (χ₂ : (h46.W2.subgroupOf (h46.W1 ⊔ h46.W2)) →* ℂˣ) :
+    caseBXsetExtension hyp h46 Ximg (OddOrder.Peterfalvi.S06.columnSum h46 χ₂)
+      = Ximg (OddOrder.Peterfalvi.S06.columnSum h46 χ₂) := by
+  classical
+  rw [OddOrder.Peterfalvi.S06.columnSum_def, map_sum,
+    Finset.sum_congr rfl (fun i _ => caseBXsetExtension_grid hyp h46 hW1 Ximg χ₂ i),
+    ← map_sum, ← OddOrder.Peterfalvi.S06.columnSum_def, xChiExtension_columnSum]
+
+/-- On an irreducible `X`-member `χ ∈ Xset W₂` the dichotomy extension sends it to `Ximg χ`
+(the `ω ∈ Xset W₂` branch on the basis element `χ`). -/
+theorem caseBXsetExtension_irr
+    (hyp : SibleyDadeHypothesis G L H) [H.Normal]
+    (h46 : OddOrder.Peterfalvi.S06.Hypothesis46 (sharpImage H) L)
+    [NeZero (Nat.card h46.W1)] [Fintype ↥(h46.W1 ⊔ h46.W2)]
+    [Invertible (Nat.card ↥(h46.W1 ⊔ h46.W2) : ℂ)]
+    (Ximg : ClassFunction ↥L ℂ → ClassFunction G ℂ)
+    {χ : ClassFunction ↥L ℂ} (hirr : IsIrreducibleCharacter χ)
+    (hmem : χ ∈ hyp.Xset h46.W2) :
+    caseBXsetExtension hyp h46 Ximg χ = Ximg χ := by
+  classical
+  have hcoe : ((⟨χ, hirr⟩ : IrreducibleCharacter ↥L) : ClassFunction ↥L ℂ) = χ := rfl
+  rw [caseBXsetExtension, LinearMap.restrictScalars_apply]
+  conv_lhs => rw [← hcoe, ← OddOrder.Peterfalvi.S05.irreducibleCharacterBasis_apply (G := ↥L)
+    (⟨χ, hirr⟩ : IrreducibleCharacter ↥L)]
+  rw [(OddOrder.Peterfalvi.S05.irreducibleCharacterBasis (G := ↥L)).constr_basis ℂ _
+    (⟨χ, hirr⟩ : IrreducibleCharacter ↥L), caseBXsetExtensionFun, hcoe, if_pos hmem]
+
+/-- **The dichotomy extension realizes the anchored images on the whole `X`-set**: `ν χ = Ximg χ`
+for every `χ ∈ Xset W₂` (column or irreducible, via `caseB_S_member_column_or_irreducible`). -/
+theorem caseBXsetExtension_eq
+    (hyp : SibleyDadeHypothesis G L H) [H.Normal]
+    (h46 : OddOrder.Peterfalvi.S06.Hypothesis46 (sharpImage H) L) (hHK : h46.K = H)
+    (hW1 : h46.W1 = hyp.W1)
+    [NeZero (Nat.card h46.W1)] [Invertible (Nat.card ↥h46.K : ℂ)]
+    [Fintype ↥(h46.W1 ⊔ h46.W2)] [Invertible (Nat.card ↥(h46.W1 ⊔ h46.W2) : ℂ)]
+    (Ximg : ClassFunction ↥L ℂ → ClassFunction G ℂ)
+    {χ : ClassFunction ↥L ℂ} (hmem : χ ∈ hyp.Xset h46.W2) :
+    caseBXsetExtension hyp h46 Ximg χ = Ximg χ := by
+  rcases caseB_S_member_column_or_irreducible hyp h46 hHK (hyp.Xset_subset_S hmem) with
+    ⟨χ₂, -, hcol⟩ | hirr
+  · rw [← hcol, caseBXsetExtension_columnSum hyp h46 hW1 Ximg χ₂]
+  · exact caseBXsetExtension_irr hyp h46 Ximg hirr hmem
+
 /-- **⚠ NON-VIABLE base (kept as a structural record).**  The map convention here is correct
 (`hyp.tau = dadeIntegralCharacterMap hyp.dade (hyp.dade.fullDadeIsometryData hyp.hconj)` defeq, so
 `xChainCoherentW hyp.dade hyp.hconj` lands at `hyp.tau` — no retargeting), **but the `hstep`
