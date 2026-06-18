@@ -40,6 +40,23 @@ multiplicative group. The only nontrivial input is **U acts irreducibly on P**, 
 So (14.2)(a) reduces to a self-contained representation-theory + elementary-number-theory
 argument. The genuinely §13-gated part is only (14.2)(b) (Q's structure, `y`, via (13.2.b)/(14.5)).
 
+## ✅✅ DONE: the entire abstract (14.2)(a) machinery (2026-06-18)
+
+`OddOrder/GroupTheory/RepresentationTheory/SingerField.lean`, all sorry-free + axiom-clean:
+
+* `nonempty_singerFieldData` / `card_K_eq` / `nonempty_ringEquiv_galoisField` (Singer engine, `3b8b7204`)
+* `cyclotomicQuotient_not_dvd_pow_sub_one` (number-theory core, `c4622552`)
+* `pow_sub_one_dvd_of_dvd`, `not_dvd_factorial_pred` (helpers)
+* **`isSimpleModule_of_isCyclic_faithful_card`** (Singer irreducibility keystone, `9043df39`):
+  faithful cyclic `C` of order `(p^q-1)/(p-1)` acting on `F_p`-module of order `p^q` ⟹ simple.
+  Needs only `[Module (MonoidAlgebra (ZMod p) C) M]` + `[NeZero (card C : ZMod p)]` (the dual
+  `ZMod p`/scalar-tower structure turned out unused — Maschke supplies it via `restrictScalars`).
+* **`exists_galoisField_repr`** (abstract (14.2)(a), `4bdedb49`): same hypotheses ⟹
+  `∃ e : M ≃+ GaloisField p q, ∃ μ : C →* (GaloisField p q)ˣ, Injective μ ∧ e (of c • x) = μ c · e x`.
+
+⟹ **steps 1 and 3 are complete.** The remaining (14.7) work is purely FT-specific wiring,
+and it depends on §13/§15 producers (see "Remaining" below).
+
 ## ✅ Done: the Singer engine (commit `3b8b7204`)
 
 `OddOrder/GroupTheory/RepresentationTheory/SingerField.lean` — sorry-free, axiom-clean
@@ -70,14 +87,24 @@ argument. The genuinely §13-gated part is only (14.2)(b) (Q's structure, `y`, v
      `Module (MonoidAlgebra (ZMod p) U)` (for the action) with an `IsScalarTower`; applying Singer to a
      `Submodule` `Sᵢ` and reading `finrank Sᵢ` is the fiddly part. ~100-150 lines, own focused build.
      Input `u=(p^q-1)/(p-1)` comes from (14.7)'s arithmetic (already done).
-2. **`P` as `F_p[U]`-module** from the conjugation action (`IsElementaryAbelian p P` ⟹ `ZMod p`-module;
-   U-conjugation is `F_p`-linear). Build the `Module (MonoidAlgebra (ZMod p) ↥U) ↥P` directly.
-3. **Apply Singer engine** → `P ≃+ GF(p^q)`, `U → GF(p^q)ˣ`.
-4. **σ assembly** — build `sigma : GF(p^q)⋊U* →* G` matching `P`/`U`/`W₂`, using (not modifying)
-   the frozen Core defs (`fieldNormalizerFrobeniusGroup`, `fieldNormalizerKernel`, …). Heavy but
-   ungated.
+2. ✅ **abstract field structure** — `exists_galoisField_repr` (DONE, see above). Just needs its
+   hypotheses supplied.
+3. **`P` as `F_p[U]`-module + discharge hypotheses** — the FT-specific wiring:
+   - `IsElementaryAbelian p P` ⟹ `ZMod p`-module on `↥P`; `U`-conjugation is `F_p`-linear ⟹
+     `Representation (ZMod p) ↥U ↥P` ⟹ `Module (MonoidAlgebra (ZMod p) ↥U) (asModule)`.
+     ⚠ asModule tactic-synth trap may resurface — provide the instance explicitly / apply at term level.
+   - `Nat.card ↥P = p^q` (from `basic_structure` (13.2), **a sorried §13 producer**),
+     `Nat.card ↥U = (p^q-1)/(p-1)` (from (14.7) arithmetic + `c_eq_one`), faithful (`c_eq_one`),
+     `NeZero` (|U| coprime to p). ⟹ `exists_galoisField_repr` gives `P ≃+ GF(p^q)`, `U → GF(p^q)ˣ`.
+4. **σ assembly** — build `sigma : GF(p^q)⋊U* →* G` matching `P`/`U`/`W₂` from the (14.2)(a) iso,
+   using (not modifying) the frozen Core defs (`fieldNormalizerFrobeniusGroup`, `fieldNormalizerKernel`,
+   …). Heavy mechanical wiring.
 5. **part (14.2)(b)** — `Q` elem abelian, `W₂` normalizes `Q`, `∃ y∈Q` — via (13.2.b)/(14.5).
-   **This is the only §13-gated piece** (and is a small structural read-off in the textbook).
+   §13-gated structural read-off.
+
+**Net**: the genuinely-novel/ungated math of (14.2)(a) is DONE. What's left is FT-specific plumbing
+that **bottoms out in the sorried §13/§15 producers** (`basic_structure`, `c_eq_one`, the (14.7)
+case arithmetic) — i.e. the same §13 character/structure theory that gates `exists_L/MHypothesis`.
 
 `exists_LHypothesis`/`exists_MHypothesis` (14.3/14.10) and the case-B cascade remain Dade-gated
 (Lane B's §3-13 character theory), independent of the above.
