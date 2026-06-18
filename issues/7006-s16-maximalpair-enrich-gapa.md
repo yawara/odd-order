@@ -32,8 +32,8 @@ type-P partner を `Mstar`、`T' := Mstar^g` (非自明共役) とすると `T'`
 
 ## やること
 
-**`Section16MaximalPair` を partner witness で enrich** (owner = lane-g / hub; 構造変更ゆえ
-lane-f は所有境界で触れない)。`typeP_pair_inf_eq` の入力にちょうど対応する field 群を追加:
+**`Section16MaximalPair` を partner witness で enrich** (owner = **lane-f**; 2026-06-18 lane-g 退役で
+BG 全域が F に集約され、struct 改変も F が単独承認可)。`typeP_pair_inf_eq` の入力にちょうど対応する field 群を追加:
 
 - [ ] `Section16MaximalPair` に以下を追加 (canonical packaging):
       `K Kstar : Subgroup G` / `K ≤ S` / `Ch03.IsHallSubgroup (kappa S) (K.subgroupOf S)` /

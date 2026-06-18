@@ -6,20 +6,21 @@
 > **2026-06-11 追加**: 合流 commit が成立したら最後に `git push origin main` (cron job `a8824a71`;
 > 変化なし/全 abort 時は push しない)。
 
-## レーン (2026-06-14: B+F+G+H、branch = lane-b/f/g/h、FT spine pipeline)
+## レーン (2026-06-18 最新³: B+F+H の 3 レーン体制、branch = lane-b/f/h — **G 退役・BG を F に集約**)
 
-| レーン | branch | 内容 | 推奨モデル | 自動合流 |
-|---|---|---|---|---|
-| **B** | `lane-b` | Pf §6: (4.x) certain-type → case-B → (6.8) capstone (`S08_CoherenceTheorems:59` 唯一実 sorry) | Opus 4.8 (1M) | ✅ 対象 |
-| **F** | `lane-f` | **Wielandt (9.1) I-1 critical path** (2026-06-16 夜³ reactivate, issue 7004): `CoprimeAction`/`RepresentationTheory/*` のボトムアップ。on-path lead-up (I-3→step2→系(i)→I-2) を loop、I-1 modular Brauer hard wall で escalate。**producing** (F=0 は first commit 後なら stall 候補) | Opus 4.8 (1M) | ✅ 対象 |
-| **G** | `lane-g` | **§16 skeleton pre-positioning** (2026-06-17 夜² ユーザー裁可で §15→§16 転換): `S16_MainResults` 主結果 (proposition_type_classification → theoremI_type_dichotomy_of_inputs → theoremII_tame_embedding_of_inputs) を `_of_inputs` skeleton 化。§15.2 は depleted。**S16_MainResults editable 部を G に再 grant** (F は Wielandt) | Opus 4.8 (1M) | ✅ 対象 |
-| **H** | `lane-h` | **long pole 単独**: Lem 12.17 TI clause (`S12_E`) → Prop 14.2 (g) `S14:1796` → Thm 14.7 `typeP_duality` `S14:1964` (Thm 3.10(a) は完了済) | Opus 4.8 (1M) | ✅ 対象 |
+| レーン | branch | 本 | 内容 | 推奨モデル | 自動合流 |
+|---|---|---|---|---|---|
+| **B** | `lane-b` | Peterfalvi | Pf §6: (4.x) certain-type → case-B → (6.8) capstone (`S08_CoherenceTheorems:59` 唯一実 sorry) → §13 Dade grid `section16CharacterData` (issue 1004, deferred) | Opus 4.8 (1M) | ✅ 対象 |
+| **F** | `lane-f` | **BG 集約** | **BG §9/§14/§16 + POLE-1 構造側を単独所有** (2026-06-18 G 退役で集約): `S16_MainResults`/`S16_PairIntersection`/`S14_TypePCounting` 編集可 + producer `section16MaximalPair`(済)/`section16TypePStructure`(sorry, issue 7005) + `Section16MaximalPair` enrich (issue 7006) + Wielandt §9 (park, issue 7004)。即タスク = option-1 ②enrich→③typeP producer discharge | Opus 4.8 (1M) | ✅ 対象 |
+| **H** | `lane-h` | Peterfalvi | **POLE-2** = Pf (14.2) `field_normalizer_structure` (`S16_NonExistenceG:1965`, issue 2009)。tractable 部 landing 済、残 14.7 finite-field model は §10-13 char gate | Opus 4.8 (1M) | ✅ 対象 |
 
-**G 固有の取り決め (2026-06-12)**: (1) G は **S12_E.lean を編集しない** (F の active ファイル)。
-(2) G の §12 依存は sorry'd statement の引用で賄う — **新規 `axiom` 宣言が G から来たら従来どおり
-abort+ユーザー承認**。(3) `notes/bg/s13_prime_action.md` は G 所有 (F は触らない)。
-(4) issue base: B=1000 / F=7000 / **G=8000** / **H=2000**。
-マージ順 = **F → G → B → H** (独立レーンゆえ順序は形式的)。
+**F 固有の取り決め (2026-06-18, G 退役後)**: (1) F は **BG 全域 (`S14_*`/`S16_*`/`FeitThompson.lean` の §16 producer 2 本) を単独所有**。
+旧「G が S16_MainResults 所有 / F は cite のみ」「G は S12_E 編集禁止」等の F↔G 分割取り決めは**全廃**。
+(2) `Section16MaximalPair` struct の型改変は F が単独承認可 (旧「hub/user 承認要」は集約で解除) — 但し
+下流 `section16CharacterData` (lane-b) + assembly に build-green を保て (field **追加**ゆえ非破壊)。
+(3) **新規 `axiom` 宣言は従来どおり abort+ユーザー承認**。(4) `notes/bg/*` は F 所有。
+(5) issue base: B=1000 / **F=7000 (旧 G の 8000 番台 issue も F が継承)** / **H=2000**。
+マージ順 = **F → B → H** (独立レーンゆえ順序は形式的)。
 
 **H 固有の取り決め (2026-06-12)**: (1) H は **Lane B の §4–§9 coherence/certain-type ファイル
 (`S04_*`〜`S09_*`) を編集しない** (cite のみ)。(2) §10–13 は BG↔Pf interface (BG Thm A–E/I–II)
@@ -54,7 +55,7 @@ branch とも削除済み。旧 **A** / **D** も同様に退役済み (履歴�
 
 1. 各レーンの未マージ確認: `git log --oneline main..<branch>`。
    **全レーン 0 なら「変化なし」1行報告で即終了**（build を走らせない）。
-2. **F → G → B → H の順**で（独立レーンゆえ順序は形式的）、未マージがあれば自動合流:
+2. **F → B → H の順**で（独立レーンゆえ順序は形式的; G は 2026-06-18 退役）、未マージがあれば自動合流:
    - マージ前の実 sorry 数を記録: `bin/count-sorry`
      （prose 偽陽性 [sorry-free / sorryAx / `sorry'd` / backtick 引用] を除外する判定器。
        旧 `grep '(^|[^a-zA-Z-])sorry'` は 259 と過大計上したが count-sorry は 146 ≈ 実 141。
@@ -157,6 +158,17 @@ branch とも削除済み。旧 **A** / **D** も同様に退役済み (履歴�
 
 ## 現状メモ
 
+- **2026-06-18 (最新³) — lane-g 退役 → BG を F に集約 (ユーザー裁可)**: レーン分担が「B,H=Peterfalvi /
+  F,G=BG」に整理された後、F↔G の BG 内分割 (G=§16 main results / F=§14+POLE-1 構造) が
+  ハンドシェイク待ち (issue 7006 の enrich を G が、producer discharge を F が担当) で **3h 停滞**して
+  いたため、ユーザー裁可で **lane-g を退役し BG 全域を F に集約**。手順: (1) G 最終 commit `f492e046`
+  (forward-half `kappa_join_kstar_le_pair_inf` 削除、lane-f の `typeP_pair_inf_eq` が supersede) を合流
+  (merge `0c2470fd`, build 緑 3860 jobs / AxiomsCheck OK / 実 sorry 140 不変)、(2) `git worktree remove`
+  + `git branch -d lane-g` (全成果 main 合流済を確認の上)。**F が BG §16 option-1 チェーンを端から端まで
+  単独で回せる** (②`Section16MaximalPair` enrich + dichotomy clause 復活 → ③`section16TypePStructure`
+  producer discharge)。issue 7006 (旧 lane-g/hub) は F に移管、8000 番 issue も F が継承。lane table +
+  F LAUNCH.md REASSIGN #3 更新済。残レーン = **B + F + H** の 3 体制。cron は session-only ゆえ要再作成
+  (B/F/H、push なし)。
 - **2026-06-18 (後刻) — POLE-1 設計訂正 + option-1 再タスク + 4 レーン合流**: cron 再消滅 (`/model` 切替) →
   新 cron `9fb5aff8` (`4,19,34,49 * * * *`, session-only, push なし) 再作成。**4 レーン合流** (f→g→b→h, clean,
   build 緑 3859 jobs / AxiomsCheck OK / 実 sorry **141→140**): 目玉 = **lane-g が `section16MaximalPair`
