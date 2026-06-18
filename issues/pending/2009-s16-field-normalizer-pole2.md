@@ -94,6 +94,26 @@ module-setup → `exists_galoisField_repr` 適用 (|P|=p^q `basic_structure` + f
 + part(b) (13.2.b/14.5 = §13)。`field_normalizer_of_U_characteristic` の docstring に reduction を明示。
 full build 3860 jobs ~12.6s green、real sorry 140 不変 (σ-bridge は reduction lemma、新 sorry 無し)。
 
+### ✅ 2026-06-18 再開⁵ cite-route 訂正 + 構造入力 2 本 (commits `a6ab11ee`/`427e36e9`)
+
+**訂正**: 「POLE-2 は §13-gated で停止」は早計だった (ユーザー指摘「cite してできることないの？」)。sorried §13 定理
+(`basic_structure`/`c_eq_one`/`caseB_order_u`=13.15) は **citeable** で、repo は既にこれを多用 (`u_modEq_one_mod_q`
+S16:1491、`u_eq_full_cyclotomic_of_caseB` S16:1692 = proven が sorried §13 を cite)。⟹ cite で (14.7) を前進可能。
+
+**教科書 (14.7) は短い**: part(b)=(13.2.b)+(14.5) / あとは `u=full` を示せば足り (cite (14.6)(9.7)(13.12))、
+それは (13.15)`caseB_order_u` の二分 + W₂^y の U への FPF 作用 `q≡qu≡1 (mod p)` 矛盾 (q<p)。
+
+**着地した σ-bridge 構造入力 2 本** (`fieldNormalizerData_of_repr` の hypotheses):
+- ✅ `conj_mem_P` (hUP: ∀v∈U x∈P, v·x·v⁻¹∈P) + `U_le_normalizer_P` — **完全 unconditional** (Hypothesis
+  フィールド S_deriv_eq_PU/P_eq_SF + maxNilpotentNormalHall_le_normalizer のみ、axiom-clean)。
+- ✅ `P_inf_U_eq_bot` (hPU_disj: P⊓U=⊥) — **§13-cite** (P elem abelian⟹P≤C_G(P)、c_eq_one⟹C=⊥)、body
+  sorry-free だが transitive に sorryAx (NOT axiom-clean)。
+
+**残る (14.7) core (multi-session)**: ① value-argument `u=full` (FPF `u≡1 mod p` = W₂^y on U が**未形式化**、
+要 §14-structural) ② `Additive ↥P` の 𝔽_p[U]-module 構成 (~150 行、infra `IsElementaryAbelian.zmodModule`
+PRank:87 在) → `exists_galoisField_repr` 適用 → e/μ/hcompat ③ hW2 (prime line↔W₂、iso の scaling) ④ partB
+(13.2.b/14.5 cite)。infra は揃い blocked ではない。
+
 ## 完了条件
 
 `field_normalizer_structure` の `sorry` が消え、`lake build OddOrder OddOrder.AxiomsCheck` 緑。
