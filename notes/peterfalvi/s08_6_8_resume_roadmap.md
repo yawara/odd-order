@@ -136,6 +136,18 @@ degree theory を要する:
 **∴ cX = 大型 multi-session §6 work**(weighted chain consumer + degree producer monolith + map congr)。
 **機械的でない**。**(B) glue も mixed-X ν 構築要**。
 
+> ### ✅ cont.⁹ 更新 (2026-06-18) — weighted chain consumer DONE、map congr は不要だった
+> **`caseB_Xset_isCoherent_of_hstepW`**(`S08_CaseBAnchoredSeed.lean`, commit `804fbfe1`, sorry-free・
+> axiom-clean): cX を **per-step `hstep` (XAdjoinStepInputW) のみに gate** する chain consumer。
+> 🔑 **cont.⁸ の「map congr monolith 要」は誤り**: `hyp.tau = dadeIntegralCharacterMap hyp.dade
+> (hyp.dade.fullDadeIsometryData hyp.hconj)` が **defeq** ゆえ `xChainCoherentW hyp.dade hyp.hconj` が
+> hyp.tau に直接 land(retarget 不要)、base `certainTypeSet_isCoherent_tau_canonical` も defeq 一致。
+> 上記 #1「新規 chain consumer 構築」= **完了**(thin wrapper だった)。
+> **∴ cX 残務 = per-step `hstep` (= XAdjoinStepInputW producer) のみ** = (6.6) degree producer monolith。
+> core field (Dmem/hortho/htau1) = `caseB_member_orthoDatum` 既存。真の gate = **hDeg `2a < ∑ deg²/mc`**
+> (=(6.6) degree-divisibility、Frobenius `commonIndexPrimePowerSums` の weighted 版)+ field assembly
+> (brick 3 `sMember_degreeSqNormBound` を **column-anchor** 用に翻案、brick 3 は Y-anchor 前提ゆえ要 adapt)。
+
 **FT 文脈**: (6.8) は [[ft-path-policy]] で **FT carrier から orphaned (deferred-payoff)** — cX を完成しても
 feitThompson の sorry は今は減らない。⟹ cX 着手は「(6.8) を完全に閉じる」価値 vs 「§14 counting (lane-H) 等
 on-path piece」の優先度判断を要する。**本セッションの確実な成果 = hmixed 完成**(seam という長年の難所)。
