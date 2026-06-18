@@ -87,6 +87,34 @@ sorry-free・axiom-clean): `caseB_column_anchored_image` を**任意 irreducible
 **→ (2) cX = xChainCoherentW の hstep assembly**(caseB_member_orthoDatum を XAdjoinStepInputW に昇格)
 **→ (3) coherentXunionYset_caseB_of_glued 配線 + diagonal D**。canonical 路線で確定。P2 span 自作は不要。
 
+## ✅✅✅ 2026-06-18 cont.⁷ — hmixed COMPLETE (両 seam + case-split assemble)、残 = cX + ν/D glue
+
+cont.⁶ の (1) hmixed を**完全 assemble**。3 lemma 着地(全 `S08_CaseBAnchoredSeed.lean`、sorry-free・axiom-clean、
+full build 3858 jobs green):
+1. **`caseB_member_anchored_image`**(`dc94d1aa`)— (6.8.2.3) per-member anchored image + X(θ)⊥Y、任意 θ。
+2. **`inner_extension_caseB_Xset_Yset_eq_zero_of_irreducible`**(`23272240`)— **irreducible-χ seam**
+   `⟨cX.ext χ, cY.ext η⟩=0`。Frobenius `inner_extension_Xset_centralCommutator_Yset_eq_zero_general` の
+   mixed-X 版だが all-X-irreducible 不要: 参照 χ'=χ̄(conj-closed + no-real)、source は hpair から
+   `inner_eq_zero_of_mem_span_of_pairwise_orthogonal`、(4.1) signed-difference。**= 旧「唯一の非自明残」を解決**。
+3. **`caseB_hmixed`**(`e3afb9de`)— glue `hmixed` を **cX + hcolAgree のみに gate**:
+   X⊥Y(`caseB_Xset_orthogonal_Yset`)で両辺 0 → case-split(`caseB_S_member_column_or_irreducible`):
+   column = `hcolAgree`(cX.ext μ_j=certainTypeExtension μ_j)+ 既存 column-Y seam
+   `inner_certainTypeExtension_columnSum_coherentYset_extension_eq_zero`(`S08_CaseBCoherence2:1449`)、
+   irreducible = #2。
+
+**∴ hmixed 完成。残 2 ピース**:
+- **(A) cX = `IsCoherent hyp.tau (Xset h46.W2)`** = `xChainCoherentW`(base=certainTypeSet canonical、
+  cover=`caseB_Xset_conjugatePairCover` 既存)+ **per-step `hstep : XAdjoinStepInputW`**
+  (`caseB_member_orthoDatum` `S08_CaseBEnumeration:341` が D+hortho+htau1 core 供給、残=全 field assemble =
+  **大型 fresh effort**)。**未 instantiate**。**+ hcolAgree**(cX.ext(col)=certainTypeExtension(col)、chain が
+  base 拡張保存 + congrMap extension 不変 ⟹ 成立のはず、要証明)。
+- **(B) ν/D/hgen/hDτ glue 配線** = `coherentXunionYset_caseB_of_glued`(`S08_CaseBCoherence2:1616`)の
+  combined map ν(cX|X + cY|Y glue)+ diagonal D。template=`coherentCertainTypeSet_union_Yset_via_anchoredImages`
+  だが mixed-X 用に要調整(orthonormal glue は column 不可、線形独立 glue 要)。
+
+**▶ 次の一手 = (A) cX 構成** → (B) glue → seed `IsCoherent (Xset W2∪Y)` → `nonempty_coherent_S_caseB`(既存)
+→ S08:59。hmixed は `caseB_hmixed` で完成済。
+
 ## 🗂 (履歴・訂正済) 2026-06-18 cont.⁴ — anchoredImages route の必要性に疑問
 
 > ⚠ 本 block の疑問は cont.⁵ で解決済 (anchoredImages = ON-PATH/CORE)。point 3「canonical cX」は誤りと判明。
