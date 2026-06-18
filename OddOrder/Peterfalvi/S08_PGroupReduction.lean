@@ -3,6 +3,7 @@ Copyright (c) 2026 The Odd Order Project. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
 import OddOrder.Peterfalvi.S08_CaseBSeedGlue
+import OddOrder.Peterfalvi.S08_CoherenceCore
 
 /-!
 # Peterfalvi (6.5): reduction to a non-abelian `p`-group — `(6.8)` application
@@ -111,5 +112,60 @@ theorem exists_isPGroup_H_of_c2_of_card_le (hyp : SibleyDadeHypothesis G L H)
     exact hb.symm
   exact isPGroup_of_isNilpotent_of_coprime_fixedPoints_le_commutator hcop.symm hfix'
     (card_abelianization_H_odd hyp) (card_W1_odd hyp) hbound
+
+/-- A `p`-group factor of the odd group `H` (`p` prime, `H ≠ ⊥`) has `p ≥ 3`: `p ∣ |H| ∣ |L|` and
+`|L|` is odd, so `p` is an odd prime. -/
+theorem three_le_of_isPGroup_H (hyp : SibleyDadeHypothesis G L H)
+    {p : ℕ} (hp : p.Prime) (hHp : IsPGroup p ↥H) : 3 ≤ p := by
+  haveI : Fact p.Prime := ⟨hp⟩
+  obtain ⟨n, hn⟩ := hHp.exists_card_eq
+  have hn0 : n ≠ 0 := by
+    rintro rfl
+    rw [pow_zero] at hn
+    exact (Finite.one_lt_card_iff_nontrivial.mpr
+      ((Subgroup.nontrivial_iff_ne_bot H).mpr hyp.H_ne_bot)).ne' hn
+  have hpH : p ∣ Nat.card ↥H := hn ▸ dvd_pow_self p hn0
+  have hpL : p ∣ Nat.card ↥L := hpH.trans H.card_subgroup_dvd_card
+  have hpodd : Odd p := hyp.card_L_odd.of_dvd_nat hpL
+  have h2 : 2 ≤ p := hp.two_le
+  rcases Nat.lt_or_ge p 3 with h | h
+  · interval_cases p
+    · exact absurd hpodd (by decide)
+  · exact h
+
+/-- **`H` is non-abelian** in the `X`-nonempty branch: `X(⁅H,H⁆) ≠ ∅` forces `⁅H,H⁆ ≠ ⊥`, hence
+`commutator ↥H ≠ ⊥`.  (If `⁅H,H⁆ = ⊥` then `S(⁅H,H⁆) = S(⊥) = S`, so `X(⁅H,H⁆) = S − S = ∅`.) -/
+theorem commutator_ne_bot_of_Xset_commutator_nonempty (hyp : SibleyDadeHypothesis G L H)
+    (hXne : (hyp.Xset ⁅H, H⁆).Nonempty) : _root_.commutator ↥H ≠ ⊥ := by
+  letI : H.Normal := hyp.H_normal
+  intro hbot
+  rw [← commutator_subgroupOf_self] at hbot
+  have hcommbot : (⁅H, H⁆ : Subgroup ↥L) = ⊥ :=
+    (Subgroup.subgroupOf_eq_bot.mp hbot).eq_bot_of_le (Subgroup.commutator_le_left H H)
+  have hXempty : hyp.Xset ⁅H, H⁆ = ∅ := by
+    show hyp.S \ hyp.SsubFiltration ⁅H, H⁆ = ∅
+    rw [hcommbot, hyp.SsubFiltration_bot, Set.diff_self]
+  rw [hXempty] at hXne
+  exact Set.not_nonempty_empty hXne
+
+/-- **Peterfalvi (6.8) — Frobenius case (6.8)(c1): `S` is coherent.**  When `L` is a Frobenius group
+with kernel `H` and complement `W₁`, and the `X`-set `X(⁅H,H⁆)` is nonempty (so `H` is non-abelian),
+the Sibley set `S` is coherent.
+
+This *fully closes* the (6.8)(c1) branch: by contradiction, if `S` is not coherent then the (6.5)
+reduction `isPGroup_of_not_coherent` makes `H` a `p`-group; `p ≥ 3` (odd order) and `H` non-abelian
+(`X`-nonempty) feed the case-(A) Frobenius coherence `nonempty_coherent_S_caseA_of_frobenius`,
+contradicting non-coherence. -/
+theorem nonempty_coherent_S_of_frobenius (hyp : SibleyDadeHypothesis G L H)
+    (hF : OddOrder.Isaacs.Ch06.IsFrobeniusGroup (↥L) H hyp.W1)
+    (hXne : (hyp.Xset ⁅H, H⁆).Nonempty) :
+    Nonempty (OddOrder.Peterfalvi.S07.IsCoherent hyp.tau hyp.S
+      (OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L)) := by
+  letI : H.Normal := hyp.H_normal
+  by_contra hncoh
+  obtain ⟨p, hp, hHp⟩ := hyp.isPGroup_of_not_coherent hF hncoh
+  exact hncoh (hyp.nonempty_coherent_S_caseA_of_frobenius hF
+    (commutator_ne_bot_of_Xset_commutator_nonempty hyp hXne) hp
+    (three_le_of_isPGroup_H hyp hp hHp) hHp)
 
 end OddOrder.Peterfalvi.S08
