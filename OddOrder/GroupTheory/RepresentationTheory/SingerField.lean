@@ -7,7 +7,11 @@ import Mathlib.RingTheory.SimpleModule.Basic
 import Mathlib.RingTheory.Ideal.Quotient.Operations
 import Mathlib.Algebra.MonoidAlgebra.Basic
 import Mathlib.FieldTheory.Finite.GaloisField
+import Mathlib.FieldTheory.Finite.Basic
 import Mathlib.Data.Nat.GCD.Basic
+import Mathlib.Data.Nat.Prime.Factorial
+import Mathlib.RepresentationTheory.Maschke
+import Mathlib.GroupTheory.SpecificGroups.Cyclic
 
 /-!
 # The Singer mechanism: irreducible abelian linear actions realize fields
@@ -156,5 +160,180 @@ theorem cyclotomicQuotient_not_dvd_pow_sub_one {p q D : ℕ} (hp : 2 ≤ p) (hq 
   have hmul' : u * (m + 1) + 1 = (m + 2) ^ q := by omega
   have hpq2 : (m + 2) ^ 2 ≤ (m + 2) ^ q := Nat.pow_le_pow_right (by omega) hq.two_le
   nlinarith [hmul', hpq2, Nat.mul_le_mul hle (le_refl (m + 1))]
+
+/-- If `a ∣ b` then `p^a - 1 ∣ p^b - 1` (a divisor of exponents lifts to a divisor of
+`p^· - 1`).  Derived from `gcd(p^a-1, p^b-1) = p^{gcd a b}-1` with `gcd a b = a`. -/
+theorem pow_sub_one_dvd_of_dvd {p a b : ℕ} (h : a ∣ b) : p ^ a - 1 ∣ p ^ b - 1 := by
+  have hg : Nat.gcd (p ^ a - 1) (p ^ b - 1) = p ^ a - 1 := by
+    rw [Nat.pow_sub_one_gcd_pow_sub_one, Nat.gcd_eq_left h]
+  rw [← hg]
+  exact Nat.gcd_dvd_right _ _
+
+/-- A prime `q` does not divide `(q-1)!`. -/
+theorem not_dvd_factorial_pred {q : ℕ} (hq : q.Prime) : ¬ q ∣ (q - 1).factorial := by
+  rw [Nat.Prime.dvd_factorial hq]
+  have := hq.two_le
+  omega
+
+/-! ## Irreducibility of a large-order faithful cyclic action
+
+The Singer construction is applied to a cyclic group `C` of order `(p^q-1)/(p-1)` acting
+faithfully on an `F_p`-space `M` of order `p^q` (`q` prime).  Such an action is automatically
+**irreducible** (`M` is a simple `F_p[C]`-module): otherwise Maschke decomposes `M` into simple
+constituents of dimensions `dᵢ < q`; each `Sᵢ` becomes a field of order `p^{dᵢ}` (Singer engine),
+so a generator `g` satisfies `g^{p^{dᵢ}-1}=1` on `Sᵢ`, hence `g^{p^D-1}=1` on `M` for `D=(q-1)!`
+(`dᵢ ∣ D`); faithfulness gives `|C| ∣ p^D-1` with `q ∤ D`, contradicting
+`cyclotomicQuotient_not_dvd_pow_sub_one`. -/
+section Irreducibility
+
+variable {p : ℕ} [Fact p.Prime] {C M : Type u}
+  [CommGroup C] [IsCyclic C] [Finite C]
+  [AddCommGroup M] [Module (MonoidAlgebra (ZMod p) C) M] [Finite M]
+
+/-- **Singer irreducibility.**  A faithful action of a cyclic group `C` of order
+`(p^q-1)/(p-1)` on an `F_p`-module `M` of order `p^q` (`q` prime) is irreducible.
+
+`NeZero (Nat.card C : ZMod p)` records that `|C|` is coprime to `p` (so Maschke applies);
+it holds because `(p^q-1)/(p-1)` divides `p^q-1`, which is coprime to `p`. -/
+theorem isSimpleModule_of_isCyclic_faithful_card {q : ℕ} (hq : q.Prime)
+    [NeZero (Nat.card C : ZMod p)]
+    (hcardM : Nat.card M = p ^ q)
+    (hcardC : Nat.card C = (p ^ q - 1) / (p - 1))
+    (hfaith : ∀ c : C, (∀ x : M, MonoidAlgebra.of (ZMod p) C c • x = x) → c = 1) :
+    IsSimpleModule (MonoidAlgebra (ZMod p) C) M := by
+  classical
+  have hp2 : 2 ≤ p := (Fact.out (p := p.Prime)).two_le
+  have hq2 : 2 ≤ q := hq.two_le
+  have hMpos : 0 < Nat.card M := by rw [hcardM]; positivity
+  haveI : IsSemisimpleModule (MonoidAlgebra (ZMod p) C) M := inferInstance
+  haveI : Nontrivial M := by
+    have hp2q : 2 ≤ p ^ q := le_trans hp2 (Nat.le_self_pow hq.pos.ne' p)
+    have : 1 < Nat.card M := by rw [hcardM]; omega
+    exact (Finite.one_lt_card_iff_nontrivial).mp this
+  by_contra hns
+  obtain ⟨s, _hindep, hsup, hsimple⟩ :=
+    IsSemisimpleModule.exists_sSupIndep_sSup_simples_eq_top (MonoidAlgebra (ZMod p) C) M
+  obtain ⟨g, hg⟩ := IsCyclic.exists_generator (α := C)
+  set D := (q - 1).factorial with hDdef
+  set N := p ^ D - 1 with hNdef
+  -- `g^N` fixes every simple constituent `m ∈ s`.
+  have hfix : ∀ m ∈ s, ∀ x : M, x ∈ m → MonoidAlgebra.of (ZMod p) C (g ^ N) • x = x := by
+    intro m hm x hxm
+    haveI hsm : IsSimpleModule (MonoidAlgebra (ZMod p) C) ↥m := hsimple m hm
+    haveI : Fintype ↥m := Fintype.ofFinite _
+    obtain ⟨data⟩ := nonempty_singerFieldData (p := p) (C := C) (M := ↥m)
+    -- `|m| = p^d`, `1 ≤ d < q`, `d ∣ D`.
+    have hmdvd : Nat.card ↥m ∣ Nat.card M :=
+      AddSubgroup.card_addSubgroup_dvd_card m.toAddSubgroup
+    obtain ⟨d, hdq, hmcard⟩ := (Nat.dvd_prime_pow (Fact.out (p := p.Prime))).mp (hcardM ▸ hmdvd)
+    have hmne : m ≠ ⊤ := by
+      rintro rfl
+      exact hns (IsSimpleModule.congr Submodule.topEquiv.symm)
+    have hcard_ne : Nat.card ↥m ≠ Nat.card M := by
+      intro heq
+      apply hmne
+      have hAtop : m.toAddSubgroup = ⊤ := AddSubgroup.eq_top_of_card_eq m.toAddSubgroup heq
+      rwa [Submodule.toAddSubgroup_eq_top] at hAtop
+    have hmlt : Nat.card ↥m < Nat.card M :=
+      lt_of_le_of_ne (Nat.le_of_dvd hMpos hmdvd) hcard_ne
+    have hdltq : d < q := by
+      rw [hmcard, hcardM] at hmlt
+      exact (Nat.pow_lt_pow_iff_right (by omega : 1 < p)).mp hmlt
+    have hd1 : 1 ≤ d := by
+      have h2 : 2 ≤ Nat.card ↥m :=
+        (Finite.one_lt_card_iff_nontrivial).mpr
+          (IsSimpleModule.nontrivial (MonoidAlgebra (ZMod p) C) ↥m)
+      rcases Nat.eq_zero_or_pos d with h0 | h
+      · rw [h0, pow_zero] at hmcard; omega
+      · exact h
+    have hdD : d ∣ D := Nat.dvd_factorial hd1 (by omega)
+    -- `μ(g)^(p^d-1) = 1`, hence `μ(g)^N = 1`.
+    have hKcard : Fintype.card data.K = p ^ d := by
+      rw [data.card_K_eq, ← Nat.card_eq_fintype_card, hmcard]
+    have hμpow : (data.μ g) ^ (p ^ d - 1) = 1 := by
+      have hu : (data.μ g) ^ (Fintype.card data.Kˣ) = 1 := pow_card_eq_one
+      rwa [Fintype.card_units, hKcard] at hu
+    have hμN : (data.μ g) ^ N = 1 := by
+      obtain ⟨k, hk⟩ := pow_sub_one_dvd_of_dvd (p := p) hdD
+      rw [hNdef, hk, pow_mul, hμpow, one_pow]
+    -- Transport along `data.compat` to fix `x`.
+    have hcompat := data.compat (g ^ N) ⟨x, hxm⟩
+    have hμcoe : ((data.μ (g ^ N) : data.K)) = 1 := by
+      rw [map_pow, hμN, Units.val_one]
+    rw [hμcoe, one_mul] at hcompat
+    have hfixsub : MonoidAlgebra.of (ZMod p) C (g ^ N) • (⟨x, hxm⟩ : ↥m) = ⟨x, hxm⟩ :=
+      data.e.injective hcompat
+    simpa using congrArg (Subtype.val) hfixsub
+  -- `g^N` fixes all of `M` (the fixed locus is a submodule containing `sSup s = ⊤`).
+  have hfixM : ∀ x : M, MonoidAlgebra.of (ZMod p) C (g ^ N) • x = x := by
+    have hle : (⊤ : Submodule (MonoidAlgebra (ZMod p) C) M) ≤
+        LinearMap.eqLocus
+          (LinearMap.lsmul (MonoidAlgebra (ZMod p) C) M
+            (MonoidAlgebra.of (ZMod p) C (g ^ N))) LinearMap.id := by
+      rw [← hsup]
+      refine sSup_le fun m hm => ?_
+      intro x hx
+      simpa [LinearMap.mem_eqLocus] using hfix m hm x hx
+    intro x
+    have hx : x ∈ LinearMap.eqLocus _ _ := hle Submodule.mem_top
+    simpa [LinearMap.mem_eqLocus] using hx
+  -- Faithfulness gives `g^N = 1`, so `card C ∣ N`, contradicting the number theory.
+  have hgN : g ^ N = 1 := hfaith _ hfixM
+  have hcardCdvd : Nat.card C ∣ N := by
+    have h := orderOf_dvd_of_pow_eq_one hgN
+    rwa [orderOf_eq_card_of_forall_mem_zpowers hg] at h
+  rw [hcardC, hNdef] at hcardCdvd
+  exact cyclotomicQuotient_not_dvd_pow_sub_one hp2 hq (not_dvd_factorial_pred hq) hcardCdvd
+
+/-- **Peterfalvi (14.2)(a), abstract form.**  A faithful action of a cyclic group `C` of order
+`(p^q-1)/(p-1)` on an `F_p`-module `M` of order `p^q` (`q` prime) realizes `M` as the Galois
+field `GF(p^q)` with `C` embedded in the multiplicative group `GF(p^q)ˣ`: there is an additive
+isomorphism `e : M ≃+ GF(p^q)` and an injective `μ : C →* GF(p^q)ˣ` with `e (c • x) = μ c · e x`.
+
+This is the field-isomorphism that the Section 16 finite-field model (`FieldNormalizerData`)
+requires: combine `isSimpleModule_of_isCyclic_faithful_card` (irreducibility), the Singer engine,
+and `nonempty_ringEquiv_galoisField` (uniqueness of finite fields). -/
+theorem exists_galoisField_repr {q : ℕ} (hq : q.Prime) [NeZero (Nat.card C : ZMod p)]
+    (hcardM : Nat.card M = p ^ q) (hcardC : Nat.card C = (p ^ q - 1) / (p - 1))
+    (hfaith : ∀ c : C, (∀ x : M, MonoidAlgebra.of (ZMod p) C c • x = x) → c = 1) :
+    ∃ (e : M ≃+ GaloisField p q) (μ : C →* (GaloisField p q)ˣ),
+      Function.Injective μ ∧
+      ∀ (c : C) (x : M),
+        e (MonoidAlgebra.of (ZMod p) C c • x) = (μ c : GaloisField p q) * e x := by
+  classical
+  haveI : Fintype M := Fintype.ofFinite _
+  haveI hsimp : IsSimpleModule (MonoidAlgebra (ZMod p) C) M :=
+    isSimpleModule_of_isCyclic_faithful_card hq hcardM hcardC hfaith
+  obtain ⟨data⟩ := nonempty_singerFieldData (p := p) (C := C) (M := M)
+  obtain ⟨φ⟩ := data.nonempty_ringEquiv_galoisField hq.pos.ne'
+    (by rw [← Nat.card_eq_fintype_card, hcardM])
+  refine ⟨data.e.trans φ.toAddEquiv,
+    (Units.map (φ : data.K →+* GaloisField p q).toMonoidHom).comp data.μ, ?_, ?_⟩
+  · -- `μ` is injective: `μ c = 1 ⟹ data.μ c = 1 ⟹ c` acts trivially `⟹ c = 1`.
+    rw [injective_iff_map_eq_one]
+    intro c hc
+    apply hfaith c
+    intro x
+    have hcoe : φ ((data.μ c : data.K)) = 1 := by
+      have := congrArg (Units.val) hc
+      simpa [Units.coe_map] using this
+    have hdμ : (data.μ c : data.K) = 1 := by
+      have := φ.injective (hcoe.trans (map_one φ).symm)
+      exact this
+    have hcompat := data.compat c x
+    rw [hdμ, one_mul] at hcompat
+    exact data.e.injective hcompat
+  · intro c x
+    have hμc : ((((Units.map (φ : data.K →+* GaloisField p q).toMonoidHom).comp data.μ) c :
+        (GaloisField p q)ˣ) : GaloisField p q) = φ ((data.μ c : data.K)) := by
+      simp [Units.coe_map]
+    calc (data.e.trans φ.toAddEquiv) (MonoidAlgebra.of (ZMod p) C c • x)
+        = φ (data.e (MonoidAlgebra.of (ZMod p) C c • x)) := rfl
+      _ = φ ((data.μ c : data.K) * data.e x) := by rw [data.compat c x]
+      _ = φ ((data.μ c : data.K)) * φ (data.e x) := map_mul _ _ _
+      _ = (((Units.map (φ : data.K →+* GaloisField p q).toMonoidHom).comp data.μ) c :
+            GaloisField p q) * (data.e.trans φ.toAddEquiv) x := by rw [hμc]; rfl
+
+end Irreducibility
 
 end OddOrder.RepresentationTheory

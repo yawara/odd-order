@@ -64,6 +64,19 @@ U 巡回・忠実 ⟹ `u = lcm(uᵢ)` (Maschke 分解 Pᵢ、各 `uᵢ ∣ p^{d�
 ⟹ (14.7) は「§13 に深く gate」ではなく、**(1)(4) が ungated な multi-session 実装、(5) のみ §13 gate**。
 exists_L/MHypothesis (14.3/14.10) + caseB cascade は依然 Dade gate (Lane B)。
 
+### ✅✅ 2026-06-18 抽象 (14.2)(a) 機構 COMPLETE (commits `9043df39` + `4bdedb49`)
+- **`isSimpleModule_of_isCyclic_faithful_card`** (`9043df39`): U-irreducibility 補題完成 (step 1)。
+  Maschke 半単純分解 → 各単純成分に Singer engine → `g^{p^D-1}=1` (D=(q-1)!, q∤D) → faithful ⟹
+  `|C|∣p^D-1` → `cyclotomicQuotient_not_dvd_pow_sub_one` で矛盾。dual structure 不要 (Maschke が
+  restrictScalars で供給)、`[NeZero (card C : ZMod p)]` のみ。
+- **`exists_galoisField_repr`** (`4bdedb49`): 抽象 (14.2)(a) capstone。faithful cyclic |C|=(p^q-1)/(p-1)
+  作用 on |M|=p^q ⟹ `∃ e : M ≃+ GaloisField p q, μ : C →* GF(p^q)ˣ (injective), e(of c•x)=μ c·e x`。
+- すべて sorry-free + axiom-clean、full build 3859 jobs green。
+- **⟹ step 1 + 3 (abstract math) DONE**。残り = FT-specific wiring (step 3 P-as-F_p[U]-module +
+  hypotheses discharge / step 4 σ assembly frozen Core / step 5 part(b))。**これらは §13/§15 の
+  sorried producers (`basic_structure`(13.2 で |P|=p^q), `c_eq_one`(faithful), (14.7) case 算術) に
+  bottom-out** = exists_L/MHypothesis と同じ §13 char theory gate。正本 = notes/peterfalvi/s16_14_7_field_construction.md。
+
 ## 完了条件
 
 `field_normalizer_structure` の `sorry` が消え、`lake build OddOrder OddOrder.AxiomsCheck` 緑。
