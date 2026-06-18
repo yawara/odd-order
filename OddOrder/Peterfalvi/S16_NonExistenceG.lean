@@ -595,6 +595,23 @@ theorem conj_mem_P (hyp : Hypothesis (G := G)) (v : ↥hyp.base.U) (x : ↥hyp.b
   have hv : (v : G) ∈ Subgroup.normalizer hyp.base.P := U_le_normalizer_P hyp v.2
   exact (Subgroup.mem_normalizer_iff.mp hv (x : G)).mp x.2
 
+/-- **(14.7) `hPU_disj` input**: `P ∩ U = 1`.  Since `P` is elementary abelian it
+centralizes itself, so `P ⊓ U ≤ U ⊓ C_G(P) = C = 1` by (13.12) `c = 1`.  Cites the
+(sorried) §13 producers `basic_structure` and `c_eq_one`. -/
+theorem P_inf_U_eq_bot [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hyp : Hypothesis (G := G)) :
+    hyp.base.P ⊓ hyp.base.U = ⊥ := by
+  obtain ⟨data, _⟩ := OddOrder.Peterfalvi.S15.basic_structure hG hyp.base
+  haveI : IsMulCommutative ↥hyp.base.P :=
+    IsMulCommutative.of_comm data.P_elementaryAbelian.comm
+  have hP_le_cent : hyp.base.P ≤ Subgroup.centralizer (hyp.base.P : Set G) :=
+    Subgroup.le_centralizer (H := hyp.base.P)
+  have hC_bot : hyp.base.C = ⊥ := by
+    apply Subgroup.eq_bot_of_card_eq
+    rw [← hyp.base.c_eq_card_C, OddOrder.Peterfalvi.S15.c_eq_one hG hyp.base]
+  rw [eq_bot_iff, ← hC_bot, hyp.base.C_eq]
+  exact le_inf inf_le_right (inf_le_left.trans hP_le_cent)
+
 /-- **Peterfalvi (14.7)**: if `U` is characteristic in `H`, then the final
 field-normalizer configuration (14.2) holds.
 
