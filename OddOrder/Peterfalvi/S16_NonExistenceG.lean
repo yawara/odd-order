@@ -1188,6 +1188,73 @@ private theorem cyclotomic_quotient_modEq_one_mod_base {p q : ℕ}
     exact dvd_pow_self p (Nat.succ_ne_zero k)
   simpa using hzero.add_right 1
 
+/-- **Peterfalvi (14.7) value argument** (arithmetic core).  In case (9.7.b), the
+`p ≡ 1 mod q` branch of (13.15) is incompatible with `u ≡ 1 mod p` — the congruence the
+fixed-point-free action of `W₂^y` on `U` supplies in (14.7).  In that branch
+`q · u = (p^q-1)/(p-1) ≡ 1 mod p` (geometric sum), so `q ≡ q·u ≡ 1 mod p` (using
+`u ≡ 1 mod p`), forcing `p ∣ q - 1` against `q < p`.  Hence `u` takes its full cyclotomic
+value and `q ∤ (p-1)` (i.e. `¬ p ≡ 1 mod q`).  Reduces the (14.7) value argument to the single
+fixed-point-free congruence `u ≡ 1 mod p`; cites the (sorried) case-(b) data `CaseBForSData`. -/
+theorem u_eq_full_of_caseB_of_u_modEq_one_mod_p {hyp : Hypothesis (G := G)}
+    (Sdata : CaseBForSData hyp) (hu_mod_p : hyp.base.u ≡ 1 [MOD hyp.base.p]) :
+    hyp.base.u = (hyp.base.p ^ hyp.base.q - 1) / (hyp.base.p - 1) ∧
+      ¬ hyp.base.p ≡ 1 [MOD hyp.base.q] := by
+  by_cases hmod : hyp.base.p ≡ 1 [MOD hyp.base.q]
+  · exfalso
+    have hqdvd : hyp.base.q ∣ (hyp.base.p ^ hyp.base.q - 1) / (hyp.base.p - 1) :=
+      OddOrder.Peterfalvi.S15.cyclotomic_quotient_dvd_of_modEq_one hyp.base.p_prime hmod
+    have hu_div : hyp.base.u =
+        (hyp.base.p ^ hyp.base.q - 1) / (hyp.base.p - 1) / hyp.base.q := by
+      rw [Sdata.u_eq_of_p_modEq_one hmod, Nat.div_div_eq_div_mul,
+        Nat.mul_comm (hyp.base.p - 1) hyp.base.q]
+    have hqu : hyp.base.q * hyp.base.u =
+        (hyp.base.p ^ hyp.base.q - 1) / (hyp.base.p - 1) := by
+      rw [hu_div, Nat.mul_div_cancel' hqdvd]
+    have hC_mod : (hyp.base.p ^ hyp.base.q - 1) / (hyp.base.p - 1) ≡ 1 [MOD hyp.base.p] :=
+      cyclotomic_quotient_modEq_one_mod_base hyp.base.p_prime.two_le hyp.base.q_prime.pos
+    have hqu_mod : hyp.base.q * hyp.base.u ≡ 1 [MOD hyp.base.p] := by rw [hqu]; exact hC_mod
+    have hqu_mod2 : hyp.base.q * hyp.base.u ≡ hyp.base.q * 1 [MOD hyp.base.p] :=
+      Nat.ModEq.mul_left hyp.base.q hu_mod_p
+    have hq_mod : hyp.base.q ≡ 1 [MOD hyp.base.p] := by
+      have h := hqu_mod2.symm.trans hqu_mod
+      simpa using h
+    have hp_dvd : hyp.base.p ∣ hyp.base.q - 1 :=
+      (Nat.modEq_iff_dvd' hyp.base.q_prime.one_lt.le).mp hq_mod.symm
+    have hqpos : 0 < hyp.base.q - 1 := by have := hyp.base.three_le_q; omega
+    have hple : hyp.base.p ≤ hyp.base.q - 1 := Nat.le_of_dvd hqpos hp_dvd
+    have hqp : hyp.base.q < hyp.base.p := hyp.q_lt_p
+    omega
+  · exact ⟨Sdata.u_eq_of_not_modEq_one hmod, hmod⟩
+
+/-- **(14.7) assembly from the fixed-point-free congruence.**  The tightest reduction of (14.7):
+given the (14.7) fixed-point-free congruence `u ≡ 1 mod p` (the `W₂^y`-on-`U` input), `U` cyclic,
+`W₂ ≤ P`, and part (14.2)(b), the field-normalizer data exists.  The value argument
+`u_eq_full_of_caseB_of_u_modEq_one_mod_p` turns `u ≡ 1 mod p` into `u = (p^q-1)/(p-1)` and
+`q ∤ (p-1)` (using the case-(b) certificate `caseB_for_S Ldata`), which then feed
+`field_normalizer_of_U_characteristic_of_inputs`.  Carries no `sorry`; gated only through the §13
+producers (`basic_structure`/`c_eq_one`, via the assembly) and `caseB_for_S` (Lane B). -/
+theorem field_normalizer_of_U_characteristic_of_fpf [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
+    (Ldata : LHypothesis hyp) [IsCyclic ↥hyp.base.U]
+    (hu_mod_p : hyp.base.u ≡ 1 [MOD hyp.base.p])
+    (hW2_le_P : hyp.base.W2 ≤ hyp.base.P)
+    (hQ_elemAb : IsElementaryAbelian hyp.base.q ↥hyp.base.Q)
+    (hW2_norm_Q : hyp.base.W2 ≤ Subgroup.normalizer (hyp.base.Q : Set G))
+    (yQ : G) (hyQ_mem : yQ ∈ hyp.base.Q)
+    (hW2_conj_y : MulAut.conj yQ • hyp.base.W2 ≤ Subgroup.normalizer (hyp.base.U : Set G)) :
+    Nonempty (FieldNormalizerData hyp) := by
+  obtain ⟨Sdata, _⟩ := caseB_for_S hG hyp Ldata
+  obtain ⟨hu_full, hnot_mod⟩ := u_eq_full_of_caseB_of_u_modEq_one_mod_p Sdata hu_mod_p
+  -- bridge `|U| = u` via (13.12) `c = 1`
+  have hU_card : Nat.card ↥hyp.base.U = hyp.base.u := by
+    rw [hyp.base.card_U_eq_uc, OddOrder.Peterfalvi.S15.c_eq_one hG hyp.base, mul_one]
+  have hcyc : Nat.Coprime
+      ((hyp.base.p ^ hyp.base.q - 1) / (hyp.base.p - 1)) (hyp.base.p - 1) :=
+    OddOrder.Peterfalvi.S15.cyclotomic_quotient_coprime_of_not_modEq_one
+      hyp.base.p_prime hyp.base.q_prime hnot_mod
+  exact field_normalizer_of_U_characteristic_of_inputs hG hyp (hU_card.trans hu_full)
+    hW2_le_P hcyc hQ_elemAb hW2_norm_Q yQ hyQ_mem hW2_conj_y
+
 private theorem cyclotomic_quotient_sub_one_lt_div {p q : ℕ} (hp2 : 2 ≤ p) :
     (((p ^ q - 1) / (p - 1) - 1 : ℕ) : ℚ) <
       (p ^ q : ℚ) / (((p - 1 : ℕ) : ℚ)) := by
