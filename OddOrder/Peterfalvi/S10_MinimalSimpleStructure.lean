@@ -110,7 +110,7 @@ theorem maximalSubgroup_type_dichotomy [Finite G] (hG : OddOrder.BG.IsMinimalSim
   -- that Peterfalvi (8.8) drops.  `S14.IsConjugateSubgroup M S` is *defeq* to
   -- `∃ g, MulAut.conj g • M = S`, so the covering clause transfers directly.
   rcases (OddOrder.BG.Ch4.S16.theoremI_nilpotentHall_conjugacy_and_type_dichotomy hG).2 with
-    hI | ⟨S, T, _W1, _W2, _W, hS, hT, hST, _hW, _hWcyc, hSnonI, hTnonI, hII, hcov⟩
+    hI | ⟨S, T, _W1, _W2, _W, hS, hT, hST, _hW, _hWcyc, _hWinter, hSnonI, hTnonI, hII, hcov⟩
   · exact Or.inl hI
   · exact Or.inr ⟨S, T, hS, hT, hST, hSnonI, hTnonI, hII, hcov⟩
 
