@@ -168,4 +168,32 @@ theorem nonempty_coherent_S_of_frobenius (hyp : SibleyDadeHypothesis G L H)
     (commutator_ne_bot_of_Xset_commutator_nonempty hyp hXne) hp
     (three_le_of_isPGroup_H hyp hp hHp) hHp)
 
+/-- **Peterfalvi (6.4.c) for case (6.8)(c2): the `W₁`-conjugation fixed points lie in `⁅H,H⁆`.**
+
+The certain-type Hypothesis (4.2)(b) gives `C_K(w) = W₂` for every `w ∈ W₁^#` (`centralizer_W2`),
+and case (c2) has `W₂ ⊆ ⁅H,H⁆`.  Hence any `x ∈ H` fixed by conjugation by a nonidentity
+`w ∈ W₁` lies in `C_L(w) ⊓ K = W₂ ⊆ ⁅H,H⁆`, so `x ∈ ⁅H,H⁆.subgroupOf H = commutator ↥H`
+(`commutator_subgroupOf_self`).  This is exactly the `hfix` hypothesis consumed by
+`exists_isPGroup_H_of_c2_of_card_le`, mirroring the `caseB_W1_dvd_index_commutator` fixed-point
+argument — the (6.4.c) Frobenius-action condition is a *consequence* of the certain-type centralizer
+datum, not an extra input. -/
+theorem fixedPoints_W1_subset_commutator_of_c2 (hyp : SibleyDadeHypothesis G L H)
+    (cert : OddOrder.Peterfalvi.S06.CertainTypeHypothesis (sharpImage H) L)
+    (hK : cert.K = H) (hW1 : cert.W1 = hyp.W1) (hW2 : cert.W2 ≤ ⁅H, H⁆) :
+    ∀ w : ↥hyp.W1, w ≠ 1 → ∀ x : ↥H,
+      (w : ↥L) * (x : ↥L) * (w : ↥L)⁻¹ = (x : ↥L) → x ∈ commutator ↥H := by
+  intro w hw x hwx
+  -- `(x:L)` commutes with `(w:L)` (from the conjugation-fixed hypothesis), so lies in `C_L(w)`.
+  have hxcen : (x : ↥L) ∈ Subgroup.centralizer ({(w : ↥L)} : Set ↥L) :=
+    Subgroup.mem_centralizer_singleton_iff.mpr (mul_inv_eq_iff_eq_mul.mp hwx).symm
+  have hwW1 : (w : ↥L) ∈ cert.W1 := by rw [hW1]; exact w.2
+  have hwne : (w : ↥L) ≠ 1 := fun h => hw (OneMemClass.coe_eq_one.mp h)
+  -- `(x:L) ∈ C_L(w) ⊓ K = W₂` by the certain-type centralizer datum (4.2.b).
+  have hxW2 : (x : ↥L) ∈ cert.W2 := by
+    rw [← cert.centralizer_W2 (w : ↥L) hwW1 hwne]
+    exact Subgroup.mem_inf.mpr ⟨hxcen, by rw [hK]; exact x.2⟩
+  -- `W₂ ⊆ ⁅H,H⁆`, so `x ∈ ⁅H,H⁆.subgroupOf H = commutator ↥H`.
+  rw [← commutator_subgroupOf_self]
+  exact Subgroup.mem_subgroupOf.mpr (hW2 hxW2)
+
 end OddOrder.Peterfalvi.S08
