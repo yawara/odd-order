@@ -159,6 +159,190 @@ structure Section16Inputs (G : Type*) [Group G] [Finite G] where
       = (deltaPrime i : ℂ) • (nu i j - nu i ⟨0, p_prime.pos⟩)
   q_lt_p : q < p
 
+/-! ### Partition of `Section16Inputs` into three independent producer obligations
+
+`Section16Inputs G` bundles three logically distinct outputs of the §7–§16
+program.  To let the corresponding lanes work in parallel without editing the same
+region, we split the menu into three dependently-chained structures, give each its
+own `sorry`'d producer, and assemble `Section16Inputs` from them `sorry`-free. -/
+
+/-- **BG §16 maximal-pair / type-classification output** — *owned by lane-g*.
+
+The maximal pair `S, T`, their (non-)types, the "at least one Type II" disjunction,
+and the case-(b) trichotomy of (8.8).  These are the fields of `Section16Inputs`
+that mention only `S, T`.  Producer: `section16MaximalPair_of_isMinimalSimpleOdd`
+(BG §16 main results). -/
+structure Section16MaximalPair (G : Type*) [Group G] [Finite G] where
+  S : Subgroup G
+  T : Subgroup G
+  S_maximal : S ∈ maximalSubgroups G
+  T_maximal : T ∈ maximalSubgroups G
+  S_ne_T : S ≠ T
+  S_nonI : IsTypeNonI S
+  T_nonI : IsTypeNonI T
+  one_typeII : IsTypeII S ∨ IsTypeII T
+  theorem88_caseB :
+    ∀ M : Subgroup G, M ∈ maximalSubgroups G →
+      IsTypeI M ∨ (∃ g : G, MulAut.conj g • M = S) ∨
+        (∃ g : G, MulAut.conj g • M = T)
+
+/-- **BG §14 type-P duality / cyclic-counting output** — *owned by lane-f*.
+
+The cyclic structure `W = W₁W₂`, the complements `U, V`, the primes `p, q`, and the
+counting parameters `u, v, c, d` with their identities.  Sibling references to the
+maximal pair are taken from `mp`.  Producer:
+`section16TypePStructure_of_isMinimalSimpleOdd` (BG §14 `typeP_duality`). -/
+structure Section16TypePStructure {G : Type*} [Group G] [Finite G]
+    (mp : Section16MaximalPair G) where
+  W1 : Subgroup G
+  W2 : Subgroup G
+  W : Subgroup G
+  U : Subgroup G
+  V : Subgroup G
+  W_eq_inter : W = mp.S ⊓ mp.T
+  W_eq_join : W = W1 ⊔ W2
+  W1_inf_W2_eq_bot : W1 ⊓ W2 = ⊥
+  W1_commutes_W2 : ∀ x ∈ W1, ∀ y ∈ W2, Commute x y
+  W_cyclic : IsCyclic ↥W
+  S_deriv_eq_PU : derivedInG mp.S = maxNilpotentNormalHall mp.S ⊔ U
+  T_deriv_eq_QV : derivedInG mp.T = maxNilpotentNormalHall mp.T ⊔ V
+  W1_normalizes_U : W1 ≤ Subgroup.normalizer (U : Set G)
+  W2_normalizes_V : W2 ≤ Subgroup.normalizer (V : Set G)
+  q : ℕ
+  p : ℕ
+  q_prime : q.Prime
+  p_prime : p.Prime
+  q_eq_card_W1 : q = Nat.card ↥W1
+  p_eq_card_W2 : p = Nat.card ↥W2
+  u : ℕ
+  v : ℕ
+  c : ℕ
+  d : ℕ
+  c_eq_card_C : c = Nat.card ↥(U ⊓ Subgroup.centralizer (maxNilpotentNormalHall mp.S : Set G))
+  d_eq_card_D : d = Nat.card ↥(V ⊓ Subgroup.centralizer (maxNilpotentNormalHall mp.T : Set G))
+  card_U_eq_uc : Nat.card ↥U = u * c
+  card_V_eq_vd : Nat.card ↥V = v * d
+  q_lt_p : q < p
+
+/-- **Peterfalvi §13 coherent Dade-grid output** — *owned by lane-b*.
+
+The character grids `ω, μ, ν` with the induction identities (13.1.e), the signs
+`δ, δ'`, the integral maps `τ_S, τ_T, τ₃`, and the exceptional-character data
+`Sset, Tset, A0S, A0T`.  Sibling references are taken from `mp` (for `S, T`) and
+`tp` (for `W, p, q` and the structural facts).  Producer:
+`section16CharacterData_of_isMinimalSimpleOdd` (Peterfalvi §3–§13 coherent grids). -/
+structure Section16CharacterData {G : Type*} [Group G] [Finite G]
+    (mp : Section16MaximalPair G) (tp : Section16TypePStructure mp) where
+  Sset : Set (ClassFunction ↥mp.S ℂ)
+  Tset : Set (ClassFunction ↥mp.T ℂ)
+  A0S : Set ↥mp.S
+  A0T : Set ↥mp.T
+  tauS : OddOrder.Peterfalvi.S07.IntegralCharacterMap ↥mp.S G
+  tauT : OddOrder.Peterfalvi.S07.IntegralCharacterMap ↥mp.T G
+  omega : Fin tp.q → Fin tp.p → ClassFunction ↥tp.W ℂ
+  mu : Fin tp.q → Fin tp.p → ClassFunction ↥mp.S ℂ
+  nu : Fin tp.q → Fin tp.p → ClassFunction ↥mp.T ℂ
+  delta : Fin tp.p → ℤ
+  deltaPrime : Fin tp.q → ℤ
+  tau3 : OddOrder.Peterfalvi.S07.IntegralCharacterMap ↥tp.W G
+  mu_definition : ∀ (i : Fin tp.q) (j : Fin tp.p),
+    ClassFunction.induce (tp.W.subgroupOf mp.S)
+        (ClassFunction.compHom
+          (Subgroup.subgroupOfEquivOfLe
+            ((le_of_eq tp.W_eq_inter).trans inf_le_left)).toMonoidHom
+          (omega i j - omega ⟨0, tp.q_prime.pos⟩ j))
+      = (delta j : ℂ) • (mu i j - mu ⟨0, tp.q_prime.pos⟩ j)
+  nu_definition : ∀ (i : Fin tp.q) (j : Fin tp.p),
+    ClassFunction.induce (tp.W.subgroupOf mp.T)
+        (ClassFunction.compHom
+          (Subgroup.subgroupOfEquivOfLe
+            ((le_of_eq tp.W_eq_inter).trans inf_le_right)).toMonoidHom
+          (omega i j - omega i ⟨0, tp.p_prime.pos⟩))
+      = (deltaPrime i : ℂ) • (nu i j - nu i ⟨0, tp.p_prime.pos⟩)
+
+/-- **BG §16 maximal-pair producer** (`sorry`) — *lane-g* (BG §16 main results).
+Constructs the maximal pair `S, T`, their type classification, and the case-(b)
+trichotomy of (8.8) from a minimal simple group of odd order. -/
+noncomputable def section16MaximalPair_of_isMinimalSimpleOdd {G : Type*} [Group G] [Finite G]
+    (hG : IsMinimalSimpleOdd G) : Section16MaximalPair G := sorry
+
+/-- **BG §14 type-P duality producer** (`sorry`) — *lane-f* (BG §14 `typeP_duality`).
+Given the maximal pair, constructs the cyclic structure `W = W₁W₂`, the complements
+`U, V`, the primes `p, q`, and the counting parameters. -/
+noncomputable def section16TypePStructure_of_isMinimalSimpleOdd {G : Type*} [Group G] [Finite G]
+    (hG : IsMinimalSimpleOdd G) (mp : Section16MaximalPair G) :
+    Section16TypePStructure mp := sorry
+
+/-- **Peterfalvi §13 coherent Dade-grid producer** (`sorry`) — *lane-b*
+(Peterfalvi §3–§13 coherent grids).  Given the maximal pair and the type-P
+structure, constructs the character grids `ω, μ, ν`, the signs, the integral maps,
+and the exceptional-character data with the induction identities. -/
+noncomputable def section16CharacterData_of_isMinimalSimpleOdd {G : Type*} [Group G] [Finite G]
+    (hG : IsMinimalSimpleOdd G) (mp : Section16MaximalPair G) (tp : Section16TypePStructure mp) :
+    Section16CharacterData mp tp := sorry
+
+/-- **Assembly of `Section16Inputs` from the three lane producers** (`sorry`-free).
+Each field of `Section16Inputs` is sourced from exactly one of `mp` / `tp` / `cd`;
+the character fields unify because `mp.S, mp.T, tp.W, tp.q, tp.p` are the chosen
+witnesses. -/
+noncomputable def section16Inputs_of_isMinimalSimpleOdd {G : Type*} [Group G] [Finite G]
+    (hG : IsMinimalSimpleOdd G) : Section16Inputs G :=
+  let mp := section16MaximalPair_of_isMinimalSimpleOdd hG
+  let tp := section16TypePStructure_of_isMinimalSimpleOdd hG mp
+  let cd := section16CharacterData_of_isMinimalSimpleOdd hG mp tp
+  { S := mp.S
+    T := mp.T
+    W1 := tp.W1
+    W2 := tp.W2
+    W := tp.W
+    U := tp.U
+    V := tp.V
+    S_maximal := mp.S_maximal
+    T_maximal := mp.T_maximal
+    S_ne_T := mp.S_ne_T
+    S_nonI := mp.S_nonI
+    T_nonI := mp.T_nonI
+    one_typeII := mp.one_typeII
+    theorem88_caseB := mp.theorem88_caseB
+    W_eq_inter := tp.W_eq_inter
+    W_eq_join := tp.W_eq_join
+    W1_inf_W2_eq_bot := tp.W1_inf_W2_eq_bot
+    W1_commutes_W2 := tp.W1_commutes_W2
+    W_cyclic := tp.W_cyclic
+    S_deriv_eq_PU := tp.S_deriv_eq_PU
+    T_deriv_eq_QV := tp.T_deriv_eq_QV
+    W1_normalizes_U := tp.W1_normalizes_U
+    W2_normalizes_V := tp.W2_normalizes_V
+    q := tp.q
+    p := tp.p
+    q_prime := tp.q_prime
+    p_prime := tp.p_prime
+    q_eq_card_W1 := tp.q_eq_card_W1
+    p_eq_card_W2 := tp.p_eq_card_W2
+    u := tp.u
+    v := tp.v
+    c := tp.c
+    d := tp.d
+    c_eq_card_C := tp.c_eq_card_C
+    d_eq_card_D := tp.d_eq_card_D
+    card_U_eq_uc := tp.card_U_eq_uc
+    card_V_eq_vd := tp.card_V_eq_vd
+    Sset := cd.Sset
+    Tset := cd.Tset
+    A0S := cd.A0S
+    A0T := cd.A0T
+    tauS := cd.tauS
+    tauT := cd.tauT
+    omega := cd.omega
+    mu := cd.mu
+    nu := cd.nu
+    delta := cd.delta
+    deltaPrime := cd.deltaPrime
+    tau3 := cd.tau3
+    mu_definition := cd.mu_definition
+    nu_definition := cd.nu_definition
+    q_lt_p := tp.q_lt_p }
+
 /-- **Assembly of the Section 16 configuration from named inputs** (`sorry`-free).
 
 Given the `Section16Inputs` witnesses, this builds `Peterfalvi.S16.Hypothesis`
@@ -270,7 +454,7 @@ contradicts the standing inequality `q < p`. -/
 noncomputable def sectionSixteenHypothesis_of_isMinimalSimpleOdd
     {G : Type*} [Group G] [Finite G] (hG : IsMinimalSimpleOdd G) :
     Peterfalvi.S16.Hypothesis (G := G) :=
-  sectionSixteenHypothesis_of_inputs hG.odd (sorry : Section16Inputs G)
+  sectionSixteenHypothesis_of_inputs hG.odd (section16Inputs_of_isMinimalSimpleOdd hG)
 
 end
 
