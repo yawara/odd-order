@@ -570,6 +570,31 @@ theorem fieldNormalizerData_of_repr (hyp : Hypothesis (G := G))
     y_mem_Q := hyQ_mem
     W2_conj_y_normalizes_U := hW2_conj_y }⟩
 
+/-! ### (14.7) standing structural inputs (proved by citing the §13 Frobenius data)
+
+These discharge the *structural* hypotheses of `fieldNormalizerData_of_repr` from the
+standing Section-15 data — they cite the (sorried) §13 producers `basic_structure`/`c_eq_one`
+the same way `u_modEq_one_mod_q` does, so they are proven (their own bodies are `sorry`-free).
+The remaining genuine work for (14.7) is the *numeric* input `|U| = (p^q-1)/(p-1)` and the
+`𝔽_p[U]`-module construction feeding `exists_galoisField_repr`. -/
+
+/-- `U` normalizes `P`: since `P = F(S)` is normal in `S` and `U ≤ S' = PU ≤ S`. -/
+theorem U_le_normalizer_P (hyp : Hypothesis (G := G)) :
+    hyp.base.U ≤ Subgroup.normalizer hyp.base.P := by
+  have hU_le_deriv : hyp.base.U ≤ derivedInG hyp.base.S := by
+    rw [hyp.base.S_deriv_eq_PU]; exact le_sup_right
+  have hderiv_le_S : derivedInG hyp.base.S ≤ hyp.base.S := Subgroup.map_subtype_le _
+  have hS_le_norm : hyp.base.S ≤ Subgroup.normalizer hyp.base.P := by
+    rw [hyp.base.P_eq_SF]
+    exact OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_le_normalizer hyp.base.S
+  exact (hU_le_deriv.trans hderiv_le_S).trans hS_le_norm
+
+/-- **(14.7) `hUP` input**: conjugating a point of `P` by an element of `U` stays in `P`. -/
+theorem conj_mem_P (hyp : Hypothesis (G := G)) (v : ↥hyp.base.U) (x : ↥hyp.base.P) :
+    (v : G) * (x : G) * (v : G)⁻¹ ∈ hyp.base.P := by
+  have hv : (v : G) ∈ Subgroup.normalizer hyp.base.P := U_le_normalizer_P hyp v.2
+  exact (Subgroup.mem_normalizer_iff.mp hv (x : G)).mp x.2
+
 /-- **Peterfalvi (14.7)**: if `U` is characteristic in `H`, then the final
 field-normalizer configuration (14.2) holds.
 
