@@ -4,6 +4,46 @@
 > `s08_6_8_assembly_plan.md`(458KB)/`s08_6_8_3_gap_resolution.md` のうち本 note と矛盾する記述は本 note を優先。
 > 上位方針・FT 接続の文脈 = 記憶 [[ft-path-policy]] の 2026-06-17 検証訂正ブロック。
 
+## ⚠️✅ 2026-06-19 cont.¹⁵ — cont.¹⁴「c2 研究レベル」誤診断を訂正 + hfix (6.4.c) landing
+
+**cont.¹⁴ 末尾「c2-(6.5) 還元の真のブロッカー = reducible-break 対応 generalized (5.6) engine = 研究レベル
+(~2-3 session)」は誤診断**(ユーザー「形式化を研究と誤称するな・原文を読め」フィードバックの対象)。
+原文精読 (04.7/04.8) + repo 監査で確定:
+
+- **Peterfalvi Theorem (5.6) は Hypothesis (5.2) 下で reducible character を完全カバー**(04.7:5 「S = a
+  set of characters of L」(irreducible 非要求)、04.7:59 (5.6) ステートメント、04.7:29「If χ and φ are
+  **reducible**, (5.2.e) follows from the form of R(μⱼ)」)。reducible column μⱼ は最初から (5.2) の対象。
+- **repo に reducible-member 対応の norm-weighted (5.6) engine `coherentDegreeSqNormBound_of_not_coherentW`
+  (S08_CoherenceWeighted:475) が sorry-free で既存**、case-B path (S08_CaseBEnumeration:720) で稼働中。
+  cont.¹⁴ は irreducible 特化版 `coherentDegreeSumBound_of_not_coherent` しか見ず「不適用」と誤判定。
+- ⟹ **c2 を閉じる残務は全て形式化労力 (原文に完全な証明)。「研究」ではない。**
+
+### ✅ hfix (6.4.c) DONE — c2 還元の named 仮説 1/3 充足
+
+`fixedPoints_W1_subset_commutator_of_c2` (S08_PGroupReduction、commit `1278969b`、axiom-clean):
+(4.2)(b) `centralizer_W2` (C_K(w)=W₂) + c2 `W₂⊆⁅H,H⁆` + `commutator_subgroupOf_self` で数行。
+論証は `caseB_W1_dvd_index_commutator` (S08_CaseBEndgame:232-244) の既存パターン。
+⟹ `exists_isPGroup_H_of_c2_of_card_le` の hfix を充足。
+
+### ▶ c2 を閉じる道筋 (確定、すべて形式化労力)
+
+| step | 内容 | 状態 |
+|---|---|---|
+| hcop | `hyp.cases.inr` から `obtain` (Hall coprimality) | 自明 (c2 cases 内) |
+| **hfix (6.4.c)** | `fixedPoints_W1_subset_commutator_of_c2` | ✅ DONE |
+| math A/B split | Z(H)⊓W₂ = ⊥ (case A) or W₂ (case B)、W₂ 素数位数 | 短 |
+| hbound (6.3 c2) | reducible break を既存 `...W` engine で (本丸・最大) | 未着手 |
+| case-A bootstrap | `Xset_centralCommutator_isCoherent_of_c2_caseA` → S coherent | 未着手 |
+| case-B 配線 | `nonempty_coherent_S_caseB_of_structure` (cont.¹³ DONE) + structure data discharge | data discharge 要 |
+
+**最初の goal = c2 dispatch skeleton** (`nonempty_coherent_S_of_c2_of_bounds`): hfix を使い、hbound +
+case-A bootstrap + case-B structure data を named 仮説に残して build-green → (6.8) c2 を named 仮説に帰着
+([[gated-endpoint-skeleton]] パターン)。**次 = hbound (6.3 c2、本丸): reducible break + 既存 `...W` engine 配線。**
+
+case-B structure data discharge (hcen/hderiv/hc2/hFPF/hcZ/hfpf/hW2cenL/hYcard) の素材は在庫:
+`caseB_W1_dvd_index_commutator`/`caseB_W1_dvd_relIndex_commutator` (S08_CaseBEndgame、FPF divisibility)、
+`caseB_fpf_bound` (S08_CaseBEndgame:338) 等。
+
 ## ✅✅✅✅ 2026-06-18 cont.¹³ — case-B 核心数学 COMPLETE: seed + anchor + bootstrap (P4+P5+P6a+P6b)
 
 **cont.¹² の残務 (P4 glue + P5 wire + P6 discharge) のうち、case-B 固有の数学を全て完成。**
