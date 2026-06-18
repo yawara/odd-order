@@ -131,7 +131,22 @@ p≥3 = p∣|H|∣|L| 奇 ⟹ p 奇。**⟹ 次の本丸 = Theorem (6.3) assembl
 
 **dispatch 配線は保留**: `nonempty_coherent_S_of_frobenius` は S08_PGroupReduction 在(S08_CoherenceTheorems の
 下流)ゆえ直接 import 不可。c1 piece は S08_CoherenceCore 上流の素材のみ使う ⟹ 将来 upstream 移設 or hub に inline。
-**c2 が揃ってから一括配線**(中間 sorry を hub に残さない)。⟹ **次 = c2-(6.3) reducible-break 精査 → 可なら c2 還元実装**。
+**c2 が揃ってから一括配線**(中間 sorry を hub に残さない)。
+
+### ⚠ cont.¹⁴ 精査結果 — c2-(6.3) break は reducible になりうる(確定) ⟹ T63-2 は一般 c2 で off-path
+
+**確定 (再調査不要)**: c2-(6.3) の minimal-A induction (A: 1→[H,H]) で break ψ∈S(B) は **column(reducible)に
+なりうる**。論拠: 列は W₂⊄ker ⟹(W₂⊆[H,H] ゆえ)[H,H]⊄ker ⟹ 列∉Yset=S([H,H]) だが、**B⊊[H,H] には
+B⊆ker(列源) で列が S(B) に入りうる**。break は S₁⊇S(A) の外ゆえ、S(A) が全列を含まない regime では列 break が起こる。
+⟹ **(5.6) engine `coherentDegreeSumBound_of_not_coherent` (`χ:IrreducibleCharacter` 必須) が列 break に不適用**。
+⟹ **T63-2 (`sSubFiltration_sum_le_two_psi_caseB`, ψ irreducible 前提) は c2-(6.3) の一般 break には off-path**
+(irreducible break sub-case のみ; T63-1 S(A)-sum は break 非依存ゆえ汎用)。
+
+**▶ c2-(6.5) 還元の真のブロッカー = reducible break 対応の generalized (5.6) engine**(列 break pair {μ_j, μ_j⁻¹}
+の norm-weighted bound; 既存 engine は irreducible 専用)。これは新規の substantial piece。+ hfix=(6.4.c)。
+**設計選択肢**: (i) generalized (5.6) engine 実装 / (ii) c2-(6.3) で列 break を case-B 列機構で別処理 /
+(iii) 列を含まない decomposition への restructure。**次 session で設計確定要**(研究レベル、~2-3 session)。
+**⟹ 現状サマリ: (6.8) c1 完全 close、c2 は reducible-break engine がブロッカーで研究レベル。**
 
 ## 🚨🚨 2026-06-18 cont.¹² — 重大訂正: 「真の gate = hDeg = (6.6)」は **誤り**。(6.8.2) は anchored-image で chain/hDeg 不要
 
