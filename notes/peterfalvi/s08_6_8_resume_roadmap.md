@@ -4,7 +4,44 @@
 > `s08_6_8_assembly_plan.md`(458KB)/`s08_6_8_3_gap_resolution.md` のうち本 note と矛盾する記述は本 note を優先。
 > 上位方針・FT 接続の文脈 = 記憶 [[ft-path-policy]] の 2026-06-17 検証訂正ブロック。
 
-## 🚨🚨 2026-06-18 cont.⁴ — anchoredImages route の必要性に疑問 (継続前に必ず読む)
+## ✅✅ 2026-06-18 cont.⁵ — ROUTE RESOLVED: anchoredImages は ON-PATH かつ CORE (cont.⁴ の疑問を解消)
+
+**cont.⁴ の疑問「anchoredImages は critical path 上か?」を、教科書 (6.8.2.3) 原文 + Lean 署名の直接精査で
+解決。結論 = anchoredImages 機構 (`caseB_per_phi_anchored_fromYset` 中心) は (6.8.2.3) の唯一の正準ツールで、
+ON-PATH かつ CORE。off-path ではない。** 検証根拠 (本セッション、code+textbook-verified):
+
+1. **教科書 (6.8.2.3) は全 χ∈X で成立** (`04.8_*.mmd:208`「Let χ∈X」): `(χ − a·η₁)^τ = X₁ − a·Y`,
+   `X₁ ⊥ Y^{τ₁}`, `a = χ(1)/|W₁|`。(6.8.2) proof (`:224`) は τ₂ を `η₁^{τ₂}=Y` でこの恒等式から組む
+   ⟹ **hmixed (= seam X-image⊥Y-image) は (6.8.2.3) そのもの**。reducible column と irreducible の両方を要する。
+2. **`caseB_per_phi_anchored_fromYset`(`S08_CaseBAssembly:1647`) が (6.8.2.3) を全 X で出す**: 中心線形指標 φ
+   の **全正重み constituent** `θ:{0<constituentWeight hφ' θ}` を走り、各 θ に
+   `τ(Ind^L_H θ − a•η₁) = (caseB_phi_family…).X − a•cY.ext η₁`(a=θ(1))を出力。**`hirrAnc` field が
+   「Ind H θ が column でない」枝 (= irreducible X-member) を明示処理**(column≠Ind H θ ⟹ η₁⊥Ind H θ)。
+   W₂≤Z(H) ゆえ全 irreducible θ は `Res^H_{W₂}θ = θ(1)·φ_θ`(`exists_central_phi_data`)で φ_θ の constituent
+   ⟹ **全 χ=Ind^L_H θ∈X が per-φ family で尽くされる**(reducible column も irreducible も)。
+3. **⟹ cX は xChiExtension を使う** (canonical Dade chain ではない): hmixed は `cX.ext(χ) = X(θ)`(anchored
+   image の X-part, ⊥ Y = hXaggorth)を要求。canonical Dade chain image は anchor 項だけずれ得て hmixed を壊す。
+   **∴ cont.⁴ point 3「real cX = xChainCoherentW canonical」は誤り**。正しい cX = `xChiExtension`-base
+   (`certainTypeSet_isCoherent_via_anchoredImages` `S08_CaseBXChiCoherence:246` の Ximg=X(θ) 拡張) を
+   **certainTypeSet → 全 Xset W2 に一般化**したもの。
+
+**∴ route 確定 = anchoredImages 一般化路線** (canonical 路線は破棄):
+
+- **(S1) `Xset_W2_isCoherent_via_anchoredImages`** = `certainTypeSet_isCoherent_via_anchoredImages` を
+  index `χ₂:W₂-dual` → `χ∈Xset W2`(または constituent θ)に一般化。extension = Ximg(χ)=X(θ_χ) を per-φ
+  producer で全 χ に供給(中心 φ_θ で被覆)。出力 = `IsCoherent hyp.tau (Xset W2)` で `cX.ext(χ)=X(θ)`。
+- **(S2) hmixed** = `⟨X(θ), cY.ext η⟩ = 0`(= per-φ producer の `hXaggorth`)で **済**(reducible+irreducible 一様)。
+- **(S3) glue** = `coherentXunionYset_caseB_of_glued`(`S08_CaseBCoherence2:1616`)に (S1)cX + (S2)hmixed +
+  diagonal D を渡し `IsCoherent hyp.tau (Xset W2 ∪ Y)` = seed → `nonempty_coherent_S_caseB` → S08:59。
+
+**残務 = 純 assembly(新数学ゼロ。(6.8.2.3) hard math は per-φ producer に sorry-free 実在)**:
+per-φ aggregation を全 X に展開(中心 φ_θ 被覆 + Classical.choose で Ximg) + cX 一般化 + glue 配線 + diagonal D。
+⚠ **「user-managed ChatGPT gap」では無くなった**(hard math 済) — Lean assembly のみ。ただし大型 multi-step。
+**↓ 以下 cont.⁴ は履歴 (point 3 canonical 説は上記で訂正済)。**
+
+## 🗂 (履歴・訂正済) 2026-06-18 cont.⁴ — anchoredImages route の必要性に疑問
+
+> ⚠ 本 block の疑問は cont.⁵ で解決済 (anchoredImages = ON-PATH/CORE)。point 3「canonical cX」は誤りと判明。
 
 **cont.³ で組んだ anchoredImages route (hXanchored, `S08_CaseBAnchoredSeed.lean` 8 commit) が seed の
 critical path 上か不確実と判明**。記憶 [[pf-s08-caseb-seed-route-uncertain]] が正本。要点:
