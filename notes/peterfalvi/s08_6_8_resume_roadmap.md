@@ -57,8 +57,10 @@ hDeg `2a < ∑ deg²/mc` = (6.6) degree theory」は誤診断。** 根拠:
   μ_{0,χ₂}↦Ximg χ₂, 他 0)。全 X は `caseB_S_member_column_or_irreducible`(`S08_CaseBAssembly:1949`)で
   **column(=columnSum χ₂) ∨ irreducible** の dichotomy ⟹ 全 X 版 = `f(ω) := if ω∈Xset W₂ then Ximg(ω)
   else xChiExtensionFun(...) ω`(irreducible は basis 要素 ↦ Ximg、column は μ_{0} 集約)。
-  **構造的前提 = 列 constituent `μ_{iχ₂} ∉ Xset W₂`**(= S-member でない)を要確認(これが満たせば basis branch
-  が交わらず ν(columnSum χ₂)=Ximg 正)。retarget は pair-based(chain 用)で textbook τ₂ には不適。
+  **構造的前提 = 列 constituent `μ_{iχ₂} ∉ Xset W₂` は ✅ 証明可(度数 mod |W₁| 論法、本セッション確認)**:
+  X-member は Ind^L_H θ で度数 `|W₁|·θ(1) ≡ 0 (mod |W₁|)`、grid constituent μ は度数 `≡ ±1 (mod |W₁|)`
+  (`certainType_degree_modEq`、`caseB_inner_irr_columnSum_eq_zero` docstring の論法)、|W₁|≠1 ⟹ 矛盾。
+  ⟹ basis branch が交わらず ν(columnSum χ₂)=Ximg 正。retarget は pair-based(chain 用)で textbook τ₂ には不適。
 - **(P4)** Y と glue(`coherentUnion_of_glued_…`、`coherentCertainTypeSet_union_Yset_caseB` template)。
 - **(P5)** seed → `nonempty_coherent_S_caseB` → S08:59 case-B 枝。
 - **見積**: extension map = fresh session 1 本(dichotomy basis 構成 + μ∉Xset 構造補題 + 4 coherence field
