@@ -242,6 +242,178 @@ theorem cyclotomic_quotient_coprime_of_not_dvd {p q : ℕ} (hp : 2 ≤ p)
     rw [Nat.gcd_comm, hgcd, Nat.gcd_comm]; exact hcoq
   exact this
 
+/-! ### (14.7) σ-bridge: transporting the (14.2)(a) field model into `G`
+
+The hard, *ungated* core of `field_normalizer_of_U_characteristic` is to turn the
+abstract field isomorphism of Peterfalvi (14.2)(a) — produced by the Singer machinery
+`exists_galoisField_repr` once the §13 inputs `Nat.card P = p^q`, `c = 1` are in hand —
+into the concrete `FieldNormalizerData`, i.e. an injective `σ : 𝔽_{p^q} ⋊ U* →* G`
+matching `P`, `U`, `W₂`.  The construction is a `SemidirectProduct.lift` of two transport
+homomorphisms `fN : 𝔽_{p^q} →* G` (the additive kernel) and `fU : U* →* G` (the
+norm-one complement), glued by the (14.2)(a) `U`-equivariance.  These pieces take the
+isomorphism as *input*, so they are independent of the §13 character theory that supplies
+it (`fieldNormalizerData_of_repr` below). -/
+
+/-- **(14.7) σ-bridge, kernel half.**  Given the Peterfalvi (14.2)(a) additive
+isomorphism `e : Additive ↥P ≃+ 𝔽_{p^q}`, this is the transport homomorphism
+`P = 𝔽_{p^q} →* G` sending a field point `s` to the group element `e⁻¹ s ∈ P ≤ G`.
+It is the kernel (`inl`) factor of the field-normalizer embedding `σ`. -/
+noncomputable def fieldNormalizerKernelTransport (hyp : Hypothesis (G := G))
+    (e : letI : Fact hyp.base.p.Prime := ⟨hyp.base.p_prime⟩
+         Additive ↥hyp.base.P ≃+ GaloisField hyp.base.p hyp.base.q) :
+    fieldNormalizerAdditiveGroup hyp →* G :=
+  letI : Fact hyp.base.p.Prime := ⟨hyp.base.p_prime⟩
+  { toFun := fun m =>
+      ((Additive.toMul (e.symm (Multiplicative.toAdd m)) : ↥hyp.base.P) : G)
+    map_one' := by simp
+    map_mul' := fun m n => by
+      simp [toAdd_mul, map_add, toMul_add] }
+
+@[simp] theorem fieldNormalizerKernelTransport_apply (hyp : Hypothesis (G := G))
+    (e : letI : Fact hyp.base.p.Prime := ⟨hyp.base.p_prime⟩
+         Additive ↥hyp.base.P ≃+ GaloisField hyp.base.p hyp.base.q)
+    (m : fieldNormalizerAdditiveGroup hyp) :
+    fieldNormalizerKernelTransport hyp e m =
+      ((Additive.toMul (e.symm (Multiplicative.toAdd m)) : ↥hyp.base.P) : G) :=
+  rfl
+
+/-- The kernel transport `fN` is injective: it is a coordinate-wise composition of the
+bijections `e.symm`, `Additive.toMul` and the (injective) subgroup inclusion `P ↪ G`. -/
+theorem fieldNormalizerKernelTransport_injective (hyp : Hypothesis (G := G))
+    (e : letI : Fact hyp.base.p.Prime := ⟨hyp.base.p_prime⟩
+         Additive ↥hyp.base.P ≃+ GaloisField hyp.base.p hyp.base.q) :
+    Function.Injective (fieldNormalizerKernelTransport hyp e) := by
+  letI : Fact hyp.base.p.Prime := ⟨hyp.base.p_prime⟩
+  intro m n hmn
+  rw [fieldNormalizerKernelTransport_apply, fieldNormalizerKernelTransport_apply] at hmn
+  have h1 : (Additive.toMul (e.symm (Multiplicative.toAdd m)) : ↥hyp.base.P) =
+      Additive.toMul (e.symm (Multiplicative.toAdd n)) := Subtype.ext hmn
+  have h2 : e.symm (Multiplicative.toAdd m) = e.symm (Multiplicative.toAdd n) :=
+    Additive.toMul.injective h1
+  have h3 : Multiplicative.toAdd m = Multiplicative.toAdd n := e.symm.injective h2
+  exact Multiplicative.toAdd.injective h3
+
+/-- The kernel transport `fN` has image exactly Peterfalvi's additive kernel `P`. -/
+theorem fieldNormalizerKernelTransport_range (hyp : Hypothesis (G := G))
+    (e : letI : Fact hyp.base.p.Prime := ⟨hyp.base.p_prime⟩
+         Additive ↥hyp.base.P ≃+ GaloisField hyp.base.p hyp.base.q) :
+    (fieldNormalizerKernelTransport hyp e).range = hyp.base.P := by
+  letI : Fact hyp.base.p.Prime := ⟨hyp.base.p_prime⟩
+  apply le_antisymm
+  · rintro _ ⟨m, rfl⟩
+    rw [fieldNormalizerKernelTransport_apply]
+    exact (Additive.toMul (e.symm (Multiplicative.toAdd m))).2
+  · intro g hg
+    refine ⟨Multiplicative.ofAdd (e (Additive.ofMul (⟨g, hg⟩ : ↥hyp.base.P))), ?_⟩
+    rw [fieldNormalizerKernelTransport_apply]
+    simp
+
+/-- **(14.7) σ-bridge, complement half.**  Given the Peterfalvi (14.2)(a)
+multiplicative character `μ : U →* 𝔽_{p^q}ˣ` realizing `U` as the norm-one units `U*`,
+this is the transport homomorphism `U* →* G` inverting `μ` and including back into `G`.
+It is the complement (`inr`) factor of the field-normalizer embedding `σ`. -/
+noncomputable def fieldNormalizerComplementTransport (hyp : Hypothesis (G := G))
+    (μ : letI : Fact hyp.base.p.Prime := ⟨hyp.base.p_prime⟩
+         ↥hyp.base.U →* (GaloisField hyp.base.p hyp.base.q)ˣ)
+    (hμ_inj : Function.Injective μ)
+    (hμ_range : letI : Fact hyp.base.p.Prime := ⟨hyp.base.p_prime⟩
+         μ.range = OddOrder.BG.AppC.NormSet.normOneUnits hyp.base.p hyp.base.q) :
+    fieldNormalizerNormOneUnits hyp →* G :=
+  letI : Fact hyp.base.p.Prime := ⟨hyp.base.p_prime⟩
+  let μ' : ↥hyp.base.U →* ↥(OddOrder.BG.AppC.NormSet.normOneUnits hyp.base.p hyp.base.q) :=
+    { toFun := fun u => ⟨μ u, hμ_range ▸ MonoidHom.mem_range.mpr ⟨u, rfl⟩⟩
+      map_one' := by ext; simp
+      map_mul' := fun a b => by ext; simp }
+  let eU : ↥hyp.base.U ≃* ↥(OddOrder.BG.AppC.NormSet.normOneUnits hyp.base.p hyp.base.q) :=
+    MulEquiv.ofBijective μ'
+      ⟨fun a b h => hμ_inj (congrArg Subtype.val h),
+       fun u => by
+         obtain ⟨v, hv⟩ := MonoidHom.mem_range.mp (by rw [hμ_range]; exact u.2)
+         exact ⟨v, Subtype.ext hv⟩⟩
+  hyp.base.U.subtype.comp eU.symm.toMonoidHom
+
+/-- The defining property of the complement transport `fU`: each norm-one unit `u*`
+has a preimage `u'' ∈ U` whose field character is `u*` and whose image under `fU` is
+exactly `u''`.  This packages everything the `SemidirectProduct.lift` compatibility
+needs about `fU`. -/
+theorem fieldNormalizerComplementTransport_exists (hyp : Hypothesis (G := G))
+    (μ : letI : Fact hyp.base.p.Prime := ⟨hyp.base.p_prime⟩
+         ↥hyp.base.U →* (GaloisField hyp.base.p hyp.base.q)ˣ)
+    (hμ_inj : Function.Injective μ)
+    (hμ_range : letI : Fact hyp.base.p.Prime := ⟨hyp.base.p_prime⟩
+         μ.range = OddOrder.BG.AppC.NormSet.normOneUnits hyp.base.p hyp.base.q)
+    (u : fieldNormalizerNormOneUnits hyp) :
+    letI : Fact hyp.base.p.Prime := ⟨hyp.base.p_prime⟩
+    ∃ v : ↥hyp.base.U,
+      (μ v : (GaloisField hyp.base.p hyp.base.q)ˣ) = (u : (GaloisField hyp.base.p hyp.base.q)ˣ) ∧
+        fieldNormalizerComplementTransport hyp μ hμ_inj hμ_range u = (v : G) := by
+  letI : Fact hyp.base.p.Prime := ⟨hyp.base.p_prime⟩
+  set μ' : ↥hyp.base.U →* ↥(OddOrder.BG.AppC.NormSet.normOneUnits hyp.base.p hyp.base.q) :=
+    { toFun := fun u => ⟨μ u, hμ_range ▸ MonoidHom.mem_range.mpr ⟨u, rfl⟩⟩
+      map_one' := by ext; simp
+      map_mul' := fun a b => by ext; simp } with hμ'def
+  set eU : ↥hyp.base.U ≃* ↥(OddOrder.BG.AppC.NormSet.normOneUnits hyp.base.p hyp.base.q) :=
+    MulEquiv.ofBijective μ'
+      ⟨fun a b h => hμ_inj (congrArg Subtype.val h),
+       fun u => by
+         obtain ⟨v, hv⟩ := MonoidHom.mem_range.mp (by rw [hμ_range]; exact u.2)
+         exact ⟨v, Subtype.ext hv⟩⟩ with heUdef
+  refine ⟨eU.symm u, ?_, rfl⟩
+  have hval : (eU (eU.symm u) : ↥(OddOrder.BG.AppC.NormSet.normOneUnits hyp.base.p hyp.base.q)) = u :=
+    eU.apply_symm_apply u
+  have : (μ (eU.symm u) : (GaloisField hyp.base.p hyp.base.q)ˣ) = (u : (GaloisField hyp.base.p hyp.base.q)ˣ) := by
+    have h1 : (μ' (eU.symm u) : (GaloisField hyp.base.p hyp.base.q)ˣ) =
+        (u : (GaloisField hyp.base.p hyp.base.q)ˣ) := congrArg Subtype.val hval
+    simpa [hμ'def] using h1
+  exact this
+
+/-- The complement transport `fU` is injective. -/
+theorem fieldNormalizerComplementTransport_injective (hyp : Hypothesis (G := G))
+    (μ : letI : Fact hyp.base.p.Prime := ⟨hyp.base.p_prime⟩
+         ↥hyp.base.U →* (GaloisField hyp.base.p hyp.base.q)ˣ)
+    (hμ_inj : Function.Injective μ)
+    (hμ_range : letI : Fact hyp.base.p.Prime := ⟨hyp.base.p_prime⟩
+         μ.range = OddOrder.BG.AppC.NormSet.normOneUnits hyp.base.p hyp.base.q) :
+    Function.Injective (fieldNormalizerComplementTransport hyp μ hμ_inj hμ_range) := by
+  letI : Fact hyp.base.p.Prime := ⟨hyp.base.p_prime⟩
+  intro a b hab
+  obtain ⟨va, hva_mu, hva⟩ := fieldNormalizerComplementTransport_exists hyp μ hμ_inj hμ_range a
+  obtain ⟨vb, hvb_mu, hvb⟩ := fieldNormalizerComplementTransport_exists hyp μ hμ_inj hμ_range b
+  rw [hva, hvb] at hab
+  have hvab : va = vb := Subtype.ext hab
+  have : (a : (GaloisField hyp.base.p hyp.base.q)ˣ) = (b : (GaloisField hyp.base.p hyp.base.q)ˣ) := by
+    rw [← hva_mu, ← hvb_mu, hvab]
+  exact Subtype.ext this
+
+/-- The complement transport `fU` has image exactly Peterfalvi's complement `U`. -/
+theorem fieldNormalizerComplementTransport_range (hyp : Hypothesis (G := G))
+    (μ : letI : Fact hyp.base.p.Prime := ⟨hyp.base.p_prime⟩
+         ↥hyp.base.U →* (GaloisField hyp.base.p hyp.base.q)ˣ)
+    (hμ_inj : Function.Injective μ)
+    (hμ_range : letI : Fact hyp.base.p.Prime := ⟨hyp.base.p_prime⟩
+         μ.range = OddOrder.BG.AppC.NormSet.normOneUnits hyp.base.p hyp.base.q) :
+    (fieldNormalizerComplementTransport hyp μ hμ_inj hμ_range).range = hyp.base.U := by
+  letI : Fact hyp.base.p.Prime := ⟨hyp.base.p_prime⟩
+  apply le_antisymm
+  · rintro _ ⟨u, rfl⟩
+    obtain ⟨v, _, hv⟩ := fieldNormalizerComplementTransport_exists hyp μ hμ_inj hμ_range u
+    rw [hv]
+    exact v.2
+  · intro g hg
+    set μ' : ↥hyp.base.U →* ↥(OddOrder.BG.AppC.NormSet.normOneUnits hyp.base.p hyp.base.q) :=
+      { toFun := fun u => ⟨μ u, by rw [← hμ_range]; exact MonoidHom.mem_range.mpr ⟨u, rfl⟩⟩
+        map_one' := by ext; simp
+        map_mul' := fun a b => by ext; simp } with hμ'def
+    set eU : ↥hyp.base.U ≃* ↥(OddOrder.BG.AppC.NormSet.normOneUnits hyp.base.p hyp.base.q) :=
+      MulEquiv.ofBijective μ'
+        ⟨fun a b h => hμ_inj (congrArg Subtype.val h),
+         fun u => by
+           obtain ⟨v, hv⟩ := MonoidHom.mem_range.mp (by rw [hμ_range]; exact u.2)
+           exact ⟨v, Subtype.ext hv⟩⟩ with heUdef
+    refine ⟨eU (⟨g, hg⟩ : ↥hyp.base.U), ?_⟩
+    show (hyp.base.U.subtype.comp eU.symm.toMonoidHom) (eU ⟨g, hg⟩) = g
+    simp
+
 /-- **Peterfalvi (14.7)**: if `U` is characteristic in `H`, then the final
 field-normalizer configuration (14.2) holds. -/
 theorem field_normalizer_of_U_characteristic [Finite G]
