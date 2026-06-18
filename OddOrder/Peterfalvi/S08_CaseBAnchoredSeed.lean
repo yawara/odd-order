@@ -917,6 +917,71 @@ theorem inner_eq_of_anchored_varying
     ClassFunction.inner_smul_left, OddOrder.RepresentationTheory.inner_smul_right, star_natCast]
   rw [hττ, hτiν, hντj, hνν]; ring
 
+/-- **(6.8.2) scaled-difference identity** (the `extends_on_supported` content for the full
+`Xset W₂` coherence).  From two anchored images `τ(χᵢ − aᵢη₁) = Xᵢ − aᵢν₁`, `τ(χ₁ − a₁η₁) =
+X₁ − a₁ν₁` with the **degree ratio** `aᵢ = dᵢ·a₁` (i.e. `χᵢ(1) = dᵢ·χ₁(1)`, integral since `H` is a
+`p`-group), the `ν₁`-terms cancel and `τ` is linear, so the scaled difference maps homogeneously:
+`Xᵢ − dᵢ·X₁ = τ(χᵢ − dᵢ·χ₁)`.
+
+This is the textbook fact that on the supported generators `χᵢ − dᵢχ₁` the running extension
+`τ₂` agrees with `τ` (the `(6.8.2)` `τ₂` defined via the anchored images), generalizing the
+equal-degree column-difference identity to varying degree (cf. `span_subset_span_
+zSupportedSpan_union_anchor_of_scaledDiffs`, the matching generation). -/
+theorem anchoredImage_scaledDiff_eq
+    (hyp : SibleyDadeHypothesis G L H) [H.Normal]
+    {η₁ : ClassFunction ↥L ℂ}
+    {χi χ1 : ClassFunction ↥L ℂ} {ai a1 di : ℕ} {Xi X1 : ClassFunction G ℂ}
+    (hanci : hyp.tau (χi - ai • η₁) = Xi - (ai : ℂ) • hyp.coherentYset.extension η₁)
+    (hanc1 : hyp.tau (χ1 - a1 • η₁) = X1 - (a1 : ℂ) • hyp.coherentYset.extension η₁)
+    (hai : ai = di * a1) :
+    Xi - di • X1 = hyp.tau (χi - di • χ1) := by
+  have hχ : χi - di • χ1 = (χi - ai • η₁) - di • (χ1 - a1 • η₁) := by
+    rw [smul_sub, ← mul_smul, ← hai]; abel
+  have hνcancel : di • ((a1 : ℂ) • hyp.coherentYset.extension η₁)
+      = (ai : ℂ) • hyp.coherentYset.extension η₁ := by
+    rw [← Nat.cast_smul_eq_nsmul ℂ di ((a1 : ℂ) • hyp.coherentYset.extension η₁), smul_smul,
+      ← Nat.cast_mul, ← hai]
+  rw [hχ, map_sub, map_nsmul, hanci, hanc1, smul_sub, hνcancel]; abel
+
+/-- **(6.8.2) grid constituents are not `X`-members** — `μ_{iχ₂} ∉ Xset W₂`.  A certain-type grid
+character has degree `≡ ±1 (mod |W₁|)` (`certainType_degree_modEq`, the sign `= ±1`), whereas every
+`X`-member `Ind^L_H θ` has degree `|W₁|·θ(1) ≡ 0 (mod |W₁|)`; with `|W₁| ≠ 1` these are incompatible.
+
+This is the disjointness underlying the **dichotomy extension** for the full `Xset W₂` coherence: on
+the basis `Irr L`, the irreducible `X`-members `χ ↦ Ximg χ` and the column grid members
+`μ_{iχ₂} ↦ (column image, concentrated on `i = 0`)` never collide, so the extension is well-defined
+and sends each column `columnSum χ₂ = ∑_i μ_{iχ₂}` to its image. -/
+theorem grid_mu_notMem_Xset
+    (hyp : SibleyDadeHypothesis G L H) [H.Normal]
+    (h46 : OddOrder.Peterfalvi.S06.Hypothesis46 (sharpImage H) L) (hW1 : h46.W1 = hyp.W1)
+    [NeZero (Nat.card h46.W1)] [Fintype ↥(h46.W1 ⊔ h46.W2)]
+    [Invertible (Nat.card ↥(h46.W1 ⊔ h46.W2) : ℂ)]
+    (χ₂ : (h46.W2.subgroupOf (h46.W1 ⊔ h46.W2)) →* ℂˣ) (i : Fin (Nat.card h46.W1)) :
+    ((h46.columnFamily χ₂).mu i : ClassFunction ↥L ℂ) ∉ hyp.Xset h46.W2 := by
+  intro hmem
+  have hS := hyp.Xset_subset_S hmem
+  rw [hyp.S_eq, Set.mem_setOf_eq] at hS
+  obtain ⟨θ, -, hμeq⟩ := hS
+  obtain ⟨a, ha⟩ := h46.certainType_degree_modEq χ₂ i
+  obtain ⟨d, _, hd⟩ := irreducibleCharacter_apply_one_eq_pos_natCast θ
+  have hindeg : ((h46.columnFamily χ₂).mu i : ClassFunction ↥L ℂ) 1
+      = (Nat.card hyp.W1 : ℂ) * (d : ℂ) := by
+    rw [hμeq, ClassFunction.induce_apply_one, hd, hyp.index_H_eq_card_W1]
+  rw [hindeg] at ha
+  have hcard : (Nat.card h46.W1 : ℂ) = (Nat.card hyp.W1 : ℂ) := by rw [hW1]
+  rw [hcard] at ha
+  have hw1 : Nat.card hyp.W1 ≠ 1 := fun h => hyp.W1_nontrivial (Subgroup.card_eq_one.mp h)
+  have hsignZ : (h46.columnFamily χ₂).sign = (Nat.card hyp.W1 : ℤ) * ((d : ℤ) - a) := by
+    have hsign : ((h46.columnFamily χ₂).sign : ℂ)
+        = (Nat.card hyp.W1 : ℂ) * ((d : ℂ) - (a : ℂ)) := by linear_combination -ha
+    exact_mod_cast hsign
+  have hdvd1 : (Nat.card hyp.W1 : ℤ) ∣ 1 := by
+    have hdvd : (Nat.card hyp.W1 : ℤ) ∣ (h46.columnFamily χ₂).sign := ⟨(d : ℤ) - a, hsignZ⟩
+    rcases (h46.columnFamily χ₂).sign_eq with hs | hs
+    · rwa [hs] at hdvd
+    · rw [hs] at hdvd; exact (dvd_neg).mp hdvd
+  exact hw1 (Nat.dvd_one.mp (by exact_mod_cast hdvd1))
+
 /-- **⚠ NON-VIABLE base (kept as a structural record).**  The map convention here is correct
 (`hyp.tau = dadeIntegralCharacterMap hyp.dade (hyp.dade.fullDadeIsometryData hyp.hconj)` defeq, so
 `xChainCoherentW hyp.dade hyp.hconj` lands at `hyp.tau` — no retargeting), **but the `hstep`

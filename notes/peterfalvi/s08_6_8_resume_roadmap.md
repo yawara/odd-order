@@ -38,26 +38,33 @@ hDeg `2a < ∑ deg²/mc` = (6.6) degree theory」は誤診断。** 根拠:
 **⟹ (6.8) case-B は hDeg(大型 §6 degree theory)無しで closeable。** orphaned 文脈は不変だが、closeability の評価が
 「multi-session hard §6 math」から「anchored-image 一般化 assembly(新数学ゼロ、在庫部品の varying-a 再配線)」に格上げ。
 
-### 🔨 cont.¹² 進捗 (本セッション) — all-X building block 2 個 landed、残 = extension + assembly
+### 🔨 cont.¹² 進捗 (本セッション) — all-X building block 3 個 landed、残 = extension map + assembly
 
-**✅ 着地 (sorry-free・axiom-clean、leaf 3632 green)**:
+**✅ 着地 (sorry-free・axiom-clean、leaf 3632 green)** — (P3) の coherence-field content は全て在庫化:
 - **`caseB_Xset_member_anchored`**(`b7329b61`)— (6.8.2.3) anchored image を **全 χ∈Xset W₂** に供給
   (θ-extraction: χ=Ind θ ∧ W₂⊄Ker θ via S_eq + mem_SsubFiltration → caseB_member_anchored_image)。
-  返り = (X, a=χ(1)/|W₁|, deg, anchored, seam ⟨X,ν₁⟩=0, X∈ZIrr, support)。
+  返り = (X, a=χ(1)/|W₁|, deg, anchored, seam ⟨X,ν₁⟩=0, X∈ZIrr, support)。= **hXanchored + hXzirr + hXmixed source**。
 - **`inner_eq_of_anchored_varying`**(`f3cb2e58`)— **varying-a** cross-member isometry
   `⟨Xᵢ,Xⱼ⟩=⟨χᵢ,χⱼ⟩`(xchi_inner_eq_of_anchored の uniform-a₀ を per-χ aᵢ/aⱼ に一般化、aᵢaⱼ 相殺)。
   = 全 X coherence の **hXinner** content。⚠ caseB_member_anchored_image は ℂ-smul `(a:ℂ)•ν` ゆえ
   scalar 補題は robust な simp-only パターン(rw は star 不在で fail)。
+- **`anchoredImage_scaledDiff_eq`**(`12764e7c`)— scaled-diff homogeneity `Xᵢ − dᵢ•X₁ = τ(χᵢ − dᵢ•χ₁)`
+  (aᵢ=dᵢ·a₁ で ν₁ 相殺 + τ 線形)。= **extends_on_supported** content(varying degree)。
 
-**▶ 残 = (P3) all-X coherence `Xset_isCoherent_via_anchoredImages` + (P4) glue + (P5) wire**:
-- **(P3) は infrastructure 重**: `xChiExtension`(`S08_CaseBXChiCoherence:66`)は **column-specific**
-  (basis Irr(L) 上 column-first-member μ_{0,χ₂}↦Ximg χ₂, 他 0)で、全 X(irreducible 含む)には非対応。
-  全 X 版 extension の再設計(basis 上 column-first-member + irreducible-X-member の両対応)or **retarget
-  engine**(`S07:2680`)で per-χ anchored target から直接構成、が要。**= 次の主タスク**(本セッション未着手)。
-  hXanchored=`caseB_Xset_member_anchored`、hXinner=`inner_eq_of_anchored_varying`、hXzirr=bundle、
-  generation=`span_subset_span_zSupportedSpan_union_anchor_of_scaledDiffs`(S07:172, scaled diff χᵢ−dᵢχ₁)。
-- **(P4)** Y と glue(`coherentUnion_of_glued_…`、my `coherentCertainTypeSet_union_Yset_caseB` template)。
+**▶ 残 = (P3) extension map のみ + (P4) glue + (P5) wire**(coherence-field content は ↑で完備):
+- **唯一の hard 残 = extension map** `ν : IntegralCharacterMap` で `ν(χ)=Ximg(χ) ∀χ∈Xset W₂`。
+  `xChiExtension`(`S08_CaseBXChiCoherence:66`)は **column-specific**(basis Irr(L) 上 column-first-member
+  μ_{0,χ₂}↦Ximg χ₂, 他 0)。全 X は `caseB_S_member_column_or_irreducible`(`S08_CaseBAssembly:1949`)で
+  **column(=columnSum χ₂) ∨ irreducible** の dichotomy ⟹ 全 X 版 = `f(ω) := if ω∈Xset W₂ then Ximg(ω)
+  else xChiExtensionFun(...) ω`(irreducible は basis 要素 ↦ Ximg、column は μ_{0} 集約)。
+  **構造的前提 = 列 constituent `μ_{iχ₂} ∉ Xset W₂` は ✅ 証明可(度数 mod |W₁| 論法、本セッション確認)**:
+  X-member は Ind^L_H θ で度数 `|W₁|·θ(1) ≡ 0 (mod |W₁|)`、grid constituent μ は度数 `≡ ±1 (mod |W₁|)`
+  (`certainType_degree_modEq`、`caseB_inner_irr_columnSum_eq_zero` docstring の論法)、|W₁|≠1 ⟹ 矛盾。
+  ⟹ basis branch が交わらず ν(columnSum χ₂)=Ximg 正。retarget は pair-based(chain 用)で textbook τ₂ には不適。
+- **(P4)** Y と glue(`coherentUnion_of_glued_…`、`coherentCertainTypeSet_union_Yset_caseB` template)。
 - **(P5)** seed → `nonempty_coherent_S_caseB` → S08:59 case-B 枝。
+- **見積**: extension map = fresh session 1 本(dichotomy basis 構成 + μ∉Xset 構造補題 + 4 coherence field
+  配線、building block は ↑で完備ゆえ純 assembly)。hDeg 不要(cont.¹²)。
 
 ## ✅✅✅ 2026-06-18 cont.¹¹ — BASE COHERENCE 完成: `IsCoherent (certainTypeSet ∪ Y)` を unconditional 化 + trap 除去
 
