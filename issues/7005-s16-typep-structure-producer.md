@@ -155,3 +155,55 @@ tp producer を honest localized sorry のまま据え置き、lane-f を re-tas
 - (b) は (10.10)/(11.9) ＝ §10/§11 character/structure に依存 ＝ lane-f 単独の clean win でない。
 - (a)(c) は深い BG §8/§14 構造論。やるなら独立タスクとして scope（issue 化）すべきで、
   「enrich すれば producer が落ちる」という LAUNCH の前提は不成立。
+
+---
+
+## 🔄 重要訂正 (2026-06-18 lane-f, さらに後刻) — tp producer は当初評価より遥かに tractable
+
+「正面から」攻める方針 (ユーザー裁可) で BG 14.7 + Pf (8.8)/(13.1) を精読した結果、
+**前回の監査 (Explore) は `OddOrder/GroupTheory/MaximalSubgroupType.lean` を見落としていた**。
+型述語 `IsTypeII/III/IV/V` は `TypeIIData/.../TypeVData` を nonempty 包み、各々:
+- `typeP : TypePData M` を carry — `W1, W2, W, U, H` + `W_eq`(W=W1⊔W2) + `W_cyclic` +
+  `W1_cyclic/W2_cyclic` + `W1/W2_nontrivial` + `M_complement`(W1 が M' を補元) +
+  `derived_complement`(H が U を M' 内で補元 ⟹ derivedInG M = H ⊔ U = M_F ⊔ U) +
+  `centralizer_W1`(W2 = C_{M'}(W1#)) + `fitting_eq`(M_F = H ⊔ (U ⊓ C(H)) ⟹ C 構造) +
+  `normalizer_V` 等、**tp が要求する構造のほぼ全部**。
+- `common : TypePNontrivialCore M typeP`(II–IV のみ)= **`(Nat.card W1).Prime`** を carry。
+
+⟹ `mp.S_nonI : IsTypeNonI S` (= II∨III∨IV∨V) は `TypeXData` を **直接** (sorry'd bridge 不要で)
+与える。`proposition_type_classification` (S16:894, sorry) は不要。
+
+### tp field の供給元 (修正版)
+
+| field | 供給 |
+|---|---|
+| `W1 W2 W U` | TypePData (直接) |
+| `W_eq_join` `W_cyclic` `W1_inf_W2_eq_bot`(W cyclic+coprime) `W1_commutes_W2`(W abelian) | TypePData |
+| `S_deriv_eq_PU` (derivedInG S = M_F ⊔ U) | `derived_complement` + `H_eq` |
+| `q_prime`(II–IV) `q_eq_card_W1` | `TypePNontrivialCore` + **`card_W1_eq_derived_index` (本セッション landing)** |
+| `c d u v` + card 恒等式 | `fitting_eq`(C=U⊓C(H)) + Lagrange |
+| `V` `T_deriv_eq_QV` `p_prime` 等 (T 側) | TypePData_T (対称) |
+
+### 真の残り core (これだけが genuine work、当初の「全部 absent」は誤り)
+
+1. **pairing reconciliation**: `tp.W = mp.S ⊓ mp.T`(= K⊔Kstar via gap B `typeP_pair_inf_eq`)を
+   TypePData_S.W / TypePData_T と同定。鍵 = **W1(S) = κ-Hall K_S**(両方 M' の補元 ⟹ 同位数、
+   `card_W1_eq_derived_index` で半分済)+ **W2(S) = Kstar_S = W1(T)**(Pf (8.9) の pairing)。
+2. **Type-V member の prime**: pair の一方が Type V なら W1 prime が型データに無い(TypeVData は
+   carry せず)→ type-II partner 経由(BG Thm C / duality、Pf (9.2) "type-II S with |S:S'|=|W₂|")。
+   ※ Pf (13.2)(a) は S を Type II/III に制限ゆえ、実際の (13.1) では Type V を回避できる可能性大。
+3. **q < p**: 両 prime 後に relabel で WLOG だが S/T のラベルに紐付くため要設計。
+4. **W1_normalizes_U / W2_normalizes_V**: Pf (13.1)(b)「remark following Def (8.4)」。
+   `TypePData.normalizer_V`(V-set の正規化)とは別物。TypePData から導けるか要確認。
+
+### 推奨 (更新) — option (D) tractable program として正面
+
+「全部 absent ゆえ lane-f 単独不可」(前回) は**訂正**。tp producer は型データ経由で大半が
+definitional に discharge でき、残り core (1)-(4) が genuine。lane-f で段階的に攻める価値あり:
+**Step 1** K_S = W1(S) 同定(card 一致は landing 済、subgroup 同定 or 位数で十分か精査)→
+**Step 2** gated-endpoint-skeleton で tp engine 化(型データ供給部を sorry-free、残 core を named
+residual)→ **Step 3** residual を 1 つずつ。base 7000、lane-f 所有。
+
+### 本セッション landing
+- `TypePData.card_W1_eq_derived_index` (`MaximalSubgroupType.lean`, `dc186aab`): |W1| = |M:M'|。
+  K↔W1 bridge + 型 II–IV の |K| prime 化の groundwork。full build 3860 green。

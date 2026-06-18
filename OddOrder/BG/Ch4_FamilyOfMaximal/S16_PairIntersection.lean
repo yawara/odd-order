@@ -176,4 +176,21 @@ theorem typeP_pair_inf_eq [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     _ = Kstar ⊔ K := hb1
     _ = K ⊔ Kstar := sup_comm Kstar K
 
+/-- **BG Theorem 14.7(8) / Theorem C, order form**: a Hall `κ(M)`-subgroup `K` of a type-`P`
+maximal subgroup has order `|M : M'|`, since it complements the derived subgroup `M' = [M,M]`
+in `M` (`typeP_derivedInG_isComplement_kappaHall`, BG part (h)).
+
+Companion of `OddOrder.GroupTheory.TypePData.card_W1_eq_derived_index` (`|W₁| = |M:M'|`): both `K`
+and the type-data factor `W₁` complement `M'`, so they share this order, `|K| = |W₁|`.  This is the
+bridge from the BG §14 κ-Hall presentation to the Peterfalvi (8.8.b1) `M = M' ⋊ W₁` presentation —
+in particular it transports BG Theorem C(10)'s "`|K|` prime" (type II–IV) to the `(card W₁).Prime`
+field carried by `TypePNontrivialCore`, the key step toward discharging the
+`section16TypePStructure` producer's prime-order fields. -/
+theorem card_kappaHall_eq_derived_index [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    {M K : Subgroup G} (hM : M ∈ maximalSubgroups G) (hP : S14.IsTypeP M) (hKM : K ≤ M)
+    (hK : Ch03.IsHallSubgroup (kappa M) (K.subgroupOf M)) [IsCyclic ↥K] :
+    Nat.card ↥K = ((derivedInG M).subgroupOf M).index := by
+  rw [← Nat.card_congr (Subgroup.subgroupOfEquivOfLe hKM).toEquiv,
+    ← (typeP_derivedInG_isComplement_kappaHall hG hM hP hKM hK).symm.index_eq_card]
+
 end OddOrder.BG.Ch4.S16
