@@ -365,3 +365,61 @@ gated-endpoint-skeleton。W-side discharge 済 (`typeP_pair_W_structure`)、prim
 
 **終端 gate** = lane-b Pf §10-12 char theory ((10.11)/(10.10)/(13.2))。ordering+U-side 完了でも
 primes は (10.11)[sorry] 依存ゆえ axiom-clean 化は lane-b 待ち。
+
+---
+
+## ✅ piece 1 DONE + piece 2 精密スコープ訂正 (2026-06-19 lane-f 再開セッション)
+
+### ✅ piece 1 (ordering honesty) 完了 — commit `b5f05289`
+`Section16MaximalPair` に `K_lt_Kstar : Nat.card K < Nat.card K*` を追加し、
+`exists_section16MaximalPair_data` で **enrich+swap** により確立 (cite でない):
+- 新 S14 補題 `card_kappaHall_ne_one` (type-P の κ-Hall は非自明; `IsTypeP` だけから、
+  (10.11) 非依存。`typeP_zTilde_conjClass_gt_half` のインライン重複を抽出・DRY 化) +
+  `card_kappaHall_ne_card_Kstar` (|K|≠|K*| = coprime + |K|>1)。
+- `lt_or_gt_of_ne` で場合分け、`>` 側は S↔T swap (typeP_duality は (S,K)↔(M*,K*) 対称;
+  dual witness = Ne.symm/Or.symm/IsConjugateSubgroup.symm/sup_comm + covering reorder)。
+- mp producer を `obtain`(大 And は large-elim 可)で再配線、脆い `.2.2.2…` チェーン排除。
+- producer residual から `|K|<|K*|` 除去 (now `mp.K_lt_Kstar`)。**residual が honest 化**
+  (旧 residual は labeling 次第で偽)。full build 3657 jobs green、実 sorry 140 維持。
+
+### ⛔ piece 2 (U-side) 精密訂正 — 「TypePData で trivial」は**誤り**、真の (13.1.b) invariant SZ
+
+producer residual = `Nonempty (Σ' U V, derivedInG S = M_F⊔U ∧ derivedInG T = M_F(T)⊔V ∧
+mp.K ≤ N(U) ∧ mp.Kstar ≤ N(V))`。本セッションで attack 経路を精査し**2 つの誤った楽観を訂正**:
+
+1. **U=M' (derivedInG S 自身) は CHEAT** (honest でない): `Section16Inputs.U` の拘束は弱い
+   (`derivedInG S = M_F⊔U`[M_F≤M' ゆえ U=M' で自明]、`K≤N(U)`[M'◁S ゆえ自明]、counting 定義)
+   が、**downstream §16 final-contradiction は強拘束** `u=(p^q-1)/(p-1)`、`N(U)≤L`
+   (`S16_NonExistenceG.lean:88,169,45`) を要求。U=M' だと `u=|M'|/c` がこの公式から外れ、
+   downstream が **unsatisfiable** ⟹ FT-critical な type-P counting を downstream に hoist する
+   だけ ([[scaffold-sorry-free-not-done]])。FT を前進させない。
+
+2. **TypePData.U で conjunct 1 は取れるが conjunct 2 `K≤N(U)` は generic に従わない**:
+   - conjunct 1 ✅: `TypePData.derivedInG_eq_fitting_sup_U` (`MaximalSubgroupType:176`) が
+     `derivedInG M = M_F ⊔ data.U` を全型で供給 (data.U = 真の complement、|U|=[M':M_F])。
+   - conjunct 2 ⛔: **U は M で normal でない** (type-II vacuity 検算): もし U◁M なら U char M'
+     (normal Hall) ◁ M ⟹ N(U)⊇M。type II の `normalizer_not_le : ¬N(U)≤M` + M maximal ⟹
+     N(U)=G ⟹ U◁G ⟹ U=⊥、しかし type-II core は U≠⊥ で**矛盾**。∴ generic な
+     「K≤M≤N(U)」は**偽**。`K≤N(U)` は **κ-Hall/W1 が U を normalize する specific 事実**を要す。
+
+   **原典 Pf (13.1.b)** (`references/peterfalvi/04.15…:7`): "Let U and V be such that
+   S=(P⋊U)⋊W₁... **Assume that W₁ normalizes U** ... which is possible by **the remark following
+   Definition (8.4)**." ⟹ `W₁ normalizes U` は **W₁-invariant complement の存在 (invariant
+   Schur-Zassenhaus)** に依拠する choice。generic data.U では不成立。
+
+### piece 2 の正しいスコープ — multi-step structural assembly (インフラ既存、~150-300 行)
+
+mathlib は basic SZ のみだが **repo に invariant-complement インフラ既存**:
+- `exists_subgroupESetup` (`S12_Lemma1211:71`): 任意 maximal M に `SubgroupESetup M E E₁ E₂ E₃`。
+- `E ≤ N(E₂⊔E₃)` (`S14:884` `hE23norm`) = E(⊇E₁=κ-part) が E₂⊔E₃ を normalize = **invariant
+  complement 内蔵**。
+- `aInvariant_piSubgroup_le_aInvariant_hall` (`S01_Solvable:1402`) / `OperatorMaschke` =
+  coprime 作用 A-invariant complement (BG §1/§4)。
+
+**route A** (SubgroupESetup): `exists_subgroupESetup mp.S` → E₁ を mp.K (κ-Hall) と同定
+[= pairing reconciliation, **crux**] → `derivedInG mp.S = M_F ⊔ (E₂⊔E₃)` 確立 → `hE23norm`。
+**route B** (直接): mp.K-invariant complement U を M_F in M' に `aInvariant_*_hall` で構成。
+どちらも multi-session、E₁↔mp.K (or 作用 setup) の reconciliation が難所。
+
+**∴ piece 2 = lane-f 所有の genuine 構造論プロジェクト** (char theory でない、正しいレーン)。
+quick win でなく loop 不適 (loop は U=M' cheat を取るか空転)。count 140→139 は assembly 完了時。
