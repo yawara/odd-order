@@ -487,17 +487,25 @@ noncomputable def section16TypePStructure_of_isMinimalSimpleOdd {G : Type*} [Gro
   obtain ⟨hWjoin, hWcyc, hbot, hcomm⟩ :=
     BG.Ch4.S16.typeP_pair_W_structure hG mp.S_maximal mp.S_typeP mp.K_le_S mp.K_hall mp.Kstar_eq
       hU₀' mp.T_maximal mp.T_typeP mp.S_T_not_conj mp.Kstar_le_T mp.Kstar_hall mp.Z_cyclic mp.K_eq
-  -- **U-side residual**: the (13.1.b) semidirect complements, the primality of `|K|, |K*|`
-  -- (BG Theorem C(10)), and the ordering `q < p` (Peterfalvi (13.2.a)).  A *true*, constructible
-  -- §14/§13 statement for the canonical pair (`mp.K`, `mp.Kstar`).
-  obtain ⟨U, V, hSderiv, hTderiv, hSprime, hTprime, hSnorm, hTnorm, hlt⟩ := Classical.choice
+  -- **Primes** `|K|, |K*|` from **Peterfalvi (10.11)** (`theorem88_caseB_prime_orders`): the
+  -- orders of the two factors of the case-(b) cyclic group are prime.  The case-(b) data is built
+  -- directly from `mp` (`W₁ = K`, `W₂ = K*`, `W = K ⊔ K*` cyclic).  This delegates the primality —
+  -- a Peterfalvi §10–12 character-theoretic fact — to its named home, where it is owned (lane-b).
+  have hprimes := Peterfalvi.S12.theorem88_caseB_prime_orders hG
+    { S := mp.S, T := mp.T, W1 := mp.K, W2 := mp.Kstar, W := mp.K ⊔ mp.Kstar,
+      S_maximal := mp.S_maximal, T_maximal := mp.T_maximal, S_ne_T := mp.S_ne_T,
+      W_eq := rfl, W_cyclic := mp.Z_cyclic,
+      S_nonI := mp.S_nonI, T_nonI := mp.T_nonI, one_typeII := mp.one_typeII }
+  -- **U-side residual**: the (13.1.b) semidirect complements `U, V` (with `M' = M_F ⊔ U` and
+  -- `K ≤ N_G(U)`) and the ordering `q < p`.  A *true*, constructible §13/§14 statement for the
+  -- canonical pair (`mp.K`, `mp.Kstar`).
+  obtain ⟨U, V, hSderiv, hTderiv, hSnorm, hTnorm, hlt⟩ := Classical.choice
     (show Nonempty (Σ' (U V : Subgroup G),
       derivedInG mp.S = maxNilpotentNormalHall mp.S ⊔ U ∧
       derivedInG mp.T = maxNilpotentNormalHall mp.T ⊔ V ∧
-      (Nat.card ↥mp.K).Prime ∧ (Nat.card ↥mp.Kstar).Prime ∧
       mp.K ≤ Subgroup.normalizer (U : Set G) ∧ mp.Kstar ≤ Subgroup.normalizer (V : Set G) ∧
       Nat.card ↥mp.K < Nat.card ↥mp.Kstar) from sorry)
-  exact section16TypePStructure_of_components mp.K mp.Kstar U V hSderiv hTderiv hSprime hTprime
+  exact section16TypePStructure_of_components mp.K mp.Kstar U V hSderiv hTderiv hprimes.1 hprimes.2
     hWjoin hWcyc hbot hcomm hSnorm hTnorm hlt
 
 /-- **Peterfalvi §13 coherent Dade-grid producer** (`sorry`) — *lane-b*
