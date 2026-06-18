@@ -717,3 +717,16 @@ before attempting the wrapper; the engine + bridges above are already in place t
 residual modest skeleton queue (lower value, §14-independent): `theoremA/C/E/aSets _of_inputs`
 (bare sorry → named residual; F already did D / II-conj1 / A-ungated / B(1) / sigma-disjoint).
 
+
+## 2026-06-18 (lane G, session #3) — POLE-1 connect + option-1 forward half
+
+- ✅ **`section16MaximalPair_of_isMinimalSimpleOdd` sorry-free** (`FeitThompson.lean`, commit
+  `651a2bae`): Pf 8.8 dichotomy case(b) via `Exists.choose` + case(a) all-Type-I 排除 (Pf 12.17
+  `theorem88_caseB_holds` + 新補題 `not_isTypeI_of_isTypeNonI` = Prop 16.1 の系). lane-g §16 が初の
+  FT spine 実 consumer に. 実 sorry 141→140. (issue 8014 closed.)
+- ✅ **`kappa_join_kstar_le_pair_inf`** (commit `48f4eb04`, axiom-clean): BG Thm I(2) の **forward
+  inclusion `K ⊔ K* ≤ M ⊓ M*`** = `S ∩ T = W` の lane-g 担当半分. 純束論 (`Msigma_le` + duality data
+  hyp: `hKM`/`hKstar`/`hKstarMstar`/`hKdual`). **逆包含 `M ⊓ M* ≤ K ⊔ K*` = lane-f の
+  `S16_PairIntersection` (BG-internal, 作業中)**. lane-f landing 後、`le_antisymm` で `W = S ⊓ T` →
+  `theoremI`/Pf 8.8 に clause 復活 + `Section16MaximalPair` に `W`/`W_eq_inter` field 追加 (struct
+  変更ゆえ要 hub/user 承認). **⟹ lane-f は forward を再形式化不要; この補題を cite して合成すればよい.**
