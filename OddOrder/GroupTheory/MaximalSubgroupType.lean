@@ -243,6 +243,13 @@ def IsTypeV (M : Subgroup G) : Prop :=
 def IsTypeNonI (M : Subgroup G) : Prop :=
   IsTypeII M ∨ IsTypeIII M ∨ IsTypeIV M ∨ IsTypeV M
 
+/-- Every non-Type-I maximal subgroup carries type-`P` data: all four of `TypeII`–`TypeV` bundle a
+`TypePData` (the type-`P` structure `M = M' ⋊ W₁`, `M' = M_F ⋊ U`, `W = W₁ × W₂`).  This is the
+entry point that lets the §16 producer extract the structure of `S` and `T` from
+`Section16MaximalPair.S_nonI`/`T_nonI`. -/
+theorem typePData_of_isTypeNonI {M : Subgroup G} (h : IsTypeNonI M) : Nonempty (TypePData M) := by
+  rcases h with h | h | h | h <;> exact ⟨h.some.typeP⟩
+
 /-- The five named Peterfalvi maximal-subgroup types. -/
 inductive PeterfalviType where
   | I | II | III | IV | V

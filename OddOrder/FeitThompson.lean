@@ -361,12 +361,31 @@ noncomputable def section16TypePStructure_of_typeData {G : Type*} [Group G] [Fin
   card_V_eq_vd := (Nat.div_mul_cancel (Subgroup.card_dvd_of_le inf_le_left)).symm
   q_lt_p := hlt
 
-/-- **BG §14 type-P duality producer** (`sorry`) — *lane-f* (BG §14 `typeP_duality`).
+/-- **BG §14 type-P duality producer** — *lane-f* (BG §14 `typeP_duality`).
 Given the maximal pair, constructs the cyclic structure `W = W₁W₂`, the complements
-`U, V`, the primes `p, q`, and the counting parameters. -/
+`U, V`, the primes `p, q`, and the counting parameters.
+
+In gated-endpoint-skeleton form (issue 7005): the type data `dataS`, `dataT` of `S`, `T` are
+extracted `sorry`-free from `mp.S_nonI`/`mp.T_nonI` (every non-Type-I maximal carries `TypePData`),
+and `section16TypePStructure_of_typeData` assembles ~18 of the 25 fields from them.  The single
+remaining `sorry` is localized to the explicit **residual menu**: the primality of `|W₁(S)|`,
+`|W₁(T)|` (BG Theorem C(10), immediate for type II–IV via the type data, partner-argument for the
+Type-V case), the cross-member pairing `S ∩ T = W₁(S) × W₁(T)` cyclic (BG §16 / Peterfalvi (8.9)),
+the normalization `W₁ ≤ N_G(U)` (Peterfalvi (13.1.b)), and the ordering `q < p`. -/
 noncomputable def section16TypePStructure_of_isMinimalSimpleOdd {G : Type*} [Group G] [Finite G]
     (hG : IsMinimalSimpleOdd G) (mp : Section16MaximalPair G) :
-    Section16TypePStructure mp := sorry
+    Section16TypePStructure mp :=
+  let dataS : TypePData mp.S := Classical.choice (typePData_of_isTypeNonI mp.S_nonI)
+  let dataT : TypePData mp.T := Classical.choice (typePData_of_isTypeNonI mp.T_nonI)
+  have residual : (Nat.card ↥dataS.W1).Prime ∧ (Nat.card ↥dataT.W1).Prime ∧
+      mp.S ⊓ mp.T = dataS.W1 ⊔ dataT.W1 ∧ IsCyclic ↥(mp.S ⊓ mp.T) ∧
+      dataS.W1 ⊓ dataT.W1 = ⊥ ∧ (∀ x ∈ dataS.W1, ∀ y ∈ dataT.W1, Commute x y) ∧
+      dataS.W1 ≤ Subgroup.normalizer (dataS.U : Set G) ∧
+      dataT.W1 ≤ Subgroup.normalizer (dataT.U : Set G) ∧
+      Nat.card ↥dataS.W1 < Nat.card ↥dataT.W1 := sorry
+  section16TypePStructure_of_typeData dataS dataT residual.1 residual.2.1 residual.2.2.1
+    residual.2.2.2.1 residual.2.2.2.2.1 residual.2.2.2.2.2.1 residual.2.2.2.2.2.2.1
+    residual.2.2.2.2.2.2.2.1 residual.2.2.2.2.2.2.2.2
 
 /-- **Peterfalvi §13 coherent Dade-grid producer** (`sorry`) — *lane-b*
 (Peterfalvi §3–§13 coherent grids).  Given the maximal pair and the type-P
