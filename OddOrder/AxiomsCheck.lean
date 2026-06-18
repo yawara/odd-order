@@ -74,6 +74,7 @@ import OddOrder.BG.Ch3_MaximalSubgroups.S13_PrimeAction
 import OddOrder.BG.Ch3_MaximalSubgroups.S13_PrimeActionTransition
 import OddOrder.BG.Ch3_MaximalSubgroups.S14_Prop142Support
 import OddOrder.BG.Ch4_FamilyOfMaximal.S14_TypePCounting
+import OddOrder.BG.Ch4_FamilyOfMaximal.S16_PairIntersection
 import OddOrder.BG.AppA_PStability
 import OddOrder.BG.AppB_Puig
 import OddOrder.BG.AppB_PuigB3B4
@@ -5121,6 +5122,15 @@ unique nonconjugate type-P partner `M*` with cyclic `Z`, TI `Ẑ`, type-P₂ sid
 Fully unconditional, axiom-clean — completes the §14 long pole feeding §15/§16. -/
 
 #assert_only_allowed_axioms OddOrder.BG.Ch4.S14.typeP_duality
+
+/-! **BG Theorem 14.7(4) / Theorem C(6) / Theorem I(2)**, the type-P dual pair intersection
+(`S16_PairIntersection`, `typeP_pair_inf_eq`): for a type-P maximal `M` with Hall `κ`-factor `K`,
+canonical `K* = M_σ ⊓ C_G(K)`, and the `typeP_duality` partner `M*` (with `K = M*_σ ⊓ C_G(K*)`),
+the pair intersects in the cyclic `Z`: `M ⊓ M* = K ⊔ K*`.  This is the reverse inclusion
+`M ⊓ M* ≤ K ⊔ K*` — the genuine missing §16 structure restating `S ∩ T = W` — proved via the
+σ-decomposition (Step 1: `M_σ ⊓ M* = K*`) and Proposition 14.2(b1) (Step 2).  Axiom-clean. -/
+
+#assert_only_allowed_axioms OddOrder.BG.Ch4.S16.typeP_pair_inf_eq
 
 /-! **BG Theorem E, `σ(Mᵢ)`-disjointness conjunct** (`S16_MainResults`,
 `sigma_reps_pairwise_disjoint`): distinct conjugacy-class representatives of maximal subgroups

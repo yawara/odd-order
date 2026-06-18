@@ -29,6 +29,31 @@ created: 2026-06-18
 
 `section16TypePStructure_of_isMinimalSimpleOdd` の `sorry` が消え、`lake build OddOrder` 緑。
 
+## 進捗 (2026-06-18 lane-f, 後刻) — ✅ 逆包含 (gap B) landing 完了
+
+hub REASSIGN #2 (option 1「難所に正面」) を受け、**逆包含 `M ⊓ Mstar ≤ K ⊔ Kstar`
+(= BG Thm 14.7(4) / Thm C(6) / Thm I(2) の `S ∩ T = W`) を完全形式化**
+(`aa177257`, sorry-free + axiom-clean, AxiomsCheck 登録済):
+
+- 新 leaf `OddOrder/BG/Ch4_FamilyOfMaximal/S16_PairIntersection.lean`、定理
+  `OddOrder.BG.Ch4.S16.typeP_pair_inf_eq : M ⊓ Mstar = K ⊔ Kstar`。
+- canonical packaging (typeP_duality の `∃!` 出力 = `Mstar` maximal/type-P/non-conj、
+  `Kstar ≤ Mstar`、`Kstar` Hall κ(Mstar)、`K = Msigma Mstar ⊓ C(Kstar)`、`IsCyclic Z`) を
+  そのまま入力に取る → consumer から直接呼べる。
+- 証明 = mmd L4063 (Thm 14.7 end-of-proof): Step1 `Msigma M ⊓ Mstar = Kstar`
+  (σ-decomposition: `⁅W,K⁆ ⊆ Msigma M ⊓ Msigma Mstar = ⊥`) + Step2 (Prop 14.2(b1) +
+  cyclic Kstar の characteristic line `X*`)。
+- **caveat 回避確認**: prerequisite (Prop 14.2(b1)/(f)、Thm 13.9、typeP_self_member、
+  eq_of_card_eq_prime_of_le_isCyclic) は全て既形式化。未形式化 §16 theory (Prop 16.1 等)
+  には bottom-out しなかった。
+
+**残 (gap A = lane-g/hub 領域)**: 元の型欠陥は未解消。`Section16MaximalPair` は依然 partner を
+共役までしか固定せず、producer `section16TypePStructure_of_isMinimalSimpleOdd` は本補題が
+あっても**まだ discharge できない**。次手 = lane-g が `Section16MaximalPair` を本補題で enrich
+(W=S∩T cyclic + dichotomy clause 復活) → そこで初めて typeP producer が discharge 可能。
+
+---
+
 ## 調査結果 (2026-06-18 lane-f) — ⚠ 現仕様では sorry-free 化が原理的に不可能
 
 精査の結果、**前提「proved `typeP_duality` を cite すれば構成可」は不正確**で、producer は
