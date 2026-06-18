@@ -789,6 +789,65 @@ noncomputable def coherentCertainTypeSet_union_Yset_caseB
         (key χ₂ hmem).2.1 (key χ₂ hmem).2.2.2 hy
     · rw [hXimg]; simp only [if_neg hmem]; rw [ClassFunction.inner_zero_left]
 
+/-- **(6.8.2.3) per-member anchored image for an arbitrary `X`-member.**  Generalizes
+`caseB_column_anchored_full` from a certain-type column to **any** `χ ∈ Xset W₂` (reducible column or
+irreducible).  Every such `χ = Ind^L_H θ` with `W₂ ⊄ Ker θ` (from `S_eq` and `χ ∉ S(W₂)`: had
+`W₂ ⊆ Ker θ` then `χ ∈ S(W₂)`), so `caseB_member_anchored_image` supplies the (6.8.2.3) anchored
+image with `a = χ(1)/|W₁| = θ(1)`.
+
+This is the uniform (6.8.2.3) datum for the **whole** of `X` — the per-member input to the case-(B)
+`Xset W₂ ∪ Y` coherence seed (Peterfalvi (6.8.2), built via the anchored-image isometry `τ₂`, *not*
+the `(6.6)` chain — see roadmap cont.¹²). -/
+theorem caseB_Xset_member_anchored
+    (hyp : SibleyDadeHypothesis G L H) [H.Normal] [Fintype ↥H]
+    (h46 : OddOrder.Peterfalvi.S06.Hypothesis46 (sharpImage H) L) (hHK : h46.K = H)
+    (hW1 : h46.W1 = hyp.W1)
+    [NeZero (Nat.card h46.W1)] [Invertible (Nat.card ↥h46.K : ℂ)]
+    [Fintype ↥(h46.W1 ⊔ h46.W2)] [Invertible (Nat.card ↥(h46.W1 ⊔ h46.W2) : ℂ)]
+    [Fintype (OddOrder.Peterfalvi.S06.ticVdiff h46).W]
+    [Invertible (Nat.card (OddOrder.Peterfalvi.S06.ticVdiff h46).W : ℂ)]
+    [h46.W2.Normal] [Invertible (Nat.card ↥h46.W2 : ℂ)]
+    [Fintype ↥(h46.W2.subgroupOf H)] [Invertible (Nat.card ↥(h46.W2.subgroupOf H) : ℂ)]
+    (hW2H : h46.W2 ≤ H)
+    (hcen : h46.W2.subgroupOf H ≤ Subgroup.center ↥H)
+    (hderiv : h46.W2.subgroupOf H ≤ commutator ↥H)
+    (hcop : Nat.Coprime (Nat.card ↥H) (Nat.card hyp.W1))
+    {p : ℕ} (hp : p.Prime) (hHp : IsPGroup p ↥H)
+    (hprime : (Nat.card h46.W2).Prime) (hW2comm : h46.W2 ≤ ⁅H, H⁆)
+    (hW2cenL : h46.W2 ≤ Subgroup.center ↥L)
+    (hc2 : 2 ≤ (h46.W2.subgroupOf H).index)
+    (hFPF : (h46.W2.index : ℤ) < ((h46.W2.subgroupOf H).index : ℤ) ^ 2)
+    {η₁ : ClassFunction ↥L ℂ} (hη₁ : η₁ ∈ hyp.Yset)
+    {χ : ClassFunction ↥L ℂ} (hχ : χ ∈ hyp.Xset h46.W2)
+    (hYcard : hyp.Yset.ncard ≠ 2) :
+    ∃ (X : ClassFunction G ℂ) (a : ℕ),
+      ((χ : ClassFunction ↥L ℂ) 1 = (a : ℂ) * η₁ 1) ∧
+      hyp.tau (χ - a • η₁) = X - (a : ℂ) • hyp.coherentYset.extension η₁ ∧
+      ClassFunction.inner X (hyp.coherentYset.extension η₁) = 0 ∧
+      X ∈ ZIrr G ∧
+      (χ - a • η₁).support ⊆ OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L := by
+  classical
+  obtain ⟨hχS, hχnotsub⟩ := hyp.mem_Xset.mp hχ
+  rw [hyp.S_eq] at hχS
+  obtain ⟨θ, hθne1, hχeq⟩ := hχS
+  have hθne : ∃ w : ↥(h46.W2.subgroupOf H),
+      (θ : ClassFunction ↥H ℂ) (w : ↥H) ≠ (θ : ClassFunction ↥H ℂ) 1 := by
+    by_contra hc
+    push_neg at hc
+    exact hχnotsub (hyp.mem_SsubFiltration.mpr ⟨θ, hθne1, fun g hg => by
+      rw [OddOrder.Peterfalvi.S03.mem_characterKernel]; exact hc ⟨g, hg⟩, hχeq⟩)
+  obtain ⟨X, a, hdeg, hanc, hmix, hXZ⟩ :=
+    caseB_member_anchored_image hyp h46 hHK hW1 hW2H hcen hderiv hcop hp hHp hprime hW2comm
+      hW2cenL hc2 hFPF hη₁ θ hθne hYcard
+  subst hχeq
+  have hsupp : (ClassFunction.induce H (θ : ClassFunction ↥H ℂ) - a • η₁).support ⊆
+      OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L := by
+    have h := hyp.sMember_smulDiffSupport_of_charValue_eq
+      (hyp.Xset_subset_S hχ) (hyp.Yset_subset_S hη₁) (m := 1) (n := a)
+      (by rw [Nat.cast_one, one_mul]; exact hdeg)
+    rwa [one_smul] at h
+  exact ⟨X, a, hdeg, hanc, hmix, hXZ, hsupp⟩
+
 /-- **⚠ NON-VIABLE base (kept as a structural record).**  The map convention here is correct
 (`hyp.tau = dadeIntegralCharacterMap hyp.dade (hyp.dade.fullDadeIsometryData hyp.hconj)` defeq, so
 `xChainCoherentW hyp.dade hyp.hconj` lands at `hyp.tau` — no retargeting), **but the `hstep`
