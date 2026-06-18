@@ -132,6 +132,19 @@ PRank:87 在) → `exists_galoisField_repr` 適用 → e/μ/hcompat ③ hW2 (pri
 (prime line↔W₂、iso scaling) ④ partB (13.2.b/14.5 cite) → ⑤ exists_pu_field_repr + fieldNormalizerData_of_repr
 を組んで `field_normalizer_of_U_characteristic` close。
 
+### ✅ 2026-06-19 再開⁷ — hμ_range producer `mu_range_eq_normOneUnits` COMPLETE (`c83540d7`)
+
+σ-bridge の `hμ_range` 入力を **unconditional**（axiom-clean、§13 非 cite）で landing: 任意の injective
+`μ : U →* 𝔽_{p^q}ˣ` で `|U|=(p^q-1)/(p-1)` なら `μ.range = normOneUnits`。両者は cyclic `𝔽_{p^q}ˣ` の
+同位数 d=(p^q-1)/(p-1) 部分群 ⟹ 共に `ker(powMonoidHom d)`（card = gcd(p^q-1,d)=d、`IsCyclic.card_powMonoidHom_ker`）
+に一致。`Subgroup.eq_of_le_of_card_ge` × 2。
+
+**proven コンポーネント棚卸し**（σ-bridge の hypothesis-inputs）: hUP=`conj_mem_P`✓ / hPU_disj=`P_inf_U_eq_bot`✓ /
+hμ_range=`mu_range_eq_normOneUnits`✓ / e,μ,hcompat=`exists_pu_field_repr`✓（value-arg 仮説）/ hcyclotomic=
+`cyclotomic_quotient_coprime_of_not_dvd`（q∤(p-1) 仮説）。**残る involved な gap**: ① value-arg `u=full`+`q∤(p-1)`
+（(13.15)二分 + W₂^y FPF、part(b) 依存）③ hW2（generic e を W₂-respecting に scaling）④ `[IsCyclic ↥U]` の §13
+producer ⑤ partB → ⑥ assembly。これらは clean な standalone でなく real argument 要（FPF 構造・scaling）。
+
 ## 完了条件
 
 `field_normalizer_structure` の `sorry` が消え、`lake build OddOrder OddOrder.AxiomsCheck` 緑。
