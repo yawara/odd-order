@@ -4,6 +4,45 @@
 > `s08_6_8_assembly_plan.md`(458KB)/`s08_6_8_3_gap_resolution.md` のうち本 note と矛盾する記述は本 note を優先。
 > 上位方針・FT 接続の文脈 = 記憶 [[ft-path-policy]] の 2026-06-17 検証訂正ブロック。
 
+## ✅✅✅✅ 2026-06-18 cont.¹³ — case-B 核心数学 COMPLETE: seed + anchor + bootstrap (P4+P5+P6a+P6b)
+
+**cont.¹² の残務 (P4 glue + P5 wire + P6 discharge) のうち、case-B 固有の数学を全て完成。**
+新 leaf [`S08_CaseBSeedGlue.lean`](../../OddOrder/Peterfalvi/S08_CaseBSeedGlue.lean) (4 producer、
+全 sorry-free + axiom-clean = propext/Classical.choice/Quot.sound のみ、full build 3859 jobs green):
+
+- **(P4) `coherentXunionYset_caseB`** — seed `IsCoherent hyp.tau (X(W₂) ∪ Y)`。cX=`caseBXset_isCoherent`、
+  ν=`exists_glue_nu_Xset_Yset_via_map`(grid ∪ irreducible-X source、全員 irreducible ゆえ orthonormality
+  自動)、hmixed=`caseB_member_seam_all_Yset`(column 専用 seam を一般メンバ化)、cross-diagonal χ₁−a₁·η₁ で
+  hDτ(anchored image 恒等式)+hgen(`hgen_withDiagonal_Xset`、次数比整数性は hdvd の p-power 可除性から)。
+  commit `e2ac14a4`。
+- **(P5) `nonempty_coherent_S_caseB_of_anchor`** — seed→S coherence(`nonempty_coherent_S_caseB` bootstrap)。
+- **(P6a) `exists_caseB_Xset_anchor`** — 最小次数 p-power anchor。`exists_charValue_one_eq_mul_xBaseBlock_anchor`
+  (Frobenius 版)を case-B へ: `Set.exists_min_image` で最小次数 χ₁ 直接選択、p-power ゆえ最小が全てを割る。
+- **(P6b) `nonempty_coherent_S_caseB_of_structure`** — **case-B 枝を「(6.4)/(6.5) 構造データ + hXne + hYcard」へ
+  完全還元**。anchor=(P6a)、hnonzero=共役差 χ̄−χ(`caseB_irr_conj_diff_support`、no-real ゆえ≠0)、Y-anchor=
+  `Yset_nonempty`。commit `e17be957`。
+
+**⟹ case-B の数学的内容(seed glue + anchor 構成 + p-power 可除性 + 6.8.3 bootstrap)は完全に閉じた。**
+**「hXanchored gap」は cont.¹² の anchored-image route で完全消滅 = ユーザー直接管理は不要に。**
+
+### ▶ 残務 = S08:59 dispatch (case-B 固有でない overarching phase、(6.5) p-群還元にゲート)
+
+`nonempty_coherent_S_caseB_of_structure` を S08:59 に配線するには:
+1. **(6.5) p-群還元** = X-nonempty(H 非可換)から H が p-群(p≥3 odd)を導く。**= dispatch 全体の真のゲート。
+   単一定理として未形式化**(case-A producer `Xset_centralCommutator_isCoherent_of_c2_caseA` も hp/hp3/hHp/hHnonab を
+   仮説で取る ⟹ 還元は dispatch level でまだ無い)。Sibley minimal-counterexample 論法、大型・別 phase。
+2. **構造データ discharge `_of_c2_caseB`** (case-A producer のミラー、未実装) = math-case-B 条件(W₂⊆Z(H)) + p-群 +
+   非可換から hcen/hderiv/hc2/hcZ/hfpf/hFPF/hYcard/hXne を導く。素材は在庫: hfpf=`caseB_fpf_bound`
+   (`S08_CaseBEndgame:338`、hMgt=非可換 + hWMgt 入力)、hFPF=hfpf + index 算術(case-B で W₂⊆H ゆえ
+   W₂.index=|W₁|·(W₂.subgroupOf H).index、∴ |W₁|<index)、hderiv=`commutator_subgroupOf_self`、
+   hcen=case 条件、hcZ=W₂ 素数。**achievable だが多ピース + 下流で (6.5) にゲート**。
+3. **math case A/B split** = Z(H)⊓W₂ が ⊥(case A)か W₂(case B)か(`eq_bot_or_eq_of_le_of_card_prime`、素数位数)。
+4. **Frobenius (c1) 枝** = `nonempty_coherent_S_caseA_of_frobenius`(unconditional、hp/hp3/hHp/hHnonab 要)。
+5. **case-A (c2) 枝** = `Xset_centralCommutator_isCoherent_of_c2_caseA` + S への bootstrap。
+
+**⟹ S08:59 を閉じる残務は case-B seed work でなく overarching dispatch + 未形式化の (6.5) 還元。**
+**FT 文脈不変**: (6.8) は [[ft-path-policy]] で orphaned (deferred-payoff) — 閉じても feitThompson sorry は今は減らない。
+
 ## 🚨🚨 2026-06-18 cont.¹² — 重大訂正: 「真の gate = hDeg = (6.6)」は **誤り**。(6.8.2) は anchored-image で chain/hDeg 不要
 
 **教科書 04.8 の (6.8) proof を直接精読(L140-235)して判明。cont.⁸/⁹/¹⁰ の「case-B X-coherence の真の gate =
