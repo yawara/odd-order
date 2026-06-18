@@ -106,6 +106,39 @@ and it depends on §13/§15 producers (see "Remaining" below).
 that **bottoms out in the sorried §13/§15 producers** (`basic_structure`, `c_eq_one`, the (14.7)
 case arithmetic) — i.e. the same §13 character/structure theory that gates `exists_L/MHypothesis`.
 
+## σ-bridge construction plan (step 4, scoped 2026-06-18 — ungated, intricate frozen-Core)
+
+The σ-bridge takes the (14.2)(a) iso as *input* (so it is ungated) and builds `FieldNormalizerData`.
+Target shape:
+```
+theorem fieldNormalizerData_of_repr (hyp : Hypothesis (G := G))
+    (e  : Additive ↥hyp.base.P ≃+ GaloisField hyp.base.p hyp.base.q)
+    (μ  : ↥hyp.base.U →* (GaloisField hyp.base.p hyp.base.q)ˣ) (hμinj : Injective μ)
+    (hμrange : μ.range = normOneUnits …)                       -- image = U*
+    (hcompat : e (Additive.ofMul (conj u • x)) = μ u • e x)    -- (14.2)(a) compat
+    (partB …) : Nonempty (FieldNormalizerData hyp)
+```
+Core facts (all in `OddOrder/BG/AppC_NormSet.lean`, frozen — *use*, don't modify):
+* `normOneFrobeniusGroup p q = additiveFieldGroup p q ⋊[normOneMulAction] normOneUnits p q`,
+  `additiveFieldGroup = Multiplicative (GaloisField p q)`, complement `normOneUnits` = norm-one
+  subgroup of `GF^×` (order `(p^q-1)/(p-1)` = `U*`).
+* `normOneFrobenius_conj_inl` : conjugation of an `inl`-kernel point by `inr u` = field-mult by `u`
+  — this is exactly the `SemidirectProduct.lift` compatibility, fed by `hcompat`.
+Construction:
+1. `f_N : Multiplicative (GF) →* G`, `ofAdd s ↦ ↑(e.symm s)` (uses `Additive`/`Multiplicative`
+   adjunction: `↥P` multiplicative in `G` ↔ `Additive ↥P` the `F_p`-space `e` lives on).
+   `map_mul` ⟸ `e.symm` additive + `↑(x+y : Additive ↥P) = ↑x * ↑y` in `G`. range `f_N = P`.
+2. `f_U : normOneUnits →* G`, `u* ↦ ↑(μ.symm-onto-range u*)` (via `hμrange`, `U* ≃ U`). range `= U`.
+3. `sigma := SemidirectProduct.lift f_N f_U <compat from normOneFrobenius_conj_inl + hcompat>`.
+4. Properties: `sigma_P_eq_P`/`sigma_U_eq_U` from `range f_N = P`/`range f_U = U` + `lift_inl`/`lift_inr`;
+   `sigma_P0_eq_W2` from `e`(prime line `F_p ⊆ GF`) `= W₂` (needs `e` to send the prime field to `W₂`
+   — extra `hcompat`-style hypothesis on the prime line); `sigma_injective` from `f_N`,`f_U` inj +
+   kernel∩complement = ⊥ (`fieldNormalizerKernel_inf_complement_eq_bot`, already in Core).
+⚠ The `Additive`/`Multiplicative` bookkeeping (steps 1-2) is the main friction. Estimate ~150-250
+lines. Then `field_normalizer_of_U_characteristic` = `fieldNormalizerData_of_repr` ∘
+(`exists_galoisField_repr` applied to `Additive ↥P` as `F_p[U]`-module via conjugation) — the latter
+needs `|P|=p^q` (`basic_structure`), `|U|=u`, `c=1` (`c_eq_one`): **the §13 gate**.
+
 `exists_LHypothesis`/`exists_MHypothesis` (14.3/14.10) and the case-B cascade remain Dade-gated
 (Lane B's §3-13 character theory), independent of the above.
 
