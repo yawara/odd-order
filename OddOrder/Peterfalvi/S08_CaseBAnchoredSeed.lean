@@ -529,18 +529,24 @@ theorem caseB_hmixed
     exact inner_extension_caseB_Xset_Yset_eq_zero_of_irreducible hyp cX hyp.coherentYset hpair
       hx hirr hχconj hχne hy
 
-/-- **(6.6) case-(B) weighted `X`-coherence chain consumer** (gated on the per-step weighted adjoin
-data).  The reducible-member analogue of `Xset_isCoherent_from_adjoinSteps_of_irreducible_X`: instead
-of the all-irreducible base `xBaseBlock` it folds onto the **certain-type column base**
-`certainTypeSet h46 k` (coherent via `certainTypeSet_isCoherent_tau_canonical`), using the
-norm-weighted chain `xChainCoherentW` (whose per-step `XAdjoinStepInputW` carries the squared-norm
-diagonal `mc i = ‖χmem i‖²`, valid on the reducible columns).
+/-- **⚠ NON-VIABLE base (kept as a structural record).**  The map convention here is correct
+(`hyp.tau = dadeIntegralCharacterMap hyp.dade (hyp.dade.fullDadeIsometryData hyp.hconj)` defeq, so
+`xChainCoherentW hyp.dade hyp.hconj` lands at `hyp.tau` — no retargeting), **but the `hstep`
+hypothesis is unsatisfiable at step 0**: `XAdjoinStepInputW` requires a **norm-1 anchor** in the
+accumulator (`hanchorNorm : mc i₁ = 1`), and the base `certainTypeSet h46 k` has **no** norm-1
+member (every column has `‖μ_k‖² = |W₁| > 1`, `S06_CertainTypeConjugation`).  So the weighted chain
+cannot be folded onto `certainTypeSet` alone.
 
-The conjugate-pair cover of `X(W₂) ∖ certainTypeSet` is supplied by `caseB_Xset_conjugatePairCover`;
-the per-step weighted adjoin input `hstep` (the norm-weighted (6.6) degree data — the remaining (5.6)
-degree-divisibility content) is taken as a hypothesis.  Since
-`hyp.tau = dadeIntegralCharacterMap hyp.dade (hyp.dade.fullDadeIsometryData hyp.hconj)`
-definitionally, `xChainCoherentW hyp.dade hyp.hconj` already lands at `hyp.tau` — no map retargeting. -/
+**Viable architecture instead**: fold the weighted chain onto base `certainTypeSet ∪ Y` (the
+`Y`-anchor `η` has `‖η‖² = 1`), building `IsCoherent hyp.tau (Xset W₂ ∪ Y)` — the **seed directly**,
+reusing brick 3's `Y`-anchored field assembly (`sMember_degreeSqNormBound`) and handling the `X ⊥ Y`
+seam in-chain via `hortho_mem`.  See roadmap cont.¹⁰.
+
+*(The map-convention fact and the `xChainCoherentW`-wrapper structure stay reusable for the corrected
+base; only the base/`X` sets change.)*
+
+**(6.6) case-(B) weighted `X`-coherence chain consumer** (gated on the per-step weighted adjoin
+data).  The reducible-member analogue of `Xset_isCoherent_from_adjoinSteps_of_irreducible_X`. -/
 noncomputable def caseB_Xset_isCoherent_of_hstepW
     (hyp : SibleyDadeHypothesis G L H) [H.Normal]
     (h46 : OddOrder.Peterfalvi.S06.Hypothesis46 (sharpImage H) L) (hHK : h46.K = H)
