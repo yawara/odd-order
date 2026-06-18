@@ -378,6 +378,86 @@ theorem caseB_member_anchored_image
     constituentWeight_eq_apply_one hW2H hcen hφ' hweight]
   ring
 
+/-- **(6.8.2.3) anchored image ⊥ the whole `Y`-image.**  The per-column anchored `X` (from the
+anchored image `τ(μ − a₀·η₁) = X − a₀·ν₁`, `hanc`, where `μ = columnSum χ₂`, `ν₁ = η₁^{τ₁}`) is
+orthogonal to `cY.extension y` for **every** `y ∈ Y`, not only the anchor `η₁`.
+
+Writing `⟨X, ν_y⟩ = ⟨X, ν_y − ν₁⟩ + ⟨X, ν₁⟩`, the anchor term is `hmix = 0` and the difference term
+`⟨X, cY.ext(y − η₁)⟩ = ⟨X, τ(y − η₁)⟩` (`cY` extends `τ` on the `H^#`-supported `y − η₁`) vanishes by
+the Dade isometry of `τ` and the `Y`-isometry of `cY`: with `X = τ(μ − a₀η₁) + a₀·ν₁`,
+`⟨X, τ(y − η₁)⟩ = ⟨μ − a₀η₁, y − η₁⟩ + a₀·⟨η₁, y − η₁⟩ = a₀(1 − c) + a₀(c − 1) = 0`
+(`c = ⟨η₁, y⟩`, the columns being orthogonal to `Y`).  This is the uniform `hXmixed` content for the
+case-(B) `certainTypeSet ∪ Y` coherence (Peterfalvi (6.8.2.3) "`X₁ ⊥ Y^{τ₁}`"). -/
+theorem caseB_anchoredImage_seam_all_Yset
+    (hyp : SibleyDadeHypothesis G L H) [H.Normal]
+    (h46 : OddOrder.Peterfalvi.S06.Hypothesis46 (sharpImage H) L) (hW1 : h46.W1 = hyp.W1)
+    [NeZero (Nat.card h46.W1)] [Fintype ↥(h46.W1 ⊔ h46.W2)]
+    [Invertible (Nat.card ↥(h46.W1 ⊔ h46.W2) : ℂ)]
+    {η₁ : ClassFunction ↥L ℂ} (hη₁ : η₁ ∈ hyp.Yset) {a₀ : ℕ}
+    {X : ClassFunction G ℂ}
+    {χ₂ : (h46.W2.subgroupOf (h46.W1 ⊔ h46.W2)) →* ℂˣ}
+    (hanc : hyp.tau (OddOrder.Peterfalvi.S06.columnSum h46 χ₂ - a₀ • η₁)
+      = X - a₀ • hyp.coherentYset.extension η₁)
+    (hmix : ClassFunction.inner X (hyp.coherentYset.extension η₁) = 0)
+    (hsupp : (OddOrder.Peterfalvi.S06.columnSum h46 χ₂ - a₀ • η₁).support ⊆
+      OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L)
+    {y : ClassFunction ↥L ℂ} (hy : y ∈ hyp.Yset) :
+    ClassFunction.inner X (hyp.coherentYset.extension y) = 0 := by
+  classical
+  -- `y − η₁` is `H^#`-supported (equal degree `|W₁|`) and lies in the `Y`-span.
+  have hydeg : y (1 : ↥L) = η₁ (1 : ↥L) :=
+    (hyp.Yset_apply_one hy).trans (hyp.Yset_apply_one hη₁).symm
+  have hysupp : (y - η₁).support ⊆
+      OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L :=
+    hyp.sMember_diffSupport_of_charValue_eq (hyp.Yset_subset_S hy) (hyp.Yset_subset_S hη₁) hydeg
+  have hymemZ : y - η₁ ∈ OddOrder.Peterfalvi.S07.zSpan (L := ↥L) hyp.Yset :=
+    Submodule.sub_mem _ (Submodule.subset_span hy) (Submodule.subset_span hη₁)
+  have hη₁memZ : η₁ ∈ OddOrder.Peterfalvi.S07.zSpan (L := ↥L) hyp.Yset :=
+    Submodule.subset_span hη₁
+  -- `cY` extends `τ` on the supported `y − η₁`.
+  have hcYext : hyp.coherentYset.extension (y - η₁) = hyp.tau (y - η₁) :=
+    hyp.coherentYset.extends_on_supported (y - η₁) ⟨hymemZ, hysupp⟩
+  -- `X = τ(μ − a₀η₁) + a₀·ν₁`.
+  have hX : X = hyp.tau (OddOrder.Peterfalvi.S06.columnSum h46 χ₂ - a₀ • η₁)
+      + (a₀ : ℂ) • hyp.coherentYset.extension η₁ := by
+    rw [hanc, ← Nat.cast_smul_eq_nsmul ℂ a₀ (hyp.coherentYset.extension η₁)]; abel
+  -- split `⟨X, ν_y⟩ = ⟨X, cY(y − η₁)⟩ + ⟨X, ν₁⟩` and discharge the anchor term by `hmix`.
+  have hsplit : ClassFunction.inner X (hyp.coherentYset.extension y)
+      = ClassFunction.inner X (hyp.coherentYset.extension (y - η₁))
+        + ClassFunction.inner X (hyp.coherentYset.extension η₁) := by
+    rw [map_sub, ClassFunction.inner_sub_right]; ring
+  rw [hsplit, hmix, add_zero, hcYext]
+  -- the Dade isometry of `τ` on the supported pair `{μ − a₀η₁, y − η₁}`.
+  have hiso : ClassFunction.inner
+        (hyp.tau (OddOrder.Peterfalvi.S06.columnSum h46 χ₂ - a₀ • η₁)) (hyp.tau (y - η₁))
+      = ClassFunction.inner (OddOrder.Peterfalvi.S06.columnSum h46 χ₂ - a₀ • η₁) (y - η₁) :=
+    OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap_inner_eq_on_supported_span hyp.dade hyp.hconj
+      (S := ({OddOrder.Peterfalvi.S06.columnSum h46 χ₂ - a₀ • η₁, y - η₁}
+        : Set (ClassFunction ↥L ℂ)))
+      (by intro s hs; simp only [Set.mem_insert_iff, Set.mem_singleton_iff] at hs
+          rcases hs with rfl | rfl; exacts [hsupp, hysupp])
+      (Submodule.subset_span (Set.mem_insert _ _))
+      (Submodule.subset_span (Set.mem_insert_of_mem _ rfl))
+  -- the `Y`-isometry of `cY`: `⟨ν₁, τ(y − η₁)⟩ = ⟨η₁, y − η₁⟩`.
+  have hcYiso : ClassFunction.inner (hyp.coherentYset.extension η₁) (hyp.tau (y - η₁))
+      = ClassFunction.inner η₁ (y - η₁) := by
+    rw [← hcYext, hyp.coherentYset.extension_inner_eq η₁ (y - η₁) hη₁memZ hymemZ]
+  -- the columns are orthogonal to `Y`.
+  have hμy : ClassFunction.inner (OddOrder.Peterfalvi.S06.columnSum h46 χ₂) y = 0 :=
+    inner_columnSum_Yset_eq_zero hyp h46 hW1 hy χ₂
+  have hμη : ClassFunction.inner (OddOrder.Peterfalvi.S06.columnSum h46 χ₂) η₁ = 0 :=
+    inner_columnSum_Yset_eq_zero hyp h46 hW1 hη₁ χ₂
+  have hηirr : IsIrreducibleCharacter η₁ := hyp.isIrreducibleCharacter_of_mem_Yset hη₁
+  have hηη : ClassFunction.inner η₁ η₁ = 1 := by
+    have h := irreducibleCharacter_inner_eq_ite (⟨η₁, hηirr⟩ : IrreducibleCharacter ↥L)
+      (⟨η₁, hηirr⟩ : IrreducibleCharacter ↥L)
+    rwa [if_pos rfl] at h
+  -- assemble: the `c = ⟨η₁, y⟩` terms cancel.
+  rw [hX, ClassFunction.inner_add_left, hiso, ClassFunction.inner_smul_left, hcYiso]
+  simp only [← Nat.cast_smul_eq_nsmul ℂ a₀ η₁, ClassFunction.inner_sub_left,
+    ClassFunction.inner_sub_right, ClassFunction.inner_smul_left, star_natCast, hμy, hμη, hηη]
+  ring
+
 /-- **(6.8.2.3) seam for an irreducible `X`-member** — `⟨χ^{τ₂}, η^{τ₁}⟩ = 0` for an irreducible
 `χ ∈ X(W₂)` and `η ∈ Y`.  The case-(B) (mixed-`X`) analogue of the Frobenius
 `inner_extension_Xset_centralCommutator_Yset_eq_zero_general`.
