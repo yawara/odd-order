@@ -1960,12 +1960,63 @@ theorem H_eq_U [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
       _hG Tdata Sdata hcaseB (nc.u_dvd_h _hG) hh_mod_p hh_mod_q
       (hyp.u_modEq_one_mod_q _hG) hx_ne_one_of_quotient
 
+/-- **Peterfalvi (14.3)**: a type-I maximal subgroup `L` over `N_G(U)` together
+with its Dade data exists.  This packages (13.17) (the type-I-over-normalizer
+Frobenius structure `S15.typeII_overNormalizer_frobenius`) with the Dade isometry
+`τ`, its extension `τ₁`, the degree-`|L:H|` character `φ`, and the virtual
+characters `β_S`, `β_T`, `β_L` of (14.3).  The construction is gated on the §13
+character theory (Dade isometry + type-I structure). -/
+theorem exists_LHypothesis [Finite G]
+    (_hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G)) :
+    Nonempty (LHypothesis hyp) := by
+  sorry
+
+/-- **Peterfalvi (14.10)**: a type-I maximal subgroup `M` over `N_G(V)` together
+with its Dade data exists.  Symmetric to `exists_LHypothesis`, packaging (13.17)
+for the `V`-side with the Dade data and the virtual character `β_M` of (14.10).
+Gated on the §13 character theory. -/
+theorem exists_MHypothesis [Finite G]
+    (_hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G)) :
+    Nonempty (MHypothesis hyp) := by
+  sorry
+
+/-- **Peterfalvi (14.16)**→(14.7) bridge: if the Fitting kernel `H` of `L`
+coincides with `U`, then `U` is characteristic in `H` (it is `H` itself).  This
+is what lets the non-conjugate case `H = U` of (14.16) feed back into (14.7). -/
+theorem U_characteristic_of_H_eq_U {hyp : Hypothesis (G := G)}
+    (Ldata : LHypothesis hyp) (hHU : Ldata.H = hyp.base.U) :
+    Ldata.U_characteristic_in_H := by
+  sorry
+
 /-- **Peterfalvi (14.2)**: the field-normalizer configuration follows from the
-Section 16 hypotheses. -/
+Section 16 hypotheses.
+
+This assembles Peterfalvi's concluding paragraph "By (14.12), (14.16) and (14.7),
+the proof of Theorem (14.2) is complete."  Take the type-I subgroup `L` over
+`N_G(U)` ((14.3), `exists_LHypothesis`) and split on whether `U` is characteristic
+in `H`:
+
+* if it is, (14.7) `field_normalizer_of_U_characteristic` finishes;
+* otherwise take the type-I subgroup `M` over `N_G(V)` ((14.10),
+  `exists_MHypothesis`) and split on whether `L` is conjugate to `M`:
+  * if it is, (14.12) `field_normalizer_of_L_conj_M` finishes;
+  * otherwise (14.13)–(14.16) `H_eq_U` give `H = U`, so `U` is characteristic in
+    `H` (`U_characteristic_of_H_eq_U`), contradicting the branch assumption. -/
 theorem field_normalizer_structure [Finite G]
     (_hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G)) :
     Nonempty (FieldNormalizerData hyp) := by
-  sorry
+  obtain ⟨Ldata⟩ := exists_LHypothesis _hG hyp
+  by_cases hchar : Ldata.U_characteristic_in_H
+  · exact field_normalizer_of_U_characteristic _hG hyp Ldata hchar
+  · obtain ⟨Mdata⟩ := exists_MHypothesis _hG hyp
+    by_cases hconj : ∃ g : G, MulAut.conj g • Ldata.L = Mdata.M
+    · exact field_normalizer_of_L_conj_M _hG hyp Ldata Mdata hconj
+    · exact absurd
+        (U_characteristic_of_H_eq_U Ldata
+          (H_eq_U _hG hyp
+            { Ldata := Ldata, Mdata := Mdata, not_conj := hconj,
+              h := Nat.card ↥Ldata.H, h_eq_card_H := rfl }))
+        hchar
 
 /-- **Peterfalvi Section 16 + BG Appendix C**: BG Appendix C turns the
 field-normalizer configuration into `p <= q`, contradicting (14.1). -/
