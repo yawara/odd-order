@@ -38,6 +38,27 @@ hDeg `2a < ∑ deg²/mc` = (6.6) degree theory」は誤診断。** 根拠:
 **⟹ (6.8) case-B は hDeg(大型 §6 degree theory)無しで closeable。** orphaned 文脈は不変だが、closeability の評価が
 「multi-session hard §6 math」から「anchored-image 一般化 assembly(新数学ゼロ、在庫部品の varying-a 再配線)」に格上げ。
 
+### 🔨 cont.¹² 進捗 (本セッション) — all-X building block 2 個 landed、残 = extension + assembly
+
+**✅ 着地 (sorry-free・axiom-clean、leaf 3632 green)**:
+- **`caseB_Xset_member_anchored`**(`b7329b61`)— (6.8.2.3) anchored image を **全 χ∈Xset W₂** に供給
+  (θ-extraction: χ=Ind θ ∧ W₂⊄Ker θ via S_eq + mem_SsubFiltration → caseB_member_anchored_image)。
+  返り = (X, a=χ(1)/|W₁|, deg, anchored, seam ⟨X,ν₁⟩=0, X∈ZIrr, support)。
+- **`inner_eq_of_anchored_varying`**(`f3cb2e58`)— **varying-a** cross-member isometry
+  `⟨Xᵢ,Xⱼ⟩=⟨χᵢ,χⱼ⟩`(xchi_inner_eq_of_anchored の uniform-a₀ を per-χ aᵢ/aⱼ に一般化、aᵢaⱼ 相殺)。
+  = 全 X coherence の **hXinner** content。⚠ caseB_member_anchored_image は ℂ-smul `(a:ℂ)•ν` ゆえ
+  scalar 補題は robust な simp-only パターン(rw は star 不在で fail)。
+
+**▶ 残 = (P3) all-X coherence `Xset_isCoherent_via_anchoredImages` + (P4) glue + (P5) wire**:
+- **(P3) は infrastructure 重**: `xChiExtension`(`S08_CaseBXChiCoherence:66`)は **column-specific**
+  (basis Irr(L) 上 column-first-member μ_{0,χ₂}↦Ximg χ₂, 他 0)で、全 X(irreducible 含む)には非対応。
+  全 X 版 extension の再設計(basis 上 column-first-member + irreducible-X-member の両対応)or **retarget
+  engine**(`S07:2680`)で per-χ anchored target から直接構成、が要。**= 次の主タスク**(本セッション未着手)。
+  hXanchored=`caseB_Xset_member_anchored`、hXinner=`inner_eq_of_anchored_varying`、hXzirr=bundle、
+  generation=`span_subset_span_zSupportedSpan_union_anchor_of_scaledDiffs`(S07:172, scaled diff χᵢ−dᵢχ₁)。
+- **(P4)** Y と glue(`coherentUnion_of_glued_…`、my `coherentCertainTypeSet_union_Yset_caseB` template)。
+- **(P5)** seed → `nonempty_coherent_S_caseB` → S08:59 case-B 枝。
+
 ## ✅✅✅ 2026-06-18 cont.¹¹ — BASE COHERENCE 完成: `IsCoherent (certainTypeSet ∪ Y)` を unconditional 化 + trap 除去
 
 cont.¹⁰ viable route の **(B1) base = `certainTypeSet ∪ Y` coherence** を **UNCONDITIONAL** で landing
