@@ -139,23 +139,45 @@ lemmas are **root-namespace** (`toAdd_ofAdd`/`ofAdd_toAdd`/`toMul_ofMul`/`ofMul_
 compatibility goal is reached defeq via `show fN (φ u s) = fU u * fN s * (fU u)⁻¹` (avoids fragile
 `simp only [comp_apply, …]`).
 
-## Remaining road (step 3 + part b — §13-gated, Lane B)
+## ✅✅✅ DONE: step 3 field model + structural inputs (2026-06-19)
 
-`field_normalizer_of_U_characteristic` still bottoms out on building the (14.2)(a)/(b) model that
-`fieldNormalizerData_of_repr` consumes:
-1. **step 3** — make `Additive ↥P` an `𝔽_p[U]`-module via conjugation (ungated machinery), then apply
-   `exists_galoisField_repr` to get `e`, `μ`, `hcompat`.  This needs `Nat.card ↥P = p^q`
-   (`S15.basic_structure`, **sorried §13**) and `U` faithful (`S15.c_eq_one`, **sorried §13**).
-2. **part (14.2)(b)** — `Q` elem abelian, `W₂` normalizes `Q`, `∃ y∈Q` via (13.2.b)/(14.5) (**§13**).
-3. `hPU_disj`/`hW2`/`hcyclotomic` are standing/arithmetic facts (the last via
-   `cyclotomic_quotient_coprime_of_not_dvd`, given `q ∤ (p-1)` from the case branch).
+`field_normalizer_of_U_characteristic` (S16:790, bare sorry) is now **structured** — both the σ-bridge
+(step 4, above) and the (14.2)(a) field model (step 3) plus most σ-bridge hypothesis-inputs are proven:
 
-The genuinely-novel/ungated math of (14.2)(a) **and** the σ-bridge are now both DONE.  What is left is
-the §13 character/structure theory (Lane B) that supplies the numeric inputs — the same gate as
-`exists_L/MHypothesis`.
+* **step 3** `exists_pu_field_repr` (`af543785`): from `hu_full : |U| = (p^q-1)/(p-1)` and `[IsCyclic ↥U]`,
+  makes `Additive ↥P` an `𝔽_p[U]`-module via conjugation (`Representation = mulAutToEnd ∘ (normalizerMonoidHom
+  ∘ inclusion(U≤N(P)))`, module via `Module.compHom` on `ρ.asAlgebraHom` — sidesteps the asModule synth trap)
+  and applies `exists_galoisField_repr` ⟹ `e : Additive ↥P ≃+ GF`, `μ : U →* GFˣ`, the compat. Cites
+  sorried §13 `basic_structure`(|P|=p^q) + `c_eq_one`(faithful). Diamond notes: `open scoped IsMulCommutative`,
+  `AddCommGroup.zmodModule` (not `IsElementaryAbelian.zmodModule`), explicit `CommGroup ↥U` reusing canonical Group.
+* **hUP** `conj_mem_P` + `U_le_normalizer_P` (`a6ab11ee`, **unconditional**): `U ≤ N(P)` via `U ≤ S' ≤ S`,
+  `P = F(S) ⊴ S` (`maxNilpotentNormalHall_le_normalizer`).
+* **hPU_disj** `P_inf_U_eq_bot` (`427e36e9`, §13-cite): `P ⊓ U ≤ U ⊓ C_G(P) = C = 1` (P abelian + `c_eq_one`).
+* **hμ_range** `mu_range_eq_normOneUnits` (`c83540d7`, **unconditional**): inj `μ` with `|U|=(p^q-1)/(p-1)`
+  ⟹ `μ.range = normOneUnits` (both = unique order-d subgroup `ker(powMonoidHom d)` of cyclic GFˣ,
+  `IsCyclic.card_powMonoidHom_ker` gives card = gcd = d).
+* **hcyclotomic** `cyclotomic_quotient_coprime_of_not_dvd` (existing): given `q∤(p-1)`.
 
-`exists_LHypothesis`/`exists_MHypothesis` (14.3/14.10) and the case-B cascade remain Dade-gated
-(Lane B's §3-13 character theory), independent of the above.
+## Remaining road (§13/§14-gated — /loop depletion 2026-06-19)
+
+To close `field_normalizer_of_U_characteristic` the remaining pieces are **all §13/§14-gated**:
+
+1. **hW2 scaling** — `exists_pu_field_repr`'s `e` is generic; rescale it so it carries the prime line to `W₂`.
+   Needs `W₂ ≤ P` (**§13-structural**, NOT a `S15.Hypothesis` field — but forced: `hW2 = (span{1}).map fN = W₂`
+   with `fN.range = P` ⟹ `W₂ ⊆ P`). **Design** (`W₂≤P` as hypothesis ⟹ ungated, ~70 lines): pick `w₀∈W₂` (≠1,
+   `|W₂|=p≥5`), `c := e₀(ofMul ⟨↑w₀,hW2≤P⟩) ≠ 0`, `e := e₀.trans (DistribMulAction.toAddEquiv₀ GF c⁻¹ _)`
+   (mult-by-`c⁻¹` AddEquiv). compat: `c⁻¹*(μv*e₀x)=μv*(c⁻¹*e₀x)` (ring). hW2: `W₂=⟨w₀⟩` (prime order) ⟹
+   `e₀(W₂)=span{c}` ⟹ `e(W₂)=span{1}` ⟹ `.map fN = W₂` (membership ↔ then `le_antisymm`).
+2. **value-argument** `u = (p^q-1)/(p-1)` + `q∤(p-1)` — (13.15) `caseB_order_u` dichotomy + the `p≡1 mod q`
+   case killed by **W₂^y acting FPF on U ⟹ u ≡ 1 mod p** (then `q ≡ qu ≡ 1 mod p`, contra `q<p`). The FPF
+   fact uses part(b)'s `y` and is **§14-structural, not formalized**. Feeds `exists_pu_field_repr` (`hu_full`)
+   and `hcyclotomic` (`q∤(p-1)`).
+3. **`[IsCyclic ↥U]`** — §13 standing fact (can't derive from the field model: `exists_pu_field_repr` *requires* it).
+4. **partB** — `Q` elem abelian / `W₂` normalizes `Q` / `∃y∈Q` via (13.2.b)/(14.5) (**§13** cite).
+5. **assembly** — feed (1)-(4) + the proven inputs to `fieldNormalizerData_of_repr`.
+
+`exists_LHypothesis`/`exists_MHypothesis` (14.3/14.10) and the case-B cascade remain Dade-gated (Lane B's
+§3-13 character theory), independent of the above.
 
 ## FT connection (verified)
 
