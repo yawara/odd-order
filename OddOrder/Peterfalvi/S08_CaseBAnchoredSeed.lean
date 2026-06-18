@@ -277,4 +277,104 @@ theorem caseB_column_anchored_image
   · rw [columnSum_eq_induce_H h46 hHK χ₂, ← hθval]
     exact hanc
 
+/-- **(6.8.2.3) per-member anchored image — general `χ = Ind^L_H θ ∈ X`.**  Generalizes
+`caseB_column_anchored_image` from a certain-type column to an **arbitrary** irreducible `θ` of `H`
+that is nonconstant on `W₂` (`hθne`, i.e. `W₂ ⊄ ker θ`, equivalently `Ind^L_H θ ∈ X = S − S(W₂)`),
+and additionally exposes the **seam orthogonality** `⟨X, η₁^{τ₁}⟩ = 0`
+(`caseB_constituentDecomposition_X_orthogonal`).
+
+Returns the Peterfalvi (6.8.2.3) anchored image
+`τ(Ind^L_H θ − a·η₁) = X − a·η₁^{τ₁}` (`a = θ(1)`) together with `X ⊥ η₁^{τ₁}`.  Since under central
+`W₂` every `χ = Ind^L_H θ ∈ X` (reducible certain-type column **or** irreducible) arises as a
+positive-weight constituent of the central `φ_θ`-induction (`exists_central_phi_data`), this single
+lemma is the uniform (6.8.2.3) `hXanchored` + `hXmixed` content for the **whole** of `X` — the basis
+of the case-(B) `X ∪ Y` coherence seed (`coherentXunionYset_caseB_of_glued`).
+
+The proof mirrors `caseB_column_anchored_image` (central char + (6.8.2.2) aggregate + bundles +
+per-`φ` producer) with `θ` taken directly instead of `Res^H μ_{0,χ₂}`, plus the `X ⊥ Y^{τ₁}` call
+with the textbook partner `η' = η̄₁` reconstructed from `η₁ ∈ Y`. -/
+theorem caseB_member_anchored_image
+    (hyp : SibleyDadeHypothesis G L H) [H.Normal] [Fintype ↥H]
+    (h46 : OddOrder.Peterfalvi.S06.Hypothesis46 (sharpImage H) L) (hHK : h46.K = H)
+    (hW1 : h46.W1 = hyp.W1)
+    [NeZero (Nat.card h46.W1)] [Invertible (Nat.card ↥h46.K : ℂ)]
+    [Fintype ↥(h46.W1 ⊔ h46.W2)] [Invertible (Nat.card ↥(h46.W1 ⊔ h46.W2) : ℂ)]
+    [Fintype (OddOrder.Peterfalvi.S06.ticVdiff h46).W]
+    [Invertible (Nat.card (OddOrder.Peterfalvi.S06.ticVdiff h46).W : ℂ)]
+    [h46.W2.Normal] [Invertible (Nat.card ↥h46.W2 : ℂ)]
+    [Fintype ↥(h46.W2.subgroupOf H)] [Invertible (Nat.card ↥(h46.W2.subgroupOf H) : ℂ)]
+    (hW2H : h46.W2 ≤ H)
+    (hcen : h46.W2.subgroupOf H ≤ Subgroup.center ↥H)
+    (hderiv : h46.W2.subgroupOf H ≤ commutator ↥H)
+    (hcop : Nat.Coprime (Nat.card ↥H) (Nat.card hyp.W1))
+    {p : ℕ} (hp : p.Prime) (hHp : IsPGroup p ↥H)
+    (hprime : (Nat.card h46.W2).Prime) (hW2comm : h46.W2 ≤ ⁅H, H⁆)
+    (hW2cenL : h46.W2 ≤ Subgroup.center ↥L)
+    (hc2 : 2 ≤ (h46.W2.subgroupOf H).index)
+    (hFPF : (h46.W2.index : ℤ) < ((h46.W2.subgroupOf H).index : ℤ) ^ 2)
+    {η₁ : ClassFunction ↥L ℂ} (hη₁ : η₁ ∈ hyp.Yset)
+    (θ : IrreducibleCharacter ↥H)
+    (hθne : ∃ w : ↥(h46.W2.subgroupOf H),
+      (θ : ClassFunction ↥H ℂ) (w : ↥H) ≠ (θ : ClassFunction ↥H ℂ) 1)
+    (hYcard : hyp.Yset.ncard ≠ 2) :
+    ∃ (X : ClassFunction G ℂ) (a : ℕ),
+      ((ClassFunction.induce H (θ : ClassFunction ↥H ℂ) : ClassFunction ↥L ℂ) 1 = (a : ℂ) * η₁ 1) ∧
+      hyp.tau (ClassFunction.induce H (θ : ClassFunction ↥H ℂ) - a • η₁)
+        = X - (a : ℂ) • hyp.coherentYset.extension η₁ ∧
+      ClassFunction.inner X (hyp.coherentYset.extension η₁) = 0 := by
+  classical
+  haveI : Fintype ↥h46.W2 := Fintype.ofFinite _
+  obtain ⟨φ, hφ', hφirr, hφ1, hweight, hreseq⟩ := exists_central_phi_data hW2H hcen θ
+  have hφne : ClassFunction.compHom (Subgroup.subgroupOfEquivOfLe hW2H).toMonoidHom φ
+      ≠ trivialClassFunction ↥(h46.W2.subgroupOf H) :=
+    compHom_phi_ne_trivial_of_restrict hreseq hθne
+  have hφneIrr : (⟨φ, hφirr⟩ : IrreducibleCharacter ↥h46.W2)
+      ≠ trivialIrreducibleCharacter ↥h46.W2 := by
+    intro heq
+    apply hφne
+    have hφtriv : φ = trivialClassFunction ↥h46.W2 := by
+      have h := congrArg (fun c : IrreducibleCharacter ↥h46.W2 => (c : ClassFunction ↥h46.W2 ℂ)) heq
+      simpa using h
+    rw [hφtriv]; ext x
+    simp [ClassFunction.compHom_apply, trivialClassFunction_apply]
+  obtain ⟨Xagg, hXaggorth, hXZ, hdecomp⟩ :=
+    exists_decomposition_caseB_coherentYset hyp hcop hp hHp hprime hW2comm hW2cenL hη₁
+      (⟨φ, hφirr⟩ : IrreducibleCharacter ↥h46.W2) hφ1 hφneIrr hc2 hFPF hYcard
+  simp only [IrreducibleCharacter.coe_mk] at hdecomp
+  have hnonlin := caseB_hnonlin hW2H hderiv hφ' hφne
+  have hcol := caseB_hcol hyp h46 hHK hW1 hW2H hcen hφ' hη₁
+  have hirr := caseB_hirr hyp h46 hHK hW2H hcen hφ' hη₁ hnonlin
+  have hirrAnc := caseB_hirrAnc hyp h46 hHK hW2H hφ' hη₁ hnonlin
+  have hanc := caseB_per_phi_anchored_fromYset hyp h46 hHK hW2H hcen hφ' hyp.coherentYset hη₁
+    hcol hirr hirrAnc (hXaggorth η₁ hη₁) hdecomp ⟨θ, hweight⟩
+  -- seam orthogonality `⟨X, η₁^{τ₁}⟩ = 0`, textbook partner `η' = η̄₁` reconstructed from `η₁ ∈ Y`.
+  have hη₁irr : IsIrreducibleCharacter η₁ := hyp.isIrreducibleCharacter_of_mem_Yset hη₁
+  have hconj : η₁.conj ∈ hyp.Yset := hyp.Yset_closedUnderConjugate hη₁
+  have hrealc1 : ¬ ClassFunction.IsReal η₁ :=
+    fun hreal => hyp.Yset_hasNoRealCharacters.not_mem_of_isReal hreal hη₁
+  have hne : η₁ ≠ η₁.conj := fun heq => hrealc1 heq.symm
+  have hee : ClassFunction.inner η₁ η₁.conj = 0 := by
+    have h := irreducibleCharacter_inner_eq_ite (⟨η₁, hη₁irr⟩ : IrreducibleCharacter ↥L)
+      (⟨η₁.conj, hη₁irr.conj⟩ : IrreducibleCharacter ↥L)
+    rw [if_neg (fun heq => hne (Subtype.ext_iff.mp heq))] at h
+    simpa using h
+  have hval : η₁ (1 : ↥L) = η₁.conj (1 : ↥L) :=
+    (hyp.Yset_apply_one hη₁).trans (hyp.Yset_apply_one hconj).symm
+  have hsupp : (η₁ - η₁.conj).support ⊆
+      OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L :=
+    hyp.sMember_diffSupport_of_charValue_eq (hyp.Yset_subset_S hη₁) (hyp.Yset_subset_S hconj) hval
+  have hdiffsuppc1 : (η₁.conj - η₁).support ⊆
+      OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L :=
+    hyp.sMember_diffSupport_of_charValue_eq (hyp.Yset_subset_S hconj) (hyp.Yset_subset_S hη₁)
+      hval.symm
+  have hXorth := caseB_constituentDecomposition_X_orthogonal hyp h46 hHK θ
+    (hcol ⟨θ, hweight⟩) (hirr ⟨θ, hweight⟩) hyp.coherentYset hη₁ hη₁irr hrealc1 hdiffsuppc1 hconj
+    (hyp.coherentYset.extension_mem_ZIrr η₁ (Submodule.subset_span hη₁)) hee hconj hη₁irr.conj hee
+    hsupp (hirrAnc ⟨θ, hweight⟩)
+  refine ⟨(caseB_phi_family hyp h46 hW2H hφ' hcol hirr ⟨θ, hweight⟩).X,
+    constituentWeight hφ' θ, ?_, hanc, hXorth⟩
+  rw [ClassFunction.induce_apply_one, hyp.index_H_eq_card_W1, hyp.Yset_apply_one hη₁,
+    constituentWeight_eq_apply_one hW2H hcen hφ' hweight]
+  ring
+
 end OddOrder.Peterfalvi.S08
