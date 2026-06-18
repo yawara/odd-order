@@ -943,6 +943,45 @@ theorem anchoredImage_scaledDiff_eq
       ← Nat.cast_mul, ← hai]
   rw [hχ, map_sub, map_nsmul, hanci, hanc1, smul_sub, hνcancel]; abel
 
+/-- **(6.8.2) grid constituents are not `X`-members** — `μ_{iχ₂} ∉ Xset W₂`.  A certain-type grid
+character has degree `≡ ±1 (mod |W₁|)` (`certainType_degree_modEq`, the sign `= ±1`), whereas every
+`X`-member `Ind^L_H θ` has degree `|W₁|·θ(1) ≡ 0 (mod |W₁|)`; with `|W₁| ≠ 1` these are incompatible.
+
+This is the disjointness underlying the **dichotomy extension** for the full `Xset W₂` coherence: on
+the basis `Irr L`, the irreducible `X`-members `χ ↦ Ximg χ` and the column grid members
+`μ_{iχ₂} ↦ (column image, concentrated on `i = 0`)` never collide, so the extension is well-defined
+and sends each column `columnSum χ₂ = ∑_i μ_{iχ₂}` to its image. -/
+theorem grid_mu_notMem_Xset
+    (hyp : SibleyDadeHypothesis G L H) [H.Normal]
+    (h46 : OddOrder.Peterfalvi.S06.Hypothesis46 (sharpImage H) L) (hW1 : h46.W1 = hyp.W1)
+    [NeZero (Nat.card h46.W1)] [Fintype ↥(h46.W1 ⊔ h46.W2)]
+    [Invertible (Nat.card ↥(h46.W1 ⊔ h46.W2) : ℂ)]
+    (χ₂ : (h46.W2.subgroupOf (h46.W1 ⊔ h46.W2)) →* ℂˣ) (i : Fin (Nat.card h46.W1)) :
+    ((h46.columnFamily χ₂).mu i : ClassFunction ↥L ℂ) ∉ hyp.Xset h46.W2 := by
+  intro hmem
+  have hS := hyp.Xset_subset_S hmem
+  rw [hyp.S_eq, Set.mem_setOf_eq] at hS
+  obtain ⟨θ, -, hμeq⟩ := hS
+  obtain ⟨a, ha⟩ := h46.certainType_degree_modEq χ₂ i
+  obtain ⟨d, _, hd⟩ := irreducibleCharacter_apply_one_eq_pos_natCast θ
+  have hindeg : ((h46.columnFamily χ₂).mu i : ClassFunction ↥L ℂ) 1
+      = (Nat.card hyp.W1 : ℂ) * (d : ℂ) := by
+    rw [hμeq, ClassFunction.induce_apply_one, hd, hyp.index_H_eq_card_W1]
+  rw [hindeg] at ha
+  have hcard : (Nat.card h46.W1 : ℂ) = (Nat.card hyp.W1 : ℂ) := by rw [hW1]
+  rw [hcard] at ha
+  have hw1 : Nat.card hyp.W1 ≠ 1 := fun h => hyp.W1_nontrivial (Subgroup.card_eq_one.mp h)
+  have hsignZ : (h46.columnFamily χ₂).sign = (Nat.card hyp.W1 : ℤ) * ((d : ℤ) - a) := by
+    have hsign : ((h46.columnFamily χ₂).sign : ℂ)
+        = (Nat.card hyp.W1 : ℂ) * ((d : ℂ) - (a : ℂ)) := by linear_combination -ha
+    exact_mod_cast hsign
+  have hdvd1 : (Nat.card hyp.W1 : ℤ) ∣ 1 := by
+    have hdvd : (Nat.card hyp.W1 : ℤ) ∣ (h46.columnFamily χ₂).sign := ⟨(d : ℤ) - a, hsignZ⟩
+    rcases (h46.columnFamily χ₂).sign_eq with hs | hs
+    · rwa [hs] at hdvd
+    · rw [hs] at hdvd; exact (dvd_neg).mp hdvd
+  exact hw1 (Nat.dvd_one.mp (by exact_mod_cast hdvd1))
+
 /-- **⚠ NON-VIABLE base (kept as a structural record).**  The map convention here is correct
 (`hyp.tau = dadeIntegralCharacterMap hyp.dade (hyp.dade.fullDadeIsometryData hyp.hconj)` defeq, so
 `xChainCoherentW hyp.dade hyp.hconj` lands at `hyp.tau` — no retargeting), **but the `hstep`
