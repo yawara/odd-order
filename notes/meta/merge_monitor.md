@@ -157,6 +157,18 @@ branch とも削除済み。旧 **A** / **D** も同様に退役済み (履歴�
 
 ## 現状メモ
 
+- **2026-06-18 (監視再開) — cron 再作成 + f/g stall flag**: `/model` 切替で旧 cron (`8922498c`) 消滅
+  ([[cron-dies-on-model-switch]]) → 新 cron `aa439f22` (`3,18,33,48 * * * *`, session-only, **push なし**=
+  2026-06-18 standing policy) を再作成。tick 時点: **全レーン未マージ 0** (b/f/g/h の成果は main 合流済、
+  main HEAD `10dcec96`、実 sorry `bin/count-sorry`=141)。FT critical path は `Section16Inputs` の 3 producer
+  skeleton (`FeitThompson.lean:267` section16MaximalPair=G / `:274` section16TypePStructure=F / `:282`
+  section16CharacterData=B) + POLE-2 (`S16_NonExistenceG` field_normalizer_structure=H) に底打ち。
+  - **lane-b**: 稼働中 (S08_CaseBAnchoredSeed.lean 編集, 83min 前 commit `2ef62cc8`)。(6.8) capstone case-B 継続。
+  - **lane-h**: POLE-2 tractable 部 (`field_normalizer_structure` sorry-free + cyclotomic 算術核 `e7cc9ddc`) を
+    landing し**自己 VERDICT=STOP**(残 14.7 finite-field model は §10-13 char theory gate=明示 stop trigger)。正常停止。
+  - **⚠ lane-f / lane-g = 3h 静止**: 再配分 `a79a331b` 以降コミット・ファイル編集とも無し (b/h は同点以降に前進)。
+    sessions 未起動 or 即ブロックの疑い。g=section16MaximalPair (§16 main results が type-data construction
+    4-bridge に gate=大物)、f=section16TypePStructure (g の `mp` 入力前提)。要ユーザー判断 (再起動 or 再割当)。
 - **2026-06-17 (夜²) — G を §16 skeleton pre-positioning に転換 (ユーザー裁可 + feasibility audit `a8b3835fd`)**:
   §15.2 の §14-非依存 skeleton が depleted (conjunct 3 landing 済 `d2961075`、残 conjunct 2/4/5 は σ-gap/§14
   gated で空転) とコード検証 (audit `lane-g 監査`) で確定 → ユーザー裁可で **G を §16 (`S16_MainResults.lean`) に
