@@ -183,11 +183,24 @@ green, real sorry 140 unchanged):
 ⟹ `field_normalizer_of_U_characteristic` is now reduced to *producing* `_of_inputs`'s named obligations
 (docstring records the recipe). **The ungated field-algebra runway is exhausted.**
 
-### Remaining (all pure §13/§14, Lane B / §14 counting)
+### ✅ value-argument arithmetic core DONE (2026-06-19, `40150bb0`)
 
-1. **value-argument** `|U| = (p^q-1)/(p-1)` + `q∤(p-1)` — (13.15) `caseB_order_u` dichotomy + the `p≡1 mod q`
-   case killed by **W₂^y acting FPF on U ⟹ u ≡ 1 mod p** (then `q ≡ qu ≡ 1 mod p`, contra `q<p`). FPF fact
-   uses part(b)'s `y`, **§14-structural, not formalized**.
+The (14.7) value argument's **arithmetic core is formalized, axiom-clean**, reducing it to the single
+fixed-point-free congruence `u ≡ 1 mod p`:
+
+* **`u_eq_full_of_caseB_of_u_modEq_one_mod_p`** (axiom-clean) — `CaseBForSData` + `u ≡ 1 mod p` ⟹
+  `u = (p^q-1)/(p-1) ∧ ¬(p≡1 mod q)`. In the (13.15) `p≡1 mod q` branch, `q·u = (p^q-1)/(p-1) ≡ 1 mod p`
+  (geom sum, private `cyclotomic_quotient_modEq_one_mod_base`), so `q ≡ q·u ≡ 1 mod p`, forcing `p ∣ q-1`
+  against `hyp.q_lt_p`.
+* **`field_normalizer_of_U_characteristic_of_fpf`** — tightest assembly engine; chains the value argument
+  (`caseB_for_S Ldata`) into `_of_inputs`. ⟹ (14.7) reduces to exactly `u ≡ 1 mod p` + `W₂ ≤ P` + part(b).
+
+### Remaining (the irreducible §13/§14 structural core)
+
+1. **FPF fact** `u ≡ 1 mod p` — the source is **`W₂^y` (order `p`) acting on `U` as a Frobenius complement**
+   ⟹ `|U| ≡ 1 mod p`. Needs (a) part(b) [no producer], (b) the `W₂^y`-on-`U` Frobenius structure [absent;
+   only the `U⋊W₁` mod-`q` analogue `u_modEq_one_mod_q` exists], (c) `IsFrobeniusGroup.card_kernel_modEq_one`
+   [available]. **Deep §14 field-model work, no scaffolding** (verified by grep 2026-06-19).
 2. **`[IsCyclic ↥U]`** — §13 standing fact (can't derive from the field model: `exists_pu_field_repr` *requires* it).
 3. **`W₂ ≤ P`** — §13-structural (`FieldNormalizerData.W2_le_P` is a *data* projection ⟹ circular; needs an
    independent producer from the §13/§15 structure).
