@@ -68,3 +68,19 @@ BG 全域が F に集約され、struct 改変も F が単独承認可)。`typeP
   `S16_MainResults.lean:1014-1050` (Theorem I で S,T=双対対を構成する経路)
 - 関連: 8014 (section16MaximalPair, lane-g) / 1004 (character_data, lane-b) / 2009 (POLE-2, lane-h)
 - メモリ: `s16-typep-producer-unfillable`
+
+---
+
+## ⚠ 訂正 (2026-06-18 lane-f 再開) — enrich は obstruction を解消しない
+
+本 issue の前提「`Section16MaximalPair` を partner witness で enrich すれば producer が discharge 可能」は
+**不正確**と判明（フィージビリティ監査、issue 7005 の「② 構造変更は obstruction を移動するだけ」）。
+
+`Section16TypePStructure` は `W = W₁ × W₂` で **W₁/W₂ 両方が素数位数**（q<p）+ U/V semidirect を要求する。
+enrich で mp に K/K* witness（または W=S∩T cyclic）を載せても、tp が要求する素数位数分解は「W cyclic」
+より真に強いので、enrich field を `section16MaximalPair_of_isMinimalSimpleOdd` が構成する段で同じ
+**absent theory**（対の素数位数 P₁ 側 / `q<p` / `W₁_normalizes_U`）に bottom-out する。
+
+∴ enrich を実施しても producer の sorry は消えない。本 issue（gap A enrichment）は **真の blocker ではなく
+前提整備**であり、真の gate = issue 7005 監査の (a)(b)(c)。gap B（`typeP_pair_inf_eq`）は Theorem I clause(2)
+に配線済（`536974a9`）。**enrich の着手は absent theory が揃うまで保留推奨**（今やっても sorry を動かさない）。

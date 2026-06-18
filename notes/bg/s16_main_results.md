@@ -733,3 +733,19 @@ residual modest skeleton queue (lower value, §14-independent): `theoremA/C/E/aS
 - **option-1 残作業 (lane-f landing 済 → unblock)**: `typeP_pair_inf_eq` を使い
   `theoremI`/Pf 8.8 に `W = S ⊓ T` clause 復活 + `Section16MaximalPair` に `W`/`W_eq_inter` field 追加
   (struct 変更ゆえ **要 hub/user 承認**) → typeP producer (`section16TypePStructure`, lane-f) dischargeable に.
+
+### 2026-06-18 (lane-f 再開) — option-1 clause 復活 LANDED + tp producer gate 確定
+
+- ✅ **`theoremI` の `S ⊓ T = W` clause 復活 LANDED** (`536974a9`): `typeP_pair_inf_eq` (gap B) を
+  `theoremI_nilpotentHall_conjugacy_and_type_dichotomy` の type-P-pair 枝に配線 (partner bundle を
+  typeP_duality から抽出 + `(κ∪σ)'`-Hall U を Hall 定理で構成)。sorry-free、full build 3860 green。
+  consumer `maximalSubgroup_type_dichotomy` (S10:113) は `_hWinter` 1 個追加で透過 (W-data drop は不変)。
+  `S16_MainResults` が `S16_PairIntersection` を import (cycle 無し)。**gap B が terminal でなくなった。**
+- ❌ **`Section16MaximalPair` enrich + tp producer discharge は absent theory に bottom-out**
+  (フィージビリティ監査, issue 7005)。上の「typeP producer dischargeable に」は**不成立**: tp は
+  `W=W₁×W₂` で W₁/W₂ **両素数位数** (q<p) を要求し「W cyclic」より真に強い。enrich しても mp producer
+  構成段で同じ gate に落ちる (relocate-not-resolve)。真の gate:
+  - (a) **対の素数位数 P₁ 側** — `isTypeP2_kappaHall_prime` (S14:1555) は P₂ のみ;
+  - (b) **`q_lt_p`** — ABSENT (Pf (13.2)(a)←(10.10)/(11.9) char-theoretic = lane-b 上流);
+  - (c) **`W₁_normalizes_U`** + U/V (13.1)(b) semidirect — ABSENT (Pf「remark following Def (8.4)」=§8)。
+  ∴ lane-f を tp 固定は非生産的。(a)(b)(c) は独立 issue で scope 推奨 (hub 判断、issue 7005「推奨」参照)。
