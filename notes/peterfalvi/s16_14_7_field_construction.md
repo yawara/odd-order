@@ -158,23 +158,41 @@ compatibility goal is reached defeq via `show fN (φ u s) = fU u * fN s * (fU u)
   `IsCyclic.card_powMonoidHom_ker` gives card = gcd = d).
 * **hcyclotomic** `cyclotomic_quotient_coprime_of_not_dvd` (existing): given `q∤(p-1)`.
 
-## Remaining road (§13/§14-gated — /loop depletion 2026-06-19)
+## ✅✅ hW2 scaling DONE + assembly verified (2026-06-19, `b2564baf`)
 
-To close `field_normalizer_of_U_characteristic` the remaining pieces are **all §13/§14-gated**:
+The one piece deferred at the 2026-06-19 depletion stop — the **hW2 scaling** — is **done**, and the
+full σ-bridge assembly is verified `sorry`-free as an engine. Three lemmas (full build 3863 jobs ~32s
+green, real sorry 140 unchanged):
 
-1. **hW2 scaling** — `exists_pu_field_repr`'s `e` is generic; rescale it so it carries the prime line to `W₂`.
-   Needs `W₂ ≤ P` (**§13-structural**, NOT a `S15.Hypothesis` field — but forced: `hW2 = (span{1}).map fN = W₂`
-   with `fN.range = P` ⟹ `W₂ ⊆ P`). **Design** (`W₂≤P` as hypothesis ⟹ ungated, ~70 lines): pick `w₀∈W₂` (≠1,
-   `|W₂|=p≥5`), `c := e₀(ofMul ⟨↑w₀,hW2≤P⟩) ≠ 0`, `e := e₀.trans (DistribMulAction.toAddEquiv₀ GF c⁻¹ _)`
-   (mult-by-`c⁻¹` AddEquiv). compat: `c⁻¹*(μv*e₀x)=μv*(c⁻¹*e₀x)` (ring). hW2: `W₂=⟨w₀⟩` (prime order) ⟹
-   `e₀(W₂)=span{c}` ⟹ `e(W₂)=span{1}` ⟹ `.map fN = W₂` (membership ↔ then `le_antisymm`).
-2. **value-argument** `u = (p^q-1)/(p-1)` + `q∤(p-1)` — (13.15) `caseB_order_u` dichotomy + the `p≡1 mod q`
-   case killed by **W₂^y acting FPF on U ⟹ u ≡ 1 mod p** (then `q ≡ qu ≡ 1 mod p`, contra `q<p`). The FPF
-   fact uses part(b)'s `y` and is **§14-structural, not formalized**. Feeds `exists_pu_field_repr` (`hu_full`)
-   and `hcyclotomic` (`q∤(p-1)`).
-3. **`[IsCyclic ↥U]`** — §13 standing fact (can't derive from the field model: `exists_pu_field_repr` *requires* it).
+* **`field_repr_rescale_to_W2`** — *axiom-clean* (`[propext, Classical.choice, Quot.sound]`, no §13 cite).
+  Takes the generic model `(e₀, μ, hcompat₀)` + `W₂ ≤ P`; pick `w₀ ∈ W₂` (≠1, `|W₂|=p`),
+  `c := e₀(ofMul w₀) ≠ 0`, build the `×c⁻¹` `AddEquiv` *by hand* (`mul_inv_cancel_left₀`/`inv_mul_cancel_left₀`/
+  `mul_add` — sidesteps the missing `DistribMulAction.toAddEquiv₀`), `e := e₀.trans scale`. Then `e(ofMul w₀)=1`.
+  hW2 proof: `Span = (span 𝔽_p{1}).toAddSubgroup.toSubgroup = Subgroup.zpowers (Multiplicative.ofAdd 1)`
+  (le_antisymm; `Multiplicative.mem_toSubgroup` + `Submodule.mem_span_singleton`; ZMod p-linearity via
+  `r•x = r.val•x` = `Nat.cast_smul_eq_nsmul` + `ZMod.natCast_rightInverse`; `ofAdd_nsmul`, `ofAdd_toAdd`),
+  then `MonoidHom.map_zpowers` ⟹ `Span.map fN = zpowers (fN(ofAdd 1)) = zpowers (↑w₀)`, and
+  `zpowers ↑w₀ = W₂` since `orderOf ↑w₀ = p` (prime, `OneMemClass.coe_eq_one`/`orderOf_dvd_natCard`),
+  `Subgroup.eq_of_le_of_card_ge`. compat survives by field commutativity (`ring`).
+* **`exists_pu_field_repr_W2`** (§13-cite) — chains `exists_pu_field_repr` + the rescaling → full
+  `(e, μ, hμ_inj, hcompat, hW2)` package.
+* **`field_normalizer_of_U_characteristic_of_inputs`** (literal-`sorry`-free) — assembly engine taking the
+  §13/§14 facts as explicit hypotheses; calls `exists_pu_field_repr_W2` + `mu_range_eq_normOneUnits` +
+  `conj_mem_P` + `P_inf_U_eq_bot` + `fieldNormalizerData_of_repr`. **Verifies the whole σ-bridge typechecks.**
+
+⟹ `field_normalizer_of_U_characteristic` is now reduced to *producing* `_of_inputs`'s named obligations
+(docstring records the recipe). **The ungated field-algebra runway is exhausted.**
+
+### Remaining (all pure §13/§14, Lane B / §14 counting)
+
+1. **value-argument** `|U| = (p^q-1)/(p-1)` + `q∤(p-1)` — (13.15) `caseB_order_u` dichotomy + the `p≡1 mod q`
+   case killed by **W₂^y acting FPF on U ⟹ u ≡ 1 mod p** (then `q ≡ qu ≡ 1 mod p`, contra `q<p`). FPF fact
+   uses part(b)'s `y`, **§14-structural, not formalized**.
+2. **`[IsCyclic ↥U]`** — §13 standing fact (can't derive from the field model: `exists_pu_field_repr` *requires* it).
+3. **`W₂ ≤ P`** — §13-structural (`FieldNormalizerData.W2_le_P` is a *data* projection ⟹ circular; needs an
+   independent producer from the §13/§15 structure).
 4. **partB** — `Q` elem abelian / `W₂` normalizes `Q` / `∃y∈Q` via (13.2.b)/(14.5) (**§13** cite).
-5. **assembly** — feed (1)-(4) + the proven inputs to `fieldNormalizerData_of_repr`.
+5. **close** — feed (1)-(4) + `IsCyclic` to `field_normalizer_of_U_characteristic_of_inputs`.
 
 `exists_LHypothesis`/`exists_MHypothesis` (14.3/14.10) and the case-B cascade remain Dade-gated (Lane B's
 §3-13 character theory), independent of the above.

@@ -775,24 +775,199 @@ theorem mu_range_eq_normOneUnits {hyp : Hypothesis (G := G)}
     Subgroup.eq_of_le_of_card_ge (hsub _ hncard) (le_of_eq (hkercard.trans hncard.symm))
   rw [hμeq, hneq]
 
+/-- **(14.7) prime-line rescaling.**  The field model `e₀` produced by `exists_pu_field_repr`
+is canonical only up to a nonzero field scalar — nothing in the Singer construction pins down
+where it sends the prime line `W₂`.  Given `W₂ ≤ P` (a §13-structural fact), rescale
+`e₀ ↦ c⁻¹ • e₀` by `c := e₀(w₀)` for a nonidentity `w₀ ∈ W₂`.  The rescaled `e` then sends
+`w₀ ↦ 1`, hence carries the prime line `⟨1⟩ = (span 𝔽_p {1})` of `𝔽_{p^q}` exactly onto `W₂`
+(both are cyclic of prime order `p`).  The `U`-equivariance `hcompat` survives because the
+field is commutative (`c⁻¹·(μv·y) = μv·(c⁻¹·y)`).  This produces the `hW2` input of
+`fieldNormalizerData_of_repr`; it is pure field algebra, *independent* of the §13 character
+theory that produces `e₀` — `W₂ ≤ P` is its only structural input. -/
+theorem field_repr_rescale_to_W2 (hyp : Hypothesis (G := G))
+    (hW2_le_P : hyp.base.W2 ≤ hyp.base.P)
+    (e₀ : letI : Fact hyp.base.p.Prime := ⟨hyp.base.p_prime⟩
+         Additive ↥hyp.base.P ≃+ GaloisField hyp.base.p hyp.base.q)
+    (μ : letI : Fact hyp.base.p.Prime := ⟨hyp.base.p_prime⟩
+         ↥hyp.base.U →* (GaloisField hyp.base.p hyp.base.q)ˣ)
+    (hcompat₀ : letI : Fact hyp.base.p.Prime := ⟨hyp.base.p_prime⟩
+         ∀ (v : ↥hyp.base.U) (x : ↥hyp.base.P),
+           e₀ (Additive.ofMul (⟨(v : G) * (x : G) * (v : G)⁻¹, conj_mem_P hyp v x⟩ :
+               ↥hyp.base.P))
+             = ((μ v : (GaloisField hyp.base.p hyp.base.q)ˣ) :
+                 GaloisField hyp.base.p hyp.base.q) * e₀ (Additive.ofMul x)) :
+    letI : Fact hyp.base.p.Prime := ⟨hyp.base.p_prime⟩
+    ∃ e : Additive ↥hyp.base.P ≃+ GaloisField hyp.base.p hyp.base.q,
+      (∀ (v : ↥hyp.base.U) (x : ↥hyp.base.P),
+          e (Additive.ofMul (⟨(v : G) * (x : G) * (v : G)⁻¹, conj_mem_P hyp v x⟩ :
+              ↥hyp.base.P))
+            = ((μ v : (GaloisField hyp.base.p hyp.base.q)ˣ) :
+                GaloisField hyp.base.p hyp.base.q) * e (Additive.ofMul x)) ∧
+      (((Submodule.span (ZMod hyp.base.p)
+            ({(1 : GaloisField hyp.base.p hyp.base.q)} :
+              Set (GaloisField hyp.base.p hyp.base.q))).toAddSubgroup).toSubgroup).map
+          (fieldNormalizerKernelTransport hyp e) = hyp.base.W2 := by
+  letI : Fact hyp.base.p.Prime := ⟨hyp.base.p_prime⟩
+  haveI : NeZero hyp.base.p := ⟨hyp.base.p_prime.ne_zero⟩
+  -- `ZMod p`-linearity reduces to `nsmul` (any module over `ZMod p`)
+  have hsmul_red : ∀ (r : ZMod hyp.base.p) (x : GaloisField hyp.base.p hyp.base.q),
+      r • x = r.val • x := by
+    intro r x
+    rw [← Nat.cast_smul_eq_nsmul (ZMod hyp.base.p) r.val x, ZMod.natCast_rightInverse r]
+  -- a nonidentity element of the prime line `W₂ ≤ P`
+  haveI hW2fin : Finite ↥hyp.base.W2 := Nat.finite_of_card_ne_zero (by
+    rw [← hyp.base.p_eq_card_W2]; exact hyp.base.p_prime.ne_zero)
+  haveI : Nontrivial ↥hyp.base.W2 := Finite.one_lt_card_iff_nontrivial.mp (by
+    rw [← hyp.base.p_eq_card_W2]; exact hyp.base.p_prime.one_lt)
+  obtain ⟨w0', hw0'_ne⟩ := exists_ne (1 : ↥hyp.base.W2)
+  have hw0G_ne : (w0' : G) ≠ 1 := fun h => hw0'_ne (OneMemClass.coe_eq_one.mp h)
+  set w0 : ↥hyp.base.P := ⟨(w0' : G), hW2_le_P w0'.2⟩ with hw0def
+  have hw0_ne : w0 ≠ 1 := by
+    rw [hw0def, ne_eq, Subtype.ext_iff]; simpa using hw0G_ne
+  -- the rescaling scalar `c = e₀ w₀ ≠ 0`
+  set c : GaloisField hyp.base.p hyp.base.q := e₀ (Additive.ofMul w0) with hcdef
+  have hc : c ≠ 0 := by
+    rw [hcdef, ne_eq, map_eq_zero_iff _ e₀.injective]
+    rw [show (0 : Additive ↥hyp.base.P) = Additive.ofMul (1 : ↥hyp.base.P) from rfl,
+      EmbeddingLike.apply_eq_iff_eq]
+    exact hw0_ne
+  -- multiplication by `c⁻¹` is an additive automorphism of the field
+  let scale : GaloisField hyp.base.p hyp.base.q ≃+ GaloisField hyp.base.p hyp.base.q :=
+    { toFun := fun x => c⁻¹ * x
+      invFun := fun x => c * x
+      left_inv := fun x => mul_inv_cancel_left₀ hc x
+      right_inv := fun x => inv_mul_cancel_left₀ hc x
+      map_add' := fun x y => mul_add c⁻¹ x y }
+  set e : Additive ↥hyp.base.P ≃+ GaloisField hyp.base.p hyp.base.q := e₀.trans scale with hedef
+  have he_apply : ∀ a, e a = c⁻¹ * e₀ a := fun a => rfl
+  have he_w0 : e (Additive.ofMul w0) = 1 := by
+    rw [he_apply, ← hcdef, inv_mul_cancel₀ hc]
+  refine ⟨e, ?_, ?_⟩
+  · -- `hcompat` survives rescaling by commutativity
+    intro v x
+    simp only [he_apply]
+    rw [hcompat₀ v x]; ring
+  · -- the prime line `span{1}` maps onto `W₂`
+    have hSpan : (((Submodule.span (ZMod hyp.base.p)
+          ({(1 : GaloisField hyp.base.p hyp.base.q)} :
+            Set (GaloisField hyp.base.p hyp.base.q))).toAddSubgroup).toSubgroup)
+        = Subgroup.zpowers
+            (Multiplicative.ofAdd (1 : GaloisField hyp.base.p hyp.base.q)) := by
+      apply le_antisymm
+      · intro g hg
+        rw [Multiplicative.mem_toSubgroup, Submodule.mem_toAddSubgroup,
+          Submodule.mem_span_singleton] at hg
+        obtain ⟨r, hr⟩ := hg
+        rw [Subgroup.mem_zpowers_iff]
+        refine ⟨(r.val : ℤ), ?_⟩
+        rw [zpow_natCast, ← ofAdd_nsmul, ← hsmul_red r, hr, ofAdd_toAdd]
+      · rw [Subgroup.zpowers_le, Multiplicative.mem_toSubgroup, Submodule.mem_toAddSubgroup]
+        exact Submodule.subset_span (by simp)
+    rw [hSpan, MonoidHom.map_zpowers]
+    have hfN1 : fieldNormalizerKernelTransport hyp e
+        (Multiplicative.ofAdd (1 : GaloisField hyp.base.p hyp.base.q)) = (w0' : G) := by
+      rw [fieldNormalizerKernelTransport_apply]
+      have hsymm : e.symm (1 : GaloisField hyp.base.p hyp.base.q) = Additive.ofMul w0 := by
+        rw [← he_w0, e.symm_apply_apply]
+      simp [hsymm, hw0def]
+    rw [hfN1]
+    -- `zpowers (w0' : G) = W₂` since `w0'` has prime order `p`
+    have horder : orderOf ((w0' : G)) = hyp.base.p := by
+      have hne1 : orderOf ((w0' : G)) ≠ 1 := fun h => hw0G_ne (orderOf_eq_one_iff.mp h)
+      have hdvd : orderOf ((w0' : G)) ∣ hyp.base.p := by
+        have heq : orderOf ((w0' : G)) = orderOf w0' :=
+          orderOf_injective hyp.base.W2.subtype (Subgroup.subtype_injective _) w0'
+        rw [heq, hyp.base.p_eq_card_W2]
+        exact orderOf_dvd_natCard w0'
+      rcases (hyp.base.p_prime.eq_one_or_self_of_dvd _ hdvd) with h | h
+      · exact absurd h hne1
+      · exact h
+    have hle : Subgroup.zpowers ((w0' : G)) ≤ hyp.base.W2 := by
+      rw [Subgroup.zpowers_le]; exact w0'.2
+    have hcard : Nat.card hyp.base.W2 ≤ Nat.card (Subgroup.zpowers ((w0' : G))) := by
+      rw [Nat.card_zpowers, horder, ← hyp.base.p_eq_card_W2]
+    exact Subgroup.eq_of_le_of_card_ge hle hcard
+
+/-- **(14.7)/(14.2)(a) field model carrying the prime line to `W₂`.**  Chains the Singer
+field model `exists_pu_field_repr` with the prime-line rescaling `field_repr_rescale_to_W2`,
+producing the full `(e, μ)` package that `fieldNormalizerData_of_repr` consumes: an additive
+isomorphism `e : Additive ↥P ≃+ 𝔽_{p^q}`, an injective character `μ : U →* 𝔽_{p^q}ˣ`, the
+`U`-equivariance `hcompat`, and the prime-line/`W₂` identification `hW2`.  Cites the §13
+producers `basic_structure` (`|P| = p^q`) and `c_eq_one` (`U` faithful) through
+`exists_pu_field_repr`; its extra structural input is `W₂ ≤ P`. -/
+theorem exists_pu_field_repr_W2 [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hyp : Hypothesis (G := G)) [IsCyclic ↥hyp.base.U]
+    (hu_full : Nat.card ↥hyp.base.U =
+      (hyp.base.p ^ hyp.base.q - 1) / (hyp.base.p - 1))
+    (hW2_le_P : hyp.base.W2 ≤ hyp.base.P) :
+    letI : Fact hyp.base.p.Prime := ⟨hyp.base.p_prime⟩
+    ∃ (e : Additive ↥hyp.base.P ≃+ GaloisField hyp.base.p hyp.base.q)
+      (μ : ↥hyp.base.U →* (GaloisField hyp.base.p hyp.base.q)ˣ),
+      Function.Injective μ ∧
+      (∀ (v : ↥hyp.base.U) (x : ↥hyp.base.P),
+          e (Additive.ofMul (⟨(v : G) * (x : G) * (v : G)⁻¹, conj_mem_P hyp v x⟩ :
+              ↥hyp.base.P))
+            = ((μ v : (GaloisField hyp.base.p hyp.base.q)ˣ) :
+                GaloisField hyp.base.p hyp.base.q) * e (Additive.ofMul x)) ∧
+      (((Submodule.span (ZMod hyp.base.p)
+            ({(1 : GaloisField hyp.base.p hyp.base.q)} :
+              Set (GaloisField hyp.base.p hyp.base.q))).toAddSubgroup).toSubgroup).map
+          (fieldNormalizerKernelTransport hyp e) = hyp.base.W2 := by
+  letI : Fact hyp.base.p.Prime := ⟨hyp.base.p_prime⟩
+  obtain ⟨e₀, μ, hμinj, hcompat₀⟩ := exists_pu_field_repr hG hyp hu_full
+  obtain ⟨e, hcompat, hW2⟩ := field_repr_rescale_to_W2 hyp hW2_le_P e₀ μ hcompat₀
+  exact ⟨e, μ, hμinj, hcompat, hW2⟩
+
+/-- **(14.7) assembly engine.**  Given the §13/§14-gated structural facts as explicit
+hypotheses — the cyclotomic value `|U| = (p^q-1)/(p-1)` (14.7), `U` cyclic (13), `W₂ ≤ P`
+(13), the coprimality `gcd((p^q-1)/(p-1), p-1) = 1` (14.7), and part (14.2)(b)
+(`Q` elementary abelian, `W₂ ≤ N_G(Q)`, and a `y ∈ Q` with `W₂^y ≤ N_G(U)`) — the concrete
+`FieldNormalizerData` exists.  Every step is one of the proven (14.7) producers:
+`exists_pu_field_repr_W2` (field model + prime line → `W₂`), `mu_range_eq_normOneUnits`
+(`μ` onto `U*`), `conj_mem_P`/`P_inf_U_eq_bot` (the kernel/complement intersection), assembled
+by the σ-bridge `fieldNormalizerData_of_repr`.  This engine carries no `sorry`; it is gated only
+through the §13 producers `basic_structure`/`c_eq_one` cited inside `exists_pu_field_repr_W2`
+and `P_inf_U_eq_bot` (Lane B), so it becomes unconditional exactly when those land. -/
+theorem field_normalizer_of_U_characteristic_of_inputs [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
+    [IsCyclic ↥hyp.base.U]
+    (hu_full : Nat.card ↥hyp.base.U =
+      (hyp.base.p ^ hyp.base.q - 1) / (hyp.base.p - 1))
+    (hW2_le_P : hyp.base.W2 ≤ hyp.base.P)
+    (hcyc : Nat.Coprime
+      ((hyp.base.p ^ hyp.base.q - 1) / (hyp.base.p - 1)) (hyp.base.p - 1))
+    (hQ_elemAb : IsElementaryAbelian hyp.base.q ↥hyp.base.Q)
+    (hW2_norm_Q : hyp.base.W2 ≤ Subgroup.normalizer (hyp.base.Q : Set G))
+    (yQ : G) (hyQ_mem : yQ ∈ hyp.base.Q)
+    (hW2_conj_y : MulAut.conj yQ • hyp.base.W2 ≤ Subgroup.normalizer (hyp.base.U : Set G)) :
+    Nonempty (FieldNormalizerData hyp) := by
+  obtain ⟨e, μ, hμinj, hcompat, hW2⟩ := exists_pu_field_repr_W2 hG hyp hu_full hW2_le_P
+  exact fieldNormalizerData_of_repr hyp e μ hμinj
+    (mu_range_eq_normOneUnits hu_full μ hμinj) (conj_mem_P hyp) hcompat hW2
+    (P_inf_U_eq_bot hG hyp) hcyc hQ_elemAb hW2_norm_Q yQ hyQ_mem hW2_conj_y
+
 /-- **Peterfalvi (14.7)**: if `U` is characteristic in `H`, then the final
 field-normalizer configuration (14.2) holds.
 
-The ungated heart of the construction is `fieldNormalizerData_of_repr` above: it
-assembles the concrete `FieldNormalizerData` (the embedding `σ`, its injectivity, and
-the `P`/`U`/`W₂` matching) out of the abstract Peterfalvi (14.2)(a) field model.  What
-remains here is to *produce that model*: apply the Singer machinery
-`OddOrder.RepresentationTheory.exists_galoisField_repr` to `Additive ↥P` as an
-`𝔽_p[U]`-module (via the conjugation action), obtaining `e`, `μ`, and the
-`U`-equivariance, then read off part (14.2)(b).  Those inputs need
-`Nat.card ↥P = p^q` (`S15.basic_structure`, §13) and `U` faithful on `P`
-(`S15.c_eq_one`, §13) — the remaining §13 character-theory gate (Lane B). -/
+The whole assembly is now realized, `sorry`-free, by `field_normalizer_of_U_characteristic_of_inputs`
+above (field model `exists_pu_field_repr_W2` + prime-line rescaling `field_repr_rescale_to_W2`
++ σ-bridge `fieldNormalizerData_of_repr`).  Closing *this* `sorry` reduces to *producing* that
+engine's explicit hypotheses from `Ldata`/`hchar`:
+* `hu_full : |U| = (p^q-1)/(p-1)` and the cyclotomic coprimality — the (14.7) value argument
+  (the case `p ≡ 1 (mod q)` is killed by `W₂^y` acting fixed-point-freely on `U`);
+* `IsCyclic ↥U` — the §13 standing structure;
+* `W₂ ≤ P` — §13-structural (forced: `hW2`'s kernel transport has range `P`);
+* part (14.2)(b) — `Q` elementary abelian, `W₂ ≤ N_G(Q)`, and `y ∈ Q` with `W₂^y ≤ N_G(U)`,
+  from (13.2.b)/(14.5).
+Each is a §13/§14 character-theory obligation (Lane B / the §14 counting), independent of the
+ungated field algebra above. -/
 theorem field_normalizer_of_U_characteristic [Finite G]
     (_hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
     (Ldata : LHypothesis hyp)
     (hchar : (hyp.base.U.subgroupOf Ldata.H).Characteristic) :
     Nonempty (FieldNormalizerData hyp) := by
-  -- reduce to `fieldNormalizerData_of_repr` once the §13-gated (14.2)(a)/(b) model is built
+  -- `field_normalizer_of_U_characteristic_of_inputs` applied to the §13/§14-gated facts:
+  -- `hu_full`, `IsCyclic ↥U`, `W₂ ≤ P`, the cyclotomic coprimality, and part (14.2)(b).
   sorry
 
 /-! ## (14.8)--(14.9): the key inequality and `T` is type II -/
