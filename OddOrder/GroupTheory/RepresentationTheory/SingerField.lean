@@ -285,6 +285,55 @@ theorem isSimpleModule_of_isCyclic_faithful_card {q : ℕ} (hq : q.Prime)
   rw [hcardC, hNdef] at hcardCdvd
   exact cyclotomicQuotient_not_dvd_pow_sub_one hp2 hq (not_dvd_factorial_pred hq) hcardCdvd
 
+/-- **Peterfalvi (14.2)(a), abstract form.**  A faithful action of a cyclic group `C` of order
+`(p^q-1)/(p-1)` on an `F_p`-module `M` of order `p^q` (`q` prime) realizes `M` as the Galois
+field `GF(p^q)` with `C` embedded in the multiplicative group `GF(p^q)ˣ`: there is an additive
+isomorphism `e : M ≃+ GF(p^q)` and an injective `μ : C →* GF(p^q)ˣ` with `e (c • x) = μ c · e x`.
+
+This is the field-isomorphism that the Section 16 finite-field model (`FieldNormalizerData`)
+requires: combine `isSimpleModule_of_isCyclic_faithful_card` (irreducibility), the Singer engine,
+and `nonempty_ringEquiv_galoisField` (uniqueness of finite fields). -/
+theorem exists_galoisField_repr {q : ℕ} (hq : q.Prime) [NeZero (Nat.card C : ZMod p)]
+    (hcardM : Nat.card M = p ^ q) (hcardC : Nat.card C = (p ^ q - 1) / (p - 1))
+    (hfaith : ∀ c : C, (∀ x : M, MonoidAlgebra.of (ZMod p) C c • x = x) → c = 1) :
+    ∃ (e : M ≃+ GaloisField p q) (μ : C →* (GaloisField p q)ˣ),
+      Function.Injective μ ∧
+      ∀ (c : C) (x : M),
+        e (MonoidAlgebra.of (ZMod p) C c • x) = (μ c : GaloisField p q) * e x := by
+  classical
+  haveI : Fintype M := Fintype.ofFinite _
+  haveI hsimp : IsSimpleModule (MonoidAlgebra (ZMod p) C) M :=
+    isSimpleModule_of_isCyclic_faithful_card hq hcardM hcardC hfaith
+  obtain ⟨data⟩ := nonempty_singerFieldData (p := p) (C := C) (M := M)
+  obtain ⟨φ⟩ := data.nonempty_ringEquiv_galoisField hq.pos.ne'
+    (by rw [← Nat.card_eq_fintype_card, hcardM])
+  refine ⟨data.e.trans φ.toAddEquiv,
+    (Units.map (φ : data.K →+* GaloisField p q).toMonoidHom).comp data.μ, ?_, ?_⟩
+  · -- `μ` is injective: `μ c = 1 ⟹ data.μ c = 1 ⟹ c` acts trivially `⟹ c = 1`.
+    rw [injective_iff_map_eq_one]
+    intro c hc
+    apply hfaith c
+    intro x
+    have hcoe : φ ((data.μ c : data.K)) = 1 := by
+      have := congrArg (Units.val) hc
+      simpa [Units.coe_map] using this
+    have hdμ : (data.μ c : data.K) = 1 := by
+      have := φ.injective (hcoe.trans (map_one φ).symm)
+      exact this
+    have hcompat := data.compat c x
+    rw [hdμ, one_mul] at hcompat
+    exact data.e.injective hcompat
+  · intro c x
+    have hμc : ((((Units.map (φ : data.K →+* GaloisField p q).toMonoidHom).comp data.μ) c :
+        (GaloisField p q)ˣ) : GaloisField p q) = φ ((data.μ c : data.K)) := by
+      simp [Units.coe_map]
+    calc (data.e.trans φ.toAddEquiv) (MonoidAlgebra.of (ZMod p) C c • x)
+        = φ (data.e (MonoidAlgebra.of (ZMod p) C c • x)) := rfl
+      _ = φ ((data.μ c : data.K) * data.e x) := by rw [data.compat c x]
+      _ = φ ((data.μ c : data.K)) * φ (data.e x) := map_mul _ _ _
+      _ = (((Units.map (φ : data.K →+* GaloisField p q).toMonoidHom).comp data.μ) c :
+            GaloisField p q) * (data.e.trans φ.toAddEquiv) x := by rw [hμc]; rfl
+
 end Irreducibility
 
 end OddOrder.RepresentationTheory
