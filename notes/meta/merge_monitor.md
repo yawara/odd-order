@@ -157,6 +157,20 @@ branch とも削除済み。旧 **A** / **D** も同様に退役済み (履歴�
 
 ## 現状メモ
 
+- **2026-06-18 (後刻) — POLE-1 設計訂正 + option-1 再タスク + 4 レーン合流**: cron 再消滅 (`/model` 切替) →
+  新 cron `9fb5aff8` (`4,19,34,49 * * * *`, session-only, push なし) 再作成。**4 レーン合流** (f→g→b→h, clean,
+  build 緑 3859 jobs / AxiomsCheck OK / 実 sorry **141→140**): 目玉 = **lane-g が `section16MaximalPair`
+  producer 証明** (`651a2bae`, issue 8014 close, POLE-1 §16 obligation 1 本 discharge)。
+  **🔑 POLE-1 設計判断**: lane-f が「`section16TypePStructure_of_isMinimalSimpleOdd` は現仕様で型レベル充足不能」
+  と指摘 (issue 7005) → **hub 独立検証 (3レンズ高確度 CONFIRMED)**: 出力が `W_eq_inter : W = mp.S ⊓ mp.T`
+  cyclic を要求するが入力 `Section16MaximalPair` は W を持たず公理が共役不変 (共役 partner `Mstar^g` が全公理
+  充足の反例)。真の missing math = **逆包含 `M⊓Mstar ≤ K⊔Kstar` = BG Thm I clause(2) `S∩T=W`** (Lean の
+  `theoremI`/`maximalSubgroup_type_dichotomy` `S16_MainResults:950` が drop した unfaithful transcription;
+  forward `K⊔Kstar≤M⊓Mstar` は `typeP_duality` `S14:7961` から既出)。姉妹 `section16MaximalPair` は非ブロック。
+  **ユーザー裁可 = option 1 (難所に正面)**: ① lane-f が逆包含を新 leaf `S16_PairIntersection.lean` で形式化
+  (caveat: 上流 §16 prereq=Prop 16.1 等に bottom-out したら sorry 退避せず STOP+報告) → ② lane-g が `S∩T=W`
+  clause を dichotomy に復活 + `Section16MaximalPair` を W で enrich → ③ lane-f が typeP producer を discharge。
+  両 LAUNCH (f/g) に REASSIGN #2 記載済。フィードバック「並列化は適度な粒度で」([[feedback-reasonable-parallelism-granularity]]) 記録。
 - **2026-06-18 (監視再開) — cron 再作成 + f/g stall flag**: `/model` 切替で旧 cron (`8922498c`) 消滅
   ([[cron-dies-on-model-switch]]) → 新 cron `aa439f22` (`3,18,33,48 * * * *`, session-only, **push なし**=
   2026-06-18 standing policy) を再作成。tick 時点: **全レーン未マージ 0** (b/f/g/h の成果は main 合流済、
