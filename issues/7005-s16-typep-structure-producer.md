@@ -278,3 +278,35 @@ mp producer `section16MaximalPair_of_isMinimalSimpleOdd` を canonical partner (
 3. **tp producer discharge**: enriched mp.K/Kstar から `typeP_pair_W_structure` で pairing、
    bridge 補題で prime(II–IV)、type data + coprime 構成で U-side、(14.1)/(13.2) で q<p。
    engine `section16TypePStructure_of_typeData` が assemble(既 sorry-free)。
+
+---
+
+## ✅✅ Step 3 大幅前進 (2026-06-18→19 lane-f) — type-emptiness 解消 + W-side discharge
+
+「続けてください/深いところに」を受け enrich 本体を実行。**type-emptiness を完全解消し、tp producer
+の pairing (W-side) を sorry-free 化**。実 sorry 140 据え置き (residual は U-side に縮小)、full build 3860 green。
+
+### landing (全 sorry-free)
+1. **`exists_section16MaximalPair_data`** (`FeitThompson`, `852831d0`): canonical type-P dual pair
+   `S,T=Mstar` + κ-Hall witness 一式 (BG 14.7)。theoremI branch mirror、case-(a) は Pf (12.17) で排除。
+   `open OddOrder.Isaacs` 追加で Ch03 解決、heavy qual。
+2. **`Section16MaximalPair` enrich** (`852831d0`): `K, Kstar` + 10 witness field (canonical partner)。
+   ⟹ pathological mp.T 排除、`Section16TypePStructure mp` 非空型化。非破壊 (field 追加、lane-b cd 透過)。
+3. **mp producer 再構成** (`852831d0`): `exists_section16MaximalPair_data` から choose (nested .choose×4)。
+4. **engine → component 化** (`7e970944`): `section16TypePStructure_of_components` (W1/W2/U/V 直接、
+   mp.K/mp.Kstar plug-in)。
+5. **W-side discharge** (`7e970944`): producer 内で `typeP_pair_W_structure` を mp の witness に適用
+   → `S∩T=K⊔Kstar` cyclic + bot + commute を sorry-free 取得。
+
+### 残 residual (U-side のみ、honest = 真・構成可能)
+
+producer の唯一 sorry = `Nonempty (Σ' (U V : Subgroup G), derivedInG S = M_F ⊔ U ∧
+derivedInG T = M_F(T) ⊔ V ∧ |K| prime ∧ |Kstar| prime ∧ K ≤ N(U) ∧ Kstar ≤ N(V) ∧ |K| < |Kstar|)`。
+= Pf (13.1.b) semidirect data + BG Thm C(10) primality + (13.2.a) ordering。
+
+**残の attack 経路** (genuine §13/§14、bundled ゆえ分割は U が hSderiv∧hSnorm 両方に出るため不可):
+- **U-side**: K-normalized complement `U` to M_F in M' (coprime action / Schur-Zassenhaus)。
+- **primes**: type-II member は `typeP_structure` の `IsTypeP2→∃q prime |K|=q`; II–IV は bridge
+  (`card_kappaHall_eq_derived_index`+`card_W1_eq_derived_index`+型データ common); Type-V は partner 論。
+  ⚠ BG 14.7(6) は片側のみ prime 保証 → 両 prime は (13.1)/(8.9) の subtle argument。
+- **q<p**: (13.2.a)。
