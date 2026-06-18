@@ -4,6 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
 import OddOrder.BG.AppC_NormSet
+import OddOrder.GroupTheory.RepresentationTheory.SingerField
 import OddOrder.Peterfalvi.S15_SAndT
 import OddOrder.Peterfalvi.S16_NonExistenceGCore
 
@@ -611,6 +612,112 @@ theorem P_inf_U_eq_bot [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     rw [← hyp.base.c_eq_card_C, OddOrder.Peterfalvi.S15.c_eq_one hG hyp.base]
   rw [eq_bot_iff, ← hC_bot, hyp.base.C_eq]
   exact le_inf inf_le_right (inf_le_left.trans hP_le_cent)
+
+set_option maxHeartbeats 1000000 in
+open scoped IsMulCommutative in
+/-- **(14.7)/(14.2)(a) field model from the §13 numeric data.**  When
+`|U| = (p^q-1)/(p-1)` (the (14.7) cyclotomic value), the conjugation action of `U` on the
+elementary-abelian `P` of order `p^q` makes `Additive ↥P ≅ 𝔽_{p^q}` with `U ↪ 𝔽^×`
+(Singer mechanism, `exists_galoisField_repr`).  Cites the §13 producers `basic_structure`
+(`|P|=p^q`, `P` elementary abelian) and `c_eq_one` (`U` faithful on `P`). -/
+theorem exists_pu_field_repr [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hyp : Hypothesis (G := G)) [IsCyclic ↥hyp.base.U]
+    (hu_full : Nat.card ↥hyp.base.U =
+      (hyp.base.p ^ hyp.base.q - 1) / (hyp.base.p - 1)) :
+    letI : Fact hyp.base.p.Prime := ⟨hyp.base.p_prime⟩
+    ∃ (e : Additive ↥hyp.base.P ≃+ GaloisField hyp.base.p hyp.base.q)
+      (μ : ↥hyp.base.U →* (GaloisField hyp.base.p hyp.base.q)ˣ),
+      Function.Injective μ ∧
+      ∀ (v : ↥hyp.base.U) (x : ↥hyp.base.P),
+        e (Additive.ofMul (⟨(v : G) * (x : G) * (v : G)⁻¹, conj_mem_P hyp v x⟩ :
+            ↥hyp.base.P))
+          = ((μ v : (GaloisField hyp.base.p hyp.base.q)ˣ) :
+              GaloisField hyp.base.p hyp.base.q) * e (Additive.ofMul x) := by
+  letI : Fact hyp.base.p.Prime := ⟨hyp.base.p_prime⟩
+  haveI : NeZero hyp.base.p := ⟨hyp.base.p_prime.ne_zero⟩
+  obtain ⟨data, _⟩ := OddOrder.Peterfalvi.S15.basic_structure hG hyp.base
+  haveI hPcomm : IsMulCommutative ↥hyp.base.P :=
+    IsMulCommutative.of_comm data.P_elementaryAbelian.comm
+  letI hUcomm : CommGroup ↥hyp.base.U :=
+    { (inferInstance : Group ↥hyp.base.U) with
+      mul_comm := fun a b => (isMulCommutative_iff.mp data.U_commutative) a b }
+  have hpsmul : ∀ x : Additive ↥hyp.base.P, (hyp.base.p : ℕ) • x = 0 := by
+    intro x
+    apply Additive.toMul.injective
+    rw [toMul_nsmul, toMul_zero]
+    exact data.P_elementaryAbelian.pow_eq_one x.toMul
+  haveI hPmod : Module (ZMod hyp.base.p) (Additive ↥hyp.base.P) :=
+    AddCommGroup.zmodModule hpsmul
+  -- the conjugation representation of `U` on `Additive ↥P`
+  let conjHom : ↥hyp.base.U →* MulAut ↥hyp.base.P :=
+    (Subgroup.normalizerMonoidHom (H := hyp.base.P)).comp
+      (Subgroup.inclusion (U_le_normalizer_P hyp))
+  let ρ : Representation (ZMod hyp.base.p) ↥hyp.base.U (Additive ↥hyp.base.P) :=
+    (OddOrder.BG.Ch1_Preliminary.mulAutToEnd ↥hyp.base.P hyp.base.p).comp conjHom
+  have hρ_apply : ∀ (c : ↥hyp.base.U) (a : Additive ↥hyp.base.P),
+      ρ c a = Additive.ofMul ((conjHom c) (Additive.toMul a)) := fun _ _ => rfl
+  -- `Additive ↥P` as an `𝔽_p[U]`-module *directly* (sidesteps the `asModule` synth trap)
+  letI hPmodAlg :
+      Module (MonoidAlgebra (ZMod hyp.base.p) ↥hyp.base.U) (Additive ↥hyp.base.P) :=
+    Module.compHom (Additive ↥hyp.base.P) (ρ.asAlgebraHom).toRingHom
+  have hof_smul : ∀ (c : ↥hyp.base.U) (a : Additive ↥hyp.base.P),
+      MonoidAlgebra.of (ZMod hyp.base.p) ↥hyp.base.U c • a =
+        Additive.ofMul ((conjHom c) (Additive.toMul a)) := by
+    intro c a
+    have h : MonoidAlgebra.of (ZMod hyp.base.p) ↥hyp.base.U c • a = ρ c a := by
+      show (ρ.asAlgebraHom (MonoidAlgebra.of (ZMod hyp.base.p) ↥hyp.base.U c)) a = ρ c a
+      rw [Representation.asAlgebraHom_of]
+    rw [h, hρ_apply]
+  haveI hNeZero : NeZero (Nat.card ↥hyp.base.U : ZMod hyp.base.p) := by
+    refine ⟨fun h => ?_⟩
+    rw [hu_full] at h
+    have hdvd : hyp.base.p ∣ (hyp.base.p ^ hyp.base.q - 1) / (hyp.base.p - 1) :=
+      (ZMod.natCast_eq_zero_iff _ _).mp h
+    have hmod : (hyp.base.p ^ hyp.base.q - 1) / (hyp.base.p - 1) ≡ 1 [MOD hyp.base.p] := by
+      have hsum_eq : ∑ k ∈ Finset.range hyp.base.q, hyp.base.p ^ k =
+          (hyp.base.p ^ hyp.base.q - 1) / (hyp.base.p - 1) :=
+        Nat.geomSum_eq hyp.base.p_prime.two_le _
+      rw [← hsum_eq, show hyp.base.q = (hyp.base.q - 1) + 1 by
+          have := hyp.base.q_prime.pos; omega, Finset.sum_range_succ']
+      have hzero : (∑ k ∈ Finset.range (hyp.base.q - 1), hyp.base.p ^ (k + 1)) ≡ 0
+          [MOD hyp.base.p] := by
+        rw [Nat.modEq_zero_iff_dvd]
+        exact Finset.dvd_sum fun k _ => dvd_pow_self hyp.base.p (Nat.succ_ne_zero k)
+      simpa using hzero.add_right 1
+    have hdvd1 : hyp.base.p ∣ 1 := by
+      have h0 := (Nat.modEq_zero_iff_dvd).mpr hdvd
+      have h01 := h0.symm.trans hmod
+      rwa [Nat.modEq_iff_dvd', Nat.sub_zero] at h01
+      omega
+    exact absurd (Nat.le_of_dvd one_pos hdvd1) (by have := hyp.base.p_prime.two_le; omega)
+  have hcardM : Nat.card (Additive ↥hyp.base.P) = hyp.base.p ^ hyp.base.q := data.P_order
+  have hfaith : ∀ c : ↥hyp.base.U,
+      (∀ x : Additive ↥hyp.base.P,
+          MonoidAlgebra.of (ZMod hyp.base.p) ↥hyp.base.U c • x = x) → c = 1 := by
+    intro c hc
+    have hcomm : ∀ y : ↥hyp.base.P, (c : G) * (y : G) = (y : G) * (c : G) := by
+      intro y
+      have h1 := hc (Additive.ofMul y)
+      rw [hof_smul] at h1
+      have h2 : (conjHom c) y = y := Additive.ofMul.injective (by simpa using h1)
+      have h3 : (c : G) * (y : G) * (c : G)⁻¹ = (y : G) := congrArg Subtype.val h2
+      rwa [mul_inv_eq_iff_eq_mul] at h3
+    have hmem : (c : G) ∈ hyp.base.C := by
+      rw [hyp.base.C_eq]
+      exact ⟨c.2, Subgroup.mem_centralizer_iff.mpr (fun y hy => (hcomm ⟨y, hy⟩).symm)⟩
+    have hCbot : hyp.base.C = ⊥ := by
+      apply Subgroup.eq_bot_of_card_eq
+      rw [← hyp.base.c_eq_card_C, OddOrder.Peterfalvi.S15.c_eq_one hG hyp.base]
+    rw [hCbot, Subgroup.mem_bot] at hmem
+    exact Subtype.ext hmem
+  obtain ⟨e0, μ, hμinj, hcompat0⟩ :=
+    OddOrder.RepresentationTheory.exists_galoisField_repr
+      (C := ↥hyp.base.U) (M := Additive ↥hyp.base.P)
+      hyp.base.q_prime hcardM hu_full hfaith
+  refine ⟨e0, μ, hμinj, ?_⟩
+  intro v x
+  rw [← hcompat0 v (Additive.ofMul x), hof_smul v (Additive.ofMul x)]
+  congr 2
 
 /-- **Peterfalvi (14.7)**: if `U` is characteristic in `H`, then the final
 field-normalizer configuration (14.2) holds.
