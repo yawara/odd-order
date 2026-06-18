@@ -937,6 +937,34 @@ theorem not_isTypeI_of_isTypeNonI [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOd
   · exact S14.isTypeP_of_isTypeP1 (hIII_IVc.mp (Or.inr hIV)).1
   · exact S14.isTypeP_of_isTypeP1 (hVd.mp hV).1
 
+/-- **BG Theorem I(2), forward inclusion** `K ⊔ K* ≤ M ⊓ M*` — the lane-g half of
+`S ∩ T = W`.
+
+In the type-P dual pair (`typeP_duality`), `W = K ⊔ K*` and the pair is `S = M`,
+`T = M*`.  Restoring the dropped `W = S ⊓ T` clause to the dichotomy needs both
+inclusions; this is the easy one, a pure subgroup-lattice fact from the duality
+data:
+
+* `K ≤ M` is the setup hypothesis, and `K = M*_σ ⊓ C(K*) ≤ M*_σ ≤ M*` (the dual
+  presentation) places `K` in `M*`;
+* `K* = M_σ ⊓ C(K) ≤ M_σ ≤ M` places `K*` in `M`, and `K* ≤ M*` is the duality
+  output.
+
+The reverse inclusion `M ⊓ M* ≤ K ⊔ K*` is the BG-internal content of (8.4)/(16.x)
+being formalized separately (lane-f, `S16_PairIntersection`); `le_antisymm` of the
+two then gives `W = S ⊓ T`. -/
+theorem kappa_join_kstar_le_pair_inf {M Mstar K Kstar : Subgroup G}
+    (hKM : K ≤ M)
+    (hKstar : Kstar = OddOrder.BG.Ch3.S10.Msigma M ⊓ Subgroup.centralizer (K : Set G))
+    (hKstarMstar : Kstar ≤ Mstar)
+    (hKdual : K = OddOrder.BG.Ch3.S10.Msigma Mstar ⊓ Subgroup.centralizer (Kstar : Set G)) :
+    K ⊔ Kstar ≤ M ⊓ Mstar := by
+  refine sup_le (le_inf hKM ?_) (le_inf ?_ hKstarMstar)
+  · -- `K ≤ M*`: `K = M*_σ ⊓ C(K*) ≤ M*_σ ≤ M*`.
+    rw [hKdual]; exact inf_le_left.trans (OddOrder.BG.Ch3.S10.Msigma_le Mstar)
+  · -- `K* ≤ M`: `K* = M_σ ⊓ C(K) ≤ M_σ ≤ M`.
+    rw [hKstar]; exact inf_le_left.trans (OddOrder.BG.Ch3.S10.Msigma_le M)
+
 /-! ## Theorems I and II: the BG output consumed by Peterfalvi -/
 
 /-- **§16 helper (general, §14-independent).**  A `π`-Hall subgroup `H` of `G` contained in a
