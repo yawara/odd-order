@@ -213,7 +213,7 @@ itself (`hsplit`, prime-order `W₂.subgroupOf H` ⟹ `⊥` or all in `Z(H)`) is
 discharged separately.  Wiring this into `S08_CoherenceTheorems:59` (the c2 branch) follows once the
 three obligations are filled. -/
 theorem nonempty_coherent_S_of_c2_of_branches (hyp : SibleyDadeHypothesis G L H)
-    [H.Normal] [Fintype ↥H]
+    [H.Normal] [Finite ↥H]
     (h46 : OddOrder.Peterfalvi.S06.Hypothesis46 (sharpImage H) L)
     (hHK : h46.K = H) (hW1 : h46.W1 = hyp.W1) (hW2comm : h46.W2 ≤ ⁅H, H⁆)
     (hcop : Nat.Coprime (Nat.card ↥H) (Nat.card hyp.W1))
@@ -235,5 +235,25 @@ theorem nonempty_coherent_S_of_c2_of_branches (hyp : SibleyDadeHypothesis G L H)
   rcases hsplit with hB | hA
   · exact hcaseB hp hHp hB
   · exact hcaseA hp hHp hA
+
+/-- **(6.8) case A/B split** (discharges `hsplit` of `nonempty_coherent_S_of_c2_of_branches`).
+Since `W₂ ≤ H` is of prime order, `W₂.subgroupOf H` has prime order too, so the subgroup
+`(W₂.subgroupOf H) ⊓ Z(H)` is either trivial (case A: `Z(H) ∩ W₂ = 1`) or all of `W₂.subgroupOf H`
+(case B: `1 ≠ W₂ ⊆ Z(H)`).  This is Peterfalvi (6.8)'s two-case dichotomy (04.8:152-154). -/
+theorem caseAB_split_of_c2 [H.Normal] [Finite ↥H]
+    (h46 : OddOrder.Peterfalvi.S06.Hypothesis46 (sharpImage H) L)
+    (hW2H : h46.W2 ≤ H) (hprime : (Nat.card h46.W2).Prime) :
+    h46.W2.subgroupOf H ≤ Subgroup.center ↥H ∨
+    Disjoint (h46.W2.subgroupOf H) (Subgroup.center ↥H) := by
+  by_cases hB : h46.W2.subgroupOf H ≤ Subgroup.center ↥H
+  · exact Or.inl hB
+  refine Or.inr (disjoint_iff.mpr ?_)
+  have hWprime : (Nat.card ↥(h46.W2.subgroupOf H)).Prime := by
+    rwa [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hW2H).toEquiv]
+  have hdvd : Nat.card ↥(h46.W2.subgroupOf H ⊓ Subgroup.center ↥H) ∣
+      Nat.card ↥(h46.W2.subgroupOf H) := Subgroup.card_dvd_of_le inf_le_left
+  rcases (Nat.dvd_prime hWprime).mp hdvd with h1 | hfull
+  · exact Subgroup.card_eq_one.mp h1
+  · exact absurd (inf_eq_left.mp (Subgroup.eq_of_le_of_card_ge inf_le_left hfull.ge)) hB
 
 end OddOrder.Peterfalvi.S08
