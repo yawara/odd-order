@@ -848,6 +848,75 @@ theorem caseB_Xset_member_anchored
     rwa [one_smul] at h
   exact ⟨X, a, hdeg, hanc, hmix, hXZ, hsupp⟩
 
+/-- **(6.8.2) cross-member isometry, varying degree.**  Generalizes `xchi_inner_eq_of_anchored`
+from a single uniform anchor weight `a₀` (equal-degree columns) to **per-member** weights `aᵢ, aⱼ`
+(arbitrary `X`-members of differing degree).  From the anchored images `τ(χᵢ − aᵢη₁) = Xᵢ − aᵢν₁`
+(`hancᵢ`), the seams `⟨Xᵢ, ν₁⟩ = 0` (`hmixᵢ`), the source orthogonalities `⟨χᵢ, η₁⟩ = 0`
+(`horthᵢ`, the `X ⊥ Y` pairing), the Dade isometry of `τ` on the `H^#`-supported anchored
+differences, and `‖η₁‖² = ‖ν₁‖² = 1`:
+`⟨Xᵢ, Xⱼ⟩ = (⟨χᵢ,χⱼ⟩ + aᵢaⱼ) − aᵢaⱼ − aᵢaⱼ + aᵢaⱼ = ⟨χᵢ, χⱼ⟩`.
+
+This is the `hXinner` content for the **full** `Xset W₂` coherence (varying-degree generalization of
+the certain-type `hXinner`). -/
+theorem inner_eq_of_anchored_varying
+    (hyp : SibleyDadeHypothesis G L H) [H.Normal]
+    {η₁ : ClassFunction ↥L ℂ} (hη₁ : η₁ ∈ hyp.Yset)
+    {χi χj : ClassFunction ↥L ℂ} {ai aj : ℕ} {Xi Xj : ClassFunction G ℂ}
+    (hanci : hyp.tau (χi - ai • η₁) = Xi - (ai : ℂ) • hyp.coherentYset.extension η₁)
+    (hancj : hyp.tau (χj - aj • η₁) = Xj - (aj : ℂ) • hyp.coherentYset.extension η₁)
+    (hmixi : ClassFunction.inner Xi (hyp.coherentYset.extension η₁) = 0)
+    (hmixj : ClassFunction.inner Xj (hyp.coherentYset.extension η₁) = 0)
+    (horthi : ClassFunction.inner χi η₁ = 0) (horthj : ClassFunction.inner χj η₁ = 0)
+    (hsuppi : (χi - ai • η₁).support ⊆
+      OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L)
+    (hsuppj : (χj - aj • η₁).support ⊆
+      OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L) :
+    ClassFunction.inner Xi Xj = ClassFunction.inner χi χj := by
+  classical
+  set ν := hyp.coherentYset.extension η₁ with hνdef
+  have hXi : Xi = hyp.tau (χi - ai • η₁) + (ai : ℂ) • ν := by
+    rw [hanci]; abel
+  have hXj : Xj = hyp.tau (χj - aj • η₁) + (aj : ℂ) • ν := by
+    rw [hancj]; abel
+  have hηirr : IsIrreducibleCharacter η₁ := hyp.isIrreducibleCharacter_of_mem_Yset hη₁
+  have hηη : ClassFunction.inner η₁ η₁ = 1 := by
+    have h := irreducibleCharacter_inner_eq_ite (⟨η₁, hηirr⟩ : IrreducibleCharacter ↥L)
+      (⟨η₁, hηirr⟩ : IrreducibleCharacter ↥L)
+    rwa [if_pos rfl] at h
+  have hνν : ClassFunction.inner ν ν = 1 := by
+    rw [hνdef, hyp.coherentYset.extension_inner_eq η₁ η₁ (Submodule.subset_span hη₁)
+      (Submodule.subset_span hη₁), hηη]
+  -- `⟨τ(χᵢ−aᵢη₁), τ(χⱼ−aⱼη₁)⟩ = ⟨χᵢ,χⱼ⟩ + aᵢaⱼ` (Dade isometry on the supported pair).
+  have hττ : ClassFunction.inner (hyp.tau (χi - ai • η₁)) (hyp.tau (χj - aj • η₁))
+      = ClassFunction.inner χi χj + (ai : ℂ) * (aj : ℂ) := by
+    rw [OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap_inner_eq_on_supported_span hyp.dade
+        hyp.hconj (S := ({χi - ai • η₁, χj - aj • η₁} : Set (ClassFunction ↥L ℂ)))
+        (by intro s hs; simp only [Set.mem_insert_iff, Set.mem_singleton_iff] at hs
+            rcases hs with rfl | rfl; exacts [hsuppi, hsuppj])
+        (Submodule.subset_span (Set.mem_insert _ _))
+        (Submodule.subset_span (Set.mem_insert_of_mem _ rfl))]
+    have hηj : ClassFunction.inner η₁ χj = 0 := by
+      rw [OddOrder.RepresentationTheory.inner_conj_symm, horthj, star_zero]
+    simp only [← Nat.cast_smul_eq_nsmul ℂ ai η₁, ← Nat.cast_smul_eq_nsmul ℂ aj η₁,
+      ClassFunction.inner_sub_left, ClassFunction.inner_sub_right, ClassFunction.inner_smul_left,
+      OddOrder.RepresentationTheory.inner_smul_right, star_natCast, horthi, hηj, hηη]
+    ring
+  -- the cross terms with `ν`.
+  have hτiν : ClassFunction.inner (hyp.tau (χi - ai • η₁)) ν = -(ai : ℂ) := by
+    rw [hanci]
+    simp only [ClassFunction.inner_sub_left, ClassFunction.inner_smul_left, star_natCast]
+    rw [hmixi, hνν]; ring
+  have hτjν : ClassFunction.inner (hyp.tau (χj - aj • η₁)) ν = -(aj : ℂ) := by
+    rw [hancj]
+    simp only [ClassFunction.inner_sub_left, ClassFunction.inner_smul_left, star_natCast]
+    rw [hmixj, hνν]; ring
+  have hντj : ClassFunction.inner ν (hyp.tau (χj - aj • η₁)) = -(aj : ℂ) := by
+    rw [OddOrder.RepresentationTheory.inner_conj_symm, hτjν, star_neg, star_natCast]
+  rw [hXi, hXj]
+  simp only [ClassFunction.inner_add_left, ClassFunction.inner_add_right,
+    ClassFunction.inner_smul_left, OddOrder.RepresentationTheory.inner_smul_right, star_natCast]
+  rw [hττ, hτiν, hντj, hνν]; ring
+
 /-- **⚠ NON-VIABLE base (kept as a structural record).**  The map convention here is correct
 (`hyp.tau = dadeIntegralCharacterMap hyp.dade (hyp.dade.fullDadeIsometryData hyp.hconj)` defeq, so
 `xChainCoherentW hyp.dade hyp.hconj` lands at `hyp.tau` — no retargeting), **but the `hstep`
