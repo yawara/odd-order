@@ -59,19 +59,27 @@ hDeg `2a < ∑ deg²/mc` = (6.6) degree theory」は誤診断。** 根拠:
   (`caseB_S_member_column_or_irreducible` dichotomy: column=`columnSum`(grid sum, μ∉Xset で交わらず)、
   irreducible=basis if_pos)。**= cont.¹² で isolate した hard blocker を解消**。
 
-**▶ 残 = (P3') cX coherence の 4 field + (P4) glue + (P5) wire**(extension は完成、building block 完備):
-- **cX = `IsCoherent (Xset W₂)`** with `extension := caseBXsetExtension Ximg`(Ximg = caseB_Xset_member_anchored の
-  X を Classical.choose、a も):
-  - extension_inner_eq: span_induction₂ + `caseBXsetExtension_eq` + `inner_eq_of_anchored_varying`。
-  - extends_on_supported: ⚠ **要 新 generation 補題 `mem_span_scaledDiff_of_mem_zSupportedSpan`**
-    (supported degree-0 φ → span{χᵢ−dᵢχ₁}、∵ ∑cᵢdᵢ=0 ⟹ φ=∑cᵢ(χᵢ−dᵢχ₁); `mem_span_columnDiff_…` の
-    varying-degree 版、未存在=要構築 ~50-80行)→ `eq_on_zSpan_of_eq_on` + `anchoredImage_scaledDiff_eq`。
-  - extension_mem_ZIrr: `caseBXsetExtension_eq` + bundle の X∈ZIrr。
-- **(P4)** Y と glue(`coherentUnion_of_glued_…`、`coherentCertainTypeSet_union_Yset_caseB` template)。
-- **(P5)** seed → `nonempty_coherent_S_caseB` → S08:59 case-B 枝。
-- **見積**: 残 = generation 補題 + cX wrapper(4 field) + glue + wire ≈ 1 fresh session(extension は済、
-  唯一の新 math = generation 補題の線形代数、他は building block 配線)。hDeg 不要(cont.¹²)。
-- **見積**: extension map = fresh session 1 本(dichotomy basis 構成 + μ∉Xset 構造補題 + 4 coherence field
+**▶✅ (P3') cX coherence = 構築完了**(本セッション):
+- **`mem_span_scaledDiff_of_mem_zSupportedSpan`**(`d645520b`)— supported degree-0 φ → span{f−d•χ₁}
+  (varying-degree generation、`mem_span_columnDiff` の一般化)。
+- **`caseBXimg` + `caseBXimg_spec`** + **`caseBXset_isCoherent`**(`fc7f8daf`)— `IsCoherent (Xset W₂)`
+  via anchored images、4 field 全て building block で discharge(inner=`inner_eq_of_anchored_varying`、
+  extends=`anchoredImage_scaledDiff_eq`+generation、ZIrr=bundle)。anchor χ₁ + divisibility(p-群 integral
+  ratio)+ nonzero を仮説化(全 satisfiable)。
+
+**▶ 残 = (P4) glue + (P5) wire + (P6) discharge**(cX 完成、最終 assembly mile):
+- **(P4) glue-ν + union**: cX(`caseBXset_isCoherent`)と cY を `coherentUnion_of_glued` で union →
+  `IsCoherent (Xset W₂ ∪ Y)` seed。要 combined ν(= caseBXsetExtension on X / cY.ext on Y)=
+  `exists_integralCharacterMap_glue_of_orthonormal`(**orthonormal source 要**: grid {μ_{ij}} ∪ irreducible
+  X-members、全 distinct irreducible で orthonormal、⊥ Y)。column 版 `exists_glue_nu_columnSum_Yset_via_map`
+  を grid+irreducible source に拡張(~60行)。glue 条件: hagreeX/Y、hsrc_ortho=`caseB_Xset_orthogonal_Yset`、
+  himg_ortho=`caseB_anchoredImage_seam_all_Yset`(seam 全 Y)、hgen。
+- **(P5)** seed → `nonempty_coherent_S_caseB`(`S08_CaseBWeightedEndgame:372`)→ S08:59 case-B 枝。
+- **(P6) discharge** {anchor χ₁=min-degree X-member, divisibility(θ(1) p-power ⟹ min∣all), nonzero,
+  hη₁1/hχ₁1(irreducible degree>0)}+ case-B 構造仮説(hyp.cases.inr)。⚠ **p-power divisibility が唯一の新 math**
+  (IsPGroup ⟹ char degree p-power、min selection)。
+- **見積**: glue-ν(orthonormal source)+ union + wire + discharge(p-power)≈ 1 fresh session。hDeg 不要。
+- **(参考・旧見積)**: extension map = fresh session 1 本(dichotomy basis 構成 + μ∉Xset 構造補題 + 4 coherence field
   配線、building block は ↑で完備ゆえ純 assembly)。hDeg 不要(cont.¹²)。
 
 ## ✅✅✅ 2026-06-18 cont.¹¹ — BASE COHERENCE 完成: `IsCoherent (certainTypeSet ∪ Y)` を unconditional 化 + trap 除去
