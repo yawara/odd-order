@@ -4,7 +4,13 @@
 > `s08_6_8_assembly_plan.md`(458KB)/`s08_6_8_3_gap_resolution.md` のうち本 note と矛盾する記述は本 note を優先。
 > 上位方針・FT 接続の文脈 = 記憶 [[ft-path-policy]] の 2026-06-17 検証訂正ブロック。
 
-## ✅✅ 2026-06-18 cont.⁵ — ROUTE RESOLVED: anchoredImages は ON-PATH かつ CORE (cont.⁴ の疑問を解消)
+## ✅✅ 2026-06-18 cont.⁵ — ROUTE RESOLVED: anchoredImages は (6.8.2.3) の正準ツール (cont.⁴ の疑問を解消)
+
+> ⚠ **cont.⁶ で精緻化**: 下記「canonical cX 説は誤り / cX は xChiExtension 必須」は **OVERSTATED**。
+> canonical column image も実は ⊥ Y(`inner_coherent_extension_certainTypeOmegaSigma_eq_zero`)ゆえ
+> **cX 本命は canonical `xChainCoherentW`**(anchoredImages-cX は不要)。`caseB_member_anchored_image` は
+> (6.8.2.3) 部品として保持だが seed には canonical 路線。詳細 = cont.⁶ 末尾。以下 cont.⁵ 本文は (6.8.2.3) の
+> 数学的理解として正しい(anchoredImages = (6.8.2.3) の正準ツールは真)が、cX 実装路線だけ cont.⁶ が上書き。
 
 **cont.⁴ の疑問「anchoredImages は critical path 上か?」を、教科書 (6.8.2.3) 原文 + Lean 署名の直接精査で
 解決。結論 = anchoredImages 機構 (`caseB_per_phi_anchored_fromYset` 中心) は (6.8.2.3) の唯一の正準ツールで、
@@ -57,12 +63,29 @@ sorry-free・axiom-clean): `caseB_column_anchored_image` を**任意 irreducible
   `span_subset_span_zSupportedSpan_union_anchor_of_scaledDiffs`(`S07_Coherence:172`)・
   `coherentOfPairChainCover`(`:4841`、xChainCoherentW が使用)。
 
-**⚠ 次の一手の前に決すべき設計 sub-question** (cX を最小労力で得る分岐):
-**`xChainCoherentW` の canonical chain-cX は hmixed を満たすか?** = `certainTypeSet_isCoherent_tau_canonical`
-の extension が column で X(θ) に一致するか? (一致すれば chain image=anchored image で **cX は xChainCoherentW で
-FREE**、残務は hmixed を `cX.ext χ = X(θ)` 経由で証明するのみ ⟹ P2 自作不要。不一致なら anchoredImages-cX を
-P2 で自作)。Peterfalvi では certain-type coherence image = (6.8.2.3) の X(θ) **のはず**だが未確認。
-**次セッション = この一致を `certainType_isCoherent` の extension 定義で精査 → cX 経路確定 (chain-free vs P2 自作)**。
+**✅ sub-question 精査済 (cont.⁶ 末尾、code-verified) — cont.⁵「canonical cX 説は誤り」は OVERSTATED と訂正**:
+
+- **canonical column image は実は ⊥ Y**: `certainTypeExtension h (columnSum χ₂) = sign·Σᵢ certainTypeOmegaSigma`
+  (`certainTypeExtension_columnSum` `S06_CertainTypeCoherence:113`)。そして **`inner_coherent_extension_
+  certainTypeOmegaSigma_eq_zero`(`S08_CaseBCoherence2:1246`)が `⟨cY.ext η, certainTypeOmegaSigma⟩=0`
+  を既に証明**(η∈coherent S₁, irreducible, η−η' supported)⟹ canonical column extension ⊥ Y は FREE。
+  ∴ cont.⁵ の「canonical は hmixed を壊す」は誤り、**column については canonical も anchoredImages も両方 OK**。
+- **⟹ cX 経路は CANONICAL xChainCoherentW が本命** (anchoredImages-cX + P2 自作 span は不要):
+  cX = `xChainCoherentW`(certainTypeSet canonical base + irreducible pair chain)、varying-degree は
+  chain が処理。per-step hstep = `XAdjoinStepInputW` は `caseB_member_orthoDatum`(`S08_CaseBEnumeration:336`、
+  coupled D+hortho+htau1 既存)から組む(brick 2/3 の成果)。**cX は既存部品でほぼ組める**。
+- **hmixed (seam) = case-split で証明** (coherentXunionYset_caseB_of_glued の hmixed):
+  - **column χ∈certainTypeSet**: `inner_coherent_extension_certainTypeOmegaSigma_eq_zero` を Σ 展開で ⊥ Y。✅ 既存
+  - **irreducible χ∈Xset W2**: Frobenius (6.8.1) `himg_ortho via (4.1)`(`S08_CoherenceCore:1424`,
+    `inner_span_Xset_Yset_eq_zero_of_irreducible_X` `CorePart2:1573`)の **mixed-X 版インスタンス化**が要
+    (all-irreducible 版は直接使えない)。← **唯一の非自明残**。
+- **`caseB_member_anchored_image`(cont.⁶ 着地)の位置づけ**: anchoredImages-cX 路線の部品だが、canonical 路線が
+  本命なら seed には不要。ただし (6.8.2.3) 自体の独立価値 + irreducible-seam を anchored image 経由で出す
+  代替路にも使える(X(θ)⊥Y を直接持つ)。**廃棄せず保持**。
+
+**▶ 次セッションの一手 = (1) hmixed の irreducible-χ 枝**(mixed-X 用 himg_ortho、(4.1)+supported-diff)
+**→ (2) cX = xChainCoherentW の hstep assembly**(caseB_member_orthoDatum を XAdjoinStepInputW に昇格)
+**→ (3) coherentXunionYset_caseB_of_glued 配線 + diagonal D**。canonical 路線で確定。P2 span 自作は不要。
 
 ## 🗂 (履歴・訂正済) 2026-06-18 cont.⁴ — anchoredImages route の必要性に疑問
 
