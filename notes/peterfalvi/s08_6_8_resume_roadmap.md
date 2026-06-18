@@ -148,6 +148,34 @@ degree theory を要する:
 > (=(6.6) degree-divisibility、Frobenius `commonIndexPrimePowerSums` の weighted 版)+ field assembly
 > (brick 3 `sMember_degreeSqNormBound` を **column-anchor** 用に翻案、brick 3 は Y-anchor 前提ゆえ要 adapt)。
 
+## 🔄 2026-06-18 cont.¹⁰ — ARCHITECTURE 訂正: separate-cX 路線は非可能、seed は chain-onto-(certainTypeSet∪Y)
+
+**重大訂正**: cont.⁹ の「cX(=X-coherence 単独)を weighted chain で構築」は **非可能**と判明。
+`XAdjoinStepInputW` は accumulator に **norm-1 anchor**(`hanchorNorm : mc i₁=1`)を要求するが、
+`certainTypeSet` は全 column が `‖μ_k‖²=|W₁|>1`(`S06_CertainTypeConjugation:270`)で **norm-1 member 皆無**
+⟹ base=certainTypeSet の chain は **step 0 で hstep unsatisfiable**。`caseB_Xset_isCoherent_of_hstepW`
+(commit `804fbfe1`)は sorry-free だが hstep discharge 不能(= [[scaffold-sorry-free-not-done]] の罠、
+docstring に⚠明記済 `7f...`)。
+
+**∴ separate-cX + glue 路線(`coherentXunionYset_caseB_of_glued`)は非可能** — cX(Xset W2 単独)が
+weighted chain で組めない(norm-1 anchor 無し)。⟹ **`caseB_hmixed`(case-split glue hmixed)+ irreducible
+seam + base-certainTypeSet consumer は非可能路線の産物**(ただし下記参照で一部再利用可)。
+
+**✅ VIABLE 路線 = seed を chain-onto-(certainTypeSet∪Y) で直接構築**:
+- base = **`certainTypeSet ∪ Y` coherence**(Y-anchor `η`, `‖η‖²=1`)= anchoredImages
+  (`coherentCertainTypeSet_union_Yset_via_anchoredImages`、∀-column hXanchored を `caseB_member_anchored_image`
+  から供給)。
+- weighted chain `xChainCoherentW` を base=certainTypeSet∪Y / X-target=`Xset W2 ∪ Y` / cover=irreducible
+  X-pair に fold → **`IsCoherent (Xset W2∪Y)` = seed を直接構築**(separate cX + glue 不要)。
+- anchor=η(Y, norm 1)ゆえ **brick 3 `sMember_degreeSqNormBound` の field assembly が直接再利用可**
+  (Y-anchor 前提が合致)。X⊥Y seam は **in-chain `hortho_mem`** で処理。
+- 真の gate = **hDeg `2a < ∑ deg²/mc`**(=(6.6) degree inequality、不変)。
+
+**再利用可否**: `caseB_member_anchored_image` = 再利用(base 供給)。`caseB_hmixed`/irreducible seam/
+base-certainTypeSet consumer = 非可能路線、ただし map-convention fact + wrapper 構造 + seam の数学は
+corrected base で部分再利用可。**▶ 次 = seed-chain-onto-(certainTypeSet∪Y) を組む**(base anchoredImages
++ chain hstep brick-3 再利用 + hDeg)。
+
 **FT 文脈**: (6.8) は [[ft-path-policy]] で **FT carrier から orphaned (deferred-payoff)** — cX を完成しても
 feitThompson の sorry は今は減らない。⟹ cX 着手は「(6.8) を完全に閉じる」価値 vs 「§14 counting (lane-H) 等
 on-path piece」の優先度判断を要する。**本セッションの確実な成果 = hmixed 完成**(seam という長年の難所)。
