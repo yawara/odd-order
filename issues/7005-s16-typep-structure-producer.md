@@ -207,3 +207,33 @@ residual)→ **Step 3** residual を 1 つずつ。base 7000、lane-f 所有。
 ### 本セッション landing
 - `TypePData.card_W1_eq_derived_index` (`MaximalSubgroupType.lean`, `dc186aab`): |W1| = |M:M'|。
   K↔W1 bridge + 型 II–IV の |K| prime 化の groundwork。full build 3860 green。
+
+---
+
+## ✅ Step 2 完了 (2026-06-18 lane-f) — honest gated-endpoint-skeleton 配線
+
+producer `section16TypePStructure_of_isMinimalSimpleOdd` を engine 経由に再配線、唯一 sorry を
+**explicit residual menu に localize**。実 sorry 140 据え置き、full build 3860 green。
+
+### landing
+1. `TypePData.card_W1_eq_derived_index` (`MaximalSubgroupType`, `dc186aab`): |W1| = |M:M'|。
+2. `card_kappaHall_eq_derived_index` (`S16_PairIntersection`, `9d500108`): |K| = |M:M'| ⟹ |K|=|W1|。
+3. `TypePData.derivedInG_eq_fitting_sup_U` (`MaximalSubgroupType`): M' = M_F ⊔ U (S_deriv_eq_PU 供給)。
+4. `typePData_of_isTypeNonI` (`MaximalSubgroupType`): IsTypeNonI → Nonempty TypePData。
+5. **`section16TypePStructure_of_typeData` engine** (`FeitThompson`, `1a58f5b7`, **sorry-free**):
+   TypePData×2 + residual 仮説 → 完全 Section16TypePStructure。25 field 中 ~18 を型データから
+   discharge (S/T_deriv, counting Lagrange, primes, q/p/c/d 定義, W_cyclic 等)。
+6. producer 再配線 (`7a6abb2c` → honest 化 `bd97bd2e`): residual を
+   `Nonempty (Σ' dataS dataT, pairing ∧ primes ∧ normalizer ∧ q<p)` に (真・構成可能命題)。
+
+### Step 3 = 残 residual の discharge (genuine §16/§14, 次の作業)
+
+producer の唯一 sorry = 上記 `Nonempty (Σ' …)` の構成。中身:
+1. **canonical data 存在**: W₁(S) ≤ S∩T (= κ-Hall K_S と一致する TypePData の選択)。
+   gap B `typeP_pair_inf_eq` が S∩T = K_S ⊔ Kstar_S を供給、bridge 補題 (3)(4) で |K_S|=|W1|。
+   但し **K_S = dataS.W1 の同定** (位数一致でなく subgroup 同定) が要 — TypePData を K_S basis で
+   構成し直すか、共役で吸収。**これが core difficulty**。
+2. **pairing** `S∩T = W₁(S) ⊔ W₁(T)` cyclic/⊓=⊥/commute: gap B + (8.9)。
+3. **primes**: II–IV は `TypePNontrivialCore` + bridge (1)(2); Type-V は type-II partner (BG Thm C)。
+4. **normalizer** W₁ ≤ N(U): Pf (13.1.b)「remark following Def (8.4)」。
+5. **q<p**: 両 prime 後 relabel (S/T ラベル設計)。

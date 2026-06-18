@@ -169,6 +169,19 @@ theorem TypePData.card_W1_eq_derived_index {M : Subgroup G} (data : TypePData M)
   rw [← Nat.card_congr (Subgroup.subgroupOfEquivOfLe data.W1_le).toEquiv,
     ← data.M_complement.symm.index_eq_card]
 
+/-- **Peterfalvi (13.1.b) `S' = PU` / BG Theorem C(3) `M' = U M_σ`** (type-data form): the derived
+subgroup of a type-`P` maximal subgroup is the join of its Fitting kernel `M_F` and the complement
+`U`, `M' = M_F ⊔ U`.  Immediate from the `derived_complement` field (`U` complements `H = M_F` in
+`M'`).  This is the `S_deriv_eq_PU` field of `Section16TypePStructure`, sourced from the type data. -/
+theorem TypePData.derivedInG_eq_fitting_sup_U {M : Subgroup G} (data : TypePData M) :
+    derivedInG M = maxNilpotentNormalHall M ⊔ data.U := by
+  rw [← data.H_eq]
+  refine le_antisymm ?_ (sup_le data.H_le data.U_le)
+  have hsup : (data.H.subgroupOf (derivedInG M)) ⊔ (data.U.subgroupOf (derivedInG M)) = ⊤ :=
+    data.derived_complement.sup_eq_top
+  rw [← Subgroup.subgroupOf_sup data.H_le data.U_le] at hsup
+  exact Subgroup.subgroupOf_eq_top.mp hsup
+
 /-- Common type II--IV hypotheses from Peterfalvi (8.6). -/
 def TypePNontrivialCore (M : Subgroup G) (data : TypePData M) : Prop :=
   data.U ≠ ⊥ ∧ (Nat.card ↥data.W1).Prime ∧
@@ -229,6 +242,13 @@ def IsTypeV (M : Subgroup G) : Prop :=
 /-- The non-Type-I alternatives in Peterfalvi (8.8). -/
 def IsTypeNonI (M : Subgroup G) : Prop :=
   IsTypeII M ∨ IsTypeIII M ∨ IsTypeIV M ∨ IsTypeV M
+
+/-- Every non-Type-I maximal subgroup carries type-`P` data: all four of `TypeII`–`TypeV` bundle a
+`TypePData` (the type-`P` structure `M = M' ⋊ W₁`, `M' = M_F ⋊ U`, `W = W₁ × W₂`).  This is the
+entry point that lets the §16 producer extract the structure of `S` and `T` from
+`Section16MaximalPair.S_nonI`/`T_nonI`. -/
+theorem typePData_of_isTypeNonI {M : Subgroup G} (h : IsTypeNonI M) : Nonempty (TypePData M) := by
+  rcases h with h | h | h | h <;> exact ⟨h.some.typeP⟩
 
 /-- The five named Peterfalvi maximal-subgroup types. -/
 inductive PeterfalviType where
