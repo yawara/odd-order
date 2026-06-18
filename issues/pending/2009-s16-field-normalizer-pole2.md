@@ -114,6 +114,24 @@ S16:1491、`u_eq_full_cyclotomic_of_caseB` S16:1692 = proven が sorried §13 �
 PRank:87 在) → `exists_galoisField_repr` 適用 → e/μ/hcompat ③ hW2 (prime line↔W₂、iso の scaling) ④ partB
 (13.2.b/14.5 cite)。infra は揃い blocked ではない。
 
+### ✅✅✅ 2026-06-18 再開⁶ — step 3 (14.2)(a) field model `exists_pu_field_repr` COMPLETE (`af543785`)
+
+**(14.7) の crux ungated 機械 = module 構成を達成。** `exists_pu_field_repr`: §13 numeric data から
+(14.2)(a) の iso (`e : Additive ↥P ≃+ GF(p^q)`, `μ : U →* GF(p^q)ˣ`, U-equivariance) を構成。
+- 共役 rep `ρ = (mulAutToEnd ↥P p) ∘ (normalizerMonoidHom ∘ inclusion(U≤N(P)))`。
+- `Additive ↥P` を `Module.compHom` で **直接** 𝔽_p[U]-module 化（**asModule trap 回避** = SingerField 自身の
+  推奨）→ `of c • x = ρ c x = 共役` が σ-bridge の hcompat と `congr 2`（defeq）で一致。
+- card/faithful/NeZero/cyclic: |P|=p^q (cite basic_structure) / c が P 中心化⟹c∈U⊓C_G(P)=C=1 (cite
+  c_eq_one) / |U|≡1 mod p (geomSum) / `[IsCyclic ↥U]` 仮説。
+- body sorry-free + transitive sorryAx（cite §13）。仮説 = `hu_full`(|U|=full) + `[IsCyclic ↥U]`（standing §13）。
+- ⚠ instance-diamond 知見（再利用可）: `open scoped IsMulCommutative`; `AddCommGroup.zmodModule`（≠
+  IsElementaryAbelian.zmodModule、CommGroup diamond 回避）; CommGroup ↥U は canonical Group 再利用で構築。
+
+**(14.7) の 2 大技術ピース (σ-bridge step 4 + field model step 3) 完成。** 残: ① value-argument
+`u=full`（FPF `u≡1 mod p` = W₂^y on U の形式化要、moderate）② `[IsCyclic ↥U]` の §13 producer ③ hW2
+(prime line↔W₂、iso scaling) ④ partB (13.2.b/14.5 cite) → ⑤ exists_pu_field_repr + fieldNormalizerData_of_repr
+を組んで `field_normalizer_of_U_characteristic` close。
+
 ## 完了条件
 
 `field_normalizer_structure` の `sorry` が消え、`lake build OddOrder OddOrder.AxiomsCheck` 緑。
