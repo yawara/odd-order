@@ -571,12 +571,23 @@ theorem fieldNormalizerData_of_repr (hyp : Hypothesis (G := G))
     W2_conj_y_normalizes_U := hW2_conj_y }⟩
 
 /-- **Peterfalvi (14.7)**: if `U` is characteristic in `H`, then the final
-field-normalizer configuration (14.2) holds. -/
+field-normalizer configuration (14.2) holds.
+
+The ungated heart of the construction is `fieldNormalizerData_of_repr` above: it
+assembles the concrete `FieldNormalizerData` (the embedding `σ`, its injectivity, and
+the `P`/`U`/`W₂` matching) out of the abstract Peterfalvi (14.2)(a) field model.  What
+remains here is to *produce that model*: apply the Singer machinery
+`OddOrder.RepresentationTheory.exists_galoisField_repr` to `Additive ↥P` as an
+`𝔽_p[U]`-module (via the conjugation action), obtaining `e`, `μ`, and the
+`U`-equivariance, then read off part (14.2)(b).  Those inputs need
+`Nat.card ↥P = p^q` (`S15.basic_structure`, §13) and `U` faithful on `P`
+(`S15.c_eq_one`, §13) — the remaining §13 character-theory gate (Lane B). -/
 theorem field_normalizer_of_U_characteristic [Finite G]
     (_hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
     (Ldata : LHypothesis hyp)
     (hchar : (hyp.base.U.subgroupOf Ldata.H).Characteristic) :
     Nonempty (FieldNormalizerData hyp) := by
+  -- reduce to `fieldNormalizerData_of_repr` once the §13-gated (14.2)(a)/(b) model is built
   sorry
 
 /-! ## (14.8)--(14.9): the key inequality and `T` is type II -/
