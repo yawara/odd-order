@@ -412,43 +412,45 @@ The *genuinely cross-member* facts — that `S ∩ T` is exactly the cyclic prod
 (Peterfalvi (13.1.b), "remark following Def (8.4)"), and the ordering `q < p` — remain explicit
 hypotheses.  Discharging them for the canonical pair is the residual obligation of the producer
 `section16TypePStructure_of_isMinimalSimpleOdd` (issue 7005). -/
-noncomputable def section16TypePStructure_of_typeData {G : Type*} [Group G] [Finite G]
-    {mp : Section16MaximalPair G} (dataS : TypePData mp.S) (dataT : TypePData mp.T)
-    (hSprime : (Nat.card ↥dataS.W1).Prime) (hTprime : (Nat.card ↥dataT.W1).Prime)
-    (hWjoin : mp.S ⊓ mp.T = dataS.W1 ⊔ dataT.W1)
+noncomputable def section16TypePStructure_of_components {G : Type*} [Group G] [Finite G]
+    {mp : Section16MaximalPair G} (W1 W2 U V : Subgroup G)
+    (hSderiv : derivedInG mp.S = maxNilpotentNormalHall mp.S ⊔ U)
+    (hTderiv : derivedInG mp.T = maxNilpotentNormalHall mp.T ⊔ V)
+    (hSprime : (Nat.card ↥W1).Prime) (hTprime : (Nat.card ↥W2).Prime)
+    (hWjoin : mp.S ⊓ mp.T = W1 ⊔ W2)
     (hWcyc : IsCyclic ↥(mp.S ⊓ mp.T))
-    (hbot : dataS.W1 ⊓ dataT.W1 = ⊥)
-    (hcomm : ∀ x ∈ dataS.W1, ∀ y ∈ dataT.W1, Commute x y)
-    (hSnorm : dataS.W1 ≤ Subgroup.normalizer (dataS.U : Set G))
-    (hTnorm : dataT.W1 ≤ Subgroup.normalizer (dataT.U : Set G))
-    (hlt : Nat.card ↥dataS.W1 < Nat.card ↥dataT.W1) :
+    (hbot : W1 ⊓ W2 = ⊥)
+    (hcomm : ∀ x ∈ W1, ∀ y ∈ W2, Commute x y)
+    (hSnorm : W1 ≤ Subgroup.normalizer (U : Set G))
+    (hTnorm : W2 ≤ Subgroup.normalizer (V : Set G))
+    (hlt : Nat.card ↥W1 < Nat.card ↥W2) :
     Section16TypePStructure mp where
-  W1 := dataS.W1
-  W2 := dataT.W1
+  W1 := W1
+  W2 := W2
   W := mp.S ⊓ mp.T
-  U := dataS.U
-  V := dataT.U
+  U := U
+  V := V
   W_eq_inter := rfl
   W_eq_join := hWjoin
   W1_inf_W2_eq_bot := hbot
   W1_commutes_W2 := hcomm
   W_cyclic := hWcyc
-  S_deriv_eq_PU := dataS.derivedInG_eq_fitting_sup_U
-  T_deriv_eq_QV := dataT.derivedInG_eq_fitting_sup_U
+  S_deriv_eq_PU := hSderiv
+  T_deriv_eq_QV := hTderiv
   W1_normalizes_U := hSnorm
   W2_normalizes_V := hTnorm
-  q := Nat.card ↥dataS.W1
-  p := Nat.card ↥dataT.W1
+  q := Nat.card ↥W1
+  p := Nat.card ↥W2
   q_prime := hSprime
   p_prime := hTprime
   q_eq_card_W1 := rfl
   p_eq_card_W2 := rfl
-  u := Nat.card ↥dataS.U /
-    Nat.card ↥(dataS.U ⊓ Subgroup.centralizer (maxNilpotentNormalHall mp.S : Set G))
-  v := Nat.card ↥dataT.U /
-    Nat.card ↥(dataT.U ⊓ Subgroup.centralizer (maxNilpotentNormalHall mp.T : Set G))
-  c := Nat.card ↥(dataS.U ⊓ Subgroup.centralizer (maxNilpotentNormalHall mp.S : Set G))
-  d := Nat.card ↥(dataT.U ⊓ Subgroup.centralizer (maxNilpotentNormalHall mp.T : Set G))
+  u := Nat.card ↥U /
+    Nat.card ↥(U ⊓ Subgroup.centralizer (maxNilpotentNormalHall mp.S : Set G))
+  v := Nat.card ↥V /
+    Nat.card ↥(V ⊓ Subgroup.centralizer (maxNilpotentNormalHall mp.T : Set G))
+  c := Nat.card ↥(U ⊓ Subgroup.centralizer (maxNilpotentNormalHall mp.S : Set G))
+  d := Nat.card ↥(V ⊓ Subgroup.centralizer (maxNilpotentNormalHall mp.T : Set G))
   c_eq_card_C := rfl
   d_eq_card_D := rfl
   card_U_eq_uc := (Nat.div_mul_cancel (Subgroup.card_dvd_of_le inf_le_left)).symm
@@ -459,31 +461,44 @@ noncomputable def section16TypePStructure_of_typeData {G : Type*} [Group G] [Fin
 Given the maximal pair, constructs the cyclic structure `W = W₁W₂`, the complements
 `U, V`, the primes `p, q`, and the counting parameters.
 
-In gated-endpoint-skeleton form (issue 7005): the type data `dataS`, `dataT` of `S`, `T` are
-extracted `sorry`-free from `mp.S_nonI`/`mp.T_nonI` (every non-Type-I maximal carries `TypePData`),
-and `section16TypePStructure_of_typeData` assembles ~18 of the 25 fields from them.  The single
-remaining `sorry` is localized to the explicit **residual menu**: the primality of `|W₁(S)|`,
-`|W₁(T)|` (BG Theorem C(10), immediate for type II–IV via the type data, partner-argument for the
-Type-V case), the cross-member pairing `S ∩ T = W₁(S) × W₁(T)` cyclic (BG §16 / Peterfalvi (8.9)),
-the normalization `W₁ ≤ N_G(U)` (Peterfalvi (13.1.b)), and the ordering `q < p`. -/
+In gated-endpoint-skeleton form (issue 7005), with `mp` now carrying the canonical partner
+witness: the **W-side** (the pairing `S ∩ T = K × K*` cyclic, `K ⊓ K* = 1`, commuting) is
+discharged `sorry`-free from `mp`'s κ-Hall data via `typeP_pair_W_structure` (BG Theorem 14.7).
+The single remaining `sorry` is localized to the **U-side residual menu**: the semidirect
+complements `U, V` with `M' = M_F ⊔ U` and `K ≤ N_G(U)` (Peterfalvi (13.1.b), "remark following
+Def (8.4)"), the primality of `|K|, |K*|` (BG Theorem C(10); type II–IV via the type data,
+Type-V via the partner argument), and the ordering `q < p` (Peterfalvi (13.2.a)). -/
 noncomputable def section16TypePStructure_of_isMinimalSimpleOdd {G : Type*} [Group G] [Finite G]
     (hG : IsMinimalSimpleOdd G) (mp : Section16MaximalPair G) :
     Section16TypePStructure mp := by
-  -- The single residual obligation: *canonical* type data of `S` and `T` exists for which the
-  -- pairing factors coincide with `S ∩ T`.  Stated existentially (not via an arbitrary
-  -- `Classical.choice`) so that the obligation is a *true*, constructible §16 statement — the
-  -- genuine content (the pairing `S ∩ T = W₁(S) × W₁(T)`, BG §16 / Peterfalvi (8.9)) constrains
-  -- *which* type data is taken.  `typePData_of_isTypeNonI` supplies the data witnesses; the
-  -- pairing/primality/ordering are the §16/§14 mathematics still to be discharged.
-  have h : Nonempty (Σ' (dataS : TypePData mp.S) (dataT : TypePData mp.T),
-        (Nat.card ↥dataS.W1).Prime ∧ (Nat.card ↥dataT.W1).Prime ∧
-        mp.S ⊓ mp.T = dataS.W1 ⊔ dataT.W1 ∧ IsCyclic ↥(mp.S ⊓ mp.T) ∧
-        dataS.W1 ⊓ dataT.W1 = ⊥ ∧ (∀ x ∈ dataS.W1, ∀ y ∈ dataT.W1, Commute x y) ∧
-        dataS.W1 ≤ Subgroup.normalizer (dataS.U : Set G) ∧
-        dataT.W1 ≤ Subgroup.normalizer (dataT.U : Set G) ∧
-        Nat.card ↥dataS.W1 < Nat.card ↥dataT.W1) := sorry
-  obtain ⟨dataS, dataT, hSp, hTp, hjoin, hcyc, hbot, hcomm, hSn, hTn, hlt⟩ := Classical.choice h
-  exact section16TypePStructure_of_typeData dataS dataT hSp hTp hjoin hcyc hbot hcomm hSn hTn hlt
+  -- **W-side** from `mp`'s canonical partner witness (`typeP_pair_W_structure`, BG 14.7).  A Hall
+  -- `(κ ∪ σ)'`-subgroup `U₀` of `S` (needed only to invoke the lemma) comes from Hall's theorem.
+  haveI : IsSolvable ↥mp.S := hG.solvable_of_mem_maximalSubgroups mp.S_maximal
+  have hUex : ∃ U₀ : Subgroup G,
+      Ch03.IsHallSubgroup ((BG.Ch4.S14.kappa mp.S ∪ BG.Ch3.S10.sigma mp.S)ᶜ)
+        (U₀.subgroupOf mp.S) := by
+    obtain ⟨U', hU'⟩ := Ch03.hall_E_exists (G := ↥mp.S)
+      ((BG.Ch4.S14.kappa mp.S ∪ BG.Ch3.S10.sigma mp.S)ᶜ)
+    exact ⟨U'.map mp.S.subtype, by
+      rw [show (U'.map mp.S.subtype).subgroupOf mp.S = U' from
+        Subgroup.comap_map_eq_self_of_injective mp.S.subtype_injective U']
+      exact hU'⟩
+  have hU₀' := hUex.choose_spec
+  obtain ⟨hWjoin, hWcyc, hbot, hcomm⟩ :=
+    BG.Ch4.S16.typeP_pair_W_structure hG mp.S_maximal mp.S_typeP mp.K_le_S mp.K_hall mp.Kstar_eq
+      hU₀' mp.T_maximal mp.T_typeP mp.S_T_not_conj mp.Kstar_le_T mp.Kstar_hall mp.Z_cyclic mp.K_eq
+  -- **U-side residual**: the (13.1.b) semidirect complements, the primality of `|K|, |K*|`
+  -- (BG Theorem C(10)), and the ordering `q < p` (Peterfalvi (13.2.a)).  A *true*, constructible
+  -- §14/§13 statement for the canonical pair (`mp.K`, `mp.Kstar`).
+  obtain ⟨U, V, hSderiv, hTderiv, hSprime, hTprime, hSnorm, hTnorm, hlt⟩ := Classical.choice
+    (show Nonempty (Σ' (U V : Subgroup G),
+      derivedInG mp.S = maxNilpotentNormalHall mp.S ⊔ U ∧
+      derivedInG mp.T = maxNilpotentNormalHall mp.T ⊔ V ∧
+      (Nat.card ↥mp.K).Prime ∧ (Nat.card ↥mp.Kstar).Prime ∧
+      mp.K ≤ Subgroup.normalizer (U : Set G) ∧ mp.Kstar ≤ Subgroup.normalizer (V : Set G) ∧
+      Nat.card ↥mp.K < Nat.card ↥mp.Kstar) from sorry)
+  exact section16TypePStructure_of_components mp.K mp.Kstar U V hSderiv hTderiv hSprime hTprime
+    hWjoin hWcyc hbot hcomm hSnorm hTnorm hlt
 
 /-- **Peterfalvi §13 coherent Dade-grid producer** (`sorry`) — *lane-b*
 (Peterfalvi §3–§13 coherent grids).  Given the maximal pair and the type-P
