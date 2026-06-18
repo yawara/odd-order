@@ -377,4 +377,108 @@ theorem caseB_member_anchored_image
     constituentWeight_eq_apply_one hW2H hcen hφ' hweight]
   ring
 
+/-- **(6.8.2.3) seam for an irreducible `X`-member** — `⟨χ^{τ₂}, η^{τ₁}⟩ = 0` for an irreducible
+`χ ∈ X(W₂)` and `η ∈ Y`.  The case-(B) (mixed-`X`) analogue of the Frobenius
+`inner_extension_Xset_centralCommutator_Yset_eq_zero_general`.
+
+The Frobenius proof requires **all** of `X` irreducible; here `X(W₂)` also contains the reducible
+certain-type columns, so the all-irreducible source-orthogonality is unavailable.  Instead we take
+the distinct reference `χ' = χ̄` (the conjugate: irreducible `hχirr.conj`, in `X(W₂)` `hχconj` since
+`X(W₂)` is conjugation-closed, distinct `hχne` as `X(W₂)` has no real characters), and discharge the
+source orthogonality `⟨d'•χ − d•χ̄, η − η'⟩ = 0` from the supplied `X(W₂) ⊥ Y` pairing `hpair`
+(`inner_eq_zero_of_mem_span_of_pairwise_orthogonal`, needing **no** irreducibility of the columns).
+The rest is the (4.1) signed-difference argument
+(`pairwise_inner_eq_zero_of_orthogonal_signedDifference`) over the supported degree-`0` differences
+`d'•χ − d•χ̄` (`sMember_smulDiffSupport_of_charValue_eq`) and `η − η'` (`sMember_diffSupport`).
+
+Paired with the certain-type column seam `inner_coherent_extension_certainTypeOmegaSigma_eq_zero`,
+this is the irreducible half of the case-(B) `X ∪ Y` glue `hmixed`. -/
+theorem inner_extension_caseB_Xset_Yset_eq_zero_of_irreducible
+    (hyp : SibleyDadeHypothesis G L H) [H.Normal]
+    {W2 : Subgroup ↥L}
+    (cX : OddOrder.Peterfalvi.S07.IsCoherent hyp.tau (hyp.Xset W2)
+      (OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L))
+    (cY : OddOrder.Peterfalvi.S07.IsCoherent hyp.tau hyp.Yset
+      (OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L))
+    (hpair : ∀ x ∈ hyp.Xset W2, ∀ y ∈ hyp.Yset, ClassFunction.inner x y = 0)
+    {χ : ClassFunction ↥L ℂ} (hχ : χ ∈ hyp.Xset W2) (hχirr : IsIrreducibleCharacter χ)
+    (hχconj : χ.conj ∈ hyp.Xset W2) (hχne : χ ≠ χ.conj)
+    {η : ClassFunction ↥L ℂ} (hη : η ∈ hyp.Yset) :
+    ClassFunction.inner (cX.extension χ) (cY.extension η) = 0 := by
+  classical
+  have hYirr : ∀ φ ∈ hyp.Yset, IsIrreducibleCharacter φ :=
+    fun φ h => hyp.isIrreducibleCharacter_of_mem_Yset h
+  have hinner : ∀ (φ ψ : ClassFunction ↥L ℂ), IsIrreducibleCharacter φ → IsIrreducibleCharacter ψ →
+      ClassFunction.inner φ ψ = if φ = ψ then (1 : ℂ) else 0 := by
+    intro φ ψ hφ hψ
+    have h := irreducibleCharacter_inner (⟨φ, hφ⟩ : IrreducibleCharacter ↥L)
+      (⟨ψ, hψ⟩ : IrreducibleCharacter ↥L)
+    simp only [IrreducibleCharacter.coe_mk] at h
+    rw [h]
+    by_cases hpq : φ = ψ
+    · rw [if_pos (Subtype.ext hpq), if_pos hpq]
+    · rw [if_neg (fun heq => hpq (Subtype.ext_iff.mp heq)), if_neg hpq]
+  obtain ⟨η', hη'Y, hη'ne⟩ :=
+    Set.exists_ne_of_one_lt_ncard (by have := hyp.two_le_Yset_ncard; omega : 1 < hyp.Yset.ncard) η
+  obtain ⟨d, hd_pos, hd_eq⟩ :=
+    irreducibleCharacter_apply_one_eq_pos_natCast (⟨χ, hχirr⟩ : IrreducibleCharacter ↥L)
+  obtain ⟨d', hd'_pos, hd'_eq⟩ :=
+    irreducibleCharacter_apply_one_eq_pos_natCast (⟨χ.conj, hχirr.conj⟩ : IrreducibleCharacter ↥L)
+  simp only [IrreducibleCharacter.coe_mk] at hd_eq hd'_eq
+  have hχs : χ ∈ Submodule.span ℤ (hyp.Xset W2) := Submodule.subset_span hχ
+  have hχ's : χ.conj ∈ Submodule.span ℤ (hyp.Xset W2) := Submodule.subset_span hχconj
+  have hηs : η ∈ Submodule.span ℤ hyp.Yset := Submodule.subset_span hη
+  have hη's : η' ∈ Submodule.span ℤ hyp.Yset := Submodule.subset_span hη'Y
+  set xdiff : ClassFunction ↥L ℂ := d' • χ - d • χ.conj with hxdiff_def
+  set ydiff : ClassFunction ↥L ℂ := η - η' with hydiff_def
+  have hx_supp : xdiff ∈ OddOrder.Peterfalvi.S07.zSupportedSpan (hyp.Xset W2)
+      (OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L) := by
+    refine ⟨?_, ?_⟩
+    · refine Submodule.sub_mem _ ?_ ?_
+      · rw [← Nat.cast_smul_eq_nsmul ℤ d' χ]; exact Submodule.smul_mem _ _ hχs
+      · rw [← Nat.cast_smul_eq_nsmul ℤ d χ.conj]; exact Submodule.smul_mem _ _ hχ's
+    · exact hyp.sMember_smulDiffSupport_of_charValue_eq (hyp.Xset_subset_S hχ)
+        (hyp.Xset_subset_S hχconj) (by rw [hd_eq, hd'_eq]; ring)
+  have hy_supp : ydiff ∈ OddOrder.Peterfalvi.S07.zSupportedSpan hyp.Yset
+      (OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L) := by
+    refine ⟨Submodule.sub_mem _ hηs hη's, ?_⟩
+    exact hyp.sMember_diffSupport_of_charValue_eq (hyp.Yset_subset_S hη) (hyp.Yset_subset_S hη'Y)
+      ((hyp.Yset_apply_one hη).trans (hyp.Yset_apply_one hη'Y).symm)
+  have hXeq : ((d' : ℝ) : ℂ) • cX.extension χ - ((d : ℝ) : ℂ) • cX.extension χ.conj
+      = cX.extension xdiff := by
+    rw [hxdiff_def, map_sub, map_nsmul, map_nsmul,
+      ← Nat.cast_smul_eq_nsmul ℂ d' (cX.extension χ),
+      ← Nat.cast_smul_eq_nsmul ℂ d (cX.extension χ.conj)]
+    push_cast
+    ring
+  have hYeq : cY.extension η - cY.extension η' = cY.extension ydiff := by
+    rw [hydiff_def, map_sub]
+  have hsrc0 : ClassFunction.inner xdiff ydiff = 0 :=
+    inner_eq_zero_of_mem_span_of_pairwise_orthogonal hpair xdiff hx_supp.1 ydiff hy_supp.1
+  have hconcl := OddOrder.RepresentationTheory.pairwise_inner_eq_zero_of_orthogonal_signedDifference
+    (Γ := G) (α := cY.extension η) (β := cY.extension η')
+    (γ := cX.extension χ) (δ := cX.extension χ.conj)
+    (u := (d' : ℝ)) (v := (d : ℝ))
+    (by exact_mod_cast hd'_pos.ne') (by exact_mod_cast hd_pos.ne')
+    (cY.extension_mem_ZIrr η hηs)
+    (by rw [cY.extension_inner_eq η η hηs hηs, hinner η η (hYirr η hη) (hYirr η hη), if_pos rfl])
+    (cY.extension_mem_ZIrr η' hη's)
+    (by rw [cY.extension_inner_eq η' η' hη's hη's, hinner η' η' (hYirr η' hη'Y) (hYirr η' hη'Y),
+        if_pos rfl])
+    (cX.extension_mem_ZIrr χ hχs)
+    (by rw [cX.extension_inner_eq χ χ hχs hχs, hinner χ χ hχirr hχirr, if_pos rfl])
+    (cX.extension_mem_ZIrr χ.conj hχ's)
+    (by rw [cX.extension_inner_eq χ.conj χ.conj hχ's hχ's,
+        hinner χ.conj χ.conj hχirr.conj hχirr.conj, if_pos rfl])
+    (by rw [cY.extension_inner_eq η η' hηs hη's, hinner η η' (hYirr η hη) (hYirr η' hη'Y),
+        if_neg (fun h => hη'ne h.symm)])
+    (by rw [cX.extension_inner_eq χ χ.conj hχs hχ's, hinner χ χ.conj hχirr hχirr.conj, if_neg hχne])
+    (by
+      rw [hXeq, hYeq, inner_conj_symm (cX.extension xdiff) (cY.extension ydiff),
+        inner_extension_eq_inner_of_supported hyp.dade hyp.hconj cX cY hx_supp hy_supp,
+        hsrc0, star_zero])
+    (by rw [hYeq]; exact extension_apply_one_eq_zero_of_supported hyp.dade hyp.hconj cY hy_supp)
+    (by rw [hXeq]; exact extension_apply_one_eq_zero_of_supported hyp.dade hyp.hconj cX hx_supp)
+  rw [inner_conj_symm (cY.extension η) (cX.extension χ), hconcl.1, star_zero]
+
 end OddOrder.Peterfalvi.S08
