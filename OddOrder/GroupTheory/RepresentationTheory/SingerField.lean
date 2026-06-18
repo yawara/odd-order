@@ -7,6 +7,7 @@ import Mathlib.RingTheory.SimpleModule.Basic
 import Mathlib.RingTheory.Ideal.Quotient.Operations
 import Mathlib.Algebra.MonoidAlgebra.Basic
 import Mathlib.FieldTheory.Finite.GaloisField
+import Mathlib.Data.Nat.GCD.Basic
 
 /-!
 # The Singer mechanism: irreducible abelian linear actions realize fields
@@ -113,5 +114,47 @@ theorem nonempty_singerFieldData [Finite M]
   change lequiv (MonoidAlgebra.of (ZMod p) C c • m) = _
   rw [map_smul, Algebra.smul_def, Ideal.Quotient.algebraMap_eq]
   rfl
+
+/-! ## Number-theoretic core of the irreducibility criterion
+
+The Singer construction is applied (Peterfalvi (14.2)(a)) to a cyclic group `U` of order
+`u = (p^q-1)/(p-1)` acting faithfully on an elementary abelian `p`-group `P` of order `p^q`
+(`q` prime).  Irreducibility of that action reduces to the fact that `u` cannot divide
+`p^D - 1` for any `D` not divisible by `q`: if every Maschke constituent had dimension `dᵢ<q`,
+then `u = lcm(uᵢ)` would divide `p^{lcm dᵢ}-1` with `q ∤ lcm dᵢ`, forcing the contradiction
+below. -/
+
+/-- If `q` is prime, `2 ≤ p`, and `q ∤ D`, then `(p^q-1)/(p-1)` does **not** divide `p^D - 1`.
+
+Indeed `u := (p^q-1)/(p-1)` divides both `p^q-1` and (by hypothesis) `p^D-1`, hence divides
+`gcd(p^q-1, p^D-1) = p^{gcd(q,D)}-1 = p-1` (as `gcd(q,D)=1`, `q` prime, `q∤D`).  But
+`u·(p-1) = p^q-1 ≥ p^2-1 > (p-1)^2`, so `u > p-1` — a contradiction. -/
+theorem cyclotomicQuotient_not_dvd_pow_sub_one {p q D : ℕ} (hp : 2 ≤ p) (hq : q.Prime)
+    (hqD : ¬ q ∣ D) : ¬ ((p ^ q - 1) / (p - 1) ∣ p ^ D - 1) := by
+  intro hdvd
+  have hp1 : (1 : ℕ) ≤ p := by omega
+  -- `(p-1) ∣ p^q - 1` via `p ≡ 1 [MOD p-1]`.
+  have hpmod : (1 : ℕ) ≡ p [MOD (p - 1)] := (Nat.modEq_iff_dvd' hp1).mpr (dvd_refl (p - 1))
+  have hpq_dvd : (p - 1) ∣ p ^ q - 1 := by
+    have h := hpmod.pow q
+    rw [one_pow] at h
+    exact (Nat.modEq_iff_dvd' (Nat.one_le_pow _ _ (by omega))).mp h
+  have hmul : (p ^ q - 1) / (p - 1) * (p - 1) = p ^ q - 1 := Nat.div_mul_cancel hpq_dvd
+  set u := (p ^ q - 1) / (p - 1) with hu
+  have hu_dvd_pq : u ∣ p ^ q - 1 := ⟨p - 1, hmul.symm⟩
+  -- `u ∣ gcd(p^q-1, p^D-1) = p^(gcd q D) - 1 = p - 1`.
+  have hg : u ∣ Nat.gcd (p ^ q - 1) (p ^ D - 1) := Nat.dvd_gcd hu_dvd_pq hdvd
+  rw [Nat.pow_sub_one_gcd_pow_sub_one] at hg
+  have hcop : Nat.gcd q D = 1 := (Nat.Prime.coprime_iff_not_dvd hq).mpr hqD
+  rw [hcop, pow_one] at hg
+  have hle : u ≤ p - 1 := Nat.le_of_dvd (by omega) hg
+  -- `u·(p-1) = p^q-1 ≥ p^2-1`, but `u ≤ p-1` gives `u·(p-1) ≤ (p-1)^2 = p^2-2p+1 < p^2-1`.
+  obtain ⟨m, rfl⟩ : ∃ m, p = m + 2 := ⟨p - 2, by omega⟩
+  have hm1 : m + 2 - 1 = m + 1 := rfl
+  rw [hm1] at hmul hle
+  have hpos : 1 ≤ (m + 2) ^ q := Nat.one_le_pow _ _ (by omega)
+  have hmul' : u * (m + 1) + 1 = (m + 2) ^ q := by omega
+  have hpq2 : (m + 2) ^ 2 ≤ (m + 2) ^ q := Nat.pow_le_pow_right (by omega) hq.two_le
+  nlinarith [hmul', hpq2, Nat.mul_le_mul hle (le_refl (m + 1))]
 
 end OddOrder.RepresentationTheory

@@ -55,11 +55,21 @@ argument. The genuinely §13-gated part is only (14.2)(b) (Q's structure, `y`, v
 
 ## Remaining road to closing (14.7) (concrete, mostly ungated)
 
-1. **`U`-irreducibility on `P`** — new lemma per the argument above. Needs `Maschke` (mathlib has
-   `RepresentationTheory/Maschke.lean`) + constituent-Singer + the primitive-prime fact. ⚠ The
-   `u = q^k` exceptional case needs number theory; **Zsygmondy is likely not in mathlib** (only
-   primitive-roots/cyclotomic files) so this step may need an elementary special-case proof or a
-   small Zsygmondy fragment. Input `u=(p^q-1)/(p-1)` comes from (14.7)'s arithmetic (already done).
+1. **`U`-irreducibility on `P`** — new lemma per the argument above.
+   - ✅ **number-theory core done**: `cyclotomicQuotient_not_dvd_pow_sub_one` (commit `c4622552`,
+     `SingerField.lean`): `q` prime, `q∤D` ⟹ `(p^q-1)/(p-1) ∤ p^D-1` (no Zsygmondy — pure gcd:
+     `Nat.pow_sub_one_gcd_pow_sub_one` gives `u ∣ p^{gcd(q,D)}-1 = p-1`, but `u > p-1`).
+   - **remaining rep-theory step** (the keystone): clean argument avoiding `orderOf = lcm` —
+     suppose `P` not simple; Maschke ⟹ `IsSemisimpleModule`; `exists_sSupIndep_sSup_simples_eq_top`
+     ⟹ finite family of simple submodules `Sᵢ` with `⨆ Sᵢ = ⊤`; each `Sᵢ ≠ P` (P not simple) so
+     `dᵢ := finrank Sᵢ < q`, hence `q ∤ D := lcm dᵢ`. Apply the **Singer engine to each `Sᵢ`** ⟹
+     `Sᵢ ≅` field of order `p^{dᵢ}`, so `(g|Sᵢ)^{p^{dᵢ}-1}=1`, and `dᵢ ∣ D` ⟹ `(g|Sᵢ)^{p^D-1}=1`.
+     So `g^{p^D-1}` fixes every `Sᵢ` ⟹ fixes `⨆Sᵢ=⊤` ⟹ `g^{p^D-1}=1` (faithful) ⟹ `u ∣ p^D-1`.
+     With `q∤D`, `cyclotomicQuotient_not_dvd_pow_sub_one` gives the contradiction. ⟹ `P` simple.
+   - ⚠ **setup caveat**: needs `P` carrying BOTH `Module (ZMod p)` (for `finrank = q`) and
+     `Module (MonoidAlgebra (ZMod p) U)` (for the action) with an `IsScalarTower`; applying Singer to a
+     `Submodule` `Sᵢ` and reading `finrank Sᵢ` is the fiddly part. ~100-150 lines, own focused build.
+     Input `u=(p^q-1)/(p-1)` comes from (14.7)'s arithmetic (already done).
 2. **`P` as `F_p[U]`-module** from the conjugation action (`IsElementaryAbelian p P` ⟹ `ZMod p`-module;
    U-conjugation is `F_p`-linear). Build the `Module (MonoidAlgebra (ZMod p) ↥U) ↥P` directly.
 3. **Apply Singer engine** → `P ≃+ GF(p^q)`, `U → GF(p^q)ˣ`.
