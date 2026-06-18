@@ -4,6 +4,61 @@
 > `s08_6_8_assembly_plan.md`(458KB)/`s08_6_8_3_gap_resolution.md` のうち本 note と矛盾する記述は本 note を優先。
 > 上位方針・FT 接続の文脈 = 記憶 [[ft-path-policy]] の 2026-06-17 検証訂正ブロック。
 
+## 🚨🚨 2026-06-18 cont.¹² — 重大訂正: 「真の gate = hDeg = (6.6)」は **誤り**。(6.8.2) は anchored-image で chain/hDeg 不要
+
+**教科書 04.8 の (6.8) proof を直接精読(L140-235)して判明。cont.⁸/⁹/¹⁰ の「case-B X-coherence の真の gate =
+hDeg `2a < ∑ deg²/mc` = (6.6) degree theory」は誤診断。** 根拠:
+
+1. **(6.6) は `X ⊂ Irr L`(全 irreducible)前提**(04.8:74)。これは **case (A)**(`Z=Z(H)∩H'`)の枝で、(6.8.1) が
+   「S と S(Z) が各 w₂−1 個の reducible char を持つ ⟹ X=S−S(Z) ⊂ Irr L」を示し (6.6) を適用。**case (B) ではない**。
+2. **case (B)(Z=W₂)は (6.8.2) が X∪Y coherence を anchored-image で直接構成**(chain も (6.6) も使わない):
+   - (6.8.2.1) η^{τ₁} は Z^# 上定数、(6.8.2.2) aggregate `(Ind^L_Z φ − |H:Z|η₁)^τ = X − |H:Z|Y`、
+     (6.8.2.3) **∀χ∈X**: `(χ − aη₁)^τ = X₁(χ) − aY`(a=χ(1)/|W₁|、X₁⊥Y^{τ₁})。
+   - **proof of (6.8.2)**: τ₂ を「Z[X∪Y,L^#] 上 = τ、η₁ ↦ Y」と定義 ⟹ (6.8.2.3) で τ₂ は生成系
+     **Z[X∪Y, L^#] ∪ {η₁}**(= Z[X∪Y] を張る)上 inner product 保存 ⟹ isometry = coherence。**degree 不等式ゼロ。**
+3. **hDeg/(6.6)/Cor 2.30(d²≤|H:Z|)は (6.8.3) にある**(04.8:230-235)= S coherent の bootstrap。これは
+   **`nonempty_coherent_S_caseB`(`S08_CaseBWeightedEndgame:372`)で既に DONE**(X∪Y coherent seed → S coherent)。
+
+**⟹ cont.⁸-¹⁰ の chain(`xChainCoherentW`)+ hDeg + norm-1 anchor 問題は全て不要な detour。** chain は (6.6)/case-A の
+道具で、case-B は anchored-image τ₂ が正道。私の `coherentCertainTypeSet_union_Yset_caseB`(cont.¹¹)は
+**まさに (6.8.2) を certainTypeSet(等次数)に制限したもの**。
+
+**▶ 正しい残務 = (6.8.2) を全 X に一般化**(= seed `IsCoherent (Xset W2 ∪ Y)`、hDeg 不要):
+- **per-χ anchored image は全 X で在庫済**: `caseB_member_anchored_image`(任意 θ∈Irr H, W₂⊄Ker θ ⟹ Ind^L_H θ∈X、
+  sorry-free)が (6.8.2.3) を全 χ∈X に供給(reducible column / irreducible 不問)。θ-extraction = `hyp.S_eq`
+  ({Ind θ:θ≠1})+ Xset membership。
+- **varying a**: certainTypeSet は等次数で uniform a₀ だったが、全 X は a=χ(1)/|W₁| が χ ごとに変わる。
+  hXinner(等長)は varying a でも成立(`⟨X(χᵢ),X(χⱼ)⟩ = ⟨χᵢ,χⱼ⟩`、私が手計算で確認: aᵢaⱼ 項相殺)。
+  xchi_inner_eq_of_anchored を varying-a に一般化要。
+- **generation**: 等次数 column diff(`mem_span_columnDiff_of_mem_zSupportedSpan`)→ **scaled diff χᵢ−dᵢχ₁**
+  (dᵢ=χᵢ(1)/χ₁(1)∈ℕ ∵ H が p-群)、`span_subset_span_zSupportedSpan_union_anchor_of_scaledDiffs`(S07:172、既存)。
+- **assembly**: `certainTypeSet_isCoherent_via_anchoredImages` を全 X に一般化(extension を χ-indexed Ximg に)
+  → Y と glue(`coherentUnion_of_glued_…`)→ seed → `nonempty_coherent_S_caseB` → S08:59。**= (6.8) case-B を閉じる。**
+
+**⟹ (6.8) case-B は hDeg(大型 §6 degree theory)無しで closeable。** orphaned 文脈は不変だが、closeability の評価が
+「multi-session hard §6 math」から「anchored-image 一般化 assembly(新数学ゼロ、在庫部品の varying-a 再配線)」に格上げ。
+
+### 🔨 cont.¹² 進捗 (本セッション) — all-X building block 2 個 landed、残 = extension + assembly
+
+**✅ 着地 (sorry-free・axiom-clean、leaf 3632 green)**:
+- **`caseB_Xset_member_anchored`**(`b7329b61`)— (6.8.2.3) anchored image を **全 χ∈Xset W₂** に供給
+  (θ-extraction: χ=Ind θ ∧ W₂⊄Ker θ via S_eq + mem_SsubFiltration → caseB_member_anchored_image)。
+  返り = (X, a=χ(1)/|W₁|, deg, anchored, seam ⟨X,ν₁⟩=0, X∈ZIrr, support)。
+- **`inner_eq_of_anchored_varying`**(`f3cb2e58`)— **varying-a** cross-member isometry
+  `⟨Xᵢ,Xⱼ⟩=⟨χᵢ,χⱼ⟩`(xchi_inner_eq_of_anchored の uniform-a₀ を per-χ aᵢ/aⱼ に一般化、aᵢaⱼ 相殺)。
+  = 全 X coherence の **hXinner** content。⚠ caseB_member_anchored_image は ℂ-smul `(a:ℂ)•ν` ゆえ
+  scalar 補題は robust な simp-only パターン(rw は star 不在で fail)。
+
+**▶ 残 = (P3) all-X coherence `Xset_isCoherent_via_anchoredImages` + (P4) glue + (P5) wire**:
+- **(P3) は infrastructure 重**: `xChiExtension`(`S08_CaseBXChiCoherence:66`)は **column-specific**
+  (basis Irr(L) 上 column-first-member μ_{0,χ₂}↦Ximg χ₂, 他 0)で、全 X(irreducible 含む)には非対応。
+  全 X 版 extension の再設計(basis 上 column-first-member + irreducible-X-member の両対応)or **retarget
+  engine**(`S07:2680`)で per-χ anchored target から直接構成、が要。**= 次の主タスク**(本セッション未着手)。
+  hXanchored=`caseB_Xset_member_anchored`、hXinner=`inner_eq_of_anchored_varying`、hXzirr=bundle、
+  generation=`span_subset_span_zSupportedSpan_union_anchor_of_scaledDiffs`(S07:172, scaled diff χᵢ−dᵢχ₁)。
+- **(P4)** Y と glue(`coherentUnion_of_glued_…`、my `coherentCertainTypeSet_union_Yset_caseB` template)。
+- **(P5)** seed → `nonempty_coherent_S_caseB` → S08:59 case-B 枝。
+
 ## ✅✅✅ 2026-06-18 cont.¹¹ — BASE COHERENCE 完成: `IsCoherent (certainTypeSet ∪ Y)` を unconditional 化 + trap 除去
 
 cont.¹⁰ viable route の **(B1) base = `certainTypeSet ∪ Y` coherence** を **UNCONDITIONAL** で landing
