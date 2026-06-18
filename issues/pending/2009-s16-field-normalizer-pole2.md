@@ -35,6 +35,35 @@ feitThompson は 2 本の独立 bare sorry に bottom-out する ([[ft-endgame-t
 gate = LAUNCH の明示 stop trigger。real sorry 140→141。詳細 = LANDING block in lane-h LAUNCH.md。
 ステータス = pending (genuine 残務は §13/Dade unblock 待ち)。
 
+## 2026-06-18 再開 (Singer-field engine 着地 + 14.7 診断訂正)
+
+**重要な診断訂正**: 前回「14.7 有限体モデルは §13 type-I 構造に深く gate」としたが、これは**誤り**。
+(14.7) の体構成 (14.2)(a) の核 = 「U が P 上に既約に作用 ⟹ P は体 F_{p^q}、U ↪ F^×」(Singer 機構)
+であり、**既約性は §11-13 構造ではなく `c_eq_one`(= U が P に忠実作用)から証明可能**:
+U 巡回・忠実 ⟹ `u = lcm(uᵢ)` (Maschke 分解 Pᵢ、各 `uᵢ ∣ p^{dᵢ}-1` を constituent 上 Singer で)、
+`u = (p^q-1)/(p-1)` の素因子 r は order_r(p)=q (primitive) か r=q のみ ⟹ dᵢ=q (単一 constituent) ⟹ 既約。
+
+### ✅ 着地 (commit `3b8b7204`)
+- **`OddOrder/GroupTheory/RepresentationTheory/SingerField.lean`** (新 leaf, sorry-free, axiom-clean):
+  - `SingerFieldData` + `nonempty_singerFieldData` = 「可換群 C の既約 F_p-線形作用 ⟹ M は体 K、C →* Kˣ、
+    作用 = 乗法」。可換環の simple module = R⧸𝔪 (極大) = 体 経由 (Wedderburn/Jacobson 不要)。
+  - `card_K_eq` (|K|=|M|), `nonempty_ringEquiv_galoisField` (K ≅ GF(p^n)) = FieldNormalizerData の
+    `GaloisField p q` への橋。
+  - asModule の tactic-mode synth 罠を回避 (M を直接 `Module (MonoidAlgebra (ZMod p) C)` で持つ)。
+
+### 14.7 σ-construction への残り道筋 (concrete, ほぼ ungated)
+1. **U-irreducibility on P** (新補題, 要 Maschke + constituent-Singer + 素因子論): `c_eq_one` 忠実性 +
+   `u=(p^q-1)/(p-1)` から既約。⚠ `u = q^k` 例外ケースの数論処理が要 (Zsygmondy は mathlib 未収録の可能性)。
+   前提 `u = (p^q-1)/(p-1)` は (14.7) 算術 (済) が供給。
+2. **P を F_p[U]-module 化** (共役作用、`IsElementaryAbelian` から F_p-module)。
+3. **Singer engine 適用** → P ≃+ GF(p^q), U → GF(p^q)ˣ。
+4. **σ assembly**: `fieldNormalizerFrobeniusGroup = GF(p^q)⋊U*` → G を P/U/W₂ に合わせて構成
+   (frozen Core `S16_NonExistenceGCore` の def 群を**使用**、改変なし)。heavy。
+5. **part(b)** (Q elem abelian, W₂ normalizes Q, ∃y∈Q): (13.2.b)/(14.5) gate (これは §13 依存・残置)。
+
+⟹ (14.7) は「§13 に深く gate」ではなく、**(1)(4) が ungated な multi-session 実装、(5) のみ §13 gate**。
+exists_L/MHypothesis (14.3/14.10) + caseB cascade は依然 Dade gate (Lane B)。
+
 ## 完了条件
 
 `field_normalizer_structure` の `sorry` が消え、`lake build OddOrder OddOrder.AxiomsCheck` 緑。
