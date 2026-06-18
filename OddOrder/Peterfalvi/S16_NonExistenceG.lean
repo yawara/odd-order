@@ -194,6 +194,54 @@ theorem caseB_for_S [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
     ∃ data : CaseBForSData hyp, data.caseB_formula := by
   sorry
 
+/-- Over `ℕ`, the geometric-sum identity `(p − 1) · ∑_{i<q} pⁱ = p^q − 1`. -/
+private theorem pred_mul_geomSum (p q : ℕ) (hp : 1 ≤ p) :
+    (p - 1) * ∑ i ∈ Finset.range q, p ^ i = p ^ q - 1 := by
+  induction q with
+  | zero => simp
+  | succ n ih =>
+      have hpn : 1 ≤ p ^ n := Nat.one_le_pow _ _ (by omega)
+      have hle : p ^ n ≤ p ^ n * p := Nat.le_mul_of_pos_right _ (by omega)
+      have key : (p - 1) * p ^ n = p ^ n * p - p ^ n := by
+        rw [Nat.sub_mul, one_mul, Nat.mul_comm p (p ^ n)]
+      rw [Finset.sum_range_succ, mul_add, ih, key, pow_succ]
+      omega
+
+/-- The geometric sum `∑_{i<q} pⁱ` is `≡ q (mod d)` whenever `p ≡ 1 (mod d)`,
+since every `pⁱ ≡ 1`. -/
+private theorem geomSum_modEq_card {p d : ℕ} (hpd : p ≡ 1 [MOD d]) (q : ℕ) :
+    ∑ i ∈ Finset.range q, p ^ i ≡ q [MOD d] := by
+  induction q with
+  | zero => simp [Nat.ModEq]
+  | succ n ih =>
+      rw [Finset.sum_range_succ]
+      have hpow : p ^ n ≡ 1 [MOD d] := by simpa using hpd.pow n
+      exact Nat.ModEq.add ih hpow
+
+/-- **Peterfalvi (14.2)(a)** arithmetic core: when `q ∤ (p − 1)`, the cyclotomic
+quotient `(p^q − 1)/(p − 1)` is prime to `p − 1`.  In (14.7) the hypothesis
+`q ∤ (p − 1)` is `p ≢ 1 (mod q)`, which holds once `u` takes its full cyclotomic
+value.  The quotient equals `∑_{i<q} pⁱ ≡ q (mod p − 1)`, so it is coprime to
+`p − 1` exactly when `q` is, and `q` prime with `q ∤ (p − 1)` gives that.  This
+discharges the `cyclotomic_coprime` field of `FieldNormalizerData`. -/
+theorem cyclotomic_quotient_coprime_of_not_dvd {p q : ℕ} (hp : 2 ≤ p)
+    (hq : q.Prime) (hnd : ¬ q ∣ (p - 1)) :
+    Nat.Coprime ((p ^ q - 1) / (p - 1)) (p - 1) := by
+  have hpd : p ≡ 1 [MOD (p - 1)] :=
+    ((Nat.modEq_iff_dvd' (by omega : (1 : ℕ) ≤ p)).mpr (dvd_refl (p - 1))).symm
+  have hdiv : (p ^ q - 1) / (p - 1) = ∑ i ∈ Finset.range q, p ^ i := by
+    rw [← pred_mul_geomSum p q (by omega),
+      Nat.mul_div_cancel_left _ (show 0 < p - 1 by omega)]
+  have hmod : (∑ i ∈ Finset.range q, p ^ i) % (p - 1) = q % (p - 1) :=
+    geomSum_modEq_card hpd q
+  have hcoq : Nat.Coprime q (p - 1) := (Nat.Prime.coprime_iff_not_dvd hq).mpr hnd
+  have hgcd : Nat.gcd (p - 1) (∑ i ∈ Finset.range q, p ^ i) = Nat.gcd (p - 1) q := by
+    rw [Nat.gcd_rec (p - 1) (∑ i ∈ Finset.range q, p ^ i), Nat.gcd_rec (p - 1) q, hmod]
+  rw [hdiv]
+  have : Nat.gcd (∑ i ∈ Finset.range q, p ^ i) (p - 1) = 1 := by
+    rw [Nat.gcd_comm, hgcd, Nat.gcd_comm]; exact hcoq
+  exact this
+
 /-- **Peterfalvi (14.7)**: if `U` is characteristic in `H`, then the final
 field-normalizer configuration (14.2) holds. -/
 theorem field_normalizer_of_U_characteristic [Finite G]
