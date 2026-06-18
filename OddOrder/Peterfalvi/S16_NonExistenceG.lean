@@ -719,6 +719,62 @@ theorem exists_pu_field_repr [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
   rw [← hcompat0 v (Additive.ofMul x), hof_smul v (Additive.ofMul x)]
   congr 2
 
+/-- **(14.7) `hμ_range` input**: any injective `μ : U →* 𝔽_{p^q}ˣ` with `|U| = (p^q-1)/(p-1)`
+has image exactly the norm-one units `U*`.  Both are subgroups of the cyclic group `𝔽_{p^q}ˣ`
+of the same order `d = (p^q-1)/(p-1)`, hence both equal the unique subgroup `{x | x^d = 1}` of
+that order (`= ker (powMonoidHom d)`, whose card is `gcd(p^q-1, d) = d`). -/
+theorem mu_range_eq_normOneUnits {hyp : Hypothesis (G := G)}
+    (hu_full : Nat.card ↥hyp.base.U =
+      (hyp.base.p ^ hyp.base.q - 1) / (hyp.base.p - 1))
+    (μ : letI : Fact hyp.base.p.Prime := ⟨hyp.base.p_prime⟩
+         ↥hyp.base.U →* (GaloisField hyp.base.p hyp.base.q)ˣ)
+    (hinj : Function.Injective μ) :
+    letI : Fact hyp.base.p.Prime := ⟨hyp.base.p_prime⟩
+    μ.range = OddOrder.BG.AppC.NormSet.normOneUnits hyp.base.p hyp.base.q := by
+  letI : Fact hyp.base.p.Prime := ⟨hyp.base.p_prime⟩
+  set d := (hyp.base.p ^ hyp.base.q - 1) / (hyp.base.p - 1) with hd
+  have hq0 : hyp.base.q ≠ 0 := hyp.base.q_prime.ne_zero
+  have hGcard : Nat.card (GaloisField hyp.base.p hyp.base.q)ˣ = hyp.base.p ^ hyp.base.q - 1 := by
+    rw [Nat.card_units, GaloisField.card hyp.base.p hyp.base.q hq0]
+  have hpm1_dvd : (hyp.base.p - 1) ∣ (hyp.base.p ^ hyp.base.q - 1) := by
+    have h1 : (1 : ℕ) ≡ hyp.base.p [MOD (hyp.base.p - 1)] :=
+      (Nat.modEq_iff_dvd' (by have := hyp.base.p_prime.two_le; omega)).mpr dvd_rfl
+    have hq1 : (1 : ℕ) ≡ hyp.base.p ^ hyp.base.q [MOD (hyp.base.p - 1)] := by
+      simpa using h1.pow hyp.base.q
+    exact (Nat.modEq_iff_dvd' (Nat.one_le_pow _ _ (by have := hyp.base.p_prime.two_le; omega))).mp hq1
+  have hd_dvd : d ∣ (hyp.base.p ^ hyp.base.q - 1) :=
+    ⟨hyp.base.p - 1, (Nat.div_mul_cancel hpm1_dvd).symm⟩
+  have hkercard : Nat.card
+      (powMonoidHom d :
+        (GaloisField hyp.base.p hyp.base.q)ˣ →* (GaloisField hyp.base.p hyp.base.q)ˣ).ker = d := by
+    rw [IsCyclic.card_powMonoidHom_ker, hGcard, Nat.gcd_eq_right hd_dvd]
+  have hμcard : Nat.card (μ.range) = d := by
+    have hcU := (Nat.card_congr (MonoidHom.ofInjective hinj).toEquiv).symm
+    rw [hu_full] at hcU
+    exact hcU
+  have hncard :
+      Nat.card (OddOrder.BG.AppC.NormSet.normOneUnits hyp.base.p hyp.base.q) = d :=
+    OddOrder.BG.AppC.NormSet.normOneUnits_card hyp.base.p hyp.base.q hq0
+  have hsub : ∀ (K : Subgroup (GaloisField hyp.base.p hyp.base.q)ˣ), Nat.card K = d →
+      K ≤ (powMonoidHom d :
+        (GaloisField hyp.base.p hyp.base.q)ˣ →* (GaloisField hyp.base.p hyp.base.q)ˣ).ker := by
+    intro K hK x hx
+    rw [MonoidHom.mem_ker, powMonoidHom_apply]
+    have hord : orderOf x ∣ d := by
+      have h := orderOf_dvd_natCard (⟨x, hx⟩ : K)
+      rw [hK] at h
+      rwa [← orderOf_injective K.subtype (Subgroup.subtype_injective K) ⟨x, hx⟩] at h
+    exact orderOf_dvd_iff_pow_eq_one.mp hord
+  have hμeq : μ.range =
+      (powMonoidHom d :
+        (GaloisField hyp.base.p hyp.base.q)ˣ →* (GaloisField hyp.base.p hyp.base.q)ˣ).ker :=
+    Subgroup.eq_of_le_of_card_ge (hsub _ hμcard) (le_of_eq (hkercard.trans hμcard.symm))
+  have hneq : OddOrder.BG.AppC.NormSet.normOneUnits hyp.base.p hyp.base.q =
+      (powMonoidHom d :
+        (GaloisField hyp.base.p hyp.base.q)ˣ →* (GaloisField hyp.base.p hyp.base.q)ˣ).ker :=
+    Subgroup.eq_of_le_of_card_ge (hsub _ hncard) (le_of_eq (hkercard.trans hncard.symm))
+  rw [hμeq, hneq]
+
 /-- **Peterfalvi (14.7)**: if `U` is characteristic in `H`, then the final
 field-normalizer configuration (14.2) holds.
 
