@@ -190,6 +190,33 @@ literal-`sorry`-free な engine で検証。3 本 landing（full build 3863 jobs
 → 5. これらを `_of_inputs` に渡して `field_normalizer_of_U_characteristic` を close。
 これらは exists_L/MHypothesis（14.3/14.10）+ case-B cascade と同じ Dade/§13 char theory gate（Lane B）。
 
+### ✅✅ 2026-06-19 再開⁹ — §14 value-argument 算術核 COMPLETE（`40150bb0`）
+
+ユーザー裁可で **§14 value-argument に着手**。論文 (14.7) の value-argument の**算術核を axiom-clean で形式化**し、
+(14.7) を「FPF 合同 `u ≡ 1 mod p` + part(b)」ちょうどに reduce（full build 3863 jobs ~15s green、sorry 140 不変）:
+
+- **`u_eq_full_of_caseB_of_u_modEq_one_mod_p`（axiom-clean = `[propext, Classical.choice, Quot.sound]`）**:
+  `CaseBForSData`（caseB dichotomy 13.15）+ FPF 合同 `u ≡ 1 mod p` を仮説に取り、`u = (p^q-1)/(p-1) ∧ ¬(p≡1 mod q)`。
+  (13.15) の `p≡1 mod q` 枝では `q·u = (p^q-1)/(p-1) ≡ 1 mod p`(geom sum, private `cyclotomic_quotient_modEq_one_mod_base`)
+  ゆえ `q ≡ q·u ≡ 1 mod p` → `p ∣ q-1`、standing `q < p`(`hyp.q_lt_p`)に矛盾。よって full 枝。
+- **`field_normalizer_of_U_characteristic_of_fpf`**: 最もタイトな (14.7) assembly engine。value-arg（`caseB_for_S Ldata`
+  cite で `u≡1 mod p` → hu_full + cyclotomic coprime）→ `_of_inputs`。**⟹ (14.7) は FPF `u≡1 mod p` + `W₂≤P` + part(b)
+  ちょうどに reduce**。gate = §13 producer（basic_structure/c_eq_one/caseB_for_S, Lane B）のみ。
+
+**⟹ value-argument の算術・assembly は完全に done（axiom-clean）。残る唯一の真の §14 gate = FPF fact `u ≡ 1 mod p`。**
+
+### 🛑 FPF fact `u ≡ 1 mod p` = 深い §14 structural（scaffold ゼロ、調査済 2026-06-19）
+
+`u ≡ 1 mod p` の source = W₂^y（位数 p）が U に Frobenius complement として作用 ⟹ `|U| ≡ 1 mod p`。必要:
+1. **part(b)**（Q elem abelian / W₂≤N(Q) / ∃y∈Q with W₂^y≤N(U)）= (13.2.b)/(14.5) — **producer ゼロ**（repo grep 済、
+   hQ_elemAb 等は全 lemma で仮説のみ）。(13.2.b) は §13、(14.5) は §14。
+2. **W₂^y-on-U Frobenius 構造**（FPF-ness 含む）= §14 field-model から構成、**repo に不在**（U⋊W₁ の mod-q 版のみ存在
+   = `u_modEq_one_mod_q` / `data.UW1_frobenius.card_kernel_modEq_one`）。
+3. generic Frobenius ⟹ kernel≡1 mod complement = `IsFrobeniusGroup.card_kernel_modEq_one`（available）。
+
+⟹ FPF fact は part(b) producer + 新規 §14 field-model action 理論を要する**大物・複数セッション**。lane-H 領域だが
+scaffold ゼロ。次セッション or ユーザー判断（part(b) producer 着手 / lane B §13 待ち / 再タスク）。
+
 ## 完了条件
 
 `field_normalizer_structure` の `sorry` が消え、`lake build OddOrder OddOrder.AxiomsCheck` 緑。
