@@ -108,6 +108,31 @@ p≥3 = p∣|H|∣|L| 奇 ⟹ p 奇。**⟹ 次の本丸 = Theorem (6.3) assembl
   `normal_central_of_maximal_normal_below`/`degreeBound_le_of_sqrt_bound`)。
 - **見積 ~1-2 session**。次着手 = (6.2) break bound を c1/c2 case 別 or raw-engine 一般で組む設計を確定 → 実装。
 
+### 🎉🎉 cont.¹⁴ 進捗³ — 特大発見: (6.2)/(6.3)/(6.5) は c1 用に repo 既存・完成 → Frobenius 枝を完全 close
+
+**`S08_CoherenceCorePart2:3538-3837` に (6.2)/(6.3)/(6.5) が Frobenius 用に全実装済みと判明**(精読見落とし):
+- `psi_degree_le_of_source`/`_central` (theta bound)、`six_two`/`six_two_central` (= (6.2))、
+  `six_three_index_bound`/`six_three` (= (6.3) minimal-A induction full)、
+  **`isPGroup_of_not_coherent` (`:3803`) = (6.5) 還元 `¬coherent(S) ⟹ H が p-群`**(全 c1=hF 依存)。
+
+**✅ R2 (`3b8b367a`、`S08_PGroupReduction.lean`、sorry-free+axiom-clean): (6.8) の Frobenius (c1) 枝を完全 close**:
+- `nonempty_coherent_S_of_frobenius` (hF + hXe ⟹ Nonempty(IsCoherent S)): by_contra →
+  `isPGroup_of_not_coherent` → p≥3 (`three_le_of_isPGroup_H`) + 非可換 (`commutator_ne_bot_of_Xset_commutator_nonempty`)
+  → `nonempty_coherent_S_caseA_of_frobenius` → 矛盾。**= S08:59 の c1 分岐そのもの**。
+
+**▶ 残 = c2 (Hyp46) 分岐の (6.5) 還元**。2 ゲート:
+1. **c2 (6.3) = reducible-break subtlety**。c1 の six_two は break ψ を irreducible 要求
+   (`isIrreducibleCharacter_of_mem_S_of_frobenius hF` + (5.6) engine `coherentDegreeSumBound_of_not_coherent`
+   は `χ : IrreducibleCharacter` 必須)。**c2 は S に reducible column を含む** ⟹ break が column なら (5.6) engine
+   不適用。**⚠ T63-1/T63-2 (sSubFiltration sum + bound) は ψ irreducible 前提ゆえ c2-(6.3) が reducible break を
+   生むなら off-path** = 要検証 ([[pf-s08-caseb-seed-route-uncertain]] 型の不確実性)。c2-(6.3) の break が
+   構造的に irreducible と示せるか(列が S(A) に常に入り break から除外されるか)を次に精査。
+2. **hfix = (6.4.c)**(W₁-共役固定点⊆⁅H,H⁆、h46 から導出、`exists_isPGroup_H_of_c2_of_card_le` 入力)。
+
+**dispatch 配線は保留**: `nonempty_coherent_S_of_frobenius` は S08_PGroupReduction 在(S08_CoherenceTheorems の
+下流)ゆえ直接 import 不可。c1 piece は S08_CoherenceCore 上流の素材のみ使う ⟹ 将来 upstream 移設 or hub に inline。
+**c2 が揃ってから一括配線**(中間 sorry を hub に残さない)。⟹ **次 = c2-(6.3) reducible-break 精査 → 可なら c2 還元実装**。
+
 ## 🚨🚨 2026-06-18 cont.¹² — 重大訂正: 「真の gate = hDeg = (6.6)」は **誤り**。(6.8.2) は anchored-image で chain/hDeg 不要
 
 **教科書 04.8 の (6.8) proof を直接精読(L140-235)して判明。cont.⁸/⁹/¹⁰ の「case-B X-coherence の真の gate =
