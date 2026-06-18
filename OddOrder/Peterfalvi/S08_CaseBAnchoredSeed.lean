@@ -1086,6 +1086,68 @@ theorem caseBXsetExtension_eq
   · rw [← hcol, caseBXsetExtension_columnSum hyp h46 hW1 Ximg χ₂]
   · exact caseBXsetExtension_irr hyp h46 Ximg hirr hmem
 
+/-- **(6.8.2) supported generation by scaled differences** (the varying-degree analogue of
+`mem_span_columnDiff_of_mem_zSupportedSpan`).  Given an anchor `χ₁ ∈ S₁` (with `χ₁(1) ≠ 0`) such that
+every `f ∈ S₁` has degree `f(1) = d·χ₁(1)` for some `d : ℕ` (the integral degree ratio, available for
+`X`-members since `H` is a `p`-group), every supported (degree-`0`) `φ ∈ Z[S₁, H^#]` lies in the span
+of the scaled differences `f − d·χ₁`.
+
+Proof mirrors the equal-degree case: the scaled differences vanish at `1` (`f(1) − d·χ₁(1) = 0`), so
+`D = span{f − d·χ₁}` sits inside `ker(ev₁)`; `Z[S₁] ≤ D ⊔ ℤ·χ₁` (write `f = (f − d·χ₁) + d·χ₁`); and a
+supported `φ = y + n·χ₁` has `0 = φ(1) = n·χ₁(1)`, forcing `n = 0`, so `φ = y ∈ D`. -/
+theorem mem_span_scaledDiff_of_mem_zSupportedSpan
+    (hyp : SibleyDadeHypothesis G L H)
+    {S₁ : Set (ClassFunction ↥L ℂ)} {χ₁ : ClassFunction ↥L ℂ}
+    (hχ₁1 : (χ₁ : ClassFunction ↥L ℂ) 1 ≠ 0)
+    (hdeg : ∀ f ∈ S₁, ∃ d : ℕ, (f : ClassFunction ↥L ℂ) 1 = (d : ℂ) * χ₁ 1)
+    {φ : ClassFunction ↥L ℂ}
+    (hφ : φ ∈ OddOrder.Peterfalvi.S07.zSupportedSpan S₁
+      (OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L)) :
+    φ ∈ Submodule.span ℤ
+      {g : ClassFunction ↥L ℂ | ∃ f ∈ S₁, ∃ d : ℕ,
+        (f : ClassFunction ↥L ℂ) 1 = (d : ℂ) * χ₁ 1 ∧ g = f - d • χ₁} := by
+  classical
+  obtain ⟨hφspan, hφsupp⟩ := hφ
+  set T : Set (ClassFunction ↥L ℂ) := {g | ∃ f ∈ S₁, ∃ d : ℕ,
+    (f : ClassFunction ↥L ℂ) 1 = (d : ℂ) * χ₁ 1 ∧ g = f - d • χ₁} with hT
+  set ev1 : ClassFunction ↥L ℂ →+ ℂ := AddMonoidHom.mk' (fun ψ => ψ (1 : ↥L)) (fun _ _ => rfl)
+    with hev1
+  have hD_vanish : ∀ δ ∈ Submodule.span ℤ T, ev1 δ = 0 := by
+    intro δ hδ
+    induction hδ using Submodule.span_induction with
+    | mem x hx =>
+        obtain ⟨f, _, d, hfd, rfl⟩ := hx
+        show (f - d • χ₁) (1 : ↥L) = 0
+        rw [ClassFunction.sub_apply, ← Nat.cast_smul_eq_nsmul ℂ d χ₁, ClassFunction.smul_apply,
+          hfd, sub_self]
+    | zero => exact map_zero ev1
+    | add x y _ _ ihx ihy => rw [map_add, ihx, ihy, add_zero]
+    | smul a x _ ih => rw [map_zsmul, ih, smul_zero]
+  have hspan_le : Submodule.span ℤ S₁ ≤ Submodule.span ℤ T ⊔ Submodule.span ℤ {χ₁} := by
+    rw [Submodule.span_le]
+    intro f hf
+    obtain ⟨d, hfd⟩ := hdeg f hf
+    rw [show f = (f - d • χ₁) + d • χ₁ from by abel]
+    refine Submodule.add_mem _ (Submodule.mem_sup_left (Submodule.subset_span ⟨f, hf, d, hfd, rfl⟩))
+      (Submodule.mem_sup_right ?_)
+    rw [← Nat.cast_smul_eq_nsmul ℤ d χ₁]
+    exact Submodule.smul_mem _ _ (Submodule.subset_span rfl)
+  obtain ⟨y, hy, z, hz, hyz⟩ := Submodule.mem_sup.mp (hspan_le hφspan)
+  obtain ⟨n, rfl⟩ := Submodule.mem_span_singleton.mp hz
+  have hφ1 : ev1 φ = 0 := by
+    show φ (1 : ↥L) = 0
+    by_contra hne
+    have h1mem := hφsupp (ClassFunction.mem_support.mpr hne)
+    rw [OddOrder.Peterfalvi.S04.mem_supportInSubgroup] at h1mem
+    simp only [sharpImage, Set.mem_diff, Set.mem_singleton_iff] at h1mem
+    exact h1mem.2 (by simp)
+  rw [← hyz, map_add, hD_vanish y hy, zero_add, map_zsmul] at hφ1
+  have hn : n = 0 := by
+    rcases smul_eq_zero.mp hφ1 with hn | hd
+    · exact hn
+    · exact absurd hd (show ev1 χ₁ ≠ 0 from hχ₁1)
+  rw [← hyz, hn, zero_smul, add_zero]; exact hy
+
 /-- **⚠ NON-VIABLE base (kept as a structural record).**  The map convention here is correct
 (`hyp.tau = dadeIntegralCharacterMap hyp.dade (hyp.dade.fullDadeIsometryData hyp.hconj)` defeq, so
 `xChainCoherentW hyp.dade hyp.hconj` lands at `hyp.tau` — no retargeting), **but the `hstep`
