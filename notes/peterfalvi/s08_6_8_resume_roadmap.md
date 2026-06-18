@@ -115,6 +115,44 @@ full build 3858 jobs green):
 **▶ 次の一手 = (A) cX 構成** → (B) glue → seed `IsCoherent (Xset W2∪Y)` → `nonempty_coherent_S_caseB`(既存)
 → S08:59。hmixed は `caseB_hmixed` で完成済。
 
+## ⚠ 2026-06-18 cont.⁸ — cX 構成の真の scope 判明: (6.6) 重み付き X-coherence (大型 §6 math)
+
+cX 構成を徹底精査(xChainCoherentW / XAdjoinStepInputW / Frobenius template / 既存 consumer 全調査)した
+結論。**cont.⁷ の「残りは機械的 assembly」は楽観で訂正** — cX = (6.6) **重み付き X-coherence** で実質的な §6
+degree theory を要する:
+
+1. **重み付き chain consumer が未存在**: irreducible-X 版 `Xset_isCoherent_from_adjoinSteps_of_irreducible_X`
+   (`S08_CoherenceCorePart2:4232`, hyp.tau bridge 内包) は **all-X-irreducible 前提**(`hX:∀φ∈Xset, irreducible`)
+   ゆえ case-B(reducible column 含む)に直接不可。weighted `xChainCoherentW`(`S08_CoherenceWeighted:556`)は
+   **dadeIntegralCharacterMap レベル**で、hyp.tau bridge を持たない。⟹ **新規 `Xset_isCoherent_from_adjoinStepsW`
+   (weighted chain + certainTypeSet base + Dade→hyp.tau congr)を構築要**(irreducible 版を mirror、laborious)。
+2. **per-step `hDeg : 2a < ∑ deg²/mc` = 真の gate = (6.6) degree-divisibility math**: Frobenius は
+   `PairUnionCommonIndexPrimePowerStepData`(prime-power / common-index / [Is] Cor 2.30 central bound)で
+   hDeg を構築。case-B はこの **weighted 版 producer (= notes/s08_6_8_blocker_central_Z.md の "producer monolith")**
+   を要する。**これが (6.6) の数学的核**。brick 3 (`sMember_degreeSqNormBound`) は field assembly を済ませたが
+   **Y-anchor 前提**(η∈S₁)で、X-chain は **column-anchor**(certainTypeSet 基準)ゆえ deg/a 定義が異なり直接再利用不可。
+3. **hcolAgree**(cX.ext(col)=certainTypeExtension(col)): chain base 保存 + congrMap で成立のはず、要証明。
+
+**∴ cX = 大型 multi-session §6 work**(weighted chain consumer + degree producer monolith + map congr)。
+**機械的でない**。**(B) glue も mixed-X ν 構築要**。
+
+> ### ✅ cont.⁹ 更新 (2026-06-18) — weighted chain consumer DONE、map congr は不要だった
+> **`caseB_Xset_isCoherent_of_hstepW`**(`S08_CaseBAnchoredSeed.lean`, commit `804fbfe1`, sorry-free・
+> axiom-clean): cX を **per-step `hstep` (XAdjoinStepInputW) のみに gate** する chain consumer。
+> 🔑 **cont.⁸ の「map congr monolith 要」は誤り**: `hyp.tau = dadeIntegralCharacterMap hyp.dade
+> (hyp.dade.fullDadeIsometryData hyp.hconj)` が **defeq** ゆえ `xChainCoherentW hyp.dade hyp.hconj` が
+> hyp.tau に直接 land(retarget 不要)、base `certainTypeSet_isCoherent_tau_canonical` も defeq 一致。
+> 上記 #1「新規 chain consumer 構築」= **完了**(thin wrapper だった)。
+> **∴ cX 残務 = per-step `hstep` (= XAdjoinStepInputW producer) のみ** = (6.6) degree producer monolith。
+> core field (Dmem/hortho/htau1) = `caseB_member_orthoDatum` 既存。真の gate = **hDeg `2a < ∑ deg²/mc`**
+> (=(6.6) degree-divisibility、Frobenius `commonIndexPrimePowerSums` の weighted 版)+ field assembly
+> (brick 3 `sMember_degreeSqNormBound` を **column-anchor** 用に翻案、brick 3 は Y-anchor 前提ゆえ要 adapt)。
+
+**FT 文脈**: (6.8) は [[ft-path-policy]] で **FT carrier から orphaned (deferred-payoff)** — cX を完成しても
+feitThompson の sorry は今は減らない。⟹ cX 着手は「(6.8) を完全に閉じる」価値 vs 「§14 counting (lane-H) 等
+on-path piece」の優先度判断を要する。**本セッションの確実な成果 = hmixed 完成**(seam という長年の難所)。
+cX(=degree theory)は別 effort として scope。
+
 ## 🗂 (履歴・訂正済) 2026-06-18 cont.⁴ — anchoredImages route の必要性に疑問
 
 > ⚠ 本 block の疑問は cont.⁵ で解決済 (anchoredImages = ON-PATH/CORE)。point 3「canonical cX」は誤りと判明。

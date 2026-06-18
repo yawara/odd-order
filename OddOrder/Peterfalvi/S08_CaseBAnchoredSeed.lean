@@ -529,4 +529,50 @@ theorem caseB_hmixed
     exact inner_extension_caseB_Xset_Yset_eq_zero_of_irreducible hyp cX hyp.coherentYset hpair
       hx hirr hχconj hχne hy
 
+/-- **(6.6) case-(B) weighted `X`-coherence chain consumer** (gated on the per-step weighted adjoin
+data).  The reducible-member analogue of `Xset_isCoherent_from_adjoinSteps_of_irreducible_X`: instead
+of the all-irreducible base `xBaseBlock` it folds onto the **certain-type column base**
+`certainTypeSet h46 k` (coherent via `certainTypeSet_isCoherent_tau_canonical`), using the
+norm-weighted chain `xChainCoherentW` (whose per-step `XAdjoinStepInputW` carries the squared-norm
+diagonal `mc i = ‖χmem i‖²`, valid on the reducible columns).
+
+The conjugate-pair cover of `X(W₂) ∖ certainTypeSet` is supplied by `caseB_Xset_conjugatePairCover`;
+the per-step weighted adjoin input `hstep` (the norm-weighted (6.6) degree data — the remaining (5.6)
+degree-divisibility content) is taken as a hypothesis.  Since
+`hyp.tau = dadeIntegralCharacterMap hyp.dade (hyp.dade.fullDadeIsometryData hyp.hconj)`
+definitionally, `xChainCoherentW hyp.dade hyp.hconj` already lands at `hyp.tau` — no map retargeting. -/
+noncomputable def caseB_Xset_isCoherent_of_hstepW
+    (hyp : SibleyDadeHypothesis G L H) [H.Normal]
+    (h46 : OddOrder.Peterfalvi.S06.Hypothesis46 (sharpImage H) L) (hHK : h46.K = H)
+    [NeZero (Nat.card h46.W1)] [Invertible (Nat.card ↥h46.K : ℂ)]
+    [Fintype ↥(h46.W1 ⊔ h46.W2)] [Invertible (Nat.card ↥(h46.W1 ⊔ h46.W2) : ℂ)]
+    [Fintype (OddOrder.Peterfalvi.S06.ticVdiff h46).W]
+    [Invertible (Nat.card (OddOrder.Peterfalvi.S06.ticVdiff h46).W : ℂ)]
+    {k : (h46.W2.subgroupOf (h46.W1 ⊔ h46.W2)) →* ℂˣ} (hk : k ≠ 1)
+    (hbase : OddOrder.Peterfalvi.S06.certainTypeSet h46 k ⊆ hyp.Xset h46.W2)
+    (hnonS₀_irr : ∀ χ ∈ hyp.Xset h46.W2,
+      χ ∉ OddOrder.Peterfalvi.S06.certainTypeSet h46 k → IsIrreducibleCharacter χ)
+    (hstep : ∀ (pair : ℕ → ClassFunction ↥L ℂ × ClassFunction ↥L ℂ) (N : ℕ)
+        (χs : ℕ → IrreducibleCharacter ↥L),
+        (∀ i, i < N → (pair i).1 = (χs i : ClassFunction ↥L ℂ)) →
+        (∀ i, i < N → (pair i).2 = (χs i : ClassFunction ↥L ℂ).conj) →
+        (∀ j, j < N → OddOrder.Peterfalvi.S07.pairSet (L := ↥L) pair j ⊆ hyp.Xset h46.W2) →
+        (∀ χ ∈ hyp.Xset h46.W2, χ ∈ OddOrder.Peterfalvi.S06.certainTypeSet h46 k ∨
+          ∃ j, j < N ∧ χ ∈ OddOrder.Peterfalvi.S07.pairSet (L := ↥L) pair j) →
+        ∀ i, i < N → ∀ (hcoh : OddOrder.Peterfalvi.S07.IsCoherent
+            (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap hyp.dade
+              (hyp.dade.fullDadeIsometryData hyp.hconj))
+            (OddOrder.Peterfalvi.S07.pairUnion (L := ↥L)
+              (OddOrder.Peterfalvi.S06.certainTypeSet h46 k) pair i)
+            (OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L)),
+          XAdjoinStepInputW hyp.dade hyp.hconj hcoh (χs i)) :
+    OddOrder.Peterfalvi.S07.IsCoherent hyp.tau (hyp.Xset h46.W2)
+      (OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L) := by
+  classical
+  choose pair N χs hpair0 hpair1 hpairs hcover using
+    caseB_Xset_conjugatePairCover hyp h46 hHK hbase hnonS₀_irr
+  exact xChainCoherentW hyp.dade hyp.hconj pair N χs hpair0 hpair1 hbase hpairs hcover
+    (hyp.certainTypeSet_isCoherent_tau_canonical h46 hk)
+    (fun i hi hcoh => hstep pair N χs hpair0 hpair1 hpairs hcover i hi hcoh)
+
 end OddOrder.Peterfalvi.S08
