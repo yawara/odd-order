@@ -51,6 +51,7 @@ hub REASSIGN #2 (option 1「難所に正面」) を受け、**逆包含 `M ⊓ M
 共役までしか固定せず、producer `section16TypePStructure_of_isMinimalSimpleOdd` は本補題が
 あっても**まだ discharge できない**。次手 = lane-g が `Section16MaximalPair` を本補題で enrich
 (W=S∩T cyclic + dichotomy clause 復活) → そこで初めて typeP producer が discharge 可能。
+**→ gap A は issue 7006 に分離 (2026-06-18, hub 伝達用)**。
 
 ---
 
