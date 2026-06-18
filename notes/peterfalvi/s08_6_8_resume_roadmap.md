@@ -51,18 +51,26 @@ hDeg `2a < ∑ deg²/mc` = (6.6) degree theory」は誤診断。** 根拠:
 - **`anchoredImage_scaledDiff_eq`**(`12764e7c`)— scaled-diff homogeneity `Xᵢ − dᵢ•X₁ = τ(χᵢ − dᵢ•χ₁)`
   (aᵢ=dᵢ·a₁ で ν₁ 相殺 + τ 線形)。= **extends_on_supported** content(varying degree)。
 
-**▶ 残 = (P3) extension map のみ + (P4) glue + (P5) wire**(coherence-field content は ↑で完備):
-- **唯一の hard 残 = extension map** `ν : IntegralCharacterMap` で `ν(χ)=Ximg(χ) ∀χ∈Xset W₂`。
-  `xChiExtension`(`S08_CaseBXChiCoherence:66`)は **column-specific**(basis Irr(L) 上 column-first-member
-  μ_{0,χ₂}↦Ximg χ₂, 他 0)。全 X は `caseB_S_member_column_or_irreducible`(`S08_CaseBAssembly:1949`)で
-  **column(=columnSum χ₂) ∨ irreducible** の dichotomy ⟹ 全 X 版 = `f(ω) := if ω∈Xset W₂ then Ximg(ω)
-  else xChiExtensionFun(...) ω`(irreducible は basis 要素 ↦ Ximg、column は μ_{0} 集約)。
-  **構造的前提 = 列 constituent `μ_{iχ₂} ∉ Xset W₂` は ✅ 証明可(度数 mod |W₁| 論法、本セッション確認)**:
-  X-member は Ind^L_H θ で度数 `|W₁|·θ(1) ≡ 0 (mod |W₁|)`、grid constituent μ は度数 `≡ ±1 (mod |W₁|)`
-  (`certainType_degree_modEq`、`caseB_inner_irr_columnSum_eq_zero` docstring の論法)、|W₁|≠1 ⟹ 矛盾。
-  ⟹ basis branch が交わらず ν(columnSum χ₂)=Ximg 正。retarget は pair-based(chain 用)で textbook τ₂ には不適。
+**▶✅ (P3) extension map = 構築完了**(本セッション、`34c707b9`):
+- **`grid_mu_notMem_Xset`**(`95f74522`)— 列 constituent μ_{iχ₂} ∉ Xset W₂(度数 mod |W₁| 論法、
+  X-member ≡0 / grid ≡±1、`certainType_degree_modEq` + |W₁|≠1)。
+- **`caseBXsetExtension`**(`34c707b9`)— dichotomy 拡張 `ν` (basis Irr(L) 上
+  `if ω∈Xset W₂ then Ximg(ω) else xChiExtensionFun`)、`caseBXsetExtension_eq : ν(χ)=Ximg(χ) ∀χ∈Xset W₂`
+  (`caseB_S_member_column_or_irreducible` dichotomy: column=`columnSum`(grid sum, μ∉Xset で交わらず)、
+  irreducible=basis if_pos)。**= cont.¹² で isolate した hard blocker を解消**。
+
+**▶ 残 = (P3') cX coherence の 4 field + (P4) glue + (P5) wire**(extension は完成、building block 完備):
+- **cX = `IsCoherent (Xset W₂)`** with `extension := caseBXsetExtension Ximg`(Ximg = caseB_Xset_member_anchored の
+  X を Classical.choose、a も):
+  - extension_inner_eq: span_induction₂ + `caseBXsetExtension_eq` + `inner_eq_of_anchored_varying`。
+  - extends_on_supported: ⚠ **要 新 generation 補題 `mem_span_scaledDiff_of_mem_zSupportedSpan`**
+    (supported degree-0 φ → span{χᵢ−dᵢχ₁}、∵ ∑cᵢdᵢ=0 ⟹ φ=∑cᵢ(χᵢ−dᵢχ₁); `mem_span_columnDiff_…` の
+    varying-degree 版、未存在=要構築 ~50-80行)→ `eq_on_zSpan_of_eq_on` + `anchoredImage_scaledDiff_eq`。
+  - extension_mem_ZIrr: `caseBXsetExtension_eq` + bundle の X∈ZIrr。
 - **(P4)** Y と glue(`coherentUnion_of_glued_…`、`coherentCertainTypeSet_union_Yset_caseB` template)。
 - **(P5)** seed → `nonempty_coherent_S_caseB` → S08:59 case-B 枝。
+- **見積**: 残 = generation 補題 + cX wrapper(4 field) + glue + wire ≈ 1 fresh session(extension は済、
+  唯一の新 math = generation 補題の線形代数、他は building block 配線)。hDeg 不要(cont.¹²)。
 - **見積**: extension map = fresh session 1 本(dichotomy basis 構成 + μ∉Xset 構造補題 + 4 coherence field
   配線、building block は ↑で完備ゆえ純 assembly)。hDeg 不要(cont.¹²)。
 
