@@ -909,6 +909,34 @@ theorem proposition_type_classification [Finite G]
           OddOrder.GroupTheory.IsTypeV M) := by
   sorry
 
+/-- **Type I and non-Type-I are mutually exclusive** (corollary of Proposition
+16.1(a)–(d)).  A maximal subgroup of a minimal simple group of odd order that is
+Type I cannot also be one of Types II–V.
+
+The proof reads the type dictionary of `proposition_type_classification`: clause
+(a) says Type I `⟺ M ∈ ℳ_𝓕` (`S14.IsTypeF`), while clauses (b)–(d) place each of
+Types II–V in `ℳ_𝓟` (`S14.IsTypeP`) — Type II in `ℳ_𝓟₂`, Types III/IV/V in
+`ℳ_𝓟₁`.  Since `ℳ_𝓕` and `ℳ_𝓟` are complementary
+(`S14.isTypeF_iff_not_isTypeP`), the two cannot coincide.
+
+Used by `OddOrder.section16MaximalPair_of_isMinimalSimpleOdd` to discharge the
+all-Type-I branch of Peterfalvi (8.8): the case-(b) witness of (12.17) is a
+non-Type-I maximal subgroup, contradicting "every maximal subgroup is Type I". -/
+theorem not_isTypeI_of_isTypeNonI [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    {M : Subgroup G} (hM : M ∈ maximalSubgroups G)
+    (hNonI : OddOrder.GroupTheory.IsTypeNonI M) :
+    ¬ OddOrder.GroupTheory.IsTypeI M := by
+  intro hI
+  obtain ⟨hIa, hIIb, hIII_IVc, hVd, _, _⟩ := proposition_type_classification hG hM
+  -- Type I forces `M ∈ ℳ_𝓕`, hence `M ∉ ℳ_𝓟`.
+  refine S14.isTypeF_iff_not_isTypeP.mp (hIa.mp hI) ?_
+  -- but each non-Type-I alternative places `M ∈ ℳ_𝓟`.
+  rcases hNonI with hII | hIII | hIV | hV
+  · exact S14.isTypeP_of_isTypeP2 (hIIb.mp hII)
+  · exact S14.isTypeP_of_isTypeP1 (hIII_IVc.mp (Or.inl hIII)).1
+  · exact S14.isTypeP_of_isTypeP1 (hIII_IVc.mp (Or.inr hIV)).1
+  · exact S14.isTypeP_of_isTypeP1 (hVd.mp hV).1
+
 /-! ## Theorems I and II: the BG output consumed by Peterfalvi -/
 
 /-- **§16 helper (general, §14-independent).**  A `π`-Hall subgroup `H` of `G` contained in a

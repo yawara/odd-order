@@ -260,11 +260,46 @@ structure Section16CharacterData {G : Type*} [Group G] [Finite G]
           (omega i j - omega i ⟨0, tp.p_prime.pos⟩))
       = (deltaPrime i : ℂ) • (nu i j - nu i ⟨0, tp.p_prime.pos⟩)
 
-/-- **BG §16 maximal-pair producer** (`sorry`) — *lane-g* (BG §16 main results).
+/-- **BG §16 maximal-pair producer** — *lane-g* (BG §16 main results).
 Constructs the maximal pair `S, T`, their type classification, and the case-(b)
-trichotomy of (8.8) from a minimal simple group of odd order. -/
+trichotomy of (8.8) from a minimal simple group of odd order.
+
+This is the first real consumer of the §16 main results.  Peterfalvi (8.8)
+(`maximalSubgroup_type_dichotomy`, repackaging BG Theorem I) gives the dichotomy
+"every maximal subgroup is Type I, or the type-P pair `S, T` covers everything".
+The second branch supplies every field directly.  The first branch is impossible:
+Peterfalvi (12.17) (`theorem88_caseB_holds`, the all-Type-I non-existence argument
+of §7.11/§12) produces a *non-Type-I* maximal subgroup, which contradicts "every
+maximal subgroup is Type I" via the type-exclusivity corollary of Proposition 16.1
+(`not_isTypeI_of_isTypeNonI`). -/
 noncomputable def section16MaximalPair_of_isMinimalSimpleOdd {G : Type*} [Group G] [Finite G]
-    (hG : IsMinimalSimpleOdd G) : Section16MaximalPair G := sorry
+    (hG : IsMinimalSimpleOdd G) : Section16MaximalPair G :=
+  -- First establish case (b) of (8.8) *as a proposition*: the type-P pair exists.
+  -- (`Or`/`Exists` live in `Prop`, so the witnesses must be extracted by choice — the
+  -- dichotomy cannot be `rcases`'d directly into the `Type`-valued structure goal.)
+  have hex : ∃ S T : Subgroup G,
+      S ∈ maximalSubgroups G ∧ T ∈ maximalSubgroups G ∧ S ≠ T ∧
+        IsTypeNonI S ∧ IsTypeNonI T ∧ (IsTypeII S ∨ IsTypeII T) ∧
+          ∀ M : Subgroup G, M ∈ maximalSubgroups G →
+            IsTypeI M ∨ (∃ g : G, MulAut.conj g • M = S) ∨ (∃ g : G, MulAut.conj g • M = T) := by
+    rcases Peterfalvi.S10.maximalSubgroup_type_dichotomy hG with hAllI | hpair
+    · -- Case (a) — every maximal subgroup is Type I — is ruled out by (12.17): its
+      -- case-(b) data is a non-Type-I maximal subgroup `cb.S`.
+      obtain ⟨cb⟩ := Peterfalvi.S14.theorem88_caseB_holds hG
+      exact absurd (hAllI cb.S cb.S_maximal)
+        (BG.Ch4.S16.not_isTypeI_of_isTypeNonI hG cb.S_maximal cb.S_nonI)
+    · exact hpair
+  -- Case (b) holds, so the type-P pair `S, T` is exactly the maximal-pair output.
+  have h := hex.choose_spec.choose_spec
+  { S := hex.choose
+    T := hex.choose_spec.choose
+    S_maximal := h.1
+    T_maximal := h.2.1
+    S_ne_T := h.2.2.1
+    S_nonI := h.2.2.2.1
+    T_nonI := h.2.2.2.2.1
+    one_typeII := h.2.2.2.2.2.1
+    theorem88_caseB := h.2.2.2.2.2.2 }
 
 /-- **BG §14 type-P duality producer** (`sorry`) — *lane-f* (BG §14 `typeP_duality`).
 Given the maximal pair, constructs the cyclic structure `W = W₁W₂`, the complements
