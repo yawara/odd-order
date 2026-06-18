@@ -414,6 +414,162 @@ theorem fieldNormalizerComplementTransport_range (hyp : Hypothesis (G := G))
     show (hyp.base.U.subtype.comp eU.symm.toMonoidHom) (eU ⟨g, hg⟩) = g
     simp
 
+/-- **(14.7) σ-bridge assembly.**  Given the full Peterfalvi (14.2)(a) field model
+(the additive isomorphism `e`, the multiplicative character `μ` realizing `U = U*`, the
+`U`-equivariance `hcompat`, the prime-line/`W₂` identification `hW2`), together with the
+standing `P ∩ U = 1`, the cyclotomic coprimality, and part (14.2)(b) data, the concrete
+`FieldNormalizerData` exists.  The embedding `σ` is the `SemidirectProduct.lift` of the
+two transport homomorphisms `fN`, `fU`, glued by (14.2)(a).  Every hypothesis is an
+*input* — the §13 character theory (`basic_structure`, `c_eq_one`) that produces them is
+not invoked here, so this reduction is the ungated heart of (14.7). -/
+theorem fieldNormalizerData_of_repr (hyp : Hypothesis (G := G))
+    (e : letI : Fact hyp.base.p.Prime := ⟨hyp.base.p_prime⟩
+         Additive ↥hyp.base.P ≃+ GaloisField hyp.base.p hyp.base.q)
+    (μ : letI : Fact hyp.base.p.Prime := ⟨hyp.base.p_prime⟩
+         ↥hyp.base.U →* (GaloisField hyp.base.p hyp.base.q)ˣ)
+    (hμ_inj : Function.Injective μ)
+    (hμ_range : letI : Fact hyp.base.p.Prime := ⟨hyp.base.p_prime⟩
+         μ.range = OddOrder.BG.AppC.NormSet.normOneUnits hyp.base.p hyp.base.q)
+    (hUP : ∀ (v : ↥hyp.base.U) (x : ↥hyp.base.P),
+         (v : G) * (x : G) * (v : G)⁻¹ ∈ hyp.base.P)
+    (hcompat : letI : Fact hyp.base.p.Prime := ⟨hyp.base.p_prime⟩
+         ∀ (v : ↥hyp.base.U) (x : ↥hyp.base.P),
+           e (Additive.ofMul (⟨(v : G) * (x : G) * (v : G)⁻¹, hUP v x⟩ : ↥hyp.base.P))
+             = ((μ v : (GaloisField hyp.base.p hyp.base.q)ˣ) :
+                 GaloisField hyp.base.p hyp.base.q) * e (Additive.ofMul x))
+    (hW2 : letI : Fact hyp.base.p.Prime := ⟨hyp.base.p_prime⟩
+         (((Submodule.span (ZMod hyp.base.p)
+             ({(1 : GaloisField hyp.base.p hyp.base.q)} :
+               Set (GaloisField hyp.base.p hyp.base.q))).toAddSubgroup).toSubgroup).map
+           (fieldNormalizerKernelTransport hyp e) = hyp.base.W2)
+    (hPU_disj : hyp.base.P ⊓ hyp.base.U = ⊥)
+    (hcyclotomic :
+       Nat.Coprime ((hyp.base.p ^ hyp.base.q - 1) / (hyp.base.p - 1)) (hyp.base.p - 1))
+    (hQ_elemAb : IsElementaryAbelian hyp.base.q ↥hyp.base.Q)
+    (hW2_norm_Q : hyp.base.W2 ≤ Subgroup.normalizer (hyp.base.Q : Set G))
+    (yQ : G) (hyQ_mem : yQ ∈ hyp.base.Q)
+    (hW2_conj_y : MulAut.conj yQ • hyp.base.W2 ≤ Subgroup.normalizer (hyp.base.U : Set G)) :
+    Nonempty (FieldNormalizerData hyp) := by
+  letI : Fact hyp.base.p.Prime := ⟨hyp.base.p_prime⟩
+  -- the `SemidirectProduct.lift` compatibility: `fN (u • s) = fU u * fN s * (fU u)⁻¹`,
+  -- which is exactly the (14.2)(a) `U`-equivariance `hcompat` transported through the iso.
+  have hcompatLift : ∀ u : OddOrder.BG.AppC.NormSet.normOneUnits hyp.base.p hyp.base.q,
+      (fieldNormalizerKernelTransport hyp e).comp
+          ((OddOrder.BG.AppC.NormSet.normOneMulAction hyp.base.p hyp.base.q u).toMonoidHom)
+        = (MulAut.conj (fieldNormalizerComplementTransport hyp μ hμ_inj hμ_range u)).toMonoidHom.comp
+          (fieldNormalizerKernelTransport hyp e) := by
+    intro u
+    ext s
+    obtain ⟨v, hμv, hfUv⟩ :=
+      fieldNormalizerComplementTransport_exists hyp μ hμ_inj hμ_range u
+    show fieldNormalizerKernelTransport hyp e
+        ((OddOrder.BG.AppC.NormSet.normOneMulAction hyp.base.p hyp.base.q u) s) =
+      fieldNormalizerComplementTransport hyp μ hμ_inj hμ_range u *
+        fieldNormalizerKernelTransport hyp e s *
+        (fieldNormalizerComplementTransport hyp μ hμ_inj hμ_range u)⁻¹
+    rw [hfUv]
+    -- compute the action `u • s = ofAdd (↑u * toAdd s)`
+    have hact : (OddOrder.BG.AppC.NormSet.normOneMulAction hyp.base.p hyp.base.q u) s =
+        Multiplicative.ofAdd (((u : (GaloisField hyp.base.p hyp.base.q)ˣ) :
+            GaloisField hyp.base.p hyp.base.q) *
+            (Multiplicative.toAdd s : GaloisField hyp.base.p hyp.base.q)) := by
+      apply Multiplicative.toAdd.injective
+      rw [toAdd_ofAdd]
+      conv_lhs => rw [← ofAdd_toAdd s]
+      exact OddOrder.BG.AppC.NormSet.normOneMulAction_apply hyp.base.p hyp.base.q u
+        (Multiplicative.toAdd s)
+    rw [hact, fieldNormalizerKernelTransport_apply, fieldNormalizerKernelTransport_apply,
+      toAdd_ofAdd]
+    -- both sides are coercions of `↥P` elements; reduce to the conjugate identity
+    set t : GaloisField hyp.base.p hyp.base.q := Multiplicative.toAdd s with htdef
+    set x : ↥hyp.base.P := Additive.toMul (e.symm t) with hxdef
+    have hex : e (Additive.ofMul x) = t := by
+      rw [hxdef, ofMul_toMul, e.apply_symm_apply]
+    have hkey : Additive.toMul (e.symm (((u : (GaloisField hyp.base.p hyp.base.q)ˣ) :
+          GaloisField hyp.base.p hyp.base.q) * t)) =
+        (⟨(v : G) * (x : G) * (v : G)⁻¹, hUP v x⟩ : ↥hyp.base.P) := by
+      have h1 := hcompat v x
+      rw [hex] at h1
+      have hμvF : ((μ v : (GaloisField hyp.base.p hyp.base.q)ˣ) :
+            GaloisField hyp.base.p hyp.base.q) =
+          ((u : (GaloisField hyp.base.p hyp.base.q)ˣ) :
+            GaloisField hyp.base.p hyp.base.q) := by rw [hμv]
+      rw [hμvF] at h1
+      have h2 : Additive.ofMul (⟨(v : G) * (x : G) * (v : G)⁻¹, hUP v x⟩ : ↥hyp.base.P) =
+          e.symm (((u : (GaloisField hyp.base.p hyp.base.q)ˣ) :
+            GaloisField hyp.base.p hyp.base.q) * t) := by
+        rw [← h1, e.symm_apply_apply]
+      rw [← h2, toMul_ofMul]
+    rw [hkey]
+  -- the field-normalizer embedding `σ`
+  set sigma := SemidirectProduct.lift (fieldNormalizerKernelTransport hyp e)
+    (fieldNormalizerComplementTransport hyp μ hμ_inj hμ_range) hcompatLift with hsigma
+  -- `σ (inl a) (inr b) = fN a * fU b`
+  have hlift_apply : ∀ g : fieldNormalizerFrobeniusGroup hyp,
+      sigma g = fieldNormalizerKernelTransport hyp e g.left *
+        fieldNormalizerComplementTransport hyp μ hμ_inj hμ_range g.right := by
+    intro g
+    rw [hsigma]
+    conv_lhs => rw [← SemidirectProduct.inl_left_mul_inr_right g]
+    rw [map_mul, SemidirectProduct.lift_inl, SemidirectProduct.lift_inr]
+  -- `σ` is injective: kernel meets complement trivially (`P ∩ U = 1`)
+  have hsigma_inj : Function.Injective sigma := by
+    rw [← MonoidHom.ker_eq_bot_iff, eq_bot_iff]
+    intro g hg
+    rw [MonoidHom.mem_ker, hlift_apply] at hg
+    -- `fN g.left = (fU g.right)⁻¹ ∈ P ⊓ U = ⊥`
+    have hPmemP : fieldNormalizerKernelTransport hyp e g.left ∈ hyp.base.P := by
+      rw [← fieldNormalizerKernelTransport_range hyp e]; exact ⟨g.left, rfl⟩
+    have hinv : fieldNormalizerKernelTransport hyp e g.left =
+        (fieldNormalizerComplementTransport hyp μ hμ_inj hμ_range g.right)⁻¹ :=
+      mul_eq_one_iff_eq_inv.mp hg
+    have hUmemU : fieldNormalizerKernelTransport hyp e g.left ∈ hyp.base.U := by
+      rw [hinv]
+      apply Subgroup.inv_mem
+      rw [← fieldNormalizerComplementTransport_range hyp μ hμ_inj hμ_range]
+      exact ⟨g.right, rfl⟩
+    have hbot : fieldNormalizerKernelTransport hyp e g.left = 1 := by
+      have : fieldNormalizerKernelTransport hyp e g.left ∈ hyp.base.P ⊓ hyp.base.U :=
+        ⟨hPmemP, hUmemU⟩
+      rw [hPU_disj] at this
+      simpa using this
+    have hleft : g.left = 1 := fieldNormalizerKernelTransport_injective hyp e (by
+      rw [hbot, map_one])
+    have hfUone : fieldNormalizerComplementTransport hyp μ hμ_inj hμ_range g.right = 1 := by
+      have hg' := hg
+      rw [hbot, one_mul] at hg'
+      exact hg'
+    have hright : g.right = 1 :=
+      fieldNormalizerComplementTransport_injective hyp μ hμ_inj hμ_range (by
+        rw [hfUone, map_one])
+    rw [Subgroup.mem_bot]
+    exact SemidirectProduct.ext hleft hright
+  -- `σ` carries the abstract kernel / complement / prime line onto `P` / `U` / `W₂`
+  have hP : (fieldNormalizerKernel hyp).map sigma = hyp.base.P := by
+    rw [fieldNormalizerKernel, MonoidHom.range_eq_map, Subgroup.map_map, hsigma,
+      SemidirectProduct.lift_comp_inl, ← MonoidHom.range_eq_map,
+      fieldNormalizerKernelTransport_range]
+  have hU : (fieldNormalizerComplement hyp).map sigma = hyp.base.U := by
+    rw [fieldNormalizerComplement, MonoidHom.range_eq_map, Subgroup.map_map, hsigma,
+      SemidirectProduct.lift_comp_inr, ← MonoidHom.range_eq_map,
+      fieldNormalizerComplementTransport_range]
+  have hP0 : (fieldNormalizerPrimeLine hyp).map sigma = hyp.base.W2 := by
+    rw [fieldNormalizerPrimeLine, OddOrder.BG.AppC.NormSet.normOneFrobeniusSubspaceKernel,
+      Subgroup.map_map, hsigma, SemidirectProduct.lift_comp_inl]
+    exact hW2
+  exact ⟨{
+    sigma := sigma
+    sigma_injective := hsigma_inj
+    sigma_P_eq_P := hP
+    sigma_P0_eq_W2 := hP0
+    sigma_U_eq_U := hU
+    cyclotomic_coprime := hcyclotomic
+    Q_elementaryAbelian := hQ_elemAb
+    W2_normalizes_Q := hW2_norm_Q
+    y := yQ
+    y_mem_Q := hyQ_mem
+    W2_conj_y_normalizes_U := hW2_conj_y }⟩
+
 /-- **Peterfalvi (14.7)**: if `U` is characteristic in `H`, then the final
 field-normalizer configuration (14.2) holds. -/
 theorem field_normalizer_of_U_characteristic [Finite G]
