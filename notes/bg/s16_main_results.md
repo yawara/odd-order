@@ -724,9 +724,12 @@ residual modest skeleton queue (lower value, §14-independent): `theoremA/C/E/aS
   `651a2bae`): Pf 8.8 dichotomy case(b) via `Exists.choose` + case(a) all-Type-I 排除 (Pf 12.17
   `theorem88_caseB_holds` + 新補題 `not_isTypeI_of_isTypeNonI` = Prop 16.1 の系). lane-g §16 が初の
   FT spine 実 consumer に. 実 sorry 141→140. (issue 8014 closed.)
-- ✅ **`kappa_join_kstar_le_pair_inf`** (commit `48f4eb04`, axiom-clean): BG Thm I(2) の **forward
-  inclusion `K ⊔ K* ≤ M ⊓ M*`** = `S ∩ T = W` の lane-g 担当半分. 純束論 (`Msigma_le` + duality data
-  hyp: `hKM`/`hKstar`/`hKstarMstar`/`hKdual`). **逆包含 `M ⊓ M* ≤ K ⊔ K*` = lane-f の
-  `S16_PairIntersection` (BG-internal, 作業中)**. lane-f landing 後、`le_antisymm` で `W = S ⊓ T` →
-  `theoremI`/Pf 8.8 に clause 復活 + `Section16MaximalPair` に `W`/`W_eq_inter` field 追加 (struct
-  変更ゆえ要 hub/user 承認). **⟹ lane-f は forward を再形式化不要; この補題を cite して合成すればよい.**
+- ⚠ **`kappa_join_kstar_le_pair_inf` (forward inclusion) は除去済** (commit `48f4eb04` で一旦着地→
+  本セッションで削除): lane-f が **full 等式 `typeP_pair_inf_eq : M ⊓ M* = K ⊔ K*`**
+  (`S16_PairIntersection.lean:73`, BG Thm 14.7(4)/C(6)/I(2)) を landing し (main `1a09c4b7`)、forward を
+  **インライン再導出** (`hfwd`, S16_PairIntersection:93-94) したため、私の forward 補題は consumer-0 の
+  dead code に. CLAUDE.md 「維持負担のみの重複は書かない」方針で削除 (AxiomsCheck 登録も撤去).
+  **⟹ option-1 の clause 復活は `typeP_pair_inf_eq` (full 等式) を直接 cite する.**
+- **option-1 残作業 (lane-f landing 済 → unblock)**: `typeP_pair_inf_eq` を使い
+  `theoremI`/Pf 8.8 に `W = S ⊓ T` clause 復活 + `Section16MaximalPair` に `W`/`W_eq_inter` field 追加
+  (struct 変更ゆえ **要 hub/user 承認**) → typeP producer (`section16TypePStructure`, lane-f) dischargeable に.
