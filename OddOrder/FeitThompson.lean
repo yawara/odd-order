@@ -374,18 +374,22 @@ Type-V case), the cross-member pairing `S ∩ T = W₁(S) × W₁(T)` cyclic (BG
 the normalization `W₁ ≤ N_G(U)` (Peterfalvi (13.1.b)), and the ordering `q < p`. -/
 noncomputable def section16TypePStructure_of_isMinimalSimpleOdd {G : Type*} [Group G] [Finite G]
     (hG : IsMinimalSimpleOdd G) (mp : Section16MaximalPair G) :
-    Section16TypePStructure mp :=
-  let dataS : TypePData mp.S := Classical.choice (typePData_of_isTypeNonI mp.S_nonI)
-  let dataT : TypePData mp.T := Classical.choice (typePData_of_isTypeNonI mp.T_nonI)
-  have residual : (Nat.card ↥dataS.W1).Prime ∧ (Nat.card ↥dataT.W1).Prime ∧
-      mp.S ⊓ mp.T = dataS.W1 ⊔ dataT.W1 ∧ IsCyclic ↥(mp.S ⊓ mp.T) ∧
-      dataS.W1 ⊓ dataT.W1 = ⊥ ∧ (∀ x ∈ dataS.W1, ∀ y ∈ dataT.W1, Commute x y) ∧
-      dataS.W1 ≤ Subgroup.normalizer (dataS.U : Set G) ∧
-      dataT.W1 ≤ Subgroup.normalizer (dataT.U : Set G) ∧
-      Nat.card ↥dataS.W1 < Nat.card ↥dataT.W1 := sorry
-  section16TypePStructure_of_typeData dataS dataT residual.1 residual.2.1 residual.2.2.1
-    residual.2.2.2.1 residual.2.2.2.2.1 residual.2.2.2.2.2.1 residual.2.2.2.2.2.2.1
-    residual.2.2.2.2.2.2.2.1 residual.2.2.2.2.2.2.2.2
+    Section16TypePStructure mp := by
+  -- The single residual obligation: *canonical* type data of `S` and `T` exists for which the
+  -- pairing factors coincide with `S ∩ T`.  Stated existentially (not via an arbitrary
+  -- `Classical.choice`) so that the obligation is a *true*, constructible §16 statement — the
+  -- genuine content (the pairing `S ∩ T = W₁(S) × W₁(T)`, BG §16 / Peterfalvi (8.9)) constrains
+  -- *which* type data is taken.  `typePData_of_isTypeNonI` supplies the data witnesses; the
+  -- pairing/primality/ordering are the §16/§14 mathematics still to be discharged.
+  have h : Nonempty (Σ' (dataS : TypePData mp.S) (dataT : TypePData mp.T),
+        (Nat.card ↥dataS.W1).Prime ∧ (Nat.card ↥dataT.W1).Prime ∧
+        mp.S ⊓ mp.T = dataS.W1 ⊔ dataT.W1 ∧ IsCyclic ↥(mp.S ⊓ mp.T) ∧
+        dataS.W1 ⊓ dataT.W1 = ⊥ ∧ (∀ x ∈ dataS.W1, ∀ y ∈ dataT.W1, Commute x y) ∧
+        dataS.W1 ≤ Subgroup.normalizer (dataS.U : Set G) ∧
+        dataT.W1 ≤ Subgroup.normalizer (dataT.U : Set G) ∧
+        Nat.card ↥dataS.W1 < Nat.card ↥dataT.W1) := sorry
+  obtain ⟨dataS, dataT, hSp, hTp, hjoin, hcyc, hbot, hcomm, hSn, hTn, hlt⟩ := Classical.choice h
+  exact section16TypePStructure_of_typeData dataS dataT hSp hTp hjoin hcyc hbot hcomm hSn hTn hlt
 
 /-- **Peterfalvi §13 coherent Dade-grid producer** (`sorry`) — *lane-b*
 (Peterfalvi §3–§13 coherent grids).  Given the maximal pair and the type-P
