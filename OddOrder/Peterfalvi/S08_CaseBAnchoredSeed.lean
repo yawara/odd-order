@@ -917,6 +917,32 @@ theorem inner_eq_of_anchored_varying
     ClassFunction.inner_smul_left, OddOrder.RepresentationTheory.inner_smul_right, star_natCast]
   rw [hττ, hτiν, hντj, hνν]; ring
 
+/-- **(6.8.2) scaled-difference identity** (the `extends_on_supported` content for the full
+`Xset W₂` coherence).  From two anchored images `τ(χᵢ − aᵢη₁) = Xᵢ − aᵢν₁`, `τ(χ₁ − a₁η₁) =
+X₁ − a₁ν₁` with the **degree ratio** `aᵢ = dᵢ·a₁` (i.e. `χᵢ(1) = dᵢ·χ₁(1)`, integral since `H` is a
+`p`-group), the `ν₁`-terms cancel and `τ` is linear, so the scaled difference maps homogeneously:
+`Xᵢ − dᵢ·X₁ = τ(χᵢ − dᵢ·χ₁)`.
+
+This is the textbook fact that on the supported generators `χᵢ − dᵢχ₁` the running extension
+`τ₂` agrees with `τ` (the `(6.8.2)` `τ₂` defined via the anchored images), generalizing the
+equal-degree column-difference identity to varying degree (cf. `span_subset_span_
+zSupportedSpan_union_anchor_of_scaledDiffs`, the matching generation). -/
+theorem anchoredImage_scaledDiff_eq
+    (hyp : SibleyDadeHypothesis G L H) [H.Normal]
+    {η₁ : ClassFunction ↥L ℂ}
+    {χi χ1 : ClassFunction ↥L ℂ} {ai a1 di : ℕ} {Xi X1 : ClassFunction G ℂ}
+    (hanci : hyp.tau (χi - ai • η₁) = Xi - (ai : ℂ) • hyp.coherentYset.extension η₁)
+    (hanc1 : hyp.tau (χ1 - a1 • η₁) = X1 - (a1 : ℂ) • hyp.coherentYset.extension η₁)
+    (hai : ai = di * a1) :
+    Xi - di • X1 = hyp.tau (χi - di • χ1) := by
+  have hχ : χi - di • χ1 = (χi - ai • η₁) - di • (χ1 - a1 • η₁) := by
+    rw [smul_sub, ← mul_smul, ← hai]; abel
+  have hνcancel : di • ((a1 : ℂ) • hyp.coherentYset.extension η₁)
+      = (ai : ℂ) • hyp.coherentYset.extension η₁ := by
+    rw [← Nat.cast_smul_eq_nsmul ℂ di ((a1 : ℂ) • hyp.coherentYset.extension η₁), smul_smul,
+      ← Nat.cast_mul, ← hai]
+  rw [hχ, map_sub, map_nsmul, hanci, hanc1, smul_sub, hνcancel]; abel
+
 /-- **⚠ NON-VIABLE base (kept as a structural record).**  The map convention here is correct
 (`hyp.tau = dadeIntegralCharacterMap hyp.dade (hyp.dade.fullDadeIsometryData hyp.hconj)` defeq, so
 `xChainCoherentW hyp.dade hyp.hconj` lands at `hyp.tau` — no retargeting), **but the `hstep`
