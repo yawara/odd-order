@@ -35,8 +35,14 @@ case-B の**実事実**で satisfiable — norm-1 anchor のような構造的�
 **▶ 残り = (B2) chain + (B3) seed 配線**(cont.¹⁰ の通り、ただし **真の gate = hDeg = (6.6) hard §6 degree theory**):
 - **(B2) chain** = `xChainCoherentW`(`S08_CoherenceWeighted:556`)を base=`coherentCertainTypeSet_union_Yset_caseB`、
   X-target=`Xset W2 ∪ Y`、cover=irreducible X-pair に fold → `IsCoherent (Xset W2 ∪ Y)` = seed。
-  - **cover** = `caseB_Xset_conjugatePairCover`(既存、非可能 lemma 内で使用)、仮説 `hnonS₀_irr`(非-certainType 列は
-    全 irreducible = (6.8.2) 構造事実)が要 — **要 viability 確認**(norm-1 anchor 同様の罠でないか精査)。
+  - **⚠ cover gap 確認済(2026-06-18)**: `caseB_Xset_conjugatePairCover` の仮説 `hnonS₀_irr`(非-certainType 列は
+    全 irreducible)は **一般には成立しない**。`S08_CaseBEnumeration:36-42` docstring の通り、**degree class k 以外の
+    reducible 列**は `certainTypeSet h46 k` に入らず irreducible でもない ⟹ `Xset W2` を base=`certainTypeSet h46 k`
+    (単一 class)+ irreducible chain で **cover しきれない**(norm-1 anchor とは別の構造 gap)。成立は
+    「`certainTypeSet h46 k` が全 reducible X-member を捕捉する regime(= 単一 degree class)」のみ。
+    ⟹ full seed には **(i) case-B で reducible 列が単一 class と示す**(6.8.2 構造)か **(ii) base を全 class の
+    reducible 列(`certainTypeSet` の class 横断和)に拡張**が要。**= (6.8.2) degree-class 構造理論**(hDeg と別の gate)。
+    私の `coherentCertainTypeSet_union_Yset_caseB`(単一 class k)は正しい building block だが full seed には不足。
   - **per-step `XAdjoinStepInputW`**: anchor=η∈Y(`‖η‖²=1`、hanchorNorm 満足 ✅)、core field
     (Dmem/hortho/htau1)=brick 2 `caseB_member_orthoDatum`、bound assembly=brick 3 `sMember_degreeSqNormBound`
     (Y-anchor で再利用可)。**真の gate = `hDeg : 2a < ∑ deg²/mc`**(=(6.6) degree inequality、FPF bound から、
