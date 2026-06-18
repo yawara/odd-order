@@ -409,4 +409,117 @@ theorem nonempty_coherent_S_caseB_of_anchor
     ⟨coherentXunionYset_caseB hyp h46 hHK hW1 hW2H hcen hderiv hcop hp hHp hprime hW2comm hW2cenL
       hc2 hFPF hη₁ hYcard hη₁1 hanchor hχ₁1 hdvd hnonzero⟩
 
+/-- **Minimal-degree `p`-power anchor for `X(W₂)`.**  In case (B) (`H` a `p`-group), a minimal-degree
+`X`-member `χ₁` divides every other: its degree ratio is a positive natural.  This is the case-(B)
+analogue of `exists_charValue_one_eq_mul_xBaseBlock_anchor`, but with the minimality coming from a
+direct minimum-degree selection (`Set.exists_min_image` over `(f 1).re`) rather than from membership
+in an equal-degree base block.  Every `X`-member's `H`-degree is a power of `p`
+(`exists_charValue_one_eq_prime_pow_of_isPGroup`), so the minimal one divides all the others
+(`p^{k₁} ∣ p^{k}`), and the `L`-degree ratio `χ(1)/χ₁(1) = p^{k−k₁}` is a positive natural.
+
+This discharges the anchor obligation `hanchor`/`hχ₁1`/`hdvd` of `coherentXunionYset_caseB`. -/
+theorem exists_caseB_Xset_anchor (hyp : SibleyDadeHypothesis G L H) [H.Normal]
+    {p : ℕ} (hp : p.Prime) (hHp : IsPGroup p ↥H)
+    {W2 : Subgroup ↥L} (hXne : (hyp.Xset W2).Nonempty) :
+    ∃ χ₁ ∈ hyp.Xset W2, χ₁ 1 ≠ 0 ∧
+      ∀ f ∈ hyp.Xset W2, ∃ d : ℕ, (f : ClassFunction ↥L ℂ) 1 = (d : ℂ) * χ₁ 1 := by
+  classical
+  haveI : Fact p.Prime := ⟨hp⟩
+  letI : H.Normal := hyp.H_normal
+  haveI : Fintype ↥H := Fintype.ofFinite _
+  -- per-member: `f(1) = |W₁|·a` with `a = θ_f(1)` a positive power of `p`.
+  have hdeg : ∀ f ∈ hyp.Xset W2, ∃ a : ℕ, 0 < a ∧ (∃ k, a = p ^ k) ∧
+      f 1 = ((Nat.card hyp.W1 * a : ℕ) : ℂ) := by
+    intro f hf
+    have hfS := hyp.Xset_subset_S hf
+    rw [hyp.S_eq] at hfS
+    obtain ⟨θ, -, hfeq⟩ := hfS
+    obtain ⟨a, ha_pos, ha⟩ := irreducibleCharacter_apply_one_eq_pos_natCast θ
+    obtain ⟨k, hk⟩ := θ.2.exists_charValue_one_eq_prime_pow_of_isPGroup hHp
+    have hak : a = p ^ k := by exact_mod_cast ha.symm.trans hk
+    exact ⟨a, ha_pos, ⟨k, hak⟩, by
+      rw [hfeq, OddOrder.RepresentationTheory.ClassFunction.induce_apply_one, ha,
+        hyp.index_H_eq_card_W1]; push_cast; ring⟩
+  -- select a minimum-degree member `χ₁` (by `(f 1).re`).
+  obtain ⟨χ₁, hχ₁X, hχ₁min⟩ :=
+    Set.exists_min_image (hyp.Xset W2) (fun f => (f 1).re) (hyp.Xset_finite W2) hXne
+  obtain ⟨a₁, ha₁pos, ⟨k₁, ha₁k₁⟩, hχ₁deg⟩ := hdeg χ₁ hχ₁X
+  have hW1pos : 0 < Nat.card hyp.W1 := Nat.card_pos
+  have hχ₁1ne : χ₁ 1 ≠ 0 := by
+    rw [hχ₁deg]; exact_mod_cast (Nat.mul_pos hW1pos ha₁pos).ne'
+  refine ⟨χ₁, hχ₁X, hχ₁1ne, fun f hf => ?_⟩
+  obtain ⟨a, ha_pos, ⟨k, hak⟩, hfdeg⟩ := hdeg f hf
+  -- minimality: `(χ₁ 1).re ≤ (f 1).re`, i.e. `|W₁|·a₁ ≤ |W₁|·a`, so `a₁ ≤ a`, so `k₁ ≤ k`.
+  have hmin := hχ₁min f hf
+  rw [hχ₁deg, hfdeg, Complex.natCast_re, Complex.natCast_re] at hmin
+  have ha₁a : a₁ ≤ a := Nat.le_of_mul_le_mul_left (by exact_mod_cast hmin) hW1pos
+  have hkk₁ : k₁ ≤ k := by
+    rw [hak, ha₁k₁] at ha₁a; exact (Nat.pow_le_pow_iff_right hp.one_lt).mp ha₁a
+  -- the ratio is `p^{k−k₁}`.
+  refine ⟨p ^ (k - k₁), ?_⟩
+  have hap : a = p ^ (k - k₁) * a₁ := by rw [hak, ha₁k₁, ← pow_add]; congr 1; omega
+  rw [hfdeg, hχ₁deg]
+  have hrw : Nat.card hyp.W1 * a = p ^ (k - k₁) * (Nat.card hyp.W1 * a₁) := by rw [hap]; ring
+  rw [hrw]; push_cast; ring
+
+/-- **Peterfalvi (6.8) case-(B): `S` is coherent (from the structural data).**  The case-(B)
+counterpart of `nonempty_coherent_S_caseA_of_frobenius`, reduced to the (6.4)/(6.5) case-(B)
+structural facts: the minimal-degree anchor `χ₁` and its divisibility `hdvd` are built internally
+(`exists_caseB_Xset_anchor`), the nonzero supported witness from a conjugate difference
+`χ̄ − χ` (`caseB_irr_conj_diff_support`, nonzero since `X(W₂)` has no real characters), and the
+`Y`-anchor from `Yset_nonempty`.
+
+The remaining inputs — the central/derived/coprime data, the prime `W₂`, the index bounds `hc2`,
+the FPF bounds `hFPF`/`hfpf`/`hcZ`, the `Y`-cardinality side condition `hYcard`, and the
+non-degeneracy `hXne` — are exactly the case-(B) structure that the dispatch supplies at
+`sibleySetup_is_coherent`. -/
+theorem nonempty_coherent_S_caseB_of_structure
+    (hyp : SibleyDadeHypothesis G L H) [H.Normal] [Fintype ↥H]
+    (h46 : OddOrder.Peterfalvi.S06.Hypothesis46 (sharpImage H) L) (hHK : h46.K = H)
+    (hW1 : h46.W1 = hyp.W1)
+    [NeZero (Nat.card h46.W1)] [Invertible (Nat.card ↥h46.K : ℂ)]
+    [Fintype ↥(h46.W1 ⊔ h46.W2)] [Invertible (Nat.card ↥(h46.W1 ⊔ h46.W2) : ℂ)]
+    [Fintype (OddOrder.Peterfalvi.S06.ticVdiff h46).W]
+    [Invertible (Nat.card (OddOrder.Peterfalvi.S06.ticVdiff h46).W : ℂ)]
+    [h46.W2.Normal] [Invertible (Nat.card ↥h46.W2 : ℂ)]
+    [Fintype ↥(h46.W2.subgroupOf H)] [Invertible (Nat.card ↥(h46.W2.subgroupOf H) : ℂ)]
+    (hW2H : h46.W2 ≤ H) (hcen : h46.W2.subgroupOf H ≤ Subgroup.center ↥H)
+    (hderiv : h46.W2.subgroupOf H ≤ commutator ↥H)
+    (hcop : Nat.Coprime (Nat.card ↥H) (Nat.card hyp.W1))
+    {p : ℕ} (hp : p.Prime) (hHp : IsPGroup p ↥H)
+    (hprime : (Nat.card h46.W2).Prime) (hW2comm : h46.W2 ≤ ⁅H, H⁆)
+    (hW2cenL : h46.W2 ≤ Subgroup.center ↥L)
+    (hc2 : 2 ≤ (h46.W2.subgroupOf H).index)
+    (hFPF : (h46.W2.index : ℤ) < ((h46.W2.subgroupOf H).index : ℤ) ^ 2)
+    (hcZ : 2 ≤ Nat.card ↥(h46.W2.subgroupOf H))
+    (hfpf : (2 * Nat.card hyp.W1 + 1) ^ 2 ≤ Nat.card (↥H ⧸ h46.W2.subgroupOf H))
+    (hYcard : hyp.Yset.ncard ≠ 2) (hXne : (hyp.Xset h46.W2).Nonempty) :
+    Nonempty (OddOrder.Peterfalvi.S07.IsCoherent hyp.tau hyp.S
+      (OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L)) := by
+  classical
+  -- the minimal-degree `X`-anchor and its divisibility.
+  obtain ⟨χ₁, hanchor, hχ₁1, hdvd⟩ := exists_caseB_Xset_anchor hyp hp hHp hXne
+  -- the `Y`-anchor `η₁` (degree `|W₁| ≠ 0`).
+  obtain ⟨η₁, hη₁⟩ := hyp.Yset_nonempty
+  have hη₁1 : η₁ (1 : ↥L) ≠ 0 := by
+    obtain ⟨dη, hdη_pos, hdη_eq⟩ := irreducibleCharacter_apply_one_eq_pos_natCast
+      (⟨η₁, hyp.isIrreducibleCharacter_of_mem_Yset hη₁⟩ : IrreducibleCharacter ↥L)
+    simp only [IrreducibleCharacter.coe_mk] at hdη_eq
+    rw [hdη_eq]; exact_mod_cast hdη_pos.ne'
+  -- a nonzero supported witness: a conjugate difference `χ̄ − χ` of an `X`-member.
+  obtain ⟨χ, hχ⟩ := hXne
+  have hχconj : χ.conj ∈ hyp.Xset h46.W2 := hyp.Xset_closedUnderConjugate_unconditional h46.W2 hχ
+  have hχne : χ ≠ χ.conj := fun heq =>
+    (Xset_hasNoRealCharacters_caseB hyp h46 hHK).not_mem_of_isReal (heq.symm : χ.IsReal) hχ
+  have hχS := hyp.Xset_subset_S hχ
+  rw [hyp.S_eq, Set.mem_setOf_eq] at hχS
+  obtain ⟨θ, -, hθeq⟩ := hχS
+  have hnonzero : ∃ φ : ClassFunction ↥L ℂ, φ ∈ OddOrder.Peterfalvi.S07.zSupportedSpan
+      (hyp.Xset h46.W2) (OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L) ∧ φ ≠ 0 :=
+    ⟨χ.conj - χ, ⟨Submodule.sub_mem _ (Submodule.subset_span hχconj) (Submodule.subset_span hχ),
+        by rw [hθeq]; exact caseB_irr_conj_diff_support hyp θ⟩,
+      sub_ne_zero.mpr (Ne.symm hχne)⟩
+  exact nonempty_coherent_S_caseB_of_anchor hyp h46 hHK hW1 hW2H hcen hderiv hcop hp hHp hprime
+    hW2comm hW2cenL hc2 hFPF hcZ hfpf hη₁ hYcard hη₁1 hanchor hχ₁1 hdvd hnonzero
+
 end OddOrder.Peterfalvi.S08
