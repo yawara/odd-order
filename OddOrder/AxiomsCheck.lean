@@ -5178,14 +5178,6 @@ themselves cite no `sorry`. -/
 #assert_only_allowed_axioms OddOrder.BG.Ch4.S16.isTypeII_of_typePData
 #assert_only_allowed_axioms OddOrder.BG.Ch4.S16.isTypeV_of_typePData
 
-/-! **BG Theorem I(2), forward inclusion** (`S16_MainResults`, `kappa_join_kstar_le_pair_inf`):
-`K ⊔ K* ≤ M ⊓ M*`, the lane-g half of `S ∩ T = W`.  A pure subgroup-lattice fact from the
-type-P duality data (`K ≤ M` setup, `K = M*_σ ⊓ C(K*) ≤ M*`, `K* = M_σ ⊓ C(K) ≤ M`,
-`K* ≤ M*`); the reverse inclusion is BG-internal (lane-f, `S16_PairIntersection`).
-Fully unconditional, axiom-clean. -/
-
-#assert_only_allowed_axioms OddOrder.BG.Ch4.S16.kappa_join_kstar_le_pair_inf
-
 /-! # Peterfalvi Appendices (Lane H)
 
 Axiom-cleanliness guards for the sorry-free Peterfalvi-appendix results
