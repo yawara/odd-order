@@ -2237,16 +2237,37 @@ theorem characteristic_of_isCyclic {C : Type*} [Group C] [Finite C] [IsCyclic C]
   conv_rhs => rw [key K]
   rw [hcard_eq]
 
-/-- **Peterfalvi (14.12) structural input**: in the `L ≅ M` case, `H = L_F` is cyclic.  By (14.11)
-`K = V` with `|M : K| = p q`, (14.4) `v = (q^p−1)/(q−1)`, and (13.12) the dual `d = 1`, the kernel
-`K = V` is cyclic (`VW₂` is a Frobenius group with abelian kernel `V`); since `L ≅ M` gives
-`H ≅ K`, `H` is cyclic.  The §13/§14 character-theory obligation (Lane B) feeding the (14.12)
-reduction to (14.7). -/
+/-- **Peterfalvi (14.11)/(14.4)/(13.12)**: the Fitting kernel `K = M_F` of the type-I maximal
+subgroup `M` over `N_G(V)` is cyclic.  By (14.11) `K = V` with `|M : K| = p q`, (14.4)
+`v = (q^p − 1)/(q − 1)`, and (13.12) the dual constant `d = 1`, so `K = V` is the abelian —
+indeed cyclic — Frobenius kernel of `V W₂`.  This is the genuine §13/§14 character-theoretic
+obligation (Lane B) feeding the (14.12) reduction; the `L ≅ M` case of (14.12) transports it to
+`H = L_F` purely structurally (`H_cyclic_of_L_conj_M`). -/
+theorem MHypothesis_kernel_cyclic [Finite G]
+    (_hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
+    (Mdata : MHypothesis hyp) : IsCyclic ↥Mdata.K := sorry
+
+/-- **Peterfalvi (14.12) structural input**: in the `L ≅ M` case, `H = L_F` is cyclic.  Since
+`L ≅ M` (a conjugation `MulAut.conj g`), the maximal nilpotent normal Hall subgroup is
+automorphism-equivariant (`maxNilpotentNormalHall_pointwise_smul`), so `H = L_F ≅ M_F = K`;
+cyclicity of `K` is the §13/§14 obligation `MHypothesis_kernel_cyclic`.  This reduction is
+purely structural — the character theory is confined to `MHypothesis_kernel_cyclic`. -/
 theorem H_cyclic_of_L_conj_M [Finite G]
     (_hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
     (Ldata : LHypothesis hyp) (Mdata : MHypothesis hyp)
     (_hconj : ∃ g : G, MulAut.conj g • Ldata.L = Mdata.M) :
-    IsCyclic ↥Ldata.H := sorry
+    IsCyclic ↥Ldata.H := by
+  obtain ⟨g, hg⟩ := _hconj
+  haveI := MHypothesis_kernel_cyclic _hG hyp Mdata
+  rw [Ldata.H_eq_LF]
+  -- `M_F` is the `conj g`-image of `L_F`: `conj g • L_F = (conj g • L)_F = M_F = K`.
+  have hmap : (maxNilpotentNormalHall Ldata.L).map ((MulAut.conj g : MulAut G) : G →* G)
+      = Mdata.K := by
+    rw [← pointwise_mulAut_smul_eq_map, maxNilpotentNormalHall_pointwise_smul, hg, Mdata.K_eq_MF]
+  set e : ↥(maxNilpotentNormalHall Ldata.L) ≃* ↥Mdata.K :=
+    (MulEquiv.subgroupMap (MulAut.conj g) (maxNilpotentNormalHall Ldata.L)).trans
+      (MulEquiv.subgroupCongr hmap) with he
+  exact isCyclic_of_surjective e.symm.toMonoidHom e.symm.surjective
 
 /-- **Peterfalvi (14.12)**: if `L` is conjugate to `M`, then the field-normalizer configuration
 (14.2) holds.  Textbook reduction: `L ≅ M ⟹ H ≅ K` cyclic (`H_cyclic_of_L_conj_M`), so every

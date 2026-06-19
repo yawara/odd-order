@@ -336,3 +336,36 @@ Lane B の Dade 指標論に bottom-out。
 - 既証明 expertise: lane-h の BG §14 type-P 構造 (typeP_duality `S14_TypePCounting.lean:7961`)
 - 関連: 8014 / 7005 / 1004 (POLE-1)。caveat: 本件は Peterfalvi §14 (field automorphism/Dade) で
   BG §14 とは別物 — lane-h は territory 学習が要る
+
+## 2026-06-19 再開¹² — M_F 自己同型同変性 (reusable infra) + H_cyclic 構造化 (`8e6b3379`)
+
+ユーザー方針「sorry 数でなく FT 寄与・B/F と領域分離・安定 signature 引用」を受け、POLE-2 frontier を
+**実証的に全マッピング**した上で、reusable building block を landing。
+
+### FT-path Peterfalvi frontier マッピング (consumer grep で確定)
+- **Pf §10 (S10_MinimalSimpleStructure) はほぼ全 orphaned** (0 consumers; `dadeSupportHypotheses_typeP`
+  のみ S12 が cite)。typeF Frobenius chain (`typeF_card_U0_eq_exponent`/`typeF_frobenius_of_card_eq_exponent`)
+  も 0 consumers。⟹ §10 で作業しても FT に繋がらない ([[ft-path-policy]] 裏付け)。
+- **FT-path の Pf producer は §12-§16 の深い char/構造**: `basic_structure`(13.2, char-Prop fields 込)、
+  `typeII_overNormalizer_frobenius`(13.17, 構造的だが case 分析 + 多数 cite)、`typeI_frobenius`(12.7,
+  minimal counterexample 12.8-16 = char)。いずれも cite-and-assemble だが assembly 入力自体が深い。
+  前セッションが cite-and-assemble を出し尽くし済 → 残りは producer 証明本体 (Lane B 領域の char + 構造)。
+- ファイル命名 offset 確認: repo S11=Pf §9 / S12=§10 / S13=§11 / S14=§12 / S15=§13。
+
+### 本セッション landing (FT 寄与 + B/F 非衝突 + 安定 signature)
+- **`maxNilpotentNormalHall_pointwise_smul`** (`GroupTheory/MaxNilpotentNormalHall.lean`, axiom-clean,
+  AxiomsCheck 登録): `φ • M_F = (φ • M)_F` (任意 `φ : MulAut G`)。候補集合の 4 条件 (≤/Normal/Nilpotent/Hall)
+  が自己同型不変 + sSup 保存 (le_sSup/sSup_le adjunction)。**BG §13 / Pf §13 の `L_F`/`M_F` 共役論法の
+  reusable building block** — 特に Pf (13.17) 証明 (L^g=S 矛盾で L_F 共役を使う) で必要。
+  helper: `map_subgroupMap_subgroupOf` (subgroupOf の φ-image)、`pointwise_mulAut_smul_eq_map`。
+- **`H_cyclic_of_L_conj_M` (14.12, POLE-2 の L≅M 枝) を sorry-free 化**: L≅M (conj g) ⟹ 上記同変性で
+  `H=L_F ≅ M_F=K` ⟹ char 内容 (K cyclic) を canonical obligation **`MHypothesis_kernel_cyclic`**
+  (Pf (14.11)/(14.4)/(13.12): K=V は VW₂ の cyclic Frobenius kernel) に isolate。POLE-2 の L≅M 枝が
+  「純構造 reduction + 単一 char gate」に。real sorry 133 不変 (sorry 再配置)。
+
+### 次セッション pickup (FT-path, 同変性 building block を使う)
+- **`typeII_overNormalizer_frobenius` (13.17, S15_SAndT)** が最有力 — POLE-2 の `exists_LHypothesis` が
+  直接 cite、carrier に char-Prop 無し (構造的)、同変性が証明の building block。Pf 原文 (pp.81-82) の証明:
+  (a) L~S を type-II def + Hall 共役で除外、L~T を (13.2.a) で除外 → (8.8.b4) type-I → (12.7) Frobenius;
+  (b) U⊆H = (8.17.a)+(9.1); (c) 補元 = [H]Satz 8.18 + (13.16) + BG Prop 3.9 (`S03g_Thm310`) + Sylow。
+  ∃ maximal L⊇N_G(U) は proper⊆maximal で provable。cite 先 (12.7/13.2.a/8.8 dichotomy/BG 3.9) は repo 在。
