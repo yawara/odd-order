@@ -126,6 +126,18 @@ theorem maxNilpotentNormalHall_isNilpotent [Finite G] (M : Subgroup G) :
   exact nilpotent_of_mulEquiv
     (Subgroup.subgroupOfEquivOfLe (maxNilpotentNormalHall_le_fittingInG M))
 
+/-- **`M_F` absorbs every nilpotent normal Hall subgroup** (`§14`-independent): a subgroup `N ≤ M`
+that is `M`-normal (`(N.subgroupOf M).Normal`), nilpotent, and a Hall `π(N)`-subgroup of `M`
+(`IsHallSubgroup (Nat.card ↥N).primeFactors (N.subgroupOf M)`) is one of the candidates in the
+`sSup` defining `M_F = maxNilpotentNormalHall M`, hence `≤ M_F`.  This is the `le_sSup` half of the
+`M_F` characterization (the converse `M_F ≤ M_σ` is `maxNilpotentNormalHall_le_Msigma`); it supplies
+`Q ≤ M_F` in Theorem 15.2 once `Q = O_q(M)` is shown to be such a subgroup. -/
+theorem le_maxNilpotentNormalHall {M N : Subgroup G} (hNM : N ≤ M)
+    (hNnorm : (N.subgroupOf M).Normal) (hNnil : Group.IsNilpotent ↥(N.subgroupOf M))
+    (hNhall : OddOrder.Isaacs.Ch03.IsHallSubgroup (Nat.card ↥N).primeFactors (N.subgroupOf M)) :
+    N ≤ maxNilpotentNormalHall M :=
+  le_sSup ⟨hNM, hNnorm, hNnil, hNhall⟩
+
 /-- If `M_σ` is nilpotent, then `M_σ ≤ M_F`: `M_σ` is then a nilpotent normal Hall subgroup of
 `M` (normal `σ`-core, `σ`-Hall by `Msigma_isHall`, nilpotent by hypothesis), hence one of the
 candidates in the `sSup` defining `M_F`.  `§14`-independent.  Combined with the (gated)
@@ -2178,6 +2190,7 @@ structure described in the text. -/
 theorem mf_ne_msigma_typeP1_structure [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M K Kstar : Subgroup G}
     (hM : M ∈ maximalSubgroups G) (hne : MF M ≠ OddOrder.BG.Ch3.S10.Msigma M)
+    (hKM : K ≤ M)
     (hK : Ch03.IsHallSubgroup (S14.kappa M) (K.subgroupOf M))
     (hKstar : Kstar = OddOrder.BG.Ch3.S10.Msigma M ⊓ Subgroup.centralizer (K : Set G)) :
     S14.IsTypeP1 M ∧
@@ -5135,7 +5148,7 @@ theorem fitting_decomposition [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
   · -- ### Case II: `M_σ` not nilpotent, `M_F ≠ M_σ`, so `M` is type `P1` and `F(M) ⊆ M_σ`.
     obtain ⟨_hP1, Q, _Q0, _D, _p, _q, _, _, _, _, _, _, _, hQsubMF, _, _, _, _, _, _, hMσderiv,
         _, hFsubMσ, hFQ, hMFnc⟩ :=
-      mf_ne_msigma_typeP1_structure hG hM hcase hKHall rfl
+      mf_ne_msigma_typeP1_structure hG hM hcase (Subgroup.map_subtype_le K') hKHall rfl
     -- In Case II: `F(M) ⊆ M_σ`, so `Y = O_{σ'}(F(M)) = ⊥` and `F(M) = F(M_σ)`.
     -- `Y = ⊥`: `F(M) ⊆ M_σ` is a `σ`-group, so its `σ'`-Hall core is trivial.
     have hYbot : Y = ⊥ := by
@@ -5320,7 +5333,7 @@ theorem typeP_kstar_in_mf [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     by_cases hMF : MF M = OddOrder.BG.Ch3.S10.Msigma M
     · rw [hKstar, hMF]; exact inf_le_left
     · obtain ⟨_, _, _, _, _, _, _, _, _, _, _, _, hk, _⟩ :=
-        mf_ne_msigma_typeP1_structure hG hM hMF hK hKstar
+        mf_ne_msigma_typeP1_structure hG hM hMF hKM hK hKstar
       exact hk
   -- `M_F` cyclic ⟹ `F(M)` cyclic:  Corollary 15.5 (`fitting_decomposition`, last conjunct).
   obtain ⟨_, _, _, _, _, _, _, _, _, _, _, hFcyc⟩ := fitting_decomposition hG hM
