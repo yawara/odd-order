@@ -1392,6 +1392,52 @@ noncomputable def coherentXunionYset_centralCommutator_of_glued_withDiagonal_gen
       (fun φ hφ => hyp.isIrreducibleCharacter_of_mem_Yset hφ) hdisj)
     hmixed D hDτ hgen
 
+/-- **(6.8) L3 outer shell — diagonal-aware form, case (c2) case (A).**  The certain-type case-(A)
+analogue of `coherentXunionYset_centralCommutator_of_glued_withDiagonal_general`: glues the
+case-(A) `X(⁅H,H⁆)`-coherence `cX` (from `Xset_centralCommutator_isCoherent_of_c2_caseA`) and the
+`Y`-coherence `cY` into `X(⁅H,H⁆) ∪ Y`-coherence.  Identical to the Frobenius version except the
+(5.2.e) `X ⊥ Y` orthogonality uses the case-(A) irreducibility
+`isIrreducibleCharacter_of_mem_Xset_c2_caseA` (`W₁` FPF on `Z(H) ∩ ⁅H,H⁆` from math-(A), via the
+case-(A) datum `hA : Z(H) ⊓ W₂ = ⊥`) in place of the Frobenius
+`isIrreducibleCharacter_of_mem_Xset_of_frobenius`. -/
+noncomputable def coherentXunionYset_centralCommutator_of_glued_withDiagonal_of_c2_caseA
+    (hyp : SibleyDadeHypothesis G L H) [H.Normal]
+    {cert : OddOrder.Peterfalvi.S06.CertainTypeHypothesis (sharpImage H) L}
+    (hK : cert.K = H) (hW1 : cert.W1 = hyp.W1)
+    (hA : Subgroup.center ↥H ⊓ cert.W2.subgroupOf H = ⊥)
+    (cX : OddOrder.Peterfalvi.S07.IsCoherent hyp.tau (hyp.Xset hyp.centralCommutator)
+      (OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L))
+    (cY : OddOrder.Peterfalvi.S07.IsCoherent hyp.tau hyp.Yset
+      (OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L))
+    (ν : OddOrder.Peterfalvi.S07.IntegralCharacterMap (↥L) G)
+    (hagreeX : ∀ x ∈ hyp.Xset hyp.centralCommutator, ν x = cX.extension x)
+    (hagreeY : ∀ y ∈ hyp.Yset, ν y = cY.extension y)
+    (hmixed : ∀ x ∈ hyp.Xset hyp.centralCommutator, ∀ y ∈ hyp.Yset,
+      ClassFunction.inner (ν x) (ν y) = ClassFunction.inner x y)
+    (D : Set (ClassFunction ↥L ℂ))
+    (hDτ : ∀ d ∈ D, ν d = hyp.tau d)
+    (hgen : OddOrder.Peterfalvi.S07.zSupportedSpan (L := ↥L)
+      (hyp.Xset hyp.centralCommutator ∪ hyp.Yset)
+      (OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L) ⊆
+        Submodule.span ℤ
+          (OddOrder.Peterfalvi.S07.zSupportedSpan (L := ↥L) (hyp.Xset hyp.centralCommutator)
+            (OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L) ∪
+          OddOrder.Peterfalvi.S07.zSupportedSpan (L := ↥L) hyp.Yset
+            (OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L) ∪ D)) :
+    OddOrder.Peterfalvi.S07.IsCoherent hyp.tau (hyp.Xset hyp.centralCommutator ∪ hyp.Yset)
+      (OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L) := by
+  have hdisj : Disjoint (hyp.Xset hyp.centralCommutator) hyp.Yset := by
+    have hYsub : hyp.Yset ⊆ hyp.SsubFiltration hyp.centralCommutator := by
+      rw [Yset]; exact hyp.SsubFiltration_antitone hyp.centralCommutator_le_commutator
+    exact Set.disjoint_of_subset_right hYsub
+      (hyp.disjoint_Xset_SsubFiltration (Z := hyp.centralCommutator))
+  exact OddOrder.Peterfalvi.S07.coherentUnion_of_glued_of_generator_mixed_inner_eq_withDiagonal
+    cX cY ν hagreeX hagreeY
+    (inner_eq_zero_of_mem_span_of_disjoint_irreducible
+      (fun φ hφ => hyp.isIrreducibleCharacter_of_mem_Xset_c2_caseA hK hW1 hA hφ)
+      (fun φ hφ => hyp.isIrreducibleCharacter_of_mem_Yset hφ) hdisj)
+    hmixed D hDτ hgen
+
 /-- L3 outer shell at the fixed witnesses (specialization of
 `coherentXunionYset_centralCommutator_of_glued_withDiagonal_general`). -/
 noncomputable def coherentXunionYset_centralCommutator_of_glued_withDiagonal_of_frobenius
