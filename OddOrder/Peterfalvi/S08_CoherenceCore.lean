@@ -2156,17 +2156,17 @@ theorem normalizer_map_subtype_eq (hyp : SibleyDadeHypothesis G L H) [H.Normal] 
           rw [Subgroup.normalizer_eq_top_iff.mpr ‹H.Normal›]
       _ ≤ Subgroup.normalizer (H.map L.subtype) := H.le_normalizer_map L.subtype
 
-/-- **(6.7)-wiring step (a): the kernel `H`, mapped into `G`, is a Sylow `p`-subgroup of `G`.**
-
-Peterfalvi (6.7) is stated for a Sylow `p`-subgroup `P` of `G` with `L = N_G(P)`; the (6.8.1)
-application uses it at `P = H` (modulus `|H|`).  Peterfalvi (6.8)(a) only assumes `H^#` TI with
-normalizer `L`, which alone does *not* force `H` Sylow — but in the **Frobenius case** it does:
-`H ◁ L` with complement `W₁` of coprime order makes `H` the unique (normal) Sylow `p`-subgroup of
-`↥L`, so every `p`-subgroup of `↥L` (in particular `Q ⊓ L` for any Sylow `Q ⊇ Ĥ`) lies in `H`;
-combined with `N_G(Ĥ) ≤ L` (from `H^#` TI, `Ĥ := H.map L.subtype`) and the self-normalizing-Sylow
-criterion `sylow_coe_eq_of_normalizer_inf_le`, this forces `Ĥ ∈ Syl_p(G)`. -/
-theorem sylow_map_subtype_of_frobenius (hyp : SibleyDadeHypothesis G L H) [H.Normal]
-    (hF : OddOrder.Isaacs.Ch06.IsFrobeniusGroup (↥L) H hyp.W1)
+/-- **`Ĥ = H.map L.subtype` is a Sylow `p`-subgroup of `G`, from the Hall coprimality** — the
+coprimality-only core of `sylow_map_subtype_of_frobenius`.  Peterfalvi (6.8)(a) only assumes `H^#`
+TI with normalizer `L`, which alone does *not* force `H` Sylow; the only extra input is
+`gcd(|H|, |W₁|) = 1` (Frobenius: `hF.coprime_card_kernel_complement`; (6.8)(c2): the `cases` Hall
+side condition).  With `H` a `p`-group and `H ◁ L` with coprime complement `W₁`, `H` is the unique
+normal Sylow `p`-subgroup of `↥L`, so every `p`-subgroup of `↥L` (e.g. `Q ⊓ L` for a Sylow
+`Q ⊇ Ĥ`) lies in `H`; with `N_G(Ĥ) ≤ L` (`H^#` TI) and the self-normalizing-Sylow criterion
+`sylow_coe_eq_of_normalizer_inf_le`, this forces `Ĥ ∈ Syl_p(G)`.  (Lifted from `S08_CaseBCoherence`;
+both Frobenius and case-(A)/(B) (6.7)-wirings delegate here.) -/
+theorem sylow_map_subtype_of_coprime (hyp : SibleyDadeHypothesis G L H) [H.Normal]
+    (hcop : Nat.Coprime (Nat.card ↥H) (Nat.card hyp.W1))
     {p : ℕ} (hp : p.Prime) (hHp : IsPGroup p ↥H) :
     ∃ Q : Sylow p G, (Q : Subgroup G) = H.map L.subtype := by
   haveI : Fact p.Prime := ⟨hp⟩
@@ -2183,8 +2183,6 @@ theorem sylow_map_subtype_of_frobenius (hyp : SibleyDadeHypothesis G L H) [H.Nor
     · exact dvd_pow_self p (Nat.succ_ne_zero n)
   have hpidx : ¬ p ∣ H.index := by
     rw [hyp.index_H_eq_card_W1]
-    have hcop : Nat.Coprime (Nat.card ↥H) (Nat.card hyp.W1) :=
-      hF.coprime_card_kernel_complement
     exact (hp.coprime_iff_not_dvd).mp (Nat.Coprime.coprime_dvd_left hpH hcop)
   -- `H` is the unique (normal) Sylow `p`-subgroup of `↥L`.
   set HSyl : Sylow p ↥L := hHp.toSylow hpidx with hHSyl_def
@@ -2210,6 +2208,18 @@ theorem sylow_map_subtype_of_frobenius (hyp : SibleyDadeHypothesis G L H) [H.Nor
   have hx'H : (⟨x, hxL⟩ : ↥L) ∈ H :=
     hpsub _ hQLp (Subgroup.mem_comap.mpr (by exact hx.2))
   exact Subgroup.mem_map.mpr ⟨⟨x, hxL⟩, hx'H, rfl⟩
+
+/-- **(6.7)-wiring step (a): the kernel `H`, mapped into `G`, is a Sylow `p`-subgroup of `G`.**
+
+Peterfalvi (6.7) is stated for a Sylow `p`-subgroup `P` of `G` with `L = N_G(P)`; the (6.8.1)
+application uses it at `P = H` (modulus `|H|`).  In the **Frobenius case**, `H ◁ L` with complement
+`W₁` of coprime order (`hF.coprime_card_kernel_complement`) makes `H` Sylow; delegates to the
+coprimality core `sylow_map_subtype_of_coprime`. -/
+theorem sylow_map_subtype_of_frobenius (hyp : SibleyDadeHypothesis G L H) [H.Normal]
+    (hF : OddOrder.Isaacs.Ch06.IsFrobeniusGroup (↥L) H hyp.W1)
+    {p : ℕ} (hp : p.Prime) (hHp : IsPGroup p ↥H) :
+    ∃ Q : Sylow p G, (Q : Subgroup G) = H.map L.subtype :=
+  hyp.sylow_map_subtype_of_coprime hF.coprime_card_kernel_complement hp hHp
 
 open scoped OddOrder.AlgInt in
 /-- **(6.7)-wiring capstone: Peterfalvi (6.7) specialized to the Sibley Frobenius setup.**
