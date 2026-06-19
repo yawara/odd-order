@@ -245,4 +245,40 @@ theorem six_three_c2 (hyp : SibleyDadeHypothesis G L H) [H.Normal]
   rw [← hAeqM]
   exact hAcoh
 
+/-- **Peterfalvi (6.3) consequence, case (c2): the abelianization bound from non-coherence.**  The
+`hbound : |Abelianization H| ≤ 4|W₁|²+1` of the (6.5)/(6.8) reduction, certain-type case.  Mirror of
+the index-bound part of `isPGroup_of_not_coherent` (`S08_CoherenceCorePart2:3818-3830`): apply
+`six_three_c2` with `M = ⊥`, `H₁ = ⁅H,H⁆` (so `S(⊥) = S` would be coherent if `|H:⁅H,H⁆| > 4|L:H|²+1`,
+contradicting `hSncoh`); `S(⁅H,H⁆) = Y` is coherent (`coherentYset`).  Feeds the c2 `p`-group
+reduction `exists_isPGroup_H_of_c2_of_card_le`. -/
+theorem abelianization_card_le_of_not_coherent_c2 (hyp : SibleyDadeHypothesis G L H) [H.Normal]
+    (h46 : OddOrder.Peterfalvi.S06.Hypothesis46 (sharpImage H) L) (hHK : h46.K = H)
+    (hW1 : h46.W1 = hyp.W1)
+    [NeZero (Nat.card h46.W1)] [Invertible (Nat.card ↥h46.K : ℂ)]
+    [Fintype ↥(h46.W1 ⊔ h46.W2)] [Invertible (Nat.card ↥(h46.W1 ⊔ h46.W2) : ℂ)]
+    [Fintype (OddOrder.Peterfalvi.S06.ticVdiff h46).W]
+    [Invertible (Nat.card (OddOrder.Peterfalvi.S06.ticVdiff h46).W : ℂ)]
+    (hSncoh : ¬ Nonempty (OddOrder.Peterfalvi.S07.IsCoherent hyp.tau hyp.S
+      (OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L))) :
+    Nat.card (Abelianization ↥H) ≤ 4 * Nat.card hyp.W1 ^ 2 + 1 := by
+  letI : H.Normal := hyp.H_normal
+  letI : Group.IsNilpotent ↥H := hyp.H_nilpotent
+  haveI : Nontrivial ↥H := (Subgroup.nontrivial_iff_ne_bot H).mpr hyp.H_ne_bot
+  have hcommlt : (⁅H, H⁆ : Subgroup ↥L) < H := by
+    have h1 : _root_.commutator ↥H < ⊤ := IsSolvable.commutator_lt_top_of_nontrivial ↥H
+    rw [← commutator_subgroupOf_self] at h1
+    refine lt_of_le_of_ne (Subgroup.commutator_le_left H H) (fun heq => ?_)
+    rw [heq, Subgroup.subgroupOf_self] at h1
+    exact lt_irrefl _ h1
+  have hidx : Nat.card (↥H ⧸ (⁅H, H⁆ : Subgroup ↥L).subgroupOf H) ≤ 4 * H.index ^ 2 + 1 := by
+    by_contra hgt
+    rw [not_le] at hgt
+    have hYcoh : Nonempty (OddOrder.Peterfalvi.S07.IsCoherent hyp.tau (hyp.SsubFiltration ⁅H, H⁆)
+        (OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L)) := ⟨hyp.coherentYset⟩
+    have hMcoh := six_three_c2 hyp h46 hHK hW1 (M := ⊥) (H₁ := ⁅H, H⁆) bot_le le_rfl hYcoh hgt
+    rw [hyp.SsubFiltration_bot] at hMcoh
+    exact hSncoh hMcoh
+  rw [commutator_subgroupOf_self, hyp.index_H_eq_card_W1] at hidx
+  exact hidx
+
 end OddOrder.Peterfalvi.S08
