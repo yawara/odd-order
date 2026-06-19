@@ -90,6 +90,24 @@ bottom-out** するので、clean 化には §15 foundation が先。真の順�
 
 ## 進捗ログ
 
+**2026-06-19 conjunct 4 (BG 15.1(e)) — K=⊥ DONE + K≠⊥ engine/packaging DONE, kernel isolated**:
+- `06278a11`: K=⊥ branch (type F) of `typeP_hall_frobenius_factor` (Thm 12.12(b))。sorry-free。
+- `49e1a380`: K≠⊥ の **assembly 層を全て sorry-free 化** + kernel を最小 per-prime 補題へ隔離:
+  - `isFrobeniusGroup_of_regular_le_maximal` (sorry-free): `isFrobeniusGroup_of_regular` の E-setup-free
+    一般化 (`U0≤M` + `M_σ⊓U0=⊥` + regularity を直接取る)。
+  - `frobenius_factor_of_regular_components` (sorry-free): U abelian + per-prime regular component
+    `Z_p` から `U0=⊔Z_p` (exp U0=exp U, U0M_σ Frobenius) を組む engine。
+  - `typeP_hall_regular_component_at_prime` (**唯一の残 sorry**): p∣|U| → regular p-component Z_p≤Sylow_p(U)
+    of full p-exponent。`typeP_hall_frobenius_factor` 自体は sorry-free (engine+helper に委譲)。
+  - K≠⊥ branch = `M_σ⊓U=⊥` (coprimality) + engine 適用。**sorry count 不変** (K≠⊥ の sorry が
+    最小 per-prime helper へ relocate)。full build 3862 green。
+- **kernel の shared linchpin (確定)**: τ1∪τ3 (partition coverage `pRank_M_le_two` で r_p=1) も
+  τ2 (regular cyclic machinery) も **両方とも type-P M の E-setup with U≤E を要求**。`pRank_M_le_two`
+  (S12_ECore:267) と `mem_tau_union_of_mem_primeFactors` (S12_ECore:295) は E-setup メソッド、τ2 機械
+  (`exists_cyclic_Enormal_regular_of_CES_eq` 等) も E-setup 取る。⟹ **次の一手 = type-P M の E-setup
+  (E=KU σ-complement, U≤E) を構成** (`subgroupESetup_of_complement` S12_Proposition1215:194 は private、
+  M=KUM_σ から M_σ⊓KU=⊥ ∧ M_σ⊔KU=M を示し E=KU で適用、または de-private wrapper)。これが linchpin。
+
 **2026-06-19 conjunct 1 (BG Lemma 15.1(b)) DONE** (`cab5603a`): standalone clean lemma
 `typeP_hall_derived_eq_and_abelian` (S15_MF.lean, `typeP_auxiliary_structure_gated` 直前) =
 `K≠⊥ → M'=U⊔M_σ ∧ IsMulCommutative U`。sorry-free + axiom-clean、full build 3862 green。
