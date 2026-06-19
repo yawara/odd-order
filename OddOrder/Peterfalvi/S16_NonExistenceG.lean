@@ -1929,6 +1929,50 @@ theorem h_modEq_one_mod_p_and_q [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd
 
 end NonConjugateHypothesis
 
+/-- **Fixed-point-free congruence** (the mod-`p` analogue of the `U⋊W₁` Frobenius congruence,
+group-theoretic core).  If a subgroup `A` of prime order `p` normalizes a finite group `U` and
+acts on it fixed-point-freely by conjugation, then `|U| ≡ 1 (mod p)`.  The conjugation action of
+the `p`-group `A` on `U` has `{1}` as its only fixed point, so the `p`-group fixed-point
+congruence `Nat.card U ≡ Nat.card (fixedPoints) (mod p)` gives `|U| ≡ 1 (mod p)`. -/
+theorem card_modEq_one_of_prime_normalizing_fpf {G : Type*} [Group G] [Finite G]
+    {U A : Subgroup G} {p : ℕ} (hp : p.Prime) (hA_card : Nat.card ↥A = p)
+    (hA_norm : A ≤ Subgroup.normalizer (U : Set G))
+    (hfpf : ∀ a ∈ A, a ≠ 1 → ∀ u ∈ U, u ≠ 1 → (a : G) * u * (a : G)⁻¹ ≠ u) :
+    Nat.card ↥U ≡ 1 [MOD p] := by
+  letI : MulAction ↥A ↥U := MulAction.compHom ↥U (Subgroup.inclusion hA_norm)
+  have hpg : IsPGroup p ↥A := IsPGroup.of_card (by rw [hA_card, pow_one])
+  -- the conjugation `smul` is `a • u = a u a⁻¹`
+  have hsmul : ∀ (a : ↥A) (u : ↥U), ((a • u : ↥U) : G) = (a : G) * (u : G) * (a : G)⁻¹ := by
+    intro a u; rfl
+  -- the only fixed point is `1`
+  haveI : Nontrivial ↥A :=
+    Finite.one_lt_card_iff_nontrivial.mp (by rw [hA_card]; exact hp.one_lt)
+  obtain ⟨a0, ha0⟩ := exists_ne (1 : ↥A)
+  have ha0G : (a0 : G) ≠ 1 := fun h => ha0 (Subtype.ext h)
+  have hfix_eq : MulAction.fixedPoints ↥A ↥U = {(1 : ↥U)} := by
+    ext u
+    simp only [Set.mem_singleton_iff]
+    constructor
+    · intro hu
+      by_contra hune
+      have huG : (u : G) ≠ 1 := fun h => hune (Subtype.ext h)
+      have hfixa : ((a0 • u : ↥U) : G) = (u : G) :=
+        congrArg (Subtype.val) (hu a0)
+      rw [hsmul] at hfixa
+      exact hfpf (a0 : G) a0.2 ha0G (u : G) u.2 huG hfixa
+    · rintro rfl
+      intro a
+      apply Subtype.ext
+      rw [hsmul]
+      simp
+  have hfix_card : Nat.card (MulAction.fixedPoints ↥A ↥U) = 1 := by
+    rw [hfix_eq]
+    haveI := Set.uniqueSingleton (1 : ↥U)
+    exact Nat.card_unique
+  haveI : Fact (Nat.Prime p) := ⟨hp⟩
+  have hcong := hpg.card_modEq_card_fixedPoints (α := ↥U)
+  rwa [hfix_card] at hcong
+
 namespace Hypothesis
 
 /-- **Peterfalvi (14.5)** fixed-point-free cardinal consequence for `U`:
@@ -1953,6 +1997,27 @@ theorem u_modEq_one_mod_q [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
       (le_sup_right : hyp.base.W1 ≤ hyp.base.U ⊔ hyp.base.W1)).toEquiv
   have hmod := data.UW1_frobenius.card_kernel_modEq_one
   rwa [hU_sub_card, hW1_sub_card, hU_card, ← hyp.base.q_eq_card_W1] at hmod
+
+/-- **Peterfalvi (14.7)** fixed-point-free congruence for `U` modulo `p`.  The conjugate
+`W₂^y` has order `p = |W₂|`; if it acts fixed-point-freely on `U` — as it does in (14.7), since
+`W₂^y` lies in the complement of the type-I Frobenius subgroup `L ⊇ N_G(U)` whose kernel
+contains `U` — then `|U| ≡ 1 mod p`, hence (using `|U| = u` by (13.12)) `u ≡ 1 mod p`.  This is
+the mod-`p` analogue of `u_modEq_one_mod_q`; it discharges the `hu_mod_p` input of the (14.7)
+value argument from the fixed-point-free action. -/
+theorem u_modEq_one_mod_p_of_fpf [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hyp : Hypothesis (G := G)) {y : G}
+    (hW2y_norm : (MulAut.conj y • hyp.base.W2 : Subgroup G) ≤
+      Subgroup.normalizer (hyp.base.U : Set G))
+    (hfpf : ∀ a ∈ (MulAut.conj y • hyp.base.W2 : Subgroup G), a ≠ 1 →
+      ∀ u ∈ hyp.base.U, u ≠ 1 → a * u * a⁻¹ ≠ u) :
+    hyp.base.u ≡ 1 [MOD hyp.base.p] := by
+  have hW2y_card : Nat.card ↥(MulAut.conj y • hyp.base.W2 : Subgroup G) = hyp.base.p := by
+    rw [hyp.base.p_eq_card_W2]
+    exact (Nat.card_congr (Subgroup.equivSMul (MulAut.conj y) hyp.base.W2).toEquiv).symm
+  have hU_card : Nat.card ↥hyp.base.U = hyp.base.u := by
+    rw [hyp.base.card_U_eq_uc, OddOrder.Peterfalvi.S15.c_eq_one hG hyp.base, mul_one]
+  have h := card_modEq_one_of_prime_normalizing_fpf hyp.base.p_prime hW2y_card hW2y_norm hfpf
+  rwa [hU_card] at h
 
 end Hypothesis
 
