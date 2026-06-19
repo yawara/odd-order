@@ -2021,6 +2021,86 @@ theorem u_modEq_one_mod_p_of_fpf [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd
 
 end Hypothesis
 
+/-- **A Frobenius complement acts fixed-point-freely on its kernel** (ambient-group form).
+If `↥L` is a Frobenius group with kernel `H.subgroupOf L` and complement `compl`, and `H ≤ L`,
+then every `a ≠ 1` lying — as a `G`-element — in the complement image `compl.map L.subtype`
+conjugates no nontrivial `u ∈ H` to itself: `a * u * a⁻¹ ≠ u`.  This transports
+`IsFrobeniusGroup.conj_frobenius` from `↥L` down to `G` through `L.subtype`; it supplies the
+`hfpf` input of `Hypothesis.u_modEq_one_mod_p_of_fpf` once Peterfalvi (14.5) places `W₂^y` in
+the Frobenius complement of `L` and `U ⊆ H` (13.17.b). -/
+theorem isFrobeniusGroup_conj_ne_of_mem_map_complement
+    {L H : Subgroup G} {compl : Subgroup ↥L}
+    (hfrob : OddOrder.Isaacs.Ch06.IsFrobeniusGroup ↥L (H.subgroupOf L) compl)
+    (hHL : H ≤ L) {a : G} (ha_mem : a ∈ compl.map L.subtype) (ha_ne : a ≠ 1)
+    {u : G} (hu_mem : u ∈ H) (hu_ne : u ≠ 1) :
+    a * u * a⁻¹ ≠ u := by
+  obtain ⟨a', ha'_compl, ha'_eq⟩ := Subgroup.mem_map.mp ha_mem
+  have ha'_ne : a' ≠ 1 := by
+    intro h
+    rw [h] at ha'_eq
+    exact ha_ne (by simpa using ha'_eq.symm)
+  have hmemL : u ∈ L := hHL hu_mem
+  have hu'_ker : (⟨u, hmemL⟩ : ↥L) ∈ H.subgroupOf L := by
+    rw [Subgroup.mem_subgroupOf]; exact hu_mem
+  have hu'_ne : (⟨u, hmemL⟩ : ↥L) ≠ 1 := fun h => hu_ne (congrArg Subtype.val h)
+  have hconj := hfrob.conj_frobenius a' ha'_compl ha'_ne ⟨u, hmemL⟩ hu'_ker hu'_ne
+  intro hcontra
+  apply hconj
+  apply Subtype.coe_injective
+  show ((a' * ⟨u, hmemL⟩ * a'⁻¹ : ↥L) : G) = ((⟨u, hmemL⟩ : ↥L) : G)
+  rw [MulMemClass.coe_mul, MulMemClass.coe_mul, InvMemClass.coe_inv,
+    show ((a' : G)) = a from ha'_eq]
+  exact hcontra
+
+/-- **Peterfalvi (14.7) value-argument input, assembled from (14.3)/(13.17)/(14.5).**
+With the type-I-over-`N_G(U)` carrier `Ldata` — so `L ⊇ N_G(U)` is a Frobenius group (13.17.a)
+with kernel `H ⊇ U` (13.17.b) — and `U` characteristic in `H` (the standing hypothesis of
+(14.7)), the element `y ∈ Q` produced by (14.5) places `W₂^y` in the Frobenius complement of `L`.
+Then `W₂^y` normalizes `U` (it normalizes `H ◁ L`, and `U` is characteristic in `H`) and acts
+fixed-point-freely on `U` (it is a nontrivial complement element acting on the kernel), so by
+`Hypothesis.u_modEq_one_mod_p_of_fpf`, `u ≡ 1 (mod p)`.  This discharges the fixed-point-free
+input of the (14.7) value argument from the structural carrier, reducing it to the (14.5)
+membership `W₂^y ≤ complement`. -/
+theorem u_modEq_one_mod_p_of_LHypothesis [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {hyp : Hypothesis (G := G)}
+    (Ldata : LHypothesis hyp)
+    (hchar : (hyp.base.U.subgroupOf Ldata.H).Characteristic)
+    {y : G}
+    (hW2y_compl : (MulAut.conj y • hyp.base.W2 : Subgroup G) ≤
+      Ldata.typeI_data.frobenius.complement.map (Ldata.typeI_data.L).subtype) :
+    hyp.base.u ≡ 1 [MOD hyp.base.p] := by
+  haveI : (hyp.base.U.subgroupOf Ldata.H).Characteristic := hchar
+  -- `U ≤ H` (13.17.b)
+  have hU_le_H : hyp.base.U ≤ Ldata.H := by
+    rw [← Ldata.typeI_data_H_eq]; exact Ldata.typeI_data.U_le_H
+  -- the Frobenius kernel base `typeI.typeF.H` is `H`
+  have hH0_eq_typeIH : Ldata.typeI_data.frobenius.typeI.typeF.H = Ldata.typeI_data.H := by
+    rw [Ldata.typeI_data.frobenius.typeI.typeF.H_eq, Ldata.typeI_data.H_eq_LF]
+  have hH0_eq_H : Ldata.typeI_data.frobenius.typeI.typeF.H = Ldata.H :=
+    hH0_eq_typeIH.trans Ldata.typeI_data_H_eq
+  -- `W₂^y ≤ N_G(U)` : each `a` normalizes `H ◁ L`, and `U` is characteristic in `H`
+  have hW2y_norm : (MulAut.conj y • hyp.base.W2 : Subgroup G) ≤
+      Subgroup.normalizer (hyp.base.U : Set G) := by
+    intro a ha
+    have ha_L : a ∈ Ldata.L := by
+      obtain ⟨a', -, ha'eq⟩ := Subgroup.mem_map.mp (hW2y_compl ha)
+      rw [← Ldata.typeI_data_L_eq, ← ha'eq]; exact a'.2
+    have ha_normH : a ∈ Subgroup.normalizer (Ldata.H : Set G) := by
+      have hLnorm := OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_le_normalizer Ldata.L ha_L
+      rwa [← Ldata.H_eq_LF] at hLnorm
+    have hmem := OddOrder.BG.Ch1.S03f.mem_normalizer_map_subtype_of_characteristic
+      (W := Ldata.H) (C := hyp.base.U.subgroupOf Ldata.H) ha_normH
+    rwa [Subgroup.map_subgroupOf_eq_of_le hU_le_H] at hmem
+  -- `W₂^y` acts fixed-point-freely on `U` (Frobenius complement on the kernel)
+  have hfpf : ∀ a ∈ (MulAut.conj y • hyp.base.W2 : Subgroup G), a ≠ 1 →
+      ∀ u ∈ hyp.base.U, u ≠ 1 → a * u * a⁻¹ ≠ u := by
+    intro a ha ha_ne u hu hu_ne
+    refine isFrobeniusGroup_conj_ne_of_mem_map_complement
+      Ldata.typeI_data.frobenius.frobenius
+      Ldata.typeI_data.frobenius.typeI.typeF.H_le (hW2y_compl ha) ha_ne ?_ hu_ne
+    rw [hH0_eq_H]; exact hU_le_H hu
+  exact Hypothesis.u_modEq_one_mod_p_of_fpf hG hyp hW2y_norm hfpf
+
 /-- The two alternatives of **Peterfalvi (14.14)**. -/
 structure OrthogonalitySwitchData {hyp : Hypothesis (G := G)}
     (nc : NonConjugateHypothesis hyp) where
