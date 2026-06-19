@@ -60,4 +60,121 @@ theorem SibleyDadeHypothesis.member_isIrreducible_of_W2_le
     exact absurd hψ (hyp.columnSum_notMem_SsubFiltration_of_le h46 hHK hAW2 hχ₂)
   · exact hirr
 
+/-- **Peterfalvi (6.2) per-step index bound, case (c2)** (`six_two_index_bound` analogue).
+
+From `S(A)` coherent and `S(B)` not coherent (`S(A) ⊆ S(B)`), there is a break character
+`ψ ∈ S(B)` with `|H : A| − 1 ≤ 2·ψ(1)`.  Mirror of the Frobenius `six_two_index_bound`
+(`S08_CoherenceCorePart2:3576`) with the three-brick swap:
+* break pair from `exists_coherentBreakPair_general` (no all-irreducible requirement);
+* `S(B)` real-free from `S_hasNoRealCharacters_caseB`;
+* the (6.2) bound from `sSubFiltration_sum_le_two_psi_caseB`, whose `hψirr` is discharged by
+  `member_isIrreducible_of_W2_le` (using `W₂ ≤ B`), and whose `Y`-anchor `η ∈ Yset` lies in `S₁`
+  because `Y = S(⁅H,H⁆) ⊆ S(A) ⊆ S₁` (using `A ≤ ⁅H,H⁆`).
+The bound's `|L:H|·(|H:A|−1) ≤ 2ψ(1)·η(1)` is divided by `η(1) = |W₁| = |L:H|` to the stated form. -/
+theorem six_two_index_bound_c2 (hyp : SibleyDadeHypothesis G L H) [H.Normal]
+    (h46 : OddOrder.Peterfalvi.S06.Hypothesis46 (sharpImage H) L) (hHK : h46.K = H)
+    (hW1 : h46.W1 = hyp.W1)
+    [NeZero (Nat.card h46.W1)] [Invertible (Nat.card ↥h46.K : ℂ)]
+    [Fintype ↥(h46.W1 ⊔ h46.W2)] [Invertible (Nat.card ↥(h46.W1 ⊔ h46.W2) : ℂ)]
+    [Fintype (OddOrder.Peterfalvi.S06.ticVdiff h46).W]
+    [Invertible (Nat.card (OddOrder.Peterfalvi.S06.ticVdiff h46).W : ℂ)]
+    {A B : Subgroup ↥L} [A.Normal]
+    (hAB : hyp.SsubFiltration A ⊆ hyp.SsubFiltration B)
+    (hAcomm2 : A ≤ ⁅H, H⁆) (hW2B : h46.W2 ≤ B)
+    (hSAcoh : Nonempty (OddOrder.Peterfalvi.S07.IsCoherent hyp.tau (hyp.SsubFiltration A)
+      (OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L)))
+    (hSBncoh : ¬ Nonempty (OddOrder.Peterfalvi.S07.IsCoherent hyp.tau (hyp.SsubFiltration B)
+      (OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L))) :
+    ∃ ψ, ψ ∈ hyp.SsubFiltration B ∧
+      (Nat.card (↥H ⧸ A.subgroupOf H) : ℝ) - 1 ≤ 2 * (ψ 1).re := by
+  obtain ⟨S₁, ψ, hS₁conj, hAS₁, hS₁B, hψB, hψnotS1, hψcnotS1, hS₁coh, hncoh⟩ :=
+    exists_coherentBreakPair_general hyp.tau hAB (hyp.SsubFiltration_finite B)
+      (hyp.SsubFiltration_closedUnderConjugate B)
+      ((S_hasNoRealCharacters_caseB hyp h46 hHK).mono hyp.SsubFiltration_subset_S)
+      (hyp.SsubFiltration_closedUnderConjugate A) hSAcoh hSBncoh
+  have hψirr : IsIrreducibleCharacter ψ := hyp.member_isIrreducible_of_W2_le h46 hHK hW2B hψB
+  obtain ⟨η, hηY⟩ := hyp.Yset_nonempty
+  have hYsubA : hyp.Yset ⊆ hyp.SsubFiltration A := hyp.SsubFiltration_antitone hAcomm2
+  have hηS₁ : η ∈ S₁ := hAS₁ (hYsubA hηY)
+  have hψS : ψ ∈ hyp.S := hyp.SsubFiltration_subset_S hψB
+  have hbound := sSubFiltration_sum_le_two_psi_caseB hyp h46 hHK hW1
+    (hS₁B.trans hyp.SsubFiltration_subset_S) hS₁conj
+    ((hyp.SsubFiltration_finite B).subset hS₁B) hS₁coh.some hAS₁ hηY hηS₁
+    hψS hψirr hψnotS1 hψcnotS1 hncoh
+  have hηre : (η 1).re = (Nat.card hyp.W1 : ℝ) := by
+    rw [hyp.Yset_apply_one hηY, Complex.natCast_re]
+  have hidx : (H.index : ℝ) = (Nat.card hyp.W1 : ℝ) := by exact_mod_cast hyp.index_H_eq_card_W1
+  have hHpos : (0 : ℝ) < (H.index : ℝ) := by rw [hidx]; exact_mod_cast Nat.card_pos
+  refine ⟨ψ, hψB, ?_⟩
+  rw [hηre, ← hidx] at hbound
+  have hX : (H.index : ℝ) * ((Nat.card (↥H ⧸ A.subgroupOf H) : ℝ) - 1)
+      ≤ (H.index : ℝ) * (2 * (ψ 1).re) := by
+    calc (H.index : ℝ) * ((Nat.card (↥H ⧸ A.subgroupOf H) : ℝ) - 1)
+        ≤ 2 * (ψ 1).re * (H.index : ℝ) := hbound
+      _ = (H.index : ℝ) * (2 * (ψ 1).re) := by ring
+  exact le_of_mul_le_mul_left hX hHpos
+
+/-- **Peterfalvi (6.2), central case `C = H`, case (c2)** (`six_two_central` analogue).
+With `B ⊆ D ≤ H` (`B` as `N = B.subgroupOf H`), `D/B` central in `H/B`, `S(A)` coherent, `S(B)` not:
+`|H:A| − 1 ≤ 2|L:H|·√|H:D|`.  Mirror of `six_two_central` (`S08_CoherenceCorePart2:3669`), already
+Frobenius-free apart from the (6.2) per-step call, which becomes `six_two_index_bound_c2`; the θ-bound
+`psi_degree_le_of_source_central` is unchanged (it consumes only `H_normal`). -/
+theorem six_two_central_c2 (hyp : SibleyDadeHypothesis G L H) [H.Normal]
+    (h46 : OddOrder.Peterfalvi.S06.Hypothesis46 (sharpImage H) L) (hHK : h46.K = H)
+    (hW1 : h46.W1 = hyp.W1)
+    [NeZero (Nat.card h46.W1)] [Invertible (Nat.card ↥h46.K : ℂ)]
+    [Fintype ↥(h46.W1 ⊔ h46.W2)] [Invertible (Nat.card ↥(h46.W1 ⊔ h46.W2) : ℂ)]
+    [Fintype (OddOrder.Peterfalvi.S06.ticVdiff h46).W]
+    [Invertible (Nat.card (OddOrder.Peterfalvi.S06.ticVdiff h46).W : ℂ)]
+    {A B : Subgroup ↥L} [A.Normal] [B.Normal]
+    (hAB : hyp.SsubFiltration A ⊆ hyp.SsubFiltration B)
+    (hAcomm2 : A ≤ ⁅H, H⁆) (hW2B : h46.W2 ≤ B)
+    (D : Subgroup ↥H) (hND : B.subgroupOf H ≤ D)
+    (hcentral : D.map (QuotientGroup.mk' (B.subgroupOf H)) ≤
+      Subgroup.center (↥H ⧸ B.subgroupOf H))
+    (hSAcoh : Nonempty (OddOrder.Peterfalvi.S07.IsCoherent hyp.tau (hyp.SsubFiltration A)
+      (OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L)))
+    (hSBncoh : ¬ Nonempty (OddOrder.Peterfalvi.S07.IsCoherent hyp.tau (hyp.SsubFiltration B)
+      (OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L))) :
+    (Nat.card (↥H ⧸ A.subgroupOf H) : ℝ) - 1 ≤ 2 * (H.index : ℝ) * Real.sqrt (D.index : ℝ) := by
+  obtain ⟨ψ, hψB, hψbound⟩ :=
+    six_two_index_bound_c2 hyp h46 hHK hW1 hAB hAcomm2 hW2B hSAcoh hSBncoh
+  rw [hyp.mem_SsubFiltration] at hψB
+  obtain ⟨θ, _hθne, hθkerB, hψeq⟩ := hψB
+  have hψdeg := hyp.psi_degree_le_of_source_central θ D hND hθkerB hcentral
+  rw [hψeq] at hψbound
+  calc (Nat.card (↥H ⧸ A.subgroupOf H) : ℝ) - 1
+      ≤ 2 * (ClassFunction.induce H (θ : ClassFunction ↥H ℂ) 1).re := hψbound
+    _ ≤ 2 * ((H.index : ℝ) * Real.sqrt (D.index : ℝ)) := by linarith [hψdeg]
+    _ = 2 * (H.index : ℝ) * Real.sqrt (D.index : ℝ) := by ring
+
+/-- **Peterfalvi (6.3) per-step index bound, case (c2)** (`six_three_index_bound` analogue).
+For a section `B ⊆ A ⊆ H₁` with `A/B` central in `H/B`, `S(A)` coherent and `S(B)` not, the (6.2)
+central bound combines with the arithmetic core `six_three_HH1_le` to give
+`|H:H₁| ≤ 4|L:K|² + 1` (`K = H`).  Mirror of `six_three_index_bound`
+(`S08_CoherenceCorePart2:3699`); only the (6.2) call becomes `six_two_central_c2`. -/
+theorem six_three_index_bound_c2 (hyp : SibleyDadeHypothesis G L H) [H.Normal]
+    (h46 : OddOrder.Peterfalvi.S06.Hypothesis46 (sharpImage H) L) (hHK : h46.K = H)
+    (hW1 : h46.W1 = hyp.W1)
+    [NeZero (Nat.card h46.W1)] [Invertible (Nat.card ↥h46.K : ℂ)]
+    [Fintype ↥(h46.W1 ⊔ h46.W2)] [Invertible (Nat.card ↥(h46.W1 ⊔ h46.W2) : ℂ)]
+    [Fintype (OddOrder.Peterfalvi.S06.ticVdiff h46).W]
+    [Invertible (Nat.card (OddOrder.Peterfalvi.S06.ticVdiff h46).W : ℂ)]
+    {A B H₁ : Subgroup ↥L} [A.Normal] [B.Normal] (hBA : B ≤ A) (hAH₁ : A ≤ H₁)
+    (hAcomm2 : A ≤ ⁅H, H⁆) (hW2B : h46.W2 ≤ B)
+    (hcentral : (A.subgroupOf H).map (QuotientGroup.mk' (B.subgroupOf H)) ≤
+      Subgroup.center (↥H ⧸ B.subgroupOf H))
+    (hSAcoh : Nonempty (OddOrder.Peterfalvi.S07.IsCoherent hyp.tau (hyp.SsubFiltration A)
+      (OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L)))
+    (hSBncoh : ¬ Nonempty (OddOrder.Peterfalvi.S07.IsCoherent hyp.tau (hyp.SsubFiltration B)
+      (OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L))) :
+    Nat.card (↥H ⧸ H₁.subgroupOf H) ≤ 4 * H.index ^ 2 + 1 := by
+  have hsixtwo := six_two_central_c2 hyp h46 hHK hW1 (hyp.SsubFiltration_antitone hBA)
+    hAcomm2 hW2B (A.subgroupOf H) (Subgroup.subgroupOf_mono H hBA) hcentral hSAcoh hSBncoh
+  have hHH1le : Nat.card (↥H ⧸ H₁.subgroupOf H) ≤ Nat.card (↥H ⧸ A.subgroupOf H) :=
+    Nat.le_of_dvd Nat.card_pos (Subgroup.index_dvd_of_le (Subgroup.subgroupOf_mono H hAH₁))
+  refine six_three_HH1_le (LK := H.index) (KH := 1) (HA := Nat.card (↥H ⧸ A.subgroupOf H))
+    (HH1 := Nat.card (↥H ⧸ H₁.subgroupOf H)) (by norm_num) hHH1le ?_
+  simpa using hsixtwo
+
 end OddOrder.Peterfalvi.S08
