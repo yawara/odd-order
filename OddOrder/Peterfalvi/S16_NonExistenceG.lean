@@ -1840,14 +1840,9 @@ theorem K_eq_V_index_pq [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
 
 /-! ## (14.12)--(14.16): comparing `L` and `M` -/
 
-/-- **Peterfalvi (14.12)**: if `L` is conjugate to `M`, then the final
-field-normalizer configuration (14.2) holds. -/
-theorem field_normalizer_of_L_conj_M [Finite G]
-    (_hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
-    (Ldata : LHypothesis hyp) (Mdata : MHypothesis hyp)
-    (hconj : ∃ g : G, MulAut.conj g • Ldata.L = Mdata.M) :
-    Nonempty (FieldNormalizerData hyp) := by
-  sorry
+/-! **Peterfalvi (14.12)** (`field_normalizer_of_L_conj_M`, the `L ≅ M` case) is assembled
+**after** (14.7) `field_normalizer_of_U_characteristic`, which it reduces to: when `L` is conjugate
+to `M`, `H` is cyclic, so `U ≤ H` is characteristic and (14.7) applies.  See it just after (14.7). -/
 
 /-- **Peterfalvi (14.13)**: the final comparison case assumes `L` and `M` are
 not conjugate and sets `h = |H|`. -/
@@ -2148,6 +2143,60 @@ theorem field_normalizer_of_U_characteristic [Finite G]
   haveI := hcyc_U
   exact field_normalizer_of_U_characteristic_of_fpf hG hyp Ldata hmod hW2_le_P
     hQ_elemAb hW2_norm_Q y hyQ hW2_conj_y
+
+/-- **Every subgroup of a finite cyclic group is characteristic.**  A subgroup `K` equals the
+`|K|`-torsion `ker (powMonoidHom |K|) = {x | x ^ |K| = 1}`: it is contained in it (Lagrange:
+`x ^ |K| = 1` for `x ∈ K`) and has the same cardinality (`|ker| = gcd(|C|, |K|) = |K|` as
+`|K| ∣ |C|`).  The torsion is preserved by every automorphism `φ` since `φ x ^ d = φ (x ^ d)`,
+so `K` is characteristic.  Used for the (14.12) `L ≅ M` case where `H` is cyclic. -/
+theorem characteristic_of_isCyclic {C : Type*} [Group C] [Finite C] [IsCyclic C]
+    (K : Subgroup C) : K.Characteristic := by
+  letI : CommGroup C := IsCyclic.commGroup
+  have key : ∀ A : Subgroup C, A = (powMonoidHom (Nat.card A) : C →* C).ker := by
+    intro A
+    have hle : A ≤ (powMonoidHom (Nat.card A) : C →* C).ker := by
+      intro a ha
+      rw [MonoidHom.mem_ker, powMonoidHom_apply]
+      have h1 : (⟨a, ha⟩ : A) ^ Nat.card A = 1 := pow_card_eq_one'
+      have h2 := congrArg (Subtype.val) h1
+      simp only [SubmonoidClass.coe_pow, OneMemClass.coe_one] at h2
+      exact h2
+    have hdvd : Nat.card A ∣ Nat.card C := Subgroup.card_subgroup_dvd_card A
+    have hcard : Nat.card (powMonoidHom (Nat.card A) : C →* C).ker = Nat.card A := by
+      rw [IsCyclic.card_powMonoidHom_ker, Nat.gcd_eq_right hdvd]
+    exact Subgroup.eq_of_le_of_card_ge hle (le_of_eq hcard)
+  rw [Subgroup.characteristic_iff_comap_eq]
+  intro φ
+  have hcard_eq : Nat.card ↥(K.comap φ.toMonoidHom) = Nat.card ↥K :=
+    Nat.card_congr (Equiv.subtypeEquiv φ.toEquiv (fun a => Subgroup.mem_comap))
+  conv_lhs => rw [key (K.comap φ.toMonoidHom)]
+  conv_rhs => rw [key K]
+  rw [hcard_eq]
+
+/-- **Peterfalvi (14.12) structural input**: in the `L ≅ M` case, `H = L_F` is cyclic.  By (14.11)
+`K = V` with `|M : K| = p q`, (14.4) `v = (q^p−1)/(q−1)`, and (13.12) the dual `d = 1`, the kernel
+`K = V` is cyclic (`VW₂` is a Frobenius group with abelian kernel `V`); since `L ≅ M` gives
+`H ≅ K`, `H` is cyclic.  The §13/§14 character-theory obligation (Lane B) feeding the (14.12)
+reduction to (14.7). -/
+theorem H_cyclic_of_L_conj_M [Finite G]
+    (_hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
+    (Ldata : LHypothesis hyp) (Mdata : MHypothesis hyp)
+    (_hconj : ∃ g : G, MulAut.conj g • Ldata.L = Mdata.M) :
+    IsCyclic ↥Ldata.H := sorry
+
+/-- **Peterfalvi (14.12)**: if `L` is conjugate to `M`, then the field-normalizer configuration
+(14.2) holds.  Textbook reduction: `L ≅ M ⟹ H ≅ K` cyclic (`H_cyclic_of_L_conj_M`), so every
+subgroup of `H` — in particular `U` — is characteristic (`characteristic_of_isCyclic`), and (14.7)
+`field_normalizer_of_U_characteristic` applies.  Carries **no `sorry`**; gated only through the
+named §13/§14 obligation `H_cyclic_of_L_conj_M`. -/
+theorem field_normalizer_of_L_conj_M [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
+    (Ldata : LHypothesis hyp) (Mdata : MHypothesis hyp)
+    (hconj : ∃ g : G, MulAut.conj g • Ldata.L = Mdata.M) :
+    Nonempty (FieldNormalizerData hyp) := by
+  haveI : IsCyclic ↥Ldata.H := H_cyclic_of_L_conj_M hG hyp Ldata Mdata hconj
+  exact field_normalizer_of_U_characteristic hG hyp Ldata
+    (characteristic_of_isCyclic (hyp.base.U.subgroupOf Ldata.H))
 
 /-- The two alternatives of **Peterfalvi (14.14)**. -/
 structure OrthogonalitySwitchData {hyp : Hypothesis (G := G)}
