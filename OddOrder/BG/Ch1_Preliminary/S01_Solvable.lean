@@ -1468,8 +1468,12 @@ private theorem hall_compl_card_mul {G : Type*} [Group G] [Finite G]
     _ = Nat.card G := Subgroup.card_mul_index H
 
 /-- Complementary Hall subgroups multiply bijectively. This is the Lean form of BG's
-`G = K H` line in Prop. 1.5(e). -/
-private theorem hall_compl_isComplement {G : Type*} [Group G] [Finite G]
+`G = K H` line in Prop. 1.5(e).
+
+De-privatised (2026-06-20) for use in BG Theorem 15.2 (`S15_MF`), where the `K`-invariant
+`{q}ᶜ`-Hall complement `D` of the normal Sylow `q`-subgroup `Q` of `M_σ` is built via
+`exists_aInvariant_hall` and shown to complement `Q` by this lemma. -/
+theorem hall_compl_isComplement {G : Type*} [Group G] [Finite G]
     {π : Set ℕ} {K H : Subgroup G}
     (hK : OddOrder.Isaacs.Ch03.IsHallSubgroup {p | p ∉ π} K)
     (hH : OddOrder.Isaacs.Ch03.IsHallSubgroup π H) :
