@@ -84,3 +84,11 @@ enrich で mp に K/K* witness（または W=S∩T cyclic）を載せても、tp
 ∴ enrich を実施しても producer の sorry は消えない。本 issue（gap A enrichment）は **真の blocker ではなく
 前提整備**であり、真の gate = issue 7005 監査の (a)(b)(c)。gap B（`typeP_pair_inf_eq`）は Theorem I clause(2)
 に配線済（`536974a9`）。**enrich の着手は absent theory が揃うまで保留推奨**（今やっても sorry を動かさない）。
+
+---
+
+## ✅ DONE (2026-06-19) — enrich 完了, mp producer assembly-complete
+
+Section16MaximalPair の enrich は前セッションで完了 (canonical pair + κ-Hall witness + K_lt_Kstar).
+mp producer `section16MaximalPair_of_isMinimalSimpleOdd` は inline sorry 0. 残 sorryAx は上流
+(Prop 16.1 / 12.17 / 10.11). issue 7005 piece 2 と合わせて lane-f POLE-1 構造側 scope 完了.

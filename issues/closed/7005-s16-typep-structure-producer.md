@@ -423,3 +423,23 @@ mathlib は basic SZ のみだが **repo に invariant-complement インフラ�
 
 **∴ piece 2 = lane-f 所有の genuine 構造論プロジェクト** (char theory でない、正しいレーン)。
 quick win でなく loop 不適 (loop は U=M' cheat を取るか空転)。count 140→139 は assembly 完了時。
+
+---
+
+## ✅✅✅ DONE (2026-06-19) — piece 2 完遂, tp producer assembly-complete (sorry 140→139)
+
+piece 2 (U-side residual) を **route B (直接 K-invariant complement)** で完遂。pairing reconciliation
+は不要だった (coprimality を `typeP_derivedInG_isComplement_kappaHall` から直接取得)。
+
+- **infra**: `OddOrder.GroupTheory.exists_aInvariant_complement_within_normal` (invariant
+  Schur–Zassenhaus, commits `d6f0c4e8`/`8b8881e3`, sorry-free + axiom-clean).
+- **新 leaf** `OddOrder/BG/Ch4_FamilyOfMaximal/S14_TypePComplement.lean` =
+  `exists_kappaHall_invariant_complement_to_MF` (Pf (13.1.b): `M' = M_F ⊔ U`, `K ≤ N_G(U)`;
+  90 行, sorry-free + axiom-clean).
+- **配線**: producer の U-side `sorry` を `U`/`V` で除去. `Section16TypePStructure mp` は Type 値
+  ゆえ `Exists.choose` で witness 抽出 (`obtain` 不可). commit `8c231082`.
+- **検証**: full build 3862 green / 実 sorry **139** / lane-f 内容 axiom-clean.
+
+**lane-f scope 完了**: mp + tp 両 producer とも assembly-complete (inline sorry 0). 残 `sorryAx` は
+上流 gate のみ (Prop 16.1 §16 / 12.17 / 10.11 lane-b). 次 frontier = **Prop 16.1 + §14 type-data
+構成理論** (別途). issue 7006 (enrich) も完了.
