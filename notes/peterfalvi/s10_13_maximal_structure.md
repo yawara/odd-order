@@ -228,3 +228,32 @@ shape も BG-internal(`kappa`/`piSet`/`tau2`/`IsTypeF/P2`/`hatMsigma`)。S10 の
 - [ ] T2/(8.11)III-IV/(8.13)(8.16)-full = BG §14-15 landing 待ち。
 - [ ] (8.2.a) BG Prop 3.9 在否(T3; 未確認、優先度低)。
 - [ ] §14/§15 が landing したら本 bridge 群で S10 を一気に wiring。
+
+### 8. faithful-(10.1) Hypothesis + honest (10.10) (2026-06-19, commit `26c1a9f0`)
+
+cite-split で H を §10-13 char track に再配向後の実作業。**(10.10)/(10.11) は当初想定より深く gated**
+と判明(調査): (10.10)=B の §10 coherence char 全体 + faithful Dade 設定、(10.11)=(10.10)+lane-f の
+BG↔Pf W1=κ bridge(gap B)+ `Theorem88CaseBData` 構造強化(FeitThompson.lean consumer 影響)。
+S10/S11/S12/S13 の ~39 sorry は全て `Hypothesis M`(loose char carrier)の opaque field 経由で、
+clean な純群論 win は無し。
+
+ユーザー裁可で **(10.1) `Hypothesis` の faithful 化**(scaffold cleanup step 3 = carrier 非空化):
+- 旧: `Sset`/`A0`/`tau` が**無制約 data field**(garbage 構成可 ⟹ `IsCoherent 0 ∅ ∅`(false)依存の
+  brittle proof が書けてしまう = やってはいけない)。
+- 新: 3 つを **genuine projection** に pin:
+  - `A0 := S04.supportInSubgroup (typePA0 M typeP) M` (= A_0(M) of (8.10))
+  - `Sset := inducedFamily M` (= {Ind_{M'}^M θ | θ∈Irr M', θ≠1} of (10.1)、新 def)
+  - `tau := S07.dadeIntegralCharacterMap dadeData.dade (… hconj)` (= genuine Dade isometry rel (A_0(M),M,G))
+  - carrier に `[finiteG : Finite G]`(S15 `FiniteInduce` パターン、scoped Fintype/Invertible)+
+    `dadeData : S10.DadeSupportHypothesisData M (typePA0 M typeP)`(= (8.15) Dade support)+ `hconj`。
+- **構成サイト不在ゆえ downstream 無破壊**(full build 3868 jobs green; S13 が `base` 経由で消費するが OK)。
+- producer `exists_hypothesis_of_typeIIIorIVorV`(type III/IV/V 極大 → faithful Hypothesis、
+  `S10.dadeSupportHypotheses_typeP` cite + own residual = `hconj` のみ = issue 2011、gated でない群論)。
+- **(10.10) `no_typeV_maximal` を honest 化**(bare sorry → proof): faithful な `hyp` 上で
+  `(10.8) S_not_coherent` ∧ `(10.10.1-4) typeV_forces_coherence` の矛盾に還元。**同一の genuine
+  `hyp.tau/Sset/A0`** を両者が参照 ⟹ B が faithful 化したら通る(brittle でない真の reduction)。
+
+real sorry 136→136(10.10 の bare sorry が producer の hconj に置換)。**gain = carrier 非空化 +
+§10 capstone (10.10) honest 化**。残 §10 materialization は **carrier bundling 壁**((10.2)/(10.3) の
+`CharacterParameters` が `w2_prime`/`d_gt_one` を bundle)+ B の §3-§6 char API 待ちで逓減。
+(10.11) は (10.10) cite + `Theorem88CaseBData` faithful 化(cross-lane, gap B)で別途。
