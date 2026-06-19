@@ -983,6 +983,95 @@ theorem typeP_centralizerGeneratedBySigma_isMulCommutative [Finite G]
     rintro C ⟨x, _, rfl⟩
     exact inf_le_left
 
+/-- **BG Lemma 15.1(e)** (mmd L4148): the Frobenius factor `U₀ M_σ`.  For a maximal `M` with
+`κ(M)`-Hall `K` and `(κ ∪ σ)'`-Hall `U ≠ 1`, there is a subgroup `U₀ ≤ U` of the same exponent as
+`U` such that `U₀ M_σ` is a Frobenius group with kernel `M_σ` and complement `U₀`.
+
+Proof by the `K = ⊥` / `K ≠ ⊥` split:
+
+* `K = ⊥` (type `F`): `U` is the `σ`-complement `E` of a §12 `E`-setup
+  (`subgroupESetup_of_isHall_kappa_eq_bot`), and Theorem 12.12(b)
+  (`frobenius_factorization_of_regular`, part (b)) supplies `U₀ = E₀ ≤ E = U` directly, with
+  `exp U₀ = exp U` and `U₀ M_σ` Frobenius.  The regularity hypothesis is discharged exactly as in
+  `typeP_centralizerGeneratedBySigma_isMulCommutative` (Lemma 14.1 for `(τ₁∪τ₃)`-elements).
+
+* `K ≠ ⊥` (type `P`): `U` is abelian (`typeP_hall_derived_eq_and_abelian`).  We build `U₀ ≤ U`
+  **`M`-internally** as the internal direct product `⨆_{p ∈ π(U)} Z_p`, where for each prime
+  `p ∈ π(U)` the cyclic `Z_p ≤ Sylow_p(U)` realizes the `p`-part of `exp U` and acts regularly on
+  `M_σ`:
+  - `p ∈ (τ₁ ∪ τ₃)` (`r_p(M) = 1`): `Sylow_p(U)` is cyclic, take `Z_p = Sylow_p(U)`; regular by
+    Lemma 14.1 (`Ω₁(Sylow_p(U)) ∈ ℰ_p¹(M)`, `p ∉ σ ∪ κ`).
+  - `p ∈ τ₂` (`r_p(M) = 2`): `Sylow_p(U)` is abelian of rank `2`; Theorem 12.5(f) gives a regular
+    line `A₁ ∈ ℰ_p¹(M)` inside `A := Ω₁(Sylow_p(U))`, and a cyclic `Z_p ≤ Sylow_p(U)` with
+    `Ω₁(Z_p) = A₁`, `exp Z_p = exp Sylow_p(U)` propagates regularity to all of `Z_p`. -/
+theorem typeP_hall_frobenius_factor [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    {M K U : Subgroup G} (hM : M ∈ maximalSubgroups G) (hKM : K ≤ M) (hUM : U ≤ M)
+    (hK : Ch03.IsHallSubgroup (S14.kappa M) (K.subgroupOf M))
+    (hU : Ch03.IsHallSubgroup ((S14.kappa M ∪ OddOrder.BG.Ch3.S10.sigma M)ᶜ) (U.subgroupOf M))
+    (hUne : U ≠ ⊥) :
+    ∃ U0 : Subgroup G, U0 ≤ U ∧ Monoid.exponent ↥U0 = Monoid.exponent ↥U ∧
+      OddOrder.Isaacs.Ch06.IsFrobeniusGroup ↥(U0 ⊔ OddOrder.BG.Ch3.S10.Msigma M)
+        ((OddOrder.BG.Ch3.S10.Msigma M).subgroupOf (U0 ⊔ OddOrder.BG.Ch3.S10.Msigma M))
+        (U0.subgroupOf (U0 ⊔ OddOrder.BG.Ch3.S10.Msigma M)) := by
+  classical
+  set Mσ := OddOrder.BG.Ch3.S10.Msigma M with hMσdef
+  by_cases hKbot : K = ⊥
+  · -- **Case `K = ⊥`** (type `F`): `U = E` is the §12 `σ`-complement; Theorem 12.12(b).
+    obtain ⟨E₁, E₂, E₃, hsetup⟩ :=
+      subgroupESetup_of_isHall_kappa_eq_bot hG hM hKM hUM hK hKbot hU
+    -- Discharge the regularity hypothesis of Theorem 12.12 via Lemma 14.1 (copied from
+    -- `typeP_centralizerGeneratedBySigma_isMulCommutative`'s `K = ⊥` branch).
+    have hreg : ∀ e ∈ U, e ≠ 1 →
+        (∀ r ∈ (orderOf e).primeFactors, r ∈ tau1 M ∪ tau3 M) →
+          Mσ ⊓ Subgroup.centralizer ({e} : Set G) = ⊥ := by
+      intro e heU hene hprimes
+      have hord1 : orderOf e ≠ 1 := fun hc => hene (orderOf_eq_one_iff.mp hc)
+      obtain ⟨p, hp, hpdvd⟩ := Nat.exists_prime_and_dvd hord1
+      haveI : Fact p.Prime := ⟨hp⟩
+      have hpτ : p ∈ tau1 M ∪ tau3 M :=
+        hprimes p (Nat.mem_primeFactors.mpr ⟨hp, hpdvd, (orderOf_pos e).ne'⟩)
+      set f : G := e ^ (orderOf e / p) with hfdef
+      have hford : orderOf f = p := orderOf_pow_orderOf_div (orderOf_pos e).ne' hpdvd
+      have hfU : f ∈ U := U.pow_mem heU _
+      have hfM : f ∈ M := hUM hfU
+      set A : Subgroup G := Subgroup.zpowers f with hAdef
+      have hAcard : Nat.card ↥A = p := by rw [hAdef, Nat.card_zpowers]; exact hford
+      have hAelem : A.IsElementaryAbelian p := Subgroup.IsElementaryAbelian.of_card_prime hAcard
+      have hAM : A ≤ M := by rw [hAdef, Subgroup.zpowers_le]; exact hfM
+      have hpπ : p ∈ S14.piSet M :=
+        Nat.mem_primeFactors.mpr ⟨hp, hpdvd.trans ((U.orderOf_dvd_natCard heU).trans
+          (Subgroup.card_dvd_of_le hUM)), Nat.card_pos.ne'⟩
+      have hpσ : p ∉ OddOrder.BG.Ch3.S10.sigma M :=
+        hpτ.elim (fun h => tau1_subset_sigma_compl M h) (fun h => tau3_subset_sigma_compl M h)
+      have hpκ : p ∉ S14.kappa M := by
+        rw [isTypeF_of_isHall_kappa_eq_bot hKM hK hKbot]; simp
+      have hr1 : pRank ↥M p = 1 :=
+        hpτ.elim tau1_pRank_eq_one tau3_pRank_eq_one
+      have hAr : A ∈ elemAbelianOfRank G p (pRank ↥M p) := by
+        rw [hr1, mem_elemAbelianOfRank]
+        exact ⟨hAelem, by rw [hAcard, pow_one]⟩
+      obtain ⟨_, hCA, _⟩ :=
+        S14.msigma_structure_of_notMem_sigma_kappa hG hM hpπ hpσ hpκ hAr hAM
+      have hCfA : Subgroup.centralizer (A : Set G) = Subgroup.centralizer ({f} : Set G) := by
+        rw [hAdef, Subgroup.zpowers_eq_closure, Subgroup.centralizer_closure]
+      have hCef : Subgroup.centralizer ({e} : Set G) ≤ Subgroup.centralizer ({f} : Set G) := by
+        intro x hx
+        rw [Subgroup.mem_centralizer_singleton_iff] at hx ⊢
+        rw [hfdef]
+        exact (show Commute x e from hx).pow_right _
+      rw [eq_bot_iff, ← hCA, hCfA]
+      exact inf_le_inf_left _ hCef
+    -- Theorem 12.12(b): the same-exponent regular complement `E₀ ≤ U`.
+    obtain ⟨_, E₀, hE₀le, hexp, hFrob⟩ :=
+      frobenius_factorization_of_regular hG hsetup hreg
+    refine ⟨E₀, hE₀le, hexp, ?_⟩
+    -- `FrobFactConclusion` states it for `M_σ ⊔ E₀`; commute to `E₀ ⊔ M_σ`.
+    rw [show E₀ ⊔ Mσ = Mσ ⊔ E₀ from sup_comm _ _]
+    exact hFrob
+  · -- **Case `K ≠ ⊥`** (type `P`): `U` is abelian; build `U₀ ≤ U` `M`-internally.
+    obtain ⟨_, hUab⟩ := typeP_hall_derived_eq_and_abelian hG hM hKM hUM hKbot hK hU
+    sorry
+
 /-- **Forward lemma: the `§14`-gated structural content of BG Lemma 15.1** (faithful to mmd L4116,
 proof deferred).  Bundles the conjuncts of Lemma 15.1 that depend on the still-`sorry` §14 results
 (Proposition 14.2(a)'s normal complement `M = K U M_σ`, Theorem 14.7(d)(h)) and Theorem 12.12:
