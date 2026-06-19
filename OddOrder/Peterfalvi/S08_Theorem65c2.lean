@@ -189,4 +189,60 @@ theorem six_three_index_bound_c2 (hyp : SibleyDadeHypothesis G L H) [H.Normal]
     (HH1 := Nat.card (↥H ⧸ H₁.subgroupOf H)) (by norm_num) hHH1le ?_
   simpa using hsixtwo
 
+/-- **Peterfalvi (6.3), case (c2)** (`six_three` analogue, `hW2B`-free).  The minimal-`A` induction:
+for `M ≤ H₁ ≤ ⁅H,H⁆` with `S(H₁)` coherent and `4|L:K|²+1 < |H:H₁|`, `S(M)` is coherent.  Mirror of
+`six_three` (`S08_CoherenceCorePart2:3750`); `hF` becomes the certain-type `(h46, hHK, hW1)`, and the
+per-step `(6.3)` index bound is `six_three_index_bound_c2`.  The break admitted by that bound need no
+longer be irreducible — the `column/irreducible` dispatch in `six_two_index_bound_c2` removed the
+`W₂ ≤ B` requirement, so the induction may descend below `W₂` (where column-transition breaks occur).
+The `A ≤ ⁅H,H⁆` input of `six_three_index_bound_c2` holds since `A ≤ H₁ ≤ ⁅H,H⁆`. -/
+theorem six_three_c2 (hyp : SibleyDadeHypothesis G L H) [H.Normal]
+    (h46 : OddOrder.Peterfalvi.S06.Hypothesis46 (sharpImage H) L) (hHK : h46.K = H)
+    (hW1 : h46.W1 = hyp.W1)
+    [NeZero (Nat.card h46.W1)] [Invertible (Nat.card ↥h46.K : ℂ)]
+    [Fintype ↥(h46.W1 ⊔ h46.W2)] [Invertible (Nat.card ↥(h46.W1 ⊔ h46.W2) : ℂ)]
+    [Fintype (OddOrder.Peterfalvi.S06.ticVdiff h46).W]
+    [Invertible (Nat.card (OddOrder.Peterfalvi.S06.ticVdiff h46).W : ℂ)]
+    {M H₁ : Subgroup ↥L} [M.Normal] [H₁.Normal] (hMH₁ : M ≤ H₁) (hH₁comm : H₁ ≤ ⁅H, H⁆)
+    (hcoh : Nonempty (OddOrder.Peterfalvi.S07.IsCoherent hyp.tau (hyp.SsubFiltration H₁)
+      (OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L)))
+    (hbound : 4 * H.index ^ 2 + 1 < Nat.card (↥H ⧸ H₁.subgroupOf H)) :
+    Nonempty (OddOrder.Peterfalvi.S07.IsCoherent hyp.tau (hyp.SsubFiltration M)
+      (OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L)) := by
+  classical
+  letI : H.Normal := hyp.H_normal
+  letI : Group.IsNilpotent ↥H := hyp.H_nilpotent
+  haveI : Finite (Subgroup ↥L) := Finite.of_injective (fun K : Subgroup ↥L => (K : Set ↥L))
+    (fun _ _ h => SetLike.coe_injective h)
+  set s : Set (Subgroup ↥L) := {A | A.Normal ∧ M ≤ A ∧ A ≤ H₁ ∧
+    Nonempty (OddOrder.Peterfalvi.S07.IsCoherent hyp.tau (hyp.SsubFiltration A)
+      (OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L))} with hs_def
+  have hH₁s : H₁ ∈ s := by
+    simp only [hs_def, Set.mem_setOf_eq]; exact ⟨‹H₁.Normal›, hMH₁, le_refl _, hcoh⟩
+  obtain ⟨A, hAmem, hAmin⟩ :=
+    Set.Finite.exists_minimalFor (id : Subgroup ↥L → Subgroup ↥L) s (Set.toFinite _) ⟨H₁, hH₁s⟩
+  simp only [hs_def, Set.mem_setOf_eq] at hAmem
+  obtain ⟨hAnorm, hMA, hAH₁, hAcoh⟩ := hAmem
+  haveI : A.Normal := hAnorm
+  have hAeqM : A = M := by
+    by_contra hne
+    have hMltA : M < A := lt_of_le_of_ne hMA (Ne.symm hne)
+    obtain ⟨B, hBnorm, hMB, hBltA, hBmaxl⟩ := exists_maximal_normal_between hMltA
+    haveI : B.Normal := hBnorm
+    have hAcomm2 : A ≤ ⁅H, H⁆ := hAH₁.trans hH₁comm
+    have hAleH : A ≤ H := hAcomm2.trans (Subgroup.commutator_le_left H H)
+    have hcentral := normal_central_of_maximal_normal_below (H := H) (A := A) (B := B)
+      ‹H.Normal› hAleH hBltA hBmaxl
+    have hSBncoh : ¬ Nonempty (OddOrder.Peterfalvi.S07.IsCoherent hyp.tau (hyp.SsubFiltration B)
+        (OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L)) := by
+      intro hBcoh
+      have hBs : B ∈ s := by
+        simp only [hs_def, Set.mem_setOf_eq]
+        exact ⟨hBnorm, hMB, hBltA.le.trans hAH₁, hBcoh⟩
+      exact lt_irrefl _ (hBltA.trans_le (hAmin hBs hBltA.le))
+    have hbnd := six_three_index_bound_c2 hyp h46 hHK hW1 hBltA.le hAH₁ hAcomm2 hcentral hAcoh hSBncoh
+    omega
+  rw [← hAeqM]
+  exact hAcoh
+
 end OddOrder.Peterfalvi.S08
