@@ -37,20 +37,59 @@ open scoped Pointwise
 
 variable {G : Type*} [Group G]
 
+/-! Scoped finiteness instances (the `S15.FiniteInduce` pattern) so the
+`Hypothesis` carrier of (10.1) can pin the genuine Dade isometry / induced family
+without leaking the `noncomputable` `Fintype`/`Invertible` data globally. -/
+namespace FiniteInduce
+
+noncomputable scoped instance finiteSubFintype [Finite G] (H : Subgroup G) :
+    Fintype ↥H := Fintype.ofFinite _
+
+noncomputable scoped instance finiteGFintype [Finite G] : Fintype G :=
+  Fintype.ofFinite _
+
+noncomputable scoped instance natCardInvC [Finite G] (H : Subgroup G) :
+    Invertible (Nat.card H : ℂ) :=
+  invertibleOfNonzero (Nat.cast_ne_zero.mpr Nat.card_pos.ne')
+
+noncomputable scoped instance natCardInvCG [Finite G] :
+    Invertible (Nat.card G : ℂ) :=
+  invertibleOfNonzero (Nat.cast_ne_zero.mpr Nat.card_pos.ne')
+
+end FiniteInduce
+
+open scoped FiniteInduce in
+/-- Peterfalvi's character family `S` of Hypothesis (10.1):
+`{Ind_{M'}^M θ | θ ∈ Irr M', θ ≠ 1_{M'}}`, where `M' = [M,M]` is realised inside
+`M` as `(derivedInG M).subgroupOf M`.  The induction is the canonical
+`ClassFunction.induce`. -/
+noncomputable def inducedFamily (M : Subgroup G) [Finite G] :
+    Set (ClassFunction ↥M ℂ) :=
+  { χ | ∃ θ : IrreducibleCharacter ↥((derivedInG M).subgroupOf M),
+      θ ≠ trivialIrreducibleCharacter ↥((derivedInG M).subgroupOf M) ∧
+      χ = ClassFunction.induce ((derivedInG M).subgroupOf M)
+        (θ : ClassFunction ↥((derivedInG M).subgroupOf M) ℂ) }
+
 /-! ## (10.1): the type III/IV/V hypothesis -/
 
+open scoped FiniteInduce in
 /-- **Peterfalvi (10.1)**: the common setup for a maximal subgroup of type III,
 IV, or V.
 
-`Sset` is Peterfalvi's family of induced characters, and `A0` is the subgroup
-version of `A_0(M)` used as the support set for the Dade isometry `tau`. -/
+Finiteness of `G` is carried as the instance field `finiteG` (the `S15`
+`FiniteInduce` pattern), so that the *genuine* Dade isometry `tau`, the induced
+family `Sset`, and the support `A0 = A_0(M)` can be defined as honest projections
+(see `Hypothesis.tau`, `Hypothesis.Sset`, `Hypothesis.A0`) rather than carried as
+unconstrained data.  `dadeData` is the (8.15) Dade support hypothesis for
+`A_0(M)` (supplied by `S10.dadeSupportHypotheses_typeP`), and `hconj` is its
+`L`-conjugation invariance, which together build the Dade isometry. -/
 structure Hypothesis (M : Subgroup G) where
+  [finiteG : Finite G]
   maximal : M ∈ maximalSubgroups G
   typeP : TypePData M
   type_alt : IsTypeIII M ∨ IsTypeIV M ∨ IsTypeV M
-  Sset : Set (ClassFunction ↥M ℂ)
-  A0 : Set ↥M
-  tau : OddOrder.Peterfalvi.S07.IntegralCharacterMap ↥M G
+  dadeData : OddOrder.Peterfalvi.S10.DadeSupportHypothesisData M (typePA0 M typeP)
+  hconj : dadeData.dade.HConjInvariant
 
 namespace Hypothesis
 
@@ -82,7 +121,62 @@ noncomputable def w1 {M : Subgroup G} (hyp : Hypothesis M) : ℕ :=
 noncomputable def w2 {M : Subgroup G} (hyp : Hypothesis M) : ℕ :=
   Nat.card ↥hyp.W2
 
+/-- Peterfalvi's support `A_0(M)` from (8.10), as a subset of `M` (the
+`supportInSubgroup` restriction of the ambient set `typePA0 M`).  This is the
+genuine support for the Dade isometry, no longer an unconstrained field. -/
+def A0 {M : Subgroup G} (hyp : Hypothesis M) : Set ↥M :=
+  OddOrder.Peterfalvi.S04.supportInSubgroup (typePA0 M hyp.typeP) M
+
+open scoped FiniteInduce in
+/-- Peterfalvi's family `S` of (10.1), pinned to the genuine `inducedFamily M`
+`= {Ind_{M'}^M θ | θ ∈ Irr M', θ ≠ 1}`, no longer an unconstrained field. -/
+noncomputable def Sset {M : Subgroup G} (hyp : Hypothesis M) :
+    Set (ClassFunction ↥M ℂ) :=
+  haveI := hyp.finiteG
+  inducedFamily M
+
+open scoped FiniteInduce in
+/-- Peterfalvi's Dade isometry `τ` relative to `(A_0(M), M, G)` from (10.1),
+pinned to the genuine `S07.dadeIntegralCharacterMap` of the (8.15) support data
+`dadeData` (no longer an unconstrained field). -/
+noncomputable def tau {M : Subgroup G} (hyp : Hypothesis M) :
+    OddOrder.Peterfalvi.S07.IntegralCharacterMap ↥M G :=
+  haveI := hyp.finiteG
+  OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap hyp.dadeData.dade
+    (hyp.dadeData.dade.fullDadeIsometryData hyp.hconj)
+
 end Hypothesis
+
+open scoped FiniteInduce in
+/-- **Peterfalvi (10.1), existence**: every maximal subgroup `M` of type III, IV,
+or V carries the (10.1) Hypothesis.  The character family, support, and Dade
+isometry are now the genuine `inducedFamily`, `A_0(M)`, and
+`S07.dadeIntegralCharacterMap`; the only inputs are the (8.15) Dade support data
+(`S10.dadeSupportHypotheses_typeP`) and the conjugation invariance `hconj` of the
+support kernels (a (8.14)/(8.15) fact). -/
+theorem exists_hypothesis_of_typeIIIorIVorV [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G}
+    (hM : M ∈ maximalSubgroups G)
+    (hType : IsTypeIII M ∨ IsTypeIV M ∨ IsTypeV M) :
+    Nonempty (Hypothesis M) := by
+  obtain ⟨data⟩ := typePData_of_isTypeNonI (Or.inr hType)
+  obtain ⟨ptype, hptype⟩ : ∃ ptype : PeterfalviType, HasPeterfalviType ptype M := by
+    rcases hType with h | h | h
+    · exact ⟨.III, h⟩
+    · exact ⟨.IV, h⟩
+    · exact ⟨.V, h⟩
+  obtain ⟨dadeData⟩ :=
+    (OddOrder.Peterfalvi.S10.dadeSupportHypotheses_typeP hG hM data hptype).1
+  -- (8.14)/(8.15): the support kernels `R(a)` are `L`-conjugation invariant.
+  have hconj : dadeData.dade.HConjInvariant := by
+    sorry
+  refine ⟨?_⟩
+  exact
+    { maximal := hM
+      typeP := data
+      type_alt := hType
+      dadeData := dadeData
+      hconj := hconj }
 
 /-! ## (10.2)--(10.4): basic character parameters and coherent extension -/
 
@@ -220,10 +314,20 @@ theorem typeV_forces_coherence [Finite G] [Fintype G]
       Nonempty (OddOrder.Peterfalvi.S07.IsCoherent hyp.tau hyp.Sset hyp.A0) := by
   sorry
 
-/-- **Peterfalvi (10.10)**: `G` has no maximal subgroup of type V. -/
+open scoped FiniteInduce in
+/-- **Peterfalvi (10.10)**: `G` has no maximal subgroup of type V.
+
+By (10.8) (`S_not_coherent`) the family `S` of any type-III/IV/V maximal is not
+coherent; but a type-V maximal forces `S` to be coherent by (10.10.1)–(10.10.4)
+(`typeV_forces_coherence`).  These now refer to the *genuine* Dade isometry,
+induced family, and support carried by the faithful (10.1) `Hypothesis` (built by
+`exists_hypothesis_of_typeIIIorIVorV`), so the contradiction is honest. -/
 theorem no_typeV_maximal [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G) :
     ¬ ∃ M : Subgroup G, M ∈ maximalSubgroups G ∧ IsTypeV M := by
-  sorry
+  rintro ⟨M, hMmax, hMV⟩
+  obtain ⟨hyp⟩ := exists_hypothesis_of_typeIIIorIVorV hG hMmax (Or.inr (Or.inr hMV))
+  obtain ⟨params, -⟩ := w2_prime_and_parameter_independence hG hyp
+  exact S_not_coherent hG hyp (typeV_forces_coherence hG hMV params).2.2
 
 /-- The case-(b) data in Peterfalvi (8.8), used in the remark (10.11). -/
 structure Theorem88CaseBData (G : Type*) [Group G] where
