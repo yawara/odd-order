@@ -186,6 +186,7 @@ import OddOrder.Peterfalvi.S08_CaseBSeedGlue
 import OddOrder.Peterfalvi.S08_PGroupReduction
 import OddOrder.Peterfalvi.S08_Theorem63
 import OddOrder.Peterfalvi.S08_Theorem65c2
+import OddOrder.Peterfalvi.S08_RetargetReducible
 import OddOrder.Peterfalvi.S09_NonexistenceCertain
 import OddOrder.Peterfalvi.S10_CoherenceWiring
 import OddOrder.Peterfalvi.S10_MinimalSimpleStructure
