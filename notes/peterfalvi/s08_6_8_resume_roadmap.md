@@ -4,7 +4,35 @@
 > `s08_6_8_assembly_plan.md`(458KB)/`s08_6_8_3_gap_resolution.md` のうち本 note と矛盾する記述は本 note を優先。
 > 上位方針・FT 接続の文脈 = 記憶 [[ft-path-policy]] の 2026-06-17 検証訂正ブロック。
 
-## 🚩🆕 HANDOFF — 次セッションはここから (2026-06-19 cont.²³)
+## 🚩🆕 HANDOFF — 次セッションはここから (2026-06-19 cont.²⁴)
+
+**状態**: branch `lane-b`、作業ツリー clean、**full build 3868 green、実 sorry 136**。reducible-break (5.6.3)
+**残チェーン step 1-8 を完了** (engine + cross-ortho toolkit + 列 break (6.2) bound chain + c2 (6.3)
+induction + hbound producer、計 ~17 feature commit、全 sorry-free + axiom-clean)。
+
+**✅ 完成済 step 6-8 (cont.²³ の step 1-5 に追加)**:
+- **step 6** `six_two_index_bound_c2` の **hW2B 撤廃** (`S08_Theorem65c2`): break ψ を
+  `caseB_S_member_column_or_irreducible` で column/irreducible dispatch (column→step 5 / irreducible→既存)。
+  caller `six_two_central_c2`/`six_three_index_bound_c2` も hW2B pass-through 除去。
+- **step 7** `six_three_c2` (`S08_Theorem65c2`): (6.3) minimal-A induction、six_three ミラー、
+  M≤H₁≤⁅H,H⁆ で S(M) coherent。hW2B-free ゆえ W₂ 以下に降りる column-transition break を許容。
+- **step 8** `abelianization_card_le_of_not_coherent_c2` (`S08_Theorem65c2`): **hbound = |Abelianization H|
+  ≤ 4|W₁|²+1** を ¬coherent(S) から (six_three_c2 を M=⊥/H₁=⁅H,H⁆ で適用)。= handoff cont.²⁰ frontier 達成。
+
+**▶ 次の一手 = step 9-11 (dispatch S08:59、= 別 sub-project: 配線 + structure-data discharge)**:
+- **DAG は配線可能と確定** (再調査不要): S08_PGroupReduction/S08_Theorem65c2 は S08_CoherenceTheorems の
+  **下流でない** (並列、cycle なし) → S08_CoherenceTheorems が両者を import 可。cont.¹⁴「下流ゆえ不可」は
+  merge 後 STALE。
+- **dispatcher は既存**: `nonempty_coherent_S_of_c2_of_branches` (`S08_PGroupReduction:215`) が
+  **hbound (step 8) + hcop + hW2comm + hsplit + hcaseA + hcaseB** から c2 coherence を出す。S08:59 c2 枝 =
+  by_contra hncoh → step 8 で hbound → dispatcher → 矛盾。c1 枝 = `nonempty_coherent_S_of_frobenius`。
+- **残ゲート = case producer の structure-data discharge** (これが本当の残務):
+  `nonempty_coherent_S_caseB_of_c2` (`:343`) は hWMgt/hYcard/hXne/hprime/hcen/hcop/hW2comm/hW2H を仮説に取る。
+  これらの discharge (`_of_c2_caseB`、handoff cont.¹⁶ で「素材在庫・未実装」) + 案 A 用 case-A producer +
+  hyp.cases (Frobenius/CertainType split) からの hcop/hW2comm 抽出が残る。**= (6.8.3) bootstrap + 構造事実**。
+**FT 文脈不変**: (6.8) は [[ft-path-policy]] で orphaned (deferred-payoff) — 閉じても feitThompson sorry は今減らない。
+
+## 🚩 HANDOFF — (2026-06-19 cont.²³)
 
 **状態**: branch `lane-b` = `main` 同期 + 新規 (cont.²² 末で main マージ、以降 step 4-5 を追加)、作業ツリー clean
 (未追跡 `s08_6_8_chatgpt_prompt.md` 旧 draft 無視可)、**full build 3868 green、実 sorry 136**。
