@@ -4,6 +4,49 @@
 > `s08_6_8_assembly_plan.md`(458KB)/`s08_6_8_3_gap_resolution.md` のうち本 note と矛盾する記述は本 note を優先。
 > 上位方針・FT 接続の文脈 = 記憶 [[ft-path-policy]] の 2026-06-17 検証訂正ブロック。
 
+## 🔄🎯 2026-06-19 cont.¹⁷ — 5-agent workflow が cont.¹⁶「大型 engine 一般化」を覆す + c2 chain が本筋
+
+ultracode (workflow `w8ljahhov`、6 agent / 646k tok) で engine 一般化を mapping。**cont.¹⁶ の
+「hbound = 大型 reducible-break engine 一般化のみ」を訂正**:
+
+### ✅ 本筋 = c2 chain assembly (bricks 全て既存・sorry-free、大半が機械的)
+
+`six_two_index_bound_c2 → six_two_central_c2 → six_three_index_bound_c2 → six_three_c2 →
+isPGroup_of_not_coherent_c2` を **c1 chain (`S08_CoherenceCorePart2:3576-3837`) の 3-fact brick swap** で
+ミラーすれば `hbound` が出る。swap 内容:
+- `exists_coherentBreakPair` → `exists_coherentBreakPair_general` (`S08_CoherenceCorePart1:1035`、全既約不要)
+- `SsubFiltration_hasNoRealCharacters hF` → `S_hasNoRealCharacters_caseB` (`S08_CaseBWeightedEndgame:231`)
+- `sMember_index_le_two_psi hF` → `sSubFiltration_sum_le_two_psi_caseB` (`S08_Theorem63:110`、÷H.index)
+他 (six_two_central/six_three_index_bound/six_three の induction) は **hF-free でそのままミラー**。
+新 leaf `S08_Theorem65c2.lean` 推奨 (CorePart2 凍結)。**見積 ~6-7 定理 / 2-3 session**。
+
+### 🔧 cont.¹⁶ の 2 つの訂正
+
+1. **(6.8.3) bootstrap の break は既に既約** (cont.¹⁶ の「同じ crux でブロック」は誤り): seed endgame
+   `S08_CaseBWeightedEndgame:311-318` は S₁⊇X(W₂)⊇全 column ゆえ break ψ∉S₁ ⟹ column でない ⟹ 既約、を
+   **導出済**。⟹ `sSubFiltration_sum_le_two_psi_caseB` の hψirr は seed level で satisfiable。
+2. **(5.4) CharacterPsiDecomposition 層は既に k-general** (workflow DIM1/2/5 一致): `(5.4.a/b)`
+   `inner_self_chi_re_le_inner_self_X`/`eq_sum_of_psi_eq_zero` 等は `(E.card:ℂ)=⟨χ,χ⟩` で `=1` 非依存。
+   k=1 をハードコードするのは `retargetTargetPair`/`retarget_isCoherent` (`S07:2536/3262`) の最終 (5.6.3) 層のみ。
+   ⟹ **もし reducible-break が要っても、retarget-to-k 一般化のみ (~5-8 lemma)** で cont.¹⁶ の「engine 全体」より小。
+
+### 🎯 唯一の open question = Step 0: (6.3) induction の break 既約性
+
+S の reducible は w₂−1 column のみ。break は S(B)\S₁ (S(A)⊆S₁)。break が column ⟺ column∈S(B) かつ ∉S(A)。
+- **B⊇W₂ なら break 既約** ((6.3) induction で): ✅ **`columnSum_notMem_SsubFiltration_of_le` (commit
+  `2ebb658d`、W₂≤A で column∉S(A)、axiom-clean) で供給**。⚠ workflow の Step-0a「A≤W₂」は向きが逆 —
+  正は **W₂≤A** (column source ψ は W₂⊄Ker ゆえ)。
+- **B⊊W₂ (column-transition break) が残 open**: minimal-A induction が B⊊W₂ の領域に入るか未確定。入るなら
+  その break が column たりうる ⟹ retarget-to-k 一般化 (上記、bounded) が要る。入らないなら純 assembly。
+  **これを (6.3) induction の minimal-A 構造から判定するのが次の決定点** (原文 04.8:32-48 + column kernel 構造)。
+
+### ▶ 次の一手
+
+1. **c2 chain assembly を開始** (regime に関わらず必要): `six_two_index_bound_c2` を新 leaf に、break 既約性を
+   `columnSum_notMem_SsubFiltration_of_le` (B⊇W₂) で discharge or named obligation 化 → 上へミラー。
+2. **Step 0 の B⊊W₂ residual** を induction 構造で判定 (純 assembly か retarget-to-k か確定)。
+**FT 文脈不変**: (6.8) は [[ft-path-policy]] で orphaned (deferred-payoff)。
+
 ## ✅🎯 2026-06-19 cont.¹⁶ — 原文精読で cont.¹⁵ 検証確定 + hcaseB 構造データ discharge + hbound 真の crux 特定
 
 ユーザー「数学的ギャップでなければまずはテキストを精読して課題を進めてください」を受け、(5.6)/(5.2)/(6.2)/(6.3)/
