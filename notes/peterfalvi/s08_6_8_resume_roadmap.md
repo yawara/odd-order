@@ -37,22 +37,44 @@ case-B anchored-image chain が `hyp.coherentYset` 固定 + `hYcard` を貫い�
    を **`hgood` パラメータ化** (caller が `hcYgood (column の φ) ...` で供給)。`orthogonal_tau_indW2_add_extension_general_caseB`
    は既に cY-generic (current code が `hyp.coherentYset` を arg で渡している) ゆえ proof body はほぼ不変。
 
-**対象 theorem (bottom→top、`S08_CaseBAnchoredSeed`)**: `exists_decomposition_caseB_coherentYset`(121) →
-`caseB_column_anchored_image`(210)/`caseB_member_anchored_image`(297) → `caseB_column_anchored_full`(623) →
-`coherentCertainTypeSet_union_Yset_caseB`(694) → `caseB_Xset_member_anchored`(801) → `caseBXimg`(1154)/
-`caseBXimg_spec`(1181) → `caseBXset_isCoherent`(1227)。**`S08_CaseBSeedGlue`**: `coherentXunionYset_caseB`(299) →
-`nonempty_coherent_S_caseB_of_anchor`(380) → `nonempty_coherent_S_caseB_of_structure`(476)。
-- `caseB_per_phi_anchored_fromYset` (`S08_CaseBAssembly:1647`) は**既に cY explicit 引数**＝触らない。
-- 注意: orthogonality `∀η, ⟨X, ·.extension η⟩=0` は swap で符号入替ゆえ cY-値不変だが、τ₂ assembly は cY を
-  一貫使用要 ⟹ statement も cY に統一 (coherentYset 据置の混在は不可)。
+### ✅ 2026-06-20 cont.²⁷: foundation 着地 + 正確な cY-path 確定 (caller/consumer grep 済)
+**✅ bottom DONE**: `exists_decomposition_caseB_anchorCY` (`S08_CaseBAnchoredSeed:167`, commit `ebb6fab1`、
+build-green、sibling 追加)。旧 `exists_decomposition_caseB_coherentYset` の coeff+hYcard 導出を `hgood` param 化。
+
+**🟢 dead code = cY-path 外、触らない (grep で caller/consumer 0 を確認済)**:
+- `caseB_column_anchored_image`(210): **caller 0** (docstring のみ)。`caseB_member_anchored_image` が superset。
+- `caseB_hmixed`(582) + `inner_certainTypeExtension_columnSum_coherentYset_extension_eq_zero`
+  (`S08_CaseBCoherence2:1449`): **consumer 0**。⟹ 当初心配した「coherentYset-specific named 補題」は無視可。
+
+**実 cY-path (~10 項、bottom→top、`S08_CaseBAnchoredSeed`)** — caseBXset_isCoherent から推移的に到達する集合:
+1. ✅ `exists_decomposition_caseB_anchorCY` (DONE)
+2. `caseB_member_anchored_image`(297) — `exists_decomposition_*`(→anchorCY) + `caseB_per_phi_anchored_fromYset`(cY-generic既) を呼ぶ
+3. `caseB_anchoredImage_seam_all_Yset`(393) — **IsCoherent-method ベース** (`extends_on_supported`/`extension_inner_eq`)
+   = cY token swap のみ、hYcard 無し
+4. `caseB_column_anchored_full`(623) — `caseB_member_anchored_image` を呼ぶ
+5. `coherentCertainTypeSet_union_Yset_caseB`(694) — `caseB_column_anchored_full` を呼ぶ
+6. `caseB_Xset_member_anchored`(801) — `caseB_member_anchored_image` + `caseB_anchoredImage_seam_all_Yset` を呼ぶ
+7. helper `inner_eq_of_anchored_varying`(861) + `anchoredImage_scaledDiff_eq`(930) — 仮説に coherentYset.extension η₁
+   を持つ (statement で cY 化要)、proof は IsCoherent-method
+8. `caseBXimg`(1154)/`caseBXimg_spec`(1181) — `caseB_Xset_member_anchored` を choose/spec
+9. `caseBXset_isCoherent`(1227) — `caseBXimg`/`caseBXimg_spec`/`inner_eq_of_anchored_varying` を呼ぶ
+
+**`S08_CaseBSeedGlue`**: `coherentXunionYset_caseB`(299) → `nonempty_coherent_S_caseB_of_anchor`(380) →
+`nonempty_coherent_S_caseB_of_structure`(476)。⚠ `caseB_Xset_orthogonal_Yset` は**ソース内積** (extension 非依存)
+ゆえ cY-path 外、触らない。
 - **top で uniform cY 供給**: `nonempty_coherent_S_caseB_of_structure` が
   `obtain ⟨cY, hcYgood⟩ := hyp.exists_Ycoherence_hgood_uniform_caseB hcop hp hHp hprime hW2comm hW2cenL hη₁ hc2 hFPF`
-  (← 本セッションの linchpin) で cY を一度取り chain に渡す。これで hYcard 完全消滅。
+  (本セッションの linchpin) で cY を一度取り chain に渡す。これで hYcard 完全消滅。
+- 注意: τ₂ assembly は cY を一貫使用要 ⟹ statement も cY に統一 (coherentYset 据置の混在は不可)。
+
+**実装方針 (sibling 安全策)**: `_cY` sibling を bottom→top で追加 (各 build-green、既存 chain 不変)、top で switch
+→ 旧 chain (exists_decomposition_caseB_coherentYset + 旧 column_anchored_image + 上記 path の旧版) を削除。
+または in-place atomic (less code だが build 一括)。foundation で pattern 実証済。
 
 **rewiring 後**: `nonempty_coherent_S_caseB_of_c2` (`S08_PGroupReduction:343`) から hYcard 引数除去 →
 dispatcher `nonempty_coherent_S_of_c2_of_branches` の hcaseB が hWMgt edge 分岐 + hXne のみに →
 **S08:59 assembly** (rcases hyp.cases + hcaseA✅ + hcaseB + c1✅ + 薄いラッパ)。case-A は完了済。
-**見積**: rewiring は ~12 theorem の token 置換 + signature 編集 (script 補助可、build-debug 込で 1 session)。
+**見積**: ~10 項 (dead 2 項除外) の token 置換 + signature 編集 (build-debug 込で 1 session)。
 **FT 文脈**: (6.8) は honest FT 証明の genuine な上流前提(§13 char data が cite)。進捗は sorry 数でなく実質的証明で測る ([[ft-path-policy]]; CLAUDE.md「進捗の測り方」; "orphaned"/"閉じても sorry 減らない" は使わない)。
 
 ---
