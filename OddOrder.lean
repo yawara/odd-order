@@ -182,6 +182,7 @@ import OddOrder.Peterfalvi.S08_CaseBHortho
 import OddOrder.Peterfalvi.S08_CaseBEnumeration
 import OddOrder.Peterfalvi.S08_CoherenceWeighted
 import OddOrder.Peterfalvi.S08_CaseBWeightedEndgame
+import OddOrder.Peterfalvi.S08_CaseAWeightedEndgame
 import OddOrder.Peterfalvi.S08_CaseBAnchoredSeed
 import OddOrder.Peterfalvi.S08_CaseBSeedGlue
 import OddOrder.Peterfalvi.S08_PGroupReduction
