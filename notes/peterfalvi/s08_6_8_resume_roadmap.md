@@ -33,18 +33,21 @@ W₂⊇ 領域に閉じ込められない)。
 `isPGroup_of_not_coherent_c2` → `hbound` → dispatch。column の R(μⱼ) data は member 側 `caseB_member_orthoDatum`
 + `certainTypeR` で既存。
 
-**⚠ retarget 内部精読 (cont.¹⁸ 末尾、S07 確認済) — 単純 norm-swap でなく projection rework**:
-`retarget`/`orthoResidualMap`/`inner_block_expand`/`retarget_inner_eq_on_zSpan_union` (`S07:2927`)/
-`retarget_isCoherent` (`S07:3262`)/`retargetTargetPair` (`S07:2536`) は全て **projection-based + norm-1
-ハードコード** (`hXX=1`/`hχχ=1`、`retargetTargetPair` は `E.card=1` で X=単一元)。norm-k 化は:
-1. **`retargetTargetPair` の k 版** = X=Σ_{α∈E}α (|E|=‖χ‖²=k、(5.4.b) `eq_sum_of_psi_eq_zero` で E 取得)、
-   ‖X‖²=k / ‖X̄‖²=|R(χ)|−k。
-2. **`retarget_inner_eq_on_zSpan_union`/`inner_block_expand` の k 版** = `hXX=1` → `hXX=⟨χ,χ⟩` (source も
-   `hχχ=⟨χ,χ⟩`)。projection 係数 ⟨φ,χ⟩/‖χ‖² は lattice generator 上は整数 (⟨χ,χ⟩/k=1, ⟨S₁,χ⟩/k=0) ゆえ
-   retarget は source lattice 上 well-defined のはず — だが要検証 (整数性が crux)。
-3. **`retarget_isCoherent` の k 版** + 上流 `retarget_isCoherent_of_extensionImage` の huu=1+a²→k+a² 等。
-**∴ 見積 ~2-3 session、design 確認 (projection vs basis-direct (5.6.3) 構成) を先に**。次 session は retarget
-内部の k 一般化を `retargetTargetPair`(k 版)から着手 or 内部 mapping workflow。
+**🚨 retarget 内部精読で DESIGN 確定 (cont.¹⁸ 末尾、S07 def 確認済) — retarget は本質 norm-1、reducible は
+basis-direct 新規構成が要る**:
+- `orthoResidualMap φ = φ − ⟨φ,χ⟩•χ − ⟨φ,χ̄⟩•χ̄` / `retarget φ = τ₁(φperp) + ⟨φ,χ⟩•X + ⟨φ,χ̄⟩•X̄`
+  (`S07` def 確認) は **projection 係数に ⟨φ,χ⟩ を直接使う = ‖χ‖²=1 ハードコード**。norm-k は ⟨φ,χ⟩/k が
+  要るが `innerLeftℤ` は ℤ 値ゆえ **/k は ℤ-線形性を壊す (k>1 不可)**。`inner_block_expand` も `hee=1` 必須。
+- **∴ retarget 機構 (ℤ-線形 projection) は norm-1 専用で、norh-k への「一般化」は不可。reducible-break は
+  retarget を使わず basis-direct な (5.6.3) 構成を新規に作る**: τ₂ を ℤ[S₁∪{χ,χ̄}] 上に χ↦X, χ̄↦X̄,
+  S₁↦τ₁ で直接定義 (χ,χ̄ が span S₁ と ℤ-独立ゆえ基底拡張で well-defined、projection 不要) + Gram 一致
+  (‖X‖²=‖χ‖²=k, ‖X̄‖²=‖χ̄‖²=k, ⟨X,X̄⟩=0, X⊥τ₁S₁) で isometry。
+- 部品: X=Σ_{α∈E}α (|E|=k) は (5.4.b) `eq_sum_of_psi_eq_zero` (k-general) で取得。R(μⱼ)=`certainTypeR`。
+  **新規 = 基底拡張 isometry の構成補題** (mathlib に Z-module basis 拡張 isometry があるか要調査、なければ自作)。
+- ⚠ 重要: weighted engine は reducible column を **base (certainTypeSet, 既 coherent) に持ち、chain は既約 pair
+  のみ adjoin** する設計。reducible を **break として adjoin** する道は repo に無い (= この新規構成が埋める穴)。
+**∴ 見積 = fresh basis-direct (5.6.3) 構成 (~2-3 session、retarget 一般化でない)**。次 session の一手 =
+basis-direct extension-isometry の構成方針確定 (mathlib basis API 調査) → (5.6.3) 構成。
 **FT 文脈不変**: (6.8) は orphaned (deferred-payoff)。
 
 ## 🔄🎯 2026-06-19 cont.¹⁷ — 5-agent workflow が cont.¹⁶「大型 engine 一般化」を覆す + c2 chain が本筋
