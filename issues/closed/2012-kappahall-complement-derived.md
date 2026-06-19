@@ -7,6 +7,16 @@ created: 2026-06-19
 
 # Discharge kappaHall_isComplement_derived (BG↔Peterfalvi 対応)
 
+## ✅ RESOLVED (2026-06-19, commit `64472a63`) — 既に形式化済だった
+
+この対応は **既に証明済(axiom-clean)** = `OddOrder.BG.Ch4.S14.typeP_derivedInG_isComplement_kappaHall`
+(`S14_TypePCounting.lean:8008`、BG Thm 14.7(h)、AxiomsCheck 登録)。私が原文/既存機構を確認せず sorry'd 重複
+`kappaHall_isComplement_derived` を切り出したのが誤り。**対応**: 重複を削除し consumer(FeitThompson.lean)で
+既存定理を直接 cite([IsCyclic ↥K] を caseB 前へ hoist)→ **(10.11) 完全 unconditional 化**(sorry 136→135)。
+教訓 = 「gap/obligation と決める前に grep + AxiomsCheck を確認」([[feedback-dont-mislabel-formalization-as-research]])。
+
+---
+
 **Owner**: lane-f (BG §14)。lane-h が (10.11) `theorem88_caseB_prime_orders` を sorry-free 化する際に
 切り出した唯一の residual(commit `daa62d7e`)。
 

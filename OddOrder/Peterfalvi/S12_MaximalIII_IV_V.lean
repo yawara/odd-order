@@ -403,21 +403,6 @@ structure Theorem88CaseBData (G : Type*) [Group G] where
   S_compl : Subgroup.IsComplement' ((derivedInG S).subgroupOf S) (W1.subgroupOf S)
   T_compl : Subgroup.IsComplement' ((derivedInG T).subgroupOf T) (W2.subgroupOf T)
 
-/-- **BG ↔ Peterfalvi notation correspondence** (`κ(M)`-Hall `=` Peterfalvi `W₁(M)`): the κ-Hall
-factor `K` of a type-`P` maximal subgroup complements the derived subgroup `M' = [M,M]` in `M`
-(`M = M' ⋊ K`, mirroring `M = M' ⋊ W₁` of (8.4.a)).  BG and Peterfalvi describe the *same* maximal
-subgroup in different notation; this lemma identifies BG's `κ(M)`-Hall with Peterfalvi's `W₁(M)`
-(the order-sharing asserted in the docstring of `TypePData.card_W1_eq_derived_index`).  It is
-formalization labour provable from the BG §14 type-`P` structure (lane-f's `typeP_duality`
-machinery), not a textbook elision.  Used by the §16 producer to supply
-`Theorem88CaseBData.S_compl`. -/
-theorem kappaHall_isComplement_derived {M K : Subgroup G}
-    (_hM : M ∈ maximalSubgroups G) (_hMP : OddOrder.BG.Ch4.S14.IsTypeP M) (_hKle : K ≤ M)
-    (_hKhall : OddOrder.Isaacs.Ch03.IsHallSubgroup (OddOrder.BG.Ch4.S14.kappa M)
-      (K.subgroupOf M)) :
-    Subgroup.IsComplement' ((derivedInG M).subgroupOf M) (K.subgroupOf M) := by
-  sorry
-
 /-- A non-type-I maximal subgroup that is not of type V (so of type II/III/IV) carries type-`P`
 data whose `W₁` has prime order — Peterfalvi (8.6.a), via `TypePNontrivialCore`.  Type V is
 excluded by Theorem (10.10) `no_typeV_maximal`. -/
