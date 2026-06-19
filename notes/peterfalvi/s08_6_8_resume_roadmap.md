@@ -27,13 +27,30 @@
 (6.3) の break は reducible column たりうる: **Y=S(H') は既約** (`04.8:156`「Y⊂Irr L, η_j(1)=|W₁|」) ゆえ
 column∉Y、よって S(B) (B⊊A⊆H') の break が column になりうる (cont.¹⁴ の確定と一致)。
 
-**hbound を閉じる 2 経路** (どちらも substantial、設計判断要):
-1. **engine 拡張**: `xAdjoinStepW`/`coherentDegreeSqNormBound_of_not_coherentW` を reducible break χ に拡張。
-   column の `R(μⱼ)` 構造 (size 2w₁、(4.9)/(5.8) `μₖ^τ₁=δₖΣωᵢₖ^σ`) を使う。= 新規の本体。
-2. **構造論証**: (6.3)-for-(6.8)-c2 の induction で break が常に既約と示す。columns∉Y は確認したが
-   columns∈S(B) を排除する論証は未確立 (S(A) が全 column を含む regime を示せれば break は既約)。
-**この crux は hbound (6.3 c2) と case-B (6.8.3) bootstrap の `hbreak` (`false_of_caseB_break_of_bounds`
-の named 入力) の両方を同時にブロックする中心 crux**。
+**❌ path 2 (break 常に既約) は RULED OUT (構造的に不成立、再調査不要)**: column μⱼ=Ind θⱼ は θⱼ が
+W₂ 上非自明 (W₂⊄Ker θⱼ、W₂⊆H')、かつ Y=S(H') は既約 (`04.8:156`) ゆえ column∉Y。(6.3) induction
+(A,B⊆H'=⁅H,H⁆) で `B⊆Ker θⱼ` かつ `A⊄Ker θⱼ` となる factor A/B では column が S(B)\S₁ の break になる
+(case A では column∈S(Z), Z=Z(H)∩H' ⊊ H' ゆえ A⊋Z で column∉S(A))。⟹ **break は既約に限定できない。**
+
+**✅ 唯一の経路 = path 1 (engine を reducible break ‖χ‖²=k に一般化 = (5.6) を reducible break で形式化)**。
+スコープ確定 (engine 精読済):
+- **データは既存・新規構成不要**: column の R(μⱼ) decomposition `CharacterPsiDecomposition` は member 側で
+  `caseB_member_orthoDatum` が既に供給 (column を member として扱う weighted 機構)。break も同じ型の object。
+  非対称は **engine だけ** (break を `decompositionDaFromDadeOfDiff`=既約専用で構成し ‖χ‖²=1 を仮定)。
+- **一般化要の engine lemma 3 本** (‖break‖²=1 → ‖break‖²=k):
+  1. **`retarget_isCoherent_of_extensionImage`** (`S08_CoherenceCorePart1:1980`) = (5.6.3) 最終構成。`hχχ=1` を
+     huu/hud/hdd/hdu 内積計算 (`‖(χ−a·χ₁)^τ‖²=1+a²` 等→`=k+a²`) + 拡張 χ^τ₂=X (X=R(χ) の k-subset 和、
+     (5.4.b) `|E|=‖χ‖²`) で使用。**core・最大**。
+  2. **`crux1_of_memberFamilyW`** (`S08_CoherenceWeighted:169`) = (5.6.1)/(5.6.2) λ-form。‖χ‖² 依存を確認要。
+  3. **`xAdjoinStepW`** (`S08_CoherenceWeighted:286`) = break Da を `decompositionDaFromDadeOfDiff` で構成する
+     箇所を一般 `Da : CharacterPsiDecomposition` パラメータ化 (member の Dmem と対称化) + ‖χ‖²=k 配線。
+  → 下流 `coherentDegreeSqNormBound_of_not_coherentW`/`sMember_degreeSqNormBound_of_not_coherent`/
+    `sSubFiltration_sum_le_two_psi_caseB` の `hψirr` を ‖ψ‖²=k 版に差し替え。
+- **見積 = multi-session** (~数百行、core coherence engine 改修)。= (5.6) reducible-break 形式化。
+
+**この crux は hbound (6.3 c2) と hcaseA/hcaseB の (6.8.3) bootstrap `hbreak`
+(`false_of_caseB_break_of_bounds` の named 入力) を全て同時にブロックする (6.8) c2 全体の中心 gate**
+(case A も S(Z) に column を持ち (6.8.3) break が column たりうる)。**∴ 次の本丸 = path 1 のみ。**
 
 ### ✅ 進捗: `nonempty_coherent_S_caseB_of_c2` landed (commit `c6114940`、axiom-clean)
 
@@ -45,8 +62,9 @@ dispatch の `hcaseB` producer を整備。`nonempty_coherent_S_caseB_of_c2_data
 
 ### ▶ 次の一手 (優先順)
 
-1. **hbound (本丸)**: 上記 crux の経路 1 (engine 拡張) か経路 2 (break 既約の構造論証) を設計確定 → 実装。
-   経路 2 が成れば既存 `sSubFiltration_sum_le_two_psi_caseB` がそのまま効く (軽い)。経路 1 は engine 本体。
+1. **hbound (本丸) = path 1 のみ** (path 2 は上記で RULED OUT): reducible-break (5.6) engine 一般化。
+   着手順 = `retarget_isCoherent_of_extensionImage` の ‖χ‖²=k 一般化 (core) → `crux1`/`xAdjoinStepW` →
+   下流 `hψirr`→‖ψ‖²=k 差し替え。multi-session。**この 1 本が hbound/hcaseA/hcaseB 全てを unblock**。
 2. **hcaseA** (case-A producer): `Xset_centralCommutator_isCoherent_of_c2_caseA` → S bootstrap (未構築)。
 3. **dispatch 配線** (S08:59): hbound+hcaseA+`nonempty_coherent_S_caseB_of_c2`+`caseAB_split_of_c2` を
    `nonempty_coherent_S_of_c2_of_branches` 経由で c2 枝に。c1 枝は `nonempty_coherent_S_of_frobenius` 既存。
