@@ -4300,6 +4300,139 @@ theorem chiefFactor_card_and_commutator_of_inputs [Finite G]
     have hg0eq : ((gbar : ↥H) : G) = g0 := hgbareq
     rw [← hg0eq]; exact hbrk
 
+open OddOrder.Isaacs.Ch04.OddOrder.Isaacs.Ch03.IsAInvariant
+  (quotientMulAutHom quotientMulAutHom_apply_mk') in
+open scoped commutatorElement in
+/-- **Theorem 15.2(f) — the chief-factor `C`-interface `|C_{Q̄}(K)| = q`, gated producer** (mmd
+L4196, BG Theorem 14.7(f)).  Discharges the `hCfix`/`hCcard` hypotheses of
+`chiefFactor_card_and_commutator_of_inputs` by exhibiting the subgroup `C = K* ⊔ Q₀` of `Q` whose
+image in `Q̄ = Q/Q₀` is the `K`-fixed-class subgroup `C_{Q̄}(K)`, and showing `[C : Q₀] = q`.
+
+In the type-`P₁` situation `K* = C_{M_σ}(K) = M_σ ⊓ C_G(K)` (`hKstar`) with `|K*| = q` prime
+(`hKstar_prime`), `K* ≤ Q ≤ M_σ` (`hKstarQ`, `hQMσ`), and `K* ⊄ Q₀` (`hKstarQ0`, an output of
+`kstar_le_Q1_of_inputs`).  The argument (verified):
+
+* **`C_Q(K) = K*`**: the conjugation-fixed points of `K` on `↥Q` push forward to `C_G(K) ⊓ Q`
+  (`fixedPointsOfMulAut_conj_map_subtype`), and `C_G(K) ⊓ Q = M_σ ⊓ C_G(K) = K*` since `Q ≤ M_σ`
+  and `K* ≤ Q`.
+* **`C_{Q̄}(K)` is the image of `K*·Q₀`** (BG Proposition 1.5(d), coprime `K`-action, `hcop`):
+  `C_{Q̄}(K) = (C_{↥Q}(K))·Q₀/Q₀` via `fixedPointsOfMulAut_quotientMulAutHom_eq_map`, so the
+  `K`-fixed-class preimage in `Q` is `C_{↥Q}(K) ⊔ (Q₀ ↾ Q) = (K* ⊔ Q₀) ↾ Q` (`comap_map_eq`).
+  This gives the membership iff `hCfix`.
+* **`K* ⊓ Q₀ = ⊥`**: since `|K*| = q` is prime, `Q₀ ↾ K*` is `⊥` or `⊤`
+  (`eq_bot_or_eq_top_of_prime_card`); `⊤` would force `K* ≤ Q₀`, against `hKstarQ0`.  Hence
+  `|K* ⊔ Q₀| = |K*|·|Q₀|` (`card_sup_eq_mul_of_le_normalizer_of_disjoint`), so
+  `[K* ⊔ Q₀ : Q₀] = |K*| = q` (`hCcard`).
+
+The §14-gated input is `hKstar_prime` (`|K*| = q`, Theorem 14.7(f)); the normalizer/coprimality
+data are structural.  Removes `hCfix`/`hCcard` from being unproduced named hypotheses of the engine:
+the wrapper instantiates the engine with `C := K* ⊔ Q₀` and these two facts. -/
+theorem card_centralizer_quotient_eq_of_kstar [Finite G]
+    {Q Q0 K Kstar Mσ : Subgroup G} {q : ℕ} [Fact q.Prime] [(Q0.subgroupOf Q).Normal]
+    (hKstar : Kstar = Mσ ⊓ Subgroup.centralizer (K : Set G))
+    (hQMσ : Q ≤ Mσ) (hKstarQ : Kstar ≤ Q) (hKstar_prime : Nat.card ↥Kstar = q)
+    (hQ0Q : Q0 ≤ Q) (hKstarQ0 : ¬ Kstar ≤ Q0)
+    (hKQ : K ≤ Subgroup.normalizer (Q : Set G))
+    (hQQ0 : Q ≤ Subgroup.normalizer (Q0 : Set G))
+    (hKQ0 : K ≤ Subgroup.normalizer (Q0 : Set G))
+    (hKstarQ0norm : Kstar ≤ Subgroup.normalizer (Q0 : Set G))
+    (hcop : Nat.Coprime (Nat.card ↥K) (Nat.card ↥Q))
+    (hSolv : IsSolvable ↥K ∨ IsSolvable ↥Q) :
+    ∃ C : Subgroup G, Q0 ≤ C ∧ C ≤ Q ∧
+      (∀ x ∈ Q, ((∀ k ∈ K, ⁅k, x⁆ ∈ Q0) ↔ x ∈ C)) ∧
+      (Q0.subgroupOf C).index = q := by
+  classical
+  -- `C_Q(K) = K*` (push-forward of conjugation-fixed points; brick: `Q ≤ M_σ`, `K* ≤ Q`).
+  set φ : ↥K →* MulAut ↥Q :=
+    (Subgroup.normalizerMonoidHom Q).comp (Subgroup.inclusion hKQ) with hφ
+  have hfixmap : (Subgroup.fixedPointsOfMulAut φ).map Q.subtype = Kstar := by
+    rw [OddOrder.BG.Ch1.S06.fixedPointsOfMulAut_conj_map_subtype hKQ]
+    -- `C_G(K) ⊓ Q = M_σ ⊓ C_G(K) = K*`, using `Q ≤ M_σ` and `K* ≤ Q`.
+    apply le_antisymm
+    · rw [hKstar]; exact le_inf (inf_le_right.trans hQMσ) inf_le_left
+    · rw [hKstar] at hKstarQ ⊢; exact le_inf inf_le_right hKstarQ
+  -- `Q₀.subgroupOf Q` is `K`-invariant (each `k ∈ K` normalizes `Q₀`).
+  have hMinv : OddOrder.Isaacs.Ch03.IsAInvariant φ (Q0.subgroupOf Q) := by
+    rw [OddOrder.Isaacs.Ch03.isAInvariant_iff_smul_mem]
+    intro a y hy
+    rw [Subgroup.mem_subgroupOf] at hy ⊢
+    show (a : G) * (y : G) * (a : G)⁻¹ ∈ Q0
+    exact (Subgroup.mem_normalizer_iff.mp (hKQ0 a.2) (y : G)).mp hy
+  -- the conjugation-fixed-class characterization on `Q̄`: `a • [x] = [x] ↔ ⁅a, x⁆ ∈ Q₀`.
+  have hsmul_iff : ∀ (a : ↥K) (x : ↥Q),
+      ((quotientMulAutHom hMinv a (QuotientGroup.mk' (Q0.subgroupOf Q) x)
+          = QuotientGroup.mk' (Q0.subgroupOf Q) x)) ↔ ⁅(a : G), (x : G)⁆ ∈ Q0 := by
+    intro a x
+    rw [quotientMulAutHom_apply_mk', QuotientGroup.mk'_apply, QuotientGroup.mk'_apply,
+      QuotientGroup.eq, Subgroup.mem_subgroupOf, Subgroup.coe_mul, Subgroup.coe_inv]
+    show ((a : G) * (x : G) * (a : G)⁻¹)⁻¹ * (x : G) ∈ Q0 ↔ ⁅(a : G), (x : G)⁆ ∈ Q0
+    have hxN : (x : G) ∈ Subgroup.normalizer (Q0 : Set G) := hQQ0 x.2
+    have heq : ((a : G) * (x : G) * (a : G)⁻¹)⁻¹ * (x : G)
+        = (x : G)⁻¹ * ⁅(a : G), (x : G)⁆⁻¹ * ((x : G)⁻¹)⁻¹ := by
+      rw [commutatorElement_def]; group
+    rw [heq]
+    have htransfer : ((x : G)⁻¹ * ⁅(a : G), (x : G)⁆⁻¹ * ((x : G)⁻¹)⁻¹ ∈ Q0)
+        ↔ ⁅(a : G), (x : G)⁆⁻¹ ∈ Q0 :=
+      (Subgroup.mem_normalizer_iff.mp ((Subgroup.normalizer (Q0 : Set G)).inv_mem hxN)
+        (⁅(a : G), (x : G)⁆⁻¹)).symm
+    rw [htransfer, Subgroup.inv_mem_iff]
+  -- Proposition 1.5(d): `C_{Q̄}(K) = (fixedPoints φ).map mk'`; its preimage in `Q` is
+  -- `fixedPoints φ ⊔ (Q₀ ↾ Q)` (`comap_map_eq`), which maps to `K* ⊔ Q₀` in `G`.
+  have hmap := OddOrder.BG.Ch1.S03h.fixedPointsOfMulAut_quotientMulAutHom_eq_map
+    (φ := φ) hcop hSolv hMinv
+  have hpreimage : (Subgroup.fixedPointsOfMulAut φ ⊔ Q0.subgroupOf Q).map Q.subtype
+      = Kstar ⊔ Q0 := by
+    rw [Subgroup.map_sup, hfixmap, Subgroup.map_subgroupOf_eq_of_le hQ0Q]
+  refine ⟨Kstar ⊔ Q0, le_sup_right, sup_le hKstarQ hQ0Q, ?_, ?_⟩
+  · -- `hCfix`: for `x ∈ Q`, `[x]` is `K`-fixed iff `x ∈ K* ⊔ Q₀`.
+    intro x hxQ
+    -- the preimage in `Q` of `C_{Q̄}(K)` is `fixedPoints φ ⊔ (Q₀ ↾ Q)`.
+    have hcomapeq : (Subgroup.fixedPointsOfMulAut (quotientMulAutHom hMinv)).comap
+          (QuotientGroup.mk' (Q0.subgroupOf Q))
+        = Subgroup.fixedPointsOfMulAut φ ⊔ Q0.subgroupOf Q := by
+      rw [hmap, Subgroup.comap_map_eq, QuotientGroup.ker_mk']
+    have hkey : (∀ k ∈ K, ⁅k, x⁆ ∈ Q0) ↔ (⟨x, hxQ⟩ : ↥Q) ∈
+        (Subgroup.fixedPointsOfMulAut φ ⊔ Q0.subgroupOf Q) := by
+      rw [← hcomapeq, Subgroup.mem_comap, Subgroup.mem_fixedPointsOfMulAut]
+      constructor
+      · intro h r
+        rcases r with ⟨k, hk⟩
+        exact (hsmul_iff ⟨k, hk⟩ ⟨x, hxQ⟩).mpr (h k hk)
+      · intro h k hk
+        exact (hsmul_iff ⟨k, hk⟩ ⟨x, hxQ⟩).mp (h ⟨k, hk⟩)
+    rw [hkey]
+    constructor
+    · intro hx
+      have : x ∈ (Subgroup.fixedPointsOfMulAut φ ⊔ Q0.subgroupOf Q).map Q.subtype :=
+        ⟨⟨x, hxQ⟩, hx, rfl⟩
+      rwa [hpreimage] at this
+    · intro hx
+      have hx' : x ∈ (Subgroup.fixedPointsOfMulAut φ ⊔ Q0.subgroupOf Q).map Q.subtype := by
+        rwa [hpreimage]
+      obtain ⟨z, hz, hzeq⟩ := hx'
+      have : z = ⟨x, hxQ⟩ := Subtype.ext hzeq
+      rwa [this] at hz
+  · -- `hCcard`: `[K* ⊔ Q₀ : Q₀] = |K*| = q` via `|K* ⊔ Q₀| = |K*|·|Q₀|` and `card_mul_index`.
+    haveI hprime : Fact (Nat.card ↥Kstar).Prime := ⟨hKstar_prime ▸ Fact.out⟩
+    -- `K* ⊓ Q₀ = ⊥`: `Q₀ ↾ K*` is `⊥` or `⊤`; `⊤` forces `K* ≤ Q₀`, against `hKstarQ0`.
+    have hdisj : Kstar ⊓ Q0 = ⊥ := by
+      rcases (Q0.subgroupOf Kstar).eq_bot_or_eq_top_of_prime_card with hbot | htop
+      · have : Disjoint Q0 Kstar := Subgroup.subgroupOf_eq_bot.mp hbot
+        rw [disjoint_iff, inf_comm] at this; exact this
+      · exact absurd (Subgroup.subgroupOf_eq_top.mp htop) hKstarQ0
+    have hKstarN : Kstar ≤ Subgroup.normalizer (Q0 : Set G) := hKstarQ0norm
+    -- `|K* ⊔ Q₀| = |K*|·|Q₀|`.
+    have hcard_sup : Nat.card ↥(Kstar ⊔ Q0) = Nat.card ↥Kstar * Nat.card ↥Q0 :=
+      card_sup_eq_mul_of_le_normalizer_of_disjoint hKstarN hdisj
+    -- `|Q₀ ↾ (K* ⊔ Q₀)| = |Q₀|` and `card · index = |K* ⊔ Q₀|`.
+    have hcardQ0sub : Nat.card ↥(Q0.subgroupOf (Kstar ⊔ Q0)) = Nat.card ↥Q0 :=
+      Nat.card_congr (Subgroup.subgroupOfEquivOfLe (le_sup_right : Q0 ≤ Kstar ⊔ Q0)).toEquiv
+    have hmul := Subgroup.card_mul_index (Q0.subgroupOf (Kstar ⊔ Q0))
+    rw [hcardQ0sub, hcard_sup, hKstar_prime, mul_comm q (Nat.card ↥Q0)] at hmul
+    -- `hmul : |Q₀| * index = |Q₀| * q`; cancel `|Q₀| > 0`.
+    have hQ0pos : 0 < Nat.card ↥Q0 := Nat.card_pos
+    exact Nat.eq_of_mul_eq_mul_left hQ0pos hmul
+
 /-- **§14-independent `⊆`-half of Theorem 15.2(g)** (mmd L4198, the easy inclusion of
 `F(M) = Q ⊔ (C_G(Q) ⊓ M)`): the nilpotent `F(M)` splits as `O_π(F(M)) ⊔ O_{π'}(F(M))`
 (`opiCoreInG_sup_compl_eq_of_isNilpotent`), and the `π'`-part centralizes the `π`-part
