@@ -125,9 +125,18 @@ bottom-out** するので、clean 化には §15 foundation が先。真の順�
 
 - [x] Lemma 15.1 conjunct 1 (BG 15.1(b)) = `typeP_hall_derived_eq_and_abelian` ✅ `cab5603a`
 - [x] conjunct 2 (BG 15.1(c)) = `typeP_hall_small_subgroup_cyclic_tau2` ✅ `e11e3028`
-- [x] BG Thm 12.12 形式化確認 — ✅ 既存 sorry-free (`S12_Theorem1212{,b,c}.lean`, `frobFact_*`)
-- [ ] conjunct 3 (BG 15.1(d)): K≠⊥ branch (conjunct 1 経由) + K=⊥ branch (Thm 12.12(a), E=U)
-- [ ] conjunct 4 (BG 15.1(e)): K=⊥ (Thm 12.12(b), U0=E₀) + K≠⊥ type-P2 (FPF, easy case — 要 FPF 補題確認)
+- [x] BG Thm 12.12 形式化確認 — ✅ 既存 sorry-free (`frobenius_factorization_of_regular` S12_Theorem1212c:520)
+- [x] conjunct 3 (BG 15.1(d)) = `typeP_centralizerGeneratedBySigma_isMulCommutative` ✅ `80aa03cf`
+- [ ] **conjunct 4 (BG 15.1(e))** `U≠⊥ → ∃U0≤U, exp U0=exp U, Mσ⊔U0 Frobenius kernel Mσ`:
+  - **K=⊥ branch**: reachable — E=U setup (`subgroupESetup_of_isHall_kappa_eq_bot`) +
+    `frobenius_factorization_of_regular` part (b) (U0=E₀)。hreg discharge は conjunct 3 と同型。
+  - **⛔ K≠⊥ branch (type-P2) = 唯一の残 hard piece**: U の M_σ への **pointwise FPF**（各 u∈U# で
+    C_Mσ(u)=⊥、または exponent 実現の regular cyclic Z_p 構成）が要点。既存 `Msigma_centralizer_E23_eq_bot_of_caseTau1`
+    は **joint** C_Mσ(E₂⊔E₃)=⊥ のみ（pointwise でない）。U abelian (conjunct 1) かつ U は κ' ゆえ
+    (τ1∪τ3)-元は自動 regular = BG 4178「easy C_E(S)=E case」。但し `frobenius_factorization_of_regular`
+    は E=σ'-complement を要求し U=(κ∪σ)'-Hall に直接適用不可。**正スコープ = `frobFact_of_abelianSylow`
+    (S12_Theorem1212c:394) の abelian-Sylow regular 構成 (Z_p per τ2-prime, Thm 12.5(f)) を U 向けに
+    再構築 or 一般化**（medium-large、~1 session）。
 - [ ] conjunct 1-4 を `typeP_auxiliary_structure_gated` に wire (sorry 139→138)
 - [ ] Thm 15.2(a) `mf_ne_msigma_typeP1_structure` (S15:1144)
 - [ ] Thm 15.7 `fitting_not_ti_cases` (S15:3896) + Cor 15.5
