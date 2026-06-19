@@ -4261,6 +4261,165 @@ theorem q_not_dvd_index_of_msigma_quotient_isNilpotent [Finite G]
     rw [← hR]; exact hReq
   exact (Subgroup.comap_injective (QuotientGroup.mk'_surjective _)) hcomapbot
 
+/-- **`Q.subgroupOf M_σ` is a Hall `{q}`-subgroup of `↥M_σ`** (`§14`-independent helper): for a
+`q`-subgroup `Q ≤ M_σ` with `q ∤ [M_σ : Q]`, the relative subgroup is a `{q}`-Hall (= normal Sylow
+`q`) of `↥M_σ`.  Used to complement `Q` by a `{q}ᶜ`-Hall in the `D`-construction. -/
+theorem isHallSubgroup_subgroupOf_of_pgroup_of_not_dvd_index [Finite G]
+    {Mσ Q : Subgroup G} {q : ℕ} [Fact q.Prime]
+    (hQMσ : Q ≤ Mσ) (hQpg : IsPGroup q ↥Q) (hidx : ¬ q ∣ (Q.subgroupOf Mσ).index) :
+    Ch03.IsHallSubgroup ({q} : Set ℕ) (Q.subgroupOf Mσ) := by
+  refine ⟨fun p hp => ?_, fun p hp => ?_⟩
+  · have hcard : Nat.card ↥(Q.subgroupOf Mσ) = Nat.card ↥Q :=
+      Nat.card_congr (Subgroup.subgroupOfEquivOfLe hQMσ).toEquiv
+    rw [hcard] at hp
+    obtain ⟨n, hn⟩ := hQpg.exists_card_eq
+    rw [hn] at hp
+    rcases Nat.eq_zero_or_pos n with hn0 | hn0
+    · simp [hn0] at hp
+    · rw [Nat.primeFactors_prime_pow hn0.ne' Fact.out, Finset.mem_singleton] at hp
+      exact Set.mem_singleton_iff.mpr hp
+  · rw [Set.mem_singleton_iff]; rintro rfl; exact hidx (Nat.dvd_of_mem_primeFactors hp)
+
+/-- **Theorem 15.2 step 3 — the `K`-invariant complement `D` of `Q` in `M_σ`** (mmd L4194, "By
+Proposition 1.5(a), we may choose a `K`-invariant complement `D` of `Q` in `M_σ`").  In the
+type-`P₁` setting (`hP`, `hKstarQ`, `hQneMσ` giving `M_σ` non-nilpotent), with `Q = O_q(M)` the
+normal Sylow `q`-subgroup of `M_σ` (`msigma_quotient_isNilpotent_of_inputs` +
+`q_not_dvd_index_of_msigma_quotient_isNilpotent`), Proposition 1.5(a) (`exists_aInvariant_hall`)
+furnishes a `K`-invariant `{q}ᶜ`-Hall subgroup `D` of `M_σ`, which complements `Q` (coprime Hall
+orders) and is nilpotent (`complement_isNilpotent_of_inputs`).
+
+Output (matching the wrapper's existential block): `D ≤ M_σ`, `K ≤ N_G(D)`, `Disjoint Q D`, the
+complement `IsComplement' (Q.subgroupOf M_σ) (D.subgroupOf M_σ)`, `D` nilpotent, and `D ≠ ⊥`. -/
+theorem exists_kInvariant_qComplement [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M K Kstar Q : Subgroup G} {q : ℕ} [Fact q.Prime]
+    (hM : M ∈ maximalSubgroups G) (hP : S14.IsTypeP M) (hKM : K ≤ M)
+    (hK : Ch03.IsHallSubgroup (S14.kappa M) (K.subgroupOf M))
+    (hKstar : Kstar = OddOrder.BG.Ch3.S10.Msigma M ⊓ Subgroup.centralizer (K : Set G))
+    (hQ : Q = opiCoreInG ({q} : Set ℕ) M)
+    (hQMσ : Q ≤ OddOrder.BG.Ch3.S10.Msigma M) (hMnormQ : M ≤ Subgroup.normalizer (Q : Set G))
+    (hKstarQ : Kstar ≤ Q) (hQneMσ : Q ≠ OddOrder.BG.Ch3.S10.Msigma M)
+    (hKne : K ≠ ⊥) (hKMσdisj : Disjoint K (OddOrder.BG.Ch3.S10.Msigma M))
+    (hcop : Nat.Coprime (Nat.card ↥K) (Nat.card ↥(OddOrder.BG.Ch3.S10.Msigma M))) :
+    ∃ D : Subgroup G, D ≤ OddOrder.BG.Ch3.S10.Msigma M ∧
+      K ≤ Subgroup.normalizer (D : Set G) ∧ Disjoint Q D ∧
+      Subgroup.IsComplement' (Q.subgroupOf (OddOrder.BG.Ch3.S10.Msigma M))
+        (D.subgroupOf (OddOrder.BG.Ch3.S10.Msigma M)) ∧
+      Group.IsNilpotent ↥D ∧ D ≠ ⊥ := by
+  classical
+  set Mσ : Subgroup G := OddOrder.BG.Ch3.S10.Msigma M with hMσ
+  have hMσM : Mσ ≤ M := OddOrder.BG.Ch3.S10.Msigma_le M
+  have hMnormMσ : M ≤ Subgroup.normalizer (Mσ : Set G) :=
+    OddOrder.GroupTheory.le_normalizer_opiCoreInG _ M
+  haveI : IsSolvable ↥M := hG.solvable_of_mem_maximalSubgroups hM
+  haveI : IsSolvable ↥Mσ := solvable_of_solvable_injective (Subgroup.inclusion_injective hMσM)
+  have hQpg : IsPGroup q ↥Q := by rw [hQ]; exact isPGroup_opiCoreInG_singleton M
+  haveI hQnMσ : (Q.subgroupOf Mσ).Normal :=
+    (Subgroup.normal_subgroupOf_iff_le_normalizer hQMσ).mpr (hMσM.trans hMnormQ)
+  -- `M_σ/Q` nilpotent (step (c)(d)) and `q ∤ [M_σ:Q]` (step (c), `Q` is the Sylow `q`).
+  have hNil : Group.IsNilpotent (↥Mσ ⧸ Q.subgroupOf Mσ) :=
+    msigma_quotient_isNilpotent_of_inputs hG hM hP hKM hK hKstar hQMσ hMnormQ hKstarQ hQneMσ hKne
+      hKMσdisj hcop
+  have hQmax : ∀ R : Subgroup G, R ≤ M → (R.subgroupOf M).Normal → IsPGroup q ↥R → R ≤ Q := by
+    intro R hRM hRnorm hRpg
+    rw [hQ]
+    refine le_opiCoreInG_of_normal_of_isPiSubgroup hRM hRnorm ?_
+    intro p hp
+    obtain ⟨n, hn⟩ := hRpg.exists_card_eq
+    rw [hn] at hp
+    rcases Nat.eq_zero_or_pos n with h0 | h0
+    · simp [h0] at hp
+    · rw [Nat.primeFactors_prime_pow h0.ne' Fact.out, Finset.mem_singleton] at hp
+      exact Set.mem_singleton_iff.mpr hp
+  have hidx : ¬ q ∣ (Q.subgroupOf Mσ).index :=
+    q_not_dvd_index_of_msigma_quotient_isNilpotent hQMσ hMσM hQpg hMnormMσ hMnormQ hQmax hNil
+  have hQHall : Ch03.IsHallSubgroup ({q} : Set ℕ) (Q.subgroupOf Mσ) :=
+    isHallSubgroup_subgroupOf_of_pgroup_of_not_dvd_index hQMσ hQpg hidx
+  -- the `K`-conjugation action on `↥M_σ` and the `K`-invariant `{q}ᶜ`-Hall `D_M`.
+  have hKnormMσ : K ≤ Subgroup.normalizer (Mσ : Set G) := hKM.trans hMnormMσ
+  set φ : ↥K →* MulAut ↥Mσ :=
+    (Subgroup.normalizerMonoidHom Mσ).comp (Subgroup.inclusion hKnormMσ) with hφ
+  obtain ⟨DM, hDM_hall, hDM_inv⟩ :=
+    OddOrder.BG.Ch1.S01.exists_aInvariant_hall (G := ↥Mσ) (A := ↥K) (φ := φ) hcop ({q}ᶜ : Set ℕ)
+  set D : Subgroup G := DM.map Mσ.subtype with hD
+  have hD_le_Mσ : D ≤ Mσ := Subgroup.map_subtype_le _
+  have hDsub_eq : D.subgroupOf Mσ = DM := by
+    rw [hD, Subgroup.subgroupOf, Subgroup.comap_map_eq_self_of_injective Mσ.subtype_injective]
+  -- `{q}ᶜ`-Hall `DM` = `{p ∉ {q}}`-Hall (defeq, for `hall_compl_isComplement`).
+  have hDM_hall' : Ch03.IsHallSubgroup {p | p ∉ ({q} : Set ℕ)} DM := hDM_hall
+  -- `IsComplement' DM (Q.subgroupOf Mσ)`, hence `IsComplement' (Q.subgroupOf Mσ) (D.subgroupOf Mσ)`.
+  have hcompl : Subgroup.IsComplement' (Q.subgroupOf Mσ) (D.subgroupOf Mσ) := by
+    rw [hDsub_eq]
+    exact (OddOrder.BG.Ch1.S01.hall_compl_isComplement hDM_hall' hQHall).symm
+  -- `Disjoint Q D`: complement disjointness lifted to `G`.
+  have hdisjQD : Disjoint Q D := by
+    rw [Subgroup.disjoint_def]
+    intro x hxQ hxD
+    have hxMσ : x ∈ Mσ := hQMσ hxQ
+    have hmem : (⟨x, hxMσ⟩ : ↥Mσ) ∈ (Q.subgroupOf Mσ) ⊓ (D.subgroupOf Mσ) :=
+      ⟨Subgroup.mem_subgroupOf.mpr hxQ, Subgroup.mem_subgroupOf.mpr hxD⟩
+    rw [hcompl.disjoint.eq_bot, Subgroup.mem_bot] at hmem
+    exact congrArg (Subgroup.subtype Mσ) hmem
+  -- `K ≤ N_G(D)`: `K`-invariance of `DM` (`φ k • DM = DM`) ⟹ `k·d·k⁻¹ ∈ D` for `d ∈ D`.
+  have hKnormD : K ≤ Subgroup.normalizer (D : Set G) := by
+    intro k hk
+    refine Subgroup.mem_normalizer_fintype ?_
+    intro x hxD
+    rw [hD] at hxD ⊢
+    obtain ⟨w, hwDM, rfl⟩ := hxD
+    -- `k·↑w·k⁻¹ = ↑(φk w)`, and `φk w ∈ DM` (invariance `φk • DM = DM`).
+    have hφwDM : φ ⟨k, hk⟩ w ∈ DM := by
+      have hmem : φ ⟨k, hk⟩ w ∈ φ ⟨k, hk⟩ • DM := by
+        rw [Subgroup.pointwise_smul_def]; exact Subgroup.mem_map.mpr ⟨w, hwDM, rfl⟩
+      rwa [hDM_inv ⟨k, hk⟩] at hmem
+    refine ⟨φ ⟨k, hk⟩ w, hφwDM, ?_⟩
+    show ((φ ⟨k, hk⟩ w : ↥Mσ) : G) = k * (Mσ.subtype w) * k⁻¹
+    rfl
+  -- `D` nilpotent (`complement_isNilpotent_of_inputs`, prime-order `K₁ ≤ K`).
+  -- (assembled below via a prime-order `K₁ ≤ K` and the prime-manner action).
+  refine ⟨D, hD_le_Mσ, hKnormD, hdisjQD, hcompl, ?_, ?_⟩
+  · -- `D` nilpotent: prime-order `K₁ ≤ K` acts FPF on `D` (Theorem 3.7).
+    have hprime := actsPrimeManner_of_typeP hG hM hP hKM hK hKstar
+    have hKcard1 : Nat.card ↥K ≠ 1 := fun hc => hKne (Subgroup.card_eq_one.mp hc)
+    obtain ⟨r, hr_prime, hr_dvd⟩ := Nat.exists_prime_and_dvd hKcard1
+    haveI : Fact r.Prime := ⟨hr_prime⟩
+    obtain ⟨c, hc_ord⟩ := exists_prime_orderOf_dvd_card' (G := ↥K) r hr_dvd
+    set K1 : Subgroup G := Subgroup.zpowers (c : G) with hK1
+    have hcK : (c : G) ∈ K := c.2
+    have hK1K : K1 ≤ K := by rw [hK1]; exact Subgroup.zpowers_le.mpr hcK
+    have hK1M : K1 ≤ M := hK1K.trans hKM
+    have hDM_le_M : D ≤ M := hD_le_Mσ.trans hMσM
+    have hord_coe : orderOf (c : G) = r := by rw [Subgroup.orderOf_coe, hc_ord]
+    have hcardK1 : Nat.card ↥K1 = r := by rw [hK1, Nat.card_zpowers, hord_coe]
+    -- `D ≠ ⊥`: else `Q = M_σ` (`Q ⊔ D = M_σ`), contradicting `hQneMσ`.
+    have hDne : D ≠ ⊥ := by
+      intro hbot
+      apply hQneMσ
+      have : Q.subgroupOf Mσ = ⊤ := by
+        have hsup : Q.subgroupOf Mσ ⊔ D.subgroupOf Mσ = ⊤ := hcompl.sup_eq_top
+        rw [hbot] at hsup; simpa using hsup
+      have hQeq : Q.subgroupOf Mσ = (⊤ : Subgroup Mσ) := this
+      have := Subgroup.subgroupOf_eq_top.mp hQeq
+      exact le_antisymm hQMσ this
+    have hK1ne : K1 ≠ ⊥ := by
+      rw [hK1, Ne, Subgroup.zpowers_eq_bot]
+      intro hc1
+      have : orderOf (c : G) = 1 := by rw [hc1]; exact orderOf_one
+      rw [hord_coe] at this; exact hr_prime.ne_one this
+    have hDQ_disj : Disjoint D Q := hdisjQD.symm
+    have hDK1disj : Disjoint D K1 := (hKMσdisj.symm.mono_left hD_le_Mσ).mono_right hK1K
+    have hK1normD : K1 ≤ Subgroup.normalizer (D : Set G) := hK1K.trans hKnormD
+    refine complement_isNilpotent_of_inputs hG hM hDM_le_M hK1M hD_le_Mσ hDQ_disj hK1K
+      hK1normD hDK1disj hDne hK1ne ⟨r, hr_prime, hcardK1⟩ ?_
+    -- `hCentleQ`: `C_G(r) ⊓ M_σ = K* ⊆ Q` for `r ∈ K#` (prime-manner + `K* ⊆ Q`).
+    intro x hxK hx1
+    rw [hprime x hxK hx1]; exact hKstarQ
+  · -- `D ≠ ⊥`: as above.
+    intro hbot
+    apply hQneMσ
+    have hsup : Q.subgroupOf Mσ ⊔ D.subgroupOf Mσ = ⊤ := hcompl.sup_eq_top
+    rw [hbot] at hsup; simp only [Subgroup.bot_subgroupOf, sup_bot_eq] at hsup
+    exact le_antisymm hQMσ (Subgroup.subgroupOf_eq_top.mp hsup)
+
 /-- **Theorem 15.2 step 4, the `D`-side fixed-point fact** (BG Proposition 1.5(d)/1.6(d), mmd
 L4196-4200): a single `q'`-element `d` (here `d ∈ D`, coprime to `Q`) that *centralizes the chief
 factor* `Q̄ = Q/Q₀` (`⁅d, y⁆ ∈ Q₀` for every `y ∈ Q`) already centralizes `Q` itself, **provided**
