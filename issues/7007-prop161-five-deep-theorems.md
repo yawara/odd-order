@@ -101,6 +101,19 @@ bottom-out** するので、clean 化には §15 foundation が先。真の順�
     of full p-exponent。`typeP_hall_frobenius_factor` 自体は sorry-free (engine+helper に委譲)。
   - K≠⊥ branch = `M_σ⊓U=⊥` (coprimality) + engine 適用。**sorry count 不変** (K≠⊥ の sorry が
     最小 per-prime helper へ relocate)。full build 3862 green。
+- `2f34b0a0`: **linchpin 確立 + τ1∪τ3 case DONE**。`exists_subgroupESetup_with_le hG hM hUM hUpi`
+  (S12_Proposition1215:283) で **U≤E の E-setup** を取得 (U は σ'-subgroup ゆえ)。τ1∪τ3 (p∉τ2 ⟹
+  r_p=1, `hsetup.pRank_M_le_two` の rank≤2 から): Z=Sylow_p(U) を G へ push、`factorization_exponent_le_of_sylow`
+  + Lemma 14.1 (K=⊥ と同じ discharge)。**残 = τ2 case のみ** (helper の唯一 sorry)。
+- **τ2 route 確定 (次の一手、~1 session)**: U-localization の conjugacy 罠は
+  **S:=Sylow_p(U) を full G-Sylow として使う**ことで回避 (`exists_cyclic_Enormal_regular_of_abelianSylow`
+  は `Z ≤ (S:Subgroup G)` を返す ⟹ S=Sylow_p(U) なら Z≤Sylow_p(U)≤U 直接)。要:
+  - **hreg** (τ1∪τ3 regularity on E、K=⊥ パターン再利用、~30行)。
+  - **full-Sylow-in-G fact (abelian)**: A=Ω₁(Sylow_p(U))∈ℰ_p²、S':Sylow p G⊇A、S' abelian ⟹
+    S'≤C_G(A)≤E≤M (`centralizer_le_E_of_tau2`)、|S'|≤(card M).fact p=(card U).fact p=|Sylow_p(U)| ⟹
+    |Sylow_p(U)|=(card G).fact p (full G-Sylow)。`Sylow.ofCard SU` で S:Sylow p G 化、適用。
+  - **nonabelian sub-case**: Sylow_p(U)=C_S(A)=A₀×Z (Thm 12.7, mmd 3237)、Z=regular cyclic factor。
+    既存 Lean `frobFact_of_nonabelianSylow` は FrobFactConclusion を返すゆえ per-prime Z 抽出は別途要 (harder)。
 - **kernel の shared linchpin (確定)**: τ1∪τ3 (partition coverage `pRank_M_le_two` で r_p=1) も
   τ2 (regular cyclic machinery) も **両方とも type-P M の E-setup with U≤E を要求**。`pRank_M_le_two`
   (S12_ECore:267) と `mem_tau_union_of_mem_primeFactors` (S12_ECore:295) は E-setup メソッド、τ2 機械
