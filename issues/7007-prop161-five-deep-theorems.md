@@ -114,6 +114,20 @@ bottom-out** するので、clean 化には §15 foundation が先。真の順�
     |Sylow_p(U)|=(card G).fact p (full G-Sylow)。`Sylow.ofCard SU` で S:Sylow p G 化、適用。
   - **nonabelian sub-case**: Sylow_p(U)=C_S(A)=A₀×Z (Thm 12.7, mmd 3237)、Z=regular cyclic factor。
     既存 Lean `frobFact_of_nonabelianSylow` は FrobFactConclusion を返すゆえ per-prime Z 抽出は別途要 (harder)。
+
+**2026-06-19 (cont.²) τ₂ abelian DONE — 残 sorry = nonabelian τ₂ のみ (1 本)**:
+- `49e1a380`→`54b01ba0` で engine+packaging+τ1∪τ3+linchpin+**τ2 abelian** すべて proven。新 infra:
+  `isFrobeniusGroup_of_regular_le_maximal` / `frobenius_factor_of_regular_components` (S15 sorry-free)
+  + `exists_regular_cyclic_in_abelianSylow_tau2` (S12_Theorem1212b, hreg/hCES-free CES_eq variant —
+  E=KU では hreg 偽 [κ⊆τ1∪τ3] かつ C_E(S)≠E ゆえ両 hyp 落とした) + de-private rank-2 constructor。
+- **nonabelian τ₂ precise plan (next, ~60-100 行)**: `exists_canonical_line_of_nonabelianSylow`
+  (S12_Theorem127:325) が A₀ (order p, centralizes M_σ) + **clause (c)** (non-A₀ line X∈ℰ_p¹(E) は
+  M_σ⊓C(X)=⊥) 供給。要 = cyclic Z≤Sylow_p(U) of full exponent with Ω₁(Z)≠A₀ (⟹ (c) で regular)。
+  abelian 構造: Sylow_p(U)=A₀×Z (A₀ direct factor ⟺ A₀⊄℧¹(Sylow_p(U)))、max-order cyclic の
+  Ω₁=L_char≠A₀ (a>b) / 任意 non-A₀ line (a=b)。cyclic Z' は既存 lemma 未露出
+  (`exists_complement_of_canonical_line` S12_Theorem127d:163 は E 内 complement E₀、cyclic Z' でない)
+  ⟹ Sylow_p(U) 上で A₀×Z 分解 or agemo-with-(c)-line を再構成要。
+
 - **kernel の shared linchpin (確定)**: τ1∪τ3 (partition coverage `pRank_M_le_two` で r_p=1) も
   τ2 (regular cyclic machinery) も **両方とも type-P M の E-setup with U≤E を要求**。`pRank_M_le_two`
   (S12_ECore:267) と `mem_tau_union_of_mem_primeFactors` (S12_ECore:295) は E-setup メソッド、τ2 機械
