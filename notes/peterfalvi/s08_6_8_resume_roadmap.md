@@ -4,6 +4,37 @@
 > `s08_6_8_assembly_plan.md`(458KB)/`s08_6_8_3_gap_resolution.md` のうち本 note と矛盾する記述は本 note を優先。
 > 上位方針・FT 接続の文脈 = 記憶 [[ft-path-policy]] の 2026-06-17 検証訂正ブロック。
 
+## 🔨🎯 2026-06-19 cont.¹⁸ — c2 chain 3 段 landed (既約-break path) + Step-0 residual を構築で確定
+
+新 leaf [`S08_Theorem65c2.lean`](../../OddOrder/Peterfalvi/S08_Theorem65c2.lean) に c2 chain を構築 (全 axiom-clean、
+full build 3864 green):
+
+- **`member_isIrreducible_of_W2_le`** (commit `2cd3d967`) — W₂≤A なら S(A) 全メンバー既約 (column∉S(A))。
+- **`six_two_index_bound_c2` / `six_two_central_c2` / `six_three_index_bound_c2`** (commit `7d043841`) —
+  c1 (`S08_CoherenceCorePart2:3576-3717`) の 3-brick swap ミラー、全初回 build 成功。break 既約性は
+  `member_isIrreducible_of_W2_le` (仮説 `hW2B: W₂≤B`)、η anchor は `Y=S(⁅H,H⁆)⊆S(A)⊆S₁` (仮説 `hAcomm2: A≤⁅H,H⁆`)。
+
+### 🎯 Step-0 residual を**構築で確定** (再調査不要)
+
+`six_three_c2` (minimal-A induction、`six_three:3750` ミラー) に到達して確定: induction は **M=⊥ から**
+minimal coherent A とその直下 maximal-normal B を取り、`six_three_index_bound_c2` に B を渡す。だが
+**内部 B は W₂⊆B を保証しない** (B⊊W₂ もありうる) ⟹ `hW2B` を供給できない。
+
+数学的内実: columns は S(C) (C⊄⊇W₂) に現れ、minimal coherent A の直下 B で **column-transition break**
+(column∈S(B)\S(A)、B=Ker ψ_col∩A) が起きうる ⟹ その break は reducible ⟹ `member_isIrreducible_of_W2_le`
+不適用。**∴ cont.¹⁷ の「B⊊W₂ residual」は real で、avoidable でない** (M=⊥ 必須ゆえ induction を
+W₂⊇ 領域に閉じ込められない)。
+
+### ▶ 唯一の残路 = reducible-break (5.6) = retarget-to-k (bounded、cont.¹⁷ の通り)
+
+`retarget_isCoherent_of_extensionImage` (`S08_CoherenceCorePart1:1980`) を ‖χ‖²=1 → ‖χ‖²=k へ一般化
+((5.4) 層は既に k-general ゆえ retargetTargetPair/retarget_isCoherent/retarget_inner_eq_on_zSpan_union の
+~5-8 lemma)。これで **reducible-break 対応 `coherentDegreeSqNormBound_of_not_coherentW`** →
+**`six_two_index_bound_c2` の hW2B 不要版** → `six_three_c2` (induction、hW2B 不要) →
+`isPGroup_of_not_coherent_c2` → `hbound` → dispatch。column の R(μⱼ) data は member 側 `caseB_member_orthoDatum`
++ `certainTypeR` で既存。**見積 ~2-3 session**。
+**FT 文脈不変**: (6.8) は orphaned (deferred-payoff)。
+
 ## 🔄🎯 2026-06-19 cont.¹⁷ — 5-agent workflow が cont.¹⁶「大型 engine 一般化」を覆す + c2 chain が本筋
 
 ultracode (workflow `w8ljahhov`、6 agent / 646k tok) で engine 一般化を mapping。**cont.¹⁶ の
