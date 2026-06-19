@@ -156,3 +156,31 @@ disjoint から Hall 論法で導出 [上記 Phase 0 診断])。F が追加す�
   `exists_conj_typeP_U_of_coprime` で配線 (hconj→coprime) で L~S 除外 → + L~T 除外 + U⊆L_F →
   exists_typeI_maximal_overNormalizer_U close。⚠ coprime `|U| |P|` は enriched Hypothesis (Phase 0(b), F 待ち)
   か §13 card 導出 (Phase 0(a)) を要 — Phase 2 着手時に再判定。
+
+## Phase 2 進捗 (2026-06-20) — ✅ skeleton landing (assembly 証明 + 4 gate 隔離)
+
+`exists_typeI_maximal_overNormalizer_U` を **gated-endpoint skeleton** 化 (ユーザー裁可)。
+Pf (13.17.a/b) を原文精読 (mmd `04.15_…S_and_T.mmd` L286-288) し正確な論法を確定。
+**assembly は sorry-free 証明**、深い §13 content を 4 gate に隔離 (full build 3868、real sorry 134→137):
+
+**✅ 証明済み assembly**:
+- `hcop` = `coprime_card_U_card_P_of_disjoint hyp tdata hdisj` (Hall 機構、landing 済)
+- `hNUS : ¬N_G(U)≤S` = `not_normalizer_U_le_S ∘ exists_conj_typeP_U_of_coprime ∘ hcop` (Phase 1 配線)
+- `hUne : U≠⊥` (`U=⊥⟹M'=P`、`TypePData.fitting_lt_derived` に矛盾)
+- `hUleS : U≤S` / `hUneTop : U≠⊤` (S maximal) / `hNUtop : N_G(U)≠⊤` (`_hG.simple.eq_bot_or_eq_top_of_normal`
+  + `normalizer_eq_top_iff`)
+- `∃ maximal L⊇N_G(U)` (`Finite.exists_le_maximal (·≠⊤)` → `Maximal`→`IsCoatom` を `lt_irrefl`+`lt_of_lt_of_le` で)
+- (8.8.b4) trichotomy dispatch (`hyp.theorem88_caseB L hLmem`)
+
+**残 4 gate (依存順 + 攻略)**:
+1. **`hdisj : P ⊓ U = ⊥`** — Phase 0(b) F-ask (carrier faithfulness、cross-lane、上記)。
+2. **L~S 除外** (`_hLconjS`) — Pf: `U^g≤S` は S の Hall 部分群 → S 内で U と共役 (Hall C `hall_C`) → 共役子
+   `gx∈N_G(U)` → `N_G(U)=N_G(U)^{gx}≤L^{gx}=S` が `hNUS` に矛盾。**要 "U は S の Hall 部分群"** (新 §13 事実、H 次手)。
+3. **L~T 除外** (`_hLconjT`) — Pf: `|L_F|=q^p` [T-side cite] → `W₁⊆L_F` (W₁⊆N_G(U)⊆L) → U が L_F 正規化 + u∤q
+   → `[U,W₁]⊆L_F∩U=1` が (13.2.a) `UW1_frobenius` (`basic_structure`) に矛盾。
+4. **U⊆L_F** (type-I 枝) — Pf (13.17.b): (8.17.a) で `q∤|L_F|` → `W₁∩L_F=1`; `U∩L_F=1` なら `UW₁` が L_F に
+   FPF 作用 → (9.1) `S11` で `|L_F|=1` 矛盾 → `U∩L_F≠1` → `U⊆C_L(U∩L_F)⊆L_F`。
+
+**▶ H 次手 = L~S gate の "U Hall in S"**: これが H 単独で出れば L~S 除外 (gate 2) を sorry-free 化できる
+(Hall C `hall_C` は既存)。"U は S の (κ∪σ)'-Hall 補元" の形式化 — type-data / σ 構造から導出可能性を調査。
+gate 3/4 は §8/§13 cite (basic_structure/(8.17.a)/(9.1))、gate 1 は F 待ち。
