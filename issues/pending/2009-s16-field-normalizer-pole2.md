@@ -414,3 +414,10 @@ obligation ① の L~S 除外を深掘り → **真の blocker = `hyp.U` の und
 
 **⟹ (13.17) 両 obligation は multi-session 深 §13 構造論** (coherence/faithfulness + Schur-Zassenhaus +
 Huppert 形式化 + sorried §8/§9 cite)。skeleton で構造化済・cite 先確定済ゆえ、着手準備は整っている。
+
+## 2026-06-19 方針① 確定 — §13 構造論プログラム計画
+
+ユーザー裁可で**方針①「H が深い §13 構造論にコミット」**。(13.17) 2 obligation の攻略計画を
+**`notes/peterfalvi/s13_17_structural_program.md`** に整理 (phase 0-4 + leaf 分類 + 検証済 infra)。
+crux base = **hyp.U coherence** (Hypothesis が hyp.U を complement/typeP.U に pin せず) →
+(a) §13 card 導出 or (b) F 協調 enrich。次の一手 = Phase 0(a) feasibility 調査 ∥ Phase 3 Huppert (H 単独並列)。
