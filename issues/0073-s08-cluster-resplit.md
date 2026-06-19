@@ -23,6 +23,7 @@ Lane B の (6.8) case-B coherence frontier の活発な進行で、S08 系の複
 | `S08_CoherenceCorePart1.lean` | 3452 |
 | `S08_CaseBCoherence2.lean` | 2185 (issue 0068) |
 | `S08_CaseBAssembly.lean` | 1988 (issue 0070) |
+| `S08_CaseBCoherence.lean` | 1516 (2026-06-20 tick で 1500 超過、(6.8.2.2) m=2 relabel 追記による) |
 
 ## やること
 
