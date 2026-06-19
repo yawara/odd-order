@@ -113,22 +113,30 @@ hub 経由 F に提案 (それまでは触らない)。
 - ✅ **transfer 部 `not_normalizer_U_le_S` 完成** (commit `9a8ffcde`, sorry-free): SZ 共役 `hconj`
   (∃ x∈S, U=conj x•typeP.U) を hypothesis に取り、`¬N_G(U)≤S` を `normalizer_conj_smul` +
   `conj_smul_eq_self_of_mem_normalizer` + `pointwise_smul_le_pointwise_smul_iff` で証明。
-- 🔧 **SZ 共役 step `exists_conj_typeP_U_of_coprime` (hconj を coprime から証明) は ~80% 実装・数学確定だが
-  API 摩擦で build-red → revert (green 維持)。次セッションで clean に実装**。確定した構造:
-  1. M'=derivedInG S; P=typeP.H (P_eq_SF+H_eq); P≤M',U≤M',typeP.U≤M' (U_le); M'≤S。
-  2. **P◁M'**: M'≤S≤N_G(P) (`maxNilpotentNormalHall_le_normalizer hyp.S`) →
-     `(Subgroup.normal_subgroupOf_iff_le_normalizer hPM').mpr`。
-  3. complements in ↥M': hKcompl=`tdata.typeP.derived_complement` (P=typeP.H 書換後);
-     hUcompl=`isComplement'_of_disjoint_and_mul_eq_univ` (disjoint←P⊓U=⊥ coprime; mul=univ←`normal_mul`+sup=⊤).
-  4. SZ: `Isaacs.Ch03.exists_conj_le_of_isComplement'_of_coprime hPsolv hKcompl hcop'` → ∃y:↥M', U_M'≤K_M'.map(conj y)。
-  5. card-eq (両 complement card_mul で |U|=|typeP.U|) → `eq_of_le_of_card_ge` で等号。
-  6. map-back: `map M'.subtype` + `map_map` + hom-ext (`M'.subtype∘conj y = conj↑y∘M'.subtype`) +
-     `map_subgroupOf_eq_of_le` + `pointwise_smul_def` → U=conj↑y•typeP.U, ↑y∈M'≤S。
-  - **要修正 API (build で判明)**: (i) `derivedInG_le` 無し → M'≤S の正しい補題名を探す (derivedInG le-self)。
-    (ii) `isSolvable_of_mulEquiv` 無し → `IsSolvable ↥M'` を S solvable (maximal in minimal-simple) +M'≤S から
-    instance 経由 (subgroup of solvable)、で P.subgroupOf M' solvable。 (iii) `set M'` が
-    `tdata.typeP.derived_complement` 内の `derivedInG hyp.S` を畳まない → `set` を使わず let/明示 rw で M' を揃える。
-    (iv) normalizer は Subgroup 版 (`normal_subgroupOf_iff` は `K ≤ normalizer H`、`(·:Set G)` 不要) — 形を合わせる。
-    (v) map-back の rw chain は各 lemma の exact form 検証要。
-- **Phase 1 完成後**: `not_normalizer_U_le_S` を `exists_conj_typeP_U_of_coprime` で配線 (hconj→coprime) →
-  Phase 2 (obligation ① の L~S/L~T 除外 + U⊆L_F) → exists_typeI_maximal_overNormalizer_U close。
+- ✅✅ **SZ 共役 step `exists_conj_typeP_U_of_coprime` 完成** (sorry-free + axiom-clean
+  `[propext, Classical.choice, Quot.sound]`, full build 3868 jobs ~49s)。`Nat.Coprime |U| |P|` 仮説から
+  `∃ x∈S, U=conj x•typeP.U` を証明。**Phase 1 完了**。5 API 摩擦の確定した解 (前回の予測どおり):
+  1. M'=`derivedInG hyp.S` を**リテラルで使用** (fix iii: `set` は projection 型内の `derivedInG hyp.S` を
+     畳まないので不使用)。P≤M'/U≤M' = `S_deriv_eq_PU`+`le_sup_left/right`、typeP.U≤M'=`U_le`、
+     M'≤S = `Subgroup.map_subtype_le _` (fix i: `derivedInG_le` は不在、これが正)。
+  2. **solvability** (fix ii): `IsSolvable ↥S`=`hG.solvable_of_mem_maximalSubgroups hyp.S_maximal` →
+     `IsSolvable ↥M'`=`solvable_of_solvable_injective (Subgroup.inclusion_injective hM'_le_S)` →
+     SZ の `hMsolv` (P.subgroupOf M' solvable) は `inferInstance` (subgroup-of-solvable)。
+  3. **P◁M'** (fix iv): `(Subgroup.normal_subgroupOf_iff_le_normalizer hP_le).mpr` (mathlib、`K ≤ normalizer H`
+     の **Set 形**: 本 repo の `Subgroup.normalizer` は `(Set G) → Subgroup G`)。N_G(P)≥M' は
+     `OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_le_normalizer hyp.S` (**要 fully-qualify**、bare 不可)。
+  4. complements in ↥M': hKcompl=`tdata.typeP.derived_complement` (goal で `rw [hPH]`、hPH: P=typeP.H);
+     hUcompl=`isComplement'_of_disjoint_and_mul_eq_univ` (disjoint=`disjoint_iff.mpr (Subgroup.inf_eq_bot_of_coprime hcop'.symm)`;
+     mul=univ=`Subgroup.normal_mul Pn Un` を `hPnUn_sup`+`coe_top` で書換)。hPnUn_sup=`Pn⊔Un=⊤` は
+     `← subgroupOf_sup` + `S_deriv_eq_PU.symm` + `subgroupOf_self`。
+  5. card-eq |U|=|typeP.U|: 両 `IsComplement'.card_mul` (=card ↥M') を `Nat.eq_of_mul_eq_mul_left hPpos` で約分
+     → card Un=card Kn → `subgroupOfEquivOfLe` の `Nat.card_congr` で `hyp.U`/`typeP.U` へ。
+  6. map-back (fix v): `Subgroup.map_map` + intertwine `hintertwine`(`(derivedInG S).subtype∘conj x = conj↑x∘subtype`,
+     `ext ⟨y,hy⟩; rfl`) + `← map_map` + `map_subgroupOf_eq_of_le htU_le` + `hsmul_map`(`conj↑x•K=K.map (conj↑x).toMonoidHom`,
+     `pointwise_smul_def; rfl`)。等号化は `Subgroup.eq_of_le_of_card_ge hle (le_of_eq …)` + `hconj_card`(conj は card 保存,
+     `card_map_of_injective (conj↑x).injective`)。
+  - **先例** = `OddOrder/BG/Ch3_MaximalSubgroups/S11_MsigmaANormal.lean:226-290` (SZ → set E₁/Esub map-back)。
+- **▶ 次 = Phase 2** (`exists_typeI_maximal_overNormalizer_U`, S15 sorry): `not_normalizer_U_le_S` を
+  `exists_conj_typeP_U_of_coprime` で配線 (hconj→coprime) で L~S 除外 → + L~T 除外 + U⊆L_F →
+  exists_typeI_maximal_overNormalizer_U close。⚠ coprime `|U| |P|` は enriched Hypothesis (Phase 0(b), F 待ち)
+  か §13 card 導出 (Phase 0(a)) を要 — Phase 2 着手時に再判定。
