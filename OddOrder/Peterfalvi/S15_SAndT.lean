@@ -747,15 +747,52 @@ structure TypeIOverNormalizerData (hyp : Hypothesis (G := G)) where
     ∃ y ∈ hyp.Q, (MulAut.conj y • hyp.W2 : Subgroup G) ≤
       frobenius.complement.map L.subtype
 
-/-- **Peterfalvi (13.17)**: if `S` is type II, a maximal subgroup over
-`N_G(U)` is type-I Frobenius, contains `U` in its kernel, and has the stated
-complement alternatives (order `p q`, containing a conjugate `W₂^y`). -/
+/-- **Peterfalvi (13.17.a/b)**: a maximal subgroup `L` over `N_G(U)` (for `S` of type II) is of
+type I with `U ⊆ L_F`.  *Proof (Pf pp.81-82):* take any maximal `L ⊇ N_G(U)` (proper since
+`U ≠ 1` and `G` is simple).  `L` is not conjugate to `S` (else `N_G(U) ⊆ S`, against
+`IsTypeII.normalizer_not_le`) nor to `T` (else `|L_F| = q^p` forces `[U,W₁] ⊆ L_F ∩ U = 1`,
+against `U W₁` Frobenius from (13.2.a)), so by (8.8.b4) `L` is type I.  Then `U ⊆ L_F`: (8.17.a)
+gives `|L_F|` prime to `q`, so `W₁ ∩ L_F = 1`; were `U ∩ L_F = 1`, `U W₁` would act
+fixed-point-freely on `L_F`, forcing `L_F = 1` by (9.1).  The genuine §13 structural obligation
+feeding (13.17); see issue 2009. -/
+theorem exists_typeI_maximal_overNormalizer_U [Finite G]
+    (_hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
+    (hSTypeII : IsTypeII hyp.S) :
+    ∃ L : Subgroup G, L ∈ maximalSubgroups G ∧ IsTypeI L ∧
+      Subgroup.normalizer (hyp.U : Set G) ≤ L ∧ hyp.U ≤ maxNilpotentNormalHall L := sorry
+
+/-- **Peterfalvi (13.17.c)/(14.5)**: the Frobenius complement of the type-I subgroup `L` over
+`N_G(U)` has order `p q` and contains a conjugate `W₂^y` (`y ∈ Q`).  *Proof (Pf p.82):* a
+complement `E ⊇ W₁` to `L_F` in `L` is a Frobenius complement of odd order, so its prime-order
+subgroups are normal ([H] V.8.18); hence `E ⊆ N_G(W₁) ⊆ Q W₂` ((13.16)) with cyclic Sylow
+subgroups ([BG] 3.9, `S03g_Thm310`), forcing `E = W₁` or `|E| = p q` with `E = W₁ W₂^y`.  The
+`W₁` alternative is excluded by (14.5).  The genuine §13/§14 obligation feeding (13.17). -/
+theorem typeI_overNormalizer_complement [Finite G]
+    (_hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
+    (hSTypeII : IsTypeII hyp.S) {L : Subgroup G} (hLmax : L ∈ maximalSubgroups G)
+    (hNUL : Subgroup.normalizer (hyp.U : Set G) ≤ L)
+    (hUH : hyp.U ≤ maxNilpotentNormalHall L)
+    (frob : OddOrder.Peterfalvi.S14.TypeIFrobeniusData L) :
+    Nat.card ↥frob.complement = hyp.p * hyp.q ∧
+      ∃ y ∈ hyp.Q, (MulAut.conj y • hyp.W2 : Subgroup G) ≤
+        frob.complement.map L.subtype := sorry
+
+/-- **Peterfalvi (13.17)**: if `S` is type II, a maximal subgroup over `N_G(U)` is type-I
+Frobenius, contains `U` in its kernel, and has the stated complement alternatives (order `p q`,
+containing a conjugate `W₂^y`).  Assembled (`sorry`-free) from the type-I existence (13.17.a/b,
+`exists_typeI_maximal_overNormalizer_U`), the (12.7) Frobenius structure
+`OddOrder.Peterfalvi.S14.typeI_frobenius`, and the complement structure (13.17.c,
+`typeI_overNormalizer_complement`). -/
 theorem typeII_overNormalizer_frobenius [Finite G]
     (_hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
     (hSTypeII : IsTypeII hyp.S) :
     ∃ data : TypeIOverNormalizerData hyp,
       data.frobenius.kernel_eq_MF ∧ (hyp.U ≤ data.H) := by
-  sorry
+  obtain ⟨L, hLmax, hLtypeI, hNUL, hUH⟩ :=
+    exists_typeI_maximal_overNormalizer_U _hG hyp hSTypeII
+  obtain ⟨frob, hker⟩ := OddOrder.Peterfalvi.S14.typeI_frobenius _hG hLmax hLtypeI
+  obtain ⟨hcard, hy⟩ := typeI_overNormalizer_complement _hG hyp hSTypeII hLmax hNUL hUH frob
+  exact ⟨⟨L, maxNilpotentNormalHall L, hLmax, rfl, hNUL, frob, hUH, hcard, hy⟩, hker, hUH⟩
 
 /-- Carrier for the virtual character `beta_j` and `Gamma_j` in (13.18). -/
 structure BetaData (hyp : Hypothesis (G := G)) where
