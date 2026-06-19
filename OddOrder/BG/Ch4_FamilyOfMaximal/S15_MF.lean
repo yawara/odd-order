@@ -126,6 +126,18 @@ theorem maxNilpotentNormalHall_isNilpotent [Finite G] (M : Subgroup G) :
   exact nilpotent_of_mulEquiv
     (Subgroup.subgroupOfEquivOfLe (maxNilpotentNormalHall_le_fittingInG M))
 
+/-- **`M_F` absorbs every nilpotent normal Hall subgroup** (`§14`-independent): a subgroup `N ≤ M`
+that is `M`-normal (`(N.subgroupOf M).Normal`), nilpotent, and a Hall `π(N)`-subgroup of `M`
+(`IsHallSubgroup (Nat.card ↥N).primeFactors (N.subgroupOf M)`) is one of the candidates in the
+`sSup` defining `M_F = maxNilpotentNormalHall M`, hence `≤ M_F`.  This is the `le_sSup` half of the
+`M_F` characterization (the converse `M_F ≤ M_σ` is `maxNilpotentNormalHall_le_Msigma`); it supplies
+`Q ≤ M_F` in Theorem 15.2 once `Q = O_q(M)` is shown to be such a subgroup. -/
+theorem le_maxNilpotentNormalHall {M N : Subgroup G} (hNM : N ≤ M)
+    (hNnorm : (N.subgroupOf M).Normal) (hNnil : Group.IsNilpotent ↥(N.subgroupOf M))
+    (hNhall : OddOrder.Isaacs.Ch03.IsHallSubgroup (Nat.card ↥N).primeFactors (N.subgroupOf M)) :
+    N ≤ maxNilpotentNormalHall M :=
+  le_sSup ⟨hNM, hNnorm, hNnil, hNhall⟩
+
 /-- If `M_σ` is nilpotent, then `M_σ ≤ M_F`: `M_σ` is then a nilpotent normal Hall subgroup of
 `M` (normal `σ`-core, `σ`-Hall by `Msigma_isHall`, nilpotent by hypothesis), hence one of the
 candidates in the `sSup` defining `M_F`.  `§14`-independent.  Combined with the (gated)
