@@ -2404,10 +2404,15 @@ anchor `χ₁ ∈ xBaseBlock Z`, the degree ratio `χ(1)/χ₁(1)` is a positive
 (`natDegree_le_of_xBaseBlock_anchor`) gives `χ₁(1) ≤ χ(1)`, so the smaller `p`-power divides the
 larger and the ratio `p^{k−k₁}` is a positive integer.  This is the `dᵢ ∈ ℤ` datum of the (6.8.1)
 `hgen'` decomposition (the degree side; `zSpan_S_support_subset_of_apply_one_eq_zero` is the support
-side). -/
-theorem exists_charValue_one_eq_mul_xBaseBlock_anchor (hyp : SibleyDadeHypothesis G L H)
-    (hF : OddOrder.Isaacs.Ch06.IsFrobeniusGroup (↥L) H hyp.W1)
+side).
+
+Only `X`-irreducibility (`hX`) is used from the ambient hypothesis, so this form serves both the
+Frobenius case (`exists_charValue_one_eq_mul_xBaseBlock_anchor`) and case (A) / c2 (where `hX` is
+`isIrreducibleCharacter_of_mem_Xset_c2_caseA`). -/
+theorem exists_charValue_one_eq_mul_xBaseBlock_anchor_of_irreducible_X
+    (hyp : SibleyDadeHypothesis G L H)
     {p : ℕ} (hp : p.Prime) (hHp : IsPGroup p ↥H) {Z : Subgroup ↥L}
+    (hX : ∀ φ ∈ hyp.Xset Z, IsIrreducibleCharacter φ)
     {χ χ₁ : ClassFunction ↥L ℂ} (hχX : χ ∈ hyp.Xset Z) (hχ₁base : χ₁ ∈ hyp.xBaseBlock Z) :
     ∃ d : ℕ, 0 < d ∧ χ 1 = (d : ℂ) * χ₁ 1 := by
   classical
@@ -2435,9 +2440,8 @@ theorem exists_charValue_one_eq_mul_xBaseBlock_anchor (hyp : SibleyDadeHypothesi
     rw [hχ₁eq, OddOrder.RepresentationTheory.ClassFunction.induce_apply_one, ha₁,
       hyp.index_H_eq_card_W1]; push_cast; ring
   -- minimality of `χ₁`: `|W₁|·a₁ ≤ |W₁|·a`, hence `a₁ ≤ a`, hence `k₁ ≤ k`.
-  have hirr : IsIrreducibleCharacter χ := hyp.isIrreducibleCharacter_of_mem_Xset_of_frobenius hF hχX
-  have hirr₁ : IsIrreducibleCharacter χ₁ :=
-    hyp.isIrreducibleCharacter_of_mem_Xset_of_frobenius hF (hyp.xBaseBlock_subset Z hχ₁base)
+  have hirr : IsIrreducibleCharacter χ := hX χ hχX
+  have hirr₁ : IsIrreducibleCharacter χ₁ := hX χ₁ (hyp.xBaseBlock_subset Z hχ₁base)
   have hle : Nat.card hyp.W1 * a₁ ≤ Nat.card hyp.W1 * a :=
     hyp.natDegree_le_of_xBaseBlock_anchor (χ₁ := ⟨χ₁, hirr₁⟩) (χ := ⟨χ, hirr⟩) hχ₁base hχX hχ₁1 hχ1
   have hW1pos : 0 < Nat.card hyp.W1 := Nat.card_pos

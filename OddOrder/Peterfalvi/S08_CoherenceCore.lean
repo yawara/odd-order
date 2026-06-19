@@ -1438,6 +1438,50 @@ noncomputable def coherentXunionYset_centralCommutator_of_glued_withDiagonal_of_
       (fun φ hφ => hyp.isIrreducibleCharacter_of_mem_Yset hφ) hdisj)
     hmixed D hDτ hgen
 
+/-- **`X(Zc)` nonemptiness, case (A) / c2 form.**  As `Xset_centralCommutator_nonempty`, but the
+strictly-positive degree-square sum is supplied via
+`Xset_nonempty_of_subgroupOf_ne_bot_of_irreducible_X` (which needs only `X`-irreducibility), with the
+`X = S − S(Zc) ⊆ Irr L` fact coming from the certain-type input
+`isIrreducibleCharacter_of_mem_Xset_c2_caseA` (cert data `hK`/`hW1`/`hA`) instead of the Frobenius
+hypothesis.  The `Zc.subgroupOf H ≠ ⊥` step is the same non-abelian-`H` argument. -/
+theorem Xset_centralCommutator_nonempty_c2_caseA (hyp : SibleyDadeHypothesis G L H)
+    {cert : OddOrder.Peterfalvi.S06.CertainTypeHypothesis (sharpImage H) L}
+    (hK : cert.K = H) (hW1 : cert.W1 = hyp.W1)
+    (hA : Subgroup.center ↥H ⊓ cert.W2.subgroupOf H = ⊥)
+    (hHnonab : _root_.commutator ↥H ≠ ⊥) :
+    (hyp.Xset hyp.centralCommutator).Nonempty := by
+  haveI := hyp.H_normal
+  haveI := hyp.centralCommutator_normal
+  have hX : ∀ φ ∈ hyp.Xset hyp.centralCommutator, IsIrreducibleCharacter φ :=
+    fun φ hφ => hyp.isIrreducibleCharacter_of_mem_Xset_c2_caseA hK hW1 hA hφ
+  have hZbot : hyp.centralCommutator.subgroupOf H ≠ ⊥ := by
+    intro hbot
+    apply hyp.centralCommutator_ne_bot hHnonab
+    rw [eq_bot_iff]
+    intro z hz
+    have hzH : z ∈ H := hyp.centralCommutator_le hz
+    have hmem : (⟨z, hzH⟩ : ↥H) ∈ hyp.centralCommutator.subgroupOf H :=
+      (Subgroup.mem_subgroupOf).mpr hz
+    rw [hbot, Subgroup.mem_bot] at hmem
+    rw [Subgroup.mem_bot]
+    exact congrArg Subtype.val hmem
+  exact hyp.Xset_nonempty_of_subgroupOf_ne_bot_of_irreducible_X hZbot
+    (fun χ hχ => hX χ ((hyp.mem_xSetFinset_iff_mem_Xset (Z := hyp.centralCommutator) χ).mp hχ))
+
+/-- **(T8 leaf 8) `2 ≤ |S₀|`**, case (A) / c2 form.  As `two_le_xBaseBlock_ncard`, but
+`X`-irreducibility comes from the certain-type input `isIrreducibleCharacter_of_mem_Xset_c2_caseA`
+(cert data `hK`/`hW1`/`hA`) instead of `hF`. -/
+theorem two_le_xBaseBlock_ncard_c2_caseA (hyp : SibleyDadeHypothesis G L H)
+    {cert : OddOrder.Peterfalvi.S06.CertainTypeHypothesis (sharpImage H) L}
+    (hK : cert.K = H) (hW1 : cert.W1 = hyp.W1)
+    (hA : Subgroup.center ↥H ⊓ cert.W2.subgroupOf H = ⊥)
+    (hXne : (hyp.Xset hyp.centralCommutator).Nonempty) :
+    2 ≤ (hyp.xBaseBlock hyp.centralCommutator).ncard := by
+  haveI := hyp.H_normal
+  haveI := hyp.centralCommutator_normal
+  exact hyp.two_le_xBaseBlock_ncard_of_irreducible_X hyp.centralCommutator_le
+    (fun _ h => hyp.isIrreducibleCharacter_of_mem_Xset_c2_caseA hK hW1 hA h) hXne
+
 /-- L3 outer shell at the fixed witnesses (specialization of
 `coherentXunionYset_centralCommutator_of_glued_withDiagonal_general`). -/
 noncomputable def coherentXunionYset_centralCommutator_of_glued_withDiagonal_of_frobenius
@@ -3314,7 +3358,8 @@ theorem hgen_withDiagonal_of_frobenius
     intro ψ hψ
     induction hψ using Submodule.span_induction with
     | mem x hx =>
-        obtain ⟨d, -, hd⟩ := hyp.exists_charValue_one_eq_mul_xBaseBlock_anchor hF hp hHp hx hχ₁base
+        obtain ⟨d, -, hd⟩ := hyp.exists_charValue_one_eq_mul_xBaseBlock_anchor_of_irreducible_X
+          hp hHp (fun _ h => hyp.isIrreducibleCharacter_of_mem_Xset_of_frobenius hF h) hx hχ₁base
         exact ⟨d, by rw [hd]; push_cast; ring⟩
     | zero => exact ⟨0, by simp⟩
     | add x y _ _ hx hy =>
@@ -3503,7 +3548,8 @@ theorem crux_general_of_higher_anchor
   classical
   have hχ₁X : χ₁ ∈ hyp.Xset hyp.centralCommutator := hyp.xBaseBlock_subset _ hχ₁base
   obtain ⟨d, hdpos, hd⟩ :=
-    hyp.exists_charValue_one_eq_mul_xBaseBlock_anchor hF hp hHp hχ₃ hχ₁base
+    hyp.exists_charValue_one_eq_mul_xBaseBlock_anchor_of_irreducible_X hp hHp
+      (fun _ h => hyp.isIrreducibleCharacter_of_mem_Xset_of_frobenius hF h) hχ₃ hχ₁base
   have hXon : ∀ ψ ψ', ψ ∈ hyp.Xset hyp.centralCommutator →
       ψ' ∈ hyp.Xset hyp.centralCommutator →
       ClassFunction.inner (cX.extension ψ) (cX.extension ψ') = if ψ = ψ' then (1 : ℂ) else 0 := by
