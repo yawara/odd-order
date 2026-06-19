@@ -1181,6 +1181,139 @@ theorem exists_cyclic_Enormal_regular_of_CES_eq [Finite G] (hG : IsMinimalSimple
     exact inf_centralizer_eq_bot_of_line_le_cyclic (S.isPGroup'.to_le hZS) hLZ
       (by rw [Nat.card_zpowers, hwG_ord]) hwG_good
 
+/-- **Regular cyclic line in an abelian Sylow `p`-subgroup** (`exists_cyclic_Enormal_regular_of_CES_eq`
+with the two hypotheses used *only* for the `E ≤ N_G(Z)` conclusion removed).  In
+`exists_cyclic_Enormal_regular_of_CES_eq` the regularity input `hreg` is never used in the
+`C_E(S)=E` branch, and `hCES` is used solely to derive `E ≤ C_G(S)` (`hEC`) for `E ≤ N_G(Z)`.
+Dropping both and that conclusion yields: for a maximal `M`, `p ∈ τ₂(M)`, `A ∈ ℰ_p²(G)` inside an
+abelian Sylow `p`-subgroup `S ≤ M` (with `A ≤ E`), there is a cyclic `Z ≤ S` of exponent `exp S`
+acting regularly on `M_σ`.  Used by the type-`P` case of BG Lemma 15.1(e), where `S = Sylow_p(U)`
+and `C_E(S)=E` fails for the full `σ`-complement `E = KU` (and `hreg` is false there, since
+`κ(M) ⊆ τ₁(M) ∪ τ₃(M)`). -/
+theorem exists_regular_cyclic_in_abelianSylow_tau2 [Finite G] (hG : IsMinimalSimpleOdd G)
+    {M E E₁ E₂ E₃ : Subgroup G} (h : SubgroupESetup M E E₁ E₂ E₃) {p : ℕ} [Fact p.Prime]
+    (hp : p ∈ tau2 M) {A : Subgroup G} (hA : A ∈ elemAbelianOfRank G p 2) (hAE : A ≤ E)
+    {S : Sylow p G} (hAS : A ≤ (S : Subgroup G)) (hSM : (S : Subgroup G) ≤ M)
+    (hSab : IsMulCommutative ↥(S : Subgroup G)) :
+    ∃ Z : Subgroup G, Z ≤ (S : Subgroup G) ∧ IsCyclic ↥Z ∧ Z ≠ ⊥ ∧
+      Monoid.exponent ↥Z = Monoid.exponent ↥(S : Subgroup G) ∧
+      ∀ z ∈ Z, z ≠ 1 → S10.Msigma M ⊓ Subgroup.centralizer ({z} : Set G) = ⊥ := by
+  classical
+  haveI := hSab
+  have hAM : A ≤ M := hAE.trans h.E_le
+  have hAom : A = (Omega ↥(S : Subgroup G) p 1).map (S : Subgroup G).subtype :=
+    (omega1_eq_of_tau2 hG h.mem_maximal hp hA hAM S.isPGroup' hAS hSM
+      (sylow_maximal_in_M_of_le hSM)).1
+  obtain ⟨a, ha⟩ : ∃ a, Monoid.exponent ↥(S : Subgroup G) = p ^ a := by
+    obtain ⟨n, hn⟩ := (IsPGroup.iff_card).mp S.isPGroup'
+    obtain ⟨b, _, hb⟩ := (Nat.dvd_prime_pow (Fact.out : p.Prime)).mp
+      (hn ▸ Group.exponent_dvd_nat_card)
+    exact ⟨b, hb⟩
+  have hpG : p ∣ Nat.card G :=
+    (hA.2 ▸ dvd_pow_self p two_ne_zero).trans (Subgroup.card_subgroup_dvd_card A)
+  have hSne : (S : Subgroup G) ≠ ⊥ := Sylow.ne_bot_of_dvd_card S hpG
+  haveI : Nontrivial ↥(S : Subgroup G) := (Subgroup.nontrivial_iff_ne_bot _).mpr hSne
+  have ha1 : 1 ≤ a := by
+    rcases Nat.eq_zero_or_pos a with rfl | hpos
+    · exfalso
+      obtain ⟨s, hs⟩ := exists_ne (1 : ↥(S : Subgroup G))
+      have hd : orderOf s ∣ Monoid.exponent ↥(S : Subgroup G) := Monoid.order_dvd_exponent s
+      rw [ha, pow_zero, Nat.dvd_one, orderOf_eq_one_iff] at hd
+      exact hs hd
+    · exact hpos
+  set UG : Subgroup G := (Agemo ↥(S : Subgroup G) p (a - 1)).map (S : Subgroup G).subtype
+    with hUGdef
+  have hAgemo_le_Omega : Agemo ↥(S : Subgroup G) p (a - 1) ≤ Omega ↥(S : Subgroup G) p 1 := by
+    rw [Agemo, Subgroup.closure_le]
+    rintro g ⟨x, rfl⟩
+    refine Omega.mem_of_pow_eq_one ?_
+    calc (x ^ p ^ (a - 1)) ^ p ^ 1
+        = x ^ (p ^ (a - 1) * p ^ 1) := (pow_mul x _ _).symm
+      _ = x ^ p ^ a := by rw [← pow_add, Nat.sub_add_cancel ha1]
+      _ = 1 := by rw [← ha]; exact Monoid.pow_exponent_eq_one x
+  have hUG_le_A : UG ≤ A := by rw [hUGdef, hAom]; exact Subgroup.map_mono hAgemo_le_Omega
+  have hUGS : UG ≤ (S : Subgroup G) := hUG_le_A.trans hAS
+  have hUG_ne : UG ≠ ⊥ := by
+    rw [hUGdef, ne_eq, Subgroup.map_eq_bot_iff_of_injective _ (S : Subgroup G).subtype_injective]
+    intro hAgemo_bot
+    have hall : ∀ x : ↥(S : Subgroup G), x ^ (p ^ (a - 1)) = 1 := fun x => by
+      have hx := Agemo.mem_of_eq_pow (p := p) (n := a - 1) x
+      rw [hAgemo_bot, Subgroup.mem_bot] at hx; exact hx
+    have hdvd : Monoid.exponent ↥(S : Subgroup G) ∣ p ^ (a - 1) :=
+      Monoid.exponent_dvd_iff_forall_pow_eq_one.mpr hall
+    rw [ha] at hdvd
+    have hle := Nat.le_of_dvd (pow_pos (Fact.out : p.Prime).pos _) hdvd
+    have hlt : p ^ (a - 1) < p ^ a := Nat.pow_lt_pow_right (Fact.out : p.Prime).one_lt (by omega)
+    omega
+  obtain ⟨wG, hwG_ord, hwG_good, hwG_mem⟩ :
+      ∃ wG : G, orderOf wG = p ∧
+        S10.Msigma M ⊓ Subgroup.centralizer ((Subgroup.zpowers wG : Subgroup G) : Set G) = ⊥ ∧
+        wG ∈ UG := by
+    by_cases hUGA : A ≤ UG
+    · obtain ⟨A₁, hA₁mem, hA₁A, hA₁good⟩ :=
+        (Msigma_nilpotent_of_tau2 hG h.mem_maximal hp hA hAM).2.2.2.2.2
+      have hA₁card : Nat.card ↥A₁ = p := by rw [hA₁mem.2, pow_one]
+      obtain ⟨w, hword, hwgen⟩ := exists_generator_of_card_prime hA₁card
+      refine ⟨w, hword, by rw [hwgen]; exact hA₁good, hUGA (hA₁A ?_)⟩
+      rw [← hwgen]; exact Subgroup.mem_zpowers w
+    · have hUGltA : UG < A := lt_of_le_of_ne hUG_le_A (fun he => hUGA he.ge)
+      have hdvd : Nat.card ↥UG ∣ p ^ 2 := by rw [← hA.2]; exact Subgroup.card_dvd_of_le hUG_le_A
+      have hne1 : Nat.card ↥UG ≠ 1 := by rw [Ne, Subgroup.card_eq_one]; exact hUG_ne
+      have hne2 : Nat.card ↥UG ≠ p ^ 2 := fun hc2 =>
+        (ne_of_lt hUGltA) (Subgroup.eq_of_le_of_card_ge hUG_le_A (by rw [hc2, hA.2]))
+      have hUGcard : Nat.card ↥UG = p := by
+        obtain ⟨c, hc_le, hc⟩ := (Nat.dvd_prime_pow (Fact.out : p.Prime)).mp hdvd
+        interval_cases c
+        · rw [pow_zero] at hc; exact absurd hc hne1
+        · rw [pow_one] at hc; exact hc
+        · exact absurd hc hne2
+      have hUGmem : UG ∈ elemAbelianOfRank G p 1 :=
+        ⟨Subgroup.IsElementaryAbelian.of_card_prime hUGcard, by rw [pow_one]; exact hUGcard⟩
+      have hUGinv : Subgroup.normalizer ((S : Subgroup G) : Set G) ≤
+          Subgroup.normalizer (UG : Set G) := by
+        rw [hUGdef]
+        exact OddOrder.BG.AppB.normalizer_le_normalizer_map_of_characteristic
+          (K := (S : Subgroup G)) (W := Agemo ↥(S : Subgroup G) p (a - 1))
+      have hgood : S10.Msigma M ⊓ Subgroup.centralizer (UG : Set G) = ⊥ :=
+        inf_centralizer_line_eq_bot_of_invariant hG h hp hA hAE hAS hSM hUGmem hUGS hUGinv
+      obtain ⟨w, hword, hwgen⟩ := exists_generator_of_card_prime hUGcard
+      refine ⟨w, hword, by rw [hwgen]; exact hgood, ?_⟩
+      rw [← hwgen]; exact Subgroup.mem_zpowers w
+  rw [hUGdef] at hwG_mem
+  obtain ⟨y', hy'mem, hy'eq⟩ := hwG_mem
+  obtain ⟨t, ht⟩ := mem_agemo_iff_of_comm.mp
+    (show y' ∈ Agemo ↥(S : Subgroup G) p (a - 1) from hy'mem)
+  set s : G := (t : G) with hsdef
+  have hsw : s ^ (p ^ (a - 1)) = wG := by
+    rw [hsdef, ← hy'eq, ht]; exact (SubmonoidClass.coe_pow t _).symm
+  have hsS : s ∈ (S : Subgroup G) := by rw [hsdef]; exact t.2
+  have hsord : orderOf s = p ^ a := by
+    have hsexp : orderOf s ∣ p ^ a := by
+      rw [← ha, hsdef]
+      exact (orderOf_injective (S : Subgroup G).subtype (S : Subgroup G).subtype_injective t) ▸
+        Monoid.order_dvd_exponent t
+    have hnd : ¬ orderOf s ∣ p ^ (a - 1) := by
+      intro hd
+      have hwG1 : wG = 1 := by rw [← hsw]; exact orderOf_dvd_iff_pow_eq_one.mp hd
+      rw [hwG1, orderOf_one] at hwG_ord
+      exact (Fact.out : p.Prime).ne_one hwG_ord.symm
+    obtain ⟨c, hc_le, hc⟩ := (Nat.dvd_prime_pow (Fact.out : p.Prime)).mp hsexp
+    rw [hc]; congr 1
+    by_contra hca
+    rw [hc] at hnd
+    exact hnd (pow_dvd_pow p (by omega))
+  have hsne : s ≠ 1 := by
+    intro h1; rw [h1, orderOf_one] at hsord
+    exact (Nat.one_lt_pow (by omega) (Fact.out : p.Prime).one_lt).ne hsord
+  have hZS : Subgroup.zpowers s ≤ (S : Subgroup G) := Subgroup.zpowers_le.mpr hsS
+  have hLZ : (Subgroup.zpowers wG : Subgroup G) ≤ Subgroup.zpowers s := by
+    rw [← hsw]
+    exact Subgroup.zpowers_le.mpr (Subgroup.pow_mem _ (Subgroup.mem_zpowers s) _)
+  refine ⟨Subgroup.zpowers s, hZS, inferInstance, (Subgroup.zpowers_eq_bot.not.mpr hsne), ?_, ?_⟩
+  · rw [IsCyclic.exponent_eq_card, Nat.card_zpowers, hsord, ha]
+  · exact inf_centralizer_eq_bot_of_line_le_cyclic (S.isPGroup'.to_le hZS) hLZ
+      (by rw [Nat.card_zpowers, hwG_ord]) hwG_good
+
 /-- **Theorem 12.12, Case 3, per-prime `Z`-construction** (both branches): in the abelian-Sylow
 regime with the regularity hypothesis, `S` has a cyclic subgroup `Z` of exponent `exp(S)`,
 normalized by `E`, acting regularly on `M_σ`. (Splits on `C_E(S) = E`: the `= E` branch uses the

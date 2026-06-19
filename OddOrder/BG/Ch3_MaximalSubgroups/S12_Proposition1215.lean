@@ -81,8 +81,9 @@ private theorem pRank_eq_of_mulEquiv {A B : Type*} [Group A] [Finite A] [Group B
 
 /-- A subgroup `H` with `q`-rank `≥ 2` contains a rank-2 elementary abelian `q`-subgroup of `G`.
 Generalizes `exists_mem_elemAbelianOfRank_two_le_of_tau2` (S12_Lemma1211) from a `τ₂`-hypothesis to
-the underlying `2 ≤ pRank ↥H q`. -/
-private theorem exists_mem_elemAbelianOfRank_two_le_of_two_le_pRank [Finite G] {H : Subgroup G}
+the underlying `2 ≤ pRank ↥H q`. (De-private: cited by `S15` for the type-`P` `τ₂` component of
+BG Lemma 15.1(e), to obtain a rank-2 elementary abelian inside `Sylow_p(U)`.) -/
+theorem exists_mem_elemAbelianOfRank_two_le_of_two_le_pRank [Finite G] {H : Subgroup G}
     {q : ℕ} (hq_prime : q.Prime) (hpr : 2 ≤ pRank ↥H q) :
     ∃ A ∈ elemAbelianOfRank G q 2, A ≤ H := by
   obtain ⟨B, hB_ea, hB_log⟩ :=
