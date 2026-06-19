@@ -107,3 +107,28 @@ coherence base の解決オプション (b) = **Hypothesis (S15_SAndT) を hyp.U
 (`P ⊓ U = ⊥` or typeP.U pin)。carrier 変更は `sectionSixteenHypothesis_of_inputs` producer
 (FeitThompson.lean, **F 領域**) の対応を要する。Phase 0(a) の H 単独 card 導出が不可と判明した時点で
 hub 経由 F に提案 (それまでは触らない)。
+
+## Phase 1 進捗 (2026-06-19 cont.)
+
+- ✅ **transfer 部 `not_normalizer_U_le_S` 完成** (commit `9a8ffcde`, sorry-free): SZ 共役 `hconj`
+  (∃ x∈S, U=conj x•typeP.U) を hypothesis に取り、`¬N_G(U)≤S` を `normalizer_conj_smul` +
+  `conj_smul_eq_self_of_mem_normalizer` + `pointwise_smul_le_pointwise_smul_iff` で証明。
+- 🔧 **SZ 共役 step `exists_conj_typeP_U_of_coprime` (hconj を coprime から証明) は ~80% 実装・数学確定だが
+  API 摩擦で build-red → revert (green 維持)。次セッションで clean に実装**。確定した構造:
+  1. M'=derivedInG S; P=typeP.H (P_eq_SF+H_eq); P≤M',U≤M',typeP.U≤M' (U_le); M'≤S。
+  2. **P◁M'**: M'≤S≤N_G(P) (`maxNilpotentNormalHall_le_normalizer hyp.S`) →
+     `(Subgroup.normal_subgroupOf_iff_le_normalizer hPM').mpr`。
+  3. complements in ↥M': hKcompl=`tdata.typeP.derived_complement` (P=typeP.H 書換後);
+     hUcompl=`isComplement'_of_disjoint_and_mul_eq_univ` (disjoint←P⊓U=⊥ coprime; mul=univ←`normal_mul`+sup=⊤).
+  4. SZ: `Isaacs.Ch03.exists_conj_le_of_isComplement'_of_coprime hPsolv hKcompl hcop'` → ∃y:↥M', U_M'≤K_M'.map(conj y)。
+  5. card-eq (両 complement card_mul で |U|=|typeP.U|) → `eq_of_le_of_card_ge` で等号。
+  6. map-back: `map M'.subtype` + `map_map` + hom-ext (`M'.subtype∘conj y = conj↑y∘M'.subtype`) +
+     `map_subgroupOf_eq_of_le` + `pointwise_smul_def` → U=conj↑y•typeP.U, ↑y∈M'≤S。
+  - **要修正 API (build で判明)**: (i) `derivedInG_le` 無し → M'≤S の正しい補題名を探す (derivedInG le-self)。
+    (ii) `isSolvable_of_mulEquiv` 無し → `IsSolvable ↥M'` を S solvable (maximal in minimal-simple) +M'≤S から
+    instance 経由 (subgroup of solvable)、で P.subgroupOf M' solvable。 (iii) `set M'` が
+    `tdata.typeP.derived_complement` 内の `derivedInG hyp.S` を畳まない → `set` を使わず let/明示 rw で M' を揃える。
+    (iv) normalizer は Subgroup 版 (`normal_subgroupOf_iff` は `K ≤ normalizer H`、`(·:Set G)` 不要) — 形を合わせる。
+    (v) map-back の rw chain は各 lemma の exact form 検証要。
+- **Phase 1 完成後**: `not_normalizer_U_le_S` を `exists_conj_typeP_U_of_coprime` で配線 (hconj→coprime) →
+  Phase 2 (obligation ① の L~S/L~T 除外 + U⊆L_F) → exists_typeI_maximal_overNormalizer_U close。
