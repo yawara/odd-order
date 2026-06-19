@@ -25,16 +25,22 @@ cont.¹⁸ で「retarget は norm-1 専用、reducible は basis-direct 新規�
 - **`retarget_isCoherent_S`** = `retarget_isCoherent` の ‖χ‖²≠1 版。reducible break を base に adjoin して
   `IsCoherent τ (S₁∪{χ,χ̄}) A` を構成 (extension=retargetS、4 field 全 discharge)。
 
-### ▶ 残務 (downstream wiring、構成本体は完成)
+### ✅ 追補 (commit `0d91d0aa`) — `retargetTargetPair_gen` 完成、(5.6.3) 構成インフラ完備
 
-1. **`retargetTargetPair_k`**: reducible χ 用の {X,X̄} 構成。X=Σ_{α∈E}α (|E|=‖χ‖²=k、(5.4.b)
-   `eq_sum_of_psi_eq_zero` で E 取得、(5.6.2) の ‖Y‖²≥‖ψ‖² から)。R(μⱼ)=`certainTypeR`。Gram 一致
-   ⟨X,X⟩=|E|=k=⟨χ,χ⟩ を出す。
-2. **reducible-break `coherentDegreeSqNormBound_of_not_coherentW`**: `xAdjoinStepW` の reducible 版を
-   `retarget_isCoherent_S` で組む (forward 構成) → 対偶 bound。
-3. **`six_two_index_bound_c2` の `hW2B` 撤廃**: reducible break OK 版に差し替え →
-   `six_three_index_bound_c2`/`six_three_c2`(induction、hW2B 不要)→ `isPGroup_of_not_coherent_c2`
-   → `hbound` → dispatch → S08:59。
+`retargetTargetPair_gen` (RetargetTargetPairGen 構造 + 構成、`=1` 特化を外すだけ、核心計算は元々
+k-general)。X=D.X, X̄=D.X−τ(χ−χ.conj) の Gram 一致 ⟨X,X⟩=⟨χ,χ⟩/⟨X̄,X̄⟩=⟨χ̄,χ̄⟩ + ZIrr + ⊥ を bundle。
+⟹ **`retarget_isCoherent_S` + `retargetTargetPair_gen` で (5.6.3) reducible-break 構成インフラ完備**
+(coherence 拡張 + target pair 構成、両 axiom-clean)。
+
+### ▶ 残務 (downstream wiring、構成インフラは完成・以降は配線)
+
+1. **`retarget_isCoherent_of_extensionImage_k`** (S08_CoherenceCorePart1:1980 の reducible 版): break χ の
+   `CharacterPsiDecomposition Da` から `retargetTargetPair_gen` で {X,X̄} → `retarget_isCoherent_S` で
+   coherence。norm 計算 huu=k+a² 等は ‖χ‖²=k で。
+2. **reducible-break `coherentDegreeSqNormBound_of_not_coherentW`**: `xAdjoinStepW` の reducible 版を #1 で
+   組む (forward 構成) → 対偶 bound。column の Da は `certainTypeDecompositionDa`/`certainTypeR`。
+3. **`six_two_index_bound_c2` の `hW2B` 撤廃** → `six_three_c2`(induction、hW2B 不要)→
+   `isPGroup_of_not_coherent_c2` → `hbound` → dispatch → S08:59。
 **FT 文脈不変**: (6.8) は orphaned (deferred-payoff)。
 
 ## 🔨🎯 2026-06-19 cont.¹⁸ — c2 chain 3 段 landed (既約-break path) + Step-0 residual を構築で確定
