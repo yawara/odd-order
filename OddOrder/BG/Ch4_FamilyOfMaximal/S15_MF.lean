@@ -4085,7 +4085,182 @@ theorem msigma_quotient_isNilpotent_of_inputs [Finite G]
   exact isNilpotent_quotient_of_regular_general hMσK1solv hMσK1normQ hK1normMσ hK1prime
     hMσK1disj hK1Qdisj hQltMσ hFPF
 
-open scoped commutatorElement in
+/-- **A nilpotent group with trivial `q`-core is a `q'`-group** (`§14`-independent, reusable):
+if `O_q(H) = ⊥` for a finite nilpotent `H`, then `q ∤ |H|`.  The Sylow `q`-subgroup of a nilpotent
+group is normal (`normalizerCondition_of_isNilpotent`), hence equals `O_q(H)`
+(`Sylow.eq_opCore_of_normal`); if that is `⊥` then `q ∤ |H|`. -/
+theorem not_dvd_card_of_opCore_eq_bot {H : Type*} [Group H] [Finite H] {q : ℕ} [Fact q.Prime]
+    [Group.IsNilpotent H] (hbot : OddOrder.Isaacs.Ch01.opCore q H = ⊥) : ¬ q ∣ Nat.card H := by
+  intro hdvd
+  obtain ⟨P⟩ := Sylow.nonempty (p := q) (G := H)
+  have hPnorm : (P : Subgroup H).Normal :=
+    Sylow.normal_of_normalizerCondition normalizerCondition_of_isNilpotent P
+  have hPcore : (P : Subgroup H) = OddOrder.Isaacs.Ch01.opCore q H :=
+    OddOrder.Isaacs.Ch01.Sylow.eq_opCore_of_normal P hPnorm
+  exact (OddOrder.Isaacs.Ch07.Sylow.ne_bot_of_dvd_card hdvd P) (hPcore.trans hbot)
+
+open OddOrder.Isaacs.Ch04.OddOrder.Isaacs.Ch03.IsAInvariant
+  (quotientMulAutHom quotientMulAutHom_apply_mk') in
+/-- **Theorem 15.2 step (c) — `Q = O_q(M)` is the Sylow `q`-subgroup of `M_σ`** (mmd L4192, the
+implicit content of "choose a complement `D` of `Q` in `M_σ`"): with `M_σ/Q` nilpotent (step (c)(d),
+`msigma_quotient_isNilpotent_of_inputs`) and `Q = O_q(M)` the maximal normal `q`-subgroup of `M`,
+the index `[M_σ : Q]` is coprime to `q`, i.e. `Q` is a Hall `{q}`-subgroup (= normal Sylow `q`) of
+`M_σ`.
+
+Argument: were `q ∣ [M_σ : Q]`, the (characteristic, since `M_σ/Q` is nilpotent) `q`-core
+`R̄ = O_q(M_σ/Q)` would be nontrivial; its preimage `R` in `M_σ` is a `q`-group properly above `Q`,
+and `R.map M_σ.subtype ⊴ M` (the `q`-core `R̄` is characteristic, so preserved by the `M`-conjugation
+automorphisms of `M_σ/Q`; `M` normalizes `M_σ` and `Q`).  A normal `q`-subgroup of `M` lies in
+`O_q(M) = Q`, forcing `R = Q`, i.e. `R̄ = ⊥` — contradiction.  Hence `O_q(M_σ/Q) = ⊥`, and
+`not_dvd_card_of_opCore_eq_bot` gives `q ∤ [M_σ : Q]`. -/
+theorem q_not_dvd_index_of_msigma_quotient_isNilpotent [Finite G]
+    {M Mσ Q : Subgroup G} {q : ℕ} [Fact q.Prime]
+    (hQMσ : Q ≤ Mσ) (hMσM : Mσ ≤ M) (hQpg : IsPGroup q ↥Q)
+    (hMnormMσ : M ≤ Subgroup.normalizer (Mσ : Set G))
+    (hMnormQ : M ≤ Subgroup.normalizer (Q : Set G))
+    (hQmax : ∀ R : Subgroup G, R ≤ M → (R.subgroupOf M).Normal → IsPGroup q ↥R → R ≤ Q)
+    [hQn : (Q.subgroupOf Mσ).Normal]
+    (hNil : Group.IsNilpotent (↥Mσ ⧸ Q.subgroupOf Mσ)) :
+    ¬ q ∣ (Q.subgroupOf Mσ).index := by
+  classical
+  haveI := hNil
+  set Cq : Subgroup (↥Mσ ⧸ Q.subgroupOf Mσ) := OddOrder.Isaacs.Ch01.opCore q (↥Mσ ⧸ Q.subgroupOf Mσ)
+    with hCq
+  -- It suffices to show `Cq = ⊥` (then `q ∤ |Mσ/Q| = [Mσ:Q]`).
+  suffices hbot : Cq = ⊥ by
+    have h := not_dvd_card_of_opCore_eq_bot (H := ↥Mσ ⧸ Q.subgroupOf Mσ) (q := q) hbot
+    rwa [show Nat.card (↥Mσ ⧸ Q.subgroupOf Mσ) = (Q.subgroupOf Mσ).index from rfl] at h
+  -- `R := preimage of Cq in ↥Mσ`, a `q`-group containing `Q.subgroupOf Mσ`.
+  set R : Subgroup ↥Mσ := Cq.comap (QuotientGroup.mk' (Q.subgroupOf Mσ)) with hR
+  set RG : Subgroup G := R.map Mσ.subtype with hRG
+  have hRG_le_Mσ : RG ≤ Mσ := Subgroup.map_subtype_le _
+  have hRG_le_M : RG ≤ M := hRG_le_Mσ.trans hMσM
+  have hmem : ∀ x : G, x ∈ RG ↔
+      ∃ hx : x ∈ Mσ, QuotientGroup.mk' (Q.subgroupOf Mσ) ⟨x, hx⟩ ∈ Cq := by
+    intro x
+    constructor
+    · rintro ⟨z, hzR, rfl⟩
+      have : QuotientGroup.mk' (Q.subgroupOf Mσ) z ∈ Cq := Subgroup.mem_comap.mp hzR
+      exact ⟨z.2, this⟩
+    · rintro ⟨hx, hxC⟩
+      exact ⟨⟨x, hx⟩, Subgroup.mem_comap.mpr hxC, rfl⟩
+  have hQsub_le_R : Q.subgroupOf Mσ ≤ R := by
+    intro x hx
+    rw [hR, Subgroup.mem_comap, QuotientGroup.mk'_apply, (QuotientGroup.eq_one_iff x).mpr hx]
+    exact Cq.one_mem
+  -- `R` is a `q`-group: extension of the `q`-group `Q.subgroupOf Mσ` by the `q`-group `Cq`.
+  have hQpg' : IsPGroup q ↥(Q.subgroupOf Mσ) :=
+    hQpg.comap_of_injective (Subgroup.subtype Mσ) Mσ.subtype_injective
+  have hCq_pg : IsPGroup q ↥Cq := OddOrder.Isaacs.Ch01.opCore_isPGroup q _
+  have hR_pg : IsPGroup q ↥R := by
+    -- the map `g : ↥R → Cq`, `r ↦ [r]`, is surjective with kernel `(Q.subgroupOf Mσ).subgroupOf R`.
+    have hmem_Cq : ∀ r : ↥R, QuotientGroup.mk' (Q.subgroupOf Mσ) (R.subtype r) ∈ Cq := fun r =>
+      Subgroup.mem_comap.mp r.2
+    set g : ↥R →* ↥Cq :=
+      ((QuotientGroup.mk' (Q.subgroupOf Mσ)).comp R.subtype).codRestrict Cq hmem_Cq with hg
+    have hgsurj : Function.Surjective g := by
+      rintro ⟨w, hw⟩
+      obtain ⟨z, hz⟩ := QuotientGroup.mk_surjective w
+      have hzmem : z ∈ R := by
+        rw [hR, Subgroup.mem_comap]; rw [← hz] at hw; exact hw
+      refine ⟨⟨z, hzmem⟩, Subtype.ext ?_⟩
+      rw [hg]
+      show (QuotientGroup.mk' (Q.subgroupOf Mσ) (R.subtype ⟨z, hzmem⟩) : ↥Mσ ⧸ Q.subgroupOf Mσ) = w
+      rw [QuotientGroup.mk'_apply]; exact hz
+    have hgval : ∀ r : ↥R, (g r : ↥Mσ ⧸ Q.subgroupOf Mσ)
+        = QuotientGroup.mk' (Q.subgroupOf Mσ) (R.subtype r) := fun r => rfl
+    have hgker : g.ker = (Q.subgroupOf Mσ).subgroupOf R := by
+      ext r
+      rw [MonoidHom.mem_ker, Subgroup.mem_subgroupOf, Subgroup.mem_subgroupOf,
+        ← Subtype.coe_inj, hgval, OneMemClass.coe_one, QuotientGroup.mk'_apply,
+        QuotientGroup.eq_one_iff, Subgroup.mem_subgroupOf]
+      rfl
+    rw [IsPGroup.iff_card]
+    have hkpg : IsPGroup q ↥g.ker := by
+      rw [hgker]
+      exact hQpg'.of_equiv (Subgroup.subgroupOfEquivOfLe hQsub_le_R).symm
+    obtain ⟨a, ha⟩ := (IsPGroup.iff_card).mp hkpg
+    obtain ⟨b, hb⟩ := (IsPGroup.iff_card).mp hCq_pg
+    have hcard : Nat.card ↥R = Nat.card ↥g.ker * Nat.card ↥Cq := by
+      have he : (↥R ⧸ g.ker) ≃* ↥Cq :=
+        QuotientGroup.quotientKerEquivOfSurjective g hgsurj
+      rw [Subgroup.card_eq_card_quotient_mul_card_subgroup g.ker, Nat.card_congr he.toEquiv,
+        mul_comm]
+    exact ⟨a + b, by rw [hcard, ha, hb, ← pow_add]⟩
+  have hRG_pg : IsPGroup q ↥RG := hR_pg.map Mσ.subtype
+  -- `RG ⊴ M`: the `q`-core `Cq` of `M_σ/Q` is characteristic, so preserved by `M`-conjugation.
+  haveI hCq_char : Cq.Characteristic := by rw [hCq]; infer_instance
+  have hRG_normM : (RG.subgroupOf M).Normal := by
+    rw [Subgroup.normal_subgroupOf_iff_le_normalizer hRG_le_M]
+    intro m hm
+    have hmMσ : m ∈ Subgroup.normalizer (Mσ : Set G) := hMnormMσ hm
+    -- conj by `m` on `↥Mσ`, the induced quotient automorphism `ᾱ`, and the `Q`-invariance of `α`.
+    set α : ↥Mσ ≃* ↥Mσ := (Subgroup.normalizerMonoidHom Mσ) ⟨m, hmMσ⟩ with hα
+    have hαval : ∀ x : ↥Mσ, (α x : G) = m * (x : G) * m⁻¹ := fun x => rfl
+    -- `α z ∈ Q.subgroupOf Mσ ↔ z ∈ Q.subgroupOf Mσ` (conjugation by `m ∈ N_G(Q)`).
+    have hαQiff : ∀ z : ↥Mσ, (α z ∈ Q.subgroupOf Mσ) ↔ (z ∈ Q.subgroupOf Mσ) := by
+      intro z
+      rw [Subgroup.mem_subgroupOf, Subgroup.mem_subgroupOf]
+      show (α z : G) ∈ Q ↔ (z : G) ∈ Q
+      rw [hαval]
+      exact (Subgroup.mem_normalizer_iff.mp (hMnormQ hm) (z : G)).symm
+    have hαmapQ : (Q.subgroupOf Mσ).map α.toMonoidHom = Q.subgroupOf Mσ := by
+      ext x
+      rw [Subgroup.mem_map]
+      constructor
+      · rintro ⟨z, hzQ, rfl⟩; exact (hαQiff z).mpr hzQ
+      · intro hxQ
+        exact ⟨α.symm x, (hαQiff (α.symm x)).mp (by rw [α.apply_symm_apply]; exact hxQ),
+          α.apply_symm_apply x⟩
+    set ᾱ : (↥Mσ ⧸ Q.subgroupOf Mσ) ≃* (↥Mσ ⧸ Q.subgroupOf Mσ) :=
+      QuotientGroup.congr (Q.subgroupOf Mσ) (Q.subgroupOf Mσ) α hαmapQ with hαbar
+    have hαbarval : ∀ x : ↥Mσ, ᾱ (QuotientGroup.mk' (Q.subgroupOf Mσ) x)
+        = QuotientGroup.mk' (Q.subgroupOf Mσ) (α x) := fun x => by
+      rw [hαbar]; exact QuotientGroup.congr_mk' (Q.subgroupOf Mσ) (Q.subgroupOf Mσ) α hαmapQ x
+    -- `ᾱ c ∈ Cq ↔ c ∈ Cq` (`Cq` characteristic ⟹ `ᾱ`-invariant).
+    have hCqiff : ∀ c : ↥Mσ ⧸ Q.subgroupOf Mσ, (ᾱ c ∈ Cq) ↔ (c ∈ Cq) := by
+      intro c
+      have hfix := hCq_char.fixed ᾱ
+      constructor
+      · intro h; rw [← hfix, Subgroup.mem_comap]; exact h
+      · intro h; rw [← hfix, Subgroup.mem_comap] at h; exact h
+    rw [Subgroup.mem_normalizer_iff]
+    intro y
+    rw [hmem, hmem]
+    constructor
+    · rintro ⟨hyMσ, hyC⟩
+      have hmym : m * y * m⁻¹ ∈ Mσ := (Subgroup.mem_normalizer_iff.mp hmMσ y).mp hyMσ
+      refine ⟨hmym, ?_⟩
+      -- `mk'⟨m·y·m⁻¹⟩ = ᾱ(mk'⟨y⟩) ∈ ᾱ(Cq) = Cq`.
+      have heqcls : QuotientGroup.mk' (Q.subgroupOf Mσ) ⟨m * y * m⁻¹, hmym⟩
+          = ᾱ (QuotientGroup.mk' (Q.subgroupOf Mσ) ⟨y, hyMσ⟩) := by
+        rw [hαbarval]
+        exact congrArg (QuotientGroup.mk' (Q.subgroupOf Mσ)) (Subtype.ext (hαval ⟨y, hyMσ⟩).symm)
+      rw [heqcls]; exact (hCqiff _).mpr hyC
+    · rintro ⟨hmymMσ, hmymC⟩
+      -- `mk'⟨m·y·m⁻¹⟩ ∈ Cq ⟹ mk'⟨y⟩ ∈ Cq` (via `ᾱ`-invariance).
+      have hyMσ : y ∈ Mσ := (Subgroup.mem_normalizer_iff.mp hmMσ y).mpr hmymMσ
+      refine ⟨hyMσ, ?_⟩
+      have heqcls : QuotientGroup.mk' (Q.subgroupOf Mσ) ⟨m * y * m⁻¹, hmymMσ⟩
+          = ᾱ (QuotientGroup.mk' (Q.subgroupOf Mσ) ⟨y, hyMσ⟩) := by
+        rw [hαbarval]
+        exact congrArg (QuotientGroup.mk' (Q.subgroupOf Mσ)) (Subtype.ext (hαval ⟨y, hyMσ⟩).symm)
+      rw [heqcls] at hmymC
+      exact (hCqiff _).mp hmymC
+  have hRG_le_Q : RG ≤ Q := hQmax RG hRG_le_M hRG_normM hRG_pg
+  -- `R ≤ Q.subgroupOf Mσ`, so combined with `hQsub_le_R`, `R = Q.subgroupOf Mσ`, forcing `Cq = ⊥`.
+  have hR_le_Qsub : R ≤ Q.subgroupOf Mσ := by
+    intro x hx
+    rw [Subgroup.mem_subgroupOf]
+    exact hRG_le_Q ⟨x, hx, rfl⟩
+  have hReq : R = Q.subgroupOf Mσ := le_antisymm hR_le_Qsub hQsub_le_R
+  -- `comap (mk') Cq = R = Q.subgroupOf Mσ = ker (mk') = comap (mk') ⊥`; `mk'` surjective ⟹ `Cq = ⊥`.
+  have hcomapbot : Cq.comap (QuotientGroup.mk' (Q.subgroupOf Mσ))
+      = (⊥ : Subgroup (↥Mσ ⧸ Q.subgroupOf Mσ)).comap (QuotientGroup.mk' (Q.subgroupOf Mσ)) := by
+    rw [MonoidHom.comap_bot, QuotientGroup.ker_mk']
+    rw [← hR]; exact hReq
+  exact (Subgroup.comap_injective (QuotientGroup.mk'_surjective _)) hcomapbot
+
 /-- **Theorem 15.2 step 4, the `D`-side fixed-point fact** (BG Proposition 1.5(d)/1.6(d), mmd
 L4196-4200): a single `q'`-element `d` (here `d ∈ D`, coprime to `Q`) that *centralizes the chief
 factor* `Q̄ = Q/Q₀` (`⁅d, y⁆ ∈ Q₀` for every `y ∈ Q`) already centralizes `Q` itself, **provided**
