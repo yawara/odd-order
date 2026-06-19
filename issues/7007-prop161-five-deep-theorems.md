@@ -130,13 +130,19 @@ bottom-out** するので、clean 化には §15 foundation が先。真の順�
 - [ ] **conjunct 4 (BG 15.1(e))** `U≠⊥ → ∃U0≤U, exp U0=exp U, Mσ⊔U0 Frobenius kernel Mσ`:
   - **K=⊥ branch**: reachable — E=U setup (`subgroupESetup_of_isHall_kappa_eq_bot`) +
     `frobenius_factorization_of_regular` part (b) (U0=E₀)。hreg discharge は conjunct 3 と同型。
-  - **⛔ K≠⊥ branch (type-P2) = 唯一の残 hard piece**: U の M_σ への **pointwise FPF**（各 u∈U# で
-    C_Mσ(u)=⊥、または exponent 実現の regular cyclic Z_p 構成）が要点。既存 `Msigma_centralizer_E23_eq_bot_of_caseTau1`
-    は **joint** C_Mσ(E₂⊔E₃)=⊥ のみ（pointwise でない）。U abelian (conjunct 1) かつ U は κ' ゆえ
-    (τ1∪τ3)-元は自動 regular = BG 4178「easy C_E(S)=E case」。但し `frobenius_factorization_of_regular`
-    は E=σ'-complement を要求し U=(κ∪σ)'-Hall に直接適用不可。**正スコープ = `frobFact_of_abelianSylow`
-    (S12_Theorem1212c:394) の abelian-Sylow regular 構成 (Z_p per τ2-prime, Thm 12.5(f)) を U 向けに
-    再構築 or 一般化**（medium-large、~1 session）。
+  - **⛔ K≠⊥ branch (type-P2) = 唯一の残 hard piece** (2026-06-19 委譲で深掘り ~530行→未完→**revert で消失**):
+    - ✅ **設計検証済**: U 上で直接構成 (U は κ' ゆえ (τ1∪τ3)∖κ 元は Lemma 14.1 で自動 regular)。
+      U0=⊔_p Z_p ((τ1∪τ3): Z_p=Sylow_p(U) cyclic / τ2: regular cyclic) → `isFrobeniusGroup_of_regular`。
+    - ✅ **設計確定だが要再構築** `exists_regular_cyclic_fullExponent_tau2` (~130行) = `exists_cyclic_Enormal_regular_of_abelianSylow`
+      の **C_E(S)=E 分岐を global hreg なしで抽出**。regularity は τ2-intrinsic (`Msigma_nilpotent_of_tau2`/`omega1_eq_of_tau2`);
+      hreg は τ2'-元 + X-存在分岐でしか使われないと grep 確認済 (CES_eq 分岐は clean に transplant 可)。
+    - ⛔ **真の blocker = `(|G|).factorization p = (|M|).factorization p` for p∈τ2(M)** (= M が G の full Sylow-p を含む)。
+      τ2 機械は `S:Sylow p G` with `S≤M` を要求。**Sylow_p(G) の abelian/nonabelian 場合分け要**:
+      abelian なら A∈ℰ_p²(U)⊆ℰ_p²(E)、S⊇A abelian ⟹ `S≤C_G(A)≤E≤M` (`centralizer_le_E_of_tau2`) ⟹ S=Sylow_p(M)=Sylow_p(U)、fact 成立;
+      nonabelian は **Thm 12.7** (`frobFact_of_nonabelianSylow`) 経由。エージェントは abelian case のみで簡略化し circular に陥った。
+    - **正スコープ = `frobenius_factorization_of_regular` の abelian/nonabelian Sylow 場合分けを U 上で再現** (各 case で
+      full-Sylow-in-G fact 確立) + hreg-free τ2 helper 再構築。**~1+ session の深い §12 work、単発委譲/loop 不適**。
+      σ-template = `exists_sylow_le_of_mem_sigma` (S10_HallStructureCore:536)、fact 技法 = `exists_mem_sigma_of_prime_dvd_card` (S14:3573)。
 - [ ] conjunct 1-4 を `typeP_auxiliary_structure_gated` に wire (sorry 139→138)
 - [ ] Thm 15.2(a) `mf_ne_msigma_typeP1_structure` (S15:1144)
 - [ ] Thm 15.7 `fitting_not_ti_cases` (S15:3896) + Cor 15.5
