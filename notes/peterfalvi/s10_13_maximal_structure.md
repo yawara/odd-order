@@ -264,3 +264,11 @@ real sorry 136→136(10.10 の bare sorry が producer の hconj に置換)。**
 `maxNilpotentNormalHall_le_normalizer` + `smul_inf`)。`hconj`=`H_eq_supportKernel`+`typePA0` の M-invariance
 (`dade.L_normalizes_A` の l/l⁻¹)。**producer 完全 honest 化**(legit upstream のみ cite)、**real sorry 136→135**。
 ⟹ **H-only clean win 出尽くし**: 残り (10.11)=cross-lane(F+gap B)/ materialization=carrier bundling+B-gated。
+
+**追記 (2026-06-19, commit `64472a63`) — (10.11) 完全 unconditional 化 + 用語訂正**: (10.11) を支える
+「κ-Hall が derived を complement する」事実は **既に証明済**(`BG.Ch4.S14.typeP_derivedInG_isComplement_kappaHall`、
+BG Thm 14.7(h)、AxiomsCheck 登録、axiom-clean)。私が原文/既存機構を確認せず sorry'd 重複 `kappaHall_isComplement_derived`
+を切り出し「gap B/lane-f obligation」と誤ラベルしたのを訂正(ユーザー指摘: 「gap」は書籍の行間/誤りに限る; cross-book
+対応・未形式化既知事実は形式化労力)。重複削除 + consumer で既存定理を直接 cite → **(10.11) は (10.10)+(8.6.a)+
+proven typeP_derivedInG_isComplement_kappaHall で完全 unconditional**(FT 消費される primality 完全証明、real sorry 135)。
+issue 2012 RESOLVED。教訓: obligation 化の前に grep + AxiomsCheck を確認。
