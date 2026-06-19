@@ -1,4 +1,5 @@
 import OddOrder.BG.AppC_FinalContradiction
+import OddOrder.BG.Ch4_FamilyOfMaximal.S14_TypePComplement
 
 /-!
 # Feit-Thompson Theorem
@@ -528,16 +529,26 @@ noncomputable def section16TypePStructure_of_isMinimalSimpleOdd {G : Type*} [Gro
   -- **U-side residual**: the (13.1.b) semidirect complements `U, V` (with `M' = M_F ⊔ U` and
   -- `K ≤ N_G(U)`) and the ordering `q < p`.  A *true*, constructible §13/§14 statement for the
   -- canonical pair (`mp.K`, `mp.Kstar`).
-  -- The ordering `|K| < |K*|` is now carried by the (relabelled) maximal pair `mp.K_lt_Kstar`, so it
-  -- no longer appears in the residual; what remains is the genuinely constructible U-side menu.
-  obtain ⟨U, V, hSderiv, hTderiv, hSnorm, hTnorm⟩ := Classical.choice
-    (show Nonempty (Σ' (U V : Subgroup G),
-      derivedInG mp.S = maxNilpotentNormalHall mp.S ⊔ U ∧
-      derivedInG mp.T = maxNilpotentNormalHall mp.T ⊔ V ∧
-      mp.K ≤ Subgroup.normalizer (U : Set G) ∧ mp.Kstar ≤ Subgroup.normalizer (V : Set G))
-      from sorry)
-  exact section16TypePStructure_of_components mp.K mp.Kstar U V hSderiv hTderiv hprimes.1 hprimes.2
-    hWjoin hWcyc hbot hcomm hSnorm hTnorm mp.K_lt_Kstar
+  -- **U-side** from Peterfalvi (13.1.b): the κ-Hall-invariant complement `U` to `M_F` in `M'`
+  -- (`exists_kappaHall_invariant_complement_to_MF` = invariant Schur–Zassenhaus, BG §1 Prop 1.5(b)).
+  -- The ordering `|K| < |K*|` is carried by the relabelled pair (`mp.K_lt_Kstar`), so the residual
+  -- is now fully discharged.  `K`, `K*` are cyclic as subgroups of the cyclic `Z = K ⊔ K*`.
+  haveI : IsCyclic ↥(mp.K ⊔ mp.Kstar) := mp.Z_cyclic
+  haveI : IsCyclic ↥mp.K :=
+    isCyclic_of_injective (Subgroup.inclusion (le_sup_left : mp.K ≤ mp.K ⊔ mp.Kstar))
+      (Subgroup.inclusion_injective _)
+  haveI : IsCyclic ↥mp.Kstar :=
+    isCyclic_of_injective (Subgroup.inclusion (le_sup_right : mp.Kstar ≤ mp.K ⊔ mp.Kstar))
+      (Subgroup.inclusion_injective _)
+  -- `Section16TypePStructure mp` is `Type`-valued, so we cannot `obtain` the `∃`-witness into the
+  -- goal (`Exists.casesOn` only eliminates into `Prop`).  Extract the data with `Exists.choose`.
+  have hScompl := BG.Ch4.S14.exists_kappaHall_invariant_complement_to_MF hG
+    mp.S_maximal mp.S_typeP mp.K_le_S mp.K_hall
+  have hTcompl := BG.Ch4.S14.exists_kappaHall_invariant_complement_to_MF hG
+    mp.T_maximal mp.T_typeP mp.Kstar_le_T mp.Kstar_hall
+  exact section16TypePStructure_of_components mp.K mp.Kstar hScompl.choose hTcompl.choose
+    hScompl.choose_spec.1 hTcompl.choose_spec.1 hprimes.1 hprimes.2
+    hWjoin hWcyc hbot hcomm hScompl.choose_spec.2 hTcompl.choose_spec.2 mp.K_lt_Kstar
 
 /-- **Peterfalvi §13 coherent Dade-grid producer** (`sorry`) — *lane-b*
 (Peterfalvi §3–§13 coherent grids).  Given the maximal pair and the type-P
