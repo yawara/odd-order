@@ -4,6 +4,54 @@
 > `s08_6_8_assembly_plan.md`(458KB)/`s08_6_8_3_gap_resolution.md` のうち本 note と矛盾する記述は本 note を優先。
 > 上位方針・FT 接続の文脈 = 記憶 [[ft-path-policy]] の 2026-06-17 検証訂正ブロック。
 
+## 🚩 HANDOFF — 次セッションはここから (2026-06-19 cont.²⁰)
+
+**状態**: branch `lane-b`、HEAD `32062fd2`、作業ツリー clean、full build 3865 green、実 sorry 140
+(`bin/count-sorry`)。今セッションの全成果は commit 済 (下記 cont.¹⁹/¹⁸/¹⁷/¹⁶)。
+(未追跡 `notes/peterfalvi/s08_6_8_chatgpt_prompt.md` は旧 draft、無視可。)
+
+**目標**: (6.8) c2 の `hbound` を埋め S08:59 `sibleySetup_is_coherent` の c2 枝を閉じる。
+
+**✅ 完成済インフラ** (今 session):
+- `S08_Theorem65c2.lean`: c2 chain 3 段 (`six_two_index_bound_c2`/`six_two_central_c2`/
+  `six_three_index_bound_c2`) — **既約-break path** (仮説 `hW2B : h46.W2 ≤ B` で break 既約性を要求)。
+  + `member_isIrreducible_of_W2_le` (W₂≤A で S(A) 全既約)。
+- `S08_CaseBCoherence2.lean`: `columnSum_notMem_SsubFiltration_of_le` (W₂≤A で column∉S(A))。
+- **`S07_RetargetScaled.lean` (reducible-break (5.6.3) 構成インフラ、完備・axiom-clean)**:
+  `retarget_isCoherent_S` (reducible χ の `IsCoherent τ (S₁∪{χ,χ̄}) A` 構成) +
+  `retargetTargetPair_gen` (reducible χ の Gram 一致 {X,X̄}) + 支持 8 lemma。
+
+**▶ 次の一手 (EXACT)**: `retarget_isCoherent_of_extensionImage` (`S08_CoherenceCorePart1:1980`) の
+**reducible 版** `..._k` を作る。手順 = 元を丸ごとミラーし:
+- `hχχ : ⟨χ,χ⟩=1` → `hχχne : ⟨χ,χ⟩≠0` (+ 同 chibar)、`hXX=1` → `hXX : ⟨X,X⟩=⟨χ,χ⟩` (Gram 一致)
+- 内部 norm 計算 `huu=1+a²` 等 → `k+a²` (= ⟨χ,χ⟩+a²)。`retarget_isIntegralIsometry`/
+  `retarget_inner_eq_on_zSpan_union` 呼出 → `retargetS_inner_eq_on_zSpan_union` に差替
+- break の Da から {X,X̄} 抽出: `retargetTargetPair` → `retargetTargetPair_gen`
+- 最終 `retarget_isCoherent` → `retarget_isCoherent_S`
+**呼出 API** (S07_RetargetScaled、`open OddOrder.Peterfalvi.S07`):
+```
+retargetTargetPair_gen (D : CharacterPsiDecomposition τ χ 0) (hχχbar) (hχbarχ) : RetargetTargetPairGen D
+  -- .inner_self_X : ⟨D.X,D.X⟩=⟨χ,χ⟩ / .inner_self_conjImage : ⟨X̄,X̄⟩=⟨χ̄,χ̄⟩ / .X_mem_ZIrr / .conjImage_mem_ZIrr / ...
+retarget_isCoherent_S (hS₁ : IsCoherent τ S₁ A) (hχχne)(hχbarχbarne)(hχχbar)(hχbarχ)
+  (hXX:⟨X,X⟩=⟨χ,χ⟩)(hXbarXbar:⟨X̄,X̄⟩=⟨χ̄,χ̄⟩)(hXXbar)(hXbarX)(hXZ)(hXbarZ)(hX_ortho)(hXbar_ortho)
+  (hXbar_def:X̄=X−τ(χ−chibar))(hχ_S1)(hχbar_S1)(hchi1)(himg)(hgen) : IsCoherent τ (S₁∪{χ,chibar}) A
+```
+
+**▶ 残チェーン**: `..._of_extensionImage_k` → `xAdjoinStepW` reducible 版
+(`S08_CoherenceWeighted:286`、break χ を Da パラメータ化) → `coherentDegreeSqNormBound_of_not_coherentW`
+reducible 版 (`:475`、対偶) → `sMember_degreeSqNormBound_of_not_coherent` の `hψirr` 撤廃
+(`S08_CaseBEnumeration:620`) → `sSubFiltration_sum_le_two_psi_caseB` の `hψirr` 撤廃 (`S08_Theorem63:110`) →
+**`six_two_index_bound_c2` の `hW2B` 撤廃** → `six_three_c2` (induction、`six_three:3750` ミラー、hW2B 不要) →
+`isPGroup_of_not_coherent_c2` (`isPGroup_of_not_coherent:3803` ミラー) → `hbound` →
+`nonempty_coherent_S_of_c2_of_branches` (`S08_PGroupReduction:215`) → dispatch S08:59。
+column の break Da = `certainTypeDecompositionDa`/`certainTypeR` (`S06_CertainTypeCoherence`)。
+
+**設計の要点 (再調査不要)**: retarget の norm-k 化は `innerLeftℤ` が **ℂ 値**ゆえ `(⟨χ,χ⟩)⁻¹` scaling で
+ℤ-線形維持 (lattice 上 ⟨φ,χ⟩=m·k で係数整数)。isometry の項照合は Gram 一致 ⟨X,X⟩=⟨χ,χ⟩ で成立
+(scaling 両辺同一ゆえ k-real 不要)。**S07_RetargetScaled は `open IntegralCharacterMap` +
+`open CharacterPsiDecomposition` 要**。
+**FT 文脈不変**: (6.8) は [[ft-path-policy]] で orphaned (deferred-payoff) — 閉じても feitThompson sorry は今減らない。
+
 ## ✅✅🎯 2026-06-19 cont.¹⁹ — reducible-break (5.6.3) coherence 拡張 `retarget_isCoherent_S` 完成
 
 cont.¹⁸ で「retarget は norm-1 専用、reducible は basis-direct 新規構成が要る」と確定した核心難所を**完成**。
