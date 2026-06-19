@@ -421,6 +421,108 @@ noncomputable def caseB_member_orthoDatum
     exact dadeOrthonormalCharacterImageFamilyOfDiff_orthogonal hyp.dade hyp.hconj
       hreal hdiffsupp hrealχ hdiffsuppχ hxχ hxχbar hxbarχ hxbarχbar
 
+/-- **(6.8.2) per-member `(5.4)` decomposition bundled with its (5.2.e) cross-orthogonality, for a
+reducible certain-type COLUMN break.**
+
+The column-break analogue of `caseB_member_orthoDatum`: the break being adjoined is a reducible
+certain-type column `μ_b = columnSum χ₂b` (not an irreducible pair), so each member's image family
+`R(x)` must be orthogonal to the column break's family `R(μ_b) = certainTypeR χ₂b`.  The member
+`Dmem`/`htau1` are produced exactly as in the irreducible-break case (break-independent); only the
+cross-orthogonality changes, dispatched on the member dichotomy:
+
+* **column member** `x = columnSum χ₂x` — `certainTypeR(χ₂x) ⊥ certainTypeR(χ₂b)` by
+  `certainTypeR_imageSet_orthogonal_certainTypeR` (column×column (5.2.e), 4a), whose disjointness
+  `χ₂x ≠ χ₂b`, `χ₂x ≠ χ₂b⁻¹` is forced by `x ≠ μ_b`, `x ≠ μ̄_b`;
+* **irreducible member** `x = Ind θ` — `dadeOfDiff(x) ⊥ certainTypeR(χ₂b)` by
+  `dadeOfDiff_imageSet_orthogonal_certainTypeR` (irreducible×column, the conjugate-symmetry swap).
+
+Unlike `caseB_member_orthoDatum`, neither branch needs the member⊥break inner products — the
+column-break cross-orthogonality is structural (V-vanishing / grid disjointness). -/
+noncomputable def caseB_member_orthoDatum_columnBreak
+    (hyp : SibleyDadeHypothesis G L H) [H.Normal]
+    (h46 : OddOrder.Peterfalvi.S06.Hypothesis46 (sharpImage H) L) (hHK : h46.K = H)
+    [NeZero (Nat.card h46.W1)] [Invertible (Nat.card ↥h46.K : ℂ)]
+    [Fintype ↥(h46.W1 ⊔ h46.W2)] [Invertible (Nat.card ↥(h46.W1 ⊔ h46.W2) : ℂ)]
+    [Fintype (OddOrder.Peterfalvi.S06.ticVdiff h46).W]
+    [Invertible (Nat.card (OddOrder.Peterfalvi.S06.ticVdiff h46).W : ℂ)]
+    {S₁ : Set (ClassFunction ↥L ℂ)} (hS₁sub : S₁ ⊆ hyp.S)
+    (hS₁coh : OddOrder.Peterfalvi.S07.IsCoherent hyp.tau S₁
+      (OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L))
+    (hS₁conj : OddOrder.Peterfalvi.S03.ClosedUnderConjugate S₁)
+    {x : ClassFunction ↥L ℂ} (hxS₁ : x ∈ S₁)
+    (hνZ : hS₁coh.extension x ∈ ZIrr G)
+    {χ₂b : (h46.W2.subgroupOf (h46.W1 ⊔ h46.W2)) →* ℂˣ} (hχ₂b : χ₂b ≠ 1)
+    (hdegb : (∑ i, ((h46.columnFamily χ₂b).mu i : ClassFunction ↥L ℂ) 1)
+      = (∑ i, ((h46.columnFamily χ₂b⁻¹).mu i : ClassFunction ↥L ℂ) 1))
+    (hxneq : x ≠ OddOrder.Peterfalvi.S06.columnSum h46 χ₂b)
+    (hxneq' : x ≠ (OddOrder.Peterfalvi.S06.columnSum h46 χ₂b).conj) :
+    { D : OddOrder.Peterfalvi.S07.CharacterPsiDecomposition hyp.tau x 0 //
+      (∀ α ∈ D.imageFamily.imageSet,
+          ∀ β ∈ (OddOrder.Peterfalvi.S06.certainTypeR h46 hχ₂b hdegb).imageSet,
+            ClassFunction.inner α β = 0) ∧
+        D.tau1 x = hS₁coh.extension x } := by
+  classical
+  haveI : Fintype ↥H := Fintype.ofFinite _
+  have hxS : x ∈ hyp.S := hS₁sub hxS₁
+  by_cases hcolumn : ∃ χ₂ : (h46.W2.subgroupOf (h46.W1 ⊔ h46.W2)) →* ℂˣ, χ₂ ≠ 1 ∧
+      OddOrder.Peterfalvi.S06.columnSum h46 χ₂ = x
+  · -- reducible certain-type column member branch
+    set χ₂ : (h46.W2.subgroupOf (h46.W1 ⊔ h46.W2)) →* ℂˣ := hcolumn.choose with hχ₂def
+    have hχ₂ : χ₂ ≠ 1 := hcolumn.choose_spec.1
+    have hcol : OddOrder.Peterfalvi.S06.columnSum h46 χ₂ = x := hcolumn.choose_spec.2
+    have hμ_S1 : OddOrder.Peterfalvi.S06.columnSum h46 χ₂ ∈ S₁ := by rw [hcol]; exact hxS₁
+    have hμbar_S1 : (OddOrder.Peterfalvi.S06.columnSum h46 χ₂).conj ∈ S₁ :=
+      hS₁conj.conj_mem hμ_S1
+    have hνZ' : hS₁coh.extension (OddOrder.Peterfalvi.S06.columnSum h46 χ₂) ∈ ZIrr G := by
+      rw [hcol]; exact hνZ
+    have hsupp : (OddOrder.Peterfalvi.S06.columnSum h46 χ₂
+        - (OddOrder.Peterfalvi.S06.columnSum h46 χ₂).conj).support ⊆
+        OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L := by
+      rw [OddOrder.Peterfalvi.S06.columnSum_conj_eq]
+      exact OddOrder.Peterfalvi.S06.columnDiff_support_subset h46 hχ₂ (inv_ne_one.mpr hχ₂)
+        (OddOrder.Peterfalvi.S06.columnSum_inv_apply_one h46 χ₂).symm
+    -- disjointness of the member column from the break column (and its inverse).
+    have hne1 : χ₂ ≠ χ₂b := fun he => hxneq (by rw [← hcol, he])
+    have hne2 : χ₂ ≠ χ₂b⁻¹ := fun he =>
+      hxneq' (by rw [← hcol, OddOrder.Peterfalvi.S06.columnSum_conj_eq, he])
+    exact hcol ▸ (⟨OddOrder.Peterfalvi.S06.certainTypeMemberDecomposition h46 hχ₂
+        (OddOrder.Peterfalvi.S06.columnSum_inv_apply_one h46 χ₂).symm
+        (caseB_column_mapagree hyp h46 hχ₂) hS₁coh hμ_S1 hμbar_S1 hνZ'
+        (OddOrder.Peterfalvi.S07.mem_zSupportedSpan_iff.mpr
+          ⟨Submodule.sub_mem _ (Submodule.subset_span hμ_S1) (Submodule.subset_span hμbar_S1),
+            hsupp⟩),
+      OddOrder.Peterfalvi.S06.certainTypeR_imageSet_orthogonal_certainTypeR h46 hχ₂ hχ₂b
+        (OddOrder.Peterfalvi.S06.columnSum_inv_apply_one h46 χ₂).symm hdegb hne1 hne2,
+      rfl⟩ :
+      { D : OddOrder.Peterfalvi.S07.CharacterPsiDecomposition hyp.tau
+          (OddOrder.Peterfalvi.S06.columnSum h46 χ₂) 0 //
+        (∀ α ∈ D.imageFamily.imageSet,
+            ∀ β ∈ (OddOrder.Peterfalvi.S06.certainTypeR h46 hχ₂b hdegb).imageSet,
+              ClassFunction.inner α β = 0) ∧
+          D.tau1 (OddOrder.Peterfalvi.S06.columnSum h46 χ₂)
+            = hS₁coh.extension (OddOrder.Peterfalvi.S06.columnSum h46 χ₂) })
+  · -- irreducible member branch
+    have hirrx : IsIrreducibleCharacter x :=
+      (caseB_S_member_column_or_irreducible hyp h46 hHK hxS).resolve_left hcolumn
+    have hreal : ¬ ClassFunction.IsReal x := by
+      have h := hxS; rw [hyp.S_eq, Set.mem_setOf_eq] at h
+      obtain ⟨θ, hθne, hxeq⟩ := h
+      rw [hxeq]; exact caseB_irr_nonreal hyp (hxeq ▸ hirrx)
+    have hdiffsupp : (x.conj - x).support ⊆
+        OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L := by
+      have h := hxS; rw [hyp.S_eq, Set.mem_setOf_eq] at h
+      obtain ⟨θ, hθne, hxeq⟩ := h
+      rw [hxeq]; exact caseB_irr_conj_diff_support hyp θ
+    have hχχbar : ClassFunction.inner x x.conj = 0 := by
+      have h := hxS; rw [hyp.S_eq, Set.mem_setOf_eq] at h
+      obtain ⟨θ, hθne, hxeq⟩ := h
+      rw [hxeq]; exact caseB_irr_conj_inner hyp (hxeq ▸ hirrx)
+    refine ⟨memberExtensionDecomposition hyp.dade hyp.hconj hS₁coh ⟨x, hirrx⟩
+      hreal hdiffsupp hxS₁ (hS₁conj.conj_mem hxS₁) hνZ hχχbar, ?_, rfl⟩
+    -- `(Dmem).imageFamily = R(x)` (Dade difference family) `⊥ R(μ_b) = certainTypeR χ₂b`.
+    exact dadeOfDiff_imageSet_orthogonal_certainTypeR hyp h46 hHK hχ₂b hdegb ⟨x, hirrx⟩
+      hreal hdiffsupp
+
 /-- **Peterfalvi (6.8.2) case-(B): distinct `S`-members are pairwise orthogonal.**
 
 For distinct members `x ≠ y` of `S` (any two, not just the `X(W₂) ∪ Y` seed), `⟨x, y⟩ = 0`.  This
