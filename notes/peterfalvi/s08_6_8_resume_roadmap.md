@@ -28,33 +28,40 @@ Frobenius 版 producer (`nonempty_coherent_S_caseA_of_frobenius`, `S08_Coherence
 `... build hXYcoh via diagonal ... ; exact false_of_coherentXunionYset_of_not_coherentS hF ...` の形。
 **残 = `false_of_coherentXunionYset_of_not_coherentS` の c2 版** (`S08_CoherenceCorePart2:3613`)。
 
-### 🚩 残ゲートの正確な診断 (再調査済、cont.²⁶)
-`false_of_coherentXunionYset_of_not_coherentS` (Frobenius) は **S 全体が既約**という前提に依存:
-- `isIrreducibleCharacter_of_mem_S_of_frobenius` (= `isIrreducibleCharacter_induce_of_frobeniusGroup`、
-  Frobenius 群で Ind θ 既約) — **case-(A) では一般に偽** (certain-type で Ind θ は可約化しうる)。
-- `S_hasNoRealCharacters` (上を使う) + `xSum_le_two_psi` (**既約**-break の (6.2) bound) を `exists_coherentBreakPair`
-  に渡す。
-- 末尾 `false_of_centralCommutator_break_arith` の FPF 入力 `centralCommutator_card_subgroupOf_lower` は **c2 化済 ✅**。
+### 🚩 残ゲートの正確な診断 (教科書 (6.8.3) 読了で確定、cont.²⁶ — **配線タスク・新数学ゼロ**)
+**教科書 `04.8_*.mmd` (6.8.3) を読んだ**: break ψ は**既約である必要なし**。証明は **norm-weighted (5.6)**
+`2ψ(1)η₁(1) ≥ Σ_{χ∈S₁} χ(1)²/‖χ‖² > Σ_{χ∈X} χ(1)²/‖χ‖²` (= `|W₁||H:Z|(|Z|-1)`、(1.5.c,d)) を使い、
+ψ=Ind θ (θ∈Irr H, deg d) の度数式 ψ(1)=|W₁|d (可約でも成立) + [Is] Cor 2.30 (d²≤|H:Z|) +
+**case-(A) FPF `|Z|-1≥2|W₁|` (= `centralCommutator_card_subgroupOf_lower_c2_caseA` ✅構築済)** で矛盾
+`4|W₁|² > |H:Z|(|Z|-1)² ≥ (2|W₁|)²`。**‖χ‖² 重みが可約を吸収** ⟹ S 全体既約は不要。
+∴ cont.²⁶ 初稿の「既約性ゲート」は誤診。`isIrreducibleCharacter_of_mem_S` 依存は Frobenius 固有の近道
+(S 全既約ゆえ unweighted で済んだ)にすぎない。
 
-**⟹ 純 mirror 不可**。case-(A) の X∪Y→S lifting は **reducible-break (6.2) bound at Zc** が要る (= (6.8.3)
-bootstrap の核心)。case-(B) は同じ lifting を `nonempty_coherent_S_caseB_of_structure` (`S08_PGroupReduction`
-経由) + reducible-break engine (`sSubFiltration_sum_le_two_psi_caseB_columnBreak` `S08_Theorem63`、
-`false_of_caseB_break_of_bounds` `S08_CaseBEndgame:384`) で **W₂ にて**解決済。case-(B) の columnBreak は
-`columnSum h46 χ₂b` (W₂ 構造の column) 固有 ⟹ Zc 版は独自構築要。
+**全部品が repo に sorry-free 実在** ([[pf-683-gap-resolved]] と整合):
+- weighted (5.6) per-member bound `sMember_degreeSqNormReBound_of_not_coherent` (`S08_CaseBEnumeration:1080`、
+  **汎用・非 column**、hψirr 不要)。
+- X-sum counting `sum_re_sq_Xset_eq` (`S08_CoherenceCorePart2`、**Z-generic** `(Z := …)`)。
+- reducible break pair `exists_coherentBreakPair_general` (`S08_CoherenceCorePart1`、**S 既約不要**、`HasNoRealCharacters Sb`
+  のみ)。
+- 算術破綻 `false_of_centralCommutator_break_arith` (`S08_CoherenceCorePart2`、Zc 用、Frobenius proof line で使用済)。
+- FPF `centralCommutator_card_subgroupOf_lower_c2_caseA` ✅。
 
-### ▶ 次の一手 (優先順、cont.²⁶)
-1. **🔑 KEY 開設問題を先に解け**: case-(A) の break `ψ ∈ S \ (X(Zc)∪Y) = S(Zc)\S(H')` (Zc kill・H' 非kill)
-   は**既約か**? **YES なら** `false_of_coherentXunionYset` c2 は near-mirror (S全体でなく break のみ既約を要求
-   する `exists_coherentBreakPair_general` (cont.²³ で存在) + 既約-break `xSum_le_two_psi` の c2 化で済む)。
-   **NO なら** case-(B) 流の column/irreducible dispatch + Zc-columnBreak (6.2) bound を構築要 (multi-session)。
-   **判定材料 = 教科書 `references/peterfalvi/04.8_*.mmd` の (6.8.3)** を読む ([[feedback-dont-mislabel-formalization-as-research]]:
-   文献に証明あれば形式化労力、研究でない)。S(Zc)\S(H') の構造を Peterfalvi がどう扱うか確認。
-2. 判定後: `xSum_le_two_psi` (Part2:3403) / `exists_coherentBreakPair` の hF 依存 (`isIrreducibleCharacter_of_mem_S`)
-   を case-(A) 既約性に置換、または reducible-break engine を Zc に instantiate。
-3. `false_of_coherentXunionYset_of_not_coherentS_c2_caseA` 完成 → producer `nonempty_coherent_S_caseA_of_c2`
-   (Frobenius producer の完全 mirror、diagonal_c2_caseA + crux_general_of_higher_anchor_c2_caseA +
-   exists_{Y,X}coherence_*_c2_caseA + false_of_*_c2_caseA を配線) → dispatcher `nonempty_coherent_S_of_c2_of_branches`
-   (`S08_PGroupReduction:215`) の hcaseA に供給 → case-B producer (済) と合わせ S08:59 dispatch。
+### ▶ 次の一手 (優先順、cont.²⁶ — tractable 配線、見積 1-2 session)
+1. **weighted xSum bound** `xSum_le_two_psi_weighted_c2_caseA` を作る: Frobenius `xSum_le_two_psi`
+   (`Part2:3403`、~127 行) を mirror、ただし per-member を `sMember_degreeSqReBound_of_not_coherent` →
+   **`sMember_degreeSqNormReBound_of_not_coherent`** (weighted、`S08_CaseBEnumeration:1080`) に差替、`hψirr` を落とし
+   ψ=Ind θ の deg d で扱う。X-sum は `sum_re_sq_Xset_eq` (Z=Zc) 流用。**crux = weighted bound の出力 family
+   (mc/‖·‖² 重み付) を X-sum `χ(1)²/‖χ‖²` に合わせる** (case-B `sSubFiltration_sum_le_two_psi_caseB` が template)。
+2. **`false_of_coherentXunionYset_c2_caseA`**: Frobenius `false_of_coherentXunionYset_of_not_coherentS`
+   (`Part2:3613`、~100 行) を mirror、`exists_coherentBreakPair` (S 既約) → `exists_coherentBreakPair_general`
+   (`S_hasNoRealCharacters` の代わりに `HasNoRealCharacters hyp.S` を別途供給 — odd-order ゆえ成立、要 c2 版か汎用)、
+   `xSum_le_two_psi` → step 1 の weighted 版、FPF/arith は c2/Zc 既存品。**ψ 既約前提を全除去**。
+3. **producer `nonempty_coherent_S_caseA_of_c2`**: Frobenius producer の完全 mirror
+   (diagonal_c2_caseA + crux_general_of_higher_anchor_c2_caseA + exists_{Y,X}coherence_*_c2_caseA +
+   step 2 の false_of_*_c2_caseA を配線) → dispatcher `nonempty_coherent_S_of_c2_of_branches`
+   (`S08_PGroupReduction:215`) の hcaseA に供給 → case-B producer (済) と合わせ S08:59 dispatch 完成。
+**⚠ 唯一の非自明 = step 1 の weight 整合** (unweighted χ(1)² → weighted χ(1)²/‖χ‖²)。case-B の
+`sSubFiltration_sum_le_two_psi_caseB` (`S08_Theorem63`) が同じ weight 整合を W₂ で済ませている = 直接 template。
 
 **FT 文脈不変**: (6.8) は [[ft-path-policy]] で orphaned (deferred-payoff) — 閉じても feitThompson sorry は今減らない。
 
