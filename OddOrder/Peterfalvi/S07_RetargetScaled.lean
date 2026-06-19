@@ -33,6 +33,7 @@ namespace OddOrder.Peterfalvi.S07
 
 open OddOrder.RepresentationTheory
 open IntegralCharacterMap
+open CharacterPsiDecomposition
 
 variable {L G : Type*} [Group L] [Group G]
 variable [Fintype L] [Invertible (Nat.card L : ℂ)]
@@ -421,5 +422,84 @@ noncomputable def retarget_isCoherent_S
     | zero => rw [map_zero]; exact Submodule.zero_mem _
     | add y z _ _ ihy ihz => rw [map_add]; exact Submodule.add_mem _ ihy ihz
     | smul a y _ ih => rw [map_zsmul]; exact Submodule.smul_mem _ a ih
+
+section TargetPairGen
+variable {τ : IntegralCharacterMap L G} {χ : ClassFunction L ℂ}
+variable [Fintype G] [Invertible (Nat.card G : ℂ)]
+
+/-- The target pair `{X, X̄}` of Peterfalvi (5.6.3) for a **possibly reducible** `χ`: bundled with the
+**Gram-matching** norms `‖X‖² = ‖χ‖²`, `‖X̄‖² = ‖χ̄‖²` (the `‖·‖² = 1` generalization of
+`CharacterPsiDecomposition.RetargetTargetPair`).  Here `X = D.X` and `X̄ = X − (χ − χ̄)^τ`. -/
+structure RetargetTargetPairGen (D : CharacterPsiDecomposition (L := L) (G := G) τ χ 0) where
+  /-- `X ∈ ℤ[Irr G]`. -/
+  X_mem_ZIrr : D.X ∈ ZIrr G
+  /-- `X̄ = X − (χ − χ̄)^τ ∈ ℤ[Irr G]`. -/
+  conjImage_mem_ZIrr : D.X - τ (χ - χ.conj) ∈ ZIrr G
+  /-- `‖X‖² = ‖χ‖²`. -/
+  inner_self_X : ClassFunction.inner D.X D.X = ClassFunction.inner χ χ
+  /-- `‖X̄‖² = ‖χ̄‖²`. -/
+  inner_self_conjImage :
+    ClassFunction.inner (D.X - τ (χ - χ.conj)) (D.X - τ (χ - χ.conj)) =
+      ClassFunction.inner χ.conj χ.conj
+  /-- `⟨X, X̄⟩ = 0`. -/
+  inner_X_conjImage : ClassFunction.inner D.X (D.X - τ (χ - χ.conj)) = 0
+  /-- `⟨X̄, X⟩ = 0`. -/
+  inner_conjImage_X : ClassFunction.inner (D.X - τ (χ - χ.conj)) D.X = 0
+
+open scoped Classical in
+/-- **Peterfalvi (5.6.3): the Gram-matched target pair `{X, X̄}` for a reducible `χ`.**
+The `‖χ‖² ≠ 1` analogue of `retargetTargetPair`: from the (5.5) decomposition `D` and the source-pair
+orthogonality `⟨χ,χ̄⟩ = ⟨χ̄,χ⟩ = 0`, `(5.5)` gives `X = ∑_{α∈E} α` with `|E| = ‖χ‖²`, so `‖X‖² = ‖χ‖²`;
+the source-pair norm `|R(χ)| = ‖χ − χ̄‖² = ‖χ‖² + ‖χ̄‖²` then gives
+`‖X̄‖² = |R(χ)| − |E| = ‖χ̄‖²`.  No `‖χ‖² = 1` assumption. -/
+noncomputable def retargetTargetPair_gen
+    (D : CharacterPsiDecomposition (L := L) (G := G) τ χ 0)
+    (hχχbar : ClassFunction.inner χ χ.conj = 0)
+    (hχbarχ : ClassFunction.inner χ.conj χ = 0) :
+    RetargetTargetPairGen D := by
+  classical
+  obtain ⟨_hY0, _hτ1χ, E, hEsub, hXsum, hEcard⟩ := D.eq_sum_of_psi_eq_zero
+  have hcardR : (D.imageFamily.imageSet.card : ℂ) =
+      ClassFunction.inner χ χ + ClassFunction.inner χ.conj χ.conj := by
+    have h1 : ClassFunction.inner (τ (χ - χ.conj)) (τ (χ - χ.conj)) =
+        (D.imageFamily.imageSet.card : ℂ) := by
+      rw [D.imageFamily.image_eq, inner_self_sum_orthonormal_eq_card D.imageFamily.orthonormal]
+    have h2 : ClassFunction.inner (τ (χ - χ.conj)) (τ (χ - χ.conj)) =
+        ClassFunction.inner (χ - χ.conj) (χ - χ.conj) := by
+      rw [← D.tau1_agrees, D.tau1_inner_eq_on_support (χ - χ.conj) (χ - χ.conj)
+        chi_sub_conj_mem_zSpan_support chi_sub_conj_mem_zSpan_support]
+    have h3 : ClassFunction.inner (χ - χ.conj) (χ - χ.conj) =
+        ClassFunction.inner χ χ + ClassFunction.inner χ.conj χ.conj := by
+      rw [ClassFunction.inner_sub_left, ClassFunction.inner_sub_right,
+        ClassFunction.inner_sub_right, hχχbar, hχbarχ]
+      ring
+    rw [← h1, h2, h3]
+  have hXnorm : ClassFunction.inner D.X D.X = ClassFunction.inner χ χ := by
+    rw [hXsum, inner_self_sum_orthonormal_eq_card
+      (fun a ha b hb => D.imageFamily.orthonormal a (hEsub ha) b (hEsub hb))]
+    exact hEcard
+  have hXbarnorm : ClassFunction.inner (D.X - τ (χ - χ.conj)) (D.X - τ (χ - χ.conj)) =
+      ClassFunction.inner χ.conj χ.conj := by
+    rw [D.inner_self_conjImage_eq_card_sdiff hEsub hXsum]
+    push_cast
+    rw [hcardR, hEcard]; ring
+  have hXXbar : ClassFunction.inner D.X (D.X - τ (χ - χ.conj)) = 0 :=
+    D.inner_X_conjImage_eq_zero hEsub hXsum
+  have hXbarX : ClassFunction.inner (D.X - τ (χ - χ.conj)) D.X = 0 := by
+    rw [OddOrder.RepresentationTheory.inner_conj_symm, hXXbar, star_zero]
+  have hXmem : D.X ∈ ZIrr G := by
+    rw [hXsum]; exact Submodule.sum_mem _ fun α hα => D.imageFamily.mem_ZIrr α (hEsub hα)
+  have hτmem : τ (χ - χ.conj) ∈ ZIrr G := by
+    rw [D.imageFamily.image_eq]
+    exact Submodule.sum_mem _ fun α hα => D.imageFamily.mem_ZIrr α hα
+  exact
+    { X_mem_ZIrr := hXmem
+      conjImage_mem_ZIrr := Submodule.sub_mem _ hXmem hτmem
+      inner_self_X := hXnorm
+      inner_self_conjImage := hXbarnorm
+      inner_X_conjImage := hXXbar
+      inner_conjImage_X := hXbarX }
+
+end TargetPairGen
 
 end OddOrder.Peterfalvi.S07
