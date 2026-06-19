@@ -697,6 +697,76 @@ theorem coherentDegreeSqNormBound_of_not_coherentW
     hχ_S1 hχbar_S1 s χmem deg i₁ hi₁ hmemdegdiffsupp hmemS1 mc hmempos hmemortho hanchorNorm
     Dmem hortho_mem htau1Dmem hdiffasuppχ htau1_memaχ ha1 hlt hSgen hgen⟩
 
+/-- **Norm-weighted (5.6) degree-square bound, reducible BREAK (contrapositive of `xAdjoinStepW_k`).**
+
+The `‖χ‖² ≠ 1` analogue of `coherentDegreeSqNormBound_of_not_coherentW`: if `S₁` is coherent but
+`S₁ ∪ {χ, χ̄}` is **not** — for a possibly **reducible** break `χ` whose decomposition `Da` is
+supplied as a parameter — then the weighted degree-square sum is bounded, `∑ deg(i)²/‖χmem i‖² ≤ 2a`.
+Pure contrapositive of the reducible-break forward engine `xAdjoinStepW_k`. -/
+theorem coherentDegreeSqNormBound_of_not_coherentW_k
+    {A : Set G}
+    (hyp : OddOrder.Peterfalvi.S04.Hypothesis G A L) (hconj : hyp.HConjInvariant)
+    {S₁ : Set (ClassFunction ↥L ℂ)}
+    (hS₁ : OddOrder.Peterfalvi.S07.IsCoherent
+      (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap hyp (hyp.fullDadeIsometryData hconj))
+      S₁ (OddOrder.Peterfalvi.S04.supportInSubgroup A L))
+    (χ : ClassFunction ↥L ℂ)
+    (hdiffsuppχ : (χ.conj - χ).support ⊆ OddOrder.Peterfalvi.S04.supportInSubgroup A L)
+    (hχχne : ClassFunction.inner χ χ ≠ 0)
+    (hχbarχbarne : ClassFunction.inner χ.conj χ.conj ≠ 0)
+    (hχχbar : ClassFunction.inner χ χ.conj = 0)
+    (hχbarχ : ClassFunction.inner χ.conj χ = 0)
+    (hχ_S1 : ∀ x ∈ S₁, ClassFunction.inner χ x = 0)
+    (hχbar_S1 : ∀ x ∈ S₁, ClassFunction.inner χ.conj x = 0)
+    {ι : Type*} (s : Finset ι) (χmem : ι → ClassFunction ↥L ℂ) (deg : ι → ℕ) (i₁ : ι)
+    (hi₁ : i₁ ∈ s)
+    (hmemdegdiffsupp : ∀ i ∈ s,
+      ((χmem i : ClassFunction ↥L ℂ) - deg i • (χmem i₁ : ClassFunction ↥L ℂ)).support ⊆
+        OddOrder.Peterfalvi.S04.supportInSubgroup A L)
+    (hmemS1 : ∀ i ∈ s, (χmem i : ClassFunction ↥L ℂ) ∈ S₁)
+    (mc : ι → ℝ) (hmempos : ∀ i ∈ s, 0 < mc i)
+    (hmemortho : ∀ i ∈ s, ∀ j ∈ s,
+      ClassFunction.inner (χmem i : ClassFunction ↥L ℂ) (χmem j : ClassFunction ↥L ℂ) =
+        if i = j then (mc i : ℂ) else 0)
+    (hanchorNorm : mc i₁ = 1)
+    {a : ℕ}
+    (Dmem : ∀ i ∈ s, OddOrder.Peterfalvi.S07.CharacterPsiDecomposition (L := ↥L) (G := G)
+      (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap hyp (hyp.fullDadeIsometryData hconj))
+      (χmem i) 0)
+    (Da : OddOrder.Peterfalvi.S07.CharacterPsiDecomposition (L := ↥L) (G := G)
+      (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap hyp (hyp.fullDadeIsometryData hconj))
+      χ (a • χmem i₁))
+    (hDatau1 : Da.tau1 = OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap hyp
+      (hyp.fullDadeIsometryData hconj))
+    (hortho_mem : ∀ i (hi : i ∈ s), (Dmem i hi).imageFamily.Orthogonal Da.imageFamily)
+    (htau1Dmem : ∀ i (hi : i ∈ s),
+      (Dmem i hi).tau1 (χmem i) = hS₁.extension (χmem i))
+    (hdiffasuppχ : (χ - a • (χmem i₁ : ClassFunction ↥L ℂ)).support ⊆
+      OddOrder.Peterfalvi.S04.supportInSubgroup A L)
+    (htau1_memaχ : OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap hyp
+      (hyp.fullDadeIsometryData hconj)
+      (χ - a • (χmem i₁ : ClassFunction ↥L ℂ)) ∈ ZIrr G)
+    (ha1 : deg i₁ = 1)
+    (hSgen : Submodule.span ℤ S₁ ≤ Submodule.span ℤ
+      (OddOrder.Peterfalvi.S07.zSupportedSpan (L := ↥L) S₁
+        (OddOrder.Peterfalvi.S04.supportInSubgroup A L) ∪ {(χmem i₁ : ClassFunction ↥L ℂ)}))
+    (hgen : OddOrder.Peterfalvi.S07.zSupportedSpan (L := ↥L)
+        (S₁ ∪ {χ, χ.conj})
+        (OddOrder.Peterfalvi.S04.supportInSubgroup A L) ⊆
+      Submodule.span ℤ (OddOrder.Peterfalvi.S07.zSupportedSpan (L := ↥L) S₁
+        (OddOrder.Peterfalvi.S04.supportInSubgroup A L) ∪
+        {χ - χ.conj, χ - a • (χmem i₁ : ClassFunction ↥L ℂ)}))
+    (hnc : ¬ Nonempty (OddOrder.Peterfalvi.S07.IsCoherent
+      (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap hyp (hyp.fullDadeIsometryData hconj))
+      (S₁ ∪ {χ, χ.conj})
+      (OddOrder.Peterfalvi.S04.supportInSubgroup A L))) :
+    ∑ i ∈ s, ((deg i : ℝ)) ^ 2 / mc i ≤ 2 * (a : ℝ) := by
+  by_contra hlt
+  push_neg at hlt
+  exact hnc ⟨xAdjoinStepW_k hyp hconj hS₁ χ hdiffsuppχ hχχne hχbarχbarne hχχbar hχbarχ
+    hχ_S1 hχbar_S1 s χmem deg i₁ hi₁ hmemdegdiffsupp hmemS1 mc hmempos hmemortho hanchorNorm
+    Dmem Da hDatau1 hortho_mem htau1Dmem hdiffasuppχ htau1_memaχ ha1 hlt hSgen hgen⟩
+
 /-- **(T-A2, norm-weighted) The X-family coherence chain fold.**
 
 The weighted analogue of `xChainCoherent`: folds the per-step weighted adjoin `xAdjoinStepW` (via
