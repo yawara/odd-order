@@ -85,7 +85,10 @@ per-call discharge** (cont.²⁵ 既述の case-B structure-data ゲート):
   W₂.subgroupOf H≠⊥ は W₂ prime ≤ H から。**容易**。
 - **hWMgt** (W₂⊊⁅H,H⁆): W₂=⁅H,H⁆ の edge は `Xset_union_Yset_eq_S` (`Part2:1068`) で S=X(W₂)∪Y + (6.8.2) seed
   `coherentXunionYset_caseB` (`S08_CaseBSeedGlue:299`) coherent ⟹ S coherent (producer 不要)。**要 edge 分岐**。
-- **hYcard** (|Y|≠2): |Y|=2 の (6.8.2) exceptional relabel ⟹ **要 edge 分岐** (最も非自明)。
+- **hYcard** (|Y|≠2): **確定ゲート** — case-B seed-glue 全体 (`coherentXunionYset_caseB` `S08_CaseBSeedGlue:299`,
+  317/400 等) が `hYcard:|Y|≠2` を貫通要求、`two_le_Yset_ncard` (`Part2:1648`) は 2≤ のみ。|Y|=2 (= |H:H'|=3,
+  p=3 の narrow case、|Y|=|H:H'|−1) は (6.8.2) exceptional relabel が**未構築**。W₂=H' edge も seed 経由ゆえ
+  これに gated。**= S08:59 closure の真の残ブロッカー (case-B 側)**。
 **∴ 残 = (A) hcaseB の edge-case 分岐 (W₂=H'/|Y|=2 を (6.8.2) で直接 S coherent、else case-B producer) +
 (B) S08:59 assembly (上記 rcases + 薄いラッパ + import)。case-A 側は完全に完了。**
 **見積**: hXne 容易、W₂=H' edge は部品あり中程度、|Y|=2 edge が要調査、assembly は機械的。~1-2 session。
