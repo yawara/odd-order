@@ -2128,6 +2128,49 @@ theorem isTypeP1_of_mf_ne_msigma [Finite G]
   by_contra hkne
   exact hnotP2 ⟨hP, hkne⟩
 
+/-- **BG Theorem 15.2, step 1 derivation (b)** (mmd L4190, "Theorem 14.7(f) implies that
+`q = |K*|` is a prime"): for a type-`P₁` maximal subgroup `M`, the order of
+`Kstar = C_{M_σ}(K)` is prime.
+
+Route (BG Theorem 14.7(f) via the `Z`-family duality):
+* `typeP_duality` provides the unique non-conjugate partner `M*` with `Kstar ≤ M*`, `Kstar` a Hall
+  `κ(M*)`-subgroup of `M*`, the symmetric relation `K = M*_σ ⊓ C_G(Kstar)`, and the disjunction
+  `IsTypeP2 M ∨ IsTypeP2 M*`.
+* Since `M` is type-`P₁`, it is not type-`P₂` (`not_isTypeP1_and_isTypeP2`); hence `M*` is type-`P₂`.
+* `typeP_structure` applied to `M*` (with `Kstar` in the `K`-role) has the `IsTypeP2 M* →`
+  conjunct `∃ q, q.Prime ∧ Nat.card ↥Kstar = q`, giving `|Kstar|` prime.
+
+The Hall `(κ(M*) ∪ σ(M*))'`-subgroup `U*` of `M*` needed by `typeP_structure` is built by Hall's
+theorem in the solvable `M*` (`Ch03.hall_E_exists`), as in `typeP_kstar_in_mf`. -/
+theorem kstar_card_prime_of_inputs [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M K Kstar : Subgroup G}
+    (hM : M ∈ maximalSubgroups G) (hP1 : S14.IsTypeP1 M) (hKM : K ≤ M)
+    (hK : Ch03.IsHallSubgroup (S14.kappa M) (K.subgroupOf M))
+    (hKstar : Kstar = OddOrder.BG.Ch3.S10.Msigma M ⊓ Subgroup.centralizer (K : Set G)) :
+    (Nat.card ↥Kstar).Prime := by
+  classical
+  -- The unique non-conjugate partner `M*` and its symmetric `Z`-family data.
+  obtain ⟨_hcompl, _hcop, Mstar, ⟨hMstarMax, hMstarP, _hMstarNC,
+      ⟨hKstarLe, hKstarHall, hKeqMstar⟩, _hZcyc, _hTI, hP2disj, _hpart⟩, _huniq⟩ :=
+    S14.typeP_duality hG hM hP1.1 hKM hK hKstar
+  -- `M` type-`P₁` ⟹ `¬ IsTypeP2 M` ⟹ `M*` is type-`P₂`.
+  have hMstar2 : S14.IsTypeP2 Mstar :=
+    hP2disj.resolve_left (fun hM2 => S14.not_isTypeP1_and_isTypeP2 ⟨hP1, hM2⟩)
+  -- A Hall `(κ(M*) ∪ σ(M*))'`-subgroup `U*` of `M*` (Hall's theorem in the solvable `M*`).
+  haveI : IsSolvable ↥Mstar := hG.solvable_of_mem_maximalSubgroups hMstarMax
+  obtain ⟨U', hU'⟩ := Ch03.hall_E_exists (G := ↥Mstar)
+    ((S14.kappa Mstar ∪ OddOrder.BG.Ch3.S10.sigma Mstar)ᶜ)
+  have hUeq : (U'.map Mstar.subtype).subgroupOf Mstar = U' :=
+    Subgroup.comap_map_eq_self_of_injective Mstar.subtype_injective U'
+  have hUstar : Ch03.IsHallSubgroup ((S14.kappa Mstar ∪ OddOrder.BG.Ch3.S10.sigma Mstar)ᶜ)
+      ((U'.map Mstar.subtype).subgroupOf Mstar) := by rw [hUeq]; exact hU'
+  -- `typeP_structure` on `M*` (with `Kstar` in the `K`-role, `K` in the `Kstar`-role):
+  -- the `IsTypeP2 M* →` conjunct yields `σ(M*) = β(M*) ∧ ∃ q, q.Prime ∧ Nat.card ↥Kstar = q ∧ …`.
+  obtain ⟨_hσβ, q, hq, hKstarq, _hTI⟩ :=
+    (S14.typeP_structure hG hMstarMax hMstarP hKstarLe hKstarHall hKeqMstar hUstar).2.2.2.2.1
+      hMstar2
+  rw [hKstarq]; exact hq
+
 /-- **BG Theorem 15.2** (mmd L4112): if `M_F` is strictly smaller than `M_sigma`,
 then `M` is type `P1` and has the normal `q`-subgroup / minimal chief factor
 structure described in the text. -/
