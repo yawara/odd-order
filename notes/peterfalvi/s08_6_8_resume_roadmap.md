@@ -46,22 +46,60 @@ Frobenius 版 producer (`nonempty_coherent_S_caseA_of_frobenius`, `S08_Coherence
 - 算術破綻 `false_of_centralCommutator_break_arith` (`S08_CoherenceCorePart2`、Zc 用、Frobenius proof line で使用済)。
 - FPF `centralCommutator_card_subgroupOf_lower_c2_caseA` ✅。
 
-### ▶ 次の一手 (優先順、cont.²⁶ — tractable 配線、見積 1-2 session)
-1. **weighted xSum bound** `xSum_le_two_psi_weighted_c2_caseA` を作る: Frobenius `xSum_le_two_psi`
-   (`Part2:3403`、~127 行) を mirror、ただし per-member を `sMember_degreeSqReBound_of_not_coherent` →
-   **`sMember_degreeSqNormReBound_of_not_coherent`** (weighted、`S08_CaseBEnumeration:1080`) に差替、`hψirr` を落とし
-   ψ=Ind θ の deg d で扱う。X-sum は `sum_re_sq_Xset_eq` (Z=Zc) 流用。**crux = weighted bound の出力 family
-   (mc/‖·‖² 重み付) を X-sum `χ(1)²/‖χ‖²` に合わせる** (case-B `sSubFiltration_sum_le_two_psi_caseB` が template)。
-2. **`false_of_coherentXunionYset_c2_caseA`**: Frobenius `false_of_coherentXunionYset_of_not_coherentS`
-   (`Part2:3613`、~100 行) を mirror、`exists_coherentBreakPair` (S 既約) → `exists_coherentBreakPair_general`
-   (`S_hasNoRealCharacters` の代わりに `HasNoRealCharacters hyp.S` を別途供給 — odd-order ゆえ成立、要 c2 版か汎用)、
-   `xSum_le_two_psi` → step 1 の weighted 版、FPF/arith は c2/Zc 既存品。**ψ 既約前提を全除去**。
-3. **producer `nonempty_coherent_S_caseA_of_c2`**: Frobenius producer の完全 mirror
-   (diagonal_c2_caseA + crux_general_of_higher_anchor_c2_caseA + exists_{Y,X}coherence_*_c2_caseA +
-   step 2 の false_of_*_c2_caseA を配線) → dispatcher `nonempty_coherent_S_of_c2_of_branches`
-   (`S08_PGroupReduction:215`) の hcaseA に供給 → case-B producer (済) と合わせ S08:59 dispatch 完成。
-**⚠ 唯一の非自明 = step 1 の weight 整合** (unweighted χ(1)² → weighted χ(1)²/‖χ‖²)。case-B の
-`sSubFiltration_sum_le_two_psi_caseB` (`S08_Theorem63`) が同じ weight 整合を W₂ で済ませている = 直接 template。
+### ✅✅✅ case-A producer COMPLETE (cont.²⁶ 後半 — `nonempty_coherent_S_caseA_of_c2` 着地, axiom-clean)
+**新 leaf `OddOrder/Peterfalvi/S08_CaseAWeightedEndgame.lean`** (3 結果、全 build-green + axiom-clean):
+- **`xSum_le_two_psi_caseB_columnBreak`** (実は `S08_CaseBWeightedEndgame` に追加): column break 用 norm-weighted
+  X-sum bound (`xSum_le_two_psi_caseB` の `_columnBreak` per-member 差替クローン)。
+- **`false_of_coherentXunionYset_caseA_of_not_coherentS`**: case-A (6.8.3) 矛盾。**column break を排除できない**
+  case-A 固有の問題を **dispatch で解決**: `caseB_S_member_column_or_irreducible` で irreducible→`xSum_le_two_psi_caseB`
+  / column→`xSum_le_two_psi_caseB_columnBreak`。**column gap は解消**: column = `Ind θ` (`columnSum_eq_induce_H`)
+  ゆえ d=θ(1)、ψ(1)=|W₁|d、d²≤|H:Zc| ([Is]2.30) が両 branch 一様 ⟹ `false_of_centralCommutator_break_arith` で締め。
+- **`nonempty_coherent_S_caseA_of_c2`**: producer。Frobenius `nonempty_coherent_S_caseA_of_frobenius` の完全
+  c2 ミラー (X(Zc)∪Y 構築 = diagonal/crux/exists_{Y,X}coherence_*_c2_caseA、cert=h46.toCertainTypeHypothesis ブリッジ)
+  + 上記 false_of で lift。FPF=`card_subgroupOf_lower_c2_caseA`、hZ2 from Zc⊊H。
+
+**⟹ c2 dispatch の `hcaseA` 完成** (dispatcher `nonempty_coherent_S_of_c2_of_branches` `S08_PGroupReduction:215`
+が要求する形)。case-A S-bootstrap (gate 1 of S08:59) は **producer レベルで着地**。
+
+### ▶ S08:59 closure への残 (cont.²⁶ 完了後)
+1. **c2 dispatch 配線** (`sibleySetup_is_coherent` `S08_CoherenceTheorems:59` の X-nonempty 枝): Frobenius/CertainType
+   split → CertainType で `nonempty_coherent_S_of_c2_of_branches` に hcaseA=**新 producer ✅** + hcaseB + hbound +
+   hsplit を供給。新 leaf を `S08_CoherenceTheorems` から import 要。
+2. **hcaseB (case-B producer) の structure-data discharge**: `nonempty_coherent_S_caseB_of_c2`
+   (`S08_PGroupReduction:343`) は hWMgt/hYcard/hXne を named 仮説に取る → これらの discharge が残 (cont.²⁵ 既述)。
+3. **hbound** = `abelianization_card_le_of_not_coherent_c2` (step 8 ✅) / **hsplit** = `caseAB_split_of_c2` ✅。
+**∴ 残 = dispatch 配線 (1) + case-B structure-data (2)。case-A 側は完了。**
+
+### 🗂 (履歴) ▶ 残ゲートの精密診断 (cont.²⁶ 深掘り — column break の解析過程、上で解決)
+**case-A producer = `false_of_coherentXunionYset_caseB_of_not_coherentS` (`S08_CaseBWeightedEndgame:272`) の
+W₂→Zc ミラー**。reusable (全 Z-generic・case-agnostic、Zc で instantiate 可):
+- `sum_re_div_normSq_Xset_eq` (`CaseBWeightedEndgame:50`、**norm-weighted** `∑_{X(Z)} χ(1).re²/‖χ‖² =
+  |W₁|(|H|-|H:Z|)`、**可約 OK**=mc reindexing 不要、両辺 weighted で一致)。
+- `xSum_le_two_psi_caseB` (`CaseBWeightedEndgame`、{W2} generic、**既約 break のみ** `hψirr`)。
+- swap: FPF `(2|W₁|+1)²≤|H:W₂|` → case-A `2|W₁|≤|Zc|-1` (`centralCommutator_card_subgroupOf_lower_c2_caseA`✅)、
+  arith `false_of_w2_break_arith` → `false_of_centralCommutator_break_arith` (`Part2`、同 `hbreak:w1·hZ·(cZ-1)≤2w1²d`)。
+- home = **新 leaf `S08_CaseAWeightedEndgame.lean`** (import CaseBWeightedEndgame + CoherenceCore) か `S08_PGroupReduction`
+  (= dispatcher/case-B producer の所在、CaseBSeedGlue+CoherenceCore 両 import 済)。
+
+**🚩 CORE GAP (cont.²⁶ で確定、再調査済) = case-A の break が可約 column になりうる**:
+case-B は break 既約を「column ∈ X(W₂) ⊆ S₁ ⟹ ψ∉S₁ 矛盾」で証明 (`columnSum_notMem_SsubFiltration_of_le`、
+**W₂≤A 要**)。case-A は A=Zc で **W₂⊄Zc** (case-A 条件 Z(H)∩W₂=⊥ ⟹ W₂⊄Z(H)⊇Zc) ⟹ この論法不可。確認済:
+- columns ∉ X(Zc) (X(Zc) 全既約 = `isIrreducibleCharacter_of_mem_Xset_c2_caseA`)。
+- columns ∉ Y (W₂≤H'=⁅H,H⁆ ⟹ `columnSum_notMem_SsubFiltration_of_le` で column∉S(H')=Y)。
+- ∴ **columns ∈ S\(X(Zc)∪Y) = column break 可能**。weighted endgame に column 版
+  (`xSum_le_two_psi_caseB_columnBreak`) は**不在**。column degree (columnSum(1)=和、`columnSum_apply_one`) は
+  arith の `2|W₁|²d` (単一 d) に**合わない**。
+
+**▶ 次セッションの選択肢 (要判断)**:
+1. **column が S₁ に吸収できるか調査**: (6.8.3) の S₁ は maximal coherent ⊇ X∪Y。column が X(Zc)∪Y と coherent
+   なら S₁ に入り break は既約に強制される (textbook (6.8.3) が「ψ induced from irreducible θ of degree d」
+   としか書かない = 暗黙にこれを仮定?)。**最有力**。教科書 `04.8_*.mmd` (6.8.3) + (5.6) を精読。
+2. column-break (6.2) bound at Zc を構築 (case-B `sSubFiltration_sum_le_two_psi_caseB_columnBreak` の Zc 版)
+   + column degree の arith 整合。**重い**。
+3. **既約 branch のみ先に配線** (gated skeleton): break が既約という仮説 `hψirr` を取る
+   `false_of_coherentXunionYset_caseA_of_not_coherentS_of_irr` を作り、column 吸収 (選択肢 1) を named gate に。
+**⚠ cont.²⁶ 初稿〜訂正の「tractable 1-2 session・配線のみ」は楽観。column break は genuine gate。** だが
+architecture (mirror 先・reusable・swap・home) は完全判明ゆえ、選択肢 1 が成れば 1-2 session で着地。
 
 **FT 文脈不変**: (6.8) は [[ft-path-policy]] で orphaned (deferred-payoff) — 閉じても feitThompson sorry は今減らない。
 

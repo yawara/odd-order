@@ -220,6 +220,77 @@ theorem xSum_le_two_psi_caseB
         refine Finset.sum_congr rfl (fun j _ => ?_); rw [hmcnorm j, Complex.ofReal_re]
     _ ≤ 2 * (ψ 1).re * (η 1).re := hfambound
 
+/-- **Norm-weighted (5.6) `X`-sum bound, reducible-column break form.**  The column analogue of
+`xSum_le_two_psi_caseB`: when the (6.8.3) break is a reducible certain-type column
+`ψ = columnSum h46 χ₂b` (not excludable when `W₂ ⊄ Z`, e.g. case (A) at `Z = Z(H) ∩ H′`), the
+norm-weighted member-family bound `sMember_degreeSqNormReBound_of_not_coherent_columnBreak` (brick 3,
+column form) gives `∑_{χ∈X(W₂)} χ(1).re²/‖χ‖² = |L:H|·(|H| − |H:W₂|) ≤ 2·(columnSum χ₂b)(1).re·η(1).re`.
+The `X`-sum identity (`sum_re_div_normSq_Xset_eq`) and the weighted domination are identical to the
+irreducible form. -/
+theorem xSum_le_two_psi_caseB_columnBreak
+    (hyp : SibleyDadeHypothesis G L H) [H.Normal]
+    (h46 : OddOrder.Peterfalvi.S06.Hypothesis46 (sharpImage H) L) (hHK : h46.K = H)
+    (hW1 : h46.W1 = hyp.W1)
+    [NeZero (Nat.card h46.W1)] [Invertible (Nat.card ↥h46.K : ℂ)]
+    [Fintype ↥(h46.W1 ⊔ h46.W2)] [Invertible (Nat.card ↥(h46.W1 ⊔ h46.W2) : ℂ)]
+    [Fintype (OddOrder.Peterfalvi.S06.ticVdiff h46).W]
+    [Invertible (Nat.card (OddOrder.Peterfalvi.S06.ticVdiff h46).W : ℂ)]
+    {W2 : Subgroup ↥L} [W2.Normal]
+    {S₁ : Set (ClassFunction ↥L ℂ)} (hS₁sub : S₁ ⊆ hyp.S)
+    (hS₁conj : OddOrder.Peterfalvi.S03.ClosedUnderConjugate S₁) (hS₁fin : S₁.Finite)
+    (hS₁coh : OddOrder.Peterfalvi.S07.IsCoherent hyp.tau S₁
+      (OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L))
+    (hXsub : hyp.Xset W2 ⊆ S₁)
+    {η : ClassFunction ↥L ℂ} (hηY : η ∈ hyp.Yset) (hηS₁ : η ∈ S₁)
+    {χ₂b : (h46.W2.subgroupOf (h46.W1 ⊔ h46.W2)) →* ℂˣ} (hχ₂b : χ₂b ≠ 1)
+    (hψnotS1 : OddOrder.Peterfalvi.S06.columnSum h46 χ₂b ∉ S₁)
+    (hψcnotS1 : (OddOrder.Peterfalvi.S06.columnSum h46 χ₂b).conj ∉ S₁)
+    (hnc : ¬ Nonempty (OddOrder.Peterfalvi.S07.IsCoherent hyp.tau
+      (S₁ ∪ {OddOrder.Peterfalvi.S06.columnSum h46 χ₂b,
+        (OddOrder.Peterfalvi.S06.columnSum h46 χ₂b).conj})
+      (OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L))) :
+    (H.index : ℝ) * ((Nat.card ↥H : ℝ) - (Nat.card (↥H ⧸ W2.subgroupOf H) : ℝ))
+      ≤ 2 * (OddOrder.Peterfalvi.S06.columnSum h46 χ₂b 1).re * (η 1).re := by
+  classical
+  obtain ⟨k, χmem, mc, hinj, hrange, hmemS1, hmcpos, hmcnorm, hfambound⟩ :=
+    sMember_degreeSqNormReBound_of_not_coherent_columnBreak hyp h46 hHK hW1 hS₁sub hS₁conj hS₁fin
+      hS₁coh hηY hηS₁ hχ₂b hψnotS1 hψcnotS1 hnc
+  have hXsum := sum_re_div_normSq_Xset_eq hyp (Z := W2)
+  set Xdiff := (Finset.univ.filter (fun θ : IrreducibleCharacter ↥H =>
+          (↑((⊥ : Subgroup ↥L).subgroupOf H) : Set ↥H) ⊆ OddOrder.Peterfalvi.S03.characterKernel
+              (θ : ClassFunction ↥H ℂ) ∧ θ ≠ trivialIrreducibleCharacter ↥H)).image
+          (fun θ => ClassFunction.induce H θ.toClassFunction) \
+        (Finset.univ.filter (fun θ : IrreducibleCharacter ↥H =>
+            (↑(W2.subgroupOf H) : Set ↥H) ⊆ OddOrder.Peterfalvi.S03.characterKernel
+                (θ : ClassFunction ↥H ℂ) ∧ θ ≠ trivialIrreducibleCharacter ↥H)).image
+          (fun θ => ClassFunction.induce H θ.toClassFunction) with hXdiffdef
+  have hsub : Xdiff ⊆ (Set.range χmem).toFinset := by
+    intro χ hχ
+    rw [Set.mem_toFinset, hrange]
+    rw [hXdiffdef, Finset.mem_sdiff] at hχ
+    obtain ⟨hχbot, hχnotZ⟩ := hχ
+    obtain ⟨θ, hθ, rfl⟩ := Finset.mem_image.mp hχbot
+    obtain ⟨-, -, hne⟩ := Finset.mem_filter.mp hθ
+    have hχS : ClassFunction.induce H θ.toClassFunction ∈ hyp.S := by
+      rw [hyp.S_eq]; exact ⟨θ, hne, rfl⟩
+    have hχnotSZ : ClassFunction.induce H θ.toClassFunction ∉ hyp.SsubFiltration W2 := by
+      intro hmem
+      rw [hyp.mem_SsubFiltration] at hmem
+      obtain ⟨θ', hne', hker', heq'⟩ := hmem
+      exact hχnotZ (Finset.mem_image.mpr
+        ⟨θ', Finset.mem_filter.mpr ⟨Finset.mem_univ _, hker', hne'⟩, heq'.symm⟩)
+    exact hXsub (hyp.mem_Xset.mpr ⟨hχS, hχnotSZ⟩)
+  rw [← hXsum]
+  calc ∑ χ ∈ Xdiff, ((χ 1).re) ^ 2 / (ClassFunction.inner χ χ).re
+      ≤ ∑ χ ∈ (Set.range χmem).toFinset, ((χ 1).re) ^ 2 / (ClassFunction.inner χ χ).re :=
+        Finset.sum_le_sum_of_subset_of_nonneg hsub
+          (fun χ _ _ => div_nonneg (sq_nonneg _) (inner_self_re_nonneg χ))
+    _ = ∑ j : Fin k, ((χmem j 1).re) ^ 2 / (ClassFunction.inner (χmem j) (χmem j)).re :=
+        sum_toFinset_range_eq hinj (fun χ => ((χ 1).re) ^ 2 / (ClassFunction.inner χ χ).re)
+    _ = ∑ j : Fin k, ((χmem j 1).re) ^ 2 / mc j := by
+        refine Finset.sum_congr rfl (fun j _ => ?_); rw [hmcnorm j, Complex.ofReal_re]
+    _ ≤ 2 * (OddOrder.Peterfalvi.S06.columnSum h46 χ₂b 1).re * (η 1).re := hfambound
+
 /-- **Peterfalvi (6.8.2) case-(B): `S` has no real characters.**
 
 Every `S`-member `Ind^L_H θ` (`θ ≠ 1`) is non-real: by `caseB_induce_column_or_irreducible` it is a
