@@ -521,26 +521,8 @@ noncomputable def section16TypePStructure_of_isMinimalSimpleOdd {G : Type*} [Gro
   -- orders of the two factors of the case-(b) cyclic group are prime.  The case-(b) data is built
   -- directly from `mp` (`W₁ = K`, `W₂ = K*`, `W = K ⊔ K*` cyclic).  This delegates the primality —
   -- a Peterfalvi §10–12 character-theoretic fact — to its named home, where it is owned (lane-b).
-  have hprimes := Peterfalvi.S12.theorem88_caseB_prime_orders hG
-    { S := mp.S, T := mp.T, W1 := mp.K, W2 := mp.Kstar, W := mp.K ⊔ mp.Kstar,
-      S_maximal := mp.S_maximal, T_maximal := mp.T_maximal, S_ne_T := mp.S_ne_T,
-      W_eq := rfl, W_cyclic := mp.Z_cyclic,
-      S_nonI := mp.S_nonI, T_nonI := mp.T_nonI, one_typeII := mp.one_typeII,
-      W1_le_S := mp.K_le_S, W2_le_T := mp.Kstar_le_T,
-      -- (8.8.b1): the κ-Hall factors complement the derived subgroups via
-      -- `kappaHall_isComplement_derived` — the BG↔Peterfalvi notation correspondence identifying
-      -- BG's `κ(M)`-Hall with Peterfalvi's `W₁(M)` (BG §14 `typeP_duality`, lane-f).
-      S_compl := Peterfalvi.S12.kappaHall_isComplement_derived mp.S_maximal mp.S_typeP mp.K_le_S
-        mp.K_hall,
-      T_compl := Peterfalvi.S12.kappaHall_isComplement_derived mp.T_maximal mp.T_typeP mp.Kstar_le_T
-        mp.Kstar_hall }
-  -- **U-side residual**: the (13.1.b) semidirect complements `U, V` (with `M' = M_F ⊔ U` and
-  -- `K ≤ N_G(U)`) and the ordering `q < p`.  A *true*, constructible §13/§14 statement for the
-  -- canonical pair (`mp.K`, `mp.Kstar`).
-  -- **U-side** from Peterfalvi (13.1.b): the κ-Hall-invariant complement `U` to `M_F` in `M'`
-  -- (`exists_kappaHall_invariant_complement_to_MF` = invariant Schur–Zassenhaus, BG §1 Prop 1.5(b)).
-  -- The ordering `|K| < |K*|` is carried by the relabelled pair (`mp.K_lt_Kstar`), so the residual
-  -- is now fully discharged.  `K`, `K*` are cyclic as subgroups of the cyclic `Z = K ⊔ K*`.
+  -- `K`, `K*` are cyclic as subgroups of the cyclic `Z = K ⊔ K*` (needed below and for the
+  -- `typeP_derivedInG_isComplement_kappaHall` instance argument in the case-(b) primality data).
   haveI : IsCyclic ↥(mp.K ⊔ mp.Kstar) := mp.Z_cyclic
   haveI : IsCyclic ↥mp.K :=
     isCyclic_of_injective (Subgroup.inclusion (le_sup_left : mp.K ≤ mp.K ⊔ mp.Kstar))
@@ -548,6 +530,26 @@ noncomputable def section16TypePStructure_of_isMinimalSimpleOdd {G : Type*} [Gro
   haveI : IsCyclic ↥mp.Kstar :=
     isCyclic_of_injective (Subgroup.inclusion (le_sup_right : mp.Kstar ≤ mp.K ⊔ mp.Kstar))
       (Subgroup.inclusion_injective _)
+  have hprimes := Peterfalvi.S12.theorem88_caseB_prime_orders hG
+    { S := mp.S, T := mp.T, W1 := mp.K, W2 := mp.Kstar, W := mp.K ⊔ mp.Kstar,
+      S_maximal := mp.S_maximal, T_maximal := mp.T_maximal, S_ne_T := mp.S_ne_T,
+      W_eq := rfl, W_cyclic := mp.Z_cyclic,
+      S_nonI := mp.S_nonI, T_nonI := mp.T_nonI, one_typeII := mp.one_typeII,
+      W1_le_S := mp.K_le_S, W2_le_T := mp.Kstar_le_T,
+      -- (8.8.b1): the κ-Hall factors complement the derived subgroups —
+      -- `typeP_derivedInG_isComplement_kappaHall` (BG Thm 14.7(h), proved + axiom-clean), the
+      -- BG↔Peterfalvi identification of BG's `κ(M)`-Hall with Peterfalvi's `W₁(M)`.
+      S_compl := BG.Ch4.S14.typeP_derivedInG_isComplement_kappaHall hG mp.S_maximal mp.S_typeP
+        mp.K_le_S mp.K_hall,
+      T_compl := BG.Ch4.S14.typeP_derivedInG_isComplement_kappaHall hG mp.T_maximal mp.T_typeP
+        mp.Kstar_le_T mp.Kstar_hall }
+  -- **U-side residual**: the (13.1.b) semidirect complements `U, V` (with `M' = M_F ⊔ U` and
+  -- `K ≤ N_G(U)`) and the ordering `q < p`.  A *true*, constructible §13/§14 statement for the
+  -- canonical pair (`mp.K`, `mp.Kstar`).
+  -- **U-side** from Peterfalvi (13.1.b): the κ-Hall-invariant complement `U` to `M_F` in `M'`
+  -- (`exists_kappaHall_invariant_complement_to_MF` = invariant Schur–Zassenhaus, BG §1 Prop 1.5(b)).
+  -- The ordering `|K| < |K*|` is carried by the relabelled pair (`mp.K_lt_Kstar`), so the residual
+  -- is now fully discharged.
   -- `Section16TypePStructure mp` is `Type`-valued, so we cannot `obtain` the `∃`-witness into the
   -- goal (`Exists.casesOn` only eliminates into `Prop`).  Extract the data with `Exists.choose`.
   have hScompl := BG.Ch4.S14.exists_kappaHall_invariant_complement_to_MF hG
