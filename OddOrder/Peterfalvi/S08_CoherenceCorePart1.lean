@@ -1785,7 +1785,7 @@ theorem inner_Y_extension_member_eq
     (hS₁ : OddOrder.Peterfalvi.S07.IsCoherent
       (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap hyp (hyp.fullDadeIsometryData hconj))
       S₁ (OddOrder.Peterfalvi.S04.supportInSubgroup A L))
-    (χ : IrreducibleCharacter ↥L) {chi1 cj : ClassFunction ↥L ℂ} {a aj : ℕ} {Xχ Y : ClassFunction G ℂ}
+    (χ : ClassFunction ↥L ℂ) {chi1 cj : ClassFunction ↥L ℂ} {a aj : ℕ} {Xχ Y : ClassFunction G ℂ}
     (hYeq : Y = Xχ - OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap hyp
       (hyp.fullDadeIsometryData hconj) ((χ : ClassFunction ↥L ℂ) - a • chi1))
     (hXortho : ClassFunction.inner Xχ (hS₁.extension cj) = 0)
