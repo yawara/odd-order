@@ -58,6 +58,7 @@ open OddOrder.BG.Ch3.S12
 open OddOrder.BG.Ch4.S14
 open scoped Pointwise
 open scoped IsMulCommutative
+open scoped commutatorElement
 
 variable {G : Type*} [Group G]
 
@@ -4382,6 +4383,181 @@ theorem fittingInAmbient_eq_sup_centralizer_inf_of_le_Msigma [Finite G]
     fittingInAmbient M = Q ⊔ (Subgroup.centralizer (Q : Set G) ⊓ M) :=
   fittingInAmbient_eq_sup_centralizer_inf_of_inputs hQ
     (centralizer_inf_le_fittingInAmbient_of_le_Msigma hG hM hMnormQ hCle)
+
+/-- **`D = ⁅D, K⁆` from the Frobenius (fixed-point-free) action** (BG Theorem 15.2, mmd L4202,
+BG Lemma 6.3(a) flavour but via the coprime decomposition): if `D ⊔ K` is a Frobenius group with
+kernel `D` and complement `K` (so `K` acts fixed-point-freely on `D`), `K ≤ N_G(D)`, and the orders
+of `K` and `D` are coprime with `D`/`K` one-sided solvable, then `⁅D, K⁆ = D`.
+
+`Proposition 1.6(d)` (`subgroup_coprime_decomposition`) gives `D = C_D(K) ⊔ ⁅D, K⁆`; the Frobenius
+condition forces `C_D(K) = C_G(K) ⊓ D = ⊥` (a nontrivial `d ∈ D` centralizing a nontrivial `k ∈ K`
+would be fixed by conjugation, contradicting `conj_frobenius`), so the decomposition collapses to
+`D = ⁅D, K⁆`. -/
+theorem commutator_eq_self_of_frobenius_DK [Finite G] {D K : Subgroup G}
+    (hfrob : OddOrder.Isaacs.Ch06.IsFrobeniusGroup G D K)
+    (hKnormD : K ≤ Subgroup.normalizer (D : Set G))
+    (hcop : Nat.Coprime (Nat.card ↥K) (Nat.card ↥D))
+    (hSolv : IsSolvable ↥K ∨ IsSolvable ↥D) :
+    ⁅D, K⁆ = D := by
+  -- `C_G(K) ⊓ D = ⊥`: a nontrivial common element contradicts the Frobenius condition.
+  have hCDK : (Subgroup.centralizer (K : Set G) ⊓ D : Subgroup G) = ⊥ := by
+    rw [eq_bot_iff]
+    intro d hd
+    rw [Subgroup.mem_inf] at hd
+    obtain ⟨hdcent, hdD⟩ := hd
+    by_contra hdne
+    rw [Subgroup.mem_bot] at hdne
+    -- Pick a nontrivial `k ∈ K`.
+    haveI : Nontrivial ↥K := (Subgroup.nontrivial_iff_ne_bot K).mpr hfrob.ne_bot_complement
+    obtain ⟨k, hkK, hkne⟩ := (Subgroup.nontrivial_iff_exists_ne_one K).mp inferInstance
+    -- `k` and `d` commute (from `d ∈ C_G(K)`), so `k * d * k⁻¹ = d`, contradicting Frobenius.
+    have hcomm : k * d = d * k := (Subgroup.mem_centralizer_iff.mp hdcent) k hkK
+    have hfix : k * d * k⁻¹ = d := by rw [hcomm]; group
+    exact hfrob.conj_frobenius k hkK hkne d hdD hdne hfix
+  -- Proposition 1.6(d): `D = (C_G(K) ⊓ D) ⊔ ⁅D, K⁆`.
+  have hdecomp := OddOrder.BG.Ch3.S13.subgroup_coprime_decomposition hKnormD hcop hSolv
+  rw [hCDK, bot_sup_eq] at hdecomp
+  exact hdecomp.symm
+
+-- The iterated quotient `(↥N ⧸ ψ.ker) ⧸ O_q(…)` makes the `Group`-instance synthesis for the
+-- `mk' _ ⁅x, y⁆ = 1` step exceed the default `synthInstance` budget; raise it locally.
+set_option synthInstance.maxHeartbeats 80000 in
+/-- **Theorem 15.2 step 5 — `D` centralizes `Q` for narrow `Q`** (mmd L4202, BG Theorem 5.5(a)):
+if `Q` is a narrow `q`-group (`q` odd), `D ⊔ K` is a Frobenius group with kernel `D` and complement
+`K` acting in a prime manner, `D ⊔ K ≤ N_G(Q)`, `D` is a `q'`-group (`q ∤ |D|`), and the orders of
+`K`, `D` are coprime, then `D ⊆ C_G(Q)`.
+
+`N := N_G(Q)` is proper (`Q ≠ 1, G` in the simple `G`), hence solvable; the conjugation action
+`ψ : N → MulAut Q` has kernel `C_G(Q) ⊓ N`.  Theorem 5.5(a) (`solvableAut_of_narrow`, applied to the
+faithful action of `N/ker`) gives that `(N/ker)'` is a `q`-group.  By the Frobenius condition
+`⁅D, K⁆ = D` (`commutator_eq_self_of_frobenius_DK`), so `D ⊆ ⁅N, N⁆ = N'`; the image of `D` in
+`N/ker` therefore lies in `(N/ker)'` (a `q`-group) yet is a `q'`-group (`q ∤ |D|`), hence trivial.
+Trivial image means `D ⊆ ker ψ = C_G(Q) ⊓ N`, i.e. `D ⊆ C_G(Q)`. -/
+theorem D_centralizes_Q_of_narrow [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    {Q D K : Subgroup G} {q : ℕ} [Fact q.Prime]
+    (hq_odd : Odd q) (hQpg : IsPGroup q ↥Q) (hQnarrow : OddOrder.GroupTheory.IsNarrow q ↥Q)
+    (hQne : Q ≠ ⊥)
+    (hfrob : OddOrder.Isaacs.Ch06.IsFrobeniusGroup G D K)
+    (hKnormD : K ≤ Subgroup.normalizer (D : Set G))
+    (hcop : Nat.Coprime (Nat.card ↥K) (Nat.card ↥D))
+    (hKsolv : IsSolvable ↥K)
+    (hDKN : D ⊔ K ≤ Subgroup.normalizer (Q : Set G))
+    (hqD : ¬ q ∣ Nat.card ↥D) :
+    D ≤ Subgroup.centralizer (Q : Set G) := by
+  classical
+  have hp_prime : q.Prime := Fact.out
+  -- `N := N_G(Q)` is a proper (hence solvable) subgroup of the simple `G`.
+  set N : Subgroup G := Subgroup.normalizer (Q : Set G) with hN_def
+  have hNlt : N < ⊤ := by
+    rw [lt_top_iff_ne_top]
+    intro htop
+    have hQnorm : Q.Normal := by rw [← Subgroup.normalizer_eq_top_iff]; exact htop
+    rcases hG.simple.eq_bot_or_eq_top_of_normal Q hQnorm with h | h
+    · exact hQne h
+    · have hGpg : IsPGroup q G := (h ▸ hQpg : IsPGroup q ↥(⊤ : Subgroup G)).of_surjective
+        (Subgroup.topEquiv : (⊤ : Subgroup G) ≃* G).toMonoidHom Subgroup.topEquiv.surjective
+      haveI : Group.IsNilpotent G := hGpg.isNilpotent
+      exact hG.notSolvable inferInstance
+  haveI hNsolv : IsSolvable ↥N := hG.solvable_of_lt_top N hNlt
+  -- The conjugation action `ψ : N → Aut Q` with kernel `C_G(Q) ∩ N`.
+  set ψ : ↥N →* MulAut ↥Q := Q.normalizerMonoidHom with hψ_def
+  have hψker : ψ.ker = (Subgroup.centralizer (Q : Set G)).subgroupOf N :=
+    Q.normalizerMonoidHom_ker
+  -- `A := N / ker ψ` acts faithfully, is solvable and odd.
+  have hA_odd : Odd (Nat.card (↥N ⧸ ψ.ker)) := by
+    refine hG.odd.of_dvd_nat (dvd_trans ?_ (Subgroup.card_subgroup_dvd_card N))
+    simpa [Subgroup.index] using Subgroup.index_dvd_card ψ.ker
+  -- Theorem 5.5(a): `(N / ker)'` is a `q`-group.
+  obtain ⟨hcomm, -, -, -⟩ := Ch1.S05.solvableAut_of_narrow hq_odd hQpg hQnarrow
+    (QuotientGroup.kerLift ψ) (QuotientGroup.kerLift_injective ψ) hA_odd
+  have hA' : IsPGroup q (_root_.commutator (↥N ⧸ ψ.ker)) := by
+    have hle : _root_.commutator (↥N ⧸ ψ.ker) ≤ Ch01.opCore q (↥N ⧸ ψ.ker) := by
+      rw [_root_.commutator, Subgroup.commutator_le]
+      intro x _ y _
+      have h1 : QuotientGroup.mk' (Ch01.opCore q (↥N ⧸ ψ.ker)) ⁅x, y⁆ = 1 := by
+        rw [map_commutatorElement, commutatorElement_eq_one_iff_mul_comm]
+        exact hcomm _ _
+      exact (QuotientGroup.eq_one_iff _).mp h1
+    exact (Ch01.opCore_isPGroup q _).to_le hle
+  -- `D ⊔ K ≤ N`, so `D ≤ N`; and `D = ⁅D, K⁆ ≤ N'`.
+  have hDN : (D : Subgroup G) ≤ N := le_sup_left.trans hDKN
+  have hDcommDK : ⁅D, K⁆ = D :=
+    commutator_eq_self_of_frobenius_DK hfrob hKnormD hcop (Or.inl hKsolv)
+  have hDcomm : (D : Subgroup G).subgroupOf N ≤ _root_.commutator ↥N := by
+    have hDder : (D : Subgroup G) ≤ derivedInG N := by
+      rw [← hDcommDK]
+      calc ⁅D, K⁆ ≤ ⁅N, N⁆ := Subgroup.commutator_mono hDN (le_sup_right.trans hDKN)
+        _ = derivedInG N := (Subgroup.map_subtype_commutator N).symm
+    have key : ((_root_.commutator ↥N).map N.subtype).comap N.subtype = _root_.commutator ↥N :=
+      Subgroup.comap_map_eq_self_of_injective N.subtype_injective (_root_.commutator ↥N)
+    calc (D : Subgroup G).subgroupOf N
+        ≤ (derivedInG N).comap N.subtype := Subgroup.comap_mono hDder
+      _ = _root_.commutator ↥N := key
+  -- The image of `D` in `A` is `≤ (N/ker)'` (a `q`-group) and is a `q'`-group: hence trivial.
+  set DA : Subgroup (↥N ⧸ ψ.ker) :=
+    ((D : Subgroup G).subgroupOf N).map (QuotientGroup.mk' ψ.ker) with hDA_def
+  have hDA_q : IsPGroup q ↥DA := by
+    refine hA'.to_le ?_
+    calc DA ≤ (_root_.commutator ↥N).map (QuotientGroup.mk' ψ.ker) := Subgroup.map_mono hDcomm
+      _ ≤ _root_.commutator (↥N ⧸ ψ.ker) := by
+          rw [_root_.commutator, _root_.commutator, Subgroup.map_commutator]
+          exact Subgroup.commutator_mono le_top le_top
+  -- `q ∤ |DA|`: `|DA|` divides `|D|` (surjective images), and `q ∤ |D|`.
+  have hDA_card_dvd : Nat.card ↥DA ∣ Nat.card ↥D := by
+    have h1 : Nat.card ↥DA ∣ Nat.card ↥((D : Subgroup G).subgroupOf N) :=
+      Subgroup.card_map_dvd (H := (D : Subgroup G).subgroupOf N) (QuotientGroup.mk' ψ.ker)
+    have h2 : Nat.card ↥((D : Subgroup G).subgroupOf N) = Nat.card ↥D :=
+      Nat.card_congr (Subgroup.subgroupOfEquivOfLe hDN).toEquiv
+    rw [h2] at h1; exact h1
+  have hqDA : ¬ q ∣ Nat.card ↥DA := fun h => hqD (h.trans hDA_card_dvd)
+  -- A `q`-group with `q ∤ |DA|` is trivial.
+  have hDA_bot : DA = ⊥ := by
+    obtain ⟨k, hk⟩ := hDA_q.exists_card_eq
+    rcases Nat.eq_zero_or_pos k with hk0 | hkpos
+    · rw [hk0, pow_zero] at hk; exact Subgroup.card_eq_one.mp hk
+    · exact absurd (hk ▸ dvd_pow_self q hkpos.ne') hqDA
+  -- Trivial image means `D ≤ ker ψ = C_G(Q) ∩ N`, hence `D ≤ C_G(Q)`.
+  have hDker : (D : Subgroup G).subgroupOf N ≤ ψ.ker := by
+    rw [hDA_def, Subgroup.map_eq_bot_iff, QuotientGroup.ker_mk'] at hDA_bot
+    exact hDA_bot
+  rw [hψker] at hDker
+  intro x hx
+  have hxN : x ∈ N := hDN hx
+  have : (⟨x, hxN⟩ : ↥N) ∈ (Subgroup.centralizer (Q : Set G)).subgroupOf N :=
+    hDker (by rw [Subgroup.mem_subgroupOf]; exact hx)
+  rw [Subgroup.mem_subgroupOf] at this
+  exact this
+
+/-- **Theorem 15.2 step 5 — `D` centralizes `Q` from `q ∉ β(M)`** (mmd L4202): the `hDcent` input of
+`mem_beta_of_inputs`, with the narrowness of `Q` discharged from `q ∉ β(M)`.
+
+When `Q = O_q(M)` is (the image in `G` of) a Sylow `q`-subgroup `P` of `M` — which holds in the
+type-P1 setting, since `M_σ/Q` is a `q'`-group, so the normal Sylow `q` of `M_σ` is a Sylow `q` of
+`M` — narrowness of `↥Q ≅ ↥P` follows from `q ∉ β(M)` (`isNarrow_sylow_of_not_mem_beta`, BG Lemma
+10.8 setup).  Chaining with `D_centralizes_Q_of_narrow` (the Theorem 5.5(a) gate) gives
+`q ∉ β(M) → D ⊆ C_G(Q)`, exactly the `hDcent` hypothesis of `mem_beta_of_inputs`. -/
+theorem D_centralizes_Q_of_not_mem_beta [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    {M Q D K : Subgroup G} {q : ℕ} [Fact q.Prime] (hM : M ∈ maximalSubgroups G)
+    (hq_odd : Odd q) (hQpg : IsPGroup q ↥Q) (hQne : Q ≠ ⊥)
+    (hqπ : q ∈ (Nat.card ↥M).primeFactors)
+    (P : Sylow q ↥M) (hQP : Q = (P : Subgroup ↥M).map M.subtype)
+    (hfrob : OddOrder.Isaacs.Ch06.IsFrobeniusGroup G D K)
+    (hKnormD : K ≤ Subgroup.normalizer (D : Set G))
+    (hcop : Nat.Coprime (Nat.card ↥K) (Nat.card ↥D))
+    (hKsolv : IsSolvable ↥K)
+    (hDKN : D ⊔ K ≤ Subgroup.normalizer (Q : Set G))
+    (hqD : ¬ q ∣ Nat.card ↥D) :
+    q ∉ OddOrder.BG.Ch3.S10.beta M → D ≤ Subgroup.centralizer (Q : Set G) := by
+  intro hqβ
+  -- Narrowness of the Sylow `P`, transferred along `↥Q ≅ ↥P`.
+  have hPnarrow : OddOrder.GroupTheory.IsNarrow q ↥(P : Subgroup ↥M) :=
+    OddOrder.BG.Ch3.S10.isNarrow_sylow_of_not_mem_beta hG hM hqπ hqβ P
+  have eQP : ↥Q ≃* ↥(P : Subgroup ↥M) :=
+    (MulEquiv.subgroupCongr hQP).trans
+      (Subgroup.equivMapOfInjective _ M.subtype M.subtype_injective).symm
+  have hQnarrow : OddOrder.GroupTheory.IsNarrow q ↥Q :=
+    OddOrder.GroupTheory.IsNarrow.of_mulEquiv eQP.symm hPnarrow
+  exact D_centralizes_Q_of_narrow hG hq_odd hQpg hQnarrow hQne hfrob hKnormD hcop hKsolv hDKN hqD
 
 /-- **Theorem 15.2 step 5 — `q ∈ β(M)`, gated-endpoint skeleton** (mmd L4202): "if `q ∉ β(M)`,
 then Theorem 5.5(a) shows `(DK)' = D` centralizes `Q`, a contradiction".  The contradiction is
