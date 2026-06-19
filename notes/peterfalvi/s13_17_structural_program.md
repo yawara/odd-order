@@ -31,13 +31,24 @@ complement (`P ⊓ U = ⊥`) も S の type-data `typeP.U` との一致も pin �
 L~S 除外は `¬ N_G(hyp.U) ≤ S` (type-II 性) を要し、`IsTypeII.normalizer_not_le` は `typeP.U` についてのみ。
 `typeP.U` は complement・≠⊥ (上記 type-data) だが `hyp.U` がそれに pin されていない (under-constraint)。
 
+**🔑 診断確定 (2026-06-20): coprimality は disjointness だけで H 単独導出可** — Phase 1 SZ 補題が要する
+`Coprime |U| |P|` は **`P ⊓ hyp.U = ⊥` (disjointness) のみから** H 単独で出る。根拠:
+`P = tdata.typeP.H = maxNilpotentNormalHall M'` (`hPH` + `TypeIIData.derived_fitting_eq`)、
+**`maxNilpotentNormalHall_isHall M'` は相対形** (`(mnh M').subgroupOf M'` が ↥M' 内で Hall) → `.coprime_index`
+で `Coprime |P| (P.subgroupOf M').index`。disjoint + `S_deriv_eq_PU` の join ⟹ U が P の補元 ⟹
+`|U| = (P.subgroupOf M').index` ⟹ `Coprime |U| |P|`。**∴ Phase 2 の真の gate は `P ⊓ hyp.U = ⊥` 1 本のみ**。
+
 **解決オプション**:
-- (a) `P ⊓ hyp.U = ⊥` を §13 card 論で導出: `|derivedInG S| = |P|·|U| = p^q·u·c` を示す → join + card 一致
-  で disjoint。要 §13 card 事実 (basic_structure |P|=p^q cite + |derivedInG S| の評価)。深いが H 可能性あり。
-- (b) **Hypothesis faithfulness enrich** (F と協調): `hyp.U` を complement に pin
-  (`P ⊓ U = ⊥` or `(IsTypeII data).typeP.U = hyp.U` フィールド追加)。carrier 変更 = FeitThompson の
-  `sectionSixteenHypothesis_of_inputs` producer 要対応 (F 領域)。faithful 改善。
-- **次の一手** = (a) の feasibility 調査 (|derivedInG S| 評価が cite で出るか) → 不可なら (b) を F に提案。
+- (a) `P ⊓ hyp.U = ⊥` を §13 構造論で H 単独導出: 上記 Hall 論法は disjoint を**仮定**する (循環でない:
+  Hall は coprime を与えるが、U が真の補元 [P⊓U=⊥] であることは別途要)。disjoint 自体は **hyp.U が
+  under-constrained** ゆえ Hypothesis から出ない (hyp.U=M' でも S_deriv_eq_PU を満たす)。⟹ §13 card でも不可。
+- (b) **Hypothesis faithfulness enrich (F、最小 ask 確定)**: `hyp.U` を P-補元に pin する **1 フィールド**を追加すれば
+  十分 — 最小は `P_inf_U_eq_bot : hyp.P ⊓ hyp.U = ⊥` (disjointness)。これだけで H が coprimality→SZ→Phase 2 を回す。
+  (代替: `IsComplement' (P.subgroupOf M') (U.subgroupOf M')` or `typeP.U = hyp.U` でも可、いずれも disjoint を含意。)
+  carrier 変更 = FeitThompson の `sectionSixteenHypothesis_of_inputs` producer 要対応 (**F 領域**、cross-lane)。
+- **結論**: (a) は infeasible (hyp.U under-constraint は構造論で塞げない、carrier の faithfulness 問題)。
+  ⟹ **(b) が唯一の道。F へ「`hyp.P ⊓ hyp.U = ⊥` を Hypothesis に追加」を提案** (issue 2009 + cross-lane notes)。
+  F が追加すれば H は `coprime_card_U_card_P_of_disjoint` (Hall 論法、~30 行) → SZ → Phase 2 を一気に進められる。
 
 ## Phase 構成 (依存順)
 
@@ -102,11 +113,16 @@ H の §13 構造証明は **B の (sorried) §13 char/構造 producer を安定
 **逆向き**: H が landing する §13 構造 producer (13.17 等) は B の §13 char (Dade grid が type-I L の
 Frobenius 構造を前提) からも cite され得る。
 
-### Phase 0(b) は F 協調 (hub / F 宛)
-coherence base の解決オプション (b) = **Hypothesis (S15_SAndT) を hyp.U が complement になるよう enrich**
-(`P ⊓ U = ⊥` or typeP.U pin)。carrier 変更は `sectionSixteenHypothesis_of_inputs` producer
-(FeitThompson.lean, **F 領域**) の対応を要する。Phase 0(a) の H 単独 card 導出が不可と判明した時点で
-hub 経由 F に提案 (それまでは触らない)。
+### ⚠ Phase 0(b) F-ask 確定 (2026-06-20、hub / F 宛、最優先)
+**Phase 0(a) [H 単独 disjoint 導出] は infeasible と確定** — hyp.U の under-constraint は carrier の
+faithfulness 問題で、§13 構造論では塞げない (hyp.U=M' でも全 Hypothesis フィールドを満たす)。
+⟹ **(b) が唯一の道。F への ask (最小・確定)**:
+> **`Hypothesis` (S15_SAndT:73) に 1 フィールド `P_inf_U_eq_bot : P ⊓ U = ⊥` を追加**。
+> carrier 変更ゆえ producer `sectionSixteenHypothesis_of_inputs` (FeitThompson.lean) の対応が要る (**F 領域**)。
+これだけで H 側が完結する (Phase 1 SZ 補題は landing 済 `exists_conj_typeP_U_of_coprime`、coprimality は
+disjoint から Hall 論法で導出 [上記 Phase 0 診断])。F が追加すれば Phase 2 (obligation ①) が一気に解禁。
+**真の構成可能性**: P⊓U=⊥ は実際の数学で真 (U は S' 内で P=S_F の Hall 補元、(13.1.b))。F は §16 producer
+構成サイトで U を補元として取れば供給可能 (scaffold でなく faithful enrich)。
 
 ## Phase 1 進捗 (2026-06-19 cont.)
 

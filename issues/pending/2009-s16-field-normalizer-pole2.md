@@ -421,3 +421,27 @@ Huppert 形式化 + sorried §8/§9 cite)。skeleton で構造化済・cite 先�
 **`notes/peterfalvi/s13_17_structural_program.md`** に整理 (phase 0-4 + leaf 分類 + 検証済 infra)。
 crux base = **hyp.U coherence** (Hypothesis が hyp.U を complement/typeP.U に pin せず) →
 (a) §13 card 導出 or (b) F 協調 enrich。次の一手 = Phase 0(a) feasibility 調査 ∥ Phase 3 Huppert (H 単独並列)。
+
+## 2026-06-20 再開 — ✅ Phase 1 完了 + Phase 0 診断確定 + F-ask 確定
+
+**✅ Phase 1 DONE** (commit `378e61b1`, sorry-free + axiom-clean): `exists_conj_typeP_U_of_coprime`
+(S15_SAndT) — `Coprime |U| |P|` から `∃ x∈S, U = conj x • typeP.U` (Schur-Zassenhaus、↥M' 内適用 →
+G へ map-back)。前回 revert した 5 API 摩擦を全解決 (詳細 = notes/peterfalvi/s13_17_structural_program.md
+「Phase 1 進捗」)。`not_normalizer_U_le_S` の `hconj` 仮説を供給する。
+
+**🔑 Phase 0 診断確定**: Phase 1 SZ 補題が要する `Coprime |U| |P|` は **`P ⊓ U = ⊥` (disjointness) のみ**
+から H 単独導出可 — `P = maxNilpotentNormalHall M'` (`derived_fitting_eq`) が **相対 Hall**
+(`maxNilpotentNormalHall_isHall` は `(mnh M').subgroupOf M'` 形) ゆえ `.coprime_index` + 補元 index で coprime。
+∴ **Phase 2 (obligation ①) の真の gate は `P ⊓ U = ⊥` 1 本のみ**。
+
+**⚠ F-ask 確定 (最小・cross-lane)**: Phase 0(a) [H 単独 disjoint 導出] は **infeasible** (hyp.U の
+under-constraint は carrier faithfulness 問題、§13 構造論で塞げない — hyp.U=M' でも全フィールド満たす)。
+⟹ **F へ**: `Hypothesis` (S15_SAndT:73) に **1 フィールド `P_inf_U_eq_bot : P ⊓ U = ⊥` を追加**
+(carrier 変更 → `sectionSixteenHypothesis_of_inputs` producer の対応要)。真に構成可能 (U は S' 内 P の Hall 補元、
+(13.1.b))。F が追加すれば H は `coprime_card_U_card_P_of_disjoint` (Hall 論法 ~30 行) → SZ → Phase 2 解禁。
+
+**残り obligation の状態**:
+- obligation ① (Phase 2 `exists_typeI_maximal_overNormalizer_U`): gate = 上記 F-ask + L~T 除外 (|L_F|=q^p cite)
+  + U⊆L_F ((9.1)/(8.17.a) cite)。
+- obligation ② (Phase 4 `typeI_overNormalizer_complement`): gate = Phase 3 [H] V.8.18 (**大物・新規形式化、
+  Isaacs Ch06 は Sylow-cyclic 部品のみ**) + (13.16) normalizer_W1 [sorried] + (14.5)。
