@@ -692,6 +692,66 @@ theorem centralizer_centralCommutator_eq (hyp : SibleyDadeHypothesis G L H) [H.N
     have hcoe := congrArg (H.subtype) hcomm
     simpa using hcoe
 
+/-- **(6.7)-wiring step (c), case (A) / c2 form: `C_↥L(z) = H` for `z ∈ Zc^#`.**  The (c2) analogue
+of `centralizer_centralCommutator_eq` (which used `hF.centralizer_kernel_le`).  `H ≤ C_L(z)` since
+`z ∈ Z(H)`; for `C_L(z) ≤ H`, decompose `g ∈ C_L(z)` via the complement `L = H ⋊ W₁`
+(`cert.isComplement`, `cert.K = H`) as `g = k·w` (`k ∈ H`, `w ∈ W₁`): `k` centralizes `z` (central),
+so `w = k⁻¹g` centralizes `z`; if `w ≠ 1` then `z ∈ C_L(w) ⊓ Zc = ⊥`
+(`centralizer_inf_centralCommutator_eq_bot_of_c2_caseA`, the math-(A) FPF), contradicting `z ≠ 1`, so
+`w = 1` and `g = k ∈ H`.  Gives the `|C_L(·)|`-constancy on `Zc^#` of Peterfalvi (6.7) without
+Frobenius. -/
+theorem centralizer_centralCommutator_eq_c2_caseA (hyp : SibleyDadeHypothesis G L H)
+    {cert : OddOrder.Peterfalvi.S06.CertainTypeHypothesis (sharpImage H) L}
+    (hK : cert.K = H) (hW1 : cert.W1 = hyp.W1)
+    (hA : Subgroup.center ↥H ⊓ cert.W2.subgroupOf H = ⊥)
+    {z : ↥L} (hz : z ∈ hyp.centralCommutator) (hz1 : z ≠ 1) :
+    Subgroup.centralizer ({z} : Set ↥L) = H := by
+  haveI := hyp.H_normal
+  have hzH : (z : ↥L) ∈ H := hyp.centralCommutator_le hz
+  have hzc : (⟨z, hzH⟩ : ↥H) ∈ Subgroup.center ↥H :=
+    hyp.centralCommutator_subgroupOf_le_center (Subgroup.mem_subgroupOf.mpr hz)
+  apply le_antisymm
+  · -- `C_L(z) ≤ H`
+    intro g hg
+    rw [Subgroup.mem_centralizer_singleton_iff] at hg  -- `hg : g * z = z * g`
+    -- `g = k·w` via the complement `L = H ⋊ W₁`
+    obtain ⟨⟨⟨k, hk⟩, ⟨w, hw⟩⟩, hkw, -⟩ := Subgroup.IsComplement.existsUnique cert.isComplement g
+    simp only at hkw  -- `hkw : k * w = g`
+    rw [hK] at hk
+    rw [hW1] at hw
+    -- `k` centralizes `z` (central in `H`)
+    have hkz : k * z = z * k := by
+      have h := (Subgroup.mem_center_iff.mp hzc) ⟨k, hk⟩
+      have hcoe := congrArg (H.subtype) h
+      simpa using hcoe
+    -- `w` centralizes `z`
+    have hwz : w * z = z * w := by
+      have h1 : k * (w * z) = k * (z * w) := by
+        calc k * (w * z) = (k * w) * z := by rw [mul_assoc]
+          _ = g * z := by rw [hkw]
+          _ = z * g := hg
+          _ = z * (k * w) := by rw [← hkw]
+          _ = (z * k) * w := by rw [mul_assoc]
+          _ = (k * z) * w := by rw [← hkz]
+          _ = k * (z * w) := by rw [mul_assoc]
+      exact mul_left_cancel h1
+    by_cases hw1 : w = 1
+    · rw [hw1, mul_one] at hkw
+      rw [← hkw]; exact hk
+    · exfalso
+      have hzC : z ∈ Subgroup.centralizer ({w} : Set ↥L) := by
+        rw [Subgroup.mem_centralizer_singleton_iff]; exact hwz.symm
+      have hmem : z ∈ Subgroup.centralizer ({w} : Set ↥L) ⊓ hyp.centralCommutator := ⟨hzC, hz⟩
+      rw [hyp.centralizer_inf_centralCommutator_eq_bot_of_c2_caseA hK hW1 hA hw hw1,
+        Subgroup.mem_bot] at hmem
+      exact hz1 hmem
+  · -- `H ≤ C_L(z)` (`z ∈ Z(H)`)
+    intro h hh
+    rw [Subgroup.mem_centralizer_singleton_iff]
+    have hcomm := (Subgroup.mem_center_iff.mp hzc) ⟨h, hh⟩
+    have hcoe := congrArg (H.subtype) hcomm
+    simpa using hcoe
+
 /-- **(6.7)-wiring step (c′): the ambient-`G` form `(L:Subgroup G) ⊓ C_G(↑w) = H.map L.subtype`.**
 Realizes `centralizer_centralCommutator_eq` (`C_↥L(w) = H`) in `G`: an element `g ∈ L` centralizes
 `↑w` iff (as an element of `↥L`) it centralizes `w`, iff it lies in `H = C_↥L(w)`.  Hence
@@ -702,6 +762,35 @@ theorem inf_centralizer_centralCommutator_map (hyp : SibleyDadeHypothesis G L H)
     {w : ↥L} (hw : w ∈ hyp.centralCommutator) (hw1 : w ≠ 1) :
     (L : Subgroup G) ⊓ Subgroup.centralizer ({(w : G)} : Set G) = H.map L.subtype := by
   have hCH := hyp.centralizer_centralCommutator_eq hF hw hw1
+  ext g
+  rw [Subgroup.mem_inf]
+  constructor
+  · rintro ⟨hgL, hgc⟩
+    rw [Subgroup.mem_centralizer_singleton_iff] at hgc
+    refine Subgroup.mem_map.mpr ⟨⟨g, hgL⟩, ?_, rfl⟩
+    rw [← hCH, Subgroup.mem_centralizer_singleton_iff]
+    exact Subtype.ext (by simpa using hgc)
+  · intro hg
+    obtain ⟨c, hcH, rfl⟩ := Subgroup.mem_map.mp hg
+    rw [← hCH, Subgroup.mem_centralizer_singleton_iff] at hcH
+    refine ⟨c.2, ?_⟩
+    rw [Subgroup.mem_centralizer_singleton_iff]
+    have := congrArg (L.subtype) hcH
+    simpa using this
+
+/-- **(6.7)-wiring step (c′), case (A) / c2 form: `(L:Subgroup G) ⊓ C_G(↑w) = H.map L.subtype`.**  The
+(c2) analogue of `inf_centralizer_centralCommutator_map`, supplying the centralizer-card constancy
+clause of Peterfalvi (6.7)'s `hconst` from the case-(A) `C_↥L(w) = H`
+(`centralizer_centralCommutator_eq_c2_caseA`).  The subgroup manipulation is identical to the
+Frobenius form. -/
+theorem inf_centralizer_centralCommutator_map_c2_caseA (hyp : SibleyDadeHypothesis G L H)
+    {cert : OddOrder.Peterfalvi.S06.CertainTypeHypothesis (sharpImage H) L}
+    (hK : cert.K = H) (hW1 : cert.W1 = hyp.W1)
+    (hA : Subgroup.center ↥H ⊓ cert.W2.subgroupOf H = ⊥)
+    {w : ↥L} (hw : w ∈ hyp.centralCommutator) (hw1 : w ≠ 1) :
+    (L : Subgroup G) ⊓ Subgroup.centralizer ({(w : G)} : Set G) = H.map L.subtype := by
+  haveI := hyp.H_normal
+  have hCH := hyp.centralizer_centralCommutator_eq_c2_caseA hK hW1 hA hw hw1
   ext g
   rw [Subgroup.mem_inf]
   constructor
