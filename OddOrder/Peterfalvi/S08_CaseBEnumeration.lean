@@ -1124,4 +1124,56 @@ theorem sMember_degreeSqNormReBound_of_not_coherent
     _ = 2 * ((a : ℝ) * (η 1).re) * (η 1).re := by ring
     _ = 2 * (ψ 1).re * (η 1).re := by rw [hψre]
 
+/-- **(6.8.3) case-(B) norm-weighted member-family degree bound (real form), reducible COLUMN
+break.**  The real-part repackaging of `sMember_degreeSqNormBound_of_not_coherent_columnBreak`,
+mirroring `sMember_degreeSqNormReBound_of_not_coherent` for the column break `μ_b = columnSum χ₂b`. -/
+theorem sMember_degreeSqNormReBound_of_not_coherent_columnBreak
+    (hyp : SibleyDadeHypothesis G L H) [H.Normal]
+    (h46 : OddOrder.Peterfalvi.S06.Hypothesis46 (sharpImage H) L) (hHK : h46.K = H)
+    (hW1 : h46.W1 = hyp.W1)
+    [NeZero (Nat.card h46.W1)] [Invertible (Nat.card ↥h46.K : ℂ)]
+    [Fintype ↥(h46.W1 ⊔ h46.W2)] [Invertible (Nat.card ↥(h46.W1 ⊔ h46.W2) : ℂ)]
+    [Fintype (OddOrder.Peterfalvi.S06.ticVdiff h46).W]
+    [Invertible (Nat.card (OddOrder.Peterfalvi.S06.ticVdiff h46).W : ℂ)]
+    {S₁ : Set (ClassFunction ↥L ℂ)} (hS₁sub : S₁ ⊆ hyp.S)
+    (hS₁conj : OddOrder.Peterfalvi.S03.ClosedUnderConjugate S₁) (hS₁fin : S₁.Finite)
+    (hS₁coh : OddOrder.Peterfalvi.S07.IsCoherent hyp.tau S₁
+      (OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L))
+    {η : ClassFunction ↥L ℂ} (hηY : η ∈ hyp.Yset) (hηS₁ : η ∈ S₁)
+    {χ₂b : (h46.W2.subgroupOf (h46.W1 ⊔ h46.W2)) →* ℂˣ} (hχ₂b : χ₂b ≠ 1)
+    (hψnotS1 : OddOrder.Peterfalvi.S06.columnSum h46 χ₂b ∉ S₁)
+    (hψcnotS1 : (OddOrder.Peterfalvi.S06.columnSum h46 χ₂b).conj ∉ S₁)
+    (hnc : ¬ Nonempty (OddOrder.Peterfalvi.S07.IsCoherent hyp.tau
+      (S₁ ∪ {OddOrder.Peterfalvi.S06.columnSum h46 χ₂b,
+        (OddOrder.Peterfalvi.S06.columnSum h46 χ₂b).conj})
+      (OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L))) :
+    ∃ (k : ℕ) (χmem : Fin k → ClassFunction ↥L ℂ) (mc : Fin k → ℝ),
+      Function.Injective χmem ∧
+      Set.range χmem = S₁ ∧
+      (∀ j, χmem j ∈ S₁) ∧
+      (∀ j, 0 < mc j) ∧
+      (∀ j, ClassFunction.inner (χmem j) (χmem j) = (mc j : ℂ)) ∧
+      ∑ j : Fin k, ((χmem j 1).re) ^ 2 / mc j
+        ≤ 2 * (OddOrder.Peterfalvi.S06.columnSum h46 χ₂b 1).re * (η 1).re := by
+  obtain ⟨k, χmem, mc, deg, a, hinj, hrange, hmcpos, hmcnorm, hdeg_eq, hψ_eq, hbound⟩ :=
+    sMember_degreeSqNormBound_of_not_coherent_columnBreak hyp h46 hHK hW1 hS₁sub hS₁conj hS₁fin
+      hS₁coh hηY hηS₁ hχ₂b hψnotS1 hψcnotS1 hnc
+  have hmemS1 : ∀ j, χmem j ∈ S₁ := fun j => hrange ▸ Set.mem_range_self j
+  refine ⟨k, χmem, mc, hinj, hrange, hmemS1, hmcpos, hmcnorm, ?_⟩
+  have hdegre : ∀ j, (χmem j 1).re = (deg j : ℝ) * (η 1).re := by
+    intro j
+    rw [hdeg_eq j, Complex.mul_re, Complex.natCast_re, Complex.natCast_im]
+    ring
+  have hψre : (OddOrder.Peterfalvi.S06.columnSum h46 χ₂b 1).re = (a : ℝ) * (η 1).re := by
+    rw [hψ_eq, Complex.mul_re, Complex.natCast_re, Complex.natCast_im]
+    ring
+  calc ∑ j : Fin k, ((χmem j 1).re) ^ 2 / mc j
+      = ∑ j : Fin k, ((deg j : ℝ) * (η 1).re) ^ 2 / mc j := by
+        refine Finset.sum_congr rfl (fun j _ => ?_); rw [hdegre j]
+    _ = (η 1).re ^ 2 * ∑ j : Fin k, (deg j : ℝ) ^ 2 / mc j := by
+        rw [Finset.mul_sum]; refine Finset.sum_congr rfl (fun j _ => ?_); ring
+    _ ≤ (η 1).re ^ 2 * (2 * (a : ℝ)) := mul_le_mul_of_nonneg_left hbound (sq_nonneg _)
+    _ = 2 * ((a : ℝ) * (η 1).re) * (η 1).re := by ring
+    _ = 2 * (OddOrder.Peterfalvi.S06.columnSum h46 χ₂b 1).re * (η 1).re := by rw [hψre]
+
 end OddOrder.Peterfalvi.S08
