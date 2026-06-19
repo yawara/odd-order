@@ -861,6 +861,87 @@ theorem centralCommutator_card_subgroupOf_lower (hyp : SibleyDadeHypothesis G L 
       (Subgroup.card_subgroup_dvd_card (hyp.centralCommutator.subgroupOf H))
   exact two_mul_add_one_le_of_odd_dvd hW1odd hModd hRdvd hMgt1
 
+/-- **(6.8.3) case-(A) fixed-point-free bound, c2 form** `|Zc| ≥ 2|W₁| + 1`.  The (c2) analogue of
+`centralCommutator_card_subgroupOf_lower` (which used `hF.toFrobeniusAction`).  `W₁` acts on `H` by
+conjugation, restricting (characteristic `Z(H) ⊓ H′`) to `Zc.subgroupOf H`; the restricted action is
+fixed-point-free *not* from a global Frobenius action but from the math-(A) FPF on `Zc`
+(`centralizer_inf_centralCommutator_eq_bot_of_c2_caseA`: `C_L(w) ⊓ Zc = ⊥` for `w ∈ W₁^#`), giving
+`|Zc| ≡ 1 (mod |W₁|)` and then `2|W₁| + 1 ≤ |Zc|`. -/
+theorem centralCommutator_card_subgroupOf_lower_c2_caseA (hyp : SibleyDadeHypothesis G L H)
+    {cert : OddOrder.Peterfalvi.S06.CertainTypeHypothesis (sharpImage H) L}
+    (hK : cert.K = H) (hW1 : cert.W1 = hyp.W1)
+    (hA : Subgroup.center ↥H ⊓ cert.W2.subgroupOf H = ⊥)
+    (hHnonab : _root_.commutator ↥H ≠ ⊥) :
+    2 * Nat.card hyp.W1 + 1 ≤ Nat.card ↥(hyp.centralCommutator.subgroupOf H) := by
+  classical
+  letI : H.Normal := hyp.H_normal
+  letI actH : MulDistribMulAction ↥hyp.W1 ↥H :=
+    MulDistribMulAction.compHom H ((MulAut.conjNormal (H := H)).comp hyp.W1.subtype)
+  have hMeq : hyp.centralCommutator.subgroupOf H = Subgroup.center ↥H ⊓ _root_.commutator ↥H :=
+    hyp.centralCommutator_subgroupOf_eq
+  have hcprod : ∀ (K : Subgroup ↥H) [K.Characteristic] (a : ↥hyp.W1) (m : ↥H),
+      m ∈ K → a • m ∈ K := by
+    intro K _ a m hm
+    have hmap := Subgroup.characteristic_iff_map_eq.mp ‹K.Characteristic›
+      (MulDistribMulAction.toMulAut ↥hyp.W1 ↥H a)
+    have hmem : (MulDistribMulAction.toMulAut ↥hyp.W1 ↥H a).toMonoidHom m ∈ K := by
+      rw [← hmap]; exact Subgroup.mem_map_of_mem _ hm
+    simpa using hmem
+  have hinv : ∀ a : ↥hyp.W1, ∀ m ∈ hyp.centralCommutator.subgroupOf H,
+      a • m ∈ hyp.centralCommutator.subgroupOf H := by
+    intro a m hm
+    rw [hMeq, Subgroup.mem_inf] at hm ⊢
+    exact ⟨hcprod (Subgroup.center ↥H) a m hm.1, hcprod (_root_.commutator ↥H) a m hm.2⟩
+  letI instM : MulDistribMulAction ↥hyp.W1 ↥(hyp.centralCommutator.subgroupOf H) :=
+    OddOrder.Isaacs.Ch06.IsFrobeniusAction.invariantSubgroupMulDistribMulAction _ hinv
+  -- FPF on `Zc.subgroupOf H` directly from the math-(A) FPF `C_L(w) ⊓ Zc = ⊥` (no global action).
+  have hFrobM : @OddOrder.Isaacs.Ch06.IsFrobeniusAction ↥hyp.W1
+      ↥(hyp.centralCommutator.subgroupOf H) _ _ instM := by
+    intro a ha m hm hfix
+    apply hm
+    -- `↑↑m ∈ Zc`
+    have hmZc : ((m : ↥H) : ↥L) ∈ hyp.centralCommutator :=
+      (Subgroup.mem_subgroupOf).mp m.2
+    have ha1 : (hyp.W1.subtype a : ↥L) ≠ 1 := fun h => ha (Subtype.ext h)
+    -- actH-fixedness of `↑m` (definitional from the invariant-subgroup action)
+    have hfixH : a • (m : ↥H) = (m : ↥H) := Subtype.ext_iff.mp hfix
+    have hc : MulAut.conjNormal (hyp.W1.subtype a) (m : ↥H) = (m : ↥H) := hfixH
+    -- `↑a` centralizes `↑↑m`
+    have hcomm : ((m : ↥H) : ↥L) ∈
+        Subgroup.centralizer ({(hyp.W1.subtype a : ↥L)} : Set ↥L) := by
+      rw [Subgroup.mem_centralizer_singleton_iff]
+      have hL := congrArg (fun x : ↥H => (x : ↥L)) hc
+      simp only [MulAut.conjNormal_apply] at hL
+      rw [mul_inv_eq_iff_eq_mul] at hL
+      exact hL.symm
+    have hbot := hyp.centralizer_inf_centralCommutator_eq_bot_of_c2_caseA hK hW1 hA
+      (w := (hyp.W1.subtype a : ↥L)) a.2 ha1
+    have hmem : ((m : ↥H) : ↥L) ∈
+        Subgroup.centralizer ({(hyp.W1.subtype a : ↥L)} : Set ↥L) ⊓ hyp.centralCommutator :=
+      ⟨hcomm, hmZc⟩
+    rw [hbot, Subgroup.mem_bot] at hmem
+    exact Subtype.ext (Subtype.ext hmem)
+  haveI : Fintype ↥hyp.W1 := Fintype.ofFinite _
+  haveI : Fintype ↥(hyp.centralCommutator.subgroupOf H) := Fintype.ofFinite _
+  have hMmod : Nat.card ↥(hyp.centralCommutator.subgroupOf H) ≡ 1 [MOD Nat.card hyp.W1] := by
+    simpa only [Fintype.card_eq_nat_card] using hFrobM.card_modEq_one
+  have hMne : hyp.centralCommutator.subgroupOf H ≠ ⊥ := by
+    rw [hMeq, inf_comm]
+    letI : Group.IsNilpotent ↥H := hyp.H_nilpotent
+    exact isNilpotent_normal_inf_center_ne_bot (Subgroup.commutator_normal ⊤ ⊤) hHnonab
+  have hMgt1 : 1 < Nat.card ↥(hyp.centralCommutator.subgroupOf H) := by
+    haveI : Nontrivial ↥(hyp.centralCommutator.subgroupOf H) :=
+      (Subgroup.nontrivial_iff_ne_bot _).mpr hMne
+    exact Finite.one_lt_card
+  have hRdvd : Nat.card hyp.W1 ∣ Nat.card ↥(hyp.centralCommutator.subgroupOf H) - 1 :=
+    (Nat.modEq_iff_dvd' (by omega)).mp hMmod.symm
+  have hW1odd : Odd (Nat.card hyp.W1) :=
+    Odd.of_dvd_nat hyp.card_L_odd (Subgroup.card_subgroup_dvd_card hyp.W1)
+  have hModd : Odd (Nat.card ↥(hyp.centralCommutator.subgroupOf H)) :=
+    Odd.of_dvd_nat (Odd.of_dvd_nat hyp.card_L_odd (Subgroup.card_subgroup_dvd_card H))
+      (Subgroup.card_subgroup_dvd_card (hyp.centralCommutator.subgroupOf H))
+  exact two_mul_add_one_le_of_odd_dvd hW1odd hModd hRdvd hMgt1
+
 /-- Membership in `S(A)`, unfolded. -/
 theorem mem_SsubFiltration (hyp : SibleyDadeHypothesis G L H) {A : Subgroup ↥L}
     {φ : ClassFunction ↥L ℂ} :

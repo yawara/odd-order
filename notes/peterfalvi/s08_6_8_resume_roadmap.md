@@ -4,7 +4,68 @@
 > `s08_6_8_assembly_plan.md`(458KB)/`s08_6_8_3_gap_resolution.md` のうち本 note と矛盾する記述は本 note を優先。
 > 上位方針・FT 接続の文脈 = 記憶 [[ft-path-policy]] の 2026-06-17 検証訂正ブロック。
 
-## 🚩🆕 HANDOFF — 次セッションはここから (2026-06-19 cont.²⁵)
+## 🚩🆕 HANDOFF — 次セッションはここから (2026-06-19 cont.²⁶)
+
+**状態**: branch `lane-b`、clean、**full build green (0 errors, 1m40s)、実 sorry 133**。本セッションで
+**case-(A) producer の前半 (X(Zc)∪Y coherence 構築 + 中心 FPF bound) を c2 化完了**。3 commit:
+`253d64ba` (sylow dedupe) → `e81f5681` ((6.7) 合同チェーン c2) → `04f0ea75` (case-A infra)。
+
+**✅ 本セッション完了 (case-(A) S-bootstrap gate 1 の前半、全 axiom-clean)**:
+- **sylow dedupe** (`253d64ba`): `sylow_map_subtype_of_coprime` を CaseBCoherence → Core へ持ち上げ、
+  `sylow_map_subtype_of_frobenius` を delegate 化 (互いに素性のみ一般化、dedupe TODO 実施)。
+- **(6.7) 合同チェーン c2** (`e81f5681`): `peterfalvi_67_centralCommutator_c2_caseA` (核心、新 FPF 基盤
+  `inf_centralizer_centralCommutator_map_c2_caseA` + `sylow_map_subtype_of_coprime` 消費) + η^{τ₁} 定数性
+  消費 8 補題 (`inner_extension_*_eq_zero_*_c2_caseA` / `inner_restrict_extension_*_c2_caseA` /
+  `restrict_extension_Yset_{degree_value_eq,const_on_centralCommutator,charValue_cong}_c2_caseA`)。
+- **case-A infra** (`04f0ea75`): **中心 FPF bound** `centralCommutator_card_subgroupOf_lower_c2_caseA`
+  (Part2、`2|W₁|+1 ≤ |Zc|`、Frobenius の global `IsFrobeniusAction W₁ H` 制限でなく、math-(A) FPF
+  `centralizer_inf_centralCommutator_eq_bot_of_c2_caseA` から `Zc.subgroupOf H` 上の FPF 作用を**直接構成**)
+  + **度数論 crux チェーン 24 補題** (Core) → **`coherentXunionYset_centralCommutator_diagonal_c2_caseA`**
+  (= X(Zc)∪Y coherent、producer の前半)。
+
+**∴ case-(A) producer `nonempty_coherent_S_caseA_of_c2` の残 = X∪Y → S lifting の 1 ピースのみ**:
+Frobenius 版 producer (`nonempty_coherent_S_caseA_of_frobenius`, `S08_CoherenceCore`末尾) は
+`... build hXYcoh via diagonal ... ; exact false_of_coherentXunionYset_of_not_coherentS hF ...` の形。
+**残 = `false_of_coherentXunionYset_of_not_coherentS` の c2 版** (`S08_CoherenceCorePart2:3613`)。
+
+### 🚩 残ゲートの正確な診断 (教科書 (6.8.3) 読了で確定、cont.²⁶ — **配線タスク・新数学ゼロ**)
+**教科書 `04.8_*.mmd` (6.8.3) を読んだ**: break ψ は**既約である必要なし**。証明は **norm-weighted (5.6)**
+`2ψ(1)η₁(1) ≥ Σ_{χ∈S₁} χ(1)²/‖χ‖² > Σ_{χ∈X} χ(1)²/‖χ‖²` (= `|W₁||H:Z|(|Z|-1)`、(1.5.c,d)) を使い、
+ψ=Ind θ (θ∈Irr H, deg d) の度数式 ψ(1)=|W₁|d (可約でも成立) + [Is] Cor 2.30 (d²≤|H:Z|) +
+**case-(A) FPF `|Z|-1≥2|W₁|` (= `centralCommutator_card_subgroupOf_lower_c2_caseA` ✅構築済)** で矛盾
+`4|W₁|² > |H:Z|(|Z|-1)² ≥ (2|W₁|)²`。**‖χ‖² 重みが可約を吸収** ⟹ S 全体既約は不要。
+∴ cont.²⁶ 初稿の「既約性ゲート」は誤診。`isIrreducibleCharacter_of_mem_S` 依存は Frobenius 固有の近道
+(S 全既約ゆえ unweighted で済んだ)にすぎない。
+
+**全部品が repo に sorry-free 実在** ([[pf-683-gap-resolved]] と整合):
+- weighted (5.6) per-member bound `sMember_degreeSqNormReBound_of_not_coherent` (`S08_CaseBEnumeration:1080`、
+  **汎用・非 column**、hψirr 不要)。
+- X-sum counting `sum_re_sq_Xset_eq` (`S08_CoherenceCorePart2`、**Z-generic** `(Z := …)`)。
+- reducible break pair `exists_coherentBreakPair_general` (`S08_CoherenceCorePart1`、**S 既約不要**、`HasNoRealCharacters Sb`
+  のみ)。
+- 算術破綻 `false_of_centralCommutator_break_arith` (`S08_CoherenceCorePart2`、Zc 用、Frobenius proof line で使用済)。
+- FPF `centralCommutator_card_subgroupOf_lower_c2_caseA` ✅。
+
+### ▶ 次の一手 (優先順、cont.²⁶ — tractable 配線、見積 1-2 session)
+1. **weighted xSum bound** `xSum_le_two_psi_weighted_c2_caseA` を作る: Frobenius `xSum_le_two_psi`
+   (`Part2:3403`、~127 行) を mirror、ただし per-member を `sMember_degreeSqReBound_of_not_coherent` →
+   **`sMember_degreeSqNormReBound_of_not_coherent`** (weighted、`S08_CaseBEnumeration:1080`) に差替、`hψirr` を落とし
+   ψ=Ind θ の deg d で扱う。X-sum は `sum_re_sq_Xset_eq` (Z=Zc) 流用。**crux = weighted bound の出力 family
+   (mc/‖·‖² 重み付) を X-sum `χ(1)²/‖χ‖²` に合わせる** (case-B `sSubFiltration_sum_le_two_psi_caseB` が template)。
+2. **`false_of_coherentXunionYset_c2_caseA`**: Frobenius `false_of_coherentXunionYset_of_not_coherentS`
+   (`Part2:3613`、~100 行) を mirror、`exists_coherentBreakPair` (S 既約) → `exists_coherentBreakPair_general`
+   (`S_hasNoRealCharacters` の代わりに `HasNoRealCharacters hyp.S` を別途供給 — odd-order ゆえ成立、要 c2 版か汎用)、
+   `xSum_le_two_psi` → step 1 の weighted 版、FPF/arith は c2/Zc 既存品。**ψ 既約前提を全除去**。
+3. **producer `nonempty_coherent_S_caseA_of_c2`**: Frobenius producer の完全 mirror
+   (diagonal_c2_caseA + crux_general_of_higher_anchor_c2_caseA + exists_{Y,X}coherence_*_c2_caseA +
+   step 2 の false_of_*_c2_caseA を配線) → dispatcher `nonempty_coherent_S_of_c2_of_branches`
+   (`S08_PGroupReduction:215`) の hcaseA に供給 → case-B producer (済) と合わせ S08:59 dispatch 完成。
+**⚠ 唯一の非自明 = step 1 の weight 整合** (unweighted χ(1)² → weighted χ(1)²/‖χ‖²)。case-B の
+`sSubFiltration_sum_le_two_psi_caseB` (`S08_Theorem63`) が同じ weight 整合を W₂ で済ませている = 直接 template。
+
+**FT 文脈不変**: (6.8) は [[ft-path-policy]] で orphaned (deferred-payoff) — 閉じても feitThompson sorry は今減らない。
+
+## 🚩 HANDOFF — (2026-06-19 cont.²⁵)
 
 **状態**: branch `lane-b`、clean、**full build green、実 sorry 136**。reducible-break チェーン step 1-8 完了
 (cont.²⁴) + **dispatch deep-dive で残務を precise 化 + case-A glue 1 ピース着地**。
