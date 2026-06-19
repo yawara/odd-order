@@ -106,41 +106,109 @@ and it depends on §13/§15 producers (see "Remaining" below).
 that **bottoms out in the sorried §13/§15 producers** (`basic_structure`, `c_eq_one`, the (14.7)
 case arithmetic) — i.e. the same §13 character/structure theory that gates `exists_L/MHypothesis`.
 
-## σ-bridge construction plan (step 4, scoped 2026-06-18 — ungated, intricate frozen-Core)
+## ✅✅ DONE: σ-bridge (step 4) — `fieldNormalizerData_of_repr` (2026-06-18, commits `aee72713`/`410471ea`/`d948ce69`)
 
+`OddOrder/Peterfalvi/S16_NonExistenceG.lean`, all sorry-free + axiom-clean + AxiomsCheck-registered.
 The σ-bridge takes the (14.2)(a) iso as *input* (so it is ungated) and builds `FieldNormalizerData`.
-Target shape:
-```
-theorem fieldNormalizerData_of_repr (hyp : Hypothesis (G := G))
-    (e  : Additive ↥hyp.base.P ≃+ GaloisField hyp.base.p hyp.base.q)
-    (μ  : ↥hyp.base.U →* (GaloisField hyp.base.p hyp.base.q)ˣ) (hμinj : Injective μ)
-    (hμrange : μ.range = normOneUnits …)                       -- image = U*
-    (hcompat : e (Additive.ofMul (conj u • x)) = μ u • e x)    -- (14.2)(a) compat
-    (partB …) : Nonempty (FieldNormalizerData hyp)
-```
-Core facts (all in `OddOrder/BG/AppC_NormSet.lean`, frozen — *use*, don't modify):
-* `normOneFrobeniusGroup p q = additiveFieldGroup p q ⋊[normOneMulAction] normOneUnits p q`,
-  `additiveFieldGroup = Multiplicative (GaloisField p q)`, complement `normOneUnits` = norm-one
-  subgroup of `GF^×` (order `(p^q-1)/(p-1)` = `U*`).
-* `normOneFrobenius_conj_inl` : conjugation of an `inl`-kernel point by `inr u` = field-mult by `u`
-  — this is exactly the `SemidirectProduct.lift` compatibility, fed by `hcompat`.
-Construction:
-1. `f_N : Multiplicative (GF) →* G`, `ofAdd s ↦ ↑(e.symm s)` (uses `Additive`/`Multiplicative`
-   adjunction: `↥P` multiplicative in `G` ↔ `Additive ↥P` the `F_p`-space `e` lives on).
-   `map_mul` ⟸ `e.symm` additive + `↑(x+y : Additive ↥P) = ↑x * ↑y` in `G`. range `f_N = P`.
-2. `f_U : normOneUnits →* G`, `u* ↦ ↑(μ.symm-onto-range u*)` (via `hμrange`, `U* ≃ U`). range `= U`.
-3. `sigma := SemidirectProduct.lift f_N f_U <compat from normOneFrobenius_conj_inl + hcompat>`.
-4. Properties: `sigma_P_eq_P`/`sigma_U_eq_U` from `range f_N = P`/`range f_U = U` + `lift_inl`/`lift_inr`;
-   `sigma_P0_eq_W2` from `e`(prime line `F_p ⊆ GF`) `= W₂` (needs `e` to send the prime field to `W₂`
-   — extra `hcompat`-style hypothesis on the prime line); `sigma_injective` from `f_N`,`f_U` inj +
-   kernel∩complement = ⊥ (`fieldNormalizerKernel_inf_complement_eq_bot`, already in Core).
-⚠ The `Additive`/`Multiplicative` bookkeeping (steps 1-2) is the main friction. Estimate ~150-250
-lines. Then `field_normalizer_of_U_characteristic` = `fieldNormalizerData_of_repr` ∘
-(`exists_galoisField_repr` applied to `Additive ↥P` as `F_p[U]`-module via conjugation) — the latter
-needs `|P|=p^q` (`basic_structure`), `|U|=u`, `c=1` (`c_eq_one`): **the §13 gate**.
 
-`exists_LHypothesis`/`exists_MHypothesis` (14.3/14.10) and the case-B cascade remain Dade-gated
-(Lane B's §3-13 character theory), independent of the above.
+* **`fieldNormalizerKernelTransport` (fN)**: from `e : Additive ↥P ≃+ 𝔽_{p^q}`, the hom
+  `𝔽_{p^q} →* G`, `s ↦ ↑(Additive.toMul (e.symm s))`. + `_apply`/`_injective`/`_range` (= P).
+* **`fieldNormalizerComplementTransport` (fU)**: from `μ : U →* 𝔽_{p^q}ˣ` (inj, range = normOneUnits),
+  the hom `U* →* G` inverting μ + including back (`U.subtype ∘ (corestrict μ).symm`). +
+  `_exists` (each `u*` has `v∈U` with `μ v = u*`, `fU u* = ↑v`) / `_injective` / `_range` (= U).
+* **`fieldNormalizerData_of_repr`**: `σ := SemidirectProduct.lift fN fU hcompatLift`, glued by the
+  (14.2)(a) `U`-equivariance.  Final signature (the actual landed interface):
+  ```
+  (e : Additive ↥P ≃+ GaloisField p q) (μ : ↥U →* (GaloisField p q)ˣ) (hμ_inj) (hμ_range)
+  (hUP : ∀ v x, (v:G)*(x:G)*(v:G)⁻¹ ∈ P)                       -- U normalizes P
+  (hcompat : ∀ v x, e (ofMul ⟨(v:G)*(x:G)*(v:G)⁻¹, hUP v x⟩) = (μ v : GF) * e (ofMul x))
+  (hW2 : (span_{ZMod p}{1}).toAddSubgroup.toSubgroup.map fN = W₂)  -- prime line ↦ W₂
+  (hPU_disj : P ⊓ U = ⊥) (hcyclotomic : Coprime ((p^q-1)/(p-1)) (p-1))
+  (hQ_elemAb …)(hW2_norm_Q …)(yQ)(hyQ_mem …)(hW2_conj_y …)                 -- part (14.2)(b)
+  : Nonempty (FieldNormalizerData hyp)
+  ```
+  Properties: `sigma_injective` via `ker = ⊥` (kernel meets complement trivially, `P ∩ U = 1`);
+  `sigma_P_eq_P`/`sigma_U_eq_U` via `range_eq_map`+`map_map`+`lift_comp_inl/inr`+transport ranges;
+  `sigma_P0_eq_W2` via the prime-line = `inl`-image of `span{1}` reduction to `hW2`.
+
+**Lean gotchas hit** (recorded for reuse): `Multiplicative.toAdd s` infers the *unfolded*
+`GaloisField`-as-`SplittingField` type → `HMul` fails against folded `GaloisField` (instance diamond);
+fix = annotate `(… : GaloisField p q)` + `set t : GaloisField p q := …`.  TypeTags cancellation
+lemmas are **root-namespace** (`toAdd_ofAdd`/`ofAdd_toAdd`/`toMul_ofMul`/`ofMul_toMul`), not
+`Multiplicative.*`/`Additive.*`.  `mul_eq_one_iff_eq_inv.mp` for `a*b=1 ⟹ a=b⁻¹`.  The lift
+compatibility goal is reached defeq via `show fN (φ u s) = fU u * fN s * (fU u)⁻¹` (avoids fragile
+`simp only [comp_apply, …]`).
+
+## ✅✅✅ DONE: step 3 field model + structural inputs (2026-06-19)
+
+`field_normalizer_of_U_characteristic` (S16:790, bare sorry) is now **structured** — both the σ-bridge
+(step 4, above) and the (14.2)(a) field model (step 3) plus most σ-bridge hypothesis-inputs are proven:
+
+* **step 3** `exists_pu_field_repr` (`af543785`): from `hu_full : |U| = (p^q-1)/(p-1)` and `[IsCyclic ↥U]`,
+  makes `Additive ↥P` an `𝔽_p[U]`-module via conjugation (`Representation = mulAutToEnd ∘ (normalizerMonoidHom
+  ∘ inclusion(U≤N(P)))`, module via `Module.compHom` on `ρ.asAlgebraHom` — sidesteps the asModule synth trap)
+  and applies `exists_galoisField_repr` ⟹ `e : Additive ↥P ≃+ GF`, `μ : U →* GFˣ`, the compat. Cites
+  sorried §13 `basic_structure`(|P|=p^q) + `c_eq_one`(faithful). Diamond notes: `open scoped IsMulCommutative`,
+  `AddCommGroup.zmodModule` (not `IsElementaryAbelian.zmodModule`), explicit `CommGroup ↥U` reusing canonical Group.
+* **hUP** `conj_mem_P` + `U_le_normalizer_P` (`a6ab11ee`, **unconditional**): `U ≤ N(P)` via `U ≤ S' ≤ S`,
+  `P = F(S) ⊴ S` (`maxNilpotentNormalHall_le_normalizer`).
+* **hPU_disj** `P_inf_U_eq_bot` (`427e36e9`, §13-cite): `P ⊓ U ≤ U ⊓ C_G(P) = C = 1` (P abelian + `c_eq_one`).
+* **hμ_range** `mu_range_eq_normOneUnits` (`c83540d7`, **unconditional**): inj `μ` with `|U|=(p^q-1)/(p-1)`
+  ⟹ `μ.range = normOneUnits` (both = unique order-d subgroup `ker(powMonoidHom d)` of cyclic GFˣ,
+  `IsCyclic.card_powMonoidHom_ker` gives card = gcd = d).
+* **hcyclotomic** `cyclotomic_quotient_coprime_of_not_dvd` (existing): given `q∤(p-1)`.
+
+## ✅✅ hW2 scaling DONE + assembly verified (2026-06-19, `b2564baf`)
+
+The one piece deferred at the 2026-06-19 depletion stop — the **hW2 scaling** — is **done**, and the
+full σ-bridge assembly is verified `sorry`-free as an engine. Three lemmas (full build 3863 jobs ~32s
+green, real sorry 140 unchanged):
+
+* **`field_repr_rescale_to_W2`** — *axiom-clean* (`[propext, Classical.choice, Quot.sound]`, no §13 cite).
+  Takes the generic model `(e₀, μ, hcompat₀)` + `W₂ ≤ P`; pick `w₀ ∈ W₂` (≠1, `|W₂|=p`),
+  `c := e₀(ofMul w₀) ≠ 0`, build the `×c⁻¹` `AddEquiv` *by hand* (`mul_inv_cancel_left₀`/`inv_mul_cancel_left₀`/
+  `mul_add` — sidesteps the missing `DistribMulAction.toAddEquiv₀`), `e := e₀.trans scale`. Then `e(ofMul w₀)=1`.
+  hW2 proof: `Span = (span 𝔽_p{1}).toAddSubgroup.toSubgroup = Subgroup.zpowers (Multiplicative.ofAdd 1)`
+  (le_antisymm; `Multiplicative.mem_toSubgroup` + `Submodule.mem_span_singleton`; ZMod p-linearity via
+  `r•x = r.val•x` = `Nat.cast_smul_eq_nsmul` + `ZMod.natCast_rightInverse`; `ofAdd_nsmul`, `ofAdd_toAdd`),
+  then `MonoidHom.map_zpowers` ⟹ `Span.map fN = zpowers (fN(ofAdd 1)) = zpowers (↑w₀)`, and
+  `zpowers ↑w₀ = W₂` since `orderOf ↑w₀ = p` (prime, `OneMemClass.coe_eq_one`/`orderOf_dvd_natCard`),
+  `Subgroup.eq_of_le_of_card_ge`. compat survives by field commutativity (`ring`).
+* **`exists_pu_field_repr_W2`** (§13-cite) — chains `exists_pu_field_repr` + the rescaling → full
+  `(e, μ, hμ_inj, hcompat, hW2)` package.
+* **`field_normalizer_of_U_characteristic_of_inputs`** (literal-`sorry`-free) — assembly engine taking the
+  §13/§14 facts as explicit hypotheses; calls `exists_pu_field_repr_W2` + `mu_range_eq_normOneUnits` +
+  `conj_mem_P` + `P_inf_U_eq_bot` + `fieldNormalizerData_of_repr`. **Verifies the whole σ-bridge typechecks.**
+
+⟹ `field_normalizer_of_U_characteristic` is now reduced to *producing* `_of_inputs`'s named obligations
+(docstring records the recipe). **The ungated field-algebra runway is exhausted.**
+
+### ✅ value-argument arithmetic core DONE (2026-06-19, `40150bb0`)
+
+The (14.7) value argument's **arithmetic core is formalized, axiom-clean**, reducing it to the single
+fixed-point-free congruence `u ≡ 1 mod p`:
+
+* **`u_eq_full_of_caseB_of_u_modEq_one_mod_p`** (axiom-clean) — `CaseBForSData` + `u ≡ 1 mod p` ⟹
+  `u = (p^q-1)/(p-1) ∧ ¬(p≡1 mod q)`. In the (13.15) `p≡1 mod q` branch, `q·u = (p^q-1)/(p-1) ≡ 1 mod p`
+  (geom sum, private `cyclotomic_quotient_modEq_one_mod_base`), so `q ≡ q·u ≡ 1 mod p`, forcing `p ∣ q-1`
+  against `hyp.q_lt_p`.
+* **`field_normalizer_of_U_characteristic_of_fpf`** — tightest assembly engine; chains the value argument
+  (`caseB_for_S Ldata`) into `_of_inputs`. ⟹ (14.7) reduces to exactly `u ≡ 1 mod p` + `W₂ ≤ P` + part(b).
+
+### Remaining (the irreducible §13/§14 structural core)
+
+1. **FPF fact** `u ≡ 1 mod p` — the source is **`W₂^y` (order `p`) acting on `U` as a Frobenius complement**
+   ⟹ `|U| ≡ 1 mod p`. Needs (a) part(b) [no producer], (b) the `W₂^y`-on-`U` Frobenius structure [absent;
+   only the `U⋊W₁` mod-`q` analogue `u_modEq_one_mod_q` exists], (c) `IsFrobeniusGroup.card_kernel_modEq_one`
+   [available]. **Deep §14 field-model work, no scaffolding** (verified by grep 2026-06-19).
+2. **`[IsCyclic ↥U]`** — §13 standing fact (can't derive from the field model: `exists_pu_field_repr` *requires* it).
+3. **`W₂ ≤ P`** — §13-structural (`FieldNormalizerData.W2_le_P` is a *data* projection ⟹ circular; needs an
+   independent producer from the §13/§15 structure).
+4. **partB** — `Q` elem abelian / `W₂` normalizes `Q` / `∃y∈Q` via (13.2.b)/(14.5) (**§13** cite).
+5. **close** — feed (1)-(4) + `IsCyclic` to `field_normalizer_of_U_characteristic_of_inputs`.
+
+`exists_LHypothesis`/`exists_MHypothesis` (14.3/14.10) and the case-B cascade remain Dade-gated (Lane B's
+§3-13 character theory), independent of the above.
 
 ## FT connection (verified)
 

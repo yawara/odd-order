@@ -4,6 +4,498 @@
 > `s08_6_8_assembly_plan.md`(458KB)/`s08_6_8_3_gap_resolution.md` のうち本 note と矛盾する記述は本 note を優先。
 > 上位方針・FT 接続の文脈 = 記憶 [[ft-path-policy]] の 2026-06-17 検証訂正ブロック。
 
+## 🚩🆕 HANDOFF — 次セッションはここから (2026-06-19 cont.²⁴)
+
+**状態**: branch `lane-b`、作業ツリー clean、**full build 3868 green、実 sorry 136**。reducible-break (5.6.3)
+**残チェーン step 1-8 を完了** (engine + cross-ortho toolkit + 列 break (6.2) bound chain + c2 (6.3)
+induction + hbound producer、計 ~17 feature commit、全 sorry-free + axiom-clean)。
+
+**✅ 完成済 step 6-8 (cont.²³ の step 1-5 に追加)**:
+- **step 6** `six_two_index_bound_c2` の **hW2B 撤廃** (`S08_Theorem65c2`): break ψ を
+  `caseB_S_member_column_or_irreducible` で column/irreducible dispatch (column→step 5 / irreducible→既存)。
+  caller `six_two_central_c2`/`six_three_index_bound_c2` も hW2B pass-through 除去。
+- **step 7** `six_three_c2` (`S08_Theorem65c2`): (6.3) minimal-A induction、six_three ミラー、
+  M≤H₁≤⁅H,H⁆ で S(M) coherent。hW2B-free ゆえ W₂ 以下に降りる column-transition break を許容。
+- **step 8** `abelianization_card_le_of_not_coherent_c2` (`S08_Theorem65c2`): **hbound = |Abelianization H|
+  ≤ 4|W₁|²+1** を ¬coherent(S) から (six_three_c2 を M=⊥/H₁=⁅H,H⁆ で適用)。= handoff cont.²⁰ frontier 達成。
+
+**▶ 次の一手 = step 9-11 (dispatch S08:59、= 別 sub-project: 配線 + structure-data discharge)**:
+- **DAG は配線可能と確定** (再調査不要): S08_PGroupReduction/S08_Theorem65c2 は S08_CoherenceTheorems の
+  **下流でない** (並列、cycle なし) → S08_CoherenceTheorems が両者を import 可。cont.¹⁴「下流ゆえ不可」は
+  merge 後 STALE。
+- **dispatcher は既存**: `nonempty_coherent_S_of_c2_of_branches` (`S08_PGroupReduction:215`) が
+  **hbound (step 8) + hcop + hW2comm + hsplit + hcaseA + hcaseB** から c2 coherence を出す。S08:59 c2 枝 =
+  by_contra hncoh → step 8 で hbound → dispatcher → 矛盾。c1 枝 = `nonempty_coherent_S_of_frobenius`。
+- **残ゲート = case producer の structure-data discharge** (これが本当の残務):
+  `nonempty_coherent_S_caseB_of_c2` (`:343`) は hWMgt/hYcard/hXne/hprime/hcen/hcop/hW2comm/hW2H を仮説に取る。
+  これらの discharge (`_of_c2_caseB`、handoff cont.¹⁶ で「素材在庫・未実装」) + 案 A 用 case-A producer +
+  hyp.cases (Frobenius/CertainType split) からの hcop/hW2comm 抽出が残る。**= (6.8.3) bootstrap + 構造事実**。
+**FT 文脈不変**: (6.8) は [[ft-path-policy]] で orphaned (deferred-payoff) — 閉じても feitThompson sorry は今減らない。
+
+## 🚩 HANDOFF — (2026-06-19 cont.²³)
+
+**状態**: branch `lane-b` = `main` 同期 + 新規 (cont.²² 末で main マージ、以降 step 4-5 を追加)、作業ツリー clean
+(未追跡 `s08_6_8_chatgpt_prompt.md` 旧 draft 無視可)、**full build 3868 green、実 sorry 136**。
+reducible-break (5.6.3) **ENGINE + (5.2.e) cross-ortho toolkit + 列 break の (6.2) bound chain 全体を完了**
+(step 1-5、計 13 feature commit、全 sorry-free + axiom-clean)。
+
+**✅ 完成済 (step 1-5、reducible-break 用 column-break (6.2) bound 機構フル)**:
+- **step 1** `retarget_isCoherent_of_extensionImage_k` (新 leaf `S08_RetargetReducible.lean`): reducible-break bridge。
+- **step 2** `xAdjoinStepW_k` (`S08_CoherenceWeighted`): break χ 可約可の weighted adjoin engine (Da パラメータ化)。
+- **step 3** `coherentDegreeSqNormBound_of_not_coherentW_k` (`S08_CoherenceWeighted`): step 2 の純対偶。
+- **4a** `certainTypeR_imageSet_orthogonal_certainTypeR` (`S06_CertainTypeCoherence`): column×column (5.2.e)。
+- **swap** `dadeOfDiff_imageSet_orthogonal_certainTypeR` (`S08_CaseBHortho`): irreducible×column (5.2.e)。
+- **4b** `caseB_breakChar_fields_columnBreak` (`S08_CaseBEnumeration`): 列 break 8 fields (ノルム w₁≠0)。
+- **4c** `caseB_member_orthoDatum_columnBreak` (`S08_CaseBEnumeration`): 列 break 用 per-member datum。
+  **🔑 τ-transport (再調査不要)**: 出力を `.Orthogonal`(同一 τ 要求)でなく **raw imageSet 直交**で出す(内積 τ 非依存)。
+- **4d** `sMember_degreeSqNormBound_of_not_coherent_columnBreak` (`S08_CaseBEnumeration`): 列 break の (5.6)
+  member bound ∑deg²/mc ≤ 2a。break Da = **`columnDecompositionTau`** (既存・hyp.tau 上・tau1=hyp.tau rfl・
+  imageFamily=`columnRFamilyTau` の imageSet=certainTypeR ゆえ 4c raw ortho が `.Orthogonal` に**定義的**一致)。
+  τ-transport は既存 case-B 機構で解決済 (新規構築不要だった)。
+- **4.5** `sMember_degreeSqNormReBound_of_not_coherent_columnBreak` (`S08_CaseBEnumeration`): 4d の実部形。
+- **5** `sSubFiltration_sum_le_two_psi_caseB_columnBreak` (`S08_Theorem63`): (6.2) S(A)-sum bound 列 break 版。
+
+**▶ 次の一手 = step 6 (`six_two_index_bound_c2` の hW2B 撤廃)**。`S08_Theorem65c2:74`。現状 hW2B は
+`member_isIrreducible_of_W2_le` で break ψ の irreducible 性を強制 → これを **column/irreducible dispatch** に置換:
+```
+obtain ⟨S₁, ψ, …⟩ := exists_coherentBreakPair_general …   -- 既存
+rcases caseB_S_member_column_or_irreducible hyp h46 hHK hψS with hcol | hirr
+· -- ψ=columnSum χ₂b: χ₂b 抽出 → sSubFiltration_sum_le_two_psi_caseB_columnBreak (step 5)
+· -- ψ irreducible: 既存 sSubFiltration_sum_le_two_psi_caseB
+```
+両枝とも結論 `H.index·(|H/A|−1) ≤ 2·(ψ 1).re·(η 1).re` 同型 ((ψ 1).re=(columnSum χ₂b 1).re)。hW2B 撤廃で
+caller `six_two_central_c2` (`:122`、hW2B 渡し) も更新要 (hW2B が central_c2 自身で他に使われるか要確認)。
+**続けて step 7-11**: six_three_c2 (induction、hW2B 不要版) → isPGroup_of_not_coherent_c2 →
+hbound → nonempty_coherent_S_of_c2_of_branches → dispatch S08:59。c1 chain
+(`S08_CoherenceCorePart2:3576-3837`) の 3-brick swap ミラーが基本パターン。
+**FT 文脈不変**: (6.8) は [[ft-path-policy]] で orphaned (deferred-payoff) — 閉じても feitThompson sorry は今減らない。
+
+## 🚩 HANDOFF — (2026-06-19 cont.²⁰)
+
+**状態**: branch `lane-b`、HEAD `32062fd2`、作業ツリー clean、full build 3865 green、実 sorry 140
+(`bin/count-sorry`)。今セッションの全成果は commit 済 (下記 cont.¹⁹/¹⁸/¹⁷/¹⁶)。
+(未追跡 `notes/peterfalvi/s08_6_8_chatgpt_prompt.md` は旧 draft、無視可。)
+
+**目標**: (6.8) c2 の `hbound` を埋め S08:59 `sibleySetup_is_coherent` の c2 枝を閉じる。
+
+**✅ 完成済インフラ** (今 session):
+- `S08_Theorem65c2.lean`: c2 chain 3 段 (`six_two_index_bound_c2`/`six_two_central_c2`/
+  `six_three_index_bound_c2`) — **既約-break path** (仮説 `hW2B : h46.W2 ≤ B` で break 既約性を要求)。
+  + `member_isIrreducible_of_W2_le` (W₂≤A で S(A) 全既約)。
+- `S08_CaseBCoherence2.lean`: `columnSum_notMem_SsubFiltration_of_le` (W₂≤A で column∉S(A))。
+- **`S07_RetargetScaled.lean` (reducible-break (5.6.3) 構成インフラ、完備・axiom-clean)**:
+  `retarget_isCoherent_S` (reducible χ の `IsCoherent τ (S₁∪{χ,χ̄}) A` 構成) +
+  `retargetTargetPair_gen` (reducible χ の Gram 一致 {X,X̄}) + 支持 8 lemma。
+
+**▶ 次の一手 (EXACT)**: `retarget_isCoherent_of_extensionImage` (`S08_CoherenceCorePart1:1980`) の
+**reducible 版** `..._k` を作る。手順 = 元を丸ごとミラーし:
+- `hχχ : ⟨χ,χ⟩=1` → `hχχne : ⟨χ,χ⟩≠0` (+ 同 chibar)、`hXX=1` → `hXX : ⟨X,X⟩=⟨χ,χ⟩` (Gram 一致)
+- 内部 norm 計算 `huu=1+a²` 等 → `k+a²` (= ⟨χ,χ⟩+a²)。`retarget_isIntegralIsometry`/
+  `retarget_inner_eq_on_zSpan_union` 呼出 → `retargetS_inner_eq_on_zSpan_union` に差替
+- break の Da から {X,X̄} 抽出: `retargetTargetPair` → `retargetTargetPair_gen`
+- 最終 `retarget_isCoherent` → `retarget_isCoherent_S`
+**呼出 API** (S07_RetargetScaled、`open OddOrder.Peterfalvi.S07`):
+```
+retargetTargetPair_gen (D : CharacterPsiDecomposition τ χ 0) (hχχbar) (hχbarχ) : RetargetTargetPairGen D
+  -- .inner_self_X : ⟨D.X,D.X⟩=⟨χ,χ⟩ / .inner_self_conjImage : ⟨X̄,X̄⟩=⟨χ̄,χ̄⟩ / .X_mem_ZIrr / .conjImage_mem_ZIrr / ...
+retarget_isCoherent_S (hS₁ : IsCoherent τ S₁ A) (hχχne)(hχbarχbarne)(hχχbar)(hχbarχ)
+  (hXX:⟨X,X⟩=⟨χ,χ⟩)(hXbarXbar:⟨X̄,X̄⟩=⟨χ̄,χ̄⟩)(hXXbar)(hXbarX)(hXZ)(hXbarZ)(hX_ortho)(hXbar_ortho)
+  (hXbar_def:X̄=X−τ(χ−chibar))(hχ_S1)(hχbar_S1)(hchi1)(himg)(hgen) : IsCoherent τ (S₁∪{χ,chibar}) A
+```
+
+**▶ 残チェーン**: `..._of_extensionImage_k` → `xAdjoinStepW` reducible 版
+(`S08_CoherenceWeighted:286`、break χ を Da パラメータ化) → `coherentDegreeSqNormBound_of_not_coherentW`
+reducible 版 (`:475`、対偶) → `sMember_degreeSqNormBound_of_not_coherent` の `hψirr` 撤廃
+(`S08_CaseBEnumeration:620`) → `sSubFiltration_sum_le_two_psi_caseB` の `hψirr` 撤廃 (`S08_Theorem63:110`) →
+**`six_two_index_bound_c2` の `hW2B` 撤廃** → `six_three_c2` (induction、`six_three:3750` ミラー、hW2B 不要) →
+`isPGroup_of_not_coherent_c2` (`isPGroup_of_not_coherent:3803` ミラー) → `hbound` →
+`nonempty_coherent_S_of_c2_of_branches` (`S08_PGroupReduction:215`) → dispatch S08:59。
+column の break Da = `certainTypeDecompositionDa`/`certainTypeR` (`S06_CertainTypeCoherence`)。
+
+**設計の要点 (再調査不要)**: retarget の norm-k 化は `innerLeftℤ` が **ℂ 値**ゆえ `(⟨χ,χ⟩)⁻¹` scaling で
+ℤ-線形維持 (lattice 上 ⟨φ,χ⟩=m·k で係数整数)。isometry の項照合は Gram 一致 ⟨X,X⟩=⟨χ,χ⟩ で成立
+(scaling 両辺同一ゆえ k-real 不要)。**S07_RetargetScaled は `open IntegralCharacterMap` +
+`open CharacterPsiDecomposition` 要**。
+**FT 文脈不変**: (6.8) は [[ft-path-policy]] で orphaned (deferred-payoff) — 閉じても feitThompson sorry は今減らない。
+
+## ✅✅🎯 2026-06-19 cont.¹⁹ — reducible-break (5.6.3) coherence 拡張 `retarget_isCoherent_S` 完成
+
+cont.¹⁸ で「retarget は norm-1 専用、reducible は basis-direct 新規構成が要る」と確定した核心難所を**完成**。
+新ファイル [`S07_RetargetScaled.lean`](../../OddOrder/Peterfalvi/S07_RetargetScaled.lean)
+(全 axiom-clean、full build 3865 green、commits `c36e231c`/`2d722d17`):
+
+**設計のブレイクスルー**: cont.¹⁸ の「ℤ-線形 projection は /k できない」は半分正しく半分誤り。
+`innerLeftℤ χ` は **ℂ 値** (`→ₗ[ℤ] ℂ`) ゆえ `(innerLeftℤ χ).smulRight ((⟨χ,χ⟩)⁻¹ • X)` は ℤ-線形を
+保ったまま `(⟨φ,χ⟩/k)•X` を与える。lattice ℤ[S₁∪{χ,χ̄}] 上では ⟨φ,χ⟩=m·k ゆえ係数 m は整数 = projection
+の整合。**∴ scaled projection で basis-direct 構成が実装できた** (新たな basis 分解は不要だった)。
+
+**構成 (8 lemma)**:
+- `inner_block_expand_gen` (変数ノルム ⟨e,e⟩=ee)
+- `orthoResidualMapS`/`retargetS` + apply (scaled、(⟨χ,χ⟩)⁻¹ 込み)
+- `inner_orthoResidualMapS_left/right` (残差⊥χ、‖χ‖²≠0 のみ)
+- `orthoResidualMapS_mem_zSpan` (残差が ℤ[S₁] 着地)
+- **`retargetS_inner_eq_on_zSpan_union`** (lattice isometry、Gram 一致 ⟨X,X⟩=⟨χ,χ⟩ で項照合、scaling 両辺同一)
+- `retargetS_eq_of_orthogonal`/`retargetS_apply_left`(χ↦X)/`retargetS_apply_right`(χ̄↦X̄)
+- **`retarget_isCoherent_S`** = `retarget_isCoherent` の ‖χ‖²≠1 版。reducible break を base に adjoin して
+  `IsCoherent τ (S₁∪{χ,χ̄}) A` を構成 (extension=retargetS、4 field 全 discharge)。
+
+### ✅ 追補 (commit `0d91d0aa`) — `retargetTargetPair_gen` 完成、(5.6.3) 構成インフラ完備
+
+`retargetTargetPair_gen` (RetargetTargetPairGen 構造 + 構成、`=1` 特化を外すだけ、核心計算は元々
+k-general)。X=D.X, X̄=D.X−τ(χ−χ.conj) の Gram 一致 ⟨X,X⟩=⟨χ,χ⟩/⟨X̄,X̄⟩=⟨χ̄,χ̄⟩ + ZIrr + ⊥ を bundle。
+⟹ **`retarget_isCoherent_S` + `retargetTargetPair_gen` で (5.6.3) reducible-break 構成インフラ完備**
+(coherence 拡張 + target pair 構成、両 axiom-clean)。
+
+### ▶ 残務 (downstream wiring、構成インフラは完成・以降は配線)
+
+1. **`retarget_isCoherent_of_extensionImage_k`** (S08_CoherenceCorePart1:1980 の reducible 版): break χ の
+   `CharacterPsiDecomposition Da` から `retargetTargetPair_gen` で {X,X̄} → `retarget_isCoherent_S` で
+   coherence。norm 計算 huu=k+a² 等は ‖χ‖²=k で。
+2. **reducible-break `coherentDegreeSqNormBound_of_not_coherentW`**: `xAdjoinStepW` の reducible 版を #1 で
+   組む (forward 構成) → 対偶 bound。column の Da は `certainTypeDecompositionDa`/`certainTypeR`。
+3. **`six_two_index_bound_c2` の `hW2B` 撤廃** → `six_three_c2`(induction、hW2B 不要)→
+   `isPGroup_of_not_coherent_c2` → `hbound` → dispatch → S08:59。
+**FT 文脈不変**: (6.8) は orphaned (deferred-payoff)。
+
+## 🔨🎯 2026-06-19 cont.¹⁸ — c2 chain 3 段 landed (既約-break path) + Step-0 residual を構築で確定
+
+新 leaf [`S08_Theorem65c2.lean`](../../OddOrder/Peterfalvi/S08_Theorem65c2.lean) に c2 chain を構築 (全 axiom-clean、
+full build 3864 green):
+
+- **`member_isIrreducible_of_W2_le`** (commit `2cd3d967`) — W₂≤A なら S(A) 全メンバー既約 (column∉S(A))。
+- **`six_two_index_bound_c2` / `six_two_central_c2` / `six_three_index_bound_c2`** (commit `7d043841`) —
+  c1 (`S08_CoherenceCorePart2:3576-3717`) の 3-brick swap ミラー、全初回 build 成功。break 既約性は
+  `member_isIrreducible_of_W2_le` (仮説 `hW2B: W₂≤B`)、η anchor は `Y=S(⁅H,H⁆)⊆S(A)⊆S₁` (仮説 `hAcomm2: A≤⁅H,H⁆`)。
+
+### 🎯 Step-0 residual を**構築で確定** (再調査不要)
+
+`six_three_c2` (minimal-A induction、`six_three:3750` ミラー) に到達して確定: induction は **M=⊥ から**
+minimal coherent A とその直下 maximal-normal B を取り、`six_three_index_bound_c2` に B を渡す。だが
+**内部 B は W₂⊆B を保証しない** (B⊊W₂ もありうる) ⟹ `hW2B` を供給できない。
+
+数学的内実: columns は S(C) (C⊄⊇W₂) に現れ、minimal coherent A の直下 B で **column-transition break**
+(column∈S(B)\S(A)、B=Ker ψ_col∩A) が起きうる ⟹ その break は reducible ⟹ `member_isIrreducible_of_W2_le`
+不適用。**∴ cont.¹⁷ の「B⊊W₂ residual」は real で、avoidable でない** (M=⊥ 必須ゆえ induction を
+W₂⊇ 領域に閉じ込められない)。
+
+### ▶ 唯一の残路 = reducible-break (5.6) = retarget-to-k (bounded、cont.¹⁷ の通り)
+
+`retarget_isCoherent_of_extensionImage` (`S08_CoherenceCorePart1:1980`) を ‖χ‖²=1 → ‖χ‖²=k へ一般化
+((5.4) 層は既に k-general)。これで **reducible-break 対応 `coherentDegreeSqNormBound_of_not_coherentW`** →
+**`six_two_index_bound_c2` の hW2B 不要版** → `six_three_c2` (induction、hW2B 不要) →
+`isPGroup_of_not_coherent_c2` → `hbound` → dispatch。column の R(μⱼ) data は member 側 `caseB_member_orthoDatum`
++ `certainTypeR` で既存。
+
+**🚨 retarget 内部精読で DESIGN 確定 (cont.¹⁸ 末尾、S07 def 確認済) — retarget は本質 norm-1、reducible は
+basis-direct 新規構成が要る**:
+- `orthoResidualMap φ = φ − ⟨φ,χ⟩•χ − ⟨φ,χ̄⟩•χ̄` / `retarget φ = τ₁(φperp) + ⟨φ,χ⟩•X + ⟨φ,χ̄⟩•X̄`
+  (`S07` def 確認) は **projection 係数に ⟨φ,χ⟩ を直接使う = ‖χ‖²=1 ハードコード**。norm-k は ⟨φ,χ⟩/k が
+  要るが `innerLeftℤ` は ℤ 値ゆえ **/k は ℤ-線形性を壊す (k>1 不可)**。`inner_block_expand` も `hee=1` 必須。
+- **∴ retarget 機構 (ℤ-線形 projection) は norm-1 専用で、norh-k への「一般化」は不可。reducible-break は
+  retarget を使わず basis-direct な (5.6.3) 構成を新規に作る**: τ₂ を ℤ[S₁∪{χ,χ̄}] 上に χ↦X, χ̄↦X̄,
+  S₁↦τ₁ で直接定義 (χ,χ̄ が span S₁ と ℤ-独立ゆえ基底拡張で well-defined、projection 不要) + Gram 一致
+  (‖X‖²=‖χ‖²=k, ‖X̄‖²=‖χ̄‖²=k, ⟨X,X̄⟩=0, X⊥τ₁S₁) で isometry。
+- 部品: X=Σ_{α∈E}α (|E|=k) は (5.4.b) `eq_sum_of_psi_eq_zero` (k-general) で取得。R(μⱼ)=`certainTypeR`。
+  **新規 = 基底拡張 isometry の構成補題** (mathlib に Z-module basis 拡張 isometry があるか要調査、なければ自作)。
+- ⚠ 重要: weighted engine は reducible column を **base (certainTypeSet, 既 coherent) に持ち、chain は既約 pair
+  のみ adjoin** する設計。reducible を **break として adjoin** する道は repo に無い (= この新規構成が埋める穴)。
+**∴ 見積 = fresh basis-direct (5.6.3) 構成 (~2-3 session、retarget 一般化でない)**。次 session の一手 =
+basis-direct extension-isometry の構成方針確定 (mathlib basis API 調査) → (5.6.3) 構成。
+**FT 文脈不変**: (6.8) は orphaned (deferred-payoff)。
+
+## 🔄🎯 2026-06-19 cont.¹⁷ — 5-agent workflow が cont.¹⁶「大型 engine 一般化」を覆す + c2 chain が本筋
+
+ultracode (workflow `w8ljahhov`、6 agent / 646k tok) で engine 一般化を mapping。**cont.¹⁶ の
+「hbound = 大型 reducible-break engine 一般化のみ」を訂正**:
+
+### ✅ 本筋 = c2 chain assembly (bricks 全て既存・sorry-free、大半が機械的)
+
+`six_two_index_bound_c2 → six_two_central_c2 → six_three_index_bound_c2 → six_three_c2 →
+isPGroup_of_not_coherent_c2` を **c1 chain (`S08_CoherenceCorePart2:3576-3837`) の 3-fact brick swap** で
+ミラーすれば `hbound` が出る。swap 内容:
+- `exists_coherentBreakPair` → `exists_coherentBreakPair_general` (`S08_CoherenceCorePart1:1035`、全既約不要)
+- `SsubFiltration_hasNoRealCharacters hF` → `S_hasNoRealCharacters_caseB` (`S08_CaseBWeightedEndgame:231`)
+- `sMember_index_le_two_psi hF` → `sSubFiltration_sum_le_two_psi_caseB` (`S08_Theorem63:110`、÷H.index)
+他 (six_two_central/six_three_index_bound/six_three の induction) は **hF-free でそのままミラー**。
+新 leaf `S08_Theorem65c2.lean` 推奨 (CorePart2 凍結)。**見積 ~6-7 定理 / 2-3 session**。
+
+### 🔧 cont.¹⁶ の 2 つの訂正
+
+1. **(6.8.3) bootstrap の break は既に既約** (cont.¹⁶ の「同じ crux でブロック」は誤り): seed endgame
+   `S08_CaseBWeightedEndgame:311-318` は S₁⊇X(W₂)⊇全 column ゆえ break ψ∉S₁ ⟹ column でない ⟹ 既約、を
+   **導出済**。⟹ `sSubFiltration_sum_le_two_psi_caseB` の hψirr は seed level で satisfiable。
+2. **(5.4) CharacterPsiDecomposition 層は既に k-general** (workflow DIM1/2/5 一致): `(5.4.a/b)`
+   `inner_self_chi_re_le_inner_self_X`/`eq_sum_of_psi_eq_zero` 等は `(E.card:ℂ)=⟨χ,χ⟩` で `=1` 非依存。
+   k=1 をハードコードするのは `retargetTargetPair`/`retarget_isCoherent` (`S07:2536/3262`) の最終 (5.6.3) 層のみ。
+   ⟹ **もし reducible-break が要っても、retarget-to-k 一般化のみ (~5-8 lemma)** で cont.¹⁶ の「engine 全体」より小。
+
+### 🎯 唯一の open question = Step 0: (6.3) induction の break 既約性
+
+S の reducible は w₂−1 column のみ。break は S(B)\S₁ (S(A)⊆S₁)。break が column ⟺ column∈S(B) かつ ∉S(A)。
+- **B⊇W₂ なら break 既約** ((6.3) induction で): ✅ **`columnSum_notMem_SsubFiltration_of_le` (commit
+  `2ebb658d`、W₂≤A で column∉S(A)、axiom-clean) で供給**。⚠ workflow の Step-0a「A≤W₂」は向きが逆 —
+  正は **W₂≤A** (column source ψ は W₂⊄Ker ゆえ)。
+- **B⊊W₂ (column-transition break) が残 open**: minimal-A induction が B⊊W₂ の領域に入るか未確定。入るなら
+  その break が column たりうる ⟹ retarget-to-k 一般化 (上記、bounded) が要る。入らないなら純 assembly。
+  **これを (6.3) induction の minimal-A 構造から判定するのが次の決定点** (原文 04.8:32-48 + column kernel 構造)。
+
+### ▶ 次の一手
+
+1. **c2 chain assembly を開始** (regime に関わらず必要): `six_two_index_bound_c2` を新 leaf に、break 既約性を
+   `columnSum_notMem_SsubFiltration_of_le` (B⊇W₂) で discharge or named obligation 化 → 上へミラー。
+2. **Step 0 の B⊊W₂ residual** を induction 構造で判定 (純 assembly か retarget-to-k か確定)。
+**FT 文脈不変**: (6.8) は [[ft-path-policy]] で orphaned (deferred-payoff)。
+
+## ✅🎯 2026-06-19 cont.¹⁶ — 原文精読で cont.¹⁵ 検証確定 + hcaseB 構造データ discharge + hbound 真の crux 特定
+
+ユーザー「数学的ギャップでなければまずはテキストを精読して課題を進めてください」を受け、(5.6)/(5.2)/(6.2)/(6.3)/
+(6.5)/(6.8) を直接精読 (04.7 / 04.8 全文) + Lean 突き合わせ。確定事項:
+
+### ✅ 確定: (6.8) c2 は数学 gap でなく形式化労力 (cont.¹⁵ を原文で検証)
+
+**Theorem (5.6)** (`04.7:59`) は **break character χ の既約性を要求しない** — `χ∈S`, `S₂={χ,χ̄}⊂S` と
+条件 (a)(b)(c) だけ。証明は (5.4)/(5.5)/(5.2.d)/(5.2.e) を使い、これらは全 `χ∈S` (reducible column μⱼ
+含む) で `R(χ)` を持つ。(5.3.b) (`04.7:25`) は明示的に「χ が μⱼ 形 (reducible)」を (4.9) の
+`R(μⱼ)={δⱼωᵢⱼ^σ,−δⱼωᵢₖ^σ}` で処理。⟹ **cont.¹⁵ 正、cont.¹⁴「reducible break = 研究レベル」誤診断確定**。
+
+### 🎯 hbound (6.3 c2 = 本丸) の真の crux 特定 (再調査不要)
+
+**Lean weighted engine の制約**: `coherentDegreeSqNormBound_of_not_coherentW` (`S08_CoherenceWeighted:475`)
+は **メンバー `χmem i` の reducible (`mc i=‖·‖²≠1`) は扱う** が **break `χ:IrreducibleCharacter ↥L`
+(`hχχ:inner χ χ=1`) の既約性は要求**。同様に `sMember_degreeSqNormBound_of_not_coherent`
+(`S08_CaseBEnumeration:620`)・`sSubFiltration_sum_le_two_psi_caseB` (`S08_Theorem63:110`) とも `hψirr` 要求。
+
+**∴ cont.¹⁵ が解決したのは「reducible メンバー」の方。「reducible break character」は別問題で未解決。**
+(6.3) の break は reducible column たりうる: **Y=S(H') は既約** (`04.8:156`「Y⊂Irr L, η_j(1)=|W₁|」) ゆえ
+column∉Y、よって S(B) (B⊊A⊆H') の break が column になりうる (cont.¹⁴ の確定と一致)。
+
+**❌ path 2 (break 常に既約) は RULED OUT (構造的に不成立、再調査不要)**: column μⱼ=Ind θⱼ は θⱼ が
+W₂ 上非自明 (W₂⊄Ker θⱼ、W₂⊆H')、かつ Y=S(H') は既約 (`04.8:156`) ゆえ column∉Y。(6.3) induction
+(A,B⊆H'=⁅H,H⁆) で `B⊆Ker θⱼ` かつ `A⊄Ker θⱼ` となる factor A/B では column が S(B)\S₁ の break になる
+(case A では column∈S(Z), Z=Z(H)∩H' ⊊ H' ゆえ A⊋Z で column∉S(A))。⟹ **break は既約に限定できない。**
+
+**✅ 唯一の経路 = path 1 (engine を reducible break ‖χ‖²=k に一般化 = (5.6) を reducible break で形式化)**。
+スコープ確定 (engine 精読済):
+- **データは既存・新規構成不要**: column の R(μⱼ) decomposition `CharacterPsiDecomposition` は member 側で
+  `caseB_member_orthoDatum` が既に供給 (column を member として扱う weighted 機構)。break も同じ型の object。
+  非対称は **engine だけ** (break を `decompositionDaFromDadeOfDiff`=既約専用で構成し ‖χ‖²=1 を仮定)。
+- **一般化要の engine lemma 3 本** (‖break‖²=1 → ‖break‖²=k):
+  1. **`retarget_isCoherent_of_extensionImage`** (`S08_CoherenceCorePart1:1980`) = (5.6.3) 最終構成。`hχχ=1` を
+     huu/hud/hdd/hdu 内積計算 (`‖(χ−a·χ₁)^τ‖²=1+a²` 等→`=k+a²`) + 拡張 χ^τ₂=X (X=R(χ) の k-subset 和、
+     (5.4.b) `|E|=‖χ‖²`) で使用。**core・最大**。
+  2. **`crux1_of_memberFamilyW`** (`S08_CoherenceWeighted:169`) = (5.6.1)/(5.6.2) λ-form。‖χ‖² 依存を確認要。
+  3. **`xAdjoinStepW`** (`S08_CoherenceWeighted:286`) = break Da を `decompositionDaFromDadeOfDiff` で構成する
+     箇所を一般 `Da : CharacterPsiDecomposition` パラメータ化 (member の Dmem と対称化) + ‖χ‖²=k 配線。
+  → 下流 `coherentDegreeSqNormBound_of_not_coherentW`/`sMember_degreeSqNormBound_of_not_coherent`/
+    `sSubFiltration_sum_le_two_psi_caseB` の `hψirr` を ‖ψ‖²=k 版に差し替え。
+- **見積 = multi-session** (~数百行、core coherence engine 改修)。= (5.6) reducible-break 形式化。
+
+**この crux は hbound (6.3 c2) と hcaseA/hcaseB の (6.8.3) bootstrap `hbreak`
+(`false_of_caseB_break_of_bounds` の named 入力) を全て同時にブロックする (6.8) c2 全体の中心 gate**
+(case A も S(Z) に column を持ち (6.8.3) break が column たりうる)。**∴ 次の本丸 = path 1 のみ。**
+
+### ✅ 進捗: `nonempty_coherent_S_caseB_of_c2` landed (commit `c6114940`、axiom-clean)
+
+dispatch の `hcaseB` producer を整備。`nonempty_coherent_S_caseB_of_c2_data` を強化し FPF/index 構造データ
+(hfpf/hc2/hFPF) を p-群 + 中心 W₂ context から**内部 discharge** → 真の (6.8.3) case 条件
+**hWMgt** (W₂⊊⁅H,H⁆=「Z≠H'」、(6.8.3) 非自明枝)・**hYcard** (m≠2)・**hXne** (X nonempty) だけ named に残す。
+- hfpf = `caseB_fpf_bound` (W₂≤Z(L) via `caseB_W2_le_center_L`、H 非可換 via nilpotency)
+- hc2/hFPF = 算術 (`relIndex_mul_index` + `index_H_eq_card_W1`)。full build 3863 green、sorry 140 維持。
+
+### ▶ 次の一手 (優先順)
+
+1. **hbound (本丸) = path 1 のみ** (path 2 は上記で RULED OUT): reducible-break (5.6) engine 一般化。
+   着手順 = `retarget_isCoherent_of_extensionImage` の ‖χ‖²=k 一般化 (core) → `crux1`/`xAdjoinStepW` →
+   下流 `hψirr`→‖ψ‖²=k 差し替え。multi-session。**この 1 本が hbound/hcaseA/hcaseB 全てを unblock**。
+2. **hcaseA** (case-A producer): `Xset_centralCommutator_isCoherent_of_c2_caseA` → S bootstrap (未構築)。
+3. **dispatch 配線** (S08:59): hbound+hcaseA+`nonempty_coherent_S_caseB_of_c2`+`caseAB_split_of_c2` を
+   `nonempty_coherent_S_of_c2_of_branches` 経由で c2 枝に。c1 枝は `nonempty_coherent_S_of_frobenius` 既存。
+**FT 文脈不変**: (6.8) は [[ft-path-policy]] で orphaned (deferred-payoff) — 閉じても feitThompson sorry は今は減らない。
+
+## ⚠️✅ 2026-06-19 cont.¹⁵ — cont.¹⁴「c2 研究レベル」誤診断を訂正 + hfix (6.4.c) landing
+
+**cont.¹⁴ 末尾「c2-(6.5) 還元の真のブロッカー = reducible-break 対応 generalized (5.6) engine = 研究レベル
+(~2-3 session)」は誤診断**(ユーザー「形式化を研究と誤称するな・原文を読め」フィードバックの対象)。
+原文精読 (04.7/04.8) + repo 監査で確定:
+
+- **Peterfalvi Theorem (5.6) は Hypothesis (5.2) 下で reducible character を完全カバー**(04.7:5 「S = a
+  set of characters of L」(irreducible 非要求)、04.7:59 (5.6) ステートメント、04.7:29「If χ and φ are
+  **reducible**, (5.2.e) follows from the form of R(μⱼ)」)。reducible column μⱼ は最初から (5.2) の対象。
+- **repo に reducible-member 対応の norm-weighted (5.6) engine `coherentDegreeSqNormBound_of_not_coherentW`
+  (S08_CoherenceWeighted:475) が sorry-free で既存**、case-B path (S08_CaseBEnumeration:720) で稼働中。
+  cont.¹⁴ は irreducible 特化版 `coherentDegreeSumBound_of_not_coherent` しか見ず「不適用」と誤判定。
+- ⟹ **c2 を閉じる残務は全て形式化労力 (原文に完全な証明)。「研究」ではない。**
+
+### ✅ hfix (6.4.c) DONE — c2 還元の named 仮説 1/3 充足
+
+`fixedPoints_W1_subset_commutator_of_c2` (S08_PGroupReduction、commit `1278969b`、axiom-clean):
+(4.2)(b) `centralizer_W2` (C_K(w)=W₂) + c2 `W₂⊆⁅H,H⁆` + `commutator_subgroupOf_self` で数行。
+論証は `caseB_W1_dvd_index_commutator` (S08_CaseBEndgame:232-244) の既存パターン。
+⟹ `exists_isPGroup_H_of_c2_of_card_le` の hfix を充足。
+
+### ▶ c2 を閉じる道筋 (確定、すべて形式化労力)
+
+| step | 内容 | 状態 |
+|---|---|---|
+| hcop | `hyp.cases.inr` から `obtain` (Hall coprimality) | 自明 (c2 cases 内) |
+| **hfix (6.4.c)** | `fixedPoints_W1_subset_commutator_of_c2` | ✅ DONE |
+| math A/B split | Z(H)⊓W₂ = ⊥ (case A) or W₂ (case B)、W₂ 素数位数 | 短 |
+| hbound (6.3 c2) | reducible break を既存 `...W` engine で (本丸・最大) | 未着手 |
+| case-A bootstrap | `Xset_centralCommutator_isCoherent_of_c2_caseA` → S coherent | 未着手 |
+| case-B 配線 | `nonempty_coherent_S_caseB_of_structure` (cont.¹³ DONE) + structure data discharge | data discharge 要 |
+
+**最初の goal = c2 dispatch skeleton** (`nonempty_coherent_S_of_c2_of_bounds`): hfix を使い、hbound +
+case-A bootstrap + case-B structure data を named 仮説に残して build-green → (6.8) c2 を named 仮説に帰着
+([[gated-endpoint-skeleton]] パターン)。**次 = hbound (6.3 c2、本丸): reducible break + 既存 `...W` engine 配線。**
+
+case-B structure data discharge (hcen/hderiv/hc2/hFPF/hcZ/hfpf/hW2cenL/hYcard) の素材は在庫:
+`caseB_W1_dvd_index_commutator`/`caseB_W1_dvd_relIndex_commutator` (S08_CaseBEndgame、FPF divisibility)、
+`caseB_fpf_bound` (S08_CaseBEndgame:338) 等。
+
+## ✅✅✅✅ 2026-06-18 cont.¹³ — case-B 核心数学 COMPLETE: seed + anchor + bootstrap (P4+P5+P6a+P6b)
+
+**cont.¹² の残務 (P4 glue + P5 wire + P6 discharge) のうち、case-B 固有の数学を全て完成。**
+新 leaf [`S08_CaseBSeedGlue.lean`](../../OddOrder/Peterfalvi/S08_CaseBSeedGlue.lean) (4 producer、
+全 sorry-free + axiom-clean = propext/Classical.choice/Quot.sound のみ、full build 3859 jobs green):
+
+- **(P4) `coherentXunionYset_caseB`** — seed `IsCoherent hyp.tau (X(W₂) ∪ Y)`。cX=`caseBXset_isCoherent`、
+  ν=`exists_glue_nu_Xset_Yset_via_map`(grid ∪ irreducible-X source、全員 irreducible ゆえ orthonormality
+  自動)、hmixed=`caseB_member_seam_all_Yset`(column 専用 seam を一般メンバ化)、cross-diagonal χ₁−a₁·η₁ で
+  hDτ(anchored image 恒等式)+hgen(`hgen_withDiagonal_Xset`、次数比整数性は hdvd の p-power 可除性から)。
+  commit `e2ac14a4`。
+- **(P5) `nonempty_coherent_S_caseB_of_anchor`** — seed→S coherence(`nonempty_coherent_S_caseB` bootstrap)。
+- **(P6a) `exists_caseB_Xset_anchor`** — 最小次数 p-power anchor。`exists_charValue_one_eq_mul_xBaseBlock_anchor`
+  (Frobenius 版)を case-B へ: `Set.exists_min_image` で最小次数 χ₁ 直接選択、p-power ゆえ最小が全てを割る。
+- **(P6b) `nonempty_coherent_S_caseB_of_structure`** — **case-B 枝を「(6.4)/(6.5) 構造データ + hXne + hYcard」へ
+  完全還元**。anchor=(P6a)、hnonzero=共役差 χ̄−χ(`caseB_irr_conj_diff_support`、no-real ゆえ≠0)、Y-anchor=
+  `Yset_nonempty`。commit `e17be957`。
+
+**⟹ case-B の数学的内容(seed glue + anchor 構成 + p-power 可除性 + 6.8.3 bootstrap)は完全に閉じた。**
+**「hXanchored gap」は cont.¹² の anchored-image route で完全消滅 = ユーザー直接管理は不要に。**
+
+### ▶ 残務 = S08:59 dispatch (case-B 固有でない overarching phase、(6.5) p-群還元にゲート)
+
+`nonempty_coherent_S_caseB_of_structure` を S08:59 に配線するには:
+1. **(6.5) p-群還元** = X-nonempty(H 非可換)から H が p-群(p≥3 odd)を導く。**= dispatch 全体の真のゲート。
+   単一定理として未形式化**(case-A producer `Xset_centralCommutator_isCoherent_of_c2_caseA` も hp/hp3/hHp/hHnonab を
+   仮説で取る ⟹ 還元は dispatch level でまだ無い)。Sibley minimal-counterexample 論法、大型・別 phase。
+2. **構造データ discharge `_of_c2_caseB`** (case-A producer のミラー、未実装) = math-case-B 条件(W₂⊆Z(H)) + p-群 +
+   非可換から hcen/hderiv/hc2/hcZ/hfpf/hFPF/hYcard/hXne を導く。素材は在庫: hfpf=`caseB_fpf_bound`
+   (`S08_CaseBEndgame:338`、hMgt=非可換 + hWMgt 入力)、hFPF=hfpf + index 算術(case-B で W₂⊆H ゆえ
+   W₂.index=|W₁|·(W₂.subgroupOf H).index、∴ |W₁|<index)、hderiv=`commutator_subgroupOf_self`、
+   hcen=case 条件、hcZ=W₂ 素数。**achievable だが多ピース + 下流で (6.5) にゲート**。
+3. **math case A/B split** = Z(H)⊓W₂ が ⊥(case A)か W₂(case B)か(`eq_bot_or_eq_of_le_of_card_prime`、素数位数)。
+4. **Frobenius (c1) 枝** = `nonempty_coherent_S_caseA_of_frobenius`(unconditional、hp/hp3/hHp/hHnonab 要)。
+5. **case-A (c2) 枝** = `Xset_centralCommutator_isCoherent_of_c2_caseA` + S への bootstrap。
+
+**⟹ S08:59 を閉じる残務は case-B seed work でなく overarching dispatch + 未形式化の (6.5) 還元。**
+**FT 文脈不変**: (6.8) は [[ft-path-policy]] で orphaned (deferred-payoff) — 閉じても feitThompson sorry は今は減らない。
+
+## 🔨 2026-06-18 cont.¹⁴ — (6.5) p-群還元に着手 (ユーザー裁可): (6.5)(b) 適用 DONE、残ゲート = (6.3)+(6.4.c)
+
+**(6.5) Theorem 精読** (`04.8:50-74`): (6.4) Hypothesis + ¬coherent(S(M)) ⟹ (a) K/H₁ chief factor +
+`|K:H₁| ≤ 4|L:K|²+1` / (b) K/M 非可換 p-群 / (c) |L:K| ∤ p−1。**(6.8) は M=1,K=H で適用**し by_contra で
+¬coherent を供給 (`04.8:150`「By (6.5), we may assume H is a non-abelian p-group」)。
+
+**🎉 (6.5)(b) の group-theory core は repo に既存・形式化済み** (`S08_CoherenceCorePart1`):
+- `isPGroup_of_isFrobeniusGroup_of_card_le` (`:3120`) = (6.8)(c1) Frobenius 版。
+- `isPGroup_of_isNilpotent_of_coprime_fixedPoints_le_commutator` (`:3159`) = (6.8)(c2) certain-type 版。
+- 両方 **`hbound : |Abelianization H| ≤ 4|W₁|²+1` を唯一の非自明入力**に取る (内部で chief-factor + nilpotent
+  ⟹ p-群 を処理 = `isPGroup_of_isNilpotent_of_isFrobeniusAction_abelianization` `:3097`)。
+
+**✅ cont.¹⁴ 成果 (R1, `057fab18`、新 leaf `S08_PGroupReduction.lean`、sorry-free+axiom-clean)**:
+- odd 側条件 `card_W1_odd`/`card_H_odd`/`card_abelianization_H_odd` (|L| 奇から)。
+- **`exists_isPGroup_H_of_frobenius_of_card_le`** = (c1) 適用 (hyp.cases.inl + odd + hbound → H p-群)。
+- **`exists_isPGroup_H_of_c2_of_card_le`** = (c2) 適用 (W₁-共役 action 構築 + explicit-conj hfix を smul 形へ
+  bridge + hcop + hbound → H p-群)。
+- ⟹ **(6.5)(b) 適用は両ケース完了**。残ゲート 2 本を named 仮説として isolate。
+
+**▶ 残ゲート (cont.¹⁴ で確定、(6.5) 還元の本体)**:
+1. **hbound = Theorem (6.3) の対偶** = 真の bottleneck。(6.3) (`04.8:24`): [H/M nilpotent ∧ S(H₁) coherent ∧
+   |H:H₁|>4|L:K|²+1] ⟹ S(M) coherent。**未 assembled**: arithmetic core (`degreeBound_le_of_sqrt_bound`
+   `:2798`) + nilpotency central step (`isNilpotent_normal_inf_center_ne_bot` `:1100` /
+   `exists_maximal_normal_between` `:1149` / `normal_central_of_maximal_normal_below` `:1175`) は在庫だが、
+   **minimal-A induction の assembly + (6.2) degree bound (`2|L:C|√|C:D| ≥ |K:A|−1`、(5.6) coherence-break
+   sum) が未**。(6.2) 部品 = `theta_degree_le_index_mul_sqrt_index` (`:557`) + break sum (case-B の
+   `sum_re_div_normSq_Xset_eq` を一般 S(A) へ)。**= 大型 (~2-3 session)**。
+   (6.8) M=1 適用: ¬coherent(S) + H nilpotent + S(⁅H,H⁆)=Y coherent (hyp.coherentYset) ⟹ |H:⁅H,H⁆|≤4|W₁|²+1。
+2. **hfix (c2 のみ) = (6.4.c)** = W₁-共役固定点 ⊆ ⁅H,H⁆ (= L/⁅H,H⁆ が kernel H/⁅H,H⁆ の Frobenius)。
+   h46 の (4.2)/(4.6) 構造から導出要。c1 は Frobenius 構造から自動。
+
+**▶ dispatch 全体構造** (S08:59、`(nonempty…).some` で Type 化):
+```
+by_contra hncoh  -- ¬Nonempty(IsCoherent S)
+rcases hyp.cases with hF | ⟨h46,…⟩
+· -- c1: hbound(6.3) → exists_isPGroup_H_of_frobenius → p≥3(odd)+nonabelian(hXe)
+  --     → nonempty_coherent_S_caseA_of_frobenius (既存 unconditional) → contra
+· -- c2: hbound(6.3)+hfix(6.4.c) → exists_isPGroup_H_of_c2 → p-群
+  --     → math A/B split (eq_bot_or_eq_of_le_of_card_prime) →
+  --       A: case-A producer / B: nonempty_coherent_S_caseB_of_structure (cont.¹³) → contra
+```
+非可換 = hXe (Xset ⁅H,H⁆ nonempty ⟹ ⁅H,H⁆≠⊥ via `SsubFiltration_bot` ⟹ commutator ↥H≠⊥)。
+p≥3 = p∣|H|∣|L| 奇 ⟹ p 奇。**⟹ 次の本丸 = Theorem (6.3) assembly ((6.2) break bound + minimal-A induction)**。
+
+### 🔨 cont.¹⁴ 進捗² — (6.3) 着手: (6.2) foundational 2 ピース landed、残 = (6.2) break bound (case-intertwined)
+
+新 leaf `S08_Theorem63.lean` (sorry-free):
+- **`sum_re_div_normSq_SsubFiltration_eq`** (`068ab98c`) = (6.2) の S(A) 次数二乗和
+  `∑_{χ∈S(A)} χ(1)²/‖χ‖² = |L:K|(|K:A|−1)` (case-B `sum_re_div_normSq_Xset_eq` を単一フィルタ簡約)。
+- **`exists_SsubFiltration_member_degree_index`** (`b0df4345`) = (6.2) の degree-|L:K| anchor
+  (A⊊K ⟹ degree-1 char inflate+Ind、divisibility |L:K|∣ψ(1) の源)。
+
+**▶ 残 = (6.2) break bound `|K:A|−1 ≤ 2|L:C|√|C:D|`** = 大型・**case-intertwined**:
+- 部品: break pair `exists_coherentBreakPair_general` (`:1035`) + (5.6) family bound + 上記 sum + theta bound
+  `theta_degree_le_index_mul_sqrt_index` (`:557`)。
+- **🚨 重要発見 (再調査不要)**: (5.6) family bound `sMember_degreeSqNormReBound_of_not_coherent`
+  (`S08_CaseBEnumeration:741`) は **h46 依存** (no-real / 列 Gram は case-B 固有)。break pair も
+  `HasNoRealCharacters Sb` を要求するが **S(A)/S(B) の no-real は c1/c2 で別証明** (c2=列/既約 dichotomy h46
+  依存、c1=Frobenius、既約は odd order)。⟹ **「general (6.2)」は naive に作れない** — (6.2)/(6.3) は (6.8) の
+  c1/c2 case 構造と絡む。raw engine `coherentDegreeSumBound_of_not_coherent` (`:2451`, h46 非依存) から
+  case 別に組むか、(6.8) M=1 適用を c1/c2 で分けて (6.2) を各々具体化する設計判断要。
+- minimal-A induction の部品は在庫 (`exists_maximal_normal_between`/`isNilpotent_normal_inf_center_ne_bot`/
+  `normal_central_of_maximal_normal_below`/`degreeBound_le_of_sqrt_bound`)。
+- **見積 ~1-2 session**。次着手 = (6.2) break bound を c1/c2 case 別 or raw-engine 一般で組む設計を確定 → 実装。
+
+### 🎉🎉 cont.¹⁴ 進捗³ — 特大発見: (6.2)/(6.3)/(6.5) は c1 用に repo 既存・完成 → Frobenius 枝を完全 close
+
+**`S08_CoherenceCorePart2:3538-3837` に (6.2)/(6.3)/(6.5) が Frobenius 用に全実装済みと判明**(精読見落とし):
+- `psi_degree_le_of_source`/`_central` (theta bound)、`six_two`/`six_two_central` (= (6.2))、
+  `six_three_index_bound`/`six_three` (= (6.3) minimal-A induction full)、
+  **`isPGroup_of_not_coherent` (`:3803`) = (6.5) 還元 `¬coherent(S) ⟹ H が p-群`**(全 c1=hF 依存)。
+
+**✅ R2 (`3b8b367a`、`S08_PGroupReduction.lean`、sorry-free+axiom-clean): (6.8) の Frobenius (c1) 枝を完全 close**:
+- `nonempty_coherent_S_of_frobenius` (hF + hXe ⟹ Nonempty(IsCoherent S)): by_contra →
+  `isPGroup_of_not_coherent` → p≥3 (`three_le_of_isPGroup_H`) + 非可換 (`commutator_ne_bot_of_Xset_commutator_nonempty`)
+  → `nonempty_coherent_S_caseA_of_frobenius` → 矛盾。**= S08:59 の c1 分岐そのもの**。
+
+**▶ 残 = c2 (Hyp46) 分岐の (6.5) 還元**。2 ゲート:
+1. **c2 (6.3) = reducible-break subtlety**。c1 の six_two は break ψ を irreducible 要求
+   (`isIrreducibleCharacter_of_mem_S_of_frobenius hF` + (5.6) engine `coherentDegreeSumBound_of_not_coherent`
+   は `χ : IrreducibleCharacter` 必須)。**c2 は S に reducible column を含む** ⟹ break が column なら (5.6) engine
+   不適用。**⚠ T63-1/T63-2 (sSubFiltration sum + bound) は ψ irreducible 前提ゆえ c2-(6.3) が reducible break を
+   生むなら off-path** = 要検証 ([[pf-s08-caseb-seed-route-uncertain]] 型の不確実性)。c2-(6.3) の break が
+   構造的に irreducible と示せるか(列が S(A) に常に入り break から除外されるか)を次に精査。
+2. **hfix = (6.4.c)**(W₁-共役固定点⊆⁅H,H⁆、h46 から導出、`exists_isPGroup_H_of_c2_of_card_le` 入力)。
+
+**dispatch 配線は保留**: `nonempty_coherent_S_of_frobenius` は S08_PGroupReduction 在(S08_CoherenceTheorems の
+下流)ゆえ直接 import 不可。c1 piece は S08_CoherenceCore 上流の素材のみ使う ⟹ 将来 upstream 移設 or hub に inline。
+**c2 が揃ってから一括配線**(中間 sorry を hub に残さない)。
+
+### ⚠ cont.¹⁴ 精査結果 — c2-(6.3) break は reducible になりうる(確定) ⟹ T63-2 は一般 c2 で off-path
+
+**確定 (再調査不要)**: c2-(6.3) の minimal-A induction (A: 1→[H,H]) で break ψ∈S(B) は **column(reducible)に
+なりうる**。論拠: 列は W₂⊄ker ⟹(W₂⊆[H,H] ゆえ)[H,H]⊄ker ⟹ 列∉Yset=S([H,H]) だが、**B⊊[H,H] には
+B⊆ker(列源) で列が S(B) に入りうる**。break は S₁⊇S(A) の外ゆえ、S(A) が全列を含まない regime では列 break が起こる。
+⟹ **(5.6) engine `coherentDegreeSumBound_of_not_coherent` (`χ:IrreducibleCharacter` 必須) が列 break に不適用**。
+⟹ **T63-2 (`sSubFiltration_sum_le_two_psi_caseB`, ψ irreducible 前提) は c2-(6.3) の一般 break には off-path**
+(irreducible break sub-case のみ; T63-1 S(A)-sum は break 非依存ゆえ汎用)。
+
+**▶ c2-(6.5) 還元の真のブロッカー = reducible break 対応の generalized (5.6) engine**(列 break pair {μ_j, μ_j⁻¹}
+の norm-weighted bound; 既存 engine は irreducible 専用)。これは新規の substantial piece。+ hfix=(6.4.c)。
+**設計選択肢**: (i) generalized (5.6) engine 実装 / (ii) c2-(6.3) で列 break を case-B 列機構で別処理 /
+(iii) 列を含まない decomposition への restructure。**次 session で設計確定要**(研究レベル、~2-3 session)。
+**⟹ 現状サマリ: (6.8) c1 完全 close、c2 は reducible-break engine がブロッカーで研究レベル。**
+
 ## 🚨🚨 2026-06-18 cont.¹² — 重大訂正: 「真の gate = hDeg = (6.6)」は **誤り**。(6.8.2) は anchored-image で chain/hDeg 不要
 
 **教科書 04.8 の (6.8) proof を直接精読(L140-235)して判明。cont.⁸/⁹/¹⁰ の「case-B X-coherence の真の gate =

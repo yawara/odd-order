@@ -421,6 +421,108 @@ noncomputable def caseB_member_orthoDatum
     exact dadeOrthonormalCharacterImageFamilyOfDiff_orthogonal hyp.dade hyp.hconj
       hreal hdiffsupp hrealχ hdiffsuppχ hxχ hxχbar hxbarχ hxbarχbar
 
+/-- **(6.8.2) per-member `(5.4)` decomposition bundled with its (5.2.e) cross-orthogonality, for a
+reducible certain-type COLUMN break.**
+
+The column-break analogue of `caseB_member_orthoDatum`: the break being adjoined is a reducible
+certain-type column `μ_b = columnSum χ₂b` (not an irreducible pair), so each member's image family
+`R(x)` must be orthogonal to the column break's family `R(μ_b) = certainTypeR χ₂b`.  The member
+`Dmem`/`htau1` are produced exactly as in the irreducible-break case (break-independent); only the
+cross-orthogonality changes, dispatched on the member dichotomy:
+
+* **column member** `x = columnSum χ₂x` — `certainTypeR(χ₂x) ⊥ certainTypeR(χ₂b)` by
+  `certainTypeR_imageSet_orthogonal_certainTypeR` (column×column (5.2.e), 4a), whose disjointness
+  `χ₂x ≠ χ₂b`, `χ₂x ≠ χ₂b⁻¹` is forced by `x ≠ μ_b`, `x ≠ μ̄_b`;
+* **irreducible member** `x = Ind θ` — `dadeOfDiff(x) ⊥ certainTypeR(χ₂b)` by
+  `dadeOfDiff_imageSet_orthogonal_certainTypeR` (irreducible×column, the conjugate-symmetry swap).
+
+Unlike `caseB_member_orthoDatum`, neither branch needs the member⊥break inner products — the
+column-break cross-orthogonality is structural (V-vanishing / grid disjointness). -/
+noncomputable def caseB_member_orthoDatum_columnBreak
+    (hyp : SibleyDadeHypothesis G L H) [H.Normal]
+    (h46 : OddOrder.Peterfalvi.S06.Hypothesis46 (sharpImage H) L) (hHK : h46.K = H)
+    [NeZero (Nat.card h46.W1)] [Invertible (Nat.card ↥h46.K : ℂ)]
+    [Fintype ↥(h46.W1 ⊔ h46.W2)] [Invertible (Nat.card ↥(h46.W1 ⊔ h46.W2) : ℂ)]
+    [Fintype (OddOrder.Peterfalvi.S06.ticVdiff h46).W]
+    [Invertible (Nat.card (OddOrder.Peterfalvi.S06.ticVdiff h46).W : ℂ)]
+    {S₁ : Set (ClassFunction ↥L ℂ)} (hS₁sub : S₁ ⊆ hyp.S)
+    (hS₁coh : OddOrder.Peterfalvi.S07.IsCoherent hyp.tau S₁
+      (OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L))
+    (hS₁conj : OddOrder.Peterfalvi.S03.ClosedUnderConjugate S₁)
+    {x : ClassFunction ↥L ℂ} (hxS₁ : x ∈ S₁)
+    (hνZ : hS₁coh.extension x ∈ ZIrr G)
+    {χ₂b : (h46.W2.subgroupOf (h46.W1 ⊔ h46.W2)) →* ℂˣ} (hχ₂b : χ₂b ≠ 1)
+    (hdegb : (∑ i, ((h46.columnFamily χ₂b).mu i : ClassFunction ↥L ℂ) 1)
+      = (∑ i, ((h46.columnFamily χ₂b⁻¹).mu i : ClassFunction ↥L ℂ) 1))
+    (hxneq : x ≠ OddOrder.Peterfalvi.S06.columnSum h46 χ₂b)
+    (hxneq' : x ≠ (OddOrder.Peterfalvi.S06.columnSum h46 χ₂b).conj) :
+    { D : OddOrder.Peterfalvi.S07.CharacterPsiDecomposition hyp.tau x 0 //
+      (∀ α ∈ D.imageFamily.imageSet,
+          ∀ β ∈ (OddOrder.Peterfalvi.S06.certainTypeR h46 hχ₂b hdegb).imageSet,
+            ClassFunction.inner α β = 0) ∧
+        D.tau1 x = hS₁coh.extension x } := by
+  classical
+  haveI : Fintype ↥H := Fintype.ofFinite _
+  have hxS : x ∈ hyp.S := hS₁sub hxS₁
+  by_cases hcolumn : ∃ χ₂ : (h46.W2.subgroupOf (h46.W1 ⊔ h46.W2)) →* ℂˣ, χ₂ ≠ 1 ∧
+      OddOrder.Peterfalvi.S06.columnSum h46 χ₂ = x
+  · -- reducible certain-type column member branch
+    set χ₂ : (h46.W2.subgroupOf (h46.W1 ⊔ h46.W2)) →* ℂˣ := hcolumn.choose with hχ₂def
+    have hχ₂ : χ₂ ≠ 1 := hcolumn.choose_spec.1
+    have hcol : OddOrder.Peterfalvi.S06.columnSum h46 χ₂ = x := hcolumn.choose_spec.2
+    have hμ_S1 : OddOrder.Peterfalvi.S06.columnSum h46 χ₂ ∈ S₁ := by rw [hcol]; exact hxS₁
+    have hμbar_S1 : (OddOrder.Peterfalvi.S06.columnSum h46 χ₂).conj ∈ S₁ :=
+      hS₁conj.conj_mem hμ_S1
+    have hνZ' : hS₁coh.extension (OddOrder.Peterfalvi.S06.columnSum h46 χ₂) ∈ ZIrr G := by
+      rw [hcol]; exact hνZ
+    have hsupp : (OddOrder.Peterfalvi.S06.columnSum h46 χ₂
+        - (OddOrder.Peterfalvi.S06.columnSum h46 χ₂).conj).support ⊆
+        OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L := by
+      rw [OddOrder.Peterfalvi.S06.columnSum_conj_eq]
+      exact OddOrder.Peterfalvi.S06.columnDiff_support_subset h46 hχ₂ (inv_ne_one.mpr hχ₂)
+        (OddOrder.Peterfalvi.S06.columnSum_inv_apply_one h46 χ₂).symm
+    -- disjointness of the member column from the break column (and its inverse).
+    have hne1 : χ₂ ≠ χ₂b := fun he => hxneq (by rw [← hcol, he])
+    have hne2 : χ₂ ≠ χ₂b⁻¹ := fun he =>
+      hxneq' (by rw [← hcol, OddOrder.Peterfalvi.S06.columnSum_conj_eq, he])
+    exact hcol ▸ (⟨OddOrder.Peterfalvi.S06.certainTypeMemberDecomposition h46 hχ₂
+        (OddOrder.Peterfalvi.S06.columnSum_inv_apply_one h46 χ₂).symm
+        (caseB_column_mapagree hyp h46 hχ₂) hS₁coh hμ_S1 hμbar_S1 hνZ'
+        (OddOrder.Peterfalvi.S07.mem_zSupportedSpan_iff.mpr
+          ⟨Submodule.sub_mem _ (Submodule.subset_span hμ_S1) (Submodule.subset_span hμbar_S1),
+            hsupp⟩),
+      OddOrder.Peterfalvi.S06.certainTypeR_imageSet_orthogonal_certainTypeR h46 hχ₂ hχ₂b
+        (OddOrder.Peterfalvi.S06.columnSum_inv_apply_one h46 χ₂).symm hdegb hne1 hne2,
+      rfl⟩ :
+      { D : OddOrder.Peterfalvi.S07.CharacterPsiDecomposition hyp.tau
+          (OddOrder.Peterfalvi.S06.columnSum h46 χ₂) 0 //
+        (∀ α ∈ D.imageFamily.imageSet,
+            ∀ β ∈ (OddOrder.Peterfalvi.S06.certainTypeR h46 hχ₂b hdegb).imageSet,
+              ClassFunction.inner α β = 0) ∧
+          D.tau1 (OddOrder.Peterfalvi.S06.columnSum h46 χ₂)
+            = hS₁coh.extension (OddOrder.Peterfalvi.S06.columnSum h46 χ₂) })
+  · -- irreducible member branch
+    have hirrx : IsIrreducibleCharacter x :=
+      (caseB_S_member_column_or_irreducible hyp h46 hHK hxS).resolve_left hcolumn
+    have hreal : ¬ ClassFunction.IsReal x := by
+      have h := hxS; rw [hyp.S_eq, Set.mem_setOf_eq] at h
+      obtain ⟨θ, hθne, hxeq⟩ := h
+      rw [hxeq]; exact caseB_irr_nonreal hyp (hxeq ▸ hirrx)
+    have hdiffsupp : (x.conj - x).support ⊆
+        OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L := by
+      have h := hxS; rw [hyp.S_eq, Set.mem_setOf_eq] at h
+      obtain ⟨θ, hθne, hxeq⟩ := h
+      rw [hxeq]; exact caseB_irr_conj_diff_support hyp θ
+    have hχχbar : ClassFunction.inner x x.conj = 0 := by
+      have h := hxS; rw [hyp.S_eq, Set.mem_setOf_eq] at h
+      obtain ⟨θ, hθne, hxeq⟩ := h
+      rw [hxeq]; exact caseB_irr_conj_inner hyp (hxeq ▸ hirrx)
+    refine ⟨memberExtensionDecomposition hyp.dade hyp.hconj hS₁coh ⟨x, hirrx⟩
+      hreal hdiffsupp hxS₁ (hS₁conj.conj_mem hxS₁) hνZ hχχbar, ?_, rfl⟩
+    -- `(Dmem).imageFamily = R(x)` (Dade difference family) `⊥ R(μ_b) = certainTypeR χ₂b`.
+    exact dadeOfDiff_imageSet_orthogonal_certainTypeR hyp h46 hHK hχ₂b hdegb ⟨x, hirrx⟩
+      hreal hdiffsupp
+
 /-- **Peterfalvi (6.8.2) case-(B): distinct `S`-members are pairwise orthogonal.**
 
 For distinct members `x ≠ y` of `S` (any two, not just the `X(W₂) ∪ Y` seed), `⟨x, y⟩ = 0`.  This
@@ -598,6 +700,88 @@ theorem caseB_breakChar_fields
     hortho ψ hψS hψnotS1,
     hortho ψ.conj (hyp.S_closedUnderConjugate.conj_mem hψS) hψcnotS1⟩
 
+/-- **(6.8.3) case-(B) break-character fields for a reducible certain-type COLUMN break.**
+
+The column analogue of `caseB_breakChar_fields`: for a certain-type column `μ_b = columnSum χ₂b`
+(`χ₂b ≠ 1`) whose pair `{μ_b, μ̄_b}` is disjoint from the coherent set `S₁`, the eight
+break-character facts the norm-weighted (5.6) engine consumes — with the self/cross norms now
+`‖μ_b‖² = ‖μ̄_b‖² = w₁ ≠ 0` (not `= 1`, since `μ_b` is reducible), supplied to the reducible-break
+contrapositive `coherentDegreeSqNormBound_of_not_coherentW_k`.  All from the certain-type column
+machinery: `columnFamily_mu_sum_inner` (grid norms, `⟨μ_b, μ_b⟩ = w₁`, `⟨μ_b, μ̄_b⟩ = 0` since
+`χ₂b ≠ χ₂b⁻¹`), `columnSum_conj_eq` (`μ̄_b = columnSum χ₂b⁻¹`), `column_inv_ne_self`,
+`columnDiff_support_subset` (support), and `caseB_S_pairwise_orthogonal` (`μ_b, μ̄_b ∈ S` via
+`columnSum_mem_S`, distinct from `S₁`-members). -/
+theorem caseB_breakChar_fields_columnBreak
+    (hyp : SibleyDadeHypothesis G L H) [H.Normal]
+    (h46 : OddOrder.Peterfalvi.S06.Hypothesis46 (sharpImage H) L) (hHK : h46.K = H)
+    (hW1 : h46.W1 = hyp.W1)
+    [NeZero (Nat.card h46.W1)] [Invertible (Nat.card ↥h46.K : ℂ)]
+    [Fintype ↥(h46.W1 ⊔ h46.W2)] [Invertible (Nat.card ↥(h46.W1 ⊔ h46.W2) : ℂ)]
+    {S₁ : Set (ClassFunction ↥L ℂ)} (hS₁sub : S₁ ⊆ hyp.S)
+    {χ₂b : (h46.W2.subgroupOf (h46.W1 ⊔ h46.W2)) →* ℂˣ} (hχ₂b : χ₂b ≠ 1)
+    (hψnotS1 : OddOrder.Peterfalvi.S06.columnSum h46 χ₂b ∉ S₁)
+    (hψcnotS1 : (OddOrder.Peterfalvi.S06.columnSum h46 χ₂b).conj ∉ S₁) :
+    ¬ ClassFunction.IsReal (OddOrder.Peterfalvi.S06.columnSum h46 χ₂b) ∧
+      ClassFunction.inner (OddOrder.Peterfalvi.S06.columnSum h46 χ₂b)
+          (OddOrder.Peterfalvi.S06.columnSum h46 χ₂b) ≠ 0 ∧
+      ClassFunction.inner (OddOrder.Peterfalvi.S06.columnSum h46 χ₂b).conj
+          (OddOrder.Peterfalvi.S06.columnSum h46 χ₂b).conj ≠ 0 ∧
+      ClassFunction.inner (OddOrder.Peterfalvi.S06.columnSum h46 χ₂b).conj
+          (OddOrder.Peterfalvi.S06.columnSum h46 χ₂b) = 0 ∧
+      ClassFunction.inner (OddOrder.Peterfalvi.S06.columnSum h46 χ₂b)
+          (OddOrder.Peterfalvi.S06.columnSum h46 χ₂b).conj = 0 ∧
+      (((OddOrder.Peterfalvi.S06.columnSum h46 χ₂b).conj
+          - OddOrder.Peterfalvi.S06.columnSum h46 χ₂b).support ⊆
+        OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L) ∧
+      (∀ χ ∈ S₁, ClassFunction.inner (OddOrder.Peterfalvi.S06.columnSum h46 χ₂b) χ = 0) ∧
+      (∀ χ ∈ S₁, ClassFunction.inner (OddOrder.Peterfalvi.S06.columnSum h46 χ₂b).conj χ = 0) := by
+  classical
+  have hw1ne : (Nat.card h46.W1 : ℂ) ≠ 0 := Nat.cast_ne_zero.mpr Nat.card_pos.ne'
+  have hμS : OddOrder.Peterfalvi.S06.columnSum h46 χ₂b ∈ hyp.S :=
+    hyp.columnSum_mem_S h46 hHK hχ₂b
+  have hμbarS : (OddOrder.Peterfalvi.S06.columnSum h46 χ₂b).conj ∈ hyp.S := by
+    rw [OddOrder.Peterfalvi.S06.columnSum_conj_eq]
+    exact hyp.columnSum_mem_S h46 hHK (inv_ne_one.mpr hχ₂b)
+  -- self/cross norms via `columnFamily_mu_sum_inner` (`= if χ₂=χ₂' then w₁ else 0`).
+  have hψψ : ClassFunction.inner (OddOrder.Peterfalvi.S06.columnSum h46 χ₂b)
+      (OddOrder.Peterfalvi.S06.columnSum h46 χ₂b) ≠ 0 := by
+    rw [OddOrder.Peterfalvi.S06.columnSum_def,
+      OddOrder.Peterfalvi.S06.columnFamily_mu_sum_inner, if_pos rfl]
+    exact hw1ne
+  have hψbarψbar : ClassFunction.inner (OddOrder.Peterfalvi.S06.columnSum h46 χ₂b).conj
+      (OddOrder.Peterfalvi.S06.columnSum h46 χ₂b).conj ≠ 0 := by
+    rw [OddOrder.Peterfalvi.S06.columnSum_conj_eq, OddOrder.Peterfalvi.S06.columnSum_def,
+      OddOrder.Peterfalvi.S06.columnFamily_mu_sum_inner, if_pos rfl]
+    exact hw1ne
+  have hψbarψ : ClassFunction.inner (OddOrder.Peterfalvi.S06.columnSum h46 χ₂b).conj
+      (OddOrder.Peterfalvi.S06.columnSum h46 χ₂b) = 0 := by
+    rw [OddOrder.Peterfalvi.S06.columnSum_conj_eq, OddOrder.Peterfalvi.S06.columnSum_def,
+      OddOrder.Peterfalvi.S06.columnSum_def, OddOrder.Peterfalvi.S06.columnFamily_mu_sum_inner,
+      if_neg (OddOrder.Peterfalvi.S06.column_inv_ne_self h46 hχ₂b)]
+  have hψψbar : ClassFunction.inner (OddOrder.Peterfalvi.S06.columnSum h46 χ₂b)
+      (OddOrder.Peterfalvi.S06.columnSum h46 χ₂b).conj = 0 := by
+    rw [OddOrder.Peterfalvi.S06.columnSum_conj_eq, OddOrder.Peterfalvi.S06.columnSum_def,
+      OddOrder.Peterfalvi.S06.columnSum_def, OddOrder.Peterfalvi.S06.columnFamily_mu_sum_inner,
+      if_neg (OddOrder.Peterfalvi.S06.column_inv_ne_self h46 hχ₂b).symm]
+  have hreal : ¬ ClassFunction.IsReal (OddOrder.Peterfalvi.S06.columnSum h46 χ₂b) := by
+    intro hr
+    have heq : (OddOrder.Peterfalvi.S06.columnSum h46 χ₂b).conj
+      = OddOrder.Peterfalvi.S06.columnSum h46 χ₂b := hr
+    rw [heq] at hψψbar
+    exact hψψ hψψbar
+  have hdiffsupp : ((OddOrder.Peterfalvi.S06.columnSum h46 χ₂b).conj
+      - OddOrder.Peterfalvi.S06.columnSum h46 χ₂b).support ⊆
+      OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L := by
+    rw [OddOrder.Peterfalvi.S06.columnSum_conj_eq]
+    exact OddOrder.Peterfalvi.S06.columnDiff_support_subset h46 (inv_ne_one.mpr hχ₂b) hχ₂b
+      (OddOrder.Peterfalvi.S06.columnSum_inv_apply_one h46 χ₂b)
+  have hortho : ∀ φ, φ ∈ hyp.S → φ ∉ S₁ → ∀ χ ∈ S₁, ClassFunction.inner φ χ = 0 :=
+    fun φ hφS hφnotS1 χ hχ =>
+      caseB_S_pairwise_orthogonal hyp h46 hHK hW1 φ hφS χ (hS₁sub hχ)
+        (fun he => hφnotS1 (by rw [he]; exact hχ))
+  exact ⟨hreal, hψψ, hψbarψbar, hψbarψ, hψψbar, hdiffsupp,
+    hortho _ hμS hψnotS1, hortho _ hμbarS hψcnotS1⟩
+
 /-- **Peterfalvi (6.8.3) case-(B) norm-weighted member-family degree-square bound** (brick 3, the
 weighted analogue of `sMember_degreeSumBound_of_not_coherent`).
 
@@ -730,6 +914,161 @@ theorem sMember_degreeSqNormBound_of_not_coherent
     fun j => by have h := hmemortho j j; rwa [if_pos rfl] at h,
     fun j => by rw [hdeg_eq j, hi₁eq], by rw [hψratio, hi₁eq], hbound⟩
 
+/-- **(6.8.3) case-(B) norm-weighted member-family degree bound, reducible COLUMN break.**
+
+The column-break analogue of `sMember_degreeSqNormBound_of_not_coherent`: the adjoined break is a
+reducible certain-type column `μ_b = columnSum χ₂b` (not an irreducible pair).  Same conclusion
+`∑ⱼ degⱼ²/mcⱼ ≤ 2a`, via the reducible-break engine: break fields from
+`caseB_breakChar_fields_columnBreak` (4b), per-member datum from `caseB_member_orthoDatum_columnBreak`
+(4c), break decomposition `columnDecompositionTau` (over `hyp.tau`, `tau1 = hyp.tau`, image family
+`columnRFamilyTau` with `imageSet = certainTypeR χ₂b` so the 4c raw orthogonality is definitionally
+`.Orthogonal`), and the bound from the reducible contrapositive
+`coherentDegreeSqNormBound_of_not_coherentW_k`. -/
+theorem sMember_degreeSqNormBound_of_not_coherent_columnBreak
+    (hyp : SibleyDadeHypothesis G L H) [H.Normal]
+    (h46 : OddOrder.Peterfalvi.S06.Hypothesis46 (sharpImage H) L) (hHK : h46.K = H)
+    (hW1 : h46.W1 = hyp.W1)
+    [NeZero (Nat.card h46.W1)] [Invertible (Nat.card ↥h46.K : ℂ)]
+    [Fintype ↥(h46.W1 ⊔ h46.W2)] [Invertible (Nat.card ↥(h46.W1 ⊔ h46.W2) : ℂ)]
+    [Fintype (OddOrder.Peterfalvi.S06.ticVdiff h46).W]
+    [Invertible (Nat.card (OddOrder.Peterfalvi.S06.ticVdiff h46).W : ℂ)]
+    {S₁ : Set (ClassFunction ↥L ℂ)} (hS₁sub : S₁ ⊆ hyp.S)
+    (hS₁conj : OddOrder.Peterfalvi.S03.ClosedUnderConjugate S₁) (hS₁fin : S₁.Finite)
+    (hS₁coh : OddOrder.Peterfalvi.S07.IsCoherent hyp.tau S₁
+      (OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L))
+    {η : ClassFunction ↥L ℂ} (hηY : η ∈ hyp.Yset) (hηS₁ : η ∈ S₁)
+    {χ₂b : (h46.W2.subgroupOf (h46.W1 ⊔ h46.W2)) →* ℂˣ} (hχ₂b : χ₂b ≠ 1)
+    (hψnotS1 : OddOrder.Peterfalvi.S06.columnSum h46 χ₂b ∉ S₁)
+    (hψcnotS1 : (OddOrder.Peterfalvi.S06.columnSum h46 χ₂b).conj ∉ S₁)
+    (hnc : ¬ Nonempty (OddOrder.Peterfalvi.S07.IsCoherent hyp.tau
+      (S₁ ∪ {OddOrder.Peterfalvi.S06.columnSum h46 χ₂b,
+        (OddOrder.Peterfalvi.S06.columnSum h46 χ₂b).conj})
+      (OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L))) :
+    ∃ (k : ℕ) (χmem : Fin k → ClassFunction ↥L ℂ) (mc : Fin k → ℝ) (deg : Fin k → ℕ) (a : ℕ),
+      Function.Injective χmem ∧
+      Set.range χmem = S₁ ∧
+      (∀ j, 0 < mc j) ∧
+      (∀ j, ClassFunction.inner (χmem j) (χmem j) = (mc j : ℂ)) ∧
+      (∀ j, χmem j 1 = (deg j : ℂ) * η 1) ∧
+      OddOrder.Peterfalvi.S06.columnSum h46 χ₂b 1 = (a : ℂ) * η 1 ∧
+      ∑ j : Fin k, ((deg j : ℝ)) ^ 2 / mc j ≤ 2 * (a : ℝ) := by
+  classical
+  -- (1) the ψ-independent member family (brick 2) — identical to the irreducible-break case.
+  obtain ⟨k, χmem, mc, hinj, hrange, hmemS1set, hmcpos, hmemortho⟩ :=
+    exists_sMemberOrthogonalFamilyW hyp h46 hHK hW1 hS₁sub hS₁fin
+  have hmemS : ∀ j, χmem j ∈ hyp.S := fun j => hS₁sub (hmemS1set j)
+  obtain ⟨i₁, hi₁eq⟩ : η ∈ Set.range χmem := by rw [hrange]; exact hηS₁
+  have hηirr : IsIrreducibleCharacter η := hyp.isIrreducibleCharacter_of_mem_Yset hηY
+  have hηdeg : η 1 = (Nat.card hyp.W1 : ℂ) := hyp.Yset_apply_one hηY
+  have hanchordeg : χmem i₁ 1 = (Nat.card hyp.W1 : ℂ) := by rw [hi₁eq]; exact hηdeg
+  have hW1ne : (Nat.card hyp.W1 : ℂ) ≠ 0 := Nat.cast_ne_zero.mpr Nat.card_pos.ne'
+  have hanchorNorm : mc i₁ = 1 := by
+    have h := hmemortho i₁ i₁; rw [if_pos rfl] at h
+    have h1 : ClassFunction.inner (χmem i₁) (χmem i₁) = 1 := by
+      have hirr : IsIrreducibleCharacter (χmem i₁) := by rw [hi₁eq]; exact hηirr
+      have := irreducibleCharacter_inner_eq_ite (⟨χmem i₁, hirr⟩ : IrreducibleCharacter ↥L)
+        ⟨χmem i₁, hirr⟩
+      rwa [if_pos rfl] at this
+    rw [h1] at h; exact_mod_cast h.symm
+  choose deg hdeg_pos hdeg_eq using fun j =>
+    hyp.sMember_charValue_one_eq_mul_anchor (hmemS j) hanchordeg
+  have hdeg_i₁ : deg i₁ = 1 := by
+    have h := hdeg_eq i₁; rw [hanchordeg] at h
+    have hd1 : (deg i₁ : ℂ) = 1 := mul_right_cancel₀ hW1ne (by rw [one_mul]; exact h.symm)
+    exact_mod_cast hd1
+  have hmemdegdiffsupp : ∀ i ∈ (Finset.univ : Finset (Fin k)),
+      ((χmem i) - deg i • (χmem i₁)).support ⊆
+        OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L :=
+    fun i _ => hyp.sMember_scaledDiffSupport_of_charValue_eq (hmemS i) (hmemS i₁) (hdeg_eq i)
+  have hanchorIrr : IsIrreducibleCharacter (χmem i₁) := by rw [hi₁eq]; exact hηirr
+  -- (4) column break fields (4b) and the degree ratio.
+  obtain ⟨_hrealψ, hψψne, hψbarψbarne, hψbarψ, hψψbar, hdiffsuppψ, hψ_S1, hψbar_S1⟩ :=
+    caseB_breakChar_fields_columnBreak hyp h46 hHK hW1 hS₁sub hχ₂b hψnotS1 hψcnotS1
+  have hψS : OddOrder.Peterfalvi.S06.columnSum h46 χ₂b ∈ hyp.S :=
+    hyp.columnSum_mem_S h46 hHK hχ₂b
+  obtain ⟨a, _ha_pos, hψratio⟩ := hyp.sMember_charValue_one_eq_mul_anchor hψS hanchordeg
+  have hdiffasuppψ : (OddOrder.Peterfalvi.S06.columnSum h46 χ₂b - a • (χmem i₁)).support ⊆
+      OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L :=
+    hyp.sMember_scaledDiffSupport_of_charValue_eq hψS (hmemS i₁) hψratio
+  -- the column virtual `μ_b ∈ ℤ[Irr L]` (sum of irreducibles), and the `H^#`-supported Dade image.
+  have hψZ : OddOrder.Peterfalvi.S06.columnSum h46 χ₂b ∈ ZIrr ↥L := by
+    rw [OddOrder.Peterfalvi.S06.columnSum_def]
+    exact Submodule.sum_mem _ (fun i _ => ((h46.columnFamily χ₂b).mu i).mem_ZIrr)
+  have htau1ψ : hyp.tau (OddOrder.Peterfalvi.S06.columnSum h46 χ₂b - a • (χmem i₁)) ∈ ZIrr G :=
+    OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap_mem_ZIrr_of_supported hyp.dade hyp.hconj
+      hdiffasuppψ
+      (Submodule.sub_mem _ hψZ (nsmul_mem hanchorIrr.mem_ZIrr a))
+  -- (5) generation bridges; `hbar1` from the column's real degree.
+  have hcover : ∀ x ∈ S₁, ∃ j, j ∈ (Finset.univ : Finset (Fin k)) ∧ χmem j = x := by
+    intro x hx; rw [← hrange] at hx; obtain ⟨j, hj⟩ := hx; exact ⟨j, Finset.mem_univ j, hj⟩
+  have hSgen := OddOrder.Peterfalvi.S07.span_subset_span_zSupportedSpan_union_anchor_of_scaledDiffs
+    (s := (Finset.univ : Finset (Fin k))) (χmem := χmem) (deg := deg) (i₁ := i₁)
+    hcover (Finset.mem_univ i₁) (fun j _ => hmemS1set j) hmemdegdiffsupp
+  have hbar1 : (OddOrder.Peterfalvi.S06.columnSum h46 χ₂b).conj 1
+      = OddOrder.Peterfalvi.S06.columnSum h46 χ₂b 1 := by
+    rw [OddOrder.Peterfalvi.S06.columnSum_conj_eq, OddOrder.Peterfalvi.S06.columnSum_apply_one,
+      OddOrder.Peterfalvi.S06.columnSum_apply_one]
+    exact OddOrder.Peterfalvi.S06.columnSum_inv_apply_one h46 χ₂b
+  have hchi1_ne : (χmem i₁) 1 ≠ 0 := by rw [hanchordeg]; exact hW1ne
+  have h1A : (1 : ↥L) ∉ OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L := by
+    rw [OddOrder.Peterfalvi.S04.mem_supportInSubgroup]; intro hmem; exact hmem.2 (by simp)
+  have hgen := OddOrder.Peterfalvi.S07.zSupportedSpan_adjoinPair_subset_span_of_anchorGeneration
+    (χ := OddOrder.Peterfalvi.S06.columnSum h46 χ₂b)
+    (chibar := (OddOrder.Peterfalvi.S06.columnSum h46 χ₂b).conj) (chi1 := (χmem i₁)) (a := a)
+    hSgen hψratio hbar1 hchi1_ne h1A
+  -- (6) per-member datum against the column break family (4c, raw `imageSet`-orthogonality).
+  have hdegb : (∑ i, ((h46.columnFamily χ₂b).mu i : ClassFunction ↥L ℂ) 1)
+      = (∑ i, ((h46.columnFamily χ₂b⁻¹).mu i : ClassFunction ↥L ℂ) 1) :=
+    (OddOrder.Peterfalvi.S06.columnSum_inv_apply_one h46 χ₂b).symm
+  have datum : ∀ i : Fin k,
+      { D : OddOrder.Peterfalvi.S07.CharacterPsiDecomposition hyp.tau (χmem i) 0 //
+        (∀ α ∈ D.imageFamily.imageSet,
+            ∀ β ∈ (OddOrder.Peterfalvi.S06.certainTypeR h46 hχ₂b hdegb).imageSet,
+              ClassFunction.inner α β = 0) ∧
+          D.tau1 (χmem i) = hS₁coh.extension (χmem i) } := fun i =>
+    caseB_member_orthoDatum_columnBreak hyp h46 hHK hS₁sub hS₁coh hS₁conj (hmemS1set i)
+      (hS₁coh.extension_mem_ZIrr (χmem i) (Submodule.subset_span (hmemS1set i))) hχ₂b hdegb
+      (fun he => hψnotS1 (by rw [← he]; exact hmemS1set i))
+      (fun he => hψcnotS1 (by rw [← he]; exact hmemS1set i))
+  -- the break decomposition over `hyp.tau` (column branch of `caseB_constituentDecomposition`).
+  have hSdiffDa : ∀ s ∈ ({OddOrder.Peterfalvi.S06.columnSum h46 χ₂b
+        - (OddOrder.Peterfalvi.S06.columnSum h46 χ₂b).conj,
+      OddOrder.Peterfalvi.S06.columnSum h46 χ₂b - a • (χmem i₁)} : Set (ClassFunction ↥L ℂ)),
+      s.support ⊆ OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L := by
+    intro s hs
+    simp only [Set.mem_insert_iff, Set.mem_singleton_iff] at hs
+    rcases hs with rfl | rfl
+    · rw [show OddOrder.Peterfalvi.S06.columnSum h46 χ₂b
+          - (OddOrder.Peterfalvi.S06.columnSum h46 χ₂b).conj
+          = -((OddOrder.Peterfalvi.S06.columnSum h46 χ₂b).conj
+            - OddOrder.Peterfalvi.S06.columnSum h46 χ₂b) from by abel, ClassFunction.support_neg]
+      exact hdiffsuppψ
+    · exact hdiffasuppψ
+  have hχψ : ClassFunction.inner (OddOrder.Peterfalvi.S06.columnSum h46 χ₂b)
+      (a • (χmem i₁) : ClassFunction ↥L ℂ) = 0 := by
+    rw [← Nat.cast_smul_eq_nsmul ℂ a (χmem i₁), OddOrder.RepresentationTheory.inner_smul_right,
+      hψ_S1 (χmem i₁) (hmemS1set i₁), mul_zero]
+  have hχbarψ : ClassFunction.inner (OddOrder.Peterfalvi.S06.columnSum h46 χ₂b).conj
+      (a • (χmem i₁) : ClassFunction ↥L ℂ) = 0 := by
+    rw [← Nat.cast_smul_eq_nsmul ℂ a (χmem i₁), OddOrder.RepresentationTheory.inner_smul_right,
+      hψbar_S1 (χmem i₁) (hmemS1set i₁), mul_zero]
+  let Da := columnDecompositionTau hyp h46 hχ₂b hdegb (η₁ := χmem i₁) (a := a)
+    (caseB_column_mapagree hyp h46 hχ₂b) hSdiffDa htau1ψ hχψ hχbarψ
+  -- (7) feed everything to the reducible-break norm-weighted (5.6) contrapositive.
+  have hbound := coherentDegreeSqNormBound_of_not_coherentW_k hyp.dade hyp.hconj hS₁coh
+    (OddOrder.Peterfalvi.S06.columnSum h46 χ₂b) hdiffsuppψ hψψne hψbarψbarne hψψbar hψbarψ
+    hψ_S1 hψbar_S1
+    (Finset.univ : Finset (Fin k)) χmem deg i₁ (Finset.mem_univ i₁) hmemdegdiffsupp
+    (fun i _ => hmemS1set i) mc (fun i _ => hmcpos i)
+    (fun i _ j _ => by rw [hmemortho i j]; rcases eq_or_ne i j with h | h <;> simp [h])
+    hanchorNorm
+    (fun i _ => (datum i).1) Da rfl (fun i _ => (datum i).2.1) (fun i _ => (datum i).2.2)
+    hdiffasuppψ htau1ψ hdeg_i₁ hSgen hgen hnc
+  -- (8) package the output, converting the anchor `χmem i₁` to `η`.
+  refine ⟨k, χmem, mc, deg, a, hinj, hrange, hmcpos,
+    fun j => by have h := hmemortho j j; rwa [if_pos rfl] at h,
+    fun j => by rw [hdeg_eq j, hi₁eq], by rw [hψratio, hi₁eq], hbound⟩
+
 /-- **Peterfalvi (6.8.3) case-(B) norm-weighted member-family degree-square bound** (real form).
 
 The degree-ratio bound `sMember_degreeSqNormBound_of_not_coherent` (`∑ⱼ (degⱼ)²/mcⱼ ≤ 2a`), rescaled
@@ -784,5 +1123,57 @@ theorem sMember_degreeSqNormReBound_of_not_coherent
     _ ≤ (η 1).re ^ 2 * (2 * (a : ℝ)) := mul_le_mul_of_nonneg_left hbound (sq_nonneg _)
     _ = 2 * ((a : ℝ) * (η 1).re) * (η 1).re := by ring
     _ = 2 * (ψ 1).re * (η 1).re := by rw [hψre]
+
+/-- **(6.8.3) case-(B) norm-weighted member-family degree bound (real form), reducible COLUMN
+break.**  The real-part repackaging of `sMember_degreeSqNormBound_of_not_coherent_columnBreak`,
+mirroring `sMember_degreeSqNormReBound_of_not_coherent` for the column break `μ_b = columnSum χ₂b`. -/
+theorem sMember_degreeSqNormReBound_of_not_coherent_columnBreak
+    (hyp : SibleyDadeHypothesis G L H) [H.Normal]
+    (h46 : OddOrder.Peterfalvi.S06.Hypothesis46 (sharpImage H) L) (hHK : h46.K = H)
+    (hW1 : h46.W1 = hyp.W1)
+    [NeZero (Nat.card h46.W1)] [Invertible (Nat.card ↥h46.K : ℂ)]
+    [Fintype ↥(h46.W1 ⊔ h46.W2)] [Invertible (Nat.card ↥(h46.W1 ⊔ h46.W2) : ℂ)]
+    [Fintype (OddOrder.Peterfalvi.S06.ticVdiff h46).W]
+    [Invertible (Nat.card (OddOrder.Peterfalvi.S06.ticVdiff h46).W : ℂ)]
+    {S₁ : Set (ClassFunction ↥L ℂ)} (hS₁sub : S₁ ⊆ hyp.S)
+    (hS₁conj : OddOrder.Peterfalvi.S03.ClosedUnderConjugate S₁) (hS₁fin : S₁.Finite)
+    (hS₁coh : OddOrder.Peterfalvi.S07.IsCoherent hyp.tau S₁
+      (OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L))
+    {η : ClassFunction ↥L ℂ} (hηY : η ∈ hyp.Yset) (hηS₁ : η ∈ S₁)
+    {χ₂b : (h46.W2.subgroupOf (h46.W1 ⊔ h46.W2)) →* ℂˣ} (hχ₂b : χ₂b ≠ 1)
+    (hψnotS1 : OddOrder.Peterfalvi.S06.columnSum h46 χ₂b ∉ S₁)
+    (hψcnotS1 : (OddOrder.Peterfalvi.S06.columnSum h46 χ₂b).conj ∉ S₁)
+    (hnc : ¬ Nonempty (OddOrder.Peterfalvi.S07.IsCoherent hyp.tau
+      (S₁ ∪ {OddOrder.Peterfalvi.S06.columnSum h46 χ₂b,
+        (OddOrder.Peterfalvi.S06.columnSum h46 χ₂b).conj})
+      (OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L))) :
+    ∃ (k : ℕ) (χmem : Fin k → ClassFunction ↥L ℂ) (mc : Fin k → ℝ),
+      Function.Injective χmem ∧
+      Set.range χmem = S₁ ∧
+      (∀ j, χmem j ∈ S₁) ∧
+      (∀ j, 0 < mc j) ∧
+      (∀ j, ClassFunction.inner (χmem j) (χmem j) = (mc j : ℂ)) ∧
+      ∑ j : Fin k, ((χmem j 1).re) ^ 2 / mc j
+        ≤ 2 * (OddOrder.Peterfalvi.S06.columnSum h46 χ₂b 1).re * (η 1).re := by
+  obtain ⟨k, χmem, mc, deg, a, hinj, hrange, hmcpos, hmcnorm, hdeg_eq, hψ_eq, hbound⟩ :=
+    sMember_degreeSqNormBound_of_not_coherent_columnBreak hyp h46 hHK hW1 hS₁sub hS₁conj hS₁fin
+      hS₁coh hηY hηS₁ hχ₂b hψnotS1 hψcnotS1 hnc
+  have hmemS1 : ∀ j, χmem j ∈ S₁ := fun j => hrange ▸ Set.mem_range_self j
+  refine ⟨k, χmem, mc, hinj, hrange, hmemS1, hmcpos, hmcnorm, ?_⟩
+  have hdegre : ∀ j, (χmem j 1).re = (deg j : ℝ) * (η 1).re := by
+    intro j
+    rw [hdeg_eq j, Complex.mul_re, Complex.natCast_re, Complex.natCast_im]
+    ring
+  have hψre : (OddOrder.Peterfalvi.S06.columnSum h46 χ₂b 1).re = (a : ℝ) * (η 1).re := by
+    rw [hψ_eq, Complex.mul_re, Complex.natCast_re, Complex.natCast_im]
+    ring
+  calc ∑ j : Fin k, ((χmem j 1).re) ^ 2 / mc j
+      = ∑ j : Fin k, ((deg j : ℝ) * (η 1).re) ^ 2 / mc j := by
+        refine Finset.sum_congr rfl (fun j _ => ?_); rw [hdegre j]
+    _ = (η 1).re ^ 2 * ∑ j : Fin k, (deg j : ℝ) ^ 2 / mc j := by
+        rw [Finset.mul_sum]; refine Finset.sum_congr rfl (fun j _ => ?_); ring
+    _ ≤ (η 1).re ^ 2 * (2 * (a : ℝ)) := mul_le_mul_of_nonneg_left hbound (sq_nonneg _)
+    _ = 2 * ((a : ℝ) * (η 1).re) * (η 1).re := by ring
+    _ = 2 * (OddOrder.Peterfalvi.S06.columnSum h46 χ₂b 1).re * (η 1).re := by rw [hψre]
 
 end OddOrder.Peterfalvi.S08

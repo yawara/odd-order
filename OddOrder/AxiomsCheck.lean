@@ -3166,6 +3166,16 @@ set_option linter.style.longLine false in
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.S16.FieldNormalizerData.s_inv_pow_mul_t_pow_mul_comm_t_inv_pow_mul_s_pow
 
+-- Peterfalvi (14.7) σ-bridge (POLE-2): the ungated transport of the (14.2)(a) field
+-- model into `G` and its assembly into `FieldNormalizerData`. Takes the field iso as
+-- *input*, so it is independent of the §13 character theory that supplies it.
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S16.fieldNormalizerKernelTransport_injective
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S16.fieldNormalizerKernelTransport_range
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S16.fieldNormalizerComplementTransport_injective
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S16.fieldNormalizerComplementTransport_range
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S16.fieldNormalizerComplementTransport_exists
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S16.fieldNormalizerData_of_repr
+
 -- BG App C Remark (I): condition (A) `gcd((p^q-1)/(p-1), p-1)=1` ⟺ `q ∤ (p-1)`.
 -- Foundation lemma of the finite-field norm-set argument toward BG Theorem C (`p ≤ q`).
 #assert_only_allowed_axioms OddOrder.BG.AppC.NormSet.conditionA_iff_not_dvd

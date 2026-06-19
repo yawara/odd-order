@@ -2062,6 +2062,27 @@ theorem SibleyDadeHypothesis.columnSum_notMem_SsubFiltration
     OneMemClass.coe_one] at hxker ⊢
   exact hxker
 
+/-- **(6.8.2) case-(B), `μ_j ∉ S(A)` for `W₂ ≤ A`** (filtration generalization of
+`columnSum_notMem_SsubFiltration`).  Since `S(A) ⊆ S(W₂)` whenever `W₂ ≤ A`
+(`SsubFiltration_antitone`: a larger kernel constraint gives a smaller filtration set) and the column
+`μ_j = columnSum h46 χ₂` (`χ₂ ≠ 1`) already lies outside `S(W₂)`
+(`columnSum_notMem_SsubFiltration`), it lies outside `S(A)` too.
+
+This is the **break-irreducibility ingredient** for the (6.3) induction at a filtration level
+`A ⊇ W₂`: the only reducible members of `S` are the `w₂ − 1` certain-type columns, so on any `S(A)`
+with `W₂ ≤ A` every member is irreducible — exactly the `hψirr` the (5.6) member-family bound
+(`sSubFiltration_sum_le_two_psi_caseB`) demands of the break. -/
+theorem SibleyDadeHypothesis.columnSum_notMem_SsubFiltration_of_le
+    (hyp : SibleyDadeHypothesis G L H) [H.Normal]
+    (h46 : OddOrder.Peterfalvi.S06.Hypothesis46 (sharpImage H) L) (hHK : h46.K = H)
+    [NeZero (Nat.card h46.W1)] [Invertible (Nat.card ↥h46.K : ℂ)]
+    [Fintype ↥(h46.W1 ⊔ h46.W2)] [Invertible (Nat.card ↥(h46.W1 ⊔ h46.W2) : ℂ)]
+    {A : Subgroup ↥L} (hAW2 : h46.W2 ≤ A)
+    {χ₂ : (h46.W2.subgroupOf (h46.W1 ⊔ h46.W2)) →* ℂˣ} (hχ₂ : χ₂ ≠ 1) :
+    OddOrder.Peterfalvi.S06.columnSum h46 χ₂ ∉ hyp.SsubFiltration A :=
+  fun hmem => hyp.columnSum_notMem_SsubFiltration h46 hHK hχ₂
+    (hyp.SsubFiltration_antitone hAW2 hmem)
+
 /-- **(6.8.2) case-(B), `𝒯 ⊆ X(W₂)`** (cont.²² item 2): the certain-type set `𝒯 = {μ_j}` of
 Peterfalvi (4.9) is contained in the (6.8) set `X(W₂) = S − S(W₂)`.  Each `μ_j = columnSum h46 χ₂`
 (`χ₂ ≠ 1`) lies in `S` (`columnSum_mem_S`, item 2a) but not in `S(W₂)`

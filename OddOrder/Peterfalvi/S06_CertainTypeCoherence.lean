@@ -672,6 +672,45 @@ noncomputable def certainTypeR (h : Hypothesis46 A L) [NeZero (Nat.card h.W1)]
       (fun p _ q _ hpq => certainTypeRImage_injective h (column_inv_ne_self h hχ₂).symm hpq)]
     exact dadeICM_columnDiff_eq_sum h hχ₂ (inv_ne_one.mpr hχ₂) hdeg
 
+open scoped Classical in
+/-- **(5.2.e) cross-orthogonality of two distinct certain-type column families `R(μ_j) ⊥ R(μ_k)`.**
+For two columns `χ₂`, `χ₂'` whose pairs `{χ₂, χ₂⁻¹}`, `{χ₂', χ₂'⁻¹}` are disjoint (`χ₂ ≠ χ₂'` and
+`χ₂ ≠ χ₂'⁻¹`), every `σ`-image of `R(μ_j) = certainTypeR χ₂` is orthogonal to every `σ`-image of
+`R(μ_k) = certainTypeR χ₂'`.  Each `R`-member is `±δ·ω_{·}^σ` built from a column in
+`{χ₂, χ₂⁻¹}` (resp. `{χ₂', χ₂'⁻¹}`); since the two column pairs are disjoint, the grid
+orthonormality `certainTypeOmegaSigma_inner` (`⟨ω_{c,i}^σ, ω_{c',i'}^σ⟩ = [c = c' ∧ i = i']`)
+makes every cross inner product vanish.  This is the reducible-column counterpart of
+`certainTypeRImage_inner` (same family) and the `R(μ_j) ⊥ R(χ)` lemma
+`certainTypeR_imageSet_orthogonal_dadeOfDiff` (column vs irreducible break). -/
+theorem certainTypeR_imageSet_orthogonal_certainTypeR (h : Hypothesis46 A L)
+    [NeZero (Nat.card h.W1)] [Invertible (Nat.card ↥h.K : ℂ)]
+    [Fintype ↥(h.W1 ⊔ h.W2)] [Invertible (Nat.card ↥(h.W1 ⊔ h.W2) : ℂ)]
+    [Fintype (ticVdiff h).W] [Invertible (Nat.card (ticVdiff h).W : ℂ)]
+    {χ₂ χ₂' : (h.W2.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ} (hχ₂ : χ₂ ≠ 1) (hχ₂' : χ₂' ≠ 1)
+    (hdeg : (∑ i, ((h.columnFamily χ₂).mu i : ClassFunction ↥L ℂ) 1)
+      = (∑ i, ((h.columnFamily χ₂⁻¹).mu i : ClassFunction ↥L ℂ) 1))
+    (hdeg' : (∑ i, ((h.columnFamily χ₂').mu i : ClassFunction ↥L ℂ) 1)
+      = (∑ i, ((h.columnFamily χ₂'⁻¹).mu i : ClassFunction ↥L ℂ) 1))
+    (hne1 : χ₂ ≠ χ₂') (hne2 : χ₂ ≠ χ₂'⁻¹) :
+    ∀ α ∈ (certainTypeR h hχ₂ hdeg).imageSet,
+    ∀ β ∈ (certainTypeR h hχ₂' hdeg').imageSet,
+      ClassFunction.inner α β = 0 := by
+  have hδstar : ∀ c : (h.W2.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ,
+      star ((h.columnFamily c).sign : ℂ) = ((h.columnFamily c).sign : ℂ) := fun c => by
+    rcases (h.columnFamily c).sign_eq with h1 | h1 <;> rw [h1] <;> norm_num
+  intro α hα β hβ
+  simp only [certainTypeR, Finset.mem_image, Finset.mem_univ, true_and] at hα hβ
+  obtain ⟨⟨bp, ip⟩, rfl⟩ := hα
+  obtain ⟨⟨bq, iq⟩, rfl⟩ := hβ
+  cases bp <;> cases bq <;>
+    simp only [certainTypeRImage, ClassFunction.inner_smul_left,
+      RepresentationTheory.inner_smul_right, certainTypeOmegaSigma_inner, hδstar, star_neg,
+      mul_neg, neg_mul, neg_neg]
+  · rw [if_neg (fun hcon => hne1 hcon.1)]; ring
+  · rw [if_neg (fun hcon => hne2 hcon.1)]; ring
+  · rw [if_neg (fun hcon => hne2 (by rw [← hcon.1, inv_inv]))]; ring
+  · rw [if_neg (fun hcon => hne1 (inv_injective hcon.1))]; ring
+
 /-- **Per-constituent `CharacterPsiDecomposition` for a reducible certain-type member `μ_j`**
 (Peterfalvi (6.8.2.3), reducible case).  The analogue of `decompositionDaFromDadeOfDiff`
 (irreducible `χ`) for a reducible column character `μ_j = columnSum χ₂`: it uses the reducible

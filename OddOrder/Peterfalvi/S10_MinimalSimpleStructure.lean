@@ -87,7 +87,27 @@ The cyclic-Sylow hypothesis is represented by the cardinal/exponent equality
 theorem typeF_frobenius_of_card_eq_exponent [Finite G] {M : Subgroup G}
     (data : TypeFData M) (hU : Nat.card ↥data.U = Monoid.exponent data.U) :
     OddOrder.Isaacs.Ch06.IsFrobeniusGroup ↥M (data.H.subgroupOf M) (data.U.subgroupOf M) := by
-  sorry
+  -- The cyclic-Sylow hypothesis `|U| = exp(U) = exp(U₀)` forces `U₀ = U`, so the
+  -- Frobenius structure of `H ⊔ U₀` (a field of `TypeFData`) collapses to `M`.
+  have hexp : Monoid.exponent ↥data.U0 = Nat.card ↥data.U :=
+    data.exponent_eq.trans hU.symm
+  have hdvd1 : Nat.card ↥data.U ∣ Nat.card ↥data.U0 := by
+    rw [← hexp]; exact Group.exponent_dvd_nat_card
+  have hdvd2 : Nat.card ↥data.U0 ∣ Nat.card ↥data.U :=
+    Subgroup.card_dvd_of_le data.U0_le
+  have hcard : Nat.card ↥data.U0 = Nat.card ↥data.U := Nat.dvd_antisymm hdvd2 hdvd1
+  have hU0eq : data.U0 = data.U := Subgroup.eq_of_le_of_card_ge data.U0_le hcard.ge
+  -- `H ⊔ U = M`, from the complement `H ⋊ U = M`.
+  have hHU : data.H ⊔ data.U = M := by
+    have htop : data.H.subgroupOf M ⊔ data.U.subgroupOf M = ⊤ := data.complement.sup_eq_top
+    have hmap := congrArg (Subgroup.map M.subtype) htop
+    rwa [Subgroup.map_sup, Subgroup.subgroupOf_map_subtype, Subgroup.subgroupOf_map_subtype,
+      inf_of_le_left data.H_le, inf_of_le_left data.U_le, ← MonoidHom.range_eq_map,
+      Subgroup.range_subtype] at hmap
+  -- Transport `frobenius_HU0 : IsFrobeniusGroup (H ⊔ U₀) H U₀` along `U₀ = U` and `H ⊔ U = M`.
+  have hfrob := data.frobenius_HU0
+  rw [hU0eq, hHU] at hfrob
+  exact hfrob
 
 /-! ## (8.8): BG maximal-subgroup dichotomy -/
 

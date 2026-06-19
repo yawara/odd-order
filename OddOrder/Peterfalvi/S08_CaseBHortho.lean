@@ -161,3 +161,33 @@ theorem certainTypeR_imageSet_orthogonal_dadeOfDiff
   · rw [hνcast, OddOrder.RepresentationTheory.inner_conj_symm,
       OddOrder.RepresentationTheory.inner_smul_right,
       key χ₂⁻¹ i hνZ hν1 hμZ hμ1 hνμ hnsignC hvanishνμ, mul_zero, star_zero]
+
+/-- **(5.2.e) irreducible break-pair vs certain-type column cross-orthogonality** `R(χ) ⊥ R(μ_j)`.
+The `R(μ_j) ⊥ R(χ)` lemma `certainTypeR_imageSet_orthogonal_dadeOfDiff` with the two families
+swapped, by conjugate symmetry of the inner product.  This is the member-side ingredient when the
+**break** is a reducible certain-type column (the family roles are reversed from the irreducible-break
+`caseB_member_orthoDatum`): an irreducible member `x = Ind θ` has image family `R(x) =
+dadeOrthonormalCharacterImageFamilyOfDiff`, which must be orthogonal to the column break's
+`R(μ_j) = certainTypeR`. -/
+theorem dadeOfDiff_imageSet_orthogonal_certainTypeR
+    (hyp : SibleyDadeHypothesis G L H) [H.Normal]
+    (h46 : OddOrder.Peterfalvi.S06.Hypothesis46 (sharpImage H) L) (hHK : h46.K = H)
+    [NeZero (Nat.card h46.W1)] [Invertible (Nat.card ↥h46.K : ℂ)]
+    [Fintype (OddOrder.Peterfalvi.S06.ticVdiff h46).W]
+    [Invertible (Nat.card (OddOrder.Peterfalvi.S06.ticVdiff h46).W : ℂ)]
+    [Fintype ↥(h46.W1 ⊔ h46.W2)] [Invertible (Nat.card ↥(h46.W1 ⊔ h46.W2) : ℂ)]
+    {χ₂ : (h46.W2.subgroupOf (h46.W1 ⊔ h46.W2)) →* ℂˣ} (hχ₂ : χ₂ ≠ 1)
+    (hdeg : (∑ i, ((h46.columnFamily χ₂).mu i : ClassFunction ↥L ℂ) 1)
+      = (∑ i, ((h46.columnFamily χ₂⁻¹).mu i : ClassFunction ↥L ℂ) 1))
+    (χ : IrreducibleCharacter ↥L)
+    (hrealχ : ¬ ClassFunction.IsReal (χ : ClassFunction ↥L ℂ))
+    (hdiffsuppχ : ((χ : ClassFunction ↥L ℂ).conj - (χ : ClassFunction ↥L ℂ)).support ⊆
+      OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L) :
+    ∀ α ∈ (OddOrder.Peterfalvi.S07.dadeOrthonormalCharacterImageFamilyOfDiff hyp.dade hyp.hconj χ
+        hrealχ hdiffsuppχ).imageSet,
+    ∀ β ∈ (OddOrder.Peterfalvi.S06.certainTypeR h46 hχ₂ hdeg).imageSet,
+      ClassFunction.inner α β = 0 := by
+  intro α hα β hβ
+  rw [OddOrder.RepresentationTheory.inner_conj_symm,
+    certainTypeR_imageSet_orthogonal_dadeOfDiff hyp h46 hHK hχ₂ hdeg χ hrealχ hdiffsuppχ β hβ α hα,
+    star_zero]
