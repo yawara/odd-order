@@ -98,22 +98,32 @@ bottom-out** するので、clean 化には §15 foundation が先。真の順�
 → 三 Hall card で |U⊔M_σ|=|M'| → M'=U⊔M_σ。U abelian = `[U,U]≤[M',M']≤M_σ`(`derivedDerived_le_Msigma`)
 ∧ `[U,U]≤U` → `[U,U]≤U⊓M_σ=⊥`。**sorry count 不変 (139)** — gated 定理に wire するのは conjunct 2-4 着地後。
 
-**conjunct 2-4 の依存状況 (2026-06-19 調査)**: より深い §12 に gated、clean named lemma 未整備:
-- conjunct 2 (BG 15.1(c) C_G(X) funnel + X cyclic τ2): `M(C_G(X))={M}` 部分は
-  `maximalContaining_centralizer_of_le_Msigma_centralizer_E1`(S14:~505) 等が rank-1 X で存在。
-  残 = 「X cyclic」(BG: **Thm 12.5(d)** C_Msigma(A)=1 for rank-2 A∈U + **Cor 12.10(b)** abelian Hall τ2)。
-  Thm 12.5(d)/12.10(b) は S14 のコメント参照のみ (L1179/1272)、named lemma 要確認/整備。
-- conjunct 3 (BG 15.1(d) ⟨C_U(x)⟩ abelian): K≠⊥ なら conjunct 1 (U abelian) から即 (≤U)。
-  K=⊥ なら **Thm 12.12**。`centralizerGeneratedBySigma M U` (S15:518) = sSup{U⊓C(x)|x∈sigmaSharp}。
-- conjunct 4 (BG 15.1(e) Frobenius U0M_σ): **Thm 12.12** (K=1 case の Frobenius 構成)。未 located。
+**conjunct 2-4 の依存状況 (2026-06-19 精査確定)**:
+- conjunct 2 (BG 15.1(c) C_G(X) funnel + X cyclic τ2): **全ピース available** ⟹ reachable。
+  - Thm 12.5(d) (rank-2 A の `Mσ⊓C(A)=⊥`) = **`Msigma_nilpotent_of_tau2`** (S14:~1275 で使用、`.2.2.2.1`)
+  - Lemma 14.1 (rank-1, p∉σ∪κ の `Mσ⊓C(A)=⊥`) = **`msigma_structure_of_notMem_sigma_kappa`** (S14:1183)
+  - Cor 14.3 funnel (τ2-element → 𝓜(C_G(x))={M}) = **`maximalContaining_centralizer_eq_singleton_of_tau2_element`** (S14:2199)
+  - Cor 12.10(b) (E' abelian) = **`nilpotent_sigmaComplement_abelian hG h`** の `.2.1.2` (`IsMulCommutative (derivedInG E)`)
+  → conjunct 2 を background subagent に委譲 (2026-06-19, S14 に standalone lemma `typeP_hall_small_subgroup_cyclic_tau2`)。
+- **⛔ conjunct 3 (K=⊥ branch) + conjunct 4 は BG Thm 12.12 に hard-gated — Thm 12.12 は未形式化**:
+  - conjunct 3 (BG 15.1(d) ⟨C_U(x)⟩ abelian): **K≠⊥ branch は conjunct 1 (U abelian) から即** (`centralizerGeneratedBySigma`
+    ≤ U abelian)。**K=⊥ branch = Thm 12.12(a)** (`E` の abelian normal A₀ で C_E(x)⊆A₀)。
+  - conjunct 4 (BG 15.1(e) Frobenius U0M_σ): **Thm 12.12(b)** (E₀ 同 exponent, E₀M_σ Frobenius kernel M_σ)。
+    BG mmd L4178: K≠1 なら "easy C_E(S)=E case" で従う、K=1 なら Thm 12.12(b) そのもの。
+  - **BG Thm 12.12** (mmd L3336): 「C_Mσ(e)=1 for each (τ1∪τ3)-element e∈E# ⟹ (a) E に abelian normal A₀,
+    C_E(x)⊆A₀; (b) E₀ 同 exponent, E₀M_σ Frobenius」。証明は **Thm 12.7・Lemma 12.8・Cor 12.6・Cor 12.10・
+    Thm 12.5(f)・Prop 3.9・Lemma 12.11** に依存 = 実質的な §12 Frobenius sub-program (~1-2 session、要 §12 prereq 確認)。
+  - ⟹ **Lemma 15.1 を sorry-free にするには Thm 12.12 の形式化が必須** (count 139→138 はその後)。これが
+    Prop 16.1 program の真の最下層 hard gate。onion: Prop16.1 → Lem15.1 → (3,4) → **Thm12.12** → (12.7/12.8/…)。
 
 ## やること
 
 - [x] Lemma 15.1 conjunct 1 (BG 15.1(b)) = `typeP_hall_derived_eq_and_abelian` ✅ `cab5603a`
-- [ ] conjunct 2 (BG 15.1(c)): Thm 12.5(d) (rank-2 C_Msigma=1) + Cor 12.10(b) (abelian Hall τ2) を
-  named lemma 化/locate → X cyclic → funnel 合成
-- [ ] conjunct 3 (BG 15.1(d)): K≠⊥ branch (conjunct 1 経由) + K=⊥ branch (Thm 12.12)
-- [ ] conjunct 4 (BG 15.1(e)): Thm 12.12 Frobenius U0M_σ を locate/整備
+- [~] conjunct 2 (BG 15.1(c)) = `typeP_hall_small_subgroup_cyclic_tau2`: 全ピース available、subagent 委譲中
+- [ ] **BG Thm 12.12 を形式化** (mmd L3336, §12 Frobenius sub-program; conjunct 3 K=⊥ + conjunct 4 の前提)
+  - [ ] §12 prereq 確認: Thm 12.7 / Lemma 12.8 / Cor 12.6 / Cor 12.10 / Thm 12.5(f) / Lemma 12.11 の整備状況
+- [ ] conjunct 3 (BG 15.1(d)): K≠⊥ branch (conjunct 1 経由、easy) + K=⊥ branch (Thm 12.12(a))
+- [ ] conjunct 4 (BG 15.1(e)): Thm 12.12(b) Frobenius U0M_σ
 - [ ] conjunct 1-4 を `typeP_auxiliary_structure_gated` に wire (sorry 139→138)
 - [ ] Thm 15.2(a) `mf_ne_msigma_typeP1_structure` (S15:1144)
 - [ ] Thm 15.7 `fitting_not_ti_cases` (S15:3896) + Cor 15.5
