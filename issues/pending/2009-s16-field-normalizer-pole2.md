@@ -397,3 +397,20 @@ real sorry 133→134 (bare sorry → 2 obligation + (12.7) cite、[[feedback-gat
 ### 本セッション成果サマリ (commits `8e6b3379`/`a5fe4a45`/`0d99daf1`)
 maxNNH 自己同型同変性 (reusable, axiom-clean) + H_cyclic_of_L_conj_M sorry-free 化 (POLE-2 L≅M 枝) +
 (13.17) skeleton。次セッション = obligation ① (coherence bridge + normalizer 同変性から着手、maxNNH 同変性流用)。
+
+## 2026-06-19 再開¹² cont.² — (13.17) obligation 深掘り: 具体的 blocker 特定
+
+obligation ① の L~S 除外を深掘り → **真の blocker = `hyp.U` の under-constraint (Hypothesis faithfulness)**:
+- Hypothesis は hyp.U を `S_deriv_eq_PU : derivedInG S = P ⊔ U` (**join のみ**) で制約。complement
+  (`P ⊓ U = ⊥`) も S の type-II `typeP.U` との一致も pin せず。⟹ L~S 除外に要る `¬ N_G(hyp.U) ≤ S`
+  (type-II 性) が `IsTypeII.normalizer_not_le` (typeP.U について) から直接出ない。
+- bridge 道筋: P=maxNNH S は derivedInG S の normal Hall (✓導出可) → hyp.U が P-complement なら
+  Schur-Zassenhaus で hyp.U ~ typeP.U (S 内共役) → normalizer 同変性 (既存) で `¬N_G(hyp.U)≤S`。
+  **gap = 「hyp.U が complement」= `P ⊓ U = ⊥`**、card 関係 `|P||U|=|derivedInG S|` (= p^q·u·c?) 要、Hypothesis 未供給。
+  → (a) §13 card 論で導出 (深い) or (b) Hypothesis に `IsComplement'`/`P⊓U=⊥` を enrich (carrier 変更=
+  FeitThompson producer 要対応、cross-file)。
+- obligation ② blocker: **[H] V.8.18** (奇数位数 Frobenius complement ⟹ 素数位数部分群正規) が **repo 不在**
+  (古典的、新規形式化要)。(13.16)`normalizer_W1`(sorried)/BG 3.9(`S03g_Thm310`)は在。
+
+**⟹ (13.17) 両 obligation は multi-session 深 §13 構造論** (coherence/faithfulness + Schur-Zassenhaus +
+Huppert 形式化 + sorried §8/§9 cite)。skeleton で構造化済・cite 先確定済ゆえ、着手準備は整っている。
