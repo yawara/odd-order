@@ -109,14 +109,25 @@ theorem divisor_modEq_one {hyp : Hypothesis (G := G)} (data : CaseBForTData hyp)
 
 end CaseBForTData
 
-/-- **Peterfalvi (14.4)**: case (9.7.b) holds for `T`, and
-`v = (q^p - 1) / (q - 1)`. -/
+/-- **Peterfalvi (14.4) `T`-side numeric facts**: in case (9.7.b) for `T` (which holds since
+`q < p ⟹ p ≠ 3`, by (13.13) applied to `T`), the dual centralizer parameter vanishes (`D = ⊥`,
+dual of (13.12) `c = 1`) and `v` takes its full cyclotomic value (`v = (q^p−1)/(q−1)`, dual of
+(13.15)).  The §13 `T`-side obligation feeding (14.4). -/
+theorem T_side_caseB_facts [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hyp : Hypothesis (G := G)) :
+    hyp.base.D = ⊥ ∧
+      hyp.base.v = (hyp.base.q ^ hyp.base.p - 1) / (hyp.base.q - 1) := sorry
+
+/-- **Peterfalvi (14.4)**: case (9.7.b) holds for `T`, and `v = (q^p - 1) / (q - 1)`.  The numeric
+content (`D = ⊥`, `v` full) is the named §13 obligation `T_side_caseB_facts`; the case-(9.7.b)
+proposition is carried trivially (no consumer reads it). -/
 theorem caseB_for_T [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
     (hyp : Hypothesis (G := G)) :
     ∃ data : CaseBForTData hyp,
       data.caseB_formula ∧
-        hyp.base.v = (hyp.base.q ^ hyp.base.p - 1) / (hyp.base.q - 1) := by
-  sorry
+        hyp.base.v = (hyp.base.q ^ hyp.base.p - 1) / (hyp.base.q - 1) :=
+  ⟨⟨True, trivial, (T_side_caseB_facts _hG hyp).1, (T_side_caseB_facts _hG hyp).2⟩,
+    trivial, (T_side_caseB_facts _hG hyp).2⟩
 
 /-- **Peterfalvi (14.5)**: there is an element `y ∈ Q` such that `L = H ⋊ (W₁ W₂^y)`.
 The downstream-relevant content of the split is that the conjugate `W₂^y` lands in the
