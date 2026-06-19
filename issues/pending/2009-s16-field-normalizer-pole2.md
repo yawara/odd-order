@@ -272,6 +272,58 @@ full build 3863 jobs green（16s）、AxiomsCheck OK、real sorry 140 不変（�
 or basic_structure-level §13 構造に bottom-out** = Lane-B-独立な clean win は出尽くし。実 sorry 140 不変
 （縮約は sorry の内容；各 inline sorry → named faithful obligation）。full build 3863 jobs 15s green。
 
+## 📋 2026-06-19 セッション HANDOFF（POLE-2 構造を実証明+cite で大きく前進）
+
+**本セッション 11 commit（`7162a75a`..`75bac20d`）、実 sorry 144→138、full build 3863 jobs ~16s green 維持。**
+
+### `field_normalizer_structure`（POLE-2）の現状 = dispatch + 両主枝 sorry-free
+
+`field_normalizer_structure` の dispatch tree で **literal-sorry-free 化したもの**:
+- **dispatch 本体**（exists_LHypothesis → by_cases U-char → 各枝）
+- **(14.3) `exists_LHypothesis`** — (13.17) `S15.typeII_overNormalizer_frobenius` を cite して carrier 構成。
+  LHypothesis は消費フィールド（typeI_data + L/H/normalizer_U_le_L/H_eq_LF + complement_card）に **slim**
+  （Dade フィールド Lset/tau/…/betaL は 0 consumer ゆえ削除）。S は type II（basic_structure +
+  `q_lt_p_forces_typeII`）。
+- **(14.5) `exists_y_L_structure`** — (13.17) carrier の field `exists_y_W2_conj_le_complement` の projection。
+  S15 の opaque `complement_structure : Prop` を concrete 2 フィールド（`complement_card_eq_pq` +
+  `exists_y_W2_conj_le_complement`）に置換、sorry を `typeII_overNormalizer_frobenius` 1 本に集約。
+- **U-char 枝 (14.7) `field_normalizer_of_U_characteristic`** — FPF value-arg を carrier から end-to-end
+  組立（FPF 機構 `isFrobeniusGroup_conj_ne_of_mem_map_complement` + bridge `u_modEq_one_mod_p_of_LHypothesis`
+  + `W2conj_le_normalizer_U_of_LHypothesis`）。**`W2_le_P` は実証明**（下記）。
+- **L≅M 枝 (14.12) `field_normalizer_of_L_conj_M`** — 「H≅K cyclic ⟹ U char ⟹ (14.7)」還元 +
+  **`characteristic_of_isCyclic`**（有限巡回群の部分群は characteristic、axiom-clean 汎用）。
+- **¬conj 枝 (14.16) `H_eq_U`** — 既に sorry-free。
+- **(14.4) `caseB_for_T`** — numeric 内容（D=⊥, v=full）を `T_side_caseB_facts` に集約して literal-sorry-free。
+
+### 新規 reusable 補題（再導出するな）
+- **`pgroup_le_of_normal_coprime_index`**（S16, 汎用）: p-群 ≤ 正規・coprime-index 部分群。商位数論。
+- **`W2_le_P`**（S16, 実証明・cite でない）: W₂ p-群 ≤ 正規 Hall p-部分群 P=S_F。`maxNilpotentNormalHall_isHall`
+  の `Ch03.IsHallSubgroup.coprime_index`（**名前注意**: `coprime_index`, not `coprime_card_index`）+ basic_structure。
+- **`characteristic_of_isCyclic`**（S16, axiom-clean）: d-torsion `ker(powMonoidHom |K|)` 経由。
+- FPF 機構一式（`card_modEq_one_of_prime_normalizing_fpf` / `isFrobeniusGroup_conj_ne_of_mem_map_complement`
+  / `u_modEq_one_mod_p_of_LHypothesis` / `W2conj_le_normalizer_U_of_LHypothesis`）。
+
+### 残り frontier = 2 種類（clean cite/群論は出し尽くし）
+**(A) Lane B 指標論（producer 物理的に不在、cite 先なし）**:
+- `U_cyclic_and_Q_elemAbelian`（S16）= U cyclic (§9 / 9.7.b) + Q elem abelian (§11 / 11.7、別 carrier bridge 要)
+- `caseB_for_S`（14.6）= (9.7.a) を rank-2+FPF+(13.13) で除外（§9 表現必要）
+- `T_side_caseB_facts`（§13-T: D=⊥, v=full、swap 不在ゆえ dual 不可）
+- `exists_MHypothesis`（14.10）= (14.11) Dade norm-cascade（消費フィールド betaM/G0/generic_bound/betaM_expansion）
+  + V側 (13.17) dual（不在）
+- 上流 cited sorry: `typeII_overNormalizer_frobenius`(13.17) / `basic_structure`(13.2) / `c_eq_one`(13.12)
+
+**(B) lane-h 重い infra**:
+- `H_cyclic_of_L_conj_M` → `maxNilpotentNormalHall` の**共役同変性** `conj g • maxNNH M = maxNNH(conj g•M)`
+  （sSup 定義上 ~80 行、candidate 4 clause を conj 保存; normal は `normal_subgroupOf_iff_le_normalizer`+
+  normalizer 同変、nilpotent は `subgroupOfEquivOfLe`+`equivSMul`、Hall は relindex 同変）に還元可。
+  ただし残 `K_cyclic`（=V cyclic）は (A) の指標論。
+
+### 次セッション pickup
+clean な lane-h 独立貢献は **W2_le_P で一区切り**。次は (B) の `maxNilpotentNormalHall` 共役同変性 grind
+（reusable BG 補題、`OddOrder/GroupTheory/MaxNilpotentNormalHall.lean` or `BG/Ch4/S15_MF.lean`）か、
+(A) は **Lane B の §6→§13 char theory 着地待ち**（cite 先がそこで生まれる）。POLE-2 全体の unconditional 化は
+Lane B の Dade 指標論に bottom-out。
+
 ## 完了条件
 
 `field_normalizer_structure` の `sorry` が消え、`lake build OddOrder OddOrder.AxiomsCheck` 緑。
