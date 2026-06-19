@@ -3827,7 +3827,8 @@ theorem chiefFactor_card_and_commutator_of_inputs [Finite G]
     (hcond3 : ∀ x ∈ K, x ≠ 1 → ∀ y ∈ Q, (⁅x, y⁆ ∈ Q0 ↔ ∀ s ∈ K, ⁅s, y⁆ ∈ Q0))
     (hCfix : ∀ x ∈ Q, ((∀ k ∈ K, ⁅k, x⁆ ∈ Q0) ↔ x ∈ C))
     (hCcard : (Q0.subgroupOf C).index = q) :
-    (Q0.subgroupOf Q).index = q ^ Nat.card ↥K ∧
+    (Nat.card ↥K).Prime ∧
+      (Q0.subgroupOf Q).index = q ^ Nat.card ↥K ∧
       ∀ g ∈ ⁅D, D⁆, ∀ x ∈ Q, ⁅g, x⁆ ∈ Q0 := by
   classical
   set H : Subgroup G := D ⊔ K with hH
@@ -3932,6 +3933,16 @@ theorem chiefFactor_card_and_commutator_of_inputs [Finite G]
     hCK hFrob hcond3'
   have hcardK : Nat.card ↥(K.subgroupOf H) = Nat.card ↥K :=
     Nat.card_congr (Subgroup.subgroupOfEquivOfLe hKH).toEquiv
+  -- **BG Theorem 3.10(a)**: `|K| = |K̄|` is prime (the same Frobenius/module data).
+  obtain ⟨pK, hpK_prime, hpK_eq, _⟩ :=
+    OddOrder.BG.Ch1.S03.prime_card_and_finrank_of_elemAbelian_general
+      (p := q) (H := ↥H) (M := ↥Q ⧸ Q0.subgroupOf Q)
+      (K := D.subgroupOf H) (R := K.subgroupOf H) hRne hKne hpH
+      (by
+        have := (hfrob.coprime_card_kernel_complement)
+        rwa [Nat.coprime_comm] at this)
+      hCK hFrob hcond3'
+  have hKprime : (Nat.card ↥K).Prime := by rw [← hcardK, hpK_eq]; exact hpK_prime
   -- `g : ↥C →* Q̄`, the natural map `c ↦ [c]`; its range is the image of `C`, of order `[C:Q₀]=q`.
   set g : ↥C →* (↥Q ⧸ Q0.subgroupOf Q) :=
     (QuotientGroup.mk' (Q0.subgroupOf Q)).comp (Subgroup.inclusion hCQ) with hg
@@ -3972,7 +3983,7 @@ theorem chiefFactor_card_and_commutator_of_inputs [Finite G]
     rw [← Nat.card_congr (QuotientGroup.quotientKerEquivRange g).toEquiv, hker,
       ← Subgroup.index_eq_card]
     exact hCcard
-  refine ⟨?_, ?_⟩
+  refine ⟨hKprime, ?_, ?_⟩
   · -- **(f)**: `[Q : Q₀] = q^{|K|}` (Thm 3.10(b), with `|C_{Q̄}(K)| = |g.range| = q`).
     rw [show (Q0.subgroupOf Q).index = Nat.card (↥Q ⧸ Q0.subgroupOf Q) from rfl, hmain, hcardK]
     congr 1
