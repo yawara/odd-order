@@ -28,11 +28,23 @@ W₂⊇ 領域に閉じ込められない)。
 ### ▶ 唯一の残路 = reducible-break (5.6) = retarget-to-k (bounded、cont.¹⁷ の通り)
 
 `retarget_isCoherent_of_extensionImage` (`S08_CoherenceCorePart1:1980`) を ‖χ‖²=1 → ‖χ‖²=k へ一般化
-((5.4) 層は既に k-general ゆえ retargetTargetPair/retarget_isCoherent/retarget_inner_eq_on_zSpan_union の
-~5-8 lemma)。これで **reducible-break 対応 `coherentDegreeSqNormBound_of_not_coherentW`** →
+((5.4) 層は既に k-general)。これで **reducible-break 対応 `coherentDegreeSqNormBound_of_not_coherentW`** →
 **`six_two_index_bound_c2` の hW2B 不要版** → `six_three_c2` (induction、hW2B 不要) →
 `isPGroup_of_not_coherent_c2` → `hbound` → dispatch。column の R(μⱼ) data は member 側 `caseB_member_orthoDatum`
-+ `certainTypeR` で既存。**見積 ~2-3 session**。
++ `certainTypeR` で既存。
+
+**⚠ retarget 内部精読 (cont.¹⁸ 末尾、S07 確認済) — 単純 norm-swap でなく projection rework**:
+`retarget`/`orthoResidualMap`/`inner_block_expand`/`retarget_inner_eq_on_zSpan_union` (`S07:2927`)/
+`retarget_isCoherent` (`S07:3262`)/`retargetTargetPair` (`S07:2536`) は全て **projection-based + norm-1
+ハードコード** (`hXX=1`/`hχχ=1`、`retargetTargetPair` は `E.card=1` で X=単一元)。norm-k 化は:
+1. **`retargetTargetPair` の k 版** = X=Σ_{α∈E}α (|E|=‖χ‖²=k、(5.4.b) `eq_sum_of_psi_eq_zero` で E 取得)、
+   ‖X‖²=k / ‖X̄‖²=|R(χ)|−k。
+2. **`retarget_inner_eq_on_zSpan_union`/`inner_block_expand` の k 版** = `hXX=1` → `hXX=⟨χ,χ⟩` (source も
+   `hχχ=⟨χ,χ⟩`)。projection 係数 ⟨φ,χ⟩/‖χ‖² は lattice generator 上は整数 (⟨χ,χ⟩/k=1, ⟨S₁,χ⟩/k=0) ゆえ
+   retarget は source lattice 上 well-defined のはず — だが要検証 (整数性が crux)。
+3. **`retarget_isCoherent` の k 版** + 上流 `retarget_isCoherent_of_extensionImage` の huu=1+a²→k+a² 等。
+**∴ 見積 ~2-3 session、design 確認 (projection vs basis-direct (5.6.3) 構成) を先に**。次 session は retarget
+内部の k 一般化を `retargetTargetPair`(k 版)から着手 or 内部 mapping workflow。
 **FT 文脈不変**: (6.8) は orphaned (deferred-payoff)。
 
 ## 🔄🎯 2026-06-19 cont.¹⁷ — 5-agent workflow が cont.¹⁶「大型 engine 一般化」を覆す + c2 chain が本筋
