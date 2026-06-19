@@ -381,9 +381,10 @@ real sorry 133→134 (bare sorry → 2 obligation + (12.7) cite、[[feedback-gat
 - ∃ maximal L⊇N_G(U): N_G(U) proper (U≠⊥ + G simple) → `Finite.exists_le_maximal`。
 - L type-I: `hyp.theorem88_caseB L hLmax` (Hypothesis field = (8.8.b4) trichotomy) で IsTypeI∨L~S∨L~T。
   - **L~S 除外** = conj g•L=S → conj g•N_G(U)≤S → (Hall 共役で conj•U を typeP.U に取り直し) → N_G(typeP.U)≤S、
-    `IsTypeII.normalizer_not_le` 矛盾。**⚠ 2 障害: (i) coherence — Hypothesis は hyp.U を S の type-II
-    `typeP.U` に pin せず** (S_deriv_eq_PU/card_U_eq_uc 等の制約のみ) → bridge 要; (ii) normalizer 同変性
-    `conj g•N_G(U)=N_G(conj g•U)` の lemma を自前導出要 (mathlib 直接無し、`Subgroup.le_normalizer_map` 等から)。
+    `IsTypeII.normalizer_not_le` 矛盾。**⚠ 真の障害 = coherence — Hypothesis は hyp.U を S の type-II
+    `typeP.U` に pin せず** (S_deriv_eq_PU/card_U_eq_uc 等の制約のみ; 両者とも「derivedInG S の P-補元」だが
+    補元は一意でなく**共役止まり**) → bridge 要。**normalizer 同変性は既存** (自前導出不要): repo
+    `normalizer_conj_smul` (S12_ExceptionalBridge:266) + mathlib `Subgroup.map_normalizer_eq_of_bijective`。
     **maxNNH 同変性 (本セッション landing) と同型の議論** = 候補。
   - **L~T 除外** = |L_F|=q^p → W₁⊆N_G(U)⊆L, W₁⊆L_F, [U,W₁]⊆L_F∩U=1、(13.2.a) UW₁ Frobenius 矛盾。要 |L_F|=q^p (T-side)。
 - U⊆L_F: (8.17.a) |L_F| coprime to q → W₁∩L_F=1; U∩L_F=1 なら UW₁ FPF on L_F → (9.1) L_F=1 矛盾。要 (8.17.a)/(9.1) 所在確認。
