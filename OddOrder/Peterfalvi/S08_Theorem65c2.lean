@@ -80,7 +80,7 @@ theorem six_two_index_bound_c2 (hyp : SibleyDadeHypothesis G L H) [H.Normal]
     [Invertible (Nat.card (OddOrder.Peterfalvi.S06.ticVdiff h46).W : ℂ)]
     {A B : Subgroup ↥L} [A.Normal]
     (hAB : hyp.SsubFiltration A ⊆ hyp.SsubFiltration B)
-    (hAcomm2 : A ≤ ⁅H, H⁆) (hW2B : h46.W2 ≤ B)
+    (hAcomm2 : A ≤ ⁅H, H⁆)
     (hSAcoh : Nonempty (OddOrder.Peterfalvi.S07.IsCoherent hyp.tau (hyp.SsubFiltration A)
       (OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L)))
     (hSBncoh : ¬ Nonempty (OddOrder.Peterfalvi.S07.IsCoherent hyp.tau (hyp.SsubFiltration B)
@@ -92,15 +92,27 @@ theorem six_two_index_bound_c2 (hyp : SibleyDadeHypothesis G L H) [H.Normal]
       (hyp.SsubFiltration_closedUnderConjugate B)
       ((S_hasNoRealCharacters_caseB hyp h46 hHK).mono hyp.SsubFiltration_subset_S)
       (hyp.SsubFiltration_closedUnderConjugate A) hSAcoh hSBncoh
-  have hψirr : IsIrreducibleCharacter ψ := hyp.member_isIrreducible_of_W2_le h46 hHK hW2B hψB
   obtain ⟨η, hηY⟩ := hyp.Yset_nonempty
   have hYsubA : hyp.Yset ⊆ hyp.SsubFiltration A := hyp.SsubFiltration_antitone hAcomm2
   have hηS₁ : η ∈ S₁ := hAS₁ (hYsubA hηY)
   have hψS : ψ ∈ hyp.S := hyp.SsubFiltration_subset_S hψB
-  have hbound := sSubFiltration_sum_le_two_psi_caseB hyp h46 hHK hW1
-    (hS₁B.trans hyp.SsubFiltration_subset_S) hS₁conj
-    ((hyp.SsubFiltration_finite B).subset hS₁B) hS₁coh.some hAS₁ hηY hηS₁
-    hψS hψirr hψnotS1 hψcnotS1 hncoh
+  -- (6.2) bound, dispatching on whether the break `ψ` is a reducible column or irreducible.  This
+  -- removes the `hW2B : W₂ ≤ B` hypothesis: the minimal-`A` induction (`six_three_c2`) cannot
+  -- guarantee `W₂ ≤ B`, so a column-transition break `ψ = μ_b` must be admitted directly.
+  have hbound : (H.index : ℝ) * ((Nat.card (↥H ⧸ A.subgroupOf H) : ℝ) - 1)
+      ≤ 2 * (ψ 1).re * (η 1).re := by
+    rcases caseB_S_member_column_or_irreducible hyp h46 hHK hψS with hcol | hirr
+    · obtain ⟨χ₂b, hχ₂b, hcoleq⟩ := hcol
+      have h := sSubFiltration_sum_le_two_psi_caseB_columnBreak hyp h46 hHK hW1
+        (hS₁B.trans hyp.SsubFiltration_subset_S) hS₁conj
+        ((hyp.SsubFiltration_finite B).subset hS₁B) hS₁coh.some hAS₁ hηY hηS₁ hχ₂b
+        (by rw [hcoleq]; exact hψnotS1) (by rw [hcoleq]; exact hψcnotS1)
+        (by rw [hcoleq]; exact hncoh)
+      rwa [hcoleq] at h
+    · exact sSubFiltration_sum_le_two_psi_caseB hyp h46 hHK hW1
+        (hS₁B.trans hyp.SsubFiltration_subset_S) hS₁conj
+        ((hyp.SsubFiltration_finite B).subset hS₁B) hS₁coh.some hAS₁ hηY hηS₁
+        hψS hirr hψnotS1 hψcnotS1 hncoh
   have hηre : (η 1).re = (Nat.card hyp.W1 : ℝ) := by
     rw [hyp.Yset_apply_one hηY, Complex.natCast_re]
   have hidx : (H.index : ℝ) = (Nat.card hyp.W1 : ℝ) := by exact_mod_cast hyp.index_H_eq_card_W1
@@ -128,7 +140,7 @@ theorem six_two_central_c2 (hyp : SibleyDadeHypothesis G L H) [H.Normal]
     [Invertible (Nat.card (OddOrder.Peterfalvi.S06.ticVdiff h46).W : ℂ)]
     {A B : Subgroup ↥L} [A.Normal] [B.Normal]
     (hAB : hyp.SsubFiltration A ⊆ hyp.SsubFiltration B)
-    (hAcomm2 : A ≤ ⁅H, H⁆) (hW2B : h46.W2 ≤ B)
+    (hAcomm2 : A ≤ ⁅H, H⁆)
     (D : Subgroup ↥H) (hND : B.subgroupOf H ≤ D)
     (hcentral : D.map (QuotientGroup.mk' (B.subgroupOf H)) ≤
       Subgroup.center (↥H ⧸ B.subgroupOf H))
@@ -138,7 +150,7 @@ theorem six_two_central_c2 (hyp : SibleyDadeHypothesis G L H) [H.Normal]
       (OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L))) :
     (Nat.card (↥H ⧸ A.subgroupOf H) : ℝ) - 1 ≤ 2 * (H.index : ℝ) * Real.sqrt (D.index : ℝ) := by
   obtain ⟨ψ, hψB, hψbound⟩ :=
-    six_two_index_bound_c2 hyp h46 hHK hW1 hAB hAcomm2 hW2B hSAcoh hSBncoh
+    six_two_index_bound_c2 hyp h46 hHK hW1 hAB hAcomm2 hSAcoh hSBncoh
   rw [hyp.mem_SsubFiltration] at hψB
   obtain ⟨θ, _hθne, hθkerB, hψeq⟩ := hψB
   have hψdeg := hyp.psi_degree_le_of_source_central θ D hND hθkerB hcentral
@@ -161,7 +173,7 @@ theorem six_three_index_bound_c2 (hyp : SibleyDadeHypothesis G L H) [H.Normal]
     [Fintype (OddOrder.Peterfalvi.S06.ticVdiff h46).W]
     [Invertible (Nat.card (OddOrder.Peterfalvi.S06.ticVdiff h46).W : ℂ)]
     {A B H₁ : Subgroup ↥L} [A.Normal] [B.Normal] (hBA : B ≤ A) (hAH₁ : A ≤ H₁)
-    (hAcomm2 : A ≤ ⁅H, H⁆) (hW2B : h46.W2 ≤ B)
+    (hAcomm2 : A ≤ ⁅H, H⁆)
     (hcentral : (A.subgroupOf H).map (QuotientGroup.mk' (B.subgroupOf H)) ≤
       Subgroup.center (↥H ⧸ B.subgroupOf H))
     (hSAcoh : Nonempty (OddOrder.Peterfalvi.S07.IsCoherent hyp.tau (hyp.SsubFiltration A)
@@ -170,7 +182,7 @@ theorem six_three_index_bound_c2 (hyp : SibleyDadeHypothesis G L H) [H.Normal]
       (OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L))) :
     Nat.card (↥H ⧸ H₁.subgroupOf H) ≤ 4 * H.index ^ 2 + 1 := by
   have hsixtwo := six_two_central_c2 hyp h46 hHK hW1 (hyp.SsubFiltration_antitone hBA)
-    hAcomm2 hW2B (A.subgroupOf H) (Subgroup.subgroupOf_mono H hBA) hcentral hSAcoh hSBncoh
+    hAcomm2 (A.subgroupOf H) (Subgroup.subgroupOf_mono H hBA) hcentral hSAcoh hSBncoh
   have hHH1le : Nat.card (↥H ⧸ H₁.subgroupOf H) ≤ Nat.card (↥H ⧸ A.subgroupOf H) :=
     Nat.le_of_dvd Nat.card_pos (Subgroup.index_dvd_of_le (Subgroup.subgroupOf_mono H hAH₁))
   refine six_three_HH1_le (LK := H.index) (KH := 1) (HA := Nat.card (↥H ⧸ A.subgroupOf H))

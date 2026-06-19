@@ -90,6 +90,37 @@ bottom-out** するので、clean 化には §15 foundation が先。真の順�
 
 ## 進捗ログ
 
+**2026-06-19 conjunct 4 (BG 15.1(e)) — K=⊥ DONE + K≠⊥ engine/packaging DONE, kernel isolated**:
+- `06278a11`: K=⊥ branch (type F) of `typeP_hall_frobenius_factor` (Thm 12.12(b))。sorry-free。
+- `49e1a380`: K≠⊥ の **assembly 層を全て sorry-free 化** + kernel を最小 per-prime 補題へ隔離:
+  - `isFrobeniusGroup_of_regular_le_maximal` (sorry-free): `isFrobeniusGroup_of_regular` の E-setup-free
+    一般化 (`U0≤M` + `M_σ⊓U0=⊥` + regularity を直接取る)。
+  - `frobenius_factor_of_regular_components` (sorry-free): U abelian + per-prime regular component
+    `Z_p` から `U0=⊔Z_p` (exp U0=exp U, U0M_σ Frobenius) を組む engine。
+  - `typeP_hall_regular_component_at_prime` (**唯一の残 sorry**): p∣|U| → regular p-component Z_p≤Sylow_p(U)
+    of full p-exponent。`typeP_hall_frobenius_factor` 自体は sorry-free (engine+helper に委譲)。
+  - K≠⊥ branch = `M_σ⊓U=⊥` (coprimality) + engine 適用。**sorry count 不変** (K≠⊥ の sorry が
+    最小 per-prime helper へ relocate)。full build 3862 green。
+- `2f34b0a0`: **linchpin 確立 + τ1∪τ3 case DONE**。`exists_subgroupESetup_with_le hG hM hUM hUpi`
+  (S12_Proposition1215:283) で **U≤E の E-setup** を取得 (U は σ'-subgroup ゆえ)。τ1∪τ3 (p∉τ2 ⟹
+  r_p=1, `hsetup.pRank_M_le_two` の rank≤2 から): Z=Sylow_p(U) を G へ push、`factorization_exponent_le_of_sylow`
+  + Lemma 14.1 (K=⊥ と同じ discharge)。**残 = τ2 case のみ** (helper の唯一 sorry)。
+- **τ2 route 確定 (次の一手、~1 session)**: U-localization の conjugacy 罠は
+  **S:=Sylow_p(U) を full G-Sylow として使う**ことで回避 (`exists_cyclic_Enormal_regular_of_abelianSylow`
+  は `Z ≤ (S:Subgroup G)` を返す ⟹ S=Sylow_p(U) なら Z≤Sylow_p(U)≤U 直接)。要:
+  - **hreg** (τ1∪τ3 regularity on E、K=⊥ パターン再利用、~30行)。
+  - **full-Sylow-in-G fact (abelian)**: A=Ω₁(Sylow_p(U))∈ℰ_p²、S':Sylow p G⊇A、S' abelian ⟹
+    S'≤C_G(A)≤E≤M (`centralizer_le_E_of_tau2`)、|S'|≤(card M).fact p=(card U).fact p=|Sylow_p(U)| ⟹
+    |Sylow_p(U)|=(card G).fact p (full G-Sylow)。`Sylow.ofCard SU` で S:Sylow p G 化、適用。
+  - **nonabelian sub-case**: Sylow_p(U)=C_S(A)=A₀×Z (Thm 12.7, mmd 3237)、Z=regular cyclic factor。
+    既存 Lean `frobFact_of_nonabelianSylow` は FrobFactConclusion を返すゆえ per-prime Z 抽出は別途要 (harder)。
+- **kernel の shared linchpin (確定)**: τ1∪τ3 (partition coverage `pRank_M_le_two` で r_p=1) も
+  τ2 (regular cyclic machinery) も **両方とも type-P M の E-setup with U≤E を要求**。`pRank_M_le_two`
+  (S12_ECore:267) と `mem_tau_union_of_mem_primeFactors` (S12_ECore:295) は E-setup メソッド、τ2 機械
+  (`exists_cyclic_Enormal_regular_of_CES_eq` 等) も E-setup 取る。⟹ **次の一手 = type-P M の E-setup
+  (E=KU σ-complement, U≤E) を構成** (`subgroupESetup_of_complement` S12_Proposition1215:194 は private、
+  M=KUM_σ から M_σ⊓KU=⊥ ∧ M_σ⊔KU=M を示し E=KU で適用、または de-private wrapper)。これが linchpin。
+
 **2026-06-19 conjunct 1 (BG Lemma 15.1(b)) DONE** (`cab5603a`): standalone clean lemma
 `typeP_hall_derived_eq_and_abelian` (S15_MF.lean, `typeP_auxiliary_structure_gated` 直前) =
 `K≠⊥ → M'=U⊔M_σ ∧ IsMulCommutative U`。sorry-free + axiom-clean、full build 3862 green。
@@ -127,22 +158,30 @@ bottom-out** するので、clean 化には §15 foundation が先。真の順�
 - [x] conjunct 2 (BG 15.1(c)) = `typeP_hall_small_subgroup_cyclic_tau2` ✅ `e11e3028`
 - [x] BG Thm 12.12 形式化確認 — ✅ 既存 sorry-free (`frobenius_factorization_of_regular` S12_Theorem1212c:520)
 - [x] conjunct 3 (BG 15.1(d)) = `typeP_centralizerGeneratedBySigma_isMulCommutative` ✅ `80aa03cf`
-- [ ] **conjunct 4 (BG 15.1(e))** `U≠⊥ → ∃U0≤U, exp U0=exp U, Mσ⊔U0 Frobenius kernel Mσ`:
-  - **K=⊥ branch**: reachable — E=U setup (`subgroupESetup_of_isHall_kappa_eq_bot`) +
-    `frobenius_factorization_of_regular` part (b) (U0=E₀)。hreg discharge は conjunct 3 と同型。
-  - **⛔ K≠⊥ branch (type-P2) = 唯一の残 hard piece** (2026-06-19 委譲で深掘り ~530行→未完→**revert で消失**):
-    - ✅ **設計検証済**: U 上で直接構成 (U は κ' ゆえ (τ1∪τ3)∖κ 元は Lemma 14.1 で自動 regular)。
-      U0=⊔_p Z_p ((τ1∪τ3): Z_p=Sylow_p(U) cyclic / τ2: regular cyclic) → `isFrobeniusGroup_of_regular`。
-    - ✅ **設計確定だが要再構築** `exists_regular_cyclic_fullExponent_tau2` (~130行) = `exists_cyclic_Enormal_regular_of_abelianSylow`
-      の **C_E(S)=E 分岐を global hreg なしで抽出**。regularity は τ2-intrinsic (`Msigma_nilpotent_of_tau2`/`omega1_eq_of_tau2`);
-      hreg は τ2'-元 + X-存在分岐でしか使われないと grep 確認済 (CES_eq 分岐は clean に transplant 可)。
-    - ⛔ **真の blocker = `(|G|).factorization p = (|M|).factorization p` for p∈τ2(M)** (= M が G の full Sylow-p を含む)。
-      τ2 機械は `S:Sylow p G` with `S≤M` を要求。**Sylow_p(G) の abelian/nonabelian 場合分け要**:
-      abelian なら A∈ℰ_p²(U)⊆ℰ_p²(E)、S⊇A abelian ⟹ `S≤C_G(A)≤E≤M` (`centralizer_le_E_of_tau2`) ⟹ S=Sylow_p(M)=Sylow_p(U)、fact 成立;
-      nonabelian は **Thm 12.7** (`frobFact_of_nonabelianSylow`) 経由。エージェントは abelian case のみで簡略化し circular に陥った。
-    - **正スコープ = `frobenius_factorization_of_regular` の abelian/nonabelian Sylow 場合分けを U 上で再現** (各 case で
-      full-Sylow-in-G fact 確立) + hreg-free τ2 helper 再構築。**~1+ session の深い §12 work、単発委譲/loop 不適**。
-      σ-template = `exists_sylow_le_of_mem_sigma` (S10_HallStructureCore:536)、fact 技法 = `exists_mem_sigma_of_prime_dvd_card` (S14:3573)。
+- [~] **conjunct 4 (BG 15.1(e))** `typeP_hall_frobenius_factor` (S15_MF:1007) `U≠⊥ → ∃U0≤U, exp U0=exp U, Mσ⊔U0 Frobenius kernel Mσ`:
+  - **✅ K=⊥ branch (type F) DONE + committed** (`06278a11`, 2026-06-19): E=U setup
+    (`subgroupESetup_of_isHall_kappa_eq_bot`) + `frobenius_factorization_of_regular` part (b) (U0=E₀)。
+    hreg discharge は conjunct 3 と同型 (Lemma 14.1 `msigma_structure_of_notMem_sigma_kappa`)。sorry-free。
+  - **⬜ K≠⊥ branch (type P2) = 残 kernel** (2026-06-19 **完全再スコープ**, BG 原文 + §12 machinery 精読):
+    - **訂正 1 — assembly は CLEAN (U abelian)**: U0=⊔_{p∈π(U)} Z_p。U abelian ⟹ `card_finsetSup_eq_prod`/
+      `mem_Z_of_orderOf_prime_mem` (S12_Theorem1212c:102/138, H=U) の normalizer 条件 `U≤N(Z_p)` が**自動**。
+      exp は `exponent_eq_of_forall_factorization_le` (S12_Theorem1212:90, E-setup 不要)。regularity は
+      `inf_centralizer_eq_bot_of_forall_prime_order` で素数位数還元 → 各 prime-order 元は `mem_Z_of_orderOf_prime_mem`
+      で Z_r 内 → Z_r の regularity。Frobenius packaging は `isFrobeniusGroup_of_regular` (S12_Theorem1212:119)
+      の **E-setup-free 一般化** (proof は h を mem_maximal/E_le/E_compl_inf でしか使わず U0≤M + Mσ⊓U0=⊥ で代替可)。
+    - **訂正 2 — BG「easy C_E(S)=E」の意味**: BG 4178「(e) is obvious from the easy C_E(S)=E argument」=
+      U abelian ⟹ C_U(Sylow_p(U))=U 自動 ⟹ Thm 12.12 の C_E(S)=E 易枝に常に居る。`exists_cyclic_Enormal_regular_of_CES_eq`
+      (S12_Theorem1212b:1044) がこの枝。**但し S:Sylow p G with S≤M を要求** = full-Sylow-in-G fact。
+    - **訂正 3 — nonabelian は full-Sylow-in-G が FAILS だが Z_p は依然存在**: Thm 12.7 proof (mmd 3227)
+      `P=C_S(A)=Sylow_p(M) ⊊ S=Sylow_p(G)` ⟹ M は full G-Sylow を含まない。だが `P=A₀×Z` (mmd 3237,
+      A₀ order p centralizes Mσ=非regular, Z cyclic regular) ⟹ **Z_p=Z** が regular cyclic of full exponent
+      (A₀ は exp p で exp を上げない)。Thm 12.7(d) `frobFact_of_nonabelianSylow` (S12_Theorem1212:414) が供給源。
+    - **正スコープ (確定)**: ① sorry-free engine `frobenius_factor_of_regular_components` (assembly + 一般化
+      Frobenius packaging, 上記訂正 1 の通り、~100 行) + ② per-prime witness の discharge: τ1∪τ3 (Z_p=Sylow_p(U)
+      cyclic, Lemma 14.1 で regular, inline 易) / **τ2 = 唯一の hard kernel** (abelian: full-Sylow-in-G fact
+      `S=Sylow_p(U)≤M` 確立 → CES_eq; nonabelian: Thm 12.7 から Z 抽出)。**τ2 kernel = ~1 session の深い §12 work**。
+    - **prior 530-line 失敗の死因 = abelian only に簡略化し circular** (訂正 3 が示す通り nonabelian は別構造で回避要)。
+      σ-template = `exists_sylow_le_of_mem_sigma` (S10:536)、`centralizer_le_E_of_tau2` (full-Sylow abelian 枝)。
 - [ ] conjunct 1-4 を `typeP_auxiliary_structure_gated` に wire (sorry 139→138)
 - [ ] Thm 15.2(a) `mf_ne_msigma_typeP1_structure` (S15:1144)
 - [ ] Thm 15.7 `fitting_not_ti_cases` (S15:3896) + Cor 15.5
