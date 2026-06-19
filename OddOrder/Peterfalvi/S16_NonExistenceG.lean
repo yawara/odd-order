@@ -45,23 +45,6 @@ structure LHypothesis (hyp : Hypothesis (G := G)) where
   L_maximal : L ∈ maximalSubgroups G
   normalizer_U_le_L : Subgroup.normalizer (hyp.base.U : Set G) ≤ L
   H_eq_LF : H = maxNilpotentNormalHall L
-  Lset : Set (ClassFunction ↥L ℂ)
-  tau : OddOrder.Peterfalvi.S07.IntegralCharacterMap ↥L G
-  tau1 : OddOrder.Peterfalvi.S07.IntegralCharacterMap ↥L G
-  phi : ClassFunction ↥L ℂ
-  e : ℕ
-  e_eq_index : Prop
-  phi_mem : phi ∈ Lset
-  phi_degree_eq_e : phi 1 = (e : ℂ)
-  betaS : ClassFunction G ℂ
-  betaT : ClassFunction G ℂ
-  betaL : ClassFunction G ℂ
-  betaS_formula : Prop
-  betaS_formula_holds : betaS_formula
-  betaT_formula : Prop
-  betaT_formula_holds : betaT_formula
-  betaL_formula : Prop
-  betaL_formula_holds : betaL_formula
   typeI_data : OddOrder.Peterfalvi.S15.TypeIOverNormalizerData hyp.base
   typeI_data_L_eq : typeI_data.L = L
   typeI_data_H_eq : typeI_data.H = H
@@ -3036,16 +3019,31 @@ theorem H_eq_U [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
       _hG Tdata Sdata hcaseB (nc.u_dvd_h _hG) hh_mod_p hh_mod_q
       (hyp.u_modEq_one_mod_q _hG) hx_ne_one_of_quotient
 
-/-- **Peterfalvi (14.3)**: a type-I maximal subgroup `L` over `N_G(U)` together
-with its Dade data exists.  This packages (13.17) (the type-I-over-normalizer
-Frobenius structure `S15.typeII_overNormalizer_frobenius`) with the Dade isometry
-`τ`, its extension `τ₁`, the degree-`|L:H|` character `φ`, and the virtual
-characters `β_S`, `β_T`, `β_L` of (14.3).  The construction is gated on the §13
-character theory (Dade isometry + type-I structure). -/
+/-- **Peterfalvi (14.3) complement-order obligation**: the Frobenius complement of the type-I
+subgroup `L` over `N_G(U)` has order `p q`.  By (13.17.c) the complement is `W₁` (order `q`) or
+`W₁W₂^y` (order `p q`); the (14.5) argument rules out the first (it forces `H = U`, contradicting
+`S` type II).  Gated on (13.17.c) + (14.5) (§13). -/
+theorem L_complement_card_eq_pq [Finite G]
+    (_hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
+    (typeI_data : OddOrder.Peterfalvi.S15.TypeIOverNormalizerData hyp.base) :
+    Nat.card ↥typeI_data.frobenius.complement = hyp.base.p * hyp.base.q := sorry
+
+/-- **Peterfalvi (14.3)**: a type-I maximal subgroup `L` over `N_G(U)` exists.  Constructed by
+citing (13.17) `S15.typeII_overNormalizer_frobenius` for the type-I-over-normalizer Frobenius data
+(`S` is type II by `basic_structure` + (14.1) `q < p`); the residual complement order `|C| = p q`
+is the named obligation `L_complement_card_eq_pq` ((14.5)).  The (14.3.b) Dade data is not carried —
+it is unused by the §14 non-existence argument, so the carrier holds exactly the structural data the
+proof consumes. -/
 theorem exists_LHypothesis [Finite G]
     (_hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G)) :
     Nonempty (LHypothesis hyp) := by
-  sorry
+  obtain ⟨bdata, _⟩ := OddOrder.Peterfalvi.S15.basic_structure _hG hyp.base
+  have hSII : IsTypeII hyp.base.S := bdata.q_lt_p_forces_typeII hyp.q_lt_p
+  obtain ⟨typeI_data, _, _, _⟩ :=
+    OddOrder.Peterfalvi.S15.typeII_overNormalizer_frobenius _hG hyp.base hSII
+  exact ⟨⟨typeI_data.L, typeI_data.H, typeI_data.L_maximal, typeI_data.normalizer_U_le_L,
+    typeI_data.H_eq_LF, typeI_data, rfl, rfl,
+    L_complement_card_eq_pq _hG hyp typeI_data⟩⟩
 
 /-- **Peterfalvi (14.10)**: a type-I maximal subgroup `M` over `N_G(V)` together
 with its Dade data exists.  Symmetric to `exists_LHypothesis`, packaging (13.17)
