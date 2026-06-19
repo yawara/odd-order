@@ -4,7 +4,30 @@
 > `s08_6_8_assembly_plan.md`(458KB)/`s08_6_8_3_gap_resolution.md` のうち本 note と矛盾する記述は本 note を優先。
 > 上位方針・FT 接続の文脈 = 記憶 [[ft-path-policy]] の 2026-06-17 検証訂正ブロック。
 
-## 🚩🆕 HANDOFF — 次セッションはここから (2026-06-19 cont.²⁴)
+## 🚩🆕 HANDOFF — 次セッションはここから (2026-06-19 cont.²⁵)
+
+**状態**: branch `lane-b`、clean、**full build green、実 sorry 136**。reducible-break チェーン step 1-8 完了
+(cont.²⁴) + **dispatch deep-dive で残務を precise 化 + case-A glue 1 ピース着地**。
+
+**S08:59 dispatch 残務 = (6.8.3) bootstrap (大型・別サブプロジェクト)。deep-dive 確定 (再調査不要)**:
+- **DAG・dispatcher・hbound・c1 枝は ready**: S08_CoherenceTheorems が S08_PGroupReduction/S08_Theorem65c2 を
+  import 可 (cycle なし)。`nonempty_coherent_S_of_c2_of_branches` (`S08_PGroupReduction:215`) が step 8 の
+  hbound + hcop/hW2comm (←hyp.cases.inr 直接供給) + hsplit (caseAB_split_of_c2) + hcaseA/hcaseB から c2 coherence。
+  c1 枝 = `nonempty_coherent_S_of_frobenius` (self-contained)。
+- **残ゲート 2 本** (両方 (6.8.3) bootstrap):
+  1. **case-A S-bootstrap** = `nonempty_coherent_S_caseA_of_frobenius` (`S08_CoherenceCore:3859`、~120 行) の
+     c2 版。X(⁅H,H⁆)∪Y=S を構築。✅ **glue ピース着地**:
+     `coherentXunionYset_centralCommutator_of_glued_withDiagonal_of_c2_caseA` (commit 済、Frobenius 版の
+     X⊥Y 既約性を c2-caseA に差替)。残 = ~6 sub-lemma の c2 版 (`coherentXunionYset_centralCommutator_diagonal_general`
+     /`crux_general_of_higher_anchor` = **度数論含む深い**、`Xset_centralCommutator_nonempty`/`two_le_xBaseBlock_ncard`
+     /`exists_Ycoherence_hgood` = 構造) + 主 producer ミラー。
+  2. **case-B structure-data** = `nonempty_coherent_S_caseB_of_c2` (`:343`) の named 仮説 hWMgt (W₂⊊⁅H,H⁆)/
+     hYcard (Yset.ncard≠2、`two_le_Yset_ncard` は ≥2 のみ)/hXne (Xset W₂≠∅、Xset 単調ゆえ Xset ⁅H,H⁆≠∅ から
+     導けない) の discharge。
+**∴ S08:59 closure は multi-session (6.8.3) bootstrap。reducible-break チェーン (本セッション主題) とは独立。**
+**FT 文脈不変**: (6.8) は [[ft-path-policy]] で orphaned (deferred-payoff)。
+
+## 🚩 HANDOFF — (2026-06-19 cont.²⁴)
 
 **状態**: branch `lane-b`、作業ツリー clean、**full build 3868 green、実 sorry 136**。reducible-break (5.6.3)
 **残チェーン step 1-8 を完了** (engine + cross-ortho toolkit + 列 break (6.2) bound chain + c2 (6.3)
