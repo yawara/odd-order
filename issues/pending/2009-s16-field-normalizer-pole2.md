@@ -369,3 +369,31 @@ Lane B の Dade 指標論に bottom-out。
   (a) L~S を type-II def + Hall 共役で除外、L~T を (13.2.a) で除外 → (8.8.b4) type-I → (12.7) Frobenius;
   (b) U⊆H = (8.17.a)+(9.1); (c) 補元 = [H]Satz 8.18 + (13.16) + BG Prop 3.9 (`S03g_Thm310`) + Sylow。
   ∃ maximal L⊇N_G(U) は proper⊆maximal で provable。cite 先 (12.7/13.2.a/8.8 dichotomy/BG 3.9) は repo 在。
+
+## 2026-06-19 再開¹² cont. — (13.17) gated-endpoint skeleton (`0d99daf1`)
+
+`typeII_overNormalizer_frobenius` (13.17, POLE-2 の exists_LHypothesis が cite) を **sorry-free
+assembly** 化: (12.7) `S14.typeI_frobenius` を cite + deep §13 内容を 2 faithful obligation に分離。
+real sorry 133→134 (bare sorry → 2 obligation + (12.7) cite、[[feedback-gated-endpoint-skeleton-pattern]])。
+
+### 残 obligation (FT-path、次の deep §13 ターゲット) + 攻略メモ
+**① `exists_typeI_maximal_overNormalizer_U` (13.17.a/b)** = ∃ type-I maximal L⊇N_G(U) with U⊆L_F:
+- ∃ maximal L⊇N_G(U): N_G(U) proper (U≠⊥ + G simple) → `Finite.exists_le_maximal`。
+- L type-I: `hyp.theorem88_caseB L hLmax` (Hypothesis field = (8.8.b4) trichotomy) で IsTypeI∨L~S∨L~T。
+  - **L~S 除外** = conj g•L=S → conj g•N_G(U)≤S → (Hall 共役で conj•U を typeP.U に取り直し) → N_G(typeP.U)≤S、
+    `IsTypeII.normalizer_not_le` 矛盾。**⚠ 真の障害 = coherence — Hypothesis は hyp.U を S の type-II
+    `typeP.U` に pin せず** (S_deriv_eq_PU/card_U_eq_uc 等の制約のみ; 両者とも「derivedInG S の P-補元」だが
+    補元は一意でなく**共役止まり**) → bridge 要。**normalizer 同変性は既存** (自前導出不要): repo
+    `normalizer_conj_smul` (S12_ExceptionalBridge:266) + mathlib `Subgroup.map_normalizer_eq_of_bijective`。
+    **maxNNH 同変性 (本セッション landing) と同型の議論** = 候補。
+  - **L~T 除外** = |L_F|=q^p → W₁⊆N_G(U)⊆L, W₁⊆L_F, [U,W₁]⊆L_F∩U=1、(13.2.a) UW₁ Frobenius 矛盾。要 |L_F|=q^p (T-side)。
+- U⊆L_F: (8.17.a) |L_F| coprime to q → W₁∩L_F=1; U∩L_F=1 なら UW₁ FPF on L_F → (9.1) L_F=1 矛盾。要 (8.17.a)/(9.1) 所在確認。
+
+**② `typeI_overNormalizer_complement` (13.17.c/14.5)** = |complement|=pq ∧ ∃y∈Q, W₂^y≤complement:
+- E⊇W₁ complement to L_F in L = odd-order Frobenius complement → 素数位数部分群正規 ([H] V.8.18) → E⊆N_G(W₁)⊆QW₂
+  ((13.16)) → Sylow cyclic ([BG] 3.9 = `S03g_Thm310`) → E=W₁ or |E|=pq=W₁W₂^y。W₁ 枝は (14.5) 除外。
+  **⚠ [H] V.8.18 (Frobenius complement odd ⟹ prime subgroups normal) の repo 所在未確認** (Appendices.Huppert?)。
+
+### 本セッション成果サマリ (commits `8e6b3379`/`a5fe4a45`/`0d99daf1`)
+maxNNH 自己同型同変性 (reusable, axiom-clean) + H_cyclic_of_L_conj_M sorry-free 化 (POLE-2 L≅M 枝) +
+(13.17) skeleton。次セッション = obligation ① (coherence bridge + normalizer 同変性から着手、maxNNH 同変性流用)。
