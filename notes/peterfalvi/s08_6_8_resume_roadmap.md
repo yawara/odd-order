@@ -61,14 +61,34 @@ Frobenius 版 producer (`nonempty_coherent_S_caseA_of_frobenius`, `S08_Coherence
 **⟹ c2 dispatch の `hcaseA` 完成** (dispatcher `nonempty_coherent_S_of_c2_of_branches` `S08_PGroupReduction:215`
 が要求する形)。case-A S-bootstrap (gate 1 of S08:59) は **producer レベルで着地**。
 
-### ▶ S08:59 closure への残 (cont.²⁶ 完了後)
-1. **c2 dispatch 配線** (`sibleySetup_is_coherent` `S08_CoherenceTheorems:59` の X-nonempty 枝): Frobenius/CertainType
-   split → CertainType で `nonempty_coherent_S_of_c2_of_branches` に hcaseA=**新 producer ✅** + hcaseB + hbound +
-   hsplit を供給。新 leaf を `S08_CoherenceTheorems` から import 要。
-2. **hcaseB (case-B producer) の structure-data discharge**: `nonempty_coherent_S_caseB_of_c2`
-   (`S08_PGroupReduction:343`) は hWMgt/hYcard/hXne を named 仮説に取る → これらの discharge が残 (cont.²⁵ 既述)。
-3. **hbound** = `abelianization_card_le_of_not_coherent_c2` (step 8 ✅) / **hsplit** = `caseAB_split_of_c2` ✅。
-**∴ 残 = dispatch 配線 (1) + case-B structure-data (2)。case-A 側は完了。**
+### ▶ S08:59 closure への残 (cont.²⁶ 完了後 — **dispatch 材料は全存在、残 = hcaseB 構築 + assembly**)
+**S08:59 `sibleySetup_is_coherent` X-nonempty 枝の構造** (精査済、`S08_CoherenceTheorems:59`):
+```
+rcases hyp.cases with hF | ⟨h46, hdade, hHK, hW1, hprime, hW2comm, hcop⟩   -- cases field = Part1:3321
+· -- c1 Frobenius: nonempty_coherent_S_of_frobenius (S08_PGroupReduction:159) ✅存在
+· -- c2 CertainType: by_contra hncoh; nonempty_coherent_S_of_c2_of_branches (PGroupReduction:215) ✅
+     に hHK hW1 hW2comm hcop + hbound + hsplit + hcaseA + hcaseB を供給 → S coherence で hncoh 矛盾
+```
+**✅ 全 dispatch 材料が存在**:
+- hyp.cases.inr → **h46/hHK/hW1/hprime/hW2comm/hcop** (CertainType data、Part1:3321)。
+- **hbound** = `abelianization_card_le_of_not_coherent_c2` (`S08_Theorem65c2:254`) ✅。
+- **hsplit** = `caseAB_split_of_c2` (`PGroupReduction:243`) ✅。
+- **hcaseA** = `nonempty_coherent_S_caseA_of_c2` (新 leaf) ✅ — 但し dispatcher の `∀{p},prime→IsPGroup→Disjoint→Nonempty`
+  形に合わせる薄いラッパ要 (hA=disjoint_iff.mp、hp3=p odd、hHnonab=X-nonempty から)。
+- **c1** = `nonempty_coherent_S_of_frobenius` (`PGroupReduction:159`) ✅。
+- **instances** (NeZero/Invertible/Fintype for h46.W1, h46.W1⊔h46.W2, ticVdiff) — CertainType 文脈で要構築/導出。
+
+**🚩 残 = hcaseB 構築** = case-B producer `nonempty_coherent_S_caseB_of_c2` (`PGroupReduction:343`) を
+dispatcher 形 `∀{p},prime→IsPGroup→(W₂.subgroupOf H≤Z(H))→Nonempty(S coh)` にする = **hWMgt/hYcard/hXne の
+per-call discharge** (cont.²⁵ 既述の case-B structure-data ゲート):
+- **hXne** (X(W₂)≠∅): `Xset_nonempty_of_subgroupOf_ne_bot_of_irreducible_X` (`Part2:3523`、X 既約 + W₂.subgroupOf H≠⊥)。
+  W₂.subgroupOf H≠⊥ は W₂ prime ≤ H から。**容易**。
+- **hWMgt** (W₂⊊⁅H,H⁆): W₂=⁅H,H⁆ の edge は `Xset_union_Yset_eq_S` (`Part2:1068`) で S=X(W₂)∪Y + (6.8.2) seed
+  `coherentXunionYset_caseB` (`S08_CaseBSeedGlue:299`) coherent ⟹ S coherent (producer 不要)。**要 edge 分岐**。
+- **hYcard** (|Y|≠2): |Y|=2 の (6.8.2) exceptional relabel ⟹ **要 edge 分岐** (最も非自明)。
+**∴ 残 = (A) hcaseB の edge-case 分岐 (W₂=H'/|Y|=2 を (6.8.2) で直接 S coherent、else case-B producer) +
+(B) S08:59 assembly (上記 rcases + 薄いラッパ + import)。case-A 側は完全に完了。**
+**見積**: hXne 容易、W₂=H' edge は部品あり中程度、|Y|=2 edge が要調査、assembly は機械的。~1-2 session。
 
 ### 🗂 (履歴) ▶ 残ゲートの精密診断 (cont.²⁶ 深掘り — column break の解析過程、上で解決)
 **case-A producer = `false_of_coherentXunionYset_caseB_of_not_coherentS` (`S08_CaseBWeightedEndgame:272`) の
