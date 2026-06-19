@@ -2103,15 +2103,29 @@ theorem u_modEq_one_mod_p_of_LHypothesis [Finite G]
     rw [hH0_eq_H]; exact hU_le_H hu
   exact Hypothesis.u_modEq_one_mod_p_of_fpf hG hyp hW2y_norm hfpf
 
+/-- **Peterfalvi (13.2) `S`-side structural inputs for the (14.7) field model.**  The field-model
+construction (14.2.a) needs three §13 structural facts about the type-`P` subgroup `S`:
+* `U` is cyclic — `UW₁` is a Frobenius group with abelian kernel `U` (13.2.a) and `c = 1` (13.12),
+  so the Hall subgroup `U` is cyclic;
+* `W₂ ≤ P` — `W₂` is a `p`-element of `S` and `P = S_F` is the normal Sylow `p`-subgroup, so
+  `W₂ ⊆ P` (the `F_p ⊆ F` identification of (14.2.a));
+* `Q` is elementary abelian — (13.2.b) applied to the dual subgroup `T` (`Q = T_F` of order `q^p`).
+Companion to `basic_structure` (which supplies the `S`-side `P`-facts); these are the §13
+group-theory obligations (Lane B), cited by the (14.7) assembly so it carries no `sorry`. -/
+theorem S_field_model_structural_inputs [Finite G]
+    (_hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G)) :
+    IsCyclic ↥hyp.base.U ∧ hyp.base.W2 ≤ hyp.base.P ∧
+      IsElementaryAbelian hyp.base.q ↥hyp.base.Q := sorry
+
 /-- **Peterfalvi (14.7)**: if `U` is characteristic in `H`, then the field-normalizer
 configuration (14.2) holds.  The value argument is assembled entirely from the structural
 carrier: (14.5) `exists_y_L_structure` supplies `y ∈ Q` with `W₂^y` in the Frobenius complement
 of `L`; the bridge `u_modEq_one_mod_p_of_LHypothesis` turns that into `u ≡ 1 mod p`; and
 `W2conj_le_normalizer_U_of_LHypothesis` supplies `W₂^y ≤ N_G(U)`.  These feed the value-argument
-engine `field_normalizer_of_U_characteristic_of_fpf`.  The single remaining `sorry` is exactly the
-bundle of genuinely §13-gated structural facts — `U` cyclic, `W₂ ≤ P`, and part (14.2.b)'s `Q`
-elementary abelian and `W₂ ≤ N_G(Q)` (from (13.2.b) and the §13 basic structure / `c = 1`, Lane B)
-— none of which the ungated field algebra or the (14.5)/(13.17) carrier can supply. -/
+engine `field_normalizer_of_U_characteristic_of_fpf`.  This theorem carries **no `sorry`**: the
+remaining §13 structural facts are cited as the named obligation `S_field_model_structural_inputs`
+(`U` cyclic / `W₂ ≤ P` / `Q` elementary abelian), while `W₂ ≤ N_G(Q)` is discharged outright
+(`W₂ ≤ W ≤ T` and `Q = T_F`). -/
 theorem field_normalizer_of_U_characteristic [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
     (Ldata : LHypothesis hyp)
@@ -2120,11 +2134,17 @@ theorem field_normalizer_of_U_characteristic [Finite G]
   obtain ⟨y, hyQ, hW2y_compl⟩ := exists_y_L_structure hG hyp Ldata
   have hmod := u_modEq_one_mod_p_of_LHypothesis hG Ldata hchar hW2y_compl
   have hW2_conj_y := W2conj_le_normalizer_U_of_LHypothesis Ldata hchar hW2y_compl
-  -- genuinely §13-gated structural facts (basic_structure / c_eq_one / (13.2.b), Lane B)
-  obtain ⟨hcyc_U, hW2_le_P, hQ_elemAb, hW2_norm_Q⟩ :
-      IsCyclic ↥hyp.base.U ∧ hyp.base.W2 ≤ hyp.base.P ∧
-        IsElementaryAbelian hyp.base.q ↥hyp.base.Q ∧
-        hyp.base.W2 ≤ Subgroup.normalizer (hyp.base.Q : Set G) := sorry
+  -- §13 structural inputs (13.2.a/b, companion to `basic_structure`; Lane B / §13 group theory)
+  obtain ⟨hcyc_U, hW2_le_P, hQ_elemAb⟩ := S_field_model_structural_inputs hG hyp
+  -- `W₂ ≤ N_G(Q)` is ungated: `W₂ ≤ W ≤ T` and `Q = T_F`
+  have hW2_norm_Q : hyp.base.W2 ≤ Subgroup.normalizer (hyp.base.Q : Set G) := by
+    have hW2_le_W : hyp.base.W2 ≤ hyp.base.W := by
+      rw [hyp.base.W_eq_join]; exact le_sup_right
+    have hW_le_T : hyp.base.W ≤ hyp.base.T := by
+      rw [hyp.base.W_eq_inter]; exact inf_le_right
+    rw [hyp.base.Q_eq_TF]
+    exact (hW2_le_W.trans hW_le_T).trans
+      (OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_le_normalizer hyp.base.T)
   haveI := hcyc_U
   exact field_normalizer_of_U_characteristic_of_fpf hG hyp Ldata hmod hW2_le_P
     hQ_elemAb hW2_norm_Q y hyQ hW2_conj_y
