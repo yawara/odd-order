@@ -169,6 +169,7 @@ import OddOrder.Peterfalvi.S06_CertainTypeCoherence
 import OddOrder.Peterfalvi.S06_CertainTypeFourCorner
 import OddOrder.Peterfalvi.S07_Coherence
 import OddOrder.Peterfalvi.S07_CoherenceGalois
+import OddOrder.Peterfalvi.S07_RetargetScaled
 import OddOrder.Peterfalvi.S08_CoherenceCore
 import OddOrder.Peterfalvi.S08_CoherenceTheorems
 import OddOrder.Peterfalvi.S08_CaseBCoherence
