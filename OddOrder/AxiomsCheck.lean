@@ -5236,3 +5236,20 @@ irreducibly on `(F, +)`), and the resulting unconditional field structure
 
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.Appendices.NearFields.nearField_field_structure_of_index_two
+
+/-! **`M_F` is automorphism-equivariant** (`MaxNilpotentNormalHall`).  The maximal nilpotent
+normal Hall subgroup `M_F` of Peterfalvi/BG is natural under any automorphism `φ` of `G`:
+`φ • M_F = (φ • M)_F` (`maxNilpotentNormalHall_pointwise_smul`), with the candidate-set/subgroupOf
+transport helper `map_subgroupMap_subgroupOf` and the automorphism-action equation
+`pointwise_mulAut_smul_eq_map`.  Reusable building block for the BG §13 / Peterfalvi §13
+conjugation arguments on `L_F`/`M_F` (e.g. the (14.12) `L ≅ M` reduction `H_cyclic_of_L_conj_M`).
+Fully unconditional, axiom-clean. -/
+
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.maxNilpotentNormalHall_pointwise_smul
+
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.map_subgroupMap_subgroupOf
+
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.pointwise_mulAut_smul_eq_map
