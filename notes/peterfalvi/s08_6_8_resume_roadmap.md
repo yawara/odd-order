@@ -4,6 +4,39 @@
 > `s08_6_8_assembly_plan.md`(458KB)/`s08_6_8_3_gap_resolution.md` のうち本 note と矛盾する記述は本 note を優先。
 > 上位方針・FT 接続の文脈 = 記憶 [[ft-path-policy]] の 2026-06-17 検証訂正ブロック。
 
+## ✅✅🎯 2026-06-19 cont.¹⁹ — reducible-break (5.6.3) coherence 拡張 `retarget_isCoherent_S` 完成
+
+cont.¹⁸ で「retarget は norm-1 専用、reducible は basis-direct 新規構成が要る」と確定した核心難所を**完成**。
+新ファイル [`S07_RetargetScaled.lean`](../../OddOrder/Peterfalvi/S07_RetargetScaled.lean)
+(全 axiom-clean、full build 3865 green、commits `c36e231c`/`2d722d17`):
+
+**設計のブレイクスルー**: cont.¹⁸ の「ℤ-線形 projection は /k できない」は半分正しく半分誤り。
+`innerLeftℤ χ` は **ℂ 値** (`→ₗ[ℤ] ℂ`) ゆえ `(innerLeftℤ χ).smulRight ((⟨χ,χ⟩)⁻¹ • X)` は ℤ-線形を
+保ったまま `(⟨φ,χ⟩/k)•X` を与える。lattice ℤ[S₁∪{χ,χ̄}] 上では ⟨φ,χ⟩=m·k ゆえ係数 m は整数 = projection
+の整合。**∴ scaled projection で basis-direct 構成が実装できた** (新たな basis 分解は不要だった)。
+
+**構成 (8 lemma)**:
+- `inner_block_expand_gen` (変数ノルム ⟨e,e⟩=ee)
+- `orthoResidualMapS`/`retargetS` + apply (scaled、(⟨χ,χ⟩)⁻¹ 込み)
+- `inner_orthoResidualMapS_left/right` (残差⊥χ、‖χ‖²≠0 のみ)
+- `orthoResidualMapS_mem_zSpan` (残差が ℤ[S₁] 着地)
+- **`retargetS_inner_eq_on_zSpan_union`** (lattice isometry、Gram 一致 ⟨X,X⟩=⟨χ,χ⟩ で項照合、scaling 両辺同一)
+- `retargetS_eq_of_orthogonal`/`retargetS_apply_left`(χ↦X)/`retargetS_apply_right`(χ̄↦X̄)
+- **`retarget_isCoherent_S`** = `retarget_isCoherent` の ‖χ‖²≠1 版。reducible break を base に adjoin して
+  `IsCoherent τ (S₁∪{χ,χ̄}) A` を構成 (extension=retargetS、4 field 全 discharge)。
+
+### ▶ 残務 (downstream wiring、構成本体は完成)
+
+1. **`retargetTargetPair_k`**: reducible χ 用の {X,X̄} 構成。X=Σ_{α∈E}α (|E|=‖χ‖²=k、(5.4.b)
+   `eq_sum_of_psi_eq_zero` で E 取得、(5.6.2) の ‖Y‖²≥‖ψ‖² から)。R(μⱼ)=`certainTypeR`。Gram 一致
+   ⟨X,X⟩=|E|=k=⟨χ,χ⟩ を出す。
+2. **reducible-break `coherentDegreeSqNormBound_of_not_coherentW`**: `xAdjoinStepW` の reducible 版を
+   `retarget_isCoherent_S` で組む (forward 構成) → 対偶 bound。
+3. **`six_two_index_bound_c2` の `hW2B` 撤廃**: reducible break OK 版に差し替え →
+   `six_three_index_bound_c2`/`six_three_c2`(induction、hW2B 不要)→ `isPGroup_of_not_coherent_c2`
+   → `hbound` → dispatch → S08:59。
+**FT 文脈不変**: (6.8) は orphaned (deferred-payoff)。
+
 ## 🔨🎯 2026-06-19 cont.¹⁸ — c2 chain 3 段 landed (既約-break path) + Step-0 residual を構築で確定
 
 新 leaf [`S08_Theorem65c2.lean`](../../OddOrder/Peterfalvi/S08_Theorem65c2.lean) に c2 chain を構築 (全 axiom-clean、
