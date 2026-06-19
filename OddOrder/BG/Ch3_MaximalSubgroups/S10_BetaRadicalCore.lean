@@ -730,8 +730,11 @@ If `p ∉ α(M)` then `r_p(M) ≤ 2`, so the Sylow has rank `≤ 2` and is narro
 (`isSylow_sylowMap_of_mem_sigma`: no normalizer growth out of `M`); and `p ∈ α(M)` with
 `p ∉ β(M)` forces `¬ idealPrime p G`, which (with `r_p(G) ≥ 3`) means some — hence every, by
 conjugacy — Sylow `p`-subgroup of `G` has a maximal elementary abelian subgroup of order `p²`,
-i.e. is narrow (`narrow_iff_exists_maximalElementaryAbelian_card_prime_sq`). -/
-private theorem isNarrow_sylow_of_not_mem_beta [Finite G] (hG : IsMinimalSimpleOdd G)
+i.e. is narrow (`narrow_iff_exists_maximalElementaryAbelian_card_prime_sq`).
+
+(De-privatised 2026-06-19: also consumed by BG Theorem 15.2 (`S15_MF`) to discharge the
+narrowness of `Q = O_q(M)` in the `q ∈ β(M)` gate.) -/
+theorem isNarrow_sylow_of_not_mem_beta [Finite G] (hG : IsMinimalSimpleOdd G)
     {M : Subgroup G} (hM : M ∈ maximalSubgroups G) {p : ℕ} [Fact p.Prime]
     (hpπ : p ∈ (Nat.card ↥M).primeFactors) (hpβ : p ∉ beta M) (P : Sylow p ↥M) :
     IsNarrow p ↥(P : Subgroup ↥M) := by
