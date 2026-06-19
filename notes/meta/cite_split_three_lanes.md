@@ -11,8 +11,24 @@
 - 残 FT work は本質的に 2 トラック: **Peterfalvi 指標論**(深い char core)と
   **BG 構造**(Prop 16.1 program)。両方 1 レーンずつだと長い直列鎖になり、
   特に H の POLE-2 は §13 char に gate されて停滞していた。
-- 解 = **gate を cite して大チャンクに割る**。H は深い char (coherence/Dade) を
-  cite で切り、自分の強み(構造群論)が効く Peterfalvi §10-13 maximal 構造を大塊で取る。
+- 解 = **gate を cite して大チャンクに割る**。3 レーンを 2 トラックに配分し、
+  **binding constraint = Peterfalvi 指標論に 2 レーン(B+H)**を置く。
+
+### 配分の根拠 (2026-06-19 訂正)
+
+**レーンに固有スキルは無い**(エージェント+worktree、char も構造も等しく可能)。
+ゆえに配分は「H の強み」でなく **binding constraint の長さ**で決める:
+
+- **Peterfalvi 指標論が binding**: 最も下流依存が多い(POLE-2 [§13] + POLE-1
+  characterData [§13 grid] + **BG §16 の char tail** [§12 の 10.10/10.11 が
+  Prop 14.2/tp producer を gate])・最大本体・今 B 単独。**並列化可**(§5/§6 char API
+  は sorry-free、§11/§12/§13 は type-case 別クラスタ)。⟹ 2 レーン目 (H) はここ。
+- **BG §16 (F 単独) は短い track** + 完全には閉じない(char tail 10.10/10.11 が
+  Peterfalvi §12 内)。ゆえに F 単独で可、2 レーン目は不要。
+- **当初「H=構造論強み ⟹ BG分担」は誤り**(スキル固有性は無い)。§10-13 を「構造」と
+  誤ラベルしたが、§11-13 は chiefFactor/Clifford/coherence/orthogonality = char theory。
+  H はそこで **char をやる**(§5/§6 char API を cite)。**leverage: H の §12 (10.10/10.11)
+  は POLE-2 と BG §16 char tail の両方を unblock** ⟹ Peterfalvi 配置は BG にも効く。
 
 ## 3 大チャンク
 
