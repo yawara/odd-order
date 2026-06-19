@@ -127,8 +127,8 @@ the part-(14.2.b) normalizer input `W₂^y ≤ N_G(U)`.  Its proof rules out the
 theorem exists_y_L_structure [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
     (hyp : Hypothesis (G := G)) (Ldata : LHypothesis hyp) :
     ∃ y ∈ hyp.base.Q, (MulAut.conj y • hyp.base.W2 : Subgroup G) ≤
-      Ldata.typeI_data.frobenius.complement.map (Ldata.typeI_data.L).subtype := by
-  sorry
+      Ldata.typeI_data.frobenius.complement.map (Ldata.typeI_data.L).subtype :=
+  Ldata.typeI_data.exists_y_W2_conj_le_complement
 
 /-- Carrier for the case-(9.7.b) conclusion applied to `S` in Peterfalvi
 (14.6). -/
@@ -3019,19 +3019,10 @@ theorem H_eq_U [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
       _hG Tdata Sdata hcaseB (nc.u_dvd_h _hG) hh_mod_p hh_mod_q
       (hyp.u_modEq_one_mod_q _hG) hx_ne_one_of_quotient
 
-/-- **Peterfalvi (14.3) complement-order obligation**: the Frobenius complement of the type-I
-subgroup `L` over `N_G(U)` has order `p q`.  By (13.17.c) the complement is `W₁` (order `q`) or
-`W₁W₂^y` (order `p q`); the (14.5) argument rules out the first (it forces `H = U`, contradicting
-`S` type II).  Gated on (13.17.c) + (14.5) (§13). -/
-theorem L_complement_card_eq_pq [Finite G]
-    (_hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
-    (typeI_data : OddOrder.Peterfalvi.S15.TypeIOverNormalizerData hyp.base) :
-    Nat.card ↥typeI_data.frobenius.complement = hyp.base.p * hyp.base.q := sorry
-
 /-- **Peterfalvi (14.3)**: a type-I maximal subgroup `L` over `N_G(U)` exists.  Constructed by
 citing (13.17) `S15.typeII_overNormalizer_frobenius` for the type-I-over-normalizer Frobenius data
-(`S` is type II by `basic_structure` + (14.1) `q < p`); the residual complement order `|C| = p q`
-is the named obligation `L_complement_card_eq_pq` ((14.5)).  The (14.3.b) Dade data is not carried —
+(`S` is type II by `basic_structure` + (14.1) `q < p`); the complement order `|C| = p q` is a field
+`complement_card_eq_pq` of that data ((13.17.c)/(14.5)).  The (14.3.b) Dade data is not carried —
 it is unused by the §14 non-existence argument, so the carrier holds exactly the structural data the
 proof consumes. -/
 theorem exists_LHypothesis [Finite G]
@@ -3039,11 +3030,10 @@ theorem exists_LHypothesis [Finite G]
     Nonempty (LHypothesis hyp) := by
   obtain ⟨bdata, _⟩ := OddOrder.Peterfalvi.S15.basic_structure _hG hyp.base
   have hSII : IsTypeII hyp.base.S := bdata.q_lt_p_forces_typeII hyp.q_lt_p
-  obtain ⟨typeI_data, _, _, _⟩ :=
+  obtain ⟨typeI_data, _, _⟩ :=
     OddOrder.Peterfalvi.S15.typeII_overNormalizer_frobenius _hG hyp.base hSII
   exact ⟨⟨typeI_data.L, typeI_data.H, typeI_data.L_maximal, typeI_data.normalizer_U_le_L,
-    typeI_data.H_eq_LF, typeI_data, rfl, rfl,
-    L_complement_card_eq_pq _hG hyp typeI_data⟩⟩
+    typeI_data.H_eq_LF, typeI_data, rfl, rfl, typeI_data.complement_card_eq_pq⟩⟩
 
 /-- **Peterfalvi (14.10)**: a type-I maximal subgroup `M` over `N_G(V)` together
 with its Dade data exists.  Symmetric to `exists_LHypothesis`, packaging (13.17)
