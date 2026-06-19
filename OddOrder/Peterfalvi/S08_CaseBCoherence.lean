@@ -1336,4 +1336,181 @@ theorem SibleyDadeHypothesis.exists_Ycoherence_hgood_caseB
     rw [OddOrder.Peterfalvi.S07.IsCoherent.extension_eqRec hYeq.symm cY', hcY'1, hcY0map,
       ClassFunction.inner_neg_right, hconst]
 
+/-- **(6.8.2.2) `φ`-independence of `⟨α^τ, η'^{τ₁}⟩`** (Peterfalvi's "`Y` is independent of `φ`").
+For `α_φ = Ind^L_{W₂}φ − |H:W₂|·η₁` (`φ` a nontrivial linear character of the central `W₂`), the
+multiplicity `⟨α_φ^τ, η'^{τ₁}⟩` against a *fixed* `η' ∈ Y` is the **same** for all nontrivial linear
+`φ`.
+
+Proof: by Dade reciprocity (`inner_tau_indW2_sub_smul_eq`) the multiplicity is
+`⟨φ, Res_{W₂} Res_L η'^{τ₁}⟩ − |H:W₂|·⟨η₁, Res_L η'^{τ₁}⟩`; the second term is already `φ`-free, and
+the first equals `(f 1 − f z)/|W₂|` (`apply_one_sub_apply_eq_card_mul_inner`, since
+`f = Res_{W₂} Res_L η'^{τ₁}` is constant on `W₂^#` by (6.8.2.1)
+`coherentYset_extension_const_on_W2`) — visibly independent of `φ`.  This is the fact that makes the
+`m = 2` relabel choice in `exists_Ycoherence_hgood_uniform_caseB` uniform across all `φ`. -/
+theorem SibleyDadeHypothesis.inner_tau_alpha_extension_phiIndep
+    (hyp : SibleyDadeHypothesis G L H) [H.Normal]
+    {W2 : Subgroup ↥L} [Invertible (Nat.card ↥W2 : ℂ)]
+    (hprime : (Nat.card W2).Prime) (hW2comm : W2 ≤ ⁅H, H⁆)
+    {η₁ : ClassFunction ↥L ℂ} (hη₁ : η₁ ∈ hyp.Yset)
+    {η' : ClassFunction ↥L ℂ} (hη' : η' ∈ hyp.Yset)
+    (φ φ' : IrreducibleCharacter ↥W2)
+    (hφ1 : (φ : ClassFunction ↥W2 ℂ) 1 = 1) (hφ : φ ≠ trivialIrreducibleCharacter ↥W2)
+    (hφ'1 : (φ' : ClassFunction ↥W2 ℂ) 1 = 1) (hφ' : φ' ≠ trivialIrreducibleCharacter ↥W2) :
+    ClassFunction.inner (hyp.tau (ClassFunction.induce W2 (φ : ClassFunction ↥W2 ℂ)
+        - ((W2.subgroupOf H).index : ℂ) • η₁)) (hyp.coherentYset.extension η')
+      = ClassFunction.inner (hyp.tau (ClassFunction.induce W2 (φ' : ClassFunction ↥W2 ℂ)
+        - ((W2.subgroupOf H).index : ℂ) • η₁)) (hyp.coherentYset.extension η') := by
+  haveI : Fintype ↥W2 := Fintype.ofFinite _
+  classical
+  have hW2H : W2 ≤ H := by
+    have hle : ⁅H, H⁆ ≤ H := by
+      rw [Subgroup.commutator_le]; intro a ha b hb; rw [commutatorElement_def]
+      exact H.mul_mem (H.mul_mem (H.mul_mem ha hb) (H.inv_mem ha)) (H.inv_mem hb)
+    exact hW2comm.trans hle
+  have hdeg : ∀ χ : ClassFunction ↥W2 ℂ, χ 1 = 1 →
+      ClassFunction.induce W2 χ 1 = ((W2.subgroupOf H).index : ℂ) * η₁ 1 := by
+    intro χ hχ1
+    rw [ClassFunction.induce_apply_one, hχ1, mul_one, hyp.Yset_apply_one hη₁]
+    have hidx : W2.index = (W2.subgroupOf H).index * H.index :=
+      (Subgroup.relIndex_mul_index hW2H).symm
+    rw [hidx, hyp.index_H_eq_card_W1]; push_cast; ring
+  rw [hyp.inner_tau_indW2_sub_smul_eq hW2H (φ : ClassFunction ↥W2 ℂ) hη₁
+        ((W2.subgroupOf H).index : ℂ) (hdeg _ hφ1) (hyp.coherentYset.extension η'),
+    hyp.inner_tau_indW2_sub_smul_eq hW2H (φ' : ClassFunction ↥W2 ℂ) hη₁
+        ((W2.subgroupOf H).index : ℂ) (hdeg _ hφ'1) (hyp.coherentYset.extension η')]
+  set f := ClassFunction.restrict W2 (ClassFunction.restrict L (hyp.coherentYset.extension η'))
+    with hf
+  haveI : Nontrivial ↥W2 := Finite.one_lt_card_iff_nontrivial.mp hprime.one_lt
+  obtain ⟨z₀, hz₀1⟩ := exists_ne (1 : ↥W2)
+  have hfconst : ∀ a : ↥W2, a ≠ 1 → f a = f z₀ := by
+    intro a ha
+    have hA1 : (W2.subtype a) ≠ 1 := fun h => ha (W2.subtype_injective (by simpa using h))
+    have hZ1 : (W2.subtype z₀) ≠ 1 := fun h => hz₀1 (W2.subtype_injective (by simpa using h))
+    have hc := hyp.coherentYset_extension_const_on_W2 hprime hW2comm hη'
+      (SetLike.coe_mem z₀) hZ1 (SetLike.coe_mem a) hA1
+    simp only [hf, ClassFunction.restrict_apply]
+    exact hc
+  have hcard : (Nat.card ↥W2 : ℂ) ≠ 0 := by
+    have h := Nat.card_pos (α := ↥W2); exact_mod_cast h.ne'
+  have key : ClassFunction.inner f (φ : ClassFunction ↥W2 ℂ)
+      = ClassFunction.inner f (φ' : ClassFunction ↥W2 ℂ) := by
+    apply mul_left_cancel₀ hcard
+    rw [← apply_one_sub_apply_eq_card_mul_inner hφ1 hφ f (z := z₀) hfconst,
+      ← apply_one_sub_apply_eq_card_mul_inner hφ'1 hφ' f (z := z₀) hfconst]
+  rw [OddOrder.RepresentationTheory.inner_conj_symm f (φ : ClassFunction ↥W2 ℂ),
+    OddOrder.RepresentationTheory.inner_conj_symm f (φ' : ClassFunction ↥W2 ℂ), key]
+
+open scoped Classical in
+/-- **(6.8.2.2) uniform good-value `Y`-coherence** (the `hYcard`-free strengthening of
+`exists_Ycoherence_hgood_caseB`).  Produces a *single* `Y`-coherence `cY` whose (6.8.2.2) anchor
+multiplicity is the good value `−|H:W₂|` **simultaneously for every** nontrivial linear
+`φ ∈ Irr(W₂)`.
+
+The `m = 2` relabel (`coherentEqualDegree_swap_neg`, `η₁ ↦ −η₂^{τ₁}`) is folded in *uniformly*:
+by `φ`-independence (`inner_tau_alpha_extension_phiIndep`) the good/edge branch of
+`coeff_eq_neg_or_edge_caseB` is the same for **all** `φ`, so one global choice of `cY` suffices —
+`coherentYset` when `|Y| ≥ 3` or the good branch holds, and the sign-swap relabel in the `|Y| = 2`
+edge.  This removes the `|Y| ≠ 2` side condition (`hYcard`) from the case-(B) `X ∪ Y`-coherence
+chain. -/
+theorem SibleyDadeHypothesis.exists_Ycoherence_hgood_uniform_caseB
+    (hyp : SibleyDadeHypothesis G L H) [H.Normal]
+    (hcop : Nat.Coprime (Nat.card ↥H) (Nat.card hyp.W1))
+    {p : ℕ} (hp : p.Prime) (hHp : IsPGroup p ↥H)
+    {W2 : Subgroup ↥L} [W2.Normal] [Invertible (Nat.card ↥W2 : ℂ)]
+    (hprime : (Nat.card W2).Prime) (hW2comm : W2 ≤ ⁅H, H⁆)
+    (hW2cen : W2 ≤ Subgroup.center ↥L)
+    {η₁ : ClassFunction ↥L ℂ} (hη₁ : η₁ ∈ hyp.Yset)
+    (hc2 : 2 ≤ (W2.subgroupOf H).index)
+    (hFPF : (W2.index : ℤ) < ((W2.subgroupOf H).index : ℤ) ^ 2) :
+    ∃ cY : OddOrder.Peterfalvi.S07.IsCoherent hyp.tau hyp.Yset
+      (OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L),
+      ∀ (φ : IrreducibleCharacter ↥W2), (φ : ClassFunction ↥W2 ℂ) 1 = 1 →
+        φ ≠ trivialIrreducibleCharacter ↥W2 →
+        ClassFunction.inner (hyp.tau (ClassFunction.induce W2 (φ : ClassFunction ↥W2 ℂ)
+          - ((W2.subgroupOf H).index : ℂ) • η₁)) (cY.extension η₁)
+          = -((W2.subgroupOf H).index : ℂ) := by
+  haveI : Fintype ↥W2 := Fintype.ofFinite _
+  classical
+  by_cases hYc : hyp.Yset.ncard = 2
+  · -- `|Y| = 2` edge: pick the branch with one `φ₀`, propagate by `φ`-independence.
+    by_cases hex : ∃ φ₀ : IrreducibleCharacter ↥W2,
+        (φ₀ : ClassFunction ↥W2 ℂ) 1 = 1 ∧ φ₀ ≠ trivialIrreducibleCharacter ↥W2
+    · obtain ⟨φ₀, hφ₀1, hφ₀⟩ := hex
+      rcases hyp.coeff_eq_neg_or_edge_caseB hcop hp hHp hprime hW2comm hW2cen hη₁ φ₀ hφ₀1 hφ₀ hc2 hFPF
+        with hgood₀ | ⟨_, hbad₀⟩
+      · -- good branch: `cY = coherentYset`.
+        refine ⟨hyp.coherentYset, fun φ hφ1 hφ => ?_⟩
+        rw [hyp.inner_tau_alpha_extension_phiIndep hprime hW2comm hη₁ hη₁ φ φ₀ hφ1 hφ hφ₀1 hφ₀]
+        exact hgood₀
+      · -- edge branch: `cY = coherentEqualDegree_swap_neg`.
+        obtain ⟨η₂, hη₂Y, hη₂ne⟩ :=
+          Set.exists_ne_of_one_lt_ncard (by omega : 1 < hyp.Yset.ncard) η₁
+        have hpairsub : ({η₁, η₂} : Set (ClassFunction ↥L ℂ)) ⊆ hyp.Yset := by
+          intro x hx; rcases hx with rfl | rfl
+          · exact hη₁
+          · exact hη₂Y
+        have hYeq : hyp.Yset = ({η₁, η₂} : Set (ClassFunction ↥L ℂ)) :=
+          (Set.eq_of_subset_of_ncard_le hpairsub
+            (hYc.le.trans_eq (Set.ncard_pair hη₂ne.symm).symm) hyp.Yset_finite).symm
+        have hinner : ∀ ψ ψ' : ClassFunction ↥L ℂ, IsIrreducibleCharacter ψ →
+            IsIrreducibleCharacter ψ' →
+            ClassFunction.inner ψ ψ' = if ψ = ψ' then (1 : ℂ) else 0 := by
+          intro ψ ψ' hψ hψ'
+          have h := irreducibleCharacter_inner (⟨ψ, hψ⟩ : IrreducibleCharacter ↥L)
+            (⟨ψ', hψ'⟩ : IrreducibleCharacter ↥L)
+          simp only [IrreducibleCharacter.coe_mk] at h
+          rw [h]
+          by_cases hpq : ψ = ψ'
+          · rw [if_pos (Subtype.ext hpq), if_pos hpq]
+          · rw [if_neg (fun heq => hpq (Subtype.ext_iff.mp heq)), if_neg hpq]
+        have hY1irr := hyp.isIrreducibleCharacter_of_mem_Yset hη₁
+        have hY2irr := hyp.isIrreducibleCharacter_of_mem_Yset hη₂Y
+        have horth : ClassFunction.inner η₁ η₂ = 0 := by
+          rw [hinner η₁ η₂ hY1irr hY2irr, if_neg (Ne.symm hη₂ne)]
+        have hn1 : ClassFunction.inner η₁ η₁ = 1 := by rw [hinner η₁ η₁ hY1irr hY1irr, if_pos rfl]
+        have hn2 : ClassFunction.inner η₂ η₂ = 1 := by rw [hinner η₂ η₂ hY2irr hY2irr, if_pos rfl]
+        have hdegeq : (η₂ : ↥L → ℂ) 1 = (η₁ : ↥L → ℂ) 1 :=
+          (hyp.Yset_apply_one hη₂Y).trans (hyp.Yset_apply_one hη₁).symm
+        have hdeg0 : (η₁ : ↥L → ℂ) 1 ≠ 0 := by
+          rw [hyp.Yset_apply_one hη₁]; exact_mod_cast Nat.card_pos.ne'
+        have h1A : (1 : ↥L) ∉ OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L := by
+          rw [OddOrder.Peterfalvi.S04.mem_supportInSubgroup]; intro hmem; exact hmem.2 (by simp)
+        have hsupp : (η₂ - η₁).support ⊆
+            OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L :=
+          hyp.sMember_diffSupport_of_charValue_eq (hyp.Yset_subset_S hη₂Y) (hyp.Yset_subset_S hη₁)
+            hdegeq
+        have hcY0map : (hYeq ▸ hyp.coherentYset).extension = hyp.coherentYset.extension :=
+          OddOrder.Peterfalvi.S07.IsCoherent.extension_eqRec hYeq hyp.coherentYset
+        obtain ⟨cY', hcY'1, _⟩ := OddOrder.Peterfalvi.S07.coherentEqualDegree_swap_neg
+          (hYeq ▸ hyp.coherentYset) horth hn1 hn2 hdegeq hdeg0 h1A hsupp
+        refine ⟨hYeq.symm ▸ cY', fun φ hφ1 hφ => ?_⟩
+        have hW2H : W2 ≤ H := by
+          have hle : ⁅H, H⁆ ≤ H := by
+            rw [Subgroup.commutator_le]; intro a ha b hb; rw [commutatorElement_def]
+            exact H.mul_mem (H.mul_mem (H.mul_mem ha hb) (H.inv_mem ha)) (H.inv_mem hb)
+          exact hW2comm.trans hle
+        have h1φ : ClassFunction.induce W2 (φ : ClassFunction ↥W2 ℂ) 1
+            = ((W2.subgroupOf H).index : ℂ) * η₁ 1 := by
+          rw [ClassFunction.induce_apply_one, hφ1, mul_one, hyp.Yset_apply_one hη₁]
+          have hidx : W2.index = (W2.subgroupOf H).index * H.index :=
+            (Subgroup.relIndex_mul_index hW2H).symm
+          rw [hidx, hyp.index_H_eq_card_W1]; push_cast; ring
+        have hvφ : ClassFunction.inner (hyp.tau (ClassFunction.induce W2 (φ : ClassFunction ↥W2 ℂ)
+            - ((W2.subgroupOf H).index : ℂ) • η₁)) (hyp.coherentYset.extension η₁) = 0 := by
+          rw [hyp.inner_tau_alpha_extension_phiIndep hprime hW2comm hη₁ hη₁ φ φ₀ hφ1 hφ hφ₀1 hφ₀]
+          exact hbad₀
+        have hconst := hyp.inner_tau_indW2_sub_smul_tau_Yset_diff hW2H hW2comm
+          (φ : ClassFunction ↥W2 ℂ) hη₁ hη₂Y hη₂ne ((W2.subgroupOf H).index : ℂ) h1φ
+        rw [← hyp.coherentYset_extension_Yset_diff_eq_tau hη₁ hη₂Y,
+          ClassFunction.inner_sub_right, hvφ, sub_zero] at hconst
+        rw [OddOrder.Peterfalvi.S07.IsCoherent.extension_eqRec hYeq.symm cY', hcY'1, hcY0map,
+          ClassFunction.inner_neg_right, hconst]
+    · -- no nontrivial linear `φ`: the `∀ φ` is vacuous.
+      exact ⟨hyp.coherentYset, fun φ hφ1 hφ => absurd ⟨φ, hφ1, hφ⟩ hex⟩
+  · -- `|Y| ≥ 3`: every `φ` lies in the good branch; `cY = coherentYset`.
+    refine ⟨hyp.coherentYset, fun φ hφ1 hφ => ?_⟩
+    have hm3 : 3 ≤ hyp.Yset.ncard := by have := hyp.two_le_Yset_ncard; omega
+    exact hyp.inner_tau_indW2_extension_Yset_eq_neg_caseB hcop hp hHp hprime hW2comm hW2cen hη₁
+      φ hφ1 hφ hc2 hFPF hm3
+
 end OddOrder.Peterfalvi.S08
