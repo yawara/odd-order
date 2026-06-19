@@ -217,6 +217,40 @@ literal-`sorry`-free な engine で検証。3 本 landing（full build 3863 jobs
 ⟹ FPF fact は part(b) producer + 新規 §14 field-model action 理論を要する**大物・複数セッション**。lane-H 領域だが
 scaffold ゼロ。次セッション or ユーザー判断（part(b) producer 着手 / lane B §13 待ち / 再タスク）。
 
+### ✅✅✅ 2026-06-19 再開¹⁰ — FPF fact 完成 + (14.7) を §13 facts 4本に縮約（`7162a75a`/`db39b06e`/`e9253a02`）
+
+**前回診断「FPF fact は新規 §14 field-model action 理論を要する大物・scaffold ゼロ」は過度に悲観的だった。**
+FPF の source は新規理論でなく、**LHypothesis が既に carry している type-I Frobenius 構造 (13.17.a)**。教科書通り
+「L = H⋊(W₁W₂^y) は kernel H の Frobenius 群、W₂^y は complement、U⊆H、U char in H」から FPF が出る。実装3本:
+
+- **`card_modEq_one_of_prime_normalizing_fpf`**（汎用・axiom-clean）: 素数位数部分群 A が U を正規化し FPF 作用
+  ⟹ |U|≡1 mod p（p-群 fixed-point 合同、{1} が唯一不動点）。
+- **`isFrobeniusGroup_conj_ne_of_mem_map_complement`**（汎用・axiom-clean `[propext, Quot.sound]`）:
+  `IsFrobeniusGroup.conj_frobenius` を ↥L→G へ `L.subtype` 経由で transport。complement の元（G元として
+  `compl.map L.subtype` 内）は kernel H の任意元に FPF 作用。
+- **`u_modEq_one_mod_p_of_LHypothesis`**: Ldata + U char in H + (14.5) の `W₂^y ≤ complement.map subtype`
+  から、`W₂^y≤N_G(U)`（char + `maxNilpotentNormalHall_le_normalizer` + `mem_normalizer_map_subtype_of_characteristic`）
+  と FPF（上記 helper）を導き、`u_modEq_one_mod_p_of_fpf` で `u≡1 mod p`。
+- **`W2conj_le_normalizer_U_of_LHypothesis`**: part(14.2.b) の `W₂^y≤N_G(U)` を carrier から抽出（共有 lemma）。
+
+**(14.5) `exists_y_L_structure` を concrete 化**: 旧 opaque field `L_semidirect_formula : G→Prop`（producer/consumer
+ゼロの dead scaffold）を削除し、結論を `∃ y∈Q, W₂^y ≤ complement.map L.subtype`（bridge が消費する形）に。
+
+**`field_normalizer_of_U_characteristic` を bridge 後へ移動 + wire**: (14.5)→bridge(`u≡1`)→`_of_fpf` engine、
+`W₂^y≤N(U)` は共有 lemma。**⟹ 唯一の残 `sorry` = §13 facts 4本ちょうど**:
+`IsCyclic U ∧ W₂≤P ∧ IsElementaryAbelian q Q ∧ W₂≤N_G(Q)`。
+
+**残 4 facts は真に §13/Lane-B gated（cite 不可）**: `Q_elementaryAbelian`/`W2_normalizes_Q`/`W2_le_P` は
+**FieldNormalizerData のフィールド（出力＝循環）**で独立 producer なし; `basic_structure`(13.2.b) は P側のみ
+（Q側 dual 未形式化）; `IsCyclic U` は c=1 経由 §13 standing。∴ fake-discharge せず honest sorry のまま残置。
+
+**⟹ POLE-2 の §14-internal long pole（FPF value-argument）は完成。残 POLE-2 = §13/Lane-B**:
+① §13 facts 4本（basic_structure T-dual / c_eq_one / (13.2.b) / W₂≤P structural）
+② (14.5) `exists_y_L_structure`（(13.17.c) 二分 + (13.19.c1) Dade counting = Lane B）
+③ (14.6) `caseB_for_S`（Dade = Lane B）
+④ もう片方の枝 `field_normalizer_of_L_conj_M` + `exists_LHypothesis`/`exists_MHypothesis`（(13.17)構成 + Dade）。
+full build 3863 jobs green（16s）、AxiomsCheck OK、real sorry 140 不変（縮約は sorry の内容、本数でない）。
+
 ## 完了条件
 
 `field_normalizer_structure` の `sorry` が消え、`lake build OddOrder OddOrder.AxiomsCheck` 緑。
