@@ -196,4 +196,200 @@ theorem fixedPoints_W1_subset_commutator_of_c2 (hyp : SibleyDadeHypothesis G L H
   rw [← commutator_subgroupOf_self]
   exact Subgroup.mem_subgroupOf.mpr (hW2 hxW2)
 
+/-- **Peterfalvi (6.8) — certain-type case (6.8)(c2): `S` is coherent (dispatch skeleton).**
+
+The (6.8)(c2) branch of `sibleySetup_is_coherent`, assembled from the certain-type data `h46` of
+`hyp.cases.inr`.  By contradiction-free assembly: the (6.5) reduction
+(`exists_isPGroup_H_of_c2_of_card_le`, fed `hfix` from `fixedPoints_W1_subset_commutator_of_c2` and
+the (6.3) index bound `hbound`) makes `H` a `p`-group, then the math case split (6.8.A/B) on whether
+`W₂ ⊆ Z(H)` routes to the case-A coherence producer (`Z(H) ∩ W₂ = 1`) or the case-B one
+(`1 ≠ W₂ ⊆ Z(H)`, `nonempty_coherent_S_caseB_of_structure`, cont.¹³).
+
+This is the [[gated-endpoint-skeleton]] form: the three genuine residual obligations are isolated as
+named hypotheses — `hbound` (Theorem (6.3) c2, the main remaining work, via the reducible-break
+norm-weighted (5.6) engine), `hcaseA` (the case-A `_of_c2_caseA` → `S` bootstrap), and `hcaseB` (the
+case-B structure-data discharge feeding `nonempty_coherent_S_caseB_of_structure`).  The A/B split
+itself (`hsplit`, prime-order `W₂.subgroupOf H` ⟹ `⊥` or all in `Z(H)`) is also named, to be
+discharged separately.  Wiring this into `S08_CoherenceTheorems:59` (the c2 branch) follows once the
+three obligations are filled. -/
+theorem nonempty_coherent_S_of_c2_of_branches (hyp : SibleyDadeHypothesis G L H)
+    [H.Normal] [Finite ↥H]
+    (h46 : OddOrder.Peterfalvi.S06.Hypothesis46 (sharpImage H) L)
+    (hHK : h46.K = H) (hW1 : h46.W1 = hyp.W1) (hW2comm : h46.W2 ≤ ⁅H, H⁆)
+    (hcop : Nat.Coprime (Nat.card ↥H) (Nat.card hyp.W1))
+    (hbound : Nat.card (Abelianization ↥H) ≤ 4 * Nat.card ↥hyp.W1 ^ 2 + 1)
+    (hsplit : h46.W2.subgroupOf H ≤ Subgroup.center ↥H ∨
+      Disjoint (h46.W2.subgroupOf H) (Subgroup.center ↥H))
+    (hcaseA : ∀ {p : ℕ}, p.Prime → IsPGroup p ↥H →
+      Disjoint (h46.W2.subgroupOf H) (Subgroup.center ↥H) →
+      Nonempty (OddOrder.Peterfalvi.S07.IsCoherent hyp.tau hyp.S
+        (OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L)))
+    (hcaseB : ∀ {p : ℕ}, p.Prime → IsPGroup p ↥H →
+      h46.W2.subgroupOf H ≤ Subgroup.center ↥H →
+      Nonempty (OddOrder.Peterfalvi.S07.IsCoherent hyp.tau hyp.S
+        (OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L))) :
+    Nonempty (OddOrder.Peterfalvi.S07.IsCoherent hyp.tau hyp.S
+      (OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L)) := by
+  have hfix := fixedPoints_W1_subset_commutator_of_c2 hyp h46.toCertainTypeHypothesis hHK hW1 hW2comm
+  obtain ⟨p, hp, hHp⟩ := exists_isPGroup_H_of_c2_of_card_le hyp hcop hfix hbound
+  rcases hsplit with hB | hA
+  · exact hcaseB hp hHp hB
+  · exact hcaseA hp hHp hA
+
+/-- **(6.8) case A/B split** (discharges `hsplit` of `nonempty_coherent_S_of_c2_of_branches`).
+Since `W₂ ≤ H` is of prime order, `W₂.subgroupOf H` has prime order too, so the subgroup
+`(W₂.subgroupOf H) ⊓ Z(H)` is either trivial (case A: `Z(H) ∩ W₂ = 1`) or all of `W₂.subgroupOf H`
+(case B: `1 ≠ W₂ ⊆ Z(H)`).  This is Peterfalvi (6.8)'s two-case dichotomy (04.8:152-154). -/
+theorem caseAB_split_of_c2 [H.Normal] [Finite ↥H]
+    (h46 : OddOrder.Peterfalvi.S06.Hypothesis46 (sharpImage H) L)
+    (hW2H : h46.W2 ≤ H) (hprime : (Nat.card h46.W2).Prime) :
+    h46.W2.subgroupOf H ≤ Subgroup.center ↥H ∨
+    Disjoint (h46.W2.subgroupOf H) (Subgroup.center ↥H) := by
+  by_cases hB : h46.W2.subgroupOf H ≤ Subgroup.center ↥H
+  · exact Or.inl hB
+  refine Or.inr (disjoint_iff.mpr ?_)
+  have hWprime : (Nat.card ↥(h46.W2.subgroupOf H)).Prime := by
+    rwa [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hW2H).toEquiv]
+  have hdvd : Nat.card ↥(h46.W2.subgroupOf H ⊓ Subgroup.center ↥H) ∣
+      Nat.card ↥(h46.W2.subgroupOf H) := Subgroup.card_dvd_of_le inf_le_left
+  rcases (Nat.dvd_prime hWprime).mp hdvd with h1 | hfull
+  · exact Subgroup.card_eq_one.mp h1
+  · exact absurd (inf_eq_left.mp (Subgroup.eq_of_le_of_card_ge inf_le_left hfull.ge)) hB
+
+/-- **(6.8) case-B: `W₂ ≤ Z(L)`** (helper for the case-B structure-data discharge).
+In case (B), `W₂ ⊆ Z(H)` (`hcen`) so `W₂` commutes with all of `H`; and `W₂` commutes with `W₁` by
+the certain-type centralizer datum (`commute_of_mem_W1_of_mem_W2`).  Since `L = H ⋊ W₁`
+(`H ⊔ W₁ = ⊤`), `W₂` commutes with every element of `L` (by closure induction), i.e. `W₂ ≤ Z(L)`. -/
+theorem caseB_W2_le_center_L (hyp : SibleyDadeHypothesis G L H) [H.Normal]
+    (h46 : OddOrder.Peterfalvi.S06.Hypothesis46 (sharpImage H) L)
+    (hW1 : h46.W1 = hyp.W1) (hW2H : h46.W2 ≤ H)
+    (hcen : h46.W2.subgroupOf H ≤ Subgroup.center ↥H) :
+    h46.W2 ≤ Subgroup.center ↥L := by
+  intro w hw
+  have hwZH : (⟨w, hW2H hw⟩ : ↥H) ∈ Subgroup.center ↥H :=
+    hcen (Subgroup.mem_subgroupOf.mpr hw)
+  rw [Subgroup.mem_center_iff] at hwZH
+  rw [Subgroup.mem_center_iff]
+  intro g
+  have hg : g ∈ Subgroup.closure ((H : Set ↥L) ∪ (hyp.W1 : Set ↥L)) := by
+    rw [Subgroup.closure_union, Subgroup.closure_eq, Subgroup.closure_eq, hyp.split.sup_eq_top]
+    exact Subgroup.mem_top g
+  have hcomm : Commute g w := by
+    induction hg using Subgroup.closure_induction with
+    | mem x hx =>
+      rcases hx with hxH | hxW1
+      · have h3 : ((⟨x, hxH⟩ * ⟨w, hW2H hw⟩ : ↥H) : ↥L) =
+            ((⟨w, hW2H hw⟩ * ⟨x, hxH⟩ : ↥H) : ↥L) := congrArg _ (hwZH ⟨x, hxH⟩)
+        rw [Subgroup.coe_mul, Subgroup.coe_mul] at h3
+        exact h3
+      · exact h46.commute_of_mem_W1_of_mem_W2 (by rw [hW1]; exact hxW1) hw
+    | one => exact Commute.one_left w
+    | mul x y _ _ ihx ihy => exact ihx.mul_left ihy
+    | inv x _ ihx => exact ihx.inv_left
+  exact hcomm
+
+/-- **Peterfalvi (6.8) case-B coherence from c2 data** (discharges `hcaseB` of the dispatch skeleton).
+Given the case-B math condition `W₂ ⊆ Z(H)` (`hcen`) and the `p`-group structure, derive the
+structural inputs `hderiv` (W₂ ⊆ commutator via `commutator_subgroupOf_self`), `hcZ` (`|W₂|` prime),
+and `hW2cenL` (`caseB_W2_le_center_L`), then feed `nonempty_coherent_S_caseB_of_structure` (cont.¹³).
+The FPF index data (`hc2`/`hfpf`/`hFPF`) and the X/Y-cardinality conditions (`hYcard`/`hXne`) remain
+as named hypotheses, to be discharged separately (`hfpf` via `caseB_fpf_bound`, the rest from the
+final `S08:59` wiring). -/
+theorem nonempty_coherent_S_caseB_of_c2_data (hyp : SibleyDadeHypothesis G L H)
+    [H.Normal] [Fintype ↥H]
+    (h46 : OddOrder.Peterfalvi.S06.Hypothesis46 (sharpImage H) L) (hHK : h46.K = H)
+    (hW1 : h46.W1 = hyp.W1)
+    [NeZero (Nat.card h46.W1)] [Invertible (Nat.card ↥h46.K : ℂ)]
+    [Fintype ↥(h46.W1 ⊔ h46.W2)] [Invertible (Nat.card ↥(h46.W1 ⊔ h46.W2) : ℂ)]
+    [Fintype (OddOrder.Peterfalvi.S06.ticVdiff h46).W]
+    [Invertible (Nat.card (OddOrder.Peterfalvi.S06.ticVdiff h46).W : ℂ)]
+    [h46.W2.Normal] [Invertible (Nat.card ↥h46.W2 : ℂ)]
+    [Fintype ↥(h46.W2.subgroupOf H)] [Invertible (Nat.card ↥(h46.W2.subgroupOf H) : ℂ)]
+    (hW2H : h46.W2 ≤ H) (hcop : Nat.Coprime (Nat.card ↥H) (Nat.card hyp.W1))
+    {p : ℕ} (hp : p.Prime) (hHp : IsPGroup p ↥H)
+    (hprime : (Nat.card h46.W2).Prime) (hW2comm : h46.W2 ≤ ⁅H, H⁆)
+    (hcen : h46.W2.subgroupOf H ≤ Subgroup.center ↥H)
+    (hc2 : 2 ≤ (h46.W2.subgroupOf H).index)
+    (hfpf : (2 * Nat.card hyp.W1 + 1) ^ 2 ≤ Nat.card (↥H ⧸ h46.W2.subgroupOf H))
+    (hFPF : (h46.W2.index : ℤ) < ((h46.W2.subgroupOf H).index : ℤ) ^ 2)
+    (hYcard : hyp.Yset.ncard ≠ 2) (hXne : (hyp.Xset h46.W2).Nonempty) :
+    Nonempty (OddOrder.Peterfalvi.S07.IsCoherent hyp.tau hyp.S
+      (OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L)) := by
+  have hderiv : h46.W2.subgroupOf H ≤ commutator ↥H := by
+    rw [← commutator_subgroupOf_self]
+    exact fun x hx => Subgroup.mem_subgroupOf.mpr (hW2comm (Subgroup.mem_subgroupOf.mp hx))
+  have hcZ : 2 ≤ Nat.card ↥(h46.W2.subgroupOf H) := by
+    rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hW2H).toEquiv]; exact hprime.two_le
+  have hW2cenL : h46.W2 ≤ Subgroup.center ↥L := caseB_W2_le_center_L hyp h46 hW1 hW2H hcen
+  exact nonempty_coherent_S_caseB_of_structure hyp h46 hHK hW1 hW2H hcen hderiv hcop hp hHp
+    hprime hW2comm hW2cenL hc2 hFPF hcZ hfpf hYcard hXne
+
+/-- **Peterfalvi (6.8) case-B coherence — full c2 FPF/index structure-data discharge.**
+
+Strengthens `nonempty_coherent_S_caseB_of_c2_data` by deriving the FPF/index structure data
+(`hfpf`/`hc2`/`hFPF`) *internally* from the `p`-group + central-`W₂` context, so that only the
+genuine (6.8.3) *case* conditions remain as named hypotheses:
+* `hWMgt` — `W₂ ⊊ ⁅H,H⁆` (`1 < |⁅H,H⁆ : W₂|`), i.e. `Z = W₂ ≠ H' = ⁅H,H⁆`, the (6.8.3) nontrivial
+  branch (when `Z = H'` we already have `S = X ∪ Y` coherent by (6.8.2));
+* `hYcard` — `m = |Y| ≠ 2`, the (6.8.2) exceptional case;
+* `hXne` — `X` nonempty.
+
+The (6.8.3) FPF bound `hfpf : (2|W₁|+1)² ≤ |H:W₂|` comes from `caseB_fpf_bound` (`W₂ ≤ Z(L)` via
+`caseB_W2_le_center_L`; `H` non-abelian via nilpotency — `⁅H,H⁆ ⊊ H` so `1 < |H:⁅H,H⁆|`).  The
+remaining index data is arithmetic: `hc2` (`|H:W₂| ≥ 9 ≥ 2`) and `hFPF`
+(`|W₂|_L = |H:W₂|·|W₁| < |H:W₂|²` since `|W₁| < |H:W₂|`, via `relIndex_mul_index` and
+`index_H_eq_card_W1`).  This is the clean `hcaseB` producer feeding the dispatch skeleton
+`nonempty_coherent_S_of_c2_of_branches`. -/
+theorem nonempty_coherent_S_caseB_of_c2 (hyp : SibleyDadeHypothesis G L H)
+    [H.Normal] [Fintype ↥H]
+    (h46 : OddOrder.Peterfalvi.S06.Hypothesis46 (sharpImage H) L) (hHK : h46.K = H)
+    (hW1 : h46.W1 = hyp.W1)
+    [NeZero (Nat.card h46.W1)] [Invertible (Nat.card ↥h46.K : ℂ)]
+    [Fintype ↥(h46.W1 ⊔ h46.W2)] [Invertible (Nat.card ↥(h46.W1 ⊔ h46.W2) : ℂ)]
+    [Fintype (OddOrder.Peterfalvi.S06.ticVdiff h46).W]
+    [Invertible (Nat.card (OddOrder.Peterfalvi.S06.ticVdiff h46).W : ℂ)]
+    [h46.W2.Normal] [Invertible (Nat.card ↥h46.W2 : ℂ)]
+    [Fintype ↥(h46.W2.subgroupOf H)] [Invertible (Nat.card ↥(h46.W2.subgroupOf H) : ℂ)]
+    (hW2H : h46.W2 ≤ H) (hcop : Nat.Coprime (Nat.card ↥H) (Nat.card hyp.W1))
+    {p : ℕ} (hp : p.Prime) (hHp : IsPGroup p ↥H)
+    (hprime : (Nat.card h46.W2).Prime) (hW2comm : h46.W2 ≤ ⁅H, H⁆)
+    (hcen : h46.W2.subgroupOf H ≤ Subgroup.center ↥H)
+    (hWMgt : 1 < (h46.W2.subgroupOf H).relIndex (commutator ↥H))
+    (hYcard : hyp.Yset.ncard ≠ 2) (hXne : (hyp.Xset h46.W2).Nonempty) :
+    Nonempty (OddOrder.Peterfalvi.S07.IsCoherent hyp.tau hyp.S
+      (OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L)) := by
+  letI : Group.IsNilpotent ↥H := hyp.H_nilpotent
+  haveI : Nontrivial ↥H := (Subgroup.nontrivial_iff_ne_bot H).mpr hyp.H_ne_bot
+  -- `W₂ ≤ Z(L)` (case-B central datum).
+  have hW2cenL : h46.W2 ≤ Subgroup.center ↥L := caseB_W2_le_center_L hyp h46 hW1 hW2H hcen
+  -- `H` non-abelian: `⁅H,H⁆ ⊊ H`, so `1 < |H : ⁅H,H⁆|`.
+  have hMgt : 1 < (commutator ↥H).index := by
+    have hne : commutator ↥H ≠ ⊤ := (IsSolvable.commutator_lt_top_of_nontrivial ↥H).ne
+    have h0 : (commutator ↥H).index ≠ 0 := Subgroup.index_ne_zero_of_finite
+    have h1 : (commutator ↥H).index ≠ 1 := fun h => hne (Subgroup.index_eq_one.mp h)
+    omega
+  -- the (6.8.3) FPF bound `(2|W₁|+1)² ≤ |H:W₂|`.
+  have hfpf : (2 * Nat.card hyp.W1 + 1) ^ 2 ≤ Nat.card (↥H ⧸ h46.W2.subgroupOf H) :=
+    caseB_fpf_bound hyp h46.toCertainTypeHypothesis hHK hW1 hW2comm hW2cenL hcop hMgt hWMgt
+  have hw1pos : 1 ≤ Nat.card hyp.W1 := Nat.card_pos
+  -- `|H:W₂| ≥ 2`.
+  have hc2 : 2 ≤ (h46.W2.subgroupOf H).index :=
+    le_trans (le_trans (by omega) (Nat.le_self_pow (by norm_num) (2 * Nat.card hyp.W1 + 1))) hfpf
+  -- `|W₂|_L = |H:W₂|·|W₁| < |H:W₂|²`.
+  have hFPF : (h46.W2.index : ℤ) < ((h46.W2.subgroupOf H).index : ℤ) ^ 2 := by
+    have hidx : h46.W2.index = (h46.W2.subgroupOf H).index * Nat.card hyp.W1 := by
+      have h := Subgroup.relIndex_mul_index hW2H
+      rw [hyp.index_H_eq_card_W1] at h
+      exact h.symm
+    have hw1lt : Nat.card hyp.W1 < (h46.W2.subgroupOf H).index :=
+      lt_of_lt_of_le
+        (lt_of_lt_of_le (by omega) (Nat.le_self_pow (by norm_num) (2 * Nat.card hyp.W1 + 1))) hfpf
+    have hw1ltZ : (Nat.card hyp.W1 : ℤ) < ((h46.W2.subgroupOf H).index : ℤ) := by
+      exact_mod_cast hw1lt
+    have hiposZ : (0 : ℤ) < ((h46.W2.subgroupOf H).index : ℤ) := by
+      exact_mod_cast lt_of_le_of_lt (Nat.zero_le _) hw1lt
+    rw [hidx]; push_cast; nlinarith [hw1ltZ, hiposZ]
+  exact nonempty_coherent_S_caseB_of_c2_data hyp h46 hHK hW1 hW2H hcop hp hHp hprime hW2comm
+    hcen hc2 hfpf hFPF hYcard hXne
+
 end OddOrder.Peterfalvi.S08

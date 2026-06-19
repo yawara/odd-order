@@ -2211,6 +2211,208 @@ theorem maximalContaining_centralizer_eq_singleton_of_tau2_element [Finite G]
       show r ∈ (Nat.card ↥(Subgroup.closure {x'})).primeFactors
       rw [hcard]; exact hr)) hC
 
+/-- **BG Lemma 15.1(c)** (mmd L4170): if `U` is a `(κ(M) ∪ σ(M))'`-Hall subgroup of `M` and
+`X` is a nonidentity subgroup of `U` with `C_{M_σ}(X) ≠ 1`, then `ℳ(C_G(X)) = {M}` and `X` is a
+cyclic `τ₂(M)`-subgroup.
+
+Proof (following BG L4176): since `X ≤ U`, every prime `p ∈ π(X)` lies in `(κ(M) ∪ σ(M))'`,
+so `p ∉ σ(M)`, `p ∉ κ(M)`, and `p ∈ π(M)`.
+
+*`π(X) ⊆ τ₂(M)`:* if some `p ∈ π(X)` had `p ∉ τ₂(M)`, then `r_p(M) = 1`, and a rank-one
+elementary abelian `A ≤ X` (Cauchy) realizes the maximal rank, so Lemma 14.1
+(`msigma_structure_of_notMem_sigma_kappa`) gives `C_{M_σ}(A) = 1`; centralizer antitonicity
+(`A ≤ X`) yields `C_{M_σ}(X) ≤ C_{M_σ}(A) = 1`, contradicting `hCX`.
+
+*`X` cyclic:* `X` is a `τ₂(M)`-subgroup of the solvable `M`, hence (Hall D) conjugate into the
+abelian Hall `τ₂(M)`-subgroup `E₂` (Corollary 12.10(b)), so `X` is abelian.  Each Sylow `p` of `X`
+is cyclic, for if it contained `A ∈ ℰ_p²(X)` then Theorem 12.5(d) (`Msigma_nilpotent_of_tau2`)
+would give `C_{M_σ}(A) = 1` and again `C_{M_σ}(X) = 1`.  An abelian group with cyclic Sylow
+subgroups is cyclic (`isCyclic_of_sylow_isCyclic`).
+
+*`ℳ(C_G(X)) = {M}`:* with `X = ⟨x⟩` cyclic and `C_G(X) = C_G(x)`, apply Corollary 14.3 branch 2
+(`maximalContaining_centralizer_eq_singleton_of_tau2_element`). -/
+theorem typeP_hall_small_subgroup_cyclic_tau2 [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    {M U : Subgroup G} (hM : M ∈ maximalSubgroups G) (hUM : U ≤ M)
+    (hU : Ch03.IsHallSubgroup ((kappa M ∪ OddOrder.BG.Ch3.S10.sigma M)ᶜ) (U.subgroupOf M))
+    {X : Subgroup G} (hXU : X ≤ U) (hXne : X ≠ ⊥)
+    (hCX : OddOrder.BG.Ch3.S10.Msigma M ⊓ Subgroup.centralizer (X : Set G) ≠ ⊥) :
+    maximalSubgroupsContaining (Subgroup.centralizer (X : Set G)) = {M} ∧
+      IsCyclic ↥X ∧ (↑(Nat.card ↥X).primeFactors ⊆ tau2 M) := by
+  classical
+  haveI hMsolv : IsSolvable ↥M := hG.solvable_of_mem_maximalSubgroups hM
+  have hXM : X ≤ M := hXU.trans hUM
+  obtain ⟨E, E₁, E₂, E₃, hsetup⟩ := exists_subgroupESetup hG hM
+  -- Each prime of `X` lies in `(κ(M) ∪ σ(M))'`, hence `∉ σ`, `∉ κ`, and `∈ π(M)`.
+  have hXprimes : ∀ p ∈ (Nat.card ↥X).primeFactors,
+      p ∉ OddOrder.BG.Ch3.S10.sigma M ∧ p ∉ kappa M ∧ p ∈ piSet M := by
+    intro p hp
+    obtain ⟨hpp, hpdvdX, _⟩ := Nat.mem_primeFactors.mp hp
+    have hpdvdU : p ∣ Nat.card ↥U := hpdvdX.trans (Subgroup.card_dvd_of_le hXU)
+    have hpdvdM : p ∣ Nat.card ↥M := hpdvdX.trans (Subgroup.card_dvd_of_le hXM)
+    have hpUM : p ∈ (Nat.card ↥(U.subgroupOf M)).primeFactors := by
+      rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hUM).toEquiv]
+      exact Nat.mem_primeFactors.mpr ⟨hpp, hpdvdU, Nat.card_pos.ne'⟩
+    have hpcompl : p ∈ (kappa M ∪ OddOrder.BG.Ch3.S10.sigma M)ᶜ := hU.1 p hpUM
+    rw [Set.mem_compl_iff, Set.mem_union, not_or] at hpcompl
+    exact ⟨hpcompl.2, hpcompl.1, Nat.mem_primeFactors.mpr ⟨hpp, hpdvdM, Nat.card_pos.ne'⟩⟩
+  -- **Part A**: `π(X) ⊆ τ₂(M)`.
+  have hXτ2 : ∀ p ∈ (Nat.card ↥X).primeFactors, p ∈ tau2 M := by
+    intro p hp
+    obtain ⟨hpσ, hpκ, hpπ⟩ := hXprimes p hp
+    obtain ⟨hpp, hpdvdX, _⟩ := Nat.mem_primeFactors.mp hp
+    haveI : Fact p.Prime := ⟨hpp⟩
+    by_contra hpτ2
+    -- `p ∉ τ₂(M)` with `p ∉ σ(M)` gives `r_p(M) ≠ 2`; rank bounds force `r_p(M) = 1`.
+    have hr2 : pRank ↥M p ≠ 2 := fun h => hpτ2 ((mem_tau2_iff M p).mpr ⟨hpσ, h⟩)
+    have hpE : p ∈ (Nat.card ↥E).primeFactors :=
+      mem_primeFactors_E_of_mem_M_of_not_sigma hG hsetup hpp hpπ hpσ
+    have h1r : 1 ≤ pRank ↥M p := one_le_pRank_of_mem_primeFactors hpπ
+    have hub : pRank ↥M p ≤ 2 := hsetup.pRank_M_le_two hG hpE
+    have hr1 : pRank ↥M p = 1 := by omega
+    -- A rank-one elementary abelian subgroup `A ≤ X` of maximal rank.
+    obtain ⟨a, hacard⟩ := exists_prime_orderOf_dvd_card' (G := ↥X) p hpdvdX
+    set A : Subgroup G := Subgroup.zpowers (a : G) with hAdef
+    have hAX : A ≤ X := by rw [hAdef, Subgroup.zpowers_le]; exact a.2
+    have haGcard : orderOf (a : G) = p :=
+      (orderOf_injective X.subtype X.subtype_injective a).trans hacard
+    have hAcard : Nat.card ↥A = p := by rw [hAdef, Nat.card_zpowers]; exact haGcard
+    have hAelem : A.IsElementaryAbelian p := Subgroup.IsElementaryAbelian.of_card_prime hAcard
+    have hA : A ∈ elemAbelianOfRank G p (pRank ↥M p) := by
+      rw [hr1, mem_elemAbelianOfRank]
+      exact ⟨hAelem, by rw [hAcard, pow_one]⟩
+    -- Lemma 14.1: `C_{M_σ}(A) = 1`; antitonicity gives `C_{M_σ}(X) = 1`, contradiction.
+    obtain ⟨_, hCA, _⟩ :=
+      msigma_structure_of_notMem_sigma_kappa hG hM hpπ hpσ hpκ hA (hAX.trans hXM)
+    apply hCX
+    rw [eq_bot_iff, ← hCA]
+    exact inf_le_inf_left _ (Subgroup.centralizer_le (SetLike.coe_subset_coe.mpr hAX))
+  -- **Part B(i)**: `X` is abelian (conjugate into the abelian Hall `τ₂`-subgroup `E₂`).
+  -- `X` is a `τ₂(M)`-subgroup, so `X.subgroupOf M` is a `τ₂(M)`-π-subgroup of `↥M`.
+  have hXsub : ∀ q ∈ (Nat.card ↥(X.subgroupOf M)).primeFactors, q ∈ tau2 M := by
+    intro q hq
+    rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hXM).toEquiv] at hq
+    exact hXτ2 q hq
+  obtain ⟨H', hH'hall, hH'ge⟩ := Ch03.hall_D (G := ↥M) hXsub
+  set HG : Subgroup G := H'.map M.subtype with hHGdef
+  have hHG_le_M : HG ≤ M := Subgroup.map_subtype_le _
+  have hHG_hall : Ch03.IsHallSubgroup (tau2 M) (HG.subgroupOf M) := by
+    rw [hHGdef, Subgroup.subgroupOf,
+      Subgroup.comap_map_eq_self_of_injective M.subtype_injective]
+    exact hH'hall
+  have hX_le_HG : X ≤ HG := by
+    rw [hHGdef]
+    refine le_trans ?_ (Subgroup.map_mono hH'ge)
+    rw [Subgroup.map_subgroupOf_eq_of_le hXM]
+  -- `E₂` is also a Hall `τ₂(M)`-subgroup of `M`.
+  have hE₂_hall_M : Ch03.IsHallSubgroup (tau2 M) (E₂.subgroupOf M) :=
+    hallPiece_isHall_in_M hG hsetup hsetup.E₂_le hsetup.E₂_hall (tau2_subset_sigma_compl M)
+  -- Conjugate `HG` onto `E₂` (Hall C inside `↥M`).
+  obtain ⟨w, _, hw⟩ :=
+    OddOrder.BG.Ch1.S06.exists_conj_eq_of_isHall_subgroupOf hMsolv hHG_le_M hsetup.E2_le_M
+      hHG_hall hE₂_hall_M
+  have hbE₂ : IsMulCommutative ↥E₂ := (nilpotent_sigmaComplement_abelian hG hsetup).2.1.1
+  -- `conj w • X ≤ E₂`; commuting in `E₂` transports back to `X`.
+  have hXwE₂ : (MulAut.conj w • X : Subgroup G) ≤ E₂ := by
+    rw [← hw]
+    exact Subgroup.map_mono hX_le_HG
+  have hXab : IsMulCommutative ↥X := by
+    refine ⟨⟨fun a b => Subtype.ext ?_⟩⟩
+    -- `w·a·w⁻¹` and `w·b·w⁻¹` lie in `conj w • X ≤ E₂`, hence commute.
+    have haw : w * (a : G) * w⁻¹ ∈ E₂ := by
+      apply hXwE₂
+      have h := (Subgroup.smul_mem_pointwise_smul_iff
+        (a := MulAut.conj w) (S := X) (x := (a : G))).mpr a.2
+      rwa [MulAut.smul_def, MulAut.conj_apply] at h
+    have hbw : w * (b : G) * w⁻¹ ∈ E₂ := by
+      apply hXwE₂
+      have h := (Subgroup.smul_mem_pointwise_smul_iff
+        (a := MulAut.conj w) (S := X) (x := (b : G))).mpr b.2
+      rwa [MulAut.smul_def, MulAut.conj_apply] at h
+    have hcomm : (w * (a : G) * w⁻¹) * (w * (b : G) * w⁻¹)
+        = (w * (b : G) * w⁻¹) * (w * (a : G) * w⁻¹) :=
+      congrArg Subtype.val (hbE₂.is_comm.comm ⟨_, haw⟩ ⟨_, hbw⟩)
+    have hcancel := congrArg (fun u => w⁻¹ * u * w) hcomm
+    simpa [mul_assoc] using hcancel
+  haveI : IsMulCommutative ↥X := hXab
+  -- **Part B(ii)**: every Sylow `p` of `X` is cyclic (else `ℰ_p²(X)` ↝ `C_{M_σ}(X) = 1`).
+  have hSylcyc : ∀ p : ℕ, p.Prime → ∀ P : Sylow p ↥X, IsCyclic P := by
+    intro p hp P
+    haveI : Fact p.Prime := ⟨hp⟩
+    by_contra hPnc
+    -- `P` is noncyclic, hence nontrivial, so `p ∣ |X|` and (oddness of `G`) `p` is odd.
+    have hpcardP : p ∣ Nat.card ↥(P : Subgroup ↥X) := by
+      obtain ⟨n, hn⟩ := IsPGroup.iff_card.mp P.isPGroup'
+      rcases Nat.eq_zero_or_pos n with h0 | hpos
+      · refine absurd ?_ hPnc
+        haveI : Subsingleton ↥(P : Subgroup ↥X) :=
+          (Nat.card_eq_one_iff_unique.mp (by rw [hn, h0, pow_zero])).1
+        exact isCyclic_of_subsingleton
+      · rw [hn]; exact dvd_pow_self p hpos.ne'
+    have hpcardX : p ∣ Nat.card ↥X :=
+      hpcardP.trans (Subgroup.card_subgroup_dvd_card _)
+    have hodd : Odd p :=
+      hG.odd.of_dvd_nat (hpcardX.trans (Subgroup.card_subgroup_dvd_card X))
+    -- A noncyclic odd `p`-group contains a rank-two elementary abelian subgroup (BG Lemma 4.5(a)).
+    obtain ⟨B, hBelem, hBcard⟩ :=
+      OddOrder.BG.Ch1.S04.exists_isElementaryAbelian_card_prime_sq_of_not_isCyclic
+        P.isPGroup' hodd hPnc
+    -- Map `B ≤ P ≤ ↥X` up to `G`.
+    set A : Subgroup G := (B.map (P : Subgroup ↥X).subtype).map X.subtype with hAdef
+    have hAelem : A.IsElementaryAbelian p := by
+      rw [hAdef]
+      exact (hBelem.map (Subgroup.subtype_injective _)).map X.subtype_injective
+    have hAcard : Nat.card ↥A = p ^ 2 := by
+      rw [hAdef, Subgroup.card_map_of_injective X.subtype_injective,
+        Subgroup.card_map_of_injective (Subgroup.subtype_injective _), hBcard]
+    have hAX : A ≤ X := by
+      rw [hAdef]
+      exact le_trans (Subgroup.map_mono (Subgroup.map_subtype_le _)) (Subgroup.map_subtype_le _)
+    have hA2 : A ∈ elemAbelianOfRank G p 2 := mem_elemAbelianOfRank.mpr ⟨hAelem, hAcard⟩
+    -- `p ∈ τ₂(M)`, then Theorem 12.5(d): `C_{M_σ}(A) = 1`, contradicting `hCX`.
+    have hpX : p ∈ (Nat.card ↥X).primeFactors := by
+      refine Nat.mem_primeFactors.mpr ⟨hp, ?_, Nat.card_pos.ne'⟩
+      exact (dvd_pow_self p two_ne_zero).trans (hAcard ▸ Subgroup.card_dvd_of_le hAX)
+    have hpτ2 : p ∈ tau2 M := hXτ2 p hpX
+    have hCA := (Msigma_nilpotent_of_tau2 hG hM hpτ2 hA2 (hAX.trans hXM)).2.2.2.1
+    apply hCX
+    rw [eq_bot_iff, ← hCA]
+    exact inf_le_inf_left _ (Subgroup.centralizer_le (SetLike.coe_subset_coe.mpr hAX))
+  -- `X` abelian with cyclic Sylows ⟹ `X` cyclic.
+  have hXcyc : IsCyclic ↥X := by
+    letI : IsMulCommutative ↥X := hXab
+    exact OddOrder.Isaacs.Ch06.isCyclic_of_sylow_isCyclic hSylcyc
+  refine ⟨?_, hXcyc, fun p hp => hXτ2 p hp⟩
+  -- **Part C**: `ℳ(C_G(X)) = {M}` via the cyclic generator `x`.
+  obtain ⟨x₀, hx₀gen⟩ := hXcyc.exists_generator
+  set x : G := (x₀ : G) with hxdef
+  have hXeq : X = Subgroup.zpowers x := by
+    apply le_antisymm
+    · intro y hy
+      obtain ⟨k, hk⟩ := Subgroup.mem_zpowers_iff.mp (hx₀gen ⟨y, hy⟩)
+      refine Subgroup.mem_zpowers_iff.mpr ⟨k, ?_⟩
+      rw [hxdef, ← Subgroup.coe_zpow, hk]
+    · rw [Subgroup.zpowers_le, hxdef]; exact x₀.2
+  have hxX : x ∈ X := hXeq ▸ Subgroup.mem_zpowers x
+  have hxM : x ∈ M := hXM hxX
+  -- `x ≠ 1` (else `X = ⟨1⟩ = ⊥`).
+  have hx1 : x ≠ 1 := by
+    intro hxe
+    apply hXne
+    rw [hXeq, hxe, Subgroup.zpowers_one_eq_bot]
+  -- `π(⟨x⟩) ⊆ τ₂(M)`.
+  have hxτ2 : ∀ p ∈ piSet (Subgroup.closure {x}), p ∈ tau2 M := by
+    intro p hp
+    refine hXτ2 p ?_
+    have : Subgroup.closure {x} = X := by rw [← Subgroup.zpowers_eq_closure, ← hXeq]
+    rwa [this] at hp
+  -- `C_G(X) = C_G({x})`.
+  have hCeq : Subgroup.centralizer (X : Set G) = Subgroup.centralizer ({x} : Set G) := by
+    rw [hXeq, Subgroup.zpowers_eq_closure, Subgroup.centralizer_closure]
+  have hCne : OddOrder.BG.Ch3.S10.Msigma M ⊓ Subgroup.centralizer ({x} : Set G) ≠ ⊥ := by
+    rwa [hCeq] at hCX
+  rw [hCeq]
+  exact maximalContaining_centralizer_eq_singleton_of_tau2_element hG hM hxM hx1 hxτ2 hCne
+
 /-- The `σ`-set is conjugation-invariant: `σ(Mᵍ) = σ(M)` (both inclusions from `sigma_conj`;
 non-primes lie in neither set). -/
 private theorem sigma_conj_smul_eq [Finite G] (g : G) (M : Subgroup G) :
@@ -4513,6 +4715,40 @@ theorem coprime_card_kappaHall_Kstar [Finite G] {M K Kstar : Subgroup G} (hKM : 
       (Nat.mem_primeFactors.mpr ⟨hp, hpK, Nat.card_pos.ne'⟩)
   exact hpσc (Kstar_isPiSubgroup_sigma hKstar p
     (Nat.mem_primeFactors.mpr ⟨hp, hpKstar, Nat.card_pos.ne'⟩))
+
+/-- **BG 14.7, `|K| > 1`**: the κ-Hall factor of a type-`P` maximal subgroup is nontrivial.  Some
+prime `p ∈ κ(M)` divides `|K|`: `p` divides `|M|` (it is the order of an elementary abelian
+`p`-subgroup of `M`, by the definition of `κ`), and is coprime to the Hall index `[M : K]`, so it
+divides the Hall order `|K|`. -/
+theorem card_kappaHall_ne_one [Finite G] {M K : Subgroup G} (hP : IsTypeP M) (hKM : K ≤ M)
+    (hK : Ch03.IsHallSubgroup (kappa M) (K.subgroupOf M)) :
+    Nat.card ↥K ≠ 1 := by
+  obtain ⟨p, hpκ⟩ := hP
+  have hpprime : p.Prime := hpκ.1
+  obtain ⟨P, hPelem, hPM, -⟩ := hpκ.2.2
+  have hpcardP : Nat.card ↥P = p := by obtain ⟨_, hc⟩ := hPelem; rwa [pow_one] at hc
+  have hpM : p ∣ Nat.card ↥M := hpcardP ▸ Subgroup.card_dvd_of_le hPM
+  have hpK : p ∣ Nat.card ↥K := by
+    have hlag : Nat.card ↥K * (K.subgroupOf M).index = Nat.card ↥M := by
+      rw [← Nat.card_congr (Subgroup.subgroupOfEquivOfLe hKM).toEquiv]
+      exact Subgroup.card_mul_index (K.subgroupOf M)
+    have hpidx : ¬ p ∣ (K.subgroupOf M).index := fun hd =>
+      hK.2 p (Nat.mem_primeFactors.mpr ⟨hpprime, hd, Subgroup.index_ne_zero_of_finite⟩) hpκ
+    exact (hpprime.dvd_mul.mp (hlag.symm ▸ hpM)).resolve_right hpidx
+  exact fun h => hpprime.ne_one (Nat.dvd_one.mp (h ▸ hpK))
+
+/-- **BG 14.7, `|K| ≠ |K*|`**: the two κ-Hall factors of a type-`P` dual pair have distinct orders.
+They are coprime (`coprime_card_kappaHall_Kstar`) and `|K| > 1` (`card_kappaHall_ne_one`), so equality
+would force `|K| = 1`. -/
+theorem card_kappaHall_ne_card_Kstar [Finite G] {M K Kstar : Subgroup G} (hP : IsTypeP M)
+    (hKM : K ≤ M) (hK : Ch03.IsHallSubgroup (kappa M) (K.subgroupOf M))
+    (hKstar : Kstar = OddOrder.BG.Ch3.S10.Msigma M ⊓ Subgroup.centralizer (K : Set G)) :
+    Nat.card ↥K ≠ Nat.card ↥Kstar := by
+  intro heq
+  have hcop : Nat.Coprime (Nat.card ↥K) (Nat.card ↥Kstar) :=
+    coprime_card_kappaHall_Kstar hKM hK hKstar
+  rw [← heq, Nat.Coprime, Nat.gcd_self] at hcop
+  exact card_kappaHall_ne_one hP hKM hK hcop
 
 /-- **BG 14.7, `K ⊓ K* = 1`**: the coprime factors meet trivially. -/
 theorem kappaHall_inf_Kstar_eq_bot [Finite G] {M K Kstar : Subgroup G} (hKM : K ≤ M)
@@ -7098,21 +7334,8 @@ theorem typeP_zTilde_conjClass_gt_half [Finite G] (hG : OddOrder.BG.IsMinimalSim
   have hKodd : Odd (Nat.card ↥K) := hG.odd.of_dvd_nat (Subgroup.card_subgroup_dvd_card K)
   have hKstarodd : Odd (Nat.card ↥Kstar) :=
     hG.odd.of_dvd_nat (Subgroup.card_subgroup_dvd_card Kstar)
-  -- `k > 1`: a prime `p ∈ κ(M)` divides `|K|`.
-  have hKne1 : Nat.card ↥K ≠ 1 := by
-    obtain ⟨p, hpκ⟩ := hP
-    have hpprime : p.Prime := hpκ.1
-    obtain ⟨P, hPelem, hPM, -⟩ := hpκ.2.2
-    have hpcardP : Nat.card ↥P = p := by obtain ⟨_, hc⟩ := hPelem; rwa [pow_one] at hc
-    have hpM : p ∣ Nat.card ↥M := hpcardP ▸ Subgroup.card_dvd_of_le hPM
-    have hpK : p ∣ Nat.card ↥K := by
-      have hlag : Nat.card ↥K * (K.subgroupOf M).index = Nat.card ↥M := by
-        rw [← Nat.card_congr (Subgroup.subgroupOfEquivOfLe hKM).toEquiv]
-        exact Subgroup.card_mul_index (K.subgroupOf M)
-      have hpidx : ¬ p ∣ (K.subgroupOf M).index := fun hd =>
-        hK.2 p (Nat.mem_primeFactors.mpr ⟨hpprime, hd, Subgroup.index_ne_zero_of_finite⟩) hpκ
-      exact (hpprime.dvd_mul.mp (hlag.symm ▸ hpM)).resolve_right hpidx
-    exact fun h => hpprime.ne_one (Nat.dvd_one.mp (h ▸ hpK))
+  -- `k > 1`: a prime `p ∈ κ(M)` divides `|K|` (`card_kappaHall_ne_one`).
+  have hKne1 : Nat.card ↥K ≠ 1 := card_kappaHall_ne_one hP hKM hK
   -- `k* > 1`: `K* ≠ ⊥` (Proposition 14.2's second conjunct).
   have hKstarne1 : Nat.card ↥Kstar ≠ 1 :=
     fun h => (typeP_structure hG hM hP hKM hK hKstar hU).2.1 (Subgroup.eq_bot_of_card_eq _ h)

@@ -685,6 +685,304 @@ theorem subgroupESetup_of_isHall_kappa_eq_bot [Finite G]
 
 /-! ## Lemma 15.1: the `U M_sigma` auxiliary structure -/
 
+/-- **The three Hall factors `K`, `U`, `M_σ` partition `|M|`** (`§14`-independent counting helper).
+With `K` a `κ(M)`-Hall, `U` a `(κ(M) ∪ σ(M))'`-Hall, and `M_σ` the `σ(M)`-Hall of `M`, the three
+prime sets `κ`, `(κ ∪ σ)'`, `σ` are pairwise disjoint and cover every prime, so the orders multiply
+to `|M|`.  Proven by prime-by-prime factorization: each prime `p` of `|M|` lies in exactly one of
+the three sets, and the corresponding Hall subgroup carries the full `p`-part (its index is a
+`p'`-number). -/
+theorem card_mul_card_mul_card_eq_of_three_hall [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M K U : Subgroup G} (hM : M ∈ maximalSubgroups G)
+    (hK : Ch03.IsHallSubgroup (S14.kappa M) (K.subgroupOf M))
+    (hU : Ch03.IsHallSubgroup ((S14.kappa M ∪ OddOrder.BG.Ch3.S10.sigma M)ᶜ) (U.subgroupOf M)) :
+    Nat.card ↥(K.subgroupOf M) * Nat.card ↥(U.subgroupOf M) *
+      Nat.card ↥((OddOrder.BG.Ch3.S10.Msigma M).subgroupOf M) = Nat.card ↥M := by
+  classical
+  set a := Nat.card ↥(K.subgroupOf M) with ha
+  set b := Nat.card ↥(U.subgroupOf M) with hb
+  set c := Nat.card ↥((OddOrder.BG.Ch3.S10.Msigma M).subgroupOf M) with hc
+  set n := Nat.card ↥M with hn
+  have hMσ : Ch03.IsHallSubgroup (OddOrder.BG.Ch3.S10.sigma M)
+      ((OddOrder.BG.Ch3.S10.Msigma M).subgroupOf M) :=
+    OddOrder.BG.Ch3.S10.Msigma_subgroupOf_isHall hG hM
+  have hane : a ≠ 0 := Nat.card_pos.ne'
+  have hbne : b ≠ 0 := Nat.card_pos.ne'
+  have hcne : c ≠ 0 := Nat.card_pos.ne'
+  have hnne : n ≠ 0 := Nat.card_pos.ne'
+  -- Each Hall card divides `|M|`.
+  have hadvd : a ∣ n := Subgroup.card_subgroup_dvd_card _
+  have hbdvd : b ∣ n := Subgroup.card_subgroup_dvd_card _
+  have hcdvd : c ∣ n := Subgroup.card_subgroup_dvd_card _
+  -- Prime-set membership of the three Hall cards.
+  have hUprimes_compl : ∀ p ∈ b.primeFactors, p ∈ (S14.kappa M ∪ OddOrder.BG.Ch3.S10.sigma M)ᶜ :=
+    hU.1
+  have hUprimes_notκ : ∀ p ∈ b.primeFactors, p ∉ S14.kappa M := fun p hp hpκ =>
+    hUprimes_compl p hp (Or.inl hpκ)
+  have hUprimes_notσ : ∀ p ∈ b.primeFactors, p ∉ OddOrder.BG.Ch3.S10.sigma M := fun p hp hpσ =>
+    hUprimes_compl p hp (Or.inr hpσ)
+  have hKprimes_notσ : ∀ p ∈ a.primeFactors, p ∉ OddOrder.BG.Ch3.S10.sigma M := fun p hp =>
+    S14.kappa_subset_sigmaCompl (hK.1 p hp)
+  -- Pairwise coprimality of the three Hall cards (disjoint prime sets).
+  have hcop_ab : Nat.Coprime a b :=
+    Ch03.Nat.coprime_of_isPiGroup_of_isPiGroup_compl (π := S14.kappa M) hane hbne hK.1
+      hUprimes_notκ
+  have hcop_ac : Nat.Coprime a c :=
+    Ch03.Nat.coprime_of_isPiGroup_of_isPiGroup_compl
+      (π := OddOrder.BG.Ch3.S10.sigma M) hcne hane hMσ.1 hKprimes_notσ |>.symm
+  have hcop_bc : Nat.Coprime b c :=
+    Ch03.Nat.coprime_of_isPiGroup_of_isPiGroup_compl
+      (π := OddOrder.BG.Ch3.S10.sigma M) hcne hbne hMσ.1 hUprimes_notσ |>.symm
+  -- `a * b * c ∣ n` from pairwise coprimality + each `∣ n`.
+  have habc_dvd : a * b * c ∣ n :=
+    (Nat.Coprime.mul_dvd_of_dvd_of_dvd (Nat.coprime_mul_iff_left.mpr ⟨hcop_ac, hcop_bc⟩)
+      (hcop_ab.mul_dvd_of_dvd_of_dvd hadvd hbdvd) hcdvd)
+  -- `n ∣ a * b * c` by prime-by-prime factorization: each prime of `n` lies in `κ`, `σ`, or
+  -- `(κ ∪ σ)'`, and the corresponding Hall subgroup carries its full `p`-part.
+  have hn_dvd : n ∣ a * b * c := by
+    rw [← Nat.factorization_prime_le_iff_dvd hnne (mul_ne_zero (mul_ne_zero hane hbne) hcne)]
+    intro p hp
+    rw [Nat.factorization_mul (mul_ne_zero hane hbne) hcne,
+      Nat.factorization_mul hane hbne, Finsupp.add_apply, Finsupp.add_apply]
+    -- For a Hall `π`-subgroup `H` of `M` with `p ∉ index`, `n.factorization p = (card H).factor p`.
+    -- Choose the Hall whose prime set contains `p`.
+    by_cases hpκ : p ∈ S14.kappa M
+    · -- `p ∈ κ`: `K` carries the `p`-part.
+      have hpidx : ¬ p ∣ (K.subgroupOf M).index := fun hd =>
+        hK.2 p (Nat.mem_primeFactors.mpr ⟨hp, hd, Subgroup.index_ne_zero_of_finite⟩) hpκ
+      have hsplit : a * (K.subgroupOf M).index = n := Subgroup.card_mul_index _
+      have : n.factorization p = a.factorization p := by
+        rw [← hsplit, Nat.factorization_mul hane (Subgroup.index_ne_zero_of_finite),
+          Finsupp.add_apply, Nat.factorization_eq_zero_of_not_dvd hpidx, add_zero]
+      omega
+    · by_cases hpσ : p ∈ OddOrder.BG.Ch3.S10.sigma M
+      · -- `p ∈ σ`: `M_σ` carries the `p`-part.
+        have hpidx : ¬ p ∣ ((OddOrder.BG.Ch3.S10.Msigma M).subgroupOf M).index := fun hd =>
+          hMσ.2 p (Nat.mem_primeFactors.mpr ⟨hp, hd, Subgroup.index_ne_zero_of_finite⟩) hpσ
+        have hsplit : c * ((OddOrder.BG.Ch3.S10.Msigma M).subgroupOf M).index = n :=
+          Subgroup.card_mul_index _
+        have : n.factorization p = c.factorization p := by
+          rw [← hsplit, Nat.factorization_mul hcne (Subgroup.index_ne_zero_of_finite),
+            Finsupp.add_apply, Nat.factorization_eq_zero_of_not_dvd hpidx, add_zero]
+        omega
+      · -- `p ∈ (κ ∪ σ)'`: `U` carries the `p`-part.
+        have hpcompl : p ∈ (S14.kappa M ∪ OddOrder.BG.Ch3.S10.sigma M)ᶜ :=
+          Set.mem_compl (fun h => h.elim hpκ hpσ)
+        have hpidx : ¬ p ∣ (U.subgroupOf M).index := fun hd =>
+          hU.2 p (Nat.mem_primeFactors.mpr ⟨hp, hd, Subgroup.index_ne_zero_of_finite⟩) hpcompl
+        have hsplit : b * (U.subgroupOf M).index = n := Subgroup.card_mul_index _
+        have : n.factorization p = b.factorization p := by
+          rw [← hsplit, Nat.factorization_mul hbne (Subgroup.index_ne_zero_of_finite),
+            Finsupp.add_apply, Nat.factorization_eq_zero_of_not_dvd hpidx, add_zero]
+        omega
+  exact Nat.dvd_antisymm habc_dvd hn_dvd
+
+/-- **BG Lemma 15.1(b)** (mmd L4169): for a maximal `M` with nontrivial κ-Hall `K`,
+`M' = U M_σ` and `U` is abelian (`U` a `(κ∪σ)'`-Hall subgroup of `M`).
+
+Proof: `K ≠ ⊥` forces `IsTypeP M`, so Theorem 14.7(h) (`typeP_duality`) gives that `M'` complements
+the κ-Hall `K` in `M`, with `|M'|`, `|K|` coprime.  Then:
+* `U ⊓ M_σ = ⊥` (coprime orders: `|U|` is a `(κ∪σ)'`-number, `|M_σ|` a `σ`-number);
+* `M_σ ≤ M'` (`Msigma_le_derived`) and `U ≤ M'` (the κ'-number `|U|` is coprime to the κ-number
+  index `[M:M'] = |K|`, so `U ≤ M'` via `le_of_coprime_index`); hence `U M_σ ≤ M'`;
+* `|M'| = |U|·|M_σ|` from the three-Hall partition `|M| = |K|·|U|·|M_σ|`
+  (`card_mul_card_mul_card_eq_of_three_hall`) and the complement `|M'|·|K| = |M|`; combined with
+  `U ⊓ M_σ = ⊥` (so `|U M_σ| = |U|·|M_σ|`) this gives `|U M_σ| = |M'|`, hence equality;
+* `U` abelian: `⁅U,U⁆ ≤ U ⊓ M_σ = ⊥` (using `U ≤ M'` and `M'' ≤ M_σ` from
+  `derivedDerived_le_Msigma`), so `commutator ↥U = ⊥`. -/
+theorem typeP_hall_derived_eq_and_abelian [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    {M K U : Subgroup G} (hM : M ∈ maximalSubgroups G) (hKM : K ≤ M) (hUM : U ≤ M)
+    (hKne : K ≠ ⊥)
+    (hK : Ch03.IsHallSubgroup (S14.kappa M) (K.subgroupOf M))
+    (hU : Ch03.IsHallSubgroup ((S14.kappa M ∪ OddOrder.BG.Ch3.S10.sigma M)ᶜ) (U.subgroupOf M)) :
+    derivedInG M = U ⊔ OddOrder.BG.Ch3.S10.Msigma M ∧ IsMulCommutative ↥U := by
+  classical
+  set Mσ := OddOrder.BG.Ch3.S10.Msigma M with hMσdef
+  have hM'le : derivedInG M ≤ M := Subgroup.map_subtype_le _
+  -- `IsTypeP M` from `K ≠ ⊥`.
+  have hKofne : K.subgroupOf M ≠ ⊥ := by
+    rw [ne_eq, Subgroup.subgroupOf_eq_bot]
+    exact fun hd => hKne (hd.eq_bot_of_le hKM)
+  have hP : S14.IsTypeP M := isTypeP_of_isHall_kappa_subgroupOf_ne_bot hK hKofne
+  -- Theorem 14.7(h): `M'` complements `K` in `M`, with coprime orders.
+  obtain ⟨hcompl, _hcoprime, _⟩ := typeP_duality hG hM hP hKM hK rfl
+  -- `M_σ ≤ M'`.
+  have hMσ_le_M' : Mσ ≤ derivedInG M := OddOrder.BG.Ch3.S10.Msigma_le_derived hG hM
+  -- `M_σ` is `σ`-Hall in `M`.
+  have hMσHall : Ch03.IsHallSubgroup (OddOrder.BG.Ch3.S10.sigma M) (Mσ.subgroupOf M) :=
+    OddOrder.BG.Ch3.S10.Msigma_subgroupOf_isHall hG hM
+  -- `U ⊓ M_σ = ⊥`: `|U|` is a `(κ∪σ)'`-number, `|M_σ|` a `σ`-number, so coprime.
+  have hUMσ_bot : U ⊓ Mσ = ⊥ := by
+    have hcop : Nat.Coprime (Nat.card ↥U) (Nat.card ↥Mσ) := by
+      refine Ch03.Nat.coprime_of_isPiGroup_of_isPiGroup_compl
+        (π := (S14.kappa M ∪ OddOrder.BG.Ch3.S10.sigma M)ᶜ) Nat.card_pos.ne' Nat.card_pos.ne'
+        ?_ ?_
+      · intro p hp
+        exact hU.1 p (by rwa [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hUM).toEquiv])
+      · intro p hp hpcompl
+        have hpMσ : p ∈ (Nat.card ↥(Mσ.subgroupOf M)).primeFactors := by
+          rwa [Nat.card_congr (Subgroup.subgroupOfEquivOfLe (OddOrder.BG.Ch3.S10.Msigma_le M)).toEquiv]
+        exact hpcompl (Or.inr (hMσHall.1 p hpMσ))
+    exact Subgroup.inf_eq_bot_of_coprime hcop
+  -- `U ≤ M'`: `|U|` (a κ'-number) is coprime to `[M:M'] = |K|` (a κ-number).
+  have hU_le_M' : U ≤ derivedInG M := by
+    have hM'norm : ((derivedInG M).subgroupOf M).Normal := by
+      rw [derivedInG, Subgroup.subgroupOf,
+        Subgroup.comap_map_eq_self_of_injective M.subtype_injective]
+      infer_instance
+    haveI := hM'norm
+    -- `[M:M'] = |K|` (index of the complement factor).
+    have hidx : ((derivedInG M).subgroupOf M).index = Nat.card ↥(K.subgroupOf M) :=
+      hcompl.symm.index_eq_card
+    -- `Coprime |U.subgroupOf M| [M:M']`.
+    have hcop : Nat.Coprime (Nat.card ↥(U.subgroupOf M)) ((derivedInG M).subgroupOf M).index := by
+      rw [hidx]
+      refine (Ch03.Nat.coprime_of_isPiGroup_of_isPiGroup_compl (π := S14.kappa M)
+        Nat.card_pos.ne' Nat.card_pos.ne' hK.1 ?_).symm
+      intro p hp hpκ
+      exact hU.1 p hp (Or.inl hpκ)
+    have hUsub_le : U.subgroupOf M ≤ (derivedInG M).subgroupOf M :=
+      S14.le_of_coprime_index (N := (derivedInG M).subgroupOf M) (H := U.subgroupOf M) hcop
+    -- Push back to the ambient via `M.subtype`.
+    calc U = (U.subgroupOf M).map M.subtype := (Subgroup.map_subgroupOf_eq_of_le hUM).symm
+      _ ≤ ((derivedInG M).subgroupOf M).map M.subtype := Subgroup.map_mono hUsub_le
+      _ = derivedInG M := Subgroup.map_subgroupOf_eq_of_le hM'le
+  -- `U M_σ ≤ M'`.
+  have hsup_le : U ⊔ Mσ ≤ derivedInG M := sup_le hU_le_M' hMσ_le_M'
+  -- Cardinalities.  `|M'| = |U|·|M_σ|`.
+  have hcardM' : Nat.card ↥(derivedInG M) = Nat.card ↥U * Nat.card ↥Mσ := by
+    -- complement: `|M'.subgroupOf M| · |K.subgroupOf M| = |M|`.
+    have hcompl_card : Nat.card ↥((derivedInG M).subgroupOf M) * Nat.card ↥(K.subgroupOf M)
+        = Nat.card ↥M := hcompl.card_mul
+    -- three-Hall partition: `|K|·|U|·|M_σ| = |M|` (subgroupOf).
+    have hthree := card_mul_card_mul_card_eq_of_three_hall hG hM hK hU
+    -- transport subgroupOf cards to ambient cards.
+    rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hM'le).toEquiv] at hcompl_card
+    rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hUM).toEquiv,
+      Nat.card_congr (Subgroup.subgroupOfEquivOfLe (OddOrder.BG.Ch3.S10.Msigma_le M)).toEquiv]
+      at hthree
+    -- `|M'| · |K| = |M| = |K| · |U| · |M_σ|`, cancel `|K|`.
+    have hKpos : 0 < Nat.card ↥(K.subgroupOf M) := Nat.card_pos
+    apply Nat.eq_of_mul_eq_mul_right hKpos
+    rw [hcompl_card, ← hthree]
+    ring
+  -- `|U M_σ| = |U|·|M_σ|` (disjoint, `U ≤ M ≤ N_G(M_σ)`).
+  have hUnorm : U ≤ Subgroup.normalizer (Mσ : Set G) := by
+    refine le_trans hUM ?_
+    rw [hMσdef, OddOrder.BG.Ch3.S10.Msigma]
+    exact le_normalizer_opiCoreInG (OddOrder.BG.Ch3.S10.sigma M) M
+  have hcardSup : Nat.card ↥(U ⊔ Mσ) = Nat.card ↥U * Nat.card ↥Mσ :=
+    card_sup_eq_mul_of_le_normalizer_of_disjoint hUnorm hUMσ_bot
+  -- `M' = U M_σ` by `le_antisymm` + equal cardinality.
+  have hderiv_eq : derivedInG M = U ⊔ Mσ := by
+    refine (Subgroup.eq_of_le_of_card_ge hsup_le ?_).symm
+    rw [hcardSup, hcardM']
+  refine ⟨hderiv_eq, ?_⟩
+  -- `U` abelian: `derivedInG U ≤ U ⊓ M_σ = ⊥`, so `commutator ↥U = ⊥`.
+  have hUU_le_M'' : derivedInG U ≤ Mσ :=
+    (OddOrder.BG.Ch3.S12.derivedInG_le_derivedInG hU_le_M').trans
+      (derivedDerived_le_Msigma hG hM)
+  have hUU_le_U : derivedInG U ≤ U := Subgroup.map_subtype_le (commutator ↥U)
+  have hUU_bot : derivedInG U = ⊥ := le_bot_iff.mp (hUMσ_bot ▸ le_inf hUU_le_U hUU_le_M'')
+  -- `derivedInG U = (commutator ↥U).map U.subtype = ⊥` and `U.subtype` injective ⟹ `comm ↥U = ⊥`.
+  have hcomm_bot : commutator ↥U = ⊥ := by
+    have := hUU_bot
+    rw [derivedInG, Subgroup.map_eq_bot_iff, U.ker_subtype] at this
+    exact le_bot_iff.mp this
+  exact (commutator_eq_bot_iff ↥U).mp hcomm_bot
+
+/-- **BG Lemma 15.1(d)** (mmd L4171): the subgroup `⟨C_U(x) | x ∈ M_σ#⟩` generated by the
+centralizers in `U` of the nonidentity `σ`-elements is abelian.
+
+Proof by the `K = ⊥` case split:
+
+* `K ≠ ⊥`: `U` itself is abelian (`typeP_hall_derived_eq_and_abelian`, mmd 15.1(b)); the
+  generated subgroup `centralizerGeneratedBySigma M U ≤ U` (a `sSup` of subgroups `U ⊓ C(x) ≤ U`),
+  so a subgroup of an abelian group is abelian.
+* `K = ⊥`: `M` is type `F`, so `κ(M) = ∅` and `U` is the `σ`-complement `E` of a §12 `E`-setup
+  (`subgroupESetup_of_isHall_kappa_eq_bot`).  Theorem 12.12(a)
+  (`frobenius_factorization_of_regular`) supplies an abelian normal subgroup `A₀ ≤ U` swallowing
+  every `C_U(x)` (`x ∈ M_σ#`); its regularity hypothesis `hreg` is discharged via Lemma 14.1
+  (`msigma_structure_of_notMem_sigma_kappa`): a prime-order power `f` of a `(τ₁∪τ₃)`-element
+  `e ∈ U#` generates `A = ⟨f⟩ ∈ ℰ_p^{r_p(M)}(M)` with `p ∉ σ(M)` (`τ₁∪τ₃ ⊆ σ′`) and
+  `p ∉ κ(M) = ∅`, giving `M_σ ⊓ C(A) = ⊥`, whence `M_σ ⊓ C(e) ≤ M_σ ⊓ C(f) = ⊥`.  Then
+  `centralizerGeneratedBySigma M U ≤ A₀` (`sSup` of swallowed generators), so abelian. -/
+theorem typeP_centralizerGeneratedBySigma_isMulCommutative [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M K U : Subgroup G}
+    (hM : M ∈ maximalSubgroups G) (hKM : K ≤ M) (hUM : U ≤ M)
+    (hK : Ch03.IsHallSubgroup (S14.kappa M) (K.subgroupOf M))
+    (hU : Ch03.IsHallSubgroup ((S14.kappa M ∪ OddOrder.BG.Ch3.S10.sigma M)ᶜ) (U.subgroupOf M)) :
+    IsMulCommutative ↥(centralizerGeneratedBySigma M U) := by
+  classical
+  set Mσ := OddOrder.BG.Ch3.S10.Msigma M with hMσdef
+  by_cases hKbot : K = ⊥
+  · -- **Case `K = ⊥`**: `U` is the `σ`-complement `E` of a §12 `E`-setup; Theorem 12.12(a).
+    have hκ : S14.kappa M = ∅ := isTypeF_of_isHall_kappa_eq_bot hKM hK hKbot
+    obtain ⟨E₁, E₂, E₃, hsetup⟩ :=
+      subgroupESetup_of_isHall_kappa_eq_bot hG hM hKM hUM hK hKbot hU
+    -- Discharge the regularity hypothesis of Theorem 12.12 via Lemma 14.1.
+    have hreg : ∀ e ∈ U, e ≠ 1 →
+        (∀ r ∈ (orderOf e).primeFactors, r ∈ tau1 M ∪ tau3 M) →
+          Mσ ⊓ Subgroup.centralizer ({e} : Set G) = ⊥ := by
+      intro e heU hene hprimes
+      -- pick a prime divisor `p` of `orderOf e`; then `p ∈ τ₁(M) ∪ τ₃(M)`.
+      have hord1 : orderOf e ≠ 1 := fun hc => hene (orderOf_eq_one_iff.mp hc)
+      obtain ⟨p, hp, hpdvd⟩ := Nat.exists_prime_and_dvd hord1
+      haveI : Fact p.Prime := ⟨hp⟩
+      have hpτ : p ∈ tau1 M ∪ tau3 M :=
+        hprimes p (Nat.mem_primeFactors.mpr ⟨hp, hpdvd, (orderOf_pos e).ne'⟩)
+      -- the prime-order power `f = e^(orderOf e / p)` and its cyclic group `A = ⟨f⟩`.
+      set f : G := e ^ (orderOf e / p) with hfdef
+      have hford : orderOf f = p := orderOf_pow_orderOf_div (orderOf_pos e).ne' hpdvd
+      have hfU : f ∈ U := U.pow_mem heU _
+      have hfM : f ∈ M := hUM hfU
+      set A : Subgroup G := Subgroup.zpowers f with hAdef
+      have hAcard : Nat.card ↥A = p := by rw [hAdef, Nat.card_zpowers]; exact hford
+      have hAelem : A.IsElementaryAbelian p := Subgroup.IsElementaryAbelian.of_card_prime hAcard
+      have hAM : A ≤ M := by rw [hAdef, Subgroup.zpowers_le]; exact hfM
+      -- Lemma 14.1 hypotheses: `p ∈ π(M)`, `p ∉ σ(M)` (`τ₁∪τ₃ ⊆ σ′`), `p ∉ κ(M) = ∅`.
+      have hpπ : p ∈ S14.piSet M :=
+        Nat.mem_primeFactors.mpr ⟨hp, hpdvd.trans ((U.orderOf_dvd_natCard heU).trans
+          (Subgroup.card_dvd_of_le hUM)), Nat.card_pos.ne'⟩
+      have hpσ : p ∉ OddOrder.BG.Ch3.S10.sigma M :=
+        hpτ.elim (fun h => tau1_subset_sigma_compl M h) (fun h => tau3_subset_sigma_compl M h)
+      have hpκ : p ∉ S14.kappa M := by rw [hκ]; simp
+      -- maximal-rank elementary abelian witness: `r_p(M) = 1`, so `A ∈ ℰ_p^{r_p(M)}(M)`.
+      have hr1 : pRank ↥M p = 1 :=
+        hpτ.elim tau1_pRank_eq_one tau3_pRank_eq_one
+      have hAr : A ∈ elemAbelianOfRank G p (pRank ↥M p) := by
+        rw [hr1, mem_elemAbelianOfRank]
+        exact ⟨hAelem, by rw [hAcard, pow_one]⟩
+      -- Lemma 14.1: `M_σ ⊓ C(A) = ⊥`; antitonicity `C(e) ≤ C(f) = C(A)` lifts it to `e`.
+      obtain ⟨_, hCA, _⟩ :=
+        S14.msigma_structure_of_notMem_sigma_kappa hG hM hpπ hpσ hpκ hAr hAM
+      -- `C(A) = C(f)` and `C(e) ≤ C(f)`: centralizing `e` centralizes its power `f = e^k`.
+      have hCfA : Subgroup.centralizer (A : Set G) = Subgroup.centralizer ({f} : Set G) := by
+        rw [hAdef, Subgroup.zpowers_eq_closure, Subgroup.centralizer_closure]
+      have hCef : Subgroup.centralizer ({e} : Set G) ≤ Subgroup.centralizer ({f} : Set G) := by
+        intro x hx
+        rw [Subgroup.mem_centralizer_singleton_iff] at hx ⊢
+        rw [hfdef]
+        exact (show Commute x e from hx).pow_right _
+      rw [eq_bot_iff, ← hCA, hCfA]
+      exact inf_le_inf_left _ hCef
+    -- Theorem 12.12(a): abelian normal `A₀ ≤ U` swallowing every `C_U(x)`.
+    obtain ⟨⟨A₀, hA₀le, hA₀ab, _hA₀norm, hA₀swallow⟩, _⟩ :=
+      frobenius_factorization_of_regular hG hsetup hreg
+    -- `centralizerGeneratedBySigma M U ≤ A₀`, so abelian.
+    refine isMulCommutative_of_le hA₀ab ?_
+    rw [centralizerGeneratedBySigma]
+    refine sSup_le ?_
+    rintro C ⟨x, hx, rfl⟩
+    obtain ⟨hxMσ, hxne⟩ := hx
+    exact hA₀swallow x hxMσ (by simpa using hxne)
+  · -- **Case `K ≠ ⊥`**: `U` is abelian; the generated subgroup is `≤ U`.
+    obtain ⟨_, hUab⟩ := typeP_hall_derived_eq_and_abelian hG hM hKM hUM hKbot hK hU
+    refine isMulCommutative_of_le hUab ?_
+    rw [centralizerGeneratedBySigma]
+    refine sSup_le ?_
+    rintro C ⟨x, _, rfl⟩
+    exact inf_le_left
+
 /-- **Forward lemma: the `§14`-gated structural content of BG Lemma 15.1** (faithful to mmd L4116,
 proof deferred).  Bundles the conjuncts of Lemma 15.1 that depend on the still-`sorry` §14 results
 (Proposition 14.2(a)'s normal complement `M = K U M_σ`, Theorem 14.7(d)(h)) and Theorem 12.12:

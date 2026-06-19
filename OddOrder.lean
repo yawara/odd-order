@@ -1,3 +1,4 @@
+import OddOrder.GroupTheory.AInvariantComplement
 import OddOrder.GroupTheory.AInvariantPiSubgroups
 import OddOrder.GroupTheory.CentralProduct
 import OddOrder.GroupTheory.ChermakDelgado
@@ -168,6 +169,7 @@ import OddOrder.Peterfalvi.S06_CertainTypeCoherence
 import OddOrder.Peterfalvi.S06_CertainTypeFourCorner
 import OddOrder.Peterfalvi.S07_Coherence
 import OddOrder.Peterfalvi.S07_CoherenceGalois
+import OddOrder.Peterfalvi.S07_RetargetScaled
 import OddOrder.Peterfalvi.S08_CoherenceCore
 import OddOrder.Peterfalvi.S08_CoherenceTheorems
 import OddOrder.Peterfalvi.S08_CaseBCoherence
@@ -184,6 +186,7 @@ import OddOrder.Peterfalvi.S08_CaseBAnchoredSeed
 import OddOrder.Peterfalvi.S08_CaseBSeedGlue
 import OddOrder.Peterfalvi.S08_PGroupReduction
 import OddOrder.Peterfalvi.S08_Theorem63
+import OddOrder.Peterfalvi.S08_Theorem65c2
 import OddOrder.Peterfalvi.S09_NonexistenceCertain
 import OddOrder.Peterfalvi.S10_CoherenceWiring
 import OddOrder.Peterfalvi.S10_MinimalSimpleStructure

@@ -339,3 +339,107 @@ named lane-b 定理 ((10.11) `theorem88_caseB_prime_orders` 等) そのもの。
 2. **U-side complement** (BG-side, 非 char): K-invariant complement U to M_F in M' (coprime action;
    mathlib は `exists_right_complement'_of_coprime` のみ、invariant 版は要構成)。
 3. これらを揃えても ordering が gated ゆえ producer は sorry-free 化せず → **真の gate = lane-b §10-12**。
+
+---
+
+## 🤝 引き継ぎ (2026-06-19) — primes cite 済、残 = ordering swap + U-side complement
+
+**producer 現状** (`section16TypePStructure_of_isMinimalSimpleOdd`, `FeitThompson.lean`): honest
+gated-endpoint-skeleton。W-side discharge 済 (`typeP_pair_W_structure`)、primes cite 済
+(Pf (10.11) `theorem88_caseB_prime_orders`, `70296d47`)。唯一 residual = `Nonempty(Σ' U V, M'=M_F⊔U
+∧ M'(T)=M_F(T)⊔V ∧ K≤N(U) ∧ Kstar≤N(V) ∧ |K|<|Kstar|)`。
+
+**残 step 1 = ordering** (`|mp.K|<|mp.Kstar|`, ⚠ honesty 必須):
+- `Section16MaximalPair` (`FeitThompson.lean`) に `K_lt_Kstar : Nat.card ↥K < Nat.card ↥Kstar` 追加。
+- `exists_section16MaximalPair_data` (同) で確立: `|K|≠|Kstar|` を coprime + `Kstar≠⊥` + `|K|>1` で示し、
+  `rcases lt_or_gt_of_ne` で S↔T **swap**（dual witness は typeP_duality の対称出力 +
+  `IsConjugateSubgroup.symm`/`Or.symm`/`sup_comm`）。bullet を `have` 化して 2 case 共有すると簡潔。
+- mp producer に `K_lt_Kstar := h.<proj>` 追加、tp producer の `hlt := mp.K_lt_Kstar`（residual から除去）。
+- ※ cite でなく enrich+swap。count 不変だが residual を honest 化（現状は labeling 次第で偽）。
+
+**残 step 2 = U-side** (`∃U, M'=M_F⊔U ∧ K≤N(U)`, S/T 両側) = Pf (13.1.b):
+- K-invariant complement to `M_F` in `M'` (coprime action / Schur-Zassenhaus)。mathlib は
+  `Subgroup.exists_right_complement'_of_coprime` のみ → invariant 版要構成（または §12 SubgroupESetup の
+  `E₂⊔E₃` 経由を検討、但し M_F vs Msigma の差異注意: type III/IV で M_F≠Msigma）。
+- **これで producer 自前 sorry 消滅 → count 140→139**（残依存は named (10.11) のみ = lane-b）。
+
+**終端 gate** = lane-b Pf §10-12 char theory ((10.11)/(10.10)/(13.2))。ordering+U-side 完了でも
+primes は (10.11)[sorry] 依存ゆえ axiom-clean 化は lane-b 待ち。
+
+---
+
+## ✅ piece 1 DONE + piece 2 精密スコープ訂正 (2026-06-19 lane-f 再開セッション)
+
+### ✅ piece 1 (ordering honesty) 完了 — commit `b5f05289`
+`Section16MaximalPair` に `K_lt_Kstar : Nat.card K < Nat.card K*` を追加し、
+`exists_section16MaximalPair_data` で **enrich+swap** により確立 (cite でない):
+- 新 S14 補題 `card_kappaHall_ne_one` (type-P の κ-Hall は非自明; `IsTypeP` だけから、
+  (10.11) 非依存。`typeP_zTilde_conjClass_gt_half` のインライン重複を抽出・DRY 化) +
+  `card_kappaHall_ne_card_Kstar` (|K|≠|K*| = coprime + |K|>1)。
+- `lt_or_gt_of_ne` で場合分け、`>` 側は S↔T swap (typeP_duality は (S,K)↔(M*,K*) 対称;
+  dual witness = Ne.symm/Or.symm/IsConjugateSubgroup.symm/sup_comm + covering reorder)。
+- mp producer を `obtain`(大 And は large-elim 可)で再配線、脆い `.2.2.2…` チェーン排除。
+- producer residual から `|K|<|K*|` 除去 (now `mp.K_lt_Kstar`)。**residual が honest 化**
+  (旧 residual は labeling 次第で偽)。full build 3657 jobs green、実 sorry 140 維持。
+
+### ⛔ piece 2 (U-side) 精密訂正 — 「TypePData で trivial」は**誤り**、真の (13.1.b) invariant SZ
+
+producer residual = `Nonempty (Σ' U V, derivedInG S = M_F⊔U ∧ derivedInG T = M_F(T)⊔V ∧
+mp.K ≤ N(U) ∧ mp.Kstar ≤ N(V))`。本セッションで attack 経路を精査し**2 つの誤った楽観を訂正**:
+
+1. **U=M' (derivedInG S 自身) は CHEAT** (honest でない): `Section16Inputs.U` の拘束は弱い
+   (`derivedInG S = M_F⊔U`[M_F≤M' ゆえ U=M' で自明]、`K≤N(U)`[M'◁S ゆえ自明]、counting 定義)
+   が、**downstream §16 final-contradiction は強拘束** `u=(p^q-1)/(p-1)`、`N(U)≤L`
+   (`S16_NonExistenceG.lean:88,169,45`) を要求。U=M' だと `u=|M'|/c` がこの公式から外れ、
+   downstream が **unsatisfiable** ⟹ FT-critical な type-P counting を downstream に hoist する
+   だけ ([[scaffold-sorry-free-not-done]])。FT を前進させない。
+
+2. **TypePData.U で conjunct 1 は取れるが conjunct 2 `K≤N(U)` は generic に従わない**:
+   - conjunct 1 ✅: `TypePData.derivedInG_eq_fitting_sup_U` (`MaximalSubgroupType:176`) が
+     `derivedInG M = M_F ⊔ data.U` を全型で供給 (data.U = 真の complement、|U|=[M':M_F])。
+   - conjunct 2 ⛔: **U は M で normal でない** (type-II vacuity 検算): もし U◁M なら U char M'
+     (normal Hall) ◁ M ⟹ N(U)⊇M。type II の `normalizer_not_le : ¬N(U)≤M` + M maximal ⟹
+     N(U)=G ⟹ U◁G ⟹ U=⊥、しかし type-II core は U≠⊥ で**矛盾**。∴ generic な
+     「K≤M≤N(U)」は**偽**。`K≤N(U)` は **κ-Hall/W1 が U を normalize する specific 事実**を要す。
+
+   **原典 Pf (13.1.b)** (`references/peterfalvi/04.15…:7`): "Let U and V be such that
+   S=(P⋊U)⋊W₁... **Assume that W₁ normalizes U** ... which is possible by **the remark following
+   Definition (8.4)**." ⟹ `W₁ normalizes U` は **W₁-invariant complement の存在 (invariant
+   Schur-Zassenhaus)** に依拠する choice。generic data.U では不成立。
+
+### piece 2 の正しいスコープ — multi-step structural assembly (インフラ既存、~150-300 行)
+
+mathlib は basic SZ のみだが **repo に invariant-complement インフラ既存**:
+- `exists_subgroupESetup` (`S12_Lemma1211:71`): 任意 maximal M に `SubgroupESetup M E E₁ E₂ E₃`。
+- `E ≤ N(E₂⊔E₃)` (`S14:884` `hE23norm`) = E(⊇E₁=κ-part) が E₂⊔E₃ を normalize = **invariant
+  complement 内蔵**。
+- `aInvariant_piSubgroup_le_aInvariant_hall` (`S01_Solvable:1402`) / `OperatorMaschke` =
+  coprime 作用 A-invariant complement (BG §1/§4)。
+
+**route A** (SubgroupESetup): `exists_subgroupESetup mp.S` → E₁ を mp.K (κ-Hall) と同定
+[= pairing reconciliation, **crux**] → `derivedInG mp.S = M_F ⊔ (E₂⊔E₃)` 確立 → `hE23norm`。
+**route B** (直接): mp.K-invariant complement U を M_F in M' に `aInvariant_*_hall` で構成。
+どちらも multi-session、E₁↔mp.K (or 作用 setup) の reconciliation が難所。
+
+**∴ piece 2 = lane-f 所有の genuine 構造論プロジェクト** (char theory でない、正しいレーン)。
+quick win でなく loop 不適 (loop は U=M' cheat を取るか空転)。count 140→139 は assembly 完了時。
+
+---
+
+## ✅✅✅ DONE (2026-06-19) — piece 2 完遂, tp producer assembly-complete (sorry 140→139)
+
+piece 2 (U-side residual) を **route B (直接 K-invariant complement)** で完遂。pairing reconciliation
+は不要だった (coprimality を `typeP_derivedInG_isComplement_kappaHall` から直接取得)。
+
+- **infra**: `OddOrder.GroupTheory.exists_aInvariant_complement_within_normal` (invariant
+  Schur–Zassenhaus, commits `d6f0c4e8`/`8b8881e3`, sorry-free + axiom-clean).
+- **新 leaf** `OddOrder/BG/Ch4_FamilyOfMaximal/S14_TypePComplement.lean` =
+  `exists_kappaHall_invariant_complement_to_MF` (Pf (13.1.b): `M' = M_F ⊔ U`, `K ≤ N_G(U)`;
+  90 行, sorry-free + axiom-clean).
+- **配線**: producer の U-side `sorry` を `U`/`V` で除去. `Section16TypePStructure mp` は Type 値
+  ゆえ `Exists.choose` で witness 抽出 (`obtain` 不可). commit `8c231082`.
+- **検証**: full build 3862 green / 実 sorry **139** / lane-f 内容 axiom-clean.
+
+**lane-f scope 完了**: mp + tp 両 producer とも assembly-complete (inline sorry 0). 残 `sorryAx` は
+上流 gate のみ (Prop 16.1 §16 / 12.17 / 10.11 lane-b). 次 frontier = **Prop 16.1 + §14 type-data
+構成理論** (別途). issue 7006 (enrich) も完了.

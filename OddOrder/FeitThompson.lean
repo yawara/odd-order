@@ -1,4 +1,5 @@
 import OddOrder.BG.AppC_FinalContradiction
+import OddOrder.BG.Ch4_FamilyOfMaximal.S14_TypePComplement
 
 /-!
 # Feit-Thompson Theorem
@@ -204,6 +205,11 @@ structure Section16MaximalPair (G : Type*) [Group G] [Finite G] where
   Kstar_hall : Ch03.IsHallSubgroup (BG.Ch4.S14.kappa T) (Kstar.subgroupOf T)
   K_eq : K = BG.Ch3.S10.Msigma T ⊓ Subgroup.centralizer (Kstar : Set G)
   Z_cyclic : IsCyclic ↥(K ⊔ Kstar)
+  /-- **Ordering** `|K| < |K*|`: the pair is labelled so that the κ-Hall factor of `S` is the
+  smaller of the two coprime factors of `W = K × K*`.  Established by relabelling `S ↔ T` in
+  `exists_section16MaximalPair_data` (`card_kappaHall_ne_card_Kstar` makes the two orders distinct,
+  so one of the two labellings has `|K| < |K*|`).  This pins the otherwise-ambiguous `q < p`. -/
+  K_lt_Kstar : Nat.card ↥K < Nat.card ↥Kstar
 
 /-- **BG §14 type-P duality / cyclic-counting output** — *owned by lane-f*.
 
@@ -301,7 +307,7 @@ theorem exists_section16MaximalPair_data {G : Type*} [Group G] [Finite G]
       BG.Ch4.S14.IsTypeP S ∧ BG.Ch4.S14.IsTypeP T ∧ ¬ BG.Ch4.S14.IsConjugateSubgroup S T ∧
       Kstar ≤ T ∧ Ch03.IsHallSubgroup (BG.Ch4.S14.kappa T) (Kstar.subgroupOf T) ∧
       K = BG.Ch3.S10.Msigma T ⊓ Subgroup.centralizer (Kstar : Set G) ∧
-      IsCyclic ↥(K ⊔ Kstar) := by
+      IsCyclic ↥(K ⊔ Kstar) ∧ Nat.card ↥K < Nat.card ↥Kstar := by
   classical
   have notTypeI_imp_typeP : ∀ N : Subgroup G, N ∈ maximalSubgroups G →
       ¬ IsTypeI N → BG.Ch4.S14.IsTypeP N := by
@@ -338,21 +344,39 @@ theorem exists_section16MaximalPair_data {G : Type*} [Group G] [Finite G]
       rw [hKeq]; exact hK'
     set Kstar : Subgroup G :=
       BG.Ch3.S10.Msigma S ⊓ Subgroup.centralizer (K : Set G) with hKstardef
+    have hKM : K ≤ S := Subgroup.map_subtype_le K'
     obtain ⟨_, _, Mstar, ⟨hMstarMem, hMstarP, hSnconjMstar,
         ⟨hKstarMstar, hKstar_hall, hK_eq⟩, hcyc, _, hP2disj, hcover⟩, _⟩ :=
-      BG.Ch4.S14.typeP_duality hG hS hSP (Subgroup.map_subtype_le K') hK hKstardef
-    refine ⟨S, Mstar, K, Kstar, hS, hMstarMem, ?_, typeP_imp_nonI S hS hSP,
-      typeP_imp_nonI Mstar hMstarMem hMstarP, ?_, ?_, Subgroup.map_subtype_le K', hK, hKstardef,
-      hSP, hMstarP, hSnconjMstar, hKstarMstar, hKstar_hall, hK_eq, hcyc⟩
-    · rintro rfl
-      exact hSnconjMstar (BG.Ch4.S14.IsConjugateSubgroup.refl S)
-    · rcases hP2disj with hP2S | hP2M
+      BG.Ch4.S14.typeP_duality hG hS hSP hKM hK hKstardef
+    -- The structural data is symmetric in `(S, K) ↔ (Mstar, K*)`; collect the shared facts once.
+    have hSne : S ≠ Mstar := by
+      rintro rfl; exact hSnconjMstar (BG.Ch4.S14.IsConjugateSubgroup.refl S)
+    have hnonIS : IsTypeNonI S := typeP_imp_nonI S hS hSP
+    have hnonIM : IsTypeNonI Mstar := typeP_imp_nonI Mstar hMstarMem hMstarP
+    have hone : IsTypeII S ∨ IsTypeII Mstar := by
+      rcases hP2disj with hP2S | hP2M
       · exact Or.inl ((BG.Ch4.S16.proposition_type_classification hG hS).2.1.mpr hP2S)
       · exact Or.inr ((BG.Ch4.S16.proposition_type_classification hG hMstarMem).2.1.mpr hP2M)
-    · intro M hM
+    have hcov : ∀ M : Subgroup G, M ∈ maximalSubgroups G →
+        IsTypeI M ∨ (∃ g : G, MulAut.conj g • M = S) ∨ (∃ g : G, MulAut.conj g • M = Mstar) := by
+      intro M hM
       by_cases hMI : IsTypeI M
       · exact Or.inl hMI
       · exact Or.inr (hcover M hM (notTypeI_imp_typeP M hM hMI))
+    -- The two κ-Hall factors have distinct orders, so one of the two labellings has `|K| < |K*|`.
+    rcases lt_or_gt_of_ne (BG.Ch4.S14.card_kappaHall_ne_card_Kstar hSP hKM hK hKstardef) with
+      hlt | hgt
+    · exact ⟨S, Mstar, K, Kstar, hS, hMstarMem, hSne, hnonIS, hnonIM, hone, hcov, hKM, hK,
+        hKstardef, hSP, hMstarP, hSnconjMstar, hKstarMstar, hKstar_hall, hK_eq, hcyc, hlt⟩
+    · refine ⟨Mstar, S, Kstar, K, hMstarMem, hS, hSne.symm, hnonIM, hnonIS, hone.symm, ?_,
+        hKstarMstar, hKstar_hall, hK_eq, hMstarP, hSP, fun h => hSnconjMstar h.symm, hKM, hK,
+        hKstardef, ?_, hgt⟩
+      · intro M hM
+        rcases hcov M hM with hI | hSc | hMc
+        · exact Or.inl hI
+        · exact Or.inr (Or.inr hSc)
+        · exact Or.inr (Or.inl hMc)
+      · rw [sup_comm]; exact hcyc
 
 /-- **BG §16 maximal-pair producer** — *lane-g* (BG §16 main results).
 Constructs the maximal pair `S, T`, their type classification, and the case-(b)
@@ -367,33 +391,39 @@ of §7.11/§12) produces a *non-Type-I* maximal subgroup, which contradicts "eve
 maximal subgroup is Type I" via the type-exclusivity corollary of Proposition 16.1
 (`not_isTypeI_of_isTypeNonI`). -/
 noncomputable def section16MaximalPair_of_isMinimalSimpleOdd {G : Type*} [Group G] [Finite G]
-    (hG : IsMinimalSimpleOdd G) : Section16MaximalPair G :=
+    (hG : IsMinimalSimpleOdd G) : Section16MaximalPair G := by
+  classical
   -- `exists_section16MaximalPair_data` supplies the canonical pair `S, T = Mstar` with the full
-  -- κ-Hall witness data (`Or`/`Exists` live in `Prop`, so the witnesses are extracted by choice —
-  -- the existential cannot be `rcases`'d directly into the `Type`-valued structure goal).
-  let e := exists_section16MaximalPair_data hG
-  have h := e.choose_spec.choose_spec.choose_spec.choose_spec
-  { S := e.choose
-    T := e.choose_spec.choose
-    K := e.choose_spec.choose_spec.choose
-    Kstar := e.choose_spec.choose_spec.choose_spec.choose
-    S_maximal := h.1
-    T_maximal := h.2.1
-    S_ne_T := h.2.2.1
-    S_nonI := h.2.2.2.1
-    T_nonI := h.2.2.2.2.1
-    one_typeII := h.2.2.2.2.2.1
-    theorem88_caseB := h.2.2.2.2.2.2.1
-    K_le_S := h.2.2.2.2.2.2.2.1
-    K_hall := h.2.2.2.2.2.2.2.2.1
-    Kstar_eq := h.2.2.2.2.2.2.2.2.2.1
-    S_typeP := h.2.2.2.2.2.2.2.2.2.2.1
-    T_typeP := h.2.2.2.2.2.2.2.2.2.2.2.1
-    S_T_not_conj := h.2.2.2.2.2.2.2.2.2.2.2.2.1
-    Kstar_le_T := h.2.2.2.2.2.2.2.2.2.2.2.2.2.1
-    Kstar_hall := h.2.2.2.2.2.2.2.2.2.2.2.2.2.2.1
-    K_eq := h.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.1
-    Z_cyclic := h.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2.2 }
+  -- κ-Hall witness data.  The four subgroup witnesses are extracted by choice (the `Exists` cannot
+  -- be `rcases`'d into the `Type`-valued structure goal); the structural conjunction is an `And`
+  -- (large-eliminating), so it `obtain`s into named hypotheses directly.
+  have e := exists_section16MaximalPair_data hG
+  obtain ⟨hSmax, hTmax, hSneT, hSnonI, hTnonI, hone, hcaseB, hKleS, hKhall, hKstareq,
+    hStypeP, hTtypeP, hSTnconj, hKstarleT, hKstarhall, hKeq, hZcyc, hKlt⟩ :=
+    e.choose_spec.choose_spec.choose_spec.choose_spec
+  exact
+    { S := e.choose
+      T := e.choose_spec.choose
+      K := e.choose_spec.choose_spec.choose
+      Kstar := e.choose_spec.choose_spec.choose_spec.choose
+      S_maximal := hSmax
+      T_maximal := hTmax
+      S_ne_T := hSneT
+      S_nonI := hSnonI
+      T_nonI := hTnonI
+      one_typeII := hone
+      theorem88_caseB := hcaseB
+      K_le_S := hKleS
+      K_hall := hKhall
+      Kstar_eq := hKstareq
+      S_typeP := hStypeP
+      T_typeP := hTtypeP
+      S_T_not_conj := hSTnconj
+      Kstar_le_T := hKstarleT
+      Kstar_hall := hKstarhall
+      K_eq := hKeq
+      Z_cyclic := hZcyc
+      K_lt_Kstar := hKlt }
 
 /-- **Type-P structure engine from the type data** (`sorry`-free, gated-endpoint skeleton).
 
@@ -499,14 +529,26 @@ noncomputable def section16TypePStructure_of_isMinimalSimpleOdd {G : Type*} [Gro
   -- **U-side residual**: the (13.1.b) semidirect complements `U, V` (with `M' = M_F ⊔ U` and
   -- `K ≤ N_G(U)`) and the ordering `q < p`.  A *true*, constructible §13/§14 statement for the
   -- canonical pair (`mp.K`, `mp.Kstar`).
-  obtain ⟨U, V, hSderiv, hTderiv, hSnorm, hTnorm, hlt⟩ := Classical.choice
-    (show Nonempty (Σ' (U V : Subgroup G),
-      derivedInG mp.S = maxNilpotentNormalHall mp.S ⊔ U ∧
-      derivedInG mp.T = maxNilpotentNormalHall mp.T ⊔ V ∧
-      mp.K ≤ Subgroup.normalizer (U : Set G) ∧ mp.Kstar ≤ Subgroup.normalizer (V : Set G) ∧
-      Nat.card ↥mp.K < Nat.card ↥mp.Kstar) from sorry)
-  exact section16TypePStructure_of_components mp.K mp.Kstar U V hSderiv hTderiv hprimes.1 hprimes.2
-    hWjoin hWcyc hbot hcomm hSnorm hTnorm hlt
+  -- **U-side** from Peterfalvi (13.1.b): the κ-Hall-invariant complement `U` to `M_F` in `M'`
+  -- (`exists_kappaHall_invariant_complement_to_MF` = invariant Schur–Zassenhaus, BG §1 Prop 1.5(b)).
+  -- The ordering `|K| < |K*|` is carried by the relabelled pair (`mp.K_lt_Kstar`), so the residual
+  -- is now fully discharged.  `K`, `K*` are cyclic as subgroups of the cyclic `Z = K ⊔ K*`.
+  haveI : IsCyclic ↥(mp.K ⊔ mp.Kstar) := mp.Z_cyclic
+  haveI : IsCyclic ↥mp.K :=
+    isCyclic_of_injective (Subgroup.inclusion (le_sup_left : mp.K ≤ mp.K ⊔ mp.Kstar))
+      (Subgroup.inclusion_injective _)
+  haveI : IsCyclic ↥mp.Kstar :=
+    isCyclic_of_injective (Subgroup.inclusion (le_sup_right : mp.Kstar ≤ mp.K ⊔ mp.Kstar))
+      (Subgroup.inclusion_injective _)
+  -- `Section16TypePStructure mp` is `Type`-valued, so we cannot `obtain` the `∃`-witness into the
+  -- goal (`Exists.casesOn` only eliminates into `Prop`).  Extract the data with `Exists.choose`.
+  have hScompl := BG.Ch4.S14.exists_kappaHall_invariant_complement_to_MF hG
+    mp.S_maximal mp.S_typeP mp.K_le_S mp.K_hall
+  have hTcompl := BG.Ch4.S14.exists_kappaHall_invariant_complement_to_MF hG
+    mp.T_maximal mp.T_typeP mp.Kstar_le_T mp.Kstar_hall
+  exact section16TypePStructure_of_components mp.K mp.Kstar hScompl.choose hTcompl.choose
+    hScompl.choose_spec.1 hTcompl.choose_spec.1 hprimes.1 hprimes.2
+    hWjoin hWcyc hbot hcomm hScompl.choose_spec.2 hTcompl.choose_spec.2 mp.K_lt_Kstar
 
 /-- **Peterfalvi §13 coherent Dade-grid producer** (`sorry`) — *lane-b*
 (Peterfalvi §3–§13 coherent grids).  Given the maximal pair and the type-P
