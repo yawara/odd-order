@@ -397,13 +397,57 @@ structure Theorem88CaseBData (G : Type*) [Group G] where
   S_nonI : IsTypeNonI S
   T_nonI : IsTypeNonI T
   one_typeII : IsTypeII S ∨ IsTypeII T
+  /-- (8.8.b1): `W₁ ≤ S` and `S = [S,S] ⋊ W₁` (so `W₁` complements `S' = [S,S]` in `S`). -/
+  W1_le_S : W1 ≤ S
+  W2_le_T : W2 ≤ T
+  S_compl : Subgroup.IsComplement' ((derivedInG S).subgroupOf S) (W1.subgroupOf S)
+  T_compl : Subgroup.IsComplement' ((derivedInG T).subgroupOf T) (W2.subgroupOf T)
+
+/-- **gap B (BG §14 ↔ Peterfalvi §8)**: the κ-Hall factor `K` of a type-`P` maximal subgroup
+complements the derived subgroup `M' = [M,M]` in `M` (`M = M' ⋊ K`, mirroring `M = M' ⋊ W₁` of
+(8.4.a)).  This is the BG §14 `typeP_duality` bridge asserted in the docstring of
+`TypePData.card_W1_eq_derived_index` (identifying BG's `κ(M)`-Hall with Peterfalvi's `W₁(M)`); it
+is owned by the BG §14 lane.  Used by the §16 producer to supply `Theorem88CaseBData.S_compl`. -/
+theorem kappaHall_isComplement_derived {M K : Subgroup G}
+    (_hM : M ∈ maximalSubgroups G) (_hMP : OddOrder.BG.Ch4.S14.IsTypeP M) (_hKle : K ≤ M)
+    (_hKhall : OddOrder.Isaacs.Ch03.IsHallSubgroup (OddOrder.BG.Ch4.S14.kappa M)
+      (K.subgroupOf M)) :
+    Subgroup.IsComplement' ((derivedInG M).subgroupOf M) (K.subgroupOf M) := by
+  sorry
+
+/-- A non-type-I maximal subgroup that is not of type V (so of type II/III/IV) carries type-`P`
+data whose `W₁` has prime order — Peterfalvi (8.6.a), via `TypePNontrivialCore`.  Type V is
+excluded by Theorem (10.10) `no_typeV_maximal`. -/
+private theorem caseB_typeP_prime_W1 [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    {M : Subgroup G} (hM : M ∈ maximalSubgroups G) (hnonI : IsTypeNonI M) :
+    ∃ data : TypePData M, (Nat.card ↥data.W1).Prime := by
+  rcases hnonI with h | h | h | h
+  · exact ⟨h.some.typeP, h.some.common.2.1⟩
+  · exact ⟨h.some.typeP, h.some.common.2.1⟩
+  · exact ⟨h.some.typeP, h.some.common.2.1⟩
+  · exact absurd ⟨M, hM, h⟩ (no_typeV_maximal hG)
 
 /-- **Peterfalvi (10.11), first assertion**: in case (b) of Theorem (8.8), the
-orders of `W_1` and `W_2` are prime. -/
+orders of `W_1` and `W_2` are prime.
+
+By Theorem (10.10) `no_typeV_maximal`, the non-type-I subgroups `S`, `T` are of type II/III/IV,
+whose type-`P` `W₁` has prime order (8.6.a).  The case-(b) factors `W₁`, `W₂` complement the
+derived subgroups of `S`, `T` (8.8.b1, `S_compl`/`T_compl`), so they share the orders
+`|S : S'|`, `|T : T'|` with the respective type-`P` `W₁` (`card_W1_eq_derived_index`) — hence prime. -/
 theorem theorem88_caseB_prime_orders [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     (caseB : Theorem88CaseBData G) :
     (Nat.card ↥caseB.W1).Prime ∧ (Nat.card ↥caseB.W2).Prime := by
-  sorry
+  have hW1 : Nat.card ↥caseB.W1 = ((derivedInG caseB.S).subgroupOf caseB.S).index := by
+    rw [← Nat.card_congr (Subgroup.subgroupOfEquivOfLe caseB.W1_le_S).toEquiv,
+      ← caseB.S_compl.symm.index_eq_card]
+  have hW2 : Nat.card ↥caseB.W2 = ((derivedInG caseB.T).subgroupOf caseB.T).index := by
+    rw [← Nat.card_congr (Subgroup.subgroupOfEquivOfLe caseB.W2_le_T).toEquiv,
+      ← caseB.T_compl.symm.index_eq_card]
+  refine ⟨?_, ?_⟩
+  · obtain ⟨dataS, hSp⟩ := caseB_typeP_prime_W1 hG caseB.S_maximal caseB.S_nonI
+    rw [hW1, ← dataS.card_W1_eq_derived_index]; exact hSp
+  · obtain ⟨dataT, hTp⟩ := caseB_typeP_prime_W1 hG caseB.T_maximal caseB.T_nonI
+    rw [hW2, ← dataT.card_W1_eq_derived_index]; exact hTp
 
 /-- **Peterfalvi (10.11), Type II assertion**: for a type-II maximal subgroup,
 the §11 family `S(H_0 C')` specializes to a coherent set. -/

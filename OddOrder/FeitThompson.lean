@@ -525,7 +525,14 @@ noncomputable def section16TypePStructure_of_isMinimalSimpleOdd {G : Type*} [Gro
     { S := mp.S, T := mp.T, W1 := mp.K, W2 := mp.Kstar, W := mp.K ⊔ mp.Kstar,
       S_maximal := mp.S_maximal, T_maximal := mp.T_maximal, S_ne_T := mp.S_ne_T,
       W_eq := rfl, W_cyclic := mp.Z_cyclic,
-      S_nonI := mp.S_nonI, T_nonI := mp.T_nonI, one_typeII := mp.one_typeII }
+      S_nonI := mp.S_nonI, T_nonI := mp.T_nonI, one_typeII := mp.one_typeII,
+      W1_le_S := mp.K_le_S, W2_le_T := mp.Kstar_le_T,
+      -- (8.8.b1): the κ-Hall factors complement the derived subgroups (BG §14 `typeP_duality`
+      -- bridge `kappaHall_isComplement_derived`, gap B = identifying `κ(M)`-Hall with `W₁(M)`).
+      S_compl := Peterfalvi.S12.kappaHall_isComplement_derived mp.S_maximal mp.S_typeP mp.K_le_S
+        mp.K_hall,
+      T_compl := Peterfalvi.S12.kappaHall_isComplement_derived mp.T_maximal mp.T_typeP mp.Kstar_le_T
+        mp.Kstar_hall }
   -- **U-side residual**: the (13.1.b) semidirect complements `U, V` (with `M' = M_F ⊔ U` and
   -- `K ≤ N_G(U)`) and the ordering `q < p`.  A *true*, constructible §13/§14 statement for the
   -- canonical pair (`mp.K`, `mp.Kstar`).
