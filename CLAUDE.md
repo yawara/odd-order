@@ -12,6 +12,17 @@
 
 PDF と Nougat 抽出 Markdown (`.mmd`) は `references/` 配下 (別 private リポ、本リポでは gitignore)。教科書本文を読む必要があるときは PDF を直接読まず、まず該当の `.mmd` を grep / Read してトークン効率を上げる。
 
+## 進捗の測り方 — FT への実質的証明の積み上げ (sorry 数ではない)
+
+このプロジェクトの目的は **Feit–Thompson 定理の honest な証明を積み上げること**。**短期的に `sorry` の数を減らすことは目的でも指標でもない。** 進捗は「honest な FT 証明がいずれ推移的に必要とする本物の数学を前進させたか」で測る。
+
+- **sorry カウントで進捗を測らない (両方向で誤る)**:
+  - hard content を未充足の仮説や free field (opaque な構造フィールド) に hoist すれば、何も証明せずに `sorry` は消える。「sorry-free」「AxiomsCheck OK」は doneness を意味しない。doneness は **仮説・carrier の構成可能性**で判定する。
+  - 逆に、本物の上流前提を「上の carrier が今は free field で bypass しているから、閉じても `feitThompson` の sorry は今は減らない」と評価して deprioritize / hedge するのも**同じ誤り**。それは「上に scaffold が何枚あるか」を測っているだけで、その仕事が本物の必要な数学かどうかとは無関係。**この種の "FT-orphaned"・"閉じても sorry 減らない" という言い回しは使わない** (誤解を招く自家製ジャーゴン; 本物の prerequisite を「孤児・不要」と誤読させる)。
+- **判定基準 (これが本当の進捗)**: opaque な carrier / posited data を実際に**構成**したか、free field・仮説を**実証明に置換**したか、spine がいずれ cite すべき本物の定理を**証明**したか。満たせば、その commit が headline の sorry を今減らすかは問わない。
+- assigned な honest-architecture prerequisite は、今 FT critical path から外れて見えても hedge せず淡々と完遂する。「deferred-payoff (報酬が後払い) だから」「今 consumer 0 だから」は deprioritize の理由にならない。
+- **FT 経路限定**は維持 (FT を閉じるのに無関係な「3 冊網羅」の残りは当面しない; 上記スコープは長期目標であり続けるが別フェーズ)。ただし「FT 経路の中で何を優先するか」も sorry 削減量でなく**実質的証明の積み上げ**で測る。
+
 ## やらないこと (重要)
 
 - **leanblueprint は使わない** — TeX 依存グラフ方式は採用しない。教科書 (PDF/mmd) → Lean を直接書く。「blueprint を立てよう」「TeX で証明概略を…」等の提案は不可。
