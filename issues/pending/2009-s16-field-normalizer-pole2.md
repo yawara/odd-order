@@ -336,3 +336,88 @@ Lane B の Dade 指標論に bottom-out。
 - 既証明 expertise: lane-h の BG §14 type-P 構造 (typeP_duality `S14_TypePCounting.lean:7961`)
 - 関連: 8014 / 7005 / 1004 (POLE-1)。caveat: 本件は Peterfalvi §14 (field automorphism/Dade) で
   BG §14 とは別物 — lane-h は territory 学習が要る
+
+## 2026-06-19 再開¹² — M_F 自己同型同変性 (reusable infra) + H_cyclic 構造化 (`8e6b3379`)
+
+ユーザー方針「sorry 数でなく FT 寄与・B/F と領域分離・安定 signature 引用」を受け、POLE-2 frontier を
+**実証的に全マッピング**した上で、reusable building block を landing。
+
+### FT-path Peterfalvi frontier マッピング (consumer grep で確定)
+- **Pf §10 (S10_MinimalSimpleStructure) はほぼ全 orphaned** (0 consumers; `dadeSupportHypotheses_typeP`
+  のみ S12 が cite)。typeF Frobenius chain (`typeF_card_U0_eq_exponent`/`typeF_frobenius_of_card_eq_exponent`)
+  も 0 consumers。⟹ §10 で作業しても FT に繋がらない ([[ft-path-policy]] 裏付け)。
+- **FT-path の Pf producer は §12-§16 の深い char/構造**: `basic_structure`(13.2, char-Prop fields 込)、
+  `typeII_overNormalizer_frobenius`(13.17, 構造的だが case 分析 + 多数 cite)、`typeI_frobenius`(12.7,
+  minimal counterexample 12.8-16 = char)。いずれも cite-and-assemble だが assembly 入力自体が深い。
+  前セッションが cite-and-assemble を出し尽くし済 → 残りは producer 証明本体 (Lane B 領域の char + 構造)。
+- ファイル命名 offset 確認: repo S11=Pf §9 / S12=§10 / S13=§11 / S14=§12 / S15=§13。
+
+### 本セッション landing (FT 寄与 + B/F 非衝突 + 安定 signature)
+- **`maxNilpotentNormalHall_pointwise_smul`** (`GroupTheory/MaxNilpotentNormalHall.lean`, axiom-clean,
+  AxiomsCheck 登録): `φ • M_F = (φ • M)_F` (任意 `φ : MulAut G`)。候補集合の 4 条件 (≤/Normal/Nilpotent/Hall)
+  が自己同型不変 + sSup 保存 (le_sSup/sSup_le adjunction)。**BG §13 / Pf §13 の `L_F`/`M_F` 共役論法の
+  reusable building block** — 特に Pf (13.17) 証明 (L^g=S 矛盾で L_F 共役を使う) で必要。
+  helper: `map_subgroupMap_subgroupOf` (subgroupOf の φ-image)、`pointwise_mulAut_smul_eq_map`。
+- **`H_cyclic_of_L_conj_M` (14.12, POLE-2 の L≅M 枝) を sorry-free 化**: L≅M (conj g) ⟹ 上記同変性で
+  `H=L_F ≅ M_F=K` ⟹ char 内容 (K cyclic) を canonical obligation **`MHypothesis_kernel_cyclic`**
+  (Pf (14.11)/(14.4)/(13.12): K=V は VW₂ の cyclic Frobenius kernel) に isolate。POLE-2 の L≅M 枝が
+  「純構造 reduction + 単一 char gate」に。real sorry 133 不変 (sorry 再配置)。
+
+### 次セッション pickup (FT-path, 同変性 building block を使う)
+- **`typeII_overNormalizer_frobenius` (13.17, S15_SAndT)** が最有力 — POLE-2 の `exists_LHypothesis` が
+  直接 cite、carrier に char-Prop 無し (構造的)、同変性が証明の building block。Pf 原文 (pp.81-82) の証明:
+  (a) L~S を type-II def + Hall 共役で除外、L~T を (13.2.a) で除外 → (8.8.b4) type-I → (12.7) Frobenius;
+  (b) U⊆H = (8.17.a)+(9.1); (c) 補元 = [H]Satz 8.18 + (13.16) + BG Prop 3.9 (`S03g_Thm310`) + Sylow。
+  ∃ maximal L⊇N_G(U) は proper⊆maximal で provable。cite 先 (12.7/13.2.a/8.8 dichotomy/BG 3.9) は repo 在。
+
+## 2026-06-19 再開¹² cont. — (13.17) gated-endpoint skeleton (`0d99daf1`)
+
+`typeII_overNormalizer_frobenius` (13.17, POLE-2 の exists_LHypothesis が cite) を **sorry-free
+assembly** 化: (12.7) `S14.typeI_frobenius` を cite + deep §13 内容を 2 faithful obligation に分離。
+real sorry 133→134 (bare sorry → 2 obligation + (12.7) cite、[[feedback-gated-endpoint-skeleton-pattern]])。
+
+### 残 obligation (FT-path、次の deep §13 ターゲット) + 攻略メモ
+**① `exists_typeI_maximal_overNormalizer_U` (13.17.a/b)** = ∃ type-I maximal L⊇N_G(U) with U⊆L_F:
+- ∃ maximal L⊇N_G(U): N_G(U) proper (U≠⊥ + G simple) → `Finite.exists_le_maximal`。
+- L type-I: `hyp.theorem88_caseB L hLmax` (Hypothesis field = (8.8.b4) trichotomy) で IsTypeI∨L~S∨L~T。
+  - **L~S 除外** = conj g•L=S → conj g•N_G(U)≤S → (Hall 共役で conj•U を typeP.U に取り直し) → N_G(typeP.U)≤S、
+    `IsTypeII.normalizer_not_le` 矛盾。**⚠ 真の障害 = coherence — Hypothesis は hyp.U を S の type-II
+    `typeP.U` に pin せず** (S_deriv_eq_PU/card_U_eq_uc 等の制約のみ; 両者とも「derivedInG S の P-補元」だが
+    補元は一意でなく**共役止まり**) → bridge 要。**normalizer 同変性は既存** (自前導出不要): repo
+    `normalizer_conj_smul` (S12_ExceptionalBridge:266) + mathlib `Subgroup.map_normalizer_eq_of_bijective`。
+    **maxNNH 同変性 (本セッション landing) と同型の議論** = 候補。
+  - **L~T 除外** = |L_F|=q^p → W₁⊆N_G(U)⊆L, W₁⊆L_F, [U,W₁]⊆L_F∩U=1、(13.2.a) UW₁ Frobenius 矛盾。要 |L_F|=q^p (T-side)。
+- U⊆L_F: (8.17.a) |L_F| coprime to q → W₁∩L_F=1; U∩L_F=1 なら UW₁ FPF on L_F → (9.1) L_F=1 矛盾。要 (8.17.a)/(9.1) 所在確認。
+
+**② `typeI_overNormalizer_complement` (13.17.c/14.5)** = |complement|=pq ∧ ∃y∈Q, W₂^y≤complement:
+- E⊇W₁ complement to L_F in L = odd-order Frobenius complement → 素数位数部分群正規 ([H] V.8.18) → E⊆N_G(W₁)⊆QW₂
+  ((13.16)) → Sylow cyclic ([BG] 3.9 = `S03g_Thm310`) → E=W₁ or |E|=pq=W₁W₂^y。W₁ 枝は (14.5) 除外。
+  **⚠ [H] V.8.18 (Frobenius complement odd ⟹ prime subgroups normal) の repo 所在未確認** (Appendices.Huppert?)。
+
+### 本セッション成果サマリ (commits `8e6b3379`/`a5fe4a45`/`0d99daf1`)
+maxNNH 自己同型同変性 (reusable, axiom-clean) + H_cyclic_of_L_conj_M sorry-free 化 (POLE-2 L≅M 枝) +
+(13.17) skeleton。次セッション = obligation ① (coherence bridge + normalizer 同変性から着手、maxNNH 同変性流用)。
+
+## 2026-06-19 再開¹² cont.² — (13.17) obligation 深掘り: 具体的 blocker 特定
+
+obligation ① の L~S 除外を深掘り → **真の blocker = `hyp.U` の under-constraint (Hypothesis faithfulness)**:
+- Hypothesis は hyp.U を `S_deriv_eq_PU : derivedInG S = P ⊔ U` (**join のみ**) で制約。complement
+  (`P ⊓ U = ⊥`) も S の type-II `typeP.U` との一致も pin せず。⟹ L~S 除外に要る `¬ N_G(hyp.U) ≤ S`
+  (type-II 性) が `IsTypeII.normalizer_not_le` (typeP.U について) から直接出ない。
+- bridge 道筋: P=maxNNH S は derivedInG S の normal Hall (✓導出可) → hyp.U が P-complement なら
+  Schur-Zassenhaus で hyp.U ~ typeP.U (S 内共役) → normalizer 同変性 (既存) で `¬N_G(hyp.U)≤S`。
+  **gap = 「hyp.U が complement」= `P ⊓ U = ⊥`**、card 関係 `|P||U|=|derivedInG S|` (= p^q·u·c?) 要、Hypothesis 未供給。
+  → (a) §13 card 論で導出 (深い) or (b) Hypothesis に `IsComplement'`/`P⊓U=⊥` を enrich (carrier 変更=
+  FeitThompson producer 要対応、cross-file)。
+- obligation ② blocker: **[H] V.8.18** (奇数位数 Frobenius complement ⟹ 素数位数部分群正規) が **repo 不在**
+  (古典的、新規形式化要)。(13.16)`normalizer_W1`(sorried)/BG 3.9(`S03g_Thm310`)は在。
+
+**⟹ (13.17) 両 obligation は multi-session 深 §13 構造論** (coherence/faithfulness + Schur-Zassenhaus +
+Huppert 形式化 + sorried §8/§9 cite)。skeleton で構造化済・cite 先確定済ゆえ、着手準備は整っている。
+
+## 2026-06-19 方針① 確定 — §13 構造論プログラム計画
+
+ユーザー裁可で**方針①「H が深い §13 構造論にコミット」**。(13.17) 2 obligation の攻略計画を
+**`notes/peterfalvi/s13_17_structural_program.md`** に整理 (phase 0-4 + leaf 分類 + 検証済 infra)。
+crux base = **hyp.U coherence** (Hypothesis が hyp.U を complement/typeP.U に pin せず) →
+(a) §13 card 導出 or (b) F 協調 enrich。次の一手 = Phase 0(a) feasibility 調査 ∥ Phase 3 Huppert (H 単独並列)。
