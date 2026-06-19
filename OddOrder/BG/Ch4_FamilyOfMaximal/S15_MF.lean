@@ -3766,6 +3766,66 @@ theorem mem_centralizer_of_centralizes_quotient [Finite G]
     Subgroup.mem_subgroupOf] at hxbar
   exact hxbar
 
+open scoped commutatorElement in
+/-- **Theorem 15.2 step 4, the `D`-side fixed-point fact** (BG Proposition 1.5(d)/1.6(d), mmd
+L4196-4200): a single `q'`-element `d` (here `d ∈ D`, coprime to `Q`) that *centralizes the chief
+factor* `Q̄ = Q/Q₀` (`⁅d, y⁆ ∈ Q₀` for every `y ∈ Q`) already centralizes `Q` itself, **provided**
+`Q₀ ⊆ C_G(d)` (which holds since `Q₀ = C_Q(D) ⊆ C_G(d)` for `d ∈ D`).
+
+This is the BG step "`C_D(Q̄) = C_D(Q)`".  Proof via the coprime decomposition (Proposition 1.6(d),
+`subgroup_coprime_decomposition`): for the coprime action of `A = ⟨d⟩` on `Q`,
+`Q = C_Q(⟨d⟩) ⊔ ⁅Q, ⟨d⟩⁆`.  The set of `x ∈ N(Q₀)` whose conjugation centralizes `Q̄` is a subgroup
+containing `d` (closure uses `⁅x x', y⁆ = x ⁅x', y⁆ x⁻¹ · ⁅x, y⁆`), hence `⟨d⟩`, so `⁅Q, ⟨d⟩⁆ ≤ Q₀`.
+With `Q₀ ⊆ C_G(d)` and `C_Q(⟨d⟩) ⊆ C_G(d)` (as `d ∈ ⟨d⟩`), both summands centralize `d`, so does `Q`.
+
+Used in `centralizer_msigma_quotient_le_fittingInAmbient` to decompose `C_{M_σ}(Q̄) = Q·C_D(Q)`. -/
+theorem centralizes_Q_of_centralizes_quotient [Finite G]
+    {Q Q0 : Subgroup G} {d : G}
+    (hdN : d ∈ Subgroup.normalizer (Q : Set G))
+    (hQQ0 : Q ≤ Subgroup.normalizer (Q0 : Set G))
+    (hdQ0 : d ∈ Subgroup.normalizer (Q0 : Set G))
+    (hQ0Q : Q0 ≤ Q) (hQ0d : Q0 ≤ Subgroup.centralizer ({d} : Set G))
+    (hcop : Nat.Coprime (Nat.card ↥(Subgroup.zpowers d)) (Nat.card ↥Q))
+    (hSolv : IsSolvable ↥Q)
+    (hfix : ∀ y ∈ Q, ⁅d, y⁆ ∈ Q0) :
+    Q ≤ Subgroup.centralizer ({d} : Set G) := by
+  classical
+  have hAN : Subgroup.zpowers d ≤ Subgroup.normalizer (Q : Set G) :=
+    (Subgroup.zpowers_le).mpr hdN
+  -- The set of `x ∈ N(Q₀)` whose conjugation centralizes `Q̄` (`⁅x, y⁆ ∈ Q₀` for all `y ∈ Q`) is a
+  -- subgroup of `G`; it contains `d`, hence all of `⟨d⟩`.  `⁅x x', y⁆ = x ⁅x', y⁆ x⁻¹ · ⁅x, y⁆`.
+  let T : Subgroup G :=
+    { carrier := {x | x ∈ Subgroup.normalizer (Q0 : Set G) ∧ ∀ y ∈ Q, ⁅x, y⁆ ∈ Q0}
+      one_mem' := ⟨(Subgroup.normalizer (Q0 : Set G)).one_mem, fun y _ => by
+        rw [commutatorElement_one_left]; exact Q0.one_mem⟩
+      mul_mem' := fun {x x'} hx hx' => ⟨(Subgroup.normalizer (Q0 : Set G)).mul_mem hx.1 hx'.1,
+        fun y hyQ => by
+          have heq : ⁅x * x', y⁆ = (x * ⁅x', y⁆ * x⁻¹) * ⁅x, y⁆ := by
+            rw [commutatorElement_def, commutatorElement_def, commutatorElement_def]; group
+          rw [heq]
+          exact Q0.mul_mem ((Subgroup.mem_normalizer_iff.mp hx.1 ⁅x', y⁆).mp (hx'.2 y hyQ))
+            (hx.2 y hyQ)⟩
+      inv_mem' := fun {x} hx => ⟨(Subgroup.normalizer (Q0 : Set G)).inv_mem hx.1, fun y hyQ => by
+        have heq : ⁅x⁻¹, y⁆ = x⁻¹ * ⁅x, y⁆⁻¹ * (x⁻¹)⁻¹ := by
+          rw [commutatorElement_def, commutatorElement_def]; group
+        rw [heq]
+        exact (Subgroup.mem_normalizer_iff.mp ((Subgroup.normalizer (Q0 : Set G)).inv_mem hx.1)
+          ⁅x, y⁆⁻¹).mp (Q0.inv_mem (hx.2 y hyQ))⟩ }
+  have hdT : d ∈ T := ⟨hdQ0, hfix⟩
+  have hzpT : Subgroup.zpowers d ≤ T := (Subgroup.zpowers_le).mpr hdT
+  -- Hence `⁅Q, ⟨d⟩⁆ ≤ Q₀`.
+  have hcommQ0 : ⁅Q, Subgroup.zpowers d⁆ ≤ Q0 := by
+    rw [Subgroup.commutator_le]
+    intro y hyQ a ha
+    rw [← commutatorElement_inv]
+    exact Q0.inv_mem ((hzpT ha).2 y hyQ)
+  -- Proposition 1.6(d): `Q = C_Q(⟨d⟩) ⊔ ⁅Q, ⟨d⟩⁆`.
+  have hdecomp := OddOrder.BG.Ch3.S13.subgroup_coprime_decomposition hAN hcop (Or.inr hSolv)
+  -- Both summands centralize `d`: `C(⟨d⟩) ⊆ C(d)` and `⁅Q, ⟨d⟩⁆ ≤ Q₀ ⊆ C(d)`.
+  rw [hdecomp]
+  refine sup_le (inf_le_left.trans ?_) (hcommQ0.trans hQ0d)
+  exact Subgroup.centralizer_le (Set.singleton_subset_iff.mpr (Subgroup.mem_zpowers d))
+
 /-- A finite `ZMod q`-module of cardinality `q` (`q` prime) has `Module.finrank ≤ 1`
 (`§14`-independent, reusable).  Used to feed the cyclicity hypothesis `hcyc` of BG Theorem 3.10(c)
 once `|C_{Q̄}(K)| = q` is known. -/
