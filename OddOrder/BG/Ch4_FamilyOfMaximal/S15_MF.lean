@@ -4243,6 +4243,80 @@ theorem centralizer_le_Msigma_of_primeManner [Finite G]
     exact le_inf hQcent hQMσ
   exact hKstarneQ (le_antisymm hKstarQ hQKstar)
 
+/-- **`D ⋊ K` is a Frobenius group from the prime-manner action** (BG Theorem 15.2, mmd L4196-4200,
+BG Theorem 3.10(b)(c) input): for the `q'`-Hall complement `D` of `Q` in `M_σ` and the `κ`-Hall
+complement `K`, the group `D ⊔ K` is Frobenius with kernel `D` and complement `K`.
+
+The Frobenius (fixed-point-free) condition is exactly the prime-manner action: a `k ∈ K#` fixing
+`n ∈ D#` would centralize it, so `n ∈ C_{M_σ}(k) = K* ⊆ Q` (`hprime`, `hKstarQ`; `D ≤ M_σ`), while
+`n ∈ D` and `D ∩ Q = 1` (`hDQ`), forcing `n = 1`.  The remaining structure is bookkeeping:
+`D ◁ D⊔K` (`K ≤ N_G(D)`, `hKnormD`), `D, K` complements (`D ∩ K = 1`, `hDK`), both nontrivial.
+
+Discharges the `hfrob` hypothesis of `chiefFactor_card_and_commutator_of_inputs`. -/
+theorem isFrobeniusGroup_DK_of_primeManner
+    {M K D Kstar Q : Subgroup G}
+    (hprime : ∀ x ∈ K, x ≠ 1 →
+      Subgroup.centralizer ({x} : Set G) ⊓ OddOrder.BG.Ch3.S10.Msigma M = Kstar)
+    (hDMσ : D ≤ OddOrder.BG.Ch3.S10.Msigma M) (hKstarQ : Kstar ≤ Q) (hDQ : Disjoint D Q)
+    (hKnormD : K ≤ Subgroup.normalizer (D : Set G)) (hDK : Disjoint D K)
+    (hDne : D ≠ ⊥) (hKne : K ≠ ⊥) :
+    OddOrder.Isaacs.Ch06.IsFrobeniusGroup ↥(D ⊔ K)
+      (D.subgroupOf (D ⊔ K)) (K.subgroupOf (D ⊔ K)) := by
+  have hDL : D ≤ D ⊔ K := le_sup_left
+  have hKL : K ≤ D ⊔ K := le_sup_right
+  -- `D ◁ D⊔K` from `D ≤ N(D)` and `K ≤ N(D)`.
+  have hDnormD : (D : Subgroup G) ≤ Subgroup.normalizer (D : Set G) := Subgroup.le_normalizer
+  haveI hDLnormal : (D.subgroupOf (D ⊔ K)).Normal :=
+    (Subgroup.normal_subgroupOf_iff_le_normalizer hDL).mpr (sup_le hDnormD hKnormD)
+  refine
+    { isNormal := hDLnormal
+      isComplement := ?_
+      ne_bot_kernel := ?_
+      ne_bot_complement := ?_
+      conj_frobenius := ?_ }
+  · -- `D` and `K` are complements in `D ⊔ K`.
+    apply Subgroup.isComplement'_of_disjoint_and_mul_eq_univ
+    · rw [Subgroup.disjoint_def]
+      intro x hxD hxK
+      rw [Subgroup.mem_subgroupOf] at hxD hxK
+      exact Subtype.ext (Subgroup.disjoint_def.mp hDK hxD hxK)
+    · have hsup : D.subgroupOf (D ⊔ K) ⊔ K.subgroupOf (D ⊔ K) = ⊤ := by
+        rw [← Subgroup.subgroupOf_sup hDL hKL, Subgroup.subgroupOf_self]
+      have := Subgroup.normal_mul (D.subgroupOf (D ⊔ K)) (K.subgroupOf (D ⊔ K))
+      rw [hsup, Subgroup.coe_top] at this
+      exact this.symm
+  · -- kernel nontrivial.
+    intro hbot
+    exact hDne (by
+      have := Subgroup.map_mono (f := (D ⊔ K).subtype) (le_of_eq hbot)
+      rwa [Subgroup.map_subgroupOf_eq_of_le hDL, Subgroup.map_bot, le_bot_iff] at this)
+  · -- complement nontrivial.
+    intro hbot
+    exact hKne (by
+      have := Subgroup.map_mono (f := (D ⊔ K).subtype) (le_of_eq hbot)
+      rwa [Subgroup.map_subgroupOf_eq_of_le hKL, Subgroup.map_bot, le_bot_iff] at this)
+  · -- Frobenius condition = fixed-point-free = prime manner.
+    rintro a ha ha1 n hn hn1 hfix
+    rw [Subgroup.mem_subgroupOf] at ha hn
+    have haK : (a : G) ∈ K := ha
+    have ha1G : (a : G) ≠ 1 := fun h => ha1 (Subtype.ext h)
+    have hnG : (n : G) ≠ 1 := fun h => hn1 (Subtype.ext h)
+    have hfixG : (a : G) * (n : G) * (a : G)⁻¹ = (n : G) := Subtype.ext_iff.mp hfix
+    -- `n ∈ C_G(a)`: `a n a⁻¹ = n` ⟹ `a n = n a`.
+    have han : (a : G) * (n : G) = (n : G) * (a : G) := by
+      rw [mul_inv_eq_iff_eq_mul] at hfixG; exact hfixG
+    have hnCent : (n : G) ∈ Subgroup.centralizer ({(a : G)} : Set G) := by
+      rw [Subgroup.mem_centralizer_iff]
+      rintro g hg
+      rw [Set.mem_singleton_iff] at hg; subst hg
+      exact han
+    -- `n ∈ C_{M_σ}(a) = K* ⊆ Q`, while `n ∈ D` and `D ∩ Q = 1`.
+    have hnMσ : (n : G) ∈ OddOrder.BG.Ch3.S10.Msigma M := hDMσ hn
+    have hnKstar : (n : G) ∈ Kstar := by
+      rw [← hprime (a : G) haK ha1G]; exact Subgroup.mem_inf.mpr ⟨hnCent, hnMσ⟩
+    have hnQ : (n : G) ∈ Q := hKstarQ hnKstar
+    exact hnG (Subgroup.disjoint_def.mp hDQ hn hnQ)
+
 /-- **Theorem 15.2(g) reverse inclusion, reduced to `C_M(Q) ⊆ M_σ`** (mmd L4196-4198): if the
 centralizer `C_M(Q)` of the normal `q`-subgroup `Q` lies in `M_σ` (the genuinely BG-specific input,
 from `σ`-uniqueness — it does *not* follow from local structure, cf. the ChatGPT-verified counter-
