@@ -76,3 +76,34 @@ complement E (⊇W₁) は odd Frobenius complement → Phase 3 で素数位数�
    可なら Phase 1 へ直結。不可なら (b) を F に提案 (cross-lane)。
 2. **Phase 3 (Huppert [H] V.8.18)**: Phase 0 と独立・H 単独で並行着手可。obligation ② を de-risk。
 3. Phase 0 解決後 → Phase 1 → 2、Phase 3 後 → 4。
+
+## cross-lane 伝達 (hub / B / F) — 2026-06-19
+
+> 伝達機構 = 共有 notes/issue + cron merge (lane↔lane の `send_message` は unsupervised lane で
+> 不可、[[cross-lane-sync-via-notes]])。本節 + issue 2009 + commit が main へ流れ hub/B が読む。
+
+### ⚠ S15_SAndT の §13 sub-split (hub / B 宛)
+`cite_split_three_lanes.md` は名目上 **B = S15_SAndT (§13 char)** とするが、H の方針① は同ファイルの
+**(13.17) `typeII_overNormalizer_frobenius` = 構造的 producer** (type-I Frobenius 構造、POLE-2 が cite)
+を扱う。**提案する §13 sub-split**:
+- **H = §13 構造 producer**: (13.17) typeII_overNormalizer_frobenius + その obligation
+  (exists_typeI_maximal_overNormalizer_U / typeI_overNormalizer_complement) + (13.16) normalizer_W1
+  等の構造補題 + 本プログラムの Phase 0-4。
+- **B = §13 char producer**: basic_structure の **char fields** (tauS_eq_induction/A0S_TI)、(13.3)以降の
+  CharacterDegreeData / μ_j / Dade grid、S_coherent、coherence/Dade 本体。
+- **即時衝突なし** (B は現在 §6 (6.8) bootstrap、§13 未着手)。B が §13 char に到達したら hub が
+  prefix-split (構造 prefix を H-leaf、char を後続) で分離可。H は当面 S15_SAndT で構造 producer を進める。
+
+### H→B cite 関係 (B 宛)
+H の §13 構造証明は **B の (sorried) §13 char/構造 producer を安定 signature として cite**:
+- `basic_structure` (13.2) の構造 fields (P_elementaryAbelian / P_order |P|=p^q / u_bound)
+- (9.1) Wielandt FPF (S11=Pf§9)、(8.17.a) (S10=Pf§8)
+これらが B/将来セッションで unconditional 化されると H の構造 producer も自動 unconditional 化。
+**逆向き**: H が landing する §13 構造 producer (13.17 等) は B の §13 char (Dade grid が type-I L の
+Frobenius 構造を前提) からも cite され得る。
+
+### Phase 0(b) は F 協調 (hub / F 宛)
+coherence base の解決オプション (b) = **Hypothesis (S15_SAndT) を hyp.U が complement になるよう enrich**
+(`P ⊓ U = ⊥` or typeP.U pin)。carrier 変更は `sectionSixteenHypothesis_of_inputs` producer
+(FeitThompson.lean, **F 領域**) の対応を要する。Phase 0(a) の H 単独 card 導出が不可と判明した時点で
+hub 経由 F に提案 (それまでは触らない)。
