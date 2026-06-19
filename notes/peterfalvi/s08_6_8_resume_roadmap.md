@@ -4,42 +4,41 @@
 > `s08_6_8_assembly_plan.md`(458KB)/`s08_6_8_3_gap_resolution.md` のうち本 note と矛盾する記述は本 note を優先。
 > 上位方針・FT 接続の文脈 = 記憶 [[ft-path-policy]] の 2026-06-17 検証訂正ブロック。
 
-## 🚩🆕 HANDOFF — 次セッションはここから (2026-06-19 cont.²¹)
+## 🚩🆕 HANDOFF — 次セッションはここから (2026-06-19 cont.²²)
 
-**状態**: branch `lane-b`、HEAD `8c5caa02`、作業ツリー clean (未追跡 `s08_6_8_chatgpt_prompt.md` 旧 draft は無視可)、
-full build 3866 green、実 sorry 140。cont.²⁰ の残チェーン step 1-3 + step 4a を完了 (5 commits)。
+**状態**: branch `lane-b` = `main` に同期済 (cont.²¹ 末で main マージ、HEAD は 4c コミット)、作業ツリー clean
+(未追跡 `s08_6_8_chatgpt_prompt.md` 旧 draft 無視可)、**full build 3868 green、実 sorry 136**
+(main 同期で 140→136、lane-h 8.2.b 等)。reducible-break (5.6.3) **ENGINE + cross-ortho toolkit + member
+datum を完了** (step 1-3 + 4a + swap + 4c、計 6 feature commit、全 sorry-free + axiom-clean)。
 
-**✅ 完成済 (cont.²¹、reducible-break (5.6.3) ENGINE 本体 + cross-ortho foundation)**:
-- **step 1** `retarget_isCoherent_of_extensionImage_k` (新 leaf `S08_RetargetReducible.lean`、commit `62b1febe`):
-  reducible-break bridge。X=τ(χ−a·χ₁)+a·νχ₁ を内積記号化 (huu=⟨χ,χ⟩+a² 等)、Gram 一致
-  ‖X‖²=⟨χ,χ⟩/‖X̄‖²=⟨χ̄,χ̄⟩ を ring で、最終 `retarget_isCoherent_S` 呼出。
-- **step 2** `xAdjoinStepW_k` (`S08_CoherenceWeighted`、commit `577a0d69`): break χ も reducible 可の weighted
-  adjoin engine。**Da をパラメータ化** + `hDatau1 : Da.tau1 = τ` (実 caller `certainTypeDecompositionDa` で rfl)。
-  支持的に `crux1_of_memberFamilyW`/`inner_Y_extension_member_eq` を generic-χ 一般化 (χ を coerce のみ・自由)。
-- **step 3** `coherentDegreeSqNormBound_of_not_coherentW_k` (`S08_CoherenceWeighted`、commit `1f029035`):
-  step 2 の純対偶 (by_contra→push_neg→xAdjoinStepW_k)。¬coherent → ∑deg²/mc ≤ 2a。
-- **step 4a** `certainTypeR_imageSet_orthogonal_certainTypeR` (`S06_CertainTypeCoherence`、commit `8c5caa02`):
-  column×column の (5.2.e) cross-ortho。2 列対 {χ₂,χ₂⁻¹}∩{χ₂',χ₂'⁻¹}=∅ (hne1:χ₂≠χ₂' + hne2:χ₂≠χ₂'⁻¹) で
-  `certainTypeOmegaSigma_inner` から 4 ケース 0。
+**✅ 完成済 (reducible-break (5.6.3) ENGINE + (5.2.e) cross-ortho toolkit + 列 break member datum)**:
+- **step 1** `retarget_isCoherent_of_extensionImage_k` (新 leaf `S08_RetargetReducible.lean`):
+  reducible-break bridge。X=τ(χ−a·χ₁)+a·νχ₁ 内積記号化、Gram 一致 ‖X‖²=⟨χ,χ⟩、`retarget_isCoherent_S` 呼出。
+- **step 2** `xAdjoinStepW_k` (`S08_CoherenceWeighted`): break χ も reducible 可の weighted adjoin engine。
+  **Da をパラメータ化** + `hDatau1 : Da.tau1 = τ`。`crux1_of_memberFamilyW`/`inner_Y_extension_member_eq` を
+  generic-χ 一般化済。
+- **step 3** `coherentDegreeSqNormBound_of_not_coherentW_k` (`S08_CoherenceWeighted`): step 2 の純対偶。
+- **4a** `certainTypeR_imageSet_orthogonal_certainTypeR` (`S06_CertainTypeCoherence`): column×column (5.2.e)。
+- **swap** `dadeOfDiff_imageSet_orthogonal_certainTypeR` (`S08_CaseBHortho`): irreducible×column (5.2.e)、
+  既存 column×irreducible の conj 対称。
+- **4c** `caseB_member_orthoDatum_columnBreak` (`S08_CaseBEnumeration:441`): column-break 用 per-member datum
+  (Dmem + ortho + htau1)。dichotomy = column member→4a / irreducible member→swap。
+  **🔑 τ-transport 知見 (再調査不要)**: 出力 ortho は `.Orthogonal`(同一 τ を要求し certainTypeR は h46-dade-map
+  上・Dmem は hyp.tau 上で不一致)を**避け、raw imageSet 直交** `∀ α∈D.imageFamily.imageSet, ∀ β∈certainTypeR.imageSet,
+  ⟨α,β⟩=0` で出す(内積は τ 非依存)。
 
-**▶ 次の一手 = step 4 本体 (reducible-break sMember bound) の残り 4b/4c/4d**。設計確定済 (de-risked):
-`sMember_degreeSqNormBound_of_not_coherent` (`S08_CaseBEnumeration:620`) の hψirr を撤廃した `_k` 版を作る。
-break ψ=column μⱼ。必要部品:
-- **4b 列 break-fields**: `caseB_breakChar_fields` (irreducible、hψψ=1 供給) の column 版。column の非実性
-  (`certainType_columnSum_conj` で μ̄ⱼ=columnSum χ₂⁻¹≠μⱼ)・ノルム≠0 (列ノルム=w₁、`columnFamily_mu_sum_inner`)・
-  直交 (`caseB_S_pairwise_orthogonal` は S-member 一般ゆえ列も OK)・conj-diff support (`columnDiff_support_subset`)。
-  hbar1 (ψ.conj 1 = ψ 1) は列の実次数ゆえ成立 (`columnSum_inv_apply_one`)。
-- **4c member datum_k**: `caseB_member_orthoDatum` (`S08_CaseBEnumeration:341`) の column-break 版。member の R(x) を
-  **break の Da.imageFamily=certainTypeR(χ₂_break)** 相手に直交。member dichotomy:
-  - irreducible member → `dadeOfDiff(x) ⊥ certainTypeR(break)` = 既存 `certainTypeR_imageSet_orthogonal_dadeOfDiff`
-    の **conj 対称 (inner_conj_symm)** ※`.Orthogonal` の向きを要確認。
-  - column member → **step 4a** で `certainTypeR(x) ⊥ certainTypeR(break)` (hne1/hne2 は member≠break・member≠break̄
-    から; S₁ 帰属 + 列単射 `columnSum`/`column_inv_ne_self` で導出)。
-- **4d sMember_k**: 上記 + break Da=`certainTypeDecompositionDa` + step 3 `coherentDegreeSqNormBound_of_not_coherentW_k`
-  で組む。出力は同型 (∑deg²/mc ≤ 2a)。
-**続けて step 5-11** (handoff cont.²⁰ 参照): sSubFiltration_sum_le_two_psi_caseB hψirr 撤廃 → six_two_index_bound_c2
+**▶ 次の一手 = 4b + 4d (step 4 本体の残り)**。`sMember_degreeSqNormBound_of_not_coherent`
+(`S08_CaseBEnumeration:620`) の hψirr 撤廃 `_k` 版を作る (break ψ=column μⱼ):
+- **4b 列 break-fields**: `caseB_breakChar_fields` の column 版 (hψψ=1→hψψne)。非実性 `certainType_columnSum_conj`、
+  ノルム≠0 `columnFamily_mu_sum_inner` (=w₁≠0)、S₁ 直交 `caseB_S_pairwise_orthogonal`、conj-diff support
+  `columnDiff_support_subset`、hbar1 `columnSum_inv_apply_one`。
+- **4d sMember_k**: 4c(per-member datum)+ 4b + break **Da=`certainTypeDecompositionDa`**(over hyp.tau、
+  `caseB_column_mapagree` で hagree)+ step 3。**🔑 τ-transport**: 4c の raw ortho を xAdjoinStepW_k の
+  `.Orthogonal Da_break.imageFamily` に包む = `Da_break.imageFamily.imageSet = certainTypeR(χ₂b).imageSet`
+  (certainTypeDecompositionDa の imageSet 定義から)で β の membership を rw。hDatau1 = rfl。
+  4c の member ortho が `certainTypeR(χ₂b).imageSet` 相手ゆえ、Da_break.imageSet との橋渡しが crux。
+**続けて step 5-11** (cont.²⁰ 参照): sSubFiltration_sum_le_two_psi_caseB hψirr 撤廃 → six_two_index_bound_c2
 hW2B 撤廃 → six_three_c2 → isPGroup_of_not_coherent_c2 → hbound → dispatch S08:59。
-**要確認**: `.Orthogonal` の引数方向 (OrthonormalCharacterImageFamily.Orthogonal の def)。
 **FT 文脈不変**: (6.8) は [[ft-path-policy]] で orphaned (deferred-payoff) — 閉じても feitThompson sorry は今減らない。
 
 ## 🚩 HANDOFF — (2026-06-19 cont.²⁰)
