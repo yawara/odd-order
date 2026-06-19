@@ -272,3 +272,27 @@ BG Thm 14.7(h)、AxiomsCheck 登録、axiom-clean)。私が原文/既存機構�
 対応・未形式化既知事実は形式化労力)。重複削除 + consumer で既存定理を直接 cite → **(10.11) は (10.10)+(8.6.a)+
 proven typeP_derivedInG_isComplement_kappaHall で完全 unconditional**(FT 消費される primality 完全証明、real sorry 135)。
 issue 2012 RESOLVED。教訓: obligation 化の前に grep + AxiomsCheck を確認。
+
+### 9. §10-13 残 sorry 監査 (2026-06-19) — citeable vs gated 分類
+
+(10.11) が「既存 proven 定理 cite」で閉じた後、残 sorry を**精読して**分類(gated と決めつけず原文確認):
+
+**citeable に見えて実は gated(精読で判明)**:
+- `hall_maxNilpotentNormalHall_and_mainSubgroup` (8.11) — `maxNilpotentNormalHall_isHall`(S15_MF:279 proven）は
+  **Hall-in-M**(`.subgroupOf M`)。target は **Hall-in-G**。別物。G-level は sorried BG §16(theoremE/I）経由 ⟹ gated。
+- `typeF_card_U0_eq_exponent` (8.2.a) — `|U0|=exp(U0)` に U0 の cyclic-Sylow(BG Prop 3.9 = 奇 Frobenius 補元）要。
+  **TypeFData は U0 を Frobenius 補元として carry せず** ⟹ gated（structure 不足）。
+
+**character-theory-gated(B の §3-§6 char API 待ち、~11 本)**: `typeI_or_typeII_centralizer_unique` /
+`escapingCentralizers_control` / `dadeSupportHypotheses_typeI`/`_typeP` / `support_mutual_exclusion`（S10）;
+`clifford_dichotomy` / `caseA`/`caseB_character_counts`（S11）; `S_H0C_not_coherent` / `coherent_quotient_bound` /
+`orthogonality_setup` / `not_orthogonal_mu0_sub_zeta` / `final_typeIII_conclusions`（S13）。
+
+**opaque-carrier materialization（murky、~8 本）**: `typeII_III_IV_order_relations` / `exists_chiefFactorData` /
+`chiefFactor_basic` / `exceptional_case_frobenius_realization`（S11）; `secondDerived_eq_HC` / `core_structure` /
+`H_elementaryAbelian`（S13）。結論が S11/S13 Hypothesis carrier の opaque Prop field ゆえ「証明」が vacuous/要材料化で murky。
+
+⟹ **§10-13 の clean な H-only win は (10.10)/(10.11) で出尽くし**。残りは (a) BG §16 G-level Hall（sorried BG 下流）、
+(b) B の §3-§6 char API、(c) opaque carrier 材料化（B 寄り）に gated。faithful (10.1) tau は §4 Dade proven 補題
+(`dadeIntegralCharacterMap_inner_eq_on_supported_span` 等)を cite する土台になるが、(10.5)/(10.8) 等の materialization は
+Peterfalvi 原文の長い算術論法ゆえ substantial。
