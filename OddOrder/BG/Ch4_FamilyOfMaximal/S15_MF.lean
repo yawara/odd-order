@@ -2065,6 +2065,112 @@ theorem complement_isNilpotent_of_inputs [Finite G]
   have hnQ : n ∈ Q := hCentleQ r hrK hr1 (Subgroup.mem_inf.mpr ⟨hnCent, hnMσ⟩)
   exact hn1 (Subgroup.disjoint_def.mp hDQ hnD hnQ)
 
+/-- **BG Theorem 15.2, step 1 derivation (a)** (mmd L4190, "By Lemma 14.1, this implies (a)"):
+if `M_F ≠ M_σ` (i.e. `M_σ` is *not* nilpotent), then `M` is of type `P₁`.
+
+Two halves, both via BG Lemma 14.1 (`msigma_structure_of_notMem_sigma_kappa`):
+
+* `¬ IsTypeP2 M`: were `M` type-`P₂`, `msigma_isNilpotent_of_isTypeP2` would make `M_σ` nilpotent.
+* `IsTypeP M`: the `σ`-complement `E` of `M` is nontrivial (`SubgroupESetup.E_ne_bot`), so some prime
+  `p ∣ |E|` lies in `π(M) ∖ σ(M)`.  Building a maximal-rank elementary abelian `A ≤ M` (as in
+  `msigma_isNilpotent_of_isTypeP2`), if `p ∉ κ(M)` then Lemma 14.1 forces `M_σ` nilpotent — a
+  contradiction; hence `p ∈ κ(M)`, so `κ(M) ≠ ∅`, i.e. `M` is type-`P`.
+
+`IsTypeP M ∧ ¬ IsTypeP2 M` gives `κ(M) = π(M) ∖ σ(M)` (the only failure mode for a type-`P`
+member is `κ(M) ⊊ π(M) ∖ σ(M)`, which is type-`P₂`), i.e. `IsTypeP1 M`. -/
+theorem isTypeP1_of_mf_ne_msigma [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} (hM : M ∈ maximalSubgroups G)
+    (hne : MF M ≠ OddOrder.BG.Ch3.S10.Msigma M) :
+    S14.IsTypeP1 M := by
+  classical
+  -- `M_σ` is not nilpotent (else `M_F = M_σ`).
+  have hMσ_not_nil : ¬ Group.IsNilpotent ↥(OddOrder.BG.Ch3.S10.Msigma M) := fun hnil =>
+    hne ((maxNilpotentNormalHall_eq_Msigma_iff_isNilpotent hG hM).mpr hnil)
+  -- `¬ IsTypeP2 M` (else `M_σ` nilpotent, BG `msigma_isNilpotent_of_isTypeP2`).
+  have hnotP2 : ¬ S14.IsTypeP2 M := fun hP2 =>
+    hMσ_not_nil (S14.msigma_isNilpotent_of_isTypeP2 hG hM hP2)
+  -- `IsTypeP M`: a prime `p ∣ |E|` lands in `κ(M)` (else Lemma 14.1 makes `M_σ` nilpotent).
+  have hP : S14.IsTypeP M := by
+    obtain ⟨E, E₁, E₂, E₃, hsetup⟩ := OddOrder.BG.Ch3.S12.exists_subgroupESetup hG hM
+    have hEne : E ≠ ⊥ := hsetup.E_ne_bot hG
+    have hEcard : Nat.card ↥E ≠ 1 := fun hc => hEne (Subgroup.card_eq_one.mp hc)
+    obtain ⟨p, hp, hpdvd⟩ := Nat.exists_prime_and_dvd hEcard
+    haveI : Fact p.Prime := ⟨hp⟩
+    have hpE : p ∈ (Nat.card ↥E).primeFactors :=
+      Nat.mem_primeFactors.mpr ⟨hp, hpdvd, Nat.card_pos.ne'⟩
+    have hpσ : p ∉ OddOrder.BG.Ch3.S10.sigma M :=
+      hsetup.not_mem_sigma_of_mem_primeFactors hG hpE
+    -- `p ∈ π(M)`: `p ∣ |E|` and `E ≤ M`.
+    have hpdvdM : p ∣ Nat.card ↥M := hpdvd.trans (Subgroup.card_dvd_of_le hsetup.E_le)
+    have hpM : p ∈ (Nat.card ↥M).primeFactors :=
+      Nat.mem_primeFactors.mpr ⟨hp, hpdvdM, Nat.card_pos.ne'⟩
+    have hpπ : p ∈ S14.piSet M := hpM
+    -- A maximal-rank elementary abelian `p`-subgroup `A = B.map M.subtype ≤ M`.
+    obtain ⟨B, hBea, hBlog⟩ :=
+      exists_isElementaryAbelian_log_card_ge_of_pos_le_pRank (G := ↥M) (p := p)
+        (n := pRank ↥M p) (OddOrder.BG.Ch3.S12.one_le_pRank_of_mem_primeFactors hpM) (le_refl _)
+    obtain ⟨j, hj⟩ := hBea.isPGroup.exists_card_eq
+    have hjeq : j = pRank ↥M p := by
+      have hsq := le_antisymm (le_pRank B hBea) hBlog
+      rwa [hj, Nat.log_pow hp.one_lt] at hsq
+    have hAmem : B.map M.subtype ∈ elemAbelianOfRank G p (pRank ↥M p) := by
+      refine ⟨Subgroup.IsElementaryAbelian.map M.subtype_injective hBea, ?_⟩
+      rw [Subgroup.card_map_of_injective M.subtype_injective, hj, hjeq]
+    -- If `p ∉ κ(M)`, Lemma 14.1 makes `M_σ` nilpotent — contradiction.  So `p ∈ κ(M)`.
+    by_contra hPfalse
+    rw [S14.IsTypeP, Set.not_nonempty_iff_eq_empty] at hPfalse
+    have hpκ : p ∉ S14.kappa M := (Set.eq_empty_iff_forall_notMem.mp hPfalse) p
+    exact hMσ_not_nil
+      (S14.msigma_structure_of_notMem_sigma_kappa hG hM hpπ hpσ hpκ hAmem
+        (Subgroup.map_subtype_le _)).2.2
+  -- `IsTypeP M ∧ ¬ IsTypeP2 M` ⟹ `κ(M) = π(M) ∖ σ(M)`, i.e. `IsTypeP1 M`.
+  refine ⟨hP, ?_⟩
+  by_contra hkne
+  exact hnotP2 ⟨hP, hkne⟩
+
+/-- **BG Theorem 15.2, step 1 derivation (b)** (mmd L4190, "Theorem 14.7(f) implies that
+`q = |K*|` is a prime"): for a type-`P₁` maximal subgroup `M`, the order of
+`Kstar = C_{M_σ}(K)` is prime.
+
+Route (BG Theorem 14.7(f) via the `Z`-family duality):
+* `typeP_duality` provides the unique non-conjugate partner `M*` with `Kstar ≤ M*`, `Kstar` a Hall
+  `κ(M*)`-subgroup of `M*`, the symmetric relation `K = M*_σ ⊓ C_G(Kstar)`, and the disjunction
+  `IsTypeP2 M ∨ IsTypeP2 M*`.
+* Since `M` is type-`P₁`, it is not type-`P₂` (`not_isTypeP1_and_isTypeP2`); hence `M*` is type-`P₂`.
+* `typeP_structure` applied to `M*` (with `Kstar` in the `K`-role) has the `IsTypeP2 M* →`
+  conjunct `∃ q, q.Prime ∧ Nat.card ↥Kstar = q`, giving `|Kstar|` prime.
+
+The Hall `(κ(M*) ∪ σ(M*))'`-subgroup `U*` of `M*` needed by `typeP_structure` is built by Hall's
+theorem in the solvable `M*` (`Ch03.hall_E_exists`), as in `typeP_kstar_in_mf`. -/
+theorem kstar_card_prime_of_inputs [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M K Kstar : Subgroup G}
+    (hM : M ∈ maximalSubgroups G) (hP1 : S14.IsTypeP1 M) (hKM : K ≤ M)
+    (hK : Ch03.IsHallSubgroup (S14.kappa M) (K.subgroupOf M))
+    (hKstar : Kstar = OddOrder.BG.Ch3.S10.Msigma M ⊓ Subgroup.centralizer (K : Set G)) :
+    (Nat.card ↥Kstar).Prime := by
+  classical
+  -- The unique non-conjugate partner `M*` and its symmetric `Z`-family data.
+  obtain ⟨_hcompl, _hcop, Mstar, ⟨hMstarMax, hMstarP, _hMstarNC,
+      ⟨hKstarLe, hKstarHall, hKeqMstar⟩, _hZcyc, _hTI, hP2disj, _hpart⟩, _huniq⟩ :=
+    S14.typeP_duality hG hM hP1.1 hKM hK hKstar
+  -- `M` type-`P₁` ⟹ `¬ IsTypeP2 M` ⟹ `M*` is type-`P₂`.
+  have hMstar2 : S14.IsTypeP2 Mstar :=
+    hP2disj.resolve_left (fun hM2 => S14.not_isTypeP1_and_isTypeP2 ⟨hP1, hM2⟩)
+  -- A Hall `(κ(M*) ∪ σ(M*))'`-subgroup `U*` of `M*` (Hall's theorem in the solvable `M*`).
+  haveI : IsSolvable ↥Mstar := hG.solvable_of_mem_maximalSubgroups hMstarMax
+  obtain ⟨U', hU'⟩ := Ch03.hall_E_exists (G := ↥Mstar)
+    ((S14.kappa Mstar ∪ OddOrder.BG.Ch3.S10.sigma Mstar)ᶜ)
+  have hUeq : (U'.map Mstar.subtype).subgroupOf Mstar = U' :=
+    Subgroup.comap_map_eq_self_of_injective Mstar.subtype_injective U'
+  have hUstar : Ch03.IsHallSubgroup ((S14.kappa Mstar ∪ OddOrder.BG.Ch3.S10.sigma Mstar)ᶜ)
+      ((U'.map Mstar.subtype).subgroupOf Mstar) := by rw [hUeq]; exact hU'
+  -- `typeP_structure` on `M*` (with `Kstar` in the `K`-role, `K` in the `Kstar`-role):
+  -- the `IsTypeP2 M* →` conjunct yields `σ(M*) = β(M*) ∧ ∃ q, q.Prime ∧ Nat.card ↥Kstar = q ∧ …`.
+  obtain ⟨_hσβ, q, hq, hKstarq, _hTI⟩ :=
+    (S14.typeP_structure hG hMstarMax hMstarP hKstarLe hKstarHall hKeqMstar hUstar).2.2.2.2.1
+      hMstar2
+  rw [hKstarq]; exact hq
+
 /-- **BG Theorem 15.2** (mmd L4112): if `M_F` is strictly smaller than `M_sigma`,
 then `M` is type `P1` and has the normal `q`-subgroup / minimal chief factor
 structure described in the text. -/
