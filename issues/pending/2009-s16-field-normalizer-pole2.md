@@ -251,6 +251,27 @@ FPF の source は新規理論でなく、**LHypothesis が既に carry して�
 ④ もう片方の枝 `field_normalizer_of_L_conj_M` + `exists_LHypothesis`/`exists_MHypothesis`（(13.17)構成 + Dade）。
 full build 3863 jobs green（16s）、AxiomsCheck OK、real sorry 140 不変（縮約は sorry の内容、本数でない）。
 
+### ✅✅✅ 2026-06-19 再開¹¹ — POLE-2 両主枝 sorry-free、carrier 構成2本に縮約（`5c229f68`/`ca1b69e2`）
+
+ユーザー指摘「§13 cite で進められないか」を受け、cite-route で POLE-2 を縮約。**`field_normalizer_structure`
+の dispatch tree の literal sorry が `exists_LHypothesis`(14.3) + `exists_MHypothesis`(14.10) の2本だけに**:
+
+- **U-char 枝** `field_normalizer_of_U_characteristic` = **literal-sorry-free**（`5c229f68`）。残 §13 構造facts
+  3本を named obligation `S_field_model_structural_inputs`(13.2.a/b: IsCyclic U / W₂≤P / Q elem abelian、
+  `basic_structure` の companion、sorried)に集約 + cite。`W₂≤N(Q)` は **ungated 導出**（W₂≤W≤T, Q=T_F,
+  `maxNilpotentNormalHall_le_normalizer T`、当初 gated 扱いは誤り）。
+- **L≅M 枝** `field_normalizer_of_L_conj_M` = **literal-sorry-free**（`ca1b69e2`）。教科書 (14.12) 還元
+  「L≅M ⟹ H≅K cyclic ⟹ U char ⟹ (14.7)」を実装。新 reusable 補題 **`characteristic_of_isCyclic`**
+  （有限巡回群の部分群は characteristic、**axiom-clean**、d-torsion `ker(powMonoidHom |K|)` 経由）+ named
+  obligation `H_cyclic_of_L_conj_M`(14.11/14.4/13.12 = H cyclic、sorried)。U-char engine の後ろへ移動。
+- **¬conj 枝** = `H_eq_U`(14.16) + `U_characteristic_of_H_eq_U` で既に sorry-free（H=U ⟹ U char）。
+
+**⟹ POLE-2 は named/faithful な §13/§14/Dade obligation に完全還元**: ① exists_LHypothesis/exists_MHypothesis
+(14.3/14.10 = Dade carrier 構成、大型) ② S_field_model_structural_inputs(§13 構造) ③ caseB_for_S(14.6 Dade)
+④ exists_y_L_structure(14.5: (13.17.c)構造 + (13.19)Dade) ⑤ H_cyclic_of_L_conj_M(Dade)。**全て Dade(Lane B)
+or basic_structure-level §13 構造に bottom-out** = Lane-B-独立な clean win は出尽くし。実 sorry 140 不変
+（縮約は sorry の内容；各 inline sorry → named faithful obligation）。full build 3863 jobs 15s green。
+
 ## 完了条件
 
 `field_normalizer_structure` の `sorry` が消え、`lake build OddOrder OddOrder.AxiomsCheck` 緑。
