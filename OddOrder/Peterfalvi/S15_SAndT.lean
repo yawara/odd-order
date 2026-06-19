@@ -738,16 +738,23 @@ structure TypeIOverNormalizerData (hyp : Hypothesis (G := G)) where
   normalizer_U_le_L : Subgroup.normalizer (hyp.U : Set G) ≤ L
   frobenius : OddOrder.Peterfalvi.S14.TypeIFrobeniusData L
   U_le_H : hyp.U ≤ H
-  complement_structure : Prop
+  /-- **Peterfalvi (13.17.c)/(14.5)**: the Frobenius complement has order `p q` (the `W₁W₂^y`
+  alternative; the `W₁` alternative of (13.17.c) is ruled out by (14.5)). -/
+  complement_card_eq_pq : Nat.card ↥frobenius.complement = hyp.p * hyp.q
+  /-- **Peterfalvi (13.17.c)/(14.5)**: a conjugate `W₂^y` (`y ∈ Q`) lies in the Frobenius
+  complement `W₁W₂^y` of `L`. -/
+  exists_y_W2_conj_le_complement :
+    ∃ y ∈ hyp.Q, (MulAut.conj y • hyp.W2 : Subgroup G) ≤
+      frobenius.complement.map L.subtype
 
 /-- **Peterfalvi (13.17)**: if `S` is type II, a maximal subgroup over
 `N_G(U)` is type-I Frobenius, contains `U` in its kernel, and has the stated
-complement alternatives. -/
+complement alternatives (order `p q`, containing a conjugate `W₂^y`). -/
 theorem typeII_overNormalizer_frobenius [Finite G]
     (_hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
     (hSTypeII : IsTypeII hyp.S) :
     ∃ data : TypeIOverNormalizerData hyp,
-      data.frobenius.kernel_eq_MF ∧ (hyp.U ≤ data.H) ∧ data.complement_structure := by
+      data.frobenius.kernel_eq_MF ∧ (hyp.U ≤ data.H) := by
   sorry
 
 /-- Carrier for the virtual character `beta_j` and `Gamma_j` in (13.18). -/
