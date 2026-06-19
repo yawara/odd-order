@@ -747,6 +747,37 @@ structure TypeIOverNormalizerData (hyp : Hypothesis (G := G)) where
     ∃ y ∈ hyp.Q, (MulAut.conj y • hyp.W2 : Subgroup G) ≤
       frobenius.complement.map L.subtype
 
+/-- **Coherence bridge for Pf (13.17), L~S rule-out**: for `S` of type II, the configuration
+complement `U` (coprime to `P = S_F`) has `N_G(U) ⊄ S`.
+
+`U` and the type-data complement `typeP.U` are both `P`-complements in `M' = derivedInG S`
+(`P ◁ M'`, solvable), hence conjugate by some `x ∈ M' ≤ S` (Schur–Zassenhaus,
+`exists_conj_le_of_isComplement'_of_coprime`).  Transferring the type-II property
+`IsTypeII.normalizer_not_le` (`¬ N_G(typeP.U) ≤ S`) along `conj x` (`normalizer_conj_smul`;
+`conj x` fixes the subgroup `S` as `x ∈ S`) gives `N_G(U) ⊄ S`.
+
+The `Coprime |U| |P|` hypothesis is the (13.2) faithfulness datum (`U` is the `(κ∪σ)'`-complement,
+`p ∈ σ`); it is supplied by the enriched §16 Hypothesis (Phase 0(b),
+`notes/peterfalvi/s13_17_structural_program.md`).  The Schur–Zassenhaus conjugacy step itself is
+isolated as `exists_conj_typeP_U_of_coprime` below. -/
+theorem not_normalizer_U_le_S [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hyp : Hypothesis (G := G)) (tdata : TypeIIData hyp.S)
+    (hconj : ∃ x : G, x ∈ hyp.S ∧ hyp.U = MulAut.conj x • tdata.typeP.U) :
+    ¬ Subgroup.normalizer (hyp.U : Set G) ≤ hyp.S := by
+  obtain ⟨x, hxS, hUconj⟩ := hconj
+  intro hNUS
+  refine tdata.normalizer_not_le ?_
+  have hSfix : MulAut.conj x • hyp.S = hyp.S :=
+    conj_smul_eq_self_of_mem_normalizer (Subgroup.le_normalizer hxS)
+  have hnorm_eq : Subgroup.normalizer (hyp.U : Set G)
+      = MulAut.conj x • Subgroup.normalizer ((tdata.typeP.U : Subgroup G) : Set G) := by
+    rw [hUconj]
+    exact (OddOrder.BG.Ch3.S12.normalizer_conj_smul x tdata.typeP.U).symm
+  rw [hnorm_eq] at hNUS
+  have hle : MulAut.conj x • Subgroup.normalizer ((tdata.typeP.U : Subgroup G) : Set G)
+      ≤ MulAut.conj x • hyp.S := by rw [hSfix]; exact hNUS
+  exact Subgroup.pointwise_smul_le_pointwise_smul_iff.mp hle
+
 /-- **Peterfalvi (13.17.a/b)**: a maximal subgroup `L` over `N_G(U)` (for `S` of type II) is of
 type I with `U ⊆ L_F`.  *Proof (Pf pp.81-82):* take any maximal `L ⊇ N_G(U)` (proper since
 `U ≠ 1` and `G` is simple).  `L` is not conjugate to `S` (else `N_G(U) ⊆ S`, against
