@@ -164,6 +164,50 @@ theorem exists_decomposition_caseB_coherentYset
       + ((W2.subgroupOf H).index : ℂ) • hyp.coherentYset.extension η₁, horth, hXZ, ?_⟩
   abel
 
+/-- **(6.8.2.2) aggregate against an arbitrary `Y`-coherence `cY`** — the `hYcard`-free,
+uniform-`cY` form of `exists_decomposition_caseB_coherentYset`.  Given the good anchor multiplicity
+`hgood : ⟨(Ind^L_{W₂}φ − |H:W₂|·η₁)^τ, cY.extension η₁⟩ = −|H:W₂|` (supplied uniformly across all `φ`
+by `SibleyDadeHypothesis.exists_Ycoherence_hgood_uniform_caseB`, folding in the `m = 2` relabel),
+produces the anchored decomposition against `cY` with `X ⊥ cY.extension(𝒴)` and `X ∈ ZIrr`.  Replaces
+the `coeff_eq_neg_or_edge_caseB` + `hYcard` derivation by the `hgood` hypothesis; the rest of the
+proof (`orthogonal_tau_indW2_add_extension_general_caseB`, already `cY`-generic) is unchanged.  This
+is the bottom of the `hYcard`-free case-(B) `X ∪ Y`-coherence chain. -/
+theorem exists_decomposition_caseB_anchorCY
+    (hyp : SibleyDadeHypothesis G L H) [H.Normal]
+    {W2 : Subgroup ↥L} [W2.Normal] [Invertible (Nat.card ↥W2 : ℂ)]
+    (hW2comm : W2 ≤ ⁅H, H⁆)
+    (cY : OddOrder.Peterfalvi.S07.IsCoherent hyp.tau hyp.Yset
+      (OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L))
+    {η₁ : ClassFunction ↥L ℂ} (hη₁ : η₁ ∈ hyp.Yset)
+    (φ : IrreducibleCharacter ↥W2) (hφ1 : (φ : ClassFunction ↥W2 ℂ) 1 = 1)
+    (hgood : ClassFunction.inner (hyp.tau (ClassFunction.induce W2 (φ : ClassFunction ↥W2 ℂ)
+        - ((W2.subgroupOf H).index : ℂ) • η₁)) (cY.extension η₁)
+        = -((W2.subgroupOf H).index : ℂ)) :
+    ∃ X : ClassFunction G ℂ,
+      (∀ η ∈ hyp.Yset, ClassFunction.inner X (cY.extension η) = 0)
+        ∧ X ∈ ZIrr G
+        ∧ hyp.tau (ClassFunction.induce W2 (φ : ClassFunction ↥W2 ℂ)
+            - ((W2.subgroupOf H).index : ℂ) • η₁)
+          = X - ((W2.subgroupOf H).index : ℂ) • cY.extension η₁ := by
+  haveI : Fintype ↥W2 := Fintype.ofFinite _
+  have hW2H : W2 ≤ H := by
+    have hle : ⁅H, H⁆ ≤ H := by
+      rw [Subgroup.commutator_le]; intro a ha b hb; rw [commutatorElement_def]
+      exact H.mul_mem (H.mul_mem (H.mul_mem ha hb) (H.inv_mem ha)) (H.inv_mem hb)
+    exact hW2comm.trans hle
+  have h1 : ClassFunction.induce W2 (φ : ClassFunction ↥W2 ℂ) 1
+      = ((W2.subgroupOf H).index : ℂ) * η₁ 1 := by
+    rw [ClassFunction.induce_apply_one, hφ1, mul_one, hyp.Yset_apply_one hη₁]
+    have hidx : W2.index = (W2.subgroupOf H).index * H.index :=
+      (Subgroup.relIndex_mul_index hW2H).symm
+    rw [hidx, hyp.index_H_eq_card_W1]; push_cast; ring
+  obtain ⟨horth, hXZ⟩ :=
+    hyp.orthogonal_tau_indW2_add_extension_general_caseB hW2H hW2comm cY hη₁ φ hφ1 h1 hgood
+  refine ⟨hyp.tau (ClassFunction.induce W2 (φ : ClassFunction ↥W2 ℂ)
+      - ((W2.subgroupOf H).index : ℂ) • η₁)
+      + ((W2.subgroupOf H).index : ℂ) • cY.extension η₁, horth, hXZ, ?_⟩
+  abel
+
 /-- **(6.8.2.3) certain-type column is nonconstant on `W₂`** (`hWne` provider, the `(R1)` §6 fact).
 For a nontrivial column `χ₂ ≠ 1`, the underlying irreducible `θ = Res^H μ_{0,χ₂}` is **not constant
 on `W₂.subgroupOf H`** (`∃ w, θ(w) ≠ θ(1)`, i.e. `W₂ ⊄ ker θ`).  This is Peterfalvi (4.7)
