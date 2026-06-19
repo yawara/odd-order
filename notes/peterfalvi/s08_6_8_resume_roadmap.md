@@ -4,7 +4,60 @@
 > `s08_6_8_assembly_plan.md`(458KB)/`s08_6_8_3_gap_resolution.md` のうち本 note と矛盾する記述は本 note を優先。
 > 上位方針・FT 接続の文脈 = 記憶 [[ft-path-policy]] の 2026-06-17 検証訂正ブロック。
 
-## 🚩🆕 HANDOFF — 次セッションはここから (2026-06-19 cont.²⁶)
+## 🚩🆕🆕 HANDOFF — 次セッションはここから (2026-06-20 cont.²⁷ — |Y|=2 ブロッカー数学的解決 ✅, 残 = mechanical cY-rewiring)
+
+**状態**: branch `lane-b`、clean、**leaf build green (S08_CaseBCoherence 3480 jobs)、commit `4ec49966`**。
+**cont.²⁶ の「確定ブロッカー = case-B |Y|=2 edge」を数学的に解決した** (linchpin 2 定理、sorry-free + axiom-clean)。
+
+### ✅✅✅ 本セッション完了 = |Y|=2 (m=2) relabel の uniform 化 (linchpin、`S08_CaseBCoherence` 末尾)
+教科書 (6.8.2.2) を精読し確定: **m=2 は genuine な edge だが教科書は除外せず符号付き relabel `Y=−η₂^{τ₁}` で処理**
+(line 190 `x=0 ∨ (x=1 ∧ m=2)`)。下流 (6.8.2.3)/(6.8.2) は「Y は (6.8.2.2) の Y」とパラメトリックに使うだけ。
+**前セッションが relabel coherence `coherentEqualDegree_swap_neg` (S07) + per-φ `exists_Ycoherence_hgood_caseB`
+を既に構築済**だった (発見)。本セッションで残ギャップ = **uniform cY** (全 φ 同一 cY ⟸「Y independent of φ」) を埋めた:
+- **`SibleyDadeHypothesis.inner_tau_alpha_extension_phiIndep`**: ⟨α_φ^τ, η'^{τ₁}⟩ は非自明線形 φ に依らない。
+  核心 = reciprocity `inner_tau_indW2_sub_smul_eq` + **`apply_one_sub_apply_eq_card_mul_inner`**
+  (f=Res_W2 ψ が W2^# 上定数 (6.8.2.1) ⟹ ⟨f,φ⟩=(f1−fz)/|W2| は φ-free)。`swap anchor element` は無効
+  (両 anchor とも bb=0 を厳密確認済) ゆえ符号 flip 必須。
+- **`SibleyDadeHypothesis.exists_Ycoherence_hgood_uniform_caseB`**: 単一 cY で全非自明線形 φ に対し
+  `⟨α_φ^τ, cY.extension η₁⟩ = −idx`。|Y|≥3 は `inner_tau_indW2_extension_Yset_eq_neg_caseB` (全 φ good)、
+  |Y|=2 は φ₀ で dichotomy → φ-independence で全 φ に伝播 (good→coherentYset / edge→swap cY')。
+**∴ hYcard は不要になった** (cY を uniform に選べば |Y|=2 も handle 可)。`hcaseB` の確定ブロッカー消滅。
+
+### ▶▶ 残 = mechanical cY-rewiring (新数学ゼロ、~12 theorem の atomic refactor) — 次セッションの主タスク
+case-B anchored-image chain が `hyp.coherentYset` 固定 + `hYcard` を貫いている (~200 occurrence)。これを
+**uniform cY パラメータ**に置換すれば hYcard が消え、case-B producer が hypothesis-free 化 → S08:59 closeable。
+
+**変換レシピ (各 theorem 一律)**:
+1. signature: `(hYcard : hyp.Yset.ncard ≠ 2)` を削除 →
+   `(cY : OddOrder.Peterfalvi.S07.IsCoherent hyp.tau hyp.Yset (S04.supportInSubgroup (sharpImage H) L))`
+   + `(hcYgood : ∀ φ : IrreducibleCharacter ↥h46.W2, (φ:_) 1 = 1 → φ ≠ trivialIrreducibleCharacter _ →
+       ⟨hyp.tau (induce W2 φ − idx • η₁), cY.extension η₁⟩ = −idx)` を追加。
+2. statement/proof: `hyp.coherentYset` → `cY` (全 token、`.extension`/`.extension_mem_ZIrr` 含む)。
+3. bottom `exists_decomposition_caseB_coherentYset` (`:121`): hgood 導出 (coeff_eq_neg_or_edge + absurd hYcard)
+   を **`hgood` パラメータ化** (caller が `hcYgood (column の φ) ...` で供給)。`orthogonal_tau_indW2_add_extension_general_caseB`
+   は既に cY-generic (current code が `hyp.coherentYset` を arg で渡している) ゆえ proof body はほぼ不変。
+
+**対象 theorem (bottom→top、`S08_CaseBAnchoredSeed`)**: `exists_decomposition_caseB_coherentYset`(121) →
+`caseB_column_anchored_image`(210)/`caseB_member_anchored_image`(297) → `caseB_column_anchored_full`(623) →
+`coherentCertainTypeSet_union_Yset_caseB`(694) → `caseB_Xset_member_anchored`(801) → `caseBXimg`(1154)/
+`caseBXimg_spec`(1181) → `caseBXset_isCoherent`(1227)。**`S08_CaseBSeedGlue`**: `coherentXunionYset_caseB`(299) →
+`nonempty_coherent_S_caseB_of_anchor`(380) → `nonempty_coherent_S_caseB_of_structure`(476)。
+- `caseB_per_phi_anchored_fromYset` (`S08_CaseBAssembly:1647`) は**既に cY explicit 引数**＝触らない。
+- 注意: orthogonality `∀η, ⟨X, ·.extension η⟩=0` は swap で符号入替ゆえ cY-値不変だが、τ₂ assembly は cY を
+  一貫使用要 ⟹ statement も cY に統一 (coherentYset 据置の混在は不可)。
+- **top で uniform cY 供給**: `nonempty_coherent_S_caseB_of_structure` が
+  `obtain ⟨cY, hcYgood⟩ := hyp.exists_Ycoherence_hgood_uniform_caseB hcop hp hHp hprime hW2comm hW2cenL hη₁ hc2 hFPF`
+  (← 本セッションの linchpin) で cY を一度取り chain に渡す。これで hYcard 完全消滅。
+
+**rewiring 後**: `nonempty_coherent_S_caseB_of_c2` (`S08_PGroupReduction:343`) から hYcard 引数除去 →
+dispatcher `nonempty_coherent_S_of_c2_of_branches` の hcaseB が hWMgt edge 分岐 + hXne のみに →
+**S08:59 assembly** (rcases hyp.cases + hcaseA✅ + hcaseB + c1✅ + 薄いラッパ)。case-A は完了済。
+**見積**: rewiring は ~12 theorem の token 置換 + signature 編集 (script 補助可、build-debug 込で 1 session)。
+**FT 文脈不変**: (6.8) は [[ft-path-policy]] で orphaned (deferred-payoff) — 閉じても feitThompson sorry は今減らない。
+
+---
+
+## 🚩 HANDOFF — (2026-06-19 cont.²⁶)
 
 **状態**: branch `lane-b`、clean、**full build green (0 errors, 1m40s)、実 sorry 133**。本セッションで
 **case-(A) producer の前半 (X(Zc)∪Y coherence 構築 + 中心 FPF bound) を c2 化完了**。3 commit:
