@@ -3433,8 +3433,119 @@ theorem isNilpotent_DQ1_quotient_of_regular [Finite G]
     (QuotientGroup.quotientMulEquivOfEq hkerψ.symm).trans (QuotientGroup.quotientKerEquivRange ψ)
   exact nilpotent_of_mulEquiv e.symm
 
+/-- **Regular-action ⟹ quotient nilpotent, single-subgroup form** (`§14`-independent, reusable;
+generalises `isNilpotent_DQ1_quotient_of_regular` from `N = D ⊔ Q₁` to an arbitrary `N`).  If a
+prime-order subgroup `K₁` acts on `N/Q₀` (`Q₀ ⊴ N`, `Q₀ < N`, `K₁ ≤ N_G(N)`, `K₁ ⊓ N = ⊥`,
+`K₁ ⊓ Q₀ = ⊥`) fixed-point-freely on preimages — `k·x⁻¹·k⁻¹·x ∈ Q₀ ⟹ x ∈ Q₀` for `1 ≠ k ∈ K₁`,
+`x ∈ N` — then `↥N / Q₀.subgroupOf N` is nilpotent.
+
+Ambient `P = N ⊔ K₁`, `Γ = ↥P / Q₀`; the images `N̄ = ψ.range`, `K̄₁ = ρ.range` form a Frobenius
+group (Theorem 3.7), making `N̄` nilpotent, and Noether's first isomorphism transfers it to the
+quotient.  Used in Theorem 15.2 step (c)(d) with `N = M_σ`, `Q₀ = Q`, to prove `M_σ/Q` nilpotent
+("`K` acts regularly on `M_σ/Q`", since `C_{M_σ}(K) = K* ⊆ Q`). -/
+theorem isNilpotent_quotient_of_regular_general [Finite G]
+    {N K1 Q0 : Subgroup G} [(Q0.subgroupOf N).Normal]
+    (hPsolv : IsSolvable ↥(N ⊔ K1))
+    (hPQ0 : N ⊔ K1 ≤ Subgroup.normalizer (Q0 : Set G))
+    (hK1N : K1 ≤ Subgroup.normalizer (N : Set G))
+    (hK1prime : ∃ p : ℕ, p.Prime ∧ Nat.card ↥K1 = p)
+    (hdisj : Disjoint N K1)
+    (hK1Q0disj : Disjoint K1 Q0)
+    (hQ0lt : Q0 < N)
+    (hFPF : ∀ k ∈ K1, k ≠ 1 → ∀ x ∈ N, k * x⁻¹ * k⁻¹ * x ∈ Q0 → x ∈ Q0) :
+    Group.IsNilpotent (↥N ⧸ (Q0.subgroupOf N)) := by
+  have hNP : N ≤ N ⊔ K1 := le_sup_left
+  have hK1P : K1 ≤ N ⊔ K1 := le_sup_right
+  haveI hQ0P_normal : (Q0.subgroupOf (N ⊔ K1)).Normal :=
+    Subgroup.normal_subgroupOf_of_le_normalizer hPQ0
+  set π : ↥(N ⊔ K1) →* ↥(N ⊔ K1) ⧸ (Q0.subgroupOf (N ⊔ K1)) :=
+    QuotientGroup.mk' _ with hπ
+  set ψ : ↥N →* ↥(N ⊔ K1) ⧸ (Q0.subgroupOf (N ⊔ K1)) :=
+    π.comp (Subgroup.inclusion hNP) with hψ
+  set ρ : ↥K1 →* ↥(N ⊔ K1) ⧸ (Q0.subgroupOf (N ⊔ K1)) :=
+    π.comp (Subgroup.inclusion hK1P) with hρ
+  haveI := hPsolv
+  have hkerψ : ψ.ker = Q0.subgroupOf N := by
+    rw [hψ, ← MonoidHom.comap_ker, QuotientGroup.ker_mk']; rfl
+  have hkerρ : ρ.ker = Q0.subgroupOf K1 := by
+    rw [hρ, ← MonoidHom.comap_ker, QuotientGroup.ker_mk']; rfl
+  have hψ1 : ∀ b : ↥N, ψ b = 1 ↔ (b : G) ∈ Q0 := fun b => by
+    rw [← MonoidHom.mem_ker, hkerψ, Subgroup.mem_subgroupOf]
+  have hρ1 : ∀ b : ↥K1, ρ b = 1 ↔ (b : G) ∈ Q0 := fun b => by
+    rw [← MonoidHom.mem_ker, hkerρ, Subgroup.mem_subgroupOf]
+  have hρinj : Function.Injective ρ := by
+    rw [← MonoidHom.ker_eq_bot_iff, hkerρ, Subgroup.subgroupOf_eq_bot]
+    exact hK1Q0disj.symm
+  have hπeq : ∀ u v : ↥(N ⊔ K1), π u = π v ↔ (u : G)⁻¹ * (v : G) ∈ Q0 := by
+    intro u v
+    rw [hπ, QuotientGroup.mk'_apply, QuotientGroup.mk'_apply, QuotientGroup.eq,
+      Subgroup.mem_subgroupOf, Subgroup.coe_mul, Subgroup.coe_inv]
+  have hψval : ∀ b : ↥N, ψ b = π (Subgroup.inclusion hNP b) := fun b => rfl
+  have hρval : ∀ c : ↥K1, ρ c = π (Subgroup.inclusion hK1P c) := fun c => rfl
+  haveI : IsSolvable ↥(ψ.range ⊔ ρ.range) :=
+    solvable_of_solvable_injective (Subgroup.subtype_injective _)
+  have hψrange : ψ.range = (N.subgroupOf (N ⊔ K1)).map π := by
+    rw [hψ, MonoidHom.range_comp, Subgroup.inclusion_range]
+  haveI hNPnormal : (N.subgroupOf (N ⊔ K1)).Normal :=
+    Subgroup.normal_subgroupOf_of_le_normalizer (sup_le Subgroup.le_normalizer hK1N)
+  haveI hψrange_normal : (ψ.range).Normal := by
+    rw [hψrange]; exact hNPnormal.map π (QuotientGroup.mk'_surjective _)
+  have hNilpN : Group.IsNilpotent ↥(ψ.range) := by
+    refine OddOrder.BG.Ch1.S03c.isNilpotent_of_normalizing_primeOrder_fixedPointFree
+      (N := ψ.range) (R := ρ.range) ?_ ?_ ?_ ?_ ?_ ?_
+    · exact le_top.trans_eq (Subgroup.normalizer_eq_top_iff.mpr hψrange_normal).symm
+    · rw [Subgroup.disjoint_def]
+      intro y hyψ hyρ
+      obtain ⟨b, rfl⟩ := MonoidHom.mem_range.mp hyψ
+      obtain ⟨c, hc⟩ := MonoidHom.mem_range.mp hyρ
+      have hbc : (b : G)⁻¹ * (c : G) ∈ Q0 :=
+        (hπeq (Subgroup.inclusion hNP b) (Subgroup.inclusion hK1P c)).mp
+          (by rw [← hψval, ← hρval]; exact hc.symm)
+      have hcN : (c : G) ∈ N := by
+        have hrw : (c : G) = (b : G) * ((b : G)⁻¹ * (c : G)) := by group
+        rw [hrw]
+        exact N.mul_mem b.2 (hQ0lt.le hbc)
+      have hmem : (c : G) ∈ N ⊓ K1 := ⟨hcN, c.2⟩
+      rw [hdisj.eq_bot, Subgroup.mem_bot] at hmem
+      rw [← hc, show c = 1 from Subtype.ext hmem, map_one]
+    · obtain ⟨x, hxN, hxQ0⟩ := SetLike.exists_of_lt hQ0lt
+      intro hbot
+      refine hxQ0 ((hψ1 ⟨x, hxN⟩).mp ?_)
+      have hmem : ψ ⟨x, hxN⟩ ∈ ψ.range := MonoidHom.mem_range.mpr ⟨_, rfl⟩
+      rwa [hbot, Subgroup.mem_bot] at hmem
+    · obtain ⟨p, hp, hcard⟩ := hK1prime
+      haveI : Nontrivial ↥K1 := Finite.one_lt_card_iff_nontrivial.mp (by rw [hcard]; exact hp.one_lt)
+      obtain ⟨k, hk1⟩ := exists_ne (1 : ↥K1)
+      intro hbot
+      refine hk1 (Subtype.ext ?_)
+      have hρk : ρ k = 1 := by
+        have hmem : ρ k ∈ ρ.range := MonoidHom.mem_range.mpr ⟨k, rfl⟩
+        rwa [hbot, Subgroup.mem_bot] at hmem
+      have hmem : (k : G) ∈ K1 ⊓ Q0 := ⟨k.2, (hρ1 k).mp hρk⟩
+      rw [hK1Q0disj.eq_bot, Subgroup.mem_bot] at hmem
+      exact hmem
+    · obtain ⟨p, hp, hcard⟩ := hK1prime
+      exact ⟨p, hp, by rw [← hcard]; exact Nat.card_congr (MonoidHom.ofInjective hρinj).symm.toEquiv⟩
+    · intro r hr hr1 n hn hn1 heq
+      obtain ⟨a, rfl⟩ := MonoidHom.mem_range.mp hr
+      obtain ⟨b, rfl⟩ := MonoidHom.mem_range.mp hn
+      have hk1 : (a : G) ≠ 1 := fun h => hr1 (by
+        rw [hρval, show Subgroup.inclusion hK1P a = 1 from Subtype.ext h, map_one])
+      have hconj : ρ a * ψ b * (ρ a)⁻¹ = π (Subgroup.inclusion hK1P a *
+          Subgroup.inclusion hNP b * (Subgroup.inclusion hK1P a)⁻¹) := by
+        rw [hρval, hψval, map_mul, map_mul, map_inv]
+      rw [hconj, hψval b] at heq
+      have hmem := (hπeq _ _).mp heq
+      refine hn1 ((hψ1 b).mpr (hFPF (a : G) a.2 hk1 (b : G) b.2 ?_))
+      simpa only [Subgroup.coe_mul, Subgroup.coe_inv, Subgroup.coe_inclusion, mul_inv_rev,
+        inv_inv, mul_assoc] using hmem
+  have e : (↥N ⧸ Q0.subgroupOf N) ≃* ↥(ψ.range) :=
+    (QuotientGroup.quotientMulEquivOfEq hkerψ.symm).trans (QuotientGroup.quotientKerEquivRange ψ)
+  exact nilpotent_of_mulEquiv e.symm
+
 /-- **Brick A "core" of Theorem 15.2 step 3(ii)** (mmd L4194): under the `K*`-condition, the fixed
 points of `k` (with prime-manner action `C_{M_σ}(k) = K*`) inside `D ⊔ Q₁` land in `Q₀`.
+`C(k) ⊓ (D ⊔ Q₁) ⊆ C(k) ⊓ M_σ = K*`; since `K* ≤ Q` and `Q ⊓ (D ⊔ Q₁) = Q₁` (Dedekind, `D ⊓ Q = ⊥`,
 `C(k) ⊓ (D ⊔ Q₁) ⊆ C(k) ⊓ M_σ = K*`; since `K* ≤ Q` and `Q ⊓ (D ⊔ Q₁) = Q₁` (Dedekind, `D ⊓ Q = ⊥`,
 `D ≤ N_G(Q₁)`), the fixed points lie in `K* ⊓ Q₁`, which is `≤ Q₀` (if `K* ≤ Q₀`) or trivial (if
 `K* ⊄ Q₁`, as `|K*|` is prime).  Supplies `C_{DQ₁}(k) ⊆ Q₀` to brick A's Prop 1.5(d) lift. -/
@@ -3544,6 +3655,81 @@ theorem fpf_of_centralizer_inf_le [Finite G]
     rw [ha, map_zpow]
     exact hpow (quotientMulAutHom hMinv ⟨k, Subgroup.mem_zpowers k⟩)
       (QuotientGroup.mk' (Q0.subgroupOf (D ⊔ Q1)) ⟨x, hx⟩) hkbar i
+  rw [hfpbot, Subgroup.mem_bot, QuotientGroup.mk'_apply, QuotientGroup.eq_one_iff,
+    Subgroup.mem_subgroupOf] at hxbar
+  exact hxbar
+
+open OddOrder.Isaacs.Ch04.OddOrder.Isaacs.Ch03.IsAInvariant
+  (quotientMulAutHom quotientMulAutHom_apply_mk') in
+/-- **Single-subgroup form of `fpf_of_centralizer_inf_le`** (`§14`-independent, reusable): the
+Prop 1.5(d) fixed-point lift for an arbitrary subgroup `A` (not just `D ⊔ Q₁`).  If `k` normalizes
+`A` and the normal `Q₀ ≤ A`, acts coprimely (`(|⟨k⟩|, |A|) = 1`, one-sided solvable), and
+`C_G(k) ⊓ A ≤ Q₀`, then `k` acts fixed-point-freely on `A/Q₀`: `k·x⁻¹·k⁻¹·x ∈ Q₀ ⟹ x ∈ Q₀` for
+`x ∈ A`.  Used in Theorem 15.2 step (c)(d) with `A = M_σ`, `Q₀ = Q` (the regular `K`-action on
+`M_σ/Q` from `C_{M_σ}(k) = K* ⊆ Q`). -/
+theorem fpf_of_centralizer_inf_le_general [Finite G]
+    {A Q0 : Subgroup G} {k : G}
+    (hk_norm : k ∈ Subgroup.normalizer (A : Set G))
+    (hk_normQ0 : k ∈ Subgroup.normalizer (Q0 : Set G))
+    (hAQ0 : A ≤ Subgroup.normalizer (Q0 : Set G))
+    (hQ0A : Q0 ≤ A)
+    (hcop : Nat.Coprime (Nat.card ↥(Subgroup.zpowers k)) (Nat.card ↥A))
+    (hsolv : IsSolvable ↥(Subgroup.zpowers k) ∨ IsSolvable ↥A)
+    (hCk : Subgroup.centralizer ({k} : Set G) ⊓ A ≤ Q0) :
+    ∀ x ∈ A, k * x⁻¹ * k⁻¹ * x ∈ Q0 → x ∈ Q0 := by
+  have hkz : Subgroup.zpowers k ≤ Subgroup.normalizer (A : Set G) :=
+    Subgroup.zpowers_le.mpr hk_norm
+  have hkzQ0 : Subgroup.zpowers k ≤ Subgroup.normalizer (Q0 : Set G) :=
+    Subgroup.zpowers_le.mpr hk_normQ0
+  set φ : ↥(Subgroup.zpowers k) →* MulAut ↥A :=
+    (Subgroup.normalizerMonoidHom A).comp (Subgroup.inclusion hkz) with hφ
+  haveI hQ0_normal : (Q0.subgroupOf A).Normal :=
+    (Subgroup.normal_subgroupOf_iff_le_normalizer hQ0A).mpr hAQ0
+  have hMinv : OddOrder.Isaacs.Ch03.IsAInvariant φ (Q0.subgroupOf A) := by
+    rw [OddOrder.Isaacs.Ch03.isAInvariant_iff_smul_mem]
+    intro a x hx
+    rw [Subgroup.mem_subgroupOf] at hx ⊢
+    show (a : G) * (x : G) * (a : G)⁻¹ ∈ Q0
+    exact (Subgroup.mem_normalizer_iff.mp (hkzQ0 a.2) (x : G)).mp hx
+  have hbridge : (Subgroup.fixedPointsOfMulAut φ).map A.subtype =
+      Subgroup.centralizer ((Subgroup.zpowers k : Subgroup G) : Set G) ⊓ A :=
+    OddOrder.BG.Ch1.S06.fixedPointsOfMulAut_conj_map_subtype hkz
+  have hfp_le : Subgroup.fixedPointsOfMulAut φ ≤ Q0.subgroupOf A := by
+    intro y hy
+    rw [Subgroup.mem_subgroupOf]
+    have hym : (A.subtype y) ∈ (Subgroup.fixedPointsOfMulAut φ).map A.subtype := ⟨y, hy, rfl⟩
+    rw [hbridge] at hym
+    obtain ⟨hcent, _⟩ := Subgroup.mem_inf.mp hym
+    exact hCk (Subgroup.mem_inf.mpr
+      ⟨Subgroup.centralizer_le (Set.singleton_subset_iff.mpr (Subgroup.mem_zpowers k)) hcent, y.2⟩)
+  have hmap := OddOrder.BG.Ch1.S03h.fixedPointsOfMulAut_quotientMulAutHom_eq_map
+    (φ := φ) hcop hsolv hMinv
+  have hfpbot : Subgroup.fixedPointsOfMulAut (quotientMulAutHom hMinv) = ⊥ := by
+    rw [hmap, Subgroup.map_eq_bot_iff, QuotientGroup.ker_mk']
+    exact hfp_le
+  intro x hx hpre
+  have hpow : ∀ (f : MulAut (↥A ⧸ Q0.subgroupOf A)) (y : ↥A ⧸ Q0.subgroupOf A),
+      f y = y → ∀ i : ℤ, (f ^ i) y = y :=
+    fun f y hf i => MulAction.mem_stabilizer_iff.mp
+      ((MulAction.stabilizer (MulAut (↥A ⧸ Q0.subgroupOf A)) y).zpow_mem
+        (MulAction.mem_stabilizer_iff.mpr hf) i)
+  have hkbar : quotientMulAutHom hMinv ⟨k, Subgroup.mem_zpowers k⟩
+      (QuotientGroup.mk' (Q0.subgroupOf A) ⟨x, hx⟩) =
+      QuotientGroup.mk' (Q0.subgroupOf A) ⟨x, hx⟩ := by
+    rw [quotientMulAutHom_apply_mk', QuotientGroup.mk'_apply, QuotientGroup.mk'_apply,
+      QuotientGroup.eq, Subgroup.mem_subgroupOf, Subgroup.coe_mul, Subgroup.coe_inv]
+    show (k * x * k⁻¹)⁻¹ * x ∈ Q0
+    have heq : (k * x * k⁻¹)⁻¹ * x = k * x⁻¹ * k⁻¹ * x := by group
+    rw [heq]; exact hpre
+  have hxbar : QuotientGroup.mk' (Q0.subgroupOf A) ⟨x, hx⟩ ∈
+      Subgroup.fixedPointsOfMulAut (quotientMulAutHom hMinv) := by
+    rw [Subgroup.mem_fixedPointsOfMulAut]
+    intro a
+    obtain ⟨i, hi⟩ := Subgroup.mem_zpowers_iff.mp a.2
+    have ha : a = ⟨k, Subgroup.mem_zpowers k⟩ ^ i := Subtype.ext (by rw [← hi, Subgroup.coe_zpow])
+    rw [ha, map_zpow]
+    exact hpow (quotientMulAutHom hMinv ⟨k, Subgroup.mem_zpowers k⟩)
+      (QuotientGroup.mk' (Q0.subgroupOf A) ⟨x, hx⟩) hkbar i
   rw [hfpbot, Subgroup.mem_bot, QuotientGroup.mk'_apply, QuotientGroup.eq_one_iff,
     Subgroup.mem_subgroupOf] at hxbar
   exact hxbar
@@ -3822,6 +4008,82 @@ theorem mem_centralizer_of_centralizes_quotient [Finite G]
   rw [hfpbot, Subgroup.mem_bot, QuotientGroup.mk'_apply, QuotientGroup.eq_one_iff,
     Subgroup.mem_subgroupOf] at hxbar
   exact hxbar
+
+/-- **Theorem 15.2 step (c)(d) — `M_σ/Q` is nilpotent** (mmd L4192, "`K` acts regularly on `M_σ/Q`,
+therefore by Theorem 3.7 (applied to `K₁M_σ/Q`), `M_σ/Q` is nilpotent").  In the type-`P` setting
+with `K` a Hall `κ`-subgroup, `K* = C_{M_σ}(K) ⊆ Q = O_q(M)` (step 2), so `K` acts fixed-point-freely
+on `M_σ/Q` (Proposition 1.5(d): the fixed classes lift to `C_{M_σ}(k) = K* ⊆ Q`).  Theorem 3.7
+applied to a prime-order `K₁ ≤ K` makes `M_σ/Q` nilpotent.
+
+The FPF condition for `M_σ/Q` is `fpf_of_centralizer_inf_le_general` (`A = M_σ`, `Q₀ = Q`) with the
+prime-manner input `C_G(k) ⊓ M_σ = K* ≤ Q` (`actsPrimeManner_of_typeP` + `hKstarQ`); the nilpotence
+of `M_σ/Q` is then `isNilpotent_quotient_of_regular_general` (`N = M_σ`, `Q₀ = Q`, `K₁` of prime
+order in `K`).  The disjointness/normalizer data comes from `K` complementing `M_σ` in `M`
+(`hcompl`, `hcop`) and `Q ⊴ M` (`hMnormQ`, `hQMσ`).  Gated only through `§14`/structural inputs
+(`hP`, `hKstarQ`, `hQneMσ`), all already discharged. -/
+theorem msigma_quotient_isNilpotent_of_inputs [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M K Kstar Q : Subgroup G}
+    (hM : M ∈ maximalSubgroups G) (hP : S14.IsTypeP M) (hKM : K ≤ M)
+    (hK : Ch03.IsHallSubgroup (S14.kappa M) (K.subgroupOf M))
+    (hKstar : Kstar = OddOrder.BG.Ch3.S10.Msigma M ⊓ Subgroup.centralizer (K : Set G))
+    (hQMσ : Q ≤ OddOrder.BG.Ch3.S10.Msigma M) (hMnormQ : M ≤ Subgroup.normalizer (Q : Set G))
+    (hKstarQ : Kstar ≤ Q) (hQneMσ : Q ≠ OddOrder.BG.Ch3.S10.Msigma M)
+    (hKne : K ≠ ⊥)
+    (hKMσdisj : Disjoint K (OddOrder.BG.Ch3.S10.Msigma M))
+    (hcop : Nat.Coprime (Nat.card ↥K) (Nat.card ↥(OddOrder.BG.Ch3.S10.Msigma M)))
+    [(Q.subgroupOf (OddOrder.BG.Ch3.S10.Msigma M)).Normal] :
+    Group.IsNilpotent (↥(OddOrder.BG.Ch3.S10.Msigma M) ⧸
+      Q.subgroupOf (OddOrder.BG.Ch3.S10.Msigma M)) := by
+  classical
+  set Mσ : Subgroup G := OddOrder.BG.Ch3.S10.Msigma M with hMσ
+  have hMσM : Mσ ≤ M := OddOrder.BG.Ch3.S10.Msigma_le M
+  have hMnormMσ : M ≤ Subgroup.normalizer (Mσ : Set G) :=
+    OddOrder.GroupTheory.le_normalizer_opiCoreInG _ M
+  -- the prime-manner action `C_G(x) ⊓ M_σ = K*` for `x ∈ K#`.
+  have hprime := actsPrimeManner_of_typeP hG hM hP hKM hK hKstar
+  -- `K₁ ≤ K` of prime order (Cauchy in `↥K`).
+  have hKcard1 : Nat.card ↥K ≠ 1 := fun hc => hKne (Subgroup.card_eq_one.mp hc)
+  obtain ⟨r, hr_prime, hr_dvd⟩ := Nat.exists_prime_and_dvd hKcard1
+  haveI : Fact r.Prime := ⟨hr_prime⟩
+  obtain ⟨c, hc_ord⟩ := exists_prime_orderOf_dvd_card' (G := ↥K) r hr_dvd
+  set K1 : Subgroup G := Subgroup.zpowers (c : G) with hK1
+  have hcK : (c : G) ∈ K := c.2
+  have hK1K : K1 ≤ K := by rw [hK1]; exact Subgroup.zpowers_le.mpr hcK
+  have hK1M : K1 ≤ M := hK1K.trans hKM
+  have hord_coe : orderOf (c : G) = r := by rw [Subgroup.orderOf_coe, hc_ord]
+  have hcardK1 : Nat.card ↥K1 = r := by rw [hK1, Nat.card_zpowers, hord_coe]
+  have hK1prime : ∃ p : ℕ, p.Prime ∧ Nat.card ↥K1 = p := ⟨r, hr_prime, hcardK1⟩
+  -- structural facts for `isNilpotent_quotient_of_regular_general` (`N = M_σ`, `Q₀ = Q`, `K₁`).
+  have hQltMσ : Q < Mσ := lt_of_le_of_ne hQMσ hQneMσ
+  have hMσK1solv : IsSolvable ↥(Mσ ⊔ K1) := by
+    haveI : IsSolvable ↥M := hG.solvable_of_mem_maximalSubgroups hM
+    exact solvable_of_solvable_injective (Subgroup.inclusion_injective (sup_le hMσM hK1M))
+  have hMσK1normQ : Mσ ⊔ K1 ≤ Subgroup.normalizer (Q : Set G) := sup_le (hMσM.trans hMnormQ)
+    (hK1M.trans hMnormQ)
+  have hK1normMσ : K1 ≤ Subgroup.normalizer (Mσ : Set G) := hK1M.trans hMnormMσ
+  have hMσK1disj : Disjoint Mσ K1 := (hKMσdisj.symm).mono_right hK1K
+  have hK1Qdisj : Disjoint K1 Q := (hKMσdisj.mono_left hK1K).mono_right hQMσ
+  -- the FPF condition `k·x⁻¹·k⁻¹·x ∈ Q ⟹ x ∈ Q` for `k ∈ K₁#`.
+  have hFPF : ∀ k ∈ K1, k ≠ 1 → ∀ x ∈ Mσ, k * x⁻¹ * k⁻¹ * x ∈ Q → x ∈ Q := by
+    intro k hkK1 hk1 x hxMσ hpre
+    have hkK : k ∈ K := hK1K hkK1
+    -- `C_G(k) ⊓ M_σ = K* ≤ Q`.
+    have hCk : Subgroup.centralizer ({k} : Set G) ⊓ Mσ ≤ Q := by
+      rw [hprime k hkK hk1]; exact hKstarQ
+    -- coprime `(|⟨k⟩|, |M_σ|)`: `|⟨k⟩| ∣ |K|` coprime `|M_σ|`.
+    have hcopk : Nat.Coprime (Nat.card ↥(Subgroup.zpowers k)) (Nat.card ↥Mσ) :=
+      hcop.coprime_dvd_left (Subgroup.card_dvd_of_le (Subgroup.zpowers_le.mpr hkK))
+    have hkM : k ∈ M := hKM hkK
+    have hk_normMσ : k ∈ Subgroup.normalizer (Mσ : Set G) := hMnormMσ hkM
+    have hk_normQ : k ∈ Subgroup.normalizer (Q : Set G) := hMnormQ hkM
+    have hMσnormQ : Mσ ≤ Subgroup.normalizer (Q : Set G) := hMσM.trans hMnormQ
+    haveI : IsSolvable ↥Mσ :=
+      have : IsSolvable ↥M := hG.solvable_of_mem_maximalSubgroups hM
+      solvable_of_solvable_injective (Subgroup.inclusion_injective hMσM)
+    exact fpf_of_centralizer_inf_le_general (k := k) hk_normMσ hk_normQ hMσnormQ hQMσ hcopk
+      (Or.inr inferInstance) hCk x hxMσ hpre
+  exact isNilpotent_quotient_of_regular_general hMσK1solv hMσK1normQ hK1normMσ hK1prime
+    hMσK1disj hK1Qdisj hQltMσ hFPF
 
 open scoped commutatorElement in
 /-- **Theorem 15.2 step 4, the `D`-side fixed-point fact** (BG Proposition 1.5(d)/1.6(d), mmd
