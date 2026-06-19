@@ -2184,6 +2184,63 @@ theorem kstar_card_prime_of_inputs [Finite G]
       hMstar2
   rw [hKstarq]; exact hq
 
+/-- **BG Theorem 15.2, `M_σ = M'` for a type-`P₁` member** (mmd L4188 "`M_σ = M'`"): for a type-`P₁`
+maximal subgroup `M` with Hall `κ(M)`-subgroup `K`, the `σ`-core equals the derived subgroup.
+
+`M_σ ≤ M'` always (`Msigma_le_derived`).  For the reverse, compare orders: the derived subgroup
+complements `K` in `M` (Theorem 14.7(h) duality, `typeP_duality`), so `|M'|·|K| = |M|`, while
+`typeP1_card_eq` gives `|M| = |M_σ|·|K|`; cancelling `|K|` yields `|M'| = |M_σ|`, so `M_σ = M'`.
+This is `§14`-gated only through `typeP_duality`/`typeP1_card_eq` (both sorry-free).  Supplies
+conjunct `M_σ = M'` of Theorem 15.2, and the `M_σ ⋊ K` complement of its proof. -/
+theorem typeP1_msigma_eq_derivedInG [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M K Kstar : Subgroup G}
+    (hM : M ∈ maximalSubgroups G) (hP1 : S14.IsTypeP1 M) (hKM : K ≤ M)
+    (hK : Ch03.IsHallSubgroup (S14.kappa M) (K.subgroupOf M))
+    (hKstar : Kstar = OddOrder.BG.Ch3.S10.Msigma M ⊓ Subgroup.centralizer (K : Set G)) :
+    OddOrder.BG.Ch3.S10.Msigma M = derivedInG M := by
+  classical
+  obtain ⟨hcomplD, _, _⟩ := S14.typeP_duality hG hM hP1.1 hKM hK hKstar
+  have hM'le : derivedInG M ≤ M := Subgroup.map_subtype_le _
+  have hcardM' : Nat.card ↥((derivedInG M).subgroupOf M) = Nat.card ↥(derivedInG M) :=
+    Nat.card_congr (Subgroup.subgroupOfEquivOfLe hM'le).toEquiv
+  have hcardK' : Nat.card ↥(K.subgroupOf M) = Nat.card ↥K :=
+    Nat.card_congr (Subgroup.subgroupOfEquivOfLe hKM).toEquiv
+  have hmul := hcomplD.card_mul
+  rw [hcardM', hcardK'] at hmul
+  have hcardM := S14.typeP1_card_eq hG hM hP1 hKM hK
+  have heq : Nat.card ↥(derivedInG M) = Nat.card ↥(OddOrder.BG.Ch3.S10.Msigma M) :=
+    Nat.eq_of_mul_eq_mul_right Nat.card_pos (by rw [hmul, hcardM])
+  exact Subgroup.eq_of_le_of_card_ge (OddOrder.BG.Ch3.S10.Msigma_le_derived hG hM) heq.le
+
+/-- **BG Theorem 15.2, the prime-manner action in `G`** (Proposition 14.2(a), mmd L4192 "`K` acts
+in a prime manner on `M_σ`"): for a type-`P` maximal `M` with Hall `κ(M)`-subgroup `K`, every
+nontrivial `x ∈ K` has `C_G(x) ⊓ M_σ = K* = C_{M_σ}(K)`.
+
+Unpacks `ActsPrimeOn (M_σ) K` (`typeP_structure` conjunct (a)) — `C_{M_σ}(x) = C_{M_σ}(K)` for
+`x ∈ K#` — and rewrites via `hKstar`.  The Hall `(κ ∪ σ)'`-subgroup `U` needed by `typeP_structure`
+is built by Hall's theorem in the solvable `M` (`Ch03.hall_E_exists`).  Supplies the `hprime`
+hypothesis of `centralizer_le_Msigma_of_primeManner`, `isFrobeniusGroup_DK_of_primeManner`, etc. -/
+theorem actsPrimeManner_of_typeP [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M K Kstar : Subgroup G}
+    (hM : M ∈ maximalSubgroups G) (hP : S14.IsTypeP M) (hKM : K ≤ M)
+    (hK : Ch03.IsHallSubgroup (S14.kappa M) (K.subgroupOf M))
+    (hKstar : Kstar = OddOrder.BG.Ch3.S10.Msigma M ⊓ Subgroup.centralizer (K : Set G)) :
+    ∀ x ∈ K, x ≠ 1 →
+      Subgroup.centralizer ({x} : Set G) ⊓ OddOrder.BG.Ch3.S10.Msigma M = Kstar := by
+  classical
+  haveI : IsSolvable ↥M := hG.solvable_of_mem_maximalSubgroups hM
+  obtain ⟨U', hU'⟩ := Ch03.hall_E_exists (G := ↥M)
+    ((S14.kappa M ∪ OddOrder.BG.Ch3.S10.sigma M)ᶜ)
+  have hUeq : (U'.map M.subtype).subgroupOf M = U' :=
+    Subgroup.comap_map_eq_self_of_injective M.subtype_injective U'
+  have hU : Ch03.IsHallSubgroup ((S14.kappa M ∪ OddOrder.BG.Ch3.S10.sigma M)ᶜ)
+      ((U'.map M.subtype).subgroupOf M) := by rw [hUeq]; exact hU'
+  have hprimeOn := (S14.typeP_structure hG hM hP hKM hK hKstar hU).1
+  intro x hxK hx1
+  have hpm := hprimeOn x hxK hx1
+  rw [OddOrder.BG.Ch3.S13.fixedByElement_def, OddOrder.BG.Ch3.S13.fixedBy_def] at hpm
+  rw [inf_comm, hpm, hKstar]
+
 /-- **BG Theorem 15.2** (mmd L4112): if `M_F` is strictly smaller than `M_sigma`,
 then `M` is type `P1` and has the normal `q`-subgroup / minimal chief factor
 structure described in the text. -/
@@ -3825,6 +3882,170 @@ theorem centralizes_Q_of_centralizes_quotient [Finite G]
   rw [hdecomp]
   refine sup_le (inf_le_left.trans ?_) (hcommQ0.trans hQ0d)
   exact Subgroup.centralizer_le (Set.singleton_subset_iff.mpr (Subgroup.mem_zpowers d))
+
+/-- From an `IsComplement'` of `H.subgroupOf N` and `K.subgroupOf N` (with `H, K ≤ N`), every
+`x ∈ N` factors as `x = a·b` with `a ∈ H`, `b ∈ K` (`§14`-independent, generic helper; keeps the
+`↥N`-complement reasoning away from later `M_σ`-unfolding). -/
+theorem exists_mul_mem_of_isComplement_subgroupOf {N H K : Subgroup G} (hHN : H ≤ N) (hKN : K ≤ N)
+    (hcompl : Subgroup.IsComplement' (H.subgroupOf N) (K.subgroupOf N))
+    {x : G} (hxN : x ∈ N) : ∃ a ∈ H, ∃ b ∈ K, x = a * b := by
+  -- `(H.subgroupOf N) * (K.subgroupOf N) = univ` (complement), so `⟨x, _⟩` factors there.
+  have hmul : (⟨x, hxN⟩ : ↥N) ∈
+      ((H.subgroupOf N : Set ↥N) * (K.subgroupOf N : Set ↥N)) := by
+    rw [hcompl.mul_eq]; exact Set.mem_univ _
+  obtain ⟨u, huH, v, hvK, huv⟩ := Set.mem_mul.mp hmul
+  rw [SetLike.mem_coe, Subgroup.mem_subgroupOf] at huH hvK
+  refine ⟨(u : G), huH, (v : G), hvK, ?_⟩
+  have hcoe : ((⟨x, hxN⟩ : ↥N) : G) = ((u * v : ↥N) : G) := congrArg _ huv.symm
+  rw [Subgroup.coe_mul] at hcoe
+  exact hcoe
+
+set_option maxHeartbeats 1600000 in
+open scoped commutatorElement in
+/-- **Theorem 15.2(g) — the section-Fitting containment `C_{M_σ}(Q̄) ⊆ F(M)`** (mmd L4196-4198,
+"`F(M) = Q·C_M(Q) = C_{M_σ}(Q̄)`"), which discharges `hsecFit` of
+`derivedDerived_le_fittingInAmbient_of_inputs`.  Unlike the *full* centralizer `C_M(Q)` (which needs
+the genuine `σ`-uniqueness gate `C_M(Q) ⊆ M_σ`), the `M_σ`-section centralizer `C_{M_σ}(Q̄)` lands in
+`F(M)` from the local `M_σ = Q ⋊ D` structure alone:
+
+* `S := C_{M_σ}(Q̄) = {x ∈ M_σ : ⁅x, y⁆ ∈ Q₀ ∀ y ∈ Q}` decomposes as `S = Q ⊔ (D ⊓ S)`: writing
+  `x ∈ M_σ` as `a·d'` (`a ∈ Q`, `d' ∈ D`, the complement), `a ∈ Q ⊆ S` (`Q̄` abelian, `hQab`), so
+  `d' = a⁻¹x ∈ D ⊓ S`;
+* `D ⊓ S ⊆ C_G(Q)`: each `d' ∈ D ⊓ S` centralizes `Q̄` and is a `q'`-element, hence centralizes `Q`
+  (`centralizes_Q_of_centralizes_quotient`);
+* so `⁅Q, D ⊓ S⁆ = ⊥`, and `S = Q ⊔ (D ⊓ S)` is nilpotent (`Q` a `q`-group, `D ⊓ S ⊆ D` nilpotent,
+  commuting: `isNilpotent_sup_of_commutator_eq_bot`);
+* `S ◁ M` (`M` normalizes `Q`, `Q₀`, and `M_σ`), so a nilpotent normal subgroup of `M` lands in
+  `F(M)` (`nilpotent_normal_le_fitting`).
+
+No `σ`-uniqueness input is needed (the `C_M(Q) ⊆ M_σ` gate is only for the *full* `C_M(Q)`). -/
+theorem centralizer_msigma_quotient_le_fittingInAmbient [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M Q Q0 D : Subgroup G} {q : ℕ} [Fact q.Prime]
+    (hM : M ∈ maximalSubgroups G)
+    (hQMσ : Q ≤ OddOrder.BG.Ch3.S10.Msigma M) (hDMσ : D ≤ OddOrder.BG.Ch3.S10.Msigma M)
+    (hQ0 : Q0 = Q ⊓ Subgroup.centralizer (D : Set G)) (hQ0Q : Q0 ≤ Q)
+    (hcompl : Subgroup.IsComplement' (Q.subgroupOf (OddOrder.BG.Ch3.S10.Msigma M))
+      (D.subgroupOf (OddOrder.BG.Ch3.S10.Msigma M)))
+    (hMnormQ : M ≤ Subgroup.normalizer (Q : Set G))
+    (hMnormQ0 : M ≤ Subgroup.normalizer (Q0 : Set G))
+    (hQpg : IsPGroup q ↥Q) (hDnil : Group.IsNilpotent ↥D)
+    (hcop : Nat.Coprime (Nat.card ↥D) (Nat.card ↥Q))
+    (hQab : ∀ x ∈ Q, ∀ y ∈ Q, ⁅x, y⁆ ∈ Q0) :
+    ∀ x ∈ OddOrder.BG.Ch3.S10.Msigma M,
+      (∀ y ∈ Q, ⁅x, y⁆ ∈ Q0) → x ∈ fittingInAmbient M := by
+  classical
+  haveI : IsSolvable ↥M := hG.solvable_of_mem_maximalSubgroups hM
+  set Mσ : Subgroup G := OddOrder.BG.Ch3.S10.Msigma M with hMσ
+  have hMσM : Mσ ≤ M := OddOrder.BG.Ch3.S10.Msigma_le M
+  have hMnormMσ : M ≤ Subgroup.normalizer (Mσ : Set G) :=
+    OddOrder.GroupTheory.le_normalizer_opiCoreInG _ M
+  have hQM : Q ≤ M := hQMσ.trans hMσM
+  have hDM : D ≤ M := hDMσ.trans hMσM
+  haveI : IsSolvable ↥Q := solvable_of_solvable_injective (Subgroup.inclusion_injective hQM)
+  -- The section centralizer `S = C_{M_σ}(Q̄)`, realized as a subgroup of `G`.
+  -- (Membership in `M_σ` already gives `x ∈ N(Q₀)` since `M_σ ≤ M ≤ N(Q₀)`.)
+  have hMσnormQ0 : Mσ ≤ Subgroup.normalizer (Q0 : Set G) := hMσM.trans hMnormQ0
+  let S : Subgroup G :=
+    { carrier := {x | x ∈ Mσ ∧ ∀ y ∈ Q, ⁅x, y⁆ ∈ Q0}
+      one_mem' := ⟨Mσ.one_mem, fun y _ => by rw [commutatorElement_one_left]; exact Q0.one_mem⟩
+      mul_mem' := fun {x x'} hx hx' => ⟨Mσ.mul_mem hx.1 hx'.1, fun y hyQ => by
+        have heq : ⁅x * x', y⁆ = (x * ⁅x', y⁆ * x⁻¹) * ⁅x, y⁆ := by
+          rw [commutatorElement_def, commutatorElement_def, commutatorElement_def]; group
+        rw [heq]
+        have hxN0 : x ∈ Subgroup.normalizer (Q0 : Set G) := hMσnormQ0 hx.1
+        exact Q0.mul_mem ((Subgroup.mem_normalizer_iff.mp hxN0 ⁅x', y⁆).mp (hx'.2 y hyQ))
+          (hx.2 y hyQ)⟩
+      inv_mem' := fun {x} hx => ⟨Mσ.inv_mem hx.1, fun y hyQ => by
+        have heq : ⁅x⁻¹, y⁆ = x⁻¹ * ⁅x, y⁆⁻¹ * (x⁻¹)⁻¹ := by
+          rw [commutatorElement_def, commutatorElement_def]; group
+        rw [heq]
+        have hxN0 : x ∈ Subgroup.normalizer (Q0 : Set G) := hMσnormQ0 hx.1
+        exact (Subgroup.mem_normalizer_iff.mp ((Subgroup.normalizer (Q0 : Set G)).inv_mem hxN0)
+          ⁅x, y⁆⁻¹).mp (Q0.inv_mem (hx.2 y hyQ))⟩ }
+  have hSmem : ∀ x, x ∈ S ↔ x ∈ Mσ ∧ ∀ y ∈ Q, ⁅x, y⁆ ∈ Q0 := fun x => Iff.rfl
+  have hSMσ : S ≤ Mσ := fun x hx => hx.1
+  -- `Q ≤ S` (`Q̄` abelian) and `D ⊓ S ⊆ C_G(Q)` (the `q'`-elements of `S` centralize `Q`).
+  have hQS : Q ≤ S := fun a haQ => ⟨hQMσ haQ, fun y hyQ => hQab a haQ y hyQ⟩
+  have hDScent : (D ⊓ S : Subgroup G) ≤ Subgroup.centralizer (Q : Set G) := by
+    intro d hd
+    rw [Subgroup.mem_inf] at hd
+    obtain ⟨hdD, hdS⟩ := hd
+    have hdN : d ∈ Subgroup.normalizer (Q : Set G) := hMnormQ (hDM hdD)
+    have hdN0 : d ∈ Subgroup.normalizer (Q0 : Set G) := hMnormQ0 (hDM hdD)
+    -- coprimality `|⟨d⟩| | |Q|`.
+    have hcopd : Nat.Coprime (Nat.card ↥(Subgroup.zpowers d)) (Nat.card ↥Q) :=
+      hcop.coprime_dvd_left (Subgroup.card_dvd_of_le (Subgroup.zpowers_le.mpr hdD))
+    -- `Q₀ ⊆ C_G(d)` (since `Q₀ = Q ⊓ C(D)` and `d ∈ D`).
+    have hQ0d : Q0 ≤ Subgroup.centralizer ({d} : Set G) := by
+      rw [hQ0]
+      refine inf_le_right.trans ?_
+      exact Subgroup.centralizer_le (Set.singleton_subset_iff.mpr hdD)
+    have hQN0 : Q ≤ Subgroup.normalizer (Q0 : Set G) := hQMσ.trans hMσnormQ0
+    have hQleCd : Q ≤ Subgroup.centralizer ({d} : Set G) :=
+      centralizes_Q_of_centralizes_quotient hdN hQN0 hdN0 hQ0Q hQ0d hcopd ‹IsSolvable ↥Q› hdS.2
+    rw [Subgroup.mem_centralizer_iff]
+    intro g hg
+    exact (Subgroup.mem_centralizer_iff.mp (hQleCd hg) d (Set.mem_singleton d)).symm
+  -- `S = Q ⊔ (D ⊓ S)`: the `M_σ = Q·D` decomposition lands the `q'`-part in `D ⊓ S`.
+  have hSdecomp : S = Q ⊔ (D ⊓ S) := by
+    refine le_antisymm (fun x hx => ?_) (sup_le hQS inf_le_right)
+    -- `x ∈ M_σ = Q·D`, so `x = a·b` with `a ∈ Q`, `b ∈ D`; then `b = a⁻¹x ∈ D ⊓ S`.
+    obtain ⟨a, haQ, b, hbD, hxeq⟩ :=
+      exists_mul_mem_of_isComplement_subgroupOf hQMσ hDMσ hcompl (hSMσ hx)
+    have haS : a ∈ S := hQS haQ
+    have hbS : b ∈ S := by
+      have hbeq : b = a⁻¹ * x := by rw [hxeq]; group
+      rw [hbeq]; exact S.mul_mem (S.inv_mem haS) hx
+    rw [hxeq]
+    exact Subgroup.mul_mem _ (Subgroup.mem_sup_left haQ)
+      (Subgroup.mem_sup_right (Subgroup.mem_inf.mpr ⟨hbD, hbS⟩))
+  -- `S` is nilpotent: `Q ⊔ (D ⊓ S)` with `⁅Q, D ⊓ S⁆ = ⊥` (`D ⊓ S` centralizes `Q`).
+  haveI : Group.IsNilpotent ↥Q := hQpg.isNilpotent
+  haveI hDSnil : Group.IsNilpotent ↥((D ⊓ S : Subgroup G).subgroupOf D) := inferInstance
+  haveI : Group.IsNilpotent ↥(D ⊓ S : Subgroup G) :=
+    nilpotent_of_mulEquiv
+      (Subgroup.subgroupOfEquivOfLe (inf_le_left : (D ⊓ S : Subgroup G) ≤ D))
+  have hcommbot : ⁅Q, (D ⊓ S : Subgroup G)⁆ = ⊥ := by
+    rw [Subgroup.commutator_comm]
+    exact Subgroup.commutator_eq_bot_iff_le_centralizer.mpr hDScent
+  haveI : Group.IsNilpotent ↥S := by
+    rw [hSdecomp]; exact isNilpotent_sup_of_commutator_eq_bot hcommbot
+  -- `S ◁ M`: `M` normalizes `Q`, `Q₀`, and `M_σ`, hence the section centralizer.  Single direction
+  -- `m·S·m⁻¹ ⊆ S` for `m ∈ M`, applied to `m` and `m⁻¹` gives normality.
+  have hpreserve : ∀ m ∈ M, ∀ z ∈ S, m * z * m⁻¹ ∈ S := by
+    intro m hm z hz
+    obtain ⟨hzMσ, hzc⟩ := hz
+    refine ⟨(Subgroup.mem_normalizer_iff.mp (hMnormMσ hm) z).mp hzMσ, fun y hyQ => ?_⟩
+    -- `⁅m z m⁻¹, y⁆ = m ⁅z, m⁻¹ y m⁆ m⁻¹ ∈ m Q₀ m⁻¹ = Q₀`.
+    have hyQ' : m⁻¹ * y * m ∈ Q := by
+      have := (Subgroup.mem_normalizer_iff.mp (hMnormQ (M.inv_mem hm)) y).mp hyQ
+      rwa [inv_inv] at this
+    have hc := hzc (m⁻¹ * y * m) hyQ'
+    have heq : ⁅m * z * m⁻¹, y⁆ = m * ⁅z, m⁻¹ * y * m⁆ * m⁻¹ := by
+      rw [conjugate_commutatorElement]; congr 1 <;> group
+    rw [heq]
+    exact (Subgroup.mem_normalizer_iff.mp (hMnormQ0 hm) ⁅z, m⁻¹ * y * m⁆).mp hc
+  have hMnormS : M ≤ Subgroup.normalizer (S : Set G) := by
+    intro m hm
+    rw [Subgroup.mem_normalizer_iff]
+    intro z
+    constructor
+    · intro hz; exact hpreserve m hm z hz
+    · intro hz
+      have := hpreserve m⁻¹ (M.inv_mem hm) (m * z * m⁻¹) hz
+      rwa [show m⁻¹ * (m * z * m⁻¹) * m⁻¹⁻¹ = z by group] at this
+  -- `S` nilpotent + normal in `M` ⟹ `S ⊆ F(M)`.
+  haveI hSnormM : (S.subgroupOf M).Normal :=
+    (Subgroup.normal_subgroupOf_iff_le_normalizer (hSMσ.trans hMσM)).mpr hMnormS
+  haveI : Group.IsNilpotent ↥(S.subgroupOf M) :=
+    nilpotent_of_mulEquiv (Subgroup.subgroupOfEquivOfLe (hSMσ.trans hMσM)).symm
+  have hSF : S ≤ fittingInAmbient M := by
+    calc S = (S.subgroupOf M).map M.subtype := (Subgroup.map_subgroupOf_eq_of_le (hSMσ.trans hMσM)).symm
+      _ ≤ (OddOrder.Isaacs.Ch01.fitting ↥M).map M.subtype :=
+          Subgroup.map_mono OddOrder.Isaacs.Ch01.nilpotent_normal_le_fitting
+      _ = fittingInAmbient M := rfl
+  intro x hxMσ hxc
+  exact hSF ⟨hxMσ, hxc⟩
 
 /-- A finite `ZMod q`-module of cardinality `q` (`q` prime) has `Module.finrank ≤ 1`
 (`§14`-independent, reusable).  Used to feed the cyclicity hypothesis `hcyc` of BG Theorem 3.10(c)
