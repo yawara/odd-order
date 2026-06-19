@@ -147,6 +147,55 @@ noncomputable def tau {M : Subgroup G} (hyp : Hypothesis M) :
 
 end Hypothesis
 
+/-- Conjugation transports the centralizer of a singleton: `g · C_G(a) · g⁻¹ = C_G(g a g⁻¹)`.
+(The singleton analogue of `BG.Ch3.S12.centralizer_conj_smul`.) -/
+private theorem conj_smul_centralizer_singleton (g a : G) :
+    MulAut.conj g • Subgroup.centralizer ({a} : Set G)
+      = Subgroup.centralizer ({g * a * g⁻¹} : Set G) := by
+  ext y
+  rw [Subgroup.mem_pointwise_smul_iff_inv_smul_mem, Subgroup.mem_centralizer_iff,
+      Subgroup.mem_centralizer_iff]
+  have hinv : (MulAut.conj g)⁻¹ • y = g⁻¹ * y * g := by
+    rw [← map_inv, MulAut.smul_def, MulAut.conj_apply, inv_inv]
+  simp only [Set.mem_singleton_iff, forall_eq, hinv]
+  constructor
+  · intro h
+    calc g * a * g⁻¹ * y
+        = g * (a * (g⁻¹ * y * g)) * g⁻¹ := by group
+      _ = g * (g⁻¹ * y * g * a) * g⁻¹ := by rw [h]
+      _ = y * (g * a * g⁻¹) := by group
+  · intro h
+    calc a * (g⁻¹ * y * g)
+        = g⁻¹ * (g * a * g⁻¹ * y) * g := by group
+      _ = g⁻¹ * (y * (g * a * g⁻¹)) * g := by rw [h]
+      _ = g⁻¹ * y * g * a := by group
+
+/-- **Peterfalvi (8.14)/(8.15)**: the support kernel `R(x)` is `M`-conjugation equivariant.
+`supportKernel M M X (g x g⁻¹) = g · supportKernel M M X x · g⁻¹` for `g ∈ M` and `X` an
+`M`-invariant set.  `R(x) = M_F ⊓ C_G(x)` on the escaping-centralizer set (else `⊥`); the
+escaping condition is `M`-invariant, `M_F` is `M`-normal, and the centralizer is equivariant. -/
+private theorem supportKernel_conj_invariant {M : Subgroup G} {X : Set G} {g x : G}
+    (hg : g ∈ M) (hmem : g * x * g⁻¹ ∈ X ↔ x ∈ X) :
+    supportKernel M M X (g * x * g⁻¹) = MulAut.conj g • supportKernel M M X x := by
+  have hMfix : MulAut.conj g • maxNilpotentNormalHall M = maxNilpotentNormalHall M :=
+    conj_smul_eq_self_of_mem_normalizer
+      (OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_le_normalizer M hg)
+  have hMself : MulAut.conj g • M = M :=
+    conj_smul_eq_self_of_mem_normalizer (Subgroup.le_normalizer hg)
+  have hcent : (Subgroup.centralizer ({g * x * g⁻¹} : Set G) ≤ M)
+      ↔ (Subgroup.centralizer ({x} : Set G) ≤ M) := by
+    rw [← conj_smul_centralizer_singleton]
+    conv_lhs => rw [← hMself]
+    exact Subgroup.pointwise_smul_le_pointwise_smul_iff
+  have hescape : (g * x * g⁻¹ ∈ escapingCentralizerSet M X)
+      ↔ (x ∈ escapingCentralizerSet M X) := by
+    simp only [escapingCentralizerSet, Set.mem_setOf_eq, hmem, hcent]
+  unfold supportKernel
+  by_cases hx : x ∈ escapingCentralizerSet M X
+  · rw [if_pos (hescape.mpr hx), if_pos hx, Subgroup.smul_inf, hMfix,
+        conj_smul_centralizer_singleton]
+  · rw [if_neg (fun h => hx (hescape.mp h)), if_neg hx, Subgroup.smul_bot]
+
 open scoped FiniteInduce in
 /-- **Peterfalvi (10.1), existence**: every maximal subgroup `M` of type III, IV,
 or V carries the (10.1) Hypothesis.  The character family, support, and Dade
@@ -167,9 +216,13 @@ theorem exists_hypothesis_of_typeIIIorIVorV [Finite G]
     · exact ⟨.V, h⟩
   obtain ⟨dadeData⟩ :=
     (OddOrder.Peterfalvi.S10.dadeSupportHypotheses_typeP hG hM data hptype).1
-  -- (8.14)/(8.15): the support kernels `R(a)` are `L`-conjugation invariant.
+  -- (8.14)/(8.15): the support kernels `R(a)` are `M`-conjugation invariant.
   have hconj : dadeData.dade.HConjInvariant := by
-    sorry
+    intro a l
+    simp only [dadeData.H_eq_supportKernel]
+    refine supportKernel_conj_invariant l.2 ?_
+    exact ⟨fun h => by simpa using dadeData.dade.L_normalizes_A l⁻¹ h,
+      fun h => dadeData.dade.L_normalizes_A l h⟩
   refine ⟨?_⟩
   exact
     { maximal := hM

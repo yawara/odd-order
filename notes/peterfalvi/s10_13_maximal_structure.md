@@ -257,3 +257,10 @@ real sorry 136→136(10.10 の bare sorry が producer の hconj に置換)。**
 §10 capstone (10.10) honest 化**。残 §10 materialization は **carrier bundling 壁**((10.2)/(10.3) の
 `CharacterParameters` が `w2_prime`/`d_gt_one` を bundle)+ B の §3-§6 char API 待ちで逓減。
 (10.11) は (10.10) cite + `Theorem88CaseBData` faithful 化(cross-lane, gap B)で別途。
+
+**追記 (2026-06-19, commit `e9c37da7`)**: producer の own residual `hconj` を discharge(issue 2011 closed)。
+新 private helper 2 本: `conj_smul_centralizer_singleton`(`g·C_G(a)·g⁻¹=C_G(gag⁻¹)`、calc+`group`)+
+`supportKernel_conj_invariant`(`supportKernel M M X (gxg⁻¹)=g·supportKernel·g⁻¹`、escaping 不変 + M_F の M-normal
+`maxNilpotentNormalHall_le_normalizer` + `smul_inf`)。`hconj`=`H_eq_supportKernel`+`typePA0` の M-invariance
+(`dade.L_normalizes_A` の l/l⁻¹)。**producer 完全 honest 化**(legit upstream のみ cite)、**real sorry 136→135**。
+⟹ **H-only clean win 出尽くし**: 残り (10.11)=cross-lane(F+gap B)/ materialization=carrier bundling+B-gated。
