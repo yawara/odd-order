@@ -390,54 +390,6 @@ theorem SibleyDadeHypothesis.inner_tau_indW2_sub_smul_eq
     ClassFunction.inner_sub_left, ClassFunction.inner_smul_left,
     ClassFunction.inner_induce_eq_inner_restrict]
 
-/-- **`Ĥ = H.map L.subtype` is a Sylow `p`-subgroup of `G`, from the Hall coprimality.**  This is
-the coprimality-only generalization of `sylow_map_subtype_of_frobenius` (which uses
-`hF.coprime_card_kernel_complement`): the Frobenius hypothesis is needed *only* to supply
-`gcd(|H|, |W₁|) = 1`, which in the (6.8)(c2) case is the `cases` side condition.  With `H` a
-`p`-group (the (6.5) reduction) and `H ◁ L` with `W₁` a coprime complement, `H` is the unique normal
-Sylow `p`-subgroup of `↥L`; combined with `N_G(Ĥ) ≤ L` (`H^#` TI) this forces `Ĥ ∈ Syl_p(G)`.
-
-(Dedupe candidate: `sylow_map_subtype_of_frobenius` in `S08_CoherenceCore` could delegate here.) -/
-theorem SibleyDadeHypothesis.sylow_map_subtype_of_coprime
-    (hyp : SibleyDadeHypothesis G L H) [H.Normal]
-    (hcop : Nat.Coprime (Nat.card ↥H) (Nat.card hyp.W1))
-    {p : ℕ} (hp : p.Prime) (hHp : IsPGroup p ↥H) :
-    ∃ Q : Sylow p G, (Q : Subgroup G) = H.map L.subtype := by
-  haveI : Fact p.Prime := ⟨hp⟩
-  set Ĥ : Subgroup G := H.map L.subtype with hĤ_def
-  have hĤp : IsPGroup p ↥Ĥ := hHp.map L.subtype
-  have hpH : p ∣ Nat.card ↥H := by
-    obtain ⟨n, hn⟩ := IsPGroup.iff_card.mp hHp
-    have h1 : 1 < Nat.card ↥H := (Subgroup.one_lt_card_iff_ne_bot (H := H)).mpr hyp.H_ne_bot
-    rw [hn] at h1 ⊢
-    rcases n with _ | n
-    · simp at h1
-    · exact dvd_pow_self p (Nat.succ_ne_zero n)
-  have hpidx : ¬ p ∣ H.index := by
-    rw [hyp.index_H_eq_card_W1]
-    exact (hp.coprime_iff_not_dvd).mp (Nat.Coprime.coprime_dvd_left hpH hcop)
-  set HSyl : Sylow p ↥L := hHp.toSylow hpidx with hHSyl_def
-  have hHSyl : (HSyl : Subgroup ↥L) = H := IsPGroup.toSylow_coe hHp hpidx
-  haveI hHSylNormal : (HSyl : Subgroup ↥L).Normal := by rw [hHSyl]; exact ‹H.Normal›
-  haveI : Unique (Sylow p ↥L) := Sylow.unique_of_normal HSyl hHSylNormal
-  have hpsub : ∀ K : Subgroup ↥L, IsPGroup p K → K ≤ H := by
-    intro K hK
-    obtain ⟨R, hR⟩ := hK.exists_le_sylow
-    calc K ≤ (R : Subgroup ↥L) := hR
-      _ = (HSyl : Subgroup ↥L) := by rw [Subsingleton.elim R HSyl]
-      _ = H := hHSyl
-  have hNle : Subgroup.normalizer Ĥ ≤ L := hyp.normalizer_map_subtype_eq.le
-  obtain ⟨Q, hĤQ⟩ := hĤp.exists_le_sylow
-  refine ⟨Q, ?_⟩
-  apply OddOrder.GroupTheory.sylow_coe_eq_of_normalizer_inf_le hĤQ
-  intro x hx
-  have hxL : x ∈ L := hNle hx.1
-  have hQLp : IsPGroup p ((Q : Subgroup G).comap L.subtype : Subgroup ↥L) :=
-    Q.isPGroup'.comap_of_injective L.subtype L.subtype_injective
-  have hx'H : (⟨x, hxL⟩ : ↥L) ∈ H :=
-    hpsub _ hQLp (Subgroup.mem_comap.mpr (by exact hx.2))
-  exact Subgroup.mem_map.mpr ⟨⟨x, hxL⟩, hx'H, rfl⟩
-
 /-- **The `Y`-coherence image of an `η ∈ Y` is `±` an irreducible character of `G`.**  Since `η` is
 irreducible (`isIrreducibleCharacter_of_mem_Yset`, so `⟨η,η⟩ = 1`) and the coherence extension is
 norm-preserving on `Z[Y]` (`extension_inner_eq`) with image in `ZIrr G` (`extension_mem_ZIrr`), the
