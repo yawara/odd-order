@@ -4,7 +4,58 @@
 > `s08_6_8_assembly_plan.md`(458KB)/`s08_6_8_3_gap_resolution.md` のうち本 note と矛盾する記述は本 note を優先。
 > 上位方針・FT 接続の文脈 = 記憶 [[ft-path-policy]] の 2026-06-17 検証訂正ブロック。
 
-## 🚩🆕 HANDOFF — 次セッションはここから (2026-06-19 cont.²³)
+## 🚩🆕 HANDOFF — 次セッションはここから (2026-06-19 cont.²⁵)
+
+**状態**: branch `lane-b`、clean、**full build green、実 sorry 136**。reducible-break チェーン step 1-8 完了
+(cont.²⁴) + **dispatch deep-dive で残務を precise 化 + case-A glue 1 ピース着地**。
+
+**S08:59 dispatch 残務 = (6.8.3) bootstrap (大型・別サブプロジェクト)。deep-dive 確定 (再調査不要)**:
+- **DAG・dispatcher・hbound・c1 枝は ready**: S08_CoherenceTheorems が S08_PGroupReduction/S08_Theorem65c2 を
+  import 可 (cycle なし)。`nonempty_coherent_S_of_c2_of_branches` (`S08_PGroupReduction:215`) が step 8 の
+  hbound + hcop/hW2comm (←hyp.cases.inr 直接供給) + hsplit (caseAB_split_of_c2) + hcaseA/hcaseB から c2 coherence。
+  c1 枝 = `nonempty_coherent_S_of_frobenius` (self-contained)。
+- **残ゲート 2 本** (両方 (6.8.3) bootstrap):
+  1. **case-A S-bootstrap** = `nonempty_coherent_S_caseA_of_frobenius` (`S08_CoherenceCore:3859`、~120 行) の
+     c2 版。X(⁅H,H⁆)∪Y=S を構築。✅ **glue ピース着地**:
+     `coherentXunionYset_centralCommutator_of_glued_withDiagonal_of_c2_caseA` (commit 済、Frobenius 版の
+     X⊥Y 既約性を c2-caseA に差替)。残 = ~6 sub-lemma の c2 版 (`coherentXunionYset_centralCommutator_diagonal_general`
+     /`crux_general_of_higher_anchor` = **度数論含む深い**、`Xset_centralCommutator_nonempty`/`two_le_xBaseBlock_ncard`
+     /`exists_Ycoherence_hgood` = 構造) + 主 producer ミラー。
+  2. **case-B structure-data** = `nonempty_coherent_S_caseB_of_c2` (`:343`) の named 仮説 hWMgt (W₂⊊⁅H,H⁆)/
+     hYcard (Yset.ncard≠2、`two_le_Yset_ncard` は ≥2 のみ)/hXne (Xset W₂≠∅、Xset 単調ゆえ Xset ⁅H,H⁆≠∅ から
+     導けない) の discharge。
+**∴ S08:59 closure は multi-session (6.8.3) bootstrap。reducible-break チェーン (本セッション主題) とは独立。**
+**FT 文脈不変**: (6.8) は [[ft-path-policy]] で orphaned (deferred-payoff)。
+
+## 🚩 HANDOFF — (2026-06-19 cont.²⁴)
+
+**状態**: branch `lane-b`、作業ツリー clean、**full build 3868 green、実 sorry 136**。reducible-break (5.6.3)
+**残チェーン step 1-8 を完了** (engine + cross-ortho toolkit + 列 break (6.2) bound chain + c2 (6.3)
+induction + hbound producer、計 ~17 feature commit、全 sorry-free + axiom-clean)。
+
+**✅ 完成済 step 6-8 (cont.²³ の step 1-5 に追加)**:
+- **step 6** `six_two_index_bound_c2` の **hW2B 撤廃** (`S08_Theorem65c2`): break ψ を
+  `caseB_S_member_column_or_irreducible` で column/irreducible dispatch (column→step 5 / irreducible→既存)。
+  caller `six_two_central_c2`/`six_three_index_bound_c2` も hW2B pass-through 除去。
+- **step 7** `six_three_c2` (`S08_Theorem65c2`): (6.3) minimal-A induction、six_three ミラー、
+  M≤H₁≤⁅H,H⁆ で S(M) coherent。hW2B-free ゆえ W₂ 以下に降りる column-transition break を許容。
+- **step 8** `abelianization_card_le_of_not_coherent_c2` (`S08_Theorem65c2`): **hbound = |Abelianization H|
+  ≤ 4|W₁|²+1** を ¬coherent(S) から (six_three_c2 を M=⊥/H₁=⁅H,H⁆ で適用)。= handoff cont.²⁰ frontier 達成。
+
+**▶ 次の一手 = step 9-11 (dispatch S08:59、= 別 sub-project: 配線 + structure-data discharge)**:
+- **DAG は配線可能と確定** (再調査不要): S08_PGroupReduction/S08_Theorem65c2 は S08_CoherenceTheorems の
+  **下流でない** (並列、cycle なし) → S08_CoherenceTheorems が両者を import 可。cont.¹⁴「下流ゆえ不可」は
+  merge 後 STALE。
+- **dispatcher は既存**: `nonempty_coherent_S_of_c2_of_branches` (`S08_PGroupReduction:215`) が
+  **hbound (step 8) + hcop + hW2comm + hsplit + hcaseA + hcaseB** から c2 coherence を出す。S08:59 c2 枝 =
+  by_contra hncoh → step 8 で hbound → dispatcher → 矛盾。c1 枝 = `nonempty_coherent_S_of_frobenius`。
+- **残ゲート = case producer の structure-data discharge** (これが本当の残務):
+  `nonempty_coherent_S_caseB_of_c2` (`:343`) は hWMgt/hYcard/hXne/hprime/hcen/hcop/hW2comm/hW2H を仮説に取る。
+  これらの discharge (`_of_c2_caseB`、handoff cont.¹⁶ で「素材在庫・未実装」) + 案 A 用 case-A producer +
+  hyp.cases (Frobenius/CertainType split) からの hcop/hW2comm 抽出が残る。**= (6.8.3) bootstrap + 構造事実**。
+**FT 文脈不変**: (6.8) は [[ft-path-policy]] で orphaned (deferred-payoff) — 閉じても feitThompson sorry は今減らない。
+
+## 🚩 HANDOFF — (2026-06-19 cont.²³)
 
 **状態**: branch `lane-b` = `main` 同期 + 新規 (cont.²² 末で main マージ、以降 step 4-5 を追加)、作業ツリー clean
 (未追跡 `s08_6_8_chatgpt_prompt.md` 旧 draft 無視可)、**full build 3868 green、実 sorry 136**。

@@ -1150,7 +1150,7 @@ Proof (BG mmd 4178 + Theorem 12.12 `C_E(S)=E` argument), to be supplied:
   mmd 3237) and `Z` is the regular cyclic factor of full exponent (`A₀` has order `p`). -/
 theorem typeP_hall_regular_component_at_prime [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M U : Subgroup G}
-    (hM : M ∈ maximalSubgroups G) (hUM : U ≤ M)
+    (hM : M ∈ maximalSubgroups G) (hUM : U ≤ M) (hUab : IsMulCommutative ↥U)
     (hU : Ch03.IsHallSubgroup ((S14.kappa M ∪ OddOrder.BG.Ch3.S10.sigma M)ᶜ) (U.subgroupOf M))
     {p : ℕ} (hp : p ∈ (Nat.card ↥U).primeFactors) :
     ∃ Z : Subgroup G, Z ≤ U ∧ IsPGroup p ↥Z ∧
@@ -1178,10 +1178,91 @@ theorem typeP_hall_regular_component_at_prime [Finite G]
     Nat.mem_primeFactors.mpr ⟨Fact.out,
       (Nat.dvd_of_mem_primeFactors hp).trans (Subgroup.card_dvd_of_le hUE), Nat.card_pos.ne'⟩
   by_cases hpτ2 : p ∈ tau2 M
-  · -- **τ₂ case** (`r_p(M) = 2`): the regular cyclic line in `Sylow_p(U)` (Theorem 12.12
-    -- `C_E(S)=E` argument; abelian `Sylow_p(G)` via `exists_cyclic_Enormal_regular_of_CES_eq`,
-    -- nonabelian via Theorem 12.7).  `U ≤ E` is now available.
-    sorry
+  · -- **τ₂ case** (`r_p(M) = 2`): the regular cyclic line in `Sylow_p(U)`.
+    by_cases habel : ∀ Sp : Sylow p G, IsMulCommutative ↥(Sp : Subgroup G)
+    · -- **abelian `Sylow_p(G)`**: `Sylow_p(U)` is a full `G`-Sylow, so the trimmed `C_E(S)=E`
+      -- construction (`exists_regular_cyclic_in_abelianSylow_tau2`) supplies `Z ≤ Sylow_p(U) ≤ U`.
+      -- `ν_p(|U|) = ν_p(|M|)` (`U` is the `(κ∪σ)'`-Hall, `p ∈ (κ∪σ)'`).
+      have hUMfact : (Nat.card ↥U).factorization p = (Nat.card ↥M).factorization p := by
+        have hmul := Subgroup.card_mul_index (U.subgroupOf M)
+        have hcard_eqUM : Nat.card ↥(U.subgroupOf M) = Nat.card ↥U :=
+          Nat.card_congr (Subgroup.subgroupOfEquivOfLe hUM).toEquiv
+        have hidx : ((U.subgroupOf M).index).factorization p = 0 := by
+          rw [Nat.factorization_eq_zero_iff]
+          exact Or.inr (Or.inl fun hd => (hU.2 p (Nat.mem_primeFactors.mpr
+            ⟨Fact.out, hd, Subgroup.index_ne_zero_of_finite⟩)) hpcompl)
+        have hh := congrArg (fun n => n.factorization p) hmul
+        simp only [Nat.factorization_mul Nat.card_pos.ne' Subgroup.index_ne_zero_of_finite,
+          Finsupp.add_apply, hidx, add_zero] at hh
+        rw [hcard_eqUM] at hh; exact hh
+      -- `SUG = Sylow_p(U)` pushed into `G`.
+      obtain ⟨SU⟩ : Nonempty (Sylow p ↥U) := inferInstance
+      set SUG : Subgroup G := (SU : Subgroup ↥U).map U.subtype with hSUGdef
+      have hSUG_U : SUG ≤ U := Subgroup.map_subtype_le _
+      have hSUG_M : SUG ≤ M := hSUG_U.trans hUM
+      have hSUGcard : Nat.card ↥SUG = p ^ (Nat.card ↥U).factorization p := by
+        rw [hSUGdef, Subgroup.card_map_of_injective U.subtype_injective, SU.card_eq_multiplicity]
+      have hSUGcardM : Nat.card ↥SUG = p ^ (Nat.card ↥M).factorization p := by
+        rw [hSUGcard, hUMfact]
+      have hSUGsubM_card : Nat.card ↥(SUG.subgroupOf M) = p ^ (Nat.card ↥M).factorization p := by
+        rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hSUG_M).toEquiv]; exact hSUGcardM
+      set SM : Sylow p ↥M := Sylow.ofCard (SUG.subgroupOf M) hSUGsubM_card with hSMdef
+      have hpRankSUG : 2 ≤ pRank ↥SUG p := by
+        have e1 := pRank_sylow_eq SM
+        rw [hSMdef, Sylow.coe_ofCard] at e1
+        have e2 : pRank ↥(SUG.subgroupOf M) p = pRank ↥SUG p :=
+          le_antisymm
+            (pRank_le_of_injective (f := (Subgroup.subgroupOfEquivOfLe hSUG_M).toMonoidHom)
+              (Subgroup.subgroupOfEquivOfLe hSUG_M).injective)
+            (pRank_le_of_injective (f := (Subgroup.subgroupOfEquivOfLe hSUG_M).symm.toMonoidHom)
+              (Subgroup.subgroupOfEquivOfLe hSUG_M).symm.injective)
+        have hr2 : pRank ↥M p = 2 := hpτ2.2
+        omega
+      -- a rank-2 `A ≤ SUG` (de-private `S12_Proposition1215`).
+      obtain ⟨A, hA, hASUG⟩ := exists_mem_elemAbelianOfRank_two_le_of_two_le_pRank
+        (Fact.out : p.Prime) hpRankSUG
+      have hAE : A ≤ E := hASUG.trans (hSUG_U.trans hUE)
+      -- **full `G`-Sylow**: `ν_p(|M|) = ν_p(|G|)` via abelian `S' ⊇ A` with `S' ≤ C_G(A) ≤ E ≤ M`.
+      obtain ⟨S', hAS'⟩ := hA.1.isPGroup.exists_le_sylow
+      have hS'M : (S' : Subgroup G) ≤ M :=
+        ((le_centralizer_of_le_of_le (habel S') le_rfl hAS').trans
+          (centralizer_le_E_of_tau2 hG hsetup hpτ2 hA hAE).1).trans hsetup.E_le
+      have hMG : (Nat.card ↥M).factorization p ≤ (Nat.card G).factorization p :=
+        (Nat.factorization_le_iff_dvd Nat.card_pos.ne' Nat.card_pos.ne').mpr
+          (Subgroup.card_subgroup_dvd_card M) p
+      have hGM : (Nat.card G).factorization p ≤ (Nat.card ↥M).factorization p := by
+        have hdvd : Nat.card ↥(S' : Subgroup G) ∣ Nat.card ↥M := Subgroup.card_dvd_of_le hS'M
+        rw [S'.card_eq_multiplicity] at hdvd
+        exact (Nat.Prime.pow_dvd_iff_le_factorization Fact.out Nat.card_pos.ne').mp hdvd
+      have hfull : (Nat.card ↥M).factorization p = (Nat.card G).factorization p :=
+        le_antisymm hMG hGM
+      have hSUGfull : Nat.card ↥SUG = p ^ (Nat.card G).factorization p := by
+        rw [hSUGcardM, hfull]
+      set SG : Sylow p G := Sylow.ofCard SUG hSUGfull with hSGdef
+      have hSGcoe : (SG : Subgroup G) = SUG := by rw [hSGdef, Sylow.coe_ofCard]
+      have hSGab : IsMulCommutative ↥(SG : Subgroup G) := by
+        rw [hSGcoe]
+        exact Subgroup.le_centralizer_iff_isMulCommutative.mp
+          (hSUG_U.trans ((Subgroup.le_centralizer_iff_isMulCommutative.mpr hUab).trans
+            (Subgroup.centralizer_le (SetLike.coe_subset_coe.mpr hSUG_U))))
+      obtain ⟨Z, hZS, _hZcyc, _hZne, hZexp, hZreg⟩ :=
+        exists_regular_cyclic_in_abelianSylow_tau2 hG hsetup hpτ2 hA hAE
+          (hSGcoe ▸ hASUG) (hSGcoe ▸ hSUG_M) hSGab
+      have hZSUG : Z ≤ SUG := hSGcoe ▸ hZS
+      refine ⟨Z, hZSUG.trans hSUG_U, (SG.isPGroup'.to_le hZS), ?_, hZreg⟩
+      -- exponent: `exp Z = exp SUG`, and `ν_p(exp U) ≤ ν_p(exp SUG)` (`Sylow_p(U)`).
+      have hSUGsubU : SUG.subgroupOf U = (SU : Subgroup ↥U) := by
+        rw [hSUGdef, Subgroup.subgroupOf,
+          Subgroup.comap_map_eq_self_of_injective U.subtype_injective]
+      have hSUGsubU_card : Nat.card ↥(SUG.subgroupOf U) = p ^ (Nat.card ↥U).factorization p := by
+        rw [hSUGsubU, SU.card_eq_multiplicity]
+      have hZexp' : Monoid.exponent ↥Z = Monoid.exponent ↥SUG := by rw [hZexp, hSGcoe]
+      rw [hZexp']
+      exact factorization_exponent_le_of_sylow hSUG_U hSUGsubU_card
+    · -- **nonabelian `Sylow_p(G)`** (`Sylow_p(U) = C_S(A) = A₀ × Z`, Theorem 12.7): the cyclic
+      -- regular factor.  (Existing Lean Theorem 12.7 returns `FrobFactConclusion`; per-prime `Z`
+      -- extraction is a separate construction.)
+      sorry
   · -- **τ₁ ∪ τ₃ case** (`r_p(M) = 1`): `Z = Sylow_p(U)` is regular by Lemma 14.1.
     have hr1 : pRank ↥M p = 1 := by
       have hle : pRank ↥M p ≤ 2 := hsetup.pRank_M_le_two hG hpE
@@ -1335,7 +1416,7 @@ theorem typeP_hall_frobenius_factor [Finite G] (hG : OddOrder.BG.IsMinimalSimple
           exact hqcompl (Or.inr (hMσHall.1 q hqMσ))
       rw [inf_comm]; exact Subgroup.inf_eq_bot_of_coprime hcop
     exact frobenius_factor_of_regular_components hG hM hUM hUne hUab hUinf
-      (fun p hp => typeP_hall_regular_component_at_prime hG hM hUM hU hp)
+      (fun p hp => typeP_hall_regular_component_at_prime hG hM hUM hUab hU hp)
 
 /-- **Forward lemma: the `§14`-gated structural content of BG Lemma 15.1** (faithful to mmd L4116,
 proof deferred).  Bundles the conjuncts of Lemma 15.1 that depend on the still-`sorry` §14 results
