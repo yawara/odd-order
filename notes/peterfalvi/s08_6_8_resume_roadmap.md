@@ -4,6 +4,54 @@
 > `s08_6_8_assembly_plan.md`(458KB)/`s08_6_8_3_gap_resolution.md` のうち本 note と矛盾する記述は本 note を優先。
 > 上位方針・FT 接続の文脈 = 記憶 [[ft-path-policy]] の 2026-06-17 検証訂正ブロック。
 
+## ✅🎯 2026-06-19 cont.¹⁶ — 原文精読で cont.¹⁵ 検証確定 + hcaseB 構造データ discharge + hbound 真の crux 特定
+
+ユーザー「数学的ギャップでなければまずはテキストを精読して課題を進めてください」を受け、(5.6)/(5.2)/(6.2)/(6.3)/
+(6.5)/(6.8) を直接精読 (04.7 / 04.8 全文) + Lean 突き合わせ。確定事項:
+
+### ✅ 確定: (6.8) c2 は数学 gap でなく形式化労力 (cont.¹⁵ を原文で検証)
+
+**Theorem (5.6)** (`04.7:59`) は **break character χ の既約性を要求しない** — `χ∈S`, `S₂={χ,χ̄}⊂S` と
+条件 (a)(b)(c) だけ。証明は (5.4)/(5.5)/(5.2.d)/(5.2.e) を使い、これらは全 `χ∈S` (reducible column μⱼ
+含む) で `R(χ)` を持つ。(5.3.b) (`04.7:25`) は明示的に「χ が μⱼ 形 (reducible)」を (4.9) の
+`R(μⱼ)={δⱼωᵢⱼ^σ,−δⱼωᵢₖ^σ}` で処理。⟹ **cont.¹⁵ 正、cont.¹⁴「reducible break = 研究レベル」誤診断確定**。
+
+### 🎯 hbound (6.3 c2 = 本丸) の真の crux 特定 (再調査不要)
+
+**Lean weighted engine の制約**: `coherentDegreeSqNormBound_of_not_coherentW` (`S08_CoherenceWeighted:475`)
+は **メンバー `χmem i` の reducible (`mc i=‖·‖²≠1`) は扱う** が **break `χ:IrreducibleCharacter ↥L`
+(`hχχ:inner χ χ=1`) の既約性は要求**。同様に `sMember_degreeSqNormBound_of_not_coherent`
+(`S08_CaseBEnumeration:620`)・`sSubFiltration_sum_le_two_psi_caseB` (`S08_Theorem63:110`) とも `hψirr` 要求。
+
+**∴ cont.¹⁵ が解決したのは「reducible メンバー」の方。「reducible break character」は別問題で未解決。**
+(6.3) の break は reducible column たりうる: **Y=S(H') は既約** (`04.8:156`「Y⊂Irr L, η_j(1)=|W₁|」) ゆえ
+column∉Y、よって S(B) (B⊊A⊆H') の break が column になりうる (cont.¹⁴ の確定と一致)。
+
+**hbound を閉じる 2 経路** (どちらも substantial、設計判断要):
+1. **engine 拡張**: `xAdjoinStepW`/`coherentDegreeSqNormBound_of_not_coherentW` を reducible break χ に拡張。
+   column の `R(μⱼ)` 構造 (size 2w₁、(4.9)/(5.8) `μₖ^τ₁=δₖΣωᵢₖ^σ`) を使う。= 新規の本体。
+2. **構造論証**: (6.3)-for-(6.8)-c2 の induction で break が常に既約と示す。columns∉Y は確認したが
+   columns∈S(B) を排除する論証は未確立 (S(A) が全 column を含む regime を示せれば break は既約)。
+**この crux は hbound (6.3 c2) と case-B (6.8.3) bootstrap の `hbreak` (`false_of_caseB_break_of_bounds`
+の named 入力) の両方を同時にブロックする中心 crux**。
+
+### ✅ 進捗: `nonempty_coherent_S_caseB_of_c2` landed (commit `c6114940`、axiom-clean)
+
+dispatch の `hcaseB` producer を整備。`nonempty_coherent_S_caseB_of_c2_data` を強化し FPF/index 構造データ
+(hfpf/hc2/hFPF) を p-群 + 中心 W₂ context から**内部 discharge** → 真の (6.8.3) case 条件
+**hWMgt** (W₂⊊⁅H,H⁆=「Z≠H'」、(6.8.3) 非自明枝)・**hYcard** (m≠2)・**hXne** (X nonempty) だけ named に残す。
+- hfpf = `caseB_fpf_bound` (W₂≤Z(L) via `caseB_W2_le_center_L`、H 非可換 via nilpotency)
+- hc2/hFPF = 算術 (`relIndex_mul_index` + `index_H_eq_card_W1`)。full build 3863 green、sorry 140 維持。
+
+### ▶ 次の一手 (優先順)
+
+1. **hbound (本丸)**: 上記 crux の経路 1 (engine 拡張) か経路 2 (break 既約の構造論証) を設計確定 → 実装。
+   経路 2 が成れば既存 `sSubFiltration_sum_le_two_psi_caseB` がそのまま効く (軽い)。経路 1 は engine 本体。
+2. **hcaseA** (case-A producer): `Xset_centralCommutator_isCoherent_of_c2_caseA` → S bootstrap (未構築)。
+3. **dispatch 配線** (S08:59): hbound+hcaseA+`nonempty_coherent_S_caseB_of_c2`+`caseAB_split_of_c2` を
+   `nonempty_coherent_S_of_c2_of_branches` 経由で c2 枝に。c1 枝は `nonempty_coherent_S_of_frobenius` 既存。
+**FT 文脈不変**: (6.8) は [[ft-path-policy]] で orphaned (deferred-payoff) — 閉じても feitThompson sorry は今は減らない。
+
 ## ⚠️✅ 2026-06-19 cont.¹⁵ — cont.¹⁴「c2 研究レベル」誤診断を訂正 + hfix (6.4.c) landing
 
 **cont.¹⁴ 末尾「c2-(6.5) 還元の真のブロッカー = reducible-break 対応 generalized (5.6) engine = 研究レベル

@@ -324,4 +324,72 @@ theorem nonempty_coherent_S_caseB_of_c2_data (hyp : SibleyDadeHypothesis G L H)
   exact nonempty_coherent_S_caseB_of_structure hyp h46 hHK hW1 hW2H hcen hderiv hcop hp hHp
     hprime hW2comm hW2cenL hc2 hFPF hcZ hfpf hYcard hXne
 
+/-- **Peterfalvi (6.8) case-B coherence — full c2 FPF/index structure-data discharge.**
+
+Strengthens `nonempty_coherent_S_caseB_of_c2_data` by deriving the FPF/index structure data
+(`hfpf`/`hc2`/`hFPF`) *internally* from the `p`-group + central-`W₂` context, so that only the
+genuine (6.8.3) *case* conditions remain as named hypotheses:
+* `hWMgt` — `W₂ ⊊ ⁅H,H⁆` (`1 < |⁅H,H⁆ : W₂|`), i.e. `Z = W₂ ≠ H' = ⁅H,H⁆`, the (6.8.3) nontrivial
+  branch (when `Z = H'` we already have `S = X ∪ Y` coherent by (6.8.2));
+* `hYcard` — `m = |Y| ≠ 2`, the (6.8.2) exceptional case;
+* `hXne` — `X` nonempty.
+
+The (6.8.3) FPF bound `hfpf : (2|W₁|+1)² ≤ |H:W₂|` comes from `caseB_fpf_bound` (`W₂ ≤ Z(L)` via
+`caseB_W2_le_center_L`; `H` non-abelian via nilpotency — `⁅H,H⁆ ⊊ H` so `1 < |H:⁅H,H⁆|`).  The
+remaining index data is arithmetic: `hc2` (`|H:W₂| ≥ 9 ≥ 2`) and `hFPF`
+(`|W₂|_L = |H:W₂|·|W₁| < |H:W₂|²` since `|W₁| < |H:W₂|`, via `relIndex_mul_index` and
+`index_H_eq_card_W1`).  This is the clean `hcaseB` producer feeding the dispatch skeleton
+`nonempty_coherent_S_of_c2_of_branches`. -/
+theorem nonempty_coherent_S_caseB_of_c2 (hyp : SibleyDadeHypothesis G L H)
+    [H.Normal] [Fintype ↥H]
+    (h46 : OddOrder.Peterfalvi.S06.Hypothesis46 (sharpImage H) L) (hHK : h46.K = H)
+    (hW1 : h46.W1 = hyp.W1)
+    [NeZero (Nat.card h46.W1)] [Invertible (Nat.card ↥h46.K : ℂ)]
+    [Fintype ↥(h46.W1 ⊔ h46.W2)] [Invertible (Nat.card ↥(h46.W1 ⊔ h46.W2) : ℂ)]
+    [Fintype (OddOrder.Peterfalvi.S06.ticVdiff h46).W]
+    [Invertible (Nat.card (OddOrder.Peterfalvi.S06.ticVdiff h46).W : ℂ)]
+    [h46.W2.Normal] [Invertible (Nat.card ↥h46.W2 : ℂ)]
+    [Fintype ↥(h46.W2.subgroupOf H)] [Invertible (Nat.card ↥(h46.W2.subgroupOf H) : ℂ)]
+    (hW2H : h46.W2 ≤ H) (hcop : Nat.Coprime (Nat.card ↥H) (Nat.card hyp.W1))
+    {p : ℕ} (hp : p.Prime) (hHp : IsPGroup p ↥H)
+    (hprime : (Nat.card h46.W2).Prime) (hW2comm : h46.W2 ≤ ⁅H, H⁆)
+    (hcen : h46.W2.subgroupOf H ≤ Subgroup.center ↥H)
+    (hWMgt : 1 < (h46.W2.subgroupOf H).relIndex (commutator ↥H))
+    (hYcard : hyp.Yset.ncard ≠ 2) (hXne : (hyp.Xset h46.W2).Nonempty) :
+    Nonempty (OddOrder.Peterfalvi.S07.IsCoherent hyp.tau hyp.S
+      (OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L)) := by
+  letI : Group.IsNilpotent ↥H := hyp.H_nilpotent
+  haveI : Nontrivial ↥H := (Subgroup.nontrivial_iff_ne_bot H).mpr hyp.H_ne_bot
+  -- `W₂ ≤ Z(L)` (case-B central datum).
+  have hW2cenL : h46.W2 ≤ Subgroup.center ↥L := caseB_W2_le_center_L hyp h46 hW1 hW2H hcen
+  -- `H` non-abelian: `⁅H,H⁆ ⊊ H`, so `1 < |H : ⁅H,H⁆|`.
+  have hMgt : 1 < (commutator ↥H).index := by
+    have hne : commutator ↥H ≠ ⊤ := (IsSolvable.commutator_lt_top_of_nontrivial ↥H).ne
+    have h0 : (commutator ↥H).index ≠ 0 := Subgroup.index_ne_zero_of_finite
+    have h1 : (commutator ↥H).index ≠ 1 := fun h => hne (Subgroup.index_eq_one.mp h)
+    omega
+  -- the (6.8.3) FPF bound `(2|W₁|+1)² ≤ |H:W₂|`.
+  have hfpf : (2 * Nat.card hyp.W1 + 1) ^ 2 ≤ Nat.card (↥H ⧸ h46.W2.subgroupOf H) :=
+    caseB_fpf_bound hyp h46.toCertainTypeHypothesis hHK hW1 hW2comm hW2cenL hcop hMgt hWMgt
+  have hw1pos : 1 ≤ Nat.card hyp.W1 := Nat.card_pos
+  -- `|H:W₂| ≥ 2`.
+  have hc2 : 2 ≤ (h46.W2.subgroupOf H).index :=
+    le_trans (le_trans (by omega) (Nat.le_self_pow (by norm_num) (2 * Nat.card hyp.W1 + 1))) hfpf
+  -- `|W₂|_L = |H:W₂|·|W₁| < |H:W₂|²`.
+  have hFPF : (h46.W2.index : ℤ) < ((h46.W2.subgroupOf H).index : ℤ) ^ 2 := by
+    have hidx : h46.W2.index = (h46.W2.subgroupOf H).index * Nat.card hyp.W1 := by
+      have h := Subgroup.relIndex_mul_index hW2H
+      rw [hyp.index_H_eq_card_W1] at h
+      exact h.symm
+    have hw1lt : Nat.card hyp.W1 < (h46.W2.subgroupOf H).index :=
+      lt_of_lt_of_le
+        (lt_of_lt_of_le (by omega) (Nat.le_self_pow (by norm_num) (2 * Nat.card hyp.W1 + 1))) hfpf
+    have hw1ltZ : (Nat.card hyp.W1 : ℤ) < ((h46.W2.subgroupOf H).index : ℤ) := by
+      exact_mod_cast hw1lt
+    have hiposZ : (0 : ℤ) < ((h46.W2.subgroupOf H).index : ℤ) := by
+      exact_mod_cast lt_of_le_of_lt (Nat.zero_le _) hw1lt
+    rw [hidx]; push_cast; nlinarith [hw1ltZ, hiposZ]
+  exact nonempty_coherent_S_caseB_of_c2_data hyp h46 hHK hW1 hW2H hcop hp hHp hprime hW2comm
+    hcen hc2 hfpf hFPF hYcard hXne
+
 end OddOrder.Peterfalvi.S08
