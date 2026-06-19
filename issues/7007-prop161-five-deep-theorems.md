@@ -90,6 +90,18 @@ bottom-out** するので、clean 化には §15 foundation が先。真の順�
 
 ## 進捗ログ
 
+**2026-06-19 (cont.³) ✅✅ BG Lemma 15.1 完全完成 — conjunct 4 + gated lemma wire DONE**:
+- `3d240069`: **conjunct 4 (15.1(e)) COMPLETE** — τ₂ **nonabelian** sub-case 着地で `typeP_hall_frobenius_factor`
+  全 sorry-free (K=⊥ / K≠⊥ τ₁∪τ₃ / τ₂ abelian / τ₂ nonabelian すべて)。nonabelian: Lemma 10.13
+  (`nonabelian_pSubgroup_rankTwo_elemAbelian_structure`) で `C_{S'}(A)=A₀⊔Z` (Z cyclic) を取得、
+  S'⊇Sylow_p(U) で C_{S'}(A)=Sylow_p(U)、Z regular は clause (c)、exp Z=exp SUG は not-cyclic 論法。
+  新規 infra: `open scoped IsMulCommutative` (CommGroup 導出)。
+- `7337cdf2`: **`typeP_auxiliary_structure_gated` wire DONE** — 4 conjunct standalone lemma の直接 4-tuple、
+  sorry-free。BG Lemma 15.1 の §14-gated 構造内容が全 proven。
+- sorry count 136→134 (merge 後)。**Lemma 15.1 は Thm A/C/TypePData の土台 — 完成で §16 endpoint へ前進**。
+- **次 = Thm 15.2(a) `mf_ne_msigma_typeP1_structure` (S15) / Thm 15.7 `fitting_not_ti_cases` / Thm A / Thm C / Prop 16.1 wire**。
+
+
 **2026-06-19 conjunct 4 (BG 15.1(e)) — K=⊥ DONE + K≠⊥ engine/packaging DONE, kernel isolated**:
 - `06278a11`: K=⊥ branch (type F) of `typeP_hall_frobenius_factor` (Thm 12.12(b))。sorry-free。
 - `49e1a380`: K≠⊥ の **assembly 層を全て sorry-free 化** + kernel を最小 per-prime 補題へ隔離:

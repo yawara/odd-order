@@ -57,6 +57,7 @@ open OddOrder.Isaacs
 open OddOrder.BG.Ch3.S12
 open OddOrder.BG.Ch4.S14
 open scoped Pointwise
+open scoped IsMulCommutative
 
 variable {G : Type*} [Group G]
 
@@ -1259,10 +1260,199 @@ theorem typeP_hall_regular_component_at_prime [Finite G]
       have hZexp' : Monoid.exponent ↥Z = Monoid.exponent ↥SUG := by rw [hZexp, hSGcoe]
       rw [hZexp']
       exact factorization_exponent_le_of_sylow hSUG_U hSUGsubU_card
-    · -- **nonabelian `Sylow_p(G)`** (`Sylow_p(U) = C_S(A) = A₀ × Z`, Theorem 12.7): the cyclic
-      -- regular factor.  (Existing Lean Theorem 12.7 returns `FrobFactConclusion`; per-prime `Z`
-      -- extraction is a separate construction.)
-      sorry
+    · -- **nonabelian `Sylow_p(G)`**: `Sylow_p(U) = C_{S'}(A) = A₀ ⊔ Z` (Lemma 10.13); `Z` is the
+      -- regular cyclic factor (`Ω₁(Z) ≠ A₀`, regular by the canonical line's clause (c)).
+      have hUMfact : (Nat.card ↥U).factorization p = (Nat.card ↥M).factorization p := by
+        have hmul := Subgroup.card_mul_index (U.subgroupOf M)
+        have hcard_eqUM : Nat.card ↥(U.subgroupOf M) = Nat.card ↥U :=
+          Nat.card_congr (Subgroup.subgroupOfEquivOfLe hUM).toEquiv
+        have hidx : ((U.subgroupOf M).index).factorization p = 0 := by
+          rw [Nat.factorization_eq_zero_iff]
+          exact Or.inr (Or.inl fun hd => (hU.2 p (Nat.mem_primeFactors.mpr
+            ⟨Fact.out, hd, Subgroup.index_ne_zero_of_finite⟩)) hpcompl)
+        have hh := congrArg (fun n => n.factorization p) hmul
+        simp only [Nat.factorization_mul Nat.card_pos.ne' Subgroup.index_ne_zero_of_finite,
+          Finsupp.add_apply, hidx, add_zero] at hh
+        rw [hcard_eqUM] at hh; exact hh
+      obtain ⟨SU⟩ : Nonempty (Sylow p ↥U) := inferInstance
+      set SUG : Subgroup G := (SU : Subgroup ↥U).map U.subtype with hSUGdef
+      have hSUG_U : SUG ≤ U := Subgroup.map_subtype_le _
+      have hSUG_M : SUG ≤ M := hSUG_U.trans hUM
+      have hSUGcard : Nat.card ↥SUG = p ^ (Nat.card ↥U).factorization p := by
+        rw [hSUGdef, Subgroup.card_map_of_injective U.subtype_injective, SU.card_eq_multiplicity]
+      have hSUGcardM : Nat.card ↥SUG = p ^ (Nat.card ↥M).factorization p := by
+        rw [hSUGcard, hUMfact]
+      have hSUGpg : IsPGroup p ↥SUG := IsPGroup.of_card hSUGcard
+      have hSUGsubM_card : Nat.card ↥(SUG.subgroupOf M) = p ^ (Nat.card ↥M).factorization p := by
+        rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hSUG_M).toEquiv]; exact hSUGcardM
+      set SM : Sylow p ↥M := Sylow.ofCard (SUG.subgroupOf M) hSUGsubM_card with hSMdef
+      have hpRankSUG : 2 ≤ pRank ↥SUG p := by
+        have e1 := pRank_sylow_eq SM
+        rw [hSMdef, Sylow.coe_ofCard] at e1
+        have e2 : pRank ↥(SUG.subgroupOf M) p = pRank ↥SUG p :=
+          le_antisymm
+            (pRank_le_of_injective (f := (Subgroup.subgroupOfEquivOfLe hSUG_M).toMonoidHom)
+              (Subgroup.subgroupOfEquivOfLe hSUG_M).injective)
+            (pRank_le_of_injective (f := (Subgroup.subgroupOfEquivOfLe hSUG_M).symm.toMonoidHom)
+              (Subgroup.subgroupOfEquivOfLe hSUG_M).symm.injective)
+        have hr2 : pRank ↥M p = 2 := hpτ2.2
+        omega
+      obtain ⟨A, hA, hASUG⟩ := exists_mem_elemAbelianOfRank_two_le_of_two_le_pRank
+        (Fact.out : p.Prime) hpRankSUG
+      have hAE : A ≤ E := hASUG.trans (hSUG_U.trans hUE)
+      have hAM : A ≤ M := hASUG.trans hSUG_M
+      have hSUGab : IsMulCommutative ↥SUG :=
+        Subgroup.le_centralizer_iff_isMulCommutative.mp
+          (hSUG_U.trans ((Subgroup.le_centralizer_iff_isMulCommutative.mpr hUab).trans
+            (Subgroup.centralizer_le (SetLike.coe_subset_coe.mpr hSUG_U))))
+      have hAmax : IsMaximalElementaryAbelian p A :=
+        (isMaximalElementaryAbelian_of_mem_tau2 hG hM Fact.out hpτ2 hAM hA).1
+      -- nonabelian Sylow `S' ⊇ SUG`.
+      push_neg at habel
+      obtain ⟨S', hSUGS'⟩ := hSUGpg.exists_le_sylow
+      have hAS' : A ≤ (S' : Subgroup G) := hASUG.trans hSUGS'
+      have hS'nonab : ¬ IsMulCommutative ↥(S' : Subgroup G) := by
+        obtain ⟨S₀, hS₀⟩ := habel
+        obtain ⟨g, hg⟩ := MulAction.exists_smul_eq G S₀ S'
+        intro hab
+        apply hS₀
+        have hcoe : (S₀ : Subgroup G) = MulAut.conj g⁻¹ • (S' : Subgroup G) := by
+          rw [← hg, Sylow.coe_subgroup_smul, ← mul_smul, ← map_mul, inv_mul_cancel,
+            map_one, one_smul]
+        rw [hcoe, mulAut_smul_eq_map]
+        exact OddOrder.BG.Ch3.S11.isMulCommutative_of_mulEquiv
+          (Subgroup.equivMapOfInjective _ _ (MulAut.conj g⁻¹).injective) hab
+      -- `C_G(A) ⊓ S' = SUG`.
+      have hSUG_le_C : SUG ≤ Subgroup.centralizer (A : Set G) ⊓ (S' : Subgroup G) :=
+        le_inf (le_centralizer_of_le_of_le hSUGab le_rfl hASUG) hSUGS'
+      have hC_le_M : Subgroup.centralizer (A : Set G) ⊓ (S' : Subgroup G) ≤ M :=
+        (inf_le_left.trans (centralizer_le_E_of_tau2 hG hsetup hpτ2 hA hAE).1).trans hsetup.E_le
+      have hCcard_le : Nat.card ↥(Subgroup.centralizer (A : Set G) ⊓ (S' : Subgroup G)) ≤
+          Nat.card ↥SUG := by
+        rw [hSUGcardM]
+        obtain ⟨k, hk⟩ := (IsPGroup.iff_card).mp (S'.isPGroup'.to_le inf_le_right)
+        rw [hk]
+        exact Nat.pow_le_pow_right (Fact.out : p.Prime).one_lt.le
+          ((Nat.Prime.pow_dvd_iff_le_factorization Fact.out Nat.card_pos.ne').mp
+            (hk ▸ Subgroup.card_dvd_of_le hC_le_M))
+      have hCeqSUG : Subgroup.centralizer (A : Set G) ⊓ (S' : Subgroup G) = SUG :=
+        (Subgroup.eq_of_le_of_card_ge hSUG_le_C hCcard_le).symm
+      -- canonical line `A₀` + clause (c).
+      obtain ⟨A₀, _hA₀eq, hA₀card, hA₀A, hMσA₀, hcReg, _hA₀max⟩ :=
+        exists_canonical_line_of_nonabelianSylow hG hsetup hpτ2 hA hAE habel
+      have hMσ_ne : OddOrder.BG.Ch3.S10.Msigma M ≠ ⊥ := OddOrder.BG.Ch3.S10.Msigma_ne_bot hG hM
+      have hA₀mem : A₀ ∈ elemAbelianOfRank G p 1 :=
+        ⟨Subgroup.IsElementaryAbelian.of_card_prime hA₀card, by rw [hA₀card, pow_one]⟩
+      have hA₀C : OddOrder.BG.Ch3.S10.Msigma M ⊓ Subgroup.centralizer (A₀ : Set G) ≠ ⊥ := by
+        rw [inf_eq_left.mpr hMσA₀]; exact hMσ_ne
+      have hM_single : maximalSubgroupsContaining (Subgroup.centralizer (A₀ : Set G)) = {M} :=
+        maximalContaining_centralizer_line_eq_singleton hG hsetup hpτ2 hA hAE hA₀mem hA₀A hA₀C
+      have hCA₀_le_M : Subgroup.centralizer (A₀ : Set G) ≤ M := by
+        have hlt : Subgroup.centralizer (A₀ : Set G) < ⊤ :=
+          lt_of_le_of_lt (Subgroup.centralizer_le_normalizer _)
+            (normalizer_lt_top_of_le_of_ne_bot hG hM (hA₀A.trans hAM)
+              (ne_bot_of_mem_elemAbelianOfRank_one hA₀mem))
+        obtain ⟨Mst, hco, hle⟩ := (eq_top_or_exists_le_coatom _).resolve_left hlt.ne
+        have hmem : Mst ∈ maximalSubgroupsContaining (Subgroup.centralizer (A₀ : Set G)) :=
+          mem_maximalSubgroupsContaining.mpr ⟨hco, hle⟩
+        rw [hM_single, Set.mem_singleton_iff] at hmem
+        exact hmem ▸ hle
+      -- `S' ⊄ M` (nonabelian, but `Sylow_p(M) = SUG` abelian).
+      have hS'_not_le_M : ¬ ((S' : Subgroup G) ≤ M) := by
+        intro hS'M
+        have hcardle : Nat.card ↥(S' : Subgroup G) ≤ Nat.card ↥SUG := by
+          rw [hSUGcardM, S'.card_eq_multiplicity]
+          exact Nat.pow_le_pow_right (Fact.out : p.Prime).one_lt.le
+            ((Nat.Prime.pow_dvd_iff_le_factorization Fact.out Nat.card_pos.ne').mp
+              (S'.card_eq_multiplicity ▸ Subgroup.card_dvd_of_le hS'M))
+        exact hS'nonab ((Subgroup.eq_of_le_of_card_ge hSUGS' hcardle) ▸ hSUGab)
+      -- `A₀ ≠ Ω₁(Z(S'))`.
+      set Z₀' : Subgroup G := OddOrder.BG.Ch3.S10.omega1CenterInG (S' : Subgroup G) p with hZ₀'def
+      have hS'_cent_Z₀ : (S' : Subgroup G) ≤ Subgroup.centralizer (Z₀' : Set G) := by
+        intro q hq
+        rw [Subgroup.mem_centralizer_iff]
+        intro z hz
+        rw [SetLike.mem_coe, hZ₀'def, OddOrder.BG.Ch3.S10.omega1CenterInG, Subgroup.mem_map] at hz
+        obtain ⟨z', hz', rfl⟩ := hz
+        have hz'c : z' ∈ Subgroup.center ↥(S' : Subgroup G) := (mem_omega1OfAbelian.mp hz').1
+        exact (congrArg Subtype.val (Subgroup.mem_center_iff.mp hz'c ⟨q, hq⟩)).symm
+      have hA₀_ne_Z₀ : A₀ ≠ Z₀' := by
+        rintro rfl
+        exact hS'_not_le_M (hS'_cent_Z₀.trans hCA₀_le_M)
+      -- Lemma 10.13: `C_{S'}(A) = A₀ ⊔ Z` with `Z` cyclic, `A₀ ⊓ Z = ⊥`.
+      have hpG : p ∈ (Nat.card G).primeFactors :=
+        Nat.mem_primeFactors.mpr ⟨Fact.out,
+          (hA.2 ▸ dvd_pow_self p two_ne_zero).trans (Subgroup.card_subgroup_dvd_card A),
+          Nat.card_pos.ne'⟩
+      obtain ⟨Z, _hZS', hZcyc, _hZ₀Z, hA₀Z, hCdecomp⟩ :=
+        (OddOrder.BG.Ch3.S10.nonabelian_pSubgroup_rankTwo_elemAbelian_structure hG hpG hA hAmax
+          S'.isPGroup' hS'nonab hAS' ⟨hA₀mem, hA₀A⟩ hA₀_ne_Z₀).2.1
+      have hSUGdecomp : SUG = A₀ ⊔ Z := hCeqSUG ▸ hCdecomp
+      have hZSUG : Z ≤ SUG := hSUGdecomp ▸ le_sup_right
+      refine ⟨Z, hZSUG.trans hSUG_U, hSUGpg.to_le hZSUG, ?_, ?_⟩
+      · -- exponent: `ν_p(exp U) ≤ ν_p(exp SUG) ≤ ν_p(exp Z)` (`exp SUG ∣ exp Z`,
+        -- since `SUG = A₀ ⊔ Z` with `|A₀| = p ∣ exp Z`).
+        have hSUGsubU_card : Nat.card ↥(SUG.subgroupOf U) = p ^ (Nat.card ↥U).factorization p := by
+          rw [show SUG.subgroupOf U = (SU : Subgroup ↥U) from by
+            rw [hSUGdef, Subgroup.subgroupOf,
+              Subgroup.comap_map_eq_self_of_injective U.subtype_injective], SU.card_eq_multiplicity]
+        refine le_trans (factorization_exponent_le_of_sylow hSUG_U hSUGsubU_card) ?_
+        haveI := hSUGab
+        obtain ⟨k, hk⟩ := (IsPGroup.iff_card).mp (hSUGpg.to_le hZSUG)
+        have hA₀NZ : A₀ ≤ Subgroup.normalizer (Z : Set G) :=
+          (le_centralizer_of_le_of_le hSUGab (hA₀A.trans hASUG) hZSUG).trans
+            (Subgroup.centralizer_le_normalizer _)
+        have hcardSUG : Nat.card ↥SUG = p ^ (k + 1) := by
+          rw [hSUGdecomp, card_sup_eq_mul_of_le_normalizer_of_disjoint hA₀NZ hA₀Z, hA₀card, hk,
+            ← pow_succ']
+        -- `SUG` is not cyclic (it contains the rank-2 elementary abelian `A`), so `exp SUG < |SUG|`.
+        have hSUGnotcyc : ¬ IsCyclic ↥SUG := by
+          intro hcyc
+          haveI := hcyc
+          have hAcyc : IsCyclic ↥A :=
+            isCyclic_of_surjective (Subgroup.subgroupOfEquivOfLe hASUG).toMonoidHom
+              (Subgroup.subgroupOfEquivOfLe hASUG).surjective
+          have hdvdp : Monoid.exponent ↥A ∣ p :=
+            Monoid.exponent_dvd_iff_forall_pow_eq_one.mpr (fun x => hA.1.2 x)
+          rw [hAcyc.exponent_eq_card, hA.2] at hdvdp
+          exact absurd (Nat.le_of_dvd (Fact.out : p.Prime).pos hdvdp)
+            (by nlinarith [(Fact.out : p.Prime).two_le])
+        have hexpSUGne : Monoid.exponent ↥SUG ≠ Nat.card ↥SUG :=
+          fun heq => hSUGnotcyc (IsCyclic.of_exponent_eq_card heq)
+        obtain ⟨m, hm_le, hm⟩ := (Nat.dvd_prime_pow (Fact.out : p.Prime)).mp
+          (hcardSUG ▸ Group.exponent_dvd_nat_card)
+        have hmk : m ≤ k := by
+          by_contra hc
+          push_neg at hc
+          exact hexpSUGne (by rw [hm, show m = k + 1 by omega, hcardSUG])
+        have hfp : ∀ n, (p ^ n).factorization p = n := fun n => by
+          rw [Nat.factorization_pow, Finsupp.smul_apply,
+            Nat.Prime.factorization_self (Fact.out : p.Prime), smul_eq_mul, mul_one]
+        rw [hm, hZcyc.exponent_eq_card, hk, hfp, hfp]
+        exact hmk
+      · -- regularity: every prime-order `z ∈ Z` generates a line `⟨z⟩ ≠ A₀` (`A₀ ⊓ Z = ⊥`),
+        -- which clause (c) shows is regular on `M_σ`.
+        refine inf_centralizer_eq_bot_of_forall_prime_order ?_
+        intro z hzZ hzprime
+        have hordz : orderOf z = p := by
+          obtain ⟨j, hj⟩ := (IsPGroup.iff_card).mp (hSUGpg.to_le hZSUG)
+          have hqdvd : orderOf z ∣ p ^ j := by
+            have h := (Subgroup.orderOf_coe (⟨z, hzZ⟩ : ↥Z)) ▸ orderOf_dvd_natCard (⟨z, hzZ⟩ : ↥Z)
+            rwa [hj] at h
+          exact (Nat.prime_dvd_prime_iff_eq hzprime Fact.out).mp (hzprime.dvd_of_dvd_pow hqdvd)
+        set X : Subgroup G := Subgroup.zpowers z with hXdef
+        have hXcard : Nat.card ↥X = p := by rw [hXdef, Nat.card_zpowers]; exact hordz
+        have hXmem : X ∈ elemAbelianOfRank G p 1 :=
+          ⟨Subgroup.IsElementaryAbelian.of_card_prime hXcard, by rw [hXcard, pow_one]⟩
+        have hXZ : X ≤ Z := by rw [hXdef, Subgroup.zpowers_le]; exact hzZ
+        have hXE : X ≤ E := (hXZ.trans hZSUG).trans (hSUG_U.trans hUE)
+        have hXneA₀ : X ≠ A₀ := by
+          intro he
+          have hbot : A₀ = ⊥ := le_bot_iff.mp (hA₀Z ▸ le_inf le_rfl (he ▸ hXZ))
+          rw [hbot, Subgroup.card_bot] at hA₀card
+          exact (Fact.out : p.Prime).ne_one hA₀card.symm
+        have hreg := (hcReg X hXmem hXE hXneA₀).1
+        rwa [hXdef, Subgroup.zpowers_eq_closure, Subgroup.centralizer_closure] at hreg
   · -- **τ₁ ∪ τ₃ case** (`r_p(M) = 1`): `Z = Sylow_p(U)` is regular by Lemma 14.1.
     have hr1 : pRank ↥M p = 1 := by
       have hle : pRank ↥M p ≤ 2 := hsetup.pRank_M_le_two hG hpE
@@ -1451,8 +1641,12 @@ theorem typeP_auxiliary_structure_gated [Finite G] (hG : OddOrder.BG.IsMinimalSi
             ↥(U0 ⊔ OddOrder.BG.Ch3.S10.Msigma M)
             ((OddOrder.BG.Ch3.S10.Msigma M).subgroupOf
               (U0 ⊔ OddOrder.BG.Ch3.S10.Msigma M))
-            (U0.subgroupOf (U0 ⊔ OddOrder.BG.Ch3.S10.Msigma M))) := by
-  sorry
+            (U0.subgroupOf (U0 ⊔ OddOrder.BG.Ch3.S10.Msigma M))) :=
+  -- All four conjuncts of BG Lemma 15.1 are now standalone clean lemmas (issue 7007).
+  ⟨fun hKbot => typeP_hall_derived_eq_and_abelian hG hM hKM hUM hKbot hK hU,
+   fun _X hXU hXne hCX => typeP_hall_small_subgroup_cyclic_tau2 hG hM hUM hU hXU hXne hCX,
+   typeP_centralizerGeneratedBySigma_isMulCommutative hG hM hKM hUM hK hU,
+   fun hUne => typeP_hall_frobenius_factor hG hM hKM hUM hK hU hUne⟩
 
 /-- **BG Lemma 15.1** (mmd L4116): auxiliary structure around the `U`-factor of an
 **arbitrary** maximal subgroup `M = KUM_σ`.  The quotient assertion `M'/M_sigma` abelian is
