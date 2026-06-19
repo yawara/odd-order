@@ -1641,8 +1641,12 @@ theorem typeP_auxiliary_structure_gated [Finite G] (hG : OddOrder.BG.IsMinimalSi
             ↥(U0 ⊔ OddOrder.BG.Ch3.S10.Msigma M)
             ((OddOrder.BG.Ch3.S10.Msigma M).subgroupOf
               (U0 ⊔ OddOrder.BG.Ch3.S10.Msigma M))
-            (U0.subgroupOf (U0 ⊔ OddOrder.BG.Ch3.S10.Msigma M))) := by
-  sorry
+            (U0.subgroupOf (U0 ⊔ OddOrder.BG.Ch3.S10.Msigma M))) :=
+  -- All four conjuncts of BG Lemma 15.1 are now standalone clean lemmas (issue 7007).
+  ⟨fun hKbot => typeP_hall_derived_eq_and_abelian hG hM hKM hUM hKbot hK hU,
+   fun _X hXU hXne hCX => typeP_hall_small_subgroup_cyclic_tau2 hG hM hUM hU hXU hXne hCX,
+   typeP_centralizerGeneratedBySigma_isMulCommutative hG hM hKM hUM hK hU,
+   fun hUne => typeP_hall_frobenius_factor hG hM hKM hUM hK hU hUne⟩
 
 /-- **BG Lemma 15.1** (mmd L4116): auxiliary structure around the `U`-factor of an
 **arbitrary** maximal subgroup `M = KUM_σ`.  The quotient assertion `M'/M_sigma` abelian is
