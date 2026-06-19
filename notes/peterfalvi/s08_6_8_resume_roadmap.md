@@ -53,7 +53,7 @@ case-B anchored-image chain が `hyp.coherentYset` 固定 + `hYcard` を貫い�
 dispatcher `nonempty_coherent_S_of_c2_of_branches` の hcaseB が hWMgt edge 分岐 + hXne のみに →
 **S08:59 assembly** (rcases hyp.cases + hcaseA✅ + hcaseB + c1✅ + 薄いラッパ)。case-A は完了済。
 **見積**: rewiring は ~12 theorem の token 置換 + signature 編集 (script 補助可、build-debug 込で 1 session)。
-**FT 文脈不変**: (6.8) は [[ft-path-policy]] で orphaned (deferred-payoff) — 閉じても feitThompson sorry は今減らない。
+**FT 文脈**: (6.8) は honest FT 証明の genuine な上流前提(§13 char data が cite)。進捗は sorry 数でなく実質的証明で測る ([[ft-path-policy]]; CLAUDE.md「進捗の測り方」; "orphaned"/"閉じても sorry 減らない" は使わない)。
 
 ---
 
@@ -177,7 +177,7 @@ case-B は break 既約を「column ∈ X(W₂) ⊆ S₁ ⟹ ψ∉S₁ 矛盾」
 **⚠ cont.²⁶ 初稿〜訂正の「tractable 1-2 session・配線のみ」は楽観。column break は genuine gate。** だが
 architecture (mirror 先・reusable・swap・home) は完全判明ゆえ、選択肢 1 が成れば 1-2 session で着地。
 
-**FT 文脈不変**: (6.8) は [[ft-path-policy]] で orphaned (deferred-payoff) — 閉じても feitThompson sorry は今減らない。
+**FT 文脈**: (6.8) は honest FT 証明の genuine な上流前提(§13 char data が cite)。進捗は sorry 数でなく実質的証明で測る ([[ft-path-policy]]; CLAUDE.md「進捗の測り方」; "orphaned"/"閉じても sorry 減らない" は使わない)。
 
 ## 🚩 HANDOFF — (2026-06-19 cont.²⁵)
 
@@ -200,7 +200,7 @@ architecture (mirror 先・reusable・swap・home) は完全判明ゆえ、選�
      hYcard (Yset.ncard≠2、`two_le_Yset_ncard` は ≥2 のみ)/hXne (Xset W₂≠∅、Xset 単調ゆえ Xset ⁅H,H⁆≠∅ から
      導けない) の discharge。
 **∴ S08:59 closure は multi-session (6.8.3) bootstrap。reducible-break チェーン (本セッション主題) とは独立。**
-**FT 文脈不変**: (6.8) は [[ft-path-policy]] で orphaned (deferred-payoff)。
+**FT 文脈**: (6.8) は honest FT 証明の genuine な上流前提。進捗は sorry 数でなく実質的証明で測る (CLAUDE.md「進捗の測り方」; "orphaned"/"閉じても sorry 減らない" は使わない)。
 
 ## 🚩 HANDOFF — (2026-06-19 cont.²⁴)
 
@@ -228,7 +228,7 @@ induction + hbound producer、計 ~17 feature commit、全 sorry-free + axiom-cl
   `nonempty_coherent_S_caseB_of_c2` (`:343`) は hWMgt/hYcard/hXne/hprime/hcen/hcop/hW2comm/hW2H を仮説に取る。
   これらの discharge (`_of_c2_caseB`、handoff cont.¹⁶ で「素材在庫・未実装」) + 案 A 用 case-A producer +
   hyp.cases (Frobenius/CertainType split) からの hcop/hW2comm 抽出が残る。**= (6.8.3) bootstrap + 構造事実**。
-**FT 文脈不変**: (6.8) は [[ft-path-policy]] で orphaned (deferred-payoff) — 閉じても feitThompson sorry は今減らない。
+**FT 文脈**: (6.8) は honest FT 証明の genuine な上流前提(§13 char data が cite)。進捗は sorry 数でなく実質的証明で測る ([[ft-path-policy]]; CLAUDE.md「進捗の測り方」; "orphaned"/"閉じても sorry 減らない" は使わない)。
 
 ## 🚩 HANDOFF — (2026-06-19 cont.²³)
 
@@ -266,7 +266,7 @@ caller `six_two_central_c2` (`:122`、hW2B 渡し) も更新要 (hW2B が centra
 **続けて step 7-11**: six_three_c2 (induction、hW2B 不要版) → isPGroup_of_not_coherent_c2 →
 hbound → nonempty_coherent_S_of_c2_of_branches → dispatch S08:59。c1 chain
 (`S08_CoherenceCorePart2:3576-3837`) の 3-brick swap ミラーが基本パターン。
-**FT 文脈不変**: (6.8) は [[ft-path-policy]] で orphaned (deferred-payoff) — 閉じても feitThompson sorry は今減らない。
+**FT 文脈**: (6.8) は honest FT 証明の genuine な上流前提(§13 char data が cite)。進捗は sorry 数でなく実質的証明で測る ([[ft-path-policy]]; CLAUDE.md「進捗の測り方」; "orphaned"/"閉じても sorry 減らない" は使わない)。
 
 ## 🚩 HANDOFF — (2026-06-19 cont.²⁰)
 
@@ -314,7 +314,7 @@ column の break Da = `certainTypeDecompositionDa`/`certainTypeR` (`S06_CertainT
 ℤ-線形維持 (lattice 上 ⟨φ,χ⟩=m·k で係数整数)。isometry の項照合は Gram 一致 ⟨X,X⟩=⟨χ,χ⟩ で成立
 (scaling 両辺同一ゆえ k-real 不要)。**S07_RetargetScaled は `open IntegralCharacterMap` +
 `open CharacterPsiDecomposition` 要**。
-**FT 文脈不変**: (6.8) は [[ft-path-policy]] で orphaned (deferred-payoff) — 閉じても feitThompson sorry は今減らない。
+**FT 文脈**: (6.8) は honest FT 証明の genuine な上流前提(§13 char data が cite)。進捗は sorry 数でなく実質的証明で測る ([[ft-path-policy]]; CLAUDE.md「進捗の測り方」; "orphaned"/"閉じても sorry 減らない" は使わない)。
 
 ## ✅✅🎯 2026-06-19 cont.¹⁹ — reducible-break (5.6.3) coherence 拡張 `retarget_isCoherent_S` 完成
 
@@ -353,7 +353,7 @@ k-general)。X=D.X, X̄=D.X−τ(χ−χ.conj) の Gram 一致 ⟨X,X⟩=⟨χ,�
    組む (forward 構成) → 対偶 bound。column の Da は `certainTypeDecompositionDa`/`certainTypeR`。
 3. **`six_two_index_bound_c2` の `hW2B` 撤廃** → `six_three_c2`(induction、hW2B 不要)→
    `isPGroup_of_not_coherent_c2` → `hbound` → dispatch → S08:59。
-**FT 文脈不変**: (6.8) は orphaned (deferred-payoff)。
+**FT 文脈**: (6.8) は honest FT 証明の genuine な上流前提。進捗は sorry 数でなく実質的証明で測る (CLAUDE.md「進捗の測り方」; "orphaned"/"閉じても sorry 減らない" は使わない)。
 
 ## 🔨🎯 2026-06-19 cont.¹⁸ — c2 chain 3 段 landed (既約-break path) + Step-0 residual を構築で確定
 
@@ -399,7 +399,7 @@ basis-direct 新規構成が要る**:
   のみ adjoin** する設計。reducible を **break として adjoin** する道は repo に無い (= この新規構成が埋める穴)。
 **∴ 見積 = fresh basis-direct (5.6.3) 構成 (~2-3 session、retarget 一般化でない)**。次 session の一手 =
 basis-direct extension-isometry の構成方針確定 (mathlib basis API 調査) → (5.6.3) 構成。
-**FT 文脈不変**: (6.8) は orphaned (deferred-payoff)。
+**FT 文脈**: (6.8) は honest FT 証明の genuine な上流前提。進捗は sorry 数でなく実質的証明で測る (CLAUDE.md「進捗の測り方」; "orphaned"/"閉じても sorry 減らない" は使わない)。
 
 ## 🔄🎯 2026-06-19 cont.¹⁷ — 5-agent workflow が cont.¹⁶「大型 engine 一般化」を覆す + c2 chain が本筋
 
@@ -442,7 +442,7 @@ S の reducible は w₂−1 column のみ。break は S(B)\S₁ (S(A)⊆S₁)�
 1. **c2 chain assembly を開始** (regime に関わらず必要): `six_two_index_bound_c2` を新 leaf に、break 既約性を
    `columnSum_notMem_SsubFiltration_of_le` (B⊇W₂) で discharge or named obligation 化 → 上へミラー。
 2. **Step 0 の B⊊W₂ residual** を induction 構造で判定 (純 assembly か retarget-to-k か確定)。
-**FT 文脈不変**: (6.8) は [[ft-path-policy]] で orphaned (deferred-payoff)。
+**FT 文脈**: (6.8) は honest FT 証明の genuine な上流前提。進捗は sorry 数でなく実質的証明で測る (CLAUDE.md「進捗の測り方」; "orphaned"/"閉じても sorry 減らない" は使わない)。
 
 ## ✅🎯 2026-06-19 cont.¹⁶ — 原文精読で cont.¹⁵ 検証確定 + hcaseB 構造データ discharge + hbound 真の crux 特定
 
@@ -508,7 +508,7 @@ dispatch の `hcaseB` producer を整備。`nonempty_coherent_S_caseB_of_c2_data
 2. **hcaseA** (case-A producer): `Xset_centralCommutator_isCoherent_of_c2_caseA` → S bootstrap (未構築)。
 3. **dispatch 配線** (S08:59): hbound+hcaseA+`nonempty_coherent_S_caseB_of_c2`+`caseAB_split_of_c2` を
    `nonempty_coherent_S_of_c2_of_branches` 経由で c2 枝に。c1 枝は `nonempty_coherent_S_of_frobenius` 既存。
-**FT 文脈不変**: (6.8) は [[ft-path-policy]] で orphaned (deferred-payoff) — 閉じても feitThompson sorry は今は減らない。
+**FT 文脈**: (6.8) は honest FT 証明の genuine な上流前提。進捗は sorry 数でなく実質的証明で測る (CLAUDE.md「進捗の測り方」; "orphaned"/"閉じても sorry 減らない" は使わない)。
 
 ## ⚠️✅ 2026-06-19 cont.¹⁵ — cont.¹⁴「c2 研究レベル」誤診断を訂正 + hfix (6.4.c) landing
 
@@ -587,7 +587,7 @@ case-B structure data discharge (hcen/hderiv/hc2/hFPF/hcZ/hfpf/hW2cenL/hYcard) �
 5. **case-A (c2) 枝** = `Xset_centralCommutator_isCoherent_of_c2_caseA` + S への bootstrap。
 
 **⟹ S08:59 を閉じる残務は case-B seed work でなく overarching dispatch + 未形式化の (6.5) 還元。**
-**FT 文脈不変**: (6.8) は [[ft-path-policy]] で orphaned (deferred-payoff) — 閉じても feitThompson sorry は今は減らない。
+**FT 文脈**: (6.8) は honest FT 証明の genuine な上流前提。進捗は sorry 数でなく実質的証明で測る (CLAUDE.md「進捗の測り方」; "orphaned"/"閉じても sorry 減らない" は使わない)。
 
 ## 🔨 2026-06-18 cont.¹⁴ — (6.5) p-群還元に着手 (ユーザー裁可): (6.5)(b) 適用 DONE、残ゲート = (6.3)+(6.4.c)
 

@@ -13,11 +13,20 @@
 ## 0. 方針（TL;DR）
 
 1. **作業は FT critical path 上に限定する。** off-path（= 3 冊完全形式化スコープのうち
-   FT に寄与しない部分）は FT が閉じるまで凍結。新規着手しない。
+   honest な FT 証明が推移的に必要としない部分）は FT が閉じるまで凍結。新規着手しない。
 2. **FT 経路上の Peterfalvi character-API signature は先行して pin する。**
    §10–16 spine が opaque field を「§3–§9 の faithful signature への cite」に置換できる状態を作る
    → downstream は stable interface を cite、upstream（B）は独立に proof を埋める → **並列化が効く**。
-3. judge 基準は `sorry` 数でなく **carrier 材料化**（[[scaffold-sorry-free-not-done]]）。
+3. **目的 = FT への実質的証明の積み上げ。短期的な `sorry` 削減は目的でも指標でもない**
+   (CLAUDE.md「進捗の測り方」が正本)。judge 基準は `sorry` 数でなく
+   **opaque carrier / posited data を実際に構成したか・free field を実証明に置換したか**
+   （[[scaffold-sorry-free-not-done]]）。
+   - ⚠ **逆向きの誤りに注意**: 「上の carrier が free field で bypass しているから、この前提を
+     閉じても `feitThompson` の sorry は今は減らない」を deprioritize / hedge の理由にしない。
+     それは scaffold の枚数を測っているだけで、その仕事が本物の必要な数学かは別。
+     **"FT-orphaned"・"閉じても sorry 減らない" の言い回しは使わない**（自家製ジャーゴン、誤読を招く）。
+     honest architecture の genuine prerequisite なら、今 consumer 0 でも淡々と完遂する
+     （[[feedback-orphaned-not-reason-to-defer]]）。
 
 ---
 
@@ -72,9 +81,11 @@ Isaacs✅ ─ BG AppA/B✅ ─ BG §1-16 ─┐
 
 ## 3. on-path / off-path 分類 + 判定原則
 
-**判定原則**: 「`sectionSixteenHypothesis_of_isMinimalSimpleOdd` の honest 構成が推移的に必要とするか」
-= 具体的には「**Pf §10–16 spine が consume するか**（直接 or §3–§9 char API 経由）」。
-consume しなければ off-path。
+**判定原則**: 「`sectionSixteenHypothesis_of_isMinimalSimpleOdd` の **honest** な構成が推移的に必要とするか」。
+これは **math architecture 上の判断**であって、現在の import / consume 状況ではない。
+今 §10–16 spine が opaque field で bypass していて未 cite でも、honest 証明がいずれ必要とするなら **on-path**
+（= deferred-payoff な genuine prerequisite。今 consumer 0 でも本物の仕事）。honest 証明が必要としないものだけが off-path。
+**「今 consume / import されていない」を off-path の根拠にしない**（[[scaffold-sorry-free-not-done]] の逆向きの誤り）。
 
 ### ✅ ON-PATH（ここを作業）
 | 区分 | 範囲 | 担当 |
@@ -83,10 +94,12 @@ consume しなければ off-path。
 | Track C | Pf §3–§9 character API の **§10–16 が consume する slice のみ**（§4 の surface） | B |
 | 合流 | Pf §10–16 spine（opaque→cite 置換 + 実証明） | B / §10–16 owner |
 
-### ❄ OFF-PATH（FT が閉じるまで凍結 — 新規着手しない）
+### ❄ OFF-PATH（honest な FT 証明が必要としない — FT が閉じるまで凍結、新規着手しない）
 - **Pf Appendices**（`FeitSibley`/`Huppert`/`NearFields`/`SemilinearField`/`Suzuki`/`Suzuki2Groups`）
-  — §10–16 から **未 import**（AxiomsCheck guard のみ）= orphaned 確定。
-- **Pf §5/§6 の full-scope completeness** — §10–16 が consume しない部分
+  — honest な odd-order 矛盾が推移的に必要としない見込み。⚠ 「§10–16 から未 import / AxiomsCheck guard のみ」は
+  off-path の**ヒント**であって基準ではない（未 import = off-path とは限らない）。各 appendix が honest spine に
+  本当に不要かは math で再確認してから凍結を当てにする。
+- **Pf §5/§6 の full-scope completeness** — honest な §10–16 spine が必要としない部分
   （例: §6 certain-type のうち §4 の μ/η/ν constructor + coherence producer **以外**、
   (3.8) trichotomy の §10–16 非依存部分、(7.10) 等）。
 - Isaacs / BG の FT route 外の網羅、3 冊完全形式化の残り。
