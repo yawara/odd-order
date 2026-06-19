@@ -4099,6 +4099,150 @@ theorem isNilpotent_of_centralizes_normal_of_quotient_isNilpotent {Q K H : Subgr
   rw [Subgroup.coe_mul, Subgroup.coe_mul]
   exact (Subgroup.mem_centralizer_iff.mp (hHQ y.2) _ hx).symm
 
+/-- **`κ(M)`-subgroup pushed into the `κ`-Hall complement `K`** (§14 Prop 14.2 Hall machinery):
+in a maximal subgroup `M` (solvable, BG `IsMinimalSimpleOdd`) with a `κ(M)`-Hall subgroup `K ≤ M`,
+any `κ(M)`-subgroup `X ≤ M` is `M`-conjugate into `K`: some `w ∈ M` has `w X w⁻¹ ≤ K`.
+
+Mirrors `exists_conj_smul_le_hallPiece` (which targets the `E`-setup Hall pieces) but targets the
+ambient `κ`-Hall `K` directly: `aInvariant_piSubgroup_le_aInvariant_hall` (trivial `Unit`-action)
+embeds `X` in some `κ`-Hall subgroup `H` of `↥M`, and `exists_conj_eq_of_isHall_subgroupOf`
+conjugates `H` to `K` (both `κ`-Hall of the solvable `M`). -/
+theorem exists_conj_smul_le_isHall_kappa [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M K : Subgroup G} (hM : M ∈ maximalSubgroups G)
+    (hKM : K ≤ M) (hK : Ch03.IsHallSubgroup (S14.kappa M) (K.subgroupOf M))
+    {X : Subgroup G} (hXM : X ≤ M)
+    (hXpi : Ch03.Subgroup.IsPiGroup (S14.kappa M) (X.subgroupOf M)) :
+    ∃ w ∈ M, MulAut.conj w • X ≤ K := by
+  classical
+  haveI : IsSolvable ↥M := hG.solvable_of_mem_maximalSubgroups hM
+  -- Embed `X.subgroupOf M` in a `κ`-Hall subgroup `H` of `↥M` (trivial `Unit`-action).
+  obtain ⟨H, hH_hall, -, hX_le_H⟩ :=
+    OddOrder.BG.Ch1.S01.aInvariant_piSubgroup_le_aInvariant_hall
+      (A := Unit) (φ := (1 : Unit →* MulAut ↥M))
+      (by rw [Nat.card_unique]; exact Nat.coprime_one_left _)
+      hXpi (fun _ => one_smul _ _)
+  set HG : Subgroup G := H.map M.subtype with hHGdef
+  have hHG_le_M : HG ≤ M := Subgroup.map_subtype_le _
+  have hHG_hall : Ch03.IsHallSubgroup (S14.kappa M) (HG.subgroupOf M) := by
+    rwa [hHGdef, Subgroup.subgroupOf,
+      Subgroup.comap_map_eq_self_of_injective M.subtype_injective]
+  -- Conjugate `HG` to `K` (both `κ`-Hall of the solvable `M`).
+  obtain ⟨w, hwM, hw⟩ :=
+    OddOrder.BG.Ch1.S06.exists_conj_eq_of_isHall_subgroupOf inferInstance hHG_le_M hKM
+      hHG_hall hK
+  have hXHG : X ≤ HG := by
+    intro x hx
+    rw [hHGdef]
+    exact Subgroup.mem_map.mpr ⟨⟨x, hXM hx⟩, hX_le_H (Subgroup.mem_subgroupOf.mpr hx), rfl⟩
+  exact ⟨w, hwM, (conj_smul_mono (MulAut.conj w) hXHG).trans hw.le⟩
+
+/-- **`C_M(Q) ⊆ M_σ` from the prime-manner action** (BG Theorem 15.2, mmd L4196-4198): for a
+type-`P₁` maximal subgroup `M = M_σ ⋊ K` with `K` acting in a prime manner on `M_σ`
+(BG Prop 14.2(a)), the centralizer `C_M(Q)` of the normal `q`-subgroup `Q ⊴ M` (with `Q ≤ M_σ`,
+`K* = C_{M_σ}(K) ⊊ Q`) lies in `M_σ`.
+
+This *corrects an earlier misdiagnosis* (the `M = (C₇⋊C₃)×(C₃₁⋊C₅)` "counterexample" violates the
+prime-manner action: there a `κ`-element centralizes all of `M_σ`, so `C_{M_σ}(x) ≠ K*`).  In the
+genuine type-`P₁` setting the prime-manner action makes `C_M(Q) ⊆ M_σ` derivable.
+
+Proof: it suffices to show `C := C_M(Q)` is a `σ(M)`-group (then
+`sigma_subgroup_le_Msigma_of_isHall` gives `C ⊆ M_σ`).  Suppose a prime `r ∣ |C|` with
+`r ∉ σ(M)`.  As `M` is type-`P₁`,
+`κ(M) = π(M) ∖ σ(M)`, so `r ∈ κ(M)`; Cauchy gives a `κ`-element `c ∈ C` of order `r`.  By the Hall
+machinery (`exists_conj_smul_le_isHall_kappa`) some `w ∈ M` conjugates `⟨c⟩` into `K`: `cʷ ∈ K`,
+`cʷ ≠ 1`.  Since `Q ⊴ M` (`M ≤ N_G(Q)`) and `c` centralizes `Q`, `cʷ` centralizes `Qʷ = Q`, so
+`Q ≤ C_{M_σ}(cʷ) = K*` (prime manner).  With `K* ≤ Q` this forces `Q = K*`, against `K* ≠ Q`.
+Hence no such `r`, i.e. `C` is a `σ`-group. -/
+theorem centralizer_le_Msigma_of_primeManner [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M K Q Kstar : Subgroup G}
+    (hM : M ∈ maximalSubgroups G) (hP1 : S14.IsTypeP1 M)
+    (hKM : K ≤ M) (hK : Ch03.IsHallSubgroup (S14.kappa M) (K.subgroupOf M))
+    (hprime : ∀ x ∈ K, x ≠ 1 →
+      Subgroup.centralizer ({x} : Set G) ⊓ OddOrder.BG.Ch3.S10.Msigma M = Kstar)
+    (hQMσ : Q ≤ OddOrder.BG.Ch3.S10.Msigma M)
+    (hMnormQ : M ≤ Subgroup.normalizer (Q : Set G))
+    (hKstarQ : Kstar ≤ Q) (hKstarneQ : Kstar ≠ Q) :
+    Subgroup.centralizer (Q : Set G) ⊓ M ≤ OddOrder.BG.Ch3.S10.Msigma M := by
+  classical
+  set C : Subgroup G := Subgroup.centralizer (Q : Set G) ⊓ M with hCdef
+  -- It suffices to show `C` is a `σ(M)`-group.
+  refine OddOrder.BG.Ch3.S10.sigma_subgroup_le_Msigma_of_isHall
+    (OddOrder.BG.Ch3.S10.Msigma_isHall hG hM) inf_le_right ?_
+  -- `C` is a `σ(M)`-group: every prime `r ∣ |C|` lies in `σ(M)`.
+  intro r hr
+  by_contra hrσ
+  have hr_prime : r.Prime := (Nat.mem_primeFactors.mp hr).1
+  haveI : Fact r.Prime := ⟨hr_prime⟩
+  -- `r ∈ π(M)` (since `r ∣ |C|` and `C ≤ M`), and `r ∉ σ(M)`, so `r ∈ κ(M)` (type-`P₁`).
+  have hrπ : r ∈ S14.piSet M := by
+    refine Nat.mem_primeFactors.mpr ⟨hr_prime, ?_, Nat.card_pos.ne'⟩
+    exact (Nat.mem_primeFactors.mp hr).2.1.trans (Subgroup.card_dvd_of_le inf_le_right)
+  have hrκ : r ∈ S14.kappa M := by
+    rw [hP1.2]; exact ⟨hrπ, hrσ⟩
+  -- A `κ`-element `c ∈ C` of order `r` (Cauchy in `↥C`).
+  obtain ⟨c, hc_ord⟩ := exists_prime_orderOf_dvd_card' (G := ↥C) r
+    ((Nat.mem_primeFactors.mp hr).2.1)
+  have hc_ne : (c : G) ≠ 1 := by
+    intro hc1
+    have h1 : orderOf c = 1 := by
+      rw [show c = 1 from Subtype.ext hc1]; exact orderOf_one
+    rw [hc_ord] at h1; exact hr_prime.ne_one h1
+  -- `X := ⟨c⟩ ≤ M` is a `κ(M)`-group.
+  have hcC : (c : G) ∈ C := c.2
+  have hcC' : (c : G) ∈ Subgroup.centralizer (Q : Set G) ⊓ M := hCdef ▸ hcC
+  have hcM : (c : G) ∈ M := (Subgroup.mem_inf.mp hcC').2
+  set X : Subgroup G := Subgroup.zpowers (c : G) with hXdef
+  have hXM : X ≤ M := by rw [hXdef]; exact Subgroup.zpowers_le.mpr hcM
+  have hord_coe : orderOf (c : G) = r := by rw [Subgroup.orderOf_coe, hc_ord]
+  have hXpi : Ch03.Subgroup.IsPiGroup (S14.kappa M) (X.subgroupOf M) := by
+    intro s hs
+    -- `|X.subgroupOf M| = |X| = orderOf c = r`, so its only prime factor is `r ∈ κ(M)`.
+    have hcard : Nat.card ↥(X.subgroupOf M) = r := by
+      rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hXM).toEquiv, hXdef,
+        Nat.card_zpowers, hord_coe]
+    rw [hcard, hr_prime.primeFactors, Finset.mem_singleton] at hs
+    rw [hs]; exact hrκ
+  -- Conjugate `X` into `K`: `cʷ ∈ K`, `cʷ ≠ 1`.
+  obtain ⟨w, hwM, hwle⟩ := exists_conj_smul_le_isHall_kappa hG hM hKM hK hXM hXpi
+  set cw : G := w * (c : G) * w⁻¹ with hcwdef
+  have hcw_mem_smul : cw ∈ MulAut.conj w • X := by
+    rw [Subgroup.mem_pointwise_smul_iff_inv_smul_mem, MulAut.smul_def, MulAut.conj_inv_apply,
+      hcwdef]
+    rw [hXdef, show w⁻¹ * (w * (c : G) * w⁻¹) * w = (c : G) by group]
+    exact Subgroup.mem_zpowers _
+  have hcwK : cw ∈ K := hwle hcw_mem_smul
+  have hcw_ne : cw ≠ 1 := by
+    intro h
+    apply hc_ne
+    have hconj : w⁻¹ * cw * w = (c : G) := by rw [hcwdef]; group
+    rw [h, mul_one, inv_mul_cancel] at hconj
+    exact hconj.symm
+  -- `Q ≤ C_{M_σ}(cʷ) = K*`: `cʷ` centralizes `Qʷ = Q`, and `Q ≤ M_σ`.
+  have hc_cent : (c : G) ∈ Subgroup.centralizer (Q : Set G) := (Subgroup.mem_inf.mp hcC').1
+  have hQcent : Q ≤ Subgroup.centralizer ({cw} : Set G) := by
+    intro y hy
+    rw [Subgroup.mem_centralizer_iff]
+    rintro g hg
+    rw [Set.mem_singleton_iff] at hg; subst hg
+    -- `w⁻¹ y w ∈ Q` (`Q ⊴ M`, `w ∈ M`), and `c` centralizes it.
+    have hwinvN : w⁻¹ ∈ Subgroup.normalizer (Q : Set G) := hMnormQ (M.inv_mem hwM)
+    have hwinvyw : w⁻¹ * y * w ∈ Q := by
+      have hmem : w⁻¹ * y * (w⁻¹)⁻¹ ∈ Q :=
+        (Subgroup.mem_normalizer_iff.mp hwinvN y).mp hy
+      rwa [inv_inv] at hmem
+    have hcyc : (w⁻¹ * y * w) * (c : G) = (c : G) * (w⁻¹ * y * w) :=
+      Subgroup.mem_centralizer_iff.mp hc_cent (w⁻¹ * y * w) hwinvyw
+    -- Translate back: `cw * y = y * cw`.
+    rw [hcwdef]
+    calc w * (c : G) * w⁻¹ * y
+        = w * ((c : G) * (w⁻¹ * y * w)) * w⁻¹ := by group
+      _ = w * ((w⁻¹ * y * w) * (c : G)) * w⁻¹ := by rw [hcyc]
+      _ = y * (w * (c : G) * w⁻¹) := by group
+  have hQKstar : Q ≤ Kstar := by
+    rw [← hprime cw hcwK hcw_ne]
+    exact le_inf hQcent hQMσ
+  exact hKstarneQ (le_antisymm hKstarQ hQKstar)
+
 /-- **Theorem 15.2(g) reverse inclusion, reduced to `C_M(Q) ⊆ M_σ`** (mmd L4196-4198): if the
 centralizer `C_M(Q)` of the normal `q`-subgroup `Q` lies in `M_σ` (the genuinely BG-specific input,
 from `σ`-uniqueness — it does *not* follow from local structure, cf. the ChatGPT-verified counter-
