@@ -62,7 +62,6 @@ structure LHypothesis (hyp : Hypothesis (G := G)) where
   betaT_formula_holds : betaT_formula
   betaL_formula : Prop
   betaL_formula_holds : betaL_formula
-  L_semidirect_formula : G → Prop
   typeI_data : OddOrder.Peterfalvi.S15.TypeIOverNormalizerData hyp.base
   typeI_data_L_eq : typeI_data.L = L
   typeI_data_H_eq : typeI_data.H = H
@@ -136,11 +135,16 @@ theorem caseB_for_T [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
         hyp.base.v = (hyp.base.q ^ hyp.base.p - 1) / (hyp.base.q - 1) := by
   sorry
 
-/-- **Peterfalvi (14.5)**: after conjugating `W_2` by some element of `Q`,
-`L` splits as `H semidirect (W_1 W_2^y)`. -/
+/-- **Peterfalvi (14.5)**: there is an element `y ∈ Q` such that `L = H ⋊ (W₁ W₂^y)`.
+The downstream-relevant content of the split is that the conjugate `W₂^y` lands in the
+Frobenius complement of `L` (the complement `W₁W₂^y`); this is the concrete form consumed by
+`u_modEq_one_mod_p_of_LHypothesis` (the (14.7) fixed-point-free value argument) and, through it,
+the part-(14.2.b) normalizer input `W₂^y ≤ N_G(U)`.  Its proof rules out the alternative
+`L = H ⋊ W₁` of (13.17.c) via (13.19.c1)/(13.2.a). -/
 theorem exists_y_L_structure [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
     (hyp : Hypothesis (G := G)) (Ldata : LHypothesis hyp) :
-    ∃ y : G, y ∈ hyp.base.Q ∧ Ldata.L_semidirect_formula y := by
+    ∃ y ∈ hyp.base.Q, (MulAut.conj y • hyp.base.W2 : Subgroup G) ≤
+      Ldata.typeI_data.frobenius.complement.map (Ldata.typeI_data.L).subtype := by
   sorry
 
 /-- Carrier for the case-(9.7.b) conclusion applied to `S` in Peterfalvi
@@ -946,29 +950,11 @@ theorem field_normalizer_of_U_characteristic_of_inputs [Finite G]
     (mu_range_eq_normOneUnits hu_full μ hμinj) (conj_mem_P hyp) hcompat hW2
     (P_inf_U_eq_bot hG hyp) hcyc hQ_elemAb hW2_norm_Q yQ hyQ_mem hW2_conj_y
 
-/-- **Peterfalvi (14.7)**: if `U` is characteristic in `H`, then the final
-field-normalizer configuration (14.2) holds.
-
-The whole assembly is now realized, `sorry`-free, by `field_normalizer_of_U_characteristic_of_inputs`
-above (field model `exists_pu_field_repr_W2` + prime-line rescaling `field_repr_rescale_to_W2`
-+ σ-bridge `fieldNormalizerData_of_repr`).  Closing *this* `sorry` reduces to *producing* that
-engine's explicit hypotheses from `Ldata`/`hchar`:
-* `hu_full : |U| = (p^q-1)/(p-1)` and the cyclotomic coprimality — the (14.7) value argument
-  (the case `p ≡ 1 (mod q)` is killed by `W₂^y` acting fixed-point-freely on `U`);
-* `IsCyclic ↥U` — the §13 standing structure;
-* `W₂ ≤ P` — §13-structural (forced: `hW2`'s kernel transport has range `P`);
-* part (14.2)(b) — `Q` elementary abelian, `W₂ ≤ N_G(Q)`, and `y ∈ Q` with `W₂^y ≤ N_G(U)`,
-  from (13.2.b)/(14.5).
-Each is a §13/§14 character-theory obligation (Lane B / the §14 counting), independent of the
-ungated field algebra above. -/
-theorem field_normalizer_of_U_characteristic [Finite G]
-    (_hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
-    (Ldata : LHypothesis hyp)
-    (hchar : (hyp.base.U.subgroupOf Ldata.H).Characteristic) :
-    Nonempty (FieldNormalizerData hyp) := by
-  -- `field_normalizer_of_U_characteristic_of_inputs` applied to the §13/§14-gated facts:
-  -- `hu_full`, `IsCyclic ↥U`, `W₂ ≤ P`, the cyclotomic coprimality, and part (14.2)(b).
-  sorry
+/-! **Peterfalvi (14.7)** (`field_normalizer_of_U_characteristic`) is assembled **after** the
+(14.5)/(13.17) fixed-point-free bridge `u_modEq_one_mod_p_of_LHypothesis` below: it consumes that
+bridge (for `u ≡ 1 mod p`), the value-argument engine `field_normalizer_of_U_characteristic_of_fpf`,
+and the part-(14.2.b) normalizer lemma `W2conj_le_normalizer_U_of_LHypothesis`.  See it just before
+`field_normalizer_of_L_conj_M`. -/
 
 /-! ## (14.8)--(14.9): the key inequality and `T` is type II -/
 
@@ -2052,6 +2038,34 @@ theorem isFrobeniusGroup_conj_ne_of_mem_map_complement
     show ((a' : G)) = a from ha'_eq]
   exact hcontra
 
+/-- **Part (14.2.b) normalizer conclusion `W₂^y ≤ N_G(U)`, from the structural carrier.**
+The (14.5) complement membership of `W₂^y` already forces `W₂^y ≤ N_G(U)`: each element of `W₂^y`
+lies in `L`, normalizes the Fitting kernel `H ◁ L` (`maxNilpotentNormalHall_le_normalizer`), and
+`U` is characteristic in `H`, so it normalizes `U`
+(`mem_normalizer_map_subtype_of_characteristic`).  Shared by the (14.7) value argument and the
+final field-normalizer assembly. -/
+theorem W2conj_le_normalizer_U_of_LHypothesis
+    {hyp : Hypothesis (G := G)} (Ldata : LHypothesis hyp)
+    (hchar : (hyp.base.U.subgroupOf Ldata.H).Characteristic)
+    {y : G}
+    (hW2y_compl : (MulAut.conj y • hyp.base.W2 : Subgroup G) ≤
+      Ldata.typeI_data.frobenius.complement.map (Ldata.typeI_data.L).subtype) :
+    (MulAut.conj y • hyp.base.W2 : Subgroup G) ≤
+      Subgroup.normalizer (hyp.base.U : Set G) := by
+  haveI : (hyp.base.U.subgroupOf Ldata.H).Characteristic := hchar
+  have hU_le_H : hyp.base.U ≤ Ldata.H := by
+    rw [← Ldata.typeI_data_H_eq]; exact Ldata.typeI_data.U_le_H
+  intro a ha
+  have ha_L : a ∈ Ldata.L := by
+    obtain ⟨a', -, ha'eq⟩ := Subgroup.mem_map.mp (hW2y_compl ha)
+    rw [← Ldata.typeI_data_L_eq, ← ha'eq]; exact a'.2
+  have ha_normH : a ∈ Subgroup.normalizer (Ldata.H : Set G) := by
+    have hLnorm := OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_le_normalizer Ldata.L ha_L
+    rwa [← Ldata.H_eq_LF] at hLnorm
+  have hmem := OddOrder.BG.Ch1.S03f.mem_normalizer_map_subtype_of_characteristic
+    (W := Ldata.H) (C := hyp.base.U.subgroupOf Ldata.H) ha_normH
+  rwa [Subgroup.map_subgroupOf_eq_of_le hU_le_H] at hmem
+
 /-- **Peterfalvi (14.7) value-argument input, assembled from (14.3)/(13.17)/(14.5).**
 With the type-I-over-`N_G(U)` carrier `Ldata` — so `L ⊇ N_G(U)` is a Frobenius group (13.17.a)
 with kernel `H ⊇ U` (13.17.b) — and `U` characteristic in `H` (the standing hypothesis of
@@ -2069,7 +2083,6 @@ theorem u_modEq_one_mod_p_of_LHypothesis [Finite G]
     (hW2y_compl : (MulAut.conj y • hyp.base.W2 : Subgroup G) ≤
       Ldata.typeI_data.frobenius.complement.map (Ldata.typeI_data.L).subtype) :
     hyp.base.u ≡ 1 [MOD hyp.base.p] := by
-  haveI : (hyp.base.U.subgroupOf Ldata.H).Characteristic := hchar
   -- `U ≤ H` (13.17.b)
   have hU_le_H : hyp.base.U ≤ Ldata.H := by
     rw [← Ldata.typeI_data_H_eq]; exact Ldata.typeI_data.U_le_H
@@ -2078,19 +2091,8 @@ theorem u_modEq_one_mod_p_of_LHypothesis [Finite G]
     rw [Ldata.typeI_data.frobenius.typeI.typeF.H_eq, Ldata.typeI_data.H_eq_LF]
   have hH0_eq_H : Ldata.typeI_data.frobenius.typeI.typeF.H = Ldata.H :=
     hH0_eq_typeIH.trans Ldata.typeI_data_H_eq
-  -- `W₂^y ≤ N_G(U)` : each `a` normalizes `H ◁ L`, and `U` is characteristic in `H`
-  have hW2y_norm : (MulAut.conj y • hyp.base.W2 : Subgroup G) ≤
-      Subgroup.normalizer (hyp.base.U : Set G) := by
-    intro a ha
-    have ha_L : a ∈ Ldata.L := by
-      obtain ⟨a', -, ha'eq⟩ := Subgroup.mem_map.mp (hW2y_compl ha)
-      rw [← Ldata.typeI_data_L_eq, ← ha'eq]; exact a'.2
-    have ha_normH : a ∈ Subgroup.normalizer (Ldata.H : Set G) := by
-      have hLnorm := OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_le_normalizer Ldata.L ha_L
-      rwa [← Ldata.H_eq_LF] at hLnorm
-    have hmem := OddOrder.BG.Ch1.S03f.mem_normalizer_map_subtype_of_characteristic
-      (W := Ldata.H) (C := hyp.base.U.subgroupOf Ldata.H) ha_normH
-    rwa [Subgroup.map_subgroupOf_eq_of_le hU_le_H] at hmem
+  -- `W₂^y ≤ N_G(U)` (part (14.2.b)), shared with the final assembly
+  have hW2y_norm := W2conj_le_normalizer_U_of_LHypothesis Ldata hchar hW2y_compl
   -- `W₂^y` acts fixed-point-freely on `U` (Frobenius complement on the kernel)
   have hfpf : ∀ a ∈ (MulAut.conj y • hyp.base.W2 : Subgroup G), a ≠ 1 →
       ∀ u ∈ hyp.base.U, u ≠ 1 → a * u * a⁻¹ ≠ u := by
@@ -2100,6 +2102,32 @@ theorem u_modEq_one_mod_p_of_LHypothesis [Finite G]
       Ldata.typeI_data.frobenius.typeI.typeF.H_le (hW2y_compl ha) ha_ne ?_ hu_ne
     rw [hH0_eq_H]; exact hU_le_H hu
   exact Hypothesis.u_modEq_one_mod_p_of_fpf hG hyp hW2y_norm hfpf
+
+/-- **Peterfalvi (14.7)**: if `U` is characteristic in `H`, then the field-normalizer
+configuration (14.2) holds.  The value argument is assembled entirely from the structural
+carrier: (14.5) `exists_y_L_structure` supplies `y ∈ Q` with `W₂^y` in the Frobenius complement
+of `L`; the bridge `u_modEq_one_mod_p_of_LHypothesis` turns that into `u ≡ 1 mod p`; and
+`W2conj_le_normalizer_U_of_LHypothesis` supplies `W₂^y ≤ N_G(U)`.  These feed the value-argument
+engine `field_normalizer_of_U_characteristic_of_fpf`.  The single remaining `sorry` is exactly the
+bundle of genuinely §13-gated structural facts — `U` cyclic, `W₂ ≤ P`, and part (14.2.b)'s `Q`
+elementary abelian and `W₂ ≤ N_G(Q)` (from (13.2.b) and the §13 basic structure / `c = 1`, Lane B)
+— none of which the ungated field algebra or the (14.5)/(13.17) carrier can supply. -/
+theorem field_normalizer_of_U_characteristic [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
+    (Ldata : LHypothesis hyp)
+    (hchar : (hyp.base.U.subgroupOf Ldata.H).Characteristic) :
+    Nonempty (FieldNormalizerData hyp) := by
+  obtain ⟨y, hyQ, hW2y_compl⟩ := exists_y_L_structure hG hyp Ldata
+  have hmod := u_modEq_one_mod_p_of_LHypothesis hG Ldata hchar hW2y_compl
+  have hW2_conj_y := W2conj_le_normalizer_U_of_LHypothesis Ldata hchar hW2y_compl
+  -- genuinely §13-gated structural facts (basic_structure / c_eq_one / (13.2.b), Lane B)
+  obtain ⟨hcyc_U, hW2_le_P, hQ_elemAb, hW2_norm_Q⟩ :
+      IsCyclic ↥hyp.base.U ∧ hyp.base.W2 ≤ hyp.base.P ∧
+        IsElementaryAbelian hyp.base.q ↥hyp.base.Q ∧
+        hyp.base.W2 ≤ Subgroup.normalizer (hyp.base.Q : Set G) := sorry
+  haveI := hcyc_U
+  exact field_normalizer_of_U_characteristic_of_fpf hG hyp Ldata hmod hW2_le_P
+    hQ_elemAb hW2_norm_Q y hyQ hW2_conj_y
 
 /-- The two alternatives of **Peterfalvi (14.14)**. -/
 structure OrthogonalitySwitchData {hyp : Hypothesis (G := G)}
