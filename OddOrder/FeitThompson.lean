@@ -527,8 +527,9 @@ noncomputable def section16TypePStructure_of_isMinimalSimpleOdd {G : Type*} [Gro
       W_eq := rfl, W_cyclic := mp.Z_cyclic,
       S_nonI := mp.S_nonI, T_nonI := mp.T_nonI, one_typeII := mp.one_typeII,
       W1_le_S := mp.K_le_S, W2_le_T := mp.Kstar_le_T,
-      -- (8.8.b1): the κ-Hall factors complement the derived subgroups (BG §14 `typeP_duality`
-      -- bridge `kappaHall_isComplement_derived`, gap B = identifying `κ(M)`-Hall with `W₁(M)`).
+      -- (8.8.b1): the κ-Hall factors complement the derived subgroups via
+      -- `kappaHall_isComplement_derived` — the BG↔Peterfalvi notation correspondence identifying
+      -- BG's `κ(M)`-Hall with Peterfalvi's `W₁(M)` (BG §14 `typeP_duality`, lane-f).
       S_compl := Peterfalvi.S12.kappaHall_isComplement_derived mp.S_maximal mp.S_typeP mp.K_le_S
         mp.K_hall,
       T_compl := Peterfalvi.S12.kappaHall_isComplement_derived mp.T_maximal mp.T_typeP mp.Kstar_le_T

@@ -403,11 +403,14 @@ structure Theorem88CaseBData (G : Type*) [Group G] where
   S_compl : Subgroup.IsComplement' ((derivedInG S).subgroupOf S) (W1.subgroupOf S)
   T_compl : Subgroup.IsComplement' ((derivedInG T).subgroupOf T) (W2.subgroupOf T)
 
-/-- **gap B (BG §14 ↔ Peterfalvi §8)**: the κ-Hall factor `K` of a type-`P` maximal subgroup
-complements the derived subgroup `M' = [M,M]` in `M` (`M = M' ⋊ K`, mirroring `M = M' ⋊ W₁` of
-(8.4.a)).  This is the BG §14 `typeP_duality` bridge asserted in the docstring of
-`TypePData.card_W1_eq_derived_index` (identifying BG's `κ(M)`-Hall with Peterfalvi's `W₁(M)`); it
-is owned by the BG §14 lane.  Used by the §16 producer to supply `Theorem88CaseBData.S_compl`. -/
+/-- **BG ↔ Peterfalvi notation correspondence** (`κ(M)`-Hall `=` Peterfalvi `W₁(M)`): the κ-Hall
+factor `K` of a type-`P` maximal subgroup complements the derived subgroup `M' = [M,M]` in `M`
+(`M = M' ⋊ K`, mirroring `M = M' ⋊ W₁` of (8.4.a)).  BG and Peterfalvi describe the *same* maximal
+subgroup in different notation; this lemma identifies BG's `κ(M)`-Hall with Peterfalvi's `W₁(M)`
+(the order-sharing asserted in the docstring of `TypePData.card_W1_eq_derived_index`).  It is
+formalization labour provable from the BG §14 type-`P` structure (lane-f's `typeP_duality`
+machinery), not a textbook elision.  Used by the §16 producer to supply
+`Theorem88CaseBData.S_compl`. -/
 theorem kappaHall_isComplement_derived {M K : Subgroup G}
     (_hM : M ∈ maximalSubgroups G) (_hMP : OddOrder.BG.Ch4.S14.IsTypeP M) (_hKle : K ≤ M)
     (_hKhall : OddOrder.Isaacs.Ch03.IsHallSubgroup (OddOrder.BG.Ch4.S14.kappa M)
