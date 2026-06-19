@@ -933,12 +933,67 @@ type I with `U ⊆ L_F`.  *Proof (Pf pp.81-82):* take any maximal `L ⊇ N_G(U)`
 against `U W₁` Frobenius from (13.2.a)), so by (8.8.b4) `L` is type I.  Then `U ⊆ L_F`: (8.17.a)
 gives `|L_F|` prime to `q`, so `W₁ ∩ L_F = 1`; were `U ∩ L_F = 1`, `U W₁` would act
 fixed-point-freely on `L_F`, forcing `L_F = 1` by (9.1).  The genuine §13 structural obligation
-feeding (13.17); see issue 2009. -/
+feeding (13.17); see issue 2009.
+
+*Skeleton status (Phase 2):* the assembly is proven — `U ≠ ⊥` (from `fitting_lt_derived`), `N_G(U) ≠ ⊤`
+(simplicity), the maximal `L ⊇ N_G(U)`, and the (8.8.b4) trichotomy dispatch, with the type-II
+property `N_G(U) ⊄ S` wired in through `not_normalizer_U_le_S ∘ exists_conj_typeP_U_of_coprime ∘
+coprime_card_U_card_P_of_disjoint`.  Four documented gates remain: `hdisj` (Phase 0(b) carrier
+faithfulness, F-ask `P ⊓ U = ⊥`); the L~S Hall-conjugacy derivation of `N_G(U) ⊆ S`; the L~T
+`|L_F| = q^p` exclusion; and `U ⊆ L_F` ((8.17.a)+(9.1)). -/
 theorem exists_typeI_maximal_overNormalizer_U [Finite G]
     (_hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
     (hSTypeII : IsTypeII hyp.S) :
     ∃ L : Subgroup G, L ∈ maximalSubgroups G ∧ IsTypeI L ∧
-      Subgroup.normalizer (hyp.U : Set G) ≤ L ∧ hyp.U ≤ maxNilpotentNormalHall L := sorry
+      Subgroup.normalizer (hyp.U : Set G) ≤ L ∧ hyp.U ≤ maxNilpotentNormalHall L := by
+  obtain ⟨tdata⟩ := hSTypeII
+  -- (Phase 0(b), F-ask) the configuration complement meets the Fitting kernel trivially.
+  have hdisj : hyp.P ⊓ hyp.U = ⊥ := sorry
+  have hcop : Nat.Coprime (Nat.card ↥hyp.U) (Nat.card ↥hyp.P) :=
+    coprime_card_U_card_P_of_disjoint hyp tdata hdisj
+  -- (Phase 1) the type-II property transferred to `hyp.U`: `N_G(U) ⊄ S`.
+  have hNUS : ¬ Subgroup.normalizer (hyp.U : Set G) ≤ hyp.S :=
+    not_normalizer_U_le_S _hG hyp tdata (exists_conj_typeP_U_of_coprime _hG hyp tdata hcop)
+  -- `U ≠ ⊥` (else `M' = P ⊔ ⊥ = P`, against `fitting_lt_derived`).
+  have hUne : hyp.U ≠ ⊥ := by
+    intro hUbot
+    have heq : derivedInG hyp.S = hyp.P := by rw [hyp.S_deriv_eq_PU, hUbot, sup_bot_eq]
+    have hlt := tdata.typeP.fitting_lt_derived
+    rw [← hyp.P_eq_SF, heq] at hlt
+    exact lt_irrefl _ hlt
+  -- `U ≤ S`, hence `U ≠ ⊤`; then by simplicity `N_G(U) ≠ ⊤`.
+  have hM'_le_S : derivedInG hyp.S ≤ hyp.S := Subgroup.map_subtype_le _
+  have hUleS : hyp.U ≤ hyp.S := (le_sup_right.trans hyp.S_deriv_eq_PU.ge).trans hM'_le_S
+  have hUneTop : hyp.U ≠ ⊤ := fun hUtop =>
+    (mem_maximalSubgroups.mp hyp.S_maximal).1 (top_le_iff.mp (hUtop ▸ hUleS))
+  have hNUtop : Subgroup.normalizer (hyp.U : Set G) ≠ ⊤ := by
+    intro hNtop
+    haveI hUnormal : (hyp.U).Normal := Subgroup.normalizer_eq_top_iff.mp hNtop
+    rcases _hG.simple.eq_bot_or_eq_top_of_normal hyp.U hUnormal with h | h
+    · exact hUne h
+    · exact hUneTop h
+  -- a maximal subgroup `L ⊇ N_G(U)`.
+  obtain ⟨L, hNUL, hLmaximal⟩ :=
+    Finite.exists_le_maximal (p := fun K : Subgroup G => K ≠ ⊤) hNUtop
+  have hLmem : L ∈ maximalSubgroups G :=
+    mem_maximalSubgroups.mpr ⟨hLmaximal.1, fun b hLb => by
+      by_contra hbne
+      exact lt_irrefl L (lt_of_lt_of_le hLb (hLmaximal.2 hbne hLb.le))⟩
+  -- (8.8.b4) trichotomy: `L` is type I, or conjugate to `S`, or conjugate to `T`.
+  rcases hyp.theorem88_caseB L hLmem with hLI | _hLconjS | _hLconjT
+  · -- `L` is type I; conclude with `U ⊆ L_F` (Pf (13.17.b)).
+    refine ⟨L, hLmem, hLI, hNUL, ?_⟩
+    -- (8.17.a) gives `q ∤ |L_F|`, so `W₁ ∩ L_F = 1`; if `U ∩ L_F = 1` then `U W₁` acts FPF on
+    -- `L_F`, forcing `L_F = 1` (9.1); hence `U ∩ L_F ≠ 1` and `U ⊆ C_L(U ∩ L_F) ⊆ L_F`.
+    sorry
+  · -- `L` conjugate to `S` is excluded (`_hLconjS`): Pf (13.17.a) derives `N_G(U) ⊆ S` from the
+    -- Hall conjugacy of `U` in the solvable `S`, contradicting `hNUS`.
+    exfalso
+    sorry
+  · -- `L` conjugate to `T` is excluded (`_hLconjT`): `|L_F| = q^p` forces `W₁ ⊆ L_F` and
+    -- `[U,W₁] ⊆ L_F ∩ U = 1`, contradicting the `U W₁` Frobenius structure (13.2.a).
+    exfalso
+    sorry
 
 /-- **Peterfalvi (13.17.c)/(14.5)**: the Frobenius complement of the type-I subgroup `L` over
 `N_G(U)` has order `p q` and contains a conjugate `W₂^y` (`y ∈ Q`).  *Proof (Pf p.82):* a
