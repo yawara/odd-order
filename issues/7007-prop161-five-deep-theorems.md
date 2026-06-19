@@ -88,10 +88,33 @@ bottom-out** するので、clean 化には §15 foundation が先。真の順�
 - `theoremA_ungated_conjuncts` (S16:181, clean): Thm A の (1)(5 partial)(6 partial) 既証。
 - `theoremB_U_sylow_abelian_rank_le_two` (S16:242, clean): Thm B(1)。
 
+## 進捗ログ
+
+**2026-06-19 conjunct 1 (BG Lemma 15.1(b)) DONE** (`cab5603a`): standalone clean lemma
+`typeP_hall_derived_eq_and_abelian` (S15_MF.lean, `typeP_auxiliary_structure_gated` 直前) =
+`K≠⊥ → M'=U⊔M_σ ∧ IsMulCommutative U`。sorry-free + axiom-clean、full build 3862 green。
++ helper `card_mul_card_mul_card_eq_of_three_hall` (|M|=|K||U||M_σ| 三 Hall 分割)。
+証明: `typeP_duality`(clean) で M' complements K + coprime → M_σ≤M' / U≤M'(|U| coprime [M:M']=|K|)
+→ 三 Hall card で |U⊔M_σ|=|M'| → M'=U⊔M_σ。U abelian = `[U,U]≤[M',M']≤M_σ`(`derivedDerived_le_Msigma`)
+∧ `[U,U]≤U` → `[U,U]≤U⊓M_σ=⊥`。**sorry count 不変 (139)** — gated 定理に wire するのは conjunct 2-4 着地後。
+
+**conjunct 2-4 の依存状況 (2026-06-19 調査)**: より深い §12 に gated、clean named lemma 未整備:
+- conjunct 2 (BG 15.1(c) C_G(X) funnel + X cyclic τ2): `M(C_G(X))={M}` 部分は
+  `maximalContaining_centralizer_of_le_Msigma_centralizer_E1`(S14:~505) 等が rank-1 X で存在。
+  残 = 「X cyclic」(BG: **Thm 12.5(d)** C_Msigma(A)=1 for rank-2 A∈U + **Cor 12.10(b)** abelian Hall τ2)。
+  Thm 12.5(d)/12.10(b) は S14 のコメント参照のみ (L1179/1272)、named lemma 要確認/整備。
+- conjunct 3 (BG 15.1(d) ⟨C_U(x)⟩ abelian): K≠⊥ なら conjunct 1 (U abelian) から即 (≤U)。
+  K=⊥ なら **Thm 12.12**。`centralizerGeneratedBySigma M U` (S15:518) = sSup{U⊓C(x)|x∈sigmaSharp}。
+- conjunct 4 (BG 15.1(e) Frobenius U0M_σ): **Thm 12.12** (K=1 case の Frobenius 構成)。未 located。
+
 ## やること
 
-- [ ] Lemma 15.1 `typeP_auxiliary_structure_gated` (S15:704) — conjunct ①→④ を順に discharge
-  （まず Thm 14.7 経由 citation を確認、`derivedInG_eq_Msigma_sup_derivedInG_complement` + Frobenius E=K⋉U）
+- [x] Lemma 15.1 conjunct 1 (BG 15.1(b)) = `typeP_hall_derived_eq_and_abelian` ✅ `cab5603a`
+- [ ] conjunct 2 (BG 15.1(c)): Thm 12.5(d) (rank-2 C_Msigma=1) + Cor 12.10(b) (abelian Hall τ2) を
+  named lemma 化/locate → X cyclic → funnel 合成
+- [ ] conjunct 3 (BG 15.1(d)): K≠⊥ branch (conjunct 1 経由) + K=⊥ branch (Thm 12.12)
+- [ ] conjunct 4 (BG 15.1(e)): Thm 12.12 Frobenius U0M_σ を locate/整備
+- [ ] conjunct 1-4 を `typeP_auxiliary_structure_gated` に wire (sorry 139→138)
 - [ ] Thm 15.2(a) `mf_ne_msigma_typeP1_structure` (S15:1144)
 - [ ] Thm 15.7 `fitting_not_ti_cases` (S15:3896) + Cor 15.5
 - [ ] Thm A `theoremA_maximal_structure` (S16:144) — Lemma 15.1 + Prop 14.2 + §15 で全 conjunct
