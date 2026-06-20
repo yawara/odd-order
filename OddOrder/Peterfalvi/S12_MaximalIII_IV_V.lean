@@ -231,6 +231,32 @@ theorem exists_hypothesis_of_typeIIIorIVorV [Finite G]
       dadeData := dadeData
       hconj := hconj }
 
+/-! ## §10 → §5 ω-grid bridge prerequisites (gate #3)
+
+The Peterfalvi §10 character analysis ((10.2)–(10.10)) consumes the §5 `ω_{ij}` grid
+(`S05.TICyclicHypothesis.omegaGrid` / `omegaSigmaGrid`) on `W = W₁ × W₂`.  Building the
+bridge `Hypothesis → S05.TICyclicHypothesis` rests on the cyclic-`TI` structure of `(W, V)`,
+whose first prerequisites are the disjointness and coprimality of the factors `W₁`, `W₂`.
+See `notes/peterfalvi/s12_s10_character_bridge.md`. -/
+
+/-- The cyclic factors `W₁`, `W₂` of a type-`P` maximal subgroup are disjoint:
+`W₁` complements `M' = [M,M]` in `M` (`TypePData.M_complement`), and `W₂ ≤ M'`
+(`W₂ ≤ H ⊓ M'' ≤ H ≤ M'`), so `W₁ ⊓ W₂ ≤ W₁ ⊓ M' = ⊥`. -/
+theorem typePData_disjoint_W1_W2 {M : Subgroup G} (data : TypePData M) :
+    Disjoint data.W1 data.W2 := by
+  have hW2D : data.W2 ≤ derivedInG M :=
+    data.W2_le.trans (inf_le_left.trans data.H_le)
+  rw [Subgroup.disjoint_def]
+  intro x hx1 hx2
+  have hxM : x ∈ M := data.W1_le hx1
+  have hdisj := data.M_complement.disjoint
+  rw [Subgroup.disjoint_def] at hdisj
+  have hmem1 : (⟨x, hxM⟩ : ↥M) ∈ (derivedInG M).subgroupOf M :=
+    Subgroup.mem_subgroupOf.mpr (hW2D hx2)
+  have hmem2 : (⟨x, hxM⟩ : ↥M) ∈ data.W1.subgroupOf M :=
+    Subgroup.mem_subgroupOf.mpr hx1
+  exact Subtype.ext_iff.mp (hdisj hmem1 hmem2)
+
 /-! ## (10.2)--(10.4): basic character parameters and coherent extension -/
 
 /-- The character parameters obtained in Peterfalvi (10.2)--(10.3).
