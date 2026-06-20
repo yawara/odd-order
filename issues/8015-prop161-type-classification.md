@@ -155,6 +155,44 @@ Prop 16.1 はそれらの downstream。本 issue の 6 補題は前倒し infra 
 - [ ] **assembly**: 全 input が揃ったら `proposition_type_classification := …_of_inputs h11 …` で close。
       揃うまでは各 input を named lemma 化 (tractable は sorry-free、hard は sorry'd named residual)。
 
+### ✅ 2026-06-20² FittingIsTI を Thm 15.7(a) 単一 rank 残務に還元 + ≥3 側を証明 (本セッション)
+**FittingIsTI 精査結論を訂正・前進。** 前回「Thm 15.2 外の深い fusion」と評したが、**A(8) FittingIsTI =
+Theorem 15.7(a) の `M_F = M_σ` 結論の対偶**と特定 (schematic proof: A(6)(7)(8) ← 15.2(a)/Cor15.5/
+**15.7(a)(b)**)。15.7(a) は `¬FittingIsTI ⟹ H=M_σ` (= `fitting_not_ti_cases` 第2 conjunct, S15 sorry)。
+依存 (Cor15.5/Thm10.1/Lem12.17/Thm12.13/Uniqueness/15.2(b)/β⊆σ/pRank-mono/nilpotent-commute) は**全て
+sorry-free 在庫**と確認。
+
+**landed (2 commits, full build 3869 green, AxiomsCheck OK):**
+- **A(8) 配線チェーン** (`32a243e1`, S15_MF + S16): `mf_eq_msigma_of_piSet_inf_beta_disjoint`
+  (ENDGAME, **axiom-clean**: π(M_F)∩β=∅ ⟹ M_F=M_σ、Hall κ-構成 + 15.2(b) 対偶) → 
+  `mf_eq_msigma_of_not_fittingIsTI` (COMBINE) → `fitting_isTI_of_mf_ne_msigma` (A(8) 方向=対偶) →
+  **`theoremA8_structure`** (S16, A(8) 完全形 U=⊥ ∧ FittingIsTI ∧ |K|=p, sorry-free)。
+- **pRank-index 補題 dedup** (`9e74c51f`): `pRank_eq_of_le_of_not_dvd_index` を S12 の 2 private 重複
+  → `OddOrder.GroupTheory` (PRank.lean) public 昇格。
+- **G1 = `three_le_pRank_mf_of_mem_beta`** (`9e74c51f`, **sorry-free + axiom-clean, AxiomsCheck 登録**):
+  r∈π(M_F)∩β ⟹ r_r(M_F)≥3 (M_F Hall ⟹ r_r(M_F)=r_r(M)、β⊆α)。15.7(a) rank dichotomy の **≥3 側**。
+
+**⟹ A(8) FittingIsTI は「all of Thm 15.7」gate から単一 sorry に縮小**:
+`piSet_mf_inf_beta_disjoint_of_not_fittingIsTI` (S15:7206) は partial proof 化済 —
+G1 で ≥3 側 discharge、**残 sorry = `pRank (M_F) r < 3`** (1 点)。
+
+### 🎯 残 `pRank (M_F) r < 3` の証明計画 (15.7(a) deep core、次セッション)
+`¬FittingIsTI M` から導出。base 補題は全在庫:
+1. **setup**: ¬FittingIsTI unfold (`IsTISubset` def S15... = `∀g,(∃a∈A,gag⁻¹∈A)→g∈L`) ⟹ ∃g, a∈
+   `fittingSharp M`, gag⁻¹∈fittingSharp, g∉N_G(F(M))。`F(M)=fittingInAmbient M` ⊴ M
+   (`fittingInG_subgroupOf_normal` S08:142) ⟹ M≤N(F(M)) ⟹ **g∉M**。X:=F(M)⊓(conj g•F(M))≠⊥
+   (gag⁻¹ を含む)。
+2. **X⊆M_σ**: p∈π(X)、X₁=order-p ≤ X。O_p(M) cyclic なら X₁ char ⟹ X₁⊴M,M^g ⟹ 単純性矛盾
+   ⟹ O_p(M) 非 cyclic ⟹ (Cor15.5 `fitting_decomposition`: O_{σ'}(F(M)) cyclic) p∈σ(M)。∀p∈π(X)
+   ⟹ X⊆O_σ(F(M))=F(M_σ)⊆M_σ。
+3. **C_G(X₁)⊄M**: Thm10.1(a) (`fusion_control_of_mem_sigma` S10:906) + Lem12.17。
+4. **C_{M_F}(X₁) rank<3** ★最深: 𝓜(C_{M_F}(X₁))≠{M} (C_G(X₁)⊄M 経由) ⟹ Thm12.13
+   (`nonabelian_pgroup_isUniquelyMaximal` S12_1213:862) + Uniqueness (`uniquenessTheorem`) で
+   abelian rank<3。
+5. **bridge to r_r(M_F)<3**: M_F≤F(M) nilpotent ⟹ r≠p の O_r(M_F) が X₁ (p-group) を中心化
+   (`commute_of_coprime_orderOf_of_isNilpotent` S10_LLC:679) ⟹ O_r(M_F)≤C_{M_F}(X₁) ⟹
+   r_r(M_F)=r_r(O_r(M_F))<3 (`pRank_mono_of_le`/`pRank_sylow_eq`)。r=p は X cyclic 経由。
+
 ## 完了条件
 
 `proposition_type_classification` (S16:894) が sorry-free。中間状態は各 input lemma が個別に landing し、
