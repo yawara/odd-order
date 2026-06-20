@@ -7454,10 +7454,134 @@ theorem piSet_mf_inf_beta_disjoint_of_not_fittingIsTI [Finite G]
   intro r hrπ hrβ
   -- The `≥ 3` side (proved): `r ∈ π(M_F) ∩ β(M) ⟹ r_r(M_F) ≥ 3`.
   have h3 : 3 ≤ pRank ↥(MF M) r := three_le_pRank_mf_of_mem_beta hG hM hrπ hrβ
-  -- Remaining (deep): from `¬FittingIsTI M` derive `pRank (M_F) r < 3`, contradicting `h3`.
-  have hlt : pRank ↥(MF M) r < 3 := by
-    sorry
-  exact absurd h3 (not_le.mpr hlt)
+  have hrp : r.Prime := Nat.prime_of_mem_primeFactors hrπ
+  haveI : Fact r.Prime := ⟨hrp⟩
+  refine absurd h3 (not_le.mpr ?_)
+  -- Setup: `g ∉ M`, `X = F(M) ⊓ F(M)^g ≠ ⊥`.
+  obtain ⟨g, hgM, hXne⟩ := exists_notMem_inf_conj_fitting_ne_bot_of_not_fittingIsTI hnotTI
+  -- A prime `p ∈ π(X)`, and `p ∈ σ(M)` (step 3).
+  have hXcard : Nat.card ↥(fittingInAmbient M ⊓ MulAut.conj g • fittingInAmbient M) ≠ 1 :=
+    fun h => hXne (Subgroup.card_eq_one.mp h)
+  obtain ⟨p, hp, hpdvd⟩ := Nat.exists_prime_and_dvd hXcard
+  haveI : Fact p.Prime := ⟨hp⟩
+  have hpσ : p ∈ OddOrder.BG.Ch3.S10.sigma M :=
+    mem_sigma_of_prime_dvd_card_inf_conj_fitting hG hM hgM hp hpdvd
+  -- An order-`p` subgroup `X₁ ≤ X`.
+  obtain ⟨x, hxord⟩ := exists_prime_orderOf_dvd_card'
+    (G := ↥(fittingInAmbient M ⊓ MulAut.conj g • fittingInAmbient M)) p hpdvd
+  set X₁ : Subgroup G :=
+    (Subgroup.zpowers x).map (fittingInAmbient M ⊓ MulAut.conj g • fittingInAmbient M).subtype
+    with hX₁def
+  have hX₁leX : X₁ ≤ fittingInAmbient M ⊓ MulAut.conj g • fittingInAmbient M :=
+    hX₁def ▸ Subgroup.map_subtype_le _
+  have hX₁card : Nat.card ↥X₁ = p := by
+    rw [hX₁def, Subgroup.card_map_of_injective
+      (fittingInAmbient M ⊓ MulAut.conj g • fittingInAmbient M).subtype_injective,
+      Nat.card_zpowers, hxord]
+  have hX₁ne : X₁ ≠ ⊥ := fun h => hp.one_lt.ne' (by rw [← hX₁card, h, Subgroup.card_bot])
+  have hX₁pg : IsPGroup p ↥X₁ := IsPGroup.of_card (n := 1) (by rw [hX₁card, pow_one])
+  have hX₁F : X₁ ≤ fittingInAmbient M := hX₁leX.trans inf_le_left
+  have hX₁cF : X₁ ≤ MulAut.conj g • fittingInAmbient M := hX₁leX.trans inf_le_right
+  have hX₁M : X₁ ≤ M := hX₁F.trans (OddOrder.BG.Ch2.S08.fittingInG_le M)
+  -- Step 5: `p ∉ β(M)` (via `X₁ ≤ M_σ ⊓ M^g` and Lemma 12.17), hence `r ≠ p`.
+  have hpσ_sub : ({p} : Set ℕ) ⊆ OddOrder.BG.Ch3.S10.sigma M := by
+    intro q hq; rw [Set.mem_singleton_iff] at hq; rw [hq]; exact hpσ
+  have hX₁Mσ : X₁ ≤ OddOrder.BG.Ch3.S10.Msigma M := by
+    have h1 : X₁ ≤ opiCoreInG ({p} : Set ℕ) (fittingInAmbient M) :=
+      OddOrder.BG.Ch2.S08.le_opiCoreInG_singleton_of_isPGroup_of_le_nilpotent
+        (OddOrder.BG.Ch2.S08.fittingInG_isNilpotent M) hX₁F hX₁pg
+    have h2 : opiCoreInG ({p} : Set ℕ) (fittingInAmbient M)
+        ≤ opiCoreInG (OddOrder.BG.Ch3.S10.sigma M) (fittingInAmbient M) :=
+      Subgroup.map_mono (OddOrder.Isaacs.Ch03.oPiCore_mono hpσ_sub _)
+    have h3' : opiCoreInG (OddOrder.BG.Ch3.S10.sigma M) (fittingInAmbient M)
+        = fittingInAmbient (OddOrder.BG.Ch3.S10.Msigma M) :=
+      opiCoreInG_sigma_fittingInAmbient_eq_fittingInAmbient_Msigma
+    exact (h1.trans h2).trans (h3' ▸ OddOrder.BG.Ch2.S08.fittingInG_le _)
+  have hX₁cM : X₁ ≤ MulAut.conj g • M :=
+    hX₁cF.trans (Subgroup.pointwise_smul_le_pointwise_smul_iff.mpr
+      (OddOrder.BG.Ch2.S08.fittingInG_le M))
+  have hpβ : p ∉ OddOrder.BG.Ch3.S10.beta M :=
+    OddOrder.BG.Ch3.S12.Msigma_inf_conj_isBetaCompl hG hM hgM p
+      (Nat.mem_primeFactors.mpr ⟨hp,
+        hX₁card ▸ Subgroup.card_dvd_of_le (le_inf hX₁Mσ hX₁cM),
+        Nat.card_pos.ne'⟩)
+  have hrnep : r ≠ p := fun h => hpβ (h ▸ hrβ)
+  -- Step 6: `C_G(X₁) ⊄ M` (Theorem 10.1(e)).
+  have hconj_g_inv : MulAut.conj g⁻¹ • X₁ ≤ M := by
+    have hle : MulAut.conj g⁻¹ • X₁ ≤ MulAut.conj g⁻¹ • (MulAut.conj g • fittingInAmbient M) :=
+      Subgroup.pointwise_smul_le_pointwise_smul_iff.mpr hX₁cF
+    rw [← mul_smul, ← map_mul, inv_mul_cancel, map_one, one_smul] at hle
+    exact hle.trans (OddOrder.BG.Ch2.S08.fittingInG_le M)
+  have hCGnotM : ¬ Subgroup.centralizer (X₁ : Set G) ≤ M := by
+    intro hCG
+    have he := (OddOrder.BG.Ch3.S10.fusion_control_of_mem_sigma hG hM hpσ hX₁ne hX₁pg).2.2.2.2
+    exact hgM (by simpa using inv_mem (he hX₁M hCG g⁻¹ hconj_g_inv))
+  -- Step 7: `rank (C_{M_F}(X₁)) < 3` (`C_{M_F}(X₁)` lies in `M` and in a coatom `N ≠ M`).
+  obtain ⟨x₀, hx₀ne⟩ := Subgroup.ne_bot_iff_exists_ne_one.mp hX₁ne
+  have hCGlt : Subgroup.centralizer (X₁ : Set G) < ⊤ :=
+    lt_of_le_of_lt
+      (Subgroup.centralizer_le (Set.singleton_subset_iff.mpr x₀.2))
+      (OddOrder.BG.Ch2.S09.centralizer_singleton_lt_top hG
+        (fun h => hx₀ne (Subtype.ext h)))
+  obtain ⟨N, hNco, hCGN⟩ :=
+    (eq_top_or_exists_le_coatom (Subgroup.centralizer (X₁ : Set G))).resolve_left hCGlt.ne
+  have hNmax : N ∈ maximalSubgroups G := mem_maximalSubgroups.mpr hNco
+  have hNneM : M ≠ N := fun h => hCGnotM (h ▸ hCGN)
+  have hrank3 : rank ↥(MF M ⊓ Subgroup.centralizer (X₁ : Set G)) < 3 :=
+    rank_lt_three_of_le_two_maximals hG hM hNmax hNneM
+      (inf_le_left.trans (maxNilpotentNormalHall_le M)) (inf_le_right.trans hCGN)
+  -- Step 8: `r`-elements of `M_F` centralize `X₁` (coprime, `F(M)` nilpotent), so the `r`-Sylow of
+  -- `M_F` lies in `C_{M_F}(X₁)`; hence `r ∤ [M_F : C_{M_F}(X₁)]` and `r_r(M_F) = r_r(C_{M_F}(X₁)) < 3`.
+  haveI : Group.IsNilpotent ↥(fittingInAmbient M) := OddOrder.BG.Ch2.S08.fittingInG_isNilpotent M
+  have hcentr : ∀ A : Subgroup G, A ≤ MF M → IsPGroup r ↥A →
+      A ≤ Subgroup.centralizer (X₁ : Set G) := by
+    intro A hAMF hAr a ha
+    rw [Subgroup.mem_centralizer_iff]
+    intro y hy
+    have haF : a ∈ fittingInAmbient M := (hAMF.trans (maxNilpotentNormalHall_le_fittingInG M)) ha
+    have hyF : y ∈ fittingInAmbient M := hX₁F hy
+    obtain ⟨i, hi⟩ := (IsPGroup.iff_orderOf.mp hAr) ⟨a, ha⟩
+    obtain ⟨j, hj⟩ := (IsPGroup.iff_orderOf.mp hX₁pg) ⟨y, hy⟩
+    have e1 : orderOf (⟨a, haF⟩ : ↥(fittingInAmbient M)) = r ^ i :=
+      (orderOf_injective (fittingInAmbient M).subtype
+        (fittingInAmbient M).subtype_injective ⟨a, haF⟩).symm.trans
+        ((orderOf_injective A.subtype A.subtype_injective ⟨a, ha⟩).trans hi)
+    have e2 : orderOf (⟨y, hyF⟩ : ↥(fittingInAmbient M)) = p ^ j :=
+      (orderOf_injective (fittingInAmbient M).subtype
+        (fittingInAmbient M).subtype_injective ⟨y, hyF⟩).symm.trans
+        ((orderOf_injective X₁.subtype X₁.subtype_injective ⟨y, hy⟩).trans hj)
+    have hcop : Nat.Coprime (orderOf (⟨a, haF⟩ : ↥(fittingInAmbient M)))
+        (orderOf (⟨y, hyF⟩ : ↥(fittingInAmbient M))) := by
+      rw [e1, e2]; exact Nat.Coprime.pow _ _ ((Nat.coprime_primes hrp hp).mpr hrnep)
+    have hcomm := OddOrder.BG.Ch3.S10.commute_of_coprime_orderOf_of_isNilpotent
+      (x := (⟨a, haF⟩ : ↥(fittingInAmbient M))) (y := ⟨y, hyF⟩) hcop
+    have := congrArg (Subtype.val) hcomm.eq
+    simpa using this.symm
+  -- The `r`-Sylow `P'` of `M_F` lies in `C_{M_F}(X₁) = M_F ⊓ C_G(X₁)`.
+  obtain ⟨P⟩ : Nonempty (Sylow r ↥(MF M)) := inferInstance
+  set P' : Subgroup G := (P : Subgroup ↥(MF M)).map (MF M).subtype with hP'def
+  have hP'MF : P' ≤ MF M := hP'def ▸ Subgroup.map_subtype_le _
+  have hP'r : IsPGroup r ↥P' := by
+    obtain ⟨n, hn⟩ := IsPGroup.iff_card.mp P.2
+    exact IsPGroup.of_card (by
+      rw [hP'def, Subgroup.card_map_of_injective (MF M).subtype_injective, hn])
+  have hP'C : P' ≤ MF M ⊓ Subgroup.centralizer (X₁ : Set G) :=
+    le_inf hP'MF (hcentr P' hP'MF hP'r)
+  have hidx : ¬ r ∣ ((MF M ⊓ Subgroup.centralizer (X₁ : Set G)).subgroupOf (MF M)).index := by
+    intro hdvd
+    have hP'sub : P'.subgroupOf (MF M) ≤ (MF M ⊓ Subgroup.centralizer (X₁ : Set G)).subgroupOf (MF M) :=
+      Subgroup.subgroupOf_mono (MF M) hP'C
+    have hdvd2 : r ∣ (P'.subgroupOf (MF M)).index :=
+      hdvd.trans (Subgroup.index_dvd_of_le hP'sub)
+    have hPeq : P'.subgroupOf (MF M) = (P : Subgroup ↥(MF M)) :=
+      hP'def ▸ Subgroup.comap_map_eq_self_of_injective (MF M).subtype_injective _
+    rw [hPeq] at hdvd2
+    exact P.not_dvd_index hdvd2
+  calc pRank ↥(MF M) r
+      = pRank ↥(MF M ⊓ Subgroup.centralizer (X₁ : Set G)) r :=
+        (OddOrder.GroupTheory.pRank_eq_of_le_of_not_dvd_index inf_le_left hidx).symm
+    _ ≤ rank ↥(MF M ⊓ Subgroup.centralizer (X₁ : Set G)) := pRank_le_rank r
+    _ < 3 := hrank3
 
 /-- **`M_F = M_σ` from `¬FittingIsTI`** (the `M_F = M_σ` conclusion of BG Theorem 15.7(a)):
 combine the rank-theoretic core `piSet_mf_inf_beta_disjoint_of_not_fittingIsTI` with the
