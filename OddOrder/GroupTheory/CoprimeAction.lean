@@ -180,7 +180,43 @@ theorem wielandt_fixedPoint_trivial_U_fixed {L H : Type*} [Group L] [Group H]
   simp only [hUE, hU, Subgroup.card_bot, one_pow, one_mul, mul_one] at key
   exact key
 
+/-- **Peterfalvi (9.1), the fixed-point-free corollary**: if *both* the Frobenius kernel `U` and
+the complement `E` act fixed-point-freely on `H` (`C_H(U) = C_H(E) = 1`), then `H` is trivial.
+This is the form used in Peterfalvi (13.17.b): a Frobenius group `U W₁` acting fixed-point-freely
+on the Fitting kernel `H = L_F` forces `|L_F| = 1`. -/
+theorem coprimeFrobeniusAction_card_eq_one {L H : Type*} [Group L] [Group H]
+    [Finite L] [Finite H] (act : CoprimeFrobeniusAction L H)
+    (hE : act.fixedByE = ⊥) (hU : act.fixedByU = ⊥) :
+    Nat.card H = 1 := by
+  have key := wielandt_fixedPoint_trivial_U_fixed act hU
+  rw [hE, Subgroup.card_bot, one_pow] at key
+  exact key
+
 end WielandtFixedPoint
+
+section FrobeniusCentralizer
+
+open OddOrder.Isaacs
+
+variable {L : Type*} [Group L] [Finite L] {N A : Subgroup L}
+
+/-- **A non-kernel element centralizes nothing nontrivial in the Frobenius kernel.**  In a finite
+Frobenius group with kernel `N`, if `g ∉ N` then `C_L(g) ⊓ N = 1`: any `x ∈ N` commuting with `g`
+would put `g ∈ C_L(x) ≤ N` (`centralizer_kernel_le`).  Reusable; the engine of the fixed-point-free
+action in Peterfalvi (9.1)/(13.17.b). -/
+theorem IsFrobeniusGroup.centralizer_inf_kernel_eq_bot_of_not_mem
+    (h : Ch06.IsFrobeniusGroup L N A) {g : L} (hg : g ∉ N) :
+    Subgroup.centralizer ({g} : Set L) ⊓ N = ⊥ := by
+  rw [eq_bot_iff]
+  intro x hx
+  obtain ⟨hxc, hxN⟩ := Subgroup.mem_inf.mp hx
+  by_contra hxne
+  rw [Subgroup.mem_bot] at hxne
+  refine hg (h.centralizer_kernel_le x hxN hxne ?_)
+  rw [Subgroup.mem_centralizer_singleton_iff]
+  exact (Subgroup.mem_centralizer_singleton_iff.mp hxc).symm
+
+end FrobeniusCentralizer
 
 
 end OddOrder.GroupTheory
