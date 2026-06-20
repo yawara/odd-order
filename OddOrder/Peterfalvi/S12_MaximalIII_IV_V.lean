@@ -471,6 +471,50 @@ directly.  This bridge builds the §6 *structural* Hypothesis (4.2) `S06.Hypothe
 `S04.Hypothesis G (A₀(M)) M`) into a `S06.CertainTypeHypothesis`.  See
 `notes/peterfalvi/s12_s10_character_bridge.md` §6. -/
 
+/-- **Peterfalvi (4.2.a) Hall coprimality** (issue 1006): for a type-`P` maximal subgroup `M`,
+`gcd(|M'|, |W₁|) = 1`, i.e. `W₁` is a *Hall* complement to `M' = [M,M]` in `M`.
+
+A bare complement need not be Hall, but the κ-Hall structure of a type-`P` maximal supplies it: a
+Hall `κ(M)`-subgroup `K ≤ M` (`exists_isHallSubgroup_kappa_ge`) is cyclic (BG Theorem A,
+`theoremA_maximal_structure` — cited here even though its proof currently carries a `sorry`, since
+its statement is the correct BG result and the dependency is honest), so it complements `M'` in `M`
+(`typeP_derivedInG_isComplement_kappaHall`); hence `gcd(|K|, |M'|) = 1`
+(`IsHallSubgroup.coprime_index`), and `|K| = [M:M'] = |W₁|` (`card_kappaHall_eq_derived_index`,
+`TypePData.card_W1_eq_derived_index`).  Discharges the `hHall` obligation of the §10 → §6 bridge. -/
+theorem typePData_W1_hall_coprime [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    {M : Subgroup G} (hM : M ∈ maximalSubgroups G)
+    (hP : OddOrder.BG.Ch4.S14.IsTypeP M) (data : TypePData M) :
+    Nat.Coprime (Nat.card ↥(derivedInG M)) (Nat.card ↥data.W1) := by
+  classical
+  haveI : IsSolvable ↥M := hG.solvable_of_mem_maximalSubgroups hM
+  -- A Hall `κ(M)`-subgroup `K ≤ M`.
+  obtain ⟨K, hKM, hK, -⟩ :=
+    OddOrder.BG.Ch4.S14.exists_isHallSubgroup_kappa_ge hG hM (X := ⊥) bot_le (by simp)
+  -- A `(κ(M) ∪ σ(M))'`-Hall subgroup `U` (needed only to invoke BG Theorem A).
+  obtain ⟨U', hU'hall, -⟩ :=
+    Ch03.hall_D (G := ↥M)
+      (π := (OddOrder.BG.Ch4.S14.kappa M ∪ OddOrder.BG.Ch3.S10.sigma M)ᶜ) (U := ⊥) (by simp)
+  have hUeq : (U'.map M.subtype).subgroupOf M = U' :=
+    Subgroup.comap_map_eq_self_of_injective M.subtype_injective U'
+  have hU : Ch03.IsHallSubgroup ((OddOrder.BG.Ch4.S14.kappa M ∪ OddOrder.BG.Ch3.S10.sigma M)ᶜ)
+      ((U'.map M.subtype).subgroupOf M) := by rw [hUeq]; exact hU'hall
+  -- `K` is cyclic by BG Theorem A.
+  haveI : IsCyclic ↥K := (OddOrder.BG.Ch4.S16.theoremA_maximal_structure hG hM hK rfl hU).2.1
+  -- Coprimality `gcd(|K|, |M'|) = 1` from the κ-Hall complement (mirrors S14_TypePComplement).
+  have hM'le : derivedInG M ≤ M := Subgroup.map_subtype_le _
+  have hcompl := OddOrder.BG.Ch4.S14.typeP_derivedInG_isComplement_kappaHall hG hM hP hKM hK
+  have hidx : (K.subgroupOf M).index = Nat.card ↥(derivedInG M) := by
+    rw [hcompl.index_eq_card]
+    exact Nat.card_congr (Subgroup.subgroupOfEquivOfLe hM'le).toEquiv
+  have hCop : Nat.Coprime (Nat.card ↥K) (Nat.card ↥(derivedInG M)) := by
+    have hco := hK.coprime_index
+    rwa [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hKM).toEquiv, hidx] at hco
+  -- `|K| = [M:M'] = |W₁|`.
+  have hKW1 : Nat.card ↥K = Nat.card ↥data.W1 := by
+    rw [OddOrder.BG.Ch4.S16.card_kappaHall_eq_derived_index hG hM hP hKM hK,
+      data.card_W1_eq_derived_index]
+  rw [Nat.coprime_comm, ← hKW1]; exact hCop
+
 /-- **§10 → §6 (4.2) bridge, structural part**: build the Peterfalvi Hypothesis (4.2)
 `S06.Hypothesis ↥M` from a type-`P` maximal subgroup's `TypePData`, with `L = M`, `K = M' = [M,M]`
 and the (8.4) cyclic factors `W₁, W₂` transported into `↥M` via `subgroupOf`.  Structural fields
@@ -532,18 +576,35 @@ def typePData_toS06Hypothesis [Finite G] {M : Subgroup G} (data : TypePData M)
           ← data.W_eq]
         exact typePData_W_card_odd data hodd }
 
+/-- The §10 Hypothesis (10.1) for a type III/IV/V maximal subgroup `M` exhibits `M` as a *BG*
+type-`P` maximal (`(κ(M)).Nonempty`).  By BG Proposition 16.1
+(`proposition_type_classification`, cited even though it currently carries a `sorry`), each
+Peterfalvi type III/IV/V maps to `S14.IsTypeP1`, hence to `S14.IsTypeP`.  This is the BG type-`P`
+input needed to discharge the Hall coprimality `typePData_W1_hall_coprime`. -/
+theorem Hypothesis.bgTypeP [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G}
+    (hyp : Hypothesis M) : OddOrder.BG.Ch4.S14.IsTypeP M := by
+  have hclass := OddOrder.BG.Ch4.S16.proposition_type_classification hG hyp.maximal
+  rcases hyp.type_alt with h | h | h
+  · exact (hclass.2.2.1.mp (Or.inl h)).1.1
+  · exact (hclass.2.2.1.mp (Or.inr h)).1.1
+  · exact (hclass.2.2.2.1.mp h).1.1
+
 open scoped FiniteInduce in
 /-- **§10 → §6 (4.2)+Dade bridge**: from the §10 Hypothesis (10.1) for a type-`P` maximal subgroup
 `M`, build the §6 certain-type Hypothesis `S06.CertainTypeHypothesis (A₀(M)) M`.  The structural
 (4.2) part is `typePData_toS06Hypothesis`; the Dade datum is the §10 `dadeData.dade` (already a
 `S04.Hypothesis G (typePA0 M typeP) M`), so no new Dade construction is needed.  This unlocks the
-entire §6 μ/ω/ζ machinery with `L = M`, the common source of (10.2), (10.3) and the `μ`-grid. -/
-def Hypothesis.toCertainTypeHypothesis [Finite G] {M : Subgroup G} (hyp : Hypothesis M)
-    (hodd : Odd (Nat.card G))
-    (hHall : Nat.Coprime (Nat.card ↥(derivedInG M)) (Nat.card ↥hyp.typeP.W1)) :
+entire §6 μ/ω/ζ machinery with `L = M`, the common source of (10.2), (10.3) and the `μ`-grid.
+
+The Hall coprimality is discharged internally via `typePData_W1_hall_coprime` (using the BG
+type-`P` from `Hypothesis.bgTypeP`), so this bridge is **unconditional** — no external `hHall`
+input (closes issue 1006 for the §10 consumer). -/
+def Hypothesis.toCertainTypeHypothesis [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    {M : Subgroup G} (hyp : Hypothesis M) (hodd : Odd (Nat.card G)) :
     OddOrder.Peterfalvi.S06.CertainTypeHypothesis (typePA0 M hyp.typeP) M :=
   haveI := hyp.finiteG
-  { toHypothesis := typePData_toS06Hypothesis hyp.typeP hodd hHall
+  { toHypothesis := typePData_toS06Hypothesis hyp.typeP hodd
+      (typePData_W1_hall_coprime hG hyp.maximal (hyp.bgTypeP hG) hyp.typeP)
     dade := hyp.dadeData.dade }
 
 /-- **A finite non-perfect group has a non-trivial linear character.**  If `commutator K ≠ ⊤`
