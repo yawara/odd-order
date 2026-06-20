@@ -1490,3 +1490,16 @@ case B) / T5 ([Is]Lem 2.27)。他に S09 (7.10) の (7.8.a)(7.9) (issue 0044)。
 ### 厳守事項
 shared `main` 不可侵 / NO sorry-admit-axiom (scaffolding 禁止) / AxiomsCheck 登録 / green 単位 commit +
 `Co-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>` / push は指示時のみ。
+
+## ✅ CLOSED (2026-06-20)
+
+`sibleySetup_is_coherent` (`S08_CoherenceTheorems`) は **完全に証明済・sorry-free・axiom-clean**
+(`#print axioms` = propext/Classical.choice/Quot.sound のみ)。X-empty / Frobenius / (6.8)(c2)
+case-A / case-B dispatch (W₂⊊H′ bootstrap vs W₂=H′ seed) で締結。
+
+完成への鍵 (本セッション 2026-06-20):
+- cY-rewiring (commit `66eee14e`): case-B chain の |Y|≠2 ゲートを uniform cY+hcYgood に置換除去。
+- 弱 X-nonemptiness (commit `3c988ee5`): `Xset_nonempty_of_subgroupOf_ne_bot_weighted` (Frobenius 不要)。
+- capstone closure (commit `03deca0a`): X-nonempty 枝 assembly + edge producer `nonempty_coherent_S_caseB_edge`。
+
+下流 = §9 (7.10) `card_G0_lower_bound` (issue 0044) が unblock。
