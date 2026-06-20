@@ -189,21 +189,25 @@ apparatus が (10.2)/(10.3)/μ-grid をすべて供給**、新規 apparatus buil
   | `W1_nontrivial`/`W1_cyclic` | `W1_nontrivial`/`W1_cyclic` | subgroupOf transport |
   | `W2_nontrivial`/`W2_cyclic`/`W2_le_K` | `W2_*`/(W2≤H≤M') | subgroupOf transport |
   | `centralizer_W2 : ∀x∈W1#, C_K(x)=W2` | `centralizer_W1` (C_{M'}(x)=W2) | G↔↥M transport (fiddly) |
-  | `card_coprime : Coprime |K| |W1|` | **W₁ Hall in M (要確認)** | ⚠ TypePData に直接無し? gap 可能 |
-  | `W_odd` | `typePData_W_card_odd` 系 | 易 |
+  | `card_coprime : Coprime |K| |W1|` | **param `hHall`** (W₁ Hall, 非導出) | ⏸ **issue 1006** |
+  | `W_odd` | `typePData_W_card_odd` 系 | ✅ 易 |
 
-  **⚠ 主リスク = `card_coprime` (W₁ が M の Hall complement = gcd(|M'|,|W₁|)=1)**: complement だけでは
-  従わない。TypePData が供給するか / BG type-P 構造から導けるか要確認 (gap なら別 obligation 化)。
-  他は subtype (subgroupOf) transport の機械作業 (centralizer の G↔↥M が最も fiddly)。
+  **`card_coprime` (W₁ が M の Hall complement = gcd(|M'|,|W₁|)=1) は param `hHall` 化**: complement だけ
+  では従わない (確認済: C₂×C₂ 反例)、κ-Hall 経由でのみ導出可ゆえ obligation = [issue 1006](../../issues/1006-typep-w1-hall.md)。
+  他 10 field は subtype (subgroupOf) transport の機械作業で discharge (centralizer は `S03h.centralizer_subgroupOf`)。
 
-**この bridge 完成 ⟹ §6 の `toTICyclicHypothesis`・μ/ω column API・Clifford inertia がすべて L=M で発火**
-⟹ (10.2) ζ、(10.3) μ_ij/δ_j、μ-grid (de-opaque の `mu`/`alpha` 供給源) が §6 結果として落ちる。
+**✅✅ bridge DONE (2026-06-20)**: `typePData_toS06Hypothesis` (構造部, 11 field) +
+`Hypothesis.toCertainTypeHypothesis` (CertainTypeHypothesis 組立, dade=既在) 完成・axiom-clean
+(`39f1ead4` 系の続き)。⟹ §6 の `toTICyclicHypothesis`・μ/ω column API・Clifford inertia が L=M で発火可。
 
-### ▶ 次セッションの推奨着手順 (real 進捗順)
+### ▶ 次の着手順 (real 進捗順)
 
-1. **★ §10→§6 bridge** (上記)。まず `card_coprime` (W₁ Hall) の供給可否を確認 (gap なら parameter 化)。
-   構造部 `S06.Hypothesis ↥M` 構成 → `CertainTypeHypothesis` 組立 (dade は既在)。最重だが apparatus 既在ゆえ
-   見かけより tractable。これが (10.2)/(10.3)/μ-grid の共通 unlock。
-2. 並行可: CharacterParameters de-opaque (self-contained 3 field: zeta_irreducible/n_formula/alpha_formula)
-   を producer signature 書換と一括で (piecemeal 禁、全 self-contained field を 1 commit)。
-3. issue 1005 (hVti / 4.6.b ambient TI discharge)。
+1. ✅ **§10→§6 bridge DONE**。残 = `hHall` discharge ([issue 1006](../../issues/1006-typep-w1-hall.md), κ-Hall 経由)。
+2. **▶ (10.2)/(10.3) を §6 機構で形式化**: bridge の `CertainTypeHypothesis` から §6 の μ/ω/ζ family・
+   Brauer/inertia を引き、(10.2) ζ (degree w₁ irreducible∈S)、(10.3) μ_ij/δ_j independence + w₂ prime を
+   producer (`exists_zeta_degree_w1` 等) として構成。これで `CharacterParameters` の zeta/mu/omegaSigma が
+   §6 由来の実データに。⚠ §6 が L=M で何を即供給するか (どの定理が `CertainTypeHypothesis`/`Hypothesis46`
+   入力か) を先に RECON。
+3. CharacterParameters de-opaque (self-contained field: zeta_irreducible/n_formula/alpha_formula) を
+   producer signature 書換と一括で。
+4. issue 1005 (hVti) / 1006 (hHall) discharge。
