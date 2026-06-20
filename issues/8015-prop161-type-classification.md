@@ -83,10 +83,30 @@ cluster (Theorems A-E) と相互依存**。多くが §16 sorried endpoint 自�
 - [x] **hVP1 の MF=Mσ 半分** `mf_eq_msigma_of_typePData_U_eq_bot` (c8484496, axiom-clean, A(8)-free)。
 - [x] **σ-complement 半分** `typePData_W1_prime_not_mem_sigma` (2d59f42d, axiom-clean): `p∈π(W₁) → p∉σ(M)`
       (条件 2)。order-p subgroup L≤W₁ を `sigma_subgroup_le_Msigma_of_isHall` で M_σ に落とし W₁∩M'=⊥ と矛盾。
-- [ ] **rank-1 半分 (carrier-gated, 残 crux)**: `pRank_M p=1` for p∈π(W₁) — W₁=κ-Hall witness が要る
-      (`Section16TypePStructure`/issue 7005 の構造から)。これが medium 方向の真の gate。**次セッション**:
-      `Section16TypePStructure`/carrier が W₁=κ-Hall (or rank-1) を供給するか確認し、それを使って
-      `typePData_kappa_nonempty` (carrier 版) を組む。3 条件のうち 2 (centralizer+σ-comp) は済。
+- [x] **kappa-nonempty capstone** `typePData_kappa_nonempty_of_rank1` (2d6bde51, axiom-clean):
+      TypePData + (∀p∈π(W₁), pRank_M p=1) ⟹ κ(M)≠∅。3 building block を組み上げ "→IsTypeP" を
+      **rank-1 named input 1 つに精密還元** (gated-endpoint)。
+- [ ] **rank-1 input の供給 (残 crux)**: `pRank_M p=1` for p∈π(W₁)。下記 DAG の通り §16 Theorems A-D
+      gate。carrier 経由も §16 endpoint 経由ゆえ root は §16 Theorems。
+
+### 🔑 2026-06-20 dependency DAG 確定 (carrier shortcut は無い)
+`exists_section16MaximalPair_data` (producer, FeitThompson:298) は **その構築内で Prop 16.1 を cite**
+(`notTypeI_imp_typeP`/`typeP_imp_nonI`/`hone` が `proposition_type_classification` 経由, FeitThompson:322/358)。
+⟹ **carrier (`Section16MaximalPair`) も Prop 16.1 から作られる**ので「carrier が rank-1/κ-Hall を供給」
+は循環で使えない。真の DAG:
+```
+§14 κ-structure (Prop 14.2✅, typeP_duality✅) + §15 (Thm 15.2✅, 15.7?)
+  → §16 Theorems A/B/C/D (sorried endpoints)
+    → Prop 16.1 (本 issue)  → §16 producer → S16.Hypothesis → FT
+```
+各 input の真の gate (BG 証明より): hFI←A(8)+B(1-3)+15.7(c) / hP2II←C(1)(10)+B(1)(4)+A(8) /
+hP1neIIIIV←A(8)+Frattini / hP1eqV←15.7(c) / **reverse hIIP2/hIIIIVP1/hVP1 の →IsTypeP←rank-1**
+(capstone で還元済、rank-1 は κ-Hall=Prop 14.2/C 由来) / **hIF←A(8)+Frobenius FPF** (type-F⟹κ=∅:
+M_σ=M_F[A(8)] なら U が M_σ に FPF 作用 ⟹ σ-complement 元の M_σ-centralizer=1 ⟹ κ=∅)。
+**⟹ 次の実質前進 = §16 Theorems A-D (特に Theorem A の MF/Mσ 構造 = `theoremA_maximal_structure`
+S16:144 sorry, と Theorem C) を attack する**。Prop 16.1 はそれらの downstream assembly。
+本 issue で landed の 4 補題 (MF=Mσ / centralizer / σ-complement / kappa-nonempty capstone) は
+A-D landing 時に reverse 方向で消費される honest infra。
 - [ ] **input 1-4, 9 (hard 構成)**: §16 endpoint A-E と協調。`typeFData_of_kappa_eq_bot` を起点に
       TypeIData の `alternative` (8.3 三分岐) を構成 (要 Thm 15.7(c))。← 最深、後回し。
 - [ ] **assembly**: 全 input が揃ったら `proposition_type_classification := …_of_inputs h11 …` で close。
