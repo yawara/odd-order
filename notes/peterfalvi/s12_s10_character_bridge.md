@@ -224,6 +224,28 @@ apparatus が (10.2)/(10.3)/μ-grid をすべて供給**、新規 apparatus buil
    producer signature 書換と一括で。
 4. issue 1005 (hVti) / 1006 (hHall) discharge。
 
+### ✅✅✅ (10.2) DONE (2026-06-20 cont.⁴): `exists_zeta_in_inducedFamily_degree_w1`
+
+**Peterfalvi (10.2) を構成的に形式化完了** (`S12_MaximalIII_IV_V.lean`, axiom-clean, sorry-free, full
+build 3870 green)。下の BREAKTHROUGH 通り、全 `Hypothesis L` (§6 bridge) で完結:
+- helper `exists_nontrivial_linearIrreducibleCharacter` (非 perfect 群 → 非自明 linear char,
+  Pontryagin `exists_apply_ne_one_of_hasEnoughRootsOfUnity` + abelianization, axiom-clean)。
+- M' 非 perfect = M''<M' (TypePData `secondDerived_le_fitting`+`fitting_eq`+`fitting_lt_derived`)
+  → `Group.IsPerfect.ofSurjective` で ↥h.K≅↥M' 転送。
+- crux = (4.4) `certainType_zero_column_anchor` (μ_00=1_L) + `exists_certainType_zero_column_eq_of_
+  subset_characterKernel` + `apply_eq_one_of_mem_commutator_of_apply_one_eq_one` + `columnFamily_mu_ne`。
+- assembly = `induce_isIrreducible_of_forall_chiRestrict_ne` + `induce_apply_one` + `card_W1_eq_derived_index`。
+
+⚠ **デバッグ知見**: `IsPerfect` は `namespace Group` 内 = `Group.IsPerfect` (import
+`Mathlib.GroupTheory.IsPerfect`)。instance synth は `let h` の `↥h.K` を見抜けない → 明示
+`↥((derivedInG M).subgroupOf M)` で `haveI` 登録要。`induce` の Invertible instance は
+inducedFamily と同じ ambient (FiniteInduce) を使う (自前 haveI を作ると membership rfl 破綻)。
+`commutator_def` は 2 名義あり曖昧 → `Group.IsPerfect.ofSurjective` 経由が clean。
+
+**▶ 次**: (10.3) (w₂ prime + d/δ independence) → `CharacterParameters` de-opaque (zeta を (10.2) で,
+mu/omegaSigma を §6 columnFamily で materialize) → (10.5)+ Dade calc。
+
+---
 ### ★★★ BREAKTHROUGH (2026-06-20 cont.³, 原文 (8.15)+(4.4) 精読): **(10.2) は Hypothesis L で可、Hypothesis46 不要**
 
 ⚠⚠⚠ **下の cont.² の「Hypothesis46 が次の build target」は SUPERSEDED**。原文 (8.15) (Nougat 欠落 page を
