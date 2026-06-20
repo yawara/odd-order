@@ -869,6 +869,57 @@ theorem typePData_W1_prime_not_mem_sigma [Finite G]
   rw [hLbot, Subgroup.card_bot] at hLcard
   exact (Fact.out : p.Prime).ne_one hLcard.symm
 
+/-- **Prop 16.1 reverse, `M_P` from `TypePData` modulo the rank-one input** (mmd L4478,
+`π(W₁) ⊆ κ(M) ⟹ κ(M) ≠ ∅`): a type-`P` datum whose `W₁`-primes all have `M`-rank one has
+`κ(M) ≠ ∅`, hence `M` is `S14.IsTypeP`.  This is the gated-endpoint assembly of the three `κ`-bridge
+ingredients for a prime `p ∣ |W₁|`: `p ∉ σ(M)` (`typePData_W1_prime_not_mem_sigma`) and `r_p(M) = 1`
+(the hypothesis `hrank`) put `p ∈ τ₁(M) ∪ τ₃(M)`, while `⟨g⟩` (`g ∈ W₁` of order `p`) is a rank-one
+elementary abelian subgroup with `M_σ ⊓ C(⟨g⟩) ⊇ M_σ ⊓ C(g) ≠ ⊥`
+(`typePData_msigma_inf_centralizer_W1_ne_bot`).  So `p ∈ κ(M)`.
+
+The only residual hypothesis `hrank` is the carrier-gated half (the `W₁ = κ`-Hall fact forces
+`r_p(M) = 1`; cf. issue 8015).  Supplies the `→ M_P` direction of the reverse classifications
+`hIIP2`/`hIIIIVP1`/`hVP1` of `proposition_type_classification_of_inputs`. -/
+theorem typePData_kappa_nonempty_of_rank1 [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} (hM : M ∈ maximalSubgroups G)
+    (data : TypePData M)
+    (hrank : ∀ p ∈ (Nat.card ↥data.W1).primeFactors, pRank ↥M p = 1) :
+    (S14.kappa M).Nonempty := by
+  classical
+  -- A prime `p ∣ |W₁|` (`W₁ ≠ ⊥`).
+  have hW1card : Nat.card ↥data.W1 ≠ 1 := fun h => data.W1_nontrivial (Subgroup.card_eq_one.mp h)
+  obtain ⟨p, hpp, hpdvd⟩ := Nat.exists_prime_and_dvd hW1card
+  have hp : p ∈ (Nat.card ↥data.W1).primeFactors :=
+    Nat.mem_primeFactors.mpr ⟨hpp, hpdvd, Nat.card_pos.ne'⟩
+  haveI : Fact p.Prime := ⟨hpp⟩
+  -- An order-`p` element `g ∈ W₁` and the rank-one subgroup `P = ⟨g⟩`.
+  obtain ⟨g, hg⟩ := exists_prime_orderOf_dvd_card' (G := ↥data.W1) p hpdvd
+  have hgord : orderOf ((g : G)) = p :=
+    (orderOf_injective data.W1.subtype data.W1.subtype_injective g).trans hg
+  have hgne : (g : G) ≠ 1 := fun hc => by
+    rw [hc, orderOf_one] at hgord; exact hpp.ne_one hgord.symm
+  have hPcard : Nat.card ↥(Subgroup.zpowers (g : G)) = p := by rw [Nat.card_zpowers, hgord]
+  refine ⟨p, hpp, ?_, Subgroup.zpowers (g : G),
+    ⟨Subgroup.IsElementaryAbelian.of_card_prime hPcard, by rw [hPcard, pow_one]⟩,
+    (Subgroup.zpowers_le.mpr g.2).trans data.W1_le, ?_⟩
+  · -- `p ∈ τ₁(M) ∪ τ₃(M)` from `p ∉ σ(M)` and `r_p(M) = 1`.
+    have hpσ : p ∉ OddOrder.BG.Ch3.S10.sigma M := typePData_W1_prime_not_mem_sigma hG hM data hp
+    have hr : pRank ↥M p = 1 := hrank p hp
+    by_cases hM' : p ∈ (Nat.card ↥(derivedInG M)).primeFactors
+    · exact Or.inr ((mem_tau3_iff M p).mpr ⟨hpσ, hM', hr⟩)
+    · exact Or.inl ((mem_tau1_iff M p).mpr ⟨hpσ, hM', hr⟩)
+  · -- `M_σ ⊓ C(⟨g⟩) ⊇ M_σ ⊓ C(g) ≠ ⊥`.
+    have hCne : OddOrder.BG.Ch3.S10.Msigma M ⊓ Subgroup.centralizer ({(g : G)} : Set G) ≠ ⊥ :=
+      typePData_msigma_inf_centralizer_W1_ne_bot hG hM data g.2 hgne
+    have hCle : Subgroup.centralizer ({(g : G)} : Set G) ≤
+        Subgroup.centralizer ((Subgroup.zpowers (g : G) : Subgroup G) : Set G) := by
+      intro y hy
+      rw [Subgroup.mem_centralizer_iff] at hy ⊢
+      intro z hz
+      obtain ⟨n, rfl⟩ := Subgroup.mem_zpowers_iff.mp hz
+      exact Commute.zpow_left (hy (g : G) (Set.mem_singleton _)) n
+    exact fun hbot => hCne (le_bot_iff.mp ((inf_le_inf_left _ hCle).trans hbot.le))
+
 /-! ## Proposition 16.1: BG local taxonomy and shared Type I--V predicates -/
 
 /-- **§14/§15-independent assembly engine for BG Proposition 16.1** (mmd L4478; the source proof
