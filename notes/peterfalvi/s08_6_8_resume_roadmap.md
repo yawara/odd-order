@@ -4,7 +4,25 @@
 > `s08_6_8_assembly_plan.md`(458KB)/`s08_6_8_3_gap_resolution.md` のうち本 note と矛盾する記述は本 note を優先。
 > 上位方針・FT 接続の文脈 = 記憶 [[ft-path-policy]] の 2026-06-17 検証訂正ブロック。
 
-## 🚩🆕🆕🆕 HANDOFF — 次セッションはここから (2026-06-20 cont.²⁸ — cY-rewiring 完了 ✅✅, 残 = S08:59 assembly)
+## ✅✅✅ DONE (2026-06-20 cont.²⁸ 完) — S08:59 `sibleySetup_is_coherent` 完全証明・(6.8) capstone 締結
+
+**`sibleySetup_is_coherent` は sorry-free + axiom-clean** (`#print axioms` = propext/Classical.choice/Quot.sound のみ)。
+§8 唯一の実 sorry が消滅。full build green (3869 jobs, AxiomsCheck OK)、**実 sorry 137→136**。issue 0046 closed。
+本セッション 4 commit:
+- `66eee14e` cY-rewiring (case-B chain の |Y|≠2 ゲート除去、uniform cY+hcYgood)。
+- `3c988ee5` `Xset_nonempty_of_subgroupOf_ne_bot_weighted` (Frobenius 不要 X-nonemptiness、case-B hXne discharge)。
+- `03deca0a` capstone closure: X-nonempty 枝 assembly (`S08_CoherenceTheorems`) + edge producer
+  `nonempty_coherent_S_caseB_edge` (`S08_CaseBSeedGlue`)。
+- assembly 構造: `Nonempty.some` + `rcases hyp.cases` → Frobenius (`nonempty_coherent_S_of_frobenius`) /
+  c2 (instances + `by_contra` + hbound/hsplit → `nonempty_coherent_S_of_c2_of_branches`、hcaseA=`_caseA_of_c2`、
+  hcaseB= hWMgt 分岐: W₂⊊H′ → `_caseB_of_c2` / W₂=H′ → `_caseB_edge`)。教科書 (6.8.3) 通り: Z=H′ ⟹ S=X∪Y (seed)、
+  Z⊊H′ ⟹ bootstrap。弱 FPF `|W₁|<|H:W₂|` は `caseB_W1_dvd_index_commutator` (hWMgt 非依存)。
+
+**▶ 次フロンティア (lane B)**: (1) §9 (7.10) `card_G0_lower_bound` (issue 0044) が (6.8) で unblock —
+ただし FT-path 上の優先度・接続は要確認。(2) §13 char-grid (issue 1004 deferred)。(3) lane の次タスクは要ユーザー指示。
+**↓ 以下は S08:59 を閉じる過程の作業ログ (履歴、cont.²⁸/²⁷)**。
+
+## 🚩 (履歴) HANDOFF — (2026-06-20 cont.²⁸ — cY-rewiring 完了 ✅✅, 残 = S08:59 assembly) [DONE 上に集約]
 
 **状態**: branch `lane-b`、clean、**full build green (3869 jobs, AxiomsCheck OK, 0 errors)、実 sorry 不変**。
 cont.²⁷ の「mechanical cY-rewiring」を**完遂**: case-B coherence chain 全体を `hyp.coherentYset`+`hYcard` から
