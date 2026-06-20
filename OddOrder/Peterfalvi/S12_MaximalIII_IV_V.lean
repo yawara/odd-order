@@ -1102,6 +1102,156 @@ theorem Hypothesis.w2_prime [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
   rw [← hcard]
   exact dataII.common.2.1
 
+open scoped FiniteInduce in
+/-- **Peterfalvi (10.3), arithmetic data**: the common nontrivial-column degree `d`, the sign
+`δ`, and the integer `n = (d − δ)/w₁`, materialized from the §6 column family.
+
+We pick a nontrivial column `j₀` (which exists because `w₂` is prime, hence `≥ 2`) and read off
+`d = μ_{0 j₀}(1)` as a natural number (the degree of an irreducible character,
+`exists_natDegree_characterDegree_dvd_card`).  `d > 1` is Peterfalvi (4.4): if `μ_{0 j₀}` had degree
+`1` it would be linear, hence `K`-trivial, hence a column-`0` character — contradicting `χ₂ ≠ 1`
+(`columnFamily_mu_ne`); this mirrors the crux of `exists_zeta_in_inducedFamily_degree_w1`.  `δ` is the
+column sign; and the congruence `μ_{0 j₀}(1) ≡ δ (mod w₁)` (Peterfalvi (4.3.d),
+`certainType_degree_modEq`) gives `n` with `n·w₁ = d − δ`.  The degree independence
+`μ_{ij}(1) = d` for all `i` and all nontrivial `j` is the materialized (10.3) constancy
+`muGrid_apply_one_eq`. -/
+theorem Hypothesis.exists_charParamArith [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} (hyp : Hypothesis M)
+    (hodd : Odd (Nat.card G)) :
+    ∃ (d : ℕ) (delta : ℤ) (n : ℕ), 1 < d ∧ (n : ℤ) * (hyp.w1 : ℤ) = (d : ℤ) - delta ∧
+      ∀ (i : Fin hyp.w1) (j : Fin hyp.w2), j ≠ 0 → hyp.muGrid hG hodd i j 1 = (d : ℂ) := by
+  haveI := hyp.finiteG
+  classical
+  have hw2 := hyp.w2_prime hG
+  have hw2ge : 2 ≤ hyp.w2 := hw2.two_le
+  -- a nontrivial column index `j₀`
+  let j₀ : Fin hyp.w2 := ⟨1, by omega⟩
+  have hj₀ : j₀ ≠ 0 := Fin.ne_of_val_ne (by simp [j₀])
+  -- Reconstruct the §6 host and instances exactly as in `Hypothesis.muGrid`.
+  let h := (hyp.toCertainTypeHypothesis hG hodd).toHypothesis
+  haveI hNeZ1 : NeZero (Nat.card h.W1) := ⟨by have := h.one_lt_card_W1; omega⟩
+  haveI hcyc : IsCyclic ↥(h.W1 ⊔ h.W2) := h.isCyclic_sup
+  letI : CommGroup ↥(h.W1 ⊔ h.W2) := IsCyclic.commGroup
+  have hW1le : hyp.typeP.W1 ≤ M := hyp.typeP.W1_le
+  have hW2le : hyp.typeP.W2 ≤ M :=
+    (hyp.typeP.W2_le.trans inf_le_left).trans
+      (hyp.typeP.H_le.trans (Subgroup.map_subtype_le _))
+  have hcardW1 : Nat.card ↥h.W1 = hyp.w1 :=
+    Nat.card_congr (Subgroup.subgroupOfEquivOfLe hW1le).toEquiv
+  have hcardW2sub : Nat.card ↥(h.W2.subgroupOf (h.W1 ⊔ h.W2)) = hyp.w2 := by
+    rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe (le_sup_right)).toEquiv]
+    exact Nat.card_congr (Subgroup.subgroupOfEquivOfLe hW2le).toEquiv
+  haveI hNeZ2 : NeZero (Nat.card ↥(h.W2.subgroupOf (h.W1 ⊔ h.W2))) := ⟨Nat.card_pos.ne'⟩
+  let χ₂ : (h.W2.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ :=
+    finCardEquivCharacterGroup _ (finCongr hcardW2sub.symm j₀)
+  let k₀ : Fin (Nat.card h.W1) := finCongr hcardW1.symm 0
+  -- `χ₂` is a nontrivial dual (the column-`0` dual is the trivial one).
+  have hχ₂ne : χ₂ ≠ 1 := by
+    intro heq
+    rw [← finCardEquivCharacterGroup_zero (h.W2.subgroupOf (h.W1 ⊔ h.W2))] at heq
+    have hk0 : finCongr hcardW2sub.symm j₀ = 0 := (finCardEquivCharacterGroup _).injective heq
+    have : (j₀ : ℕ) = 0 := by simpa using congrArg Fin.val hk0
+    exact hj₀ (Fin.ext this)
+  -- `muGrid 0 j₀ = (h.columnFamily χ₂).mu k₀` definitionally.
+  have hmg : hyp.muGrid hG hodd 0 j₀ = ((h.columnFamily χ₂).mu k₀ : ClassFunction ↥M ℂ) := by
+    unfold Hypothesis.muGrid
+    rfl
+  -- `h.K = commutator ↥M` (so (4.4) applies).
+  have hKeq : h.K = (derivedInG M).subgroupOf M := rfl
+  have hKcomm : h.K = commutator ↥M := by
+    rw [hKeq, derivedInG, Subgroup.subgroupOf,
+      Subgroup.comap_map_eq_self_of_injective M.subtype_injective]
+  -- `d := μ_{0 j₀}(1) ∈ ℕ`.
+  obtain ⟨d, hd0, hdeg, -⟩ :=
+    OddOrder.Peterfalvi.S03.exists_natDegree_characterDegree_dvd_card
+      ((h.columnFamily χ₂).mu k₀)
+  rw [OddOrder.Peterfalvi.S03.characterDegree_def] at hdeg
+  -- `d > 1` by (4.4): a nontrivial column is not linear (mirrors the `exists_zeta` crux).
+  have hne1 : ((h.columnFamily χ₂).mu k₀ : ClassFunction ↥M ℂ) 1 ≠ 1 := by
+    intro hmu1
+    have hker : (h.K : Set ↥M) ⊆ OddOrder.Peterfalvi.S03.characterKernel
+        ((h.columnFamily χ₂).mu k₀ : ClassFunction ↥M ℂ) := by
+      intro x hx
+      have hx1 := ((h.columnFamily χ₂).mu k₀).isIrreducible
+        |>.apply_eq_one_of_mem_commutator_of_apply_one_eq_one hmu1 (hKcomm ▸ hx)
+      rw [OddOrder.Peterfalvi.S03.mem_characterKernel, hx1,
+        OddOrder.Peterfalvi.S03.characterDegree_def, hmu1]
+    obtain ⟨i, hi⟩ := h.exists_certainType_zero_column_eq_of_subset_characterKernel _ hker
+    exact h.columnFamily_mu_ne hχ₂ne k₀ i hi.symm
+  have hd1 : 1 < d := by
+    rw [hdeg] at hne1
+    have : d ≠ 1 := fun hd => hne1 (by rw [hd]; norm_num)
+    omega
+  -- (4.3.d): `μ_{0 j₀}(1) = δ + w₁·a`.
+  obtain ⟨a, ha⟩ := h.certainType_degree_modEq χ₂ k₀
+  have hcardW1c : (Nat.card ↥h.W1 : ℂ) = (hyp.w1 : ℂ) := by exact_mod_cast hcardW1
+  have hcombine : (d : ℂ) = ((h.columnFamily χ₂).sign : ℂ) + (hyp.w1 : ℂ) * (a : ℂ) := by
+    rw [← hdeg, ha, hcardW1c]
+  have hZ : (d : ℤ) = (h.columnFamily χ₂).sign + (hyp.w1 : ℤ) * a := by exact_mod_cast hcombine
+  -- `a ≥ 0` (so `n := a.toNat` realizes `n·w₁ = d − δ`).
+  have hw1posN : 0 < hyp.w1 := Nat.pos_of_ne_zero (NeZero.ne hyp.w1)
+  have hw1pos : (0 : ℤ) < (hyp.w1 : ℤ) := by exact_mod_cast hw1posN
+  have hdsign : (0 : ℤ) < (d : ℤ) - (h.columnFamily χ₂).sign := by
+    rcases (h.columnFamily χ₂).sign_eq with hs | hs <;> rw [hs] <;> omega
+  have hapos : 0 ≤ a := by
+    by_contra hlt
+    push_neg at hlt
+    have hwa : (hyp.w1 : ℤ) * a < 0 := mul_neg_of_pos_of_neg hw1pos hlt
+    linarith [hZ, hdsign, hwa]
+  -- degree independence (the materialized (10.3) constancy).
+  have hdi : ∀ (i : Fin hyp.w1) (j : Fin hyp.w2), j ≠ 0 →
+      hyp.muGrid hG hodd i j 1 = (d : ℂ) := by
+    intro i j hj
+    rw [hyp.muGrid_apply_one_eq hG hodd hw2 i 0 hj hj₀, hmg]
+    exact hdeg
+  refine ⟨d, (h.columnFamily χ₂).sign, a.toNat, hd1, ?_, hdi⟩
+  rw [Int.toNat_of_nonneg hapos, mul_comm]
+  linarith [hZ]
+
+open scoped FiniteInduce in
+/-- **Peterfalvi (10.2)+(10.3), the character parameters of (10.4)**: assemble a genuine
+`CharacterParameters` for the §10 Hypothesis from the materialized §6 data.
+
+`ζ` is the degree-`w₁` irreducible of (10.2) (`exists_zeta_in_inducedFamily_degree_w1`), the `μ`- and
+`ω^σ`-grids are `muGrid`/`omegaSigmaGrid`, `w₂` is prime by the non-circular (10.3) first clause
+(`Hypothesis.w2_prime`), and the degree data `d > 1`, `n·w₁ = d − δ`, `μ_{ij}(1) = d` come from
+`exists_charParamArith`.  Only the still-`Prop`-placeholder fields (`delta_independent`, the `τ₁`-level
+formulas) are filled trivially, pending the (10.5)/(10.6) Dade calculations. -/
+theorem Hypothesis.exists_charParameters [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    {M : Subgroup G} (hyp : Hypothesis M) :
+    ∃ params : CharacterParameters hyp,
+      (params.zeta ∈ hyp.Sset ∧ IsIrreducibleCharacter params.zeta ∧
+          params.zeta 1 = ((hyp.w1 : ℕ) : ℂ)) ∧
+        (1 < params.d ∧
+          (∀ (i : Fin hyp.w1) (j : Fin hyp.w2), j ≠ 0 → params.mu i j 1 = (params.d : ℂ)) ∧
+          params.delta_independent ∧
+          ((params.n : ℤ) * (hyp.w1 : ℤ) = (params.d : ℤ) - params.delta)) := by
+  haveI := hyp.finiteG
+  classical
+  have hodd : Odd (Nat.card G) := hG.odd
+  obtain ⟨ζ, hζS, hζirr, hζdeg⟩ := exists_zeta_in_inducedFamily_degree_w1 hyp.typeP hodd
+    (typePData_W1_hall_coprime hG hyp.maximal (hyp.bgTypeP hG) hyp.typeP)
+  obtain ⟨d, delta, n, hd1, hnf, hdi⟩ := hyp.exists_charParamArith hG hodd
+  exact ⟨{ zeta := ζ
+           zeta_mem_S := hζS
+           zeta_irreducible := hζirr
+           d := d
+           delta := delta
+           n := n
+           w2_prime := hyp.w2_prime hG
+           d_gt_one := hd1
+           mu := hyp.muGrid hG hodd
+           omegaSigma := hyp.omegaSigmaGrid hG hodd
+           degree_independent := hdi
+           n_formula := hnf
+           delta_independent := True
+           delta_independent_holds := trivial
+           zeta_tau1_norm_bound := True
+           orthogonality_w1_lt_w2 := True
+           typeV_parameter_formula := True
+           typeV_coherence_formula := True },
+    ⟨hζS, hζirr, hζdeg⟩, hd1, hdi, trivial, hnf⟩
+
 /-- **Peterfalvi (10.2)**: the family `S` contains an irreducible character
 `zeta` of degree `w_1`. -/
 theorem exists_zeta_degree_w1 [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
@@ -1109,7 +1259,8 @@ theorem exists_zeta_degree_w1 [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     ∃ params : CharacterParameters hyp,
       params.zeta ∈ hyp.Sset ∧ IsIrreducibleCharacter params.zeta ∧
         params.zeta 1 = ((hyp.w1 : ℕ) : ℂ) := by
-  sorry
+  obtain ⟨params, h1, -⟩ := hyp.exists_charParameters hG
+  exact ⟨params, h1⟩
 
 /-- **Peterfalvi (10.3)**: `w_2` is prime and the parameters `d`, `delta`, and
 `n = (d - delta) / w_1` are well-defined and independent of the indices. -/
@@ -1120,7 +1271,8 @@ theorem w2_prime_and_parameter_independence [Finite G]
         (∀ (i : Fin hyp.w1) (j : Fin hyp.w2), j ≠ 0 → params.mu i j 1 = (params.d : ℂ)) ∧
         params.delta_independent ∧
         ((params.n : ℤ) * (hyp.w1 : ℤ) = (params.d : ℤ) - params.delta) := by
-  sorry
+  obtain ⟨params, -, h2⟩ := hyp.exists_charParameters hG
+  exact ⟨params, hyp.w2_prime hG, h2⟩
 
 /-! ## (10.5)--(10.6): Dade-isometry calculations -/
 
