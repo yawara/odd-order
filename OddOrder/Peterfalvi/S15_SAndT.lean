@@ -5,6 +5,7 @@ Authors: Yawara Ishida
 -/
 import OddOrder.Peterfalvi.S14_MaximalI
 import OddOrder.Peterfalvi.S10_CoherenceWiring
+import OddOrder.Isaacs.Ch06_FrobeniusActions.OddComplement
 import OddOrder.GroupTheory.MaximalSubgroupTypeConj
 import OddOrder.GroupTheory.CoprimeAction
 import Mathlib.Algebra.BigOperators.ModEq
@@ -1301,6 +1302,78 @@ theorem exists_typeI_maximal_overNormalizer_U [Finite G]
     have hconj_eq : (⟨w, hwUW1⟩ : ↥(hyp.U ⊔ hyp.W1)) * ⟨n, hnUW1⟩ * ⟨w, hwUW1⟩⁻¹ = ⟨n, hnUW1⟩ :=
       Subtype.ext (by simpa using hcomm)
     exact bdata.UW1_frobenius.conj_frobenius _ hwmem hwne' _ hnmem hnne' hconj_eq
+
+/-- **Peterfalvi (13.17.c), Huppert step.**  If `W₁` lies in a Frobenius complement `E` of the
+type-I subgroup `L`, then `E ⊆ Q W₂`.
+
+*Proof (Pf p.82):* `E` is a Frobenius complement of **odd** order (`E ≤ L ≤ G`, `|G|` odd), so by
+Huppert ([H] Kapitel V Satz 8.18 b), `normal_of_card_prime_of_isFrobeniusGroup_of_odd`) its
+prime-order subgroup `W₁` (`|W₁| = q`) is normal in `E`.  Hence `E ⊆ N_G(W₁) = C_G(W₁) = Q W₂`
+by (13.16) (`normalizer_W1`).  This is the step of (13.17.c) consuming the new Frobenius-complement
+structure theory; the remaining order analysis (`|E| ∈ {q, p q}`, cyclic Sylows by [BG] 3.9, and
+the `(14.5)` exclusion of `E = W₁`) builds on this containment. -/
+theorem complement_le_QW2 [Finite G]
+    (_hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
+    {L : Subgroup G} (frob : OddOrder.Peterfalvi.S14.TypeIFrobeniusData L)
+    (hW1E : hyp.W1 ≤ frob.complement.map L.subtype) :
+    frob.complement.map L.subtype ≤ hyp.Q ⊔ hyp.W2 := by
+  set E := frob.complement with hEdef
+  -- `W₁ ≤ L`, and `W₁` (as a subgroup of `↥L`) is contained in `E`.
+  have hEleL : E.map L.subtype ≤ L := Subgroup.map_subtype_le E
+  have hW1L : hyp.W1 ≤ L := hW1E.trans hEleL
+  have hW1L_le_E : hyp.W1.subgroupOf L ≤ E := by
+    intro x hx
+    rw [Subgroup.mem_subgroupOf] at hx
+    obtain ⟨e, he, hee⟩ := hW1E hx
+    have hex : e = x := Subtype.coe_injective (by simpa using hee)
+    rw [← hex]; exact he
+  -- `R := W₁` viewed inside `E`, of prime order `q`.
+  set R : Subgroup ↥E := (hyp.W1.subgroupOf L).subgroupOf E with hRdef
+  have hRcard : Nat.card ↥R = hyp.q := by
+    rw [hRdef, Nat.card_congr (Subgroup.subgroupOfEquivOfLe hW1L_le_E).toEquiv,
+      Nat.card_congr (Subgroup.subgroupOfEquivOfLe hW1L).toEquiv]
+    exact hyp.q_eq_card_W1.symm
+  -- `E` has odd order (it divides `|G|`).
+  have hEdvd : Nat.card ↥E ∣ Nat.card G :=
+    (Subgroup.card_subgroup_dvd_card E).trans (Subgroup.card_subgroup_dvd_card L)
+  have hodd : Odd (Nat.card ↥E) := _hG.odd.of_dvd_nat hEdvd
+  -- Huppert V.8.18 b): `W₁` is normal in `E`, so `E` normalizes `W₁` in `↥L`.
+  haveI hRnormal : R.Normal :=
+    OddOrder.Isaacs.Ch06.normal_of_card_prime_of_isFrobeniusGroup_of_odd
+      frob.frobenius hodd hyp.q_prime hRcard
+  have hEnorm := (Subgroup.normal_subgroupOf_iff_le_normalizer hW1L_le_E).mp hRnormal
+  -- Lift to `G`: `E.map L.subtype ≤ N_G(W₁)`.
+  have hEN : E.map L.subtype ≤ Subgroup.normalizer (hyp.W1 : Set G) := by
+    rintro _ ⟨e, he, rfl⟩
+    have heN := hEnorm he
+    rw [Subgroup.mem_normalizer_iff] at heN ⊢
+    intro w
+    constructor
+    · intro hw
+      have hwL : w ∈ L := hW1L hw
+      have hw' : (⟨w, hwL⟩ : ↥L) ∈ hyp.W1.subgroupOf L := by
+        rw [Subgroup.mem_subgroupOf]; exact hw
+      have hconj := ((heN ⟨w, hwL⟩).mp hw')
+      rw [Subgroup.mem_subgroupOf] at hconj
+      simpa using hconj
+    · intro hw
+      -- the conjugate lies in `W₁ ≤ L`, so `w ∈ L`, and we apply `heN` backwards.
+      have he' : (L.subtype e : G) ∈ L := e.2
+      have hwL : w ∈ L := by
+        have hrw : w = (L.subtype e)⁻¹ * ((L.subtype e) * w * (L.subtype e)⁻¹) * (L.subtype e) := by
+          group
+        rw [hrw]
+        exact L.mul_mem (L.mul_mem (L.inv_mem he') (hW1L hw)) he'
+      have hconjmem : (e * ⟨w, hwL⟩ * e⁻¹) ∈ hyp.W1.subgroupOf L := by
+        rw [Subgroup.mem_subgroupOf]; simpa using hw
+      have hfin := (heN ⟨w, hwL⟩).mpr hconjmem
+      rw [Subgroup.mem_subgroupOf] at hfin
+      simpa using hfin
+  -- (13.16): `N_G(W₁) = C_G(W₁) = Q W₂`.
+  have h1316 := normalizer_W1 _hG hyp
+  calc E.map L.subtype ≤ Subgroup.normalizer (hyp.W1 : Set G) := hEN
+    _ = Subgroup.centralizer (hyp.W1 : Set G) := h1316.1
+    _ = hyp.Q ⊔ hyp.W2 := h1316.2
 
 /-- **Peterfalvi (13.17.c)/(14.5)**: the Frobenius complement of the type-I subgroup `L` over
 `N_G(U)` has order `p q` and contains a conjugate `W₂^y` (`y ∈ Q`).  *Proof (Pf p.82):* a
