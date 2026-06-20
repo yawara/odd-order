@@ -107,6 +107,25 @@ M_σ=M_F[A(8)] なら U が M_σ に FPF 作用 ⟹ σ-complement 元の M_σ-ce
 S16:144 sorry, と Theorem C) を attack する**。Prop 16.1 はそれらの downstream assembly。
 本 issue で landed の 4 補題 (MF=Mσ / centralizer / σ-complement / kappa-nonempty capstone) は
 A-D landing 時に reverse 方向で消費される honest infra。
+
+### 🎯 最有力エントリ = Theorem A(8) を Thm 15.2 から導出 (lane-f の今セッション成果を直接活用)
+`theoremA_ungated_conjuncts` (S16:181) が既に A(1)/A(5)/A(6) を sorry-free 化済。残 monolith
+`theoremA_maximal_structure` の **A(8)** (`MF≠Mσ → U=⊥ ∧ FittingIsTI M ∧ ∃p prime |K|=p`) は
+**Thm 15.2 `mf_ne_msigma_typeP1_structure` (今セッション完成) から部分導出可能**:
+- `U=⊥`: ✅ **landed** `isTypeP1_kappaSigma_compl_hall_subgroupOf_eq_bot` (e0894437, axiom-clean):
+  IsTypeP1 ⟹ κ=π\σ ⟹ π(M)⊆κ∪σ ⟹ (κ∪σ)ᶜ-Hall は素因子なし ⟹ `U.subgroupOf M = ⊥`。
+- `∃p prime |K|=p`: 15.2 が `p.Prime ∧ Nat.card ↥K = p` を直接供給 (cite のみ)。
+- `FittingIsTI M`: 15.2 conjunct に直接は無い → 要確認 (Thm 15.7 由来か、別途)。**次セッションの A(8) 残務**。
+⟹ A(8) の U=⊥ landed + |K|=p は 15.2 cite。次セッションは (i) FittingIsTI の供給元特定 →
+A(8) を `theoremA_maximal_structure` の該当 branch に配線 → A(8) は hIF/hP2II/hP1neIIIIV の共通 gate
+ゆえ Prop 16.1 を大きく前進。
+
+### 本セッション landed の building block (全 axiom-clean, S16_MainResults)
+1. `mf_eq_msigma_of_typePData_U_eq_bot` — TypePData+U=⊥ ⟹ MF=Mσ (hVP1 部分)
+2. `typePData_msigma_inf_centralizer_W1_ne_bot` — κ bridge 条件1 (centralizer)
+3. `typePData_W1_prime_not_mem_sigma` — κ bridge 条件2 (σ-complement)
+4. `typePData_kappa_nonempty_of_rank1` — κ-nonempty capstone (rank-1 gated-endpoint)
+5. `isTypeP1_kappaSigma_compl_hall_subgroupOf_eq_bot` — Thm A(8) の U=⊥ 核
 - [ ] **input 1-4, 9 (hard 構成)**: §16 endpoint A-E と協調。`typeFData_of_kappa_eq_bot` を起点に
       TypeIData の `alternative` (8.3 三分岐) を構成 (要 Thm 15.7(c))。← 最深、後回し。
 - [ ] **assembly**: 全 input が揃ったら `proposition_type_classification := …_of_inputs h11 …` で close。
