@@ -7162,6 +7162,37 @@ theorem mf_eq_msigma_of_piSet_inf_beta_disjoint [Finite G]
     (mf_ne_msigma_typeP1_structure hG hM hne hKM hK rfl).2
   exact hdisj _ hqπ hqβ
 
+/-- **Setup for BG Theorem 15.7(a)**: `¬FittingIsTI M` produces an element `g ∉ M` and a nontrivial
+intersection `F(M) ⊓ F(M)^g`.  Unfolding `¬IsTISubset (F(M)^#) (N_G(F(M)))`: there is `g ∉ N_G(F(M))`
+and `a ∈ F(M)^#` with `gag⁻¹ ∈ F(M)^#`; then `gag⁻¹ ∈ F(M) ⊓ (conj g • F(M))` is nontrivial, and
+`g ∉ M` because `F(M) ⊴ M` forces `M ≤ N_G(F(M))`. -/
+theorem exists_notMem_inf_conj_fitting_ne_bot_of_not_fittingIsTI {M : Subgroup G}
+    (hnotTI : ¬ FittingIsTI M) :
+    ∃ g : G, g ∉ M ∧
+      (fittingInAmbient M ⊓ MulAut.conj g • fittingInAmbient M : Subgroup G) ≠ ⊥ := by
+  rw [FittingIsTI] at hnotTI
+  simp only [OddOrder.GroupTheory.IsTISubset] at hnotTI
+  push_neg at hnotTI
+  obtain ⟨g, ⟨a, haA, hgaA⟩, hgN⟩ := hnotTI
+  simp only [fittingSharp, sharpSubgroup, Set.mem_diff, SetLike.mem_coe,
+    Set.mem_singleton_iff] at haA hgaA
+  obtain ⟨haF, _ha1⟩ := haA
+  obtain ⟨hgaF, hga1⟩ := hgaA
+  -- `g ∉ M`: `F(M) ⊴ M` ⟹ `M ≤ N_G(F(M))`, but `g ∉ N_G(F(M))`.
+  have hMN : M ≤ Subgroup.normalizer ((fittingInAmbient M : Subgroup G) : Set G) :=
+    (Subgroup.normal_subgroupOf_iff_le_normalizer (OddOrder.BG.Ch2.S08.fittingInG_le M)).mp
+      (OddOrder.BG.Ch2.S08.fittingInG_subgroupOf_normal M)
+  refine ⟨g, fun h => hgN (hMN h), ?_⟩
+  -- `gag⁻¹` is a nontrivial element of `F(M) ⊓ conj g • F(M)`.
+  intro hbot
+  have hmem : g * a * g⁻¹ ∈
+      (fittingInAmbient M ⊓ MulAut.conj g • fittingInAmbient M : Subgroup G) := by
+    refine Subgroup.mem_inf.mpr ⟨hgaF, ?_⟩
+    rw [Subgroup.mem_pointwise_smul_iff_inv_smul_mem]
+    simpa [MulAut.smul_def, MulAut.conj_apply, mul_assoc] using haF
+  rw [hbot, Subgroup.mem_bot] at hmem
+  exact hga1 hmem
+
 /-- **Rank-3 lower bound on `M_F` for `β`-primes** (the `≥ 3` side of BG Theorem 15.7(a)'s rank
 dichotomy): if a prime `r` divides `M_F` and lies in `β(M)`, then `r_r(M_F) ≥ 3`.
 
