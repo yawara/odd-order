@@ -2487,6 +2487,143 @@ theorem mf_hall_centralizer_control [Finite G] (hG : OddOrder.BG.IsMinimalSimple
       ∃ n ∈ Subgroup.normalizer (H : Set G), y = n * x * n⁻¹) := by
   sorry
 
+/-- **BG Corollary 15.3(a) for `H = M_σ`** (mmd L4204-4209), *sorry-free*.  The centralizer
+`C_M(M_σ)` decomposes as `(C_G(M_σ) ⊓ M_σ) ⊔ X` with `X` a cyclic `τ₂(M)`-subgroup.
+
+This is exactly the `ha` input that `fitting_decomposition` (Corollary 15.5) consumes at
+`H = M_σ`; using it in place of the (sorried, general) `mf_hall_centralizer_control` makes the
+A(8) `FittingIsTI` chain axiom-clean (issue 8016).
+
+Proof (BG L4209).  `C := C_M(M_σ)` is a `κ(M)'`-group
+(`centralizer_msigma_isPiSubgroup_kappa_compl`, = Prop 14.2(b1)(e)).  Its normal Hall
+`σ`-subgroup `N = M_σ ⊓ C` has a complement `X` by Schur–Zassenhaus: `[C : N] = M_σ.relIndex C`
+divides `[M : M_σ]` (`relIndex_subgroupOf` + `relIndex_dvd_index_of_normal`, a `σ'`-number),
+coprime to `|N| ∣ |M_σ|`.  Then `C = N ⊔ X` and `X` is a `(κ∪σ)'`-group (`|X| = [C:N]` is
+`σ'`, and `X ≤ C` is `κ'`).  As `X ≤ M`, Hall's theorem (`hall_D`) embeds it in a Hall
+`(κ∪σ)'`-subgroup `U` of `M`; `X` centralizes `M_σ` (so `C_{M_σ}(X) = M_σ ≠ 1`), and Lemma
+15.1(c) (`typeP_hall_small_subgroup_cyclic_tau2`) makes `X` cyclic `τ₂`. -/
+theorem mf_centralizer_msigma_decomp [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    {M : Subgroup G} (hM : M ∈ maximalSubgroups G) :
+    ∃ X : Subgroup G, IsCyclic ↥X ∧ (↑(Nat.card ↥X).primeFactors ⊆ tau2 M) ∧
+      Subgroup.centralizer (OddOrder.BG.Ch3.S10.Msigma M : Set G) ⊓ M =
+        (Subgroup.centralizer (OddOrder.BG.Ch3.S10.Msigma M : Set G) ⊓
+          OddOrder.BG.Ch3.S10.Msigma M) ⊔ X := by
+  classical
+  haveI : IsSolvable ↥M := hG.solvable_of_mem_maximalSubgroups hM
+  set Mσ := OddOrder.BG.Ch3.S10.Msigma M with hMσdef
+  set C : Subgroup G := Subgroup.centralizer (Mσ : Set G) ⊓ M with hCdef
+  have hC_le_M : C ≤ M := inf_le_right
+  have hC_le_cent : C ≤ Subgroup.centralizer (Mσ : Set G) := inf_le_left
+  -- `M ≤ N_G(M_σ)`, so `C ≤ N_G(M_σ)`, hence `N := M_σ.subgroupOf C ⊴ C`.
+  have hM_norm_Mσ : M ≤ Subgroup.normalizer (Mσ : Set G) := by
+    rw [hMσdef, OddOrder.BG.Ch3.S10.Msigma]
+    exact le_normalizer_opiCoreInG (OddOrder.BG.Ch3.S10.sigma M) M
+  have hMσinfC_le_C : Mσ ⊓ C ≤ C := inf_le_right
+  have hC_norm_MσinfC : C ≤ Subgroup.normalizer ((Mσ ⊓ C : Subgroup G) : Set G) := by
+    have h1 : C ≤ Subgroup.normalizer (Mσ : Set G) := hC_le_M.trans hM_norm_Mσ
+    exact (le_inf h1 Subgroup.le_normalizer).trans Subgroup.inf_normalizer_le_normalizer_inf
+  haveI hN_normal : ((Mσ ⊓ C).subgroupOf C).Normal :=
+    (Subgroup.normal_subgroupOf_iff_le_normalizer hMσinfC_le_C).mpr hC_norm_MσinfC
+  set N : Subgroup ↥C := (Mσ ⊓ C).subgroupOf C with hNdef
+  have hN_eq_Mσ : N = Mσ.subgroupOf C := by rw [hNdef, Subgroup.inf_subgroupOf_right]
+  -- `|N| = |M_σ ⊓ C|` (a `σ`-number).
+  have hNcard : Nat.card ↥N = Nat.card ↥(Mσ ⊓ C : Subgroup G) :=
+    Nat.card_congr (Subgroup.subgroupOfEquivOfLe hMσinfC_le_C).toEquiv
+  have hN_pi : ∀ p ∈ (Nat.card ↥N).primeFactors, p ∈ OddOrder.BG.Ch3.S10.sigma M := by
+    intro p hp
+    rw [hNcard] at hp
+    exact OddOrder.BG.Ch3.S10.Msigma_isPiGroup M p
+      (Nat.primeFactors_mono (Subgroup.card_dvd_of_le (inf_le_left : Mσ ⊓ C ≤ Mσ))
+        Nat.card_pos.ne' hp)
+  -- `N.index = M_σ.relIndex C ∣ (M_σ.subgroupOf M).index`, a `σ'`-number.
+  haveI hMσM_normal : ((Mσ).subgroupOf M).Normal := by
+    rw [hMσdef, OddOrder.BG.Ch3.S10.Msigma_subgroupOf]; infer_instance
+  have hNindex_dvd : N.index ∣ (Mσ.subgroupOf M).index := by
+    have hNi : N.index = Mσ.relIndex C := by rw [hN_eq_Mσ]; rfl
+    rw [hNi, ← Subgroup.relIndex_subgroupOf hC_le_M]
+    exact Subgroup.relIndex_dvd_index_of_normal (Mσ.subgroupOf M) (C.subgroupOf M)
+  have hMσM_hall : Ch03.IsHallSubgroup (OddOrder.BG.Ch3.S10.sigma M) (Mσ.subgroupOf M) :=
+    OddOrder.BG.Ch3.S10.Msigma_subgroupOf_isHall hG hM
+  have hNindex_pi' : ∀ p ∈ N.index.primeFactors, p ∉ OddOrder.BG.Ch3.S10.sigma M := by
+    intro p hp
+    exact hMσM_hall.index_no_pi p (Nat.mem_primeFactors.mpr
+      ⟨Nat.prime_of_mem_primeFactors hp,
+        (Nat.dvd_of_mem_primeFactors hp).trans hNindex_dvd, Subgroup.index_ne_zero_of_finite⟩)
+  -- Coprimality for Schur–Zassenhaus.
+  have hcop : Nat.Coprime (Nat.card ↥N) N.index :=
+    Ch03.Nat.coprime_of_isPiGroup_of_isPiGroup_compl
+      (π := OddOrder.BG.Ch3.S10.sigma M) Nat.card_pos.ne' Subgroup.index_ne_zero_of_finite
+      hN_pi hNindex_pi'
+  -- Schur–Zassenhaus: complement `H''` of `N` in `↥C`; `X := H''.map C.subtype`.
+  obtain ⟨H'', hH''⟩ := Subgroup.exists_right_complement'_of_coprime hcop
+  set X : Subgroup G := H''.map C.subtype with hXdef
+  have hX_le_C : X ≤ C := hXdef ▸ Subgroup.map_subtype_le H''
+  have hX_le_M : X ≤ M := hX_le_C.trans hC_le_M
+  -- `C = (M_σ ⊓ C) ⊔ X`.
+  have hCeq0 : Mσ ⊓ C ⊔ X = C := by
+    have htop : N ⊔ H'' = ⊤ := hH''.sup_eq_top
+    have hmap := congrArg (Subgroup.map C.subtype) htop
+    rw [Subgroup.map_sup, hNdef, Subgroup.subgroupOf_map_subtype, inf_eq_left.mpr hMσinfC_le_C,
+      ← hXdef] at hmap
+    rw [hmap, ← Subgroup.subgroupOf_self C, Subgroup.subgroupOf_map_subtype, inf_idem]
+  -- `|X| = N.index` (complement card).
+  have hXcard : Nat.card ↥X = N.index := by
+    rw [hXdef, ← Nat.card_congr
+        (Subgroup.equivMapOfInjective H'' C.subtype C.subtype_injective).toEquiv,
+      (hH''.symm).index_eq_card]
+  -- `X` is a `(κ ∪ σ)'`-group:  `κ'` (from `X ≤ C`) and `σ'` (from `|X| = N.index`).
+  have hX_pi : ∀ p ∈ (Nat.card ↥X).primeFactors, p ∈ (S14.kappa M ∪ OddOrder.BG.Ch3.S10.sigma M)ᶜ := by
+    intro p hp
+    rw [Set.mem_compl_iff, Set.mem_union]
+    push_neg
+    refine ⟨?_, ?_⟩
+    · -- `p ∉ κ(M)`: `X ≤ C`, and `C` is a `κ'`-group.
+      have hpC : p ∈ (Nat.card ↥C).primeFactors :=
+        Nat.primeFactors_mono (Subgroup.card_dvd_of_le hX_le_C) Nat.card_pos.ne' hp
+      have := centralizer_msigma_isPiSubgroup_kappa_compl hG hM
+      exact (Set.mem_compl_iff _ _).mp (this p hpC)
+    · -- `p ∉ σ(M)`: `|X| = N.index`, a `σ'`-number.
+      rw [hXcard] at hp; exact hNindex_pi' p hp
+  -- A Hall `(κ ∪ σ)'`-subgroup `U` of `M` containing `X` (Hall D).
+  have hX_pi_M : ∀ p ∈ (Nat.card ↥(X.subgroupOf M)).primeFactors,
+      p ∈ (S14.kappa M ∪ OddOrder.BG.Ch3.S10.sigma M)ᶜ := by
+    intro p hp
+    exact hX_pi p (by rwa [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hX_le_M).toEquiv] at hp)
+  obtain ⟨U₀, hU₀hall, hXU₀⟩ := Ch03.hall_D (G := ↥M) hX_pi_M
+  set U : Subgroup G := U₀.map M.subtype with hUdef
+  have hUof : U.subgroupOf M = U₀ :=
+    Subgroup.comap_map_eq_self_of_injective M.subtype_injective U₀
+  have hUM : U ≤ M := hUdef ▸ Subgroup.map_subtype_le U₀
+  have hUhall : Ch03.IsHallSubgroup ((S14.kappa M ∪ OddOrder.BG.Ch3.S10.sigma M)ᶜ)
+      (U.subgroupOf M) := by rw [hUof]; exact hU₀hall
+  have hXU : X ≤ U := by
+    have h1 : X.subgroupOf M ≤ U.subgroupOf M := by rw [hUof]; exact hXU₀
+    calc X = (X.subgroupOf M).map M.subtype := (Subgroup.map_subgroupOf_eq_of_le hX_le_M).symm
+      _ ≤ (U.subgroupOf M).map M.subtype := Subgroup.map_mono h1
+      _ = U := Subgroup.map_subgroupOf_eq_of_le hUM
+  -- `X` centralizes `M_σ`, so `C_{M_σ}(X) = M_σ ≠ 1`.
+  have hX_cent : X ≤ Subgroup.centralizer (Mσ : Set G) := hX_le_C.trans hC_le_cent
+  have hMσinfCX : Mσ ⊓ Subgroup.centralizer (X : Set G) = Mσ := by
+    rw [inf_eq_left]; exact Subgroup.le_centralizer_iff.mp hX_cent
+  have hMσne : Mσ ≠ ⊥ := hMσdef ▸ OddOrder.BG.Ch3.S10.Msigma_ne_bot hG hM
+  have hCXne : Mσ ⊓ Subgroup.centralizer (X : Set G) ≠ ⊥ := by rw [hMσinfCX]; exact hMσne
+  -- Conclude.
+  refine ⟨X, ?_, ?_, ?_⟩
+  · -- `X` cyclic.
+    by_cases hXbot : X = ⊥
+    · rw [hXbot]; infer_instance
+    · exact (typeP_hall_small_subgroup_cyclic_tau2 hG hM hUM hUhall hXU hXbot hCXne).2.1
+  · -- `π(X) ⊆ τ₂`.
+    by_cases hXbot : X = ⊥
+    · rw [hXbot]; simp
+    · exact (typeP_hall_small_subgroup_cyclic_tau2 hG hM hUM hUhall hXU hXbot hCXne).2.2
+  · -- `C_G(M_σ) ⊓ M = (C_G(M_σ) ⊓ M_σ) ⊔ X`.
+    have hMσinfC_eq : Mσ ⊓ C = Subgroup.centralizer (Mσ : Set G) ⊓ Mσ := by
+      rw [hCdef, inf_comm (Subgroup.centralizer (Mσ : Set G)) M, ← inf_assoc,
+        inf_eq_left.mpr (OddOrder.BG.Ch3.S10.Msigma_le M), inf_comm]
+    rw [hMσinfC_eq] at hCeq0
+    exact hCeq0.symm
+
 /-- **General helper (§14-independent, reusable).**  A nonidentity maximal subgroup of a minimal
 simple group is self-normalizing: `N_G(M) = M`.  If `M ⊊ N_G(M)`, maximality forces `N_G(M) = G`,
 so `M ⊴ G`; simplicity then gives `M = ⊥` or `M = ⊤`, both excluded.  This is the step of BG
@@ -6687,11 +6824,9 @@ theorem fitting_decomposition [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
       exact Subgroup.commutator_eq_bot_iff_le_centralizer.mp hMσY
     have hY_le_M : Y ≤ M := h3.trans (OddOrder.BG.Ch2.S08.fittingInG_le M)
     -- Corollary 15.3(a) at `H := M_σ`: `C_M(M_σ) = (C_G(M_σ) ⊓ M_σ) ⊔ X`, `X` cyclic `τ₂`.
-    have hMσne : Mσ ≠ ⊥ := OddOrder.BG.Ch3.S10.Msigma_ne_bot hG hM
-    have hHallMσ : Ch03.IsHallSubgroup (S14.piSet Mσ) (Mσ.subgroupOf Mσ) := by
-      rw [Subgroup.subgroupOf_self, Ch03.IsHallSubgroup.top_iff]
-      intro p hp; exact hp
-    obtain ⟨⟨X, hXcyc, hXτ₂, hCeq⟩, _⟩ := mf_hall_centralizer_control hG hM hHallMσ hMσne
+    -- Sorry-free via `mf_centralizer_msigma_decomp` (Prop 14.2(b1)(e) + Schur–Zassenhaus +
+    -- Lemma 15.1(c)); this de-axiomatises the A(8) `FittingIsTI` chain (issue 8016).
+    obtain ⟨X, hXcyc, hXτ₂, hCeq⟩ := mf_centralizer_msigma_decomp hG hM
     -- `C := C_G(M_σ) ⊓ M`, `A := C_G(M_σ) ⊓ M_σ`.
     set C : Subgroup G := Subgroup.centralizer (Mσ : Set G) ⊓ M with hCdef
     set A : Subgroup G := Subgroup.centralizer (Mσ : Set G) ⊓ Mσ with hAdef

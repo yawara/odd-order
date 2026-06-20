@@ -3823,6 +3823,25 @@ set_option linter.style.longLine false in
 -- The proved half of the rank core `piSet_mf_inf_beta_disjoint_of_not_fittingIsTI`; sorry-free +
 -- axiom-clean.
 #assert_only_allowed_axioms OddOrder.BG.Ch4.S15.three_le_pRank_mf_of_mem_beta
+-- BG Proposition 14.2(e) core (`S14_TypePCounting`, issue 8016): in a type-`P` `E`-setup with the
+-- `κ`-Hall `K` playing the `E₁`-role, `K* = C_{M_σ}(K) ⊊ M_σ`.  Proven *non-circularly* (Lemma
+-- 13.13 ⟹ `ℳ(K*) ≠ {M}`, Lemma 13.6 ⟹ `ℳ(Syl_p M_σ) = {M}`), replacing the circular Cor 15.6
+-- route.  Exposed as the 7th conjunct of `typeP_structure`.  Sorry-free + axiom-clean.
+#assert_only_allowed_axioms OddOrder.BG.Ch4.S14.kstar_ne_msigma_aux
+-- BG Corollary 15.3 step (`S14_TypePCounting`, issue 8016): `C_M(M_σ)` is a `κ(M)'`-group.  The
+-- exact statement BG cites at the start of Cor 15.3's proof (mmd L4209).  Sorry-free + axiom-clean.
+#assert_only_allowed_axioms OddOrder.BG.Ch4.S14.centralizer_msigma_isPiSubgroup_kappa_compl
+-- BG Corollary 15.3(a) for `H = M_σ` (`S15_MF`, issue 8016): `C_M(M_σ) = (C_G(M_σ) ⊓ M_σ) ⊔ X`,
+-- `X` cyclic `τ₂`.  The `ha` input that `fitting_decomposition` consumes; assembled from the
+-- `κ'`-group property + Schur–Zassenhaus + Lemma 15.1(c).  Sorry-free + axiom-clean.
+#assert_only_allowed_axioms OddOrder.BG.Ch4.S15.mf_centralizer_msigma_decomp
+-- BG Theorem A(8) `FittingIsTI` (`S15_MF`, issue 8016): `M_F ≠ M_σ ⟹ F(M)` is a `TI`-subgroup.
+-- Now **fully axiom-clean** — the last sorryAx (via `fitting_decomposition`'s cite of the sorried
+-- general Corollary 15.3) is eliminated by routing through `mf_centralizer_msigma_decomp`.
+#assert_only_allowed_axioms OddOrder.BG.Ch4.S15.fitting_isTI_of_mf_ne_msigma
+-- BG Theorem A(8) full form (`S16_MainResults`, issue 8016): `M_F ≠ M_σ ⟹ U = ⊥ ∧ FittingIsTI M ∧
+-- (∃ p prime, |K| = p)`.  All three conjuncts now axiom-clean.
+#assert_only_allowed_axioms OddOrder.BG.Ch4.S16.theoremA8_structure
 
 /-! ### Forward-axiom islands (historical mechanism; currently empty)
 
