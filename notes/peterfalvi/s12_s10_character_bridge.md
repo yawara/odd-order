@@ -64,12 +64,15 @@ lane-f の POLE-1 `section16TypePStructure` の primes 残 sorry も honest 化*
 | W/W1/W2, W1≤W, W2≤W, nontrivial, W1⊔W2=W, W_cyclic | TypePData 直対応 (`W_eq`/`W_cyclic`/`W*_nontrivial`) | 易 |
 | `W_disjoint` | `M_complement` (W1∩M'=⊥) + W2≤H≤M' | ✅ **DONE** = `typePData_disjoint_W1_W2` (S12) |
 | `W_card_coprime` | disjoint + cyclic ⟹ coprime | ✅ **DONE** = `typePData_coprime_card_W1_W2` (S12) |
-| `W_card_odd` | G odd (IsMinimalSimpleOdd) ⟹ \|W\| odd。要 hG 引数 | TODO (容易) |
-| `V := typePV M = W\(W1∪W2)` | TICyclicHypothesis.V と一致 | 易 |
-| `V_subset_sharp` | 1∈W1 ⟹ 1∉V ⟹ V⊆univ\{1} | 易 |
-| `V_subset_W` | set diff ⊆ W | 易 |
-| `W_normalizes_V` | W abelian (cyclic) ⟹ w∈W で wvw⁻¹=v∈V | 易 |
-| `V_ti : IsTISubset V W` | **genuine gap** (§3b) | **TODO (核心)** |
+| `W_card_odd` | `Odd |G| ⟹ |W| ∣ |G| ⟹ Odd |W|` | ✅ **DONE** = `typePData_W_card_odd` |
+| `V := typePV M = W\(W1∪W2)` | TICyclicHypothesis.V と一致 | ✅ |
+| `V_subset_sharp` | 1∈W1 ⟹ 1∉V ⟹ V⊆univ\{1} | ✅ |
+| `V_subset_W` | set diff ⊆ W | ✅ |
+| `W_normalizes_V` | W abelian (cyclic) ⟹ w∈W で wvw⁻¹=v∈V | ✅ (`commute_of_mem_of_isCyclic`) |
+| `V_ti : IsTISubset V W` | **genuine gap** (§3b) → param `hVti` | ⏸ **issue 1005** (4.6.b ambient TI) |
+
+**⟹ ブリッジ `typePData_toTICyclicHypothesis` (S12) 完成・axiom-clean (2026-06-20)。** 残 = `hVti`
+([issue 1005](../../issues/1005-typep-ambient-v-ti.md))。
 
 ### 3b. V_ti gap (要設計判断)
 
@@ -118,11 +121,18 @@ TICyclicHypothesis は **W-level ω/σ** のみ (ω on W, ω^σ on G)。μ_ij (o
 ## 5. 攻略順 (推奨)
 
 1. ✅ `typePData_disjoint_W1_W2` (DONE, S12)。
-2. ✅ `typePData_coprime_card_W1_W2` (DONE, S12)。**残: `W_card_odd`** (G odd from hG; 容易)。
-3. V_ti 解決 (§3b の調査 (i)/(ii) → 最悪 (iii) パラメータ化) ⟹ **ブリッジ `Hypothesis.toTICyclicHypothesis` 完成** ⟹ ω-grid が §10 で利用可能に。次セッションの主タスク。
-4. `CharacterParameters` de-opaque (§2、S15 模範) — opaque Prop を実恒等式に。
-5. μ-level: M' の certain-type 構造 (§3d) ⟹ `mu`/`alpha` grid 供給。
-6. (10.2)/(10.3) producer 構成 → (10.5)/(10.6) Dade calc → (10.8) keystone → (10.9)/(10.10.x)。
-7. ⟹ §11/S13 (9.x/11.x riders) も同 machinery で。
+2. ✅ `typePData_coprime_card_W1_W2` (DONE, S12)。
+3. ✅ `typePData_W_card_odd` (DONE, S12; `Odd |G| → |W| ∣ |G| → Odd |W|`)。
+4. ✅✅ **ブリッジ `typePData_toTICyclicHypothesis` 完成** (DONE 2026-06-20, S12, axiom-clean)。
+   17 フィールド中 16 を `TypePData` から実証明で供給、`V_ti` のみ ambient TI = Peterfalvi (4.6.b) を
+   **明示パラメータ `hVti`** で取る (§5 `mapOfInjective` / §6 `toTICyclicHypothesisOfV` と同設計;
+   §3b の調査 (i)/(ii) で Dade data も normalizer_V も V_ti を供給しないと確定 → (iii) パラメータ化)。
+   ⟹ ω-grid (`omegaGrid`/`omegaSigmaGrid`/`sigmaIntegral`) が §10 で利用可能に。
+   **残 obligation = `hVti` の discharge = [issue 1005](../../issues/1005-typep-ambient-v-ti.md)**
+   (4.6.b ambient-TI; 上流 BG σ-理論に gate されるか要判定)。
+5. ▶ **次**: `CharacterParameters` de-opaque (§2、S15 模範) — opaque Prop を実恒等式に。
+6. μ-level: M' の certain-type 構造 (§3d) ⟹ `mu`/`alpha` grid 供給。
+7. (10.2)/(10.3) producer 構成 → (10.5)/(10.6) Dade calc → (10.8) keystone → (10.9)/(10.10.x)。
+8. ⟹ §11/S13 (9.x/11.x riders) も同 machinery で。
 
 **STOP 規律**: 1 leaf が ~4-5 実質試行で進まなければ STOP + 本 note に障害記録。難所回避禁止 ([[feedback-no-avoiding-hard-parts]])。

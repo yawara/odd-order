@@ -288,6 +288,61 @@ theorem typePData_coprime_card_W1_W2 [Finite G] {M : Subgroup G} (data : TypePDa
   haveI : IsCyclic (↥data.W1 × ↥data.W2) := isCyclic_of_injective _ hinj
   exact coprime_card_of_isCyclic_prod (↥data.W1) (↥data.W2)
 
+/-- The cyclic factor product `W = W₁ × W₂` of a type-`P` maximal subgroup has odd order.
+`W ≤ G`, so `|W| ∣ |G|`, and `G` has odd order; a divisor of an odd number is odd. -/
+theorem typePData_W_card_odd [Finite G] {M : Subgroup G} (data : TypePData M)
+    (hodd : Odd (Nat.card G)) : Odd (Nat.card ↥data.W) :=
+  hodd.of_dvd_nat (Subgroup.card_subgroup_dvd_card data.W)
+
+open scoped FiniteInduce in
+/-- **§10 → §5 ω-grid bridge (gate #3)**: a type-`P` maximal subgroup's cyclic factor
+`W = W₁ × W₂`, with the exceptional set `V = W − (W₁ ∪ W₂)`, is a Peterfalvi (3.1) TI-cyclic
+normalizer setup in the ambient group `G`.  Every structural field is read off from the
+`TypePData`: the `W`-block is disjoint (`typePData_disjoint_W1_W2`) / coprime
+(`typePData_coprime_card_W1_W2`) / cyclic (`W_cyclic`), oddness comes from `Odd |G|`, and `V` is
+`W`-normalized because the cyclic `W` is abelian.
+
+The single genuine input is the **ambient** TI property `hVti : IsTISubset V W` — Peterfalvi
+(4.6.b), the `G`-version of the (4.3.a) `(3.1)`-for-`L` fact.  It is supplied here exactly as §5
+`TICyclicHypothesis.mapOfInjective` (S05) and §6 `CertainTypeHypothesis.toTICyclicHypothesisOfV`
+(S06) take it: the `isTISubset_sup_sdiff` argument that proves the TI property *inside* a maximal
+`L = K ⋊ W` uses the normal complement `K ⊴ L` (`L/K` abelian ⇒ `[g,x] ∈ K ⊓ W₁ = ⊥`) and does
+**not** transfer to the ambient `G`, which has no normal complement to `W`.  See
+`issues/1005-typep-ambient-v-ti.md` and `notes/peterfalvi/s12_s10_character_bridge.md`.
+
+Through this bridge the entire §5 ω/σ-grid (`TICyclicHypothesis.omegaGrid`, `omegaSigmaGrid`,
+`sigmaIntegral`) becomes available for the §10 character analysis ((10.2)–(10.10)). -/
+noncomputable def typePData_toTICyclicHypothesis [Finite G] {M : Subgroup G}
+    (data : TypePData M) (hodd : Odd (Nat.card G))
+    (hVti : IsTISubset (typePV M data) data.W) :
+    OddOrder.Peterfalvi.S05.TICyclicHypothesis G where
+  W := data.W
+  W1 := data.W1
+  W2 := data.W2
+  W1_le_W := by rw [data.W_eq]; exact le_sup_left
+  W2_le_W := by rw [data.W_eq]; exact le_sup_right
+  W1_nontrivial := data.W1_nontrivial
+  W2_nontrivial := data.W2_nontrivial
+  W_sup := data.W_eq.symm
+  W_disjoint := typePData_disjoint_W1_W2 data
+  W_card_coprime := typePData_coprime_card_W1_W2 data
+  W_card_odd := typePData_W_card_odd data hodd
+  W_cyclic := data.W_cyclic
+  V := typePV M data
+  V_subset_sharp := by
+    intro v hv
+    rw [OddOrder.Peterfalvi.S04.mem_sharp]
+    refine ⟨Set.mem_univ v, fun heq => hv.2 (Or.inl ?_)⟩
+    rw [heq]; exact data.W1.one_mem
+  V_subset_W := fun _ hv => hv.1
+  W_normalizes_V := by
+    intro w v hv
+    have hcomm : Commute (w : G) v :=
+      S06.commute_of_mem_of_isCyclic data.W_cyclic w.2 hv.1
+    have h3 : (w : G) * v * (w : G)⁻¹ = v := by rw [hcomm.eq, mul_inv_cancel_right]
+    rw [h3]; exact hv
+  V_ti := hVti
+
 /-! ## (10.2)--(10.4): basic character parameters and coherent extension -/
 
 /-- The character parameters obtained in Peterfalvi (10.2)--(10.3).
