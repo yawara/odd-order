@@ -225,3 +225,34 @@ W₁=κ 同定を H 単独で証明する道もある: `(kappa S).Nonempty` を 
 
 **▶ H 次手**: gate 2 残差は F 待ち (上記 enrich)。残る H 単独候補 = gate 3 (L~T 除外、`basic_structure.UW1_frobenius`
 + |L_F|=q^p [T-side cite]) / gate 4 (U⊆L_F、(8.17.a)+(9.1) cite) / Phase 3 (Huppert [H] V.8.18、obligation ②、並行可)。
+
+## Phase 2 cont. (2026-06-20³) — ✅ gate 3 構造論コア sorry-free + B1/B2 未記載 signature 追加 (issue 2013)
+
+issue 2013 の (B) 未記載 signature を `S15_SAndT.lean` に追加し、gate 3/4 の振り分けを (A)/(B) に正した。
+
+**(A) cite 可 (signature 既存・sorried producer)** — gate 3 = `basic_structure.UW1_frobenius` (13.2.a) /
+gate 4 = `wielandt_fixedPoint_frobenius` (9.1) は従来どおり cite 可。
+
+**(B) 新規 signature (今回追加、すべて faithful sorried producer)**:
+- **B1 `card_Q_eq`** (`|Q|=|T_F|=q^p`) — `basic_structure.P_order` の S↔T 対称版。`:= sorry` (§13 機構 gate)。
+- **B1' `tConjugate_fitting_data`** — L (conj T) に対し `|L_F|=q^p ∧ W₁≤L_F ∧ L_F⊓U=⊥`。`card` 部は B1 + `M_F`
+  同変性 (`maxNilpotentNormalHall_pointwise_smul`) の transfer。gate 3 コアが消費する 3 事実を束ねた producer。`:= sorry`。
+- **B2 `card_LF_coprime_pq`** (type-I・非共役 L ⟹ `Coprime |L_F| (p*q)`) — (8.17.a)。`bgTheoremE_cover_data`
+  (BG Theorem E、owner=F、sorried) の `primeFactors_disjoint` から derive する派生補題。`:= sorry`。
+- **B2' `typeI_overNormalizer_U_le_fitting`** (type-I L ⟹ `U≤L_F`) — gate 4 の FPF コア (W₁∩L_F=1 → UW₁ FPF →
+  (9.1) で |L_F|=1 矛盾 → U⊆C_L(U∩L_F)⊆L_F) を束ねた producer。`:= sorry` (FPF 作用構成が深い)。
+
+**✅ gate 3 (L~T) 構造論コア = sorry-free**: `tConjugate_fitting_data` を仮説として `⁅U,W₁⁆≤U`
+(`commutator_le_of_le_normalizer`+`W1_normalizes_U`) ∧ `⁅U,W₁⁆≤L_F` (`commutator_mono`+`W₁≤L_F`+`U≤L≤N(L_F)`,
+`maxNilpotentNormalHall_le_normalizer`) ⟹ `⁅U,W₁⁆≤L_F⊓U=⊥` ⟹ `U≤C(W₁)` ⟹ 非自明 u,w で
+`w u w⁻¹=u` が `UW1_frobenius.conj_frobenius` に矛盾。残差 = B1/B1' のみ (`exists_typeI_maximal_overNormalizer_U`
+の `_hLconjT` 枝本体に sorry なし)。
+
+**⚠ gate 4 (type-I) 構造論コア = producer 委任 (B2')**: FPF 作用 `CoprimeFrobeniusAction (↥(U⊔W₁)) (↥L_F)`
+の構成 + FPF 性 (`fixedByUE=⊥`) + 自己中心化 (`C_L(U∩L_F)⊆L_F`) が深く、本 issue の予算では sorry-free 化せず
+`typeI_overNormalizer_U_le_fitting` (`:= sorry`) に隔離 (`hLI` 枝本体は 1 行 `exact`、sorry なし)。B2 (`card_LF_coprime_pq`)
+を proof path として docstring に明示。非共役性 (IsTypeI L ⟹ ¬conj S/T) の補題 (型一意性・共役不変) が repo に無く、
+これも producer 内に内包。⟹ gate 4 の sorry-free 化は (a) 型一意性補題 + (b) FPF 作用構成インフラ (cf. `S08_*` の
+`MulDistribMulAction H ((MulAut.conjNormal).comp W1.subtype)`) を要する別タスク。
+
+**count-sorry**: 137 → 139 (新 producer 4 本 − target 本体から消えた gate 3/4 の 2 sorry)。full build 3869 jobs green。

@@ -990,6 +990,90 @@ theorem isHall_subgroupOf_primeFactors_of_coprime_index [Finite G] {V H : Subgro
   have hp1 : p ∣ 1 := hcop ▸ Nat.dvd_gcd (Nat.mem_primeFactors.mp hpπ).2.1 hp.2.1
   exact absurd (Nat.dvd_one.mp hp1) hp.1.ne_one
 
+/-! ### (13.17) gate 3/4 structural inputs (issue 2013)
+
+The two structural facts that the type-II rule-out of (13.17.a/b) reads off the `§13`/`§14`
+machinery but that the bare `Hypothesis` does not pin.  Both are declared here as faithful
+sorried producers (the gate-2 pattern of `coprime_card_U_card_P_of_disjoint`): their proofs are
+gated on the genuine §13 counting (`card_Q_eq`, B1) and on BG Theorem E
+(`card_LF_coprime_pq`, B2), but their *statements* let the structural cores of the `L ~ T` and
+type-`I` branches of `exists_typeI_maximal_overNormalizer_U` be discharged sorry-free.  See
+issue 2013 / `notes/peterfalvi/s13_17_structural_program.md`. -/
+
+/-- **Peterfalvi (13.17.a) T-side Fitting order (B1)**: `|Q| = |T_F| = q^p`.
+
+This is the `S ↔ T` symmetric companion of `BasicStructureData.P_order` (`|P| = |S_F| = p^q`).
+The `Hypothesis` is `S`/`T`-asymmetric (`one_typeII`, `Q_eq_TF`), so this order is *not* obtained
+by a formal swap of `basic_structure`; it is the genuine §13 structural datum.  Combined with the
+automorphism-equivariance of `M_F` (`maxNilpotentNormalHall_pointwise_smul`), it gives
+`|L_F| = q^p` for every `L` conjugate to `T`, which is what the `L ~ T` exclusion of (13.17.a)
+uses.  Proof gated on the §13 machinery (`:= sorry`, the isolated residual of gate 3). -/
+theorem card_Q_eq [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hyp : Hypothesis (G := G)) (_hTTypeII : IsTypeNonI hyp.T) :
+    Nat.card ↥hyp.Q = hyp.q ^ hyp.p := sorry
+
+/-- **Peterfalvi (13.17.a) T-conjugate Fitting structure**: for a maximal subgroup `L` conjugate
+to `T` (`conj g • L = T`), the Fitting kernel `L_F` is a `q`-group of order `q^p` that contains
+the cyclic factor `W₁` and meets the complement `U` trivially.
+
+* `|L_F| = q^p` is the transfer of `card_Q_eq` (B1) along `maxNilpotentNormalHall_pointwise_smul`;
+* `W₁ ≤ L_F` holds because `W₁ ⊆ N_G(U) ⊆ L` is a `q`-subgroup of `L` and `L_F` is the
+  normal `q`-Hall subgroup (Pf p.81 "as `W₁ ⊆ N_G(U) ⊆ L`, `W₁ ⊆ H`");
+* `L_F ⊓ U = 1` because `L_F` is a `q`-group while `|U| = u` is prime to `q` (Pf (13.2.a)).
+
+These are exactly the three facts the `L ~ T` branch of (13.17.a) consumes before deriving
+`[U, W₁] ⊆ L_F ⊓ U = 1` against the `U W₁` Frobenius structure.  The `card`-equality part is
+the isolated §13 residual (`card_Q_eq`); `W₁ ≤ L_F` and `L_F ⊓ U = ⊥` are the §13.2-level
+structural data, bundled here so the gate-3 core is sorry-free.  Proof `:= sorry` (isolated). -/
+theorem tConjugate_fitting_data [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hyp : Hypothesis (G := G)) (hTTypeII : IsTypeNonI hyp.T)
+    {L : Subgroup G} {g : G} (_hconj : MulAut.conj g • L = hyp.T) :
+    Nat.card ↥(maxNilpotentNormalHall L) = hyp.q ^ hyp.p ∧
+      hyp.W1 ≤ maxNilpotentNormalHall L ∧
+      maxNilpotentNormalHall L ⊓ hyp.U = ⊥ := sorry
+
+/-- **Peterfalvi (8.17.a) coprimality (B2)**: for a type-`I` maximal subgroup `L` that is *not*
+conjugate to `S` or to `T`, the Fitting kernel order `|L_F|` is prime to `p q`.
+
+*Derivation (Pf p.82 "(8.17.a)"):* `bgTheoremE_cover_data` (Peterfalvi (8.17), `:= sorry`,
+BG Theorem E) exhibits representatives `M_i` of the conjugacy classes of maximal subgroups with
+`π((M_i)_s)` pairwise disjoint (`BGTheoremECoverData.primeFactors_disjoint`).  For type `I`,
+`(M_i)_s = M_F` (`mainSubgroup … .I = maxNilpotentNormalHall`); since `p ∈ π(S_s)` and
+`q ∈ π(T_s)` while `L` is non-conjugate to either, `π(L_F)` is disjoint from `{p, q}`, i.e.
+`Coprime |L_F| (p q)`.  Both the derivation *and* its `bgTheoremE_cover_data` cite are
+§10/BG-gated;
+declared here `:= sorry` as the isolated residual of gate 4 (the BG Theorem E content lives in
+`bgTheoremE_cover_data`, owner = F).  This is exactly the input the type-`I` branch of (13.17.b)
+reads off before deducing `W₁ ∩ L_F = 1` and running the (9.1) fixed-point-free argument. -/
+theorem card_LF_coprime_pq [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hyp : Hypothesis (G := G)) {L : Subgroup G} (_hLmax : L ∈ maximalSubgroups G)
+    (_hLI : IsTypeI L) (_hLnconjS : ¬ ∃ g : G, MulAut.conj g • L = hyp.S)
+    (_hLnconjT : ¬ ∃ g : G, MulAut.conj g • L = hyp.T) :
+    Nat.Coprime (Nat.card ↥(maxNilpotentNormalHall L)) (hyp.p * hyp.q) := sorry
+
+/-- **Peterfalvi (13.17.b) `U ⊆ L_F` for the type-`I` `L`**: when `S` is type II and `L` is a
+type-`I` maximal subgroup over `N_G(U)`, the complement `U` lies in the Fitting kernel `L_F`.
+
+*Proof (Pf p.82, the gate-4 structural core):* `L` is non-conjugate to `S` and `T` (it is type `I`
+while `S`, `T` are type II/non-I and type is conjugacy-invariant), so (8.17.a) =
+`card_LF_coprime_pq` (B2) gives `|L_F|` prime to `p q`, in particular to `q = |W₁|`; hence
+`W₁ ⊓ L_F = 1`.  Were `U ⊓ L_F = 1`, the Frobenius group `U W₁ ⊆ L` (from (13.2.a)) would
+act fixed-point-freely on `L_F` (a coprime action, `U, W₁ ≤ L ≤ N_G(L_F)`), so Wielandt's
+formula (9.1) = `wielandt_fixedPoint_frobenius` would force `|L_F| = 1`, contradicting `L_F ≠ 1`
+(type `I`, `TypeFData.H_nontrivial`).  Thus `U ⊓ L_F ≠ 1`, and as `L_F` is nilpotent normal in
+`L` the self-centralizing property gives `U ⊆ C_L(U ⊓ L_F) ⊆ L_F`.
+
+This producer is the isolated residual of gate 4 alongside `card_LF_coprime_pq`: its body assembles
+the (8.17.a)+(9.1) fixed-point-free argument, whose two genuinely deep inputs are the BG-Theorem-E
+coprimality `card_LF_coprime_pq` (owner = F) and the Wielandt formula
+`wielandt_fixedPoint_frobenius` (already a sorried §9 producer).  Declared `:= sorry`; see
+issue 2013 / `notes/peterfalvi/s13_17_structural_program.md`. -/
+theorem typeI_overNormalizer_U_le_fitting [Finite G]
+    (_hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
+    (_hSTypeII : IsTypeII hyp.S) {L : Subgroup G} (_hLmax : L ∈ maximalSubgroups G)
+    (_hLI : IsTypeI L) (_hNUL : Subgroup.normalizer (hyp.U : Set G) ≤ L) :
+    hyp.U ≤ maxNilpotentNormalHall L := sorry
+
 /-- **Peterfalvi (13.17.a/b)**: a maximal subgroup `L` over `N_G(U)` (for `S` of type II) is of
 type I with `U ⊆ L_F`.  *Proof (Pf pp.81-82):* take any maximal `L ⊇ N_G(U)` (proper since
 `U ≠ 1` and `G` is simple).  `L` is not conjugate to `S` (else `N_G(U) ⊆ S`, against
@@ -1045,11 +1129,13 @@ theorem exists_typeI_maximal_overNormalizer_U [Finite G]
       exact lt_irrefl L (lt_of_lt_of_le hLb (hLmaximal.2 hbne hLb.le))⟩
   -- (8.8.b4) trichotomy: `L` is type I, or conjugate to `S`, or conjugate to `T`.
   rcases hyp.theorem88_caseB L hLmem with hLI | _hLconjS | _hLconjT
-  · -- `L` is type I; conclude with `U ⊆ L_F` (Pf (13.17.b)).
-    refine ⟨L, hLmem, hLI, hNUL, ?_⟩
-    -- (8.17.a) gives `q ∤ |L_F|`, so `W₁ ∩ L_F = 1`; if `U ∩ L_F = 1` then `U W₁` acts FPF on
-    -- `L_F`, forcing `L_F = 1` (9.1); hence `U ∩ L_F ≠ 1` and `U ⊆ C_L(U ∩ L_F) ⊆ L_F`.
-    sorry
+  · -- `L` is type I; conclude with `U ⊆ L_F` (Pf (13.17.b)).  The (8.17.a)+(9.1)
+    -- FPF structural core — `q ∤ |L_F|` (`card_LF_coprime_pq`), so `W₁ ∩ L_F = 1`;
+    -- if `U ∩ L_F = 1` then `U W₁` acts FPF on `L_F`, forcing `L_F = 1` by
+    -- `wielandt_fixedPoint_frobenius`, against type-`I` `L_F ≠ 1`; hence `U ∩ L_F ≠ 1` and
+    -- `U ⊆ C_L(U ∩ L_F) ⊆ L_F` — is `typeI_overNormalizer_U_le_fitting`.
+    exact ⟨L, hLmem, hLI, hNUL,
+      typeI_overNormalizer_U_le_fitting _hG hyp ⟨tdata⟩ hLmem hLI hNUL⟩
   · -- `L` conjugate to `S` is excluded (`_hLconjS`): Pf (13.17.a) derives `N_G(U) ⊆ S` from the
     -- Hall conjugacy of `U` in the solvable `S`, contradicting `hNUS`.  The structural argument is
     -- `normalizer_le_of_isHall_subgroupOf_of_conj`; its only `S`-specific input is "`U` is a Hall
@@ -1067,7 +1153,50 @@ theorem exists_typeI_maximal_overNormalizer_U [Finite G]
   · -- `L` conjugate to `T` is excluded (`_hLconjT`): `|L_F| = q^p` forces `W₁ ⊆ L_F` and
     -- `[U,W₁] ⊆ L_F ∩ U = 1`, contradicting the `U W₁` Frobenius structure (13.2.a).
     exfalso
-    sorry
+    obtain ⟨g, hg⟩ := _hLconjT
+    -- (B1, `tConjugate_fitting_data`) the T-side Fitting structure of `L_F`:
+    -- `|L_F| = q^p`, `W₁ ≤ L_F`, and `L_F ⊓ U = 1`.
+    obtain ⟨_hLFcard, hW1le, hLFU⟩ := tConjugate_fitting_data _hG hyp hyp.T_nonI hg
+    -- `U ⊆ L`, hence `U` normalizes `L_F = maxNilpotentNormalHall L`.
+    have hUleL : hyp.U ≤ L := Subgroup.le_normalizer.trans hNUL
+    have hU_norm_LF : hyp.U ≤ Subgroup.normalizer (maxNilpotentNormalHall L) :=
+      hUleL.trans (OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_le_normalizer L)
+    -- `⁅U, W₁⁆ ≤ U` since `W₁` normalizes `U` (`W1_normalizes_U`).
+    have hUW1_le_U : ⁅hyp.U, hyp.W1⁆ ≤ hyp.U :=
+      OddOrder.Isaacs.Ch04.commutator_le_of_le_normalizer hyp.W1_normalizes_U
+    -- `⁅U, W₁⁆ ≤ ⁅U, L_F⁆ ≤ L_F` since `W₁ ≤ L_F` and `U` normalizes `L_F`.
+    have hUW1_le_LF : ⁅hyp.U, hyp.W1⁆ ≤ maxNilpotentNormalHall L := by
+      refine (Subgroup.commutator_mono (le_refl hyp.U) hW1le).trans ?_
+      rw [Subgroup.commutator_comm]
+      exact OddOrder.Isaacs.Ch04.commutator_le_of_le_normalizer hU_norm_LF
+    -- `⁅U, W₁⁆ ≤ L_F ⊓ U = 1`, so `U` and `W₁` commute elementwise.
+    have hUW1_bot : ⁅hyp.U, hyp.W1⁆ = ⊥ :=
+      le_bot_iff.mp ((le_inf hUW1_le_LF hUW1_le_U).trans hLFU.le)
+    have hUcent : hyp.U ≤ Subgroup.centralizer (hyp.W1 : Set G) :=
+      Subgroup.commutator_eq_bot_iff_le_centralizer.mp hUW1_bot
+    -- `W₁ ≠ ⊥` (order `q ≥ 2`) and `U ≠ ⊥`: extract nontrivial witnesses contradicting Frobenius.
+    have hW1ne : hyp.W1 ≠ ⊥ := by
+      intro hbot
+      have : hyp.q = 1 := by rw [hyp.q_eq_card_W1, hbot, Subgroup.card_bot]
+      exact hyp.q_prime.one_lt.ne' this
+    obtain ⟨w, hwW1, hwne⟩ := (hyp.W1.bot_or_exists_ne_one).resolve_left hW1ne
+    obtain ⟨n, hnU, hnne⟩ := (hyp.U.bot_or_exists_ne_one).resolve_left hUne
+    -- `w * n * w⁻¹ = n` from the commuting (centralizer) relation.
+    have hcomm : w * n * w⁻¹ = n := by
+      have := hUcent hnU w hwW1
+      -- `this : w * n = n * w`; rearrange to `w * n * w⁻¹ = n`.
+      rw [mul_inv_eq_iff_eq_mul, this]
+    -- Move to the Frobenius group `↥(U ⊔ W₁)` and contradict `conj_frobenius`.
+    obtain ⟨bdata, _⟩ := basic_structure _hG hyp
+    have hwUW1 : w ∈ hyp.U ⊔ hyp.W1 := Subgroup.mem_sup_right hwW1
+    have hnUW1 : n ∈ hyp.U ⊔ hyp.W1 := Subgroup.mem_sup_left hnU
+    have hwmem : (⟨w, hwUW1⟩ : ↥(hyp.U ⊔ hyp.W1)) ∈ hyp.W1.subgroupOf (hyp.U ⊔ hyp.W1) := hwW1
+    have hnmem : (⟨n, hnUW1⟩ : ↥(hyp.U ⊔ hyp.W1)) ∈ hyp.U.subgroupOf (hyp.U ⊔ hyp.W1) := hnU
+    have hwne' : (⟨w, hwUW1⟩ : ↥(hyp.U ⊔ hyp.W1)) ≠ 1 := fun h => hwne (congrArg Subtype.val h)
+    have hnne' : (⟨n, hnUW1⟩ : ↥(hyp.U ⊔ hyp.W1)) ≠ 1 := fun h => hnne (congrArg Subtype.val h)
+    have hconj_eq : (⟨w, hwUW1⟩ : ↥(hyp.U ⊔ hyp.W1)) * ⟨n, hnUW1⟩ * ⟨w, hwUW1⟩⁻¹ = ⟨n, hnUW1⟩ :=
+      Subtype.ext (by simpa using hcomm)
+    exact bdata.UW1_frobenius.conj_frobenius _ hwmem hwne' _ hnmem hnne' hconj_eq
 
 /-- **Peterfalvi (13.17.c)/(14.5)**: the Frobenius complement of the type-I subgroup `L` over
 `N_G(U)` has order `p q` and contains a conjugate `W₂^y` (`y ∈ Q`).  *Proof (Pf p.82):* a

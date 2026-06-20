@@ -467,3 +467,21 @@ under-constraint は carrier faithfulness 問題、§13 構造論で塞げない
 「Phase 2 cont. (2026-06-20²)」。
 
 **H 次手**: gate 2 残差は F 待ち。残る H 単独 = gate 3 (L~T) / gate 4 (U⊆L_F) / Phase 3 (Huppert)。
+
+## 2026-06-20³ — ✅ gate 3 構造論コア sorry-free + gate 3/4 の (B) 未記載 signature 追加 (issue 2013)
+
+gate 3/4 は (A)「signature 既存・sorried producer (cite 可)」と (B)「signature 未記載」の混合だった
+(issue 2013)。(B) を `S15_SAndT.lean` に faithful sorried producer として追加:
+- **gate 3 (B)** `card_Q_eq` (`|Q|=q^p`) + `tConjugate_fitting_data` (L conj T ⟹ `|L_F|=q^p ∧ W₁≤L_F ∧ L_F⊓U=⊥`)。
+- **gate 4 (B)** `card_LF_coprime_pq` (type-I 非共役 L ⟹ `Coprime |L_F| (p*q)`、`bgTheoremE_cover_data`[F] 派生) +
+  `typeI_overNormalizer_U_le_fitting` (type-I L ⟹ `U≤L_F`、FPF コア束ね)。
+
+**✅ gate 3 (L~T) 構造論コア = sorry-free** (`exists_typeI_maximal_overNormalizer_U` の `_hLconjT` 枝):
+`tConjugate_fitting_data` ⟹ `⁅U,W₁⁆≤L_F⊓U=⊥` ⟹ `UW1_frobenius.conj_frobenius` 矛盾。残差 = B1 producer のみ。
+
+**⚠ gate 4 (type-I) = producer 委任**: FPF 作用 `CoprimeFrobeniusAction (↥(U⊔W₁)) (↥L_F)` 構成 + FPF 性 +
+自己中心化が深く、`typeI_overNormalizer_U_le_fitting` (`:= sorry`) に隔離 (`hLI` 枝は 1 行 `exact`、sorry なし)。
+sorry-free 化には (a) 型一意性補題 (IsTypeI L ⟹ ¬conj S/T) + (b) FPF 作用構成インフラ が別途要る。
+
+count-sorry 137→139 (新 producer 4 − 消えた gate 3/4 の 2 sorry)。full build 3869 jobs green。詳細 =
+`notes/peterfalvi/s13_17_structural_program.md`「Phase 2 cont. (2026-06-20³)」。
