@@ -540,4 +540,84 @@ theorem nonempty_coherent_S_caseB_of_structure
   exact nonempty_coherent_S_caseB_of_anchor hyp h46 hHK hW1 hW2H hcen hderiv hcop hp hHp hprime
     hW2comm hW2cenL hc2 hFPF hcZ hfpf hη₁ cY hcYgood hη₁1 hanchor hχ₁1 hdvd hnonzero
 
+/-- **Peterfalvi (6.8) case-(B) edge `Z = W₂ = H′`: `S` is coherent directly via (6.8.2).**
+When `W₂ = ⁅H,H⁆` (`hWeq`, the `¬(W₂ ⊊ H′)` branch of (6.8.3)), `S = X(W₂) ∪ Y`
+(`Xset_union_Yset_eq_S`), so the (6.8.2) seed `coherentXunionYset_caseB` **is** the coherence of
+`S`; the (6.8.3) bootstrap (whose strong FPF bound `(2|W₁|+1)² ≤ |H:W₂|` is *false* in the edge,
+by the (6.3) bound `|H:H′| ≤ 4|W₁|²+1`) is not invoked.  The weak FPF `|W₁| < |H:W₂|` (needed for
+`hFPF` and the linchpin `hcYgood`) comes from `caseB_W1_dvd_index_commutator` (`W₁` acts FPF on
+`H/H′`), independent of `W₂ ⊊ H′`. -/
+theorem nonempty_coherent_S_caseB_edge (hyp : SibleyDadeHypothesis G L H)
+    [H.Normal] [Fintype ↥H]
+    (h46 : OddOrder.Peterfalvi.S06.Hypothesis46 (sharpImage H) L) (hHK : h46.K = H)
+    (hW1 : h46.W1 = hyp.W1)
+    [NeZero (Nat.card h46.W1)] [Invertible (Nat.card ↥h46.K : ℂ)]
+    [Fintype ↥(h46.W1 ⊔ h46.W2)] [Invertible (Nat.card ↥(h46.W1 ⊔ h46.W2) : ℂ)]
+    [Fintype (OddOrder.Peterfalvi.S06.ticVdiff h46).W]
+    [Invertible (Nat.card (OddOrder.Peterfalvi.S06.ticVdiff h46).W : ℂ)]
+    [h46.W2.Normal] [Invertible (Nat.card ↥h46.W2 : ℂ)]
+    [Fintype ↥(h46.W2.subgroupOf H)] [Invertible (Nat.card ↥(h46.W2.subgroupOf H) : ℂ)]
+    (hW2H : h46.W2 ≤ H) (hcen : h46.W2.subgroupOf H ≤ Subgroup.center ↥H)
+    (hderiv : h46.W2.subgroupOf H ≤ commutator ↥H)
+    (hcop : Nat.Coprime (Nat.card ↥H) (Nat.card hyp.W1))
+    {p : ℕ} (hp : p.Prime) (hHp : IsPGroup p ↥H)
+    (hprime : (Nat.card h46.W2).Prime) (hW2comm : h46.W2 ≤ ⁅H, H⁆)
+    (hW2cenL : h46.W2 ≤ Subgroup.center ↥L)
+    (hWeq : h46.W2 = ⁅H, H⁆) (hXne : (hyp.Xset h46.W2).Nonempty) :
+    Nonempty (OddOrder.Peterfalvi.S07.IsCoherent hyp.tau hyp.S
+      (OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L)) := by
+  classical
+  letI : Group.IsNilpotent ↥H := hyp.H_nilpotent
+  haveI : Nontrivial ↥H := (Subgroup.nontrivial_iff_ne_bot H).mpr hyp.H_ne_bot
+  -- `W₂.subgroupOf H = commutator H` (edge), and the weak FPF `|W₁| < |H:W₂|`.
+  have hsubeq : h46.W2.subgroupOf H = commutator ↥H := by rw [hWeq, ← commutator_subgroupOf_self]
+  have hMgt : 1 < (commutator ↥H).index := by
+    have hne : commutator ↥H ≠ ⊤ := (IsSolvable.commutator_lt_top_of_nontrivial ↥H).ne
+    have h0 : (commutator ↥H).index ≠ 0 := Subgroup.index_ne_zero_of_finite
+    have h1 : (commutator ↥H).index ≠ 1 := fun h => hne (Subgroup.index_eq_one.mp h)
+    omega
+  have hdvdidx : Nat.card ↥hyp.W1 ∣ (commutator ↥H).index - 1 :=
+    caseB_W1_dvd_index_commutator hyp h46.toCertainTypeHypothesis hHK hW1 hW2comm hcop
+  have hw1lt : Nat.card hyp.W1 < (h46.W2.subgroupOf H).index := by
+    rw [hsubeq]; have := Nat.le_of_dvd (by omega) hdvdidx; omega
+  have hc2 : 2 ≤ (h46.W2.subgroupOf H).index := by
+    have : 1 ≤ Nat.card hyp.W1 := Nat.card_pos; omega
+  have hFPF : (h46.W2.index : ℤ) < ((h46.W2.subgroupOf H).index : ℤ) ^ 2 := by
+    have hidx : h46.W2.index = (h46.W2.subgroupOf H).index * Nat.card hyp.W1 := by
+      have h := Subgroup.relIndex_mul_index hW2H
+      rw [hyp.index_H_eq_card_W1] at h
+      exact h.symm
+    have hw1ltZ : (Nat.card hyp.W1 : ℤ) < ((h46.W2.subgroupOf H).index : ℤ) := by exact_mod_cast hw1lt
+    have hiposZ : (0 : ℤ) < ((h46.W2.subgroupOf H).index : ℤ) := by
+      exact_mod_cast lt_of_le_of_lt (Nat.zero_le _) hw1lt
+    rw [hidx]; push_cast; nlinarith [hw1ltZ, hiposZ]
+  -- the minimal-degree `X`-anchor, the `Y`-anchor `η₁`, and the nonzero supported witness.
+  obtain ⟨χ₁, hanchor, hχ₁1, hdvd⟩ := exists_caseB_Xset_anchor hyp hp hHp hXne
+  obtain ⟨η₁, hη₁⟩ := hyp.Yset_nonempty
+  have hη₁1 : η₁ (1 : ↥L) ≠ 0 := by
+    obtain ⟨dη, hdη_pos, hdη_eq⟩ := irreducibleCharacter_apply_one_eq_pos_natCast
+      (⟨η₁, hyp.isIrreducibleCharacter_of_mem_Yset hη₁⟩ : IrreducibleCharacter ↥L)
+    simp only [IrreducibleCharacter.coe_mk] at hdη_eq
+    rw [hdη_eq]; exact_mod_cast hdη_pos.ne'
+  obtain ⟨χ, hχ⟩ := hXne
+  have hχconj : χ.conj ∈ hyp.Xset h46.W2 := hyp.Xset_closedUnderConjugate_unconditional h46.W2 hχ
+  have hχne : χ ≠ χ.conj := fun heq =>
+    (Xset_hasNoRealCharacters_caseB hyp h46 hHK).not_mem_of_isReal (heq.symm : χ.IsReal) hχ
+  have hχS := hyp.Xset_subset_S hχ
+  rw [hyp.S_eq, Set.mem_setOf_eq] at hχS
+  obtain ⟨θ, -, hθeq⟩ := hχS
+  have hnonzero : ∃ φ : ClassFunction ↥L ℂ, φ ∈ OddOrder.Peterfalvi.S07.zSupportedSpan
+      (hyp.Xset h46.W2) (OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L) ∧ φ ≠ 0 :=
+    ⟨χ.conj - χ, ⟨Submodule.sub_mem _ (Submodule.subset_span hχconj) (Submodule.subset_span hχ),
+        by rw [hθeq]; exact caseB_irr_conj_diff_support hyp θ⟩,
+      sub_ne_zero.mpr (Ne.symm hχne)⟩
+  -- the uniform `Y`-coherence `cY` (linchpin), and the (6.8.2) seed `X(W₂) ∪ Y` coherent.
+  obtain ⟨cY, hcYgood⟩ := hyp.exists_Ycoherence_hgood_uniform_caseB hcop hp hHp hprime hW2comm
+    hW2cenL hη₁ hc2 hFPF
+  have hseed := coherentXunionYset_caseB hyp h46 hHK hW1 hW2H hcen hderiv hcop hp hHp hprime hW2comm
+    hW2cenL hc2 hFPF hη₁ cY hcYgood hη₁1 hanchor hχ₁1 hdvd hnonzero
+  -- `W₂ = H′ ⟹ X(W₂) ∪ Y = S` (`Xset_union_Yset_eq_S`).
+  have hSeteq : hyp.Xset h46.W2 ∪ hyp.Yset = hyp.S := by rw [hWeq]; exact hyp.Xset_union_Yset_eq_S
+  exact ⟨hSeteq ▸ hseed⟩
+
 end OddOrder.Peterfalvi.S08

@@ -4,6 +4,9 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
 import OddOrder.Peterfalvi.S08_CoherenceCore
+import OddOrder.Peterfalvi.S08_Theorem65c2
+import OddOrder.Peterfalvi.S08_CaseAWeightedEndgame
+import OddOrder.Peterfalvi.S08_PGroupReduction
 
 /-!
 # Peterfalvi §8: Some Coherence Theorems
@@ -13,7 +16,8 @@ T. Peterfalvi, *Character Theory for the Odd Order Theorem* (LMS LNS 272, 2000),
 
 Active leaf of §8 (the frozen lemma infrastructure lives upstream in
 `S08_CoherenceCore.lean`): the (6.8) coherence capstone `sibleySetup_is_coherent`
-(S08's sole `sorry`; X-nonempty branch = Frobenius / CertainType case split) and the
+(now **complete** — `X`-empty / Frobenius / (6.8)(c2) case-A / case-B dispatch, the latter
+splitting `W₂ ⊊ H′` (6.8.3 bootstrap) vs `W₂ = H′` (6.8.2 seed)) and the
 (7.10)-facing consumer interfaces (`IndChainDecomposition` and the Frobenius-case
 constructor).
 
@@ -28,18 +32,20 @@ open scoped commutatorElement
 variable {L G : Type*} [Group L] [Group G]
 
 
-/-- **Peterfalvi (6.8) Theorem** (statement; proof deferred).  Under the faithful Sibley
-hypotheses `SibleyDadeHypothesis` (a)/(b)/(c), the set `S = {Ind_H^L θ | θ ∈ Irr H, θ ≠ 1_H}` is
+/-- **Peterfalvi (6.8) Theorem.**  Under the faithful Sibley hypotheses
+`SibleyDadeHypothesis` (a)/(b)/(c), the set `S = {Ind_H^L θ | θ ∈ Irr H, θ ≠ 1_H}` is
 coherent: there is an integral isometric extension of the §4 Dade map `τ` from `Z[S, H^#]` to
 `Z[S]` (`hyp.CoherenceTarget = IsCoherent hyp.tau S H^#`).
 
-The full proof is the central technical content of §8 — the reduction to `H` a non-abelian
-`p`-group ((6.5)), the case split (A)/(B) on `Z(H) ∩ W₂` (mmd L150-), and gluing the
-`Y = S(H')`-coherence (equal degree `|W₁|`, via [Is] Thm 6.34, now available as
-`isIrreducibleCharacter_induce_of_inertia_eq`) with the `X = S − S(Z)`-coherence ((6.6)) through
-the §7 engine `coherentUnion_of_glued`. This is one of the two sorries blocking §9 (7.10)
-`card_G0_lower_bound`; see `issues/0046-peterfalvi-s08-6-8-coherence.md` and
-`notes/peterfalvi/s08_6_8_assembly_plan.md` (task DAG T0–T11).
+The proof dispatches on `hyp.cases`: the `X`-empty (abelian) branch is the `Y`-coherence
+`coherenceTarget_of_Xset_empty`; the `X`-nonempty branch splits Frobenius
+(`nonempty_coherent_S_of_frobenius`) vs (6.8)(c2) certain-type, where the (6.5) reduction makes
+`H` a `p`-group and the (6.8.A/B) split on `Z(H) ∩ W₂` routes to the case-A producer
+(`nonempty_coherent_S_caseA_of_c2`) or the case-B dispatch: `W₂ ⊊ H′` uses the (6.8.3) FPF
+bootstrap (`nonempty_coherent_S_caseB_of_c2`), `W₂ = H′` uses the (6.8.2) seed directly
+(`nonempty_coherent_S_caseB_edge`, since then `S = X(W₂) ∪ Y`).  Completed 2026-06-20; this was
+one of the two sorries blocking §9 (7.10) `card_G0_lower_bound`
+(`issues/0046-peterfalvi-s08-6-8-coherence.md`).
 
 `noncomputable def` (not `theorem`) because `CoherenceTarget` (an `IsCoherent`) carries the
 extension map `ν` as data, living in `Type`, not `Prop`. -/
@@ -51,12 +57,82 @@ noncomputable def sibleySetup_is_coherent {G : Type*} [Group G] [Fintype G]
   by_cases hXe : hyp.Xset ⁅H, H⁆ = ∅
   · -- `X`-empty (abelian) branch: `S = Y`, discharged by the `Y`-coherence `coherentYset`.
     exact hyp.coherenceTarget_of_Xset_empty hXe
-  · -- `X`-nonempty branch: the genuine §8 content — glue the `X = S − S(Z)`-coherence
-    -- (`Xset_commutator_isCoherent_from_pairUnionBaseAnchorCommonIndexPrimePowerData_of_frobenius`,
-    -- per-step (6.6) prime-power degree data) with `Y`-coherence via the §7 engine.  Requires
-    -- the case split `hyp.cases` (Frobenius / CertainType) and the per-step `hstepData` +
-    -- combined extension `ν` glue data, which remain to be constructed.
-    sorry
+  · -- `X`-nonempty branch: dispatch on `hyp.cases` (Frobenius / (6.8)(c2) certain-type).
+    have hXne : (hyp.Xset ⁅H, H⁆).Nonempty := Set.nonempty_iff_ne_empty.mpr hXe
+    refine Nonempty.some ?_
+    rcases hyp.cases with hF | ⟨h46, _hdade, hHK, hW1, hprime, hW2comm, hcop⟩
+    · -- (c1) Frobenius
+      exact nonempty_coherent_S_of_frobenius hyp hF hXne
+    · -- (c2) certain-type: reduce to `H` a `p`-group ((6.5)), case-split (6.8.A/B) on `Z(H) ∩ W₂`.
+      haveI : Finite ↥h46.W1 := inferInstance
+      haveI : NeZero (Nat.card h46.W1) := ⟨Nat.card_pos.ne'⟩
+      haveI : Invertible (Nat.card ↥h46.K : ℂ) := by
+        have h : (Nat.card ↥h46.K : ℂ) = (Nat.card ↥H : ℂ) := by rw [hHK]
+        rw [h]; infer_instance
+      haveI : Fintype ↥(h46.W1 ⊔ h46.W2) := Fintype.ofFinite _
+      haveI : Invertible (Nat.card ↥(h46.W1 ⊔ h46.W2) : ℂ) :=
+        invertibleOfNonzero (by exact_mod_cast Nat.card_pos.ne')
+      haveI : Fintype (OddOrder.Peterfalvi.S06.ticVdiff h46).W := Fintype.ofFinite _
+      haveI : Invertible (Nat.card (OddOrder.Peterfalvi.S06.ticVdiff h46).W : ℂ) :=
+        invertibleOfNonzero (by exact_mod_cast Nat.card_pos.ne')
+      have hW2H : h46.W2 ≤ H := hW2comm.trans (by
+        rw [Subgroup.commutator_le]; intro a ha b _hb; rw [commutatorElement_def]
+        exact H.mul_mem (H.mul_mem (H.mul_mem ha _hb) (H.inv_mem ha)) (H.inv_mem _hb))
+      by_contra hncoh
+      have hbound := abelianization_card_le_of_not_coherent_c2 hyp h46 hHK hW1 hncoh
+      have hsplit := caseAB_split_of_c2 h46 hW2H hprime
+      refine hncoh (nonempty_coherent_S_of_c2_of_branches hyp h46 hHK hW1 hW2comm hcop hbound hsplit
+        ?caseA ?caseB)
+      case caseA =>
+        intro p hp hHp hA
+        refine nonempty_coherent_S_caseA_of_c2 hyp h46 hHK hW1
+          (commutator_ne_bot_of_Xset_commutator_nonempty hyp hXne) ?_ hp
+          (three_le_of_isPGroup_H hyp hp hHp) hHp
+        rw [inf_comm]; exact disjoint_iff.mp hA
+      case caseB =>
+        intro p hp hHp hB
+        haveI : Fintype ↥H := Fintype.ofFinite _
+        haveI : Invertible (Nat.card ↥h46.W2 : ℂ) :=
+          invertibleOfNonzero (by exact_mod_cast Nat.card_pos.ne')
+        haveI : Fintype ↥(h46.W2.subgroupOf H) := Fintype.ofFinite _
+        haveI : Invertible (Nat.card ↥(h46.W2.subgroupOf H) : ℂ) :=
+          invertibleOfNonzero (by exact_mod_cast Nat.card_pos.ne')
+        have hW2cenL : h46.W2 ≤ Subgroup.center ↥L := caseB_W2_le_center_L hyp h46 hW1 hW2H hB
+        haveI : h46.W2.Normal := ⟨fun w hw g => by
+          have hc : g * w = w * g := Subgroup.mem_center_iff.mp (hW2cenL hw) g
+          have hgw : g * w * g⁻¹ = w := by rw [hc, mul_assoc, mul_inv_cancel, mul_one]
+          rw [hgw]; exact hw⟩
+        have hderiv : h46.W2.subgroupOf H ≤ commutator ↥H := by
+          rw [← commutator_subgroupOf_self]
+          exact fun x hx => Subgroup.mem_subgroupOf.mpr (hW2comm (Subgroup.mem_subgroupOf.mp hx))
+        have hW2Hne : h46.W2.subgroupOf H ≠ ⊥ := by
+          rw [← (h46.W2.subgroupOf H).one_lt_card_iff_ne_bot,
+            Nat.card_congr (Subgroup.subgroupOfEquivOfLe hW2H).toEquiv]
+          exact hprime.one_lt
+        have hXne' : (hyp.Xset h46.W2).Nonempty :=
+          Xset_nonempty_of_subgroupOf_ne_bot_weighted hyp hW2Hne
+        by_cases hWMgt : 1 < (h46.W2.subgroupOf H).relIndex (commutator ↥H)
+        · exact nonempty_coherent_S_caseB_of_c2 hyp h46 hHK hW1 hW2H hcop hp hHp hprime hW2comm hB
+            hWMgt hXne'
+        · -- edge `W₂ = H′ = ⁅H,H⁆`: `relIndex = 1`, so `W₂.subgroupOf H = commutator H`.
+          have hHHle : (⁅H, H⁆ : Subgroup ↥L) ≤ H := by
+            rw [Subgroup.commutator_le]; intro a ha b _hb; rw [commutatorElement_def]
+            exact H.mul_mem (H.mul_mem (H.mul_mem ha _hb) (H.inv_mem ha)) (H.inv_mem _hb)
+          have hr1 : (h46.W2.subgroupOf H).relIndex (commutator ↥H) = 1 := by
+            have hne0 : (h46.W2.subgroupOf H).relIndex (commutator ↥H) ≠ 0 := by
+              haveI : Finite ↥(commutator ↥H) := inferInstance
+              exact Subgroup.index_ne_zero_of_finite
+            have hle1 : (h46.W2.subgroupOf H).relIndex (commutator ↥H) ≤ 1 := Nat.not_lt.mp hWMgt
+            omega
+          have hge : commutator ↥H ≤ h46.W2.subgroupOf H := Subgroup.relIndex_eq_one.mp hr1
+          have hsubeq : h46.W2.subgroupOf H = commutator ↥H := le_antisymm hderiv hge
+          have hcardeq : Nat.card ↥h46.W2 = Nat.card ↥(⁅H, H⁆ : Subgroup ↥L) := by
+            rw [← Nat.card_congr (Subgroup.subgroupOfEquivOfLe hW2H).toEquiv,
+              ← Nat.card_congr (Subgroup.subgroupOfEquivOfLe hHHle).toEquiv,
+              hsubeq, commutator_subgroupOf_self]
+          have hWeq : h46.W2 = ⁅H, H⁆ := Subgroup.eq_of_le_of_card_ge hW2comm hcardeq.ge
+          exact nonempty_coherent_S_caseB_edge hyp h46 hHK hW1 hW2H hB hderiv hcop hp hHp hprime
+            hW2comm hW2cenL hWeq hXne'
 
 /-- **Peterfalvi (6.8) → (7.10) consumer interface.**
 A degree-scaled `Z`-chain decomposition: given a coherence input `τ` on `(S, A)`
