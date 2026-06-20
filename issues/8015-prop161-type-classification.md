@@ -212,6 +212,49 @@ step3 (p∈σ, **最深**: simplicity 経由)/step5 (p∉β)/step6 (C_G(X₁)⊄
 (theoremA8_structure)。次 = §16 Theorems B-E / Prop 16.1 hard 方向、または fitting_decomposition
 の axiom-clean 化。
 
+### 🔬 2026-06-20⁵ axiom-clean 化の調査結論 (option 1 = A(8) を axiom-clean に)
+A(8) FittingIsTI chain の **唯一の sorryAx 源を特定**: `mf_hall_centralizer_control` (BG **Cor 15.3**,
+`S15_MF:2488` literal sorry) を `fitting_decomposition` (Cor 15.5) が **H=M_σ で 1 箇所 cite**
+(`S15_MF:6694`) → `opiCoreInG_sigmaCompl_fittingInAmbient_isCyclic` → `mem_sigma_...` → residual。
+**他は全 axiom-clean** (`#print axioms` 確認: rank_lt_three / three_le_pRank / fusion_control /
+Msigma_inf_conj_isBetaCompl / centralizer_singleton_lt_top すべて allowlist 3 軸のみ)。
+- **Cor 15.3 の証明 engine `mf_hall_centralizer_control_of_inputs` は proven** (3 input ha/hconj/hfratt
+  を取る)。fitting_decomposition は `.1` (=ha) のみ使用。
+- **ha (=C_M(H)=C_{M_σ}(H)⊔X, X cyclic τ₂) の crux = 「C_M(H) は κ'-group」(Prop 14.2(b1)(e))**。
+  これは **§14 で deferred** (`typeP_structure` は (b1)(e) の κ'-group 句を expose せず) かつ **shortcut なし**
+  (`ActsPrimeOn` は `C_N(g)=C_N(X)` のみで faithfulness を与えない)。cyclic-τ₂ 核
+  `typeP_hall_small_subgroup_cyclic_tau2` (S14:2234) は sorry-free 在庫。
+- **⟹ A(8) を完全 axiom-clean にするには BG Prop 14.2(b1)(e) (C_M(M_σ) κ'-group) を先に証明し
+  Cor 15.3 を assemble する必要** = 実質的な §14 上流仕事 (multi-session、quick assembly ではない;
+  Explore の「feasible assembly」判定は κ'-group 句を未確認の楽観)。
+- **現状の clean な到達点**: A(8) FittingIsTI は sorry-free declaration、axiom gap は **正確に Cor 15.3
+  一本**に収束。次は (i) Prop 14.2(b1)(e)+Cor 15.3 の §14 effort を行う or (ii) この状態を受容し
+  §16 Theorems B-E / Prop 16.1 hard 方向へ。
+
+### 🔧 2026-06-20⁶ Cor 15.3 (axiom-clean) 着手 — 証明戦略 + type-P2 subtlety 確定
+ユーザー裁可で §14 effort 着手。fitting_decomposition は Cor 15.3 を **H=M_σ で 1 箇所のみ** cite
+(`S15:6694`)、消費は `⟨X, hXcyc, hXτ₂, hCeq: C_G(M_σ)⊓M=(C_G(M_σ)⊓M_σ)⊔X⟩` (=`ha`)。⟹ 目標 =
+`ha` (H=M_σ) を sorry-free 化し fitting_decomposition を refactor (full Cor 15.3 の hconj/hfratt 不要)。
+
+**証明戦略 (確定)**:
+1. **crux: C_M(M_σ) κ'-group** ⟸ C_K(M_σ)=1 ⟸ ∀k∈K#, C_{M_σ}(k)=K* (ActsPrimeOn, typeP_structure
+   第1連言 + `fixedBy_eq_of_le_of_ne_bot` S13:110) ∧ **K*⊊M_σ** ∧ κ-prime⟹Sylow_p(M) cyclic
+   (`tau1/tau3_pRank_eq_one` + odd) + Sylow 共役で κ-元を K に共役。
+2. Hall σ/σ' 分解 (Schur-Zassenhaus): C_M(M_σ)=(C⊓M_σ)⊔X, X=σ'-Hall。κ'-group ⟹ X は (κ∪σ)'-group
+   ⟹ U に共役。
+3. `typeP_hall_small_subgroup_cyclic_tau2` (S14:2234, sorry-free): X≤U + M_σ⊓C(X)≠⊥ ⟹ X cyclic τ₂。
+4. assemble `ha` + refactor fitting_decomposition。
+
+**⚠ type-P2 subtlety (確定した残課題)**: 上記 1 の **K*⊊M_σ** は
+- type-F (κ=∅): vacuous。
+- type-P1: `[M_σ,K]=M_σ` (`msigma_eq_commutator_kappa_of_isComplement'`, M=KM_σ complement) で K*⊊M_σ。
+- **type-P2 (M=KUM_σ, M_σ nilpotent ∵ 15.2): GAP** — 既存 `[M_σ,K]=M_σ` は M=KM_σ complement 前提
+  (P1-only)。P2 では M_σ は KU の complement ゆえ `[M_σ,KU]=M_σ` は出るが、K 単独の非自明作用
+  (K*⊊M_σ) は別途要 (典型: Lem 6.3a を E=KU でなく K に restrict する一般形 or K-faithfulness の
+  別証)。「K acts nontrivially on M_σ」を type-P 一般で与える repo 補題は未発見。
+⟹ fitting_decomposition は一般 M (P2 含む) ゆえ、完全 axiom-clean には type-P2 K-faithfulness が要。
+これが Cor 15.3 axiom-clean 化の真の残 core (genuine multi-session)。次セッション着手点。
+
 ### 🎯 残 `pRank (M_F) r < 3` の証明計画 (✅ 上記で完了)
 `¬FittingIsTI M` から導出。base 補題は全在庫:
 1. **setup**: ¬FittingIsTI unfold (`IsTISubset` def S15... = `∀g,(∃a∈A,gag⁻¹∈A)→g∈L`) ⟹ ∃g, a∈
