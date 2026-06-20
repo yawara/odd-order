@@ -430,3 +430,42 @@ complement 位数・[L:L_F]・Q∩L=W₁ の事実なし)。⟹ 順序論は §1
 に gate。fabricate せず future work。`typeI_overNormalizer_complement` 本体は `complement_le_QW2` を
 cite して order 論を載せる形で完成予定 (consumer `typeII_overNormalizer_frobenius` は W₁⊆E 供給のため
 W₁ 含む complement 存在補題も要)。
+
+### ✅ `Q_W2_structure` 実証明化 (2026-06-20¹⁰, commit `f854532e`, 実 sorry 139→138)
+
+(13.17.c) の ∃y step が消費する `Q_W2_structure` を opaque `:= sorry` から実 assembly へ。3 連言を
+すべて証明し、唯一の gated 入力を `card_Q_eq` (genuine §13 counting residual B1) の cite のみに集約:
+
+- **conjunct 1** (`W₂ ≤ N_G(Q)`): `W₂ ≤ W = S⊓T ≤ T` (`W_eq_join`/`W_eq_inter`) + `Q = T_F ◁ T`
+  (`OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_le_normalizer`) — **完全無条件**。
+- **`p ≠ q`** (新規導出): 巡回群 `W` の素数位数部分群一意性 (`Ch06.eq_of_card_eq_prime_of_isCyclic`、
+  subgroupOf で `↥W` に落として適用) で `W₁ = W₂` を導き `W₁ ⊓ W₂ = 1` (`W1_inf_W2_eq_bot`) と矛盾。
+- **conjunct 3** (`p ∤ |Q|`): `card_Q_eq` で `|Q| = q^p`、`p ∤ q` (distinct primes) から
+  (`Nat.Prime.dvd_of_dvd_pow` + `Nat.prime_dvd_prime_iff_eq`)。
+- **conjunct 2** (`Q ⊓ W₂ = ⊥`): coprimality `|Q| ⟂ p = |W₂|` (`Subgroup.inf_eq_bot_of_coprime`)。
+
+署名不変ゆえ consumer `typeI_overNormalizer_complement` 無破壊。full build 3871 jobs green + AxiomsCheck。
+
+### ⛔ 残 §13.17 helper 2 本 = genuine §13 gate と確定 (fabricate せず)
+
+`Q_W2_structure` 完了で (13.17.c) ∃y 部分の gate は `card_Q_eq` 1 本に集約。残る 2 helper を精査し、
+**lane-h が honest に塞げないことを確定** (CLAUDE.md「進捗の測り方」+「難所を回避しない」に従い検証):
+
+- **`complement_card_eq_pq`** (|E|=pq): `complement_le_QW2` (E⊆QW₂、proven) + `W₁≤E` まではあるが、
+  `|E|=pq` には **`E ∩ Q = W₁`** (E の q-Sylow が exactly W₁) が必須。検算: E⊆QW₂ の q-元は Q 内
+  (QW₂/Q≅W₂ 位数 p) ⟹ E の q-Sylow = E∩Q ⊇ W₁、しかし E∩Q が cyclic q-群で位数 q に pin するには
+  §13 構造 ([L:L_F]=pq) が要る。repo 不在。`E=W₁` 除外も (13.19)/(13.2.a) gate。**深い §13 構造**。
+- **`q_not_dvd_kernel`** (q∤|L_F|): statement が **L~T 非共役の仮説を欠き、一般には偽** — L が T 共役なら
+  `tConjugate_fitting_data` で |L_F|=q^p ⟹ q∣|L_F|。honest 化には (L maximal, type-I, ¬conj S/T) を
+  追加して `card_LF_coprime_pq` (B2, F) を cite する必要があり、carrier opacity `kernel_eq_MF` も絡む。
+  **carrier honesty + F-ask**。
+
+さらに上流 **`card_Q_eq` 自体が §13 maximal-structure machinery 全体に gate**: S-side 対応物
+`basic_structure` (`P_order: |P|=p^q`) も `S15_SAndT:245 := sorry`。両 Fitting order とも Pf §13.2 の
+type 分類 + 体構造 (BG §14) に bottom-out = lane-F/B 領域の大物。formal S↔T swap 不可 (Hypothesis 非対称)。
+
+**⟹ lane-h の §13.17 / POLE-2 構造的 frontier は honestly-closable 分を出し尽くした**。残る POLE-2 gate は
+すべて (i) §13 maximal-structure counting (`basic_structure`/`card_Q_eq`、大物・lane-F/B 重複),
+(ii) §9/§11/§13 character theory (`exists_MHypothesis` の Dade/β_M, `U_cyclic_and_Q_elemAbelian` = lane-B),
+(iii) carrier F-ask (`P_inf_U_eq_bot`/`W1_complements_derived`、未追加) に bottom-out。
+**次手は要ユーザー/hub 判断** (大物 §13 structure 着手 / lane-h pivot / F-ask 待ち)。

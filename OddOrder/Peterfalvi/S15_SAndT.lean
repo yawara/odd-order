@@ -1573,13 +1573,35 @@ theorem typeI_overNormalizer_complement [Finite G]
     hyp.p_eq_card_W2.symm hpQ hEQW2 hpE
 
 /-- `W₁` (order `q`) is coprime to the type-I Frobenius kernel `L_F` (`q ∤ |L_F|`).  This is
-Peterfalvi's "`W₁ ∩ H = 1`", from (8.17.a) / `card_LF_coprime_pq`.  Gated on the opaque
-`kernel_eq_MF` carrier identifying `frob`'s kernel with `maxNilpotentNormalHall L` (`:= sorry`,
-isolated). -/
+Peterfalvi's "`W₁ ∩ H = 1`", from (8.17.a).
+
+*Proof.*  `L` is type I while `S` and `T` are type non-I maximal subgroups, so `L` is conjugate to
+neither (`not_conj_of_isTypeI_of_isTypeNonI`).  Hence (8.17.a) `card_LF_coprime_pq` gives
+`|L_F| ⟂ p q`, in particular `|L_F| ⟂ q`, i.e. `q ∤ |L_F|`; the kernel `H = frob.typeI.typeF.H`
+equals `L_F = maxNilpotentNormalHall L` (`TypeFData.H_eq`, so the "kernel_eq_MF" identification is
+*not* opaque) and `|H.subgroupOf L| = |H|`.  The only gated input is `card_LF_coprime_pq` (B2,
+BG Theorem E, owner F). -/
 theorem q_not_dvd_kernel [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
-    (hyp : Hypothesis (G := G)) {L : Subgroup G}
-    (frob : OddOrder.Peterfalvi.S14.TypeIFrobeniusData L) :
-    ¬ hyp.q ∣ Nat.card ↥(frob.typeI.typeF.H.subgroupOf L) := sorry
+    (hyp : Hypothesis (G := G)) {L : Subgroup G} (hLmax : L ∈ maximalSubgroups G)
+    (hLI : IsTypeI L) (frob : OddOrder.Peterfalvi.S14.TypeIFrobeniusData L) :
+    ¬ hyp.q ∣ Nat.card ↥(frob.typeI.typeF.H.subgroupOf L) := by
+  -- `L` is type I, while `S`, `T` are type non-I maximal: `L` is conjugate to neither.
+  have hnconjS : ¬ ∃ g : G, MulAut.conj g • L = hyp.S :=
+    not_conj_of_isTypeI_of_isTypeNonI _hG hLI hyp.S_maximal hyp.S_nonI
+  have hnconjT : ¬ ∃ g : G, MulAut.conj g • L = hyp.T :=
+    not_conj_of_isTypeI_of_isTypeNonI _hG hLI hyp.T_maximal hyp.T_nonI
+  -- (8.17.a): `|L_F| ⟂ p q`, hence `q ∤ |L_F|`.
+  have hcop := card_LF_coprime_pq _hG hyp hLmax hLI hnconjS hnconjT
+  have hcopq : Nat.Coprime (Nat.card ↥(maxNilpotentNormalHall L)) hyp.q :=
+    Nat.Coprime.coprime_dvd_right (dvd_mul_left hyp.q hyp.p) hcop
+  have hnotdvd : ¬ hyp.q ∣ Nat.card ↥(maxNilpotentNormalHall L) :=
+    hyp.q_prime.coprime_iff_not_dvd.mp hcopq.symm
+  -- `H = L_F = maxNilpotentNormalHall L`, and `|H.subgroupOf L| = |H|`.
+  have hHeq : frob.typeI.typeF.H = maxNilpotentNormalHall L := frob.typeI.typeF.H_eq
+  have hHleL : frob.typeI.typeF.H ≤ L := by
+    rw [hHeq]; exact OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_le L
+  rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hHleL).toEquiv, hHeq]
+  exact hnotdvd
 
 /-- (13.17.a/b)-strengthening of (12.7): the type-I Frobenius decomposition of `L` can be taken
 with the complement containing `W₁` — Peterfalvi's "let `E` be a complement to `H` in `L` such
@@ -1607,7 +1629,7 @@ theorem exists_typeIFrobeniusData_W1_le [Finite G] (_hG : OddOrder.BG.IsMinimalS
       rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hW1L).toEquiv]
       exact hyp.q_eq_card_W1.symm
     rw [hW1card]
-    exact (hyp.q_prime.coprime_iff_not_dvd).mpr (q_not_dvd_kernel _hG hyp frob₀)
+    exact (hyp.q_prime.coprime_iff_not_dvd).mpr (q_not_dvd_kernel _hG hyp hLmax hLtypeI frob₀)
   -- `W₁` lies in a conjugate `E₀^x` of the complement.
   obtain ⟨x, hx⟩ := Ch03.exists_conj_le_of_isComplement'_of_coprime
     inferInstance frob₀.frobenius.isComplement hcop
