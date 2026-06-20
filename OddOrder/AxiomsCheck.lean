@@ -3842,6 +3842,14 @@ set_option linter.style.longLine false in
 -- BG Theorem A(8) full form (`S16_MainResults`, issue 8016): `M_F ≠ M_σ ⟹ U = ⊥ ∧ FittingIsTI M ∧
 -- (∃ p prime, |K| = p)`.  All three conjuncts now axiom-clean.
 #assert_only_allowed_axioms OddOrder.BG.Ch4.S16.theoremA8_structure
+-- BG Corollary 15.5 (`S15_MF`, issue 8016): the full Fitting decomposition `F(M) = F(M_σ) × Y`
+-- (`Y` cyclic `τ₂`), `M'' ⊆ F(M)`, `M_F ≤ M'`, etc.  Now **fully axiom-clean** — the H=M_σ cite of
+-- the sorried general Cor 15.3 (the corollary's only sorryAx source) is routed through the
+-- sorry-free `mf_centralizer_msigma_decomp`.
+#assert_only_allowed_axioms OddOrder.BG.Ch4.S15.fitting_decomposition
+-- BG Corollary 15.5(a) (`S15_MF`, issue 8016): `O_{σ(M)'}(F(M))` is cyclic.  Extracted from the
+-- now-clean `fitting_decomposition`; the bridge that the A(8) `FittingIsTI` rank core consumes.
+#assert_only_allowed_axioms OddOrder.BG.Ch4.S15.opiCoreInG_sigmaCompl_fittingInAmbient_isCyclic
 
 /-! ### Forward-axiom islands (historical mechanism; currently empty)
 
