@@ -4,7 +4,66 @@
 > `s08_6_8_assembly_plan.md`(458KB)/`s08_6_8_3_gap_resolution.md` のうち本 note と矛盾する記述は本 note を優先。
 > 上位方針・FT 接続の文脈 = 記憶 [[ft-path-policy]] の 2026-06-17 検証訂正ブロック。
 
-## 🚩🆕🆕 HANDOFF — 次セッションはここから (2026-06-20 cont.²⁷ — |Y|=2 ブロッカー数学的解決 ✅, 残 = mechanical cY-rewiring)
+## 🚩🆕🆕🆕 HANDOFF — 次セッションはここから (2026-06-20 cont.²⁸ — cY-rewiring 完了 ✅✅, 残 = S08:59 assembly)
+
+**状態**: branch `lane-b`、clean、**full build green (3869 jobs, AxiomsCheck OK, 0 errors)、実 sorry 不変**。
+cont.²⁷ の「mechanical cY-rewiring」を**完遂**: case-B coherence chain 全体を `hyp.coherentYset`+`hYcard` から
+**uniform `cY`+`hcYgood` パラメータ**に置換し、top で linchpin `exists_Ycoherence_hgood_uniform_caseB` から供給。
+**⟹ `nonempty_coherent_S_caseB_of_c2` (および `_of_c2_data`/`_of_structure`) が `hYcard : |Y|≠2` を要求しなくなった**
+(|Y|=2 edge は内部で解決済)。これが roadmap が「S08:59 closure の真の残ブロッカー (case-B 側)」と呼んでいたもの。
+
+### ✅✅ 本セッション完了 = cY-rewiring (5 ファイル、全 axiom-clean、新 sorry ゼロ)
+roadmap cont.²⁷ の想定より広域だった (helper が複数ファイルで `hyp.coherentYset` を bake していた)。実施:
+- **`S08_CaseBAnchoredSeed`**: items 2–9 (`caseB_member_anchored_image`→`caseBXset_isCoherent`) を cY 化。bottom は
+  foundation `exists_decomposition_caseB_anchorCY` を呼ぶ (cont.²⁷ 着地済)。
+- **`S08_CaseBXChiCoherence`**: `xchi_inner_eq_of_anchored` / `certainTypeSet_isCoherent_via_anchoredImages` /
+  `exists_glue_nu_columnSum_Yset_via_map` / `coherentCertainTypeSet_union_Yset_via_anchoredImages` を cY-generic 化
+  (これらが item 5 に cY-anchored data を渡される — roadmap の list が見落としていた)。
+- **`S08_CaseBCoherence2`**: `coherentXunionYset_caseB_of_glued` に cY param (唯一の実 caller=SeedGlue、他は docstring)。
+- **`S08_CaseBSeedGlue`**: `exists_glue_nu_Xset_Yset_via_map` / `caseB_member_seam_all_Yset` を cY 化;
+  `coherentXunionYset_caseB` / `nonempty_coherent_S_caseB_of_anchor` を cY+hcYgood 化;
+  **`nonempty_coherent_S_caseB_of_structure` が linchpin から `⟨cY,hcYgood⟩` を obtain して hYcard を drop**。
+- **`S08_PGroupReduction`**: `nonempty_coherent_S_caseB_of_c2` / `_of_c2_data` から hYcard 引数を除去。
+- ⚠ dead pair `exists_decomposition_caseB_coherentYset` (`:121`) + `caseB_column_anchored_image` (`:254`) は
+  caller 0 ゆえ未変更で残置 (cont.²⁷ の「触らない」方針)。将来 cleanup 候補。
+
+### ▶▶ 残 = S08:59 `sibleySetup_is_coherent` X-nonempty 枝 assembly (`S08_CoherenceTheorems:46/59`) — 次の主タスク
+cont.²⁶ の診断 (本 note 下方「▶ S08:59 closure への残」) が今や **完全に有効** (hYcard ゲート消滅、残は wiring + edge)。
+goal = `CoherenceTarget` = `IsCoherent hyp.tau hyp.S (supportInSubgroup (sharpImage H) L)` (**data, Type**;
+`by_contra` 不可ゆえ `refine Nonempty.some ?_` で `Nonempty (...)` に落としてから producer を呼ぶ)。構造 (精査済):
+```
+· -- X-nonempty 枝
+  have hXne : (hyp.Xset ⁅H,H⁆).Nonempty := Set.nonempty_iff_ne_empty.mpr hXe
+  refine Nonempty.some ?_
+  rcases hyp.cases with hF | ⟨h46, hdade, hHK, hW1, hprime, hW2comm, hcop⟩
+  · exact nonempty_coherent_S_of_frobenius hyp hF hXne          -- ✅存在 (PGroupReduction:159)
+  · -- c2 CertainType: 要 h46-instances 構築 (NeZero/Invertible/Fintype W1⊔W2/ticVdiff/W2/W2.subgroupOf H)
+    by_contra hncoh                                              -- hncoh : ¬ Nonempty (IsCoherent ...)
+    have hbound := abelianization_card_le_of_not_coherent_c2 hyp h46 hHK hW1 hncoh   -- ✅ Theorem65c2:254
+    have hW2H : h46.W2 ≤ H := …                                  -- from hW2comm (≤⁅H,H⁆≤H)
+    have hsplit := caseAB_split_of_c2 h46 hW2H hprime            -- ✅ PGroupReduction:243
+    exact hncoh (nonempty_coherent_S_of_c2_of_branches hyp h46 hHK hW1 hW2comm hcop hbound hsplit
+      ?hcaseA ?hcaseB)                                            -- ✅ dispatcher PGroupReduction:215
+```
+- **instances** (cont.²⁶ で「要構築」と flag): `NeZero (Nat.card h46.W1)`=`⟨Nat.card_pos.ne'⟩`;
+  `Invertible (Nat.card ↥h46.K : ℂ)` = `hHK ▸ (ambient Invertible H)`; `Fintype ↥(...)` = `Fintype.ofFinite _`;
+  `Invertible (Nat.card X : ℂ)` = `invertibleOfNonzero (by exact_mod_cast Nat.card_pos.ne')`; ticVdiff も Fintype.ofFinite。
+- **hcaseA** (`∀{p},prime→IsPGroup→Disjoint(W₂.subgroupOf H)(Z H)→Nonempty`): `nonempty_coherent_S_caseA_of_c2`
+  (`S08_CaseAWeightedEndgame:144`) を wrap — `hHnonab`=commutator≠⊥ (X-nonempty から)、`hA`=`center⊓W₂=⊥`
+  (Disjoint→inf=⊥, inf_comm)、`hp3`=`three_le_of_isPGroup_H`。
+- **hcaseB** (`∀{p},prime→IsPGroup→(W₂.subgroupOf H≤Z H)→Nonempty`): **edge 分岐**。
+  `by_cases hWMgt : 1 < (W₂.subgroupOf H).relIndex (commutator H)` →
+  (a) `hWMgt` 真: `nonempty_coherent_S_caseB_of_c2 hyp h46 … hWMgt hXne'` (hYcard 不要化済！hXne'=`Xset_nonempty_of_subgroupOf_ne_bot…`);
+  (b) `hWMgt` 偽 (W₂=H'): S=X∪Y を `Xset_union_Yset_eq_S` (`Part2:1068`) で書き、(6.8.2) seed
+      `coherentXunionYset_caseB` (`SeedGlue:299`, 今 cY+hcYgood 取る) で直接 coherent。
+- **見積**: instances 構築 + hcaseA/hcaseB wrap が fiddly (cont.²⁶ で「~1-2 session」と評価)。新数学はほぼゼロ
+  (edge は既存部品)。iterative leaf build (`lake build OddOrder.Peterfalvi.S08_CoherenceTheorems`) で詰める。
+- **FT 文脈**: S08:59 が閉じれば §8 唯一の実 sorry が消え、§9 (7.10) `card_G0_lower_bound` へ。(6.8) は honest FT
+  証明の genuine な上流前提 (進捗は sorry 数でなく実質的証明で測る)。
+
+---
+
+## 🚩🆕🆕 HANDOFF — (2026-06-20 cont.²⁷ — |Y|=2 ブロッカー数学的解決 ✅, 残 = mechanical cY-rewiring) [DONE, 上に集約]
 
 **状態**: branch `lane-b`、clean、**leaf build green (S08_CaseBCoherence 3480 jobs)、commit `4ec49966`**。
 **cont.²⁶ の「確定ブロッカー = case-B |Y|=2 edge」を数学的に解決した** (linchpin 2 定理、sorry-free + axiom-clean)。

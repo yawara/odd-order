@@ -52,10 +52,12 @@ theorem exists_glue_nu_Xset_Yset_via_map
     [NeZero (Nat.card h46.W1)] [Invertible (Nat.card ↥h46.K : ℂ)]
     [Fintype ↥(h46.W1 ⊔ h46.W2)] [Invertible (Nat.card ↥(h46.W1 ⊔ h46.W2) : ℂ)]
     (hW2comm : h46.W2 ≤ ⁅H, H⁆)
+    (cY : OddOrder.Peterfalvi.S07.IsCoherent hyp.tau hyp.Yset
+      (OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L))
     (νX : OddOrder.Peterfalvi.S07.IntegralCharacterMap (↥L) G) :
     ∃ ν : OddOrder.Peterfalvi.S07.IntegralCharacterMap (↥L) G,
       (∀ x ∈ hyp.Xset h46.W2, ν x = νX x)
-      ∧ (∀ y ∈ hyp.Yset, ν y = hyp.coherentYset.extension y) := by
+      ∧ (∀ y ∈ hyp.Yset, ν y = cY.extension y) := by
   classical
   haveI : Finite ((h46.W2.subgroupOf (h46.W1 ⊔ h46.W2)) →* ℂˣ) :=
     SibleyDadeHypothesis.finite_linearCharacters_of_finite
@@ -96,7 +98,7 @@ theorem exists_glue_nu_Xset_Yset_via_map
     · exact caseB_Xset_orthogonal_Yset hyp h46 hHK hW1 hW2comm x hxX y hy
   obtain ⟨ν, hνsrc, hνY⟩ :=
     OddOrder.Peterfalvi.S07.IntegralCharacterMap.exists_integralCharacterMap_glue_of_orthonormal
-      hsrcfin hyp.Yset_finite hsrcorth hYorth hsrcY νX hyp.coherentYset.extension
+      hsrcfin hyp.Yset_finite hsrcorth hYorth hsrcY νX cY.extension
   refine ⟨ν, fun x hx => ?_, hνY⟩
   rcases caseB_S_member_column_or_irreducible hyp h46 hHK (hyp.Xset_subset_S hx) with
     ⟨χ₂, -, hcol⟩ | hirr
@@ -122,13 +124,15 @@ theorem caseB_member_seam_all_Yset
     [NeZero (Nat.card h46.W1)] [Invertible (Nat.card ↥h46.K : ℂ)]
     [Fintype ↥(h46.W1 ⊔ h46.W2)] [Invertible (Nat.card ↥(h46.W1 ⊔ h46.W2) : ℂ)]
     (hW2comm : h46.W2 ≤ ⁅H, H⁆)
+    (cY : OddOrder.Peterfalvi.S07.IsCoherent hyp.tau hyp.Yset
+      (OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L))
     {η₁ : ClassFunction ↥L ℂ} (hη₁ : η₁ ∈ hyp.Yset) {a₀ : ℕ} {X : ClassFunction G ℂ}
     {χ : ClassFunction ↥L ℂ} (hχ : χ ∈ hyp.Xset h46.W2)
-    (hanc : hyp.tau (χ - a₀ • η₁) = X - (a₀ : ℂ) • hyp.coherentYset.extension η₁)
-    (hmix : ClassFunction.inner X (hyp.coherentYset.extension η₁) = 0)
+    (hanc : hyp.tau (χ - a₀ • η₁) = X - (a₀ : ℂ) • cY.extension η₁)
+    (hmix : ClassFunction.inner X (cY.extension η₁) = 0)
     (hsupp : (χ - a₀ • η₁).support ⊆ OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L)
     {y : ClassFunction ↥L ℂ} (hy : y ∈ hyp.Yset) :
-    ClassFunction.inner X (hyp.coherentYset.extension y) = 0 := by
+    ClassFunction.inner X (cY.extension y) = 0 := by
   classical
   -- `y − η₁` is `H^#`-supported (equal degree `|W₁|`) and lies in the `Y`-span.
   have hydeg : y (1 : ↥L) = η₁ (1 : ↥L) :=
@@ -140,15 +144,15 @@ theorem caseB_member_seam_all_Yset
     Submodule.sub_mem _ (Submodule.subset_span hy) (Submodule.subset_span hη₁)
   have hη₁memZ : η₁ ∈ OddOrder.Peterfalvi.S07.zSpan (L := ↥L) hyp.Yset :=
     Submodule.subset_span hη₁
-  have hcYext : hyp.coherentYset.extension (y - η₁) = hyp.tau (y - η₁) :=
-    hyp.coherentYset.extends_on_supported (y - η₁) ⟨hymemZ, hysupp⟩
+  have hcYext : cY.extension (y - η₁) = hyp.tau (y - η₁) :=
+    cY.extends_on_supported (y - η₁) ⟨hymemZ, hysupp⟩
   -- `X = τ(χ − a₀η₁) + a₀·ν₁`.
-  have hX : X = hyp.tau (χ - a₀ • η₁) + (a₀ : ℂ) • hyp.coherentYset.extension η₁ := by
+  have hX : X = hyp.tau (χ - a₀ • η₁) + (a₀ : ℂ) • cY.extension η₁ := by
     rw [hanc]; abel
   -- split `⟨X, ν_y⟩ = ⟨X, cY(y − η₁)⟩ + ⟨X, ν₁⟩` and discharge the anchor term by `hmix`.
-  have hsplit : ClassFunction.inner X (hyp.coherentYset.extension y)
-      = ClassFunction.inner X (hyp.coherentYset.extension (y - η₁))
-        + ClassFunction.inner X (hyp.coherentYset.extension η₁) := by
+  have hsplit : ClassFunction.inner X (cY.extension y)
+      = ClassFunction.inner X (cY.extension (y - η₁))
+        + ClassFunction.inner X (cY.extension η₁) := by
     rw [map_sub, ClassFunction.inner_sub_right]; ring
   rw [hsplit, hmix, add_zero, hcYext]
   -- the Dade isometry of `τ` on the supported pair `{χ − a₀η₁, y − η₁}`.
@@ -161,9 +165,9 @@ theorem caseB_member_seam_all_Yset
       (Submodule.subset_span (Set.mem_insert _ _))
       (Submodule.subset_span (Set.mem_insert_of_mem _ rfl))
   -- the `Y`-isometry of `cY`: `⟨ν₁, τ(y − η₁)⟩ = ⟨η₁, y − η₁⟩`.
-  have hcYiso : ClassFunction.inner (hyp.coherentYset.extension η₁) (hyp.tau (y - η₁))
+  have hcYiso : ClassFunction.inner (cY.extension η₁) (hyp.tau (y - η₁))
       = ClassFunction.inner η₁ (y - η₁) := by
-    rw [← hcYext, hyp.coherentYset.extension_inner_eq η₁ (y - η₁) hη₁memZ hymemZ]
+    rw [← hcYext, cY.extension_inner_eq η₁ (y - η₁) hη₁memZ hymemZ]
   -- the member is orthogonal to `Y` (columns and irreducibles alike).
   have hμy : ClassFunction.inner χ y = 0 :=
     caseB_Xset_orthogonal_Yset hyp h46 hHK hW1 hW2comm χ hχ y hy
@@ -314,7 +318,13 @@ noncomputable def coherentXunionYset_caseB
     (hW2cenL : h46.W2 ≤ Subgroup.center ↥L)
     (hc2 : 2 ≤ (h46.W2.subgroupOf H).index)
     (hFPF : (h46.W2.index : ℤ) < ((h46.W2.subgroupOf H).index : ℤ) ^ 2)
-    {η₁ : ClassFunction ↥L ℂ} (hη₁ : η₁ ∈ hyp.Yset) (hYcard : hyp.Yset.ncard ≠ 2)
+    {η₁ : ClassFunction ↥L ℂ} (hη₁ : η₁ ∈ hyp.Yset) (cY : OddOrder.Peterfalvi.S07.IsCoherent hyp.tau hyp.Yset
+      (OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L))
+    (hcYgood : ∀ φ : IrreducibleCharacter ↥h46.W2, (φ : ClassFunction ↥h46.W2 ℂ) 1 = 1 →
+      φ ≠ trivialIrreducibleCharacter ↥h46.W2 →
+      ClassFunction.inner (hyp.tau (ClassFunction.induce h46.W2 (φ : ClassFunction ↥h46.W2 ℂ)
+          - ((h46.W2.subgroupOf H).index : ℂ) • η₁)) (cY.extension η₁)
+          = -((h46.W2.subgroupOf H).index : ℂ))
     (hη₁1 : η₁ (1 : ↥L) ≠ 0)
     {χ₁ : ClassFunction ↥L ℂ} (hanchor : χ₁ ∈ hyp.Xset h46.W2) (hχ₁1 : χ₁ (1 : ↥L) ≠ 0)
     (hdvd : ∀ f ∈ hyp.Xset h46.W2, ∃ d : ℕ, (f : ClassFunction ↥L ℂ) 1 = (d : ℂ) * χ₁ 1)
@@ -325,20 +335,20 @@ noncomputable def coherentXunionYset_caseB
   classical
   -- the full `X(W₂)`-coherence `cX` (anchored-image dichotomy extension).
   set cX := caseBXset_isCoherent hyp h46 hHK hW1 hW2H hcen hderiv hcop hp hHp hprime hW2comm
-    hW2cenL hc2 hFPF hη₁ hYcard hη₁1 hanchor hχ₁1 hdvd hnonzero with hcXdef
+    hW2cenL hc2 hFPF hη₁ cY hcYgood hη₁1 hanchor hχ₁1 hdvd hnonzero with hcXdef
   -- on every `X`-member, `cX.extension = caseBXimg` (the anchored image).
   have hcXext : ∀ x ∈ hyp.Xset h46.W2, cX.extension x =
       caseBXimg hyp h46 hHK hW1 hW2H hcen hderiv hcop hp hHp hprime hW2comm hW2cenL hc2 hFPF
-        hη₁ hYcard x := by
+        hη₁ cY hcYgood x := by
     intro x hx
     rw [hcXdef]
     exact caseBXsetExtension_eq hyp h46 hHK hW1 _ hx
   -- the glue map `ν` agreeing with `cX.extension` on `X(W₂)` and `cY` on `Y` (extracted via
   -- `Exists.choose` since the eventual goal `IsCoherent` lives in `Type`).
-  have hglue := exists_glue_nu_Xset_Yset_via_map hyp h46 hHK hW1 hW2comm cX.extension
+  have hglue := exists_glue_nu_Xset_Yset_via_map hyp h46 hHK hW1 hW2comm cY cX.extension
   set ν := hglue.choose with hνdef
   have hagreeX : ∀ x ∈ hyp.Xset h46.W2, ν x = cX.extension x := hglue.choose_spec.1
-  have hagreeY : ∀ y ∈ hyp.Yset, ν y = hyp.coherentYset.extension y := hglue.choose_spec.2
+  have hagreeY : ∀ y ∈ hyp.Yset, ν y = cY.extension y := hglue.choose_spec.2
   -- `X(W₂) ⊥ Y`.
   have hpair := caseB_Xset_orthogonal_Yset hyp h46 hHK hW1 hW2comm (W2 := h46.W2)
   -- `hmixed`: both sides vanish (`X ⊥ Y` and the image seam `caseBXimg ⊥ Y^{τ₁}`).
@@ -347,17 +357,17 @@ noncomputable def coherentXunionYset_caseB
     intro x hx y hy
     rw [hagreeX x hx, hagreeY y hy, hpair x hx y hy, hcXext x hx]
     obtain ⟨a, -, hanc, hmix, -, hsupp⟩ := caseBXimg_spec hyp h46 hHK hW1 hW2H hcen hderiv hcop
-      hp hHp hprime hW2comm hW2cenL hc2 hFPF hη₁ hYcard hx
-    exact caseB_member_seam_all_Yset hyp h46 hHK hW1 hW2comm hη₁ hx hanc hmix hsupp hy
+      hp hHp hprime hW2comm hW2cenL hc2 hFPF hη₁ cY hcYgood hx
+    exact caseB_member_seam_all_Yset hyp h46 hHK hW1 hW2comm cY hη₁ hx hanc hmix hsupp hy
   -- the cross-diagonal `χ₁ − a₁·η₁` (`a₁` = anchor weight from `caseBXimg_spec`; extracted via
   -- `Exists.choose` since the eventual goal `IsCoherent` lives in `Type`).
   have hanchorSpec := caseBXimg_spec hyp h46 hHK hW1 hW2H hcen hderiv hcop
-    hp hHp hprime hW2comm hW2cenL hc2 hFPF hη₁ hYcard hanchor
+    hp hHp hprime hW2comm hW2cenL hc2 hFPF hη₁ cY hcYgood hanchor
   set a₁ : ℕ := hanchorSpec.choose with ha₁def
   have ha₁deg : χ₁ 1 = (a₁ : ℂ) * η₁ 1 := hanchorSpec.choose_spec.1
   have ha₁anc : hyp.tau (χ₁ - a₁ • η₁)
       = caseBXimg hyp h46 hHK hW1 hW2H hcen hderiv hcop hp hHp hprime hW2comm hW2cenL hc2 hFPF
-          hη₁ hYcard χ₁ - (a₁ : ℂ) • hyp.coherentYset.extension η₁ :=
+          hη₁ cY hcYgood χ₁ - (a₁ : ℂ) • cY.extension η₁ :=
     hanchorSpec.choose_spec.2.1
   -- `hDτ`: ν agrees with τ on the diagonal (by the anchored image identity).
   have hDτ : ∀ d ∈ ({χ₁ - a₁ • η₁} : Set (ClassFunction ↥L ℂ)), ν d = hyp.tau d := by
@@ -365,7 +375,7 @@ noncomputable def coherentXunionYset_caseB
     rw [Set.mem_singleton_iff] at hd; subst hd
     rw [map_sub, map_nsmul, hagreeX χ₁ hanchor, hagreeY η₁ hη₁, hcXext χ₁ hanchor, ha₁anc,
       Nat.cast_smul_eq_nsmul]
-  exact hyp.coherentXunionYset_caseB_of_glued cX ν hagreeX hagreeY hpair hmixed
+  exact hyp.coherentXunionYset_caseB_of_glued cY cX ν hagreeX hagreeY hpair hmixed
     {χ₁ - a₁ • η₁} hDτ (hgen_withDiagonal_Xset hyp hanchor hdvd hη₁ ha₁deg)
 
 /-- **Peterfalvi (6.8) case-(B): `S` is coherent (from the anchor data).**  The case-(B) analogue of
@@ -397,7 +407,13 @@ theorem nonempty_coherent_S_caseB_of_anchor
     (hFPF : (h46.W2.index : ℤ) < ((h46.W2.subgroupOf H).index : ℤ) ^ 2)
     (hcZ : 2 ≤ Nat.card ↥(h46.W2.subgroupOf H))
     (hfpf : (2 * Nat.card hyp.W1 + 1) ^ 2 ≤ Nat.card (↥H ⧸ h46.W2.subgroupOf H))
-    {η₁ : ClassFunction ↥L ℂ} (hη₁ : η₁ ∈ hyp.Yset) (hYcard : hyp.Yset.ncard ≠ 2)
+    {η₁ : ClassFunction ↥L ℂ} (hη₁ : η₁ ∈ hyp.Yset) (cY : OddOrder.Peterfalvi.S07.IsCoherent hyp.tau hyp.Yset
+      (OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L))
+    (hcYgood : ∀ φ : IrreducibleCharacter ↥h46.W2, (φ : ClassFunction ↥h46.W2 ℂ) 1 = 1 →
+      φ ≠ trivialIrreducibleCharacter ↥h46.W2 →
+      ClassFunction.inner (hyp.tau (ClassFunction.induce h46.W2 (φ : ClassFunction ↥h46.W2 ℂ)
+          - ((h46.W2.subgroupOf H).index : ℂ) • η₁)) (cY.extension η₁)
+          = -((h46.W2.subgroupOf H).index : ℂ))
     (hη₁1 : η₁ (1 : ↥L) ≠ 0)
     {χ₁ : ClassFunction ↥L ℂ} (hanchor : χ₁ ∈ hyp.Xset h46.W2) (hχ₁1 : χ₁ (1 : ↥L) ≠ 0)
     (hdvd : ∀ f ∈ hyp.Xset h46.W2, ∃ d : ℕ, (f : ClassFunction ↥L ℂ) 1 = (d : ℂ) * χ₁ 1)
@@ -407,7 +423,7 @@ theorem nonempty_coherent_S_caseB_of_anchor
       (OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L)) :=
   nonempty_coherent_S_caseB hyp h46 hHK hW1 hcen hcZ hfpf
     ⟨coherentXunionYset_caseB hyp h46 hHK hW1 hW2H hcen hderiv hcop hp hHp hprime hW2comm hW2cenL
-      hc2 hFPF hη₁ hYcard hη₁1 hanchor hχ₁1 hdvd hnonzero⟩
+      hc2 hFPF hη₁ cY hcYgood hη₁1 hanchor hχ₁1 hdvd hnonzero⟩
 
 /-- **Minimal-degree `p`-power anchor for `X(W₂)`.**  In case (B) (`H` a `p`-group), a minimal-degree
 `X`-member `χ₁` divides every other: its degree ratio is a positive natural.  This is the case-(B)
@@ -493,7 +509,7 @@ theorem nonempty_coherent_S_caseB_of_structure
     (hFPF : (h46.W2.index : ℤ) < ((h46.W2.subgroupOf H).index : ℤ) ^ 2)
     (hcZ : 2 ≤ Nat.card ↥(h46.W2.subgroupOf H))
     (hfpf : (2 * Nat.card hyp.W1 + 1) ^ 2 ≤ Nat.card (↥H ⧸ h46.W2.subgroupOf H))
-    (hYcard : hyp.Yset.ncard ≠ 2) (hXne : (hyp.Xset h46.W2).Nonempty) :
+    (hXne : (hyp.Xset h46.W2).Nonempty) :
     Nonempty (OddOrder.Peterfalvi.S07.IsCoherent hyp.tau hyp.S
       (OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L)) := by
   classical
@@ -501,6 +517,8 @@ theorem nonempty_coherent_S_caseB_of_structure
   obtain ⟨χ₁, hanchor, hχ₁1, hdvd⟩ := exists_caseB_Xset_anchor hyp hp hHp hXne
   -- the `Y`-anchor `η₁` (degree `|W₁| ≠ 0`).
   obtain ⟨η₁, hη₁⟩ := hyp.Yset_nonempty
+  obtain ⟨cY, hcYgood⟩ := hyp.exists_Ycoherence_hgood_uniform_caseB hcop hp hHp hprime hW2comm
+    hW2cenL hη₁ hc2 hFPF
   have hη₁1 : η₁ (1 : ↥L) ≠ 0 := by
     obtain ⟨dη, hdη_pos, hdη_eq⟩ := irreducibleCharacter_apply_one_eq_pos_natCast
       (⟨η₁, hyp.isIrreducibleCharacter_of_mem_Yset hη₁⟩ : IrreducibleCharacter ↥L)
@@ -520,6 +538,6 @@ theorem nonempty_coherent_S_caseB_of_structure
         by rw [hθeq]; exact caseB_irr_conj_diff_support hyp θ⟩,
       sub_ne_zero.mpr (Ne.symm hχne)⟩
   exact nonempty_coherent_S_caseB_of_anchor hyp h46 hHK hW1 hW2H hcen hderiv hcop hp hHp hprime
-    hW2comm hW2cenL hc2 hFPF hcZ hfpf hη₁ hYcard hη₁1 hanchor hχ₁1 hdvd hnonzero
+    hW2comm hW2cenL hc2 hFPF hcZ hfpf hη₁ cY hcYgood hη₁1 hanchor hχ₁1 hdvd hnonzero
 
 end OddOrder.Peterfalvi.S08

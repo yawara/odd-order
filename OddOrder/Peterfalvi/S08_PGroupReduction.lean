@@ -312,7 +312,7 @@ theorem nonempty_coherent_S_caseB_of_c2_data (hyp : SibleyDadeHypothesis G L H)
     (hc2 : 2 ≤ (h46.W2.subgroupOf H).index)
     (hfpf : (2 * Nat.card hyp.W1 + 1) ^ 2 ≤ Nat.card (↥H ⧸ h46.W2.subgroupOf H))
     (hFPF : (h46.W2.index : ℤ) < ((h46.W2.subgroupOf H).index : ℤ) ^ 2)
-    (hYcard : hyp.Yset.ncard ≠ 2) (hXne : (hyp.Xset h46.W2).Nonempty) :
+    (hXne : (hyp.Xset h46.W2).Nonempty) :
     Nonempty (OddOrder.Peterfalvi.S07.IsCoherent hyp.tau hyp.S
       (OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L)) := by
   have hderiv : h46.W2.subgroupOf H ≤ commutator ↥H := by
@@ -322,7 +322,7 @@ theorem nonempty_coherent_S_caseB_of_c2_data (hyp : SibleyDadeHypothesis G L H)
     rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hW2H).toEquiv]; exact hprime.two_le
   have hW2cenL : h46.W2 ≤ Subgroup.center ↥L := caseB_W2_le_center_L hyp h46 hW1 hW2H hcen
   exact nonempty_coherent_S_caseB_of_structure hyp h46 hHK hW1 hW2H hcen hderiv hcop hp hHp
-    hprime hW2comm hW2cenL hc2 hFPF hcZ hfpf hYcard hXne
+    hprime hW2comm hW2cenL hc2 hFPF hcZ hfpf hXne
 
 /-- **Peterfalvi (6.8) case-B coherence — full c2 FPF/index structure-data discharge.**
 
@@ -355,7 +355,7 @@ theorem nonempty_coherent_S_caseB_of_c2 (hyp : SibleyDadeHypothesis G L H)
     (hprime : (Nat.card h46.W2).Prime) (hW2comm : h46.W2 ≤ ⁅H, H⁆)
     (hcen : h46.W2.subgroupOf H ≤ Subgroup.center ↥H)
     (hWMgt : 1 < (h46.W2.subgroupOf H).relIndex (commutator ↥H))
-    (hYcard : hyp.Yset.ncard ≠ 2) (hXne : (hyp.Xset h46.W2).Nonempty) :
+    (hXne : (hyp.Xset h46.W2).Nonempty) :
     Nonempty (OddOrder.Peterfalvi.S07.IsCoherent hyp.tau hyp.S
       (OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L)) := by
   letI : Group.IsNilpotent ↥H := hyp.H_nilpotent
@@ -390,6 +390,6 @@ theorem nonempty_coherent_S_caseB_of_c2 (hyp : SibleyDadeHypothesis G L H)
       exact_mod_cast lt_of_le_of_lt (Nat.zero_le _) hw1lt
     rw [hidx]; push_cast; nlinarith [hw1ltZ, hiposZ]
   exact nonempty_coherent_S_caseB_of_c2_data hyp h46 hHK hW1 hW2H hcop hp hHp hprime hW2comm
-    hcen hc2 hfpf hFPF hYcard hXne
+    hcen hc2 hfpf hFPF hXne
 
 end OddOrder.Peterfalvi.S08
