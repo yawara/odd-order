@@ -7216,24 +7216,48 @@ theorem three_le_pRank_mf_of_mem_beta [Finite G]
   rw [OddOrder.GroupTheory.pRank_eq_of_le_of_not_dvd_index (maxNilpotentNormalHall_le M) hidx]
   exact (OddOrder.BG.Ch3.S10.beta_subset_alpha M hrβ).2
 
+/-- A subgroup contained in two **distinct** maximal subgroups of a minimal simple odd group has
+rank `< 3`.  Contrapositive of `isUniquelyMaximal_of_three_le_rank_of_lt_top`: rank `≥ 3` would
+force unique maximality, contradicting membership in two distinct coatoms. -/
+theorem rank_lt_three_of_le_two_maximals [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    {C M N : Subgroup G} (hM : M ∈ maximalSubgroups G) (hN : N ∈ maximalSubgroups G)
+    (hMN : M ≠ N) (hCM : C ≤ M) (hCN : C ≤ N) : rank ↥C < 3 := by
+  by_contra h
+  have hCt : C < ⊤ := lt_of_le_of_lt hCM (OddOrder.GroupTheory.mem_maximalSubgroups.mp hM).lt_top
+  exact hMN ((OddOrder.BG.Ch2.S09.isUniquelyMaximal_of_three_le_rank_of_lt_top hG hCt
+    (not_lt.mp h)).eq_of_isCoatom_of_le (OddOrder.GroupTheory.mem_maximalSubgroups.mp hM) hCM
+    (OddOrder.GroupTheory.mem_maximalSubgroups.mp hN) hCN)
+
 /-- **BG Theorem 15.7(a), rank-theoretic core** (mmd L4192-4198): if `F(M)` is not a TI-subgroup
 of `G`, then no prime divides `M_F` and lies in `β(M)`.
 
 The `≥ 3` side is fully proved (`three_le_pRank_mf_of_mem_beta`: any `r ∈ π(M_F) ∩ β(M)` has
 `r_r(M_F) ≥ 3`); the proof below reduces the goal to the complementary `< 3` bound
-`pRank (M_F) r < 3`, which is the genuinely deep §15 content isolated as the single remaining
-`sorry`.  The BG argument for that bound: `¬FittingIsTI M` yields `g ∉ N_G(F(M)) = M` and a
-nontrivial `X = F(M) ∩ F(M)^g`.  For `p ∈ π(X)` with `X₁ ∈ E_p^1(X)`: if `O_p(M)` were cyclic,
-`X₁` would be characteristic, hence normal in both `M` and `M^g`, contradicting simplicity; so
-`O_p(M)` is non-cyclic and, by Corollary 15.5 (`fitting_decomposition`: `O_{σ'}(F(M))` cyclic),
-`p ∈ σ(M)`.  Thus `X ≤ F(M_σ) ≤ M_σ`, and by Lemma 12.17 (`Msigma_inf_conj_isBetaCompl`) `X` is
-cyclic with `C_G(X₁) ⊄ M`.  Then `𝓜(C_{M_F}(X₁)) ≠ {M}`, so Theorem 12.13
-(`nonabelian_pgroup_isUniquelyMaximal`) and the Uniqueness Theorem force `C_{M_F}(X₁)` to have
-rank `< 3`; since `M_F ≤ F(M)` is nilpotent, `O_r(M_F)` centralizes the `p`-group `X₁`
-(`commute_of_coprime_orderOf_of_isNilpotent`, `r ≠ p`), so `O_r(M_F) ≤ C_{M_F}(X₁)` and
-`r_r(M_F) = r_r(O_r(M_F)) < 3` (the `r = p` case uses `X` cyclic).  Combined with
-`mf_eq_msigma_of_piSet_inf_beta_disjoint` this yields the `M_F = M_σ` conclusion of Theorem
-15.7(a), i.e. the `FittingIsTI` clause of Theorem A(8). -/
+`pRank (M_F) r < 3`, the genuinely deep §15 content isolated as the single remaining `sorry`.
+
+**Proved building blocks (this file):** the setup
+`exists_notMem_inf_conj_fitting_ne_bot_of_not_fittingIsTI` (step 1: `g ∉ M`, `X = F(M) ⊓ F(M)^g ≠ ⊥`)
+and `rank_lt_three_of_le_two_maximals` (step 7 core: a subgroup in two distinct maximals has rank
+`< 3`).  The remaining assembly, with the located upstream lemmas:
+
+* **(step 3, `p ∈ σ(M)`)** pick `p ∈ π(X)`, `X₁ ≤ X` of order `p`
+  (`le_opiCoreInG_singleton_of_isPGroup_of_le_nilpotent`: `X₁ ≤ O_p(F(M))`).  If `p ∉ σ(M)` then
+  `O_p(F(M)) ≤ O_{σ'}(F(M))` is cyclic (`fitting_decomposition`), so `X₁` is the unique order-`p`
+  subgroup, hence characteristic and normal in both `M` and `M^g`; `normalizer_eq_of_normal_of_mem_maximal`
+  (S08, currently `private`) forces `M^g = M`, contradicting `g ∉ M`.  ⟹ `p ∈ σ(M)`.  *(fiddly sub-step:
+  cyclic group ⟹ unique/characteristic order-`p` subgroup.)*
+* **(step 5, `p ∉ β(M)`)** `X₁ ≤ O_p(M) ≤ M_σ` (`opiCoreInG_singleton_le_Msigma_of_mem_sigma`) and
+  `X₁ ≤ F(M)^g ≤ M^g`, so `X₁ ≤ M_σ ⊓ M^g`; Lemma 12.17 (`Msigma_inf_conj_isBetaCompl`) ⟹ `p ∉ β(M)`,
+  hence `r ≠ p` for the `β`-prime `r` (so the `r = p` case is vacuous).
+* **(step 6, `C_G(X₁) ⊄ M`)** `fusion_control_of_mem_sigma` part (e) with `p ∈ σ(M)`, `X₁ ≤ M`,
+  `conj g⁻¹ • X₁ ≤ M`.
+* **(step 7, `rank C_{M_F}(X₁) < 3`)** `C_G(X₁) < ⊤` (else `X₁ ≤ Z(G) = ⊥`, simple), so a coatom
+  `N ⊇ C_G(X₁)` exists with `N ≠ M`; `C_{M_F}(X₁) ≤ M ⊓ N` ⟹ `rank_lt_three_of_le_two_maximals`.
+* **(step 8, bridge)** `O_r(M_F) ≤ C_{M_F}(X₁)` (`commute_of_coprime_orderOf_of_isNilpotent`, `r ≠ p`,
+  both in nilpotent `F(M)`), so `r_r(M_F) = r_r(O_r(M_F)) ≤ rank C_{M_F}(X₁) < 3`.
+
+Combined with `mf_eq_msigma_of_piSet_inf_beta_disjoint` this yields the `M_F = M_σ` conclusion of
+Theorem 15.7(a), i.e. the `FittingIsTI` clause of Theorem A(8). -/
 theorem piSet_mf_inf_beta_disjoint_of_not_fittingIsTI [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} (hM : M ∈ maximalSubgroups G)
     (hnotTI : ¬ FittingIsTI M) :
