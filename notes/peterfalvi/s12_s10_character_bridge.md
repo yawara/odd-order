@@ -256,6 +256,32 @@ inducedFamily と同じ ambient (FiniteInduce) を使う (自前 haveI を作る
   W₂-dual ↔ Fin w₂ equiv 要、中)。(c) omegaSigma ← §5 bridge omegaSigmaGrid。
   **gated 本筋**: (8.8) w₂ prime → (10.3)-(10.6) → (10.8) keystone。(8.8) は BG §16 partner existence。
 
+### ★ (8.8) gate 攻略 map (2026-06-20 cont.⁶, ユーザー選択「(8.8) 攻略」)
+
+依存構造を精査 (S12 keystone chain + S14 (12.17)):
+- **(8.8) case-(b) 存在 = `theorem88_caseB_holds` (Pf (12.17), `S14_MaximalI:308`, SORRY)** =「全 type-I は不可能」。
+  Pf §12 ゆえ §10 結果に依存 (独立 counting path は無い)。
+- **prime-orders chain** `theorem88_caseB_prime_orders` (S12:720) → `no_typeV_maximal` (S12:675) →
+  **3 sorry に依存**: `w2_prime_and_parameter_independence` (10.3, S12:587) + `typeV_forces_coherence`
+  (10.10.x, S12:659) + **`S_not_coherent` (10.8, S12:640)**。
+- ⟹ **中心の analytic keystone = (10.8) `S_not_coherent`**: signature は `(hyp : Hypothesis M)` のみ
+  (**gated CharacterParameters 非経由**) ⟹ **standalone 証明可** ((10.2) と同様、w₂ prime gate を回避)。
+
+**(10.8) S_not_coherent の証明** (Pf 原文 04.12 L13-): S coherent (CoherentHypothesis) を仮定 →
+(10.5) `α_ij^τ = δ(ω_ij^σ − ω_i0^σ) − n·ζ^τ₁` (Dade isometry on α、Supp⊆A₀) → (10.6) norm bound
+`‖ζ^τ₁‖² ≥ ...` → 算術矛盾 `n²−n−1 < 0` (n≥2 で不可能、(10.5) の Cauchy-Schwarz から)。
+
+**entry point (非gated、standalone)**: (10.5)/(10.6) Dade calc を CharacterParameters を介さず構築:
+- μ-grid = §6 `columnFamily` (私の §6 bridge `typePData_toS06Hypothesis` から、W₂-dual ↔ Fin w₂ equiv)。
+- ω^σ-grid = 私の §5 bridge `omegaSigmaGrid` (要 hVti)。
+- ζ = (10.2) `exists_zeta_in_inducedFamily_degree_w1` (✅)。τ = `hyp.tau` (§10 Hypothesis、✅ genuine Dade)。
+- τ₁ = coherent extension (CoherentHypothesis 仮定下、(10.4))。
+- α_ij = μ_ij − δμ_i0 − nζ; Supp(α_ij)⊆A₀ ((10.5) 前半、support 論); α^τ formula ((10.5) 後半、Dade)。
+
+**規模**: (10.8) は §10 の analytic 本丸 = 大規模 (Dade isometry calc + norm bound + 算術)、multi-session。
+**しかし gated CharacterParameters を回避でき、私の 2 bridge + (10.2) が直接 feed する**。次の focused program。
+⚠ 当面 (10.8) を仮定 (standalone, hyp 引数) で no_typeV/(12.17)/(8.8)-prime に配線するか、(10.5) から積むか選択。
+
 ---
 ### ★★★ BREAKTHROUGH (2026-06-20 cont.³, 原文 (8.15)+(4.4) 精読): **(10.2) は Hypothesis L で可、Hypothesis46 不要**
 
