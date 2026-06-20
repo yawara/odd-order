@@ -295,6 +295,13 @@ end -- 1B
     - **Peterfalvi worktree を main へ merge** (先行 f5bcb14 + 2026-05-31 834b76c)。§7 coherence / §8 / §9 / Dade isometry / Clifford / ZIrr / `InflationCharacter.lean` 配線済。worktree も main に ff 同期、`lake build OddOrder` green **3372 jobs**。
     - **実 `sorry` は全リポジトリで 2 個** (`Peterfalvi/S08_CoherenceTheorems.lean` `sibleySetup_is_coherent`=issue 0046 / `Peterfalvi/S09_NonexistenceCertain.lean` `card_G0_lower_bound`=issue 0044)、`axiom`/`admit` 0。
 
+- **2026-06-20** **(catch-up: 06-01→06-20 の集約記録)** BG 局所解析 spine と Peterfalvi が大きく前進し FT 経路は終盤へ。**正確な live 状況は [`notes/meta/ft_master_roadmap_2026_05_29.md`](notes/meta/ft_master_roadmap_2026_05_29.md) 冒頭「2026-06-20 現状更新ヘッダ」+ memory `ft-master-roadmap`/`ft-endgame-two-poles` が正本**、本エントリは要約:
+    - **BG spine 完成域**: §9 Uniqueness (9.1-9.6) + §10 Thm 10.1 (fusion control) + §11 全 7 結果 + §12 大半 + §13 endgame (13.7-13.13) + Thm 3.4/3.5/3.6 (任意体) + App.C 完全形式化 — すべて sorry-free・axiom-clean。forward axiom 残 **0 本**。
+    - **BG §14-16 + Pf §6-§16 が active frontier に昇格**: 最上位 `feitThompson` は配線済 (還元 sorry-free)。FT 層の実 obligation = **2 POLE** = POLE-1 `sectionSixteenHypothesis_of_isMinimalSimpleOdd` (→ `Peterfalvi.S16.Hypothesis`、`Section16Inputs` 3 producer) + POLE-2 `field_normalizer_structure` (Pf 14.2)。
+    - **2026-06-20 セッションの frontier 前進** (3 レーン B/F/H 並行): **BG Thm 15.2 (M_F 構造) を step-1〜(c)/(d)/3 まで sorry-free 構築** (残 wrapper gate `Q0⊴M`) / **Pf (6.8) case-A coherence producer COMPLETE** + case-B `|Y|=2` 数学解決 + cY-rewiring foundation / **Pf (14.12) M_F automorphism-equivariance reduction** + (13.17) を Phase 0-2 構造プログラム化 (実 assembly + 4 gate 隔離)。
+    - **進捗の測り方を成文化** (CLAUDE.md「進捗の測り方」節新設): 目的 = honest な FT 証明の積み上げ。`sorry` 数は進捗指標でない (両方向で誤る)。doneness は carrier・仮説の構成可能性で判定。"FT-orphaned"・"閉じても sorry 減らない" の言い回しは使わない。
+    - 実 `sorry` = **137** (`bin/count-sorry`、transitive scaffold 数; AxiomsCheck-guard 島の「2 個」= issue 0046/0044 とは別指標)。build green **3869 jobs** / `axiom` 宣言 0 / origin push 済。
+
 ## Phase 1 内の章間依存 (Isaacs)
 
 Isaacs FGT 本文中で `Theorem|Lemma|Corollary|Proposition N.M` 形式の章間参照を `references/isaacs/finite-group-theory.mmd` から集計した実依存:

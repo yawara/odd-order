@@ -1,5 +1,16 @@
 # BG §15: The Subgroup M_F — mini-roadmap
 
+> ## ⚠ 現状 (2026-06-20、以下の「予定」記述に優先)
+> 本ノートは **着工前の調査・計画段階** (「形式化先(予定)」) の記述で、実装は大きく先行している。
+> `OddOrder/BG/Ch4_FamilyOfMaximal/S15_MF.lean` は **~6000 行・実在** (lane-f 所有)。
+> **Theorem 15.2 (M_F 構造) は step-1〜step (c)/(d)/3 まで sorry-free 構築済**
+> (`isTypeP1_of_mf_ne_msigma` / chief-factor engine / prime-manner / `hsecFit` C-interface /
+> `card_centralizer_quotient_eq_of_kstar` / M_σ/Q nilpotent / Q=O_q(M) Sylow / K-invariant complement D)。
+> **残 = wrapper gate `Q0⊴M` 1 点**。live 状況は memory [[ft-endgame-two-poles]] + issue 8012 が正本、
+> 全体地図は [`../meta/ft_master_roadmap_2026_05_29.md`](../meta/ft_master_roadmap_2026_05_29.md) 冒頭 2026-06-20 ヘッダ。
+> 巨大化 (>1500 行) につき split issue [0071](../../issues/0071-s15-mf-split.md) が capstone 後分割を追跡。
+> 以下は当初計画 (歴史的参考) ↓
+
 **スコープ**: BG §15 (pp.117-122), mmd L4086-4255, 9 結果.
 形式化先 (予定): `OddOrder/BG/Ch4_FamilyOfMaximal/S15_MF.lean`
 ROADMAP 上の位置: **Phase 2a 第 5 波** (§14 完成必須, §16 直前)

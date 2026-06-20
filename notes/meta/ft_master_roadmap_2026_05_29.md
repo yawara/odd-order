@@ -11,6 +11,32 @@
 
 ---
 
+## ⚠ 2026-06-20 現状更新ヘッダ (最新 — 本体 2026-05-29 + 以下の旧ヘッダすべてに優先)
+
+本体 (2026-05-29) と 05-31/06-03 ヘッダは「BG §7-§16 と Pf §10-§16 は Lean ファイルゼロ」という前提で書かれており、**この骨格部分が最も古い**。2026-06 を通じて BG §1-§16 spine と Peterfalvi §6-§16 が実質的に形式化され、FT 経路は終盤に入った。live 状況は memory [[ft-master-roadmap]] + [[ft-endgame-two-poles]] + [[peterfalvi-work-in-worktree]] が保持。本ブロックは 2026-06-20 時点のスナップショット。
+
+### 進捗の測り方 (CLAUDE.md「進捗の測り方」が正本)
+目的 = FT の honest な証明の積み上げ。**`sorry` 数は進捗指標でない** (両方向で誤る; hoist で消える / genuine prerequisite を bypass 理由で hedge するのも誤り)。doneness は carrier・仮説の構成可能性で判定。**"FT-orphaned"・"閉じても sorry 減らない" の言い回しは使わない** ([[feedback-orphaned-not-reason-to-defer]])。以下「実 sorry N」は AxiomsCheck-guard 島でなく `bin/count-sorry` の transitive scaffold 数 ([[scaffold-sorry-free-not-done]])。
+
+### FT 経路の現在地 (2026-06-20)
+- **最上位 `feitThompson` は配線済** (還元 `feitThompson_of_noMinimalSimpleOdd` sorry-free)。FT 層の実 obligation は **2 POLE**:
+  - **POLE-1** = `sectionSixteenHypothesis_of_isMinimalSimpleOdd` → `Peterfalvi.S16.Hypothesis` carrier (`Section16Inputs` の 3 producer = §16 maximal-pair 構造 [F] / type-P 構造 [F] / character data [B])。
+  - **POLE-2** = `field_normalizer_structure` (Pf (14.2), S16, lane-h)。
+- これらは **Pf §10-16 spine** に gate され、その spine は **BG §7-§16 (局所解析)** と **Pf §3-§9 (指標論コア)** の合流で構成される。BG §9 Uniqueness / §10 Thm 10.1 / §11 全結果 / §12 大半 / §13 endgame / App.C は **完成・sorry-free・axiom-clean** (2026-06 前半)。
+
+### 2026-06-20 時点の active frontier (3 レーン体制)
+| lane | 担当 | 現在地 | 残り |
+|---|---|---|---|
+| **F** (`lane-f`) | BG §14/§15/§16 + POLE-1 構造側 producer | **BG Thm 15.2 (M_F 構造) を step-1〜(c)/(d)/3 まで sorry-free 構築** | wrapper gate `Q0⊴M` 1 点; §16 Prop 16.1 type classification |
+| **B** (`lane-b`) | Pf §6/§8 coherence (6.8 capstone) → §13 Dade char data (POLE-1 char) | **(6.8) case-A producer COMPLETE** + case-B `\|Y\|=2` 数学解決 + cY-rewiring foundation | S08:59 (6.8) dispatch (cY-rewiring 実装) → §13 grid |
+| **H** (`lane-h`) | Pf §13/§14 + POLE-2 (field normalizer §14.2) | **(14.12) M_F equivariance reduction** + (13.17) を Phase 0-2 構造プログラム化 (実 assembly + 4 gate 隔離) | (13.17) 4 gate (`P⊓U=⊥` F-ask 含む) → §14 counting → POLE-2 |
+
+- **保留 cross-lane handshake**: lane-h (13.17) の gate `P⊓U=⊥` は carrier enrich を要し `sectionSixteenHypothesis_of_inputs` (FeitThompson.lean = F 領域) に触れる。F-ask は 1 仮説に最小化済、正式要請は未発火。
+- 実 sorry = **137** (`bin/count-sorry`, 2026-06-20)。build-green 3869 jobs / AxiomsCheck OK / 新 axiom 0。
+- 旧ヘッダの「実 sorry 2 個」は AxiomsCheck-guard 島 (issue 0046/0044) の指標で、transitive closure は上記 137。「Pf §10-16 は BG §16 完成まで着手不可」(本体 §2/§4) も **stale** — §10-16 は 2026-06 に scaffold + 部分形式化が進行済 (BG §16 statement は存在、Thm A-E cite 可)。
+
+以下、さらに古い訂正ヘッダ ↓
+
 ## ⚠ 2026-05-31 訂正ヘッダ (本体は 2026-05-29 時点、§4–§6 が drift)
 
 本体は 2026-05-29 のスナップショットで以下が既に古い。**正確な live 状況は memory `ft-master-roadmap` が保持**。2026-05-29 以降の確定差分:
