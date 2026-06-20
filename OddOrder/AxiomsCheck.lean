@@ -5276,3 +5276,14 @@ sorried §16 type classification `not_isTypeI_of_isTypeNonI`, so it is not regis
 
 #assert_only_allowed_axioms
   OddOrder.GroupTheory.isTypeI_of_conj
+
+/-! **Frobenius-kernel fixed-point engine for Peterfalvi (9.1)/(13.17.b)** (`CoprimeAction`).
+In a finite Frobenius group with kernel `N`, a non-kernel element centralizes nothing nontrivial
+in `N` (`IsFrobeniusGroup.centralizer_inf_kernel_eq_bot_of_not_mem`) — the engine of the
+fixed-point-free action that, with Wielandt's formula `wielandt_fixedPoint_frobenius`, forces the
+Fitting kernel `L_F` to be trivial in (13.17.b).  Axiom-clean (the Wielandt corollary
+`coprimeFrobeniusAction_card_eq_one` itself transitively cites the sorried Wielandt formula and is
+not registered here). -/
+
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.IsFrobeniusGroup.centralizer_inf_kernel_eq_bot_of_not_mem
