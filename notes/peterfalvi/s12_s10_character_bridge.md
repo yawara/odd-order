@@ -45,9 +45,25 @@ producer は実証明で組み上がった (実 sorry S12: 9→7)。方針 = [[f
 (10.5) `alpha_support_and_image` + (10.6) `tau1_values_and_norm_bound` (= Dade calc、`CoherentHypothesis`
 仮定下、要 τ₁) + (10.7)/(10.8)(=(8.8) gate+counting) + (10.9)/(10.10.x)。
 **⚠ (10.5)+ は重い**: (10.5) Dade image は (3.6)/(3.8)/(3.2.c/d)/(5.3.b)/(5.5) の重 §3/§5 machinery を要し、かつ
-`params.mu`/`omegaSigma` は free field ゆえ arbitrary params では未証明 — **faithfulness pinning (mu_eq/omegaSigma_eq、
-∀-hG technique で structure 不変)** が前提。(10.5) support 半分は §6 在庫 ((2.1) `mem_compl_conj_into_W`/vanishing/(4.4) anchor)
-で可だが Dade image 半分が deep。(10.7)/(10.8) は (8.8)=lane-f gate。**∴ §10 spine の残りは multi-session Dade 努力**。
+`params.mu`/`omegaSigma` は free field ゆえ arbitrary params では未証明。(10.7)/(10.8) は (8.8)=lane-f gate。
+
+### ★ 2026-06-21 cont. 調査結果 (次セッション用 de-risk)
+
+- **faithfulness pinning `[Finite G]`-on-structure 経路は不可** (試行→revert): CharacterParameters に `[Finite G]`
+  追加すると S13.Hypothesis(`params : CharacterParameters base`)が要 `[Finite G]` 化 → S13 の auto-generated
+  field projection (`Hypothesis.q`/`.p` 等)の dot-notation が壊れる cascade。**∀-hG pin を使うなら `@Hypothesis.muGrid G _ hyp.finiteG …` explicit-finiteG 形式** (structure に `[Finite G]` 足さない) か、muGrid の sig から `[Finite G]` を外し
+  hyp.finiteG 内部供給に変える(muGrid は既に body で `haveI := hyp.finiteG` 済→sig の `[Finite G]` は冗長の可能性)。
+- **`Hypothesis46` 全構築は dade0 が deep**: `Hypothesis46.tic_V = W\W₂` 固定 (4.3.a 大 TI)、`dade0` は
+  `A ∪ (W\W₂)^L` 上 = `typePA0 ∪ (W₁#)^M`。§10 `typePA0 = typePA ∪ (typePV)^G` (typePV=W\(W1∪W2)、**W₁# 除外**)
+  ゆえ §10 dadeData(typePA0 上)では **(W₁#)^M 分** 足りない → enlarged-support Dade を新規構成要 (§4、deep)。
+- **🟢 但し (10.5) SUPPORT 半分は dade0 不要で feasible**: (4.7) core
+  `mem_A_of_apply_ne_zero_of_not_subset_characterKernel` (S06_CertainTypeSupport:47) は **構造フィールドのみ使用**
+  (`subH`/`subH_normal`/`K`/`A_covers`、**`dade0`/`tau` 不使用**)。∴ §10 structural (4.6.a-d) データで (4.7) を発火可
+  (Hypothesis46 全体=dade0 不要)。**次セッション (10.5) support 攻略**: (4.7) core を structural-param 化
+  (または §10 で再証明) + (4.3.c) μ-W₁-vanishing (`induce_omegaColumnDiff_mu_diff` の Hyp-L 版要確認) + (4.4)
+  `certainType_zero_column_anchor` + (2.1) `mem_compl_conj_into_W` で canonical α の support ⊆ A_0 を構成。
+  (10.5) を `alpha_support` / `alpha_tau_image` に分割し前者を close。後者 (Dade image) は dade0 待ち。
+- **∴ §10 spine: support 系は dade0-free で進める / Dade-image 系は enlarged dade0 (deep §4) + (8.8) (lane-f) 待ち**。
 
 ## ★ 2026-06-21 更新 — (10.3) degree theory 完全 materialize (axiom-clean) + column-0 faithfulness 修正
 
