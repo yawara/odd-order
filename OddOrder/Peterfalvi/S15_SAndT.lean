@@ -6,6 +6,7 @@ Authors: Yawara Ishida
 import OddOrder.Peterfalvi.S14_MaximalI
 import OddOrder.Peterfalvi.S10_CoherenceWiring
 import OddOrder.GroupTheory.MaximalSubgroupTypeConj
+import OddOrder.GroupTheory.CoprimeAction
 import Mathlib.Algebra.BigOperators.ModEq
 import Mathlib.FieldTheory.Finite.Basic
 import Mathlib.RingTheory.Polynomial.Cyclotomic.Roots
@@ -1092,12 +1093,64 @@ the Frobenius group `U W₁ ⊆ L` (from (13.2.a)) would act fixed-point-freely 
 (`le_kernel_of_isMulCommutative_of_inf_ne_bot`).  The isolated deep residual of gate 4: the
 `CoprimeFrobeniusAction (U W₁) (L_F)` construction plus the (still sorried) Wielandt formula.
 `:= sorry`; see issue 2009 / `notes/peterfalvi/s13_17_structural_program.md`. -/
-theorem typeI_U_le_fitting_of_coprime [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
+theorem typeI_U_le_fitting_of_coprime [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     (hyp : Hypothesis (G := G)) (_hSTypeII : IsTypeII hyp.S) {L : Subgroup G}
-    (_hLmax : L ∈ maximalSubgroups G) (_hLI : IsTypeI L)
-    (_hNUL : Subgroup.normalizer (hyp.U : Set G) ≤ L)
-    (_hcop : Nat.Coprime (Nat.card ↥(maxNilpotentNormalHall L)) (hyp.p * hyp.q)) :
-    hyp.U ≤ maxNilpotentNormalHall L := sorry
+    (hLmax : L ∈ maximalSubgroups G) (hLI : IsTypeI L)
+    (hNUL : Subgroup.normalizer (hyp.U : Set G) ≤ L)
+    (hcop : Nat.Coprime (Nat.card ↥(maxNilpotentNormalHall L)) (hyp.p * hyp.q)) :
+    hyp.U ≤ maxNilpotentNormalHall L := by
+  -- The (12.7) Frobenius structure of the type-`I` `L`, with kernel `L_F = maxNilpotentNormalHall L`.
+  obtain ⟨frob, _⟩ := OddOrder.Peterfalvi.S14.typeI_frobenius hG hLmax hLI
+  have hHeq : frob.typeI.typeF.H = maxNilpotentNormalHall L := frob.typeI.typeF.H_eq
+  have hfrobLF : OddOrder.Isaacs.Ch06.IsFrobeniusGroup ↥L
+      ((maxNilpotentNormalHall L).subgroupOf L) frob.complement := hHeq ▸ frob.frobenius
+  have hUleL : hyp.U ≤ L := Subgroup.le_normalizer.trans hNUL
+  have hW1leL : hyp.W1 ≤ L := hyp.W1_normalizes_U.trans hNUL
+  have hLFleL : maxNilpotentNormalHall L ≤ L := OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_le L
+  obtain ⟨bdata, _⟩ := basic_structure hG hyp
+  have hsolv : IsSolvable ↥(maxNilpotentNormalHall L) := by
+    haveI := OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_isNilpotent L
+    exact IsNilpotent.to_isSolvable
+  -- piece 3: `W₁ ⊓ L_F = ⊥`, since `q = |W₁|` divides `p q` and `|L_F| ⟂ p q`.
+  have hcopLFq : Nat.Coprime (Nat.card ↥(maxNilpotentNormalHall L)) hyp.q :=
+    Nat.Coprime.coprime_dvd_right (dvd_mul_left hyp.q hyp.p) hcop
+  have hW1LF : hyp.W1 ⊓ maxNilpotentNormalHall L = ⊥ :=
+    Subgroup.inf_eq_bot_of_coprime (by rw [← hyp.q_eq_card_W1]; exact hcopLFq.symm)
+  -- piece 5: `U ⊓ L_F ≠ ⊥` (else the Frobenius `U W₁` acts fixed-point-freely on `L_F`).
+  have hUmeets : hyp.U ⊓ maxNilpotentNormalHall L ≠ ⊥ := by
+    intro hbot
+    have hcopU : Nat.Coprime (Nat.card ↥hyp.U) (Nat.card ↥(maxNilpotentNormalHall L)) :=
+      OddOrder.GroupTheory.IsFrobeniusGroup.coprime_card_of_inf_kernel_eq_bot_le
+        hLFleL hUleL hfrobLF hbot
+    have hcopW1 : Nat.Coprime (Nat.card ↥hyp.W1) (Nat.card ↥(maxNilpotentNormalHall L)) :=
+      OddOrder.GroupTheory.IsFrobeniusGroup.coprime_card_of_inf_kernel_eq_bot_le
+        hLFleL hW1leL hfrobLF hW1LF
+    have hcardUW1 : Nat.card ↥(hyp.U ⊔ hyp.W1) = Nat.card ↥hyp.U * Nat.card ↥hyp.W1 := by
+      rw [← bdata.UW1_frobenius.isComplement.card_mul,
+        Nat.card_congr (Subgroup.subgroupOfEquivOfLe le_sup_left).toEquiv,
+        Nat.card_congr (Subgroup.subgroupOfEquivOfLe le_sup_right).toEquiv]
+    have hcopUW1 : Nat.Coprime (Nat.card ↥(maxNilpotentNormalHall L)) (Nat.card ↥(hyp.U ⊔ hyp.W1)) := by
+      rw [hcardUW1]; exact Nat.Coprime.mul_right hcopU.symm hcopW1.symm
+    have hLFbot : maxNilpotentNormalHall L = ⊥ :=
+      OddOrder.GroupTheory.isFrobenius_kernel_eq_bot_of_frobenius_subgroup hLFleL
+        (sup_le hUleL hW1leL) ⟨frob.complement, hfrobLF⟩ bdata.UW1_frobenius hbot hW1LF hsolv hcopUW1
+    exact frob.frobenius.ne_bot_kernel (by rw [hHeq, hLFbot, Subgroup.bot_subgroupOf])
+  -- piece 6: `U ⊆ C_L(U ∩ L_F) ⊆ L_F` since `U` is abelian and `L_F` is the Frobenius kernel.
+  have hUab : IsMulCommutative ↥(hyp.U.subgroupOf L) :=
+    OddOrder.GroupTheory.isMulCommutative_of_mulEquiv
+      (Subgroup.subgroupOfEquivOfLe hUleL).symm bdata.U_commutative
+  have hinf : (hyp.U.subgroupOf L) ⊓ ((maxNilpotentNormalHall L).subgroupOf L) ≠ ⊥ := by
+    rw [show (hyp.U.subgroupOf L) ⊓ ((maxNilpotentNormalHall L).subgroupOf L)
+        = (hyp.U ⊓ maxNilpotentNormalHall L).subgroupOf L from (Subgroup.comap_inf _ _ _).symm]
+    intro h
+    apply hUmeets
+    have hle : hyp.U ⊓ maxNilpotentNormalHall L ≤ L := inf_le_right.trans hLFleL
+    rw [← inf_eq_left.mpr hle]
+    exact disjoint_iff.mp (Subgroup.subgroupOf_eq_bot.mp h)
+  have hsub := le_kernel_of_isMulCommutative_of_inf_ne_bot hfrobLF hUab hinf
+  calc hyp.U = (hyp.U.subgroupOf L).map L.subtype := (Subgroup.map_subgroupOf_eq_of_le hUleL).symm
+    _ ≤ ((maxNilpotentNormalHall L).subgroupOf L).map L.subtype := Subgroup.map_mono hsub
+    _ = maxNilpotentNormalHall L := Subgroup.map_subgroupOf_eq_of_le hLFleL
 
 /-- **Peterfalvi (13.17.b) `U ⊆ L_F` for the type-`I` `L`**: when `S` is type II and `L` is a
 type-`I` maximal subgroup over `N_G(U)`, the complement `U` lies in the Fitting kernel `L_F`.
