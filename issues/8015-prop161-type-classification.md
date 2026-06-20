@@ -128,6 +128,8 @@ A(8) を `theoremA_maximal_structure` の該当 branch に配線 → A(8) は hI
 5. `isTypeP1_kappaSigma_compl_hall_subgroupOf_eq_bot` — Thm A(8) の U=⊥ 核 (IsTypeP1→U=⊥)
 6. `kappa_eq_sigmaComplementPrimes_of_hall_subgroupOf_eq_bot` — 逆 (U=⊥→κ=σ')
    ⟹ **IsTypeP1 ⟺ Hall (κ∪σ)ᶜ-complement trivial characterization 完成** (IsTypeP modulo)
+7. `theoremA8_complement_eq_bot_and_kappa_prime` — **Thm A(8) の 2/3 を de-gate**
+   (MF≠Mσ ⟹ U=⊥ ∧ ∃p prime |K|=p、Thm 15.2 直接活用)。残 = FittingIsTI のみ。
 
 ### ⚠ 残務の正直な評価 (2026-06-20 セッション末)
 6 補題は全て Prop 16.1/Theorem A の reverse・forward で消費される honest infra だが、**いずれも
