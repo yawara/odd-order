@@ -994,6 +994,30 @@ theorem theorem88_caseB_prime_orders [Finite G] (hG : OddOrder.BG.IsMinimalSimpl
   · obtain ⟨dataT, hTp⟩ := caseB_typeP_prime_W1 hG caseB.T_maximal caseB.T_nonI
     rw [hW2, ← dataT.card_W1_eq_derived_index]; exact hTp
 
+/-- **Peterfalvi (8.8) ↔ M, the case-(b) datum containing `M`** (faithful (8.8)(b) consequence for a
+type-`P` maximal): the §10 maximal subgroup `M` participates in a case-(b) configuration of Theorem
+(8.8) whose shared cyclic factor `W = W₁ × W₂` matches `M`'s — so `w₂ = |W₂|` equals one of the two
+cyclic factor orders of the datum.  The generic existence `theorem88_caseB_holds` produces a case-(b)
+datum but does not tie it to a *given* `M`; that tying is the content of (8.8) applied to `M`,
+recorded here as a faithful obligation (its statement is the correct (8.8) consequence; its proof is
+currently a `sorry`, dischargeable from the (8.8)/(8.13) uniqueness structure). -/
+theorem Hypothesis.exists_caseBData_with_w2 [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    {M : Subgroup G} (hyp : Hypothesis M) :
+    ∃ caseB : Theorem88CaseBData G,
+      Nat.card ↥caseB.W1 = hyp.w2 ∨ Nat.card ↥caseB.W2 = hyp.w2 := by
+  sorry
+
+/-- **Peterfalvi (10.3), first clause**: `w₂` is prime.  By Theorem (8.8) the type-`P` maximal `M`
+sits in a case-(b) datum (`exists_caseBData_with_w2`) whose two cyclic factors have prime order
+(`theorem88_caseB_prime_orders`), and `w₂` is one of them. -/
+theorem Hypothesis.w2_prime [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    {M : Subgroup G} (hyp : Hypothesis M) : (hyp.w2).Prime := by
+  obtain ⟨caseB, hcard⟩ := hyp.exists_caseBData_with_w2 hG
+  have hp := theorem88_caseB_prime_orders hG caseB
+  rcases hcard with h | h
+  · rw [← h]; exact hp.1
+  · rw [← h]; exact hp.2
+
 /-- **Peterfalvi (10.11), Type II assertion**: for a type-II maximal subgroup,
 the §11 family `S(H_0 C')` specializes to a coherent set. -/
 theorem typeII_section11_coherence [Finite G] [Fintype G]
