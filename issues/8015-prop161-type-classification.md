@@ -48,14 +48,26 @@ Peterfalvi が下流で使う構造的 shared 述語 (`GroupTheory.IsTypeI`–`I
 C_{M_σ}(P) ⊇ C_{M_σ}(W₁) ⊇ C_H(W₁) ≠ 1、かつ **p ∈ τ₁∪τ₃** を示せば `p ∈ kappa(M)` (定義 S14:121)。
 ⟹ κ≠∅ ⟹ IsTypeP。`p∈τ₁∪τ₃` 部分が非自明 (W₁ の prime が τ₁∪τ₃ にある構造的事実)。
 
-**⚠ 2026-06-20 調査で判明した crux**: `p∈τ₁∪τ₃` の供給元 = 既存 `mem_kappa_of_mem_primeFactors_card_E1`
-(S14:436) / `mem_tau1_union_tau3_of_mem_primeFactors_card_E` (S14:352) は **`SubgroupESetup` ベース**で
-`TypePData.W1` を直接扱わない。memory [[typep-w1-kappa-carrier-not-derivable]] の通り **`TypePData.W1 = BG
-κ-Hall` は bare TypePData から導出不可** (2 つの IsTypeP 述語 kappa-nonempty vs Nonempty-TypePData は別物)
-⟹ W₁ を E-setup の E₁ (or κ-Hall K) に同定する bridge が要り、これは **§16 maximal-pair / carrier
-(Section16MaximalPair) レベル**の情報を要する可能性大。⟹ medium 方向も「W₁↔E₁/K 同定」を要する
-真の構造論 (carrier-aware)。次セッションは **(i) W₁↔E-setup 橋渡しの所在確認** から着手すべき
-(`exists_subgroupESetup` + W₁ の complement 性質から E₁ 同定が可能か, or §16 carrier 必須か)。
+### ✅ 2026-06-20 kappa bridge `p∈π(W₁) → p∈κ(M)` の精密分解 (3 条件に分けて crux を特定)
+`κ(M)` 定義 (S14:121) = `{p prime ∧ p∈τ₁∪τ₃ ∧ ∃P∈elemAbRank 1, P≤M ∧ M_σ⊓C(P)≠⊥}`、
+`τ₁∪τ₃ = {p | p∉σ(M) ∧ pRank_M p=1}` (τ定義 S12_ECore:51-60: τ₁=rank1∧p∤|M'|, τ₃=rank1∧p∣|M'|,
+τ₂=rank2)。⟹ `p∈π(W₁) → p∈κ(M)` は 3 条件に分かれる:
+1. **centralizer `M_σ⊓C(P)≠⊥`** (P=⟨x⟩, x∈W₁#): ✅ **bare TypePData から導出可・landed**
+   (`typePData_msigma_inf_centralizer_W1_ne_bot`, c8484496): W₂=M'⊓C(x)≤M_σ⊓C(x) かつ W₂≠⊥。
+   W₁=κ-Hall 同定**不要**。
+2. **σ-complement `p∉σ(M)`**: 導出可 (未 landed)。論法: p∈σ(M) なら M_σ (=σ-Hall, normal) が
+   Sylow_p(M) を含む ⟹ W₁ の p-part Q は Sylow 共役 + M_σ◁M で Q≤M_σ ⟹ Q≤W₁⊓M_σ=1 (W₁∩M_σ⊆W₁∩M'=1,
+   `M_complement`) ⟹ p∤|W₁| 矛盾。要 `Msigma_isHall`/`Msigma.Normal`。
+3. **rank-1 `pRank_M p=1`** (τ₂ 除外): ❌ **carrier-gated・真の残 crux**。bare TypePData の W₁ は
+   cyclic だが M の Sylow_p は rank≥2 かも (p∈τ₂)。これを排除するには **W₁=BG κ-Hall** (κ-prime は
+   定義上 rank 1) が必要で、bare TypePData から導出不可 [[typep-w1-kappa-carrier-not-derivable]]。
+   ⟹ carrier (`Section16MaximalPair`/`Section16TypePStructure`, lane-f 所有 issue 7005/7006) の
+   W₁=κ-Hall witness が要る。
+
+**⟹ 次セッションの分岐判断**: medium reverse 方向 (hIIP2/hIIIIVP1/hVP1 の →IsTypeP 部分) は
+**rank-1 条件で carrier-gated**。よって Prop 16.1 は (i) bare M でなく carrier 文脈で reverse を
+証明する形に再設計するか、(ii) `Section16TypePStructure` が W₁=κ-Hall を供給する経路を使うか。
+condition 2 (σ-complement) は次に landing 可 (要 Sylow/Hall 補題確認)。
 
 ### hard 方向 (1-4, 9) = type-data CONSTRUCTION
 κ-membership から TypeXData の全フィールド (TypePData の H/U/W1/W2/W + Frobenius/complement/centralizer
@@ -65,11 +77,14 @@ cluster (Theorems A-E) と相互依存**。多くが §16 sorried endpoint 自�
 
 ## やること
 
-- [ ] **input 11 `h152a` wire** (即可): `isTypeP1_of_mf_ne_msigma` を named helper として供給。
-- [ ] **medium 核 `typePData_kappa_nonempty`**: `TypePData M → (kappa M).Nonempty` (π(W₁)⊆κ 論法)。
-      `p∈τ₁∪τ₃` の供給元を特定 (W₁ の構造 or 別 §14 補題)。これが input 6/7/8 の "→IsTypeP" 部分。
-- [ ] **input 5-8 の MF/Mσ・U 条件抽出**: TypeIIData→U≠1 (normalizer_not_le 等)、TypeV→U=⊥ (U_eq_bot)、
-      MF≠Mσ ⟺ U≠⊥ の bridge (Thm 15.2 の MF=Q⊔… 構造から)。
+- [x] **input 11 `h152a`** = `isTypeP1_of_mf_ne_msigma` (Thm 15.2(a)) で即供給可 (assembly 時に cite)。
+- [x] **medium 核の centralizer 半分** `typePData_msigma_inf_centralizer_W1_ne_bot` (c8484496, axiom-clean):
+      x∈W₁# で M_σ⊓C(x)≠⊥。kappa bridge の 3 条件のうち条件 1 を bare TypePData から discharge。
+- [x] **hVP1 の MF=Mσ 半分** `mf_eq_msigma_of_typePData_U_eq_bot` (c8484496, axiom-clean, A(8)-free)。
+- [ ] **σ-complement 半分** `typePData_W1_prime_not_mem_sigma`: `p∈π(W₁) → p∉σ(M)` (条件 2)。論法は
+      上記 crux 分解 §参照 (Sylow 共役 + M_σ◁M + W₁∩M_σ=1)。要 `Msigma_isHall`/`Msigma.Normal` 確認。
+- [ ] **rank-1 半分 (carrier-gated)**: `pRank_M p=1` for p∈π(W₁) — W₁=κ-Hall witness が要る
+      (`Section16TypePStructure`/issue 7005 の構造から)。これが medium 方向の真の gate。
 - [ ] **input 1-4, 9 (hard 構成)**: §16 endpoint A-E と協調。`typeFData_of_kappa_eq_bot` を起点に
       TypeIData の `alternative` (8.3 三分岐) を構成 (要 Thm 15.7(c))。← 最深、後回し。
 - [ ] **assembly**: 全 input が揃ったら `proposition_type_classification := …_of_inputs h11 …` で close。
