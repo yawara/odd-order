@@ -827,6 +827,48 @@ theorem typePData_msigma_inf_centralizer_W1_ne_bot [Finite G]
   -- A subgroup containing the nontrivial `W₂` is nontrivial.
   exact fun hbot => data.W2_nontrivial (le_bot_iff.mp (hW2le.trans hbot.le))
 
+/-- **Prop 16.1 reverse, `σ`-complement half of `π(W₁) ⊆ κ(M)`** (mmd L4478, `W₁ ∩ M_σ = 1`): for a
+type-`P` datum, every prime dividing `|W₁|` lies outside `σ(M)`.  If `p ∈ σ(M)`, an order-`p`
+subgroup `L ≤ W₁` is a `σ(M)`-group, so it lands in the `σ`-Hall subgroup `M_σ`
+(`sigma_subgroup_le_Msigma_of_isHall`, `Msigma_isHall`); but `W₁ ∩ M_σ ≤ W₁ ∩ M' = 1`
+(`M_complement`), forcing `L = ⊥` and `|L| = p = 1`, a contradiction.
+
+This is the second `κ`-membership ingredient **derivable from the bare `TypePData`** (with
+`typePData_msigma_inf_centralizer_W1_ne_bot`).  Together they give `p ∉ σ(M)` and `M_σ ⊓ C(P) ≠ ⊥`;
+the only carrier-gated ingredient left for `π(W₁) ⊆ κ(M)` is the rank-one condition `r_p(M) = 1`. -/
+theorem typePData_W1_prime_not_mem_sigma [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} (hM : M ∈ maximalSubgroups G)
+    (data : TypePData M) {p : ℕ} (hp : p ∈ (Nat.card ↥data.W1).primeFactors) :
+    p ∉ OddOrder.BG.Ch3.S10.sigma M := by
+  intro hpσ
+  haveI : Fact p.Prime := ⟨Nat.prime_of_mem_primeFactors hp⟩
+  -- An order-`p` element `g ∈ W₁` and the cyclic subgroup `L = ⟨g⟩` of order `p`.
+  obtain ⟨g, hg⟩ := exists_prime_orderOf_dvd_card' (G := ↥data.W1) p (Nat.dvd_of_mem_primeFactors hp)
+  have hgord : orderOf ((g : G)) = p :=
+    (orderOf_injective data.W1.subtype data.W1.subtype_injective g).trans hg
+  set L : Subgroup G := Subgroup.zpowers (g : G) with hLdef
+  have hLcard : Nat.card ↥L = p := by rw [hLdef, Nat.card_zpowers, hgord]
+  have hLW1 : L ≤ data.W1 := Subgroup.zpowers_le.mpr g.2
+  have hLM : L ≤ M := hLW1.trans data.W1_le
+  -- `L` is a `σ(M)`-group (its only prime divisor is `p ∈ σ(M)`).
+  have hLpi : Ch03.Subgroup.IsPiGroup (OddOrder.BG.Ch3.S10.sigma M) L := by
+    intro q hq
+    rw [hLcard, (Fact.out : p.Prime).primeFactors, Finset.mem_singleton] at hq
+    exact hq ▸ hpσ
+  -- So `L ≤ M_σ ≤ M'`, while `L ≤ W₁` and `W₁ ∩ M' = ⊥` (complement); hence `L = ⊥`.
+  have hLMσ : L ≤ OddOrder.BG.Ch3.S10.Msigma M :=
+    OddOrder.BG.Ch3.S10.sigma_subgroup_le_Msigma_of_isHall
+      (OddOrder.BG.Ch3.S10.Msigma_isHall hG hM) hLM hLpi
+  have hLsub_bot : L.subgroupOf M = ⊥ := by
+    rw [eq_bot_iff, ← disjoint_iff.mp data.M_complement.disjoint]
+    exact le_inf
+      (Subgroup.comap_mono (hLMσ.trans (OddOrder.BG.Ch3.S10.Msigma_le_derived hG hM)))
+      (Subgroup.comap_mono hLW1)
+  have hLbot : L = ⊥ :=
+    (inf_eq_left.mpr hLM).symm.trans (disjoint_iff.mp (Subgroup.subgroupOf_eq_bot.mp hLsub_bot))
+  rw [hLbot, Subgroup.card_bot] at hLcard
+  exact (Fact.out : p.Prime).ne_one hLcard.symm
+
 /-! ## Proposition 16.1: BG local taxonomy and shared Type I--V predicates -/
 
 /-- **§14/§15-independent assembly engine for BG Proposition 16.1** (mmd L4478; the source proof
