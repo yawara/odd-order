@@ -31,6 +31,7 @@ import OddOrder.Isaacs.Ch04_Commutators.Main
 import OddOrder.Isaacs.Ch04_Commutators.ForwardFromCh03
 import OddOrder.Isaacs.Ch05_Transfer.Main
 import OddOrder.Isaacs.Ch06_FrobeniusActions.Main
+import OddOrder.Isaacs.Ch06_FrobeniusActions.OddComplement
 import OddOrder.Isaacs.Ch07_ThompsonSubgroup.Main
 import OddOrder.BG.Ch1_Preliminary.S01_Solvable
 import OddOrder.BG.Ch1_Preliminary.S04d_GorThm415
@@ -330,6 +331,17 @@ disallowed axiom(s):{indentD m!"{bad.toList}"}"
   OddOrder.Isaacs.Ch06.isCyclic_of_comm_two_group_involutions_invert_element
 #assert_only_allowed_axioms
   OddOrder.Isaacs.Ch06.exists_distinct_subgroups_card_two_of_external_involution
+
+-- Ch.6 (Frobenius Actions): Huppert V.8.18 b) — odd Frobenius complement is a Z-group,
+-- its order-`r` subgroups centralize the commutator, and every prime-order subgroup is normal.
+#assert_only_allowed_axioms
+  OddOrder.Isaacs.Ch06.isZGroup_of_isFrobeniusAction_of_odd
+#assert_only_allowed_axioms
+  OddOrder.Isaacs.Ch06.centralizes_commutator_of_card_prime_coprime
+#assert_only_allowed_axioms
+  OddOrder.Isaacs.Ch06.normal_of_card_prime_of_isFrobeniusAction_of_odd
+#assert_only_allowed_axioms
+  OddOrder.Isaacs.Ch06.normal_of_card_prime_of_isFrobeniusGroup_of_odd
 #assert_only_allowed_axioms
   OddOrder.Isaacs.Ch06.false_of_unique_subgroups_card_two_of_external_involution
 -- Lem 6.21 setup: `K = ⟨ C_N(a) | a ≠ 1 ⟩` and its abelian-action invariance.
@@ -5298,3 +5310,29 @@ Fully unconditional, axiom-clean. -/
 
 #assert_only_allowed_axioms
   OddOrder.GroupTheory.pointwise_mulAut_smul_eq_map
+
+/-! **The Peterfalvi maximal-subgroup type is conjugacy-invariant** (`MaximalSubgroupTypeConj`).
+Every structural datum of `TypeFData`/`TypeIData` transfers along `φ : MulAut G`
+(`TypeFData.conj`, `isTypeI_pointwise_smul`), so conjugate maximal subgroups share their Peterfalvi
+type (`isTypeI_of_conj`).  This is the unconditional, axiom-clean **gate-4 piece 1** infrastructure
+of Peterfalvi (13.17.b).  Its downstream application
+`OddOrder.Peterfalvi.S15.not_conj_of_isTypeI_of_isTypeNonI` (a type-`I` maximal subgroup is
+non-conjugate to the non-I `S`, `T`) has a sorry-free *proof* but transitively cites the still
+sorried §16 type classification `not_isTypeI_of_isTypeNonI`, so it is not registered here. -/
+
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.TypeFData.conj
+
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.isTypeI_of_conj
+
+/-! **Frobenius-kernel fixed-point engine for Peterfalvi (9.1)/(13.17.b)** (`CoprimeAction`).
+In a finite Frobenius group with kernel `N`, a non-kernel element centralizes nothing nontrivial
+in `N` (`IsFrobeniusGroup.centralizer_inf_kernel_eq_bot_of_not_mem`) — the engine of the
+fixed-point-free action that, with Wielandt's formula `wielandt_fixedPoint_frobenius`, forces the
+Fitting kernel `L_F` to be trivial in (13.17.b).  Axiom-clean (the Wielandt corollary
+`coprimeFrobeniusAction_card_eq_one` itself transitively cites the sorried Wielandt formula and is
+not registered here). -/
+
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.IsFrobeniusGroup.centralizer_inf_kernel_eq_bot_of_not_mem
