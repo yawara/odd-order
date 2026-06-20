@@ -223,3 +223,37 @@ apparatus が (10.2)/(10.3)/μ-grid をすべて供給**、新規 apparatus buil
 3. CharacterParameters de-opaque (self-contained field: zeta_irreducible/n_formula/alpha_formula) を
    producer signature 書換と一括で。
 4. issue 1005 (hVti) / 1006 (hHall) discharge。
+
+### ★★ (10.2) 深掘り結論 (2026-06-20 cont.²): **Hypothesis46 が次の build target**
+
+§6 Clifford 機構の host を精査して判明 (`S06_CertainTypeClifford:365` `variable (h : Hypothesis L)`):
+- **core Clifford (`columnFamily`/`chiRestrict`/`inertia_eq_K_of_forall_chiRestrict_ne`/
+  `induce_isIrreducible_of_forall_chiRestrict_ne` `:902`) は bare `Hypothesis L` 上** ⟹ §6 bridge
+  (`typePData_toS06Hypothesis : S06.Hypothesis ↥M`) で irreducibility step は発火可。要 instance =
+  `[NeZero (Nat.card h.W1)]`(=`one_lt_card_W1`)/`[Fintype ↥M]`/`[Invertible (Nat.card ↥M:ℂ)]`/
+  `[Invertible (Nat.card ↥K:ℂ)]` (FiniteInduce 供給)。
+- **だが (10.2) crux `∀χ₂, chiRestrict χ₂ ≠ θ` は degree fact を要す**: counting 論 = K の非自明 linear char
+  ≥2 個 (|M'/M''|≥3 odd) vs degree-1 chiRestrict ≤1 個 (χ₂=1 列のみ degree 1; χ₂≠1 は μ_0j(1)=d>1)。
+  この「χ₂≠1 ⟹ μ_0j(1)>1」= `columnFamily_mu_apply_one_eq` (`S06_CertainTypeIsometry:961`, **Hypothesis46 上**)
+  + (4.4) d>1。∴ **crux は Hypothesis46-level degree theory に gate**。
+
+**⟹ 次 build target = `Hypothesis.toHypothesis46 : S06.Hypothesis46 (typePA0 M typeP) M`** (両 bridge 統合):
+`Hypothesis46 extends CertainTypeHypothesis A L` + 追加 field (`S06_CertainHypothesis46:39`):
+- `tic` = §5 bridge `typePData_toTICyclicHypothesis` (要 hVti)。
+- `tic_W1/tic_W2` = `data.W1 = (data.W1.subgroupOf M).map M.subtype` (W1≤M ゆえ map-subgroupOf 恒等)。
+- `tic_V` = typePV = ↑W\↑W2 (§5 bridge V と一致、要 set 計算)。
+- `subH := K` (H=K=M' from (10.1)); `subH_normal`/`W2_le_subH`/`subH_le_K` = K facts (易)。
+- `A_covers`: ∀h∈K#, x∈C_K(h)#, ↑x∈typePA0 — `typePA = centralizerSupport (sharpSubgroup M) (derivedInG M)`
+  定義から (h∈M'#⊆M#, x∈C_{M'}(h) ⟹ x∈typePA)。要 centralizerSupport 定義確認。
+- `dade0 : S04.Hypothesis G (A∪V^L) M`: **A∪V^L = typePA0** (V^L=M-conj of typePV ⊆ conjClassSet typePV ⊆ typePA0)
+  ⟹ §10 `dadeData.dade : S04.Hypothesis G typePA0 M` を set 等式で transport (Eq.mpr/cast)。
+- `tau : FullDadeIsometryData dade0`: §10 `dadeData.dade.fullDadeIsometryData hconj` から (同 transport)。
+
+**主リスク** = dade0/tau の set-equality transport (typePA0∪V^L=typePA0 の証明 + S04.Hypothesis の型 cast) +
+A_covers (centralizerSupport 計算)。中規模 (1 focused session)。完成 ⟹ §6 全 apparatus (degree theory 含む)
+が L=M で発火 ⟹ (10.2) crux の counting + (10.3) d/δ independence が落ちる。
+
+**代替 route (10.2 のみ)** = 商 M/M'' の Frobenius (`IsFrobeniusGroup.of_centralizer_kernel_le` で
+centralizer_W1 から構成) + `isIrreducibleCharacter_induce_of_frobeniusGroup` + inflation 引き戻し。
+Hypothesis46 を経ず (10.2) 単独可だが inflation/商 API 要。**Hypothesis46 が (10.3)/μ-grid も一括 unlock
+ゆえ優先推奨**。
