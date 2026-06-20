@@ -242,8 +242,19 @@ build 3870 green)。下の BREAKTHROUGH 通り、全 `Hypothesis L` (§6 bridge)
 inducedFamily と同じ ambient (FiniteInduce) を使う (自前 haveI を作ると membership rfl 破綻)。
 `commutator_def` は 2 名義あり曖昧 → `Group.IsPerfect.ofSurjective` 経由が clean。
 
-**▶ 次**: (10.3) (w₂ prime + d/δ independence) → `CharacterParameters` de-opaque (zeta を (10.2) で,
-mu/omegaSigma を §6 columnFamily で materialize) → (10.5)+ Dade calc。
+**▶ 次の frontier 整理 (2026-06-20 cont.⁵)**:
+- ✅ **`CharacterParameters.zeta_irreducible` de-opaque 済** (`250096bc`): opaque Prop → `IsIrreducibleCharacter zeta`
+  (S15.Hypothesis 模範)。`exists_zeta_degree_w1` conclusion も実述語化。
+- ⚠ **§10 producer chain は (8.8) に gate**: `CharacterParameters` は `w2_prime : hyp.w2.Prime` を
+  **real field** として要求 ⟹ どの producer も w₂ prime なしに CharacterParameters を構成不可。
+  w₂ prime = Peterfalvi (8.8) (type-II partner S with |S:[S,S]|=w₂)、`Theorem88CaseBData` は
+  **case-B pair (S,T)** ゆえ単一 `Hypothesis M` から得られない (深い BG §16 構造)。
+  ∴ exists_zeta_degree_w1 / w2_prime_and_parameter_independence は (8.8) 待ち。
+  **私の standalone (10.2) `exists_zeta_in_inducedFamily_degree_w1` はこの gate を回避** (CharacterParameters 非経由)。
+- **次の non-gated 候補**: (a) (10.3) within-column degree-const `μ_ij(1)=μ_0j(1)` を Hypothesis L で
+  (columnFamily_difference_apply_one、小)。(b) μ-grid materialize (CharacterParameters.mu ← §6 columnFamily,
+  W₂-dual ↔ Fin w₂ equiv 要、中)。(c) omegaSigma ← §5 bridge omegaSigmaGrid。
+  **gated 本筋**: (8.8) w₂ prime → (10.3)-(10.6) → (10.8) keystone。(8.8) は BG §16 partner existence。
 
 ---
 ### ★★★ BREAKTHROUGH (2026-06-20 cont.³, 原文 (8.15)+(4.4) 精読): **(10.2) は Hypothesis L で可、Hypothesis46 不要**
