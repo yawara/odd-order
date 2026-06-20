@@ -5303,3 +5303,5 @@ group-theoretic core of the chief-series assembly of Wielandt's formula (issue 2
 #assert_only_allowed_axioms OddOrder.GroupTheory.card_fixedSubgroup_eq_mul
 #assert_only_allowed_axioms OddOrder.GroupTheory.map_fixedSubgroup_eq_fixedSubgroup_quotient
 #assert_only_allowed_axioms OddOrder.GroupTheory.isAInvariant_comp_subtype
+#assert_only_allowed_axioms OddOrder.GroupTheory.fixedSubgroup_restrict_eq
+#assert_only_allowed_axioms OddOrder.GroupTheory.card_fixedSubgroup_restrict

@@ -121,6 +121,32 @@ theorem card_fixedSubgroup_eq_mul [N.Normal] [Finite ↥X] [Finite H]
     Nat.card_congr (QuotientGroup.quotientKerEquivRange
       ((QuotientGroup.mk' N).comp C.subtype)).toEquiv, hr, hk, mul_comm]
 
+/-- The fixed subgroup of the **restricted action** `hN.restrict : L →* MulAut ↥N` on an
+`L`-invariant subgroup `N ≤ H` is, as a subgroup of `↥N`, exactly `(C_H(X)).subgroupOf N`: an
+element `n ∈ N` is fixed by the restricted `X`-action iff it is fixed by the ambient action
+(`IsAInvariant.restrict_apply_val`). -/
+theorem fixedSubgroup_restrict_eq (hN : IsAInvariant φ N) :
+    fixedSubgroup hN.restrict X = (fixedSubgroup φ X).subgroupOf N := by
+  ext x
+  simp only [mem_fixedSubgroup, Subgroup.mem_subgroupOf]
+  constructor
+  · intro hx l hl
+    have h := congrArg Subtype.val (hx l hl)
+    rwa [IsAInvariant.restrict_apply_val] at h
+  · intro hx l hl
+    exact Subtype.ext ((IsAInvariant.restrict_apply_val hN l x).trans (hx l hl))
+
+/-- **Card of the restricted fixed subgroup.**  `|C_N(X)| = |C_H(X) ⊓ N|`: the fixed points of the
+`X`-action restricted to an `L`-invariant subgroup `N ≤ H` are exactly the ambient fixed points
+lying in `N`.  This is the subgroup-side bridge feeding the per-chief-factor Wielandt identity on an
+elementary-abelian chief factor `N` (its module `C_N(X)` of fixed points has this cardinality). -/
+theorem card_fixedSubgroup_restrict (hN : IsAInvariant φ N) :
+    Nat.card ↥(fixedSubgroup hN.restrict X) =
+      Nat.card ↥((fixedSubgroup φ X ⊓ N : Subgroup H)) := by
+  rw [fixedSubgroup_restrict_eq,
+    Nat.card_congr (((fixedSubgroup φ X).subgroupOf N).equivMapOfInjective N.subtype
+      N.subtype_injective).toEquiv, Subgroup.subgroupOf_map_subtype]
+
 end ChiefStep
 
 end OddOrder.GroupTheory
