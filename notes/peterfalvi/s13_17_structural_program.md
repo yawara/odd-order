@@ -381,6 +381,18 @@ full build 3820 green): W₁ を含む Frobenius 補元 E について `E.map L.
 (`mem_normalizer_iff` 両方向、reverse は ↑e∈L で w∈L 回収) → (13.16) `normalizer_W1` で = Q⊔W₂。
 唯一 sorried 依存 = (13.16) (gated-endpoint、axiom-clean でない=normalizer_W1 の sorry に bottom-out)。
 
+### ✅ ∃y step DONE — `exists_mem_conj_W2_le_of_dvd_card` (2026-06-20⁸, commit `3e44d18f`)
+
+(13.17.c) 結論第 2 連言「∃y∈Q, W₂^y≤E」の reusable 群論コア。**sorry-free, abstract** (S15_SAndT):
+Q⋊W₂ (Q◁ 可解 normal Hall, |W₂|=p prime, p∤|Q|) で E≤Q⊔W₂ ∧ p∣|E| ⟹ ∃y∈Q, W₂^y≤E。
+証明 = Cauchy で位数 p 部分群 P≤E → P は normal complemented Q に coprime →
+**Schur-Zassenhaus 補元共役** (`Ch03.exists_conj_le_of_isComplement'_of_coprime` を ↥(Q⊔W₂) 内適用)
+で P≤W₂^g → card 一致で P=W₂^g → ξ=q'w' 分解 (Q'◁↥K, `normal_mul` の Set 積) で W₂^g=W₂^{q'}。
+pointwise smul = `mem_pointwise_smul_iff_inv_smul_mem` / `pointwise_smul_def`。
+
+**⟹ (13.17.c) の reusable 群論コア 2/2 完成** (`complement_le_QW2` = E⊆QW₂ / 本 = ∃y)。
+残るは |E|=pq 順序論のみ。
+
 ### ⛔ 残 order 論 = §13 構造 gate と確定 (要追加形式化)
 
 (13.17.c) の残り「|E|∈{q,pq} + ∃y∈Q W₂^y≤E」の crux = **E の q-Sylow が exactly W₁ (位数 q)**。
