@@ -31,6 +31,7 @@ import OddOrder.Isaacs.Ch04_Commutators.Main
 import OddOrder.Isaacs.Ch04_Commutators.ForwardFromCh03
 import OddOrder.Isaacs.Ch05_Transfer.Main
 import OddOrder.Isaacs.Ch06_FrobeniusActions.Main
+import OddOrder.Isaacs.Ch06_FrobeniusActions.OddComplement
 import OddOrder.Isaacs.Ch07_ThompsonSubgroup.Main
 import OddOrder.BG.Ch1_Preliminary.S01_Solvable
 import OddOrder.BG.Ch1_Preliminary.S04d_GorThm415
@@ -329,6 +330,17 @@ disallowed axiom(s):{indentD m!"{bad.toList}"}"
   OddOrder.Isaacs.Ch06.isCyclic_of_comm_two_group_involutions_invert_element
 #assert_only_allowed_axioms
   OddOrder.Isaacs.Ch06.exists_distinct_subgroups_card_two_of_external_involution
+
+-- Ch.6 (Frobenius Actions): Huppert V.8.18 b) — odd Frobenius complement is a Z-group,
+-- its order-`r` subgroups centralize the commutator, and every prime-order subgroup is normal.
+#assert_only_allowed_axioms
+  OddOrder.Isaacs.Ch06.isZGroup_of_isFrobeniusAction_of_odd
+#assert_only_allowed_axioms
+  OddOrder.Isaacs.Ch06.centralizes_commutator_of_card_prime_coprime
+#assert_only_allowed_axioms
+  OddOrder.Isaacs.Ch06.normal_of_card_prime_of_isFrobeniusAction_of_odd
+#assert_only_allowed_axioms
+  OddOrder.Isaacs.Ch06.normal_of_card_prime_of_isFrobeniusGroup_of_odd
 #assert_only_allowed_axioms
   OddOrder.Isaacs.Ch06.false_of_unique_subgroups_card_two_of_external_involution
 -- Lem 6.21 setup: `K = ⟨ C_N(a) | a ≠ 1 ⟩` and its abelian-action invariance.
