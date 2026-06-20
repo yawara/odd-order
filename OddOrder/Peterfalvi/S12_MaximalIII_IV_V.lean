@@ -4,6 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
 import OddOrder.Peterfalvi.S11_MaximalII_III_IV
+import OddOrder.Peterfalvi.S05_OmegaSigmaGrid
 import Mathlib.GroupTheory.IsPerfect
 
 /-!
@@ -754,6 +755,28 @@ noncomputable def Hypothesis.muGrid [Finite G] (hG : OddOrder.BG.IsMinimalSimple
   let χ₂ : (h.W2.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ :=
     finCardEquivCharacterGroup _ (finCongr hcardW2sub.symm j)
   exact ((h.columnFamily χ₂).mu (finCongr hcardW1.symm i) : ClassFunction ↥M ℂ)
+
+open scoped FiniteInduce in
+/-- **§10 ω^σ-grid materialization** (Peterfalvi (3.6)): the `Fin w₁ × Fin w₂`-indexed family of
+virtual characters `ω_{ij}^σ` of `G`, read off from the §5 `TICyclicHypothesis.omegaSigmaGrid` of
+the (now unconditional) §10→§5 bridge `typePData_toTICyclicHypothesis`.  The required §4 Dade
+application is built directly: the TI-cyclic Dade hypothesis has trivial local subgroups
+(`HConjInvariant.of_forall_H_eq_bot`), so `Hypothesis.fullDadeIsometryData` applies.  Its index set
+`Fin |W₁| × Fin |W₂|` is definitionally `Fin w₁ × Fin w₂`.  This is the genuine source for
+`CharacterParameters.omegaSigma`. -/
+noncomputable def Hypothesis.omegaSigmaGrid [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    {M : Subgroup G} (hyp : Hypothesis M) (hodd : Odd (Nat.card G)) :
+    Fin hyp.w1 → Fin hyp.w2 → ClassFunction G ℂ := by
+  haveI := hyp.finiteG
+  classical
+  let tic := typePData_toTICyclicHypothesis hyp.typeP hodd
+  haveI : NeZero (Nat.card ↥tic.W1) := ⟨Nat.card_pos.ne'⟩
+  haveI : NeZero (Nat.card ↥tic.W2) := ⟨Nat.card_pos.ne'⟩
+  let app : OddOrder.Peterfalvi.S05.TICyclicHypothesis.FullDadeApplication tic :=
+    ⟨tic.toDadeHypothesis.fullDadeIsometryData
+      (OddOrder.Peterfalvi.S04.Hypothesis.HConjInvariant.of_forall_H_eq_bot _ (fun _ => rfl))⟩
+  have hVeq : tic.V = tic.Vdiff := rfl
+  exact fun i j => tic.omegaSigmaGrid hVeq app i j
 
 /-- The character parameters obtained in Peterfalvi (10.2)--(10.3).
 
