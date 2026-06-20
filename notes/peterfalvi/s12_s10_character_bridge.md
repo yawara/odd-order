@@ -136,3 +136,61 @@ TICyclicHypothesis は **W-level ω/σ** のみ (ω on W, ω^σ on G)。μ_ij (o
 8. ⟹ §11/S13 (9.x/11.x riders) も同 machinery で。
 
 **STOP 規律**: 1 leaf が ~4-5 実質試行で進まなければ STOP + 本 note に障害記録。難所回避禁止 ([[feedback-no-avoiding-hard-parts]])。
+
+## 6. (10.2)–(10.5) 原文照合 + (10.2) 攻略 diagnosis (2026-06-20 bridge 後の調査)
+
+原文 = `references/peterfalvi/04.12_pp_58_63_Maximal_Subgroups_of_Types_III_IV_and_V.mmd` L1-42 を verbatim 照合。
+**確定した式 (de-opaque で baking する正値)**:
+
+- **(10.1)**: `S = {Ind_{M'}^M θ | θ∈Irr M', θ≠1}`。「By (8.15), Hyp (4.6) と (5.2) が L=M, H=K=M' で成立。
+  w₁,w₂,σ,ω_ij,μ_ij,μ_j,δ_j は **Hyp (4.6) with L=M** と同義」⟹ **μ/ω/δ は §6 (4.6)-with-L=M 由来**
+  (∴ μ-level の真の供給源 = §10 Hyp → §6 `Hypothesis46 M M'` bridge、§3d)。
+- **(10.3)**: `0≤i<w₁, 0<j<w₂` で `d=μ_ij(1)` は i,j 独立、`δ=δ_j` は j 独立、`d>1`、`n=(d-δ)/w₁∈ℕ`。
+  (w₂ prime は **Thm (8.8)** 経由 type-II maximal S with |S:[S,S]|=w₂。)
+- **(10.5)**: `α_ij = μ_ij − δ·μ_i0 − n·ζ` (`0≤i<w₁, 0<j<w₂`)、`Supp(α_ij)⊆A₀(M)`、
+  `α_ij^τ = δ(ω_ij^σ − ω_i0^σ) − n·ζ^τ₁`。
+
+### CharacterParameters de-opaque field specs (S15.Hypothesis 模範 = data+real恒等式, opaque Prop 廃止)
+
+| 現 opaque Prop | 実恒等式 (self-contained = tau/tau₁ 不要) | 備考 |
+|---|---|---|
+| `zeta_irreducible` | `IsIrreducibleCharacter zeta` | producer 結論も書換要 (∧ の項) |
+| `n_formula` | `(n:ℤ)*(hyp.w1:ℤ) = (d:ℤ) - delta` | clean |
+| `alpha_formula` | `∀ i j, alpha i j = mu i j - (delta:ℂ)•mu i 0 - (n:ℂ)•zeta` | clean |
+| `degree_independent` | `∀ i (j:Fin w2), j≠0 → (mu i j) 1 = (d:ℂ)` | index 0<j 要 |
+| `delta_independent` | δ_j family field 追加要 (現状 `delta:ℤ` は共通値のみ) | 要新 field |
+| `alpha_tau_formula`/`mu_tau1_formula`/`zeta_tau1_norm_bound`/`orthogonality_w1_lt_w2`/`typeV_*` | **tau (hyp.tau) / tau₁ (CoherentHypothesis) 要** | CoherentHypothesis 文脈で de-opaque |
+
+⚠ S15.Hypothesis は `omega`/`eta`/`tau3` を **data field** + 恒等式 `eta_eq_tau_omega : eta i j = tau3 (omega i j)`
+(S15_SAndT:131-147) で carry。CharacterParameters.omegaSigma も同様に bridge の `omegaSigmaGrid` に pin できる
+(`omegaSigmaGrid` docstring が「`S12.CharacterParameters.omegaSigma` がこれに pin される」と明記)。
+
+### (10.2) 攻略 diagnosis (real construction、but 重い apparatus 要)
+
+(10.2) = ζ∈S∩Irr M, ζ(1)=w₁ を **構成**する初の §10 結果。原文証明:
+W₂⊆M'' [(8.4.d)] + M' solvable≠1 ⟹ **(M'/M'')⋊W₁ Frobenius (kernel M'/M'')** ⟹ M' の非自明 degree-1
+char を M へ induce すると irreducible∈S, degree w₁。
+
+**API 在庫 (`OddOrder/GroupTheory/RepresentationTheory/InducedIrreducible.lean`)**:
+- `isIrreducibleCharacter_induce_of_frobeniusGroup` (:453) — `IsFrobeniusGroup G H W` + θ≠1 ⟹ `induce θ` irreducible。
+  **⚠ 直接適用不可**: G=M,H=M',W=W₁ では `IsFrobeniusGroup M M' W₁` が **偽** (W₁ は W₂⊆M'' を centralize
+  = `centralizer_W1`、∴ M'⋊W₁ は Frobenius でない、quotient のみ)。
+- `isIrreducibleCharacter_induce_of_inertia_eq` (:424) — `inertia(θ)=H` ⟹ induce irreducible。**こちらが正路**。
+- `inertia_eq_of_frobeniusGroup` (:68) — full-group Frobenius 要、本件不適。
+
+**∴ (10.2) 正路 (multi-step, 未在庫 apparatus)**: (1) **quotient Frobenius (M'/M'')⋊(W₁ image⊆M/M'')**
+を `centralizer_W1` (FPF on M'/M'') から構成。(2) **Brauer permutation lemma** = 「Frobenius complement は
+kernel の非自明 character に FPF 作用」⟹ 非自明 linear θ (M'' を kernel に持つ) は W₁# で不動でない。
+(3) ⟹ `ClassFunction.inertia (M) θ = M'`。(4) `isIrreducibleCharacter_induce_of_inertia_eq` 適用。
+(2) の Brauer 系が repo 未在庫の可能性大 (要調査: `OddOrder/Isaacs/Ch06_FrobeniusActions/` の character 版)。
+**∴ (10.2) は real だが quotient-Frobenius + Brauer-FPF-on-chars + inertia-pullback の apparatus build を要する
+multi-session 案件**。非 quick-win。
+
+### ▶ 次セッションの推奨着手順 (real 進捗順)
+
+1. **(10.2)** を standalone lemma `∃ ζ∈inducedFamily M, IsIrreducibleCharacter ζ ∧ ζ 1 = (w₁:ℂ)` として
+   形式化 (上記 4-step)。CharacterParameters 全構成は不要 (μ-grid に gate されない切り出し)。
+   先に `Ch06_FrobeniusActions/` に Brauer-FPF-on-characters があるか調査 → 無ければ apparatus build。
+2. 並行/代替: CharacterParameters de-opaque (self-contained 3 field: zeta_irreducible/n_formula/alpha_formula)
+   を producer signature 書換と共に一括で (piecemeal は半端状態を生むので全 self-contained field を 1 commit で)。
+3. μ-level 本筋 = §10 Hyp → §6 `Hypothesis46 M M'` bridge (§3d、full 4.6 apparatus、最重)。
