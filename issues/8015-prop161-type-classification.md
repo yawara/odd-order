@@ -128,6 +128,17 @@ A(8) を `theoremA_maximal_structure` の該当 branch に配線 → A(8) は hI
 5. `isTypeP1_kappaSigma_compl_hall_subgroupOf_eq_bot` — Thm A(8) の U=⊥ 核 (IsTypeP1→U=⊥)
 6. `kappa_eq_sigmaComplementPrimes_of_hall_subgroupOf_eq_bot` — 逆 (U=⊥→κ=σ')
    ⟹ **IsTypeP1 ⟺ Hall (κ∪σ)ᶜ-complement trivial characterization 完成** (IsTypeP modulo)
+7. `theoremA8_complement_eq_bot_and_kappa_prime` — **Thm A(8) の 2/3 を de-gate**
+   (MF≠Mσ ⟹ U=⊥ ∧ ∃p prime |K|=p、Thm 15.2 直接活用)。残 = FittingIsTI のみ。
+
+### 🔬 FittingIsTI 精査結論 (2026-06-20 セッション末)
+**FittingIsTI は Theorem 15.2 の結論に無い** (mmd L4180-4202 確認: 15.2 は Q/Q̄/D 構造 + M''=Mσ'⊆F(M)=
+C_{Mσ}(Q̄) + q∈β のみ、TI 言及なし)。FittingIsTI は **Theorem A(8) の content** で Theorem A 証明
+(§16, mmd L4346-4355) 内で確立される深い §15/§16 fusion 事実。既存 TI 機構 (`isTISubset_sigmaSharp_of_sigma_eq_beta`
+S14:1443 [σ=β 時]、`typeP_family_T_isTI` S14:6222、`typeP_zTilde_isTI` S14:7210) の上に type-P1 構造
+(F(M)=C_{Mσ}(Q̄)⊂Mσ、Q̄ minimal normal) を接続する argument が要る。**深い multi-session 定理** —
+F(M) TI を Q=O_q(M) の TI 性 (§10 σ-uniqueness 由来) + F(M)=QC_M(Q) から組む or sigmaSharp TI から
+還元する経路を要形式化。次セッションの focused 着手対象。
 
 ### ⚠ 残務の正直な評価 (2026-06-20 セッション末)
 6 補題は全て Prop 16.1/Theorem A の reverse・forward で消費される honest infra だが、**いずれも
