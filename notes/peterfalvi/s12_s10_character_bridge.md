@@ -69,26 +69,25 @@ lane-f の POLE-1 `section16TypePStructure` の primes 残 sorry も honest 化*
 | `V_subset_sharp` | 1∈W1 ⟹ 1∉V ⟹ V⊆univ\{1} | ✅ |
 | `V_subset_W` | set diff ⊆ W | ✅ |
 | `W_normalizes_V` | W abelian (cyclic) ⟹ w∈W で wvw⁻¹=v∈V | ✅ (`commute_of_mem_of_isCyclic`) |
-| `V_ti : IsTISubset V W` | **genuine gap** (§3b) → param `hVti` | ⏸ **issue 1005** (4.6.b ambient TI) |
+| `V_ti : IsTISubset V W` | ✅ **DONE** = `typePData_V_ti` (§3b, cyclic-characteristic) | ✅ **issue 1005 CLOSED** |
 
-**⟹ ブリッジ `typePData_toTICyclicHypothesis` (S12) 完成・axiom-clean (2026-06-20)。** 残 = `hVti`
-([issue 1005](../../issues/1005-typep-ambient-v-ti.md))。
+**⟹ ブリッジ `typePData_toTICyclicHypothesis` (S12) 完成・axiom-clean・unconditional (2026-06-20)。**
+`hVti` param は廃止、`typePData_V_ti data` で内部 discharge。
 
-### 3b. V_ti gap (要設計判断)
+### 3b. V_ti ✅ RESOLVED (2026-06-20, issue 1005 CLOSED)
 
-`normalizer_V` (TypePData field: ∀ nonempty X⊆V, N_G(X)=W) からの直接導出は **非自明**:
-- 単集合 {a} で `N_G({a}) = C_G(a) = W` (a∈V) は出る。
-- a∈V, b=gag⁻¹∈V ⟹ C_G(b)=gC_G(a)g⁻¹ ⟹ gWg⁻¹=W ⟹ **g∈N_G(W)** までで、`g∈W` は出ない
-  (N_G(W)=W が別途要)。
-- ∴ IsTISubset V W は normalizer_V より strict に強い。§6 でも `hti` として**入力**
-  (`toTICyclicHypothesisOfV` の引数、`Hypothesis46.tic.V_ti`)。
-- **ツール**: `normalizer_eq_sup_of_isTISubset_of_isCyclic` (S16_MainResults:639) は
-  **IsTISubset → normalizer_V の方向** (逆ではない)。
-- **次の調査**: (i) §10 `Hypothesis.dadeData : DadeSupportHypothesisData M (typePA0 M)` が V の TI を内包するか
-  (Dade isometry 構築で V_ti を使ったはず — 遡って expose 可能か)。(ii) `exists_hypothesis_of_typeIIIorIVorV`
-  /`dadeSupportHypotheses_typeP` (S10:270) の構築過程で IsTISubset V W が available か。
-  (iii) 最悪 case = ブリッジを `(hVti : IsTISubset (typePV M typeP) typeP.W)` パラメータ化 (§6 precedent) し、
-  V_ti を別 obligation として後で discharge (honest factoring; scaffold ではない — V_ti は具体的 TI 事実)。
+**当初「genuine gap」と診断したが誤り**。`normalizer_V` + **cyclic 因子構造**で完全に閉じる。
+キーは「**cyclic W では W₁, W₂ が位数で一意 ⟹ characteristic**」(当初の §3b 分析はこれを見落とし)。
+
+- `typePData_V_ti (data : TypePData M) : IsTISubset (typePV M data) data.W` (S12, axiom-clean)。
+- 証明: g, a∈V, b=gag⁻¹∈V を取る。
+  - `normalizer_V {a}` で `N_G({a}) = W`、同 `N_G({b}) = W` (singleton normalizer = 点 stabilizer)。
+  - `g` は W を正規化: `h∈W ↔ ghg⁻¹∈W` は両辺とも `hah⁻¹=a` に帰着 (b=gag⁻¹ の展開を `group`)。
+  - **characteristic**: A≤W cyclic で `A.map (conj g) = A` を `cyclic_subgroup_eq_of_card_eq`
+    (`BG.Ch3.S10`, ↥W で位数一致 ⟹ 部分群一致) で。⟹ g は W₁, W₂ も正規化。
+  - ⟹ g は V を正規化 ⟹ `g ∈ N_G(V) = W` (`normalizer_V` X=V, nonempty=`typePData_typePV_nonempty`)。
+- ⚠ 当初「IsTISubset は normalizer_V より strict に強い」「§6 でも入力」は **cyclicity 抜きの話**で、
+  type-P の cyclic W では成立しない。`normalizer_eq_sup_of_isTISubset_of_isCyclic` (逆方向) は不要だった。
 
 ### 3c. coprime ✅ DONE
 
@@ -264,23 +263,28 @@ inducedFamily と同じ ambient (FiniteInduce) を使う (自前 haveI を作る
 - **prime-orders chain** `theorem88_caseB_prime_orders` (S12:720) → `no_typeV_maximal` (S12:675) →
   **3 sorry に依存**: `w2_prime_and_parameter_independence` (10.3, S12:587) + `typeV_forces_coherence`
   (10.10.x, S12:659) + **`S_not_coherent` (10.8, S12:640)**。
-- ⟹ **中心の analytic keystone = (10.8) `S_not_coherent`**: signature は `(hyp : Hypothesis M)` のみ
-  (**gated CharacterParameters 非経由**) ⟹ **standalone 証明可** ((10.2) と同様、w₂ prime gate を回避)。
+- ⚠⚠ **訂正 (2026-06-20 原文 04.12 L77-90 精読)**: cont.⁶ の「(10.8) は standalone 証明可」は **誤り**。
+  signature が `(hyp : Hypothesis M)` のみ ≠ proof が standalone。原文 (10.8) の証明本体が
+  **Theorem (8.8) を直接 cite**:「By Theorem (8.8), there is a maximal subgroup S of Type II such that
+  S∩M=W, S=[S,S]⋊W₂, C_{[S,S]}(W₂)=W₁」+ (7.5)/(7.8.b) counting + (8.11) Hall + (8.6.a) TI + (10.7)。
+  ∴ **(10.8) は (8.8)=`theorem88_caseB_holds` (S14:308 SORRY, lane-f/BG §14) に gate**。(10.2) と違い回避不可。
 
-**(10.8) S_not_coherent の証明** (Pf 原文 04.12 L13-): S coherent (CoherentHypothesis) を仮定 →
-(10.5) `α_ij^τ = δ(ω_ij^σ − ω_i0^σ) − n·ζ^τ₁` (Dade isometry on α、Supp⊆A₀) → (10.6) norm bound
-`‖ζ^τ₁‖² ≥ ...` → 算術矛盾 `n²−n−1 < 0` (n≥2 で不可能、(10.5) の Cauchy-Schwarz から)。
+**(10.8) S_not_coherent の証明** (Pf 原文 04.12 L77-): S coherent 仮定 → (8.8) で Type-II partner S 取得
+→ G を G₀ (order prime to w₁, ∉Ã(M)) / G₁ に分割 → (7.5)+(7.8.b) counting + (10.6.b) `|ζ^τ₁(g)|≥1`
+→ `w₁/|M'| ≥ 1 − |G₁|/|G| − 1/w₁` の不等式 → G₁⊆(H#)^G∪V^G (8.11/8.6.a/10.7) で |G₁|/|G| 評価 → 矛盾。
+(⚠ 旧記載の「n²−n−1<0 が (10.8)」は誤り — それは (10.5) 内の補助矛盾。)
 
-**entry point (非gated、standalone)**: (10.5)/(10.6) Dade calc を CharacterParameters を介さず構築:
-- μ-grid = §6 `columnFamily` (私の §6 bridge `typePData_toS06Hypothesis` から、W₂-dual ↔ Fin w₂ equiv)。
-- ω^σ-grid = 私の §5 bridge `omegaSigmaGrid` (要 hVti)。
-- ζ = (10.2) `exists_zeta_in_inducedFamily_degree_w1` (✅)。τ = `hyp.tau` (§10 Hypothesis、✅ genuine Dade)。
-- τ₁ = coherent extension (CoherentHypothesis 仮定下、(10.4))。
-- α_ij = μ_ij − δμ_i0 − nζ; Supp(α_ij)⊆A₀ ((10.5) 前半、support 論); α^τ formula ((10.5) 後半、Dade)。
+**真の §10 spine gating 構造** (3 gate、すべて lane-f BG §14 or §6 deep):
+- (10.3) w₂ prime / (10.7)/(10.8) = **(8.8) Type-II partner** に gate (lane-f `theorem88_caseB_holds`)。
+- (10.3) cross-column degree (μ_0j(1) indep of j, δ_j indep) = §5 σ-Galois ((3.9.b)) — §5 bridge は ✅ unconditional
+  になった (issue 1005 closed) ので**発火可**。within-column (μ_ij(1) indep of i) = `columnFamily_difference_apply_one`
+  (bare Hypothesis L) も発火可。
+- μ-grid materialize = §6 bridge `typePData_toS06Hypothesis` 経由だが `hHall` (issue 1006) 待ち。
+  **issue 1006 は lane-f κ-Hall cyclicity (`theoremA` SORRY / `typeP_duality`) に gate** と判明 (2026-06-20 調査)。
 
-**規模**: (10.8) は §10 の analytic 本丸 = 大規模 (Dade isometry calc + norm bound + 算術)、multi-session。
-**しかし gated CharacterParameters を回避でき、私の 2 bridge + (10.2) が直接 feed する**。次の focused program。
-⚠ 当面 (10.8) を仮定 (standalone, hyp 引数) で no_typeV/(12.17)/(8.8)-prime に配線するか、(10.5) から積むか選択。
+**∴ lane-b 単独で今 honest に積めるのは**: (a) §5 bridge unconditional 化 ✅ DONE (issue 1005)、
+(b) (10.3) within-column degree (Hypothesis L, 小)、(c) (10.3) cross-column degree (§5 σ-Galois、要調査)。
+**(10.8) 本体 + μ-grid + (10.3) w₂ prime は lane-f BG §14 ((8.8)/κ-Hall) 待ち** (cross-lane gate)。
 
 ---
 ### ★★★ BREAKTHROUGH (2026-06-20 cont.³, 原文 (8.15)+(4.4) 精読): **(10.2) は Hypothesis L で可、Hypothesis46 不要**
