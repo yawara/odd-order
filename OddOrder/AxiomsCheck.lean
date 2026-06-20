@@ -6,6 +6,7 @@ Authors: Yawara Ishida
 import Lean
 import OddOrder.Algebra.AlgInt
 import OddOrder.GroupTheory.ChermakDelgado
+import OddOrder.GroupTheory.CoprimeFixedPoints
 import OddOrder.GroupTheory.PiElementDecomposition
 import OddOrder.GroupTheory.RepresentationTheory.CharacterCount
 import OddOrder.GroupTheory.RepresentationTheory.CharacterCompleteness
@@ -5291,3 +5292,14 @@ not registered here). -/
 
 #assert_only_allowed_axioms
   OddOrder.GroupTheory.IsFrobeniusGroup.centralizer_inf_kernel_eq_bot_of_not_mem
+
+/-! **(9.1) I-5 chief-step multiplicativity of coprime fixed points** (`CoprimeFixedPoints`).
+For a coprime solvable action `φ : L →* MulAut H`, `X ≤ L`, and an `L`-invariant normal `N ◁ H`,
+the fixed points split across the chief step: `|C_H(X)| = |C_H(X) ⊓ N| · |C_{H/N}(X)|`
+(`card_fixedSubgroup_eq_mul`), via the surjectivity of the reduction map onto the quotient fixed
+points (`map_fixedSubgroup_eq_fixedSubgroup_quotient` = Isaacs Cor 3.28).  This is the
+group-theoretic core of the chief-series assembly of Wielandt's formula (issue 2014). -/
+
+#assert_only_allowed_axioms OddOrder.GroupTheory.card_fixedSubgroup_eq_mul
+#assert_only_allowed_axioms OddOrder.GroupTheory.map_fixedSubgroup_eq_fixedSubgroup_quotient
+#assert_only_allowed_axioms OddOrder.GroupTheory.isAInvariant_comp_subtype

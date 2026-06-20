@@ -50,10 +50,23 @@ deepest pole。`|C_H(UE)|^|E| · |H| = |C_H(E)|^|E| · |C_H(U)|` (Frobenius L=U�
       `card_fixedSubgroup_wielandt_of_dim` — (⋆) 次元恒等式 `hdim` を仮定し、bridge で `p^(·)` 化して
       `|C_V(⊤)|^|E|·|V| = |C_V(E)|^|E|·|C_V(U)|`。`hdim` = `finrank_elab_identity` の結論 ((†) modulo)
       ゆえ (†) は依然 isolate。helper `invariants_comp_top_subtype` (`invariants(ρ.comp ⊤)=ρ.invariants`)。
-- [ ] **I-5 chief-series assembly** (lane-h, group theory): `|C_H(X)| = ∏_i |C_{V_i}(X)|` を
-      `ChiefFactor.chiefSeriesInside` + Isaacs Cor 3.28 (`coprime_fixedPoints_quotient`) で確立 →
-      per-factor (⋆) を p_i-power して掛け合わせ → 群 (9.1)。
-- [ ] **assembly** → `wielandt_fixedPoint_frobenius` sorry-free 化。
+- [x] **I-5 chief-step multiplicativity** (single step) = **DONE** (`CoprimeFixedPoints.lean`,
+      sorry-free + axiom-clean, full build 3873 green): `card_fixedSubgroup_eq_mul` —
+      `|C_H(X)| = |C_H(X) ⊓ N| · |C_{H/N}(X)|` for `N ◁ H` `L`-invariant, coprime + solvable.
+      核 = reduction map `C_H(X) →* H/N` の image = `C_{H/N}(X)` (surjectivity =
+      `map_fixedSubgroup_eq_fixedSubgroup_quotient` = Isaacs Cor 3.28
+      `OddOrder.Isaacs.Ch04.coprime_fixedPoints_quotient`), kernel = `C_H(X) ⊓ N` (Lagrange +
+      first iso)。helper `isAInvariant_comp_subtype` (restriction along `X ≤ L`)。
+      ⚠ naming wart: 誘導商作用は `OddOrder.Isaacs.Ch04.OddOrder.Isaacs.Ch03.IsAInvariant.quotientMulAutHom`
+      (Ch04 Main で `namespace Ch04` 内に Ch03 修飾名で `def` ⟹ Ch04 prefix が付く; dot 不可)。
+      clean 化は source の `_root_.` 修飾要 = spine 全 rebuild ゆえ別 issue で coordinate。
+- [ ] **chief-series telescoping**: 上記 single-step を `L`-invariant chief series で反復 →
+      `|C_H(X)| = ∏_i |C_{V_i}(X)|`。要 = 強帰納 (`Nat.card H`) で minimal `L`-invariant normal `N`
+      (el-ab) を取り、`N` に per-factor (⋆) を、`H/N` に IH を適用、X∈{UE,E,U} の single-step ×
+      `|H|=|N|·|H/N|` を掛けて (9.1) を組む。新ピース = minimal `L`-invariant normal の存在 (el-ab) +
+      `C_H(X)⊓N` ↔ `C_N(X)` の per-factor bridge card 一致。
+- [ ] **assembly** → `wielandt_fixedPoint_frobenius` sorry-free 化 (architecture: 最終 assembly は
+      `WielandtElabBridge` を要し CoprimeAction の下流ゆえ、statement+carrier の downstream 再配置が要る)。
 - [ ] 下流 (別 issue 可): (9.3) `typeII_III_IV_order_relations` → (9.6) → (10.11)/(11.7) → (13.2.b)
       `basic_structure.P_order` / `card_Q_eq` を順に de-gate。
 
