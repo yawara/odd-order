@@ -1526,16 +1526,78 @@ theorem Q_W2_structure [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
   rw [← hyp.p_eq_card_W2]
   exact (hyp.p_prime.coprime_iff_not_dvd.mpr hpQ).symm
 
+/-- **Peterfalvi (13.17.c) §13 intersection structure.**  The `W₁`-containing Frobenius complement
+`E` of the type-I `L` meets `Q = T_F` exactly in `W₁` (Pf p.82 "`E ∩ Q = W₁`"), and is not
+contained in `Q` (the `E = W₁` alternative is excluded by Peterfalvi (13.19.c1)/(13.2.a)).  This is
+the genuine deep §13 structural datum behind the order `|E| = p q`; it is not reducible to the
+existing §13 residuals (`TypeIFrobeniusData` carries no complement-order field).  `:= sorry`,
+isolated — the order argument `complement_card_eq_pq` below is sorry-free modulo this. -/
+theorem complement_inf_Q_structure [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hyp : Hypothesis (G := G)) {L : Subgroup G}
+    (frob : OddOrder.Peterfalvi.S14.TypeIFrobeniusData L)
+    (hW1E : hyp.W1 ≤ frob.complement.map L.subtype) :
+    frob.complement.map L.subtype ⊓ hyp.Q = hyp.W1 ∧
+      ¬ frob.complement.map L.subtype ≤ hyp.Q := sorry
+
 /-- **Peterfalvi (13.17.c) order argument.**  The `W₁`-containing Frobenius complement `E` of `L`
-has order `p q`.  *Proof (Pf p.82):* `E ⊆ Q W₂` (`complement_le_QW2`), and the cyclic Sylow
-subgroups ([BG] Prop 3.9 / `OddComplement`) with `E ∩ Q = W₁` force `|E| = q` or `p q`; the
-`E = W₁` alternative is excluded by (13.19.c1)/(13.2.a).  Gated on the §13 intersection structure
-`E ∩ Q = W₁` (`:= sorry`, isolated). -/
+has order `p q`.
+
+*Proof (Pf p.82).*  `E ⊆ Q W₂` (`complement_le_QW2`), and `Q ⋊ W₂` has `Q ◁ Q W₂` with
+`[Q W₂ : Q] = |W₂| = p` (`Q_W2_structure`).  The relative index `[E : E ∩ Q]` divides `[Q W₂ : Q] = p`
+(normal-subgroup relative index, `relIndex_dvd_index_of_normal` inside `↥(Q W₂)`) and is `≠ 1` since
+`E ⊄ Q`, hence `= p`; with `E ∩ Q = W₁` of order `q`, `|E| = |E ∩ Q| · [E : E ∩ Q] = q p`.  The two
+§13 facts `E ∩ Q = W₁` and `E ⊄ Q` are isolated in `complement_inf_Q_structure`; everything else is
+sorry-free group theory. -/
 theorem complement_card_eq_pq [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
     (hyp : Hypothesis (G := G)) {L : Subgroup G}
     (frob : OddOrder.Peterfalvi.S14.TypeIFrobeniusData L)
     (hW1E : hyp.W1 ≤ frob.complement.map L.subtype) :
-    Nat.card ↥frob.complement = hyp.p * hyp.q := sorry
+    Nat.card ↥frob.complement = hyp.p * hyp.q := by
+  set Em := frob.complement.map L.subtype with hEm
+  set Hg := hyp.Q ⊔ hyp.W2 with hHg
+  -- §13 residual: `E ∩ Q = W₁` and `E ⊄ Q`.
+  obtain ⟨hInf, hnle⟩ := complement_inf_Q_structure _hG hyp frob hW1E
+  -- `E ⊆ Q W₂` (Huppert step) and the `Q ⋊ W₂` structure.
+  have hEH : Em ≤ Hg := complement_le_QW2 _hG hyp frob hW1E
+  obtain ⟨hWnorm, hdisj, _⟩ := Q_W2_structure _hG hyp
+  have hQleH : hyp.Q ≤ Hg := le_sup_left
+  -- `|E ∩ Q| = |W₁| = q`.
+  have hInfCard : Nat.card ↥(Em ⊓ hyp.Q) = hyp.q := by rw [hInf]; exact hyp.q_eq_card_W1.symm
+  -- `Q ◁ Q W₂` (as `Q W₂ ≤ N_G(Q)`).
+  haveI hQnorm : (hyp.Q.subgroupOf Hg).Normal :=
+    (Subgroup.normal_subgroupOf_iff_le_normalizer hQleH).mpr (sup_le Subgroup.le_normalizer hWnorm)
+  -- `|Q W₂| = |Q| · p`.
+  have hHcard : Nat.card ↥Hg = Nat.card ↥hyp.Q * hyp.p := by
+    have h := OddOrder.BG.Ch3.S12.card_sup_eq_mul_of_le_normalizer_of_disjoint hWnorm
+      (show hyp.W2 ⊓ hyp.Q = ⊥ by rw [inf_comm]; exact hdisj)
+    rw [hHg, sup_comm, h, ← hyp.p_eq_card_W2]
+    exact mul_comm _ _
+  have hQpos : 0 < Nat.card ↥hyp.Q := Nat.card_pos
+  -- `[Q W₂ : Q] = p`.
+  have hindexH : (hyp.Q.subgroupOf Hg).index = hyp.p := by
+    have hmul := Subgroup.card_mul_index (hyp.Q.subgroupOf Hg)
+    rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hQleH).toEquiv, hHcard] at hmul
+    exact Nat.eq_of_mul_eq_mul_left hQpos hmul
+  -- `[E : E ∩ Q] = Q.relIndex E` divides `[Q W₂ : Q] = p`, and is `≠ 1` (`E ⊄ Q`), hence `= p`.
+  have hdvd : hyp.Q.relIndex Em ∣ hyp.p := by
+    have h1 := Subgroup.relIndex_dvd_index_of_normal (H := hyp.Q.subgroupOf Hg)
+      (K := Em.subgroupOf Hg)
+    rwa [Subgroup.relIndex_subgroupOf hEH, hindexH] at h1
+  have hne1 : hyp.Q.relIndex Em ≠ 1 := fun h => hnle (Subgroup.relIndex_eq_one.mp h)
+  have hrel : hyp.Q.relIndex Em = hyp.p :=
+    (hyp.p_prime.eq_one_or_self_of_dvd _ hdvd).resolve_left hne1
+  -- `|E| = |E ∩ Q| · [E : E ∩ Q] = q · p`.
+  have hEmcard : Nat.card ↥Em = hyp.q * hyp.p := by
+    have hmul := Subgroup.card_mul_index (hyp.Q.subgroupOf Em)
+    rw [show (hyp.Q.subgroupOf Em).index = hyp.p from hrel, ← Subgroup.inf_subgroupOf_left,
+      Nat.card_congr (Subgroup.subgroupOfEquivOfLe (inf_le_left : Em ⊓ hyp.Q ≤ Em)).toEquiv,
+      hInfCard] at hmul
+    exact hmul.symm
+  -- transfer `|E.map| = |E|`.
+  rw [show Nat.card ↥frob.complement = Nat.card ↥Em from
+    Nat.card_congr (Subgroup.equivMapOfInjective frob.complement L.subtype
+      L.subtype_injective).toEquiv, hEmcard]
+  exact mul_comm _ _
 
 /-- **Peterfalvi (13.17.c)/(14.5)**: the `W₁`-containing Frobenius complement of the type-I
 subgroup `L` over `N_G(U)` has order `p q` and contains a conjugate `W₂^y` (`y ∈ Q`).
