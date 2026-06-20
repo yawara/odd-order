@@ -5212,6 +5212,93 @@ theorem chiefFactor_card_and_commutator_of_inputs [Finite G]
 open OddOrder.Isaacs.Ch04.OddOrder.Isaacs.Ch03.IsAInvariant
   (quotientMulAutHom quotientMulAutHom_apply_mk') in
 open scoped commutatorElement in
+/-- **`C_{Q̄}(K)` is the image of `K* ⊔ Q₀`** (BG Proposition 1.5(d), the `hCfix` core of Theorem
+15.2(f)).  For a coprime `K`-action on the `q`-group `Q` (with `Q ≤ M_σ`, `K* = C_{M_σ}(K)`,
+`K* ≤ Q`, `Q₀ ⊴` normalized by `K` and `Q`), a class `[x]` of `Q̄ = Q/Q₀` is `K`-fixed iff its
+representative lies in `K* ⊔ Q₀`:
+`(∀ k ∈ K, ⁅k, x⁆ ∈ Q₀) ↔ x ∈ K* ⊔ Q₀`.
+
+Proof: `C_{↥Q}(K)` pushes forward to `C_G(K) ⊓ Q = M_σ ⊓ C_G(K) = K*`
+(`fixedPointsOfMulAut_conj_map_subtype`); Proposition 1.5(d)
+(`fixedPointsOfMulAut_quotientMulAutHom_eq_map`) gives `C_{Q̄}(K) = (C_{↥Q}(K))·Q₀/Q₀`, whose
+preimage in `Q` is `C_{↥Q}(K) ⊔ (Q₀ ↾ Q)`, mapping to `K* ⊔ Q₀` in `G`.
+
+Used both by `card_centralizer_quotient_eq_of_kstar` (its `hCfix` half) and by
+`actsPrimeManner_quotient_of_inputs` (applying it to `K` and to each `⟨x⟩`, `x ∈ K#`, whose `K*`
+coincides by the prime-manner action) to discharge the chief-factor engine's `hcond3`. -/
+theorem centralizes_quotient_iff_mem_kstar_sup [Finite G]
+    {Q Q0 K Kstar Mσ : Subgroup G} [(Q0.subgroupOf Q).Normal]
+    (hKstar : Kstar = Mσ ⊓ Subgroup.centralizer (K : Set G))
+    (hQMσ : Q ≤ Mσ) (hKstarQ : Kstar ≤ Q) (hQ0Q : Q0 ≤ Q)
+    (hKQ : K ≤ Subgroup.normalizer (Q : Set G))
+    (hQQ0 : Q ≤ Subgroup.normalizer (Q0 : Set G))
+    (hKQ0 : K ≤ Subgroup.normalizer (Q0 : Set G))
+    (hcop : Nat.Coprime (Nat.card ↥K) (Nat.card ↥Q))
+    (hSolv : IsSolvable ↥K ∨ IsSolvable ↥Q) :
+    ∀ x ∈ Q, ((∀ k ∈ K, ⁅k, x⁆ ∈ Q0) ↔ x ∈ Kstar ⊔ Q0) := by
+  classical
+  set φ : ↥K →* MulAut ↥Q :=
+    (Subgroup.normalizerMonoidHom Q).comp (Subgroup.inclusion hKQ) with hφ
+  have hfixmap : (Subgroup.fixedPointsOfMulAut φ).map Q.subtype = Kstar := by
+    rw [OddOrder.BG.Ch1.S06.fixedPointsOfMulAut_conj_map_subtype hKQ]
+    apply le_antisymm
+    · rw [hKstar]; exact le_inf (inf_le_right.trans hQMσ) inf_le_left
+    · rw [hKstar] at hKstarQ ⊢; exact le_inf inf_le_right hKstarQ
+  have hMinv : OddOrder.Isaacs.Ch03.IsAInvariant φ (Q0.subgroupOf Q) := by
+    rw [OddOrder.Isaacs.Ch03.isAInvariant_iff_smul_mem]
+    intro a y hy
+    rw [Subgroup.mem_subgroupOf] at hy ⊢
+    show (a : G) * (y : G) * (a : G)⁻¹ ∈ Q0
+    exact (Subgroup.mem_normalizer_iff.mp (hKQ0 a.2) (y : G)).mp hy
+  have hsmul_iff : ∀ (a : ↥K) (x : ↥Q),
+      ((quotientMulAutHom hMinv a (QuotientGroup.mk' (Q0.subgroupOf Q) x)
+          = QuotientGroup.mk' (Q0.subgroupOf Q) x)) ↔ ⁅(a : G), (x : G)⁆ ∈ Q0 := by
+    intro a x
+    rw [quotientMulAutHom_apply_mk', QuotientGroup.mk'_apply, QuotientGroup.mk'_apply,
+      QuotientGroup.eq, Subgroup.mem_subgroupOf, Subgroup.coe_mul, Subgroup.coe_inv]
+    show ((a : G) * (x : G) * (a : G)⁻¹)⁻¹ * (x : G) ∈ Q0 ↔ ⁅(a : G), (x : G)⁆ ∈ Q0
+    have hxN : (x : G) ∈ Subgroup.normalizer (Q0 : Set G) := hQQ0 x.2
+    have heq : ((a : G) * (x : G) * (a : G)⁻¹)⁻¹ * (x : G)
+        = (x : G)⁻¹ * ⁅(a : G), (x : G)⁆⁻¹ * ((x : G)⁻¹)⁻¹ := by
+      rw [commutatorElement_def]; group
+    rw [heq]
+    have htransfer : ((x : G)⁻¹ * ⁅(a : G), (x : G)⁆⁻¹ * ((x : G)⁻¹)⁻¹ ∈ Q0)
+        ↔ ⁅(a : G), (x : G)⁆⁻¹ ∈ Q0 :=
+      (Subgroup.mem_normalizer_iff.mp ((Subgroup.normalizer (Q0 : Set G)).inv_mem hxN)
+        (⁅(a : G), (x : G)⁆⁻¹)).symm
+    rw [htransfer, Subgroup.inv_mem_iff]
+  have hmap := OddOrder.BG.Ch1.S03h.fixedPointsOfMulAut_quotientMulAutHom_eq_map
+    (φ := φ) hcop hSolv hMinv
+  have hpreimage : (Subgroup.fixedPointsOfMulAut φ ⊔ Q0.subgroupOf Q).map Q.subtype
+      = Kstar ⊔ Q0 := by
+    rw [Subgroup.map_sup, hfixmap, Subgroup.map_subgroupOf_eq_of_le hQ0Q]
+  intro x hxQ
+  have hcomapeq : (Subgroup.fixedPointsOfMulAut (quotientMulAutHom hMinv)).comap
+        (QuotientGroup.mk' (Q0.subgroupOf Q))
+      = Subgroup.fixedPointsOfMulAut φ ⊔ Q0.subgroupOf Q := by
+    rw [hmap, Subgroup.comap_map_eq, QuotientGroup.ker_mk']
+  have hkey : (∀ k ∈ K, ⁅k, x⁆ ∈ Q0) ↔ (⟨x, hxQ⟩ : ↥Q) ∈
+      (Subgroup.fixedPointsOfMulAut φ ⊔ Q0.subgroupOf Q) := by
+    rw [← hcomapeq, Subgroup.mem_comap, Subgroup.mem_fixedPointsOfMulAut]
+    constructor
+    · intro h r
+      rcases r with ⟨k, hk⟩
+      exact (hsmul_iff ⟨k, hk⟩ ⟨x, hxQ⟩).mpr (h k hk)
+    · intro h k hk
+      exact (hsmul_iff ⟨k, hk⟩ ⟨x, hxQ⟩).mp (h ⟨k, hk⟩)
+  rw [hkey]
+  constructor
+  · intro hx
+    have : x ∈ (Subgroup.fixedPointsOfMulAut φ ⊔ Q0.subgroupOf Q).map Q.subtype :=
+      ⟨⟨x, hxQ⟩, hx, rfl⟩
+    rwa [hpreimage] at this
+  · intro hx
+    have hx' : x ∈ (Subgroup.fixedPointsOfMulAut φ ⊔ Q0.subgroupOf Q).map Q.subtype := by
+      rwa [hpreimage]
+    obtain ⟨z, hz, hzeq⟩ := hx'
+    have : z = ⟨x, hxQ⟩ := Subtype.ext hzeq
+    rwa [this] at hz
+
 /-- **Theorem 15.2(f) — the chief-factor `C`-interface `|C_{Q̄}(K)| = q`, gated producer** (mmd
 L4196, BG Theorem 14.7(f)).  Discharges the `hCfix`/`hCcard` hypotheses of
 `chiefFactor_card_and_commutator_of_inputs` by exhibiting the subgroup `C = K* ⊔ Q₀` of `Q` whose
@@ -5251,76 +5338,8 @@ theorem card_centralizer_quotient_eq_of_kstar [Finite G]
       (∀ x ∈ Q, ((∀ k ∈ K, ⁅k, x⁆ ∈ Q0) ↔ x ∈ C)) ∧
       (Q0.subgroupOf C).index = q := by
   classical
-  -- `C_Q(K) = K*` (push-forward of conjugation-fixed points; brick: `Q ≤ M_σ`, `K* ≤ Q`).
-  set φ : ↥K →* MulAut ↥Q :=
-    (Subgroup.normalizerMonoidHom Q).comp (Subgroup.inclusion hKQ) with hφ
-  have hfixmap : (Subgroup.fixedPointsOfMulAut φ).map Q.subtype = Kstar := by
-    rw [OddOrder.BG.Ch1.S06.fixedPointsOfMulAut_conj_map_subtype hKQ]
-    -- `C_G(K) ⊓ Q = M_σ ⊓ C_G(K) = K*`, using `Q ≤ M_σ` and `K* ≤ Q`.
-    apply le_antisymm
-    · rw [hKstar]; exact le_inf (inf_le_right.trans hQMσ) inf_le_left
-    · rw [hKstar] at hKstarQ ⊢; exact le_inf inf_le_right hKstarQ
-  -- `Q₀.subgroupOf Q` is `K`-invariant (each `k ∈ K` normalizes `Q₀`).
-  have hMinv : OddOrder.Isaacs.Ch03.IsAInvariant φ (Q0.subgroupOf Q) := by
-    rw [OddOrder.Isaacs.Ch03.isAInvariant_iff_smul_mem]
-    intro a y hy
-    rw [Subgroup.mem_subgroupOf] at hy ⊢
-    show (a : G) * (y : G) * (a : G)⁻¹ ∈ Q0
-    exact (Subgroup.mem_normalizer_iff.mp (hKQ0 a.2) (y : G)).mp hy
-  -- the conjugation-fixed-class characterization on `Q̄`: `a • [x] = [x] ↔ ⁅a, x⁆ ∈ Q₀`.
-  have hsmul_iff : ∀ (a : ↥K) (x : ↥Q),
-      ((quotientMulAutHom hMinv a (QuotientGroup.mk' (Q0.subgroupOf Q) x)
-          = QuotientGroup.mk' (Q0.subgroupOf Q) x)) ↔ ⁅(a : G), (x : G)⁆ ∈ Q0 := by
-    intro a x
-    rw [quotientMulAutHom_apply_mk', QuotientGroup.mk'_apply, QuotientGroup.mk'_apply,
-      QuotientGroup.eq, Subgroup.mem_subgroupOf, Subgroup.coe_mul, Subgroup.coe_inv]
-    show ((a : G) * (x : G) * (a : G)⁻¹)⁻¹ * (x : G) ∈ Q0 ↔ ⁅(a : G), (x : G)⁆ ∈ Q0
-    have hxN : (x : G) ∈ Subgroup.normalizer (Q0 : Set G) := hQQ0 x.2
-    have heq : ((a : G) * (x : G) * (a : G)⁻¹)⁻¹ * (x : G)
-        = (x : G)⁻¹ * ⁅(a : G), (x : G)⁆⁻¹ * ((x : G)⁻¹)⁻¹ := by
-      rw [commutatorElement_def]; group
-    rw [heq]
-    have htransfer : ((x : G)⁻¹ * ⁅(a : G), (x : G)⁆⁻¹ * ((x : G)⁻¹)⁻¹ ∈ Q0)
-        ↔ ⁅(a : G), (x : G)⁆⁻¹ ∈ Q0 :=
-      (Subgroup.mem_normalizer_iff.mp ((Subgroup.normalizer (Q0 : Set G)).inv_mem hxN)
-        (⁅(a : G), (x : G)⁆⁻¹)).symm
-    rw [htransfer, Subgroup.inv_mem_iff]
-  -- Proposition 1.5(d): `C_{Q̄}(K) = (fixedPoints φ).map mk'`; its preimage in `Q` is
-  -- `fixedPoints φ ⊔ (Q₀ ↾ Q)` (`comap_map_eq`), which maps to `K* ⊔ Q₀` in `G`.
-  have hmap := OddOrder.BG.Ch1.S03h.fixedPointsOfMulAut_quotientMulAutHom_eq_map
-    (φ := φ) hcop hSolv hMinv
-  have hpreimage : (Subgroup.fixedPointsOfMulAut φ ⊔ Q0.subgroupOf Q).map Q.subtype
-      = Kstar ⊔ Q0 := by
-    rw [Subgroup.map_sup, hfixmap, Subgroup.map_subgroupOf_eq_of_le hQ0Q]
-  refine ⟨Kstar ⊔ Q0, le_sup_right, sup_le hKstarQ hQ0Q, ?_, ?_⟩
-  · -- `hCfix`: for `x ∈ Q`, `[x]` is `K`-fixed iff `x ∈ K* ⊔ Q₀`.
-    intro x hxQ
-    -- the preimage in `Q` of `C_{Q̄}(K)` is `fixedPoints φ ⊔ (Q₀ ↾ Q)`.
-    have hcomapeq : (Subgroup.fixedPointsOfMulAut (quotientMulAutHom hMinv)).comap
-          (QuotientGroup.mk' (Q0.subgroupOf Q))
-        = Subgroup.fixedPointsOfMulAut φ ⊔ Q0.subgroupOf Q := by
-      rw [hmap, Subgroup.comap_map_eq, QuotientGroup.ker_mk']
-    have hkey : (∀ k ∈ K, ⁅k, x⁆ ∈ Q0) ↔ (⟨x, hxQ⟩ : ↥Q) ∈
-        (Subgroup.fixedPointsOfMulAut φ ⊔ Q0.subgroupOf Q) := by
-      rw [← hcomapeq, Subgroup.mem_comap, Subgroup.mem_fixedPointsOfMulAut]
-      constructor
-      · intro h r
-        rcases r with ⟨k, hk⟩
-        exact (hsmul_iff ⟨k, hk⟩ ⟨x, hxQ⟩).mpr (h k hk)
-      · intro h k hk
-        exact (hsmul_iff ⟨k, hk⟩ ⟨x, hxQ⟩).mp (h ⟨k, hk⟩)
-    rw [hkey]
-    constructor
-    · intro hx
-      have : x ∈ (Subgroup.fixedPointsOfMulAut φ ⊔ Q0.subgroupOf Q).map Q.subtype :=
-        ⟨⟨x, hxQ⟩, hx, rfl⟩
-      rwa [hpreimage] at this
-    · intro hx
-      have hx' : x ∈ (Subgroup.fixedPointsOfMulAut φ ⊔ Q0.subgroupOf Q).map Q.subtype := by
-        rwa [hpreimage]
-      obtain ⟨z, hz, hzeq⟩ := hx'
-      have : z = ⟨x, hxQ⟩ := Subtype.ext hzeq
-      rwa [this] at hz
+  refine ⟨Kstar ⊔ Q0, le_sup_right, sup_le hKstarQ hQ0Q,
+    centralizes_quotient_iff_mem_kstar_sup hKstar hQMσ hKstarQ hQ0Q hKQ hQQ0 hKQ0 hcop hSolv, ?_⟩
   · -- `hCcard`: `[K* ⊔ Q₀ : Q₀] = |K*| = q` via `|K* ⊔ Q₀| = |K*|·|Q₀|` and `card_mul_index`.
     haveI hprime : Fact (Nat.card ↥Kstar).Prime := ⟨hKstar_prime ▸ Fact.out⟩
     -- `K* ⊓ Q₀ = ⊥`: `Q₀ ↾ K*` is `⊥` or `⊤`; `⊤` forces `K* ≤ Q₀`, against `hKstarQ0`.
@@ -5341,6 +5360,74 @@ theorem card_centralizer_quotient_eq_of_kstar [Finite G]
     -- `hmul : |Q₀| * index = |Q₀| * q`; cancel `|Q₀| > 0`.
     have hQ0pos : 0 < Nat.card ↥Q0 := Nat.card_pos
     exact Nat.eq_of_mul_eq_mul_left hQ0pos hmul
+
+open scoped commutatorElement in
+/-- **Theorem 15.2(f) — `K` acts in a prime manner on the chief factor `Q̄ = Q/Q₀`** (mmd L4196,
+the chief-factor engine's `hcond3`).  For a coprime `K`-action on the `q`-group `Q` with the
+prime-manner action `C_{M_σ}(x) = K*` (∀ `x ∈ K#`, Proposition 14.2(a), `hprime`), every nontrivial
+`x ∈ K` and `y ∈ Q` satisfy
+`⁅x, y⁆ ∈ Q₀ ↔ ∀ s ∈ K, ⁅s, y⁆ ∈ Q₀` (i.e. `C_{Q̄}(x) = C_{Q̄}(K)`).
+
+Proof: both `C_{Q̄}(x)` and `C_{Q̄}(K)` equal the image of `K* ⊔ Q₀`
+(`centralizes_quotient_iff_mem_kstar_sup`, applied to `K` and to `⟨x⟩`, whose
+`K* = M_σ ⊓ C_G(⟨x⟩) = M_σ ⊓ C_G(x)` coincides by the prime-manner action).  The bridge
+`⁅x, y⁆ ∈ Q₀ → ∀ k ∈ ⟨x⟩, ⁅k, y⁆ ∈ Q₀` uses that `{g ∈ N_G(Q₀) | ⁅g, y⁆ ∈ Q₀}` is a subgroup
+containing `x` (the standard `⁅g g', y⁆ = g ⁅g', y⁆ g⁻¹ · ⁅g, y⁆` closure), hence `⟨x⟩`.
+
+Discharges the `hcond3` named hypothesis of `chiefFactor_card_and_commutator_of_inputs` — the only
+one of its inputs without a producer. -/
+theorem actsPrimeManner_quotient_of_inputs [Finite G]
+    {Q Q0 K Kstar Mσ : Subgroup G} [(Q0.subgroupOf Q).Normal]
+    (hKstar : Kstar = Mσ ⊓ Subgroup.centralizer (K : Set G))
+    (hprime : ∀ x ∈ K, x ≠ 1 → Subgroup.centralizer ({x} : Set G) ⊓ Mσ = Kstar)
+    (hQMσ : Q ≤ Mσ) (hKstarQ : Kstar ≤ Q) (hQ0Q : Q0 ≤ Q)
+    (hKQ : K ≤ Subgroup.normalizer (Q : Set G))
+    (hQQ0 : Q ≤ Subgroup.normalizer (Q0 : Set G))
+    (hKQ0 : K ≤ Subgroup.normalizer (Q0 : Set G))
+    (hcop : Nat.Coprime (Nat.card ↥K) (Nat.card ↥Q))
+    (hSolv : IsSolvable ↥K ∨ IsSolvable ↥Q) :
+    ∀ x ∈ K, x ≠ 1 → ∀ y ∈ Q, (⁅x, y⁆ ∈ Q0 ↔ ∀ s ∈ K, ⁅s, y⁆ ∈ Q0) := by
+  classical
+  have hCfixK := centralizes_quotient_iff_mem_kstar_sup hKstar hQMσ hKstarQ hQ0Q hKQ hQQ0 hKQ0
+    hcop hSolv
+  intro x hxK hx1 y hyQ
+  have hxN0 : x ∈ Subgroup.normalizer (Q0 : Set G) := hKQ0 hxK
+  have hxzK : Subgroup.zpowers x ≤ K := Subgroup.zpowers_le.mpr hxK
+  -- `C_G(⟨x⟩) = C_G(x)`, so the `⟨x⟩`-version's `K*` is the same `Kstar`.
+  have hcentEq : Subgroup.centralizer ((Subgroup.zpowers x : Subgroup G) : Set G)
+      = Subgroup.centralizer ({x} : Set G) := by
+    apply le_antisymm
+    · exact Subgroup.centralizer_le (Set.singleton_subset_iff.mpr (Subgroup.mem_zpowers x))
+    · intro g hg
+      rw [Subgroup.mem_centralizer_iff] at hg ⊢
+      intro k hk
+      obtain ⟨n, rfl⟩ := Subgroup.mem_zpowers_iff.mp hk
+      exact (Commute.zpow_left (hg x (Set.mem_singleton x)) n)
+  have hKstarX : Kstar = Mσ ⊓ Subgroup.centralizer ((Subgroup.zpowers x : Subgroup G) : Set G) := by
+    rw [hcentEq, inf_comm]; exact (hprime x hxK hx1).symm
+  haveI : IsSolvable ↥(Subgroup.zpowers x) := inferInstance
+  have hCfixX := centralizes_quotient_iff_mem_kstar_sup hKstarX hQMσ hKstarQ hQ0Q
+    (hxzK.trans hKQ) hQQ0 (hxzK.trans hKQ0)
+    (hcop.coprime_dvd_left (Subgroup.card_dvd_of_le hxzK)) (Or.inl inferInstance)
+  refine ⟨fun hxy => (hCfixK y hyQ).mpr ((hCfixX y hyQ).mp ?_), fun h => h x hxK⟩
+  -- bridge: `{g ∈ N_G(Q₀) | ⁅g, y⁆ ∈ Q₀}` is a subgroup containing `x`, hence `⟨x⟩`.
+  let T : Subgroup G :=
+    { carrier := {g | g ∈ Subgroup.normalizer (Q0 : Set G) ∧ ⁅g, y⁆ ∈ Q0}
+      one_mem' := ⟨(Subgroup.normalizer (Q0 : Set G)).one_mem, by
+        rw [commutatorElement_one_left]; exact Q0.one_mem⟩
+      mul_mem' := fun {a b} ha hb => ⟨(Subgroup.normalizer (Q0 : Set G)).mul_mem ha.1 hb.1, by
+        have heq : ⁅a * b, y⁆ = (a * ⁅b, y⁆ * a⁻¹) * ⁅a, y⁆ := by
+          rw [commutatorElement_def, commutatorElement_def, commutatorElement_def]; group
+        rw [heq]
+        exact Q0.mul_mem ((Subgroup.mem_normalizer_iff.mp ha.1 ⁅b, y⁆).mp hb.2) ha.2⟩
+      inv_mem' := fun {a} ha => ⟨(Subgroup.normalizer (Q0 : Set G)).inv_mem ha.1, by
+        have heq : ⁅a⁻¹, y⁆ = a⁻¹ * ⁅a, y⁆⁻¹ * (a⁻¹)⁻¹ := by
+          rw [commutatorElement_def, commutatorElement_def]; group
+        rw [heq]
+        exact (Subgroup.mem_normalizer_iff.mp ((Subgroup.normalizer (Q0 : Set G)).inv_mem ha.1)
+          ⁅a, y⁆⁻¹).mp (Q0.inv_mem ha.2)⟩ }
+  have hxT : x ∈ T := ⟨hxN0, hxy⟩
+  exact fun k hk => ((Subgroup.zpowers_le.mpr hxT) hk).2
 
 /-- **§14-independent `⊆`-half of Theorem 15.2(g)** (mmd L4198, the easy inclusion of
 `F(M) = Q ⊔ (C_G(Q) ⊓ M)`): the nilpotent `F(M)` splits as `O_π(F(M)) ⊔ O_{π'}(F(M))`
@@ -5665,6 +5752,98 @@ theorem isFrobeniusGroup_DK_of_primeManner
     have hnQ : (n : G) ∈ Q := hKstarQ hnKstar
     exact hnG (Subgroup.disjoint_def.mp hDQ hn hnQ)
 
+/-- **BG Theorem 15.2 step 3-4, the chief-factor engine wiring** (mmd L4194-4196): given the
+type-`P₁` data with `Q = O_q(M)`, the `K`-invariant complement `D` of `Q` in `M_σ`, and the
+*output of `chiefFactor_Q0_normal_minimal_of_inputs`* (the normal `Q₀ = C_Q(D) ⊴ M`, `¬ K* ≤ Q₀`,
+`Q₀ < Q`, and the lattice-minimality), it runs Theorem 3.10 on the Frobenius group `KD` and yields
+the chief-factor index `[Q : Q₀] = q^{|K|}` with `|K|` prime, the commutator constraint
+`D' ⊆ C_D(Q̄)`, and the elementary abelian section `Q̄ = Q/Q₀`.
+
+Chains the chief-factor producers: `isElementaryAbelian_chiefFactor_of_minimalNormal`
+(`hEA`/`hNT`), `card_centralizer_quotient_eq_of_kstar` (`hCfix`/`hCcard`),
+`isFrobeniusGroup_DK_of_primeManner` (`hfrob`), `mem_centralizer_of_centralizes_quotient`
+(`hFPF`), `actsPrimeManner_quotient_of_inputs` (`hcond3`), and the Theorem 3.10 engine
+`chiefFactor_card_and_commutator_of_inputs`.  The coprimality `gcd(|D ⊔ K|, |Q|) = 1` uses
+`|D ⊔ K| = |K|·|D|` (the Frobenius semidirect structure). -/
+theorem chiefFactor_engine_of_inputs [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M K Kstar Q D Q0 : Subgroup G} {q : ℕ} [Fact q.Prime]
+    [(Q0.subgroupOf Q).Normal]
+    (hM : M ∈ maximalSubgroups G) (hP1 : S14.IsTypeP1 M) (hKM : K ≤ M)
+    (hK : Ch03.IsHallSubgroup (S14.kappa M) (K.subgroupOf M))
+    (hKstar : Kstar = OddOrder.BG.Ch3.S10.Msigma M ⊓ Subgroup.centralizer (K : Set G))
+    (hQ : Q = opiCoreInG ({q} : Set ℕ) M)
+    (hQMσ : Q ≤ OddOrder.BG.Ch3.S10.Msigma M) (hMnormQ : M ≤ Subgroup.normalizer (Q : Set G))
+    (hKstarQ : Kstar ≤ Q) (hKne : K ≠ ⊥)
+    (hKMσdisj : Disjoint K (OddOrder.BG.Ch3.S10.Msigma M))
+    (hcop : Nat.Coprime (Nat.card ↥K) (Nat.card ↥(OddOrder.BG.Ch3.S10.Msigma M)))
+    (hDq' : q ∉ (Nat.card ↥D).primeFactors)
+    (hDMσ : D ≤ OddOrder.BG.Ch3.S10.Msigma M) (hKnormD : K ≤ Subgroup.normalizer (D : Set G))
+    (hQDdisj : Disjoint Q D) (hDne : D ≠ ⊥)
+    (hQ0def : Q0 = Q ⊓ Subgroup.centralizer (D : Set G))
+    (hMNQ0 : M ≤ Subgroup.normalizer (Q0 : Set G)) (hKstarNotQ0 : ¬ Kstar ≤ Q0)
+    (hQ0ltQ : Q0 < Q)
+    (hmin : ∀ H : Subgroup G, Q0 < H → H ≤ Q → (H.subgroupOf M).Normal → Q ≤ H) :
+    (Nat.card ↥K).Prime ∧
+      (Q0.subgroupOf Q).index = q ^ Nat.card ↥K ∧
+      (∀ g ∈ ⁅D, D⁆, ∀ x ∈ Q, ⁅g, x⁆ ∈ Q0) ∧
+      OddOrder.GroupTheory.IsElementaryAbelian q (↥Q ⧸ Q0.subgroupOf Q) := by
+  classical
+  have hMσM : OddOrder.BG.Ch3.S10.Msigma M ≤ M := OddOrder.BG.Ch3.S10.Msigma_le M
+  have hQM : Q ≤ M := hQMσ.trans hMσM
+  have hDM : D ≤ M := hDMσ.trans hMσM
+  haveI : IsSolvable ↥M := hG.solvable_of_mem_maximalSubgroups hM
+  have hQpg : IsPGroup q ↥Q := by rw [hQ]; exact isPGroup_opiCoreInG_singleton M
+  have hQ0Q : Q0 ≤ Q := hQ0ltQ.le
+  have hKQ : K ≤ Subgroup.normalizer (Q : Set G) := hKM.trans hMnormQ
+  have hDNQ : D ≤ Subgroup.normalizer (Q : Set G) := hDM.trans hMnormQ
+  have hQQ0 : Q ≤ Subgroup.normalizer (Q0 : Set G) := hQM.trans hMNQ0
+  have hKQ0 : K ≤ Subgroup.normalizer (Q0 : Set G) := hKM.trans hMNQ0
+  have hDNQ0 : D ≤ Subgroup.normalizer (Q0 : Set G) := hDM.trans hMNQ0
+  have hKstarN : Kstar ≤ Subgroup.normalizer (Q0 : Set G) := hKstarQ.trans hQQ0
+  have hSolvQ : IsSolvable ↥Q := solvable_of_solvable_injective (Subgroup.inclusion_injective hQM)
+  have hsolvDK : IsSolvable ↥(D ⊔ K) :=
+    solvable_of_solvable_injective (Subgroup.inclusion_injective (sup_le hDM hKM))
+  have hKstarP : (Nat.card ↥Kstar).Prime := kstar_card_prime_of_inputs hG hM hP1 hKM hK hKstar
+  have hKstarEqQ : Nat.card ↥Kstar = q := by
+    obtain ⟨n, hn⟩ := hQpg.exists_card_eq
+    have hdvd : Nat.card ↥Kstar ∣ Nat.card ↥Q := Subgroup.card_dvd_of_le hKstarQ
+    rw [hn] at hdvd
+    exact (Nat.prime_dvd_prime_iff_eq hKstarP Fact.out).mp (hKstarP.dvd_of_dvd_pow hdvd)
+  have hqD : ¬ q ∣ Nat.card ↥D := fun hdvd =>
+    hDq' (Nat.mem_primeFactors.mpr ⟨Fact.out, hdvd, Nat.card_pos.ne'⟩)
+  have hcopDQ : Nat.Coprime (Nat.card ↥D) (Nat.card ↥Q) := by
+    obtain ⟨n, hn⟩ := hQpg.exists_card_eq
+    rw [hn]
+    rcases Nat.eq_zero_or_pos n with h0 | h0
+    · subst h0; simpa using Nat.coprime_one_right _
+    · rw [Nat.coprime_pow_right_iff h0]
+      exact ((Fact.out : q.Prime).coprime_iff_not_dvd.mpr hqD).symm
+  have hcopKQ : Nat.Coprime (Nat.card ↥K) (Nat.card ↥Q) :=
+    hcop.coprime_dvd_right (Subgroup.card_dvd_of_le hQMσ)
+  have hDKdisj : Disjoint D K := hKMσdisj.symm.mono_left hDMσ
+  have hcopDKQ : Nat.Coprime (Nat.card ↥(D ⊔ K)) (Nat.card ↥Q) := by
+    have hcardsup : Nat.card ↥(D ⊔ K) = Nat.card ↥K * Nat.card ↥D := by
+      rw [sup_comm]
+      exact card_sup_eq_mul_of_le_normalizer_of_disjoint hKnormD (disjoint_iff.mp hDKdisj.symm)
+    rw [hcardsup]; exact Nat.coprime_mul_iff_left.mpr ⟨hcopKQ, hcopDQ⟩
+  have hprime := actsPrimeManner_of_typeP hG hM hP1.1 hKM hK hKstar
+  obtain ⟨hEA, hNT⟩ :=
+    isElementaryAbelian_chiefFactor_of_minimalNormal hQ0ltQ hQM hQpg hMnormQ hMNQ0 hmin
+  obtain ⟨C, hQ0C, hCQ, hCfix, hCcard⟩ :=
+    card_centralizer_quotient_eq_of_kstar hKstar hQMσ hKstarQ hKstarEqQ hQ0Q hKstarNotQ0 hKQ hQQ0
+      hKQ0 hKstarN hcopKQ (Or.inr hSolvQ)
+  have hfrob := isFrobeniusGroup_DK_of_primeManner (M := M) hprime hDMσ hKstarQ hQDdisj.symm hKnormD
+    hDKdisj hDne hKne
+  have hFPF : ∀ x ∈ Q, (∀ d ∈ D, ⁅d, x⁆ ∈ Q0) → x ∈ Q0 :=
+    fun x hxQ hfix => mem_centralizer_of_centralizes_quotient hQ0def hDNQ hQQ0 hDNQ0 hcopDQ
+      (Or.inr hSolvQ) hxQ hfix
+  have hcond3 := actsPrimeManner_quotient_of_inputs hKstar hprime hQMσ hKstarQ hQ0Q hKQ hQQ0 hKQ0
+    hcopKQ (Or.inr hSolvQ)
+  obtain ⟨hKprime, hindex, hDcomm⟩ :=
+    chiefFactor_card_and_commutator_of_inputs hQ0Q hQ0C hCQ hDne hEA hNT hDNQ hKQ hDNQ0 hKQ0 hQQ0
+      hsolvDK hfrob hcopDKQ hFPF hcond3 hCfix hCcard
+  exact ⟨hKprime, hindex, hDcomm, hEA⟩
+
 /-- **Theorem 15.2(g) reverse inclusion, reduced to `C_M(Q) ⊆ M_σ`** (mmd L4196-4198): if the
 centralizer `C_M(Q)` of the normal `q`-subgroup `Q` lies in `M_σ` (the genuinely BG-specific input,
 from `σ`-uniqueness — it does *not* follow from local structure, cf. the ChatGPT-verified counter-
@@ -5730,7 +5909,8 @@ condition forces `C_D(K) = C_G(K) ⊓ D = ⊥` (a nontrivial `d ∈ D` centraliz
 would be fixed by conjugation, contradicting `conj_frobenius`), so the decomposition collapses to
 `D = ⁅D, K⁆`. -/
 theorem commutator_eq_self_of_frobenius_DK [Finite G] {D K : Subgroup G}
-    (hfrob : OddOrder.Isaacs.Ch06.IsFrobeniusGroup G D K)
+    (hKne : K ≠ ⊥)
+    (hFrobFPF : ∀ a ∈ K, a ≠ 1 → ∀ n ∈ D, n ≠ 1 → a * n * a⁻¹ ≠ n)
     (hKnormD : K ≤ Subgroup.normalizer (D : Set G))
     (hcop : Nat.Coprime (Nat.card ↥K) (Nat.card ↥D))
     (hSolv : IsSolvable ↥K ∨ IsSolvable ↥D) :
@@ -5744,12 +5924,12 @@ theorem commutator_eq_self_of_frobenius_DK [Finite G] {D K : Subgroup G}
     by_contra hdne
     rw [Subgroup.mem_bot] at hdne
     -- Pick a nontrivial `k ∈ K`.
-    haveI : Nontrivial ↥K := (Subgroup.nontrivial_iff_ne_bot K).mpr hfrob.ne_bot_complement
+    haveI : Nontrivial ↥K := (Subgroup.nontrivial_iff_ne_bot K).mpr hKne
     obtain ⟨k, hkK, hkne⟩ := (Subgroup.nontrivial_iff_exists_ne_one K).mp inferInstance
     -- `k` and `d` commute (from `d ∈ C_G(K)`), so `k * d * k⁻¹ = d`, contradicting Frobenius.
     have hcomm : k * d = d * k := (Subgroup.mem_centralizer_iff.mp hdcent) k hkK
     have hfix : k * d * k⁻¹ = d := by rw [hcomm]; group
-    exact hfrob.conj_frobenius k hkK hkne d hdD hdne hfix
+    exact hFrobFPF k hkK hkne d hdD hdne hfix
   -- Proposition 1.6(d): `D = (C_G(K) ⊓ D) ⊔ ⁅D, K⁆`.
   have hdecomp := OddOrder.BG.Ch3.S13.subgroup_coprime_decomposition hKnormD hcop hSolv
   rw [hCDK, bot_sup_eq] at hdecomp
@@ -5773,7 +5953,8 @@ theorem D_centralizes_Q_of_narrow [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOd
     {Q D K : Subgroup G} {q : ℕ} [Fact q.Prime]
     (hq_odd : Odd q) (hQpg : IsPGroup q ↥Q) (hQnarrow : OddOrder.GroupTheory.IsNarrow q ↥Q)
     (hQne : Q ≠ ⊥)
-    (hfrob : OddOrder.Isaacs.Ch06.IsFrobeniusGroup G D K)
+    (hKne : K ≠ ⊥)
+    (hFrobFPF : ∀ a ∈ K, a ≠ 1 → ∀ n ∈ D, n ≠ 1 → a * n * a⁻¹ ≠ n)
     (hKnormD : K ≤ Subgroup.normalizer (D : Set G))
     (hcop : Nat.Coprime (Nat.card ↥K) (Nat.card ↥D))
     (hKsolv : IsSolvable ↥K)
@@ -5818,7 +5999,7 @@ theorem D_centralizes_Q_of_narrow [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOd
   -- `D ⊔ K ≤ N`, so `D ≤ N`; and `D = ⁅D, K⁆ ≤ N'`.
   have hDN : (D : Subgroup G) ≤ N := le_sup_left.trans hDKN
   have hDcommDK : ⁅D, K⁆ = D :=
-    commutator_eq_self_of_frobenius_DK hfrob hKnormD hcop (Or.inl hKsolv)
+    commutator_eq_self_of_frobenius_DK hKne hFrobFPF hKnormD hcop (Or.inl hKsolv)
   have hDcomm : (D : Subgroup G).subgroupOf N ≤ _root_.commutator ↥N := by
     have hDder : (D : Subgroup G) ≤ derivedInG N := by
       rw [← hDcommDK]
@@ -5877,7 +6058,8 @@ theorem D_centralizes_Q_of_not_mem_beta [Finite G] (hG : OddOrder.BG.IsMinimalSi
     (hq_odd : Odd q) (hQpg : IsPGroup q ↥Q) (hQne : Q ≠ ⊥)
     (hqπ : q ∈ (Nat.card ↥M).primeFactors)
     (P : Sylow q ↥M) (hQP : Q = (P : Subgroup ↥M).map M.subtype)
-    (hfrob : OddOrder.Isaacs.Ch06.IsFrobeniusGroup G D K)
+    (hKne : K ≠ ⊥)
+    (hFrobFPF : ∀ a ∈ K, a ≠ 1 → ∀ n ∈ D, n ≠ 1 → a * n * a⁻¹ ≠ n)
     (hKnormD : K ≤ Subgroup.normalizer (D : Set G))
     (hcop : Nat.Coprime (Nat.card ↥K) (Nat.card ↥D))
     (hKsolv : IsSolvable ↥K)
@@ -5893,7 +6075,8 @@ theorem D_centralizes_Q_of_not_mem_beta [Finite G] (hG : OddOrder.BG.IsMinimalSi
       (Subgroup.equivMapOfInjective _ M.subtype M.subtype_injective).symm
   have hQnarrow : OddOrder.GroupTheory.IsNarrow q ↥Q :=
     OddOrder.GroupTheory.IsNarrow.of_mulEquiv eQP.symm hPnarrow
-  exact D_centralizes_Q_of_narrow hG hq_odd hQpg hQnarrow hQne hfrob hKnormD hcop hKsolv hDKN hqD
+  exact D_centralizes_Q_of_narrow hG hq_odd hQpg hQnarrow hQne hKne hFrobFPF hKnormD hcop hKsolv
+    hDKN hqD
 
 /-- **Theorem 15.2 step 5 — `q ∈ β(M)`, gated-endpoint skeleton** (mmd L4202): "if `q ∉ β(M)`,
 then Theorem 5.5(a) shows `(DK)' = D` centralizes `Q`, a contradiction".  The contradiction is
