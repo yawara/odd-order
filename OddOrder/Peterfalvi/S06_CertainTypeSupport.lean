@@ -38,12 +38,58 @@ variable {G : Type*} [Group G] [Fintype G]
 variable {A : Set G} {L : Subgroup G} [Fintype ↥L]
 variable [Invertible (Nat.card G : ℂ)] [Invertible (Nat.card ↥L : ℂ)]
 
+/-- **Peterfalvi (4.7)**, core support statement, *structural form*.  This is the (4.7) core depending
+only on the (4.6.c)/(4.6.d) data — a normal `subH ≤ K` and the covering condition `A_covers` — and
+**not** on the Dade isometry (`dade0`/`tau`) of `Hypothesis46`.  It therefore applies in any setting
+that supplies these structural data (e.g. the §10 type-`P` setting, via `K = M'`, `subH = M_F`, and
+`A = A(M)`), without constructing the enlarged-support Dade datum.
+
+If `χ ∈ Irr(K)` satisfies `subH ⊄ Ker χ`, then every nonidentity `g ∈ K` with `χ(g) ≠ 0` maps into
+`A` (i.e. `Supp χ ⊆ A ∪ {1}`). -/
+theorem mem_A_of_apply_ne_zero_of_covers
+    (K : Subgroup ↥L) (subH : Subgroup ↥L) (subH_normal : subH.Normal)
+    (A_covers : ∀ (hh : ↥L), hh ∈ subH → hh ≠ 1 →
+      ∀ (x : ↥L), x ∈ Subgroup.centralizer ({hh} : Set ↥L) ⊓ K → x ≠ 1 → (L.subtype x) ∈ A)
+    (χ : IrreducibleCharacter ↥K)
+    (hker : ¬ ((subH.subgroupOf K : Set ↥K) ⊆ S03.characterKernel (χ : ClassFunction ↥K ℂ)))
+    {g : ↥K}
+    (hg1 : L.subtype (K.subtype g) ≠ 1)
+    (hval : (χ : ClassFunction ↥K ℂ) g ≠ 0) :
+    L.subtype (K.subtype g) ∈ A := by
+  classical
+  -- `subH` is normal in `K` (a normal subgroup of `L` contained in `K`).
+  haveI hHK_normal : (subH.subgroupOf K).Normal := subH_normal.subgroupOf K
+  -- (1.2) contrapositive: `χ(g) ≠ 0 ⟹ C_subH(g) ≠ 1`.
+  have hCne : S03.centralizerInSubgroup (subH.subgroupOf K) g ≠ ⊥ := fun hbot =>
+    hval (S03.irreducibleCharacter_apply_eq_zero_of_centralizerInSubgroup_eq_bot χ hker hbot)
+  -- extract a nontrivial `c ∈ subH ∩ C_K(g)`.
+  obtain ⟨c, hc_mem, hc_ne⟩ := (Subgroup.bot_or_exists_ne_one _).resolve_left hCne
+  rw [S03.mem_centralizerInSubgroup] at hc_mem
+  obtain ⟨hc_H, hc_comm⟩ := hc_mem
+  -- the images of `c` and `g` in `L`.
+  set cL : ↥L := K.subtype c with hcL
+  set gL : ↥L := K.subtype g with hgL
+  have hcL_subH : cL ∈ subH := (Subgroup.mem_subgroupOf).mp hc_H
+  have hcL_ne : cL ≠ 1 := fun he =>
+    hc_ne (K.subtype_injective (he.trans (map_one K.subtype).symm))
+  have hgL_K : gL ∈ K := g.2
+  have hgL_ne : gL ≠ 1 := fun he => hg1 (by rw [he]; exact map_one L.subtype)
+  -- `cL` and `gL` commute (image under the monoid hom `K.subtype` of `c * g = g * c`).
+  have hcomm : cL * gL = gL * cL := by
+    have := congrArg K.subtype hc_comm
+    rwa [map_mul, map_mul] at this
+  -- apply the covering condition (4.6.d).
+  refine A_covers cL hcL_subH hcL_ne gL ?_ hgL_ne
+  exact Subgroup.mem_inf.mpr
+    ⟨Subgroup.mem_centralizer_singleton_iff.mpr hcomm.symm, hgL_K⟩
+
 /-- **Peterfalvi (4.7)**, core support statement.  Under Hypothesis (4.6), if
 `χ ∈ Irr(K)` satisfies `H ⊄ Ker χ`, then every nonidentity `g ∈ K` with `χ(g) ≠ 0`
 maps into `A` (i.e. `Supp χ ⊆ A ∪ {1}`).
 
 The hypothesis `H ⊄ Ker χ` is phrased at the class-function level as
-`¬ (H ⊆ characterKernel χ)`, matching Peterfalvi (1.2). -/
+`¬ (H ⊆ characterKernel χ)`, matching Peterfalvi (1.2).  A thin specialization of the structural
+`mem_A_of_apply_ne_zero_of_covers` to the `Hypothesis46` fields. -/
 theorem mem_A_of_apply_ne_zero_of_not_subset_characterKernel
     (h : Hypothesis46 A L)
     (χ : IrreducibleCharacter ↥h.K)
@@ -52,33 +98,8 @@ theorem mem_A_of_apply_ne_zero_of_not_subset_characterKernel
     {g : ↥h.K}
     (hg1 : L.subtype (h.K.subtype g) ≠ 1)
     (hval : (χ : ClassFunction ↥h.K ℂ) g ≠ 0) :
-    L.subtype (h.K.subtype g) ∈ A := by
-  classical
-  -- `H` is normal in `K` (a normal subgroup of `L` contained in `K`).
-  haveI hHK_normal : (h.subH.subgroupOf h.K).Normal := h.subH_normal.subgroupOf h.K
-  -- (1.2) contrapositive: `χ(g) ≠ 0 ⟹ C_H(g) ≠ 1`.
-  have hCne : S03.centralizerInSubgroup (h.subH.subgroupOf h.K) g ≠ ⊥ := fun hbot =>
-    hval (S03.irreducibleCharacter_apply_eq_zero_of_centralizerInSubgroup_eq_bot χ hker hbot)
-  -- extract a nontrivial `c ∈ H ∩ C_K(g)`.
-  obtain ⟨c, hc_mem, hc_ne⟩ := (Subgroup.bot_or_exists_ne_one _).resolve_left hCne
-  rw [S03.mem_centralizerInSubgroup] at hc_mem
-  obtain ⟨hc_H, hc_comm⟩ := hc_mem
-  -- the images of `c` and `g` in `L`.
-  set cL : ↥L := h.K.subtype c with hcL
-  set gL : ↥L := h.K.subtype g with hgL
-  have hcL_subH : cL ∈ h.subH := (Subgroup.mem_subgroupOf).mp hc_H
-  have hcL_ne : cL ≠ 1 := fun he =>
-    hc_ne (h.K.subtype_injective (he.trans (map_one h.K.subtype).symm))
-  have hgL_K : gL ∈ h.K := g.2
-  have hgL_ne : gL ≠ 1 := fun he => hg1 (by rw [he]; exact map_one L.subtype)
-  -- `cL` and `gL` commute (image under the monoid hom `K.subtype` of `c * g = g * c`).
-  have hcomm : cL * gL = gL * cL := by
-    have := congrArg h.K.subtype hc_comm
-    rwa [map_mul, map_mul] at this
-  -- apply the covering condition (4.6.d).
-  refine h.A_covers cL hcL_subH hcL_ne gL ?_ hgL_ne
-  exact Subgroup.mem_inf.mpr
-    ⟨Subgroup.mem_centralizer_singleton_iff.mpr hcomm.symm, hgL_K⟩
+    L.subtype (h.K.subtype g) ∈ A :=
+  mem_A_of_apply_ne_zero_of_covers h.K h.subH h.subH_normal h.A_covers χ hker hg1 hval
 
 /-- **Peterfalvi (4.7)**, support form (`Supp χ ⊆ A ∪ {1}`).  Under Hypothesis (4.6),
 an irreducible character `χ` of `K` with `H ⊄ Ker χ` vanishes at every `g ∈ K` whose

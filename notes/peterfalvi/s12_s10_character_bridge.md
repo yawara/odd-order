@@ -65,6 +65,34 @@ producer は実証明で組み上がった (実 sorry S12: 9→7)。方針 = [[f
   (10.5) を `alpha_support` / `alpha_tau_image` に分割し前者を close。後者 (Dade image) は dade0 待ち。
 - **∴ §10 spine: support 系は dade0-free で進める / Dade-image 系は enlarged dade0 (deep §4) + (8.8) (lane-f) 待ち**。
 
+### ★★★ 2026-06-21 cont.² 決定的発見 — (10.5)/(10.6) は deep dade0 を必要としない (Explore 検証)
+
+⚠ 上記「Dade-image 系は enlarged dade0 待ち」は **訂正**。Peterfalvi (10.5)/(10.6) 原文 + Lean §6 精査で確定:
+**(10.5)/(10.6) は §10 既存 `hyp.tau` (= Dade rel (A_0(M),M,G)、typePV-based) + 既存 `omegaSigmaGrid` (§5 σ) +
+構造的 §6 facts のみ使用、新規 W\W₂ Dade (`Hypothesis46.dade0`) 不要。** 各 cited fact の Lean level:
+- **(4.3.c)** = `certainType_apply_eq_of_mem_V` (S06_CertainTypeCharacters:878、**Hypothesis L**、dade0 不使用) ✅在庫
+- **(4.4)** = `certainType_zero_column_anchor` (S06、**Hypothesis L**) ✅在庫
+- **(4.7)** = `mem_A_of_apply_ne_zero_of_not_subset_characterKernel` (S06_CertainTypeSupport:47、Hypothesis46 だが
+  **proof は subH/subH_normal/subH_le_K/A_covers/K のみ使用、dade0/tau 不使用**)。consumer = 同一ファイル 3 箇所
+  (:100/:136) + AxiomsCheck:752 のみ。
+- **τ** = `hyp.tau` (既存 §10 Dade)、**ω^σ** = `omegaSigmaGrid` (既存 §5 bridge、typePV) ✅在庫
+- **(3.2.c)/(3.8)/(3.6)** = §3 Dade NC machinery (要確認だが §3 既存と推定)。
+
+**⟹ §10 Hypothesis46 全構築 (dade0/tau) は UNNECESSARY。** `Hypothesis46.tic_V=W\W₂` は §6 (6.8) 専用特殊化で
+§10 (typePV) には元々不適合 (cont.² で既出)。
+
+**▶ dade0-free 実装計画**:
+1. **(4.7) を structural-param 化** (decouple from `Hypothesis46`): `mem_A_of_apply_ne_zero...` を
+   (K, subH, subH_normal, A_covers) 引数版にし、既存 Hypothesis46 consumer は h.subH 等で呼ぶ (DRY)。
+2. **§10 structural (4.6.c-d) data**: subH = M_F (=maxNilpotentNormalHall M, subgroupOf M; W2≤M_F≤M'),
+   subH_normal (M_F◁M), A_covers = **typePA 定義そのもの** (C_{M'}(h)#⊆typePA ∀h∈M#)。tractable。
+3. **(10.5) `alpha_support`** (分割前半、dade0-free): structural (4.7) + (4.3.c) + (4.4) + (2.1)
+   `mem_compl_conj_into_W` で canonical α support ⊆ A_0。
+4. **(10.5) `alpha_tau_image`** (分割後半): `hyp.tau` + `omegaSigmaGrid` + (4.3.c) + (3.2.c)/(3.8)/(3.6) +
+   (5.3.b)/(5.5)。§3 NC machinery 使用、harder だが dade0-free。
+5. **(10.6)** 同様。
+→ (10.7)/(10.8) のみ (8.8)=lane-f gate 残。**§10 spine の大半は lane-b 単独で dade0-free に開通可能**。
+
 ## ★ 2026-06-21 更新 — (10.3) degree theory 完全 materialize (axiom-clean) + column-0 faithfulness 修正
 
 §6 attack-order の (b)(c) ((10.3) degree 独立性) を**両半分とも axiom-clean で形式化完了**。frontier 前進:
