@@ -60,13 +60,24 @@ deepest pole。`|C_H(UE)|^|E| · |H| = |C_H(E)|^|E| · |C_H(U)|` (Frobenius L=U�
       ⚠ naming wart: 誘導商作用は `OddOrder.Isaacs.Ch04.OddOrder.Isaacs.Ch03.IsAInvariant.quotientMulAutHom`
       (Ch04 Main で `namespace Ch04` 内に Ch03 修飾名で `def` ⟹ Ch04 prefix が付く; dot 不可)。
       clean 化は source の `_root_.` 修飾要 = spine 全 rebuild ゆえ別 issue で coordinate。
-- [ ] **chief-series telescoping**: 上記 single-step を `L`-invariant chief series で反復 →
-      `|C_H(X)| = ∏_i |C_{V_i}(X)|`。要 = 強帰納 (`Nat.card H`) で minimal `L`-invariant normal `N`
-      (el-ab) を取り、`N` に per-factor (⋆) を、`H/N` に IH を適用、X∈{UE,E,U} の single-step ×
-      `|H|=|N|·|H/N|` を掛けて (9.1) を組む。新ピース = minimal `L`-invariant normal の存在 (el-ab) +
-      `C_H(X)⊓N` ↔ `C_N(X)` の per-factor bridge card 一致。
-- [ ] **assembly** → `wielandt_fixedPoint_frobenius` sorry-free 化 (architecture: 最終 assembly は
-      `WielandtElabBridge` を要し CoprimeAction の下流ゆえ、statement+carrier の downstream 再配置が要る)。
+- [x] **subgroup-side bridge** = **DONE** (`CoprimeFixedPoints.lean`): `card_fixedSubgroup_restrict`
+      (`|C_N(X)| = |C_H(X)⊓N|`, 制限作用 `IsAInvariant.restrict`) + `fixedSubgroup_restrict_eq`。
+- [x] **induction step** = **DONE** (`CoprimeFixedPoints.lean`): `wielandt_step` — `N` の per-factor
+      恒等式 (hfac) + `H/N` の IH (hIH) ⟹ 群レベル `|C_H(UE)|^|E|·|H| = |C_H(E)|^|E|·|C_H(U)|`
+      (single-step ×3 + `|H|=|N|·|H/N|` + `wielandt_card_combine` 純算術)。
+- [x] **existence (piece A)** = **DONE** (`MinimalInvariantNormal.lean`):
+      `exists_aInvariant_normal_isElementaryAbelian` — 非自明有限可解 H に ∃ 非自明 L-不変正規 el-ab N
+      (極小元 + `commutator ↥N`/p-th-powers の char-kill)。+ helper `aInvariant_normal_map_of_characteristic`。
+- [x] **B 強帰納 wrapper** = **DONE** (`WielandtAssembly.lean`, sorry-free + axiom-clean):
+      `wielandt_formula_of_perfactor` — `WielandtPerFactor L U E` (per-factor を全 H+el-ab N で uniform 化
+      した述語) から群公式を `Nat.card H` 強帰納で。A→N 取得、`H/N` に IH、`wielandt_step` で combine。
+      型可変 recursion は `theorem ….{u}` + `WielandtPerFactor.{_,u}` + `∀ (H:Type u)` で H 宇宙統一。
+      ⟹ **群論層 (toolkit+A+step+assembly) 完全 axiom-clean**; 残りは表現論的 (†) のみ。
+- [ ] **C per-factor discharge**: universal per-factor を `card_fixedSubgroup_restrict` +
+      `card_fixedSubgroup_wielandt_of_dim` (el-ab N の hN.restrict 作用) で。(†) dim 恒等式 gate。
+- [ ] **D (†) module wiring** (lane-f coupled rep-theory)。
+- [ ] **E relocation** → `wielandt_fixedPoint_frobenius` を downstream leaf へ (CoprimeAction は
+      `WielandtElabBridge`/`CoprimeFixedPoints` を循環で import 不可)。
 - [ ] 下流 (別 issue 可): (9.3) `typeII_III_IV_order_relations` → (9.6) → (10.11)/(11.7) → (13.2.b)
       `basic_structure.P_order` / `card_Q_eq` を順に de-gate。
 

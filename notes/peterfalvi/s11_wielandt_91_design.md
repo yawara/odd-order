@@ -564,3 +564,40 @@ rebuild ゆえ別 issue で coordinate (lane-f 領域)。
    (CoprimeAction の下流) を要す ⟹ statement+carrier を downstream leaf へ再配置 + 消費側 S11/S15 の
    import 更新が要る (CoprimeAction は CoprimeFixedPoints を import 不可=循環)。B+C は CoprimeFixedPoints
    下流の新 leaf に置き、E でそこへ wielandt_fixedPoint_frobenius を移す。
+
+## 2026-06-21 (lane-h resume²cont) — 群論層 完全完成 (toolkit + A + step + assembly)
+
+**✅✅✅✅✅ (9.1) chief-series assembly の群論的層が全 axiom-clean で完成** (5 leaf-lemma, full build
+3875 green, AxiomsCheck 全登録)。`wielandt_fixedPoint_frobenius` は群論的に完全還元され、残りは
+表現論的 (†) のみ:
+
+| lemma | file | 内容 |
+|---|---|---|
+| `card_fixedSubgroup_eq_mul` | CoprimeFixedPoints | `\|C_H(X)\|=\|C_H(X)⊓N\|·\|C_{H/N}(X)\|` (商側, Cor 3.28) |
+| `card_fixedSubgroup_restrict` | CoprimeFixedPoints | `\|C_N(X)\|=\|C_H(X)⊓N\|` (部分群側, `IsAInvariant.restrict`) |
+| `wielandt_step` | CoprimeFixedPoints | per-factor + IH ⟹ 群レベル恒等式 (1 chief step) |
+| `exists_aInvariant_normal_isElementaryAbelian` | MinimalInvariantNormal | A: 非自明可解 H に el-ab L-不変正規 N◁H 存在 |
+| `wielandt_formula_of_perfactor` | WielandtAssembly | B: `WielandtPerFactor L U E` ⟹ 群公式 (`Nat.card H` 強帰納) |
+
+**還元の鎖**: 群公式 ⟸ `WielandtPerFactor L U E` (B, axiom-clean) ⟸ universal per-factor 恒等式 (C,
+未) ⟸ (†) per el-ab chief factor (D=lane-f rep-theory)。
+
+### 残り (この順)
+
+**C. per-factor discharge** (`WielandtPerFactor L U E` を提供): 各 el-ab N で
+`card_fixedSubgroup_wielandt_of_dim` (WielandtElabBridge, V=↥N, φ=hN.restrict, module =
+`IsElementaryAbelian.zmodModule`) + `card_fixedSubgroup_restrict` (3×, `\|fixedSubgroup hN.restrict X\|
+=\|C_H(X)⊓N\|`) を合成 ⟹ per-factor 恒等式。dim 恒等式 `hdim` (= `finrank_elab_identity` modulo (†)) を
+universal hypothesis 化すれば C も axiom-clean (gate=(†))。**新 leaf は WielandtElabBridge + WielandtAssembly
+を import** (両者 independent branch, 循環なし)。fiddly 点 = `elabRepresentation (hN.restrict)` の
+invariants と `fixedSubgroup hN.restrict` の card 整合 + module instance 配線。
+
+**D. (†) module wiring** (lane-f coupled rep-theory, resume⁵ NEXT 0-3): `hdim`/`htag` を done engine 群
+(centerProj isotypic + free-orbit + base change) から discharge。
+
+**E. relocation**: `wielandt_fixedPoint_frobenius` (CoprimeAction.lean:160) を C を import する downstream
+leaf へ移し、`wielandt_formula_of_perfactor` + C で sorry-free 化。statement+carrier `CoprimeFrobeniusAction`
++3 corollary を移動、消費側 S11/S15 の import 更新 (CoprimeAction は CoprimeFixedPoints 等を循環で import 不可)。
+
+⚠ universe: B は型可変強帰納ゆえ `theorem ….{u}` + `WielandtPerFactor.{_, u}` + `∀ (H : Type u)` で
+H 宇宙を統一 (`∀ (H : Type _)` だと fresh 宇宙で `hpf H` が mismatch)。C も同様の注意要。
