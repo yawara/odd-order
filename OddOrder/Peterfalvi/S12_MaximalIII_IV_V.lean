@@ -536,8 +536,10 @@ automorphism calculation around (3.9). -/
 structure CharacterParameters {M : Subgroup G} (hyp : Hypothesis M) where
   zeta : ClassFunction ↥M ℂ
   zeta_mem_S : zeta ∈ hyp.Sset
-  zeta_irreducible : Prop
-  zeta_irreducible_holds : zeta_irreducible
+  /-- (10.2): `ζ` is irreducible.  De-opaqued from a placeholder `Prop` to the genuine
+  irreducibility predicate, now that `exists_zeta_in_inducedFamily_degree_w1` constructs such a
+  `ζ`. -/
+  zeta_irreducible : IsIrreducibleCharacter zeta
   d : ℕ
   delta : ℤ
   n : ℕ
@@ -576,7 +578,7 @@ structure CoherentHypothesis {M : Subgroup G} [Fintype G] [Fintype ↥M]
 theorem exists_zeta_degree_w1 [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     {M : Subgroup G} (hyp : Hypothesis M) :
     ∃ params : CharacterParameters hyp,
-      params.zeta ∈ hyp.Sset ∧ params.zeta_irreducible ∧
+      params.zeta ∈ hyp.Sset ∧ IsIrreducibleCharacter params.zeta ∧
         params.zeta 1 = ((hyp.w1 : ℕ) : ℂ) := by
   sorry
 
