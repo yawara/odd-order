@@ -706,6 +706,17 @@ theorem exists_zeta_in_inducedFamily_degree_w1 [Finite G] {M : Subgroup G}
 
 /-! ## (10.2)--(10.4): basic character parameters and coherent extension -/
 
+/-- **Pontryagin reindex** (the §5/§6 "`W₂`-dual ↔ `Fin w₂`" bridge): for a finite abelian group
+`C`, the index set `Fin |C|` is equivalent to the character group `C →* ℂˣ`.  Since `ℂ` is
+algebraically closed it has enough roots of unity, so `C ≃* (C →* ℂˣ)`
+(`CommGroup.monoidHom_mulEquiv_of_hasEnoughRootsOfUnity`); composing with `C ≃ Fin |C|` reindexes
+the character group by `Fin |C|`.  This is what lets the §6 `columnFamily` (indexed by `W₂`-duals)
+populate the `Fin w₂`-indexed `μ`-grid of `CharacterParameters`. -/
+noncomputable def finCardEquivCharacterGroup (C : Type*) [CommGroup C] [Finite C] :
+    Fin (Nat.card C) ≃ (C →* ℂˣ) :=
+  (Finite.equivFin C).symm.trans
+    (CommGroup.monoidHom_mulEquiv_of_hasEnoughRootsOfUnity C ℂ).some.toEquiv.symm
+
 instance instNeZeroW1 {M : Subgroup G} (hyp : Hypothesis M) : NeZero hyp.w1 := by
   haveI := hyp.finiteG
   exact ⟨Nat.card_pos.ne'⟩
