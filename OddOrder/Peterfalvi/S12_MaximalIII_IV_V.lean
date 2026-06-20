@@ -4,6 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
 import OddOrder.Peterfalvi.S11_MaximalII_III_IV
+import Mathlib.GroupTheory.IsPerfect
 
 /-!
 # Peterfalvi Section 12: Maximal Subgroups of Types III, IV, and V
@@ -453,6 +454,77 @@ theorem exists_nontrivial_linearIrreducibleCharacter {K : Type*} [Group K] [Fini
   refine ⟨linearIrreducibleCharacter ψ, ?_, linearIrreducibleCharacter_apply_one ψ⟩
   rw [ne_eq, linearIrreducibleCharacter_eq_trivial_iff]
   exact hψ
+
+open scoped FiniteInduce in
+/-- **Peterfalvi (10.2)**: the family `S = {Ind_{M'}^M θ | θ ∈ Irr M', θ ≠ 1}` contains an
+irreducible character `ζ` of degree `w₁ = |W₁|`.
+
+Take a non-principal degree-`1` character `θ` of `M' = [M,M]` (exists since `M'` is not perfect:
+`M'' < M'`, via `exists_nontrivial_linearIrreducibleCharacter`).  By the §6 Clifford engine `θ` is
+none of the `chiRestrict χ₂` (the `W₁^#`-fixed irreducibles of `M'`): the trivial column gives
+`chiRestrict 1 = Res_{M'} μ_{00} = Res_{M'} 1_M = 1_{M'}` (Peterfalvi (4.4) anchor), avoided since
+`θ ≠ 1`; a non-trivial column `χ₂` gives `chiRestrict χ₂ = Res_{M'} μ_{0j}` of degree
+`μ_{0j}(1) > 1` (else `μ_{0j}` is linear ⇒ `M'`-trivial ⇒ a column-`0` character by (4.4),
+contradicting `columnFamily_mu_ne`), avoided by degree.  Hence `Ind_{M'}^M θ` is irreducible
+(`induce_isIrreducible_of_forall_chiRestrict_ne`) of degree `[M:M']·1 = |W₁|` (`induce_apply_one`
+and `TypePData.card_W1_eq_derived_index`).  The §6 hypothesis is supplied by the §10→§6 bridge
+`typePData_toS06Hypothesis` (so `K = M'`), needing the same `hodd`/`hHall` inputs. -/
+theorem exists_zeta_in_inducedFamily_degree_w1 [Finite G] {M : Subgroup G}
+    (data : TypePData M) (hodd : Odd (Nat.card G))
+    (hHall : Nat.Coprime (Nat.card ↥(derivedInG M)) (Nat.card ↥data.W1)) :
+    ∃ ζ : ClassFunction ↥M ℂ, ζ ∈ inducedFamily M ∧ IsIrreducibleCharacter ζ ∧
+      ζ 1 = (Nat.card ↥data.W1 : ℂ) := by
+  classical
+  let h : OddOrder.Peterfalvi.S06.Hypothesis ↥M := typePData_toS06Hypothesis data hodd hHall
+  haveI hNeZ : NeZero (Nat.card h.W1) := ⟨by have := h.one_lt_card_W1; omega⟩
+  have hKeq : h.K = (derivedInG M).subgroupOf M := rfl
+  have hKcomm : h.K = commutator ↥M := by
+    rw [hKeq, derivedInG, Subgroup.subgroupOf,
+      Subgroup.comap_map_eq_self_of_injective M.subtype_injective]
+  -- `M'` is not perfect: `M'' ≤ F(M) < M'`.
+  have hM'le : derivedInG M ≤ M := Subgroup.map_subtype_le _
+  have hM''lt : secondDerivedInAmbient M < derivedInG M :=
+    lt_of_le_of_lt (data.secondDerived_le_fitting.trans data.fitting_eq.ge) data.fitting_lt_derived
+  have hcomm_K : commutator ↥h.K ≠ ⊤ := by
+    intro hperf
+    have hperfM' : Group.IsPerfect ↥(derivedInG M) := by
+      haveI : Group.IsPerfect ↥((derivedInG M).subgroupOf M) := ⟨hperf⟩
+      exact Group.IsPerfect.ofSurjective (f := (Subgroup.subgroupOfEquivOfLe hM'le).toMonoidHom)
+        (Subgroup.subgroupOfEquivOfLe hM'le).surjective
+    have heq : secondDerivedInAmbient M = derivedInG M := by
+      rw [secondDerivedInAmbient, derivedInG, hperfM'.commutator_eq_top, ← MonoidHom.range_eq_map,
+        Subgroup.range_subtype]
+    exact hM''lt.ne heq
+  obtain ⟨θ, hθne, hθ1⟩ := exists_nontrivial_linearIrreducibleCharacter hcomm_K
+  -- the crux: `θ` avoids every `chiRestrict χ₂`.
+  have havoid : ∀ χ₂, h.chiRestrict χ₂ ≠ θ := by
+    intro χ₂ heq
+    by_cases hχ₂ : χ₂ = 1
+    · subst hχ₂
+      refine hθne ?_
+      rw [← heq]
+      apply IrreducibleCharacter.ext
+      rw [OddOrder.Peterfalvi.S06.Hypothesis.coe_chiRestrict, (h.certainType_zero_column_anchor).2,
+        OddOrder.Peterfalvi.S03.restrict_trivialClassFunction]
+      rfl
+    · have hmu1 : ((h.columnFamily χ₂).mu 0 : ClassFunction ↥M ℂ) (1 : ↥M) = 1 := by
+        have hval := congrArg
+          (fun c : IrreducibleCharacter ↥h.K => (c : ClassFunction ↥h.K ℂ) (1 : ↥h.K)) heq
+        simp only [OddOrder.Peterfalvi.S06.Hypothesis.coe_chiRestrict, ClassFunction.restrict_apply,
+          Subgroup.coe_one] at hval
+        rw [hval, hθ1]
+      have hker : (h.K : Set ↥M) ⊆ OddOrder.Peterfalvi.S03.characterKernel
+          ((h.columnFamily χ₂).mu 0 : ClassFunction ↥M ℂ) := by
+        intro x hx
+        have hx1 := ((h.columnFamily χ₂).mu 0).isIrreducible
+          |>.apply_eq_one_of_mem_commutator_of_apply_one_eq_one hmu1 (hKcomm ▸ hx)
+        rw [OddOrder.Peterfalvi.S03.mem_characterKernel, hx1,
+          OddOrder.Peterfalvi.S03.characterDegree_def, hmu1]
+      obtain ⟨i, hi⟩ := h.exists_certainType_zero_column_eq_of_subset_characterKernel _ hker
+      exact h.columnFamily_mu_ne hχ₂ 0 i hi.symm
+  refine ⟨ClassFunction.induce h.K (θ : ClassFunction ↥h.K ℂ), ⟨θ, hθne, rfl⟩,
+    h.induce_isIrreducible_of_forall_chiRestrict_ne havoid, ?_⟩
+  rw [ClassFunction.induce_apply_one, hθ1, mul_one, hKeq, ← data.card_W1_eq_derived_index]
 
 /-! ## (10.2)--(10.4): basic character parameters and coherent extension -/
 
