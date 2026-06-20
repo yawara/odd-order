@@ -4635,7 +4635,7 @@ theorem exists_kInvariant_qComplement [Finite G]
       K ≤ Subgroup.normalizer (D : Set G) ∧ Disjoint Q D ∧
       Subgroup.IsComplement' (Q.subgroupOf (OddOrder.BG.Ch3.S10.Msigma M))
         (D.subgroupOf (OddOrder.BG.Ch3.S10.Msigma M)) ∧
-      Group.IsNilpotent ↥D ∧ D ≠ ⊥ := by
+      Group.IsNilpotent ↥D ∧ D ≠ ⊥ ∧ q ∉ (Nat.card ↥D).primeFactors := by
   classical
   set Mσ : Subgroup G := OddOrder.BG.Ch3.S10.Msigma M with hMσ
   have hMσM : Mσ ≤ M := OddOrder.BG.Ch3.S10.Msigma_le M
@@ -4707,7 +4707,7 @@ theorem exists_kInvariant_qComplement [Finite G]
     rfl
   -- `D` nilpotent (`complement_isNilpotent_of_inputs`, prime-order `K₁ ≤ K`).
   -- (assembled below via a prime-order `K₁ ≤ K` and the prime-manner action).
-  refine ⟨D, hD_le_Mσ, hKnormD, hdisjQD, hcompl, ?_, ?_⟩
+  refine ⟨D, hD_le_Mσ, hKnormD, hdisjQD, hcompl, ?_, ?_, ?_⟩
   · -- `D` nilpotent: prime-order `K₁ ≤ K` acts FPF on `D` (Theorem 3.7).
     have hprime := actsPrimeManner_of_typeP hG hM hP hKM hK hKstar
     have hKcard1 : Nat.card ↥K ≠ 1 := fun hc => hKne (Subgroup.card_eq_one.mp hc)
@@ -4750,6 +4750,13 @@ theorem exists_kInvariant_qComplement [Finite G]
     have hsup : Q.subgroupOf Mσ ⊔ D.subgroupOf Mσ = ⊤ := hcompl.sup_eq_top
     rw [hbot] at hsup; simp only [Subgroup.bot_subgroupOf, sup_bot_eq] at hsup
     exact le_antisymm hQMσ (Subgroup.subgroupOf_eq_top.mp hsup)
+  · -- `q ∤ |D|`: `|D| = [M_σ : Q]` (complement) and `q ∤ [M_σ : Q]` (`hidx`).
+    intro hmem
+    apply hidx
+    have hDcard : Nat.card ↥D = (Q.subgroupOf Mσ).index := by
+      rw [← Nat.card_congr (Subgroup.subgroupOfEquivOfLe hD_le_Mσ).toEquiv]
+      exact (hcompl.symm.index_eq_card).symm
+    rw [← hDcard]; exact (Nat.mem_primeFactors.mp hmem).2.1
 
 /-- **Theorem 15.2 step 4, the `D`-side fixed-point fact** (BG Proposition 1.5(d)/1.6(d), mmd
 L4196-4200): a single `q'`-element `d` (here `d ∈ D`, coprime to `Q`) that *centralizes the chief
@@ -6346,7 +6353,225 @@ theorem mf_ne_msigma_typeP1_structure [Finite G]
         -- so `M_F` is non-cyclic.  Breaks the 15.5↔15.6 circularity (Corollary 15.6's proof needs
         -- this without citing Corollary 15.5).
         ¬ IsCyclic ↥(MF M) := by
-  sorry
+  classical
+  -- **Setup.**  `p = |K|`, `q = |K*|`; `M` is type `P₁`, `q` prime, `M_σ = M'`.
+  set q : ℕ := Nat.card ↥Kstar with hqdef
+  have hP1 : S14.IsTypeP1 M := isTypeP1_of_mf_ne_msigma hG hM hne
+  have hP : S14.IsTypeP M := hP1.1
+  have hq_prime : q.Prime := kstar_card_prime_of_inputs hG hM hP1 hKM hK hKstar
+  haveI : Fact q.Prime := ⟨hq_prime⟩
+  have hMσderived : OddOrder.BG.Ch3.S10.Msigma M = derivedInG M :=
+    typeP1_msigma_eq_derivedInG hG hM hP1 hKM hK hKstar
+  obtain ⟨hcomplDer, _, _⟩ := S14.typeP_duality hG hM hP hKM hK hKstar
+  have hcomplMσ : Subgroup.IsComplement' ((OddOrder.BG.Ch3.S10.Msigma M).subgroupOf M)
+      (K.subgroupOf M) := by rw [hMσderived]; exact hcomplDer
+  have hMσM : OddOrder.BG.Ch3.S10.Msigma M ≤ M := OddOrder.BG.Ch3.S10.Msigma_le M
+  haveI : IsSolvable ↥M := hG.solvable_of_mem_maximalSubgroups hM
+  have hMσnotnil : ¬ Group.IsNilpotent ↥(OddOrder.BG.Ch3.S10.Msigma M) := fun hnil =>
+    hne ((maxNilpotentNormalHall_eq_Msigma_iff_isNilpotent hG hM).mpr hnil)
+  have hKstarMσ : Kstar ≤ OddOrder.BG.Ch3.S10.Msigma M := by rw [hKstar]; exact inf_le_left
+  have hqMσ : q ∣ Nat.card ↥(OddOrder.BG.Ch3.S10.Msigma M) := by
+    rw [hqdef]; exact Subgroup.card_dvd_of_le hKstarMσ
+  have hqσ : q ∈ OddOrder.BG.Ch3.S10.sigma M :=
+    OddOrder.BG.Ch3.S10.Msigma_isPiGroup M q
+      (Nat.mem_primeFactors.mpr ⟨hq_prime, hqMσ, Nat.card_pos.ne'⟩)
+  set Q : Subgroup G := opiCoreInG ({q} : Set ℕ) M with hQdef
+  have hQMσ : Q ≤ OddOrder.BG.Ch3.S10.Msigma M := by
+    rw [hQdef]; exact OddOrder.BG.Ch3.S10.opiCoreInG_singleton_le_Msigma_of_mem_sigma hqσ
+  have hMnormQ : M ≤ Subgroup.normalizer (Q : Set G) := by
+    rw [hQdef]; exact OddOrder.GroupTheory.le_normalizer_opiCoreInG _ M
+  have hQM : Q ≤ M := hQMσ.trans hMσM
+  have hcop_sub : Nat.Coprime (Nat.card ↥((OddOrder.BG.Ch3.S10.Msigma M).subgroupOf M))
+      (Nat.card ↥(K.subgroupOf M)) := by
+    have h := coprime_card_derived_kappaHall_of_isComplement' hK hcomplDer
+    rwa [hMσderived]
+  have hcond2 := actsPrimeManner_subgroupOf_of_typeP hG hM hP hKM hK hKstar
+  have hqG : (Nat.card ↥(OddOrder.BG.Ch3.S10.Msigma M
+      ⊓ Subgroup.centralizer (K : Set G))).Prime := by rw [← hKstar]; exact hq_prime
+  have hKstarQ : Kstar ≤ Q := by
+    have h := kstar_le_opiCore_of_inputs hG hM hKM hcomplMσ hcop_sub.symm hcond2 hne hqG
+    rw [← hKstar, ← hqdef, ← hQdef] at h; exact h
+  have hcopKMσ : Nat.Coprime (Nat.card ↥K) (Nat.card ↥(OddOrder.BG.Ch3.S10.Msigma M)) := by
+    have e1 : Nat.card ↥(K.subgroupOf M) = Nat.card ↥K :=
+      Nat.card_congr (Subgroup.subgroupOfEquivOfLe hKM).toEquiv
+    have e2 : Nat.card ↥((OddOrder.BG.Ch3.S10.Msigma M).subgroupOf M)
+        = Nat.card ↥(OddOrder.BG.Ch3.S10.Msigma M) :=
+      Nat.card_congr (Subgroup.subgroupOfEquivOfLe hMσM).toEquiv
+    rw [e1, e2] at hcop_sub; exact hcop_sub.symm
+  have hKMσdisj : Disjoint K (OddOrder.BG.Ch3.S10.Msigma M) := by
+    rw [disjoint_iff]
+    exact Subgroup.card_eq_one.mp (Nat.eq_one_of_dvd_coprimes hcopKMσ
+      (Subgroup.card_dvd_of_le inf_le_left) (Subgroup.card_dvd_of_le inf_le_right))
+  have hKne : K ≠ ⊥ := by
+    intro hK0
+    apply hMσnotnil
+    have hKstareq : Kstar = OddOrder.BG.Ch3.S10.Msigma M := by
+      rw [hKstar, hK0]
+      have hc : Subgroup.centralizer ((⊥ : Subgroup G) : Set G) = ⊤ := by
+        rw [Subgroup.coe_bot]; ext g; simp [Subgroup.mem_centralizer_iff]
+      rw [hc, inf_top_eq]
+    have hcardMσ : Nat.card ↥(OddOrder.BG.Ch3.S10.Msigma M) = q ^ 1 := by
+      rw [pow_one, hqdef, hKstareq]
+    exact (IsPGroup.of_card hcardMσ).isNilpotent
+  have hQpg : IsPGroup q ↥Q := by rw [hQdef]; exact isPGroup_opiCoreInG_singleton M
+  have hQneMσ : Q ≠ OddOrder.BG.Ch3.S10.Msigma M := by
+    intro hQeq; exact hMσnotnil (hQeq ▸ hQpg.isNilpotent)
+  -- **The `K`-invariant complement `D` of `Q` in `M_σ`.**
+  obtain ⟨D, hDMσ, hKnormD, hQDdisj, hcomplD, hDnil, hDne, hDq'⟩ :=
+    exists_kInvariant_qComplement hG hM hP hKM hK hKstar hQdef hQMσ hMnormQ hKstarQ hQneMσ hKne
+      hKMσdisj hcopKMσ
+  -- **The chief factor `Q₀ = C_Q(D) ⊴ M` and the Theorem 3.10 engine outputs.**
+  obtain ⟨hMNQ0, hKstarNotQ0, hQ0ltQ, hmin⟩ :=
+    chiefFactor_Q0_normal_minimal_of_inputs hG hM hP1 hKM hK hKstar hQdef hQMσ hMnormQ hKstarQ
+      hQneMσ hKne hKMσdisj hcopKMσ hMσnotnil hDq' hDMσ hKnormD hQDdisj hcomplD hDnil hDne
+  set Q0 : Subgroup G := Q ⊓ Subgroup.centralizer (D : Set G) with hQ0def
+  have hQ0Q : Q0 ≤ Q := hQ0ltQ.le
+  haveI hQ0nQ : (Q0.subgroupOf Q).Normal :=
+    (Subgroup.normal_subgroupOf_iff_le_normalizer hQ0Q).mpr (hQM.trans hMNQ0)
+  obtain ⟨hKprime, hindex, hDcomm, hEA⟩ :=
+    chiefFactor_engine_of_inputs hG hM hP1 hKM hK hKstar hQdef hQMσ hMnormQ hKstarQ hKne hKMσdisj
+      hcopKMσ hDq' hDMσ hKnormD hQDdisj hDne hQ0def hMNQ0 hKstarNotQ0 hQ0ltQ hmin
+  -- **Fitting subgroup (Theorem 15.2(g)).**
+  haveI hQnMσ : (Q.subgroupOf (OddOrder.BG.Ch3.S10.Msigma M)).Normal :=
+    (Subgroup.normal_subgroupOf_iff_le_normalizer hQMσ).mpr (hMσM.trans hMnormQ)
+  haveI hNilMσQ : Group.IsNilpotent (↥(OddOrder.BG.Ch3.S10.Msigma M) ⧸
+      Q.subgroupOf (OddOrder.BG.Ch3.S10.Msigma M)) :=
+    msigma_quotient_isNilpotent_of_inputs hG hM hP hKM hK hKstar hQMσ hMnormQ hKstarQ hQneMσ hKne
+      hKMσdisj hcopKMσ
+  have hprime := actsPrimeManner_of_typeP hG hM hP hKM hK hKstar
+  have hQgtq : q < Nat.card ↥Q := by
+    have h1 : (Q0.subgroupOf Q).index ≤ Nat.card ↥Q :=
+      Nat.le_of_dvd Nat.card_pos (Subgroup.index_dvd_card _)
+    have h2 : q < q ^ Nat.card ↥K := by
+      calc q = q ^ 1 := (pow_one q).symm
+        _ < q ^ Nat.card ↥K := Nat.pow_lt_pow_right hq_prime.one_lt hKprime.two_le
+    rw [hindex] at h1; exact lt_of_lt_of_le h2 h1
+  have hKstarneQ : Kstar ≠ Q := by
+    intro h
+    have hqeq : q = Nat.card ↥Q := by rw [hqdef, h]
+    rw [hqeq] at hQgtq; exact lt_irrefl _ hQgtq
+  have hCle : Subgroup.centralizer (Q : Set G) ⊓ M ≤ OddOrder.BG.Ch3.S10.Msigma M :=
+    centralizer_le_Msigma_of_primeManner hG hM hP1 hKM hK hprime hQMσ hMnormQ hKstarQ hKstarneQ
+  have cC17 : fittingInAmbient M ≤ OddOrder.BG.Ch3.S10.Msigma M :=
+    fittingInAmbient_le_Msigma_of_le_Msigma hG hM hMnormQ hQdef hqσ hCle
+  have cC18 : fittingInAmbient M = Q ⊔ (Subgroup.centralizer (Q : Set G) ⊓ M) :=
+    fittingInAmbient_eq_sup_centralizer_inf_of_le_Msigma hG hM hMnormQ hQdef hCle
+  have hcopDQ : Nat.Coprime (Nat.card ↥D) (Nat.card ↥Q) := by
+    obtain ⟨n, hn⟩ := hQpg.exists_card_eq
+    rw [hn]
+    rcases Nat.eq_zero_or_pos n with h0 | h0
+    · subst h0; simpa using Nat.coprime_one_right _
+    · rw [Nat.coprime_pow_right_iff h0]
+      exact ((Fact.out : q.Prime).coprime_iff_not_dvd.mpr (fun hd =>
+        hDq' (Nat.mem_primeFactors.mpr ⟨Fact.out, hd, Nat.card_pos.ne'⟩))).symm
+  have hQab : ∀ x ∈ Q, ∀ y ∈ Q, ⁅x, y⁆ ∈ Q0 := by
+    intro x hxQ y hyQ
+    have hcomm := hEA.comm (QuotientGroup.mk (⟨x, hxQ⟩ : ↥Q))
+      (QuotientGroup.mk (⟨y, hyQ⟩ : ↥Q))
+    have h1 : QuotientGroup.mk (⁅(⟨x, hxQ⟩ : ↥Q), (⟨y, hyQ⟩ : ↥Q)⁆) =
+        (1 : ↥Q ⧸ Q0.subgroupOf Q) := by
+      rw [← QuotientGroup.mk'_apply, map_commutatorElement, commutatorElement_eq_one_iff_mul_comm]
+      exact hcomm
+    rw [QuotientGroup.eq_one_iff, Subgroup.mem_subgroupOf] at h1
+    have h2 : ((⁅(⟨x, hxQ⟩ : ↥Q), (⟨y, hyQ⟩ : ↥Q)⁆ : ↥Q) : G) = ⁅x, y⁆ := by
+      push_cast [commutatorElement_def]; rfl
+    rwa [h2] at h1
+  -- `M_σ' ⊆ Q ⊔ ⁅D, D⁆`: the derived subgroup of the semidirect `M_σ = Q ⋊ D` (`Q` normal).
+  -- The single remaining gate of the Theorem 15.2 wrapper: `Q ⊔ ⁅D,D⁆ ⊴ M_σ` and the quotient
+  -- `M_σ/(Q ⊔ ⁅D,D⁆)` is abelian (generated by the image of `D`, with `D'` killed), so
+  -- `⁅M_σ, M_σ⁆ ≤ Q ⊔ ⁅D,D⁆`.  (Commutator sup-distribution is unavailable; needs the
+  -- normal-target / quotient argument.)
+  have hsigmaprime : derivedInG (OddOrder.BG.Ch3.S10.Msigma M) ≤ Q ⊔ ⁅D, D⁆ := by sorry
+  have hsecFit : ∀ x ∈ OddOrder.BG.Ch3.S10.Msigma M, (∀ y ∈ Q, ⁅x, y⁆ ∈ Q0) →
+      x ∈ fittingInAmbient M :=
+    centralizer_msigma_quotient_le_fittingInAmbient hG hM hQMσ hDMσ hQ0def hQ0Q hcomplD hMnormQ
+      hMNQ0 hQpg hDnil hcopDQ hQab
+  have cC16 : derivedInG (derivedInG M) ≤ fittingInAmbient M :=
+    derivedDerived_le_fittingInAmbient_of_inputs hMσderived hsigmaprime hQMσ hDMσ hQab hDcomm hsecFit
+  -- **`q ∈ β(M)` (conjunct 6).**
+  have hQne : Q ≠ ⊥ := by
+    intro h0
+    have hKstar0 : Kstar = ⊥ := le_bot_iff.mp (h0 ▸ hKstarQ)
+    have : q = 1 := by rw [hqdef, hKstar0, Subgroup.card_bot]
+    exact hq_prime.ne_one this
+  have hQ0notC : ¬ Q ≤ Subgroup.centralizer (D : Set G) := by
+    intro hle
+    exact (ne_of_lt hQ0ltQ) (le_antisymm hQ0Q (le_inf le_rfl hle))
+  have hqπ : q ∈ (Nat.card ↥M).primeFactors :=
+    Nat.mem_primeFactors.mpr ⟨hq_prime, hqMσ.trans (Subgroup.card_dvd_of_le hMσM), Nat.card_pos.ne'⟩
+  have hq_odd : Odd q := hG.odd.of_dvd_nat ((Nat.mem_primeFactors.mp hqπ).2.1.trans
+    (Subgroup.card_subgroup_dvd_card M))
+  have hcopKD : Nat.Coprime (Nat.card ↥K) (Nat.card ↥D) :=
+    hcopKMσ.coprime_dvd_right (Subgroup.card_dvd_of_le hDMσ)
+  have hDKN : D ⊔ K ≤ Subgroup.normalizer (Q : Set G) :=
+    sup_le (hDMσ.trans (hMσM.trans hMnormQ)) (hKM.trans hMnormQ)
+  have hqD : ¬ q ∣ Nat.card ↥D := fun hd =>
+    hDq' (Nat.mem_primeFactors.mpr ⟨Fact.out, hd, Nat.card_pos.ne'⟩)
+  haveI hKsolv : IsSolvable ↥K :=
+    solvable_of_solvable_injective (Subgroup.inclusion_injective hKM)
+  have hqK : ¬ q ∣ Nat.card ↥K := fun hd =>
+    hq_prime.one_lt.ne' (Nat.eq_one_of_dvd_coprimes hcopKMσ hd hqMσ)
+  -- Sylow witness `P : Sylow q ↥M` with `Q = P.map M.subtype`.
+  have hidx_M : ¬ q ∣ (Q.subgroupOf M).index := by
+    have hMcard : Nat.card ↥M = Nat.card ↥(OddOrder.BG.Ch3.S10.Msigma M) * Nat.card ↥K := by
+      have h := hcomplMσ.card_mul
+      rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hMσM).toEquiv,
+        Nat.card_congr (Subgroup.subgroupOfEquivOfLe hKM).toEquiv] at h
+      exact h.symm
+    have hMσcard : Nat.card ↥(OddOrder.BG.Ch3.S10.Msigma M) = Nat.card ↥Q * Nat.card ↥D := by
+      have h := hcomplD.card_mul
+      rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hQMσ).toEquiv,
+        Nat.card_congr (Subgroup.subgroupOfEquivOfLe hDMσ).toEquiv] at h
+      exact h.symm
+    have hidxeq : (Q.subgroupOf M).index = Nat.card ↥D * Nat.card ↥K := by
+      have hmul := Subgroup.card_mul_index (Q.subgroupOf M)
+      rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hQM).toEquiv, hMcard, hMσcard] at hmul
+      refine Nat.eq_of_mul_eq_mul_left Nat.card_pos (?_ : Nat.card ↥Q * _ = Nat.card ↥Q * _)
+      rw [hmul]; ring
+    rw [hidxeq]
+    exact fun hdvd => ((Nat.Prime.dvd_mul hq_prime).mp hdvd).elim hqD hqK
+  obtain ⟨P, hQP⟩ := exists_sylow_eq_opiCore hQdef hQM hMnormQ hQpg hidx_M
+  -- the `G`-level fixed-point-free condition, lifted from the `↥(D ⊔ K)`-Frobenius group.
+  have hfrob := isFrobeniusGroup_DK_of_primeManner (M := M) hprime hDMσ hKstarQ hQDdisj.symm hKnormD
+    (hKMσdisj.symm.mono_left hDMσ) hDne hKne
+  have hFrobFPF : ∀ a ∈ K, a ≠ 1 → ∀ n ∈ D, n ≠ 1 → a * n * a⁻¹ ≠ n := by
+    intro a haK ha1 n hnD hn1 heq
+    have haDK : a ∈ D ⊔ K := (le_sup_right : K ≤ D ⊔ K) haK
+    have hnDK : n ∈ D ⊔ K := (le_sup_left : D ≤ D ⊔ K) hnD
+    refine hfrob.conj_frobenius ⟨a, haDK⟩ (Subgroup.mem_subgroupOf.mpr haK)
+      (fun h => ha1 (congrArg Subtype.val h)) ⟨n, hnDK⟩ (Subgroup.mem_subgroupOf.mpr hnD)
+      (fun h => hn1 (congrArg Subtype.val h)) (Subtype.ext ?_)
+    show (a : G) * (n : G) * (a : G)⁻¹ = (n : G)
+    exact heq
+  have cC6 : q ∈ OddOrder.BG.Ch3.S10.beta M :=
+    mem_beta_of_inputs hQ0notC (D_centralizes_Q_of_not_mem_beta hG hM hq_odd hQpg hQne hqπ P hQP
+      hKne hFrobFPF hKnormD hcopKD hKsolv hDKN hqD)
+  -- **`Q, K* ⊆ M_F` and `q ∈ π(M_F)` (conjuncts 5,7,8).**
+  have hQhall : OddOrder.Isaacs.Ch03.IsHallSubgroup (Nat.card ↥Q).primeFactors
+      (Q.subgroupOf M) := by
+    have hpf : ((Nat.card ↥Q).primeFactors : Set ℕ) = ({q} : Set ℕ) := by
+      obtain ⟨n, hn⟩ := hQpg.exists_card_eq
+      have hn0 : n ≠ 0 := by
+        rintro rfl; rw [pow_zero] at hn; rw [hn] at hQgtq
+        have := hq_prime.two_le; omega
+      rw [hn, Nat.primeFactors_prime_pow hn0 hq_prime, Finset.coe_singleton]
+    rw [hpf]
+    exact isHallSubgroup_subgroupOf_of_pgroup_of_not_dvd_index hQM hQpg hidx_M
+  haveI hQnilM : Group.IsNilpotent ↥(Q.subgroupOf M) :=
+    (hQpg.comap_subtype).isNilpotent
+  have cC8 : Q ≤ MF M := le_maxNilpotentNormalHall hQM
+    ((Subgroup.normal_subgroupOf_iff_le_normalizer hQM).mpr hMnormQ) hQnilM hQhall
+  have cC7 : Kstar ≤ MF M := hKstarQ.trans cC8
+  have cC5 : q ∈ S14.piSet (MF M) := by
+    rw [S14.piSet, Set.mem_setOf_eq]
+    refine Nat.mem_primeFactors.mpr ⟨hq_prime, ?_, Nat.card_pos.ne'⟩
+    rw [hqdef]; exact Subgroup.card_dvd_of_le cC7
+  -- **`¬ IsCyclic M_F` (conjunct 19).**
+  have cC19 : ¬ IsCyclic ↥(MF M) :=
+    not_isCyclic_MF_of_chiefFactor_inputs hq_prime hKprime.two_le hEA hindex cC8
+  -- **Assemble.**
+  exact ⟨hP1, Q, Q0, D, Nat.card ↥K, q, hKprime, hq_prime, rfl, hqdef.symm, cC5, cC6, cC7, cC8,
+    hMnormQ, hcomplD, hDnil, hQ0def, hMNQ0, hindex, hMσderived, cC16, cC17, cC18, cC19⟩
 
 /-- **BG Corollary 15.5** (mmd L4225): the decomposition `F(M) = F(M_σ) × Y` with
 `Y = O_{σ(M)'}(F(M))` a cyclic `τ₂(M)`-subgroup, together with `F(M) = C_M(M_F)·M_F`,
