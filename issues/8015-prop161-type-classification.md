@@ -176,6 +176,22 @@ sorry-free 在庫**と確認。
 `piSet_mf_inf_beta_disjoint_of_not_fittingIsTI` (S15:7206) は partial proof 化済 —
 G1 で ≥3 側 discharge、**残 sorry = `pRank (M_F) r < 3`** (1 点)。
 
+### ✅ 2026-06-20³ residual の building block 2 本を証明 (本セッション続き)
+`pRank (M_F) r < 3` の証明 building block のうち概念核 2 本を sorry-free 化 (commits `e3e6cd97`/
+`8f6fe3e2`, full build 3869 green):
+- **`exists_notMem_inf_conj_fitting_ne_bot_of_not_fittingIsTI`** (step 1 setup): ¬FittingIsTI ⟹
+  ∃g∉M, F(M)⊓conj g•F(M)≠⊥。push_neg + F(M)⊴M (fittingInG_subgroupOf_normal)。
+- **`rank_lt_three_of_le_two_maximals`** (step 7 核, 汎用再利用可): 異なる 2 極大に含まれる部分群は
+  rank<3 (isUniquelyMaximal_of_three_le_rank_of_lt_top 対偶 + eq_of_isCoatom_of_le)。
+⟹ residual の docstring に 5-step assembly + 各 located upstream 補題を精密記載済。残 assembly =
+step3 (p∈σ, **最深**: simplicity 経由)/step5 (p∉β)/step6 (C_G(X₁)⊄M)/step8 (bridge) + 組立。
+**step3 の fiddly 核** = 「cyclic O_p(F) の unique order-p 部分群 X₁ が char ⟹ M≤N(X₁)」
+(char-in-normalized 転送 + cyclic-unique-subgroup) + `normalizer_eq_of_normal_of_mem_maximal`
+(S08 private、要 public 化) の simplicity 矛盾。infra: `characteristic_of_isCyclic` (Peterfalvi 在、
+要 GroupTheory 昇格 or S15 複製)、`le_opiCoreInG_singleton_of_isPGroup_of_le_nilpotent` (S08)、
+`opiCoreInG_fittingInG_subgroupOf_normal` (S08)。step8 infra: `commute_of_coprime_orderOf_of_isNilpotent`
+(要 subgroup-level lift)。
+
 ### 🎯 残 `pRank (M_F) r < 3` の証明計画 (15.7(a) deep core、次セッション)
 `¬FittingIsTI M` から導出。base 補題は全在庫:
 1. **setup**: ¬FittingIsTI unfold (`IsTISubset` def S15... = `∀g,(∃a∈A,gag⁻¹∈A)→g∈L`) ⟹ ∃g, a∈
