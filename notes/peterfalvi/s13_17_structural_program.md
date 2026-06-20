@@ -315,17 +315,27 @@ bottom-out)。原文 (mmd L288) 精読で論法確定: 「W₁∩H=1。U∩H=1 �
   `MulDistribMulAction (normalizer N) N` で φ 構成 (N◁L、作用は共役で rfl 展開) → U/E 非自明元 ∉ N で
   fixedByU=fixedByE=⊥ → combinator。Wielandt のみ依存。
 
-**▶ 残 = S15 application** (`typeI_U_le_fitting_of_coprime` で engine 適用、~110 行 mechanical plumbing):
-1. **piece 3** `W₁⊓L_F=⊥`: `_hcop` (Coprime |L_F| pq) → `Coprime |L_F| q` (`q=|W₁|`) → `inf_eq_bot_of_coprime`。
-2. **piece 5** (`U⊓L_F≠⊥`): by_contra `hbot:U⊓L_F=⊥` → engine を **L=↥L** で適用。engine 入力:
-   - `hFrob` = `⟨frob.complement, frob.typeI.typeF.H_eq ▸ frob.frobenius⟩` (typeI_frobenius、kernel=L_F.subgroupOf L)
-   - `hUN`/`hEN` = `hbot`/piece3 を subgroupOf へ (`subgroupOf_inf` 分配)
-   - `hsolv` = `maxNilpotentNormalHall_isNilpotent` → solvable (subgroupOf iso)
-   - `hUE` = **basic_structure.UW1_frobenius を ↥(U⊔W₁)[G] → ↥((U⊔W₁).subgroupOf L)[↥L] へ transfer**
-     (新 infra `isFrobeniusGroup_map_of_mulEquiv` + subgroupOf-sup 分配 + nested subgroupOf iso) ← **crux**
-   - `hcop` = `Coprime |L_F| |U⊔W₁|`: |U⊔W₁|=u·q (Frobenius)、|L_F|⟂q ✓、**|L_F|⟂u** は `hbot` から
-     (`U⊓L_F=⊥` ⟹ `|U| | [L:L_F]` ⟹ coprime to |L_F| via Frobenius `coprime_card_kernel_complement`)
-   - → engine: `L_F.subgroupOf L = ⊥` → `L_F=⊥` 矛盾 (frob...H_nontrivial)。
-3. **piece 6** (`U≤L_F`): `le_kernel_of_isMulCommutative_of_inf_ne_bot` を ↥L で (U abelian=bdata.U_commutative
-   を ↥L へ + piece 5) → `U.subgroupOf L ≤ L_F.subgroupOf L` → map back (`map_subgroupOf_eq_of_le`)。
-crux = hUE transfer (nested subgroupOf) + hcop の |L_F|⟂u。engine は完成ゆえ残は plumbing。
+## ✅✅✅ piece 5 完成 — typeI_U_le_fitting_of_coprime sorry-free (2026-06-20⁷, commit `753e9722`)
+
+S15 application を完遂し `typeI_U_le_fitting_of_coprime` を **sorry-free 化** (実 sorry 138→137)。
+**engine 経由で sorried Wielandt formula のみに bottom-out**。gate 4 の H 構造論 (pieces 1,3,5,6) 完了。
+
+**engine を G-ambient 化** (`CoprimeAction.lean`): `isFrobenius_kernel_eq_bot_of_frobenius_subgroup` を
+「Frobenius 群 Lsub≤G、Frobenius 部分群 UE≤Lsub を自然な ↥(U⊔E)[G] 形で受ける」形に書換 — juggling を
+lifting で engine 内に封入し **caller は basic_structure.UW1_frobenius を直接供給** (subgroupOf transfer 不要、
+当初 crux 視した hUE transfer を回避)。+ reusable coprimality 補題 2 本 (`coprime_card_of_inf_kernel_eq_bot`
+[↥L] / `_le` [G-ambient]): 核と自明交差する部分群は核と coprime (`card_dvd_of_injective`+`coprime_card_kernel_complement`)。
+
+**S15 application** (`typeI_U_le_fitting_of_coprime`):
+1. piece 3 `W₁⊓L_F=⊥` (`_hcop`→`Coprime |L_F| q`→`inf_eq_bot_of_coprime`)。
+2. piece 5 `U⊓L_F≠⊥`: by_contra → engine を L=↥L で適用 (hFrob=typeI_frobenius / hUE=basic_structure 直接 /
+   hcop=`|L_F|⟂|U⊔W₁|`=`|U|·|W₁|` [`IsComplement'.card_mul`] を 2 coprimality+`Nat.Coprime.mul_right` から /
+   hsolv=maxNNH nilpotent) → `L_F=⊥` 矛盾 (frob.frobenius.ne_bot_kernel)。
+3. piece 6 `U≤L_F`: `le_kernel_of_isMulCommutative_of_inf_ne_bot` を ↥L で (U abelian=bdata.U_commutative を
+   `isMulCommutative_of_mulEquiv` で ↥L へ + piece 5) → `U.subgroupOf L≤L_F.subgroupOf L` → map back。
+
+**⟹ gate 4 obligation ① (`exists_typeI_maximal_overNormalizer_U`) の H 構造論は全完了**。残 sorried 依存:
+`card_LF_coprime_pq` (B2, BG Thm E, owner F) / `card_Q_eq`/`tConjugate_fitting_data` (gate 3 B1/B1') /
+gate 1,2 (hdisj/hUhall_cop = F-ask) / Wielandt (§9)。**▶ 次 H = obligation ② `typeI_overNormalizer_complement`
+(13.17.c)**: Frobenius 補元 E⊇W₁ が odd Frobenius complement → Huppert [H] V.8.18 (素数位数正規) →
+E⊆N_G(W₁)⊆QW₂ [(13.16)] → cyclic Sylow [BG 3.9] → E=W₁ or |E|=pq。Huppert V.8.18 は repo 不在=新規 (Phase 3)。
