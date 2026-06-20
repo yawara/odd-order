@@ -63,6 +63,80 @@ goal = `CoherenceTarget` = `IsCoherent hyp.tau hyp.S (supportInSubgroup (sharpIm
 
 ---
 
+### ✅ cont.²⁸ 追補: S08:59 assembly の **bulk は build-verified**、残 = hcaseB の 2 sub-problem (本セッションで切り分け確定)
+
+本セッションで S08:59 assembly を実装試行し、**bulk (skeleton + c2 instances + hbound + hsplit + hcaseA) が
+leaf build green** を確認 (hcaseB=sorry の状態で `lake build OddOrder.Peterfalvi.S08_CoherenceTheorems` 通過)。
+sorry を commit できないため working-tree は revert 済 (cY-rewiring commit `66eee14e` のみ残置)。**以下の bulk は
+そのまま貼れる** (検証済)。
+
+**import 追加** (`S08_CoherenceTheorems.lean` 冒頭、cycle なし確認済):
+```
+import OddOrder.Peterfalvi.S08_Theorem65c2
+import OddOrder.Peterfalvi.S08_CaseAWeightedEndgame
+import OddOrder.Peterfalvi.S08_PGroupReduction
+```
+(`S08_PGroupReduction` が `S08_CaseBSeedGlue` + ticVdiff(S06) を推移 import。)
+
+**bulk (X-nonempty 枝、build-verified、hcaseB のみ未充足)**:
+```lean
+  · have hXne : (hyp.Xset ⁅H, H⁆).Nonempty := Set.nonempty_iff_ne_empty.mpr hXe
+    refine Nonempty.some ?_
+    rcases hyp.cases with hF | ⟨h46, _hdade, hHK, hW1, hprime, hW2comm, hcop⟩
+    · exact nonempty_coherent_S_of_frobenius hyp hF hXne
+    · haveI : Finite ↥h46.W1 := inferInstance
+      haveI : NeZero (Nat.card h46.W1) := ⟨Nat.card_pos.ne'⟩
+      haveI : Invertible (Nat.card ↥h46.K : ℂ) := by
+        have h : (Nat.card ↥h46.K : ℂ) = (Nat.card ↥H : ℂ) := by rw [hHK]
+        rw [h]; infer_instance
+      haveI : Fintype ↥(h46.W1 ⊔ h46.W2) := Fintype.ofFinite _
+      haveI : Invertible (Nat.card ↥(h46.W1 ⊔ h46.W2) : ℂ) :=
+        invertibleOfNonzero (by exact_mod_cast Nat.card_pos.ne')
+      haveI : Fintype (OddOrder.Peterfalvi.S06.ticVdiff h46).W := Fintype.ofFinite _
+      haveI : Invertible (Nat.card (OddOrder.Peterfalvi.S06.ticVdiff h46).W : ℂ) :=
+        invertibleOfNonzero (by exact_mod_cast Nat.card_pos.ne')
+      have hW2H : h46.W2 ≤ H := hW2comm.trans (by
+        rw [Subgroup.commutator_le]; intro a ha b _hb; rw [commutatorElement_def]
+        exact H.mul_mem (H.mul_mem (H.mul_mem ha _hb) (H.inv_mem ha)) (H.inv_mem _hb))
+      by_contra hncoh
+      have hbound := abelianization_card_le_of_not_coherent_c2 hyp h46 hHK hW1 hncoh
+      have hsplit := caseAB_split_of_c2 h46 hW2H hprime
+      refine hncoh (nonempty_coherent_S_of_c2_of_branches hyp h46 hHK hW1 hW2comm hcop hbound hsplit
+        ?caseA ?caseB)
+      case caseA =>
+        intro p hp hHp hA
+        refine nonempty_coherent_S_caseA_of_c2 hyp h46 hHK hW1
+          (commutator_ne_bot_of_Xset_commutator_nonempty hyp hXne) ?_ hp
+          (three_le_of_isPGroup_H hyp hp hHp) hHp
+        rw [inf_comm]; exact disjoint_iff.mp hA
+      case caseB =>
+        intro p hp hHp hB
+        <HCASEB>
+```
+
+**▶▶ 残 = hcaseB の 2 sub-problem** (`hB : h46.W2.subgroupOf H ≤ Subgroup.center ↥H`、goal=`Nonempty (IsCoherent S)`):
+教科書 (6.8.3) を精読 (mmd `04.8` L226-) し確定: **`Z = H'`(=`W₂=⁅H,H⁆`)なら `S = X∪Y` ⟹ (6.8.2) seed で直接 coherent
+(easy 枝); `Z ⊊ H'`(`hWMgt` 真)なら (6.8.3) bootstrap**。⟹ `by_cases hWMgt : 1 < (h46.W2.subgroupOf H).relIndex (commutator ↥H)`:
+- **(a) generic (hWMgt 真)**: `nonempty_coherent_S_caseB_of_c2 hyp h46 hHK hW1 hW2H hcop hp hHp hprime hW2comm hB hWMgt hXne'`
+  (hYcard 不要化済！)。**残 sub-problem 1 = `hXne' : (hyp.Xset h46.W2).Nonempty`** — case-B (非 Frobenius) の X(W₂) 非空。
+  既存 `Xset_nonempty_of_subgroupOf_ne_bot` は **Frobenius 仮定要**で使えず、`_of_irreducible_X` は **全 X(W₂) 既約**要
+  (case-B は reducible certain-type column を含みうるので非自明; roadmap cont.²⁶「容易」は要再検証)。
+  **新 lemma 候補**: W₂⊆Z(H) 中心・|W₂|=p ⟹ ∃ θ∈Irr H, W₂⊄ker θ ⟹ Ind θ∈X(W₂) (中心指標が W₂ 上非自明)。
+- **(b) edge (hWMgt 偽 ⟹ W₂=⁅H,H⁆)**: relIndex=1 ⟹ `W₂.subgroupOf H = commutator H` ⟹ `W₂=⁅H,H⁆` (subgroupOf 単射)。
+  seed `coherentXunionYset_caseB hyp h46 hHK hW1 hW2H hB hderiv hcop hp hHp hprime hW2comm hW2cenL hc2 hFPF
+  hk hη₁ cY hcYgood hη₁1 hanchor hχ₁1 hdvd hnonzero` で X(W₂)∪Y coherent → `Xset_union_Yset_eq_S` (Part2:1068,
+  `Xset ⁅H,H⁆ ∪ Yset = S`) で書換え → S coherent。**残 sub-problem 2 = seed の setup**: anchor (`exists_caseB_Xset_anchor`),
+  cY+hcYgood (linchpin `exists_Ycoherence_hgood_uniform_caseB`), 構造 hyp (hderiv/hW2cenL=caseB_W2_le_center_L,
+  **hc2/hFPF(弱)**), hnonzero/hη₁1 (`nonempty_coherent_S_caseB_of_structure` の setup を mirror)。
+  - **弱 hFPF (`|W₁| < |H:W₂|`) は edge でも成立**: `caseB_W1_dvd_index_commutator` (S08_CaseBEndgame:223,
+    「W₁ FPF on H/H'」、hWMgt 非依存) が `|H:H'|=|H:W₂| ≡ 1 mod |W₁|` ⟹ `|W₁| < |H:W₂|` を与える。
+    (強 hfpf `(2|W₁|+1)²≤|H:W₂|` は edge で**偽**: hbound が `|H^ab| < (2|W₁|+1)²` を与えるため。∴ edge は bootstrap 不可、seed 必須。)
+- **見積**: sub-problem 1 (hXne' lemma) と 2 (edge seed setup) はそれぞれ ~30-80 行。bulk は確定。**新数学は hXne' の
+  中心指標論のみ** (edge は既存部品の wiring)。次セッションは bulk を貼り、hXne' lemma を S08_CoherenceCorePart2 か
+  新 leaf に書き、edge を組む。
+
+---
+
 ## 🚩🆕🆕 HANDOFF — (2026-06-20 cont.²⁷ — |Y|=2 ブロッカー数学的解決 ✅, 残 = mechanical cY-rewiring) [DONE, 上に集約]
 
 **状態**: branch `lane-b`、clean、**leaf build green (S08_CaseBCoherence 3480 jobs)、commit `4ec49966`**。
