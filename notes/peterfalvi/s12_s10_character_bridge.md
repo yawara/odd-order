@@ -5,6 +5,38 @@
 > 上位文脈 = 記憶 [[ft-endgame-two-poles]] [[peterfalvi-s10-13-gated-on-bg-spine]]、
 > Lane H 視点の正本 = [`s10_13_maximal_structure.md`](s10_13_maximal_structure.md)。
 
+## ★★ 2026-06-21 更新² — 循環解消 + (10.2)/(10.3) producer 完全 materialize
+
+下の「更新」の結論「producer は (8.8) gate 待ちで打ち止め (循環)」は **SUPERSEDED**。循環は構造変更で断ち、
+producer は実証明で組み上がった (実 sorry S12: 9→7)。方針 = [[feedback-cite-sorried-lemmas-if-signature-correct]]
+(signature 正しければ gated lemma を cite して下流を実証明)。
+
+- **① 循環解消 (`0c4f250a`)**: 旧 `w2_prime` は generic case-B datum 経由で `no_typeV_maximal` → producer に
+  循環した。Peterfalvi (10.3) 原文証明 (`04.12:17` verbatim「By Theorem (8.8), there is a maximal subgroup
+  S of G of **Type II** such that |S:[S,S]|=w₂, **and so w₂ is prime**」) が正路。新 obligation
+  `Hypothesis.exists_typeII_maximal_with_w2` (∃ type-II maximal S, |S:S'|=w₂; faithful sorry, lane-f
+  `theorem88_caseB_holds` gate) から `w2_prime` を**非循環**に実証明 (type-II → W₁ prime (8.6.a), no_typeV 不要)。
+  旧 `exists_caseBData_with_w2` 削除。⟹ `w2_prime` を producer 上流に配置可能に。
+  ⚠ **(8.8) case (b3) 原文確認**: S,T は「Type II/III/IV **or V**」 ⟹ datum を non-type-V に強化するのは
+  unfaithful。type-V を許す generic datum では prime W₁ が出ず no_typeV 必須 = 循環は本物だった。type-II 特化が解。
+- **② producer materialize (`10e97492`)**: 実 sorry 2 本 (`exists_zeta_degree_w1` (10.2) +
+  `w2_prime_and_parameter_independence` (10.3)) → 実証明。
+  - **`Hypothesis.exists_charParamArith`** (sorry-free body): (10.3) 算術 d/δ/n を §6 から materialize。
+    j₀ nontrivial column (w₂ prime⇒≥2)、`d = μ_{0j₀}(1)∈ℕ` (`exists_natDegree_characterDegree_dvd_card`)、
+    **d>1 = (4.4)** (非自明 column は linear でない: linear⇒K-trivial⇒column-0、`columnFamily_mu_ne` 矛盾;
+    `exists_zeta` crux の inline。§6 Recipe 補題は concrete `↥M` instance 要ゆえ generic-L Lemma は不可、inline が解)、
+    **δ=column sign, n·w₁=d−δ = (4.3.d)** (`certainType_degree_modEq` の `μ(1)=δ+w₁·a`、n:=a.toNat、a≥0 ∵ d−δ>0)、
+    degree independence = `muGrid_apply_one_eq`。muGrid↔columnFamily 接続 = `unfold Hypothesis.muGrid; rfl`
+    (host/instance を muGrid と同一に再構成)。
+  - **`Hypothesis.exists_charParameters`**: ζ(10.2)+μ/ω^σ-grid+w2_prime+算術 を実 `CharacterParameters` に package。
+    残 opaque field (delta_independent / τ₁-formulas) は True で埋め (→ (10.5)/(10.6) Dade calc 待ち)。両 producer が cite。
+  - axiom footprint = [propext, sorryAx, Classical.choice, Quot.sound] (sorryAx = (8.8)+Prop16.1 gate のみ、body は sorry 無)。
+
+**▶ 次の lane-b frontier**: S12 残 7 sorry = `exists_typeII_maximal_with_w2` ((8.8) gate=lane-f) +
+(10.5) `alpha_support_and_image` + (10.6) `tau1_values_and_norm_bound` (= Dade calc、`CoherentHypothesis`
+仮定下、要 τ₁) + (10.7)/(10.8)(=(8.8) gate+counting) + (10.9)/(10.10.x)。次の非 lane-f 候補 = **(10.5) α_ij
+support + Dade image** (`coh : CoherentHypothesis` を仮定に取るので coherent 拡張の構成は不要、formula のみ)。
+
 ## ★ 2026-06-21 更新 — (10.3) degree theory 完全 materialize (axiom-clean) + column-0 faithfulness 修正
 
 §6 attack-order の (b)(c) ((10.3) degree 独立性) を**両半分とも axiom-clean で形式化完了**。frontier 前進:
