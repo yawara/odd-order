@@ -247,13 +247,16 @@ apparatus が (10.2)/(10.3)/μ-grid をすべて供給**、新規 apparatus buil
 - `subH := K` (H=K=M' from (10.1)); `subH_normal`/`W2_le_subH`/`subH_le_K` = K facts (易)。
 - `A_covers`: ∀h∈K#, x∈C_K(h)#, ↑x∈typePA0 — `typePA = centralizerSupport (sharpSubgroup M) (derivedInG M)`
   定義から (h∈M'#⊆M#, x∈C_{M'}(h) ⟹ x∈typePA)。要 centralizerSupport 定義確認。
-- `dade0 : S04.Hypothesis G (A∪V^L) M`: **A∪V^L = typePA0** (V^L=M-conj of typePV ⊆ conjClassSet typePV ⊆ typePA0)
-  ⟹ §10 `dadeData.dade : S04.Hypothesis G typePA0 M` を set 等式で transport (Eq.mpr/cast)。
-- `tau : FullDadeIsometryData dade0`: §10 `dadeData.dade.fullDadeIsometryData hconj` から (同 transport)。
+- `dade0 : S04.Hypothesis G (A∪tic.V^L) M`: ⚠⚠ **tic.V=W\W2 ゆえ A∪tic.V^L = typePA0 ∪ (W\W2)^M ⊋ typePA0**
+  (W\W2 ⊇ W1#、W1∩M'=⊥ ゆえ W1#-conj ∉ typePA0)。∴ **§10 dadeData.dade (typePA0 上) では不足** —
+  §6 (4.6) の A₀ (W\W2-based) は §10 A_0(M) (typePV-based) と **別 support**。Peterfalvi (8.15)/(4.6) の
+  A の取り方を精読して reconcile 要 (typePA0 と (4.6) A の関係)。**= 深い Dade bookkeeping、naive transport 不可**。
+- `tau : FullDadeIsometryData dade0`: dade0 解決後。
 
-**主リスク** = dade0/tau の set-equality transport (typePA0∪V^L=typePA0 の証明 + S04.Hypothesis の型 cast) +
-A_covers (centralizerSupport 計算)。中規模 (1 focused session)。完成 ⟹ §6 全 apparatus (degree theory 含む)
-が L=M で発火 ⟹ (10.2) crux の counting + (10.3) d/δ independence が落ちる。
+**主リスク (改訂)** = **dade0 の support 不一致** (§10 typePV-A_0 vs §6 W\W2-A₀ の Peterfalvi 整合) が最重。
++ §5 bridge variant (V=W\W2) + A_covers。⟹ Hypothesis46 は「両 bridge の clean 統合」**ではなく**、
+(4.6) の A/A₀ 定義を Peterfalvi 原文 (§8.15) で精読して §10 と橋渡しする deep construction。**要原文精読**。
+完成すれば §6 全 apparatus (degree theory) が L=M 発火 ⟹ (10.2) crux counting + (10.3) が落ちる。
 
 **代替 route (10.2 のみ)** = 商 M/M'' の Frobenius (`IsFrobeniusGroup.of_centralizer_kernel_le` で
 centralizer_W1 から構成) + `isIrreducibleCharacter_induce_of_frobeniusGroup` + inflation 引き戻し。
