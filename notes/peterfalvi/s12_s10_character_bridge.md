@@ -32,10 +32,22 @@ producer は実証明で組み上がった (実 sorry S12: 9→7)。方針 = [[f
     残 opaque field (delta_independent / τ₁-formulas) は True で埋め (→ (10.5)/(10.6) Dade calc 待ち)。両 producer が cite。
   - axiom footprint = [propext, sorryAx, Classical.choice, Quot.sound] (sorryAx = (8.8)+Prop16.1 gate のみ、body は sorry 無)。
 
+- **③ (10.3) δ_j-independence 完成 (`fa71df35`)**: producer 最後の vacuous clause (`delta_independent := True`) を実証明化。
+  新 §6 sign-constancy `columnFamily_mu_zero_sign_pow` + prime form `columnFamily_mu_zero_sign_eq_of_ne_one`
+  (**axiom-clean**; degree lemma と同じ (3.9.b)+(4.3.b) `hZ : δ'·d'=δ·d`、d'=d>0 で δ'=δ をキャンセル) +
+  §10 `Hypothesis.muColumnSign` (per-column 符号、muGrid 同型再構成) + `muColumnSign_eq_of_ne` (δ_j=δ_j')。
+  `CharacterParameters` の opaque `delta_independent`/`_holds` フィールド削除 → (10.3) 結論が実
+  `∀ j j'≠0, muColumnSign j = muColumnSign j'` を主張・`muColumnSign_eq_of_ne` で証明。
+  **⟹ (10.3) `w2_prime_and_parameter_independence` 全 5 clause 実証明** (w₂ prime / d>1 / degree-indep /
+  δ-indep / n-formula)。sign lemma 単体は axiom-clean、§10 muColumnSign_eq_of_ne は bridge Prop16.1 gate のみ。
+
 **▶ 次の lane-b frontier**: S12 残 7 sorry = `exists_typeII_maximal_with_w2` ((8.8) gate=lane-f) +
 (10.5) `alpha_support_and_image` + (10.6) `tau1_values_and_norm_bound` (= Dade calc、`CoherentHypothesis`
-仮定下、要 τ₁) + (10.7)/(10.8)(=(8.8) gate+counting) + (10.9)/(10.10.x)。次の非 lane-f 候補 = **(10.5) α_ij
-support + Dade image** (`coh : CoherentHypothesis` を仮定に取るので coherent 拡張の構成は不要、formula のみ)。
+仮定下、要 τ₁) + (10.7)/(10.8)(=(8.8) gate+counting) + (10.9)/(10.10.x)。
+**⚠ (10.5)+ は重い**: (10.5) Dade image は (3.6)/(3.8)/(3.2.c/d)/(5.3.b)/(5.5) の重 §3/§5 machinery を要し、かつ
+`params.mu`/`omegaSigma` は free field ゆえ arbitrary params では未証明 — **faithfulness pinning (mu_eq/omegaSigma_eq、
+∀-hG technique で structure 不変)** が前提。(10.5) support 半分は §6 在庫 ((2.1) `mem_compl_conj_into_W`/vanishing/(4.4) anchor)
+で可だが Dade image 半分が deep。(10.7)/(10.8) は (8.8)=lane-f gate。**∴ §10 spine の残りは multi-session Dade 努力**。
 
 ## ★ 2026-06-21 更新 — (10.3) degree theory 完全 materialize (axiom-clean) + column-0 faithfulness 修正
 
