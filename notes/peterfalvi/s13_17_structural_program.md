@@ -393,7 +393,23 @@ pointwise smul = `mem_pointwise_smul_iff_inv_smul_mem` / `pointwise_smul_def`。
 **⟹ (13.17.c) の reusable 群論コア 2/2 完成** (`complement_le_QW2` = E⊆QW₂ / 本 = ∃y)。
 残るは |E|=pq 順序論のみ。
 
-### ⛔ 残 order 論 = §13 構造 gate と確定 (要追加形式化)
+### ✅✅✅ (13.17.c) 本体組立 DONE — `typeI_overNormalizer_complement` 実 assembly (2026-06-20⁹, commit `41b3da9e`)
+
+ユーザー裁可「gated でも sorry 含む定理使用可」を受け、(13.17.c) の opaque `:= sorry` を**実 assembly に置換**。
+3 reusable コア配線: `complement_le_QW2` (Huppert→E⊆QW₂) + `exists_mem_conj_W2_le_of_dvd_card`
+(Schur-Zassenhaus→∃y) + order 論。複製論「W₁⊂E なる complement」を `hW1E` 仮説で忠実記録、consumer
+`typeII_overNormalizer_frobenius` は新 `exists_typeIFrobeniusData_W1_le` 経由で供給(signature 変更
+1 consumer のみ、downstream 無破壊)。**typeI_overNormalizer_complement 本体 + consumer は sorry-free**。
+
+gated 内容を faithful named §13 helper 3 本に isolate(全て gated-endpoint、忠実記述):
+- `Q_W2_structure` (S15:1481): W₂≤N(Q) ∧ Q⊓W₂=⊥ ∧ p∤|Q|。要 W₂≤T + p≠q(bare Hypothesis 不在)。
+- `complement_card_eq_pq` (S15:1494): |E|=pq。要 E∩Q=W₁ + (13.19)/(13.2.a) 除外(深い §13 構造)。
+- `exists_typeIFrobeniusData_W1_le` (S15:1539): W₁ 含む complement 存在。要 W₁∩H=1 (card_LF_coprime) + 補元存在。
+IsSolvable Q は派生 (Q=T_F≤T<⊤)。full build 3844 green、実 sorry 137→139(opaque 1→実 assembly+faithful 3 gap)。
+
+**⟹ (13.17.c) は完全 assembly 化。残り = 3 named §13 helper の証明**(順序論が最深、E∩Q=W₁ gate)。
+
+### ⛔ 旧 order 論メモ = §13 構造 gate と確定 (要追加形式化)
 
 (13.17.c) の残り「|E|∈{q,pq} + ∃y∈Q W₂^y≤E」の crux = **E の q-Sylow が exactly W₁ (位数 q)**。
 これは `E∩Q=W₁` or `[L:L_F]=pq` 等の §13 構造事実を要するが **repo 不在** (grep 確認: S14/S15 に

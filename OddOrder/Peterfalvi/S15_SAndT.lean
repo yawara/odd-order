@@ -1474,27 +1474,113 @@ theorem complement_le_QW2 [Finite G]
     _ = Subgroup.centralizer (hyp.W1 : Set G) := h1316.1
     _ = hyp.Q ⊔ hyp.W2 := h1316.2
 
-/-- **Peterfalvi (13.17.c)/(14.5)**: the Frobenius complement of the type-I subgroup `L` over
-`N_G(U)` has order `p q` and contains a conjugate `W₂^y` (`y ∈ Q`).  *Proof (Pf p.82):* a
-complement `E ⊇ W₁` to `L_F` in `L` is a Frobenius complement of odd order, so its prime-order
-subgroups are normal ([H] V.8.18); hence `E ⊆ N_G(W₁) ⊆ Q W₂` ((13.16)) with cyclic Sylow
-subgroups ([BG] 3.9, `S03g_Thm310`), forcing `E = W₁` or `|E| = p q` with `E = W₁ W₂^y`.  The
-`W₁` alternative is excluded by (14.5).  The genuine §13/§14 obligation feeding (13.17). -/
+/-- §13 structural data for the semidirect product `Q ⋊ W₂` (`Q = T_F`) consumed by the
+`∃ y` step of (13.17.c).  `W₂` normalizes `Q` (as `W₂ ≤ T` and `Q ◁ T`), meets it trivially, and
+`p ∤ |Q| = q^p` (since `p ≠ q`).  Gated on the §13 structure of `T` (`:= sorry`, isolated). -/
+theorem Q_W2_structure [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hyp : Hypothesis (G := G)) :
+    hyp.W2 ≤ Subgroup.normalizer (hyp.Q : Set G) ∧ hyp.Q ⊓ hyp.W2 = ⊥ ∧
+      ¬ hyp.p ∣ Nat.card ↥hyp.Q := sorry
+
+/-- **Peterfalvi (13.17.c) order argument.**  The `W₁`-containing Frobenius complement `E` of `L`
+has order `p q`.  *Proof (Pf p.82):* `E ⊆ Q W₂` (`complement_le_QW2`), and the cyclic Sylow
+subgroups ([BG] Prop 3.9 / `OddComplement`) with `E ∩ Q = W₁` force `|E| = q` or `p q`; the
+`E = W₁` alternative is excluded by (13.19.c1)/(13.2.a).  Gated on the §13 intersection structure
+`E ∩ Q = W₁` (`:= sorry`, isolated). -/
+theorem complement_card_eq_pq [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hyp : Hypothesis (G := G)) {L : Subgroup G}
+    (frob : OddOrder.Peterfalvi.S14.TypeIFrobeniusData L)
+    (hW1E : hyp.W1 ≤ frob.complement.map L.subtype) :
+    Nat.card ↥frob.complement = hyp.p * hyp.q := sorry
+
+/-- **Peterfalvi (13.17.c)/(14.5)**: the `W₁`-containing Frobenius complement of the type-I
+subgroup `L` over `N_G(U)` has order `p q` and contains a conjugate `W₂^y` (`y ∈ Q`).
+
+Assembled from the order argument (`complement_card_eq_pq`, gated on `E ∩ Q = W₁`) and the
+group-theoretic `∃ y` extraction (`exists_mem_conj_W2_le_of_dvd_card`, Schur–Zassenhaus), the
+latter fed `E ⊆ Q W₂` by the Huppert step (`complement_le_QW2`).  The `W₁ ⊆ E` hypothesis records
+Peterfalvi's choice "let `E` be a complement to `H` in `L` such that `W₁ ⊂ E`". -/
 theorem typeI_overNormalizer_complement [Finite G]
     (_hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
     (hSTypeII : IsTypeII hyp.S) {L : Subgroup G} (hLmax : L ∈ maximalSubgroups G)
     (hNUL : Subgroup.normalizer (hyp.U : Set G) ≤ L)
     (hUH : hyp.U ≤ maxNilpotentNormalHall L)
-    (frob : OddOrder.Peterfalvi.S14.TypeIFrobeniusData L) :
+    (frob : OddOrder.Peterfalvi.S14.TypeIFrobeniusData L)
+    (hW1E : hyp.W1 ≤ frob.complement.map L.subtype) :
     Nat.card ↥frob.complement = hyp.p * hyp.q ∧
       ∃ y ∈ hyp.Q, (MulAut.conj y • hyp.W2 : Subgroup G) ≤
-        frob.complement.map L.subtype := sorry
+        frob.complement.map L.subtype := by
+  have hcard := complement_card_eq_pq _hG hyp frob hW1E
+  refine ⟨hcard, ?_⟩
+  obtain ⟨hWnorm, hdisj, hpQ⟩ := Q_W2_structure _hG hyp
+  have hEQW2 := complement_le_QW2 _hG hyp frob hW1E
+  -- `Q` is solvable: `Q = T_F ≤ T < ⊤`.
+  haveI hQsolv : IsSolvable ↥hyp.Q := by
+    have hQT : hyp.Q ≤ hyp.T := by
+      rw [hyp.Q_eq_TF]; exact OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_le hyp.T
+    have hTlt : hyp.T < ⊤ := lt_top_iff_ne_top.mpr (mem_maximalSubgroups.mp hyp.T_maximal).1
+    exact _hG.solvable_of_lt_top hyp.Q (lt_of_le_of_lt hQT hTlt)
+  -- `p ∣ |E.map| = |E| = p q`.
+  have hpE : hyp.p ∣ Nat.card ↥(frob.complement.map L.subtype) := by
+    rw [Nat.card_congr (Subgroup.equivMapOfInjective frob.complement L.subtype
+      L.subtype_injective).toEquiv.symm, hcard]
+    exact dvd_mul_right hyp.p hyp.q
+  exact exists_mem_conj_W2_le_of_dvd_card hWnorm hQsolv hdisj hyp.p_prime
+    hyp.p_eq_card_W2.symm hpQ hEQW2 hpE
+
+/-- `W₁` (order `q`) is coprime to the type-I Frobenius kernel `L_F` (`q ∤ |L_F|`).  This is
+Peterfalvi's "`W₁ ∩ H = 1`", from (8.17.a) / `card_LF_coprime_pq`.  Gated on the opaque
+`kernel_eq_MF` carrier identifying `frob`'s kernel with `maxNilpotentNormalHall L` (`:= sorry`,
+isolated). -/
+theorem q_not_dvd_kernel [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hyp : Hypothesis (G := G)) {L : Subgroup G}
+    (frob : OddOrder.Peterfalvi.S14.TypeIFrobeniusData L) :
+    ¬ hyp.q ∣ Nat.card ↥(frob.typeI.typeF.H.subgroupOf L) := sorry
+
+/-- (13.17.a/b)-strengthening of (12.7): the type-I Frobenius decomposition of `L` can be taken
+with the complement containing `W₁` — Peterfalvi's "let `E` be a complement to `H` in `L` such
+that `W₁ ⊂ E`".  Since `W₁ ≤ N_G(U) ≤ L` is coprime to the kernel (`q ∤ |L_F|`,
+`q_not_dvd_kernel`), Schur–Zassenhaus complement conjugacy
+(`exists_conj_le_of_isComplement'_of_coprime`) places `W₁` in a conjugate `E₀^x` of any complement
+`E₀`, which is again a Frobenius complement (`IsFrobeniusGroup.conjComplement`).  The only `sorry`
+is the coprimality, gated on the opaque `kernel_eq_MF` carrier. -/
+theorem exists_typeIFrobeniusData_W1_le [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hyp : Hypothesis (G := G)) {L : Subgroup G} (hLmax : L ∈ maximalSubgroups G)
+    (hLtypeI : IsTypeI L) (hNUL : Subgroup.normalizer (hyp.U : Set G) ≤ L) :
+    ∃ frob : OddOrder.Peterfalvi.S14.TypeIFrobeniusData L, frob.kernel_eq_MF ∧
+      hyp.W1 ≤ frob.complement.map L.subtype := by
+  obtain ⟨frob₀, hker₀⟩ := OddOrder.Peterfalvi.S14.typeI_frobenius _hG hLmax hLtypeI
+  have hW1L : hyp.W1 ≤ L := hyp.W1_normalizes_U.trans hNUL
+  haveI : (frob₀.typeI.typeF.H.subgroupOf L).Normal := frob₀.frobenius.isNormal
+  -- `L` (maximal) is solvable, hence so is the kernel.
+  haveI hLsolv : IsSolvable ↥L :=
+    _hG.solvable_of_lt_top L (lt_top_iff_ne_top.mpr (mem_maximalSubgroups.mp hLmax).1)
+  haveI : IsSolvable ↥(frob₀.typeI.typeF.H.subgroupOf L) := inferInstance
+  -- coprimality `|W₁| = q` to `|L_F|`.
+  have hcop : Nat.Coprime (Nat.card ↥(hyp.W1.subgroupOf L))
+      (Nat.card ↥(frob₀.typeI.typeF.H.subgroupOf L)) := by
+    have hW1card : Nat.card ↥(hyp.W1.subgroupOf L) = hyp.q := by
+      rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hW1L).toEquiv]
+      exact hyp.q_eq_card_W1.symm
+    rw [hW1card]
+    exact (hyp.q_prime.coprime_iff_not_dvd).mpr (q_not_dvd_kernel _hG hyp frob₀)
+  -- `W₁` lies in a conjugate `E₀^x` of the complement.
+  obtain ⟨x, hx⟩ := Ch03.exists_conj_le_of_isComplement'_of_coprime
+    inferInstance frob₀.frobenius.isComplement hcop
+  refine ⟨{ frob₀ with
+      complement := frob₀.complement.map (MulAut.conj x).toMonoidHom
+      frobenius := frob₀.frobenius.conjComplement x }, frob₀.kernel_eq_MF_holds, ?_⟩
+  -- `W₁ = (W₁.subgroupOf L).map L.subtype ≤ (E₀^x).map L.subtype`.
+  have : hyp.W1 = (hyp.W1.subgroupOf L).map L.subtype := by
+    rw [Subgroup.map_subgroupOf_eq_of_le hW1L]
+  rw [this]
+  exact Subgroup.map_mono hx
 
 /-- **Peterfalvi (13.17)**: if `S` is type II, a maximal subgroup over `N_G(U)` is type-I
 Frobenius, contains `U` in its kernel, and has the stated complement alternatives (order `p q`,
-containing a conjugate `W₂^y`).  Assembled (`sorry`-free) from the type-I existence (13.17.a/b,
-`exists_typeI_maximal_overNormalizer_U`), the (12.7) Frobenius structure
-`OddOrder.Peterfalvi.S14.typeI_frobenius`, and the complement structure (13.17.c,
+containing a conjugate `W₂^y`).  Assembled from the type-I existence (13.17.a/b,
+`exists_typeI_maximal_overNormalizer_U`), a `W₁`-containing Frobenius decomposition
+(`exists_typeIFrobeniusData_W1_le`), and the complement structure (13.17.c,
 `typeI_overNormalizer_complement`). -/
 theorem typeII_overNormalizer_frobenius [Finite G]
     (_hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
@@ -1503,8 +1589,9 @@ theorem typeII_overNormalizer_frobenius [Finite G]
       data.frobenius.kernel_eq_MF ∧ (hyp.U ≤ data.H) := by
   obtain ⟨L, hLmax, hLtypeI, hNUL, hUH⟩ :=
     exists_typeI_maximal_overNormalizer_U _hG hyp hSTypeII
-  obtain ⟨frob, hker⟩ := OddOrder.Peterfalvi.S14.typeI_frobenius _hG hLmax hLtypeI
-  obtain ⟨hcard, hy⟩ := typeI_overNormalizer_complement _hG hyp hSTypeII hLmax hNUL hUH frob
+  obtain ⟨frob, hker, hW1E⟩ := exists_typeIFrobeniusData_W1_le _hG hyp hLmax hLtypeI hNUL
+  obtain ⟨hcard, hy⟩ :=
+    typeI_overNormalizer_complement _hG hyp hSTypeII hLmax hNUL hUH frob hW1E
   exact ⟨⟨L, maxNilpotentNormalHall L, hLmax, rfl, hNUL, frob, hUH, hcard, hy⟩, hker, hUH⟩
 
 /-- Carrier for the virtual character `beta_j` and `Gamma_j` in (13.18). -/

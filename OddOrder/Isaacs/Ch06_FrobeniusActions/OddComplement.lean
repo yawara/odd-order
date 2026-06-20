@@ -392,4 +392,56 @@ theorem normal_of_card_prime_of_isFrobeniusGroup_of_odd
   haveI : Nontrivial ↥N := (Subgroup.nontrivial_iff_ne_bot N).mpr hFrob.ne_bot_kernel
   exact normal_of_card_prime_of_isFrobeniusAction_of_odd hFrob.toFrobeniusAction hodd hr hRcard
 
+/-- A conjugate `A^g` of the complement of a Frobenius group `G = N ⋊ A` is again a Frobenius
+complement (the normal kernel `N` is fixed by conjugation).  Used to choose a complement
+containing a prescribed kernel-disjoint subgroup. -/
+theorem IsFrobeniusGroup.conjComplement {G : Type*} [Group G] [Finite G] {N A : Subgroup G}
+    (h : IsFrobeniusGroup G N A) (g : G) :
+    IsFrobeniusGroup G N (A.map (MulAut.conj g).toMonoidHom) := by
+  haveI := h.isNormal
+  have hAg_card : Nat.card ↥(A.map (MulAut.conj g).toMonoidHom) = Nat.card ↥A :=
+    Nat.card_congr (Subgroup.equivMapOfInjective A (MulAut.conj g).toMonoidHom
+      (MulAut.conj g).injective).toEquiv.symm
+  -- `x ∈ A^g ↔ g⁻¹ x g ∈ A`.
+  have hmem : ∀ x : G, x ∈ A.map (MulAut.conj g).toMonoidHom ↔ g⁻¹ * x * g ∈ A := by
+    intro x
+    rw [Subgroup.mem_map]
+    constructor
+    · rintro ⟨b, hb, rfl⟩
+      have : g⁻¹ * (MulAut.conj g).toMonoidHom b * g = b := by simp [MulAut.conj_apply]; group
+      rwa [this]
+    · intro hx
+      exact ⟨g⁻¹ * x * g, hx, by simp [MulAut.conj_apply]; group⟩
+  have hNdisj : N ⊓ A = ⊥ := disjoint_iff.mp h.isComplement.disjoint
+  refine ⟨h.isNormal, ?_, h.ne_bot_kernel, ?_, ?_⟩
+  · -- `IsComplement' N A^g` via card and disjointness.
+    rw [Subgroup.isComplement'_iff_card_mul_and_disjoint]
+    refine ⟨by rw [hAg_card]; exact h.isComplement.card_mul, ?_⟩
+    rw [Subgroup.disjoint_def]
+    intro x hxN hxAg
+    rw [hmem] at hxAg
+    have hgxg : g⁻¹ * x * g ∈ N ⊓ A :=
+      ⟨by simpa using h.isNormal.conj_mem x hxN g⁻¹, hxAg⟩
+    rw [hNdisj, Subgroup.mem_bot] at hgxg
+    have : x = g * (g⁻¹ * x * g) * g⁻¹ := by group
+    rw [this, hgxg]; group
+  · -- `A^g ≠ ⊥`.
+    intro hbot
+    exact h.ne_bot_complement (Subgroup.card_eq_one.mp (by rw [← hAg_card, hbot, Subgroup.card_bot]))
+  · -- conjugation Frobenius for `A^g`, transferred along `g`.
+    intro a haAg ha1 n hnN hn1 hfix
+    rw [hmem] at haAg
+    have hmN : g⁻¹ * n * g ∈ N := by simpa using h.isNormal.conj_mem n hnN g⁻¹
+    have hb1 : g⁻¹ * a * g ≠ 1 := fun he => ha1 (by
+      have : a = g * (g⁻¹ * a * g) * g⁻¹ := by group
+      rw [this, he]; group)
+    have hm1 : g⁻¹ * n * g ≠ 1 := fun he => hn1 (by
+      have : n = g * (g⁻¹ * n * g) * g⁻¹ := by group
+      rw [this, he]; group)
+    -- `a n a⁻¹ = n` transfers to `(g⁻¹ a g)(g⁻¹ n g)(g⁻¹ a g)⁻¹ = g⁻¹ n g`.
+    have hbm : (g⁻¹ * a * g) * (g⁻¹ * n * g) * (g⁻¹ * a * g)⁻¹ = g⁻¹ * n * g := by
+      have : (g⁻¹ * a * g) * (g⁻¹ * n * g) * (g⁻¹ * a * g)⁻¹ = g⁻¹ * (a * n * a⁻¹) * g := by group
+      rw [this, hfix]
+    exact h.conj_frobenius _ haAg hb1 _ hmN hm1 hbm
+
 end OddOrder.Isaacs.Ch06
