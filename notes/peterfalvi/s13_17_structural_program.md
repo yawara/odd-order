@@ -339,3 +339,35 @@ lifting で engine 内に封入し **caller は basic_structure.UW1_frobenius �
 gate 1,2 (hdisj/hUhall_cop = F-ask) / Wielandt (§9)。**▶ 次 H = obligation ② `typeI_overNormalizer_complement`
 (13.17.c)**: Frobenius 補元 E⊇W₁ が odd Frobenius complement → Huppert [H] V.8.18 (素数位数正規) →
 E⊆N_G(W₁)⊆QW₂ [(13.16)] → cyclic Sylow [BG 3.9] → E=W₁ or |E|=pq。Huppert V.8.18 は repo 不在=新規 (Phase 3)。
+
+## ✅✅✅ Phase 3 完成 — Huppert [H] V.8.18 b) 完全形式化 (2026-06-20⁸, commit `5a577c10`)
+
+**obligation ② の核 ([H] Kapitel V Satz 8.18 b) = 「奇数位数 Frobenius complement の素数位数部分群は正規」)
+を新規 leaf `OddOrder/Isaacs/Ch06_FrobeniusActions/OddComplement.lean` (395 行) で完全形式化**。
+sorry-free + axiom-clean + AxiomsCheck 登録 (full build 3844 jobs green, 実 sorry 137 不変)。reusable。
+
+作用形式 `IsFrobeniusAction A U` ベース (Frobenius 入力は **order-pq cyclic 1 本のみ**
+=`false_of_frobeniusAction_actorSubgroup_not_isCyclic_card_mul_prime`; 残りは A 内在の Z-群論):
+1. `isZGroup_of_isFrobeniusAction_of_odd`: 奇数位数 ⟹ Z-群 (各 Sylow cyclic、6.10+6.11)。
+   ⟹ mathlib `IsZGroup` で N=commutator A cyclic normal、A/N cyclic、`coprime_commutator_index`。
+2. `centralizes_commutator_of_card_prime_coprime`: r∤|N| の R は N を中心化 (coprime 分解
+   `fixedPoints_inf_actionCommutator_eq_bot_of_abelian` + [N,R]≠⊥ なら R⊔S 位数 rs 非cyclic 矛盾)。
+3. `normal_of_card_prime_of_isFrobeniusAction_of_odd` (+ `_isFrobeniusGroup_` 版 = (13.17.c) consumer 用):
+   R^g≤R を r∣|N| (cyclic N 一意性) / r∤|N| (元論法: k r₀⁻¹=⁅g,r₀⁆∈N、ν^r=1⟹coprime で ν=1) で。
+ローカル複製: `eq_of_card_eq_prime_of_isCyclic` (cyclic 素数位数一意性、BG 版を import 方向回避で複製) +
+card 積補題 2 本 (BG S01/S12_E 複製)。
+
+**▶ 残り = (13.17.c) assembly 本体** (Huppert を cite して |E|=pq ∧ ∃y∈Q W₂^y≤E を出す)。**未完。3 つの
+独立した壁**:
+- **(設計) complement choice 問題**: `typeI_overNormalizer_complement` は**任意の** `frob.complement` を取るが、
+  原文証明は「W₁⊆E なる complement E を選ぶ」。Frobenius complement は全共役ゆえ |E|=[L:H]=pq の card 部分は
+  共役不変だが、**`∃y∈Q W₂^y≤E` 部分は a∈L 共役で y₀↦a·y₀ となり Q 内に戻る保証がない** ⟹ 任意 complement では
+  偽になりうる。解 = (a) 仮説 `W₁.subgroupOf L ≤ frob.complement` を追加 (原文に忠実) + consumer
+  `typeII_overNormalizer_frobenius` で W₁ 含む complement の存在 (W₁ は q-部分群・W₁∩H=1 ⟹ ある complement に入る)
+  を別途供給、or (b) 12.7 `typeI_frobenius` (現 sorried) を W₁ 含む complement を返す形に強化。**(a) 推奨**。
+- **(cite) sorried 依存**: (13.16) `normalizer_W1` (N_G(W₁)=QW₂, S15:727 sorried) / (14.5) (S16, E=W₁ 除外) /
+  BG Prop 3.9 cyclic Sylow (= `S03g_Thm310` 系、要確認)。
+- **(構造) |E|∈{q,pq} 抽出**: E⊆QW₂ + cyclic Sylow + W₁⊆E から |E|=q or pq、第 2 case で Sylow 定理で
+  W₂^y≤E (y∈Q)。pure group theory だが Sylow + coercion (↥L vs G) で中量。
+レシピ: Huppert normality を `normal_of_card_prime_of_isFrobeniusGroup_of_odd` で cite
+(W₁.subgroupOf E が位数 q ⟹ E 内正規 ⟹ E≤N_G(W₁))。
