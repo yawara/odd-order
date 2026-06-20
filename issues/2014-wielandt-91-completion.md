@@ -40,8 +40,10 @@ deepest pole。`|C_H(UE)|^|E| · |H| = |C_H(E)|^|E| · |C_H(U)|` (Frobenius L=U�
       を done engine 群 (centerProj isotypic + free-orbit + base change) から discharge。
       items 0-3: (0) E-conjugation → simplesAction module bridge ★ / (1) 3d.3c を real carrier に wire /
       (2) (†) realize / (3) I-4 base change F_p→F̄_p。
-- [ ] **el-ab card↔dim bridge** (lane-h, 自己完結): `Fintype.card ↥(C_V(X)) = p ^ finrank invariants`
-      (`Module.card_eq_pow_finrank` + group fixed subgroup ↔ module invariants 対応)。
+- [x] **el-ab card↔dim bridge `|V|=p^dim`** = **既存** `IsElementaryAbelian.card_eq_pow_finrank`
+      (`PRank.lean:106`, `Nat.card G = p ^ finrank (ZMod p) (Additive G)`)。再導出不要、直接 cite。
+- [ ] **fixed-point 対応** (lane-h, 残): group `C_V(X)` (el-ab V の固定部分群) ↔ module `invariants ρ_X`
+      (`Additive ↥(C_V(X)) ≃ₗ ↥(invariants)` or card 一致)。これと上を合わせ `|C_V(X)|=p^dim V^X`。
 - [ ] **I-5 chief-series assembly** (lane-h, group theory): `|C_H(X)| = ∏_i |C_{V_i}(X)|` を
       `ChiefFactor.chiefSeriesInside` + Isaacs Cor 3.28 (`coprime_fixedPoints_quotient`) で確立 →
       per-factor (⋆) を p_i-power して掛け合わせ → 群 (9.1)。
