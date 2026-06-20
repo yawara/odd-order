@@ -257,6 +257,37 @@ theorem typePData_disjoint_W1_W2 {M : Subgroup G} (data : TypePData M) :
     Subgroup.mem_subgroupOf.mpr hx1
   exact Subtype.ext_iff.mp (hdisj hmem1 hmem2)
 
+/-- The cyclic factors `W₁`, `W₂` of a type-`P` maximal subgroup have coprime orders.
+`W = W₁ × W₂` is cyclic (`TypePData.W_cyclic`) and `W₁`, `W₂` are disjoint
+(`typePData_disjoint_W1_W2`), so the multiplication map `↥W₁ × ↥W₂ →* ↥W` is injective;
+a group embedding into the cyclic `↥W` is cyclic, and a finite cyclic product forces
+coprime factor orders (`coprime_card_of_isCyclic_prod`). -/
+theorem typePData_coprime_card_W1_W2 [Finite G] {M : Subgroup G} (data : TypePData M) :
+    Nat.Coprime (Nat.card ↥data.W1) (Nat.card ↥data.W2) := by
+  haveI hcyc : IsCyclic ↥data.W := data.W_cyclic
+  letI : CommGroup ↥data.W := hcyc.commGroup
+  have hW1le : data.W1 ≤ data.W := data.W_eq ▸ le_sup_left
+  have hW2le : data.W2 ≤ data.W := data.W_eq ▸ le_sup_right
+  have hdisj := typePData_disjoint_W1_W2 data
+  have hinj : Function.Injective
+      ((Subgroup.inclusion hW1le).coprod (Subgroup.inclusion hW2le)) := by
+    rw [injective_iff_map_eq_one]
+    rintro ⟨a, b⟩ hab
+    rw [MonoidHom.coprod_apply] at hab
+    have hG : (a : G) * (b : G) = 1 := by
+      have h2 := congrArg (Subtype.val (p := fun x => x ∈ data.W)) hab
+      simpa [Subgroup.coe_inclusion] using h2
+    have ha1 : (a : G) = 1 := by
+      have haW2 : (a : G) ∈ data.W2 := by
+        rw [mul_eq_one_iff_eq_inv.mp hG]; exact data.W2.inv_mem b.2
+      have hmem : (a : G) ∈ data.W1 ⊓ data.W2 := ⟨a.2, haW2⟩
+      rw [disjoint_iff.mp hdisj] at hmem
+      exact Subgroup.mem_bot.mp hmem
+    have hb1 : (b : G) = 1 := by rw [ha1, one_mul] at hG; exact hG
+    exact Prod.ext (Subtype.ext ha1) (Subtype.ext hb1)
+  haveI : IsCyclic (↥data.W1 × ↥data.W2) := isCyclic_of_injective _ hinj
+  exact coprime_card_of_isCyclic_prod (↥data.W1) (↥data.W2)
+
 /-! ## (10.2)--(10.4): basic character parameters and coherent extension -/
 
 /-- The character parameters obtained in Peterfalvi (10.2)--(10.3).

@@ -63,7 +63,7 @@ lane-f の POLE-1 `section16TypePStructure` の primes 残 sorry も honest 化*
 |---|---|---|
 | W/W1/W2, W1≤W, W2≤W, nontrivial, W1⊔W2=W, W_cyclic | TypePData 直対応 (`W_eq`/`W_cyclic`/`W*_nontrivial`) | 易 |
 | `W_disjoint` | `M_complement` (W1∩M'=⊥) + W2≤H≤M' | ✅ **DONE** = `typePData_disjoint_W1_W2` (S12) |
-| `W_card_coprime` | disjoint + cyclic ⟹ coprime (cyclic-subgroup-lattice 引数) | **TODO** (§3c) |
+| `W_card_coprime` | disjoint + cyclic ⟹ coprime | ✅ **DONE** = `typePData_coprime_card_W1_W2` (S12) |
 | `W_card_odd` | G odd (IsMinimalSimpleOdd) ⟹ \|W\| odd。要 hG 引数 | TODO (容易) |
 | `V := typePV M = W\(W1∪W2)` | TICyclicHypothesis.V と一致 | 易 |
 | `V_subset_sharp` | 1∈W1 ⟹ 1∉V ⟹ V⊆univ\{1} | 易 |
@@ -87,12 +87,13 @@ lane-f の POLE-1 `section16TypePStructure` の primes 残 sorry も honest 化*
   (iii) 最悪 case = ブリッジを `(hVti : IsTISubset (typePV M typeP) typeP.W)` パラメータ化 (§6 precedent) し、
   V_ti を別 obligation として後で discharge (honest factoring; scaffold ではない — V_ti は具体的 TI 事実)。
 
-### 3c. coprime TODO
+### 3c. coprime ✅ DONE
 
-W cyclic + `typePData_disjoint_W1_W2` ⟹ Coprime \|W1\| \|W2\|。Klein-four 反例ゆえ **cyclic が本質**
-(disjoint 単独では不可)。S15 `coprime_card_U_card_P_of_disjoint` (S15_SAndT:888) は **Hall 経由**で別機構。
-要: cyclic 群の「disjoint subgroups ⟹ coprime orders」(subgroup-of-order-gcd 一意性)。
-product 公式 `|W1⊔W2|·|W1⊓W2|=|W1||W2|` (abelian) + cyclic uniqueness で ~30-50 行見込み。
+`typePData_coprime_card_W1_W2` (S12, axiom-clean)。Klein-four 反例ゆえ **cyclic が本質** (disjoint 単独では
+不可)。S15 `coprime_card_U_card_P_of_disjoint` (S15_SAndT:888) は Hall 経由で別機構ゆえ非流用。
+**実装** = 乗法写像 `(Subgroup.inclusion hW1le).coprod (Subgroup.inclusion hW2le) : ↥W₁ × ↥W₂ →* ↥W`
+が disjoint から injective → `isCyclic_of_injective` (cyclic への埋め込みは cyclic) →
+`coprime_card_of_isCyclic_prod` (mathlib `SpecificGroups/Cyclic`: 有限 cyclic product ⟹ 因子 coprime)。
 
 ### 3d. μ-level (ブリッジの次)
 
@@ -117,8 +118,8 @@ TICyclicHypothesis は **W-level ω/σ** のみ (ω on W, ω^σ on G)。μ_ij (o
 ## 5. 攻略順 (推奨)
 
 1. ✅ `typePData_disjoint_W1_W2` (DONE, S12)。
-2. `typePData_coprime_card_W1_W2` (§3c, cyclic-lattice)。+ `W_card_odd` (要 hG)。
-3. V_ti 解決 (§3b の調査 (i)/(ii) → 最悪 (iii) パラメータ化) ⟹ **ブリッジ `Hypothesis.toTICyclicHypothesis` 完成** ⟹ ω-grid が §10 で利用可能に。
+2. ✅ `typePData_coprime_card_W1_W2` (DONE, S12)。**残: `W_card_odd`** (G odd from hG; 容易)。
+3. V_ti 解決 (§3b の調査 (i)/(ii) → 最悪 (iii) パラメータ化) ⟹ **ブリッジ `Hypothesis.toTICyclicHypothesis` 完成** ⟹ ω-grid が §10 で利用可能に。次セッションの主タスク。
 4. `CharacterParameters` de-opaque (§2、S15 模範) — opaque Prop を実恒等式に。
 5. μ-level: M' の certain-type 構造 (§3d) ⟹ `mu`/`alpha` grid 供給。
 6. (10.2)/(10.3) producer 構成 → (10.5)/(10.6) Dade calc → (10.8) keystone → (10.9)/(10.10.x)。
