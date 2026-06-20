@@ -949,6 +949,38 @@ theorem isTypeP1_kappaSigma_compl_hall_subgroupOf_eq_bot [Finite G] {M U : Subgr
   · exact Set.mem_union_right _ hpσ
   · exact Set.mem_union_left _ (hP1.2 ▸ ⟨hpM, hpσ⟩)
 
+/-- **Converse: `κ(M) = π(M) ∖ σ(M)` from a trivial Hall `(κ ∪ σ)ᶜ`-complement** (the second half of
+the type-`P₁` ⟺ `U = ⊥` characterization).  If the Hall `(κ(M) ∪ σ(M))ᶜ`-subgroup of `M` is trivial,
+then `(κ ∪ σ)ᶜ` contains no prime dividing `|M|` (the Hall index condition `hU.2` with index `|M|`),
+so `π(M) ⊆ κ(M) ∪ σ(M)`; combined with `κ(M) ⊆ π(M) ∖ σ(M)` (every `κ`-prime is a non-`σ` divisor of
+`|M|`) this gives `κ(M) = π(M) ∖ σ(M) = sigmaComplementPrimes M`.
+
+Together with `isTypeP1_kappaSigma_compl_hall_subgroupOf_eq_bot` this is the prime-set core of BG's
+"`M ∈ M_{P₁} ⟺ U = ⊥`": modulo `IsTypeP` (`κ ≠ ∅`), `U = ⊥ ⟺ M` is type `P₁`. -/
+theorem kappa_eq_sigmaComplementPrimes_of_hall_subgroupOf_eq_bot [Finite G] {M U : Subgroup G}
+    (hU : Ch03.IsHallSubgroup ((S14.kappa M ∪ OddOrder.BG.Ch3.S10.sigma M)ᶜ) (U.subgroupOf M))
+    (hUbot : U.subgroupOf M = ⊥) :
+    S14.kappa M = S14.sigmaComplementPrimes M := by
+  refine Set.Subset.antisymm (fun p hpκ => ?_) (fun p hpσ' => ?_)
+  · -- `κ ⊆ π ∖ σ`: a `κ`-prime is non-`σ` (`τ₁ ∪ τ₃`) and divides `|M|` (rank-one `P ≤ M`).
+    obtain ⟨hpp, hτ, P, hPelem, hPM, _⟩ := hpκ
+    have hpσ : p ∉ OddOrder.BG.Ch3.S10.sigma M := by
+      rcases hτ with h | h
+      · exact ((mem_tau1_iff M p).mp h).1
+      · exact ((mem_tau3_iff M p).mp h).1
+    have hpπ : p ∈ S14.piSet M := by
+      refine Nat.mem_primeFactors.mpr ⟨hpp, ?_, Nat.card_pos.ne'⟩
+      have hPcard : Nat.card ↥P = p := by rw [hPelem.2, pow_one]
+      exact hPcard ▸ Subgroup.card_dvd_of_le hPM
+    exact ⟨hpπ, hpσ⟩
+  · -- `π ∖ σ ⊆ κ`: `U = ⊥` forces every `|M|`-prime into `κ ∪ σ`; non-`σ` ones land in `κ`.
+    obtain ⟨hpπ, hpσ⟩ := hpσ'
+    by_contra hpκ
+    refine hU.2 p (by rw [hUbot, Subgroup.index_bot]; exact hpπ) ?_
+    rintro (h | h)
+    · exact hpκ h
+    · exact hpσ h
+
 /-! ## Proposition 16.1: BG local taxonomy and shared Type I--V predicates -/
 
 /-- **§14/§15-independent assembly engine for BG Proposition 16.1** (mmd L4478; the source proof
