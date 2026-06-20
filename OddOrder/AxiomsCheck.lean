@@ -5253,3 +5253,18 @@ Fully unconditional, axiom-clean. -/
 
 #assert_only_allowed_axioms
   OddOrder.GroupTheory.pointwise_mulAut_smul_eq_map
+
+/-! **The Peterfalvi maximal-subgroup type is conjugacy-invariant** (`MaximalSubgroupTypeConj`).
+Every structural datum of `TypeFData`/`TypeIData` transfers along `φ : MulAut G`
+(`TypeFData.conj`, `isTypeI_pointwise_smul`), so conjugate maximal subgroups share their Peterfalvi
+type (`isTypeI_of_conj`).  This is the unconditional, axiom-clean **gate-4 piece 1** infrastructure
+of Peterfalvi (13.17.b).  Its downstream application
+`OddOrder.Peterfalvi.S15.not_conj_of_isTypeI_of_isTypeNonI` (a type-`I` maximal subgroup is
+non-conjugate to the non-I `S`, `T`) has a sorry-free *proof* but transitively cites the still
+sorried §16 type classification `not_isTypeI_of_isTypeNonI`, so it is not registered here. -/
+
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.TypeFData.conj
+
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.isTypeI_of_conj

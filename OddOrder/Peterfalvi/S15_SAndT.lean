@@ -5,6 +5,7 @@ Authors: Yawara Ishida
 -/
 import OddOrder.Peterfalvi.S14_MaximalI
 import OddOrder.Peterfalvi.S10_CoherenceWiring
+import OddOrder.GroupTheory.MaximalSubgroupTypeConj
 import Mathlib.Algebra.BigOperators.ModEq
 import Mathlib.FieldTheory.Finite.Basic
 import Mathlib.RingTheory.Polynomial.Cyclotomic.Roots
@@ -1068,28 +1069,61 @@ theorem le_kernel_of_isMulCommutative_of_inf_ne_bot {L : Type*} [Group L] [Finit
   refine hcent (Subgroup.mem_centralizer_singleton_iff.mpr ?_)
   exact congrArg Subtype.val (hUab.is_comm.comm ⟨u, hu⟩ ⟨x, hxU⟩)
 
+/-- **Type is conjugacy-invariant** (the (13.17.a/b) `L ~ S`/`L ~ T` rule-out): a type-`I` maximal
+subgroup `L` is not conjugate to any non-type-`I` maximal subgroup `M`.  If `conj g • L = M` then
+`M` would be type `I` (`isTypeI_of_conj`, the automorphism-equivariance of the Peterfalvi taxonomy
+— `OddOrder.GroupTheory.MaximalSubgroupTypeConj`), contradicting
+`not_isTypeI_of_isTypeNonI`.  This is **gate-4 piece 1**, now discharged (sorry-free, axiom-clean);
+reusable across the §16 conjugacy arguments. -/
+theorem not_conj_of_isTypeI_of_isTypeNonI [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    {L M : Subgroup G} (hLI : IsTypeI L) (hMmax : M ∈ maximalSubgroups G)
+    (hMnonI : IsTypeNonI M) : ¬ ∃ g : G, MulAut.conj g • L = M :=
+  fun ⟨g, hg⟩ =>
+    OddOrder.BG.Ch4.S16.not_isTypeI_of_isTypeNonI hG hMmax hMnonI
+      (OddOrder.GroupTheory.isTypeI_of_conj hLI hg)
+
+/-- **Peterfalvi (13.17.b), the (9.1) fixed-point-free residual (gate-4 pieces 4–6)**: once the
+(8.17.a) coprimality `|L_F| ⟂ p q` is in hand for the type-`I` `L` over `N_G(U)`, the complement
+`U` lies in the Fitting kernel `L_F`.  As `|W₁| = q ∤ |L_F|`, `W₁ ∩ L_F = 1`; were `U ∩ L_F = 1`,
+the Frobenius group `U W₁ ⊆ L` (from (13.2.a)) would act fixed-point-freely on `L_F`
+(`U, W₁ ≤ L ≤ N_G(L_F)`, a coprime action), so Wielandt's formula (9.1)
+`wielandt_fixedPoint_frobenius` would force `|L_F| = 1`, against type-`I` `L_F ≠ 1`
+(`TypeFData.H_nontrivial`); hence `U ∩ L_F ≠ 1` and `U ⊆ C_L(U ∩ L_F) ⊆ L_F`
+(`le_kernel_of_isMulCommutative_of_inf_ne_bot`).  The isolated deep residual of gate 4: the
+`CoprimeFrobeniusAction (U W₁) (L_F)` construction plus the (still sorried) Wielandt formula.
+`:= sorry`; see issue 2009 / `notes/peterfalvi/s13_17_structural_program.md`. -/
+theorem typeI_U_le_fitting_of_coprime [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hyp : Hypothesis (G := G)) (_hSTypeII : IsTypeII hyp.S) {L : Subgroup G}
+    (_hLmax : L ∈ maximalSubgroups G) (_hLI : IsTypeI L)
+    (_hNUL : Subgroup.normalizer (hyp.U : Set G) ≤ L)
+    (_hcop : Nat.Coprime (Nat.card ↥(maxNilpotentNormalHall L)) (hyp.p * hyp.q)) :
+    hyp.U ≤ maxNilpotentNormalHall L := sorry
+
 /-- **Peterfalvi (13.17.b) `U ⊆ L_F` for the type-`I` `L`**: when `S` is type II and `L` is a
 type-`I` maximal subgroup over `N_G(U)`, the complement `U` lies in the Fitting kernel `L_F`.
 
 *Proof (Pf p.82, the gate-4 structural core):* `L` is non-conjugate to `S` and `T` (it is type `I`
-while `S`, `T` are type II/non-I and type is conjugacy-invariant), so (8.17.a) =
-`card_LF_coprime_pq` (B2) gives `|L_F|` prime to `p q`, in particular to `q = |W₁|`; hence
-`W₁ ⊓ L_F = 1`.  Were `U ⊓ L_F = 1`, the Frobenius group `U W₁ ⊆ L` (from (13.2.a)) would
-act fixed-point-freely on `L_F` (a coprime action, `U, W₁ ≤ L ≤ N_G(L_F)`), so Wielandt's
-formula (9.1) = `wielandt_fixedPoint_frobenius` would force `|L_F| = 1`, contradicting `L_F ≠ 1`
-(type `I`, `TypeFData.H_nontrivial`).  Thus `U ⊓ L_F ≠ 1`, and as `L_F` is nilpotent normal in
-`L` the self-centralizing property gives `U ⊆ C_L(U ⊓ L_F) ⊆ L_F`.
+while `S`, `T` are non-I and type is conjugacy-invariant — `not_conj_of_isTypeI_of_isTypeNonI`, the
+**discharged gate-4 piece 1**), so (8.17.a) = `card_LF_coprime_pq` (B2) gives `|L_F|` prime to
+`p q`, in particular to `q = |W₁|`.  The remaining (9.1) fixed-point-free argument
+(`W₁ ∩ L_F = 1`; `U ∩ L_F ≠ 1` by Wielandt; `U ⊆ C_L(U ∩ L_F) ⊆ L_F`) is
+`typeI_U_le_fitting_of_coprime` (the isolated deep residual of gate 4).
 
-This producer is the isolated residual of gate 4 alongside `card_LF_coprime_pq`: its body assembles
-the (8.17.a)+(9.1) fixed-point-free argument, whose two genuinely deep inputs are the BG-Theorem-E
-coprimality `card_LF_coprime_pq` (owner = F) and the Wielandt formula
-`wielandt_fixedPoint_frobenius` (already a sorried §9 producer).  Declared `:= sorry`; see
-issue 2013 / `notes/peterfalvi/s13_17_structural_program.md`. -/
+Assembled `sorry`-free from the piece-1 non-conjugacy, the (8.17.a) coprimality producer
+`card_LF_coprime_pq` (owner = F, BG Theorem E), and `typeI_U_le_fitting_of_coprime`. -/
 theorem typeI_overNormalizer_U_le_fitting [Finite G]
     (_hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
     (_hSTypeII : IsTypeII hyp.S) {L : Subgroup G} (_hLmax : L ∈ maximalSubgroups G)
     (_hLI : IsTypeI L) (_hNUL : Subgroup.normalizer (hyp.U : Set G) ≤ L) :
-    hyp.U ≤ maxNilpotentNormalHall L := sorry
+    hyp.U ≤ maxNilpotentNormalHall L := by
+  -- (piece 1) `L` is non-conjugate to `S`, `T` (type is conjugacy-invariant; `S`, `T` are non-I).
+  have hnS : ¬ ∃ g : G, MulAut.conj g • L = hyp.S :=
+    not_conj_of_isTypeI_of_isTypeNonI _hG _hLI hyp.S_maximal hyp.S_nonI
+  have hnT : ¬ ∃ g : G, MulAut.conj g • L = hyp.T :=
+    not_conj_of_isTypeI_of_isTypeNonI _hG _hLI hyp.T_maximal hyp.T_nonI
+  -- (piece 2) the (8.17.a) coprimality, then (pieces 4–6) the isolated FPF residual.
+  exact typeI_U_le_fitting_of_coprime _hG hyp _hSTypeII _hLmax _hLI _hNUL
+    (card_LF_coprime_pq _hG hyp _hLmax _hLI hnS hnT)
 
 /-- **Peterfalvi (13.17.a/b)**: a maximal subgroup `L` over `N_G(U)` (for `S` of type II) is of
 type I with `U ⊆ L_F`.  *Proof (Pf pp.81-82):* take any maximal `L ⊇ N_G(U)` (proper since
