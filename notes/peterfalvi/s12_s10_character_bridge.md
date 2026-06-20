@@ -5,6 +5,37 @@
 > 上位文脈 = 記憶 [[ft-endgame-two-poles]] [[peterfalvi-s10-13-gated-on-bg-spine]]、
 > Lane H 視点の正本 = [`s10_13_maximal_structure.md`](s10_13_maximal_structure.md)。
 
+## ★★★ 2026-06-21 更新³ — (10.5) support half 完成 (dade0-free, 自前 sorry 0)
+
+**Peterfalvi (10.5) の support 半分 `Supp(α_{ij}) ⊆ A_0(M)` を dade0-free で完全形式化** (S12, build-green
+3870 jobs + AxiomsCheck OK)。直前 commit (`f1467765` で抽出した (4.7) structural core) を使う計画通り、
+**enlarged-support Dade (`Hypothesis46.dade0`) を一切構成せず**に原文 (10.5) の short argument を忠実に再現:
+
+- **`Hypothesis.muGrid_apply_eq_columnSign_mul_zeroColumn_of_mem_W1`** (linchpin): `x ∈ W₁^#` で
+  `μ_{ij}(x) = δ_j · μ_{i0}(x)` ((4.3.c) `certainType_apply_eq_of_mem_V` on `V=W∖W₂ ⊇ W₁^#` + chiColumn の
+  `W₁`-coll collapse (`wSnd=1` で χ₂ 因子消滅, inline `chiColumn_apply_eq` 相当) + δ_0=1 anchor)。muGrid/muColumnSign
+  reconstruction は `unfold; rfl` idiom (instance は **明示供給せず synthesis** に任せる ← `Fintype` は data ゆえ
+  明示 haveI は def の synthesized と不一致になり rfl 破綻、これが最大の罠だった)。
+- **`Hypothesis.muGrid_zero_column_apply_one`**: `μ_{i0}(1)=1` ((4.4) anchor `μ_{00}=1_L` + within-column 定数性)。
+- **`Hypothesis.muGrid_alpha_support`** (本体): α(1)=0 (n·w₁=d−δ) + ζ は M' 誘導ゆえ M' 外で消滅
+  (`support_induce_subset_of_normal`/`induce_eq_zero_of_not_mem_normal`) + z∈M' は自己中心化で `(M')^#⊆typePA` +
+  z∉M' は (2.1) `mem_compl_conj_into_W` で `x·y` (x∈W₁^#,y∈W₂) に共役、y=1 なら W₁^# vanishing で矛盾、y≠1 なら
+  `x·y∈typePV`⟹`z∈conjClassSet typePV`。`α.conj_eq` で class-function 不変性、`typePData_disjoint_W1_W2` で W₁⊓W₂=⊥。
+- **carrier 配線**: `CharacterParameters` に **`alpha_support : ∀ i j, j≠0 → (alpha i j).support ⊆ A0`** field を追加
+  (placeholder でなく genuine 述語)。producer `exists_charParameters` で `muGrid_alpha_support` から discharge。
+  そのため `exists_charParamArith` を **δ_j-independence (`∀ j≠0, muColumnSign j = delta`) も返す**よう拡張
+  (`muColumnSign_eq_of_ne` + `unfold muColumnSign; rfl`)。`alpha_support_and_image` (旧 1 sorry, support+image 束ね) を
+  **`alpha_support` (= `params.alpha_support`, 完全 axiom-clean `[propext,Classical.choice,Quot.sound]`) + `alpha_tau_image`
+  (Dade-image 半分, sorry 残置)** に分割。
+- **axiom footprint**: `muGrid_alpha_support`/W₁-lemma = `[propext, sorryAx, Classical.choice, Quot.sound]`、sorryAx は
+  **すべて上流 bridge gate (Prop 16.1 / `theoremA_maximal_structure`, lane-f 所有) 由来で自前 sorry 0** (§10 muGrid 全結果と同じ)。
+  `alpha_support` (projection) は sorryAx すら無し。
+
+**▶ 次の lane-b frontier** (real 進捗順): **(10.5) Dade-image 半分 `alpha_tau_image`** (`S12:~1690`, sorry) =
+`α_{ij}^τ = δ(ω_{ij}^σ − ω_{i0}^σ) − n·ζ^{τ₁}`。原文は `hyp.tau` (既存 §10 Dade) + `omegaSigmaGrid` (§5) + (4.3.c) +
+(3.2.c)/(3.6)/(3.8) NC machinery + (5.3.b)/(5.5) を使う **重い analytic** (cont.² で dade0-free と確認済だが §3 NC が要)。
+その後 (10.6) `tau1_values_and_norm_bound`。(10.7)/(10.8) は (8.8)=lane-f gate。S12 は **1700+ 行で hub 分割対象** (⚠ flag)。
+
 ## ★★ 2026-06-21 更新² — 循環解消 + (10.2)/(10.3) producer 完全 materialize
 
 下の「更新」の結論「producer は (8.8) gate 待ちで打ち止め (循環)」は **SUPERSEDED**。循環は構造変更で断ち、
