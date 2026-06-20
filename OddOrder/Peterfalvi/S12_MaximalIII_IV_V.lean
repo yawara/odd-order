@@ -343,6 +343,91 @@ noncomputable def typePData_toTICyclicHypothesis [Finite G] {M : Subgroup G}
     rw [h3]; exact hv
   V_ti := hVti
 
+/-! ## §10 → §6 (4.2)+Dade bridge (μ-grid unlock)
+
+Peterfalvi (10.1) states that Hypothesis (4.6) holds with `L = M`, `H = K = M' = [M,M]`.  Once that
+instantiation is realised, the §6 certain-type apparatus (the `μ_{ij}`/`ω_{ij}`/`ζ` families, the
+Brauer permutation lemma, the Clifford inertia computation) supplies (10.2), (10.3) and the `μ`-grid
+directly.  This bridge builds the §6 *structural* Hypothesis (4.2) `S06.Hypothesis ↥M` from the
+`TypePData`, then combines it with the §10 Dade datum (`dadeData.dade`, already a
+`S04.Hypothesis G (A₀(M)) M`) into a `S06.CertainTypeHypothesis`.  See
+`notes/peterfalvi/s12_s10_character_bridge.md` §6. -/
+
+/-- **§10 → §6 (4.2) bridge, structural part**: build the Peterfalvi Hypothesis (4.2)
+`S06.Hypothesis ↥M` from a type-`P` maximal subgroup's `TypePData`, with `L = M`, `K = M' = [M,M]`
+and the (8.4) cyclic factors `W₁, W₂` transported into `↥M` via `subgroupOf`.  Structural fields
+come from `TypePData`: `M_complement → isComplement`, `centralizer_W1 → centralizer_W2` (through the
+ambient↔`↥M` centralizer transport `S03h.centralizer_subgroupOf`), and cyclicity / oddness through
+the order-preserving `subgroupOfEquivOfLe`; `K ⊴ ↥M` because `K = commutator ↥M`.
+
+The Hall coprimality `card_coprime` (`gcd(|M'|,|W₁|) = 1`, i.e. `W₁` is a *Hall* complement to `M'`
+in `M`) is **not** derivable from `TypePData` alone — a complement need not be Hall — so it is taken
+as the input `hHall`.  This is the Peterfalvi (4.2.a) Hall condition, dischargeable at call sites
+from the κ-Hall structure of a type-`P` maximal (`typeP_derivedInG_isComplement_kappaHall` +
+`IsHallSubgroup.coprime_index`, since `|W₁| = [M:M'] = |κ-Hall K|`).  See issue 1006. -/
+def typePData_toS06Hypothesis [Finite G] {M : Subgroup G} (data : TypePData M)
+    (hodd : Odd (Nat.card G))
+    (hHall : Nat.Coprime (Nat.card ↥(derivedInG M)) (Nat.card ↥data.W1)) :
+    OddOrder.Peterfalvi.S06.Hypothesis ↥M := by
+  have hM'le : derivedInG M ≤ M := Subgroup.map_subtype_le _
+  have hW2leM' : data.W2 ≤ derivedInG M :=
+    data.W2_le.trans (le_trans inf_le_right (Subgroup.map_subtype_le _))
+  have hW2leM : data.W2 ≤ M := hW2leM'.trans hM'le
+  haveI := data.W1_cyclic
+  haveI := data.W2_cyclic
+  exact
+    { K := (derivedInG M).subgroupOf M
+      W1 := data.W1.subgroupOf M
+      W2 := data.W2.subgroupOf M
+      K_normal := by
+        rw [show (derivedInG M).subgroupOf M = commutator ↥M by
+          rw [derivedInG, Subgroup.subgroupOf,
+            Subgroup.comap_map_eq_self_of_injective M.subtype_injective]]
+        infer_instance
+      isComplement := data.M_complement
+      W1_nontrivial := by
+        rw [ne_eq, Subgroup.subgroupOf_eq_bot]
+        exact fun hdisj => data.W1_nontrivial (disjoint_self.mp (hdisj.mono_right data.W1_le))
+      W1_cyclic := isCyclic_of_injective (Subgroup.subgroupOfEquivOfLe data.W1_le).toMonoidHom
+        (Subgroup.subgroupOfEquivOfLe data.W1_le).injective
+      card_coprime := by
+        rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hM'le).toEquiv,
+          Nat.card_congr (Subgroup.subgroupOfEquivOfLe data.W1_le).toEquiv]
+        exact hHall
+      W2_nontrivial := by
+        rw [ne_eq, Subgroup.subgroupOf_eq_bot]
+        exact fun hdisj => data.W2_nontrivial (disjoint_self.mp (hdisj.mono_right hW2leM))
+      W2_cyclic := isCyclic_of_injective (Subgroup.subgroupOfEquivOfLe hW2leM).toMonoidHom
+        (Subgroup.subgroupOfEquivOfLe hW2leM).injective
+      W2_le_K := Subgroup.comap_mono hW2leM'
+      centralizer_W2 := by
+        intro x hx1 hx2
+        have hxW1 : (x : G) ∈ data.W1 := Subgroup.mem_subgroupOf.mp hx1
+        have hxne : (x : G) ≠ 1 := fun h => hx2 (Subtype.ext h)
+        have hamb : Subgroup.centralizer ({(x : G)} : Set G) ⊓ derivedInG M = data.W2 := by
+          rw [inf_comm]; exact data.centralizer_W1 (x : G) hxW1 hxne
+        rw [OddOrder.BG.Ch1.S03h.centralizer_subgroupOf, Set.image_singleton]
+        simp only [Subgroup.subgroupOf, ← Subgroup.comap_inf, Subgroup.coe_subtype, hamb]
+      W_odd := by
+        rw [← Subgroup.subgroupOf_sup data.W1_le hW2leM,
+          Nat.card_congr (Subgroup.subgroupOfEquivOfLe (sup_le data.W1_le hW2leM)).toEquiv,
+          ← data.W_eq]
+        exact typePData_W_card_odd data hodd }
+
+open scoped FiniteInduce in
+/-- **§10 → §6 (4.2)+Dade bridge**: from the §10 Hypothesis (10.1) for a type-`P` maximal subgroup
+`M`, build the §6 certain-type Hypothesis `S06.CertainTypeHypothesis (A₀(M)) M`.  The structural
+(4.2) part is `typePData_toS06Hypothesis`; the Dade datum is the §10 `dadeData.dade` (already a
+`S04.Hypothesis G (typePA0 M typeP) M`), so no new Dade construction is needed.  This unlocks the
+entire §6 μ/ω/ζ machinery with `L = M`, the common source of (10.2), (10.3) and the `μ`-grid. -/
+def Hypothesis.toCertainTypeHypothesis [Finite G] {M : Subgroup G} (hyp : Hypothesis M)
+    (hodd : Odd (Nat.card G))
+    (hHall : Nat.Coprime (Nat.card ↥(derivedInG M)) (Nat.card ↥hyp.typeP.W1)) :
+    OddOrder.Peterfalvi.S06.CertainTypeHypothesis (typePA0 M hyp.typeP) M :=
+  haveI := hyp.finiteG
+  { toHypothesis := typePData_toS06Hypothesis hyp.typeP hodd hHall
+    dade := hyp.dadeData.dade }
+
 /-! ## (10.2)--(10.4): basic character parameters and coherent extension -/
 
 /-- The character parameters obtained in Peterfalvi (10.2)--(10.3).

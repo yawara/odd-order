@@ -189,21 +189,37 @@ apparatus が (10.2)/(10.3)/μ-grid をすべて供給**、新規 apparatus buil
   | `W1_nontrivial`/`W1_cyclic` | `W1_nontrivial`/`W1_cyclic` | subgroupOf transport |
   | `W2_nontrivial`/`W2_cyclic`/`W2_le_K` | `W2_*`/(W2≤H≤M') | subgroupOf transport |
   | `centralizer_W2 : ∀x∈W1#, C_K(x)=W2` | `centralizer_W1` (C_{M'}(x)=W2) | G↔↥M transport (fiddly) |
-  | `card_coprime : Coprime |K| |W1|` | **W₁ Hall in M (要確認)** | ⚠ TypePData に直接無し? gap 可能 |
-  | `W_odd` | `typePData_W_card_odd` 系 | 易 |
+  | `card_coprime : Coprime |K| |W1|` | **param `hHall`** (W₁ Hall, 非導出) | ⏸ **issue 1006** |
+  | `W_odd` | `typePData_W_card_odd` 系 | ✅ 易 |
 
-  **⚠ 主リスク = `card_coprime` (W₁ が M の Hall complement = gcd(|M'|,|W₁|)=1)**: complement だけでは
-  従わない。TypePData が供給するか / BG type-P 構造から導けるか要確認 (gap なら別 obligation 化)。
-  他は subtype (subgroupOf) transport の機械作業 (centralizer の G↔↥M が最も fiddly)。
+  **`card_coprime` (W₁ が M の Hall complement = gcd(|M'|,|W₁|)=1) は param `hHall` 化**: complement だけ
+  では従わない (確認済: C₂×C₂ 反例)、κ-Hall 経由でのみ導出可ゆえ obligation = [issue 1006](../../issues/1006-typep-w1-hall.md)。
+  他 10 field は subtype (subgroupOf) transport の機械作業で discharge (centralizer は `S03h.centralizer_subgroupOf`)。
 
-**この bridge 完成 ⟹ §6 の `toTICyclicHypothesis`・μ/ω column API・Clifford inertia がすべて L=M で発火**
-⟹ (10.2) ζ、(10.3) μ_ij/δ_j、μ-grid (de-opaque の `mu`/`alpha` 供給源) が §6 結果として落ちる。
+**✅✅ bridge DONE (2026-06-20)**: `typePData_toS06Hypothesis` (構造部, 11 field) +
+`Hypothesis.toCertainTypeHypothesis` (CertainTypeHypothesis 組立, dade=既在) 完成・axiom-clean
+(`39f1ead4` 系の続き)。⟹ §6 の `toTICyclicHypothesis`・μ/ω column API・Clifford inertia が L=M で発火可。
 
-### ▶ 次セッションの推奨着手順 (real 進捗順)
+### ▶ 次の着手順 (real 進捗順)
 
-1. **★ §10→§6 bridge** (上記)。まず `card_coprime` (W₁ Hall) の供給可否を確認 (gap なら parameter 化)。
-   構造部 `S06.Hypothesis ↥M` 構成 → `CertainTypeHypothesis` 組立 (dade は既在)。最重だが apparatus 既在ゆえ
-   見かけより tractable。これが (10.2)/(10.3)/μ-grid の共通 unlock。
-2. 並行可: CharacterParameters de-opaque (self-contained 3 field: zeta_irreducible/n_formula/alpha_formula)
-   を producer signature 書換と一括で (piecemeal 禁、全 self-contained field を 1 commit)。
-3. issue 1005 (hVti / 4.6.b ambient TI discharge)。
+1. ✅ **§10→§6 bridge DONE**。残 = `hHall` discharge ([issue 1006](../../issues/1006-typep-w1-hall.md), κ-Hall 経由)。
+2. **▶ (10.2) を §6 Clifford 機構で形式化** (RECON 済 2026-06-20、正確な execution path):
+   - **核心定理 = `induce_isIrreducible_of_forall_chiRestrict_ne`** (`S06_CertainTypeClifford:902`):
+     `h : Hypothesis L` (or CertainTypeHypothesis), `χ : IrreducibleCharacter ↥h.K`,
+     `hχ : ∀ χ₂, h.chiRestrict χ₂ ≠ χ` ⟹ `IsIrreducibleCharacter (induce h.K χ)`。
+     engine = `inertia_eq_K_of_forall_chiRestrict_ne` (`:878`, I_L(χ)=K) + Isaacs 6.34。
+   - **(10.2) ζ**: θ = 非自明 linear (degree-1) irreducible char of M'=K を取る。
+     `induce_isIrreducible_of_forall_chiRestrict_ne` 適用 → Ind_{M'}^M θ irreducible、
+     degree = [M:M']·1 = w₁、∈ inducedFamily M (= Sset)。
+   - **crux = `∀ χ₂, chiRestrict χ₂ ≠ θ`**: `chiRestrict χ₂ = Res_K μ_0j` (column leader 制限,
+     `:772`)。degree 論で discharge — j>0 で μ_0j(1)=d>1 ((10.3)) ゆえ degree-1 の θ と不一致;
+     j=0 (trivial χ₂) の chiRestrict のみ degree 1 なので θ がそれと異なる事を別途確認 (μ_00 の特定要)。
+   - **prereq**: 非自明 linear char of M' の存在 (M'/M''≠1、M' solvable≠1 ゆえ); μ_0j degrees の特定。
+   - これで `CharacterParameters.zeta` が §6 由来の実データに。
+   - **(10.3)**: w₂ prime = `theorem88_caseB_prime_orders` (`S12:622`, mp→Theorem88CaseBData);
+     d/δ independence = columnFamily の degree-const (`columnFamily_difference_apply_one :468`) + (4.5.a)。
+   - μ-grid (de-opaque `mu`/`alpha` 供給源) = `columnFamily` (`S06_CertainTypeCharacters:432`,
+     `SignedIrreducibleDifferenceFamily L |W1|`) + `induce_omegaColumnDiff_mu_diff` (`S06_MuColumnBridge:44`)。
+3. CharacterParameters de-opaque (self-contained field: zeta_irreducible/n_formula/alpha_formula) を
+   producer signature 書換と一括で。
+4. issue 1005 (hVti) / 1006 (hHall) discharge。
