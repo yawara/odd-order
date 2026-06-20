@@ -5909,7 +5909,8 @@ condition forces `C_D(K) = C_G(K) ⊓ D = ⊥` (a nontrivial `d ∈ D` centraliz
 would be fixed by conjugation, contradicting `conj_frobenius`), so the decomposition collapses to
 `D = ⁅D, K⁆`. -/
 theorem commutator_eq_self_of_frobenius_DK [Finite G] {D K : Subgroup G}
-    (hfrob : OddOrder.Isaacs.Ch06.IsFrobeniusGroup G D K)
+    (hKne : K ≠ ⊥)
+    (hFrobFPF : ∀ a ∈ K, a ≠ 1 → ∀ n ∈ D, n ≠ 1 → a * n * a⁻¹ ≠ n)
     (hKnormD : K ≤ Subgroup.normalizer (D : Set G))
     (hcop : Nat.Coprime (Nat.card ↥K) (Nat.card ↥D))
     (hSolv : IsSolvable ↥K ∨ IsSolvable ↥D) :
@@ -5923,12 +5924,12 @@ theorem commutator_eq_self_of_frobenius_DK [Finite G] {D K : Subgroup G}
     by_contra hdne
     rw [Subgroup.mem_bot] at hdne
     -- Pick a nontrivial `k ∈ K`.
-    haveI : Nontrivial ↥K := (Subgroup.nontrivial_iff_ne_bot K).mpr hfrob.ne_bot_complement
+    haveI : Nontrivial ↥K := (Subgroup.nontrivial_iff_ne_bot K).mpr hKne
     obtain ⟨k, hkK, hkne⟩ := (Subgroup.nontrivial_iff_exists_ne_one K).mp inferInstance
     -- `k` and `d` commute (from `d ∈ C_G(K)`), so `k * d * k⁻¹ = d`, contradicting Frobenius.
     have hcomm : k * d = d * k := (Subgroup.mem_centralizer_iff.mp hdcent) k hkK
     have hfix : k * d * k⁻¹ = d := by rw [hcomm]; group
-    exact hfrob.conj_frobenius k hkK hkne d hdD hdne hfix
+    exact hFrobFPF k hkK hkne d hdD hdne hfix
   -- Proposition 1.6(d): `D = (C_G(K) ⊓ D) ⊔ ⁅D, K⁆`.
   have hdecomp := OddOrder.BG.Ch3.S13.subgroup_coprime_decomposition hKnormD hcop hSolv
   rw [hCDK, bot_sup_eq] at hdecomp
@@ -5952,7 +5953,8 @@ theorem D_centralizes_Q_of_narrow [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOd
     {Q D K : Subgroup G} {q : ℕ} [Fact q.Prime]
     (hq_odd : Odd q) (hQpg : IsPGroup q ↥Q) (hQnarrow : OddOrder.GroupTheory.IsNarrow q ↥Q)
     (hQne : Q ≠ ⊥)
-    (hfrob : OddOrder.Isaacs.Ch06.IsFrobeniusGroup G D K)
+    (hKne : K ≠ ⊥)
+    (hFrobFPF : ∀ a ∈ K, a ≠ 1 → ∀ n ∈ D, n ≠ 1 → a * n * a⁻¹ ≠ n)
     (hKnormD : K ≤ Subgroup.normalizer (D : Set G))
     (hcop : Nat.Coprime (Nat.card ↥K) (Nat.card ↥D))
     (hKsolv : IsSolvable ↥K)
@@ -5997,7 +5999,7 @@ theorem D_centralizes_Q_of_narrow [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOd
   -- `D ⊔ K ≤ N`, so `D ≤ N`; and `D = ⁅D, K⁆ ≤ N'`.
   have hDN : (D : Subgroup G) ≤ N := le_sup_left.trans hDKN
   have hDcommDK : ⁅D, K⁆ = D :=
-    commutator_eq_self_of_frobenius_DK hfrob hKnormD hcop (Or.inl hKsolv)
+    commutator_eq_self_of_frobenius_DK hKne hFrobFPF hKnormD hcop (Or.inl hKsolv)
   have hDcomm : (D : Subgroup G).subgroupOf N ≤ _root_.commutator ↥N := by
     have hDder : (D : Subgroup G) ≤ derivedInG N := by
       rw [← hDcommDK]
@@ -6056,7 +6058,8 @@ theorem D_centralizes_Q_of_not_mem_beta [Finite G] (hG : OddOrder.BG.IsMinimalSi
     (hq_odd : Odd q) (hQpg : IsPGroup q ↥Q) (hQne : Q ≠ ⊥)
     (hqπ : q ∈ (Nat.card ↥M).primeFactors)
     (P : Sylow q ↥M) (hQP : Q = (P : Subgroup ↥M).map M.subtype)
-    (hfrob : OddOrder.Isaacs.Ch06.IsFrobeniusGroup G D K)
+    (hKne : K ≠ ⊥)
+    (hFrobFPF : ∀ a ∈ K, a ≠ 1 → ∀ n ∈ D, n ≠ 1 → a * n * a⁻¹ ≠ n)
     (hKnormD : K ≤ Subgroup.normalizer (D : Set G))
     (hcop : Nat.Coprime (Nat.card ↥K) (Nat.card ↥D))
     (hKsolv : IsSolvable ↥K)
@@ -6072,7 +6075,8 @@ theorem D_centralizes_Q_of_not_mem_beta [Finite G] (hG : OddOrder.BG.IsMinimalSi
       (Subgroup.equivMapOfInjective _ M.subtype M.subtype_injective).symm
   have hQnarrow : OddOrder.GroupTheory.IsNarrow q ↥Q :=
     OddOrder.GroupTheory.IsNarrow.of_mulEquiv eQP.symm hPnarrow
-  exact D_centralizes_Q_of_narrow hG hq_odd hQpg hQnarrow hQne hfrob hKnormD hcop hKsolv hDKN hqD
+  exact D_centralizes_Q_of_narrow hG hq_odd hQpg hQnarrow hQne hKne hFrobFPF hKnormD hcop hKsolv
+    hDKN hqD
 
 /-- **Theorem 15.2 step 5 — `q ∈ β(M)`, gated-endpoint skeleton** (mmd L4202): "if `q ∉ β(M)`,
 then Theorem 5.5(a) shows `(DK)' = D` centralizes `Q`, a contradiction".  The contradiction is
