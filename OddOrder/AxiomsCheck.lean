@@ -3818,6 +3818,11 @@ set_option linter.style.longLine false in
 -- rank-theoretic core (`piSet_mf_inf_beta_disjoint_of_not_fittingIsTI`, the sole residual) gives
 -- `π(M_F) ∩ β(M) = ∅`, this lemma delivers `M_F = M_σ` via Theorem 15.2.  Sorry-free + axiom-clean.
 #assert_only_allowed_axioms OddOrder.BG.Ch4.S15.mf_eq_msigma_of_piSet_inf_beta_disjoint
+-- BG Theorem 15.7(a), the `≥ 3` side of the rank dichotomy (`S15_MF`, issue 8015): any prime
+-- `r ∈ π(M_F) ∩ β(M)` has `r_r(M_F) ≥ 3` (via `M_F` Hall ⟹ `r_r(M_F) = r_r(M)`, and `β ⊆ α`).
+-- The proved half of the rank core `piSet_mf_inf_beta_disjoint_of_not_fittingIsTI`; sorry-free +
+-- axiom-clean.
+#assert_only_allowed_axioms OddOrder.BG.Ch4.S15.three_le_pRank_mf_of_mem_beta
 
 /-! ### Forward-axiom islands (historical mechanism; currently empty)
 

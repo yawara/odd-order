@@ -7162,26 +7162,58 @@ theorem mf_eq_msigma_of_piSet_inf_beta_disjoint [Finite G]
     (mf_ne_msigma_typeP1_structure hG hM hne hKM hK rfl).2
   exact hdisj _ hqπ hqβ
 
+/-- **Rank-3 lower bound on `M_F` for `β`-primes** (the `≥ 3` side of BG Theorem 15.7(a)'s rank
+dichotomy): if a prime `r` divides `M_F` and lies in `β(M)`, then `r_r(M_F) ≥ 3`.
+
+`M_F` is a Hall subgroup of `M` (`maxNilpotentNormalHall_isHall`), so `r ∈ π(M_F)` gives
+`r ∤ [M : M_F]` and hence `r_r(M_F) = r_r(M)` (`pRank_eq_of_le_of_not_dvd_index`); and
+`r ∈ β(M) ⊆ α(M)` gives `r_r(M) ≥ 3` by the definition of `α(M)`.  Consumed by the rank core
+`piSet_mf_inf_beta_disjoint_of_not_fittingIsTI` as the contradiction target against the `< 3`
+bound coming from `C_{M_F}(X₁)`. -/
+theorem three_le_pRank_mf_of_mem_beta [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} (hM : M ∈ maximalSubgroups G)
+    {r : ℕ} (hrπ : r ∈ S14.piSet (MF M)) (hrβ : r ∈ OddOrder.BG.Ch3.S10.beta M) :
+    3 ≤ pRank ↥(MF M) r := by
+  have hrmem : r ∈ (Nat.card ↥(MF M)).primeFactors := hrπ
+  have hrp : r.Prime := Nat.prime_of_mem_primeFactors hrmem
+  haveI : Fact r.Prime := ⟨hrp⟩
+  -- `M_F` is `π(M_F)`-Hall in `M`; `r ∈ π(M_F)` ⟹ `r ∤ [M : M_F]`.
+  have hHall := maxNilpotentNormalHall_isHall (G := G) M
+  have hidx : ¬ r ∣ ((MF M).subgroupOf M).index := fun hdvd =>
+    hHall.2 r (Nat.mem_primeFactors.mpr ⟨hrp, hdvd, Subgroup.index_ne_zero_of_finite⟩) hrmem
+  -- `r_r(M_F) = r_r(M)`; and `r ∈ β(M) ⊆ α(M)` ⟹ `r_r(M) ≥ 3`.
+  rw [OddOrder.GroupTheory.pRank_eq_of_le_of_not_dvd_index (maxNilpotentNormalHall_le M) hidx]
+  exact (OddOrder.BG.Ch3.S10.beta_subset_alpha M hrβ).2
+
 /-- **BG Theorem 15.7(a), rank-theoretic core** (mmd L4192-4198): if `F(M)` is not a TI-subgroup
 of `G`, then no prime divides `M_F` and lies in `β(M)`.
 
-This is the genuinely deep §15 content of Theorem 15.7(a), isolated as a single named obligation.
-The BG argument: `¬FittingIsTI M` yields `g ∉ N_G(F(M)) = M` and a nontrivial
-`X = F(M) ∩ F(M)^g`.  For `p ∈ π(X)` with `X₁ ∈ E_p^1(X)`: if `O_p(M)` were cyclic, `X₁` would be
-characteristic, hence normal in both `M` and `M^g`, contradicting simplicity; so `O_p(M)` is
-non-cyclic and, by Corollary 15.5 (`fitting_decomposition`: `O_{σ'}(F(M))` cyclic), `p ∈ σ(M)`.
-Thus `X ≤ F(M_σ) ≤ M_σ`, and by Lemma 12.17 (`Msigma_inf_conj_isBetaCompl`/`M_σ ∩ M^g` cyclic)
-`X` is cyclic with `C_G(X₁) ⊄ M`.  Then `𝓜(C_{M_F}(X₁)) ≠ {M}`, so Theorem 12.13
+The `≥ 3` side is fully proved (`three_le_pRank_mf_of_mem_beta`: any `r ∈ π(M_F) ∩ β(M)` has
+`r_r(M_F) ≥ 3`); the proof below reduces the goal to the complementary `< 3` bound
+`pRank (M_F) r < 3`, which is the genuinely deep §15 content isolated as the single remaining
+`sorry`.  The BG argument for that bound: `¬FittingIsTI M` yields `g ∉ N_G(F(M)) = M` and a
+nontrivial `X = F(M) ∩ F(M)^g`.  For `p ∈ π(X)` with `X₁ ∈ E_p^1(X)`: if `O_p(M)` were cyclic,
+`X₁` would be characteristic, hence normal in both `M` and `M^g`, contradicting simplicity; so
+`O_p(M)` is non-cyclic and, by Corollary 15.5 (`fitting_decomposition`: `O_{σ'}(F(M))` cyclic),
+`p ∈ σ(M)`.  Thus `X ≤ F(M_σ) ≤ M_σ`, and by Lemma 12.17 (`Msigma_inf_conj_isBetaCompl`) `X` is
+cyclic with `C_G(X₁) ⊄ M`.  Then `𝓜(C_{M_F}(X₁)) ≠ {M}`, so Theorem 12.13
 (`nonabelian_pgroup_isUniquelyMaximal`) and the Uniqueness Theorem force `C_{M_F}(X₁)` to have
-rank `< 3`; since `M_F` is nilpotent, `C_{M_F}(X₁) ⊇ O_{p'}(M_F)`, whence every `r ∈ π(M_F)`,
-`r ≠ p` has `r_r(M_F) ≤ 2`, so `r ∉ β(M)`.  (The `r = p` prime is handled by `X` cyclic ⟹
-`r_p` bound.)  Combined with `mf_eq_msigma_of_piSet_inf_beta_disjoint` this yields the
-`M_F = M_σ` conclusion of Theorem 15.7(a), which is the `FittingIsTI` clause of Theorem A(8). -/
+rank `< 3`; since `M_F ≤ F(M)` is nilpotent, `O_r(M_F)` centralizes the `p`-group `X₁`
+(`commute_of_coprime_orderOf_of_isNilpotent`, `r ≠ p`), so `O_r(M_F) ≤ C_{M_F}(X₁)` and
+`r_r(M_F) = r_r(O_r(M_F)) < 3` (the `r = p` case uses `X` cyclic).  Combined with
+`mf_eq_msigma_of_piSet_inf_beta_disjoint` this yields the `M_F = M_σ` conclusion of Theorem
+15.7(a), i.e. the `FittingIsTI` clause of Theorem A(8). -/
 theorem piSet_mf_inf_beta_disjoint_of_not_fittingIsTI [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} (hM : M ∈ maximalSubgroups G)
     (hnotTI : ¬ FittingIsTI M) :
     ∀ q : ℕ, q ∈ S14.piSet (MF M) → q ∉ OddOrder.BG.Ch3.S10.beta M := by
-  sorry
+  intro r hrπ hrβ
+  -- The `≥ 3` side (proved): `r ∈ π(M_F) ∩ β(M) ⟹ r_r(M_F) ≥ 3`.
+  have h3 : 3 ≤ pRank ↥(MF M) r := three_le_pRank_mf_of_mem_beta hG hM hrπ hrβ
+  -- Remaining (deep): from `¬FittingIsTI M` derive `pRank (M_F) r < 3`, contradicting `h3`.
+  have hlt : pRank ↥(MF M) r < 3 := by
+    sorry
+  exact absurd h3 (not_le.mpr hlt)
 
 /-- **`M_F = M_σ` from `¬FittingIsTI`** (the `M_F = M_σ` conclusion of BG Theorem 15.7(a)):
 combine the rank-theoretic core `piSet_mf_inf_beta_disjoint_of_not_fittingIsTI` with the
