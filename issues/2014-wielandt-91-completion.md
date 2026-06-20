@@ -1,0 +1,73 @@
+---
+id: 2014
+slug: wielandt-91-completion
+title: "lane-h drives Pf (9.1) Wielandt fixed-point formula to completion"
+created: 2026-06-21
+---
+
+# lane-h drives Pf (9.1) Wielandt fixed-point formula to completion
+
+## 背景
+
+ユーザー指示 (2026-06-21): lane-h POLE-2 frontier が cross-lane gate で exhausted →
+**「§14 体構造 |P|=p^q に着手」** を選択。その honest path を辿ると:
+
+```
+Pf (13.2.b) |P|=p^q  (basic_structure.P_order / card_Q_eq, S15_SAndT, sorry)
+  ← Pf (10.11) [Type II] + Pf (11.7) [Type III]      (S12 / S13, sorry)
+  ← Pf (9.3) |H|=|W₂|^q + Pf (9.6) chief factor       (S11, typeII_III_IV_order_relations, sorry)
+  ← Pf (9.1) Wielandt fixed-point formula             (CoprimeAction.wielandt_fixedPoint_frobenius)
+```
+
+⟹ **|P|=p^q は Pf (9.1) Wielandt の fixed-point formula に bottom-out**。これがチェーン全体の
+deepest pole。`|C_H(UE)|^|E| · |H| = |C_H(E)|^|E| · |C_H(U)|` (Frobenius L=U⋊E が可解 H に coprime
+作用)。mathlib 不在 (mathlib の "wielandt" は primitive permutation group のみ)。
+
+## 現状 (2026-06-21 調査)
+
+(9.1) は **lane-f の parked infrastructure** (設計 = `notes/peterfalvi/s11_wielandt_91_design.md`,
+2026-06-17〜18)。**~70% 完成**:
+- ✅ 全 abstract cores が 0-sorry, axiom-clean: I-1 (modular Brauer orbit-equality, Teichmüller-free,
+  `CenterSimplesOrbit`/`CenterOrbitFree`/`FreeActionOrbitCount`), I-2 (isotypic decomp,
+  `CenterModuleDecomp`), I-3 + 抽象 free-orbit engine (`WielandtCounting`/`FreeOrbitModuleCount`
+  `finrank_eq_card_mul_finrank_invariants_of_free`), step 2 (⋆ `finrank_elab_identity`, modulo (†))。
+- ❌ **唯一の残 sorry = `wielandt_fixedPoint_frobenius`** (`CoprimeAction.lean:160`)。3 corollary は
+  main formula から証明済 (sorry-free)。残務は **carrier-level wiring** のみ。
+
+## やること (resume⁵ NEXT, 設計 notes 末尾)
+
+- [ ] **(†) module wiring** (lane-f coupled rep-theory 領域): `htag` = `dim[V,U] = |E|·dim([V,U]⊓V^E)`
+      を done engine 群 (centerProj isotypic + free-orbit + base change) から discharge。
+      items 0-3: (0) E-conjugation → simplesAction module bridge ★ / (1) 3d.3c を real carrier に wire /
+      (2) (†) realize / (3) I-4 base change F_p→F̄_p。
+- [ ] **el-ab card↔dim bridge** (lane-h, 自己完結): `Fintype.card ↥(C_V(X)) = p ^ finrank invariants`
+      (`Module.card_eq_pow_finrank` + group fixed subgroup ↔ module invariants 対応)。
+- [ ] **I-5 chief-series assembly** (lane-h, group theory): `|C_H(X)| = ∏_i |C_{V_i}(X)|` を
+      `ChiefFactor.chiefSeriesInside` + Isaacs Cor 3.28 (`coprime_fixedPoints_quotient`) で確立 →
+      per-factor (⋆) を p_i-power して掛け合わせ → 群 (9.1)。
+- [ ] **assembly** → `wielandt_fixedPoint_frobenius` sorry-free 化。
+- [ ] 下流 (別 issue 可): (9.3) `typeII_III_IV_order_relations` → (9.6) → (10.11)/(11.7) → (13.2.b)
+      `basic_structure.P_order` / `card_Q_eq` を順に de-gate。
+
+## 完了条件
+
+`wielandt_fixedPoint_frobenius` が sorry-free + axiom-clean。full build green。
+(下流の |P|=p^q de-gate は後続 issue。)
+
+## lane 調整
+
+(9.1) ファイル群 (`GroupTheory/CoprimeAction.lean` + `GroupTheory/RepresentationTheory/*`) は設計上
+lane-f 所有だが lane-f は §16/§14 に pivot して **parked**。lane-h の現 §14 体構造タスクが (9.1) 完成を
+要するため lane-h が pickup。ファイルは lane-f の現 frontier (S14/S15/S16) と disjoint ゆえ merge 衝突
+低。設計 notes に lane-h pickup を記録。**(†) module wiring は lane-f の coupled 領域**ゆえ、lane-h は
+まず group-theoretic な I-5 chief-series assembly + el-ab bridge を進め、(†) は lane-f 知見と要調整。
+
+## 参照
+
+- 設計: `notes/peterfalvi/s11_wielandt_91_design.md` (lane-f, resume⁵ "NEXT" がロードマップ)
+- assembly point: `OddOrder/GroupTheory/CoprimeAction.lean:156` (`wielandt_fixedPoint_frobenius`)
+- (⋆): `OddOrder/GroupTheory/RepresentationTheory/WielandtCounting.lean:176` (`finrank_elab_identity`)
+- chief series: `OddOrder/GroupTheory/ChiefFactor.lean`; Cor 3.28:
+  `OddOrder/Isaacs/Ch04_Commutators/ForwardFromCh03.lean:808`
+- 下流 scaffolding: `S11_MaximalII_III_IV.lean` (9.3/9.4/9.6), `S12_MaximalIII_IV_V.lean` (10.11),
+  `S13_MaximalIII_IV.lean` (11.7), `S15_SAndT.lean` (13.2.b)

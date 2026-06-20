@@ -484,3 +484,34 @@ still sorried, needs I-1 wall) but is genuine on-path progress (I-5 application 
 
 (9.1) is consumed by (9.3) → §11, which is Lane-B character-API-gated and far downstream;
 finishing (9.1) closes the local `CoprimeAction.lean` sorry but unblocks nothing now.
+
+## 2026-06-21 (lane-h pickup) — (9.1) は |P|=p^q の deepest pole と判明、lane-h が完成を driving
+
+ユーザーが lane-h を **§14 体構造 |P|=p^q** に向けた (lane-h POLE-2 frontier が cross-lane gate で
+exhausted → 選択肢「§14 体構造に着手」を採択)。その honest path を辿ると **|P|=p^q ⟹ Pf (9.1) Wielandt**
+に bottom-out する (チェーン全体の deepest pole):
+
+```
+Pf (13.2.b) |P|=p^q  ← (10.11)[II]+(11.7)[III] ← (9.3)|H|=|W₂|^q + (9.6) ← (9.1) Wielandt
+```
+
+- (13.2.b) `basic_structure.P_order`/`card_Q_eq` (S15, sorry) ← (10.11) `theorem88_caseB_prime_orders`
+  は **primality のみ証明済**で |H|=p^q 部分は別 (S12) / (11.7) `H_elementaryAbelian` (S13, sorry)。
+- (9.3) `typeII_III_IV_order_relations` (S11, sorry): Type II で C_H(U)=1 [(8.6.b)/(8.12.b)] +
+  **|H|=|C_H(W₁)|^q [(9.1)]** = |W₂|^q。⟹ (9.1) cor (ii) (`wielandt_fixedPoint_trivial_U_fixed`) が core。
+
+**∴ lane-h は本 design の (9.1) 完成を pickup** (lane-f は §16/§14 に pivot して parked; ファイルは
+lane-f 現 frontier と disjoint, 衝突低)。issue 2014。**進め方** (CLAUDE.md「難所を回避しない」+ lane 領域):
+1. **group-theoretic 層を先に** (lane-h strength, (†) と decouple):
+   - el-ab card↔dim bridge `Fintype.card ↥(C_V(X)) = p^finrank invariants`
+     (`Module.card_eq_pow_finrank`: `Fintype.card V = Fintype.card K ^ finrank K V`, K=ZMod p)。
+   - **I-5 chief-series multiplicativity** `|C_H(X)| = ∏_i |C_{V_i}(X)|`
+     (`ChiefFactor.chiefSeriesInside`/`_exists_eq_bot` + Isaacs Cor 3.28
+     `coprime_fixedPoints_quotient`, telescoping over the L-invariant chief series)。
+   - assembly skeleton: per-factor (⋆) `finrank_elab_identity` を p_i-power して掛け、群 (9.1) に。
+     ⟹ `wielandt_fixedPoint_frobenius` を **(†)-per-chief-factor の named residual modulo** で証明。
+2. **(†) module wiring** (resume⁵ NEXT items 0-3, lane-f coupled rep-theory) を最後に discharge
+   (done engine 群を carrier に wire; lane-f 知見と要調整)。
+
+⚠ resume⁵ NEXT (items 0-5) が依然ロードマップ; 上記 1 = items 4-5 を group 層から先取りして (†) を
+clean に isolate する順序。実 sorry は assembly 完了まで不変 (`wielandt_fixedPoint_frobenius` 1 本)。
