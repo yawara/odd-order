@@ -7135,6 +7135,74 @@ theorem typeP_kstar_in_mf [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
 
 /-! ## Theorems 15.7--15.9: TI failure and final local constraints -/
 
+/-- **BG Theorem 15.2(b), contrapositive form** (mmd L4185): if no prime divides `M_F` and lies
+in `β(M)`, then `M_F = M_σ`.  Theorem 15.2 shows that whenever `M_F ≠ M_σ`, the prime `q = |K*|`
+satisfies `q ∈ π(M_F) ∩ β(M)`; the contrapositive gives the claim.  A Hall `κ(M)`-subgroup `K`
+needed to invoke 15.2 exists by solvability of `M` (Hall's theorem).
+
+This is the `M_F = M_σ` endgame of Theorem 15.7(a): once the rank-theoretic core
+`piSet_mf_inf_beta_disjoint_of_not_fittingIsTI` establishes `π(M_F) ∩ β(M) = ∅`, this lemma
+delivers `M_F = M_σ` (equivalently, `M_σ` nilpotent). -/
+theorem mf_eq_msigma_of_piSet_inf_beta_disjoint [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} (hM : M ∈ maximalSubgroups G)
+    (hdisj : ∀ q : ℕ, q ∈ S14.piSet (MF M) → q ∉ OddOrder.BG.Ch3.S10.beta M) :
+    MF M = OddOrder.BG.Ch3.S10.Msigma M := by
+  classical
+  haveI : IsSolvable ↥M := hG.solvable_of_mem_maximalSubgroups hM
+  by_contra hne
+  -- A Hall `κ(M)`-subgroup `K` of `M` exists by Hall's theorem in the solvable group `↥M`.
+  obtain ⟨K', hK'⟩ := Ch03.hall_E_exists (G := ↥M) (S14.kappa M)
+  set K : Subgroup G := K'.map M.subtype with hKdef
+  have hKM : K ≤ M := hKdef ▸ Subgroup.map_subtype_le K'
+  have hKeq : K.subgroupOf M = K' :=
+    hKdef ▸ Subgroup.comap_map_eq_self_of_injective M.subtype_injective K'
+  have hK : Ch03.IsHallSubgroup (S14.kappa M) (K.subgroupOf M) := hKeq ▸ hK'
+  -- Theorem 15.2(b): for `M_F ≠ M_σ`, the prime `q = |K*|` lies in `π(M_F) ∩ β(M)`.
+  obtain ⟨_, _, _, _, _, _, _, _, _, hqπ, hqβ, _⟩ :=
+    (mf_ne_msigma_typeP1_structure hG hM hne hKM hK rfl).2
+  exact hdisj _ hqπ hqβ
+
+/-- **BG Theorem 15.7(a), rank-theoretic core** (mmd L4192-4198): if `F(M)` is not a TI-subgroup
+of `G`, then no prime divides `M_F` and lies in `β(M)`.
+
+This is the genuinely deep §15 content of Theorem 15.7(a), isolated as a single named obligation.
+The BG argument: `¬FittingIsTI M` yields `g ∉ N_G(F(M)) = M` and a nontrivial
+`X = F(M) ∩ F(M)^g`.  For `p ∈ π(X)` with `X₁ ∈ E_p^1(X)`: if `O_p(M)` were cyclic, `X₁` would be
+characteristic, hence normal in both `M` and `M^g`, contradicting simplicity; so `O_p(M)` is
+non-cyclic and, by Corollary 15.5 (`fitting_decomposition`: `O_{σ'}(F(M))` cyclic), `p ∈ σ(M)`.
+Thus `X ≤ F(M_σ) ≤ M_σ`, and by Lemma 12.17 (`Msigma_inf_conj_isBetaCompl`/`M_σ ∩ M^g` cyclic)
+`X` is cyclic with `C_G(X₁) ⊄ M`.  Then `𝓜(C_{M_F}(X₁)) ≠ {M}`, so Theorem 12.13
+(`nonabelian_pgroup_isUniquelyMaximal`) and the Uniqueness Theorem force `C_{M_F}(X₁)` to have
+rank `< 3`; since `M_F` is nilpotent, `C_{M_F}(X₁) ⊇ O_{p'}(M_F)`, whence every `r ∈ π(M_F)`,
+`r ≠ p` has `r_r(M_F) ≤ 2`, so `r ∉ β(M)`.  (The `r = p` prime is handled by `X` cyclic ⟹
+`r_p` bound.)  Combined with `mf_eq_msigma_of_piSet_inf_beta_disjoint` this yields the
+`M_F = M_σ` conclusion of Theorem 15.7(a), which is the `FittingIsTI` clause of Theorem A(8). -/
+theorem piSet_mf_inf_beta_disjoint_of_not_fittingIsTI [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} (hM : M ∈ maximalSubgroups G)
+    (hnotTI : ¬ FittingIsTI M) :
+    ∀ q : ℕ, q ∈ S14.piSet (MF M) → q ∉ OddOrder.BG.Ch3.S10.beta M := by
+  sorry
+
+/-- **`M_F = M_σ` from `¬FittingIsTI`** (the `M_F = M_σ` conclusion of BG Theorem 15.7(a)):
+combine the rank-theoretic core `piSet_mf_inf_beta_disjoint_of_not_fittingIsTI` with the
+Theorem 15.2(b) endgame `mf_eq_msigma_of_piSet_inf_beta_disjoint`. -/
+theorem mf_eq_msigma_of_not_fittingIsTI [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} (hM : M ∈ maximalSubgroups G)
+    (hnotTI : ¬ FittingIsTI M) : MF M = OddOrder.BG.Ch3.S10.Msigma M :=
+  mf_eq_msigma_of_piSet_inf_beta_disjoint hG hM
+    (piSet_mf_inf_beta_disjoint_of_not_fittingIsTI hG hM hnotTI)
+
+/-- **BG Theorem A(8), the `FittingIsTI` clause** (mmd L4274, schematic proof: Theorem 15.7(a)(b)):
+if `M_F ≠ M_σ`, then `F(M)` is a TI-subgroup of `G`.  This is the contrapositive of the
+`M_F = M_σ` conclusion of Theorem 15.7(a) (`mf_eq_msigma_of_not_fittingIsTI`): if `F(M)` failed to
+be TI, then `M_F` would equal `M_σ`.  Discharges the last (and deepest) conjunct of Theorem A(8),
+modulo the single rank-theoretic residual `piSet_mf_inf_beta_disjoint_of_not_fittingIsTI`. -/
+theorem fitting_isTI_of_mf_ne_msigma [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} (hM : M ∈ maximalSubgroups G)
+    (hne : MF M ≠ OddOrder.BG.Ch3.S10.Msigma M) : FittingIsTI M := by
+  by_contra h
+  exact hne (mf_eq_msigma_of_not_fittingIsTI hG hM h)
+
 /-- **BG Theorem 15.7** (mmd L4180): if `F(M)` is not TI in `G`, then `M` is in
 `M_F ∪ M_P1`, the relevant intersection is cyclic inside `M_F = M_sigma`, and
 one of the three local cases of the theorem holds. -/

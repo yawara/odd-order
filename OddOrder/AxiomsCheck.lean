@@ -3813,6 +3813,11 @@ set_option linter.style.longLine false in
 -- via `S13.derivedInG_le_sup_of_normal`, and every §14 lemma it cites (`typeP_duality`, the
 -- `_of_inputs` chief-factor helpers, …) is itself axiom-clean.
 #assert_only_allowed_axioms OddOrder.BG.Ch4.S15.mf_ne_msigma_typeP1_structure
+-- BG Theorem 15.2(b) contrapositive (`S15_MF`, issue 8015): `π(M_F) ∩ β(M) = ∅ ⟹ M_F = M_σ`.
+-- The `M_F = M_σ` endgame of Theorem 15.7(a) / the `FittingIsTI` clause of Theorem A(8): once the
+-- rank-theoretic core (`piSet_mf_inf_beta_disjoint_of_not_fittingIsTI`, the sole residual) gives
+-- `π(M_F) ∩ β(M) = ∅`, this lemma delivers `M_F = M_σ` via Theorem 15.2.  Sorry-free + axiom-clean.
+#assert_only_allowed_axioms OddOrder.BG.Ch4.S15.mf_eq_msigma_of_piSet_inf_beta_disjoint
 
 /-! ### Forward-axiom islands (historical mechanism; currently empty)
 
