@@ -64,12 +64,15 @@ lane-f の POLE-1 `section16TypePStructure` の primes 残 sorry も honest 化*
 | W/W1/W2, W1≤W, W2≤W, nontrivial, W1⊔W2=W, W_cyclic | TypePData 直対応 (`W_eq`/`W_cyclic`/`W*_nontrivial`) | 易 |
 | `W_disjoint` | `M_complement` (W1∩M'=⊥) + W2≤H≤M' | ✅ **DONE** = `typePData_disjoint_W1_W2` (S12) |
 | `W_card_coprime` | disjoint + cyclic ⟹ coprime | ✅ **DONE** = `typePData_coprime_card_W1_W2` (S12) |
-| `W_card_odd` | G odd (IsMinimalSimpleOdd) ⟹ \|W\| odd。要 hG 引数 | TODO (容易) |
-| `V := typePV M = W\(W1∪W2)` | TICyclicHypothesis.V と一致 | 易 |
-| `V_subset_sharp` | 1∈W1 ⟹ 1∉V ⟹ V⊆univ\{1} | 易 |
-| `V_subset_W` | set diff ⊆ W | 易 |
-| `W_normalizes_V` | W abelian (cyclic) ⟹ w∈W で wvw⁻¹=v∈V | 易 |
-| `V_ti : IsTISubset V W` | **genuine gap** (§3b) | **TODO (核心)** |
+| `W_card_odd` | `Odd |G| ⟹ |W| ∣ |G| ⟹ Odd |W|` | ✅ **DONE** = `typePData_W_card_odd` |
+| `V := typePV M = W\(W1∪W2)` | TICyclicHypothesis.V と一致 | ✅ |
+| `V_subset_sharp` | 1∈W1 ⟹ 1∉V ⟹ V⊆univ\{1} | ✅ |
+| `V_subset_W` | set diff ⊆ W | ✅ |
+| `W_normalizes_V` | W abelian (cyclic) ⟹ w∈W で wvw⁻¹=v∈V | ✅ (`commute_of_mem_of_isCyclic`) |
+| `V_ti : IsTISubset V W` | **genuine gap** (§3b) → param `hVti` | ⏸ **issue 1005** (4.6.b ambient TI) |
+
+**⟹ ブリッジ `typePData_toTICyclicHypothesis` (S12) 完成・axiom-clean (2026-06-20)。** 残 = `hVti`
+([issue 1005](../../issues/1005-typep-ambient-v-ti.md))。
 
 ### 3b. V_ti gap (要設計判断)
 
@@ -118,11 +121,89 @@ TICyclicHypothesis は **W-level ω/σ** のみ (ω on W, ω^σ on G)。μ_ij (o
 ## 5. 攻略順 (推奨)
 
 1. ✅ `typePData_disjoint_W1_W2` (DONE, S12)。
-2. ✅ `typePData_coprime_card_W1_W2` (DONE, S12)。**残: `W_card_odd`** (G odd from hG; 容易)。
-3. V_ti 解決 (§3b の調査 (i)/(ii) → 最悪 (iii) パラメータ化) ⟹ **ブリッジ `Hypothesis.toTICyclicHypothesis` 完成** ⟹ ω-grid が §10 で利用可能に。次セッションの主タスク。
-4. `CharacterParameters` de-opaque (§2、S15 模範) — opaque Prop を実恒等式に。
-5. μ-level: M' の certain-type 構造 (§3d) ⟹ `mu`/`alpha` grid 供給。
-6. (10.2)/(10.3) producer 構成 → (10.5)/(10.6) Dade calc → (10.8) keystone → (10.9)/(10.10.x)。
-7. ⟹ §11/S13 (9.x/11.x riders) も同 machinery で。
+2. ✅ `typePData_coprime_card_W1_W2` (DONE, S12)。
+3. ✅ `typePData_W_card_odd` (DONE, S12; `Odd |G| → |W| ∣ |G| → Odd |W|`)。
+4. ✅✅ **ブリッジ `typePData_toTICyclicHypothesis` 完成** (DONE 2026-06-20, S12, axiom-clean)。
+   17 フィールド中 16 を `TypePData` から実証明で供給、`V_ti` のみ ambient TI = Peterfalvi (4.6.b) を
+   **明示パラメータ `hVti`** で取る (§5 `mapOfInjective` / §6 `toTICyclicHypothesisOfV` と同設計;
+   §3b の調査 (i)/(ii) で Dade data も normalizer_V も V_ti を供給しないと確定 → (iii) パラメータ化)。
+   ⟹ ω-grid (`omegaGrid`/`omegaSigmaGrid`/`sigmaIntegral`) が §10 で利用可能に。
+   **残 obligation = `hVti` の discharge = [issue 1005](../../issues/1005-typep-ambient-v-ti.md)**
+   (4.6.b ambient-TI; 上流 BG σ-理論に gate されるか要判定)。
+5. ▶ **次**: `CharacterParameters` de-opaque (§2、S15 模範) — opaque Prop を実恒等式に。
+6. μ-level: M' の certain-type 構造 (§3d) ⟹ `mu`/`alpha` grid 供給。
+7. (10.2)/(10.3) producer 構成 → (10.5)/(10.6) Dade calc → (10.8) keystone → (10.9)/(10.10.x)。
+8. ⟹ §11/S13 (9.x/11.x riders) も同 machinery で。
 
 **STOP 規律**: 1 leaf が ~4-5 実質試行で進まなければ STOP + 本 note に障害記録。難所回避禁止 ([[feedback-no-avoiding-hard-parts]])。
+
+## 6. (10.2)–(10.5) 原文照合 + (10.2) 攻略 diagnosis (2026-06-20 bridge 後の調査)
+
+原文 = `references/peterfalvi/04.12_pp_58_63_Maximal_Subgroups_of_Types_III_IV_and_V.mmd` L1-42 を verbatim 照合。
+**確定した式 (de-opaque で baking する正値)**:
+
+- **(10.1)**: `S = {Ind_{M'}^M θ | θ∈Irr M', θ≠1}`。「By (8.15), Hyp (4.6) と (5.2) が L=M, H=K=M' で成立。
+  w₁,w₂,σ,ω_ij,μ_ij,μ_j,δ_j は **Hyp (4.6) with L=M** と同義」⟹ **μ/ω/δ は §6 (4.6)-with-L=M 由来**
+  (∴ μ-level の真の供給源 = §10 Hyp → §6 `Hypothesis46 M M'` bridge、§3d)。
+- **(10.3)**: `0≤i<w₁, 0<j<w₂` で `d=μ_ij(1)` は i,j 独立、`δ=δ_j` は j 独立、`d>1`、`n=(d-δ)/w₁∈ℕ`。
+  (w₂ prime は **Thm (8.8)** 経由 type-II maximal S with |S:[S,S]|=w₂。)
+- **(10.5)**: `α_ij = μ_ij − δ·μ_i0 − n·ζ` (`0≤i<w₁, 0<j<w₂`)、`Supp(α_ij)⊆A₀(M)`、
+  `α_ij^τ = δ(ω_ij^σ − ω_i0^σ) − n·ζ^τ₁`。
+
+### CharacterParameters de-opaque field specs (S15.Hypothesis 模範 = data+real恒等式, opaque Prop 廃止)
+
+| 現 opaque Prop | 実恒等式 (self-contained = tau/tau₁ 不要) | 備考 |
+|---|---|---|
+| `zeta_irreducible` | `IsIrreducibleCharacter zeta` | producer 結論も書換要 (∧ の項) |
+| `n_formula` | `(n:ℤ)*(hyp.w1:ℤ) = (d:ℤ) - delta` | clean |
+| `alpha_formula` | `∀ i j, alpha i j = mu i j - (delta:ℂ)•mu i 0 - (n:ℂ)•zeta` | clean |
+| `degree_independent` | `∀ i (j:Fin w2), j≠0 → (mu i j) 1 = (d:ℂ)` | index 0<j 要 |
+| `delta_independent` | δ_j family field 追加要 (現状 `delta:ℤ` は共通値のみ) | 要新 field |
+| `alpha_tau_formula`/`mu_tau1_formula`/`zeta_tau1_norm_bound`/`orthogonality_w1_lt_w2`/`typeV_*` | **tau (hyp.tau) / tau₁ (CoherentHypothesis) 要** | CoherentHypothesis 文脈で de-opaque |
+
+⚠ S15.Hypothesis は `omega`/`eta`/`tau3` を **data field** + 恒等式 `eta_eq_tau_omega : eta i j = tau3 (omega i j)`
+(S15_SAndT:131-147) で carry。CharacterParameters.omegaSigma も同様に bridge の `omegaSigmaGrid` に pin できる
+(`omegaSigmaGrid` docstring が「`S12.CharacterParameters.omegaSigma` がこれに pin される」と明記)。
+
+### ★ (10.2)/(10.3)/μ-grid 攻略 = §10→§6 (4.2)+Dade bridge (apparatus は §6 に既在!)
+
+⚠⚠ **重要訂正** (2026-06-20 深掘り): 当初「(10.2) は quotient-Frobenius + Brauer を一から build」と
+診断したが **誤り**。(10.1) 原文「Hyp (4.6) が L=M, H=K=M' で成立」が正路を指す: **§6 certain-type
+apparatus が (10.2)/(10.3)/μ-grid をすべて供給**、新規 apparatus build は不要。Brauer/inertia は §6 に既在:
+- `S06_CertainTypeClifford.lean:538` `card_fixedPoints_conjByPermIrr_eq_card_fixedPoints_conjClassPerm`
+  (**Brauer permutation lemma**)、`:756` inertia `I_L(χ)=K`「W₁# で不動な char 無し」(= FPF-on-chars)。
+- `IsFrobeniusGroup.of_centralizer_kernel_le` (`Ch06_FrobeniusActions/FrobeniusGroup.lean:324`) =
+  `centralizer_W1` 条件から Frobenius 構成。
+- `isIrreducibleCharacter_induce_of_inertia_eq` (`InducedIrreducible.lean:424`)。
+
+**∴ 真の次ステップ = §10→§6 bridge = `Hypothesis M → S06.CertainTypeHypothesis (typePA0 M typeP) M`**
+(`CertainTypeHypothesis A L extends S06.Hypothesis ↥L` + `dade : S04.Hypothesis G A L`):
+- **Dade 部 `dade` は §10 Hyp に既在**: `Hypothesis.dadeData.dade : S04.Hypothesis G (typePA0 M typeP) M`。
+- **構造部 `S06.Hypothesis ↥M`** (S06_DadeIsometryCertain:67, **11 field**) を `TypePData M` から構成
+  (L=↥M, K=M'.subgroupOf M, W1/W2.subgroupOf M)。field 対応:
+
+  | S06.Hypothesis ↥M field | TypePData M source | 備考 |
+  |---|---|---|
+  | `K = M'.subgroupOf M` / `K_normal` | derivedInG M 正規 (commutator) | 易 (subtype transport) |
+  | `isComplement : IsComplement' K W1` | `M_complement` | **直対応** |
+  | `W1_nontrivial`/`W1_cyclic` | `W1_nontrivial`/`W1_cyclic` | subgroupOf transport |
+  | `W2_nontrivial`/`W2_cyclic`/`W2_le_K` | `W2_*`/(W2≤H≤M') | subgroupOf transport |
+  | `centralizer_W2 : ∀x∈W1#, C_K(x)=W2` | `centralizer_W1` (C_{M'}(x)=W2) | G↔↥M transport (fiddly) |
+  | `card_coprime : Coprime |K| |W1|` | **W₁ Hall in M (要確認)** | ⚠ TypePData に直接無し? gap 可能 |
+  | `W_odd` | `typePData_W_card_odd` 系 | 易 |
+
+  **⚠ 主リスク = `card_coprime` (W₁ が M の Hall complement = gcd(|M'|,|W₁|)=1)**: complement だけでは
+  従わない。TypePData が供給するか / BG type-P 構造から導けるか要確認 (gap なら別 obligation 化)。
+  他は subtype (subgroupOf) transport の機械作業 (centralizer の G↔↥M が最も fiddly)。
+
+**この bridge 完成 ⟹ §6 の `toTICyclicHypothesis`・μ/ω column API・Clifford inertia がすべて L=M で発火**
+⟹ (10.2) ζ、(10.3) μ_ij/δ_j、μ-grid (de-opaque の `mu`/`alpha` 供給源) が §6 結果として落ちる。
+
+### ▶ 次セッションの推奨着手順 (real 進捗順)
+
+1. **★ §10→§6 bridge** (上記)。まず `card_coprime` (W₁ Hall) の供給可否を確認 (gap なら parameter 化)。
+   構造部 `S06.Hypothesis ↥M` 構成 → `CertainTypeHypothesis` 組立 (dade は既在)。最重だが apparatus 既在ゆえ
+   見かけより tractable。これが (10.2)/(10.3)/μ-grid の共通 unlock。
+2. 並行可: CharacterParameters de-opaque (self-contained 3 field: zeta_irreducible/n_formula/alpha_formula)
+   を producer signature 書換と一括で (piecemeal 禁、全 self-contained field を 1 commit)。
+3. issue 1005 (hVti / 4.6.b ambient TI discharge)。
