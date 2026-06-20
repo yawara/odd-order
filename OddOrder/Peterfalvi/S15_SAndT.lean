@@ -1476,11 +1476,55 @@ theorem complement_le_QW2 [Finite G]
 
 /-- §13 structural data for the semidirect product `Q ⋊ W₂` (`Q = T_F`) consumed by the
 `∃ y` step of (13.17.c).  `W₂` normalizes `Q` (as `W₂ ≤ T` and `Q ◁ T`), meets it trivially, and
-`p ∤ |Q| = q^p` (since `p ≠ q`).  Gated on the §13 structure of `T` (`:= sorry`, isolated). -/
+`p ∤ |Q| = q^p` (since `p ≠ q`).
+
+*Proof.*  `W₂ ≤ W = S ⊓ T ≤ T` and `Q = T_F ◁ T` (`maxNilpotentNormalHall_le_normalizer`) give the
+normalization.  The distinctness `p ≠ q` is forced because otherwise `W₁` and `W₂` would be equal
+order-`q` subgroups of the cyclic `W` (`eq_of_card_eq_prime_of_isCyclic`), contradicting
+`W₁ ⊓ W₂ = 1`; then `p ∤ q^p`, and the coprimality `|Q| ⟂ |W₂| = p` gives `Q ⊓ W₂ = 1`.  The only
+gated input is `|Q| = q^p` (`card_Q_eq`, the isolated §13 counting residual B1). -/
 theorem Q_W2_structure [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
     (hyp : Hypothesis (G := G)) :
     hyp.W2 ≤ Subgroup.normalizer (hyp.Q : Set G) ∧ hyp.Q ⊓ hyp.W2 = ⊥ ∧
-      ¬ hyp.p ∣ Nat.card ↥hyp.Q := sorry
+      ¬ hyp.p ∣ Nat.card ↥hyp.Q := by
+  -- `W₂ ≤ W = S ⊓ T ≤ T`.
+  have hW2T : hyp.W2 ≤ hyp.T :=
+    (le_sup_right.trans hyp.W_eq_join.ge).trans (hyp.W_eq_inter.le.trans inf_le_right)
+  -- Conjunct 1: `W₂ ≤ N_G(Q)`, as `Q = T_F ◁ T` and `W₂ ≤ T`.
+  have hWnorm : hyp.W2 ≤ Subgroup.normalizer (hyp.Q : Set G) := by
+    rw [hyp.Q_eq_TF]
+    exact hW2T.trans (OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_le_normalizer hyp.T)
+  -- `p ≠ q`: else `W₁` and `W₂` are equal order-`q` subgroups of the cyclic `W`.
+  have hpq : hyp.p ≠ hyp.q := by
+    intro heq
+    haveI : IsCyclic ↥hyp.W := hyp.W_cyclic
+    have hW1W : hyp.W1 ≤ hyp.W := le_sup_left.trans hyp.W_eq_join.ge
+    have hW2W : hyp.W2 ≤ hyp.W := le_sup_right.trans hyp.W_eq_join.ge
+    have hW1card : Nat.card ↥(hyp.W1.subgroupOf hyp.W) = hyp.q := by
+      rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hW1W).toEquiv]; exact hyp.q_eq_card_W1.symm
+    have hW2card : Nat.card ↥(hyp.W2.subgroupOf hyp.W) = hyp.q := by
+      rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hW2W).toEquiv, ← heq]
+      exact hyp.p_eq_card_W2.symm
+    have hsubeq : hyp.W1.subgroupOf hyp.W = hyp.W2.subgroupOf hyp.W :=
+      Ch06.eq_of_card_eq_prime_of_isCyclic hyp.q_prime hW1card hW2card
+    have hWeq : hyp.W1 = hyp.W2 := by
+      have hmap := congrArg (Subgroup.map hyp.W.subtype) hsubeq
+      rwa [Subgroup.map_subgroupOf_eq_of_le hW1W, Subgroup.map_subgroupOf_eq_of_le hW2W] at hmap
+    have hbot : hyp.W1 = ⊥ := by
+      have h := hyp.W1_inf_W2_eq_bot; rwa [← hWeq, inf_idem] at h
+    have hq1 : hyp.q = 1 := by rw [hyp.q_eq_card_W1, hbot, Subgroup.card_bot]
+    exact hyp.q_prime.one_lt.ne' hq1
+  -- Conjunct 3: `p ∤ |Q| = q^p`, since `p ∤ q` (distinct primes).
+  have hpQ : ¬ hyp.p ∣ Nat.card ↥hyp.Q := by
+    rw [card_Q_eq _hG hyp hyp.T_nonI]
+    intro hdvd
+    exact hpq ((Nat.prime_dvd_prime_iff_eq hyp.p_prime hyp.q_prime).mp
+      (hyp.p_prime.dvd_of_dvd_pow hdvd))
+  -- Conjunct 2: `Q ⊓ W₂ = ⊥`, from coprimality `|Q| ⟂ p = |W₂|`.
+  refine ⟨hWnorm, ?_, hpQ⟩
+  apply Subgroup.inf_eq_bot_of_coprime
+  rw [← hyp.p_eq_card_W2]
+  exact (hyp.p_prime.coprime_iff_not_dvd.mpr hpQ).symm
 
 /-- **Peterfalvi (13.17.c) order argument.**  The `W₁`-containing Frobenius complement `E` of `L`
 has order `p q`.  *Proof (Pf p.82):* `E ⊆ Q W₂` (`complement_le_QW2`), and the cyclic Sylow
