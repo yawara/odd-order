@@ -74,6 +74,7 @@ import OddOrder.BG.Ch3_MaximalSubgroups.S13_PrimeAction
 import OddOrder.BG.Ch3_MaximalSubgroups.S13_PrimeActionTransition
 import OddOrder.BG.Ch3_MaximalSubgroups.S14_Prop142Support
 import OddOrder.BG.Ch4_FamilyOfMaximal.S14_TypePCounting
+import OddOrder.BG.Ch4_FamilyOfMaximal.S15_MF
 import OddOrder.BG.Ch4_FamilyOfMaximal.S16_PairIntersection
 import OddOrder.BG.AppA_PStability
 import OddOrder.BG.AppB_Puig
@@ -3805,6 +3806,13 @@ set_option linter.style.longLine false in
 -- axiom `pLengthOne_commutator_of_zgroupCentralizer`, de-axiomatized (2026-06-10) to a
 -- convention bridge onto `thm36`.
 #assert_only_allowed_axioms OddOrder.BG.Ch3.S10.pLengthOne_commutator_of_zgroupCentralizer
+-- BG Theorem 15.2 (`S15_MF`, issue 8012): if `M_F < M_σ` then `M` is type `P1` with the normal
+-- `q`-subgroup `Q` / minimal chief-factor `Q̄ = Q/Q₀` structure (the §15→§16 keystone, supplying
+-- `Cor 15.3`'s `Q` and `Cor 15.6`'s `K* ⊆ M_F`).  The full wrapper is now sorry-free AND axiom-clean
+-- (2026-06-20): the final semidirect-product gate `hsigmaprime : M_σ' ⊆ Q ⊔ ⁅D, D⁆` was discharged
+-- via `S13.derivedInG_le_sup_of_normal`, and every §14 lemma it cites (`typeP_duality`, the
+-- `_of_inputs` chief-factor helpers, …) is itself axiom-clean.
+#assert_only_allowed_axioms OddOrder.BG.Ch4.S15.mf_ne_msigma_typeP1_structure
 
 /-! ### Forward-axiom islands (historical mechanism; currently empty)
 
