@@ -2241,6 +2241,62 @@ theorem actsPrimeManner_of_typeP [Finite G]
   rw [OddOrder.BG.Ch3.S13.fixedByElement_def, OddOrder.BG.Ch3.S13.fixedBy_def] at hpm
   rw [inf_comm, hpm, hKstar]
 
+/-- **The prime-manner action in the `↥M`-internal form** (Theorem 15.2 step 2 plumbing): the
+`↥M`-rephrasing of `actsPrimeManner_of_typeP`, supplying the `hcond2` hypothesis of
+`kstar_le_opiCore_of_inputs`.  For `x ∈ (κ(M))^#` (as an `↥M`-element), the centralizer
+`C_{↥M}({x}) ⊓ (M_σ ↾ M)` equals `C_{↥M}(K ↾ M) ⊓ (M_σ ↾ M)` — both restrict to `K* ↾ M` via
+`centralizer_subgroupOf` (`C_{↥M}(T) = C_G(M.subtype '' T) ↾ M`) and the global prime-manner
+identity `C_G(x) ⊓ M_σ = K* = M_σ ⊓ C_G(K)`. -/
+theorem actsPrimeManner_subgroupOf_of_typeP [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M K Kstar : Subgroup G}
+    (hM : M ∈ maximalSubgroups G) (hP : S14.IsTypeP M) (hKM : K ≤ M)
+    (hK : Ch03.IsHallSubgroup (S14.kappa M) (K.subgroupOf M))
+    (hKstar : Kstar = OddOrder.BG.Ch3.S10.Msigma M ⊓ Subgroup.centralizer (K : Set G)) :
+    ∀ x ∈ (K.subgroupOf M : Set ↥M), x ≠ 1 →
+      Subgroup.centralizer ({x} : Set ↥M) ⊓ (OddOrder.BG.Ch3.S10.Msigma M).subgroupOf M
+        = Subgroup.centralizer (K.subgroupOf M : Set ↥M)
+            ⊓ (OddOrder.BG.Ch3.S10.Msigma M).subgroupOf M := by
+  classical
+  have hprime := actsPrimeManner_of_typeP hG hM hP hKM hK hKstar
+  intro x hxK hx1
+  have hxKM : x ∈ K.subgroupOf M := hxK
+  have hxG : (x : G) ∈ K := Subgroup.mem_subgroupOf.mp hxKM
+  have hxG1 : (x : G) ≠ 1 := fun h => hx1 (Subtype.ext h)
+  have himg_x : M.subtype '' ({x} : Set ↥M) = ({(x : G)} : Set G) := by
+    rw [Set.image_singleton]; rfl
+  have himg_K : M.subtype '' (K.subgroupOf M : Set ↥M) = (K : Set G) := by
+    rw [← Subgroup.coe_map, Subgroup.map_subgroupOf_eq_of_le hKM]
+  have sgInf : ∀ A B : Subgroup G, A.subgroupOf M ⊓ B.subgroupOf M = (A ⊓ B).subgroupOf M :=
+    fun A B => (Subgroup.comap_inf A B M.subtype).symm
+  -- both sides equal `Kstar.subgroupOf M`.
+  have hL : Subgroup.centralizer ({x} : Set ↥M) ⊓ (OddOrder.BG.Ch3.S10.Msigma M).subgroupOf M
+      = Kstar.subgroupOf M := by
+    rw [OddOrder.BG.Ch1.S03h.centralizer_subgroupOf ({x} : Set ↥M), himg_x, sgInf,
+      hprime (x : G) hxG hxG1]
+  have hR : Subgroup.centralizer (K.subgroupOf M : Set ↥M)
+        ⊓ (OddOrder.BG.Ch3.S10.Msigma M).subgroupOf M = Kstar.subgroupOf M := by
+    rw [OddOrder.BG.Ch1.S03h.centralizer_subgroupOf (K.subgroupOf M : Set ↥M), himg_K, sgInf,
+      inf_comm, ← hKstar]
+  rw [hL, hR]
+
+/-- **The normal `q`-Sylow of `↥M` underlying `Q = O_q(M)`** (Theorem 15.2 step 5 plumbing): when
+`Q = O_q(M)` is the normal Sylow `q`-subgroup of `M` (a `q`-group with `q ∤ [M : Q]`), there is a
+`Sylow q ↥M` whose image under `M.subtype` is `Q`.  `Q ↾ M` is a `q`-group (`comap_subtype`) of
+`q'`-index, hence a Sylow (`IsPGroup.toSylow`); being normal (`Q ⊴ M`), its ambient image is the
+singleton core `O_q(M) = Q` (`sylowMap_eq_opiCoreInG_singleton_of_normal`).  Supplies the Sylow
+witness `(P, hQP)` of `D_centralizes_Q_of_not_mem_beta`. -/
+theorem exists_sylow_eq_opiCore [Finite G] {M Q : Subgroup G} {q : ℕ} [Fact q.Prime]
+    (hQ : Q = opiCoreInG ({q} : Set ℕ) M) (hQM : Q ≤ M)
+    (hMnormQ : M ≤ Subgroup.normalizer (Q : Set G))
+    (hQpg : IsPGroup q ↥Q) (hidx : ¬ q ∣ (Q.subgroupOf M).index) :
+    ∃ P : Sylow q ↥M, Q = (P : Subgroup ↥M).map M.subtype := by
+  have hQsubpg : IsPGroup q ↥(Q.subgroupOf M) := hQpg.comap_subtype
+  refine ⟨hQsubpg.toSylow hidx, ?_⟩
+  haveI hPnorm : (hQsubpg.toSylow hidx : Subgroup ↥M).Normal := by
+    rw [hQsubpg.toSylow_coe hidx]
+    exact (Subgroup.normal_subgroupOf_iff_le_normalizer hQM).mpr hMnormQ
+  rw [OddOrder.BG.Ch3.S10.sylowMap_eq_opiCoreInG_singleton_of_normal _ hPnorm, ← hQ]
+
 /-- **BG Theorem 15.2** (mmd L4112): if `M_F` is strictly smaller than `M_sigma`,
 then `M` is type `P1` and has the normal `q`-subgroup / minimal chief factor
 structure described in the text. -/
