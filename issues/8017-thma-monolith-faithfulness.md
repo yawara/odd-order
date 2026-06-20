@@ -29,17 +29,43 @@ conjunct 4 (`∀k∈K#, U⊓C(k)=⊥`) と conjunct 7 (`K≠⊥→∀k∈K#, M�
 `typeP_auxiliary_structure` (S15:1702) がこれら大半を sorry-free で供給:cyclic K / M≤N(UMσ) /
 Mσ≤M' / M'=U⊔Mσ structure。A(8) は `theoremA8_structure` (issue 8016, axiom-clean)。)
 
-## やること
+## ✅ 2026-06-21 (cont.) 忠実性 audit 解決 + element-wise conjunct 4/5 を sorry-free 達成
 
-- [ ] **忠実性の確認**: conjunct 4 (`C_U(k)=1`) が任意 (κ∪σ)'-Hall U で成り立つか、K-invariant U
-      限定かを確定 (math: 共役不変性を精査; 非自明な transfer があるか)。
-- [ ] **忠実なら**: conjunct 4/5-element を K-invariant U about に restate (existential
-      `∃ K-invariant U, ...` or hypothesis `U◁UK`) → cross-lane (lane-b/Prop16.1 の cite) signature
-      影響を要調整 (hub/ユーザー裁可)。
-- [ ] **assembly**: 残 gap = conjunct 4 (K regular on U = Prop 14.2(a) deferred 部分、
-      `actsRegularlyOn_E23_E1_of_caseTau1` 経由 E-setup で証明可、K*≠Mσ [issue 8016] と同様の機構) +
-      conjunct 7 (element-wise `M⊓C(k)=K⊔Kstar`; typeP_structure (b1) は rank-1 X 用、k∈K# への拡張要)。
-- [ ] monolith を assemble (available conjuncts は cite、gap を埋める)。
+**忠実性の結論: conjunct 4 (`C_U(k)=1`) は任意 (κ∪σ)'-Hall U で真。K-invariant 限定は不要、monolith
+は (conjunct 4 について) 忠実。** 当初の「非 K-invariant U で偽の疑い」は**否定された**:
+
+- **鍵: conjunct 4 (`U⊓C(k)=⊥`) は conjunct 7 (`M⊓C(k)=K⊔K*`) に還元され、conjunct 7 は U に依存しない。**
+  `U⊓C_G(k) = U⊓(M⊓C_G(k)) = U⊓(K⊔K*)` (U≤M)、`|U|` は (κ∪σ)'-数、`|K⊔K*|=|K|·|K*|` は (κ∪σ)-数
+  (`card_kappaHall_sup_Kstar`) ゆえ互いに素 ⟹ `U⊓(K⊔K*)=⊥`。**U の取り方 (K-invariant か否か) に無関係。**
+
+**landed (S16_MainResults, 両 sorry-free + axiom-clean, AxiomsCheck 登録):**
+- **`typeP_centralizer_kappaElement_eq`** (S16:149, conjunct 7 = BG Thm A(5) element form):
+  type-P M + cyclic K で `∀k∈K#, M⊓C_G(k)=K⊔K*`。Prop 14.2(b1) (`typeP_structure`, rank-1 X の
+  `N(X)⊓M=K⊔K*`) を element-wise に sharpen。Bridge: K cyclic ⟹ `⟨k⟩` の order-p 部分群 X≤K を取り
+  `C_G(k)≤C_G(X)≤N_G(X)` ⟹ `M⊓C_G(k)≤N(X)⊓M=K⊔K*`; 逆は K abelian (`Subgroup.le_centralizer`) +
+  `K*≤C_G(K)≤C_G(k)`。
+- **`typeP_hall_inf_centralizer_kappaElement_eq_bot`** (S16:212, conjunct 4 = BG Thm A(4)):
+  type-P M + cyclic K + **U≤M** で `∀k∈K#, U⊓C_G(k)=⊥`。上記還元 + coprimality
+  (`coprime_of_isPiGroup_of_isPiGroup_compl`)。**hUM (U≤M) は必須** (conjunct 4 は U≤M なしでは偽)。
+
+## やること (残)
+
+- [x] **忠実性の確認** ✅: conjunct 4 は任意 (κ∪σ)'-Hall U≤M で真 (上記)。restate 不要。
+- [x] **assembly conjunct 7** ✅ `typeP_centralizer_kappaElement_eq`。
+- [x] **assembly conjunct 4/5** ✅ `typeP_hall_inf_centralizer_kappaElement_eq_bot`。
+- [ ] **monolith signature の忠実性 fix (cross-lane, hub/ユーザー裁可)**: 現 `theoremA_maximal_structure`
+      (S16:249) は hKM (K≤M)・hUM (U≤M) を欠き、conjunct 3 (`M=K⊔U⊔Msigma`)・conjunct 4 が forces
+      する K≤M/U≤M を満たさない ⟹ **as-stated は unprovable (faithfulness bug)**。fix には hKM・hUM
+      追加が要るが、**`theoremA_maximal_structure` は Peterfalvi `S12_MaximalIII_IV_V:503` (lane-b) +
+      S16:669 が cite** ⟹ signature 変更は cross-lane。`theoremA_ungated_conjuncts`/`theoremB(1)` の
+      faithfulness precedent (hKM/hUM 明示) に倣う。**標準 (buggy) monolith に触れず新 faithful 版
+      `theoremA_maximal_structure_faithful` (hKM/hUM 明示, 全 conjunct sorry-free) を別建てし、後で
+      callers を移行**するのが安全。
+- [ ] **faithful monolith assembly** (新版): conjunct 1 (`Msigma_isHall`)/2 (cyclic K,
+      `typeP_auxiliary_structure`)/3 (`M=K⊔U⊔Msigma`, S16:1561 で導出例あり要確認)/4-5 (上記新補題)/
+      6 (`theoremA_ungated_conjuncts`)/7 (上記新補題)/8-9 (`theoremA_ungated_conjuncts`)/
+      10 (`M''≤F(M)` ← `derivedInG M ≤ fittingInAmbient M` S15:449 + M''≤M')/11 (A(8) `theoremA8_structure`)
+      を cite して組む。残調査 = conjunct 3 の type-F (K=⊥) 枝。
 
 ## 完了条件
 
