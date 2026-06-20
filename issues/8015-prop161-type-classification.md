@@ -125,7 +125,20 @@ A(8) を `theoremA_maximal_structure` の該当 branch に配線 → A(8) は hI
 2. `typePData_msigma_inf_centralizer_W1_ne_bot` — κ bridge 条件1 (centralizer)
 3. `typePData_W1_prime_not_mem_sigma` — κ bridge 条件2 (σ-complement)
 4. `typePData_kappa_nonempty_of_rank1` — κ-nonempty capstone (rank-1 gated-endpoint)
-5. `isTypeP1_kappaSigma_compl_hall_subgroupOf_eq_bot` — Thm A(8) の U=⊥ 核
+5. `isTypeP1_kappaSigma_compl_hall_subgroupOf_eq_bot` — Thm A(8) の U=⊥ 核 (IsTypeP1→U=⊥)
+6. `kappa_eq_sigmaComplementPrimes_of_hall_subgroupOf_eq_bot` — 逆 (U=⊥→κ=σ')
+   ⟹ **IsTypeP1 ⟺ Hall (κ∪σ)ᶜ-complement trivial characterization 完成** (IsTypeP modulo)
+
+### ⚠ 残務の正直な評価 (2026-06-20 セッション末)
+6 補題は全て Prop 16.1/Theorem A の reverse・forward で消費される honest infra だが、**いずれも
+深い §16 endpoint theorem を closure には要する**。具体的な残 gate:
+- **FittingIsTI M** (A(8) 残 conjunct): どこからも未供給の深い §15 構造事実 (F(M) が TI-set;
+  Thm 15.2 の Q/Q̄ 構造から導く?)。A(8) の真の hard core。
+- **rank-1 `pRank_M p=1` for p∈π(W₁)** (reverse →IsTypeP の残): carrier (W₁=κ-Hall) gated。
+- **TypePData.U ↔ Hall (κ∪σ)ᶜ-complement U の同定**: characterization (補題5/6) は Hall U の話、
+  TypeVData.U=TypePData.U は derived-complement で別物。reverse 方向で両者の bridge が要る。
+⟹ **次の実質 closure = §16 Theorems A-D の本体着手** (FittingIsTI / Theorem C の構造論)。
+Prop 16.1 はそれらの downstream。本 issue の 6 補題は前倒し infra として valid。
 - [ ] **input 1-4, 9 (hard 構成)**: §16 endpoint A-E と協調。`typeFData_of_kappa_eq_bot` を起点に
       TypeIData の `alternative` (8.3 三分岐) を構成 (要 Thm 15.7(c))。← 最深、後回し。
 - [ ] **assembly**: 全 input が揃ったら `proposition_type_classification := …_of_inputs h11 …` で close。
