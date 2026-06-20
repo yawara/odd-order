@@ -1066,6 +1066,42 @@ structure CoherentHypothesis {M : Subgroup G} [Fintype G] [Fintype ↥M]
   tau1_extends_tau_on_S : Prop
   tau1_extends_tau_on_S_holds : tau1_extends_tau_on_S
 
+/-- **Peterfalvi (8.8) for `M`, used at the start of (10.3)**: there is a maximal subgroup `S` of `G`
+of **Type II** such that `|S : [S,S]| = w₂`.
+
+This is exactly the opening sentence of the proof of (10.3) ("By Theorem (8.8), there is a maximal
+subgroup `S` of `G` of Type II such that `|S:[S,S]| = w₂`"): the type-`P` maximal `M` of (10.1)
+participates in the case-(b) configuration of Theorem (8.8), one of whose two maximal subgroups is
+of Type II and shares the cyclic factor order `w₂`.  Tying the generic case-(b) datum
+(`theorem88_caseB_holds`) to the *given* `M` is the content of (8.8)/(8.13) applied to `M`; it is
+recorded here as a faithful obligation (its proof is currently a `sorry`, gated on the BG §16
+partner-existence behind `theorem88_caseB_holds`). -/
+theorem Hypothesis.exists_typeII_maximal_with_w2 [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} (hyp : Hypothesis M) :
+    ∃ S : Subgroup G, S ∈ maximalSubgroups G ∧ IsTypeII S ∧
+      ((derivedInG S).subgroupOf S).index = hyp.w2 := by
+  sorry
+
+/-- **Peterfalvi (10.3), first clause**: `w₂` is prime.
+
+By Theorem (8.8) there is a Type-II maximal subgroup `S` with `|S:[S,S]| = w₂`
+(`exists_typeII_maximal_with_w2`); a Type-II maximal's cyclic factor `W₁(S)` has prime order
+(Peterfalvi (8.6.a), carried by `TypePNontrivialCore`) and equals `|S:[S,S]|`
+(`card_W1_eq_derived_index`), so `w₂` is prime.
+
+This follows Peterfalvi's own proof of (10.3) verbatim and is **non-circular**: it does *not* route
+through `no_typeV_maximal` (the way a generic case-(b) datum would, since `TypeVData` carries no
+prime-order field), so it may be used to populate `CharacterParameters.w2_prime` *upstream* of the
+(10.10) Type-V elimination — which is what unblocks the (10.2)/(10.3) producer below. -/
+theorem Hypothesis.w2_prime [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    {M : Subgroup G} (hyp : Hypothesis M) : (hyp.w2).Prime := by
+  obtain ⟨S, -, hSII, hindex⟩ := hyp.exists_typeII_maximal_with_w2 hG
+  obtain ⟨dataII⟩ := hSII
+  have hcard : Nat.card ↥dataII.typeP.W1 = hyp.w2 := by
+    rw [dataII.typeP.card_W1_eq_derived_index]; exact hindex
+  rw [← hcard]
+  exact dataII.common.2.1
+
 /-- **Peterfalvi (10.2)**: the family `S` contains an irreducible character
 `zeta` of degree `w_1`. -/
 theorem exists_zeta_degree_w1 [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
@@ -1235,30 +1271,6 @@ theorem theorem88_caseB_prime_orders [Finite G] (hG : OddOrder.BG.IsMinimalSimpl
     rw [hW1, ← dataS.card_W1_eq_derived_index]; exact hSp
   · obtain ⟨dataT, hTp⟩ := caseB_typeP_prime_W1 hG caseB.T_maximal caseB.T_nonI
     rw [hW2, ← dataT.card_W1_eq_derived_index]; exact hTp
-
-/-- **Peterfalvi (8.8) ↔ M, the case-(b) datum containing `M`** (faithful (8.8)(b) consequence for a
-type-`P` maximal): the §10 maximal subgroup `M` participates in a case-(b) configuration of Theorem
-(8.8) whose shared cyclic factor `W = W₁ × W₂` matches `M`'s — so `w₂ = |W₂|` equals one of the two
-cyclic factor orders of the datum.  The generic existence `theorem88_caseB_holds` produces a case-(b)
-datum but does not tie it to a *given* `M`; that tying is the content of (8.8) applied to `M`,
-recorded here as a faithful obligation (its statement is the correct (8.8) consequence; its proof is
-currently a `sorry`, dischargeable from the (8.8)/(8.13) uniqueness structure). -/
-theorem Hypothesis.exists_caseBData_with_w2 [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
-    {M : Subgroup G} (hyp : Hypothesis M) :
-    ∃ caseB : Theorem88CaseBData G,
-      Nat.card ↥caseB.W1 = hyp.w2 ∨ Nat.card ↥caseB.W2 = hyp.w2 := by
-  sorry
-
-/-- **Peterfalvi (10.3), first clause**: `w₂` is prime.  By Theorem (8.8) the type-`P` maximal `M`
-sits in a case-(b) datum (`exists_caseBData_with_w2`) whose two cyclic factors have prime order
-(`theorem88_caseB_prime_orders`), and `w₂` is one of them. -/
-theorem Hypothesis.w2_prime [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
-    {M : Subgroup G} (hyp : Hypothesis M) : (hyp.w2).Prime := by
-  obtain ⟨caseB, hcard⟩ := hyp.exists_caseBData_with_w2 hG
-  have hp := theorem88_caseB_prime_orders hG caseB
-  rcases hcard with h | h
-  · rw [← h]; exact hp.1
-  · rw [← h]; exact hp.2
 
 /-- **Peterfalvi (10.11), Type II assertion**: for a type-II maximal subgroup,
 the §11 family `S(H_0 C')` specializes to a coherent set. -/
