@@ -446,23 +446,30 @@ W₁ 含む complement 存在補題も要)。
 
 署名不変ゆえ consumer `typeI_overNormalizer_complement` 無破壊。full build 3871 jobs green + AxiomsCheck。
 
-### §13.17 helper 3 本中 2 本 honest 化 (2026-06-20¹⁰)、残 1 本 = genuine §13 gate
+### §13.17 helper 3 本すべて honest 化 (2026-06-20¹⁰〜¹¹)
 
-`Q_W2_structure` + `q_not_dvd_kernel` 完了で 3 本中 2 本が実証明化。各 helper を精査し、塞げる 2 本を
-landing・残 1 本が **lane-h で honest に塞げないことを確定** (CLAUDE.md「進捗の測り方」+「難所を回避しない」):
+`Q_W2_structure` + `q_not_dvd_kernel` + `complement_card_eq_pq` の 3 本すべてを opaque sorry から実
+assembly へ (CLAUDE.md「進捗の測り方」+「難所を回避しない」)。各 helper を精査し group-theoretic 内容を
+honest に landing、残 gate を named §13 residual に最小 isolate:
 
 - **`q_not_dvd_kernel`** (q∤|L_F|): ✅ **DONE (commit `1c673bbb`)** — 当初「carrier opacity + 偽 statement で
   gated」と診断したが、診断した path がそのまま honest 解になった: (1) carrier opacity は誤り
   (`frob.typeI.typeF.H_eq` が TypeFData 直接フィールド)、(2) statement を `hLmax`/`hLI` で強化すると
   `not_conj_of_isTypeI_of_isTypeNonI` で S,T 非共役が導出可 → `card_LF_coprime_pq` (B2, F, cite 可) に帰着。
   consumer `exists_typeIFrobeniusData_W1_le` は hLmax/hLtypeI 既持で無破壊。唯一 gate = `card_LF_coprime_pq`。
-- **`complement_card_eq_pq`** (|E|=pq): ⛔ **残・genuine 深 §13 gate**。`complement_le_QW2` (E⊆QW₂、proven) +
-  `W₁≤E` まではあるが、`|E|=pq` には **`E ∩ Q = W₁`** (E の q-Sylow が exactly W₁) が必須。検算: E⊆QW₂ の
-  q-元は Q 内 (QW₂/Q≅W₂ 位数 p) ⟹ E の q-Sylow = E∩Q ⊇ W₁、しかし E∩Q が cyclic q-群で位数 q に pin
-  するには §13 構造 ([L:L_F]=pq) が要る。`TypeIFrobeniusData` に complement-order フィールド無し ＝ 既存
-  §13 residual に非帰着 = **新規の深い §13 構造**。`E=W₁` 除外も (13.19)/(13.2.a) gate。index 論証
-  (~100 行) で「E∩Q=W₁ ∧ E⊄Q ⟹ |E|=pq」は honest 化可だが残 residual E∩Q=W₁ は依然 gated かつ downstream
-  `exists_LHypothesis` は既に carrier 経由 sorry-free ゆえ unblock 効果なし → 着手判断は要ユーザー/hub。
+- **`complement_card_eq_pq`** (|E|=pq): ✅ **DONE (commit `a2ae4ec6`)** — ユーザー裁可で index 論証を landing。
+  「E⊆QW₂ ∧ E∩Q=W₁ ∧ E⊄Q ⟹ |E|=pq」を sorry-free 群論で形式化: Q◁QW₂ かつ [QW₂:Q]=|W₂|=p →
+  [E:E∩Q]=Q.relIndex E が p を割り (`relIndex_dvd_index_of_normal` を ↥(QW₂) 内 + `relIndex_subgroupOf`)、
+  E⊄Q で ≠1 ⟹ =p、|E|=|E∩Q|·[E:E∩Q]=q·p (`card_mul_index`+`inf_subgroupOf_left`)。**card_Q_eq 非依存**
+  (|QW₂|=|Q|·p で十分)。genuine §13 residual を `complement_inf_Q_structure` (E∩Q=W₁ ∧ E⊄Q、Pf p.82 +
+  (13.19)/(13.2.a)、`TypeIFrobeniusData` に complement-order 無し＝既存 residual 非帰着) に最小 isolate。
+  実 sorry 137 維持 (削除 1 + residual 1)。
+
+**⟹ §13.17 helper 3 本すべて実 assembly 化完了** (`Q_W2_structure` / `q_not_dvd_kernel` /
+`complement_card_eq_pq`)。(13.17.c)→`typeII_overNormalizer_frobenius`→`exists_LHypothesis` の chain は
+named §13 residual のみに bottom-out: `card_Q_eq` (B1) / `card_LF_coprime_pq` (B2, F) /
+`complement_inf_Q_structure` (新, 深 §13) / gate 1/2 F-ask / `tConjugate_fitting_data` / Wielandt (§9)。
+これらは全て §13 maximal-structure・char theory・carrier ＝ lane-F/B 領域 or 大物。lane-h 群論 frontier は出し尽くした。
 
 さらに上流 **`card_Q_eq` 自体が §13 maximal-structure machinery 全体に gate**: S-side 対応物
 `basic_structure` (`P_order: |P|=p^q`) も `S15_SAndT:245 := sorry`。両 Fitting order とも Pf §13.2 の
