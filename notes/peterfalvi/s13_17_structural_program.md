@@ -184,3 +184,44 @@ Pf (13.17.a/b) を原文精読 (mmd `04.15_…S_and_T.mmd` L286-288) し正確�
 **▶ H 次手 = L~S gate の "U Hall in S"**: これが H 単独で出れば L~S 除外 (gate 2) を sorry-free 化できる
 (Hall C `hall_C` は既存)。"U は S の (κ∪σ)'-Hall 補元" の形式化 — type-data / σ 構造から導出可能性を調査。
 gate 3/4 は §8/§13 cite (basic_structure/(8.17.a)/(9.1))、gate 1 は F 待ち。
+
+## Phase 2 cont. (2026-06-20²) — ✅ gate 2 構造論コア sorry-free + 🔑 残差は W1=κ carrier-coherence (F-ask)
+
+gate 2 (L~S) の**構造論 (Hall 共役論法) を sorry-free + axiom-clean で landing** (commit `4357cc7d`)。
+残差を Pf 原文どおりの 1 本 `Coprime |U| [S:U]` (=「U is a Hall subgroup of S」) に縮約。
+
+**✅ 新規 (両 axiom-clean、汎用・再利用可、S15_SAndT.lean)**:
+- `normalizer_le_of_isHall_subgroupOf_of_conj` — (13.17.a) 構造論コア: U が可解 V の π-Hall・`L^g=V`・
+  `N_G(U)⊆L` ⟹ `N_G(U)⊆V`。証明 = `U^g⊆V` 同位数 π-Hall → Hall 共役 (`exists_conj_eq_of_isHall_subgroupOf`)
+  で `w∈V, (U^g)^w=U` → `wg∈N_G(U)` → `N_G(U)=N_G(U)^{wg}⊆L^{wg}=V`。
+- `isHall_subgroupOf_primeFactors_of_coprime_index` — `H≤V` で `|H|⟂[V:H]` ⟹ `H` は `π(|H|)`-Hall。
+
+**🔑🔑 知見 (LAUNCH/上記「次の一手」見積りの訂正)**: gate 2 残差は **「~40-60 行 H 単独 basic_structure cite」では
+閉じない**。深掘りで以下が確定:
+- `Coprime |U| [S:U]` は `[S:U]=[S:M']·|P|` で分解。`|U|⟂|P|` は `hcop` (済) だが **`|U|⟂[S:M']` が問題**。
+- `[S:M'] = |tdata.typeP.W1|` (`card_W1_eq_derived_index`、prime)。`|U|⟂[S:M']` には **`tdata.typeP.W1` が
+  κ(S)-Hall であること** (`IsHallSubgroup (kappa S) (W1.subgroupOf S)`、`coprime_card_derived_kappaHall_of_isComplement'`
+  の入力) を要する。= **BG↔Pf の「W₁ = κ(S)-Hall」同定**。
+- ⚠ **`BG.Ch4.S14.IsTypeP` (`(kappa M).Nonempty`) と Pf `GroupTheory.IsTypeP` (`Nonempty TypePData`) は別述語**。
+  BG の κ-Hall 補題群 (`typeP_derivedInG_isComplement_kappaHall` 等) は前者 + cyclic κ-Hall K を要求。
+- ⚠ **`Section16MaximalPair` (lane-f) では `K_hall`/`S_typeP`/`Z_cyclic` はすべて carrier フィールド** (enrich が供給)。
+  bare `TypeIIData hyp.S` からは導出されない。⟹ **W₁=κ 同定は carrier-faithfulness、§13 構造論で塞げない**。
+- **∴ gate 2 残差 = gate 1 (hdisj) と同種の F-ask**。
+
+### Phase 0(b) F-ask 改訂 (gate 1 + gate 2 を一括で塞ぐ carrier enrich)
+F への ask を以下に統合・拡張 (issue 2009 + cross-lane):
+- **gate 1**: `P_inf_U_eq_bot : hyp.P ⊓ hyp.U = ⊥` (既出)。
+- **gate 2 (新)**: `hyp.W1` を `derivedInG S` の κ-Hall complement に pin。最小形は
+  `W1_complements_derived : IsComplement' ((derivedInG S).subgroupOf S) (W1.subgroupOf S)`
+  (⟹ `[S:M']=|W₁|`)。これと `basic_structure.UW1_frobenius` (`Coprime |U| |W₁|`、citeable sorried producer) で
+  `Coprime |U| [S:M']` ⟹ `Coprime |U| [S:U]` (`isHall_subgroupOf_primeFactors_of_coprime_index` 経由) ⟹ gate 2 close。
+- **真の構成可能性**: いずれも実数学で真 (`hyp.U`/`hyp.W1` は type-P 構造の真の補元; (13.1.b))。F は §16 producer
+  構成サイトで補元として取れば faithful に供給可 (scaffold でない)。
+
+### gate 2 を H 単独で閉じる代替 (非推奨・大物)
+W₁=κ 同定を H 単独で証明する道もある: `(kappa S).Nonempty` を `TypeIIData` から導出 (τ₁∪τ₃ の prime + 中心化子条件)
++ cyclic κ-Hall 存在 → `typeP_derivedInG_isComplement_kappaHall`。但しこれは深い §14 構造論 (W₁ の prime が κ に
+入ることの証明) で、carrier enrich (F-ask) の方が遥かに安価。**F-ask を推奨**。
+
+**▶ H 次手**: gate 2 残差は F 待ち (上記 enrich)。残る H 単独候補 = gate 3 (L~T 除外、`basic_structure.UW1_frobenius`
++ |L_F|=q^p [T-side cite]) / gate 4 (U⊆L_F、(8.17.a)+(9.1) cite) / Phase 3 (Huppert [H] V.8.18、obligation ②、並行可)。
