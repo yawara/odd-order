@@ -785,6 +785,48 @@ theorem isTypeV_of_typePData {M : Subgroup G} (data : TypePData M)
     IsTypeV M :=
   ⟨{ typeP := data, U_eq_bot := hUbot, alternative := halt }⟩
 
+/-- **Prop 16.1(d)/(f) reverse, `M_F = M_σ` from `U = ⊥`** (the `M_F = M_σ` conjunct of `hVP1`,
+mmd L4478): a type-`P` datum with trivial complement `U = ⊥` has `M_F = M_σ`.  Sandwiching:
+`M' = M_F ⊔ U = M_F` (`TypePData.derivedInG_eq_fitting_sup_U` with `U = ⊥`), while always
+`M_F ≤ M_σ ≤ M'` (`maxNilpotentNormalHall_le_Msigma`, `Msigma_le_derived`); so `M_F = M_σ = M'`.
+Axiom-clean (does *not* cite Theorem A(8), unlike the `M_F = M_σ` step of `typeFData_of_kappa_eq_bot`).
+This is the structural half of clause (d): the `IsTypeP1` half is the (deeper) `κ` refinement. -/
+theorem mf_eq_msigma_of_typePData_U_eq_bot [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    {M : Subgroup G} (hM : M ∈ maximalSubgroups G) (data : TypePData M) (hU : data.U = ⊥) :
+    S15.MF M = OddOrder.BG.Ch3.S10.Msigma M := by
+  -- `M' = M_F` since `M' = M_F ⊔ U` and `U = ⊥`.
+  have hderiv : derivedInG M = S15.MF M := by
+    rw [data.derivedInG_eq_fitting_sup_U, hU, sup_bot_eq]
+  -- `M_F ≤ M_σ` always; `M_σ ≤ M' = M_F`; hence equal.
+  refine le_antisymm (S15.maxNilpotentNormalHall_le_Msigma hG hM) ?_
+  exact hderiv ▸ OddOrder.BG.Ch3.S10.Msigma_le_derived hG hM
+
+/-- **Prop 16.1 reverse, centralizer half of `π(W₁) ⊆ κ(M)`** (mmd L4478, `1 ⊂ C_H(W₁) ⊆
+C_{M_σ}(W₁)`): for a type-`P` datum and a nonidentity `x ∈ W₁`, the `M_σ`-centralizer of `x` is
+nontrivial.  Witness: `W₂ = M' ⊓ C(x)` (`centralizer_W1`) lies in both `M_σ` (`W₂ ≤ H = M_F ≤ M_σ`)
+and `C(x)`, and `W₂ ≠ ⊥` (`W2_nontrivial`); so `W₂ ≤ M_σ ⊓ C(x)` is a nontrivial subgroup.
+
+This is the `κ(M)`-membership ingredient that is **derivable from the bare `TypePData`** (it needs
+no `W₁ = κ`-Hall identification).  The remaining `κ`-membership ingredients — `p ∉ σ(M)` and the
+rank-one condition `r_p(M) = 1` putting `p ∈ τ₁(M) ∪ τ₃(M)` — are the carrier-gated half (the latter
+genuinely needs `W₁` to be the Hall `κ(M)`-subgroup; cf. issue 8015 and
+`typep-w1-kappa-carrier-not-derivable`). -/
+theorem typePData_msigma_inf_centralizer_W1_ne_bot [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} (hM : M ∈ maximalSubgroups G)
+    (data : TypePData M) {x : G} (hx : x ∈ data.W1) (hxne : x ≠ 1) :
+    OddOrder.BG.Ch3.S10.Msigma M ⊓ Subgroup.centralizer ({x} : Set G) ≠ ⊥ := by
+  -- `W₂ ≤ M_σ ⊓ C(x)`.
+  have hW2le : data.W2 ≤ OddOrder.BG.Ch3.S10.Msigma M ⊓ Subgroup.centralizer ({x} : Set G) := by
+    refine le_inf ?_ ?_
+    · -- `W₂ ≤ H = M_F ≤ M_σ`.
+      calc data.W2 ≤ data.H := data.W2_le.trans inf_le_left
+        _ = maxNilpotentNormalHall M := data.H_eq
+        _ ≤ _ := S15.maxNilpotentNormalHall_le_Msigma hG hM
+    · -- `W₂ = M' ⊓ C(x) ≤ C(x)`.
+      rw [← data.centralizer_W1 x hx hxne]; exact inf_le_right
+  -- A subgroup containing the nontrivial `W₂` is nontrivial.
+  exact fun hbot => data.W2_nontrivial (le_bot_iff.mp (hW2le.trans hbot.le))
+
 /-! ## Proposition 16.1: BG local taxonomy and shared Type I--V predicates -/
 
 /-- **§14/§15-independent assembly engine for BG Proposition 16.1** (mmd L4478; the source proof
