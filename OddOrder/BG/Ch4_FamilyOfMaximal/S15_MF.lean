@@ -5752,6 +5752,98 @@ theorem isFrobeniusGroup_DK_of_primeManner
     have hnQ : (n : G) ∈ Q := hKstarQ hnKstar
     exact hnG (Subgroup.disjoint_def.mp hDQ hn hnQ)
 
+/-- **BG Theorem 15.2 step 3-4, the chief-factor engine wiring** (mmd L4194-4196): given the
+type-`P₁` data with `Q = O_q(M)`, the `K`-invariant complement `D` of `Q` in `M_σ`, and the
+*output of `chiefFactor_Q0_normal_minimal_of_inputs`* (the normal `Q₀ = C_Q(D) ⊴ M`, `¬ K* ≤ Q₀`,
+`Q₀ < Q`, and the lattice-minimality), it runs Theorem 3.10 on the Frobenius group `KD` and yields
+the chief-factor index `[Q : Q₀] = q^{|K|}` with `|K|` prime, the commutator constraint
+`D' ⊆ C_D(Q̄)`, and the elementary abelian section `Q̄ = Q/Q₀`.
+
+Chains the chief-factor producers: `isElementaryAbelian_chiefFactor_of_minimalNormal`
+(`hEA`/`hNT`), `card_centralizer_quotient_eq_of_kstar` (`hCfix`/`hCcard`),
+`isFrobeniusGroup_DK_of_primeManner` (`hfrob`), `mem_centralizer_of_centralizes_quotient`
+(`hFPF`), `actsPrimeManner_quotient_of_inputs` (`hcond3`), and the Theorem 3.10 engine
+`chiefFactor_card_and_commutator_of_inputs`.  The coprimality `gcd(|D ⊔ K|, |Q|) = 1` uses
+`|D ⊔ K| = |K|·|D|` (the Frobenius semidirect structure). -/
+theorem chiefFactor_engine_of_inputs [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M K Kstar Q D Q0 : Subgroup G} {q : ℕ} [Fact q.Prime]
+    [(Q0.subgroupOf Q).Normal]
+    (hM : M ∈ maximalSubgroups G) (hP1 : S14.IsTypeP1 M) (hKM : K ≤ M)
+    (hK : Ch03.IsHallSubgroup (S14.kappa M) (K.subgroupOf M))
+    (hKstar : Kstar = OddOrder.BG.Ch3.S10.Msigma M ⊓ Subgroup.centralizer (K : Set G))
+    (hQ : Q = opiCoreInG ({q} : Set ℕ) M)
+    (hQMσ : Q ≤ OddOrder.BG.Ch3.S10.Msigma M) (hMnormQ : M ≤ Subgroup.normalizer (Q : Set G))
+    (hKstarQ : Kstar ≤ Q) (hKne : K ≠ ⊥)
+    (hKMσdisj : Disjoint K (OddOrder.BG.Ch3.S10.Msigma M))
+    (hcop : Nat.Coprime (Nat.card ↥K) (Nat.card ↥(OddOrder.BG.Ch3.S10.Msigma M)))
+    (hDq' : q ∉ (Nat.card ↥D).primeFactors)
+    (hDMσ : D ≤ OddOrder.BG.Ch3.S10.Msigma M) (hKnormD : K ≤ Subgroup.normalizer (D : Set G))
+    (hQDdisj : Disjoint Q D) (hDne : D ≠ ⊥)
+    (hQ0def : Q0 = Q ⊓ Subgroup.centralizer (D : Set G))
+    (hMNQ0 : M ≤ Subgroup.normalizer (Q0 : Set G)) (hKstarNotQ0 : ¬ Kstar ≤ Q0)
+    (hQ0ltQ : Q0 < Q)
+    (hmin : ∀ H : Subgroup G, Q0 < H → H ≤ Q → (H.subgroupOf M).Normal → Q ≤ H) :
+    (Nat.card ↥K).Prime ∧
+      (Q0.subgroupOf Q).index = q ^ Nat.card ↥K ∧
+      (∀ g ∈ ⁅D, D⁆, ∀ x ∈ Q, ⁅g, x⁆ ∈ Q0) ∧
+      OddOrder.GroupTheory.IsElementaryAbelian q (↥Q ⧸ Q0.subgroupOf Q) := by
+  classical
+  have hMσM : OddOrder.BG.Ch3.S10.Msigma M ≤ M := OddOrder.BG.Ch3.S10.Msigma_le M
+  have hQM : Q ≤ M := hQMσ.trans hMσM
+  have hDM : D ≤ M := hDMσ.trans hMσM
+  haveI : IsSolvable ↥M := hG.solvable_of_mem_maximalSubgroups hM
+  have hQpg : IsPGroup q ↥Q := by rw [hQ]; exact isPGroup_opiCoreInG_singleton M
+  have hQ0Q : Q0 ≤ Q := hQ0ltQ.le
+  have hKQ : K ≤ Subgroup.normalizer (Q : Set G) := hKM.trans hMnormQ
+  have hDNQ : D ≤ Subgroup.normalizer (Q : Set G) := hDM.trans hMnormQ
+  have hQQ0 : Q ≤ Subgroup.normalizer (Q0 : Set G) := hQM.trans hMNQ0
+  have hKQ0 : K ≤ Subgroup.normalizer (Q0 : Set G) := hKM.trans hMNQ0
+  have hDNQ0 : D ≤ Subgroup.normalizer (Q0 : Set G) := hDM.trans hMNQ0
+  have hKstarN : Kstar ≤ Subgroup.normalizer (Q0 : Set G) := hKstarQ.trans hQQ0
+  have hSolvQ : IsSolvable ↥Q := solvable_of_solvable_injective (Subgroup.inclusion_injective hQM)
+  have hsolvDK : IsSolvable ↥(D ⊔ K) :=
+    solvable_of_solvable_injective (Subgroup.inclusion_injective (sup_le hDM hKM))
+  have hKstarP : (Nat.card ↥Kstar).Prime := kstar_card_prime_of_inputs hG hM hP1 hKM hK hKstar
+  have hKstarEqQ : Nat.card ↥Kstar = q := by
+    obtain ⟨n, hn⟩ := hQpg.exists_card_eq
+    have hdvd : Nat.card ↥Kstar ∣ Nat.card ↥Q := Subgroup.card_dvd_of_le hKstarQ
+    rw [hn] at hdvd
+    exact (Nat.prime_dvd_prime_iff_eq hKstarP Fact.out).mp (hKstarP.dvd_of_dvd_pow hdvd)
+  have hqD : ¬ q ∣ Nat.card ↥D := fun hdvd =>
+    hDq' (Nat.mem_primeFactors.mpr ⟨Fact.out, hdvd, Nat.card_pos.ne'⟩)
+  have hcopDQ : Nat.Coprime (Nat.card ↥D) (Nat.card ↥Q) := by
+    obtain ⟨n, hn⟩ := hQpg.exists_card_eq
+    rw [hn]
+    rcases Nat.eq_zero_or_pos n with h0 | h0
+    · subst h0; simpa using Nat.coprime_one_right _
+    · rw [Nat.coprime_pow_right_iff h0]
+      exact ((Fact.out : q.Prime).coprime_iff_not_dvd.mpr hqD).symm
+  have hcopKQ : Nat.Coprime (Nat.card ↥K) (Nat.card ↥Q) :=
+    hcop.coprime_dvd_right (Subgroup.card_dvd_of_le hQMσ)
+  have hDKdisj : Disjoint D K := hKMσdisj.symm.mono_left hDMσ
+  have hcopDKQ : Nat.Coprime (Nat.card ↥(D ⊔ K)) (Nat.card ↥Q) := by
+    have hcardsup : Nat.card ↥(D ⊔ K) = Nat.card ↥K * Nat.card ↥D := by
+      rw [sup_comm]
+      exact card_sup_eq_mul_of_le_normalizer_of_disjoint hKnormD (disjoint_iff.mp hDKdisj.symm)
+    rw [hcardsup]; exact Nat.coprime_mul_iff_left.mpr ⟨hcopKQ, hcopDQ⟩
+  have hprime := actsPrimeManner_of_typeP hG hM hP1.1 hKM hK hKstar
+  obtain ⟨hEA, hNT⟩ :=
+    isElementaryAbelian_chiefFactor_of_minimalNormal hQ0ltQ hQM hQpg hMnormQ hMNQ0 hmin
+  obtain ⟨C, hQ0C, hCQ, hCfix, hCcard⟩ :=
+    card_centralizer_quotient_eq_of_kstar hKstar hQMσ hKstarQ hKstarEqQ hQ0Q hKstarNotQ0 hKQ hQQ0
+      hKQ0 hKstarN hcopKQ (Or.inr hSolvQ)
+  have hfrob := isFrobeniusGroup_DK_of_primeManner (M := M) hprime hDMσ hKstarQ hQDdisj.symm hKnormD
+    hDKdisj hDne hKne
+  have hFPF : ∀ x ∈ Q, (∀ d ∈ D, ⁅d, x⁆ ∈ Q0) → x ∈ Q0 :=
+    fun x hxQ hfix => mem_centralizer_of_centralizes_quotient hQ0def hDNQ hQQ0 hDNQ0 hcopDQ
+      (Or.inr hSolvQ) hxQ hfix
+  have hcond3 := actsPrimeManner_quotient_of_inputs hKstar hprime hQMσ hKstarQ hQ0Q hKQ hQQ0 hKQ0
+    hcopKQ (Or.inr hSolvQ)
+  obtain ⟨hKprime, hindex, hDcomm⟩ :=
+    chiefFactor_card_and_commutator_of_inputs hQ0Q hQ0C hCQ hDne hEA hNT hDNQ hKQ hDNQ0 hKQ0 hQQ0
+      hsolvDK hfrob hcopDKQ hFPF hcond3 hCfix hCcard
+  exact ⟨hKprime, hindex, hDcomm, hEA⟩
+
 /-- **Theorem 15.2(g) reverse inclusion, reduced to `C_M(Q) ⊆ M_σ`** (mmd L4196-4198): if the
 centralizer `C_M(Q)` of the normal `q`-subgroup `Q` lies in `M_σ` (the genuinely BG-specific input,
 from `σ`-uniqueness — it does *not* follow from local structure, cf. the ChatGPT-verified counter-
