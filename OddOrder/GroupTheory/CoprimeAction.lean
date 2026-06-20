@@ -216,6 +216,66 @@ theorem IsFrobeniusGroup.centralizer_inf_kernel_eq_bot_of_not_mem
   rw [Subgroup.mem_centralizer_singleton_iff]
   exact (Subgroup.mem_centralizer_singleton_iff.mp hxc).symm
 
+/-- **Peterfalvi (13.17.b), the fixed-point-free engine**: in a finite Frobenius group `L` with
+kernel `N`, if a *Frobenius subgroup* `U E ≤ L` (kernel `U`, complement `E`) meets `N` trivially
+(`U ⊓ N = E ⊓ N = ⊥`) and acts coprimely (`|N| ⟂ |UE|`), then `N = ⊥`.
+
+Both `U` and `E` act fixed-point-freely on `N` (every nontrivial element lies outside `N`, so
+`centralizer_inf_kernel_eq_bot_of_not_mem` makes its centralizer meet `N` trivially), so Wielandt's
+formula (`coprimeFrobeniusAction_card_eq_one`) forces `|N| = 1`.  This is exactly the step that, in
+(13.17.b), derives `|L_F| = 1` from `U ∩ L_F = 1`, contradicting `L_F ≠ 1`. -/
+theorem isFrobenius_kernel_eq_bot_of_frobenius_subgroup {L : Type*} [Group L] [Finite L]
+    {N U E : Subgroup L} (hFrob : ∃ A : Subgroup L, Ch06.IsFrobeniusGroup L N A)
+    (hUE : Ch06.IsFrobeniusGroup ↥(U ⊔ E) (U.subgroupOf (U ⊔ E)) (E.subgroupOf (U ⊔ E)))
+    (hUN : U ⊓ N = ⊥) (hEN : E ⊓ N = ⊥) (hsolv : IsSolvable ↥N)
+    (hcop : Nat.Coprime (Nat.card ↥N) (Nat.card ↥(U ⊔ E))) :
+    N = ⊥ := by
+  classical
+  obtain ⟨A, hFrobA⟩ := hFrob
+  haveI hNnormal := hFrobA.isNormal
+  have hUEle : (U ⊔ E) ≤ Subgroup.normalizer (N : Set L) :=
+    (Subgroup.normalizer_eq_top (H := N)).symm ▸ le_top
+  letI act : MulDistribMulAction ↥(U ⊔ E) ↥N :=
+    MulDistribMulAction.compHom (M := ↥(Subgroup.normalizer (N : Set L))) ↥N
+      (Subgroup.inclusion hUEle)
+  set φ : ↥(U ⊔ E) →* MulAut ↥N := MulDistribMulAction.toMulAut ↥(U ⊔ E) ↥N with hφ
+  have hφ_coe : ∀ (a : ↥(U ⊔ E)) (x : ↥N), ((φ a) x : L) = (a : L) * (x : L) * (a : L)⁻¹ :=
+    fun _ _ => rfl
+  let act' : CoprimeFrobeniusAction ↥(U ⊔ E) ↥N :=
+    { U := U.subgroupOf (U ⊔ E), E := E.subgroupOf (U ⊔ E), frobenius := hUE,
+      H_solvable := hsolv, φ := φ, coprime_order := hcop }
+  -- The fixed-point-free facts: each factor's nontrivial elements lie outside `N`.
+  have key : ∀ {K : Subgroup L}, K ⊓ N = ⊥ → K ≠ ⊥ → K ≤ U ⊔ E →
+      fixedSubgroup φ (K.subgroupOf (U ⊔ E)) = ⊥ := by
+    intro K hKN hKne hKle
+    rw [eq_bot_iff]
+    intro n hn
+    rw [Subgroup.mem_bot]
+    by_contra hne
+    have hnL : (n : L) ≠ 1 := fun h => hne (Subtype.ext h)
+    obtain ⟨k, hkK, hkne⟩ := (K.bot_or_exists_ne_one).resolve_left hKne
+    have hkUE : k ∈ U ⊔ E := hKle hkK
+    have hk_mem : (⟨k, hkUE⟩ : ↥(U ⊔ E)) ∈ K.subgroupOf (U ⊔ E) :=
+      Subgroup.mem_subgroupOf.mpr hkK
+    have hfix := (mem_fixedSubgroup.mp hn) ⟨k, hkUE⟩ hk_mem
+    have hcomm : k * (n : L) * k⁻¹ = (n : L) := by
+      have hc : ((φ ⟨k, hkUE⟩) n : L) = (n : L) := Subtype.ext_iff.mp hfix
+      rwa [hφ_coe] at hc
+    have hkN : k ∉ N := fun h =>
+      hkne (Subgroup.disjoint_def.mp (disjoint_iff.mpr hKN) hkK h)
+    have hcb := IsFrobeniusGroup.centralizer_inf_kernel_eq_bot_of_not_mem hFrobA hkN
+    have hkn : k * (n : L) = (n : L) * k := by rwa [mul_inv_eq_iff_eq_mul] at hcomm
+    have hn_cent : (n : L) ∈ Subgroup.centralizer ({k} : Set L) :=
+      Subgroup.mem_centralizer_singleton_iff.mpr hkn.symm
+    have hn_in : (n : L) ∈ Subgroup.centralizer ({k} : Set L) ⊓ N := ⟨hn_cent, n.2⟩
+    exact hnL (Subgroup.mem_bot.mp (hcb ▸ hn_in))
+  have hUne : U ≠ ⊥ := fun hb => hUE.ne_bot_kernel (by rw [hb, Subgroup.bot_subgroupOf])
+  have hEne : E ≠ ⊥ := fun hb => hUE.ne_bot_complement (by rw [hb, Subgroup.bot_subgroupOf])
+  have hfixU : act'.fixedByU = ⊥ := key hUN hUne le_sup_left
+  have hfixE : act'.fixedByE = ⊥ := key hEN hEne le_sup_right
+  have hcard := coprimeFrobeniusAction_card_eq_one act' hfixE hfixU
+  exact Subgroup.card_eq_one.mp hcard
+
 end FrobeniusCentralizer
 
 
