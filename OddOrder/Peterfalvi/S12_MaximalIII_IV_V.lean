@@ -778,6 +778,29 @@ noncomputable def Hypothesis.omegaSigmaGrid [Finite G] (hG : OddOrder.BG.IsMinim
   have hVeq : tic.V = tic.Vdiff := rfl
   exact fun i j => tic.omegaSigmaGrid hVeq app i j
 
+open scoped FiniteInduce in
+/-- **§10 within-column degree constancy** (Peterfalvi (4.5.a), the `i`-independence half of
+(10.3)): within a fixed `W₂`-column `j`, the degree `μ_{ij}(1)` of the materialized `μ`-grid does
+not depend on the row `i`.  This is the §6 fact `columnFamily_difference_apply_one` (the
+within-column difference `μ_{ij} − μ_{0j}` vanishes at `1`) read through the `muGrid` definition. -/
+theorem Hypothesis.muGrid_apply_one_within_column [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} (hyp : Hypothesis M)
+    (hodd : Odd (Nat.card G)) (i : Fin hyp.w1) (j : Fin hyp.w2) :
+    hyp.muGrid hG hodd i j 1 = hyp.muGrid hG hodd 0 j 1 := by
+  haveI := hyp.finiteG
+  classical
+  have key : ∀ (h : OddOrder.Peterfalvi.S06.Hypothesis (↥M)) [NeZero (Nat.card h.W1)]
+      (χ₂ : (h.W2.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ) (k : Fin (Nat.card h.W1)),
+      ((h.columnFamily χ₂).mu k : ClassFunction (↥M) ℂ) 1
+        = ((h.columnFamily χ₂).mu 0 : ClassFunction (↥M) ℂ) 1 := by
+    intro h _ χ₂ k
+    have hd := h.columnFamily_difference_apply_one χ₂ k
+    simp only [SignedIrreducibleDifferenceFamily.difference_apply,
+      SignedIrreducibleDifferenceFamily.classFunction_apply, ClassFunction.sub_apply] at hd
+    exact sub_eq_zero.mp hd
+  unfold Hypothesis.muGrid
+  simp only [key]
+
 /-- The character parameters obtained in Peterfalvi (10.2)--(10.3).
 
 The arithmetic fields are now de-opaqued to genuine identities: `degree_independent` is the
