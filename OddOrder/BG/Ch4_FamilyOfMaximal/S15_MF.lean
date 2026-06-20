@@ -4127,6 +4127,127 @@ theorem chiefFactor_Q0_normal_minimal_of_inputs [Finite G]
   have := hQ1min H hH1 (hQ1eqQ ▸ hH2) hH3'
   rwa [hQ1eqQ] at this
 
+/-- **BG Theorem 15.2 step 3, the elementary abelian chief factor `Q̄ = Q/Q₀`** (mmd L4194-4196,
+"`Q̄` is a minimal normal subgroup of `M/Q₀` and is elementary abelian of order `q^p`").  Given the
+lattice-minimality of `Q` over `Q₀` among `M`-normal subgroups (output of
+`chiefFactor_Q0_normal_minimal_of_inputs`) with `Q ⊴ M`, `Q₀ ⊴ M`, `Q₀ < Q` and `Q` a `q`-group,
+the chief factor `Q/Q₀` is elementary abelian (and nontrivial).
+
+Proof: the image `E = Q/Q₀` of `Q` in the solvable quotient `M/Q₀` is a *minimal normal* subgroup —
+the lattice-minimality `hmin` transfers along the correspondence `comap (mk' Q₀)` — so by Isaacs
+Theorem 3.11 (`solvable_minimal_normal_isElementaryAbelian`) it is elementary abelian for some
+prime; the first isomorphism theorem (`quotientKerEquivRange` of `↥Q → M/Q₀`) identifies `E` with
+`↥Q ⧸ Q₀.subgroupOf Q`, and as a quotient of the `q`-group `Q` that prime is `q`.
+
+Discharges the `hEA`/`hNT` hypotheses of `chiefFactor_card_and_commutator_of_inputs`. -/
+theorem isElementaryAbelian_chiefFactor_of_minimalNormal [Finite G]
+    {M Q Q0 : Subgroup G} {q : ℕ} [Fact q.Prime] [IsSolvable ↥M] [(Q0.subgroupOf Q).Normal]
+    (hQ0Q : Q0 < Q) (hQM : Q ≤ M) (hQpg : IsPGroup q ↥Q)
+    (hMnormQ : M ≤ Subgroup.normalizer (Q : Set G))
+    (hMnormQ0 : M ≤ Subgroup.normalizer (Q0 : Set G))
+    (hmin : ∀ H : Subgroup G, Q0 < H → H ≤ Q → (H.subgroupOf M).Normal → Q ≤ H) :
+    OddOrder.GroupTheory.IsElementaryAbelian q (↥Q ⧸ Q0.subgroupOf Q) ∧
+      Nontrivial (↥Q ⧸ Q0.subgroupOf Q) := by
+  classical
+  have hQ0M : Q0 ≤ M := hQ0Q.le.trans hQM
+  haveI hQ0nM : (Q0.subgroupOf M).Normal :=
+    (Subgroup.normal_subgroupOf_iff_le_normalizer hQ0M).mpr hMnormQ0
+  haveI hQnM : (Q.subgroupOf M).Normal :=
+    (Subgroup.normal_subgroupOf_iff_le_normalizer hQM).mpr hMnormQ
+  -- `Nontrivial Q̄` (`Q₀ < Q`).
+  obtain ⟨x0, hx0Q, hx0Q0⟩ := (SetLike.lt_iff_le_and_exists.mp hQ0Q).2
+  haveI hNT : Nontrivial (↥Q ⧸ Q0.subgroupOf Q) := by
+    refine ⟨QuotientGroup.mk ⟨x0, hx0Q⟩, 1, ?_⟩
+    rw [Ne, QuotientGroup.eq_one_iff, Subgroup.mem_subgroupOf]
+    exact hx0Q0
+  -- ambient quotient `M/Q₀` and the chief-factor image `E = (Q ↾ M)·Q₀ / Q₀`.
+  set N0 : Subgroup ↥M := Q0.subgroupOf M with hN0def
+  set E : Subgroup (↥M ⧸ N0) := (Q.subgroupOf M).map (QuotientGroup.mk' N0) with hEdef
+  have hN0QM : N0 ≤ Q.subgroupOf M := by rw [hN0def]; exact Subgroup.comap_mono hQ0Q.le
+  -- `E` is minimal normal in the solvable `M/Q₀`.
+  have hEmin : OddOrder.Isaacs.Ch02.IsMinimalNormal E := by
+    refine ⟨hQnM.map (QuotientGroup.mk' N0) (QuotientGroup.mk'_surjective N0), ?_, ?_⟩
+    · -- `E ≠ ⊥`.
+      intro hEbot
+      rw [hEdef, Subgroup.map_eq_bot_iff, QuotientGroup.ker_mk'] at hEbot
+      have hQle : Q ≤ Q0 := by
+        intro x hxQ
+        have hxM : x ∈ M := hQM hxQ
+        have hmem : (⟨x, hxM⟩ : ↥M) ∈ Q0.subgroupOf M :=
+          hEbot (Subgroup.mem_subgroupOf.mpr hxQ)
+        exact Subgroup.mem_subgroupOf.mp hmem
+      exact hQ0Q.ne (le_antisymm hQ0Q.le hQle)
+    · -- minimality via the correspondence.
+      intro N' hN'norm hN'E
+      haveI := hN'norm
+      set N'' : Subgroup ↥M := Subgroup.comap (QuotientGroup.mk' N0) N' with hN''def
+      have hN0N'' : N0 ≤ N'' := QuotientGroup.le_comap_mk' N0 N'
+      have hN''QM : N'' ≤ Q.subgroupOf M := by
+        have hsub : N'' ≤ Subgroup.comap (QuotientGroup.mk' N0) E := Subgroup.comap_mono hN'E
+        rwa [hEdef, QuotientGroup.comap_map_mk', sup_eq_right.mpr hN0QM] at hsub
+      set H : Subgroup G := N''.map M.subtype with hHdef
+      have hHsubM : H.subgroupOf M = N'' :=
+        Subgroup.comap_map_eq_self_of_injective M.subtype_injective N''
+      have hQ0H : Q0 ≤ H := by
+        rw [hHdef]
+        intro y hy
+        have hyM : y ∈ M := hQ0M hy
+        exact ⟨⟨y, hyM⟩, hN0N'' (Subgroup.mem_subgroupOf.mpr hy), rfl⟩
+      have hHQ : H ≤ Q := by
+        rw [hHdef]
+        rintro _ ⟨w, hwN'', rfl⟩
+        exact (Subgroup.mem_subgroupOf.mp (hN''QM hwN''))
+      have hHnorm : (H.subgroupOf M).Normal := by rw [hHsubM]; infer_instance
+      have hN'eq : N' = N''.map (QuotientGroup.mk' N0) := by
+        rw [hN''def, Subgroup.map_comap_eq_self_of_surjective (QuotientGroup.mk'_surjective N0)]
+      rcases eq_or_lt_of_le hQ0H with hHeq | hHlt
+      · -- `H = Q₀`, so `N'' = N0`, `N' = ⊥`.
+        left
+        have hHQ0 : H = Q0 := hHeq.symm
+        have hN''N0 : N'' = N0 := by rw [← hHsubM, hHQ0]
+        rw [hN'eq, hN''N0, Subgroup.map_eq_bot_iff]
+        exact (QuotientGroup.ker_mk' N0).ge
+      · -- `Q₀ < H`, so `hmin` forces `H = Q`, `N'' = Q.subgroupOf M`, `N' = E`.
+        right
+        have hHeqQ : H = Q := le_antisymm hHQ (hmin H hHlt hHQ hHnorm)
+        have hN''QMeq : N'' = Q.subgroupOf M := by rw [← hHsubM, hHeqQ]
+        rw [hN'eq, hN''QMeq, hEdef]
+  -- elementary abelian for some prime `p`.
+  obtain ⟨p, hp_prime, hEAp⟩ :=
+    OddOrder.Isaacs.Ch03.solvable_minimal_normal_isElementaryAbelian hEmin
+  -- the first isomorphism `↥Q ⧸ Q₀ ≃* ↥E`.
+  set f : ↥Q →* (↥M ⧸ N0) := (QuotientGroup.mk' N0).comp (Subgroup.inclusion hQM) with hfdef
+  have hfker : f.ker = Q0.subgroupOf Q := by
+    ext z
+    rw [hfdef, MonoidHom.mem_ker, MonoidHom.comp_apply, QuotientGroup.mk'_apply,
+      QuotientGroup.eq_one_iff, hN0def, Subgroup.mem_subgroupOf, Subgroup.mem_subgroupOf]
+    rfl
+  have hfrange : f.range = E := by
+    rw [hfdef, MonoidHom.range_comp, Subgroup.inclusion_range, hEdef]
+  let e : (↥Q ⧸ Q0.subgroupOf Q) ≃* ↥E :=
+    (QuotientGroup.quotientMulEquivOfEq hfker.symm).trans
+      ((QuotientGroup.quotientKerEquivRange f).trans (MulEquiv.subgroupCongr hfrange))
+  -- transport elementary abelian to `Q̄`, and identify the prime as `q`.
+  have hEAp' : OddOrder.GroupTheory.IsElementaryAbelian p (↥Q ⧸ Q0.subgroupOf Q) :=
+    OddOrder.GroupTheory.IsElementaryAbelian.of_mulEquiv e.symm hEAp
+  have hpgp : IsPGroup p (↥Q ⧸ Q0.subgroupOf Q) := hEAp'.isPGroup
+  have hpgq : IsPGroup q (↥Q ⧸ Q0.subgroupOf Q) := hQpg.to_quotient (Q0.subgroupOf Q)
+  haveI : Finite (↥Q ⧸ Q0.subgroupOf Q) := inferInstance
+  haveI : Fact p.Prime := ⟨hp_prime⟩
+  have hpq : p = q := by
+    obtain ⟨a, ha⟩ := hpgp.exists_card_eq
+    obtain ⟨b, hb⟩ := hpgq.exists_card_eq
+    have hqdvd : q ∣ Nat.card (↥Q ⧸ Q0.subgroupOf Q) := by
+      rw [hb]
+      rcases Nat.eq_zero_or_pos b with h0 | h0
+      · rw [h0, pow_zero] at hb
+        exact absurd hb (Finite.one_lt_card_iff_nontrivial.mpr hNT).ne'
+      · exact dvd_pow_self q h0.ne'
+    rw [ha] at hqdvd
+    exact ((Nat.prime_dvd_prime_iff_eq Fact.out hp_prime).mp
+      ((Fact.out : q.Prime).dvd_of_dvd_pow hqdvd)).symm
+  exact ⟨hpq ▸ hEAp', hNT⟩
+
 open OddOrder.Isaacs.Ch04.OddOrder.Isaacs.Ch03.IsAInvariant
   (quotientMulAutHom quotientMulAutHom_apply_mk') in
 open scoped commutatorElement in
