@@ -371,3 +371,21 @@ card 積補題 2 本 (BG S01/S12_E 複製)。
   W₂^y≤E (y∈Q)。pure group theory だが Sylow + coercion (↥L vs G) で中量。
 レシピ: Huppert normality を `normal_of_card_prime_of_isFrobeniusGroup_of_odd` で cite
 (W₁.subgroupOf E が位数 q ⟹ E 内正規 ⟹ E≤N_G(W₁))。
+
+### ✅ Huppert step DONE — `complement_le_QW2` (2026-06-20⁸, commit `6d11c560`)
+
+Huppert を **§13 spine で load-bearing 化**。新定理 `complement_le_QW2` (S15_SAndT, **sorry-free**,
+full build 3820 green): W₁ を含む Frobenius 補元 E について `E.map L.subtype ≤ Q⊔W₂`。
+証明 = 奇数位数 (E≤L≤G, `_hG.odd.of_dvd_nat`) → `Ch06.normal_of_card_prime_of_isFrobeniusGroup_of_odd`
+(W₁ 位数 q が E 内正規) → `normal_subgroupOf_iff_le_normalizer` で E≤N_↥L(W₁) → ↥L→G 持ち上げ
+(`mem_normalizer_iff` 両方向、reverse は ↑e∈L で w∈L 回収) → (13.16) `normalizer_W1` で = Q⊔W₂。
+唯一 sorried 依存 = (13.16) (gated-endpoint、axiom-clean でない=normalizer_W1 の sorry に bottom-out)。
+
+### ⛔ 残 order 論 = §13 構造 gate と確定 (要追加形式化)
+
+(13.17.c) の残り「|E|∈{q,pq} + ∃y∈Q W₂^y≤E」の crux = **E の q-Sylow が exactly W₁ (位数 q)**。
+これは `E∩Q=W₁` or `[L:L_F]=pq` 等の §13 構造事実を要するが **repo 不在** (grep 確認: S14/S15 に
+complement 位数・[L:L_F]・Q∩L=W₁ の事実なし)。⟹ 順序論は §13 の深い構造形式化 (多くは sorried/未着手)
+に gate。fabricate せず future work。`typeI_overNormalizer_complement` 本体は `complement_le_QW2` を
+cite して order 論を載せる形で完成予定 (consumer `typeII_overNormalizer_frobenius` は W₁⊆E 供給のため
+W₁ 含む complement 存在補題も要)。
