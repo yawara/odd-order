@@ -165,32 +165,45 @@ TICyclicHypothesis は **W-level ω/σ** のみ (ω on W, ω^σ on G)。μ_ij (o
 (S15_SAndT:131-147) で carry。CharacterParameters.omegaSigma も同様に bridge の `omegaSigmaGrid` に pin できる
 (`omegaSigmaGrid` docstring が「`S12.CharacterParameters.omegaSigma` がこれに pin される」と明記)。
 
-### (10.2) 攻略 diagnosis (real construction、but 重い apparatus 要)
+### ★ (10.2)/(10.3)/μ-grid 攻略 = §10→§6 (4.2)+Dade bridge (apparatus は §6 に既在!)
 
-(10.2) = ζ∈S∩Irr M, ζ(1)=w₁ を **構成**する初の §10 結果。原文証明:
-W₂⊆M'' [(8.4.d)] + M' solvable≠1 ⟹ **(M'/M'')⋊W₁ Frobenius (kernel M'/M'')** ⟹ M' の非自明 degree-1
-char を M へ induce すると irreducible∈S, degree w₁。
+⚠⚠ **重要訂正** (2026-06-20 深掘り): 当初「(10.2) は quotient-Frobenius + Brauer を一から build」と
+診断したが **誤り**。(10.1) 原文「Hyp (4.6) が L=M, H=K=M' で成立」が正路を指す: **§6 certain-type
+apparatus が (10.2)/(10.3)/μ-grid をすべて供給**、新規 apparatus build は不要。Brauer/inertia は §6 に既在:
+- `S06_CertainTypeClifford.lean:538` `card_fixedPoints_conjByPermIrr_eq_card_fixedPoints_conjClassPerm`
+  (**Brauer permutation lemma**)、`:756` inertia `I_L(χ)=K`「W₁# で不動な char 無し」(= FPF-on-chars)。
+- `IsFrobeniusGroup.of_centralizer_kernel_le` (`Ch06_FrobeniusActions/FrobeniusGroup.lean:324`) =
+  `centralizer_W1` 条件から Frobenius 構成。
+- `isIrreducibleCharacter_induce_of_inertia_eq` (`InducedIrreducible.lean:424`)。
 
-**API 在庫 (`OddOrder/GroupTheory/RepresentationTheory/InducedIrreducible.lean`)**:
-- `isIrreducibleCharacter_induce_of_frobeniusGroup` (:453) — `IsFrobeniusGroup G H W` + θ≠1 ⟹ `induce θ` irreducible。
-  **⚠ 直接適用不可**: G=M,H=M',W=W₁ では `IsFrobeniusGroup M M' W₁` が **偽** (W₁ は W₂⊆M'' を centralize
-  = `centralizer_W1`、∴ M'⋊W₁ は Frobenius でない、quotient のみ)。
-- `isIrreducibleCharacter_induce_of_inertia_eq` (:424) — `inertia(θ)=H` ⟹ induce irreducible。**こちらが正路**。
-- `inertia_eq_of_frobeniusGroup` (:68) — full-group Frobenius 要、本件不適。
+**∴ 真の次ステップ = §10→§6 bridge = `Hypothesis M → S06.CertainTypeHypothesis (typePA0 M typeP) M`**
+(`CertainTypeHypothesis A L extends S06.Hypothesis ↥L` + `dade : S04.Hypothesis G A L`):
+- **Dade 部 `dade` は §10 Hyp に既在**: `Hypothesis.dadeData.dade : S04.Hypothesis G (typePA0 M typeP) M`。
+- **構造部 `S06.Hypothesis ↥M`** (S06_DadeIsometryCertain:67, **11 field**) を `TypePData M` から構成
+  (L=↥M, K=M'.subgroupOf M, W1/W2.subgroupOf M)。field 対応:
 
-**∴ (10.2) 正路 (multi-step, 未在庫 apparatus)**: (1) **quotient Frobenius (M'/M'')⋊(W₁ image⊆M/M'')**
-を `centralizer_W1` (FPF on M'/M'') から構成。(2) **Brauer permutation lemma** = 「Frobenius complement は
-kernel の非自明 character に FPF 作用」⟹ 非自明 linear θ (M'' を kernel に持つ) は W₁# で不動でない。
-(3) ⟹ `ClassFunction.inertia (M) θ = M'`。(4) `isIrreducibleCharacter_induce_of_inertia_eq` 適用。
-(2) の Brauer 系が repo 未在庫の可能性大 (要調査: `OddOrder/Isaacs/Ch06_FrobeniusActions/` の character 版)。
-**∴ (10.2) は real だが quotient-Frobenius + Brauer-FPF-on-chars + inertia-pullback の apparatus build を要する
-multi-session 案件**。非 quick-win。
+  | S06.Hypothesis ↥M field | TypePData M source | 備考 |
+  |---|---|---|
+  | `K = M'.subgroupOf M` / `K_normal` | derivedInG M 正規 (commutator) | 易 (subtype transport) |
+  | `isComplement : IsComplement' K W1` | `M_complement` | **直対応** |
+  | `W1_nontrivial`/`W1_cyclic` | `W1_nontrivial`/`W1_cyclic` | subgroupOf transport |
+  | `W2_nontrivial`/`W2_cyclic`/`W2_le_K` | `W2_*`/(W2≤H≤M') | subgroupOf transport |
+  | `centralizer_W2 : ∀x∈W1#, C_K(x)=W2` | `centralizer_W1` (C_{M'}(x)=W2) | G↔↥M transport (fiddly) |
+  | `card_coprime : Coprime |K| |W1|` | **W₁ Hall in M (要確認)** | ⚠ TypePData に直接無し? gap 可能 |
+  | `W_odd` | `typePData_W_card_odd` 系 | 易 |
+
+  **⚠ 主リスク = `card_coprime` (W₁ が M の Hall complement = gcd(|M'|,|W₁|)=1)**: complement だけでは
+  従わない。TypePData が供給するか / BG type-P 構造から導けるか要確認 (gap なら別 obligation 化)。
+  他は subtype (subgroupOf) transport の機械作業 (centralizer の G↔↥M が最も fiddly)。
+
+**この bridge 完成 ⟹ §6 の `toTICyclicHypothesis`・μ/ω column API・Clifford inertia がすべて L=M で発火**
+⟹ (10.2) ζ、(10.3) μ_ij/δ_j、μ-grid (de-opaque の `mu`/`alpha` 供給源) が §6 結果として落ちる。
 
 ### ▶ 次セッションの推奨着手順 (real 進捗順)
 
-1. **(10.2)** を standalone lemma `∃ ζ∈inducedFamily M, IsIrreducibleCharacter ζ ∧ ζ 1 = (w₁:ℂ)` として
-   形式化 (上記 4-step)。CharacterParameters 全構成は不要 (μ-grid に gate されない切り出し)。
-   先に `Ch06_FrobeniusActions/` に Brauer-FPF-on-characters があるか調査 → 無ければ apparatus build。
-2. 並行/代替: CharacterParameters de-opaque (self-contained 3 field: zeta_irreducible/n_formula/alpha_formula)
-   を producer signature 書換と共に一括で (piecemeal は半端状態を生むので全 self-contained field を 1 commit で)。
-3. μ-level 本筋 = §10 Hyp → §6 `Hypothesis46 M M'` bridge (§3d、full 4.6 apparatus、最重)。
+1. **★ §10→§6 bridge** (上記)。まず `card_coprime` (W₁ Hall) の供給可否を確認 (gap なら parameter 化)。
+   構造部 `S06.Hypothesis ↥M` 構成 → `CertainTypeHypothesis` 組立 (dade は既在)。最重だが apparatus 既在ゆえ
+   見かけより tractable。これが (10.2)/(10.3)/μ-grid の共通 unlock。
+2. 並行可: CharacterParameters de-opaque (self-contained 3 field: zeta_irreducible/n_formula/alpha_formula)
+   を producer signature 書換と一括で (piecemeal 禁、全 self-contained field を 1 commit)。
+3. issue 1005 (hVti / 4.6.b ambient TI discharge)。
