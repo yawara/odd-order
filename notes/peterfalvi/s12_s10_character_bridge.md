@@ -239,9 +239,11 @@ apparatus が (10.2)/(10.3)/μ-grid をすべて供給**、新規 apparatus buil
 
 **⟹ 次 build target = `Hypothesis.toHypothesis46 : S06.Hypothesis46 (typePA0 M typeP) M`** (両 bridge 統合):
 `Hypothesis46 extends CertainTypeHypothesis A L` + 追加 field (`S06_CertainHypothesis46:39`):
-- `tic` = §5 bridge `typePData_toTICyclicHypothesis` (要 hVti)。
-- `tic_W1/tic_W2` = `data.W1 = (data.W1.subgroupOf M).map M.subtype` (W1≤M ゆえ map-subgroupOf 恒等)。
-- `tic_V` = typePV = ↑W\↑W2 (§5 bridge V と一致、要 set 計算)。
+- `tic` = **§5 bridge の VARIANT (要新規)**: ⚠ `tic_V : tic.V = ↑W\↑W2` (= (4.3.a) 大 TI set),
+  既存 `typePData_toTICyclicHypothesis` の `V := typePV = ↑W\(↑W1∪↑W2)` とは **不一致**
+  (W1∩W2=⊥ ゆえ W1# 分だけ違う)。⟹ V=↑W\↑W2 版の §5 bridge を別途構成要 (V_ti = (4.3.a) ambient TI;
+  §6 `isTISubset_sup_sdiff` の ambient 版)。既存 bridge (V=typePV) は A_0/Dade-support 用で流用不可。
+- `tic_W1/tic_W2` = `(data.W1.subgroupOf M).map M.subtype = data.W1` (`map_subgroupOf_eq_of_le`, W1≤M)。
 - `subH := K` (H=K=M' from (10.1)); `subH_normal`/`W2_le_subH`/`subH_le_K` = K facts (易)。
 - `A_covers`: ∀h∈K#, x∈C_K(h)#, ↑x∈typePA0 — `typePA = centralizerSupport (sharpSubgroup M) (derivedInG M)`
   定義から (h∈M'#⊆M#, x∈C_{M'}(h) ⟹ x∈typePA)。要 centralizerSupport 定義確認。
