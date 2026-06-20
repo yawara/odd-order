@@ -224,7 +224,33 @@ apparatus が (10.2)/(10.3)/μ-grid をすべて供給**、新規 apparatus buil
    producer signature 書換と一括で。
 4. issue 1005 (hVti) / 1006 (hHall) discharge。
 
-### ★★ (10.2) 深掘り結論 (2026-06-20 cont.²): **Hypothesis46 が次の build target**
+### ★★★ BREAKTHROUGH (2026-06-20 cont.³, 原文 (8.15)+(4.4) 精読): **(10.2) は Hypothesis L で可、Hypothesis46 不要**
+
+⚠⚠⚠ **下の cont.² の「Hypothesis46 が次の build target」は SUPERSEDED**。原文 (8.15) (Nougat 欠落 page を
+PDF 復元) + (4.4) で判明:
+
+- **(8.15) 原文**: 「M type-P, M'=[M,M] ⟹ Hyp (4.6) holds for **L=M, K=M', A=A(M), A_0=A_0(M)**, H=M_F or M_s」。
+  ∴ §10 の (4.6) は **V=typePV, A_0=typePA0** (W\W2 ではない!)。§10 dadeData の support と一致 ⟹
+  **A_0 不一致は誤診だった** (cont.² の dade0 transport 問題は消滅)。Lean `Hypothesis46.tic_V=W\W2` は
+  §6/(6.8) 専用の特殊化で §10 には合わない ⟹ **§10 で Hypothesis46 は使わない**。
+- **(4.4) 原文** (`04.6:35`, Lean `certainType_zero_column_anchor` `S06_CertainTypeCharacters:1013` +
+  `exists_certainType_zero_column_eq_of_subset_characterKernel` `:1060`、**両方 Hypothesis L 上**):
+  「μ_i0 (column 0) = K-trivial irreducibles、**δ_0=1, μ_00=1_L**」。K-trivial ⟺ column-0 ⟺ linear。
+
+**⟹ (10.2) crux `∀χ₂, chiRestrict χ₂ ≠ θ` (θ=非自明 linear char of K) は Hypothesis L で完結**:
+- χ₂=1: `chiRestrict 1 = Res_K μ_00 = Res_K 1_L = 1_K` ⟹ θ≠1_K (非自明) で回避。
+- χ₂≠1: μ_0j は column-0 でない ⟹ (4.4) で K-trivial でない ⟹ linear でない (linear ⟹ K=[L,L]⊆ker ⟹
+  K-trivial) ⟹ `chiRestrict χ₂ = Res_K μ_0j` degree = μ_0j(1) = d > 1 ≠ 1 = θ(1) で回避。
+- degree 定数性 `columnFamily_difference_apply_one` も **Hypothesis L** (`S06_CertainTypeCharacters:468`)。
+
+**⟹ (10.2) は §6 bridge (`typePData_toS06Hypothesis : S06.Hypothesis ↥M`) で形式化可。Hypothesis46 不要。**
+残ステップ (全 Hypothesis L): (1) 非自明 linear char of K 存在 (K^ab=M'/M''≠1; `LinearCharacter.lean` API),
+(2) crux 上記, (3) `induce_isIrreducible_of_forall_chiRestrict_ne` (S06_Clifford:902), (4) degree=w₁ + ∈Sset。
+要 instance = `[NeZero (Nat.card W1)]`(`one_lt_card_W1`)/`[Fintype ↥M]`/`[Invertible (Nat.card ↥M:ℂ)]`/
+`[Invertible (Nat.card ↥K:ℂ)]` (FiniteInduce)。**これが次の build。中規模 (~150 行) だが全 Hypothesis L で gate-free。**
+
+---
+### ★★ (旧 SUPERSEDED) (10.2) cont.²: Hypothesis46 が次の build target
 
 §6 Clifford 機構の host を精査して判明 (`S06_CertainTypeClifford:365` `variable (h : Hypothesis L)`):
 - **core Clifford (`columnFamily`/`chiRestrict`/`inertia_eq_K_of_forall_chiRestrict_ne`/
