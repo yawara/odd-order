@@ -445,3 +445,25 @@ under-constraint は carrier faithfulness 問題、§13 構造論で塞げない
   + U⊆L_F ((9.1)/(8.17.a) cite)。
 - obligation ② (Phase 4 `typeI_overNormalizer_complement`): gate = Phase 3 [H] V.8.18 (**大物・新規形式化、
   Isaacs Ch06 は Sylow-cyclic 部品のみ**) + (13.16) normalizer_W1 [sorried] + (14.5)。
+
+## 2026-06-20² 再開 — ✅ Phase 2 gate 2 (L~S) 構造論コア sorry-free + 🔑 gate 2 残差も F-ask 判明
+
+**✅ gate 2 (L~S) 構造論 DONE** (commit `4357cc7d`, sorry-free + axiom-clean): Pf (13.17.a)「L が S に共役」
+枝の Hall 共役論法を 2 汎用補題で landing — `normalizer_le_of_isHall_subgroupOf_of_conj` (U が可解 V の π-Hall
++ `L^g=V` + `N_G(U)⊆L` ⟹ `N_G(U)⊆V`) + `isHall_subgroupOf_primeFactors_of_coprime_index`。L~S 枝の assembly
+は sorry-free 化、残差を Pf 原文どおり `Coprime |U| [S:U]` (=「U is a Hall subgroup of S」) 1 本に縮約。
+
+**🔑 知見: gate 2 残差も carrier-faithfulness F-ask** (LAUNCH の「~40-60 行 H 単独 basic_structure cite」訂正):
+- 残差 `Coprime |U| [S:U]` は `[S:U]=[S:M']·|P|`、`|U|⟂|P|` = `hcop` (済)、**`|U|⟂[S:M']` が真の gate**。
+- `[S:M']=|tdata.typeP.W1|` (prime)。`|U|⟂[S:M']` には `tdata.typeP.W1` が **κ(S)-Hall** であること
+  (BG↔Pf の W₁=κ 同定) を要するが、これは bare `TypeIIData hyp.S` から導出されない carrier-faithfulness
+  (`Section16MaximalPair`/lane-f レベルでのみ `K_hall`/`S_typeP` として供給)。
+- ⚠ `BG.Ch4.S14.IsTypeP` (`kappa nonempty`) ≠ Pf `GroupTheory.IsTypeP` (`Nonempty TypePData`)。
+
+**⚠ F-ask 改訂 (gate 1 + gate 2 一括)**: gate 1 の `P_inf_U_eq_bot` に加え、**gate 2 用**:
+`W1_complements_derived : IsComplement' ((derivedInG S).subgroupOf S) (W1.subgroupOf S)` を Hypothesis に追加。
+⟹ `[S:M']=|W₁|` + `basic_structure.UW1_frobenius` (`Coprime |U| |W₁|`、citeable) で gate 2 残差が close。
+両 ask とも真に構成可能 (U/W₁ は type-P 構造の真の補元、(13.1.b))。詳細 = `notes/peterfalvi/s13_17_structural_program.md`
+「Phase 2 cont. (2026-06-20²)」。
+
+**H 次手**: gate 2 残差は F 待ち。残る H 単独 = gate 3 (L~T) / gate 4 (U⊆L_F) / Phase 3 (Huppert)。

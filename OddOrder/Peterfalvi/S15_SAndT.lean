@@ -926,6 +926,70 @@ theorem coprime_card_U_card_P_of_disjoint [Finite G]
   rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hP_le).toEquiv, hidx] at hcop_idx
   exact hcop_idx.symm
 
+/-- **Structural core of Peterfalvi (13.17.a)** — the `L`-conjugate-to-`S` exclusion.  If `U` is a
+`π`-Hall subgroup of the solvable subgroup `V`, `L` is conjugate to `V` (`L^g = V`, i.e.
+`conj g • L = V`), and `N_G(U) ⊆ L`, then `N_G(U) ⊆ V`.
+
+*Proof (Pf p.81):* `U ⊆ N_G(U) ⊆ L`, so `U^g = conj g • U ⊆ conj g • L = V` is another
+`π`-Hall subgroup of `V` (same order as `U`).  Since `V` is solvable, Hall conjugacy
+(`exists_conj_eq_of_isHall_subgroupOf`, Isaacs Thm 3.21) gives `w ∈ V` with `(U^g)^w = U`, i.e.
+`wg ∈ N_G(U)`.  Then `N_G(U) = N_G(U)^{wg} ⊆ L^{wg} = (L^g)^w = V^w = V`.  Specialised to
+`V = S` of type II (with `hNUS = IsTypeII.normalizer_not_le` transferred to `U`) this rules out
+the `L ~ S` branch of (8.8.b4).  Generic and reusable; the only `S`-specific input is "`U` is a
+Hall subgroup of `S`". -/
+theorem normalizer_le_of_isHall_subgroupOf_of_conj [Finite G] {V U L : Subgroup G}
+    (hVsolv : IsSolvable ↥V) (hUV : U ≤ V) {π : Set ℕ}
+    (hUhall : Ch03.IsHallSubgroup π (U.subgroupOf V))
+    {g : G} (hconj : MulAut.conj g • L = V)
+    (hNUL : Subgroup.normalizer (U : Set G) ≤ L) :
+    Subgroup.normalizer (U : Set G) ≤ V := by
+  -- `U ⊆ L`, hence `U^g = conj g • U ⊆ conj g • L = V`.
+  have hUL : U ≤ L := Subgroup.le_normalizer.trans hNUL
+  have hUgV : (MulAut.conj g • U : Subgroup G) ≤ V := by
+    rw [← hconj]; exact Subgroup.pointwise_smul_le_pointwise_smul_iff.mpr hUL
+  -- `U^g` is a `π`-Hall subgroup of `V`: same card and (hence) same index in `V` as `U`.
+  have hcardUg : Nat.card ↥(MulAut.conj g • U : Subgroup G) = Nat.card ↥U := by
+    rw [OddOrder.BG.Ch3.S12.mulAut_smul_eq_map]
+    exact Subgroup.card_map_of_injective (MulAut.conj g).injective
+  have hcardEq : Nat.card ↥((MulAut.conj g • U).subgroupOf V)
+      = Nat.card ↥(U.subgroupOf V) := by
+    rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hUgV).toEquiv,
+      Nat.card_congr (Subgroup.subgroupOfEquivOfLe hUV).toEquiv, hcardUg]
+  have hidxEq : ((MulAut.conj g • U).subgroupOf V).index = (U.subgroupOf V).index := by
+    have h1 := Subgroup.card_mul_index ((MulAut.conj g • U).subgroupOf V)
+    have h2 := Subgroup.card_mul_index (U.subgroupOf V)
+    rw [hcardEq] at h1
+    exact Nat.eq_of_mul_eq_mul_left Nat.card_pos (h1.trans h2.symm)
+  have hUghall : Ch03.IsHallSubgroup π ((MulAut.conj g • U).subgroupOf V) :=
+    ⟨fun p hp => hUhall.1 p (hcardEq ▸ hp), fun p hp => hUhall.2 p (hidxEq ▸ hp)⟩
+  -- Hall conjugacy in the solvable `V`: some `w ∈ V` conjugates `U^g` back to `U`.
+  obtain ⟨w, hwV, hw⟩ :=
+    OddOrder.BG.Ch1.S06.exists_conj_eq_of_isHall_subgroupOf hVsolv hUgV hUV hUghall hUhall
+  -- `wg` normalises `U`, and conjugates `L` onto `V`.
+  have hwgU : MulAut.conj (w * g) • U = U := by rw [map_mul, mul_smul, hw]
+  have hLconj : MulAut.conj (w * g) • L = V := by
+    rw [map_mul, mul_smul, hconj]
+    exact conj_smul_eq_self_of_mem_normalizer (Subgroup.le_normalizer hwV)
+  -- `N_G(U) = N_G(U)^{wg} ⊆ L^{wg} = V`.
+  calc Subgroup.normalizer (U : Set G)
+      = MulAut.conj (w * g) • Subgroup.normalizer (U : Set G) := by
+        rw [OddOrder.BG.Ch3.S12.normalizer_conj_smul, hwgU]
+    _ ≤ MulAut.conj (w * g) • L := Subgroup.pointwise_smul_le_pointwise_smul_iff.mpr hNUL
+    _ = V := hLconj
+
+/-- A subgroup `H ≤ V` whose order is coprime to its index `[V : H]` is a Hall subgroup of `V`
+for `π = π(|H|)` (its own set of prime divisors).  The Hall conditions are immediate:
+`π(|H|) ⊆ π` by definition, and no prime of `[V : H]` divides `|H|`, by coprimality. -/
+theorem isHall_subgroupOf_primeFactors_of_coprime_index [Finite G] {V H : Subgroup G}
+    (hHV : H ≤ V) (hcop : Nat.Coprime (Nat.card ↥H) ((H.subgroupOf V).index)) :
+    Ch03.IsHallSubgroup {p | p ∈ (Nat.card ↥H).primeFactors} (H.subgroupOf V) := by
+  have hcard : Nat.card ↥(H.subgroupOf V) = Nat.card ↥H :=
+    Nat.card_congr (Subgroup.subgroupOfEquivOfLe hHV).toEquiv
+  refine ⟨fun p hp => by rw [hcard] at hp; exact hp, fun p hp hpπ => ?_⟩
+  rw [Nat.mem_primeFactors] at hp
+  have hp1 : p ∣ 1 := hcop ▸ Nat.dvd_gcd (Nat.mem_primeFactors.mp hpπ).2.1 hp.2.1
+  exact absurd (Nat.dvd_one.mp hp1) hp.1.ne_one
+
 /-- **Peterfalvi (13.17.a/b)**: a maximal subgroup `L` over `N_G(U)` (for `S` of type II) is of
 type I with `U ⊆ L_F`.  *Proof (Pf pp.81-82):* take any maximal `L ⊇ N_G(U)` (proper since
 `U ≠ 1` and `G` is simple).  `L` is not conjugate to `S` (else `N_G(U) ⊆ S`, against
@@ -987,9 +1051,19 @@ theorem exists_typeI_maximal_overNormalizer_U [Finite G]
     -- `L_F`, forcing `L_F = 1` (9.1); hence `U ∩ L_F ≠ 1` and `U ⊆ C_L(U ∩ L_F) ⊆ L_F`.
     sorry
   · -- `L` conjugate to `S` is excluded (`_hLconjS`): Pf (13.17.a) derives `N_G(U) ⊆ S` from the
-    -- Hall conjugacy of `U` in the solvable `S`, contradicting `hNUS`.
-    exfalso
-    sorry
+    -- Hall conjugacy of `U` in the solvable `S`, contradicting `hNUS`.  The structural argument is
+    -- `normalizer_le_of_isHall_subgroupOf_of_conj`; its only `S`-specific input is "`U` is a Hall
+    -- subgroup of `S`".  That coprimality `|U| ⟂ [S:U]` is the residual (13.2) Hall-faithfulness
+    -- datum: `[S:U] = [S:M']·|P|`, `|U| ⟂ |P|` is `hcop`, and `|U| ⟂ [S:M']` holds because
+    -- `[S:M'] = |W₁|` is the order of the cyclic κ(S)-Hall complement of `M'` (Pf's `W₁`),
+    -- coprime to `|M'| ⊇ |U|`.  The `W₁ = κ(S)`-Hall identification is the carrier-level fact
+    -- supplied at the §16 `Section16MaximalPair` (lane-f) but not pinned by the bare `Hypothesis`;
+    -- see issue 2009 / `notes/peterfalvi/s13_17_structural_program.md`.
+    obtain ⟨g, hg⟩ := _hLconjS
+    have hUhall_cop : Nat.Coprime (Nat.card ↥hyp.U) ((hyp.U.subgroupOf hyp.S).index) := sorry
+    exact absurd (normalizer_le_of_isHall_subgroupOf_of_conj
+        (_hG.solvable_of_mem_maximalSubgroups hyp.S_maximal) hUleS
+        (isHall_subgroupOf_primeFactors_of_coprime_index hUleS hUhall_cop) hg hNUL) hNUS
   · -- `L` conjugate to `T` is excluded (`_hLconjT`): `|L_F| = q^p` forces `W₁ ⊆ L_F` and
     -- `[U,W₁] ⊆ L_F ∩ U = 1`, contradicting the `U W₁` Frobenius structure (13.2.a).
     exfalso
