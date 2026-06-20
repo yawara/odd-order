@@ -151,15 +151,17 @@ theorem xchi_inner_eq_of_anchored
     (h46 : OddOrder.Peterfalvi.S06.Hypothesis46 (sharpImage H) L) (hW1 : h46.W1 = hyp.W1)
     [NeZero (Nat.card h46.W1)]
     [Fintype ↥(h46.W1 ⊔ h46.W2)] [Invertible (Nat.card ↥(h46.W1 ⊔ h46.W2) : ℂ)]
+    (cY : OddOrder.Peterfalvi.S07.IsCoherent hyp.tau hyp.Yset
+      (OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L))
     {η₁ : ClassFunction ↥L ℂ} (hη₁ : η₁ ∈ hyp.Yset) {a₀ : ℕ}
     {Xj Xl : ClassFunction G ℂ}
     {χ₂ χ₂' : (h46.W2.subgroupOf (h46.W1 ⊔ h46.W2)) →* ℂˣ}
     (hanc : hyp.tau (OddOrder.Peterfalvi.S06.columnSum h46 χ₂ - a₀ • η₁)
-      = Xj - a₀ • hyp.coherentYset.extension η₁)
+      = Xj - a₀ • cY.extension η₁)
     (hanc' : hyp.tau (OddOrder.Peterfalvi.S06.columnSum h46 χ₂' - a₀ • η₁)
-      = Xl - a₀ • hyp.coherentYset.extension η₁)
-    (hmix : ClassFunction.inner Xj (hyp.coherentYset.extension η₁) = 0)
-    (hmix' : ClassFunction.inner Xl (hyp.coherentYset.extension η₁) = 0)
+      = Xl - a₀ • cY.extension η₁)
+    (hmix : ClassFunction.inner Xj (cY.extension η₁) = 0)
+    (hmix' : ClassFunction.inner Xl (cY.extension η₁) = 0)
     (hsupp : (OddOrder.Peterfalvi.S06.columnSum h46 χ₂ - a₀ • η₁).support ⊆
       OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L)
     (hsupp' : (OddOrder.Peterfalvi.S06.columnSum h46 χ₂' - a₀ • η₁).support ⊆
@@ -168,7 +170,7 @@ theorem xchi_inner_eq_of_anchored
       = ClassFunction.inner (OddOrder.Peterfalvi.S06.columnSum h46 χ₂)
           (OddOrder.Peterfalvi.S06.columnSum h46 χ₂') := by
   classical
-  set ν := hyp.coherentYset.extension η₁ with hνdef
+  set ν := cY.extension η₁ with hνdef
   -- `Xⱼ = τ(μⱼ − a₀η₁) + a₀·ν` (rearranged anchored image), in `ℂ`-smul form.
   have hXj : Xj = hyp.tau (OddOrder.Peterfalvi.S06.columnSum h46 χ₂ - a₀ • η₁) + (a₀ : ℂ) • ν := by
     rw [hanc, ← Nat.cast_smul_eq_nsmul ℂ a₀ ν]; abel
@@ -181,7 +183,7 @@ theorem xchi_inner_eq_of_anchored
       (⟨η₁, hηirr⟩ : IrreducibleCharacter ↥L)
     rwa [if_pos rfl] at h
   have hνν : ClassFunction.inner ν ν = 1 := by
-    rw [hνdef, hyp.coherentYset.extension_inner_eq η₁ η₁ (Submodule.subset_span hη₁)
+    rw [hνdef, cY.extension_inner_eq η₁ η₁ (Submodule.subset_span hη₁)
       (Submodule.subset_span hη₁), hηη]
   have hcolj : ClassFunction.inner (OddOrder.Peterfalvi.S06.columnSum h46 χ₂) η₁ = 0 :=
     inner_columnSum_Yset_eq_zero hyp h46 hW1 hη₁ χ₂
@@ -248,13 +250,15 @@ noncomputable def certainTypeSet_isCoherent_via_anchoredImages
     (h46 : OddOrder.Peterfalvi.S06.Hypothesis46 (sharpImage H) L)
     [NeZero (Nat.card h46.W1)] [Invertible (Nat.card ↥h46.K : ℂ)]
     [Fintype ↥(h46.W1 ⊔ h46.W2)] [Invertible (Nat.card ↥(h46.W1 ⊔ h46.W2) : ℂ)]
+    (cY : OddOrder.Peterfalvi.S07.IsCoherent hyp.tau hyp.Yset
+      (OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L))
     {k : (h46.W2.subgroupOf (h46.W1 ⊔ h46.W2)) →* ℂˣ} (hk : k ≠ 1)
     {η₁ : ClassFunction ↥L ℂ} {a₀ : ℕ}
     (Ximg : ((h46.W2.subgroupOf (h46.W1 ⊔ h46.W2)) →* ℂˣ) → ClassFunction G ℂ)
     (hXanchored : ∀ χ₂ : (h46.W2.subgroupOf (h46.W1 ⊔ h46.W2)) →* ℂˣ,
       OddOrder.Peterfalvi.S06.columnSum h46 χ₂ ∈ OddOrder.Peterfalvi.S06.certainTypeSet h46 k →
       hyp.tau (OddOrder.Peterfalvi.S06.columnSum h46 χ₂ - a₀ • η₁)
-        = Ximg χ₂ - a₀ • hyp.coherentYset.extension η₁)
+        = Ximg χ₂ - a₀ • cY.extension η₁)
     (hXinner : ∀ χ₂ χ₂' : (h46.W2.subgroupOf (h46.W1 ⊔ h46.W2)) →* ℂˣ,
       OddOrder.Peterfalvi.S06.columnSum h46 χ₂ ∈ OddOrder.Peterfalvi.S06.certainTypeSet h46 k →
       OddOrder.Peterfalvi.S06.columnSum h46 χ₂' ∈ OddOrder.Peterfalvi.S06.certainTypeSet h46 k →
@@ -332,11 +336,13 @@ theorem exists_glue_nu_columnSum_Yset_via_map
     (h46 : OddOrder.Peterfalvi.S06.Hypothesis46 (sharpImage H) L) (hW1 : h46.W1 = hyp.W1)
     [NeZero (Nat.card h46.W1)] [Invertible (Nat.card ↥h46.K : ℂ)]
     [Fintype ↥(h46.W1 ⊔ h46.W2)] [Invertible (Nat.card ↥(h46.W1 ⊔ h46.W2) : ℂ)]
+    (cY : OddOrder.Peterfalvi.S07.IsCoherent hyp.tau hyp.Yset
+      (OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L))
     (νX : OddOrder.Peterfalvi.S07.IntegralCharacterMap (↥L) G) :
     ∃ ν : OddOrder.Peterfalvi.S07.IntegralCharacterMap (↥L) G,
       (∀ χ₂ : (h46.W2.subgroupOf (h46.W1 ⊔ h46.W2)) →* ℂˣ,
         ν (OddOrder.Peterfalvi.S06.columnSum h46 χ₂) = νX (OddOrder.Peterfalvi.S06.columnSum h46 χ₂))
-      ∧ (∀ y ∈ hyp.Yset, ν y = hyp.coherentYset.extension y) := by
+      ∧ (∀ y ∈ hyp.Yset, ν y = cY.extension y) := by
   classical
   haveI : Finite ((h46.W2.subgroupOf (h46.W1 ⊔ h46.W2)) →* ℂˣ) :=
     SibleyDadeHypothesis.finite_linearCharacters_of_finite
@@ -368,7 +374,7 @@ theorem exists_glue_nu_columnSum_Yset_via_map
     exact inner_columnFamily_mu_Yset_eq_zero hyp h46 hW1 hy p.1 p.2
   obtain ⟨ν, hνgrid, hνY⟩ :=
     OddOrder.Peterfalvi.S07.IntegralCharacterMap.exists_integralCharacterMap_glue_of_orthonormal
-    hXfin hyp.Yset_finite hXorth hYorth hXY νX hyp.coherentYset.extension
+    hXfin hyp.Yset_finite hXorth hYorth hXY νX cY.extension
   refine ⟨ν, fun χ₂ => ?_, hνY⟩
   rw [OddOrder.Peterfalvi.S06.columnSum_def]
   simp only [map_sum]
@@ -394,6 +400,8 @@ noncomputable def coherentCertainTypeSet_union_Yset_via_anchoredImages
     (hHK : h46.K = H) (hW1 : h46.W1 = hyp.W1)
     [NeZero (Nat.card h46.W1)] [Invertible (Nat.card ↥h46.K : ℂ)]
     [Fintype ↥(h46.W1 ⊔ h46.W2)] [Invertible (Nat.card ↥(h46.W1 ⊔ h46.W2) : ℂ)]
+    (cY : OddOrder.Peterfalvi.S07.IsCoherent hyp.tau hyp.Yset
+      (OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L))
     {k : (h46.W2.subgroupOf (h46.W1 ⊔ h46.W2)) →* ℂˣ} (hk : k ≠ 1)
     {η₁ : ClassFunction ↥L ℂ} (hη₁ : η₁ ∈ hyp.Yset)
     {k0 : (h46.W2.subgroupOf (h46.W1 ⊔ h46.W2)) →* ℂˣ}
@@ -405,7 +413,7 @@ noncomputable def coherentCertainTypeSet_union_Yset_via_anchoredImages
     (hXanchored : ∀ χ₂ : (h46.W2.subgroupOf (h46.W1 ⊔ h46.W2)) →* ℂˣ,
       OddOrder.Peterfalvi.S06.columnSum h46 χ₂ ∈ OddOrder.Peterfalvi.S06.certainTypeSet h46 k →
       hyp.tau (OddOrder.Peterfalvi.S06.columnSum h46 χ₂ - a₀ • η₁)
-        = Ximg χ₂ - a₀ • hyp.coherentYset.extension η₁)
+        = Ximg χ₂ - a₀ • cY.extension η₁)
     (hXinner : ∀ χ₂ χ₂' : (h46.W2.subgroupOf (h46.W1 ⊔ h46.W2)) →* ℂˣ,
       OddOrder.Peterfalvi.S06.columnSum h46 χ₂ ∈ OddOrder.Peterfalvi.S06.certainTypeSet h46 k →
       OddOrder.Peterfalvi.S06.columnSum h46 χ₂' ∈ OddOrder.Peterfalvi.S06.certainTypeSet h46 k →
@@ -414,17 +422,17 @@ noncomputable def coherentCertainTypeSet_union_Yset_via_anchoredImages
             (OddOrder.Peterfalvi.S06.columnSum h46 χ₂'))
     (hXzirr : ∀ χ₂ : (h46.W2.subgroupOf (h46.W1 ⊔ h46.W2)) →* ℂˣ, Ximg χ₂ ∈ ZIrr G)
     (hXmixed : ∀ χ₂ : (h46.W2.subgroupOf (h46.W1 ⊔ h46.W2)) →* ℂˣ, ∀ y ∈ hyp.Yset,
-      ClassFunction.inner (Ximg χ₂) (hyp.coherentYset.extension y) = 0) :
+      ClassFunction.inner (Ximg χ₂) (cY.extension y) = 0) :
     OddOrder.Peterfalvi.S07.IsCoherent hyp.tau
       (OddOrder.Peterfalvi.S06.certainTypeSet h46 k ∪ hyp.Yset)
       (OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L) := by
   classical
   -- the textbook column coherence `cX` (extension `= Ximg`, T=0-free).
-  set cX := certainTypeSet_isCoherent_via_anchoredImages hyp h46 hk Ximg hXanchored hXinner hXzirr
+  set cX := certainTypeSet_isCoherent_via_anchoredImages hyp h46 cY hk Ximg hXanchored hXinner hXzirr
     with hcX
   -- the glue map `ν` agreeing with `xChiExtension` (`= cX.extension`) on columns and `cY` on `Y`.
-  have hspec := (exists_glue_nu_columnSum_Yset_via_map hyp h46 hW1 (xChiExtension h46 Ximg)).choose_spec
-  set ν := (exists_glue_nu_columnSum_Yset_via_map hyp h46 hW1 (xChiExtension h46 Ximg)).choose
+  have hspec := (exists_glue_nu_columnSum_Yset_via_map hyp h46 hW1 cY (xChiExtension h46 Ximg)).choose_spec
+  set ν := (exists_glue_nu_columnSum_Yset_via_map hyp h46 hW1 cY (xChiExtension h46 Ximg)).choose
     with hνdef
   have hνcol : ∀ χ₂, ν (OddOrder.Peterfalvi.S06.columnSum h46 χ₂) = Ximg χ₂ := by
     intro χ₂; rw [hspec.1 χ₂, xChiExtension_columnSum]
@@ -453,7 +461,7 @@ noncomputable def coherentCertainTypeSet_union_Yset_via_anchoredImages
     subst hd
     rw [hXanchored k0 hk0mem, map_sub, map_nsmul, hνcol k0, hνY η₁ hη₁]
   exact OddOrder.Peterfalvi.S07.coherentUnion_of_glued_of_generator_mixed_inner_eq_withDiagonal
-    cX hyp.coherentYset ν hagreeX hνY
+    cX cY ν hagreeX hνY
     (inner_eq_zero_of_mem_span_of_pairwise_orthogonal hpair) hmixed
     {OddOrder.Peterfalvi.S06.columnSum h46 k0 - a₀ • η₁} hDτ
     (hgen_withDiagonal_certainTypeSet hyp h46 hHK hk0mem hη₁ ha₀)

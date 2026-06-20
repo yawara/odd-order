@@ -1616,11 +1616,13 @@ generation `hgen`) are supplied at capstone wiring. -/
 noncomputable def SibleyDadeHypothesis.coherentXunionYset_caseB_of_glued
     (hyp : SibleyDadeHypothesis G L H) [H.Normal]
     {W2 : Subgroup ↥L}
+    (cY : OddOrder.Peterfalvi.S07.IsCoherent hyp.tau hyp.Yset
+      (OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L))
     (cX : OddOrder.Peterfalvi.S07.IsCoherent hyp.tau (hyp.Xset W2)
       (OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L))
     (ν : OddOrder.Peterfalvi.S07.IntegralCharacterMap (↥L) G)
     (hagreeX : ∀ x ∈ hyp.Xset W2, ν x = cX.extension x)
-    (hagreeY : ∀ y ∈ hyp.Yset, ν y = hyp.coherentYset.extension y)
+    (hagreeY : ∀ y ∈ hyp.Yset, ν y = cY.extension y)
     (hpair : ∀ x ∈ hyp.Xset W2, ∀ y ∈ hyp.Yset, ClassFunction.inner x y = 0)
     (hmixed : ∀ x ∈ hyp.Xset W2, ∀ y ∈ hyp.Yset,
       ClassFunction.inner (ν x) (ν y) = ClassFunction.inner x y)
@@ -1634,7 +1636,7 @@ noncomputable def SibleyDadeHypothesis.coherentXunionYset_caseB_of_glued
     OddOrder.Peterfalvi.S07.IsCoherent hyp.tau (hyp.Xset W2 ∪ hyp.Yset)
       (OddOrder.Peterfalvi.S04.supportInSubgroup (sharpImage H) L) :=
   OddOrder.Peterfalvi.S07.coherentUnion_of_glued_of_generator_mixed_inner_eq_withDiagonal
-    cX hyp.coherentYset ν hagreeX hagreeY
+    cX cY ν hagreeX hagreeY
     (inner_eq_zero_of_mem_span_of_pairwise_orthogonal hpair) hmixed D hDτ hgen
 
 /-- **(6.8.2) case-(B) `{μ_j}`-coherence transported to `hyp.tau`.**  The reducible column characters
