@@ -149,4 +149,60 @@ theorem card_fixedSubgroup_restrict (hN : IsAInvariant φ N) :
 
 end ChiefStep
 
+section AssemblyStep
+
+/-- Readable alias for the induced quotient action `L →* MulAut (H ⧸ N)`; the underlying
+`quotientMulAutHom` has an awkward fully-qualified name (it is declared inside `namespace …Ch04`
+with a `…Ch03`-qualified head, see the `naming wart` note in
+`notes/peterfalvi/s11_wielandt_91_design.md`). -/
+local notation3 "quotMulAut " hN => OddOrder.Isaacs.Ch04.OddOrder.Isaacs.Ch03.IsAInvariant.quotientMulAutHom hN
+
+variable {L H : Type*} [Group L] [Group H]
+
+/-- **The arithmetic core of the chief-series induction.**  If the per-chief-factor identity holds
+on `N` (`hfac`) and the Wielandt identity holds on the quotient `H/N` (`hIH`, the induction
+hypothesis), the two combine multiplicatively.  Pure `ℕ`-arithmetic: writing each ambient term as
+`a_X · b_X` (the chief-step multiplicativity) and `|H| = |N| · |H/N|`, the exponent-`e` product of
+`hfac` and `hIH` is exactly the group identity. -/
+theorem wielandt_card_combine {e aT aE aU bT bE bU n m : ℕ}
+    (hfac : aT ^ e * n = aE ^ e * aU) (hIH : bT ^ e * m = bE ^ e * bU) :
+    (aT * bT) ^ e * (n * m) = (aE * bE) ^ e * (aU * bU) := by
+  rw [mul_pow, mul_pow]
+  calc aT ^ e * bT ^ e * (n * m) = (aT ^ e * n) * (bT ^ e * m) := by ring
+    _ = (aE ^ e * aU) * (bE ^ e * bU) := by rw [hfac, hIH]
+    _ = aE ^ e * bE ^ e * (aU * bU) := by ring
+
+/-- **Peterfalvi (9.1), the chief-series induction step.**  Given a coprime solvable action
+`φ : L →* MulAut H`, an `L`-invariant normal subgroup `N ◁ H`, the per-chief-factor Wielandt
+identity on `N` (`hfac`), and the Wielandt identity on the quotient `H/N` (`hIH`), the group-level
+Wielandt identity holds for `H`:
+`|C_H(UE)|^{|E|} · |H| = |C_H(E)|^{|E|} · |C_H(U)|` (with `C_H(UE) = fixedSubgroup φ ⊤`).
+
+This is the inductive step of `wielandt_fixedPoint_frobenius`: the chief-step multiplicativity
+`card_fixedSubgroup_eq_mul` rewrites each ambient fixed-point count as `|C_H(X) ⊓ N| · |C_{H/N}(X)|`,
+`|H| = |N| · |H/N|`, and `wielandt_card_combine` multiplies `hfac` and `hIH`. -/
+theorem wielandt_step [Finite L] [Finite H] {φ : L →* MulAut H} {U E : Subgroup L}
+    {N : Subgroup H} [N.Normal] [IsSolvable H] (hN : IsAInvariant φ N)
+    (hcop : Nat.Coprime (Nat.card L) (Nat.card H))
+    (hfac : Nat.card ↥(fixedSubgroup φ ⊤ ⊓ N) ^ Nat.card ↥E * Nat.card ↥N =
+      Nat.card ↥(fixedSubgroup φ E ⊓ N) ^ Nat.card ↥E *
+        Nat.card ↥(fixedSubgroup φ U ⊓ N))
+    (hIH : Nat.card ↥(fixedSubgroup (quotMulAut hN) ⊤) ^ Nat.card ↥E * Nat.card (H ⧸ N) =
+      Nat.card ↥(fixedSubgroup (quotMulAut hN) E) ^ Nat.card ↥E *
+        Nat.card ↥(fixedSubgroup (quotMulAut hN) U)) :
+    Nat.card ↥(fixedSubgroup φ ⊤) ^ Nat.card ↥E * Nat.card H =
+      Nat.card ↥(fixedSubgroup φ E) ^ Nat.card ↥E * Nat.card ↥(fixedSubgroup φ U) := by
+  have hcopOfDvd : ∀ X : Subgroup L, Nat.Coprime (Nat.card ↥X) (Nat.card H) := fun X =>
+    hcop.coprime_dvd_left (Subgroup.card_subgroup_dvd_card X)
+  have mT := card_fixedSubgroup_eq_mul (φ := φ) (X := ⊤) hN
+    (by rw [Nat.card_congr (Subgroup.topEquiv (G := L)).toEquiv]; exact hcop) (Or.inr ‹_›)
+  have mE := card_fixedSubgroup_eq_mul (φ := φ) (X := E) hN (hcopOfDvd E) (Or.inr ‹_›)
+  have mU := card_fixedSubgroup_eq_mul (φ := φ) (X := U) hN (hcopOfDvd U) (Or.inr ‹_›)
+  have hH : Nat.card H = Nat.card ↥N * Nat.card (H ⧸ N) := by
+    rw [mul_comm]; exact Subgroup.card_eq_card_quotient_mul_card_subgroup N
+  rw [mT, mE, mU, hH]
+  exact wielandt_card_combine hfac hIH
+
+end AssemblyStep
+
 end OddOrder.GroupTheory
