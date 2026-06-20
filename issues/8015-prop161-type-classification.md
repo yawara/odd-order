@@ -81,10 +81,12 @@ cluster (Theorems A-E) と相互依存**。多くが §16 sorried endpoint 自�
 - [x] **medium 核の centralizer 半分** `typePData_msigma_inf_centralizer_W1_ne_bot` (c8484496, axiom-clean):
       x∈W₁# で M_σ⊓C(x)≠⊥。kappa bridge の 3 条件のうち条件 1 を bare TypePData から discharge。
 - [x] **hVP1 の MF=Mσ 半分** `mf_eq_msigma_of_typePData_U_eq_bot` (c8484496, axiom-clean, A(8)-free)。
-- [ ] **σ-complement 半分** `typePData_W1_prime_not_mem_sigma`: `p∈π(W₁) → p∉σ(M)` (条件 2)。論法は
-      上記 crux 分解 §参照 (Sylow 共役 + M_σ◁M + W₁∩M_σ=1)。要 `Msigma_isHall`/`Msigma.Normal` 確認。
-- [ ] **rank-1 半分 (carrier-gated)**: `pRank_M p=1` for p∈π(W₁) — W₁=κ-Hall witness が要る
-      (`Section16TypePStructure`/issue 7005 の構造から)。これが medium 方向の真の gate。
+- [x] **σ-complement 半分** `typePData_W1_prime_not_mem_sigma` (2d59f42d, axiom-clean): `p∈π(W₁) → p∉σ(M)`
+      (条件 2)。order-p subgroup L≤W₁ を `sigma_subgroup_le_Msigma_of_isHall` で M_σ に落とし W₁∩M'=⊥ と矛盾。
+- [ ] **rank-1 半分 (carrier-gated, 残 crux)**: `pRank_M p=1` for p∈π(W₁) — W₁=κ-Hall witness が要る
+      (`Section16TypePStructure`/issue 7005 の構造から)。これが medium 方向の真の gate。**次セッション**:
+      `Section16TypePStructure`/carrier が W₁=κ-Hall (or rank-1) を供給するか確認し、それを使って
+      `typePData_kappa_nonempty` (carrier 版) を組む。3 条件のうち 2 (centralizer+σ-comp) は済。
 - [ ] **input 1-4, 9 (hard 構成)**: §16 endpoint A-E と協調。`typeFData_of_kappa_eq_bot` を起点に
       TypeIData の `alternative` (8.3 三分岐) を構成 (要 Thm 15.7(c))。← 最深、後回し。
 - [ ] **assembly**: 全 input が揃ったら `proposition_type_classification := …_of_inputs h11 …` で close。
