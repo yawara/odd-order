@@ -192,7 +192,27 @@ step3 (p∈σ, **最深**: simplicity 経由)/step5 (p∉β)/step6 (C_G(X₁)⊄
 `opiCoreInG_fittingInG_subgroupOf_normal` (S08)。step8 infra: `commute_of_coprime_orderOf_of_isNilpotent`
 (要 subgroup-level lift)。
 
-### 🎯 残 `pRank (M_F) r < 3` の証明計画 (15.7(a) deep core、次セッション)
+### ✅✅✅ 2026-06-20⁴ Thm 15.7(a) rank core 完成 → A(8) FittingIsTI sorry-free (本セッション続行)
+**residual `piSet_mf_inf_beta_disjoint_of_not_fittingIsTI` を完全に sorry-free 化**。⟹
+`fitting_isTI_of_mf_ne_msigma` (A(8) FittingIsTI) + `theoremA8_structure` (A(8) 完全形) が
+**sorry-free declaration**。実 sorry 138→137。下記すべて landed (commits `ee5586e6` infra /
+`165317a7` step3 / `614ac0b1` back-half):
+- **infra** (S15): `eq_of_card_eq_of_isCyclic`/`eq_of_le_isCyclic_of_card_eq`/
+  `le_normalizer_of_le_isCyclic_normalized` (cyclic 部分群一意・正規化転送) +
+  `opiCoreInG_sigmaCompl_fittingInAmbient_isCyclic` (Cor 15.5(a): O_{σ'}(F) cyclic、
+  fitting_decomposition から modularity で抽出) + S10/S08 で `maximal_normalizer_le_self`/
+  `normalizer_eq_of_normal_of_mem_maximal` を private→public 化。
+- **step 3 gateway**: `mem_sigma_of_prime_dvd_card_inf_conj_fitting` (p | |F⊓F^g| ⟹ p∈σ、simplicity)。
+- **back-half**: step5 (p∉β/12.17)・step6 (C_G(X₁)⊄M/fusion 10.1e)・step7 (rank<3/uniqueness)・
+  step8 (nilpotent bridge/Sylow index)。
+- ⚠ **axiom status**: chain は sorry-free declaration だが `fitting_decomposition` 経由で **upstream
+  sorryAx を transitively 保持** (既存 gap; 本作業導入でない)。完全 axiom-clean には
+  fitting_decomposition の transitive sorryAx 解消が別途要。
+**⟹ A(8) の 3 conjunct (U=⊥ / FittingIsTI / |K|prime) すべて sorry-free declaration で揃った**
+(theoremA8_structure)。次 = §16 Theorems B-E / Prop 16.1 hard 方向、または fitting_decomposition
+の axiom-clean 化。
+
+### 🎯 残 `pRank (M_F) r < 3` の証明計画 (✅ 上記で完了)
 `¬FittingIsTI M` から導出。base 補題は全在庫:
 1. **setup**: ¬FittingIsTI unfold (`IsTISubset` def S15... = `∀g,(∃a∈A,gag⁻¹∈A)→g∈L`) ⟹ ∃g, a∈
    `fittingSharp M`, gag⁻¹∈fittingSharp, g∉N_G(F(M))。`F(M)=fittingInAmbient M` ⊴ M
