@@ -981,6 +981,30 @@ theorem kappa_eq_sigmaComplementPrimes_of_hall_subgroupOf_eq_bot [Finite G] {M U
     · exact hpκ h
     · exact hpσ h
 
+/-- **Theorem A(8), the `FittingIsTI`-free part** (mmd L4274): for `M_F ≠ M_σ`, the Hall
+`(κ ∪ σ)ᶜ`-complement `U` is trivial and `|K| = p` is prime.  Both follow from
+`mf_ne_msigma_typeP1_structure` (Theorem 15.2): `M_F ≠ M_σ ⟹ IsTypeP1 M`
+(`isTypeP1_of_mf_ne_msigma`), whence `U.subgroupOf M = ⊥`
+(`isTypeP1_kappaSigma_compl_hall_subgroupOf_eq_bot`), while `|K| = p` prime is read off Theorem
+15.2's structure conjunction directly.
+
+This discharges two of the three conjuncts of Theorem A(8) in `theoremA_maximal_structure`; the
+remaining `FittingIsTI M` (`F(M)` a TI-subgroup of `G`) is the genuinely deep §15 content (Theorem A
+proper, via the §9–§10 uniqueness/fusion machinery) and is *not* supplied here. -/
+theorem theoremA8_complement_eq_bot_and_kappa_prime [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M K Kstar U : Subgroup G}
+    (hM : M ∈ maximalSubgroups G) (hKM : K ≤ M)
+    (hK : Ch03.IsHallSubgroup (S14.kappa M) (K.subgroupOf M))
+    (hKstar : Kstar = OddOrder.BG.Ch3.S10.Msigma M ⊓ Subgroup.centralizer (K : Set G))
+    (hU : Ch03.IsHallSubgroup ((S14.kappa M ∪ OddOrder.BG.Ch3.S10.sigma M)ᶜ) (U.subgroupOf M))
+    (hne : S15.MF M ≠ OddOrder.BG.Ch3.S10.Msigma M) :
+    U.subgroupOf M = ⊥ ∧ ∃ p : ℕ, p.Prime ∧ Nat.card ↥K = p := by
+  refine ⟨isTypeP1_kappaSigma_compl_hall_subgroupOf_eq_bot
+    (isTypeP1_of_mf_ne_msigma hG hM hne) hU, ?_⟩
+  obtain ⟨_, _, _, p, _, hpp, _, hKp, -⟩ :=
+    (mf_ne_msigma_typeP1_structure hG hM hne hKM hK hKstar).2
+  exact ⟨p, hpp, hKp⟩
+
 /-! ## Proposition 16.1: BG local taxonomy and shared Type I--V predicates -/
 
 /-- **§14/§15-independent assembly engine for BG Proposition 16.1** (mmd L4478; the source proof
