@@ -264,18 +264,39 @@ main 取込後 (HUB の issue 2013 解決済) に gate 4 (`typeI_overNormalizer_
 
 | piece | 内容 | infra 状態 |
 |---|---|---|
-| 1 | `L` 非共役 S/T (IsTypeI ⟹ ¬conj) | ⚠ exclusivity **`BG.Ch4.S16.not_isTypeI_of_isTypeNonI` 既存** (FeitThompson:334)。残 = **IsTypeI conj-不変** (~150 行 transfer、`maxNilpotentNormalHall_pointwise_smul` 等で feasible) |
+| 1 | `L` 非共役 S/T (IsTypeI ⟹ ¬conj) | ✅ **DONE (2026-06-20⁵)**: `not_conj_of_isTypeI_of_isTypeNonI` (sorry-free) = `isTypeI_of_conj` (新 infra) + `not_isTypeI_of_isTypeNonI` (既存) |
 | 2 | `Coprime |L_F| (p·q)` | `card_LF_coprime_pq` (B2、sorried producer、cite 可) |
 | 3 | `W₁ ⊓ L_F = ⊥` | piece 2 + |W₁|=q prime、clean (~10 行) |
 | 4 | `L` Frobenius kernel L_F | `S14.typeI_frobenius` ((12.7) `TypeIFrobeniusData`、Frobenius 内蔵) |
 | 5 | `U∩L_F=⊥` ⟹ FPF ⟹ Wielandt ⟹ |L_F|=1 矛盾 ⟹ `U∩L_F≠⊥` | ❌ **最深**: `CoprimeFrobeniusAction (UW₁) (L_F)` 構成 + FPF (`fixedByU=⊥` 等)。coprimality は **L の Frobenius (kernel⊥complement, `coprime_card_kernel_complement`)** から (card_LF_coprime_pq でなく) |
-| 6 | `U∩L_F≠⊥` ⟹ `U⊆C_L(U∩L_F)⊆L_F` | ✅ **landing 済** (下記) |
+| 6 | `U∩L_F≠⊥` ⟹ `U⊆C_L(U∩L_F)⊆L_F` | ✅ **landing 済** (`le_kernel_of_isMulCommutative_of_inf_ne_bot`) |
 
-**✅ piece 6 landing (本セッション)**: `le_kernel_of_isMulCommutative_of_inf_ne_bot` (S15_SAndT, sorry-free,
+**✅ piece 6 landing (2026-06-20⁴)**: `le_kernel_of_isMulCommutative_of_inf_ne_bot` (S15_SAndT, sorry-free,
 汎用 Frobenius 補題、`Ch06` へ hoist 可): Frobenius 群 L (kernel N) で abelian U が N と非自明交差 ⟹ U≤N。
-`IsFrobeniusGroup.centralizer_kernel_le` (既存、kernel 元の centralizer ⊆ kernel) + `is_comm.comm` で u が x∈U∩N を
-中心化 ⟹ U≤C_L(x)≤N。**piece 6 (最終 step) は済**。
 
-**⟹ gate 4 の残**: piece 1 の **IsTypeI 共役不変** (~150 行、reusable、unblocker) + piece 5 の **FPF 作用構成**
-(最深、CoprimeFrobeniusAction + Wielandt 配線)。piece 3/4 は clean glue。U abelian は `tdata.U_commutative` +
-hyp.U~typeP.U 共役 (IsMulCommutative transfer) から。**multi-session だが piece 6 + infra 棚卸しで道筋は確定**。
+## ✅ piece 1 DONE — IsTypeI 共役不変 (2026-06-20⁵, commit `d83d56be`)
+
+「型一意性補題が repo に無い」評価を覆し、Peterfalvi 型分類が **`MulAut G` 不変**であることを正面から形式化。
+
+**新 reusable infra `OddOrder/GroupTheory/MaximalSubgroupTypeConj.lean`** (331 行, axiom-clean, AxiomsCheck 登録):
+- **MulAut-equivariance toolkit** (汎用・再利用可): `card_pointwise_smul`/`pointwise_smul_eq_bot_iff`/
+  `isCyclic_pointwise_smul`/`isMulCommutative_pointwise_smul`/`exponent_pointwise_smul`/
+  `centralizer_pointwise_smul`/`normalizer_pointwise_smul`/`image_sharpSubgroup`/`isTISubset_pointwise_smul`/
+  `isComplement'_map_of_mulEquiv`/`isFrobeniusGroup_map_of_mulEquiv`/`rank_of_mulEquiv`/
+  `opiCoreInG_pointwise_smul` (S07 private `conj_smul_opiCoreInG` を public 再証明)。
+- **型データ transfer**: `TypeFData.conj` (15 field 全 transfer; `map_subgroupMap_subgroupOf` で subgroupOf
+  field [complement/U1_normal/frobenius_HU0] を処理) / `TypeIData.conj` (alternative 3 枝も transfer) /
+  `isTypeI_pointwise_smul` / `isTypeI_of_conj`。TypeFData は `derivedInG` 非依存ゆえ nilpotent transfer 不要。
+
+**gate 4 配線** (`S15_SAndT.lean`):
+- `not_conj_of_isTypeI_of_isTypeNonI` (sorry-free proof; transitively `not_isTypeI_of_isTypeNonI` の §16
+  classification sorry に依存ゆえ axiom-clean ではない=honest upstream gate)。
+- **`typeI_overNormalizer_U_le_fitting` を sorry-free 化**: piece 1 で L~S/L~T 非共役を証明・consume →
+  `card_LF_coprime_pq` cite → 残 FPF を **`typeI_U_le_fitting_of_coprime`** (pieces 4-6 隔離, sorried) に押し出し。
+- 実 sorry 138 不変 (piece 1 = assumed hyp → proven lemma の置換; CLAUDE.md「進捗の測り方」)。
+
+**⟹ gate 4 の残 = piece 5 のみ** (`typeI_U_le_fitting_of_coprime` 本体): FPF 作用構成
+(`CoprimeFrobeniusAction (UW₁) (L_F)` + `wielandt_fixedPoint_frobenius` [sorried §9] 配線 + piece 6 の
+↥L bookkeeping)。piece 3/4 は同 producer 内 clean glue。U abelian は `tdata.U_commutative` +
+hyp.U~typeP.U 共役 (新 infra の IsMulCommutative transfer) から。**最深・multi-session**。
+gate 1/2 は依然 F-ask (hdisj / W₁=κ carrier-faithfulness)。
