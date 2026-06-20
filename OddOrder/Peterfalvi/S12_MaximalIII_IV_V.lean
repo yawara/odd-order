@@ -801,6 +801,70 @@ theorem Hypothesis.muGrid_apply_one_within_column [Finite G]
   unfold Hypothesis.muGrid
   simp only [key]
 
+open OddOrder.Peterfalvi.S06 in
+/-- **§6 cross-column degree constancy** (Peterfalvi (10.3) via (3.9.b) + (4.3.b)): the degree
+`μ_{0j}(1)` of the column-`0` certain-type character is unchanged when the `W₂`-dual `χ₂` indexing
+the column is replaced by a Galois power `χ₂ ^ k` (with `k` coprime to the order of the row-`0`
+source character).  This is the cross-column half of (10.3): by (3.9.b) there is a ring
+automorphism `u` of `ℂ` with `σ(ω_{0,χ₂^k}) = (σ(ω_{0,χ₂}))^u`, hence by (4.3.b)
+`δ_{χ₂^k}·μ_{0,χ₂^k} = (δ_{χ₂}·μ_{0,χ₂})^u`; evaluating at `1` and using that `u` fixes the
+integer `δ·μ(1)` (degrees are positive, signs `±1`) forces `μ_{0,χ₂^k}(1) = μ_{0,χ₂}(1)`. -/
+theorem columnFamily_mu_zero_apply_one_pow {L : Type*} [Group L] [Fintype L]
+    [Invertible (Nat.card L : ℂ)] (h : OddOrder.Peterfalvi.S06.Hypothesis L)
+    [NeZero (Nat.card h.W1)] [Fintype ↥(h.W1 ⊔ h.W2)]
+    [Invertible (Nat.card ↥(h.W1 ⊔ h.W2) : ℂ)]
+    (χ₂ : (h.W2.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ) {k : ℕ}
+    (hk : k.Coprime (orderOf (h.toTICyclicHypothesis.omegaProdChar 1 χ₂))) :
+    ((h.columnFamily (χ₂ ^ k)).mu 0 : ClassFunction L ℂ) 1
+      = ((h.columnFamily χ₂).mu 0 : ClassFunction L ℂ) 1 := by
+  classical
+  -- (3.9.b): the Galois automorphism `u` relating the row-`0` source to its `k`-th power
+  obtain ⟨u, hu, -⟩ := h.toTICyclicHypothesis.exists_mapRingEquiv_sigma_omega_pow rfl
+    h.toTICyclicFullDadeApplication (h.toTICyclicHypothesis.omegaProdChar 1 χ₂) hk
+  -- the `k`-th power of the row-`0` source is the row-`0` source of column `χ₂ ^ k`
+  have hpow : (h.toTICyclicHypothesis.omegaProdChar 1 χ₂) ^ k
+      = h.toTICyclicHypothesis.omegaProdChar 1 (χ₂ ^ k) := by
+    rw [h.toTICyclicHypothesis.omegaProdChar_one_left,
+      h.toTICyclicHypothesis.omegaProdChar_one_left]
+    refine MonoidHom.ext fun w => ?_
+    simp only [MonoidHom.pow_apply, MonoidHom.comp_apply]
+    exact (MonoidHom.pow_apply χ₂ k _).symm
+  rw [hpow] at hu
+  -- (4.3.b) at row `0`, stated in `omega`/source form (`chiColumn ψ 0 = ω(omegaProdChar 1 ψ)`)
+  have e43 : ∀ ψ : (h.W2.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ,
+      h.toTICyclicHypothesis.sigma rfl h.toTICyclicFullDadeApplication
+          (h.toTICyclicHypothesis.omega (h.toTICyclicHypothesis.omegaProdChar 1 ψ) :
+            ClassFunction h.toTICyclicHypothesis.W ℂ)
+        = (h.columnFamily ψ).sign • ((h.columnFamily ψ).mu 0 : ClassFunction L ℂ) := by
+    intro ψ
+    have hψ := h.sigma_chiColumn_eq_certainType ψ 0
+    rw [h.chiColumn_zero] at hψ
+    exact hψ
+  rw [e43 (χ₂ ^ k), e43 χ₂] at hu
+  -- `hu : δ' • μ'_0 = (δ • μ_0)^u`; evaluate at `1`
+  have h1 := congrArg (fun f : ClassFunction L ℂ => (f : L → ℂ) (1 : L)) hu
+  simp only at h1
+  obtain ⟨d, hd_pos, hd⟩ :=
+    irreducibleCharacter_apply_one_eq_pos_natCast ((h.columnFamily χ₂).mu 0)
+  obtain ⟨d', hd'_pos, hd'⟩ :=
+    irreducibleCharacter_apply_one_eq_pos_natCast ((h.columnFamily (χ₂ ^ k)).mu 0)
+  rw [ClassFunction.zsmul_apply, ClassFunction.mapRingEquiv_apply, ClassFunction.zsmul_apply,
+    zsmul_eq_mul, zsmul_eq_mul, hd, hd'] at h1
+  -- `h1 : δ' * d' = u (δ * d)`; `u` fixes the integer `δ * d`
+  rw [← Int.cast_natCast (R := ℂ) d, ← Int.cast_natCast (R := ℂ) d', ← Int.cast_mul,
+    ← Int.cast_mul, map_intCast] at h1
+  have hZ : (h.columnFamily (χ₂ ^ k)).sign * (d' : ℤ) = (h.columnFamily χ₂).sign * (d : ℤ) :=
+    Int.cast_injective h1
+  -- magnitudes: signs are `±1`, degrees positive, so `d' = d`
+  rw [hd, hd']
+  have hdd : d' = d := by
+    have habs := congrArg Int.natAbs hZ
+    rw [Int.natAbs_mul, Int.natAbs_mul] at habs
+    rcases (h.columnFamily (χ₂ ^ k)).sign_eq with hs | hs <;>
+      rcases (h.columnFamily χ₂).sign_eq with hs' | hs' <;>
+        simp only [hs, hs'] at habs <;> simpa using habs
+  rw [hdd]
+
 /-- The character parameters obtained in Peterfalvi (10.2)--(10.3).
 
 The arithmetic fields are now de-opaqued to genuine identities: `degree_independent` is the
