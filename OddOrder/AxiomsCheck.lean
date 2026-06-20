@@ -8,6 +8,7 @@ import OddOrder.Algebra.AlgInt
 import OddOrder.GroupTheory.ChermakDelgado
 import OddOrder.GroupTheory.CoprimeFixedPoints
 import OddOrder.GroupTheory.MinimalInvariantNormal
+import OddOrder.GroupTheory.WielandtAssembly
 import OddOrder.GroupTheory.PiElementDecomposition
 import OddOrder.GroupTheory.RepresentationTheory.CharacterCount
 import OddOrder.GroupTheory.RepresentationTheory.CharacterCompleteness
@@ -5320,3 +5321,13 @@ chief-series induction of Wielandt's formula (issue 2014). -/
 #assert_only_allowed_axioms OddOrder.GroupTheory.exists_aInvariant_normal_isElementaryAbelian
 #assert_only_allowed_axioms OddOrder.GroupTheory.aInvariant_normal_map_of_characteristic
 #assert_only_allowed_axioms OddOrder.GroupTheory.aInvariant_map_subtype_of_restrict
+
+/-! **(9.1) chief-series assembly** (`WielandtAssembly`).  The group-level Wielandt fixed-point
+identity follows from the per-chief-factor identity (`WielandtPerFactor`) by strong induction on
+`|H|` (`wielandt_formula_of_perfactor`): an elementary-abelian `L`-invariant normal subgroup `N`
+splits the problem via `wielandt_step`, with the per-factor identity on `N` and the induction
+hypothesis on `H/N`.  This completes the *group-theoretic* layer of Wielandt's formula; the only
+remaining input is the per-chief-factor identity itself (the representation-theoretic (†), lane-f).
+-/
+
+#assert_only_allowed_axioms OddOrder.GroupTheory.wielandt_formula_of_perfactor
