@@ -7,6 +7,7 @@ import Lean
 import OddOrder.Algebra.AlgInt
 import OddOrder.GroupTheory.ChermakDelgado
 import OddOrder.GroupTheory.CoprimeFixedPoints
+import OddOrder.GroupTheory.MinimalInvariantNormal
 import OddOrder.GroupTheory.PiElementDecomposition
 import OddOrder.GroupTheory.RepresentationTheory.CharacterCount
 import OddOrder.GroupTheory.RepresentationTheory.CharacterCompleteness
@@ -5307,3 +5308,15 @@ group-theoretic core of the chief-series assembly of Wielandt's formula (issue 2
 #assert_only_allowed_axioms OddOrder.GroupTheory.card_fixedSubgroup_restrict
 #assert_only_allowed_axioms OddOrder.GroupTheory.wielandt_card_combine
 #assert_only_allowed_axioms OddOrder.GroupTheory.wielandt_step
+
+/-! **(9.1) existence of an elementary-abelian `L`-invariant normal subgroup**
+(`MinimalInvariantNormal`).  A nontrivial finite solvable `H` with an action `φ : L →* MulAut H`
+has a nontrivial `L`-invariant normal `N ◁ H` that is elementary abelian
+(`exists_aInvariant_normal_isElementaryAbelian`): a minimal such `N` has trivial derived subgroup
+(abelian) and trivial `p`-th powers (exponent `p`), both forced by minimality applied to the
+characteristic subgroups of `↥N` mapped into `H`.  This is the existence input driving the
+chief-series induction of Wielandt's formula (issue 2014). -/
+
+#assert_only_allowed_axioms OddOrder.GroupTheory.exists_aInvariant_normal_isElementaryAbelian
+#assert_only_allowed_axioms OddOrder.GroupTheory.aInvariant_normal_map_of_characteristic
+#assert_only_allowed_axioms OddOrder.GroupTheory.aInvariant_map_subtype_of_restrict
