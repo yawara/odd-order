@@ -203,11 +203,23 @@ apparatus が (10.2)/(10.3)/μ-grid をすべて供給**、新規 apparatus buil
 ### ▶ 次の着手順 (real 進捗順)
 
 1. ✅ **§10→§6 bridge DONE**。残 = `hHall` discharge ([issue 1006](../../issues/1006-typep-w1-hall.md), κ-Hall 経由)。
-2. **▶ (10.2)/(10.3) を §6 機構で形式化**: bridge の `CertainTypeHypothesis` から §6 の μ/ω/ζ family・
-   Brauer/inertia を引き、(10.2) ζ (degree w₁ irreducible∈S)、(10.3) μ_ij/δ_j independence + w₂ prime を
-   producer (`exists_zeta_degree_w1` 等) として構成。これで `CharacterParameters` の zeta/mu/omegaSigma が
-   §6 由来の実データに。⚠ §6 が L=M で何を即供給するか (どの定理が `CertainTypeHypothesis`/`Hypothesis46`
-   入力か) を先に RECON。
+2. **▶ (10.2) を §6 Clifford 機構で形式化** (RECON 済 2026-06-20、正確な execution path):
+   - **核心定理 = `induce_isIrreducible_of_forall_chiRestrict_ne`** (`S06_CertainTypeClifford:902`):
+     `h : Hypothesis L` (or CertainTypeHypothesis), `χ : IrreducibleCharacter ↥h.K`,
+     `hχ : ∀ χ₂, h.chiRestrict χ₂ ≠ χ` ⟹ `IsIrreducibleCharacter (induce h.K χ)`。
+     engine = `inertia_eq_K_of_forall_chiRestrict_ne` (`:878`, I_L(χ)=K) + Isaacs 6.34。
+   - **(10.2) ζ**: θ = 非自明 linear (degree-1) irreducible char of M'=K を取る。
+     `induce_isIrreducible_of_forall_chiRestrict_ne` 適用 → Ind_{M'}^M θ irreducible、
+     degree = [M:M']·1 = w₁、∈ inducedFamily M (= Sset)。
+   - **crux = `∀ χ₂, chiRestrict χ₂ ≠ θ`**: `chiRestrict χ₂ = Res_K μ_0j` (column leader 制限,
+     `:772`)。degree 論で discharge — j>0 で μ_0j(1)=d>1 ((10.3)) ゆえ degree-1 の θ と不一致;
+     j=0 (trivial χ₂) の chiRestrict のみ degree 1 なので θ がそれと異なる事を別途確認 (μ_00 の特定要)。
+   - **prereq**: 非自明 linear char of M' の存在 (M'/M''≠1、M' solvable≠1 ゆえ); μ_0j degrees の特定。
+   - これで `CharacterParameters.zeta` が §6 由来の実データに。
+   - **(10.3)**: w₂ prime = `theorem88_caseB_prime_orders` (`S12:622`, mp→Theorem88CaseBData);
+     d/δ independence = columnFamily の degree-const (`columnFamily_difference_apply_one :468`) + (4.5.a)。
+   - μ-grid (de-opaque `mu`/`alpha` 供給源) = `columnFamily` (`S06_CertainTypeCharacters:432`,
+     `SignedIrreducibleDifferenceFamily L |W1|`) + `induce_omegaColumnDiff_mu_diff` (`S06_MuColumnBridge:44`)。
 3. CharacterParameters de-opaque (self-contained field: zeta_irreducible/n_formula/alpha_formula) を
    producer signature 書換と一括で。
 4. issue 1005 (hVti) / 1006 (hHall) discharge。
