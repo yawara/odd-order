@@ -300,3 +300,32 @@ main 取込後 (HUB の issue 2013 解決済) に gate 4 (`typeI_overNormalizer_
 ↥L bookkeeping)。piece 3/4 は同 producer 内 clean glue。U abelian は `tdata.U_commutative` +
 hyp.U~typeP.U 共役 (新 infra の IsMulCommutative transfer) から。**最深・multi-session**。
 gate 1/2 は依然 F-ask (hdisj / W₁=κ carrier-faithfulness)。
+
+## ✅ piece 5 の (9.1) FPF engine DONE (2026-06-20⁶, commits `6dd849ed`/`50b8b9fe`)
+
+`typeI_U_le_fitting_of_coprime` の FPF 核心を **reusable engine 化** (`CoprimeAction.lean`, Wielandt sorry のみに
+bottom-out)。原文 (mmd L288) 精読で論法確定: 「W₁∩H=1。U∩H=1 と仮定 → UW₁ が H に FPF 作用 → (9.1)|H|=1 矛盾」。
+
+**新 3 補題** (`CoprimeAction.lean`):
+- `coprimeFrobeniusAction_card_eq_one`: `fixedByE=⊥ ∧ fixedByU=⊥ ⟹ |H|=1` (既存 `wielandt_fixedPoint_trivial_U_fixed`)。
+- `IsFrobeniusGroup.centralizer_inf_kernel_eq_bot_of_not_mem` (**axiom-clean**, AxiomsCheck 登録): Frobenius 核 N の
+  非核元 g∉N は `C_L(g)⊓N=⊥` (`centralizer_kernel_le`)。FPF 作用の engine。
+- **`isFrobenius_kernel_eq_bot_of_frobenius_subgroup`** (generic engine): 有限 Frobenius 群 L (核 N) に
+  N と自明交差する Frobenius 部分群 UE (`U⊓N=E⊓N=⊥`) が coprime 作用 ⟹ **N=⊥**。証明 = mathlib
+  `MulDistribMulAction (normalizer N) N` で φ 構成 (N◁L、作用は共役で rfl 展開) → U/E 非自明元 ∉ N で
+  fixedByU=fixedByE=⊥ → combinator。Wielandt のみ依存。
+
+**▶ 残 = S15 application** (`typeI_U_le_fitting_of_coprime` で engine 適用、~110 行 mechanical plumbing):
+1. **piece 3** `W₁⊓L_F=⊥`: `_hcop` (Coprime |L_F| pq) → `Coprime |L_F| q` (`q=|W₁|`) → `inf_eq_bot_of_coprime`。
+2. **piece 5** (`U⊓L_F≠⊥`): by_contra `hbot:U⊓L_F=⊥` → engine を **L=↥L** で適用。engine 入力:
+   - `hFrob` = `⟨frob.complement, frob.typeI.typeF.H_eq ▸ frob.frobenius⟩` (typeI_frobenius、kernel=L_F.subgroupOf L)
+   - `hUN`/`hEN` = `hbot`/piece3 を subgroupOf へ (`subgroupOf_inf` 分配)
+   - `hsolv` = `maxNilpotentNormalHall_isNilpotent` → solvable (subgroupOf iso)
+   - `hUE` = **basic_structure.UW1_frobenius を ↥(U⊔W₁)[G] → ↥((U⊔W₁).subgroupOf L)[↥L] へ transfer**
+     (新 infra `isFrobeniusGroup_map_of_mulEquiv` + subgroupOf-sup 分配 + nested subgroupOf iso) ← **crux**
+   - `hcop` = `Coprime |L_F| |U⊔W₁|`: |U⊔W₁|=u·q (Frobenius)、|L_F|⟂q ✓、**|L_F|⟂u** は `hbot` から
+     (`U⊓L_F=⊥` ⟹ `|U| | [L:L_F]` ⟹ coprime to |L_F| via Frobenius `coprime_card_kernel_complement`)
+   - → engine: `L_F.subgroupOf L = ⊥` → `L_F=⊥` 矛盾 (frob...H_nontrivial)。
+3. **piece 6** (`U≤L_F`): `le_kernel_of_isMulCommutative_of_inf_ne_bot` を ↥L で (U abelian=bdata.U_commutative
+   を ↥L へ + piece 5) → `U.subgroupOf L ≤ L_F.subgroupOf L` → map back (`map_subgroupOf_eq_of_le`)。
+crux = hUE transfer (nested subgroupOf) + hcop の |L_F|⟂u。engine は完成ゆえ残は plumbing。
