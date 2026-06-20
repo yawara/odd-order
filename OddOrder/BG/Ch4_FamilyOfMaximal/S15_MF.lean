@@ -2297,44 +2297,6 @@ theorem exists_sylow_eq_opiCore [Finite G] {M Q : Subgroup G} {q : ℕ} [Fact q.
     exact (Subgroup.normal_subgroupOf_iff_le_normalizer hQM).mpr hMnormQ
   rw [OddOrder.BG.Ch3.S10.sylowMap_eq_opiCoreInG_singleton_of_normal _ hPnorm, ← hQ]
 
-/-- **BG Theorem 15.2** (mmd L4112): if `M_F` is strictly smaller than `M_sigma`,
-then `M` is type `P1` and has the normal `q`-subgroup / minimal chief factor
-structure described in the text. -/
-theorem mf_ne_msigma_typeP1_structure [Finite G]
-    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M K Kstar : Subgroup G}
-    (hM : M ∈ maximalSubgroups G) (hne : MF M ≠ OddOrder.BG.Ch3.S10.Msigma M)
-    (hKM : K ≤ M)
-    (hK : Ch03.IsHallSubgroup (S14.kappa M) (K.subgroupOf M))
-    (hKstar : Kstar = OddOrder.BG.Ch3.S10.Msigma M ⊓ Subgroup.centralizer (K : Set G)) :
-    S14.IsTypeP1 M ∧
-      ∃ Q Q0 D : Subgroup G, ∃ p q : ℕ,
-        p.Prime ∧ q.Prime ∧ Nat.card ↥K = p ∧ Nat.card ↥Kstar = q ∧
-        q ∈ S14.piSet (MF M) ∧ q ∈ OddOrder.BG.Ch3.S10.beta M ∧
-        Kstar ≤ MF M ∧
-        Q ≤ MF M ∧ M ≤ Subgroup.normalizer (Q : Set G) ∧
-        Subgroup.IsComplement' (Q.subgroupOf (OddOrder.BG.Ch3.S10.Msigma M))
-          (D.subgroupOf (OddOrder.BG.Ch3.S10.Msigma M)) ∧
-        Group.IsNilpotent ↥D ∧
-        Q0 = Q ⊓ Subgroup.centralizer (D : Set G) ∧
-        M ≤ Subgroup.normalizer (Q0 : Set G) ∧
-        -- mmd 15.2(f): the chief factor `Q̄ = Q/Q0` is elementary abelian of order `q^p`
-        -- (faithfulness fix, Lane G 2026-06-16: the previous scaffold wrote
-        -- `Nat.card ↥(Q.subgroupOf (Q ⊔ Q0))`, which is `|Q|` since `Q0 = Q ⊓ C(D) ⊆ Q` forces
-        -- `Q ⊔ Q0 = Q`; the intended `|Q̄| = |Q : Q0|` is `(Q0.subgroupOf Q).index`).
-        (Q0.subgroupOf Q).index = q ^ p ∧
-        OddOrder.BG.Ch3.S10.Msigma M = derivedInG M ∧
-        derivedInG (derivedInG M) ≤ fittingInAmbient M ∧
-        -- mmd 15.2(g) "F(M) ⊂ M_σ": the Fitting subgroup is contained in the σ-core.
-        fittingInAmbient M ≤ OddOrder.BG.Ch3.S10.Msigma M ∧
-        -- mmd 15.2(g) "F(M) = Q C_M(Q)": the Fitting subgroup is the product of the normal
-        -- `q`-subgroup `Q` and its `M`-centralizer (`Q` self-centralizing up to `C_M(Q)`).
-        fittingInAmbient M = Q ⊔ (Subgroup.centralizer (Q : Set G) ⊓ M) ∧
-        -- mmd 15.2(f): `M_F ⊇ Q̄`, an elementary abelian section of order `q^p` (rank `p ≥ 3`),
-        -- so `M_F` is non-cyclic.  Breaks the 15.5↔15.6 circularity (Corollary 15.6's proof needs
-        -- this without citing Corollary 15.5).
-        ¬ IsCyclic ↥(MF M) := by
-  sorry
-
 /-- **§14-independent Frattini factorization** (BG Corollary 15.3 proof, mmd L4213 "by the
 Frattini argument").  If `Q ⊴ M`, `QH ⊴ M`, `Q ∩ H = 1`, `|Q|` and `|H|` are coprime, and `M`
 is solvable, then `M = N_M(H)·Q`: every `m ∈ M` factors as `m = n·a` with `n ∈ N_G(H)` and
@@ -6347,6 +6309,44 @@ theorem le_fittingInAmbient_of_subgroupOf_normal_of_isNilpotent [Finite G] {M N 
     _ ≤ (OddOrder.Isaacs.Ch01.fitting ↥M).map M.subtype :=
         Subgroup.map_mono OddOrder.Isaacs.Ch01.nilpotent_normal_le_fitting
     _ = fittingInAmbient M := rfl
+
+/-- **BG Theorem 15.2** (mmd L4112): if `M_F` is strictly smaller than `M_sigma`,
+then `M` is type `P1` and has the normal `q`-subgroup / minimal chief factor
+structure described in the text. -/
+theorem mf_ne_msigma_typeP1_structure [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M K Kstar : Subgroup G}
+    (hM : M ∈ maximalSubgroups G) (hne : MF M ≠ OddOrder.BG.Ch3.S10.Msigma M)
+    (hKM : K ≤ M)
+    (hK : Ch03.IsHallSubgroup (S14.kappa M) (K.subgroupOf M))
+    (hKstar : Kstar = OddOrder.BG.Ch3.S10.Msigma M ⊓ Subgroup.centralizer (K : Set G)) :
+    S14.IsTypeP1 M ∧
+      ∃ Q Q0 D : Subgroup G, ∃ p q : ℕ,
+        p.Prime ∧ q.Prime ∧ Nat.card ↥K = p ∧ Nat.card ↥Kstar = q ∧
+        q ∈ S14.piSet (MF M) ∧ q ∈ OddOrder.BG.Ch3.S10.beta M ∧
+        Kstar ≤ MF M ∧
+        Q ≤ MF M ∧ M ≤ Subgroup.normalizer (Q : Set G) ∧
+        Subgroup.IsComplement' (Q.subgroupOf (OddOrder.BG.Ch3.S10.Msigma M))
+          (D.subgroupOf (OddOrder.BG.Ch3.S10.Msigma M)) ∧
+        Group.IsNilpotent ↥D ∧
+        Q0 = Q ⊓ Subgroup.centralizer (D : Set G) ∧
+        M ≤ Subgroup.normalizer (Q0 : Set G) ∧
+        -- mmd 15.2(f): the chief factor `Q̄ = Q/Q0` is elementary abelian of order `q^p`
+        -- (faithfulness fix, Lane G 2026-06-16: the previous scaffold wrote
+        -- `Nat.card ↥(Q.subgroupOf (Q ⊔ Q0))`, which is `|Q|` since `Q0 = Q ⊓ C(D) ⊆ Q` forces
+        -- `Q ⊔ Q0 = Q`; the intended `|Q̄| = |Q : Q0|` is `(Q0.subgroupOf Q).index`).
+        (Q0.subgroupOf Q).index = q ^ p ∧
+        OddOrder.BG.Ch3.S10.Msigma M = derivedInG M ∧
+        derivedInG (derivedInG M) ≤ fittingInAmbient M ∧
+        -- mmd 15.2(g) "F(M) ⊂ M_σ": the Fitting subgroup is contained in the σ-core.
+        fittingInAmbient M ≤ OddOrder.BG.Ch3.S10.Msigma M ∧
+        -- mmd 15.2(g) "F(M) = Q C_M(Q)": the Fitting subgroup is the product of the normal
+        -- `q`-subgroup `Q` and its `M`-centralizer (`Q` self-centralizing up to `C_M(Q)`).
+        fittingInAmbient M = Q ⊔ (Subgroup.centralizer (Q : Set G) ⊓ M) ∧
+        -- mmd 15.2(f): `M_F ⊇ Q̄`, an elementary abelian section of order `q^p` (rank `p ≥ 3`),
+        -- so `M_F` is non-cyclic.  Breaks the 15.5↔15.6 circularity (Corollary 15.6's proof needs
+        -- this without citing Corollary 15.5).
+        ¬ IsCyclic ↥(MF M) := by
+  sorry
 
 /-- **BG Corollary 15.5** (mmd L4225): the decomposition `F(M) = F(M_σ) × Y` with
 `Y = O_{σ(M)'}(F(M))` a cyclic `τ₂(M)`-subgroup, together with `F(M) = C_M(M_F)·M_F`,
