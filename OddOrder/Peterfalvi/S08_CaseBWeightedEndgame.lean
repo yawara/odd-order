@@ -147,6 +147,64 @@ theorem sum_re_div_normSq_Xset_eq (hyp : SibleyDadeHypothesis G L H) {Z : Subgro
     push_cast; ring
   exact Complex.ofReal_inj.mp key
 
+/-- **(6.6)/(6.8) X-set nonemptiness, norm-weighted (case-B, no Frobenius).**  As
+`Xset_nonempty_of_subgroupOf_ne_bot`, but the strictly-positive degree sum is the **norm-weighted**
+identity `sum_re_div_normSq_Xset_eq` (`∑_{X(Z)} χ(1).re²/‖χ‖² = |L:H|(|H|−|H:Z|)`, valid for
+reducible `X`-members), so no Frobenius / `X`-irreducibility hypothesis is needed.  Since
+`Z.subgroupOf H ≠ ⊥` gives `|H:Z| < |H|`, the weighted sum is `> 0`, hence `X(Z) ≠ ∅`.  This is the
+case-(B) discharge of the `hXne` obligation of `nonempty_coherent_S_caseB_of_c2`. -/
+theorem Xset_nonempty_of_subgroupOf_ne_bot_weighted (hyp : SibleyDadeHypothesis G L H)
+    {Z : Subgroup ↥L} [Z.Normal] (hZbot : Z.subgroupOf H ≠ ⊥) :
+    (hyp.Xset Z).Nonempty := by
+  haveI : Fintype ↥H := Fintype.ofFinite _
+  have hXsum := sum_re_div_normSq_Xset_eq hyp (Z := Z)
+  set Xdiff := (Finset.univ.filter (fun θ : IrreducibleCharacter ↥H =>
+          (↑((⊥ : Subgroup ↥L).subgroupOf H) : Set ↥H) ⊆ OddOrder.Peterfalvi.S03.characterKernel
+              (θ : ClassFunction ↥H ℂ) ∧
+            θ ≠ trivialIrreducibleCharacter ↥H)).image
+          (fun θ => ClassFunction.induce H θ.toClassFunction) \
+        (Finset.univ.filter (fun θ : IrreducibleCharacter ↥H =>
+            (↑(Z.subgroupOf H) : Set ↥H) ⊆ OddOrder.Peterfalvi.S03.characterKernel
+                (θ : ClassFunction ↥H ℂ) ∧
+              θ ≠ trivialIrreducibleCharacter ↥H)).image
+          (fun θ => ClassFunction.induce H θ.toClassFunction) with hXdiffdef
+  have hlt : Nat.card (↥H ⧸ Z.subgroupOf H) < Nat.card ↥H := by
+    have h2 : 1 < Nat.card ↥(Z.subgroupOf H) := (Z.subgroupOf H).one_lt_card_iff_ne_bot.mpr hZbot
+    have hcard : Nat.card ↥H
+        = Nat.card (↥H ⧸ Z.subgroupOf H) * Nat.card ↥(Z.subgroupOf H) :=
+      Subgroup.card_eq_card_quotient_mul_card_subgroup (Z.subgroupOf H)
+    calc Nat.card (↥H ⧸ Z.subgroupOf H)
+        < Nat.card (↥H ⧸ Z.subgroupOf H) * Nat.card ↥(Z.subgroupOf H) :=
+          lt_mul_of_one_lt_right Nat.card_pos h2
+      _ = Nat.card ↥H := hcard.symm
+  have hidxpos : 0 < H.index := by rw [hyp.index_H_eq_card_W1]; exact Nat.card_pos
+  have hpos : (0 : ℝ) < (H.index : ℝ) *
+      ((Nat.card ↥H : ℝ) - (Nat.card (↥H ⧸ Z.subgroupOf H) : ℝ)) := by
+    refine mul_pos (by exact_mod_cast hidxpos) ?_
+    have : (Nat.card (↥H ⧸ Z.subgroupOf H) : ℝ) < (Nat.card ↥H : ℝ) := by exact_mod_cast hlt
+    linarith
+  rw [← hXsum] at hpos
+  have hne : Xdiff.Nonempty := by
+    by_contra h
+    rw [Finset.not_nonempty_iff_eq_empty] at h
+    rw [h, Finset.sum_empty] at hpos
+    exact lt_irrefl 0 hpos
+  obtain ⟨χ, hχ⟩ := hne
+  refine ⟨χ, ?_⟩
+  rw [hXdiffdef, Finset.mem_sdiff] at hχ
+  obtain ⟨hχbot, hχnotZ⟩ := hχ
+  obtain ⟨θ, hθ, rfl⟩ := Finset.mem_image.mp hχbot
+  obtain ⟨-, -, hθne⟩ := Finset.mem_filter.mp hθ
+  have hχS : ClassFunction.induce H θ.toClassFunction ∈ hyp.S := by
+    rw [hyp.S_eq]; exact ⟨θ, hθne, rfl⟩
+  have hχnotSZ : ClassFunction.induce H θ.toClassFunction ∉ hyp.SsubFiltration Z := by
+    intro hmem
+    rw [hyp.mem_SsubFiltration] at hmem
+    obtain ⟨θ', hne', hker', heq'⟩ := hmem
+    exact hχnotZ (Finset.mem_image.mpr
+      ⟨θ', Finset.mem_filter.mpr ⟨Finset.mem_univ _, hker', hne'⟩, heq'.symm⟩)
+  exact hyp.mem_Xset.mpr ⟨hχS, hχnotSZ⟩
+
 /-- **(6.2) norm-weighted `X`-sum bound** (case-(B) form).
 
 The norm-weighted Peterfalvi (5.6) inequality for case (B): if `X(W₂) ∪ Y` is coherent but adding
