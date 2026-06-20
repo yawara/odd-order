@@ -428,6 +428,32 @@ def Hypothesis.toCertainTypeHypothesis [Finite G] {M : Subgroup G} (hyp : Hypoth
   { toHypothesis := typePData_toS06Hypothesis hyp.typeP hodd hHall
     dade := hyp.dadeData.dade }
 
+/-- **A finite non-perfect group has a non-trivial linear character.**  If `commutator K ≠ ⊤`
+(the abelianization `K/[K,K]` is non-trivial), there is a non-trivial degree-one irreducible
+character of `K`: a non-trivial element of `K/[K,K]` is separated by some `φ : (K/[K,K]) →* ℂˣ`
+(Pontryagin duality over `ℂ`, `exists_apply_ne_one_of_hasEnoughRootsOfUnity`), pulled back along
+`K ↠ K/[K,K]`.  This supplies the non-principal degree-`1` character of `M' = [M,M]` whose induction
+to `M` is the (10.2) character `ζ`. -/
+theorem exists_nontrivial_linearIrreducibleCharacter {K : Type*} [Group K] [Finite K]
+    (hK : commutator K ≠ ⊤) :
+    ∃ θ : IrreducibleCharacter K, θ ≠ trivialIrreducibleCharacter K ∧
+      (θ : ClassFunction K ℂ) 1 = 1 := by
+  classical
+  obtain ⟨a, ha⟩ : ∃ a : K, a ∉ commutator K := by
+    by_contra h
+    push_neg at h
+    exact hK (top_le_iff.mp fun x _ => h x)
+  haveI : Finite (Abelianization K) := Quotient.finite _
+  have hā : (Abelianization.of a) ≠ 1 := by
+    rw [ne_eq, ← MonoidHom.mem_ker, Abelianization.ker_of]; exact ha
+  obtain ⟨φ, hφ⟩ := CommGroup.exists_apply_ne_one_of_hasEnoughRootsOfUnity
+    (G := Abelianization K) (M := ℂ) hā
+  set ψ : K →* ℂˣ := φ.comp Abelianization.of with hψdef
+  have hψ : ψ ≠ 1 := fun h => hφ (by rw [← MonoidHom.comp_apply, ← hψdef, h, MonoidHom.one_apply])
+  refine ⟨linearIrreducibleCharacter ψ, ?_, linearIrreducibleCharacter_apply_one ψ⟩
+  rw [ne_eq, linearIrreducibleCharacter_eq_trivial_iff]
+  exact hψ
+
 /-! ## (10.2)--(10.4): basic character parameters and coherent extension -/
 
 /-- The character parameters obtained in Peterfalvi (10.2)--(10.3).
