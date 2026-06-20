@@ -51,3 +51,18 @@ Nat.Coprime (Nat.card ↥(derivedInG M)) (Nat.card ↥data.W1)` でパラメー�
 - `OddOrder/Peterfalvi/S06_DadeIsometryCertain.lean:67` — `S06.Hypothesis` (4.2), `card_coprime` field
 - `notes/peterfalvi/s12_s10_character_bridge.md` §6 — bridge field 対応表 + リスク
 - 関連 issue: 1005 (hVti / ambient TI, 同型の obligation)
+
+## 2026-06-20 調査: lane-f κ-Hall cyclicity に gate
+
+上記「κ-Hall 経由」プランは **cyclic κ-Hall K の存在**を要するが、これが lane-f BG §14 に gate と判明:
+- `typeP_derivedInG_isComplement_kappaHall` / `card_kappaHall_eq_derived_index` はいずれも
+  `[IsCyclic ↥K]` を仮説に取る (S14_TypePCounting:8011 / S16_PairIntersection:191)。
+- 単一 type-P maximal M の κ-Hall K の cyclicity は **`theoremA_maximal_structure` (S16_MainResults:144) が
+  `IsCyclic ↥K` を主張するが SORRY** (line 164)。実証明は `typeP_duality` 経由 (S15_MF:1750 の `hconj2`)
+  で、これは **partner Mstar との pairing を要する**深い §14 duality。
+- ∴ `Coprime |M'| |W₁|` (= M' が M の Hall) は `TypePData` 単独・lane-b 単独では出ず、lane-f の
+  κ-Hall cyclicity (theoremA or typeP_duality) 着地待ち。
+- 代替: `typeP_structure` (Prop 14.2, sorry-free) から「M' = U·M_σ は κ(M)'-Hall」を抽出できれば
+  prime-set disjointness (`kappa_subset_sigmaCompl`) で coprimality が出る可能性 — 要 lane-f 構造抽出。
+
+**∴ issue 1006 は lane-f BG §14 待ち** (cross-lane gate)。lane-b 単独では closeable でない。

@@ -295,6 +295,126 @@ theorem typePData_W_card_odd [Finite G] {M : Subgroup G} (data : TypePData M)
     (hodd : Odd (Nat.card G)) : Odd (Nat.card ↥data.W) :=
   hodd.of_dvd_nat (Subgroup.card_subgroup_dvd_card data.W)
 
+/-- For a type-`P` maximal subgroup the exceptional set `V = W − (W₁ ∪ W₂)` is nonempty:
+the product `x·y` of a nontrivial `x ∈ W₁` and a nontrivial `y ∈ W₂` lies in `W` but in neither
+factor, since `W₁` and `W₂` are disjoint (`typePData_disjoint_W1_W2`). -/
+theorem typePData_typePV_nonempty {M : Subgroup G} (data : TypePData M) :
+    (typePV M data).Nonempty := by
+  obtain ⟨x, hxW1, hxne⟩ := (data.W1.bot_or_exists_ne_one).resolve_left data.W1_nontrivial
+  obtain ⟨y, hyW2, hyne⟩ := (data.W2.bot_or_exists_ne_one).resolve_left data.W2_nontrivial
+  have hW1le : data.W1 ≤ data.W := data.W_eq ▸ le_sup_left
+  have hW2le : data.W2 ≤ data.W := data.W_eq ▸ le_sup_right
+  have hdisj := disjoint_iff.mp (typePData_disjoint_W1_W2 data)
+  refine ⟨x * y, ?_⟩
+  simp only [typePV, Set.mem_diff, Set.mem_union, SetLike.mem_coe, not_or]
+  refine ⟨mul_mem (hW1le hxW1) (hW2le hyW2), ?_, ?_⟩
+  · intro hxy
+    have hy1 : y ∈ data.W1 := by
+      have he : y = x⁻¹ * (x * y) := by group
+      rw [he]; exact mul_mem (inv_mem hxW1) hxy
+    exact hyne (Subgroup.mem_bot.mp (hdisj ▸ Subgroup.mem_inf.mpr ⟨hy1, hyW2⟩))
+  · intro hxy
+    have hx1 : x ∈ data.W2 := by
+      have he : x = (x * y) * y⁻¹ := by group
+      rw [he]; exact mul_mem hxy (inv_mem hyW2)
+    exact hxne (Subgroup.mem_bot.mp (hdisj ▸ Subgroup.mem_inf.mpr ⟨hxW1, hx1⟩))
+
+/-- **Peterfalvi (4.6.b) / (4.3.a), ambient version** (issue 1005): for a type-`P` maximal
+subgroup, the exceptional set `V = W − (W₁ ∪ W₂)` is a TI-subset of `G` with normalizer-bound `W`.
+
+Given `g` conjugating some `a ∈ V` into `V`, the singleton normalizer fact `N_G({a}) = W`
+(`TypePData.normalizer_V`) forces `g` to normalize `W` — both `h ∈ W` and `g h g⁻¹ ∈ W` reduce to
+`h a h⁻¹ = a`.  Since `W = W₁ × W₂` is cyclic with coprime factors, `W₁` and `W₂` are the *unique*
+subgroups of their orders (`cyclic_subgroup_eq_of_card_eq`), hence characteristic, so `g` also
+normalizes `W₁` and `W₂` and therefore `V`; finally `N_G(V) = W` (`normalizer_V` with `X = V`,
+nonempty by `typePData_typePV_nonempty`) gives `g ∈ W`.
+
+This discharges the last field of `typePData_toTICyclicHypothesis`, making the §10 → §5 ω-grid
+bridge unconditional (closes issue 1005).  It also corrects the earlier diagnosis that
+`normalizer_V` is strictly weaker than the TI property: that is true *without* cyclicity, but the
+cyclic factor structure recovers the ambient TI. -/
+theorem typePData_V_ti [Finite G] {M : Subgroup G} (data : TypePData M) :
+    IsTISubset (typePV M data) data.W := by
+  classical
+  haveI : IsCyclic ↥data.W := data.W_cyclic
+  have hW1le : data.W1 ≤ data.W := data.W_eq ▸ le_sup_left
+  have hW2le : data.W2 ≤ data.W := data.W_eq ▸ le_sup_right
+  -- Singleton normalizer = pointwise stabilizer.
+  have mem_norm_sing : ∀ c z : G,
+      z ∈ Subgroup.normalizer ({c} : Set G) ↔ z * c * z⁻¹ = c := by
+    intro c z
+    rw [Subgroup.mem_set_normalizer_iff]
+    constructor
+    · intro hz
+      have := (hz c).mp rfl
+      simpa using this
+    · intro hz h
+      simp only [Set.mem_singleton_iff]
+      constructor
+      · rintro rfl; exact hz
+      · intro hh
+        have hcc : z * h * z⁻¹ = z * c * z⁻¹ := by rw [hh, hz]
+        exact mul_left_cancel (mul_right_cancel hcc)
+  intro g hg
+  obtain ⟨a, haV, hbV⟩ := hg
+  have hNa : Subgroup.normalizer ({a} : Set G) = data.W :=
+    data.normalizer_V {a} (Set.singleton_nonempty a) (Set.singleton_subset_iff.mpr haV)
+  have hNb : Subgroup.normalizer ({g * a * g⁻¹} : Set G) = data.W :=
+    data.normalizer_V {g * a * g⁻¹} (Set.singleton_nonempty _) (Set.singleton_subset_iff.mpr hbV)
+  -- `g` normalizes `W` as a set: both sides reduce to `h * a * h⁻¹ = a`.
+  have hgW : ∀ h, h ∈ data.W ↔ g * h * g⁻¹ ∈ data.W := by
+    intro h
+    have e1 : (h ∈ data.W) ↔ h * a * h⁻¹ = a := by rw [← hNa, mem_norm_sing]
+    have e2 : (g * h * g⁻¹ ∈ data.W) ↔ h * a * h⁻¹ = a := by
+      rw [← hNb, mem_norm_sing]
+      have hexp : g * h * g⁻¹ * (g * a * g⁻¹) * (g * h * g⁻¹)⁻¹ = g * (h * a * h⁻¹) * g⁻¹ := by
+        group
+      rw [hexp]
+      constructor
+      · intro hh; exact mul_left_cancel (mul_right_cancel hh)
+      · intro hh; rw [hh]
+    rw [e1, e2]
+  -- Any subgroup `A ≤ W` is `g`-stable (cyclic uniqueness ⇒ `A` characteristic in `W`).
+  have hstab : ∀ (A : Subgroup G), A ≤ data.W → ∀ x : G, g * x * g⁻¹ ∈ A ↔ x ∈ A := by
+    intro A hAW
+    have hmap_le : A.map (MulAut.conj g).toMonoidHom ≤ data.W := by
+      rintro y hy
+      rw [Subgroup.mem_map] at hy
+      obtain ⟨z, hzA, rfl⟩ := hy
+      simp only [MulEquiv.coe_toMonoidHom, MulAut.conj_apply]
+      exact (hgW z).mp (hAW hzA)
+    have hcard : Nat.card ↥(A.map (MulAut.conj g).toMonoidHom) = Nat.card ↥A :=
+      (Nat.card_congr (Subgroup.equivMapOfInjective A (MulAut.conj g).toMonoidHom
+        (MulAut.conj g).injective).toEquiv).symm
+    have hsubeq : (A.map (MulAut.conj g).toMonoidHom).subgroupOf data.W
+        = A.subgroupOf data.W := by
+      apply OddOrder.BG.Ch3.S10.cyclic_subgroup_eq_of_card_eq (C := ↥data.W)
+      rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hmap_le).toEquiv,
+        Nat.card_congr (Subgroup.subgroupOfEquivOfLe hAW).toEquiv, hcard]
+    have hmapeq : A.map (MulAut.conj g).toMonoidHom = A := by
+      rw [← Subgroup.map_subgroupOf_eq_of_le hmap_le, hsubeq,
+        Subgroup.map_subgroupOf_eq_of_le hAW]
+    intro x
+    constructor
+    · intro hx
+      have hmem : g * x * g⁻¹ ∈ A.map (MulAut.conj g).toMonoidHom := by rw [hmapeq]; exact hx
+      rw [Subgroup.mem_map] at hmem
+      obtain ⟨z, hzA, hz⟩ := hmem
+      simp only [MulEquiv.coe_toMonoidHom, MulAut.conj_apply] at hz
+      have hzx : z = x := mul_left_cancel (mul_right_cancel hz)
+      rwa [hzx] at hzA
+    · intro hx
+      have hmem : (MulAut.conj g).toMonoidHom x ∈ A.map (MulAut.conj g).toMonoidHom :=
+        Subgroup.mem_map_of_mem _ hx
+      rw [hmapeq] at hmem
+      simpa only [MulEquiv.coe_toMonoidHom, MulAut.conj_apply] using hmem
+  -- `g` normalizes `V`, so `g ∈ N_G(V) = W`.
+  rw [← data.normalizer_V (typePV M data) ⟨a, haV⟩ Set.Subset.rfl,
+    Subgroup.mem_set_normalizer_iff]
+  intro h
+  simp only [typePV, Set.mem_diff, Set.mem_union, SetLike.mem_coe]
+  rw [hgW h, hstab data.W1 hW1le h, hstab data.W2 hW2le h]
+
 open scoped FiniteInduce in
 /-- **§10 → §5 ω-grid bridge (gate #3)**: a type-`P` maximal subgroup's cyclic factor
 `W = W₁ × W₂`, with the exceptional set `V = W − (W₁ ∪ W₂)`, is a Peterfalvi (3.1) TI-cyclic
@@ -303,19 +423,16 @@ normalizer setup in the ambient group `G`.  Every structural field is read off f
 (`typePData_coprime_card_W1_W2`) / cyclic (`W_cyclic`), oddness comes from `Odd |G|`, and `V` is
 `W`-normalized because the cyclic `W` is abelian.
 
-The single genuine input is the **ambient** TI property `hVti : IsTISubset V W` — Peterfalvi
-(4.6.b), the `G`-version of the (4.3.a) `(3.1)`-for-`L` fact.  It is supplied here exactly as §5
-`TICyclicHypothesis.mapOfInjective` (S05) and §6 `CertainTypeHypothesis.toTICyclicHypothesisOfV`
-(S06) take it: the `isTISubset_sup_sdiff` argument that proves the TI property *inside* a maximal
-`L = K ⋊ W` uses the normal complement `K ⊴ L` (`L/K` abelian ⇒ `[g,x] ∈ K ⊓ W₁ = ⊥`) and does
-**not** transfer to the ambient `G`, which has no normal complement to `W`.  See
-`issues/1005-typep-ambient-v-ti.md` and `notes/peterfalvi/s12_s10_character_bridge.md`.
+The ambient TI property `V_ti : IsTISubset V W` — Peterfalvi (4.6.b), the `G`-version of (4.3.a) —
+is the one field that does not read off directly from the `TypePData` fields; it is supplied by the
+companion `typePData_V_ti`, which derives it from `normalizer_V` together with the cyclic factor
+structure (`W₁`, `W₂` are the unique, hence characteristic, subgroups of their orders in the cyclic
+`W`).  This makes the bridge **unconditional** (no external TI hypothesis; closes issue 1005).
 
 Through this bridge the entire §5 ω/σ-grid (`TICyclicHypothesis.omegaGrid`, `omegaSigmaGrid`,
 `sigmaIntegral`) becomes available for the §10 character analysis ((10.2)–(10.10)). -/
 noncomputable def typePData_toTICyclicHypothesis [Finite G] {M : Subgroup G}
-    (data : TypePData M) (hodd : Odd (Nat.card G))
-    (hVti : IsTISubset (typePV M data) data.W) :
+    (data : TypePData M) (hodd : Odd (Nat.card G)) :
     OddOrder.Peterfalvi.S05.TICyclicHypothesis G where
   W := data.W
   W1 := data.W1
@@ -342,7 +459,7 @@ noncomputable def typePData_toTICyclicHypothesis [Finite G] {M : Subgroup G}
       S06.commute_of_mem_of_isCyclic data.W_cyclic w.2 hv.1
     have h3 : (w : G) * v * (w : G)⁻¹ = v := by rw [hcomm.eq, mul_inv_cancel_right]
     rw [h3]; exact hv
-  V_ti := hVti
+  V_ti := typePData_V_ti data
 
 /-! ## §10 → §6 (4.2)+Dade bridge (μ-grid unlock)
 
