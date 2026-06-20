@@ -1051,6 +1051,23 @@ theorem card_LF_coprime_pq [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
     (_hLnconjT : ¬ ∃ g : G, MulAut.conj g • L = hyp.T) :
     Nat.Coprime (Nat.card ↥(maxNilpotentNormalHall L)) (hyp.p * hyp.q) := sorry
 
+/-- **Frobenius-kernel self-centralizing (the gate-4 final step)**: in a finite Frobenius group `L`
+with kernel `N`, any abelian subgroup `U` meeting `N` nontrivially lies in `N`.  Picking
+`1 ≠ x ∈ U ⊓ N`, every `u ∈ U` commutes with `x` (`U` abelian), so `u ∈ C_L(x) ≤ N`
+(`IsFrobeniusGroup.centralizer_kernel_le`: the centralizer of a nontrivial kernel element lies in
+the kernel).  This is exactly the `U ⊆ C_L(U ∩ L_F) ⊆ L_F` deduction of Peterfalvi (13.17.b) once
+`U ∩ L_F ≠ 1` is known.  General group theory; reusable, hoistable to `Ch06`. -/
+theorem le_kernel_of_isMulCommutative_of_inf_ne_bot {L : Type*} [Group L] [Finite L]
+    {N A U : Subgroup L} (h : Ch06.IsFrobeniusGroup L N A)
+    (hUab : IsMulCommutative ↥U) (hinf : U ⊓ N ≠ ⊥) : U ≤ N := by
+  obtain ⟨x, hxmem, hxne⟩ := (U ⊓ N).bot_or_exists_ne_one.resolve_left hinf
+  have hxU : x ∈ U := (Subgroup.mem_inf.mp hxmem).1
+  have hxN : x ∈ N := (Subgroup.mem_inf.mp hxmem).2
+  have hcent := h.centralizer_kernel_le x hxN hxne
+  intro u hu
+  refine hcent (Subgroup.mem_centralizer_singleton_iff.mpr ?_)
+  exact congrArg Subtype.val (hUab.is_comm.comm ⟨u, hu⟩ ⟨x, hxU⟩)
+
 /-- **Peterfalvi (13.17.b) `U ⊆ L_F` for the type-`I` `L`**: when `S` is type II and `L` is a
 type-`I` maximal subgroup over `N_G(U)`, the complement `U` lies in the Fitting kernel `L_F`.
 
