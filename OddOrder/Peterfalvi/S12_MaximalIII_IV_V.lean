@@ -725,6 +725,36 @@ instance instNeZeroW2 {M : Subgroup G} (hyp : Hypothesis M) : NeZero hyp.w2 := b
   haveI := hyp.finiteG
   exact ⟨Nat.card_pos.ne'⟩
 
+open scoped FiniteInduce in
+/-- **§10 μ-grid materialization** (Peterfalvi (10.1)/(4.3.b)): the `Fin w₁ × Fin w₂`-indexed family
+of induced characters `μ_{ij}` of `M`, read off from the §6 `columnFamily` of the (now
+unconditional) §10→§6 bridge `Hypothesis.toCertainTypeHypothesis`, reindexed by
+`finCardEquivCharacterGroup` (the `W₂`-dual ↔ `Fin w₂` Pontryagin bijection) on the column index and
+by the order identity `|W₁| = w₁` on the row index.  This is the genuine source for
+`CharacterParameters.mu`. -/
+noncomputable def Hypothesis.muGrid [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    {M : Subgroup G} (hyp : Hypothesis M) (hodd : Odd (Nat.card G)) :
+    Fin hyp.w1 → Fin hyp.w2 → ClassFunction ↥M ℂ := by
+  haveI := hyp.finiteG
+  classical
+  intro i j
+  let h := (hyp.toCertainTypeHypothesis hG hodd).toHypothesis
+  haveI : NeZero (Nat.card h.W1) := ⟨by have := h.one_lt_card_W1; omega⟩
+  haveI : IsCyclic ↥(h.W1 ⊔ h.W2) := h.isCyclic_sup
+  letI : CommGroup ↥(h.W1 ⊔ h.W2) := IsCyclic.commGroup
+  have hW1le : hyp.typeP.W1 ≤ M := hyp.typeP.W1_le
+  have hW2le : hyp.typeP.W2 ≤ M :=
+    (hyp.typeP.W2_le.trans inf_le_left).trans
+      (hyp.typeP.H_le.trans (Subgroup.map_subtype_le _))
+  have hcardW1 : Nat.card ↥h.W1 = hyp.w1 :=
+    Nat.card_congr (Subgroup.subgroupOfEquivOfLe hW1le).toEquiv
+  have hcardW2sub : Nat.card ↥(h.W2.subgroupOf (h.W1 ⊔ h.W2)) = hyp.w2 := by
+    rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe (le_sup_right)).toEquiv]
+    exact Nat.card_congr (Subgroup.subgroupOfEquivOfLe hW2le).toEquiv
+  let χ₂ : (h.W2.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ :=
+    finCardEquivCharacterGroup _ (finCongr hcardW2sub.symm j)
+  exact ((h.columnFamily χ₂).mu (finCongr hcardW1.symm i) : ClassFunction ↥M ℂ)
+
 /-- The character parameters obtained in Peterfalvi (10.2)--(10.3).
 
 The arithmetic fields are now de-opaqued to genuine identities: `degree_independent` is the
