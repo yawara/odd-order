@@ -255,6 +255,26 @@ Msigma_inf_conj_isBetaCompl / centralizer_singleton_lt_top すべて allowlist 3
 ⟹ fitting_decomposition は一般 M (P2 含む) ゆえ、完全 axiom-clean には type-P2 K-faithfulness が要。
 これが Cor 15.3 axiom-clean 化の真の残 core (genuine multi-session)。次セッション着手点。
 
+### 🔬 2026-06-20⁷ type-P2 K-faithfulness 深掘り結論 — 自然 route は CIRCULAR (重要)
+ユーザー裁可で type-P2 K-faithfulness (K*⊊M_σ) を深掘り。**自然 route が循環と判明** (`#print axioms`
+で確認):
+- **K*⊊M_σ の自然証明 = Cor 15.6 (`typeP_kstar_in_mf`): K* cyclic ∧ M_F not cyclic ∧ K*⊆M_F**
+  ⟹ K*=M_σ なら M_F=M_σ=K* cyclic で M_F not cyclic と矛盾。**しかし `typeP_kstar_in_mf` は sorryAx
+  を持つ** (`fitting_decomposition` (Cor 15.5) 経由) → Cor 15.3 を証明するのに使えない (**循環**:
+  Cor15.3 ← K*⊊M_σ ← Cor15.6 ← Cor15.5 ← Cor15.3、Lean で順序不能)。
+- **clean な部品**: `msigma_eq_commutator_kappa_of_isComplement'` (P1: [M_σ,K]=M_σ, **axiom-clean ✓**)、
+  `typeP_duality` (K/K* cyclic, **axiom-clean ✓**)。
+- **P1**: [M_σ,K]=M_σ で K*⊊M_σ clean ✅。
+- **P2 (M=KUM_σ, M_σ nilpotent)**: ⛔ 非循環 route 無し。`[M_σ,KU]=M_σ` は出る (E=KU complement) が
+  K 単独の非自明作用を与えない (U が full に作用しうる)。「M_σ non-cyclic / M''≠1 / M_σ non-abelian
+  for type-P2」も**全て循環** (Cor 15.6/fitting_decomposition 経由)。typeP_structure (Prop 14.2 partial)
+  は κ'-group 句 (b1)(e) を expose せず。
+- **⟹ A(8) 完全 axiom-clean の真の blocker = BG Prop 14.2(b1)(e) (C_M(H) κ'-group) を §14 の
+  E-setup/Frobenius-normalizer 機構から非循環に証明すること** (= 独立 §14 定理、issue 別建て)。
+  A(8) endpoint は M_F≠M_σ=type-P1 だが、証明 path (residual→Cor15.5→Cor15.3) は一般 M (P2 含む) を
+  通るため P1 限定にはできない。
+**現状維持が妥当**: A(8) FittingIsTI sorry-free、axiom gap=Cor 15.3 (=Prop 14.2(b1)(e) §14 deferred)。
+
 ### 🎯 残 `pRank (M_F) r < 3` の証明計画 (✅ 上記で完了)
 `¬FittingIsTI M` から導出。base 補題は全在庫:
 1. **setup**: ¬FittingIsTI unfold (`IsTISubset` def S15... = `∀g,(∃a∈A,gag⁻¹∈A)→g∈L`) ⟹ ∃g, a∈
