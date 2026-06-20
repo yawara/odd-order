@@ -7162,6 +7162,61 @@ theorem mf_eq_msigma_of_piSet_inf_beta_disjoint [Finite G]
     (mf_ne_msigma_typeP1_structure hG hM hne hKM hK rfl).2
   exact hdisj _ hqπ hqβ
 
+/-- In a finite cyclic group, a subgroup is determined by its cardinality (every subgroup is the
+kernel of `x ↦ x ^ |A|`, which depends only on `|A|`). -/
+theorem eq_of_card_eq_of_isCyclic {C : Type*} [Group C] [Finite C] [IsCyclic C]
+    {H K : Subgroup C} (h : Nat.card ↥H = Nat.card ↥K) : H = K := by
+  letI : CommGroup C := IsCyclic.commGroup
+  have key : ∀ A : Subgroup C, A = (powMonoidHom (Nat.card ↥A) : C →* C).ker := by
+    intro A
+    have hcard : Nat.card ↥((powMonoidHom (Nat.card ↥A) : C →* C).ker) = Nat.card ↥A := by
+      rw [IsCyclic.card_powMonoidHom_ker, Nat.gcd_eq_right (Subgroup.card_subgroup_dvd_card A)]
+    refine Subgroup.eq_of_le_of_card_ge (fun a ha => ?_) (le_of_eq hcard)
+    rw [MonoidHom.mem_ker, powMonoidHom_apply]
+    have h1 : (⟨a, ha⟩ : ↥A) ^ Nat.card ↥A = 1 := pow_card_eq_one'
+    simpa only [SubmonoidClass.coe_pow, OneMemClass.coe_one] using congrArg Subtype.val h1
+  rw [key H, key K, h]
+
+/-- Two subgroups of `G` of equal finite order, both contained in a cyclic subgroup `C`, are
+equal. -/
+theorem eq_of_le_isCyclic_of_card_eq [Finite G] {C H K : Subgroup G} [IsCyclic ↥C]
+    (hHC : H ≤ C) (hKC : K ≤ C) (h : Nat.card ↥H = Nat.card ↥K) : H = K := by
+  have hcardH : Nat.card ↥(H.subgroupOf C) = Nat.card ↥H :=
+    Nat.card_congr (Subgroup.subgroupOfEquivOfLe hHC).toEquiv
+  have hcardK : Nat.card ↥(K.subgroupOf C) = Nat.card ↥K :=
+    Nat.card_congr (Subgroup.subgroupOfEquivOfLe hKC).toEquiv
+  have hsub : H.subgroupOf C = K.subgroupOf C :=
+    eq_of_card_eq_of_isCyclic (by rw [hcardH, hcardK, h])
+  rw [← Subgroup.map_subgroupOf_eq_of_le hHC, ← Subgroup.map_subgroupOf_eq_of_le hKC, hsub]
+
+/-- If `K` normalizes a cyclic subgroup `C` and `X ≤ C` is finite, then `K` normalizes `X`:
+subgroups of a cyclic group are determined by their order, so the order-preserving `C`-conjugation
+by elements of `K` fixes `X`. -/
+theorem le_normalizer_of_le_isCyclic_normalized [Finite G] {C X K : Subgroup G} [IsCyclic ↥C]
+    (hXC : X ≤ C) (hKC : K ≤ Subgroup.normalizer (C : Set G)) :
+    K ≤ Subgroup.normalizer (X : Set G) := by
+  intro m hm
+  -- `m` conjugates `C` to itself.
+  have hmC : MulAut.conj m • C = C := by
+    ext x
+    rw [Subgroup.mem_pointwise_smul_iff_inv_smul_mem,
+      show ((MulAut.conj m)⁻¹ • x : G) = m⁻¹ * x * m by
+        simp [MulAut.smul_def, ← map_inv, MulAut.conj_apply]]
+    exact ((Subgroup.mem_normalizer_iff''.mp (hKC hm)) x).symm
+  -- `conj m • X ≤ C` and has the same order, so equals `X`.
+  have hconjle : MulAut.conj m • X ≤ C :=
+    hmC ▸ (Subgroup.pointwise_smul_le_pointwise_smul_iff.mpr hXC)
+  have hcard : Nat.card ↥(MulAut.conj m • X) = Nat.card ↥X :=
+    (Nat.card_congr (Subgroup.equivSMul (MulAut.conj m) X).toEquiv).symm
+  have hXeq : MulAut.conj m • X = X := eq_of_le_isCyclic_of_card_eq hconjle hXC hcard
+  rw [Subgroup.mem_normalizer_iff'']
+  intro h
+  have hiff : h ∈ MulAut.conj m • X ↔ m⁻¹ * h * m ∈ X := by
+    rw [Subgroup.mem_pointwise_smul_iff_inv_smul_mem,
+      show ((MulAut.conj m)⁻¹ • h : G) = m⁻¹ * h * m by
+        simp [MulAut.smul_def, ← map_inv, MulAut.conj_apply]]
+  rwa [hXeq] at hiff
+
 /-- **Setup for BG Theorem 15.7(a)**: `¬FittingIsTI M` produces an element `g ∉ M` and a nontrivial
 intersection `F(M) ⊓ F(M)^g`.  Unfolding `¬IsTISubset (F(M)^#) (N_G(F(M)))`: there is `g ∉ N_G(F(M))`
 and `a ∈ F(M)^#` with `gag⁻¹ ∈ F(M)^#`; then `gag⁻¹ ∈ F(M) ⊓ (conj g • F(M))` is nontrivial, and
