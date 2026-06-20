@@ -817,6 +817,21 @@ theorem Hypothesis.muGrid_apply_one_within_column [Finite G]
   simp only [key]
 
 open OddOrder.Peterfalvi.S06 in
+/-- The `k`-th power of the row-`0` product source `ω(1, χ₂)` is the row-`0` source of the
+`k`-th power dual: `(omegaProdChar 1 χ₂)^k = omegaProdChar 1 (χ₂^k)` (on the §6 `toTICyclicHypothesis`).
+Row `0` is the trivial `W₁`-dual, fixed by powering, so only the `W₂`-factor `χ₂` is raised. -/
+theorem omegaProdChar_one_pow {L : Type*} [Group L] [Fintype L]
+    (h : OddOrder.Peterfalvi.S06.Hypothesis L)
+    (χ₂ : (h.W2.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ) (k : ℕ) :
+    (h.toTICyclicHypothesis.omegaProdChar 1 χ₂) ^ k
+      = h.toTICyclicHypothesis.omegaProdChar 1 (χ₂ ^ k) := by
+  rw [h.toTICyclicHypothesis.omegaProdChar_one_left,
+    h.toTICyclicHypothesis.omegaProdChar_one_left]
+  refine MonoidHom.ext fun w => ?_
+  rw [MonoidHom.pow_apply, MonoidHom.comp_apply, MonoidHom.comp_apply]
+  exact (MonoidHom.pow_apply χ₂ k _).symm
+
+open OddOrder.Peterfalvi.S06 in
 /-- **§6 cross-column degree constancy** (Peterfalvi (10.3) via (3.9.b) + (4.3.b)): the degree
 `μ_{0j}(1)` of the column-`0` certain-type character is unchanged when the `W₂`-dual `χ₂` indexing
 the column is replaced by a Galois power `χ₂ ^ k` (with `k` coprime to the order of the row-`0`
@@ -837,14 +852,7 @@ theorem columnFamily_mu_zero_apply_one_pow {L : Type*} [Group L] [Fintype L]
   obtain ⟨u, hu, -⟩ := h.toTICyclicHypothesis.exists_mapRingEquiv_sigma_omega_pow rfl
     h.toTICyclicFullDadeApplication (h.toTICyclicHypothesis.omegaProdChar 1 χ₂) hk
   -- the `k`-th power of the row-`0` source is the row-`0` source of column `χ₂ ^ k`
-  have hpow : (h.toTICyclicHypothesis.omegaProdChar 1 χ₂) ^ k
-      = h.toTICyclicHypothesis.omegaProdChar 1 (χ₂ ^ k) := by
-    rw [h.toTICyclicHypothesis.omegaProdChar_one_left,
-      h.toTICyclicHypothesis.omegaProdChar_one_left]
-    refine MonoidHom.ext fun w => ?_
-    simp only [MonoidHom.pow_apply, MonoidHom.comp_apply]
-    exact (MonoidHom.pow_apply χ₂ k _).symm
-  rw [hpow] at hu
+  rw [omegaProdChar_one_pow h χ₂ k] at hu
   -- (4.3.b) at row `0`, stated in `omega`/source form (`chiColumn ψ 0 = ω(omegaProdChar 1 ψ)`)
   have e43 : ∀ ψ : (h.W2.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ,
       h.toTICyclicHypothesis.sigma rfl h.toTICyclicFullDadeApplication
@@ -879,6 +887,52 @@ theorem columnFamily_mu_zero_apply_one_pow {L : Type*} [Group L] [Fintype L]
       rcases (h.columnFamily χ₂).sign_eq with hs' | hs' <;>
         simp only [hs, hs'] at habs <;> simpa using habs
   rw [hdd]
+
+open OddOrder.Peterfalvi.S06 in
+/-- **§6 cross-column degree constancy, prime-order form** (Peterfalvi (10.3)): when the `W₂`-dual
+group has prime order (`w₂` prime), every nontrivial column shares the common degree.  Any two
+nontrivial duals `χ₂`, `χ₂'` are powers of each other (the dual group is cyclic of prime order, so
+a nontrivial element generates), with the power coprime to `w₂`;
+`columnFamily_mu_zero_apply_one_pow` then equates the column-`0` degrees.  This is the full
+cross-column (j-independence) half of (10.3):
+all the columns `0 < j < w₂` have degree `d = μ_{0j}(1)` independent of `j`. -/
+theorem columnFamily_mu_zero_apply_one_eq_of_ne_one {L : Type*} [Group L] [Fintype L]
+    [Invertible (Nat.card L : ℂ)] (h : OddOrder.Peterfalvi.S06.Hypothesis L)
+    [NeZero (Nat.card h.W1)] [Fintype ↥(h.W1 ⊔ h.W2)]
+    [Invertible (Nat.card ↥(h.W1 ⊔ h.W2) : ℂ)]
+    (hp : (Nat.card ((h.W2.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ)).Prime)
+    {χ₂ χ₂' : (h.W2.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ} (hχ₂ : χ₂ ≠ 1) (hχ₂' : χ₂' ≠ 1) :
+    ((h.columnFamily χ₂').mu 0 : ClassFunction L ℂ) 1
+      = ((h.columnFamily χ₂).mu 0 : ClassFunction L ℂ) 1 := by
+  classical
+  -- a prime cardinality forces the dual group to be finite
+  haveI : Finite ((h.W2.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ) :=
+    (Nat.card_pos_iff.mp hp.pos).2
+  -- `orderOf χ₂ = |D|` (a nontrivial element of a prime-order group generates it)
+  have hord : orderOf χ₂ = Nat.card ((h.W2.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ) := by
+    rcases (hp.eq_one_or_self_of_dvd _ (orderOf_dvd_natCard χ₂)) with h1 | h1
+    · exact absurd (orderOf_eq_one_iff.mp h1) hχ₂
+    · exact h1
+  -- `χ₂'` is a power of `χ₂`
+  have hgen : χ₂' ∈ Submonoid.powers χ₂ := by
+    rw [mem_powers_iff_mem_zpowers]
+    have htop : Subgroup.zpowers χ₂ = ⊤ :=
+      Subgroup.eq_top_of_card_eq _ (by rw [Nat.card_zpowers, hord])
+    rw [htop]; exact Subgroup.mem_top _
+  obtain ⟨k, hk_eq⟩ := hgen
+  -- `k` is coprime to `orderOf χ₂ = |D| = p`
+  have hcop : k.Coprime (orderOf χ₂) := by
+    rw [hord, Nat.coprime_comm, hp.coprime_iff_not_dvd]
+    intro hdvd
+    rw [← hord] at hdvd
+    exact hχ₂' (hk_eq ▸ orderOf_dvd_iff_pow_eq_one.mp hdvd)
+  -- transfer coprimality to the order of the row-`0` source character
+  have hsdvd : orderOf (h.toTICyclicHypothesis.omegaProdChar 1 χ₂) ∣ orderOf χ₂ := by
+    apply orderOf_dvd_of_pow_eq_one
+    rw [omegaProdChar_one_pow h χ₂ (orderOf χ₂), pow_orderOf_eq_one χ₂]
+    exact h.toTICyclicHypothesis.omegaProdChar_one_one
+  rw [← hk_eq]
+  exact columnFamily_mu_zero_apply_one_pow h χ₂ (hcop.coprime_dvd_right hsdvd)
 
 /-- The character parameters obtained in Peterfalvi (10.2)--(10.3).
 

@@ -5,6 +5,30 @@
 > 上位文脈 = 記憶 [[ft-endgame-two-poles]] [[peterfalvi-s10-13-gated-on-bg-spine]]、
 > Lane H 視点の正本 = [`s10_13_maximal_structure.md`](s10_13_maximal_structure.md)。
 
+## ★ 2026-06-21 更新 — (10.3) degree theory 完全 materialize (axiom-clean) + column-0 faithfulness 修正
+
+§6 attack-order の (b)(c) ((10.3) degree 独立性) を**両半分とも axiom-clean で形式化完了**。frontier 前進:
+
+- **(b) within-column (i-independence) ✅** `Hypothesis.muGrid_apply_one_within_column` (S12, `69dc59fb`):
+  muGrid レベル、`columnFamily_difference_apply_one` 経由。muGrid unfold 技法確立 = `unfold Hypothesis.muGrid; simp only [key]`。
+- **(c) cross-column (j-independence) Galois ✅ axiom-clean** `columnFamily_mu_zero_apply_one_pow` (S12, `eec2a065`):
+  原文 (10.3) の核心。χ₂ → χ₂^k で degree 不変。(3.9.b) `exists_mapRingEquiv_sigma_omega_pow` + (4.3.b)
+  `sigma_chiColumn_eq_certainType` + 1 で評価 (u は ℤ 固定 `map_intCast`, degree>0/sign=±1 `Int.natAbs`)。
+  sdiff/toTIC σ は W 共有で omega/omegaProdChar defeq (`chiColumn_zero` bridge)。
+- **(c') prime-order form ✅ axiom-clean** `columnFamily_mu_zero_apply_one_eq_of_ne_one` (S12, `c122d857`):
+  |D| prime (=w₂) なら全非自明 column が共通 degree。prime card ⟹ `Finite D` (`Nat.card_pos_iff`)、非自明元が
+  生成 ⟹ χ₂'=χ₂^k、k coprime w₂、coprimality を source order に転送 (`orderOf(ω(1,χ₂)) ∣ orderOf χ₂`)。
+  helper `omegaProdChar_one_pow` ((ω(1,χ₂))^k=ω(1,χ₂^k)) 抽出。
+- **column-0 faithfulness 修正 ✅** `finCardEquivCharacterGroup` を 0↦trivial に pin (`3d170683`、`finCardEquivCharacterGroup_zero`)。
+  旧版は任意全単射で muGrid column-0 が trivial dual に固定されず → degree_independent (j≠0=非自明前提) が
+  unfaithful になりえた。Peterfalvi (4.4) 規約 (column 0 = trivial) に整合。
+
+**▶ 残 = muGrid-level cross-column wiring (gated)**: `muGrid 0 j 1 = muGrid 0 j' 1` (j,j'≠0) を上記 corollary に
+帰着するには (i) muGrid unfold + χ₂_j 非自明 (`finCardEquivCharacterGroup_zero`+injective+`finCongr 0=0`)、
+(ii) **Pontryagin card `|W₂sub →* ℂˣ| = w₂`** (`card_charGroup_subgroupOf` 系, S05_OmegaGrid:42 が言及)、
+(iii) **w₂ prime = `Hypothesis.w2_prime`** (gated cite on (8.8))。⟹ producer 構成時に gated で実施。
+corollary 自体は axiom-clean ゆえ、これは plumbing。**§10 keystone ((10.8)) + μ-grid full は依然 lane-f (8.8) 待ち**。
+
 ## 0. 現在地 (2026-06-20)
 
 - **(6.8) `sibleySetup_is_coherent` DONE** (§8 唯一 sorry 消滅、実 sorry 138)。
