@@ -920,6 +920,35 @@ theorem typePData_kappa_nonempty_of_rank1 [Finite G]
       exact Commute.zpow_left (hy (g : G) (Set.mem_singleton _)) n
     exact fun hbot => hCne (le_bot_iff.mp ((inf_le_inf_left _ hCle).trans hbot.le))
 
+/-- **Theorem A(8) `U = ⊥` core, from type `P₁`** (mmd L4274): for a type-`P₁` maximal subgroup,
+the Hall `(κ(M) ∪ σ(M))ᶜ`-complement `U` is trivial.  Type `P₁` means `κ(M) = π(M) ∖ σ(M)`
+(`IsTypeP1.2`), so `π(M) ⊆ κ(M) ∪ σ(M)` and the prime set `(κ(M) ∪ σ(M))ᶜ` meets `π(M)` only in
+`∅`; a Hall `(κ ∪ σ)ᶜ`-subgroup of `M` therefore has order coprime to `|M|`, i.e. trivial.
+
+This is the `U = ⊥` conjunct of Theorem A(8) (`theoremA_maximal_structure`), now **derivable from
+`Thm 15.2 (mf_ne_msigma_typeP1_structure)`** via `isTypeP1_of_mf_ne_msigma`: `M_F ≠ M_σ ⟹ IsTypeP1 ⟹
+U = ⊥`.  Together with `|K| = p` (also a Thm 15.2 output) this leaves only `FittingIsTI M` for the
+full A(8).  Stated for the relative `U.subgroupOf M` (which is what the Hall hypothesis constrains);
+when `U ≤ M` it gives `U = ⊥`. -/
+theorem isTypeP1_kappaSigma_compl_hall_subgroupOf_eq_bot [Finite G] {M U : Subgroup G}
+    (hP1 : S14.IsTypeP1 M)
+    (hU : Ch03.IsHallSubgroup ((S14.kappa M ∪ OddOrder.BG.Ch3.S10.sigma M)ᶜ) (U.subgroupOf M)) :
+    U.subgroupOf M = ⊥ := by
+  rw [← Subgroup.card_eq_one]
+  by_contra hne
+  obtain ⟨p, hpp, hpdvd⟩ := Nat.exists_prime_and_dvd hne
+  -- `p ∈ (κ ∪ σ)ᶜ` (Hall) and `p ∈ π(M)` (`|U.subgroupOf M| ∣ |M|`).
+  have hpcompl : p ∈ (S14.kappa M ∪ OddOrder.BG.Ch3.S10.sigma M)ᶜ :=
+    hU.1 p (Nat.mem_primeFactors.mpr ⟨hpp, hpdvd, Nat.card_pos.ne'⟩)
+  have hpM : p ∈ (Nat.card ↥M).primeFactors :=
+    Nat.mem_primeFactors.mpr ⟨hpp,
+      hpdvd.trans (Subgroup.card_subgroup_dvd_card (U.subgroupOf M)), Nat.card_pos.ne'⟩
+  -- but `π(M) ⊆ κ(M) ∪ σ(M)` for type `P₁`.
+  refine hpcompl ?_
+  by_cases hpσ : p ∈ OddOrder.BG.Ch3.S10.sigma M
+  · exact Set.mem_union_right _ hpσ
+  · exact Set.mem_union_left _ (hP1.2 ▸ ⟨hpM, hpσ⟩)
+
 /-! ## Proposition 16.1: BG local taxonomy and shared Type I--V predicates -/
 
 /-- **§14/§15-independent assembly engine for BG Proposition 16.1** (mmd L4478; the source proof
