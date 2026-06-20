@@ -23,11 +23,30 @@
   旧版は任意全単射で muGrid column-0 が trivial dual に固定されず → degree_independent (j≠0=非自明前提) が
   unfaithful になりえた。Peterfalvi (4.4) 規約 (column 0 = trivial) に整合。
 
-**▶ 残 = muGrid-level cross-column wiring (gated)**: `muGrid 0 j 1 = muGrid 0 j' 1` (j,j'≠0) を上記 corollary に
-帰着するには (i) muGrid unfold + χ₂_j 非自明 (`finCardEquivCharacterGroup_zero`+injective+`finCongr 0=0`)、
-(ii) **Pontryagin card `|W₂sub →* ℂˣ| = w₂`** (`card_charGroup_subgroupOf` 系, S05_OmegaGrid:42 が言及)、
-(iii) **w₂ prime = `Hypothesis.w2_prime`** (gated cite on (8.8))。⟹ producer 構成時に gated で実施。
-corollary 自体は axiom-clean ゆえ、これは plumbing。**§10 keystone ((10.8)) + μ-grid full は依然 lane-f (8.8) 待ち**。
+**✅ muGrid-level cross-column wiring DONE (2026-06-21 後続セッション)**: `Hypothesis.muGrid_apply_one_cross_column`
+(S12) — `muGrid 0 j 1 = muGrid 0 j' 1` (j,j'≠0)。実装:
+- (i) §6 corollary `columnFamily_mu_zero_apply_one_eq_of_ne_one` を within-column と同じ `key` 技法
+  (`unfold Hypothesis.muGrid; simp only [key]` で row index を 0 に剥がす) で muGrid に配線、最後に corollary を `exact`。
+- (ii) Pontryagin card: `h.card_charGroup_W2 : Nat.card (Ŵ₂) = Nat.card h.W2`、これを `subgroupOfEquivOfLe` で
+  `Nat.card (W2.subgroupOf (W1⊔W2)) = hcardW2sub` 経由 `hyp.w2` に繋ぐ。
+- (iii) **w₂ prime は仮説 `hw2 : (hyp.w2).Prime` として取る** (`Hypothesis.w2_prime` を cite **しない**)。
+  ⚠ **理由 = 循環依存回避**: `Hypothesis.w2_prime` → `theorem88_caseB_prime_orders` → `caseB_typeP_prime_W1`
+  (type-V branch) → **`no_typeV_maximal`** → `w2_prime_and_parameter_independence` (= **producer 自身**) →
+  (もし cross-column を cite すれば) → w2_prime。`TypeVData` は `TypePNontrivialCore` (prime W1) フィールドを
+  持たない (typeP/U_eq_bot/alternative のみ) ゆえ type-V を no_typeV で除外するしかなく循環は本物
+  (Peterfalvi が §10 で no-type-V と w₂-prime を相互証明する構造を反映)。∴ cross-column は hw2 を仮説化して自己完結。
+- nontriviality: `finCardEquivCharacterGroup` injective + `finCardEquivCharacterGroup_zero` (0↦trivial) + finCongr val。
+
+**✅ combined degree independence DONE**: `Hypothesis.muGrid_apply_one_eq`
+(`(hw2 : w2.Prime) → muGrid i j 1 = muGrid i' j' 1` for j,j'≠0) = within (i→0) ×2 + cross (j→j')。
+これが `CharacterParameters.degree_independent` の materialized 本体 (producer で d を命名して使う)。
+両者とも axiom footprint = muGrid と同一 (= upstream Prop 16.1 gate のみ、自前 sorry 0; within-column と同じ)。
+
+**▶ 残 = producer (`w2_prime_and_parameter_independence`/`exists_zeta_degree_w1`) = (8.8) gate 待ち (循環)**:
+producer は `CharacterParameters.w2_prime : hyp.w2.Prime` field を要求するが、これは上記循環で lane-b 単独では
+閉じない。`Hypothesis.w2_prime` (S12:1174) の sorry 源 = `exists_caseBData_with_w2` (faithful (8.8)↔M 義務) +
+`no_typeV_maximal` 経由の producer 循環。**∴ §10 keystone ((10.8)) + producer + (10.3) w₂ prime は lane-f (8.8)
+着地待ち**。(10.3) degree theory の lane-b 単独 honest 反映は cross-column 完成で**打ち止め (完了)**。
 
 ## 0. 現在地 (2026-06-20)
 

@@ -934,6 +934,87 @@ theorem columnFamily_mu_zero_apply_one_eq_of_ne_one {L : Type*} [Group L] [Finty
   rw [← hk_eq]
   exact columnFamily_mu_zero_apply_one_pow h χ₂ (hcop.coprime_dvd_right hsdvd)
 
+open scoped FiniteInduce in
+open OddOrder.Peterfalvi.S06 in
+/-- **§10 cross-column degree constancy** (Peterfalvi (10.3), the `j`-independence half at the
+materialized `μ`-grid level): the degree `μ_{0j}(1)` of the row-`0` materialized `μ`-grid is
+independent of the *nontrivial* column `0 < j < w₂`.
+
+This wires the §6 prime-order corollary `columnFamily_mu_zero_apply_one_eq_of_ne_one` through the
+`muGrid` materialization.  The required prime cardinality of the `W₂`-dual group is supplied by the
+Pontryagin count `|Ŵ₂| = |W₂| = w₂` (`card_charGroup_W2`) together with the hypothesis `hw2` that
+`w₂` is prime (Theorem (8.8), supplied at producer-construction time to avoid the
+`no_typeV_maximal` → parameter-producer dependency cycle); the two columns are nontrivial duals
+because the `Fin w₂`-reindex `finCardEquivCharacterGroup` is injective and sends only `0` to the
+trivial character.  Together with `muGrid_apply_one_within_column` this gives the full (10.3) degree
+independence `μ_{ij}(1) = d` for all `0 ≤ i < w₁`, `0 < j < w₂`. -/
+theorem Hypothesis.muGrid_apply_one_cross_column [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} (hyp : Hypothesis M)
+    (hodd : Odd (Nat.card G)) (hw2 : (hyp.w2).Prime) {j j' : Fin hyp.w2}
+    (hj : j ≠ 0) (hj' : j' ≠ 0) :
+    hyp.muGrid hG hodd 0 j 1 = hyp.muGrid hG hodd 0 j' 1 := by
+  haveI := hyp.finiteG
+  classical
+  -- Reconstruct the §6 host and the instances exactly as in `Hypothesis.muGrid`.
+  let h := (hyp.toCertainTypeHypothesis hG hodd).toHypothesis
+  haveI hNeZ1 : NeZero (Nat.card h.W1) := ⟨by have := h.one_lt_card_W1; omega⟩
+  haveI hcyc : IsCyclic ↥(h.W1 ⊔ h.W2) := h.isCyclic_sup
+  letI : CommGroup ↥(h.W1 ⊔ h.W2) := IsCyclic.commGroup
+  have hW1le : hyp.typeP.W1 ≤ M := hyp.typeP.W1_le
+  have hW2le : hyp.typeP.W2 ≤ M :=
+    (hyp.typeP.W2_le.trans inf_le_left).trans
+      (hyp.typeP.H_le.trans (Subgroup.map_subtype_le _))
+  have hcardW2sub : Nat.card ↥(h.W2.subgroupOf (h.W1 ⊔ h.W2)) = hyp.w2 := by
+    rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe (le_sup_right)).toEquiv]
+    exact Nat.card_congr (Subgroup.subgroupOfEquivOfLe hW2le).toEquiv
+  haveI hNeZ2 : NeZero (Nat.card ↥(h.W2.subgroupOf (h.W1 ⊔ h.W2))) := ⟨Nat.card_pos.ne'⟩
+  -- The `W₂`-dual group has prime cardinality `w₂` (Pontryagin count + (8.8)).
+  have hp : (Nat.card ((h.W2.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ)).Prime := by
+    rw [h.card_charGroup_W2,
+      ← (Nat.card_congr (Subgroup.subgroupOfEquivOfLe (le_sup_right : h.W2 ≤ h.W1 ⊔ h.W2)).toEquiv),
+      hcardW2sub]
+    exact hw2
+  -- A nontrivial column index gives a nontrivial `W₂`-dual.
+  have hcol_ne : ∀ (k : Fin hyp.w2), k ≠ 0 →
+      finCardEquivCharacterGroup (h.W2.subgroupOf (h.W1 ⊔ h.W2))
+        (finCongr hcardW2sub.symm k) ≠ 1 := by
+    intro k hk heq
+    rw [← finCardEquivCharacterGroup_zero (h.W2.subgroupOf (h.W1 ⊔ h.W2))] at heq
+    have hk0 : finCongr hcardW2sub.symm k = 0 := (finCardEquivCharacterGroup _).injective heq
+    apply hk
+    have hval : (k : ℕ) = 0 := by simpa using congrArg Fin.val hk0
+    exact Fin.ext hval
+  -- The within-column degree-constancy key (Peterfalvi (4.5.a)), as in
+  -- `muGrid_apply_one_within_column`, used here only to strip the row index to `0`.
+  have key : ∀ (h' : OddOrder.Peterfalvi.S06.Hypothesis (↥M)) [NeZero (Nat.card h'.W1)]
+      (χ : (h'.W2.subgroupOf (h'.W1 ⊔ h'.W2)) →* ℂˣ) (k : Fin (Nat.card h'.W1)),
+      ((h'.columnFamily χ).mu k : ClassFunction (↥M) ℂ) 1
+        = ((h'.columnFamily χ).mu 0 : ClassFunction (↥M) ℂ) 1 := by
+    intro h' _ χ k
+    have hd := h'.columnFamily_difference_apply_one χ k
+    simp only [SignedIrreducibleDifferenceFamily.difference_apply,
+      SignedIrreducibleDifferenceFamily.classFunction_apply, ClassFunction.sub_apply] at hd
+    exact sub_eq_zero.mp hd
+  unfold Hypothesis.muGrid
+  simp only [key]
+  exact (columnFamily_mu_zero_apply_one_eq_of_ne_one h hp (hcol_ne j hj) (hcol_ne j' hj')).symm
+
+/-- **§10 degree independence** (Peterfalvi (10.3), full statement at the materialized `μ`-grid
+level): for nontrivial columns (`0 < j, j' < w₂`) the common degree `μ_{ij}(1) = d` is independent
+of *both* the row `i` and the (nontrivial) column `j`.  This is the genuine (10.3) degree constancy,
+combining the within-column constancy `muGrid_apply_one_within_column` (the `i`-independence (4.5.a))
+with the cross-column constancy `muGrid_apply_one_cross_column` (the `j`-independence via Theorem
+(8.8) `w₂` prime + Pontryagin).  It is exactly what populates `CharacterParameters.degree_independent`
+once the common value `d` is named (at producer-construction time, where `hw2` is available). -/
+theorem Hypothesis.muGrid_apply_one_eq [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} (hyp : Hypothesis M)
+    (hodd : Odd (Nat.card G)) (hw2 : (hyp.w2).Prime) (i i' : Fin hyp.w1) {j j' : Fin hyp.w2}
+    (hj : j ≠ 0) (hj' : j' ≠ 0) :
+    hyp.muGrid hG hodd i j 1 = hyp.muGrid hG hodd i' j' 1 := by
+  rw [hyp.muGrid_apply_one_within_column hG hodd i j,
+    hyp.muGrid_apply_one_cross_column hG hodd hw2 hj hj',
+    ← hyp.muGrid_apply_one_within_column hG hodd i' j']
+
 /-- The character parameters obtained in Peterfalvi (10.2)--(10.3).
 
 The arithmetic fields are now de-opaqued to genuine identities: `degree_independent` is the
