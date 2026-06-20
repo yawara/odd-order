@@ -268,6 +268,37 @@ theorem theoremA_maximal_structure [Finite G] (hG : OddOrder.BG.IsMinimalSimpleO
         U = ⊥ ∧ S15.FittingIsTI M ∧ ∃ p : ℕ, p.Prime ∧ Nat.card ↥K = p) := by
   sorry
 
+/-- **BG Theorem A(3) decomposition** (mmd L4276): `M = K U M_σ`.  For a maximal `M` with Hall
+`κ`-subgroup `K ≤ M` and Hall `(κ ∪ σ)'`-subgroup `U ≤ M`, the three factors join to all of `M`.
+
+Type-F (`K = ⊥`): `M = U M_σ` from the `K = ⊥` `SubgroupESetup` (`E_compl_sup`).  Type-P (`K ≠ ⊥`):
+`M' = U M_σ` and `M'` complements `K` in `M` (`typeP_auxiliary_structure`, Lemma 15.1(b)/Theorem
+14.7(h)), so `M = M' K = (U M_σ) K`; the complement's `H ⊔ K = ⊤` is pushed from `M` to `G` via
+`Subgroup.map M.subtype`.  This is the `sorry`-free standalone form of conjunct 3 of
+`theoremA_maximal_structure`. -/
+theorem typeP_maximal_eq_kappaHall_sup_U_sup_Msigma [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M K U : Subgroup G} (hM : M ∈ maximalSubgroups G)
+    (hKM : K ≤ M) (hUM : U ≤ M) (hK : Ch03.IsHallSubgroup (S14.kappa M) (K.subgroupOf M))
+    (hU : Ch03.IsHallSubgroup ((S14.kappa M ∪ OddOrder.BG.Ch3.S10.sigma M)ᶜ) (U.subgroupOf M)) :
+    M = K ⊔ U ⊔ OddOrder.BG.Ch3.S10.Msigma M := by
+  by_cases hKbot : K = ⊥
+  · -- Type-F: `M = U M_σ`.
+    obtain ⟨_E₁, _E₂, _E₃, hsetup⟩ :=
+      subgroupESetup_of_isHall_kappa_eq_bot hG hM hKM hUM hK hKbot hU
+    rw [hKbot, bot_sup_eq, sup_comm]
+    exact hsetup.E_compl_sup.symm
+  · -- Type-P: `M = M' K`, `M' = U M_σ`.
+    have haux := typeP_auxiliary_structure hG hM hKM hUM hK rfl hU
+    obtain ⟨hM'eq, _, hcompl, _⟩ := haux.2.2.2.2.1 hKbot
+    have hMle : derivedInG M ≤ M := Subgroup.map_subtype_le _
+    have hMM' : derivedInG M ⊔ K = M := by
+      have htop : (derivedInG M ⊔ K).subgroupOf M = ⊤ := by
+        rw [Subgroup.subgroupOf_sup hMle hKM]; exact hcompl.sup_eq_top
+      exact le_antisymm (sup_le hMle hKM) (Subgroup.subgroupOf_eq_top.mp htop)
+    -- `M = M' K = (U M_σ) K = K U M_σ` (a pure `⊔`-AC rewrite, no lattice `whnf`).
+    conv_lhs => rw [← hMM']
+    rw [hM'eq, sup_comm (U ⊔ OddOrder.BG.Ch3.S10.Msigma M) K, ← sup_assoc]
+
 /-- **BG Theorem A — the ungated conjuncts** (mmd L4274), as a standalone `sorry`-free lemma.
 
 Bundles the conjuncts of `theoremA_maximal_structure` whose upstreams are all proved transitively

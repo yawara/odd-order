@@ -61,11 +61,19 @@ Mσ≤M' / M'=U⊔Mσ structure。A(8) は `theoremA8_structure` (issue 8016, ax
       faithfulness precedent (hKM/hUM 明示) に倣う。**標準 (buggy) monolith に触れず新 faithful 版
       `theoremA_maximal_structure_faithful` (hKM/hUM 明示, 全 conjunct sorry-free) を別建てし、後で
       callers を移行**するのが安全。
-- [ ] **faithful monolith assembly** (新版): conjunct 1 (`Msigma_isHall`)/2 (cyclic K,
-      `typeP_auxiliary_structure`)/3 (`M=K⊔U⊔Msigma`, S16:1561 で導出例あり要確認)/4-5 (上記新補題)/
-      6 (`theoremA_ungated_conjuncts`)/7 (上記新補題)/8-9 (`theoremA_ungated_conjuncts`)/
-      10 (`M''≤F(M)` ← `derivedInG M ≤ fittingInAmbient M` S15:449 + M''≤M')/11 (A(8) `theoremA8_structure`)
-      を cite して組む。残調査 = conjunct 3 の type-F (K=⊥) 枝。
+- [x] **conjunct 3 (`M = K U M_σ`) standalone** ✅ `typeP_maximal_eq_kappaHall_sup_U_sup_Msigma`
+      (S16, sorry-free + axiom-clean): type-F via `subgroupESetup_of_isHall_kappa_eq_bot.E_compl_sup`,
+      type-P via `typeP_auxiliary_structure` complement (`M'=U M_σ`, `M'` complements `K`) pushed
+      `M→G` (`subgroupOf_sup`/`subgroupOf_eq_top`)。⚠ Lean tip: `Msigma M`/`derivedInG M` を含む
+      lattice `≤` は `le_antisymm`/`sup_le` で whnf 爆発 → 明示引数 `conv_lhs`/`rw [sup_comm …, ← sup_assoc]`
+      の純 AC 書換えで回避。`rw [← hMM']` は `Msigma M` 内の `M` まで書換える → `conv_lhs` で LHS 限定。
+- [x] **extended `theoremA_ungated_conjuncts`** ✅: 4→8 conjunct (A(2) cyclic K / A(3) M≤N(UMσ) /
+      A(4) C_U(k)=⊥ / A(5)-element C_M(k)=K⊔Kstar 追加、hUM 追加)。
+- [ ] **残 = faithful monolith の組立** (新版 `theoremA_maximal_structure_faithful`): conjunct 1-9 は全て
+      sorry-free standalone で揃った (上記 + `theoremA8_structure` の A(8))。**唯一の gate = A(7) `M''≤F(M)`**
+      = `derivedDerived_le_fittingInAmbient_of_inputs` (S15:6340, **type-P1 chief-factor 入力 Q/Q0/D に
+      gated**, type-P1 構造論待ち)。A(7) が landing したら 11-conjunct faithful monolith を組める。
+      buggy 標準 monolith (hKM/hUM 欠) は Peterfalvi S12:503 cite ゆえ触らない (cross-lane)。
 
 ## 完了条件
 

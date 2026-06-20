@@ -5240,6 +5240,14 @@ Axiom-clean. -/
 
 #assert_only_allowed_axioms OddOrder.BG.Ch4.S16.typeP_hall_inf_centralizer_kappaElement_eq_bot
 
+/-! **BG Theorem A(3) decomposition** (`S16_MainResults`, `typeP_maximal_eq_kappaHall_sup_U_sup_Msigma`):
+`M = K U M_σ` for a maximal `M` with Hall `κ`-subgroup `K ≤ M` and Hall `(κ∪σ)'`-subgroup `U ≤ M`.
+Type-F via the `K = ⊥` `SubgroupESetup`; type-P via the `M' = U M_σ`/`M'`-complements-`K` structure
+(`typeP_auxiliary_structure`), pushed from `M` to `G` by `subgroupOf_sup`/`subgroupOf_eq_top`.
+Standalone `sorry`-free form of conjunct 3 of `theoremA_maximal_structure`.  Axiom-clean. -/
+
+#assert_only_allowed_axioms OddOrder.BG.Ch4.S16.typeP_maximal_eq_kappaHall_sup_U_sup_Msigma
+
 /-! **BG Proposition 16.1 — type-`P` data construction layer** (`S16_MainResults`): the shared
 `TypePData` core and the type II/III/IV/V "last-mile" bridges feeding
 `proposition_type_classification`'s forward bridges.
