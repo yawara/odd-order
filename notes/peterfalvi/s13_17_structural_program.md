@@ -409,6 +409,19 @@ IsSolvable Q は派生 (Q=T_F≤T<⊤)。full build 3844 green、実 sorry 137�
 
 **⟹ (13.17.c) は完全 assembly 化。残り = 3 named §13 helper の証明**(順序論が最深、E∩Q=W₁ gate)。
 
+### ✅ existence 実 assembly + `IsFrobeniusGroup.conjComplement` (2026-06-20⁹ cont., commit `7f8ee0da`)
+
+reusable Ch06 補題 **`IsFrobeniusGroup.conjComplement`** (OddComplement.lean, sorry-free, axiom-clean):
+Frobenius 補元の共役 A^g も Frobenius 補元 (正規核 N 固定)。これを使い **`exists_typeIFrobeniusData_W1_le`
+を実 assembly 化** (本体 sorry-free): typeI_frobenius → W₁≤N_G(U)≤L → coprimality → Schur-Zassenhaus
+補元共役 → conjComplement で frob₁ 構成。consumer に hNUL 配線。唯一 gap = `q_not_dvd_kernel` (q∤|kernel|)
+を isolate。これは **opaque `kernel_eq_MF` carrier** (frob.kernel = maxNilpotentNormalHall L の同定が
+Prop field) に gate ⟹ carrier honesty 待ち。
+
+**⟹ (13.17.c) + existence 両方 実 assembly 化完了。残 gap = 3 named faithful §13 helper、全て深い §13
+構造/carrier opacity に gate**: `complement_card_eq_pq` (E∩Q=W₁) / `Q_W2_structure` (W₂≤T+p≠q) /
+`q_not_dvd_kernel` (opaque kernel_eq_MF)。
+
 ### ⛔ 旧 order 論メモ = §13 構造 gate と確定 (要追加形式化)
 
 (13.17.c) の残り「|E|∈{q,pq} + ∃y∈Q W₂^y≤E」の crux = **E の q-Sylow が exactly W₁ (位数 q)**。
