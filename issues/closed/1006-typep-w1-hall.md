@@ -66,3 +66,19 @@ Nat.Coprime (Nat.card ↥(derivedInG M)) (Nat.card ↥data.W1)` でパラメー�
   prime-set disjointness (`kappa_subset_sigmaCompl`) で coprimality が出る可能性 — 要 lane-f 構造抽出。
 
 **∴ issue 1006 は lane-f BG §14 待ち** (cross-lane gate)。lane-b 単独では closeable でない。
+
+## 2026-06-20 RESOLVED — discharged by citing the sorried BG lemmas
+
+⚠ 上の「lane-f 待ちで closeable でない」は **方針誤り** (ユーザー指摘: signature が正しければ sorry
+を含む lemma を cite してよい)。`theorem88`/`theoremA` 等は **statement が正しい**ので、proof が
+現状 sorry でも cite して下流を honest に証明できる。
+
+`typePData_W1_hall_coprime` (`S12_MaximalIII_IV_V.lean`) で `Coprime |M'| |W₁|` を実証明:
+κ-Hall K 取得 (`exists_isHallSubgroup_kappa_ge`) → cyclicity を **`theoremA_maximal_structure`
+(BG Thm A, 現 sorry) を cite** → `typeP_derivedInG_isComplement_kappaHall` で complement →
+`coprime_index` + `card_kappaHall_eq_derived_index` = `card_W1_eq_derived_index`。BG type-P は
+`Hypothesis.bgTypeP` (Prop 16.1 `proposition_type_classification` を cite) で §10 type III/IV/V から導出。
+
+⟹ §10→§6 bridge `Hypothesis.toCertainTypeHypothesis` を **unconditional 化** (hHall param 廃止)。
+#print axioms = sorryAx (cited theoremA/Prop16.1 由来) で、lane-f がそれらを証明すれば自動 axiom-clean。
+**CLOSED**。
