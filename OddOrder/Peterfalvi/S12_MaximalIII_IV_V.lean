@@ -814,8 +814,6 @@ structure CharacterParameters {M : Subgroup G} (hyp : Hypothesis M) where
   /-- (10.3) `δ = δ_j` is independent of `j` (placeholder pending the `δ_j` family field). -/
   delta_independent : Prop
   delta_independent_holds : delta_independent
-  alpha_tau_formula : Prop
-  mu_tau1_formula : Prop
   zeta_tau1_norm_bound : Prop
   orthogonality_w1_lt_w2 : Prop
   typeV_parameter_formula : Prop
@@ -860,7 +858,11 @@ theorem alpha_support_and_image [Finite G] [Fintype G]
     [Invertible (Nat.card ↥M : ℂ)] [Invertible (Nat.card G : ℂ)]
     {hyp : Hypothesis M} {params : CharacterParameters hyp}
     (coh : CoherentHypothesis hyp params) :
-    (∀ i j, (params.alpha i j).support ⊆ hyp.A0) ∧ params.alpha_tau_formula := by
+    (∀ i j, (params.alpha i j).support ⊆ hyp.A0) ∧
+      (∀ (i : Fin hyp.w1) (j : Fin hyp.w2), j ≠ 0 →
+        hyp.tau (params.alpha i j) =
+          (params.delta : ℂ) • (params.omegaSigma i j - params.omegaSigma i 0)
+            - (params.n : ℂ) • coh.tau1 params.zeta) := by
   sorry
 
 /-- **Peterfalvi (10.6)**: the sums of `omega_ij^sigma` describe the `tau1`
@@ -871,7 +873,10 @@ theorem tau1_values_and_norm_bound [Finite G] [Fintype G]
     [Invertible (Nat.card ↥M : ℂ)] [Invertible (Nat.card G : ℂ)]
     {hyp : Hypothesis M} {params : CharacterParameters hyp}
     (coh : CoherentHypothesis hyp params) :
-    params.mu_tau1_formula ∧ params.zeta_tau1_norm_bound := by
+    (∀ (j : Fin hyp.w2), j ≠ 0 →
+        coh.tau1 (∑ i : Fin hyp.w1, params.mu i j) =
+          (params.delta : ℂ) • ∑ i : Fin hyp.w1, params.omegaSigma i j) ∧
+      params.zeta_tau1_norm_bound := by
   sorry
 
 /-! ## (10.7)--(10.8): Type II derived Frobenius and non-coherence -/
