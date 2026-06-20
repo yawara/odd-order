@@ -712,11 +712,25 @@ theorem exists_zeta_in_inducedFamily_degree_w1 [Finite G] {M : Subgroup G}
 algebraically closed it has enough roots of unity, so `C ≃* (C →* ℂˣ)`
 (`CommGroup.monoidHom_mulEquiv_of_hasEnoughRootsOfUnity`); composing with `C ≃ Fin |C|` reindexes
 the character group by `Fin |C|`.  This is what lets the §6 `columnFamily` (indexed by `W₂`-duals)
-populate the `Fin w₂`-indexed `μ`-grid of `CharacterParameters`. -/
-noncomputable def finCardEquivCharacterGroup (C : Type*) [CommGroup C] [Finite C] :
-    Fin (Nat.card C) ≃ (C →* ℂˣ) :=
-  (Finite.equivFin C).symm.trans
-    (CommGroup.monoidHom_mulEquiv_of_hasEnoughRootsOfUnity C ℂ).some.toEquiv.symm
+populate the `Fin w₂`-indexed `μ`-grid of `CharacterParameters`.
+
+The bijection is normalized to send `0` to the trivial character `1`
+(`finCardEquivCharacterGroup_zero`, by composing with the transposition `(0 ↔ e⁻¹ 1)`), matching
+Peterfalvi's convention that column `0` is the trivial column (`δ_0 = 1`, `μ_{00} = 1`, by (4.4))
+and `0 < j < w₂` are the nontrivial columns of common degree `d` (10.3). -/
+noncomputable def finCardEquivCharacterGroup (C : Type*) [CommGroup C] [Finite C]
+    [NeZero (Nat.card C)] : Fin (Nat.card C) ≃ (C →* ℂˣ) :=
+  let e : Fin (Nat.card C) ≃ (C →* ℂˣ) :=
+    (Finite.equivFin C).symm.trans
+      (CommGroup.monoidHom_mulEquiv_of_hasEnoughRootsOfUnity C ℂ).some.toEquiv.symm
+  (Equiv.swap (0 : Fin (Nat.card C)) (e.symm 1)).trans e
+
+/-- The normalized Pontryagin reindex sends `0` to the trivial character (Peterfalvi's column-`0`
+convention). -/
+theorem finCardEquivCharacterGroup_zero (C : Type*) [CommGroup C] [Finite C]
+    [NeZero (Nat.card C)] : finCardEquivCharacterGroup C 0 = 1 := by
+  simp only [finCardEquivCharacterGroup, Equiv.trans_apply, Equiv.swap_apply_left,
+    Equiv.apply_symm_apply]
 
 instance instNeZeroW1 {M : Subgroup G} (hyp : Hypothesis M) : NeZero hyp.w1 := by
   haveI := hyp.finiteG
@@ -752,6 +766,7 @@ noncomputable def Hypothesis.muGrid [Finite G] (hG : OddOrder.BG.IsMinimalSimple
   have hcardW2sub : Nat.card ↥(h.W2.subgroupOf (h.W1 ⊔ h.W2)) = hyp.w2 := by
     rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe (le_sup_right)).toEquiv]
     exact Nat.card_congr (Subgroup.subgroupOfEquivOfLe hW2le).toEquiv
+  haveI : NeZero (Nat.card ↥(h.W2.subgroupOf (h.W1 ⊔ h.W2))) := ⟨Nat.card_pos.ne'⟩
   let χ₂ : (h.W2.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ :=
     finCardEquivCharacterGroup _ (finCongr hcardW2sub.symm j)
   exact ((h.columnFamily χ₂).mu (finCongr hcardW1.symm i) : ClassFunction ↥M ℂ)
