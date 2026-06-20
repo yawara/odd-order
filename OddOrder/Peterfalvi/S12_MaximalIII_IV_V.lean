@@ -706,11 +706,20 @@ theorem exists_zeta_in_inducedFamily_degree_w1 [Finite G] {M : Subgroup G}
 
 /-! ## (10.2)--(10.4): basic character parameters and coherent extension -/
 
+instance instNeZeroW1 {M : Subgroup G} (hyp : Hypothesis M) : NeZero hyp.w1 := by
+  haveI := hyp.finiteG
+  exact ⟨Nat.card_pos.ne'⟩
+
+instance instNeZeroW2 {M : Subgroup G} (hyp : Hypothesis M) : NeZero hyp.w2 := by
+  haveI := hyp.finiteG
+  exact ⟨Nat.card_pos.ne'⟩
+
 /-- The character parameters obtained in Peterfalvi (10.2)--(10.3).
 
-The fields `degree_independent`, `delta_independent`, and `n_formula` name the
-arithmetic conclusions whose detailed proofs come from (4.5.a) and the
-automorphism calculation around (3.9). -/
+The arithmetic fields are now de-opaqued to genuine identities: `degree_independent` is the
+degree constancy `μ_{ij}(1) = d` (4.5.a), `n_formula` is `n·w₁ = d − δ`, and `alpha` is the
+genuine virtual character `μ_{ij} − δ·μ_{i0} − n·ζ` (10.5).  `delta_independent` remains a
+placeholder pending the `δ_j` family field. -/
 structure CharacterParameters {M : Subgroup G} (hyp : Hypothesis M) where
   zeta : ClassFunction ↥M ℂ
   zeta_mem_S : zeta ∈ hyp.Sset
@@ -723,17 +732,24 @@ structure CharacterParameters {M : Subgroup G} (hyp : Hypothesis M) where
   n : ℕ
   w2_prime : hyp.w2.Prime
   d_gt_one : 1 < d
-  degree_independent : Prop
-  degree_independent_holds : degree_independent
-  delta_independent : Prop
-  delta_independent_holds : delta_independent
-  n_formula : Prop
-  n_formula_holds : n_formula
   mu : Fin hyp.w1 → Fin hyp.w2 → ClassFunction ↥M ℂ
   omegaSigma : Fin hyp.w1 → Fin hyp.w2 → ClassFunction G ℂ
-  alpha : Fin hyp.w1 → Fin hyp.w2 → ClassFunction ↥M ℂ
-  alpha_formula : Prop
-  alpha_formula_holds : alpha_formula
+  /-- (10.3) degree independence (4.5.a): `d = μ_{ij}(1)` is independent of the indices, for
+  `0 ≤ i < w₁` and `0 < j < w₂`.  De-opaqued from a placeholder `Prop` to the genuine degree
+  identity. -/
+  degree_independent : ∀ (i : Fin hyp.w1) (j : Fin hyp.w2), j ≠ 0 → mu i j 1 = (d : ℂ)
+  /-- (10.3) the index relation `n = (d − δ)/w₁ ∈ ℕ`, in the cleared form `n·w₁ = d − δ`.
+  De-opaqued from a placeholder `Prop`. -/
+  n_formula : (n : ℤ) * (hyp.w1 : ℤ) = (d : ℤ) - delta
+  /-- (10.5): `α_{ij} = μ_{ij} − δ·μ_{i0} − n·ζ`.  De-opaqued from a free field + placeholder
+  formula to the genuine definition in terms of the `μ`-grid, `δ`, `n` and `ζ`. -/
+  alpha : Fin hyp.w1 → Fin hyp.w2 → ClassFunction ↥M ℂ :=
+    fun i j => mu i j - (delta : ℂ) • mu i 0 - (n : ℂ) • zeta
+  alpha_def : ∀ i j, alpha i j = mu i j - (delta : ℂ) • mu i 0 - (n : ℂ) • zeta := by
+    intro i j; rfl
+  /-- (10.3) `δ = δ_j` is independent of `j` (placeholder pending the `δ_j` family field). -/
+  delta_independent : Prop
+  delta_independent_holds : delta_independent
   alpha_tau_formula : Prop
   mu_tau1_formula : Prop
   zeta_tau1_norm_bound : Prop
@@ -765,8 +781,10 @@ theorem exists_zeta_degree_w1 [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
 theorem w2_prime_and_parameter_independence [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} (hyp : Hypothesis M) :
     ∃ params : CharacterParameters hyp,
-      hyp.w2.Prime ∧ 1 < params.d ∧ params.degree_independent ∧
-        params.delta_independent ∧ params.n_formula := by
+      hyp.w2.Prime ∧ 1 < params.d ∧
+        (∀ (i : Fin hyp.w1) (j : Fin hyp.w2), j ≠ 0 → params.mu i j 1 = (params.d : ℂ)) ∧
+        params.delta_independent ∧
+        ((params.n : ℤ) * (hyp.w1 : ℤ) = (params.d : ℤ) - params.delta) := by
   sorry
 
 /-! ## (10.5)--(10.6): Dade-isometry calculations -/
