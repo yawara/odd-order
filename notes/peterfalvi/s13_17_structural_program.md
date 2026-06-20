@@ -446,19 +446,23 @@ W₁ 含む complement 存在補題も要)。
 
 署名不変ゆえ consumer `typeI_overNormalizer_complement` 無破壊。full build 3871 jobs green + AxiomsCheck。
 
-### ⛔ 残 §13.17 helper 2 本 = genuine §13 gate と確定 (fabricate せず)
+### §13.17 helper 3 本中 2 本 honest 化 (2026-06-20¹⁰)、残 1 本 = genuine §13 gate
 
-`Q_W2_structure` 完了で (13.17.c) ∃y 部分の gate は `card_Q_eq` 1 本に集約。残る 2 helper を精査し、
-**lane-h が honest に塞げないことを確定** (CLAUDE.md「進捗の測り方」+「難所を回避しない」に従い検証):
+`Q_W2_structure` + `q_not_dvd_kernel` 完了で 3 本中 2 本が実証明化。各 helper を精査し、塞げる 2 本を
+landing・残 1 本が **lane-h で honest に塞げないことを確定** (CLAUDE.md「進捗の測り方」+「難所を回避しない」):
 
-- **`complement_card_eq_pq`** (|E|=pq): `complement_le_QW2` (E⊆QW₂、proven) + `W₁≤E` まではあるが、
-  `|E|=pq` には **`E ∩ Q = W₁`** (E の q-Sylow が exactly W₁) が必須。検算: E⊆QW₂ の q-元は Q 内
-  (QW₂/Q≅W₂ 位数 p) ⟹ E の q-Sylow = E∩Q ⊇ W₁、しかし E∩Q が cyclic q-群で位数 q に pin するには
-  §13 構造 ([L:L_F]=pq) が要る。repo 不在。`E=W₁` 除外も (13.19)/(13.2.a) gate。**深い §13 構造**。
-- **`q_not_dvd_kernel`** (q∤|L_F|): statement が **L~T 非共役の仮説を欠き、一般には偽** — L が T 共役なら
-  `tConjugate_fitting_data` で |L_F|=q^p ⟹ q∣|L_F|。honest 化には (L maximal, type-I, ¬conj S/T) を
-  追加して `card_LF_coprime_pq` (B2, F) を cite する必要があり、carrier opacity `kernel_eq_MF` も絡む。
-  **carrier honesty + F-ask**。
+- **`q_not_dvd_kernel`** (q∤|L_F|): ✅ **DONE (commit `1c673bbb`)** — 当初「carrier opacity + 偽 statement で
+  gated」と診断したが、診断した path がそのまま honest 解になった: (1) carrier opacity は誤り
+  (`frob.typeI.typeF.H_eq` が TypeFData 直接フィールド)、(2) statement を `hLmax`/`hLI` で強化すると
+  `not_conj_of_isTypeI_of_isTypeNonI` で S,T 非共役が導出可 → `card_LF_coprime_pq` (B2, F, cite 可) に帰着。
+  consumer `exists_typeIFrobeniusData_W1_le` は hLmax/hLtypeI 既持で無破壊。唯一 gate = `card_LF_coprime_pq`。
+- **`complement_card_eq_pq`** (|E|=pq): ⛔ **残・genuine 深 §13 gate**。`complement_le_QW2` (E⊆QW₂、proven) +
+  `W₁≤E` まではあるが、`|E|=pq` には **`E ∩ Q = W₁`** (E の q-Sylow が exactly W₁) が必須。検算: E⊆QW₂ の
+  q-元は Q 内 (QW₂/Q≅W₂ 位数 p) ⟹ E の q-Sylow = E∩Q ⊇ W₁、しかし E∩Q が cyclic q-群で位数 q に pin
+  するには §13 構造 ([L:L_F]=pq) が要る。`TypeIFrobeniusData` に complement-order フィールド無し ＝ 既存
+  §13 residual に非帰着 = **新規の深い §13 構造**。`E=W₁` 除外も (13.19)/(13.2.a) gate。index 論証
+  (~100 行) で「E∩Q=W₁ ∧ E⊄Q ⟹ |E|=pq」は honest 化可だが残 residual E∩Q=W₁ は依然 gated かつ downstream
+  `exists_LHypothesis` は既に carrier 経由 sorry-free ゆえ unblock 効果なし → 着手判断は要ユーザー/hub。
 
 さらに上流 **`card_Q_eq` 自体が §13 maximal-structure machinery 全体に gate**: S-side 対応物
 `basic_structure` (`P_order: |P|=p^q`) も `S15_SAndT:245 := sorry`。両 Fitting order とも Pf §13.2 の
