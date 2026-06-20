@@ -869,6 +869,118 @@ theorem typePData_W1_prime_not_mem_sigma [Finite G]
   rw [hLbot, Subgroup.card_bot] at hLcard
   exact (Fact.out : p.Prime).ne_one hLcard.symm
 
+/-- **Prop 16.1 reverse, `M_P` from `TypePData` modulo the rank-one input** (mmd L4478,
+`π(W₁) ⊆ κ(M) ⟹ κ(M) ≠ ∅`): a type-`P` datum whose `W₁`-primes all have `M`-rank one has
+`κ(M) ≠ ∅`, hence `M` is `S14.IsTypeP`.  This is the gated-endpoint assembly of the three `κ`-bridge
+ingredients for a prime `p ∣ |W₁|`: `p ∉ σ(M)` (`typePData_W1_prime_not_mem_sigma`) and `r_p(M) = 1`
+(the hypothesis `hrank`) put `p ∈ τ₁(M) ∪ τ₃(M)`, while `⟨g⟩` (`g ∈ W₁` of order `p`) is a rank-one
+elementary abelian subgroup with `M_σ ⊓ C(⟨g⟩) ⊇ M_σ ⊓ C(g) ≠ ⊥`
+(`typePData_msigma_inf_centralizer_W1_ne_bot`).  So `p ∈ κ(M)`.
+
+The only residual hypothesis `hrank` is the carrier-gated half (the `W₁ = κ`-Hall fact forces
+`r_p(M) = 1`; cf. issue 8015).  Supplies the `→ M_P` direction of the reverse classifications
+`hIIP2`/`hIIIIVP1`/`hVP1` of `proposition_type_classification_of_inputs`. -/
+theorem typePData_kappa_nonempty_of_rank1 [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} (hM : M ∈ maximalSubgroups G)
+    (data : TypePData M)
+    (hrank : ∀ p ∈ (Nat.card ↥data.W1).primeFactors, pRank ↥M p = 1) :
+    (S14.kappa M).Nonempty := by
+  classical
+  -- A prime `p ∣ |W₁|` (`W₁ ≠ ⊥`).
+  have hW1card : Nat.card ↥data.W1 ≠ 1 := fun h => data.W1_nontrivial (Subgroup.card_eq_one.mp h)
+  obtain ⟨p, hpp, hpdvd⟩ := Nat.exists_prime_and_dvd hW1card
+  have hp : p ∈ (Nat.card ↥data.W1).primeFactors :=
+    Nat.mem_primeFactors.mpr ⟨hpp, hpdvd, Nat.card_pos.ne'⟩
+  haveI : Fact p.Prime := ⟨hpp⟩
+  -- An order-`p` element `g ∈ W₁` and the rank-one subgroup `P = ⟨g⟩`.
+  obtain ⟨g, hg⟩ := exists_prime_orderOf_dvd_card' (G := ↥data.W1) p hpdvd
+  have hgord : orderOf ((g : G)) = p :=
+    (orderOf_injective data.W1.subtype data.W1.subtype_injective g).trans hg
+  have hgne : (g : G) ≠ 1 := fun hc => by
+    rw [hc, orderOf_one] at hgord; exact hpp.ne_one hgord.symm
+  have hPcard : Nat.card ↥(Subgroup.zpowers (g : G)) = p := by rw [Nat.card_zpowers, hgord]
+  refine ⟨p, hpp, ?_, Subgroup.zpowers (g : G),
+    ⟨Subgroup.IsElementaryAbelian.of_card_prime hPcard, by rw [hPcard, pow_one]⟩,
+    (Subgroup.zpowers_le.mpr g.2).trans data.W1_le, ?_⟩
+  · -- `p ∈ τ₁(M) ∪ τ₃(M)` from `p ∉ σ(M)` and `r_p(M) = 1`.
+    have hpσ : p ∉ OddOrder.BG.Ch3.S10.sigma M := typePData_W1_prime_not_mem_sigma hG hM data hp
+    have hr : pRank ↥M p = 1 := hrank p hp
+    by_cases hM' : p ∈ (Nat.card ↥(derivedInG M)).primeFactors
+    · exact Or.inr ((mem_tau3_iff M p).mpr ⟨hpσ, hM', hr⟩)
+    · exact Or.inl ((mem_tau1_iff M p).mpr ⟨hpσ, hM', hr⟩)
+  · -- `M_σ ⊓ C(⟨g⟩) ⊇ M_σ ⊓ C(g) ≠ ⊥`.
+    have hCne : OddOrder.BG.Ch3.S10.Msigma M ⊓ Subgroup.centralizer ({(g : G)} : Set G) ≠ ⊥ :=
+      typePData_msigma_inf_centralizer_W1_ne_bot hG hM data g.2 hgne
+    have hCle : Subgroup.centralizer ({(g : G)} : Set G) ≤
+        Subgroup.centralizer ((Subgroup.zpowers (g : G) : Subgroup G) : Set G) := by
+      intro y hy
+      rw [Subgroup.mem_centralizer_iff] at hy ⊢
+      intro z hz
+      obtain ⟨n, rfl⟩ := Subgroup.mem_zpowers_iff.mp hz
+      exact Commute.zpow_left (hy (g : G) (Set.mem_singleton _)) n
+    exact fun hbot => hCne (le_bot_iff.mp ((inf_le_inf_left _ hCle).trans hbot.le))
+
+/-- **Theorem A(8) `U = ⊥` core, from type `P₁`** (mmd L4274): for a type-`P₁` maximal subgroup,
+the Hall `(κ(M) ∪ σ(M))ᶜ`-complement `U` is trivial.  Type `P₁` means `κ(M) = π(M) ∖ σ(M)`
+(`IsTypeP1.2`), so `π(M) ⊆ κ(M) ∪ σ(M)` and the prime set `(κ(M) ∪ σ(M))ᶜ` meets `π(M)` only in
+`∅`; a Hall `(κ ∪ σ)ᶜ`-subgroup of `M` therefore has order coprime to `|M|`, i.e. trivial.
+
+This is the `U = ⊥` conjunct of Theorem A(8) (`theoremA_maximal_structure`), now **derivable from
+`Thm 15.2 (mf_ne_msigma_typeP1_structure)`** via `isTypeP1_of_mf_ne_msigma`: `M_F ≠ M_σ ⟹ IsTypeP1 ⟹
+U = ⊥`.  Together with `|K| = p` (also a Thm 15.2 output) this leaves only `FittingIsTI M` for the
+full A(8).  Stated for the relative `U.subgroupOf M` (which is what the Hall hypothesis constrains);
+when `U ≤ M` it gives `U = ⊥`. -/
+theorem isTypeP1_kappaSigma_compl_hall_subgroupOf_eq_bot [Finite G] {M U : Subgroup G}
+    (hP1 : S14.IsTypeP1 M)
+    (hU : Ch03.IsHallSubgroup ((S14.kappa M ∪ OddOrder.BG.Ch3.S10.sigma M)ᶜ) (U.subgroupOf M)) :
+    U.subgroupOf M = ⊥ := by
+  rw [← Subgroup.card_eq_one]
+  by_contra hne
+  obtain ⟨p, hpp, hpdvd⟩ := Nat.exists_prime_and_dvd hne
+  -- `p ∈ (κ ∪ σ)ᶜ` (Hall) and `p ∈ π(M)` (`|U.subgroupOf M| ∣ |M|`).
+  have hpcompl : p ∈ (S14.kappa M ∪ OddOrder.BG.Ch3.S10.sigma M)ᶜ :=
+    hU.1 p (Nat.mem_primeFactors.mpr ⟨hpp, hpdvd, Nat.card_pos.ne'⟩)
+  have hpM : p ∈ (Nat.card ↥M).primeFactors :=
+    Nat.mem_primeFactors.mpr ⟨hpp,
+      hpdvd.trans (Subgroup.card_subgroup_dvd_card (U.subgroupOf M)), Nat.card_pos.ne'⟩
+  -- but `π(M) ⊆ κ(M) ∪ σ(M)` for type `P₁`.
+  refine hpcompl ?_
+  by_cases hpσ : p ∈ OddOrder.BG.Ch3.S10.sigma M
+  · exact Set.mem_union_right _ hpσ
+  · exact Set.mem_union_left _ (hP1.2 ▸ ⟨hpM, hpσ⟩)
+
+/-- **Converse: `κ(M) = π(M) ∖ σ(M)` from a trivial Hall `(κ ∪ σ)ᶜ`-complement** (the second half of
+the type-`P₁` ⟺ `U = ⊥` characterization).  If the Hall `(κ(M) ∪ σ(M))ᶜ`-subgroup of `M` is trivial,
+then `(κ ∪ σ)ᶜ` contains no prime dividing `|M|` (the Hall index condition `hU.2` with index `|M|`),
+so `π(M) ⊆ κ(M) ∪ σ(M)`; combined with `κ(M) ⊆ π(M) ∖ σ(M)` (every `κ`-prime is a non-`σ` divisor of
+`|M|`) this gives `κ(M) = π(M) ∖ σ(M) = sigmaComplementPrimes M`.
+
+Together with `isTypeP1_kappaSigma_compl_hall_subgroupOf_eq_bot` this is the prime-set core of BG's
+"`M ∈ M_{P₁} ⟺ U = ⊥`": modulo `IsTypeP` (`κ ≠ ∅`), `U = ⊥ ⟺ M` is type `P₁`. -/
+theorem kappa_eq_sigmaComplementPrimes_of_hall_subgroupOf_eq_bot [Finite G] {M U : Subgroup G}
+    (hU : Ch03.IsHallSubgroup ((S14.kappa M ∪ OddOrder.BG.Ch3.S10.sigma M)ᶜ) (U.subgroupOf M))
+    (hUbot : U.subgroupOf M = ⊥) :
+    S14.kappa M = S14.sigmaComplementPrimes M := by
+  refine Set.Subset.antisymm (fun p hpκ => ?_) (fun p hpσ' => ?_)
+  · -- `κ ⊆ π ∖ σ`: a `κ`-prime is non-`σ` (`τ₁ ∪ τ₃`) and divides `|M|` (rank-one `P ≤ M`).
+    obtain ⟨hpp, hτ, P, hPelem, hPM, _⟩ := hpκ
+    have hpσ : p ∉ OddOrder.BG.Ch3.S10.sigma M := by
+      rcases hτ with h | h
+      · exact ((mem_tau1_iff M p).mp h).1
+      · exact ((mem_tau3_iff M p).mp h).1
+    have hpπ : p ∈ S14.piSet M := by
+      refine Nat.mem_primeFactors.mpr ⟨hpp, ?_, Nat.card_pos.ne'⟩
+      have hPcard : Nat.card ↥P = p := by rw [hPelem.2, pow_one]
+      exact hPcard ▸ Subgroup.card_dvd_of_le hPM
+    exact ⟨hpπ, hpσ⟩
+  · -- `π ∖ σ ⊆ κ`: `U = ⊥` forces every `|M|`-prime into `κ ∪ σ`; non-`σ` ones land in `κ`.
+    obtain ⟨hpπ, hpσ⟩ := hpσ'
+    by_contra hpκ
+    refine hU.2 p (by rw [hUbot, Subgroup.index_bot]; exact hpπ) ?_
+    rintro (h | h)
+    · exact hpκ h
+    · exact hpσ h
+
 /-! ## Proposition 16.1: BG local taxonomy and shared Type I--V predicates -/
 
 /-- **§14/§15-independent assembly engine for BG Proposition 16.1** (mmd L4478; the source proof
