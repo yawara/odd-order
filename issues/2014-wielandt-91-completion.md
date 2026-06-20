@@ -46,6 +46,10 @@ deepest pole。`|C_H(UE)|^|E| · |H| = |C_H(E)|^|E| · |C_H(U)|` (Frobenius L=U�
       `elabRepresentation p φ` (el-ab V の ZMod p-表現) + `card_fixedSubgroup_eq_card_invariants`
       (group `C_V(X)=fixedSubgroup φ X` ↔ module `invariants (ρ.comp X.subtype)` の card 一致、
       `Additive.ofMul` で同一集合) + `card_fixedSubgroup_eq_pow_finrank` (`|C_V(X)|=p^dim V^X`)。
+- [x] **per-factor (9.1) card 恒等式** = **DONE** (`WielandtElabBridge.lean`, sorry-free, build 3872 green):
+      `card_fixedSubgroup_wielandt_of_dim` — (⋆) 次元恒等式 `hdim` を仮定し、bridge で `p^(·)` 化して
+      `|C_V(⊤)|^|E|·|V| = |C_V(E)|^|E|·|C_V(U)|`。`hdim` = `finrank_elab_identity` の結論 ((†) modulo)
+      ゆえ (†) は依然 isolate。helper `invariants_comp_top_subtype` (`invariants(ρ.comp ⊤)=ρ.invariants`)。
 - [ ] **I-5 chief-series assembly** (lane-h, group theory): `|C_H(X)| = ∏_i |C_{V_i}(X)|` を
       `ChiefFactor.chiefSeriesInside` + Isaacs Cor 3.28 (`coprime_fixedPoints_quotient`) で確立 →
       per-factor (⋆) を p_i-power して掛け合わせ → 群 (9.1)。
