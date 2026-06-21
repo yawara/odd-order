@@ -90,6 +90,19 @@ bottom-out** するので、clean 化には §15 foundation が先。真の順�
 
 ## 進捗ログ
 
+**2026-06-22 (cont.) ✅ Thm C conjunct 10 (BG C(9) `A0-A` TI) を構造的包含一点に還元 + 数学的完全再構成** (`d553f1e0`, full build 3881 green):
+- **再利用可能な TI-transport 補題** `IsTISubset.of_subset_conj_of_isTISubset` (TISubset.lean、純群論、`Mathlib.Tactic.Group` import 追加): `T` が TI (normalizer `Z≤M`) かつ `A` の各元が `T` の元に `M`-共役 ⟹ `A` は TI (normalizer `M`)。BG Theorem B(5) (`A(M)-M_σ` TI) にも使える。
+- **conjunct 10 を還元**: `theoremC_paired_structure` の conjunct 10 を transport 補題 + `typeP_duality` の Ẑ-TI (`hMstarP.2.2.2.2.2.1`、`N_G(Ẑ)=K⊔K*≤M`) で discharge。残 = 構造的包含 `a0_minus_a_subset_conj_zTilde` (S16, sorry) のみ。
+- **✅✅ 構造的包含の数学的証明を完全再構成** (docstring に記載、要 Lean 化):
+  - `a ∈ A0-A` = `a∈M`, `M_σ⊓C_G(a)≠1`, `a∉𝒞_G(K#)`, `a∉U M_σ`。κ/κ'-分解 `a=a_κ·a_{κ'}` (`exists_isPiElement_mul`、可換、a の冪)。
+  - `a_κ` を Hall-共役で `K` 内へ (`exists_conj_smul_le_isHall_kappa`、`⟨a_κ⟩` は κ-部分群)。`w∈M`、`b:=waw⁻¹=b_κ b_{κ'}`、`b_κ∈K`。
+  - `a_κ≠1`: 否なら `a=a_{κ'}` は κ'-元 ⟹ `a∈M'=U⊔M_σ` (下記補題) で `a∉U M_σ` と矛盾。
+  - `b_{κ'}≠1`: 否なら `a` が `b_κ∈K#` に `G`-共役 ⟹ `a∈𝒞_G(K#)` 矛盾。
+  - **`b_{κ'}∈K*` (簡略化済・linchpin)**: `b_{κ'}∈M'` (κ'-元), `b_{κ'}` は `b_κ` と可換。`C_{M'}(b_κ)=M'⊓C_M(b_κ)=M'⊓(K⊔K*)=K*`。最後の等号は **直接集合計算** (`x=k k*∈M'`, `k*∈K*≤M'` ⟹ `k=x(k*)⁻¹∈M'`, `k∈K⊓M'=1`, `x=k*∈K*`)。**⚠ 旧計画の「K normalizes U + U⋊M_σ 分解」は不要** — `M'⊓(K⊔K*)=K*` で直接。
+  - 組立: `b=b_κ b_{κ'}∈K·K*` 両非自明 ⟹ `b∈Z-(K∪K*)=Ẑ`。`a=w⁻¹ b w`、`m=w⁻¹∈M`、`t=b`。
+- **残る唯一の実質補題 = 「M の κ'-元 ∈ M'=U⊔M_σ」** (coprime-index): `M'=derivedInG M` (Thm C(3) `typeP_hall_derived_eq_and_abelian.1`) ◁ M, `[M:M']=|K|` (κ-数)。κ'-元 `x` の `M/M'` 内 image の位数は `orderOf x` (κ'-数) と `[M:M']` (κ-数) を割る ⟹ 1 ⟹ `x∈M'`。~60-100 行。+ `M'⊓(K⊔K*)=K*` 集合計算 ~30 行 + 組立。**全 sorry-free 化可能、次の単位**。
+- 既存材料: Thm A(5) `typeP_centralizer_kappaElement_eq` (`M⊓C(k)=K⊔K*`)、`exists_conj_smul_le_isHall_kappa`、`exists_isPiElement_mul`、`card_kappaHall_ne_one`。
+
 **2026-06-22 ✅✅✅ BG Thm 15.7 `fitting_not_ti_cases` 完全完成 — type-F の `M'≤F(M)` residual close、sorry-free + axiom-clean** (`549511d7`, full build 3881 green, 実 sorry 134→133):
 - 前セッションで (c) を faithful な `M'≤F(M)` に弱め (overstatement 判明)、唯一残っていた **type-F の `M'≤F(M)`** sorry を close。`=F(M)` gate (`C_Y(E₁)=1`) が消えたので **ungated**。
 - 証明は **type 非依存** (旧 type-P1-only 証明を包含、`rcases ha` 場合分けは `≤` 方向には spurious だったので削除):
