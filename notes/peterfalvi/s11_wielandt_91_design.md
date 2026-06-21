@@ -733,3 +733,39 @@ piece D (items 1-3 + assembly) を 4 commit で締結。**実 sorry 135→134**,
 - **refinement**: `WielandtPerFactor`/`wielandtPerFactor_of_dim` に coprimality `Coprime |L| |H|` 追加 (FPF dim fact が `p∤|U|` 必須ゆえ正当; piece B が chief factor から thread)。
 
 **⟹ 下流解禁**: (9.3) `typeII_III_IV_order_relations` (S11) → (9.6) → (10.11)/(11.7) → (13.2.b) `|P|=p^q` (`basic_structure.P_order`/`card_Q_eq`)。Wielandt corollary `coprimeFrobeniusAction_card_eq_one` + (13.17.b) engine `isFrobenius_kernel_eq_bot_of_frobenius_subgroup` も axiom-clean 化。issue 2014 CLOSED。
+
+## 2026-06-21 (lane-h resume⁵) — ✅✅ Pf (9.3) order relation を Wielandt (9.1) で driving
+
+完成した (9.1) `wielandt_fixedPoint_frobenius` を**直接消費**して Pf (9.3)
+`typeII_III_IV_order_relations` の量的核を構築 (`S11_MaximalII_III_IV.lean`、sorry-free helper 群 +
+(9.3) honest 還元、全 axiom-clean、AxiomsCheck 登録、full build 3881 green、実 sorry 134→136)。
+
+**新 sorry-free 定理** (`OddOrder.Peterfalvi.S11`):
+- `typeP_uW1_frobenius (data : TypePData M) (hU : data.U ≠ ⊥)` — Def (8.4): `U W₁` は kernel `U` の
+  Frobenius 群。`conj_frobenius` = FPF (`typeP_W1_fpf_U`: `C_U(w) ⊆ M'⊓C(w)=W₂` (`centralizer_W1`),
+  `U⊓W₂ ⊆ U⊓H=⊥`); `isComplement` は `isComplement'_of_disjoint_and_mul_eq_univ` + `normal_mul`;
+  `isNormal` は `W1_normalizes_U`。型 V (`U=⊥`) では退化ゆえ `hU` 必須。
+- `typeP_coprimeAction (data) (hU)` — `CoprimeFrobeniusAction ↥(U⊔W₁) ↥H`。φ = 共役 (engine
+  `isFrobenius_kernel_eq_bot_of_frobenius_subgroup` の compHom パターン), H solvable (nilpotent),
+  coprime `|H| ⟂ |U⊔W₁|` = `maxNilpotentNormalHall_isHall.coprime_index` + **relindex tower**
+  `[M:H]=[M':H]·[M:M']=|U|·|W₁|` (`Subgroup.relIndex_mul_relIndex`, 大文字 I)。
+- `typeP_fixedSubgroup_map`/`typeP_card_fixedSubgroup` — 共役 fixed subgroup の像 = `H⊓C_G(K)`;
+  card は `equivMapOfInjective` (subtype 単射)。
+- `typeP_H_inf_centralizer_W1` — `C_H(W₁)=W₂` (`centralizer_W1` for nontrivial `w∈W₁#` ⊆ ; `W` cyclic
+  ⟹ `W₂` が `W₁` を centralize ⊇, `S06.commute_of_mem_of_isCyclic` で diamond 回避)。
+- `typeP_wielandt_order_relation (data) (hU)` ← **(9.3) の量的核**:
+  `|C_H(U W₁)|^q · |H| = |W₂|^q · |C_H(U)|` (q=|W₁|)。Wielandt formula + 上記 bridge を rw。
+
+**(9.3) 本体**は identity に honest 還元 (proof は real、§8 fixed-point-free facts のみ gated): 各 §8 fact が
+`U≠⊥` を含意 (`U=⊥` なら `C_H(·)` が `H` or `W₂` で非自明)、ゆえ identity 適用→ order relation 導出。
+残 3 sorry = **精密な §8 gates のみ**: Type II `C_H(U)=1` ((8.6.b II)+(8.12.b)=`typeI_or_typeII_centralizer_unique`),
+Type III/IV `|W₂|=p` 素数 ((8.8)=`theorem88_caseB` の M-specific partner, hard) + `C_H(UW₁)=1` ((8.5.b))。
+
+**技術知見**: (1) `subgroupOf` ↔ `comap subtype` は defeq だが `rw` は syntactic → `have hc : ... := (comap_inf
+...).symm` で橋渡し。(2) `Subgroup.normalizer (X : Set G)` は repo の set-form で `normal_subgroupOf_iff_le_normalizer`
+と整合。(3) CommGroup instance を `IsCyclic.commGroup` で haveI すると `↥W` の元の Group と mul が非 defeq の
+diamond → `S06.commute_of_mem_of_isCyclic` (Commute を返す Prop 補題) で回避。(4) `mem_fixedSubgroup` は `Iff.rfl`
+ゆえ `rw` 不要、membership を defeq で直接 ∀ として使用。(5) `IsHallSubgroup.coprime_index` で Hall→coprime。
+
+**▶ 次フロンティア**: (9.4)/(9.6) chief factor (S11 残 sorry、character 寄りで lane-b gate 可能性) / §8 gates
+(S10 領域、(8.8) partner は hard) / (10.11)/(11.7)→(13.2.b) |P|=p^q へ (9.3) cite で前進 / §13.17 POLE-2 再訪。
