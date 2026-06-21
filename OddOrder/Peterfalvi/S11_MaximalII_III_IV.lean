@@ -56,10 +56,16 @@ interface is expected to be reused by the BG and Isaacs layers. -/
 /-! ## (9.2)--(9.6): type II--IV setup and the chief factor `H/H_0` -/
 
 /-- The common setup of Peterfalvi (9.2): a maximal subgroup of type II, III, or
-IV, together with its type-`P` data from (8.4). -/
+IV, together with its type-`P` data from (8.4).
+
+The `nontrivial` field records the `TypePNontrivialCore` of (8.6) — `U ≠ 1`, `|W₁|` prime, and the
+TI condition — that all of types II, III, IV carry (it is the `common` field of `TypeIIData` /
+`TypeIIIData` / `TypeIVData`); it makes the setup a faithful model of "`M` is of type II/III/IV with
+*these* data" (so e.g. `U ≠ 1` is available for the present `typeP`, not only for some witness). -/
 structure TypesIIIIIIVSetup (M : Subgroup G) where
   maximal : M ∈ maximalSubgroups G
   typeP : TypePData M
+  nontrivial : TypePNontrivialCore M typeP
   type_alt : IsTypeII M ∨ IsTypeIII M ∨ IsTypeIV M
 
 namespace TypesIIIIIIVSetup
@@ -455,19 +461,9 @@ theorem typeII_III_IV_order_relations [Finite G] (hG : OddOrder.BG.IsMinimalSimp
   have hH_ne : data.typeP.H ≠ ⊥ := fun heq => data.typeP.H_noncyclic (heq ▸ inferInstance)
   refine ⟨fun _hII => ?_, fun _hIII_IV => ?_⟩
   · -- **Type II.** §8 input: `C_H(U) = 1` (Peterfalvi (8.6.b II) + (8.12.b)).
+    have hU : data.typeP.U ≠ ⊥ := data.nontrivial.1
     have hCU : data.typeP.H ⊓ Subgroup.centralizer (data.typeP.U : Set G) = ⊥ := by
       sorry
-    have hU : data.typeP.U ≠ ⊥ := by
-      intro hUbot
-      apply hH_ne
-      have hle : data.typeP.H ≤ Subgroup.centralizer (data.typeP.U : Set G) := by
-        rw [hUbot]
-        intro h _
-        rw [Subgroup.mem_centralizer_iff]
-        intro g hg
-        rw [Subgroup.coe_bot, Set.mem_singleton_iff] at hg
-        subst hg; group
-      rwa [inf_eq_left.mpr hle] at hCU
     -- `C_H(U W₁) ⊆ C_H(U) = 1`.
     have hmono : Subgroup.centralizer ((data.typeP.U ⊔ data.typeP.W1 : Subgroup G) : Set G)
         ≤ Subgroup.centralizer (data.typeP.U : Set G) :=
@@ -478,12 +474,11 @@ theorem typeII_III_IV_order_relations [Finite G] (hG : OddOrder.BG.IsMinimalSimp
     refine ⟨hCU, ?_⟩
     have key := typeP_wielandt_order_relation data.typeP hU
     rwa [hCUW, hCU, Subgroup.card_bot, one_pow, one_mul, mul_one] at key
-  · -- **Types III/IV.** §8 inputs: `|W₂| = p` prime (Theorem (8.8)) and `U ≠ 1`
-    -- (`TypePNontrivialCore`; carrier).  `C_H(U W₁) = 1` is then *derived* from (8.5.b).
+  · -- **Types III/IV.** Sole §8 input: `|W₂| = p` prime (Theorem (8.8)).  `U ≠ 1` is the setup's
+    -- `nontrivial` core, and `C_H(U W₁) = 1` is then *derived* from (8.5.b).
     obtain ⟨p, hp_prime, hpW2⟩ : ∃ p : ℕ, p.Prime ∧ Nat.card ↥data.typeP.W2 = p := by
       sorry
-    have hU : data.typeP.U ≠ ⊥ := by
-      sorry
+    have hU : data.typeP.U ≠ ⊥ := data.nontrivial.1
     -- `C_H(U W₁) = 1`: it lies in `C_H(W₁) = W₂` of prime order `p`; were it nontrivial it would
     -- equal `W₂`, and Wielandt's identity would force `|H| = |C_H(U)|`, i.e. `U` centralizes `H`,
     -- against (8.5.b) (`typeP_U_not_centralizes_H`).
