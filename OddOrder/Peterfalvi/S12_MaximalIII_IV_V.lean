@@ -2313,6 +2313,97 @@ theorem Hypothesis.muGridAlpha_tau_inner_self [Finite G]
   rw [hyp.tau_inner_eq_of_supported hsupp hsupp]
   exact hyp.muGridAlpha_inner_self hG hodd i hj0 hζirr hdζ h0ζ hδpm
 
+open scoped FiniteInduce in
+/-- **Peterfalvi (10.5), `(α_{ij}, ζ − ζ̄) = −n`** (M-side): the inner product of
+`α_{ij} = μ_{ij} − δ·μ_{i0} − n·ζ` against `ζ − ζ̄`.  The certain-type characters `μ_{ij}`, `μ_{i0}`
+are degree-distinct from `ζ` and its conjugate `ζ̄` (both of degree `w₁ = ζ(1)`), so they are
+orthogonal to both (`muGrid_inner_eq_zero_of_apply_one_ne`); `ζ ≠ ζ̄` (no real characters) gives
+`(ζ, ζ̄) = 0`, while `(ζ, ζ) = 1`.  The only surviving term is `−n·(ζ, ζ) = −n`.
+
+This is the `M`-side of the `(α_{ij}^τ, (ζ−ζ̄)^τ) = (α_{ij}, ζ−ζ̄) = −n` step of the (10.5)
+`a = 0` argument (`ζ − ζ̄` is `A_0`-supported, so the Dade isometry transfers it). -/
+theorem Hypothesis.muGridAlpha_inner_zeta_sub_conj [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} [Invertible (Nat.card ↥M : ℂ)]
+    (hyp : Hypothesis M) (hodd : Odd (Nat.card G)) (i : Fin hyp.w1) (j : Fin hyp.w2)
+    {ζ : ClassFunction ↥M ℂ} (hζirr : IsIrreducibleCharacter ζ) (hζne : ζ.conj ≠ ζ)
+    {δ : ℤ} {n : ℕ}
+    (hdζ : hyp.muGrid hG hodd i j 1 ≠ ζ 1) (h0ζ : hyp.muGrid hG hodd i 0 1 ≠ ζ 1) :
+    ClassFunction.inner (hyp.muGrid hG hodd i j - (δ : ℂ) • hyp.muGrid hG hodd i 0 - (n : ℂ) • ζ)
+        (ζ - ζ.conj) = -(n : ℂ) := by
+  haveI := hyp.finiteG
+  classical
+  have hconjirr : IsIrreducibleCharacter ζ.conj := hζirr.conj
+  -- `ζ̄(1) = ζ(1)`: the degree is a real natural number, fixed by `star`.
+  have hconj1 : ζ.conj 1 = ζ 1 := by
+    obtain ⟨nn, _, hn, _⟩ := hζirr.exists_natDegree_charValue_one_dvd_card
+    simp only [ClassFunction.conj_apply, hn, star_natCast]
+  have hμijζ : ClassFunction.inner (hyp.muGrid hG hodd i j) ζ = 0 :=
+    hyp.muGrid_inner_eq_zero_of_apply_one_ne hG hodd i j hζirr hdζ
+  have hμi0ζ : ClassFunction.inner (hyp.muGrid hG hodd i 0) ζ = 0 :=
+    hyp.muGrid_inner_eq_zero_of_apply_one_ne hG hodd i 0 hζirr h0ζ
+  have hμijζc : ClassFunction.inner (hyp.muGrid hG hodd i j) ζ.conj = 0 :=
+    hyp.muGrid_inner_eq_zero_of_apply_one_ne hG hodd i j hconjirr (by rw [hconj1]; exact hdζ)
+  have hμi0ζc : ClassFunction.inner (hyp.muGrid hG hodd i 0) ζ.conj = 0 :=
+    hyp.muGrid_inner_eq_zero_of_apply_one_ne hG hodd i 0 hconjirr (by rw [hconj1]; exact h0ζ)
+  have hζζ : ClassFunction.inner ζ ζ = 1 := by
+    rw [OddOrder.RepresentationTheory.irr_cf_inner hζirr hζirr, if_pos rfl]
+  have hζζc : ClassFunction.inner ζ ζ.conj = 0 := by
+    rw [OddOrder.RepresentationTheory.irr_cf_inner hζirr hconjirr, if_neg (Ne.symm hζne)]
+  simp only [ClassFunction.inner_sub_left, ClassFunction.inner_sub_right,
+    ClassFunction.inner_smul_left, hμijζ, hμi0ζ, hμijζc, hμi0ζc, hζζ, hζζc,
+    star_intCast, star_natCast, mul_zero, zero_mul, sub_zero, zero_sub, mul_one]
+
+open scoped FiniteInduce in
+/-- **Peterfalvi (10.5), `(α_{ij}, μ_k − dζ̄) = 0`** (M-side, `0 < k < w₂`, `k ≠ j`): the inner
+product of `α_{ij} = μ_{ij} − δ·μ_{i0} − n·ζ` against `μ_k − dζ̄`, where `μ_k = ∑_{0≤i'<w₁} μ_{i'k}`
+is the `W₂`-column-`k` sum.  Since `k ≠ j` and `k ≠ 0`, every `μ_{i'k}` is cross-column-orthogonal
+to `μ_{ij}` and `μ_{i0}` (`muGrid_inner_cross_column`), and degree-distinct from `ζ`
+(`hkζ`), so `(α_{ij}, μ_k) = 0`; and `(α_{ij}, ζ̄) = 0` (degree distinctness + `(ζ, ζ̄) = 0`), so
+`(α_{ij}, dζ̄) = 0`.  Hence `(α_{ij}, μ_k − dζ̄) = 0`.
+
+This is the `M`-side of the `(α_{ij}^τ, μ_k^{τ₁} − dζ̄^{τ₁}) = (α_{ij}, μ_k − dζ̄) = 0` step of
+the (10.5) `a = 0` argument (whence `(α_{ij}^τ, μ_k^{τ₁}) = da`). -/
+theorem Hypothesis.muGridAlpha_inner_muColumn_sub_conj [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} [Invertible (Nat.card ↥M : ℂ)]
+    (hyp : Hypothesis M) (hodd : Odd (Nat.card G)) (i : Fin hyp.w1) (j k : Fin hyp.w2)
+    (hjk : j ≠ k) (hk0 : k ≠ 0)
+    {ζ : ClassFunction ↥M ℂ} (hζirr : IsIrreducibleCharacter ζ) (hζne : ζ.conj ≠ ζ)
+    (hkζ : ∀ i' : Fin hyp.w1, hyp.muGrid hG hodd i' k 1 ≠ ζ 1)
+    (hdζ : hyp.muGrid hG hodd i j 1 ≠ ζ 1) (h0ζ : hyp.muGrid hG hodd i 0 1 ≠ ζ 1)
+    {δ : ℤ} {n d : ℕ} :
+    ClassFunction.inner (hyp.muGrid hG hodd i j - (δ : ℂ) • hyp.muGrid hG hodd i 0 - (n : ℂ) • ζ)
+        ((∑ i' : Fin hyp.w1, hyp.muGrid hG hodd i' k) - (d : ℂ) • ζ.conj) = 0 := by
+  haveI := hyp.finiteG
+  classical
+  have hconjirr : IsIrreducibleCharacter ζ.conj := hζirr.conj
+  have hconj1 : ζ.conj 1 = ζ 1 := by
+    obtain ⟨nn, _, hn, _⟩ := hζirr.exists_natDegree_charValue_one_dvd_card
+    simp only [ClassFunction.conj_apply, hn, star_natCast]
+  -- `(α_{ij}, ζ̄) = 0`: `μ_{ij}, μ_{i0}` degree-distinct from `ζ̄`, and `(ζ, ζ̄) = 0`.
+  have hαζc : ClassFunction.inner
+      (hyp.muGrid hG hodd i j - (δ : ℂ) • hyp.muGrid hG hodd i 0 - (n : ℂ) • ζ) ζ.conj = 0 := by
+    have a1 := hyp.muGrid_inner_eq_zero_of_apply_one_ne hG hodd i j hconjirr (by rw [hconj1]; exact hdζ)
+    have a2 := hyp.muGrid_inner_eq_zero_of_apply_one_ne hG hodd i 0 hconjirr (by rw [hconj1]; exact h0ζ)
+    have a3 : ClassFunction.inner ζ ζ.conj = 0 := by
+      rw [OddOrder.RepresentationTheory.irr_cf_inner hζirr hconjirr, if_neg (Ne.symm hζne)]
+    simp only [ClassFunction.inner_sub_left, ClassFunction.inner_smul_left, a1, a2, a3,
+      mul_zero, sub_zero]
+  -- `(α_{ij}, μ_{i'k}) = 0` for each `i'`: cross-column (`k ≠ j`, `k ≠ 0`) + degree (`k`-column ≠ ζ).
+  have hrow : ∀ i' : Fin hyp.w1,
+      ClassFunction.inner (hyp.muGrid hG hodd i j - (δ : ℂ) • hyp.muGrid hG hodd i 0 - (n : ℂ) • ζ)
+        (hyp.muGrid hG hodd i' k) = 0 := by
+    intro i'
+    have h1 := hyp.muGrid_inner_cross_column hG hodd i i' hjk
+    have h2 := hyp.muGrid_inner_cross_column hG hodd i i' (Ne.symm hk0)
+    have h3 : ClassFunction.inner ζ (hyp.muGrid hG hodd i' k) = 0 := by
+      rw [OddOrder.RepresentationTheory.inner_conj_symm (hyp.muGrid hG hodd i' k) ζ,
+        hyp.muGrid_inner_eq_zero_of_apply_one_ne hG hodd i' k hζirr (hkζ i'), star_zero]
+    simp only [ClassFunction.inner_sub_left, ClassFunction.inner_smul_left, h1, h2, h3,
+      mul_zero, sub_zero]
+  rw [ClassFunction.inner_sub_right, OddOrder.RepresentationTheory.inner_sum_right,
+    Finset.sum_eq_zero (fun i' _ => hrow i'),
+    OddOrder.RepresentationTheory.inner_smul_right, hαζc, mul_zero, sub_zero]
+
 /-- **Peterfalvi (10.5), Dade-image half**: under the coherent extension, `α_{ij}` has the stated
 Dade image `δ·(ω_{ij}^σ − ω_{i0}^σ) − n·ζ^{τ₁}`.  (The support half is `alpha_support`.) -/
 theorem alpha_tau_image [Finite G] [Fintype G]
