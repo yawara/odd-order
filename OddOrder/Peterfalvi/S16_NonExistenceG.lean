@@ -62,6 +62,23 @@ theorem isTypeI {hyp : Hypothesis (G := G)} (Ldata : LHypothesis hyp) :
 
 end LHypothesis
 
+/-- **Peterfalvi (14.3)**: a type-I maximal subgroup `L` over `N_G(U)` exists.  Constructed by
+citing (13.17) `S15.typeII_overNormalizer_frobenius` for the type-I-over-normalizer Frobenius data
+(`S` is type II by `basic_structure` + (14.1) `q < p`); the complement order `|C| = p q` is a field
+`complement_card_eq_pq` of that data ((13.17.c)/(14.5)).  The (14.3.b) Dade data is not carried —
+it is unused by the §14 non-existence argument, so the carrier holds exactly the structural data the
+proof consumes.  Placed here (ahead of the (14.4)--(14.16) lemmas) so the mid-file numeric lemmas
+can construct an `LHypothesis` to feed the S-side case-(9.7.b) data `caseB_for_S`. -/
+theorem exists_LHypothesis [Finite G]
+    (_hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G)) :
+    Nonempty (LHypothesis hyp) := by
+  obtain ⟨bdata, _⟩ := OddOrder.Peterfalvi.S15.basic_structure _hG hyp.base
+  have hSII : IsTypeII hyp.base.S := bdata.q_lt_p_forces_typeII hyp.q_lt_p
+  obtain ⟨typeI_data, _, _⟩ :=
+    OddOrder.Peterfalvi.S15.typeII_overNormalizer_frobenius _hG hyp.base hSII
+  exact ⟨⟨typeI_data.L, typeI_data.H, typeI_data.L_maximal, typeI_data.normalizer_U_le_L,
+    typeI_data.H_eq_LF, typeI_data, rfl, rfl, typeI_data.complement_card_eq_pq⟩⟩
+
 /-- Carrier for the case-(9.7.b) conclusion applied to `T` in Peterfalvi
 (14.4). -/
 structure CaseBForTData (hyp : Hypothesis (G := G)) where
@@ -1524,8 +1541,11 @@ theorem key_inequality [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
     hyp.base.q ^ (hyp.base.p + 1) > hyp.base.p ^ (hyp.base.q + 1) ∧
       (((hyp.base.v - 1 : ℕ) : ℚ) / (hyp.base.p : ℚ) >
         ((hyp.base.u - 1 : ℕ) : ℚ) / (hyp.base.q : ℚ)) := by
-  refine ⟨hyp.q_pow_gt_p_pow, ?_⟩
-  sorry
+  -- (14.8) is the proven arithmetic consumer `key_inequality_of_caseB_outputs`
+  -- fed by the (14.4) T-side and (14.6) S-side case-(9.7.b) data.  The S-side
+  -- data `caseB_for_S` needs an `LHypothesis`, supplied by `exists_LHypothesis`.
+  obtain ⟨Ldata⟩ := exists_LHypothesis _hG hyp
+  exact key_inequality_of_caseB_outputs (caseB_for_T _hG hyp) (caseB_for_S _hG hyp Ldata)
 
 /-- **Peterfalvi (14.9)**: the subgroup `T` is of Type II. -/
 theorem T_typeII [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
@@ -1750,8 +1770,26 @@ theorem norm_cascade_contradiction_of_caseB_outputs_main_size_bounds
   exact norm_cascade_contradiction_of_caseB_data_main_size_bounds Tdata Sdata Mdata
     hsize hbound
 
+/-- **Peterfalvi (14.11.1)** structural half: under `K ≠ V`, the Fitting kernel `K = M_F` is large
+(`k > 2 p v`) and the Frobenius quotient `(k − 1) / e` dominates `(v − 1) / p`.  Both bounds come
+from the type-I structure of `M` and the degree/index data of (14.10)--(14.11) — they are the
+genuine §13/§14 character-theoretic residual of (14.11.1) (Lane B).  The third inequality of
+(14.11.1), `(v − 1) / p > (u − 1) / q`, is *pure arithmetic* (it is `key_ratio_inequality_of_caseB_data`)
+and is discharged directly in `main_size_bounds`. -/
+theorem main_size_bounds_structural [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hyp : Hypothesis (G := G)) (Mdata : MHypothesis hyp)
+    (hne : Mdata.K ≠ hyp.base.V) :
+    Mdata.k > 2 * hyp.base.p * hyp.base.v ∧
+      (((Mdata.k - 1 : ℕ) : ℚ) / (Mdata.e : ℚ) ≥
+        ((hyp.base.v - 1 : ℕ) : ℚ) / (hyp.base.p : ℚ)) := sorry
+
 /-- **Peterfalvi (14.11.1)**: if `K != V`, then `k` is large and the quotient
-bound dominates `(v - 1) / p`. -/
+bound dominates `(v - 1) / p`.
+
+The third conjunct `(v − 1) / p > (u − 1) / q` is now a genuine proof: it is the arithmetic
+ratio comparison `key_ratio_inequality_of_caseB_data` (14.8), fed by the (14.4)/(14.6) case-(9.7.b)
+cyclotomic data.  The two structural bounds remain the named §13/§14 obligation
+`main_size_bounds_structural`. -/
 theorem main_size_bounds [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
     (hyp : Hypothesis (G := G)) (Mdata : MHypothesis hyp)
     (hne : Mdata.K ≠ hyp.base.V) :
@@ -1760,7 +1798,11 @@ theorem main_size_bounds [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
         ((hyp.base.v - 1 : ℕ) : ℚ) / (hyp.base.p : ℚ)) ∧
       (((hyp.base.v - 1 : ℕ) : ℚ) / (hyp.base.p : ℚ) >
         ((hyp.base.u - 1 : ℕ) : ℚ) / (hyp.base.q : ℚ)) := by
-  sorry
+  obtain ⟨Ldata⟩ := exists_LHypothesis _hG hyp
+  obtain ⟨Tdata, _⟩ := caseB_for_T _hG hyp
+  obtain ⟨Sdata, _⟩ := caseB_for_S _hG hyp Ldata
+  obtain ⟨hk, hke⟩ := main_size_bounds_structural _hG hyp Mdata hne
+  exact ⟨hk, hke, key_ratio_inequality_of_caseB_data Tdata Sdata⟩
 
 /-- **Peterfalvi (14.11.2)**: under `K != V`, `e = p q`, and
 `beta_M^tau` is a signed sum of the `eta_ij` with one character removed. -/
@@ -2237,15 +2279,29 @@ theorem characteristic_of_isCyclic {C : Type*} [Group C] [Finite C] [IsCyclic C]
   conv_rhs => rw [key K]
   rw [hcard_eq]
 
+/-- **Peterfalvi (13.2.a) for `T`**: the `T`-side cyclic complement `V` is cyclic — the dual of `U`
+cyclic (`U_cyclic_and_Q_elemAbelian`, 13.2.a for `S`).  `V` is the abelian Frobenius kernel of the
+type-I-over-`N_G(V)` configuration; cyclicity is the §9/§13 character-theoretic obligation (Lane B)
+for the `V`-side, used to transport `K = V` (14.11) to `K` cyclic in `MHypothesis_kernel_cyclic`. -/
+theorem V_cyclic [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hyp : Hypothesis (G := G)) : IsCyclic ↥hyp.base.V := sorry
+
 /-- **Peterfalvi (14.11)/(14.4)/(13.12)**: the Fitting kernel `K = M_F` of the type-I maximal
-subgroup `M` over `N_G(V)` is cyclic.  By (14.11) `K = V` with `|M : K| = p q`, (14.4)
-`v = (q^p − 1)/(q − 1)`, and (13.12) the dual constant `d = 1`, so `K = V` is the abelian —
-indeed cyclic — Frobenius kernel of `V W₂`.  This is the genuine §13/§14 character-theoretic
-obligation (Lane B) feeding the (14.12) reduction; the `L ≅ M` case of (14.12) transports it to
-`H = L_F` purely structurally (`H_cyclic_of_L_conj_M`). -/
+subgroup `M` over `N_G(V)` is cyclic.
+
+This realizes the textbook route directly: by (14.11) `K = V` (`K_eq_V_index_pq`, the
+(14.11.1)--(14.11.4) norm cascade), and `V` is cyclic (`V_cyclic`, 13.2.a for `T`), so `K` is
+cyclic.  The remaining character-theoretic content is therefore isolated into the two named
+obligations `K_eq_V_index_pq` (the (14.11) cascade, whose structural input is
+`main_size_bounds_structural` and whose character input is `betaM_expansion` /
+`generic_character_bound`) and `V_cyclic` (13.2.a for `T`).  Feeds the (14.12) reduction; the
+`L ≅ M` case transports it to `H = L_F` purely structurally (`H_cyclic_of_L_conj_M`). -/
 theorem MHypothesis_kernel_cyclic [Finite G]
     (_hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
-    (Mdata : MHypothesis hyp) : IsCyclic ↥Mdata.K := sorry
+    (Mdata : MHypothesis hyp) : IsCyclic ↥Mdata.K := by
+  obtain ⟨Ldata⟩ := exists_LHypothesis _hG hyp
+  rw [(K_eq_V_index_pq _hG hyp Ldata Mdata).1]
+  exact V_cyclic _hG hyp
 
 /-- **Peterfalvi (14.12) structural input**: in the `L ≅ M` case, `H = L_F` is cyclic.  Since
 `L ≅ M` (a conjugation `MulAut.conj g`), the maximal nilpotent normal Hall subgroup is
@@ -3120,22 +3176,6 @@ theorem H_eq_U [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
   · exact data.caseB_contradiction_of_full_u_card_congruences
       _hG Tdata Sdata hcaseB (nc.u_dvd_h _hG) hh_mod_p hh_mod_q
       (hyp.u_modEq_one_mod_q _hG) hx_ne_one_of_quotient
-
-/-- **Peterfalvi (14.3)**: a type-I maximal subgroup `L` over `N_G(U)` exists.  Constructed by
-citing (13.17) `S15.typeII_overNormalizer_frobenius` for the type-I-over-normalizer Frobenius data
-(`S` is type II by `basic_structure` + (14.1) `q < p`); the complement order `|C| = p q` is a field
-`complement_card_eq_pq` of that data ((13.17.c)/(14.5)).  The (14.3.b) Dade data is not carried —
-it is unused by the §14 non-existence argument, so the carrier holds exactly the structural data the
-proof consumes. -/
-theorem exists_LHypothesis [Finite G]
-    (_hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G)) :
-    Nonempty (LHypothesis hyp) := by
-  obtain ⟨bdata, _⟩ := OddOrder.Peterfalvi.S15.basic_structure _hG hyp.base
-  have hSII : IsTypeII hyp.base.S := bdata.q_lt_p_forces_typeII hyp.q_lt_p
-  obtain ⟨typeI_data, _, _⟩ :=
-    OddOrder.Peterfalvi.S15.typeII_overNormalizer_frobenius _hG hyp.base hSII
-  exact ⟨⟨typeI_data.L, typeI_data.H, typeI_data.L_maximal, typeI_data.normalizer_U_le_L,
-    typeI_data.H_eq_LF, typeI_data, rfl, rfl, typeI_data.complement_card_eq_pq⟩⟩
 
 /-- **Peterfalvi (14.10)**: a type-I maximal subgroup `M` over `N_G(V)` together
 with its Dade data exists.  Symmetric to `exists_LHypothesis`, packaging (13.17)
