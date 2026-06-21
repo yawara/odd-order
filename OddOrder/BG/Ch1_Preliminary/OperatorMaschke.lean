@@ -355,4 +355,60 @@ theorem exists_aInvariant_complement_of_isElementaryAbelian
   · have h := congrArg Φ hinf; rwa [Φ.map_inf, Φ.map_bot, hΦpU, ← hW_def] at h
   · have h := congrArg Φ hsup; rwa [Φ.map_sup, Φ.map_top, hΦpU, ← hW_def] at h
 
+/-- **Semisimple decomposition: an irreducible summand avoiding a proper invariant subgroup.**
+Let `A` act coprimely on a finite elementary abelian `p`-group `V` (so `V` is a semisimple
+`𝔽ₚ[A]`-module by operator Maschke), and let `C ≤ V` be a *proper* `A`-invariant subgroup
+(`C ≠ ⊤`).  Then `V` has an `A`-invariant direct summand `S` (with `A`-invariant complement `W`,
+so `V = S ⊕ W`) which is `A`-irreducible and meets `C` trivially: `C ⊓ S = ⊥` (and `S ≠ ⊥`).
+
+This is the group-theoretic core of Peterfalvi (9.4): on `V = P/Φ(P)` operator Maschke decomposes
+into `U W₁`-irreducibles, and taking `C = C_V(U)` (`U` does not centralize `V`, so `C ≠ ⊤`) yields
+an irreducible summand `S` with `C_S(U) = C ⊓ S = ⊥`, i.e. on which `U` is fixed-point-free.  The
+complement `W` realises `S` as the chief factor `V/W ≅ S`. -/
+theorem exists_aInvariant_irreducible_summand_disjoint
+    {V A : Type*} [Group V] [Finite V] [Group A] [Finite A] [Fact p.Prime]
+    (hV : IsElementaryAbelian p V) {φ : A →* MulAut V}
+    (hcop : Nat.Coprime (Nat.card A) (Nat.card V))
+    {C : Subgroup V} (hCinv : IsAInvariant φ C) (hC : C ≠ ⊤) :
+    ∃ S W : Subgroup V, IsAInvariant φ S ∧ IsAInvariant φ W ∧
+      S ⊓ W = ⊥ ∧ S ⊔ W = ⊤ ∧ S ≠ ⊥ ∧
+      (∀ K : Subgroup V, IsAInvariant φ K → K ≤ S → K = ⊥ ∨ K = S) ∧
+      C ⊓ S = ⊥ := by
+  classical
+  -- `V` is nontrivial (else every subgroup, including `C`, is `⊤`), so `p ∣ |V|`.
+  have hVnt : Nontrivial V := by
+    by_contra h
+    rw [not_nontrivial_iff_subsingleton] at h
+    haveI := h
+    refine hC (top_le_iff.mp fun x _ => ?_)
+    rw [Subsingleton.elim x 1]; exact C.one_mem
+  have hpV : p ∣ Nat.card V := by
+    obtain ⟨x, hx⟩ := exists_ne (1 : V)
+    have hord : orderOf x = p :=
+      ((Fact.out : p.Prime).eq_one_or_self_of_dvd _
+        (orderOf_dvd_of_pow_eq_one (hV.pow_eq_one x))).resolve_left
+        (fun h1 => hx (orderOf_eq_one_iff.mp h1))
+    exact hord ▸ orderOf_dvd_natCard x
+  -- Step 1: split off an `A`-invariant complement `X` of `C`; `X ≠ ⊥` since `C ≠ ⊤`.
+  obtain ⟨X, hXinv, hCX_inf, hCX_sup⟩ :=
+    exists_aInvariant_complement_of_isElementaryAbelian hpV hcop hV hCinv
+  have hX_ne : X ≠ ⊥ := by
+    rintro rfl; rw [sup_bot_eq] at hCX_sup; exact hC hCX_sup
+  -- Step 2: a minimal nonzero `A`-invariant subgroup `S ≤ X` (hence `A`-irreducible).
+  set T : Set (Subgroup V) := {K | K ≠ ⊥ ∧ IsAInvariant φ K ∧ K ≤ X} with hT_def
+  obtain ⟨S, ⟨hS_ne, hS_inv, hS_le⟩, hS_min⟩ :=
+    (Set.toFinite T).exists_minimal ⟨X, hX_ne, hXinv, le_rfl⟩
+  have hirr : ∀ K : Subgroup V, IsAInvariant φ K → K ≤ S → K = ⊥ ∨ K = S := by
+    intro K hKinv hKS
+    by_cases hK0 : K = ⊥
+    · exact Or.inl hK0
+    · exact Or.inr (le_antisymm hKS (hS_min ⟨hK0, hKinv, hKS.trans hS_le⟩ hKS))
+  -- `C ⊓ S ≤ C ⊓ X = ⊥`.
+  have hCS : C ⊓ S = ⊥ :=
+    le_bot_iff.mp (hCX_inf ▸ inf_le_inf_left C hS_le)
+  -- Step 3: split off an `A`-invariant complement `W` of `S`.
+  obtain ⟨W, hWinv, hSW_inf, hSW_sup⟩ :=
+    exists_aInvariant_complement_of_isElementaryAbelian hpV hcop hV hS_inv
+  exact ⟨S, W, hS_inv, hWinv, hSW_inf, hSW_sup, hS_ne, hirr, hCS⟩
+
 end OddOrder.BG.Ch1_Preliminary
