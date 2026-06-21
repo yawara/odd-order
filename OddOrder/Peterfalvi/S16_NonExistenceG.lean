@@ -1569,7 +1569,9 @@ structure MHypothesis (hyp : Hypothesis (G := G)) where
   psi : ClassFunction ↥M ℂ
   e : ℕ
   k : ℕ
-  e_eq_index : Prop
+  /-- **Peterfalvi (14.10)**: `e = |M : K|` (the degree of `ψ`).  De-opacified from the former
+  opaque `Prop` to the concrete index identity (lane-c §16 char-endpoint, carrier honesty). -/
+  e_eq_index : e = (K.subgroupOf M).index
   k_eq_card_K : k = Nat.card ↥K
   psi_mem : psi ∈ Mset
   psi_degree_eq_e : psi 1 = (e : ℂ)
@@ -1577,7 +1579,6 @@ structure MHypothesis (hyp : Hypothesis (G := G)) where
   betaM_formula : Prop
   betaM_formula_holds : betaM_formula
   G0 : Set G
-  generic_bound_formula : G → Prop
   betaM_expansion_formula : Prop
   final_norm_contradiction : Prop
 
@@ -1812,12 +1813,19 @@ theorem betaM_expansion [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
     Mdata.e = hyp.base.p * hyp.base.q ∧ Mdata.betaM_expansion_formula := by
   sorry
 
-/-- **Peterfalvi (14.11.3)**: on the generic set `G_0`, the extended character
-`psi^tau_1` has absolute value at least one. -/
+/-- **Peterfalvi (14.11.3)**: on the generic set `G_0`, the extended character `ψ^{τ₁}` has
+absolute value at least one: `|ψ^{τ₁}(g)| ≥ 1` for `g ∈ G_0`.
+
+De-opacified (lane-c §16 char-endpoint): the former opaque carrier field
+`generic_bound_formula : G → Prop` is replaced by this concrete inequality on the `ℤ`-linear
+Dade extension `τ₁` applied to `ψ`.  Proof recipe (Pf p.89): for `g ∈ G_0`, `β_M^τ(g) = 0` (as
+`g ∉ Ã(M)`), so by (14.11.2) `ψ^{τ₁}(g) = ±Σ_{i,j}(±η_ij(g))`; `g` has order prime to `pq`, so by
+(3.9.c) each `η_ij(g) ∈ ℤ` and by (3.9.a) they pair under conjugation, and `η₀₀(g) = 1`, whence
+`Σ(±η_ij(g)) ∈ 2ℤ+1`, giving absolute value `≥ 1`.  Depends on `betaM_expansion` (14.11.2). -/
 theorem generic_character_bound [Finite G]
     (_hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
     (Mdata : MHypothesis hyp) :
-    ∀ g : G, g ∈ Mdata.G0 → Mdata.generic_bound_formula g := by
+    ∀ g : G, g ∈ Mdata.G0 → 1 ≤ ‖(Mdata.tau1 Mdata.psi) g‖ := by
   sorry
 
 /-- **Peterfalvi (14.11.2)+(14.11.3) ⇒ (14.11.4)**: the character-theoretic norm
