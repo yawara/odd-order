@@ -113,6 +113,82 @@ sesquilinear `inner_sub/smul` 展開 + 逆順は `inner_conj_symm` + `rcases hδ
 - (vi) NC(ψ)≤4 + (3.8) → ψ=0 → `alpha_tau_image`。
 gate 1 (carrier pinning) は params 接続で必要だが grid-level statement で回避継続。
 
+## ✅✅✅✅✅ 進捗 (2026-06-21 cont.³) — (ii) τ-isometry + (iii) M-side + (iv) τ-side leg 完成 (6 補題)
+
+a=0 論証の **τ-isometry primitive + M-side inner products + τ-side transfer** を全形式化 (build-green
+3818 jobs、全 axiom footprint = `[propext,(sorryAx),Classical.choice,Quot.sound]`、sorryAx は muGrid 系
+上流 gate のみ・自前 sorry 0)。commit `de5b502d`/`dbd34818`/`c3506741`:
+
+- ✅✅ **`Hypothesis.tau_inner_eq_of_supported`** (`de5b502d`, **完全 axiom-clean** = sorryAx 無):
+  A₀-supported φ,ψ で `(hyp.tau φ, hyp.tau ψ) = (φ, ψ)`。§7 `dadeIntegralCharacterMap_inner_eq_on_supported_span`
+  を `hyp.dadeData.dade`/`hyp.hconj` + 2 元集合 `{φ,ψ}` で instantiate。**再利用可能 primitive** (a=0 の
+  全 `(α^τ,…)` で使う)。⚠ `open scoped FiniteInduce in` 必須 (hyp.tau と同じ `Fintype.ofFinite` instance;
+  明示 `[Fintype G]` は defeq mismatch)。
+- ✅ **`Hypothesis.muGridAlpha_tau_inner_self`** (`de5b502d`): `‖α_ij^τ‖² = 2+n²` (Cauchy-Schwarz 第1因子)。
+  `muGridAlpha_inner_self` を primitive で transfer (α A₀-supported by `muGrid_alpha_support`)。
+- ✅ **`Hypothesis.muGridAlpha_inner_zeta_sub_conj`** (`dbd34818`): M-side `(α_ij, ζ−ζ̄) = −n`。
+  μ_ij/μ_i0 が ζ,ζ̄ (共 degree w₁) と次数相異 + `(ζ,ζ̄)=0` (ζ≠ζ̄=no-real, caller-supplied) + `(ζ,ζ)=1`。
+  `ζ̄(1)=ζ(1)` は `exists_natDegree_charValue_one_dvd_card` (degree 実数)。
+- ✅ **`Hypothesis.muGridAlpha_inner_muColumn_sub_conj`** (`dbd34818`): M-side `(α_ij, μ_k−dζ̄) = 0`
+  (k≠j,k≠0, μ_k=∑_i' μ_{i'k})。cross-column 直交 (`muGrid_inner_cross_column`) + `(ζ,μ_{i'k})=0` (次数) で
+  `(α,μ_k)=0`; `(α,ζ̄)=0` で `(α,dζ̄)=0`。
+- ✅ **`Hypothesis.zeta_sub_conj_support`** (`c3506741`, **完全 axiom-clean**): `(ζ−ζ̄).support ⊆ A₀`。
+  ζ,ζ̄ は normal M' 誘導ゆえ M' 外で消滅 + `(ζ−ζ̄)(1)=0` → M'^#、各 M'^# 元は自己中心化で A(M)⊆A₀
+  (`muGrid_alpha_support` 左 disjunct パターン、(2.1) 共役不要で簡潔)。
+- ✅ **`Hypothesis.muGridAlpha_tau_inner_zeta_sub_conj`** (`c3506741`): **`(α_ij^τ, (ζ−ζ̄)^τ) = −n`**。
+  α と ζ−ζ̄ 共に A₀-supported → primitive で M-side 値 (=−n) に transfer。
+
+**▶ 残り = τ₁-side (distinct deep sub-area、要 coherence object `coh` + Dade-coherence adjunction)**:
+1. **τ/τ₁ 互換 on supported** (中): `hyp.tau (ζ−ζ̄) = coh.tau1 ζ − coh.tau1 ζ.conj`。
+   要 `ζ−ζ̄ ∈ zSpan(S)` (← `ClosedUnderConjugate(inducedFamily)`、未確立; ζ̄=ζ.conj∈S は induce-conj-commute で
+   要証明) + `coh.coherent.extends_on_supported` (ζ−ζ̄ A₀-supported by `zeta_sub_conj_support` ✅) + 線形性。
+   ⟹ `(α^τ, ζ̄^{τ₁}) = a` (a := `(α^{τ₁},ζ^{τ₁})+n` 定義 + 上の `(α^τ,(ζ−ζ̄)^τ)=−n` ✅ + 線形)。
+2. **🔑 Dade-coherence adjunction (最難・crux)**: `(α^τ, β^{τ₁}) = (α, β)` for **α A₀-supported, β ∈ ℤ[S]**
+   (β=μ_k−dζ̄ は A₀-supported でない=μ_k 全指標ゆえ `extends_on_supported` 不可)。原文 line 29 の
+   `(α,μ_k−dζ̄)=(α^τ,μ_k^{τ₁}−dζ̄^{τ₁})` の核心。§4 `adjoint_formula` (2.7) を χ=β^{τ₁} で使うには
+   `adjointAverageFun(β^{τ₁})=β` on A₀ が要 = coherence extension の Dade-averaging 互換性 (非自明・未形式化)。
+   ⚠ **domain 機微**: 原文 `α^{τ₁}` は α∉ℤ[S] ゆえ厳密には α^τ (supported 拡張) を指す; τ₁ の domain と
+   α/μ_ij の lattice 帰属を精密化要。**この adjunction が τ₁-side 全体の gate**。
+3. (iv) 続き: adjunction で `(α^τ, μ_k^{τ₁})=da` → Cauchy-Schwarz (✅ ‖α^τ‖²=2+n² + 要 ‖μ_k^{τ₁}‖²=w₁
+   [`muGrid_column_sum_inner_self` ✅ を τ₁ で transfer]) → n<2 矛盾 → a=0。
+4. (v) ζ^{τ₁} vanishes on V (§5) → ψ vanishes on V (value-on-V leg ✅)。(vi) NC≤4+(3.8)→ψ=0。
+
+**次セッション着手先 = 上記 1 (τ/τ₁ 互換) + ClosedUnderConjugate(inducedFamily)** が tractable warm-up、
+本丸は 2 (adjunction)。adjunction が解ければ μ_k step → Cauchy-Schwarz → a=0 が一気に通る。
+
+## ✅✅✅✅✅✅ 進捗 (2026-06-21 cont.⁴) — 🔑 adjunction 不要が判明 + τ₁-side 基盤 5 補題
+
+**🔑 最重要発見: 一般 Dade-coherence adjunction は完全に不要**。cont.³ で「μ_k step の crux = adjunction」と
+診断したが**誤り**: 原文 line 29 の `μ_k − dζ̄` は **combination が A₀-supported** (μ_k は M' から誘導され消滅、
+ζ̄ も M' 誘導、degree が dw₁ で相殺 → (μ_k−dζ̄)(1)=0)。∴ ζ−ζ̄ と全く同様に既存 `tau_inner_eq_of_supported`
+primitive で transfer でき、adjunction は要らない。これで τ₁-side が大幅に de-risk。commit `af1eb2b5`/`cf45120c`/`32f87323`:
+
+- ✅ **`inducedFamily_closedUnderConjugate`** (`af1eb2b5`, **完全 axiom-clean**): S=inducedFamily が共役閉
+  (`(Ind θ).conj=Ind θ̄` via `ClassFunction.induce_conj`、θ̄≠1 は inline `conj_conj`+`trivialClassFunction_isReal`;
+  S08 `irreducibleCharacter_conj_ne_trivial` は S12 import 外)。⟹ ζ̄∈ℤ[S]。
+- ✅ **`muGrid_column_sum_vanishes_off_derived`** (`cf45120c`): `∑_i μ_{ik}` が M' 外で消滅。列和=誘導指標
+  `Ind_{M'}^M(Res_{M'} μ_{0k})` (§6 `induce_restrict_certainType_eq`、§10→§6 host 再構成 + `finCongr` reindex)
+  → normal M' 外で `induce_eq_zero_of_not_mem_normal`。**μ_k=∑μ_ik が誘導**という構造事実が adjunction 回避の鍵。
+- ✅ **`muColumn_sub_conj_support`** (`cf45120c`): `(μ_k−dζ̄).support ⊆ A₀`。`zeta_sub_conj_support` の companion
+  (μ_k vanishing + degree 相殺 + M'^#→A(M))。⚠ クラス関数有限和の点評価は `Finset.induction` helper (直接 sum_apply 無)。
+- ✅ **`muGridAlpha_tau_inner_muColumn_sub_conj`** (`cf45120c`): **`(α_ij^τ, (μ_k−dζ̄)^τ) = 0`**
+  (primitive + M-side E)。μ_k,ζ̄∈ℤ[S] ゆえ `(μ_k−dζ̄)^τ=μ_k^{τ₁}−dζ̄^{τ₁}` → `(α^τ,μ_k^{τ₁})=da` step。
+- ✅ **`tau_zeta_sub_conj_eq_tau1`** (`32f87323`, **完全 axiom-clean**): `hyp.tau(ζ−ζ̄)=coh.tau1 ζ−coh.tau1 ζ.conj`。
+  `coh.coherent.extends_on_supported` (ζ−ζ̄∈zSupportedSpan) + `map_sub`。**CoherentHypothesis explicit-Fintype
+  regime と hyp.tau の FiniteInduce regime は extends_on_supported が hyp.tau を直接参照ゆえ衝突せず**。
+
+**▶ 残り (a=0 完遂への明確な arc、adjunction 不要が確定したので全て primitive ベース)**:
+1. **μ_k τ/τ₁ 互換** `hyp.tau((∑μ)−dζ̄)=coh.tau1(∑μ)−d•coh.tau1 ζ.conj` (`tau_zeta_sub_conj_eq_tau1` の類比)。
+   要 `∑_i μ_ik ∈ ℤ[S]` (= μ_k∈inducedFamily、列和=`induce(θ)` θ既約非自明; §6 `exists_irreducible_restrict_certainType`)。
+2. **a-derivation**: `a := (α^τ,coh.tau1 ζ)+n` 定義 → `(α^τ,ζ̄^{τ₁})=a` (τ/τ₁ ζ−ζ̄ ✅ + def) →
+   `(α^τ,μ_k^{τ₁})=da` (μ_k τ/τ₁ + 上記)。
+3. **Cauchy-Schwarz + a=0**: `(da)²≤‖α^τ‖²·‖μ_k^{τ₁}‖²=(2+n²)·w₁` (✅ `muGridAlpha_tau_inner_self` +
+   要 `‖μ_k^{τ₁}‖²=w₁` = coherence isometry で `muGrid_column_sum_inner_self` ✅ を transfer) + a∈ℤ (α^τ,μ_k^{τ₁}∈ZIrr) +
+   a≠0→|a|≥1→`d²≤(2+n²)w₁`→n<2 矛盾 ((10.3) n even>0)。
+4. **(v)(vi)**: a=0 → `α^τ=X−nζ^{τ₁}`, X⊥ζ^{τ₁}, ‖X‖²=2 → ζ^{τ₁} vanishes on V (§5 5.3.b/5.5/3.2.d) →
+   ψ=X−δ(ω^σ diff) vanishes on V (value-on-V leg ✅) → NC(ψ)≤4 + (3.8) → ψ=0 → `alpha_tau_image`。
+全 piece は `coh`+ζ irreducibility 経由、新 adjunction 数学なし。Cauchy-Schwarz が次の山。
+
 ## やること (旧)
 
 - [ ] **carrier pinning**: `CharacterParameters.omegaSigma`/`mu` を `Hypothesis.omegaSigmaGrid`/`muGrid`

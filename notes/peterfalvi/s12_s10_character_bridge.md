@@ -5,6 +5,25 @@
 > 上位文脈 = 記憶 [[ft-endgame-two-poles]] [[peterfalvi-s10-13-gated-on-bg-spine]]、
 > Lane H 視点の正本 = [`s10_13_maximal_structure.md`](s10_13_maximal_structure.md)。
 
+## ★★★★★ 2026-06-21 更新⁷ — a=0 の τ-isometry primitive + M-side + τ-side leg 完成 (6 補題)
+
+(10.5) a=0 論証の **(ii) τ-isometry transfer + (iii) M-side inner products + (iv) τ-side** を全形式化
+(build-green 3818 jobs、全 axiom-clean=muGrid 上流 gate のみ)。commit `de5b502d`/`dbd34818`/`c3506741`、
+詳細 = issue 1007「進捗 cont.³」。主要 = **`tau_inner_eq_of_supported`** (完全 axiom-clean な再利用 primitive:
+A₀-supported で `(hyp.tau φ,hyp.tau ψ)=(φ,ψ)`、§7 `dadeIntegralCharacterMap_inner_eq_on_supported_span` を
+`{φ,ψ}` で instantiate) + `muGridAlpha_tau_inner_self` (‖α^τ‖²=2+n²) + `muGridAlpha_inner_zeta_sub_conj`
+((α,ζ−ζ̄)=−n) + `muGridAlpha_inner_muColumn_sub_conj` ((α,μ_k−dζ̄)=0) + `zeta_sub_conj_support`
+((ζ−ζ̄).support⊆A₀, 完全 axiom-clean) + `muGridAlpha_tau_inner_zeta_sub_conj` ((α^τ,(ζ−ζ̄)^τ)=−n)。
+
+**▶ 残り = τ₁-side**。**🔑 2026-06-21 cont.⁴: 一般 Dade-coherence adjunction は不要と判明** — 原文 line 29 の
+`μ_k−dζ̄` は **combination が A₀-supported** (μ_k=∑μ_ik は M' 誘導で消滅 by `induce_restrict_certainType_eq`、
+degree dw₁ 相殺) ゆえ既存 `tau_inner_eq_of_supported` で transfer 可。cont.⁴ で τ₁-side 基盤 5 補題 landing
+(`inducedFamily_closedUnderConjugate`/`muGrid_column_sum_vanishes_off_derived`/`muColumn_sub_conj_support`/
+`muGridAlpha_tau_inner_muColumn_sub_conj`/`tau_zeta_sub_conj_eq_tau1`、詳細 issue 1007 cont.⁴)。
+**残 arc** (全 primitive ベース、新 adjunction 数学なし): (1) μ_k τ/τ₁ 互換 (要 ∑μ_ik∈ℤ[S]=μ_k∈inducedFamily)、
+(2) a-derivation `(α^τ,ζ̄^{τ₁})=a`/`(α^τ,μ_k^{τ₁})=da`、(3) **Cauchy-Schwarz→a=0** (要 ‖μ_k^{τ₁}‖²=w₁ + a∈ℤ; 次の山)、
+(4) (v)ζ^{τ₁} vanish on V + (vi)NC≤4+(3.8)→ψ=0。⟹ issue 1007 cont.⁴ 参照。
+
 ## ★★★★ 2026-06-21 更新⁶ — a=0 の μ-side inner-product inventory 完成 (CRUX μ⊥ζ 含む)
 
 a=0 norm 論証の M-side inner products を全形式化 (build-green、axiom-clean=上流 gate のみ)。詳細・commit =
