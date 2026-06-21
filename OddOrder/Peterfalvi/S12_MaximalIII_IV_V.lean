@@ -72,6 +72,36 @@ noncomputable def inducedFamily (M : Subgroup G) [Finite G] :
       χ = ClassFunction.induce ((derivedInG M).subgroupOf M)
         (θ : ClassFunction ↥((derivedInG M).subgroupOf M) ℂ) }
 
+open scoped FiniteInduce in
+/-- **The induced family `S` is closed under complex conjugation** (Peterfalvi §10): for
+`χ = Ind_{M'}^M θ ∈ S` with `θ ∈ Irr M'`, `θ ≠ 1`, the conjugate is `χ̄ = Ind_{M'}^M θ̄`
+(`ClassFunction.induce_conj`), and `θ̄` is again a non-trivial irreducible of `M'`
+(`IsIrreducibleCharacter.conj`, `irreducibleCharacter_conj_ne_trivial`).  This is the
+`ζ̄ ∈ S` input to the `(α_{ij}^τ, (ζ−ζ̄)^τ)` step of the (10.5) `a = 0` argument. -/
+theorem inducedFamily_closedUnderConjugate [Finite G] (M : Subgroup G) :
+    OddOrder.Peterfalvi.S03.ClosedUnderConjugate (inducedFamily M) := by
+  classical
+  intro φ hφ
+  obtain ⟨θ, hθ_ne, hφeq⟩ := hφ
+  refine ⟨⟨(θ : ClassFunction ↥((derivedInG M).subgroupOf M) ℂ).conj, θ.isIrreducible.conj⟩,
+    ?_, ?_⟩
+  · -- `θ̄ ≠ 1`: else `θ = θ̄̄ = 1̄ = 1` (the trivial character is real).
+    intro h
+    apply hθ_ne
+    have hcoe : (θ : ClassFunction ↥((derivedInG M).subgroupOf M) ℂ).conj
+        = trivialClassFunction ↥((derivedInG M).subgroupOf M) := by
+      simpa using congrArg
+        (fun c : IrreducibleCharacter ↥((derivedInG M).subgroupOf M) =>
+          (c : ClassFunction ↥((derivedInG M).subgroupOf M) ℂ)) h
+    apply Subtype.ext
+    show (θ : ClassFunction ↥((derivedInG M).subgroupOf M) ℂ)
+      = trivialClassFunction ↥((derivedInG M).subgroupOf M)
+    rw [← ClassFunction.conj_conj (θ : ClassFunction ↥((derivedInG M).subgroupOf M) ℂ), hcoe]
+    exact trivialClassFunction_isReal
+  · rw [hφeq]
+    simpa using ClassFunction.induce_conj ((derivedInG M).subgroupOf M)
+      (θ : ClassFunction ↥((derivedInG M).subgroupOf M) ℂ)
+
 /-! ## (10.1): the type III/IV/V hypothesis -/
 
 open scoped FiniteInduce in
