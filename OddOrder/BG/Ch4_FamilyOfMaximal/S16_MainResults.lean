@@ -562,9 +562,8 @@ theorem theoremC_paired_structure [Finite G]
       exact fun hd => hUne (hd.eq_bot_of_le hUM)
     have hP2 : S14.IsTypeP2 M := isTypeP2_of_hall_subgroupOf_ne_bot hP hU hUne'
     obtain ⟨q, hq, hKq, _⟩ := ((S14.typeP_structure hG hM hP hKM hK hKstar hU).2.2.2.2.1 hP2).2
-    refine ⟨q, hq, hKq, ?_⟩
-    -- `FittingIsTI M` for type-`P₂`: BG Theorem C(10) via Theorem 15.7(a). Residual.
-    sorry
+    -- `FittingIsTI M` for type-`P₂`: BG Theorem 15.7(a) (`fittingIsTI_of_isTypeP2`).
+    exact ⟨q, hq, hKq, S15.fittingIsTI_of_isTypeP2 hG hM hP2⟩
   · -- Conjunct 12 (BG Theorem C(8) = `kstar_card_prime_of_inputs`): `U = ⊥ → |K*|` prime.
     -- `U = ⊥` makes `M` type-`P₁` (`κ(M) = σ(M)'` via the trivial Hall complement), then `|K*|` prime.
     intro hUbot
