@@ -858,12 +858,129 @@ theorem exists_chiefFactor_kernel [Finite G] {M : Subgroup G} (data : TypePData 
     rw [← hmap, ← hCHW1card]
     exact Subgroup.card_map_dvd CHW1 (QuotientGroup.mk' N₀)
 
+/-- **`M`-normality of the chief-factor kernel image.**  For a `U W₁`-invariant normal subgroup
+`N ◁ H = M_F`, its image `H₀ = N.map H.subtype` in `G` is normalized by all of `M`.  Indeed
+`M = H ⊔ U ⊔ W₁` (the `M' = H ⋊ U`, `M = M' ⋊ W₁` complement splittings), `H` normalizes `H₀`
+(`N ◁ H`, via `Subgroup.le_normalizer_map`), and `U W₁` normalizes `H₀` (`N` is `U W₁`-invariant:
+conjugation by `g ∈ U W₁` is `typeP_conjAction` and preserves `N`). -/
+theorem typeP_aInvariantNormal_le_normalizer [Finite G] {M : Subgroup G} (data : TypePData M)
+    {N : Subgroup ↥data.H} [hNn : N.Normal] (hN : IsAInvariant (typeP_conjAction data) N) :
+    M ≤ Subgroup.normalizer ((N.map data.H.subtype : Subgroup G) : Set G) := by
+  -- `M ≤ (H ⊔ U) ⊔ W₁`.
+  have hM1 : M ≤ derivedInG M ⊔ data.W1 := by
+    have hsup := data.M_complement.sup_eq_top
+    rw [← Subgroup.subgroupOf_sup (derivedInG_le_self M) data.W1_le] at hsup
+    exact Subgroup.subgroupOf_eq_top.mp hsup
+  have hderiv : derivedInG M = data.H ⊔ data.U := by
+    rw [data.derivedInG_eq_fitting_sup_U, ← data.H_eq]
+  have hM2 : M ≤ (data.H ⊔ data.U) ⊔ data.W1 := hderiv ▸ hM1
+  -- `H` normalizes `H₀` (`N ◁ H`): `H = subtype '' (normalizer N = ⊤) ≤ normalizer (image)`.
+  have hH_norm : data.H ≤ Subgroup.normalizer ((N.map data.H.subtype : Subgroup G) : Set G) := by
+    have h := Subgroup.le_normalizer_map (H := N) data.H.subtype
+    rwa [Subgroup.normalizer_eq_top_iff.mpr hNn, ← MonoidHom.range_eq_map,
+      Subgroup.range_subtype] at h
+  -- `U W₁` normalizes `H₀`: conjugation by `g ∈ U W₁` is `typeP_conjAction`, which preserves `N`.
+  have hconj : ∀ (l : ↥(data.U ⊔ data.W1)) {m : ↥data.H}, m ∈ N →
+      (l : G) * data.H.subtype m * (l : G)⁻¹ ∈ N.map data.H.subtype := fun l m hm =>
+    ⟨typeP_conjAction data l m, hN.smul_mem l hm, typeP_conjAction_apply data l m⟩
+  have hUW1_norm :
+      data.U ⊔ data.W1 ≤ Subgroup.normalizer ((N.map data.H.subtype : Subgroup G) : Set G) := by
+    intro g hg
+    rw [Subgroup.mem_normalizer_iff]
+    rintro h
+    refine ⟨fun ⟨m, hm, hval⟩ => hval ▸ hconj ⟨g, hg⟩ hm, fun hh => ?_⟩
+    obtain ⟨m, hm, hval⟩ := hh
+    have key := hconj ⟨g, hg⟩⁻¹ hm
+    have hE : ((⟨g, hg⟩ : ↥(data.U ⊔ data.W1))⁻¹ : G) * data.H.subtype m
+        * (((⟨g, hg⟩ : ↥(data.U ⊔ data.W1))⁻¹ : G))⁻¹ = h := by
+      rw [hval]; show g⁻¹ * (g * h * g⁻¹) * (g⁻¹ : G)⁻¹ = h; group
+    exact hE ▸ key
+  exact hM2.trans (sup_le (sup_le hH_norm (le_sup_left.trans hUW1_norm))
+    (le_sup_right.trans hUW1_norm))
+
+/-- **Peterfalvi (9.4), the elementary-abelian seed** (the remaining group-theoretic input).
+There is a `U W₁`-invariant normal subgroup `N₀ ◁ H = M_F` with `H/N₀` elementary abelian `p`
+on which `U` is non-central (`C_H(U) ⊔ N₀ ≠ H`, action-free form).
+
+*Proof (to be formalised):* `H = M_F` is nilpotent and `U` does not centralise it
+(`typeP_U_noncentral_on_H`).  For a prime `p` and the Sylow `p`-subgroup `P ≤ H` on which `U` acts
+non-centrally, `H/N₀ ≅ P/Φ(P)` is elementary abelian (`IsPGroup.quotient_frattini_isElementaryAbelian`)
+with `U` non-central by [BG] Thm 1.8 (`aFixed_quotient_frattini`, contrapositive). -/
+theorem exists_chiefFactor_seed [Finite G] {M : Subgroup G} (data : TypePData M) (hU : data.U ≠ ⊥) :
+    ∃ (p : ℕ) (N₀ : Subgroup ↥data.H) (_ : N₀.Normal), p.Prime ∧
+      IsAInvariant (typeP_conjAction data) N₀ ∧
+      IsElementaryAbelian p (↥data.H ⧸ N₀) ∧
+      fixedSubgroup (typeP_conjAction data) (data.U.subgroupOf (data.U ⊔ data.W1)) ⊔ N₀ ≠ ⊤ := by
+  sorry
+
 /-- **Peterfalvi (9.4)**: existence of a nontrivial elementary abelian chief
-factor `H/H_0` not centralized by `U`. -/
+factor `H/H_0` not centralized by `U`.  Assembles the elementary-abelian seed
+(`exists_chiefFactor_seed`), the chief-factor kernel (`exists_chiefFactor_kernel`,
+`|H/H₀| = p^q`, `p ∣ |W₂|`), and the `M`-normality of the kernel image
+(`typeP_aInvariantNormal_le_normalizer`) into the `ChiefFactorData`. -/
 theorem exists_chiefFactorData [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     {M : Subgroup G} (data : TypesIIIIIIVSetup M) :
     ∃ chief : ChiefFactorData data, chief.H0 < data.H := by
-  sorry
+  classical
+  have hU : data.typeP.U ≠ ⊥ := data.nontrivial.1
+  obtain ⟨p, N₀, hN₀norm, hp, hN₀inv, hpe, hUnc_seed⟩ := exists_chiefFactor_seed data.typeP hU
+  haveI := hN₀norm
+  -- Convert the action-free non-centrality `C_H(U) ⊔ N₀ ≠ H` to the quotient form `fixedByU ≠ ⊤`.
+  have hUnc : (typeP_quotientCoprimeAction data.typeP hU hN₀inv).fixedByU ≠ ⊤ := by
+    have hcopU : Nat.Coprime
+        (Nat.card ↥(data.typeP.U.subgroupOf (data.typeP.U ⊔ data.typeP.W1)))
+        (Nat.card ↥data.typeP.H) :=
+      (typeP_coprime_H_uW1 data.typeP hU).symm.coprime_dvd_left (Subgroup.card_subgroup_dvd_card _)
+    haveI : IsSolvable ↥data.typeP.H := (typeP_coprimeAction data.typeP hU).H_solvable
+    have hmap := map_fixedSubgroup_eq_fixedSubgroup_quotient (φ := typeP_conjAction data.typeP)
+      (N := N₀) (X := data.typeP.U.subgroupOf (data.typeP.U ⊔ data.typeP.W1)) hN₀inv hcopU
+      (Or.inr inferInstance)
+    rw [show (typeP_quotientCoprimeAction data.typeP hU hN₀inv).fixedByU
+        = (fixedSubgroup (typeP_conjAction data.typeP)
+            (data.typeP.U.subgroupOf (data.typeP.U ⊔ data.typeP.W1))).map
+            (QuotientGroup.mk' N₀) from hmap.symm]
+    intro htop
+    refine hUnc_seed ?_
+    have hc := congrArg (Subgroup.comap (QuotientGroup.mk' N₀)) htop
+    rwa [Subgroup.comap_map_eq, QuotientGroup.ker_mk', Subgroup.comap_top] at hc
+  -- The chief-factor kernel and its image `H₀ = N.map subtype`.
+  obtain ⟨N, hN₀leN, hNnorm, hNinv, hcardN, hpW2⟩ :=
+    exists_chiefFactor_kernel data.typeP hU hp hN₀inv hpe hUnc
+  haveI := hNnorm
+  have hqpos : Nat.card ↥data.typeP.W1 ≠ 0 := Nat.card_pos.ne'
+  have hNtop : N ≠ ⊤ := by
+    intro h
+    rw [h, show Nat.card (↥data.typeP.H ⧸ (⊤ : Subgroup ↥data.typeP.H)) = 1
+      from Subgroup.index_top] at hcardN
+    exact (Nat.one_lt_pow hqpos hp.one_lt).ne' hcardN.symm
+  have hlt : N.map data.typeP.H.subtype < data.typeP.H :=
+    lt_of_le_of_ne (Subgroup.map_subtype_le N) fun heq => hNtop <| by
+      apply Subgroup.map_injective data.typeP.H.subtype_injective
+      rw [heq, ← MonoidHom.range_eq_map, Subgroup.range_subtype]
+  refine ⟨{ H0 := N.map data.typeP.H.subtype
+            H0_lt_H := hlt
+            H0_normalized_by_M := typeP_aInvariantNormal_le_normalizer data.typeP hNinv
+            p := p
+            p_prime := hp
+            quotient_elementaryAbelian := True
+            quotient_elementaryAbelian_holds := trivial
+            quotient_chiefFactor := True
+            quotient_chiefFactor_holds := trivial
+            quotient_order := ?_
+            typeIII_IV_p_eq_W2 := ?_
+            U_noncentral_on_quotient := True
+            U_noncentral_on_quotient_holds := trivial }, hlt⟩
+  · -- `|H| = |H/N| · |N| = p^q · |H₀|`.
+    show Nat.card ↥data.typeP.H
+        = p ^ Nat.card ↥data.typeP.W1 * Nat.card ↥(N.map data.typeP.H.subtype)
+    rw [← Subgroup.index_mul_card N,
+      show N.index = p ^ Nat.card ↥data.typeP.W1 from hcardN,
+      Nat.card_congr (Subgroup.equivMapOfInjective N data.typeP.H.subtype
+        data.typeP.H.subtype_injective).toEquiv]
+  · -- `p = |W₂|` for type III/IV: `p ∣ |W₂|` and `|W₂|` is prime.
+    intro hIIIIV
+    exact ((Nat.prime_dvd_prime_iff_eq hp
+      (typeIIIorIV_W2_prime hG data.typeP data.maximal hIIIIV)).mp hpW2).symm
 
 /-! ## (9.5)--(9.7): Clifford-theory data over the selected chief factor -/
 
