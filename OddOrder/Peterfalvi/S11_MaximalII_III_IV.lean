@@ -898,6 +898,22 @@ theorem typeP_aInvariantNormal_le_normalizer [Finite G] {M : Subgroup G} (data :
   exact hM2.trans (sup_le (sup_le hH_norm (le_sup_left.trans hUW1_norm))
     (le_sup_right.trans hUW1_norm))
 
+/-- A subgroup containing a Sylow `p`-subgroup for every prime `p` is the whole group: its order is
+divisible by every maximal prime power `p^{v_p(|G|)} = |Sylow_p|`, hence by `|G|`. -/
+theorem eq_top_of_forall_sylow_le {Γ : Type*} [Group Γ] [Finite Γ] {K : Subgroup Γ}
+    (h : ∀ (p : ℕ) [Fact p.Prime] (P : Sylow p Γ), (↑P : Subgroup Γ) ≤ K) : K = ⊤ := by
+  refine Subgroup.eq_top_of_card_eq K
+    (Nat.dvd_antisymm (Subgroup.card_subgroup_dvd_card K) ?_)
+  rw [← Nat.factorization_le_iff_dvd Nat.card_pos.ne' Nat.card_pos.ne', Finsupp.le_def]
+  intro p
+  by_cases hp : p.Prime
+  · haveI : Fact p.Prime := ⟨hp⟩
+    have hdvd : p ^ (Nat.card Γ).factorization p ∣ Nat.card ↥K := by
+      have := Subgroup.card_dvd_of_le (h p (default : Sylow p Γ))
+      rwa [Sylow.card_eq_multiplicity] at this
+    exact (hp.pow_dvd_iff_le_factorization Nat.card_pos.ne').mp hdvd
+  · simp [Nat.factorization_eq_zero_of_non_prime _ hp]
+
 /-- **Peterfalvi (9.4), the elementary-abelian seed** (the remaining group-theoretic input).
 There is a `U W₁`-invariant normal subgroup `N₀ ◁ H = M_F` with `H/N₀` elementary abelian `p`
 on which `U` is non-central (`C_H(U) ⊔ N₀ ≠ H`, action-free form).
