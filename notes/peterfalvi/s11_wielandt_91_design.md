@@ -808,3 +808,32 @@ sub-quotient では不可、top quotient が `quotient_order:|H|=p^q·|H₀|` �
 =lane-f piece D 系の modular rep-theory infra 要 (multi-session)。front-end (i) U 非中心 on H = ✅ 済
 (`typeP_U_noncentral_on_H`)。次 = (ii) U 非中心 on `P/Φ(P)` (BG 1.8) → (iii) 半単純分解で simple 商 peel。
 assembly では `H0:Subgroup G ↔ N:Subgroup ↥H` 翻訳 + ChiefFactorData の opaque Props を honest 化。
+
+---
+
+## 更新 (2026-06-22, lane-b) — (9.3) §8 gates 両方 discharge → (9.3) 完全 honest 還元
+
+lane-h handoff の (9.3) 残 2 §8 gate を honest reduction で discharge (build-green, full 3881 jobs)。
+`C_H(UW₁)=1` は merged (9.3) 本体で `typeP_U_not_centralizes_H` (8.5.b) から **既に導出済**ゆえ別 gate でない;
+実 gate は 2 本のみだった。
+
+- **gate 2 `typeIIIorIV_W2_prime`** (`|W₂|` prime): (8.8) の M-specific Type-II partner を §8 (S10) に
+  `exists_typeII_maximal_with_w2_of_typeP` として **配置** (S11 は S12 を forward-ref 不可だったため; bare
+  `TypePData` keyed, S11/S12 両用)。gate = partner 存在 + `card_W1_eq_derived_index` + 素数 cyclic factor。
+  S12 `Hypothesis.exists_typeII_maximal_with_w2` も S10 版を cite (重複 sorry 削除)。`589891c9`。
+- **gate 1 `typeII_centralizer_U_eq_bot`** (`C_H(U)=1`): 原文 (04.11) verbatim。`C_H(U)≠1` → (8.12.b) で
+  `M` が `C_G(U)` を含む唯一の maximal → `g∈N_G(U)` が `C_G(U)` 固定 → 共役で唯一 maximal を保つ →
+  `g∈N_G(M)=M` (self-normalizing) → `N_G(U)⊆M` → (8.6.b II) と矛盾。`3df6418e`。
+  - **faithfulness fix**: `typeI_or_typeII_centralizer_unique` は旧 `IsUniquelyMaximal (C_G(X))` のみで
+    under-stated (type II では `C_G(X)⊆M` 不保証 ⟹ 唯一 maximal を `M` と同定不能)。faithful (8.12.b)
+    `C_G(X) ≤ M ∧ IsUniquelyMaximal (C_G(X))` に restate (旧 consumer ゼロ)。
+  - 新 helper: `TypePData.card_U_eq_index` (`|U|=[M':M_F]` witness-independent → `data.U≠⊥`),
+    local `isCoatom_conj_smul` / `maximal_normalizer_eq_self`。
+
+**▶ (9.3) は完全 honest 還元完了**。残る §8 obligations (S10、いずれも上流 gate):
+- `exists_typeII_maximal_with_w2_of_typeP` (8.8) — BG §16 partner-existence (`theorem88_caseB_holds`) gated。
+- `typeI_or_typeII_centralizer_unique` (8.12.b) — BG §16 Thm B / Prop 16.1 gated。
+- `typeII_normalizer_not_le_of_typePData` (canonical 8.6.b II) — complement-conjugacy (solvable `M'` の
+  Schur-Zassenhaus II) gated。witness `TypeIIData.normalizer_not_le` から共役で出るが SZ-II が mathlib 未収。
+
+**▶ 次**: (9.4)/(9.6) chief factor (S11 残 sorry、character 寄り) / (10.11)/(11.7)→(13.2.b) で (9.3) cite。
