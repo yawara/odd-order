@@ -320,6 +320,55 @@ theorem typePData_typePV_nonempty {M : Subgroup G} (data : TypePData M) :
       rw [he]; exact mul_mem hxy (inv_mem hyW2)
     exact hxne (Subgroup.mem_bot.mp (hdisj ▸ Subgroup.mem_inf.mpr ⟨hxW1, hx1⟩))
 
+/-- An element of the exceptional set `V = W − (W₁ ∪ W₂)` of a type-`P` maximal subgroup lies
+outside the derived subgroup `M' = [M,M]`.
+
+Decompose `v ∈ W = W₁ ⊔ W₂` (cyclic, hence abelian) as `v = x·y` with `x ∈ W₁`, `y ∈ W₂`
+(`Subgroup.mem_sup`).  Now `W₂ ≤ M'` (`W₂ ≤ H ⊓ M'' ≤ H ≤ M'`); if `v ∈ M'` then
+`x = v·y⁻¹ ∈ M'`, so `x ∈ W₁ ⊓ M' = ⊥` (`M_complement` disjointness), i.e. `x = 1` and
+`v = y ∈ W₂`, contradicting `v ∉ W₂`.
+
+This is the structural fact behind `ζ` (induced from the normal `M'`) vanishing on `V`, used in the
+Dade-image half of (10.5). -/
+theorem typePData_typePV_not_mem_derived {M : Subgroup G} (data : TypePData M)
+    {v : G} (hv : v ∈ typePV M data) : v ∉ derivedInG M := by
+  simp only [typePV, Set.mem_diff, Set.mem_union, SetLike.mem_coe, not_or] at hv
+  obtain ⟨hvW, _hvnW1, hvnW2⟩ := hv
+  intro hvM'
+  haveI hcyc : IsCyclic ↥data.W := data.W_cyclic
+  letI : CommGroup ↥data.W := hcyc.commGroup
+  have hW1le : data.W1 ≤ data.W := data.W_eq ▸ le_sup_left
+  have hW2le : data.W2 ≤ data.W := data.W_eq ▸ le_sup_right
+  -- Decompose `v` in the abelian `↥W` along `W₁ ⊔ W₂ = ⊤`.
+  have hsup : data.W1.subgroupOf data.W ⊔ data.W2.subgroupOf data.W = ⊤ := by
+    rw [← Subgroup.subgroupOf_sup hW1le hW2le, ← data.W_eq, Subgroup.subgroupOf_self]
+  have hvmem : (⟨v, hvW⟩ : ↥data.W) ∈
+      data.W1.subgroupOf data.W ⊔ data.W2.subgroupOf data.W := by
+    rw [hsup]; exact Subgroup.mem_top _
+  rw [Subgroup.mem_sup] at hvmem
+  obtain ⟨a, ha, b, hb, hab⟩ := hvmem
+  have haW1 : ((a : ↥data.W) : G) ∈ data.W1 := Subgroup.mem_subgroupOf.mp ha
+  have hbW2 : ((b : ↥data.W) : G) ∈ data.W2 := Subgroup.mem_subgroupOf.mp hb
+  have habG : ((a : ↥data.W) : G) * ((b : ↥data.W) : G) = v := by
+    have := congrArg (Subtype.val) hab
+    simpa using this
+  -- `W₂ ≤ M'`, so `b ∈ M'`; with `v ∈ M'` this forces `a = v·b⁻¹ ∈ M'`.
+  have hW2D : data.W2 ≤ derivedInG M := data.W2_le.trans (inf_le_left.trans data.H_le)
+  have haM' : ((a : ↥data.W) : G) ∈ derivedInG M := by
+    have heq : ((a : ↥data.W) : G) = v * ((b : ↥data.W) : G)⁻¹ := by rw [← habG]; group
+    rw [heq]; exact mul_mem hvM' (inv_mem (hW2D hbW2))
+  -- `a ∈ W₁ ⊓ M' = ⊥` (the `M_complement` disjointness), hence `a = 1`.
+  have haM : ((a : ↥data.W) : G) ∈ M := data.W1_le haW1
+  have hdisj := data.M_complement.disjoint
+  rw [Subgroup.disjoint_def] at hdisj
+  have hm1 : (⟨(a : ↥data.W), haM⟩ : ↥M) ∈ (derivedInG M).subgroupOf M :=
+    Subgroup.mem_subgroupOf.mpr haM'
+  have hm2 : (⟨(a : ↥data.W), haM⟩ : ↥M) ∈ data.W1.subgroupOf M :=
+    Subgroup.mem_subgroupOf.mpr haW1
+  have ha1 : ((a : ↥data.W) : G) = 1 := Subtype.ext_iff.mp (hdisj hm1 hm2)
+  -- Then `v = b ∈ W₂`, contradicting `v ∉ W₂`.
+  exact hvnW2 (by rw [← habG, ha1, one_mul]; exact hbW2)
+
 /-- **Peterfalvi (4.6.b) / (4.3.a), ambient version** (issue 1005): for a type-`P` maximal
 subgroup, the exceptional set `V = W − (W₁ ∪ W₂)` is a TI-subset of `G` with normalizer-bound `W`.
 
@@ -1231,6 +1280,40 @@ theorem Hypothesis.muColumnSign_eq_of_ne [Finite G]
   exact columnFamily_mu_zero_sign_eq_of_ne_one h hp (hcol_ne j' hj') (hcol_ne j hj)
 
 open scoped FiniteInduce in
+/-- **§10 column-`0` sign** (Peterfalvi (10.3) / (4.4) `δ_0 = 1`): the sign `δ_0` of the trivial
+column is `1`.  The column-`0` dual is the trivial character (`finCardEquivCharacterGroup_zero`), and
+the trivial column has sign `1` (`certainType_zero_column_anchor.1`, the `μ_{00} = 1_L` anchor).
+This is the `δ_0 = 1` normalisation used by the (10.5) Dade-image identity (the column-`0` term in
+`α_{ij} = μ_{ij} − δ·μ_{i0} − n·ζ` is reconciled against `ω_{i0}^σ` with unit sign). -/
+theorem Hypothesis.muColumnSign_zero [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} (hyp : Hypothesis M)
+    (hodd : Odd (Nat.card G)) :
+    hyp.muColumnSign hG hodd 0 = 1 := by
+  haveI := hyp.finiteG
+  classical
+  let h := (hyp.toCertainTypeHypothesis hG hodd).toHypothesis
+  haveI hNeZ1 : NeZero (Nat.card h.W1) := ⟨by have := h.one_lt_card_W1; omega⟩
+  haveI hcyc : IsCyclic ↥(h.W1 ⊔ h.W2) := h.isCyclic_sup
+  letI : CommGroup ↥(h.W1 ⊔ h.W2) := IsCyclic.commGroup
+  have hW2le : hyp.typeP.W2 ≤ M :=
+    (hyp.typeP.W2_le.trans inf_le_left).trans
+      (hyp.typeP.H_le.trans (Subgroup.map_subtype_le _))
+  have hcardW2sub : Nat.card ↥(h.W2.subgroupOf (h.W1 ⊔ h.W2)) = hyp.w2 := by
+    rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe (le_sup_right)).toEquiv]
+    exact Nat.card_congr (Subgroup.subgroupOfEquivOfLe hW2le).toEquiv
+  haveI hNeZ2 : NeZero (Nat.card ↥(h.W2.subgroupOf (h.W1 ⊔ h.W2))) := ⟨Nat.card_pos.ne'⟩
+  have hdual0 : finCardEquivCharacterGroup (h.W2.subgroupOf (h.W1 ⊔ h.W2))
+      (finCongr hcardW2sub.symm (0 : Fin hyp.w2)) = 1 := by
+    rw [show finCongr hcardW2sub.symm (0 : Fin hyp.w2) = 0 from by apply Fin.ext; simp,
+      finCardEquivCharacterGroup_zero]
+  have esign : hyp.muColumnSign hG hodd 0
+      = (h.columnFamily (finCardEquivCharacterGroup _
+          (finCongr hcardW2sub.symm (0 : Fin hyp.w2)))).sign := by
+    unfold Hypothesis.muColumnSign; rfl
+  rw [esign, hdual0]
+  exact h.certainType_zero_column_anchor.1
+
+open scoped FiniteInduce in
 /-- **§10 `W₁`-vanishing of the column difference** (Peterfalvi (10.5), first step, via (4.3.c) +
 (4.4)): on `W₁^#`, the materialized character `μ_{ij}` equals `δ_j` times the column-`0` character
 `μ_{i0}`.  Indeed `x ∈ W₁^# ⊆ V = W − W₂`, so (4.3.c) gives `μ_{ij}(x) = δ_j·ω_{ij}(x)` and
@@ -1863,6 +1946,68 @@ theorem Hypothesis.tau_apply_of_mem_typePV [Finite G] {M : Subgroup G} (hyp : Hy
     exact Set.mem_union_right _ (OddOrder.GroupTheory.subset_conjClassSet hv)
   exact OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap_apply_mem hyp.dadeData.dade
     (hyp.dadeData.dade.fullDadeIsometryData hyp.hconj) hφ hvA0
+
+open scoped FiniteInduce in
+/-- **Peterfalvi (10.5), the Dade-image value on `V`** (the "vanishes on `V`" leg of the Dade-image
+half): on the exceptional set `V = typePV`, the Dade image `α_{ij}^τ` of the virtual character
+`α_{ij} = μ_{ij} − δ·μ_{i0} − n·ζ` equals `δ·(ω_{ij}^σ − ω_{i0}^σ)`, where `ω^σ` is the *aligned*
+σ-grid `alignedOmegaSigmaGrid` (the σ-image of the same ω that `μ` is built from).
+
+This is Peterfalvi's step *"By (3.2.c), (4.3.c) and the definition of `τ`, `α_{ij}^τ − δ(ω_{ij}^σ −
+ω_{i0}^σ)` vanishes on `V`"*, assembled from:
+* the cornerstone `tau_apply_of_mem_typePV` — `α` is supported on `A_0(M)` (the support half,
+  `muGrid_alpha_support`), so `τ` restores `α`'s value on `V`;
+* the reconciliation `muGrid_apply_eq_columnSign_smul_alignedOmegaSigma_of_mem_typePV` —
+  `μ_{ij}(v) = δ_j·ω_{ij}^σ(v)` on `V`, both at `j` and at column `0`;
+* `muColumnSign_zero` — `δ_0 = 1`;
+* `ζ` vanishing on `V` — `ζ` is induced from the normal `M' = [M,M]` and `v ∉ M'`
+  (`typePData_typePV_not_mem_derived`).
+
+It is the reusable on-`V` identity feeding the `(10.5)`/`(10.6.b)`/`(10.9)` value computations; the
+*global* Dade-image identity additionally requires the `a = 0` norm/Cauchy–Schwarz argument and the
+(3.8) trichotomy. -/
+theorem Hypothesis.tau_muGridAlpha_apply_eq_on_typePV [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} (hyp : Hypothesis M)
+    (hodd : Odd (Nat.card G)) {i : Fin hyp.w1} {j : Fin hyp.w2} (hj : j ≠ 0)
+    {ζ : ClassFunction ↥M ℂ} (hζS : ζ ∈ inducedFamily M)
+    {d : ℕ} {δ : ℤ} {n : ℕ}
+    (hdeg : hyp.muGrid hG hodd i j 1 = (d : ℂ))
+    (hμ0 : hyp.muGrid hG hodd i 0 1 = 1)
+    (hζ1 : ζ 1 = (hyp.w1 : ℂ))
+    (hnf : (n : ℤ) * (hyp.w1 : ℤ) = (d : ℤ) - δ)
+    (hδj : hyp.muColumnSign hG hodd j = δ)
+    {v : G} (hv : v ∈ typePV M hyp.typeP) :
+    hyp.tau (hyp.muGrid hG hodd i j - (δ : ℂ) • hyp.muGrid hG hodd i 0 - (n : ℂ) • ζ) v
+      = ((δ : ℂ) • (hyp.alignedOmegaSigmaGrid hG hodd i j
+          - hyp.alignedOmegaSigmaGrid hG hodd i 0)) v := by
+  haveI := hyp.finiteG
+  classical
+  -- `v ∈ M` (`V ⊆ W ⊆ M`).
+  have hvM : v ∈ M := typePData_W_le_self hyp.typeP (SetLike.mem_coe.mp hv.1)
+  -- The (10.5) support half, so `τ` restores `α` on `V`.
+  have hsupp := hyp.muGrid_alpha_support hG hodd hj hζS hdeg hμ0 hζ1 hnf hδj
+  rw [hyp.tau_apply_of_mem_typePV hsupp hv hvM]
+  -- `ζ` vanishes on `V`: induced from the normal `M'`, and `v ∉ M'`.
+  have hζv : ζ ⟨v, hvM⟩ = 0 := by
+    obtain ⟨θ, _hθne, hζeq⟩ := hζS
+    have hKcomm : (derivedInG M).subgroupOf M = commutator ↥M := by
+      rw [derivedInG, Subgroup.subgroupOf,
+        Subgroup.comap_map_eq_self_of_injective M.subtype_injective]
+    haveI hKnormal : ((derivedInG M).subgroupOf M).Normal := by rw [hKcomm]; infer_instance
+    have hnotmem : (⟨v, hvM⟩ : ↥M) ∉ (derivedInG M).subgroupOf M := by
+      rw [Subgroup.mem_subgroupOf]
+      exact typePData_typePV_not_mem_derived hyp.typeP hv
+    rw [hζeq]
+    exact ClassFunction.induce_eq_zero_of_not_mem_normal _ hnotmem
+  -- Evaluate `α ⟨v⟩` via the reconciliation (`μ = δ_j·ω^σ`), `δ_0 = 1`, and `ζ(v) = 0`.
+  rw [ClassFunction.sub_apply, ClassFunction.sub_apply, ClassFunction.smul_apply,
+    ClassFunction.smul_apply,
+    hyp.muGrid_apply_eq_columnSign_smul_alignedOmegaSigma_of_mem_typePV hG hodd i j hv hvM,
+    hyp.muGrid_apply_eq_columnSign_smul_alignedOmegaSigma_of_mem_typePV hG hodd i 0 hv hvM,
+    hδj, hyp.muColumnSign_zero hG hodd, hζv,
+    ClassFunction.smul_apply, ClassFunction.sub_apply]
+  push_cast
+  ring
 
 /-- **Peterfalvi (10.5), Dade-image half**: under the coherent extension, `α_{ij}` has the stated
 Dade image `δ·(ω_{ij}^σ − ω_{i0}^σ) − n·ζ^{τ₁}`.  (The support half is `alpha_support`.) -/

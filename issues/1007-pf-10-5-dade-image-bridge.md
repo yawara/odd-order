@@ -50,12 +50,36 @@ misalignment fix (producer-local) を実装し、**deep gate だった cross-lev
   + `e` が v を保つ (`he_coe`: `subgroupCongr_apply` rfl + `subgroupOfEquivOfLe.symm` 定義的) → 両 chiColumn 引数一致。
 - ⟹ aligned design 検証完了。per-(i,j) (10.5) identity が provable に (raw omegaSigmaGrid では不可能だった)。
 
-**▶ 残り (full bridge / alpha_tau_image)**:
-1. producer wiring: `exists_charParameters` の `omegaSigma := hyp.omegaSigmaGrid` を `alignedOmegaSigmaGrid` に
-   (S13 consumer 確認)。⚠ alpha_tau_image は arbitrary params ゆえ grid-level bridge 定理が本筋。
-2. bridge value-on-V: `α^τ − δ(ω^σ diff)` が V で消える = reconciliation + ζ-vanishing(`induce_eq_zero_of_not_mem_normal`)
-   + τ-cornerstone(`tau_apply_of_mem_typePV`)を組む。
-3. a=0 norm/numeric + (3.8) trichotomy(§5 `sigmaCoeff_trichotomy`)→ close。
+## ✅✅✅ 進捗 (2026-06-21 cont.) — value-on-V leg DONE (2 analytic leg のうち 1 本)
+
+下記「残り 2」の **value-on-V leg を grid-level で完全形式化** (`0601b2bb`, build-green 3818 jobs)。
+原文「By (3.2.c), (4.3.c) and the definition of τ, α_ij^τ − δ(ω_ij^σ − ω_i0^σ) vanishes on V」を honest 実装:
+
+- ✅ `Hypothesis.tau_muGridAlpha_apply_eq_on_typePV` (leg 本体): **V 上で
+  `hyp.tau (μ_ij − δ·μ_i0 − n·ζ) v = δ·(ω_ij^σ − ω_i0^σ)(v)`** (ω^σ = alignedOmegaSigmaGrid)。
+  cornerstone `tau_apply_of_mem_typePV` (α は A₀ supported ∵ `muGrid_alpha_support` → τ が V で α 復元)
+  + reconciliation `muGrid_apply_eq_columnSign_smul_alignedOmegaSigma_of_mem_typePV` (j と 0 の両方)
+  + `muColumnSign_zero` (δ_0=1) + ζ-vanishing (induced from normal M', v∉M')。
+- ✅ `typePData_typePV_not_mem_derived` (**完全 axiom-clean** `[propext,Classical.choice,Quot.sound]`):
+  v∈V ⟹ v∉M'。↥W (abelian) で v=x·y 分解 (`Subgroup.mem_sup`) → W₂≤M' ∧ W₁⊓M'=⊥ (`M_complement`)
+  ⟹ x=1 ⟹ v=y∈W₂ 矛盾。ζ-vanishing on V の構造的核心。
+- ✅ `Hypothesis.muColumnSign_zero` (δ_0=1): column-0 dual = trivial (`finCardEquivCharacterGroup_zero`)
+  + trivial column sign=1 (`certainType_zero_column_anchor.1`)。
+- axiom footprint: leg/muColumnSign_zero = `[propext, sorryAx, Classical.choice, Quot.sound]`
+  (sorryAx = §10 muGrid 系と同じ上流 bridge gate Prop16.1/theoremA、**自前 sorry 無**)。
+
+**▶ 残り (full `alpha_tau_image` を閉じるための 2 gate)**:
+1. **carrier pinning** (⚠ 要ユーザー判断・cross-file): producer `exists_charParameters` の
+   `omegaSigma := hyp.omegaSigmaGrid` を `alignedOmegaSigmaGrid` に差し替え + `CharacterParameters` に
+   identity field (`mu_def`/`omegaSigma_def`)。ただし `CharacterParameters` は `hG`/`hodd` を carry せず
+   (S13 cascade 回避のため structure param 化は危険、note cont. 参照) ⟹ identity field でなく
+   **`alpha_tau_image` を grid-level の `Hypothesis.tau_muGridAlpha_eq` 定理に再構成**し params 版を
+   薄い corollary (`hmu`/`hos`/`hzeta` hypothesis で grid に紐付け) にするのが本筋。
+2. **a=0 norm 論証** (deep, multi-session): `(α^τ, ζ^{τ₁})=a−n` 定義 → `(α^τ,(ζ−ζ̄)^τ)=−n` (τ isometry)
+   → `(α^τ, μ_k^{τ₁})=da` (k≠j,0) → Cauchy-Schwarz `d²a² ≤ ‖α^τ‖²‖μ_k^{τ₁}‖²=(2+n²)w₁` → n<2 矛盾
+   ((10.3) n even>0) → `α^τ = X − nζ^{τ₁}`, `‖X‖²=2`, X⊥ζ^{τ₁} → ζ^{τ₁} vanishes on V (5.3.b/5.5/3.2.d)
+   → ψ=X−δ(ω^σ diff) vanishes on V (**= leg ✅ + 上記**) → NC(ψ)≤4<2inf(w₁,w₂) → (3.8) → ψ=0。
+   要 §3 NC machinery (3.6/3.8) + §5 (5.3.b)/(5.5) + τ-inner-product isometry + μ-grid orthonormality。
 
 ## やること (旧)
 
