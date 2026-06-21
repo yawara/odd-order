@@ -90,6 +90,17 @@ bottom-out** するので、clean 化には §15 foundation が先。真の順�
 
 ## 進捗ログ
 
+**2026-06-21 (cont.) ✅✅ BG Thm 15.7(a) `fittingIsTI_of_isTypeP2` 完成 → Thm C conjunct 11 close (10/12) + 15.7 を (c) 残のみに** (`dc2fe378` + `7eeb933b`, full build 3881 green, sorry 136→135):
+- **`fittingIsTI_of_isTypeP2` (S15, BG Thm 15.7 conjunct (a), mmd L4244)**: type-P2 maximal ⟹ FittingIsTI。
+  証明 = landed §15 piece のみ: `¬FittingIsTI ⟹ MF=Mσ` (`mf_eq_msigma_of_not_fittingIsTI`) + `π(MF)∩β=∅`
+  (`piSet_mf_inf_beta_disjoint_of_not_fittingIsTI`)、type-P2 は σ=β (Prop 14.2(g))、Mσ≠⊥ で q∈π(Mσ)=π(MF)⊆σ=β、
+  disjoint と矛盾。sorry-free declaration (既存 `fitting_decomposition` sorryAx を transitively 保持、新規導入なし)。
+- **Thm C conjunct 11 完全 close**: `U≠⊥→IsTypeP2` (`isTypeP2_of_hall_subgroupOf_ne_bot`) + |K| prime (Prop 14.2)
+  + FittingIsTI (本補題)。⟹ **Thm C は 10/12 conjunct 実証明**、残 = conjunct 2 (N(U)⊄M=Cor 14.12)/10 (A0-A TI=Thm A(3)(5)) のみ。
+- **`fitting_not_ti_cases` (フル 15.7) も (a)+(b) wire 済** (`7eeb933b`): (a)=本補題の対偶+F/P1/P2 三分律、(b)=`mf_eq_msigma_of_not_fittingIsTI`。
+  残 sorry = (c)-(e) のみ (cyclic X=X₁∈Mσ / M'=F(M) / O_p(M) 非可換・Lem 10.13(b) / 三 local case = deep §15)。
+- 15.7(a) は Prop 16.1 の hP1eqV/hVP1 にも再利用可 (型分類 reverse 方向)。**次 = Thm C conjunct 2/10、または 15.7(c)、または Cor 14.12**。
+
 **2026-06-21 (lane F resume) ✅ Thm C `theoremC_paired_structure` 9/12 conjunct discharge + faithfulness 修正 2 件** (`8f636b54` + `ec711630`, full build 3881 green):
 - TypePData de-contradiction (issue 7008, `0530f90c`) で lane unblock → Thm C 着手。Thm C は full sorry の scaffold だったが **9/12 conjunct を landed §14/§15 補題から実証明**:
   - conjunct 1,7 (U abelian, M'=U⊔M_σ) ← `typeP_hall_derived_eq_and_abelian` (Lem 15.1(b))
@@ -223,9 +234,9 @@ bottom-out** するので、clean 化には §15 foundation が先。真の順�
       σ-template = `exists_sylow_le_of_mem_sigma` (S10:536)、`centralizer_le_E_of_tau2` (full-Sylow abelian 枝)。
 - [ ] conjunct 1-4 を `typeP_auxiliary_structure_gated` に wire (sorry 139→138)
 - [ ] Thm 15.2(a) `mf_ne_msigma_typeP1_structure` (S15:1144)
-- [ ] Thm 15.7 `fitting_not_ti_cases` (S15:3896) + Cor 15.5
+- [~] Thm 15.7 `fitting_not_ti_cases` — **(a) `fittingIsTI_of_isTypeP2` + (b) `mf_eq_msigma_of_not_fittingIsTI` DONE** (`dc2fe378`/`7eeb933b`, 2026-06-21)。残 = (c)-(e) local 構造 (cyclic X / O_p(M) 非可換 / 三 case)
 - [ ] Thm A `theoremA_maximal_structure` (S16:144) — Lemma 15.1 + Prop 14.2 + §15 で全 conjunct
-- [~] Thm C `theoremC_paired_structure` — **9/12 conjunct discharge + faithfulness 修正 2 件 DONE** (`8f636b54`/`ec711630`, 2026-06-21)。残 = conjunct 2 (N(U)⊄M)/10 (A0-A TI)/11 (U≠⊥→|K|prime∧F(M) TI) の deep construction
+- [~] Thm C `theoremC_paired_structure` — **10/12 conjunct discharge + faithfulness 修正 2 件 DONE** (`8f636b54`/`ec711630`/`378e91cf`/`dc2fe378`, 2026-06-21)。残 = conjunct 2 (N(U)⊄M=Cor 14.12)/10 (A0-A TI=Thm A(3)(5)) のみ (conjunct 11 は 15.7(a) で close)
 - [ ] Prop 16.1 配線 `proposition_type_classification` (S16:894) + AxiomsCheck 登録
 
 ## 完了条件
