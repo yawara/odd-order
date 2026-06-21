@@ -56,10 +56,16 @@ interface is expected to be reused by the BG and Isaacs layers. -/
 /-! ## (9.2)--(9.6): type II--IV setup and the chief factor `H/H_0` -/
 
 /-- The common setup of Peterfalvi (9.2): a maximal subgroup of type II, III, or
-IV, together with its type-`P` data from (8.4). -/
+IV, together with its type-`P` data from (8.4).
+
+The `nontrivial` field records the `TypePNontrivialCore` of (8.6) — `U ≠ 1`, `|W₁|` prime, and the
+TI condition — that all of types II, III, IV carry (it is the `common` field of `TypeIIData` /
+`TypeIIIData` / `TypeIVData`); it makes the setup a faithful model of "`M` is of type II/III/IV with
+*these* data" (so e.g. `U ≠ 1` is available for the present `typeP`, not only for some witness). -/
 structure TypesIIIIIIVSetup (M : Subgroup G) where
   maximal : M ∈ maximalSubgroups G
   typeP : TypePData M
+  nontrivial : TypePNontrivialCore M typeP
   type_alt : IsTypeII M ∨ IsTypeIII M ∨ IsTypeIV M
 
 namespace TypesIIIIIIVSetup
@@ -321,6 +327,92 @@ theorem typeP_wielandt_order_relation [Finite G] (data : TypePData M) (hU : data
   rw [hUEfix, hEcard, hEfix, hUfix] at key
   exact key
 
+/-! ### Peterfalvi (8.5.b): `U` does not centralize `H` (derived from the type-`P` data) -/
+
+/-- `C_H(U W₁) ≤ W₂`: the fixed points of the whole Frobenius group lie in `C_H(W₁) = W₂`. -/
+theorem typeP_centralizer_uW1_le_W2 (data : TypePData M) :
+    data.H ⊓ Subgroup.centralizer ((data.U ⊔ data.W1 : Subgroup G) : Set G) ≤ data.W2 := by
+  rw [← typeP_H_inf_centralizer_W1 data]
+  exact inf_le_inf_left data.H (Subgroup.centralizer_le (SetLike.coe_subset_coe.mpr le_sup_right))
+
+/-- `|H| ⟂ |W₁|`: `H` is Hall in `M` and `|W₁| = [M : M']` divides `[M : H]`. -/
+private theorem typeP_coprime_H_W1 [Finite G] (data : TypePData M) :
+    Nat.Coprime (Nat.card ↥data.H) (Nat.card ↥data.W1) := by
+  have hHleM : data.H ≤ M := data.H_le.trans (derivedInG_le_self M)
+  have hHall := OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_isHall M
+  rw [← data.H_eq] at hHall
+  have hcop_idx := hHall.coprime_index
+  rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hHleM).toEquiv] at hcop_idx
+  have hW1idx : ((derivedInG M).subgroupOf M).index = Nat.card ↥data.W1 := by
+    rw [data.M_complement.symm.index_eq_card,
+      Nat.card_congr (Subgroup.subgroupOfEquivOfLe data.W1_le).toEquiv]
+  have hdvd : Nat.card ↥data.W1 ∣ (data.H.subgroupOf M).index := by
+    rw [← hW1idx]; exact Subgroup.index_dvd_of_le (Subgroup.comap_mono data.H_le)
+  exact hcop_idx.coprime_dvd_right hdvd
+
+/-- `|U| ⟂ |W₁|`: from the Frobenius group `U W₁`. -/
+private theorem typeP_coprime_U_W1 [Finite G] (data : TypePData M) (hU : data.U ≠ ⊥) :
+    Nat.Coprime (Nat.card ↥data.U) (Nat.card ↥data.W1) := by
+  have h := (typeP_uW1_frobenius data hU).coprime_card_kernel_complement
+  rwa [Nat.card_congr (Subgroup.subgroupOfEquivOfLe le_sup_left).toEquiv,
+    Nat.card_congr (Subgroup.subgroupOfEquivOfLe le_sup_right).toEquiv] at h
+
+/-- **Peterfalvi (8.5.b)**: if `U ≠ 1`, then `U` does not centralize `H`.
+
+If `U ≤ C(H)`, then `F(M) = H ⊔ (U ⊓ C(H)) = H ⊔ U = M'` (`fitting_eq`,
+`derivedInG_eq_fitting_sup_U`), so `M' = derivedInG M` is nilpotent (the image of the Fitting
+subgroup).  But `M'` is also a normal Hall subgroup of `M` (`|M'| = |H|·|U|` is coprime to
+`[M : M'] = |W₁|`, since `H` is Hall and `U W₁` is Frobenius), so `M' ≤ M_F = H`
+(`le_maxNilpotentNormalHall`); then `U ≤ M' ≤ H` with `H ⊓ U = ⊥` forces `U = ⊥`. -/
+theorem typeP_U_not_centralizes_H [Finite G] (data : TypePData M) (hU : data.U ≠ ⊥) :
+    ¬ data.U ≤ Subgroup.centralizer (data.H : Set G) := by
+  intro hUC
+  apply hU
+  have hM'M : derivedInG M ≤ M := derivedInG_le_self M
+  -- `M' = H ⊔ U` and `F(M) = M'`.
+  have hM'eq : derivedInG M = data.H ⊔ data.U := by
+    rw [data.derivedInG_eq_fitting_sup_U, data.H_eq]
+  have hFit : (OddOrder.Isaacs.Ch01.fitting ↥M).map M.subtype = derivedInG M := by
+    rw [data.fitting_eq, inf_eq_left.mpr hUC, hM'eq]
+  -- `M'` is nilpotent (image of `F(↥M)`).
+  haveI : Group.IsNilpotent ↥(OddOrder.Isaacs.Ch01.fitting (↥M : Type _)) :=
+    OddOrder.Isaacs.Ch01.fitting.isNilpotent
+  haveI hM'nil : Group.IsNilpotent ↥(derivedInG M) := by
+    rw [← hFit]
+    exact nilpotent_of_mulEquiv (Subgroup.equivMapOfInjective (OddOrder.Isaacs.Ch01.fitting ↥M)
+      M.subtype M.subtype_injective)
+  -- `M'.subgroupOf M` is the commutator subgroup of `↥M`: normal and nilpotent.
+  have hM'sub : (derivedInG M).subgroupOf M = commutator ↥M :=
+    Subgroup.comap_map_eq_self_of_injective M.subtype_injective (commutator ↥M)
+  have hM'norm : ((derivedInG M).subgroupOf M).Normal := by rw [hM'sub]; infer_instance
+  haveI : Group.IsNilpotent ↥((derivedInG M).subgroupOf M) :=
+    nilpotent_of_mulEquiv (Subgroup.subgroupOfEquivOfLe hM'M).symm
+  -- `M'` is a normal Hall subgroup of `M`, so `M' ≤ M_F = H`.
+  have hidxM' : ((derivedInG M).subgroupOf M).index = Nat.card ↥data.W1 := by
+    rw [data.M_complement.symm.index_eq_card,
+      Nat.card_congr (Subgroup.subgroupOfEquivOfLe data.W1_le).toEquiv]
+  have hcop : Nat.Coprime (Nat.card ↥(derivedInG M)) (Nat.card ↥data.W1) := by
+    rw [show Nat.card ↥(derivedInG M) = Nat.card ↥data.H * Nat.card ↥data.U by
+      rw [← data.derived_complement.card_mul,
+        Nat.card_congr (Subgroup.subgroupOfEquivOfLe data.H_le).toEquiv,
+        Nat.card_congr (Subgroup.subgroupOfEquivOfLe data.U_le).toEquiv]]
+    exact (Nat.Coprime.mul_right (typeP_coprime_H_W1 data).symm
+      (typeP_coprime_U_W1 data hU).symm).symm
+  have hcardSub : Nat.card ↥((derivedInG M).subgroupOf M) = Nat.card ↥(derivedInG M) :=
+    Nat.card_congr (Subgroup.subgroupOfEquivOfLe hM'M).toEquiv
+  have hM'hall : OddOrder.Isaacs.Ch03.IsHallSubgroup
+      (Nat.card ↥(derivedInG M)).primeFactors ((derivedInG M).subgroupOf M) := by
+    refine ⟨fun p hp => hcardSub ▸ hp, fun p hp hpM' => ?_⟩
+    rw [hidxM'] at hp
+    have hp1 : p ∣ 1 :=
+      hcop ▸ Nat.dvd_gcd (Nat.dvd_of_mem_primeFactors hpM') (Nat.dvd_of_mem_primeFactors hp)
+    exact (Nat.prime_of_mem_primeFactors hp).ne_one (Nat.dvd_one.mp hp1)
+  have hM'leH : derivedInG M ≤ data.H := by
+    rw [data.H_eq]
+    exact OddOrder.BG.Ch4.S15.le_maxNilpotentNormalHall hM'M hM'norm inferInstance hM'hall
+  have hUleH : data.U ≤ data.H := (le_sup_right.trans hM'eq.ge).trans hM'leH
+  rw [← inf_of_le_left hUleH, inf_comm, typeP_H_inf_U data]
+
 end Wielandt93
 
 /-- Data for the chief factor `H/H_0` selected in Peterfalvi (9.4).
@@ -350,10 +442,12 @@ versus types III/IV.
 fixed-point-free §8 inputs.  For type II, `C_H(U) = 1` (Peterfalvi (8.6.b II)+(8.12.b): a nontrivial
 `C_H(U)` would put `N_G(U)` both inside and outside `M`); then `C_H(U W₁) ⊆ C_H(U) = 1` and the
 identity gives `|H| = |W₂|^q`.  For types III/IV, `|W₂| = p` is prime (Theorem (8.8): there is a
-type-II maximal `S` with `|S : S'| = |W₂|`), and `C_H(U W₁) = 1` (else `C_H(U W₁) ⊆ C_H(W₁) = W₂`
-has order `p`, forcing `|H| = |C_H(U)|`, against (8.5.b)); the identity then gives
-`|H| = p^q · |C_H(U)|`.  The three fixed-point-free statements are the genuine §8 obligations; the
-order arithmetic is the Wielandt content discharged here. -/
+type-II maximal `S` with `|S : S'| = |W₂|`), and then `C_H(U W₁) = 1` is *derived* from Peterfalvi
+(8.5.b) (`typeP_U_not_centralizes_H`): `C_H(U W₁) ⊆ C_H(W₁) = W₂` has order dividing the prime `p`, so
+if nontrivial it equals `W₂` and the identity forces `|H| = |C_H(U)|`, i.e. `U` centralizes `H`,
+contradicting (8.5.b); the identity then gives `|H| = p^q · |C_H(U)|`.  The remaining §8 obligations
+are exactly: type II `C_H(U) = 1`, and types III/IV `|W₂|` prime and `U ≠ 1` — the order arithmetic
+and the type III/IV `C_H(U W₁) = 1` reduction are the content discharged here. -/
 theorem typeII_III_IV_order_relations [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     {M : Subgroup G} (data : TypesIIIIIIVSetup M) :
     (IsTypeII M →
@@ -367,19 +461,9 @@ theorem typeII_III_IV_order_relations [Finite G] (hG : OddOrder.BG.IsMinimalSimp
   have hH_ne : data.typeP.H ≠ ⊥ := fun heq => data.typeP.H_noncyclic (heq ▸ inferInstance)
   refine ⟨fun _hII => ?_, fun _hIII_IV => ?_⟩
   · -- **Type II.** §8 input: `C_H(U) = 1` (Peterfalvi (8.6.b II) + (8.12.b)).
+    have hU : data.typeP.U ≠ ⊥ := data.nontrivial.1
     have hCU : data.typeP.H ⊓ Subgroup.centralizer (data.typeP.U : Set G) = ⊥ := by
       sorry
-    have hU : data.typeP.U ≠ ⊥ := by
-      intro hUbot
-      apply hH_ne
-      have hle : data.typeP.H ≤ Subgroup.centralizer (data.typeP.U : Set G) := by
-        rw [hUbot]
-        intro h _
-        rw [Subgroup.mem_centralizer_iff]
-        intro g hg
-        rw [Subgroup.coe_bot, Set.mem_singleton_iff] at hg
-        subst hg; group
-      rwa [inf_eq_left.mpr hle] at hCU
     -- `C_H(U W₁) ⊆ C_H(U) = 1`.
     have hmono : Subgroup.centralizer ((data.typeP.U ⊔ data.typeP.W1 : Subgroup G) : Set G)
         ≤ Subgroup.centralizer (data.typeP.U : Set G) :=
@@ -390,16 +474,36 @@ theorem typeII_III_IV_order_relations [Finite G] (hG : OddOrder.BG.IsMinimalSimp
     refine ⟨hCU, ?_⟩
     have key := typeP_wielandt_order_relation data.typeP hU
     rwa [hCUW, hCU, Subgroup.card_bot, one_pow, one_mul, mul_one] at key
-  · -- **Types III/IV.** §8 inputs: `|W₂| = p` prime (Theorem (8.8)) and `C_H(U W₁) = 1` ((8.5.b)).
+  · -- **Types III/IV.** Sole §8 input: `|W₂| = p` prime (Theorem (8.8)).  `U ≠ 1` is the setup's
+    -- `nontrivial` core, and `C_H(U W₁) = 1` is then *derived* from (8.5.b).
     obtain ⟨p, hp_prime, hpW2⟩ : ∃ p : ℕ, p.Prime ∧ Nat.card ↥data.typeP.W2 = p := by
       sorry
+    have hU : data.typeP.U ≠ ⊥ := data.nontrivial.1
+    -- `C_H(U W₁) = 1`: it lies in `C_H(W₁) = W₂` of prime order `p`; were it nontrivial it would
+    -- equal `W₂`, and Wielandt's identity would force `|H| = |C_H(U)|`, i.e. `U` centralizes `H`,
+    -- against (8.5.b) (`typeP_U_not_centralizes_H`).
     have hCUW : data.typeP.H
         ⊓ Subgroup.centralizer ((data.typeP.U ⊔ data.typeP.W1 : Subgroup G) : Set G) = ⊥ := by
-      sorry
-    have hU : data.typeP.U ≠ ⊥ := by
-      intro hUbot
-      rw [hUbot, bot_sup_eq, typeP_H_inf_centralizer_W1 data.typeP] at hCUW
-      exact data.typeP.W2_nontrivial hCUW
+      by_contra hne
+      have hdvd : Nat.card ↥(data.typeP.H
+          ⊓ Subgroup.centralizer ((data.typeP.U ⊔ data.typeP.W1 : Subgroup G) : Set G))
+          ∣ Nat.card ↥data.typeP.W2 :=
+        Subgroup.card_dvd_of_le (typeP_centralizer_uW1_le_W2 data.typeP)
+      have hcardCUW : Nat.card ↥(data.typeP.H
+          ⊓ Subgroup.centralizer ((data.typeP.U ⊔ data.typeP.W1 : Subgroup G) : Set G)) = p := by
+        rw [hpW2] at hdvd
+        refine (hp_prime.eq_one_or_self_of_dvd _ hdvd).resolve_left (fun h1 => hne ?_)
+        exact Subgroup.card_eq_one.mp h1
+      have key := typeP_wielandt_order_relation data.typeP hU
+      rw [hcardCUW, hpW2] at key
+      have hHC : Nat.card ↥data.typeP.H
+          = Nat.card ↥(data.typeP.H ⊓ Subgroup.centralizer (data.typeP.U : Set G)) :=
+        Nat.eq_of_mul_eq_mul_left (pow_pos hp_prime.pos _) key
+      have hHleCU : data.typeP.H ≤ Subgroup.centralizer (data.typeP.U : Set G) := by
+        have : data.typeP.H ⊓ Subgroup.centralizer (data.typeP.U : Set G) = data.typeP.H :=
+          Subgroup.eq_of_le_of_card_ge inf_le_left hHC.le
+        rw [← this]; exact inf_le_right
+      exact typeP_U_not_centralizes_H data.typeP hU (Subgroup.le_centralizer_iff.mp hHleCU)
     refine ⟨p, hp_prime, hpW2, hCUW, ?_⟩
     have key := typeP_wielandt_order_relation data.typeP hU
     rwa [hCUW, hpW2, Subgroup.card_bot, one_pow, one_mul] at key
