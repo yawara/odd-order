@@ -15,6 +15,17 @@ created: 2026-06-22
 (Pf §13 char/Dade、issue 1004 section16CharacterData) に bottom-out する。
 正本 = `notes/peterfalvi/s16_nonexistence_gate_map.md`、POLE-2 = issue 2009。
 
+## 2026-06-22 再開: 基盤 char-infra ピボット (ユーザー裁可)
+
+全数 audit で S16 内に ungated 証明仕事が無いと再確認 (lane-b 0 commits 先行、η-grid free field、
+(7.5)/(3.9) absent)。ユーザー選択「基盤 char インフラ構築」に従い、§14-16 endgame を gate する
+foundational arithmetic backbone を構築 (η free-field に非依存、signature 先行整備):
+
+- [x] `one_le_norm_signed_paired_sum` — (3.9)/(14.11.3) parity core (commit `2d517956`)。
+- [x] `all_pm_one_and_card_of_odd_sq_sum_le` — (14.11.2) sum-of-squares core (commit `9f17b010`)。
+- 真の long pole = **S15 η-grid carrier の honest 化 (lane-h)**。詳細 + lane-h への精密 ask =
+  `notes/peterfalvi/s16_nonexistence_gate_map.md` 冒頭セクション + issue 4003。
+
 ## やること (lane-c 単独で進められる部分)
 
 - [x] (kickoff) `key_inequality` (14.8) 実証明 + `main_size_bounds` conjunct 3 実証明 +

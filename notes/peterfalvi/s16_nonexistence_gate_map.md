@@ -7,6 +7,44 @@
 > dependency on Lane B (Pf §13 char/Dade) and Lane F (BG §14-16 carrier) is explicit.
 > 正本 issue = 2009 (POLE-2). 関連 = 1004 (section16CharacterData, Lane B).
 
+## 2026-06-22 (lane-c 再開): 基盤 char-infra へのピボット (ユーザー裁可)
+
+再開時の全数 audit + Explore 監査で確認: **S16 の 13 sorry はすべて上流 char theory に gated** —
+char core (14.11.2/.3/.4, 14.14, 14.16) は **η-grid が S15 free field** + (7.5)/(7.8)/(3.7)/(3.9) が
+**repo に ABSENT**、構造 cyclic/typeII は §9/§11/§13 (Lane B)。ungated 3 本は kickoff (ff2338a5) で
+消化済、直近 2 commit は carrier de-opacify (honest 化) 済。lane-b は main から 0 commits 先行、
+`section16CharacterData` 未着手 ⟹ S16 内に ungated な証明仕事は無い。
+
+→ **方針転換 (ユーザー選択「基盤 char インフラ構築」)**: §16 sorry を待つのでなく、§14-16 endgame
+全体を gate している **foundational char infra を lane-c が構築**する。η free-field に依存しない
+ungated な arithmetic backbone を先に積み、η carrier honest 化 (lane-h) 後に consume する
+(signature 先行整備、[[feedback-gated-endpoint-skeleton-pattern]])。
+
+### 構築済 foundational cores (sorry-free + axiom-clean)
+
+| lemma | 役割 | commit |
+|---|---|---|
+| `one_le_norm_signed_paired_sum` | **(3.9)/(14.11.3) parity core**: 整数値 grid が共役 involution でペア・唯一固定点で値 1 ⟹ ±1 符号和は奇整数 ⟹ ‖·‖≥1。`generic_character_bound` (14.11.3) + dual (14.16) が cite | `2d517956` |
+| `all_pm_one_and_card_of_odd_sq_sum_le` | **(14.11.2) sum-of-squares core**: 奇係数 grid・Σa²≤e−1・e≤\|grid\|+1 ⟹ e=\|grid\|+1 かつ全 a=±1。`betaM_expansion` (14.11.2) が cite | `9f17b010` |
+
+両者 generic (`Fintype ι`)、`#print axioms` = [propext, Classical.choice, Quot.sound]。
+
+### 適用に要る η-carrier 強化 = lane-h への ask (S15)
+
+上記 core を `betaM_expansion`/`generic_character_bound`/(14.16) に wire するには、**S15 の η-grid
+(`Hypothesis.eta : Fin q → Fin p → ClassFunction G ℂ`、現 free field + `eta_eq_tau_omega` のみ) を
+honest 化**し、(3.9) の値性質を record/export する必要がある (lane-h 所有、lane-c は cite):
+
+- **(3.9.c)** 生成元 `g ∈ G_0` (位数 pq 素) で `η_ij(g) ∈ ℤ` (整数値)。parity core の `n i` を供給。
+- **(3.9.a)** 共役ペア `η_{(-i,-j)}(g) = conj(η_ij(g))`、整数値ゆえ実 = `η_ij(g)`。parity core の involution `ρ` + `hpair` を供給。`η₀₀(g) = 1` (唯一固定点 `i₀ = (0,0)`)。
+- **η-grid 直交正規性** (5.x/3.9): 係数 `a_ij = ⟨β_M^τ, η_ij⟩` を射影として取り出し、展開
+  `β_M^τ = Σ a_ij η_ij − χ` を出す。sum-of-squares core の `a` + `Σa²≤e−1` を供給。
+- **(13.19.c)** 系の odd parity: `⟨β_M^τ, η_ij⟩` が奇。S15 に `OddIntegerInner` 既存 (betaL 側
+  `caseC2_eta0j_odd` 等) — betaM 側の analog を export。
+
+これらが揃えば lane-c が betaM/generic engine を core 経由で sorry-free に組める。
+**∴ §16 char endgame の真の long pole = S15 η-grid carrier の honest 化 (lane-h)**。
+
 ## 現状 (2026-06-22, kickoff session)
 
 `field_normalizer_structure` (POLE-2) の **dispatch tree は sorry-free** (lane-h の成果):
