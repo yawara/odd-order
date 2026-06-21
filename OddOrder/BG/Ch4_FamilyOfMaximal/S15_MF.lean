@@ -7794,18 +7794,31 @@ one of the three local cases of the theorem holds.
 be *some* cyclic nontrivial subgroup of `M_F` (the Lean surface does not pin `X = F(M) ∩ F(M)ᵍ` as
 BG does — a scaffold weakening), so it is supplied by an order-`q` element of `M_σ ≠ 1`; the prime
 `p ∈ σ(M) ∖ β(M)` comes from that same `q` via the rank-core disjointness
-(`piSet_mf_inf_beta_disjoint_of_not_fittingIsTI`), and the final disjunct follows from (a).  The
-structural identity `M' = F(M)` (`derivedInG M = fittingInAmbient M`, BG conjunct (c)) is proved
-for the **type-`P₁`** case here (`U = ⊥` ⟹ `M' = M_σ` by Lemma 15.1(b); `M_σ = M_F` nilpotent
-⟹ `M_σ ≤ F(M)`; `F(M) ≤ M'` by Corollary 15.5(d) as `M ∉ M_F`).  The **single remaining residual**
-is the **type-`F`** case of `M' = F(M)`, where Corollary 15.5(d) does not apply and BG instead uses
-the `E₃ = 1` argument (Corollary 12.6(d) + Lemma 12.19, Corollary 15.5, Lemma 12.1). -/
+(`piSet_mf_inf_beta_disjoint_of_not_fittingIsTI`), and the final disjunct follows from (a).
+
+**Faithfulness fix (2026-06-22): conjunct (c) is `M' ≤ F(M)`, not the printed `M' = F(M)`.**  BG's
+printed Theorem 15.7(c) asserts the *equality* `M' = F(M) = M_σ × O_{σ'}(F(M))`, but the equality is
+an **overstatement** for the type-`F` case.  Verified two ways: (1) a ChatGPT (GPT-5 Pro) consult
+plus an independent reduction shows `M' = F(M) ⟺ C_Y(E₁) = 1` (E₁ acts fixed-point-freely on the
+τ₂-Fitting factor `Y = O_{σ'}(F(M))`), and `C_Y(E₁) = 1` is **not** derivable from the cited results
+(Cor 12.6(d) is vacuous once `E₃ = 1`; the rest control the action on `M_σ`, not on `Y`); (2) the
+authoritative MathComp odd-order formalization (`BGsection15`, `nonTI_Fitting_structure`) states
+conjunct (c) as `M^'(1) ⊆ 'F(M)` (inclusion) `∧ M_σ × O_σ('F(M)) = 'F(M)`, **not** equality.  Only
+`M' ≤ F(M)` is BG-faithful and provable; the equality holds iff `C_Y(E₁) = 1`, a non-derivable
+condition (BG only gets `M` Frobenius later, in Corollary 15.9, after `τ₂(M) = ∅`, i.e. `E₂ = 1`).
+See `notes/bg/s15_7_typeF_chatgpt_prompt.md`.
+
+`M' ≤ F(M)` is proved here for the **type-`P₁`** case (`U = ⊥` ⟹ `M' = M_σ` by Lemma 15.1(b);
+`M_σ = M_F` nilpotent ⟹ `M' = M_σ ≤ F(M)`).  The remaining residual is the **type-`F`** case of
+`M' ≤ F(M)` — now **ungated** (the `= F(M)` gate `C_Y(E₁) = 1` is gone): `M' = M_σ × E'` with `E'`
+centralizing `M_σ` (Lemma 12.19, as `π(M_σ) ∩ β = ∅`) is nilpotent normal, so `M' ≤ F(M)`; the
+remaining work is the `E`-setup + nilpotent-direct-product packaging. -/
 theorem fitting_not_ti_cases [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     {M : Subgroup G} (hM : M ∈ maximalSubgroups G) (hnotTI : ¬ FittingIsTI M) :
     (S14.IsTypeF M ∨ S14.IsTypeP1 M) ∧ MF M = OddOrder.BG.Ch3.S10.Msigma M ∧
       ∃ X : Subgroup G,
         X ≤ MF M ∧ X ≠ ⊥ ∧ IsCyclic ↥X ∧
-        derivedInG M = fittingInAmbient M ∧
+        derivedInG M ≤ fittingInAmbient M ∧
         (∃ p : ℕ, p.Prime ∧ p ∈ OddOrder.BG.Ch3.S10.sigma M ∧
           p ∉ OddOrder.BG.Ch3.S10.beta M ∧
           (IsMulCommutative ↥(MF M) ∨
@@ -7848,12 +7861,15 @@ theorem fitting_not_ti_cases [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     exact fun h => hwne (Subgroup.mem_bot.mp (h ▸ Subgroup.mem_zpowers (w : G)))
   · -- `IsCyclic X`
     infer_instance
-  · -- `M' = F(M)` (BG conjunct (c)).  Case-split on (a).
+  · -- `M' ≤ F(M)` (BG conjunct (c), faithful form — see docstring: the printed `M' = F(M)` is an
+    -- overstatement, MathComp `BGsection15` uses `M^'(1) ⊆ 'F(M)`).  Case-split on (a).
     rcases ha with hF | hP1
-    · -- type-`F`: the deep `E₃ = 1` argument (Cor 12.6(d) + Lem 12.19, Cor 15.5, Lem 12.1).  Residual.
+    · -- type-`F`: `M' = M_σ ⋊ E'` with `E'` centralizing `M_σ` (Lem 12.19), so `M' = M_σ × E'` is
+      -- nilpotent normal, whence `M' ≤ F(M)`.  Now **ungated** (the `M' = F(M)` direction was gated on
+      -- the non-derivable `C_Y(E₁) = 1`; the `≤` direction needs only the `E`-setup + Lem 12.19 + the
+      -- nilpotent direct-product packaging — `exists_subgroupESetup`/`derivedE_centralizes_betaComplement`).
       sorry
-    · -- type-`P₁`: `U = ⊥` gives `M' = M_σ` (Lemma 15.1(b)); `M_σ = M_F` is nilpotent so `M_σ ≤ F(M)`,
-      -- while `F(M) ≤ M'` (Cor 15.5(d), as `M ∉ M_F`).  Hence `M' = F(M) = M_σ`.
+    · -- type-`P₁`: `U = ⊥` gives `M' = M_σ` (Lemma 15.1(b)); `M_σ = M_F` nilpotent ⟹ `M' = M_σ ≤ F(M)`.
       have hP : S14.IsTypeP M := hP1.1
       haveI : IsSolvable ↥M := hG.solvable_of_mem_maximalSubgroups hM
       obtain ⟨K', hK'⟩ := Ch03.hall_E_exists (G := ↥M) (S14.kappa M)
@@ -7891,16 +7907,11 @@ theorem fitting_not_ti_cases [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
       -- `M' = U ⊔ M_σ = M_σ` (Lemma 15.1(b) with `U = ⊥`).
       have hM'eq : derivedInG M = OddOrder.BG.Ch3.S10.Msigma M := by
         rw [(typeP_hall_derived_eq_and_abelian hG hM hKM hUM hKne hK hU).1, hUbot, bot_sup_eq]
-      -- `F(M) ≤ M' = M_σ` (Cor 15.5(d), `M ∉ M_F`).
-      have hnF : ¬ S14.IsTypeF M := fun hFc => (S14.isTypeF_iff_not_isTypeP.mp hFc) hP
-      obtain ⟨_Y, _, _, _, _, _, _, _, _, _, hd, _⟩ := fitting_decomposition hG hM
-      have hFleMσ : fittingInAmbient M ≤ OddOrder.BG.Ch3.S10.Msigma M := hM'eq ▸ hd hnF
-      -- `M_σ = M_F ≤ F(M)` (`M_F` nilpotent normal).
+      -- `M' = M_σ = M_F ≤ F(M)` (`M_F` nilpotent normal).
       haveI : Group.IsNilpotent ↥(MF M) := maxNilpotentNormalHall_isNilpotent M
-      have hMσleF : OddOrder.BG.Ch3.S10.Msigma M ≤ fittingInAmbient M :=
-        hMFeq ▸ le_fittingInAmbient_of_subgroupOf_normal_of_isNilpotent
-          (maxNilpotentNormalHall_le M) (maxNilpotentNormalHall_subgroupOf_normal M)
-      rw [hM'eq]; exact (le_antisymm hFleMσ hMσleF).symm
+      rw [hM'eq]
+      exact hMFeq ▸ le_fittingInAmbient_of_subgroupOf_normal_of_isNilpotent
+        (maxNilpotentNormalHall_le M) (maxNilpotentNormalHall_subgroupOf_normal M)
   · -- final disjunct: from (a).
     by_cases h : IsMulCommutative ↥(MF M)
     · exact Or.inl h
