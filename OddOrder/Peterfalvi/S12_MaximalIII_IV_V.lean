@@ -1388,6 +1388,73 @@ theorem Hypothesis.muGrid_inner_cross_column [Finite G] (hG : OddOrder.BG.IsMini
   · exact (h.columnFamily_cross_products_zero hχne hi hi').1
 
 open scoped FiniteInduce in
+/-- **§10 μ-grid within-column orthogonality** (Peterfalvi (4.3.b)): distinct rows of the same
+`W₂`-column give orthogonal certain-type characters, `(μ_{ij}, μ_{i'j}) = 0` for `i ≠ i'`.  The
+§6 `columnFamily` `mu` are distinct irreducibles (`irreducibleCharacter_inner` + the family's
+`injective` field), read through `muGrid`.  With `muGrid_inner_self` this completes the
+orthonormality of the full `μ`-grid. -/
+theorem Hypothesis.muGrid_inner_within_column [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    {M : Subgroup G} [Invertible (Nat.card ↥M : ℂ)] (hyp : Hypothesis M)
+    (hodd : Odd (Nat.card G)) {i i' : Fin hyp.w1} (j : Fin hyp.w2) (hii' : i ≠ i') :
+    ClassFunction.inner (hyp.muGrid hG hodd i j) (hyp.muGrid hG hodd i' j) = 0 := by
+  haveI := hyp.finiteG
+  classical
+  let h := (hyp.toCertainTypeHypothesis hG hodd).toHypothesis
+  haveI hNeZ1 : NeZero (Nat.card h.W1) := ⟨by have := h.one_lt_card_W1; omega⟩
+  haveI hcyc : IsCyclic ↥(h.W1 ⊔ h.W2) := h.isCyclic_sup
+  letI : CommGroup ↥(h.W1 ⊔ h.W2) := IsCyclic.commGroup
+  have hW1le : hyp.typeP.W1 ≤ M := hyp.typeP.W1_le
+  have hW2le : hyp.typeP.W2 ≤ M := typePData_W2_le_self hyp.typeP
+  have hcardW1 : Nat.card ↥h.W1 = hyp.w1 :=
+    Nat.card_congr (Subgroup.subgroupOfEquivOfLe hW1le).toEquiv
+  have hcardW2sub : Nat.card ↥(h.W2.subgroupOf (h.W1 ⊔ h.W2)) = hyp.w2 := by
+    rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe (le_sup_right)).toEquiv]
+    exact Nat.card_congr (Subgroup.subgroupOfEquivOfLe hW2le).toEquiv
+  haveI hNeZ2 : NeZero (Nat.card ↥(h.W2.subgroupOf (h.W1 ⊔ h.W2))) := ⟨Nat.card_pos.ne'⟩
+  have hrowne : (finCongr hcardW1.symm i) ≠ (finCongr hcardW1.symm i') :=
+    fun heq => hii' ((finCongr hcardW1.symm).injective heq)
+  have emj : hyp.muGrid hG hodd i j
+      = ((h.columnFamily (finCardEquivCharacterGroup _ (finCongr hcardW2sub.symm j))).mu
+          (finCongr hcardW1.symm i) : ClassFunction ↥M ℂ) := by
+    unfold Hypothesis.muGrid; rfl
+  have emj' : hyp.muGrid hG hodd i' j
+      = ((h.columnFamily (finCardEquivCharacterGroup _ (finCongr hcardW2sub.symm j))).mu
+          (finCongr hcardW1.symm i') : ClassFunction ↥M ℂ) := by
+    unfold Hypothesis.muGrid; rfl
+  rw [emj, emj', OddOrder.RepresentationTheory.irreducibleCharacter_inner,
+    if_neg (fun heq => hrowne ((h.columnFamily _).injective heq))]
+
+open scoped FiniteInduce in
+/-- **§10 column-sum norm** (Peterfalvi (10.5)/(10.6), `‖μ_k‖² = w₁`): the `W₂`-column sum
+`μ_k = ∑_{0≤i<w₁} μ_{ik}` has squared norm `w₁`, since its `w₁` summands are orthonormal
+(`muGrid_inner_self` on the diagonal, `muGrid_inner_within_column` off it).  This is the
+`‖μ_k^{τ₁}‖² = w₁` factor in the Cauchy–Schwarz bound of the (10.5) `a = 0` argument. -/
+theorem Hypothesis.muGrid_column_sum_inner_self [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G}
+    [Invertible (Nat.card ↥M : ℂ)] (hyp : Hypothesis M) (hodd : Odd (Nat.card G))
+    (j : Fin hyp.w2) :
+    ClassFunction.inner (∑ i : Fin hyp.w1, hyp.muGrid hG hodd i j)
+        (∑ i : Fin hyp.w1, hyp.muGrid hG hodd i j) = (hyp.w1 : ℂ) := by
+  haveI := hyp.finiteG
+  classical
+  -- per-pair inner products: `1` on the diagonal, `0` off it.
+  have hpair : ∀ i i' : Fin hyp.w1, ClassFunction.inner (hyp.muGrid hG hodd i j)
+      (hyp.muGrid hG hodd i' j) = (if i' = i then 1 else 0) := by
+    intro i i'
+    by_cases h : i' = i
+    · subst h; rw [if_pos rfl]; exact hyp.muGrid_inner_self hG hodd i' j
+    · rw [if_neg h]; exact hyp.muGrid_inner_within_column hG hodd j (Ne.symm h)
+  have hrow : ∀ i : Fin hyp.w1, ClassFunction.inner (hyp.muGrid hG hodd i j)
+      (∑ i' : Fin hyp.w1, hyp.muGrid hG hodd i' j) = 1 := by
+    intro i
+    rw [OddOrder.RepresentationTheory.inner_sum_right,
+      Finset.sum_congr rfl (fun i' _ => hpair i i'), Finset.sum_ite_eq' Finset.univ i]
+    simp
+  rw [OddOrder.RepresentationTheory.inner_sum_left,
+    Finset.sum_congr rfl (fun i _ => hrow i), Finset.sum_const, Finset.card_univ,
+    Fintype.card_fin, nsmul_eq_mul, mul_one]
+
+open scoped FiniteInduce in
 /-- **§10 `W₁`-vanishing of the column difference** (Peterfalvi (10.5), first step, via (4.3.c) +
 (4.4)): on `W₁^#`, the materialized character `μ_{ij}` equals `δ_j` times the column-`0` character
 `μ_{i0}`.  Indeed `x ∈ W₁^# ⊆ V = W − W₂`, so (4.3.c) gives `μ_{ij}(x) = δ_j·ω_{ij}(x)` and
