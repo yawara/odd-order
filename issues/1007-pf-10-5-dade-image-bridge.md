@@ -39,7 +39,25 @@ S15.Hypothesis.eta も pin (docstring) ⟹ omegaSigmaGrid 自体を再定義す�
 `omegaSigma` だけ aligned grid に差し替え (omegaSigmaGrid は S15 用に温存、docstring の「同一」主張は要更新)。
 **要ユーザー判断** (architectural, cross-file)。
 
-## やること
+## ✅✅ 進捗 (2026-06-21) — cross-level transport + reconciliation DONE
+
+misalignment fix (producer-local) を実装し、**deep gate だった cross-level reconciliation を close**:
+- ✅ `Hypothesis.alignedOmegaSigmaGrid` (`3b28cb54`): muGrid 自身の ω (`chiColumn`) を §6 `↥M` から §10 `G` へ
+  `e : ↥tic.W ≃* ↥(h.W1⊔h.W2)` (`subgroupOfEquivOfLe.symm` ∘ `subgroupCongr`) で transport し σ_∫。
+  infra: `typePData_W2_le_self`/`typePData_W_le_self`/`typePData_sup_subgroupOf_eq` + `ClassFunction.compHom`。
+- ✅ `Hypothesis.muGrid_apply_eq_columnSign_smul_alignedOmegaSigma_of_mem_typePV` (`dda1134c`): **V 上で
+  `μ_ij(v) = δ_j · alignedOmegaSigma_ij(v)`**。M-side (4.3.c) + σ-side (`sigmaIntegral_apply_of_mem_V`+`compHom_apply`)
+  + `e` が v を保つ (`he_coe`: `subgroupCongr_apply` rfl + `subgroupOfEquivOfLe.symm` 定義的) → 両 chiColumn 引数一致。
+- ⟹ aligned design 検証完了。per-(i,j) (10.5) identity が provable に (raw omegaSigmaGrid では不可能だった)。
+
+**▶ 残り (full bridge / alpha_tau_image)**:
+1. producer wiring: `exists_charParameters` の `omegaSigma := hyp.omegaSigmaGrid` を `alignedOmegaSigmaGrid` に
+   (S13 consumer 確認)。⚠ alpha_tau_image は arbitrary params ゆえ grid-level bridge 定理が本筋。
+2. bridge value-on-V: `α^τ − δ(ω^σ diff)` が V で消える = reconciliation + ζ-vanishing(`induce_eq_zero_of_not_mem_normal`)
+   + τ-cornerstone(`tau_apply_of_mem_typePV`)を組む。
+3. a=0 norm/numeric + (3.8) trichotomy(§5 `sigmaCoeff_trichotomy`)→ close。
+
+## やること (旧)
 
 - [ ] **carrier pinning**: `CharacterParameters.omegaSigma`/`mu` を `Hypothesis.omegaSigmaGrid`/`muGrid`
       に identity field (`omegaSigma_def`/`mu_def`) で pin。producer `exists_charParameters` は既に
