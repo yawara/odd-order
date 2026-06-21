@@ -5528,3 +5528,12 @@ obligations. -/
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S11.typeP_card_fixedSubgroup
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S11.typeP_H_inf_centralizer_W1
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S11.typeP_wielandt_order_relation
+
+/-! **Peterfalvi (8.5.b)** (`Peterfalvi.S11`).  `U ≠ 1 ⟹ U` does not centralize `H`, *derived* from
+the type-`P` data: if `U ≤ C(H)` then `F(M) = H ⊔ U = M'` is nilpotent, but `M'` is also a normal
+Hall subgroup of `M` (`|M'| = |H|·|U|` coprime to `[M : M'] = |W₁|`), so `M' ≤ M_F = H`, forcing
+`U ⊆ H ∩ U = 1` (`typeP_U_not_centralizes_H`).  With `C_H(U W₁) ≤ W₂` (`typeP_centralizer_uW1_le_W2`)
+this discharges the `C_H(U W₁) = 1` input of (9.3) for types III/IV from `|W₂|` prime alone. -/
+
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S11.typeP_centralizer_uW1_le_W2
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S11.typeP_U_not_centralizes_H
