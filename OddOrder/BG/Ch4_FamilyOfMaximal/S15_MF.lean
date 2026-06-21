@@ -7798,7 +7798,17 @@ theorem fitting_not_ti_cases [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
           (IsMulCommutative ↥(MF M) ∨
             ¬ IsMulCommutative ↥(MF M) ∧
               (S14.IsTypeF M ∨ S14.IsTypeP1 M))) := by
-  sorry
+  refine ⟨?_, mf_eq_msigma_of_not_fittingIsTI hG hM hnotTI, ?_⟩
+  · -- (a) `M ∈ M_F ∪ M_{P₁}`: `¬FittingIsTI` excludes type `P₂` (`fittingIsTI_of_isTypeP2`),
+    -- and every maximal subgroup is type `F`, `P₁`, or `P₂`.
+    have hnP2 : ¬ S14.IsTypeP2 M := fun hP2 => hnotTI (fittingIsTI_of_isTypeP2 hG hM hP2)
+    by_cases hP : S14.IsTypeP M
+    · exact Or.inr ((S14.isTypeP_iff_isTypeP1_or_isTypeP2.mp hP).resolve_right hnP2)
+    · exact Or.inl (S14.isTypeF_iff_not_isTypeP.mpr hP)
+  · -- (c)-(e) the cyclic intersection `X = X₁ ∈ M_σ` and the three local cases (BG L4250-4260):
+    -- `O_p(M)` non-abelian (else `X₁` is characteristic, normal in `M` and `Mᵍ`), `X` cyclic by
+    -- Lemma 10.13(b), and the case split on `M_F` abelian / Type F / Type P₁.  Residual.
+    sorry
 
 /-- **BG Theorem 15.8** (mmd L4264; Feit--Thompson 1991): in the Corollary 14.12 setup,
 nonempty `tau_2(H)` forces `tau_2(M) = ∅`, `q := |K|` prime, and `tau_2(H) = {q}`.
