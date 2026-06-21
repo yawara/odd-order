@@ -608,30 +608,37 @@ theorem card_dvd_prime_of_isCyclic_of_pow {H : Type*} [Group H] {p : ℕ}
 abstracted from the carrier).  For a coprime Frobenius action `act` (kernel `act.U` normal in `L`,
 complement `act.E`) on an elementary abelian `p`-group `K`: if `act` is `L`-irreducible (every
 invariant subgroup is `⊥` or `⊤`), `act.U` does not centralize `K` (`fixedByU ≠ ⊤`), the `E`-fixed
-points `C_K(E) = fixedByE` are cyclic, and `K ≠ 1`, then `|K| = p^{|E|}`.
+points `C_K(E) = fixedByE` are cyclic, and `K ≠ 1`, then `|K| = p^{|E|}` *and* `|C_K(E)| = p`.
 
 `C_K(U) = fixedByU` is `L`-invariant (as `act.U ◁ L`) and `≠ K`, so `= ⊥` by irreducibility;
-`|C_K(E)| ∣ p` since `C_K(E)` is cyclic of exponent `p`; Wielandt's fixed-point formula
-(`coprimeFrobeniusAction_card_eq_prime_pow`) then gives `|K| = p^{|E|}`.  This serves both the
-quotient chief factor `H̄ = ↥H ⧸ N` (`typeP_chiefFactor_card`) and the irreducible *summand* of the
-elementary abelian seed in the (9.4) existence proof. -/
+`|C_K(E)| ∣ p` since `C_K(E)` is cyclic of exponent `p`, and `≠ 1` (else `|K| = |C_K(E)|^{|E|} = 1`
+by Wielandt), so `= p`; Wielandt's fixed-point formula then gives `|K| = p^{|E|}`.  The `|C_K(E)| = p`
+clause feeds the type III/IV identity `p = |W₂|` (the chief factor's `E`-fixed points are the image
+of `W₂`).  This serves both the quotient chief factor `H̄ = ↥H ⧸ N` (`typeP_chiefFactor_card`) and
+the irreducible *summand* of the elementary abelian seed in the (9.4) existence proof. -/
 theorem coprimeFrobeniusChiefFactor_card {L K : Type*} [Group L] [Group K] [Finite K] [Finite L]
     (act : CoprimeFrobeniusAction L K) (hUnorm : act.U.Normal)
     {p : ℕ} (hp : p.Prime) (hK : IsElementaryAbelian p K)
     (hirr : ∀ J : Subgroup K, IsAInvariant act.φ J → J = ⊥ ∨ J = ⊤)
     (hUntriv : act.fixedByU ≠ ⊤) (hEcyc : IsCyclic ↥act.fixedByE)
     (hK1 : Nat.card K ≠ 1) :
-    Nat.card K = p ^ Nat.card ↥act.E := by
+    Nat.card K = p ^ Nat.card ↥act.E ∧ Nat.card ↥act.fixedByE = p := by
   have hUinv : IsAInvariant act.φ act.fixedByU :=
     isAInvariant_fixedSubgroup_of_normal act.φ hUnorm
   have hfixU : act.fixedByU = ⊥ := (hirr _ hUinv).resolve_right hUntriv
   have hdvd : Nat.card ↥act.fixedByE ∣ p := card_dvd_prime_of_isCyclic_of_pow hK.2 hEcyc
-  exact coprimeFrobeniusAction_card_eq_prime_pow act hfixU hp hdvd hK1
+  have hcard := coprimeFrobeniusAction_card_eq_prime_pow act hfixU hp hdvd hK1
+  refine ⟨hcard, ?_⟩
+  have hne : Nat.card ↥act.fixedByE ≠ 1 := fun h => hK1 (by
+    have key := wielandt_fixedPoint_trivial_U_fixed act hfixU
+    rwa [h, one_pow] at key)
+  exact (hp.eq_one_or_self_of_dvd _ hdvd).resolve_left hne
 
 /-- **Chief-factor order on an irreducible summand** (the form (9.4)/(9.6) use).  For a coprime
 Frobenius action `act` on an elementary abelian `p`-group `V` (kernel `act.U ◁ L`, `C_V(E)` cyclic),
 and an `act.φ`-invariant subgroup `S ≠ ⊥` that is `L`-irreducible *inside `V`* (`hirr`) and met
-trivially by `C_V(U)` (`hUnc`, so `U` is fixed-point-free on `S`), the order of `S` is `p^{|E|}`.
+trivially by `C_V(U)` (`hUnc`, so `U` is fixed-point-free on `S`), the order of `S` is `p^{|E|}`,
+and `|C_V(E) ⊓ S| = |C_S(E)| = p`.
 
 This is `coprimeFrobeniusChiefFactor_card` transported to the *summand* `S` via the restricted
 action `hSinv.restrict` on `↥S`: `S` is elementary abelian (subgroup of `V`); `L`-irreducible
@@ -647,7 +654,8 @@ theorem coprimeFrobeniusChiefFactor_card_of_summand
     {S : Subgroup V} (hSinv : IsAInvariant act.φ S) (hSne : S ≠ ⊥)
     (hirr : ∀ K : Subgroup V, IsAInvariant act.φ K → K ≤ S → K = ⊥ ∨ K = S)
     (hUnc : act.fixedByU ⊓ S = ⊥) (hEcyc : IsCyclic ↥act.fixedByE) :
-    Nat.card ↥S = p ^ Nat.card ↥act.E := by
+    Nat.card ↥S = p ^ Nat.card ↥act.E ∧
+      Nat.card ↥(act.fixedByE ⊓ S : Subgroup V) = p := by
   have hSel : IsElementaryAbelian p ↥S := hV.to_subgroup S
   have hSsolv : IsSolvable ↥S := by
     letI : CommGroup ↥S := { (inferInstance : Group ↥S) with mul_comm := hSel.comm }
@@ -690,7 +698,13 @@ theorem coprimeFrobeniusChiefFactor_card_of_summand
     show IsCyclic ↥(fixedSubgroup hSinv.restrict act.E)
     rwa [fixedSubgroup_restrict_eq hSinv]
   have hK1 : Nat.card ↥S ≠ 1 := fun h => hSne (Subgroup.card_eq_one.mp h)
-  exact coprimeFrobeniusChiefFactor_card act_S hUnorm hp hSel hirr_S hUntriv_S hEcyc_S hK1
+  obtain ⟨hScard, hEcard⟩ :=
+    coprimeFrobeniusChiefFactor_card act_S hUnorm hp hSel hirr_S hUntriv_S hEcyc_S hK1
+  refine ⟨hScard, ?_⟩
+  -- `|C_V(E) ⊓ S| = |C_S(E)| = p` via `card_fixedSubgroup_restrict`.
+  have hr := card_fixedSubgroup_restrict (φ := act.φ) (N := S) (X := act.E) hSinv
+  rw [show fixedSubgroup hSinv.restrict act.E = act_S.fixedByE from rfl, hEcard] at hr
+  exact hr.symm
 
 /-- **Peterfalvi (9.6)** (conditional on the (9.4) chief factor): the order computation
 `|H̄| = p^q` for the chief factor `H̄ = ↥H ⧸ N`.
@@ -739,7 +753,7 @@ theorem typeP_chiefFactor_card [Finite G] (data : TypePData M) (hU : data.U ≠ 
     rw [← hrange]
     exact isCyclic_of_surjective f.rangeRestrict f.rangeRestrict_surjective
   -- Wielandt's formula + the prime computation give `|H̄| = p^{|act'.E|} = p^q`.
-  have hcard := coprimeFrobeniusChiefFactor_card act' hUnorm hp hpe hirr hUntriv hEcyc hHbar
+  have hcard := (coprimeFrobeniusChiefFactor_card act' hUnorm hp hpe hirr hUntriv hEcyc hHbar).1
   rw [hcard]
   congr 1
   exact Nat.card_congr (Subgroup.subgroupOfEquivOfLe le_sup_right).toEquiv
