@@ -1365,6 +1365,83 @@ theorem proposition_type_classification_of_inputs {M : Subgroup G}
         exact mf_eq_of_not_typeP1 (fun hP1 => S14.not_isTypeP1_and_isTypeP2 ⟨hP1, hP2⟩)
       · exact (hVP1 hV).2
 
+/-- **Proposition 16.1 input `hF_not_derived` / BG Theorem A(3) contrapositive** (mmd L4290): a
+type-`F` maximal subgroup `M` (`κ(M) = ∅`) has **no** `(κ ∪ σ)'`-Hall `U` with `M' = U M_σ`.
+For type-`F`, `M = U M_σ` for *every* such `U` (`typeP_maximal_eq_kappaHall_sup_U_sup_Msigma` with
+`K = ⊥`: the `⊥`-`κ`-Hall witness exists since `κ(M) = ∅`), so `M' = U M_σ` would force `M' = M`,
+contradicting the proper derived subgroup `M' < M` of the nontrivial solvable `M`
+(`IsSolvable.commutator_lt_top_of_nontrivial`).  This is the `M ∈ ℳ_𝓕 ⟹ M' ⊊ M = U M_σ` half
+powering Proposition 16.1 clause (e) (`M' = U M_σ ⟺ ¬ Type I`). -/
+theorem typeF_not_exists_hall_derived_eq [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} (hM : M ∈ maximalSubgroups G)
+    (hF : S14.IsTypeF M) :
+    ¬ ∃ U : Subgroup G,
+      Ch03.IsHallSubgroup ((S14.kappa M ∪ OddOrder.BG.Ch3.S10.sigma M)ᶜ) (U.subgroupOf M) ∧
+      derivedInG M = U ⊔ OddOrder.BG.Ch3.S10.Msigma M := by
+  rintro ⟨U, hUhall, hM'eq⟩
+  have hkappa : S14.kappa M = ∅ := hF
+  haveI : IsSolvable ↥M := hG.solvable_of_mem_maximalSubgroups hM
+  -- `U ≤ M' ≤ M`.
+  have hUM : U ≤ M := by
+    have h : U ≤ derivedInG M := by rw [hM'eq]; exact le_sup_left
+    exact h.trans (Subgroup.map_subtype_le _)
+  -- `⊥` is a `κ(M)`-Hall subgroup of `M` (type-`F`: `κ(M) = ∅`).
+  have hK_bot : Ch03.IsHallSubgroup (S14.kappa M) ((⊥ : Subgroup G).subgroupOf M) := by
+    rw [Subgroup.bot_subgroupOf, Ch03.IsHallSubgroup.bot_iff]
+    intro p _
+    rw [hkappa]; exact Set.notMem_empty p
+  -- type-`F` decomposition `M = ⊥ ⊔ U ⊔ M_σ = U ⊔ M_σ`.
+  have hMeq : M = U ⊔ OddOrder.BG.Ch3.S10.Msigma M := by
+    have h := typeP_maximal_eq_kappaHall_sup_U_sup_Msigma hG hM bot_le hUM hK_bot hUhall
+    rwa [bot_sup_eq] at h
+  -- but `M' < M` (proper derived subgroup of the nontrivial solvable `M`).
+  have hMne : M ≠ ⊥ := fun h =>
+    OddOrder.BG.Ch3.S10.Msigma_ne_bot hG hM
+      (le_bot_iff.mp (h ▸ OddOrder.BG.Ch3.S10.Msigma_le M))
+  haveI : Nontrivial ↥M := (Subgroup.nontrivial_iff_ne_bot M).mpr hMne
+  have hlt : derivedInG M < M := by
+    rw [derivedInG]
+    conv_rhs => rw [← Subgroup.range_subtype M, MonoidHom.range_eq_map]
+    rw [Subgroup.map_lt_map_iff_of_injective M.subtype_injective]
+    exact IsSolvable.commutator_lt_top_of_nontrivial (G := ↥M)
+  exact (ne_of_lt hlt) (hM'eq.trans hMeq.symm)
+
+/-- **Proposition 16.1 input `hP_derived` / BG Theorem C(3)** (mmd L4307): a type-`P` maximal
+subgroup `M` has a `(κ ∪ σ)'`-Hall `U` with `M' = U M_σ`.  Construct a `κ(M)`-Hall `K` and a
+`(κ ∪ σ)'`-Hall `U` of the solvable `M` (Hall's theorem); `K ≠ ⊥` since `M` is type-`P`
+(`isTypeF_of_isHall_kappa_eq_bot` would force `κ(M) = ∅`); then `typeP_hall_derived_eq_and_abelian`
+(Theorem 14.7(h) + the three-Hall partition) gives `M' = U M_σ`.  Together with
+`typeF_not_exists_hall_derived_eq` this supplies both directions of Proposition 16.1 clause (e)
+(`M' = U M_σ ⟺ ¬ Type I`). -/
+theorem typeP_exists_hall_derived_eq [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} (hM : M ∈ maximalSubgroups G)
+    (hP : S14.IsTypeP M) :
+    ∃ U : Subgroup G,
+      Ch03.IsHallSubgroup ((S14.kappa M ∪ OddOrder.BG.Ch3.S10.sigma M)ᶜ) (U.subgroupOf M) ∧
+      derivedInG M = U ⊔ OddOrder.BG.Ch3.S10.Msigma M := by
+  classical
+  haveI : IsSolvable ↥M := hG.solvable_of_mem_maximalSubgroups hM
+  -- A `κ(M)`-Hall subgroup `K` of `M` (Hall's theorem in the solvable `M`).
+  obtain ⟨K', hK'⟩ := Ch03.hall_E_exists (G := ↥M) (S14.kappa M)
+  set K : Subgroup G := K'.map M.subtype with hKdef
+  have hKM : K ≤ M := hKdef ▸ Subgroup.map_subtype_le K'
+  have hKeq : K.subgroupOf M = K' :=
+    hKdef ▸ Subgroup.comap_map_eq_self_of_injective M.subtype_injective K'
+  have hK : Ch03.IsHallSubgroup (S14.kappa M) (K.subgroupOf M) := hKeq ▸ hK'
+  -- A `(κ ∪ σ)'`-Hall subgroup `U` of `M`.
+  obtain ⟨U', hU'⟩ := Ch03.hall_E_exists (G := ↥M)
+    ((S14.kappa M ∪ OddOrder.BG.Ch3.S10.sigma M)ᶜ)
+  set U : Subgroup G := U'.map M.subtype with hUdef
+  have hUM : U ≤ M := hUdef ▸ Subgroup.map_subtype_le U'
+  have hUeq : U.subgroupOf M = U' :=
+    hUdef ▸ Subgroup.comap_map_eq_self_of_injective M.subtype_injective U'
+  have hU : Ch03.IsHallSubgroup ((S14.kappa M ∪ OddOrder.BG.Ch3.S10.sigma M)ᶜ) (U.subgroupOf M) :=
+    hUeq ▸ hU'
+  -- `K ≠ ⊥`: else `M` would be type-`F` (`κ(M) = ∅`), contradicting `IsTypeP M`.
+  have hKne : K ≠ ⊥ := fun h =>
+    (S14.isTypeF_iff_not_isTypeP.mp (isTypeF_of_isHall_kappa_eq_bot hKM hK h)) hP
+  exact ⟨U, hU, (typeP_hall_derived_eq_and_abelian hG hM hKM hUM hKne hK hU).1⟩
+
 /-- **BG Proposition 16.1** (mmd L4478): the §14--§15 local families are exactly
 the shared Type I--V maximal-subgroup predicates consumed downstream by Peterfalvi.
 Six clauses = mmd (a)-(f): (a) Type I ⟺ `M ∈ ℳ_𝓕`, (b) Type II ⟺ `M ∈ ℳ_𝓟₂`,
