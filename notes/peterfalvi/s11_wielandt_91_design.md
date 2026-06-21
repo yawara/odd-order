@@ -657,3 +657,31 @@ downstream leaf へ移し `wielandt_formula_of_perfactor` + `wielandtPerFactor_o
 (`isFrobenius_kernel_eq_bot_of_frobenius_subgroup` 等) が **CoprimeAction 内で carrier を使用**しているので
 それらも一緒に移す必要がある (`fixedSubgroup` def 自体は多数 import 元ゆえ CoprimeAction に残す)。消費側
 S11/S15 の import 更新も。spine refactor ゆえ要計画。**D 無しでは sorry は減らない** (E は配線のみ)。
+
+## 2026-06-21 (lane-h resume³ cont) — piece E DONE (relocation, assembly load-bearing)
+
+**✅✅ piece E 完成** (新 leaf `OddOrder/GroupTheory/WielandtFixedPoint.lean`, commit `d98be5d7`,
+full build 3878 green + AxiomsCheck, 実 sorry 135 不変)。main マージ後 (HEAD `1ca93c1e`) に実施。
+
+`wielandt_fixedPoint_frobenius` を **chief-series assembly 経由で証明**:
+```
+wielandt_formula_of_perfactor (wielandtPerFactor_of_dim hdim) H act.φ act.coprime_order.symm
+```
+群論層 (A/B/C, 全 axiom-clean) が **live theorem で load-bearing** 化。唯一残 sorry = `hdim` =
+**per-factor (†) dim 恒等式 `PerFactorDimIdentity`** (= piece D の証明対象、精密に isolate された)。
+`#print axioms wielandt_fixedPoint_frobenius` = `[propext, sorryAx, Classical.choice, Quot.sound]`
+(sorryAx は hdim 由来; 群論層は cite 済)。
+
+**relocation の構成** (entangle 解消):
+- `CoprimeAction` 残置: carrier `CoprimeFrobeniusAction` + `fixedSubgroup`/`fixedByUE/E/U` +
+  pure Frobenius helper 3 本 (`centralizer_inf_kernel_eq_bot_of_not_mem`,
+  `coprime_card_of_inf_kernel_eq_bot{,_le}`)。
+- 新 leaf `WielandtFixedPoint` (imports CoprimeAction + WielandtPerFactorDischarge): 4 Wielandt 定理
+  (formula + 3 corollary) + engine `isFrobenius_kernel_eq_bot_of_frobenius_subgroup`。
+- consumer 更新: `S15_SAndT` import を CoprimeAction → WielandtFixedPoint (engine を cite;
+  `coprime_card_of_inf_kernel_eq_bot_le` は transitively 到達)。`S11` docstring の所在を更新。root に
+  新 leaf 追加。AxiomsCheck assertion は移動定理になし (sorried ゆえ登録不可、`centralizer_inf_…` は残置で不変)。
+
+**⟹ honest architecture 完成**: (9.1) は群論的還元 (A/B/C) を経て **唯一 (†) per-factor dim 恒等式
+`PerFactorDimIdentity` に bottom-out**。残るは **piece D のみ** (= 上記「NEXT — carrier-level」items 0-3 の
+modular Brauer / free-orbit rep-theory で `PerFactorDimIdentity` を per chief factor 証明)。
