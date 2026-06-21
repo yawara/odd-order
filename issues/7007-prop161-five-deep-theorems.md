@@ -90,6 +90,40 @@ bottom-out** するので、clean 化には §15 foundation が先。真の順�
 
 ## 進捗ログ
 
+**2026-06-22 (cont.³) ▶ BG Lemma 14.11 着手 — 依存閉包を全解決 + phase 1 (`q∈τ₁ ∧ C_{M_σ}(Q)=1`) landed**:
+`exists_maximal_of_typeF_notMem_fitting` (S14_TypePCounting:8473, sorry) は Thm C conjunct 2
+(`N_G(U)⊄M`=Cor 14.12) と Prop 16.1 の `hP2II` 両方の linchpin (TypeIIData.normalizer_not_le)。
+**「§13 gated」は STALE** — 実依存は §12/§10/§14 で全 landed (Workflow `wf_136774bc-e30` で監査確定)。
+
+- **de-privatize `subgroupESetup_of_complement`** (S12_Proposition1215:170 `private`→public): 与えられた
+  `M_σ`-補元 `E` 上に E-setup を張る (`exists_subgroupESetup_with_le` は別 `E'` を作り `Q⊄F(E)` を
+  運べないので、与えられた `E` 上に張る必要)。
+- **landed helpers** (S14_TypePCounting, Lemma 14.11 直前, 全 build-green):
+  `esetup_of_isComplement` (IsComplement'→E-setup) / `typeF_complement_q_notMem_tau2` (S1, Cor 12.6(a)
+  `elemAb_normal_in_E_of_tau2` + `le_fittingInG_of_normal_isPiSubgroup_singleton`) /
+  `typeF_complement_q_notMem_tau3` (S2, `E3_le_fittingInG` + `isPiGroup_le_of_normal_isHallSubgroup`) /
+  `typeF_complement_q_tau1_and_centralizer` (S3 τ-partition `mem_tau_union_of_mem_primeFactors` + gap C:
+  κ(M)=∅ で `C_{M_σ}(Q)=1`)。
+
+**残 (S4-S13) = 全 lemma 名解決済、次セッションは straight 実装**:
+- **S4-S7 (τ₂(M)≠∅)**: `K:=⁅E,Q⁆` は abelian (`⁅E,Q⁆≤derivedInG E`, Cor 12.10(b)
+  `nilpotent_sigmaComplement_abelian` の `.2.1.2`) かつ `q'`-群 (`≤derivedInG M`, `q∈τ₁⟹q∉π(M')` =
+  `tau1_not_mem_derived_primeFactors`)。`Q≤N(K)` = `subgroup_le_normalizer_commutator_self E Q` ∘ `hQE`。
+  `C_{M_σ}(Q)=1` (phase 1) で **Prop 10.11(d) `sigma_complement_commutator_cyclic_normal`** を lemma-K=`⁅E,Q⁆`,
+  P=Q で適用 → `K':=⁅⁅E,Q⁆,Q⁆` cyclic normal, `≤C(M_σ)`, `M≤N(K')`。**`K'≠⊥`**: 反対なら
+  `⁅E,Q⁆≤C(Q)` (`commutator_eq_bot_iff_le_centralizer`) → `Q^E=Q⊔⁅E,Q⁆` abelian normal → `≤fittingInG E`
+  (`nilpotent_normal_le_fitting`) → `Q⊆F(E)` 矛盾。**`π(K')⊆τ₂`**: `K'≤C(M_σ)` で `M_σ⊓C(K')=M_σ≠⊥`、
+  各 `p∈π(K')` に `typeP_hall_small_subgroup_cyclic_tau2` の Part-A (S14:2461-2490) を port
+  (`p∉τ₂⟹r_p=1⟹`Lemma 14.1 `msigma_structure_of_notMem_sigma_kappa` antitone 矛盾)。注: ⁅E,Q⁆=⁅⁅E,Q⁆,Q⁆
+  の Frattini 恒等式は **不要** (A₀=K 同定は BG の注記のみで存在結論に未使用)。
+- **S8-S13 (M* 二分律)**: `p∈τ₂`, `A∈ℰ_p²(E)` (`exists_elemAb_rank_two_le_E_of_tau2`)、`⁅A,Q⁆≠⊥`
+  (Q⊄C_E(A); A∈ℰ_p², Q∈ℰ_q¹ p≠q)。**Cor 12.9 `commutator_decomp_of_tau1_action`** (hp hq hA hAE hQ hQE hCQ hAQ)
+  → `A₀=⁅A,Q⁆=A⊓C(M_σ)` (M≤N(A₀)) + `A₁=A⊓C(Q)`, `C_G(A₁)⊄M`。`M*∈𝓜(N_G(A))` (maximalSubgroupsContaining
+  存在)。**Lemma 12.11 `tau2_transfer_to_maximal`** → `.1`: p∈σ(M*)∖β(M*); `.2.1`: q∈τ₁(M*)∪τ₂(M*)
+  (q∈π([E:C_E(A)]), Q⊄C_E(A) より)。case q∈τ₂(M*): Cor 12.10(e) (`nilpotent_sigmaComplement_abelian.2.2.2.2.2`)
+  → `𝓜(C_G(Q))={M*}` (Or.inl)。case q∈τ₁(M*): `q∈κ(M*)` (witness Q, C_{M*_σ}(Q)⊇C_A(Q)≠⊥) + σ(M*)≠β(M*)
+  → ¬P2 → `IsTypeP1 M*` (typeP_structure conjunct 5 + `isTypeP_iff_isTypeP1_or_isTypeP2`) (Or.inr)。
+
 **2026-06-22 (cont.²) ✅✅✅ Thm C conjunct 10 (BG C(9) `A0-A` TI) 完全完成 — sorry-free + axiom-clean** (`491bdd3d`, full build 3881 green):
 - 構造的包含 `a0_minus_a_subset_conj_zTilde` を **完全に証明** (前 commit `d553f1e0` の residual を充足)。`#print axioms` = 標準3公理のみ。AxiomsCheck 登録 (transport 補題と共に)。
 - **Helper A** (κ'-元 ∈ M'): `M'` が Hall κ-部分群 `K` を補完 (`typeP_duality.symm.index_eq_card` で `[M:M']=|K|` κ-数) → `↥M⧸M'` での像の位数が `[M:M']` と `orderOf x` (κ'-数) を割る → 1 → `x∈M'`。quotient-order 論法。
