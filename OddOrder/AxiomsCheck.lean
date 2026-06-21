@@ -5454,3 +5454,15 @@ the input that drops the trivial summand in the kernel-FPF count (†) when `W�
 #assert_only_allowed_axioms OddOrder.GroupTheory.WielandtKernelFPF.symm_single_eq_average
 #assert_only_allowed_axioms OddOrder.GroupTheory.WielandtKernelFPF.range_centerProj_aug_eq_invariants
 #assert_only_allowed_axioms OddOrder.GroupTheory.WielandtKernelFPF.exists_aug_coordinate
+
+/-! **(9.1) the kernel-FPF dimension fact (†)** over an algebraically closed field
+(`WielandtKernelFPF`, item 2).  For `U ◁ L` a `p′`-group, `E ≤ L` (`U ⊔ E = ⊤`) acting on `U`
+fixed-point-freely by conjugation, and a finite-dimensional `k[L]`-module `W` with `Wᵁ = 0`,
+`dim W = |E| · dim Wᴱ` (`finrank_eq_card_mul_finrank_invariants_kernelFPF`).  The `U`-isotypic
+decomposition drops its trivial summand (`Wᵁ = 0`), and `E` permutes the rest freely (item 1), so the
+free-orbit count applies.  This is the representation-theoretic core (†) of Wielandt's formula;
+`isInternal_restrict_ne` is the supporting drop-zero-summand lemma.  Axiom-clean. -/
+
+#assert_only_allowed_axioms OddOrder.GroupTheory.WielandtKernelFPF.isInternal_restrict_ne
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.WielandtKernelFPF.finrank_eq_card_mul_finrank_invariants_kernelFPF

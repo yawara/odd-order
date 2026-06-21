@@ -240,4 +240,141 @@ theorem exists_aug_coordinate :
 
 end TrivialIsotypic
 
+/-! ### Dropping a zero summand from an internal direct sum -/
+
+/-- If `V = ⊕_{i:ι} A i` internally and one summand `A i₀ = ⊥`, then dropping it still gives an
+internal direct sum `V = ⊕_{i ≠ i₀} A i`.  (Used to restrict the isotypic decomposition to the
+nontrivial simples, where the Frobenius complement acts freely.) -/
+theorem isInternal_restrict_ne {R M ι : Type*} [Ring R] [AddCommGroup M] [Module R M]
+    [DecidableEq ι] {A : ι → Submodule R M} (hint : DirectSum.IsInternal A) {i₀ : ι}
+    (h0 : A i₀ = ⊥) :
+    DirectSum.IsInternal (fun i : {i : ι // i ≠ i₀} => A i.val) := by
+  rw [DirectSum.isInternal_submodule_iff_iSupIndep_and_iSup_eq_top] at hint ⊢
+  obtain ⟨hind, hsup⟩ := hint
+  refine ⟨hind.comp Subtype.val_injective, le_antisymm le_top ?_⟩
+  rw [← hsup]
+  refine iSup_le fun i => ?_
+  by_cases hi : i = i₀
+  · rw [hi, h0]; exact bot_le
+  · exact le_iSup (fun j : {j : ι // j ≠ i₀} => A j.val) ⟨i, hi⟩
+
+/-! ### The kernel-FPF dimension fact (†) over an algebraically closed field -/
+
+section KernelFPF
+
+open Module Representation
+open OddOrder.GroupTheory.CenterModuleDecomp (centerProj isInternal_centerProj map_range_centerProj)
+open OddOrder.GroupTheory.CenterSplitting (exists_center_algEquiv_pi)
+open OddOrder.GroupTheory.WielandtCounting (finrank_eq_card_mul_finrank_invariants_of_free)
+
+variable {k : Type*} [Field k] [IsAlgClosed k]
+variable {L : Type*} [Group L] [Finite L] {W : Type*} [AddCommGroup W] [Module k W]
+variable [FiniteDimensional k W]
+
+/-- **Peterfalvi (9.1), the kernel-FPF dimension fact (†).**  Let `L` be finite, `U ◁ L` a `p′`-group
+(`char k ∤ |U|`), `E ≤ L` with `U ⊔ E = ⊤` and `|E|` coprime to `|U|`, the conjugation action of `E`
+on `U` fixed-point-free (`hfpf`).  Then for any finite-dimensional `k[L]`-module `W` with no
+`U`-invariants (`Wᵁ = 0`), `dim W = |E| · dim Wᴱ`.
+
+Proof: split `W` into its `U`-isotypic components `A i = range (centerProj φ ρᵁ i)` (over a splitting
+`φ : Z(k[U]) ≃ (Fin N → k)`); the trivial component `A i₀` is `Wᵁ = 0`, so `W = ⊕_{i ≠ i₀} A i`.  The
+Frobenius complement `E` permutes the `A i` by `simplesAction φ ∘ ψ` (item 0) and acts **freely** off
+`i₀` (item 1, via 3d.3c), so the free-orbit count
+`finrank_eq_card_mul_finrank_invariants_of_free` gives `dim W = |E| · dim Wᴱ`. -/
+theorem finrank_eq_card_mul_finrank_invariants_kernelFPF
+    (ρ : Representation k L W) {U E : Subgroup L} [U.Normal]
+    [Fintype ↥E] [Invertible (Fintype.card ↥E : k)] [NeZero (Nat.card ↥U : k)]
+    (hsup : U ⊔ E = ⊤)
+    (hcop : Nat.Coprime (Nat.card ↥E) (Nat.card ↥U))
+    (hEnt : 1 < Nat.card ↥E)
+    (hfpf : ∀ e ∈ E, e ≠ 1 → ∀ u ∈ U, e * u * e⁻¹ = u → u = 1)
+    (hWU : invariants (ρ.comp U.subtype) = ⊥) :
+    Module.finrank k W
+      = Fintype.card ↥E * Module.finrank k ↥(invariants (ρ.comp E.subtype)) := by
+  classical
+  haveI : Finite ↥U := Subtype.finite
+  haveI : Fintype ↥U := Fintype.ofFinite _
+  haveI : Invertible (Fintype.card ↥U : k) :=
+    invertibleOfNonzero (by rw [Nat.card_eq_fintype_card] at *; exact NeZero.ne _)
+  -- The `U`-representation and a splitting of `Z(k[U])`.
+  set ρU : Representation k ↥U W := ρ.comp U.subtype with hρU
+  obtain ⟨N, ⟨φ⟩⟩ := exists_center_algEquiv_pi k ↥U
+  -- The conjugation action `ψ : E → MulAut U`, fixed-point-free and coprime off the identity.
+  set ψ : ↥E →* MulAut ↥U := (MulAut.conjNormal (H := U)).comp E.subtype with hψ
+  have hψfpf : ∀ γ : ↥E, γ ≠ 1 → ∀ u : ↥U, ψ γ u = u → u = 1 := by
+    intro γ hγ u hu
+    have hγL : (γ : L) ≠ 1 := fun h => hγ (Subtype.ext h)
+    have : (γ : L) * (u : L) * (γ : L)⁻¹ = (u : L) := by
+      have := congrArg (Subtype.val) hu
+      rwa [hψ, MonoidHom.comp_apply, MulAut.conjNormal_apply] at this
+    exact Subtype.ext (hfpf (γ : L) γ.2 hγL (u : L) u.2 this)
+  have hψcop : ∀ γ : ↥E, γ ≠ 1 →
+      Nat.Coprime (Nat.card ↥(Subgroup.zpowers (ψ γ))) (Nat.card ↥U) := by
+    intro γ _
+    rw [Nat.card_zpowers]
+    exact hcop.coprime_dvd_left ((orderOf_map_dvd ψ γ).trans (orderOf_dvd_natCard γ))
+  -- The augmentation coordinate `i₀` (the trivial simple), fixed by all `simplesAction φ α`.
+  obtain ⟨i₀, haug, hi₀fix⟩ := exists_aug_coordinate φ
+  -- The isotypic family and the vanishing of the trivial summand.
+  set A : Fin N → Submodule k W := fun i => LinearMap.range (centerProj φ ρU i) with hA
+  have hintA : DirectSum.IsInternal A := isInternal_centerProj φ ρU
+  have hAi₀ : A i₀ = ⊥ := by
+    rw [hA]; dsimp only
+    rw [range_centerProj_aug_eq_invariants φ ρU haug, hρU]; exact hWU
+  have hintA' : DirectSum.IsInternal (fun i : {i : Fin N // i ≠ i₀} => A i.val) :=
+    isInternal_restrict_ne hintA hAi₀
+  -- The free `E`-action on the nontrivial simples (item 1).
+  obtain ⟨i₁, hi₁fix, hi₁free⟩ := exists_fixed_simple_free_of_fpf φ ψ hEnt hψcop hψfpf
+  have hi₁eq : i₁ = i₀ := by
+    by_contra hne
+    haveI : Nontrivial ↥E := Finite.one_lt_card_iff_nontrivial.mp hEnt
+    obtain ⟨γ, hγ1⟩ := exists_ne (1 : ↥E)
+    exact hγ1 (hi₁free i₀ γ (Ne.symm hne) (hi₀fix (ψ γ)))
+  -- The `E`-action on the nontrivial-simple index set `{i ≠ i₀}`.
+  letI mulE : MulAction ↥E {i : Fin N // i ≠ i₀} :=
+    { smul := fun e i => ⟨simplesAction φ (ψ e) i.val, fun hc => i.2
+        ((simplesAction φ (ψ e)).injective (hc.trans (hi₀fix (ψ e)).symm))⟩
+      one_smul := fun i => Subtype.ext (show simplesAction φ (ψ 1) i.val = i.val by
+        rw [map_one, map_one, Equiv.Perm.coe_one, id_eq])
+      mul_smul := fun e e' i => Subtype.ext
+        (show simplesAction φ (ψ (e * e')) i.val
+            = simplesAction φ (ψ e) (simplesAction φ (ψ e') i.val) by
+          rw [map_mul, map_mul, Equiv.Perm.mul_apply]) }
+  have hsmul : ∀ (e : ↥E) (i : {i : Fin N // i ≠ i₀}),
+      (e • i).val = simplesAction φ (ψ e) i.val := fun _ _ => rfl
+  -- `hperm`: `E` permutes the nontrivial isotypic summands (item 0).
+  have hperm : ∀ (e : ↥E) (i : {i : Fin N // i ≠ i₀}),
+      (A i.val).map ((ρ.comp E.subtype) e) = A (e • i).val := by
+    intro e i
+    -- `τ = ρ (e:L)` as a linear automorphism of `W`.
+    let τ : W ≃ₗ[k] W := LinearEquiv.ofLinear (ρ (e : L)) (ρ ((e : L)⁻¹))
+      (by rw [← Module.End.mul_eq_comp, ← map_mul, mul_inv_cancel, map_one]; rfl)
+      (by rw [← Module.End.mul_eq_comp, ← map_mul, inv_mul_cancel, map_one]; rfl)
+    have hτcoe : (τ : W →ₗ[k] W) = ρ (e : L) := rfl
+    have hintertwine : ∀ u : ↥U,
+        (τ : Module.End k W) * ρU u = ρU (ψ e u) * (τ : Module.End k W) := by
+      intro u
+      show ρ (e : L) * ρ ((u : L)) = ρ ((ψ e u : ↥U) : L) * ρ (e : L)
+      rw [← map_mul, ← map_mul]
+      congr 1
+      rw [show ((ψ e u : ↥U) : L) = (e : L) * (u : L) * (e : L)⁻¹ from
+        MulAut.conjNormal_apply (e : L) u]
+      group
+    have hmap := map_range_centerProj φ ρU τ (ψ e) hintertwine i.val
+    rw [hτcoe] at hmap
+    rw [show ((ρ.comp E.subtype) e : W →ₗ[k] W) = ρ (e : L) from rfl, hmap, hsmul]
+  -- `hfree`: `E` acts freely (item 1, transported through `i₁ = i₀`).
+  have hfree : ∀ (e : ↥E) (i : {i : Fin N // i ≠ i₀}), e • i = i → e = 1 := by
+    intro e i hei
+    refine hi₁free i.val e (hi₁eq ▸ i.2) ?_
+    have := congrArg Subtype.val hei
+    rwa [hsmul] at this
+  -- Apply the free-orbit dimension count to the nontrivial summands.
+  haveI : Fintype (orbitRel.Quotient ↥E {i : Fin N // i ≠ i₀}) := Fintype.ofFinite _
+  have hcount := finrank_eq_card_mul_finrank_invariants_of_free (ρ.comp E.subtype)
+    hintA' hperm hfree
+  exact hcount
+
+end KernelFPF
+
 end OddOrder.GroupTheory.WielandtKernelFPF
