@@ -549,8 +549,19 @@ theorem theoremC_paired_structure [Finite G]
   -- Conjunct 9 (Theorem 14.7): the unique non-conjugate type-`P` partner `M*`.
   have hdual := (typeP_duality hG hM hP hKM hK hKstar).2.2
   refine ⟨hUab, ?_, hKsne, hKscyc, hKsMF, hMFnc, hM'eq, hKsdd, hdual, ?_, ?_, ?_⟩
-  · -- Conjunct 2 (BG Theorem C(1) / Corollary 14.12): `N_G(U) ⊄ M`.  Residual.
-    sorry
+  · -- Conjunct 2 (BG Theorem C(1) / Corollary 14.12): `N_G(U) ⊄ M`.
+    by_cases hUbot : U = ⊥
+    · -- `U = ⊥` (type-`P₁`): `N_G(⊥) = ⊤ ⊄ M` since `M` is a proper (maximal) subgroup.
+      subst hUbot
+      intro hle
+      have htop : (⊤ : Subgroup G) ≤ Subgroup.normalizer ((⊥ : Subgroup G) : Set G) := by
+        intro g _
+        rw [Subgroup.mem_normalizer_iff]
+        intro h
+        simp [Subgroup.mem_bot]
+      exact (mem_maximalSubgroups.mp hM).1 (top_le_iff.mp (htop.trans hle))
+    · -- `U ≠ ⊥` (type-`P₂`): `N_G(U) ⊄ M` is BG Corollary 14.12.  Residual.
+      sorry
   · -- Conjunct 10 (BG Theorem A(3),(5) + Prop 14.2(d)): `A_0(M) - A(M)` is a TI set.  Residual.
     sorry
   · -- Conjunct 11 (BG Theorem C(10) = Prop 14.2(g) + Theorem 15.7(a)): `U ≠ ⊥ → |K|` prime ∧ `F(M)` TI.
