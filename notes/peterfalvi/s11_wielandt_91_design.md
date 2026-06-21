@@ -808,3 +808,54 @@ sub-quotient では不可、top quotient が `quotient_order:|H|=p^q·|H₀|` �
 =lane-f piece D 系の modular rep-theory infra 要 (multi-session)。front-end (i) U 非中心 on H = ✅ 済
 (`typeP_U_noncentral_on_H`)。次 = (ii) U 非中心 on `P/Φ(P)` (BG 1.8) → (iii) 半単純分解で simple 商 peel。
 assembly では `H0:Subgroup G ↔ N:Subgroup ↥H` 翻訳 + ChiefFactorData の opaque Props を honest 化。
+
+## 2026-06-22 (lane-h resume⁷) — ✅✅✅ (9.4)/(9.6) Maschke+Wielandt 核 3 補題 landing → 残 = seed + assembly
+
+(9.4) `exists_chiefFactorData` を **完全に設計し、Maschke+Wielandt の数学的核心を 3 つの再利用可能・
+axiom-clean 補題で landing**。残るは (a) elementary-abelian **seed** と (b) **assembly** (機械的 bookkeeping) のみ。
+
+### 重要な構造的発見 (resume⁶ の「multi-session bottleneck」を解像度上げ)
+- **M = H ⋊ (U W₁)**: `M_complement` (W₁ が M'=derivedInG M を complement) + `derived_complement`
+  (U が H=M_F を M' で complement) ⟹ `M = M' ⊔ W₁ = (H ⊔ U) ⊔ W₁`。∴ **N ◁ ↥H かつ U W₁-invariant なら
+  自動的に H0=N.map subtype が M-normal** (別途 M-invariance 論法 不要)。`TypePData.derivedInG_eq_fitting_sup_U`
+  (M'=H⊔U) + `M_complement.sup_eq_top` で `M ≤ (H⊔U)⊔W₁` が出る。
+- **p=|W₂| は post-hoc**: chief factor の prime p は seed の el-ab prime そのまま。typeIII_IV では
+  `|C_S(W₁)|=p` (Wielandt) ∣ |W₂| (C_S(W₁) ≤ image of W₂) + §8 prime `typeIIIorIV_W2_prime` (cite) で
+  `p=|W₂|`。**∴ seed は「ある el-ab p 商で U 非中心」だけでよく、特定 Sylow を選ぶ必要なし** (II/III/IV 一様)。
+  §8 gate は typeIII_IV_p_eq_W2 の最後の cite 一点のみ。
+
+### ✅ landed 3 補題 (全 axiom-clean = propext/choice/Quot.sound)
+1. **`exists_aInvariant_irreducible_summand_disjoint`** (`OperatorMaschke.lean`, commit `46c388df`):
+   el-ab p-群 V + coprime A-作用 + proper A-inv `C≠⊤` ⟹ A-inv 直和因子 S (V=S⊕W, A-irreducible,
+   `C⊓S=⊥`)。証明 = complement で C を split → minimal A-inv `S≤X` (irreducible) → S を split。
+   汎用化: noncentral witness を `C_V(U)` 限定せず任意 proper A-inv `C` に (証明は fixed-point 性質を
+   使わない)。(13.16) でも cite 可。
+2. **`coprimeFrobeniusChiefFactor_card`** (S11, commit `88a1dd39`): 任意 CoprimeFrobeniusAction (kernel
+   `U◁L`) on el-ab p-群 K, irreducible + `fixedByU≠⊤` + `C_K(E)` cyclic + `K≠1` ⟹ `|K|=p^{|E|}`。
+   = (9.6) 算術核を carrier から抽出。`typeP_chiefFactor_card` (商版) を thin application にリファクタ。
+3. **`coprimeFrobeniusChiefFactor_card_of_summand`** (S11, commit `90ff9552`): #2 を summand S に transport
+   (restricted action `hSinv.restrict` on ↥S; irreducible 対応 = `aInvariant_map_subtype_of_restrict`;
+   noncentral = `card_fixedSubgroup_restrict` で `|C_S(U)|=|C_V(U)⊓S|=1`; `C_S(E)` cyclic = sub of cyclic)
+   ⟹ `|S|=p^{|E|}`。#1+#3 = (9.4)+(9.6) の Maschke+Wielandt 全内容 `|H̄|=p^q` (seed 待ち)。
+
+### 残タスク (a) seed — `exists_chiefFactor_seed` (ungated 群論、§8 cite なし)
+目標: `∃ p (prime) N₀ (◁↥H, A-inv), IsElementaryAbelian p (↥H⧸N₀) ∧
+(typeP_quotientCoprimeAction data hU hN₀).fixedByU ≠ ⊤`。
+レシピ (H=M_F nilpotent): (i) U 非中心 on H = `typeP_U_noncentral_on_H` ✅。(ii) H nilpotent ⟹ Sylow 分解
+H=∏P_ℓ、C_H(U)=∏C_{P_ℓ}(U) ⟹ ∃ℓ U 非中心 on P_ℓ。(iii) P=P_ℓ, V=P/Φ(P) el-ab
+(`FrattiniPGroup.IsPGroup.quotient_frattini_isElementaryAbelian` Lem 1.7b)。(iv) BG 1.8 = `aFixed_quotient_frattini`
+(Isaacs Cor 3.29、ForwardFromCh03:835) の**対偶**で U 非中心 on V。(v) N₀ = (V の kernel を ↥H に pullback)。
+要 infra: nilpotent=Sylow 直積 (mathlib `IsNilpotent`→`Sylow.directProduct`?) + fixed-point-of-product 分解。
+
+### 残タスク (b) assembly — `exists_chiefFactorData` (機械的 bookkeeping、~150-250 行)
+pipeline: seed → `act_V := typeP_quotientCoprimeAction data hU hN₀` → Maschke 核 #1 (C=act_V.fixedByU,
+hcop=act_V.coprime_order.symm) → S,W → summand-Wielandt #3 → `|S|=p^q` → `N := W.comap (mk' N₀)`,
+`H0 := N.map H.subtype`。
+- **quotient_order** `|H|=p^q·|H0|`: `Nat.card ↥H = |↥H⧸N|·|N|` (Lagrange) + `↥H⧸N≅V/W` (card のみ,
+  `QuotientGroup.quotientQuotientEquivQuotient`) + `|V/W|=|S|` (complement V=S⊕W) + `|N|=|H0|`。
+- **H0_normalized_by_M**: `M ≤ (H⊔U)⊔W₁ ≤ normalizer(H0)`。H≤normalizer(H0) (N◁↥H), U⊔W₁≤normalizer(H0)
+  (N A-inv) — N→H0 normality 翻訳が crux。
+- **typeIII_IV_p_eq_W2**: `|C_S(E)|=p` (要: #2/#3 に fixedByE card 露出の variant 追加) ∣ |W₂| + cite
+  `typeIIIorIV_W2_prime` (§8、sorried だが signature 正、cite 可)。
+- 3 つの opaque Prop fields (quotient_elementaryAbelian/quotient_chiefFactor/U_noncentral_on_quotient)
+  は honest 化 (el-ab=hpe, chief=hirr, noncentral=hUntriv 由来)。
