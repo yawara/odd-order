@@ -49,6 +49,19 @@ Peterfalvi (10.5) の Dade-image 半分 `α_ij^τ = δ(ω_ij^σ − ω_i0^σ) �
   - **⚠ 別 obstruction = Dade support gap**: §6 (4.8) `certainType_diff_dade_eq` の `h.tau` は **W∖W₂-based**
     (ticVdiff)、§10 `hyp.tau` は **typePV-based** (typePA0)。W₁# 扱いが違い直 cite 不可 ((10.5) は −nζ で W₁# を消し
     typePV に落とす)。∴ §10 は §6 (4.8) を template に parallel re-derive (部品 4.3.c/3.2.c/3.8/NC 共有)。
+  - **▶ build entry-point (2026-06-21 atomize)**: reconcile は **value-level の character transport を一から build**
+    する。`omega`/`omegaProdChar`/`charEquiv` は **W のみ依存** (V/Dade 非依存) ゆえ:
+    - atom (1) `omega_apply` (`S05_TICyclic:330`): `omega χ w = χ w`。
+    - atom (2) `omegaProdChar χ₁ χ₂ (w) = χ₁ (wFst w) · χ₂ (wSnd w)` (`wFst`/`wSnd` = W₁/W₂ 成分射影,
+      `S05_TICyclic:488-501`)。
+    - ⟹ `chiColumn_6@↥M(v)` と `omegaGrid_5@G(v)` を両方 dual 値に分解し、`wFst`/`wSnd` の M.subtype 転送 +
+      **index 対応** (§6 χ₂ = `finCardEquivCharacterGroup j` ⟦muGrid def⟧ vs §5 `charEquiv W2_le_W j`) を示す。
+    - ⚠ `mapOfInjective` (`S05_TICyclic:97`, ↥L→G 転送、docstring が「§6 toTICyclicHypothesis を G に lift」と明記)
+      は **定義済だが全くの未使用** (omega/charEquiv transport lemma ゼロ)。∴ transport API は新規 build。
+      §5 tic は mapOfInjective 経由でなく G に直接構成ゆえ、tic = `mapOfInjective sdiff M.subtype` の証明も要
+      (W は一致するが V が異なる ⟹ 構造 eq でなく omega-grid value 一致を狙う)。
+    - 他の bridge 部品: ζ-vanishing on V = `induce_eq_zero_of_not_mem_normal` (ζ∈inducedFamily, v∈V⟹v∉M' ∵
+      W₁-成分非自明 + W₁∩M'=1; `muGrid_alpha_support` 内に pattern 既在)。M-side = (4.3.c)。σ-side = inline。
 - [ ] **norm/numeric `a=0`**: τ isometry (`IsCoherent.inner_eq_on_supported` / `extension_inner_eq`) +
       τ₁ 拡張で `(α_ij^τ, ζ^τ₁) = −n`、Cauchy-Schwarz + 不等式 + (n even,>0 ⟹ n≥2 で n<2 と矛盾)。
       要 μ-grid orthonormality (genuine μ 構造)。
