@@ -39,10 +39,11 @@ variable {G : Type*} [Group G]
 
 /-! ## (9.1): Wielandt's fixed-point formula
 
-The shared carrier and theorem statements for Peterfalvi (9.1) live in
-`OddOrder.GroupTheory.CoprimeAction`:
+The shared carrier `OddOrder.GroupTheory.CoprimeFrobeniusAction` lives in
+`OddOrder.GroupTheory.CoprimeAction`; the Wielandt theorems, proved from the chief-series
+assembly, live in `OddOrder.GroupTheory.WielandtFixedPoint`:
 
-* `OddOrder.GroupTheory.CoprimeFrobeniusAction`
+* `OddOrder.GroupTheory.CoprimeFrobeniusAction` (carrier, `CoprimeAction`)
 * `OddOrder.GroupTheory.wielandt_fixedPoint_frobenius`
 * `OddOrder.GroupTheory.wielandt_fixedPoint_trivial_E_fixed`
 * `OddOrder.GroupTheory.wielandt_fixedPoint_trivial_U_fixed`

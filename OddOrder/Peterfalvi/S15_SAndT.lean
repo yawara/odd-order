@@ -7,7 +7,7 @@ import OddOrder.Peterfalvi.S14_MaximalI
 import OddOrder.Peterfalvi.S10_CoherenceWiring
 import OddOrder.Isaacs.Ch06_FrobeniusActions.OddComplement
 import OddOrder.GroupTheory.MaximalSubgroupTypeConj
-import OddOrder.GroupTheory.CoprimeAction
+import OddOrder.GroupTheory.WielandtFixedPoint
 import Mathlib.Algebra.BigOperators.ModEq
 import Mathlib.FieldTheory.Finite.Basic
 import Mathlib.RingTheory.Polynomial.Cyclotomic.Roots
