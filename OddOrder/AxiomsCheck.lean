@@ -5511,3 +5511,20 @@ fully unconditional (axiom-clean).**  Likewise its corollaries and the (13.17.b)
 #assert_only_allowed_axioms OddOrder.GroupTheory.wielandt_fixedPoint_frobenius
 #assert_only_allowed_axioms OddOrder.GroupTheory.coprimeFrobeniusAction_card_eq_one
 #assert_only_allowed_axioms OddOrder.GroupTheory.isFrobenius_kernel_eq_bot_of_frobenius_subgroup
+
+/-! **(9.3) the order relation via Wielandt (9.1)** (`Peterfalvi.S11`).  Definition (8.4) makes
+`U W₁` a Frobenius group (kernel `U`) acting coprimely on `H = M_F` (`typeP_uW1_frobenius`,
+`typeP_coprimeAction`); the three fixed-point subgroups of Wielandt's formula are the concrete
+centralizers (`typeP_card_fixedSubgroup`, with `C_H(W₁) = W₂` from `typeP_H_inf_centralizer_W1`),
+giving the quantitative core `|C_H(U W₁)|^q · |H| = |W₂|^q · |C_H(U)|`
+(`typeP_wielandt_order_relation`).  This is the Wielandt content of Peterfalvi (9.3); the
+fixed-point-free §8 inputs (`C_H(U) = 1`, `|W₂|` prime, `C_H(U W₁) = 1`) are the remaining §8
+obligations. -/
+
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S11.typeP_uW1_frobenius
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S11.typeP_coprime_H_uW1
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S11.typeP_coprimeAction
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S11.typeP_fixedSubgroup_map
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S11.typeP_card_fixedSubgroup
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S11.typeP_H_inf_centralizer_W1
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S11.typeP_wielandt_order_relation
