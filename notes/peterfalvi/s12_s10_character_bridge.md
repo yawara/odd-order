@@ -5,6 +5,125 @@
 > 上位文脈 = 記憶 [[ft-endgame-two-poles]] [[peterfalvi-s10-13-gated-on-bg-spine]]、
 > Lane H 視点の正本 = [`s10_13_maximal_structure.md`](s10_13_maximal_structure.md)。
 
+## ★★★ 2026-06-21 更新³ — (10.5) support half 完成 (dade0-free, 自前 sorry 0)
+
+**Peterfalvi (10.5) の support 半分 `Supp(α_{ij}) ⊆ A_0(M)` を dade0-free で完全形式化** (S12, build-green
+3870 jobs + AxiomsCheck OK)。直前 commit (`f1467765` で抽出した (4.7) structural core) を使う計画通り、
+**enlarged-support Dade (`Hypothesis46.dade0`) を一切構成せず**に原文 (10.5) の short argument を忠実に再現:
+
+- **`Hypothesis.muGrid_apply_eq_columnSign_mul_zeroColumn_of_mem_W1`** (linchpin): `x ∈ W₁^#` で
+  `μ_{ij}(x) = δ_j · μ_{i0}(x)` ((4.3.c) `certainType_apply_eq_of_mem_V` on `V=W∖W₂ ⊇ W₁^#` + chiColumn の
+  `W₁`-coll collapse (`wSnd=1` で χ₂ 因子消滅, inline `chiColumn_apply_eq` 相当) + δ_0=1 anchor)。muGrid/muColumnSign
+  reconstruction は `unfold; rfl` idiom (instance は **明示供給せず synthesis** に任せる ← `Fintype` は data ゆえ
+  明示 haveI は def の synthesized と不一致になり rfl 破綻、これが最大の罠だった)。
+- **`Hypothesis.muGrid_zero_column_apply_one`**: `μ_{i0}(1)=1` ((4.4) anchor `μ_{00}=1_L` + within-column 定数性)。
+- **`Hypothesis.muGrid_alpha_support`** (本体): α(1)=0 (n·w₁=d−δ) + ζ は M' 誘導ゆえ M' 外で消滅
+  (`support_induce_subset_of_normal`/`induce_eq_zero_of_not_mem_normal`) + z∈M' は自己中心化で `(M')^#⊆typePA` +
+  z∉M' は (2.1) `mem_compl_conj_into_W` で `x·y` (x∈W₁^#,y∈W₂) に共役、y=1 なら W₁^# vanishing で矛盾、y≠1 なら
+  `x·y∈typePV`⟹`z∈conjClassSet typePV`。`α.conj_eq` で class-function 不変性、`typePData_disjoint_W1_W2` で W₁⊓W₂=⊥。
+- **carrier 配線**: `CharacterParameters` に **`alpha_support : ∀ i j, j≠0 → (alpha i j).support ⊆ A0`** field を追加
+  (placeholder でなく genuine 述語)。producer `exists_charParameters` で `muGrid_alpha_support` から discharge。
+  そのため `exists_charParamArith` を **δ_j-independence (`∀ j≠0, muColumnSign j = delta`) も返す**よう拡張
+  (`muColumnSign_eq_of_ne` + `unfold muColumnSign; rfl`)。`alpha_support_and_image` (旧 1 sorry, support+image 束ね) を
+  **`alpha_support` (= `params.alpha_support`, 完全 axiom-clean `[propext,Classical.choice,Quot.sound]`) + `alpha_tau_image`
+  (Dade-image 半分, sorry 残置)** に分割。
+- **axiom footprint**: `muGrid_alpha_support`/W₁-lemma = `[propext, sorryAx, Classical.choice, Quot.sound]`、sorryAx は
+  **すべて上流 bridge gate (Prop 16.1 / `theoremA_maximal_structure`, lane-f 所有) 由来で自前 sorry 0** (§10 muGrid 全結果と同じ)。
+  `alpha_support` (projection) は sorryAx すら無し。
+
+**▶ 次の lane-b frontier** (real 進捗順): **(10.5) Dade-image 半分 `alpha_tau_image`** (`S12:~1690`, sorry) =
+`α_{ij}^τ = δ(ω_{ij}^σ − ω_{i0}^σ) − n·ζ^{τ₁}`。原文は `hyp.tau` (既存 §10 Dade) + `omegaSigmaGrid` (§5) + (4.3.c) +
+(3.2.c)/(3.6)/(3.8) NC machinery + (5.3.b)/(5.5) を使う **重い analytic** (cont.² で dade0-free と確認済だが §3 NC が要)。
+その後 (10.6) `tau1_values_and_norm_bound`。(10.7)/(10.8) は (8.8)=lane-f gate。S12 は **1700+ 行で hub 分割対象** (⚠ flag)。
+
+## ★★ 2026-06-21 更新² — 循環解消 + (10.2)/(10.3) producer 完全 materialize
+
+下の「更新」の結論「producer は (8.8) gate 待ちで打ち止め (循環)」は **SUPERSEDED**。循環は構造変更で断ち、
+producer は実証明で組み上がった (実 sorry S12: 9→7)。方針 = [[feedback-cite-sorried-lemmas-if-signature-correct]]
+(signature 正しければ gated lemma を cite して下流を実証明)。
+
+- **① 循環解消 (`0c4f250a`)**: 旧 `w2_prime` は generic case-B datum 経由で `no_typeV_maximal` → producer に
+  循環した。Peterfalvi (10.3) 原文証明 (`04.12:17` verbatim「By Theorem (8.8), there is a maximal subgroup
+  S of G of **Type II** such that |S:[S,S]|=w₂, **and so w₂ is prime**」) が正路。新 obligation
+  `Hypothesis.exists_typeII_maximal_with_w2` (∃ type-II maximal S, |S:S'|=w₂; faithful sorry, lane-f
+  `theorem88_caseB_holds` gate) から `w2_prime` を**非循環**に実証明 (type-II → W₁ prime (8.6.a), no_typeV 不要)。
+  旧 `exists_caseBData_with_w2` 削除。⟹ `w2_prime` を producer 上流に配置可能に。
+  ⚠ **(8.8) case (b3) 原文確認**: S,T は「Type II/III/IV **or V**」 ⟹ datum を non-type-V に強化するのは
+  unfaithful。type-V を許す generic datum では prime W₁ が出ず no_typeV 必須 = 循環は本物だった。type-II 特化が解。
+- **② producer materialize (`10e97492`)**: 実 sorry 2 本 (`exists_zeta_degree_w1` (10.2) +
+  `w2_prime_and_parameter_independence` (10.3)) → 実証明。
+  - **`Hypothesis.exists_charParamArith`** (sorry-free body): (10.3) 算術 d/δ/n を §6 から materialize。
+    j₀ nontrivial column (w₂ prime⇒≥2)、`d = μ_{0j₀}(1)∈ℕ` (`exists_natDegree_characterDegree_dvd_card`)、
+    **d>1 = (4.4)** (非自明 column は linear でない: linear⇒K-trivial⇒column-0、`columnFamily_mu_ne` 矛盾;
+    `exists_zeta` crux の inline。§6 Recipe 補題は concrete `↥M` instance 要ゆえ generic-L Lemma は不可、inline が解)、
+    **δ=column sign, n·w₁=d−δ = (4.3.d)** (`certainType_degree_modEq` の `μ(1)=δ+w₁·a`、n:=a.toNat、a≥0 ∵ d−δ>0)、
+    degree independence = `muGrid_apply_one_eq`。muGrid↔columnFamily 接続 = `unfold Hypothesis.muGrid; rfl`
+    (host/instance を muGrid と同一に再構成)。
+  - **`Hypothesis.exists_charParameters`**: ζ(10.2)+μ/ω^σ-grid+w2_prime+算術 を実 `CharacterParameters` に package。
+    残 opaque field (delta_independent / τ₁-formulas) は True で埋め (→ (10.5)/(10.6) Dade calc 待ち)。両 producer が cite。
+  - axiom footprint = [propext, sorryAx, Classical.choice, Quot.sound] (sorryAx = (8.8)+Prop16.1 gate のみ、body は sorry 無)。
+
+- **③ (10.3) δ_j-independence 完成 (`fa71df35`)**: producer 最後の vacuous clause (`delta_independent := True`) を実証明化。
+  新 §6 sign-constancy `columnFamily_mu_zero_sign_pow` + prime form `columnFamily_mu_zero_sign_eq_of_ne_one`
+  (**axiom-clean**; degree lemma と同じ (3.9.b)+(4.3.b) `hZ : δ'·d'=δ·d`、d'=d>0 で δ'=δ をキャンセル) +
+  §10 `Hypothesis.muColumnSign` (per-column 符号、muGrid 同型再構成) + `muColumnSign_eq_of_ne` (δ_j=δ_j')。
+  `CharacterParameters` の opaque `delta_independent`/`_holds` フィールド削除 → (10.3) 結論が実
+  `∀ j j'≠0, muColumnSign j = muColumnSign j'` を主張・`muColumnSign_eq_of_ne` で証明。
+  **⟹ (10.3) `w2_prime_and_parameter_independence` 全 5 clause 実証明** (w₂ prime / d>1 / degree-indep /
+  δ-indep / n-formula)。sign lemma 単体は axiom-clean、§10 muColumnSign_eq_of_ne は bridge Prop16.1 gate のみ。
+
+**▶ 次の lane-b frontier**: S12 残 7 sorry = `exists_typeII_maximal_with_w2` ((8.8) gate=lane-f) +
+(10.5) `alpha_support_and_image` + (10.6) `tau1_values_and_norm_bound` (= Dade calc、`CoherentHypothesis`
+仮定下、要 τ₁) + (10.7)/(10.8)(=(8.8) gate+counting) + (10.9)/(10.10.x)。
+**⚠ (10.5)+ は重い**: (10.5) Dade image は (3.6)/(3.8)/(3.2.c/d)/(5.3.b)/(5.5) の重 §3/§5 machinery を要し、かつ
+`params.mu`/`omegaSigma` は free field ゆえ arbitrary params では未証明。(10.7)/(10.8) は (8.8)=lane-f gate。
+
+### ★ 2026-06-21 cont. 調査結果 (次セッション用 de-risk)
+
+- **faithfulness pinning `[Finite G]`-on-structure 経路は不可** (試行→revert): CharacterParameters に `[Finite G]`
+  追加すると S13.Hypothesis(`params : CharacterParameters base`)が要 `[Finite G]` 化 → S13 の auto-generated
+  field projection (`Hypothesis.q`/`.p` 等)の dot-notation が壊れる cascade。**∀-hG pin を使うなら `@Hypothesis.muGrid G _ hyp.finiteG …` explicit-finiteG 形式** (structure に `[Finite G]` 足さない) か、muGrid の sig から `[Finite G]` を外し
+  hyp.finiteG 内部供給に変える(muGrid は既に body で `haveI := hyp.finiteG` 済→sig の `[Finite G]` は冗長の可能性)。
+- **`Hypothesis46` 全構築は dade0 が deep**: `Hypothesis46.tic_V = W\W₂` 固定 (4.3.a 大 TI)、`dade0` は
+  `A ∪ (W\W₂)^L` 上 = `typePA0 ∪ (W₁#)^M`。§10 `typePA0 = typePA ∪ (typePV)^G` (typePV=W\(W1∪W2)、**W₁# 除外**)
+  ゆえ §10 dadeData(typePA0 上)では **(W₁#)^M 分** 足りない → enlarged-support Dade を新規構成要 (§4、deep)。
+- **🟢 但し (10.5) SUPPORT 半分は dade0 不要で feasible**: (4.7) core
+  `mem_A_of_apply_ne_zero_of_not_subset_characterKernel` (S06_CertainTypeSupport:47) は **構造フィールドのみ使用**
+  (`subH`/`subH_normal`/`K`/`A_covers`、**`dade0`/`tau` 不使用**)。∴ §10 structural (4.6.a-d) データで (4.7) を発火可
+  (Hypothesis46 全体=dade0 不要)。**次セッション (10.5) support 攻略**: (4.7) core を structural-param 化
+  (または §10 で再証明) + (4.3.c) μ-W₁-vanishing (`induce_omegaColumnDiff_mu_diff` の Hyp-L 版要確認) + (4.4)
+  `certainType_zero_column_anchor` + (2.1) `mem_compl_conj_into_W` で canonical α の support ⊆ A_0 を構成。
+  (10.5) を `alpha_support` / `alpha_tau_image` に分割し前者を close。後者 (Dade image) は dade0 待ち。
+- **∴ §10 spine: support 系は dade0-free で進める / Dade-image 系は enlarged dade0 (deep §4) + (8.8) (lane-f) 待ち**。
+
+### ★★★ 2026-06-21 cont.² 決定的発見 — (10.5)/(10.6) は deep dade0 を必要としない (Explore 検証)
+
+⚠ 上記「Dade-image 系は enlarged dade0 待ち」は **訂正**。Peterfalvi (10.5)/(10.6) 原文 + Lean §6 精査で確定:
+**(10.5)/(10.6) は §10 既存 `hyp.tau` (= Dade rel (A_0(M),M,G)、typePV-based) + 既存 `omegaSigmaGrid` (§5 σ) +
+構造的 §6 facts のみ使用、新規 W\W₂ Dade (`Hypothesis46.dade0`) 不要。** 各 cited fact の Lean level:
+- **(4.3.c)** = `certainType_apply_eq_of_mem_V` (S06_CertainTypeCharacters:878、**Hypothesis L**、dade0 不使用) ✅在庫
+- **(4.4)** = `certainType_zero_column_anchor` (S06、**Hypothesis L**) ✅在庫
+- **(4.7)** = `mem_A_of_apply_ne_zero_of_not_subset_characterKernel` (S06_CertainTypeSupport:47、Hypothesis46 だが
+  **proof は subH/subH_normal/subH_le_K/A_covers/K のみ使用、dade0/tau 不使用**)。consumer = 同一ファイル 3 箇所
+  (:100/:136) + AxiomsCheck:752 のみ。
+- **τ** = `hyp.tau` (既存 §10 Dade)、**ω^σ** = `omegaSigmaGrid` (既存 §5 bridge、typePV) ✅在庫
+- **(3.2.c)/(3.8)/(3.6)** = §3 Dade NC machinery (要確認だが §3 既存と推定)。
+
+**⟹ §10 Hypothesis46 全構築 (dade0/tau) は UNNECESSARY。** `Hypothesis46.tic_V=W\W₂` は §6 (6.8) 専用特殊化で
+§10 (typePV) には元々不適合 (cont.² で既出)。
+
+**▶ dade0-free 実装計画**:
+1. **(4.7) を structural-param 化** (decouple from `Hypothesis46`): `mem_A_of_apply_ne_zero...` を
+   (K, subH, subH_normal, A_covers) 引数版にし、既存 Hypothesis46 consumer は h.subH 等で呼ぶ (DRY)。
+2. **§10 structural (4.6.c-d) data**: subH = M_F (=maxNilpotentNormalHall M, subgroupOf M; W2≤M_F≤M'),
+   subH_normal (M_F◁M), A_covers = **typePA 定義そのもの** (C_{M'}(h)#⊆typePA ∀h∈M#)。tractable。
+3. **(10.5) `alpha_support`** (分割前半、dade0-free): structural (4.7) + (4.3.c) + (4.4) + (2.1)
+   `mem_compl_conj_into_W` で canonical α support ⊆ A_0。
+4. **(10.5) `alpha_tau_image`** (分割後半): `hyp.tau` + `omegaSigmaGrid` + (4.3.c) + (3.2.c)/(3.8)/(3.6) +
+   (5.3.b)/(5.5)。§3 NC machinery 使用、harder だが dade0-free。
+5. **(10.6)** 同様。
+→ (10.7)/(10.8) のみ (8.8)=lane-f gate 残。**§10 spine の大半は lane-b 単独で dade0-free に開通可能**。
+
 ## ★ 2026-06-21 更新 — (10.3) degree theory 完全 materialize (axiom-clean) + column-0 faithfulness 修正
 
 §6 attack-order の (b)(c) ((10.3) degree 独立性) を**両半分とも axiom-clean で形式化完了**。frontier 前進:
@@ -23,11 +142,30 @@
   旧版は任意全単射で muGrid column-0 が trivial dual に固定されず → degree_independent (j≠0=非自明前提) が
   unfaithful になりえた。Peterfalvi (4.4) 規約 (column 0 = trivial) に整合。
 
-**▶ 残 = muGrid-level cross-column wiring (gated)**: `muGrid 0 j 1 = muGrid 0 j' 1` (j,j'≠0) を上記 corollary に
-帰着するには (i) muGrid unfold + χ₂_j 非自明 (`finCardEquivCharacterGroup_zero`+injective+`finCongr 0=0`)、
-(ii) **Pontryagin card `|W₂sub →* ℂˣ| = w₂`** (`card_charGroup_subgroupOf` 系, S05_OmegaGrid:42 が言及)、
-(iii) **w₂ prime = `Hypothesis.w2_prime`** (gated cite on (8.8))。⟹ producer 構成時に gated で実施。
-corollary 自体は axiom-clean ゆえ、これは plumbing。**§10 keystone ((10.8)) + μ-grid full は依然 lane-f (8.8) 待ち**。
+**✅ muGrid-level cross-column wiring DONE (2026-06-21 後続セッション)**: `Hypothesis.muGrid_apply_one_cross_column`
+(S12) — `muGrid 0 j 1 = muGrid 0 j' 1` (j,j'≠0)。実装:
+- (i) §6 corollary `columnFamily_mu_zero_apply_one_eq_of_ne_one` を within-column と同じ `key` 技法
+  (`unfold Hypothesis.muGrid; simp only [key]` で row index を 0 に剥がす) で muGrid に配線、最後に corollary を `exact`。
+- (ii) Pontryagin card: `h.card_charGroup_W2 : Nat.card (Ŵ₂) = Nat.card h.W2`、これを `subgroupOfEquivOfLe` で
+  `Nat.card (W2.subgroupOf (W1⊔W2)) = hcardW2sub` 経由 `hyp.w2` に繋ぐ。
+- (iii) **w₂ prime は仮説 `hw2 : (hyp.w2).Prime` として取る** (`Hypothesis.w2_prime` を cite **しない**)。
+  ⚠ **理由 = 循環依存回避**: `Hypothesis.w2_prime` → `theorem88_caseB_prime_orders` → `caseB_typeP_prime_W1`
+  (type-V branch) → **`no_typeV_maximal`** → `w2_prime_and_parameter_independence` (= **producer 自身**) →
+  (もし cross-column を cite すれば) → w2_prime。`TypeVData` は `TypePNontrivialCore` (prime W1) フィールドを
+  持たない (typeP/U_eq_bot/alternative のみ) ゆえ type-V を no_typeV で除外するしかなく循環は本物
+  (Peterfalvi が §10 で no-type-V と w₂-prime を相互証明する構造を反映)。∴ cross-column は hw2 を仮説化して自己完結。
+- nontriviality: `finCardEquivCharacterGroup` injective + `finCardEquivCharacterGroup_zero` (0↦trivial) + finCongr val。
+
+**✅ combined degree independence DONE**: `Hypothesis.muGrid_apply_one_eq`
+(`(hw2 : w2.Prime) → muGrid i j 1 = muGrid i' j' 1` for j,j'≠0) = within (i→0) ×2 + cross (j→j')。
+これが `CharacterParameters.degree_independent` の materialized 本体 (producer で d を命名して使う)。
+両者とも axiom footprint = muGrid と同一 (= upstream Prop 16.1 gate のみ、自前 sorry 0; within-column と同じ)。
+
+**▶ 残 = producer (`w2_prime_and_parameter_independence`/`exists_zeta_degree_w1`) = (8.8) gate 待ち (循環)**:
+producer は `CharacterParameters.w2_prime : hyp.w2.Prime` field を要求するが、これは上記循環で lane-b 単独では
+閉じない。`Hypothesis.w2_prime` (S12:1174) の sorry 源 = `exists_caseBData_with_w2` (faithful (8.8)↔M 義務) +
+`no_typeV_maximal` 経由の producer 循環。**∴ §10 keystone ((10.8)) + producer + (10.3) w₂ prime は lane-f (8.8)
+着地待ち**。(10.3) degree theory の lane-b 単独 honest 反映は cross-column 完成で**打ち止め (完了)**。
 
 ## 0. 現在地 (2026-06-20)
 
