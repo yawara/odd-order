@@ -899,6 +899,61 @@ def typePData_of_inputs {M H U W1 W2 : Subgroup G}
       normalizer_V := fun X hXne hXV =>
         normalizer_eq_sup_of_isTISubset_of_isCyclic hWcyc hTI hXne hXV }
 
+/-- **Prop 16.1(b)--(d) forward bridge — `TypePData M` from BG-local `IsTypeP M`** (gated-endpoint).
+Constructs the shared Peterfalvi type-`P` datum (`TypePData M`) for a type-`P` maximal subgroup with
+a nontrivial `κ(M)`-Hall `K`, discharging *eleven* of the eighteen `typePData_of_inputs` fields from
+the proven §14/§15 structure and gating only on the genuinely-deep **`M_F`-internal Fitting core**
+(BG Corollary 15.5 / Lemma 15.1):
+
+* discharged (`typeP_duality` = Theorem 14.7: `hMcompl`/`hWcyc`/`hTI`; `typeP_kstar_in_mf` = Corollary
+  15.6: `hW2ne`/`hW2le`/`hHncyc`; plus `hHeq`/`hHle`/`hW1le`/`hW1ne`), with `W₁ = K`, `W₂ = K*`,
+  `W = K ⊔ K*`, `H = M_F`;
+* gated (named residuals): the `M_F`-internal complement `U` (`M' = M_F ⊔ U`, `U ⊴ M'` nilpotent —
+  `hUle`/`hUnorm`/`hUnilp`/`hDcompl`), the Fitting decomposition `F(M) = M_F (U ⊓ C_M(M_F))`
+  (`hSDfit`/`hFiteq`/`hFitlt`), and the `W₂ = C_{M'}(W₁#)` centralizer law (`hCentW1`, BG's
+  `C_{M'}(k) = K*` for `k ∈ K#`).
+
+This single construction feeds all three of `hP2II`/`hP1neIIIIV`/`hP1eqV` (types II/III/IV/V bundle a
+`TypePData`); the gated residuals are exactly the `M_F`-internal structure not present in
+`typeP_auxiliary_structure`'s `M' = U M_σ` decomposition. -/
+noncomputable def typePData_of_isTypeP_of_inputs [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M K U : Subgroup G}
+    (hM : M ∈ maximalSubgroups G) (hP : S14.IsTypeP M) (hKM : K ≤ M) (hKne : K ≠ ⊥)
+    (hK : Ch03.IsHallSubgroup (S14.kappa M) (K.subgroupOf M))
+    (hUle : U ≤ derivedInG M)
+    (hUnorm : (U.subgroupOf (derivedInG M)).Normal)
+    (hUnilp : Group.IsNilpotent ↥U)
+    (hDcompl : Subgroup.IsComplement'
+      ((maxNilpotentNormalHall M).subgroupOf (derivedInG M)) (U.subgroupOf (derivedInG M)))
+    (hSDfit : secondDerivedInAmbient M ≤
+      maxNilpotentNormalHall M ⊔ (U ⊓ Subgroup.centralizer (maxNilpotentNormalHall M : Set G)))
+    (hFiteq : maxNilpotentNormalHall M =
+      maxNilpotentNormalHall M ⊔ (U ⊓ Subgroup.centralizer (maxNilpotentNormalHall M : Set G)))
+    (hFitlt : maxNilpotentNormalHall M < derivedInG M)
+    (hCentW1 : ∀ x ∈ K, x ≠ 1 →
+      derivedInG M ⊓ Subgroup.centralizer ({x} : Set G) =
+        OddOrder.BG.Ch3.S10.Msigma M ⊓ Subgroup.centralizer (K : Set G)) :
+    TypePData M := by
+  classical
+  set Kstar : Subgroup G := OddOrder.BG.Ch3.S10.Msigma M ⊓ Subgroup.centralizer (K : Set G)
+    with hKstar
+  -- Theorem 14.7 (`typeP_duality`): the `M'`-complement (`.1`), `K ⊔ K*` cyclic and `zTilde` TI
+  -- (extracted in `Prop`-valued `have` blocks — the `∃!` witness cannot be eliminated into the
+  -- `def`'s `Type`).
+  have hMcompl : Subgroup.IsComplement' ((derivedInG M).subgroupOf M) (K.subgroupOf M) :=
+    (typeP_duality hG hM hP hKM hK hKstar).1
+  have hWcyc : IsCyclic ↥(K ⊔ Kstar) := by
+    obtain ⟨_, _, _, ⟨_, _, _, _, h, _, _, _⟩, _⟩ := typeP_duality hG hM hP hKM hK hKstar
+    exact h
+  have hTI : IsTISubset (S14.zTilde K Kstar) (K ⊔ Kstar) := by
+    obtain ⟨_, _, _, ⟨_, _, _, _, _, h, _, _⟩, _⟩ := typeP_duality hG hM hP hKM hK hKstar
+    exact h
+  -- Corollary 15.6 (`typeP_kstar_in_mf`): `K* ≠ ⊥`, `K* ≤ M_F`, `K* ≤ M''`, `M_F` noncyclic.
+  have hk := typeP_kstar_in_mf hG hM hP hKM hK hKstar
+  exact typePData_of_inputs (H := maxNilpotentNormalHall M) (U := U) (W1 := K) (W2 := Kstar)
+    rfl (maxNilpotentNormalHall_le_derived hG hM) hUle hKM (le_inf hk.2.2.1 hk.2.2.2.1)
+    hWcyc hKne hk.1 hMcompl hUnorm hUnilp hDcompl hk.2.2.2.2 hSDfit hFiteq hFitlt hCentW1 hTI
+
 /-- **Prop 16.1 forward bridge, type III/IV last mile** (Peterfalvi (8.7)): a type-`P` datum whose
 `U`-factor has its normalizer inside `M` is of type III or IV, according as `U` is abelian or not.
 This is the clean part of the `hP1neIIIIV` bridge — no deep `alternative`/`derived_typeF` content,

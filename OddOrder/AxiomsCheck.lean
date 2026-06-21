@@ -5281,6 +5281,14 @@ Powers Proposition 16.1 clause (e).  Axiom-clean. -/
 
 #assert_only_allowed_axioms OddOrder.BG.Ch4.S16.typeP_exists_hall_derived_eq
 
+/-! **Prop 16.1(b)--(d) forward bridge — `TypePData` constructor** (`S16_MainResults`,
+`typePData_of_isTypeP_of_inputs`): builds `TypePData M` from BG-local `IsTypeP M` + a nontrivial
+`κ`-Hall `K`, discharging 11 of 18 `typePData_of_inputs` fields from `typeP_duality`/`typeP_kstar_in_mf`
+and gating only on the deep `M_F`-internal Fitting core (BG Cor 15.5).  The foundation feeding all
+three forward bridges hP2II/hP1neIIIIV/hP1eqV.  Axiom-clean. -/
+
+#assert_only_allowed_axioms OddOrder.BG.Ch4.S16.typePData_of_isTypeP_of_inputs
+
 /-! **BG Proposition 16.1 — type-`P` data construction layer** (`S16_MainResults`): the shared
 `TypePData` core and the type II/III/IV/V "last-mile" bridges feeding
 `proposition_type_classification`'s forward bridges.
