@@ -166,8 +166,9 @@ private theorem not_dvd_index_of_sup_top_normal {K' : Type*} [Group K'] [Finite 
 assembly of `S12_Lemma1211.exists_subgroupESetup` (L129-213), factored to accept a prescribed
 complement `E` — so `exists_subgroupESetup_with_le` below can choose `E ⊇` a given σ'-subgroup
 (via `Ch03.hall_D`). Replicated here (rather than refactoring the shared `exists_subgroupESetup`)
-to keep the §12 spine untouched. -/
-private theorem subgroupESetup_of_complement [Finite G] (hG : IsMinimalSimpleOdd G)
+to keep the §12 spine untouched.  De-privatized for cross-file use (BG §14 Lemma 14.11 builds the
+E-setup on a *given* complement to keep the `Q ⊄ F(E)` hypothesis on the nose). -/
+theorem subgroupESetup_of_complement [Finite G] (hG : IsMinimalSimpleOdd G)
     {M E : Subgroup G} (hM : M ∈ maximalSubgroups G) (hE_le : E ≤ M)
     (hcompl_inf : S10.Msigma M ⊓ E = ⊥) (hcompl_sup : S10.Msigma M ⊔ E = M) :
     ∃ E₁ E₂ E₃ : Subgroup G, SubgroupESetup M E E₁ E₂ E₃ := by

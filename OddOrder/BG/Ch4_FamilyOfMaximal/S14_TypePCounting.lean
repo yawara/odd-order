@@ -8464,12 +8464,121 @@ theorem exists_sigmaDecomposition_length_le_two [Finite G]
     ∃ D : SigmaDecompositionData G, ∀ g : G, D.length g ≤ 2 := by
   sorry
 
+/-! ### BG Lemma 14.11 — phase 1: `Q ⊄ F(E) ⟹ q ∈ τ₁(M)` and `C_{M_σ}(Q) = 1`
+
+The proof of Lemma 14.11 (`exists_maximal_of_typeF_notMem_fitting` below) first locates the prime
+`q` in the τ-partition and pins down its `M_σ`-centralizer.  These first steps are factored as
+reusable lemmas; the remaining structure (the cyclic-normal `⁅E,Q⁆`, `τ₂(M) ≠ ∅`, and the
+`M*`-dichotomy) is recorded in `issues/7007`. -/
+
+/-- Build a `SubgroupESetup` on a *given* `M_σ`-complement `E` (converting the `IsComplement'`
+hypothesis to the `M_σ ⊓ E = ⊥`, `M_σ ⊔ E = M` form expected by `subgroupESetup_of_complement`). -/
+theorem esetup_of_isComplement [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    {M E : Subgroup G} (hM : M ∈ maximalSubgroups G)
+    (hE : Subgroup.IsComplement' ((OddOrder.BG.Ch3.S10.Msigma M).subgroupOf M) (E.subgroupOf M))
+    (hEM : E ≤ M) :
+    ∃ E₁ E₂ E₃ : Subgroup G, SubgroupESetup M E E₁ E₂ E₃ := by
+  have hMσM : OddOrder.BG.Ch3.S10.Msigma M ≤ M := OddOrder.BG.Ch3.S10.Msigma_le M
+  have hinf : OddOrder.BG.Ch3.S10.Msigma M ⊓ E = ⊥ := by
+    have hd := hE.disjoint
+    rw [disjoint_iff] at hd
+    have h2 : (OddOrder.BG.Ch3.S10.Msigma M ⊓ E).subgroupOf M = ⊥ := by
+      have he : (OddOrder.BG.Ch3.S10.Msigma M ⊓ E).subgroupOf M
+          = (OddOrder.BG.Ch3.S10.Msigma M).subgroupOf M ⊓ E.subgroupOf M :=
+        Subgroup.comap_inf _ _ M.subtype
+      rw [he]; exact hd
+    have h3 := congrArg (Subgroup.map M.subtype) h2
+    rwa [Subgroup.map_subgroupOf_eq_of_le (inf_le_of_left_le hMσM), Subgroup.map_bot] at h3
+  have hsup : OddOrder.BG.Ch3.S10.Msigma M ⊔ E = M := by
+    have hs := hE.sup_eq_top
+    have h3 := congrArg (Subgroup.map M.subtype) hs
+    rw [Subgroup.map_sup, Subgroup.map_subgroupOf_eq_of_le hMσM,
+      Subgroup.map_subgroupOf_eq_of_le hEM, ← MonoidHom.range_eq_map, Subgroup.range_subtype] at h3
+    exact h3
+  exact subgroupESetup_of_complement hG hM hEM hinf hsup
+
+/-- BG Lemma 14.11 step S1: `q ∉ τ₂(M)`.  A rank-2 elem abelian `B ∈ ℰ_q²(E)` is normal in `E`
+(Cor 12.6(a)) hence `≤ F(E)`; line-membership forces `Q ≤ B ≤ F(E)`, contradicting `Q ⊄ F(E)`. -/
+theorem typeF_complement_q_notMem_tau2 [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    {M E E₁ E₂ E₃ Q : Subgroup G} {q : ℕ} [Fact q.Prime]
+    (hsetup : SubgroupESetup M E E₁ E₂ E₃)
+    (hQ : Q ∈ elemAbelianOfRank G q 1) (hQE : Q ≤ E)
+    (hQF : ¬ Q ≤ OddOrder.BG.Ch2.S08.fittingInG E) :
+    q ∉ tau2 M := by
+  intro hτ2
+  obtain ⟨B, hB, hBE⟩ := exists_elemAb_rank_two_le_E_of_tau2 hG hsetup hτ2
+  obtain ⟨⟨hENB, hline⟩, _⟩ := elemAb_normal_in_E_of_tau2 hG hsetup hτ2 hB hBE
+  have hQB : Q ≤ B := (hline Q hQ).mp hQE
+  have hBnorm : (B.subgroupOf E).Normal :=
+    (Subgroup.normal_subgroupOf_iff_le_normalizer hBE).mpr hENB
+  have hBpi : Subgroup.IsPiSubgroup ({q} : Set ℕ) B := by
+    intro p hp
+    rw [hB.2, Nat.primeFactors_prime_pow (by norm_num) (Fact.out : q.Prime),
+      Finset.mem_singleton] at hp
+    exact hp
+  have hBF : B ≤ OddOrder.BG.Ch2.S08.fittingInG E :=
+    OddOrder.BG.Ch2.S08.le_fittingInG_of_normal_isPiSubgroup_singleton hBE hBnorm hBpi
+  exact hQF (hQB.trans hBF)
+
+/-- BG Lemma 14.11 step S2: `q ∉ τ₃(M)`.  The τ₃-Hall `E₃` is cyclic, normal in `E`, hence `≤ F(E)`
+(`E3_le_fittingInG`); a `q`-subgroup with `q ∈ τ₃` lands in `E₃`, so `Q ≤ E₃ ≤ F(E)`. -/
+theorem typeF_complement_q_notMem_tau3 [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    {M E E₁ E₂ E₃ Q : Subgroup G} {q : ℕ} [Fact q.Prime]
+    (hsetup : SubgroupESetup M E E₁ E₂ E₃)
+    (hQ : Q ∈ elemAbelianOfRank G q 1) (hQE : Q ≤ E)
+    (hQF : ¬ Q ≤ OddOrder.BG.Ch2.S08.fittingInG E) :
+    q ∉ tau3 M := by
+  intro hτ3
+  haveI hE₃norm : (E₃.subgroupOf E).Normal :=
+    (Subgroup.normal_subgroupOf_iff_le_normalizer hsetup.E₃_le).mpr (hsetup.E3_normal hG)
+  have hQcard : Nat.card ↥Q = q := by rw [hQ.2, pow_one]
+  have hQpiG : Ch03.Subgroup.IsPiGroup (tau3 M) (Q.subgroupOf E) := by
+    intro r hr
+    rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hQE).toEquiv, hQcard,
+      (Fact.out : q.Prime).primeFactors, Finset.mem_singleton] at hr
+    exact hr ▸ hτ3
+  have hle : Q.subgroupOf E ≤ E₃.subgroupOf E :=
+    OddOrder.BG.Ch3.S10.isPiGroup_le_of_normal_isHallSubgroup hsetup.E₃_hall hQpiG
+  have hQE₃ : Q ≤ E₃ := by
+    have := Subgroup.map_mono (f := E.subtype) hle
+    rwa [Subgroup.map_subgroupOf_eq_of_le hQE,
+      Subgroup.map_subgroupOf_eq_of_le hsetup.E₃_le] at this
+  exact hQF (hQE₃.trans (E3_le_fittingInG hG hsetup))
+
+/-- BG Lemma 14.11 steps S1–S3 + gap C: `Q ⊄ F(E)` with `M ∈ 𝓜_F` forces `q ∈ τ₁(M)` and
+`C_{M_σ}(Q) = 1`.  (`q ∈ π(E) ⊆ σ(M)'` is τ-covered; S1/S2 rule out τ₂/τ₃; a nontrivial
+`C_{M_σ}(Q)` would place `q ∈ κ(M) = ∅`.) -/
+theorem typeF_complement_q_tau1_and_centralizer [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    {M E E₁ E₂ E₃ Q : Subgroup G} {q : ℕ}
+    (hsetup : SubgroupESetup M E E₁ E₂ E₃) (hF : IsTypeF M)
+    (hq : q ∈ piSet E) (hQ : Q ∈ elemAbelianOfRank G q 1) (hQE : Q ≤ E)
+    (hQF : ¬ Q ≤ OddOrder.BG.Ch2.S08.fittingInG E) :
+    q ∈ tau1 M ∧ OddOrder.BG.Ch3.S10.Msigma M ⊓ Subgroup.centralizer (Q : Set G) = ⊥ := by
+  have hqpf : q ∈ (Nat.card ↥E).primeFactors := hq
+  haveI : Fact q.Prime := ⟨Nat.prime_of_mem_primeFactors hqpf⟩
+  have hqτ1 : q ∈ tau1 M := by
+    rcases hsetup.mem_tau_union_of_mem_primeFactors hG hqpf with (h | h) | h
+    · exact h
+    · exact absurd h (typeF_complement_q_notMem_tau2 hG hsetup hQ hQE hQF)
+    · exact absurd h (typeF_complement_q_notMem_tau3 hG hsetup hQ hQE hQF)
+  have hQM : Q ≤ M := hQE.trans hsetup.E_le
+  refine ⟨hqτ1, ?_⟩
+  by_contra hne
+  exact Set.notMem_empty q (hF ▸ (⟨Fact.out, Or.inl hqτ1, Q, hQ, hQM, hne⟩ : q ∈ kappa M))
+
 /-- **BG Lemma 14.11** (mmd L4086): for `M ∈ 𝓜_F` with `E` a complement of `M_σ` in `M`, a
 prime `q ∈ π(E)`, and `Q ∈ ℰ_q¹(E)` with `Q ⊄ F(E)`, there is `M* ∈ 𝓜` with either
 (1) `q ∈ τ₂(M*)` and `𝓜(C_G(Q)) = {M*}`, or (2) `q ∈ κ(M*)` and `M* ∈ 𝓜_{P₁}`.
 
 "Of independent interest" (BG L4084); used here only by Corollary 14.12.  `F(E)` is the Fitting
-subgroup of the complement `E`, taken in `G` via `fittingInG`.  Gated on §13. -/
+subgroup of the complement `E`, taken in `G` via `fittingInG`.
+
+Phase 1 (`q ∈ τ₁(M)`, `C_{M_σ}(Q) = 1`) is `typeF_complement_q_tau1_and_centralizer`.  The
+remaining phases — `τ₂(M) ≠ ∅` via the cyclic-normal `⁅E,Q⁆` (Prop 10.11(d) +
+`commutator_commutator_right_eq_of_le_normalizer` / a `Q^E`-nilpotent argument for `⁅E,Q⁆ ≠ 1`),
+then Cor 12.9 (`commutator_decomp_of_tau1_action`) and the `M*`-dichotomy via Lemma 12.11
+(`tau2_transfer_to_maximal`) — are tracked in `issues/7007`. -/
 theorem exists_maximal_of_typeF_notMem_fitting [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     {M E Q : Subgroup G} {q : ℕ} (hM : M ∈ maximalSubgroups G) (hF : IsTypeF M)
