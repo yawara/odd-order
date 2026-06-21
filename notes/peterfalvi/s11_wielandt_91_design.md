@@ -859,3 +859,18 @@ hcop=act_V.coprime_order.symm) → S,W → summand-Wielandt #3 → `|S|=p^q` →
   `typeIIIorIV_W2_prime` (§8、sorried だが signature 正、cite 可)。
 - 3 つの opaque Prop fields (quotient_elementaryAbelian/quotient_chiefFactor/U_noncentral_on_quotient)
   は honest 化 (el-ab=hpe, chief=hirr, noncentral=hUntriv 由来)。
+
+### resume⁷ cont. — ✅ `exists_chiefFactor_kernel` landed (sorry-free, core consumed)
+assembly の **card-chain 本体を sorry-free 化** (commit `57df844b`)。`exists_chiefFactor_kernel` は seed を
+**仮説**に取り (sorry でなく)、Maschke核 #1 + summand-Wielandt #3 を end-to-end consume して
+`N (◁↥H, U W₁-inv, ⊇N₀)` + `|↥H⧸N|=p^q` + `p∣|W₂|` を生成。card-chain = `index_comap_of_surjective`
+(N=W逆像で |↥H⧸N|=W.index) + `IsComplement'.index_eq_card` (W.index=|S|) + `card_map_dvd`
+(p=|C_V(W₁)⊓S| ∣ |C_V(W₁)| = |W₂像| ∣ |W₂|)。helper `typeP_quotient_fixedByE_cyclic` 抽出 (再利用)。
+
+**▶ 残り 2 点のみ** (両方 exists_chiefFactorData 内):
+1. **seed** `exists_chiefFactor_seed` (上記レシピ、ungated 群論): nilpotent Sylow 分解 + Frattini 商 + BG 1.8。
+2. **最終 packaging** (kernel N → ChiefFactorData): `H0=N.map subtype`; `quotient_order` = `index_mul_card`
+   (|↥H|=|↥H⧸N|·|N|=p^q·|H0|); `H0_normalized_by_M` = **M-normality 翻訳** (M=H⊔U⊔W₁ via
+   `derivedInG_eq_fitting_sup_U`+`M_complement`; H≤N(H0) from N◁↥H; U⊔W₁≤N(H0) from N IsAInvariant —
+   `typeP_conjAction_apply` で G-共役へ翻訳、唯一 fiddly); typeIII_IV_p_eq_W2 = `p∣|W₂|`(kernel) +
+   `typeIIIorIV_W2_prime` cite; opaque Props は free。
