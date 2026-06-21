@@ -7822,6 +7822,12 @@ theorem fitting_not_ti_cases [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     (S14.IsTypeF M ∨ S14.IsTypeP1 M) ∧ MF M = OddOrder.BG.Ch3.S10.Msigma M ∧
       ∃ X : Subgroup G,
         X ≤ MF M ∧ X ≠ ⊥ ∧ IsCyclic ↥X ∧
+        -- ⚠ conjunct (c) is `≤`, NOT `=`.  The BG book (Theorem 15.7(c)) prints the *equality*
+        -- `M' = F(M)`, but that equality is an **overstatement** in the type-`F` case (it is
+        -- equivalent to the non-derivable condition `C_Y(E₁) = 1`).  We therefore weakened it to the
+        -- faithful inclusion `M' ⊆ F(M)`, matching the authoritative MathComp formalization
+        -- (`nonTI_Fitting_structure`, which uses `M^'(1) ⊆ 'F(M)` and whose source comment states the
+        -- printed equality "does not appear to be valid").  Full justification in the docstring above.
         derivedInG M ≤ fittingInAmbient M ∧
         (∃ p : ℕ, p.Prime ∧ p ∈ OddOrder.BG.Ch3.S10.sigma M ∧
           p ∉ OddOrder.BG.Ch3.S10.beta M ∧
