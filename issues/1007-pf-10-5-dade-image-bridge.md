@@ -375,3 +375,52 @@ have hVeq : tic.V = tic.Vdiff := rfl
 4. **carrier pinning** (grid → params)。
 
 最大の未解決 = (1) σ-orthogonality (§5↔§7)。FullDadeApplication が ready ゆえ (2)(3) は計算/assembly 主体。
+
+## ✅✅✅✅✅✅✅✅ 進捗 (2026-06-22 lane-b) — ⭐ ζ^τ₁ vanishes on V 完成 (genuine bottleneck, axiom-clean) + endgame 完全 de-risk
+
+**(1) σ-orthogonality = ζ^τ₁-vanish (「最大の未解決」「genuine math」と診断していた本丸) を完全形式化**
+(commit `e7e05c15`、full build 3881 jobs green、**両 top-level 定理 fully axiom-clean
+`[propext,Classical.choice,Quot.sound]` — sorryAx 無**)。**R(ζ)/(5.5) CharacterPsiDecomposition 機構は不要**だった
+— 整数 norm-1 projection で迂回:
+
+- ✅ `Hypothesis.tau_zeta_sub_conj_vanishes_on_typePV`: `(ζ−ζ̄)^τ` が V で消える。ζ は normal M' 誘導 +
+  v∈V⟹v∉M' (`typePData_typePV_not_mem_derived`) ゆえ ζ,ζ̄ とも v で 0、ζ−ζ̄ は A₀-supported
+  (`zeta_sub_conj_support`) ゆえ cornerstone `tau_apply_of_mem_typePV` で値復元。
+- ✅ `inner_left_eq_zero_of_inner_sub_eq_zero` (private, 一般): **整数 norm-1 projection** — a,s∈ZIrr,
+  ‖a‖²=‖b‖²=‖s‖²=1, a⊥b, ⟨a−b,s⟩=0 ⟹ x:=⟨a,s⟩∈ℤ で `‖s−x·a−x·b‖²=1−2x²≥0` → 2x²≤1 → x=0。
+  **これが R(ζ) 構成機構を置き換える核心** (a=ζ^τ₁, b=ζ̄^τ₁, s=ω^σ)。
+- ✅ `Hypothesis.tau1_zeta_vanishes_on_typePV`: ζ^τ₁ が V で消える。(ζ−ζ̄)^τ vanish on V + NC≤2<min(w₁,w₂)
+  (各 ζ^τ₁/ζ̄^τ₁ が norm-1 ⟹ σ-coeff ≤1 個 by `ncard_inner_chiFam_ne_zero_le_one` ×2 + union; (3.8) 系
+  `sigmaCoeff_eq_zero_of_sigmaNC_lt` = (5.3.b)) → projection で ζ^τ₁⊥χ_pq (= (5.5)) → (3.2.d)
+  `eq_zero_of_mem_V_of_inner_chiFam_eq_zero` で vanish。**V-bridge 不要** (tic.V = typePV by rfl)。
+
+**⟹ `muGridPsi_vanishes_on_typePV` の唯一の named hypothesis `hζvanish` が discharge 可能になった**
+(ψ = X − δ(ω^σ diff) が V で消えるのが unconditional に)。
+
+### ⭐ endgame ((2)+(3): NC(ψ)≤4 + (3.8) → ψ=0) は §6 (4.8) の完全 mirror と判明 (大幅 de-risk)
+
+§6 `certainType_diff_dade_eq` (`S06_CertainTypeIsometry.lean:794-903`) が **(10.5) endgame と同一の形**を解いている:
+`ψ = φ − δ(ω diff)`, φ = norm-√2 character, NC(ψ)≤4, → ψ=0。**reusable S05 infra で組まれている**:
+- `S05.grid_trichotomy` (S05_GridTrichotomy:179) — 抽象 (3.8) trichotomy。public。
+- `grid_no_constant_column` / `grid_no_constant_row` (`S06_CertainTypeIsometry.lean:702/767`) — **完全に
+  一般** (ι,κ,G,a,P,Q,s で抽象、§6 固有データ無) な (b)/(c) 排除 (‖φ‖²=2 casework を内包)。**だが
+  `private` (S06)** ⟹ S12 から使えない。
+
+**∴ endgame の残務 (次セッション、~150-250 行)**:
+1. **`grid_no_constant_column/row` + helper `exists_two_ne_ne` を S06-private → public 化** (or S05_GridTrichotomy
+   へ hoist が数学的に正しい置き場)。⚠ toolkit (S06) 編集 = 要判断 (LAUNCH「§3-9 は cite のみ」)。最小は
+   `private` 削除 3 箇所。**duplication は DRY 違反ゆえ避ける**。
+2. **§10 版 norm-2 補題** (§6 `sigmaNC_dade_le_two`/`sigmaCoeff_dade_eq_zero_or_one` の analog): X = α^τ + n·ζ^τ₁
+   (`muGridAlpha_tau_X_inner` で ‖X‖²=2) の σ-coeff が **NC(X)≤2** かつ **∈{0,±1}** (Bessel `sum_sq_le_inner_self_re`
+   + 整数性 `inner_mem_ZIrr_int`)。新規一般補題、clean。
+3. **`sigmaCoeff_psi_eq` analog**: ψ の σ-coeff = X の σ-coeff − δ·(指標 [Pij=·]−[Pi0=·])。Pij/Pi0 =
+   alignedOmegaSigmaGrid の σ-index。
+4. **endgame mirror** (S06:804-903 を §10 tic で parallel re-derive): hG2/hG01/hae/hψV(=muGridPsi+ζ-vanish)/hadd →
+   w₁<w₂ で gap → grid_trichotomy → (a) で ψ=0, (b)(c) は grid_no_constant_column/row で排除 → X=δ(ω^σdiff) →
+   grid-level (10.5)。
+5. **carrier pinning** (grid → params): `alpha_tau_image` は params-level。grid-level `tau_muGridAlpha_eq` 定理 +
+   薄い corollary。
+
+⚠ endgame は alignedOmegaSigmaGrid (Prop16.1 sorryAx gate) を使うゆえ axiom-clean にはならない (上流 gate のみ;
+自前 sorry 無は維持可能)。**最難だった analytic 核 (a=0 + ζ^τ₁-vanish) は完全に越えた**; 残りは grid-combinatorics
+の mirror + 数論。
