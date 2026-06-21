@@ -601,3 +601,59 @@ leaf へ移し、`wielandt_formula_of_perfactor` + C で sorry-free 化。statem
 
 ⚠ universe: B は型可変強帰納ゆえ `theorem ….{u}` + `WielandtPerFactor.{_, u}` + `∀ (H : Type u)` で
 H 宇宙を統一 (`∀ (H : Type _)` だと fresh 宇宙で `hpf H` が mismatch)。C も同様の注意要。
+
+## 2026-06-21 (lane-h resume³) — piece C DONE (per-factor discharge, axiom-clean)
+
+**✅✅ piece C 完成** (新 leaf `OddOrder/GroupTheory/WielandtPerFactorDischarge.lean`, sorry-free +
+axiom-clean, AxiomsCheck 登録, full build 3876 green, 実 sorry 137 不変 = 設計通り)。commit `7423193a`。
+
+`WielandtPerFactor L U E` を **dim 恒等式 (⋆) を hyp 化**して produce する配線が完成。鎖:
+群公式 ⟸ `WielandtPerFactor` (B✅) ⟸ `wielandtPerFactor_of_dim` (C✅) ⟸ per-factor (⋆)
+`PerFactorDimIdentity` (= D の obligation, (†) gate) ⟸ (†) per chief factor (D=lane-f, 未)。
+
+新 leaf の構成:
+- `WielandtDimIdentity {V} [CommGroup V] (p) [Module (ZMod p) (Additive V)] (ρ) (U E) [Fintype E]` —
+  抽象 𝔽_p-表現の dim 恒等式 (⋆)。`finrank_elab_identity` の結論形 ((†) modulo)。
+- `IsElementaryAbelian.subgroupCommGroup`/`subgroupZmodModule` — `↥N` の canonical 𝔽_p-構造。
+- `PerFactorDimIdentity φ hN p hpe` — (⋆) を `V = ↥N` (制限作用 `hN.restrict`) に特殊化。**piece D の証明対象**。
+- `wielandtPerFactor_of_dim.{u} [Fintype E] (hdim : ∀ …, PerFactorDimIdentity …) : WielandtPerFactor.{_,u}`
+  — `card_fixedSubgroup_wielandt_of_dim` (dim→card on ↥N) + `card_fixedSubgroup_restrict`×3
+  (`|C_N(X)|=|C_H(X)⊓N|`) で配線。
+
+### ⚠⚠ 重要な instance 知見 (piece D も必ず踏む — `↥N` を 𝔽_p-加群に見る詰みどころ)
+
+`↥N` (subgroup 型) は canonical な**非可換** `Group ↥N` を持つため、`Additive ↥N` の additive 構造が
+ダイヤモンドになり `↥(Submodule …)` coercion が壊れる。`finrank_elab_identity`/`card_fixedSubgroup_*`
+は `↥(elabRepresentation …).invariants` を coerce するのでこれを踏む。2 段で回避:
+
+1. **CommGroup は canonical Group の上に直に構築** (`{ (inferInstance : Group ↥N) with mul_comm := hpe.comm }`)
+   — `CommGroup.toGroup = N.mul` (canonical) ゆえ `MulAut ↥N` が `hN.restrict` と一致。
+   PRank の `IsElementaryAbelian.zmodModule` (= `IsMulCommutative` 経由) は **使わない** — その内部
+   AddCommGroup が canonical と別で coercion がダイヤモンドる。module は `AddCommGroup.zmodModule`
+   (`[NeZero p]` 不要) で**この canonical CommGroup の上に**直構築 (`subgroupZmodModule`)。
+2. **dim 恒等式は module を instance *binder* に持つ別 def `WielandtDimIdentity` で書く** — coercion は
+   binder に対し**一度だけ**解決され、`↥N` の concrete module を**代入**しても壊れない。直接 `letI`-module
+   の上で `↥(Submodule …)` を書くと coercion が壊れる (`Module.finrank (ZMod p) (Additive ↥N)` は letI でも
+   通るのに `↥Submodule` だけ壊れるのが罠; probe で確認)。`card_fixedSubgroup_wielandt_of_dim` 自体が
+   binder-def ゆえ、これに渡す分には問題ない (適用は代入)。
+   - 補足: scoped instance `[Group G][IsMulCommutative G] → CommGroup G` は `open scoped IsMulCommutative`
+     で発火するが priority 50 + coercion 解決では効かず `↥Submodule` は救えない (probe 済)。
+
+⚠ universe: piece B 同様 `wielandtPerFactor_of_dim.{u}` + `∀ (H : Type u)` + `WielandtPerFactor.{_,u}`。
+⚠ `PerFactorDimIdentity φ hN p hpe` は `U E` を引数で受けない (section 暗黙) ので hyp 内で `(U := U) (E := E)`
+   明示 pin が要る (さもないと `Fintype E` が metavar 化して stuck)。
+
+### 残り (この順) — piece C 完了後
+
+**D. (†) module wiring** (lane-f coupled rep-theory, resume⁵ NEXT 0-3): `PerFactorDimIdentity φ hN p hpe`
+(= `WielandtDimIdentity p hN.restrict U E` modulo 上記 letI 構造) を per chief factor で証明。中身 =
+`finrank_elab_identity` (要 `hUE: U⊔E=⊤` + `htag` (†)) を `elabRepresentation p hN.restrict` に適用し
+done engine 群 (centerProj isotypic + free-orbit + base change) で `htag` を discharge。上記 instance 知見を
+そのまま流用。`hUE` は Frobenius 構造から。`Invertible (Fintype.card U : ZMod p)` は coprimality + p 素数。
+
+**E. relocation** — `wielandt_fixedPoint_frobenius` (`CoprimeAction.lean:156`, sorry) を C import 可能な
+downstream leaf へ移し `wielandt_formula_of_perfactor` + `wielandtPerFactor_of_dim` で sorry-free 化。
+⚠ entangle 注意: carrier `CoprimeFrobeniusAction` + 3 corollary + FrobeniusCentralizer 節
+(`isFrobenius_kernel_eq_bot_of_frobenius_subgroup` 等) が **CoprimeAction 内で carrier を使用**しているので
+それらも一緒に移す必要がある (`fixedSubgroup` def 自体は多数 import 元ゆえ CoprimeAction に残す)。消費側
+S11/S15 の import 更新も。spine refactor ゆえ要計画。**D 無しでは sorry は減らない** (E は配線のみ)。
