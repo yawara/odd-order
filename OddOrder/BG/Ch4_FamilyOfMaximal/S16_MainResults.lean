@@ -137,6 +137,111 @@ def piStar (G : Type*) [Group G] : Set ℕ :=
 
 /-! ## Theorems A--E -/
 
+/-- **BG Theorem A(5), element form** (mmd L4280): for a type-`P` maximal subgroup `M` with cyclic
+Hall `κ(M)`-subgroup `K` and `K* = C_{M_σ}(K)`, the `M`-centralizer of every nonidentity `k ∈ K`
+is the cyclic product `K ⊔ K*` (BG's `C_M(k) = K × K*`).
+
+This sharpens Proposition 14.2(b1) (`typeP_structure`), which gives `N_M(X) = K ⊔ K*` only for the
+rank-one `X ∈ ℰ¹(K)`, to the element-wise centralizer.  Bridge: `K` is cyclic, so `⟨k⟩ ≤ K` is
+cyclic and contains a subgroup `X` of prime order `p ∣ |k|` with `X ≤ K`; then
+`C_G(k) ≤ C_G(X) ≤ N_G(X)`, so `M ⊓ C_G(k) ≤ N_G(X) ⊓ M = K ⊔ K*`, while `K ≤ C_G(k)` (`K` abelian)
+and `K* ≤ C_G(K) ≤ C_G(k)` give the reverse. -/
+theorem typeP_centralizer_kappaElement_eq [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    {M K Kstar U : Subgroup G} (hM : M ∈ maximalSubgroups G) (hP : S14.IsTypeP M) (hKM : K ≤ M)
+    (hK : Ch03.IsHallSubgroup (S14.kappa M) (K.subgroupOf M))
+    (hKstar : Kstar = OddOrder.BG.Ch3.S10.Msigma M ⊓ Subgroup.centralizer (K : Set G))
+    (hU : Ch03.IsHallSubgroup ((S14.kappa M ∪ OddOrder.BG.Ch3.S10.sigma M)ᶜ) (U.subgroupOf M))
+    [IsCyclic ↥K] :
+    ∀ k ∈ K, k ≠ 1 → M ⊓ Subgroup.centralizer ({k} : Set G) = K ⊔ Kstar := by
+  intro k hk hk1
+  -- `⟨k⟩ ≤ K`.
+  have hzk : Subgroup.zpowers k ≤ K := Subgroup.zpowers_le.mpr hk
+  -- A prime `p ∣ |k|` and an element `v ∈ ⟨k⟩` of order `p`.
+  have hord1 : orderOf k ≠ 1 := fun h => hk1 (orderOf_eq_one_iff.mp h)
+  obtain ⟨p, hp, hpk⟩ := (orderOf k).exists_prime_and_dvd hord1
+  haveI : Fact p.Prime := ⟨hp⟩
+  have hpcard : p ∣ Nat.card ↥(Subgroup.zpowers k) := by rw [Nat.card_zpowers]; exact hpk
+  obtain ⟨v, hv⟩ := exists_prime_orderOf_dvd_card' p hpcard
+  -- `X = ⟨v⟩` is rank-one elementary abelian and `X ≤ K`.
+  set X : Subgroup G := Subgroup.zpowers (v : G) with hXdef
+  have hXcard : Nat.card ↥X = p := by
+    rw [hXdef, Nat.card_zpowers]
+    exact (orderOf_injective _ (Subgroup.zpowers k).subtype_injective v).trans hv
+  have hXelem : X ∈ elemAbelianOfRank G p 1 :=
+    ⟨Subgroup.IsElementaryAbelian.of_card_prime hXcard, by rw [hXcard, pow_one]⟩
+  have hXzk : X ≤ Subgroup.zpowers k := by rw [hXdef]; exact Subgroup.zpowers_le.mpr v.2
+  have hXK : X ≤ K := hXzk.trans hzk
+  -- Proposition 14.2(b1): `N_G(X) ⊓ M = K ⊔ K*`.
+  obtain ⟨_, _, hb1, _, _, _, _⟩ := typeP_structure hG hM hP hKM hK hKstar hU
+  have hNX : Subgroup.normalizer (X : Set G) ⊓ M = K ⊔ Kstar := hb1 p hp X hXelem hXK
+  -- `C_G(k) ≤ C_G(X)`: everything centralizing `k` centralizes `⟨k⟩ ⊇ X`.
+  have hCkX : Subgroup.centralizer ({k} : Set G) ≤ Subgroup.centralizer (X : Set G) := by
+    intro g hg
+    rw [Subgroup.mem_centralizer_iff]
+    intro y hy
+    have hkCg : k ∈ Subgroup.centralizer ({g} : Set G) :=
+      Subgroup.mem_centralizer_singleton_iff.mpr (Subgroup.mem_centralizer_singleton_iff.mp hg).symm
+    have hyCg : y ∈ Subgroup.centralizer ({g} : Set G) :=
+      (Subgroup.zpowers_le.mpr hkCg) (hXzk hy)
+    exact Subgroup.mem_centralizer_singleton_iff.mp hyCg
+  -- Forward `M ⊓ C_G(k) ≤ K ⊔ K*` via `C_G(k) ≤ C_G(X) ≤ N_G(X)`.
+  have hfwd : M ⊓ Subgroup.centralizer ({k} : Set G) ≤ K ⊔ Kstar := by
+    rw [← hNX]
+    exact le_inf
+      (inf_le_right.trans (hCkX.trans (Subgroup.centralizer_le_normalizer (X : Set G)))) inf_le_left
+  -- Reverse `K ⊔ K* ≤ M ⊓ C_G(k)`.
+  have hrev : K ⊔ Kstar ≤ M ⊓ Subgroup.centralizer ({k} : Set G) := by
+    refine sup_le (le_inf hKM ?_) ?_
+    · -- `K ≤ C_G(k)`: `K` cyclic ⟹ `K ≤ C_G(K) ≤ C_G(k)` (`k ∈ K`).
+      exact le_trans (Subgroup.le_centralizer K)
+        (Subgroup.centralizer_le (Set.singleton_subset_iff.mpr hk))
+    · -- `K* ≤ M_σ ≤ M` and `K* ≤ C_G(K) ≤ C_G(k)`.
+      rw [hKstar]
+      exact le_inf (inf_le_left.trans (OddOrder.BG.Ch3.S10.Msigma_le M))
+        (inf_le_right.trans (Subgroup.centralizer_le (Set.singleton_subset_iff.mpr hk)))
+  exact le_antisymm hfwd hrev
+
+/-- **BG Theorem A(4)** (mmd L4279): `C_U(k) = 1` for `k ∈ K#` — the `(κ(M) ∪ σ(M))'`-Hall
+complement `U` meets each `M`-centralizer `C_M(k) = K ⊔ K*` trivially.
+
+**Faithfulness (issue 8017).** BG states A(4) for the *`K`-invariant* complement `U`, but the
+conclusion holds for **every** `(κ ∪ σ)'`-Hall `U ≤ M`: by `typeP_centralizer_kappaElement_eq`,
+`U ⊓ C_G(k) = U ⊓ (M ⊓ C_G(k)) = U ⊓ (K ⊔ K*)`, and `|U|` (a `(κ ∪ σ)'`-number) is coprime to
+`|K ⊔ K*| = |K|·|K*|` (a `(κ ∪ σ)`-number, `K` Hall `κ`, `K* ≤ M_σ` Hall `σ`), so the intersection
+is trivial.  No `K`-invariance of `U` is needed; the bug-suspect conjunct is faithful as stated. -/
+theorem typeP_hall_inf_centralizer_kappaElement_eq_bot [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M K Kstar U : Subgroup G}
+    (hM : M ∈ maximalSubgroups G) (hP : S14.IsTypeP M) (hKM : K ≤ M) (hUM : U ≤ M)
+    (hK : Ch03.IsHallSubgroup (S14.kappa M) (K.subgroupOf M))
+    (hKstar : Kstar = OddOrder.BG.Ch3.S10.Msigma M ⊓ Subgroup.centralizer (K : Set G))
+    (hU : Ch03.IsHallSubgroup ((S14.kappa M ∪ OddOrder.BG.Ch3.S10.sigma M)ᶜ) (U.subgroupOf M))
+    [IsCyclic ↥K] :
+    ∀ k ∈ K, k ≠ 1 → U ⊓ Subgroup.centralizer ({k} : Set G) = ⊥ := by
+  intro k hk hk1
+  -- `C_M(k) = K ⊔ K*`, hence `U ⊓ C_G(k) = U ⊓ (K ⊔ K*)` (`U ≤ M`).
+  have hCM := typeP_centralizer_kappaElement_eq hG hM hP hKM hK hKstar hU k hk hk1
+  have hstep : U ⊓ Subgroup.centralizer ({k} : Set G) = U ⊓ (K ⊔ Kstar) := by
+    rw [← hCM, ← inf_assoc, inf_eq_left.mpr hUM]
+  rw [hstep]
+  -- `|U|` and `|K ⊔ K*| = |K|·|K*|` are coprime: `(κ∪σ)'` vs `κ∪σ`.
+  apply Subgroup.inf_eq_bot_of_coprime
+  have hcard : Nat.card ↥(K ⊔ Kstar) = Nat.card ↥K * Nat.card ↥Kstar :=
+    card_kappaHall_sup_Kstar hKM hK hKstar
+  refine Ch03.Nat.coprime_of_isPiGroup_of_isPiGroup_compl
+    (π := (S14.kappa M ∪ OddOrder.BG.Ch3.S10.sigma M)ᶜ) Nat.card_pos.ne' Nat.card_pos.ne' ?_ ?_
+  · -- `|U|` is a `(κ∪σ)'`-number.
+    intro p hp
+    exact hU.1 p (by rwa [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hUM).toEquiv])
+  · -- every prime of `|K ⊔ K*|` lies in `κ ∪ σ`.
+    intro p hp hpcompl
+    rw [hcard, Nat.primeFactors_mul Nat.card_pos.ne' Nat.card_pos.ne'] at hp
+    rcases Finset.mem_union.mp hp with hpK | hpKstar
+    · exact hpcompl (Or.inl (hK.1 p (by
+        rwa [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hKM).toEquiv])))
+    · refine hpcompl (Or.inr (OddOrder.BG.Ch3.S10.Msigma_isPiGroup M p ?_))
+      have hKstar_le_Mσ : Kstar ≤ OddOrder.BG.Ch3.S10.Msigma M := by rw [hKstar]; exact inf_le_left
+      exact Nat.primeFactors_mono (Subgroup.card_dvd_of_le hKstar_le_Mσ) Nat.card_pos.ne' hpKstar
+
 /-- **BG Theorem A** (mmd L4274): the basic structure of a maximal subgroup:
 unique `M_sigma`, cyclic `K`, a `K`-invariant complement `U`, centralizer product
 with `Kstar`, derived/Fitting layering, and the extreme case
@@ -163,47 +268,98 @@ theorem theoremA_maximal_structure [Finite G] (hG : OddOrder.BG.IsMinimalSimpleO
         U = ⊥ ∧ S15.FittingIsTI M ∧ ∃ p : ℕ, p.Prime ∧ Nat.card ↥K = p) := by
   sorry
 
+/-- **BG Theorem A(3) decomposition** (mmd L4276): `M = K U M_σ`.  For a maximal `M` with Hall
+`κ`-subgroup `K ≤ M` and Hall `(κ ∪ σ)'`-subgroup `U ≤ M`, the three factors join to all of `M`.
+
+Type-F (`K = ⊥`): `M = U M_σ` from the `K = ⊥` `SubgroupESetup` (`E_compl_sup`).  Type-P (`K ≠ ⊥`):
+`M' = U M_σ` and `M'` complements `K` in `M` (`typeP_auxiliary_structure`, Lemma 15.1(b)/Theorem
+14.7(h)), so `M = M' K = (U M_σ) K`; the complement's `H ⊔ K = ⊤` is pushed from `M` to `G` via
+`Subgroup.map M.subtype`.  This is the `sorry`-free standalone form of conjunct 3 of
+`theoremA_maximal_structure`. -/
+theorem typeP_maximal_eq_kappaHall_sup_U_sup_Msigma [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M K U : Subgroup G} (hM : M ∈ maximalSubgroups G)
+    (hKM : K ≤ M) (hUM : U ≤ M) (hK : Ch03.IsHallSubgroup (S14.kappa M) (K.subgroupOf M))
+    (hU : Ch03.IsHallSubgroup ((S14.kappa M ∪ OddOrder.BG.Ch3.S10.sigma M)ᶜ) (U.subgroupOf M)) :
+    M = K ⊔ U ⊔ OddOrder.BG.Ch3.S10.Msigma M := by
+  by_cases hKbot : K = ⊥
+  · -- Type-F: `M = U M_σ`.
+    obtain ⟨_E₁, _E₂, _E₃, hsetup⟩ :=
+      subgroupESetup_of_isHall_kappa_eq_bot hG hM hKM hUM hK hKbot hU
+    rw [hKbot, bot_sup_eq, sup_comm]
+    exact hsetup.E_compl_sup.symm
+  · -- Type-P: `M = M' K`, `M' = U M_σ`.
+    have haux := typeP_auxiliary_structure hG hM hKM hUM hK rfl hU
+    obtain ⟨hM'eq, _, hcompl, _⟩ := haux.2.2.2.2.1 hKbot
+    have hMle : derivedInG M ≤ M := Subgroup.map_subtype_le _
+    have hMM' : derivedInG M ⊔ K = M := by
+      have htop : (derivedInG M ⊔ K).subgroupOf M = ⊤ := by
+        rw [Subgroup.subgroupOf_sup hMle hKM]; exact hcompl.sup_eq_top
+      exact le_antisymm (sup_le hMle hKM) (Subgroup.subgroupOf_eq_top.mp htop)
+    -- `M = M' K = (U M_σ) K = K U M_σ` (a pure `⊔`-AC rewrite, no lattice `whnf`).
+    conv_lhs => rw [← hMM']
+    rw [hM'eq, sup_comm (U ⊔ OddOrder.BG.Ch3.S10.Msigma M) K, ← sup_assoc]
+
 /-- **BG Theorem A — the ungated conjuncts** (mmd L4274), as a standalone `sorry`-free lemma.
 
-Bundles the four conjuncts of `theoremA_maximal_structure` whose upstreams are all proved
-transitively (mirroring `theoremB_U_sylow_abelian_rank_le_two` / `sigma_reps_pairwise_disjoint`):
+Bundles the conjuncts of `theoremA_maximal_structure` whose upstreams are all proved transitively
+(mirroring `theoremB_U_sylow_abelian_rank_le_two` / `sigma_reps_pairwise_disjoint`):
 
 * A(1) `M_σ` is a `σ(M)`-Hall subgroup (`Msigma_isHall`);
-* A(5) `Kstar ≠ ⊥` — the genuinely new content, unblocked once Proposition 14.2
-  (`S14.typeP_structure`) landed `sorry`-free: a `K`-case-split, with the `K ≠ ⊥` branch supplying
-  `IsTypeP M` (`isTypeP_of_isHall_kappa_subgroupOf_ne_bot`) and reading off the `Kstar ≠ ⊥`
-  conjunct of Proposition 14.2, and the `K = ⊥` (type-F) branch collapsing `Kstar = M_σ ≠ ⊥`;
+* A(2) `K` cyclic (`typeP_auxiliary_structure`, Lemma 15.1(a)/Theorem 14.7(h));
+* A(3) `M ≤ N_G(U M_σ)` (`typeP_auxiliary_structure`: `U M_σ = M` for type-F, `= M' ⊴ M` for type-P);
+* A(4) `C_U(k) = 1` for `k ∈ K#` (`typeP_hall_inf_centralizer_kappaElement_eq_bot`);
+* A(5) `Kstar ≠ ⊥` (`S14.typeP_structure`, with `K = ⊥` collapsing `Kstar = M_σ ≠ ⊥`) and the
+  element form `C_M(k) = K ⊔ K*` for `K ≠ ⊥`, `k ∈ K#` (`typeP_centralizer_kappaElement_eq`);
 * A(6) `M_F ≤ M_σ ≤ M'` (`maxNilpotentNormalHall_le_Msigma`, `Msigma_le_derived`).
 
-As with the Theorem B(1) precedent the explicit `hKM : K ≤ M` is added (it is part of the BG setup
-`M = K U M_σ` but not forced by `hK`, a Hall condition on `K.subgroupOf M`); the monolith
-`theoremA_maximal_structure` is left untouched (its other conjuncts are `§14`/`§15`-gated). -/
+The remaining monolith conjuncts (`M = K U M_σ`, `M'' ≤ F(M)`, the `M_F ≠ M_σ` extreme A(8)) are
+left to `theoremA_maximal_structure`/`theoremA8_structure`: A(3)-decomposition needs the
+complement→join plumbing and A(7) routes through the still-`sorry` type-`P₁` chief-factor inputs.
+
+As with the Theorem B(1) precedent the explicit `hKM : K ≤ M`, `hUM : U ≤ M` are added (part of the
+BG setup `M = K U M_σ` but not forced by the Hall conditions on `K.subgroupOf M`/`U.subgroupOf M`). -/
 theorem theoremA_ungated_conjuncts [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
-    {M K Kstar U : Subgroup G} (hM : M ∈ maximalSubgroups G) (hKM : K ≤ M)
+    {M K Kstar U : Subgroup G} (hM : M ∈ maximalSubgroups G) (hKM : K ≤ M) (hUM : U ≤ M)
     (hK : Ch03.IsHallSubgroup (S14.kappa M) (K.subgroupOf M))
     (hKstar : Kstar = OddOrder.BG.Ch3.S10.Msigma M ⊓ Subgroup.centralizer (K : Set G))
     (hU : Ch03.IsHallSubgroup ((S14.kappa M ∪ OddOrder.BG.Ch3.S10.sigma M)ᶜ)
       (U.subgroupOf M)) :
     Ch03.IsHallSubgroup (OddOrder.BG.Ch3.S10.sigma M) (OddOrder.BG.Ch3.S10.Msigma M) ∧
+      IsCyclic ↥K ∧
+      M ≤ Subgroup.normalizer ((U ⊔ OddOrder.BG.Ch3.S10.Msigma M : Subgroup G) : Set G) ∧
+      (∀ k ∈ K, k ≠ 1 → U ⊓ Subgroup.centralizer ({k} : Set G) = ⊥) ∧
       Kstar ≠ ⊥ ∧
+      (K ≠ ⊥ → ∀ k ∈ K, k ≠ 1 → M ⊓ Subgroup.centralizer ({k} : Set G) = K ⊔ Kstar) ∧
       S15.MF M ≤ OddOrder.BG.Ch3.S10.Msigma M ∧
       OddOrder.BG.Ch3.S10.Msigma M ≤ derivedInG M := by
-  refine ⟨OddOrder.BG.Ch3.S10.Msigma_isHall hG hM, ?_,
+  -- `IsTypeP M` from a nonempty `κ`-Hall, packaged for the type-`P` conjuncts.
+  have hPofne : K ≠ ⊥ → S14.IsTypeP M := fun hKne =>
+    isTypeP_of_isHall_kappa_subgroupOf_ne_bot hK
+      (fun h => hKne (by rw [← Subgroup.map_subgroupOf_eq_of_le hKM, h, Subgroup.map_bot]))
+  have haux := typeP_auxiliary_structure hG hM hKM hUM hK hKstar hU
+  haveI hKcyc : IsCyclic ↥K := haux.2.1
+  refine ⟨OddOrder.BG.Ch3.S10.Msigma_isHall hG hM, hKcyc, haux.1, ?_, ?_, ?_,
     maxNilpotentNormalHall_le_Msigma hG hM, OddOrder.BG.Ch3.S10.Msigma_le_derived hG hM⟩
-  by_cases hKbot : K = ⊥
-  · -- type-F branch: `Kstar = M_σ ⊓ C(1) = M_σ ≠ ⊥`.
-    subst hKbot
-    have hc : Subgroup.centralizer ((⊥ : Subgroup G) : Set G) = ⊤ := by
-      rw [Subgroup.coe_bot, Subgroup.centralizer_eq_top_iff_subset]
-      exact Set.singleton_subset_iff.mpr (Subgroup.one_mem _)
-    rw [hc, inf_top_eq] at hKstar
-    rw [hKstar]
-    exact OddOrder.BG.Ch3.S10.Msigma_ne_bot hG hM
-  · -- type-P branch: `Kstar ≠ ⊥` is conjunct 2 of Proposition 14.2.
-    have hKofne : K.subgroupOf M ≠ ⊥ := fun h =>
-      hKbot (by rw [← Subgroup.map_subgroupOf_eq_of_le hKM, h, Subgroup.map_bot])
-    have hP : S14.IsTypeP M := isTypeP_of_isHall_kappa_subgroupOf_ne_bot hK hKofne
-    exact (S14.typeP_structure hG hM hP hKM hK hKstar hU).2.1
+  · -- A(4): `C_U(k) = 1`.  Vacuous for `K = ⊥`; else type-`P` element centralizer.
+    intro k hk hk1
+    by_cases hKbot : K = ⊥
+    · rw [hKbot, Subgroup.mem_bot] at hk; exact absurd hk hk1
+    · exact typeP_hall_inf_centralizer_kappaElement_eq_bot hG hM (hPofne hKbot) hKM hUM hK hKstar hU
+        k hk hk1
+  · -- A(5): `Kstar ≠ ⊥`.
+    by_cases hKbot : K = ⊥
+    · -- type-F: `Kstar = M_σ ⊓ C(1) = M_σ ≠ ⊥`.
+      subst hKbot
+      have hc : Subgroup.centralizer ((⊥ : Subgroup G) : Set G) = ⊤ := by
+        rw [Subgroup.coe_bot, Subgroup.centralizer_eq_top_iff_subset]
+        exact Set.singleton_subset_iff.mpr (Subgroup.one_mem _)
+      rw [hc, inf_top_eq] at hKstar
+      rw [hKstar]
+      exact OddOrder.BG.Ch3.S10.Msigma_ne_bot hG hM
+    · exact (S14.typeP_structure hG hM (hPofne hKbot) hKM hK hKstar hU).2.1
+  · -- A(5) element form: `C_M(k) = K ⊔ K*` for `K ≠ ⊥`.
+    intro hKne k hk hk1
+    exact typeP_centralizer_kappaElement_eq hG hM (hPofne hKne) hKM hK hKstar hU k hk hk1
 
 /-- **BG Theorem B** (mmd L4295): restrictions on `U` and the tameness of
 `A(M) - M_sigma`. -/
@@ -784,6 +940,329 @@ theorem isTypeV_of_typePData {M : Subgroup G} (data : TypePData M)
         IsCyclic ↥(opiCoreInG {p}ᶜ data.H))) :
     IsTypeV M :=
   ⟨{ typeP := data, U_eq_bot := hUbot, alternative := halt }⟩
+
+/-- **Prop 16.1(d)/(f) reverse, `M_F = M_σ` from `U = ⊥`** (the `M_F = M_σ` conjunct of `hVP1`,
+mmd L4478): a type-`P` datum with trivial complement `U = ⊥` has `M_F = M_σ`.  Sandwiching:
+`M' = M_F ⊔ U = M_F` (`TypePData.derivedInG_eq_fitting_sup_U` with `U = ⊥`), while always
+`M_F ≤ M_σ ≤ M'` (`maxNilpotentNormalHall_le_Msigma`, `Msigma_le_derived`); so `M_F = M_σ = M'`.
+Axiom-clean (does *not* cite Theorem A(8), unlike the `M_F = M_σ` step of `typeFData_of_kappa_eq_bot`).
+This is the structural half of clause (d): the `IsTypeP1` half is the (deeper) `κ` refinement. -/
+theorem mf_eq_msigma_of_typePData_U_eq_bot [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    {M : Subgroup G} (hM : M ∈ maximalSubgroups G) (data : TypePData M) (hU : data.U = ⊥) :
+    S15.MF M = OddOrder.BG.Ch3.S10.Msigma M := by
+  -- `M' = M_F` since `M' = M_F ⊔ U` and `U = ⊥`.
+  have hderiv : derivedInG M = S15.MF M := by
+    rw [data.derivedInG_eq_fitting_sup_U, hU, sup_bot_eq]
+  -- `M_F ≤ M_σ` always; `M_σ ≤ M' = M_F`; hence equal.
+  refine le_antisymm (S15.maxNilpotentNormalHall_le_Msigma hG hM) ?_
+  exact hderiv ▸ OddOrder.BG.Ch3.S10.Msigma_le_derived hG hM
+
+/-- **Prop 16.1 reverse, centralizer half of `π(W₁) ⊆ κ(M)`** (mmd L4478, `1 ⊂ C_H(W₁) ⊆
+C_{M_σ}(W₁)`): for a type-`P` datum and a nonidentity `x ∈ W₁`, the `M_σ`-centralizer of `x` is
+nontrivial.  Witness: `W₂ = M' ⊓ C(x)` (`centralizer_W1`) lies in both `M_σ` (`W₂ ≤ H = M_F ≤ M_σ`)
+and `C(x)`, and `W₂ ≠ ⊥` (`W2_nontrivial`); so `W₂ ≤ M_σ ⊓ C(x)` is a nontrivial subgroup.
+
+This is the `κ(M)`-membership ingredient that is **derivable from the bare `TypePData`** (it needs
+no `W₁ = κ`-Hall identification).  The remaining `κ`-membership ingredients — `p ∉ σ(M)` and the
+rank-one condition `r_p(M) = 1` putting `p ∈ τ₁(M) ∪ τ₃(M)` — are the carrier-gated half (the latter
+genuinely needs `W₁` to be the Hall `κ(M)`-subgroup; cf. issue 8015 and
+`typep-w1-kappa-carrier-not-derivable`). -/
+theorem typePData_msigma_inf_centralizer_W1_ne_bot [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} (hM : M ∈ maximalSubgroups G)
+    (data : TypePData M) {x : G} (hx : x ∈ data.W1) (hxne : x ≠ 1) :
+    OddOrder.BG.Ch3.S10.Msigma M ⊓ Subgroup.centralizer ({x} : Set G) ≠ ⊥ := by
+  -- `W₂ ≤ M_σ ⊓ C(x)`.
+  have hW2le : data.W2 ≤ OddOrder.BG.Ch3.S10.Msigma M ⊓ Subgroup.centralizer ({x} : Set G) := by
+    refine le_inf ?_ ?_
+    · -- `W₂ ≤ H = M_F ≤ M_σ`.
+      calc data.W2 ≤ data.H := data.W2_le.trans inf_le_left
+        _ = maxNilpotentNormalHall M := data.H_eq
+        _ ≤ _ := S15.maxNilpotentNormalHall_le_Msigma hG hM
+    · -- `W₂ = M' ⊓ C(x) ≤ C(x)`.
+      rw [← data.centralizer_W1 x hx hxne]; exact inf_le_right
+  -- A subgroup containing the nontrivial `W₂` is nontrivial.
+  exact fun hbot => data.W2_nontrivial (le_bot_iff.mp (hW2le.trans hbot.le))
+
+/-- **Prop 16.1 reverse, `σ`-complement half of `π(W₁) ⊆ κ(M)`** (mmd L4478, `W₁ ∩ M_σ = 1`): for a
+type-`P` datum, every prime dividing `|W₁|` lies outside `σ(M)`.  If `p ∈ σ(M)`, an order-`p`
+subgroup `L ≤ W₁` is a `σ(M)`-group, so it lands in the `σ`-Hall subgroup `M_σ`
+(`sigma_subgroup_le_Msigma_of_isHall`, `Msigma_isHall`); but `W₁ ∩ M_σ ≤ W₁ ∩ M' = 1`
+(`M_complement`), forcing `L = ⊥` and `|L| = p = 1`, a contradiction.
+
+This is the second `κ`-membership ingredient **derivable from the bare `TypePData`** (with
+`typePData_msigma_inf_centralizer_W1_ne_bot`).  Together they give `p ∉ σ(M)` and `M_σ ⊓ C(P) ≠ ⊥`;
+the only carrier-gated ingredient left for `π(W₁) ⊆ κ(M)` is the rank-one condition `r_p(M) = 1`. -/
+theorem typePData_W1_prime_not_mem_sigma [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} (hM : M ∈ maximalSubgroups G)
+    (data : TypePData M) {p : ℕ} (hp : p ∈ (Nat.card ↥data.W1).primeFactors) :
+    p ∉ OddOrder.BG.Ch3.S10.sigma M := by
+  intro hpσ
+  haveI : Fact p.Prime := ⟨Nat.prime_of_mem_primeFactors hp⟩
+  -- An order-`p` element `g ∈ W₁` and the cyclic subgroup `L = ⟨g⟩` of order `p`.
+  obtain ⟨g, hg⟩ := exists_prime_orderOf_dvd_card' (G := ↥data.W1) p (Nat.dvd_of_mem_primeFactors hp)
+  have hgord : orderOf ((g : G)) = p :=
+    (orderOf_injective data.W1.subtype data.W1.subtype_injective g).trans hg
+  set L : Subgroup G := Subgroup.zpowers (g : G) with hLdef
+  have hLcard : Nat.card ↥L = p := by rw [hLdef, Nat.card_zpowers, hgord]
+  have hLW1 : L ≤ data.W1 := Subgroup.zpowers_le.mpr g.2
+  have hLM : L ≤ M := hLW1.trans data.W1_le
+  -- `L` is a `σ(M)`-group (its only prime divisor is `p ∈ σ(M)`).
+  have hLpi : Ch03.Subgroup.IsPiGroup (OddOrder.BG.Ch3.S10.sigma M) L := by
+    intro q hq
+    rw [hLcard, (Fact.out : p.Prime).primeFactors, Finset.mem_singleton] at hq
+    exact hq ▸ hpσ
+  -- So `L ≤ M_σ ≤ M'`, while `L ≤ W₁` and `W₁ ∩ M' = ⊥` (complement); hence `L = ⊥`.
+  have hLMσ : L ≤ OddOrder.BG.Ch3.S10.Msigma M :=
+    OddOrder.BG.Ch3.S10.sigma_subgroup_le_Msigma_of_isHall
+      (OddOrder.BG.Ch3.S10.Msigma_isHall hG hM) hLM hLpi
+  have hLsub_bot : L.subgroupOf M = ⊥ := by
+    rw [eq_bot_iff, ← disjoint_iff.mp data.M_complement.disjoint]
+    exact le_inf
+      (Subgroup.comap_mono (hLMσ.trans (OddOrder.BG.Ch3.S10.Msigma_le_derived hG hM)))
+      (Subgroup.comap_mono hLW1)
+  have hLbot : L = ⊥ :=
+    (inf_eq_left.mpr hLM).symm.trans (disjoint_iff.mp (Subgroup.subgroupOf_eq_bot.mp hLsub_bot))
+  rw [hLbot, Subgroup.card_bot] at hLcard
+  exact (Fact.out : p.Prime).ne_one hLcard.symm
+
+/-- **Prop 16.1 reverse, `M_P` from `TypePData` modulo the rank-one input** (mmd L4478,
+`π(W₁) ⊆ κ(M) ⟹ κ(M) ≠ ∅`): a type-`P` datum whose `W₁`-primes all have `M`-rank one has
+`κ(M) ≠ ∅`, hence `M` is `S14.IsTypeP`.  This is the gated-endpoint assembly of the three `κ`-bridge
+ingredients for a prime `p ∣ |W₁|`: `p ∉ σ(M)` (`typePData_W1_prime_not_mem_sigma`) and `r_p(M) = 1`
+(the hypothesis `hrank`) put `p ∈ τ₁(M) ∪ τ₃(M)`, while `⟨g⟩` (`g ∈ W₁` of order `p`) is a rank-one
+elementary abelian subgroup with `M_σ ⊓ C(⟨g⟩) ⊇ M_σ ⊓ C(g) ≠ ⊥`
+(`typePData_msigma_inf_centralizer_W1_ne_bot`).  So `p ∈ κ(M)`.
+
+The only residual hypothesis `hrank` is the carrier-gated half (the `W₁ = κ`-Hall fact forces
+`r_p(M) = 1`; cf. issue 8015).  Supplies the `→ M_P` direction of the reverse classifications
+`hIIP2`/`hIIIIVP1`/`hVP1` of `proposition_type_classification_of_inputs`. -/
+theorem typePData_kappa_nonempty_of_rank1 [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} (hM : M ∈ maximalSubgroups G)
+    (data : TypePData M)
+    (hrank : ∀ p ∈ (Nat.card ↥data.W1).primeFactors, pRank ↥M p = 1) :
+    (S14.kappa M).Nonempty := by
+  classical
+  -- A prime `p ∣ |W₁|` (`W₁ ≠ ⊥`).
+  have hW1card : Nat.card ↥data.W1 ≠ 1 := fun h => data.W1_nontrivial (Subgroup.card_eq_one.mp h)
+  obtain ⟨p, hpp, hpdvd⟩ := Nat.exists_prime_and_dvd hW1card
+  have hp : p ∈ (Nat.card ↥data.W1).primeFactors :=
+    Nat.mem_primeFactors.mpr ⟨hpp, hpdvd, Nat.card_pos.ne'⟩
+  haveI : Fact p.Prime := ⟨hpp⟩
+  -- An order-`p` element `g ∈ W₁` and the rank-one subgroup `P = ⟨g⟩`.
+  obtain ⟨g, hg⟩ := exists_prime_orderOf_dvd_card' (G := ↥data.W1) p hpdvd
+  have hgord : orderOf ((g : G)) = p :=
+    (orderOf_injective data.W1.subtype data.W1.subtype_injective g).trans hg
+  have hgne : (g : G) ≠ 1 := fun hc => by
+    rw [hc, orderOf_one] at hgord; exact hpp.ne_one hgord.symm
+  have hPcard : Nat.card ↥(Subgroup.zpowers (g : G)) = p := by rw [Nat.card_zpowers, hgord]
+  refine ⟨p, hpp, ?_, Subgroup.zpowers (g : G),
+    ⟨Subgroup.IsElementaryAbelian.of_card_prime hPcard, by rw [hPcard, pow_one]⟩,
+    (Subgroup.zpowers_le.mpr g.2).trans data.W1_le, ?_⟩
+  · -- `p ∈ τ₁(M) ∪ τ₃(M)` from `p ∉ σ(M)` and `r_p(M) = 1`.
+    have hpσ : p ∉ OddOrder.BG.Ch3.S10.sigma M := typePData_W1_prime_not_mem_sigma hG hM data hp
+    have hr : pRank ↥M p = 1 := hrank p hp
+    by_cases hM' : p ∈ (Nat.card ↥(derivedInG M)).primeFactors
+    · exact Or.inr ((mem_tau3_iff M p).mpr ⟨hpσ, hM', hr⟩)
+    · exact Or.inl ((mem_tau1_iff M p).mpr ⟨hpσ, hM', hr⟩)
+  · -- `M_σ ⊓ C(⟨g⟩) ⊇ M_σ ⊓ C(g) ≠ ⊥`.
+    have hCne : OddOrder.BG.Ch3.S10.Msigma M ⊓ Subgroup.centralizer ({(g : G)} : Set G) ≠ ⊥ :=
+      typePData_msigma_inf_centralizer_W1_ne_bot hG hM data g.2 hgne
+    have hCle : Subgroup.centralizer ({(g : G)} : Set G) ≤
+        Subgroup.centralizer ((Subgroup.zpowers (g : G) : Subgroup G) : Set G) := by
+      intro y hy
+      rw [Subgroup.mem_centralizer_iff] at hy ⊢
+      intro z hz
+      obtain ⟨n, rfl⟩ := Subgroup.mem_zpowers_iff.mp hz
+      exact Commute.zpow_left (hy (g : G) (Set.mem_singleton _)) n
+    exact fun hbot => hCne (le_bot_iff.mp ((inf_le_inf_left _ hCle).trans hbot.le))
+
+/-- **Theorem A(8) `U = ⊥` core, from type `P₁`** (mmd L4274): for a type-`P₁` maximal subgroup,
+the Hall `(κ(M) ∪ σ(M))ᶜ`-complement `U` is trivial.  Type `P₁` means `κ(M) = π(M) ∖ σ(M)`
+(`IsTypeP1.2`), so `π(M) ⊆ κ(M) ∪ σ(M)` and the prime set `(κ(M) ∪ σ(M))ᶜ` meets `π(M)` only in
+`∅`; a Hall `(κ ∪ σ)ᶜ`-subgroup of `M` therefore has order coprime to `|M|`, i.e. trivial.
+
+This is the `U = ⊥` conjunct of Theorem A(8) (`theoremA_maximal_structure`), now **derivable from
+`Thm 15.2 (mf_ne_msigma_typeP1_structure)`** via `isTypeP1_of_mf_ne_msigma`: `M_F ≠ M_σ ⟹ IsTypeP1 ⟹
+U = ⊥`.  Together with `|K| = p` (also a Thm 15.2 output) this leaves only `FittingIsTI M` for the
+full A(8).  Stated for the relative `U.subgroupOf M` (which is what the Hall hypothesis constrains);
+when `U ≤ M` it gives `U = ⊥`. -/
+theorem isTypeP1_kappaSigma_compl_hall_subgroupOf_eq_bot [Finite G] {M U : Subgroup G}
+    (hP1 : S14.IsTypeP1 M)
+    (hU : Ch03.IsHallSubgroup ((S14.kappa M ∪ OddOrder.BG.Ch3.S10.sigma M)ᶜ) (U.subgroupOf M)) :
+    U.subgroupOf M = ⊥ := by
+  rw [← Subgroup.card_eq_one]
+  by_contra hne
+  obtain ⟨p, hpp, hpdvd⟩ := Nat.exists_prime_and_dvd hne
+  -- `p ∈ (κ ∪ σ)ᶜ` (Hall) and `p ∈ π(M)` (`|U.subgroupOf M| ∣ |M|`).
+  have hpcompl : p ∈ (S14.kappa M ∪ OddOrder.BG.Ch3.S10.sigma M)ᶜ :=
+    hU.1 p (Nat.mem_primeFactors.mpr ⟨hpp, hpdvd, Nat.card_pos.ne'⟩)
+  have hpM : p ∈ (Nat.card ↥M).primeFactors :=
+    Nat.mem_primeFactors.mpr ⟨hpp,
+      hpdvd.trans (Subgroup.card_subgroup_dvd_card (U.subgroupOf M)), Nat.card_pos.ne'⟩
+  -- but `π(M) ⊆ κ(M) ∪ σ(M)` for type `P₁`.
+  refine hpcompl ?_
+  by_cases hpσ : p ∈ OddOrder.BG.Ch3.S10.sigma M
+  · exact Set.mem_union_right _ hpσ
+  · exact Set.mem_union_left _ (hP1.2 ▸ ⟨hpM, hpσ⟩)
+
+/-- **Converse: `κ(M) = π(M) ∖ σ(M)` from a trivial Hall `(κ ∪ σ)ᶜ`-complement** (the second half of
+the type-`P₁` ⟺ `U = ⊥` characterization).  If the Hall `(κ(M) ∪ σ(M))ᶜ`-subgroup of `M` is trivial,
+then `(κ ∪ σ)ᶜ` contains no prime dividing `|M|` (the Hall index condition `hU.2` with index `|M|`),
+so `π(M) ⊆ κ(M) ∪ σ(M)`; combined with `κ(M) ⊆ π(M) ∖ σ(M)` (every `κ`-prime is a non-`σ` divisor of
+`|M|`) this gives `κ(M) = π(M) ∖ σ(M) = sigmaComplementPrimes M`.
+
+Together with `isTypeP1_kappaSigma_compl_hall_subgroupOf_eq_bot` this is the prime-set core of BG's
+"`M ∈ M_{P₁} ⟺ U = ⊥`": modulo `IsTypeP` (`κ ≠ ∅`), `U = ⊥ ⟺ M` is type `P₁`. -/
+theorem kappa_eq_sigmaComplementPrimes_of_hall_subgroupOf_eq_bot [Finite G] {M U : Subgroup G}
+    (hU : Ch03.IsHallSubgroup ((S14.kappa M ∪ OddOrder.BG.Ch3.S10.sigma M)ᶜ) (U.subgroupOf M))
+    (hUbot : U.subgroupOf M = ⊥) :
+    S14.kappa M = S14.sigmaComplementPrimes M := by
+  refine Set.Subset.antisymm (fun p hpκ => ?_) (fun p hpσ' => ?_)
+  · -- `κ ⊆ π ∖ σ`: a `κ`-prime is non-`σ` (`τ₁ ∪ τ₃`) and divides `|M|` (rank-one `P ≤ M`).
+    obtain ⟨hpp, hτ, P, hPelem, hPM, _⟩ := hpκ
+    have hpσ : p ∉ OddOrder.BG.Ch3.S10.sigma M := by
+      rcases hτ with h | h
+      · exact ((mem_tau1_iff M p).mp h).1
+      · exact ((mem_tau3_iff M p).mp h).1
+    have hpπ : p ∈ S14.piSet M := by
+      refine Nat.mem_primeFactors.mpr ⟨hpp, ?_, Nat.card_pos.ne'⟩
+      have hPcard : Nat.card ↥P = p := by rw [hPelem.2, pow_one]
+      exact hPcard ▸ Subgroup.card_dvd_of_le hPM
+    exact ⟨hpπ, hpσ⟩
+  · -- `π ∖ σ ⊆ κ`: `U = ⊥` forces every `|M|`-prime into `κ ∪ σ`; non-`σ` ones land in `κ`.
+    obtain ⟨hpπ, hpσ⟩ := hpσ'
+    by_contra hpκ
+    refine hU.2 p (by rw [hUbot, Subgroup.index_bot]; exact hpπ) ?_
+    rintro (h | h)
+    · exact hpκ h
+    · exact hpσ h
+
+/-- **Theorem A(8), the `FittingIsTI`-free part** (mmd L4274): for `M_F ≠ M_σ`, the Hall
+`(κ ∪ σ)ᶜ`-complement `U` is trivial and `|K| = p` is prime.  Both follow from
+`mf_ne_msigma_typeP1_structure` (Theorem 15.2): `M_F ≠ M_σ ⟹ IsTypeP1 M`
+(`isTypeP1_of_mf_ne_msigma`), whence `U.subgroupOf M = ⊥`
+(`isTypeP1_kappaSigma_compl_hall_subgroupOf_eq_bot`), while `|K| = p` prime is read off Theorem
+15.2's structure conjunction directly.
+
+This discharges two of the three conjuncts of Theorem A(8) in `theoremA_maximal_structure`; the
+remaining `FittingIsTI M` (`F(M)` a TI-subgroup of `G`) is the genuinely deep §15 content (Theorem A
+proper, via the §9–§10 uniqueness/fusion machinery) and is *not* supplied here. -/
+theorem theoremA8_complement_eq_bot_and_kappa_prime [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M K Kstar U : Subgroup G}
+    (hM : M ∈ maximalSubgroups G) (hKM : K ≤ M)
+    (hK : Ch03.IsHallSubgroup (S14.kappa M) (K.subgroupOf M))
+    (hKstar : Kstar = OddOrder.BG.Ch3.S10.Msigma M ⊓ Subgroup.centralizer (K : Set G))
+    (hU : Ch03.IsHallSubgroup ((S14.kappa M ∪ OddOrder.BG.Ch3.S10.sigma M)ᶜ) (U.subgroupOf M))
+    (hne : S15.MF M ≠ OddOrder.BG.Ch3.S10.Msigma M) :
+    U.subgroupOf M = ⊥ ∧ ∃ p : ℕ, p.Prime ∧ Nat.card ↥K = p := by
+  refine ⟨isTypeP1_kappaSigma_compl_hall_subgroupOf_eq_bot
+    (isTypeP1_of_mf_ne_msigma hG hM hne) hU, ?_⟩
+  obtain ⟨_, _, _, p, _, hpp, _, hKp, -⟩ :=
+    (mf_ne_msigma_typeP1_structure hG hM hne hKM hK hKstar).2
+  exact ⟨p, hpp, hKp⟩
+
+/-- **BG Theorem A(8), in full** (mmd L4274): for `M_F ≠ M_σ`, the Hall `(κ ∪ σ)ᶜ`-complement `U`
+is trivial, `F(M)` is a TI-subgroup of `G`, and `|K| = p` is prime.  Combines the
+`FittingIsTI`-free part (`theoremA8_complement_eq_bot_and_kappa_prime`, via Theorem 15.2) with the
+`FittingIsTI` clause (`S15.fitting_isTI_of_mf_ne_msigma`, the contrapositive of the `M_F = M_σ`
+conclusion of Theorem 15.7(a)).  This is the full conjunction `theoremA_maximal_structure` carries
+for the `M_F ≠ M_σ` case; it is `sorry`-free modulo the single deep §15 rank-theoretic residual
+`S15.piSet_mf_inf_beta_disjoint_of_not_fittingIsTI` (Theorem 15.7(a) core). -/
+theorem theoremA8_structure [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M K Kstar U : Subgroup G}
+    (hM : M ∈ maximalSubgroups G) (hKM : K ≤ M)
+    (hK : Ch03.IsHallSubgroup (S14.kappa M) (K.subgroupOf M))
+    (hKstar : Kstar = OddOrder.BG.Ch3.S10.Msigma M ⊓ Subgroup.centralizer (K : Set G))
+    (hU : Ch03.IsHallSubgroup ((S14.kappa M ∪ OddOrder.BG.Ch3.S10.sigma M)ᶜ) (U.subgroupOf M))
+    (hne : S15.MF M ≠ OddOrder.BG.Ch3.S10.Msigma M) :
+    U.subgroupOf M = ⊥ ∧ S15.FittingIsTI M ∧ ∃ p : ℕ, p.Prime ∧ Nat.card ↥K = p := by
+  obtain ⟨hUbot, hKp⟩ :=
+    theoremA8_complement_eq_bot_and_kappa_prime hG hM hKM hK hKstar hU hne
+  exact ⟨hUbot, S15.fitting_isTI_of_mf_ne_msigma hG hM hne, hKp⟩
+
+/-- **BG Theorem A(7), first clause — `M'' ⊆ F(M)`** (mmd L4354), as a standalone `sorry`-free
+lemma for *any* maximal `M`.  No longer `M_F ≠ M_σ`-gated: Theorem 15.2's closing (issue 8012)
+supplies the type-`P₁` half, so a case split on `M_F = M_σ` discharges both branches.
+
+* `M_F = M_σ` (`M_σ` nilpotent, `maxNilpotentNormalHall_eq_Msigma_iff_isNilpotent`): then
+  `M'' ≤ M_σ` (`derivedDerived_le_Msigma`, always true via §12 `E'` abelian) and
+  `M_σ ≤ M_F ≤ F(M)` (`Msigma_le_maxNilpotentNormalHall_of_nilpotent`,
+  `maxNilpotentNormalHall_le_fittingInG`);
+* `M_F ≠ M_σ` (type `P₁`): the `M'' ⊆ F(M)` conjunct of Theorem 15.2
+  (`mf_ne_msigma_typeP1_structure`), where `F(M) = Q C_M(Q) ⊊ M_σ` and the containment is the
+  genuinely-harder chief-factor analysis (not reducible to `M'' ≤ M_σ`, since `M_σ ⊄ F(M)` here).
+
+The second clause of A(7) (`F(M) = C_M(M_F) M_F`, and `K ≠ 1 → F(M) ⊆ M'`) is left to the gated
+`fittingInAmbient_eq_*`/`theoremC_paired_structure`; only `M'' ⊆ F(M)` enters the faithful monolith
+`theoremA_maximal_structure_faithful`. -/
+theorem derivedDerived_le_fittingInAmbient [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M K Kstar : Subgroup G}
+    (hM : M ∈ maximalSubgroups G) (hKM : K ≤ M)
+    (hK : Ch03.IsHallSubgroup (S14.kappa M) (K.subgroupOf M))
+    (hKstar : Kstar = OddOrder.BG.Ch3.S10.Msigma M ⊓ Subgroup.centralizer (K : Set G)) :
+    derivedInG (derivedInG M) ≤ S15.fittingInAmbient M := by
+  by_cases hne : S15.MF M = OddOrder.BG.Ch3.S10.Msigma M
+  · -- `M_σ` nilpotent: `M'' ≤ M_σ ≤ M_F ≤ F(M)`.
+    have hnil : Group.IsNilpotent ↥(OddOrder.BG.Ch3.S10.Msigma M) :=
+      (S15.maxNilpotentNormalHall_eq_Msigma_iff_isNilpotent hG hM).mp hne
+    calc derivedInG (derivedInG M)
+        ≤ OddOrder.BG.Ch3.S10.Msigma M := S15.derivedDerived_le_Msigma hG hM
+      _ ≤ maxNilpotentNormalHall M :=
+          S15.Msigma_le_maxNilpotentNormalHall_of_nilpotent hG hM hnil
+      _ ≤ S15.fittingInAmbient M := S15.maxNilpotentNormalHall_le_fittingInG M
+  · -- type `P₁`: cite the `M'' ⊆ F(M)` conjunct (16th) of Theorem 15.2.
+    obtain ⟨_, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, hA7, _, _, _⟩ :=
+      S15.mf_ne_msigma_typeP1_structure hG hM hne hKM hK hKstar
+    exact hA7
+
+/-- **BG Theorem A — the faithful monolith** (mmd L4346-4355), all 11 conjuncts `sorry`-free.
+
+This is the faithfulness-corrected counterpart of `theoremA_maximal_structure`: it adds the explicit
+`hKM : K ≤ M` and `hUM : U ≤ M` that the BG setup `M = K U M_σ` carries but the bare Hall
+conditions on `K.subgroupOf M` / `U.subgroupOf M` do not force, so conjuncts A(3) (`M = K U M_σ`),
+A(4) (`C_U(k) = 1`), and A(8) (`U = 1`) become provable.  Every conjunct is discharged by a
+standalone lemma — none gated:
+
+* A(1) `M_σ` is `σ(M)`-Hall, A(2) `K` cyclic, A(3)-normal `M ≤ N(U M_σ)`, A(4) `C_U(k) = 1`,
+  A(5) `K* ≠ 1` and `C_M(k) = K K*`, A(6) `M_F ≤ M_σ ≤ M'` — all from `theoremA_ungated_conjuncts`;
+* A(3)-decomposition `M = K U M_σ` — `typeP_maximal_eq_kappaHall_sup_U_sup_Msigma`;
+* A(7) `M'' ⊆ F(M)` — `derivedDerived_le_fittingInAmbient` (now ungated, issue 8012);
+* A(8) `M_F ≠ M_σ ⟹ U = 1 ∧ F(M)` TI `∧ |K|` prime — `theoremA8_structure` (`U.subgroupOf M = ⊥`
+  upgraded to `U = ⊥` via `hUM`).
+
+The `sorry` `theoremA_maximal_structure` is kept as-is for its existing (cross-lane) callers; new
+consumers wanting a proved Theorem A cite this faithful form. -/
+theorem theoremA_maximal_structure_faithful [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M K Kstar U : Subgroup G}
+    (hM : M ∈ maximalSubgroups G) (hKM : K ≤ M) (hUM : U ≤ M)
+    (hK : Ch03.IsHallSubgroup (S14.kappa M) (K.subgroupOf M))
+    (hKstar : Kstar = OddOrder.BG.Ch3.S10.Msigma M ⊓ Subgroup.centralizer (K : Set G))
+    (hU : Ch03.IsHallSubgroup ((S14.kappa M ∪ OddOrder.BG.Ch3.S10.sigma M)ᶜ)
+      (U.subgroupOf M)) :
+    Ch03.IsHallSubgroup (OddOrder.BG.Ch3.S10.sigma M) (OddOrder.BG.Ch3.S10.Msigma M) ∧
+      IsCyclic ↥K ∧
+      M = K ⊔ U ⊔ OddOrder.BG.Ch3.S10.Msigma M ∧
+      M ≤ Subgroup.normalizer ((U ⊔ OddOrder.BG.Ch3.S10.Msigma M : Subgroup G) : Set G) ∧
+      (∀ k ∈ K, k ≠ 1 → U ⊓ Subgroup.centralizer ({k} : Set G) = ⊥) ∧
+      Kstar ≠ ⊥ ∧
+      (K ≠ ⊥ → ∀ k ∈ K, k ≠ 1 → M ⊓ Subgroup.centralizer ({k} : Set G) = K ⊔ Kstar) ∧
+      S15.MF M ≤ OddOrder.BG.Ch3.S10.Msigma M ∧
+      OddOrder.BG.Ch3.S10.Msigma M ≤ derivedInG M ∧
+      derivedInG (derivedInG M) ≤ S15.fittingInAmbient M ∧
+      (S15.MF M ≠ OddOrder.BG.Ch3.S10.Msigma M →
+        U = ⊥ ∧ S15.FittingIsTI M ∧ ∃ p : ℕ, p.Prime ∧ Nat.card ↥K = p) := by
+  obtain ⟨hA1, hA2, hA3n, hA4, hA5a, hA5b, hA6a, hA6b⟩ :=
+    theoremA_ungated_conjuncts hG hM hKM hUM hK hKstar hU
+  refine ⟨hA1, hA2, typeP_maximal_eq_kappaHall_sup_U_sup_Msigma hG hM hKM hUM hK hU,
+    hA3n, hA4, hA5a, hA5b, hA6a, hA6b,
+    derivedDerived_le_fittingInAmbient hG hM hKM hK hKstar, ?_⟩
+  -- A(8): `theoremA8_structure` gives `U.subgroupOf M = ⊥`; lift to `U = ⊥` via `hUM`.
+  intro hne
+  obtain ⟨hUsub, hTI, hp⟩ := theoremA8_structure hG hM hKM hK hKstar hU hne
+  refine ⟨?_, hTI, hp⟩
+  have h := Subgroup.map_subgroupOf_eq_of_le hUM
+  rw [hUsub, Subgroup.map_bot] at h
+  exact h.symm
 
 /-! ## Proposition 16.1: BG local taxonomy and shared Type I--V predicates -/
 

@@ -79,6 +79,7 @@ import OddOrder.BG.Ch3_MaximalSubgroups.S13_PrimeAction
 import OddOrder.BG.Ch3_MaximalSubgroups.S13_PrimeActionTransition
 import OddOrder.BG.Ch3_MaximalSubgroups.S14_Prop142Support
 import OddOrder.BG.Ch4_FamilyOfMaximal.S14_TypePCounting
+import OddOrder.BG.Ch4_FamilyOfMaximal.S15_MF
 import OddOrder.BG.Ch4_FamilyOfMaximal.S16_PairIntersection
 import OddOrder.BG.AppA_PStability
 import OddOrder.BG.AppB_Puig
@@ -3821,6 +3822,50 @@ set_option linter.style.longLine false in
 -- axiom `pLengthOne_commutator_of_zgroupCentralizer`, de-axiomatized (2026-06-10) to a
 -- convention bridge onto `thm36`.
 #assert_only_allowed_axioms OddOrder.BG.Ch3.S10.pLengthOne_commutator_of_zgroupCentralizer
+-- BG Theorem 15.2 (`S15_MF`, issue 8012): if `M_F < M_σ` then `M` is type `P1` with the normal
+-- `q`-subgroup `Q` / minimal chief-factor `Q̄ = Q/Q₀` structure (the §15→§16 keystone, supplying
+-- `Cor 15.3`'s `Q` and `Cor 15.6`'s `K* ⊆ M_F`).  The full wrapper is now sorry-free AND axiom-clean
+-- (2026-06-20): the final semidirect-product gate `hsigmaprime : M_σ' ⊆ Q ⊔ ⁅D, D⁆` was discharged
+-- via `S13.derivedInG_le_sup_of_normal`, and every §14 lemma it cites (`typeP_duality`, the
+-- `_of_inputs` chief-factor helpers, …) is itself axiom-clean.
+#assert_only_allowed_axioms OddOrder.BG.Ch4.S15.mf_ne_msigma_typeP1_structure
+-- BG Theorem 15.2(b) contrapositive (`S15_MF`, issue 8015): `π(M_F) ∩ β(M) = ∅ ⟹ M_F = M_σ`.
+-- The `M_F = M_σ` endgame of Theorem 15.7(a) / the `FittingIsTI` clause of Theorem A(8): once the
+-- rank-theoretic core (`piSet_mf_inf_beta_disjoint_of_not_fittingIsTI`, the sole residual) gives
+-- `π(M_F) ∩ β(M) = ∅`, this lemma delivers `M_F = M_σ` via Theorem 15.2.  Sorry-free + axiom-clean.
+#assert_only_allowed_axioms OddOrder.BG.Ch4.S15.mf_eq_msigma_of_piSet_inf_beta_disjoint
+-- BG Theorem 15.7(a), the `≥ 3` side of the rank dichotomy (`S15_MF`, issue 8015): any prime
+-- `r ∈ π(M_F) ∩ β(M)` has `r_r(M_F) ≥ 3` (via `M_F` Hall ⟹ `r_r(M_F) = r_r(M)`, and `β ⊆ α`).
+-- The proved half of the rank core `piSet_mf_inf_beta_disjoint_of_not_fittingIsTI`; sorry-free +
+-- axiom-clean.
+#assert_only_allowed_axioms OddOrder.BG.Ch4.S15.three_le_pRank_mf_of_mem_beta
+-- BG Proposition 14.2(e) core (`S14_TypePCounting`, issue 8016): in a type-`P` `E`-setup with the
+-- `κ`-Hall `K` playing the `E₁`-role, `K* = C_{M_σ}(K) ⊊ M_σ`.  Proven *non-circularly* (Lemma
+-- 13.13 ⟹ `ℳ(K*) ≠ {M}`, Lemma 13.6 ⟹ `ℳ(Syl_p M_σ) = {M}`), replacing the circular Cor 15.6
+-- route.  Exposed as the 7th conjunct of `typeP_structure`.  Sorry-free + axiom-clean.
+#assert_only_allowed_axioms OddOrder.BG.Ch4.S14.kstar_ne_msigma_aux
+-- BG Corollary 15.3 step (`S14_TypePCounting`, issue 8016): `C_M(M_σ)` is a `κ(M)'`-group.  The
+-- exact statement BG cites at the start of Cor 15.3's proof (mmd L4209).  Sorry-free + axiom-clean.
+#assert_only_allowed_axioms OddOrder.BG.Ch4.S14.centralizer_msigma_isPiSubgroup_kappa_compl
+-- BG Corollary 15.3(a) for `H = M_σ` (`S15_MF`, issue 8016): `C_M(M_σ) = (C_G(M_σ) ⊓ M_σ) ⊔ X`,
+-- `X` cyclic `τ₂`.  The `ha` input that `fitting_decomposition` consumes; assembled from the
+-- `κ'`-group property + Schur–Zassenhaus + Lemma 15.1(c).  Sorry-free + axiom-clean.
+#assert_only_allowed_axioms OddOrder.BG.Ch4.S15.mf_centralizer_msigma_decomp
+-- BG Theorem A(8) `FittingIsTI` (`S15_MF`, issue 8016): `M_F ≠ M_σ ⟹ F(M)` is a `TI`-subgroup.
+-- Now **fully axiom-clean** — the last sorryAx (via `fitting_decomposition`'s cite of the sorried
+-- general Corollary 15.3) is eliminated by routing through `mf_centralizer_msigma_decomp`.
+#assert_only_allowed_axioms OddOrder.BG.Ch4.S15.fitting_isTI_of_mf_ne_msigma
+-- BG Theorem A(8) full form (`S16_MainResults`, issue 8016): `M_F ≠ M_σ ⟹ U = ⊥ ∧ FittingIsTI M ∧
+-- (∃ p prime, |K| = p)`.  All three conjuncts now axiom-clean.
+#assert_only_allowed_axioms OddOrder.BG.Ch4.S16.theoremA8_structure
+-- BG Corollary 15.5 (`S15_MF`, issue 8016): the full Fitting decomposition `F(M) = F(M_σ) × Y`
+-- (`Y` cyclic `τ₂`), `M'' ⊆ F(M)`, `M_F ≤ M'`, etc.  Now **fully axiom-clean** — the H=M_σ cite of
+-- the sorried general Cor 15.3 (the corollary's only sorryAx source) is routed through the
+-- sorry-free `mf_centralizer_msigma_decomp`.
+#assert_only_allowed_axioms OddOrder.BG.Ch4.S15.fitting_decomposition
+-- BG Corollary 15.5(a) (`S15_MF`, issue 8016): `O_{σ(M)'}(F(M))` is cyclic.  Extracted from the
+-- now-clean `fitting_decomposition`; the bridge that the A(8) `FittingIsTI` rank core consumes.
+#assert_only_allowed_axioms OddOrder.BG.Ch4.S15.opiCoreInG_sigmaCompl_fittingInAmbient_isCyclic
 
 /-! ### Forward-axiom islands (historical mechanism; currently empty)
 
@@ -5182,6 +5227,46 @@ is `Kstar ≠ ⊥`, unblocked once Proposition 14.2 (`S14.typeP_structure`) land
 Fully unconditional, axiom-clean. -/
 
 #assert_only_allowed_axioms OddOrder.BG.Ch4.S16.theoremA_ungated_conjuncts
+
+/-! **BG Theorem A(5), element form** (`S16_MainResults`, `typeP_centralizer_kappaElement_eq`):
+for a type-`P` `M` with cyclic Hall `κ`-subgroup `K`, the `M`-centralizer of every `k ∈ K#` is
+`K ⊔ K*` (BG's `C_M(k) = K × K*`).  Sharpens Proposition 14.2(b1) (rank-one normalizer) to the
+element-wise centralizer via the order-`p` subgroup of `⟨k⟩` and `C_G(k) ≤ C_G(X) ≤ N_G(X)`.
+Axiom-clean. -/
+
+#assert_only_allowed_axioms OddOrder.BG.Ch4.S16.typeP_centralizer_kappaElement_eq
+
+/-! **BG Theorem A(4)** (`S16_MainResults`, `typeP_hall_inf_centralizer_kappaElement_eq_bot`):
+`C_U(k) = 1` for `k ∈ K#`.  Faithfulness resolution (issue 8017): the conclusion holds for **every**
+`(κ ∪ σ)'`-Hall `U ≤ M`, not just the `K`-invariant complement, because it reduces (via
+`typeP_centralizer_kappaElement_eq`) to the `U`-independent `C_M(k) = K ⊔ K*` plus coprimality of
+`|U|` with `|K ⊔ K*| = |K|·|K*|`.  Axiom-clean. -/
+
+#assert_only_allowed_axioms OddOrder.BG.Ch4.S16.typeP_hall_inf_centralizer_kappaElement_eq_bot
+
+/-! **BG Theorem A(3) decomposition** (`S16_MainResults`, `typeP_maximal_eq_kappaHall_sup_U_sup_Msigma`):
+`M = K U M_σ` for a maximal `M` with Hall `κ`-subgroup `K ≤ M` and Hall `(κ∪σ)'`-subgroup `U ≤ M`.
+Type-F via the `K = ⊥` `SubgroupESetup`; type-P via the `M' = U M_σ`/`M'`-complements-`K` structure
+(`typeP_auxiliary_structure`), pushed from `M` to `G` by `subgroupOf_sup`/`subgroupOf_eq_top`.
+Standalone `sorry`-free form of conjunct 3 of `theoremA_maximal_structure`.  Axiom-clean. -/
+
+#assert_only_allowed_axioms OddOrder.BG.Ch4.S16.typeP_maximal_eq_kappaHall_sup_U_sup_Msigma
+
+/-! **BG Theorem A(7), first clause** (`S16_MainResults`, `derivedDerived_le_fittingInAmbient`):
+`M'' ⊆ F(M)` for any maximal `M`.  No longer `M_F ≠ M_σ`-gated (issue 8012): the `M_F = M_σ` branch
+runs `M'' ≤ M_σ ≤ M_F ≤ F(M)` (`derivedDerived_le_Msigma` + `M_σ` nilpotent), the type-`P₁` branch
+cites Theorem 15.2 (`mf_ne_msigma_typeP1_structure`).  Axiom-clean. -/
+
+#assert_only_allowed_axioms OddOrder.BG.Ch4.S16.derivedDerived_le_fittingInAmbient
+
+/-! **BG Theorem A — faithful monolith** (`S16_MainResults`, `theoremA_maximal_structure_faithful`):
+all 11 conjuncts of BG Theorem A, `sorry`-free.  The faithfulness-corrected counterpart of the
+`sorry` `theoremA_maximal_structure` (adds the explicit `K ≤ M`, `U ≤ M` of the BG setup
+`M = K U M_σ`, making A(3)/A(4)/A(8) provable).  Assembled from `theoremA_ungated_conjuncts`,
+`typeP_maximal_eq_kappaHall_sup_U_sup_Msigma`, `derivedDerived_le_fittingInAmbient`, and
+`theoremA8_structure`.  Axiom-clean. -/
+
+#assert_only_allowed_axioms OddOrder.BG.Ch4.S16.theoremA_maximal_structure_faithful
 
 /-! **BG Proposition 16.1 — type-`P` data construction layer** (`S16_MainResults`): the shared
 `TypePData` core and the type II/III/IV/V "last-mile" bridges feeding

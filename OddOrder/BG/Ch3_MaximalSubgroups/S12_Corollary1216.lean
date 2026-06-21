@@ -95,33 +95,9 @@ private theorem not_dvd_index_of_sup_top_normal {K' : Type*} [Group K'] [Finite 
     exact (Nat.mul_dvd_mul_iff_left (Nat.card_pos)).mp h2
   exact fun h => hrN (h.trans hidx_dvd)
 
-/-- `pRank` is preserved by a subgroup of `r`-coprime index (`r` prime). (Replicated from
-S12_Proposition1215.) -/
-private theorem pRank_eq_of_le_of_not_dvd_index {G : Type*} [Group G] [Finite G] {r : ℕ}
-    [Fact r.Prime] {H K : Subgroup G} (hHK : H ≤ K)
-    (hidx : ¬ r ∣ (H.subgroupOf K).index) : pRank ↥H r = pRank ↥K r := by
-  obtain ⟨R⟩ : Nonempty (Sylow r ↥H) := inferInstance
-  set Rincl : Subgroup ↥K := (R : Subgroup ↥H).map (Subgroup.inclusion hHK) with hRincl
-  have hcardRincl : Nat.card ↥Rincl = r ^ (Nat.card ↥K).factorization r := by
-    have hidxcard : Nat.card ↥H * (H.subgroupOf K).index = Nat.card ↥K := by
-      rw [← Nat.card_congr (Subgroup.subgroupOfEquivOfLe hHK).toEquiv]
-      exact (H.subgroupOf K).card_mul_index
-    have hidx_ne : (H.subgroupOf K).index ≠ 0 := by
-      intro h; rw [h, mul_zero] at hidxcard; exact (Nat.card_pos).ne' hidxcard.symm
-    have hfact : (Nat.card ↥K).factorization r = (Nat.card ↥H).factorization r := by
-      rw [← hidxcard, Nat.factorization_mul (Nat.card_pos).ne' hidx_ne, Finsupp.add_apply,
-        Nat.factorization_eq_zero_of_not_dvd hidx, add_zero]
-    rw [hRincl, Subgroup.card_map_of_injective (Subgroup.inclusion_injective hHK),
-      R.card_eq_multiplicity, hfact]
-  have eR : ↥(R : Subgroup ↥H) ≃* ↥Rincl :=
-    hRincl ▸ Subgroup.equivMapOfInjective _ (Subgroup.inclusion hHK)
-      (Subgroup.inclusion_injective hHK)
-  have hSylK : pRank ↥Rincl r = pRank ↥K r := by
-    have h := pRank_sylow_eq (Sylow.ofCard Rincl hcardRincl)
-    rwa [Sylow.coe_ofCard] at h
-  rw [← pRank_sylow_eq R, ← hSylK]
-  exact le_antisymm (pRank_le_of_injective (f := eR.toMonoidHom) eR.injective)
-    (pRank_le_of_injective (f := eR.symm.toMonoidHom) eR.symm.injective)
+-- `pRank` preserved by a subgroup of `r`-coprime index: the general-API lemma
+-- `OddOrder.GroupTheory.pRank_eq_of_le_of_not_dvd_index` (in `PRank.lean`, reached via
+-- `open OddOrder.GroupTheory`).
 
 /-- Monotonicity of the ambient derived subgroup. (Replicated from S09_Lemma95.) -/
 private theorem derivedInG_mono {H K : Subgroup G} (hHK : H ≤ K) :
