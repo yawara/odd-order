@@ -1455,6 +1455,45 @@ theorem Hypothesis.muGrid_column_sum_inner_self [Finite G]
     Fintype.card_fin, nsmul_eq_mul, mul_one]
 
 open scoped FiniteInduce in
+/-- **§10 μ-grid ⊥ a degree-distinct irreducible** (Peterfalvi (10.5), `(μ_{ij}, ζ) = 0`): the
+certain-type character `μ_{ij}` is orthogonal to any irreducible character `χ` of a *different*
+degree.  Both are irreducible, so `(μ_{ij}, χ) ∈ {0, 1}` and equals `1` only if `μ_{ij} = χ`; a
+degree mismatch `μ_{ij}(1) ≠ χ(1)` rules that out.
+
+This is the orthogonality `(μ_{ij}, ζ) = 0` (and `(μ_{ij}, ζ̄) = 0`) to the degree-`w₁` member
+`ζ ∈ S` in the norm `‖α_{ij}‖² = 2 + n²` of the (10.5) `a = 0` argument: the caller supplies the
+degree mismatch (`μ_{i0}(1) = 1 ≠ w₁`, and `μ_{ij}(1) = d ≠ w₁` since `n·w₁ = d − δ`, `d > 1`,
+`w₁ > 1`).  It needs no Clifford theory — only orthonormality of irreducibles. -/
+theorem Hypothesis.muGrid_inner_eq_zero_of_apply_one_ne [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} [Invertible (Nat.card ↥M : ℂ)]
+    (hyp : Hypothesis M) (hodd : Odd (Nat.card G)) (i : Fin hyp.w1) (j : Fin hyp.w2)
+    {χ : ClassFunction ↥M ℂ} (hχirr : IsIrreducibleCharacter χ)
+    (hne : hyp.muGrid hG hodd i j 1 ≠ χ 1) :
+    ClassFunction.inner (hyp.muGrid hG hodd i j) χ = 0 := by
+  haveI := hyp.finiteG
+  classical
+  let h := (hyp.toCertainTypeHypothesis hG hodd).toHypothesis
+  haveI hNeZ1 : NeZero (Nat.card h.W1) := ⟨by have := h.one_lt_card_W1; omega⟩
+  haveI hcyc : IsCyclic ↥(h.W1 ⊔ h.W2) := h.isCyclic_sup
+  letI : CommGroup ↥(h.W1 ⊔ h.W2) := IsCyclic.commGroup
+  have hW1le : hyp.typeP.W1 ≤ M := hyp.typeP.W1_le
+  have hW2le : hyp.typeP.W2 ≤ M := typePData_W2_le_self hyp.typeP
+  have hcardW1 : Nat.card ↥h.W1 = hyp.w1 :=
+    Nat.card_congr (Subgroup.subgroupOfEquivOfLe hW1le).toEquiv
+  have hcardW2sub : Nat.card ↥(h.W2.subgroupOf (h.W1 ⊔ h.W2)) = hyp.w2 := by
+    rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe (le_sup_right)).toEquiv]
+    exact Nat.card_congr (Subgroup.subgroupOfEquivOfLe hW2le).toEquiv
+  haveI hNeZ2 : NeZero (Nat.card ↥(h.W2.subgroupOf (h.W1 ⊔ h.W2))) := ⟨Nat.card_pos.ne'⟩
+  have emj : hyp.muGrid hG hodd i j
+      = ((h.columnFamily (finCardEquivCharacterGroup _ (finCongr hcardW2sub.symm j))).mu
+          (finCongr hcardW1.symm i) : ClassFunction ↥M ℂ) := by
+    unfold Hypothesis.muGrid; rfl
+  have hμirr : IsIrreducibleCharacter (hyp.muGrid hG hodd i j) := by
+    rw [emj]; exact OddOrder.RepresentationTheory.IrreducibleCharacter.isIrreducible _
+  rw [OddOrder.RepresentationTheory.irr_cf_inner hμirr hχirr,
+    if_neg (fun heq => hne (by rw [heq]))]
+
+open scoped FiniteInduce in
 /-- **§10 `W₁`-vanishing of the column difference** (Peterfalvi (10.5), first step, via (4.3.c) +
 (4.4)): on `W₁^#`, the materialized character `μ_{ij}` equals `δ_j` times the column-`0` character
 `μ_{i0}`.  Indeed `x ∈ W₁^# ⊆ V = W − W₂`, so (4.3.c) gives `μ_{ij}(x) = δ_j·ω_{ij}(x)` and
