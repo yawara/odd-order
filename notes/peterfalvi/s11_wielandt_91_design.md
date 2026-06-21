@@ -685,3 +685,30 @@ wielandt_formula_of_perfactor (wielandtPerFactor_of_dim hdim) H act.φ act.copri
 **⟹ honest architecture 完成**: (9.1) は群論的還元 (A/B/C) を経て **唯一 (†) per-factor dim 恒等式
 `PerFactorDimIdentity` に bottom-out**。残るは **piece D のみ** (= 上記「NEXT — carrier-level」items 0-3 の
 modular Brauer / free-orbit rep-theory で `PerFactorDimIdentity` を per chief factor 証明)。
+
+## 2026-06-21 (lane-h resume³ cont²) — piece D item 0 DONE (the genuinely-coupled crux)
+
+**✅✅ item 0 完成** (新 leaf `OddOrder/GroupTheory/RepresentationTheory/CenterProjConjugation.lean`,
+sorry-free + axiom-clean, full build 3879 green, commit `c2658ef1`)。「NEXT — carrier-level」item 0
+(E-conjugation → simplesAction module bridge) を **抽象化して** (L/E 非依存) landing:
+
+入力 = 線形自己同型 `τ : W ≃ₗ[k] W` + `c : MulAut U` + **intertwining** `hτ : ∀ u, τ * ρ u = ρ (c u) * τ`。
+結論 = `(range (centerProj φ ρ i)).map τ = range (centerProj φ ρ (simplesAction φ c i))` (engine の `hperm`)。
+3 補題:
+- `conj_asAlgebraHom` — intertwining を k[U] 全体に k-線形拡張 (`τ · asAlgebraHom ρ a = asAlgebraHom ρ
+  (domCongrAut c a) · τ`、`MonoidAlgebra.induction_linear`)。
+- `domCongrAut_centerIdem` — `domCongrAut c ε_i = ε_{σ_e i}` (= `centerRep_apply_symm_single` を群環レベルで、
+  `centerRep_eq_centerCongr` + `CenterSplitting.centerCongr_apply` 経由)。
+- `map_range_centerProj` — 合成 (`τ ∘ centerProj i = centerProj (σ i) ∘ τ`) + range 読み (τ 全射、
+  `LinearMap.range_comp` + `Submodule.map_top`)。
+
+**(†) 適用時**: `τ = ρ_L e` (e∈E), `c = ` 共役 by e on U◁L; intertwining は `ρ_L` が準同型ゆえ自明
+(`ρ_L e ∘ ρ_L u = ρ_L(eue⁻¹) ∘ ρ_L e`)。⚠ 技術知見: `Finsupp.induction_linear` でなく
+`MonoidAlgebra.induction_linear` (型シノニムで `single` が噛む); `centerCongr_apply` は `CenterSplitting`
+namespace; 補題は使用変数のみ explicit (φ/ρ の有無に注意)。
+
+**▶ 次 = item 1** (3d.3c を real carrier に wire): Frobenius `L=U⋊E`, `ψ:E→MulAut U` (各非自明 FPF),
+splitting `φ:Z(𝔽̄_p[U])≃(Fin N→𝔽̄_p)` (`exists_center_algEquiv_pi`, 要 `IsAlgClosed`+`char∤|U|`)。item 0 で
+`hperm`、3d.3c (`CenterOrbitFree.gamma_free_off_trivial_simple`) で `hfree` (E が**非自明** simples に自由作用)
+を供給 → engine `finrank_eq_card_mul_finrank_invariants_of_free` に。→ item 2 (module wire: A i=idemBasis 射影、
+非自明 i に制限) → item 3 (base change 𝔽_p→𝔽̄_p) → assembly で `PerFactorDimIdentity` discharge。
