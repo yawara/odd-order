@@ -63,12 +63,27 @@ created: 2026-06-22
 4. **線形 stretch では frontier レーンのみ productive と認める**: 上流が未達の区間に下流レーンを
    常駐させない (idle 検出時の thumbs-down ではなく**最初から立てない**)。
 
-## lane-c の自己評価 (参考)
+## ⚠ 訂正 (2026-06-22, ユーザー指摘「signature 正確なら待つ必要ないのでは」)
 
-lane-c は kickoff で clean win を 3 本出して bottleneck 壁に到達。**今後の大きな前進は Lane B
-の §13 Dade producer (issue 1004) 着地待ち**で、それまで lane-c で安全に積める分はほぼ尽きている
-(gate 詳細 = `notes/peterfalvi/s16_nonexistence_gate_map.md`、ask = issue 4001)。
-⟹ lane-c をフル稼働の独立レーンとして維持するより、上記 1/2 の再配分が効くと思われる。
+初稿の「lane-c は Lane B 待ちでやることが尽きた」は**過大**だった。残り 13 sorry を精査すると
+3 類型に分かれ、「Lane B 待ち」と呼べるのは一部だけ:
+
+- **① 忠実 signature が存在 (sorried) → cite 可・ブロックでない**。policy どおり cite すべき
+  (kickoff の 3 本はこれ)。
+- **② lane-c 自身のファイルの opaque `Prop` carrier field (`_holds` 無し)**: `betaM_expansion_formula`
+  / `generic_bound_formula` / `e_eq_index` 等。cite 対象でなく**プレースホルダ**。honest な対応は
+  **de-opacify** (opaque Prop を concrete な (14.11.2) η-展開等の文に置換) して証明する = **lane-c
+  自身の §14 char 仕事。「Lane B 待ち」ではない**。
+- **③ 未 authored な文** (T/V-side type-II analog、S-side caseB 判定、U/V cyclic): cite 先が無いが
+  **hard-block でない** — lane-c が obligation として author 可 (`V_cyclic` でやった)。author+cite が
+  vacuous (obligation == 全内容) なときだけ無意味。
+
+⟹ **真の cross-lane 依存は narrow** (§13 `basic_structure` レベル、これは citeable)。大半は
+**lane-c 自身の §14 Dade char (opaque Props の de-opacify + (14.11) β_M norm 計算 + V-side Dade 構成)**
+で、これは hard だが lane-c がやれる/やるべき。⟹ 分担問題の本質は「C が受動的に block」でなく、
+**§13-14 char/構造が 1 つの連結した hard chunk なのに lane-split (§13=B / §14-15=H / §16=C) が
+それを横断分割していること**。fan-out を割るなら char-theory chunk を機能 (Dade 構成 / norm 計算 /
+型判定) で割る方が、§ 区間で割るより starve しない。
 
 ## 参照
 
