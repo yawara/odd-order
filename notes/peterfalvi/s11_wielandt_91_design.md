@@ -770,6 +770,45 @@ diamond → `S06.commute_of_mem_of_isCyclic` (Commute を返す Prop 補題) で
 **▶ 次フロンティア**: (9.4)/(9.6) chief factor (S11 残 sorry、character 寄りで lane-b gate 可能性) / §8 gates
 (S10 領域、(8.8) partner は hard) / (10.11)/(11.7)→(13.2.b) |P|=p^q へ (9.3) cite で前進 / §13.17 POLE-2 再訪。
 
+## 2026-06-21 (lane-h resume⁶) — ✅✅ (9.6) chief-factor order |H̄|=p^q (arithmetic core, axiom-clean)
+
+完成した Wielandt (9.1) を直接消費して **Peterfalvi (9.6) の量的核を sorry-free + axiom-clean** で landing
+(`S11_MaximalII_III_IV.lean`、full build 3881 green、実 sorry 135 不変)。⚠ 旧「character 寄りで lane-b gate
+可能性」は**誤判定だった**: §9 reference (04.11) を精読した結果 (9.4)/(9.6) は**純群論** (Maschke + Frattini +
+coprime action + Wielandt (9.1)+(9.3)) — character theory は (9.7)+ から。lane-h 領域で確定。
+
+**新規 (all axiom-clean, AxiomsCheck 登録)**:
+- `coprimeFrobeniusAction_card_eq_prime_pow` (WielandtFixedPoint): (9.6) 最終算術 — `C_H(U)=⊥` +
+  `|C_H(E)| ∣ p` (prime) + `H≠1` ⟹ `|H|=p^|E|`。`wielandt_fixedPoint_trivial_U_fixed` 経由。
+- `CoprimeFrobeniusAction.quotient` 相当の `typeP_quotientCoprimeAction` (S11): U W₁-conjugation を
+  U W₁-invariant 商 `H̄ = ↥H ⧸ N` へ降下 (`quotientMulAutHom`、`|H̄| ∣ |H|` coprime、`H̄` solvable)。
+- `isAInvariant_fixedSubgroup_of_normal` (S11): 正規 `K ◁ L` の `fixedSubgroup φ K` は φ-invariant
+  (⟹ `C_{H̄}(U)` は U W₁-invariant、`U ◁ U W₁`)。
+- `card_dvd_prime_of_isCyclic_of_pow` (S11): exponent-p 群の cyclic 部分群は位数 ∣ p。
+- **`typeP_chiefFactor_card`** (S11) = **Peterfalvi (9.6)**: 仮定 = N が U W₁-invariant 正規、`H̄` el-ab
+  p-group、`H̄` が U W₁-irreducible (`hirr`)、U 非中心化 (`hUntriv`)、`H̄≠1`。結論 `|H̄| = p^q`。証明:
+  `C_{H̄}(U)` は invariant かつ `≠H̄` ⟹ `=⊥` (irreducible); Wielandt ⟹ `|H̄|=|C_{H̄}(W₁)|^q`;
+  `C_{H̄}(W₁)` = cyclic `W₂=C_H(W₁)` の像 (Isaacs Cor 3.28 `map_fixedSubgroup_eq_fixedSubgroup_quotient`)、
+  exponent p で cyclic ⟹ 位数 p。**`#print axioms` = [propext, Classical.choice, Quot.sound] (sorryAx 無し)**。
+- `typeP_U_noncentral_on_H` (S11): (9.4) の非中心化 input。`(typeP_coprimeAction data hU).fixedByU ≠ ⊤`、
+  (8.5.b) `typeP_U_not_centralizes_H` (sorry-free) の action 形。
+
+**de-risk 知見 (再利用infra発見)**: `OddOrder/GroupTheory/CoprimeFixedPoints.lean` が Wielandt assembly
+用に **BG 1.5(d) を既に持っていた** — `map_fixedSubgroup_eq_fixedSubgroup_quotient`
+(`(fixedSubgroup φ X).map(mk' N) = fixedSubgroup(quotient action) X`) + `card_fixedSubgroup_eq_mul`。
+S11 に `import OddOrder.GroupTheory.CoprimeFixedPoints` 追加で到達。BG 1.8 = `Isaacs.Ch04.aFixed_quotient_frattini`、
+BG 1.5(d) lift = `coprime_fixedPoints_quotient`、Maschke = `exists_aInvariant_complement_in_omega1_quotient`
+(全 sorry-free)。⚠ `quotientMulAutHom` 実名は doubled namespace `OddOrder.Isaacs.Ch04.OddOrder.Isaacs.Ch03.IsAInvariant.quotientMulAutHom`。
+
+**▶ 残 = (9.4) existence (Maschke/semisimplicity core, 次セッション)**: `exists_chiefFactorData` (S11:688, sorry)。
+証明対象 = ∃ N (U W₁-invariant 正規 ◁ ↥H) で `↥H⧸N` el-ab p-group, U W₁-irreducible (top quotient), U 非中心化,
+III/IV では p=|W₂|。**bottleneck = top-quotient chief factor を peel するための semisimplicity** (一般の M-chief
+sub-quotient では不可、top quotient が `quotient_order:|H|=p^q·|H₀|` に必要)。原文 path = `P=Sylow_p(H)`,
+`P/Φ(P)` を 𝔽_p[U W₁]-module 化 (Maschke で半単純) → U 非中心 simple 商を peel (BG 1.8 で U 非中心 on P/Φ(P))。
+=lane-f piece D 系の modular rep-theory infra 要 (multi-session)。front-end (i) U 非中心 on H = ✅ 済
+(`typeP_U_noncentral_on_H`)。次 = (ii) U 非中心 on `P/Φ(P)` (BG 1.8) → (iii) 半単純分解で simple 商 peel。
+assembly では `H0:Subgroup G ↔ N:Subgroup ↥H` 翻訳 + ChiefFactorData の opaque Props を honest 化。
+
 ---
 
 ## 更新 (2026-06-22, lane-b) — (9.3) §8 gates 両方 discharge → (9.3) 完全 honest 還元
@@ -798,3 +837,56 @@ lane-h handoff の (9.3) 残 2 §8 gate を honest reduction で discharge (buil
   Schur-Zassenhaus II) gated。witness `TypeIIData.normalizer_not_le` から共役で出るが SZ-II が mathlib 未収。
 
 **▶ 次**: (9.4)/(9.6) chief factor (S11 残 sorry、character 寄り) / (10.11)/(11.7)→(13.2.b) で (9.3) cite。
+
+---
+
+## 2026-06-22 (lane-h resume⁷) — ✅✅✅ (9.4)/(9.6) Maschke+Wielandt 核 3 補題 landing → 残 = seed + assembly
+
+(9.4) `exists_chiefFactorData` を **完全に設計し、Maschke+Wielandt の数学的核心を 3 つの再利用可能・
+axiom-clean 補題で landing**。残るは (a) elementary-abelian **seed** と (b) **assembly** (機械的 bookkeeping) のみ。
+
+### 重要な構造的発見 (resume⁶ の「multi-session bottleneck」を解像度上げ)
+- **M = H ⋊ (U W₁)**: `M_complement` (W₁ が M'=derivedInG M を complement) + `derived_complement`
+  (U が H=M_F を M' で complement) ⟹ `M = M' ⊔ W₁ = (H ⊔ U) ⊔ W₁`。∴ **N ◁ ↥H かつ U W₁-invariant なら
+  自動的に H0=N.map subtype が M-normal** (別途 M-invariance 論法 不要)。`TypePData.derivedInG_eq_fitting_sup_U`
+  (M'=H⊔U) + `M_complement.sup_eq_top` で `M ≤ (H⊔U)⊔W₁` が出る。
+- **p=|W₂| は post-hoc**: chief factor の prime p は seed の el-ab prime そのまま。typeIII_IV では
+  `|C_S(W₁)|=p` (Wielandt) ∣ |W₂| (C_S(W₁) ≤ image of W₂) + §8 prime `typeIIIorIV_W2_prime` (cite) で
+  `p=|W₂|`。**∴ seed は「ある el-ab p 商で U 非中心」だけでよく、特定 Sylow を選ぶ必要なし** (II/III/IV 一様)。
+  §8 gate は typeIII_IV_p_eq_W2 の最後の cite 一点のみ。
+
+### ✅ landed 3 補題 (全 axiom-clean = propext/choice/Quot.sound)
+1. **`exists_aInvariant_irreducible_summand_disjoint`** (`OperatorMaschke.lean`, commit `46c388df`):
+   el-ab p-群 V + coprime A-作用 + proper A-inv `C≠⊤` ⟹ A-inv 直和因子 S (V=S⊕W, A-irreducible,
+   `C⊓S=⊥`)。証明 = complement で C を split → minimal A-inv `S≤X` (irreducible) → S を split。
+   汎用化: noncentral witness を `C_V(U)` 限定せず任意 proper A-inv `C` に (証明は fixed-point 性質を
+   使わない)。(13.16) でも cite 可。
+2. **`coprimeFrobeniusChiefFactor_card`** (S11, commit `88a1dd39`): 任意 CoprimeFrobeniusAction (kernel
+   `U◁L`) on el-ab p-群 K, irreducible + `fixedByU≠⊤` + `C_K(E)` cyclic + `K≠1` ⟹ `|K|=p^{|E|}`。
+   = (9.6) 算術核を carrier から抽出。`typeP_chiefFactor_card` (商版) を thin application にリファクタ。
+3. **`coprimeFrobeniusChiefFactor_card_of_summand`** (S11, commit `90ff9552`): #2 を summand S に transport
+   (restricted action `hSinv.restrict` on ↥S; irreducible 対応 = `aInvariant_map_subtype_of_restrict`;
+   noncentral = `card_fixedSubgroup_restrict` で `|C_S(U)|=|C_V(U)⊓S|=1`; `C_S(E)` cyclic = sub of cyclic)
+   ⟹ `|S|=p^{|E|}`。#1+#3 = (9.4)+(9.6) の Maschke+Wielandt 全内容 `|H̄|=p^q` (seed 待ち)。
+
+### 残タスク (a) seed — `exists_chiefFactor_seed` (ungated 群論、§8 cite なし)
+目標: `∃ p (prime) N₀ (◁↥H, A-inv), IsElementaryAbelian p (↥H⧸N₀) ∧
+(typeP_quotientCoprimeAction data hU hN₀).fixedByU ≠ ⊤`。
+レシピ (H=M_F nilpotent): (i) U 非中心 on H = `typeP_U_noncentral_on_H` ✅。(ii) H nilpotent ⟹ Sylow 分解
+H=∏P_ℓ、C_H(U)=∏C_{P_ℓ}(U) ⟹ ∃ℓ U 非中心 on P_ℓ。(iii) P=P_ℓ, V=P/Φ(P) el-ab
+(`FrattiniPGroup.IsPGroup.quotient_frattini_isElementaryAbelian` Lem 1.7b)。(iv) BG 1.8 = `aFixed_quotient_frattini`
+(Isaacs Cor 3.29、ForwardFromCh03:835) の**対偶**で U 非中心 on V。(v) N₀ = (V の kernel を ↥H に pullback)。
+要 infra: nilpotent=Sylow 直積 (mathlib `IsNilpotent`→`Sylow.directProduct`?) + fixed-point-of-product 分解。
+
+### 残タスク (b) assembly — `exists_chiefFactorData` (機械的 bookkeeping、~150-250 行)
+pipeline: seed → `act_V := typeP_quotientCoprimeAction data hU hN₀` → Maschke 核 #1 (C=act_V.fixedByU,
+hcop=act_V.coprime_order.symm) → S,W → summand-Wielandt #3 → `|S|=p^q` → `N := W.comap (mk' N₀)`,
+`H0 := N.map H.subtype`。
+- **quotient_order** `|H|=p^q·|H0|`: `Nat.card ↥H = |↥H⧸N|·|N|` (Lagrange) + `↥H⧸N≅V/W` (card のみ,
+  `QuotientGroup.quotientQuotientEquivQuotient`) + `|V/W|=|S|` (complement V=S⊕W) + `|N|=|H0|`。
+- **H0_normalized_by_M**: `M ≤ (H⊔U)⊔W₁ ≤ normalizer(H0)`。H≤normalizer(H0) (N◁↥H), U⊔W₁≤normalizer(H0)
+  (N A-inv) — N→H0 normality 翻訳が crux。
+- **typeIII_IV_p_eq_W2**: `|C_S(E)|=p` (要: #2/#3 に fixedByE card 露出の variant 追加) ∣ |W₂| + cite
+  `typeIIIorIV_W2_prime` (§8、sorried だが signature 正、cite 可)。
+- 3 つの opaque Prop fields (quotient_elementaryAbelian/quotient_chiefFactor/U_noncentral_on_quotient)
+  は honest 化 (el-ab=hpe, chief=hirr, noncentral=hUntriv 由来)。

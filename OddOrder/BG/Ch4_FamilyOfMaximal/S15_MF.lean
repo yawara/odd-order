@@ -7794,16 +7794,35 @@ one of the three local cases of the theorem holds.
 be *some* cyclic nontrivial subgroup of `M_F` (the Lean surface does not pin `X = F(M) ∩ F(M)ᵍ` as
 BG does — a scaffold weakening), so it is supplied by an order-`q` element of `M_σ ≠ 1`; the prime
 `p ∈ σ(M) ∖ β(M)` comes from that same `q` via the rank-core disjointness
-(`piSet_mf_inf_beta_disjoint_of_not_fittingIsTI`), and the final disjunct follows from (a).  The
-**single remaining residual** is therefore the structural identity `M' = F(M)`
-(`derivedInG M = fittingInAmbient M`), BG conjunct (c) — obtained in BG from `E₃ = 1`
-(Corollary 12.6(d) + Lemma 12.19), Corollary 15.5, and Lemma 12.1. -/
+(`piSet_mf_inf_beta_disjoint_of_not_fittingIsTI`), and the final disjunct follows from (a).
+
+**Faithfulness fix (2026-06-22): conjunct (c) is `M' ≤ F(M)`, not the printed `M' = F(M)`.**  BG's
+printed Theorem 15.7(c) asserts the *equality* `M' = F(M) = M_σ × O_{σ'}(F(M))`, but the equality is
+an **overstatement** for the type-`F` case.  Verified two ways: (1) a ChatGPT (GPT-5 Pro) consult
+plus an independent reduction shows `M' = F(M) ⟺ C_Y(E₁) = 1` (E₁ acts fixed-point-freely on the
+τ₂-Fitting factor `Y = O_{σ'}(F(M))`), and `C_Y(E₁) = 1` is **not** derivable from the cited results
+(Cor 12.6(d) is vacuous once `E₃ = 1`; the rest control the action on `M_σ`, not on `Y`); (2) the
+authoritative MathComp odd-order formalization (`theories/BGsection15.v`, `nonTI_Fitting_structure`)
+states conjunct (c) as `M^'(1) ⊆ 'F(M)` (inclusion) `∧ M_σ × O_σ('F(M)) = 'F(M)`, **not** equality —
+its source comment explicitly records the change: *"We had to change the statement … the first
+equality of part (c) does not appear to be valid: if M is of type F … E2 might have a Sylow subgroup
+that meets F(M) but is also centralised by E1 and hence intersects M' trivially; … only the inclusion
+M' ⊆ F(M) seems to be needed in the sequel."*  (independently curl-verified, not via the consult).
+Only `M' ≤ F(M)` is BG-faithful and provable; the equality holds iff `C_Y(E₁) = 1`, a non-derivable
+condition (BG only gets `M` Frobenius later, in Corollary 15.9, after `τ₂(M) = ∅`, i.e. `E₂ = 1`).
+See `notes/bg/s15_7_typeF_chatgpt_prompt.md`.
+
+`M' ≤ F(M)` is proved here for the **type-`P₁`** case (`U = ⊥` ⟹ `M' = M_σ` by Lemma 15.1(b);
+`M_σ = M_F` nilpotent ⟹ `M' = M_σ ≤ F(M)`).  The remaining residual is the **type-`F`** case of
+`M' ≤ F(M)` — now **ungated** (the `= F(M)` gate `C_Y(E₁) = 1` is gone): `M' = M_σ × E'` with `E'`
+centralizing `M_σ` (Lemma 12.19, as `π(M_σ) ∩ β = ∅`) is nilpotent normal, so `M' ≤ F(M)`; the
+remaining work is the `E`-setup + nilpotent-direct-product packaging. -/
 theorem fitting_not_ti_cases [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     {M : Subgroup G} (hM : M ∈ maximalSubgroups G) (hnotTI : ¬ FittingIsTI M) :
     (S14.IsTypeF M ∨ S14.IsTypeP1 M) ∧ MF M = OddOrder.BG.Ch3.S10.Msigma M ∧
       ∃ X : Subgroup G,
         X ≤ MF M ∧ X ≠ ⊥ ∧ IsCyclic ↥X ∧
-        derivedInG M = fittingInAmbient M ∧
+        derivedInG M ≤ fittingInAmbient M ∧
         (∃ p : ℕ, p.Prime ∧ p ∈ OddOrder.BG.Ch3.S10.sigma M ∧
           p ∉ OddOrder.BG.Ch3.S10.beta M ∧
           (IsMulCommutative ↥(MF M) ∨
@@ -7846,9 +7865,57 @@ theorem fitting_not_ti_cases [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     exact fun h => hwne (Subgroup.mem_bot.mp (h ▸ Subgroup.mem_zpowers (w : G)))
   · -- `IsCyclic X`
     infer_instance
-  · -- `M' = F(M)`: the single deep structural residual (BG (c) = Corollary 15.5 + Lemma 12.1, via
-    -- the `E₃ = 1` argument from Corollary 12.6(d) + Lemma 12.19).
-    sorry
+  · -- `M' ≤ F(M)` (BG conjunct (c), faithful form — see docstring: the printed `M' = F(M)` is an
+    -- overstatement, MathComp `BGsection15` uses `M^'(1) ⊆ 'F(M)`).  Case-split on (a).
+    rcases ha with hF | hP1
+    · -- type-`F`: `M' = M_σ ⋊ E'` with `E'` centralizing `M_σ` (Lem 12.19), so `M' = M_σ × E'` is
+      -- nilpotent normal, whence `M' ≤ F(M)`.  Now **ungated** (the `M' = F(M)` direction was gated on
+      -- the non-derivable `C_Y(E₁) = 1`; the `≤` direction needs only the `E`-setup + Lem 12.19 + the
+      -- nilpotent direct-product packaging — `exists_subgroupESetup`/`derivedE_centralizes_betaComplement`).
+      sorry
+    · -- type-`P₁`: `U = ⊥` gives `M' = M_σ` (Lemma 15.1(b)); `M_σ = M_F` nilpotent ⟹ `M' = M_σ ≤ F(M)`.
+      have hP : S14.IsTypeP M := hP1.1
+      haveI : IsSolvable ↥M := hG.solvable_of_mem_maximalSubgroups hM
+      obtain ⟨K', hK'⟩ := Ch03.hall_E_exists (G := ↥M) (S14.kappa M)
+      set K : Subgroup G := K'.map M.subtype with hKdef
+      have hKM : K ≤ M := hKdef ▸ Subgroup.map_subtype_le K'
+      have hKeq : K.subgroupOf M = K' :=
+        hKdef ▸ Subgroup.comap_map_eq_self_of_injective M.subtype_injective K'
+      have hK : Ch03.IsHallSubgroup (S14.kappa M) (K.subgroupOf M) := hKeq ▸ hK'
+      have hKne : K ≠ ⊥ := fun h =>
+        card_kappaHall_ne_one hP hKM hK (by rw [h, Subgroup.card_bot])
+      obtain ⟨U', hU'⟩ :=
+        Ch03.hall_E_exists (G := ↥M) ((S14.kappa M ∪ OddOrder.BG.Ch3.S10.sigma M)ᶜ)
+      set U : Subgroup G := U'.map M.subtype with hUdef
+      have hUM : U ≤ M := hUdef ▸ Subgroup.map_subtype_le U'
+      have hUeq : U.subgroupOf M = U' :=
+        hUdef ▸ Subgroup.comap_map_eq_self_of_injective M.subtype_injective U'
+      have hU : Ch03.IsHallSubgroup ((S14.kappa M ∪ OddOrder.BG.Ch3.S10.sigma M)ᶜ)
+          (U.subgroupOf M) := hUeq ▸ hU'
+      -- `U = ⊥` from type-`P₁` (`κ(M) = σ'(M)`): no prime of `(κ∪σ)ᶜ` divides `|M|`.
+      have hUbot : U = ⊥ := by
+        have hUsub : U.subgroupOf M = ⊥ := by
+          rw [← Subgroup.card_eq_one]
+          by_contra hne
+          obtain ⟨p, hpp, hpdvd⟩ := Nat.exists_prime_and_dvd hne
+          have hpcompl : p ∈ (S14.kappa M ∪ OddOrder.BG.Ch3.S10.sigma M)ᶜ :=
+            hU.1 p (Nat.mem_primeFactors.mpr ⟨hpp, hpdvd, Nat.card_pos.ne'⟩)
+          have hpM : p ∈ S14.piSet M :=
+            Nat.mem_primeFactors.mpr ⟨hpp,
+              hpdvd.trans (Subgroup.card_subgroup_dvd_card (U.subgroupOf M)), Nat.card_pos.ne'⟩
+          refine hpcompl ?_
+          by_cases hpσ : p ∈ OddOrder.BG.Ch3.S10.sigma M
+          · exact Set.mem_union_right _ hpσ
+          · exact Set.mem_union_left _ (by rw [hP1.2]; exact ⟨hpM, hpσ⟩)
+        exact (Subgroup.subgroupOf_eq_bot.mp hUsub).eq_bot_of_le hUM
+      -- `M' = U ⊔ M_σ = M_σ` (Lemma 15.1(b) with `U = ⊥`).
+      have hM'eq : derivedInG M = OddOrder.BG.Ch3.S10.Msigma M := by
+        rw [(typeP_hall_derived_eq_and_abelian hG hM hKM hUM hKne hK hU).1, hUbot, bot_sup_eq]
+      -- `M' = M_σ = M_F ≤ F(M)` (`M_F` nilpotent normal).
+      haveI : Group.IsNilpotent ↥(MF M) := maxNilpotentNormalHall_isNilpotent M
+      rw [hM'eq]
+      exact hMFeq ▸ le_fittingInAmbient_of_subgroupOf_normal_of_isNilpotent
+        (maxNilpotentNormalHall_le M) (maxNilpotentNormalHall_subgroupOf_normal M)
   · -- final disjunct: from (a).
     by_cases h : IsMulCommutative ↥(MF M)
     · exact Or.inl h

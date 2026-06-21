@@ -133,6 +133,25 @@ theorem wielandt_fixedPoint_trivial_U_fixed {L H : Type*} [Group L] [Group H]
   simp only [hUE, hU, Subgroup.card_bot, one_pow, one_mul, mul_one] at key
   exact key
 
+/-- **Peterfalvi (9.6), the arithmetic step**: if the Frobenius kernel acts fixed-point-freely
+(`C_H(U) = 1`) and `C_H(E)` has order dividing a prime `p` — e.g. `H` is an elementary abelian
+`p`-group on which `C_H(E)` is cyclic — then a nontrivial `H` has order `p^{|E|}`.
+
+From `wielandt_fixedPoint_trivial_U_fixed`, `|H| = |C_H(E)|^{|E|}`; the divisibility and primality
+pin `|C_H(E)| = p` once `H ≠ 1` rules out `|C_H(E)| = 1`.  This is the final order computation of
+Peterfalvi (9.6): `|H̄| = |W̄₂|^q` with `W̄₂` cyclic of order dividing `p`, whence `|H̄| = p^q`. -/
+theorem coprimeFrobeniusAction_card_eq_prime_pow {L H : Type*} [Group L] [Group H]
+    [Finite L] [Finite H] (act : CoprimeFrobeniusAction L H)
+    (hU : act.fixedByU = ⊥) {p : ℕ} (hp : p.Prime)
+    (hdvd : Nat.card ↥act.fixedByE ∣ p) (hHne : Nat.card H ≠ 1) :
+    Nat.card H = p ^ Nat.card ↥act.E := by
+  have key := wielandt_fixedPoint_trivial_U_fixed act hU
+  have hCEne : Nat.card ↥act.fixedByE ≠ 1 := by
+    intro h; rw [h, one_pow] at key; exact hHne key
+  have hCEp : Nat.card ↥act.fixedByE = p :=
+    (hp.eq_one_or_self_of_dvd _ hdvd).resolve_left hCEne
+  rw [key, hCEp]
+
 /-- **Peterfalvi (9.1), the fixed-point-free corollary**: if *both* the Frobenius kernel `U` and
 the complement `E` act fixed-point-freely on `H` (`C_H(U) = C_H(E) = 1`), then `H` is trivial.
 This is the form used in Peterfalvi (13.17.b): a Frobenius group `U W₁` acting fixed-point-freely

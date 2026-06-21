@@ -5537,3 +5537,20 @@ this discharges the `C_H(U W₁) = 1` input of (9.3) for types III/IV from `|W�
 
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S11.typeP_centralizer_uW1_le_W2
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S11.typeP_U_not_centralizes_H
+
+/-! **Peterfalvi (9.6) the chief-factor order** (`Peterfalvi.S11`, conditional on the (9.4) chief
+factor `H̄ = H/H₀`).  The `U W₁`-action on `H = M_F` descends to the chief factor `H̄`
+(`typeP_quotientCoprimeAction`, a `CoprimeFrobeniusAction`); `C_{H̄}(U)` is `U W₁`-invariant
+(`isAInvariant_fixedSubgroup_of_normal`, `U ◁ U W₁`) so vanishes by irreducibility, and Wielandt's
+formula together with the prime computation `coprimeFrobeniusAction_card_eq_prime_pow` gives
+`|H̄| = |C_{H̄}(W₁)|^q = p^q` — using that `C_{H̄}(W₁)` is the image of the cyclic `W₂ = C_H(W₁)`
+(Isaacs Cor 3.28), hence cyclic of order dividing the exponent `p`
+(`card_dvd_prime_of_isCyclic_of_pow`).  The Wielandt content of (9.6) is fully discharged
+(`typeP_chiefFactor_card`); the remaining gap is the (9.4) existence of the chief factor. -/
+
+#assert_only_allowed_axioms OddOrder.GroupTheory.coprimeFrobeniusAction_card_eq_prime_pow
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S11.isAInvariant_fixedSubgroup_of_normal
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S11.typeP_quotientCoprimeAction
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S11.card_dvd_prime_of_isCyclic_of_pow
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S11.typeP_chiefFactor_card
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S11.typeP_U_noncentral_on_H
