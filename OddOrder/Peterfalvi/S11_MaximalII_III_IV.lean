@@ -664,6 +664,22 @@ theorem typeP_chiefFactor_card [Finite G] (data : TypePData M) (hU : data.U ≠ 
   congr 1
   exact Nat.card_congr (Subgroup.subgroupOfEquivOfLe le_sup_right).toEquiv
 
+/-- **Peterfalvi (9.4) input**: `U` does not centralize `H = M_F` (in action form): the fixed
+subgroup `C_H(U)` of the Frobenius kernel is a *proper* subgroup, `C_H(U) ≠ H`.  This is the
+non-centrality that the (9.4) chief factor selection requires; it is the action-level reading of
+Peterfalvi (8.5.b) (`typeP_U_not_centralizes_H`): a nontrivial `U` cannot centralize `H`. -/
+theorem typeP_U_noncentral_on_H [Finite G] (data : TypePData M) (hU : data.U ≠ ⊥) :
+    (typeP_coprimeAction data hU).fixedByU ≠ ⊤ := by
+  intro htop
+  refine typeP_U_not_centralizes_H data hU (Subgroup.le_centralizer_iff.mp ?_)
+  have key := typeP_card_fixedSubgroup data (le_sup_left : data.U ≤ data.U ⊔ data.W1)
+  rw [show fixedSubgroup (typeP_conjAction data) (data.U.subgroupOf (data.U ⊔ data.W1))
+      = (typeP_coprimeAction data hU).fixedByU from rfl, htop,
+    Nat.card_congr Subgroup.topEquiv.toEquiv] at key
+  have heq : data.H ⊓ Subgroup.centralizer (data.U : Set G) = data.H :=
+    Subgroup.eq_of_le_of_card_ge inf_le_left key.le
+  exact heq ▸ inf_le_right
+
 /-- **Peterfalvi (9.4)**: existence of a nontrivial elementary abelian chief
 factor `H/H_0` not centralized by `U`. -/
 theorem exists_chiefFactorData [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)

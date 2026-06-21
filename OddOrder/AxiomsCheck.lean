@@ -5553,3 +5553,4 @@ formula together with the prime computation `coprimeFrobeniusAction_card_eq_prim
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S11.typeP_quotientCoprimeAction
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S11.card_dvd_prime_of_isCyclic_of_pow
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S11.typeP_chiefFactor_card
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S11.typeP_U_noncentral_on_H
