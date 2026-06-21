@@ -465,7 +465,7 @@ private theorem fusion_d_of_mem_sigma [Finite G]
 (`M` is a coatom; if `M < N_G(M)` then `N_G(M) = ⊤`, so `M ⊴ G`, forcing `M ∈ {⊥, ⊤}` by
 simplicity — both impossible: `M = ⊤` contradicts the coatom, and `M = ⊥` makes `G` cyclic of
 prime order, contradicting non-solvability.) -/
-private theorem maximal_normalizer_le_self [Finite G] (hG : IsMinimalSimpleOdd G)
+theorem maximal_normalizer_le_self [Finite G] (hG : IsMinimalSimpleOdd G)
     {M : Subgroup G} (hM : M ∈ maximalSubgroups G) :
     Subgroup.normalizer (M : Set G) ≤ M := by
   have hco : IsCoatom M := mem_maximalSubgroups.mp hM

@@ -569,6 +569,36 @@ theorem pRank_sylow_eq [Finite G] [Fact p.Prime] (S : Sylow p G) :
     pRank ↥(S : Subgroup G) p = pRank G p :=
   le_antisymm (pRank_mono_of_le (S : Subgroup G)) (pRank_le_pRank_sylow S)
 
+/-- **`p`-rank is unchanged under passing to a subgroup of coprime index.** If `H ≤ K` and the
+prime `r` does not divide the index `[K : H]`, then a Sylow `r`-subgroup of `H` has full `r`-power
+order in `K`, hence is a Sylow `r`-subgroup of `K`; so `r_r(H) = r_r(K)`.  Typical use: a Hall
+subgroup `H` of `K` with `r ∈ π(H)` satisfies `r ∤ [K : H]`, giving `r_r(H) = r_r(K)`. -/
+theorem pRank_eq_of_le_of_not_dvd_index [Finite G] {r : ℕ}
+    [Fact r.Prime] {H K : Subgroup G} (hHK : H ≤ K)
+    (hidx : ¬ r ∣ (H.subgroupOf K).index) : pRank ↥H r = pRank ↥K r := by
+  obtain ⟨R⟩ : Nonempty (Sylow r ↥H) := inferInstance
+  set Rincl : Subgroup ↥K := (R : Subgroup ↥H).map (Subgroup.inclusion hHK) with hRincl
+  have hcardRincl : Nat.card ↥Rincl = r ^ (Nat.card ↥K).factorization r := by
+    have hidxcard : Nat.card ↥H * (H.subgroupOf K).index = Nat.card ↥K := by
+      rw [← Nat.card_congr (Subgroup.subgroupOfEquivOfLe hHK).toEquiv]
+      exact (H.subgroupOf K).card_mul_index
+    have hidx_ne : (H.subgroupOf K).index ≠ 0 := by
+      intro h; rw [h, mul_zero] at hidxcard; exact (Nat.card_pos).ne' hidxcard.symm
+    have hfact : (Nat.card ↥K).factorization r = (Nat.card ↥H).factorization r := by
+      rw [← hidxcard, Nat.factorization_mul (Nat.card_pos).ne' hidx_ne, Finsupp.add_apply,
+        Nat.factorization_eq_zero_of_not_dvd hidx, add_zero]
+    rw [hRincl, Subgroup.card_map_of_injective (Subgroup.inclusion_injective hHK),
+      R.card_eq_multiplicity, hfact]
+  have eR : ↥(R : Subgroup ↥H) ≃* ↥Rincl :=
+    hRincl ▸ Subgroup.equivMapOfInjective _ (Subgroup.inclusion hHK)
+      (Subgroup.inclusion_injective hHK)
+  have hSylK : pRank ↥Rincl r = pRank ↥K r := by
+    have h := pRank_sylow_eq (Sylow.ofCard Rincl hcardRincl)
+    rwa [Sylow.coe_ofCard] at h
+  rw [← pRank_sylow_eq R, ← hSylK]
+  exact le_antisymm (pRank_le_of_injective (f := eR.toMonoidHom) eR.injective)
+    (pRank_le_of_injective (f := eR.symm.toMonoidHom) eR.symm.injective)
+
 end Properties
 
 section Rank

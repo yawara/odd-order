@@ -158,6 +158,29 @@ branch とも削除済み。旧 **A** / **D** も同様に退役済み (履歴�
 
 ## 現状メモ
 
+- **2026-06-21 — 監視再開 + 固定 25分 cron (ユーザー要望「25分おきで」) + dead-merge 復旧**:
+  ユーザー指示で監視再開。**動的 15-30 分 (2026-06-18) を固定 25 分間隔に上書き**。cron job
+  `e3dcf75f` (`4,29,54 * * * *` = 25分間隔 + :54→:04 の 10分 wrap、session-only、push なし、7日
+  auto-expire)。/model 切替で消えるのは従来同様 ([[cron-dies-on-model-switch]])。
+  - **開始時に前セッションの dead-merge を復旧**: `.git/MERGE_HEAD` = `c5fc73a5` (lane-f の**古い**状態、
+    現 lane-f HEAD は 8 commits 先行) の stale な mid-merge が残存 (コンフリクト解決・staged 済だが
+    未 commit)。コンフリクトマーカー残存なしを確認 → 混在していた未ステージ issue doc 変更
+    (`2013-s1317-...md`、既コミット作業の trailing 記録) を退避 → `git merge --abort` で
+    クリーン main へ → issue doc を standalone commit (`040fae9d`) → lane-f を**現 HEAD から fresh
+    full merge** (古い MERGE_HEAD でなく) で S14+S15+S16 を一括取込。
+  - **4 レーン backlog 合流** (F→B→H、build 各 3872/3872/3876/3876 jobs green / AxiomsCheck OK /
+    新 axiom 0、実 sorry **137→135**):
+    - **lane-f** (4 合流): BG Thm A faithful monolith complete (A(2)-(7) + 11-conjunct assembly,
+      issue 8017 CLOSED) + Cor 15.3(a)/de-axiom A(8) FittingIsTI (issue 8016 CLOSED) + Prop 14.2(e)
+      core + C_M(M_σ)=κ(M)'-group。
+    - **lane-b** (1 合流): Pf §12 (10.3) δ_j-independence 完成 + (10.2)/(10.3) producer materialize
+      + (10.5) support half `Supp(α_ij)⊆A_0(M)` (dade0-free)。sorry net -2。
+    - **lane-h** (1 合流): **Wielandt (9.1) 群論層 完全完成** — 新 leaf 4 本 (CoprimeFixedPoints /
+      MinimalInvariantNormal / WielandtElabBridge[OddOrder root 配線] / WielandtAssembly)、全 sorry-free。
+      残 = (†) module wiring (`wielandt_fixedPoint_frobenius` CoprimeAction:156)、消費側 Pf §11 未配線。
+  - **⚠ サイズ flag**: `S12_MaximalIII_IV_V.lean` 1847 行 (>1500) — lane-b の active frontier
+    ((10.x) Dade 加筆中) ゆえ分割は凍結境界待ちで**起票保留**。なお S14 (8525)/S15 (7788) 等の巨大
+    frontier が筆頭で、分割 issue 0068-0075 が既に滞留。
 - **2026-06-18 (最新⁴) — 監視間隔を動的化 (15-30分、ユーザー要望「うざいから動的に」)**: 固定 15分
   recurring cron を廃止し、**活動量に応じた動的間隔の自己再スケジュール式**に変更。各 tick の末尾で
   次回をスケジュール: **合流あり→15分後 / 変化なし(or 全 skip)→30分後**。実装 = one-shot cron

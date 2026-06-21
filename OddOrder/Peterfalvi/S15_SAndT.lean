@@ -5,6 +5,9 @@ Authors: Yawara Ishida
 -/
 import OddOrder.Peterfalvi.S14_MaximalI
 import OddOrder.Peterfalvi.S10_CoherenceWiring
+import OddOrder.Isaacs.Ch06_FrobeniusActions.OddComplement
+import OddOrder.GroupTheory.MaximalSubgroupTypeConj
+import OddOrder.GroupTheory.CoprimeAction
 import Mathlib.Algebra.BigOperators.ModEq
 import Mathlib.FieldTheory.Finite.Basic
 import Mathlib.RingTheory.Polynomial.Cyclotomic.Roots
@@ -720,8 +723,107 @@ theorem caseB_order_u_data [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
 
 /-! ## (13.16)--(13.19): normalizers and type-I interaction -/
 
-/-- **Peterfalvi (13.16)**: the normalizer and centralizer of `W_1` are
-`Q W_2`. -/
+/-- **Group-theoretic core of the `∃ y ∈ Q, W₂^y ≤ E` step of Peterfalvi (13.17.c).**
+
+Let `Q ⊔ W₂` be a semidirect product `Q ⋊ W₂` with `Q` a (solvable) normal Hall subgroup
+(`W₂ ≤ N(Q)`, `Q ⊓ W₂ = ⊥`, `|W₂| = p` prime, `p ∤ |Q|`).  Then any subgroup `E ≤ Q ⊔ W₂`
+whose order is divisible by `p` contains a `Q`-conjugate of `W₂`.
+
+*Proof:* an order-`p` subgroup `P ≤ E` (Cauchy) is coprime to the normal complemented `Q`, so by
+Schur–Zassenhaus complement conjugacy (`exists_conj_le_of_isComplement'_of_coprime`, applied inside
+`↥(Q ⊔ W₂)`) it lies in a conjugate `W₂^g` of the complement `W₂`; cardinalities force `P = W₂^g`.
+Decomposing `g = q w` (`q ∈ Q`, `w ∈ W₂`) gives `W₂^g = W₂^q`, so `W₂^q = P ≤ E` with `q ∈ Q`. -/
+theorem exists_mem_conj_W2_le_of_dvd_card [Finite G]
+    {Q W2 E : Subgroup G} (hWnorm : W2 ≤ Subgroup.normalizer (Q : Set G))
+    (hQsolv : IsSolvable ↥Q) (hdisj : Q ⊓ W2 = ⊥)
+    {p : ℕ} (hp : p.Prime) (hW2 : Nat.card ↥W2 = p) (hpQ : ¬ p ∣ Nat.card ↥Q)
+    (hE : E ≤ Q ⊔ W2) (hpE : p ∣ Nat.card ↥E) :
+    ∃ y ∈ Q, (MulAut.conj y • W2 : Subgroup G) ≤ E := by
+  haveI : Fact p.Prime := ⟨hp⟩
+  set K : Subgroup G := Q ⊔ W2 with hKdef
+  -- `Q` and `W₂`, transported into `↥K`, with `Q` normal and complementing `W₂`.
+  have hQK : Q ≤ K := le_sup_left
+  have hW2K : W2 ≤ K := le_sup_right
+  haveI hQ'normal : (Q.subgroupOf K).Normal :=
+    Subgroup.normal_subgroupOf_of_le_normalizer (by
+      rw [hKdef]; exact sup_le Subgroup.le_normalizer hWnorm)
+  have hsup_top : (Q.subgroupOf K) ⊔ (W2.subgroupOf K) = ⊤ := by
+    rw [← Subgroup.subgroupOf_sup hQK hW2K, ← hKdef, Subgroup.subgroupOf_self]
+  have hcompl : (Q.subgroupOf K).IsComplement' (W2.subgroupOf K) := by
+    apply Subgroup.isComplement'_of_disjoint_and_mul_eq_univ
+    · rw [disjoint_iff, eq_bot_iff]
+      intro y hy
+      rw [Subgroup.mem_inf, Subgroup.mem_subgroupOf, Subgroup.mem_subgroupOf] at hy
+      have hyQW : (y : G) ∈ Q ⊓ W2 := ⟨hy.1, hy.2⟩
+      rw [hdisj, Subgroup.mem_bot] at hyQW
+      rw [Subgroup.mem_bot]; exact Subtype.ext hyQW
+    · rw [← Subgroup.normal_mul, hsup_top, Subgroup.coe_top]
+  -- An order-`p` subgroup `P ≤ E` (Cauchy).
+  haveI : Fintype ↥E := Fintype.ofFinite _
+  obtain ⟨x, hx⟩ := exists_prime_orderOf_dvd_card (G := ↥E) p (by
+    rwa [Nat.card_eq_fintype_card] at hpE)
+  set z : G := (x : G) with hzdef
+  have hzE : z ∈ E := x.2
+  have hzord : orderOf z = p := by
+    have h : orderOf z = orderOf x := orderOf_injective E.subtype Subtype.coe_injective x
+    rw [h]; exact hx
+  set P : Subgroup G := Subgroup.zpowers z with hPdef
+  have hPcard : Nat.card ↥P = p := by rw [hPdef, Nat.card_zpowers, hzord]
+  have hPE : P ≤ E := (Subgroup.zpowers_le).mpr hzE
+  have hPK : P ≤ K := hPE.trans hE
+  -- `P` (inside `↥K`) is coprime to `Q`, so it lies in a conjugate of `W₂`.
+  have hcop : Nat.Coprime (Nat.card ↥(P.subgroupOf K)) (Nat.card ↥(Q.subgroupOf K)) := by
+    rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hPK).toEquiv,
+      Nat.card_congr (Subgroup.subgroupOfEquivOfLe hQK).toEquiv, hPcard]
+    exact (hp.coprime_iff_not_dvd).mpr hpQ
+  haveI : IsSolvable ↥Q := hQsolv
+  haveI hQ'solv : IsSolvable ↥(Q.subgroupOf K) :=
+    solvable_of_surjective (f := (Subgroup.subgroupOfEquivOfLe hQK).symm.toMonoidHom)
+      (Subgroup.subgroupOfEquivOfLe hQK).symm.surjective
+  obtain ⟨ξ, hξ⟩ := Ch03.exists_conj_le_of_isComplement'_of_coprime hQ'solv hcompl hcop
+  -- Decompose `ξ = q' * w'` in `↥K` (`Q'` normal complement).
+  have hξprod : (ξ : ↥K) ∈ (↑(Q.subgroupOf K) : Set ↥K) * (↑(W2.subgroupOf K) : Set ↥K) := by
+    rw [← Subgroup.normal_mul, hsup_top, Subgroup.coe_top]; exact Set.mem_univ ξ
+  obtain ⟨q', hq', w', hw', hqw⟩ := Set.mem_mul.mp hξprod
+  refine ⟨(q' : G), (Subgroup.mem_subgroupOf.mp hq'), ?_⟩
+  -- `W₂^(↑q') = W₂^ξ ⊇ P`, and cardinalities give equality.
+  have hconj_le : P ≤ MulAut.conj (q' : G) • W2 := by
+    intro a ha
+    -- `a ∈ P`, so `⟨a,_⟩ ∈ P.subgroupOf K ≤ (W₂.subgroupOf K).map (conj ξ)`.
+    have haK : a ∈ K := hPK ha
+    have ha' : (⟨a, haK⟩ : ↥K) ∈ (W2.subgroupOf K).map (MulAut.conj ξ).toMonoidHom :=
+      hξ (by rw [Subgroup.mem_subgroupOf]; exact ha)
+    rw [Subgroup.mem_map] at ha'
+    obtain ⟨v, hv, hva⟩ := ha'
+    -- `v ∈ W₂'`, `conj ξ v = ⟨a,_⟩`; project to `G`: `ξ v ξ⁻¹ = a`.
+    rw [Subgroup.mem_subgroupOf] at hv
+    have hvW2 : (v : G) ∈ W2 := hv
+    have hval : (ξ : G) * (v : G) * (ξ : G)⁻¹ = a := by
+      have h := congrArg (Subgroup.subtype K) hva
+      simpa [MulAut.conj_apply] using h
+    -- `ξ = q' w'`.
+    have hξqw : (ξ : G) = (q' : G) * (w' : G) := by
+      have h := congrArg (Subgroup.subtype K) hqw
+      simpa using h.symm
+    have hw'W2 : (w' : G) ∈ W2 := hw'
+    have hconj_w : (w' : G) * (v : G) * (w' : G)⁻¹ ∈ W2 :=
+      W2.mul_mem (W2.mul_mem hw'W2 hvW2) (W2.inv_mem hw'W2)
+    -- `a = q' (w' v w'⁻¹) q'⁻¹ ∈ W₂.map (conj q')`.
+    rw [Subgroup.mem_pointwise_smul_iff_inv_smul_mem, MulAut.smul_def, MulAut.conj_inv_apply,
+      ← hval, hξqw]
+    have hsimp : (q' : G)⁻¹ * ((q' : G) * (w' : G) * (v : G) * ((q' : G) * (w' : G))⁻¹) * (q' : G)
+        = (w' : G) * (v : G) * (w' : G)⁻¹ := by group
+    rw [hsimp]; exact hconj_w
+  -- `P = W₂^(↑q')` by cardinality, and `P ≤ E`.
+  have hmap : (MulAut.conj (q' : G) • W2 : Subgroup G)
+      = W2.map (MulAut.conj (q' : G)).toMonoidHom := by
+    rw [Subgroup.pointwise_smul_def]; rfl
+  have hcard_eq : Nat.card ↥(MulAut.conj (q' : G) • W2 : Subgroup G) = p := by
+    rw [hmap, Nat.card_congr (Subgroup.equivMapOfInjective W2
+      (MulAut.conj (q' : G)).toMonoidHom (MulAut.conj (q' : G)).injective).toEquiv.symm, hW2]
+  have hPeq : P = MulAut.conj (q' : G) • W2 :=
+    Subgroup.eq_of_le_of_card_ge hconj_le (by rw [hcard_eq, hPcard])
+  rw [← hPeq]; exact hPE
 theorem normalizer_W1 [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
     (hyp : Hypothesis (G := G)) :
     Subgroup.normalizer (hyp.W1 : Set G) = Subgroup.centralizer (hyp.W1 : Set G) ∧
@@ -1068,28 +1170,113 @@ theorem le_kernel_of_isMulCommutative_of_inf_ne_bot {L : Type*} [Group L] [Finit
   refine hcent (Subgroup.mem_centralizer_singleton_iff.mpr ?_)
   exact congrArg Subtype.val (hUab.is_comm.comm ⟨u, hu⟩ ⟨x, hxU⟩)
 
+/-- **Type is conjugacy-invariant** (the (13.17.a/b) `L ~ S`/`L ~ T` rule-out): a type-`I` maximal
+subgroup `L` is not conjugate to any non-type-`I` maximal subgroup `M`.  If `conj g • L = M` then
+`M` would be type `I` (`isTypeI_of_conj`, the automorphism-equivariance of the Peterfalvi taxonomy
+— `OddOrder.GroupTheory.MaximalSubgroupTypeConj`), contradicting
+`not_isTypeI_of_isTypeNonI`.  This is **gate-4 piece 1**, now discharged (sorry-free, axiom-clean);
+reusable across the §16 conjugacy arguments. -/
+theorem not_conj_of_isTypeI_of_isTypeNonI [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    {L M : Subgroup G} (hLI : IsTypeI L) (hMmax : M ∈ maximalSubgroups G)
+    (hMnonI : IsTypeNonI M) : ¬ ∃ g : G, MulAut.conj g • L = M :=
+  fun ⟨g, hg⟩ =>
+    OddOrder.BG.Ch4.S16.not_isTypeI_of_isTypeNonI hG hMmax hMnonI
+      (OddOrder.GroupTheory.isTypeI_of_conj hLI hg)
+
+/-- **Peterfalvi (13.17.b), the (9.1) fixed-point-free residual (gate-4 pieces 4–6)**: once the
+(8.17.a) coprimality `|L_F| ⟂ p q` is in hand for the type-`I` `L` over `N_G(U)`, the complement
+`U` lies in the Fitting kernel `L_F`.  As `|W₁| = q ∤ |L_F|`, `W₁ ∩ L_F = 1`; were `U ∩ L_F = 1`,
+the Frobenius group `U W₁ ⊆ L` (from (13.2.a)) would act fixed-point-freely on `L_F`
+(`U, W₁ ≤ L ≤ N_G(L_F)`, a coprime action), so Wielandt's formula (9.1)
+`wielandt_fixedPoint_frobenius` would force `|L_F| = 1`, against type-`I` `L_F ≠ 1`
+(`TypeFData.H_nontrivial`); hence `U ∩ L_F ≠ 1` and `U ⊆ C_L(U ∩ L_F) ⊆ L_F`
+(`le_kernel_of_isMulCommutative_of_inf_ne_bot`).  The isolated deep residual of gate 4: the
+`CoprimeFrobeniusAction (U W₁) (L_F)` construction plus the (still sorried) Wielandt formula.
+`:= sorry`; see issue 2009 / `notes/peterfalvi/s13_17_structural_program.md`. -/
+theorem typeI_U_le_fitting_of_coprime [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hyp : Hypothesis (G := G)) (_hSTypeII : IsTypeII hyp.S) {L : Subgroup G}
+    (hLmax : L ∈ maximalSubgroups G) (hLI : IsTypeI L)
+    (hNUL : Subgroup.normalizer (hyp.U : Set G) ≤ L)
+    (hcop : Nat.Coprime (Nat.card ↥(maxNilpotentNormalHall L)) (hyp.p * hyp.q)) :
+    hyp.U ≤ maxNilpotentNormalHall L := by
+  -- The (12.7) Frobenius structure of the type-`I` `L`, with kernel `L_F = maxNilpotentNormalHall L`.
+  obtain ⟨frob, _⟩ := OddOrder.Peterfalvi.S14.typeI_frobenius hG hLmax hLI
+  have hHeq : frob.typeI.typeF.H = maxNilpotentNormalHall L := frob.typeI.typeF.H_eq
+  have hfrobLF : OddOrder.Isaacs.Ch06.IsFrobeniusGroup ↥L
+      ((maxNilpotentNormalHall L).subgroupOf L) frob.complement := hHeq ▸ frob.frobenius
+  have hUleL : hyp.U ≤ L := Subgroup.le_normalizer.trans hNUL
+  have hW1leL : hyp.W1 ≤ L := hyp.W1_normalizes_U.trans hNUL
+  have hLFleL : maxNilpotentNormalHall L ≤ L := OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_le L
+  obtain ⟨bdata, _⟩ := basic_structure hG hyp
+  have hsolv : IsSolvable ↥(maxNilpotentNormalHall L) := by
+    haveI := OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_isNilpotent L
+    exact IsNilpotent.to_isSolvable
+  -- piece 3: `W₁ ⊓ L_F = ⊥`, since `q = |W₁|` divides `p q` and `|L_F| ⟂ p q`.
+  have hcopLFq : Nat.Coprime (Nat.card ↥(maxNilpotentNormalHall L)) hyp.q :=
+    Nat.Coprime.coprime_dvd_right (dvd_mul_left hyp.q hyp.p) hcop
+  have hW1LF : hyp.W1 ⊓ maxNilpotentNormalHall L = ⊥ :=
+    Subgroup.inf_eq_bot_of_coprime (by rw [← hyp.q_eq_card_W1]; exact hcopLFq.symm)
+  -- piece 5: `U ⊓ L_F ≠ ⊥` (else the Frobenius `U W₁` acts fixed-point-freely on `L_F`).
+  have hUmeets : hyp.U ⊓ maxNilpotentNormalHall L ≠ ⊥ := by
+    intro hbot
+    have hcopU : Nat.Coprime (Nat.card ↥hyp.U) (Nat.card ↥(maxNilpotentNormalHall L)) :=
+      OddOrder.GroupTheory.IsFrobeniusGroup.coprime_card_of_inf_kernel_eq_bot_le
+        hLFleL hUleL hfrobLF hbot
+    have hcopW1 : Nat.Coprime (Nat.card ↥hyp.W1) (Nat.card ↥(maxNilpotentNormalHall L)) :=
+      OddOrder.GroupTheory.IsFrobeniusGroup.coprime_card_of_inf_kernel_eq_bot_le
+        hLFleL hW1leL hfrobLF hW1LF
+    have hcardUW1 : Nat.card ↥(hyp.U ⊔ hyp.W1) = Nat.card ↥hyp.U * Nat.card ↥hyp.W1 := by
+      rw [← bdata.UW1_frobenius.isComplement.card_mul,
+        Nat.card_congr (Subgroup.subgroupOfEquivOfLe le_sup_left).toEquiv,
+        Nat.card_congr (Subgroup.subgroupOfEquivOfLe le_sup_right).toEquiv]
+    have hcopUW1 : Nat.Coprime (Nat.card ↥(maxNilpotentNormalHall L)) (Nat.card ↥(hyp.U ⊔ hyp.W1)) := by
+      rw [hcardUW1]; exact Nat.Coprime.mul_right hcopU.symm hcopW1.symm
+    have hLFbot : maxNilpotentNormalHall L = ⊥ :=
+      OddOrder.GroupTheory.isFrobenius_kernel_eq_bot_of_frobenius_subgroup hLFleL
+        (sup_le hUleL hW1leL) ⟨frob.complement, hfrobLF⟩ bdata.UW1_frobenius hbot hW1LF hsolv hcopUW1
+    exact frob.frobenius.ne_bot_kernel (by rw [hHeq, hLFbot, Subgroup.bot_subgroupOf])
+  -- piece 6: `U ⊆ C_L(U ∩ L_F) ⊆ L_F` since `U` is abelian and `L_F` is the Frobenius kernel.
+  have hUab : IsMulCommutative ↥(hyp.U.subgroupOf L) :=
+    OddOrder.GroupTheory.isMulCommutative_of_mulEquiv
+      (Subgroup.subgroupOfEquivOfLe hUleL).symm bdata.U_commutative
+  have hinf : (hyp.U.subgroupOf L) ⊓ ((maxNilpotentNormalHall L).subgroupOf L) ≠ ⊥ := by
+    rw [show (hyp.U.subgroupOf L) ⊓ ((maxNilpotentNormalHall L).subgroupOf L)
+        = (hyp.U ⊓ maxNilpotentNormalHall L).subgroupOf L from (Subgroup.comap_inf _ _ _).symm]
+    intro h
+    apply hUmeets
+    have hle : hyp.U ⊓ maxNilpotentNormalHall L ≤ L := inf_le_right.trans hLFleL
+    rw [← inf_eq_left.mpr hle]
+    exact disjoint_iff.mp (Subgroup.subgroupOf_eq_bot.mp h)
+  have hsub := le_kernel_of_isMulCommutative_of_inf_ne_bot hfrobLF hUab hinf
+  calc hyp.U = (hyp.U.subgroupOf L).map L.subtype := (Subgroup.map_subgroupOf_eq_of_le hUleL).symm
+    _ ≤ ((maxNilpotentNormalHall L).subgroupOf L).map L.subtype := Subgroup.map_mono hsub
+    _ = maxNilpotentNormalHall L := Subgroup.map_subgroupOf_eq_of_le hLFleL
+
 /-- **Peterfalvi (13.17.b) `U ⊆ L_F` for the type-`I` `L`**: when `S` is type II and `L` is a
 type-`I` maximal subgroup over `N_G(U)`, the complement `U` lies in the Fitting kernel `L_F`.
 
 *Proof (Pf p.82, the gate-4 structural core):* `L` is non-conjugate to `S` and `T` (it is type `I`
-while `S`, `T` are type II/non-I and type is conjugacy-invariant), so (8.17.a) =
-`card_LF_coprime_pq` (B2) gives `|L_F|` prime to `p q`, in particular to `q = |W₁|`; hence
-`W₁ ⊓ L_F = 1`.  Were `U ⊓ L_F = 1`, the Frobenius group `U W₁ ⊆ L` (from (13.2.a)) would
-act fixed-point-freely on `L_F` (a coprime action, `U, W₁ ≤ L ≤ N_G(L_F)`), so Wielandt's
-formula (9.1) = `wielandt_fixedPoint_frobenius` would force `|L_F| = 1`, contradicting `L_F ≠ 1`
-(type `I`, `TypeFData.H_nontrivial`).  Thus `U ⊓ L_F ≠ 1`, and as `L_F` is nilpotent normal in
-`L` the self-centralizing property gives `U ⊆ C_L(U ⊓ L_F) ⊆ L_F`.
+while `S`, `T` are non-I and type is conjugacy-invariant — `not_conj_of_isTypeI_of_isTypeNonI`, the
+**discharged gate-4 piece 1**), so (8.17.a) = `card_LF_coprime_pq` (B2) gives `|L_F|` prime to
+`p q`, in particular to `q = |W₁|`.  The remaining (9.1) fixed-point-free argument
+(`W₁ ∩ L_F = 1`; `U ∩ L_F ≠ 1` by Wielandt; `U ⊆ C_L(U ∩ L_F) ⊆ L_F`) is
+`typeI_U_le_fitting_of_coprime` (the isolated deep residual of gate 4).
 
-This producer is the isolated residual of gate 4 alongside `card_LF_coprime_pq`: its body assembles
-the (8.17.a)+(9.1) fixed-point-free argument, whose two genuinely deep inputs are the BG-Theorem-E
-coprimality `card_LF_coprime_pq` (owner = F) and the Wielandt formula
-`wielandt_fixedPoint_frobenius` (already a sorried §9 producer).  Declared `:= sorry`; see
-issue 2013 / `notes/peterfalvi/s13_17_structural_program.md`. -/
+Assembled `sorry`-free from the piece-1 non-conjugacy, the (8.17.a) coprimality producer
+`card_LF_coprime_pq` (owner = F, BG Theorem E), and `typeI_U_le_fitting_of_coprime`. -/
 theorem typeI_overNormalizer_U_le_fitting [Finite G]
     (_hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
     (_hSTypeII : IsTypeII hyp.S) {L : Subgroup G} (_hLmax : L ∈ maximalSubgroups G)
     (_hLI : IsTypeI L) (_hNUL : Subgroup.normalizer (hyp.U : Set G) ≤ L) :
-    hyp.U ≤ maxNilpotentNormalHall L := sorry
+    hyp.U ≤ maxNilpotentNormalHall L := by
+  -- (piece 1) `L` is non-conjugate to `S`, `T` (type is conjugacy-invariant; `S`, `T` are non-I).
+  have hnS : ¬ ∃ g : G, MulAut.conj g • L = hyp.S :=
+    not_conj_of_isTypeI_of_isTypeNonI _hG _hLI hyp.S_maximal hyp.S_nonI
+  have hnT : ¬ ∃ g : G, MulAut.conj g • L = hyp.T :=
+    not_conj_of_isTypeI_of_isTypeNonI _hG _hLI hyp.T_maximal hyp.T_nonI
+  -- (piece 2) the (8.17.a) coprimality, then (pieces 4–6) the isolated FPF residual.
+  exact typeI_U_le_fitting_of_coprime _hG hyp _hSTypeII _hLmax _hLI _hNUL
+    (card_LF_coprime_pq _hG hyp _hLmax _hLI hnS hnT)
 
 /-- **Peterfalvi (13.17.a/b)**: a maximal subgroup `L` over `N_G(U)` (for `S` of type II) is of
 type I with `U ⊆ L_F`.  *Proof (Pf pp.81-82):* take any maximal `L ⊇ N_G(U)` (proper since
@@ -1215,27 +1402,313 @@ theorem exists_typeI_maximal_overNormalizer_U [Finite G]
       Subtype.ext (by simpa using hcomm)
     exact bdata.UW1_frobenius.conj_frobenius _ hwmem hwne' _ hnmem hnne' hconj_eq
 
-/-- **Peterfalvi (13.17.c)/(14.5)**: the Frobenius complement of the type-I subgroup `L` over
-`N_G(U)` has order `p q` and contains a conjugate `W₂^y` (`y ∈ Q`).  *Proof (Pf p.82):* a
-complement `E ⊇ W₁` to `L_F` in `L` is a Frobenius complement of odd order, so its prime-order
-subgroups are normal ([H] V.8.18); hence `E ⊆ N_G(W₁) ⊆ Q W₂` ((13.16)) with cyclic Sylow
-subgroups ([BG] 3.9, `S03g_Thm310`), forcing `E = W₁` or `|E| = p q` with `E = W₁ W₂^y`.  The
-`W₁` alternative is excluded by (14.5).  The genuine §13/§14 obligation feeding (13.17). -/
+/-- **Peterfalvi (13.17.c), Huppert step.**  If `W₁` lies in a Frobenius complement `E` of the
+type-I subgroup `L`, then `E ⊆ Q W₂`.
+
+*Proof (Pf p.82):* `E` is a Frobenius complement of **odd** order (`E ≤ L ≤ G`, `|G|` odd), so by
+Huppert ([H] Kapitel V Satz 8.18 b), `normal_of_card_prime_of_isFrobeniusGroup_of_odd`) its
+prime-order subgroup `W₁` (`|W₁| = q`) is normal in `E`.  Hence `E ⊆ N_G(W₁) = C_G(W₁) = Q W₂`
+by (13.16) (`normalizer_W1`).  This is the step of (13.17.c) consuming the new Frobenius-complement
+structure theory; the remaining order analysis (`|E| ∈ {q, p q}`, cyclic Sylows by [BG] 3.9, and
+the `(14.5)` exclusion of `E = W₁`) builds on this containment. -/
+theorem complement_le_QW2 [Finite G]
+    (_hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
+    {L : Subgroup G} (frob : OddOrder.Peterfalvi.S14.TypeIFrobeniusData L)
+    (hW1E : hyp.W1 ≤ frob.complement.map L.subtype) :
+    frob.complement.map L.subtype ≤ hyp.Q ⊔ hyp.W2 := by
+  set E := frob.complement with hEdef
+  -- `W₁ ≤ L`, and `W₁` (as a subgroup of `↥L`) is contained in `E`.
+  have hEleL : E.map L.subtype ≤ L := Subgroup.map_subtype_le E
+  have hW1L : hyp.W1 ≤ L := hW1E.trans hEleL
+  have hW1L_le_E : hyp.W1.subgroupOf L ≤ E := by
+    intro x hx
+    rw [Subgroup.mem_subgroupOf] at hx
+    obtain ⟨e, he, hee⟩ := hW1E hx
+    have hex : e = x := Subtype.coe_injective (by simpa using hee)
+    rw [← hex]; exact he
+  -- `R := W₁` viewed inside `E`, of prime order `q`.
+  set R : Subgroup ↥E := (hyp.W1.subgroupOf L).subgroupOf E with hRdef
+  have hRcard : Nat.card ↥R = hyp.q := by
+    rw [hRdef, Nat.card_congr (Subgroup.subgroupOfEquivOfLe hW1L_le_E).toEquiv,
+      Nat.card_congr (Subgroup.subgroupOfEquivOfLe hW1L).toEquiv]
+    exact hyp.q_eq_card_W1.symm
+  -- `E` has odd order (it divides `|G|`).
+  have hEdvd : Nat.card ↥E ∣ Nat.card G :=
+    (Subgroup.card_subgroup_dvd_card E).trans (Subgroup.card_subgroup_dvd_card L)
+  have hodd : Odd (Nat.card ↥E) := _hG.odd.of_dvd_nat hEdvd
+  -- Huppert V.8.18 b): `W₁` is normal in `E`, so `E` normalizes `W₁` in `↥L`.
+  haveI hRnormal : R.Normal :=
+    OddOrder.Isaacs.Ch06.normal_of_card_prime_of_isFrobeniusGroup_of_odd
+      frob.frobenius hodd hyp.q_prime hRcard
+  have hEnorm := (Subgroup.normal_subgroupOf_iff_le_normalizer hW1L_le_E).mp hRnormal
+  -- Lift to `G`: `E.map L.subtype ≤ N_G(W₁)`.
+  have hEN : E.map L.subtype ≤ Subgroup.normalizer (hyp.W1 : Set G) := by
+    rintro _ ⟨e, he, rfl⟩
+    have heN := hEnorm he
+    rw [Subgroup.mem_normalizer_iff] at heN ⊢
+    intro w
+    constructor
+    · intro hw
+      have hwL : w ∈ L := hW1L hw
+      have hw' : (⟨w, hwL⟩ : ↥L) ∈ hyp.W1.subgroupOf L := by
+        rw [Subgroup.mem_subgroupOf]; exact hw
+      have hconj := ((heN ⟨w, hwL⟩).mp hw')
+      rw [Subgroup.mem_subgroupOf] at hconj
+      simpa using hconj
+    · intro hw
+      -- the conjugate lies in `W₁ ≤ L`, so `w ∈ L`, and we apply `heN` backwards.
+      have he' : (L.subtype e : G) ∈ L := e.2
+      have hwL : w ∈ L := by
+        have hrw : w = (L.subtype e)⁻¹ * ((L.subtype e) * w * (L.subtype e)⁻¹) * (L.subtype e) := by
+          group
+        rw [hrw]
+        exact L.mul_mem (L.mul_mem (L.inv_mem he') (hW1L hw)) he'
+      have hconjmem : (e * ⟨w, hwL⟩ * e⁻¹) ∈ hyp.W1.subgroupOf L := by
+        rw [Subgroup.mem_subgroupOf]; simpa using hw
+      have hfin := (heN ⟨w, hwL⟩).mpr hconjmem
+      rw [Subgroup.mem_subgroupOf] at hfin
+      simpa using hfin
+  -- (13.16): `N_G(W₁) = C_G(W₁) = Q W₂`.
+  have h1316 := normalizer_W1 _hG hyp
+  calc E.map L.subtype ≤ Subgroup.normalizer (hyp.W1 : Set G) := hEN
+    _ = Subgroup.centralizer (hyp.W1 : Set G) := h1316.1
+    _ = hyp.Q ⊔ hyp.W2 := h1316.2
+
+/-- §13 structural data for the semidirect product `Q ⋊ W₂` (`Q = T_F`) consumed by the
+`∃ y` step of (13.17.c).  `W₂` normalizes `Q` (as `W₂ ≤ T` and `Q ◁ T`), meets it trivially, and
+`p ∤ |Q| = q^p` (since `p ≠ q`).
+
+*Proof.*  `W₂ ≤ W = S ⊓ T ≤ T` and `Q = T_F ◁ T` (`maxNilpotentNormalHall_le_normalizer`) give the
+normalization.  The distinctness `p ≠ q` is forced because otherwise `W₁` and `W₂` would be equal
+order-`q` subgroups of the cyclic `W` (`eq_of_card_eq_prime_of_isCyclic`), contradicting
+`W₁ ⊓ W₂ = 1`; then `p ∤ q^p`, and the coprimality `|Q| ⟂ |W₂| = p` gives `Q ⊓ W₂ = 1`.  The only
+gated input is `|Q| = q^p` (`card_Q_eq`, the isolated §13 counting residual B1). -/
+theorem Q_W2_structure [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hyp : Hypothesis (G := G)) :
+    hyp.W2 ≤ Subgroup.normalizer (hyp.Q : Set G) ∧ hyp.Q ⊓ hyp.W2 = ⊥ ∧
+      ¬ hyp.p ∣ Nat.card ↥hyp.Q := by
+  -- `W₂ ≤ W = S ⊓ T ≤ T`.
+  have hW2T : hyp.W2 ≤ hyp.T :=
+    (le_sup_right.trans hyp.W_eq_join.ge).trans (hyp.W_eq_inter.le.trans inf_le_right)
+  -- Conjunct 1: `W₂ ≤ N_G(Q)`, as `Q = T_F ◁ T` and `W₂ ≤ T`.
+  have hWnorm : hyp.W2 ≤ Subgroup.normalizer (hyp.Q : Set G) := by
+    rw [hyp.Q_eq_TF]
+    exact hW2T.trans (OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_le_normalizer hyp.T)
+  -- `p ≠ q`: else `W₁` and `W₂` are equal order-`q` subgroups of the cyclic `W`.
+  have hpq : hyp.p ≠ hyp.q := by
+    intro heq
+    haveI : IsCyclic ↥hyp.W := hyp.W_cyclic
+    have hW1W : hyp.W1 ≤ hyp.W := le_sup_left.trans hyp.W_eq_join.ge
+    have hW2W : hyp.W2 ≤ hyp.W := le_sup_right.trans hyp.W_eq_join.ge
+    have hW1card : Nat.card ↥(hyp.W1.subgroupOf hyp.W) = hyp.q := by
+      rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hW1W).toEquiv]; exact hyp.q_eq_card_W1.symm
+    have hW2card : Nat.card ↥(hyp.W2.subgroupOf hyp.W) = hyp.q := by
+      rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hW2W).toEquiv, ← heq]
+      exact hyp.p_eq_card_W2.symm
+    have hsubeq : hyp.W1.subgroupOf hyp.W = hyp.W2.subgroupOf hyp.W :=
+      Ch06.eq_of_card_eq_prime_of_isCyclic hyp.q_prime hW1card hW2card
+    have hWeq : hyp.W1 = hyp.W2 := by
+      have hmap := congrArg (Subgroup.map hyp.W.subtype) hsubeq
+      rwa [Subgroup.map_subgroupOf_eq_of_le hW1W, Subgroup.map_subgroupOf_eq_of_le hW2W] at hmap
+    have hbot : hyp.W1 = ⊥ := by
+      have h := hyp.W1_inf_W2_eq_bot; rwa [← hWeq, inf_idem] at h
+    have hq1 : hyp.q = 1 := by rw [hyp.q_eq_card_W1, hbot, Subgroup.card_bot]
+    exact hyp.q_prime.one_lt.ne' hq1
+  -- Conjunct 3: `p ∤ |Q| = q^p`, since `p ∤ q` (distinct primes).
+  have hpQ : ¬ hyp.p ∣ Nat.card ↥hyp.Q := by
+    rw [card_Q_eq _hG hyp hyp.T_nonI]
+    intro hdvd
+    exact hpq ((Nat.prime_dvd_prime_iff_eq hyp.p_prime hyp.q_prime).mp
+      (hyp.p_prime.dvd_of_dvd_pow hdvd))
+  -- Conjunct 2: `Q ⊓ W₂ = ⊥`, from coprimality `|Q| ⟂ p = |W₂|`.
+  refine ⟨hWnorm, ?_, hpQ⟩
+  apply Subgroup.inf_eq_bot_of_coprime
+  rw [← hyp.p_eq_card_W2]
+  exact (hyp.p_prime.coprime_iff_not_dvd.mpr hpQ).symm
+
+/-- **Peterfalvi (13.17.c) §13 intersection structure.**  The `W₁`-containing Frobenius complement
+`E` of the type-I `L` meets `Q = T_F` exactly in `W₁` (Pf p.82 "`E ∩ Q = W₁`"), and is not
+contained in `Q` (the `E = W₁` alternative is excluded by Peterfalvi (13.19.c1)/(13.2.a)).  This is
+the genuine deep §13 structural datum behind the order `|E| = p q`; it is not reducible to the
+existing §13 residuals (`TypeIFrobeniusData` carries no complement-order field).  `:= sorry`,
+isolated — the order argument `complement_card_eq_pq` below is sorry-free modulo this. -/
+theorem complement_inf_Q_structure [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hyp : Hypothesis (G := G)) {L : Subgroup G}
+    (frob : OddOrder.Peterfalvi.S14.TypeIFrobeniusData L)
+    (hW1E : hyp.W1 ≤ frob.complement.map L.subtype) :
+    frob.complement.map L.subtype ⊓ hyp.Q = hyp.W1 ∧
+      ¬ frob.complement.map L.subtype ≤ hyp.Q := sorry
+
+/-- **Peterfalvi (13.17.c) order argument.**  The `W₁`-containing Frobenius complement `E` of `L`
+has order `p q`.
+
+*Proof (Pf p.82).*  `E ⊆ Q W₂` (`complement_le_QW2`), and `Q ⋊ W₂` has `Q ◁ Q W₂` with
+`[Q W₂ : Q] = |W₂| = p` (`Q_W2_structure`).  The relative index `[E : E ∩ Q]` divides `[Q W₂ : Q] = p`
+(normal-subgroup relative index, `relIndex_dvd_index_of_normal` inside `↥(Q W₂)`) and is `≠ 1` since
+`E ⊄ Q`, hence `= p`; with `E ∩ Q = W₁` of order `q`, `|E| = |E ∩ Q| · [E : E ∩ Q] = q p`.  The two
+§13 facts `E ∩ Q = W₁` and `E ⊄ Q` are isolated in `complement_inf_Q_structure`; everything else is
+sorry-free group theory. -/
+theorem complement_card_eq_pq [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hyp : Hypothesis (G := G)) {L : Subgroup G}
+    (frob : OddOrder.Peterfalvi.S14.TypeIFrobeniusData L)
+    (hW1E : hyp.W1 ≤ frob.complement.map L.subtype) :
+    Nat.card ↥frob.complement = hyp.p * hyp.q := by
+  set Em := frob.complement.map L.subtype with hEm
+  set Hg := hyp.Q ⊔ hyp.W2 with hHg
+  -- §13 residual: `E ∩ Q = W₁` and `E ⊄ Q`.
+  obtain ⟨hInf, hnle⟩ := complement_inf_Q_structure _hG hyp frob hW1E
+  -- `E ⊆ Q W₂` (Huppert step) and the `Q ⋊ W₂` structure.
+  have hEH : Em ≤ Hg := complement_le_QW2 _hG hyp frob hW1E
+  obtain ⟨hWnorm, hdisj, _⟩ := Q_W2_structure _hG hyp
+  have hQleH : hyp.Q ≤ Hg := le_sup_left
+  -- `|E ∩ Q| = |W₁| = q`.
+  have hInfCard : Nat.card ↥(Em ⊓ hyp.Q) = hyp.q := by rw [hInf]; exact hyp.q_eq_card_W1.symm
+  -- `Q ◁ Q W₂` (as `Q W₂ ≤ N_G(Q)`).
+  haveI hQnorm : (hyp.Q.subgroupOf Hg).Normal :=
+    (Subgroup.normal_subgroupOf_iff_le_normalizer hQleH).mpr (sup_le Subgroup.le_normalizer hWnorm)
+  -- `|Q W₂| = |Q| · p`.
+  have hHcard : Nat.card ↥Hg = Nat.card ↥hyp.Q * hyp.p := by
+    have h := OddOrder.BG.Ch3.S12.card_sup_eq_mul_of_le_normalizer_of_disjoint hWnorm
+      (show hyp.W2 ⊓ hyp.Q = ⊥ by rw [inf_comm]; exact hdisj)
+    rw [hHg, sup_comm, h, ← hyp.p_eq_card_W2]
+    exact mul_comm _ _
+  have hQpos : 0 < Nat.card ↥hyp.Q := Nat.card_pos
+  -- `[Q W₂ : Q] = p`.
+  have hindexH : (hyp.Q.subgroupOf Hg).index = hyp.p := by
+    have hmul := Subgroup.card_mul_index (hyp.Q.subgroupOf Hg)
+    rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hQleH).toEquiv, hHcard] at hmul
+    exact Nat.eq_of_mul_eq_mul_left hQpos hmul
+  -- `[E : E ∩ Q] = Q.relIndex E` divides `[Q W₂ : Q] = p`, and is `≠ 1` (`E ⊄ Q`), hence `= p`.
+  have hdvd : hyp.Q.relIndex Em ∣ hyp.p := by
+    have h1 := Subgroup.relIndex_dvd_index_of_normal (H := hyp.Q.subgroupOf Hg)
+      (K := Em.subgroupOf Hg)
+    rwa [Subgroup.relIndex_subgroupOf hEH, hindexH] at h1
+  have hne1 : hyp.Q.relIndex Em ≠ 1 := fun h => hnle (Subgroup.relIndex_eq_one.mp h)
+  have hrel : hyp.Q.relIndex Em = hyp.p :=
+    (hyp.p_prime.eq_one_or_self_of_dvd _ hdvd).resolve_left hne1
+  -- `|E| = |E ∩ Q| · [E : E ∩ Q] = q · p`.
+  have hEmcard : Nat.card ↥Em = hyp.q * hyp.p := by
+    have hmul := Subgroup.card_mul_index (hyp.Q.subgroupOf Em)
+    rw [show (hyp.Q.subgroupOf Em).index = hyp.p from hrel, ← Subgroup.inf_subgroupOf_left,
+      Nat.card_congr (Subgroup.subgroupOfEquivOfLe (inf_le_left : Em ⊓ hyp.Q ≤ Em)).toEquiv,
+      hInfCard] at hmul
+    exact hmul.symm
+  -- transfer `|E.map| = |E|`.
+  rw [show Nat.card ↥frob.complement = Nat.card ↥Em from
+    Nat.card_congr (Subgroup.equivMapOfInjective frob.complement L.subtype
+      L.subtype_injective).toEquiv, hEmcard]
+  exact mul_comm _ _
+
+/-- **Peterfalvi (13.17.c)/(14.5)**: the `W₁`-containing Frobenius complement of the type-I
+subgroup `L` over `N_G(U)` has order `p q` and contains a conjugate `W₂^y` (`y ∈ Q`).
+
+Assembled from the order argument (`complement_card_eq_pq`, gated on `E ∩ Q = W₁`) and the
+group-theoretic `∃ y` extraction (`exists_mem_conj_W2_le_of_dvd_card`, Schur–Zassenhaus), the
+latter fed `E ⊆ Q W₂` by the Huppert step (`complement_le_QW2`).  The `W₁ ⊆ E` hypothesis records
+Peterfalvi's choice "let `E` be a complement to `H` in `L` such that `W₁ ⊂ E`". -/
 theorem typeI_overNormalizer_complement [Finite G]
     (_hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
     (hSTypeII : IsTypeII hyp.S) {L : Subgroup G} (hLmax : L ∈ maximalSubgroups G)
     (hNUL : Subgroup.normalizer (hyp.U : Set G) ≤ L)
     (hUH : hyp.U ≤ maxNilpotentNormalHall L)
-    (frob : OddOrder.Peterfalvi.S14.TypeIFrobeniusData L) :
+    (frob : OddOrder.Peterfalvi.S14.TypeIFrobeniusData L)
+    (hW1E : hyp.W1 ≤ frob.complement.map L.subtype) :
     Nat.card ↥frob.complement = hyp.p * hyp.q ∧
       ∃ y ∈ hyp.Q, (MulAut.conj y • hyp.W2 : Subgroup G) ≤
-        frob.complement.map L.subtype := sorry
+        frob.complement.map L.subtype := by
+  have hcard := complement_card_eq_pq _hG hyp frob hW1E
+  refine ⟨hcard, ?_⟩
+  obtain ⟨hWnorm, hdisj, hpQ⟩ := Q_W2_structure _hG hyp
+  have hEQW2 := complement_le_QW2 _hG hyp frob hW1E
+  -- `Q` is solvable: `Q = T_F ≤ T < ⊤`.
+  haveI hQsolv : IsSolvable ↥hyp.Q := by
+    have hQT : hyp.Q ≤ hyp.T := by
+      rw [hyp.Q_eq_TF]; exact OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_le hyp.T
+    have hTlt : hyp.T < ⊤ := lt_top_iff_ne_top.mpr (mem_maximalSubgroups.mp hyp.T_maximal).1
+    exact _hG.solvable_of_lt_top hyp.Q (lt_of_le_of_lt hQT hTlt)
+  -- `p ∣ |E.map| = |E| = p q`.
+  have hpE : hyp.p ∣ Nat.card ↥(frob.complement.map L.subtype) := by
+    rw [Nat.card_congr (Subgroup.equivMapOfInjective frob.complement L.subtype
+      L.subtype_injective).toEquiv.symm, hcard]
+    exact dvd_mul_right hyp.p hyp.q
+  exact exists_mem_conj_W2_le_of_dvd_card hWnorm hQsolv hdisj hyp.p_prime
+    hyp.p_eq_card_W2.symm hpQ hEQW2 hpE
+
+/-- `W₁` (order `q`) is coprime to the type-I Frobenius kernel `L_F` (`q ∤ |L_F|`).  This is
+Peterfalvi's "`W₁ ∩ H = 1`", from (8.17.a).
+
+*Proof.*  `L` is type I while `S` and `T` are type non-I maximal subgroups, so `L` is conjugate to
+neither (`not_conj_of_isTypeI_of_isTypeNonI`).  Hence (8.17.a) `card_LF_coprime_pq` gives
+`|L_F| ⟂ p q`, in particular `|L_F| ⟂ q`, i.e. `q ∤ |L_F|`; the kernel `H = frob.typeI.typeF.H`
+equals `L_F = maxNilpotentNormalHall L` (`TypeFData.H_eq`, so the "kernel_eq_MF" identification is
+*not* opaque) and `|H.subgroupOf L| = |H|`.  The only gated input is `card_LF_coprime_pq` (B2,
+BG Theorem E, owner F). -/
+theorem q_not_dvd_kernel [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hyp : Hypothesis (G := G)) {L : Subgroup G} (hLmax : L ∈ maximalSubgroups G)
+    (hLI : IsTypeI L) (frob : OddOrder.Peterfalvi.S14.TypeIFrobeniusData L) :
+    ¬ hyp.q ∣ Nat.card ↥(frob.typeI.typeF.H.subgroupOf L) := by
+  -- `L` is type I, while `S`, `T` are type non-I maximal: `L` is conjugate to neither.
+  have hnconjS : ¬ ∃ g : G, MulAut.conj g • L = hyp.S :=
+    not_conj_of_isTypeI_of_isTypeNonI _hG hLI hyp.S_maximal hyp.S_nonI
+  have hnconjT : ¬ ∃ g : G, MulAut.conj g • L = hyp.T :=
+    not_conj_of_isTypeI_of_isTypeNonI _hG hLI hyp.T_maximal hyp.T_nonI
+  -- (8.17.a): `|L_F| ⟂ p q`, hence `q ∤ |L_F|`.
+  have hcop := card_LF_coprime_pq _hG hyp hLmax hLI hnconjS hnconjT
+  have hcopq : Nat.Coprime (Nat.card ↥(maxNilpotentNormalHall L)) hyp.q :=
+    Nat.Coprime.coprime_dvd_right (dvd_mul_left hyp.q hyp.p) hcop
+  have hnotdvd : ¬ hyp.q ∣ Nat.card ↥(maxNilpotentNormalHall L) :=
+    hyp.q_prime.coprime_iff_not_dvd.mp hcopq.symm
+  -- `H = L_F = maxNilpotentNormalHall L`, and `|H.subgroupOf L| = |H|`.
+  have hHeq : frob.typeI.typeF.H = maxNilpotentNormalHall L := frob.typeI.typeF.H_eq
+  have hHleL : frob.typeI.typeF.H ≤ L := by
+    rw [hHeq]; exact OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_le L
+  rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hHleL).toEquiv, hHeq]
+  exact hnotdvd
+
+/-- (13.17.a/b)-strengthening of (12.7): the type-I Frobenius decomposition of `L` can be taken
+with the complement containing `W₁` — Peterfalvi's "let `E` be a complement to `H` in `L` such
+that `W₁ ⊂ E`".  Since `W₁ ≤ N_G(U) ≤ L` is coprime to the kernel (`q ∤ |L_F|`,
+`q_not_dvd_kernel`), Schur–Zassenhaus complement conjugacy
+(`exists_conj_le_of_isComplement'_of_coprime`) places `W₁` in a conjugate `E₀^x` of any complement
+`E₀`, which is again a Frobenius complement (`IsFrobeniusGroup.conjComplement`).  The only `sorry`
+is the coprimality, gated on the opaque `kernel_eq_MF` carrier. -/
+theorem exists_typeIFrobeniusData_W1_le [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hyp : Hypothesis (G := G)) {L : Subgroup G} (hLmax : L ∈ maximalSubgroups G)
+    (hLtypeI : IsTypeI L) (hNUL : Subgroup.normalizer (hyp.U : Set G) ≤ L) :
+    ∃ frob : OddOrder.Peterfalvi.S14.TypeIFrobeniusData L, frob.kernel_eq_MF ∧
+      hyp.W1 ≤ frob.complement.map L.subtype := by
+  obtain ⟨frob₀, hker₀⟩ := OddOrder.Peterfalvi.S14.typeI_frobenius _hG hLmax hLtypeI
+  have hW1L : hyp.W1 ≤ L := hyp.W1_normalizes_U.trans hNUL
+  haveI : (frob₀.typeI.typeF.H.subgroupOf L).Normal := frob₀.frobenius.isNormal
+  -- `L` (maximal) is solvable, hence so is the kernel.
+  haveI hLsolv : IsSolvable ↥L :=
+    _hG.solvable_of_lt_top L (lt_top_iff_ne_top.mpr (mem_maximalSubgroups.mp hLmax).1)
+  haveI : IsSolvable ↥(frob₀.typeI.typeF.H.subgroupOf L) := inferInstance
+  -- coprimality `|W₁| = q` to `|L_F|`.
+  have hcop : Nat.Coprime (Nat.card ↥(hyp.W1.subgroupOf L))
+      (Nat.card ↥(frob₀.typeI.typeF.H.subgroupOf L)) := by
+    have hW1card : Nat.card ↥(hyp.W1.subgroupOf L) = hyp.q := by
+      rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hW1L).toEquiv]
+      exact hyp.q_eq_card_W1.symm
+    rw [hW1card]
+    exact (hyp.q_prime.coprime_iff_not_dvd).mpr (q_not_dvd_kernel _hG hyp hLmax hLtypeI frob₀)
+  -- `W₁` lies in a conjugate `E₀^x` of the complement.
+  obtain ⟨x, hx⟩ := Ch03.exists_conj_le_of_isComplement'_of_coprime
+    inferInstance frob₀.frobenius.isComplement hcop
+  refine ⟨{ frob₀ with
+      complement := frob₀.complement.map (MulAut.conj x).toMonoidHom
+      frobenius := frob₀.frobenius.conjComplement x }, frob₀.kernel_eq_MF_holds, ?_⟩
+  -- `W₁ = (W₁.subgroupOf L).map L.subtype ≤ (E₀^x).map L.subtype`.
+  have : hyp.W1 = (hyp.W1.subgroupOf L).map L.subtype := by
+    rw [Subgroup.map_subgroupOf_eq_of_le hW1L]
+  rw [this]
+  exact Subgroup.map_mono hx
 
 /-- **Peterfalvi (13.17)**: if `S` is type II, a maximal subgroup over `N_G(U)` is type-I
 Frobenius, contains `U` in its kernel, and has the stated complement alternatives (order `p q`,
-containing a conjugate `W₂^y`).  Assembled (`sorry`-free) from the type-I existence (13.17.a/b,
-`exists_typeI_maximal_overNormalizer_U`), the (12.7) Frobenius structure
-`OddOrder.Peterfalvi.S14.typeI_frobenius`, and the complement structure (13.17.c,
+containing a conjugate `W₂^y`).  Assembled from the type-I existence (13.17.a/b,
+`exists_typeI_maximal_overNormalizer_U`), a `W₁`-containing Frobenius decomposition
+(`exists_typeIFrobeniusData_W1_le`), and the complement structure (13.17.c,
 `typeI_overNormalizer_complement`). -/
 theorem typeII_overNormalizer_frobenius [Finite G]
     (_hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
@@ -1244,8 +1717,9 @@ theorem typeII_overNormalizer_frobenius [Finite G]
       data.frobenius.kernel_eq_MF ∧ (hyp.U ≤ data.H) := by
   obtain ⟨L, hLmax, hLtypeI, hNUL, hUH⟩ :=
     exists_typeI_maximal_overNormalizer_U _hG hyp hSTypeII
-  obtain ⟨frob, hker⟩ := OddOrder.Peterfalvi.S14.typeI_frobenius _hG hLmax hLtypeI
-  obtain ⟨hcard, hy⟩ := typeI_overNormalizer_complement _hG hyp hSTypeII hLmax hNUL hUH frob
+  obtain ⟨frob, hker, hW1E⟩ := exists_typeIFrobeniusData_W1_le _hG hyp hLmax hLtypeI hNUL
+  obtain ⟨hcard, hy⟩ :=
+    typeI_overNormalizer_complement _hG hyp hSTypeII hLmax hNUL hUH frob hW1E
   exact ⟨⟨L, maxNilpotentNormalHall L, hLmax, rfl, hNUL, frob, hUH, hcard, hy⟩, hker, hUH⟩
 
 /-- Carrier for the virtual character `beta_j` and `Gamma_j` in (13.18). -/

@@ -62,6 +62,7 @@ import OddOrder.GroupTheory.RepresentationTheory.IdempotentDirectSum
 import OddOrder.GroupTheory.RepresentationTheory.SingerField
 import OddOrder.GroupTheory.RepresentationTheory.SkolemNoether
 import OddOrder.GroupTheory.RepresentationTheory.WielandtCounting
+import OddOrder.GroupTheory.RepresentationTheory.WielandtElabBridge
 import OddOrder.GroupTheory.RepresentationTheory.ZIrr
 import OddOrder.GroupTheory.RepresentationTheory.ZIrrFourier
 import OddOrder.GroupTheory.SCN

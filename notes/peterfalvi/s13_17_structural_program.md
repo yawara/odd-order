@@ -264,18 +264,219 @@ main 取込後 (HUB の issue 2013 解決済) に gate 4 (`typeI_overNormalizer_
 
 | piece | 内容 | infra 状態 |
 |---|---|---|
-| 1 | `L` 非共役 S/T (IsTypeI ⟹ ¬conj) | ⚠ exclusivity **`BG.Ch4.S16.not_isTypeI_of_isTypeNonI` 既存** (FeitThompson:334)。残 = **IsTypeI conj-不変** (~150 行 transfer、`maxNilpotentNormalHall_pointwise_smul` 等で feasible) |
+| 1 | `L` 非共役 S/T (IsTypeI ⟹ ¬conj) | ✅ **DONE (2026-06-20⁵)**: `not_conj_of_isTypeI_of_isTypeNonI` (sorry-free) = `isTypeI_of_conj` (新 infra) + `not_isTypeI_of_isTypeNonI` (既存) |
 | 2 | `Coprime |L_F| (p·q)` | `card_LF_coprime_pq` (B2、sorried producer、cite 可) |
 | 3 | `W₁ ⊓ L_F = ⊥` | piece 2 + |W₁|=q prime、clean (~10 行) |
 | 4 | `L` Frobenius kernel L_F | `S14.typeI_frobenius` ((12.7) `TypeIFrobeniusData`、Frobenius 内蔵) |
 | 5 | `U∩L_F=⊥` ⟹ FPF ⟹ Wielandt ⟹ |L_F|=1 矛盾 ⟹ `U∩L_F≠⊥` | ❌ **最深**: `CoprimeFrobeniusAction (UW₁) (L_F)` 構成 + FPF (`fixedByU=⊥` 等)。coprimality は **L の Frobenius (kernel⊥complement, `coprime_card_kernel_complement`)** から (card_LF_coprime_pq でなく) |
-| 6 | `U∩L_F≠⊥` ⟹ `U⊆C_L(U∩L_F)⊆L_F` | ✅ **landing 済** (下記) |
+| 6 | `U∩L_F≠⊥` ⟹ `U⊆C_L(U∩L_F)⊆L_F` | ✅ **landing 済** (`le_kernel_of_isMulCommutative_of_inf_ne_bot`) |
 
-**✅ piece 6 landing (本セッション)**: `le_kernel_of_isMulCommutative_of_inf_ne_bot` (S15_SAndT, sorry-free,
+**✅ piece 6 landing (2026-06-20⁴)**: `le_kernel_of_isMulCommutative_of_inf_ne_bot` (S15_SAndT, sorry-free,
 汎用 Frobenius 補題、`Ch06` へ hoist 可): Frobenius 群 L (kernel N) で abelian U が N と非自明交差 ⟹ U≤N。
-`IsFrobeniusGroup.centralizer_kernel_le` (既存、kernel 元の centralizer ⊆ kernel) + `is_comm.comm` で u が x∈U∩N を
-中心化 ⟹ U≤C_L(x)≤N。**piece 6 (最終 step) は済**。
 
-**⟹ gate 4 の残**: piece 1 の **IsTypeI 共役不変** (~150 行、reusable、unblocker) + piece 5 の **FPF 作用構成**
-(最深、CoprimeFrobeniusAction + Wielandt 配線)。piece 3/4 は clean glue。U abelian は `tdata.U_commutative` +
-hyp.U~typeP.U 共役 (IsMulCommutative transfer) から。**multi-session だが piece 6 + infra 棚卸しで道筋は確定**。
+## ✅ piece 1 DONE — IsTypeI 共役不変 (2026-06-20⁵, commit `d83d56be`)
+
+「型一意性補題が repo に無い」評価を覆し、Peterfalvi 型分類が **`MulAut G` 不変**であることを正面から形式化。
+
+**新 reusable infra `OddOrder/GroupTheory/MaximalSubgroupTypeConj.lean`** (331 行, axiom-clean, AxiomsCheck 登録):
+- **MulAut-equivariance toolkit** (汎用・再利用可): `card_pointwise_smul`/`pointwise_smul_eq_bot_iff`/
+  `isCyclic_pointwise_smul`/`isMulCommutative_pointwise_smul`/`exponent_pointwise_smul`/
+  `centralizer_pointwise_smul`/`normalizer_pointwise_smul`/`image_sharpSubgroup`/`isTISubset_pointwise_smul`/
+  `isComplement'_map_of_mulEquiv`/`isFrobeniusGroup_map_of_mulEquiv`/`rank_of_mulEquiv`/
+  `opiCoreInG_pointwise_smul` (S07 private `conj_smul_opiCoreInG` を public 再証明)。
+- **型データ transfer**: `TypeFData.conj` (15 field 全 transfer; `map_subgroupMap_subgroupOf` で subgroupOf
+  field [complement/U1_normal/frobenius_HU0] を処理) / `TypeIData.conj` (alternative 3 枝も transfer) /
+  `isTypeI_pointwise_smul` / `isTypeI_of_conj`。TypeFData は `derivedInG` 非依存ゆえ nilpotent transfer 不要。
+
+**gate 4 配線** (`S15_SAndT.lean`):
+- `not_conj_of_isTypeI_of_isTypeNonI` (sorry-free proof; transitively `not_isTypeI_of_isTypeNonI` の §16
+  classification sorry に依存ゆえ axiom-clean ではない=honest upstream gate)。
+- **`typeI_overNormalizer_U_le_fitting` を sorry-free 化**: piece 1 で L~S/L~T 非共役を証明・consume →
+  `card_LF_coprime_pq` cite → 残 FPF を **`typeI_U_le_fitting_of_coprime`** (pieces 4-6 隔離, sorried) に押し出し。
+- 実 sorry 138 不変 (piece 1 = assumed hyp → proven lemma の置換; CLAUDE.md「進捗の測り方」)。
+
+**⟹ gate 4 の残 = piece 5 のみ** (`typeI_U_le_fitting_of_coprime` 本体): FPF 作用構成
+(`CoprimeFrobeniusAction (UW₁) (L_F)` + `wielandt_fixedPoint_frobenius` [sorried §9] 配線 + piece 6 の
+↥L bookkeeping)。piece 3/4 は同 producer 内 clean glue。U abelian は `tdata.U_commutative` +
+hyp.U~typeP.U 共役 (新 infra の IsMulCommutative transfer) から。**最深・multi-session**。
+gate 1/2 は依然 F-ask (hdisj / W₁=κ carrier-faithfulness)。
+
+## ✅ piece 5 の (9.1) FPF engine DONE (2026-06-20⁶, commits `6dd849ed`/`50b8b9fe`)
+
+`typeI_U_le_fitting_of_coprime` の FPF 核心を **reusable engine 化** (`CoprimeAction.lean`, Wielandt sorry のみに
+bottom-out)。原文 (mmd L288) 精読で論法確定: 「W₁∩H=1。U∩H=1 と仮定 → UW₁ が H に FPF 作用 → (9.1)|H|=1 矛盾」。
+
+**新 3 補題** (`CoprimeAction.lean`):
+- `coprimeFrobeniusAction_card_eq_one`: `fixedByE=⊥ ∧ fixedByU=⊥ ⟹ |H|=1` (既存 `wielandt_fixedPoint_trivial_U_fixed`)。
+- `IsFrobeniusGroup.centralizer_inf_kernel_eq_bot_of_not_mem` (**axiom-clean**, AxiomsCheck 登録): Frobenius 核 N の
+  非核元 g∉N は `C_L(g)⊓N=⊥` (`centralizer_kernel_le`)。FPF 作用の engine。
+- **`isFrobenius_kernel_eq_bot_of_frobenius_subgroup`** (generic engine): 有限 Frobenius 群 L (核 N) に
+  N と自明交差する Frobenius 部分群 UE (`U⊓N=E⊓N=⊥`) が coprime 作用 ⟹ **N=⊥**。証明 = mathlib
+  `MulDistribMulAction (normalizer N) N` で φ 構成 (N◁L、作用は共役で rfl 展開) → U/E 非自明元 ∉ N で
+  fixedByU=fixedByE=⊥ → combinator。Wielandt のみ依存。
+
+## ✅✅✅ piece 5 完成 — typeI_U_le_fitting_of_coprime sorry-free (2026-06-20⁷, commit `753e9722`)
+
+S15 application を完遂し `typeI_U_le_fitting_of_coprime` を **sorry-free 化** (実 sorry 138→137)。
+**engine 経由で sorried Wielandt formula のみに bottom-out**。gate 4 の H 構造論 (pieces 1,3,5,6) 完了。
+
+**engine を G-ambient 化** (`CoprimeAction.lean`): `isFrobenius_kernel_eq_bot_of_frobenius_subgroup` を
+「Frobenius 群 Lsub≤G、Frobenius 部分群 UE≤Lsub を自然な ↥(U⊔E)[G] 形で受ける」形に書換 — juggling を
+lifting で engine 内に封入し **caller は basic_structure.UW1_frobenius を直接供給** (subgroupOf transfer 不要、
+当初 crux 視した hUE transfer を回避)。+ reusable coprimality 補題 2 本 (`coprime_card_of_inf_kernel_eq_bot`
+[↥L] / `_le` [G-ambient]): 核と自明交差する部分群は核と coprime (`card_dvd_of_injective`+`coprime_card_kernel_complement`)。
+
+**S15 application** (`typeI_U_le_fitting_of_coprime`):
+1. piece 3 `W₁⊓L_F=⊥` (`_hcop`→`Coprime |L_F| q`→`inf_eq_bot_of_coprime`)。
+2. piece 5 `U⊓L_F≠⊥`: by_contra → engine を L=↥L で適用 (hFrob=typeI_frobenius / hUE=basic_structure 直接 /
+   hcop=`|L_F|⟂|U⊔W₁|`=`|U|·|W₁|` [`IsComplement'.card_mul`] を 2 coprimality+`Nat.Coprime.mul_right` から /
+   hsolv=maxNNH nilpotent) → `L_F=⊥` 矛盾 (frob.frobenius.ne_bot_kernel)。
+3. piece 6 `U≤L_F`: `le_kernel_of_isMulCommutative_of_inf_ne_bot` を ↥L で (U abelian=bdata.U_commutative を
+   `isMulCommutative_of_mulEquiv` で ↥L へ + piece 5) → `U.subgroupOf L≤L_F.subgroupOf L` → map back。
+
+**⟹ gate 4 obligation ① (`exists_typeI_maximal_overNormalizer_U`) の H 構造論は全完了**。残 sorried 依存:
+`card_LF_coprime_pq` (B2, BG Thm E, owner F) / `card_Q_eq`/`tConjugate_fitting_data` (gate 3 B1/B1') /
+gate 1,2 (hdisj/hUhall_cop = F-ask) / Wielandt (§9)。**▶ 次 H = obligation ② `typeI_overNormalizer_complement`
+(13.17.c)**: Frobenius 補元 E⊇W₁ が odd Frobenius complement → Huppert [H] V.8.18 (素数位数正規) →
+E⊆N_G(W₁)⊆QW₂ [(13.16)] → cyclic Sylow [BG 3.9] → E=W₁ or |E|=pq。Huppert V.8.18 は repo 不在=新規 (Phase 3)。
+
+## ✅✅✅ Phase 3 完成 — Huppert [H] V.8.18 b) 完全形式化 (2026-06-20⁸, commit `5a577c10`)
+
+**obligation ② の核 ([H] Kapitel V Satz 8.18 b) = 「奇数位数 Frobenius complement の素数位数部分群は正規」)
+を新規 leaf `OddOrder/Isaacs/Ch06_FrobeniusActions/OddComplement.lean` (395 行) で完全形式化**。
+sorry-free + axiom-clean + AxiomsCheck 登録 (full build 3844 jobs green, 実 sorry 137 不変)。reusable。
+
+作用形式 `IsFrobeniusAction A U` ベース (Frobenius 入力は **order-pq cyclic 1 本のみ**
+=`false_of_frobeniusAction_actorSubgroup_not_isCyclic_card_mul_prime`; 残りは A 内在の Z-群論):
+1. `isZGroup_of_isFrobeniusAction_of_odd`: 奇数位数 ⟹ Z-群 (各 Sylow cyclic、6.10+6.11)。
+   ⟹ mathlib `IsZGroup` で N=commutator A cyclic normal、A/N cyclic、`coprime_commutator_index`。
+2. `centralizes_commutator_of_card_prime_coprime`: r∤|N| の R は N を中心化 (coprime 分解
+   `fixedPoints_inf_actionCommutator_eq_bot_of_abelian` + [N,R]≠⊥ なら R⊔S 位数 rs 非cyclic 矛盾)。
+3. `normal_of_card_prime_of_isFrobeniusAction_of_odd` (+ `_isFrobeniusGroup_` 版 = (13.17.c) consumer 用):
+   R^g≤R を r∣|N| (cyclic N 一意性) / r∤|N| (元論法: k r₀⁻¹=⁅g,r₀⁆∈N、ν^r=1⟹coprime で ν=1) で。
+ローカル複製: `eq_of_card_eq_prime_of_isCyclic` (cyclic 素数位数一意性、BG 版を import 方向回避で複製) +
+card 積補題 2 本 (BG S01/S12_E 複製)。
+
+**▶ 残り = (13.17.c) assembly 本体** (Huppert を cite して |E|=pq ∧ ∃y∈Q W₂^y≤E を出す)。**未完。3 つの
+独立した壁**:
+- **(設計) complement choice 問題**: `typeI_overNormalizer_complement` は**任意の** `frob.complement` を取るが、
+  原文証明は「W₁⊆E なる complement E を選ぶ」。Frobenius complement は全共役ゆえ |E|=[L:H]=pq の card 部分は
+  共役不変だが、**`∃y∈Q W₂^y≤E` 部分は a∈L 共役で y₀↦a·y₀ となり Q 内に戻る保証がない** ⟹ 任意 complement では
+  偽になりうる。解 = (a) 仮説 `W₁.subgroupOf L ≤ frob.complement` を追加 (原文に忠実) + consumer
+  `typeII_overNormalizer_frobenius` で W₁ 含む complement の存在 (W₁ は q-部分群・W₁∩H=1 ⟹ ある complement に入る)
+  を別途供給、or (b) 12.7 `typeI_frobenius` (現 sorried) を W₁ 含む complement を返す形に強化。**(a) 推奨**。
+- **(cite) sorried 依存**: (13.16) `normalizer_W1` (N_G(W₁)=QW₂, S15:727 sorried) / (14.5) (S16, E=W₁ 除外) /
+  BG Prop 3.9 cyclic Sylow (= `S03g_Thm310` 系、要確認)。
+- **(構造) |E|∈{q,pq} 抽出**: E⊆QW₂ + cyclic Sylow + W₁⊆E から |E|=q or pq、第 2 case で Sylow 定理で
+  W₂^y≤E (y∈Q)。pure group theory だが Sylow + coercion (↥L vs G) で中量。
+レシピ: Huppert normality を `normal_of_card_prime_of_isFrobeniusGroup_of_odd` で cite
+(W₁.subgroupOf E が位数 q ⟹ E 内正規 ⟹ E≤N_G(W₁))。
+
+### ✅ Huppert step DONE — `complement_le_QW2` (2026-06-20⁸, commit `6d11c560`)
+
+Huppert を **§13 spine で load-bearing 化**。新定理 `complement_le_QW2` (S15_SAndT, **sorry-free**,
+full build 3820 green): W₁ を含む Frobenius 補元 E について `E.map L.subtype ≤ Q⊔W₂`。
+証明 = 奇数位数 (E≤L≤G, `_hG.odd.of_dvd_nat`) → `Ch06.normal_of_card_prime_of_isFrobeniusGroup_of_odd`
+(W₁ 位数 q が E 内正規) → `normal_subgroupOf_iff_le_normalizer` で E≤N_↥L(W₁) → ↥L→G 持ち上げ
+(`mem_normalizer_iff` 両方向、reverse は ↑e∈L で w∈L 回収) → (13.16) `normalizer_W1` で = Q⊔W₂。
+唯一 sorried 依存 = (13.16) (gated-endpoint、axiom-clean でない=normalizer_W1 の sorry に bottom-out)。
+
+### ✅ ∃y step DONE — `exists_mem_conj_W2_le_of_dvd_card` (2026-06-20⁸, commit `3e44d18f`)
+
+(13.17.c) 結論第 2 連言「∃y∈Q, W₂^y≤E」の reusable 群論コア。**sorry-free, abstract** (S15_SAndT):
+Q⋊W₂ (Q◁ 可解 normal Hall, |W₂|=p prime, p∤|Q|) で E≤Q⊔W₂ ∧ p∣|E| ⟹ ∃y∈Q, W₂^y≤E。
+証明 = Cauchy で位数 p 部分群 P≤E → P は normal complemented Q に coprime →
+**Schur-Zassenhaus 補元共役** (`Ch03.exists_conj_le_of_isComplement'_of_coprime` を ↥(Q⊔W₂) 内適用)
+で P≤W₂^g → card 一致で P=W₂^g → ξ=q'w' 分解 (Q'◁↥K, `normal_mul` の Set 積) で W₂^g=W₂^{q'}。
+pointwise smul = `mem_pointwise_smul_iff_inv_smul_mem` / `pointwise_smul_def`。
+
+**⟹ (13.17.c) の reusable 群論コア 2/2 完成** (`complement_le_QW2` = E⊆QW₂ / 本 = ∃y)。
+残るは |E|=pq 順序論のみ。
+
+### ✅✅✅ (13.17.c) 本体組立 DONE — `typeI_overNormalizer_complement` 実 assembly (2026-06-20⁹, commit `41b3da9e`)
+
+ユーザー裁可「gated でも sorry 含む定理使用可」を受け、(13.17.c) の opaque `:= sorry` を**実 assembly に置換**。
+3 reusable コア配線: `complement_le_QW2` (Huppert→E⊆QW₂) + `exists_mem_conj_W2_le_of_dvd_card`
+(Schur-Zassenhaus→∃y) + order 論。複製論「W₁⊂E なる complement」を `hW1E` 仮説で忠実記録、consumer
+`typeII_overNormalizer_frobenius` は新 `exists_typeIFrobeniusData_W1_le` 経由で供給(signature 変更
+1 consumer のみ、downstream 無破壊)。**typeI_overNormalizer_complement 本体 + consumer は sorry-free**。
+
+gated 内容を faithful named §13 helper 3 本に isolate(全て gated-endpoint、忠実記述):
+- `Q_W2_structure` (S15:1481): W₂≤N(Q) ∧ Q⊓W₂=⊥ ∧ p∤|Q|。要 W₂≤T + p≠q(bare Hypothesis 不在)。
+- `complement_card_eq_pq` (S15:1494): |E|=pq。要 E∩Q=W₁ + (13.19)/(13.2.a) 除外(深い §13 構造)。
+- `exists_typeIFrobeniusData_W1_le` (S15:1539): W₁ 含む complement 存在。要 W₁∩H=1 (card_LF_coprime) + 補元存在。
+IsSolvable Q は派生 (Q=T_F≤T<⊤)。full build 3844 green、実 sorry 137→139(opaque 1→実 assembly+faithful 3 gap)。
+
+**⟹ (13.17.c) は完全 assembly 化。残り = 3 named §13 helper の証明**(順序論が最深、E∩Q=W₁ gate)。
+
+### ✅ existence 実 assembly + `IsFrobeniusGroup.conjComplement` (2026-06-20⁹ cont., commit `7f8ee0da`)
+
+reusable Ch06 補題 **`IsFrobeniusGroup.conjComplement`** (OddComplement.lean, sorry-free, axiom-clean):
+Frobenius 補元の共役 A^g も Frobenius 補元 (正規核 N 固定)。これを使い **`exists_typeIFrobeniusData_W1_le`
+を実 assembly 化** (本体 sorry-free): typeI_frobenius → W₁≤N_G(U)≤L → coprimality → Schur-Zassenhaus
+補元共役 → conjComplement で frob₁ 構成。consumer に hNUL 配線。唯一 gap = `q_not_dvd_kernel` (q∤|kernel|)
+を isolate。これは **opaque `kernel_eq_MF` carrier** (frob.kernel = maxNilpotentNormalHall L の同定が
+Prop field) に gate ⟹ carrier honesty 待ち。
+
+**⟹ (13.17.c) + existence 両方 実 assembly 化完了。残 gap = 3 named faithful §13 helper、全て深い §13
+構造/carrier opacity に gate**: `complement_card_eq_pq` (E∩Q=W₁) / `Q_W2_structure` (W₂≤T+p≠q) /
+`q_not_dvd_kernel` (opaque kernel_eq_MF)。
+
+### ⛔ 旧 order 論メモ = §13 構造 gate と確定 (要追加形式化)
+
+(13.17.c) の残り「|E|∈{q,pq} + ∃y∈Q W₂^y≤E」の crux = **E の q-Sylow が exactly W₁ (位数 q)**。
+これは `E∩Q=W₁` or `[L:L_F]=pq` 等の §13 構造事実を要するが **repo 不在** (grep 確認: S14/S15 に
+complement 位数・[L:L_F]・Q∩L=W₁ の事実なし)。⟹ 順序論は §13 の深い構造形式化 (多くは sorried/未着手)
+に gate。fabricate せず future work。`typeI_overNormalizer_complement` 本体は `complement_le_QW2` を
+cite して order 論を載せる形で完成予定 (consumer `typeII_overNormalizer_frobenius` は W₁⊆E 供給のため
+W₁ 含む complement 存在補題も要)。
+
+### ✅ `Q_W2_structure` 実証明化 (2026-06-20¹⁰, commit `f854532e`, 実 sorry 139→138)
+
+(13.17.c) の ∃y step が消費する `Q_W2_structure` を opaque `:= sorry` から実 assembly へ。3 連言を
+すべて証明し、唯一の gated 入力を `card_Q_eq` (genuine §13 counting residual B1) の cite のみに集約:
+
+- **conjunct 1** (`W₂ ≤ N_G(Q)`): `W₂ ≤ W = S⊓T ≤ T` (`W_eq_join`/`W_eq_inter`) + `Q = T_F ◁ T`
+  (`OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_le_normalizer`) — **完全無条件**。
+- **`p ≠ q`** (新規導出): 巡回群 `W` の素数位数部分群一意性 (`Ch06.eq_of_card_eq_prime_of_isCyclic`、
+  subgroupOf で `↥W` に落として適用) で `W₁ = W₂` を導き `W₁ ⊓ W₂ = 1` (`W1_inf_W2_eq_bot`) と矛盾。
+- **conjunct 3** (`p ∤ |Q|`): `card_Q_eq` で `|Q| = q^p`、`p ∤ q` (distinct primes) から
+  (`Nat.Prime.dvd_of_dvd_pow` + `Nat.prime_dvd_prime_iff_eq`)。
+- **conjunct 2** (`Q ⊓ W₂ = ⊥`): coprimality `|Q| ⟂ p = |W₂|` (`Subgroup.inf_eq_bot_of_coprime`)。
+
+署名不変ゆえ consumer `typeI_overNormalizer_complement` 無破壊。full build 3871 jobs green + AxiomsCheck。
+
+### §13.17 helper 3 本すべて honest 化 (2026-06-20¹⁰〜¹¹)
+
+`Q_W2_structure` + `q_not_dvd_kernel` + `complement_card_eq_pq` の 3 本すべてを opaque sorry から実
+assembly へ (CLAUDE.md「進捗の測り方」+「難所を回避しない」)。各 helper を精査し group-theoretic 内容を
+honest に landing、残 gate を named §13 residual に最小 isolate:
+
+- **`q_not_dvd_kernel`** (q∤|L_F|): ✅ **DONE (commit `1c673bbb`)** — 当初「carrier opacity + 偽 statement で
+  gated」と診断したが、診断した path がそのまま honest 解になった: (1) carrier opacity は誤り
+  (`frob.typeI.typeF.H_eq` が TypeFData 直接フィールド)、(2) statement を `hLmax`/`hLI` で強化すると
+  `not_conj_of_isTypeI_of_isTypeNonI` で S,T 非共役が導出可 → `card_LF_coprime_pq` (B2, F, cite 可) に帰着。
+  consumer `exists_typeIFrobeniusData_W1_le` は hLmax/hLtypeI 既持で無破壊。唯一 gate = `card_LF_coprime_pq`。
+- **`complement_card_eq_pq`** (|E|=pq): ✅ **DONE (commit `a2ae4ec6`)** — ユーザー裁可で index 論証を landing。
+  「E⊆QW₂ ∧ E∩Q=W₁ ∧ E⊄Q ⟹ |E|=pq」を sorry-free 群論で形式化: Q◁QW₂ かつ [QW₂:Q]=|W₂|=p →
+  [E:E∩Q]=Q.relIndex E が p を割り (`relIndex_dvd_index_of_normal` を ↥(QW₂) 内 + `relIndex_subgroupOf`)、
+  E⊄Q で ≠1 ⟹ =p、|E|=|E∩Q|·[E:E∩Q]=q·p (`card_mul_index`+`inf_subgroupOf_left`)。**card_Q_eq 非依存**
+  (|QW₂|=|Q|·p で十分)。genuine §13 residual を `complement_inf_Q_structure` (E∩Q=W₁ ∧ E⊄Q、Pf p.82 +
+  (13.19)/(13.2.a)、`TypeIFrobeniusData` に complement-order 無し＝既存 residual 非帰着) に最小 isolate。
+  実 sorry 137 維持 (削除 1 + residual 1)。
+
+**⟹ §13.17 helper 3 本すべて実 assembly 化完了** (`Q_W2_structure` / `q_not_dvd_kernel` /
+`complement_card_eq_pq`)。(13.17.c)→`typeII_overNormalizer_frobenius`→`exists_LHypothesis` の chain は
+named §13 residual のみに bottom-out: `card_Q_eq` (B1) / `card_LF_coprime_pq` (B2, F) /
+`complement_inf_Q_structure` (新, 深 §13) / gate 1/2 F-ask / `tConjugate_fitting_data` / Wielandt (§9)。
+これらは全て §13 maximal-structure・char theory・carrier ＝ lane-F/B 領域 or 大物。lane-h 群論 frontier は出し尽くした。
+
+さらに上流 **`card_Q_eq` 自体が §13 maximal-structure machinery 全体に gate**: S-side 対応物
+`basic_structure` (`P_order: |P|=p^q`) も `S15_SAndT:245 := sorry`。両 Fitting order とも Pf §13.2 の
+type 分類 + 体構造 (BG §14) に bottom-out = lane-F/B 領域の大物。formal S↔T swap 不可 (Hypothesis 非対称)。
+
+**⟹ lane-h の §13.17 / POLE-2 構造的 frontier は honestly-closable 分を出し尽くした**。残る POLE-2 gate は
+すべて (i) §13 maximal-structure counting (`basic_structure`/`card_Q_eq`、大物・lane-F/B 重複),
+(ii) §9/§11/§13 character theory (`exists_MHypothesis` の Dade/β_M, `U_cyclic_and_Q_elemAbelian` = lane-B),
+(iii) carrier F-ask (`P_inf_U_eq_bot`/`W1_complements_derived`、未追加) に bottom-out。
+**次手は要ユーザー/hub 判断** (大物 §13 structure 着手 / lane-h pivot / F-ask 待ち)。

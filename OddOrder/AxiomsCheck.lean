@@ -6,6 +6,9 @@ Authors: Yawara Ishida
 import Lean
 import OddOrder.Algebra.AlgInt
 import OddOrder.GroupTheory.ChermakDelgado
+import OddOrder.GroupTheory.CoprimeFixedPoints
+import OddOrder.GroupTheory.MinimalInvariantNormal
+import OddOrder.GroupTheory.WielandtAssembly
 import OddOrder.GroupTheory.PiElementDecomposition
 import OddOrder.GroupTheory.RepresentationTheory.CharacterCount
 import OddOrder.GroupTheory.RepresentationTheory.CharacterCompleteness
@@ -31,6 +34,7 @@ import OddOrder.Isaacs.Ch04_Commutators.Main
 import OddOrder.Isaacs.Ch04_Commutators.ForwardFromCh03
 import OddOrder.Isaacs.Ch05_Transfer.Main
 import OddOrder.Isaacs.Ch06_FrobeniusActions.Main
+import OddOrder.Isaacs.Ch06_FrobeniusActions.OddComplement
 import OddOrder.Isaacs.Ch07_ThompsonSubgroup.Main
 import OddOrder.BG.Ch1_Preliminary.S01_Solvable
 import OddOrder.BG.Ch1_Preliminary.S04d_GorThm415
@@ -74,6 +78,7 @@ import OddOrder.BG.Ch3_MaximalSubgroups.S13_PrimeAction
 import OddOrder.BG.Ch3_MaximalSubgroups.S13_PrimeActionTransition
 import OddOrder.BG.Ch3_MaximalSubgroups.S14_Prop142Support
 import OddOrder.BG.Ch4_FamilyOfMaximal.S14_TypePCounting
+import OddOrder.BG.Ch4_FamilyOfMaximal.S15_MF
 import OddOrder.BG.Ch4_FamilyOfMaximal.S16_PairIntersection
 import OddOrder.BG.AppA_PStability
 import OddOrder.BG.AppB_Puig
@@ -329,6 +334,17 @@ disallowed axiom(s):{indentD m!"{bad.toList}"}"
   OddOrder.Isaacs.Ch06.isCyclic_of_comm_two_group_involutions_invert_element
 #assert_only_allowed_axioms
   OddOrder.Isaacs.Ch06.exists_distinct_subgroups_card_two_of_external_involution
+
+-- Ch.6 (Frobenius Actions): Huppert V.8.18 b) — odd Frobenius complement is a Z-group,
+-- its order-`r` subgroups centralize the commutator, and every prime-order subgroup is normal.
+#assert_only_allowed_axioms
+  OddOrder.Isaacs.Ch06.isZGroup_of_isFrobeniusAction_of_odd
+#assert_only_allowed_axioms
+  OddOrder.Isaacs.Ch06.centralizes_commutator_of_card_prime_coprime
+#assert_only_allowed_axioms
+  OddOrder.Isaacs.Ch06.normal_of_card_prime_of_isFrobeniusAction_of_odd
+#assert_only_allowed_axioms
+  OddOrder.Isaacs.Ch06.normal_of_card_prime_of_isFrobeniusGroup_of_odd
 #assert_only_allowed_axioms
   OddOrder.Isaacs.Ch06.false_of_unique_subgroups_card_two_of_external_involution
 -- Lem 6.21 setup: `K = ⟨ C_N(a) | a ≠ 1 ⟩` and its abelian-action invariance.
@@ -3805,6 +3821,50 @@ set_option linter.style.longLine false in
 -- axiom `pLengthOne_commutator_of_zgroupCentralizer`, de-axiomatized (2026-06-10) to a
 -- convention bridge onto `thm36`.
 #assert_only_allowed_axioms OddOrder.BG.Ch3.S10.pLengthOne_commutator_of_zgroupCentralizer
+-- BG Theorem 15.2 (`S15_MF`, issue 8012): if `M_F < M_σ` then `M` is type `P1` with the normal
+-- `q`-subgroup `Q` / minimal chief-factor `Q̄ = Q/Q₀` structure (the §15→§16 keystone, supplying
+-- `Cor 15.3`'s `Q` and `Cor 15.6`'s `K* ⊆ M_F`).  The full wrapper is now sorry-free AND axiom-clean
+-- (2026-06-20): the final semidirect-product gate `hsigmaprime : M_σ' ⊆ Q ⊔ ⁅D, D⁆` was discharged
+-- via `S13.derivedInG_le_sup_of_normal`, and every §14 lemma it cites (`typeP_duality`, the
+-- `_of_inputs` chief-factor helpers, …) is itself axiom-clean.
+#assert_only_allowed_axioms OddOrder.BG.Ch4.S15.mf_ne_msigma_typeP1_structure
+-- BG Theorem 15.2(b) contrapositive (`S15_MF`, issue 8015): `π(M_F) ∩ β(M) = ∅ ⟹ M_F = M_σ`.
+-- The `M_F = M_σ` endgame of Theorem 15.7(a) / the `FittingIsTI` clause of Theorem A(8): once the
+-- rank-theoretic core (`piSet_mf_inf_beta_disjoint_of_not_fittingIsTI`, the sole residual) gives
+-- `π(M_F) ∩ β(M) = ∅`, this lemma delivers `M_F = M_σ` via Theorem 15.2.  Sorry-free + axiom-clean.
+#assert_only_allowed_axioms OddOrder.BG.Ch4.S15.mf_eq_msigma_of_piSet_inf_beta_disjoint
+-- BG Theorem 15.7(a), the `≥ 3` side of the rank dichotomy (`S15_MF`, issue 8015): any prime
+-- `r ∈ π(M_F) ∩ β(M)` has `r_r(M_F) ≥ 3` (via `M_F` Hall ⟹ `r_r(M_F) = r_r(M)`, and `β ⊆ α`).
+-- The proved half of the rank core `piSet_mf_inf_beta_disjoint_of_not_fittingIsTI`; sorry-free +
+-- axiom-clean.
+#assert_only_allowed_axioms OddOrder.BG.Ch4.S15.three_le_pRank_mf_of_mem_beta
+-- BG Proposition 14.2(e) core (`S14_TypePCounting`, issue 8016): in a type-`P` `E`-setup with the
+-- `κ`-Hall `K` playing the `E₁`-role, `K* = C_{M_σ}(K) ⊊ M_σ`.  Proven *non-circularly* (Lemma
+-- 13.13 ⟹ `ℳ(K*) ≠ {M}`, Lemma 13.6 ⟹ `ℳ(Syl_p M_σ) = {M}`), replacing the circular Cor 15.6
+-- route.  Exposed as the 7th conjunct of `typeP_structure`.  Sorry-free + axiom-clean.
+#assert_only_allowed_axioms OddOrder.BG.Ch4.S14.kstar_ne_msigma_aux
+-- BG Corollary 15.3 step (`S14_TypePCounting`, issue 8016): `C_M(M_σ)` is a `κ(M)'`-group.  The
+-- exact statement BG cites at the start of Cor 15.3's proof (mmd L4209).  Sorry-free + axiom-clean.
+#assert_only_allowed_axioms OddOrder.BG.Ch4.S14.centralizer_msigma_isPiSubgroup_kappa_compl
+-- BG Corollary 15.3(a) for `H = M_σ` (`S15_MF`, issue 8016): `C_M(M_σ) = (C_G(M_σ) ⊓ M_σ) ⊔ X`,
+-- `X` cyclic `τ₂`.  The `ha` input that `fitting_decomposition` consumes; assembled from the
+-- `κ'`-group property + Schur–Zassenhaus + Lemma 15.1(c).  Sorry-free + axiom-clean.
+#assert_only_allowed_axioms OddOrder.BG.Ch4.S15.mf_centralizer_msigma_decomp
+-- BG Theorem A(8) `FittingIsTI` (`S15_MF`, issue 8016): `M_F ≠ M_σ ⟹ F(M)` is a `TI`-subgroup.
+-- Now **fully axiom-clean** — the last sorryAx (via `fitting_decomposition`'s cite of the sorried
+-- general Corollary 15.3) is eliminated by routing through `mf_centralizer_msigma_decomp`.
+#assert_only_allowed_axioms OddOrder.BG.Ch4.S15.fitting_isTI_of_mf_ne_msigma
+-- BG Theorem A(8) full form (`S16_MainResults`, issue 8016): `M_F ≠ M_σ ⟹ U = ⊥ ∧ FittingIsTI M ∧
+-- (∃ p prime, |K| = p)`.  All three conjuncts now axiom-clean.
+#assert_only_allowed_axioms OddOrder.BG.Ch4.S16.theoremA8_structure
+-- BG Corollary 15.5 (`S15_MF`, issue 8016): the full Fitting decomposition `F(M) = F(M_σ) × Y`
+-- (`Y` cyclic `τ₂`), `M'' ⊆ F(M)`, `M_F ≤ M'`, etc.  Now **fully axiom-clean** — the H=M_σ cite of
+-- the sorried general Cor 15.3 (the corollary's only sorryAx source) is routed through the
+-- sorry-free `mf_centralizer_msigma_decomp`.
+#assert_only_allowed_axioms OddOrder.BG.Ch4.S15.fitting_decomposition
+-- BG Corollary 15.5(a) (`S15_MF`, issue 8016): `O_{σ(M)'}(F(M))` is cyclic.  Extracted from the
+-- now-clean `fitting_decomposition`; the bridge that the A(8) `FittingIsTI` rank core consumes.
+#assert_only_allowed_axioms OddOrder.BG.Ch4.S15.opiCoreInG_sigmaCompl_fittingInAmbient_isCyclic
 
 /-! ### Forward-axiom islands (historical mechanism; currently empty)
 
@@ -5167,6 +5227,46 @@ Fully unconditional, axiom-clean. -/
 
 #assert_only_allowed_axioms OddOrder.BG.Ch4.S16.theoremA_ungated_conjuncts
 
+/-! **BG Theorem A(5), element form** (`S16_MainResults`, `typeP_centralizer_kappaElement_eq`):
+for a type-`P` `M` with cyclic Hall `κ`-subgroup `K`, the `M`-centralizer of every `k ∈ K#` is
+`K ⊔ K*` (BG's `C_M(k) = K × K*`).  Sharpens Proposition 14.2(b1) (rank-one normalizer) to the
+element-wise centralizer via the order-`p` subgroup of `⟨k⟩` and `C_G(k) ≤ C_G(X) ≤ N_G(X)`.
+Axiom-clean. -/
+
+#assert_only_allowed_axioms OddOrder.BG.Ch4.S16.typeP_centralizer_kappaElement_eq
+
+/-! **BG Theorem A(4)** (`S16_MainResults`, `typeP_hall_inf_centralizer_kappaElement_eq_bot`):
+`C_U(k) = 1` for `k ∈ K#`.  Faithfulness resolution (issue 8017): the conclusion holds for **every**
+`(κ ∪ σ)'`-Hall `U ≤ M`, not just the `K`-invariant complement, because it reduces (via
+`typeP_centralizer_kappaElement_eq`) to the `U`-independent `C_M(k) = K ⊔ K*` plus coprimality of
+`|U|` with `|K ⊔ K*| = |K|·|K*|`.  Axiom-clean. -/
+
+#assert_only_allowed_axioms OddOrder.BG.Ch4.S16.typeP_hall_inf_centralizer_kappaElement_eq_bot
+
+/-! **BG Theorem A(3) decomposition** (`S16_MainResults`, `typeP_maximal_eq_kappaHall_sup_U_sup_Msigma`):
+`M = K U M_σ` for a maximal `M` with Hall `κ`-subgroup `K ≤ M` and Hall `(κ∪σ)'`-subgroup `U ≤ M`.
+Type-F via the `K = ⊥` `SubgroupESetup`; type-P via the `M' = U M_σ`/`M'`-complements-`K` structure
+(`typeP_auxiliary_structure`), pushed from `M` to `G` by `subgroupOf_sup`/`subgroupOf_eq_top`.
+Standalone `sorry`-free form of conjunct 3 of `theoremA_maximal_structure`.  Axiom-clean. -/
+
+#assert_only_allowed_axioms OddOrder.BG.Ch4.S16.typeP_maximal_eq_kappaHall_sup_U_sup_Msigma
+
+/-! **BG Theorem A(7), first clause** (`S16_MainResults`, `derivedDerived_le_fittingInAmbient`):
+`M'' ⊆ F(M)` for any maximal `M`.  No longer `M_F ≠ M_σ`-gated (issue 8012): the `M_F = M_σ` branch
+runs `M'' ≤ M_σ ≤ M_F ≤ F(M)` (`derivedDerived_le_Msigma` + `M_σ` nilpotent), the type-`P₁` branch
+cites Theorem 15.2 (`mf_ne_msigma_typeP1_structure`).  Axiom-clean. -/
+
+#assert_only_allowed_axioms OddOrder.BG.Ch4.S16.derivedDerived_le_fittingInAmbient
+
+/-! **BG Theorem A — faithful monolith** (`S16_MainResults`, `theoremA_maximal_structure_faithful`):
+all 11 conjuncts of BG Theorem A, `sorry`-free.  The faithfulness-corrected counterpart of the
+`sorry` `theoremA_maximal_structure` (adds the explicit `K ≤ M`, `U ≤ M` of the BG setup
+`M = K U M_σ`, making A(3)/A(4)/A(8) provable).  Assembled from `theoremA_ungated_conjuncts`,
+`typeP_maximal_eq_kappaHall_sup_U_sup_Msigma`, `derivedDerived_le_fittingInAmbient`, and
+`theoremA8_structure`.  Axiom-clean. -/
+
+#assert_only_allowed_axioms OddOrder.BG.Ch4.S16.theoremA_maximal_structure_faithful
+
 /-! **BG Proposition 16.1 — type-`P` data construction layer** (`S16_MainResults`): the shared
 `TypePData` core and the type II/III/IV/V "last-mile" bridges feeding
 `proposition_type_classification`'s forward bridges.
@@ -5253,3 +5353,66 @@ Fully unconditional, axiom-clean. -/
 
 #assert_only_allowed_axioms
   OddOrder.GroupTheory.pointwise_mulAut_smul_eq_map
+
+/-! **The Peterfalvi maximal-subgroup type is conjugacy-invariant** (`MaximalSubgroupTypeConj`).
+Every structural datum of `TypeFData`/`TypeIData` transfers along `φ : MulAut G`
+(`TypeFData.conj`, `isTypeI_pointwise_smul`), so conjugate maximal subgroups share their Peterfalvi
+type (`isTypeI_of_conj`).  This is the unconditional, axiom-clean **gate-4 piece 1** infrastructure
+of Peterfalvi (13.17.b).  Its downstream application
+`OddOrder.Peterfalvi.S15.not_conj_of_isTypeI_of_isTypeNonI` (a type-`I` maximal subgroup is
+non-conjugate to the non-I `S`, `T`) has a sorry-free *proof* but transitively cites the still
+sorried §16 type classification `not_isTypeI_of_isTypeNonI`, so it is not registered here. -/
+
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.TypeFData.conj
+
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.isTypeI_of_conj
+
+/-! **Frobenius-kernel fixed-point engine for Peterfalvi (9.1)/(13.17.b)** (`CoprimeAction`).
+In a finite Frobenius group with kernel `N`, a non-kernel element centralizes nothing nontrivial
+in `N` (`IsFrobeniusGroup.centralizer_inf_kernel_eq_bot_of_not_mem`) — the engine of the
+fixed-point-free action that, with Wielandt's formula `wielandt_fixedPoint_frobenius`, forces the
+Fitting kernel `L_F` to be trivial in (13.17.b).  Axiom-clean (the Wielandt corollary
+`coprimeFrobeniusAction_card_eq_one` itself transitively cites the sorried Wielandt formula and is
+not registered here). -/
+
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.IsFrobeniusGroup.centralizer_inf_kernel_eq_bot_of_not_mem
+
+/-! **(9.1) I-5 chief-step multiplicativity of coprime fixed points** (`CoprimeFixedPoints`).
+For a coprime solvable action `φ : L →* MulAut H`, `X ≤ L`, and an `L`-invariant normal `N ◁ H`,
+the fixed points split across the chief step: `|C_H(X)| = |C_H(X) ⊓ N| · |C_{H/N}(X)|`
+(`card_fixedSubgroup_eq_mul`), via the surjectivity of the reduction map onto the quotient fixed
+points (`map_fixedSubgroup_eq_fixedSubgroup_quotient` = Isaacs Cor 3.28).  This is the
+group-theoretic core of the chief-series assembly of Wielandt's formula (issue 2014). -/
+
+#assert_only_allowed_axioms OddOrder.GroupTheory.card_fixedSubgroup_eq_mul
+#assert_only_allowed_axioms OddOrder.GroupTheory.map_fixedSubgroup_eq_fixedSubgroup_quotient
+#assert_only_allowed_axioms OddOrder.GroupTheory.isAInvariant_comp_subtype
+#assert_only_allowed_axioms OddOrder.GroupTheory.fixedSubgroup_restrict_eq
+#assert_only_allowed_axioms OddOrder.GroupTheory.card_fixedSubgroup_restrict
+#assert_only_allowed_axioms OddOrder.GroupTheory.wielandt_card_combine
+#assert_only_allowed_axioms OddOrder.GroupTheory.wielandt_step
+
+/-! **(9.1) existence of an elementary-abelian `L`-invariant normal subgroup**
+(`MinimalInvariantNormal`).  A nontrivial finite solvable `H` with an action `φ : L →* MulAut H`
+has a nontrivial `L`-invariant normal `N ◁ H` that is elementary abelian
+(`exists_aInvariant_normal_isElementaryAbelian`): a minimal such `N` has trivial derived subgroup
+(abelian) and trivial `p`-th powers (exponent `p`), both forced by minimality applied to the
+characteristic subgroups of `↥N` mapped into `H`.  This is the existence input driving the
+chief-series induction of Wielandt's formula (issue 2014). -/
+
+#assert_only_allowed_axioms OddOrder.GroupTheory.exists_aInvariant_normal_isElementaryAbelian
+#assert_only_allowed_axioms OddOrder.GroupTheory.aInvariant_normal_map_of_characteristic
+#assert_only_allowed_axioms OddOrder.GroupTheory.aInvariant_map_subtype_of_restrict
+
+/-! **(9.1) chief-series assembly** (`WielandtAssembly`).  The group-level Wielandt fixed-point
+identity follows from the per-chief-factor identity (`WielandtPerFactor`) by strong induction on
+`|H|` (`wielandt_formula_of_perfactor`): an elementary-abelian `L`-invariant normal subgroup `N`
+splits the problem via `wielandt_step`, with the per-factor identity on `N` and the induction
+hypothesis on `H/N`.  This completes the *group-theoretic* layer of Wielandt's formula; the only
+remaining input is the per-chief-factor identity itself (the representation-theoretic (†), lane-f).
+-/
+
+#assert_only_allowed_axioms OddOrder.GroupTheory.wielandt_formula_of_perfactor

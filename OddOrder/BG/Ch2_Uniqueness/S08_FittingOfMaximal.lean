@@ -1106,7 +1106,11 @@ theorem three_le_rank_center_cFitting_of_isMaxElemAbelianIn [Finite G]
       (Subgroup.subgroupOfEquivOfLe hA0A).symm.injective
   exact hm.trans (hA0_rank_le_sub.trans hsub_rank)
 
-private theorem normalizer_eq_of_normal_of_mem_maximal [Finite G] (hG : IsMinimalSimpleOdd G)
+/-- **Simplicity normalizer fact**: in a minimal simple odd group, the normalizer of a nonidentity
+subgroup `L` that is normal in a maximal subgroup `M` (and contained in `M`) is exactly `M`.  If
+`N_G(L) = G` then `L ⊴ G`, contradicting simplicity (`L ≠ ⊥`, `L ≤ M < ⊤`); else `N_G(L)` lies in a
+maximal, which must be `M` since `M ≤ N_G(L)`. -/
+theorem normalizer_eq_of_normal_of_mem_maximal [Finite G] (hG : IsMinimalSimpleOdd G)
     {M L : Subgroup G} (hM : M ∈ maximalSubgroups G) (hLM : (L.subgroupOf M).Normal)
     (hLne : L ≠ ⊥) (hLleM : L ≤ M) :
     Subgroup.normalizer (L : Set G) = M := by

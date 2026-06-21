@@ -1,0 +1,98 @@
+/-
+Copyright (c) 2026 Yawara Ishida. All rights reserved.
+Released under Apache 2.0 license as described in the file LICENSE.
+Authors: Yawara Ishida
+-/
+import OddOrder.GroupTheory.CoprimeFixedPoints
+import OddOrder.GroupTheory.MinimalInvariantNormal
+
+/-!
+# Peterfalvi (9.1): the chief-series assembly of Wielandt's fixed-point formula
+
+`OddOrder.GroupTheory.WielandtAssembly`: the chief-series induction reducing the group-level
+Wielandt fixed-point identity to the *per-chief-factor* identity.
+
+`WielandtPerFactor L U E` packages the per-chief-factor identity uniformly over all finite groups
+`H` carrying an `L`-action and all elementary-abelian `L`-invariant normal `N ◁ H`:
+`|C_H(UE) ⊓ N|^{|E|} · |N| = |C_H(E) ⊓ N|^{|E|} · |C_H(U) ⊓ N|`.
+
+`wielandt_formula_of_perfactor` proves, by strong induction on `|H|`, that this per-factor identity
+implies the group-level identity
+`|C_H(UE)|^{|E|} · |H| = |C_H(E)|^{|E|} · |C_H(U)|`
+for every coprime solvable action.  The induction peels off an elementary-abelian `L`-invariant
+normal subgroup `N` (`exists_aInvariant_normal_isElementaryAbelian`), feeds the per-factor identity
+on `N` and the induction hypothesis on `H/N` into `wielandt_step`, and recurses.
+
+This isolates the only genuinely representation-theoretic input — the per-chief-factor identity,
+itself the cardinality form of the elementary-abelian dimension identity (⋆)
+`WielandtCounting.finrank_elab_identity` modulo the kernel-fixed-point-free fact (†) — into the
+hypothesis `WielandtPerFactor`, leaving the assembly purely group-theoretic and axiom-clean.
+
+`notes/peterfalvi/s11_wielandt_91_design.md` (assembly piece B), issue 2014.
+-/
+
+namespace OddOrder.GroupTheory
+
+open OddOrder.Isaacs.Ch03 (IsAInvariant)
+
+local notation3 "quotMulAut " hN => OddOrder.Isaacs.Ch04.OddOrder.Isaacs.Ch03.IsAInvariant.quotientMulAutHom hN
+
+/-- The **per-chief-factor Wielandt identity**, uniformly over all finite groups `H` carrying an
+`L`-action and all elementary-abelian `L`-invariant normal subgroups `N ◁ H`.  This is the single
+representation-theoretic input to the chief-series assembly (`wielandt_formula_of_perfactor`); it is
+the cardinality form of the elementary-abelian dimension identity `finrank_elab_identity`. -/
+def WielandtPerFactor (L : Type*) [Group L] (U E : Subgroup L) : Prop :=
+  ∀ (H : Type*) [Group H] [Finite H] (φ : L →* MulAut H) (N : Subgroup H) [N.Normal],
+    IsAInvariant φ N → (∃ p : ℕ, IsElementaryAbelian p ↥N) →
+    Nat.card ↥(fixedSubgroup φ ⊤ ⊓ N) ^ Nat.card ↥E * Nat.card ↥N =
+      Nat.card ↥(fixedSubgroup φ E ⊓ N) ^ Nat.card ↥E * Nat.card ↥(fixedSubgroup φ U ⊓ N)
+
+/-- **Peterfalvi (9.1), the chief-series assembly.**  Given the per-chief-factor identity
+(`hpf : WielandtPerFactor L U E`), the group-level Wielandt fixed-point identity holds for every
+coprime solvable action `φ : L →* MulAut H`:
+`|C_H(UE)|^{|E|} · |H| = |C_H(E)|^{|E|} · |C_H(U)|` (with `C_H(UE) = fixedSubgroup φ ⊤`).
+
+Proved by strong induction on `|H|`: the trivial group is the base case; otherwise an
+elementary-abelian `L`-invariant normal subgroup `N` (`exists_aInvariant_normal_isElementaryAbelian`)
+splits the problem via `wielandt_step`, with the per-factor identity on `N` from `hpf` and the
+induction hypothesis on the smaller quotient `H/N`. -/
+theorem wielandt_formula_of_perfactor.{u} {L : Type*} [Group L] [Finite L] {U E : Subgroup L}
+    (hpf : WielandtPerFactor.{_, u} L U E) :
+    ∀ (H : Type u) [Group H] [Finite H] [IsSolvable H] (φ : L →* MulAut H),
+      Nat.Coprime (Nat.card L) (Nat.card H) →
+      Nat.card ↥(fixedSubgroup φ ⊤) ^ Nat.card ↥E * Nat.card H =
+        Nat.card ↥(fixedSubgroup φ E) ^ Nat.card ↥E * Nat.card ↥(fixedSubgroup φ U) := by
+  suffices key : ∀ n : ℕ, ∀ (H : Type u) [Group H] [Finite H] [IsSolvable H] (φ : L →* MulAut H),
+      Nat.Coprime (Nat.card L) (Nat.card H) → Nat.card H = n →
+      Nat.card ↥(fixedSubgroup φ ⊤) ^ Nat.card ↥E * Nat.card H =
+        Nat.card ↥(fixedSubgroup φ E) ^ Nat.card ↥E * Nat.card ↥(fixedSubgroup φ U) by
+    intro H _ _ _ φ hcop
+    exact key (Nat.card H) H φ hcop rfl
+  intro n
+  induction n using Nat.strong_induction_on with
+  | _ n ih =>
+    intro H _ _ _ φ hcop hcard
+    rcases eq_or_ne (Nat.card H) 1 with h1 | h1
+    · -- Base case: `H` is trivial, so every fixed-point count is `1`.
+      haveI : Subsingleton H := Nat.card_eq_one_iff_unique.mp h1 |>.1
+      have hsub : ∀ K : Subgroup H, Nat.card ↥K = 1 := fun K =>
+        Nat.card_eq_one_iff_unique.mpr ⟨⟨fun a b => Subtype.ext (Subsingleton.elim _ _)⟩, ⟨1⟩⟩
+      simp only [hsub, h1, one_pow, mul_one]
+    · -- Inductive step: peel off an elementary-abelian `L`-invariant normal subgroup `N`.
+      haveI : Nontrivial H :=
+        Finite.one_lt_card_iff_nontrivial.mp (by have := Nat.card_pos (α := H); omega)
+      obtain ⟨N, p, _, hN_ne, hN_normal, hN_inv, hN_elab⟩ :=
+        exists_aInvariant_normal_isElementaryAbelian (φ := φ)
+      haveI : N.Normal := hN_normal
+      -- Coprimality and the quotient action descend to `H / N`.
+      have hcopN : Nat.Coprime (Nat.card L) (Nat.card (H ⧸ N)) :=
+        hcop.coprime_dvd_right (Subgroup.card_dvd_of_surjective _ (QuotientGroup.mk'_surjective N))
+      have hlt : Nat.card (H ⧸ N) < n := by
+        rw [← hcard]; exact Subgroup.card_quotient_lt_of_ne_bot hN_ne
+      -- Induction hypothesis on the quotient.
+      have hIH := ih (Nat.card (H ⧸ N)) hlt (H ⧸ N) (quotMulAut hN_inv) hcopN rfl
+      -- Per-factor identity on the elementary-abelian `N`.
+      have hfac := hpf H φ N hN_inv ⟨p, hN_elab⟩
+      exact wielandt_step hN_inv hcop hfac hIH
+
+end OddOrder.GroupTheory

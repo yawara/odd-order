@@ -484,3 +484,120 @@ still sorried, needs I-1 wall) but is genuine on-path progress (I-5 application 
 
 (9.1) is consumed by (9.3) → §11, which is Lane-B character-API-gated and far downstream;
 finishing (9.1) closes the local `CoprimeAction.lean` sorry but unblocks nothing now.
+
+## 2026-06-21 (lane-h pickup) — (9.1) は |P|=p^q の deepest pole と判明、lane-h が完成を driving
+
+ユーザーが lane-h を **§14 体構造 |P|=p^q** に向けた (lane-h POLE-2 frontier が cross-lane gate で
+exhausted → 選択肢「§14 体構造に着手」を採択)。その honest path を辿ると **|P|=p^q ⟹ Pf (9.1) Wielandt**
+に bottom-out する (チェーン全体の deepest pole):
+
+```
+Pf (13.2.b) |P|=p^q  ← (10.11)[II]+(11.7)[III] ← (9.3)|H|=|W₂|^q + (9.6) ← (9.1) Wielandt
+```
+
+- (13.2.b) `basic_structure.P_order`/`card_Q_eq` (S15, sorry) ← (10.11) `theorem88_caseB_prime_orders`
+  は **primality のみ証明済**で |H|=p^q 部分は別 (S12) / (11.7) `H_elementaryAbelian` (S13, sorry)。
+- (9.3) `typeII_III_IV_order_relations` (S11, sorry): Type II で C_H(U)=1 [(8.6.b)/(8.12.b)] +
+  **|H|=|C_H(W₁)|^q [(9.1)]** = |W₂|^q。⟹ (9.1) cor (ii) (`wielandt_fixedPoint_trivial_U_fixed`) が core。
+
+**∴ lane-h は本 design の (9.1) 完成を pickup** (lane-f は §16/§14 に pivot して parked; ファイルは
+lane-f 現 frontier と disjoint, 衝突低)。issue 2014。**進め方** (CLAUDE.md「難所を回避しない」+ lane 領域):
+1. **group-theoretic 層を先に** (lane-h strength, (†) と decouple):
+   - el-ab card↔dim bridge `Fintype.card ↥(C_V(X)) = p^finrank invariants`
+     (`Module.card_eq_pow_finrank`: `Fintype.card V = Fintype.card K ^ finrank K V`, K=ZMod p)。
+   - **I-5 chief-series multiplicativity** `|C_H(X)| = ∏_i |C_{V_i}(X)|`
+     (`ChiefFactor.chiefSeriesInside`/`_exists_eq_bot` + Isaacs Cor 3.28
+     `coprime_fixedPoints_quotient`, telescoping over the L-invariant chief series)。
+   - assembly skeleton: per-factor (⋆) `finrank_elab_identity` を p_i-power して掛け、群 (9.1) に。
+     ⟹ `wielandt_fixedPoint_frobenius` を **(†)-per-chief-factor の named residual modulo** で証明。
+2. **(†) module wiring** (resume⁵ NEXT items 0-3, lane-f coupled rep-theory) を最後に discharge
+   (done engine 群を carrier に wire; lane-f 知見と要調整)。
+
+⚠ resume⁵ NEXT (items 0-5) が依然ロードマップ; 上記 1 = items 4-5 を group 層から先取りして (†) を
+clean に isolate する順序。実 sorry は assembly 完了まで不変 (`wielandt_fixedPoint_frobenius` 1 本)。
+
+## 2026-06-21 (lane-h resume²) — chief-step fixed-point multiplicativity toolkit DONE
+
+新 leaf `OddOrder/GroupTheory/CoprimeFixedPoints.lean` (sorry-free + axiom-clean, AxiomsCheck 5 本,
+full build 3873 green)。assembly 帰納の群論的核を両側そろえた:
+
+- **`card_fixedSubgroup_eq_mul`** (商側, chief step `1→N→H→H/N→1`): coprime+solvable 作用
+  `φ:L→*MulAut H`, `X≤L`, L-不変正規 `N◁H` で `|C_H(X)| = |C_H(X)⊓N| · |C_{H/N}(X)|`。
+  核 = reduction map `C_H(X)→*H/N` の image=`C_{H/N}(X)` (`map_fixedSubgroup_eq_fixedSubgroup_quotient`
+  = Isaacs Cor 3.28 `OddOrder.Isaacs.Ch04.coprime_fixedPoints_quotient`), kernel=`C_H(X)⊓N`
+  (Lagrange + Noether 第一同型)。`C_{H/N}(X)` の誘導商作用 = `IsAInvariant.quotientMulAutHom`。
+- **`fixedSubgroup_restrict_eq` / `card_fixedSubgroup_restrict`** (部分群側): L-不変部分群 `N≤H` への
+  制限作用 `hN.restrict:L→*MulAut ↥N` (既存 Ch03 `IsAInvariant.restrict`) で
+  `fixedSubgroup hN.restrict X = (fixedSubgroup φ X).subgroupOf N` ⟹ `|C_N(X)| = |C_H(X)⊓N|`。
+- helper `isAInvariant_comp_subtype` (A-inv の `X≤L` 制限)。
+
+⚠ **naming wart**: 誘導商作用の実名は `OddOrder.Isaacs.Ch04.OddOrder.Isaacs.Ch03.IsAInvariant.quotientMulAutHom`
+(Ch04 Main が `namespace Ch04` 内で Ch03 修飾名 `def` ⟹ Ch04 prefix; dot 不可)。一方 `restrict`/
+`restrict_apply_val` は Ch03 で正しく宣言され dot OK。clean 化は source の `_root_.` 修飾 = spine 全
+rebuild ゆえ別 issue で coordinate (lane-f 領域)。
+
+### 残り group-theoretic assembly (次 pickup, この順)
+
+**A. 最小 L-不変正規 el-ab 存在** (gating, 再利用可・cor (i) も unblock): 非自明有限可解 `H` + L-作用で
+   ∃ 非自明 L-不変正規 el-ab `N◁H`。route = (i) `{N:Subgroup H | N≠⊥ ∧ N.Normal ∧ IsAInvariant φ N}`
+   は ⊤ を含む非空有限 poset ⟹ 極小元 `N` (mathlib `Finite.exists_min`/well-founded); (ii) N el-ab:
+   `⁅N,N⁆` と p-torsion が N の char ⟹ L-不変正規 (helper 要: `IsAInvariant φ ⁅N,N⁆` を
+   `IsAInvariant φ N` から — `(φ l)` が ⁅N,N⁆ を保つ; 既存 `IsAInvariant.commutator_self` は全体群版,
+   部分群版を書く) ⟹ 極小性で `⁅N,N⁆=⊥` (N abel) + p-torsion=N (exponent p) ⟹ el-ab。
+   別 route (極小元回避): 最終非自明 derived `H^(n)` = char abel 非自明 → その p-torsion = char el-ab。
+
+**B. 強帰納 `wielandt_group_formula_of_perfactor`** (`Nat.card H` 上): 非自明なら A で `N` を取り、
+   per-factor 恒等式を `N` に (C 経由)、IH を `H/N` (quotientMulAutHom 作用) に適用、
+   `card_fixedSubgroup_eq_mul` ×3 (X=⊤/E/U) + `|H|=|N|·|H/N|` で combine。combine 算術 (検算済,
+   clean): per-factor `a_⊤^e·|N|=a_E^e·a_U` × IH `b_⊤^e·|H/N|=b_E^e·b_U` ⟹
+   `(a_⊤b_⊤)^e·|H| = (a_Eb_E)^e·(a_Ub_U)`, ここで `|C_H(X)|=a_X·b_X` (multiplicativity), e=|E|。
+   base `H=1` 自明。**per-factor を hypothesis 化して (†) を isolate**。
+
+**C. per-factor 恒等式の discharge**: `card_fixedSubgroup_restrict` (a_X=|C_N(X)|) +
+   `card_fixedSubgroup_wielandt_of_dim` (el-ab N の作用 hN.restrict, modulo (†) dim 恒等式 hdim)。
+   hdim = `WielandtCounting.finrank_elab_identity` (modulo (†))。
+
+**D. (†) module wiring** (lane-f coupled rep-theory, resume⁵ NEXT 0-3): hdim を done engine 群から。
+
+**E. architecture relocation**: 最終 `wielandt_fixedPoint_frobenius` は `CoprimeAction.lean` (statement+
+   carrier `CoprimeFrobeniusAction`+3 corollary) にあるが、real proof は `WielandtElabBridge`
+   (CoprimeAction の下流) を要す ⟹ statement+carrier を downstream leaf へ再配置 + 消費側 S11/S15 の
+   import 更新が要る (CoprimeAction は CoprimeFixedPoints を import 不可=循環)。B+C は CoprimeFixedPoints
+   下流の新 leaf に置き、E でそこへ wielandt_fixedPoint_frobenius を移す。
+
+## 2026-06-21 (lane-h resume²cont) — 群論層 完全完成 (toolkit + A + step + assembly)
+
+**✅✅✅✅✅ (9.1) chief-series assembly の群論的層が全 axiom-clean で完成** (5 leaf-lemma, full build
+3875 green, AxiomsCheck 全登録)。`wielandt_fixedPoint_frobenius` は群論的に完全還元され、残りは
+表現論的 (†) のみ:
+
+| lemma | file | 内容 |
+|---|---|---|
+| `card_fixedSubgroup_eq_mul` | CoprimeFixedPoints | `\|C_H(X)\|=\|C_H(X)⊓N\|·\|C_{H/N}(X)\|` (商側, Cor 3.28) |
+| `card_fixedSubgroup_restrict` | CoprimeFixedPoints | `\|C_N(X)\|=\|C_H(X)⊓N\|` (部分群側, `IsAInvariant.restrict`) |
+| `wielandt_step` | CoprimeFixedPoints | per-factor + IH ⟹ 群レベル恒等式 (1 chief step) |
+| `exists_aInvariant_normal_isElementaryAbelian` | MinimalInvariantNormal | A: 非自明可解 H に el-ab L-不変正規 N◁H 存在 |
+| `wielandt_formula_of_perfactor` | WielandtAssembly | B: `WielandtPerFactor L U E` ⟹ 群公式 (`Nat.card H` 強帰納) |
+
+**還元の鎖**: 群公式 ⟸ `WielandtPerFactor L U E` (B, axiom-clean) ⟸ universal per-factor 恒等式 (C,
+未) ⟸ (†) per el-ab chief factor (D=lane-f rep-theory)。
+
+### 残り (この順)
+
+**C. per-factor discharge** (`WielandtPerFactor L U E` を提供): 各 el-ab N で
+`card_fixedSubgroup_wielandt_of_dim` (WielandtElabBridge, V=↥N, φ=hN.restrict, module =
+`IsElementaryAbelian.zmodModule`) + `card_fixedSubgroup_restrict` (3×, `\|fixedSubgroup hN.restrict X\|
+=\|C_H(X)⊓N\|`) を合成 ⟹ per-factor 恒等式。dim 恒等式 `hdim` (= `finrank_elab_identity` modulo (†)) を
+universal hypothesis 化すれば C も axiom-clean (gate=(†))。**新 leaf は WielandtElabBridge + WielandtAssembly
+を import** (両者 independent branch, 循環なし)。fiddly 点 = `elabRepresentation (hN.restrict)` の
+invariants と `fixedSubgroup hN.restrict` の card 整合 + module instance 配線。
+
+**D. (†) module wiring** (lane-f coupled rep-theory, resume⁵ NEXT 0-3): `hdim`/`htag` を done engine 群
+(centerProj isotypic + free-orbit + base change) から discharge。
+
+**E. relocation**: `wielandt_fixedPoint_frobenius` (CoprimeAction.lean:160) を C を import する downstream
+leaf へ移し、`wielandt_formula_of_perfactor` + C で sorry-free 化。statement+carrier `CoprimeFrobeniusAction`
++3 corollary を移動、消費側 S11/S15 の import 更新 (CoprimeAction は CoprimeFixedPoints 等を循環で import 不可)。
+
+⚠ universe: B は型可変強帰納ゆえ `theorem ….{u}` + `WielandtPerFactor.{_, u}` + `∀ (H : Type u)` で
+H 宇宙を統一 (`∀ (H : Type _)` だと fresh 宇宙で `hpf H` が mismatch)。C も同様の注意要。

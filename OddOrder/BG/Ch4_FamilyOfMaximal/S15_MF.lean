@@ -2487,6 +2487,143 @@ theorem mf_hall_centralizer_control [Finite G] (hG : OddOrder.BG.IsMinimalSimple
       ∃ n ∈ Subgroup.normalizer (H : Set G), y = n * x * n⁻¹) := by
   sorry
 
+/-- **BG Corollary 15.3(a) for `H = M_σ`** (mmd L4204-4209), *sorry-free*.  The centralizer
+`C_M(M_σ)` decomposes as `(C_G(M_σ) ⊓ M_σ) ⊔ X` with `X` a cyclic `τ₂(M)`-subgroup.
+
+This is exactly the `ha` input that `fitting_decomposition` (Corollary 15.5) consumes at
+`H = M_σ`; using it in place of the (sorried, general) `mf_hall_centralizer_control` makes the
+A(8) `FittingIsTI` chain axiom-clean (issue 8016).
+
+Proof (BG L4209).  `C := C_M(M_σ)` is a `κ(M)'`-group
+(`centralizer_msigma_isPiSubgroup_kappa_compl`, = Prop 14.2(b1)(e)).  Its normal Hall
+`σ`-subgroup `N = M_σ ⊓ C` has a complement `X` by Schur–Zassenhaus: `[C : N] = M_σ.relIndex C`
+divides `[M : M_σ]` (`relIndex_subgroupOf` + `relIndex_dvd_index_of_normal`, a `σ'`-number),
+coprime to `|N| ∣ |M_σ|`.  Then `C = N ⊔ X` and `X` is a `(κ∪σ)'`-group (`|X| = [C:N]` is
+`σ'`, and `X ≤ C` is `κ'`).  As `X ≤ M`, Hall's theorem (`hall_D`) embeds it in a Hall
+`(κ∪σ)'`-subgroup `U` of `M`; `X` centralizes `M_σ` (so `C_{M_σ}(X) = M_σ ≠ 1`), and Lemma
+15.1(c) (`typeP_hall_small_subgroup_cyclic_tau2`) makes `X` cyclic `τ₂`. -/
+theorem mf_centralizer_msigma_decomp [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    {M : Subgroup G} (hM : M ∈ maximalSubgroups G) :
+    ∃ X : Subgroup G, IsCyclic ↥X ∧ (↑(Nat.card ↥X).primeFactors ⊆ tau2 M) ∧
+      Subgroup.centralizer (OddOrder.BG.Ch3.S10.Msigma M : Set G) ⊓ M =
+        (Subgroup.centralizer (OddOrder.BG.Ch3.S10.Msigma M : Set G) ⊓
+          OddOrder.BG.Ch3.S10.Msigma M) ⊔ X := by
+  classical
+  haveI : IsSolvable ↥M := hG.solvable_of_mem_maximalSubgroups hM
+  set Mσ := OddOrder.BG.Ch3.S10.Msigma M with hMσdef
+  set C : Subgroup G := Subgroup.centralizer (Mσ : Set G) ⊓ M with hCdef
+  have hC_le_M : C ≤ M := inf_le_right
+  have hC_le_cent : C ≤ Subgroup.centralizer (Mσ : Set G) := inf_le_left
+  -- `M ≤ N_G(M_σ)`, so `C ≤ N_G(M_σ)`, hence `N := M_σ.subgroupOf C ⊴ C`.
+  have hM_norm_Mσ : M ≤ Subgroup.normalizer (Mσ : Set G) := by
+    rw [hMσdef, OddOrder.BG.Ch3.S10.Msigma]
+    exact le_normalizer_opiCoreInG (OddOrder.BG.Ch3.S10.sigma M) M
+  have hMσinfC_le_C : Mσ ⊓ C ≤ C := inf_le_right
+  have hC_norm_MσinfC : C ≤ Subgroup.normalizer ((Mσ ⊓ C : Subgroup G) : Set G) := by
+    have h1 : C ≤ Subgroup.normalizer (Mσ : Set G) := hC_le_M.trans hM_norm_Mσ
+    exact (le_inf h1 Subgroup.le_normalizer).trans Subgroup.inf_normalizer_le_normalizer_inf
+  haveI hN_normal : ((Mσ ⊓ C).subgroupOf C).Normal :=
+    (Subgroup.normal_subgroupOf_iff_le_normalizer hMσinfC_le_C).mpr hC_norm_MσinfC
+  set N : Subgroup ↥C := (Mσ ⊓ C).subgroupOf C with hNdef
+  have hN_eq_Mσ : N = Mσ.subgroupOf C := by rw [hNdef, Subgroup.inf_subgroupOf_right]
+  -- `|N| = |M_σ ⊓ C|` (a `σ`-number).
+  have hNcard : Nat.card ↥N = Nat.card ↥(Mσ ⊓ C : Subgroup G) :=
+    Nat.card_congr (Subgroup.subgroupOfEquivOfLe hMσinfC_le_C).toEquiv
+  have hN_pi : ∀ p ∈ (Nat.card ↥N).primeFactors, p ∈ OddOrder.BG.Ch3.S10.sigma M := by
+    intro p hp
+    rw [hNcard] at hp
+    exact OddOrder.BG.Ch3.S10.Msigma_isPiGroup M p
+      (Nat.primeFactors_mono (Subgroup.card_dvd_of_le (inf_le_left : Mσ ⊓ C ≤ Mσ))
+        Nat.card_pos.ne' hp)
+  -- `N.index = M_σ.relIndex C ∣ (M_σ.subgroupOf M).index`, a `σ'`-number.
+  haveI hMσM_normal : ((Mσ).subgroupOf M).Normal := by
+    rw [hMσdef, OddOrder.BG.Ch3.S10.Msigma_subgroupOf]; infer_instance
+  have hNindex_dvd : N.index ∣ (Mσ.subgroupOf M).index := by
+    have hNi : N.index = Mσ.relIndex C := by rw [hN_eq_Mσ]; rfl
+    rw [hNi, ← Subgroup.relIndex_subgroupOf hC_le_M]
+    exact Subgroup.relIndex_dvd_index_of_normal (Mσ.subgroupOf M) (C.subgroupOf M)
+  have hMσM_hall : Ch03.IsHallSubgroup (OddOrder.BG.Ch3.S10.sigma M) (Mσ.subgroupOf M) :=
+    OddOrder.BG.Ch3.S10.Msigma_subgroupOf_isHall hG hM
+  have hNindex_pi' : ∀ p ∈ N.index.primeFactors, p ∉ OddOrder.BG.Ch3.S10.sigma M := by
+    intro p hp
+    exact hMσM_hall.index_no_pi p (Nat.mem_primeFactors.mpr
+      ⟨Nat.prime_of_mem_primeFactors hp,
+        (Nat.dvd_of_mem_primeFactors hp).trans hNindex_dvd, Subgroup.index_ne_zero_of_finite⟩)
+  -- Coprimality for Schur–Zassenhaus.
+  have hcop : Nat.Coprime (Nat.card ↥N) N.index :=
+    Ch03.Nat.coprime_of_isPiGroup_of_isPiGroup_compl
+      (π := OddOrder.BG.Ch3.S10.sigma M) Nat.card_pos.ne' Subgroup.index_ne_zero_of_finite
+      hN_pi hNindex_pi'
+  -- Schur–Zassenhaus: complement `H''` of `N` in `↥C`; `X := H''.map C.subtype`.
+  obtain ⟨H'', hH''⟩ := Subgroup.exists_right_complement'_of_coprime hcop
+  set X : Subgroup G := H''.map C.subtype with hXdef
+  have hX_le_C : X ≤ C := hXdef ▸ Subgroup.map_subtype_le H''
+  have hX_le_M : X ≤ M := hX_le_C.trans hC_le_M
+  -- `C = (M_σ ⊓ C) ⊔ X`.
+  have hCeq0 : Mσ ⊓ C ⊔ X = C := by
+    have htop : N ⊔ H'' = ⊤ := hH''.sup_eq_top
+    have hmap := congrArg (Subgroup.map C.subtype) htop
+    rw [Subgroup.map_sup, hNdef, Subgroup.subgroupOf_map_subtype, inf_eq_left.mpr hMσinfC_le_C,
+      ← hXdef] at hmap
+    rw [hmap, ← Subgroup.subgroupOf_self C, Subgroup.subgroupOf_map_subtype, inf_idem]
+  -- `|X| = N.index` (complement card).
+  have hXcard : Nat.card ↥X = N.index := by
+    rw [hXdef, ← Nat.card_congr
+        (Subgroup.equivMapOfInjective H'' C.subtype C.subtype_injective).toEquiv,
+      (hH''.symm).index_eq_card]
+  -- `X` is a `(κ ∪ σ)'`-group:  `κ'` (from `X ≤ C`) and `σ'` (from `|X| = N.index`).
+  have hX_pi : ∀ p ∈ (Nat.card ↥X).primeFactors, p ∈ (S14.kappa M ∪ OddOrder.BG.Ch3.S10.sigma M)ᶜ := by
+    intro p hp
+    rw [Set.mem_compl_iff, Set.mem_union]
+    push_neg
+    refine ⟨?_, ?_⟩
+    · -- `p ∉ κ(M)`: `X ≤ C`, and `C` is a `κ'`-group.
+      have hpC : p ∈ (Nat.card ↥C).primeFactors :=
+        Nat.primeFactors_mono (Subgroup.card_dvd_of_le hX_le_C) Nat.card_pos.ne' hp
+      have := centralizer_msigma_isPiSubgroup_kappa_compl hG hM
+      exact (Set.mem_compl_iff _ _).mp (this p hpC)
+    · -- `p ∉ σ(M)`: `|X| = N.index`, a `σ'`-number.
+      rw [hXcard] at hp; exact hNindex_pi' p hp
+  -- A Hall `(κ ∪ σ)'`-subgroup `U` of `M` containing `X` (Hall D).
+  have hX_pi_M : ∀ p ∈ (Nat.card ↥(X.subgroupOf M)).primeFactors,
+      p ∈ (S14.kappa M ∪ OddOrder.BG.Ch3.S10.sigma M)ᶜ := by
+    intro p hp
+    exact hX_pi p (by rwa [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hX_le_M).toEquiv] at hp)
+  obtain ⟨U₀, hU₀hall, hXU₀⟩ := Ch03.hall_D (G := ↥M) hX_pi_M
+  set U : Subgroup G := U₀.map M.subtype with hUdef
+  have hUof : U.subgroupOf M = U₀ :=
+    Subgroup.comap_map_eq_self_of_injective M.subtype_injective U₀
+  have hUM : U ≤ M := hUdef ▸ Subgroup.map_subtype_le U₀
+  have hUhall : Ch03.IsHallSubgroup ((S14.kappa M ∪ OddOrder.BG.Ch3.S10.sigma M)ᶜ)
+      (U.subgroupOf M) := by rw [hUof]; exact hU₀hall
+  have hXU : X ≤ U := by
+    have h1 : X.subgroupOf M ≤ U.subgroupOf M := by rw [hUof]; exact hXU₀
+    calc X = (X.subgroupOf M).map M.subtype := (Subgroup.map_subgroupOf_eq_of_le hX_le_M).symm
+      _ ≤ (U.subgroupOf M).map M.subtype := Subgroup.map_mono h1
+      _ = U := Subgroup.map_subgroupOf_eq_of_le hUM
+  -- `X` centralizes `M_σ`, so `C_{M_σ}(X) = M_σ ≠ 1`.
+  have hX_cent : X ≤ Subgroup.centralizer (Mσ : Set G) := hX_le_C.trans hC_le_cent
+  have hMσinfCX : Mσ ⊓ Subgroup.centralizer (X : Set G) = Mσ := by
+    rw [inf_eq_left]; exact Subgroup.le_centralizer_iff.mp hX_cent
+  have hMσne : Mσ ≠ ⊥ := hMσdef ▸ OddOrder.BG.Ch3.S10.Msigma_ne_bot hG hM
+  have hCXne : Mσ ⊓ Subgroup.centralizer (X : Set G) ≠ ⊥ := by rw [hMσinfCX]; exact hMσne
+  -- Conclude.
+  refine ⟨X, ?_, ?_, ?_⟩
+  · -- `X` cyclic.
+    by_cases hXbot : X = ⊥
+    · rw [hXbot]; infer_instance
+    · exact (typeP_hall_small_subgroup_cyclic_tau2 hG hM hUM hUhall hXU hXbot hCXne).2.1
+  · -- `π(X) ⊆ τ₂`.
+    by_cases hXbot : X = ⊥
+    · rw [hXbot]; simp
+    · exact (typeP_hall_small_subgroup_cyclic_tau2 hG hM hUM hUhall hXU hXbot hCXne).2.2
+  · -- `C_G(M_σ) ⊓ M = (C_G(M_σ) ⊓ M_σ) ⊔ X`.
+    have hMσinfC_eq : Mσ ⊓ C = Subgroup.centralizer (Mσ : Set G) ⊓ Mσ := by
+      rw [hCdef, inf_comm (Subgroup.centralizer (Mσ : Set G)) M, ← inf_assoc,
+        inf_eq_left.mpr (OddOrder.BG.Ch3.S10.Msigma_le M), inf_comm]
+    rw [hMσinfC_eq] at hCeq0
+    exact hCeq0.symm
+
 /-- **General helper (§14-independent, reusable).**  A nonidentity maximal subgroup of a minimal
 simple group is self-normalizing: `N_G(M) = M`.  If `M ⊊ N_G(M)`, maximality forces `N_G(M) = G`,
 so `M ⊴ G`; simplicity then gives `M = ⊥` or `M = ⊤`, both excluded.  This is the step of BG
@@ -6476,12 +6613,19 @@ theorem mf_ne_msigma_typeP1_structure [Finite G]
     have h2 : ((⁅(⟨x, hxQ⟩ : ↥Q), (⟨y, hyQ⟩ : ↥Q)⁆ : ↥Q) : G) = ⁅x, y⁆ := by
       push_cast [commutatorElement_def]; rfl
     rwa [h2] at h1
-  -- `M_σ' ⊆ Q ⊔ ⁅D, D⁆`: the derived subgroup of the semidirect `M_σ = Q ⋊ D` (`Q` normal).
-  -- The single remaining gate of the Theorem 15.2 wrapper: `Q ⊔ ⁅D,D⁆ ⊴ M_σ` and the quotient
-  -- `M_σ/(Q ⊔ ⁅D,D⁆)` is abelian (generated by the image of `D`, with `D'` killed), so
-  -- `⁅M_σ, M_σ⁆ ≤ Q ⊔ ⁅D,D⁆`.  (Commutator sup-distribution is unavailable; needs the
-  -- normal-target / quotient argument.)
-  have hsigmaprime : derivedInG (OddOrder.BG.Ch3.S10.Msigma M) ≤ Q ⊔ ⁅D, D⁆ := by sorry
+  -- `M_σ' ⊆ Q ⊔ ⁅D, D⁆`: the derived subgroup of the semidirect `M_σ = Q ⋊ D` (`Q` normal,
+  -- `D` complement).  `derivedInG_le_sup_of_normal` (S13) is exactly this normal-target argument:
+  -- modulo the normal `Q` the quotient `M_σ/Q` is the image of `D`, so its derived subgroup is the
+  -- image of `D' = ⁅D, D⁆`, and pulling back gives `M_σ' ⊆ Q ⊔ ⁅D, D⁆`.  (The `M_σ = QD`
+  -- decomposition `Q ⊔ D = M_σ` is read off the complement `hcomplD.sup_eq_top`.)
+  have hsigmaprime : derivedInG (OddOrder.BG.Ch3.S10.Msigma M) ≤ Q ⊔ ⁅D, D⁆ := by
+    have hsup : Q ⊔ D = OddOrder.BG.Ch3.S10.Msigma M := by
+      have h := congrArg (Subgroup.map (OddOrder.BG.Ch3.S10.Msigma M).subtype) hcomplD.sup_eq_top
+      rwa [Subgroup.map_sup, Subgroup.subgroupOf_map_subtype, Subgroup.subgroupOf_map_subtype,
+        inf_eq_left.mpr hQMσ, inf_eq_left.mpr hDMσ, ← MonoidHom.range_eq_map,
+        Subgroup.range_subtype] at h
+    have hle := OddOrder.BG.Ch3.S13.derivedInG_le_sup_of_normal hQMσ hDMσ hsup hQnMσ
+    rwa [show derivedInG D = ⁅D, D⁆ from Subgroup.map_subtype_commutator D] at hle
   have hsecFit : ∀ x ∈ OddOrder.BG.Ch3.S10.Msigma M, (∀ y ∈ Q, ⁅x, y⁆ ∈ Q0) →
       x ∈ fittingInAmbient M :=
     centralizer_msigma_quotient_le_fittingInAmbient hG hM hQMσ hDMσ hQ0def hQ0Q hcomplD hMnormQ
@@ -6680,11 +6824,9 @@ theorem fitting_decomposition [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
       exact Subgroup.commutator_eq_bot_iff_le_centralizer.mp hMσY
     have hY_le_M : Y ≤ M := h3.trans (OddOrder.BG.Ch2.S08.fittingInG_le M)
     -- Corollary 15.3(a) at `H := M_σ`: `C_M(M_σ) = (C_G(M_σ) ⊓ M_σ) ⊔ X`, `X` cyclic `τ₂`.
-    have hMσne : Mσ ≠ ⊥ := OddOrder.BG.Ch3.S10.Msigma_ne_bot hG hM
-    have hHallMσ : Ch03.IsHallSubgroup (S14.piSet Mσ) (Mσ.subgroupOf Mσ) := by
-      rw [Subgroup.subgroupOf_self, Ch03.IsHallSubgroup.top_iff]
-      intro p hp; exact hp
-    obtain ⟨⟨X, hXcyc, hXτ₂, hCeq⟩, _⟩ := mf_hall_centralizer_control hG hM hHallMσ hMσne
+    -- Sorry-free via `mf_centralizer_msigma_decomp` (Prop 14.2(b1)(e) + Schur–Zassenhaus +
+    -- Lemma 15.1(c)); this de-axiomatises the A(8) `FittingIsTI` chain (issue 8016).
+    obtain ⟨X, hXcyc, hXτ₂, hCeq⟩ := mf_centralizer_msigma_decomp hG hM
     -- `C := C_G(M_σ) ⊓ M`, `A := C_G(M_σ) ⊓ M_σ`.
     set C : Subgroup G := Subgroup.centralizer (Mσ : Set G) ⊓ M with hCdef
     set A : Subgroup G := Subgroup.centralizer (Mσ : Set G) ⊓ Mσ with hAdef
@@ -7127,6 +7269,474 @@ theorem typeP_kstar_in_mf [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
   exact typeP_kstar_in_mf_of_inputs hG hM hKstar hKne hcyc hKsubMF hcompl hcop hFcyc
 
 /-! ## Theorems 15.7--15.9: TI failure and final local constraints -/
+
+/-- **BG Theorem 15.2(b), contrapositive form** (mmd L4185): if no prime divides `M_F` and lies
+in `β(M)`, then `M_F = M_σ`.  Theorem 15.2 shows that whenever `M_F ≠ M_σ`, the prime `q = |K*|`
+satisfies `q ∈ π(M_F) ∩ β(M)`; the contrapositive gives the claim.  A Hall `κ(M)`-subgroup `K`
+needed to invoke 15.2 exists by solvability of `M` (Hall's theorem).
+
+This is the `M_F = M_σ` endgame of Theorem 15.7(a): once the rank-theoretic core
+`piSet_mf_inf_beta_disjoint_of_not_fittingIsTI` establishes `π(M_F) ∩ β(M) = ∅`, this lemma
+delivers `M_F = M_σ` (equivalently, `M_σ` nilpotent). -/
+theorem mf_eq_msigma_of_piSet_inf_beta_disjoint [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} (hM : M ∈ maximalSubgroups G)
+    (hdisj : ∀ q : ℕ, q ∈ S14.piSet (MF M) → q ∉ OddOrder.BG.Ch3.S10.beta M) :
+    MF M = OddOrder.BG.Ch3.S10.Msigma M := by
+  classical
+  haveI : IsSolvable ↥M := hG.solvable_of_mem_maximalSubgroups hM
+  by_contra hne
+  -- A Hall `κ(M)`-subgroup `K` of `M` exists by Hall's theorem in the solvable group `↥M`.
+  obtain ⟨K', hK'⟩ := Ch03.hall_E_exists (G := ↥M) (S14.kappa M)
+  set K : Subgroup G := K'.map M.subtype with hKdef
+  have hKM : K ≤ M := hKdef ▸ Subgroup.map_subtype_le K'
+  have hKeq : K.subgroupOf M = K' :=
+    hKdef ▸ Subgroup.comap_map_eq_self_of_injective M.subtype_injective K'
+  have hK : Ch03.IsHallSubgroup (S14.kappa M) (K.subgroupOf M) := hKeq ▸ hK'
+  -- Theorem 15.2(b): for `M_F ≠ M_σ`, the prime `q = |K*|` lies in `π(M_F) ∩ β(M)`.
+  obtain ⟨_, _, _, _, _, _, _, _, _, hqπ, hqβ, _⟩ :=
+    (mf_ne_msigma_typeP1_structure hG hM hne hKM hK rfl).2
+  exact hdisj _ hqπ hqβ
+
+/-- **BG Corollary 15.5(a)**: `O_{σ(M)'}(F(M))` is cyclic.  Extracted from `fitting_decomposition`,
+whose cyclic witness `Y` (a `τ₂(M) ⊆ σ(M)ᶜ`-group, normal in the nilpotent `F(M)` and complementing
+`O_{σ(M)}(F(M)) = F(M_σ)`) equals `O_{σ(M)'}(F(M))` by modularity. -/
+theorem opiCoreInG_sigmaCompl_fittingInAmbient_isCyclic [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} (hM : M ∈ maximalSubgroups G) :
+    IsCyclic ↥(opiCoreInG (OddOrder.BG.Ch3.S10.sigma M)ᶜ (fittingInAmbient M)) := by
+  classical
+  set σ := OddOrder.BG.Ch3.S10.sigma M with hσdef
+  set F := fittingInAmbient M with hFdef
+  obtain ⟨Y, hYcyc, hYtau2, hYleF, _, _, hF_eq, _hFmσ_Y_bot, hcomm, _, _, _⟩ :=
+    fitting_decomposition hG hM
+  -- `O_σ(F) = F(M_σ)`, so `F = O_σ(F) ⊔ Y`.
+  have hOσ : opiCoreInG σ F = fittingInAmbient (OddOrder.BG.Ch3.S10.Msigma M) :=
+    opiCoreInG_sigma_fittingInAmbient_eq_fittingInAmbient_Msigma
+  have hF_eq2 : F = opiCoreInG σ F ⊔ Y := by rw [hOσ]; exact hF_eq
+  -- `Y ⊴ F`: normalized by `Y` and by `F(M_σ)` (which centralizes it), and `F = F(M_σ) ⊔ Y`.
+  have hYnorm : (Y.subgroupOf F).Normal := by
+    refine (Subgroup.normal_subgroupOf_iff_le_normalizer hYleF).mpr ?_
+    rw [hF_eq]
+    refine sup_le ?_ Subgroup.le_normalizer
+    have h1 : fittingInAmbient (OddOrder.BG.Ch3.S10.Msigma M) ≤ Subgroup.centralizer (Y : Set G) :=
+      Subgroup.commutator_eq_bot_iff_le_centralizer.mp hcomm
+    exact h1.trans (Subgroup.centralizer_le_normalizer _)
+  -- `Y` is a `σᶜ`-group (`π(Y) ⊆ τ₂(M) ⊆ σᶜ`).
+  have hYpi : Subgroup.IsPiSubgroup σᶜ Y := fun r hr => tau2_subset_sigma_compl M (hYtau2 hr)
+  have hYle : Y ≤ opiCoreInG σᶜ F := le_opiCoreInG_of_normal_of_isPiSubgroup hYleF hYnorm hYpi
+  have hinf : opiCoreInG σ F ⊓ opiCoreInG σᶜ F = ⊥ :=
+    OddOrder.GroupTheory.inf_eq_bot_of_isPiSubgroup_of_isPiSubgroup_compl
+      (OddOrder.GroupTheory.isPiSubgroup_opiCoreInG σ F)
+      (OddOrder.GroupTheory.isPiSubgroup_opiCoreInG σᶜ F)
+  -- `O_σ(F) = F(M_σ)` centralizes `Y`, so it normalizes `Y`.
+  have hEnorm : opiCoreInG σ F ≤ Subgroup.normalizer (Y : Set G) := by
+    rw [hOσ]
+    exact (Subgroup.commutator_eq_bot_iff_le_centralizer.mp hcomm).trans
+      (Subgroup.centralizer_le_normalizer _)
+  -- `O_{σᶜ}(F) = Y` by the normality-aware Dedekind law, hence cyclic.
+  have hDF : opiCoreInG σᶜ F ≤ F := OddOrder.GroupTheory.opiCoreInG_le σᶜ F
+  have hDY : opiCoreInG σᶜ F = Y := by
+    have hkey := Subgroup.inf_sup_eq_of_le_normalizer_of_inf_eq_bot
+      (W := Y) (A := opiCoreInG σ F) (L := opiCoreInG σᶜ F) hYle hinf hEnorm
+    rw [← hkey, sup_comm, ← hF_eq2, inf_eq_right.mpr hDF]
+  rw [hDY]; exact hYcyc
+
+/-- In a finite cyclic group, a subgroup is determined by its cardinality (every subgroup is the
+kernel of `x ↦ x ^ |A|`, which depends only on `|A|`). -/
+theorem eq_of_card_eq_of_isCyclic {C : Type*} [Group C] [Finite C] [IsCyclic C]
+    {H K : Subgroup C} (h : Nat.card ↥H = Nat.card ↥K) : H = K := by
+  letI : CommGroup C := IsCyclic.commGroup
+  have key : ∀ A : Subgroup C, A = (powMonoidHom (Nat.card ↥A) : C →* C).ker := by
+    intro A
+    have hcard : Nat.card ↥((powMonoidHom (Nat.card ↥A) : C →* C).ker) = Nat.card ↥A := by
+      rw [IsCyclic.card_powMonoidHom_ker, Nat.gcd_eq_right (Subgroup.card_subgroup_dvd_card A)]
+    refine Subgroup.eq_of_le_of_card_ge (fun a ha => ?_) (le_of_eq hcard)
+    rw [MonoidHom.mem_ker, powMonoidHom_apply]
+    have h1 : (⟨a, ha⟩ : ↥A) ^ Nat.card ↥A = 1 := pow_card_eq_one'
+    simpa only [SubmonoidClass.coe_pow, OneMemClass.coe_one] using congrArg Subtype.val h1
+  rw [key H, key K, h]
+
+/-- Two subgroups of `G` of equal finite order, both contained in a cyclic subgroup `C`, are
+equal. -/
+theorem eq_of_le_isCyclic_of_card_eq [Finite G] {C H K : Subgroup G} [IsCyclic ↥C]
+    (hHC : H ≤ C) (hKC : K ≤ C) (h : Nat.card ↥H = Nat.card ↥K) : H = K := by
+  have hcardH : Nat.card ↥(H.subgroupOf C) = Nat.card ↥H :=
+    Nat.card_congr (Subgroup.subgroupOfEquivOfLe hHC).toEquiv
+  have hcardK : Nat.card ↥(K.subgroupOf C) = Nat.card ↥K :=
+    Nat.card_congr (Subgroup.subgroupOfEquivOfLe hKC).toEquiv
+  have hsub : H.subgroupOf C = K.subgroupOf C :=
+    eq_of_card_eq_of_isCyclic (by rw [hcardH, hcardK, h])
+  rw [← Subgroup.map_subgroupOf_eq_of_le hHC, ← Subgroup.map_subgroupOf_eq_of_le hKC, hsub]
+
+/-- If `K` normalizes a cyclic subgroup `C` and `X ≤ C` is finite, then `K` normalizes `X`:
+subgroups of a cyclic group are determined by their order, so the order-preserving `C`-conjugation
+by elements of `K` fixes `X`. -/
+theorem le_normalizer_of_le_isCyclic_normalized [Finite G] {C X K : Subgroup G} [IsCyclic ↥C]
+    (hXC : X ≤ C) (hKC : K ≤ Subgroup.normalizer (C : Set G)) :
+    K ≤ Subgroup.normalizer (X : Set G) := by
+  intro m hm
+  -- `m` conjugates `C` to itself.
+  have hmC : MulAut.conj m • C = C := by
+    ext x
+    rw [Subgroup.mem_pointwise_smul_iff_inv_smul_mem,
+      show ((MulAut.conj m)⁻¹ • x : G) = m⁻¹ * x * m by
+        simp [MulAut.smul_def, ← map_inv, MulAut.conj_apply]]
+    exact ((Subgroup.mem_normalizer_iff''.mp (hKC hm)) x).symm
+  -- `conj m • X ≤ C` and has the same order, so equals `X`.
+  have hconjle : MulAut.conj m • X ≤ C :=
+    hmC ▸ (Subgroup.pointwise_smul_le_pointwise_smul_iff.mpr hXC)
+  have hcard : Nat.card ↥(MulAut.conj m • X) = Nat.card ↥X :=
+    (Nat.card_congr (Subgroup.equivSMul (MulAut.conj m) X).toEquiv).symm
+  have hXeq : MulAut.conj m • X = X := eq_of_le_isCyclic_of_card_eq hconjle hXC hcard
+  rw [Subgroup.mem_normalizer_iff'']
+  intro h
+  have hiff : h ∈ MulAut.conj m • X ↔ m⁻¹ * h * m ∈ X := by
+    rw [Subgroup.mem_pointwise_smul_iff_inv_smul_mem,
+      show ((MulAut.conj m)⁻¹ • h : G) = m⁻¹ * h * m by
+        simp [MulAut.smul_def, ← map_inv, MulAut.conj_apply]]
+  rwa [hXeq] at hiff
+
+/-- **Setup for BG Theorem 15.7(a)**: `¬FittingIsTI M` produces an element `g ∉ M` and a nontrivial
+intersection `F(M) ⊓ F(M)^g`.  Unfolding `¬IsTISubset (F(M)^#) (N_G(F(M)))`: there is `g ∉ N_G(F(M))`
+and `a ∈ F(M)^#` with `gag⁻¹ ∈ F(M)^#`; then `gag⁻¹ ∈ F(M) ⊓ (conj g • F(M))` is nontrivial, and
+`g ∉ M` because `F(M) ⊴ M` forces `M ≤ N_G(F(M))`. -/
+theorem exists_notMem_inf_conj_fitting_ne_bot_of_not_fittingIsTI {M : Subgroup G}
+    (hnotTI : ¬ FittingIsTI M) :
+    ∃ g : G, g ∉ M ∧
+      (fittingInAmbient M ⊓ MulAut.conj g • fittingInAmbient M : Subgroup G) ≠ ⊥ := by
+  rw [FittingIsTI] at hnotTI
+  simp only [OddOrder.GroupTheory.IsTISubset] at hnotTI
+  push_neg at hnotTI
+  obtain ⟨g, ⟨a, haA, hgaA⟩, hgN⟩ := hnotTI
+  simp only [fittingSharp, sharpSubgroup, Set.mem_diff, SetLike.mem_coe,
+    Set.mem_singleton_iff] at haA hgaA
+  obtain ⟨haF, _ha1⟩ := haA
+  obtain ⟨hgaF, hga1⟩ := hgaA
+  -- `g ∉ M`: `F(M) ⊴ M` ⟹ `M ≤ N_G(F(M))`, but `g ∉ N_G(F(M))`.
+  have hMN : M ≤ Subgroup.normalizer ((fittingInAmbient M : Subgroup G) : Set G) :=
+    (Subgroup.normal_subgroupOf_iff_le_normalizer (OddOrder.BG.Ch2.S08.fittingInG_le M)).mp
+      (OddOrder.BG.Ch2.S08.fittingInG_subgroupOf_normal M)
+  refine ⟨g, fun h => hgN (hMN h), ?_⟩
+  -- `gag⁻¹` is a nontrivial element of `F(M) ⊓ conj g • F(M)`.
+  intro hbot
+  have hmem : g * a * g⁻¹ ∈
+      (fittingInAmbient M ⊓ MulAut.conj g • fittingInAmbient M : Subgroup G) := by
+    refine Subgroup.mem_inf.mpr ⟨hgaF, ?_⟩
+    rw [Subgroup.mem_pointwise_smul_iff_inv_smul_mem]
+    simpa [MulAut.smul_def, MulAut.conj_apply, mul_assoc] using haF
+  rw [hbot, Subgroup.mem_bot] at hmem
+  exact hga1 hmem
+
+/-- **Step 3 of BG Theorem 15.7(a)**: a prime `p` dividing the TI-failure intersection
+`F(M) ⊓ F(M)^g` (with `g ∉ M`) lies in `σ(M)`.
+
+If not, `O_{σ(M)'}(F(M))` is cyclic (`opiCoreInG_sigmaCompl_fittingInAmbient_isCyclic`), so any
+order-`p` subgroup `X₁ ≤ F(M) ⊓ F(M)^g` (it is a `p`-subgroup of `F(M)`, hence
+`≤ O_p(F(M)) ≤ O_{σ'}(F(M))`) is the unique one, hence normalized by both `M` and `M^g` (each
+normalizes the relevant cyclic `O_{σ'}` and `X₁ = (X₁)` is order-preserved).  Then
+`normalizer_eq_of_normal_of_mem_maximal` gives `N_G(X₁) = M`, but also `M = N_G(g⁻¹·X₁·g) = g⁻¹·M·g`,
+forcing `g ∈ M` — contradiction. -/
+theorem mem_sigma_of_prime_dvd_card_inf_conj_fitting [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} (hM : M ∈ maximalSubgroups G)
+    {g : G} (hgM : g ∉ M) {p : ℕ} (hp : p.Prime)
+    (hpdvd : p ∣ Nat.card ↥(fittingInAmbient M ⊓ MulAut.conj g • fittingInAmbient M)) :
+    p ∈ OddOrder.BG.Ch3.S10.sigma M := by
+  classical
+  haveI : Fact p.Prime := ⟨hp⟩
+  by_contra hpσ
+  set F := fittingInAmbient M with hFdef
+  set σ := OddOrder.BG.Ch3.S10.sigma M with hσdef
+  have hFleM : F ≤ M := OddOrder.BG.Ch2.S08.fittingInG_le M
+  -- `O_{σᶜ}(F)` is cyclic and normalized by `M`.
+  haveI hcyc : IsCyclic ↥(opiCoreInG σᶜ F) := opiCoreInG_sigmaCompl_fittingInAmbient_isCyclic hG hM
+  have hMNOσc : M ≤ Subgroup.normalizer ((opiCoreInG σᶜ F : Subgroup G) : Set G) :=
+    (Subgroup.normal_subgroupOf_iff_le_normalizer
+      ((OddOrder.GroupTheory.opiCoreInG_le σᶜ F).trans hFleM)).mp
+      (OddOrder.BG.Ch2.S08.opiCoreInG_fittingInG_subgroupOf_normal σᶜ M)
+  have hpσc : ({p} : Set ℕ) ⊆ σᶜ := by
+    intro q hq; rw [Set.mem_singleton_iff] at hq; rw [hq]; exact hpσ
+  -- Generic helper: a `p`-subgroup of `F` is normalized by `M` (via `X₁ ≤ O_{σᶜ}(F)` cyclic).
+  have hpnorm : ∀ Z : Subgroup G, Z ≤ F → IsPGroup p ↥Z →
+      M ≤ Subgroup.normalizer (Z : Set G) := by
+    intro Z hZF hZp
+    have hZOp : Z ≤ opiCoreInG ({p} : Set ℕ) F :=
+      OddOrder.BG.Ch2.S08.le_opiCoreInG_singleton_of_isPGroup_of_le_nilpotent
+        (OddOrder.BG.Ch2.S08.fittingInG_isNilpotent M) hZF hZp
+    have hZOσc : Z ≤ opiCoreInG σᶜ F :=
+      hZOp.trans (Subgroup.map_mono (OddOrder.Isaacs.Ch03.oPiCore_mono hpσc _))
+    exact le_normalizer_of_le_isCyclic_normalized hZOσc hMNOσc
+  -- An order-`p` subgroup `X₁` of `X = F ⊓ F^g`.
+  obtain ⟨x, hxord⟩ := exists_prime_orderOf_dvd_card'
+    (G := ↥(F ⊓ MulAut.conj g • F)) p hpdvd
+  set X₁ : Subgroup G := (Subgroup.zpowers x).map (F ⊓ MulAut.conj g • F).subtype with hX₁def
+  have hX₁leX : X₁ ≤ F ⊓ MulAut.conj g • F := hX₁def ▸ Subgroup.map_subtype_le _
+  have hX₁card : Nat.card ↥X₁ = p := by
+    rw [hX₁def, Subgroup.card_map_of_injective (F ⊓ MulAut.conj g • F).subtype_injective,
+      Nat.card_zpowers, hxord]
+  have hX₁ne : X₁ ≠ ⊥ := by
+    intro h; rw [h, Subgroup.card_bot] at hX₁card; exact hp.one_lt.ne' hX₁card.symm
+  have hX₁pg : IsPGroup p ↥X₁ := IsPGroup.of_card (n := 1) (by rw [hX₁card, pow_one])
+  have hX₁F : X₁ ≤ F := hX₁leX.trans inf_le_left
+  have hX₁cF : X₁ ≤ MulAut.conj g • F := hX₁leX.trans inf_le_right
+  -- `X₁ ⊴ M`, so `N_G(X₁) = M`.
+  have hMNX₁ : M ≤ Subgroup.normalizer (X₁ : Set G) := hpnorm X₁ hX₁F hX₁pg
+  have hNX₁ : Subgroup.normalizer (X₁ : Set G) = M :=
+    OddOrder.BG.Ch2.S08.normalizer_eq_of_normal_of_mem_maximal hG hM
+      ((Subgroup.normal_subgroupOf_iff_le_normalizer (hX₁F.trans hFleM)).mpr hMNX₁)
+      hX₁ne (hX₁F.trans hFleM)
+  -- `g⁻¹·X₁·g ≤ F` is also a `p`-group, so `M ≤ N(g⁻¹·X₁·g) = g⁻¹·N(X₁)·g = g⁻¹·M·g`.
+  set X₁' : Subgroup G := MulAut.conj g⁻¹ • X₁ with hX₁'def
+  have hX₁'card : Nat.card ↥X₁' = p := by
+    rw [hX₁'def, ← Nat.card_congr (Subgroup.equivSMul (MulAut.conj g⁻¹) X₁).toEquiv, hX₁card]
+  have hX₁'F : X₁' ≤ F := by
+    have hle : X₁' ≤ MulAut.conj g⁻¹ • (MulAut.conj g • F) :=
+      hX₁'def ▸ Subgroup.pointwise_smul_le_pointwise_smul_iff.mpr hX₁cF
+    rwa [← mul_smul, ← map_mul, inv_mul_cancel, map_one, one_smul] at hle
+  have hX₁'pg : IsPGroup p ↥X₁' := IsPGroup.of_card (n := 1) (by rw [hX₁'card, pow_one])
+  have hMNX₁' : M ≤ Subgroup.normalizer (X₁' : Set G) := hpnorm X₁' hX₁'F hX₁'pg
+  -- `N(X₁') = g⁻¹ • N(X₁) = g⁻¹ • M`.
+  have hNX₁'eq : Subgroup.normalizer (X₁' : Set G) = MulAut.conj g⁻¹ • M := by
+    rw [hX₁'def, ← hNX₁]
+    exact (Subgroup.map_normalizer_eq_of_bijective X₁ (MulAut.conj g⁻¹).bijective).symm
+  -- So `M ≤ g⁻¹ • M`, equal cards ⟹ `M = g⁻¹ • M`, i.e. `g ∈ N(M) = M`.
+  rw [hNX₁'eq] at hMNX₁'
+  have hcardM : Nat.card ↥(MulAut.conj g⁻¹ • M) = Nat.card ↥M :=
+    (Nat.card_congr (Subgroup.equivSMul (MulAut.conj g⁻¹) M).toEquiv).symm
+  have hMeq : MulAut.conj g⁻¹ • M = M :=
+    (Subgroup.eq_of_le_of_card_ge hMNX₁' (le_of_eq hcardM)).symm
+  -- `g⁻¹·M·g = M ⟹ g⁻¹ ∈ N_G(M) ≤ M ⟹ g ∈ M`, contradicting `g ∉ M`.
+  have hg_inv_N : g⁻¹ ∈ Subgroup.normalizer (M : Set G) := by
+    rw [Subgroup.mem_normalizer_iff'']
+    intro h
+    have hiff : h ∈ MulAut.conj g⁻¹ • M ↔ g * h * g⁻¹ ∈ M := by
+      rw [Subgroup.mem_pointwise_smul_iff_inv_smul_mem,
+        show ((MulAut.conj g⁻¹)⁻¹ • h : G) = g * h * g⁻¹ by
+          simp [MulAut.smul_def, ← map_inv, MulAut.conj_apply]]
+    rw [hMeq] at hiff
+    rw [inv_inv]; exact hiff
+  have hg_inv_M : g⁻¹ ∈ M :=
+    OddOrder.BG.Ch3.S10.maximal_normalizer_le_self hG hM hg_inv_N
+  exact hgM (by simpa using inv_mem hg_inv_M)
+
+/-- **Rank-3 lower bound on `M_F` for `β`-primes** (the `≥ 3` side of BG Theorem 15.7(a)'s rank
+dichotomy): if a prime `r` divides `M_F` and lies in `β(M)`, then `r_r(M_F) ≥ 3`.
+
+`M_F` is a Hall subgroup of `M` (`maxNilpotentNormalHall_isHall`), so `r ∈ π(M_F)` gives
+`r ∤ [M : M_F]` and hence `r_r(M_F) = r_r(M)` (`pRank_eq_of_le_of_not_dvd_index`); and
+`r ∈ β(M) ⊆ α(M)` gives `r_r(M) ≥ 3` by the definition of `α(M)`.  Consumed by the rank core
+`piSet_mf_inf_beta_disjoint_of_not_fittingIsTI` as the contradiction target against the `< 3`
+bound coming from `C_{M_F}(X₁)`. -/
+theorem three_le_pRank_mf_of_mem_beta [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} (hM : M ∈ maximalSubgroups G)
+    {r : ℕ} (hrπ : r ∈ S14.piSet (MF M)) (hrβ : r ∈ OddOrder.BG.Ch3.S10.beta M) :
+    3 ≤ pRank ↥(MF M) r := by
+  have hrmem : r ∈ (Nat.card ↥(MF M)).primeFactors := hrπ
+  have hrp : r.Prime := Nat.prime_of_mem_primeFactors hrmem
+  haveI : Fact r.Prime := ⟨hrp⟩
+  -- `M_F` is `π(M_F)`-Hall in `M`; `r ∈ π(M_F)` ⟹ `r ∤ [M : M_F]`.
+  have hHall := maxNilpotentNormalHall_isHall (G := G) M
+  have hidx : ¬ r ∣ ((MF M).subgroupOf M).index := fun hdvd =>
+    hHall.2 r (Nat.mem_primeFactors.mpr ⟨hrp, hdvd, Subgroup.index_ne_zero_of_finite⟩) hrmem
+  -- `r_r(M_F) = r_r(M)`; and `r ∈ β(M) ⊆ α(M)` ⟹ `r_r(M) ≥ 3`.
+  rw [OddOrder.GroupTheory.pRank_eq_of_le_of_not_dvd_index (maxNilpotentNormalHall_le M) hidx]
+  exact (OddOrder.BG.Ch3.S10.beta_subset_alpha M hrβ).2
+
+/-- A subgroup contained in two **distinct** maximal subgroups of a minimal simple odd group has
+rank `< 3`.  Contrapositive of `isUniquelyMaximal_of_three_le_rank_of_lt_top`: rank `≥ 3` would
+force unique maximality, contradicting membership in two distinct coatoms. -/
+theorem rank_lt_three_of_le_two_maximals [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    {C M N : Subgroup G} (hM : M ∈ maximalSubgroups G) (hN : N ∈ maximalSubgroups G)
+    (hMN : M ≠ N) (hCM : C ≤ M) (hCN : C ≤ N) : rank ↥C < 3 := by
+  by_contra h
+  have hCt : C < ⊤ := lt_of_le_of_lt hCM (OddOrder.GroupTheory.mem_maximalSubgroups.mp hM).lt_top
+  exact hMN ((OddOrder.BG.Ch2.S09.isUniquelyMaximal_of_three_le_rank_of_lt_top hG hCt
+    (not_lt.mp h)).eq_of_isCoatom_of_le (OddOrder.GroupTheory.mem_maximalSubgroups.mp hM) hCM
+    (OddOrder.GroupTheory.mem_maximalSubgroups.mp hN) hCN)
+
+/-- **BG Theorem 15.7(a), rank-theoretic core** (mmd L4192-4198): if `F(M)` is not a TI-subgroup
+of `G`, then no prime divides `M_F` and lies in `β(M)`.
+
+The `≥ 3` side is fully proved (`three_le_pRank_mf_of_mem_beta`: any `r ∈ π(M_F) ∩ β(M)` has
+`r_r(M_F) ≥ 3`); the proof below reduces the goal to the complementary `< 3` bound
+`pRank (M_F) r < 3`, the genuinely deep §15 content isolated as the single remaining `sorry`.
+
+**Proved building blocks (this file):** the setup
+`exists_notMem_inf_conj_fitting_ne_bot_of_not_fittingIsTI` (step 1: `g ∉ M`, `X = F(M) ⊓ F(M)^g ≠ ⊥`)
+and `rank_lt_three_of_le_two_maximals` (step 7 core: a subgroup in two distinct maximals has rank
+`< 3`).  The remaining assembly, with the located upstream lemmas:
+
+* **(step 3, `p ∈ σ(M)`)** pick `p ∈ π(X)`, `X₁ ≤ X` of order `p`
+  (`le_opiCoreInG_singleton_of_isPGroup_of_le_nilpotent`: `X₁ ≤ O_p(F(M))`).  If `p ∉ σ(M)` then
+  `O_p(F(M)) ≤ O_{σ'}(F(M))` is cyclic (`fitting_decomposition`), so `X₁` is the unique order-`p`
+  subgroup, hence characteristic and normal in both `M` and `M^g`; `normalizer_eq_of_normal_of_mem_maximal`
+  (S08, currently `private`) forces `M^g = M`, contradicting `g ∉ M`.  ⟹ `p ∈ σ(M)`.  *(fiddly sub-step:
+  cyclic group ⟹ unique/characteristic order-`p` subgroup.)*
+* **(step 5, `p ∉ β(M)`)** `X₁ ≤ O_p(M) ≤ M_σ` (`opiCoreInG_singleton_le_Msigma_of_mem_sigma`) and
+  `X₁ ≤ F(M)^g ≤ M^g`, so `X₁ ≤ M_σ ⊓ M^g`; Lemma 12.17 (`Msigma_inf_conj_isBetaCompl`) ⟹ `p ∉ β(M)`,
+  hence `r ≠ p` for the `β`-prime `r` (so the `r = p` case is vacuous).
+* **(step 6, `C_G(X₁) ⊄ M`)** `fusion_control_of_mem_sigma` part (e) with `p ∈ σ(M)`, `X₁ ≤ M`,
+  `conj g⁻¹ • X₁ ≤ M`.
+* **(step 7, `rank C_{M_F}(X₁) < 3`)** `C_G(X₁) < ⊤` (else `X₁ ≤ Z(G) = ⊥`, simple), so a coatom
+  `N ⊇ C_G(X₁)` exists with `N ≠ M`; `C_{M_F}(X₁) ≤ M ⊓ N` ⟹ `rank_lt_three_of_le_two_maximals`.
+* **(step 8, bridge)** `O_r(M_F) ≤ C_{M_F}(X₁)` (`commute_of_coprime_orderOf_of_isNilpotent`, `r ≠ p`,
+  both in nilpotent `F(M)`), so `r_r(M_F) = r_r(O_r(M_F)) ≤ rank C_{M_F}(X₁) < 3`.
+
+Combined with `mf_eq_msigma_of_piSet_inf_beta_disjoint` this yields the `M_F = M_σ` conclusion of
+Theorem 15.7(a), i.e. the `FittingIsTI` clause of Theorem A(8). -/
+theorem piSet_mf_inf_beta_disjoint_of_not_fittingIsTI [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} (hM : M ∈ maximalSubgroups G)
+    (hnotTI : ¬ FittingIsTI M) :
+    ∀ q : ℕ, q ∈ S14.piSet (MF M) → q ∉ OddOrder.BG.Ch3.S10.beta M := by
+  intro r hrπ hrβ
+  -- The `≥ 3` side (proved): `r ∈ π(M_F) ∩ β(M) ⟹ r_r(M_F) ≥ 3`.
+  have h3 : 3 ≤ pRank ↥(MF M) r := three_le_pRank_mf_of_mem_beta hG hM hrπ hrβ
+  have hrp : r.Prime := Nat.prime_of_mem_primeFactors hrπ
+  haveI : Fact r.Prime := ⟨hrp⟩
+  refine absurd h3 (not_le.mpr ?_)
+  -- Setup: `g ∉ M`, `X = F(M) ⊓ F(M)^g ≠ ⊥`.
+  obtain ⟨g, hgM, hXne⟩ := exists_notMem_inf_conj_fitting_ne_bot_of_not_fittingIsTI hnotTI
+  -- A prime `p ∈ π(X)`, and `p ∈ σ(M)` (step 3).
+  have hXcard : Nat.card ↥(fittingInAmbient M ⊓ MulAut.conj g • fittingInAmbient M) ≠ 1 :=
+    fun h => hXne (Subgroup.card_eq_one.mp h)
+  obtain ⟨p, hp, hpdvd⟩ := Nat.exists_prime_and_dvd hXcard
+  haveI : Fact p.Prime := ⟨hp⟩
+  have hpσ : p ∈ OddOrder.BG.Ch3.S10.sigma M :=
+    mem_sigma_of_prime_dvd_card_inf_conj_fitting hG hM hgM hp hpdvd
+  -- An order-`p` subgroup `X₁ ≤ X`.
+  obtain ⟨x, hxord⟩ := exists_prime_orderOf_dvd_card'
+    (G := ↥(fittingInAmbient M ⊓ MulAut.conj g • fittingInAmbient M)) p hpdvd
+  set X₁ : Subgroup G :=
+    (Subgroup.zpowers x).map (fittingInAmbient M ⊓ MulAut.conj g • fittingInAmbient M).subtype
+    with hX₁def
+  have hX₁leX : X₁ ≤ fittingInAmbient M ⊓ MulAut.conj g • fittingInAmbient M :=
+    hX₁def ▸ Subgroup.map_subtype_le _
+  have hX₁card : Nat.card ↥X₁ = p := by
+    rw [hX₁def, Subgroup.card_map_of_injective
+      (fittingInAmbient M ⊓ MulAut.conj g • fittingInAmbient M).subtype_injective,
+      Nat.card_zpowers, hxord]
+  have hX₁ne : X₁ ≠ ⊥ := fun h => hp.one_lt.ne' (by rw [← hX₁card, h, Subgroup.card_bot])
+  have hX₁pg : IsPGroup p ↥X₁ := IsPGroup.of_card (n := 1) (by rw [hX₁card, pow_one])
+  have hX₁F : X₁ ≤ fittingInAmbient M := hX₁leX.trans inf_le_left
+  have hX₁cF : X₁ ≤ MulAut.conj g • fittingInAmbient M := hX₁leX.trans inf_le_right
+  have hX₁M : X₁ ≤ M := hX₁F.trans (OddOrder.BG.Ch2.S08.fittingInG_le M)
+  -- Step 5: `p ∉ β(M)` (via `X₁ ≤ M_σ ⊓ M^g` and Lemma 12.17), hence `r ≠ p`.
+  have hpσ_sub : ({p} : Set ℕ) ⊆ OddOrder.BG.Ch3.S10.sigma M := by
+    intro q hq; rw [Set.mem_singleton_iff] at hq; rw [hq]; exact hpσ
+  have hX₁Mσ : X₁ ≤ OddOrder.BG.Ch3.S10.Msigma M := by
+    have h1 : X₁ ≤ opiCoreInG ({p} : Set ℕ) (fittingInAmbient M) :=
+      OddOrder.BG.Ch2.S08.le_opiCoreInG_singleton_of_isPGroup_of_le_nilpotent
+        (OddOrder.BG.Ch2.S08.fittingInG_isNilpotent M) hX₁F hX₁pg
+    have h2 : opiCoreInG ({p} : Set ℕ) (fittingInAmbient M)
+        ≤ opiCoreInG (OddOrder.BG.Ch3.S10.sigma M) (fittingInAmbient M) :=
+      Subgroup.map_mono (OddOrder.Isaacs.Ch03.oPiCore_mono hpσ_sub _)
+    have h3' : opiCoreInG (OddOrder.BG.Ch3.S10.sigma M) (fittingInAmbient M)
+        = fittingInAmbient (OddOrder.BG.Ch3.S10.Msigma M) :=
+      opiCoreInG_sigma_fittingInAmbient_eq_fittingInAmbient_Msigma
+    exact (h1.trans h2).trans (h3' ▸ OddOrder.BG.Ch2.S08.fittingInG_le _)
+  have hX₁cM : X₁ ≤ MulAut.conj g • M :=
+    hX₁cF.trans (Subgroup.pointwise_smul_le_pointwise_smul_iff.mpr
+      (OddOrder.BG.Ch2.S08.fittingInG_le M))
+  have hpβ : p ∉ OddOrder.BG.Ch3.S10.beta M :=
+    OddOrder.BG.Ch3.S12.Msigma_inf_conj_isBetaCompl hG hM hgM p
+      (Nat.mem_primeFactors.mpr ⟨hp,
+        hX₁card ▸ Subgroup.card_dvd_of_le (le_inf hX₁Mσ hX₁cM),
+        Nat.card_pos.ne'⟩)
+  have hrnep : r ≠ p := fun h => hpβ (h ▸ hrβ)
+  -- Step 6: `C_G(X₁) ⊄ M` (Theorem 10.1(e)).
+  have hconj_g_inv : MulAut.conj g⁻¹ • X₁ ≤ M := by
+    have hle : MulAut.conj g⁻¹ • X₁ ≤ MulAut.conj g⁻¹ • (MulAut.conj g • fittingInAmbient M) :=
+      Subgroup.pointwise_smul_le_pointwise_smul_iff.mpr hX₁cF
+    rw [← mul_smul, ← map_mul, inv_mul_cancel, map_one, one_smul] at hle
+    exact hle.trans (OddOrder.BG.Ch2.S08.fittingInG_le M)
+  have hCGnotM : ¬ Subgroup.centralizer (X₁ : Set G) ≤ M := by
+    intro hCG
+    have he := (OddOrder.BG.Ch3.S10.fusion_control_of_mem_sigma hG hM hpσ hX₁ne hX₁pg).2.2.2.2
+    exact hgM (by simpa using inv_mem (he hX₁M hCG g⁻¹ hconj_g_inv))
+  -- Step 7: `rank (C_{M_F}(X₁)) < 3` (`C_{M_F}(X₁)` lies in `M` and in a coatom `N ≠ M`).
+  obtain ⟨x₀, hx₀ne⟩ := Subgroup.ne_bot_iff_exists_ne_one.mp hX₁ne
+  have hCGlt : Subgroup.centralizer (X₁ : Set G) < ⊤ :=
+    lt_of_le_of_lt
+      (Subgroup.centralizer_le (Set.singleton_subset_iff.mpr x₀.2))
+      (OddOrder.BG.Ch2.S09.centralizer_singleton_lt_top hG
+        (fun h => hx₀ne (Subtype.ext h)))
+  obtain ⟨N, hNco, hCGN⟩ :=
+    (eq_top_or_exists_le_coatom (Subgroup.centralizer (X₁ : Set G))).resolve_left hCGlt.ne
+  have hNmax : N ∈ maximalSubgroups G := mem_maximalSubgroups.mpr hNco
+  have hNneM : M ≠ N := fun h => hCGnotM (h ▸ hCGN)
+  have hrank3 : rank ↥(MF M ⊓ Subgroup.centralizer (X₁ : Set G)) < 3 :=
+    rank_lt_three_of_le_two_maximals hG hM hNmax hNneM
+      (inf_le_left.trans (maxNilpotentNormalHall_le M)) (inf_le_right.trans hCGN)
+  -- Step 8: `r`-elements of `M_F` centralize `X₁` (coprime, `F(M)` nilpotent), so the `r`-Sylow of
+  -- `M_F` lies in `C_{M_F}(X₁)`; hence `r ∤ [M_F : C_{M_F}(X₁)]` and `r_r(M_F) = r_r(C_{M_F}(X₁)) < 3`.
+  haveI : Group.IsNilpotent ↥(fittingInAmbient M) := OddOrder.BG.Ch2.S08.fittingInG_isNilpotent M
+  have hcentr : ∀ A : Subgroup G, A ≤ MF M → IsPGroup r ↥A →
+      A ≤ Subgroup.centralizer (X₁ : Set G) := by
+    intro A hAMF hAr a ha
+    rw [Subgroup.mem_centralizer_iff]
+    intro y hy
+    have haF : a ∈ fittingInAmbient M := (hAMF.trans (maxNilpotentNormalHall_le_fittingInG M)) ha
+    have hyF : y ∈ fittingInAmbient M := hX₁F hy
+    obtain ⟨i, hi⟩ := (IsPGroup.iff_orderOf.mp hAr) ⟨a, ha⟩
+    obtain ⟨j, hj⟩ := (IsPGroup.iff_orderOf.mp hX₁pg) ⟨y, hy⟩
+    have e1 : orderOf (⟨a, haF⟩ : ↥(fittingInAmbient M)) = r ^ i :=
+      (orderOf_injective (fittingInAmbient M).subtype
+        (fittingInAmbient M).subtype_injective ⟨a, haF⟩).symm.trans
+        ((orderOf_injective A.subtype A.subtype_injective ⟨a, ha⟩).trans hi)
+    have e2 : orderOf (⟨y, hyF⟩ : ↥(fittingInAmbient M)) = p ^ j :=
+      (orderOf_injective (fittingInAmbient M).subtype
+        (fittingInAmbient M).subtype_injective ⟨y, hyF⟩).symm.trans
+        ((orderOf_injective X₁.subtype X₁.subtype_injective ⟨y, hy⟩).trans hj)
+    have hcop : Nat.Coprime (orderOf (⟨a, haF⟩ : ↥(fittingInAmbient M)))
+        (orderOf (⟨y, hyF⟩ : ↥(fittingInAmbient M))) := by
+      rw [e1, e2]; exact Nat.Coprime.pow _ _ ((Nat.coprime_primes hrp hp).mpr hrnep)
+    have hcomm := OddOrder.BG.Ch3.S10.commute_of_coprime_orderOf_of_isNilpotent
+      (x := (⟨a, haF⟩ : ↥(fittingInAmbient M))) (y := ⟨y, hyF⟩) hcop
+    have := congrArg (Subtype.val) hcomm.eq
+    simpa using this.symm
+  -- The `r`-Sylow `P'` of `M_F` lies in `C_{M_F}(X₁) = M_F ⊓ C_G(X₁)`.
+  obtain ⟨P⟩ : Nonempty (Sylow r ↥(MF M)) := inferInstance
+  set P' : Subgroup G := (P : Subgroup ↥(MF M)).map (MF M).subtype with hP'def
+  have hP'MF : P' ≤ MF M := hP'def ▸ Subgroup.map_subtype_le _
+  have hP'r : IsPGroup r ↥P' := by
+    obtain ⟨n, hn⟩ := IsPGroup.iff_card.mp P.2
+    exact IsPGroup.of_card (by
+      rw [hP'def, Subgroup.card_map_of_injective (MF M).subtype_injective, hn])
+  have hP'C : P' ≤ MF M ⊓ Subgroup.centralizer (X₁ : Set G) :=
+    le_inf hP'MF (hcentr P' hP'MF hP'r)
+  have hidx : ¬ r ∣ ((MF M ⊓ Subgroup.centralizer (X₁ : Set G)).subgroupOf (MF M)).index := by
+    intro hdvd
+    have hP'sub : P'.subgroupOf (MF M) ≤ (MF M ⊓ Subgroup.centralizer (X₁ : Set G)).subgroupOf (MF M) :=
+      Subgroup.subgroupOf_mono (MF M) hP'C
+    have hdvd2 : r ∣ (P'.subgroupOf (MF M)).index :=
+      hdvd.trans (Subgroup.index_dvd_of_le hP'sub)
+    have hPeq : P'.subgroupOf (MF M) = (P : Subgroup ↥(MF M)) :=
+      hP'def ▸ Subgroup.comap_map_eq_self_of_injective (MF M).subtype_injective _
+    rw [hPeq] at hdvd2
+    exact P.not_dvd_index hdvd2
+  calc pRank ↥(MF M) r
+      = pRank ↥(MF M ⊓ Subgroup.centralizer (X₁ : Set G)) r :=
+        (OddOrder.GroupTheory.pRank_eq_of_le_of_not_dvd_index inf_le_left hidx).symm
+    _ ≤ rank ↥(MF M ⊓ Subgroup.centralizer (X₁ : Set G)) := pRank_le_rank r
+    _ < 3 := hrank3
+
+/-- **`M_F = M_σ` from `¬FittingIsTI`** (the `M_F = M_σ` conclusion of BG Theorem 15.7(a)):
+combine the rank-theoretic core `piSet_mf_inf_beta_disjoint_of_not_fittingIsTI` with the
+Theorem 15.2(b) endgame `mf_eq_msigma_of_piSet_inf_beta_disjoint`. -/
+theorem mf_eq_msigma_of_not_fittingIsTI [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} (hM : M ∈ maximalSubgroups G)
+    (hnotTI : ¬ FittingIsTI M) : MF M = OddOrder.BG.Ch3.S10.Msigma M :=
+  mf_eq_msigma_of_piSet_inf_beta_disjoint hG hM
+    (piSet_mf_inf_beta_disjoint_of_not_fittingIsTI hG hM hnotTI)
+
+/-- **BG Theorem A(8), the `FittingIsTI` clause** (mmd L4274, schematic proof: Theorem 15.7(a)(b)):
+if `M_F ≠ M_σ`, then `F(M)` is a TI-subgroup of `G`.  This is the contrapositive of the
+`M_F = M_σ` conclusion of Theorem 15.7(a) (`mf_eq_msigma_of_not_fittingIsTI`): if `F(M)` failed to
+be TI, then `M_F` would equal `M_σ`.  Discharges the last (and deepest) conjunct of Theorem A(8),
+modulo the single rank-theoretic residual `piSet_mf_inf_beta_disjoint_of_not_fittingIsTI`. -/
+theorem fitting_isTI_of_mf_ne_msigma [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} (hM : M ∈ maximalSubgroups G)
+    (hne : MF M ≠ OddOrder.BG.Ch3.S10.Msigma M) : FittingIsTI M := by
+  by_contra h
+  exact hne (mf_eq_msigma_of_not_fittingIsTI hG hM h)
 
 /-- **BG Theorem 15.7** (mmd L4180): if `F(M)` is not TI in `G`, then `M` is in
 `M_F ∪ M_P1`, the relevant intersection is cyclic inside `M_F = M_sigma`, and
