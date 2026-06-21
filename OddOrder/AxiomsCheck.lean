@@ -5574,3 +5574,7 @@ formula together with the prime computation `coprimeFrobeniusAction_card_eq_prim
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S11.card_dvd_prime_of_isCyclic_of_pow
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S11.typeP_chiefFactor_card
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S11.typeP_U_noncentral_on_H
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S11.eq_top_of_forall_sylow_le
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S11.exists_characteristic_complement_to_sylow_of_nilpotent
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S11.exists_chiefFactor_seed
