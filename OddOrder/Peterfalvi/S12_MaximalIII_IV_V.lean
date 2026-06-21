@@ -2732,6 +2732,41 @@ theorem Hypothesis.tau_zeta_sub_conj_eq_tau1 [Finite G] [Fintype G] {M : Subgrou
   rw [← coh.coherent.extends_on_supported _ hmem, map_sub]
   rfl
 
+open scoped FiniteInduce in
+/-- **§10 τ/τ₁ compatibility on `μ_k − dζ̄`** (Peterfalvi (10.5), `a = 0` argument): the Dade image
+`(μ_k − dζ̄)^τ` equals `μ_k^{τ₁} − dζ̄^{τ₁}` for the coherent extension `τ₁`.  Since
+`μ_k = ∑_i μ_{ik} ∈ S` (`muGrid_column_sum_mem_inducedFamily`) and `ζ̄ ∈ S`
+(`inducedFamily_closedUnderConjugate`), the combination `μ_k − dζ̄` lies in the supported lattice
+`ℤ[S, A_0]` (`muColumn_sub_conj_support`), where `τ₁` agrees with `τ`
+(`coherent.extends_on_supported`); `τ₁`-linearity (`map_sub`, `map_nsmul`) then splits the image.
+
+This converts `(α_{ij}^τ, (μ_k − dζ̄)^τ) = 0` (`muGridAlpha_tau_inner_muColumn_sub_conj`) into the
+`τ₁` form, giving `(α_{ij}^τ, μ_k^{τ₁}) = da` in the (10.5) `a = 0` argument. -/
+theorem Hypothesis.tau_muColumn_sub_conj_eq_tau1 [Finite G] [Fintype G] {M : Subgroup G}
+    [Fintype ↥M] [Invertible (Nat.card ↥M : ℂ)] [Invertible (Nat.card G : ℂ)]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis M) (hodd : Odd (Nat.card G))
+    (k : Fin hyp.w2) {params : CharacterParameters hyp} (coh : CoherentHypothesis hyp params)
+    {ζ : ClassFunction ↥M ℂ} (hζS : ζ ∈ inducedFamily M) (hζirr : IsIrreducibleCharacter ζ)
+    {d : ℕ} (hcol1 : ∀ i, hyp.muGrid hG hodd i k 1 = (d : ℂ)) (hζ1 : ζ 1 = (hyp.w1 : ℂ))
+    (hdk1 : hyp.muGrid hG hodd 0 k 1 ≠ 1) :
+    hyp.tau ((∑ i : Fin hyp.w1, hyp.muGrid hG hodd i k) - (d : ℂ) • ζ.conj)
+      = coh.tau1 (∑ i : Fin hyp.w1, hyp.muGrid hG hodd i k) - (d : ℂ) • coh.tau1 ζ.conj := by
+  have hμkS := hyp.muGrid_column_sum_mem_inducedFamily hG hodd k hdk1
+  have hspanμ : (∑ i : Fin hyp.w1, hyp.muGrid hG hodd i k)
+      ∈ OddOrder.Peterfalvi.S07.zSpan hyp.Sset := Submodule.subset_span hμkS
+  have hspanζc : ζ.conj ∈ OddOrder.Peterfalvi.S07.zSpan hyp.Sset :=
+    Submodule.subset_span (inducedFamily_closedUnderConjugate M hζS)
+  have hsmulmem : (d : ℂ) • ζ.conj ∈ OddOrder.Peterfalvi.S07.zSpan hyp.Sset := by
+    rw [Nat.cast_smul_eq_nsmul]; exact nsmul_mem hspanζc d
+  have hmem : ((∑ i : Fin hyp.w1, hyp.muGrid hG hodd i k) - (d : ℂ) • ζ.conj)
+      ∈ OddOrder.Peterfalvi.S07.zSupportedSpan hyp.Sset hyp.A0 :=
+    ⟨Submodule.sub_mem _ hspanμ hsmulmem,
+      hyp.muColumn_sub_conj_support hG hodd k hζS hζirr hcol1 hζ1⟩
+  rw [← coh.coherent.extends_on_supported _ hmem, map_sub]
+  congr 1
+  rw [Nat.cast_smul_eq_nsmul, map_nsmul, Nat.cast_smul_eq_nsmul]
+  rfl
+
 /-- **Peterfalvi (10.5), Dade-image half**: under the coherent extension, `α_{ij}` has the stated
 Dade image `δ·(ω_{ij}^σ − ω_{i0}^σ) − n·ζ^{τ₁}`.  (The support half is `alpha_support`.) -/
 theorem alpha_tau_image [Finite G] [Fintype G]
