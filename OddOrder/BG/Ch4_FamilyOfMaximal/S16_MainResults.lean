@@ -458,6 +458,28 @@ theorem kappa_eq_sigmaComplementPrimes_of_hall_subgroupOf_eq_bot [Finite G] {M U
     · exact hpκ h
     · exact hpσ h
 
+/-- **`M` is type `P₂` from a nontrivial Hall `(κ ∪ σ)ᶜ`-complement** (the type-`P₂` side of the
+`M ∈ M_{P₁} ⟺ U = ⊥` characterization): a type-`P` maximal subgroup whose Hall `(κ(M) ∪ σ(M))ᶜ`-
+subgroup `U` is nontrivial has `κ(M) ≠ σ'(M)`, i.e. is type `P₂`.  Dual to
+`isTypeP1_kappaSigma_compl_hall_subgroupOf_eq_bot`: a prime `p ∣ |U|` lies in `(κ ∪ σ)ᶜ ∩ π(M)`,
+so if `κ = σ' = π ∖ σ` then `p ∈ κ` (it is a non-`σ` divisor of `|M|`), contradicting `p ∉ κ`. -/
+theorem isTypeP2_of_hall_subgroupOf_ne_bot [Finite G] {M U : Subgroup G}
+    (hP : S14.IsTypeP M)
+    (hU : Ch03.IsHallSubgroup ((S14.kappa M ∪ OddOrder.BG.Ch3.S10.sigma M)ᶜ) (U.subgroupOf M))
+    (hUne : U.subgroupOf M ≠ ⊥) :
+    S14.IsTypeP2 M := by
+  refine ⟨hP, fun hκσ => ?_⟩
+  obtain ⟨p, hpp, hpdvd⟩ := Nat.exists_prime_and_dvd
+    (by rwa [ne_eq, ← Subgroup.card_eq_one] at hUne)
+  have hpcompl : p ∈ (S14.kappa M ∪ OddOrder.BG.Ch3.S10.sigma M)ᶜ :=
+    hU.1 p (Nat.mem_primeFactors.mpr ⟨hpp, hpdvd, Nat.card_pos.ne'⟩)
+  have hpπ : p ∈ S14.piSet M :=
+    Nat.mem_primeFactors.mpr ⟨hpp,
+      hpdvd.trans (Subgroup.card_subgroup_dvd_card (U.subgroupOf M)), Nat.card_pos.ne'⟩
+  have hpσ : p ∉ OddOrder.BG.Ch3.S10.sigma M := fun h => hpcompl (Set.mem_union_right _ h)
+  have hpκ : p ∈ S14.kappa M := by rw [hκσ]; exact ⟨hpπ, hpσ⟩
+  exact hpcompl (Set.mem_union_left _ hpκ)
+
 /-- **BG Theorem C** (mmd L4303): when `K ≠ 1`, `M` has a paired maximal
 subgroup `Mstar`, the cyclic product `Z = K Kstar`, a TI set `Z_tilde`, and the
 associated type-P duality.
@@ -532,6 +554,16 @@ theorem theoremC_paired_structure [Finite G]
   · -- Conjunct 10 (BG Theorem A(3),(5) + Prop 14.2(d)): `A_0(M) - A(M)` is a TI set.  Residual.
     sorry
   · -- Conjunct 11 (BG Theorem C(10) = Prop 14.2(g) + Theorem 15.7(a)): `U ≠ ⊥ → |K|` prime ∧ `F(M)` TI.
+    -- `U ≠ ⊥` makes `M` type-`P₂`; `|K| = q` prime is Prop 14.2's type-`P₂` clause.  The
+    -- `FittingIsTI M` conjunct (BG Theorem C(10), via Theorem 15.7(a)) is the residual.
+    intro hUne
+    have hUne' : U.subgroupOf M ≠ ⊥ := by
+      rw [ne_eq, Subgroup.subgroupOf_eq_bot]
+      exact fun hd => hUne (hd.eq_bot_of_le hUM)
+    have hP2 : S14.IsTypeP2 M := isTypeP2_of_hall_subgroupOf_ne_bot hP hU hUne'
+    obtain ⟨q, hq, hKq, _⟩ := ((S14.typeP_structure hG hM hP hKM hK hKstar hU).2.2.2.2.1 hP2).2
+    refine ⟨q, hq, hKq, ?_⟩
+    -- `FittingIsTI M` for type-`P₂`: BG Theorem C(10) via Theorem 15.7(a). Residual.
     sorry
   · -- Conjunct 12 (BG Theorem C(8) = `kstar_card_prime_of_inputs`): `U = ⊥ → |K*|` prime.
     -- `U = ⊥` makes `M` type-`P₁` (`κ(M) = σ(M)'` via the trivial Hall complement), then `|K*|` prime.
