@@ -7871,57 +7871,51 @@ theorem fitting_not_ti_cases [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     exact fun h => hwne (Subgroup.mem_bot.mp (h ▸ Subgroup.mem_zpowers (w : G)))
   · -- `IsCyclic X`
     infer_instance
-  · -- `M' ≤ F(M)` (BG conjunct (c), faithful form — see docstring: the printed `M' = F(M)` is an
-    -- overstatement, MathComp `BGsection15` uses `M^'(1) ⊆ 'F(M)`).  Case-split on (a).
-    rcases ha with hF | hP1
-    · -- type-`F`: `M' = M_σ ⋊ E'` with `E'` centralizing `M_σ` (Lem 12.19), so `M' = M_σ × E'` is
-      -- nilpotent normal, whence `M' ≤ F(M)`.  Now **ungated** (the `M' = F(M)` direction was gated on
-      -- the non-derivable `C_Y(E₁) = 1`; the `≤` direction needs only the `E`-setup + Lem 12.19 + the
-      -- nilpotent direct-product packaging — `exists_subgroupESetup`/`derivedE_centralizes_betaComplement`).
-      sorry
-    · -- type-`P₁`: `U = ⊥` gives `M' = M_σ` (Lemma 15.1(b)); `M_σ = M_F` nilpotent ⟹ `M' = M_σ ≤ F(M)`.
-      have hP : S14.IsTypeP M := hP1.1
-      haveI : IsSolvable ↥M := hG.solvable_of_mem_maximalSubgroups hM
-      obtain ⟨K', hK'⟩ := Ch03.hall_E_exists (G := ↥M) (S14.kappa M)
-      set K : Subgroup G := K'.map M.subtype with hKdef
-      have hKM : K ≤ M := hKdef ▸ Subgroup.map_subtype_le K'
-      have hKeq : K.subgroupOf M = K' :=
-        hKdef ▸ Subgroup.comap_map_eq_self_of_injective M.subtype_injective K'
-      have hK : Ch03.IsHallSubgroup (S14.kappa M) (K.subgroupOf M) := hKeq ▸ hK'
-      have hKne : K ≠ ⊥ := fun h =>
-        card_kappaHall_ne_one hP hKM hK (by rw [h, Subgroup.card_bot])
-      obtain ⟨U', hU'⟩ :=
-        Ch03.hall_E_exists (G := ↥M) ((S14.kappa M ∪ OddOrder.BG.Ch3.S10.sigma M)ᶜ)
-      set U : Subgroup G := U'.map M.subtype with hUdef
-      have hUM : U ≤ M := hUdef ▸ Subgroup.map_subtype_le U'
-      have hUeq : U.subgroupOf M = U' :=
-        hUdef ▸ Subgroup.comap_map_eq_self_of_injective M.subtype_injective U'
-      have hU : Ch03.IsHallSubgroup ((S14.kappa M ∪ OddOrder.BG.Ch3.S10.sigma M)ᶜ)
-          (U.subgroupOf M) := hUeq ▸ hU'
-      -- `U = ⊥` from type-`P₁` (`κ(M) = σ'(M)`): no prime of `(κ∪σ)ᶜ` divides `|M|`.
-      have hUbot : U = ⊥ := by
-        have hUsub : U.subgroupOf M = ⊥ := by
-          rw [← Subgroup.card_eq_one]
-          by_contra hne
-          obtain ⟨p, hpp, hpdvd⟩ := Nat.exists_prime_and_dvd hne
-          have hpcompl : p ∈ (S14.kappa M ∪ OddOrder.BG.Ch3.S10.sigma M)ᶜ :=
-            hU.1 p (Nat.mem_primeFactors.mpr ⟨hpp, hpdvd, Nat.card_pos.ne'⟩)
-          have hpM : p ∈ S14.piSet M :=
-            Nat.mem_primeFactors.mpr ⟨hpp,
-              hpdvd.trans (Subgroup.card_subgroup_dvd_card (U.subgroupOf M)), Nat.card_pos.ne'⟩
-          refine hpcompl ?_
-          by_cases hpσ : p ∈ OddOrder.BG.Ch3.S10.sigma M
-          · exact Set.mem_union_right _ hpσ
-          · exact Set.mem_union_left _ (by rw [hP1.2]; exact ⟨hpM, hpσ⟩)
-        exact (Subgroup.subgroupOf_eq_bot.mp hUsub).eq_bot_of_le hUM
-      -- `M' = U ⊔ M_σ = M_σ` (Lemma 15.1(b) with `U = ⊥`).
-      have hM'eq : derivedInG M = OddOrder.BG.Ch3.S10.Msigma M := by
-        rw [(typeP_hall_derived_eq_and_abelian hG hM hKM hUM hKne hK hU).1, hUbot, bot_sup_eq]
-      -- `M' = M_σ = M_F ≤ F(M)` (`M_F` nilpotent normal).
-      haveI : Group.IsNilpotent ↥(MF M) := maxNilpotentNormalHall_isNilpotent M
-      rw [hM'eq]
-      exact hMFeq ▸ le_fittingInAmbient_of_subgroupOf_normal_of_isNilpotent
+  · -- **`M' ≤ F(M)`** (BG conjunct (c), faithful form — see docstring: the printed `M' = F(M)` is an
+    -- overstatement, MathComp `BGsection15` uses `M^'(1) ⊆ 'F(M)`).  The argument is *type-independent*
+    -- (covers both type `F` and type `P₁`): take a §12 `E`-setup `M = M_σ ⋊ E`, so
+    -- `M' = M_σ ⊔ E'` (`derivedInG_eq_Msigma_sup_derivedInG_complement`).  Lemma 12.19 supplies a Hall
+    -- `β(M)'`-subgroup `W ≤ M_σ` of `M_σ` that `E'` centralizes; since `π(M_σ) = π(M_F)` is disjoint
+    -- from `β(M)` (`piSet_mf_inf_beta_disjoint_of_not_fittingIsTI`, as `M_F = M_σ`), `M_σ` is itself a
+    -- `β'`-group, so `W = M_σ` and `E' ≤ C_G(M_σ)`.  Then `M_σ ≤ F(M)` (`M_F = M_σ` nilpotent normal)
+    -- and `E' ≤ C_G(M_σ) ⊓ M ≤ F(M)` (`fitting_decomposition`: `F(M) = (C_M(M_F) ⊓ M) ⊔ M_F`), whence
+    -- `M' = M_σ ⊔ E' ≤ F(M)`.
+    haveI : Group.IsNilpotent ↥(MF M) := maxNilpotentNormalHall_isNilpotent M
+    obtain ⟨E, E₁, E₂, E₃, hsetup⟩ := exists_subgroupESetup hG hM
+    -- `M' = M_σ ⊔ E'`.
+    rw [derivedInG_eq_Msigma_sup_derivedInG_complement hG hsetup]
+    -- Lemma 12.19: a Hall `β(M)'`-subgroup `W ≤ M_σ` of `M_σ` centralized by `E'`.
+    obtain ⟨W, hWle, hWHall, hWcent⟩ := derivedE_centralizes_betaComplement hG hsetup
+    -- `W = M_σ`: every prime of the index `[M_σ : W]` divides `|M_σ| = |M_F|`, hence lies in `π(M_F)`,
+    -- which is disjoint from `β(M)`; but the Hall condition makes that index a `β`-number, so it is `1`.
+    have hWeq : W = OddOrder.BG.Ch3.S10.Msigma M := by
+      have hidx : (W.subgroupOf (OddOrder.BG.Ch3.S10.Msigma M)).index = 1 := by
+        by_contra hne
+        obtain ⟨p, hpp, hpdvd⟩ := Nat.exists_prime_and_dvd hne
+        have hpβ : p ∈ OddOrder.BG.Ch3.S10.beta M := by
+          by_contra hpc
+          exact hWHall.2 p
+            (Nat.mem_primeFactors.mpr ⟨hpp, hpdvd, Subgroup.index_ne_zero_of_finite⟩) hpc
+        have hpπ : p ∈ S14.piSet (MF M) := by
+          rw [hMFeq]
+          exact Nat.mem_primeFactors.mpr ⟨hpp,
+            hpdvd.trans (W.subgroupOf (OddOrder.BG.Ch3.S10.Msigma M)).index_dvd_card,
+            Nat.card_pos.ne'⟩
+        exact piSet_mf_inf_beta_disjoint_of_not_fittingIsTI hG hM hnotTI p hpπ hpβ
+      exact le_antisymm hWle (Subgroup.subgroupOf_eq_top.mp (Subgroup.index_eq_one.mp hidx))
+    -- `M_σ ≤ F(M)` (`M_σ = M_F`, nilpotent normal).
+    have hMσF : OddOrder.BG.Ch3.S10.Msigma M ≤ fittingInAmbient M :=
+      hMFeq ▸ le_fittingInAmbient_of_subgroupOf_normal_of_isNilpotent
         (maxNilpotentNormalHall_le M) (maxNilpotentNormalHall_subgroupOf_normal M)
+    -- `E' ≤ C_G(M_σ) ⊓ M ≤ F(M)`.
+    have hE'F : derivedInG E ≤ fittingInAmbient M := by
+      have hE'cent : derivedInG E ≤ Subgroup.centralizer (MF M : Set G) := by
+        rw [hMFeq, ← hWeq]; exact hWcent
+      have hE'M : derivedInG E ≤ M := (Subgroup.map_subtype_le _).trans hsetup.E_le
+      obtain ⟨Y, -, -, -, -, hFdecomp, -, -, -, -, -, -⟩ := fitting_decomposition hG hM
+      rw [hFdecomp]
+      exact le_sup_of_le_left (le_inf hE'cent hE'M)
+    exact sup_le hMσF hE'F
   · -- final disjunct: from (a).
     by_cases h : IsMulCommutative ↥(MF M)
     · exact Or.inl h

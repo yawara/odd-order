@@ -3869,6 +3869,17 @@ set_option linter.style.longLine false in
 -- BG Corollary 15.5(a) (`S15_MF`, issue 8016): `O_{σ(M)'}(F(M))` is cyclic.  Extracted from the
 -- now-clean `fitting_decomposition`; the bridge that the A(8) `FittingIsTI` rank core consumes.
 #assert_only_allowed_axioms OddOrder.BG.Ch4.S15.opiCoreInG_sigmaCompl_fittingInAmbient_isCyclic
+-- BG Theorem 15.7(a), the type-classification clause (`S15_MF`, issue 7007): a type-`P₂` maximal
+-- subgroup has a `TI` Fitting subgroup (contrapositive: `¬FittingIsTI ⟹ M` is type `F` or `P₁`).
+-- Sorry-free + axiom-clean.
+#assert_only_allowed_axioms OddOrder.BG.Ch4.S15.fittingIsTI_of_isTypeP2
+-- BG Theorem 15.7, the full `¬FittingIsTI` structure theorem (`S15_MF`, issue 7007): `M ∈ M_F ∪ M_P1`,
+-- `M_F = M_σ`, a cyclic nontrivial `X ≤ M_F`, and the faithful conjunct (c) `M' ≤ F(M)` (the printed
+-- equality `M' = F(M)` is an overstatement, weakened to the inclusion matching MathComp `BGsection15`).
+-- The `M' ≤ F(M)` proof is type-independent: `M' = M_σ ⊔ E'`, `E'` centralizes `M_σ` (Lemma 12.19,
+-- since `π(M_σ) ∩ β = ∅`), so both summands lie in `F(M)` via `fitting_decomposition`.  Now fully
+-- sorry-free + axiom-clean (the type-`F` residual is closed; the `= F(M)` gate `C_Y(E₁) = 1` is gone).
+#assert_only_allowed_axioms OddOrder.BG.Ch4.S15.fitting_not_ti_cases
 
 /-! ### Forward-axiom islands (historical mechanism; currently empty)
 
