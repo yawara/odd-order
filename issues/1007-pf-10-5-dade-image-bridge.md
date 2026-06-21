@@ -19,6 +19,26 @@ Peterfalvi (10.5) の Dade-image 半分 `α_ij^τ = δ(ω_ij^σ − ω_i0^σ) �
 `alpha_tau_image` は現状 statement では**証明不能** (arbitrary `params`/`coh`、`omegaSigma`/`mu` free)。
 閉じるには下記 carrier 材料化 + 解析が必須 ([[scaffold-sorry-free-not-done]])。
 
+## ⚠⚠⚠ 最重要 finding (2026-06-21 transport build 中に発覚) — grid index 不整合
+
+**`muGrid` と `omegaSigmaGrid` は独立な index→ω map を使う ⟹ 同一 (i,j) で μ_ij と ω_ij^σ が無関係な
+character になり、per-(i,j) の (10.5) identity `alpha_tau_image` は現 grid 定義では SEMANTICALLY FALSE**
+(transport だけでは閉じない; これが真の core issue):
+- `muGrid i j` (S12:750) = chiColumn 経由、W₁-dual = **`w1CharEquiv i`** (§6, S06:196)、W₂-dual =
+  **`finCardEquivCharacterGroup j`** (§10, S12:721)。台 = ↥M。
+- `omegaSigmaGrid i j` (S12:782) = §5 tic 経由、両 dual = **`charEquiv i`/`charEquiv j`** (§5, S05:54)。台 = G。
+- `w1CharEquiv`/`finCardEquivCharacterGroup`/`charEquiv` は全て「Fin card ≃ duals, 0↦1」だが **独立な
+  base equiv** ゆえ対応しない。producer (`exists_charParameters` S12:1659-1660) は両 grid を**独立に**
+  `mu := muGrid` / `omegaSigma := omegaSigmaGrid` で詰める ⟹ misaligned。
+- **(10.3) (degree/δ 独立性) は index-invariant ゆえ dormant だった**; (10.5) が初めて per-(i,j) 対応を要求し露見。
+
+**∴ 正しい fix = `omegaSigma` を muGrid 自身の ω の §5 σ-image (↥M→G transport) として ALIGN 定義する**
+(transport を畳み込み + 整合を構成的に保証)。cross-level transport は不可避だが、それを「与えられた 2 grid の
+reconcile」でなく「omegaSigma を muGrid に揃えて定義」する形で使う。⚠ **cross-file 影響**: `omegaSigmaGrid` は
+S15.Hypothesis.eta も pin (docstring) ⟹ omegaSigmaGrid 自体を再定義すると S15 に波及。低影響版 = producer 内で
+`omegaSigma` だけ aligned grid に差し替え (omegaSigmaGrid は S15 用に温存、docstring の「同一」主張は要更新)。
+**要ユーザー判断** (architectural, cross-file)。
+
 ## やること
 
 - [ ] **carrier pinning**: `CharacterParameters.omegaSigma`/`mu` を `Hypothesis.omegaSigmaGrid`/`muGrid`
