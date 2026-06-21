@@ -222,6 +222,30 @@ commit `e6eb42b6`/`15bcd901`/`364b3690`/`d5014be8`:
    NC(ψ)≤4+(3.8)→ψ=0→`alpha_tau_image`。
 次の山 = (2) 一般 Cauchy-Schwarz (or 基底展開) + (3) 数論。(1) は cite で軽い。
 
+## 🎉🎉🎉 進捗 (2026-06-21 cont.⁶) — **a=0 PROVEN** (Cauchy-Schwarz 解析的核心 完成)
+
+**(10.5) の解析的核心 `a=0` を完全形式化** = `(α_ij^τ, ζ^{τ₁}) = −n`。Cauchy-Schwarz 議論の全 step
+を組み上げた。commit `cb6111df`/`39f85329`/`553b004e`:
+
+- ✅ **`classFunction_inner_re_sq_le`** (`cb6111df`, private, 一般 H): `⟨φ,ψ⟩.re² ≤ ⟨φ,φ⟩.re·⟨ψ,ψ⟩.re`。
+  **判別式法** — `‖φ−tψ‖²≥0 ∀t` (`inner_self_re_nonneg`) → `discrim_le_zero`。**Parseval/基底展開 不要**
+  (cont.⁵ の「基底展開 or 新規証明」見積もりより遥かに簡潔)。⚠ `.re` 展開は `pow_two`+`Complex.mul_im`+
+  `Complex.star_def` で `(↑t)²` の im と `(star z).re` を処理。
+- ✅ **`muGrid_isIrreducible`** + **`muGridAlpha_tau_mem_ZIrr`** (`39f85329`): μ_ij 既約 (host emj) → α∈ℤ[Irr M]
+  (sub/zsmul/nsmul_mem + `Int/Nat.cast_smul_eq_zsmul/nsmul`) → α^τ∈ℤ[Irr G] (`dadeIntegralCharacterMap_mem_ZIrr_of_supported`)。
+- ✅ **`cauchySchwarz_numeric`** (`553b004e`, private, 純算術): `(d·a)²≤(2+n²)w₁`, d=nw₁+δ, δ=±1, **w₁≥3 (奇数)**,
+  **n≥2 (偶数)** → a=0。a≠0→a²≥1→d²≤(2+n²)w₁ だが `(nw₁+δ)²>(2+n²)w₁` (nlinarith)。原文「n<2 矛盾」を
+  忠実実装。**鍵 = w₁ は奇数 >1 ゆえ ≥3** (これが無いと w₁=2 で bound 違反せず)。
+- ✅✅✅ **`muGridAlpha_tau1_zeta_eq_neg_n`** (`553b004e`): **`(α_ij^τ, ζ^{τ₁}) = −n` (a=0)**。
+  m=(α^τ,ζ^τ₁)∈ℤ (`ClassFunction.inner_mem_ZIrr_int`) + da identity + C-S helper + 3 inner 値 (da, 2+n², w₁) +
+  cauchySchwarz_numeric。`.re` 計算 + `convert`/`push_cast` で numeric に橋渡し。
+
+**▶ 残り = (10.5) Dade-image を閉じる最終 (v)(vi) のみ** (a=0 の上で、別 sub-area):
+a=0 → `α^τ = X − nζ^{τ₁}`, X⊥ζ^{τ₁}, ‖X‖²=2 (← `‖α^τ‖²=2+n²` − n²·‖ζ^τ₁‖²; X:=α^τ+nζ^τ₁ の構成 + 直交)。
+(v) ζ^{τ₁} vanishes on V (§5 (5.3.b)/(5.5)/(3.2.d)) → ψ=X−δ(ω^σ diff) vanishes on V (value-on-V leg ✅)。
+(vi) NC(ψ)≤4<2inf(w₁,w₂) → **(3.8)** → ψ⊥ω_ij^σ,ω_i0^σ → ψ=0 → `alpha_tau_image`。
+**要 §3 (3.6)/(3.8) NC machinery + §5 (5.3.b)/(5.5)** — 新 sub-area。a=0 で解析の山は越えた。
+
 ## やること (旧)
 
 - [ ] **carrier pinning**: `CharacterParameters.omegaSigma`/`mu` を `Hypothesis.omegaSigmaGrid`/`muGrid`
