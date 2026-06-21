@@ -1494,6 +1494,46 @@ theorem Hypothesis.muGrid_inner_eq_zero_of_apply_one_ne [Finite G]
     if_neg (fun heq => hne (by rw [heq]))]
 
 open scoped FiniteInduce in
+/-- **Peterfalvi (10.5), `‖α_{ij}‖² = 2 + n²`**: the squared norm of the virtual character
+`α_{ij} = μ_{ij} − δ·μ_{i0} − n·ζ`.  The triple `{μ_{ij}, μ_{i0}, ζ}` is orthonormal — `μ_{ij}` and
+`μ_{i0}` are orthonormal certain-type characters (`muGrid_inner_self` / `muGrid_inner_cross_column`,
+`j ≠ 0`), and both are orthogonal to the degree-distinct irreducible `ζ`
+(`muGrid_inner_eq_zero_of_apply_one_ne`, from the degree mismatches `hdζ`/`h0ζ`) — so
+`‖α‖² = 1 + δ² + n² = 2 + n²` (`δ² = 1`).  The reversed inner products use `inner_conj_symm`.
+
+This is the `‖α_{ij}^τ‖²` input to the Cauchy–Schwarz bound of the (10.5) `a = 0` argument (the
+Dade isometry `τ` preserves the norm).  The caller supplies the degree mismatches
+`μ_{i0}(1) = 1 ≠ w₁` and `μ_{ij}(1) = d ≠ w₁` (from `n·w₁ = d − δ`, `d > 1`, `w₁ > 1`). -/
+theorem Hypothesis.muGridAlpha_inner_self [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} [Invertible (Nat.card ↥M : ℂ)]
+    (hyp : Hypothesis M) (hodd : Odd (Nat.card G)) (i : Fin hyp.w1) {j : Fin hyp.w2} (hj0 : j ≠ 0)
+    {ζ : ClassFunction ↥M ℂ} (hζirr : IsIrreducibleCharacter ζ) {δ : ℤ} {n : ℕ}
+    (hdζ : hyp.muGrid hG hodd i j 1 ≠ ζ 1) (h0ζ : hyp.muGrid hG hodd i 0 1 ≠ ζ 1)
+    (hδpm : δ = 1 ∨ δ = -1) :
+    ClassFunction.inner (hyp.muGrid hG hodd i j - (δ : ℂ) • hyp.muGrid hG hodd i 0 - (n : ℂ) • ζ)
+        (hyp.muGrid hG hodd i j - (δ : ℂ) • hyp.muGrid hG hodd i 0 - (n : ℂ) • ζ)
+      = 2 + (n : ℂ) ^ 2 := by
+  haveI := hyp.finiteG
+  classical
+  have hA := hyp.muGrid_inner_self hG hodd i j
+  have hB := hyp.muGrid_inner_self hG hodd i 0
+  have hZ : ClassFunction.inner ζ ζ = 1 := by
+    rw [OddOrder.RepresentationTheory.irr_cf_inner hζirr hζirr, if_pos rfl]
+  have hP := hyp.muGrid_inner_cross_column hG hodd i i hj0
+  have hP' := hyp.muGrid_inner_cross_column hG hodd i i (Ne.symm hj0)
+  have hQ := hyp.muGrid_inner_eq_zero_of_apply_one_ne hG hodd i j hζirr hdζ
+  have hR := hyp.muGrid_inner_eq_zero_of_apply_one_ne hG hodd i 0 hζirr h0ζ
+  have hQ' : ClassFunction.inner ζ (hyp.muGrid hG hodd i j) = 0 := by
+    rw [OddOrder.RepresentationTheory.inner_conj_symm (hyp.muGrid hG hodd i j) ζ, hQ, star_zero]
+  have hR' : ClassFunction.inner ζ (hyp.muGrid hG hodd i 0) = 0 := by
+    rw [OddOrder.RepresentationTheory.inner_conj_symm (hyp.muGrid hG hodd i 0) ζ, hR, star_zero]
+  simp only [ClassFunction.inner_sub_left, ClassFunction.inner_sub_right,
+    ClassFunction.inner_smul_left, OddOrder.RepresentationTheory.inner_smul_right,
+    hA, hB, hZ, hP, hP', hQ, hQ', hR, hR', star_intCast, star_natCast,
+    mul_zero, zero_mul, sub_zero, zero_sub, mul_one, mul_neg, neg_neg, neg_zero]
+  rcases hδpm with h | h <;> subst h <;> push_cast <;> ring
+
+open scoped FiniteInduce in
 /-- **§10 `W₁`-vanishing of the column difference** (Peterfalvi (10.5), first step, via (4.3.c) +
 (4.4)): on `W₁^#`, the materialized character `μ_{ij}` equals `δ_j` times the column-`0` character
 `μ_{i0}`.  Indeed `x ∈ W₁^# ⊆ V = W − W₂`, so (4.3.c) gives `μ_{ij}(x) = δ_j·ω_{ij}(x)` and
