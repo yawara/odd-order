@@ -5251,6 +5251,22 @@ Standalone `sorry`-free form of conjunct 3 of `theoremA_maximal_structure`.  Axi
 
 #assert_only_allowed_axioms OddOrder.BG.Ch4.S16.typeP_maximal_eq_kappaHall_sup_U_sup_Msigma
 
+/-! **BG Theorem A(7), first clause** (`S16_MainResults`, `derivedDerived_le_fittingInAmbient`):
+`M'' ⊆ F(M)` for any maximal `M`.  No longer `M_F ≠ M_σ`-gated (issue 8012): the `M_F = M_σ` branch
+runs `M'' ≤ M_σ ≤ M_F ≤ F(M)` (`derivedDerived_le_Msigma` + `M_σ` nilpotent), the type-`P₁` branch
+cites Theorem 15.2 (`mf_ne_msigma_typeP1_structure`).  Axiom-clean. -/
+
+#assert_only_allowed_axioms OddOrder.BG.Ch4.S16.derivedDerived_le_fittingInAmbient
+
+/-! **BG Theorem A — faithful monolith** (`S16_MainResults`, `theoremA_maximal_structure_faithful`):
+all 11 conjuncts of BG Theorem A, `sorry`-free.  The faithfulness-corrected counterpart of the
+`sorry` `theoremA_maximal_structure` (adds the explicit `K ≤ M`, `U ≤ M` of the BG setup
+`M = K U M_σ`, making A(3)/A(4)/A(8) provable).  Assembled from `theoremA_ungated_conjuncts`,
+`typeP_maximal_eq_kappaHall_sup_U_sup_Msigma`, `derivedDerived_le_fittingInAmbient`, and
+`theoremA8_structure`.  Axiom-clean. -/
+
+#assert_only_allowed_axioms OddOrder.BG.Ch4.S16.theoremA_maximal_structure_faithful
+
 /-! **BG Proposition 16.1 — type-`P` data construction layer** (`S16_MainResults`): the shared
 `TypePData` core and the type II/III/IV/V "last-mile" bridges feeding
 `proposition_type_classification`'s forward bridges.
