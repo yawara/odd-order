@@ -90,6 +90,15 @@ bottom-out** するので、clean 化には §15 foundation が先。真の順�
 
 ## 進捗ログ
 
+**2026-06-22 ✅✅✅ BG Thm 15.7 `fitting_not_ti_cases` 完全完成 — type-F の `M'≤F(M)` residual close、sorry-free + axiom-clean** (`549511d7`, full build 3881 green, 実 sorry 134→133):
+- 前セッションで (c) を faithful な `M'≤F(M)` に弱め (overstatement 判明)、唯一残っていた **type-F の `M'≤F(M)`** sorry を close。`=F(M)` gate (`C_Y(E₁)=1`) が消えたので **ungated**。
+- 証明は **type 非依存** (旧 type-P1-only 証明を包含、`rcases ha` 場合分けは `≤` 方向には spurious だったので削除):
+  - §12 E-setup `M=M_σ⋊E` (`exists_subgroupESetup`) ⟹ `M'=M_σ⊔E'` (`derivedInG_eq_Msigma_sup_derivedInG_complement`)
+  - Lemma 12.19 (`derivedE_centralizes_betaComplement`) で Hall β'-部分群 `W≤M_σ` (E' が中心化) を取得。`π(M_σ)=π(M_F)` は `β(M)` と disjoint (`piSet_mf_inf_beta_disjoint_of_not_fittingIsTI`、M_F=M_σ) ゆえ M_σ は β'-群 → index `[M_σ:W]=1` → `W=M_σ` → `E'≤C_G(M_σ)`
+  - `M_σ≤F(M)` (M_σ=M_F nilpotent normal) + `E'≤C_G(M_σ)⊓M≤F(M)` (`fitting_decomposition`: `F(M)=(C_M(M_F)⊓M)⊔M_F`) ⟹ `M'=M_σ⊔E'≤F(M)`
+- **`#print axioms` = `[propext, Classical.choice, Quot.sound]`** (sorryAx 無し)。`fittingIsTI_of_isTypeP2` と共に AxiomsCheck 登録 (回帰保護)。
+- ⟹ **5 deep 定理のうち Lemma 15.1 / Thm 15.2(a) / Thm 15.7 / Cor 15.5 が全完了**。残 = **Thm C conjunct 2 (N(U)⊄M=Cor 14.12) / conjunct 10 (A0-A TI=Thm A(3)(5)+Prop 14.2(d))** + **Prop 16.1 配線**。
+
 **2026-06-21 (cont.) ✅✅ BG Thm 15.7(a) `fittingIsTI_of_isTypeP2` 完成 → Thm C conjunct 11 close (10/12) + 15.7 を (c) 残のみに** (`dc2fe378` + `7eeb933b`, full build 3881 green, sorry 136→135):
 - **`fittingIsTI_of_isTypeP2` (S15, BG Thm 15.7 conjunct (a), mmd L4244)**: type-P2 maximal ⟹ FittingIsTI。
   証明 = landed §15 piece のみ: `¬FittingIsTI ⟹ MF=Mσ` (`mf_eq_msigma_of_not_fittingIsTI`) + `π(MF)∩β=∅`
@@ -234,6 +243,7 @@ bottom-out** するので、clean 化には §15 foundation が先。真の順�
       σ-template = `exists_sylow_le_of_mem_sigma` (S10:536)、`centralizer_le_E_of_tau2` (full-Sylow abelian 枝)。
 - [ ] conjunct 1-4 を `typeP_auxiliary_structure_gated` に wire (sorry 139→138)
 - [ ] Thm 15.2(a) `mf_ne_msigma_typeP1_structure` (S15:1144)
+- [x] **Thm 15.7 `fitting_not_ti_cases` 完全完成** (`549511d7`, 2026-06-22): type-F の `M'≤F(M)` residual を close、**sorry-free + axiom-clean** (AxiomsCheck 登録)。type 非依存証明で旧 type-P1-only を包含。詳細 = 上記進捗ログ 2026-06-22。↓ 以下は (c) overstatement 発見の経緯記録 (resolved):
 - [~] Thm 15.7 `fitting_not_ti_cases` — **✅✅✅ 2026-06-22 重大発見: BG 印刷版 conjunct (c) `M'=F(M)` は overstatement、faithful 版は `M'≤F(M)`** (ChatGPT GPT-5 Pro 相談 + MathComp 検証で確定):
   - **等式 `M'=F(M)` は type-F で `C_Y(E₁)=1` (E₁ が τ₂-Fitting 因子 Y=O_σ'(F(M)) 上 FPF) 一点に等価** (lane-f 独立検証) で、引用補題 (12.1/12.6/12.12/15.1/15.5) から**導出不能** (Cor 12.6(d) は E₃=1 で vacuous、他は Mσ 作用で Y でない)。私の旧診断「C_E(Mσ)=1 (Frobenius)」は過剰 — 正しい等価は弱い `C_Y(E₁)=1` (C_E(H)=E')。
   - **authoritative MathComp odd-order 形式化 (`theories/BGsection15.v`/`nonTI_Fitting_structure`) が conjunct (c) を `M^'(1) ⊆ 'F(M)` (包含, L944) ∧ `Mσ × O_σ('F(M)) = 'F(M)` と形式化、等式でない** → BG 印刷版が overstatement と確定。**形式化者コメント (L916-922) が smoking gun**: "We had to change the statement ... the first equality of part (c) does not appear to be valid ... only the inclusion M' ⊆ F(M) seems to be needed" (= C_Y(E₁)≠1 機序)。**curl で一次ソース独立検証済** (workflow `wddw8y3qt`; ChatGPT が付けた source「Ethiopian digital library」は偽だったが MathComp の事実は本物 — 再 cite 時は一次ソース参照)。詳細 `notes/bg/s15_7_typeF_chatgpt_prompt.md`。
