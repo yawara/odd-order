@@ -141,56 +141,9 @@ theorem fixedByUE_le_fixedByU (act : CoprimeFrobeniusAction L H) :
 
 end CoprimeFrobeniusAction
 
-/-- **Peterfalvi (9.1)**: Wielandt's fixed-point formula for a coprime Frobenius action.
-For `L = U ⋊ E` Frobenius with kernel `U` acting on a finite solvable `H` of order prime
-to `|L|`,
-`|C_H(UE)|^{|E|} · |H| = |C_H(E)|^{|E|} · |C_H(U)|`.
-
-The proof rests on **Wielandt's fixed-point theorem** ([HB], Ch. XI, Thm 12.4): the
-group-ring identity `U·E + |U|·1 = ∑_{u∈U} E^u + U` in `ℤ[L]` transforms, via the
-solvability of `H` and the coprimality, into the multiplicative fixed-point identity
-`|C_H(UE)|^{|L|} · |H|^{|U|} = (∏_{u∈U} |C_H(E^u)|^{|E|}) · |C_H(U)|^{|U|}`, whence the
-claim by taking `|U|`-th roots.  Wielandt's theorem is not yet available in mathlib: its
-core reduces to a characteristic-0 / Brauer-character trace argument on the
-elementary-abelian chief factors of the solvable group `H`. -/
-theorem wielandt_fixedPoint_frobenius {L H : Type*} [Group L] [Group H]
-    [Finite L] [Finite H] (act : CoprimeFrobeniusAction L H) :
-    Nat.card ↥act.fixedByUE ^ Nat.card ↥act.E * Nat.card H =
-      Nat.card ↥act.fixedByE ^ Nat.card ↥act.E * Nat.card ↥act.fixedByU := by
-  sorry
-
-/-- **Peterfalvi (9.1), first corollary**: if `C_H(E) = 1` then the Frobenius kernel `U`
-centralizes `H`, i.e. `C_H(U) = H`. -/
-theorem wielandt_fixedPoint_trivial_E_fixed {L H : Type*} [Group L] [Group H]
-    [Finite L] [Finite H] (act : CoprimeFrobeniusAction L H)
-    (hE : act.fixedByE = ⊥) :
-    act.fixedByU = ⊤ := by
-  have key := wielandt_fixedPoint_frobenius act
-  have hUE : act.fixedByUE = ⊥ := le_bot_iff.mp (hE ▸ act.fixedByUE_le_fixedByE)
-  simp only [hUE, hE, Subgroup.card_bot, one_pow, one_mul] at key
-  exact Subgroup.eq_top_of_card_eq _ key.symm
-
-/-- **Peterfalvi (9.1), second corollary**: if `C_H(U) = 1` then `|H| = |C_H(E)|^{|E|}`. -/
-theorem wielandt_fixedPoint_trivial_U_fixed {L H : Type*} [Group L] [Group H]
-    [Finite L] [Finite H] (act : CoprimeFrobeniusAction L H)
-    (hU : act.fixedByU = ⊥) :
-    Nat.card H = Nat.card ↥act.fixedByE ^ Nat.card ↥act.E := by
-  have key := wielandt_fixedPoint_frobenius act
-  have hUE : act.fixedByUE = ⊥ := le_bot_iff.mp (hU ▸ act.fixedByUE_le_fixedByU)
-  simp only [hUE, hU, Subgroup.card_bot, one_pow, one_mul, mul_one] at key
-  exact key
-
-/-- **Peterfalvi (9.1), the fixed-point-free corollary**: if *both* the Frobenius kernel `U` and
-the complement `E` act fixed-point-freely on `H` (`C_H(U) = C_H(E) = 1`), then `H` is trivial.
-This is the form used in Peterfalvi (13.17.b): a Frobenius group `U W₁` acting fixed-point-freely
-on the Fitting kernel `H = L_F` forces `|L_F| = 1`. -/
-theorem coprimeFrobeniusAction_card_eq_one {L H : Type*} [Group L] [Group H]
-    [Finite L] [Finite H] (act : CoprimeFrobeniusAction L H)
-    (hE : act.fixedByE = ⊥) (hU : act.fixedByU = ⊥) :
-    Nat.card H = 1 := by
-  have key := wielandt_fixedPoint_trivial_U_fixed act hU
-  rw [hE, Subgroup.card_bot, one_pow] at key
-  exact key
+/-! The group-level Wielandt formula `wielandt_fixedPoint_frobenius` and its corollaries are proved
+from the chief-series assembly in `OddOrder.GroupTheory.WielandtFixedPoint` (downstream of this
+file, which holds only the shared carrier and fixed-point subgroups). -/
 
 end WielandtFixedPoint
 
@@ -247,76 +200,10 @@ theorem IsFrobeniusGroup.coprime_card_of_inf_kernel_eq_bot_le {G : Type*} [Group
   rwa [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hKL).toEquiv,
     Nat.card_congr (Subgroup.subgroupOfEquivOfLe hNL).toEquiv] at hcop
 
-/-- **Peterfalvi (13.17.b), the fixed-point-free engine**: let `Lsub ≤ G` be a finite Frobenius
-group with kernel `N` (`N ≤ Lsub`, `N.subgroupOf Lsub` normal).  If a *Frobenius subgroup*
-`U E ≤ Lsub` (kernel `U`, complement `E`, with its own Frobenius structure on `↥(U ⊔ E)`) meets `N`
-trivially (`U ⊓ N = E ⊓ N = ⊥`) and acts coprimely (`|N| ⟂ |UE|`), then `N = ⊥`.
-
-Both `U` and `E` act fixed-point-freely on `N`: every nontrivial element, lifted into the Frobenius
-group `↥Lsub`, lies outside the kernel, so `centralizer_inf_kernel_eq_bot_of_not_mem` makes its
-centralizer meet `N` trivially.  Hence the fixed-point subgroups vanish and Wielandt's formula
-(`coprimeFrobeniusAction_card_eq_one`) forces `|N| = 1`.  This is exactly the step that, in
-(13.17.b), derives `|L_F| = 1` from `U ∩ L_F = 1`, contradicting `L_F ≠ 1`.  Phrasing the Frobenius
-subgroup `U E` in the ambient `G` (rather than inside `↥Lsub`) lets callers supply `basic_structure`'s
-`UW1_frobenius` directly, with no `subgroupOf` transfer. -/
-theorem isFrobenius_kernel_eq_bot_of_frobenius_subgroup {G : Type*} [Group G] [Finite G]
-    {Lsub N U E : Subgroup G} (hNL : N ≤ Lsub) (hUL : U ⊔ E ≤ Lsub)
-    (hFrob : ∃ A : Subgroup ↥Lsub, Ch06.IsFrobeniusGroup ↥Lsub (N.subgroupOf Lsub) A)
-    (hUE : Ch06.IsFrobeniusGroup ↥(U ⊔ E) (U.subgroupOf (U ⊔ E)) (E.subgroupOf (U ⊔ E)))
-    (hUN : U ⊓ N = ⊥) (hEN : E ⊓ N = ⊥) (hsolv : IsSolvable ↥N)
-    (hcop : Nat.Coprime (Nat.card ↥N) (Nat.card ↥(U ⊔ E))) :
-    N = ⊥ := by
-  classical
-  obtain ⟨A, hFrobA⟩ := hFrob
-  -- `U ⊔ E ≤ Lsub ≤ N_G(N)` (the latter because `N` is normal in the Frobenius group `↥Lsub`).
-  have hUEnorm : (U ⊔ E) ≤ Subgroup.normalizer (N : Set G) :=
-    hUL.trans ((Subgroup.normal_subgroupOf_iff_le_normalizer hNL).mp hFrobA.isNormal)
-  letI act : MulDistribMulAction ↥(U ⊔ E) ↥N :=
-    MulDistribMulAction.compHom (M := ↥(Subgroup.normalizer (N : Set G))) ↥N
-      (Subgroup.inclusion hUEnorm)
-  set φ : ↥(U ⊔ E) →* MulAut ↥N := MulDistribMulAction.toMulAut ↥(U ⊔ E) ↥N with hφ
-  have hφ_coe : ∀ (a : ↥(U ⊔ E)) (x : ↥N), ((φ a) x : G) = (a : G) * (x : G) * (a : G)⁻¹ :=
-    fun _ _ => rfl
-  let act' : CoprimeFrobeniusAction ↥(U ⊔ E) ↥N :=
-    { U := U.subgroupOf (U ⊔ E), E := E.subgroupOf (U ⊔ E), frobenius := hUE,
-      H_solvable := hsolv, φ := φ, coprime_order := hcop }
-  -- Each factor's nontrivial elements lie outside `N`, hence (lifted into the Frobenius group
-  -- `↥Lsub`) centralize nothing nontrivial in `N`: the fixed-point subgroup is trivial.
-  have key : ∀ {K : Subgroup G}, K ⊓ N = ⊥ → K ≠ ⊥ → K ≤ U ⊔ E →
-      fixedSubgroup φ (K.subgroupOf (U ⊔ E)) = ⊥ := by
-    intro K hKN hKne hKle
-    rw [eq_bot_iff]
-    intro n hn
-    rw [Subgroup.mem_bot]
-    by_contra hne
-    have hnG : (n : G) ≠ 1 := fun h => hne (Subtype.ext h)
-    obtain ⟨k, hkK, hkne⟩ := (K.bot_or_exists_ne_one).resolve_left hKne
-    have hkUE : k ∈ U ⊔ E := hKle hkK
-    have hfix := (mem_fixedSubgroup.mp hn) ⟨k, hkUE⟩ (Subgroup.mem_subgroupOf.mpr hkK)
-    have hcomm : k * (n : G) * k⁻¹ = (n : G) := by
-      have hc : ((φ ⟨k, hkUE⟩) n : G) = (n : G) := Subtype.ext_iff.mp hfix
-      rwa [hφ_coe] at hc
-    have hkN : k ∉ N := fun h =>
-      hkne (Subgroup.disjoint_def.mp (disjoint_iff.mpr hKN) hkK h)
-    -- Lift `k`, `n` into the Frobenius group `↥Lsub` and apply the kernel-centralizer engine.
-    have hk_notmem : (⟨k, hUL hkUE⟩ : ↥Lsub) ∉ N.subgroupOf Lsub :=
-      fun h => hkN (Subgroup.mem_subgroupOf.mp h)
-    have hcb := IsFrobeniusGroup.centralizer_inf_kernel_eq_bot_of_not_mem hFrobA hk_notmem
-    have hkn : k * (n : G) = (n : G) * k := by rwa [mul_inv_eq_iff_eq_mul] at hcomm
-    have hn_cent : (⟨(n : G), hNL n.2⟩ : ↥Lsub) ∈
-        Subgroup.centralizer ({(⟨k, hUL hkUE⟩ : ↥Lsub)} : Set ↥Lsub) := by
-      rw [Subgroup.mem_centralizer_singleton_iff]
-      exact Subtype.ext hkn.symm
-    have hn_in : (⟨(n : G), hNL n.2⟩ : ↥Lsub) ∈
-        Subgroup.centralizer ({(⟨k, hUL hkUE⟩ : ↥Lsub)} : Set ↥Lsub) ⊓ N.subgroupOf Lsub :=
-      ⟨hn_cent, Subgroup.mem_subgroupOf.mpr n.2⟩
-    exact hnG (congrArg Subtype.val (Subgroup.mem_bot.mp (hcb.le hn_in)))
-  have hUne : U ≠ ⊥ := fun hb => hUE.ne_bot_kernel (by rw [hb, Subgroup.bot_subgroupOf])
-  have hEne : E ≠ ⊥ := fun hb => hUE.ne_bot_complement (by rw [hb, Subgroup.bot_subgroupOf])
-  have hfixU : act'.fixedByU = ⊥ := key hUN hUne le_sup_left
-  have hfixE : act'.fixedByE = ⊥ := key hEN hEne le_sup_right
-  have hcard := coprimeFrobeniusAction_card_eq_one act' hfixE hfixU
-  exact Subgroup.card_eq_one.mp hcard
+/-! The fixed-point-free engine `isFrobenius_kernel_eq_bot_of_frobenius_subgroup` (Peterfalvi
+(13.17.b)), which combines `centralizer_inf_kernel_eq_bot_of_not_mem` with Wielandt's formula
+`coprimeFrobeniusAction_card_eq_one`, lives in `OddOrder.GroupTheory.WielandtFixedPoint`
+(downstream, since it depends on the assembled Wielandt formula). -/
 
 end FrobeniusCentralizer
 

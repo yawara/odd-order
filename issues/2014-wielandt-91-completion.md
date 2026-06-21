@@ -88,8 +88,13 @@ deepest pole。`|C_H(UE)|^|E| · |H| = |C_H(E)|^|E| · |C_H(U)|` (Frobenius L=U�
       factor で証明。`finrank_elab_identity` (要 `hUE:U⊔E=⊤` + `htag` (†)) を `elabRepresentation p hN.restrict`
       に適用 + done engine 群で `htag` discharge。上記 instance 知見を流用。`Invertible(card U:ZMod p)` =
       coprimality + p 素数。
-- [ ] **E relocation** → `wielandt_fixedPoint_frobenius` を downstream leaf へ (CoprimeAction は
-      `WielandtElabBridge`/`CoprimeFixedPoints` を循環で import 不可)。
+- [x] **E relocation** = **DONE** (2026-06-21, 新 leaf `WielandtFixedPoint.lean`, commit `d98be5d7`,
+      full build 3878 green, 実 sorry 135 不変): `wielandt_fixedPoint_frobenius` を assembly 経由で証明
+      (`wielandt_formula_of_perfactor (wielandtPerFactor_of_dim hdim) …`)。群論層 A/B/C が load-bearing 化、
+      唯一残 sorry = `hdim` = piece D の `PerFactorDimIdentity`。carrier + Frobenius helper 3 本は
+      CoprimeAction 残置、4 Wielandt 定理 + engine `isFrobenius_kernel_eq_bot_of_frobenius_subgroup` を
+      新 leaf へ。S15 import を WielandtFixedPoint に retarget。**⟹ (9.1) は honest に (†) per-factor dim
+      恒等式のみに bottom-out。残るは piece D のみ。**
 - [ ] 下流 (別 issue 可): (9.3) `typeII_III_IV_order_relations` → (9.6) → (10.11)/(11.7) → (13.2.b)
       `basic_structure.P_order` / `card_Q_eq` を順に de-gate。
 
