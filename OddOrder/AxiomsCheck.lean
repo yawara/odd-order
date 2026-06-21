@@ -5273,6 +5273,13 @@ contradicts `M' < M`).  Powers Proposition 16.1 clause (e).  Axiom-clean. -/
 
 #assert_only_allowed_axioms OddOrder.BG.Ch4.S16.typeF_not_exists_hall_derived_eq
 
+/-! **Proposition 16.1 input `hP_derived` / BG Theorem C(3)** (`S16_MainResults`,
+`typeP_exists_hall_derived_eq`): a type-`P` maximal subgroup has a `(κ∪σ)'`-Hall `U` with
+`M' = U M_σ` (constructed `K`/`U`, `K ≠ ⊥` from type-`P`, then `typeP_hall_derived_eq_and_abelian`).
+Powers Proposition 16.1 clause (e).  Axiom-clean. -/
+
+#assert_only_allowed_axioms OddOrder.BG.Ch4.S16.typeP_exists_hall_derived_eq
+
 /-! **BG Proposition 16.1 — type-`P` data construction layer** (`S16_MainResults`): the shared
 `TypePData` core and the type II/III/IV/V "last-mile" bridges feeding
 `proposition_type_classification`'s forward bridges.
