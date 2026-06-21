@@ -1180,6 +1180,90 @@ theorem theoremA8_structure [Finite G]
     theoremA8_complement_eq_bot_and_kappa_prime hG hM hKM hK hKstar hU hne
   exact ⟨hUbot, S15.fitting_isTI_of_mf_ne_msigma hG hM hne, hKp⟩
 
+/-- **BG Theorem A(7), first clause — `M'' ⊆ F(M)`** (mmd L4354), as a standalone `sorry`-free
+lemma for *any* maximal `M`.  No longer `M_F ≠ M_σ`-gated: Theorem 15.2's closing (issue 8012)
+supplies the type-`P₁` half, so a case split on `M_F = M_σ` discharges both branches.
+
+* `M_F = M_σ` (`M_σ` nilpotent, `maxNilpotentNormalHall_eq_Msigma_iff_isNilpotent`): then
+  `M'' ≤ M_σ` (`derivedDerived_le_Msigma`, always true via §12 `E'` abelian) and
+  `M_σ ≤ M_F ≤ F(M)` (`Msigma_le_maxNilpotentNormalHall_of_nilpotent`,
+  `maxNilpotentNormalHall_le_fittingInG`);
+* `M_F ≠ M_σ` (type `P₁`): the `M'' ⊆ F(M)` conjunct of Theorem 15.2
+  (`mf_ne_msigma_typeP1_structure`), where `F(M) = Q C_M(Q) ⊊ M_σ` and the containment is the
+  genuinely-harder chief-factor analysis (not reducible to `M'' ≤ M_σ`, since `M_σ ⊄ F(M)` here).
+
+The second clause of A(7) (`F(M) = C_M(M_F) M_F`, and `K ≠ 1 → F(M) ⊆ M'`) is left to the gated
+`fittingInAmbient_eq_*`/`theoremC_paired_structure`; only `M'' ⊆ F(M)` enters the faithful monolith
+`theoremA_maximal_structure_faithful`. -/
+theorem derivedDerived_le_fittingInAmbient [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M K Kstar : Subgroup G}
+    (hM : M ∈ maximalSubgroups G) (hKM : K ≤ M)
+    (hK : Ch03.IsHallSubgroup (S14.kappa M) (K.subgroupOf M))
+    (hKstar : Kstar = OddOrder.BG.Ch3.S10.Msigma M ⊓ Subgroup.centralizer (K : Set G)) :
+    derivedInG (derivedInG M) ≤ S15.fittingInAmbient M := by
+  by_cases hne : S15.MF M = OddOrder.BG.Ch3.S10.Msigma M
+  · -- `M_σ` nilpotent: `M'' ≤ M_σ ≤ M_F ≤ F(M)`.
+    have hnil : Group.IsNilpotent ↥(OddOrder.BG.Ch3.S10.Msigma M) :=
+      (S15.maxNilpotentNormalHall_eq_Msigma_iff_isNilpotent hG hM).mp hne
+    calc derivedInG (derivedInG M)
+        ≤ OddOrder.BG.Ch3.S10.Msigma M := S15.derivedDerived_le_Msigma hG hM
+      _ ≤ maxNilpotentNormalHall M :=
+          S15.Msigma_le_maxNilpotentNormalHall_of_nilpotent hG hM hnil
+      _ ≤ S15.fittingInAmbient M := S15.maxNilpotentNormalHall_le_fittingInG M
+  · -- type `P₁`: cite the `M'' ⊆ F(M)` conjunct (16th) of Theorem 15.2.
+    obtain ⟨_, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, hA7, _, _, _⟩ :=
+      S15.mf_ne_msigma_typeP1_structure hG hM hne hKM hK hKstar
+    exact hA7
+
+/-- **BG Theorem A — the faithful monolith** (mmd L4346-4355), all 11 conjuncts `sorry`-free.
+
+This is the faithfulness-corrected counterpart of `theoremA_maximal_structure`: it adds the explicit
+`hKM : K ≤ M` and `hUM : U ≤ M` that the BG setup `M = K U M_σ` carries but the bare Hall
+conditions on `K.subgroupOf M` / `U.subgroupOf M` do not force, so conjuncts A(3) (`M = K U M_σ`),
+A(4) (`C_U(k) = 1`), and A(8) (`U = 1`) become provable.  Every conjunct is discharged by a
+standalone lemma — none gated:
+
+* A(1) `M_σ` is `σ(M)`-Hall, A(2) `K` cyclic, A(3)-normal `M ≤ N(U M_σ)`, A(4) `C_U(k) = 1`,
+  A(5) `K* ≠ 1` and `C_M(k) = K K*`, A(6) `M_F ≤ M_σ ≤ M'` — all from `theoremA_ungated_conjuncts`;
+* A(3)-decomposition `M = K U M_σ` — `typeP_maximal_eq_kappaHall_sup_U_sup_Msigma`;
+* A(7) `M'' ⊆ F(M)` — `derivedDerived_le_fittingInAmbient` (now ungated, issue 8012);
+* A(8) `M_F ≠ M_σ ⟹ U = 1 ∧ F(M)` TI `∧ |K|` prime — `theoremA8_structure` (`U.subgroupOf M = ⊥`
+  upgraded to `U = ⊥` via `hUM`).
+
+The `sorry` `theoremA_maximal_structure` is kept as-is for its existing (cross-lane) callers; new
+consumers wanting a proved Theorem A cite this faithful form. -/
+theorem theoremA_maximal_structure_faithful [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M K Kstar U : Subgroup G}
+    (hM : M ∈ maximalSubgroups G) (hKM : K ≤ M) (hUM : U ≤ M)
+    (hK : Ch03.IsHallSubgroup (S14.kappa M) (K.subgroupOf M))
+    (hKstar : Kstar = OddOrder.BG.Ch3.S10.Msigma M ⊓ Subgroup.centralizer (K : Set G))
+    (hU : Ch03.IsHallSubgroup ((S14.kappa M ∪ OddOrder.BG.Ch3.S10.sigma M)ᶜ)
+      (U.subgroupOf M)) :
+    Ch03.IsHallSubgroup (OddOrder.BG.Ch3.S10.sigma M) (OddOrder.BG.Ch3.S10.Msigma M) ∧
+      IsCyclic ↥K ∧
+      M = K ⊔ U ⊔ OddOrder.BG.Ch3.S10.Msigma M ∧
+      M ≤ Subgroup.normalizer ((U ⊔ OddOrder.BG.Ch3.S10.Msigma M : Subgroup G) : Set G) ∧
+      (∀ k ∈ K, k ≠ 1 → U ⊓ Subgroup.centralizer ({k} : Set G) = ⊥) ∧
+      Kstar ≠ ⊥ ∧
+      (K ≠ ⊥ → ∀ k ∈ K, k ≠ 1 → M ⊓ Subgroup.centralizer ({k} : Set G) = K ⊔ Kstar) ∧
+      S15.MF M ≤ OddOrder.BG.Ch3.S10.Msigma M ∧
+      OddOrder.BG.Ch3.S10.Msigma M ≤ derivedInG M ∧
+      derivedInG (derivedInG M) ≤ S15.fittingInAmbient M ∧
+      (S15.MF M ≠ OddOrder.BG.Ch3.S10.Msigma M →
+        U = ⊥ ∧ S15.FittingIsTI M ∧ ∃ p : ℕ, p.Prime ∧ Nat.card ↥K = p) := by
+  obtain ⟨hA1, hA2, hA3n, hA4, hA5a, hA5b, hA6a, hA6b⟩ :=
+    theoremA_ungated_conjuncts hG hM hKM hUM hK hKstar hU
+  refine ⟨hA1, hA2, typeP_maximal_eq_kappaHall_sup_U_sup_Msigma hG hM hKM hUM hK hU,
+    hA3n, hA4, hA5a, hA5b, hA6a, hA6b,
+    derivedDerived_le_fittingInAmbient hG hM hKM hK hKstar, ?_⟩
+  -- A(8): `theoremA8_structure` gives `U.subgroupOf M = ⊥`; lift to `U = ⊥` via `hUM`.
+  intro hne
+  obtain ⟨hUsub, hTI, hp⟩ := theoremA8_structure hG hM hKM hK hKstar hU hne
+  refine ⟨?_, hTI, hp⟩
+  have h := Subgroup.map_subgroupOf_eq_of_le hUM
+  rw [hUsub, Subgroup.map_bot] at h
+  exact h.symm
+
 /-! ## Proposition 16.1: BG local taxonomy and shared Type I--V predicates -/
 
 /-- **§14/§15-independent assembly engine for BG Proposition 16.1** (mmd L4478; the source proof
