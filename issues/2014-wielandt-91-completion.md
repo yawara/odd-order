@@ -85,9 +85,19 @@ deepest pole。`|C_H(UE)|^|E| · |H| = |C_H(E)|^|E| · |C_H(U)|` (Frobenius L=U�
       (2) dim 恒等式を **module-binder の別 def** で書く (coercion を binder に一度解決→`↥N` 代入で生存;
       `letI`-module 直書きは破綻)。詳細 = design notes「resume³」。
 - [ ] **D (†) module wiring** (lane-f coupled rep-theory): `PerFactorDimIdentity φ hN p hpe` を per chief
-      factor で証明。`finrank_elab_identity` (要 `hUE:U⊔E=⊤` + `htag` (†)) を `elabRepresentation p hN.restrict`
-      に適用 + done engine 群で `htag` discharge。上記 instance 知見を流用。`Invertible(card U:ZMod p)` =
-      coprimality + p 素数。
+      factor で証明 = modular Brauer / free-orbit rep-theory の items 0-3 + assembly。
+  - [x] **item 0 (★ the genuinely-coupled crux)** = **DONE** (2026-06-21, 新 leaf
+        `CenterProjConjugation.lean`, commit `c2658ef1`, sorry-free + axiom-clean, full build 3879 green):
+        `map_range_centerProj` — 抽象化 (`τ:W≃ₗW` + `c:MulAut U` + intertwining `hτ`) した
+        E-conjugation→simplesAction module bridge (engine の `hperm`)。+ `conj_asAlgebraHom` +
+        `domCongrAut_centerIdem`。詳細 = design notes「resume³ cont²」。
+  - [ ] **item 1**: 3d.3c を real carrier (Frobenius L=U⋊E, ψ:E→MulAut U, splitting φ) に wire →
+        `hperm` (item 0) + `hfree` (3d.3c) を engine に。
+  - [ ] **item 2**: (†) `W^U=0⟹dim W=|E|·dim W^E` — module wire (A i=idemBasis 射影, 非自明 i 制限) +
+        engine 適用。
+  - [ ] **item 3**: I-4 base change 𝔽_p→𝔽̄_p (`Module.finrank_baseChange`)。
+  - [ ] assembly → `PerFactorDimIdentity` discharge。`finrank_elab_identity` (要 `hUE:U⊔E=⊤` + `htag` (†))
+        も別経路; `Invertible(card U:ZMod p)` = coprimality + p 素数。piece C の instance 知見を流用。
 - [x] **E relocation** = **DONE** (2026-06-21, 新 leaf `WielandtFixedPoint.lean`, commit `d98be5d7`,
       full build 3878 green, 実 sorry 135 不変): `wielandt_fixedPoint_frobenius` を assembly 経由で証明
       (`wielandt_formula_of_perfactor (wielandtPerFactor_of_dim hdim) …`)。群論層 A/B/C が load-bearing 化、
