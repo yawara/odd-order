@@ -1830,6 +1830,76 @@ theorem betaM_expansion [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
               (ε i j : ℂ) • hyp.base.eta i j) - χ := by
   sorry
 
+/-- **Parity core of Peterfalvi (3.9)/(14.11.3)**: a `±1`-signed sum of an integer-valued grid
+that pairs under a conjugation involution has complex norm `≥ 1`.
+
+Concretely, let `n : ι → ℤ` be constant on the orbits of an involution `ρ` whose *unique* fixed
+point `i₀` carries the principal value `n i₀ = 1`, and let `ε : ι → ℤ` take values in `{±1}`.  Then
+the signed sum `∑ ε_i n_i` is an **odd** integer — the `ρ`-paired off-principal terms contribute an
+even total (`n` is `ρ`-invariant, so each pair sums to `2 n_i`), while the fixed point contributes
+`±1` — so its image in `ℂ` has norm `≥ 1`.
+
+This is the arithmetic heart of (14.11.3): on a generic element `g`, the η-grid values `η_ij(g)`
+are rational integers (3.9.c) that pair under the conjugation `(i,j) ↦ (−i,−j)` with the single
+principal value `η₀₀(g) = 1` (3.9.a); combined with the (14.11.2) expansion
+`ψ^{τ₁}(g) = ±∑ ε_ij η_ij(g)` (valid on `G_0`, where `β_M^τ(g) = 0`) this forces
+`|ψ^{τ₁}(g)| ≥ 1`.  Stated generically over a `Fintype` so it serves both the (14.11.3) bound and
+the dual (14.16) parity contradiction. -/
+theorem one_le_norm_signed_paired_sum {ι : Type*} [Fintype ι]
+    (n ε : ι → ℤ) (ρ : Equiv.Perm ι) (i₀ : ι)
+    (hε : ∀ i, ε i = 1 ∨ ε i = -1)
+    (hρ : Function.Involutive ρ)
+    (hfix : ∀ i, ρ i = i ↔ i = i₀)
+    (hpair : ∀ i, n (ρ i) = n i)
+    (hn0 : n i₀ = 1) :
+    1 ≤ ‖(∑ i, (ε i : ℂ) * (n i : ℂ))‖ := by
+  classical
+  have hcast : (∑ i, (ε i : ℂ) * (n i : ℂ)) = ((∑ i, ε i * n i : ℤ) : ℂ) := by
+    push_cast; rfl
+  rw [hcast, Complex.norm_intCast]
+  -- Off-principal terms sum to an even integer (fixed-point-free involution on `univ ∖ {i₀}`).
+  have heven_erase : (2 : ℤ) ∣ ∑ i ∈ Finset.univ.erase i₀, n i := by
+    have hz : ((∑ i ∈ Finset.univ.erase i₀, n i : ℤ) : ZMod 2) = 0 := by
+      push_cast
+      refine Finset.sum_involution (fun a _ => ρ a) ?_ ?_ ?_ ?_
+      · intro a _
+        rw [hpair a]; exact CharTwo.add_self_eq_zero _
+      · intro a ha _ hcontra
+        exact (Finset.mem_erase.mp ha).1 ((hfix a).mp hcontra)
+      · intro a ha
+        rw [Finset.mem_erase] at ha ⊢
+        refine ⟨fun hcontra => ha.1 ?_, Finset.mem_univ _⟩
+        change ρ a = i₀ at hcontra
+        calc a = ρ (ρ a) := (hρ a).symm
+          _ = ρ i₀ := by rw [hcontra]
+          _ = i₀ := (hfix i₀).mpr rfl
+      · intro a _; exact hρ a
+    exact_mod_cast (ZMod.intCast_zmod_eq_zero_iff_dvd _ 2).mp hz
+  -- Each sign satisfies `ε_i ≡ 1 (mod 2)`, so `∑ ε_i n_i ≡ ∑ n_i (mod 2)`.
+  have hdiff : (2 : ℤ) ∣ (∑ i, ε i * n i) - (∑ i, n i) := by
+    rw [← Finset.sum_sub_distrib]
+    refine Finset.dvd_sum (fun i _ => ?_)
+    have hrw : ε i * n i - n i = (ε i - 1) * n i := by ring
+    rw [hrw]
+    exact Dvd.dvd.mul_right (by rcases hε i with h | h <;> rw [h] <;> norm_num) (n i)
+  have hsum_n : ∑ i, n i = (∑ i ∈ Finset.univ.erase i₀, n i) + n i₀ :=
+    (Finset.sum_erase_add Finset.univ n (Finset.mem_univ i₀)).symm
+  have hodd_n : Odd (∑ i, n i) := by
+    rw [hsum_n, hn0]
+    rcases heven_erase with ⟨c, hc⟩
+    exact ⟨c, by rw [hc]⟩
+  have hodd : Odd (∑ i, ε i * n i) := by
+    rcases hdiff with ⟨d, hd⟩
+    rcases hodd_n with ⟨m, hm⟩
+    refine ⟨d + m, ?_⟩
+    have hA : ∑ i, ε i * n i = (∑ i, n i) + 2 * d := by omega
+    rw [hA, hm]; ring
+  rcases hodd with ⟨m, hm⟩
+  rw [hm, ← Int.cast_abs]
+  have hh : (1 : ℤ) ≤ |2 * m + 1| := by
+    rcases abs_cases (2 * m + 1 : ℤ) with ⟨h1, _⟩ | ⟨h1, _⟩ <;> rw [h1] <;> omega
+  exact_mod_cast hh
+
 /-- **Peterfalvi (14.11.3)**: on the generic set `G_0`, the extended character `ψ^{τ₁}` has
 absolute value at least one: `|ψ^{τ₁}(g)| ≥ 1` for `g ∈ G_0`.
 
