@@ -896,3 +896,41 @@ infra 特定済: **`Sylow.directProductOfNormal`** / `isNilpotent_of_finite_tfae
 (P/Φ(P) el-ab) + `aFixed_quotient_frattini` (BG 1.8 対偶: U 非中心 on P ⟹ on P/Φ(P))。
 **fiddly = 直積 domain `∀ p:primeFactors, ∀ P:Sylow p G, ↥P`** の fixed-points-split (C_H(U)=∏C_{P_ℓ}(U)
 ⟹ ∃ℓ 非中心) + projection-kernel (↥H ↠ P_p ↠ P_p/Φ(P_p)、N₀=kernel)。§8/(9.3) 不要 (p は post-hoc)。
+
+## 2026-06-22 (lane-h resume⁷ cont.³) — ✅✅✅ seed `exists_chiefFactor_seed` COMPLETE → (9.4) 群論部分 100% 完了
+
+seed を **sorry-free + axiom-clean** で締結 → (9.4) `exists_chiefFactorData` の群論内容が全完了。
+残 sorryAx は §8 cite (`typeIIIorIV_W2_prime`/`typeII_centralizer_U_eq_bot`) のみ = character/local
+理論 (lane-b/§12 gate)。full build 3881 green (63s)、AxiomsCheck OK、seed+helper+`eq_top_of_forall_sylow_le`
+を AxiomsCheck 登録。
+
+### 重要: 設計を簡略化した 2 つの発見 (resume⁷ の当初プランより大幅に簡単になった)
+1. **char p-complement は repo の `opCore` で一発** (Isaacs Ch01): 当初プランの「`directProductOfNormal`
+   の直積 domain `∀ p, ∀ Sylow, ↥P` を fixed-points-split」(fiddly) は**不要**だった。`opCore p H = ⨅Sylow`
+   = O_p(H) が **characteristic instance** (`opCore.characteristic`)、`iSupIndep_of_coprime_card_of_normal`
+   で独立性、`iSup_default_sylow_eq_top_of_nilpotent` で `⨆=⊤`。これらで新 helper
+   **`exists_characteristic_complement_to_sylow_of_nilpotent`** (nilpotent H + Sylow P ⟹ char complement Q,
+   `IsComplement' ↑P Q`) を ~40 行で構築。**characteristic ⟹ Normal も A-invariant も両方 free** ゆえ
+   `Q` の A-不変性論法 (invariant Schur-Zassenhaus 等) は不要。汎用 helper として再利用可。
+2. **非中心性は BG 1.8 (`aFixed_quotient_frattini`) 不要** → `frattini_nongenerating` (mathlib) で十分:
+   `K ⊔ Φ(G) = ⊤ ⟹ K = ⊤` は coprime も action も不要な純 Frattini 性質。`C_B(U) ⊔ Φ(B) = ⊤ ⟹ C_B(U)=⊤`
+   を一発で出す。当初の「BG 1.8 で U 非中心 on P/Φ(P)」より遥かに簡単。
+
+### 最終構成 (`exists_chiefFactor_seed`)
+- p, P = `eq_top_of_forall_sylow_le` の対偶 (C_H(U)≠⊤ ⟹ ∃ Sylow P, ↑P⊄C_H(U))。
+- Q = char p-complement (上記 helper)、`B := ↥H/Q` は p-群 (`|B|=[H:Q]=|P|=p^k`、`IsPGroup.of_card`)。
+- **N₀ := comap (mk' Q) (frattini B)** (kernel でなく Frattini 商の逆像): Normal + A-inv
+  (`isAInvariant_comap_mk'` + frattini characteristic)、`↥H/N₀ ≅ B/Φ(B)` el-ab p
+  (`quotientMulEquivOfEq`+`quotientQuotientEquivQuotient`+`IsElementaryAbelian.of_mulEquiv`+
+  `IsPGroup.quotient_frattini_isElementaryAbelian`)。
+- 非中心: `C_H(U)⊔N₀=⊤` 仮定 → mk' Q で射影 (`map_fixedSubgroup_eq_fixedSubgroup_quotient`+`hN₀map`) →
+  `C_B(U)⊔Φ(B)=⊤` → `frattini_nongenerating` → `C_B(U)=⊤` → x∈P に対し `(φlx)⁻¹x∈Q⊓↑P=⊥` (complement) ⟹
+  φlx=x ⟹ ↑P≤C_H(U) 矛盾。
+- 技術知見: dependent quotient `G⧸X` は `[X.Normal]` 依存ゆえ `rw [hN₀map] at hiso` は motive-error →
+  `quotientMulEquivOfEq` で iso bridge。`open ...quotientMulAutHom...in` は docstring の**前**。`set N₀` 後の
+  comap membership は `rw [hN₀, mem_comap, mk'_apply, eq_one_iff]`。
+
+### ▶ 残り (9.4)/(9.3) = §8 cite のみ (群論完了、lane-b/§12 char 待ち)
+`typeII_centralizer_U_eq_bot` (8.6.b II + 8.12 = `S10.typeI_or_typeII_centralizer_unique`) /
+`typeIIIorIV_W2_prime` (8.8 = `S12...exists_typeII_maximal_with_w2`+`theorem88_caseB_prime_orders`)。
+両者 signature 正・sorried ⟹ cite 可 (policy)。下流 (10.11)/(11.7)/(13.2.b) は §8/§12/§13 char 解禁待ち。

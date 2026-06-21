@@ -914,20 +914,179 @@ theorem eq_top_of_forall_sylow_le {Γ : Type*} [Group Γ] [Finite Γ] {K : Subgr
     exact (hp.pow_dvd_iff_le_factorization Nat.card_pos.ne').mp hdvd
   · simp [Nat.factorization_eq_zero_of_non_prime _ hp]
 
+/-- In a finite **nilpotent** group `H`, a Sylow `p`-subgroup `P` (for a prime `p ∣ |H|`) has a
+**characteristic complement** `Q` — the `p`-complement `⨆_{q ≠ p} O_q(H)`.  Each `O_q = opCore q H`
+is characteristic; their join is characteristic; the `O_q` have pairwise coprime order hence are
+independent (so `O_p` is disjoint from the join of the others); and they jointly generate `H`
+(nilpotent), so `Q` complements the normal Sylow `O_p = ↑P`.  Characteristic ⟹ both `Q.Normal`
+and (for any operator action) `IsAInvariant`, which is what the (9.4) seed needs. -/
+theorem exists_characteristic_complement_to_sylow_of_nilpotent
+    {H : Type*} [Group H] [Finite H] [Group.IsNilpotent H]
+    {p : ℕ} [Fact p.Prime] (P : Sylow p H) (hp_mem : p ∈ (Nat.card H).primeFactors) :
+    ∃ Q : Subgroup H, Q.Characteristic ∧ Subgroup.IsComplement' (↑P : Subgroup H) Q := by
+  classical
+  set O : (Nat.card H).primeFactors → Subgroup H :=
+    fun q => OddOrder.Isaacs.Ch01.opCore (q : ℕ) H with hOdef
+  -- The `opCore`'s have pairwise coprime order, hence are independent.
+  have hindep : iSupIndep O := by
+    apply OddOrder.Isaacs.Ch01.iSupIndep_of_coprime_card_of_normal O
+    intro i j hij
+    haveI : Fact (i : ℕ).Prime := ⟨Nat.prime_of_mem_primeFactors i.2⟩
+    haveI : Fact (j : ℕ).Prime := ⟨Nat.prime_of_mem_primeFactors j.2⟩
+    have hne : (i : ℕ) ≠ (j : ℕ) := fun h => hij (Subtype.ext h)
+    exact IsPGroup.coprime_card_of_ne (i : ℕ) (j : ℕ) hne _ _
+      (OddOrder.Isaacs.Ch01.opCore_isPGroup (i : ℕ) H)
+      (OddOrder.Isaacs.Ch01.opCore_isPGroup (j : ℕ) H)
+  -- `↑P = O ⟨p, hp_mem⟩` (a normal Sylow is the `p`-core).
+  have hPnorm : (↑P : Subgroup H).Normal := OddOrder.Isaacs.Ch01.Sylow.normal_of_isNilpotent P
+  set i₀ : (Nat.card H).primeFactors := ⟨p, hp_mem⟩ with hi₀
+  have hPeq : (↑P : Subgroup H) = O i₀ := OddOrder.Isaacs.Ch01.Sylow.eq_opCore_of_normal P hPnorm
+  -- The join of all `opCore`'s is `⊤` (nilpotent: Sylows generate, and each = its `p`-core).
+  have htop : (⨆ q, O q) = ⊤ := by
+    have hrw : (⨆ q, O q)
+        = ⨆ q : (Nat.card H).primeFactors, ((default : Sylow (q : ℕ) H) : Subgroup H) :=
+      iSup_congr fun q => by
+        haveI : Fact (q : ℕ).Prime := ⟨Nat.prime_of_mem_primeFactors q.2⟩
+        exact (OddOrder.Isaacs.Ch01.Sylow.eq_opCore_of_normal default
+          (OddOrder.Isaacs.Ch01.Sylow.normal_of_isNilpotent default)).symm
+    rw [hrw]; exact OddOrder.Isaacs.Ch01.iSup_default_sylow_eq_top_of_nilpotent H
+  refine ⟨⨆ (j) (_ : j ≠ i₀), O j, ?_, ?_⟩
+  · -- characteristic: join of characteristic `opCore`'s.
+    rw [Subgroup.characteristic_iff_map_eq]
+    intro φ
+    simp_rw [Subgroup.map_iSup]
+    exact iSup_congr fun j => iSup_congr fun _ =>
+      Subgroup.characteristic_iff_map_eq.mp (OddOrder.Isaacs.Ch01.opCore.characteristic (j : ℕ) H) φ
+  · -- complement: disjoint (independence) + join `⊤`.
+    rw [hPeq]
+    have hdisj : Disjoint (O i₀) (⨆ (j) (_ : j ≠ i₀), O j) := (iSupIndep_def.mp hindep) i₀
+    have hsup : O i₀ ⊔ (⨆ (j) (_ : j ≠ i₀), O j) = ⊤ := by
+      refine le_antisymm le_top ?_
+      rw [← htop]
+      refine iSup_le fun j => ?_
+      by_cases hj : j = i₀
+      · exact hj ▸ le_sup_left
+      · exact le_sup_of_le_right (le_iSup₂ (f := fun j (_ : j ≠ i₀) => O j) j hj)
+    exact Subgroup.isComplement'_of_disjoint_and_mul_eq_univ hdisj
+      (by rw [← Subgroup.normal_mul, hsup, Subgroup.coe_top])
+
+open OddOrder.Isaacs.Ch04.OddOrder.Isaacs.Ch03.IsAInvariant
+  (quotientMulAutHom quotientMulAutHom_apply_mk') in
 /-- **Peterfalvi (9.4), the elementary-abelian seed** (the remaining group-theoretic input).
 There is a `U W₁`-invariant normal subgroup `N₀ ◁ H = M_F` with `H/N₀` elementary abelian `p`
 on which `U` is non-central (`C_H(U) ⊔ N₀ ≠ H`, action-free form).
 
-*Proof (to be formalised):* `H = M_F` is nilpotent and `U` does not centralise it
-(`typeP_U_noncentral_on_H`).  For a prime `p` and the Sylow `p`-subgroup `P ≤ H` on which `U` acts
-non-centrally, `H/N₀ ≅ P/Φ(P)` is elementary abelian (`IsPGroup.quotient_frattini_isElementaryAbelian`)
-with `U` non-central by [BG] Thm 1.8 (`aFixed_quotient_frattini`, contrapositive). -/
+*Proof.* `H = M_F` is nilpotent and `U` does not centralise it (`typeP_U_noncentral_on_H`).  Since
+`C_H(U) ≠ ⊤`, `eq_top_of_forall_sylow_le` produces a Sylow `p`-subgroup `P` with `↑P ⊄ C_H(U)`.  As
+`H` is nilpotent, `P = O_p(H)` is characteristic and has a characteristic `p`-complement `Q`
+(`exists_characteristic_complement_to_sylow_of_nilpotent`), so `B := H/Q ≅ P` is a `p`-group.  Take
+`N₀ = (mk' Q)⁻¹ (Φ(B))`: it is normal, `A`-invariant (`isAInvariant_comap_mk'` + `Φ(B)`
+characteristic), and `H/N₀ ≅ B/Φ(B)` is elementary abelian `p`
+(`IsPGroup.quotient_frattini_isElementaryAbelian`).  If `C_H(U) ⊔ N₀ = ⊤`, projecting to `B` gives
+`C_B(U) ⊔ Φ(B) = ⊤`, so `C_B(U) = ⊤` by the Frattini non-generating property
+(`frattini_nongenerating`); then for `x ∈ P`, `(φ l x) x⁻¹ ∈ P ⊓ Q = ⊥`, i.e. `↑P ≤ C_H(U)`,
+contradicting the choice of `P`. -/
 theorem exists_chiefFactor_seed [Finite G] {M : Subgroup G} (data : TypePData M) (hU : data.U ≠ ⊥) :
     ∃ (p : ℕ) (N₀ : Subgroup ↥data.H) (_ : N₀.Normal), p.Prime ∧
       IsAInvariant (typeP_conjAction data) N₀ ∧
       IsElementaryAbelian p (↥data.H ⧸ N₀) ∧
       fixedSubgroup (typeP_conjAction data) (data.U.subgroupOf (data.U ⊔ data.W1)) ⊔ N₀ ≠ ⊤ := by
-  sorry
+  classical
+  -- `H = M_F` is nilpotent.
+  haveI hHnil : Group.IsNilpotent ↥data.H := by
+    rw [data.H_eq]; exact OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_isNilpotent M
+  set CU := fixedSubgroup (typeP_conjAction data) (data.U.subgroupOf (data.U ⊔ data.W1)) with hCU
+  -- `U` does not centralise `H`: `C_H(U) = CU ≠ ⊤`.
+  have hCUtop : CU ≠ ⊤ := typeP_U_noncentral_on_H data hU
+  -- A Sylow `p`-subgroup `P` of `H` with `U` non-central on it (`↑P ⊄ CU`).
+  obtain ⟨p, hpfact, P, hP_not⟩ :
+      ∃ (p : ℕ) (_ : Fact p.Prime) (P : Sylow p ↥data.H),
+        ¬ ((↑P : Subgroup ↥data.H) ≤ CU) := by
+    by_contra hcon
+    push_neg at hcon
+    exact hCUtop (eq_top_of_forall_sylow_le hcon)
+  haveI := hpfact
+  have hp : p.Prime := hpfact.out
+  -- `↑P ≠ ⊥` (else `↑P ≤ CU`), so `p ∣ |H|`, i.e. `p ∈ primeFactors |H|`.
+  have hPbot : (↑P : Subgroup ↥data.H) ≠ ⊥ := fun h => hP_not (h ▸ bot_le)
+  have hp_mem : p ∈ (Nat.card ↥data.H).primeFactors := by
+    rw [Nat.mem_primeFactors]
+    refine ⟨hp, ?_, Nat.card_pos.ne'⟩
+    by_contra hpdvd
+    refine hPbot (Subgroup.eq_bot_of_card_eq _ ?_)
+    rw [Sylow.card_eq_multiplicity, Nat.factorization_eq_zero_of_not_dvd hpdvd, pow_zero]
+  -- The characteristic `p`-complement `Q` (so `H = P × Q` internally).
+  obtain ⟨Q, hQchar, hQcompl⟩ :=
+    exists_characteristic_complement_to_sylow_of_nilpotent P hp_mem
+  haveI : Q.Characteristic := hQchar
+  haveI : Q.Normal := inferInstance
+  have hQinv : IsAInvariant (typeP_conjAction data) Q :=
+    OddOrder.Isaacs.Ch03.IsAInvariant.of_characteristic (typeP_conjAction data)
+  -- `↑P` is characteristic (`= O_p(H)`), hence `A`-invariant.
+  have hPnorm : (↑P : Subgroup ↥data.H).Normal :=
+    OddOrder.Isaacs.Ch01.Sylow.normal_of_isNilpotent P
+  haveI hPchar : (↑P : Subgroup ↥data.H).Characteristic := by
+    rw [OddOrder.Isaacs.Ch01.Sylow.eq_opCore_of_normal P hPnorm]; infer_instance
+  have hPinv : IsAInvariant (typeP_conjAction data) (↑P : Subgroup ↥data.H) :=
+    OddOrder.Isaacs.Ch03.IsAInvariant.of_characteristic (typeP_conjAction data)
+  -- `B = H/Q` is a `p`-group (`|B| = [H:Q] = |P| = p^k`).
+  haveI hBpgroup : IsPGroup p (↥data.H ⧸ Q) :=
+    IsPGroup.of_card (by
+      calc Nat.card (↥data.H ⧸ Q) = Nat.card (↑P : Subgroup ↥data.H) := hQcompl.index_eq_card
+        _ = p ^ (Nat.card ↥data.H).factorization p := Sylow.card_eq_multiplicity P)
+  -- `N₀ = (mk' Q)⁻¹ Φ(B)`: normal, `A`-invariant, and `H/N₀ ≅ B/Φ(B)` el. abelian `p`.
+  set N₀ := Subgroup.comap (QuotientGroup.mk' Q) (frattini (↥data.H ⧸ Q)) with hN₀
+  haveI : N₀.Normal := inferInstance
+  have hN₀inv : IsAInvariant (typeP_conjAction data) N₀ :=
+    OddOrder.BG.Ch1_Preliminary.isAInvariant_comap_mk' hQinv
+      (OddOrder.Isaacs.Ch03.IsAInvariant.of_characteristic (quotientMulAutHom hQinv))
+  have hQleN₀ : Q ≤ N₀ := by
+    intro x hx
+    rw [hN₀, Subgroup.mem_comap, QuotientGroup.mk'_apply, (QuotientGroup.eq_one_iff x).mpr hx]
+    exact one_mem _
+  have hN₀map : N₀.map (QuotientGroup.mk' Q) = frattini (↥data.H ⧸ Q) :=
+    Subgroup.map_comap_eq_self_of_surjective (QuotientGroup.mk'_surjective Q) _
+  have hEA : IsElementaryAbelian p (↥data.H ⧸ N₀) := by
+    haveI : (N₀.map (QuotientGroup.mk' Q)).Normal :=
+      (inferInstance : N₀.Normal).map _ (QuotientGroup.mk'_surjective Q)
+    exact IsElementaryAbelian.of_mulEquiv
+      ((QuotientGroup.quotientMulEquivOfEq hN₀map).symm.trans
+        (QuotientGroup.quotientQuotientEquivQuotient Q N₀ hQleN₀))
+      (OddOrder.GroupTheory.IsPGroup.quotient_frattini_isElementaryAbelian hBpgroup)
+  refine ⟨p, N₀, inferInstance, hp, hN₀inv, hEA, ?_⟩
+  -- Non-centrality `CU ⊔ N₀ ≠ ⊤`.
+  intro htop
+  have hcopU : Nat.Coprime (Nat.card ↥(data.U.subgroupOf (data.U ⊔ data.W1)))
+      (Nat.card ↥data.H) :=
+    (typeP_coprime_H_uW1 data hU).symm.coprime_dvd_left (Subgroup.card_subgroup_dvd_card _)
+  haveI : IsSolvable ↥data.H := (typeP_coprimeAction data hU).H_solvable
+  -- Project to `B`: `C_B(U) ⊔ Φ(B) = ⊤`, so by the Frattini argument `C_B(U) = ⊤`.
+  have hCUmap := map_fixedSubgroup_eq_fixedSubgroup_quotient
+    (φ := typeP_conjAction data) (N := Q) hQinv hcopU (Or.inr inferInstance)
+  have hproj : fixedSubgroup (quotientMulAutHom hQinv)
+      (data.U.subgroupOf (data.U ⊔ data.W1)) ⊔ frattini (↥data.H ⧸ Q) = ⊤ := by
+    rw [← hCUmap, ← hN₀map, ← Subgroup.map_sup, ← hCU, htop,
+      Subgroup.map_top_of_surjective _ (QuotientGroup.mk'_surjective Q)]
+  have hfix := frattini_nongenerating hproj
+  -- Hence `↑P ≤ CU`, contradicting `hP_not`.
+  apply hP_not
+  intro x hxP
+  rw [hCU, mem_fixedSubgroup]
+  intro l hl
+  -- `mk' Q x` is `U`-fixed in `B`, so `mk' Q (φ l x) = mk' Q x`.
+  have hxfix : quotientMulAutHom hQinv l (QuotientGroup.mk' Q x) = QuotientGroup.mk' Q x := by
+    have hmem : QuotientGroup.mk' Q x ∈ fixedSubgroup (quotientMulAutHom hQinv)
+        (data.U.subgroupOf (data.U ⊔ data.W1)) := by rw [hfix]; exact Subgroup.mem_top _
+    exact mem_fixedSubgroup.mp hmem l hl
+  rw [quotientMulAutHom_apply_mk'] at hxfix
+  -- `(φ l x)⁻¹ * x ∈ Q ∩ ↑P = ⊥`, so `φ l x = x`.
+  have hQmem : (typeP_conjAction data l x)⁻¹ * x ∈ Q := by
+    rwa [QuotientGroup.mk'_apply, QuotientGroup.mk'_apply, QuotientGroup.eq] at hxfix
+  have hPmem : (typeP_conjAction data l x)⁻¹ * x ∈ (↑P : Subgroup ↥data.H) :=
+    Subgroup.mul_mem _ (Subgroup.inv_mem _ (hPinv.smul_mem l hxP)) hxP
+  have hinf : (typeP_conjAction data l x)⁻¹ * x ∈ ((↑P : Subgroup ↥data.H) ⊓ Q) := ⟨hPmem, hQmem⟩
+  rw [disjoint_iff.mp hQcompl.disjoint, Subgroup.mem_bot, inv_mul_eq_one] at hinf
+  exact hinf
 
 /-- **Peterfalvi (9.4)**: existence of a nontrivial elementary abelian chief
 factor `H/H_0` not centralized by `U`.  Assembles the elementary-abelian seed
