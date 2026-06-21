@@ -1527,6 +1527,66 @@ theorem Hypothesis.muGrid_column_sum_vanishes_off_derived [Finite G]
   exact ClassFunction.induce_eq_zero_of_not_mem_normal _ hx
 
 open scoped FiniteInduce in
+/-- **§10 column sum lies in the family `S`** (Peterfalvi (10.5)/(4.5.a)): for `0 < k < w₂`, the
+`W₂`-column sum `μ_k = ∑_{i} μ_{ik}` is the induced character `Ind_{M'}^M θ` of a *non-trivial*
+irreducible `θ` of `M'` (`exists_irreducible_restrict_certainType`), hence lies in
+`S = inducedFamily M`.  Non-triviality follows from the degree: `θ(1) = (Res_{M'} μ_{0k})(1) =
+μ_{0k}(1) ≠ 1` (the caller supplies `μ_{0k}(1) = d > 1` from (10.3)).
+
+This is the `μ_k ∈ ℤ[S]` input that the coherent extension `τ₁` consumes: it lets `μ_k^{τ₁}`
+participate in the isometry (`‖μ_k^{τ₁}‖² = ‖μ_k‖² = w₁`) and the `(μ_k − dζ̄)^τ = μ_k^{τ₁} −
+dζ̄^{τ₁}` split of the (10.5) `a = 0` argument. -/
+theorem Hypothesis.muGrid_column_sum_mem_inducedFamily [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} (hyp : Hypothesis M)
+    (hodd : Odd (Nat.card G)) (k : Fin hyp.w2)
+    (hdk1 : hyp.muGrid hG hodd 0 k 1 ≠ 1) :
+    (∑ i : Fin hyp.w1, hyp.muGrid hG hodd i k) ∈ inducedFamily M := by
+  haveI := hyp.finiteG
+  classical
+  let h := (hyp.toCertainTypeHypothesis hG hodd).toHypothesis
+  haveI hNeZ1 : NeZero (Nat.card h.W1) := ⟨by have := h.one_lt_card_W1; omega⟩
+  haveI hcyc : IsCyclic ↥(h.W1 ⊔ h.W2) := h.isCyclic_sup
+  letI : CommGroup ↥(h.W1 ⊔ h.W2) := IsCyclic.commGroup
+  have hW1le : hyp.typeP.W1 ≤ M := hyp.typeP.W1_le
+  have hW2le : hyp.typeP.W2 ≤ M := typePData_W2_le_self hyp.typeP
+  have hcardW1 : Nat.card ↥h.W1 = hyp.w1 :=
+    Nat.card_congr (Subgroup.subgroupOfEquivOfLe hW1le).toEquiv
+  have hcardW2sub : Nat.card ↥(h.W2.subgroupOf (h.W1 ⊔ h.W2)) = hyp.w2 := by
+    rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe (le_sup_right)).toEquiv]
+    exact Nat.card_congr (Subgroup.subgroupOfEquivOfLe hW2le).toEquiv
+  haveI hNeZ2 : NeZero (Nat.card ↥(h.W2.subgroupOf (h.W1 ⊔ h.W2))) := ⟨Nat.card_pos.ne'⟩
+  obtain ⟨θ, hθeq, hind⟩ :=
+    h.exists_irreducible_restrict_certainType (finCardEquivCharacterGroup _ (finCongr hcardW2sub.symm k))
+  -- row-0 entry equals the certain-type character `μ_{0k}` (`finCongr` fixes `0`).
+  have hrow0 : hyp.muGrid hG hodd 0 k
+      = ((h.columnFamily (finCardEquivCharacterGroup _ (finCongr hcardW2sub.symm k))).mu 0
+          : ClassFunction ↥M ℂ) := by
+    have hfc : (finCongr hcardW1.symm (0 : Fin hyp.w1)) = (0 : Fin (Nat.card h.W1)) := by simp
+    rw [show hyp.muGrid hG hodd 0 k
+      = ((h.columnFamily (finCardEquivCharacterGroup _ (finCongr hcardW2sub.symm k))).mu
+          (finCongr hcardW1.symm 0) : ClassFunction ↥M ℂ) from by unfold Hypothesis.muGrid; rfl, hfc]
+  -- `θ ≠ 1`: else `μ_{0k}(1) = θ(1) = 1`, contradicting `hdk1`.
+  have hθne : θ ≠ trivialIrreducibleCharacter ↥h.K := by
+    intro htriv
+    apply hdk1
+    rw [hrow0]
+    have h2 : (ClassFunction.restrict h.K
+        ((h.columnFamily (finCardEquivCharacterGroup _ (finCongr hcardW2sub.symm k))).mu 0
+          : ClassFunction ↥M ℂ)) (1 : ↥h.K) = (θ : ClassFunction ↥h.K ℂ) (1 : ↥h.K) := by
+      rw [hθeq]
+    rw [ClassFunction.restrict_apply] at h2
+    rw [htriv] at h2
+    simpa using h2
+  -- The column sum is `Ind_{M'}^M θ`, so it lies in `S`.
+  refine ⟨θ, hθne, ?_⟩
+  show (∑ i : Fin hyp.w1, hyp.muGrid hG hodd i k)
+    = ClassFunction.induce h.K (θ : ClassFunction ↥h.K ℂ)
+  rw [hind, ← Equiv.sum_comp (finCongr hcardW1.symm)
+    (fun i' => ((h.columnFamily (finCardEquivCharacterGroup _ (finCongr hcardW2sub.symm k))).mu i'
+      : ClassFunction ↥M ℂ))]
+  exact Finset.sum_congr rfl (fun i _ => by unfold Hypothesis.muGrid; rfl)
+
+open scoped FiniteInduce in
 /-- **§10 column-sum norm** (Peterfalvi (10.5)/(10.6), `‖μ_k‖² = w₁`): the `W₂`-column sum
 `μ_k = ∑_{0≤i<w₁} μ_{ik}` has squared norm `w₁`, since its `w₁` summands are orthonormal
 (`muGrid_inner_self` on the diagonal, `muGrid_inner_within_column` off it).  This is the
