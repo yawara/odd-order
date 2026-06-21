@@ -1576,11 +1576,12 @@ structure MHypothesis (hyp : Hypothesis (G := G)) where
   psi_mem : psi ∈ Mset
   psi_degree_eq_e : psi 1 = (e : ℂ)
   betaM : ClassFunction G ℂ
+  /-- **Peterfalvi (14.10)**: `betaM` is `β_M^τ`, the image under the Dade isometry `τ` of
+  `β_M = Ind_K^M 1_K − ψ`.  Still carried as an opaque `Prop` pending the induce/`Invertible`
+  instance plumbing needed to spell `Ind_K^M 1_K` inside a field type (lane-c §16). -/
   betaM_formula : Prop
   betaM_formula_holds : betaM_formula
   G0 : Set G
-  betaM_expansion_formula : Prop
-  final_norm_contradiction : Prop
 
 /-- The displayed rational inequality produced by the norm calculation in
 **Peterfalvi (14.11.4)**, after substituting `e = p q`.  It is kept concrete so
@@ -1805,12 +1806,28 @@ theorem main_size_bounds [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
   obtain ⟨hk, hke⟩ := main_size_bounds_structural _hG hyp Mdata hne
   exact ⟨hk, hke, key_ratio_inequality_of_caseB_data Tdata Sdata⟩
 
-/-- **Peterfalvi (14.11.2)**: under `K != V`, `e = p q`, and
-`beta_M^tau` is a signed sum of the `eta_ij` with one character removed. -/
+/-- **Peterfalvi (14.11.2)**: under `K ≠ V`, `e = p q` and `β_M^τ` is a signed sum of the
+`η_ij` grid with one unit-norm character `χ` removed:
+`β_M^τ = Σ_{0≤i<q, 0≤j<p} (±η_ij) − χ`, where `χ = ψ^{τ₁}` or `−ψ̄^{τ₁}`.
+
+De-opacified (lane-c §16 char-endpoint): the former opaque carrier field
+`betaM_expansion_formula : Prop` is dropped and the conclusion is stated concretely.  The signs
+are an explicit `ε : Fin q → Fin p → ℤ` with values `±1`; `χ` is recorded by the
+downstream-relevant, branch-independent property `∀ g, ‖χ g‖ = ‖ψ^{τ₁} g‖` (which holds whether
+`χ = ψ^{τ₁}` or `χ = −ψ̄^{τ₁}`, since `|z| = |z̄|`) — exactly the input (14.11.3) consumes.
+Proof (Pf p.88-89, sorried): the Dade-isometry inner-product parities `a_ij ≡ 1 (mod 2)`
+(13.19.c / 7.8 / 3.7) with `Σ a_ij² ≤ e − 1` and `e ≤ pq` force `e = pq`, `a_ij = ±1`. -/
 theorem betaM_expansion [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
     (hyp : Hypothesis (G := G)) (Mdata : MHypothesis hyp)
     (hne : Mdata.K ≠ hyp.base.V) :
-    Mdata.e = hyp.base.p * hyp.base.q ∧ Mdata.betaM_expansion_formula := by
+    Mdata.e = hyp.base.p * hyp.base.q ∧
+      ∃ ε : Fin hyp.base.q → Fin hyp.base.p → ℤ,
+        (∀ i j, ε i j = 1 ∨ ε i j = -1) ∧
+        ∃ χ : ClassFunction G ℂ,
+          (∀ g : G, ‖χ g‖ = ‖(Mdata.tau1 Mdata.psi) g‖) ∧
+          Mdata.betaM =
+            (∑ i : Fin hyp.base.q, ∑ j : Fin hyp.base.p,
+              (ε i j : ℂ) • hyp.base.eta i j) - χ := by
   sorry
 
 /-- **Peterfalvi (14.11.3)**: on the generic set `G_0`, the extended character `ψ^{τ₁}` has
