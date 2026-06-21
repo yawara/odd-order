@@ -20,9 +20,14 @@ A₀-supported で `(hyp.tau φ,hyp.tau ψ)=(φ,ψ)`、§7 `dadeIntegralCharacte
 degree dw₁ 相殺) ゆえ既存 `tau_inner_eq_of_supported` で transfer 可。cont.⁴ で τ₁-side 基盤 5 補題 landing
 (`inducedFamily_closedUnderConjugate`/`muGrid_column_sum_vanishes_off_derived`/`muColumn_sub_conj_support`/
 `muGridAlpha_tau_inner_muColumn_sub_conj`/`tau_zeta_sub_conj_eq_tau1`、詳細 issue 1007 cont.⁴)。
-**残 arc** (全 primitive ベース、新 adjunction 数学なし): (1) μ_k τ/τ₁ 互換 (要 ∑μ_ik∈ℤ[S]=μ_k∈inducedFamily)、
-(2) a-derivation `(α^τ,ζ̄^{τ₁})=a`/`(α^τ,μ_k^{τ₁})=da`、(3) **Cauchy-Schwarz→a=0** (要 ‖μ_k^{τ₁}‖²=w₁ + a∈ℤ; 次の山)、
-(4) (v)ζ^{τ₁} vanish on V + (vi)NC≤4+(3.8)→ψ=0。⟹ issue 1007 cont.⁴ 参照。
+**cont.⁵ (2026-06-21) で τ₁-side inner-product 計算 完成** (5 補題、issue 1007 cont.⁵): `muGrid_column_sum_mem_inducedFamily`
+(μ_k∈ℤ[S]) + `tau_muColumn_sub_conj_eq_tau1` (μ_k τ/τ₁) + **`muGridAlpha_tau1_inner_muColumn`** (`(α^τ,μ_k^{τ₁})=da`) +
+`muColumn_tau1_inner_self` (`‖μ_k^{τ₁}‖²=w₁`)。⟹ **Cauchy-Schwarz `(da)²≤(2+n²)w₁` の全因子 materialize**
+(`(α^τ,μ_k^{τ₁})=da` + `‖α^τ‖²=2+n²` + `‖μ_k^{τ₁}‖²=w₁`)。⚠ **coh を使う inner 計算 lemma は `[Finite G]`+FiniteInduce
+regime 一本で書く** (explicit Fintype 混入で inner の Invertible が defeq mismatch、cont.⁵ で実害)。
+**残 = final assembly の山**: (1)a∈ℤ (`inner_mem_ZIrr_int` cite, 軽い)、(2)**一般 Cauchy-Schwarz** (ClassFunction.inner、
+既存は coefficient/norm-1 特殊形のみ→基底展開 or 新規証明; 次の山)、(3)数論 (nw₁+δ)²≤(2+n²)w₁→n<2 矛盾→a=0、
+(4)(v)ζ^{τ₁} vanish on V + (vi)NC≤4+(3.8)→ψ=0。⟹ issue 1007 cont.⁵ 参照。
 
 ## ★★★★ 2026-06-21 更新⁶ — a=0 の μ-side inner-product inventory 完成 (CRUX μ⊥ζ 含む)
 

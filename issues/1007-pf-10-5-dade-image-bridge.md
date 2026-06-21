@@ -189,6 +189,73 @@ primitive で transfer でき、adjunction は要らない。これで τ₁-sid
    ψ=X−δ(ω^σ diff) vanishes on V (value-on-V leg ✅) → NC(ψ)≤4 + (3.8) → ψ=0 → `alpha_tau_image`。
 全 piece は `coh`+ζ irreducibility 経由、新 adjunction 数学なし。Cauchy-Schwarz が次の山。
 
+## ✅✅✅✅✅✅✅ 進捗 (2026-06-21 cont.⁵) — τ₁-side inner-product 計算 完成 (5 補題)、残 = Cauchy-Schwarz+数論
+
+a=0 論証の **τ₁-side inner-product 計算を完全に積み上げ**、Cauchy-Schwarz の全入力を materialize。
+commit `e6eb42b6`/`15bcd901`/`364b3690`/`d5014be8`:
+
+- ✅ **`muGrid_column_sum_mem_inducedFamily`** (`e6eb42b6`): `∑_i μ_{ik} ∈ S` (k で μ_{0k}(1)≠1)。列和=
+  `Ind_{M'}^M θ` (θ既約 via §6 `exists_irreducible_restrict_certainType`)、θ≠1 from θ(1)=μ_{0k}(1)≠1。
+  ⟹ μ_k∈ℤ[S] (τ₁ の定義域)。⚠ host 再構成 + finCongr reindex + θ(1)=μ_0(1) (restrict_apply, forward-rw)。
+- ✅ **`tau_muColumn_sub_conj_eq_tau1`** (`15bcd901`): `(μ_k−dζ̄)^τ=μ_k^{τ₁}−dζ̄^{τ₁}`。tau_zeta 版の類比、
+  μ_k∈S + ζ̄∈S。⚠ `(d:ℂ)•` (ℂ-smul) を `Nat.cast_smul_eq_nsmul`+`map_nsmul` で ℤ-linear τ₁ に通す。
+- ✅✅ **`muGridAlpha_tau1_inner_muColumn`** (`364b3690`): **`(α_ij^τ, μ_k^{τ₁}) = d·((α_ij^τ,ζ^{τ₁})+n)` = da**
+  (a:=(α^τ,ζ^{τ₁})+n)。両 τ/τ₁ bridge + 純-τ identity (=−n,=0) を `inner_sub/smul_right`+`linear_combination`。
+  ⚠⚠ **instance regime 衝突 (FiniteInduce vs explicit Fintype) が inner で顕在** → この lemma を `[Finite G]`+
+  FiniteInduce 一本に統一 (CoherentHypothesis の explicit binder も FiniteInduce が供給) で解消。**以後 coh を
+  使う inner 計算 lemma は全て FiniteInduce regime で書くこと** (explicit Fintype を混ぜると `inner` の Invertible が
+  defeq mismatch)。
+- ✅ **`muColumn_tau1_inner_self`** (`d5014be8`): `‖μ_k^{τ₁}‖²=w₁` (`coherent.extension_inner_eq` +
+  `muGrid_column_sum_inner_self`)。⚠ `coh.tau1=extension` は `show` で defeq 変換してから rw。
+
+**⟹ Cauchy-Schwarz `(da)² ≤ ‖α^τ‖²·‖μ_k^{τ₁}‖² = (2+n²)·w₁` の全因子が揃った**:
+✅ `(α^τ,μ_k^{τ₁})=da` + ✅ `‖α^τ‖²=2+n²` (`muGridAlpha_tau_inner_self`) + ✅ `‖μ_k^{τ₁}‖²=w₁`。
+
+**▶ 残り (final assembly = a=0 の山 + (v)(vi))**:
+1. **a∈ℤ**: `(α^τ,ζ^{τ₁})∈ℤ` ← `inner_mem_ZIrr_int` (InducedCharacter:716、利用可) + α^τ,ζ^{τ₁}∈ZIrr(G)
+   (Dade `dadeIntegralCharacterMap_mem_ZIrr_of_supported` + coherence `extension_mem_ZIrr`)。
+2. **Cauchy-Schwarz**: `(da)²≤(2+n²)·w₁`。⚠ ClassFunction.inner の**一般** Cauchy-Schwarz が必要 (既存は
+   coefficient-vector `ZIrrFourier:306` / norm-1 `S08_CaseBCoherence2:613` の特殊形のみ; α^τ,μ_k^{τ₁} を Irr(G)
+   正規直交基底で展開して coefficient 版に帰着、or 一般形を新規証明)。
+3. **数論**: d=nw₁+δ (hnf), δ=±1, w₁>1, n even>0。a≠0→|a|≥1→`d²≤(2+n²)w₁`→`(nw₁+δ)²≤(2+n²)w₁`→n<2 矛盾→a=0。
+4. **(v)(vi)**: a=0→`α^τ=X−nζ^{τ₁}`,X⊥ζ^{τ₁},‖X‖²=2→ζ^{τ₁} vanish on V (§5)→ψ vanish on V (leg ✅)→
+   NC(ψ)≤4+(3.8)→ψ=0→`alpha_tau_image`。
+次の山 = (2) 一般 Cauchy-Schwarz (or 基底展開) + (3) 数論。(1) は cite で軽い。
+
+## 🎉🎉🎉 進捗 (2026-06-21 cont.⁶) — **a=0 PROVEN** (Cauchy-Schwarz 解析的核心 完成)
+
+**(10.5) の解析的核心 `a=0` を完全形式化** = `(α_ij^τ, ζ^{τ₁}) = −n`。Cauchy-Schwarz 議論の全 step
+を組み上げた。commit `cb6111df`/`39f85329`/`553b004e`:
+
+- ✅ **`classFunction_inner_re_sq_le`** (`cb6111df`, private, 一般 H): `⟨φ,ψ⟩.re² ≤ ⟨φ,φ⟩.re·⟨ψ,ψ⟩.re`。
+  **判別式法** — `‖φ−tψ‖²≥0 ∀t` (`inner_self_re_nonneg`) → `discrim_le_zero`。**Parseval/基底展開 不要**
+  (cont.⁵ の「基底展開 or 新規証明」見積もりより遥かに簡潔)。⚠ `.re` 展開は `pow_two`+`Complex.mul_im`+
+  `Complex.star_def` で `(↑t)²` の im と `(star z).re` を処理。
+- ✅ **`muGrid_isIrreducible`** + **`muGridAlpha_tau_mem_ZIrr`** (`39f85329`): μ_ij 既約 (host emj) → α∈ℤ[Irr M]
+  (sub/zsmul/nsmul_mem + `Int/Nat.cast_smul_eq_zsmul/nsmul`) → α^τ∈ℤ[Irr G] (`dadeIntegralCharacterMap_mem_ZIrr_of_supported`)。
+- ✅ **`cauchySchwarz_numeric`** (`553b004e`, private, 純算術): `(d·a)²≤(2+n²)w₁`, d=nw₁+δ, δ=±1, **w₁≥3 (奇数)**,
+  **n≥2 (偶数)** → a=0。a≠0→a²≥1→d²≤(2+n²)w₁ だが `(nw₁+δ)²>(2+n²)w₁` (nlinarith)。原文「n<2 矛盾」を
+  忠実実装。**鍵 = w₁ は奇数 >1 ゆえ ≥3** (これが無いと w₁=2 で bound 違反せず)。
+- ✅✅✅ **`muGridAlpha_tau1_zeta_eq_neg_n`** (`553b004e`): **`(α_ij^τ, ζ^{τ₁}) = −n` (a=0)**。
+  m=(α^τ,ζ^τ₁)∈ℤ (`ClassFunction.inner_mem_ZIrr_int`) + da identity + C-S helper + 3 inner 値 (da, 2+n², w₁) +
+  cauchySchwarz_numeric。`.re` 計算 + `convert`/`push_cast` で numeric に橋渡し。
+
+**✅ X-decomposition DONE** (`541122df`): `Hypothesis.zeta_tau1_inner_self` (‖ζ^τ₁‖²=1) +
+`muGridAlpha_tau_X_inner` (X:=α^τ+nζ^τ₁ で **‖X‖²=2 ∧ X⊥ζ^τ₁**)。a=0 + ‖α^τ‖²=2+n² + ‖ζ^τ₁‖²=1 の
+sesquilinear 展開。⟹ `α^τ = X − nζ^τ₁` (X virtual char, ‖X‖²=2, X⊥ζ^τ₁) 確立。
+
+**▶ 残り = (10.5) Dade-image を閉じる最終 (v)(vi) のみ** (別 large sub-area、§5/§3 wiring + pinning):
+1. **ζ^{τ₁} vanishes on V** (§5 (5.3.b)/(5.5)/(3.2.d))。coh.tau1 ζ が V で消える — §5 coherence/σ 機構の §10 wiring。
+2. **ψ vanishes on V**: ψ:=X−δ(ω^σ diff)。on V: ψ = (α^τ−δ(ω^σ diff)) + nζ^τ₁ = 0 + n·0 = 0
+   (value-on-V leg `tau_muGridAlpha_apply_eq_on_typePV` ✅ で α^τ=δ(ω^σ diff) on V、+ 上記 1)。**= 1 が gate**。
+3. **NC(ψ)≤4 + (3.8)**: `sigmaCoeff_trichotomy` (S05_SigmaTrichotomy:41) は `TICyclicHypothesis G`
+   (`typePData_toTICyclicHypothesis` ✅) + **`FullDadeApplication` (要構成)** + ψ vanish on V + gap `w₁+2≤w₂` +
+   `sigmaNC ψ < 2w₁` を取り σ-coeff trichotomy を返す。ψ の σ-coeff 計算 + NC≤4 (w₁≥3 で 2w₁≥6>4) →
+   trichotomy → ψ⊥ω^σ → ψ=0 → X=δ(ω^σ diff) → `α^τ=δ(ω^σ diff)−nζ^τ₁`。
+4. **pinning**: grid-level (10.5) → `alpha_tau_image` (params.alpha/omegaSigma/zeta を grid に pin)。
+**要 §5 (5.3.b)/(5.5) ζ^τ₁-vanish + FullDadeApplication 構成 + (3.8) σ-coeff wiring** — 新 large sub-area
+(別セッション規模)。**a=0 + X-decomposition で (10.5) の解析の山は完全に越えた**; 残りは構造論的 endgame。
+
 ## やること (旧)
 
 - [ ] **carrier pinning**: `CharacterParameters.omegaSigma`/`mu` を `Hypothesis.omegaSigmaGrid`/`muGrid`
