@@ -416,6 +416,21 @@ theorem typePData_V_ti [Finite G] {M : Subgroup G} (data : TypePData M) :
   simp only [typePV, Set.mem_diff, Set.mem_union, SetLike.mem_coe]
   rw [hgW h, hstab data.W1 hW1le h, hstab data.W2 hW2le h]
 
+/-- `W₂ ≤ M` for type-`P` data (`W₂ ≤ H ⊓ M'' ≤ M' ≤ M`). -/
+theorem typePData_W2_le_self {M : Subgroup G} (data : TypePData M) : data.W2 ≤ M :=
+  (data.W2_le.trans (le_trans inf_le_right (Subgroup.map_subtype_le _))).trans
+    (Subgroup.map_subtype_le _)
+
+/-- `W ≤ M` for type-`P` data (`W = W₁ ⊔ W₂`, both `≤ M`). -/
+theorem typePData_W_le_self {M : Subgroup G} (data : TypePData M) : data.W ≤ M :=
+  data.W_eq ▸ sup_le data.W1_le (typePData_W2_le_self data)
+
+/-- The §6 `↥M`-level `W = W₁.subgroupOf M ⊔ W₂.subgroupOf M` is `W.subgroupOf M`: the `subgroupOf`
+order-iso on subgroups `≤ M` preserves joins. -/
+theorem typePData_sup_subgroupOf_eq {M : Subgroup G} (data : TypePData M) :
+    data.W1.subgroupOf M ⊔ data.W2.subgroupOf M = data.W.subgroupOf M := by
+  rw [← Subgroup.subgroupOf_sup data.W1_le (typePData_W2_le_self data), ← data.W_eq]
+
 open scoped FiniteInduce in
 /-- **§10 → §5 ω-grid bridge (gate #3)**: a type-`P` maximal subgroup's cyclic factor
 `W = W₁ × W₂`, with the exceptional set `V = W − (W₁ ∪ W₂)`, is a Peterfalvi (3.1) TI-cyclic
@@ -792,6 +807,54 @@ noncomputable def Hypothesis.omegaSigmaGrid [Finite G] (hG : OddOrder.BG.IsMinim
       (OddOrder.Peterfalvi.S04.Hypothesis.HConjInvariant.of_forall_H_eq_bot _ (fun _ => rfl))⟩
   have hVeq : tic.V = tic.Vdiff := rfl
   exact fun i j => tic.omegaSigmaGrid hVeq app i j
+
+open scoped FiniteInduce in
+/-- **§10 aligned ω^σ-grid** (producer-local alignment fix for (10.5)): the §5 `σ`-image of the
+*same* ω that `muGrid` is built from — `h.chiColumn χ₂ i` (`χ₂ = finCardEquivCharacterGroup j`,
+`i` via `w1CharEquiv`) — transported from the §6 `↥M`-level `W = W₁ ⊔ W₂` to the §10 `G`-level
+`tic.W = data.W` along the `W ≤ M ≤ G` isomorphism `e` (`subgroupOfEquivOfLe` ∘ `subgroupCongr` of
+`typePData_sup_subgroupOf_eq`).
+
+Unlike `omegaSigmaGrid` (which reindexes via the *independent* §5 `charEquiv`), this grid shares
+`muGrid`'s indexing by construction, so on `V` it satisfies `alignedOmegaSigma_{ij}(v) =
+chiColumn(v)` — matching `(μ_{ij} − δ·μ_{i0})(v) = δ·(chiColumn_{ij} − chiColumn_{i0})(v)` ((4.3.c))
+needed by the (10.5) Dade-image identity.  This is the genuine `CharacterParameters.omegaSigma`. -/
+noncomputable def Hypothesis.alignedOmegaSigmaGrid [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} (hyp : Hypothesis M)
+    (hodd : Odd (Nat.card G)) : Fin hyp.w1 → Fin hyp.w2 → ClassFunction G ℂ := by
+  haveI := hyp.finiteG
+  classical
+  intro i j
+  -- §6 host (the source of `muGrid`'s ω `chiColumn`) — mirror `muGrid`.
+  let h := (hyp.toCertainTypeHypothesis hG hodd).toHypothesis
+  haveI : NeZero (Nat.card h.W1) := ⟨by have := h.one_lt_card_W1; omega⟩
+  haveI : IsCyclic ↥(h.W1 ⊔ h.W2) := h.isCyclic_sup
+  letI : CommGroup ↥(h.W1 ⊔ h.W2) := IsCyclic.commGroup
+  have hW1le : hyp.typeP.W1 ≤ M := hyp.typeP.W1_le
+  have hW2le : hyp.typeP.W2 ≤ M := typePData_W2_le_self hyp.typeP
+  have hcardW1 : Nat.card ↥h.W1 = hyp.w1 :=
+    Nat.card_congr (Subgroup.subgroupOfEquivOfLe hW1le).toEquiv
+  have hcardW2sub : Nat.card ↥(h.W2.subgroupOf (h.W1 ⊔ h.W2)) = hyp.w2 := by
+    rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe (le_sup_right)).toEquiv]
+    exact Nat.card_congr (Subgroup.subgroupOfEquivOfLe hW2le).toEquiv
+  haveI : NeZero (Nat.card ↥(h.W2.subgroupOf (h.W1 ⊔ h.W2))) := ⟨Nat.card_pos.ne'⟩
+  let χ₂ : (h.W2.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ :=
+    finCardEquivCharacterGroup _ (finCongr hcardW2sub.symm j)
+  -- §5 `G`-level TI-cyclic hypothesis (for `σ`) — mirror `omegaSigmaGrid`.
+  let tic := typePData_toTICyclicHypothesis hyp.typeP hodd
+  haveI : NeZero (Nat.card ↥tic.W1) := ⟨Nat.card_pos.ne'⟩
+  haveI : NeZero (Nat.card ↥tic.W2) := ⟨Nat.card_pos.ne'⟩
+  let app : OddOrder.Peterfalvi.S05.TICyclicHypothesis.FullDadeApplication tic :=
+    ⟨tic.toDadeHypothesis.fullDadeIsometryData
+      (OddOrder.Peterfalvi.S04.Hypothesis.HConjInvariant.of_forall_H_eq_bot _ (fun _ => rfl))⟩
+  -- the `W ≤ M ≤ G` isomorphism `↥tic.W ≃* ↥(h.W₁ ⊔ h.W₂)`.
+  let e : ↥tic.W ≃* ↥(h.W1 ⊔ h.W2) :=
+    (Subgroup.subgroupOfEquivOfLe (typePData_W_le_self hyp.typeP)).symm.trans
+      (MulEquiv.subgroupCongr (typePData_sup_subgroupOf_eq hyp.typeP).symm)
+  -- `σ` of the transported `chiColumn` (= `muGrid`'s own ω).
+  exact tic.sigmaIntegral rfl app
+    (ClassFunction.compHom e.toMonoidHom
+      (h.chiColumn χ₂ (finCongr hcardW1.symm i) : ClassFunction h.sdiffTICyclicHypothesis.W ℂ))
 
 open scoped FiniteInduce in
 /-- **§10 within-column degree constancy** (Peterfalvi (4.5.a), the `i`-independence half of
