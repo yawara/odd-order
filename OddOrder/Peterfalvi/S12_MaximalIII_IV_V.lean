@@ -1321,6 +1321,82 @@ theorem Hypothesis.muGrid_apply_eq_columnSign_mul_zeroColumn_of_mem_W1 [Finite G
   exact keyW1 _ _
 
 open scoped FiniteInduce in
+/-- **§10 reconciliation on `V`** (the M-side ↔ σ-side link of (10.5)): for `v ∈ V = typePV`,
+`μ_{ij}(v) = δ_j · ω_{ij}^σ(v)` where `ω^σ = alignedOmegaSigmaGrid`.  Both sides reduce to the §6
+column character `chiColumn χ₂ i` evaluated at `v`: the M-side by (4.3.c)
+(`certainType_apply_eq_of_mem_V`, giving `μ_{ij}(v) = δ_j·chiColumn(v)`), the σ-side because
+`alignedOmegaSigma` is `σ_∫` of the transported `chiColumn`, restored on `V` by
+`sigmaIntegral_apply_of_mem_V`; the `W ≤ M ≤ G` isomorphism `e` carries `v` to itself, so the two
+`chiColumn` arguments agree.  This is the alignment that makes the (10.5) Dade-image identity hold
+(impossible with the independently-indexed `omegaSigmaGrid`). -/
+theorem Hypothesis.muGrid_apply_eq_columnSign_smul_alignedOmegaSigma_of_mem_typePV [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} (hyp : Hypothesis M)
+    (hodd : Odd (Nat.card G)) (i : Fin hyp.w1) (j : Fin hyp.w2)
+    {v : G} (hv : v ∈ typePV M hyp.typeP) (hvM : v ∈ M) :
+    hyp.muGrid hG hodd i j ⟨v, hvM⟩
+      = (hyp.muColumnSign hG hodd j : ℂ) * hyp.alignedOmegaSigmaGrid hG hodd i j v := by
+  haveI := hyp.finiteG
+  classical
+  let h := (hyp.toCertainTypeHypothesis hG hodd).toHypothesis
+  haveI hNeZ1 : NeZero (Nat.card h.W1) := ⟨by have := h.one_lt_card_W1; omega⟩
+  haveI hcyc : IsCyclic ↥(h.W1 ⊔ h.W2) := h.isCyclic_sup
+  letI : CommGroup ↥(h.W1 ⊔ h.W2) := IsCyclic.commGroup
+  have hW1le : hyp.typeP.W1 ≤ M := hyp.typeP.W1_le
+  have hW2le : hyp.typeP.W2 ≤ M := typePData_W2_le_self hyp.typeP
+  have hcardW1 : Nat.card ↥h.W1 = hyp.w1 :=
+    Nat.card_congr (Subgroup.subgroupOfEquivOfLe hW1le).toEquiv
+  have hcardW2sub : Nat.card ↥(h.W2.subgroupOf (h.W1 ⊔ h.W2)) = hyp.w2 := by
+    rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe (le_sup_right)).toEquiv]
+    exact Nat.card_congr (Subgroup.subgroupOfEquivOfLe hW2le).toEquiv
+  haveI hNeZ2 : NeZero (Nat.card ↥(h.W2.subgroupOf (h.W1 ⊔ h.W2))) := ⟨Nat.card_pos.ne'⟩
+  let tic := typePData_toTICyclicHypothesis hyp.typeP hodd
+  haveI : NeZero (Nat.card ↥tic.W1) := ⟨Nat.card_pos.ne'⟩
+  haveI : NeZero (Nat.card ↥tic.W2) := ⟨Nat.card_pos.ne'⟩
+  let app : OddOrder.Peterfalvi.S05.TICyclicHypothesis.FullDadeApplication tic :=
+    ⟨tic.toDadeHypothesis.fullDadeIsometryData
+      (OddOrder.Peterfalvi.S04.Hypothesis.HConjInvariant.of_forall_H_eq_bot _ (fun _ => rfl))⟩
+  let e : ↥tic.W ≃* ↥(h.W1 ⊔ h.W2) :=
+    (Subgroup.subgroupOfEquivOfLe (typePData_W_le_self hyp.typeP)).symm.trans
+      (MulEquiv.subgroupCongr (typePData_sup_subgroupOf_eq hyp.typeP).symm)
+  set χ₂ := finCardEquivCharacterGroup (h.W2.subgroupOf (h.W1 ⊔ h.W2)) (finCongr hcardW2sub.symm j)
+    with hχ₂
+  have hvtic : v ∈ tic.V := hv
+  have hWeq : h.W1 ⊔ h.W2 = hyp.typeP.W.subgroupOf M := typePData_sup_subgroupOf_eq hyp.typeP
+  have hvW : (⟨v, hvM⟩ : ↥M) ∈ h.W1 ⊔ h.W2 := by
+    rw [hWeq, Subgroup.mem_subgroupOf]; exact hv.1
+  -- `⟨v, hvM⟩ ∈ sdiff.V = W − W₂` (`v ∈ typePV = W − (W₁ ∪ W₂) ⊆ W − W₂`).
+  have hvsdiffV : (⟨v, hvM⟩ : ↥M) ∈ h.sdiffTICyclicHypothesis.V := by
+    refine ⟨hvW, ?_⟩
+    intro hvW2
+    exact hv.2 (Or.inr (Subgroup.mem_subgroupOf.mp hvW2))
+  -- the transport `e` carries `v` to itself (same underlying `G`-element).
+  have he_coe : ((e ⟨v, tic.V_subset_W hvtic⟩ : ↥(h.W1 ⊔ h.W2)) : ↥M) = ⟨v, hvM⟩ := by
+    apply Subtype.ext
+    show ((MulEquiv.subgroupCongr (typePData_sup_subgroupOf_eq hyp.typeP).symm
+        ((Subgroup.subgroupOfEquivOfLe (typePData_W_le_self hyp.typeP)).symm
+          ⟨v, tic.V_subset_W hvtic⟩) : ↥M) : G) = v
+    rw [MulEquiv.subgroupCongr_apply]; rfl
+  -- the two `chiColumn` arguments (from (4.3.c) and from `e`) agree.
+  have harg : (⟨⟨v, hvM⟩, h.sdiffTICyclicHypothesis.V_subset_W hvsdiffV⟩
+        : ↥h.sdiffTICyclicHypothesis.W)
+      = e ⟨v, tic.V_subset_W hvtic⟩ := by
+    apply Subtype.ext; rw [he_coe]
+  -- unfold `alignedOmegaSigma` to `chiColumn (e ⟨v⟩)` on `V`.
+  have eaos : hyp.alignedOmegaSigmaGrid hG hodd i j v
+      = (h.chiColumn χ₂ (finCongr hcardW1.symm i) : ClassFunction h.sdiffTICyclicHypothesis.W ℂ)
+          (e ⟨v, tic.V_subset_W hvtic⟩) := by
+    unfold Hypothesis.alignedOmegaSigmaGrid
+    rw [tic.sigmaIntegral_apply_of_mem_V rfl app _ hvtic, ClassFunction.compHom_apply]
+    rfl
+  -- unfold `muGrid`/`muColumnSign` and apply (4.3.c); the two `chiColumn` arguments agree.
+  have emj : hyp.muGrid hG hodd i j = (h.columnFamily χ₂).mu (finCongr hcardW1.symm i) := by
+    unfold Hypothesis.muGrid; rfl
+  have esign : hyp.muColumnSign hG hodd j = (h.columnFamily χ₂).sign := by
+    unfold Hypothesis.muColumnSign; rfl
+  rw [emj, esign, eaos,
+    h.certainType_apply_eq_of_mem_V χ₂ (finCongr hcardW1.symm i) hvsdiffV, harg]
+
+open scoped FiniteInduce in
 /-- **§10 column-`0` degree** (Peterfalvi (4.4)): `μ_{i0}(1) = 1`.  The column-`0` character is
 `K`-trivial (`μ_{00} = 1_L` by the (4.4) anchor), of degree `1`; by within-column degree constancy
 (`muGrid_apply_one_within_column`) every `μ_{i0}` has the same degree. -/
