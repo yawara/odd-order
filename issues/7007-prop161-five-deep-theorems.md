@@ -90,6 +90,13 @@ bottom-out** するので、clean 化には §15 foundation が先。真の順�
 
 ## 進捗ログ
 
+**2026-06-22 (cont.²) ✅✅✅ Thm C conjunct 10 (BG C(9) `A0-A` TI) 完全完成 — sorry-free + axiom-clean** (`491bdd3d`, full build 3881 green):
+- 構造的包含 `a0_minus_a_subset_conj_zTilde` を **完全に証明** (前 commit `d553f1e0` の residual を充足)。`#print axioms` = 標準3公理のみ。AxiomsCheck 登録 (transport 補題と共に)。
+- **Helper A** (κ'-元 ∈ M'): `M'` が Hall κ-部分群 `K` を補完 (`typeP_duality.symm.index_eq_card` で `[M:M']=|K|` κ-数) → `↥M⧸M'` での像の位数が `[M:M']` と `orderOf x` (κ'-数) を割る → 1 → `x∈M'`。quotient-order 論法。
+- **Helper B** (`M'⊓(K⊔K*)=K*`): `K` が `K⊔K*` で normal (K*≤C(K))、`K⊓M'=⊥` (補完の disjoint) → `le_centralizerFactor_of_le_sup_of_le_Msigma` と同型の `mem_sup_of_normal_left` 分解で `x=a·b`, `a∈K⊓M'=⊥`, `x=b∈K*`。
+- 知見: `IsComplement'.index_eq_card` は `K.index=card H` 方向 (要 `.symm`); `subgroupOf` の inf 分配は elementwise (`Subtype.ext_iff`) が安全; `le_normalizer_derivedInG` + `normal_subgroupOf_of_le_normalizer` で `(derivedInG M).subgroupOf M` normal。
+- ⟹ **Thm C 残 = conjunct 2 (Cor 14.12 `N_G(U)⊄M`) のみ** (Lemma 14.11 sorry に gated、最深)。
+
 **2026-06-22 (cont.) ✅ Thm C conjunct 10 (BG C(9) `A0-A` TI) を構造的包含一点に還元 + 数学的完全再構成** (`d553f1e0`, full build 3881 green):
 - **再利用可能な TI-transport 補題** `IsTISubset.of_subset_conj_of_isTISubset` (TISubset.lean、純群論、`Mathlib.Tactic.Group` import 追加): `T` が TI (normalizer `Z≤M`) かつ `A` の各元が `T` の元に `M`-共役 ⟹ `A` は TI (normalizer `M`)。BG Theorem B(5) (`A(M)-M_σ` TI) にも使える。
 - **conjunct 10 を還元**: `theoremC_paired_structure` の conjunct 10 を transport 補題 + `typeP_duality` の Ẑ-TI (`hMstarP.2.2.2.2.2.1`、`N_G(Ẑ)=K⊔K*≤M`) で discharge。残 = 構造的包含 `a0_minus_a_subset_conj_zTilde` (S16, sorry) のみ。
@@ -263,7 +270,7 @@ bottom-out** するので、clean 化には §15 foundation が先。真の順�
   - ⟹ **Lean statement を `≤` に弱める faithfulness 修正** (Theorem C ∃! と同種、`fitting_not_ti_cases` consumer ゼロゆえ安全)。(a)=`fittingIsTI_of_isTypeP2`+三分律 / (b)=`mf_eq_msigma_of_not_fittingIsTI` / ∃X+prime+disjunct 全 discharge / **M'≤F(M) type-P1 case 実証明** (M'=Mσ via Lem15.1b U=⊥ + Mσ=MF nilpotent)。
   - **残 = type-F の M'≤F(M) のみ・now ungated** (C_Y(E₁)=1 gate 消滅): `exists_subgroupESetup` (一般 M) → M'=Mσ⊔E' (`derivedInG_eq_Msigma_sup_derivedInG_complement`) → E'≤C(Mσ) (Lem 12.19 `derivedE_centralizes_betaComplement` + W=Mσ [π(Mσ)∩β=∅]) → E'≤C_G(Mσ)⊓M≤F(M) (`fitting_decomposition` F=(C⊔MF)) + Mσ≤F(M) ⟹ sup_le。**M' nilpotent 経由不要**、crux = W=Mσ の Hall plumbing のみ
 - [ ] Thm A `theoremA_maximal_structure` (S16:144) — Lemma 15.1 + Prop 14.2 + §15 で全 conjunct
-- [~] Thm C `theoremC_paired_structure` — **10/12 conjunct discharge + faithfulness 修正 2 件 DONE** (`8f636b54`/`ec711630`/`378e91cf`/`dc2fe378`, 2026-06-21)。残 = conjunct 2 (N(U)⊄M=Cor 14.12)/10 (A0-A TI=Thm A(3)(5)) のみ (conjunct 11 は 15.7(a) で close)
+- [~] Thm C `theoremC_paired_structure` — **11/12 conjunct DONE** (conjunct 10 = BG C(9) `A0-A` TI を `491bdd3d` で完全証明、残 = conjunct 2 (Cor 14.12) のみ)。旧: 10/12 + faithfulness 修正 2 件 DONE (`8f636b54`/`ec711630`/`378e91cf`/`dc2fe378`, 2026-06-21)。残 = conjunct 2 (N(U)⊄M=Cor 14.12)/10 (A0-A TI=Thm A(3)(5)) のみ (conjunct 11 は 15.7(a) で close)
 - [ ] Prop 16.1 配線 `proposition_type_classification` (S16:894) + AxiomsCheck 登録
 
 ## 完了条件
