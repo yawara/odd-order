@@ -47,11 +47,33 @@ Y=O_σ'(F(M)) 上で固定点自由) 一点に等価**。
 C_E(H)=1 (faithful action ≠ pointwise FPF) は strictly stronger。Frobenius (C_H(e)=1 ∀e) はさらに強い。
 BG も Thm 12.12 は E₀≤E (≠E) で HE₀ Frobenius、Cor 15.9 で初めて M Frobenius (但し τ₂=∅ で E₂=1 後)。
 
-**⚠ 未検証 (hallucination 兆候)**: 「MathComp odd-order 形式化が同じ defect を見つけ M'≤F(M) に弱めた」
-は引用元が偽 (Ethiopian digital library) ゆえ**鵜呑み不可**。数学的論証 (補題不足 + abstract H⋊E local
-model) 自体は妥当だが、これは minimal-simple 環境での反例でない (uniqueness 等で C_Y(E₁)=1 が出る余地)。
-⟹ 等式が「真だが難 (minimal-simple 固有の深い fact)」か「genuine overstatement」かは**未解決**。
+## ✅ 解決済み (2026-06-22, workflow `wddw8y3qt` で MathComp を curl 独立検証 + 数学核を独立再導出)
 
-**Lean 方針**: (a) M'≤F(M) は landed piece から証明可 (~40行, E-setup+Lem12.19+直積)、
-(b) 等式 residual = `C_Y(E₁)=1` (Y≤M') に厳密化。statement を `≤` に弱めるかは要ユーザー判断
-(MathComp 確認 or minimal-simple 深掘り)。`fitting_not_ti_cases` は consumer ゼロゆえ緊急性低。
+**provenance の明確化**: ChatGPT (GPT-5 Pro, 23m43s) 回答は「MathComp が等式を弱めた」と述べたが
+**引用元として偽 source「Ethiopian digital library」を hallucinate** した。⟹ ChatGPT の source 主張は
+鵜呑み不可。**だが MathComp の事実自体は workflow が実 repo を curl して独立に確定** (下記)。よって
+**この発見は settled-CONFIRMED** (ChatGPT 経由でなく一次ソースで裏付け済み)。
+
+**MathComp 一次ソース確認 (curl `math-comp/odd-order` master `theories/BGsection15.v`)**:
+定理 `nonTI_Fitting_structure` (header L939) の conjunct (c) は逐語:
+```coq
+(*c*) M^`(1) \subset 'F(M) /\ M`_\sigma \x 'O_\sigma(M)^'('F(M)) = 'F(M),   (* L944 *)
+```
+= **包含 `M^'(1) ⊆ 'F(M)`** ∧ 直積分解。さらに形式化者の**明示コメント (L916-922) が smoking gun**:
+> We had to change the statement of the Theorem, because the first equality of part (c) does not
+> appear to be valid: if M is of type F, we know very little of the action E1 on the Sylow subgroups
+> of E2, and so E2 might have a Sylow subgroup that meets F(M) but is also centralised by E1 and
+> hence intersects M' trivially; luckily, only the inclusion M' ⊆ F(M) seems to be needed in the sequel.
+
+これは私の `C_Y(E₁)≠1` 機序そのもの (E₂ の Sylow が E₁ に中心化され [E₂,E₁]=E'=M'∩E₂ の外)。
+コメント L923-938 は B&G の他の修正も列挙 (12.6(d) 誤用 / X₁≠Z₀ 強化 / Lem 10.13(b) 極大性 / 等)。
+下流使用 L1248, L1488。
+
+**数学核 (workflow 独立再導出 → 全 step CONFIRMED)**: M'=F(M)⟺Y⊆E'⟺C_Y(E₁)=1 の各 step (E'⊆Y 常成立、
+converse は Prop 1.6(d) を E₁↷E₂ 全体に適用) airtight、C_Y(E₁)=1 は引用補題から導出不能と確定。
+
+**Lean 修正 DONE** (`6b82e6c6`): `fitting_not_ti_cases` conjunct (c) を `derivedInG M = fittingInAmbient M`
+→ `derivedInG M ≤ fittingInAmbient M` に弱め (MathComp 包含に一致)。type-P1 実証明、type-F は ungated
+residual (単一 sorry `S15_MF:7871`、W=Mσ Hall plumbing のみ)。記録は memory `bg-15-7-c-overstatement` +
+issue 7007 + docstring に整合。**⚠ 再 cite 時の注意**: MathComp の事実は本物だが、ChatGPT が付けた source
+は偽だった — MathComp を引くときは一次ソース (BGsection15.v) を参照すること。
