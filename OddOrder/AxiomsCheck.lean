@@ -5443,3 +5443,14 @@ simple `i₀` fixed by all of `Γ`, and `Γ` acts freely off it.  Axiom-clean (t
 kernel-FPF dimension fact (†) to the real Frobenius carrier, issue 2014). -/
 
 #assert_only_allowed_axioms OddOrder.GroupTheory.WielandtKernelFPF.exists_fixed_simple_free_of_fpf
+
+/-! **(9.1) item 2(g) — the trivial isotypic component is the `G`-invariants** (`WielandtKernelFPF`).
+The trivial primitive central idempotent `φ.symm (Pi.single i₀ 1)` (augmentation coordinate `i₀`)
+equals the averaging idempotent `GroupAlgebra.average` (`symm_single_eq_average`), so its isotypic
+projection is the averaging projection and its range is the invariants
+(`range_centerProj_aug_eq_invariants`); `exists_aug_coordinate` produces that coordinate.  This is
+the input that drops the trivial summand in the kernel-FPF count (†) when `Wᴳ = 0`.  Axiom-clean. -/
+
+#assert_only_allowed_axioms OddOrder.GroupTheory.WielandtKernelFPF.symm_single_eq_average
+#assert_only_allowed_axioms OddOrder.GroupTheory.WielandtKernelFPF.range_centerProj_aug_eq_invariants
+#assert_only_allowed_axioms OddOrder.GroupTheory.WielandtKernelFPF.exists_aug_coordinate
