@@ -2767,6 +2767,41 @@ theorem Hypothesis.tau_muColumn_sub_conj_eq_tau1 [Finite G] [Fintype G] {M : Sub
   rw [Nat.cast_smul_eq_nsmul, map_nsmul, Nat.cast_smul_eq_nsmul]
   rfl
 
+/-- **Cauchy–Schwarz for the class-function inner product** (real-part form): for class functions
+`φ, ψ` of any finite group `H`, `⟨φ, ψ⟩.re² ≤ ⟨φ, φ⟩.re · ⟨ψ, ψ⟩.re`.
+
+Proof by the discriminant: the real quadratic `t ↦ ⟨φ − tψ, φ − tψ⟩.re = ⟨ψ,ψ⟩.re·t² −
+2⟨φ,ψ⟩.re·t + ⟨φ,φ⟩.re` is `≥ 0` for every real `t` (positive semidefiniteness,
+`inner_self_re_nonneg`), so its discriminant is `≤ 0` (`discrim_le_zero`).  This is the
+`(α_{ij}^τ, μ_k^{τ₁})² ≤ ‖α_{ij}^τ‖²·‖μ_k^{τ₁}‖²` of the (10.5) `a = 0` argument. -/
+private theorem classFunction_inner_re_sq_le {H : Type*} [Group H] [Fintype H]
+    [Invertible (Nat.card H : ℂ)] (φ ψ : ClassFunction H ℂ) :
+    (ClassFunction.inner φ ψ).re ^ 2
+      ≤ (ClassFunction.inner φ φ).re * (ClassFunction.inner ψ ψ).re := by
+  have hquad : ∀ t : ℝ, 0 ≤ (ClassFunction.inner ψ ψ).re * (t * t)
+      + (-2 * (ClassFunction.inner φ ψ).re) * t + (ClassFunction.inner φ φ).re := by
+    intro t
+    have key : ClassFunction.inner (φ - (t : ℂ) • ψ) (φ - (t : ℂ) • ψ)
+        = ClassFunction.inner φ φ - (t : ℂ) * ClassFunction.inner φ ψ
+          - (t : ℂ) * ClassFunction.inner ψ φ + (t : ℂ) * (t : ℂ) * ClassFunction.inner ψ ψ := by
+      simp only [ClassFunction.inner_sub_left, ClassFunction.inner_sub_right,
+        ClassFunction.inner_smul_left, OddOrder.RepresentationTheory.inner_smul_right,
+        Complex.star_def, Complex.conj_ofReal]
+      ring
+    have hre : (ClassFunction.inner (φ - (t : ℂ) • ψ) (φ - (t : ℂ) • ψ)).re
+        = (ClassFunction.inner ψ ψ).re * (t * t)
+          + (-2 * (ClassFunction.inner φ ψ).re) * t + (ClassFunction.inner φ φ).re := by
+      rw [key, OddOrder.RepresentationTheory.inner_conj_symm φ ψ]
+      simp only [pow_two, Complex.add_re, Complex.sub_re, Complex.mul_re, Complex.mul_im,
+        Complex.ofReal_re, Complex.ofReal_im, Complex.star_def, Complex.conj_re, Complex.conj_im,
+        zero_mul, mul_zero, sub_zero, add_zero]
+      ring
+    rw [← hre]
+    exact inner_self_re_nonneg _
+  have hd := discrim_le_zero hquad
+  rw [discrim] at hd
+  nlinarith [hd]
+
 open scoped FiniteInduce in
 /-- **Peterfalvi (10.5), `(α_{ij}^τ, μ_k^{τ₁}) = da`** (`0 < k < w₂`, `k ≠ j`): the key inner
 product of the (10.5) `a = 0` argument, where `a := (α_{ij}^τ, ζ^{τ₁}) + n`.
