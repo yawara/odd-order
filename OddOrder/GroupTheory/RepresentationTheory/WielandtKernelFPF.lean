@@ -1,0 +1,243 @@
+/-
+Copyright (c) 2026 Yawara Ishida. All rights reserved.
+Released under Apache 2.0 license as described in the file LICENSE.
+Authors: Yawara Ishida
+-/
+import OddOrder.GroupTheory.RepresentationTheory.CenterOrbitFree
+import OddOrder.GroupTheory.RepresentationTheory.CenterProjConjugation
+import OddOrder.GroupTheory.RepresentationTheory.FreeOrbitModuleCount
+
+/-!
+# Peterfalvi (9.1): the kernel-FPF dimension fact (†) over an algebraically closed field
+
+This file assembles the **kernel fixed-point-free dimension fact (†)** of Peterfalvi (9.1):
+for a finite group `Γ` acting through `ψ : Γ →* MulAut G` on a `p′`-group `G` (split over an
+algebraically closed field `k`) so that every nonidentity `ψ γ` is fixed-point-free, the dimension
+identity `dim W = |Γ| · dim Wᴳ` holds for any finite-dimensional `k[Γ ⋉ G]`-module `W` with no
+`G`-invariants (`Wᴳ = 0`).
+
+The two completed engines it stitches together are:
+
+* `CenterOrbitFree.gamma_free_off_trivial_simple` (3d.3c): `Γ` acts on the simples `Fin N` with a
+  unique fixed point `i₀` (the trivial simple) and freely off it;
+* `WielandtCounting.finrank_eq_card_mul_finrank_invariants_of_free`: the Brauer-free free-orbit
+  dimension count, fed the isotypic decomposition `W = ⊕ᵢ range (centerProj φ ρ i)`
+  (`CenterModuleDecomp.isInternal_centerProj`) with the permutation supplied by
+  `CenterProjConjugation.map_range_centerProj` (item 0).
+
+## Main results (growing bottom-up)
+
+* `exists_fixed_simple_free_of_fpf` (item 1) — packages 3d.3c with the *canonical* induced actions
+  (`Γ` on `ConjClasses G` through `ψ`, `Γ` on `Fin N` through `simplesAction φ ∘ ψ`): there is a
+  simple `i₀` fixed by all of `Γ`, and `Γ` acts freely off it (`i ≠ i₀ ∧ simplesAction φ (ψ γ) i = i
+  ⟹ γ = 1`).
+
+`notes/peterfalvi/s11_wielandt_91_design.md` (NEXT — carrier-level, items 1–2), issue 2014.
+-/
+
+namespace OddOrder.GroupTheory.WielandtKernelFPF
+
+open OddOrder.GroupTheory.CenterSimplesOrbit (simplesAction)
+open OddOrder.GroupTheory.CenterOrbitFree (gamma_free_off_trivial_simple)
+open MulAction
+
+variable {G : Type*} [Group G] [Finite G]
+
+/-- **Peterfalvi (9.1), item 1 — the free `Γ`-action on the nontrivial simples.**
+Fix a splitting `φ : Z(k[G]) ≃ₐ[k] (Fin N → k)` and let a finite group `Γ` act through
+`ψ : Γ →* MulAut G` so that every nonidentity `ψ γ` is fixed-point-free (`hfpf`) with `⟨ψ γ⟩`
+coprime to `|G|` (`hcop`).  Then on the simples `Fin N` (acted on by `simplesAction φ ∘ ψ`) there is
+a simple `i₀` — the trivial one — fixed by all of `Γ`, and `Γ` acts **freely off it**: for `i ≠ i₀`,
+any `γ` fixing `i` is the identity.
+
+This is `gamma_free_off_trivial_simple` (3d.3c) packaged with the canonical induced `Γ`-actions
+(`Γ` on `ConjClasses G` via `ψ`, `Γ` on `Fin N` via `simplesAction φ ∘ ψ`), with the orbit-size
+statement converted to triviality of the point stabilisers off `i₀`. -/
+theorem exists_fixed_simple_free_of_fpf
+    {k : Type*} [Field k] {N : ℕ}
+    (φ : Subalgebra.center k (MonoidAlgebra k G) ≃ₐ[k] (Fin N → k))
+    {Γ : Type*} [Group Γ] [Finite Γ] (ψ : Γ →* MulAut G)
+    (hd : 1 < Nat.card Γ)
+    (hcop : ∀ γ : Γ, γ ≠ 1 → Nat.Coprime (Nat.card ↥(Subgroup.zpowers (ψ γ))) (Nat.card G))
+    (hfpf : ∀ γ : Γ, γ ≠ 1 → ∀ x : G, ψ γ x = x → x = 1) :
+    ∃ i₀ : Fin N,
+      (∀ γ : Γ, simplesAction φ (ψ γ) i₀ = i₀) ∧
+      (∀ (i : Fin N) (γ : Γ), i ≠ i₀ → simplesAction φ (ψ γ) i = i → γ = 1) := by
+  classical
+  haveI : Fintype G := Fintype.ofFinite _
+  haveI : Finite (ConjClasses G) := Finite.of_surjective _ ConjClasses.mk_surjective
+  haveI : Fintype (ConjClasses G) := Fintype.ofFinite _
+  -- The canonical induced `Γ`-actions, through which 3d.3c applies (`hcl`/`hsi` are then `rfl`).
+  letI mulCl : MulAction Γ (ConjClasses G) := MulAction.compHom (ConjClasses G) ψ
+  letI mulSi : MulAction Γ (Fin N) := MulAction.compHom (Fin N) ((simplesAction φ).comp ψ)
+  have hcl : ∀ (γ : Γ) (C : ConjClasses G), γ • C = ψ γ • C := fun _ _ => rfl
+  have hsi : ∀ (γ : Γ) (i : Fin N), γ • i = simplesAction φ (ψ γ) i := fun _ _ => rfl
+  obtain ⟨i₀, hi₀fix, hi₀uniq, hi₀free⟩ :=
+    gamma_free_off_trivial_simple φ ψ hcl hsi hd hcop hfpf
+  refine ⟨i₀, fun γ => ?_, fun i γ hi hfix => ?_⟩
+  · -- `i₀` is fixed by every `γ`: read `mem_fixedPoints` through `hsi`.
+    have := mem_fixedPoints.mp hi₀fix γ
+    rwa [hsi] at this
+  · -- `i ≠ i₀ ⟹ i ∉ fixedPoints` (uniqueness) ⟹ `|orbit i| = |Γ|` ⟹ trivial stabiliser.
+    have hi_nf : i ∉ fixedPoints Γ (Fin N) := fun hc => hi (hi₀uniq i hc)
+    have horb : Nat.card (orbit Γ i) = Nat.card Γ := hi₀free i hi_nf
+    -- orbit–stabiliser: `|Γ| = |orbit i| · |stab i|`, so `|stab i| = 1`, hence `stab i = ⊥`.
+    have hqs : Nat.card (Γ ⧸ stabilizer Γ i) = Nat.card Γ := by
+      rw [← Nat.card_congr (orbitEquivQuotientStabilizer Γ i), horb]
+    have hstab1 : Nat.card ↥(stabilizer Γ i) = 1 := by
+      have hmul := Subgroup.card_mul_index (stabilizer Γ i)
+      rw [Subgroup.index_eq_card, hqs] at hmul
+      have hpos : 0 < Nat.card Γ := Nat.card_pos
+      have h1 : Nat.card ↥(stabilizer Γ i) * Nat.card Γ = 1 * Nat.card Γ := by
+        rw [one_mul]; exact hmul
+      exact Nat.eq_of_mul_eq_mul_right hpos h1
+    have hstabbot : stabilizer Γ i = ⊥ := Subgroup.card_eq_one.mp hstab1
+    have hγstab : γ ∈ stabilizer Γ i := by
+      rw [mem_stabilizer_iff, hsi]; exact hfix
+    rw [hstabbot, Subgroup.mem_bot] at hγstab
+    exact hγstab
+
+/-! ### The trivial isotypic component equals the `G`-invariants (item 2, ingredient g)
+
+For the free-orbit dimension count (†) we must drop the trivial isotypic summand `A i₀` (the
+unique `Γ`-fixed simple).  This identifies it: the trivial primitive central idempotent
+`ε_{i₀} = φ.symm (Pi.single i₀ 1)` *is* the averaging idempotent `average k G`, so its isotypic
+projection `centerProj φ ρ i₀` is the averaging projection `averageMap ρ`, whose range is the
+`G`-invariants.  Hence `Wᴳ = 0 ⟹ A i₀ = ⊥`.
+-/
+
+section TrivialIsotypic
+
+open MonoidAlgebra Representation GroupAlgebra
+open OddOrder.GroupTheory.CenterClassSum (centerRep)
+open OddOrder.GroupTheory.CenterSimplesOrbit (aug aug_apply aug_centerRep centerRep_apply_symm_single)
+open OddOrder.GroupTheory.CenterModuleDecomp (centerProj)
+
+variable {k : Type*} [Field k] [Fintype G] [Invertible (Fintype.card G : k)]
+
+/-- **The averaging idempotent absorbs right multiplication.**  `average · z = (aug z) • average`
+for every `z ∈ k[G]`: right-multiplying by a group element fixes `average`
+(`GroupAlgebra.mul_average_right`), and a general `z` contributes its augmentation coefficient. -/
+theorem average_mul (z : MonoidAlgebra k G) :
+    average k G * z = MonoidAlgebra.lift k k G 1 z • average k G := by
+  induction z using MonoidAlgebra.induction_linear with
+  | zero => simp
+  | add x y hx hy => rw [mul_add, hx, hy, map_add, add_smul]
+  | single g b =>
+    rw [MonoidAlgebra.lift_single, MonoidHom.one_apply, smul_eq_mul, mul_one,
+      show (MonoidAlgebra.single g b : MonoidAlgebra k G) = b • MonoidAlgebra.single g 1 by
+        rw [MonoidAlgebra.smul_single, smul_eq_mul, mul_one],
+      mul_smul_comm, GroupAlgebra.mul_average_right]
+
+/-- The averaging idempotent absorbs left multiplication too: `z · average = (aug z) • average`. -/
+theorem mul_average (z : MonoidAlgebra k G) :
+    z * average k G = MonoidAlgebra.lift k k G 1 z • average k G := by
+  induction z using MonoidAlgebra.induction_linear with
+  | zero => simp
+  | add x y hx hy => rw [add_mul, hx, hy, map_add, add_smul]
+  | single g b =>
+    rw [MonoidAlgebra.lift_single, MonoidHom.one_apply, smul_eq_mul, mul_one,
+      show (MonoidAlgebra.single g b : MonoidAlgebra k G) = b • MonoidAlgebra.single g 1 by
+        rw [MonoidAlgebra.smul_single, smul_eq_mul, mul_one],
+      smul_mul_assoc, GroupAlgebra.mul_average_left]
+
+/-- The averaging idempotent is central in `k[G]`. -/
+theorem average_mem_center : average k G ∈ Subalgebra.center k (MonoidAlgebra k G) :=
+  Subalgebra.mem_center_iff.mpr fun z => by rw [average_mul, mul_average]
+
+variable {N : ℕ} (φ : Subalgebra.center k (MonoidAlgebra k G) ≃ₐ[k] (Fin N → k))
+
+/-- **The trivial primitive central idempotent is the averaging idempotent.**  If `i₀` is the
+augmentation coordinate (`φ z i₀ = aug z` for all `z`), then `φ.symm (Pi.single i₀ 1) = average`.
+Proof: writing `a := ⟨average, _⟩ ∈ Z`, `a · ε_{i₀} = average` (since `aug ε_{i₀} = 1`), so
+`φ a · Pi.single i₀ 1 = φ a`, forcing `φ a = Pi.single i₀ (φ a i₀)`; and `φ a i₀ = aug a = 1`. -/
+theorem symm_single_eq_average {i₀ : Fin N} (haug : ∀ z, φ z i₀ = aug z) :
+    ((φ.symm (Pi.single i₀ 1) : Subalgebra.center k (MonoidAlgebra k G)) : MonoidAlgebra k G)
+      = average k G := by
+  set a : Subalgebra.center k (MonoidAlgebra k G) := ⟨average k G, average_mem_center⟩ with ha
+  -- `aug (φ.symm (Pi.single i₀ 1)) = 1`.
+  have haug1 : aug (φ.symm (Pi.single i₀ 1)) = 1 := by
+    rw [← haug, AlgEquiv.apply_symm_apply, Pi.single_eq_same]
+  -- `aug a = 1` (the augmentation of the averaging idempotent).
+  have hauga : aug a = 1 := by
+    rw [aug_apply]
+    show MonoidAlgebra.lift k k G 1 (average k G) = 1
+    rw [show average k G = ⅟(Fintype.card G : k) • ∑ g : G, MonoidAlgebra.of k G g from rfl,
+      map_smul, map_sum]
+    rw [show (∑ g : G, MonoidAlgebra.lift k k G 1 (MonoidAlgebra.of k G g)) = (Fintype.card G : k) by
+          simp only [MonoidAlgebra.lift_of, MonoidHom.one_apply, Finset.sum_const, Finset.card_univ,
+            nsmul_eq_mul, mul_one],
+      smul_eq_mul, invOf_mul_self]
+  -- `a * φ.symm (Pi.single i₀ 1) = a` (from `average · z = aug z • average` and `aug ε_{i₀} = 1`).
+  have hstep : a * φ.symm (Pi.single i₀ 1) = a := by
+    apply Subtype.ext
+    show average k G * ((φ.symm (Pi.single i₀ 1) : _) : MonoidAlgebra k G) = average k G
+    rw [average_mul, ← aug_apply, haug1, one_smul]
+  -- Apply `φ`: `φ a * Pi.single i₀ 1 = φ a`, hence `φ a = Pi.single i₀ (φ a i₀)`.
+  have hφstep : φ a * Pi.single i₀ 1 = φ a := by
+    conv_lhs => rw [show (Pi.single i₀ 1 : Fin N → k) = φ (φ.symm (Pi.single i₀ 1)) from
+      (AlgEquiv.apply_symm_apply φ _).symm]
+    rw [← map_mul, hstep]
+  have hsupp : φ a = Pi.single i₀ (φ a i₀) := by
+    funext j
+    have hj := congrFun hφstep j
+    simp only [Pi.mul_apply, Pi.single_apply, mul_ite, mul_one, mul_zero] at hj
+    rw [Pi.single_apply]
+    by_cases h : j = i₀
+    · subst h; simp
+    · rw [if_neg h] at hj ⊢; exact hj.symm
+  -- The single coordinate is `1` (`φ a i₀ = aug a = 1`).
+  have hval : φ a i₀ = 1 := by rw [haug, hauga]
+  rw [hval] at hsupp
+  -- `a = φ.symm (Pi.single i₀ 1)`, so `average = (φ.symm (Pi.single i₀ 1)).val`.
+  have hae : a = φ.symm (Pi.single i₀ 1) := by rw [← AlgEquiv.symm_apply_apply φ a, hsupp]
+  rw [← hae]
+
+/-- **The trivial isotypic projection is the averaging projection.**  For the augmentation
+coordinate `i₀`, `centerProj φ ρ i₀ = averageMap ρ`. -/
+theorem centerProj_aug_eq_averageMap {W : Type*} [AddCommGroup W] [Module k W]
+    (ρ : Representation k G W) {i₀ : Fin N} (haug : ∀ z, φ z i₀ = aug z) :
+    centerProj φ ρ i₀ = averageMap ρ := by
+  show asAlgebraHom ρ ((φ.symm (Pi.single i₀ 1) : _) : MonoidAlgebra k G) = asAlgebraHom ρ (average k G)
+  rw [symm_single_eq_average φ haug]
+
+/-- **The trivial isotypic component equals the `G`-invariants** (item 2, ingredient g).  For the
+augmentation coordinate `i₀`, `range (centerProj φ ρ i₀) = invariants ρ`.  In particular, if
+`Wᴳ = 0` then the trivial summand vanishes. -/
+theorem range_centerProj_aug_eq_invariants {W : Type*} [AddCommGroup W] [Module k W]
+    (ρ : Representation k G W) {i₀ : Fin N} (haug : ∀ z, φ z i₀ = aug z) :
+    LinearMap.range (centerProj φ ρ i₀) = invariants ρ := by
+  rw [centerProj_aug_eq_averageMap φ ρ haug]
+  exact (isProj_averageMap ρ).range
+
+/-- The augmentation coordinate `i₀` is fixed by every `simplesAction φ α` (it is *the* trivial
+simple).  Proof: applying `aug` to `centerRep_apply_symm_single` and using `aug`-invariance of
+`centerRep` (`aug_centerRep`) shows the idempotent at `simplesAction φ α i₀` has augmentation `1`,
+which (read through `φ z i₀ = aug z`) pins that coordinate to `i₀`. -/
+theorem simplesAction_fixed_of_aug {i₀ : Fin N} (haug : ∀ z, φ z i₀ = aug z) (α : MulAut G) :
+    simplesAction φ α i₀ = i₀ := by
+  have key : aug (φ.symm (Pi.single (simplesAction φ α i₀) 1)) = aug (φ.symm (Pi.single i₀ 1)) := by
+    rw [← centerRep_apply_symm_single φ α i₀, aug_centerRep]
+  rw [← haug, ← haug, AlgEquiv.apply_symm_apply, AlgEquiv.apply_symm_apply, Pi.single_eq_same,
+    Pi.single_apply] at key
+  by_contra h
+  rw [if_neg (Ne.symm h)] at key
+  exact zero_ne_one key
+
+/-- **The augmentation coordinate exists** (the trivial simple).  There is `i₀ : Fin N` with
+`φ z i₀ = aug z` for every `z` — the augmentation read through the splitting — and it is fixed by
+every `simplesAction φ α`.  This is the simple whose isotypic component is the `G`-invariants
+(`range_centerProj_aug_eq_invariants`). -/
+theorem exists_aug_coordinate :
+    ∃ i₀ : Fin N, (∀ z, φ z i₀ = aug z) ∧ (∀ α : MulAut G, simplesAction φ α i₀ = i₀) := by
+  obtain ⟨i₀, hi₀⟩ := PiAlgebraAut.algHom_pi_eq_eval (aug.comp φ.symm.toAlgHom)
+  have haug : ∀ z, φ z i₀ = aug z := by
+    intro z
+    have h := hi₀ (φ z)
+    rw [AlgHom.comp_apply, AlgEquiv.toAlgHom_apply, AlgEquiv.symm_apply_apply] at h
+    exact h.symm
+  exact ⟨i₀, haug, fun α => simplesAction_fixed_of_aug φ haug α⟩
+
+end TrivialIsotypic
+
+end OddOrder.GroupTheory.WielandtKernelFPF

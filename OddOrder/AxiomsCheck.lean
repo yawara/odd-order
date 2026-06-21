@@ -10,6 +10,7 @@ import OddOrder.GroupTheory.CoprimeFixedPoints
 import OddOrder.GroupTheory.MinimalInvariantNormal
 import OddOrder.GroupTheory.WielandtAssembly
 import OddOrder.GroupTheory.WielandtPerFactorDischarge
+import OddOrder.GroupTheory.RepresentationTheory.WielandtKernelFPF
 import OddOrder.GroupTheory.PiElementDecomposition
 import OddOrder.GroupTheory.RepresentationTheory.CharacterCount
 import OddOrder.GroupTheory.RepresentationTheory.CharacterCompleteness
@@ -5456,3 +5457,29 @@ This isolates the sole remaining representation-theoretic input — the kernel-F
 (†) — into the explicit hypothesis. -/
 
 #assert_only_allowed_axioms OddOrder.GroupTheory.wielandtPerFactor_of_dim
+
+/-! **(9.1) item 0 — conjugation permutes the isotypic projections** (`CenterProjConjugation`).
+A linear automorphism `τ` of `W` intertwining `ρ : Representation k U W` with its `c`-twist carries
+the `i`-th isotypic projection's range onto the `simplesAction φ c i`-th one
+(`map_range_centerProj`); this is the `hperm` of the free-orbit dimension count.  Axiom-clean. -/
+
+#assert_only_allowed_axioms OddOrder.GroupTheory.CenterModuleDecomp.map_range_centerProj
+
+/-! **(9.1) item 1 — the free `Γ`-action on the nontrivial simples** (`WielandtKernelFPF`).
+Packaging `gamma_free_off_trivial_simple` (3d.3c) with the canonical induced `Γ`-actions
+(`Γ` on `ConjClasses G` through `ψ`, `Γ` on `Fin N` through `simplesAction φ ∘ ψ`): there is a
+simple `i₀` fixed by all of `Γ`, and `Γ` acts freely off it.  Axiom-clean (the wiring of the
+kernel-FPF dimension fact (†) to the real Frobenius carrier, issue 2014). -/
+
+#assert_only_allowed_axioms OddOrder.GroupTheory.WielandtKernelFPF.exists_fixed_simple_free_of_fpf
+
+/-! **(9.1) item 2(g) — the trivial isotypic component is the `G`-invariants** (`WielandtKernelFPF`).
+The trivial primitive central idempotent `φ.symm (Pi.single i₀ 1)` (augmentation coordinate `i₀`)
+equals the averaging idempotent `GroupAlgebra.average` (`symm_single_eq_average`), so its isotypic
+projection is the averaging projection and its range is the invariants
+(`range_centerProj_aug_eq_invariants`); `exists_aug_coordinate` produces that coordinate.  This is
+the input that drops the trivial summand in the kernel-FPF count (†) when `Wᴳ = 0`.  Axiom-clean. -/
+
+#assert_only_allowed_axioms OddOrder.GroupTheory.WielandtKernelFPF.symm_single_eq_average
+#assert_only_allowed_axioms OddOrder.GroupTheory.WielandtKernelFPF.range_centerProj_aug_eq_invariants
+#assert_only_allowed_axioms OddOrder.GroupTheory.WielandtKernelFPF.exists_aug_coordinate
