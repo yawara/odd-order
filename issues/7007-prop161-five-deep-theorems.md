@@ -234,7 +234,7 @@ bottom-out** するので、clean 化には §15 foundation が先。真の順�
       σ-template = `exists_sylow_le_of_mem_sigma` (S10:536)、`centralizer_le_E_of_tau2` (full-Sylow abelian 枝)。
 - [ ] conjunct 1-4 を `typeP_auxiliary_structure_gated` に wire (sorry 139→138)
 - [ ] Thm 15.2(a) `mf_ne_msigma_typeP1_structure` (S15:1144)
-- [~] Thm 15.7 `fitting_not_ti_cases` — **(a) `fittingIsTI_of_isTypeP2` + (b) `mf_eq_msigma_of_not_fittingIsTI` DONE** (`dc2fe378`/`7eeb933b`, 2026-06-21)。残 = (c)-(e) local 構造 (cyclic X / O_p(M) 非可換 / 三 case)
+- [~] Thm 15.7 `fitting_not_ti_cases` — **単一 residual `M'=F(M)` に還元 DONE** (`dc2fe378`/`7eeb933b`/`1d5e6ff0`, 2026-06-21)。(a)=`fittingIsTI_of_isTypeP2`+三分律 / (b)=`mf_eq_msigma_of_not_fittingIsTI` / ∃X=巡回非自明 X≤MF は Mσ 内 order-q 元 (Lean 文は X を F(M)∩F(M)^g に pin せず=scaffold 弱化) + prime p∈σ-β は disjointness + disjunct は (a)。**残 = `derivedInG M = fittingInAmbient M` (M'=F(M)) 一点**。分析: type-P1 は導出可 (M'=Mσ via Lem15.1b U=⊥ [但し U=⊥ 補題 `isTypeP1_kappaSigma_compl...` は S16=S15 から不可、inline 要] + Mσ=MF nilpotent → M'≤F(M) + clause d F(M)≤M')、type-F は deep (E₃=1 argument)。`le_fittingInAmbient_of_subgroupOf_normal_of_isNilpotent` (MF≤F(M)) 在
 - [ ] Thm A `theoremA_maximal_structure` (S16:144) — Lemma 15.1 + Prop 14.2 + §15 で全 conjunct
 - [~] Thm C `theoremC_paired_structure` — **10/12 conjunct discharge + faithfulness 修正 2 件 DONE** (`8f636b54`/`ec711630`/`378e91cf`/`dc2fe378`, 2026-06-21)。残 = conjunct 2 (N(U)⊄M=Cor 14.12)/10 (A0-A TI=Thm A(3)(5)) のみ (conjunct 11 は 15.7(a) で close)
 - [ ] Prop 16.1 配線 `proposition_type_classification` (S16:894) + AxiomsCheck 登録
