@@ -172,6 +172,35 @@ example {M : Subgroup G} [Finite G] (d : TypePData M) : False := by
   exact absurd hMFeq (ne_of_lt d.fitting_lt_derived)
 ```
 
+## 解決 (2026-06-21, hub) — CLOSED
+
+ユーザー裁可で hub が atomic 修正を実施。`example : TypePData M → False` を独立検証で再現
+(sorry-free) → 3 field を Pf (8.4)/(8.5) 忠実版に修正 → 旧矛盾証明が `Invalid field U_normal`
+で再現不能になることを確認。**実 sorry 134 不変・full build 3881 jobs green・AxiomsCheck OK・
+新 axiom 0**。
+
+修正内容 (`MaximalSubgroupType.lean` の `TypePData`):
+1. `U_normal : (U.subgroupOf M').Normal` → **`W1_normalizes_U : W1 ≤ Subgroup.normalizer (U : Set G)`**
+   ((8.4.b) 忠実、downstream `FeitThompson.lean` の `Section16TypePStructure`/`Section16Inputs` が
+   既に使う形と一致)。
+2. `fitting_eq` の LHS: `maxNilpotentNormalHall M` → **`(OddOrder.Isaacs.Ch01.fitting ↥M).map M.subtype`**
+   (実 Fitting `F(M)`、(8.5.a) 忠実)。
+3. `fitting_lt_derived : M_F < M'` → **削除** ((8.4.c) の `F(M) ⊆ M'` は新 fitting_eq から導出可、
+   type V で False だった strict を除去)。
+
+consumer 修正 (結論は不変、矛盾 field 非依存に再証明):
+- producer `typePData_of_inputs`/`typePData_of_isTypeP_of_inputs` (S16): hypothesis 署名更新
+  (`hUnorm`→`hKnorm`/`hFiteq` LHS/`hFitlt` 削除) + field 代入。
+- **S12:730** `M'' < M'`: `M' = M_F ⋊ U` solvable (`maxNilpotentNormalHall_isNilpotent` +
+  `U_nilpotent` + `derived_complement.QuotientMulEquiv` + `solvable_of_ker_le_range`) かつ nontrivial
+  (`W₂ ≠ ⊥`) ⟹ 非 perfect で再証明。
+- **S15:1313** `hyp.U ≠ ⊥`: `U` が `tdata.typeP.U` (type-II core `common.1` で `≠ ⊥`) に S-共役
+  (`exists_conj_typeP_U_of_coprime` + `pointwise_smul_eq_bot_iff`) で再証明。
+
+⟹ **Prop 16.1 forward bridges が honest に組める** (IsTypeP/IsTypeII 等が証明可能 False でなくなった)。
+**⚠ レーン伝播**: S12=lane-b / S15=lane-h の active 編集と次回マージで衝突しうる (本 fix を main に
+先行投入、各レーンが main 取込時に reconcile)。
+
 ## 参照
 
 - 影響: Prop 16.1（issue 7007/8015）の forward/reverse bridges は本 fix 後でないと honest に組めない。

@@ -724,20 +724,47 @@ theorem exists_zeta_in_inducedFamily_degree_w1 [Finite G] {M : Subgroup G}
   have hKcomm : h.K = commutator ↥M := by
     rw [hKeq, derivedInG, Subgroup.subgroupOf,
       Subgroup.comap_map_eq_self_of_injective M.subtype_injective]
-  -- `M'` is not perfect: `M'' ≤ F(M) < M'`.
+  -- `M'` is not perfect (issue 7008, replacing the deleted `fitting_lt_derived`): `M' = M_F ⋊ U`
+  -- is solvable — `M_F` nilpotent (`maxNilpotentNormalHall_isNilpotent`) is the normal kernel and the
+  -- quotient `M'/M_F ≃ U` is nilpotent (`U_nilpotent`) via `derived_complement` — and nontrivial
+  -- (`W₂ ≠ ⊥`, `W₂ ≤ M_F ≤ M'`); a nontrivial solvable group is not perfect.
   have hM'le : derivedInG M ≤ M := Subgroup.map_subtype_le _
-  have hM''lt : secondDerivedInAmbient M < derivedInG M :=
-    lt_of_le_of_lt (data.secondDerived_le_fitting.trans data.fitting_eq.ge) data.fitting_lt_derived
+  haveI hHnorm : (data.H.subgroupOf (derivedInG M)).Normal := by
+    refine (Subgroup.normal_subgroupOf_iff_le_normalizer data.H_le).mpr ?_
+    rw [data.H_eq]
+    exact hM'le.trans (OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_le_normalizer M)
+  haveI : IsSolvable ↥(data.H.subgroupOf (derivedInG M)) := by
+    haveI : Group.IsNilpotent ↥data.H := by
+      rw [data.H_eq]; exact OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_isNilpotent M
+    haveI : IsSolvable ↥data.H := IsNilpotent.to_isSolvable
+    exact solvable_of_solvable_injective
+      (f := (Subgroup.subgroupOfEquivOfLe data.H_le).toMonoidHom)
+      (Subgroup.subgroupOfEquivOfLe data.H_le).injective
+  haveI : IsSolvable ↥(data.U.subgroupOf (derivedInG M)) := by
+    haveI : Group.IsNilpotent ↥data.U := data.U_nilpotent
+    haveI : IsSolvable ↥data.U := IsNilpotent.to_isSolvable
+    exact solvable_of_solvable_injective
+      (f := (Subgroup.subgroupOfEquivOfLe data.U_le).toMonoidHom)
+      (Subgroup.subgroupOfEquivOfLe data.U_le).injective
+  haveI : IsSolvable (↥(derivedInG M) ⧸ data.H.subgroupOf (derivedInG M)) :=
+    solvable_of_solvable_injective
+      (f := data.derived_complement.symm.QuotientMulEquiv.toMonoidHom)
+      data.derived_complement.symm.QuotientMulEquiv.injective
+  haveI : IsSolvable ↥(derivedInG M) :=
+    solvable_of_ker_le_range ((data.H.subgroupOf (derivedInG M)).subtype)
+      (QuotientGroup.mk' (data.H.subgroupOf (derivedInG M)))
+      (by rw [QuotientGroup.ker_mk']; exact (data.H.subgroupOf (derivedInG M)).range_subtype.ge)
+  haveI : Nontrivial ↥(derivedInG M) :=
+    (Subgroup.nontrivial_iff_ne_bot _).mpr fun hbot =>
+      data.W2_nontrivial (le_bot_iff.mp (hbot ▸ data.W2_le.trans (inf_le_left.trans data.H_le)))
   have hcomm_K : commutator ↥h.K ≠ ⊤ := by
     intro hperf
     have hperfM' : Group.IsPerfect ↥(derivedInG M) := by
       haveI : Group.IsPerfect ↥((derivedInG M).subgroupOf M) := ⟨hperf⟩
       exact Group.IsPerfect.ofSurjective (f := (Subgroup.subgroupOfEquivOfLe hM'le).toMonoidHom)
         (Subgroup.subgroupOfEquivOfLe hM'le).surjective
-    have heq : secondDerivedInAmbient M = derivedInG M := by
-      rw [secondDerivedInAmbient, derivedInG, hperfM'.commutator_eq_top, ← MonoidHom.range_eq_map,
-        Subgroup.range_subtype]
-    exact hM''lt.ne heq
+    exact absurd hperfM'.commutator_eq_top
+      (IsSolvable.commutator_lt_top_of_nontrivial ↥(derivedInG M)).ne
   obtain ⟨θ, hθne, hθ1⟩ := exists_nontrivial_linearIrreducibleCharacter hcomm_K
   -- the crux: `θ` avoids every `chiRestrict χ₂`.
   have havoid : ∀ χ₂, h.chiRestrict χ₂ ≠ θ := by

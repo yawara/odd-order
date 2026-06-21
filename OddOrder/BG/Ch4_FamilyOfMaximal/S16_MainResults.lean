@@ -839,11 +839,12 @@ structural fields are taken as named hypotheses; their BG sources are:
 * the derived-series complement `M = M' W₁`, `W = W₁ ⊔ W₂` cyclic, and the `zTilde` `TI` property
   (`hMcompl`/`hWcyc`/`hTI`) come from Theorem 14.7 (`typeP_duality`) with `W₁ = K`, `W₂ = K*`,
   `W = K ⊔ K*`;
-* the Fitting decomposition `F(M) = H ⊔ (U ⊓ C_M(H))`, `M'' ≤ F(M)`, `F(M) < M'`, and `M_F`
-  noncyclic (`hFiteq`/`hSDfit`/`hFitlt`/`hHncyc`) come from Theorem 15.2
-  (`mf_ne_msigma_typeP1_structure`) and Corollary 15.6;
-* the `M'`-internal complement `M' = H U` with `U ⊴ M'` nilpotent (`hDcompl`/`hUnorm`/`hUnilp`)
-  comes from Lemma 15.1 / Theorem A.
+* the **real Fitting** decomposition `F(M) = H ⊔ (U ⊓ C_M(H))` (Peterfalvi (8.5.a), issue 7008 — the
+  LHS is `F(M)`, not `M_F`) and `M'' ≤ F(M)`, with `M_F` noncyclic (`hFiteq`/`hSDfit`/`hHncyc`) come
+  from Theorem 15.2 (`mf_ne_msigma_typeP1_structure`) and Corollary 15.6;
+* the `M'`-internal complement `M' = H U` with `U` nilpotent and **normalized by `W₁`** (Peterfalvi
+  (8.4.b); `U ⊴ M'` would force `U = 1`, issue 7008) — `hDcompl`/`hUnilp`/`hW1norm` — comes from
+  Lemma 15.1 / Theorem A.
 
 The genuinely *derived* (not renamed) fields are `W_eq` (definitional), `W1_cyclic`/`W2_cyclic`
 (subgroups of the cyclic `W`), and `normalizer_V` (the `TI` + cyclic reduction
@@ -857,14 +858,14 @@ def typePData_of_inputs {M H U W1 W2 : Subgroup G}
     (hWcyc : IsCyclic ↥(W1 ⊔ W2))
     (hW1ne : W1 ≠ ⊥) (hW2ne : W2 ≠ ⊥)
     (hMcompl : Subgroup.IsComplement' ((derivedInG M).subgroupOf M) (W1.subgroupOf M))
-    (hUnorm : (U.subgroupOf (derivedInG M)).Normal)
+    (hW1norm : W1 ≤ Subgroup.normalizer (U : Set G))
     (hUnilp : Group.IsNilpotent ↥U)
     (hDcompl :
       Subgroup.IsComplement' (H.subgroupOf (derivedInG M)) (U.subgroupOf (derivedInG M)))
     (hHncyc : ¬ IsCyclic ↥H)
     (hSDfit : secondDerivedInAmbient M ≤ H ⊔ (U ⊓ Subgroup.centralizer (H : Set G)))
-    (hFiteq : maxNilpotentNormalHall M = H ⊔ (U ⊓ Subgroup.centralizer (H : Set G)))
-    (hFitlt : maxNilpotentNormalHall M < derivedInG M)
+    (hFiteq : (OddOrder.Isaacs.Ch01.fitting ↥M).map M.subtype =
+      H ⊔ (U ⊓ Subgroup.centralizer (H : Set G)))
     (hCentW1 : ∀ x ∈ W1, x ≠ 1 →
       derivedInG M ⊓ Subgroup.centralizer ({x} : Set G) = W2)
     (hTI : IsTISubset ((↑(W1 ⊔ W2) : Set G) \ ((W1 : Set G) ∪ (W2 : Set G))) (W1 ⊔ W2)) :
@@ -888,13 +889,12 @@ def typePData_of_inputs {M H U W1 W2 : Subgroup G}
       W1_cyclic := Subgroup.isCyclic_of_le (le_sup_left : W1 ≤ W1 ⊔ W2)
       W2_cyclic := Subgroup.isCyclic_of_le (le_sup_right : W2 ≤ W1 ⊔ W2)
       M_complement := hMcompl
-      U_normal := hUnorm
+      W1_normalizes_U := hW1norm
       U_nilpotent := hUnilp
       derived_complement := hDcompl
       H_noncyclic := hHncyc
       secondDerived_le_fitting := hSDfit
       fitting_eq := hFiteq
-      fitting_lt_derived := hFitlt
       centralizer_W1 := hCentW1
       normalizer_V := fun X hXne hXV =>
         normalizer_eq_sup_of_isTISubset_of_isCyclic hWcyc hTI hXne hXV }
@@ -973,9 +973,9 @@ the proven §14/§15 structure and gating only on the genuinely-deep **`M_F`-int
   15.6: `hW2ne`/`hW2le`/`hHncyc`; the `W₂ = C_{M'}(W₁#)` centralizer law `hCentW1`
   (`typeP_derivedInG_inf_centralizer_kappaElement_eq` = Theorem A(5) + Dedekind); plus
   `hHeq`/`hHle`/`hW1le`/`hW1ne`), with `W₁ = K`, `W₂ = K*`, `W = K ⊔ K*`, `H = M_F`;
-* gated (named residuals): the `M_F`-internal complement `U` (`M' = M_F ⊔ U`, `U ⊴ M'` nilpotent —
-  `hUle`/`hUnorm`/`hUnilp`/`hDcompl`) and the Fitting decomposition `F(M) = M_F (U ⊓ C_M(M_F))`
-  (`hSDfit`/`hFiteq`/`hFitlt`).
+* gated (named residuals): the `M_F`-internal complement `U` (`M' = M_F ⊔ U`, `U` nilpotent and
+  normalized by `W₁` — `hUle`/`hKnorm`/`hUnilp`/`hDcompl`; issue 7008: `U ⊴ M'` is unfaithful) and the
+  real Fitting decomposition `F(M) = M_F ⊔ (U ⊓ C_M(M_F))` (`hSDfit`/`hFiteq`).
 
 This single construction feeds all three of `hP2II`/`hP1neIIIIV`/`hP1eqV` (types II/III/IV/V bundle a
 `TypePData`); the gated residuals are exactly the `M_F`-internal structure not present in
@@ -985,15 +985,14 @@ noncomputable def typePData_of_isTypeP_of_inputs [Finite G]
     (hM : M ∈ maximalSubgroups G) (hP : S14.IsTypeP M) (hKM : K ≤ M) (hKne : K ≠ ⊥)
     (hK : Ch03.IsHallSubgroup (S14.kappa M) (K.subgroupOf M))
     (hUle : U ≤ derivedInG M)
-    (hUnorm : (U.subgroupOf (derivedInG M)).Normal)
+    (hKnorm : K ≤ Subgroup.normalizer (U : Set G))
     (hUnilp : Group.IsNilpotent ↥U)
     (hDcompl : Subgroup.IsComplement'
       ((maxNilpotentNormalHall M).subgroupOf (derivedInG M)) (U.subgroupOf (derivedInG M)))
     (hSDfit : secondDerivedInAmbient M ≤
       maxNilpotentNormalHall M ⊔ (U ⊓ Subgroup.centralizer (maxNilpotentNormalHall M : Set G)))
-    (hFiteq : maxNilpotentNormalHall M =
-      maxNilpotentNormalHall M ⊔ (U ⊓ Subgroup.centralizer (maxNilpotentNormalHall M : Set G)))
-    (hFitlt : maxNilpotentNormalHall M < derivedInG M) :
+    (hFiteq : (OddOrder.Isaacs.Ch01.fitting ↥M).map M.subtype =
+      maxNilpotentNormalHall M ⊔ (U ⊓ Subgroup.centralizer (maxNilpotentNormalHall M : Set G))) :
     TypePData M := by
   classical
   set Kstar : Subgroup G := OddOrder.BG.Ch3.S10.Msigma M ⊓ Subgroup.centralizer (K : Set G)
@@ -1013,7 +1012,7 @@ noncomputable def typePData_of_isTypeP_of_inputs [Finite G]
   have hk := typeP_kstar_in_mf hG hM hP hKM hK hKstar
   exact typePData_of_inputs (H := maxNilpotentNormalHall M) (U := U) (W1 := K) (W2 := Kstar)
     rfl (maxNilpotentNormalHall_le_derived hG hM) hUle hKM (le_inf hk.2.2.1 hk.2.2.2.1)
-    hWcyc hKne hk.1 hMcompl hUnorm hUnilp hDcompl hk.2.2.2.2 hSDfit hFiteq hFitlt
+    hWcyc hKne hk.1 hMcompl hKnorm hUnilp hDcompl hk.2.2.2.2 hSDfit hFiteq
     (typeP_derivedInG_inf_centralizer_kappaElement_eq hG hM hP hKM hK hKstar) hTI
 
 /-- **Prop 16.1 forward bridge, type III/IV last mile** (Peterfalvi (8.7)): a type-`P` datum whose

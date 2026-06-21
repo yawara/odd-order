@@ -1306,13 +1306,12 @@ theorem exists_typeI_maximal_overNormalizer_U [Finite G]
   -- (Phase 1) the type-II property transferred to `hyp.U`: `N_G(U) ⊄ S`.
   have hNUS : ¬ Subgroup.normalizer (hyp.U : Set G) ≤ hyp.S :=
     not_normalizer_U_le_S _hG hyp tdata (exists_conj_typeP_U_of_coprime _hG hyp tdata hcop)
-  -- `U ≠ ⊥` (else `M' = P ⊔ ⊥ = P`, against `fitting_lt_derived`).
+  -- `U ≠ ⊥` (issue 7008): `U` is `S`-conjugate to `tdata.typeP.U`, which is `≠ ⊥` for type II
+  -- (the `TypePNontrivialCore` first conjunct `common.1`); conjugation preserves nontriviality.
   have hUne : hyp.U ≠ ⊥ := by
-    intro hUbot
-    have heq : derivedInG hyp.S = hyp.P := by rw [hyp.S_deriv_eq_PU, hUbot, sup_bot_eq]
-    have hlt := tdata.typeP.fitting_lt_derived
-    rw [← hyp.P_eq_SF, heq] at hlt
-    exact lt_irrefl _ hlt
+    obtain ⟨x, _, hUconj⟩ := exists_conj_typeP_U_of_coprime _hG hyp tdata hcop
+    rw [hUconj]
+    exact mt (pointwise_smul_eq_bot_iff (MulAut.conj x)).mp tdata.common.1
   -- `U ≤ S`, hence `U ≠ ⊤`; then by simplicity `N_G(U) ≠ ⊤`.
   have hM'_le_S : derivedInG hyp.S ≤ hyp.S := Subgroup.map_subtype_le _
   have hUleS : hyp.U ≤ hyp.S := (le_sup_right.trans hyp.S_deriv_eq_PU.ge).trans hM'_le_S

@@ -141,15 +141,22 @@ structure TypePData (M : Subgroup G) where
   W1_cyclic : IsCyclic ↥W1
   W2_cyclic : IsCyclic ↥W2
   M_complement : Subgroup.IsComplement' ((derivedInG M).subgroupOf M) (W1.subgroupOf M)
-  U_normal : (U.subgroupOf (derivedInG M)).Normal
+  -- (8.4.b) "`U` normalized by `W₁`" = `W₁ ≤ N(U)`.  NOT "`U ◁ M'`": in the semidirect product
+  -- `M' = H ⋊ U`, `U ◁ M'` forces a direct product hence `U = 1`, vacuating types II–IV (issue 7008).
+  W1_normalizes_U : W1 ≤ Subgroup.normalizer (U : Set G)
   U_nilpotent : Group.IsNilpotent ↥U
   derived_complement :
     Subgroup.IsComplement' (H.subgroupOf (derivedInG M)) (U.subgroupOf (derivedInG M))
   H_noncyclic : ¬ IsCyclic ↥H
   secondDerived_le_fitting :
     secondDerivedInAmbient M ≤ H ⊔ (U ⊓ Subgroup.centralizer (H : Set G))
-  fitting_eq : maxNilpotentNormalHall M = H ⊔ (U ⊓ Subgroup.centralizer (H : Set G))
-  fitting_lt_derived : maxNilpotentNormalHall M < derivedInG M
+  -- (8.5.a) `F(M) = H · C_U(H) = H ⊔ (U ⊓ C_M(H))`.  The LHS is the **real Fitting** `F(M)`, NOT
+  -- `M_F = maxNilpotentNormalHall M` (= `H`): with `M_F` the field would force `C_U(H) ≤ M_F`,
+  -- excluding type IV and (with `derived_complement`) collapsing `M_F = M'` (issue 7008).  The old
+  -- `fitting_lt_derived : M_F < M'` is deleted: `F(M) ⊆ M'` is derivable from this `fitting_eq`,
+  -- `H_le`, `U_le`, and is `≤` (non-strict; equality at type V where `U = ⊥`, `F(M) = H = M' = M_F`).
+  fitting_eq :
+    (OddOrder.Isaacs.Ch01.fitting ↥M).map M.subtype = H ⊔ (U ⊓ Subgroup.centralizer (H : Set G))
   centralizer_W1 : ∀ x ∈ W1, x ≠ 1 →
     derivedInG M ⊓ Subgroup.centralizer ({x} : Set G) = W2
   normalizer_V : ∀ X : Set G, X.Nonempty →
