@@ -14,20 +14,25 @@
 
 | レーン | branch | セグメント | 所有ファイル | 自動合流 |
 |---|---|---|---|---|
-| **F** | `lane-f` | **BG §14-16** | `S14_TypePCounting`/`S15_MF`/`S16_MainResults`/`S16_PairIntersection` + `FeitThompson.lean` の §16 producer。Theorem A-I / Prop 16.1 (構造 foundation) | ✅ |
-| **B** | `lane-b` | **Pf §10-13** | `S10_MinimalSimpleStructure`/`S11_MaximalII_III_IV`/`S12_MaximalIII_IV_V`/`S13_MaximalIII_IV`。char grids/parameters。§11 (9.3) を H から引継 | ✅ |
-| **H** | `lane-h` | **Pf §14-15** | `S14_MaximalI`/`S15_SAndT`。type I + S&T 構造。§16 へ signature export (★pre-work) | ✅ |
-| **C** | `lane-c` | **Pf §16** | `S16_NonExistenceG` (Core は凍結)。非存在 + **POLE-2** `field_normalizer_structure` (issue 2009) | ✅ |
+**⚠ 2026-06-22 最小修正 (ユーザー裁可、機能再割当)**: lane-c issue 4002 + S11 衝突 ×2 → hub 深掘り
+([`lane_functional_split_analysis.md`](lane_functional_split_analysis.md)) → §-分割が 3 機能 (群構造/Dade char/assembly)
+を散乱させていたと判明。ユーザー選択「最小修正」(file-split なし、機能で再割当): **S11 を H 単独所有に
+変更** (Wielandt §9 は H の連結 chunk、§11 衝突解消)、B は §10/§12/§13 char grid に専念、C は §16 char
+endpoint を自走所有 (B 待ちにしない)。
 
-**signature-first interface (分割の肝)**: 線形チェーンの import 境界で上流が sorried signature を export → 下流が
-cite (実証明しない)。clean な cut: BG §16→Pf §10 / Pf §13→§14 / **Pf §15→§16** (S16 は `S15.basic_structure`/
-`typeI_orthogonality_dichotomy`/`CaseBOrderUData`/`TypeIOrthogonalityData` 等を named cite、調査済 clean)。
-H の最優先 pre-work = この S15 export signature を確定させ lane-c を unblock。
+| レーン | branch | 機能 | 所有ファイル | 自動合流 |
+|---|---|---|---|---|
+| **F** | `lane-f` | **① BG 構造** | `S14_TypePCounting`/`S15_MF`/`S16_MainResults`/`S16_PairIntersection` + `FeitThompson.lean` の §16 producer。Theorem A-I / Prop 16.1 | ✅ |
+| **B** | `lane-b` | **② Dade char producer** | `S10_MinimalSimpleStructure`/`S12_MaximalIII_IV_V`/`S13_MaximalIII_IV`。char grids/parameters/`section16CharacterData`。**S11 は触らない (H 所有)** | ✅ |
+| **H** | `lane-h` | **① Wielandt §9 + §14-15** | **`S11_MaximalII_III_IV` (Wielandt §9 + 型分類, H 単独所有)** + `S14_MaximalI`/`S15_SAndT` (type I + S&T) | ✅ |
+| **C** | `lane-c` | **②endpoint + ③assembly** | `S16_NonExistenceG` (Core 凍結)。非存在 + **POLE-2** (issue 2009) + §16 char endpoint **de-opacify (自走)** | ✅ |
 
-**取り決め**: (1) 各レーンは**自セグメントのファイルのみ編集**、他は cite のみ (cross-lane の編集要望は notes/issue 経由)。
-(2) **新規 `axiom` 宣言は従来どおり abort+ユーザー承認** (cross-lane interface の forward axiom も同様)。
-(3) §11 handoff: H が現 (9.3) WIP commit → マージ後に B が §11 着手 (衝突回避)。
-(4) issue base: **B=1000 / H=2000 / C=4000 / F=7000**。(5) `notes/bg/*`=F、`notes/peterfalvi/*`=B/H/C。
+**signature-first interface**: 上流が sorried signature を export → 下流が cite。真の cross-lane 依存は narrow
+(§13 `basic_structure` レベル)。大半は自レーン内 (lane-c の §16 de-opacify 等)。signature 不足は notes/issue 経由。
+
+**取り決め**: (1) 各レーンは**自所有ファイルのみ編集**、他は cite のみ (要望は notes/issue 経由)。
+**特に S11 は H のみ** (B/H 衝突源だった)。(2) **新規 `axiom` 宣言は abort+ユーザー承認**。
+(3) issue base: **B=1000 / H=2000 / C=4000 / F=7000**。(4) `notes/bg/*`=F、`notes/peterfalvi/*`=B/H/C。
 マージ順 = **F → B → H → C** (独立レーンゆえ順序は形式的、上流→下流の自然順)。
 
 **H 固有の取り決め (2026-06-12)**: (1) H は **Lane B の §4–§9 coherence/certain-type ファイル
