@@ -236,4 +236,109 @@ theorem grid_trichotomy {ι κ : Type*} [Finite ι] [Finite κ] [Nonempty ι] [N
       have hge := card_support_ge_of_not_const f g hfc hgc
       omega
 
+/-! ### Peterfalvi (3.8) corollaries: constant-row/column exclusion for a separable grid
+
+These abstract grid lemmas (no character-theoretic data) are used by the §6 (4.8) and §10 (10.5)
+Dade-image isometry identities to discharge the `(b)`/`(c)` branches of `grid_trichotomy`. -/
+
+/-- Two distinct elements of a fintype of card `≥ 3`, both different from a given `d`. -/
+theorem exists_two_ne_ne {α : Type*} [Fintype α] (h3 : 3 ≤ Fintype.card α) (d : α) :
+    ∃ a b : α, a ≠ b ∧ a ≠ d ∧ b ≠ d := by
+  classical
+  have hcard : 2 ≤ ({d}ᶜ : Finset α).card := by
+    rw [Finset.card_compl, Finset.card_singleton]; omega
+  obtain ⟨a, ha, b, hb, hab⟩ := Finset.one_lt_card.mp (by omega : 1 < ({d}ᶜ : Finset α).card)
+  exact ⟨a, b, hab, by simpa using ha, by simpa using hb⟩
+
+open scoped Classical in
+/-- **The abstract `(b)/(c)` exclusion.**  A separable-grid `a = G − δ-part` cannot have a constant
+nonzero full column.  Here `G` has at most two nonzero entries, all in `{0, ±1}`; the `δ`-part is
+`s·([P = ·] − [Q = ·])` (`s = ±1`, `P ≠ Q`).  If `a(·, j₀) ≡ c ≠ 0` and `a` vanishes off column
+`j₀`, then either both `P, Q` lie in column `j₀` — forcing `G P = c + s`, `G Q = c − s`, which with
+`G P, G Q ∈ {0, ±1}` and `G P − G Q = 2s = ±2` gives `c = 0` (contradiction) — or at most one does,
+yielding three distinct nonzero `G`-entries (two non-`δ` column rows since `|ι| ≥ 3`, plus one
+off-column `δ`-point), contradicting `|Supp G| ≤ 2`.  Used for both `(b)` and `(c)` (the latter via
+the transposed grid). -/
+theorem grid_no_constant_column {ι κ : Type*} [Fintype ι] [Fintype κ]
+    (h3 : 3 ≤ Fintype.card ι) (G : ι × κ → ℂ)
+    (hG2 : {x | G x ≠ 0}.ncard ≤ 2) (hG01 : ∀ x, G x = 0 ∨ G x = 1 ∨ G x = -1)
+    (P Q : ι × κ) (hPQ : P ≠ Q) {s : ℂ} (hs : s = 1 ∨ s = -1) (a : ι × κ → ℂ)
+    (ha : ∀ x, a x = G x - s * ((if P = x then (1 : ℂ) else 0) - (if Q = x then (1 : ℂ) else 0)))
+    {j₀ : κ} {c : ℂ} (hc : c ≠ 0) (hcol : ∀ i, a (i, j₀) = c)
+    (hoff : ∀ i j, j ≠ j₀ → a (i, j) = 0) : False := by
+  classical
+  haveI : Finite (ι × κ) := inferInstance
+  by_cases hboth : P.2 = j₀ ∧ Q.2 = j₀
+  · -- both `P, Q` in column `j₀`: `G P = c + s`, `G Q = c − s` force `c = 0`
+    obtain ⟨hPj, hQj⟩ := hboth
+    have hGP : G P = c + s := by
+      have hP : a P = c := by have h := hcol P.1; rwa [← hPj] at h
+      have := ha P; rw [if_pos rfl, if_neg (Ne.symm hPQ)] at this; rw [hP] at this
+      linear_combination -this
+    have hGQ : G Q = c - s := by
+      have hQ : a Q = c := by have h := hcol Q.1; rwa [← hQj] at h
+      have := ha Q; rw [if_neg hPQ, if_pos rfl] at this; rw [hQ] at this
+      linear_combination -this
+    have hsum : G P + G Q = 2 * c := by linear_combination hGP + hGQ
+    have hdiff : G P - G Q = 2 * s := by linear_combination hGP - hGQ
+    rcases hG01 P with hp | hp | hp <;> rcases hG01 Q with hq | hq | hq <;>
+      rcases hs with hsv | hsv <;> rw [hp, hq] at hsum hdiff <;> rw [hsv] at hdiff <;>
+      first
+      | exact hc (by linear_combination (-1 / 2 : ℂ) * hsum)
+      | norm_num at hdiff
+  · -- at most one of `P, Q` in column `j₀`: exhibit three distinct nonzero `G`-entries
+    obtain ⟨Off, d, hOffmem, hOffj, hnonδ⟩ :
+        ∃ (Off : ι × κ) (d : ι), G Off ≠ 0 ∧ Off.2 ≠ j₀ ∧
+          ∀ r, r ≠ d → (r, j₀) ≠ P ∧ (r, j₀) ≠ Q := by
+      by_cases hPj : P.2 = j₀
+      · have hQj : Q.2 ≠ j₀ := fun hQj => hboth ⟨hPj, hQj⟩
+        have hGQ : G Q = -s := by
+          have h0 : a Q = 0 := hoff Q.1 Q.2 hQj
+          have := ha Q; rw [if_neg hPQ, if_pos rfl, h0] at this; linear_combination -this
+        refine ⟨Q, P.1, by rw [hGQ]; rcases hs with h | h <;> simp [h], hQj, fun r hr => ?_⟩
+        exact ⟨fun hrP => hr (congrArg Prod.fst hrP), fun hrQ => hQj (congrArg Prod.snd hrQ).symm⟩
+      · have hGP : G P = s := by
+          have h0 : a P = 0 := hoff P.1 P.2 hPj
+          have := ha P; rw [if_pos rfl, if_neg (Ne.symm hPQ), h0] at this; linear_combination -this
+        refine ⟨P, Q.1, by rw [hGP]; rcases hs with h | h <;> simp [h], hPj, fun r hr => ?_⟩
+        exact ⟨fun hrP => hPj (congrArg Prod.snd hrP).symm, fun hrQ => hr (congrArg Prod.fst hrQ)⟩
+    obtain ⟨r₁, r₂, hr12, hr1d, hr2d⟩ := exists_two_ne_ne h3 d
+    have hG1 : G (r₁, j₀) ≠ 0 := by
+      have := hcol r₁; rw [ha, if_neg (Ne.symm (hnonδ r₁ hr1d).1),
+        if_neg (Ne.symm (hnonδ r₁ hr1d).2)] at this; rw [show G (r₁, j₀) = c by linear_combination this]
+      exact hc
+    have hG2' : G (r₂, j₀) ≠ 0 := by
+      have := hcol r₂; rw [ha, if_neg (Ne.symm (hnonδ r₂ hr2d).1),
+        if_neg (Ne.symm (hnonδ r₂ hr2d).2)] at this; rw [show G (r₂, j₀) = c by linear_combination this]
+      exact hc
+    have hsub : ({(r₁, j₀), (r₂, j₀), Off} : Set (ι × κ)) ⊆ {x | G x ≠ 0} := by
+      intro x hx; rcases hx with rfl | rfl | rfl
+      exacts [hG1, hG2', hOffmem]
+    have hcard3 : ({(r₁, j₀), (r₂, j₀), Off} : Set (ι × κ)).ncard = 3 := by
+      rw [Set.ncard_eq_three]
+      exact ⟨_, _, _, by simp [hr12], fun h => hOffj (congrArg Prod.snd h.symm),
+        fun h => hOffj (congrArg Prod.snd h.symm), rfl⟩
+    have := Set.ncard_le_ncard hsub (Set.toFinite _)
+    rw [hcard3] at this; omega
+
+open scoped Classical in
+/-- The row analogue of `grid_no_constant_column` (no constant nonzero full row), obtained by
+applying the column statement to the transposed grid. -/
+theorem grid_no_constant_row {ι κ : Type*} [Fintype ι] [Fintype κ]
+    (h3 : 3 ≤ Fintype.card κ) (G : ι × κ → ℂ)
+    (hG2 : {x | G x ≠ 0}.ncard ≤ 2) (hG01 : ∀ x, G x = 0 ∨ G x = 1 ∨ G x = -1)
+    (P Q : ι × κ) (hPQ : P ≠ Q) {s : ℂ} (hs : s = 1 ∨ s = -1) (a : ι × κ → ℂ)
+    (ha : ∀ x, a x = G x - s * ((if P = x then (1 : ℂ) else 0) - (if Q = x then (1 : ℂ) else 0)))
+    {i₀ : ι} {c : ℂ} (hc : c ≠ 0) (hrow : ∀ j, a (i₀, j) = c)
+    (hoff : ∀ i j, i ≠ i₀ → a (i, j) = 0) : False := by
+  have hswapG : {x : κ × ι | G (x.2, x.1) ≠ 0}.ncard ≤ 2 :=
+    le_trans (Set.ncard_le_ncard_of_injOn Prod.swap (fun x hx => hx)
+      (Prod.swap_injective.injOn) (Set.toFinite _)) hG2
+  have hflip : ∀ (R : ι × κ) (y : κ × ι), (Prod.swap R = y) ↔ (R = (y.2, y.1)) := fun R y => by
+    rw [Prod.ext_iff, Prod.ext_iff, Prod.fst_swap, Prod.snd_swap]; tauto
+  refine grid_no_constant_column h3 (fun x => G (x.2, x.1)) hswapG (fun x => hG01 _)
+    (Prod.swap P) (Prod.swap Q) (fun he => hPQ (Prod.swap_injective he)) hs
+    (fun x => a (x.2, x.1)) (fun x => ?_) hc (fun j => hrow j) (fun j i hi => hoff i j hi)
+  simp only [ha, hflip]
+
 end OddOrder.Peterfalvi.S05
