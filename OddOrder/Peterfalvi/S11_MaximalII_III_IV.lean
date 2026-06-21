@@ -628,6 +628,70 @@ theorem coprimeFrobeniusChiefFactor_card {L K : Type*} [Group L] [Group K] [Fini
   have hdvd : Nat.card ↥act.fixedByE ∣ p := card_dvd_prime_of_isCyclic_of_pow hK.2 hEcyc
   exact coprimeFrobeniusAction_card_eq_prime_pow act hfixU hp hdvd hK1
 
+/-- **Chief-factor order on an irreducible summand** (the form (9.4)/(9.6) use).  For a coprime
+Frobenius action `act` on an elementary abelian `p`-group `V` (kernel `act.U ◁ L`, `C_V(E)` cyclic),
+and an `act.φ`-invariant subgroup `S ≠ ⊥` that is `L`-irreducible *inside `V`* (`hirr`) and met
+trivially by `C_V(U)` (`hUnc`, so `U` is fixed-point-free on `S`), the order of `S` is `p^{|E|}`.
+
+This is `coprimeFrobeniusChiefFactor_card` transported to the *summand* `S` via the restricted
+action `hSinv.restrict` on `↥S`: `S` is elementary abelian (subgroup of `V`); `L`-irreducible
+(invariant subgroups of `↥S` correspond, via `S.subtype`, to invariant subgroups of `V` inside `S`);
+`U`-noncentral (`C_S(U) = C_V(U) ⊓ S = ⊥ ≠ S`); and `C_S(E) = C_V(E) ⊓ S` is cyclic (subgroup of the
+cyclic `C_V(E)`).  Together with the Maschke summand `exists_aInvariant_irreducible_summand_disjoint`
+this furnishes the chief factor `|H̄| = p^q` of Peterfalvi (9.4) once the elementary-abelian seed is
+in place. -/
+theorem coprimeFrobeniusChiefFactor_card_of_summand
+    {L V : Type*} [Group L] [Group V] [Finite V] [Finite L]
+    (act : CoprimeFrobeniusAction L V) (hUnorm : act.U.Normal)
+    {p : ℕ} (hp : p.Prime) (hV : IsElementaryAbelian p V)
+    {S : Subgroup V} (hSinv : IsAInvariant act.φ S) (hSne : S ≠ ⊥)
+    (hirr : ∀ K : Subgroup V, IsAInvariant act.φ K → K ≤ S → K = ⊥ ∨ K = S)
+    (hUnc : act.fixedByU ⊓ S = ⊥) (hEcyc : IsCyclic ↥act.fixedByE) :
+    Nat.card ↥S = p ^ Nat.card ↥act.E := by
+  have hSel : IsElementaryAbelian p ↥S := hV.to_subgroup S
+  have hSsolv : IsSolvable ↥S := by
+    letI : CommGroup ↥S := { (inferInstance : Group ↥S) with mul_comm := hSel.comm }
+    infer_instance
+  -- the restricted Frobenius action on the summand `↥S`
+  let act_S : CoprimeFrobeniusAction L ↥S :=
+    { U := act.U
+      E := act.E
+      frobenius := act.frobenius
+      H_solvable := hSsolv
+      φ := hSinv.restrict
+      coprime_order :=
+        Nat.Coprime.coprime_dvd_left (Subgroup.card_subgroup_dvd_card S) act.coprime_order }
+  -- `L`-irreducibility of `↥S`: invariant subgroups correspond to invariant subgroups of `V ≤ S`.
+  have hirr_S : ∀ J : Subgroup ↥S, IsAInvariant act_S.φ J → J = ⊥ ∨ J = ⊤ := by
+    intro J hJinv
+    rcases hirr (J.map S.subtype) (aInvariant_map_subtype_of_restrict hSinv hJinv)
+        (Subgroup.map_subtype_le J) with h | h
+    · exact Or.inl (Subgroup.map_injective S.subtype_injective (by rw [h, Subgroup.map_bot]))
+    · exact Or.inr (Subgroup.map_injective S.subtype_injective
+        (by rw [h, ← MonoidHom.range_eq_map, Subgroup.range_subtype]))
+  -- `U` is non-central on `↥S`: `|C_S(U)| = |C_V(U) ⊓ S| = 1 ≠ |S|`.
+  have hUntriv_S : act_S.fixedByU ≠ ⊤ := by
+    intro htop
+    have hc : Nat.card ↥act_S.fixedByU = 1 := by
+      have hr := card_fixedSubgroup_restrict (φ := act.φ) (N := S) (X := act.U) hSinv
+      rwa [show fixedSubgroup act.φ act.U ⊓ S = ⊥ from hUnc, Subgroup.card_bot] at hr
+    rw [htop, Nat.card_congr Subgroup.topEquiv.toEquiv] at hc
+    exact hSne (Subgroup.card_eq_one.mp hc)
+  -- `C_S(E) = C_V(E) ⊓ S` is a subgroup of the cyclic `C_V(E)`, hence cyclic.
+  have hEcyc_S : IsCyclic ↥act_S.fixedByE := by
+    haveI : IsCyclic ↥(fixedSubgroup act.φ act.E) := hEcyc
+    haveI : IsCyclic ↥(fixedSubgroup act.φ act.E ⊓ S : Subgroup V) :=
+      Subgroup.isCyclic_of_le inf_le_left
+    have e := Subgroup.equivMapOfInjective
+      ((fixedSubgroup act.φ act.E).subgroupOf S) S.subtype S.subtype_injective
+    rw [Subgroup.subgroupOf_map_subtype] at e
+    have hcyc : IsCyclic ↥((fixedSubgroup act.φ act.E).subgroupOf S) :=
+      isCyclic_of_surjective e.symm e.symm.surjective
+    show IsCyclic ↥(fixedSubgroup hSinv.restrict act.E)
+    rwa [fixedSubgroup_restrict_eq hSinv]
+  have hK1 : Nat.card ↥S ≠ 1 := fun h => hSne (Subgroup.card_eq_one.mp h)
+  exact coprimeFrobeniusChiefFactor_card act_S hUnorm hp hSel hirr_S hUntriv_S hEcyc_S hK1
+
 /-- **Peterfalvi (9.6)** (conditional on the (9.4) chief factor): the order computation
 `|H̄| = p^q` for the chief factor `H̄ = ↥H ⧸ N`.
 
