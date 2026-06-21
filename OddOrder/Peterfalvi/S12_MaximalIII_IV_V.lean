@@ -2649,6 +2649,29 @@ theorem Hypothesis.muGridAlpha_tau_inner_muColumn_sub_conj [Finite G]
   rw [hyp.tau_inner_eq_of_supported hαsupp hμsupp]
   exact hyp.muGridAlpha_inner_muColumn_sub_conj hG hodd i j k hjk hk0 hζirr hζne hkζ hdζ h0ζ
 
+/-- **§10 τ/τ₁ compatibility on `ζ − ζ̄`** (Peterfalvi (10.5), `a = 0` argument): the Dade image
+`(ζ − ζ̄)^τ` equals `ζ^{τ₁} − ζ̄^{τ₁}` for the coherent extension `τ₁`.  Since `ζ ∈ S` and
+`ζ̄ ∈ S` (`inducedFamily_closedUnderConjugate`), the difference `ζ − ζ̄` lies in the supported
+lattice `ℤ[S, A_0]` (`zeta_sub_conj_support`), where `τ₁` agrees with `τ`
+(`coherent.extends_on_supported`); linearity of `τ₁` (`map_sub`) then splits the image.
+
+This converts the pure-`τ` identity `(α_{ij}^τ, (ζ−ζ̄)^τ) = −n`
+(`muGridAlpha_tau_inner_zeta_sub_conj`) into the `τ₁` form, giving `(α_{ij}^τ, ζ̄^{τ₁}) = a`
+(with `a − n := (α_{ij}^τ, ζ^{τ₁})`) in the (10.5) `a = 0` argument. -/
+theorem Hypothesis.tau_zeta_sub_conj_eq_tau1 [Finite G] [Fintype G] {M : Subgroup G} [Fintype ↥M]
+    [Invertible (Nat.card ↥M : ℂ)] [Invertible (Nat.card G : ℂ)]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis M) (hodd : Odd (Nat.card G))
+    {params : CharacterParameters hyp} (coh : CoherentHypothesis hyp params)
+    {ζ : ClassFunction ↥M ℂ} (hζS : ζ ∈ inducedFamily M) (hζirr : IsIrreducibleCharacter ζ) :
+    hyp.tau (ζ - ζ.conj) = coh.tau1 ζ - coh.tau1 ζ.conj := by
+  have hspanζ : ζ ∈ OddOrder.Peterfalvi.S07.zSpan hyp.Sset := Submodule.subset_span hζS
+  have hspanζc : ζ.conj ∈ OddOrder.Peterfalvi.S07.zSpan hyp.Sset :=
+    Submodule.subset_span (inducedFamily_closedUnderConjugate M hζS)
+  have hmem : (ζ - ζ.conj) ∈ OddOrder.Peterfalvi.S07.zSupportedSpan hyp.Sset hyp.A0 :=
+    ⟨Submodule.sub_mem _ hspanζ hspanζc, hyp.zeta_sub_conj_support hG hodd hζS hζirr⟩
+  rw [← coh.coherent.extends_on_supported _ hmem, map_sub]
+  rfl
+
 /-- **Peterfalvi (10.5), Dade-image half**: under the coherent extension, `α_{ij}` has the stated
 Dade image `δ·(ω_{ij}^σ − ω_{i0}^σ) − n·ζ^{τ₁}`.  (The support half is `alpha_support`.) -/
 theorem alpha_tau_image [Finite G] [Fintype G]
