@@ -5,6 +5,21 @@
 > 上位文脈 = 記憶 [[ft-endgame-two-poles]] [[peterfalvi-s10-13-gated-on-bg-spine]]、
 > Lane H 視点の正本 = [`s10_13_maximal_structure.md`](s10_13_maximal_structure.md)。
 
+## ★★★★ 2026-06-21 更新⁶ — a=0 の μ-side inner-product inventory 完成 (CRUX μ⊥ζ 含む)
+
+a=0 norm 論証の M-side inner products を全形式化 (build-green、axiom-clean=上流 gate のみ)。詳細・commit =
+issue 1007「進捗 cont.²」。**最重要: μ⊥ζ (crux) は Clifford 不要 — μ_ij も ζ も既約ゆえ degree distinctness のみ**:
+- `muGrid_inner_eq_zero_of_apply_one_ne` (CRUX `78d7c066`): `(μ_ij,χ)=0` for irr χ with `μ_ij(1)≠χ(1)`
+  (`irr_cf_inner`+degree)。`(μ_ij,ζ)=0`/`(μ_ij,ζ̄)=0` = `μ_i0(1)=1≠w₁`/`μ_ij(1)=d≠w₁` (n·w₁=d−δ,d>1,w₁>1)。
+  ⚠ Explore の「200-500行 Clifford/Mackey」見積もりは誤り (Res_K μ_ij 分析不要)。
+- `muGrid_inner_self`/`_cross_column`/`_within_column` (`24bcfd02`/`36609290`): full grid orthonormality。
+- `muGrid_column_sum_inner_self` (`36609290`): `‖∑_i μ_ik‖²=w₁`。
+- ⚠ instance: inner は Fintype を term-relevant に持つ → unfold;rfl 系は explicit Fintype 不可、classical/
+  `open scoped FiniteInduce` で finiteSubFintype synthesize。
+
+**⟹ ‖α‖²=2+n² 組める**。残 = (i)norm assembly(grid-level で pinning 回避)(ii)τ/τ₁ isometry transfer
+(§7→hyp.tau/coh.tau1)(iii)(α,ζ−ζ̄)=−n 等(iv)Cauchy-Schwarz+a=0(v)ζ^{τ₁} vanish on V(vi)NC+(3.8)→ψ=0。
+
 ## ★★★ 2026-06-21 更新⁵ — (10.5) Dade-image の **value-on-V leg** 完成 (2 leg のうち 1)
 
 **(10.5) Dade-image の 2 analytic leg のうち value-on-V leg を完全形式化** (`0601b2bb`, build-green

@@ -1314,6 +1314,226 @@ theorem Hypothesis.muColumnSign_zero [Finite G]
   exact h.certainType_zero_column_anchor.1
 
 open scoped FiniteInduce in
+/-- **§10 μ-grid normalization** (Peterfalvi (4.1)/(4.3.b)): each materialized certain-type
+character `μ_{ij}` is an irreducible character of `M`, hence has norm one, `(μ_{ij}, μ_{ij}) = 1`.
+Read off the §6 `columnFamily` (whose `mu` are irreducible) through the `muGrid` reconstruction. -/
+theorem Hypothesis.muGrid_inner_self [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    {M : Subgroup G} [Invertible (Nat.card ↥M : ℂ)] (hyp : Hypothesis M)
+    (hodd : Odd (Nat.card G)) (i : Fin hyp.w1) (j : Fin hyp.w2) :
+    ClassFunction.inner (hyp.muGrid hG hodd i j) (hyp.muGrid hG hodd i j) = 1 := by
+  haveI := hyp.finiteG
+  classical
+  let h := (hyp.toCertainTypeHypothesis hG hodd).toHypothesis
+  haveI hNeZ1 : NeZero (Nat.card h.W1) := ⟨by have := h.one_lt_card_W1; omega⟩
+  haveI hcyc : IsCyclic ↥(h.W1 ⊔ h.W2) := h.isCyclic_sup
+  letI : CommGroup ↥(h.W1 ⊔ h.W2) := IsCyclic.commGroup
+  have hW1le : hyp.typeP.W1 ≤ M := hyp.typeP.W1_le
+  have hW2le : hyp.typeP.W2 ≤ M := typePData_W2_le_self hyp.typeP
+  have hcardW1 : Nat.card ↥h.W1 = hyp.w1 :=
+    Nat.card_congr (Subgroup.subgroupOfEquivOfLe hW1le).toEquiv
+  have hcardW2sub : Nat.card ↥(h.W2.subgroupOf (h.W1 ⊔ h.W2)) = hyp.w2 := by
+    rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe (le_sup_right)).toEquiv]
+    exact Nat.card_congr (Subgroup.subgroupOfEquivOfLe hW2le).toEquiv
+  haveI hNeZ2 : NeZero (Nat.card ↥(h.W2.subgroupOf (h.W1 ⊔ h.W2))) := ⟨Nat.card_pos.ne'⟩
+  have emj : hyp.muGrid hG hodd i j
+      = ((h.columnFamily (finCardEquivCharacterGroup _ (finCongr hcardW2sub.symm j))).mu
+          (finCongr hcardW1.symm i) : ClassFunction ↥M ℂ) := by
+    unfold Hypothesis.muGrid; rfl
+  rw [emj, OddOrder.RepresentationTheory.irreducibleCharacter_inner, if_pos rfl]
+
+open scoped FiniteInduce in
+/-- **§10 μ-grid cross-column orthogonality** (Peterfalvi (4.3.b)): certain-type characters from
+*different* `W₂`-columns are orthogonal, `(μ_{ij}, μ_{i'j'}) = 0` for `j ≠ j'` (any rows `i, i'`).
+The §6 `columnFamily_cross_products_zero` (via (4.1)), read through `muGrid`, with a case split on
+which rows are `0`.  In particular `(μ_{ij}, μ_{i0}) = 0` for `0 < j`, the cross term in the
+norm `‖α_{ij}‖² = 2 + n²` of the (10.5) Dade-image argument. -/
+theorem Hypothesis.muGrid_inner_cross_column [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    {M : Subgroup G} [Invertible (Nat.card ↥M : ℂ)] (hyp : Hypothesis M)
+    (hodd : Odd (Nat.card G)) (i i' : Fin hyp.w1) {j j' : Fin hyp.w2} (hjj' : j ≠ j') :
+    ClassFunction.inner (hyp.muGrid hG hodd i j) (hyp.muGrid hG hodd i' j') = 0 := by
+  haveI := hyp.finiteG
+  classical
+  let h := (hyp.toCertainTypeHypothesis hG hodd).toHypothesis
+  haveI hNeZ1 : NeZero (Nat.card h.W1) := ⟨by have := h.one_lt_card_W1; omega⟩
+  haveI hcyc : IsCyclic ↥(h.W1 ⊔ h.W2) := h.isCyclic_sup
+  letI : CommGroup ↥(h.W1 ⊔ h.W2) := IsCyclic.commGroup
+  have hW1le : hyp.typeP.W1 ≤ M := hyp.typeP.W1_le
+  have hW2le : hyp.typeP.W2 ≤ M := typePData_W2_le_self hyp.typeP
+  have hcardW1 : Nat.card ↥h.W1 = hyp.w1 :=
+    Nat.card_congr (Subgroup.subgroupOfEquivOfLe hW1le).toEquiv
+  have hcardW2sub : Nat.card ↥(h.W2.subgroupOf (h.W1 ⊔ h.W2)) = hyp.w2 := by
+    rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe (le_sup_right)).toEquiv]
+    exact Nat.card_congr (Subgroup.subgroupOfEquivOfLe hW2le).toEquiv
+  haveI hNeZ2 : NeZero (Nat.card ↥(h.W2.subgroupOf (h.W1 ⊔ h.W2))) := ⟨Nat.card_pos.ne'⟩
+  -- The two `W₂`-duals differ (different columns).
+  have hχne : finCardEquivCharacterGroup (h.W2.subgroupOf (h.W1 ⊔ h.W2)) (finCongr hcardW2sub.symm j)
+      ≠ finCardEquivCharacterGroup (h.W2.subgroupOf (h.W1 ⊔ h.W2)) (finCongr hcardW2sub.symm j') :=
+    fun heq => hjj' ((finCongr hcardW2sub.symm).injective
+      ((finCardEquivCharacterGroup _).injective heq))
+  have emj : hyp.muGrid hG hodd i j
+      = ((h.columnFamily (finCardEquivCharacterGroup _ (finCongr hcardW2sub.symm j))).mu
+          (finCongr hcardW1.symm i) : ClassFunction ↥M ℂ) := by
+    unfold Hypothesis.muGrid; rfl
+  have emj' : hyp.muGrid hG hodd i' j'
+      = ((h.columnFamily (finCardEquivCharacterGroup _ (finCongr hcardW2sub.symm j'))).mu
+          (finCongr hcardW1.symm i') : ClassFunction ↥M ℂ) := by
+    unfold Hypothesis.muGrid; rfl
+  rw [emj, emj']
+  have hz : (⟨1, h.one_lt_card_W1⟩ : Fin (Nat.card h.W1)) ≠ 0 := Fin.ne_of_val_ne (by simp)
+  rcases eq_or_ne (finCongr hcardW1.symm i) 0 with hi | hi <;>
+    rcases eq_or_ne (finCongr hcardW1.symm i') 0 with hi' | hi'
+  · rw [hi, hi']; exact (h.columnFamily_cross_products_zero hχne hz hz).2.2.2
+  · rw [hi]; exact (h.columnFamily_cross_products_zero hχne hz hi').2.2.1
+  · rw [hi']; exact (h.columnFamily_cross_products_zero hχne hi hz).2.1
+  · exact (h.columnFamily_cross_products_zero hχne hi hi').1
+
+open scoped FiniteInduce in
+/-- **§10 μ-grid within-column orthogonality** (Peterfalvi (4.3.b)): distinct rows of the same
+`W₂`-column give orthogonal certain-type characters, `(μ_{ij}, μ_{i'j}) = 0` for `i ≠ i'`.  The
+§6 `columnFamily` `mu` are distinct irreducibles (`irreducibleCharacter_inner` + the family's
+`injective` field), read through `muGrid`.  With `muGrid_inner_self` this completes the
+orthonormality of the full `μ`-grid. -/
+theorem Hypothesis.muGrid_inner_within_column [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    {M : Subgroup G} [Invertible (Nat.card ↥M : ℂ)] (hyp : Hypothesis M)
+    (hodd : Odd (Nat.card G)) {i i' : Fin hyp.w1} (j : Fin hyp.w2) (hii' : i ≠ i') :
+    ClassFunction.inner (hyp.muGrid hG hodd i j) (hyp.muGrid hG hodd i' j) = 0 := by
+  haveI := hyp.finiteG
+  classical
+  let h := (hyp.toCertainTypeHypothesis hG hodd).toHypothesis
+  haveI hNeZ1 : NeZero (Nat.card h.W1) := ⟨by have := h.one_lt_card_W1; omega⟩
+  haveI hcyc : IsCyclic ↥(h.W1 ⊔ h.W2) := h.isCyclic_sup
+  letI : CommGroup ↥(h.W1 ⊔ h.W2) := IsCyclic.commGroup
+  have hW1le : hyp.typeP.W1 ≤ M := hyp.typeP.W1_le
+  have hW2le : hyp.typeP.W2 ≤ M := typePData_W2_le_self hyp.typeP
+  have hcardW1 : Nat.card ↥h.W1 = hyp.w1 :=
+    Nat.card_congr (Subgroup.subgroupOfEquivOfLe hW1le).toEquiv
+  have hcardW2sub : Nat.card ↥(h.W2.subgroupOf (h.W1 ⊔ h.W2)) = hyp.w2 := by
+    rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe (le_sup_right)).toEquiv]
+    exact Nat.card_congr (Subgroup.subgroupOfEquivOfLe hW2le).toEquiv
+  haveI hNeZ2 : NeZero (Nat.card ↥(h.W2.subgroupOf (h.W1 ⊔ h.W2))) := ⟨Nat.card_pos.ne'⟩
+  have hrowne : (finCongr hcardW1.symm i) ≠ (finCongr hcardW1.symm i') :=
+    fun heq => hii' ((finCongr hcardW1.symm).injective heq)
+  have emj : hyp.muGrid hG hodd i j
+      = ((h.columnFamily (finCardEquivCharacterGroup _ (finCongr hcardW2sub.symm j))).mu
+          (finCongr hcardW1.symm i) : ClassFunction ↥M ℂ) := by
+    unfold Hypothesis.muGrid; rfl
+  have emj' : hyp.muGrid hG hodd i' j
+      = ((h.columnFamily (finCardEquivCharacterGroup _ (finCongr hcardW2sub.symm j))).mu
+          (finCongr hcardW1.symm i') : ClassFunction ↥M ℂ) := by
+    unfold Hypothesis.muGrid; rfl
+  rw [emj, emj', OddOrder.RepresentationTheory.irreducibleCharacter_inner,
+    if_neg (fun heq => hrowne ((h.columnFamily _).injective heq))]
+
+open scoped FiniteInduce in
+/-- **§10 column-sum norm** (Peterfalvi (10.5)/(10.6), `‖μ_k‖² = w₁`): the `W₂`-column sum
+`μ_k = ∑_{0≤i<w₁} μ_{ik}` has squared norm `w₁`, since its `w₁` summands are orthonormal
+(`muGrid_inner_self` on the diagonal, `muGrid_inner_within_column` off it).  This is the
+`‖μ_k^{τ₁}‖² = w₁` factor in the Cauchy–Schwarz bound of the (10.5) `a = 0` argument. -/
+theorem Hypothesis.muGrid_column_sum_inner_self [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G}
+    [Invertible (Nat.card ↥M : ℂ)] (hyp : Hypothesis M) (hodd : Odd (Nat.card G))
+    (j : Fin hyp.w2) :
+    ClassFunction.inner (∑ i : Fin hyp.w1, hyp.muGrid hG hodd i j)
+        (∑ i : Fin hyp.w1, hyp.muGrid hG hodd i j) = (hyp.w1 : ℂ) := by
+  haveI := hyp.finiteG
+  classical
+  -- per-pair inner products: `1` on the diagonal, `0` off it.
+  have hpair : ∀ i i' : Fin hyp.w1, ClassFunction.inner (hyp.muGrid hG hodd i j)
+      (hyp.muGrid hG hodd i' j) = (if i' = i then 1 else 0) := by
+    intro i i'
+    by_cases h : i' = i
+    · subst h; rw [if_pos rfl]; exact hyp.muGrid_inner_self hG hodd i' j
+    · rw [if_neg h]; exact hyp.muGrid_inner_within_column hG hodd j (Ne.symm h)
+  have hrow : ∀ i : Fin hyp.w1, ClassFunction.inner (hyp.muGrid hG hodd i j)
+      (∑ i' : Fin hyp.w1, hyp.muGrid hG hodd i' j) = 1 := by
+    intro i
+    rw [OddOrder.RepresentationTheory.inner_sum_right,
+      Finset.sum_congr rfl (fun i' _ => hpair i i'), Finset.sum_ite_eq' Finset.univ i]
+    simp
+  rw [OddOrder.RepresentationTheory.inner_sum_left,
+    Finset.sum_congr rfl (fun i _ => hrow i), Finset.sum_const, Finset.card_univ,
+    Fintype.card_fin, nsmul_eq_mul, mul_one]
+
+open scoped FiniteInduce in
+/-- **§10 μ-grid ⊥ a degree-distinct irreducible** (Peterfalvi (10.5), `(μ_{ij}, ζ) = 0`): the
+certain-type character `μ_{ij}` is orthogonal to any irreducible character `χ` of a *different*
+degree.  Both are irreducible, so `(μ_{ij}, χ) ∈ {0, 1}` and equals `1` only if `μ_{ij} = χ`; a
+degree mismatch `μ_{ij}(1) ≠ χ(1)` rules that out.
+
+This is the orthogonality `(μ_{ij}, ζ) = 0` (and `(μ_{ij}, ζ̄) = 0`) to the degree-`w₁` member
+`ζ ∈ S` in the norm `‖α_{ij}‖² = 2 + n²` of the (10.5) `a = 0` argument: the caller supplies the
+degree mismatch (`μ_{i0}(1) = 1 ≠ w₁`, and `μ_{ij}(1) = d ≠ w₁` since `n·w₁ = d − δ`, `d > 1`,
+`w₁ > 1`).  It needs no Clifford theory — only orthonormality of irreducibles. -/
+theorem Hypothesis.muGrid_inner_eq_zero_of_apply_one_ne [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} [Invertible (Nat.card ↥M : ℂ)]
+    (hyp : Hypothesis M) (hodd : Odd (Nat.card G)) (i : Fin hyp.w1) (j : Fin hyp.w2)
+    {χ : ClassFunction ↥M ℂ} (hχirr : IsIrreducibleCharacter χ)
+    (hne : hyp.muGrid hG hodd i j 1 ≠ χ 1) :
+    ClassFunction.inner (hyp.muGrid hG hodd i j) χ = 0 := by
+  haveI := hyp.finiteG
+  classical
+  let h := (hyp.toCertainTypeHypothesis hG hodd).toHypothesis
+  haveI hNeZ1 : NeZero (Nat.card h.W1) := ⟨by have := h.one_lt_card_W1; omega⟩
+  haveI hcyc : IsCyclic ↥(h.W1 ⊔ h.W2) := h.isCyclic_sup
+  letI : CommGroup ↥(h.W1 ⊔ h.W2) := IsCyclic.commGroup
+  have hW1le : hyp.typeP.W1 ≤ M := hyp.typeP.W1_le
+  have hW2le : hyp.typeP.W2 ≤ M := typePData_W2_le_self hyp.typeP
+  have hcardW1 : Nat.card ↥h.W1 = hyp.w1 :=
+    Nat.card_congr (Subgroup.subgroupOfEquivOfLe hW1le).toEquiv
+  have hcardW2sub : Nat.card ↥(h.W2.subgroupOf (h.W1 ⊔ h.W2)) = hyp.w2 := by
+    rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe (le_sup_right)).toEquiv]
+    exact Nat.card_congr (Subgroup.subgroupOfEquivOfLe hW2le).toEquiv
+  haveI hNeZ2 : NeZero (Nat.card ↥(h.W2.subgroupOf (h.W1 ⊔ h.W2))) := ⟨Nat.card_pos.ne'⟩
+  have emj : hyp.muGrid hG hodd i j
+      = ((h.columnFamily (finCardEquivCharacterGroup _ (finCongr hcardW2sub.symm j))).mu
+          (finCongr hcardW1.symm i) : ClassFunction ↥M ℂ) := by
+    unfold Hypothesis.muGrid; rfl
+  have hμirr : IsIrreducibleCharacter (hyp.muGrid hG hodd i j) := by
+    rw [emj]; exact OddOrder.RepresentationTheory.IrreducibleCharacter.isIrreducible _
+  rw [OddOrder.RepresentationTheory.irr_cf_inner hμirr hχirr,
+    if_neg (fun heq => hne (by rw [heq]))]
+
+open scoped FiniteInduce in
+/-- **Peterfalvi (10.5), `‖α_{ij}‖² = 2 + n²`**: the squared norm of the virtual character
+`α_{ij} = μ_{ij} − δ·μ_{i0} − n·ζ`.  The triple `{μ_{ij}, μ_{i0}, ζ}` is orthonormal — `μ_{ij}` and
+`μ_{i0}` are orthonormal certain-type characters (`muGrid_inner_self` / `muGrid_inner_cross_column`,
+`j ≠ 0`), and both are orthogonal to the degree-distinct irreducible `ζ`
+(`muGrid_inner_eq_zero_of_apply_one_ne`, from the degree mismatches `hdζ`/`h0ζ`) — so
+`‖α‖² = 1 + δ² + n² = 2 + n²` (`δ² = 1`).  The reversed inner products use `inner_conj_symm`.
+
+This is the `‖α_{ij}^τ‖²` input to the Cauchy–Schwarz bound of the (10.5) `a = 0` argument (the
+Dade isometry `τ` preserves the norm).  The caller supplies the degree mismatches
+`μ_{i0}(1) = 1 ≠ w₁` and `μ_{ij}(1) = d ≠ w₁` (from `n·w₁ = d − δ`, `d > 1`, `w₁ > 1`). -/
+theorem Hypothesis.muGridAlpha_inner_self [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} [Invertible (Nat.card ↥M : ℂ)]
+    (hyp : Hypothesis M) (hodd : Odd (Nat.card G)) (i : Fin hyp.w1) {j : Fin hyp.w2} (hj0 : j ≠ 0)
+    {ζ : ClassFunction ↥M ℂ} (hζirr : IsIrreducibleCharacter ζ) {δ : ℤ} {n : ℕ}
+    (hdζ : hyp.muGrid hG hodd i j 1 ≠ ζ 1) (h0ζ : hyp.muGrid hG hodd i 0 1 ≠ ζ 1)
+    (hδpm : δ = 1 ∨ δ = -1) :
+    ClassFunction.inner (hyp.muGrid hG hodd i j - (δ : ℂ) • hyp.muGrid hG hodd i 0 - (n : ℂ) • ζ)
+        (hyp.muGrid hG hodd i j - (δ : ℂ) • hyp.muGrid hG hodd i 0 - (n : ℂ) • ζ)
+      = 2 + (n : ℂ) ^ 2 := by
+  haveI := hyp.finiteG
+  classical
+  have hA := hyp.muGrid_inner_self hG hodd i j
+  have hB := hyp.muGrid_inner_self hG hodd i 0
+  have hZ : ClassFunction.inner ζ ζ = 1 := by
+    rw [OddOrder.RepresentationTheory.irr_cf_inner hζirr hζirr, if_pos rfl]
+  have hP := hyp.muGrid_inner_cross_column hG hodd i i hj0
+  have hP' := hyp.muGrid_inner_cross_column hG hodd i i (Ne.symm hj0)
+  have hQ := hyp.muGrid_inner_eq_zero_of_apply_one_ne hG hodd i j hζirr hdζ
+  have hR := hyp.muGrid_inner_eq_zero_of_apply_one_ne hG hodd i 0 hζirr h0ζ
+  have hQ' : ClassFunction.inner ζ (hyp.muGrid hG hodd i j) = 0 := by
+    rw [OddOrder.RepresentationTheory.inner_conj_symm (hyp.muGrid hG hodd i j) ζ, hQ, star_zero]
+  have hR' : ClassFunction.inner ζ (hyp.muGrid hG hodd i 0) = 0 := by
+    rw [OddOrder.RepresentationTheory.inner_conj_symm (hyp.muGrid hG hodd i 0) ζ, hR, star_zero]
+  simp only [ClassFunction.inner_sub_left, ClassFunction.inner_sub_right,
+    ClassFunction.inner_smul_left, OddOrder.RepresentationTheory.inner_smul_right,
+    hA, hB, hZ, hP, hP', hQ, hQ', hR, hR', star_intCast, star_natCast,
+    mul_zero, zero_mul, sub_zero, zero_sub, mul_one, mul_neg, neg_neg, neg_zero]
+  rcases hδpm with h | h <;> subst h <;> push_cast <;> ring
+
+open scoped FiniteInduce in
 /-- **§10 `W₁`-vanishing of the column difference** (Peterfalvi (10.5), first step, via (4.3.c) +
 (4.4)): on `W₁^#`, the materialized character `μ_{ij}` equals `δ_j` times the column-`0` character
 `μ_{i0}`.  Indeed `x ∈ W₁^# ⊆ V = W − W₂`, so (4.3.c) gives `μ_{ij}(x) = δ_j·ω_{ij}(x)` and
