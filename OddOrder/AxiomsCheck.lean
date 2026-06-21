@@ -10,6 +10,7 @@ import OddOrder.GroupTheory.CoprimeFixedPoints
 import OddOrder.GroupTheory.MinimalInvariantNormal
 import OddOrder.GroupTheory.WielandtAssembly
 import OddOrder.GroupTheory.WielandtPerFactorDischarge
+import OddOrder.GroupTheory.RepresentationTheory.WielandtKernelFPF
 import OddOrder.GroupTheory.PiElementDecomposition
 import OddOrder.GroupTheory.RepresentationTheory.CharacterCount
 import OddOrder.GroupTheory.RepresentationTheory.CharacterCompleteness
@@ -5427,3 +5428,18 @@ This isolates the sole remaining representation-theoretic input — the kernel-F
 (†) — into the explicit hypothesis. -/
 
 #assert_only_allowed_axioms OddOrder.GroupTheory.wielandtPerFactor_of_dim
+
+/-! **(9.1) item 0 — conjugation permutes the isotypic projections** (`CenterProjConjugation`).
+A linear automorphism `τ` of `W` intertwining `ρ : Representation k U W` with its `c`-twist carries
+the `i`-th isotypic projection's range onto the `simplesAction φ c i`-th one
+(`map_range_centerProj`); this is the `hperm` of the free-orbit dimension count.  Axiom-clean. -/
+
+#assert_only_allowed_axioms OddOrder.GroupTheory.CenterModuleDecomp.map_range_centerProj
+
+/-! **(9.1) item 1 — the free `Γ`-action on the nontrivial simples** (`WielandtKernelFPF`).
+Packaging `gamma_free_off_trivial_simple` (3d.3c) with the canonical induced `Γ`-actions
+(`Γ` on `ConjClasses G` through `ψ`, `Γ` on `Fin N` through `simplesAction φ ∘ ψ`): there is a
+simple `i₀` fixed by all of `Γ`, and `Γ` acts freely off it.  Axiom-clean (the wiring of the
+kernel-FPF dimension fact (†) to the real Frobenius carrier, issue 2014). -/
+
+#assert_only_allowed_axioms OddOrder.GroupTheory.WielandtKernelFPF.exists_fixed_simple_free_of_fpf
