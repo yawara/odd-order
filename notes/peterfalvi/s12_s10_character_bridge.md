@@ -15,12 +15,14 @@ A₀-supported で `(hyp.tau φ,hyp.tau ψ)=(φ,ψ)`、§7 `dadeIntegralCharacte
 ((α,ζ−ζ̄)=−n) + `muGridAlpha_inner_muColumn_sub_conj` ((α,μ_k−dζ̄)=0) + `zeta_sub_conj_support`
 ((ζ−ζ̄).support⊆A₀, 完全 axiom-clean) + `muGridAlpha_tau_inner_zeta_sub_conj` ((α^τ,(ζ−ζ̄)^τ)=−n)。
 
-**▶ 残り = τ₁-side (distinct deep sub-area)**: (1) τ/τ₁ 互換 `tau(ζ−ζ̄)=tau1 ζ−tau1 ζ̄`
-(要 `ClosedUnderConjugate(inducedFamily)` 未確立 + coherence `extends_on_supported`) → `(α^τ,ζ̄^{τ₁})=a`、
-(2) **🔑 Dade-coherence adjunction `(α^τ,β^{τ₁})=(α,β)` for α A₀-supported, β∈ℤ[S]** (β=μ_k−dζ̄ は
-非 supported、§4 (2.7) adjoint formula の coherence-互換版要、未形式化 = **τ₁-side 全体の gate**)、
-(3) Cauchy-Schwarz→a=0、(4) (v)(vi)。次着手 = (1)+ClosedUnderConjugate が warm-up、本丸は (2) adjunction。
-⚠ domain 機微: 原文 α^{τ₁} は α∉ℤ[S] ゆえ実は α^τ。⟹ issue 1007 cont.³ 参照。
+**▶ 残り = τ₁-side**。**🔑 2026-06-21 cont.⁴: 一般 Dade-coherence adjunction は不要と判明** — 原文 line 29 の
+`μ_k−dζ̄` は **combination が A₀-supported** (μ_k=∑μ_ik は M' 誘導で消滅 by `induce_restrict_certainType_eq`、
+degree dw₁ 相殺) ゆえ既存 `tau_inner_eq_of_supported` で transfer 可。cont.⁴ で τ₁-side 基盤 5 補題 landing
+(`inducedFamily_closedUnderConjugate`/`muGrid_column_sum_vanishes_off_derived`/`muColumn_sub_conj_support`/
+`muGridAlpha_tau_inner_muColumn_sub_conj`/`tau_zeta_sub_conj_eq_tau1`、詳細 issue 1007 cont.⁴)。
+**残 arc** (全 primitive ベース、新 adjunction 数学なし): (1) μ_k τ/τ₁ 互換 (要 ∑μ_ik∈ℤ[S]=μ_k∈inducedFamily)、
+(2) a-derivation `(α^τ,ζ̄^{τ₁})=a`/`(α^τ,μ_k^{τ₁})=da`、(3) **Cauchy-Schwarz→a=0** (要 ‖μ_k^{τ₁}‖²=w₁ + a∈ℤ; 次の山)、
+(4) (v)ζ^{τ₁} vanish on V + (vi)NC≤4+(3.8)→ψ=0。⟹ issue 1007 cont.⁴ 参照。
 
 ## ★★★★ 2026-06-21 更新⁶ — a=0 の μ-side inner-product inventory 完成 (CRUX μ⊥ζ 含む)
 
