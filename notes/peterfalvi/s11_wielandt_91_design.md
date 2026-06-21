@@ -712,3 +712,24 @@ splitting `φ:Z(𝔽̄_p[U])≃(Fin N→𝔽̄_p)` (`exists_center_algEquiv_pi`,
 `hperm`、3d.3c (`CenterOrbitFree.gamma_free_off_trivial_simple`) で `hfree` (E が**非自明** simples に自由作用)
 を供給 → engine `finrank_eq_card_mul_finrank_invariants_of_free` に。→ item 2 (module wire: A i=idemBasis 射影、
 非自明 i に制限) → item 3 (base change 𝔽_p→𝔽̄_p) → assembly で `PerFactorDimIdentity` discharge。
+
+## 2026-06-21 (lane-h resume⁴) — ✅✅✅ piece D 全完了: (9.1) Wielandt 完全 unconditional
+
+**`wielandt_fixedPoint_frobenius` は sorry-free + axiom-clean (3 axioms, allowlist) で完成。**
+piece D (items 1-3 + assembly) を 4 commit で締結。**実 sorry 135→134**, full build 3881 green。
+
+| commit | piece | 内容 |
+|---|---|---|
+| `18f9c3fd` | item 1 | `exists_fixed_simple_free_of_fpf` — 3d.3c を conjugation `ψ` に wire (free E-action on nontrivial simples), compHom MulAction + orbit→stabilizer 変換 |
+| `07bf82dd` | item 2(g) | `symm_single_eq_average` (trivial 原始中心冪等元 = 平均化冪等元 `average k G`, `mul_average_right` 経由) → `range_centerProj_aug_eq_invariants` (trivial isotypic = U-invariants) + `exists_aug_coordinate` |
+| `f358b48e` | item 2 | `finrank_eq_card_mul_finrank_invariants_kernelFPF` — 抽象 (†) over alg-closed k: `dim W = |E| dim W^E` when `W^U=0` (isotypic 分解 + zero-summand drop `isInternal_restrict_ne` + item 0 hperm + item 1 hfree + free-orbit engine) |
+| `54341528` | item 3 + assembly | `htag_of_frobenius` (base change `𝔽_p→𝔽̄_p` で (†) を `𝔽_p` に下ろす: `subrepresentation` + `invariants_baseChangeRepresentation_eq_bot` + `Module.finrank_baseChange` + `finrank_invariants_baseChangeRepresentation` + `Submodule.map` bridge) + `wielandtDimIdentity_of_frobenius` (module-binder で diamond 回避) → hdim discharge (casing |N'|=1 trivial / 非trivial→coprimality) |
+
+**鍵となった技術知見**:
+- **`averageMap` whnf 爆発**: `averageMap` (`@[simp] noncomputable def`) を含む式は defeq で MonoidAlgebra へ深く展開し whnf timeout。**augmentation submodule `[V,U]` を opaque な `W₀` に `obtain ⟨W₀,hW₀⟩ := ⟨_,rfl⟩` で generalize** して全 defeq を回避 (`set` は逆に置換が重く悪化)。
+- **`Additive ↥N` diamond (piece C 既知の罠の再来)**: 具体 `Additive ↥N'` を `finrank_elab_identity`/`FiniteDimensional` に直接代入すると instance 合成 stuck。**解決 = piece C と同じ「module を instance binder にした補題」** (`wielandtDimIdentity_of_frobenius` を `{V}[CommGroup V][Module (ZMod p)(Additive V)][Finite V]` で書き、適用は項代入)。
+- `Field (ZMod p)` は `Mathlib.Algebra.Field.ZMod` import 要 (`[Fact p.Prime]` だけでは `DivisionRing` 不発)。
+- `CharP (AlgebraicClosure (ZMod p)) p` は自動 instance。`Module.Finite.of_finite` は instance (`[Finite M]` 要)。
+- **refinement**: `WielandtPerFactor`/`wielandtPerFactor_of_dim` に coprimality `Coprime |L| |H|` 追加 (FPF dim fact が `p∤|U|` 必須ゆえ正当; piece B が chief factor から thread)。
+
+**⟹ 下流解禁**: (9.3) `typeII_III_IV_order_relations` (S11) → (9.6) → (10.11)/(11.7) → (13.2.b) `|P|=p^q` (`basic_structure.P_order`/`card_Q_eq`)。Wielandt corollary `coprimeFrobeniusAction_card_eq_one` + (13.17.b) engine `isFrobenius_kernel_eq_bot_of_frobenius_subgroup` も axiom-clean 化。issue 2014 CLOSED。
