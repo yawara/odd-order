@@ -5,6 +5,23 @@
 > 上位文脈 = 記憶 [[ft-endgame-two-poles]] [[peterfalvi-s10-13-gated-on-bg-spine]]、
 > Lane H 視点の正本 = [`s10_13_maximal_structure.md`](s10_13_maximal_structure.md)。
 
+## ★★★★★ 2026-06-21 更新⁷ — a=0 の τ-isometry primitive + M-side + τ-side leg 完成 (6 補題)
+
+(10.5) a=0 論証の **(ii) τ-isometry transfer + (iii) M-side inner products + (iv) τ-side** を全形式化
+(build-green 3818 jobs、全 axiom-clean=muGrid 上流 gate のみ)。commit `de5b502d`/`dbd34818`/`c3506741`、
+詳細 = issue 1007「進捗 cont.³」。主要 = **`tau_inner_eq_of_supported`** (完全 axiom-clean な再利用 primitive:
+A₀-supported で `(hyp.tau φ,hyp.tau ψ)=(φ,ψ)`、§7 `dadeIntegralCharacterMap_inner_eq_on_supported_span` を
+`{φ,ψ}` で instantiate) + `muGridAlpha_tau_inner_self` (‖α^τ‖²=2+n²) + `muGridAlpha_inner_zeta_sub_conj`
+((α,ζ−ζ̄)=−n) + `muGridAlpha_inner_muColumn_sub_conj` ((α,μ_k−dζ̄)=0) + `zeta_sub_conj_support`
+((ζ−ζ̄).support⊆A₀, 完全 axiom-clean) + `muGridAlpha_tau_inner_zeta_sub_conj` ((α^τ,(ζ−ζ̄)^τ)=−n)。
+
+**▶ 残り = τ₁-side (distinct deep sub-area)**: (1) τ/τ₁ 互換 `tau(ζ−ζ̄)=tau1 ζ−tau1 ζ̄`
+(要 `ClosedUnderConjugate(inducedFamily)` 未確立 + coherence `extends_on_supported`) → `(α^τ,ζ̄^{τ₁})=a`、
+(2) **🔑 Dade-coherence adjunction `(α^τ,β^{τ₁})=(α,β)` for α A₀-supported, β∈ℤ[S]** (β=μ_k−dζ̄ は
+非 supported、§4 (2.7) adjoint formula の coherence-互換版要、未形式化 = **τ₁-side 全体の gate**)、
+(3) Cauchy-Schwarz→a=0、(4) (v)(vi)。次着手 = (1)+ClosedUnderConjugate が warm-up、本丸は (2) adjunction。
+⚠ domain 機微: 原文 α^{τ₁} は α∉ℤ[S] ゆえ実は α^τ。⟹ issue 1007 cont.³ 参照。
+
 ## ★★★★ 2026-06-21 更新⁶ — a=0 の μ-side inner-product inventory 完成 (CRUX μ⊥ζ 含む)
 
 a=0 norm 論証の M-side inner products を全形式化 (build-green、axiom-clean=上流 gate のみ)。詳細・commit =
