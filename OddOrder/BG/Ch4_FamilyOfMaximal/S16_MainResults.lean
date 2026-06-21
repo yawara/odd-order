@@ -899,19 +899,83 @@ def typePData_of_inputs {M H U W1 W2 : Subgroup G}
       normalizer_V := fun X hXne hXV =>
         normalizer_eq_sup_of_isTISubset_of_isCyclic hWcyc hTI hXne hXV }
 
+/-- **The `W₂ = C_{M'}(W₁#)` centralizer law** (BG Theorem C / Peterfalvi (8.4), the `TypePData`
+`centralizer_W1` field): for a type-`P` maximal subgroup with cyclic `κ`-Hall `K`, the `M'`-centralizer
+of every `k ∈ K#` is exactly `K* = C_{M_σ}(K)`.  Sharpens Theorem A(5) (`C_M(k) = K ⊔ K*`,
+`typeP_centralizer_kappaElement_eq`) by intersecting with `M'`: since `K* ≤ M'` and `K ⊓ M' = ⊥`
+(the `M = M' ⋊ K` complement has coprime orders, Theorem 14.7(h)), the modular law gives
+`M' ⊓ (K ⊔ K*) = K*`.  Discharges the `hCentW1` residual of `typePData_of_isTypeP_of_inputs`. -/
+theorem typeP_derivedInG_inf_centralizer_kappaElement_eq [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M K Kstar : Subgroup G}
+    (hM : M ∈ maximalSubgroups G) (hP : S14.IsTypeP M) (hKM : K ≤ M)
+    (hK : Ch03.IsHallSubgroup (S14.kappa M) (K.subgroupOf M))
+    (hKstar : Kstar = OddOrder.BG.Ch3.S10.Msigma M ⊓ Subgroup.centralizer (K : Set G)) :
+    ∀ x ∈ K, x ≠ 1 →
+      derivedInG M ⊓ Subgroup.centralizer ({x} : Set G) = Kstar := by
+  classical
+  haveI : IsSolvable ↥M := hG.solvable_of_mem_maximalSubgroups hM
+  -- Theorem 14.7(h): `M = M' ⋊ K` complement (coprime orders), `K ⊔ K*` cyclic ⟹ `K` cyclic.
+  obtain ⟨_hMcompl, hcop, _, ⟨_, _, _, _, hWcyc, _, _, _⟩, _⟩ := typeP_duality hG hM hP hKM hK hKstar
+  haveI : IsCyclic ↥(K ⊔ Kstar) := hWcyc
+  haveI : IsCyclic ↥K := Subgroup.isCyclic_of_le (le_sup_left : K ≤ K ⊔ Kstar)
+  -- A Hall `(κ ∪ σ)ᶜ`-subgroup `U` of `M` (for the Theorem A(5) citation).
+  obtain ⟨U', hU'⟩ := Ch03.hall_E_exists (G := ↥M)
+    ((S14.kappa M ∪ OddOrder.BG.Ch3.S10.sigma M)ᶜ)
+  have hUeq : (U'.map M.subtype).subgroupOf M = U' :=
+    Subgroup.comap_map_eq_self_of_injective M.subtype_injective U'
+  have hU : Ch03.IsHallSubgroup ((S14.kappa M ∪ OddOrder.BG.Ch3.S10.sigma M)ᶜ)
+      ((U'.map M.subtype).subgroupOf M) := by rw [hUeq]; exact hU'
+  -- `K ⊓ M' = ⊥` (coprime `|K|`, `|M'|`).
+  have hcop' : Nat.Coprime (Nat.card ↥K) (Nat.card ↥(derivedInG M)) := by
+    have e1 : Nat.card ↥(K.subgroupOf M) = Nat.card ↥K :=
+      Nat.card_congr (Subgroup.subgroupOfEquivOfLe hKM).toEquiv
+    have e2 : Nat.card ↥((derivedInG M).subgroupOf M) = Nat.card ↥(derivedInG M) :=
+      Nat.card_congr (Subgroup.subgroupOfEquivOfLe (Subgroup.map_subtype_le _)).toEquiv
+    rw [e1, e2] at hcop; exact hcop.symm
+  have hKinfM' : K ⊓ derivedInG M = ⊥ :=
+    Subgroup.card_eq_one.mp (Nat.eq_one_of_dvd_coprimes hcop'
+      (Subgroup.card_dvd_of_le inf_le_left) (Subgroup.card_dvd_of_le inf_le_right))
+  -- `K* ≤ M_σ ≤ M'`.
+  have hKstarM' : Kstar ≤ derivedInG M := by
+    rw [hKstar]; exact inf_le_left.trans (OddOrder.BG.Ch3.S10.Msigma_le_derived hG hM)
+  have hM'M : derivedInG M ≤ M := Subgroup.map_subtype_le _
+  -- `K ≤ N(K*)`: `K* ≤ C(K)` (from `K* = M_σ ⊓ C(K)`), so `K ≤ C(K*) ≤ N(K*)`.
+  have hKsubCK : Kstar ≤ Subgroup.centralizer (K : Set G) := by rw [hKstar]; exact inf_le_right
+  have hKN : K ≤ Subgroup.normalizer (Kstar : Set G) := by
+    refine le_trans (fun k hk => ?_) (Subgroup.centralizer_le_normalizer (Kstar : Set G))
+    rw [Subgroup.mem_centralizer_iff]
+    intro s hs
+    have hsCK := hKsubCK hs
+    rw [Subgroup.mem_centralizer_iff] at hsCK
+    exact (hsCK k hk).symm
+  -- `M' ⊓ C(x) = M' ⊓ (M ⊓ C(x)) = M' ⊓ (K ⊔ K*)`, then Dedekind ⟹ `= K*`.
+  intro x hx hx1
+  have hA5 := typeP_centralizer_kappaElement_eq hG hM hP hKM hK hKstar hU x hx hx1
+  have hredux : derivedInG M ⊓ Subgroup.centralizer ({x} : Set G) = derivedInG M ⊓ (K ⊔ Kstar) := by
+    rw [← hA5, ← inf_assoc, inf_eq_left.mpr hM'M]
+  rw [hredux]
+  -- Dedekind (`eq_sup_inf_of_le_normalizer`): `H = K* ⊔ (H ⊓ K)`, with `H ⊓ K ≤ M' ⊓ K = ⊥`.
+  have hKstarH : Kstar ≤ derivedInG M ⊓ (K ⊔ Kstar) := le_inf hKstarM' le_sup_right
+  have hHle : derivedInG M ⊓ (K ⊔ Kstar) ≤ Kstar ⊔ K := by rw [sup_comm]; exact inf_le_right
+  have hHinfK : (derivedInG M ⊓ (K ⊔ Kstar)) ⊓ K = ⊥ := by
+    rw [eq_bot_iff]
+    calc (derivedInG M ⊓ (K ⊔ Kstar)) ⊓ K ≤ derivedInG M ⊓ K := inf_le_inf_right K inf_le_left
+      _ = ⊥ := by rw [inf_comm]; exact hKinfM'
+  rw [eq_sup_inf_of_le_normalizer hKN hKstarH hHle, hHinfK, sup_bot_eq]
+
 /-- **Prop 16.1(b)--(d) forward bridge — `TypePData M` from BG-local `IsTypeP M`** (gated-endpoint).
 Constructs the shared Peterfalvi type-`P` datum (`TypePData M`) for a type-`P` maximal subgroup with
-a nontrivial `κ(M)`-Hall `K`, discharging *eleven* of the eighteen `typePData_of_inputs` fields from
+a nontrivial `κ(M)`-Hall `K`, discharging *twelve* of the eighteen `typePData_of_inputs` fields from
 the proven §14/§15 structure and gating only on the genuinely-deep **`M_F`-internal Fitting core**
 (BG Corollary 15.5 / Lemma 15.1):
 
 * discharged (`typeP_duality` = Theorem 14.7: `hMcompl`/`hWcyc`/`hTI`; `typeP_kstar_in_mf` = Corollary
-  15.6: `hW2ne`/`hW2le`/`hHncyc`; plus `hHeq`/`hHle`/`hW1le`/`hW1ne`), with `W₁ = K`, `W₂ = K*`,
-  `W = K ⊔ K*`, `H = M_F`;
+  15.6: `hW2ne`/`hW2le`/`hHncyc`; the `W₂ = C_{M'}(W₁#)` centralizer law `hCentW1`
+  (`typeP_derivedInG_inf_centralizer_kappaElement_eq` = Theorem A(5) + Dedekind); plus
+  `hHeq`/`hHle`/`hW1le`/`hW1ne`), with `W₁ = K`, `W₂ = K*`, `W = K ⊔ K*`, `H = M_F`;
 * gated (named residuals): the `M_F`-internal complement `U` (`M' = M_F ⊔ U`, `U ⊴ M'` nilpotent —
-  `hUle`/`hUnorm`/`hUnilp`/`hDcompl`), the Fitting decomposition `F(M) = M_F (U ⊓ C_M(M_F))`
-  (`hSDfit`/`hFiteq`/`hFitlt`), and the `W₂ = C_{M'}(W₁#)` centralizer law (`hCentW1`, BG's
-  `C_{M'}(k) = K*` for `k ∈ K#`).
+  `hUle`/`hUnorm`/`hUnilp`/`hDcompl`) and the Fitting decomposition `F(M) = M_F (U ⊓ C_M(M_F))`
+  (`hSDfit`/`hFiteq`/`hFitlt`).
 
 This single construction feeds all three of `hP2II`/`hP1neIIIIV`/`hP1eqV` (types II/III/IV/V bundle a
 `TypePData`); the gated residuals are exactly the `M_F`-internal structure not present in
@@ -929,10 +993,7 @@ noncomputable def typePData_of_isTypeP_of_inputs [Finite G]
       maxNilpotentNormalHall M ⊔ (U ⊓ Subgroup.centralizer (maxNilpotentNormalHall M : Set G)))
     (hFiteq : maxNilpotentNormalHall M =
       maxNilpotentNormalHall M ⊔ (U ⊓ Subgroup.centralizer (maxNilpotentNormalHall M : Set G)))
-    (hFitlt : maxNilpotentNormalHall M < derivedInG M)
-    (hCentW1 : ∀ x ∈ K, x ≠ 1 →
-      derivedInG M ⊓ Subgroup.centralizer ({x} : Set G) =
-        OddOrder.BG.Ch3.S10.Msigma M ⊓ Subgroup.centralizer (K : Set G)) :
+    (hFitlt : maxNilpotentNormalHall M < derivedInG M) :
     TypePData M := by
   classical
   set Kstar : Subgroup G := OddOrder.BG.Ch3.S10.Msigma M ⊓ Subgroup.centralizer (K : Set G)
@@ -952,7 +1013,8 @@ noncomputable def typePData_of_isTypeP_of_inputs [Finite G]
   have hk := typeP_kstar_in_mf hG hM hP hKM hK hKstar
   exact typePData_of_inputs (H := maxNilpotentNormalHall M) (U := U) (W1 := K) (W2 := Kstar)
     rfl (maxNilpotentNormalHall_le_derived hG hM) hUle hKM (le_inf hk.2.2.1 hk.2.2.2.1)
-    hWcyc hKne hk.1 hMcompl hUnorm hUnilp hDcompl hk.2.2.2.2 hSDfit hFiteq hFitlt hCentW1 hTI
+    hWcyc hKne hk.1 hMcompl hUnorm hUnilp hDcompl hk.2.2.2.2 hSDfit hFiteq hFitlt
+    (typeP_derivedInG_inf_centralizer_kappaElement_eq hG hM hP hKM hK hKstar) hTI
 
 /-- **Prop 16.1 forward bridge, type III/IV last mile** (Peterfalvi (8.7)): a type-`P` datum whose
 `U`-factor has its normalizer inside `M` is of type III or IV, according as `U` is abelian or not.
