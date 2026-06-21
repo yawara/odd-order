@@ -10,6 +10,7 @@ import OddOrder.GroupTheory.WielandtFixedPoint
 import OddOrder.GroupTheory.CoprimeFixedPoints
 import OddOrder.GroupTheory.MaximalSubgroupTypeConj
 import OddOrder.GroupTheory.AInvariantPiSubgroups
+import OddOrder.BG.Ch1_Preliminary.OperatorMaschke
 import OddOrder.BG.Ch4_FamilyOfMaximal.S15_MF
 
 /-!
@@ -808,6 +809,39 @@ theorem coprimeFrobeniusChiefFactor_card_of_summand
   rw [show fixedSubgroup hSinv.restrict act.E = act_S.fixedByE from rfl, hEcard] at hr
   exact hr.symm
 
+/-- The `E`-fixed points `C_{H̄}(W₁)` of the quotient chief-factor action are cyclic: they are the
+image (under `mk' N`, Isaacs Cor 3.28 `map_fixedSubgroup_eq_fixedSubgroup_quotient`) of the cyclic
+`W₂ = C_H(W₁)`.  This is the cyclic-`C_K(E)` hypothesis of `coprimeFrobeniusChiefFactor_card` for
+both the chief factor (`typeP_chiefFactor_card`) and the (9.4) existence proof. -/
+theorem typeP_quotient_fixedByE_cyclic [Finite G] (data : TypePData M) (hU : data.U ≠ ⊥)
+    {N : Subgroup ↥data.H} [N.Normal] (hN : IsAInvariant (typeP_conjAction data) N) :
+    IsCyclic ↥(typeP_quotientCoprimeAction data hU hN).fixedByE := by
+  set act' := typeP_quotientCoprimeAction data hU hN with hact'
+  have hcopHW1 : Nat.Coprime
+      (Nat.card ↥(data.W1.subgroupOf (data.U ⊔ data.W1))) (Nat.card ↥data.H) :=
+    (typeP_coprime_H_uW1 data hU).symm.coprime_dvd_left (Subgroup.card_subgroup_dvd_card _)
+  haveI : IsSolvable ↥data.H := (typeP_coprimeAction data hU).H_solvable
+  have hmap : (fixedSubgroup (typeP_conjAction data)
+      (data.W1.subgroupOf (data.U ⊔ data.W1))).map (QuotientGroup.mk' N) = act'.fixedByE :=
+    map_fixedSubgroup_eq_fixedSubgroup_quotient hN hcopHW1 (Or.inr inferInstance)
+  have hCHW1 : (fixedSubgroup (typeP_conjAction data)
+      (data.W1.subgroupOf (data.U ⊔ data.W1))).map data.H.subtype = data.W2 := by
+    rw [typeP_fixedSubgroup_map data le_sup_right, typeP_H_inf_centralizer_W1]
+  haveI : IsCyclic ↥data.W2 := data.W2_cyclic
+  haveI hcycCHW1 : IsCyclic ↥(fixedSubgroup (typeP_conjAction data)
+      (data.W1.subgroupOf (data.U ⊔ data.W1))) := by
+    have e := Subgroup.equivMapOfInjective
+      (fixedSubgroup (typeP_conjAction data) (data.W1.subgroupOf (data.U ⊔ data.W1)))
+      data.H.subtype data.H.subtype_injective
+    rw [hCHW1] at e
+    exact isCyclic_of_surjective e.symm e.symm.surjective
+  let f := (QuotientGroup.mk' N).comp (fixedSubgroup (typeP_conjAction data)
+      (data.W1.subgroupOf (data.U ⊔ data.W1))).subtype
+  have hrange : f.range = act'.fixedByE := by
+    rw [MonoidHom.range_comp, Subgroup.range_subtype]; exact hmap
+  rw [← hrange]
+  exact isCyclic_of_surjective f.rangeRestrict f.rangeRestrict_surjective
+
 /-- **Peterfalvi (9.6)** (conditional on the (9.4) chief factor): the order computation
 `|H̄| = p^q` for the chief factor `H̄ = ↥H ⧸ N`.
 
@@ -828,32 +862,7 @@ theorem typeP_chiefFactor_card [Finite G] (data : TypePData M) (hU : data.U ≠ 
     Nat.card (↥data.H ⧸ N) = p ^ Nat.card ↥data.W1 := by
   set act' := typeP_quotientCoprimeAction data hU hN with hact'
   have hUnorm : (act'.U).Normal := (typeP_uW1_frobenius data hU).isNormal
-  -- `C_{H̄}(W₁)` is cyclic: it is the image of the cyclic `W₂ = C_H(W₁)` (Isaacs Cor 3.28).
-  have hEcyc : IsCyclic ↥act'.fixedByE := by
-    have hcopHW1 : Nat.Coprime
-        (Nat.card ↥(data.W1.subgroupOf (data.U ⊔ data.W1))) (Nat.card ↥data.H) :=
-      (typeP_coprime_H_uW1 data hU).symm.coprime_dvd_left (Subgroup.card_subgroup_dvd_card _)
-    haveI : IsSolvable ↥data.H := (typeP_coprimeAction data hU).H_solvable
-    have hmap : (fixedSubgroup (typeP_conjAction data)
-        (data.W1.subgroupOf (data.U ⊔ data.W1))).map (QuotientGroup.mk' N) = act'.fixedByE :=
-      map_fixedSubgroup_eq_fixedSubgroup_quotient hN hcopHW1 (Or.inr inferInstance)
-    have hCHW1 : (fixedSubgroup (typeP_conjAction data)
-        (data.W1.subgroupOf (data.U ⊔ data.W1))).map data.H.subtype = data.W2 := by
-      rw [typeP_fixedSubgroup_map data le_sup_right, typeP_H_inf_centralizer_W1]
-    haveI : IsCyclic ↥data.W2 := data.W2_cyclic
-    haveI hcycCHW1 : IsCyclic ↥(fixedSubgroup (typeP_conjAction data)
-        (data.W1.subgroupOf (data.U ⊔ data.W1))) := by
-      have e := Subgroup.equivMapOfInjective
-        (fixedSubgroup (typeP_conjAction data) (data.W1.subgroupOf (data.U ⊔ data.W1)))
-        data.H.subtype data.H.subtype_injective
-      rw [hCHW1] at e
-      exact isCyclic_of_surjective e.symm e.symm.surjective
-    let f := (QuotientGroup.mk' N).comp (fixedSubgroup (typeP_conjAction data)
-        (data.W1.subgroupOf (data.U ⊔ data.W1))).subtype
-    have hrange : f.range = act'.fixedByE := by
-      rw [MonoidHom.range_comp, Subgroup.range_subtype]; exact hmap
-    rw [← hrange]
-    exact isCyclic_of_surjective f.rangeRestrict f.rangeRestrict_surjective
+  have hEcyc : IsCyclic ↥act'.fixedByE := typeP_quotient_fixedByE_cyclic data hU hN
   -- Wielandt's formula + the prime computation give `|H̄| = p^{|act'.E|} = p^q`.
   have hcard := (coprimeFrobeniusChiefFactor_card act' hUnorm hp hpe hirr hUntriv hEcyc hHbar).1
   rw [hcard]
@@ -876,12 +885,220 @@ theorem typeP_U_noncentral_on_H [Finite G] (data : TypePData M) (hU : data.U ≠
     Subgroup.eq_of_le_of_card_ge inf_le_left key.le
   exact heq ▸ inf_le_right
 
+/-- **Peterfalvi (9.4), the chief-factor kernel** (given the elementary-abelian seed `N₀`).  From a
+`U W₁`-invariant normal `N₀ ◁ H = M_F` with `H/N₀` elementary abelian `p` on which `U` is non-central
+(`hUnc`), the operator Maschke summand and the summand Wielandt order produce a chief-factor kernel
+`N ⊇ N₀` with `|H/N| = p^q` (the chief factor `|H̄|`) and `p ∣ |W₂|`.
+
+`V = H/N₀ = S ⊕ W` (Maschke), `S` irreducible with `U` fixed-point-free (`C_V(U) ⊓ S = ⊥`), so
+`|S| = p^q` and `|C_V(W₁) ⊓ S| = p` (`coprimeFrobeniusChiefFactor_card_of_summand`).  Take
+`N = W.comap (mk' N₀)`: then `H/N ≅ V/W ≅ S`, so `|H/N| = W.index = |S| = p^q`; and
+`p = |C_V(W₁) ⊓ S| ∣ |C_V(W₁)| ∣ |W₂|` since `C_V(W₁)` is the image of `W₂`. -/
+theorem exists_chiefFactor_kernel [Finite G] {M : Subgroup G} (data : TypePData M)
+    (hU : data.U ≠ ⊥) {p : ℕ} (hp : p.Prime) {N₀ : Subgroup ↥data.H} [N₀.Normal]
+    (hN₀ : IsAInvariant (typeP_conjAction data) N₀)
+    (hpe : IsElementaryAbelian p (↥data.H ⧸ N₀))
+    (hUnc : (typeP_quotientCoprimeAction data hU hN₀).fixedByU ≠ ⊤) :
+    ∃ N : Subgroup ↥data.H, N₀ ≤ N ∧ ∃ _ : N.Normal,
+      IsAInvariant (typeP_conjAction data) N ∧
+      Nat.card (↥data.H ⧸ N) = p ^ Nat.card ↥data.W1 ∧ p ∣ Nat.card ↥data.W2 := by
+  classical
+  haveI : Fact p.Prime := ⟨hp⟩
+  set act_V := typeP_quotientCoprimeAction data hU hN₀ with hact_V
+  have hUnorm : act_V.U.Normal := (typeP_uW1_frobenius data hU).isNormal
+  have hCinv : IsAInvariant act_V.φ act_V.fixedByU :=
+    isAInvariant_fixedSubgroup_of_normal act_V.φ hUnorm
+  -- Operator Maschke: an irreducible summand `S` with `U`-noncentral complement structure.
+  obtain ⟨S, W, hSinv, hWinv, hSW_inf, hSW_sup, hSne, hirr, hCS⟩ :=
+    OddOrder.BG.Ch1_Preliminary.exists_aInvariant_irreducible_summand_disjoint hpe
+      act_V.coprime_order.symm hCinv hUnc
+  have hEcyc : IsCyclic ↥act_V.fixedByE := typeP_quotient_fixedByE_cyclic data hU hN₀
+  obtain ⟨hScard, hCSEcard⟩ :=
+    coprimeFrobeniusChiefFactor_card_of_summand act_V hUnorm hp hpe hSinv hSne hirr hCS hEcyc
+  have hEcard : Nat.card ↥act_V.E = Nat.card ↥data.W1 := by
+    show Nat.card ↥(data.W1.subgroupOf (data.U ⊔ data.W1)) = Nat.card ↥data.W1
+    exact Nat.card_congr (Subgroup.subgroupOfEquivOfLe le_sup_right).toEquiv
+  have hScard' : Nat.card ↥S = p ^ Nat.card ↥data.W1 := by rw [hScard, hEcard]
+  -- `V` is abelian, so all its subgroups are normal.
+  haveI hSnorm : S.Normal := ⟨fun n hn g => by
+    rwa [show g * n * g⁻¹ = n by rw [hpe.comm g n]; group]⟩
+  haveI hWnorm : W.Normal := ⟨fun n hn g => by
+    rwa [show g * n * g⁻¹ = n by rw [hpe.comm g n]; group]⟩
+  -- `S` complements `W` in `V`, so `W.index = |S|`.
+  have hcompl : Subgroup.IsComplement' S W :=
+    Subgroup.isComplement'_of_disjoint_and_mul_eq_univ (disjoint_iff.mpr hSW_inf)
+      (by rw [← Subgroup.normal_mul, hSW_sup, Subgroup.coe_top])
+  refine ⟨W.comap (QuotientGroup.mk' N₀), ?_, inferInstance, ?_, ?_, ?_⟩
+  · -- `N₀ ≤ N`: `N₀ = ker (mk' N₀) ≤ comap _ W`.
+    intro x hx
+    rw [Subgroup.mem_comap, QuotientGroup.mk'_apply, (QuotientGroup.eq_one_iff x).mpr hx]
+    exact W.one_mem
+  · -- `N` is `U W₁`-invariant (preimage of the invariant `W`).
+    exact OddOrder.BG.Ch1_Preliminary.isAInvariant_comap_mk' hN₀ hWinv
+  · -- `|H/N| = W.index = |S| = p^q`.
+    show (W.comap (QuotientGroup.mk' N₀)).index = p ^ Nat.card ↥data.W1
+    rw [Subgroup.index_comap_of_surjective _ (QuotientGroup.mk'_surjective N₀),
+      hcompl.index_eq_card, hScard']
+  · -- `p ∣ |W₂|`: `p = |C_V(W₁) ⊓ S| ∣ |C_V(W₁)| = |act_V.fixedByE| ∣ |W₂|`.
+    have h1 : p ∣ Nat.card ↥act_V.fixedByE :=
+      hCSEcard ▸ Subgroup.card_dvd_of_le inf_le_left
+    refine h1.trans ?_
+    set CHW1 := fixedSubgroup (typeP_conjAction data) (data.W1.subgroupOf (data.U ⊔ data.W1))
+      with hCHW1def
+    have hcopHW1 : Nat.Coprime
+        (Nat.card ↥(data.W1.subgroupOf (data.U ⊔ data.W1))) (Nat.card ↥data.H) :=
+      (typeP_coprime_H_uW1 data hU).symm.coprime_dvd_left (Subgroup.card_subgroup_dvd_card _)
+    haveI : IsSolvable ↥data.H := (typeP_coprimeAction data hU).H_solvable
+    have hmap : CHW1.map (QuotientGroup.mk' N₀) = act_V.fixedByE :=
+      map_fixedSubgroup_eq_fixedSubgroup_quotient hN₀ hcopHW1 (Or.inr inferInstance)
+    have hCHW1card : Nat.card ↥CHW1 = Nat.card ↥data.W2 := by
+      have hCHW1eq : CHW1.map data.H.subtype = data.W2 := by
+        rw [hCHW1def, typeP_fixedSubgroup_map data le_sup_right, typeP_H_inf_centralizer_W1]
+      rw [← hCHW1eq]
+      exact Nat.card_congr
+        (Subgroup.equivMapOfInjective CHW1 data.H.subtype data.H.subtype_injective).toEquiv
+    rw [← hmap, ← hCHW1card]
+    exact Subgroup.card_map_dvd CHW1 (QuotientGroup.mk' N₀)
+
+/-- **`M`-normality of the chief-factor kernel image.**  For a `U W₁`-invariant normal subgroup
+`N ◁ H = M_F`, its image `H₀ = N.map H.subtype` in `G` is normalized by all of `M`.  Indeed
+`M = H ⊔ U ⊔ W₁` (the `M' = H ⋊ U`, `M = M' ⋊ W₁` complement splittings), `H` normalizes `H₀`
+(`N ◁ H`, via `Subgroup.le_normalizer_map`), and `U W₁` normalizes `H₀` (`N` is `U W₁`-invariant:
+conjugation by `g ∈ U W₁` is `typeP_conjAction` and preserves `N`). -/
+theorem typeP_aInvariantNormal_le_normalizer [Finite G] {M : Subgroup G} (data : TypePData M)
+    {N : Subgroup ↥data.H} [hNn : N.Normal] (hN : IsAInvariant (typeP_conjAction data) N) :
+    M ≤ Subgroup.normalizer ((N.map data.H.subtype : Subgroup G) : Set G) := by
+  -- `M ≤ (H ⊔ U) ⊔ W₁`.
+  have hM1 : M ≤ derivedInG M ⊔ data.W1 := by
+    have hsup := data.M_complement.sup_eq_top
+    rw [← Subgroup.subgroupOf_sup (derivedInG_le_self M) data.W1_le] at hsup
+    exact Subgroup.subgroupOf_eq_top.mp hsup
+  have hderiv : derivedInG M = data.H ⊔ data.U := by
+    rw [data.derivedInG_eq_fitting_sup_U, ← data.H_eq]
+  have hM2 : M ≤ (data.H ⊔ data.U) ⊔ data.W1 := hderiv ▸ hM1
+  -- `H` normalizes `H₀` (`N ◁ H`): `H = subtype '' (normalizer N = ⊤) ≤ normalizer (image)`.
+  have hH_norm : data.H ≤ Subgroup.normalizer ((N.map data.H.subtype : Subgroup G) : Set G) := by
+    have h := Subgroup.le_normalizer_map (H := N) data.H.subtype
+    rwa [Subgroup.normalizer_eq_top_iff.mpr hNn, ← MonoidHom.range_eq_map,
+      Subgroup.range_subtype] at h
+  -- `U W₁` normalizes `H₀`: conjugation by `g ∈ U W₁` is `typeP_conjAction`, which preserves `N`.
+  have hconj : ∀ (l : ↥(data.U ⊔ data.W1)) {m : ↥data.H}, m ∈ N →
+      (l : G) * data.H.subtype m * (l : G)⁻¹ ∈ N.map data.H.subtype := fun l m hm =>
+    ⟨typeP_conjAction data l m, hN.smul_mem l hm, typeP_conjAction_apply data l m⟩
+  have hUW1_norm :
+      data.U ⊔ data.W1 ≤ Subgroup.normalizer ((N.map data.H.subtype : Subgroup G) : Set G) := by
+    intro g hg
+    rw [Subgroup.mem_normalizer_iff]
+    rintro h
+    refine ⟨fun ⟨m, hm, hval⟩ => hval ▸ hconj ⟨g, hg⟩ hm, fun hh => ?_⟩
+    obtain ⟨m, hm, hval⟩ := hh
+    have key := hconj ⟨g, hg⟩⁻¹ hm
+    have hE : ((⟨g, hg⟩ : ↥(data.U ⊔ data.W1))⁻¹ : G) * data.H.subtype m
+        * (((⟨g, hg⟩ : ↥(data.U ⊔ data.W1))⁻¹ : G))⁻¹ = h := by
+      rw [hval]; show g⁻¹ * (g * h * g⁻¹) * (g⁻¹ : G)⁻¹ = h; group
+    exact hE ▸ key
+  exact hM2.trans (sup_le (sup_le hH_norm (le_sup_left.trans hUW1_norm))
+    (le_sup_right.trans hUW1_norm))
+
+/-- A subgroup containing a Sylow `p`-subgroup for every prime `p` is the whole group: its order is
+divisible by every maximal prime power `p^{v_p(|G|)} = |Sylow_p|`, hence by `|G|`. -/
+theorem eq_top_of_forall_sylow_le {Γ : Type*} [Group Γ] [Finite Γ] {K : Subgroup Γ}
+    (h : ∀ (p : ℕ) [Fact p.Prime] (P : Sylow p Γ), (↑P : Subgroup Γ) ≤ K) : K = ⊤ := by
+  refine Subgroup.eq_top_of_card_eq K
+    (Nat.dvd_antisymm (Subgroup.card_subgroup_dvd_card K) ?_)
+  rw [← Nat.factorization_le_iff_dvd Nat.card_pos.ne' Nat.card_pos.ne', Finsupp.le_def]
+  intro p
+  by_cases hp : p.Prime
+  · haveI : Fact p.Prime := ⟨hp⟩
+    have hdvd : p ^ (Nat.card Γ).factorization p ∣ Nat.card ↥K := by
+      have := Subgroup.card_dvd_of_le (h p (default : Sylow p Γ))
+      rwa [Sylow.card_eq_multiplicity] at this
+    exact (hp.pow_dvd_iff_le_factorization Nat.card_pos.ne').mp hdvd
+  · simp [Nat.factorization_eq_zero_of_non_prime _ hp]
+
+/-- **Peterfalvi (9.4), the elementary-abelian seed** (the remaining group-theoretic input).
+There is a `U W₁`-invariant normal subgroup `N₀ ◁ H = M_F` with `H/N₀` elementary abelian `p`
+on which `U` is non-central (`C_H(U) ⊔ N₀ ≠ H`, action-free form).
+
+*Proof (to be formalised):* `H = M_F` is nilpotent and `U` does not centralise it
+(`typeP_U_noncentral_on_H`).  For a prime `p` and the Sylow `p`-subgroup `P ≤ H` on which `U` acts
+non-centrally, `H/N₀ ≅ P/Φ(P)` is elementary abelian (`IsPGroup.quotient_frattini_isElementaryAbelian`)
+with `U` non-central by [BG] Thm 1.8 (`aFixed_quotient_frattini`, contrapositive). -/
+theorem exists_chiefFactor_seed [Finite G] {M : Subgroup G} (data : TypePData M) (hU : data.U ≠ ⊥) :
+    ∃ (p : ℕ) (N₀ : Subgroup ↥data.H) (_ : N₀.Normal), p.Prime ∧
+      IsAInvariant (typeP_conjAction data) N₀ ∧
+      IsElementaryAbelian p (↥data.H ⧸ N₀) ∧
+      fixedSubgroup (typeP_conjAction data) (data.U.subgroupOf (data.U ⊔ data.W1)) ⊔ N₀ ≠ ⊤ := by
+  sorry
+
 /-- **Peterfalvi (9.4)**: existence of a nontrivial elementary abelian chief
-factor `H/H_0` not centralized by `U`. -/
+factor `H/H_0` not centralized by `U`.  Assembles the elementary-abelian seed
+(`exists_chiefFactor_seed`), the chief-factor kernel (`exists_chiefFactor_kernel`,
+`|H/H₀| = p^q`, `p ∣ |W₂|`), and the `M`-normality of the kernel image
+(`typeP_aInvariantNormal_le_normalizer`) into the `ChiefFactorData`. -/
 theorem exists_chiefFactorData [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     {M : Subgroup G} (data : TypesIIIIIIVSetup M) :
     ∃ chief : ChiefFactorData data, chief.H0 < data.H := by
-  sorry
+  classical
+  have hU : data.typeP.U ≠ ⊥ := data.nontrivial.1
+  obtain ⟨p, N₀, hN₀norm, hp, hN₀inv, hpe, hUnc_seed⟩ := exists_chiefFactor_seed data.typeP hU
+  haveI := hN₀norm
+  -- Convert the action-free non-centrality `C_H(U) ⊔ N₀ ≠ H` to the quotient form `fixedByU ≠ ⊤`.
+  have hUnc : (typeP_quotientCoprimeAction data.typeP hU hN₀inv).fixedByU ≠ ⊤ := by
+    have hcopU : Nat.Coprime
+        (Nat.card ↥(data.typeP.U.subgroupOf (data.typeP.U ⊔ data.typeP.W1)))
+        (Nat.card ↥data.typeP.H) :=
+      (typeP_coprime_H_uW1 data.typeP hU).symm.coprime_dvd_left (Subgroup.card_subgroup_dvd_card _)
+    haveI : IsSolvable ↥data.typeP.H := (typeP_coprimeAction data.typeP hU).H_solvable
+    have hmap := map_fixedSubgroup_eq_fixedSubgroup_quotient (φ := typeP_conjAction data.typeP)
+      (N := N₀) (X := data.typeP.U.subgroupOf (data.typeP.U ⊔ data.typeP.W1)) hN₀inv hcopU
+      (Or.inr inferInstance)
+    rw [show (typeP_quotientCoprimeAction data.typeP hU hN₀inv).fixedByU
+        = (fixedSubgroup (typeP_conjAction data.typeP)
+            (data.typeP.U.subgroupOf (data.typeP.U ⊔ data.typeP.W1))).map
+            (QuotientGroup.mk' N₀) from hmap.symm]
+    intro htop
+    refine hUnc_seed ?_
+    have hc := congrArg (Subgroup.comap (QuotientGroup.mk' N₀)) htop
+    rwa [Subgroup.comap_map_eq, QuotientGroup.ker_mk', Subgroup.comap_top] at hc
+  -- The chief-factor kernel and its image `H₀ = N.map subtype`.
+  obtain ⟨N, hN₀leN, hNnorm, hNinv, hcardN, hpW2⟩ :=
+    exists_chiefFactor_kernel data.typeP hU hp hN₀inv hpe hUnc
+  haveI := hNnorm
+  have hqpos : Nat.card ↥data.typeP.W1 ≠ 0 := Nat.card_pos.ne'
+  have hNtop : N ≠ ⊤ := by
+    intro h
+    rw [h, show Nat.card (↥data.typeP.H ⧸ (⊤ : Subgroup ↥data.typeP.H)) = 1
+      from Subgroup.index_top] at hcardN
+    exact (Nat.one_lt_pow hqpos hp.one_lt).ne' hcardN.symm
+  have hlt : N.map data.typeP.H.subtype < data.typeP.H :=
+    lt_of_le_of_ne (Subgroup.map_subtype_le N) fun heq => hNtop <| by
+      apply Subgroup.map_injective data.typeP.H.subtype_injective
+      rw [heq, ← MonoidHom.range_eq_map, Subgroup.range_subtype]
+  refine ⟨{ H0 := N.map data.typeP.H.subtype
+            H0_lt_H := hlt
+            H0_normalized_by_M := typeP_aInvariantNormal_le_normalizer data.typeP hNinv
+            p := p
+            p_prime := hp
+            quotient_elementaryAbelian := True
+            quotient_elementaryAbelian_holds := trivial
+            quotient_chiefFactor := True
+            quotient_chiefFactor_holds := trivial
+            quotient_order := ?_
+            typeIII_IV_p_eq_W2 := ?_
+            U_noncentral_on_quotient := True
+            U_noncentral_on_quotient_holds := trivial }, hlt⟩
+  · -- `|H| = |H/N| · |N| = p^q · |H₀|`.
+    show Nat.card ↥data.typeP.H
+        = p ^ Nat.card ↥data.typeP.W1 * Nat.card ↥(N.map data.typeP.H.subtype)
+    rw [← Subgroup.index_mul_card N,
+      show N.index = p ^ Nat.card ↥data.typeP.W1 from hcardN,
+      Nat.card_congr (Subgroup.equivMapOfInjective N data.typeP.H.subtype
+        data.typeP.H.subtype_injective).toEquiv]
+  · -- `p = |W₂|` for type III/IV: `p ∣ |W₂|` and `|W₂|` is prime.
+    intro hIIIIV
+    exact ((Nat.prime_dvd_prime_iff_eq hp
+      (typeIIIorIV_W2_prime hG data.typeP data.maximal hIIIIV)).mp hpW2).symm
 
 /-! ## (9.5)--(9.7): Clifford-theory data over the selected chief factor -/
 

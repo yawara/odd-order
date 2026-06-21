@@ -890,3 +890,40 @@ hcop=act_V.coprime_order.symm) → S,W → summand-Wielandt #3 → `|S|=p^q` →
   `typeIIIorIV_W2_prime` (§8、sorried だが signature 正、cite 可)。
 - 3 つの opaque Prop fields (quotient_elementaryAbelian/quotient_chiefFactor/U_noncentral_on_quotient)
   は honest 化 (el-ab=hpe, chief=hirr, noncentral=hUntriv 由来)。
+
+### resume⁷ cont. — ✅ `exists_chiefFactor_kernel` landed (sorry-free, core consumed)
+assembly の **card-chain 本体を sorry-free 化** (commit `57df844b`)。`exists_chiefFactor_kernel` は seed を
+**仮説**に取り (sorry でなく)、Maschke核 #1 + summand-Wielandt #3 を end-to-end consume して
+`N (◁↥H, U W₁-inv, ⊇N₀)` + `|↥H⧸N|=p^q` + `p∣|W₂|` を生成。card-chain = `index_comap_of_surjective`
+(N=W逆像で |↥H⧸N|=W.index) + `IsComplement'.index_eq_card` (W.index=|S|) + `card_map_dvd`
+(p=|C_V(W₁)⊓S| ∣ |C_V(W₁)| = |W₂像| ∣ |W₂|)。helper `typeP_quotient_fixedByE_cyclic` 抽出 (再利用)。
+
+**▶ 残り 2 点のみ** (両方 exists_chiefFactorData 内):
+1. **seed** `exists_chiefFactor_seed` (上記レシピ、ungated 群論): nilpotent Sylow 分解 + Frattini 商 + BG 1.8。
+2. **最終 packaging** (kernel N → ChiefFactorData): `H0=N.map subtype`; `quotient_order` = `index_mul_card`
+   (|↥H|=|↥H⧸N|·|N|=p^q·|H0|); `H0_normalized_by_M` = **M-normality 翻訳** (M=H⊔U⊔W₁ via
+   `derivedInG_eq_fitting_sup_U`+`M_complement`; H≤N(H0) from N◁↥H; U⊔W₁≤N(H0) from N IsAInvariant —
+   `typeP_conjAction_apply` で G-共役へ翻訳、唯一 fiddly); typeIII_IV_p_eq_W2 = `p∣|W₂|`(kernel) +
+   `typeIIIorIV_W2_prime` cite; opaque Props は free。
+
+### resume⁷ cont.² — ✅✅ (9.4) `exists_chiefFactorData` 完全組み立て (seed 以外 sorry-free)
+**packaging 完了** (commit `1c57fb00`)。`exists_chiefFactorData` の sorryAx は **seed `exists_chiefFactor_seed`
+(line ~909) + §8 cite `typeIIIorIV_W2_prime` のみ**。packaging は全 sorry-free で kernel を end-to-end consume:
+- `H0=N.map subtype`, `H0<H` (`N≠⊤` ∵ `|H/N|=p^q>1`); `quotient_order |H|=p^q·|H0|` = `index_mul_card` +
+  `equivMapOfInjective` card; `typeIII_IV_p_eq_W2 p=|W₂|` = `p∣|W₂|`(kernel) + `prime_dvd_prime_iff_eq` +
+  cite; `H0_normalized_by_M` = 新 helper `typeP_aInvariantNormal_le_normalizer`。
+- opaque Props (quotient_elementaryAbelian/chiefFactor/U_noncentral) = `True` (vestigial doc flag、下流は
+  再exposeのみ; 実 chief-factor 内容は kernel 構成 + quotient_order に honest にある)。
+
+**新 sorry-free helper `typeP_aInvariantNormal_le_normalizer`**: N◁↥H + U W₁-inv ⟹ M≤N(N.map subtype)。
+M=(H⊔U)⊔W₁ (`M_complement`+`derivedInG_eq_fitting_sup_U`); H側=`le_normalizer_map`+`normalizer_eq_top_iff`;
+U W₁側=`typeP_conjAction_apply` で IsAInvariant→G-共役 (mem_normalizer_iff 両方向、coercion は `hcoe:=rfl`/
+明示 `hE` で処理)。
+
+### ▶ 残り = seed のみ (`exists_chiefFactor_seed`、ungated 群論、専用セッション ~150 行)
+goal: `∃ p N₀(◁↥H,U W₁-inv) el-ab p 商 + C_H(U)⊔N₀≠⊤` (action-free noncentral)。
+infra 特定済: **`Sylow.directProductOfNormal`** / `isNilpotent_of_finite_tfae` (nilpotent ↥H=∏Sylow, tfae
+1→4 Sylow normal / 1→5 直積 iso) + `FrattiniPGroup.IsPGroup.quotient_frattini_isElementaryAbelian`
+(P/Φ(P) el-ab) + `aFixed_quotient_frattini` (BG 1.8 対偶: U 非中心 on P ⟹ on P/Φ(P))。
+**fiddly = 直積 domain `∀ p:primeFactors, ∀ P:Sylow p G, ↥P`** の fixed-points-split (C_H(U)=∏C_{P_ℓ}(U)
+⟹ ∃ℓ 非中心) + projection-kernel (↥H ↠ P_p ↠ P_p/Φ(P_p)、N₀=kernel)。§8/(9.3) 不要 (p は post-hoc)。
