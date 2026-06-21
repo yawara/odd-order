@@ -1806,6 +1806,48 @@ theorem main_size_bounds [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
   obtain ⟨hk, hke⟩ := main_size_bounds_structural _hG hyp Mdata hne
   exact ⟨hk, hke, key_ratio_inequality_of_caseB_data Tdata Sdata⟩
 
+/-- **Arithmetic core of Peterfalvi (14.11.2)**: an integer grid of *odd* Dade-isometry
+coefficients whose squares sum to at most `e − 1`, with `e ≤ |grid| + 1`, forces `e = |grid| + 1`
+and every coefficient `= ±1`.
+
+The Dade parities (13.19.c / 7.8 / 3.7) make each pairing coefficient `a_ij = ⟨β_M^τ, η_ij⟩` an
+*odd* integer, so `a_ij² ≥ 1`; the isometry norm bound gives `∑ a_ij² ≤ e − 1`; and `e ≤ pq`
+(here `|grid| = pq − 1`, the non-principal η's, so `e ≤ |grid| + 1`).  Sandwiching
+`|grid| ≤ ∑ a_ij² ≤ e − 1 ≤ |grid|` collapses every inequality: `e = pq` and each `a_ij² = 1`,
+i.e. `a_ij = ±1`.  Stated generically over a `Fintype` (`|grid| = Fintype.card ι`); the η-grid
+specialization indexes by the non-principal characters. -/
+theorem all_pm_one_and_card_of_odd_sq_sum_le {ι : Type*} [Fintype ι]
+    (a : ι → ℤ) (e : ℕ)
+    (hodd : ∀ i, Odd (a i))
+    (hsq : ∑ i, (a i) ^ 2 ≤ (e : ℤ) - 1)
+    (he : (e : ℤ) ≤ (Fintype.card ι : ℤ) + 1) :
+    (e : ℤ) = (Fintype.card ι : ℤ) + 1 ∧ ∀ i, a i = 1 ∨ a i = -1 := by
+  -- Each `a_i² ≥ 1` (odd ⟹ nonzero).
+  have hge1 : ∀ i, (1 : ℤ) ≤ (a i) ^ 2 := by
+    intro i
+    have h0 : a i ≠ 0 := by rcases hodd i with ⟨m, hm⟩; omega
+    nlinarith [Int.one_le_abs h0, sq_abs (a i)]
+  -- `card ≤ ∑ a_i²`, so the sandwich `card ≤ ∑ a_i² ≤ e − 1 ≤ card` pins everything.
+  have hsum_ge : (Fintype.card ι : ℤ) ≤ ∑ i, (a i) ^ 2 := by
+    calc (Fintype.card ι : ℤ) = ∑ _i : ι, (1 : ℤ) := by
+          rw [Finset.sum_const, Finset.card_univ]; ring
+      _ ≤ ∑ i, (a i) ^ 2 := Finset.sum_le_sum (fun i _ => hge1 i)
+  refine ⟨by omega, ?_⟩
+  have hsum_eq : ∑ i, (a i) ^ 2 = (Fintype.card ι : ℤ) := by omega
+  -- `∑ (a_i² − 1) = 0` with each summand `≥ 0` ⟹ each `a_i² = 1` ⟹ `a_i = ±1`.
+  have heach : ∀ i, (a i) ^ 2 = 1 := by
+    have hz : ∑ i, ((a i) ^ 2 - 1) = 0 := by
+      rw [Finset.sum_sub_distrib, Finset.sum_const, Finset.card_univ, hsum_eq]; ring
+    have hnn : ∀ i ∈ (Finset.univ : Finset ι), (0 : ℤ) ≤ (a i) ^ 2 - 1 :=
+      fun i _ => by linarith [hge1 i]
+    have hall := (Finset.sum_eq_zero_iff_of_nonneg hnn).mp hz
+    intro i; have := hall i (Finset.mem_univ i); linarith
+  intro i
+  have hfac : (a i - 1) * (a i + 1) = 0 := by nlinarith [heach i]
+  rcases mul_eq_zero.mp hfac with h | h
+  · left; linarith
+  · right; linarith
+
 /-- **Peterfalvi (14.11.2)**: under `K ≠ V`, `e = p q` and `β_M^τ` is a signed sum of the
 `η_ij` grid with one unit-norm character `χ` removed:
 `β_M^τ = Σ_{0≤i<q, 0≤j<p} (±η_ij) − χ`, where `χ = ψ^{τ₁}` or `−ψ̄^{τ₁}`.
