@@ -463,7 +463,18 @@ theorem typeIIIorIV_W2_prime [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     {M : Subgroup G} (data : TypePData M) (hM : M ∈ maximalSubgroups G)
     (hIIIIV : IsTypeIII M ∨ IsTypeIV M) :
     (Nat.card ↥data.W2).Prime := by
-  sorry
+  -- (8.8)/(8.13) for `M` (`S10.exists_typeII_maximal_with_w2_of_typeP`): there is a Type-II maximal
+  -- subgroup `S` with `|S : [S,S]| = |W₂|`.  A Type-II maximal's cyclic factor `W₁(S)` has prime
+  -- order (8.6.a, carried by `TypePNontrivialCore`) and equals that index
+  -- (`card_W1_eq_derived_index`), so `|W₂|` is prime.  (Mirrors `S12.Hypothesis.w2_prime`.)
+  obtain ⟨S, -, hSII, hindex⟩ :=
+    OddOrder.Peterfalvi.S10.exists_typeII_maximal_with_w2_of_typeP hG data hM
+      (hIIIIV.elim Or.inl (fun h => Or.inr (Or.inl h)))
+  obtain ⟨dataII⟩ := hSII
+  have hcard : Nat.card ↥dataII.typeP.W1 = Nat.card ↥data.W2 := by
+    rw [dataII.typeP.card_W1_eq_derived_index]; exact hindex
+  rw [← hcard]
+  exact dataII.common.2.1
 
 /-- **Peterfalvi (9.3)**: the order and centralizer alternatives for type II
 versus types III/IV.

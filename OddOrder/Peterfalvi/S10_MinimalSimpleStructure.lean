@@ -134,6 +134,24 @@ theorem maximalSubgroup_type_dichotomy [Finite G] (hG : OddOrder.BG.IsMinimalSim
   · exact Or.inl hI
   · exact Or.inr ⟨S, T, hS, hT, hST, hSnonI, hTnonI, hII, hcov⟩
 
+/-- **Peterfalvi (8.8)/(8.13) for the given `M`**: a non-type-I (type-`P`) maximal subgroup `M`
+admits a Type-II maximal subgroup `S` whose cyclic-factor order `|S : [S,S]|` equals `|W₂|`.
+
+This is the `M`-specific case-(b) datum of Theorem (8.8): the type-`P` maximal `M` participates in
+the case-(b) configuration of (8.8), one of whose two distinguished maximal subgroups is of Type II
+and shares the cyclic-factor order `w₂ = |W₂|`.  It is the §8 obligation behind both the (9.3) order
+relations (`S11.typeIIIorIV_W2_prime`) and the (10.3) prime computation (`S12.Hypothesis.w2_prime`).
+
+Stated here in `§8` on the bare `TypePData` (rather than the §10 `Hypothesis`) so it is citable from
+`S11` (§9) as well as `S12` (§10).  Its proof is gated on the BG §16 partner-existence behind
+`Peterfalvi.S14.theorem88_caseB_holds`; recorded as a faithful obligation. -/
+theorem exists_typeII_maximal_with_w2_of_typeP [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} (data : TypePData M)
+    (hM : M ∈ maximalSubgroups G) (hType : IsTypeIII M ∨ IsTypeIV M ∨ IsTypeV M) :
+    ∃ S : Subgroup G, S ∈ maximalSubgroups G ∧ IsTypeII S ∧
+      ((derivedInG S).subgroupOf S).index = Nat.card ↥data.W2 := by
+  sorry
+
 /-! ## (8.10)--(8.13): `M_s`, support sets, and centralizer control -/
 
 /-- **Peterfalvi (8.10)**: the notation `M_s`, shared as `mainSubgroup`. -/

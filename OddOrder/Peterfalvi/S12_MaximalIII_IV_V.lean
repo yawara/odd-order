@@ -2119,7 +2119,11 @@ theorem Hypothesis.exists_typeII_maximal_with_w2 [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} (hyp : Hypothesis M) :
     ∃ S : Subgroup G, S ∈ maximalSubgroups G ∧ IsTypeII S ∧
       ((derivedInG S).subgroupOf S).index = hyp.w2 := by
-  sorry
+  -- The `M`-specific (8.8) partner now lives in §8 (`S10.exists_typeII_maximal_with_w2_of_typeP`),
+  -- stated on the bare `TypePData`; here `hyp.w2 = |W₂(hyp.typeP)|`.
+  simpa only [Hypothesis.w2, Hypothesis.W2] using
+    OddOrder.Peterfalvi.S10.exists_typeII_maximal_with_w2_of_typeP hG hyp.typeP hyp.maximal
+      hyp.type_alt
 
 /-- **Peterfalvi (10.3), first clause**: `w₂` is prime.
 
