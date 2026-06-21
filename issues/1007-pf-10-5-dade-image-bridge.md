@@ -319,3 +319,59 @@ sesquilinear 展開。⟹ `α^τ = X − nζ^τ₁` (X virtual char, ‖X‖²=2
   `sigmaNC_dade_le_two` (`:442`)。
 - landed foundation: `CoherentHypothesis` (S12, IsCoherent extension)・`Hypothesis.tau_apply_of_mem_typePV`。
 - 上位: [[ft-endgame-two-poles]] [[peterfalvi-s10-13-gated-on-bg-spine]]、issue 1004 (section16CharacterData は §10-13 待ち)。
+
+## ✅ 進捗 (2026-06-22, lane-b) — (vi) precursor「ψ vanishes on V」landed + endgame 精密スコープ
+
+(10.5) 原典証明 (04.12:43) を精読し endgame を完全 map:
+`a=0 ✅` → `α^τ = X − nζ^τ₁ (‖X‖²=2, X⊥ζ^τ₁) ✅` (`muGridAlpha_tau_X_inner`) →
+**ζ^τ₁ vanishes on V** ((5.3.b)/(5.5)/(3.2.d)) → α^τ − δ(ω^σ diff) vanishes on V (**= value-on-V leg ✅**)
+→ **ψ = X − δ(ω^σ diff) vanishes on V** → NC(ψ)≤4 + (3.8) → ψ⊥ω^σ → ψ=0 → `alpha_tau_image`。
+
+- ✅ **`Hypothesis.muGridPsi_vanishes_on_typePV`** (`0b587456`, sorry-free, build-green 3843):
+  ψ = α^τ + n·ζ^τ₁ − δ(ω^σ diff) が V で消える。value-on-V leg + ζ^τ₁-vanish (named hypothesis
+  `hζvanish`) の assembly。gate 1/2 と同じ honest-reduction パターン (proven piece を組み、genuine
+  upstream fact = ζ^τ₁-vanish を named input に隔離)。`ClassFunction.{sub,add,smul}_apply` + leg + `simp`。
+
+**▶ `alpha_tau_image` を閉じる残り = 3 piece** (いずれも別 sub-task):
+1. **ζ^τ₁ vanishes on V** (§5/§7、真の bottleneck): 原典「By (5.3.b), (5.5) and (3.2.d), ζ^τ₁ vanishes
+   on V」。coh.tau1 ζ (§7 coherence extension) を §5 V-構造に wiring。§5 lemma = `vanishOnV_of_inner_alphaCF`
+   (S05_SigmaIsometry:1144) / `sigma_apply_of_mem_V` (:1203)。multi-lemma §5/§3 chain。
+2. **(3.8) trichotomy** = `S05.sigmaCoeff_trichotomy` (S05_SigmaTrichotomy:41): 要 `FullDadeApplication
+   (G:=G) tic` (tic = `typePData_toTICyclicHypothesis`) **の構成** (issue「要構成」、§4/§5 V-supported Dade
+   isometry; hyp.dadeData は A_0(M)-support ゆえ別物) + ψ vanish on V (✅) + gap `w₁+2≤w₂` + `sigmaNC ψ < 2w₁`
+   (NC≤4 計算)。trichotomy → ψ⊥ω^σ → ψ=0。
+3. **carrier pinning**: grid-level (ψ-vanish 等) → params.alpha/omegaSigma/zeta version。`alpha_tau_image`
+   は params-level。grid-level `Hypothesis.tau_muGridPsi_eq` 定理 + 薄い params corollary が本筋 (issue 旧記載)。
+
+最難 = (2) FullDadeApplication 構成 (横断: (10.6)/(10.8) も σ-coeff machinery を要求)。
+
+## 🎯 finding (2026-06-22, lane-b) — FullDadeApplication は「要構成」でなく **ready 3行パターン** → endgame 大幅 de-risk
+
+(vi) の linchpin と見ていた **`FullDadeApplication (G:=G) tic` (tic = `typePData_toTICyclicHypothesis`) は
+既に repo の確立パターン** (S12:911-913 `omegaSigmaGrid` / 953-955 `alignedOmegaSigmaGrid` が使用):
+
+```lean
+let tic := typePData_toTICyclicHypothesis hyp.typeP hodd
+haveI : NeZero (Nat.card ↥tic.W1) := ⟨Nat.card_pos.ne'⟩
+haveI : NeZero (Nat.card ↥tic.W2) := ⟨Nat.card_pos.ne'⟩
+let app : S05.TICyclicHypothesis.FullDadeApplication tic :=
+  ⟨tic.toDadeHypothesis.fullDadeIsometryData
+    (S04.Hypothesis.HConjInvariant.of_forall_H_eq_bot _ (fun _ => rfl))⟩   -- H(a)=⊥ ゆえ trivial
+have hVeq : tic.V = tic.Vdiff := rfl
+```
+
+`tic.toDadeHypothesis` は H(a)=⊥ の pure-TI Dade hypothesis (`toDadeHypothesis_H`) ゆえ HConjInvariant は
+`of_forall_H_eq_bot` で trivial、`Hypothesis.fullDadeIsometryData` (S04:4315) が即適用。**∴「要構成」は誤り。**
+
+⟹ **(3.2.d) と (3.8) が両方解禁**:
+- **(3.2.d)** = `S05.exists_sigma` (S05:1275) の第6 conjunct: `χ ⊥ σ(Irr W) → χ vanishes on V`。app 供給で利用可。
+- **(3.8)** = `S05.sigmaCoeff_trichotomy` (S05_SigmaTrichotomy:41): app + ψ vanish on V (✅) + gap + NC<2w₁ で trichotomy。
+
+**▶ (10.5) の真の残りクラックス (FullDadeApplication 解禁後、precise)**:
+1. **`coh.tau1 ζ ⊥ σ-image`** (= ζ^τ₁-vanish の残り、(3.2.d) 適用後): `∀ ω : Irr(tic.W), (coh.tau1 ζ, σ ω) = 0`。
+   §5↔§7 orthogonality (coherence extension ⊥ σ image)。これが ζ^τ₁-vanish の genuine math。原典 (5.3.b)/(5.5)。
+2. **NC(ψ)≤4 計算** ((3.8) の入力): ψ の σ-coeff が ≤4 個非零 (= `sigmaNC ψ < 2w₁`, w₁≥3 で 2w₁≥6>4)。
+3. **(3.8) assembly + ψ=0** → X = δ(ω^σ diff) → `alpha_tau_image` (grid-level)。
+4. **carrier pinning** (grid → params)。
+
+最大の未解決 = (1) σ-orthogonality (§5↔§7)。FullDadeApplication が ready ゆえ (2)(3) は計算/assembly 主体。
