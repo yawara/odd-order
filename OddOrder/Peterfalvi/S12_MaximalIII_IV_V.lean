@@ -1447,14 +1447,32 @@ structure CharacterParameters {M : Subgroup G} (hyp : Hypothesis M) where
   typeV_coherence_formula : Prop
 
 /-- **Peterfalvi (10.4)**: the coherent-extension hypothesis for the family of
-characters in (10.1). -/
+characters in (10.1).
+
+De-opaqued: instead of an unconstrained `tau1` field plus an opaque `tau1_extends_tau_on_S : Prop`,
+this carries the *genuine* coherence datum `IsCoherent hyp.tau hyp.Sset hyp.A0` (Peterfalvi (5.1)).
+Its bundled `extension` is Peterfalvi's `τ₁`, exposed as `CoherentHypothesis.tau1`: a lattice
+isometry on `ℤ[S]` (`coherent.extension_inner_eq`) extending `τ` on the supported lattice
+`ℤ[S, A₀]` (`coherent.extends_on_supported`).  This is exactly the content of (10.4.b) ("`S` is
+coherent and `τ₁` is an extension of `τ` to `ℤ[S]`"), no longer a free map + placeholder `Prop`. -/
 structure CoherentHypothesis {M : Subgroup G} [Fintype G] [Fintype ↥M]
     [Invertible (Nat.card ↥M : ℂ)] [Invertible (Nat.card G : ℂ)]
     (hyp : Hypothesis M) (params : CharacterParameters hyp) where
-  coherent_S : Nonempty (OddOrder.Peterfalvi.S07.IsCoherent hyp.tau hyp.Sset hyp.A0)
-  tau1 : OddOrder.Peterfalvi.S07.IntegralCharacterMap ↥M G
-  tau1_extends_tau_on_S : Prop
-  tau1_extends_tau_on_S_holds : tau1_extends_tau_on_S
+  /-- (10.4.b): the family `S` is coherent; the bundled `extension` is Peterfalvi's `τ₁`. -/
+  coherent : OddOrder.Peterfalvi.S07.IsCoherent hyp.tau hyp.Sset hyp.A0
+
+namespace CoherentHypothesis
+
+/-- **Peterfalvi's `τ₁`** (10.4.b): the coherent extension of the Dade isometry `τ` to `ℤ[S]`,
+projected out of the bundled `IsCoherent` datum.  It is a lattice isometry on `ℤ[S]` and agrees
+with `τ` on the supported lattice `ℤ[S, A₀(M)]`. -/
+noncomputable def tau1 {M : Subgroup G} [Fintype G] [Fintype ↥M]
+    [Invertible (Nat.card ↥M : ℂ)] [Invertible (Nat.card G : ℂ)]
+    {hyp : Hypothesis M} {params : CharacterParameters hyp}
+    (coh : CoherentHypothesis hyp params) : OddOrder.Peterfalvi.S07.IntegralCharacterMap ↥M G :=
+  coh.coherent.extension
+
+end CoherentHypothesis
 
 /-- **Peterfalvi (8.8) for `M`, used at the start of (10.3)**: there is a maximal subgroup `S` of `G`
 of **Type II** such that `|S : [S,S]| = w₂`.
@@ -1685,6 +1703,27 @@ theorem alpha_support [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : S
     {hyp : Hypothesis M} (params : CharacterParameters hyp) :
     ∀ (i : Fin hyp.w1) (j : Fin hyp.w2), j ≠ 0 → (params.alpha i j).support ⊆ hyp.A0 :=
   params.alpha_support
+
+open scoped FiniteInduce in
+/-- **§10 Dade value on `V`** (Peterfalvi's "by definition of `τ`").  For a class function `φ` on
+`M` supported on `A_0(M)`, the Dade image `φ^τ = hyp.tau φ` *restores* `φ`'s value at any
+`v ∈ V = typePV M`: `(φ^τ)(v) = φ(v)`.
+
+Since `V = typePV ⊆ conjClassSet (typePV) ⊆ A_0(M)` (`subset_conjClassSet`), this is exactly the
+value-on-support property `dadeIntegralCharacterMap_apply_mem` of the genuine §10 Dade isometry
+`hyp.tau`.  It is the reusable "agrees/vanishes on `V` by definition of `τ`" step underlying the
+Dade-image half of (10.5) (`α_{ij}^τ − δ(ω_{ij}^σ − ω_{i0}^σ)` vanishes on `V`), and the (10.6.b) /
+(10.9) value computations. -/
+theorem Hypothesis.tau_apply_of_mem_typePV [Finite G] {M : Subgroup G} (hyp : Hypothesis M)
+    {φ : ClassFunction ↥M ℂ} (hφ : φ.support ⊆ hyp.A0)
+    {v : G} (hv : v ∈ typePV M hyp.typeP) (hvM : v ∈ M) :
+    hyp.tau φ v = φ ⟨v, hvM⟩ := by
+  haveI := hyp.finiteG
+  have hvA0 : v ∈ typePA0 M hyp.typeP := by
+    rw [typePA0]
+    exact Set.mem_union_right _ (OddOrder.GroupTheory.subset_conjClassSet hv)
+  exact OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap_apply_mem hyp.dadeData.dade
+    (hyp.dadeData.dade.fullDadeIsometryData hyp.hconj) hφ hvA0
 
 /-- **Peterfalvi (10.5), Dade-image half**: under the coherent extension, `α_{ij}` has the stated
 Dade image `δ·(ω_{ij}^σ − ω_{i0}^σ) − n·ζ^{τ₁}`.  (The support half is `alpha_support`.) -/

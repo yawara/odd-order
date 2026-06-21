@@ -5,6 +5,46 @@
 > 上位文脈 = 記憶 [[ft-endgame-two-poles]] [[peterfalvi-s10-13-gated-on-bg-spine]]、
 > Lane H 視点の正本 = [`s10_13_maximal_structure.md`](s10_13_maximal_structure.md)。
 
+## ★★★ 2026-06-21 更新⁴ — (10.5) Dade-image foundation (carrier de-opaque + τ-value cornerstone)
+
+**「(10.5) Dade-image」着手。最重要 finding: `alpha_tau_image` は現状の statement では数学的に証明不能 (scaffold sorry)** —
+`{params : CharacterParameters}`・`{coh : CoherentHypothesis}` を**任意**に取り、`params.omegaSigma`/`params.mu` は
+free field・旧 `coh.tau1` も free + `tau1_extends_tau_on_S` は opaque `Prop` ゆえ、結論
+`τ(α_ij) = δ(ω_ij^σ−ω_i0^σ) − n·τ₁ζ` は arbitrary な omegaSigma/τ₁ に対し成立しない。**閉じるには carrier 材料化が必須**
+(headline sorry を opaque field に hoist して消すのは禁止 [[scaffold-sorry-free-not-done]])。今回はその honest foundation を 2 つ landing:
+
+- **① `CoherentHypothesis` de-opaque (10.4.b)**: 旧 `coherent_S : Nonempty(IsCoherent…)` (Prop、extension 取り出し不能)
+  ＋ free `tau1` ＋ opaque `tau1_extends_tau_on_S` を **genuine `coherent : S07.IsCoherent hyp.tau hyp.Sset hyp.A0`**
+  1 field に置換。`CoherentHypothesis.tau1 := coh.coherent.extension` (def) で Peterfalvi の τ₁ を materialize ⟹
+  τ₁ が **本物の lattice isometry** (`coherent.extension_inner_eq`) ＋ **τ の supported-lattice 拡張**
+  (`coherent.extends_on_supported`/`extension_agrees`) を carry。producer 無し (純 hypothesis = 「(10.4) を仮定」) ゆえ安全。
+  consumer (`alpha_tau_image`/`tau1_values_and_norm_bound`/`typeII_derived_frobenius`) は `coh.tau1` のまま透過。
+- **② `Hypothesis.tau_apply_of_mem_typePV` (τ-value cornerstone, axiom-clean)**: φ supported on A₀(M) なら
+  `v∈V=typePV` で `(φ^τ)(v) = φ(v)`。`typePV ⊆ conjClassSet(typePV) ⊆ typePA0` (`subset_conjClassSet`) ＋
+  `S07.dadeIntegralCharacterMap_apply_mem` の直適用。**`#print axioms` = [propext, Classical.choice, Quot.sound]
+  (sorryAx 無・Prop16.1 gate 無 — 周辺 muGrid 系より clean)**。これは原文「by definition of τ, X vanishes on V」の
+  **再利用 step** で (10.5) Dade-image・(10.6.b)・(10.9) が共有。⚠ 要 `open scoped FiniteInduce in` (hyp.tau と同じ
+  scoped Fintype/Invertible instance を使う; 明示 `[Fintype G]` を足すと instance defeq mismatch する罠)。
+
+**▶ (10.5) Dade-image を閉じるための残 gate (real 進捗順、この foundation の上に積む)**:
+1. **carrier pinning**: `CharacterParameters.omegaSigma`/`mu` を `omegaSigmaGrid`/`muGrid` に identity field で pin
+   (producer は既に `:= …Grid` ゆえ `rfl` discharge、S13 projection 非破壊の additive 変更)。⟹ statement を faithful 化。
+2. **bridge 本体 = §10 σ↔τ on V**: `α_ij^τ − δ(ω_ij^σ − ω_i0^σ)` が V で消える。3 部品:
+   (a) **M-side** `muGrid(v) = δ·ω_ij(v)` on V = (4.3.c) `certainType_apply_eq_of_mem_V` (§6 `Hypothesis L`、V=W∖W₂⊇typePV)。
+   (b) **σ-side** `omegaSigmaGrid(v) = ω_ij(v)` on V = (3.2.c) `sigma_apply_of_mem_V` (§5)。
+   (c) **τ-side** = cornerstone ② (✅landed)。
+   ⚠⚠ **真の linchpin = §6 chiColumn ω (in 4.3.c) ↔ §5 omegaGrid ω (in omegaSigmaGrid) の reconcile**: 両者は
+   `TypePData` から**別 bridge** (`toCertainTypeHypothesis` vs `typePData_toTICyclicHypothesis`) で構成され、
+   現状 citeable な等式が無い = **deep gate** (multi-session)。
+3. **norm/numeric `a=0`**: τ isometry (`coherent.extension_inner_eq` ＋ `inner_eq_on_supported`) ＋ τ₁ 拡張で
+   `(α_ij^τ, ζ^τ₁)=−n` ＋ Cauchy-Schwarz ＋ (n even,>0,<2 矛盾)。要 μ-grid orthonormality (genuine μ 構造)。
+4. **(3.8) trichotomy at §10**: 機構は §5 W-level に既在 (`sigmaCoeff_trichotomy`/`grid_no_constant_column`/`sigmaNC`)、
+   §10 carrier への配線要。
+- **§6 は (4.8) の完全 template を持つ** (`certainType_diff_dade_eq` = `(μ_ij−μ_ik)^τ=δ(ω_ij^σ−ω_ik^σ)`, sorry-free)
+  が **support が W∖W₂** ゆえ §10 (typePV) には**直 cite 不可** (W₁# の扱いが違う; (10.5) は −nζ で W₁# を消して typePV に落とす)。
+  → §10 は parallel な re-derivation。但し部品 (4.3.c/3.2.c/3.8/NC) は §5/§6 と共有。
+- **issue = [1007](../../issues/1007-pf-10-5-dade-image-bridge.md)** (σ↔τ bridge + reconcile linchpin)。
+
 ## ★★★ 2026-06-21 更新³ — (10.5) support half 完成 (dade0-free, 自前 sorry 0)
 
 **Peterfalvi (10.5) の support 半分 `Supp(α_{ij}) ⊆ A_0(M)` を dade0-free で完全形式化** (S12, build-green
