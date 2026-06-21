@@ -73,9 +73,21 @@ deepest pole。`|C_H(UE)|^|E| · |H| = |C_H(E)|^|E| · |C_H(U)|` (Frobenius L=U�
       した述語) から群公式を `Nat.card H` 強帰納で。A→N 取得、`H/N` に IH、`wielandt_step` で combine。
       型可変 recursion は `theorem ….{u}` + `WielandtPerFactor.{_,u}` + `∀ (H:Type u)` で H 宇宙統一。
       ⟹ **群論層 (toolkit+A+step+assembly) 完全 axiom-clean**; 残りは表現論的 (†) のみ。
-- [ ] **C per-factor discharge**: universal per-factor を `card_fixedSubgroup_restrict` +
-      `card_fixedSubgroup_wielandt_of_dim` (el-ab N の hN.restrict 作用) で。(†) dim 恒等式 gate。
-- [ ] **D (†) module wiring** (lane-f coupled rep-theory)。
+- [x] **C per-factor discharge** = **DONE** (2026-06-21, `WielandtPerFactorDischarge.lean`, commit
+      `7423193a`, sorry-free + axiom-clean, AxiomsCheck 登録, full build 3876 green, 実 sorry 137 不変):
+      `WielandtDimIdentity` (抽象 (⋆), module を instance binder にして `↥Submodule` coercion を救う) +
+      `PerFactorDimIdentity` (V=↥N 特殊化, = piece D の証明対象) + `wielandtPerFactor_of_dim`
+      (`card_fixedSubgroup_wielandt_of_dim` で dim→card on ↥N + `card_fixedSubgroup_restrict`×3 で
+      `|C_N(X)|=|C_H(X)⊓N|` ⟹ `WielandtPerFactor`)。`WielandtPerFactor` に `p.Prime` を追加 (bridge が
+      `[Fact p.Prime]` 要、el-ab 述語から復元不可)、piece B が `exists_aInvariant_normal_…` から thread。
+      **⚠ instance 知見 (D も踏む)**: `↥N` の `Additive` ダイヤモンドで `↥Submodule` coercion 破綻 →
+      (1) CommGroup を canonical `Group ↥N` 上に直構築 (MulAut が `hN.restrict` と一致, PRank zmodModule は不可)、
+      (2) dim 恒等式を **module-binder の別 def** で書く (coercion を binder に一度解決→`↥N` 代入で生存;
+      `letI`-module 直書きは破綻)。詳細 = design notes「resume³」。
+- [ ] **D (†) module wiring** (lane-f coupled rep-theory): `PerFactorDimIdentity φ hN p hpe` を per chief
+      factor で証明。`finrank_elab_identity` (要 `hUE:U⊔E=⊤` + `htag` (†)) を `elabRepresentation p hN.restrict`
+      に適用 + done engine 群で `htag` discharge。上記 instance 知見を流用。`Invertible(card U:ZMod p)` =
+      coprimality + p 素数。
 - [ ] **E relocation** → `wielandt_fixedPoint_frobenius` を downstream leaf へ (CoprimeAction は
       `WielandtElabBridge`/`CoprimeFixedPoints` を循環で import 不可)。
 - [ ] 下流 (別 issue 可): (9.3) `typeII_III_IV_order_relations` → (9.6) → (10.11)/(11.7) → (13.2.b)
