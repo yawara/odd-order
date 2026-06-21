@@ -7795,9 +7795,11 @@ be *some* cyclic nontrivial subgroup of `M_F` (the Lean surface does not pin `X 
 BG does — a scaffold weakening), so it is supplied by an order-`q` element of `M_σ ≠ 1`; the prime
 `p ∈ σ(M) ∖ β(M)` comes from that same `q` via the rank-core disjointness
 (`piSet_mf_inf_beta_disjoint_of_not_fittingIsTI`), and the final disjunct follows from (a).  The
-**single remaining residual** is therefore the structural identity `M' = F(M)`
-(`derivedInG M = fittingInAmbient M`), BG conjunct (c) — obtained in BG from `E₃ = 1`
-(Corollary 12.6(d) + Lemma 12.19), Corollary 15.5, and Lemma 12.1. -/
+structural identity `M' = F(M)` (`derivedInG M = fittingInAmbient M`, BG conjunct (c)) is proved
+for the **type-`P₁`** case here (`U = ⊥` ⟹ `M' = M_σ` by Lemma 15.1(b); `M_σ = M_F` nilpotent
+⟹ `M_σ ≤ F(M)`; `F(M) ≤ M'` by Corollary 15.5(d) as `M ∉ M_F`).  The **single remaining residual**
+is the **type-`F`** case of `M' = F(M)`, where Corollary 15.5(d) does not apply and BG instead uses
+the `E₃ = 1` argument (Corollary 12.6(d) + Lemma 12.19, Corollary 15.5, Lemma 12.1). -/
 theorem fitting_not_ti_cases [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     {M : Subgroup G} (hM : M ∈ maximalSubgroups G) (hnotTI : ¬ FittingIsTI M) :
     (S14.IsTypeF M ∨ S14.IsTypeP1 M) ∧ MF M = OddOrder.BG.Ch3.S10.Msigma M ∧
@@ -7846,9 +7848,59 @@ theorem fitting_not_ti_cases [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     exact fun h => hwne (Subgroup.mem_bot.mp (h ▸ Subgroup.mem_zpowers (w : G)))
   · -- `IsCyclic X`
     infer_instance
-  · -- `M' = F(M)`: the single deep structural residual (BG (c) = Corollary 15.5 + Lemma 12.1, via
-    -- the `E₃ = 1` argument from Corollary 12.6(d) + Lemma 12.19).
-    sorry
+  · -- `M' = F(M)` (BG conjunct (c)).  Case-split on (a).
+    rcases ha with hF | hP1
+    · -- type-`F`: the deep `E₃ = 1` argument (Cor 12.6(d) + Lem 12.19, Cor 15.5, Lem 12.1).  Residual.
+      sorry
+    · -- type-`P₁`: `U = ⊥` gives `M' = M_σ` (Lemma 15.1(b)); `M_σ = M_F` is nilpotent so `M_σ ≤ F(M)`,
+      -- while `F(M) ≤ M'` (Cor 15.5(d), as `M ∉ M_F`).  Hence `M' = F(M) = M_σ`.
+      have hP : S14.IsTypeP M := hP1.1
+      haveI : IsSolvable ↥M := hG.solvable_of_mem_maximalSubgroups hM
+      obtain ⟨K', hK'⟩ := Ch03.hall_E_exists (G := ↥M) (S14.kappa M)
+      set K : Subgroup G := K'.map M.subtype with hKdef
+      have hKM : K ≤ M := hKdef ▸ Subgroup.map_subtype_le K'
+      have hKeq : K.subgroupOf M = K' :=
+        hKdef ▸ Subgroup.comap_map_eq_self_of_injective M.subtype_injective K'
+      have hK : Ch03.IsHallSubgroup (S14.kappa M) (K.subgroupOf M) := hKeq ▸ hK'
+      have hKne : K ≠ ⊥ := fun h =>
+        card_kappaHall_ne_one hP hKM hK (by rw [h, Subgroup.card_bot])
+      obtain ⟨U', hU'⟩ :=
+        Ch03.hall_E_exists (G := ↥M) ((S14.kappa M ∪ OddOrder.BG.Ch3.S10.sigma M)ᶜ)
+      set U : Subgroup G := U'.map M.subtype with hUdef
+      have hUM : U ≤ M := hUdef ▸ Subgroup.map_subtype_le U'
+      have hUeq : U.subgroupOf M = U' :=
+        hUdef ▸ Subgroup.comap_map_eq_self_of_injective M.subtype_injective U'
+      have hU : Ch03.IsHallSubgroup ((S14.kappa M ∪ OddOrder.BG.Ch3.S10.sigma M)ᶜ)
+          (U.subgroupOf M) := hUeq ▸ hU'
+      -- `U = ⊥` from type-`P₁` (`κ(M) = σ'(M)`): no prime of `(κ∪σ)ᶜ` divides `|M|`.
+      have hUbot : U = ⊥ := by
+        have hUsub : U.subgroupOf M = ⊥ := by
+          rw [← Subgroup.card_eq_one]
+          by_contra hne
+          obtain ⟨p, hpp, hpdvd⟩ := Nat.exists_prime_and_dvd hne
+          have hpcompl : p ∈ (S14.kappa M ∪ OddOrder.BG.Ch3.S10.sigma M)ᶜ :=
+            hU.1 p (Nat.mem_primeFactors.mpr ⟨hpp, hpdvd, Nat.card_pos.ne'⟩)
+          have hpM : p ∈ S14.piSet M :=
+            Nat.mem_primeFactors.mpr ⟨hpp,
+              hpdvd.trans (Subgroup.card_subgroup_dvd_card (U.subgroupOf M)), Nat.card_pos.ne'⟩
+          refine hpcompl ?_
+          by_cases hpσ : p ∈ OddOrder.BG.Ch3.S10.sigma M
+          · exact Set.mem_union_right _ hpσ
+          · exact Set.mem_union_left _ (by rw [hP1.2]; exact ⟨hpM, hpσ⟩)
+        exact (Subgroup.subgroupOf_eq_bot.mp hUsub).eq_bot_of_le hUM
+      -- `M' = U ⊔ M_σ = M_σ` (Lemma 15.1(b) with `U = ⊥`).
+      have hM'eq : derivedInG M = OddOrder.BG.Ch3.S10.Msigma M := by
+        rw [(typeP_hall_derived_eq_and_abelian hG hM hKM hUM hKne hK hU).1, hUbot, bot_sup_eq]
+      -- `F(M) ≤ M' = M_σ` (Cor 15.5(d), `M ∉ M_F`).
+      have hnF : ¬ S14.IsTypeF M := fun hFc => (S14.isTypeF_iff_not_isTypeP.mp hFc) hP
+      obtain ⟨_Y, _, _, _, _, _, _, _, _, _, hd, _⟩ := fitting_decomposition hG hM
+      have hFleMσ : fittingInAmbient M ≤ OddOrder.BG.Ch3.S10.Msigma M := hM'eq ▸ hd hnF
+      -- `M_σ = M_F ≤ F(M)` (`M_F` nilpotent normal).
+      haveI : Group.IsNilpotent ↥(MF M) := maxNilpotentNormalHall_isNilpotent M
+      have hMσleF : OddOrder.BG.Ch3.S10.Msigma M ≤ fittingInAmbient M :=
+        hMFeq ▸ le_fittingInAmbient_of_subgroupOf_normal_of_isNilpotent
+          (maxNilpotentNormalHall_le M) (maxNilpotentNormalHall_subgroupOf_normal M)
+      rw [hM'eq]; exact (le_antisymm hFleMσ hMσleF).symm
   · -- final disjunct: from (a).
     by_cases h : IsMulCommutative ↥(MF M)
     · exact Or.inl h
