@@ -110,15 +110,16 @@ and `card_fixedSubgroup_restrict` rewrites `|C_N(X)| = |C_H(X) ⊓ N|`.  Feeding
 theorem wielandtPerFactor_of_dim.{u} [Fintype E]
     (hdim : ∀ (H : Type u) [Group H] [Finite H] (φ : L →* MulAut H) (N : Subgroup H) [N.Normal]
       (hN : IsAInvariant φ N) (p : ℕ) (_hp : p.Prime) (hpe : IsElementaryAbelian p ↥N),
+      Nat.Coprime (Nat.card L) (Nat.card H) →
       PerFactorDimIdentity (U := U) (E := E) φ hN p hpe) :
     WielandtPerFactor.{_, u} L U E := by
-  intro H _ _ φ N _ hN_inv helab
+  intro H _ _ φ N _ hcop hN_inv helab
   obtain ⟨p, hp, hpe⟩ := helab
   haveI : Fact p.Prime := ⟨hp⟩
   letI : CommGroup ↥N := hpe.subgroupCommGroup
   letI : Module (ZMod p) (Additive ↥N) := hpe.subgroupZmodModule
   -- The per-factor dimension identity, unfolded to the abstract `WielandtDimIdentity` form.
-  have hd : WielandtDimIdentity (V := ↥N) p hN_inv.restrict U E := hdim H φ N hN_inv p hp hpe
+  have hd : WielandtDimIdentity (V := ↥N) p hN_inv.restrict U E := hdim H φ N hN_inv p hp hpe hcop
   -- The cardinality identity on the elementary-abelian chief factor `↥N` (restricted action).
   have key := card_fixedSubgroup_wielandt_of_dim (V := ↥N) (U := U) (E := E) p hN_inv.restrict hd
   -- Rewrite the restricted fixed-point counts `|C_N(X)|` as the ambient `|C_H(X) ⊓ N|`.

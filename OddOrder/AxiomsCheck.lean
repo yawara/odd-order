@@ -11,6 +11,8 @@ import OddOrder.GroupTheory.MinimalInvariantNormal
 import OddOrder.GroupTheory.WielandtAssembly
 import OddOrder.GroupTheory.WielandtPerFactorDischarge
 import OddOrder.GroupTheory.RepresentationTheory.WielandtKernelFPF
+import OddOrder.GroupTheory.RepresentationTheory.WielandtElabFrobenius
+import OddOrder.GroupTheory.WielandtFixedPoint
 import OddOrder.GroupTheory.PiElementDecomposition
 import OddOrder.GroupTheory.RepresentationTheory.CharacterCount
 import OddOrder.GroupTheory.RepresentationTheory.CharacterCompleteness
@@ -5466,3 +5468,17 @@ free-orbit count applies.  This is the representation-theoretic core (†) of Wi
 #assert_only_allowed_axioms OddOrder.GroupTheory.WielandtKernelFPF.isInternal_restrict_ne
 #assert_only_allowed_axioms
   OddOrder.GroupTheory.WielandtKernelFPF.finrank_eq_card_mul_finrank_invariants_kernelFPF
+
+/-! **(9.1) the kernel-FPF identity (†) over `𝔽_p`, via base change** (`WielandtElabFrobenius`,
+item 3 + assembly).  Base change `𝔽_p → 𝔽̄_p` transfers the algebraically-closed (†)
+(`finrank_eq_card_mul_finrank_invariants_kernelFPF`) to the prime field
+(`htag_of_frobenius`), discharging the `htag` of `finrank_elab_identity` and yielding the
+per-chief-factor dimension identity (⋆) `wielandtDimIdentity_of_frobenius`.  **This closes the lone
+representation-theoretic input of Wielandt's formula `wielandt_fixedPoint_frobenius`, which is now
+fully unconditional (axiom-clean).**  Likewise its corollaries and the (13.17.b) engine. -/
+
+#assert_only_allowed_axioms OddOrder.GroupTheory.WielandtKernelFPF.htag_of_frobenius
+#assert_only_allowed_axioms OddOrder.GroupTheory.WielandtKernelFPF.wielandtDimIdentity_of_frobenius
+#assert_only_allowed_axioms OddOrder.GroupTheory.wielandt_fixedPoint_frobenius
+#assert_only_allowed_axioms OddOrder.GroupTheory.coprimeFrobeniusAction_card_eq_one
+#assert_only_allowed_axioms OddOrder.GroupTheory.isFrobenius_kernel_eq_bot_of_frobenius_subgroup

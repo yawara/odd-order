@@ -49,6 +49,7 @@ from `IsElementaryAbelian p ↥N` alone (e.g. `IsElementaryAbelian 6 (ZMod 2)` h
 explicitly. -/
 def WielandtPerFactor (L : Type*) [Group L] (U E : Subgroup L) : Prop :=
   ∀ (H : Type*) [Group H] [Finite H] (φ : L →* MulAut H) (N : Subgroup H) [N.Normal],
+    Nat.Coprime (Nat.card L) (Nat.card H) →
     IsAInvariant φ N → (∃ p : ℕ, p.Prime ∧ IsElementaryAbelian p ↥N) →
     Nat.card ↥(fixedSubgroup φ ⊤ ⊓ N) ^ Nat.card ↥E * Nat.card ↥N =
       Nat.card ↥(fixedSubgroup φ E ⊓ N) ^ Nat.card ↥E * Nat.card ↥(fixedSubgroup φ U ⊓ N)
@@ -97,8 +98,8 @@ theorem wielandt_formula_of_perfactor.{u} {L : Type*} [Group L] [Finite L] {U E 
         rw [← hcard]; exact Subgroup.card_quotient_lt_of_ne_bot hN_ne
       -- Induction hypothesis on the quotient.
       have hIH := ih (Nat.card (H ⧸ N)) hlt (H ⧸ N) (quotMulAut hN_inv) hcopN rfl
-      -- Per-factor identity on the elementary-abelian `N`.
-      have hfac := hpf H φ N hN_inv ⟨p, hp, hN_elab⟩
+      -- Per-factor identity on the elementary-abelian `N` (coprimality `|L| ⟂ |H|` available).
+      have hfac := hpf H φ N hcop hN_inv ⟨p, hp, hN_elab⟩
       exact wielandt_step hN_inv hcop hfac hIH
 
 end OddOrder.GroupTheory

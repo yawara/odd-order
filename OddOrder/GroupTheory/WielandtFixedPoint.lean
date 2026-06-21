@@ -5,6 +5,7 @@ Authors: Yawara Ishida
 -/
 import OddOrder.GroupTheory.CoprimeAction
 import OddOrder.GroupTheory.WielandtPerFactorDischarge
+import OddOrder.GroupTheory.RepresentationTheory.WielandtElabFrobenius
 
 /-!
 # Peterfalvi (9.1): Wielandt's fixed-point formula (assembled) and the (13.17.b) engine
@@ -19,11 +20,11 @@ upstream in `OddOrder.GroupTheory.CoprimeAction` (reused by the BG and Isaacs la
 (`wielandt_formula_of_perfactor` ∘ `wielandtPerFactor_of_dim`), which `CoprimeAction` cannot import
 without a cycle.
 
-`wielandt_fixedPoint_frobenius` is reduced — via the group-theoretic chief-series assembly (pieces
-A/B/C, all axiom-clean) — to the single per-chief-factor **dimension identity** (⋆)
-`PerFactorDimIdentity` on each elementary-abelian chief factor.  That dimension identity is the sole
-remaining representation-theoretic input (the kernel-FPF fact (†), to be discharged by the modular
-Brauer / free-orbit machinery of lane-f); it is the lone `sorry` below.
+`wielandt_fixedPoint_frobenius` is **fully unconditional** (sorry-free, axiom-clean): the
+group-theoretic chief-series assembly (pieces A/B/C) reduces it to the per-chief-factor **dimension
+identity** (⋆) `PerFactorDimIdentity` on each elementary-abelian chief factor, and that identity is
+discharged by the kernel-FPF fact (†) over `𝔽̄_p` (`WielandtKernelFPF.wielandtDimIdentity_of_frobenius`,
+the modular Brauer / free-orbit count plus base change `𝔽_p → 𝔽̄_p`).
 
 `notes/peterfalvi/s11_wielandt_91_design.md` (assembly piece E), issue 2014.
 -/
@@ -43,9 +44,9 @@ to `|L|`,
 Proved by the **chief-series assembly** (`wielandt_formula_of_perfactor`): the group-level identity
 follows by strong induction on `|H|` from the per-chief-factor identity `WielandtPerFactor`, which
 in turn (`wielandtPerFactor_of_dim`) follows from the per-factor **dimension identity** (⋆)
-`PerFactorDimIdentity` on each elementary-abelian chief factor.  The whole group-theoretic reduction
-(pieces A/B/C) is axiom-clean; the sole remaining input is that dimension identity — the kernel-FPF
-fact (†) (modular Brauer / free-orbit count, lane-f), which is the `sorry` `hdim` below. -/
+`PerFactorDimIdentity` on each elementary-abelian chief factor.  That dimension identity is supplied
+by `WielandtKernelFPF.wielandtDimIdentity_of_frobenius` (the kernel-FPF fact (†) over `𝔽̄_p` plus base
+change), so the whole proof is unconditional (axiom-clean). -/
 theorem wielandt_fixedPoint_frobenius {L H : Type*} [Group L] [Group H]
     [Finite L] [Finite H] (act : CoprimeFrobeniusAction L H) :
     Nat.card ↥act.fixedByUE ^ Nat.card ↥act.E * Nat.card H =
@@ -56,9 +57,58 @@ theorem wielandt_fixedPoint_frobenius {L H : Type*} [Group L] [Group H]
   -- remaining representation-theoretic input (the kernel-FPF fact (†), lane-f rep-theory: piece D).
   have hdim : ∀ (H' : Type _) [Group H'] [Finite H'] (φ' : L →* MulAut H') (N' : Subgroup H')
       [N'.Normal] (hN' : IsAInvariant φ' N') (p' : ℕ) (_hp' : p'.Prime)
-      (hpe' : IsElementaryAbelian p' ↥N'),
+      (hpe' : IsElementaryAbelian p' ↥N') (hcop' : Nat.Coprime (Nat.card L) (Nat.card H')),
       PerFactorDimIdentity (U := act.U) (E := act.E) φ' hN' p' hpe' := by
-    sorry
+    intro H' _ _ φ' N' _ hN' p' hp' hpe' hcop'
+    haveI : Fact p'.Prime := ⟨hp'⟩
+    haveI hUnorm : act.U.Normal := act.frobenius.isNormal
+    haveI : Fintype ↥act.U := Fintype.ofFinite _
+    -- The Frobenius data of `act` feeding (†).
+    have hsup : act.U ⊔ act.E = ⊤ := act.frobenius.isComplement.sup_eq_top
+    have hcopUE : Nat.Coprime (Nat.card ↥act.E) (Nat.card ↥act.U) :=
+      (act.frobenius.coprime_card_kernel_complement).symm
+    have hEnt : 1 < Nat.card ↥act.E := by
+      haveI : Nontrivial ↥act.E :=
+        act.E.nontrivial_iff_ne_bot.mpr act.frobenius.ne_bot_complement
+      exact Finite.one_lt_card_iff_nontrivial.mpr inferInstance
+    have hfpf : ∀ e ∈ act.E, e ≠ 1 → ∀ u ∈ act.U, e * u * e⁻¹ = u → u = 1 := by
+      intro e he hne u hu heq
+      by_contra hune
+      exact act.frobenius.conj_frobenius e he hne u hu hune heq
+    -- The canonical `𝔽_{p'}`-module structure on the chief factor `↥N'`.
+    letI : CommGroup ↥N' := hpe'.subgroupCommGroup
+    letI : Module (ZMod p') (Additive ↥N') := hpe'.subgroupZmodModule
+    show WielandtDimIdentity (V := ↥N') p' hN'.restrict act.U act.E
+    by_cases hN1 : Nat.card ↥N' = 1
+    · -- Trivial chief factor: the module is `0`-dimensional, both sides vanish.
+      haveI : Subsingleton ↥N' := (Nat.card_eq_one_iff_unique.mp hN1).1
+      haveI : Subsingleton (Additive ↥N') := inferInstanceAs (Subsingleton ↥N')
+      simp only [WielandtDimIdentity, Module.finrank_zero_of_subsingleton, mul_zero, add_zero]
+    · -- Nontrivial chief factor: `p' ∤ |U|, |E|` (coprimality), so (†) over `𝔽_p` applies.
+      haveI : Nontrivial ↥N' := by
+        rw [← Finite.one_lt_card_iff_nontrivial]
+        have := Nat.card_pos (α := ↥N'); omega
+      -- `p' ∣ |N'| ∣ |H'|`, so coprimality forces `p' ∤ |L|`, hence `p' ∤ |U|, |E|`.
+      have hpN : p' ∣ Nat.card ↥N' := by
+        obtain ⟨x, hx⟩ := exists_ne (1 : ↥N')
+        have hdvd : orderOf x ∣ p' := orderOf_dvd_of_pow_eq_one (hpe'.2 x)
+        have hox : orderOf x = p' :=
+          (hp'.eq_one_or_self_of_dvd _ hdvd).resolve_left
+            (fun h => hx (orderOf_eq_one_iff.mp h))
+        exact hox ▸ orderOf_dvd_natCard x
+      have hpH : p' ∣ Nat.card H' := hpN.trans (Subgroup.card_subgroup_dvd_card N')
+      have hpL : ¬ p' ∣ Nat.card L := fun h =>
+        hp'.ne_one (Nat.dvd_one.mp (hcop' ▸ Nat.dvd_gcd h hpH))
+      have hpU : ¬ p' ∣ Nat.card ↥act.U := fun h =>
+        hpL (h.trans (Subgroup.card_subgroup_dvd_card act.U))
+      have hpE : ¬ p' ∣ Nat.card ↥act.E := fun h =>
+        hpL (h.trans (Subgroup.card_subgroup_dvd_card act.E))
+      haveI : Invertible (Fintype.card ↥act.U : ZMod p') := invertibleOfNonzero (by
+        rw [← Nat.card_eq_fintype_card]
+        intro h; exact hpU ((ZMod.natCast_eq_zero_iff _ p').mp h))
+      -- (†) over `𝔽_{p'}` ⟹ the elementary-abelian dimension identity (⋆).
+      exact WielandtKernelFPF.wielandtDimIdentity_of_frobenius
+        hsup hcopUE hEnt hfpf hpU hpE hN'.restrict
   -- The chief-series assembly: per-factor identity ⟹ group-level Wielandt formula.
   exact wielandt_formula_of_perfactor (wielandtPerFactor_of_dim hdim) H act.φ act.coprime_order.symm
 
