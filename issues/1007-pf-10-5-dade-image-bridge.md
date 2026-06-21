@@ -98,12 +98,20 @@ a=0 norm 論証の **M-side inner products を全て形式化** (build-green 381
   instance に持つ**。muGrid unfold;rfl 系は explicit `[Fintype ↥M]` 不可 (choose が instance-dependent) →
   `classical`/`open scoped FiniteInduce` で finiteSubFintype を synthesize。sum 系は `open scoped FiniteInduce in`。
 
-**⟹ ‖α_ij‖²=2+n² は今や組める** (μ-side: self=1 ×2 + cross=0 + μ⊥ζ + (ζ,ζ)=1[irr_cf_inner 1 行] + δ²=1)。
-**▶ 残り (a=0 の上で積む)**: (i) ‖α‖²=2+n² assembly (μ-side ✅, ζ-props は irr_cf_inner で trivial、要 grid-level
-statement で pinning 回避) → (ii) τ/τ₁ isometry transfer (§7 `extension_inner_eq`/`extends_on_supported` を
-hyp.tau/coh.tau1 に wiring) → (iii) (α,ζ−ζ̄)=−n / (α,μ_k−dζ̄)=0 → (iv) Cauchy-Schwarz + n<2 + a=0 →
-(v) ζ^{τ₁} vanishes on V (§5 5.3.b/5.5/3.2.d) → (vi) NC(ψ)≤4 + (3.8) → ψ=0。
-gate 1 (carrier pinning) は (i)-(iv) の params 接続で必要だが grid-level statement なら回避可。
+**✅ (i) `‖α_ij‖²=2+n²` assembly DONE** (`bda228a8`): `Hypothesis.muGridAlpha_inner_self` — grid-level
+(pinning 回避)、degree mismatch を hypothesis 化 (`hdζ`/`h0ζ`)。{μ_ij,μ_i0,ζ} orthonormal + δ²=1。
+sesquilinear `inner_sub/smul` 展開 + 逆順は `inner_conj_symm` + `rcases hδpm <;> ring`。一発 build。
+
+**▶ 残り (a=0 の上で積む、grid-level で pinning 回避)**:
+- (ii) **τ/τ₁ isometry transfer** (次の sub-area、§7 Dade machinery): `(α^τ,(ζ−ζ̄)^τ)=(α,ζ−ζ̄)`。
+  鍵 = ζ−ζ̄ ∈ ℤ[S,A_0] (supported on A_0: ζ−ζ̄ は K=M' 上 support、K^#⊆A(M)⊆A_0、(ζ−ζ̄)(1)=0) +
+  Dade isometry `(τα,τβ)=(α,β)` (`S07.dadeIntegralCharacterMap` isometry) + τ₁ extends τ on supported
+  (`coherent.extends_on_supported` で (ζ−ζ̄)^τ=(ζ−ζ̄)^{τ₁})。
+- (iii) `(α,ζ−ζ̄)=−n` / `(α,μ_k−dζ̄)=0` (M-side、μ-inventory ✅ で組める)。
+- (iv) Cauchy-Schwarz `d²a²≤‖α^τ‖²·‖μ_k^{τ₁}‖²=(2+n²)w₁` (✅ ‖α‖²=2+n² + ✅ ‖μ_k‖²=w₁ + τ-isometry) + n<2 矛盾 + a=0。
+- (v) ζ^{τ₁} vanishes on V (§5 5.3.b/5.5/3.2.d) → ψ=X−δ(ω^σ diff) vanishes on V (**= value-on-V leg ✅**)。
+- (vi) NC(ψ)≤4 + (3.8) → ψ=0 → `alpha_tau_image`。
+gate 1 (carrier pinning) は params 接続で必要だが grid-level statement で回避継続。
 
 ## やること (旧)
 
