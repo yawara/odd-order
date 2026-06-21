@@ -480,6 +480,37 @@ theorem isTypeP2_of_hall_subgroupOf_ne_bot [Finite G] {M U : Subgroup G}
   have hpκ : p ∈ S14.kappa M := by rw [hκσ]; exact ⟨hpπ, hpσ⟩
   exact hpcompl (Set.mem_union_left _ hpκ)
 
+/-- **BG Theorem C(9), structural inclusion** (mmd L4385; schematic proof: Proposition 14.2(d) +
+Theorem A(3),(5)): every element of `A_0(M) − A(M)` is `M`-conjugate to an element of
+`Ẑ = Z − (K ∪ K*)`.  This is the `⊆` half of BG's identity `A_0(M) − A(M) = 𝒞_M(Ẑ)`, and together
+with the TI-ness of `Ẑ` (Theorem 14.7(e), `N_G(Ẑ) = K ⊔ K* ≤ M`) it is exactly what the TI claim of
+Theorem C(9) needs, via the transport lemma `IsTISubset.of_subset_conj_of_isTISubset`.
+
+Proof: let `a ∈ A_0(M) − A(M)`, so `a ∈ M`, `M_σ ⊓ C_G(a) ≠ 1`, `a ∉ 𝒞_G(K#)`, and `a ∉ U M_σ`.
+Take the `κ`/`κ'`-decomposition `a = a_κ · a_{κ'}` (`exists_isPiElement_mul`: commuting powers of
+`a`, `a_κ` a `κ`-element, `a_{κ'}` a `κ'`-element).  Conjugate by some `w ∈ M` so that `a_κ ∈ K`
+(`exists_conj_smul_le_isHall_kappa`, as `⟨a_κ⟩` is a `κ`-subgroup of `M`).  Then:
+
+* `a_κ ≠ 1`: otherwise `a = a_{κ'}` is a `κ'`-element, hence lies in the normal Hall `κ'`-subgroup
+  `M' = U M_σ` (Theorem C(3)), contradicting `a ∉ U M_σ`.
+* `a_{κ'} ≠ 1`: otherwise `a` is `G`-conjugate to `a_κ ∈ K#`, contradicting `a ∉ 𝒞_G(K#)`.
+* `a_{κ'} ∈ K*`: `a_{κ'} ∈ M' = U ⋊ M_σ` commutes with `a_κ ∈ K#`; writing `a_{κ'} = u·t`
+  (`u ∈ U`, `t ∈ M_σ`), `K`-invariance of `U` (Proposition 14.2(a)) and of `M_σ` plus uniqueness of
+  the `U ⋊ M_σ` factorization force `u ∈ C_U(a_κ) = 1` (Theorem A(4)) and `t ∈ C_{M_σ}(a_κ) = K*`
+  (Theorem A(5)), so `a_{κ'} = t ∈ K*`.
+
+Hence (after the conjugation) `a = a_κ · a_{κ'} ∈ K·K*` with both factors nontrivial, i.e.
+`a ∈ Z − (K ∪ K*) = Ẑ`. -/
+theorem a0_minus_a_subset_conj_zTilde [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    {M K Kstar U : Subgroup G} (hM : M ∈ maximalSubgroups G) (hP : S14.IsTypeP M)
+    (hKM : K ≤ M) (hUM : U ≤ M)
+    (hK : Ch03.IsHallSubgroup (S14.kappa M) (K.subgroupOf M))
+    (hKstar : Kstar = OddOrder.BG.Ch3.S10.Msigma M ⊓ Subgroup.centralizer (K : Set G))
+    (hU : Ch03.IsHallSubgroup ((S14.kappa M ∪ OddOrder.BG.Ch3.S10.sigma M)ᶜ) (U.subgroupOf M)) :
+    ∀ a ∈ A0Set M K \ ASet M U,
+      ∃ m ∈ M, ∃ t ∈ S14.zTilde K Kstar, a = m * t * m⁻¹ := by
+  sorry
+
 /-- **BG Theorem C** (mmd L4303): when `K ≠ 1`, `M` has a paired maximal
 subgroup `Mstar`, the cyclic product `Z = K Kstar`, a TI set `Z_tilde`, and the
 associated type-P duality.
@@ -562,8 +593,17 @@ theorem theoremC_paired_structure [Finite G]
       exact (mem_maximalSubgroups.mp hM).1 (top_le_iff.mp (htop.trans hle))
     · -- `U ≠ ⊥` (type-`P₂`): `N_G(U) ⊄ M` is BG Corollary 14.12.  Residual.
       sorry
-  · -- Conjunct 10 (BG Theorem A(3),(5) + Prop 14.2(d)): `A_0(M) - A(M)` is a TI set.  Residual.
-    sorry
+  · -- Conjunct 10 (BG Theorem C(9)): `A_0(M) - A(M) = 𝒞_M(Ẑ)` is a TI-subset of `M`.  Reduce to the
+    -- structural inclusion `A_0(M) - A(M) ⊆ 𝒞_M(Ẑ)` (`a0_minus_a_subset_conj_zTilde`) plus the
+    -- TI-ness of `Ẑ` (`typeP_duality`; `N_G(Ẑ) = K ⊔ K* ≤ M`), via the transport lemma.
+    obtain ⟨Mstar, hMstarP⟩ := hdual.exists
+    have hZti : OddOrder.GroupTheory.IsTISubset (S14.zTilde K Kstar) (K ⊔ Kstar) :=
+      hMstarP.2.2.2.2.2.1
+    have hKstarMσ : Kstar ≤ OddOrder.BG.Ch3.S10.Msigma M := by rw [hKstar]; exact inf_le_left
+    have hZM : (K ⊔ Kstar : Subgroup G) ≤ M :=
+      sup_le hKM (hKstarMσ.trans (OddOrder.BG.Ch3.S10.Msigma_le M))
+    exact hZti.of_subset_conj_of_isTISubset hZM
+      (a0_minus_a_subset_conj_zTilde hG hM hP hKM hUM hK hKstar hU)
   · -- Conjunct 11 (BG Theorem C(10) = Prop 14.2(g) + Theorem 15.7(a)): `U ≠ ⊥ → |K|` prime ∧ `F(M)` TI.
     -- `U ≠ ⊥` makes `M` type-`P₂`; `|K| = q` prime is Prop 14.2's type-`P₂` clause.  The
     -- `FittingIsTI M` conjunct (BG Theorem C(10), via Theorem 15.7(a)) is the residual.

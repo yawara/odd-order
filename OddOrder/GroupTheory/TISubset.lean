@@ -5,6 +5,7 @@ Authors: Yawara Ishida
 -/
 import Mathlib.Algebra.Group.Subgroup.Basic
 import Mathlib.GroupTheory.Subgroup.Centralizer
+import Mathlib.Tactic.Group
 
 /-!
 # Trivial Intersection (TI) Subsets
@@ -113,6 +114,37 @@ theorem centralizer_le (hA : IsTISubset A L) {x : G} (hx : x ∈ A) :
     have hxx : c * x * c⁻¹ = x := by rw [← hcomm, mul_inv_cancel_right]
     rwa [hxx]
   exact hA c ⟨x, hx, hfix⟩
+
+/-- **TI transport along an `M`-conjugacy saturation.**  If `T` is a TI-subset with
+normalizer-bound `Z ≤ M`, and every element of `A` is `M`-conjugate to an element of `T`
+(i.e. `A` lies inside the `M`-conjugacy saturation `⋃_{m ∈ M} m·T·m⁻¹`), then `A` is itself a
+TI-subset with normalizer-bound `M`.
+
+This is the abstract content behind BG Theorem B(5) and C(9): the sets `A(M) − M_σ` and
+`A_0(M) − A(M)` are contained in `M`-conjugacy saturations of TI-sets (the `σ`-singular pieces,
+resp. `Ẑ = Z − (K ∪ K*)`), so they inherit TI-ness with normalizer `M`.
+
+Proof: for `a, g·a·g⁻¹ ∈ A`, write `a = m₁·t₁·m₁⁻¹` and `g·a·g⁻¹ = m₂·t₂·m₂⁻¹` with `mᵢ ∈ M`,
+`tᵢ ∈ T`.  Then `h := m₂⁻¹·g·m₁` conjugates `t₁` to `t₂ ∈ T`, so `h ∈ Z ≤ M` by the TI property
+of `T`, whence `g = m₂·h·m₁⁻¹ ∈ M`. -/
+theorem of_subset_conj_of_isTISubset {T : Set G} {Z M : Subgroup G}
+    (hT : IsTISubset T Z) (hZM : Z ≤ M)
+    (hsub : ∀ a ∈ A, ∃ m ∈ M, ∃ t ∈ T, a = m * t * m⁻¹) :
+    IsTISubset A M := by
+  intro g ⟨a, ha, hga⟩
+  obtain ⟨m₁, hm₁, t₁, ht₁, ha₁⟩ := hsub a ha
+  obtain ⟨m₂, hm₂, t₂, ht₂, ha₂⟩ := hsub _ hga
+  -- `h := m₂⁻¹ * g * m₁` conjugates `t₁` to `t₂ ∈ T`.
+  have hconj : (m₂⁻¹ * g * m₁) * t₁ * (m₂⁻¹ * g * m₁)⁻¹ = t₂ := by
+    have e : (m₂⁻¹ * g * m₁) * t₁ * (m₂⁻¹ * g * m₁)⁻¹
+        = m₂⁻¹ * (g * (m₁ * t₁ * m₁⁻¹) * g⁻¹) * m₂ := by group
+    rw [e, ← ha₁, ha₂]; group
+  -- The TI property of `T` then places `h` in `Z ≤ M`, and `g = m₂ · h · m₁⁻¹ ∈ M`.
+  have hhZ : m₂⁻¹ * g * m₁ ∈ Z := hT _ ⟨t₁, ht₁, by rw [hconj]; exact ht₂⟩
+  have hgM : m₂ * (m₂⁻¹ * g * m₁) * m₁⁻¹ ∈ M :=
+    M.mul_mem (M.mul_mem hm₂ (hZM hhZ)) (M.inv_mem hm₁)
+  have hg_eq : m₂ * (m₂⁻¹ * g * m₁) * m₁⁻¹ = g := by group
+  rwa [hg_eq] at hgM
 
 end IsTISubset
 
