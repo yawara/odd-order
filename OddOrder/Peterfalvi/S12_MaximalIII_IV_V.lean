@@ -3097,6 +3097,176 @@ theorem Hypothesis.muGridPsi_vanishes_on_typePV [Finite G] {M : Subgroup G}
   rw [hleg, hζvanish v hv]
   simp
 
+open scoped FiniteInduce in
+/-- **Peterfalvi (10.5), `(ζ − ζ̄)^τ` vanishes on `V`** (the "by definition of `τ`" step underlying
+the (5.3.b)/(5.5)/(3.2.d) `ζ^{τ₁}`-vanishing argument).  Since `ζ` is induced from the normal
+`M' = [M,M]` and every `v ∈ V = typePV` lies outside `M'` (`typePData_typePV_not_mem_derived`),
+both `ζ` and its conjugate `ζ̄` vanish at `v`; the difference `ζ − ζ̄` is `A_0(M)`-supported
+(`zeta_sub_conj_support`), so the Dade isometry restores its value at `v`
+(`tau_apply_of_mem_typePV`), giving `(ζ − ζ̄)^τ(v) = 0`. -/
+theorem Hypothesis.tau_zeta_sub_conj_vanishes_on_typePV [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} (hyp : Hypothesis M)
+    (hodd : Odd (Nat.card G)) {ζ : ClassFunction ↥M ℂ} (hζS : ζ ∈ inducedFamily M)
+    (hζirr : IsIrreducibleCharacter ζ) {v : G} (hv : v ∈ typePV M hyp.typeP) :
+    hyp.tau (ζ - ζ.conj) v = 0 := by
+  haveI := hyp.finiteG
+  classical
+  have hvM : v ∈ M := typePData_W_le_self hyp.typeP (SetLike.mem_coe.mp hv.1)
+  have hsupp := hyp.zeta_sub_conj_support hG hodd hζS hζirr
+  rw [hyp.tau_apply_of_mem_typePV hsupp hv hvM]
+  -- `ζ` (induced from the normal `M'`) vanishes at `v ∉ M'`, hence so does `ζ̄ = star ∘ ζ`.
+  obtain ⟨θ, _hθne, hζeq⟩ := hζS
+  have hKcomm : (derivedInG M).subgroupOf M = commutator ↥M := by
+    rw [derivedInG, Subgroup.subgroupOf,
+      Subgroup.comap_map_eq_self_of_injective M.subtype_injective]
+  haveI hKnormal : ((derivedInG M).subgroupOf M).Normal := by rw [hKcomm]; infer_instance
+  have hnotmem : (⟨v, hvM⟩ : ↥M) ∉ (derivedInG M).subgroupOf M := by
+    rw [Subgroup.mem_subgroupOf]
+    exact typePData_typePV_not_mem_derived hyp.typeP hv
+  have hζv : ζ ⟨v, hvM⟩ = 0 := by
+    rw [hζeq]; exact ClassFunction.induce_eq_zero_of_not_mem_normal _ hnotmem
+  rw [ClassFunction.sub_apply, ClassFunction.conj_apply, hζv, star_zero, sub_zero]
+
+/-- **Norm-`1` projection orthogonality.**  If `a, s ∈ ℤ[Irr G]` with `‖a‖² = ‖b‖² = ‖s‖² = 1`,
+`a ⊥ b`, and the difference `a − b` is orthogonal to `s`, then `a ⊥ s`.
+
+Since `⟨a,s⟩ = ⟨b,s⟩ =: x ∈ ℤ` (`a, s ∈ ℤ[Irr G]`, `inner_mem_ZIrr_int`), the projection norm
+`‖s − x·a − x·b‖² = 1 − 2x² ≥ 0` forces `2x² ≤ 1`, hence `x = 0`.  This is the integral-geometry
+core that lets the §10 `ζ^{τ₁}`-vanishing argument bypass the (5.4)/(5.5) `R(ζ)` machinery:
+applied with `a = ζ^{τ₁}`, `b = ζ̄^{τ₁}`, `s = ω^σ`, the orthogonality of `(ζ − ζ̄)^τ = a − b` to the
+`σ`-image (Peterfalvi (5.3.b), via (3.8)) gives `ζ^{τ₁} ⊥ ω^σ` directly. -/
+private theorem inner_left_eq_zero_of_inner_sub_eq_zero {G : Type*} [Group G] [Fintype G]
+    [Invertible (Nat.card G : ℂ)]
+    {a b s : ClassFunction G ℂ} (haZ : a ∈ ZIrr G) (hsZ : s ∈ ZIrr G)
+    (ha1 : ClassFunction.inner a a = 1) (hb1 : ClassFunction.inner b b = 1)
+    (hs1 : ClassFunction.inner s s = 1) (hab : ClassFunction.inner a b = 0)
+    (hdiff : ClassFunction.inner (a - b) s = 0) :
+    ClassFunction.inner a s = 0 := by
+  obtain ⟨x, hx⟩ := ClassFunction.inner_mem_ZIrr_int haZ hsZ
+  -- `⟨b,s⟩ = ⟨a,s⟩ = x` from `⟨a − b, s⟩ = 0`.
+  have hbs : ClassFunction.inner b s = (x : ℂ) := by
+    rw [ClassFunction.inner_sub_left, hx, sub_eq_zero] at hdiff
+    exact hdiff.symm
+  -- the conjugate-symmetric companions (`x` is real, being an integer).
+  have hsa : ClassFunction.inner s a = (x : ℂ) := by
+    rw [inner_conj_symm a s, hx, star_intCast]
+  have hsb : ClassFunction.inner s b = (x : ℂ) := by
+    rw [inner_conj_symm b s, hbs, star_intCast]
+  have hba : ClassFunction.inner b a = 0 := by
+    rw [inner_conj_symm a b, hab, star_zero]
+  -- the projection norm `‖s − x·a − x·b‖² = 1 − 2x²`.
+  have key : ClassFunction.inner (s - (x : ℂ) • a - (x : ℂ) • b)
+      (s - (x : ℂ) • a - (x : ℂ) • b) = 1 - 2 * (x : ℂ) ^ 2 := by
+    simp only [ClassFunction.inner_sub_left, ClassFunction.inner_sub_right,
+      ClassFunction.inner_smul_left, OddOrder.RepresentationTheory.inner_smul_right,
+      ha1, hb1, hs1, hab, hba, hx, hbs, hsa, hsb, star_intCast]
+    ring
+  have hnn := inner_self_re_nonneg (s - (x : ℂ) • a - (x : ℂ) • b)
+  rw [key] at hnn
+  have hcast : (1 : ℂ) - 2 * (x : ℂ) ^ 2 = ((1 - 2 * x ^ 2 : ℤ) : ℂ) := by push_cast; ring
+  rw [hcast, Complex.intCast_re] at hnn
+  have hint : (0 : ℤ) ≤ 1 - 2 * x ^ 2 := by exact_mod_cast hnn
+  have h0 : (0 : ℤ) ≤ x ^ 2 := sq_nonneg x
+  have hsq : x ^ 2 = 0 := by omega
+  have hx0 : x = 0 := by rw [pow_two] at hsq; exact mul_self_eq_zero.mp hsq
+  rw [hx, hx0, Int.cast_zero]
+
+open scoped FiniteInduce in
+/-- **Peterfalvi (10.5), `ζ^{τ₁}` vanishes on `V`** (the genuine §5/§7 input, the textbook's
+"By (5.3.b), (5.5) and (3.2.d), `ζ^{τ₁}` vanishes on `V`").
+
+Reorganized to avoid the (5.4)/(5.5) `R(ζ)`-extraction machinery, using the integral norm-`1`
+projection (`inner_left_eq_zero_of_inner_sub_eq_zero`) instead:
+* `(ζ − ζ̄)^τ = ζ^{τ₁} − ζ̄^{τ₁}` vanishes on `V` (`tau_zeta_sub_conj_vanishes_on_typePV`) and has
+  `NC ≤ 2 < min(w₁, w₂)`: each of `ζ^{τ₁}`, `ζ̄^{τ₁}` is a norm-`1` virtual character with at most
+  one nonzero `σ`-coefficient (`ncard_inner_chiFam_ne_zero_le_one`), so by the (3.8) corollary
+  `sigmaCoeff_eq_zero_of_sigmaNC_lt` every `σ`-coefficient of `(ζ − ζ̄)^τ` vanishes (Peterfalvi
+  (5.3.b));
+* `ζ^{τ₁}, ζ̄^{τ₁}` are orthonormal norm-`1` virtual characters (coherence isometry on `ℤ[S]`), so
+  the projection lemma upgrades `⟨ζ^{τ₁} − ζ̄^{τ₁}, χ_{pq}⟩ = 0` to `⟨ζ^{τ₁}, χ_{pq}⟩ = 0`
+  (Peterfalvi (5.5));
+* orthogonality to every `χ_{pq} = ω_{pq}^σ` forces `ζ^{τ₁}` to vanish on `V` (Peterfalvi (3.2.d),
+  `eq_zero_of_mem_V_of_inner_chiFam_eq_zero`).
+
+This is the last analytic input of the (10.5) Dade-image identity; with the value-on-`V` leg it
+gives `ψ = X − δ(ω^σ diff)` vanishing on `V` (`muGridPsi_vanishes_on_typePV`), unconditionally. -/
+theorem Hypothesis.tau1_zeta_vanishes_on_typePV [Finite G] {M : Subgroup G}
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis M) (hodd : Odd (Nat.card G))
+    {params : CharacterParameters hyp} (coh : CoherentHypothesis hyp params)
+    {ζ : ClassFunction ↥M ℂ} (hζS : ζ ∈ inducedFamily M) (hζirr : IsIrreducibleCharacter ζ)
+    (hζne : ζ.conj ≠ ζ) {v : G} (hv : v ∈ typePV M hyp.typeP) :
+    coh.tau1 ζ v = 0 := by
+  haveI := hyp.finiteG
+  classical
+  -- the §5 `G`-level TI-cyclic hypothesis + Dade application (the ready (10.5) `σ` pattern).
+  let tic := typePData_toTICyclicHypothesis hyp.typeP hodd
+  haveI : NeZero (Nat.card ↥tic.W1) := ⟨Nat.card_pos.ne'⟩
+  haveI : NeZero (Nat.card ↥tic.W2) := ⟨Nat.card_pos.ne'⟩
+  let app : OddOrder.Peterfalvi.S05.TICyclicHypothesis.FullDadeApplication tic :=
+    ⟨tic.toDadeHypothesis.fullDadeIsometryData
+      (OddOrder.Peterfalvi.S04.Hypothesis.HConjInvariant.of_forall_H_eq_bot _ (fun _ => rfl))⟩
+  have hVeq : tic.V = tic.Vdiff := rfl
+  -- `ζ̄ ∈ S` irreducible; the `τ₁`-images are orthonormal norm-`1` virtual characters of `G`.
+  have hζcS : ζ.conj ∈ inducedFamily M := inducedFamily_closedUnderConjugate M hζS
+  have hζcirr : IsIrreducibleCharacter ζ.conj := hζirr.conj
+  have haZ : coh.tau1 ζ ∈ ZIrr G :=
+    coh.coherent.extension_mem_ZIrr ζ (Submodule.subset_span hζS)
+  have hbZ : coh.tau1 ζ.conj ∈ ZIrr G :=
+    coh.coherent.extension_mem_ZIrr ζ.conj (Submodule.subset_span hζcS)
+  have ha1 : ClassFunction.inner (coh.tau1 ζ) (coh.tau1 ζ) = 1 :=
+    hyp.zeta_tau1_inner_self hG hodd coh hζS hζirr
+  have hb1 : ClassFunction.inner (coh.tau1 ζ.conj) (coh.tau1 ζ.conj) = 1 :=
+    hyp.zeta_tau1_inner_self hG hodd coh hζcS hζcirr
+  have hab : ClassFunction.inner (coh.tau1 ζ) (coh.tau1 ζ.conj) = 0 := by
+    change ClassFunction.inner (coh.coherent.extension ζ) (coh.coherent.extension ζ.conj) = 0
+    rw [coh.coherent.extension_inner_eq _ _ (Submodule.subset_span hζS)
+        (Submodule.subset_span hζcS),
+      OddOrder.RepresentationTheory.irr_cf_inner hζirr hζcirr, if_neg (fun h => hζne h.symm)]
+  -- `(ζ − ζ̄)^τ` vanishes on `V`, with `NC ≤ 2 < min(w₁, w₂)`.
+  have hvanish : ∀ w ∈ tic.V, hyp.tau (ζ - ζ.conj) w = 0 := fun w hw =>
+    hyp.tau_zeta_sub_conj_vanishes_on_typePV hG hodd hζS hζirr hw
+  have hNC : tic.sigmaNC hVeq app (hyp.tau (ζ - ζ.conj))
+      < min (Nat.card ↥tic.W1) (Nat.card ↥tic.W2) := by
+    have hbound : tic.sigmaNC hVeq app (hyp.tau (ζ - ζ.conj)) ≤ 2 := by
+      have hsub : {pq | tic.sigmaCoeff hVeq app (hyp.tau (ζ - ζ.conj)) pq ≠ 0} ⊆
+          {pq | ClassFunction.inner (coh.tau1 ζ) (tic.chiFam hVeq app pq) ≠ 0} ∪
+          {pq | ClassFunction.inner (coh.tau1 ζ.conj) (tic.chiFam hVeq app pq) ≠ 0} := by
+        intro pq hpq
+        by_contra hcon
+        simp only [Set.mem_union, Set.mem_setOf_eq, not_or, not_not] at hcon
+        apply hpq
+        change ClassFunction.inner (hyp.tau (ζ - ζ.conj)) (tic.chiFam hVeq app pq) = 0
+        rw [hyp.tau_zeta_sub_conj_eq_tau1 hG hodd coh hζS hζirr,
+          ClassFunction.inner_sub_left, hcon.1, hcon.2, sub_zero]
+      calc tic.sigmaNC hVeq app (hyp.tau (ζ - ζ.conj))
+          = {pq | tic.sigmaCoeff hVeq app (hyp.tau (ζ - ζ.conj)) pq ≠ 0}.ncard := rfl
+        _ ≤ ({pq | ClassFunction.inner (coh.tau1 ζ) (tic.chiFam hVeq app pq) ≠ 0} ∪
+              {pq | ClassFunction.inner (coh.tau1 ζ.conj) (tic.chiFam hVeq app pq) ≠ 0}).ncard :=
+            Set.ncard_le_ncard hsub (Set.toFinite _)
+        _ ≤ {pq | ClassFunction.inner (coh.tau1 ζ) (tic.chiFam hVeq app pq) ≠ 0}.ncard +
+              {pq | ClassFunction.inner (coh.tau1 ζ.conj) (tic.chiFam hVeq app pq) ≠ 0}.ncard :=
+            Set.ncard_union_le _ _
+        _ ≤ 1 + 1 := by
+            gcongr
+            · exact tic.ncard_inner_chiFam_ne_zero_le_one hVeq app haZ ha1
+            · exact tic.ncard_inner_chiFam_ne_zero_le_one hVeq app hbZ hb1
+        _ = 2 := rfl
+    have h3a := tic.three_le_card_W1
+    have h3b := tic.three_le_card_W2
+    omega
+  -- (3.2.d): orthogonality to every `χ_{pq}` forces vanishing on `V`.
+  refine tic.eq_zero_of_mem_V_of_inner_chiFam_eq_zero hVeq app (fun a' b' => ?_) hv
+  have hL3 : tic.sigmaCoeff hVeq app (hyp.tau (ζ - ζ.conj)) (a', b') = 0 :=
+    tic.sigmaCoeff_eq_zero_of_sigmaNC_lt hVeq app hvanish hNC (a', b')
+  have hdiff : ClassFunction.inner (coh.tau1 ζ - coh.tau1 ζ.conj)
+      (tic.chiFam hVeq app (a', b')) = 0 := by
+    rw [← hyp.tau_zeta_sub_conj_eq_tau1 hG hodd coh hζS hζirr]; exact hL3
+  have hsZ : tic.chiFam hVeq app (a', b') ∈ ZIrr G := (tic.chiFam_spec hVeq app).2.1 (a', b')
+  have hs1 : ClassFunction.inner (tic.chiFam hVeq app (a', b'))
+      (tic.chiFam hVeq app (a', b')) = 1 := by
+    rw [(tic.chiFam_spec hVeq app).2.2.1, if_pos rfl]
+  exact inner_left_eq_zero_of_inner_sub_eq_zero haZ hsZ ha1 hb1 hs1 hab hdiff
+
 /-- **Peterfalvi (10.5), Dade-image half**: under the coherent extension, `α_{ij}` has the stated
 Dade image `δ·(ω_{ij}^σ − ω_{i0}^σ) − n·ζ^{τ₁}`.  (The support half is `alpha_support`.) -/
 theorem alpha_tau_image [Finite G] [Fintype G]
