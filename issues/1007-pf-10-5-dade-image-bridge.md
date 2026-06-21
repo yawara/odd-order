@@ -81,6 +81,30 @@ misalignment fix (producer-local) を実装し、**deep gate だった cross-lev
    → ψ=X−δ(ω^σ diff) vanishes on V (**= leg ✅ + 上記**) → NC(ψ)≤4<2inf(w₁,w₂) → (3.8) → ψ=0。
    要 §3 NC machinery (3.6/3.8) + §5 (5.3.b)/(5.5) + τ-inner-product isometry + μ-grid orthonormality。
 
+## ✅✅✅✅ 進捗 (2026-06-21 cont.²) — a=0 の μ-side inner-product inventory 完成 (CRUX 含む)
+
+a=0 norm 論証の **M-side inner products を全て形式化** (build-green 3818 jobs、全 axiom-clean = 上流 gate のみ)。
+**最重要発見: μ⊥ζ (Explore が「200-500行 Clifford/Mackey」と見積もった crux) は Clifford 不要 — degree distinctness のみ**:
+
+- ✅ **`muGrid_inner_eq_zero_of_apply_one_ne` (CRUX, `78d7c066`)**: `(μ_ij, χ)=0` for irreducible χ with
+  `μ_ij(1) ≠ χ(1)`。**μ_ij も ζ も既約** ⟹ `irr_cf_inner` で inner = if eq then 1 else 0、degree mismatch で
+  ≠。∴ `(μ_ij,ζ)=0`/`(μ_ij,ζ̄)=0` は degree (`μ_i0(1)=1≠w₁`, `μ_ij(1)=d≠w₁` ∵ n·w₁=d−δ/d>1/w₁>1) のみ。
+  **当初の RES_K μ_ij Clifford 分析は不要だった** (∵ ζ 既約ゆえ直交は単なる distinctness)。
+- ✅ `muGrid_inner_self` (`24bcfd02`): `(μ_ij,μ_ij)=1`。
+- ✅ `muGrid_inner_cross_column` (`24bcfd02`): `(μ_ij,μ_i'j')=0` for j≠j' (cross-column, (4.1))。
+- ✅ `muGrid_inner_within_column` (`36609290`): `(μ_ij,μ_i'j)=0` for i≠i' (within-column) → full grid orthonormality。
+- ✅ `muGrid_column_sum_inner_self` (`36609290`): `‖∑_i μ_ik‖²=w₁` (Cauchy-Schwarz の `‖μ_k^{τ₁}‖²` factor)。
+- ⚠ instance 罠 (記録): inner は `@inner ↥M _ (FiniteInduce.finiteSubFintype M) ...` で **Fintype を term-relevant
+  instance に持つ**。muGrid unfold;rfl 系は explicit `[Fintype ↥M]` 不可 (choose が instance-dependent) →
+  `classical`/`open scoped FiniteInduce` で finiteSubFintype を synthesize。sum 系は `open scoped FiniteInduce in`。
+
+**⟹ ‖α_ij‖²=2+n² は今や組める** (μ-side: self=1 ×2 + cross=0 + μ⊥ζ + (ζ,ζ)=1[irr_cf_inner 1 行] + δ²=1)。
+**▶ 残り (a=0 の上で積む)**: (i) ‖α‖²=2+n² assembly (μ-side ✅, ζ-props は irr_cf_inner で trivial、要 grid-level
+statement で pinning 回避) → (ii) τ/τ₁ isometry transfer (§7 `extension_inner_eq`/`extends_on_supported` を
+hyp.tau/coh.tau1 に wiring) → (iii) (α,ζ−ζ̄)=−n / (α,μ_k−dζ̄)=0 → (iv) Cauchy-Schwarz + n<2 + a=0 →
+(v) ζ^{τ₁} vanishes on V (§5 5.3.b/5.5/3.2.d) → (vi) NC(ψ)≤4 + (3.8) → ψ=0。
+gate 1 (carrier pinning) は (i)-(iv) の params 接続で必要だが grid-level statement なら回避可。
+
 ## やること (旧)
 
 - [ ] **carrier pinning**: `CharacterParameters.omegaSigma`/`mu` を `Hypothesis.omegaSigmaGrid`/`muGrid`
