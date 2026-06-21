@@ -240,11 +240,21 @@ commit `e6eb42b6`/`15bcd901`/`364b3690`/`d5014be8`:
   m=(α^τ,ζ^τ₁)∈ℤ (`ClassFunction.inner_mem_ZIrr_int`) + da identity + C-S helper + 3 inner 値 (da, 2+n², w₁) +
   cauchySchwarz_numeric。`.re` 計算 + `convert`/`push_cast` で numeric に橋渡し。
 
-**▶ 残り = (10.5) Dade-image を閉じる最終 (v)(vi) のみ** (a=0 の上で、別 sub-area):
-a=0 → `α^τ = X − nζ^{τ₁}`, X⊥ζ^{τ₁}, ‖X‖²=2 (← `‖α^τ‖²=2+n²` − n²·‖ζ^τ₁‖²; X:=α^τ+nζ^τ₁ の構成 + 直交)。
-(v) ζ^{τ₁} vanishes on V (§5 (5.3.b)/(5.5)/(3.2.d)) → ψ=X−δ(ω^σ diff) vanishes on V (value-on-V leg ✅)。
-(vi) NC(ψ)≤4<2inf(w₁,w₂) → **(3.8)** → ψ⊥ω_ij^σ,ω_i0^σ → ψ=0 → `alpha_tau_image`。
-**要 §3 (3.6)/(3.8) NC machinery + §5 (5.3.b)/(5.5)** — 新 sub-area。a=0 で解析の山は越えた。
+**✅ X-decomposition DONE** (`541122df`): `Hypothesis.zeta_tau1_inner_self` (‖ζ^τ₁‖²=1) +
+`muGridAlpha_tau_X_inner` (X:=α^τ+nζ^τ₁ で **‖X‖²=2 ∧ X⊥ζ^τ₁**)。a=0 + ‖α^τ‖²=2+n² + ‖ζ^τ₁‖²=1 の
+sesquilinear 展開。⟹ `α^τ = X − nζ^τ₁` (X virtual char, ‖X‖²=2, X⊥ζ^τ₁) 確立。
+
+**▶ 残り = (10.5) Dade-image を閉じる最終 (v)(vi) のみ** (別 large sub-area、§5/§3 wiring + pinning):
+1. **ζ^{τ₁} vanishes on V** (§5 (5.3.b)/(5.5)/(3.2.d))。coh.tau1 ζ が V で消える — §5 coherence/σ 機構の §10 wiring。
+2. **ψ vanishes on V**: ψ:=X−δ(ω^σ diff)。on V: ψ = (α^τ−δ(ω^σ diff)) + nζ^τ₁ = 0 + n·0 = 0
+   (value-on-V leg `tau_muGridAlpha_apply_eq_on_typePV` ✅ で α^τ=δ(ω^σ diff) on V、+ 上記 1)。**= 1 が gate**。
+3. **NC(ψ)≤4 + (3.8)**: `sigmaCoeff_trichotomy` (S05_SigmaTrichotomy:41) は `TICyclicHypothesis G`
+   (`typePData_toTICyclicHypothesis` ✅) + **`FullDadeApplication` (要構成)** + ψ vanish on V + gap `w₁+2≤w₂` +
+   `sigmaNC ψ < 2w₁` を取り σ-coeff trichotomy を返す。ψ の σ-coeff 計算 + NC≤4 (w₁≥3 で 2w₁≥6>4) →
+   trichotomy → ψ⊥ω^σ → ψ=0 → X=δ(ω^σ diff) → `α^τ=δ(ω^σ diff)−nζ^τ₁`。
+4. **pinning**: grid-level (10.5) → `alpha_tau_image` (params.alpha/omegaSigma/zeta を grid に pin)。
+**要 §5 (5.3.b)/(5.5) ζ^τ₁-vanish + FullDadeApplication 構成 + (3.8) σ-coeff wiring** — 新 large sub-area
+(別セッション規模)。**a=0 + X-decomposition で (10.5) の解析の山は完全に越えた**; 残りは構造論的 endgame。
 
 ## やること (旧)
 
