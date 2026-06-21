@@ -5,6 +5,30 @@
 > 上位文脈 = 記憶 [[ft-endgame-two-poles]] [[peterfalvi-s10-13-gated-on-bg-spine]]、
 > Lane H 視点の正本 = [`s10_13_maximal_structure.md`](s10_13_maximal_structure.md)。
 
+## ★★★ 2026-06-21 更新⁵ — (10.5) Dade-image の **value-on-V leg** 完成 (2 leg のうち 1)
+
+**(10.5) Dade-image の 2 analytic leg のうち value-on-V leg を完全形式化** (`0601b2bb`, build-green
+3818 jobs)。原文「By (3.2.c), (4.3.c) and the definition of τ, α_ij^τ − δ(ω_ij^σ − ω_i0^σ) vanishes on V」。
+3 補題 (S12、詳細・recipe = issue 1007「進捗 2026-06-21 cont.」):
+- `Hypothesis.tau_muGridAlpha_apply_eq_on_typePV` (leg 本体): V 上で
+  `hyp.tau (μ_ij − δ·μ_i0 − n·ζ) v = δ·(ω_ij^σ − ω_i0^σ)(v)` (ω^σ=alignedOmegaSigmaGrid)。
+  = cornerstone (τ が V で α 復元) + reconciliation (μ=δ_j·ω^σ, j&0) + δ_0=1 + ζ-vanishing (v∉M')。
+- `typePData_typePV_not_mem_derived` (**完全 axiom-clean**): v∈V ⟹ v∉M'。
+- `Hypothesis.muColumnSign_zero`: δ_0=1。
+
+**▶ 残り 2 gate (full `alpha_tau_image`)**:
+1. **carrier pinning** (低リスク確認済: **S13 は params.omegaSigma/alpha_tau_image を未使用、S15.eta は独立**):
+   producer omegaSigma→alignedOmegaSigmaGrid + `alpha_tau_image` を grid-level 定理に再構成 (params 版は薄い
+   corollary)。ただし pinning だけでは sorry 不消 (a=0 が残る) = faithfulness plumbing。
+2. **a=0 norm 論証** (deep, multi-session): Cauchy-Schwarz + ‖α‖²=2+n² + (10.3 n even>0) → n<2 矛盾 →
+   ψ=X−δ(ω^σ diff) vanishes on V (**= leg ✅ で半分**) → NC(ψ)≤4 + (3.8) → ψ=0。
+   **未整備の前提** (次の real-math 着手先): (a) **cross-column μ 直交** `(μ_ij, μ_i0)=0` (§6 は within-column
+   `d.mu m ⊥ d.mu n` のみ S06:519/523) + **μ⊥ζ** → ‖α‖²=2+n²。(b) τ/τ₁ inner-product manipulation
+   (`coherent.extension_inner_eq`/`extends_on_supported` S07、(α^τ,(ζ−ζ̄)^τ)=(α,ζ−ζ̄)=−n)。
+   (c) ζ^{τ₁} vanishes on V (§5 (5.3.b)/(5.5)/(3.2.d))。(d) **§10↔§5 NC wiring** (§5 `sigmaCoeff_trichotomy`
+   S05_SigmaTrichotomy:41 / `sigmaCoeff_eq_zero_of_sigmaNC_lt` を §10 alignedOmegaSigmaGrid に接続)。
+   インフラ (§5 trichotomy / §7 isometry) は実在するが §10 carrier wiring が deep。
+
 ## ★★★ 2026-06-21 更新⁴ — (10.5) Dade-image foundation (carrier de-opaque + τ-value cornerstone)
 
 **「(10.5) Dade-image」着手。最重要 finding: `alpha_tau_image` は現状の statement では数学的に証明不能 (scaffold sorry)** —
