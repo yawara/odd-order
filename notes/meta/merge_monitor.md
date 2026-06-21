@@ -6,21 +6,34 @@
 > **2026-06-11 追加**: 合流 commit が成立したら最後に `git push origin main` (cron job `a8824a71`;
 > 変化なし/全 abort 時は push しない)。
 
-## レーン (2026-06-18 最新³: B+F+H の 3 レーン体制、branch = lane-b/f/h — **G 退役・BG を F に集約**)
+## レーン (2026-06-21 最新⁵: **B+F+H+C の 4 レーン体制**、branch = lane-b/f/h/c — FT frontier の大セグメント分割)
 
-| レーン | branch | 本 | 内容 | 推奨モデル | 自動合流 |
-|---|---|---|---|---|---|
-| **B** | `lane-b` | Peterfalvi | Pf §6: (4.x) certain-type → case-B → (6.8) capstone (`S08_CoherenceTheorems:59` 唯一実 sorry) → §13 Dade grid `section16CharacterData` (issue 1004, deferred) | Opus 4.8 (1M) | ✅ 対象 |
-| **F** | `lane-f` | **BG 集約** | **BG §9/§14/§16 + POLE-1 構造側を単独所有** (2026-06-18 G 退役で集約): `S16_MainResults`/`S16_PairIntersection`/`S14_TypePCounting` 編集可 + producer `section16MaximalPair`(済)/`section16TypePStructure`(sorry, issue 7005) + `Section16MaximalPair` enrich (issue 7006) + Wielandt §9 (park, issue 7004)。即タスク = option-1 ②enrich→③typeP producer discharge | Opus 4.8 (1M) | ✅ 対象 |
-| **H** | `lane-h` | Peterfalvi | **POLE-2** = Pf (14.2) `field_normalizer_structure` (`S16_NonExistenceG:1965`, issue 2009)。tractable 部 landing 済、残 14.7 finite-field model は §10-13 char gate | Opus 4.8 (1M) | ✅ 対象 |
+**4-lane 再編 (ユーザー裁可 2026-06-21)**: FT spine が深い線形チェーン (BG §14→16 → Pf §10→16) で char API
+(Pf §3-9) は完成済みと判明 → FT frontier (102 sorry) を **signature-first で大セグメントに分割**。隣接ファイルの
+重なり (旧 B/H が両方 Pf §10-16) を解消し、各レーンを contiguous な非重複セグメントに。
 
-**F 固有の取り決め (2026-06-18, G 退役後)**: (1) F は **BG 全域 (`S14_*`/`S16_*`/`FeitThompson.lean` の §16 producer 2 本) を単独所有**。
-旧「G が S16_MainResults 所有 / F は cite のみ」「G は S12_E 編集禁止」等の F↔G 分割取り決めは**全廃**。
-(2) `Section16MaximalPair` struct の型改変は F が単独承認可 (旧「hub/user 承認要」は集約で解除) — 但し
-下流 `section16CharacterData` (lane-b) + assembly に build-green を保て (field **追加**ゆえ非破壊)。
-(3) **新規 `axiom` 宣言は従来どおり abort+ユーザー承認**。(4) `notes/bg/*` は F 所有。
-(5) issue base: B=1000 / **F=7000 (旧 G の 8000 番台 issue も F が継承)** / **H=2000**。
-マージ順 = **F → B → H** (独立レーンゆえ順序は形式的)。
+| レーン | branch | セグメント | 所有ファイル | 自動合流 |
+|---|---|---|---|---|
+**⚠ 2026-06-22 最小修正 (ユーザー裁可、機能再割当)**: lane-c issue 4002 + S11 衝突 ×2 → hub 深掘り
+([`lane_functional_split_analysis.md`](lane_functional_split_analysis.md)) → §-分割が 3 機能 (群構造/Dade char/assembly)
+を散乱させていたと判明。ユーザー選択「最小修正」(file-split なし、機能で再割当): **S11 を H 単独所有に
+変更** (Wielandt §9 は H の連結 chunk、§11 衝突解消)、B は §10/§12/§13 char grid に専念、C は §16 char
+endpoint を自走所有 (B 待ちにしない)。
+
+| レーン | branch | 機能 | 所有ファイル | 自動合流 |
+|---|---|---|---|---|
+| **F** | `lane-f` | **① BG 構造** | `S14_TypePCounting`/`S15_MF`/`S16_MainResults`/`S16_PairIntersection` + `FeitThompson.lean` の §16 producer。Theorem A-I / Prop 16.1 | ✅ |
+| **B** | `lane-b` | **② Dade char producer** | `S10_MinimalSimpleStructure`/`S12_MaximalIII_IV_V`/`S13_MaximalIII_IV`。char grids/parameters/`section16CharacterData`。**S11 は触らない (H 所有)** | ✅ |
+| **H** | `lane-h` | **① Wielandt §9 + §14-15** | **`S11_MaximalII_III_IV` (Wielandt §9 + 型分類, H 単独所有)** + `S14_MaximalI`/`S15_SAndT` (type I + S&T) | ✅ |
+| **C** | `lane-c` | **②endpoint + ③assembly** | `S16_NonExistenceG` (Core 凍結)。非存在 + **POLE-2** (issue 2009) + §16 char endpoint **de-opacify (自走)** | ✅ |
+
+**signature-first interface**: 上流が sorried signature を export → 下流が cite。真の cross-lane 依存は narrow
+(§13 `basic_structure` レベル)。大半は自レーン内 (lane-c の §16 de-opacify 等)。signature 不足は notes/issue 経由。
+
+**取り決め**: (1) 各レーンは**自所有ファイルのみ編集**、他は cite のみ (要望は notes/issue 経由)。
+**特に S11 は H のみ** (B/H 衝突源だった)。(2) **新規 `axiom` 宣言は abort+ユーザー承認**。
+(3) issue base: **B=1000 / H=2000 / C=4000 / F=7000**。(4) `notes/bg/*`=F、`notes/peterfalvi/*`=B/H/C。
+マージ順 = **F → B → H → C** (独立レーンゆえ順序は形式的、上流→下流の自然順)。
 
 **H 固有の取り決め (2026-06-12)**: (1) H は **Lane B の §4–§9 coherence/certain-type ファイル
 (`S04_*`〜`S09_*`) を編集しない** (cite のみ)。(2) §10–13 は BG↔Pf interface (BG Thm A–E/I–II)
@@ -55,7 +68,7 @@ branch とも削除済み。旧 **A** / **D** も同様に退役済み (履歴�
 
 1. 各レーンの未マージ確認: `git log --oneline main..<branch>`。
    **全レーン 0 なら「変化なし」1行報告で即終了**（build を走らせない）。
-2. **F → B → H の順**で（独立レーンゆえ順序は形式的; G は 2026-06-18 退役）、未マージがあれば自動合流:
+2. **F → B → H → C の順**で（独立レーンゆえ順序は形式的、上流→下流の自然順）、未マージがあれば自動合流:
    - マージ前の実 sorry 数を記録: `bin/count-sorry`
      （prose 偽陽性 [sorry-free / sorryAx / `sorry'd` / backtick 引用] を除外する判定器。
        旧 `grep '(^|[^a-zA-Z-])sorry'` は 259 と過大計上したが count-sorry は 146 ≈ 実 141。
@@ -158,6 +171,35 @@ branch とも削除済み。旧 **A** / **D** も同様に退役済み (履歴�
 
 ## 現状メモ
 
+- **2026-06-22 — 監視再開 + 4 レーン backlog 合流 + cron 再作成 + `coq/` submodule 追加**: ユーザー指示で
+  監視再開。前 cron `e3dcf75f` は session 変化で消滅 → 新 cron `8e80cc9d` (`4,29,54 * * * *` = 25分間隔,
+  session-only, push なし, 7日 auto-expire) 再作成。**4 レーン全合流** (F→B→H→C, build 各 3881 jobs green /
+  AxiomsCheck OK / 新規 axiom 0, 実 sorry **134→133**):
+  - **lane-f** (3, merge `5566f34f`): BG Thm 15.7 `fitting_not_ti_cases` close — type-F conjunct (c) を
+    印刷版 `M'=F(M)` でなく faithful な `M'≤F(M)` に弱め sorry-free+axiom-clean (issue 7007; MathComp
+    `nonTI_Fitting_structure` 交差検証)。sorry -1。
+  - **lane-b** (1 実質, merge `b7f9a9eb`): Pf (10.5) ψ-vanish precursor (ψ が V 上で消える, issue 1007)。
+  - **lane-h** (5, merge `491cc249`): Pf §11 (9.4) chief-factor kernel `exists_chiefFactor_kernel`
+    (Maschke+Wielandt) → `exists_chiefFactorData` assembled (残=elementary-abelian seed) + `eq_top_of_forall_sylow_le`
+    (Sylow 生成補題)。**import 帯の独立追記衝突を union 解決** (main: MaximalSubgroupTypeConj/AInvariantPiSubgroups +
+    lane-h: OperatorMaschke)。
+  - **lane-c** (1 実質, merge `648740b9`): Pf §16 MHypothesis carrier de-opacify (e_eq_index + (14.11.2/.3) bound)。
+  - **⚠ サイズ flag** (>1500, 全て active frontier、分割 issue 0068-0075 既起票・凍結境界待ち、新規起票なし):
+    S15_MF 7955 / S16_NonExistenceG 3265 / S12_MaximalIII_IV_V 3258 / S16_MainResults 2124。
+  - **`coq/` submodule 追加** (`a69da089`, main 直下): [math-comp/odd-order](https://github.com/math-comp/odd-order)
+    を教科書の行間補完参照用に取込 (CeCILL-B 公開, pin master 6afa795b; `notes/meta/coq_odd_order_reference.md`)。
+    BG §N / Pf §N の原文を読む際に `coq/theories/{BG,PF}sectionN.v` のコメントを併読。レーンは coq/ を非編集ゆえ合流に影響なし。
+
+- **2026-06-21 (後刻) — 4-lane 再編 (ユーザー裁可): FT frontier を大セグメント分割 + lane-c 新設**:
+  ユーザー問「もっと並列化できるか (大きな分割・signature-first で衝突回避)」を受け hub が FT 構造を実地調査。
+  判明: (1) FT spine は深い線形チェーン (BG §14→16 → Pf §10→16)、(2) char API (Pf §3-9) は完成済 (S04-S08
+  全 0 sorry, (6.8) capstone complete)、(3) FT frontier 102 sorry = BG §14-16(18) + Pf §10-13(34) + Pf §14-16(50)。
+  → ユーザー選択 = **4 レーン (Pf §14-16 を §15↔§16 で分割)**。F=BG §14-16 / B=Pf §10-13 / H=Pf §14-15 /
+  **C=Pf §16+POLE-2 (新設)**。§15→§16 cut は clean (S16 が S15 を named cite、調査済)。**新 worktree
+  `/home/ywr/odd-order-lane-c` 作成** (branch lane-c @ main `8da2766c`、lake/references symlink + olean warm-start、
+  build 3881 green 確認)。LAUNCH.md: lane-c 新規 + lane-b/h に再編ブロック prepend (lane-f 不変)。issue base
+  C=4000。handoff: H の §11 (9.3) → B、H の §16 → C。**cron は 4 レーン (F→B→H→C) で要再作成**
+  (ユーザーが lane-c セッションを起動したら稼働開始)。
 - **2026-06-21 — 監視再開 + 固定 25分 cron (ユーザー要望「25分おきで」) + dead-merge 復旧**:
   ユーザー指示で監視再開。**動的 15-30 分 (2026-06-18) を固定 25 分間隔に上書き**。cron job
   `e3dcf75f` (`4,29,54 * * * *` = 25分間隔 + :54→:04 の 10分 wrap、session-only、push なし、7日

@@ -134,6 +134,24 @@ theorem maximalSubgroup_type_dichotomy [Finite G] (hG : OddOrder.BG.IsMinimalSim
   · exact Or.inl hI
   · exact Or.inr ⟨S, T, hS, hT, hST, hSnonI, hTnonI, hII, hcov⟩
 
+/-- **Peterfalvi (8.8)/(8.13) for the given `M`**: a non-type-I (type-`P`) maximal subgroup `M`
+admits a Type-II maximal subgroup `S` whose cyclic-factor order `|S : [S,S]|` equals `|W₂|`.
+
+This is the `M`-specific case-(b) datum of Theorem (8.8): the type-`P` maximal `M` participates in
+the case-(b) configuration of (8.8), one of whose two distinguished maximal subgroups is of Type II
+and shares the cyclic-factor order `w₂ = |W₂|`.  It is the §8 obligation behind both the (9.3) order
+relations (`S11.typeIIIorIV_W2_prime`) and the (10.3) prime computation (`S12.Hypothesis.w2_prime`).
+
+Stated here in `§8` on the bare `TypePData` (rather than the §10 `Hypothesis`) so it is citable from
+`S11` (§9) as well as `S12` (§10).  Its proof is gated on the BG §16 partner-existence behind
+`Peterfalvi.S14.theorem88_caseB_holds`; recorded as a faithful obligation. -/
+theorem exists_typeII_maximal_with_w2_of_typeP [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} (data : TypePData M)
+    (hM : M ∈ maximalSubgroups G) (hType : IsTypeIII M ∨ IsTypeIV M ∨ IsTypeV M) :
+    ∃ S : Subgroup G, S ∈ maximalSubgroups G ∧ IsTypeII S ∧
+      ((derivedInG S).subgroupOf S).index = Nat.card ↥data.W2 := by
+  sorry
+
 /-! ## (8.10)--(8.13): `M_s`, support sets, and centralizer control -/
 
 /-- **Peterfalvi (8.10)**: the notation `M_s`, shared as `mainSubgroup`. -/
@@ -156,17 +174,39 @@ theorem hall_maxNilpotentNormalHall_and_mainSubgroup [Finite G]
         (mainSubgroup M tau) := by
   sorry
 
-/-- **Peterfalvi (8.12)**: type I/II Sylow-complement centralizer control.
+/-- **Peterfalvi (8.12.b)**: type I/II Sylow-complement centralizer control.
 
-If `M` is type I or II and `U` is the relevant complement, every nonempty subset
-`X` of `U#` whose centralizer in `M_F` is nontrivial has ambient centralizer
-contained in a unique maximal subgroup. -/
+If `M` is of type I or II and `U` is the relevant complement (`M = H ⋊ U` for type I,
+`[M,M] = H ⋊ U` for type II), then for every non-empty subset `X` of `U#` such that
+`C_H(X) ≠ 1` (i.e. `M_F ⊓ C_G(X) ≠ ⊥`), **`M` is the unique maximal subgroup of `G` which
+contains `C_G(X)`** — recorded as `C_G(X) ≤ M` together with `IsUniquelyMaximal (C_G(X))`
+(the unique coatom above `C_G(X)` being `M`).
+
+The earlier formulation recorded only `IsUniquelyMaximal (C_G(X))`, which is strictly weaker:
+for type II `C_G(X)` need not lie in `M`, so without the `C_G(X) ≤ M` clause the result cannot
+identify the unique maximal as `M` (as (9.3) requires).  Reference: [BG], §16, Theorem B and
+Proposition 16.1. -/
 theorem typeI_or_typeII_centralizer_unique [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M U : Subgroup G}
     (hM : M ∈ maximalSubgroups G) (hType : IsTypeI M ∨ IsTypeII M) (hUle : U ≤ M) :
     ∀ X : Set G, X.Nonempty → X ⊆ sharpSubgroup U →
       maxNilpotentNormalHall M ⊓ Subgroup.centralizer X ≠ ⊥ →
-        IsUniquelyMaximal (Subgroup.centralizer X) := by
+        Subgroup.centralizer X ≤ M ∧ IsUniquelyMaximal (Subgroup.centralizer X) := by
+  sorry
+
+/-- **Peterfalvi (8.6.b II)**, canonical form: for a maximal subgroup `M` of Type II and **any**
+type-`P` data on `M`, the complement `U` has `N_G(U) ⊄ M`.
+
+Definition (8.6.b II) records `N_G(U) ⊄ M` for *the* `U` of the chosen `(8.4)` data; since any two
+type-`P` complements of `H = M_F` in `M' = [M,M]` are `M'`-conjugate (Schur–Zassenhaus in the
+solvable proper subgroup `M'`) and `N_G(U^g) = N_G(U)^g` with `g ∈ M' ≤ M`, the property is
+independent of the witness.  Stated here so the (9.3) order relations can apply it to the type-`P`
+data carried by `TypesIIIIIIVSetup` (which need not be the `IsTypeII` witness).  The
+complement-conjugacy step is the residual obligation. -/
+theorem typeII_normalizer_not_le_of_typePData [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} (data : TypePData M)
+    (hM : M ∈ maximalSubgroups G) (hII : IsTypeII M) :
+    ¬ Subgroup.normalizer (data.U : Set G) ≤ M := by
   sorry
 
 /-- **Peterfalvi (8.13)**: centralizers escaping a maximal subgroup are controlled

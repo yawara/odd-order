@@ -12,6 +12,8 @@
 
 PDF と Nougat 抽出 Markdown (`.mmd`) は `references/` 配下 (別 private リポ、本リポでは gitignore)。教科書本文を読む必要があるときは PDF を直接読まず、まず該当の `.mmd` を grep / Read してトークン効率を上げる。
 
+**Coq 形式化の併読 (`coq/` submodule)**: [math-comp/odd-order](https://github.com/math-comp/odd-order) (Gonthier et al. の Coq/mathcomp FT 完全形式化, CeCILL-B, 公開) を `coq/` に submodule として取り込んでいる。各 `.v` の**コメントが教科書 (BG / Peterfalvi) の行間を埋めている**。**BG §N / Peterfalvi §N の原文 (`.mmd`/PDF) を読むタイミングで、対応する `coq/theories/{BG,PF}sectionN.v` のコメントを併読する** (ファイル名が教科書構成と 1:1 対応; 対応表・grep レシピ・コメント規約は [`notes/meta/coq_odd_order_reference.md`](notes/meta/coq_odd_order_reference.md))。形式化対象は 3 冊のまま; Coq は**行間補完の参照専用**で Lean に直訳するソースではない (証明戦略のヒント・前提の所在確認に使う)。Coq ツールチェインは不要 (`.v` を Read/grep するだけ)。fresh clone では `git submodule update --init coq` で取得。
+
 ## 進捗の測り方 — FT への実質的証明の積み上げ (sorry 数ではない)
 
 このプロジェクトの目的は **Feit–Thompson 定理の honest な証明を積み上げること**。**短期的に `sorry` の数を減らすことは目的でも指標でもない。** 進捗は「honest な FT 証明がいずれ推移的に必要とする本物の数学を前進させたか」で測る。
@@ -137,6 +139,7 @@ ROADMAP のチェックリストから対応する `notes/` にリンクして�
 |---|---|
 | [ROADMAP.md](ROADMAP.md) | 長期計画、フェーズ、依存グラフ、章節チェックリスト |
 | `OddOrder/` | Lean ソース本体 |
+| `coq/` (submodule) | [math-comp/odd-order](https://github.com/math-comp/odd-order) — Coq/mathcomp FT 形式化。`.v` コメントで教科書の行間を併読 ([`notes/meta/coq_odd_order_reference.md`](notes/meta/coq_odd_order_reference.md)) |
 | `notes/` | ミニロードマップ・調査メモ |
 | `issues/` | ファイルベース issue (open は直下, `pending/` `closed/` で状態管理) |
 | `bin/` | 雑用スクリプト (`new-issue` 等) |
