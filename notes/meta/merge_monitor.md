@@ -171,6 +171,25 @@ branch とも削除済み。旧 **A** / **D** も同様に退役済み (履歴�
 
 ## 現状メモ
 
+- **2026-06-22 — 監視再開 + 4 レーン backlog 合流 + cron 再作成 + `coq/` submodule 追加**: ユーザー指示で
+  監視再開。前 cron `e3dcf75f` は session 変化で消滅 → 新 cron `8e80cc9d` (`4,29,54 * * * *` = 25分間隔,
+  session-only, push なし, 7日 auto-expire) 再作成。**4 レーン全合流** (F→B→H→C, build 各 3881 jobs green /
+  AxiomsCheck OK / 新規 axiom 0, 実 sorry **134→133**):
+  - **lane-f** (3, merge `5566f34f`): BG Thm 15.7 `fitting_not_ti_cases` close — type-F conjunct (c) を
+    印刷版 `M'=F(M)` でなく faithful な `M'≤F(M)` に弱め sorry-free+axiom-clean (issue 7007; MathComp
+    `nonTI_Fitting_structure` 交差検証)。sorry -1。
+  - **lane-b** (1 実質, merge `b7f9a9eb`): Pf (10.5) ψ-vanish precursor (ψ が V 上で消える, issue 1007)。
+  - **lane-h** (5, merge `491cc249`): Pf §11 (9.4) chief-factor kernel `exists_chiefFactor_kernel`
+    (Maschke+Wielandt) → `exists_chiefFactorData` assembled (残=elementary-abelian seed) + `eq_top_of_forall_sylow_le`
+    (Sylow 生成補題)。**import 帯の独立追記衝突を union 解決** (main: MaximalSubgroupTypeConj/AInvariantPiSubgroups +
+    lane-h: OperatorMaschke)。
+  - **lane-c** (1 実質, merge `648740b9`): Pf §16 MHypothesis carrier de-opacify (e_eq_index + (14.11.2/.3) bound)。
+  - **⚠ サイズ flag** (>1500, 全て active frontier、分割 issue 0068-0075 既起票・凍結境界待ち、新規起票なし):
+    S15_MF 7955 / S16_NonExistenceG 3265 / S12_MaximalIII_IV_V 3258 / S16_MainResults 2124。
+  - **`coq/` submodule 追加** (`a69da089`, main 直下): [math-comp/odd-order](https://github.com/math-comp/odd-order)
+    を教科書の行間補完参照用に取込 (CeCILL-B 公開, pin master 6afa795b; `notes/meta/coq_odd_order_reference.md`)。
+    BG §N / Pf §N の原文を読む際に `coq/theories/{BG,PF}sectionN.v` のコメントを併読。レーンは coq/ を非編集ゆえ合流に影響なし。
+
 - **2026-06-21 (後刻) — 4-lane 再編 (ユーザー裁可): FT frontier を大セグメント分割 + lane-c 新設**:
   ユーザー問「もっと並列化できるか (大きな分割・signature-first で衝突回避)」を受け hub が FT 構造を実地調査。
   判明: (1) FT spine は深い線形チェーン (BG §14→16 → Pf §10→16)、(2) char API (Pf §3-9) は完成済 (S04-S08
