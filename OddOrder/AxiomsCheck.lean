@@ -9,6 +9,7 @@ import OddOrder.GroupTheory.ChermakDelgado
 import OddOrder.GroupTheory.CoprimeFixedPoints
 import OddOrder.GroupTheory.MinimalInvariantNormal
 import OddOrder.GroupTheory.WielandtAssembly
+import OddOrder.GroupTheory.WielandtPerFactorDischarge
 import OddOrder.GroupTheory.PiElementDecomposition
 import OddOrder.GroupTheory.RepresentationTheory.CharacterCount
 import OddOrder.GroupTheory.RepresentationTheory.CharacterCompleteness
@@ -5331,3 +5332,13 @@ remaining input is the per-chief-factor identity itself (the representation-theo
 -/
 
 #assert_only_allowed_axioms OddOrder.GroupTheory.wielandt_formula_of_perfactor
+
+/-! **(9.1) per-chief-factor discharge** (`WielandtPerFactorDischarge`, piece C).  The
+per-chief-factor predicate `WielandtPerFactor` reduces (`wielandtPerFactor_of_dim`) to the
+*dimension* identity (⋆) on each elementary-abelian chief factor (`WielandtDimIdentity`): for the
+restricted action on `↥N`, `card_fixedSubgroup_wielandt_of_dim` raises the dimension identity to the
+cardinality identity on `↥N`, and `card_fixedSubgroup_restrict` rewrites `|C_N(X)| = |C_H(X) ⊓ N|`.
+This isolates the sole remaining representation-theoretic input — the kernel-FPF dimension identity
+(†) — into the explicit hypothesis. -/
+
+#assert_only_allowed_axioms OddOrder.GroupTheory.wielandtPerFactor_of_dim

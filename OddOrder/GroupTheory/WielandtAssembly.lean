@@ -38,12 +38,18 @@ open OddOrder.Isaacs.Ch03 (IsAInvariant)
 local notation3 "quotMulAut " hN => OddOrder.Isaacs.Ch04.OddOrder.Isaacs.Ch03.IsAInvariant.quotientMulAutHom hN
 
 /-- The **per-chief-factor Wielandt identity**, uniformly over all finite groups `H` carrying an
-`L`-action and all elementary-abelian `L`-invariant normal subgroups `N ◁ H`.  This is the single
-representation-theoretic input to the chief-series assembly (`wielandt_formula_of_perfactor`); it is
-the cardinality form of the elementary-abelian dimension identity `finrank_elab_identity`. -/
+`L`-action and all elementary-abelian `L`-invariant normal subgroups `N ◁ H` (of *prime* exponent
+`p`).  This is the single representation-theoretic input to the chief-series assembly
+(`wielandt_formula_of_perfactor`); it is the cardinality form of the elementary-abelian dimension
+identity `finrank_elab_identity`, discharged from that identity in `wielandtPerFactor_of_dim`.
+
+The exponent `p` is required to be *prime* (not merely an exponent): this is what makes `↥N` an
+`𝔽_p`-vector space, the form in which the dimension identity (⋆) lives.  Primality is not recoverable
+from `IsElementaryAbelian p ↥N` alone (e.g. `IsElementaryAbelian 6 (ZMod 2)` holds), so it is carried
+explicitly. -/
 def WielandtPerFactor (L : Type*) [Group L] (U E : Subgroup L) : Prop :=
   ∀ (H : Type*) [Group H] [Finite H] (φ : L →* MulAut H) (N : Subgroup H) [N.Normal],
-    IsAInvariant φ N → (∃ p : ℕ, IsElementaryAbelian p ↥N) →
+    IsAInvariant φ N → (∃ p : ℕ, p.Prime ∧ IsElementaryAbelian p ↥N) →
     Nat.card ↥(fixedSubgroup φ ⊤ ⊓ N) ^ Nat.card ↥E * Nat.card ↥N =
       Nat.card ↥(fixedSubgroup φ E ⊓ N) ^ Nat.card ↥E * Nat.card ↥(fixedSubgroup φ U ⊓ N)
 
@@ -81,7 +87,7 @@ theorem wielandt_formula_of_perfactor.{u} {L : Type*} [Group L] [Finite L] {U E 
     · -- Inductive step: peel off an elementary-abelian `L`-invariant normal subgroup `N`.
       haveI : Nontrivial H :=
         Finite.one_lt_card_iff_nontrivial.mp (by have := Nat.card_pos (α := H); omega)
-      obtain ⟨N, p, _, hN_ne, hN_normal, hN_inv, hN_elab⟩ :=
+      obtain ⟨N, p, hp, hN_ne, hN_normal, hN_inv, hN_elab⟩ :=
         exists_aInvariant_normal_isElementaryAbelian (φ := φ)
       haveI : N.Normal := hN_normal
       -- Coprimality and the quotient action descend to `H / N`.
@@ -92,7 +98,7 @@ theorem wielandt_formula_of_perfactor.{u} {L : Type*} [Group L] [Finite L] {U E 
       -- Induction hypothesis on the quotient.
       have hIH := ih (Nat.card (H ⧸ N)) hlt (H ⧸ N) (quotMulAut hN_inv) hcopN rfl
       -- Per-factor identity on the elementary-abelian `N`.
-      have hfac := hpf H φ N hN_inv ⟨p, hN_elab⟩
+      have hfac := hpf H φ N hN_inv ⟨p, hp, hN_elab⟩
       exact wielandt_step hN_inv hcop hfac hIH
 
 end OddOrder.GroupTheory
