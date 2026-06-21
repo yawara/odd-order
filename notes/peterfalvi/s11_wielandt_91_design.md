@@ -769,3 +769,42 @@ diamond → `S06.commute_of_mem_of_isCyclic` (Commute を返す Prop 補題) で
 
 **▶ 次フロンティア**: (9.4)/(9.6) chief factor (S11 残 sorry、character 寄りで lane-b gate 可能性) / §8 gates
 (S10 領域、(8.8) partner は hard) / (10.11)/(11.7)→(13.2.b) |P|=p^q へ (9.3) cite で前進 / §13.17 POLE-2 再訪。
+
+## 2026-06-21 (lane-h resume⁶) — ✅✅ (9.6) chief-factor order |H̄|=p^q (arithmetic core, axiom-clean)
+
+完成した Wielandt (9.1) を直接消費して **Peterfalvi (9.6) の量的核を sorry-free + axiom-clean** で landing
+(`S11_MaximalII_III_IV.lean`、full build 3881 green、実 sorry 135 不変)。⚠ 旧「character 寄りで lane-b gate
+可能性」は**誤判定だった**: §9 reference (04.11) を精読した結果 (9.4)/(9.6) は**純群論** (Maschke + Frattini +
+coprime action + Wielandt (9.1)+(9.3)) — character theory は (9.7)+ から。lane-h 領域で確定。
+
+**新規 (all axiom-clean, AxiomsCheck 登録)**:
+- `coprimeFrobeniusAction_card_eq_prime_pow` (WielandtFixedPoint): (9.6) 最終算術 — `C_H(U)=⊥` +
+  `|C_H(E)| ∣ p` (prime) + `H≠1` ⟹ `|H|=p^|E|`。`wielandt_fixedPoint_trivial_U_fixed` 経由。
+- `CoprimeFrobeniusAction.quotient` 相当の `typeP_quotientCoprimeAction` (S11): U W₁-conjugation を
+  U W₁-invariant 商 `H̄ = ↥H ⧸ N` へ降下 (`quotientMulAutHom`、`|H̄| ∣ |H|` coprime、`H̄` solvable)。
+- `isAInvariant_fixedSubgroup_of_normal` (S11): 正規 `K ◁ L` の `fixedSubgroup φ K` は φ-invariant
+  (⟹ `C_{H̄}(U)` は U W₁-invariant、`U ◁ U W₁`)。
+- `card_dvd_prime_of_isCyclic_of_pow` (S11): exponent-p 群の cyclic 部分群は位数 ∣ p。
+- **`typeP_chiefFactor_card`** (S11) = **Peterfalvi (9.6)**: 仮定 = N が U W₁-invariant 正規、`H̄` el-ab
+  p-group、`H̄` が U W₁-irreducible (`hirr`)、U 非中心化 (`hUntriv`)、`H̄≠1`。結論 `|H̄| = p^q`。証明:
+  `C_{H̄}(U)` は invariant かつ `≠H̄` ⟹ `=⊥` (irreducible); Wielandt ⟹ `|H̄|=|C_{H̄}(W₁)|^q`;
+  `C_{H̄}(W₁)` = cyclic `W₂=C_H(W₁)` の像 (Isaacs Cor 3.28 `map_fixedSubgroup_eq_fixedSubgroup_quotient`)、
+  exponent p で cyclic ⟹ 位数 p。**`#print axioms` = [propext, Classical.choice, Quot.sound] (sorryAx 無し)**。
+- `typeP_U_noncentral_on_H` (S11): (9.4) の非中心化 input。`(typeP_coprimeAction data hU).fixedByU ≠ ⊤`、
+  (8.5.b) `typeP_U_not_centralizes_H` (sorry-free) の action 形。
+
+**de-risk 知見 (再利用infra発見)**: `OddOrder/GroupTheory/CoprimeFixedPoints.lean` が Wielandt assembly
+用に **BG 1.5(d) を既に持っていた** — `map_fixedSubgroup_eq_fixedSubgroup_quotient`
+(`(fixedSubgroup φ X).map(mk' N) = fixedSubgroup(quotient action) X`) + `card_fixedSubgroup_eq_mul`。
+S11 に `import OddOrder.GroupTheory.CoprimeFixedPoints` 追加で到達。BG 1.8 = `Isaacs.Ch04.aFixed_quotient_frattini`、
+BG 1.5(d) lift = `coprime_fixedPoints_quotient`、Maschke = `exists_aInvariant_complement_in_omega1_quotient`
+(全 sorry-free)。⚠ `quotientMulAutHom` 実名は doubled namespace `OddOrder.Isaacs.Ch04.OddOrder.Isaacs.Ch03.IsAInvariant.quotientMulAutHom`。
+
+**▶ 残 = (9.4) existence (Maschke/semisimplicity core, 次セッション)**: `exists_chiefFactorData` (S11:688, sorry)。
+証明対象 = ∃ N (U W₁-invariant 正規 ◁ ↥H) で `↥H⧸N` el-ab p-group, U W₁-irreducible (top quotient), U 非中心化,
+III/IV では p=|W₂|。**bottleneck = top-quotient chief factor を peel するための semisimplicity** (一般の M-chief
+sub-quotient では不可、top quotient が `quotient_order:|H|=p^q·|H₀|` に必要)。原文 path = `P=Sylow_p(H)`,
+`P/Φ(P)` を 𝔽_p[U W₁]-module 化 (Maschke で半単純) → U 非中心 simple 商を peel (BG 1.8 で U 非中心 on P/Φ(P))。
+=lane-f piece D 系の modular rep-theory infra 要 (multi-session)。front-end (i) U 非中心 on H = ✅ 済
+(`typeP_U_noncentral_on_H`)。次 = (ii) U 非中心 on `P/Φ(P)` (BG 1.8) → (iii) 半単純分解で simple 商 peel。
+assembly では `H0:Subgroup G ↔ N:Subgroup ↥H` 翻訳 + ChiefFactorData の opaque Props を honest 化。
