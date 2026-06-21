@@ -7802,9 +7802,13 @@ an **overstatement** for the type-`F` case.  Verified two ways: (1) a ChatGPT (G
 plus an independent reduction shows `M' = F(M) ⟺ C_Y(E₁) = 1` (E₁ acts fixed-point-freely on the
 τ₂-Fitting factor `Y = O_{σ'}(F(M))`), and `C_Y(E₁) = 1` is **not** derivable from the cited results
 (Cor 12.6(d) is vacuous once `E₃ = 1`; the rest control the action on `M_σ`, not on `Y`); (2) the
-authoritative MathComp odd-order formalization (`BGsection15`, `nonTI_Fitting_structure`) states
-conjunct (c) as `M^'(1) ⊆ 'F(M)` (inclusion) `∧ M_σ × O_σ('F(M)) = 'F(M)`, **not** equality.  Only
-`M' ≤ F(M)` is BG-faithful and provable; the equality holds iff `C_Y(E₁) = 1`, a non-derivable
+authoritative MathComp odd-order formalization (`theories/BGsection15.v`, `nonTI_Fitting_structure`)
+states conjunct (c) as `M^'(1) ⊆ 'F(M)` (inclusion) `∧ M_σ × O_σ('F(M)) = 'F(M)`, **not** equality —
+its source comment explicitly records the change: *"We had to change the statement … the first
+equality of part (c) does not appear to be valid: if M is of type F … E2 might have a Sylow subgroup
+that meets F(M) but is also centralised by E1 and hence intersects M' trivially; … only the inclusion
+M' ⊆ F(M) seems to be needed in the sequel."*  (independently curl-verified, not via the consult).
+Only `M' ≤ F(M)` is BG-faithful and provable; the equality holds iff `C_Y(E₁) = 1`, a non-derivable
 condition (BG only gets `M` Frobenius later, in Corollary 15.9, after `τ₂(M) = ∅`, i.e. `E₂ = 1`).
 See `notes/bg/s15_7_typeF_chatgpt_prompt.md`.
 
