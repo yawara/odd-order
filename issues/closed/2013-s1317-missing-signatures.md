@@ -75,6 +75,25 @@ gate 3/4 は (A) と (B) の**混合**で、純粋な skeleton ではない。�
 - 注: (B1)(B2) の signature の **proof** 完成は本 issue のスコープ外（gate 3 は §13 機構、gate 4 は BG Theorem E に gate）。
   本 issue は「未記載 signature の特定 + statement 追加 + 文書訂正」まで。
 
+## 解決 (2026-06-20, hub)
+
+ユーザー指示で hub が実装 → **close**。`S15_SAndT.lean` に 4 producer を faithful sorried で追加:
+- **B1** `card_Q_eq` (`|Q|=q^p`) + `tConjugate_fitting_data` (L conj T ⟹ `|L_F|=q^p ∧ W₁≤L_F ∧ L_F⊓U=⊥`)
+- **B2** `card_LF_coprime_pq` (type-I 非共役 L ⟹ `Coprime |L_F| (p*q)`、`bgTheoremE_cover_data`[F] 派生) +
+  `typeI_overNormalizer_U_le_fitting` (type-I L ⟹ `U≤L_F`)
+
+結果:
+- ✅ **gate 3 (L~T) 構造論コア = sorry-free**: `tConjugate_fitting_data` ⟹ `⁅U,W₁⁆≤L_F⊓U=⊥` ⟹
+  `UW1_frobenius.conj_frobenius` 矛盾 (実 commutator/Frobenius 論法)。残差 = B1 producer のみ。
+- ⚠ **gate 4 (type-I) = producer 委任**: FPF 作用構成インフラ + 型一意性補題 (IsTypeI L ⟹ ¬conj S/T) が
+  別途要り、構造論コア sorry-free 化は未達。`typeI_overNormalizer_U_le_fitting (:= sorry)` に honest 隔離
+  (`hLI` 枝は 1 行 `exact`)。完了条件のうち gate 4 コアのみ未達だが、proof 完成は元々スコープ外ゆえ close。
+- 3 文書のうち tracked 2 件 (s13_17 / issue 2009) 訂正済、LAUNCH.md は git-excluded。
+- count-sorry 137→139、full build 3869 jobs green、新 axiom 0。
+- **後続**: gate 4 コアの sorry-free 化 (FPF 作用構成 + 型一意性) は lane-h の §13 program で追える
+  (`typeI_overNormalizer_U_le_fitting` の docstring に経路記載)。B1/B2 producer の proof は §13 機構 /
+  BG Theorem E (`bgTheoremE_cover_data`, owner=F) に gate。
+
 ## 参照
 
 - issue 2009（POLE-2、gate 1/2 の F-ask）
