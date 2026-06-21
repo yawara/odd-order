@@ -509,7 +509,185 @@ theorem a0_minus_a_subset_conj_zTilde [Finite G] (hG : OddOrder.BG.IsMinimalSimp
     (hU : Ch03.IsHallSubgroup ((S14.kappa M ∪ OddOrder.BG.Ch3.S10.sigma M)ᶜ) (U.subgroupOf M)) :
     ∀ a ∈ A0Set M K \ ASet M U,
       ∃ m ∈ M, ∃ t ∈ S14.zTilde K Kstar, a = m * t * m⁻¹ := by
-  sorry
+  classical
+  haveI hsolv : IsSolvable ↥M := hG.solvable_of_mem_maximalSubgroups hM
+  have hKne : K ≠ ⊥ := fun h => card_kappaHall_ne_one hP hKM hK (by rw [h, Subgroup.card_bot])
+  haveI hKcyc : IsCyclic ↥K := (typeP_auxiliary_structure hG hM hKM hUM hK hKstar hU).2.1
+  have hMσM : OddOrder.BG.Ch3.S10.Msigma M ≤ M := OddOrder.BG.Ch3.S10.Msigma_le M
+  have hM'M : (U ⊔ OddOrder.BG.Ch3.S10.Msigma M : Subgroup G) ≤ M := sup_le hUM hMσM
+  have hKstarMσ : Kstar ≤ OddOrder.BG.Ch3.S10.Msigma M := by rw [hKstar]; exact inf_le_left
+  -- `M' = U ⊔ M_σ` (Theorem C(3) / Lemma 15.1(b)).
+  have hM'eq : derivedInG M = U ⊔ OddOrder.BG.Ch3.S10.Msigma M :=
+    (typeP_hall_derived_eq_and_abelian hG hM hKM hUM hKne hK hU).1
+  -- **Helper A**: every `κ(M)'`-element of `M` lies in the normal Hall `κ'`-subgroup `M' = U ⊔ M_σ`.
+  -- (`M'` complements the Hall `κ`-subgroup `K` in `M`, so `[M : M'] = |K|` is a `κ`-number;
+  -- a `κ'`-element has image of order dividing both `[M : M']` and its own order, hence trivial.)
+  have hkappaComplMem : ∀ x : G, x ∈ M → IsPiElement (S14.kappa M)ᶜ x →
+      x ∈ (U ⊔ OddOrder.BG.Ch3.S10.Msigma M : Subgroup G) := by
+    intro x hxM hxπ'
+    rw [← hM'eq]
+    haveI hNnorm : ((derivedInG M).subgroupOf M).Normal :=
+      Subgroup.normal_subgroupOf_of_le_normalizer (OddOrder.BG.Ch3.S10.le_normalizer_derivedInG M)
+    set N := (derivedInG M).subgroupOf M with hNdef
+    set x' : ↥M := ⟨x, hxM⟩ with hx'def
+    -- `N.index = |K|` is a `κ`-number (`M'` complements the Hall `κ`-subgroup `K`).
+    have hidxκ : ∀ p ∈ N.index.primeFactors, p ∈ S14.kappa M := by
+      have hcompl := (typeP_duality hG hM hP hKM hK hKstar).1
+      have hidxeq : N.index = Nat.card ↥(K.subgroupOf M) := hcompl.symm.index_eq_card
+      rw [hidxeq]; exact hK.1
+    -- `orderOf x'` is a `κ'`-number, hence coprime to `N.index`.
+    have hordx' : orderOf x' = orderOf x :=
+      (orderOf_injective M.subtype M.subtype_injective x').symm
+    have hcop : Nat.Coprime (orderOf x') N.index := by
+      rw [Nat.coprime_iff_gcd_eq_one]
+      by_contra hne
+      obtain ⟨p, hpp, hpdvd⟩ := Nat.exists_prime_and_dvd hne
+      rw [Nat.dvd_gcd_iff] at hpdvd
+      have hpord : p ∈ (orderOf x).primeFactors :=
+        Nat.mem_primeFactors.mpr ⟨hpp, hordx' ▸ hpdvd.1, (orderOf_pos x).ne'⟩
+      exact (hxπ' p hpord)
+        (hidxκ p (Nat.mem_primeFactors.mpr ⟨hpp, hpdvd.2, Subgroup.index_ne_zero_of_finite⟩))
+    -- The image of `x'` in `↥M ⧸ N` has order dividing both `orderOf x'` and `N.index`, hence `1`.
+    have hord1 : orderOf (QuotientGroup.mk' N x') = 1 := by
+      have h1 : orderOf (QuotientGroup.mk' N x') ∣ orderOf x' :=
+        orderOf_dvd_of_pow_eq_one (by rw [← map_pow, pow_orderOf_eq_one, map_one])
+      have h2 : orderOf (QuotientGroup.mk' N x') ∣ N.index := orderOf_dvd_natCard _
+      exact Nat.dvd_one.mp (hcop ▸ Nat.dvd_gcd h1 h2)
+    have hx'N : x' ∈ N := by
+      have h := orderOf_eq_one_iff.mp hord1
+      rwa [QuotientGroup.mk'_apply, QuotientGroup.eq_one_iff] at h
+    exact Subgroup.mem_subgroupOf.mp hx'N
+  -- **Helper B**: `M' ⊓ (K ⊔ K*) = K*` (direct: `x = k·k* ∈ M'`, `k* ∈ K* ≤ M'`, so `k ∈ K ⊓ M' = 1`).
+  have hMeetKKstar : (U ⊔ OddOrder.BG.Ch3.S10.Msigma M : Subgroup G) ⊓ (K ⊔ Kstar) = Kstar := by
+    refine le_antisymm ?_ (le_inf (hKstarMσ.trans le_sup_right) le_sup_right)
+    -- `K` is normal in `K ⊔ K*` (`K*` centralizes it), so an element `x` of `K ⊔ K*` is `a·b`
+    -- with `a ∈ K`, `b ∈ K*`.  If also `x ∈ M'`, then `a = x·b⁻¹ ∈ K ⊓ M' = ⊥`, so `x = b ∈ K*`.
+    have hKstarC : Kstar ≤ Subgroup.centralizer (K : Set G) := by rw [hKstar]; exact inf_le_right
+    have hKnorm : (K ⊔ Kstar : Subgroup G) ≤ Subgroup.normalizer (K : Set G) :=
+      sup_le Subgroup.le_normalizer (hKstarC.trans (Subgroup.centralizer_le_normalizer _))
+    haveI : (K.subgroupOf (K ⊔ Kstar)).Normal :=
+      Subgroup.normal_subgroupOf_of_le_normalizer hKnorm
+    have hsuptop : (K.subgroupOf (K ⊔ Kstar)) ⊔ (Kstar.subgroupOf (K ⊔ Kstar)) = ⊤ := by
+      rw [← Subgroup.subgroupOf_sup le_sup_left le_sup_right, Subgroup.subgroupOf_self]
+    have hKM'bot : K ⊓ (U ⊔ OddOrder.BG.Ch3.S10.Msigma M : Subgroup G) = ⊥ := by
+      have hcompl := (typeP_duality hG hM hP hKM hK hKstar).1
+      have hdisj : Disjoint ((derivedInG M).subgroupOf M) (K.subgroupOf M) := hcompl.disjoint
+      rw [← hM'eq, eq_bot_iff]
+      intro y hy
+      rw [Subgroup.mem_inf] at hy
+      have hmemMinf : (⟨y, hKM hy.1⟩ : ↥M) ∈ (K.subgroupOf M) ⊓ ((derivedInG M).subgroupOf M) :=
+        Subgroup.mem_inf.mpr ⟨Subgroup.mem_subgroupOf.mpr hy.1, Subgroup.mem_subgroupOf.mpr hy.2⟩
+      rw [disjoint_iff.mp hdisj.symm, Subgroup.mem_bot] at hmemMinf
+      rw [Subgroup.mem_bot]; exact Subtype.ext_iff.mp hmemMinf
+    intro x hx
+    rw [Subgroup.mem_inf] at hx
+    obtain ⟨hxM', hxKK⟩ := hx
+    obtain ⟨a, ha, b, hb, hab⟩ := Subgroup.mem_sup_of_normal_left.mp
+      (hsuptop ▸ Subgroup.mem_top (⟨x, hxKK⟩ : ↥(K ⊔ Kstar)))
+    have haK : (a : G) ∈ K := Subgroup.mem_subgroupOf.mp ha
+    have hbKstar : (b : G) ∈ Kstar := Subgroup.mem_subgroupOf.mp hb
+    have hab' : (a : G) * (b : G) = x := by have := congrArg Subtype.val hab; simpa using this
+    have haM' : (a : G) ∈ (U ⊔ OddOrder.BG.Ch3.S10.Msigma M : Subgroup G) := by
+      have heq : (a : G) = x * (b : G)⁻¹ := by rw [← hab']; group
+      rw [heq]
+      exact Subgroup.mul_mem _ hxM'
+        (Subgroup.inv_mem _ ((hKstarMσ.trans le_sup_right) hbKstar))
+    have ha1 : (a : G) = 1 := Subgroup.mem_bot.mp (hKM'bot ▸ Subgroup.mem_inf.mpr ⟨haK, haM'⟩)
+    rw [← hab', ha1, one_mul]; exact hbKstar
+  -- ## Main argument.
+  intro a ha
+  have haM : a ∈ M := ha.1.1.1
+  have hanc : a ∉ conjClassSet (sharpSubgroup K) := ha.1.2
+  have haUMσ : a ∉ ((U ⊔ OddOrder.BG.Ch3.S10.Msigma M : Subgroup G) : Set G) :=
+    fun hmem => ha.2 ⟨ha.1.1, hmem⟩
+  -- `κ`/`κ'`-decomposition `a = a_κ · a_{κ'}`.
+  obtain ⟨aκ, aκ', hmul, hcomm, hκ, hκ', hazκ, hazκ'⟩ := exists_isPiElement_mul (S14.kappa M) a
+  have hzpaM : Subgroup.zpowers a ≤ M := Subgroup.zpowers_le.mpr haM
+  have haκM : aκ ∈ M := hzpaM hazκ
+  have haκ'M : aκ' ∈ M := hzpaM hazκ'
+  -- `a_κ ≠ 1`: else `a = a_{κ'}` is a `κ'`-element, so `a ∈ M'`, contradicting `a ∉ U M_σ`.
+  have haκne : aκ ≠ 1 := by
+    intro h
+    refine haUMσ ?_
+    have : a = aκ' := by rw [← hmul, h, one_mul]
+    rw [this]; exact hkappaComplMem aκ' haκ'M hκ'
+  -- Conjugate `⟨a_κ⟩` into `K`.
+  have hXpi : Ch03.Subgroup.IsPiGroup (S14.kappa M) ((Subgroup.zpowers aκ).subgroupOf M) := by
+    intro p hp
+    rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe (Subgroup.zpowers_le.mpr haκM)).toEquiv,
+      Nat.card_zpowers] at hp
+    exact hκ p hp
+  obtain ⟨w, hwM, hwle⟩ :=
+    exists_conj_smul_le_isHall_kappa hG hM hKM hK (Subgroup.zpowers_le.mpr haκM) hXpi
+  -- `b := w·a·w⁻¹ = b_κ·b_{κ'}` with `b_κ = w·a_κ·w⁻¹ ∈ K`.
+  have hbκK : w * aκ * w⁻¹ ∈ K := by
+    have hmem : (MulAut.conj w) • aκ ∈ MulAut.conj w • Subgroup.zpowers aκ :=
+      Subgroup.smul_mem_pointwise_smul aκ (MulAut.conj w) _ (Subgroup.mem_zpowers aκ)
+    have heq : (MulAut.conj w) • aκ = w * aκ * w⁻¹ := rfl
+    rw [heq] at hmem; exact hwle hmem
+  -- `b_κ' := w·a_{κ'}·w⁻¹ ∈ M'` (conjugate of a `κ'`-element, `M' ◁ M`, `w ∈ M`).
+  have hbκ'M' : w * aκ' * w⁻¹ ∈ (U ⊔ OddOrder.BG.Ch3.S10.Msigma M : Subgroup G) := by
+    have hwnorm : w ∈ Subgroup.normalizer (derivedInG M) :=
+      OddOrder.BG.Ch3.S10.le_normalizer_derivedInG M hwM
+    have h1 : aκ' ∈ derivedInG M := by rw [hM'eq]; exact hkappaComplMem aκ' haκ'M hκ'
+    have hconjM' : w * aκ' * w⁻¹ ∈ derivedInG M :=
+      (Subgroup.mem_normalizer_iff.mp hwnorm aκ').mp h1
+    rwa [hM'eq] at hconjM'
+  -- `b_κ ≠ 1` and `b_κ' ≠ 1`.
+  have hbκne : w * aκ * w⁻¹ ≠ 1 := by
+    intro h
+    exact haκne (by
+      have := congrArg (fun y => w⁻¹ * y * w) h; simpa [mul_assoc] using this)
+  have hbκ'ne : w * aκ' * w⁻¹ ≠ 1 := by
+    intro h
+    -- `b_κ' = 1 ⟹ a_{κ'} = 1 ⟹ a = a_κ`, and `a = w⁻¹·b_κ·w` is `G`-conjugate to `b_κ ∈ K#`.
+    have haκ'1 : aκ' = 1 := by
+      have h2 := congrArg (fun y => w⁻¹ * y * w) h; simpa [mul_assoc] using h2
+    have haaκ : a = aκ := by rw [← hmul, haκ'1, mul_one]
+    exact hanc ⟨w * aκ * w⁻¹, ⟨hbκK, hbκne⟩, w⁻¹, by rw [haaκ]; group⟩
+  -- `b_κ' ∈ K*`: it lies in `M' ⊓ C_M(b_κ) = M' ⊓ (K ⊔ K*) = K*`.
+  have hbκ'comm : Commute (w * aκ * w⁻¹) (w * aκ' * w⁻¹) := by
+    show w * aκ * w⁻¹ * (w * aκ' * w⁻¹) = w * aκ' * w⁻¹ * (w * aκ * w⁻¹)
+    calc w * aκ * w⁻¹ * (w * aκ' * w⁻¹) = w * (aκ * aκ') * w⁻¹ := by group
+      _ = w * (aκ' * aκ) * w⁻¹ := by rw [hcomm.eq]
+      _ = w * aκ' * w⁻¹ * (w * aκ * w⁻¹) := by group
+  have hbκ'CM : w * aκ' * w⁻¹ ∈ Subgroup.centralizer ({w * aκ * w⁻¹} : Set G) := by
+    rw [Subgroup.mem_centralizer_iff]
+    intro g hg
+    rw [Set.mem_singleton_iff] at hg; subst hg
+    exact hbκ'comm.eq
+  have hbκ'Kstar : w * aκ' * w⁻¹ ∈ Kstar := by
+    have hCMeq : M ⊓ Subgroup.centralizer ({w * aκ * w⁻¹} : Set G) = K ⊔ Kstar :=
+      typeP_centralizer_kappaElement_eq hG hM hP hKM hK hKstar hU _ hbκK hbκne
+    have hbκ'KK : w * aκ' * w⁻¹ ∈ K ⊔ Kstar := by
+      rw [← hCMeq, Subgroup.mem_inf]
+      exact ⟨hM'M hbκ'M', hbκ'CM⟩
+    rw [← hMeetKKstar, Subgroup.mem_inf]
+    exact ⟨hbκ'M', hbκ'KK⟩
+  -- Assemble: `b := w·a·w⁻¹ = b_κ·b_{κ'} ∈ K·K* ⊆ K ⊔ K*`, and `b ∉ K`, `b ∉ K*`, so `b ∈ Ẑ`.
+  refine ⟨w⁻¹, M.inv_mem hwM, w * a * w⁻¹, ?_, by group⟩
+  have hbeq : w * a * w⁻¹ = (w * aκ * w⁻¹) * (w * aκ' * w⁻¹) := by
+    rw [← hmul]; group
+  refine ⟨?_, ?_⟩
+  · -- `b ∈ K ⊔ K*`.
+    rw [hbeq]
+    exact Subgroup.mul_mem _ (Subgroup.mem_sup_left hbκK) (Subgroup.mem_sup_right hbκ'Kstar)
+  · -- `b ∉ K ∪ K*`.
+    rw [Set.mem_union]
+    push_neg
+    refine ⟨fun hbK => ?_, fun hbKstar => ?_⟩
+    · -- `b ∈ K ⟹ b_κ' = b_κ⁻¹·b ∈ K ⊓ K* = 1`, contra `b_κ' ≠ 1`.
+      have hbκ'K : w * aκ' * w⁻¹ ∈ K := by
+        have : w * aκ' * w⁻¹ = (w * aκ * w⁻¹)⁻¹ * (w * a * w⁻¹) := by rw [hbeq]; group
+        rw [this]; exact Subgroup.mul_mem _ (Subgroup.inv_mem _ hbκK) hbK
+      exact hbκ'ne (Subgroup.mem_bot.mp
+        (kappaHall_inf_Kstar_eq_bot hKM hK hKstar ▸ Subgroup.mem_inf.mpr ⟨hbκ'K, hbκ'Kstar⟩))
+    · -- `b ∈ K* ⟹ b_κ = b·b_κ'⁻¹ ∈ K ⊓ K* = 1`, contra `b_κ ≠ 1`.
+      have hbκK' : w * aκ * w⁻¹ ∈ Kstar := by
+        have : w * aκ * w⁻¹ = (w * a * w⁻¹) * (w * aκ' * w⁻¹)⁻¹ := by rw [hbeq]; group
+        rw [this]; exact Subgroup.mul_mem _ hbKstar (Subgroup.inv_mem _ hbκ'Kstar)
+      exact hbκne (Subgroup.mem_bot.mp
+        (kappaHall_inf_Kstar_eq_bot hKM hK hKstar ▸ Subgroup.mem_inf.mpr ⟨hbκK, hbκK'⟩))
 
 /-- **BG Theorem C** (mmd L4303): when `K ≠ 1`, `M` has a paired maximal
 subgroup `Mstar`, the cyclic product `Z = K Kstar`, a TI set `Z_tilde`, and the

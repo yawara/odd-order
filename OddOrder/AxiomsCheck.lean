@@ -3880,6 +3880,15 @@ set_option linter.style.longLine false in
 -- since `π(M_σ) ∩ β = ∅`), so both summands lie in `F(M)` via `fitting_decomposition`.  Now fully
 -- sorry-free + axiom-clean (the type-`F` residual is closed; the `= F(M)` gate `C_Y(E₁) = 1` is gone).
 #assert_only_allowed_axioms OddOrder.BG.Ch4.S15.fitting_not_ti_cases
+-- General TI-transport (`TISubset.lean`, issue 7007): if `T` is TI with normalizer-bound `Z ≤ M` and
+-- every element of `A` is `M`-conjugate into `T`, then `A` is TI with normalizer-bound `M`.  Pure
+-- group theory; the abstract content of BG Theorem B(5)/C(9).  Sorry-free + axiom-clean.
+#assert_only_allowed_axioms OddOrder.GroupTheory.IsTISubset.of_subset_conj_of_isTISubset
+-- BG Theorem C(9), structural inclusion (`S16_MainResults`, issue 7007): every element of
+-- `A_0(M) − A(M)` is `M`-conjugate to an element of `Ẑ` (the `⊆` half of `A_0(M) − A(M) = 𝒞_M(Ẑ)`).
+-- κ/κ'-decompose `a = a_κ·a_{κ'}`, conjugate `a_κ` into `K`, then `a_{κ'} ∈ M' ⊓ (K ⊔ K*) = K*`.
+-- Discharges conjunct 10 (`A_0(M) − A(M)` TI) of `theoremC_paired_structure`.  Sorry-free + axiom-clean.
+#assert_only_allowed_axioms OddOrder.BG.Ch4.S16.a0_minus_a_subset_conj_zTilde
 
 /-! ### Forward-axiom islands (historical mechanism; currently empty)
 
