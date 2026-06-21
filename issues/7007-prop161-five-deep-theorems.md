@@ -90,6 +90,19 @@ bottom-out** するので、clean 化には §15 foundation が先。真の順�
 
 ## 進捗ログ
 
+**2026-06-21 (lane F resume) ✅ Thm C `theoremC_paired_structure` 9/12 conjunct discharge + faithfulness 修正 2 件** (`8f636b54` + `ec711630`, full build 3881 green):
+- TypePData de-contradiction (issue 7008, `0530f90c`) で lane unblock → Thm C 着手。Thm C は full sorry の scaffold だったが **9/12 conjunct を landed §14/§15 補題から実証明**:
+  - conjunct 1,7 (U abelian, M'=U⊔M_σ) ← `typeP_hall_derived_eq_and_abelian` (Lem 15.1(b))
+  - conjunct 3,4,5,6,8 (K*≠⊥/cyclic/≤M_F/≤M''/¬cyclic M_F) ← `typeP_kstar_in_mf` (Cor 15.6)
+  - conjunct 9 (∃! M*) ← `typeP_duality` (Thm 14.7)
+  - conjunct 12 (U=⊥→|K*| prime) ← `kstar_card_prime_of_inputs` (要 `kappa_eq_sigmaComplementPrimes_of_hall_subgroupOf_eq_bot` を Thm C 前へ hoist)
+- **faithfulness 修正 2 件** (lane-internal、caller=`theoremII_tame_embedding{,_of_inputs}` のみ、3 定理に伝播):
+  1. **署名に `hKM : K ≤ M`, `hUM : U ≤ M` 追加** — `subgroupOf M` Hall 条件は K,U⊆M を含意せず、conjunct 7 (M'=U⊔M_σ) は U⊄M で偽。BG は K,U が M の Hall factor (M=KUM_σ)。
+  2. **`∃! M*` を `typeP_duality` の強い述語に強化** — 旧 scaffold の弱い述語 (maximal∧typeP∧¬conj∧(P2 M∨P2 M*)) は partner M* の全 G-共役が満たす (N_G(M*)=M*⊊G) ゆえ **∃! が literally false**。強い述語は dual Hall datum (K*≤M*, K=M*_σ⊓C(K*)) で M* を pin。caller は TI conjunct のみ projection ゆえ安全。
+- **残 residual = genuinely-deep 3 conjunct のみ**: conjunct 2 (N(U)⊄M = Cor 14.12)、conjunct 10 (A0(M)-A(M) TI = Thm A(3)(5)+Prop 14.2(d))、conjunct 11 (U≠⊥→|K|prime∧F(M) TI = Thm C(10)=Prop 14.2(g)+Thm 15.7(a))。これらは standalone 補題未 landed。
+- sorry 134→136 (1 opaque sorry を 9 conjunct 実証明 + 3 named residual に itemize、+ 2 bug fix)。進捗は sorry 数でなく実証明で測る ([[scaffold-sorry-free-not-done]])。
+- **次**: Thm C residual (conjunct 2/10/11) は §16 Theorems A-E と連動の deep construction。または Thm A faithful (`theoremA_maximal_structure_faithful` 既 sorry-free) を活用した hard input 方向、Prop 16.1 wire。
+
 **2026-06-19 (cont.³) ✅✅ BG Lemma 15.1 完全完成 — conjunct 4 + gated lemma wire DONE**:
 - `3d240069`: **conjunct 4 (15.1(e)) COMPLETE** — τ₂ **nonabelian** sub-case 着地で `typeP_hall_frobenius_factor`
   全 sorry-free (K=⊥ / K≠⊥ τ₁∪τ₃ / τ₂ abelian / τ₂ nonabelian すべて)。nonabelian: Lemma 10.13
@@ -212,7 +225,7 @@ bottom-out** するので、clean 化には §15 foundation が先。真の順�
 - [ ] Thm 15.2(a) `mf_ne_msigma_typeP1_structure` (S15:1144)
 - [ ] Thm 15.7 `fitting_not_ti_cases` (S15:3896) + Cor 15.5
 - [ ] Thm A `theoremA_maximal_structure` (S16:144) — Lemma 15.1 + Prop 14.2 + §15 で全 conjunct
-- [ ] Thm C `theoremC_paired_structure` (S16:274) — Thm A + Thm 14.7 + Lemma 15.1(b)
+- [~] Thm C `theoremC_paired_structure` — **9/12 conjunct discharge + faithfulness 修正 2 件 DONE** (`8f636b54`/`ec711630`, 2026-06-21)。残 = conjunct 2 (N(U)⊄M)/10 (A0-A TI)/11 (U≠⊥→|K|prime∧F(M) TI) の deep construction
 - [ ] Prop 16.1 配線 `proposition_type_classification` (S16:894) + AxiomsCheck 登録
 
 ## 完了条件
