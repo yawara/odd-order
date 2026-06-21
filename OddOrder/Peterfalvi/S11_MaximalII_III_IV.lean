@@ -7,6 +7,8 @@ import OddOrder.Peterfalvi.S10_MinimalSimpleStructure
 import OddOrder.Peterfalvi.S10_CoherenceWiring
 import OddOrder.GroupTheory.CoprimeAction
 import OddOrder.GroupTheory.WielandtFixedPoint
+import OddOrder.GroupTheory.MaximalSubgroupTypeConj
+import OddOrder.GroupTheory.AInvariantPiSubgroups
 import OddOrder.BG.Ch4_FamilyOfMaximal.S15_MF
 
 /-!
@@ -441,16 +443,105 @@ the *explicit* type-`P` data of the maximal subgroup, so that (9.3) cites them d
 body carries no `sorry` of its own).  Each is to be discharged by the §8/§10 local-analysis
 development by wiring it to the cited canonical result; doing so makes (9.3) unconditional. -/
 
+/-- Conjugation preserves coatoms (local copy; avoids a cross-area dependency on BG Ch3). -/
+private theorem isCoatom_conj_smul {g : G} {M : Subgroup G} (h : IsCoatom M) :
+    IsCoatom (MulAut.conj g • M) := by
+  have hMeq : M = MulAut.conj g⁻¹ • (MulAut.conj g • M) := by
+    rw [← mul_smul, ← map_mul, inv_mul_cancel, map_one, one_smul]
+  constructor
+  · intro htop
+    apply h.1
+    rw [eq_top_iff]
+    intro x _
+    have hx : g * x * g⁻¹ ∈ MulAut.conj g • M := by
+      rw [htop]; exact Subgroup.mem_top _
+    rw [Subgroup.mem_pointwise_smul_iff_inv_smul_mem] at hx
+    simpa [MulAut.smul_def, mul_assoc] using hx
+  · intro b hb
+    have hle : M ≤ MulAut.conj g⁻¹ • b := by
+      rw [hMeq]; exact Subgroup.pointwise_smul_le_pointwise_smul_iff.mpr hb.le
+    have h1 : M < MulAut.conj g⁻¹ • b := by
+      refine lt_of_le_of_ne hle (fun heq => hb.ne ?_)
+      rw [heq, ← mul_smul, ← map_mul, mul_inv_cancel, map_one, one_smul]
+    have h2 := h.2 _ h1
+    have h3 := congrArg (fun K => MulAut.conj g • K) h2
+    simpa [← mul_smul, ← map_mul, mul_inv_cancel] using h3
+
+/-- A maximal subgroup of a minimal simple group is self-normalizing (`N_G(M) = M`): `N_G(M) ⊇ M`
+is a coatom, so it is `M` or `⊤`; the latter makes `M` normal, hence `⊥` or `⊤` by simplicity —
+impossible for a nontrivial proper maximal subgroup. -/
+private theorem maximal_normalizer_eq_self [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    {M : Subgroup G} (hM : M ∈ maximalSubgroups G) :
+    Subgroup.normalizer (M : Set G) = M := by
+  have hco : IsCoatom M := hM
+  refine le_antisymm ?_ Subgroup.le_normalizer
+  by_contra hle
+  have hlt : M < Subgroup.normalizer (M : Set G) :=
+    lt_of_le_of_ne Subgroup.le_normalizer (fun heq => hle heq.ge)
+  have hnormal : M.Normal := Subgroup.normalizer_eq_top_iff.mp (hco.2 _ hlt)
+  rcases hG.simple.eq_bot_or_eq_top_of_normal M hnormal with hb | ht
+  · exact hG.ne_bot_of_isCoatom hco hb
+  · exact hco.1 ht
+
 /-- **§8 input to (9.3)** — Peterfalvi (8.6.b II) + (8.12.b): for a maximal subgroup `M` of type II,
 the Frobenius kernel `U` acts fixed-point-freely on `H = M_F`, i.e. `C_H(U) = 1`.
 
-*Discharge route:* a nontrivial `C_H(U)` makes `C_G(U)` uniquely maximal (Peterfalvi (8.12) =
-`OddOrder.Peterfalvi.S10.typeI_or_typeII_centralizer_unique`, applied to `U ≤ M`), forcing
-`N_G(U) ⊆ M`, against `TypeIIData.normalizer_not_le` (8.6.b II).  The §8/§10 obligation. -/
+*Proof.* If `C_H(U) ≠ 1` then, taking `X = U#` (`C_G(X) = C_G(U)`), Peterfalvi (8.12.b)
+(`S10.typeI_or_typeII_centralizer_unique`) makes `M` the unique maximal subgroup containing
+`C_G(U)`.  Since `g ∈ N_G(U)` fixes `C_G(U)` (it normalizes `U`), conjugation by `g` carries that
+unique maximal to itself, so `g` normalizes `M`; as `M` is self-normalizing,
+`N_G(U) ⊆ M`.  This contradicts (8.6.b II) (`S10.typeII_normalizer_not_le_of_typePData`), so
+`C_H(U) = 1`. -/
 theorem typeII_centralizer_U_eq_bot [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     {M : Subgroup G} (data : TypePData M) (hM : M ∈ maximalSubgroups G) (hII : IsTypeII M) :
     data.H ⊓ Subgroup.centralizer (data.U : Set G) = ⊥ := by
-  sorry
+  by_contra hne
+  obtain ⟨dataII⟩ := hII
+  -- `data.U ≠ ⊥`: `|U| = [M' : M_F]` is independent of the type-`P` witness, and the `IsTypeII`
+  -- witness has `U ≠ 1`.
+  have hU_ne : data.U ≠ ⊥ := by
+    have hcard : Nat.card ↥data.U = Nat.card ↥dataII.typeP.U := by
+      rw [data.card_U_eq_index, dataII.typeP.card_U_eq_index]
+    refine fun hbot => dataII.common.1 (Subgroup.card_eq_one.mp ?_)
+    rw [← hcard, hbot, Subgroup.card_bot]
+  -- `C_G(U#) = C_G(U)` (the identity is centralized by everyone).
+  have hCeq : Subgroup.centralizer (sharpSubgroup data.U)
+      = Subgroup.centralizer (data.U : Set G) := by
+    refine le_antisymm ?_ (Subgroup.centralizer_le Set.diff_subset)
+    intro g hg
+    rw [Subgroup.mem_centralizer_iff] at hg ⊢
+    intro h hh
+    rcases eq_or_ne h 1 with rfl | h1
+    · simp
+    · exact hg h ⟨hh, h1⟩
+  -- `X = U#` is nonempty and `C_H(X) ≠ 1`, so (8.12.b) makes `M` the unique maximal `∋ C_G(X)`.
+  obtain ⟨x, hxU, hx1⟩ := (Subgroup.bot_or_exists_ne_one data.U).resolve_left hU_ne
+  have hUleM : data.U ≤ M := data.U_le.trans (Subgroup.map_subtype_le _)
+  have hCHne : maxNilpotentNormalHall M ⊓ Subgroup.centralizer (sharpSubgroup data.U) ≠ ⊥ := by
+    rw [← data.H_eq, hCeq]; exact hne
+  obtain ⟨hCleM, hUniq⟩ :=
+    OddOrder.Peterfalvi.S10.typeI_or_typeII_centralizer_unique hG hM (Or.inr ⟨dataII⟩) hUleM
+      (sharpSubgroup data.U) ⟨x, hxU, hx1⟩ le_rfl hCHne
+  -- `N_G(U) ⊆ M`.
+  have hNleM : Subgroup.normalizer (data.U : Set G) ≤ M := by
+    intro g hg
+    have hgU : MulAut.conj g • data.U = data.U := conj_smul_eq_self_of_mem_normalizer hg
+    have hgC : MulAut.conj g • Subgroup.centralizer (sharpSubgroup data.U)
+        = Subgroup.centralizer (sharpSubgroup data.U) := by
+      rw [centralizer_pointwise_smul, image_sharpSubgroup, hgU]
+    have hgM : MulAut.conj g • M = M := by
+      have hCle' : Subgroup.centralizer (sharpSubgroup data.U) ≤ MulAut.conj g • M := by
+        rw [← hgC]; exact Subgroup.pointwise_smul_le_pointwise_smul_iff.mpr hCleM
+      exact hUniq.eq_of_isCoatom_of_le (isCoatom_conj_smul hM) hCle' hM hCleM
+    have hmem : g ∈ Subgroup.normalizer (M : Set G) := by
+      rw [Subgroup.mem_normalizer_iff]
+      intro h
+      have key : MulAut.conj g • h ∈ MulAut.conj g • M ↔ h ∈ M :=
+        Subgroup.smul_mem_pointwise_smul_iff
+      rw [hgM] at key
+      simpa [MulAut.smul_def, MulAut.conj_apply] using key.symm
+    rwa [maximal_normalizer_eq_self hG hM] at hmem
+  exact OddOrder.Peterfalvi.S10.typeII_normalizer_not_le_of_typePData hG data hM ⟨dataII⟩ hNleM
 
 /-- **§8 input to (9.3)** — Peterfalvi Theorem (8.8): for a maximal subgroup `M` of type III or IV,
 the order `|W₂|` is prime.
