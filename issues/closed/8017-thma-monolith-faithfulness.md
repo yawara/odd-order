@@ -53,14 +53,11 @@ Mσ≤M' / M'=U⊔Mσ structure。A(8) は `theoremA8_structure` (issue 8016, ax
 - [x] **忠実性の確認** ✅: conjunct 4 は任意 (κ∪σ)'-Hall U≤M で真 (上記)。restate 不要。
 - [x] **assembly conjunct 7** ✅ `typeP_centralizer_kappaElement_eq`。
 - [x] **assembly conjunct 4/5** ✅ `typeP_hall_inf_centralizer_kappaElement_eq_bot`。
-- [ ] **monolith signature の忠実性 fix (cross-lane, hub/ユーザー裁可)**: 現 `theoremA_maximal_structure`
-      (S16:249) は hKM (K≤M)・hUM (U≤M) を欠き、conjunct 3 (`M=K⊔U⊔Msigma`)・conjunct 4 が forces
-      する K≤M/U≤M を満たさない ⟹ **as-stated は unprovable (faithfulness bug)**。fix には hKM・hUM
-      追加が要るが、**`theoremA_maximal_structure` は Peterfalvi `S12_MaximalIII_IV_V:503` (lane-b) +
-      S16:669 が cite** ⟹ signature 変更は cross-lane。`theoremA_ungated_conjuncts`/`theoremB(1)` の
-      faithfulness precedent (hKM/hUM 明示) に倣う。**標準 (buggy) monolith に触れず新 faithful 版
-      `theoremA_maximal_structure_faithful` (hKM/hUM 明示, 全 conjunct sorry-free) を別建てし、後で
-      callers を移行**するのが安全。
+- [x] **monolith signature の忠実性 fix** ✅ (2026-06-21): 標準 (buggy) `theoremA_maximal_structure`
+      (S16:249, Peterfalvi S12:503 + S16:669 cite ゆえ cross-lane で touch 不可) には触れず、新 faithful 版
+      **`theoremA_maximal_structure_faithful`** (S16, hKM/hUM 明示, 全 11 conjunct sorry-free + axiom-clean)
+      を別建て。`theoremA_ungated_conjuncts`/`theoremB(1)` の faithfulness precedent に倣う。callers 移行は
+      後続 (cross-lane, hub/ユーザー裁可)。
 - [x] **conjunct 3 (`M = K U M_σ`) standalone** ✅ `typeP_maximal_eq_kappaHall_sup_U_sup_Msigma`
       (S16, sorry-free + axiom-clean): type-F via `subgroupESetup_of_isHall_kappa_eq_bot.E_compl_sup`,
       type-P via `typeP_auxiliary_structure` complement (`M'=U M_σ`, `M'` complements `K`) pushed
@@ -69,11 +66,27 @@ Mσ≤M' / M'=U⊔Mσ structure。A(8) は `theoremA8_structure` (issue 8016, ax
       の純 AC 書換えで回避。`rw [← hMM']` は `Msigma M` 内の `M` まで書換える → `conv_lhs` で LHS 限定。
 - [x] **extended `theoremA_ungated_conjuncts`** ✅: 4→8 conjunct (A(2) cyclic K / A(3) M≤N(UMσ) /
       A(4) C_U(k)=⊥ / A(5)-element C_M(k)=K⊔Kstar 追加、hUM 追加)。
-- [ ] **残 = faithful monolith の組立** (新版 `theoremA_maximal_structure_faithful`): conjunct 1-9 は全て
-      sorry-free standalone で揃った (上記 + `theoremA8_structure` の A(8))。**唯一の gate = A(7) `M''≤F(M)`**
-      = `derivedDerived_le_fittingInAmbient_of_inputs` (S15:6340, **type-P1 chief-factor 入力 Q/Q0/D に
-      gated**, type-P1 構造論待ち)。A(7) が landing したら 11-conjunct faithful monolith を組める。
-      buggy 標準 monolith (hKM/hUM 欠) は Peterfalvi S12:503 cite ゆえ触らない (cross-lane)。
+- [x] **A(7) `M''≤F(M)` standalone (ungated)** ✅ (2026-06-21): `derivedDerived_le_fittingInAmbient`
+      (S16, sorry-free + axiom-clean, 任意 maximal M)。**「type-P1 構造論待ち」は STALE だった** — Thm 15.2
+      完全 close (issue 8012) が既に type-P1 半分を供給済。case split: `M_F=M_σ` (M_σ nilpotent) ⟹
+      `M''≤M_σ≤M_F≤F(M)` (`derivedDerived_le_Msigma` 常時 + `Msigma_le_maxNilpotentNormalHall_of_nilpotent`
+      + `maxNilpotentNormalHall_le_fittingInG`); `M_F≠M_σ` (type-P1) ⟹ `mf_ne_msigma_typeP1_structure`
+      の conjunct 16。(旧 `derivedDerived_le_fittingInAmbient_of_inputs` S15:6340 は chief-factor 入力
+      経由の inputs 版、Thm 15.2 内部で消費済。)
+- [x] **faithful monolith の組立** ✅ (2026-06-21): **`theoremA_maximal_structure_faithful`** (S16,
+      11 conjunct sorry-free + axiom-clean、AxiomsCheck 登録)。`theoremA_ungated_conjuncts` (A1/A2/A3-normal/
+      A4/A5/A6) + `typeP_maximal_eq_kappaHall_sup_U_sup_Msigma` (A3-decomp) + `derivedDerived_le_fittingInAmbient`
+      (A7) + `theoremA8_structure` (A8; `U.subgroupOf M=⊥`→`U=⊥` を hUM で lift) を組立。full build 3872 green、
+      実 sorry 137 不変。commit `9f44f269`。
+
+## ✅ 完了 (2026-06-21)
+
+BG Theorem A は **2 形態**で形式化完了:
+- `theoremA_maximal_structure_faithful` (S16, **sorry-free + axiom-clean**, 11 conjunct) = 忠実な完全版。
+- `theoremA_ungated_conjuncts` + standalone conjuncts (A3-decomp/A4/A5-element/A7/A8) = 個別 surface。
+
+buggy 標準 `theoremA_maximal_structure` (S16:249, hKM/hUM 欠で as-stated unprovable) は cross-lane cite
+(Peterfalvi S12:503, S16:669) のため sorry のまま残置。callers の faithful 版への移行は別 issue/後続。
 
 ## 完了条件
 
