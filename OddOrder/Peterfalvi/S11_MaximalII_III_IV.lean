@@ -434,6 +434,37 @@ structure ChiefFactorData {M : Subgroup G} (data : TypesIIIIIIVSetup M) where
   U_noncentral_on_quotient : Prop
   U_noncentral_on_quotient_holds : U_noncentral_on_quotient
 
+/-! ### §8 inputs to (9.3)
+
+The two fixed-point-free §8 facts that (9.3) consumes are stated here as named obligations about
+the *explicit* type-`P` data of the maximal subgroup, so that (9.3) cites them directly (its proof
+body carries no `sorry` of its own).  Each is to be discharged by the §8/§10 local-analysis
+development by wiring it to the cited canonical result; doing so makes (9.3) unconditional. -/
+
+/-- **§8 input to (9.3)** — Peterfalvi (8.6.b II) + (8.12.b): for a maximal subgroup `M` of type II,
+the Frobenius kernel `U` acts fixed-point-freely on `H = M_F`, i.e. `C_H(U) = 1`.
+
+*Discharge route:* a nontrivial `C_H(U)` makes `C_G(U)` uniquely maximal (Peterfalvi (8.12) =
+`OddOrder.Peterfalvi.S10.typeI_or_typeII_centralizer_unique`, applied to `U ≤ M`), forcing
+`N_G(U) ⊆ M`, against `TypeIIData.normalizer_not_le` (8.6.b II).  The §8/§10 obligation. -/
+theorem typeII_centralizer_U_eq_bot [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    {M : Subgroup G} (data : TypePData M) (hM : M ∈ maximalSubgroups G) (hII : IsTypeII M) :
+    data.H ⊓ Subgroup.centralizer (data.U : Set G) = ⊥ := by
+  sorry
+
+/-- **§8 input to (9.3)** — Peterfalvi Theorem (8.8): for a maximal subgroup `M` of type III or IV,
+the order `|W₂|` is prime.
+
+*Discharge route:* (8.8) supplies a type-II maximal `S` with `|S : S'| = |W₂|`
+(`OddOrder.Peterfalvi.S12.Hypothesis.exists_typeII_maximal_with_w2`, resting on
+`theorem88_caseB_holds`), and a type-II cyclic factor has prime order
+(`theorem88_caseB_prime_orders`).  The §8/§12 obligation. -/
+theorem typeIIIorIV_W2_prime [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    {M : Subgroup G} (data : TypePData M) (hM : M ∈ maximalSubgroups G)
+    (hIIIIV : IsTypeIII M ∨ IsTypeIV M) :
+    (Nat.card ↥data.W2).Prime := by
+  sorry
+
 /-- **Peterfalvi (9.3)**: the order and centralizer alternatives for type II
 versus types III/IV.
 
@@ -460,10 +491,11 @@ theorem typeII_III_IV_order_relations [Finite G] (hG : OddOrder.BG.IsMinimalSimp
             p ^ data.q * Nat.card ↥(data.H ⊓ Subgroup.centralizer (data.U : Set G))) := by
   have hH_ne : data.typeP.H ≠ ⊥ := fun heq => data.typeP.H_noncyclic (heq ▸ inferInstance)
   refine ⟨fun _hII => ?_, fun _hIII_IV => ?_⟩
-  · -- **Type II.** §8 input: `C_H(U) = 1` (Peterfalvi (8.6.b II) + (8.12.b)).
+  · -- **Type II.** §8 input: `C_H(U) = 1` (Peterfalvi (8.6.b II) + (8.12.b)), cited as the
+    -- `typeII_centralizer_U_eq_bot` obligation.
     have hU : data.typeP.U ≠ ⊥ := data.nontrivial.1
-    have hCU : data.typeP.H ⊓ Subgroup.centralizer (data.typeP.U : Set G) = ⊥ := by
-      sorry
+    have hCU : data.typeP.H ⊓ Subgroup.centralizer (data.typeP.U : Set G) = ⊥ :=
+      typeII_centralizer_U_eq_bot hG data.typeP data.maximal _hII
     -- `C_H(U W₁) ⊆ C_H(U) = 1`.
     have hmono : Subgroup.centralizer ((data.typeP.U ⊔ data.typeP.W1 : Subgroup G) : Set G)
         ≤ Subgroup.centralizer (data.typeP.U : Set G) :=
@@ -476,8 +508,8 @@ theorem typeII_III_IV_order_relations [Finite G] (hG : OddOrder.BG.IsMinimalSimp
     rwa [hCUW, hCU, Subgroup.card_bot, one_pow, one_mul, mul_one] at key
   · -- **Types III/IV.** Sole §8 input: `|W₂| = p` prime (Theorem (8.8)).  `U ≠ 1` is the setup's
     -- `nontrivial` core, and `C_H(U W₁) = 1` is then *derived* from (8.5.b).
-    obtain ⟨p, hp_prime, hpW2⟩ : ∃ p : ℕ, p.Prime ∧ Nat.card ↥data.typeP.W2 = p := by
-      sorry
+    obtain ⟨p, hp_prime, hpW2⟩ : ∃ p : ℕ, p.Prime ∧ Nat.card ↥data.typeP.W2 = p :=
+      ⟨_, typeIIIorIV_W2_prime hG data.typeP data.maximal _hIII_IV, rfl⟩
     have hU : data.typeP.U ≠ ⊥ := data.nontrivial.1
     -- `C_H(U W₁) = 1`: it lies in `C_H(W₁) = W₂` of prime order `p`; were it nontrivial it would
     -- equal `W₂`, and Wielandt's identity would force `|H| = |C_H(U)|`, i.e. `U` centralizes `H`,
