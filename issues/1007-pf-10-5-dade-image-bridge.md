@@ -424,3 +424,32 @@ have hVeq : tic.V = tic.Vdiff := rfl
 ⚠ endgame は alignedOmegaSigmaGrid (Prop16.1 sorryAx gate) を使うゆえ axiom-clean にはならない (上流 gate のみ;
 自前 sorry 無は維持可能)。**最難だった analytic 核 (a=0 + ζ^τ₁-vanish) は完全に越えた**; 残りは grid-combinatorics
 の mirror + 数論。
+
+## ✅ 進捗 (2026-06-22 cont., lane-b) — grid 補題 hoist 完了 (endgame 解禁) + hae 経路精密化
+
+- ✅ **grid 補題 hoist DONE** (commit `3c6c9df9`, ユーザー裁可「S05 へ hoist」): `exists_two_ne_ne` /
+  `grid_no_constant_column` / `grid_no_constant_row` を S06-private → **S05_GridTrichotomy public** 化、
+  §6 (4.8) の 4 call site を `OddOrder.Peterfalvi.S05.grid_no_constant_{column,row}` に redirect。
+  full build + AxiomsCheck green (3881 jobs)、§6 (4.8) 不変・axiom-clean 維持。**endgame の (b)/(c) 排除が S12 から利用可能に**。
+
+**▶ endgame の残り (6 piece、grid 補題は解禁済)**:
+1. **hae 精密化 (σ-isometry 経路、`alignedOmegaSigmaGrid = chiFam` の literal 等式は不要)**:
+   `⟨alignedOmegaSigmaGrid_ij, chiFam pq⟩ = ⟨η, ω_pq⟩` (σ isometry; η = `compHom e (chiColumn χ₂ i)`,
+   `alignedOmegaSigma = σ(η)` via `sigmaIntegral_apply`, `chiFam pq = σ(ω_pq)`)、これが `[η = ω_pq]`
+   になるには **η が tic.W の既約 (linear) 指標**であればよい (cyclic W ⟹ Irr 正規直交基底)。
+   ∴ 真の gate = **η = `compHom e (omega (omegaProdChar ...))` が既約指標**であることの証明
+   (omega/omegaProdChar は linear char を生む + compHom が既約を保つ)。⚠ **defeq 注意**:
+   alignedOmegaSigmaGrid は def 内部で自前 `tic`/`app`/`e` を `let` するゆえ、lemma 側の tic/app/e と
+   defeq 一致が必要 (issue が多数セッション苦労した W-整合の罠と同種)。
+2. **norm-2 bounds for X** (X = α^τ + n·ζ^τ₁, `muGridAlpha_tau_X_inner` で ‖X‖²=2): G := sigmaCoeff X が
+   **NC(X)≤2** かつ **∈{0,±1}** (Bessel `sum_sq_le_inner_self_re` + `inner_mem_ZIrr_int`)。`ncard_inner_chiFam_ne_zero_le_one`
+   (norm-1 版) の norm-2 類比。
+3. **ψ vanish on V**: `muGridPsi_vanishes_on_typePV` + `tau1_zeta_vanishes_on_typePV` (✅ 本セッション) で hζvanish 供給。
+4. **mirror** (S06:804-903 を §10 tic で): hadd=`sigmaCoeff_add_eq`, hNC4 (=hsub: {a≠0}⊆{G≠0}∪{Pij,Pi0}, ≤2+2),
+   w₁<w₂ gap, `grid_trichotomy` → (a) で全 coeff 0; (b)(c) は `S05.grid_no_constant_{column,row}` で排除。Pij≠Pi0 (j≠0)。
+5. **all coeff 0 → ψ=0** (§10 版 `_of_all_sigmaCoeff_zero`): ‖ψ‖²=0 を ‖X‖²=2 + 係数値 (⟨X,ω_ij^σ⟩=δ,
+   ⟨X,ω_i0^σ⟩=−δ, 他 0) から計算 (image-σ 帰属 不要; 純 norm 計算)。
+6. **grid-level (10.5) → params pinning** → `alpha_tau_image`。
+
+⚠ endgame は alignedOmegaSigmaGrid (Prop16.1 sorryAx gate) 経由ゆえ axiom-clean にならない (上流 gate のみ)。
+最難 = piece 1 (η 既約 + defeq) と piece 4 (mirror assembly)。**次セッションで fresh context の focused unit 推奨**。
