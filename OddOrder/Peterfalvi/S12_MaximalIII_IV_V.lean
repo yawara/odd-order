@@ -2812,6 +2812,27 @@ theorem Hypothesis.muGridAlpha_tau1_inner_muColumn [Finite G] {M : Subgroup G}
     OddOrder.RepresentationTheory.inner_smul_right, star_natCast] at h45
   linear_combination h45 - (d : ℂ) * h12
 
+open scoped FiniteInduce in
+/-- **Peterfalvi (10.5), `‖μ_k^{τ₁}‖² = w₁`** (`0 < k < w₂`): the coherent extension `τ₁` is an
+isometry on `ℤ[S]`, and `μ_k = ∑_i μ_{ik} ∈ S` (`muGrid_column_sum_mem_inducedFamily`), so
+`‖μ_k^{τ₁}‖² = ‖μ_k‖² = w₁` (`coherent.extension_inner_eq` + `muGrid_column_sum_inner_self`).
+
+This is the `‖μ_k^{τ₁}‖²` factor of the (10.5) Cauchy–Schwarz bound
+`d²a² = (α_{ij}^τ, μ_k^{τ₁})² ≤ ‖α_{ij}^τ‖²·‖μ_k^{τ₁}‖² = (2+n²)w₁`. -/
+theorem Hypothesis.muColumn_tau1_inner_self [Finite G] {M : Subgroup G}
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis M) (hodd : Odd (Nat.card G))
+    (k : Fin hyp.w2) {params : CharacterParameters hyp} (coh : CoherentHypothesis hyp params)
+    (hdk1 : hyp.muGrid hG hodd 0 k 1 ≠ 1) :
+    ClassFunction.inner (coh.tau1 (∑ i : Fin hyp.w1, hyp.muGrid hG hodd i k))
+        (coh.tau1 (∑ i : Fin hyp.w1, hyp.muGrid hG hodd i k)) = (hyp.w1 : ℂ) := by
+  have hμkS := hyp.muGrid_column_sum_mem_inducedFamily hG hodd k hdk1
+  have hspan : (∑ i : Fin hyp.w1, hyp.muGrid hG hodd i k)
+      ∈ OddOrder.Peterfalvi.S07.zSpan hyp.Sset := Submodule.subset_span hμkS
+  show ClassFunction.inner (coh.coherent.extension (∑ i : Fin hyp.w1, hyp.muGrid hG hodd i k))
+      (coh.coherent.extension (∑ i : Fin hyp.w1, hyp.muGrid hG hodd i k)) = (hyp.w1 : ℂ)
+  rw [coh.coherent.extension_inner_eq _ _ hspan hspan]
+  exact hyp.muGrid_column_sum_inner_self hG hodd k
+
 /-- **Peterfalvi (10.5), Dade-image half**: under the coherent extension, `α_{ij}` has the stated
 Dade image `δ·(ω_{ij}^σ − ω_{i0}^σ) − n·ζ^{τ₁}`.  (The support half is `alpha_support`.) -/
 theorem alpha_tau_image [Finite G] [Fintype G]
