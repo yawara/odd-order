@@ -9421,46 +9421,50 @@ theorem typeP2_neighbor_is_typeF [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd
   -- (`group_set (U*K)`, here `hKNU : K ≤ N(U)`).
   have hUcomm : ∀ a b : ↥U, a * b = b * a := fun a b =>
     Subtype.ext (hUab (a : G) a.2 (b : G) b.2)
-  have hKH : K ≤ H := by
-    have hRcardU : Nat.card ↥(R.subgroupOf U) = r ^ (Nat.card ↥U).factorization r := by
-      have hpow : Nat.card ↥(R.subgroupOf U)
-          = r ^ (Nat.card ↥(R.subgroupOf U)).factorization r := by
-        apply Nat.eq_pow_of_factorization_eq_single Nat.card_pos.ne'
-        apply Finsupp.ext; intro q; rw [Finsupp.single_apply]
-        by_cases hq : r = q
-        · rw [if_pos hq, hq]
-        · rw [if_neg hq]
-          by_cases hqp : q.Prime
-          · refine Nat.factorization_eq_zero_of_not_dvd (fun hdvd => hq ?_)
-            have hmem : q ∈ (Nat.card ↥(R.subgroupOf U)).primeFactors :=
-              Nat.mem_primeFactors.mpr ⟨hqp, hdvd, Nat.card_pos.ne'⟩
-            exact (Set.mem_singleton_iff.mp (hR.1 q hmem)).symm
-          · exact Nat.factorization_eq_zero_of_non_prime _ hqp
-      have hfact : (Nat.card ↥U).factorization r
-          = (Nat.card ↥(R.subgroupOf U)).factorization r := by
-        have hidx : (R.subgroupOf U).index.factorization r = 0 :=
-          Nat.factorization_eq_zero_of_not_dvd (fun hdvd =>
-            hR.2 r (Nat.mem_primeFactors.mpr ⟨hrprime, hdvd, Subgroup.index_ne_zero_of_finite⟩) rfl)
-        have hlag := Subgroup.card_mul_index (R.subgroupOf U)
-        rw [← hlag, Nat.factorization_mul Nat.card_pos.ne' Subgroup.index_ne_zero_of_finite,
-          Finsupp.add_apply, hidx, add_zero]
-      rw [hfact]; exact hpow
-    have hRUnorm : (R.subgroupOf U).Normal := by
-      refine ⟨fun n hn g => ?_⟩
-      have heq : g * n * g⁻¹ = n := by
-        calc g * n * g⁻¹ = n * g * g⁻¹ := by rw [hUcomm g n]
-          _ = n := by group
-      rw [heq]; exact hn
-    haveI hPchar : (R.subgroupOf U).Characteristic := by
-      have hPn : ((Sylow.ofCard (R.subgroupOf U) hRcardU : Sylow r ↥U) : Subgroup ↥U).Normal := by
-        rw [Sylow.coe_ofCard]; exact hRUnorm
-      have h := Sylow.characteristic_of_normal (Sylow.ofCard (R.subgroupOf U) hRcardU) hPn
-      rwa [Sylow.coe_ofCard] at h
-    intro k hk
+  -- `R = O_r(U)` is characteristic in abelian `U` (a normal Sylow `r`-subgroup), shared by
+  -- `hKH`/`hUH`: `K, U ≤ N(U) ⟹ ≤ N(R) ≤ H`.
+  have hRcardU : Nat.card ↥(R.subgroupOf U) = r ^ (Nat.card ↥U).factorization r := by
+    have hpow : Nat.card ↥(R.subgroupOf U)
+        = r ^ (Nat.card ↥(R.subgroupOf U)).factorization r := by
+      apply Nat.eq_pow_of_factorization_eq_single Nat.card_pos.ne'
+      apply Finsupp.ext; intro q; rw [Finsupp.single_apply]
+      by_cases hq : r = q
+      · rw [if_pos hq, hq]
+      · rw [if_neg hq]
+        by_cases hqp : q.Prime
+        · refine Nat.factorization_eq_zero_of_not_dvd (fun hdvd => hq ?_)
+          have hmem : q ∈ (Nat.card ↥(R.subgroupOf U)).primeFactors :=
+            Nat.mem_primeFactors.mpr ⟨hqp, hdvd, Nat.card_pos.ne'⟩
+          exact (Set.mem_singleton_iff.mp (hR.1 q hmem)).symm
+        · exact Nat.factorization_eq_zero_of_non_prime _ hqp
+    have hfact : (Nat.card ↥U).factorization r
+        = (Nat.card ↥(R.subgroupOf U)).factorization r := by
+      have hidx : (R.subgroupOf U).index.factorization r = 0 :=
+        Nat.factorization_eq_zero_of_not_dvd (fun hdvd =>
+          hR.2 r (Nat.mem_primeFactors.mpr ⟨hrprime, hdvd, Subgroup.index_ne_zero_of_finite⟩) rfl)
+      have hlag := Subgroup.card_mul_index (R.subgroupOf U)
+      rw [← hlag, Nat.factorization_mul Nat.card_pos.ne' Subgroup.index_ne_zero_of_finite,
+        Finsupp.add_apply, hidx, add_zero]
+    rw [hfact]; exact hpow
+  have hRUnorm : (R.subgroupOf U).Normal := by
+    refine ⟨fun n hn g => ?_⟩
+    have heq : g * n * g⁻¹ = n := by
+      calc g * n * g⁻¹ = n * g * g⁻¹ := by rw [hUcomm g n]
+        _ = n := by group
+    rw [heq]; exact hn
+  haveI hPchar : (R.subgroupOf U).Characteristic := by
+    have hPn : ((Sylow.ofCard (R.subgroupOf U) hRcardU : Sylow r ↥U) : Subgroup ↥U).Normal := by
+      rw [Sylow.coe_ofCard]; exact hRUnorm
+    have h := Sylow.characteristic_of_normal (Sylow.ofCard (R.subgroupOf U) hRcardU) hPn
+    rwa [Sylow.coe_ofCard] at h
+  have hKH : K ≤ H := fun k hk => hNRH (by
     have hmem := OddOrder.BG.Ch1.S03f.mem_normalizer_map_subtype_of_characteristic
       (W := U) (C := R.subgroupOf U) (hKNU hk)
-    rw [Subgroup.map_subgroupOf_eq_of_le hRU] at hmem
-    exact hNRH hmem
+    rwa [Subgroup.map_subgroupOf_eq_of_le hRU] at hmem)
+  have hUH : U ≤ H := fun u hu => hNRH (by
+    have hmem := OddOrder.BG.Ch1.S03f.mem_normalizer_map_subtype_of_characteristic
+      (W := U) (C := R.subgroupOf U) (Subgroup.le_normalizer hu)
+    rwa [Subgroup.map_subgroupOf_eq_of_le hRU] at hmem)
   -- `H` is not conjugate to `M` (`r ∈ σ(H) ∖ σ(M)`) nor to its partner `M*` (coprime `K`/`R`).
   -- These two non-conjugacies drive both the type-`F` classification and `σ(H)'`-membership of `K`.
   have notMGH : ¬ IsConjugateSubgroup H M := by
@@ -9652,9 +9656,86 @@ theorem typeP2_neighbor_is_typeF [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd
       · refine kappa_subset_sigmaCompl (M := Mst) ?_ hqσMst
         rw [← hb, kappa_conj_smul]; exact hqκ'
   refine ⟨H, hHmem, hFmaxH, ?_, ?_, ?_⟩
-  · -- Conjunct 2 (`U ≤ M_σ(H)`): `U = [U,K] ≤ H_σ` via `K ⊆ F(E)`, and the `q'`-Hall structure
-    -- of `H_σ · O_q(E)` (Coq `sUHs`).
-    sorry
+  · -- Conjunct 2 (`U ≤ M_σ(H)`, Coq `sUHs`): `U = ⁅U,K⁆ ≤ HsDq := M_σ(H) ⊔ O_q(F(E))`, and
+    -- `M_σ(H)` is the normal `{q}'`-Hall of `HsDq` while `U` is a `{q}'`-group.
+    classical
+    -- `q ∈ κ(M)`, `q ∉ σ(H)`, and `|U|` is a `{q}'`-number.
+    have hqκM : q ∈ kappa M := hK.1 q (by
+      rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hKM).toEquiv, hKcard]
+      exact Nat.mem_primeFactors.mpr ⟨hqprime, dvd_rfl, hqprime.pos.ne'⟩)
+    have hqσ'H : q ∉ OddOrder.BG.Ch3.S10.sigma H :=
+      hsH_K q (by rw [hKcard]; exact Nat.mem_primeFactors.mpr ⟨hqprime, dvd_rfl, hqprime.pos.ne'⟩)
+    have hUq' : ∀ p ∈ (Nat.card ↥U).primeFactors, p ∈ ({q}ᶜ : Set ℕ) := by
+      intro p hp hpq
+      exact hU.1 p (by rwa [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hUM).toEquiv])
+        (Or.inl ((Set.mem_singleton_iff.mp hpq) ▸ hqκM))
+    -- `O_q(F(E))`, `K ≤ O_q(F(E))`, `E ≤ N(O_q(F(E)))`.
+    set Oq : Subgroup G := opiCoreInG ({q} : Set ℕ)
+      (OddOrder.BG.Ch2.S08.fittingInG E) with hOqdef
+    have hOqE : Oq ≤ E := (opiCoreInG_le _ _).trans
+      (OddOrder.BG.Ch2.S08.fittingInG_le E)
+    have hKOq : K ≤ Oq := OddOrder.BG.Ch2.S08.le_opiCoreInG_singleton_of_isPGroup_of_le_nilpotent
+      (OddOrder.BG.Ch2.S08.fittingInG_isNilpotent E) hsK_FE (IsPGroup.of_card (by rw [hKcard, pow_one]))
+    have hOqpi : Subgroup.IsPiSubgroup ({q} : Set ℕ) Oq :=
+      isPiSubgroup_opiCoreInG _ _
+    have hEnOq : E ≤ Subgroup.normalizer (Oq : Set G) := by
+      rw [← Subgroup.normal_subgroupOf_iff_le_normalizer hOqE]
+      exact OddOrder.BG.Ch2.S08.opiCoreInG_fittingInG_subgroupOf_normal _ _
+    -- `HsDq := M_σ(H) ⊔ O_q(F(E))`; `M_σ(H) ◁ H`, `HsDq ≤ H`, `H ≤ N(HsDq)`.
+    set HsDq : Subgroup G := OddOrder.BG.Ch3.S10.Msigma H ⊔ Oq with hHsDqdef
+    have hHsDqH : HsDq ≤ H := sup_le (OddOrder.BG.Ch3.S10.Msigma_le H) (hOqE.trans hEsetup.E_le)
+    haveI hMsHnorm : ((OddOrder.BG.Ch3.S10.Msigma H).subgroupOf H).Normal := by
+      rw [OddOrder.BG.Ch3.S10.Msigma_subgroupOf]; infer_instance
+    have hHnMsH : H ≤ Subgroup.normalizer (OddOrder.BG.Ch3.S10.Msigma H : Set G) :=
+      (Subgroup.normal_subgroupOf_iff_le_normalizer (OddOrder.BG.Ch3.S10.Msigma_le H)).mp hMsHnorm
+    have hHnHsDq : H ≤ Subgroup.normalizer (HsDq : Set G) := by
+      calc H = OddOrder.BG.Ch3.S10.Msigma H ⊔ E := hEsetup.E_compl_sup.symm
+        _ ≤ Subgroup.normalizer (HsDq : Set G) :=
+          sup_le (le_sup_left.trans Subgroup.le_normalizer)
+            (le_normalizer_sup (hEsetup.E_le.trans hHnMsH) hEnOq)
+    -- `U = ⁅U,K⁆ ≤ ⁅H, HsDq⁆ ≤ HsDq` (since `HsDq ◁ H`).
+    have hUHsDq : U ≤ HsDq := by
+      rw [← defUK]
+      refine (Subgroup.commutator_mono hUH (hKOq.trans (le_sup_right : Oq ≤ HsDq))).trans ?_
+      rw [Subgroup.commutator_comm H HsDq]
+      exact Ch04.commutator_le_of_le_normalizer hHnHsDq
+    -- `M_σ(H) ⊓ Oq = ⊥` (`σ(H)` vs `{q}`, `q ∉ σ(H)`), so `|HsDq| = |M_σ(H)|·|Oq|`.
+    have hMsOqbot : OddOrder.BG.Ch3.S10.Msigma H ⊓ Oq = ⊥ := by
+      apply Subgroup.inf_eq_bot_of_coprime
+      refine Ch03.Nat.coprime_of_isPiGroup_of_isPiGroup_compl (π := OddOrder.BG.Ch3.S10.sigma H)
+        Nat.card_pos.ne' Nat.card_pos.ne' (fun p hp => OddOrder.BG.Ch3.S10.Msigma_isPiGroup H p hp)
+        (fun p hp hpσ => ?_)
+      exact hqσ'H ((Set.mem_singleton_iff.mp (hOqpi p hp)) ▸ hpσ)
+    have hcardHsDq : Nat.card ↥HsDq = Nat.card ↥(OddOrder.BG.Ch3.S10.Msigma H) * Nat.card ↥Oq := by
+      have hOqnMs : Oq ≤ Subgroup.normalizer (OddOrder.BG.Ch3.S10.Msigma H : Set G) :=
+        (hOqE.trans hEsetup.E_le).trans hHnMsH
+      have h := card_sup_eq_mul_of_le_normalizer_of_disjoint hOqnMs (by rw [inf_comm]; exact hMsOqbot)
+      rw [hHsDqdef, sup_comm, h, Nat.mul_comm]
+    -- `M_σ(H)` is the normal `{q}'`-Hall of `HsDq`.
+    haveI hMsHsDqnorm : ((OddOrder.BG.Ch3.S10.Msigma H).subgroupOf HsDq).Normal :=
+      (Subgroup.normal_subgroupOf_iff_le_normalizer le_sup_left).mpr (hHsDqH.trans hHnMsH)
+    have hidxOq : ((OddOrder.BG.Ch3.S10.Msigma H).subgroupOf HsDq).index = Nat.card ↥Oq := by
+      have hlag := Subgroup.card_mul_index ((OddOrder.BG.Ch3.S10.Msigma H).subgroupOf HsDq)
+      rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe (le_sup_left :
+        OddOrder.BG.Ch3.S10.Msigma H ≤ HsDq)).toEquiv, hcardHsDq] at hlag
+      exact Nat.eq_of_mul_eq_mul_left Nat.card_pos hlag
+    have hMsHall : Ch03.IsHallSubgroup ({q}ᶜ : Set ℕ)
+        ((OddOrder.BG.Ch3.S10.Msigma H).subgroupOf HsDq) := by
+      refine ⟨fun p hp => ?_, fun p hp => ?_⟩
+      · rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe (le_sup_left :
+          OddOrder.BG.Ch3.S10.Msigma H ≤ HsDq)).toEquiv] at hp
+        exact fun hpq => hqσ'H ((Set.mem_singleton_iff.mp hpq) ▸
+          OddOrder.BG.Ch3.S10.Msigma_isPiGroup H p hp)
+      · rw [hidxOq] at hp
+        exact fun hpc => hpc (hOqpi p hp)
+    have hUpi : Ch03.Subgroup.IsPiGroup ({q}ᶜ : Set ℕ) (U.subgroupOf HsDq) := by
+      intro p hp
+      rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hUHsDq).toEquiv] at hp
+      exact hUq' p hp
+    have hfinal := OddOrder.BG.Ch3.S10.isPiGroup_le_of_normal_isHallSubgroup hMsHall hUpi
+    have hmapped := Subgroup.map_mono (f := HsDq.subtype) hfinal
+    rwa [Subgroup.map_subgroupOf_eq_of_le hUHsDq, Subgroup.map_subgroupOf_eq_of_le
+      (le_sup_left : OddOrder.BG.Ch3.S10.Msigma H ≤ HsDq)] at hmapped
   · -- Conjunct 3 (`M ⊓ H = U ⊔ K`): `H ∩ M* = D`, `M ∩ Fu = U` with `Fu = O_{(σ∪κ)'}(F(H))`.
     -- Residual.
     sorry
