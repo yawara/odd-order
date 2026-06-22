@@ -3682,6 +3682,62 @@ theorem alpha_tau_image [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : 
   exact hyp.tau_muGridAlpha_eq hG hodd i hj0 k hjk hk0 coh hzS params.zeta_irreducible hzconj
     hdeg hμ0 hz1 params.n_formula (hδj j hj0) hdζ h0ζ hkζ hcol1 hdk1 hδpm hw1 hn2
 
+open scoped FiniteInduce in
+/-- **Peterfalvi (10.5), column difference (per row)**: for two nontrivial columns `j, k ≠ 0`, the
+Dade image of the difference `μ_{ij} − μ_{ik}` of certain-type characters is
+`δ·(ω_{ij}^σ − ω_{ik}^σ)`.
+
+The `−δ·μ_{i0} − n·ζ` tails of `α_{ij}` and `α_{ik}` are identical, so `μ_{ij} − μ_{ik} =
+α_{ij} − α_{ik}`, and applying `alpha_tau_image` to both columns the `−n·ζ^{τ₁}` parts cancel.  This
+is the per-row ingredient of the column image-family `image_eq` (the §10 analogue of the Peterfalvi
+(4.9) summed Dade identity), feeding the (5.5)-for-columns route to (10.6)(a). -/
+theorem tau_muGrid_column_diff [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G}
+    {hyp : Hypothesis M} {params : CharacterParameters hyp} (coh : CoherentHypothesis hyp params)
+    (hmu : params.mu = hyp.muGrid hG hG.odd)
+    (hos : params.omegaSigma = hyp.alignedOmegaSigmaGrid hG hG.odd)
+    (hzS : params.zeta ∈ inducedFamily M) (hz1 : params.zeta 1 = (hyp.w1 : ℂ))
+    (hzconj : params.zeta.conj ≠ params.zeta)
+    (hδpm : params.delta = 1 ∨ params.delta = -1)
+    (hδj : ∀ j : Fin hyp.w2, j ≠ 0 → hyp.muColumnSign hG hG.odd j = params.delta)
+    (i : Fin hyp.w1) {j k : Fin hyp.w2} (hj0 : j ≠ 0) (hk0 : k ≠ 0) :
+    hyp.tau (hyp.muGrid hG hG.odd i j - hyp.muGrid hG hG.odd i k) =
+      (params.delta : ℂ) • (hyp.alignedOmegaSigmaGrid hG hG.odd i j
+        - hyp.alignedOmegaSigmaGrid hG hG.odd i k) := by
+  have hatj := alpha_tau_image hG coh hmu hos hzS hz1 hzconj hδpm hδj i j hj0
+  have hatk := alpha_tau_image hG coh hmu hos hzS hz1 hzconj hδpm hδj i k hk0
+  have halpha : hyp.muGrid hG hG.odd i j - hyp.muGrid hG hG.odd i k
+      = params.alpha i j - params.alpha i k := by
+    rw [params.alpha_def, params.alpha_def, hmu]; abel
+  rw [halpha, map_sub, hatj, hatk, hos]
+  simp only [smul_sub]; abel
+
+open scoped FiniteInduce in
+/-- **Peterfalvi (10.5), column-sum difference**: summing `tau_muGrid_column_diff` over the rows
+`0 ≤ i < w₁`, the Dade image of the difference of the two column characters `μ_j = ∑_i μ_{ij}` and
+`μ_k = ∑_i μ_{ik}` (`j, k ≠ 0`) is `δ·(∑_i ω_{ij}^σ − ∑_i ω_{ik}^σ)`.
+
+This is the §10 analogue of the Peterfalvi (4.9) summed Dade identity: it computes
+`(μ_j − μ_k)^τ = ∑_{α ∈ R} α` over the signed `σ`-image family
+`R = {δ·ω_{ij}^σ} ∪ {−δ·ω_{ik}^σ}`, the `image_eq` field of the column image family used by the
+(5.5)-for-columns route to (10.6)(a). -/
+theorem tau_muGrid_columnSum_diff [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    {M : Subgroup G} {hyp : Hypothesis M} {params : CharacterParameters hyp}
+    (coh : CoherentHypothesis hyp params)
+    (hmu : params.mu = hyp.muGrid hG hG.odd)
+    (hos : params.omegaSigma = hyp.alignedOmegaSigmaGrid hG hG.odd)
+    (hzS : params.zeta ∈ inducedFamily M) (hz1 : params.zeta 1 = (hyp.w1 : ℂ))
+    (hzconj : params.zeta.conj ≠ params.zeta)
+    (hδpm : params.delta = 1 ∨ params.delta = -1)
+    (hδj : ∀ j : Fin hyp.w2, j ≠ 0 → hyp.muColumnSign hG hG.odd j = params.delta)
+    {j k : Fin hyp.w2} (hj0 : j ≠ 0) (hk0 : k ≠ 0) :
+    hyp.tau (∑ i : Fin hyp.w1, hyp.muGrid hG hG.odd i j
+        - ∑ i : Fin hyp.w1, hyp.muGrid hG hG.odd i k) =
+      (params.delta : ℂ) • (∑ i : Fin hyp.w1, hyp.alignedOmegaSigmaGrid hG hG.odd i j
+        - ∑ i : Fin hyp.w1, hyp.alignedOmegaSigmaGrid hG hG.odd i k) := by
+  rw [← Finset.sum_sub_distrib, ← Finset.sum_sub_distrib, map_sum, Finset.smul_sum]
+  exact Finset.sum_congr rfl fun i _ =>
+    tau_muGrid_column_diff hG coh hmu hos hzS hz1 hzconj hδpm hδj i hj0 hk0
+
 /-- **Peterfalvi (10.6)**: the sums of `omega_ij^sigma` describe the `tau1`
 images, and outside the tame support the value of `zeta^tau1` has norm at least
 one. -/
