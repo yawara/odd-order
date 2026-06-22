@@ -1509,6 +1509,100 @@ theorem ncard_inner_chiFam_ne_zero_le_one (hyp : TICyclicHypothesis G) [Fintype 
         ≤ ({pq₀} : Set _).ncard := Set.ncard_le_ncard hsub (Set.toFinite _)
       _ = 1 := Set.ncard_singleton pq₀
 
+/-- **(3.9)(a)-norm-`2` support bound**: a norm-`2` virtual character `χ ∈ ZIrr(G)` has at most two
+nonzero `σ`-image coefficients.  By `mem_ZIrr_inner_self_eq_sum_sq` +
+`exists_pair_of_sum_sq_eq_two`, `χ = ε_α·α + ε_β·β` for two distinct irreducibles `α, β`; each has
+`≤ 1` nonzero inner product against the orthonormal `χ`-family (`ncard_inner_chiFam_ne_zero_le_one`),
+and the coefficient support is contained in `S_α ∪ S_β`.  This is the norm-`2` analogue of
+`ncard_inner_chiFam_ne_zero_le_one`, used by the (4.8)/(10.5) Dade-image trichotomy endgames. -/
+theorem ncard_sigmaCoeff_ne_zero_le_two (hyp : TICyclicHypothesis G) [Fintype hyp.W]
+    [Invertible (Nat.card hyp.W : ℂ)] [Invertible (Nat.card G : ℂ)]
+    (hVeq : hyp.V = hyp.Vdiff) (app : FullDadeApplication (G := G) hyp)
+    {χ : ClassFunction G ℂ} (hχ : χ ∈ ZIrr G) (hχ2 : ClassFunction.inner χ χ = 2) :
+    {pq : ((hyp.W1.subgroupOf hyp.W) →* ℂˣ) × ((hyp.W2.subgroupOf hyp.W) →* ℂˣ) |
+      hyp.sigmaCoeff hVeq app χ pq ≠ 0}.ncard ≤ 2 := by
+  classical
+  haveI : Finite G := Finite.of_fintype G
+  obtain ⟨c, hsupp, hrepr, hsq⟩ := mem_ZIrr_inner_self_eq_sum_sq hχ
+  have hsum : ∑ a ∈ c.support, c a ^ 2 = 2 := by exact_mod_cast hsq.symm.trans hχ2
+  obtain ⟨α, β, hαβ, hs, -, -⟩ := exists_pair_of_sum_sq_eq_two
+    (fun a ha => Finsupp.mem_support_iff.mp ha) hsum
+  have hαm : α ∈ irreducibleCharacters G := hsupp (by rw [hs]; simp)
+  have hβm : β ∈ irreducibleCharacters G := hsupp (by rw [hs]; simp)
+  have hαZ : α ∈ ZIrr G := IrreducibleCharacter.mem_ZIrr (⟨α, hαm⟩ : IrreducibleCharacter G)
+  have hβZ : β ∈ ZIrr G := IrreducibleCharacter.mem_ZIrr (⟨β, hβm⟩ : IrreducibleCharacter G)
+  have hα1 : ClassFunction.inner α α = 1 := by
+    have := irreducibleCharacter_inner_eq_ite (⟨α, hαm⟩ : IrreducibleCharacter G) ⟨α, hαm⟩
+    rwa [if_pos rfl] at this
+  have hβ1 : ClassFunction.inner β β = 1 := by
+    have := irreducibleCharacter_inner_eq_ite (⟨β, hβm⟩ : IrreducibleCharacter G) ⟨β, hβm⟩
+    rwa [if_pos rfl] at this
+  have hχαβ : χ = (c α : ℂ) • α + (c β : ℂ) • β := by
+    rw [hrepr, hs, Finset.sum_pair hαβ]
+  refine le_trans (Set.ncard_le_ncard (t :=
+    {pq | ClassFunction.inner α (hyp.chiFam hVeq app pq) ≠ 0} ∪
+    {pq | ClassFunction.inner β (hyp.chiFam hVeq app pq) ≠ 0})
+    ?_ (Set.toFinite _)) (le_trans (Set.ncard_union_le _ _) ?_)
+  · intro pq hpq
+    simp only [sigmaCoeff, Set.mem_setOf_eq] at hpq
+    rw [Set.mem_union, Set.mem_setOf_eq, Set.mem_setOf_eq]
+    by_contra hcon
+    push_neg at hcon
+    exact hpq (by rw [hχαβ, ClassFunction.inner_add_left, ClassFunction.inner_smul_left,
+      ClassFunction.inner_smul_left, hcon.1, hcon.2, mul_zero, mul_zero, add_zero])
+  · exact add_le_add
+      (hyp.ncard_inner_chiFam_ne_zero_le_one hVeq app hαZ hα1)
+      (hyp.ncard_inner_chiFam_ne_zero_le_one hVeq app hβZ hβ1)
+
+/-- **(3.9)(a)-norm-`2` coefficient bound**: the `σ`-image coefficients of a norm-`2` virtual
+character `χ ∈ ZIrr(G)` lie in `{0, ±1}`.  Writing `χ = ε_α·α + ε_β·β` (norm-`2` ⟹ two constituents)
+and `χ_{pq} = ε·ν` (norm-`1` classifier), the coefficient `⟨χ, χ_{pq}⟩` is `ε_α·ε` if `ν = α`,
+`ε_β·ε` if `ν = β`, and `0` otherwise (`α ≠ β`).  Norm-`2` analogue of the norm-`1` support bound,
+used by the (4.8)/(10.5) trichotomy endgames to exclude a `±2` row coefficient. -/
+theorem sigmaCoeff_eq_zero_or_one_of_inner_self_two (hyp : TICyclicHypothesis G) [Fintype hyp.W]
+    [Invertible (Nat.card hyp.W : ℂ)] [Invertible (Nat.card G : ℂ)]
+    (hVeq : hyp.V = hyp.Vdiff) (app : FullDadeApplication (G := G) hyp)
+    {χ : ClassFunction G ℂ} (hχ : χ ∈ ZIrr G) (hχ2 : ClassFunction.inner χ χ = 2)
+    (pq : ((hyp.W1.subgroupOf hyp.W) →* ℂˣ) × ((hyp.W2.subgroupOf hyp.W) →* ℂˣ)) :
+    hyp.sigmaCoeff hVeq app χ pq = 0 ∨ hyp.sigmaCoeff hVeq app χ pq = 1 ∨
+      hyp.sigmaCoeff hVeq app χ pq = -1 := by
+  classical
+  haveI : Finite G := Finite.of_fintype G
+  obtain ⟨c, hsupp, hrepr, hsq⟩ := mem_ZIrr_inner_self_eq_sum_sq hχ
+  have hsum : ∑ a ∈ c.support, c a ^ 2 = 2 := by exact_mod_cast hsq.symm.trans hχ2
+  obtain ⟨α, β, hαβ, hs, hcα, hcβ⟩ := exists_pair_of_sum_sq_eq_two
+    (fun a ha => Finsupp.mem_support_iff.mp ha) hsum
+  have hαm : α ∈ irreducibleCharacters G := hsupp (by rw [hs]; simp)
+  have hβm : β ∈ irreducibleCharacters G := hsupp (by rw [hs]; simp)
+  obtain ⟨ε, ν, hε, hν⟩ := exists_zsmul_irreducibleCharacter_of_inner_self_one
+    ((hyp.chiFam_spec hVeq app).2.1 pq)
+    (by rw [(hyp.chiFam_spec hVeq app).2.2.1, if_pos rfl])
+  have hαν : ClassFunction.inner α (ν : ClassFunction G ℂ)
+      = if (⟨α, hαm⟩ : IrreducibleCharacter G) = ν then 1 else 0 :=
+    irreducibleCharacter_inner_eq_ite (⟨α, hαm⟩ : IrreducibleCharacter G) ν
+  have hβν : ClassFunction.inner β (ν : ClassFunction G ℂ)
+      = if (⟨β, hβm⟩ : IrreducibleCharacter G) = ν then 1 else 0 :=
+    irreducibleCharacter_inner_eq_ite (⟨β, hβm⟩ : IrreducibleCharacter G) ν
+  have hf : hyp.sigmaCoeff hVeq app χ pq
+      = (c α : ℂ) * ((ε : ℂ) * (if (⟨α, hαm⟩ : IrreducibleCharacter G) = ν then 1 else 0))
+        + (c β : ℂ) * ((ε : ℂ) * (if (⟨β, hβm⟩ : IrreducibleCharacter G) = ν then 1 else 0)) := by
+    rw [sigmaCoeff, hrepr, hs, Finset.sum_pair hαβ, hν,
+      ← Int.cast_smul_eq_zsmul ℂ ε, ClassFunction.inner_add_left, ClassFunction.inner_smul_left,
+      ClassFunction.inner_smul_left, OddOrder.RepresentationTheory.inner_smul_right,
+      OddOrder.RepresentationTheory.inner_smul_right, star_intCast, hαν, hβν]
+  rw [hf]
+  by_cases hαe : (⟨α, hαm⟩ : IrreducibleCharacter G) = ν
+  · by_cases hβe : (⟨β, hβm⟩ : IrreducibleCharacter G) = ν
+    · exact absurd (Subtype.ext_iff.mp (hαe.trans hβe.symm)) hαβ
+    · rw [if_pos hαe, if_neg hβe]
+      simp only [mul_one, mul_zero, add_zero]
+      rcases hcα with hcα | hcα <;> rcases hε with hε | hε <;> rw [hcα, hε] <;> norm_num
+  · by_cases hβe : (⟨β, hβm⟩ : IrreducibleCharacter G) = ν
+    · rw [if_neg hαe, if_pos hβe]
+      simp only [mul_one, mul_zero, zero_add]
+      rcases hcβ with hcβ | hcβ <;> rcases hε with hε | hε <;> rw [hcβ, hε] <;> norm_num
+    · rw [if_neg hαe, if_neg hβe]; left; ring
+
 /-- **Peterfalvi (3.9)(a)** (§6 keystone): if `χ ∈ ±Irr(G)` (a virtual character of norm `1`)
 agrees with `ω ∈ Irr(W)` on `V`, then `χ = ω^σ`.  The difference `φ = ω^σ − χ` vanishes on `V`
 ((3.2)(c) + the hypothesis), and its `σ`-coefficient support is contained in
