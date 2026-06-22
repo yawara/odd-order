@@ -44,6 +44,18 @@ signature 不足は notes/issue 経由。**driver (§16/§10)**: 常駐レーン
 (3) issue base: **B=1000 / H=2000 / C=4000 / F=7000**。(4) `notes/bg/*`=F、`notes/peterfalvi/*`=B/H/C。
 マージ順 = **F → B → H → C** (独立レーンゆえ順序は形式的)。
 
+**🧭 方向性・cross-lane 判断は issue 起票 → hub 解決 (ユーザー方針 2026-06-22, 永続)**:
+レーンが (a) **方向性に迷った**とき (どの sorry を攻めるか・route 選択・faithfulness 解釈の迷い等)、
+または (b) **レーンをまたぐ判断**が要るとき (他レーン所有ファイルの signature 変更要望・所有境界の移動・
+cross-lane gate・割当変更等) は、**独断で進めず／他レーンのファイルを触らず**、`bin/new-issue` で
+**HUB 宛 issue を起票**する (title に "HUB:" を冠する、宛先と判断内容と選択肢を明記)。
+**hub が解決する** (issue 4005 relane の前例; hub はユーザー裁可が要る構造判断はユーザーに上げる)。
+- **hub 側の責務**: 各 tick の merge で **新規 HUB 宛 issue** (`issues/` 直下に "HUB:" タイトル or
+  `4002/4005` 系の hub-ask) が入ったら、サマリで**別枠報告**し、hub が解決する (read-only 監査 +
+  必要ならユーザーへ AskUserQuestion)。黙って merge し続けない。
+- これは [[cross-lane-sync-via-notes]] (lane↔lane の軽い sync は notes 追記) の**上位版** = 判断を要する
+  ものは issue 化して hub に集約。軽微な signature 不足通知は従来どおり notes でよい。
+
 **H 固有の取り決め (2026-06-12)**: (1) H は **Lane B の §4–§9 coherence/certain-type ファイル
 (`S04_*`〜`S09_*`) を編集しない** (cite のみ)。(2) §10–13 は BG↔Pf interface (BG Thm A–E/I–II)
 に gate されるため、H が interface を **新規 forward axiom 化する commit は従来どおり
