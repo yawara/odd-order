@@ -42,13 +42,24 @@ statement)。**S07_Coherence.lean に未形式化** — 本 issue の真の prer
     完全 axiom-clean)。`column_inv_ne_self` は Hypothesis46 据置 (S08 caller 無変更)。
   - **`Hypothesis.exists_conj_column`** (S12, commit `842c9116`): `(∑_i μ_ij).conj = ∑_i μ_ij'`
     (j'≠0, j'≠j)。= column image family の `image_eq` 材料 (χ.conj = μ_j')。
-  - **▶ 次 = column `OrthonormalCharacterImageFamily` 本体**: imageSet={δω_ij^σ}∪{−δω_ij'^σ},
-    image_eq=`tau_muGrid_columnSum_diff`(k=j')+`exists_conj_column`, **orthonormal=σ-grid の joint
-    injectivity** (重要見通し: `exists_alignedOmegaSigmaGrid_chiFam_family` を per-row→2D joint inj に強化、
-    `omegaProdChar_inj`+w1/χ₂ 単射性由来。full product 構造 P_i(j).2=κ(j) は不要、orthonormality には
-    joint inj で十分), mem_ZIrr=alignedOmegaSigmaGrid ZIrr。→ `ofProjection`(τ=hyp.tau, tau1=coh.tau1,
-    ψ=0) → (5.5)`eq_sum_of_psi_eq_zero` → μ_j^τ₁=∑_E α → σ-endgame `eq_smul_chiFam_column_of_vanishOnV`
-    で 1 列 pin → `muColumn_tau1_eq_of_single_column` で full (10.6.a)。
+- [x] **column image family + (5.5) チェーン DONE** (2026-06-23, 全 axiom-clean=§10 upstream gate のみ):
+  - `alignedOmegaSigmaGrid_inner` (σ-grid orthonormality, `b97df920`): `⟨ω_ij^σ,ω_i'j'^σ⟩=[i=i'∧j=j']`
+    (σ 等長 + (i,j)↦η_ij joint inj)。**joint inj で orthonormality 十分** (full product 不要)。
+  - `alignedOmegaSigmaGrid_mem_ZIrr` + `columnRImage`/`_inner`/`_injective`/`_sum` (`6deff68d`): R(μ_j)
+    部品 (Bool×Fin w1 → CF G ℂ, (false,i)↦δω_ij^σ, (true,i)↦−δω_ij'^σ)。
+  - **`columnImageFamily`** + `exists_columnImageFamily` (`f6693952`): `OrthonormalCharacterImageFamily
+    hyp.tau (∑μ_ij)` 完成 (4 field 全 discharge、§6 certainTypeR の hyp.tau 版)。
+  - **`exists_muColumn_tau1_eq_sum_R`** (`bd31dd8c`): (5.5) 適用 → **`μ_j^τ₁ = ∑_{α∈E} α`** (E⊆R(μ_j),
+    |E|=w₁)。ofProjection (htau1_inner_eq=extension_inner_eq / agrees=extends_on_supported /
+    mem=extension_mem_ZIrr / ⟨μ_j,μ̄_j⟩=0=muGrid_inner_cross_column) + eq_sum_of_psi_eq_zero。
+  - **▶ 残り = σ-endgame final step のみ** (= (10.6.a) の last piece): `μ_j^τ₁=∑_{α∈E} α` (E⊆R(μ_j)) を
+    σ-endgame `eq_smul_chiFam_column_of_vanishOnV` (在) に渡し E=full column {δω_ij^σ} に pin →
+    `μ_j^τ₁=δ∑ω_ij^σ` → `muColumn_tau1_eq_of_single_column` で全列。**⚠ これは column 構造
+    P_i(j).2=κ(j) (W2 成分が j のみ依存=product 構造) を要する** — orthonormality と違い σ-endgame の
+    sigmaCoeff 2-column support + 出力翻訳 ∑_p chiFam(p,kcol)=∑_i ω_ij^σ に product が必須。= 残る唯一の
+    deep 2D-structure piece (`omegaProdChar.comp e` factorization、`exists_alignedOmegaSigmaGrid_chiFam_family`
+    を 2D 化 + W2-成分 i-独立を証明)。在庫: vanish-on-V=`muColumn_tau1_vanishes_on_typePV`、
+    norm=`muColumn_tau1_inner_self`。
 - [x] **(10.6.a) column-independence DONE** (2026-06-23 lane-b 再開セッション, `muColumn_tau1_diff_eq`,
   S12, commit `9d2fc5a0`, axiom-clean=§10 muGrid upstream gate のみ・自前 sorry 0): 任意の非自明列 j,k≠0 で
   `μ_j^τ₁ − μ_k^τ₁ = δ·(∑_i ω_ij^σ − ∑_i ω_ik^σ)`、∴ 残差 `μ_j^τ₁ − δ∑_i ω_ij^σ` は**列 j に非依存**。
