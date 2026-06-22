@@ -3796,6 +3796,100 @@ theorem Hypothesis.muColumn_tau1_vanishes_on_typePV [Finite G] {M : Subgroup G}
   exact hτvan
 
 open scoped FiniteInduce in
+/-- **§10 conjugate column** (Peterfalvi (4.9)(a) at §10): for a nontrivial column `j ≠ 0`, the
+complex conjugate of the column character `μ_j = ∑_i μ_{ij}` is another nontrivial column
+`μ_{j'} = ∑_i μ_{ij'}` with `j' ≠ 0` and `j' ≠ j` (`j'` is the column of `χ₂⁻¹`).
+
+Reduces to the §6 `certainType_columnSum_conj` (`μ̄_j = ∑_i μ_{i,χ₂⁻¹}`), which (issue 1010, HUB) is
+now stated on the structural `Hypothesis ↥M`, hence applies to the §10 muGrid host
+`(hyp.toCertainTypeHypothesis hG hodd).toHypothesis`.  The `muGrid ↔ columnFamily` row reindexing
+gives `∑_i μ_{ij} = ∑_{i'} (h.columnFamily (χ₂ j)).mu i'`; complex conjugation (`ClassFunction.conj`
+= `mapRingEquiv conj` pointwise) sends it to the `χ₂⁻¹`-column.  `j' ≠ 0` from
+`finCardEquivCharacterGroup_zero` (the column-`0` dual is trivial) and `j' ≠ j` from the odd order of
+the column character group (`W_odd`/`card_charGroup_W2`, no involutions; the `column_inv_ne_self`
+argument inlined).  This is the conjugate-column input `(μ_j)‾ = μ_{j'}` for the (5.5)-for-columns
+route to (10.6)(a): `tau_muGrid_columnSum_diff` (with `k = j'`) then supplies the column
+`OrthonormalCharacterImageFamily.image_eq` field `τ(μ_j − μ̄_j) = ∑ R(μ_j)`. -/
+theorem Hypothesis.exists_conj_column [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} (hyp : Hypothesis M)
+    (hodd : Odd (Nat.card G)) {j : Fin hyp.w2} (hj0 : j ≠ 0) :
+    ∃ j' : Fin hyp.w2, j' ≠ 0 ∧ j' ≠ j ∧
+      (∑ i : Fin hyp.w1, hyp.muGrid hG hodd i j).conj
+        = ∑ i : Fin hyp.w1, hyp.muGrid hG hodd i j' := by
+  haveI := hyp.finiteG
+  haveI : Finite ↥M := inferInstance
+  classical
+  -- reconstruct the §6 structural host (as in `muGrid`)
+  let h := (hyp.toCertainTypeHypothesis hG hodd).toHypothesis
+  haveI hNeZ1 : NeZero (Nat.card h.W1) := ⟨by have := h.one_lt_card_W1; omega⟩
+  haveI hcyc : IsCyclic ↥(h.W1 ⊔ h.W2) := h.isCyclic_sup
+  letI : CommGroup ↥(h.W1 ⊔ h.W2) := IsCyclic.commGroup
+  have hW1le : hyp.typeP.W1 ≤ M := hyp.typeP.W1_le
+  have hW2le : hyp.typeP.W2 ≤ M := typePData_W2_le_self hyp.typeP
+  have hcardW1 : Nat.card ↥h.W1 = hyp.w1 :=
+    Nat.card_congr (Subgroup.subgroupOfEquivOfLe hW1le).toEquiv
+  have hcardW2sub : Nat.card ↥(h.W2.subgroupOf (h.W1 ⊔ h.W2)) = hyp.w2 := by
+    rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe (le_sup_right)).toEquiv]
+    exact Nat.card_congr (Subgroup.subgroupOfEquivOfLe hW2le).toEquiv
+  haveI hNeZ2 : NeZero (Nat.card ↥(h.W2.subgroupOf (h.W1 ⊔ h.W2))) := ⟨Nat.card_pos.ne'⟩
+  -- the column character as a function of the index
+  let χ₂ : Fin hyp.w2 → ((h.W2.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ) :=
+    fun jj => finCardEquivCharacterGroup _ (finCongr hcardW2sub.symm jj)
+  -- the `muGrid ↔ columnFamily` row-reindexing bridge
+  have hbridge : ∀ jj : Fin hyp.w2,
+      ∑ i : Fin hyp.w1, hyp.muGrid hG hodd i jj
+        = ∑ i' : Fin (Nat.card h.W1), ((h.columnFamily (χ₂ jj)).mu i' : ClassFunction ↥M ℂ) := by
+    intro jj
+    rw [← Equiv.sum_comp (finCongr hcardW1.symm)
+      (fun i' => ((h.columnFamily (χ₂ jj)).mu i' : ClassFunction ↥M ℂ))]
+    exact Finset.sum_congr rfl (fun i _ => by unfold Hypothesis.muGrid; rfl)
+  -- `ClassFunction.conj = mapRingEquiv conj` pointwise
+  have hconjbridge : ∀ X : ClassFunction ↥M ℂ,
+      X.conj = ClassFunction.mapRingEquiv Complex.conjAe.toRingEquiv X := fun X => by
+    ext g; rw [ClassFunction.conj_apply, ClassFunction.mapRingEquiv_apply]; rfl
+  -- `χ₂` injective; `χ₂ jj = 1 ↔ jj = 0`
+  have hχ₂inj : Function.Injective χ₂ := fun a b hab =>
+    (finCongr hcardW2sub.symm).injective ((finCardEquivCharacterGroup _).injective hab)
+  have hχ₂one : ∀ jj : Fin hyp.w2, χ₂ jj = 1 ↔ jj = 0 := by
+    intro jj
+    rw [show (1 : (h.W2.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ)
+        = finCardEquivCharacterGroup _ 0 from (finCardEquivCharacterGroup_zero _).symm,
+      (finCardEquivCharacterGroup _).injective.eq_iff]
+    constructor
+    · intro he; exact (finCongr hcardW2sub.symm).injective (by rw [he]; simp)
+    · intro he; subst he; simp
+  -- the conjugate-column index `j'` with `χ₂ j' = (χ₂ j)⁻¹`
+  let j' : Fin hyp.w2 :=
+    (finCongr hcardW2sub.symm).symm ((finCardEquivCharacterGroup _).symm (χ₂ j)⁻¹)
+  have hj'χ : χ₂ j' = (χ₂ j)⁻¹ := by simp only [χ₂, j', Equiv.apply_symm_apply]
+  have hχ₂jne : χ₂ j ≠ 1 := fun he => hj0 ((hχ₂one j).mp he)
+  -- `(χ₂ j)⁻¹ ≠ χ₂ j` (column char group has odd order — no involutions; `column_inv_ne_self` inline)
+  have hinvne : (χ₂ j)⁻¹ ≠ χ₂ j := by
+    have hodd' : Odd (Nat.card ((h.W2.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ)) := by
+      rw [h.card_charGroup_W2]
+      exact h.W_odd.of_dvd_nat (Subgroup.card_dvd_of_le le_sup_right)
+    intro heq
+    apply hχ₂jne
+    have hsq : (χ₂ j) ^ 2 = 1 := by
+      have hm := mul_inv_cancel (χ₂ j); rw [heq] at hm; rwa [pow_two]
+    have hcardodd : Odd (orderOf (χ₂ j)) := hodd'.of_dvd_nat (orderOf_dvd_natCard (χ₂ j))
+    have h1 : orderOf (χ₂ j) = 1 := by
+      rcases (Nat.dvd_prime Nat.prime_two).mp (orderOf_dvd_of_pow_eq_one hsq) with h2 | h2
+      · exact h2
+      · exact absurd (h2 ▸ hcardodd) (by decide)
+    exact orderOf_eq_one_iff.mp h1
+  refine ⟨j', ?_, ?_, ?_⟩
+  · -- `j' ≠ 0`
+    intro he
+    exact hχ₂jne (inv_eq_one.mp (hj'χ ▸ (hχ₂one j').mpr he))
+  · -- `j' ≠ j`
+    intro he
+    exact hinvne (hj'χ ▸ (congrArg χ₂ he))
+  · -- the conjugate identity, via the generalized §6 `certainType_columnSum_conj`
+    rw [hbridge j, hbridge j', hconjbridge,
+      OddOrder.Peterfalvi.S06.certainType_columnSum_conj h (χ₂ j), hj'χ]
+
+open scoped FiniteInduce in
 /-- **§10 column-independent `τ₁`-residual** (the reduction step of Peterfalvi (10.6)(a)): for any
 two nontrivial columns `j, k ≠ 0`, the coherent images satisfy
 `μ_j^{τ₁} − μ_k^{τ₁} = δ·(∑_i ω_{ij}^σ − ∑_i ω_{ik}^σ)`, i.e. the residual
