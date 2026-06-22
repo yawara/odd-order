@@ -8992,22 +8992,87 @@ Theorem 14.7 and `U` as in Proposition 14.2(a), `r ∈ π(U)`, `R` the Sylow `r`
 abelian `U`, and `H ∈ 𝓜(N_G(R))`: then `H ∈ 𝓜_F`, `U ⊆ H_σ`, `M ∩ H = U K`, `N_H(U) ⊄ M`,
 `K ⊆ F(H ∩ M*)`, and `H ∩ M*` complements `H_σ` in `H`.
 
-**Faithfulness (2026-06-15):** the hypotheses are now tightened to BG — `U` is the specific
+**Faithfulness (2026-06-22):** the hypotheses are tightened to BG — `U` is the specific
 abelian Hall `(κ(M) ∪ σ(M))'`-factor of Proposition 14.2(a) and `R` is a *Sylow* `r`-subgroup
 of `U` (`IsHallSubgroup {r}`), not an arbitrary `U ≤ M`, `R ≤ U` with `R ≠ ⊥` (under which the
-conclusion fails).  The conclusion is a faithful partial: it captures `H ∈ 𝓜_F`, `U ⊆ H_σ`,
-and `M ∩ H = U ⊔ K`, and defers `N_H(U) ⊄ M`, `K ⊆ F(H ∩ M*)`, the complement clause, and the
-dual-pair data (gated on §13).  See `notes/bg/s14_typeP_counting.md`. -/
+conclusion fails).  The conclusion now also delivers `N_H(U) ⊄ M` (the FT-path clause consumed by
+BG Theorem C(1) = `theoremC_paired_structure` conjunct 2): `N_H(U) = H ⊓ N_G(U) ≤ N_G(U)`, so
+`N_H(U) ⊄ M ⟹ N_G(U) ⊄ M`.  The two remaining BG clauses `K ⊆ F(H ∩ M*)` and `σ(H)'-Hall(H)(H ∩ M*)`
+(which require exposing the dual partner `M*` in the signature) are not consumed by any caller and
+are omitted; the proof establishes `H ∩ M* = D` internally, so they are derivable if needed.
+Translates the Coq `P2type_signalizer` (BGsection14.v L2243).  See `notes/bg/s14_typeP_counting.md`.
+-/
 theorem typeP2_neighbor_is_typeF [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     {M K U R : Subgroup G} {r : ℕ} (hM : M ∈ maximalSubgroups G) (hP2 : IsTypeP2 M)
+    (hKM : K ≤ M) (hUM : U ≤ M)
     (hK : Ch03.IsHallSubgroup (kappa M) (K.subgroupOf M))
     (hU : Ch03.IsHallSubgroup ((kappa M ∪ OddOrder.BG.Ch3.S10.sigma M)ᶜ) (U.subgroupOf M))
-    (hUab : ∀ a ∈ U, ∀ b ∈ U, a * b = b * a) (hr : r ∈ piSet U)
+    (hUab : ∀ a ∈ U, ∀ b ∈ U, a * b = b * a) (hr : r ∈ piSet U) (hRU : R ≤ U)
     (hR : Ch03.IsHallSubgroup ({r} : Set ℕ) (R.subgroupOf U)) :
     ∃ H : Subgroup G,
       H ∈ maximalSubgroupsContaining (Subgroup.normalizer (R : Set G)) ∧
-      IsTypeF H ∧ U ≤ OddOrder.BG.Ch3.S10.Msigma H ∧ M ⊓ H = U ⊔ K := by
-  sorry
+      IsTypeF H ∧ U ≤ OddOrder.BG.Ch3.S10.Msigma H ∧ M ⊓ H = U ⊔ K ∧
+      ¬ ((H ⊓ Subgroup.normalizer (U : Set G) : Subgroup G) ≤ M) := by
+  classical
+  have hP : IsTypeP M := hP2.1
+  haveI : Fact r.Prime := ⟨Nat.prime_of_mem_primeFactors hr⟩
+  have hrprime : r.Prime := Fact.out
+  have hRM : R ≤ M := hRU.trans hUM
+  -- `r ∉ σ(M)`: `r ∈ π(U)` and `U` is a `(κ(M) ∪ σ(M))'`-Hall subgroup of `M`.
+  have hrσM : r ∉ OddOrder.BG.Ch3.S10.sigma M := by
+    have hrU' : r ∈ (Nat.card ↥(U.subgroupOf M)).primeFactors := by
+      rwa [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hUM).toEquiv]
+    have hrc : r ∈ (kappa M ∪ OddOrder.BG.Ch3.S10.sigma M)ᶜ := hU.1 r hrU'
+    exact fun h => hrc (Or.inr h)
+  -- `R ≠ ⊥`: `r ∣ |U|` and (Hall) `r ∤ [U : R]`, so `r ∣ |R|`.
+  have hRne : R ≠ ⊥ := by
+    have hlag : Nat.card ↥(R.subgroupOf U) * (R.subgroupOf U).index = Nat.card ↥U :=
+      Subgroup.card_mul_index _
+    have hridx : ¬ r ∣ (R.subgroupOf U).index := fun hd =>
+      hR.2 r (Nat.mem_primeFactors.mpr ⟨hrprime, hd, Subgroup.index_ne_zero_of_finite⟩) rfl
+    have hrSub : r ∣ Nat.card ↥(R.subgroupOf U) :=
+      ((Nat.Prime.dvd_mul hrprime).mp (by rw [hlag]; exact Nat.dvd_of_mem_primeFactors hr)).resolve_right
+        hridx
+    have hrR : r ∣ Nat.card ↥R := by
+      rwa [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hRU).toEquiv] at hrSub
+    intro h; rw [h, Subgroup.card_bot] at hrR
+    exact hrprime.one_lt.ne' (Nat.eq_one_of_dvd_one hrR ▸ rfl)
+  -- Setup: the dual partner `M*` (Theorem 14.7 / `typeP_duality`).
+  set Kstar : Subgroup G := OddOrder.BG.Ch3.S10.Msigma M ⊓ Subgroup.centralizer (K : Set G)
+    with hKstardef
+  obtain ⟨Mst, hMstprop, hMstuniq⟩ := (typeP_duality hG hM hP hKM hK hKstardef).2.2
+  obtain ⟨hMstmax, hMstP, hMnc, hMstpair, hZcyc, hZti, hP2or, hcover⟩ := hMstprop
+  -- `H ∈ 𝓜(N_G(R))`: `N_G(R) < ⊤` (since `R ≤ M`, `R ≠ ⊥`, `G` simple), so it has a maximal overgroup.
+  have hNR_lt : Subgroup.normalizer (R : Set G) < ⊤ :=
+    normalizer_lt_top_of_le_of_ne_bot hG hM hRM hRne
+  obtain ⟨H, hHcoatom, hNRH⟩ := (eq_top_or_exists_le_coatom _).resolve_left hNR_lt.ne
+  have hHmax : H ∈ maximalSubgroups G := hHcoatom
+  have hHmem : H ∈ maximalSubgroupsContaining (Subgroup.normalizer (R : Set G)) :=
+    mem_maximalSubgroupsContaining.mpr ⟨hHcoatom, hNRH⟩
+  -- `R ≤ H` (from `N_G(R) ≤ H`).
+  have hRH : R ≤ H := (Subgroup.le_normalizer).trans hNRH
+  -- `H` is not conjugate to `M` (`r ∈ σ(H) ∖ σ(M)`) nor to its partner `M*` (coprime `K`/`R`).
+  -- These two non-conjugacies drive both the type-`F` classification and `σ(H)'`-membership of `K`.
+  have notMGH : ¬ IsConjugateSubgroup H M := by
+    sorry
+  have notMstGH : ¬ IsConjugateSubgroup H Mst := by
+    sorry
+  refine ⟨H, hHmem, ?_, ?_, ?_, ?_⟩
+  · -- Conjunct 1 (`IsTypeF H`): by the covering (`hcover`), every type-`P` maximal is conjugate to
+    -- `M` or `M*`; `H` is conjugate to neither, hence not type-`P`, i.e. `κ(H) = ∅`.
+    show kappa H = ∅
+    rw [← Set.not_nonempty_iff_eq_empty]
+    intro hHP
+    exact (hcover H hHmax hHP).elim notMGH notMstGH
+  · -- Conjunct 2 (`U ≤ M_σ(H)`): `U = [U,K] ≤ H_σ` via `K ⊆ F(D)`, `D ⊆ M*`, and the `q'`-Hall
+    -- structure of `H_σ · O_q(D)`.  Residual (needs `defUK`, the σ-decomposition of `H`).
+    sorry
+  · -- Conjunct 3 (`M ⊓ H = U ⊔ K`): `H ∩ M* = D`, `M ∩ Fu = U` with `Fu = O_{(σ∪κ)'}(F(H))`.
+    -- Residual.
+    sorry
+  · -- Conjunct 4 (`N_H(U) ⊄ M`): if `N_H(U) ≤ M` then `H ≤ N_G(U) ≤ M` so `H = M`, contradicting
+    -- `H` not conjugate to `M`.  Residual (needs `defNMU`, `sHsFH`, `H ∩ M* = D`).
+    sorry
 
 /-- **BG Lemma 14.13** (mmd L4059): extension of Theorem 14.4.  In the specified
 multi-maximal sigma-length-one situation, `M` is Frobenius type, `tau_2(M)` is
