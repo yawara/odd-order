@@ -252,6 +252,49 @@ theorem intersection_complement_structure [Finite G]
     data.M_inter_L_complements_K ∧ data.M_inter_L_le_H := by
   sorry
 
+/-- **(12.12) Case A core.**  A finite group `E` acting faithfully on a one-dimensional
+`𝔽_p`-space `V` is cyclic, with `|E| ∣ |V| - 1 = p - 1`.  This is the reducible / rank-one case
+of Peterfalvi (12.12): `End_{𝔽_p}(V) ≅ 𝔽_p` (every endomorphism of a line is a homothety), so
+`E ↪ End(V)ˣ ≅ (ℤ/p)ˣ`, a cyclic group of order `p - 1`. -/
+theorem isCyclic_and_card_dvd_of_faithful_one_dim
+    {p : ℕ} [Fact p.Prime] {E V : Type*} [Group E] [Finite E]
+    [AddCommGroup V] [Module (ZMod p) V] [Finite V]
+    (ρ : Representation (ZMod p) E V) (hfaith : Function.Injective ρ)
+    (hdim : Module.finrank (ZMod p) V = 1) :
+    IsCyclic E ∧ Nat.card E ∣ Nat.card V - 1 := by
+  classical
+  haveI : Nontrivial V := Module.nontrivial_of_finrank_eq_succ hdim
+  haveI : Module.Finite (ZMod p) V := Module.Finite.of_finite
+  -- `End_{𝔽_p}(V) ≅ 𝔽_p` via `algebraMap` (bijective in dimension one: every endo is `c • id`).
+  have hsurj : Function.Surjective (algebraMap (ZMod p) (Module.End (ZMod p) V)) := by
+    intro u
+    obtain ⟨c, hc, -⟩ := LinearMap.existsUnique_eq_smul_id_of_finrank_eq_one hdim u
+    exact ⟨c, by rw [Algebra.algebraMap_eq_smul_one, hc, Module.End.one_eq_id]⟩
+  have hinj : Function.Injective (algebraMap (ZMod p) (Module.End (ZMod p) V)) :=
+    (algebraMap (ZMod p) (Module.End (ZMod p) V)).injective
+  let eRing : ZMod p ≃+* Module.End (ZMod p) V := RingEquiv.ofBijective _ ⟨hinj, hsurj⟩
+  -- `E ↪ End(V)ˣ ≃ (ℤ/p)ˣ`.
+  let φ : E →* (ZMod p)ˣ :=
+    (Units.mapEquiv eRing.toMulEquiv).symm.toMonoidHom.comp (MonoidHom.toHomUnits ρ)
+  have hφinj : Function.Injective φ := by
+    intro a b hab
+    apply hfaith
+    have h1 : (MonoidHom.toHomUnits ρ) a = (MonoidHom.toHomUnits ρ) b :=
+      (Units.mapEquiv eRing.toMulEquiv).symm.injective (by simpa [φ] using hab)
+    simpa using congrArg (Units.val) h1
+  haveI : IsCyclic (ZMod p)ˣ := inferInstance
+  haveI : IsCyclic φ.range := inferInstance
+  have hcardV : Nat.card V = p := by
+    rw [Module.natCard_eq_pow_finrank (K := ZMod p), hdim, pow_one, Nat.card_eq_fintype_card,
+      ZMod.card]
+  refine ⟨isCyclic_of_surjective (MonoidHom.ofInjective hφinj).symm.toMonoidHom
+      (MonoidHom.ofInjective hφinj).symm.surjective, ?_⟩
+  rw [hcardV]
+  calc Nat.card E = Nat.card φ.range := Nat.card_congr (MonoidHom.ofInjective hφinj).toEquiv
+    _ ∣ Nat.card (ZMod p)ˣ := Subgroup.card_subgroup_dvd_card _
+    _ = p - 1 := by
+        rw [Nat.card_eq_fintype_card, ZMod.card_units_eq_totient, Nat.totient_prime (Fact.out)]
+
 /-- **(12.12) irreducible-case core.**  An odd-order group `E` acting faithfully and
 irreducibly on a two-dimensional `𝔽_p`-space `V` (with `p ∤ |E|`) is cyclic, with
 `|E| ∣ |V| - 1 = p² - 1`.  This is the rank-two irreducible case of Peterfalvi (12.12):
