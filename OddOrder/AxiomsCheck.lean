@@ -5260,21 +5260,21 @@ Fully unconditional, axiom-clean. -/
 
 #assert_only_allowed_axioms OddOrder.BG.Ch4.S16.theoremA_ungated_conjuncts
 
-/-! **BG Theorem A(5), element form** (`S16_MainResults`, `typeP_centralizer_kappaElement_eq`):
+/-! **BG Theorem A(5), element form** (`S14_TypePCounting`, `typeP_centralizer_kappaElement_eq`):
 for a type-`P` `M` with cyclic Hall `κ`-subgroup `K`, the `M`-centralizer of every `k ∈ K#` is
 `K ⊔ K*` (BG's `C_M(k) = K × K*`).  Sharpens Proposition 14.2(b1) (rank-one normalizer) to the
 element-wise centralizer via the order-`p` subgroup of `⟨k⟩` and `C_G(k) ≤ C_G(X) ≤ N_G(X)`.
 Axiom-clean. -/
 
-#assert_only_allowed_axioms OddOrder.BG.Ch4.S16.typeP_centralizer_kappaElement_eq
+#assert_only_allowed_axioms OddOrder.BG.Ch4.S14.typeP_centralizer_kappaElement_eq
 
-/-! **BG Theorem A(4)** (`S16_MainResults`, `typeP_hall_inf_centralizer_kappaElement_eq_bot`):
+/-! **BG Theorem A(4)** (`S14_TypePCounting`, `typeP_hall_inf_centralizer_kappaElement_eq_bot`):
 `C_U(k) = 1` for `k ∈ K#`.  Faithfulness resolution (issue 8017): the conclusion holds for **every**
 `(κ ∪ σ)'`-Hall `U ≤ M`, not just the `K`-invariant complement, because it reduces (via
 `typeP_centralizer_kappaElement_eq`) to the `U`-independent `C_M(k) = K ⊔ K*` plus coprimality of
 `|U|` with `|K ⊔ K*| = |K|·|K*|`.  Axiom-clean. -/
 
-#assert_only_allowed_axioms OddOrder.BG.Ch4.S16.typeP_hall_inf_centralizer_kappaElement_eq_bot
+#assert_only_allowed_axioms OddOrder.BG.Ch4.S14.typeP_hall_inf_centralizer_kappaElement_eq_bot
 
 /-! **BG Theorem A(3) decomposition** (`S16_MainResults`, `typeP_maximal_eq_kappaHall_sup_U_sup_Msigma`):
 `M = K U M_σ` for a maximal `M` with Hall `κ`-subgroup `K ≤ M` and Hall `(κ∪σ)'`-subgroup `U ≤ M`.
