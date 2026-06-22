@@ -1270,6 +1270,45 @@ theorem Hypothesis.exists_alignedOmegaSigmaGrid_chiFam_product [Finite G]
     exact one_ne_zero h2
 
 open scoped FiniteInduce in
+/-- **§10 σ-grid full-column collapse** (the output translation of the (5.8) σ-endgame): there is an
+injective `W₂`-column family `κ` with `∑_p χ_{(p, κ j)} = ∑_i ω_{ij}^σ` for every column `j`.  This is
+what turns the σ-endgame conclusion `μ_j^{τ₁} = δ·∑_p χ_{(p, κ j)}` into the (10.6)(a) summed isometry
+`μ_j^{τ₁} = δ·∑_i ω_{ij}^σ`.
+
+From the product structure (`exists_alignedOmegaSigmaGrid_chiFam_product`, `ω_{ij}^σ = χ_{(ρ i, κ j)}`),
+the row family `ρ : Fin w₁ → Ŵ₁` is injective and `|Fin w₁| = |Ŵ₁|` (`card_charGroup_subgroupOf`,
+`tic.W₁` is `W₁`), hence bijective; reindexing the `p`-sum along `ρ` collapses
+`∑_p χ_{(p, κ j)} = ∑_i χ_{(ρ i, κ j)} = ∑_i ω_{ij}^σ`. -/
+theorem Hypothesis.exists_kappa_sum_chiFam_column_eq [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} (hyp : Hypothesis M)
+    (hodd : Odd (Nat.card G)) :
+    ∃ κ : Fin hyp.w2 →
+        (((typePData_toTICyclicHypothesis hyp.typeP hodd).W2.subgroupOf
+          (typePData_toTICyclicHypothesis hyp.typeP hodd).W) →* ℂˣ),
+      Function.Injective κ ∧
+        ∀ j, ∑ p, (typePData_toTICyclicHypothesis hyp.typeP hodd).chiFam rfl
+            (hyp.canonicalFullDadeApp hG hodd) (p, κ j)
+          = ∑ i : Fin hyp.w1, hyp.alignedOmegaSigmaGrid hG hodd i j := by
+  haveI := hyp.finiteG
+  classical
+  let tic := typePData_toTICyclicHypothesis hyp.typeP hodd
+  let app := hyp.canonicalFullDadeApp hG hodd
+  obtain ⟨ρ, κ, hρinj, hκinj, hval⟩ := hyp.exists_alignedOmegaSigmaGrid_chiFam_product hG hodd
+  -- `ρ : Fin w₁ → Ŵ₁` is bijective (injective + matching cardinality `|Ŵ₁| = |W₁| = w₁`).
+  have hcardW1 : Nat.card ((tic.W1.subgroupOf tic.W) →* ℂˣ) = hyp.w1 := by
+    rw [tic.card_charGroup_subgroupOf tic.W1_le_W]; rfl
+  have hcard : Fintype.card (Fin hyp.w1) = Fintype.card ((tic.W1.subgroupOf tic.W) →* ℂˣ) := by
+    rw [Fintype.card_fin, ← Nat.card_eq_fintype_card, hcardW1]
+  have hρbij : Function.Bijective ρ :=
+    (Fintype.bijective_iff_injective_and_card ρ).mpr ⟨hρinj, hcard⟩
+  refine ⟨κ, hκinj, fun j => ?_⟩
+  calc ∑ p, tic.chiFam rfl app (p, κ j)
+      = ∑ i, tic.chiFam rfl app (ρ i, κ j) :=
+        (Fintype.sum_bijective ρ hρbij _ _ (fun _ => rfl)).symm
+    _ = ∑ i : Fin hyp.w1, hyp.alignedOmegaSigmaGrid hG hodd i j :=
+        Finset.sum_congr rfl (fun i _ => (hval i j).symm)
+
+open scoped FiniteInduce in
 /-- **§10 σ-grid lands in `ℤ[Irr G]`**: each `alignedOmegaSigmaGrid i j = chiFam(P_{ij}) ∈ ZIrr G`
 (`exists_alignedOmegaSigmaGrid_chiFam_family` + `chiFam_spec`).  The `mem_ZIrr` field of the column
 `OrthonormalCharacterImageFamily`. -/
