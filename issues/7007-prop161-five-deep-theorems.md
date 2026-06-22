@@ -171,6 +171,15 @@ lane-f RESUME。Cor 14.12 残 = conjunct 2/3/4 (σ-decomposition of `H`) で `S1
 - **conjunct 4 (`N_H(U)⊄M`)**: `N_H(U)≤M⟹H~M`(eq_mmax + nilpotent_sub_norm via Fu) vs notMGH。
 - **要 API 確認**: `tau2_context` 等価, subnormal trans/Fitting (Isaacs Ch02), `sub_Hall_pcore`(`Subgroup.IsPiGroup.le_oPiCore` 在), `nilpotent_sub_norm`。**~80行、1.5 session。**
 
+**★ conjuncts 3/4 精密 scope (session 末、Lean は末尾 2 clause [K⊆F(H∩Mst), σ(H)'-Hall] を省略ゆえ深い main equality [Thm 12.5e] は不要、Fu 構造のみ)**:
+- **`sHsFH : H_σ ⊆ F(H)`** = `Msigma_nilpotent_of_tau2`(S12_Theorem125:101, 要 `q∈τ₂(H)` + `A∈ℰ_q²(H)`) → `nilpotent_normal_le_fitting`(Isaacs Ch01:904)。⚠ **gate: `q∈τ₂(H)` の確立に subtlety** — Lean `kappa` def(S14:121)は centralizer 条件 `M_σ(H)⊓C(X)≠⊥` を含むので、Coq t2Hq(`partition_pi_sigma_compl`+`FtypeP`)の直訳は `M_σ(H)⊓C(K)≠⊥` を要し非自明(`pRank ↥H q = 2` を別途示すか、Coq \kappa def との差異を解消)。**最初に解くべき gate**。
+- **`defNMU : N_M(U) = U⊔K`** = ⚠ **`coprime_norm_cent`(coprime 作用 N=C)が repo に無い** — 要 locate/build。+ `Ω₁(R)⊆U`。conjunct 3 (`M⊓H=U⊔K`) の M⊓H⊆U⊔K 方向で使用。
+- **`eq_mmax : 極大 H≤M ⟹ H=M`** = ⚠ 直接補題無し(coatom 一意性から ~5行で導出可、reusable infra として建てるとよい)。conjunct 4 (`¬(H⊓N(U)≤M)`) で使用。
+- **Fu/defU**: `Fu:=opiCoreInG (σ∪κ)'ᶜ (F(H))` 的, `U⊆Fu`(U⊆H_σ⊆F(H)[sHsFH]+`Subgroup.IsPiGroup.le_oPiCore`), `M⊓Fu=U`(Hall), `Fu◁H`(char in F(H)◁H)。
+- **conjunct 4** 追加: `lt_normalizer_of_isNilpotent_of_lt_top`(Isaacs Ch01:410, nilpotent_sub_norm) + Fu。**conjunct 4 は defNMU 不要**(sHsFH/Fu/defU/eq_mmax のみ)ゆえ conjunct 3 より先に着手可。
+- `sDMst`(E⊆Mst, subnormal `K<|<|E`, `hsKuniq` を partner_inf_and_uniq から hoist)は **省略 2 clause 用**で Lean conjuncts 3/4 には不要。
+- **着手順**: ① `q∈τ₂(H)` 解決 → sHsFH → Fu/defU → ② `eq_mmax` 建てる → conjunct 4 → ③ `coprime_norm_cent` 建てる → defNMU → conjunct 3。**~70行 + 2 helper(eq_mmax, coprime_norm_cent)、1.5 session。**
+
 **(旧 sUHs plan、参考) HsDq machinery（DONE）**:
 - 反転: `U ≤ Msigma H` ⟸ `isPiGroup_le_of_normal_isHallSubgroup` を **↥HsDq 内**で適用（`HsDq := Msigma H ⊔ Oq`, `Oq := opiCoreInG {q} (fittingInG E)`; `(Msigma H).subgroupOf HsDq` が normal {q}ᶜ-Hall, `U.subgroupOf HsDq` が {q}ᶜ-群）。
 - `K ≤ Oq` = **`le_opiCoreInG_singleton_of_isPGroup_of_le_nilpotent`**(S08:460, K q-群 + `hsK_FE`(K≤F(E)) + F(E) nilpotent)。
