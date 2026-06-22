@@ -166,10 +166,29 @@ conjugation centralizer core to P₀ acting on K, then passes to the order-`p` p
 - `exists_second_maximal` ((8.17.a) `bgTheoremE_cover_data` + Sylow conjugation): L, L_type, P₀⊆L_s.
 - `centralizer_control_of_CKx` ((8.12.b) `typeI_or_typeII_centralizer_unique`): N_G(⟨x⟩)⊆M, C_G(x)⊄L.
 
-`exists_rankTwoWitness` assembles these into the witness.  **Discharging the 3 obligations is the
-residual §8 plumbing** (rank-2 is absent (8.12.a); (8.12.b)'s `N_G(⟨x⟩)⊆M` exceeds the available
-`typeI_or_typeII_centralizer_unique`; (8.17.a) needs cover-data extraction + Sylow conjugation —
-all hard/partly-absent BG §16 territory).
+`exists_rankTwoWitness` assembles these into the witness.
+
+**Two of the three obligations discharged** (2026-06-23 lane-h resume¹⁰ cont.², commits
+`c23b2134` / `cca59fcc`):
+- **`centralizer_control_of_CKx` ((8.12.b)) — sorry-free.** Apply `typeI_or_typeII_centralizer_unique`
+  with `U = M`, `X = {x}` ⟹ `C_G(x) ≤ M ∧ IsUniquelyMaximal (C_G(x))`.  Then `N_G(⟨x⟩) ⊆ M`
+  (⟨x⟩ proper [`x ∈ M < ⊤`] + nontrivial ⟹ not normal in simple `G` ⟹ `N_G(⟨x⟩) < ⊤` lies in a
+  maximal over `C_G(x)` = `M`) and `C_G(x) ⊄ L` (any maximal `L ≠ M` over `C_G(x)` would equal `M`).
+  `exists_second_maximal` strengthened to also yield `L ≠ M`.  ⚠ The earlier note "(8.12.b)'s
+  `N_G(⟨x⟩)⊆M` exceeds `typeI_or_typeII_centralizer_unique`" was wrong — the unique-maximal property
+  + `G` simple suffices.
+- **coprime / `P₀ ≤ N_G(K)` / `⁅K,K⁆ ≠ K` discharged inline** in `exists_rankTwoWitness`:
+  `(8.11)` (`hall_…`) ⟹ `M_F` Hall ⟹ `p ∤ |M_F|` (`p ∣ [M:M_F] ∣ [G:M_F]`) ⟹ p-group `P₀` coprime
+  to `K`; `P₀ ≤ M ≤ N_G(M_F)` (`maxNilpotentNormalHall_le_normalizer`); `K = M_F` nilpotent +
+  nontrivial (`TypeFData.H_nontrivial`) ⟹ `commutator ↥K < ⊤` ⟹ not perfect.
+
+**Residual = exactly two honest §8 obligations**:
+- **`counterexample_P0_K_structure` ((8.12.a), ABSENT)**: `P₀` abelian of rank 2 (every Sylow of the
+  type-`I` complement abelian rank ≤ 2 — a BG §16 consequence not extracted in repo).
+- **`exists_second_maximal` ((8.17.a))**: the second maximal `L ≠ M` with `P₀ ⊆ L_s` — from
+  `bgTheoremE_cover_data` (`p ∈ π(G)` covered by some `π((M_i)_s)`) + `(8.11)`/Sylow conjugation.
+  `L ≠ M` is forced by `p ∣ |L_s|` ∧ `p ∤ |M_s| = |M_F|` (the coprimality just proved).  This needs
+  cover-data navigation + Hall + Sylow conjugation (~60-100 lines, the next attemptable obligation).
 
 ## ▶ Next steps — full (12.12) `complement_cyclic_order_dvd` (Pf 04.14 L67-74, §8-gated)
 
