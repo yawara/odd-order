@@ -8567,6 +8567,71 @@ theorem typeF_complement_q_tau1_and_centralizer [Finite G]
   by_contra hne
   exact Set.notMem_empty q (hF ▸ (⟨Fact.out, Or.inl hqτ1, Q, hQ, hQM, hne⟩ : q ∈ kappa M))
 
+open scoped IsMulCommutative commutatorElement in
+/-- **BG Lemma 14.11, step S5 (degenerate case).**  If `Q ≤ E` is abelian, `R := ⁅E, Q⁆` is
+abelian, and `R` centralizes `Q` (equivalently `⁅⁅E, Q⁆, Q⁆ = 1`), then the normal closure
+`Q ⊔ R` of `Q` in `E` is abelian and normal in `E`, hence `Q ≤ F(E)`.  This is used to rule out
+`⁅⁅E, Q⁆, Q⁆ = 1` when `Q ⊄ F(E)`: the set of `x` with `⁅x, e⁆ ∈ Q ⊔ R` is a subgroup containing
+the generators `Q` and `R`, so `Q ⊔ R` is `E`-normal; it is abelian by `R ≤ C_G(Q)`. -/
+private theorem Q_le_fittingInG_of_commutator_centralizesQ [Finite G]
+    {E Q : Subgroup G} (hQE : Q ≤ E) (hQab : IsMulCommutative ↥Q)
+    (hRab : IsMulCommutative ↥(⁅E, Q⁆ : Subgroup G))
+    (hC : (⁅E, Q⁆ : Subgroup G) ≤ Subgroup.centralizer (Q : Set G)) :
+    Q ≤ OddOrder.BG.Ch2.S08.fittingInG E := by
+  classical
+  set R : Subgroup G := ⁅E, Q⁆ with hRdef
+  have hRE : R ≤ E := (Subgroup.commutator_mono le_rfl hQE).trans (Subgroup.commutator_le_self E)
+  have hNE : Q ⊔ R ≤ E := sup_le hQE hRE
+  have hRnorm : E ≤ Subgroup.normalizer (R : Set G) :=
+    hRdef ▸ Ch04.subgroup_le_normalizer_commutator_self E Q
+  have hRE_comm : (⁅R, E⁆ : Subgroup G) ≤ R := Ch04.commutator_le_of_le_normalizer hRnorm
+  have hC' : Q ≤ Subgroup.centralizer (R : Set G) := by
+    rw [← Subgroup.commutator_eq_bot_iff_le_centralizer, Subgroup.commutator_comm,
+      Subgroup.commutator_eq_bot_iff_le_centralizer]
+    exact hC
+  -- `Q ⊔ R` is normalized by `E`.
+  have hEnormN : E ≤ Subgroup.normalizer ((Q ⊔ R : Subgroup G) : Set G) := by
+    refine Ch04.le_normalizer_of_commutator_le ?_
+    rw [Subgroup.commutator_le]
+    intro n hn e he
+    let Se : Subgroup G :=
+      { carrier := {x | x ∈ (Q ⊔ R : Subgroup G) ∧ ⁅x, e⁆ ∈ (Q ⊔ R : Subgroup G)}
+        one_mem' := ⟨one_mem _, by rw [commutatorElement_one_left]; exact one_mem _⟩
+        mul_mem' := fun {a b} ha hb => ⟨mul_mem ha.1 hb.1, by
+          have hid : ⁅a * b, e⁆ = a * ⁅b, e⁆ * a⁻¹ * ⁅a, e⁆ := by
+            simp only [commutatorElement_def]; group
+          rw [hid]
+          exact mul_mem (mul_mem (mul_mem ha.1 hb.2) (inv_mem ha.1)) ha.2⟩
+        inv_mem' := fun {a} ha => ⟨inv_mem ha.1, by
+          have hid : ⁅a⁻¹, e⁆ = a⁻¹ * ⁅a, e⁆⁻¹ * a := by
+            simp only [commutatorElement_def]; group
+          rw [hid]
+          exact mul_mem (mul_mem (inv_mem ha.1) (inv_mem ha.2)) ha.1⟩ }
+    have hQSe : Q ≤ Se := fun x hx => ⟨Subgroup.mem_sup_left hx, by
+      refine Subgroup.mem_sup_right ?_
+      rw [hRdef, Subgroup.commutator_comm]
+      exact Subgroup.commutator_mem_commutator hx he⟩
+    have hRSe : R ≤ Se := fun x hx => ⟨Subgroup.mem_sup_right hx,
+      Subgroup.mem_sup_right (hRE_comm (Subgroup.commutator_mem_commutator hx he))⟩
+    exact ((sup_le hQSe hRSe : (Q ⊔ R) ≤ Se) hn).2
+  haveI hNnorm : ((Q ⊔ R).subgroupOf E).Normal :=
+    (Subgroup.normal_subgroupOf_iff_le_normalizer hNE).mpr hEnormN
+  have hNab : IsMulCommutative ↥(Q ⊔ R : Subgroup G) := by
+    refine isMulCommutative_of_le_centralizer ?_
+    rw [centralizer_sup_eq]
+    exact le_inf (sup_le (le_centralizer_of_le_of_le hQab le_rfl le_rfl) hC)
+      (sup_le hC' (le_centralizer_of_le_of_le hRab le_rfl le_rfl))
+  haveI : IsMulCommutative ↥(Q ⊔ R : Subgroup G) := hNab
+  haveI : Group.IsNilpotent ↥(Q ⊔ R : Subgroup G) := inferInstance
+  haveI : Group.IsNilpotent ↥((Q ⊔ R).subgroupOf E) :=
+    nilpotent_of_mulEquiv (Subgroup.subgroupOfEquivOfLe hNE).symm
+  have hfit : (Q ⊔ R).subgroupOf E ≤ OddOrder.Isaacs.Ch01.fitting ↥E :=
+    Ch01.nilpotent_normal_le_fitting
+  have hNfitG : (Q ⊔ R : Subgroup G) ≤ OddOrder.BG.Ch2.S08.fittingInG E := by
+    have hmap := Subgroup.map_mono (f := E.subtype) hfit
+    rwa [Subgroup.map_subgroupOf_eq_of_le hNE] at hmap
+  exact le_sup_left.trans hNfitG
+
 /-- **BG Lemma 14.11** (mmd L4086): for `M ∈ 𝓜_F` with `E` a complement of `M_σ` in `M`, a
 prime `q ∈ π(E)`, and `Q ∈ ℰ_q¹(E)` with `Q ⊄ F(E)`, there is `M* ∈ 𝓜` with either
 (1) `q ∈ τ₂(M*)` and `𝓜(C_G(Q)) = {M*}`, or (2) `q ∈ κ(M*)` and `M* ∈ 𝓜_{P₁}`.
