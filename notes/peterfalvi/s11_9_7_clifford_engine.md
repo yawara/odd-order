@@ -100,23 +100,46 @@ chiefFactor_basic (済) は `_holds` / `quotient_order` 経由ゆえ互換 (fiel
   `|Ū|·(p-1)∣p^q-1` ⟹ 商整除)。**∴ case-(b) 整除条件 (`u_coprime`/`u_dvd_norm`) の残ハード入力は
   `Coprime |Ū| (p-1)` 一点に縮約**。
 
-- **frontier = case-(b) FPF coprime (`Coprime |Ū| (p-1)`) — 真の残務、substantial だが full Galois iso 不要**:
-  textbook (9.7)(b) L69 は `W₁ が Ū 上 FPF ⟹ U*∩𝔽ₚ=1 ⟹ coprime(u,p-1)`。
-  **⚠ 精緻化 (2026-06-23, lane-c): L51 の full 体モデル同型 `(H̄⋊Ū)⋊W₁≅(F⋊U*)⋊Aut F` は coprime には不要**。
-  必要なのは `Ū∩𝔽ₚ*=1` (cyclic `Kˣ` 内) のみで、これは **「𝔽ₚ-scalar は `Aut(H̄)=GL_q(𝔽ₚ)` の中心」+
-  W₁-FPF** で出る (W₁-Galois 同定は不要):
-  1. `ū∈Ū` が 𝔽ₚ-scalar `λ` として作用 ⟹ scalar は加法的自己同型 `act.φ(w)` (w∈W₁) と可換 (central) ⟹
-     `act.φ(w)·ū·act.φ(w)⁻¹=ū` ⟹ `⁅w,u⁆∈ker act.φ=C_U(H̄)` ⟹ Ū 内で `ū` は `w`-不変。
-  2. `Ū⋊W₁` Frobenius (`typeP_uW1_frobenius`, W₁≠1 ∵q素数) ⟹ FPF ⟹ `w`-不変 ū は ū=1。∴ `Ū∩𝔽ₚ*=1`。
-  3. step 7b の Singer `Ū↪Kˣ` (cyclic) + 𝔽ₚ*⊆Kˣ + 交わり 1 ⟹ `gcd(|Ū|,p-1)=1` (cyclic で位数-e 部分群一意)。
-  **残課題 (substantial, instance-heavy だが ~100-150 行見込)**: Singer 体 K=`MonoidAlgebra(ZMod p)Ū⧸I` の
-  **prime subfield 𝔽ₚ*⊆Kˣ** を露出し、`μ(ū)∈𝔽ₚ* ⟺ ū が H̄≅K 上 𝔽ₚ-scalar 作用` を H̄≅K module 同型で
-  橋渡し (step 3 の transport)。W₁ は K に自然作用しないが **必要なのは H̄ 上の act.φ(W₁) と scalar の可換性
-  のみ** (K への W₁ 作用は不要)。`SingerFieldData` (SingerField.lean) が体構造を carry。
-  **⚠ over-optimism 注意 ([[scaffold-sorry-free-not-done]] audit 版, issue 4006)**: 「full iso 不要」は本物の
-  簡約だが、Singer 体 K の prime-scalar 露出 + H̄≅K transport + central-scalar + FPF の配線は instance-hell
-  (7a/7b と同種) を再度通る。単一 session で landing する保証はない。**これが case-(b) の真の長物**
-  (step 7b/dvd_norm で他は片付いた)。
+- **✅✅ FPF→coprime bridge DONE (2026-06-23, commit `5efa6b5c`, 全 sorry-free + axiom-clean)** —
+  **case-(b) FPF coprime の数学核心 (Singer 体モデル) を完全形式化**。3 補題で `chiefFactor_caseB_image_dvd_norm`
+  の唯一ハード入力 `Coprime |Ū| (p-1)` を **W₁-FPF 一点に還元**:
+  1. **`coprime_card_of_inf_eq_bot_isCyclic`** (SingerField.lean): cyclic 群で「自明交差 ⟹ 互いに素」
+     (`Subgroup.inf_eq_bot_of_coprime` の逆、cyclic ゆえ成立)。証明 = `g=gcd(|H|,|K|)` の torsion 部分群
+     `ker(x↦x^g)` が位数 `gcd(|Z|,g)=g` で H,K 双方に含まれる (各 J は自身の `|J|`-torsion) ⟹ `H⊓K=⊥` で g=1。
+     `IsCyclic.card_powMonoidHom_ker` 使用。
+  2. **`coprime_card_sub_one_of_faithful_irreducible_comm_fpf`** (SingerField.lean): Singer 仮定 + FPF additive
+     auto σ ⟹ `Coprime |E| (p-1)`。**core**: `μ(e)∈𝔽ₚ* (prime subfield, `algebraMap (ZMod p) K`)` ⟹ e は
+     `nsmul` scalar 作用 ⟹ additive σ と可換 ⟹ FPF で e=1。∴ `E↪Kˣ` と `𝔽ₚ*↪Kˣ` が cyclic `Kˣ` で自明交差
+     ⟹ coprime。**当初心配した「H̄≅K transport」は不要だった**: scalar を `nsmul` で表せば σ (additive) が
+     自動的に可換、prime subfield は `algebraMap` で直接露出 (instance-hell 回避)。
+  3. **`coprime_card_sub_one_of_aInvariant_irreducible_faithful_comm_fpf`** (S11): subgroup-level bridge。
+     `elabRepresentation`/`asModule` 経由、`σ:MulAut K` を `asModule=Additive K` 上の additive auto に carry
+     (explicit struct `toFun=ofMul∘σ∘toMul`、`MulEquiv.toAdditive` の codomain 型問題を回避)。
+  これで textbook (9.7)(b) L69 の体論パートが完了。`chiefFactor_caseB_image_dvd_norm` の `hcop` を Phase 3 補題で
+  供給すれば閉じる。
+- **▶ frontier = Phase 4: W₁-FPF on Ū の供給 (group-theoretic, multi-session)**: Phase 3 補題の hfpf 入力
+  `∀ a:Ū, (act.φ(w₀) commutes with ↑a) → a=1` (= `C_Ū(w₀)=1`、w₀∈W₁ 非自明) を Frobenius から供給する。
+  - **数学**: `act.φ(w₀) commutes with φU(u)` ⟺ `⁅w₀,u⁆∈ker(act)=C_U(H̄)` (act on H̄)。これは「W₁ が
+    `Ū=U/C_U(H̄)` 上 FPF」= **quotient FPF**。Frobenius で `C_U(w₀)=1` (`centralizer_complement_le` +
+    U∩W₁=⊥) → coprime quotient (Isaacs Cor 3.28 = `map_fixedSubgroup_eq_fixedSubgroup_quotient`) で
+    `C_Ū(w₀)=1`。coprimality は `coprime_card_kernel_complement` (Frobenius)、solvability は W₁ cyclic。
+  - **✅ 経路確定 (iso-bridge 回避)**: **raw `coprime_fixedPoints_quotient`** (Cor 3.28 の生形、`map_…_quotient`
+    でなく) を `A=⟨w₀⟩` (zpowers)、`G_act=↥(U.subgroupOf(U⊔W1))`、`φ=MulAut.conjNormal.comp subtype`、
+    `N=C_U(H̄)`、`g=u'` で適用。`hg_fix`: `act(w₀) commutes act(u')` ⟹ `act(w₀^k) commutes act(u')`
+    (冪) ⟹ `⁅w₀^k,u'⁆∈ker act=N` ⟹ `conj(w₀^k) u' = u'·n` 形 (N◁U)。Cor 3.28 が **W₁-fixed 代表元
+    `c∈u'·N`** を返す ⟹ `c∈C_U(⟨w₀⟩)⊆C_U(w₀)=1` (Frobenius `centralizer_complement_le`+U∩W₁=⊥) ⟹ c=1
+    ⟹ `u'∈N=C_U(H̄)` ⟹ `act(u')=1` ⟹ a=1。**quotient-action と φU-conjugation の iso 同一視は不要**
+    (代表元が直接 C_U に落ちる)。
+  - **plumbing (~100-180 行見込)**: (i) `MulAut.conjNormal` action (U.subgroupOf(U⊔W1)◁U⊔W1 = Frobenius
+    kernel via `typeP_uW1_frobenius.isNormal`)、(ii) N=ker(φU) ◁ G_act + ψ-invariant、(iii) coprimality
+    `|⟨w₀⟩| coprime |U|` (`coprime_card_kernel_complement`)、(iv) hg_fix の冪補題、(v) C_U(w₀)=1 を
+    Frobenius から (ambient centralizer)。**iso-bridge 不要化で大幅短縮**。
+  - **代替検討で却下**: ① 既存 act (on H̄) に Cor 3.28 → H̄ を quotient するので別物。② quotient-Frobenius
+    shortcut → ker(act)⊆U 不明で不可。③ `map_fixedSubgroup_eq_fixedSubgroup_quotient` → quotient-action の
+    iso 同一視が要り messy。∴ **raw Cor 3.28 + 代表元論法**が正道。
+  **⚠ over-optimism 注意 ([[scaffold-sorry-free-not-done]] audit 版)**: Phase 4 は数学でなく plumbing だが
+  subgroupOf iso-bridge は重く、単一 session 保証なし。**Phase 1-3 で (9.7)(b) の数学核心 (体モデル) は完了**、
+  Phase 4 は Frobenius→quotient-FPF の group-theoretic 供給。
   **carrier 構成 (clifford_dichotomy 閉鎖) — 体モデル後に GATED**: `CliffordCaseBData` は `chars.u` を参照
   (`u_coprime_p_sub_one : Coprime chars.u (p-1)`, `u_dvd_norm_quotient : chars.u ∣ (p^q-1)/(p-1)`) が
   `Section11CharacterData.u` は **free field** (`u_eq_card_quotient` opaque)。**`chars.u=|Ū|` pin が要る**
