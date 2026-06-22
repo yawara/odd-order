@@ -764,6 +764,106 @@ theorem isCyclic_and_card_dvd_of_odd_two_dim_irreducible
     exact he v
   exact isCyclic_and_card_dvd_of_faithful_irreducible_comm (M := V) hcomm hfaith'
 
+/-- **(12.12) rep-theory core (combined).**  A finite odd-order group `E` (`p ∤ |E|`) acting
+**fixed-point-freely** (no nonzero vector is fixed by a nontrivial element) on an `𝔽_p`-space `V`
+of dimension `1` or `2` is **cyclic**, with `|E| ∣ |V| - 1`.  Dispatches the two (12.12) cores:
+dim 1 (or dim 2 with an `E`-invariant line) ⟹ Case A (`isCyclic_and_card_dvd_of_faithful_one_dim`);
+dim 2 irreducible ⟹ Case B (`isCyclic_and_card_dvd_of_odd_two_dim_irreducible`).  The FPF
+hypothesis makes `E` faithful on every nonzero invariant subspace. -/
+theorem isCyclic_and_card_dvd_of_fpf_dim_le_two
+    {p : ℕ} [Fact p.Prime] {E V : Type*} [Group E] [Finite E] (hodd : Odd (Nat.card E))
+    [AddCommGroup V] [Module (ZMod p) V] [Finite V]
+    (ρ : Representation (ZMod p) E V)
+    (hfpf : ∀ e : E, e ≠ 1 → ∀ v : V, ρ e v = v → v = 0)
+    (hdim : Module.finrank (ZMod p) V = 1 ∨ Module.finrank (ZMod p) V = 2)
+    (hp_ndvd : ¬ p ∣ Nat.card E) :
+    IsCyclic E ∧ Nat.card E ∣ Nat.card V - 1 := by
+  classical
+  haveI : Module.Finite (ZMod p) V := Module.Finite.of_finite
+  -- Step 1: the FPF hypothesis makes `ρ` faithful.
+  -- `V` is nontrivial because `finrank V ≥ 1`, so it has a nonzero vector; a nontrivial element in
+  -- the kernel would fix that vector, contradicting `hfpf`.
+  haveI hVnt : Nontrivial V := by
+    rcases hdim with h | h
+    · exact Module.nontrivial_of_finrank_eq_succ h
+    · exact Module.nontrivial_of_finrank_eq_succ (n := 1) (by rw [h])
+  have hfaith : Function.Injective ρ := by
+    intro a b hab
+    by_contra hne
+    have hba : b⁻¹ * a ≠ 1 := fun h => hne (inv_mul_eq_one.mp h).symm
+    obtain ⟨v, hv⟩ := exists_ne (0 : V)
+    refine hv (hfpf (b⁻¹ * a) hba v ?_)
+    rw [map_mul, Module.End.mul_apply, hab, ← Module.End.mul_apply, ← map_mul, inv_mul_cancel,
+      map_one, Module.End.one_apply]
+  rcases hdim with hd1 | hd2
+  · -- dim 1: Case A.
+    exact isCyclic_and_card_dvd_of_faithful_one_dim ρ hfaith hd1
+  · -- dim 2.
+    by_cases hirr : Representation.IsIrreducible ρ
+    · -- irreducible: Case B.
+      exact isCyclic_and_card_dvd_of_odd_two_dim_irreducible hodd ρ hfaith hirr hd2 hp_ndvd
+    · -- reducible: a proper nonzero invariant line `W` exists; apply Case A to `W.toRepresentation`,
+      -- then lift `|E| ∣ p - 1` to `|E| ∣ p² - 1` via `p - 1 ∣ p² - 1`.
+      -- `¬ IsSimpleOrder` plus nontriviality (`⊥ ≠ ⊤` since `V` is nontrivial) yields a proper
+      -- nonzero subrepresentation `W`.
+      have hbnt : (⊥ : Subrepresentation ρ) ≠ ⊤ := fun h =>
+        bot_ne_top (congrArg Subrepresentation.toSubmodule h)
+      haveI : Nontrivial (Subrepresentation ρ) := ⟨⊥, ⊤, hbnt⟩
+      have hnotall : ¬ ∀ W : Subrepresentation ρ, W = ⊥ ∨ W = ⊤ := fun H =>
+        hirr { eq_bot_or_eq_top := H }
+      push_neg at hnotall
+      obtain ⟨W, hWbot, hWtop⟩ := hnotall
+      -- `W` is a proper nonzero subrepresentation; its submodule has `finrank = 1`.
+      have hWsub_bot : W.toSubmodule ≠ ⊥ := fun h =>
+        hWbot (Subrepresentation.toSubmodule_injective (by rw [h]; rfl))
+      have hWsub_top : W.toSubmodule ≠ ⊤ := fun h =>
+        hWtop (Subrepresentation.toSubmodule_injective (by rw [h]; rfl))
+      haveI : Finite ↥W.toSubmodule := Subtype.finite
+      haveI : Module.Finite (ZMod p) ↥W.toSubmodule := Module.Finite.of_finite
+      have hpos : 0 < Module.finrank (ZMod p) ↥W.toSubmodule := by
+        have := Submodule.finrank_lt_finrank_of_lt (s := (⊥ : Submodule (ZMod p) V))
+          (t := W.toSubmodule) (lt_of_le_of_ne bot_le (Ne.symm hWsub_bot))
+        simpa using this
+      have hlt : Module.finrank (ZMod p) ↥W.toSubmodule < Module.finrank (ZMod p) V :=
+        Submodule.finrank_lt hWsub_top
+      have hWdim : Module.finrank (ZMod p) ↥W.toSubmodule = 1 := by
+        rw [hd2] at hlt; omega
+      -- faithfulness of `W.toRepresentation` from `hfpf` restricted to `W`.
+      have hfaithW : Function.Injective W.toRepresentation := by
+        intro a b hab
+        by_contra hne
+        have hba : b⁻¹ * a ≠ 1 := fun h => hne (inv_mul_eq_one.mp h).symm
+        -- every element of `W` is fixed by `ρ (b⁻¹ a)`, hence is `0` by `hfpf`; so `W = ⊥`.
+        apply hWsub_bot
+        rw [Submodule.eq_bot_iff]
+        intro w hw
+        have hfix : W.toRepresentation (b⁻¹ * a) ⟨w, hw⟩ = ⟨w, hw⟩ := by
+          rw [map_mul, Module.End.mul_apply, hab, ← Module.End.mul_apply, ← map_mul,
+            inv_mul_cancel, map_one, Module.End.one_apply]
+        have hfixV : ρ (b⁻¹ * a) w = w := by
+          have := congrArg Subtype.val hfix
+          simpa [Subrepresentation.toRepresentation, LinearMap.restrict_coe_apply] using this
+        exact hfpf (b⁻¹ * a) hba w hfixV
+      -- Case A on `W.toRepresentation` gives `IsCyclic E ∧ |E| ∣ p - 1`.
+      obtain ⟨hcyc, hdvd⟩ :=
+        isCyclic_and_card_dvd_of_faithful_one_dim W.toRepresentation hfaithW hWdim
+      refine ⟨hcyc, ?_⟩
+      -- `Nat.card ↥W.toSubmodule = p`, `Nat.card V = p²`.
+      have hcardW : Nat.card ↥W.toSubmodule = p := by
+        rw [Module.natCard_eq_pow_finrank (K := ZMod p), hWdim, pow_one, Nat.card_eq_fintype_card,
+          ZMod.card]
+      have hcardV : Nat.card V = p ^ 2 := by
+        rw [Module.natCard_eq_pow_finrank (K := ZMod p), hd2, Nat.card_eq_fintype_card, ZMod.card]
+      rw [hcardW] at hdvd
+      rw [hcardV]
+      -- `|E| ∣ p - 1 ∣ p² - 1`, via `p² - 1 = (p - 1) * (p + 1)`.
+      refine hdvd.trans ?_
+      have hp1 : 1 ≤ p := (Fact.out (p := p.Prime)).one_le
+      obtain ⟨k, rfl⟩ : ∃ k, p = k + 1 := ⟨p - 1, by omega⟩
+      refine ⟨k + 2, ?_⟩
+      have hsq : (k + 1) ^ 2 = k * (k + 2) + 1 := by ring
+      rw [hsq, Nat.add_sub_cancel, Nat.add_sub_cancel]
+
 /-- **Peterfalvi (12.12)**: the Frobenius complement in the witness subgroup is
 cyclic, with order dividing `p - 1` or `p + 1`. -/
 theorem complement_cyclic_order_dvd [Finite G]
