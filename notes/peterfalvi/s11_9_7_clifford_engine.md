@@ -30,6 +30,33 @@ chiefFactor_basic (済) は `_holds` / `quotient_order` 経由ゆえ互換 (fiel
 
 ## 進捗
 
+- **steps 3–5 DONE (2026-06-22, commits `f90a435f` / `87395477` / `bd78654b`)** — Clifford 算術核心 **完成**
+  (全 sorry-free + axiom-clean、AxiomsCheck 登録、full build 緑、FT sorry 130 不変):
+  - **step 3 `card_eq_pow_of_iSup_aInvariant_irreducible`** (order step): 有限・要素可換な `K` が
+    φ-不変・φ-既約・共通位数 `n` の部分群族の join `⨆ S i = ⊤` なら `∃ k, |K| = n^k`。証明 = 非零ピースの
+    極大 `SupIndep` 部分族を抽出 (既約性で span 維持: ピースと partial join の交わりが φ-不変 ⟹ ⊥ or 全体、
+    ⊥ なら族を拡大できて極大性に矛盾) → `Subgroup.noncommPiCoprod` で内部直積 (独立性で単射・span で全射) ⟹
+    `|K| = ∏ n = n^k`。**罠**: `Finset.SupIndep.insert` は `IsModularLattice (Subgroup K)` 要 →
+    `hcomm` から `letI : CommGroup K` を合成 (基底 Group 継承で `Subgroup K` 型同一性保持)。
+    `smul_smul : a•b•x = (a*b)•x` (結合は forward)。
+  - **step 4 軌道 3 補題** (`isAInvariant_comp_subtype_pointwise_smul` / `forall_aInvariant_le_pointwise_smul`
+    / `card_pointwise_smul`): `U ◁ A` 作用で、A-軌道 `φ a • S₀` の各並進が U-不変・U-既約・同位数。
+    不変性 = `φu•(φa•S₀)=φa•(φ(a⁻¹ua)•S₀)=φa•S₀` (`a⁻¹ua∈U`); 既約性 = `J≤φa•S₀` を `φa⁻¹•J≤S₀` に
+    引き戻す; 位数 = automorphism は位数保存 (`pointwise_smul_def` + `equivMapOfInjective`)。
+  - **step 5 `chiefFactor_clifford_dim_dvd_q`** (組み立て): 極小 U-不変 `S₀≠⊥` (有限性) で
+    `0<d ∧ d∣q ∧ |S₀|=p^d`。step2 span (full action) + step3 order (restricted U-action) ⟹ `|H̄|=|S₀|^k`、
+    `|H̄|=p^q` (`chiefFactor_quotient_card`) ⟹ `p^q=(p^d)^k` ⟹ `q=d·k` (`Nat.pow_right_injective`)。
+    **q 素数 ⟹ d∈{1,q}** = (9.7) 二分の算術的核心。**インフラ罠**: `data.H`(`TypesIIIIIIVSetup.H`) vs
+    `data.typeP.H` の defeq をインスタンス探索が展開せず action の `[N.Normal]` が見つからない →
+    `@[reducible] TypesIIIIIIVSetup.H` で透過化 + `attribute [instance] ChiefFactorData.N_normal`
+    (文中で `Subgroup (↥H⧸N)` を使うため; instance-field は自動でグローバル instance にならない)。
+  - **frontier = step 6/7 (CaseA/CaseB データ構成)**: `clifford_dichotomy` は `chiefFactor_clifford_dim_dvd_q`
+    で `d∈{1,q}` に分岐できるが、`CliffordCaseAData`/`CliffordCaseBData` の**実フィールド**構成が残る:
+    CaseA (d=1) = `Hpart : Fin q → Subgroup G` 各位数 `p` (H̄ の q 個の order-p ピースを G に引き戻し、
+    Schur–Zassenhaus 系の分割が要る) + `a∣p-1`; CaseB (d=q) = `u_coprime_p_sub_one` / `u_dvd_norm_quotient`
+    (`End_{F_p[U]}(H̄)` 体モデル + `Ū↪F*` 巡回 + FPF)。両者とも `Section11CharacterData` の `u`
+    (opaque `u_eq_card_quotient`) を pin する必要があり深い。**これらが本当の残務** (算術核心は完成)。
+
 - **step 0 DONE (2026-06-22, commit `f69557a5`)**: `ChiefFactorData` の 3 opaque field を実構造に
   置換。`exists_chiefFactor_kernel` を強化し、kernel `N = W.comap (mk' N₀)` について
   `IsElementaryAbelian p (↥H ⧸ N)` + `UW₁`-既約 (`∀ J, IsAInvariant (quotientMulAutHom hN) J → J=⊥∨⊤`)
