@@ -1559,6 +1559,139 @@ theorem iSup_smul_eq_top_of_irreducible {A H : Type*} [Group A] [Group H] {φ : 
     rwa [map_one, one_smul] at this
   exact (hirr T hTinv).resolve_left hTne
 
+/-- **(9.7) order step** (general form): a finite group `K` whose elements pairwise commute (e.g. an
+elementary abelian `p`-group) that is the join `⨆ i, S i` of a family of `φ`-invariant subgroups,
+each either trivial or `φ`-irreducible of a common order `n`, has order a power of `n`.
+
+Extract a maximal `SupIndep` subfamily of the nonzero pieces.  By irreducibility it still spans `K`:
+any piece meets the partial join in a `φ`-invariant subgroup `≤` the piece, hence `⊥` or the whole
+piece — and `⊥` would let us enlarge the subfamily, contradicting maximality.  An independent
+commuting spanning family realises `K` as the internal direct product `∏ ↥(S i)` (via
+`Subgroup.noncommPiCoprod`, injective from independence and surjective from spanning), so
+`|K| = ∏ |S i| = ∏ n = n ^ k`.
+
+Applied to the chief factor `H̄` under the restricted `U`-action, with the pieces the `U W₁`-orbit of
+a minimal `U`-invariant `S₀` (each `U`-irreducible of order `|S₀| = p^d`), this gives `|H̄| = (p^d)^k`,
+i.e. `q = d·k` — the divisibility `d ∣ q` underlying the Clifford dichotomy (`q` prime ⟹ `d ∈ {1, q}`). -/
+theorem card_eq_pow_of_iSup_aInvariant_irreducible {K : Type*} [Group K] [Finite K]
+    {A : Type*} [Group A] {φ : A →* MulAut K} {ι : Type*} [Finite ι]
+    {S : ι → Subgroup K} {n : ℕ}
+    (hcomm : ∀ x y : K, Commute x y)
+    (hspan : ⨆ i, S i = ⊤)
+    (hinv : ∀ i, IsAInvariant φ (S i))
+    (hirr : ∀ i, ∀ J : Subgroup K, IsAInvariant φ J → J ≤ S i → J = ⊥ ∨ J = S i)
+    (hcard : ∀ i, S i ≠ ⊥ → Nat.card ↥(S i) = n) :
+    ∃ k, Nat.card K = n ^ k := by
+  classical
+  -- `K` is abelian, so its subgroup lattice is modular (used to enlarge `SupIndep` families).
+  letI : CommGroup K := { (inferInstance : Group K) with mul_comm := fun a b => (hcomm a b).eq }
+  -- Candidate finsets: `SupIndep` subfamilies of nonzero pieces.
+  set cands : Finset (Finset ι) :=
+    Finset.univ.filter (fun t => t.SupIndep S ∧ ∀ i ∈ t, S i ≠ ⊥) with hcands
+  have hmem_cands : ∀ {t : Finset ι}, t ∈ cands ↔ t.SupIndep S ∧ ∀ i ∈ t, S i ≠ ⊥ := by
+    intro t; rw [hcands, Finset.mem_filter]; exact and_iff_right (Finset.mem_univ _)
+  have hempty : (∅ : Finset ι) ∈ cands :=
+    hmem_cands.mpr ⟨Finset.supIndep_empty S, by simp⟩
+  -- Choose a candidate of maximal cardinality.
+  obtain ⟨t, ht_mem, ht_max⟩ := cands.exists_max_image Finset.card ⟨∅, hempty⟩
+  obtain ⟨ht_si, ht_ne⟩ := hmem_cands.mp ht_mem
+  -- The maximal subfamily already spans `K`.
+  have hspan_t : ⨆ i ∈ t, S i = ⊤ := by
+    refine top_le_iff.mp ?_
+    rw [← hspan]
+    refine iSup_le fun j => ?_
+    by_cases hj0 : S j = ⊥
+    · rw [hj0]; exact bot_le
+    · have hBinv : IsAInvariant φ (⨆ i ∈ t, S i) :=
+        IsAInvariant.iSup fun i => IsAInvariant.iSup fun _ => hinv i
+      rcases hirr j (S j ⊓ ⨆ i ∈ t, S i) (IsAInvariant.inf (hinv j) hBinv) inf_le_left with
+        hbot | heq
+      · -- `S j ⊓ B = ⊥`: enlarging `t` by `j` stays a candidate, contradicting maximality.
+        exfalso
+        have hjt : j ∉ t := fun hj => hj0 (by
+          have hle : S j ≤ ⨆ i ∈ t, S i :=
+            le_iSup_of_le j (le_iSup_of_le hj le_rfl)
+          rwa [inf_eq_left.mpr hle] at hbot)
+        have hdisj : Disjoint (S j) (t.sup S) := by
+          rw [Finset.sup_eq_iSup]; exact disjoint_iff.mpr hbot
+        have hins_ne : ∀ i ∈ insert j t, S i ≠ ⊥ := by
+          intro i hi
+          rcases Finset.mem_insert.mp hi with rfl | hi
+          · exact hj0
+          · exact ht_ne i hi
+        have hins_mem : insert j t ∈ cands := hmem_cands.mpr ⟨ht_si.insert hdisj, hins_ne⟩
+        have hle_card := ht_max (insert j t) hins_mem
+        rw [Finset.card_insert_of_notMem hjt] at hle_card
+        omega
+      · exact inf_eq_left.mp heq
+  -- The independent, commuting, spanning subfamily makes `K` the internal direct product `∏ S i`.
+  have hcomm_pair : Pairwise fun i j : (t : Finset ι) =>
+      ∀ x y : K, x ∈ S ↑i → y ∈ S ↑j → Commute x y :=
+    fun _ _ _ x y _ _ => hcomm x y
+  have hrange : (Subgroup.noncommPiCoprod hcomm_pair).range = ⊤ := by
+    rw [Subgroup.noncommPiCoprod_range, iSup_subtype]; exact hspan_t
+  have hbij : Function.Bijective (Subgroup.noncommPiCoprod hcomm_pair) :=
+    ⟨Subgroup.injective_noncommPiCoprod_of_iSupIndep ht_si.independent,
+      MonoidHom.range_eq_top.mp hrange⟩
+  refine ⟨t.card, ?_⟩
+  have hfac : ∀ i : (t : Finset ι), Nat.card ↥(S ↑i) = n := fun i => hcard ↑i (ht_ne ↑i i.2)
+  calc Nat.card K = Nat.card (∀ i : (t : Finset ι), ↥(S ↑i)) :=
+        (Nat.card_congr (Equiv.ofBijective _ hbij)).symm
+    _ = ∏ i : (t : Finset ι), Nat.card ↥(S ↑i) := Nat.card_pi
+    _ = ∏ _i : (t : Finset ι), n := Finset.prod_congr rfl (fun i _ => hfac i)
+    _ = n ^ t.card := by rw [Finset.prod_const, Finset.card_univ, Fintype.card_coe]
+
+/-! ### (9.7) Clifford orbit: translates of a `U`-irreducible piece
+
+The Clifford decomposition restricts the `U W₁`-action on `H̄` to the normal kernel `U` and reads
+off the orbit of a minimal `U`-invariant `S₀` under the full action.  The three lemmas below are the
+group-theoretic core: an `A`-translate `φ a • S₀` of a `U`-invariant (resp. `U`-irreducible)
+subgroup is again `U`-invariant (resp. `U`-irreducible) when `U ◁ A`, and translation preserves
+order.  Combined with the spanning step `iSup_smul_eq_top_of_irreducible` and the order step
+`card_eq_pow_of_iSup_aInvariant_irreducible`, they give `|H̄| = |S₀|^k`, hence `q = d·k`. -/
+
+/-- **Clifford orbit, invariance.** If `U ◁ A` acts on `K` through `φ` and `S₀` is `U`-invariant
+(invariant under `φ` restricted to `U`), then every `A`-translate `φ a • S₀` is again `U`-invariant:
+for `u ∈ U`, `φ u • (φ a • S₀) = φ (u·a) • S₀ = φ a • (φ (a⁻¹·u·a) • S₀) = φ a • S₀` since
+`a⁻¹·u·a ∈ U`. -/
+theorem isAInvariant_comp_subtype_pointwise_smul {A K : Type*} [Group A] [Group K]
+    {φ : A →* MulAut K} {U : Subgroup A} (hU : U.Normal)
+    {S₀ : Subgroup K} (hS₀ : IsAInvariant (φ.comp U.subtype) S₀) (a : A) :
+    IsAInvariant (φ.comp U.subtype) (φ a • S₀) := by
+  intro u
+  show φ ↑u • (φ a • S₀) = φ a • S₀
+  have hmem : a⁻¹ * (↑u : A) * a ∈ U := by
+    have h := hU.conj_mem (↑u) u.2 a⁻¹; rwa [inv_inv] at h
+  rw [smul_smul, ← map_mul,
+    show (↑u : A) * a = a * (a⁻¹ * ↑u * a) by group, map_mul, ← smul_smul]
+  congr 1
+  exact hS₀ ⟨a⁻¹ * ↑u * a, hmem⟩
+
+/-- **Clifford orbit, irreducibility.** `A`-translates of a `U`-irreducible (minimal nonzero
+`U`-invariant) subgroup `S₀` are again `U`-irreducible: a `U`-invariant `J ≤ φ a • S₀` pulls back to
+`φ a⁻¹ • J ≤ S₀`, which is `⊥` or `S₀`, so `J = φ a • (φ a⁻¹ • J)` is `⊥` or `φ a • S₀`. -/
+theorem forall_aInvariant_le_pointwise_smul {A K : Type*} [Group A] [Group K]
+    {φ : A →* MulAut K} {U : Subgroup A} (hU : U.Normal) {S₀ : Subgroup K}
+    (hirr₀ : ∀ J : Subgroup K, IsAInvariant (φ.comp U.subtype) J → J ≤ S₀ → J = ⊥ ∨ J = S₀)
+    (a : A) (J : Subgroup K) (hJinv : IsAInvariant (φ.comp U.subtype) J) (hJle : J ≤ φ a • S₀) :
+    J = ⊥ ∨ J = φ a • S₀ := by
+  have hback : φ a • (φ a⁻¹ • J) = J := by
+    rw [smul_smul, ← map_mul, mul_inv_cancel, map_one, one_smul]
+  have hJ'inv : IsAInvariant (φ.comp U.subtype) (φ a⁻¹ • J) :=
+    isAInvariant_comp_subtype_pointwise_smul hU hJinv a⁻¹
+  have hJ'le : φ a⁻¹ • J ≤ S₀ := by
+    have h := (Subgroup.pointwise_smul_le_pointwise_smul_iff (a := φ a⁻¹)).mpr hJle
+    rwa [smul_smul, ← map_mul, inv_mul_cancel, map_one, one_smul] at h
+  rcases hirr₀ (φ a⁻¹ • J) hJ'inv hJ'le with h | h
+  · exact Or.inl (by rw [← hback, h, Subgroup.smul_bot])
+  · exact Or.inr (by rw [← hback, h])
+
+/-- **Clifford orbit, order.** Translation by an automorphism preserves order: `|φ a • S| = |S|`. -/
+theorem card_pointwise_smul {A K : Type*} [Group A] [Group K] [Finite K]
+    (φ : A →* MulAut K) (a : A) (S : Subgroup K) :
+    Nat.card ↥(φ a • S) = Nat.card ↥S :=
+  (Nat.card_congr (Subgroup.equivMapOfInjective S (φ a).toMonoidHom (φ a).injective).toEquiv).symm
+
 /-- **Peterfalvi (9.7)**: the Clifford-theory dichotomy for the action on the
 chief factor `H/H_0`. -/
 theorem clifford_dichotomy [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
