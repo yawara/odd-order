@@ -223,15 +223,17 @@ The book proof of (12.12): let `P = O_p(H)`, `T = Ω₁(Z(P))` (elem-ab of order
   **`p+1` refinement**: any `A ≤ E` with `|A| ∣ p−1` embeds in `𝔽_pˣ`, so normalizes every line
   of `T`; in particular `⟨x⟩` (`x ∈ T = Ω₁(P_0)`), so `A ⊆ M` (by (12.9)), so `A = 1` (by (12.11)).
   Hence `gcd(e, p−1) = 1`, and with `e ∣ p²−1 = (p−1)(p+1)` ⟹ `e ∣ p+1`.
-- **gate**: the `T`/FPF setup + the `A=1` refinement consume **(12.9)/(12.10)/(12.11)**, which are
-  the §8-gated counterexample scaffold ((8.12.a) Sylow-of-U rank ≤ 2, (8.13.c1) `L = L_F ⋊ (M∩L)`
-  — BG §16 consequences not yet extracted in repo S10) + `CounterexampleHypothesis`/`RankTwoWitnessData`
-  faithful-ization.  ⟹ (12.12) as a whole is blocked on that scaffold; the Case B *core* is the
-  ungated, reusable part and is done.
-
-Optional ungated fragments (small, reusable, but cannot close (12.12) without the scaffold):
-Case A lemma (`E` FPF + normalizes order-`p` line ⟹ `E ↪ (ℤ/p)ˣ`), and "an `𝔽_pˣ`-acting
-`A` normalizes every line".
+- **✅ Combined FPF rep-theory core LANDED** (2026-06-23, commit `03b868e5`, sorry-free + axiom-clean):
+  **`isCyclic_and_card_dvd_of_fpf_dim_le_two`** — an odd FPF `E` (`p∤|E|`) acting on an `𝔽_p`-space
+  `V` of dim 1 or 2 is cyclic with `|E| ∣ |V|−1`.  **Consumes BOTH Case A/B cores**: FPF ⟹ faithful;
+  dim 1 / dim-2-reducible (invariant line via `Subrepresentation`) ⟹ Case A; dim-2-irreducible ⟹
+  Case B (`|E| ∣ p−1 ∣ p²−1` lift for the reducible case).  This is the **§8-free rep-theory input**
+  that the full (12.12) consumes once its `T`/FPF setup lands.
+- **gate (remaining)**: the `T = Ω₁(Z(O_p(H)))` setup (|T|∈{p,p²} from (12.9) rank 2; `E` FPF on `T`
+  from (12.10) Frobenius; elem-ab→`Representation` conversion) + the `p+1` refinement (`A=1` via
+  (12.11)/(12.9)) consume **(12.10)/(12.11)** [char/§8-gated, lane-b] and the intricate `O_p/Z/Ω₁`
+  structure.  ⟹ `complement_cyclic_order_dvd` (full disjunction) stays gated; the rep-theory core is
+  the ungated reusable part and is **done + consumes the two cores**.
 
    ### ⚠ Instance-engineering blocker (diagnosed 2026-06-22 — ✅ SUPERSEDED/RESOLVED, see "RESOLVED" block above; kept as a record of the dead ends)
    The clean composition is **blocked** because the Singer lemma requires `[CommGroup C]` but
