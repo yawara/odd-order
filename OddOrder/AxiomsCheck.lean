@@ -12,6 +12,7 @@ import OddOrder.GroupTheory.WielandtAssembly
 import OddOrder.GroupTheory.WielandtPerFactorDischarge
 import OddOrder.GroupTheory.RepresentationTheory.WielandtKernelFPF
 import OddOrder.GroupTheory.RepresentationTheory.WielandtElabFrobenius
+import OddOrder.GroupTheory.RepresentationTheory.SingerField
 import OddOrder.GroupTheory.WielandtFixedPoint
 import OddOrder.GroupTheory.PiElementDecomposition
 import OddOrder.GroupTheory.RepresentationTheory.CharacterCount
@@ -675,6 +676,13 @@ set_option linter.style.longLine false in
 #assert_only_allowed_axioms OddOrder.RepresentationTheory.card_irreducibleCharacter_le
 -- RepresentationTheory: there are finitely many irreducible characters of a finite group.
 #assert_only_allowed_axioms OddOrder.RepresentationTheory.finite_irreducibleCharacter
+-- RepresentationTheory (Singer, commutativity as a hypothesis): an abelian group acting
+-- faithfully + irreducibly on a finite 𝔽_p-module is cyclic with order dividing |M| - 1.
+-- This is the `CommGroup`-instance-free Singer mechanism (Peterfalvi (12.12) / (14.2)(a) core),
+-- realized via the quotient field `𝔽_p[E] ⧸ I`; it accepts BG Thm 2.6(a)'s commutativity output.
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.isCyclic_and_card_dvd_of_faithful_irreducible_comm
+#assert_only_allowed_axioms OddOrder.RepresentationTheory.mul_comm_monoidAlgebra_of_comm
 -- RepresentationTheory: completeness of irreducible characters — `f ⊥ Irr G ⇒ f = 0`
 -- (regular representation + Maschke + Schur).
 #assert_only_allowed_axioms OddOrder.RepresentationTheory.classFunction_eq_zero_of_orthogonal
