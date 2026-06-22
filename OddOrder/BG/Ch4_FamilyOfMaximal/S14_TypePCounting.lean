@@ -8986,6 +8986,148 @@ theorem exists_maximal_of_typeF_notMem_fitting [Finite G]
       (hQMstar hXQ) hX1 hτ2cl (by rw [hCeq]; exact hCMσQ)
     rwa [hCeq] at hsingle
 
+/-- **`M_σ ∩ M* = K*`** (BG Theorem 14.7(d) kernel, Coq `defMsMstar`): for a type-`P₂` maximal
+`M` with `κ`-Hall `K`, `K* = M_σ ⊓ C(K)`, and the dual partner `M*` (`K ≤ M*_σ`, `K* ≤ M*`, `M`
+not conjugate to `M*`), the intersection `M_σ ⊓ M*` equals `K*`.
+
+`⊇` is immediate (`K* ≤ M_σ`, `K* ≤ M*`).  For `⊆`: any `y ∈ M_σ ⊓ M*` has `⁅⟨y⟩, K⁆ ≤ M_σ`
+(`K ≤ M ≤ N(M_σ)`, `y ∈ M_σ`) and `⁅⟨y⟩, K⁆ ≤ M*_σ` (`K ≤ M*_σ ◁ M*`, `y ∈ M* ≤ N(M*_σ)`), so
+`⁅⟨y⟩, K⁆ ≤ M_σ ⊓ M*_σ = ⊥` (Lemma 10.12, `M_σ` nilpotent for type-`P₂`); hence `y` centralizes
+`K`, i.e. `y ∈ M_σ ⊓ C(K) = K*`.  Avoids the embedding's σ(M)-Hall-of-M* clause. -/
+private theorem msigma_inf_partner_eq_kstar [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    {M K Kstar Mstar : Subgroup G} (hM : M ∈ maximalSubgroups G) (hP2 : IsTypeP2 M) (hKM : K ≤ M)
+    (hKstar : Kstar = OddOrder.BG.Ch3.S10.Msigma M ⊓ Subgroup.centralizer (K : Set G))
+    (hMstarmax : Mstar ∈ maximalSubgroups G)
+    (hKMsigmaMstar : K ≤ OddOrder.BG.Ch3.S10.Msigma Mstar) (hKstarMstar : Kstar ≤ Mstar)
+    (hnc : ¬ IsConjugateSubgroup M Mstar) :
+    OddOrder.BG.Ch3.S10.Msigma M ⊓ Mstar = Kstar := by
+  classical
+  -- `M_σ` nilpotent (type-`P₂`) ⟹ `M_σ ⊓ M*_σ = ⊥` (Lemma 10.12).
+  have hdisj : OddOrder.BG.Ch3.S10.Msigma M ⊓ OddOrder.BG.Ch3.S10.Msigma Mstar = ⊥ :=
+    ((OddOrder.BG.Ch3.S10.disjoint_of_not_conj hG hM hMstarmax (fun h => hnc h)).2
+      (msigma_isNilpotent_of_isTypeP2 hG hM hP2)).1
+  have hMN : M ≤ Subgroup.normalizer (OddOrder.BG.Ch3.S10.Msigma M : Set G) := by
+    rw [OddOrder.BG.Ch3.S10.Msigma]
+    exact le_normalizer_opiCoreInG (OddOrder.BG.Ch3.S10.sigma M) M
+  have hMstarN : Mstar ≤ Subgroup.normalizer (OddOrder.BG.Ch3.S10.Msigma Mstar : Set G) := by
+    rw [OddOrder.BG.Ch3.S10.Msigma]
+    exact le_normalizer_opiCoreInG (OddOrder.BG.Ch3.S10.sigma Mstar) Mstar
+  apply le_antisymm
+  · intro y hy
+    rw [Subgroup.mem_inf] at hy
+    obtain ⟨hyMσ, hyMstar⟩ := hy
+    rw [hKstar, Subgroup.mem_inf]
+    refine ⟨hyMσ, ?_⟩
+    have hcle : (⁅Subgroup.zpowers y, K⁆ : Subgroup G) ≤ ⊥ := by
+      rw [← hdisj, le_inf_iff]
+      refine ⟨Subgroup.commutator_le.mpr ?_, Subgroup.commutator_le.mpr ?_⟩
+      · intro a ha k hk
+        have haMσ : a ∈ OddOrder.BG.Ch3.S10.Msigma M := (Subgroup.zpowers_le.mpr hyMσ) ha
+        have hkN := (Subgroup.mem_normalizer_iff.mp (hMN (hKM hk))) a⁻¹
+        rw [commutatorElement_def]
+        have hconj : k * a⁻¹ * k⁻¹ ∈ OddOrder.BG.Ch3.S10.Msigma M := hkN.mp (inv_mem haMσ)
+        have : a * k * a⁻¹ * k⁻¹ = a * (k * a⁻¹ * k⁻¹) := by group
+        rw [this]; exact mul_mem haMσ hconj
+      · intro a ha k hk
+        have haMstarσ : a ∈ Mstar := (Subgroup.zpowers_le.mpr hyMstar) ha
+        have hkMσstar : k ∈ OddOrder.BG.Ch3.S10.Msigma Mstar := hKMsigmaMstar hk
+        rw [commutatorElement_def]
+        have hconj : a * k * a⁻¹ ∈ OddOrder.BG.Ch3.S10.Msigma Mstar :=
+          (Subgroup.mem_normalizer_iff.mp (hMstarN haMstarσ) k).mp hkMσstar
+        have : a * k * a⁻¹ * k⁻¹ = (a * k * a⁻¹) * k⁻¹ := by group
+        rw [this]; exact mul_mem hconj (inv_mem hkMσstar)
+    rw [le_bot_iff, Subgroup.commutator_eq_bot_iff_le_centralizer] at hcle
+    exact hcle (Subgroup.mem_zpowers y)
+  · exact le_inf (hKstar ▸ inf_le_left) hKstarMstar
+
+/-- **The partner intersection `ziMMst` and `K`-uniqueness `sK_uniqMst`** (BG Theorem 14.7,
+embedding internals), assembled here for the type-`F` classification of Corollary 14.12.
+
+Applying `typeP_structure` to the partner `M*` (whose `κ`-Hall is `K*`, with `K = M*_σ ⊓ C(K*)`):
+the `b1` clause at a characteristic order-`p` line of the cyclic `K*` gives `N_{M*}(K*) = K* ⊔ K`,
+whence (via `M_σ ⊓ M* = K*`, here `hMsMst`) `M ⊓ M* = K ⊔ K*`; and the `K`-TI clause gives
+`K ≤ M*^a ⟹ a ∈ M*`.  Mirrors Coq `Ptype_embedding`'s `ziMMst`/`sK_uniqMst` (BGsection14.v L1820,
+L2278). -/
+private theorem partner_inf_and_uniq [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    {M K Kstar Mstar : Subgroup G} (hMstmax : Mstar ∈ maximalSubgroups G) (hMstP : IsTypeP Mstar)
+    (hKstarMst : Kstar ≤ Mstar)
+    (hKstar_hall : Ch03.IsHallSubgroup (kappa Mstar) (Kstar.subgroupOf Mstar))
+    (hK_eq : K = OddOrder.BG.Ch3.S10.Msigma Mstar ⊓ Subgroup.centralizer (Kstar : Set G))
+    (hKMsigmaMst : K ≤ OddOrder.BG.Ch3.S10.Msigma Mstar)
+    (hKM : K ≤ M) (hKstarM : Kstar ≤ M)
+    (hZcyc : IsCyclic ↥(K ⊔ Kstar)) (hKstarNe : Kstar ≠ ⊥) (hKNe : K ≠ ⊥)
+    (hMsMst : OddOrder.BG.Ch3.S10.Msigma M ⊓ Mstar = Kstar) :
+    M ⊓ Mstar = K ⊔ Kstar ∧ (∀ a : G, K ≤ MulAut.conj a • Mstar → a ∈ Mstar) := by
+  classical
+  haveI : IsSolvable ↥Mstar := hG.solvable_of_mem_maximalSubgroups hMstmax
+  haveI := hZcyc
+  -- A Hall `(κ(M*) ∪ σ(M*))'`-subgroup of `M*`, to feed `typeP_structure`.
+  obtain ⟨U', hU'⟩ := Ch03.hall_E_exists (G := ↥Mstar)
+    ((kappa Mstar ∪ OddOrder.BG.Ch3.S10.sigma Mstar)ᶜ)
+  have hUeq : (U'.map Mstar.subtype).subgroupOf Mstar = U' :=
+    Subgroup.comap_map_eq_self_of_injective Mstar.subtype_injective U'
+  have hU_Mstar : Ch03.IsHallSubgroup ((kappa Mstar ∪ OddOrder.BG.Ch3.S10.sigma Mstar)ᶜ)
+      ((U'.map Mstar.subtype).subgroupOf Mstar) := by rw [hUeq]; exact hU'
+  have hstruct := typeP_structure hG hMstmax hMstP hKstarMst hKstar_hall hK_eq hU_Mstar
+  -- `b1`: `N_G(X) ⊓ M* = K* ⊔ K` for rank-one `X ≤ K*`; TI: `g ∉ M* → K ⊓ M*^g = ⊥`.
+  have hb1 := hstruct.2.2.1
+  have hTI := hstruct.2.2.2.1
+  -- `K ≤ C(K*)` (`Z = K ⊔ K*` cyclic ⟹ abelian).
+  have hKcKstar : K ≤ Subgroup.centralizer (Kstar : Set G) := by
+    letI : CommGroup ↥(K ⊔ Kstar) := IsCyclic.commGroup
+    intro k hk
+    rw [Subgroup.mem_centralizer_iff]
+    intro s hs
+    have hkZ : k ∈ (K ⊔ Kstar : Subgroup G) := Subgroup.mem_sup_left hk
+    have hsZ : s ∈ (K ⊔ Kstar : Subgroup G) := Subgroup.mem_sup_right hs
+    exact congrArg Subtype.val (mul_comm (⟨s, hsZ⟩ : ↥(K ⊔ Kstar)) (⟨k, hkZ⟩ : ↥(K ⊔ Kstar)))
+  -- A characteristic order-`p` line `X ≤ K*` (cyclic `K*`).
+  haveI hKstarcyc : IsCyclic ↥Kstar :=
+    (Subgroup.subgroupOfEquivOfLe (le_sup_right : Kstar ≤ K ⊔ Kstar)).isCyclic.mp inferInstance
+  obtain ⟨p, hp, hpd⟩ := Nat.exists_prime_and_dvd
+    (show Nat.card ↥Kstar ≠ 1 from fun h => hKstarNe (Subgroup.card_eq_one.mp h))
+  haveI : Fact p.Prime := ⟨hp⟩
+  obtain ⟨x, hx⟩ := exists_prime_orderOf_dvd_card' (G := ↥Kstar) p hpd
+  set X : Subgroup G := Subgroup.zpowers (x : G) with hXdef
+  have hxord : orderOf (x : G) = p :=
+    (orderOf_injective Kstar.subtype Kstar.subtype_injective x).trans hx
+  have hXcard : Nat.card ↥X = p := by rw [hXdef, Nat.card_zpowers, hxord]
+  have hXKstar : X ≤ Kstar := by rw [hXdef, Subgroup.zpowers_le]; exact x.2
+  have hXelem : X ∈ elemAbelianOfRank G p 1 :=
+    mem_elemAbelianOfRank.mpr
+      ⟨Subgroup.IsElementaryAbelian.of_card_prime hXcard, by rw [hXcard, pow_one]⟩
+  have hNKstarX : Subgroup.normalizer (Kstar : Set G) ≤ Subgroup.normalizer (X : Set G) := by
+    haveI : (X.subgroupOf Kstar).Characteristic := Ch04.characteristic_of_subgroup_of_isCyclic _
+    intro g hg
+    have hmem := OddOrder.BG.Ch1.S03f.mem_normalizer_map_subtype_of_characteristic
+      (W := Kstar) (C := X.subgroupOf Kstar) hg
+    rwa [Subgroup.map_subgroupOf_eq_of_le hXKstar] at hmem
+  -- `N_{M*}(K*) = K* ⊔ K = K ⊔ K*`.
+  have hNMst : Subgroup.normalizer (Kstar : Set G) ⊓ Mstar = K ⊔ Kstar := by
+    refine le_antisymm ?_ ?_
+    · calc Subgroup.normalizer (Kstar : Set G) ⊓ Mstar
+          ≤ Subgroup.normalizer (X : Set G) ⊓ Mstar := inf_le_inf hNKstarX le_rfl
+        _ = Kstar ⊔ K := hb1 p hp X hXelem hXKstar
+        _ = K ⊔ Kstar := sup_comm _ _
+    · refine le_inf (sup_le (hKcKstar.trans (Subgroup.centralizer_le_normalizer (Kstar : Set G)))
+        Subgroup.le_normalizer) ?_
+      exact sup_le (hKMsigmaMst.trans (OddOrder.BG.Ch3.S10.Msigma_le Mstar)) hKstarMst
+  -- `ziMMst`: `M ⊓ M* = K ⊔ K*`.
+  have hMN : M ≤ Subgroup.normalizer (OddOrder.BG.Ch3.S10.Msigma M : Set G) := by
+    rw [OddOrder.BG.Ch3.S10.Msigma]
+    exact le_normalizer_opiCoreInG (OddOrder.BG.Ch3.S10.sigma M) M
+  have hziMMst : M ⊓ Mstar = K ⊔ Kstar := by
+    refine le_antisymm ?_ (le_inf (sup_le hKM hKstarM)
+      (sup_le (hKMsigmaMst.trans (OddOrder.BG.Ch3.S10.Msigma_le Mstar)) hKstarMst))
+    have hsub : M ⊓ Mstar ≤ Subgroup.normalizer (Kstar : Set G) := by
+      rw [← hMsMst]
+      exact le_normalizer_inf (inf_le_left.trans hMN) (inf_le_right.trans Subgroup.le_normalizer)
+    calc M ⊓ Mstar ≤ Subgroup.normalizer (Kstar : Set G) ⊓ Mstar := le_inf hsub inf_le_right
+      _ = K ⊔ Kstar := hNMst
+  -- `sK_uniqMst`: `K ≤ M*^a ⟹ a ∈ M*`.
+  refine ⟨hziMMst, fun a hKa => ?_⟩
+  by_contra haMst
+  exact hKNe (le_bot_iff.mp ((hTI a haMst) ▸ le_inf le_rfl hKa))
 
 /-- **BG Corollary 14.12** (mmd L4035): for `M ∈ 𝓜_{P₂}` with `K`, `M*`, `K*` as in
 Theorem 14.7 and `U` as in Proposition 14.2(a), `r ∈ π(U)`, `R` the Sylow `r`-subgroup of the
@@ -9008,7 +9150,8 @@ theorem typeP2_neighbor_is_typeF [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd
     (hK : Ch03.IsHallSubgroup (kappa M) (K.subgroupOf M))
     (hU : Ch03.IsHallSubgroup ((kappa M ∪ OddOrder.BG.Ch3.S10.sigma M)ᶜ) (U.subgroupOf M))
     (hUab : ∀ a ∈ U, ∀ b ∈ U, a * b = b * a) (hr : r ∈ piSet U) (hRU : R ≤ U)
-    (hR : Ch03.IsHallSubgroup ({r} : Set ℕ) (R.subgroupOf U)) :
+    (hR : Ch03.IsHallSubgroup ({r} : Set ℕ) (R.subgroupOf U))
+    (hKNU : K ≤ Subgroup.normalizer (U : Set G)) :
     ∃ H : Subgroup G,
       H ∈ maximalSubgroupsContaining (Subgroup.normalizer (R : Set G)) ∧
       IsTypeF H ∧ U ≤ OddOrder.BG.Ch3.S10.Msigma H ∧ M ⊓ H = U ⊔ K ∧
@@ -9019,11 +9162,10 @@ theorem typeP2_neighbor_is_typeF [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd
   have hrprime : r.Prime := Fact.out
   have hRM : R ≤ M := hRU.trans hUM
   -- `r ∉ σ(M)`: `r ∈ π(U)` and `U` is a `(κ(M) ∪ σ(M))'`-Hall subgroup of `M`.
-  have hrσM : r ∉ OddOrder.BG.Ch3.S10.sigma M := by
-    have hrU' : r ∈ (Nat.card ↥(U.subgroupOf M)).primeFactors := by
-      rwa [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hUM).toEquiv]
-    have hrc : r ∈ (kappa M ∪ OddOrder.BG.Ch3.S10.sigma M)ᶜ := hU.1 r hrU'
-    exact fun h => hrc (Or.inr h)
+  have hrU' : r ∈ (Nat.card ↥(U.subgroupOf M)).primeFactors := by
+    rwa [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hUM).toEquiv]
+  have hrκσ : r ∈ (kappa M ∪ OddOrder.BG.Ch3.S10.sigma M)ᶜ := hU.1 r hrU'
+  have hrσM : r ∉ OddOrder.BG.Ch3.S10.sigma M := fun h => hrκσ (Or.inr h)
   -- `R ≠ ⊥`: `r ∣ |U|` and (Hall) `r ∤ [U : R]`, so `r ∣ |R|`.
   have hRne : R ≠ ⊥ := by
     have hlag : Nat.card ↥(R.subgroupOf U) * (R.subgroupOf U).index = Nat.card ↥U :=
@@ -9051,12 +9193,169 @@ theorem typeP2_neighbor_is_typeF [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd
     mem_maximalSubgroupsContaining.mpr ⟨hHcoatom, hNRH⟩
   -- `R ≤ H` (from `N_G(R) ≤ H`).
   have hRH : R ≤ H := (Subgroup.le_normalizer).trans hNRH
+  -- `K ≤ H` (Coq `sEH`/`sKH`): `R = O_r(U)` is characteristic in abelian `U` (a normal Sylow
+  -- `r`-subgroup), so `K ≤ N(U) ⟹ K ≤ N(R) ≤ H`.  Uses the `kappa_complement` structure
+  -- (`group_set (U*K)`, here `hKNU : K ≤ N(U)`).
+  have hUcomm : ∀ a b : ↥U, a * b = b * a := fun a b =>
+    Subtype.ext (hUab (a : G) a.2 (b : G) b.2)
+  have hKH : K ≤ H := by
+    have hRcardU : Nat.card ↥(R.subgroupOf U) = r ^ (Nat.card ↥U).factorization r := by
+      have hpow : Nat.card ↥(R.subgroupOf U)
+          = r ^ (Nat.card ↥(R.subgroupOf U)).factorization r := by
+        apply Nat.eq_pow_of_factorization_eq_single Nat.card_pos.ne'
+        apply Finsupp.ext; intro q; rw [Finsupp.single_apply]
+        by_cases hq : r = q
+        · rw [if_pos hq, hq]
+        · rw [if_neg hq]
+          by_cases hqp : q.Prime
+          · refine Nat.factorization_eq_zero_of_not_dvd (fun hdvd => hq ?_)
+            have hmem : q ∈ (Nat.card ↥(R.subgroupOf U)).primeFactors :=
+              Nat.mem_primeFactors.mpr ⟨hqp, hdvd, Nat.card_pos.ne'⟩
+            exact (Set.mem_singleton_iff.mp (hR.1 q hmem)).symm
+          · exact Nat.factorization_eq_zero_of_non_prime _ hqp
+      have hfact : (Nat.card ↥U).factorization r
+          = (Nat.card ↥(R.subgroupOf U)).factorization r := by
+        have hidx : (R.subgroupOf U).index.factorization r = 0 :=
+          Nat.factorization_eq_zero_of_not_dvd (fun hdvd =>
+            hR.2 r (Nat.mem_primeFactors.mpr ⟨hrprime, hdvd, Subgroup.index_ne_zero_of_finite⟩) rfl)
+        have hlag := Subgroup.card_mul_index (R.subgroupOf U)
+        rw [← hlag, Nat.factorization_mul Nat.card_pos.ne' Subgroup.index_ne_zero_of_finite,
+          Finsupp.add_apply, hidx, add_zero]
+      rw [hfact]; exact hpow
+    have hRUnorm : (R.subgroupOf U).Normal := by
+      refine ⟨fun n hn g => ?_⟩
+      have heq : g * n * g⁻¹ = n := by
+        calc g * n * g⁻¹ = n * g * g⁻¹ := by rw [hUcomm g n]
+          _ = n := by group
+      rw [heq]; exact hn
+    haveI hPchar : (R.subgroupOf U).Characteristic := by
+      have hPn : ((Sylow.ofCard (R.subgroupOf U) hRcardU : Sylow r ↥U) : Subgroup ↥U).Normal := by
+        rw [Sylow.coe_ofCard]; exact hRUnorm
+      have h := Sylow.characteristic_of_normal (Sylow.ofCard (R.subgroupOf U) hRcardU) hPn
+      rwa [Sylow.coe_ofCard] at h
+    intro k hk
+    have hmem := OddOrder.BG.Ch1.S03f.mem_normalizer_map_subtype_of_characteristic
+      (W := U) (C := R.subgroupOf U) (hKNU hk)
+    rw [Subgroup.map_subgroupOf_eq_of_le hRU] at hmem
+    exact hNRH hmem
   -- `H` is not conjugate to `M` (`r ∈ σ(H) ∖ σ(M)`) nor to its partner `M*` (coprime `K`/`R`).
   -- These two non-conjugacies drive both the type-`F` classification and `σ(H)'`-membership of `K`.
   have notMGH : ¬ IsConjugateSubgroup H M := by
-    sorry
+    rintro ⟨a, ha⟩
+    -- `|R| = r ^ (|U|).factorization r` (`R` is a Sylow `r`-subgroup of `U`).
+    have hSU : Nat.card ↥(R.subgroupOf U) = Nat.card ↥R :=
+      Nat.card_congr (Subgroup.subgroupOfEquivOfLe hRU).toEquiv
+    have hRpow : Nat.card ↥R = r ^ (Nat.card ↥R).factorization r := by
+      apply Nat.eq_pow_of_factorization_eq_single Nat.card_pos.ne'
+      apply Finsupp.ext
+      intro q
+      rw [Finsupp.single_apply]
+      by_cases hq : r = q
+      · rw [if_pos hq, hq]
+      · rw [if_neg hq]
+        by_cases hqp : q.Prime
+        · refine Nat.factorization_eq_zero_of_not_dvd (fun hdvd => hq ?_)
+          have hmem : q ∈ (Nat.card ↥(R.subgroupOf U)).primeFactors :=
+            Nat.mem_primeFactors.mpr ⟨hqp, hSU ▸ hdvd, Nat.card_pos.ne'⟩
+          exact (Set.mem_singleton_iff.mp (hR.1 q hmem)).symm
+        · exact Nat.factorization_eq_zero_of_non_prime _ hqp
+    -- `(|U|).factorization r = (|R|).factorization r` (`r ∤ [U : R]`).
+    have hfUR : (Nat.card ↥U).factorization r = (Nat.card ↥R).factorization r := by
+      have hidxU : (R.subgroupOf U).index.factorization r = 0 :=
+        Nat.factorization_eq_zero_of_not_dvd (fun hdvd =>
+          hR.2 r (Nat.mem_primeFactors.mpr ⟨hrprime, hdvd, Subgroup.index_ne_zero_of_finite⟩) rfl)
+      have hlag := Subgroup.card_mul_index (R.subgroupOf U)
+      rw [← hlag, Nat.factorization_mul Nat.card_pos.ne' Subgroup.index_ne_zero_of_finite,
+        Finsupp.add_apply, hidxU, add_zero, hSU]
+    -- `(|U|).factorization r = (|M|).factorization r` (`r ∤ [M : U]`).
+    have hfUM : (Nat.card ↥U).factorization r = (Nat.card ↥M).factorization r := by
+      have hidxM : (U.subgroupOf M).index.factorization r = 0 :=
+        Nat.factorization_eq_zero_of_not_dvd (fun hdvd =>
+          hU.2 r (Nat.mem_primeFactors.mpr ⟨hrprime, hdvd, Subgroup.index_ne_zero_of_finite⟩) hrκσ)
+      have hUcard : Nat.card ↥(U.subgroupOf M) = Nat.card ↥U :=
+        Nat.card_congr (Subgroup.subgroupOfEquivOfLe hUM).toEquiv
+      have hlag := Subgroup.card_mul_index (U.subgroupOf M)
+      rw [← hlag, Nat.factorization_mul Nat.card_pos.ne' Subgroup.index_ne_zero_of_finite,
+        Finsupp.add_apply, hidxM, add_zero, hUcard]
+    -- `|H| = |M|` (conjugate subgroups).
+    have hcardHM : Nat.card ↥H = Nat.card ↥M := by
+      rw [← ha]; exact (Subgroup.card_map_of_injective (MulAut.conj a).injective).symm
+    -- `R` is a Sylow `r`-subgroup of `H`.
+    have hRsylH : Nat.card ↥(R.subgroupOf H) = r ^ (Nat.card ↥H).factorization r := by
+      rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hRH).toEquiv, hcardHM, ← hfUM, hfUR]
+      exact hRpow
+    -- `r ∈ σ(H)` (`R` Sylow `r` of `H`, `N_G(R) ≤ H`), hence `r ∈ σ(M)` (conjugacy), contradiction.
+    have hrH : r ∈ (Nat.card ↥H).primeFactors := by
+      rw [hcardHM]
+      exact Nat.mem_primeFactors.mpr ⟨hrprime,
+        (Nat.dvd_of_mem_primeFactors hr).trans (Subgroup.card_dvd_of_le hUM), Nat.card_pos.ne'⟩
+    have hrσH : r ∈ OddOrder.BG.Ch3.S10.sigma H := by
+      rw [OddOrder.BG.Ch3.S10.mem_sigma_iff]
+      refine ⟨hrH, Sylow.ofCard (R.subgroupOf H) hRsylH, ?_⟩
+      rw [Sylow.coe_ofCard, Subgroup.map_subgroupOf_eq_of_le hRH]
+      exact hNRH
+    exact hrσM (by have h := OddOrder.BG.Ch3.S10.sigma_conj (M := H) a hrσH; rwa [ha] at h)
   have notMstGH : ¬ IsConjugateSubgroup H Mst := by
-    sorry
+    -- `M_σ ∩ M* = K*` (the embedding's conjunct (d) kernel, avoiding the σ(M)-Hall-of-M* clause).
+    have hKMsigmaMst : K ≤ OddOrder.BG.Ch3.S10.Msigma Mst :=
+      (le_of_eq hMstpair.2.2).trans inf_le_left
+    have hMsMst : OddOrder.BG.Ch3.S10.Msigma M ⊓ Mst = Kstar :=
+      msigma_inf_partner_eq_kstar hG hM hP2 hKM hKstardef hMstmax hKMsigmaMst hMstpair.1 hMnc
+    have hKstarM : Kstar ≤ M := by
+      rw [hKstardef]; exact inf_le_left.trans (OddOrder.BG.Ch3.S10.Msigma_le M)
+    have hKstarNe : Kstar ≠ ⊥ := (typeP_structure hG hM hP hKM hK hKstardef hU).2.1
+    have hKNe : K ≠ ⊥ := fun h => card_kappaHall_ne_one hP hKM hK (by rw [h, Subgroup.card_bot])
+    -- `ziMMst : M ⊓ M* = K ⊔ K*` and `sK_uniqMst : K ≤ M*^a ⟹ a ∈ M*`.
+    obtain ⟨hziMMst, hsKuniq⟩ := partner_inf_and_uniq hG hMstmax hMstP hMstpair.1 hMstpair.2.1
+      hMstpair.2.2 hKMsigmaMst hKM hKstarM hZcyc hKstarNe hKNe hMsMst
+    -- `r ∤ |Z|`: `Z = K ⊔ K* = K · K*` (disjoint, commuting), `r ∉ π(K) ⊆ κ(M)`, `r ∉ π(K*) ⊆ σ(M)`.
+    have hKπ : Subgroup.IsPiSubgroup (OddOrder.BG.Ch3.S10.sigma M)ᶜ K :=
+      kappaHall_isPiSubgroup_sigmaCompl hKM hK
+    have hKstarπ : Subgroup.IsPiSubgroup (OddOrder.BG.Ch3.S10.sigma M) Kstar :=
+      Kstar_isPiSubgroup_sigma hKstardef
+    have hrnK : ¬ r ∣ Nat.card ↥K := fun hd => (fun h => hrκσ (Or.inl h))
+      (hK.1 r (Nat.mem_primeFactors.mpr ⟨hrprime, by
+        rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hKM).toEquiv]; exact hd, Nat.card_pos.ne'⟩))
+    have hrnKstar : ¬ r ∣ Nat.card ↥Kstar := fun hd =>
+      hrσM (hKstarπ r (Nat.mem_primeFactors.mpr ⟨hrprime, hd, Nat.card_pos.ne'⟩))
+    have hKKstar_bot : K ⊓ Kstar = ⊥ := by
+      rw [← Subgroup.card_eq_one]
+      by_contra hne
+      obtain ⟨p, hp, hpd⟩ := Nat.exists_prime_and_dvd hne
+      have hpσc := hKπ p (Nat.mem_primeFactors.mpr
+        ⟨hp, hpd.trans (Subgroup.card_dvd_of_le inf_le_left), Nat.card_pos.ne'⟩)
+      have hpσ := hKstarπ p (Nat.mem_primeFactors.mpr
+        ⟨hp, hpd.trans (Subgroup.card_dvd_of_le inf_le_right), Nat.card_pos.ne'⟩)
+      exact hpσc hpσ
+    have hKcKstar : K ≤ Subgroup.centralizer (Kstar : Set G) := by
+      haveI := hZcyc
+      letI : CommGroup ↥(K ⊔ Kstar) := IsCyclic.commGroup
+      intro k hk
+      rw [Subgroup.mem_centralizer_iff]
+      intro s hs
+      exact congrArg Subtype.val (mul_comm (⟨s, Subgroup.mem_sup_right hs⟩ : ↥(K ⊔ Kstar))
+        (⟨k, Subgroup.mem_sup_left hk⟩))
+    have hcardZ : Nat.card ↥(K ⊔ Kstar) = Nat.card ↥K * Nat.card ↥Kstar :=
+      card_sup_eq_mul_of_le_normalizer_of_disjoint
+        (hKcKstar.trans (Subgroup.centralizer_le_normalizer _)) hKKstar_bot
+    have hrnZ : ¬ r ∣ Nat.card ↥(K ⊔ Kstar) := by
+      rw [hcardZ]; exact fun hd => (hrprime.dvd_mul.mp hd).elim hrnK hrnKstar
+    have hrR : r ∣ Nat.card ↥R := by
+      obtain ⟨p, hp, hpd⟩ := Nat.exists_prime_and_dvd
+        (show Nat.card ↥R ≠ 1 from fun h => hRne (Subgroup.card_eq_one.mp h))
+      have hpmem : p ∈ (Nat.card ↥(R.subgroupOf U)).primeFactors :=
+        Nat.mem_primeFactors.mpr ⟨hp, by
+          rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hRU).toEquiv]; exact hpd, Nat.card_pos.ne'⟩
+      exact (Set.mem_singleton_iff.mp (hR.1 p hpmem)) ▸ hpd
+    -- If `H` were conjugate to `M*`, then `K ≤ H` and `sK_uniqMst` force `H = M*`, so
+    -- `R ≤ M ⊓ M* = Z`, whence `r ∣ |Z|`, contradicting `r ∤ |Z|`.
+    rintro ⟨a, ha⟩
+    have hHeq : H = MulAut.conj a⁻¹ • Mst := by
+      rw [← ha, ← mul_smul, ← map_mul, inv_mul_cancel, map_one, one_smul]
+    have haInvMst : a⁻¹ ∈ Mst := hsKuniq a⁻¹ (hHeq ▸ hKH)
+    have hHMst : H = Mst := hHeq.trans (Subgroup.conj_smul_eq_self_of_mem haInvMst)
+    have hRZ : R ≤ K ⊔ Kstar := hziMMst ▸ le_inf hRM (hHMst ▸ hRH)
+    exact hrnZ (hrR.trans (Subgroup.card_dvd_of_le hRZ))
   refine ⟨H, hHmem, ?_, ?_, ?_, ?_⟩
   · -- Conjunct 1 (`IsTypeF H`): by the covering (`hcover`), every type-`P` maximal is conjugate to
     -- `M` or `M*`; `H` is conjugate to neither, hence not type-`P`, i.e. `κ(H) = ∅`.
