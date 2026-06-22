@@ -25,13 +25,26 @@ Prop 16.1 の **組み立て層は完成済み**: engine `proposition_type_class
 
 ## 5 本の深い定理（= 真の残務）
 
-| Lean 名 | 場所 | BG | leverage |
+⚠ **2026-06-23 更新: この表は大半が STALE。5 本中 4 本が完了。** 残るは `theoremA_maximal_structure`
+のみ（standalone 版は faithfulness 未修正で `sorry`、faithful 変種 `theoremA_maximal_structure_faithful`
+は cont.² で完成済）。**かつ Prop 16.1 の真の gate は「5 deep theorems」ではなく 8 型 bridge =
+TypeXData construction**（下記）。
+
+| Lean 名 | 場所 | BG | 状態 |
 |---|---|---|---|
-| `theoremC_paired_structure` | `S16:274` sorry | Thm C | **最高（11 obligation 中 5本: hP_derived/hP2II/hP1neIIIIV/hIF/hIIP2）** |
-| `theoremA_maximal_structure` | `S16:144` sorry | Thm A | 高（hFI/hF_not_derived + M' の TypeFData） |
-| `typeP_auxiliary_structure_gated` | `S15:704` sorry | Lemma 15.1 | **最上流 hard math**（Thm A・C・TypePData の土台） |
-| `mf_ne_msigma_typeP1_structure` | `S15:1144` sorry | Thm 15.2(a) | h152a + Fitting 分解 |
-| `fitting_not_ti_cases` | `S15:3896` sorry | Thm 15.7 | hP1eqV + hVP1 |
+| `theoremC_paired_structure` | `S16:620` | Thm C | ✅ **DONE**（2026-06-23、conjunct 2 = Cor 14.12 配線、axiom-clean） |
+| `typeP_auxiliary_structure_gated` | `S15:1640` | Lemma 15.1 | ✅ **DONE**（standalone 4 lemma の term-mode cite、axiom-clean、2026-06-23 確認・AxiomsCheck 登録） |
+| `mf_ne_msigma_typeP1_structure` | `S15` | Thm 15.2(a) | ✅ **DONE**（issue 8012、AxiomsCheck 登録） |
+| `fitting_not_ti_cases` | `S15` | Thm 15.7 | ✅ **DONE**（type-F M'=F(M) 還元済、AxiomsCheck 登録） |
+| `theoremA_maximal_structure` | `S16:144` sorry | Thm A | ⚠ standalone は faithfulness 未修正で残 sorry（hFI = M' の TypeFData）。faithful 版完成済 |
+
+**∴ Prop 16.1 (`proposition_type_classification`, S16:1984 sorry) の真の残務 = 11 obligation のうち
+9/10/11 (`hP_derived`/`hF_not_derived`/`h152a`) は ✅ DONE、残り 8 = 型 bridge
+(`hFI`/`hP2II`/`hP1neIIIIV`/`hP1eqV` 順方向 + `hIF`/`hIIP2`/`hIIIIVP1`/`hVP1` 逆方向)** =
+BG-local 型 (`IsTypeF`/`IsTypeP1`/`IsTypeP2`、κ ベース) ↔ 抽象型 (`IsTypeI`–`V`、TypeXData) の同値。
+これは §16 TypeXData construction gate ([[bg-s16-gated-on-typedata-construction]])。matched-pair
+producer `typeP2_exists_matched_kappa_hall_pair`（2026-06-23 landed）は `hP2II` (S16:1236 `hKnorm`) を
+unblock する。
 
 ## BG schematic proof（原典 recipe、mmd 4420-4444）
 
@@ -89,6 +102,10 @@ bottom-out** するので、clean 化には §15 foundation が先。真の順�
 - `theoremB_U_sylow_abelian_rank_le_two` (S16:242, clean): Thm B(1)。
 
 ## 進捗ログ
+
+**2026-06-23 ✅ Lemma 15.1 (`typeP_auxiliary_structure_gated`) は既に DONE と確認 — 早期勝ち筋は banked 済、AxiomsCheck 登録 + stale 表/docstring 修正** (commit に含む):
+
+「5 deep theorems」の早期勝ち筋調査 (ユーザー選択)。`#print axioms typeP_auxiliary_structure{,_gated}` = `[propext, Classical.choice, Quot.sound]` を確認 — **Lemma 15.1 は前セッションで既に sorry-free + axiom-clean** だった (4 conjunct が standalone clean lemma `typeP_hall_derived_eq_and_abelian`/`typeP_hall_small_subgroup_cyclic_tau2`/`typeP_centralizerGeneratedBySigma_isMulCommutative`/`typeP_hall_frobenius_factor` の term-mode cite、Thm 14.7 も clean)。表の `S15:704 sorry` は stale。→ AxiomsCheck に両者登録 (regression lock)、`typeP_auxiliary_structure` の "Proof status" docstring の "(sorried)" 記述を訂正。**5 deep theorems は 4/5 完了 (Thm A standalone のみ残、faithful 版は完成済)**。真の Prop 16.1 gate = 8 型 bridge (上表参照)。
 
 **2026-06-23 ✅✅✅✅ BG Theorem C (`theoremC_paired_structure`) 完全完成 — conjunct 2 (`N_G(U)⊄M`) を Cor 14.12 に配線、sorry-free + axiom-clean** (commit `b9646712`、AxiomsCheck 登録、full build 3881 green、FT-path sorry 125→124):
 

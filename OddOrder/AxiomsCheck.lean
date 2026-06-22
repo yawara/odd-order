@@ -3933,6 +3933,17 @@ set_option linter.style.longLine false in
 -- since `π(M_σ) ∩ β = ∅`), so both summands lie in `F(M)` via `fitting_decomposition`.  Now fully
 -- sorry-free + axiom-clean (the type-`F` residual is closed; the `= F(M)` gate `C_Y(E₁) = 1` is gone).
 #assert_only_allowed_axioms OddOrder.BG.Ch4.S15.fitting_not_ti_cases
+-- BG **Lemma 15.1** (`S15_MF`, issue 7007): the auxiliary `U`-factor structure of an arbitrary
+-- maximal `M = K U M_σ` — `K ≠ 1 → M' = U M_σ ∧ U` abelian (15.1b); the cyclic-`τ₂` centralizer
+-- funnel (15.1c); `⟨C_U(x) | x ∈ M_σ#⟩` abelian (15.1d); the Frobenius factor `U₀ M_σ` (15.1e).
+-- The §14-gated content is isolated in `typeP_auxiliary_structure_gated`, which is now **fully
+-- sorry-free** (its four conjuncts are the standalone clean lemmas `typeP_hall_derived_eq_and_abelian`
+-- / `typeP_hall_small_subgroup_cyclic_tau2` / `typeP_centralizerGeneratedBySigma_isMulCommutative` /
+-- `typeP_hall_frobenius_factor`); `typeP_auxiliary_structure` assembles it with Thm 14.7
+-- (`typeP_duality`, now clean) and Thm 10.2(c)/Cor 12.10(b).  Both axiom-clean (issue 7007 "5 deep
+-- theorems": this entry was stale — landed when the standalone component lemmas did).
+#assert_only_allowed_axioms OddOrder.BG.Ch4.S15.typeP_auxiliary_structure_gated
+#assert_only_allowed_axioms OddOrder.BG.Ch4.S15.typeP_auxiliary_structure
 -- General TI-transport (`TISubset.lean`, issue 7007): if `T` is TI with normalizer-bound `Z ≤ M` and
 -- every element of `A` is `M`-conjugate into `T`, then `A` is TI with normalizer-bound `M`.  Pure
 -- group theory; the abstract content of BG Theorem B(5)/C(9).  Sorry-free + axiom-clean.

@@ -1682,7 +1682,11 @@ Faithfulness fix (Lane G 2026-06-15): added `hKM : K ≤ M` and `hUM : U ≤ M`.
 The sole caller (`fitting_decomposition`) constructs `K = K'.map M.subtype`, `U = U'.map M.subtype`,
 so both containments hold there.
 
-Proof status (Lane G 2026-06-15):
+Proof status (2026-06-23): **now fully sorry-free + axiom-clean** (`#print axioms
+typeP_auxiliary_structure` = `[propext, Classical.choice, Quot.sound]`).  The §14-gated parts below
+have all landed — `typeP_auxiliary_structure_gated` is now a clean term-mode citation of four
+standalone lemmas, and Thm 14.7 (`typeP_duality`) is itself sorry-free — so the "(sorried)"
+qualifiers in the historical status below are stale.  Original (Lane G 2026-06-15) breakdown:
 * **Conjunct 3** (`M_σ ≤ M'`, Thm 10.2(c)) and **conjunct 4** (`M'' ≤ M_σ` via
   `derivedDerived_le_Msigma`, Cor 12.10(b)) are **sorry-free** (`#print axioms
   derivedDerived_le_Msigma` = `[propext, Classical.choice, Quot.sound]`), citing no `sorry`.
