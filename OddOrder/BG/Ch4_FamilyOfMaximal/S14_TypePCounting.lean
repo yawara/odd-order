@@ -9842,9 +9842,157 @@ theorem typeP2_neighbor_is_typeF [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd
     exact (Subgroup.eq_of_le_of_card_ge (le_inf hUM hUFu)
       (Nat.le_of_dvd Nat.card_pos hVdvdU)).symm.le
   refine ⟨H, hHmem, hFmaxH, hUMsH, ?_, ?_⟩
-  · -- Conjunct 3 (`M ⊓ H = U ⊔ K`): `H ∩ M* = D`, `M ∩ Fu = U` with `Fu = O_{(σ∪κ)'}(F(H))`.
-    -- Residual.
-    sorry
+  · -- Conjunct 3 (`M ⊓ H = U ⊔ K`, Coq L2375-2380): `⊇` is immediate; `⊆` is
+    -- `M ⊓ H ⊆ N_M(U) = U ⊔ K` (`defNMU`, BG 6.5(b): `M = M_σ ⋊ (U⊔K)`, `C_{M_σ}(U) = 1`).
+    classical
+    refine le_antisymm ?_ (sup_le (le_inf hUM hUH) (le_inf hKM hKH))
+    -- σ-decomposition `M = M_σ ⊔ (U ⊔ K)`: the σ-Hall `M_σ`, the κ-Hall `K`, and the
+    -- `(κ∪σ)'`-Hall `U` cover all primes, so the index of their join in `M` has no prime divisor.
+    have hMσHall : Ch03.IsHallSubgroup (OddOrder.BG.Ch3.S10.sigma M)
+        ((OddOrder.BG.Ch3.S10.Msigma M).subgroupOf M) :=
+      OddOrder.BG.Ch3.S10.Msigma_subgroupOf_isHall_of_isHall
+        (OddOrder.BG.Ch3.S10.Msigma_isHall hG hM)
+    have hJleM : OddOrder.BG.Ch3.S10.Msigma M ⊔ (U ⊔ K) ≤ M :=
+      sup_le (OddOrder.BG.Ch3.S10.Msigma_le M) (sup_le hUM hKM)
+    have hJM : OddOrder.BG.Ch3.S10.Msigma M ⊔ (U ⊔ K) = M := by
+      have hidx1 : ((OddOrder.BG.Ch3.S10.Msigma M ⊔ (U ⊔ K)).subgroupOf M).index = 1 := by
+        by_contra hne
+        obtain ⟨p, hp, hpdvd⟩ := Nat.exists_prime_and_dvd hne
+        have hsub : ∀ S : Subgroup G, S ≤ OddOrder.BG.Ch3.S10.Msigma M ⊔ (U ⊔ K) →
+            p ∈ (S.subgroupOf M).index.primeFactors := by
+          intro S hSJ
+          refine Nat.mem_primeFactors.mpr ⟨hp, ?_, Subgroup.index_ne_zero_of_finite⟩
+          exact hpdvd.trans (Subgroup.index_dvd_of_le (Subgroup.subgroupOf_mono M hSJ))
+        have hpσ : p ∉ OddOrder.BG.Ch3.S10.sigma M :=
+          hMσHall.2 p (hsub _ le_sup_left)
+        have hpκσc : p ∉ (kappa M ∪ OddOrder.BG.Ch3.S10.sigma M)ᶜ :=
+          hU.2 p (hsub _ (le_sup_right.trans' le_sup_left))
+        have hpκ : p ∉ kappa M := hK.2 p (hsub _ (le_sup_right.trans' le_sup_right))
+        exact hpκσc (Set.mem_compl (fun h => h.elim hpκ hpσ))
+      have htop : (OddOrder.BG.Ch3.S10.Msigma M ⊔ (U ⊔ K)).subgroupOf M = ⊤ :=
+        Subgroup.index_eq_one.mp hidx1
+      exact le_antisymm hJleM (Subgroup.subgroupOf_eq_top.mp htop)
+    -- `C_{M_σ}(U) = ⊥` (Lemma 14.1): `R` is a Sylow `r`-subgroup of `M` (`r ∈ (κ∪σ)'`, `U` Hall),
+    -- so a maximal-rank elementary abelian `A ≤ R ≤ U` makes `M_σ ⊓ C(A) = ⊥`; antitonicity lifts
+    -- this to `M_σ ⊓ C(U) ≤ M_σ ⊓ C(A) = ⊥`.
+    have hRM : R ≤ M := hRU.trans hUM
+    have hrπM : r ∈ piSet M :=
+      Nat.mem_primeFactors.mpr ⟨hrprime,
+        (Nat.dvd_of_mem_primeFactors hr).trans (Subgroup.card_dvd_of_le hUM), Nat.card_pos.ne'⟩
+    have hCMsU : OddOrder.BG.Ch3.S10.Msigma M ⊓ Subgroup.centralizer (U : Set G) = ⊥ := by
+      have hSU : Nat.card ↥(R.subgroupOf U) = Nat.card ↥R :=
+        Nat.card_congr (Subgroup.subgroupOfEquivOfLe hRU).toEquiv
+      have hRpow : Nat.card ↥R = r ^ (Nat.card ↥R).factorization r := by
+        apply Nat.eq_pow_of_factorization_eq_single Nat.card_pos.ne'
+        apply Finsupp.ext; intro q; rw [Finsupp.single_apply]
+        by_cases hq : r = q
+        · rw [if_pos hq, hq]
+        · rw [if_neg hq]
+          by_cases hqp : q.Prime
+          · refine Nat.factorization_eq_zero_of_not_dvd (fun hdvd => hq ?_)
+            exact (Set.mem_singleton_iff.mp (hR.1 q (Nat.mem_primeFactors.mpr
+              ⟨hqp, hSU ▸ hdvd, Nat.card_pos.ne'⟩))).symm
+          · exact Nat.factorization_eq_zero_of_not_prime _ hqp
+      have hfUR : (Nat.card ↥U).factorization r = (Nat.card ↥R).factorization r := by
+        have hidxU : (R.subgroupOf U).index.factorization r = 0 :=
+          Nat.factorization_eq_zero_of_not_dvd (fun hdvd =>
+            hR.2 r (Nat.mem_primeFactors.mpr ⟨hrprime, hdvd, Subgroup.index_ne_zero_of_finite⟩) rfl)
+        have hlag := Subgroup.card_mul_index (R.subgroupOf U)
+        rw [← hlag, Nat.factorization_mul Nat.card_pos.ne' Subgroup.index_ne_zero_of_finite,
+          Finsupp.add_apply, hidxU, add_zero, hSU]
+      have hfUM : (Nat.card ↥U).factorization r = (Nat.card ↥M).factorization r := by
+        have hidxM : (U.subgroupOf M).index.factorization r = 0 :=
+          Nat.factorization_eq_zero_of_not_dvd (fun hdvd =>
+            hU.2 r (Nat.mem_primeFactors.mpr ⟨hrprime, hdvd, Subgroup.index_ne_zero_of_finite⟩) hrκσ)
+        have hUcard : Nat.card ↥(U.subgroupOf M) = Nat.card ↥U :=
+          Nat.card_congr (Subgroup.subgroupOfEquivOfLe hUM).toEquiv
+        have hlag := Subgroup.card_mul_index (U.subgroupOf M)
+        rw [← hlag, Nat.factorization_mul Nat.card_pos.ne' Subgroup.index_ne_zero_of_finite,
+          Finsupp.add_apply, hidxM, add_zero, hUcard]
+      have hRsylM : Nat.card ↥(R.subgroupOf M) = r ^ (Nat.card ↥M).factorization r := by
+        rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hRM).toEquiv, hRpow, ← hfUR, hfUM]
+      have hpRankRM : pRank ↥R r = pRank ↥M r := by
+        have h1 : pRank ↥(R.subgroupOf M) r = pRank ↥M r := by
+          have := pRank_sylow_eq (Sylow.ofCard (R.subgroupOf M) hRsylM)
+          rwa [Sylow.coe_ofCard] at this
+        rw [← h1]; exact pRank_eq_of_mulEquiv (Subgroup.subgroupOfEquivOfLe hRM).symm r
+      have hRrankpos : 0 < pRank ↥R r := by
+        rw [hpRankRM]; exact OddOrder.BG.Ch3.S12.one_le_pRank_of_mem_primeFactors hrπM
+      obtain ⟨B, hBea, hBlog⟩ := exists_isElementaryAbelian_log_card_ge_of_pos_le_pRank
+        (G := ↥R) (p := r) (n := pRank ↥R r) hRrankpos (le_refl _)
+      obtain ⟨j, hj⟩ := hBea.isPGroup.exists_card_eq
+      have hjeq : j = pRank ↥R r := by
+        have hsq := le_antisymm (le_pRank B hBea) hBlog
+        rwa [hj, Nat.log_pow hrprime.one_lt] at hsq
+      have hAR : B.map R.subtype ≤ R := Subgroup.map_subtype_le _
+      have hAmem : B.map R.subtype ∈ elemAbelianOfRank G r (pRank ↥M r) :=
+        ⟨Subgroup.IsElementaryAbelian.map R.subtype_injective hBea, by
+          rw [Subgroup.card_map_of_injective R.subtype_injective, hj, hjeq, hpRankRM]⟩
+      have hrκ : r ∉ kappa M := fun h => hrκσ (Or.inl h)
+      exact (msigma_centralizer_eq_bot_of_elemAb_le hG hM hrπM hrσM hrκ hAmem
+        (hAR.trans hRM) (hAR.trans hRU)).1
+    -- `M ⊓ H ⊆ N_M(U)` (geometric: `M ⊓ H ≤ N(M) ⊓ N(Fu) ≤ N(M ⊓ Fu) = N(U)`).
+    have hMHnU : M ⊓ H ≤ Subgroup.normalizer (U : Set G) := by
+      rw [← hdefU]
+      exact le_normalizer_inf (inf_le_left.trans Subgroup.le_normalizer)
+        (inf_le_right.trans hHnFu)
+    -- `defNMU`: BG 6.5(b) in `↥M` gives `N_{↥M}(U) = (C(U) ⊓ M_σ) · (N(U) ⊓ (U⊔K))`; the
+    -- first factor is `C_{M_σ}(U) = 1`, so every `n ∈ N_M(U)` lies in `U ⊔ K`.
+    have hKU : (OddOrder.BG.Ch3.S10.Msigma M).subgroupOf M ⊔ (U ⊔ K).subgroupOf M = ⊤ := by
+      rw [← Subgroup.subgroupOf_sup (OddOrder.BG.Ch3.S10.Msigma_le M) (sup_le hUM hKM), hJM,
+        Subgroup.subgroupOf_self]
+    have hcop : Nat.Coprime (Nat.card ↥(U.subgroupOf M))
+        (Nat.card ↥((OddOrder.BG.Ch3.S10.Msigma M).subgroupOf M)) := by
+      rw [Nat.coprime_iff_gcd_eq_one]
+      by_contra hne
+      obtain ⟨p, hp, hpd⟩ := Nat.exists_prime_and_dvd hne
+      rw [Nat.dvd_gcd_iff] at hpd
+      have hpU : p ∈ (kappa M ∪ OddOrder.BG.Ch3.S10.sigma M)ᶜ :=
+        hU.1 p (Nat.mem_primeFactors.mpr ⟨hp, hpd.1, Nat.card_pos.ne'⟩)
+      refine hpU (Or.inr (OddOrder.BG.Ch3.S10.Msigma_isPiGroup M p ?_))
+      rw [← Nat.card_congr (Subgroup.subgroupOfEquivOfLe (OddOrder.BG.Ch3.S10.Msigma_le M)).toEquiv]
+      exact Nat.mem_primeFactors.mpr ⟨hp, hpd.2, Nat.card_pos.ne'⟩
+    haveI hMsol : IsSolvable ↥M := hG.solvable_of_mem_maximalSubgroups hM
+    haveI hMσMnorm : ((OddOrder.BG.Ch3.S10.Msigma M).subgroupOf M).Normal := by
+      rw [OddOrder.BG.Ch3.S10.Msigma_subgroupOf]; infer_instance
+    have hlem := OddOrder.BG.Ch1.S06.normalizer_eq_centralizerK_mul_normalizerU (G := ↥M)
+      (K := (OddOrder.BG.Ch3.S10.Msigma M).subgroupOf M) (U := (U ⊔ K).subgroupOf M)
+      (H := U.subgroupOf M) hKU (Subgroup.subgroupOf_mono M le_sup_left) hcop
+    -- The first factor `C(U) ⊓ M_σ` is trivial in `↥M` (`C_{M_σ}(U) = 1`).
+    have hfactor1 : Subgroup.centralizer ((U.subgroupOf M : Subgroup ↥M) : Set ↥M) ⊓
+        (OddOrder.BG.Ch3.S10.Msigma M).subgroupOf M = ⊥ := by
+      rw [eq_bot_iff]
+      intro c hc
+      rw [Subgroup.mem_inf] at hc
+      have hcCU : (M.subtype c) ∈ Subgroup.centralizer (U : Set G) := by
+        rw [Subgroup.mem_centralizer_iff]
+        intro u huU
+        have hcomm := (Subgroup.mem_centralizer_iff.mp hc.1) (⟨u, hUM huU⟩ : ↥M)
+          (Subgroup.mem_subgroupOf.mpr huU)
+        have := congrArg (M.subtype) hcomm
+        simpa using this
+      have hmem : (M.subtype c) ∈ OddOrder.BG.Ch3.S10.Msigma M ⊓ Subgroup.centralizer (U : Set G) :=
+        ⟨Subgroup.mem_subgroupOf.mp hc.2, hcCU⟩
+      rw [hCMsU, Subgroup.mem_bot] at hmem
+      rw [Subgroup.mem_bot]
+      exact M.subtype_injective (by rw [hmem, map_one])
+    -- Conclude: `M ⊓ H ⊆ M ⊓ N_G(U)`, and each such `n` lies in `U ⊔ K`.
+    refine le_trans (le_inf inf_le_left hMHnU) ?_
+    intro n hn
+    rw [Subgroup.mem_inf] at hn
+    obtain ⟨hnM, hnNU⟩ := hn
+    have hnbar : (⟨n, hnM⟩ : ↥M) ∈ Subgroup.normalizer (U.subgroupOf M) := by
+      rw [← Subgroup.subgroupOf_normalizer_eq hUM, Subgroup.mem_subgroupOf]; exact hnNU
+    have hnbarc := SetLike.mem_coe.mpr hnbar
+    rw [hlem] at hnbarc
+    obtain ⟨c, hc, u, hu, hcu⟩ := Set.mem_mul.mp hnbarc
+    have hc1 : c = 1 :=
+      Subgroup.mem_bot.mp (hfactor1 ▸ SetLike.mem_coe.mp hc)
+    rw [hc1, one_mul] at hcu
+    rw [SetLike.mem_coe, Subgroup.mem_inf] at hu
+    have hnUK : (M.subtype u) ∈ U ⊔ K := Subgroup.mem_subgroupOf.mp hu.2
+    rw [hcu] at hnUK
+    simpa using hnUK
   · -- Conjunct 4 (`N_H(U) ⊄ M`): suppose `N_H(U) = H ⊓ N_G(U) ≤ M`.  Then `N_Fu(U) = N_G(U) ⊓ Fu`
     -- lies in `M ⊓ Fu = U`, so `U` is self-normalizing in the nilpotent `Fu`, forcing `Fu = U`.
     -- Hence `H ≤ N_G(Fu) = N_G(U)`, so `H = H ⊓ N_G(U) ≤ M`, whence `H = M` (both maximal),

@@ -5342,6 +5342,17 @@ equivariance.  Prerequisite for BG Cor 14.12 (`sK_FD`).  Axiom-clean. -/
 #assert_only_allowed_axioms OddOrder.BG.Ch4.S14.isTypeP1_conj_smul
 #assert_only_allowed_axioms OddOrder.BG.Ch4.S14.isTypeP2_conj_smul
 
+/-! **BG Corollary 14.12** (`S14_TypePCounting`, `typeP2_neighbor_is_typeF`): for `M ∈ 𝓜_{P₂}`,
+the κ-Hall `K`, abelian `(κ∪σ)'`-Hall `U` (Prop 14.2(a)) normalized by `K`, `r ∈ π(U)`, `R` the
+Sylow `r`-subgroup of `U`, and `H ∈ 𝓜(N_G(R))`: then `H ∈ 𝓜_F`, `U ≤ M_σ(H)`, `M ⊓ H = U ⊔ K`,
+and `N_H(U) ⊄ M` (the FT-path clause for BG Theorem C(1)).  Translates Coq `P2type_signalizer`
+(BGsection14.v L2243): `H` type-`F` (no covering partner is conjugate to `H`); `U ⊆ M_σ(H)` via the
+`HsDq = M_σ(H)·O_q(F(E))` machinery; conjunct 3 via the σ-decomposition `M = M_σ ⋊ (U⊔K)`,
+`C_{M_σ}(U) = 1` (Lemma 14.1), and BG 6.5(b) `N_M(U) = U⊔K`; conjunct 4 via the normalizer
+condition in the nilpotent `Fu = O_{(κ∪σ)'}(F(H))`.  Axiom-clean. -/
+
+#assert_only_allowed_axioms OddOrder.BG.Ch4.S14.typeP2_neighbor_is_typeF
+
 /-! **BG Theorem A(3) decomposition** (`S16_MainResults`, `typeP_maximal_eq_kappaHall_sup_U_sup_Msigma`):
 `M = K U M_σ` for a maximal `M` with Hall `κ`-subgroup `K ≤ M` and Hall `(κ∪σ)'`-subgroup `U ≤ M`.
 Type-F via the `K = ⊥` `SubgroupESetup`; type-P via the `M' = U M_σ`/`M'`-complements-`K` structure
