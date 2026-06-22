@@ -27,6 +27,15 @@
      **"FT-orphaned"・"閉じても sorry 減らない" の言い回しは使わない**（自家製ジャーゴン、誤読を招く）。
      honest architecture の genuine prerequisite なら、今 consumer 0 でも淡々と完遂する
      （[[feedback-orphaned-not-reason-to-defer]]）。
+4. **作業順序 = 上流優先 + 文書順タイブレーク**（全レーン共通の標準方針、ユーザー 2026-06-22）。
+   - **上流優先**: 各レーンは依存の**上流側から**進める。下流の gated endpoint を先回りで
+     skeleton 化（hypothesis 引数化 engine + assembly）するのは**上流が真に block されているときの
+     保険**に留め（[[feedback-gated-endpoint-skeleton-pattern]]）、基本はまず上流 prerequisite を埋める。
+   - **文書順タイブレーク**: 着手可能な選択肢が複数あるとき（どれも上流端）は、
+     **教科書（BG / Peterfalvi）上で出現が早いもの**（番号の若い §/定理/補題）から着手する。
+     線型 spine（BG §1→§16, Pf §3→§16）では「上流＝文書で早い」がほぼ一致する。
+   - **FT 経路限定**: 対象は item 1 の on-path のみ。off-path は凍結（順序判断の対象外）。
+   - これは**作業の選択順序**の規則であり、doneness 判定（item 3）とは独立。
 
 ---
 

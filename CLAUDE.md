@@ -24,6 +24,7 @@ PDF と Nougat 抽出 Markdown (`.mmd`) は `references/` 配下 (別 private �
 - **判定基準 (これが本当の進捗)**: opaque な carrier / posited data を実際に**構成**したか、free field・仮説を**実証明に置換**したか、spine がいずれ cite すべき本物の定理を**証明**したか。満たせば、その commit が headline の sorry を今減らすかは問わない。
 - assigned な honest-architecture prerequisite は、今 FT critical path から外れて見えても hedge せず淡々と完遂する。「deferred-payoff (報酬が後払い) だから」「今 consumer 0 だから」は deprioritize の理由にならない。
 - **FT 経路限定**は維持 (FT を閉じるのに無関係な「3 冊網羅」の残りは当面しない; 上記スコープは長期目標であり続けるが別フェーズ)。ただし「FT 経路の中で何を優先するか」も sorry 削減量でなく**実質的証明の積み上げ**で測る。
+- **作業順序 = 上流優先 + 文書順タイブレーク** (全レーン共通の標準方針, ユーザー 2026-06-22)。各レーンは依存の**上流から**進める。着手可能な選択肢が複数あるときは、**教科書 (BG / Peterfalvi) 上で出現が早いもの**(番号の若い §/定理/補題) から着手する。対象は **FT 経路上のものに限る**(上記)。下流の gated endpoint を先回りで skeleton 化するのは上流が真に block されているときの保険に留め、基本は上流 prerequisite を先に埋める。正本 = [`notes/meta/ft_path_policy.md`](notes/meta/ft_path_policy.md) §0。
 
 ## やらないこと (重要)
 
