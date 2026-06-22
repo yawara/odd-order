@@ -697,6 +697,10 @@ set_option linter.style.longLine false in
 -- (BG Prop 1.16(1) on K/[K,K] + the coprime fixed-point lifting, Isaacs Cor 3.28).
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.S14.exists_ne_one_actionFixedBy_not_le_commutator
+-- Peterfalvi (12.9) centralizer core, conjugation/ambient form: a noncyclic abelian `A ≤ G`
+-- normalizing a coprime `K` with `⁅K, K⁆ ≠ K` has `x ∈ A^#` with `C_G(x) ⊓ K ⊄ ⁅K, K⁆`.
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S14.exists_mem_centralizer_inf_not_le_commutator
 -- RepresentationTheory: completeness of irreducible characters — `f ⊥ Irr G ⇒ f = 0`
 -- (regular representation + Maschke + Schur).
 #assert_only_allowed_axioms OddOrder.RepresentationTheory.classFunction_eq_zero_of_orthogonal

@@ -310,6 +310,53 @@ theorem exists_ne_one_actionFixedBy_not_le_commutator
   rw [Subgroup.mem_bot, QuotientGroup.mk'_apply, QuotientGroup.eq_one_iff] at hk1
   exact hk1
 
+/-- **Conjugation form of the (12.9) centralizer core** (ambient subgroups, directly the
+form consumed by (12.9)).  If a **noncyclic abelian** subgroup `A ≤ G` normalizes a finite
+subgroup `K` of **coprime** order whose abelianization is nontrivial (`⁅K, K⁆ ≠ K`), then
+some `x ∈ A`, `x ≠ 1`, has `C_K(x) = C_G(x) ⊓ K` **not** contained in `⁅K, K⁆`.
+
+Specialization of `exists_ne_one_actionFixedBy_not_le_commutator` to the conjugation action
+`A → MulAut K` (`Subgroup.normalizerMonoidHom`): the abstract fixed subgroup `C_K(a)` becomes
+`C_G(a) ⊓ K` and `commutator ↥K` maps to `⁅K, K⁆` under `K.subtype`. -/
+theorem exists_mem_centralizer_inf_not_le_commutator
+    {A K : Subgroup G} [Finite ↥A] [IsMulCommutative ↥A] [Finite ↥K]
+    (hAK : A ≤ Subgroup.normalizer K) (hCop : Nat.Coprime (Nat.card ↥A) (Nat.card ↥K))
+    (hSolv : IsSolvable ↥A ∨ IsSolvable ↥K) (hNC : ¬ IsCyclic ↥A) (hK' : ⁅K, K⁆ ≠ K) :
+    ∃ x : G, x ∈ A ∧ x ≠ 1 ∧ ¬ (Subgroup.centralizer {x} ⊓ K ≤ ⁅K, K⁆) := by
+  classical
+  -- The conjugation action `φ : A → MulAut K` and the `K.subtype`-image of `[↥K, ↥K]`.
+  set φ : ↥A →* MulAut ↥K := (Subgroup.normalizerMonoidHom K).comp (Subgroup.inclusion hAK)
+    with hφ
+  have htop_map : (⊤ : Subgroup ↥K).map K.subtype = K := by
+    ext g
+    simp only [Subgroup.mem_map, Subgroup.mem_top, true_and]
+    constructor
+    · rintro ⟨y, rfl⟩; exact y.2
+    · intro hg; exact ⟨⟨g, hg⟩, rfl⟩
+  have hmap : (commutator ↥K).map K.subtype = ⁅K, K⁆ := by
+    rw [_root_.commutator_def, Subgroup.map_commutator, htop_map]
+  -- `[↥K, ↥K] ≠ ⊤`: else its `K.subtype`-image would be `⁅K, K⁆ = K`.
+  have hKtop : commutator ↥K ≠ ⊤ := by
+    intro h; exact hK' (by rw [← hmap, h, htop_map])
+  obtain ⟨a, ha_ne, hnle⟩ :=
+    exists_ne_one_actionFixedBy_not_le_commutator φ hCop hSolv hNC hKtop
+  -- Translate the abstract conclusion to ambient subgroups.
+  obtain ⟨n, hn_fix, hn_out⟩ := SetLike.not_le_iff_exists.mp hnle
+  refine ⟨(a : G), a.2, fun h => ha_ne (Subtype.ext h), SetLike.not_le_iff_exists.mpr
+    ⟨(n : G), ?_, ?_⟩⟩
+  · -- `n ∈ C_G(a) ⊓ K`: `a` conjugates `n` to itself, and `n ∈ K`.
+    rw [Ch06.mem_actionFixedBy] at hn_fix
+    have hval : (a : G) * (n : G) * (a : G)⁻¹ = (n : G) :=
+      congrArg (Subtype.val) hn_fix
+    refine Subgroup.mem_inf.mpr ⟨Subgroup.mem_centralizer_iff.mpr ?_, n.2⟩
+    rintro y rfl
+    exact mul_inv_eq_iff_eq_mul.mp hval
+  · -- `n ∉ ⁅K, K⁆`: else `n ∈ [↥K, ↥K]`, contradicting `hn_out`.
+    rw [← hmap]
+    intro hmem
+    obtain ⟨m, hm, hmn⟩ := Subgroup.mem_map.mp hmem
+    exact hn_out (by rw [show n = m from Subtype.ext hmn.symm]; exact hm)
+
 /-- **Peterfalvi (12.9)**: the counterexample has an abelian rank-two Sylow
 witness and an element whose centralizers force a second maximal subgroup. -/
 theorem exists_rankTwoWitness [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
