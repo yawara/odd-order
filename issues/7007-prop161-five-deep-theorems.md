@@ -90,6 +90,53 @@ bottom-out** するので、clean 化には §15 foundation が先。真の順�
 
 ## 進捗ログ
 
+**2026-06-22 (cont.⁴) ✅ BG Lemma 14.11 S5 helper + S4-S7 (τ₂(M)≠∅) landed — S8-S13 完全再構成**
+(lane-f, commits `6cf7d246` + `ab96c39d`, leaf build green):
+
+- **S5 helper** `Q_le_fittingInG_of_commutator_centralizesQ` (S14, private, sorry-free): `Q≤E` abelian,
+  `⁅E,Q⁆` abelian, `⁅E,Q⁆≤C_G(Q)` (= 退化ケース `⁅⁅E,Q⁆,Q⁆=1`) ⟹ 正規閉包 `Q⊔⁅E,Q⁆` が abelian かつ
+  E-normal ⟹ `Q≤F(E)`。**E-normality は commutator の sup-distribution を回避**: 「`⁅x,e⁆∈Q⊔R` を満たす
+  `x` の集合」を部分群として構成 (`⁅a*b,e⁆=a*⁅b,e⁆*a⁻¹*⁅a,e⁆` を `group` で)、生成元 `Q`,`R=⁅E,Q⁆` を含む
+  ⟹ `E≤N(Q⊔R)`。abelian は `centralizer_sup_eq` + `R≤C_G(Q)`、最後に `nilpotent_normal_le_fitting` を `↥E` で。
+- **S4-S7** `exists_mem_tau2_of_typeF_complement` (S14, sorry-free): Lemma 14.11 の仮説下で `τ₂(M)≠∅`。
+  `K:=⁅E,Q⁆` abelian (Cor 12.10(b) `.2.1.2`)・q'群 (≤`derivedInG M`, `tau1_not_mem_derived_primeFactors`)・
+  σ'群 (≤E, `mem_tau_union_of_mem_primeFactors`)、`Q≤N(K)⊓M` → **Prop 10.11(d)**
+  `sigma_complement_commutator_cyclic_normal` で `K':=⁅K,Q⁆` cyclic・≤`C_G(M_σ)`・`M≤N(K')`。
+  `K'≠⊥` = S5 helper (`K'=⊥⟹⁅E,Q⁆≤C_G(Q)⟹Q≤F(E)` 矛盾)。`p∈π(K')⟹p∈τ₂`: 否なら `p∈τ₁∪τ₃` で
+  `r_p=1`、line `A∈ℰ_p¹` of `K'≤C_G(M_σ)` が `C_{M_σ}(A)=M_σ≠1` (Lemma 14.1 `msigma_structure_of_notMem_sigma_kappa` 矛盾)。
+
+**残 = S8-S13 (M* 二分律) — 数学完全再構成済 (次セッション straight 実装 ~300行)**:
+1. **coprime FPF `C_{K'}(Q)=⊥`**: `K=⁅E,Q⁆` は `E` で normal、`Q` と coprime (K q'群)。`↥E` 内で
+   `commutator_commutator_right_eq (K.subgroupOf E) (Q.subgroupOf E) [Normal] (coprime)` (要 `[IsSolvable ↥E]`)
+   → `⁅K,Q⁆=⁅⁅K,Q⁆,Q⁆` i.e. `K'=⁅K',Q⁆`。coprime 分解 `K'=C_{K'}(Q)×⁅K',Q⁆`
+   (`fitting_coprime_abelian_decomp`, Cor 12.9 で既使用) + `⁅K',Q⁆=K'` ⟹ `|C_{K'}(Q)|=1` ⟹ `C_{K'}(Q)=⊥`。
+2. **`L:=Ω₁(K'_p)`** (p∈π(K'), K' cyclic ゆえ p-part も cyclic): order p, `≤C_G(M_σ)`, `M≤N(L)`
+   (K'_p char in cyclic K' → `M≤N(K')` 経由、Ω₁ char)。`C_{K'}(Q)=⊥⟹C_L(Q)=⊥⟹⁅L,Q⁆=L≠⊥` (coprime on L)。
+3. **A 選択** `A∈ℰ_p²(E)` with `L≤A` ⟹ `⁅A,Q⁆⊇⁅L,Q⁆=L≠⊥`:
+   - **nonabelian Sylow_p(E)**: `exists_canonical_line_of_nonabelianSylow` (S12_Theorem127:325) が `A∈ℰ_p²`+canonical
+     line `A₀` + **universal property `∀W, M≤N(W)∧IsPGroup p W∧W≤M ⟹ W≤A₀`**。`L` は `M≤N(L)`/p群/≤M ⟹ `L≤A₀≤A`。
+   - **abelian Sylow_p(E)**: `A:=Ω₁(Sylow_p(E))∈ℰ_p²` (rank 2)、`L≤Sylow_p` ⟹ `L=Ω₁(L)≤A`。
+4. **`⁅A,Q⁆≠⊥` → `q|[E:C_E(A)]`** (✅ **subtlety RESOLVED via A₀**): `Q⊄C_E(A)` だけでは不十分 (A は E-normal でない)
+   が、**A₀:=⁅A,Q⁆ は M-normal** (`M≤N(A₀)` = Cor 12.9 `commutator_decomp_of_tau1_action` の `.1.2.2.2`、E≤M ゆえ
+   `E≤N(A₀)`) ゆえ A₀ で index 議論が回る:
+   - `Q⊄C_E(A₀)`: `⁅A₀,Q⁆=⁅⁅A,Q⁆,Q⁆=⁅A,Q⁆=A₀≠⊥` (coprime 恒等式 `commutator_commutator_right_eq` を A (p群, Q-coprime)
+     に、A∈ℰ_p² が E で normal 要 — または A₀∈ℰ_p¹ order p で `Q≤C(A₀)⟹⁅A₀,Q⁆=⊥` 矛盾を直接)。
+   - `E≤N(A₀)` + `Q⊄C_E(A₀)` + `|Q|=q` 素数 ⟹ `Q⊓C_E(A₀)=⊥` ⟹ `|C_E(A₀)|_q<|E|_q` (A₀ E-normal ゆえ Sylow_q 議論
+     が回る: `|C_E(A₀)|_q=|E|_q` なら Sylow_q(E)≤C_E(A₀)、E-conj で全 Sylow_q≤C_E(A₀^e)=C_E(A₀)、Q≤C_E(A₀) 矛盾)
+     ⟹ `q|[E:C_E(A₀)]`。
+   - `C_E(A)≤C_E(A₀)` (A⊇A₀) ⟹ `[E:C_E(A₀)] | [E:C_E(A)]` (tower) ⟹ **`q|[E:C_E(A)]`**。✅
+   - Cor 12.9 は `hAQ:⁅A,Q⁆≠⊥` を要求 (step 3 で確立); 同時に `A₀=A⊓C(M_σ)`/`A₁=A⊓C(Q)∈ℰ_p¹`/`C_G(A₁)⊄M` も供給
+     (κ(M*) case や TI に再利用可)。**∴ S8-S13 の数学ギャップは全て閉じた**。実装は abelian/nonabelian Sylow_p(E)
+     の A-choice 場合分け (step 3) が主な分量。
+5. **Lemma 12.11** `tau2_transfer_to_maximal` (M*∈𝓜(N_G(A))): conjunct 1 `p∈σ(M*)−β(M*)`、conjunct 2
+   `q∈τ₁(M*)∪τ₂(M*)`。case `q∈τ₂(M*)`: Cor 12.10(e) (`nilpotent_sigmaComplement_abelian.2.2.2.2.2`,
+   要 x∈M# with orderOf-primes⊆τ₂ ∧ M_σ⊓C(x)≠⊥ — Q の生成元で) → `𝓜(C_G(Q))={M*}` (Or.inl)。
+   case `q∈τ₁(M*)`: `q∈κ(M*)` (witness Q, `C_{M*_σ}(Q)⊇C_A(Q)≠1`) + `σ(M*)≠β(M*)` (p∈σ−β) → ¬P2 →
+   `IsTypeP1 M*` (`typeP_structure` conjunct 5 の対偶 + `isTypeP_iff_isTypeP1_or_isTypeP2`) (Or.inr)。
+- **署名修正要**: main theorem `exists_maximal_of_typeF_notMem_fitting` に `hEM : E ≤ M` を追加 (現 `IsComplement'`
+  だけでは E≤M 不導出、`esetup_of_isComplement` が要求)。BG「E is a complement of M_σ in M」に忠実、downstream
+  Cor 14.12 は D=H∩M*≤H で供給。
+
 **2026-06-22 (cont.³) ▶ BG Lemma 14.11 着手 — 依存閉包を全解決 + phase 1 (`q∈τ₁ ∧ C_{M_σ}(Q)=1`) landed**:
 `exists_maximal_of_typeF_notMem_fitting` (S14_TypePCounting:8473, sorry) は Thm C conjunct 2
 (`N_G(U)⊄M`=Cor 14.12) と Prop 16.1 の `hP2II` 両方の linchpin (TypeIIData.normalizer_not_le)。
