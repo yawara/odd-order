@@ -74,8 +74,10 @@ structure TypesIIIIIIVSetup (M : Subgroup G) where
 
 namespace TypesIIIIIIVSetup
 
-/-- Peterfalvi's `H` in (9.2). -/
-def H {M : Subgroup G} (data : TypesIIIIIIVSetup M) : Subgroup G :=
+/-- Peterfalvi's `H` in (9.2).  Reducible so that the chief-factor carrier `↥data.H ⧸ N` is
+defeq-transparently `↥data.typeP.H ⧸ N`, letting instance search find the kernel's normality and the
+descended action across the `TypesIIIIIIVSetup`/`TypePData` boundary. -/
+@[reducible] def H {M : Subgroup G} (data : TypesIIIIIIVSetup M) : Subgroup G :=
   data.typeP.H
 
 /-- Peterfalvi's `U` in (9.2). -/
@@ -1345,6 +1347,10 @@ structure ChiefFactorData {M : Subgroup G} (data : TypesIIIIIIVSetup M) where
     fixedSubgroup (quotientMulAutHom (N := N) N_aInvariant)
       (data.typeP.U.subgroupOf (data.typeP.U ⊔ data.typeP.W1)) ≠ ⊤
 
+-- Expose the chief-factor kernel's normality as an instance, so that the quotient `↥H ⧸ N` carries
+-- its group structure (hence `Subgroup (↥H ⧸ N)` makes sense) wherever a `ChiefFactorData` is in scope.
+attribute [instance] ChiefFactorData.N_normal
+
 /-- **Peterfalvi (9.4)**: existence of a nontrivial elementary abelian chief
 factor `H/H_0` not centralized by `U`.  Assembles the elementary-abelian seed
 (`exists_chiefFactor_seed`), the chief-factor kernel (`exists_chiefFactor_kernel`,
@@ -1691,6 +1697,61 @@ theorem card_pointwise_smul {A K : Type*} [Group A] [Group K] [Finite K]
     (φ : A →* MulAut K) (a : A) (S : Subgroup K) :
     Nat.card ↥(φ a • S) = Nat.card ↥S :=
   (Nat.card_congr (Subgroup.equivMapOfInjective S (φ a).toMonoidHom (φ a).injective).toEquiv).symm
+
+/-- **(9.7) Clifford dimension dichotomy** (the arithmetic heart of (9.7)).  Restricting the
+`U W₁`-action on the chief factor `H̄ = H/H₀` to `U`, there is a minimal `U`-invariant `S₀ ≠ ⊥` of
+order `p^d` with `0 < d` and `d ∣ q`.  Since `q` is prime, `d ∈ {1, q}`: the dichotomy of (9.7),
+case (a) (`d = 1`, `U` semisimple into order-`p` pieces) vs case (b) (`d = q`, `U` irreducible).
+
+Assembled from the spanning step (`iSup_smul_eq_top_of_irreducible`, on the `U W₁`-irreducible `H̄`),
+the orbit lemmas (each `U W₁`-translate of `S₀` is `U`-irreducible of order `|S₀|`), and the order
+step (`card_eq_pow_of_iSup_aInvariant_irreducible`): `|H̄| = |S₀|^k`, while `|H̄| = p^q`, so
+`p^q = (p^d)^k`, i.e. `q = d·k`. -/
+theorem chiefFactor_clifford_dim_dvd_q [Finite G] {M : Subgroup G}
+    {data : TypesIIIIIIVSetup M} (chief : ChiefFactorData data) :
+    ∃ (d : ℕ) (S₀ : Subgroup (↥data.H ⧸ chief.N)),
+      0 < d ∧ d ∣ data.q ∧ S₀ ≠ ⊥ ∧ Nat.card ↥S₀ = chief.p ^ d := by
+  classical
+  have hU : data.typeP.U ≠ ⊥ := data.nontrivial.1
+  haveI : chief.N.Normal := chief.N_normal
+  haveI := Fact.mk chief.p_prime
+  -- The descended `U W₁`-action on the chief factor `H̄` and its restriction to the kernel `U`.
+  set act := typeP_quotientCoprimeAction data.typeP hU chief.N_aInvariant with hact
+  set φU := act.φ.comp act.U.subtype with hφU
+  have hUnorm : act.U.Normal := (typeP_uW1_frobenius data.typeP hU).isNormal
+  have hKcard : Nat.card (↥data.H ⧸ chief.N) = chief.p ^ data.q := chiefFactor_quotient_card chief
+  have hq_pos : 0 < data.q := Nat.card_pos
+  haveI hKnt : Nontrivial (↥data.H ⧸ chief.N) :=
+    Finite.one_lt_card_iff_nontrivial.mp (by
+      rw [hKcard]; exact Nat.one_lt_pow hq_pos.ne' chief.p_prime.one_lt)
+  -- A minimal nonzero `U`-invariant subgroup `S₀` (the `U`-irreducible Clifford piece).
+  set T : Set (Subgroup (↥data.H ⧸ chief.N)) := {J | J ≠ ⊥ ∧ IsAInvariant φU J} with hT
+  obtain ⟨S₀, ⟨hS₀ne, hS₀inv⟩, hS₀min⟩ :=
+    (Set.toFinite T).exists_minimal ⟨⊤, top_ne_bot, IsAInvariant.top _⟩
+  have hirr₀ : ∀ J, IsAInvariant φU J → J ≤ S₀ → J = ⊥ ∨ J = S₀ := by
+    intro J hJinv hJle
+    by_cases hJ0 : J = ⊥
+    · exact Or.inl hJ0
+    · exact Or.inr (le_antisymm hJle (hS₀min ⟨hJ0, hJinv⟩ hJle))
+  -- `|S₀| = p^d` (subgroup of the elementary abelian `p`-group `H̄`).
+  obtain ⟨d, hd⟩ := (chief.quotient_elementaryAbelian.to_subgroup S₀).isPGroup.exists_card_eq
+  -- Spanning step (full action) + order step (restricted `U`-action) give `|H̄| = |S₀|^k`.
+  have hspan : ⨆ a, act.φ a • S₀ = ⊤ :=
+    iSup_smul_eq_top_of_irreducible (φ := act.φ) chief.quotient_chiefFactor hS₀ne
+  obtain ⟨k, hk⟩ := card_eq_pow_of_iSup_aInvariant_irreducible
+    (φ := φU) (S := fun a => act.φ a • S₀) (n := Nat.card ↥S₀)
+    (fun x y => chief.quotient_elementaryAbelian.comm x y) hspan
+    (fun a => isAInvariant_comp_subtype_pointwise_smul hUnorm hS₀inv a)
+    (fun a J hJinv hJle => forall_aInvariant_le_pointwise_smul hUnorm hirr₀ a J hJinv hJle)
+    (fun a _ => card_pointwise_smul act.φ a S₀)
+  -- Arithmetic: `p^q = (p^d)^k = p^{d·k}`, so `q = d·k`.
+  rw [hd, hKcard, ← pow_mul] at hk
+  have hdk : data.q = d * k := Nat.pow_right_injective chief.p_prime.two_le hk
+  have hdpos : 0 < d := by
+    rcases Nat.eq_zero_or_pos d with h0 | h
+    · rw [h0, pow_zero] at hd; exact absurd (Subgroup.card_eq_one.mp hd) hS₀ne
+    · exact h
+  exact ⟨d, S₀, hdpos, ⟨k, hdk⟩, hS₀ne, hd⟩
 
 /-- **Peterfalvi (9.7)**: the Clifford-theory dichotomy for the action on the
 chief factor `H/H_0`. -/
