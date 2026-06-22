@@ -5616,3 +5616,6 @@ formula together with the prime computation `coprimeFrobeniusAction_card_eq_prim
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S11.card_pointwise_smul
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S11.chiefFactor_clifford_dim_dvd_q
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S11.chiefFactor_clifford_U_dichotomy
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S11.elabRepresentation_isIrreducible
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S11.isCyclic_card_dvd_of_aInvariant_irreducible_faithful_comm
