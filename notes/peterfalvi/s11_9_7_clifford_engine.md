@@ -77,12 +77,20 @@ chiefFactor_basic (済) は `_holds` / `quotient_order` 経由ゆえ互換 (fiel
   (K 巡回 ⟹ `MulAut K≅(ZMod p)ˣ` 位数 p-1 [`IsCyclic.card_mulAut`+`Nat.totient_prime`]、`φ.range≤MulAut K`)。
   sorry-free + axiom-clean。CaseA の `a=|U:C_U(H₁)|∣p-1`。
 
-- **frontier = step 7b (chief-factor Singer 適用) — GATED on (8.5.b)**: Singer 核心 (7a) を H̄ に適用して
-  `Ū 巡回 ∧ |Ū|∣p^q-1` を出すには A=`(act.φ.comp U.subtype).range`(忠実像=Ū) に Singer を適用。faithful は
-  range.subtype で自明、irreducible は case(b) から transfer 可だが、**`Ū` の可換性が必須** (comm-free Singer は
-  acting group 可換要)。`TypesIIIIIIVSetup` は `U_commutative` を持たず (type II/III の `TypeIIData`/`TypeIIIData`
-  にのみ存在、type IV は `U_not_commutative`)、`Ū` 可換は **Pf (8.5.b)「U' が H̄ を中心化」**(→ Ū は U/U' の商で
-  可換) に依存するが**未形式化** ⟹ 7b は (8.5.b) 形式化待ち (carrier/gate)。
+- **(8.5.b) DONE (2026-06-23, commit `f4a49642`)** — **`typeP_commutator_U_centralizes_H`**:
+  `⁅data.U, data.U⁆ ≤ C_M(H)` (Ū=U/C_U(H) 可換)。sorry-free + axiom-clean。証明 = `⁅U,U⁆⊆M''=⁅M',M'⁆`
+  (`commutator_mono`+`derivedInG J=⁅J,J⁆` [`map_commutator`+`← MonoidHom.range_eq_map`+`range_subtype`]) +
+  `M''⊆F(M)=H⊔(U⊓C_M(H))` (`secondDerived_le_fitting` carrier field) + `K=U⊓C_M(H)≤C_M(H)≤N(H)` で
+  `↑(H⊔K)=↑H·↑K` (`coe_mul_of_right_le_normalizer_left`, `centralizer_le_normalizer (↑H:Set)`;
+  `Subgroup.normalizer` は Set 引数) + element-wise (x=h·c, h=x·c⁻¹∈U⊓H=⊥, x=c∈K)。
+  **(8.5.b) の "U' が H 中心化" は H 全体 (H̄ でなく) ゆえ H̄=H/N 上でも自動で中心化** (N≤H)。
+
+- **frontier = step 7b (chief-factor Singer 適用) — UNBLOCKED (now (8.5.b) 済)**: 7a Singer を H̄ に適用して
+  `Ū 巡回 ∧ |Ū|∣p^q-1`。A=`ψ.range` (ψ=`act.φ.comp act.U.subtype`、忠実像 Ū)、φ=`A.subtype`。
+  faithful=subtype 単射で自明、irreducible=case(b) から transfer、**可換=(8.5.b) で `⁅U_sub,U_sub⁆⊆ker ψ`**
+  (`⁅U,U⁆⊆C_M(H)`⟹H̄ 上自明作用)。module は ambient 構築。~100 行 plumbing (range 形成 + irreducible transfer +
+  abelian + module)。**注**: 7b 後も CaseB carrier の `u_coprime`/`u_dvd_norm` は **chars.u gated** のまま
+  (|Ū| でなく chars.u を参照)。CaseA は Hpart 型+q-indexing。
   **その先 = step 7 (CaseA/CaseB carrier 構成) — GATED**: `clifford_dichotomy` は
   `chiefFactor_clifford_U_dichotomy` で case (a)/(b) に分岐できるが、`CliffordCaseAData`/`CliffordCaseBData`
   の**実フィールド**構成が残る:
