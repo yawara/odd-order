@@ -59,8 +59,15 @@ statement)。**S07_Coherence.lean に未形式化** — 本 issue の真の prer
   - M-side diagonal IP `(α_ij, μ_j − dζ̄) = 1` (`muGridAlpha_inner_muColumn_self_sub_conj`)
   - G-side diagonal IP `(α_ij^τ, (μ_j − dζ̄)^τ) = 1` (`muGridAlpha_tau_inner_muColumn_self_sub_conj`)
   - τ/τ₁ split `(α_ij^τ, μ_j^τ₁ − dζ̄^τ₁) = 1` (`muGridAlpha_tau1_inner_muColumn_self_sub_conj`)
-  ⟹ (10.6.a) reduction opening 確立。残 = (1) ⊥Imσ 項落とし `(δ(ω_ij^σ−ω_i0^σ), μ_j^τ₁)=1`
-  (ζ^τ₁/ζ̄^τ₁⊥Imσ [tau1_zeta_vanishes 経由] + ζ^τ₁⊥μ_j^τ₁ [isometry+次数] + (10.5))、(2) (5.8) core。
+  ⟹ (10.6.a) reduction opening 確立。
+- **⊥落とし isometry orthogonality 2/3 DONE** (2026-06-22, S12, isometry pattern of `zeta_tau1_inner_self`):
+  - `zeta_tau1_inner_conj`: `(ζ^τ₁, ζ̄^τ₁)=0` (**完全 axiom-clean**; isometry + (ζ,ζ̄)=0, ζ̄≠ζ irr)。
+  - `zeta_tau1_inner_muColumn`: `(ζ^τ₁, μ_k^τ₁)=0` (sorryAx=upstream muGrid gate のみ=§10 全 muGrid lemma と同一、自前 sorry 0; isometry + ∑_i (ζ,μ_ik)=0 degree mismatch)。
+- ⚠ **訂正 (audit over-optimism)**: ⊥落とし の残 3 番目 orthogonality `ζ̄^τ₁⊥Imσ` は **in-stock でない**。
+  旧記述「tau1_zeta_vanishes 経由」は誤り — Pf (5.8) 原文では `χ^τ₁⊥Imσ ⟹ vanish on V (by 3.2.d)`
+  であって**逆ではない**。vanish-on-V から ⊥Imσ は出ず、これは **§5 (5.3.b)/(5.5) gated** (5.8 σ-wrapper
+  と同じゲート)。∴ ⊥落とし全体 = §5 gated; in-stock な 2 orthogonality のみ先行着地。
+  残 (10.6.a) = `ζ̄^τ₁⊥Imσ` (§5) + (5.8) σ-wrapper。
 - [ ] (10.6.a): diagonal IP + τ/τ₁ transfer (既存 `muGridAlpha_tau_inner_muColumn_sub_conj` 類比) +
       (5.8) → `μ_j^τ₁ = δ∑ω_ij^σ`。
 - [ ] `zeta_tau1_norm_bound` Prop を (10.6.b) の genuine 主張に materialize + 証明。
