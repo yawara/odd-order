@@ -117,7 +117,16 @@ chiefFactor_basic (済) は `_holds` / `quotient_order` 経由ゆえ互換 (fiel
      (explicit struct `toFun=ofMul∘σ∘toMul`、`MulEquiv.toAdditive` の codomain 型問題を回避)。
   これで textbook (9.7)(b) L69 の体論パートが完了。`chiefFactor_caseB_image_dvd_norm` の `hcop` を Phase 3 補題で
   供給すれば閉じる。
-- **▶ frontier = Phase 4: W₁-FPF on Ū の供給 (group-theoretic, multi-session)**: Phase 3 補題の hfpf 入力
+- **✅✅✅ Phase 4 DONE (2026-06-23, commit `71ce5f81`, sorry-free + axiom-clean)** — **W₁-FPF coprimality
+  完成 ⟹ (9.7)(b) field-model long pole 完全終了**。`chiefFactor_caseB_image_coprime` が hfpf 入力
+  `C_Ū(w₀)=1` を Frobenius から供給 (raw Cor 3.28 + 代表元論法、iso-bridge 回避)。**`chiefFactor_caseB_image_dvd_norm`
+  を無条件化** (hcop を内部で `chiefFactor_caseB_image_coprime` から導出) ⟹ `|Ū| ∣ (p^q-1)/(p-1)` 無条件成立。
+  実装: `MulAut.conjNormal` で `⟨w₀⟩` の U 上共役 action、N=φU.ker の ψ-invariant、`coprime_fixedPoints_quotient`
+  (Isaacs Cor 3.28) で w₀-fixed 代表元 `c∈u₀·N` 抽出、`centralizer_complement_le`+`U⊓W₁=⊥` で c=1 ⟹ u₀∈N。
+  **当初「multi-session」見積もりwas 1 session で landing** (raw Cor 3.28 経路が iso-bridge を消した)。AxiomsCheck 登録。
+  **∴ (9.7)(b) の数学は cyclic (7b) + dvd_norm (無条件) + coprime (Phase 4) で完全**。残るは carrier wiring のみ (下記)。
+
+- **▷ 旧 frontier (Phase 4 詳細、達成済記録)**: Phase 3 補題の hfpf 入力
   `∀ a:Ū, (act.φ(w₀) commutes with ↑a) → a=1` (= `C_Ū(w₀)=1`、w₀∈W₁ 非自明) を Frobenius から供給する。
   - **数学**: `act.φ(w₀) commutes with φU(u)` ⟺ `⁅w₀,u⁆∈ker(act)=C_U(H̄)` (act on H̄)。これは「W₁ が
     `Ū=U/C_U(H̄)` 上 FPF」= **quotient FPF**。Frobenius で `C_U(w₀)=1` (`centralizer_complement_le` +

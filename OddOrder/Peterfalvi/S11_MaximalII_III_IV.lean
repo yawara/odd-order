@@ -2115,27 +2115,215 @@ theorem chiefFactor_caseB_image_cyclic [Finite G] {M : Subgroup G}
 
 open OddOrder.RepresentationTheory Representation in
 open scoped commutatorElement IsMulCommutative in
-/-- **Peterfalvi (9.7) case (b), the `u ∣ (p^q-1)/(p-1)` divisibility** — reduced to the
-fixed-point-free input `Coprime |Ū| (p-1)`.
+/-- **Peterfalvi (9.7) case (b), the fixed-point-free coprimality `Coprime |Ū| (p-1)`.**  When `U`
+acts irreducibly on the chief factor `H̄ = H/H₀` (Clifford case (b)), the image `Ū = φ_U(U)` has
+order coprime to `p - 1`.
 
-Given that `W₁` acts fixed-point-freely on `Ū` (so `U* ∩ 𝔽ₚ = 1`, i.e. `|Ū|` is prime to `p-1`),
-the Singer divisibility `|Ū| ∣ p^q-1` (`chiefFactor_caseB_image_cyclic`) upgrades to
-`|Ū| ∣ (p^q-1)/(p-1)` — the second case-(b) divisibility of `CliffordCaseBData`.  This isolates
-the elementary last step of (9.7)(b): `(p-1) ∣ (p^q-1)` together with coprimality gives
-`|Ū|·(p-1) ∣ p^q-1`, hence `|Ū| ∣ (p^q-1)/(p-1)`.  The genuinely hard `coprime` hypothesis is the
-`W₁`-Galois fixed-point-free analysis of the field model `(F ⋊ U*) ⋊ Aut F` of (9.7)(b). -/
+This discharges the hard `coprime` hypothesis of `chiefFactor_caseB_image_dvd_norm` from the
+Frobenius structure of `U W₁`: a nonidentity `w₀ ∈ W₁` acts on `Ū` fixed-point-freely.  Indeed if
+`act.φ(w₀)` commutes with `φ_U(u)` then `⁅w₀, u⁆` acts trivially on `H̄`, so `u` lies in a
+`w₀`-fixed coset of `C_U(H̄)`; Isaacs Cor 3.28 (`coprime_fixedPoints_quotient`) extracts a `w₀`-fixed
+representative `c ∈ u·C_U(H̄)`, and `c ∈ C_U(w₀) = 1` by the Frobenius condition
+(`centralizer_complement_le`, `U ⊓ W₁ = ⊥`), forcing `u ∈ C_U(H̄)`, i.e. `φ_U(u) = 1`.  The
+fixed-point-free Singer bridge `coprime_card_sub_one_of_aInvariant_irreducible_faithful_comm_fpf`
+then gives the coprimality. -/
+theorem chiefFactor_caseB_image_coprime [Finite G] {M : Subgroup G}
+    {data : TypesIIIIIIVSetup M} (chief : ChiefFactorData data)
+    (hcaseB : ∀ J : Subgroup (↥data.H ⧸ chief.N),
+        IsAInvariant ((typeP_quotientCoprimeAction data.typeP data.nontrivial.1
+          chief.N_aInvariant).φ.comp (typeP_quotientCoprimeAction data.typeP data.nontrivial.1
+          chief.N_aInvariant).U.subtype) J → J = ⊥ ∨ J = ⊤) :
+    Nat.Coprime (Nat.card ↥(((typeP_quotientCoprimeAction data.typeP data.nontrivial.1
+          chief.N_aInvariant).φ.comp (typeP_quotientCoprimeAction data.typeP data.nontrivial.1
+          chief.N_aInvariant).U.subtype).range)) (chief.p - 1) := by
+  classical
+  have hU : data.typeP.U ≠ ⊥ := data.nontrivial.1
+  haveI : chief.N.Normal := chief.N_normal
+  haveI : NeZero chief.p := ⟨chief.p_prime.pos.ne'⟩
+  haveI : Fact chief.p.Prime := ⟨chief.p_prime⟩
+  set act := typeP_quotientCoprimeAction data.typeP hU chief.N_aInvariant with hact
+  set φU := act.φ.comp act.U.subtype with hφU
+  haveI hUnorm : act.U.Normal := (typeP_uW1_frobenius data.typeP hU).isNormal
+  have hKcard : Nat.card (↥data.H ⧸ chief.N) = chief.p ^ data.q := chiefFactor_quotient_card chief
+  have hq_pos : 0 < data.q := Nat.card_pos
+  haveI hKnt : Nontrivial (↥data.H ⧸ chief.N) :=
+    Finite.one_lt_card_iff_nontrivial.mp (by
+      rw [hKcard]; exact Nat.one_lt_pow hq_pos.ne' chief.p_prime.one_lt)
+  letI : IsMulCommutative (↥data.H ⧸ chief.N) :=
+    IsMulCommutative.of_comm chief.quotient_elementaryAbelian.comm
+  letI : CommGroup (↥data.H ⧸ chief.N) := inferInstance
+  letI : Module (ZMod chief.p) (Additive (↥data.H ⧸ chief.N)) :=
+    chief.quotient_elementaryAbelian.zmodModule
+  -- Abelianness, irreducibility, faithfulness of `Ū = φU.range` (as in `chiefFactor_caseB_image_cyclic`).
+  have hcentral_triv : ∀ g : ↥(data.typeP.U ⊔ data.typeP.W1),
+      (g : G) ∈ Subgroup.centralizer (data.typeP.H : Set G) → act.φ g = 1 := by
+    intro g hg
+    have hfix : ∀ x : ↥data.typeP.H, (typeP_conjAction data.typeP g) x = x := by
+      intro x
+      apply Subtype.ext
+      rw [typeP_conjAction_apply]
+      have hcom : (x : G) * (g : G) = (g : G) * (x : G) :=
+        (Subgroup.mem_centralizer_iff.mp hg) (x : G) x.2
+      rw [← hcom, mul_assoc, mul_inv_cancel, mul_one]
+    ext y
+    refine QuotientGroup.induction_on y ?_
+    intro x
+    show (act.φ g) (QuotientGroup.mk' chief.N x) = QuotientGroup.mk' chief.N x
+    have hstep : (act.φ g) (QuotientGroup.mk' chief.N x)
+        = QuotientGroup.mk' chief.N ((typeP_conjAction data.typeP g) x) := rfl
+    rw [hstep, hfix x]
+  have hComm : ∀ a b : ↥act.U, Commute (φU a) (φU b) := by
+    intro a b
+    refine commutatorElement_eq_one_iff_commute.mp ?_
+    rw [← map_commutatorElement φU a b]
+    show act.φ (act.U.subtype ⁅a, b⁆) = 1
+    apply hcentral_triv
+    change ((data.typeP.U ⊔ data.typeP.W1).subtype.comp act.U.subtype) ⁅a, b⁆
+        ∈ Subgroup.centralizer (data.typeP.H : Set G)
+    rw [map_commutatorElement]
+    exact typeP_commutator_U_centralizes_H data.typeP
+      (Subgroup.commutator_mem_commutator
+        (Subgroup.mem_subgroupOf.mp a.2) (Subgroup.mem_subgroupOf.mp b.2))
+  have hAcomm : ∀ s t : ↥(φU.range), s * t = t * s := by
+    rintro ⟨_, a, rfl⟩ ⟨_, b, rfl⟩
+    exact Subtype.ext (hComm a b)
+  have hirr : ∀ J : Subgroup (↥data.H ⧸ chief.N),
+      IsAInvariant (φU.range).subtype J → J = ⊥ ∨ J = ⊤ := by
+    intro J hJ
+    apply hcaseB
+    intro a
+    exact hJ ⟨φU a, MonoidHom.mem_range.mpr ⟨a, rfl⟩⟩
+  have hfaith : ∀ a : ↥(φU.range),
+      (∀ x : (↥data.H ⧸ chief.N), ((φU.range).subtype a) x = x) → a = 1 := by
+    intro a ha
+    have hone : (a : MulAut (↥data.H ⧸ chief.N)) = 1 := by
+      ext x
+      simpa using ha x
+    exact Subtype.ext hone
+  -- The fixed-point-free witness: a nonidentity `w₀ ∈ W₁` inside `↥(U ⊔ W₁)`.
+  obtain ⟨w, hwW1, hwne⟩ :=
+    (data.typeP.W1.bot_or_exists_ne_one).resolve_left data.typeP.W1_nontrivial
+  have hwUW1 : w ∈ data.typeP.U ⊔ data.typeP.W1 := Subgroup.mem_sup_right hwW1
+  set w₀ : ↥(data.typeP.U ⊔ data.typeP.W1) := ⟨w, hwUW1⟩ with hw₀def
+  have hw₀E : w₀ ∈ act.E := by
+    show (⟨w, hwUW1⟩ : ↥(data.typeP.U ⊔ data.typeP.W1)) ∈
+      data.typeP.W1.subgroupOf (data.typeP.U ⊔ data.typeP.W1)
+    rw [Subgroup.mem_subgroupOf]; exact hwW1
+  have hw₀ne : w₀ ≠ 1 := fun h => hwne (Subtype.ext_iff.mp h)
+  -- Conjugation action `ψ` of `U W₁` on the kernel `act.U`, and how `φU` transforms under it.
+  set ψ : ↥(data.typeP.U ⊔ data.typeP.W1) →* MulAut ↥act.U := MulAut.conjNormal with hψdef
+  have hψcoe : ∀ (g : ↥(data.typeP.U ⊔ data.typeP.W1)) (y : ↥act.U),
+      (act.U.subtype (ψ g y) : ↥(data.typeP.U ⊔ data.typeP.W1)) =
+        (g : ↥(data.typeP.U ⊔ data.typeP.W1)) * act.U.subtype y * g⁻¹ :=
+    fun g y => MulAut.conjNormal_apply g y
+  have hφUconj : ∀ (g : ↥(data.typeP.U ⊔ data.typeP.W1)) (y : ↥act.U),
+      φU (ψ g y) = act.φ g * φU y * (act.φ g)⁻¹ := by
+    intro g y
+    have he : φU (ψ g y) = act.φ ((g : ↥(data.typeP.U ⊔ data.typeP.W1)) * act.U.subtype y * g⁻¹) := by
+      show act.φ (act.U.subtype (ψ g y)) = _
+      rw [hψcoe]
+    rw [he, map_mul, map_mul, map_inv]; rfl
+  -- The kernel `N = C_U(H̄)` of `φU`, and its `ψ`-invariance.
+  set N : Subgroup ↥act.U := φU.ker with hNdef
+  have hN_inv : IsAInvariant (ψ.comp (Subgroup.zpowers w₀).subtype) N := by
+    rw [isAInvariant_iff_smul_mem]
+    intro a y hy
+    rw [hNdef, MonoidHom.mem_ker] at hy ⊢
+    show φU (ψ ((Subgroup.zpowers w₀).subtype a) y) = 1
+    rw [hφUconj, hy, mul_one, mul_inv_cancel]
+  -- Coprimality and solvability inputs for Isaacs Cor 3.28.
+  have hCop : Nat.Coprime (Nat.card ↥(Subgroup.zpowers w₀)) (Nat.card ↥act.U) := by
+    have hkc : Nat.Coprime (Nat.card ↥act.U) (Nat.card ↥act.E) :=
+      (typeP_uW1_frobenius data.typeP hU).coprime_card_kernel_complement
+    exact Nat.Coprime.coprime_dvd_left
+      (Subgroup.card_dvd_of_le (Subgroup.zpowers_le.mpr hw₀E)) hkc.symm
+  have hSolv : IsSolvable ↥(Subgroup.zpowers w₀) ∨ IsSolvable ↥act.U :=
+    Or.inl (isSolvable_of_comm fun a b => by
+      obtain ⟨i, hi⟩ := Subgroup.mem_zpowers_iff.mp a.2
+      obtain ⟨j, hj⟩ := Subgroup.mem_zpowers_iff.mp b.2
+      exact Subtype.ext (by rw [Subgroup.coe_mul, Subgroup.coe_mul, ← hi, ← hj]; group))
+  -- Apply the fixed-point-free Singer bridge.
+  refine coprime_card_sub_one_of_aInvariant_irreducible_faithful_comm_fpf
+    (A := ↥(φU.range)) (K := ↥data.H ⧸ chief.N) (p := chief.p) (φ := (φU.range).subtype)
+    hAcomm hKnt hirr hfaith (act.φ w₀) ?_
+  intro a ha
+  obtain ⟨u₀, hu₀⟩ := a.2
+  -- `↑a = φU u₀ = act.φ u₀'`, and `act.φ w₀` commutes with it.
+  have ha1 : ((φU.range).subtype a : MulAut (↥data.H ⧸ chief.N)) = act.φ (act.U.subtype u₀) :=
+    hu₀.symm
+  have hCm : Commute (act.φ w₀) (act.φ (act.U.subtype u₀)) := by
+    show act.φ w₀ * act.φ (act.U.subtype u₀) = act.φ (act.U.subtype u₀) * act.φ w₀
+    apply MulEquiv.ext
+    intro x
+    rw [MulAut.mul_apply, MulAut.mul_apply, ← ha1]
+    exact ha x
+  -- `hg_fix`: each `w₀^k`-conjugate of `u₀` lands in `u₀ · N`.
+  have hg_fix : ∀ aa : ↥(Subgroup.zpowers w₀),
+      ∃ n ∈ N, (ψ.comp (Subgroup.zpowers w₀).subtype) aa u₀ = u₀ * n := by
+    intro aa
+    refine ⟨u₀⁻¹ * (ψ ((Subgroup.zpowers w₀).subtype aa) u₀), ?_, ?_⟩
+    · rw [hNdef, MonoidHom.mem_ker, map_mul, map_inv, hφUconj]
+      obtain ⟨k, hk⟩ := Subgroup.mem_zpowers_iff.mp aa.2
+      have hcaφ : act.φ ((Subgroup.zpowers w₀).subtype aa) = (act.φ w₀) ^ k := by
+        rw [show (Subgroup.zpowers w₀).subtype aa = w₀ ^ k from hk.symm, map_zpow]
+      have hcomm_k : Commute (act.φ ((Subgroup.zpowers w₀).subtype aa)) (φU u₀) := by
+        rw [hcaφ]; exact hCm.zpow_left k
+      rw [show act.φ ((Subgroup.zpowers w₀).subtype aa) * φU u₀ *
+            (act.φ ((Subgroup.zpowers w₀).subtype aa))⁻¹ = φU u₀ by
+        rw [hcomm_k.eq, mul_assoc, mul_inv_cancel, mul_one], inv_mul_cancel]
+    · rw [MonoidHom.comp_apply, mul_inv_cancel_left]
+  -- Isaacs Cor 3.28: a `w₀`-fixed representative `c ∈ u₀ · N`.
+  obtain ⟨c, hc_fix, n, hn, hc_eq⟩ :=
+    OddOrder.Isaacs.Ch04.coprime_fixedPoints_quotient
+      (φ := ψ.comp (Subgroup.zpowers w₀).subtype) hCop hSolv hN_inv hg_fix
+  -- `c` commutes with `w₀`, so `c ∈ C_U(w₀) ⊆ W₁`; as `c ∈ U`, `c = 1`.
+  have hc_w₀ : ψ w₀ c = c := by
+    have := hc_fix ⟨w₀, Subgroup.mem_zpowers w₀⟩
+    rwa [MonoidHom.comp_apply] at this
+  have hc_comm : (act.U.subtype c : ↥(data.typeP.U ⊔ data.typeP.W1)) * w₀ =
+      w₀ * act.U.subtype c := by
+    have h := congrArg act.U.subtype hc_w₀
+    rw [hψcoe] at h
+    -- `h : w₀ * subtype c * w₀⁻¹ = subtype c`
+    rw [mul_inv_eq_iff_eq_mul] at h
+    exact h.symm
+  have hc_in_E : (act.U.subtype c : ↥(data.typeP.U ⊔ data.typeP.W1)) ∈ act.E := by
+    refine (typeP_uW1_frobenius data.typeP hU).centralizer_complement_le w₀ hw₀E hw₀ne ?_
+    rw [Subgroup.mem_centralizer_singleton_iff]
+    exact hc_comm
+  have hc_in_U : (act.U.subtype c : ↥(data.typeP.U ⊔ data.typeP.W1)) ∈ act.U := c.2
+  have hc1 : (act.U.subtype c : ↥(data.typeP.U ⊔ data.typeP.W1)) = 1 :=
+    Subgroup.disjoint_def.mp (typeP_uW1_frobenius data.typeP hU).isComplement.disjoint
+      hc_in_U hc_in_E
+  have hc0 : c = 1 := act.U.subtype_injective (by rw [hc1, map_one])
+  -- `1 = c = u₀ · n` ⟹ `u₀ ∈ N` ⟹ `φU u₀ = 1` ⟹ `a = 1`.
+  rw [hc0] at hc_eq
+  have hu₀N : u₀ ∈ N := by
+    have : u₀ = n⁻¹ := by rw [eq_inv_iff_mul_eq_one, ← hc_eq]
+    rw [this]; exact N.inv_mem hn
+  apply Subtype.ext
+  rw [← hu₀, Subgroup.coe_one]
+  exact (MonoidHom.mem_ker (f := φU)).mp hu₀N
+
+open OddOrder.RepresentationTheory Representation in
+open scoped commutatorElement IsMulCommutative in
+/-- **Peterfalvi (9.7) case (b), the `u ∣ (p^q-1)/(p-1)` divisibility** (unconditional).
+
+The Singer divisibility `|Ū| ∣ p^q-1` (`chiefFactor_caseB_image_cyclic`) upgrades to
+`|Ū| ∣ (p^q-1)/(p-1)` via the fixed-point-free coprimality `Coprime |Ū| (p-1)`
+(`chiefFactor_caseB_image_coprime`): since `(p-1) ∣ (p^q-1)` and `|Ū|` is coprime to `p-1`,
+`|Ū|·(p-1) ∣ p^q-1`, hence `|Ū| ∣ (p^q-1)/(p-1)`.  This is the second case-(b) divisibility of
+`CliffordCaseBData`, now established without any external coprimality hypothesis. -/
 theorem chiefFactor_caseB_image_dvd_norm [Finite G] {M : Subgroup G}
     {data : TypesIIIIIIVSetup M} (chief : ChiefFactorData data)
     (hcaseB : ∀ J : Subgroup (↥data.H ⧸ chief.N),
         IsAInvariant ((typeP_quotientCoprimeAction data.typeP data.nontrivial.1
           chief.N_aInvariant).φ.comp (typeP_quotientCoprimeAction data.typeP data.nontrivial.1
-          chief.N_aInvariant).U.subtype) J → J = ⊥ ∨ J = ⊤)
-    (hcop : Nat.Coprime (Nat.card ↥(((typeP_quotientCoprimeAction data.typeP data.nontrivial.1
-          chief.N_aInvariant).φ.comp (typeP_quotientCoprimeAction data.typeP data.nontrivial.1
-          chief.N_aInvariant).U.subtype).range)) (chief.p - 1)) :
+          chief.N_aInvariant).U.subtype) J → J = ⊥ ∨ J = ⊤) :
     Nat.card ↥(((typeP_quotientCoprimeAction data.typeP data.nontrivial.1
           chief.N_aInvariant).φ.comp (typeP_quotientCoprimeAction data.typeP data.nontrivial.1
           chief.N_aInvariant).U.subtype).range) ∣ (chief.p ^ data.q - 1) / (chief.p - 1) := by
+  have hcop := chiefFactor_caseB_image_coprime chief hcaseB
   obtain ⟨_, hdvd⟩ := chiefFactor_caseB_image_cyclic chief hcaseB
   have hp1 : 1 ≤ chief.p := chief.p_prime.pos
   -- `(p-1) ∣ (p^q-1)` since `p ≡ 1 [MOD p-1]`.
