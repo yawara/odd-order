@@ -9028,3 +9028,4 @@ theorem sigmaLength_one_frobenius_type [Finite G]
   sorry
 
 end OddOrder.BG.Ch4.S14
+
