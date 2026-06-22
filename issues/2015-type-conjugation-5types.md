@@ -52,3 +52,32 @@ proof 化できる (cover data 自体は BG §16 sorry に bottom-out)。
 - `OddOrder/GroupTheory/MaxNilpotentNormalHall.lean` `maxNilpotentNormalHall_pointwise_smul`
 - `OddOrder/BG/Ch3_MaximalSubgroups/S13_PrimeAction.lean` private `smul_derivedInG_conj`
 - notes/peterfalvi/s14_maximalI.md 「(12.9) honest assembly LANDED」
+
+## hub 解決 (2026-06-23)
+
+**判断: lane-h が実装する (shared infra `GroupTheory/MaximalSubgroupTypeConj.lean` への type-II/III/IV/V
+共役同変 infra 追加)。** 根拠:
+- `OddOrder/GroupTheory/**` は**共有所有 (全 lane 編集可)** → lane-h は越境せず実装できる。lane-h は本 infra の
+  consumer ((8.17.a) `exists_second_maximal` in S14_MaximalI) ゆえ最も文脈を持つ自然な実装者。
+- 既存 `TypeFData.conj`/`TypeIData.conj`/`isTypeI_pointwise_smul`/`isTypeI_of_conj` が template。
+  II/III/IV/V は同パターンの機械的拡張 (equivariance toolkit `card_pointwise_smul`/
+  `isFrobeniusGroup_subgroupOf_pointwise_smul`/`derivedInG` 共役同変 を流用)。新規数学なし。
+- (8.17.a) は §8 obligation = honest FT 経路上の genuine な上流前提 (cover data 自体は BG §16 sorry に
+  bottom-out するが、共役同変 infra は unconditional に積める実証明)。
+
+**スコープ分割**:
+1. **core (lane-h が今すぐ実装可)**: `TypeIIData/IIIData/IVData/VData.conj` + `isTypeII/III/IV/V_pointwise_smul`
+   + 一般 `hasPeterfalviType_pointwise_smul (φ) (tau) (h) : HasPeterfalviType tau (φ • M)` (tau で case split)。
+   **全て shared `MaximalSubgroupTypeConj.lean` 内で完結** → lane-h 単独・越境なし。
+2. **optional (後回し可)**: `mainSubgroup_pointwise_smul` は `smul_derivedInG_conj` (S13_PrimeAction の
+   **private**、**B 所有**) の de-private を要する → これは別 issue で **B に依頼** (小さな de-private、
+   `MaxNilpotentNormalHall` の de-private 前例と同型)。core だけで `hasPeterfalviType_pointwise_smul` は
+   landing でき、(8.17.a) の型同変部分は unblock される。mainSubgroup の φ-同変が必要になった時点で
+   B に de-private 依頼を起票。
+
+**hub 側の合流条件**: 通常ゲート。shared infra への追記ゆえ自動合流可。lane-f も BG §14-16 で TypeXData を
+扱うが、`MaximalSubgroupTypeConj.lean` の**共役同変補題は新規追加**ゆえ衝突しない (既存宣言の改変でない)。
+万一 lane-f が同ファイルを同時編集して内容衝突したら通常どおり abort+報告。
+
+**lane-h への指示**: core (項目 1) を実装してよい。完了後 (8.17.a) `exists_second_maximal` を進める。
+de-private が要る optional は B 宛 issue を起票 (cross-lane、独断で S13 を触らない)。
