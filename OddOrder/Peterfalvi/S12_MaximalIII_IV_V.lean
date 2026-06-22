@@ -511,6 +511,40 @@ theorem typePData_sup_subgroupOf_eq {M : Subgroup G} (data : TypePData M) :
     data.W1.subgroupOf M ⊔ data.W2.subgroupOf M = data.W.subgroupOf M := by
   rw [← Subgroup.subgroupOf_sup data.W1_le (typePData_W2_le_self data), ← data.W_eq]
 
+/-- The `W ≤ M ≤ G` isomorphism `↥W ≃* ↥(W₁.subgroupOf M ⊔ W₂.subgroupOf M)` used to transport the
+§6 `↥M`-level `ω`-grid (built on `W₁.subgroupOf M ⊔ W₂.subgroupOf M`) to the §5 `G`-level TI-cyclic
+hypothesis (built on `W ≤ G`).  This is the `e` reconstructed inline in `alignedOmegaSigmaGrid`; named
+here so the (10.6) column-structure argument can reason about how it respects the `W₁/W₂`
+decomposition.  Both `subgroupOfEquivOfLe.symm` and `subgroupCongr` preserve the underlying
+`G`-element, so does `e` (`typePData_WEquiv_coe`). -/
+noncomputable def typePData_WEquiv {M : Subgroup G} (data : TypePData M) :
+    ↥data.W ≃* ↥(data.W1.subgroupOf M ⊔ data.W2.subgroupOf M) :=
+  (Subgroup.subgroupOfEquivOfLe (typePData_W_le_self data)).symm.trans
+    (MulEquiv.subgroupCongr (typePData_sup_subgroupOf_eq data).symm)
+
+/-- `typePData_WEquiv` preserves the underlying `G`-element. -/
+@[simp] theorem typePData_WEquiv_coe {M : Subgroup G} (data : TypePData M) (w : ↥data.W) :
+    (((typePData_WEquiv data w : ↥(data.W1.subgroupOf M ⊔ data.W2.subgroupOf M)) : ↥M) : G)
+      = (w : G) := rfl
+
+/-- `typePData_WEquiv` maps the `W₁`-block into the `W₁`-block: if `w ∈ W₁.subgroupOf W` then
+`e w ∈ (W₁.subgroupOf M).subgroupOf (W₁.subgroupOf M ⊔ W₂.subgroupOf M)`.  Underlying-element
+preservation reduces both memberships to `(w : G) ∈ W₁`. -/
+theorem typePData_WEquiv_mem_W1 {M : Subgroup G} (data : TypePData M) {w : ↥data.W}
+    (hw : w ∈ (data.W1.subgroupOf data.W)) :
+    typePData_WEquiv data w ∈
+      (data.W1.subgroupOf M).subgroupOf (data.W1.subgroupOf M ⊔ data.W2.subgroupOf M) := by
+  rw [Subgroup.mem_subgroupOf, Subgroup.mem_subgroupOf, typePData_WEquiv_coe]
+  exact Subgroup.mem_subgroupOf.mp hw
+
+/-- `typePData_WEquiv` maps the `W₂`-block into the `W₂`-block (see `typePData_WEquiv_mem_W1`). -/
+theorem typePData_WEquiv_mem_W2 {M : Subgroup G} (data : TypePData M) {w : ↥data.W}
+    (hw : w ∈ (data.W2.subgroupOf data.W)) :
+    typePData_WEquiv data w ∈
+      (data.W2.subgroupOf M).subgroupOf (data.W1.subgroupOf M ⊔ data.W2.subgroupOf M) := by
+  rw [Subgroup.mem_subgroupOf, Subgroup.mem_subgroupOf, typePData_WEquiv_coe]
+  exact Subgroup.mem_subgroupOf.mp hw
+
 open scoped FiniteInduce in
 /-- **§10 → §5 ω-grid bridge (gate #3)**: a type-`P` maximal subgroup's cyclic factor
 `W = W₁ × W₂`, with the exceptional set `V = W − (W₁ ∪ W₂)`, is a Peterfalvi (3.1) TI-cyclic
@@ -1110,6 +1144,130 @@ theorem Hypothesis.alignedOmegaSigmaGrid_inner [Finite G]
   by_cases hij : i = i' ∧ j = j'
   · rw [if_pos hij, if_pos (by rw [hij.1, hij.2])]
   · rw [if_neg hij, if_neg fun he => hij (hηinj i j i' j' he)]
+
+open scoped FiniteInduce in
+/-- **§10 σ-grid product structure** (Peterfalvi (10.6) column-structure linchpin): the `G`-level
+σ-images factor through a *product* index, `ω_{ij}^σ = χ_{(ρ i, κ j)}`, for an injective `W₁`-row
+family `ρ` and an injective `W₂`-column family `κ`.  Crucially the `W₂`-index `κ j` depends only on
+the column `j` (not on the row `i`), and the `W₁`-indices `ρ i` exhaust `Ŵ₁` as `i` ranges — this is
+what makes `μ_j^{τ₁}`'s σ-coefficient grid *two-column* supported (columns `κ j`, `κ j'`) and lets the
+(5.8) full-column endgame translate `∑_p χ_{(p, κ j)} = ∑_i ω_{ij}^σ`.
+
+`ω_{ij}^σ = σ(ω(ξ_{ij})) = χ_{omegaProdEquiv.symm ξ_{ij}}` (`sigma_omega`) for the transported product
+character `ξ_{ij} = ω^{sdiff}_{χ₁ i, χ₂ j} ∘ e`.  By `omegaProdEquiv_symm_eq` the index pair is
+`(ξ_{ij}|_{W₁}, ξ_{ij}|_{W₂})`, and because `e` respects the `W₁/W₂` decomposition
+(`typePData_WEquiv_mem_W1/W2`: on the `W₁`-block the `ω_{0j}` factor `χ₂ ∘ wSnd ∘ e` is trivial, and
+on the `W₂`-block the `ω_{i0}` factor `χ₁ ∘ wFst ∘ e` is trivial) these restrictions are the
+single-factor characters `ρ i = χ₁ i ∘ wFst ∘ e`, `κ j = χ₂ j ∘ wSnd ∘ e`.  Injectivity of `ρ`/`κ`
+follows from the joint orthonormality `alignedOmegaSigmaGrid_inner`. -/
+theorem Hypothesis.exists_alignedOmegaSigmaGrid_chiFam_product [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} (hyp : Hypothesis M)
+    (hodd : Odd (Nat.card G)) :
+    ∃ (ρ : Fin hyp.w1 →
+          (((typePData_toTICyclicHypothesis hyp.typeP hodd).W1.subgroupOf
+            (typePData_toTICyclicHypothesis hyp.typeP hodd).W) →* ℂˣ))
+      (κ : Fin hyp.w2 →
+          (((typePData_toTICyclicHypothesis hyp.typeP hodd).W2.subgroupOf
+            (typePData_toTICyclicHypothesis hyp.typeP hodd).W) →* ℂˣ)),
+      Function.Injective ρ ∧ Function.Injective κ ∧
+        ∀ i j, hyp.alignedOmegaSigmaGrid hG hodd i j
+          = (typePData_toTICyclicHypothesis hyp.typeP hodd).chiFam rfl
+              (hyp.canonicalFullDadeApp hG hodd) (ρ i, κ j) := by
+  haveI := hyp.finiteG
+  classical
+  let h := (hyp.toCertainTypeHypothesis hG hodd).toHypothesis
+  haveI : NeZero (Nat.card h.W1) := ⟨by have := h.one_lt_card_W1; omega⟩
+  haveI : IsCyclic ↥(h.W1 ⊔ h.W2) := h.isCyclic_sup
+  letI : CommGroup ↥(h.W1 ⊔ h.W2) := IsCyclic.commGroup
+  have hW1le : hyp.typeP.W1 ≤ M := hyp.typeP.W1_le
+  have hW2le : hyp.typeP.W2 ≤ M := typePData_W2_le_self hyp.typeP
+  have hcardW1 : Nat.card ↥h.W1 = hyp.w1 :=
+    Nat.card_congr (Subgroup.subgroupOfEquivOfLe hW1le).toEquiv
+  have hcardW2sub : Nat.card ↥(h.W2.subgroupOf (h.W1 ⊔ h.W2)) = hyp.w2 := by
+    rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe (le_sup_right)).toEquiv]
+    exact Nat.card_congr (Subgroup.subgroupOfEquivOfLe hW2le).toEquiv
+  haveI : NeZero (Nat.card ↥(h.W2.subgroupOf (h.W1 ⊔ h.W2))) := ⟨Nat.card_pos.ne'⟩
+  haveI : NeZero hyp.w1 := ⟨by have := h.one_lt_card_W1; rw [hcardW1] at this; omega⟩
+  haveI : NeZero hyp.w2 := ⟨by rw [← hcardW2sub]; exact Nat.card_pos.ne'⟩
+  let χ₂ : Fin hyp.w2 → (h.W2.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ :=
+    fun j => finCardEquivCharacterGroup _ (finCongr hcardW2sub.symm j)
+  let χ₁ : Fin hyp.w1 → (h.W1.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ :=
+    fun i => h.w1CharEquiv (finCongr hcardW1.symm i)
+  let tic := typePData_toTICyclicHypothesis hyp.typeP hodd
+  haveI : NeZero (Nat.card ↥tic.W1) := ⟨Nat.card_pos.ne'⟩
+  haveI : NeZero (Nat.card ↥tic.W2) := ⟨Nat.card_pos.ne'⟩
+  let e : ↥tic.W ≃* ↥h.sdiffTICyclicHypothesis.W := typePData_WEquiv hyp.typeP
+  let app := hyp.canonicalFullDadeApp hG hodd
+  -- the row/column families.
+  let ρ : Fin hyp.w1 → ((tic.W1.subgroupOf tic.W) →* ℂˣ) :=
+    fun i => (((χ₁ i).comp h.sdiffTICyclicHypothesis.wFst).comp e.toMonoidHom).comp
+      (tic.W1.subgroupOf tic.W).subtype
+  let κ : Fin hyp.w2 → ((tic.W2.subgroupOf tic.W) →* ℂˣ) :=
+    fun j => (((χ₂ j).comp h.sdiffTICyclicHypothesis.wSnd).comp e.toMonoidHom).comp
+      (tic.W2.subgroupOf tic.W).subtype
+  -- the value identity `ω_{ij}^σ = χ_{(ρ i, κ j)}`.
+  have hval : ∀ i j, hyp.alignedOmegaSigmaGrid hG hodd i j
+      = tic.chiFam rfl app (ρ i, κ j) := by
+    intro i j
+    -- `ω_{ij}^σ = σ(ω(ξ_{ij}))`
+    have hAOS : hyp.alignedOmegaSigmaGrid hG hodd i j
+        = tic.sigma rfl app (tic.omega
+            ((h.sdiffTICyclicHypothesis.omegaProdChar (χ₁ i) (χ₂ j)).comp e.toMonoidHom)
+              : ClassFunction ↥tic.W ℂ) := by
+      change tic.sigmaIntegral rfl app (tic.omega
+            ((h.sdiffTICyclicHypothesis.omegaProdChar (χ₁ i) (χ₂ j)).comp e.toMonoidHom)
+              : ClassFunction ↥tic.W ℂ)
+        = tic.sigma rfl app (tic.omega
+            ((h.sdiffTICyclicHypothesis.omegaProdChar (χ₁ i) (χ₂ j)).comp e.toMonoidHom)
+              : ClassFunction ↥tic.W ℂ)
+      rw [OddOrder.Peterfalvi.S05.TICyclicHypothesis.sigmaIntegral_apply]
+    -- `ξ_{ij}|_{W₁} = ρ i`, `ξ_{ij}|_{W₂} = κ j` (the cross factor is trivial on each block).
+    have hc1 : ((h.sdiffTICyclicHypothesis.omegaProdChar (χ₁ i) (χ₂ j)).comp e.toMonoidHom).comp
+          (tic.W1.subgroupOf tic.W).subtype = ρ i := by
+      apply MonoidHom.ext
+      intro x
+      have hm : e.toMonoidHom ((tic.W1.subgroupOf tic.W).subtype x) ∈
+          h.sdiffTICyclicHypothesis.W1.subgroupOf h.sdiffTICyclicHypothesis.W :=
+        typePData_WEquiv_mem_W1 hyp.typeP x.2
+      have hz := h.sdiffTICyclicHypothesis.wSnd_eq_one_of_mem_W1 hm
+      simp only [ρ, MonoidHom.comp_apply,
+        OddOrder.Peterfalvi.S05.TICyclicHypothesis.omegaProdChar, MonoidHom.mul_apply]
+      rw [hz, map_one]; exact mul_one _
+    have hc2 : ((h.sdiffTICyclicHypothesis.omegaProdChar (χ₁ i) (χ₂ j)).comp e.toMonoidHom).comp
+          (tic.W2.subgroupOf tic.W).subtype = κ j := by
+      apply MonoidHom.ext
+      intro x
+      have hm : e.toMonoidHom ((tic.W2.subgroupOf tic.W).subtype x) ∈
+          h.sdiffTICyclicHypothesis.W2.subgroupOf h.sdiffTICyclicHypothesis.W :=
+        typePData_WEquiv_mem_W2 hyp.typeP x.2
+      have hz := h.sdiffTICyclicHypothesis.wFst_eq_one_of_mem_W2 hm
+      simp only [κ, MonoidHom.comp_apply,
+        OddOrder.Peterfalvi.S05.TICyclicHypothesis.omegaProdChar, MonoidHom.mul_apply]
+      rw [hz, map_one]; exact one_mul _
+    rw [hAOS, tic.sigma_omega rfl app
+        ((h.sdiffTICyclicHypothesis.omegaProdChar (χ₁ i) (χ₂ j)).comp e.toMonoidHom),
+      tic.omegaProdEquiv_symm_eq
+        ((h.sdiffTICyclicHypothesis.omegaProdChar (χ₁ i) (χ₂ j)).comp e.toMonoidHom),
+      hc1, hc2]
+  refine ⟨ρ, κ, ?_, ?_, hval⟩
+  · -- `ρ` injective (joint orthonormality at column `0`)
+    intro i i' hii'
+    by_contra hne
+    have h1 : hyp.alignedOmegaSigmaGrid hG hodd i 0 = hyp.alignedOmegaSigmaGrid hG hodd i' 0 := by
+      rw [hval i 0, hval i' 0, hii']
+    have h2 := hyp.alignedOmegaSigmaGrid_inner hG hodd i i' 0 0
+    rw [if_neg (fun hh => hne hh.1), h1, hyp.alignedOmegaSigmaGrid_inner hG hodd i' i' 0 0,
+      if_pos ⟨rfl, rfl⟩] at h2
+    exact one_ne_zero h2
+  · -- `κ` injective (joint orthonormality at row `0`)
+    intro j j' hjj'
+    by_contra hne
+    have h1 : hyp.alignedOmegaSigmaGrid hG hodd 0 j = hyp.alignedOmegaSigmaGrid hG hodd 0 j' := by
+      rw [hval 0 j, hval 0 j', hjj']
+    have h2 := hyp.alignedOmegaSigmaGrid_inner hG hodd 0 0 j j'
+    rw [if_neg (fun hh => hne hh.2), h1, hyp.alignedOmegaSigmaGrid_inner hG hodd 0 0 j' j',
+      if_pos ⟨rfl, rfl⟩] at h2
+    exact one_ne_zero h2
 
 open scoped FiniteInduce in
 /-- **§10 σ-grid lands in `ℤ[Irr G]`**: each `alignedOmegaSigmaGrid i j = chiFam(P_{ij}) ∈ ZIrr G`

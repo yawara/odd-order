@@ -1013,6 +1013,31 @@ theorem omegaProdEquiv_symm_omegaProdChar (hyp : TICyclicHypothesis G)
     hyp.omegaProdEquiv.symm (hyp.omegaProdChar χ₁ χ₂) = (χ₁, χ₂) := by
   rw [show hyp.omegaProdChar χ₁ χ₂ = hyp.omegaProdEquiv (χ₁, χ₂) from rfl, Equiv.symm_apply_apply]
 
+/-- **`omegaProdChar` reconstructs any linear character of `W`**: the product `ω_{i0}·ω_{0j}` of the
+`W₁`- and `W₂`-restrictions `χ_k = ξ|_{W_k}` recovers `ξ`.  This is the witness of
+`omegaProdChar_surjective`, extracted as a reusable identity (uses `W = W₁ × W₂`,
+`wProj1_mul_wProj2`). -/
+theorem omegaProdChar_comp_subtype (hyp : TICyclicHypothesis G) (ξ : hyp.W →* ℂˣ) :
+    hyp.omegaProdChar (ξ.comp (hyp.W1.subgroupOf hyp.W).subtype)
+        (ξ.comp (hyp.W2.subgroupOf hyp.W).subtype) = ξ := by
+  ext w
+  simp only [omegaProdChar, MonoidHom.mul_apply, MonoidHom.comp_apply, Subgroup.coe_subtype]
+  rw [← map_mul]
+  congr 1
+  have e1 : (↑(hyp.wFst w) : hyp.W) = hyp.wProj1 w := by rw [wProj1_apply, wFst_apply]
+  have e2 : (↑(hyp.wSnd w) : hyp.W) = hyp.wProj2 w := by rw [wProj2_apply, wSnd_apply]
+  rw [e1, e2, wProj1_mul_wProj2]
+
+/-- **`omegaProdEquiv.symm` extracts the `W₁`/`W₂`-restrictions**: for any linear `ξ : W →* ℂˣ`,
+`omegaProdEquiv.symm ξ = (ξ|_{W₁}, ξ|_{W₂})`.  The §10 (10.6) column-structure argument uses this to
+read off the product index `(ρ, κ)` of a transported `ω_{ij}`: each factor of a product character
+contributes to exactly one component. -/
+theorem omegaProdEquiv_symm_eq (hyp : TICyclicHypothesis G) (ξ : hyp.W →* ℂˣ) :
+    hyp.omegaProdEquiv.symm ξ
+      = (ξ.comp (hyp.W1.subgroupOf hyp.W).subtype, ξ.comp (hyp.W2.subgroupOf hyp.W).subtype) := by
+  conv_lhs => rw [← hyp.omegaProdChar_comp_subtype ξ]
+  exact hyp.omegaProdEquiv_symm_omegaProdChar _ _
+
 /-- `σ` on a single linear character: `(ω(ξ))^σ = χ` at the index pair `omegaProdEquiv.symm ξ`. -/
 theorem sigma_omega (hyp : TICyclicHypothesis G) [Fintype hyp.W]
     [Invertible (Nat.card hyp.W : ℂ)] [Invertible (Nat.card G : ℂ)]
