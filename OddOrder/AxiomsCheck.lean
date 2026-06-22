@@ -706,6 +706,15 @@ set_option linter.style.longLine false in
 -- an order-p element x ∈ Ω₁(P₀)^# with C_K(x) ⊄ K' (centralizer core + order-p power).
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.S14.exists_orderP_centralizer_witness
+-- General 5-type HasPeterfalviType conjugation-invariance (issue 2015): a maximal subgroup's
+-- Peterfalvi type and its `M_s = mainSubgroup` are preserved under `MulAut G`.  Unblocks the
+-- Sylow-conjugation step of Pf (8.17.a) `exists_second_maximal`.
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.hasPeterfalviType_pointwise_smul
+#assert_only_allowed_axioms OddOrder.GroupTheory.mainSubgroup_pointwise_smul
+-- Hall ⟹ contains Sylow: a `p`-Hall subgroup with `p ∣ |H|` contains a Sylow `p`-subgroup of `G`
+-- (`v_p(|H|) = v_p(|G|)` since `p ∤ [G:H]`; `Sylow.ofCard`).
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S14.exists_sylow_le_of_hall
 -- RepresentationTheory: completeness of irreducible characters — `f ⊥ Irr G ⇒ f = 0`
 -- (regular representation + Maschke + Schur).
 #assert_only_allowed_axioms OddOrder.RepresentationTheory.classFunction_eq_zero_of_orthogonal
