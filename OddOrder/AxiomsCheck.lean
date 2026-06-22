@@ -5301,6 +5301,14 @@ Axiom-clean. -/
 
 #assert_only_allowed_axioms OddOrder.BG.Ch4.S14.typeP_hall_inf_centralizer_kappaElement_eq_bot
 
+/-! **BG `defUK`** (`S14_TypePCounting`, `typeP2_kappaHall_commutator_eq_self`): for a type-`P₂`
+maximal `M` with cyclic Hall `κ`-subgroup `K` and abelian `(κ∪σ)'`-Hall complement `U` normalized
+by `K`, `⁅U, K⁆ = U`.  The coprime decomposition `U = (C(K)⊓U) ⊔ ⁅U,K⁆`
+(`fitting_coprime_abelian_decomp`) collapses because `C_U(K) = ⊥` (Theorem A(4) at any `k ∈ K#`).
+A signalizer-functor prerequisite for BG Cor 14.12 (`typeP2_neighbor_is_typeF`).  Axiom-clean. -/
+
+#assert_only_allowed_axioms OddOrder.BG.Ch4.S14.typeP2_kappaHall_commutator_eq_self
+
 /-! **BG Theorem A(3) decomposition** (`S16_MainResults`, `typeP_maximal_eq_kappaHall_sup_U_sup_Msigma`):
 `M = K U M_σ` for a maximal `M` with Hall `κ`-subgroup `K ≤ M` and Hall `(κ∪σ)'`-subgroup `U ≤ M`.
 Type-F via the `K = ⊥` `SubgroupESetup`; type-P via the `M' = U M_σ`/`M'`-complements-`K` structure
