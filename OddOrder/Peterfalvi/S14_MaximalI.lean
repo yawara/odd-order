@@ -456,6 +456,39 @@ theorem counterexample_P0_K_structure [Finite G] (hG : OddOrder.BG.IsMinimalSimp
     IsMulCommutative ↥ctr.P0 ∧ rank ↥ctr.P0 = 2 := by
   sorry
 
+/-- A `p`-Hall subgroup `H` (its order having only `p`-primary divisors among `π = π(|H|)`) with
+`p ∣ |H|` contains a Sylow `p`-subgroup of the ambient group `G`.
+
+A Sylow `p`-subgroup `R` of `↥H` maps to a subgroup `R.map H.subtype ≤ H` of `G` of the same
+order `p ^ v_p(|H|)`.  Since `H` is Hall, `p ∤ [G : H]`, so `v_p(|H|) = v_p(|G|)`; hence
+`R.map H.subtype` is a Sylow `p`-subgroup of `G` contained in `H`. -/
+theorem exists_sylow_le_of_hall [Finite G] {p : ℕ} [Fact p.Prime] {H : Subgroup G}
+    (hHall : Ch03.IsHallSubgroup (Nat.card ↥H).primeFactors H) (hp : p ∣ Nat.card ↥H) :
+    ∃ Q : Sylow p G, (Q : Subgroup G) ≤ H := by
+  classical
+  -- A Sylow `p`-subgroup `R` of `↥H`.
+  obtain ⟨R⟩ := (Sylow.nonempty : Nonempty (Sylow p ↥H))
+  -- The `p`-multiplicity of `|H|` equals that of `|G|`, because `H` is Hall and `p ∣ |H|`.
+  have hfact : (Nat.card ↥H).factorization p = (Nat.card G).factorization p := by
+    have hcop : Nat.Coprime (Nat.card ↥H) H.index := hHall.coprime_index
+    have hp_notdvd : ¬ p ∣ H.index :=
+      (Fact.out : p.Prime).coprime_iff_not_dvd.mp (hcop.coprime_dvd_left hp)
+    have hidx0 : H.index.factorization p = 0 := Nat.factorization_eq_zero_of_not_dvd hp_notdvd
+    have hsplit : (Nat.card G).factorization p =
+        (Nat.card ↥H).factorization p + H.index.factorization p := by
+      rw [← H.card_mul_index, Nat.factorization_mul (Nat.card_pos (α := ↥H)).ne'
+        Subgroup.index_ne_zero_of_finite]
+      rfl
+    rw [hsplit, hidx0, add_zero]
+  -- `R.map H.subtype` is a `p ^ v_p(|G|)`-subgroup of `G`, i.e. a Sylow `p`-subgroup.
+  have hcardR : Nat.card ↥(R : Subgroup ↥H) = p ^ (Nat.card G).factorization p := by
+    rw [R.card_eq_multiplicity, hfact]
+  have hcardQ : Nat.card ↥((R : Subgroup ↥H).map H.subtype) =
+      p ^ (Nat.card G).factorization p := by
+    rw [Subgroup.card_map_of_injective H.subtype_injective, hcardR]
+  exact ⟨Sylow.ofCard ((R : Subgroup ↥H).map H.subtype) hcardQ,
+    by rw [Sylow.coe_ofCard]; exact Subgroup.map_subtype_le _⟩
+
 /-- **Peterfalvi (12.9), existence of the second maximal `L`** — a §8 obligation
 (`(8.17.a)` `bgTheoremE_cover_data`: `p ∈ π(G)` is covered by some `π((M_i)_s)`, giving a maximal
 `L` with `p ∣ |L_s|`; then `(8.11)`/`L_s ⊇ Sylow_p(G)` and Sylow conjugation place `P₀ ⊆ L_s`). -/
@@ -463,7 +496,74 @@ theorem exists_second_maximal [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     (ctr : CounterexampleHypothesis (G := G)) :
     ∃ (L : Subgroup G) (Lt : PeterfalviType), L ∈ maximalSubgroups G ∧ L ≠ ctr.M ∧
       HasPeterfalviType Lt L ∧ ctr.P0 ≤ mainSubgroup L Lt := by
-  sorry
+  classical
+  haveI : Fact ctr.p.Prime := ⟨ctr.p_prime⟩
+  -- `p ∈ π(G)`: `p ∣ [M : M_F] ∣ |M| ∣ |G|`.
+  have hp_in_G : ctr.p ∈ (Nat.card G).primeFactors := by
+    refine Nat.mem_primeFactors.mpr ⟨ctr.p_prime, ?_, Nat.card_pos.ne'⟩
+    refine dvd_trans ctr.p_dvd_index (dvd_trans ?_ (Subgroup.card_subgroup_dvd_card ctr.M))
+    exact Subgroup.relIndex_dvd_card (H := ctr.K) (K := ctr.M)
+  -- `p ∤ |M_F| = |K|`: `(8.11)` makes `M_F` Hall, and `p ∣ [M : M_F] ∣ [G : M_F]`.
+  have hKM : ctr.K ≤ ctr.M := ctr.K_eq_MF ▸ OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_le ctr.M
+  have hpK : ¬ ctr.p ∣ Nat.card ↥ctr.K := by
+    have hHall := (OddOrder.Peterfalvi.S10.hall_maxNilpotentNormalHall_and_mainSubgroup hG
+      ctr.M_maximal (tau := PeterfalviType.I) ctr.M_typeI).1
+    rw [← ctr.K_eq_MF] at hHall
+    have hp_idx : ctr.p ∣ ctr.K.index :=
+      ctr.p_dvd_index.trans (Subgroup.relIndex_dvd_index_of_le hKM)
+    exact ctr.p_prime.coprime_iff_not_dvd.mp
+      (Nat.Coprime.coprime_dvd_left hp_idx hHall.coprime_index.symm)
+  -- BG Theorem E cover data: `p ∈ π((M_i)_s)` for some representative `M_i = L₀`.  Repackage the
+  -- representative as genuine local variables `L₀, Lt` (so we may later `cases` on the type label).
+  obtain ⟨data, -⟩ := OddOrder.Peterfalvi.S10.bgTheoremE_cover_data.{_, 0} hG
+  obtain ⟨i, hi⟩ := (data.primeFactors_cover ctr.p ctr.p_prime).mp hp_in_G
+  obtain ⟨L₀, Lt, hL₀max, hL₀typed, hi'⟩ :
+      ∃ (L₀ : Subgroup G) (Lt : PeterfalviType), L₀ ∈ maximalSubgroups G ∧
+        HasPeterfalviType Lt L₀ ∧
+        ctr.p ∈ (Nat.card ↥(mainSubgroup L₀ Lt)).primeFactors :=
+    ⟨data.reps i, data.tau i, data.maximal i, data.typed i, hi⟩
+  have hp_Ls : ctr.p ∣ Nat.card ↥(mainSubgroup L₀ Lt) := (Nat.mem_primeFactors.mp hi').2.1
+  -- `(8.11)`: `(L₀)_s` is Hall, hence contains a Sylow `p`-subgroup `Q` of `G`.
+  have hLsHall : Ch03.IsHallSubgroup (Nat.card ↥(mainSubgroup L₀ Lt)).primeFactors
+      (mainSubgroup L₀ Lt) :=
+    (OddOrder.Peterfalvi.S10.hall_maxNilpotentNormalHall_and_mainSubgroup hG hL₀max hL₀typed).2
+  obtain ⟨Q, hQle⟩ := exists_sylow_le_of_hall hLsHall hp_Ls
+  -- A Sylow `p`-subgroup `Q'` of `G` over `P₀`, then conjugate `Q` to `Q'`.
+  obtain ⟨Q', hQ'le⟩ := ctr.P0_pGroup.exists_le_sylow
+  obtain ⟨g, hg⟩ := MulAction.exists_smul_eq G Q Q'
+  -- `P₀ ≤ Q' = ↑(g • Q) = conj g • ↑Q ≤ conj g • (L₀)_s`.
+  have hP0_le : ctr.P0 ≤ MulAut.conj g • mainSubgroup L₀ Lt := by
+    refine hQ'le.trans ?_
+    have hQ'eq : (Q' : Subgroup G) = MulAut.conj g • (Q : Subgroup G) := by
+      rw [← hg, Sylow.coe_subgroup_smul]
+    rw [hQ'eq]
+    exact Subgroup.pointwise_smul_le_pointwise_smul_iff.mpr hQle
+  -- Assemble: `L = conj g • L₀`, type `Lt`, with `P₀ ⊆ (conj g • L₀)_s`.
+  refine ⟨MulAut.conj g • L₀, Lt, mem_maximalSubgroups.mpr
+    (OddOrder.BG.Ch3.S12.isCoatom_conj_smul (mem_maximalSubgroups.mp hL₀max)), ?_,
+    hasPeterfalviType_pointwise_smul (MulAut.conj g) Lt hL₀typed, ?_⟩
+  · -- `conj g • L₀ ≠ M`: else `M` has type `Lt`; if `Lt = I` then `p ∣ |K|` (false), else `M` is
+    -- both type I and non-I (false).
+    rintro hEq
+    have hMtype : HasPeterfalviType Lt ctr.M :=
+      hEq ▸ hasPeterfalviType_pointwise_smul (MulAut.conj g) Lt hL₀typed
+    -- transport the divisibility `p ∣ |(L₀)_s|` to `p ∣ |M_s|`.
+    have hp_Ms : ctr.p ∣ Nat.card ↥(mainSubgroup ctr.M Lt) := by
+      have hcard : Nat.card ↥(mainSubgroup ctr.M Lt) = Nat.card ↥(mainSubgroup L₀ Lt) := by
+        rw [← hEq, ← mainSubgroup_pointwise_smul, card_pointwise_smul]
+      rw [hcard]; exact hp_Ls
+    -- `ctr.M` has type `Lt` and type I.  Type `I` forces `p ∣ |K|` (false); any non-I label
+    -- makes `ctr.M` non-I, contradicting type I via `not_isTypeI_of_isTypeNonI`.
+    have hMnotNonI : ¬ IsTypeNonI ctr.M := fun h =>
+      OddOrder.BG.Ch4.S16.not_isTypeI_of_isTypeNonI hG ctr.M_maximal h ctr.M_typeI
+    cases Lt with
+    | I => exact hpK (by rw [ctr.K_eq_MF]; exact hp_Ms)
+    | II => exact hMnotNonI (Or.inl hMtype)
+    | III => exact hMnotNonI (Or.inr (Or.inl hMtype))
+    | IV => exact hMnotNonI (Or.inr (Or.inr (Or.inl hMtype)))
+    | V => exact hMnotNonI (Or.inr (Or.inr (Or.inr hMtype)))
+  · -- `P₀ ⊆ mainSubgroup (conj g • L₀) Lt`.
+    rw [← mainSubgroup_pointwise_smul]; exact hP0_le
 
 /-- **Peterfalvi (12.9), centralizer control** — **discharged** from `(8.12.b)`
 (`typeI_or_typeII_centralizer_unique`) + `G` simple.
