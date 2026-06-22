@@ -5,6 +5,43 @@
 > 上位文脈 = 記憶 [[ft-endgame-two-poles]] [[peterfalvi-s10-13-gated-on-bg-spine]]、
 > Lane H 視点の正本 = [`s10_13_maximal_structure.md`](s10_13_maximal_structure.md)。
 
+## ✅✅ 2026-06-22 更新⁸ — (5.8) σ-level full-column endgame 完成 (issue 1009) + (5.5) gate 精密 map
+
+(10.6.a) summed isometry の linchpin = (5.8) σ-wrapper のうち **(a) Parseval + (d) sigmaCoeff↔core
+配線を完成** (commit `bcec3f86`, `S05_SigmaTrichotomy.lean`, 両 axiom-clean, full build 3881 green):
+
+- **`eq_sum_sigmaCoeff_smul_chiFam_of_inner_self_eq`** (Fourier 復元): Parseval *等式*
+  `⟨X,X⟩ = ∑ sigmaCoeff·conj(sigmaCoeff)` (= X が Im σ ⊥ 成分無し、β=0) ⟹ `X = ∑ sigmaCoeff • χ_pq`。
+  chiFam 直交性のみ依存。`span(chiFam)` を定義せず Parseval-等式を仮説化 (norm-2 endgame は ‖·‖²=0 で
+  coeff を消すが (5.8) は復元が必要)。⚠ char-group 積型に global Fintype 無 → 文の `∑ pq` が Fintype を
+  metavar 化 → 両 W1/W2 char-group `[Fintype]` を **instance 引数**化 (codebase は局所 `Fintype.ofFinite`)。
+- **`eq_smul_chiFam_column_of_vanishOnV`** ((5.8) σ-coeff full-column endgame): X が V で消え、sigmaCoeff
+  2-column {jcol,kcol} support + {0,δ}/{0,−δ} entries + ‖X‖²=w₁ + Parseval 等式 ⟹
+  `X = δ•∑_p χ_{(p,kcol)}` ∨ `X = −δ•∑_p χ_{(p,jcol)}`。abstract core `grid_eq_const_column_of_two_col`
+  + Fourier 復元 を合成。= norm-w₁ 版 `eq_smul_chiFam_diff_of_vanishOnV`。
+
+⟹ **(10.6.a) を (5.5) の出力に honest 還元完了**。残 linchpin = wrapper 仮説を実 `μ_k^τ₁` で establish。
+
+### 残 gate = (5.5)-for-columns / §6↔§5(§10) reconcile (deep, multi-session) — 精密 map (2026-06-22 調査)
+
+- **§6 `certainTypeExtension` (ν) が結論形を既に持つ**: `certainTypeExtension_columnSum` (S06_CertainTypeCoherence:112)
+  = `ν(μ_j) = δ_j ∑_i ω_{ij}^σ`。∴ (10.6.a) の真の中身 = **`coh.tau1` が certain-type column 上で ν に一致**
+  することを (5.8) で**強制**する (ν と tau1 は定義上は別、(5.8) が一致を出す)。
+- **(5.5) 機構は在庫だが単一既約用**: `eq_sum_of_psi_eq_zero` (S07_Coherence:1522, (5.5)) +
+  `norm_eq_and_X_eq_sum_of_norm_Y_ge` (S07:1469, (5.4.b)) は `CharacterPsiDecomposition` (S07:1130 付近) 上で
+  `χ^τ₁ = ∑_{α∈E⊆R(χ)} α` (E card=‖χ‖²) を出す。**だが `CharacterDifferenceImage.imageSet` は 2 元集合**
+  ({muClassFunction, nuClassFunction}=単一既約 χ の χ−χ̄ 像)。certain-type column μ_j は w₁ 既約の和で
+  R(μ_j)=2-**column** 構造 (2·w₁ σ-像) ⟹ **直接当てはまらない**。これが reconcile の crux。
+- **`IsCoherent` は abstract isometry で (5.5) を carry しない** (2026-06-22 確認、S07:1557)。§10 `coh.tau1` は
+  `IsCoherent` projection。∴ (5.5) を column に適用するには (i) `Hypothesis46` 経由で §6 certain-type host に
+  繋ぐ (旧 note cont.² の A₀/V support mismatch 問題=要原文精読) か (ii) coherence isometry 用に column-(5.5) を
+  別途立てる。**いずれも multi-session**。
+- ⚠ Explore 監査 (2026-06-22) は「400-500 行・no blocker」と評価したが、item B (μ_k 2-column 分解) を
+  「implicit」と自認 = これが linchpin。reconcile 複雑度を過小評価 ([[scaffold-sorry-free-not-done]] audit 版)。
+- **次セッション entry 候補**: (1) `Hypothesis46` bridge を原文 (8.15)/(4.6) 精読で詰める (§6 全 apparatus を
+  L=M 発火、(10.2)/(10.3) も unlock)、(2) column-用 `CharacterDifferenceImage` 一般化 (imageSet を 2-column に)。
+  正本 = issue 1009「残 linchpin」節。
+
 ## ✅✅✅ 2026-06-22 完了 — (10.5) Dade-image identity 締結 (issue 1007 CLOSED)
 
 mirror assembly + pinning 完成。(10.5) を grid + params 両 sorry-free に締結 (full build 3881 green、
