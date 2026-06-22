@@ -90,6 +90,62 @@ bottom-out** するので、clean 化には §15 foundation が先。真の順�
 
 ## 進捗ログ
 
+**2026-06-22 (cont.¹¹) ✅ A(4)/A(5) を S16→S14 relocate + BG `defUK` (`typeP2_kappaHall_commutator_eq_self`) landed — Cor 14.12 conjunct 2/3/4 の lower-half 着手** (commits `1edf774a` relocate / `730a7049` defUK、full build 3881 green、sorry 数不変 = scaffold 追加):
+
+lane-f RESUME。Cor 14.12 残 = conjunct 2/3/4 (σ-decomposition of `H`) で `S14:9518/9521/9524` の 3 sorry。Coq `P2type_signalizer` (BGsection14.v **L2243-2407**) を完全精読し proof map 確定 + lower-half の核を landed:
+
+- **relocate (`1edf774a`)**: A(4) `typeP_hall_inf_centralizer_kappaElement_eq_bot` / A(5) `typeP_centralizer_kappaElement_eq` を S16→**S14** (Cor 14.12 直前)。S14 は下流 S16 を import 不可だが conjunct 2/3/4 が A(4) を要するため。S16 の consumer は `open S14` で無変更、axiom-clean 維持。
+- **`defUK` (`730a7049`, sorry-free, axiom-clean, AxiomsCheck 登録)**: `⁅U,K⁆ = U`。`fitting_coprime_abelian_decomp` (P=U abelian, K≤N(U), coprime) の `U=(C(K)⊓U)⊔⁅U,K⁆` を `C_U(K)=C(K)⊓U=⊥` で collapse。後者 = A(4) を任意 `k∈K#` で (`C(K)⊓U ≤ C(k)⊓U = U⊓C(k) = ⊥`)。`IsCyclic K` は |K|=q prime (Prop 14.2(g)=`typeP_structure.2.2.2.2.1 hP2`)。
+
+**▶ 残 (次セッション、全 API 解決済・straight 実装) = Coq L2291-2406 の翻訳**。証明骨格 (3 conjunct は `H∩M*=D` を共有する一塊):
+
+**(I) 上半: K⊆F(D) → D⊆M*** (semiregular 不要):
+- `hFmaxH : IsTypeF H` を refine 前に hoist (現 conjunct 1 inline 証明 = `(hcover H hHmax hHP).elim notMGH notMstGH` を `have` 化、Lemma 14.11 の `hF` 引数用)。
+- **検証済コード (revert 済・貼り戻すだけ)** — `s'H_K` (K σ(H)'-群) + `D` (σ(H)'-Hall⊇K):
+  ```lean
+  haveI hHsol : IsSolvable ↥H := hG.solvable_of_mem_maximalSubgroups hHmax
+  obtain ⟨-, -, -, -, hP2struct, -, -⟩ := typeP_structure hG hM hP hKM hK hKstardef hU
+  obtain ⟨-, q, hqprime, hKcard, -⟩ := hP2struct hP2
+  haveI : Fact q.Prime := ⟨hqprime⟩
+  haveI hKcyc : IsCyclic ↥K := isCyclic_of_prime_card hKcard
+  have hKelemq : K ∈ elemAbelianOfRank G q 1 :=
+    mem_elemAbelianOfRank.mpr ⟨Subgroup.IsElementaryAbelian.of_card_prime hKcard, by rw [hKcard, pow_one]⟩
+  have defUK : (⁅U, K⁆ : Subgroup G) = U :=
+    typeP2_kappaHall_commutator_eq_self hG hM hP2 hKM hUM hK hKstardef hU hUab hKNU
+  have hKMsigmaMst : K ≤ OddOrder.BG.Ch3.S10.Msigma Mst := hMstpair.2.2.le.trans inf_le_left
+  have hHMstdisj : Disjoint (OddOrder.BG.Ch3.S10.sigma H) (OddOrder.BG.Ch3.S10.sigma Mst) :=
+    sigma_disjoint_of_nonconjugate hG hHmax hMstmax notMstGH
+  have hsH_K : Subgroup.IsPiSubgroup (OddOrder.BG.Ch3.S10.sigma H)ᶜ K := by
+    intro p hp; rw [Set.mem_compl_iff]; intro hpσH
+    exact (Set.disjoint_left.mp hHMstdisj) hpσH
+      (OddOrder.BG.Ch3.S10.Msigma_isPiGroup Mst p
+        (Nat.primeFactors_mono (Subgroup.card_dvd_of_le hKMsigmaMst) Nat.card_pos.ne' hp))
+  obtain ⟨D, hDH, hDhall, hKD⟩ : ∃ D : Subgroup G, D ≤ H ∧
+      Ch03.IsHallSubgroup ((OddOrder.BG.Ch3.S10.sigma H)ᶜ) (D.subgroupOf H) ∧ K ≤ D := by
+    have hKsub : ∀ p ∈ (Nat.card ↥(K.subgroupOf H)).primeFactors, p ∈ (OddOrder.BG.Ch3.S10.sigma H)ᶜ := by
+      intro p hp; rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hKH).toEquiv] at hp; exact hsH_K p hp
+    obtain ⟨D', hD'hall, hD'ge⟩ := Ch03.hall_D (G := ↥H) hKsub
+    have hDeq : (D'.map H.subtype).subgroupOf H = D' :=
+      Subgroup.comap_map_eq_self_of_injective H.subtype_injective D'
+    refine ⟨D'.map H.subtype, Subgroup.map_subtype_le D', ?_, ?_⟩
+    · rw [hDeq]; exact hD'hall
+    · exact le_of_eq_of_le (Subgroup.map_subgroupOf_eq_of_le hKH).symm (Subgroup.map_mono hD'ge)
+  ```
+  ⚠ 上記 hoist 時は現 `refine ⟨H, hHmem, ...⟩` の**前**に置く。これ単体では未使用 warning (green) ゆえ未 commit。
+- **`uniqMst : 𝓜(C(K))={Mst}`** (sK_FD 用): typeP_structure を **Mst** に適用 (Mst の κ-Hall=Kstar [hMstpair.2.1], Mst の dual="K"=`Msigma Mst⊓C(Kstar)` [hMstpair.2.2]) し **conjunct 6** (`.2.2.2.2.2.1`) を `p=q, X=K` (`hKelemq`, `le_rfl`) で。Mst の U は `Ch03.hall_D (G:=↥Mst) (U:=⊥, vacuous hyp `by simp`)` で構成→lift。
+- **`sK_FD : K⊆F(D)`** = **Lemma 14.11 `exists_maximal_of_typeF_notMem_fitting` cite** (S14:8845)。引数: M↦H, E↦D, Q↦K (|K|=q prime ⟹ `hQ:K∈ℰ_q¹`=hKelemq), `hF`=hFmaxH, `hE:IsComplement' (Msigma H).subgroupOf H (D.subgroupOf H)` [D=σ(H)'-Hall が normal-Hall M_σ(H) を補完、要 API], `hEM`=hDH, `hq:q∈piSet D` [K≤D], `hQE`=hKD, `hQF`=¬sK_FD (contra)。出力 ∃M*' [(q∈τ₂ ∧ 𝓜(C(K))={M*'}) ∨ (q∈κ(M*') ∧ IsTypeP1 M*')]。矛盾: case1 uniqMst⟹M*'=Mst⟹q∈τ₂(Mst) vs q∈σ(Mst)[K≤Mst_σ]; case2 hcover(M*')⟹M*'~M[P1 vs P2 矛盾] or ~Mst[q∈κ vs q∈σ(Mst) 矛盾]。
+- **`sDMst : D⊆Mst`** = K<|<|D (K⊆F(D)[sK_FD], F(D) nilpotent⟹K subnormal in F(D), F(D)◁D) → snK_sMst。**`snK_sMst : K<|<|L⟹L⊆Mst`** = subnormal 帰納 (`sK_uniqMst:K≤Mst^a⟹a∈Mst` 必要、`typeP_structure`(Mst) TI clause `.2.2.2.1` から)。⚠ 要 subnormal API (`Subgroup.IsSubnormal`, Isaacs Ch02 `isSubnormal_of_isNilpotent_finite` 等)。
+
+**(II) 下半: U⊆H_σ** (= **conjunct 2**, semiregular=defUK 要):
+- `sUHs : U⊆H_σ` (Coq L2334-2352): `H=H_σ⋊D` (sdprod_sigma, 要 σ-core 補元 API), `HsDq:=H_σ⊔O_q(D)`, H_σ は q'-Hall of HsDq (`coprime_mulGp_Hall`), K⊆HsDq (K q群⊆O_q(F(D)), 要 sK_FD), U=⁅U,K⁆⊆HsDq (defUK+commgSS), U は q'群 → `sub_normal_Hall` で U⊆H_σ。⚠ 要 API: σ-core sdprod, O_q-core, `coprime_mulGp_Hall`, `sub_Hall_pcore`, `sub_normal_Hall`。
+
+**(III) 仕上げ: H∩M*=D → conjunct 3/4** (Coq L2362-2406):
+- `sHsFH:H_σ⊆F(H)` (Fitting_max, type-F H で H_σ nilpotent), `defNMU:N_M(U)=E` (coprime_norm_cent + Ω₁(R)⊆U)。
+- **`H∩M*=D`** = main equality (`sdprod_sigma` + Fitting-Hall; D≠H∩M* case は Thm 12.5(e) `Msigma_nilpotent_of_tau2` 系 + C_{H_σ}(K)≠1→q∈τ₂(H) 矛盾)。
+- conjunct 3 (`M⊓H=U⊔K`): Fu=O_{(σ∪κ)'}(F(H)), U⊆Fu, M∩Fu=U (Hall) + defNMU。conjunct 4 (`N_H(U)⊄M`): N_H(U)≤M⟹H~M (eq_mmax + nilpotent_sub_norm) vs notMGH。
+
+**解決済 API (grep 済)**: `Ch03.hall_D` (S03:1486, solvable Hall-superset) / `sigma_disjoint_of_nonconjugate` (S13_Theorem1310:159, Thm 13.9) / `Msigma_isPiGroup` (S10_HallStructureCore:227) / `fitting_coprime_abelian_decomp` (Isaacs Ch05:352) / `Msigma_isHall` (S10_HallStructure:584) / Lemma 14.11 (S14:8845)。**要探索 API**: σ-core sdprod 補元 (Msigma normal Hall の complement), O_q pcore + `coprime_mulGp_Hall`/`sub_Hall_pcore`/`sub_normal_Hall` の mathlib 名, subnormal (Isaacs Ch02_Subnormality), Thm 12.5(e) 正確形。**~150-200 行、2 session 規模**。
+
 **2026-06-22 (cont.¹⁰) ✅✅ BG Cor 14.12 conjunct 1 (`IsTypeF H`) 完全完成 — `notMstGH` close、sorry-free** (commit `81fba262`, full build 3881 green, FT-path sorry 133→132):
 
 cont.⁹ の `notMstGH` 残務を 3 ピースで close。**conjunct 1 (`IsTypeF H`) は sorry-free** (covering `hcover` + `notMGH` + `notMstGH`):
