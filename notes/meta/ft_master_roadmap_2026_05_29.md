@@ -11,7 +11,17 @@
 
 ---
 
-## ⚠ 2026-06-20 現状更新ヘッダ (最新 — 本体 2026-05-29 + 以下の旧ヘッダすべてに優先)
+## ⚠ 2026-06-22 デルタ (最新 — 以下の 2026-06-20 ヘッダに優先)
+
+2026-06-20 ヘッダからの差分のみ (構造は不変、下記を上書き):
+- **レーン体制 = 4 (B/F/H/C)**。2026-06-20 の 3 レーン表 (下記) は **lane-c 新設で 4 レーンに再編** (2026-06-21、ユーザー裁可)。所有割当の正本は [`merge_monitor.md`](merge_monitor.md) の「2026-06-22 最小修正」表: **F**=BG §14-16 構造 (S14/S15/S16_MainResults + FeitThompson.lean §16 producer) / **B**=Pf §10/§12/§13 Dade char grid / **H**=Pf §11 Wielandt §9 + §14-15 (type I + S&T) / **C**=Pf §16 endpoint + POLE-2 (field normalizer)。**lane-d/e/g は退役済**。
+- **実 sorry = 131** (`bin/count-sorry`, 2026-06-22)。06-20 の 137 から純減。build green **3881 jobs** / AxiomsCheck OK / 新 axiom 0。
+- 主着地 (06-20→06-22): BG **Thm 15.2 完全 close** + Thm 15.7(c) を faithful `M'≤F(M)` に修正 (印刷版 overstatement 確定) + **Lemma 14.11 phase 1** / Pf **(9.1) Wielandt unconditional** + (9.4) seed / (10.5) ζ^τ₁ vanish + grid hoist (endgame de-risked)。
+- POLE-1/POLE-2 の構造は不変 (下記 §「FT 経路の現在地」参照)。
+
+---
+
+## ⚠ 2026-06-20 現状更新ヘッダ (本体 2026-05-29 + 以下の旧ヘッダすべてに優先)
 
 本体 (2026-05-29) と 05-31/06-03 ヘッダは「BG §7-§16 と Pf §10-§16 は Lean ファイルゼロ」という前提で書かれており、**この骨格部分が最も古い**。2026-06 を通じて BG §1-§16 spine と Peterfalvi §6-§16 が実質的に形式化され、FT 経路は終盤に入った。live 状況は memory [[ft-master-roadmap]] + [[ft-endgame-two-poles]] + [[peterfalvi-work-in-worktree]] が保持。本ブロックは 2026-06-20 時点のスナップショット。
 

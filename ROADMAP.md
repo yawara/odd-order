@@ -27,10 +27,10 @@
 |---|---|---|
 | 0 | Lean プロジェクト初期化 (Lean 4.29.1 + mathlib v4.29.1) | ✅ 2026-05-21 |
 | 1 | **Isaacs** Ch.1–10 + Appendix の Lean 化 | 🔄 Ch.1–7 sorry-free 完成 (FT 経路完了; Thm 7.6/7.8 含む 168 flagship axiom-clean)。Ch.8–10 は FT 経路外で保留 |
-| 2a | **BG** Ch.I–IV + 補助 Appendices の Lean 化 | 🔄 §1 大半 + §2 (Thm 2.6) + §3 (Thm 3.7 は coprime case 残) + **§4 Blackburn ✅ (Thm 4.16 apex 完成)** + **§5 完結 (Thm 5.3–5.7)** + App.A (A.1–A.5 ✅) + App.B (Puig L(S) ✅) + Thm 6.2 一般形 ✅。**§6–§16 は faithful scaffold 済 (foundation-first)**。**§7: Lemma 7.1 (推移性 keystone) ✅ + Prop 1.16 ✅ — 現フロンティア = §7 Thm 7.2/7.3/7.4/7.6 + Prop 7.5 の proof 充填**。〔監査 2026-06-03 で旧「現フロンティア §4 / §5–§16 未着手」を更新〕 |
-| 2b | **Peterfalvi** 主章 + 補章 の Lean 化 | 🔄 §1–§9 着手 (BG と並行、2026-05-31 worktree を main へ merge)。指標理論インフラ (Clifford/ZIrr/InflationCharacter/Dade isometry) 配線済。**残 sorry 2 件** = §8 coherence (6.8 Sibley `sibleySetup_is_coherent`) + §9 (7.10 `card_G0_lower_bound`) |
-| 3 | 最終矛盾の結合 (BG App.C ≅ Peterfalvi の対応物) | ⏳ |
-| 4 | `FeitThompson` メイン定理ステートメント & 完全結合 | ⏳ |
+| 2a | **BG** Ch.I–IV + 補助 Appendices の Lean 化 | 🔄 **§1–§13 spine が実質完成** (sorry-free・axiom-clean): §1–§5 + §6 Thm 6.2 + §7–§9 Uniqueness + §10 Thm 10.1 + §11 全結果 + §12 大半 + §13 endgame + §3 Thm 3.4/3.5/3.6 (任意体) + App.A/App.B/App.C。forward axiom **0 本**。**現フロンティア = §14–§16** (Thm 15.2 ✅ / Lemma 14.11 phase 1 / Prop 16.1 type classification / Theorem A–I)。〔2026-06-22 更新; 旧「現フロンティア §7」は **stale**〕 |
+| 2b | **Peterfalvi** 主章 + 補章 の Lean 化 | 🔄 **§3–§9 指標論コア完成** (Clifford/ZIrr/InflationCharacter/Dade isometry/coherence): **(6.8) Sibley `sibleySetup_is_coherent` ✅ sorry-free** (2026-06-20)。**現フロンティア = §10–§16 spine** (char grid / type 分類 / 非存在; BG §14–16 出力に gate)。(7.10) `card_G0_lower_bound` は FT 経路外で open (`not_trivial_G0_of_lowerBoundTerm` で bypass)。〔2026-06-22 更新; 旧「残 sorry 2 件」は **stale**〕 |
+| 3 | 最終矛盾の結合 (BG App.C ≅ Peterfalvi の対応物) | ✅ **App.C 完全形式化 (2026-06-06, carrier-conditional)** — `theoremC` / `final_contradiction` sorry-free。残 carrier producer = `field_normalizer_structure` (= POLE-2, Pf §14.2) |
+| 4 | `FeitThompson` メイン定理ステートメント & 完全結合 | 🔄 `feitThompson` 配線済 (還元 `feitThompson_of_noMinimalSimpleOdd` sorry-free)。FT 層の実 obligation = **2 POLE** = `sectionSixteenHypothesis_of_isMinimalSimpleOdd` (POLE-1) + `field_normalizer_structure` (POLE-2)。FT 経路 scaffold sorry = **131** (`bin/count-sorry`, 2026-06-22) |
 
 Phase 2a と 2b は Phase 1 が概ね終わった後、独立に並行進行可。
 
@@ -302,6 +302,13 @@ end -- 1B
     - **進捗の測り方を成文化** (CLAUDE.md「進捗の測り方」節新設): 目的 = honest な FT 証明の積み上げ。`sorry` 数は進捗指標でない (両方向で誤る)。doneness は carrier・仮説の構成可能性で判定。"FT-orphaned"・"閉じても sorry 減らない" の言い回しは使わない。
     - 実 `sorry` = **137** (`bin/count-sorry`、transitive scaffold 数; AxiomsCheck-guard 島の「2 個」= issue 0046/0044 とは別指標)。build green **3869 jobs** / `axiom` 宣言 0 / origin push 済。
 
+- **2026-06-22** **(レーン統合 tick — 4 レーン B/F/H/C を main へ合流)** 06-20→06-22 の 2 日間で 4 レーンが並行前進、全量 main 合流 (clean working tree, `git log main..<lane>` 空)。build green **3881 jobs** / AxiomsCheck OK (forward axiom 3 本のみ allowlist) / 新 `axiom` 0。**FT 経路 scaffold sorry = 131** (`bin/count-sorry`; 06-20 の 137 から純減)。正本は memory `ft-endgame-two-poles`/`ft-master-roadmap` + [`notes/meta/merge_monitor.md`](notes/meta/merge_monitor.md) (4 レーン体制 = F:BG §14-16 構造 / B:Pf §10/§12/§13 Dade char / H:Pf §11 Wielandt §9 + §14-15 / C:Pf §16 endpoint + POLE-2)。本 tick の主着地:
+    - **lane-f (BG §14-16)**: Thm 15.7(c) type-F を faithful `M'≤F(M)` に修正 (MathComp 交差検証で印刷版 `M'=F(M)` を overstatement と確定) / BG Thm 15.2 完全 close / Theorem C 9-12 conjunct + TypePData 矛盾修正 (issue 7008) / **BG Lemma 14.11 phase 1** (Q⊄F(E) ⟹ q∈τ₁(M) ∧ C_{M_σ}(Q)=1)。
+    - **lane-b (Pf §10/§12/§13)**: (10.5) ζ^τ₁ vanishes on V (a=0 計算完遂, axiom-clean) / issue 1007 grid hoist DONE (S06→S05_GridTrichotomy) → endgame de-risked。
+    - **lane-h (Pf §11/§14-15)**: **(9.1) Wielandt `wielandt_fixedPoint_frobenius` 完全 unconditional** (issue 2014 closed) → (9.3)/(9.4) driving; (9.4) seed `exists_chiefFactor_seed` (群論的内容 complete) / Huppert V.8.18 b)。
+    - **lane-c (Pf §16)**: 基盤 char-infra ((14.11.2) arithmetic + (3.9)/(14.11.3) parity cores) へピボット (§16 全 sorry が上流 gate と確認後)。
+    - 旧「現フロンティア §7」「残 sorry 2 件 = (6.8)+(7.10)」(Phase 表) を本 tick で **stale 解消**。
+
 ## Phase 1 内の章間依存 (Isaacs)
 
 Isaacs FGT 本文中で `Theorem|Lemma|Corollary|Proposition N.M` 形式の章間参照を `references/isaacs/finite-group-theory.mmd` から集計した実依存:
@@ -347,6 +354,13 @@ awk -v s=START -v e=END 'NR>=s && NR<e' "$mmd" \
 ```
 
 ## チャプター進捗チェックリスト
+
+> ⚠ **このチェックリストは「節ごとの初期調査メモ + 実装見積り index」であり live な進捗トラッカではない。**
+> 各 `[ ]` は「節を一次調査した」時点のスナップショットで、その後の部分形式化 (§1–§13 spine の sorry-free
+> 化、§14–§16・Pf §10–§16 の進行) は反映していない。**節ごとの live 状況の正本は**: memory
+> `ft-master-roadmap` / `ft-endgame-two-poles` + [`notes/meta/merge_monitor.md`](notes/meta/merge_monitor.md)
+> (レーン体制 + 最新合流) + [`notes/meta/ft_master_roadmap_2026_05_29.md`](notes/meta/ft_master_roadmap_2026_05_29.md)
+> 冒頭の現状ヘッダ。チェックボックスは敢えて触らず、調査メモ link 集として温存する。
 
 ### Phase 1 — Isaacs
 
