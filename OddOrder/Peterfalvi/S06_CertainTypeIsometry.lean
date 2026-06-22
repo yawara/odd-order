@@ -449,50 +449,13 @@ theorem sigmaNC_dade_le_two (h : Hypothesis46 A L)
           = ((h.columnFamily χ₂').mu i : ClassFunction ↥L ℂ) 1) :
     (ticVdiff h).sigmaNC rfl (ticVdiffFullDadeApplication h)
         (h.tau.toDadeMap (certainTypeDiffSupported h hχ₂ hχ₂' i hdeg)) ≤ 2 := by
-  classical
-  haveI : Finite G := Finite.of_fintype G
-  haveI : Fintype ((ticVdiff h).W1.subgroupOf (ticVdiff h).W →* ℂˣ) := Fintype.ofFinite _
-  haveI : Fintype ((ticVdiff h).W2.subgroupOf (ticVdiff h).W →* ℂˣ) := Fintype.ofFinite _
-  haveI hfprod : Fintype (((ticVdiff h).W1.subgroupOf (ticVdiff h).W →* ℂˣ) ×
-    ((ticVdiff h).W2.subgroupOf (ticVdiff h).W →* ℂˣ)) := inferInstance
-  haveI : Finite (((ticVdiff h).W1.subgroupOf (ticVdiff h).W →* ℂˣ) ×
-    ((ticVdiff h).W2.subgroupOf (ticVdiff h).W →* ℂˣ)) := Finite.of_fintype _
   set φ := h.tau.toDadeMap (certainTypeDiffSupported h hχ₂ hχ₂' i hdeg) with hφdef
   have hφZ : φ ∈ ZIrr G := h.tau.maps_virtualCharacter _
     ((ZIrr (↥L)).sub_mem ((h.columnFamily χ₂).mu i).mem_ZIrr
       ((h.columnFamily χ₂').mu i).mem_ZIrr)
   have hφ2 : ClassFunction.inner φ φ = 2 := certainType_diff_dade_inner_self h hχ hχ₂ hχ₂' i hdeg
-  obtain ⟨c, hsupp, hrepr, hsq⟩ := mem_ZIrr_inner_self_eq_sum_sq hφZ
-  have hsum : ∑ a ∈ c.support, c a ^ 2 = 2 := by exact_mod_cast hsq.symm.trans hφ2
-  obtain ⟨α, β, hαβ, hs, -, -⟩ := exists_pair_of_sum_sq_eq_two
-    (fun a ha => Finsupp.mem_support_iff.mp ha) hsum
-  have hαm : α ∈ irreducibleCharacters G := hsupp (by rw [hs]; simp)
-  have hβm : β ∈ irreducibleCharacters G := hsupp (by rw [hs]; simp)
-  have hαZ : α ∈ ZIrr G := IrreducibleCharacter.mem_ZIrr (⟨α, hαm⟩ : IrreducibleCharacter G)
-  have hβZ : β ∈ ZIrr G := IrreducibleCharacter.mem_ZIrr (⟨β, hβm⟩ : IrreducibleCharacter G)
-  have hα1 : ClassFunction.inner α α = 1 := by
-    have := irreducibleCharacter_inner_eq_ite (⟨α, hαm⟩ : IrreducibleCharacter G) ⟨α, hαm⟩
-    rwa [if_pos rfl] at this
-  have hβ1 : ClassFunction.inner β β = 1 := by
-    have := irreducibleCharacter_inner_eq_ite (⟨β, hβm⟩ : IrreducibleCharacter G) ⟨β, hβm⟩
-    rwa [if_pos rfl] at this
-  have hφαβ : φ = (c α : ℂ) • α + (c β : ℂ) • β := by
-    rw [hrepr, hs, Finset.sum_pair hαβ]
   rw [OddOrder.Peterfalvi.S05.TICyclicHypothesis.sigmaNC]
-  refine le_trans (Set.ncard_le_ncard (t :=
-    {pq | ClassFunction.inner α ((ticVdiff h).chiFam rfl (ticVdiffFullDadeApplication h) pq) ≠ 0} ∪
-    {pq | ClassFunction.inner β ((ticVdiff h).chiFam rfl (ticVdiffFullDadeApplication h) pq) ≠ 0})
-    ?_ (Set.finite_univ.subset (Set.subset_univ _))) (le_trans (Set.ncard_union_le _ _) ?_)
-  · intro pq hpq
-    simp only [OddOrder.Peterfalvi.S05.TICyclicHypothesis.sigmaCoeff, Set.mem_setOf_eq] at hpq
-    rw [Set.mem_union, Set.mem_setOf_eq, Set.mem_setOf_eq]
-    by_contra hcon
-    push_neg at hcon
-    exact hpq (by rw [hφαβ, ClassFunction.inner_add_left, ClassFunction.inner_smul_left,
-      ClassFunction.inner_smul_left, hcon.1, hcon.2, mul_zero, mul_zero, add_zero])
-  · exact add_le_add
-      ((ticVdiff h).ncard_inner_chiFam_ne_zero_le_one rfl (ticVdiffFullDadeApplication h) hαZ hα1)
-      ((ticVdiff h).ncard_inner_chiFam_ne_zero_le_one rfl (ticVdiffFullDadeApplication h) hβZ hβ1)
+  exact (ticVdiff h).ncard_sigmaCoeff_ne_zero_le_two rfl (ticVdiffFullDadeApplication h) hφZ hφ2
 
 /-- **Peterfalvi (4.8), step (7) input** (the `σ`-coefficients of `φ` lie in `{0, ±1}`).  Writing
 `φ = ε_α·α + ε_β·β` (norm-2 ⟹ two constituents) and `χ_{pq} = ε·ν` (norm-1 classifier), the
@@ -515,48 +478,13 @@ theorem sigmaCoeff_dade_eq_zero_or_one (h : Hypothesis46 A L)
         (h.tau.toDadeMap (certainTypeDiffSupported h hχ₂ hχ₂' i hdeg)) pq = 1 ∨
       (ticVdiff h).sigmaCoeff rfl (ticVdiffFullDadeApplication h)
         (h.tau.toDadeMap (certainTypeDiffSupported h hχ₂ hχ₂' i hdeg)) pq = -1 := by
-  classical
-  haveI : Finite G := Finite.of_fintype G
   set φ := h.tau.toDadeMap (certainTypeDiffSupported h hχ₂ hχ₂' i hdeg) with hφdef
   have hφZ : φ ∈ ZIrr G := h.tau.maps_virtualCharacter _
     ((ZIrr (↥L)).sub_mem ((h.columnFamily χ₂).mu i).mem_ZIrr
       ((h.columnFamily χ₂').mu i).mem_ZIrr)
   have hφ2 : ClassFunction.inner φ φ = 2 := certainType_diff_dade_inner_self h hχ hχ₂ hχ₂' i hdeg
-  obtain ⟨c, hsupp, hrepr, hsq⟩ := mem_ZIrr_inner_self_eq_sum_sq hφZ
-  have hsum : ∑ a ∈ c.support, c a ^ 2 = 2 := by exact_mod_cast hsq.symm.trans hφ2
-  obtain ⟨α, β, hαβ, hs, hcα, hcβ⟩ := exists_pair_of_sum_sq_eq_two
-    (fun a ha => Finsupp.mem_support_iff.mp ha) hsum
-  have hαm : α ∈ irreducibleCharacters G := hsupp (by rw [hs]; simp)
-  have hβm : β ∈ irreducibleCharacters G := hsupp (by rw [hs]; simp)
-  obtain ⟨ε, ν, hε, hν⟩ := exists_zsmul_irreducibleCharacter_of_inner_self_one
-    (((ticVdiff h).chiFam_spec rfl (ticVdiffFullDadeApplication h)).2.1 pq)
-    (by rw [((ticVdiff h).chiFam_spec rfl (ticVdiffFullDadeApplication h)).2.2.1, if_pos rfl])
-  -- the two irreducible inner products (type ascription absorbs the `CF ↔ IrreducibleCharacter` coe)
-  have hαν : ClassFunction.inner α (ν : ClassFunction G ℂ)
-      = if (⟨α, hαm⟩ : IrreducibleCharacter G) = ν then 1 else 0 :=
-    irreducibleCharacter_inner_eq_ite (⟨α, hαm⟩ : IrreducibleCharacter G) ν
-  have hβν : ClassFunction.inner β (ν : ClassFunction G ℂ)
-      = if (⟨β, hβm⟩ : IrreducibleCharacter G) = ν then 1 else 0 :=
-    irreducibleCharacter_inner_eq_ite (⟨β, hβm⟩ : IrreducibleCharacter G) ν
-  have hf : (ticVdiff h).sigmaCoeff rfl (ticVdiffFullDadeApplication h) φ pq
-      = (c α : ℂ) * ((ε : ℂ) * (if (⟨α, hαm⟩ : IrreducibleCharacter G) = ν then 1 else 0))
-        + (c β : ℂ) * ((ε : ℂ) * (if (⟨β, hβm⟩ : IrreducibleCharacter G) = ν then 1 else 0)) := by
-    rw [OddOrder.Peterfalvi.S05.TICyclicHypothesis.sigmaCoeff, hrepr, hs, Finset.sum_pair hαβ, hν,
-      ← Int.cast_smul_eq_zsmul ℂ ε, ClassFunction.inner_add_left, ClassFunction.inner_smul_left,
-      ClassFunction.inner_smul_left, OddOrder.RepresentationTheory.inner_smul_right,
-      OddOrder.RepresentationTheory.inner_smul_right, star_intCast, hαν, hβν]
-  rw [hf]
-  by_cases hαe : (⟨α, hαm⟩ : IrreducibleCharacter G) = ν
-  · by_cases hβe : (⟨β, hβm⟩ : IrreducibleCharacter G) = ν
-    · exact absurd (Subtype.ext_iff.mp (hαe.trans hβe.symm)) hαβ
-    · rw [if_pos hαe, if_neg hβe]
-      simp only [mul_one, mul_zero, add_zero]
-      rcases hcα with hcα | hcα <;> rcases hε with hε | hε <;> rw [hcα, hε] <;> norm_num
-  · by_cases hβe : (⟨β, hβm⟩ : IrreducibleCharacter G) = ν
-    · rw [if_neg hαe, if_pos hβe]
-      simp only [mul_one, mul_zero, add_zero, zero_add]
-      rcases hcβ with hcβ | hcβ <;> rcases hε with hε | hε <;> rw [hcβ, hε] <;> norm_num
-    · rw [if_neg hαe, if_neg hβe]; left; ring
+  exact (ticVdiff h).sigmaCoeff_eq_zero_or_one_of_inner_self_two rfl
+    (ticVdiffFullDadeApplication h) hφZ hφ2 pq
 
 open scoped Classical in
 /-- The `σ`-coefficient grid of `ψ = φ − δ_j·(ω_{ij}^σ − ω_{ik}^σ)`.  As `ω_{ij}^σ = χ_{P_{ij}}`
