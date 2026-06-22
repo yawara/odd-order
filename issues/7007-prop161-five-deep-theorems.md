@@ -90,6 +90,24 @@ bottom-out** するので、clean 化には §15 foundation が先。真の順�
 
 ## 進捗ログ
 
+**2026-06-23 ✅✅✅ BG Cor 14.12 (`typeP2_neighbor_is_typeF`) 完全完成 — sorry-free + axiom-clean** (commits `65194ead` conjunct 4 + shared infra / `05b8f119` conjunct 3、AxiomsCheck 登録、full build 3881 green、FT-path sorry 126→125):
+
+cont.¹¹ の残 conjunct 3/4 を 2 commit で close。**Cor 14.12 全 4 conjunct (+H membership) 証明完了、`#print axioms` = `[propext, Classical.choice, Quot.sound]`** (上流 typeP_structure/typeP_duality/Lemma 14.11 等が全 sorry-free ゆえ sorryAx 漏れ無し)。
+
+- **shared σ-decomposition infra** (conjunct 2 を `refine` 前に `hUMsH` として hoist; conjuncts 3/4 が `U ⊆ F(H)` を共有するため):
+  - **`hHsFH : M_σ(H) ⊆ F(H)`** (Coq `sHsFH`): `H` type-`F` ⟹ `q ∉ κ(H) = ∅` (free!) ⟹ `msigma_structure_of_notMem_sigma_kappa` (Lemma 14.1, 既存 S14:1184) + 最大階数 elem abelian witness で `M_σ(H)` nilpotent → `nilpotent_normal_le_fitting`。**⚠ issue が flag した「`q∈τ₂(H)` gate」は不要だった** (type-F なら κ(H)=∅ で Lemma 14.1 の `q∉κ` が自明、Coq `notP1type_Msigma_nil` 経路)。
+  - **`Fu := O_{(κ(M)∪σ(M))'}(F(H))`** + `U ≤ Fu` (`oPiCore_isHall_of_isNilpotent` + `isPiGroup_le_of_normal_isHallSubgroup`) + `Fu ◁ H` + **`defU : M ⊓ Fu = U`** (Hall 極大性、cardinality)。
+  - 新 reusable helper `eq_of_isNilpotent_normalizer_inf_le` (`sylow_coe_eq_of_normalizer_inf_le` の一般化、`P` が Sylow でなく `N` nilpotent だけ要)。
+- **conjunct 4 (`N_H(U) ⊄ M`)** (`65194ead`): `N_H(U) ≤ M` 仮定 → `N_Fu(U) ≤ M ⊓ Fu = U` → nilpotent `Fu` の normalizer condition で `Fu = U` → `H ≤ N(Fu) = N(U)` → `H ≤ M` → `H = M` (both maximal) vs `H ≁ M`。
+- **conjunct 3 (`M ⊓ H = U ⊔ K`)** (`05b8f119`): `⊇` 自明; `⊆` = `M ⊓ H ⊆ N_M(U) = U ⊔ K`。3 piece:
+  - **σ-decomp `M = M_σ ⊔ (U⊔K)`**: σ-Hall `M_σ`/κ-Hall `K`/(κ∪σ)'-Hall `U` が全素数を被覆 ⟹ `[M:join]` に素因子無し (各 `p` は担当 Hall の index 条件で排除) ⟹ index 1。
+  - **`C_{M_σ}(U) = ⊥`** (Lemma 14.1): `R` (Sylow `r` of `U`, `r∈(κ∪σ)'`) は Sylow `r` of `M` (`pRank ↥R r = pRank ↥M r` via `pRank_sylow_eq`) ⟹ 最大階数 `A ≤ R ≤ U` で `M_σ ⊓ C(A)=⊥` → `C(U)` に lift。
+  - **`defNMU : N_M(U) = U⊔K`** = BG 6.5(b) (`normalizer_eq_centralizerK_mul_normalizerU`) in `↥M`: `N(U) = (C(U)⊓M_σ)·(N(U)⊓(U⊔K))`、第1因子 `C_{M_σ}(U)=1` ⟹ `N_M(U) ≤ U⊔K`。geometric `M⊓H ⊆ N_M(U)` は `le_normalizer_inf` (`U=M⊓Fu`, `Fu◁H`)。
+
+**▶ 次 frontier = Cor 14.12 を cite する下流**: BG Thm C (`theoremC_paired_structure` S16:620) の conjunct (= Thm C(1) の `N_G(U)⊄M`/`U abelian` payload、hIIP2/hIF 系) + Prop 16.1 `hP2II`。Cor 14.12 が available になったので、issue 冒頭の「5 deep theorems」のうち Thm C / Thm A 側で Cor 14.12 を消費する conjunct を配線できる。残 §15 foundation (Lemma 15.1 `typeP_auxiliary_structure_gated`) も依然上流。
+
+---
+
 **2026-06-22 (cont.¹¹) ✅ A(4)/A(5) を S16→S14 relocate + BG `defUK` (`typeP2_kappaHall_commutator_eq_self`) landed — Cor 14.12 conjunct 2/3/4 の lower-half 着手** (commits `1edf774a` relocate / `730a7049` defUK、full build 3881 green、sorry 数不変 = scaffold 追加):
 
 lane-f RESUME。Cor 14.12 残 = conjunct 2/3/4 (σ-decomposition of `H`) で `S14:9518/9521/9524` の 3 sorry。Coq `P2type_signalizer` (BGsection14.v **L2243-2407**) を完全精読し proof map 確定 + lower-half の核を landed:
