@@ -9352,6 +9352,25 @@ theorem isTypeP2_conj_smul [Finite G] (g : G) (M : Subgroup G) :
   unfold IsTypeP2
   rw [kappa_conj_smul, sigmaComplementPrimes_conj_smul, isTypeP_conj_smul]
 
+/-- In a finite nilpotent subgroup `N`, a subgroup `P ≤ N` that is self-normalizing in `N`
+(`N_G(P) ⊓ N ≤ P`) must be all of `N` — the normalizer condition: proper subgroups of a
+nilpotent group grow under normalization.  Generalizes `sylow_coe_eq_of_normalizer_inf_le`
+(`P` need not be Sylow, only `N` nilpotent). -/
+private theorem eq_of_isNilpotent_normalizer_inf_le [Finite G] {N P : Subgroup G}
+    (hN : Group.IsNilpotent ↥N) (hPN : P ≤ N)
+    (hle : Subgroup.normalizer (P : Set G) ⊓ N ≤ P) : N = P := by
+  haveI : Group.IsNilpotent ↥N := hN
+  have hnc : NormalizerCondition ↥N := normalizerCondition_of_isNilpotent
+  have hself : Subgroup.normalizer (P.subgroupOf N) = P.subgroupOf N := by
+    rw [← Subgroup.subgroupOf_normalizer_eq hPN]
+    refine le_antisymm (fun x hx => ?_) (fun x hx => ?_) <;>
+      rw [Subgroup.mem_subgroupOf] at hx ⊢
+    · exact hle ⟨hx, x.2⟩
+    · exact P.le_normalizer hx
+  have htop : P.subgroupOf N = ⊤ :=
+    (normalizerCondition_iff_only_full_group_self_normalizing.mp hnc) _ hself
+  exact le_antisymm (Subgroup.subgroupOf_eq_top.mp htop) hPN
+
 /-- **BG Corollary 14.12** (mmd L4035): for `M ∈ 𝓜_{P₂}` with `K`, `M*`, `K*` as in
 Theorem 14.7 and `U` as in Proposition 14.2(a), `r ∈ π(U)`, `R` the Sylow `r`-subgroup of the
 abelian `U`, and `H ∈ 𝓜(N_G(R))`: then `H ∈ 𝓜_F`, `U ⊆ H_σ`, `M ∩ H = U K`, `N_H(U) ⊄ M`,
@@ -9655,9 +9674,9 @@ theorem typeP2_neighbor_is_typeF [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd
       · exact not_isTypeP1_and_isTypeP2 ⟨hb ▸ (isTypeP1_conj_smul b Mstar').mpr hP1', hP2⟩
       · refine kappa_subset_sigmaCompl (M := Mst) ?_ hqσMst
         rw [← hb, kappa_conj_smul]; exact hqκ'
-  refine ⟨H, hHmem, hFmaxH, ?_, ?_, ?_⟩
-  · -- Conjunct 2 (`U ≤ M_σ(H)`, Coq `sUHs`): `U = ⁅U,K⁆ ≤ HsDq := M_σ(H) ⊔ O_q(F(E))`, and
-    -- `M_σ(H)` is the normal `{q}'`-Hall of `HsDq` while `U` is a `{q}'`-group.
+  -- ═══ Conjunct 2 (`U ≤ M_σ(H)`, Coq `sUHs`), hoisted: also feeds `U ⊆ F(H)` for conjuncts 3/4 ═══
+  -- `U = ⁅U,K⁆ ≤ HsDq := M_σ(H) ⊔ O_q(F(E))`, and `M_σ(H)` is the normal `{q}'`-Hall of `HsDq`.
+  have hUMsH : U ≤ OddOrder.BG.Ch3.S10.Msigma H := by
     classical
     -- `q ∈ κ(M)`, `q ∉ σ(H)`, and `|U|` is a `{q}'`-number.
     have hqκM : q ∈ kappa M := hK.1 q (by
@@ -9736,12 +9755,117 @@ theorem typeP2_neighbor_is_typeF [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd
     have hmapped := Subgroup.map_mono (f := HsDq.subtype) hfinal
     rwa [Subgroup.map_subgroupOf_eq_of_le hUHsDq, Subgroup.map_subgroupOf_eq_of_le
       (le_sup_left : OddOrder.BG.Ch3.S10.Msigma H ≤ HsDq)] at hmapped
+  -- ═══ Shared structure for conjuncts 3/4: `H_σ ⊆ F(H)` and `Fu = O_{(κ∪σ)'(M)}(F(H))` ═══
+  -- `q ∉ σ(H)` (`K` is a `σ(H)'`-group, `q ∣ |K|`) and `q ∈ π(H)` (`K ≤ H`, `|K| = q`).
+  have hqσ'H : q ∉ OddOrder.BG.Ch3.S10.sigma H :=
+    hsH_K q (by rw [hKcard]; exact Nat.mem_primeFactors.mpr ⟨hqprime, dvd_rfl, hqprime.pos.ne'⟩)
+  have hqπH : q ∈ piSet H :=
+    Nat.mem_primeFactors.mpr ⟨hqprime, hKcard ▸ Subgroup.card_dvd_of_le hKH, Nat.card_pos.ne'⟩
+  -- `H_σ ⊆ F(H)` (Coq `sHsFH`): `H` is type-`F`, so `q ∉ κ(H) = ∅`; Lemma 14.1
+  -- (`msigma_structure_of_notMem_sigma_kappa`) with a maximal-rank elementary abelian `q`-subgroup
+  -- of `H` makes `M_σ(H)` nilpotent, hence `≤ F(H)`.
+  have hHsFH : OddOrder.BG.Ch3.S10.Msigma H ≤ OddOrder.BG.Ch2.S08.fittingInG H := by
+    have hκH : kappa H = ∅ := hFmaxH
+    have hqκH : q ∉ kappa H := by rw [hκH]; exact Set.notMem_empty q
+    obtain ⟨B, hBea, hBlog⟩ := exists_isElementaryAbelian_log_card_ge_of_pos_le_pRank
+      (G := ↥H) (p := q) (n := pRank ↥H q)
+      (OddOrder.BG.Ch3.S12.one_le_pRank_of_mem_primeFactors hqπH) (le_refl _)
+    obtain ⟨j, hj⟩ := hBea.isPGroup.exists_card_eq
+    have hjeq : j = pRank ↥H q := by
+      have hsq := le_antisymm (le_pRank B hBea) hBlog
+      rwa [hj, Nat.log_pow hqprime.one_lt] at hsq
+    have hAmem : B.map H.subtype ∈ elemAbelianOfRank G q (pRank ↥H q) :=
+      ⟨Subgroup.IsElementaryAbelian.map H.subtype_injective hBea, by
+        rw [Subgroup.card_map_of_injective H.subtype_injective, hj, hjeq]⟩
+    have hAH : B.map H.subtype ≤ H := Subgroup.map_subtype_le _
+    haveI h1 : ((OddOrder.BG.Ch3.S10.Msigma H).subgroupOf H).Normal := by
+      rw [OddOrder.BG.Ch3.S10.Msigma_subgroupOf]; infer_instance
+    haveI h2 : Group.IsNilpotent ↥(OddOrder.BG.Ch3.S10.Msigma H) :=
+      (msigma_structure_of_notMem_sigma_kappa hG hHmax hqπH hqσ'H hqκH hAmem hAH).2.2
+    haveI h3 : Group.IsNilpotent ↥((OddOrder.BG.Ch3.S10.Msigma H).subgroupOf H) :=
+      nilpotent_of_mulEquiv (Subgroup.subgroupOfEquivOfLe (OddOrder.BG.Ch3.S10.Msigma_le H)).symm
+    have h4 : (OddOrder.BG.Ch3.S10.Msigma H).subgroupOf H ≤ OddOrder.Isaacs.Ch01.fitting ↥H :=
+      OddOrder.Isaacs.Ch01.nilpotent_normal_le_fitting
+    calc OddOrder.BG.Ch3.S10.Msigma H
+        = ((OddOrder.BG.Ch3.S10.Msigma H).subgroupOf H).map H.subtype :=
+          (Subgroup.map_subgroupOf_eq_of_le (OddOrder.BG.Ch3.S10.Msigma_le H)).symm
+      _ ≤ (OddOrder.Isaacs.Ch01.fitting ↥H).map H.subtype := Subgroup.map_mono h4
+      _ = OddOrder.BG.Ch2.S08.fittingInG H := rfl
+  -- `Fu := O_{(κ(M)∪σ(M))'}(F(H))`: normal in `H`, contains `U`, and `M ⊓ Fu = U` (Coq `defU`).
+  set π : Set ℕ := (kappa M ∪ OddOrder.BG.Ch3.S10.sigma M)ᶜ with hπdef
+  set Fu : Subgroup G := opiCoreInG π (OddOrder.BG.Ch2.S08.fittingInG H) with hFudef
+  haveI hFHnil : Group.IsNilpotent ↥(OddOrder.BG.Ch2.S08.fittingInG H) :=
+    OddOrder.BG.Ch2.S08.fittingInG_isNilpotent H
+  have hUFH : U ≤ OddOrder.BG.Ch2.S08.fittingInG H := hUMsH.trans hHsFH
+  have hUπ : Ch03.Subgroup.IsPiGroup π U := by
+    intro p hp
+    exact hU.1 p (by rwa [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hUM).toEquiv])
+  have hUFu : U ≤ Fu := by
+    have hUFHpi : Ch03.Subgroup.IsPiGroup π (U.subgroupOf (OddOrder.BG.Ch2.S08.fittingInG H)) :=
+      Ch03.Subgroup.IsPiGroup.subgroupOf hUFH hUπ
+    have hHall : Ch03.IsHallSubgroup π
+        (Ch03.oPiCore π ↥(OddOrder.BG.Ch2.S08.fittingInG H)) :=
+      OddOrder.BG.Ch3.S10.oPiCore_isHall_of_isNilpotent _
+    have hle : U.subgroupOf (OddOrder.BG.Ch2.S08.fittingInG H) ≤
+        Ch03.oPiCore π ↥(OddOrder.BG.Ch2.S08.fittingInG H) :=
+      OddOrder.BG.Ch3.S10.isPiGroup_le_of_normal_isHallSubgroup hHall hUFHpi
+    calc U = (U.subgroupOf (OddOrder.BG.Ch2.S08.fittingInG H)).map
+              (OddOrder.BG.Ch2.S08.fittingInG H).subtype :=
+            (Subgroup.map_subgroupOf_eq_of_le hUFH).symm
+      _ ≤ (Ch03.oPiCore π ↥(OddOrder.BG.Ch2.S08.fittingInG H)).map
+              (OddOrder.BG.Ch2.S08.fittingInG H).subtype := Subgroup.map_mono hle
+      _ = Fu := rfl
+  have hFuH : Fu ≤ H :=
+    (opiCoreInG_le _ _).trans (OddOrder.BG.Ch2.S08.fittingInG_le H)
+  have hHnFu : H ≤ Subgroup.normalizer (Fu : Set G) := by
+    rw [← Subgroup.normal_subgroupOf_iff_le_normalizer hFuH]
+    exact OddOrder.BG.Ch2.S08.opiCoreInG_fittingInG_subgroupOf_normal π H
+  have hdefU : M ⊓ Fu = U := by
+    refine le_antisymm ?_ (le_inf hUM hUFu)
+    -- `V := M ⊓ Fu` is a `π`-subgroup of `M` containing the `π`-Hall `U`, so `V = U` (cardinality).
+    have hVπ : ∀ p ∈ (Nat.card ↥(M ⊓ Fu)).primeFactors, p ∈ π := by
+      intro p hp
+      exact (isPiSubgroup_opiCoreInG _ (OddOrder.BG.Ch2.S08.fittingInG H)) p
+        (Nat.primeFactors_mono (Subgroup.card_dvd_of_le inf_le_right) Nat.card_pos.ne' hp)
+    have hlag : Nat.card ↥U * (U.subgroupOf M).index = Nat.card ↥M := by
+      rw [← Nat.card_congr (Subgroup.subgroupOfEquivOfLe hUM).toEquiv]
+      exact Subgroup.card_mul_index _
+    have hcop : Nat.Coprime (Nat.card ↥(M ⊓ Fu)) (U.subgroupOf M).index := by
+      rw [Nat.coprime_iff_gcd_eq_one]
+      by_contra hne
+      obtain ⟨p, hp, hpd⟩ := Nat.exists_prime_and_dvd hne
+      rw [Nat.dvd_gcd_iff] at hpd
+      exact (hU.2 p (Nat.mem_primeFactors.mpr ⟨hp, hpd.2, Subgroup.index_ne_zero_of_finite⟩))
+        (hVπ p (Nat.mem_primeFactors.mpr ⟨hp, hpd.1, Nat.card_pos.ne'⟩))
+    have hVdvdU : Nat.card ↥(M ⊓ Fu) ∣ Nat.card ↥U :=
+      hcop.dvd_of_dvd_mul_right (hlag ▸ Subgroup.card_dvd_of_le inf_le_left)
+    exact (Subgroup.eq_of_le_of_card_ge (le_inf hUM hUFu)
+      (Nat.le_of_dvd Nat.card_pos hVdvdU)).symm.le
+  refine ⟨H, hHmem, hFmaxH, hUMsH, ?_, ?_⟩
   · -- Conjunct 3 (`M ⊓ H = U ⊔ K`): `H ∩ M* = D`, `M ∩ Fu = U` with `Fu = O_{(σ∪κ)'}(F(H))`.
     -- Residual.
     sorry
-  · -- Conjunct 4 (`N_H(U) ⊄ M`): if `N_H(U) ≤ M` then `H ≤ N_G(U) ≤ M` so `H = M`, contradicting
-    -- `H` not conjugate to `M`.  Residual (needs `defNMU`, `sHsFH`, `H ∩ M* = D`).
-    sorry
+  · -- Conjunct 4 (`N_H(U) ⊄ M`): suppose `N_H(U) = H ⊓ N_G(U) ≤ M`.  Then `N_Fu(U) = N_G(U) ⊓ Fu`
+    -- lies in `M ⊓ Fu = U`, so `U` is self-normalizing in the nilpotent `Fu`, forcing `Fu = U`.
+    -- Hence `H ≤ N_G(Fu) = N_G(U)`, so `H = H ⊓ N_G(U) ≤ M`, whence `H = M` (both maximal),
+    -- contradicting `H` not conjugate to `M`.
+    intro hNHU_M
+    have hNFuU : Subgroup.normalizer (U : Set G) ⊓ Fu ≤ U := by
+      have h1 : Subgroup.normalizer (U : Set G) ⊓ Fu ≤ M :=
+        le_trans (le_inf (le_trans inf_le_right hFuH) inf_le_left) hNHU_M
+      calc Subgroup.normalizer (U : Set G) ⊓ Fu ≤ M ⊓ Fu := le_inf h1 inf_le_right
+        _ = U := hdefU
+    haveI hFunil : Group.IsNilpotent ↥Fu :=
+      nilpotent_of_mulEquiv (Subgroup.subgroupOfEquivOfLe
+        (opiCoreInG_le π (OddOrder.BG.Ch2.S08.fittingInG H)))
+    have hFuU : Fu = U := eq_of_isNilpotent_normalizer_inf_le hFunil hUFu hNFuU
+    have hHnU : H ≤ Subgroup.normalizer (U : Set G) := hFuU ▸ hHnFu
+    have hHM : H ≤ M := le_trans (le_inf le_rfl hHnU) hNHU_M
+    have hHeqM : H = M := by
+      rcases lt_or_eq_of_le hHM with hlt | heq
+      · exact absurd ((mem_maximalSubgroups.mp hHmax).2 M hlt) (mem_maximalSubgroups.mp hM).1
+      · exact heq
+    exact notMGH (by rw [hHeqM])
 
 /-- **BG Lemma 14.13** (mmd L4059): extension of Theorem 14.4.  In the specified
 multi-maximal sigma-length-one situation, `M` is Frobenius type, `tau_2(M)` is
