@@ -2682,6 +2682,64 @@ theorem Hypothesis.muGridAlpha_inner_muColumn_sub_conj [Finite G]
     OddOrder.RepresentationTheory.inner_smul_right, hαζc, mul_zero, sub_zero]
 
 open scoped FiniteInduce in
+/-- **Peterfalvi (10.6)(a), `(α_{ij}, μ_j − dζ̄) = 1`** (M-side, `0 < j < w₂`): the diagonal
+companion of `muGridAlpha_inner_muColumn_sub_conj`, where `μ_j = ∑_{0≤i'<w₁} μ_{i'j}` is the
+`W₂`-column-`j` sum (the column of `μ_{ij}` itself).  Within column `j` the `μ_{i'j}` are
+orthonormal (`muGrid_inner_self`/`muGrid_inner_within_column`), so `(μ_{ij}, μ_j) = 1`; `μ_{i0}` and
+`ζ` are cross-column resp. degree-distinct from column `j` (`muGrid_inner_cross_column`, `hjζ`), so
+`(δμ_{i0}, μ_j) = (nζ, μ_j) = 0`, giving `(α_{ij}, μ_j) = 1`; and `(α_{ij}, ζ̄) = 0` (degree
+distinctness + `(ζ, ζ̄) = 0`).  Hence `(α_{ij}, μ_j − dζ̄) = 1`.
+
+This is the `M`-side opening `1 = (α_{ij}, μ_j − dζ̄)` of Peterfalvi (10.6)(a), feeding the
+`(δ(ω_{ij}^σ − ω_{i0}^σ), μ_j^{τ₁}) = 1` step (then Peterfalvi (5.8) gives the summed isometry
+`μ_j^{τ₁} = δ∑_i ω_{ij}^σ`). -/
+theorem Hypothesis.muGridAlpha_inner_muColumn_self_sub_conj [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} [Invertible (Nat.card ↥M : ℂ)]
+    (hyp : Hypothesis M) (hodd : Odd (Nat.card G)) (i : Fin hyp.w1) (j : Fin hyp.w2) (hj0 : j ≠ 0)
+    {ζ : ClassFunction ↥M ℂ} (hζirr : IsIrreducibleCharacter ζ) (hζne : ζ.conj ≠ ζ)
+    (hjζ : ∀ i' : Fin hyp.w1, hyp.muGrid hG hodd i' j 1 ≠ ζ 1)
+    (h0ζ : hyp.muGrid hG hodd i 0 1 ≠ ζ 1) {δ : ℤ} {n d : ℕ} :
+    ClassFunction.inner (hyp.muGrid hG hodd i j - (δ : ℂ) • hyp.muGrid hG hodd i 0 - (n : ℂ) • ζ)
+        ((∑ i' : Fin hyp.w1, hyp.muGrid hG hodd i' j) - (d : ℂ) • ζ.conj) = 1 := by
+  haveI := hyp.finiteG
+  classical
+  have hconjirr : IsIrreducibleCharacter ζ.conj := hζirr.conj
+  have hconj1 : ζ.conj 1 = ζ 1 := by
+    obtain ⟨nn, _, hn, _⟩ := hζirr.exists_natDegree_charValue_one_dvd_card
+    simp only [ClassFunction.conj_apply, hn, star_natCast]
+  -- `(α_{ij}, ζ̄) = 0`: `μ_{ij}, μ_{i0}` degree-distinct from `ζ̄`, and `(ζ, ζ̄) = 0`.
+  have hαζc : ClassFunction.inner
+      (hyp.muGrid hG hodd i j - (δ : ℂ) • hyp.muGrid hG hodd i 0 - (n : ℂ) • ζ) ζ.conj = 0 := by
+    have a1 := hyp.muGrid_inner_eq_zero_of_apply_one_ne hG hodd i j hconjirr
+      (by rw [hconj1]; exact hjζ i)
+    have a2 := hyp.muGrid_inner_eq_zero_of_apply_one_ne hG hodd i 0 hconjirr
+      (by rw [hconj1]; exact h0ζ)
+    have a3 : ClassFunction.inner ζ ζ.conj = 0 := by
+      rw [OddOrder.RepresentationTheory.irr_cf_inner hζirr hconjirr, if_neg (Ne.symm hζne)]
+    simp only [ClassFunction.inner_sub_left, ClassFunction.inner_smul_left, a1, a2, a3,
+      mul_zero, sub_zero]
+  -- `(α_{ij}, μ_{i'j}) = δ_{i,i'}`: within-column orthonormal; `μ_{i0}, ζ` off column `j`.
+  have hrow : ∀ i' : Fin hyp.w1,
+      ClassFunction.inner (hyp.muGrid hG hodd i j - (δ : ℂ) • hyp.muGrid hG hodd i 0 - (n : ℂ) • ζ)
+        (hyp.muGrid hG hodd i' j) = (if i = i' then (1 : ℂ) else 0) := by
+    intro i'
+    have h1 : ClassFunction.inner (hyp.muGrid hG hodd i j) (hyp.muGrid hG hodd i' j)
+        = (if i = i' then (1 : ℂ) else 0) := by
+      by_cases hii' : i = i'
+      · rw [if_pos hii', ← hii']; exact hyp.muGrid_inner_self hG hodd i j
+      · rw [if_neg hii']; exact hyp.muGrid_inner_within_column hG hodd j hii'
+    have h2 := hyp.muGrid_inner_cross_column hG hodd i i' (Ne.symm hj0)
+    have h3 : ClassFunction.inner ζ (hyp.muGrid hG hodd i' j) = 0 := by
+      rw [OddOrder.RepresentationTheory.inner_conj_symm (hyp.muGrid hG hodd i' j) ζ,
+        hyp.muGrid_inner_eq_zero_of_apply_one_ne hG hodd i' j hζirr (hjζ i'), star_zero]
+    simp only [ClassFunction.inner_sub_left, ClassFunction.inner_smul_left, h1, h2, h3,
+      mul_zero, sub_zero]
+  rw [ClassFunction.inner_sub_right, OddOrder.RepresentationTheory.inner_smul_right, hαζc,
+    mul_zero, sub_zero, OddOrder.RepresentationTheory.inner_sum_right,
+    Finset.sum_congr rfl (fun i' _ => hrow i')]
+  simp
+
+open scoped FiniteInduce in
 /-- **§10 support of `ζ − ζ̄`** (Peterfalvi (10.5), `a = 0` argument): the difference `ζ − ζ̄` of a
 degree-`w₁` irreducible `ζ ∈ S` and its conjugate is supported in `A_0(M)`.  Both `ζ` and `ζ̄` are
 induced from the normal `M' = [M,M]`, hence vanish off `M'`; and `(ζ − ζ̄)(1) = ζ(1) − ζ̄(1) = 0`
