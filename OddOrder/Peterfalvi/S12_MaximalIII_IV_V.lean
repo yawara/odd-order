@@ -3861,6 +3861,41 @@ theorem Hypothesis.muColumn_tau1_diff_eq [Finite G]
   rw [map_sub] at key
   rw [key, tau_muGrid_columnSum_diff hG coh hmu hos hzS hz1 hzconj hδpm hδj hj0 hk0]
 
+open scoped FiniteInduce in
+/-- **(10.6.a) reduces to a single column**: if the summed isometry `μ_{j₀}^{τ₁} = δ·∑_i ω_{i j₀}^σ`
+holds for **one** nontrivial column `j₀ ≠ 0`, then it holds for **every** nontrivial column `j ≠ 0`.
+
+Immediate from the column-independence `muColumn_tau1_diff_eq`: for any `j ≠ 0`,
+`μ_j^{τ₁} = μ_{j₀}^{τ₁} + (μ_j^{τ₁} − μ_{j₀}^{τ₁}) = δ·∑_i ω_{i j₀}^σ + δ·(∑_i ω_{ij}^σ − ∑_i ω_{i j₀}^σ)
+= δ·∑_i ω_{ij}^σ`.  This isolates the remaining content of the full (10.6)(a) summed isometry to the
+**(5.8) full-column endgame on a single column `j₀`** (which, once the column
+`OrthonormalCharacterImageFamily` is available — HUB issue 1010 — pins that one column). -/
+theorem Hypothesis.muColumn_tau1_eq_of_single_column [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} {hyp : Hypothesis M}
+    {params : CharacterParameters hyp} (coh : CoherentHypothesis hyp params)
+    (hmu : params.mu = hyp.muGrid hG hG.odd)
+    (hos : params.omegaSigma = hyp.alignedOmegaSigmaGrid hG hG.odd)
+    (hzS : params.zeta ∈ inducedFamily M) (hz1 : params.zeta 1 = (hyp.w1 : ℂ))
+    (hzconj : params.zeta.conj ≠ params.zeta)
+    (hδpm : params.delta = 1 ∨ params.delta = -1)
+    (hδj : ∀ j : Fin hyp.w2, j ≠ 0 → hyp.muColumnSign hG hG.odd j = params.delta)
+    (hd1 : ∀ j : Fin hyp.w2, j ≠ 0 → hyp.muGrid hG hG.odd 0 j 1 ≠ 1)
+    {j₀ : Fin hyp.w2} (hj₀0 : j₀ ≠ 0)
+    (hpin : coh.tau1 (∑ i : Fin hyp.w1, hyp.muGrid hG hG.odd i j₀)
+      = (params.delta : ℂ) • ∑ i : Fin hyp.w1, hyp.alignedOmegaSigmaGrid hG hG.odd i j₀) :
+    ∀ j : Fin hyp.w2, j ≠ 0 →
+      coh.tau1 (∑ i : Fin hyp.w1, hyp.muGrid hG hG.odd i j)
+        = (params.delta : ℂ) • ∑ i : Fin hyp.w1, hyp.alignedOmegaSigmaGrid hG hG.odd i j := by
+  intro j hj0
+  have hdiff := hyp.muColumn_tau1_diff_eq hG coh hmu hos hzS hz1 hzconj hδpm hδj hj0 hj₀0
+    (hd1 j hj0) (hd1 j₀ hj₀0)
+  -- `μ_j^{τ₁} = (μ_j^{τ₁} − μ_{j₀}^{τ₁}) + μ_{j₀}^{τ₁}`, then substitute the two known pieces.
+  have hrw : coh.tau1 (∑ i : Fin hyp.w1, hyp.muGrid hG hG.odd i j)
+      = (coh.tau1 (∑ i : Fin hyp.w1, hyp.muGrid hG hG.odd i j)
+          - coh.tau1 (∑ i : Fin hyp.w1, hyp.muGrid hG hG.odd i j₀))
+        + coh.tau1 (∑ i : Fin hyp.w1, hyp.muGrid hG hG.odd i j₀) := by abel
+  rw [hrw, hdiff, hpin, smul_sub]; abel
+
 /-- **Peterfalvi (10.6)**: the sums of `omega_ij^sigma` describe the `tau1`
 images, and outside the tame support the value of `zeta^tau1` has norm at least
 one. -/
