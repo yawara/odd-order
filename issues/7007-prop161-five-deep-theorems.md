@@ -90,6 +90,23 @@ bottom-out** するので、clean 化には §15 foundation が先。真の順�
 
 ## 進捗ログ
 
+**2026-06-22 (cont.¹⁰) ✅✅ BG Cor 14.12 conjunct 1 (`IsTypeF H`) 完全完成 — `notMstGH` close、sorry-free** (commit `81fba262`, full build 3881 green, FT-path sorry 133→132):
+
+cont.⁹ の `notMstGH` 残務を 3 ピースで close。**conjunct 1 (`IsTypeF H`) は sorry-free** (covering `hcover` + `notMGH` + `notMstGH`):
+
+- **新 private helper `partner_inf_and_uniq`** (S14, sorry-free): `typeP_structure` を partner `M*` に適用 (M* の κ-Hall = K*、`K = M*_σ ⊓ C(K*)`) し **両方を一発で**生成:
+  - `ziMMst : M ⊓ M* = K ⊔ K*` (Coq `Ptype_embedding` の `ziMMst`): cyclic K* の characteristic order-p line で `b1` clause → `N_{M*}(K*) = K* ⊔ K`、`M_σ ⊓ M* = K*`(=cont.⁹ kernel) と合わせ `M ⊓ M* ⊆ N(K*) ⊓ M* = K⊔K*`。
+  - `sK_uniqMst : K ≤ M*^a ⟹ a ∈ M*` (TI clause `.2.2.2.1`)。
+- **署名に `hKNU : K ≤ N(U)` 追加** = BG `kappa_complement` の **`group_set (U*K)` 成分** (faithful・構成可能、consumer 0 ゆえ安全)。⟹ **`K ≤ H` (Coq `sEH`/`sKH`)**: `R = O_r(U)` は abelian `U` で characteristic (normal Sylow-r, `Sylow.characteristic_of_normal`)、`K ≤ N(U) ⟹ K ≤ N(R) ≤ H` (`mem_normalizer_map_subtype_of_characteristic`)。
+- **`notMstGH`**: `H ~ M*` なら `K ≤ H` + `sK_uniqMst` で `H = M*` (`conj_smul_eq_self_of_mem`)、ゆえ `R ≤ M ⊓ M* = K⊔K*`; だが `r ∤ |K⊔K*| = |K|·|K*|` (`card_sup_eq_mul_of_le_normalizer_of_disjoint`, disjoint+commuting, `r ∉ κ∪σ`) かつ `r ∣ |R|`、矛盾。
+
+**残 = conjunct 2/3/4 (σ-decomposition of H、相互依存)** — Coq `P2type_signalizer` L2302-2406 の完全 map (次セッション):
+- **追加要仮説 `semiregular U K` (= `C_U(K) = U ⊓ C(K) = ⊥`、`regK`)** = kappa_complement の残り成分 (Prop 14.2 由来、現 `typeP_structure` 未露出)。`defUK : [U,K]=U` に必須。
+- **upper (semiregular 不要)**: `s'H_K` (K は σ(H)'-群、`sigma_partition` + K⊆Mst_σ) → `D := σ(H)'-Hall(H) ⊇ K` (`Hall_superset`) → **`sK_FD : K ⊆ F(D)`** (**Lemma 14.11 `exists_maximal_of_typeF_notMem_fitting`✅DONE を cite** + uniqMst + defPmax で dichotomy 矛盾) → `sDMst : D ⊆ Mst` (subnormal `snK_sMst`: K<|<|L⟹L⊆Mst、要 sK_uniqMst + `nilpotent_subnormal`)。
+- **lower (semiregular 要)**: `defUK : [U,K]=U` (`coprime_cent_prod` + `cent_semiregular`) → `sUHs : U ⊆ H_σ` (HsDq=H_σ·O_q(D) の q'-Hall、U=[U,K]⊆HsDq) → `defNMU : N_M(U)=E` (`coprime_norm_cent` + Ω₁(R)⊆U) → `sHsFH : H_σ ⊆ F(H)` (`Fitting_max`)。
+- **main equality `H ∩ M* = D`** + Thm 12.5(e) (D≠H∩M* case: C_{H_σ}(K)≠1 → q∈τ₂(H) で矛盾)。⟹ conjunct 3 (`M⊓H=U⊔K`) + conjunct 4 (`N_H(U)⊄M` = **Thm C conjunct 2 の payload**)。
+- 要確認 BG 補題: `sigma_partition`/`sigma'_kappa'_facts` (§10)、`coprime_cent_prod`/`coprime_norm_cent` の Lean 等価、subnormal API、Thm 12.5(e) の正確形 (S12_Theorem125)。**~250 行・多 sub-lemma、2-3 session 規模**。
+
 **2026-06-22 (cont.⁹) ✅ BG Cor 14.12 — `msigma_inf_partner_eq_kstar` (M_σ ∩ M* = K*) 完成 = ziMMst kernel、conjunct-b 恐怖を解消** (commit `284d2854`, full build 3881 green, sorry 133):
 
 ユーザー選択 (A) = ziMMst を建てる。**cont.⁸ で「ziMMst の `⊆` は embedding conjunct (d) で deep」と評価したが、kernel は conjunct (b) を回避できると判明・実証明した**:
