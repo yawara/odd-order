@@ -90,6 +90,20 @@ bottom-out** するので、clean 化には §15 foundation が先。真の順�
 
 ## 進捗ログ
 
+**2026-06-23 ✅✅✅✅ BG Theorem C (`theoremC_paired_structure`) 完全完成 — conjunct 2 (`N_G(U)⊄M`) を Cor 14.12 に配線、sorry-free + axiom-clean** (commit `b9646712`、AxiomsCheck 登録、full build 3881 green、FT-path sorry 125→124):
+
+Cor 14.12 完成を受け、その唯一の consumer であった Thm C conjunct 2 (type-`P₂` 分岐 `¬ N_G(U) ≤ M`、S16:811) を close。**Thm C は全 12 conjunct sorry-free + axiom-clean** (10/11/12 は cont.⁵ で既済、2 が最後の residual)。`#print axioms theoremC_paired_structure` = `[propext, Classical.choice, Quot.sound]`。
+
+- **新 producer `typeP2_exists_matched_kappa_hall_pair` (S16, axiom-clean, AxiomsCheck 登録)**: type-`P₂` maximal `M` から **matched** な κ-Hall `K₀` + (κ∪σ)'-Hall `U₀` (`U₀` abelian, `U₀≠⊥`, `K₀ ≤ N_G(U₀)`) を構成。BG `kappa_complement` = Frobenius 補元 `E = K ⋉ U`、`U₀ = E₂E₃ ◁ E ∋ K₀=E₁`。**Cor 14.12 の `hKNU : K≤N(U)` 仮説を供給する reusable infra** (S16 `hP2II` / Prop 16.1 でも同 prerequisite が要)。
+  - 退化ケース除外: `κ∩τ₃≠∅` または `E₂E₃=⊥` ⟹「`E` が κ-群」⟹ `κ = π∖σ` = type-`P₁` ⟹ `hP2` と矛盾 (新 S14 helper `kappa_eq_sigmaComplementPrimes_of_isPiGroup_card_E`)。
+  - `E₁=κ-Hall` (`mem_kappa_of_mem_primeFactors_card_E1`)、`U₀=E₂E₃=[E:E₁]=(κ∪σ)'-Hall` (E₁ の index は κ' + E が σ'-群 ⟹ (κ∪σ)'; τ₂/τ₃ の prime content 不要、`hallPiece_isHall_in_M` 経由)、abelian は Lemma 15.1(b) (`typeP_hall_derived_eq_and_abelian` に `U₀` を渡す)。
+- **conjunct 2 配線 (S16:811)**: 独立な `K,U` (Thm C 署名) では `K≤N(U)` が出ないため、**conjugacy-transport**: producer で matched `(K₀,U₀)` を作り Cor 14.12 を適用 → `¬(H⊓N_G(U₀)≤M)`; `U₀~U` (共に (κ∪σ)'-Hall, M-共役、`exists_conj_eq_of_isHall_subgroupOf`) で `N_G(U)≤M` を `N_G(U₀)≤M` へ transport (smul 代数 + `conj_smul_eq_self_of_mem_normalizer`/`mem_normalizer_of_conj_smul_eq_self`) し矛盾。option (b) [署名に `K≤N(U)` 追加] は consumer (S16:2112/2138, arbitrary K,U) を壊すため不採用。
+- S14 helper 2本追加: `kappa_subset_sigmaComplementPrimes` (κ⊆π∖σ)、`kappa_eq_sigmaComplementPrimes_of_isPiGroup_card_E`。
+
+**▶ 次 frontier (Prop 16.1 へ向けた残り)**: Thm C 完成で 5 deep theorems のうち **Thm C ✅ / Thm 15.2(a) ✅ (issue 8012)** が済。残り = **Thm A** residual (hFI = M' の TypeFData / hF_not_derived ✅) + **Lemma 15.1** (`typeP_auxiliary_structure_gated`, §15 土台) + **Thm 15.7** (`fitting_not_ti_cases`, type-F の `M'=F(M)` 一点に還元済 cont.⁵)。また **Prop 16.1 `hP2II` (S16:1236, `hKnorm` 仮説)** は今回の matched-pair producer で供給可能になった (要配線)。
+
+---
+
 **2026-06-23 ✅✅✅ BG Cor 14.12 (`typeP2_neighbor_is_typeF`) 完全完成 — sorry-free + axiom-clean** (commits `65194ead` conjunct 4 + shared infra / `05b8f119` conjunct 3、AxiomsCheck 登録、full build 3881 green、FT-path sorry 126→125):
 
 cont.¹¹ の残 conjunct 3/4 を 2 commit で close。**Cor 14.12 全 4 conjunct (+H membership) 証明完了、`#print axioms` = `[propext, Classical.choice, Quot.sound]`** (上流 typeP_structure/typeP_duality/Lemma 14.11 等が全 sorry-free ゆえ sorryAx 漏れ無し)。
