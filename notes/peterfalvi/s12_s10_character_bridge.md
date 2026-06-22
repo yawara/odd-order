@@ -5,6 +5,27 @@
 > 上位文脈 = 記憶 [[ft-endgame-two-poles]] [[peterfalvi-s10-13-gated-on-bg-spine]]、
 > Lane H 視点の正本 = [`s10_13_maximal_structure.md`](s10_13_maximal_structure.md)。
 
+## ✅✅✅✅✅ 2026-06-23 更新¹³ — (10.6)(a) summed isometry COMPLETE (linchpin landed, σ-endgame 回避)
+
+更新¹² の「残り σ-endgame final step」を、**σ-endgame engine を使わない大幅に簡潔な §10 特化 route** で完走。
+(10.6)(a) `μ_j^τ₁ = δ∑_i ω_ij^σ` を honest 証明 + `tau1_values_and_norm_bound` conjunct (a) に wiring。
+
+- **`omegaSigmaDiff_inner_muColumn_tau1`** (還元 `(ω_ij^σ−ω_i0^σ,μ_j^τ₁)=δ`, `b3393682`): in-stock のみ
+  (`muGridAlpha_tau1_inner_muColumn_self_sub_conj` + (10.5)`a=0` + `alpha_tau_image` + `zeta_tau1_inner_muColumn`)。
+  **ζ^τ₁⊥Imσ を回避** — 更新⁸ の「§5-gated `ζ̄^τ₁⊥Imσ`」懸念は対角内積経路で消滅。
+- **`muColumn_tau1_pin`** (同 commit): (5.5) `μ_j^τ₁=∑_{x∈T} columnRImage(x)` (|T|=w₁) に還元を当て、
+  `(ω_ij^σ−ω_i0^σ,μ_j^τ₁)=δ·[(false,i)∈T]` → 全 `(false,i)∈T` → `|T|=w₁` で `T={false}×univ` →
+  `μ_j^τ₁=δ∑ω_ij^σ`。**separability/sigmaCoeff/Parseval/2D-product 全て不要**。
+- **wiring** `da77ee6f`: conjunct (a) = pin、`[Finite G]`+FiniteInduce regime 統一。両 axiom-clean
+  (自前 sorry 0, §10 muGrid 上流 gate のみ)。full build 3881 green。
+- **🔑 教訓**: §10 では還元 `(δ(ω^σ−ω^σ),μ_j^τ₁)=1` が in-stock ゆえ Peterfalvi 一般 (5.8) を回避できる。
+  σ-endgame route の機材 (engine `eq_smul_chiFam_column_of_vanishOnV` / sigmaCoeff 翻訳 /
+  2D product `exists_alignedOmegaSigmaGrid_chiFam_product` / `exists_kappa_sum_chiFam_column_eq`) は
+  **valid だが (10.6)(a) には未使用**。2D product は §10/§13 で再利用余地。
+
+**▶ 残り = (10.6)(b) parity bound** (`zeta_tau1_norm_bound` de-opaque + `ζ^τ₁(g)=∑ω_i0^σ(g)` + 偶奇)。
+詳細・材料在庫 = issue 1009「残り = (10.6)(b)」。
+
 ## ✅✅✅✅ 2026-06-23 更新¹² — image family + (5.5) チェーン完成、残り = σ-endgame final step のみ
 
 更新¹¹ の「次セッション」予定を**当セッション内で完走**: column image family 組立 → (5.5) 適用まで landed。
