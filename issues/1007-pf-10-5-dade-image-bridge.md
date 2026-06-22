@@ -453,3 +453,51 @@ have hVeq : tic.V = tic.Vdiff := rfl
 
 ⚠ endgame は alignedOmegaSigmaGrid (Prop16.1 sorryAx gate) 経由ゆえ axiom-clean にならない (上流 gate のみ)。
 最難 = piece 1 (η 既約 + defeq) と piece 4 (mirror assembly)。**次セッションで fresh context の focused unit 推奨**。
+
+## ✅✅ 進捗 (2026-06-22 lane-b 再開) — piece 2 (norm-2 σ-bounds) + piece 1 (hae) 完成
+
+endgame の 2 つの foundational piece を landing (full build 3881 green、両 commit とも axiom footprint 不変):
+
+- ✅ **piece 2 (commit `33c03853`)**: `S05_SigmaIsometry` に norm-`2` σ-coeff bounds の**一般版**を追加
+  (`ncard_inner_chiFam_ne_zero_le_one` の norm-2 類比):
+  - `TICyclicHypothesis.ncard_sigmaCoeff_ne_zero_le_two` — χ∈ZIrr, ‖χ‖²=2 ⟹ NC(χ)≤2。
+  - `TICyclicHypothesis.sigmaCoeff_eq_zero_or_one_of_inner_self_two` — σ-coeff ∈ {0,±1}。
+  両者 `mem_ZIrr_inner_self_eq_sum_sq`+`exists_pair_of_sum_sq_eq_two`+norm-1 補題で証明。
+  **DRY**: §6 `sigmaNC_dade_le_two`/`sigmaCoeff_dade_eq_zero_or_one` を新一般版 cite に refactor
+  (norm-1 が既に S05 一般版を §6 が cite する設計の踏襲)。**mirror の hG2/hG01 入力** = この 2 本を X に適用
+  (X∈ZIrr=`muGridAlpha_tau_mem_ZIrr`, ‖X‖²=2=`muGridAlpha_tau_X_inner`)。
+
+- ✅ **piece 1 (commit `7b1379f5`)**: `S12` に hae σ-isometry bridge を追加:
+  - `Hypothesis.canonicalFullDadeApp` — σ-grid 内部 inline app を named def 化 (defeq 一致、σ-machinery lemma を
+    この app で書けば grid と整合)。
+  - `Hypothesis.exists_alignedOmegaSigmaGrid_chiFam_family` — 各 row i で **injective** な index family
+    `P : Fin w₂ → Ŵ₁×Ŵ₂` + `alignedOmegaSigmaGrid i j = chiFam (P j)`。
+  - **核心 (W-alignment defeq trap 解消)**: `alignedOmegaSigmaGrid i j = σ(compHom e (chiColumn χ₂ i))`、
+    `compHom e (chiColumn χ₂ i)` は tic.W の**既約 (linear) 指標** — `chiColumn = ω(omegaProdChar…)`,
+    `ω = linearIrreducibleCharacter` (定義そのもの), `compHom_linearIrreducibleCharacter` (compHom of linear = linear, by `rfl`)
+    ⟹ `compHom e (chiColumn…) = (η:CF)` が **rfl**、`sigmaIntegral=sigma`、`sigma_irreducibleCharacter` で chiFam に着地。
+    injectivity = `omegaIrrEquiv.symm`/`linearIrreducibleCharacter_injective`/`MonoidHom.cancel_right`(e 全射)/
+    `omegaProdChar_inj`/`finCardEquivCharacterGroup`/`finCongr` 単射の合成。
+
+**▶ 残り = mirror assembly (piece 4/5) + pinning (piece 6)** — §6 `certainType_diff_dade_eq`
+(`S06_CertainTypeIsometry.lean:694-803`) を §10 で再現する**単一の大 proof** `Hypothesis.tau_muGridAlpha_eq`
+(grid-level (10.5); statement = `alpha_tau_image` の grid 版):
+```
+hyp.tau (muGrid i j − δ•muGrid i 0 − n•ζ) = δ•(alignedOmegaSigmaGrid i j − alignedOmegaSigmaGrid i 0) − n•coh.tau1 ζ
+```
+構造 (先例 = `tau1_zeta_vanishes_on_typePV` の tic/app reconstruction + §6 mirror):
+1. tic/app/hVeq reconstruct。`X := α^τ + n•τ1ζ` (⟨X,X⟩=2 by `muGridAlpha_tau_X_inner`、X∈ZIrr by `muGridAlpha_tau_mem_ZIrr` + τ1ζ∈ZIrr)。
+   goal を `ψ := X − δ•(aOSG ij − aOSG i0) = 0` に還元 (`sub_eq_zero`/`linear_combination`)。
+2. piece 1 で P (injective family) 取得 → Pij:=P j, Pi0:=P 0, hPne (j≠0 + injective)。
+3. **hae** (§6 `sigmaCoeff_psi_eq` 相当): `sigmaCoeff ψ pq = sigmaCoeff X pq − δ([Pij=pq]−[Pi0=pq])`。
+   `rw [hP j, hP 0]` で aOSG→chiFam、inner 線形 + chiFam 直交性 (`chiFam_spec.2.2.1`)。
+   ⟹ **S05 一般補題 `sigmaCoeff_sub_smul_chiFam_diff` (X, Pij, Pi0, s 任意) を切り出すと clean** (mirror が軽くなる)。
+4. hG2/hG01 = piece 2 を X に適用。hψV = `muGridPsi_vanishes_on_typePV` + `tau1_zeta_vanishes_on_typePV`。
+   hadd = `sigmaCoeff_add_eq`。hNC4 (≤4 = {G≠0}∪{Pij,Pi0})。card/gap/`grid_trichotomy`/`grid_no_constant_{column,row}`
+   (S05 public) → 全 coeff 0 → ψ=0 (§6 `_of_all_sigmaCoeff_zero` mirror = ‖ψ‖² 計算)。
+5. **pinning (piece 6)**: producer `exists_charParameters` の `omegaSigma := omegaSigmaGrid` を `alignedOmegaSigmaGrid`
+   に差替 + `params.alpha`/`zeta`/`delta`/`n` を grid に pin → `alpha_tau_image` を `tau_muGridAlpha_eq` の薄い corollary に。
+   多数の (10.3) 算術 hyp (hdeg/hμ0/hζ1/hnf/hδj/hdζ/h0ζ/hkζ/hcol1/hdk1/hδpm/hw1/hn2) を producer/CharacterParameters field から discharge。
+
+mirror は ~120-150 行の単一 proof (hyp 列が長い)。**piece 3 (`muGridPsi_vanishes_on_typePV`/`tau1_zeta_vanishes_on_typePV`)
+は既存**ゆえ全 input 在庫済み。fresh context で一気に書くのが推奨 (途中 commit 不可の単一定理)。
