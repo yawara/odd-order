@@ -2037,6 +2037,41 @@ theorem chiefFactor_caseB_image_cyclic [Finite G] {M : Subgroup G}
     (φ := (φU.range).subtype) hAcomm hKnt hirr hfaith
   exact ⟨hcyc, by rwa [hKcard] at hdvd⟩
 
+open OddOrder.RepresentationTheory Representation in
+open scoped commutatorElement IsMulCommutative in
+/-- **Peterfalvi (9.7) case (b), the `u ∣ (p^q-1)/(p-1)` divisibility** — reduced to the
+fixed-point-free input `Coprime |Ū| (p-1)`.
+
+Given that `W₁` acts fixed-point-freely on `Ū` (so `U* ∩ 𝔽ₚ = 1`, i.e. `|Ū|` is prime to `p-1`),
+the Singer divisibility `|Ū| ∣ p^q-1` (`chiefFactor_caseB_image_cyclic`) upgrades to
+`|Ū| ∣ (p^q-1)/(p-1)` — the second case-(b) divisibility of `CliffordCaseBData`.  This isolates
+the elementary last step of (9.7)(b): `(p-1) ∣ (p^q-1)` together with coprimality gives
+`|Ū|·(p-1) ∣ p^q-1`, hence `|Ū| ∣ (p^q-1)/(p-1)`.  The genuinely hard `coprime` hypothesis is the
+`W₁`-Galois fixed-point-free analysis of the field model `(F ⋊ U*) ⋊ Aut F` of (9.7)(b). -/
+theorem chiefFactor_caseB_image_dvd_norm [Finite G] {M : Subgroup G}
+    {data : TypesIIIIIIVSetup M} (chief : ChiefFactorData data)
+    (hcaseB : ∀ J : Subgroup (↥data.H ⧸ chief.N),
+        IsAInvariant ((typeP_quotientCoprimeAction data.typeP data.nontrivial.1
+          chief.N_aInvariant).φ.comp (typeP_quotientCoprimeAction data.typeP data.nontrivial.1
+          chief.N_aInvariant).U.subtype) J → J = ⊥ ∨ J = ⊤)
+    (hcop : Nat.Coprime (Nat.card ↥(((typeP_quotientCoprimeAction data.typeP data.nontrivial.1
+          chief.N_aInvariant).φ.comp (typeP_quotientCoprimeAction data.typeP data.nontrivial.1
+          chief.N_aInvariant).U.subtype).range)) (chief.p - 1)) :
+    Nat.card ↥(((typeP_quotientCoprimeAction data.typeP data.nontrivial.1
+          chief.N_aInvariant).φ.comp (typeP_quotientCoprimeAction data.typeP data.nontrivial.1
+          chief.N_aInvariant).U.subtype).range) ∣ (chief.p ^ data.q - 1) / (chief.p - 1) := by
+  obtain ⟨_, hdvd⟩ := chiefFactor_caseB_image_cyclic chief hcaseB
+  have hp1 : 1 ≤ chief.p := chief.p_prime.pos
+  -- `(p-1) ∣ (p^q-1)` since `p ≡ 1 [MOD p-1]`.
+  have hpd : (chief.p - 1) ∣ (chief.p ^ data.q - 1) := by
+    have h1 : 1 ≡ chief.p [MOD chief.p - 1] := (Nat.modEq_iff_dvd' hp1).mpr (dvd_refl _)
+    have h2 : 1 ^ data.q ≡ chief.p ^ data.q [MOD chief.p - 1] := h1.pow data.q
+    rw [one_pow] at h2
+    exact (Nat.modEq_iff_dvd' (Nat.one_le_pow _ _ (by omega))).mp h2
+  -- `|Ū|·(p-1) ∣ p^q-1` (coprime), hence `|Ū| ∣ (p^q-1)/(p-1)`.
+  have hmul := hcop.mul_dvd_of_dvd_of_dvd hdvd hpd
+  exact (Nat.dvd_div_iff_mul_dvd hpd).mpr (by rwa [mul_comm] at hmul)
+
 /-- **Peterfalvi (9.7)**: the Clifford-theory dichotomy for the action on the
 chief factor `H/H_0`.
 
