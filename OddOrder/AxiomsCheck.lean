@@ -5300,6 +5300,16 @@ A signalizer-functor prerequisite for BG Cor 14.12 (`typeP2_neighbor_is_typeF`).
 
 #assert_only_allowed_axioms OddOrder.BG.Ch4.S14.typeP2_kappaHall_commutator_eq_self
 
+/-! **BG `kappaJ` / type conjugation-invariance** (`S14_TypePCounting`): `κ(M^g) = κ(M)`
+(`kappa_conj_smul`) and the type predicates `IsTypeP`/`IsTypeP1`/`IsTypeP2` transfer under
+conjugation (`isTypeP{,1,2}_conj_smul`).  Each `κ`-condition (`τ₁∪τ₃ = {p ∉ σ ∧ r_p=1}`, the
+rank-one centralizer witness) is conjugation-stable via `σ`/`M_σ`/`pRank`/`ℰ_p¹`/centralizer
+equivariance.  Prerequisite for BG Cor 14.12 (`sK_FD`).  Axiom-clean. -/
+
+#assert_only_allowed_axioms OddOrder.BG.Ch4.S14.kappa_conj_smul
+#assert_only_allowed_axioms OddOrder.BG.Ch4.S14.isTypeP1_conj_smul
+#assert_only_allowed_axioms OddOrder.BG.Ch4.S14.isTypeP2_conj_smul
+
 /-! **BG Theorem A(3) decomposition** (`S16_MainResults`, `typeP_maximal_eq_kappaHall_sup_U_sup_Msigma`):
 `M = K U M_σ` for a maximal `M` with Hall `κ`-subgroup `K ≤ M` and Hall `(κ∪σ)'`-subgroup `U ≤ M`.
 Type-F via the `K = ⊥` `SubgroupESetup`; type-P via the `M' = U M_σ`/`M'`-complements-`K` structure
