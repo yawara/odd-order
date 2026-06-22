@@ -1313,14 +1313,44 @@ structure CliffordCaseBData {M : Subgroup G} {data : TypesIIIIIIVSetup M}
   u_coprime_p_sub_one : Nat.Coprime chars.u (chief.p - 1)
   u_dvd_norm_quotient : chars.u ∣ (chief.p ^ data.q - 1) / (chief.p - 1)
 
-/-- **Peterfalvi (9.6)**: after choosing `H_0`, the induced `U`-action is
-nontrivial, `H/H_0` is a chief factor, and the relevant `W_2`-fixed part has
-order `p`. -/
+/-- **Peterfalvi (9.6)**: after choosing `H_0`, the induced `U`-action is non-trivial (`U` does not
+centralize `H`), `H̄ = H/H_0` is a chief factor of `M`, `|H̄| = p^q`, and (types III/IV) `|W_2| = p`.
+
+*Faithfulness note.* The printed (9.6) asserts `|W̄_2| = p` for the **image** `W̄_2 = C_{H̄}(W_1)`,
+which for type II is strictly smaller than the full `W_2 = C_H(W_1)` (the carrier never pins `|W_2|`,
+only `|W_1|` is prime).  The earlier formalization stated the **unconditional** `|W_2| = p`, which is
+*false* for type II: `|W_2|^q = |H| = p^q·|H_0|` (by (9.3) + `quotient_order`) gives `|W_2| = p`
+only when `H_0 = 1`.  We therefore state the faithful, carrier-provable form: `|W_2| = p` only in
+the types III/IV branch (where `|W_2| = p` directly, `typeIII_IV_p_eq_W2`), together with the genuine
+order conclusion `|H̄| = p^q` (`quotient_order`).  The image fact `|W̄_2| = p` needs the (non-opaque)
+chief-factor structure and is delivered by `typeP_chiefFactor_card`. -/
 theorem chiefFactor_basic [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     {M : Subgroup G} {data : TypesIIIIIIVSetup M} (chief : ChiefFactorData data) :
     data.U ⊓ Subgroup.centralizer (data.H : Set G) ≠ data.U ∧
-      chief.quotient_chiefFactor ∧ Nat.card ↥data.W2 = chief.p := by
-  sorry
+      chief.quotient_chiefFactor ∧
+      (IsTypeIII M ∨ IsTypeIV M → Nat.card ↥data.W2 = chief.p) ∧
+      Nat.card ↥data.H = chief.p ^ data.q * Nat.card ↥chief.H0 := by
+  obtain ⟨hII_case, hIIIIV_case⟩ := typeII_III_IV_order_relations hG data
+  have hH_ne : data.typeP.H ≠ ⊥ := fun heq => data.typeP.H_noncyclic (heq ▸ inferInstance)
+  refine ⟨?_, chief.quotient_chiefFactor_holds, chief.typeIII_IV_p_eq_W2, chief.quotient_order⟩
+  -- `U` does not centralize `H`: else `C_H(U) = H`, contradicting (9.3).
+  intro hcentr
+  have hUle : data.U ≤ Subgroup.centralizer (data.H : Set G) := inf_eq_left.mp hcentr
+  have hHle : data.H ≤ Subgroup.centralizer (data.U : Set G) := Subgroup.le_centralizer_iff.mp hUle
+  have hHinf : data.H ⊓ Subgroup.centralizer (data.U : Set G) = data.H := inf_eq_left.mpr hHle
+  rcases data.type_alt with hII | hIIIIV
+  · -- Type II: (9.3) gives `C_H(U) = ⊥`, but `C_H(U) = H ≠ ⊥`.
+    exact hH_ne (hHinf.symm.trans (hII_case hII).1)
+  · -- Types III/IV: (9.3) gives `|H| = p^q·|C_H(U)| = p^q·|H|`, forcing `p^q = 1`.
+    obtain ⟨p, hp, _hpW2, _hCUW, hHcard⟩ := hIIIIV_case hIIIIV
+    rw [hHinf] at hHcard
+    have hpq1 : p ^ data.q = 1 := by
+      rcases Nat.eq_zero_or_pos (Nat.card ↥data.H) with h0 | hpos
+      · exact absurd h0 Nat.card_pos.ne'
+      · exact Nat.eq_of_mul_eq_mul_right hpos (by rw [one_mul]; exact hHcard.symm)
+    have hq_ne : data.q ≠ 0 := Nat.card_pos.ne'
+    have h2 : 2 ≤ p ^ data.q := le_trans hp.two_le (Nat.le_self_pow hq_ne p)
+    omega
 
 /-- **Peterfalvi (9.7)**: the Clifford-theory dichotomy for the action on the
 chief factor `H/H_0`. -/

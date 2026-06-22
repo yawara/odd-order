@@ -965,3 +965,22 @@ seed を **sorry-free + axiom-clean** で締結 → (9.4) `exists_chiefFactorDat
 `typeII_centralizer_U_eq_bot` (8.6.b II + 8.12 = `S10.typeI_or_typeII_centralizer_unique`) /
 `typeIIIorIV_W2_prime` (8.8 = `S12...exists_typeII_maximal_with_w2`+`theorem88_caseB_prime_orders`)。
 両者 signature 正・sorried ⟹ cite 可 (policy)。下流 (10.11)/(11.7)/(13.2.b) は §8/§12/§13 char 解禁待ち。
+
+### ▶ (9.6) `chiefFactor_basic` 完成 + faithfulness 修正 (2026-06-22 lane-c relane)
+
+`chiefFactor_basic` を sorry-free 化 (S11 sorry 6→5)。**ただし旧 statement の conjunct 3
+`Nat.card ↥data.W2 = chief.p` (無条件 |W₂|=p) は type II で偽**と判明し faithful 化:
+
+- 教科書 (9.6) は **`|W̄₂| = p`** (像 `W̄₂ = C_{H̄}(W₁)`) を主張。type II では full `W₂ = C_H(W₁)` は
+  `W̄₂` より真に大きい (carrier は `|W₁|` prime のみ pin、`|W₂|` を一切拘束しない:
+  `TypePNontrivialCore`/`TypeIIData`)。`|W₂|^q = |H| = p^q·|H₀|` ((9.3)+`quotient_order`) ゆえ
+  `|W₂|=p` は `H₀=⊥` のときのみ。type II で `exists_chiefFactorData` は `H₀≠⊥` を作るゆえ偽。
+- **faithful 版**: conjunct 3 を `(IsTypeIII M ∨ IsTypeIV M → |W₂| = p)` (III/IV で真, `typeIII_IV_p_eq_W2`)
+  に弱め、本物の order 結論 `|H̄| = p^q` (= `quotient_order`) を conjunct 4 に追加。像の `|W̄₂|=p` は
+  非 opaque な chief-factor 構造を要し `typeP_chiefFactor_card` (855) が別途供給。
+- 証明: conjunct 1 (U が H を非中心化) = (9.3) `typeII_III_IV_order_relations` の type 分岐
+  (II: `C_H(U)=⊥≠H`; III/IV: `|H|=p^q|C_H(U)|=p^q|H|` ⟹ `p^q=1` 矛盾) + `Subgroup.le_centralizer_iff`。
+  conjunct 2/3/4 = ChiefFactorData field 直参照。**consumer 0 ゆえ statement 変更安全**。
+- 教訓: §11 leaf は ChiefFactorData の opaque Prop field (`quotient_chiefFactor=True` 等) 越しの
+  scaffold。carrier field 由来でない深い結論 (|W̄₂|=p 等) は opaque 越しに証明不能 — 本物の math は
+  engine (`typeP_chiefFactor_card`/`coprimeFrobeniusChiefFactor_card`) 側。残 leaf (9.7-9.11) 同パターン要警戒。
