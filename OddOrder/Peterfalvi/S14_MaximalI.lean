@@ -864,6 +864,90 @@ theorem isCyclic_and_card_dvd_of_fpf_dim_le_two
       have hsq : (k + 1) ^ 2 = k * (k + 2) + 1 := by ring
       rw [hsq, Nat.add_sub_cancel, Nat.add_sub_cancel]
 
+/-- **(12.12) rep-theory bridge (abstract `MulDistribMulAction` form).**  A finite odd-order group
+`E` (`p ∤ |E|`) acting **fixed-point-freely** on an elementary abelian `p`-group `M` — encoded by
+a `ZMod p`-module structure on `Additive M` — of `𝔽_p`-dimension `1` or `2` is **cyclic**, with
+`|E| ∣ |M| - 1`.
+
+This lifts `isCyclic_and_card_dvd_of_fpf_dim_le_two` from an abstract `Representation` to a
+`MulDistribMulAction` (via `Representation.ofDistribMulAction`), which is the form that a
+conjugation action of `E` on an elementary abelian subgroup supplies. -/
+theorem isCyclic_and_card_dvd_of_fpf_mulDistribMulAction
+    {p : ℕ} [Fact p.Prime] {E M : Type*} [Group E] [Finite E] (hodd : Odd (Nat.card E))
+    [CommGroup M] [Finite M] [Module (ZMod p) (Additive M)] [MulDistribMulAction E M]
+    (hp_ndvd : ¬ p ∣ Nat.card E)
+    (hdim : Module.finrank (ZMod p) (Additive M) = 1 ∨
+      Module.finrank (ZMod p) (Additive M) = 2)
+    (hfpf : ∀ e : E, e ≠ 1 → ∀ m : M, e • m = m → m = 1) :
+    IsCyclic E ∧ Nat.card E ∣ Nat.card M - 1 := by
+  classical
+  haveI : Finite (Additive M) := inferInstanceAs (Finite M)
+  -- The fixed-point-free hypothesis, transported to the additive representation `ρ = e ↦ (e • ·)`.
+  have hfpf' : ∀ e : E, e ≠ 1 → ∀ v : Additive M,
+      (Representation.ofDistribMulAction (ZMod p) E (Additive M)) e v = v → v = 0 := by
+    intro e he v hv
+    rw [Representation.ofDistribMulAction_apply_apply] at hv
+    -- `e • v = Additive.ofMul (e • v.toMul)` definitionally; pass to the multiplicative action.
+    change Additive.ofMul (e • Additive.toMul v) = v at hv
+    have hev : e • Additive.toMul v = Additive.toMul v := by
+      have := congrArg Additive.toMul hv; simpa using this
+    have hm1 : Additive.toMul v = 1 := hfpf e he _ hev
+    exact Additive.toMul.injective (by simp [hm1])
+  obtain ⟨hcyc, hdvd⟩ := isCyclic_and_card_dvd_of_fpf_dim_le_two hodd
+    (Representation.ofDistribMulAction (ZMod p) E (Additive M)) hfpf' hdim hp_ndvd
+  exact ⟨hcyc, by rwa [Nat.card_congr (Additive.toMul (α := M))] at hdvd⟩
+
+/-- **(12.12) rep-theory bridge (conjugation form).**  Let a finite group `E` normalize an
+elementary abelian `p`-subgroup `T` of order `p` or `p²` of `G`, with `|E|` odd and coprime to `p`,
+and let `E` act **fixed-point-freely on `T` by conjugation** (no nontrivial element of `T` is fixed
+by a nontrivial element of `E`).  Then `E` is **cyclic** and `|E|` divides `p - 1` or `p² - 1`.
+
+This is the `§8`-free structural core of Peterfalvi (12.12): there `T = Ω₁(Z(O_p(H)))` is the
+rank `≤ 2` elementary abelian subgroup and `E` the Frobenius complement of `L`, acting FPF on `T`
+by (12.10).  The `p + 1` refinement of (12.12) is separate (it consumes (12.9)/(12.11)). -/
+theorem isCyclic_and_card_dvd_of_fpf_conj_elemAbelian
+    {G : Type*} [Group G] [Finite G] {p : ℕ} [Fact p.Prime]
+    {T E : Subgroup G} (hT : IsElementaryAbelian p ↥T)
+    (hEnorm : E ≤ Subgroup.normalizer (T : Set G))
+    (hodd : Odd (Nat.card ↥E)) (hp_ndvd : ¬ p ∣ Nat.card ↥E)
+    (hT_card : Nat.card ↥T = p ∨ Nat.card ↥T = p ^ 2)
+    (hfpf : ∀ e : G, e ∈ E → e ≠ 1 → ∀ t : G, t ∈ T → e * t * e⁻¹ = t → t = 1) :
+    IsCyclic ↥E ∧ (Nat.card ↥E ∣ p - 1 ∨ Nat.card ↥E ∣ p ^ 2 - 1) := by
+  classical
+  letI : CommGroup ↥T := hT.subgroupCommGroup
+  letI : Module (ZMod p) (Additive ↥T) := hT.subgroupZmodModule
+  letI act : MulDistribMulAction ↥E ↥T :=
+    MulDistribMulAction.compHom (M := ↥(Subgroup.normalizer (T : Set G))) ↥T
+      (Subgroup.inclusion hEnorm)
+  -- The conjugation action's coercion: `(ε • τ : G) = ε * τ * ε⁻¹`.
+  have hsmul_coe : ∀ (ε : ↥E) (τ : ↥T), ((ε • τ : ↥T) : G) = (ε : G) * (τ : G) * (ε : G)⁻¹ :=
+    fun _ _ => rfl
+  -- `dim_{𝔽_p} (Additive T) ∈ {1, 2}` from `|T| ∈ {p, p²}`.
+  have hcard_pow : p ^ Module.finrank (ZMod p) (Additive ↥T) = Nat.card ↥T := by
+    rw [FiniteField.pow_finrank_eq_natCard p (Additive ↥T),
+      Nat.card_congr (Additive.toMul (α := ↥T))]
+  have h2le := (Fact.out (p := p.Prime)).two_le
+  have hdim : Module.finrank (ZMod p) (Additive ↥T) = 1 ∨
+      Module.finrank (ZMod p) (Additive ↥T) = 2 := by
+    rcases hT_card with h | h
+    · have e1 : p ^ Module.finrank (ZMod p) (Additive ↥T) = p ^ 1 := by rw [hcard_pow, h, pow_one]
+      exact Or.inl (Nat.pow_right_injective h2le e1)
+    · have e2 : p ^ Module.finrank (ZMod p) (Additive ↥T) = p ^ 2 := by rw [hcard_pow, h]
+      exact Or.inr (Nat.pow_right_injective h2le e2)
+  -- The conjugation FPF hypothesis, transported to the `MulDistribMulAction` form.
+  have hfpf' : ∀ ε : ↥E, ε ≠ 1 → ∀ τ : ↥T, ε • τ = τ → τ = 1 := by
+    intro ε hεne τ hτ
+    have hc : (ε : G) * (τ : G) * (ε : G)⁻¹ = (τ : G) := by
+      rw [← hsmul_coe]; exact congrArg Subtype.val hτ
+    exact OneMemClass.coe_eq_one.mp
+      (hfpf (ε : G) ε.2 (mt OneMemClass.coe_eq_one.mp hεne) (τ : G) τ.2 hc)
+  obtain ⟨hcyc, hdvd⟩ :=
+    isCyclic_and_card_dvd_of_fpf_mulDistribMulAction hodd hp_ndvd hdim hfpf'
+  refine ⟨hcyc, ?_⟩
+  rcases hT_card with h | h
+  · exact Or.inl (by rwa [h] at hdvd)
+  · exact Or.inr (by rwa [h] at hdvd)
+
 /-- **Peterfalvi (12.12)**: the Frobenius complement in the witness subgroup is
 cyclic, with order dividing `p - 1` or `p + 1`. -/
 theorem complement_cyclic_order_dvd [Finite G]

@@ -697,6 +697,16 @@ set_option linter.style.longLine false in
 -- dim-2-irreducible ⟹ Case B).
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.S14.isCyclic_and_card_dvd_of_fpf_dim_le_two
+-- Peterfalvi (12.12) rep-theory bridge (MulDistribMulAction form): an odd FPF group acting on an
+-- elementary abelian p-group of 𝔽_p-dim ≤ 2 is cyclic with |E| ∣ |M| - 1 (lifts the dim≤2 core
+-- from `Representation` to `MulDistribMulAction` via `Representation.ofDistribMulAction`).
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S14.isCyclic_and_card_dvd_of_fpf_mulDistribMulAction
+-- Peterfalvi (12.12) rep-theory bridge (conjugation form): `E ≤ N_G(T)` acting FPF by conjugation
+-- on an elementary abelian `T` of order `p` or `p²` (|E| odd, coprime to p) is cyclic with
+-- |E| ∣ p-1 or p²-1.  The §8-free structural core (12.12) consumes (before the p+1 refinement).
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S14.isCyclic_and_card_dvd_of_fpf_conj_elemAbelian
 -- Peterfalvi (12.9) centralizer core: a noncyclic abelian group acting coprimely on a finite group
 -- with nontrivial abelianization has a nonidentity element whose fixed subgroup escapes [K, K]
 -- (BG Prop 1.16(1) on K/[K,K] + the coprime fixed-point lifting, Isaacs Cor 3.28).
