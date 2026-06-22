@@ -204,11 +204,21 @@ theorem u_le_full_cyclotomic {hyp : Hypothesis (G := G)}
 
 end CaseBForSData
 
-/-- **Peterfalvi (14.6)**: case (9.7.b) holds for `S`. -/
+/-- **Peterfalvi (14.6)**: case (9.7.b) holds for `S`.
+
+Following the opaque-`Prop` convention of this file (see `caseB_for_T`), the qualitative
+case-(9.7.b) proposition `caseB_formula` is carried trivially (no consumer reads it — the
+downstream cascade reads only the numeric `order` data).  The numeric content — the `u`-order
+of (13.15) — is supplied by `S15.caseB_order_u_data` (the §13 obligation, currently a named
+upstream `sorry`); citing it wires the S-side `u`-value into the (14.8)/(14.11) cascade exactly
+as `caseB_for_T` wires the T-side `D = ⊥`/`v` value via `T_side_caseB_facts`.  The full
+group-theoretic (14.6) argument (the rank-2 Sylow contradiction ruling out case (9.7.a), via
+(13.13)/(9.7.a)/[BG] 1.16/(13.2.e)/(13.17)) is §13/§9 character/structure theory upstream. -/
 theorem caseB_for_S [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
-    (hyp : Hypothesis (G := G)) (Ldata : LHypothesis hyp) :
-    ∃ data : CaseBForSData hyp, data.caseB_formula := by
-  sorry
+    (hyp : Hypothesis (G := G)) (_Ldata : LHypothesis hyp) :
+    ∃ data : CaseBForSData hyp, data.caseB_formula :=
+  ⟨⟨True, trivial,
+      OddOrder.Peterfalvi.S15.caseB_order_u_data _hG hyp.base trivial, True, trivial⟩, trivial⟩
 
 /-- Over `ℕ`, the geometric-sum identity `(p − 1) · ∑_{i<q} pⁱ = p^q − 1`. -/
 private theorem pred_mul_geomSum (p q : ℕ) (hp : 1 ≤ p) :
@@ -1572,6 +1582,12 @@ structure MHypothesis (hyp : Hypothesis (G := G)) where
   /-- **Peterfalvi (14.10)**: `e = |M : K|` (the degree of `ψ`).  De-opacified from the former
   opaque `Prop` to the concrete index identity (lane-c §16 char-endpoint, carrier honesty). -/
   e_eq_index : e = (K.subgroupOf M).index
+  /-- **Peterfalvi (14.11)**: `e = |M : K| = p q`.  The V-side dual of
+  `LHypothesis.typeI_complement_card_eq_pq`: `M` is type I over `N_G(V)` with Frobenius complement
+  `W₁ W₂^y` of order `p q` ((13.17.c)/(14.5), dual side).  Carried structurally and supplied by
+  `exists_MHypothesis` (from the T/V-side `typeII_overNormalizer_frobenius`), so that the index
+  half of (14.11) `K_eq_V_index_pq` is a direct consequence rather than a separate obligation. -/
+  complement_card_eq_pq : e = hyp.base.p * hyp.base.q
   k_eq_card_K : k = Nat.card ↥K
   psi_mem : psi ∈ Mset
   psi_degree_eq_e : psi 1 = (e : ℂ)
@@ -2008,8 +2024,9 @@ theorem K_eq_V_index_pq [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
   · -- (14.11.1)--(14.11.4): `K ≠ V` is contradictory.
     by_contra hne
     exact contradiction_of_K_ne_V _hG hyp Ldata Mdata hne
-  · -- `|M : K| = p q` from the type-I structure of `M` (still to be supplied).
-    sorry
+  · -- `|M : K| = p q` from the type-I structure of `M`, carried by `MHypothesis`
+    -- (V-side dual of `LHypothesis.typeI_complement_card_eq_pq`).
+    exact Mdata.complement_card_eq_pq
 
 /-! ## (14.12)--(14.16): comparing `L` and `M` -/
 

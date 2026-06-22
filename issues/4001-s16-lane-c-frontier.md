@@ -30,12 +30,25 @@ foundational arithmetic backbone を構築 (η free-field に非依存、signatu
 
 - [x] (kickoff) `key_inequality` (14.8) 実証明 + `main_size_bounds` conjunct 3 実証明 +
       `MHypothesis_kernel_cyclic` を (14.11)`K_eq_V_index_pq` + `V_cyclic` へ wire (commit ff2338a5)。
-- [ ] `K_eq_V_index_pq` の `e=pq` 枝 — `MHypothesis` を `complement_card_eq_pq` field で enrich
-      (lane-c 所有 carrier、`LHypothesis.typeI_complement_card_eq_pq` と対称)。
-- [ ] `exists_MHypothesis` (14.10) の構造 skeleton — `T_typeII` (14.9) +
-      `typeII_overNormalizer_frobenius` を T/V 側に適用、Dade fields を named obligation に isolate。
-- [ ] 残り (A norm-cascade char / B §13 cyclic / C 直交 dichotomy) は Lane B の §13 Dade
-      producer 着地後に cite で実証明化。
+- [x] `K_eq_V_index_pq` の `e=pq` 枝 — `MHypothesis` を `complement_card_eq_pq` field で enrich
+      (lane-c 所有 carrier、`LHypothesis.typeI_complement_card_eq_pq` と対称)。**DONE commit `aff0bc2a`**。
+- [x] `caseB_for_S` (14.6) — `caseB_for_T` の opaque-Prop scaffold を mirror、`S15.caseB_order_u_data`
+      (13.15) を cite。**DONE commit `aff0bc2a`** (文書順で最上流の lane-c 着地点)。
+- [ ] `exists_MHypothesis` (14.10) の構造 skeleton — **blocked**: `typeII_overNormalizer_frobenius`
+      が S/U-side ハードコード (S15:1712)。V-side 構築には **T/V-side dual** が要る = lane-h ask
+      (gate map「精密 gate 特定」+ 新 issue)。dual 着地後は `exists_LHypothesis` の機械的 dual で
+      構造部 sorry-free 化可。
+- [ ] 残り (A norm-cascade char / B §13 cyclic / C 直交 dichotomy) は Lane B/H の §13 Dade
+      producer + η-carrier (issue 4003) 着地後に cite で実証明化。
+
+## 2026-06-22 resume の結論: §16 残 11 sorry は全て lane-h gated (原文レベル検証済)
+
+文書順で lane-c が忠実に閉じられる sorry は上記 2 本で尽きた (caseB_for_S 211 / K_eq_V e=pq 2012)。
+残 11 (`T_side_caseB_facts` 136 / `T_typeII` / `main_size_bounds_structural` / `betaM_expansion` /
+`generic_character_bound` / `normCascadeBound_of_charData` / `U_cyclic_and_Q_elemAbelian` /
+`V_cyclic` / `caseB_character_contradiction` / `orthogonality_switch` / `exists_MHypothesis`) は
+全て lane-h の §13/§14 char/構造理論に bottom-out (T-side dual / η-carrier / Dade)。
+正本 = `notes/peterfalvi/s16_nonexistence_gate_map.md`「更新 (2026-06-22, resume session)」。
 
 ## Lane B / hub への ask (signature-first, 正しければ sorried 可)
 

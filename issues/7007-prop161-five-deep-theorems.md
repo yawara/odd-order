@@ -90,6 +90,111 @@ bottom-out** するので、clean 化には §15 foundation が先。真の順�
 
 ## 進捗ログ
 
+**2026-06-22 (cont.⁷) ▶ NEXT = BG Cor 14.12 (`typeP2_neighbor_is_typeF`) で Thm C conjunct 2 を閉じる — Coq `P2type_signalizer` (BGsection14.v:2240) 精読で proof map 確定**:
+Thm C conjunct 2 (`N_G(U)⊄M`, S16:773 の type-P2 residual) = Cor 14.12 の `N_H(U)⊄M` clause (N_H(U)≤N_G(U) ゆえ ⟹ N_G(U)⊄M)。現状 `typeP2_neighbor_is_typeF` (S14:9001) は **conclusion に `N_H(U)⊄M` を含まず sorry** — 結論を BG full (`N_H(U)⊄M ∧ K⊆F(H∩M*) ∧ σ(H)'-Hall(H∩M*)`) に拡張 + 全証明が要る。**~160行の多段証明** (Coq P2type_signalizer 翻訳):
+- **setup**: `Ptype_embedding` (=typeP_duality) で M*=Mst + `uniqMst : 𝓜(C(K))={Mst}` (Prop 14.2(d))。`q:=|K|` prime (Prop 14.2(g))。
+- **`sK_uniqMst`**: `K⊆Mst^a ⟹ a∈Mst` (uniqueness, Prop 14.2(d) の `tiK_MstG`)。
+- **`snK_sMst`** (subnormal 帰納, ~8 Coq 行): `K<|<|L ⟹ L⊆Mst`。
+- **`sEH`**: E⊆H (R=O_r(U), N(R)⊆H, gFnorm_trans)。`sUH/sKH`: U,K⊆H。
+- **`notMGH`/`notMstGH`**: H≁M (r∈σ(H) vs r∉σ(M)) / H≁Mst (R∩=coprime TI 矛盾)。**`FmaxH`: H∈𝓜_F** (defPmax = Thm 14.7(g))。
+- **`s'H_K`**: K は σ(H)'-群 (`sigma_partition`)。`D`:= σ(H)'-Hall(H) ⊇K (`Hall_superset`)。
+- **`sK_FD`: K⊆F(D)** — ⊄F(D) なら **Lemma 14.11 (`exists_maximal_of_typeF_notMem_fitting`, ✅DONE)** で H* dichotomy → `uniqMst`/`defPmax`/q∈σ(Mst) で矛盾。**← ここで Lemma 14.11 を cite**。
+- **`sDMst`: D⊆Mst** (`nilpotent_subnormal (Fitting_nil D) sK_FD` → snK_sMst)。
+- **`defUK`: [U,K]=U** (`coprime_cent_prod` + `cent_semiregular regK`, C_U(K)=1)。
+- **`sUHs`: U⊆H_σ** (U=[U,K]⊆O_q(D)·H_σ, q^'-Hall 議論, sdprod_sigma)。
+- **最終**: `M⊓H=U⊔K`, `N_H(U)⊄M` (Lemma 14.1 `N_M(U)=UK`, H_σ⊆F(H))。`D≠H∩M*` ケース: C_{H_σ}(K)≠1 → q∈τ₂(H) → **Thm 12.5(e)** (`Msigma_nilpotent_of_tau2` 系) で H_σ∩M*=1 矛盾。
+- **要確認補題**: Thm 12.5(e) の正確な形 (S12_Theorem125), `coprime_cent_prod`/`semiregular` の Lean 等価, subnormal API (`Subgroup.Subnormal`?), `sigma_partition`。
+- ⟹ **大きい fresh-session タスク**。bottom-up helper (snK_sMst / FmaxH / sK_FD / sUHs) で分割推奨。署名拡張 (`N_H(U)⊄M` 追加) も要。
+
+**2026-06-22 (cont.⁶) ✅✅✅ BG Lemma 14.11 COMPLETE — `exists_maximal_of_typeF_notMem_fitting` sorry-free + axiom-clean** (`dc4c9055` + AxiomsCheck `6c562aa0`, full build 3881 green, FT-path sorry **131→130**):
+S8-S13 assembly 完結。**cont.⁵ で「残 gate」と誤判定した `C_{M*_σ}(Q)≠⊥` は resolvable だった** — MathComp `BGsection14.v` の `primes_non_Fitting_Ftype` (Coq Lemma 14.11) 精読で確定: **A は σ(M*)-subgroup ゆえ `A≤M*_σ`** (`sigma_subgroup_le_Msigma_of_isHall`; M*_σ は normal Hall σ-subgroup で全 σ-subgroup を含む — O_σ が任意 p-subgroup を含まないという私の懸念は誤り)、よって `C_{M*_σ}(Q)⊇A₁=A⊓C(Q)≠⊥`。
+- **assembly 鍵補題**: L=cyclic K' の order-p line (`characteristic_of_subgroup_of_isCyclic`+`mem_normalizer_map_subtype_of_characteristic` で M≤N(L)) / A E-normal (`elemAb_normal_in_E_of_tau2`) / index `q|[E:C_E(A)]` (`prime_dvd_index_of_sylow_not_le_of_normal`, Q⊄C(A) は ⁅A,Q⁆≠⊥ から直接) / Cor 12.9 で A₁∈ℰ_p¹ / Lemma 12.11 / τ₂(M*)=Cor 14.3 `maximalContaining_centralizer_eq_singleton_of_tau2_element` / κ(M*)=witness Q + ¬P2 (typeP_structure conj5 で σ=β、p∈σ\β と矛盾)。
+- 署名に `hEM : E ≤ M` 追加。**全 3 補題 (main + bundle + A-choice) を AxiomsCheck 登録**。
+- **▶ unblocks**: Cor 14.12 (`typeP2_neighbor_is_typeF`, S14:8614 の deferred `N_H(U)⊄M` clause) → **Thm C conjunct 2** → Prop 16.1。次 = Cor 14.12 で Lemma 14.11 を cite して `N_H(U)⊄M` を実証明 (issue 7007 「やること」conjunct 2)。
+
+**2026-06-22 (cont.⁵) ✅ BG Lemma 14.11 — FPF bundle + A-choice landed (4 commits) — assembly は全補題特定済、残 gate = `C_{M*_σ}(Q)≠⊥`**
+(lane-f, commits `6cf7d246`/`ab96c39d`/`5642817d`/`13132807`, full build 3881 green):
+
+実装済 infrastructure (全 sorry-free):
+- **S5 helper** `Q_le_fittingInG_of_commutator_centralizesQ` (`6cf7d246`)
+- **K' bundle (FPF 込)** `exists_typeF_complement_cyclic_commutator` (`5642817d`): K'=⁅⁅E,Q⁆,Q⁆ ≤E,
+  ≠⊥, cyclic, ≤C(M_σ), M≤N(K'), π(K')⊆τ₂, **C_{K'}(Q)=⊥** (FPF: `commutator_commutator_right_eq_of_le_normalizer`
+  で ⁅K',Q⁆=K' + `Isaacs.Ch05.fitting_coprime_abelian_decomp`)
+- **A-choice** `exists_elemAb_rank_two_le_E_containing_line` (`13132807`): L◁M order-p (p∈τ₂)、L≤E ⟹
+  ∃A∈ℰ_p²(E), L≤A。BG Lemma 10.5 (`pRank_eq_two_of_normalizer_le`, N_G(L)=M 経由) + Hall 共役
+  (`exists_conj_smul_le_hallPiece`、L は M-invariant で固定)。**Sylow/pRank bookkeeping 回避**。
+
+**残 main assembly (`exists_maximal_of_typeF_notMem_fitting`) — 全補題特定済、機械実装 ~150行**:
+1. **署名に `hEM : E ≤ M` 追加**（`esetup_of_isComplement` 要求）。
+2. **L 構成**: K' から order-p 元 `a`、`L:=zpowers a`。`L.subgroupOf K'` は **cyclic 部分群ゆえ characteristic**
+   (`characteristic_of_subgroup_of_isCyclic`) → `M≤N(K')⟹M≤N(L)` (`mem_normalizer_map_subtype_of_characteristic`)。
+   `⁅L,Q⁆≠⊥`: `L⊓C(Q)≤K'⊓C(Q)=C_{K'}(Q)=⊥` (FPF) ⟹ L⊄C(Q)。L∈ℰ_p¹。
+3. **A-choice 適用** → A∈ℰ_p²(E), L≤A。`⁅A,Q⁆≠⊥` (⊇⁅L,Q⁆≠⊥, `commutator_mono`)。
+4. **Cor 12.9** `commutator_decomp_of_tau1_action` (要 q∈τ₁ M = phase 1, hCQ): A₀=⁅A,Q⁆∈ℰ_p¹/≤A/
+   =A⊓C(M_σ)/M≤N(A₀); ¬∃g conj g•A₀=A₁; A₁=A⊓C(Q)∈ℰ_p¹/≤A/¬(C(A₁)≤M)。
+5. **index `q|[E:C_E(A)]`**: **Q⊄C(A₀)** = ¬conj 節 (Q≤C(A₀)⟹A₀≤A⊓C(Q)=A₁⟹A₀=A₁[both ℰ_p¹]⟹g=1 矛盾)。
+   E≤N(A₀)(M≤N(A₀))、C_E(A₀)◁E、Q⊓C_E(A₀)=⊥(q 素数) ⟹ `card_dvd_of_injective` で q|[E:C_E(A₀)];
+   C_E(A)≤C_E(A₀) (A⊇A₀) ⟹ `index_dvd_of_le` で [E:C_E(A₀)]|[E:C_E(A)] ⟹ q|[E:C_E(A)]。
+6. **M*∈𝓜(N_G(A))** (N_G(A)<⊤ ∵ A⊄◁simple G; maximalSubgroupsContaining 非空)。
+7. **Lemma 12.11** `tau2_transfer_to_maximal`: conjunct1 p∈σ(M*)\β(M*); conjunct2 (q∈index 経由)
+   **q∈τ₁(M*)∪τ₂(M*)**。case split:
+   - **q∈τ₂(M*)**: Cor 12.10(e) (`nilpotent_sigmaComplement_abelian.2.2.2.2.2` for M*、要 M*-E-setup) で
+     𝓜(C_G(Q))={M*} (Or.inl)。
+   - **q∈τ₁(M*)**: q∈κ(M*) (witness Q, C_{M*_σ}(Q)≠⊥) + σ(M*)≠β(M*)→¬P2→IsTypeP1 M* (Or.inr)。
+
+**⛔ 残 gate (両 case 共通) = `C_{M*_σ}(Q) = M*_σ⊓C(Q) ≠ ⊥`** (BG「C_{M*_γ}(Q)⊇C_A(Q)=A₁⊃1」):
+要 **A₁≤M*_σ**。A₁=A⊓C(Q)∈ℰ_p¹, A₁≤A≤M*, p∈σ(M*)。だが p-部分群 A₁ が O_σ(M*)=M*_σ に入るのは
+**一般に非自明**（O_σ は normal σ-core）。BG の根拠（Lemma 12.11 の σ-theory 内部構造、A≤M*_σ か A₁ の
+M*-positioning）は**未再構成 = 真の残 math gate**。Lemma 12.11 proof / §12 σ-theory の精読要。これが解ければ
+両 case の witness が出て assembly 完結。**次セッションの最優先 = この gate の解明**（infrastructure は全完備）。
+
+**2026-06-22 (cont.⁴) ✅ BG Lemma 14.11 S5 helper + S4-S7 (τ₂(M)≠∅) landed — S8-S13 完全再構成**
+(lane-f, commits `6cf7d246` + `ab96c39d`, leaf build green):
+
+- **S5 helper** `Q_le_fittingInG_of_commutator_centralizesQ` (S14, private, sorry-free): `Q≤E` abelian,
+  `⁅E,Q⁆` abelian, `⁅E,Q⁆≤C_G(Q)` (= 退化ケース `⁅⁅E,Q⁆,Q⁆=1`) ⟹ 正規閉包 `Q⊔⁅E,Q⁆` が abelian かつ
+  E-normal ⟹ `Q≤F(E)`。**E-normality は commutator の sup-distribution を回避**: 「`⁅x,e⁆∈Q⊔R` を満たす
+  `x` の集合」を部分群として構成 (`⁅a*b,e⁆=a*⁅b,e⁆*a⁻¹*⁅a,e⁆` を `group` で)、生成元 `Q`,`R=⁅E,Q⁆` を含む
+  ⟹ `E≤N(Q⊔R)`。abelian は `centralizer_sup_eq` + `R≤C_G(Q)`、最後に `nilpotent_normal_le_fitting` を `↥E` で。
+- **S4-S7** `exists_mem_tau2_of_typeF_complement` (S14, sorry-free): Lemma 14.11 の仮説下で `τ₂(M)≠∅`。
+  `K:=⁅E,Q⁆` abelian (Cor 12.10(b) `.2.1.2`)・q'群 (≤`derivedInG M`, `tau1_not_mem_derived_primeFactors`)・
+  σ'群 (≤E, `mem_tau_union_of_mem_primeFactors`)、`Q≤N(K)⊓M` → **Prop 10.11(d)**
+  `sigma_complement_commutator_cyclic_normal` で `K':=⁅K,Q⁆` cyclic・≤`C_G(M_σ)`・`M≤N(K')`。
+  `K'≠⊥` = S5 helper (`K'=⊥⟹⁅E,Q⁆≤C_G(Q)⟹Q≤F(E)` 矛盾)。`p∈π(K')⟹p∈τ₂`: 否なら `p∈τ₁∪τ₃` で
+  `r_p=1`、line `A∈ℰ_p¹` of `K'≤C_G(M_σ)` が `C_{M_σ}(A)=M_σ≠1` (Lemma 14.1 `msigma_structure_of_notMem_sigma_kappa` 矛盾)。
+
+**残 = S8-S13 (M* 二分律) — 数学完全再構成済 (次セッション straight 実装 ~300行)**:
+1. **coprime FPF `C_{K'}(Q)=⊥`**: `K=⁅E,Q⁆` は `E` で normal、`Q` と coprime (K q'群)。`↥E` 内で
+   `commutator_commutator_right_eq (K.subgroupOf E) (Q.subgroupOf E) [Normal] (coprime)` (要 `[IsSolvable ↥E]`)
+   → `⁅K,Q⁆=⁅⁅K,Q⁆,Q⁆` i.e. `K'=⁅K',Q⁆`。coprime 分解 `K'=C_{K'}(Q)×⁅K',Q⁆`
+   (`fitting_coprime_abelian_decomp`, Cor 12.9 で既使用) + `⁅K',Q⁆=K'` ⟹ `|C_{K'}(Q)|=1` ⟹ `C_{K'}(Q)=⊥`。
+2. **`L:=Ω₁(K'_p)`** (p∈π(K'), K' cyclic ゆえ p-part も cyclic): order p, `≤C_G(M_σ)`, `M≤N(L)`
+   (K'_p char in cyclic K' → `M≤N(K')` 経由、Ω₁ char)。`C_{K'}(Q)=⊥⟹C_L(Q)=⊥⟹⁅L,Q⁆=L≠⊥` (coprime on L)。
+3. **A 選択** `A∈ℰ_p²(E)` with `L≤A` ⟹ `⁅A,Q⁆⊇⁅L,Q⁆=L≠⊥`:
+   - **nonabelian Sylow_p(E)**: `exists_canonical_line_of_nonabelianSylow` (S12_Theorem127:325) が `A∈ℰ_p²`+canonical
+     line `A₀` + **universal property `∀W, M≤N(W)∧IsPGroup p W∧W≤M ⟹ W≤A₀`**。`L` は `M≤N(L)`/p群/≤M ⟹ `L≤A₀≤A`。
+   - **abelian Sylow_p(E)**: `A:=Ω₁(Sylow_p(E))∈ℰ_p²` (rank 2)、`L≤Sylow_p` ⟹ `L=Ω₁(L)≤A`。
+4. **`⁅A,Q⁆≠⊥` → `q|[E:C_E(A)]`** (✅ **subtlety RESOLVED via A₀**): `Q⊄C_E(A)` だけでは不十分 (A は E-normal でない)
+   が、**A₀:=⁅A,Q⁆ は M-normal** (`M≤N(A₀)` = Cor 12.9 `commutator_decomp_of_tau1_action` の `.1.2.2.2`、E≤M ゆえ
+   `E≤N(A₀)`) ゆえ A₀ で index 議論が回る:
+   - `Q⊄C_E(A₀)`: `⁅A₀,Q⁆=⁅⁅A,Q⁆,Q⁆=⁅A,Q⁆=A₀≠⊥` (coprime 恒等式 `commutator_commutator_right_eq` を A (p群, Q-coprime)
+     に、A∈ℰ_p² が E で normal 要 — または A₀∈ℰ_p¹ order p で `Q≤C(A₀)⟹⁅A₀,Q⁆=⊥` 矛盾を直接)。
+   - `E≤N(A₀)` + `Q⊄C_E(A₀)` + `|Q|=q` 素数 ⟹ `Q⊓C_E(A₀)=⊥` ⟹ `|C_E(A₀)|_q<|E|_q` (A₀ E-normal ゆえ Sylow_q 議論
+     が回る: `|C_E(A₀)|_q=|E|_q` なら Sylow_q(E)≤C_E(A₀)、E-conj で全 Sylow_q≤C_E(A₀^e)=C_E(A₀)、Q≤C_E(A₀) 矛盾)
+     ⟹ `q|[E:C_E(A₀)]`。
+   - `C_E(A)≤C_E(A₀)` (A⊇A₀) ⟹ `[E:C_E(A₀)] | [E:C_E(A)]` (tower) ⟹ **`q|[E:C_E(A)]`**。✅
+   - Cor 12.9 は `hAQ:⁅A,Q⁆≠⊥` を要求 (step 3 で確立); 同時に `A₀=A⊓C(M_σ)`/`A₁=A⊓C(Q)∈ℰ_p¹`/`C_G(A₁)⊄M` も供給
+     (κ(M*) case や TI に再利用可)。**∴ S8-S13 の数学ギャップは全て閉じた**。実装は abelian/nonabelian Sylow_p(E)
+     の A-choice 場合分け (step 3) が主な分量。
+5. **Lemma 12.11** `tau2_transfer_to_maximal` (M*∈𝓜(N_G(A))): conjunct 1 `p∈σ(M*)−β(M*)`、conjunct 2
+   `q∈τ₁(M*)∪τ₂(M*)`。case `q∈τ₂(M*)`: Cor 12.10(e) (`nilpotent_sigmaComplement_abelian.2.2.2.2.2`,
+   要 x∈M# with orderOf-primes⊆τ₂ ∧ M_σ⊓C(x)≠⊥ — Q の生成元で) → `𝓜(C_G(Q))={M*}` (Or.inl)。
+   case `q∈τ₁(M*)`: `q∈κ(M*)` (witness Q, `C_{M*_σ}(Q)⊇C_A(Q)≠1`) + `σ(M*)≠β(M*)` (p∈σ−β) → ¬P2 →
+   `IsTypeP1 M*` (`typeP_structure` conjunct 5 の対偶 + `isTypeP_iff_isTypeP1_or_isTypeP2`) (Or.inr)。
+- **署名修正要**: main theorem `exists_maximal_of_typeF_notMem_fitting` に `hEM : E ≤ M` を追加 (現 `IsComplement'`
+  だけでは E≤M 不導出、`esetup_of_isComplement` が要求)。BG「E is a complement of M_σ in M」に忠実、downstream
+  Cor 14.12 は D=H∩M*≤H で供給。
+
 **2026-06-22 (cont.³) ▶ BG Lemma 14.11 着手 — 依存閉包を全解決 + phase 1 (`q∈τ₁ ∧ C_{M_σ}(Q)=1`) landed**:
 `exists_maximal_of_typeF_notMem_fitting` (S14_TypePCounting:8473, sorry) は Thm C conjunct 2
 (`N_G(U)⊄M`=Cor 14.12) と Prop 16.1 の `hP2II` 両方の linchpin (TypeIIData.normalizer_not_le)。

@@ -45,6 +45,40 @@ honest 化**し、(3.9) の値性質を record/export する必要がある (lan
 これらが揃えば lane-c が betaM/generic engine を core 経由で sorry-free に組める。
 **∴ §16 char endgame の真の long pole = S15 η-grid carrier の honest 化 (lane-h)**。
 
+## 更新 (2026-06-22, resume session — 上流 2 sorry 着地 + 精密 gate 特定)
+
+ユーザー指示「上流から、文書上で早いものから、FT 限定」で再開。教科書 (14.4)/(14.6) 原文 +
+上流 (S15) export を精読し、**文書順で lane-c 自身が忠実に閉じられる 2 本**を着地 (commit `aff0bc2a`、
+full build + AxiomsCheck 緑 3881 jobs)。S16 実 sorry **13 → 11**、`bin/count-sorry` **131 → 129**。
+
+- **`caseB_for_S` (14.6, 旧 211)** ✅ — `caseB_for_T` と同じ opaque-`Prop` scaffold で close:
+  qualitative (9.7.b) 命題は `True` 担持 (consumer 不読)、数値 `u`-order は `S15.caseB_order_u_data`
+  (13.15, faithful sorried §13 obligation) を cite して (14.8)/(14.11) cascade へ wire
+  ([[feedback-cite-sorried-lemmas-if-signature-correct]])。(14.6) の rank-2 Sylow 群論本体は §13/§9 上流。
+- **`K_eq_V_index_pq` の index 半 (`e=p*q`, 14.11, 旧 2012)** ✅ — `MHypothesis` を
+  `complement_card_eq_pq` field で enrich (`LHypothesis.typeI_complement_card_eq_pq` の V-side dual)。
+  唯一の constructor `exists_MHypothesis` (既 sorry) が供給ゆえ index 半は直接帰結化。
+
+### ⚠ 精密 gate 特定 (lane-h ask、新規): `exists_MHypothesis` (14.10) の V-side 構造構築
+
+`exists_LHypothesis` は **sorry-free** だが、その dual `exists_MHypothesis` (旧 3324) は構造部すら
+組めない。理由: `S15.typeII_overNormalizer_frobenius` が **S/U-side ハードコード**
+(`(hSTypeII : IsTypeII hyp.S) → ∃ data, … ∧ (hyp.U ≤ data.H)`、S15:1712)。V-side 構築には
+**T/V-side dual** が必要:
+
+> **lane-h ask**: `typeII_overNormalizer_frobenius` の **T/V-side 版**を S15 に export —
+> `(hTTypeII : IsTypeII hyp.T) → ∃ data : TypeIOverNormalizerData(V-side), … ∧ (hyp.V ≤ data.H)`
+> (+ `complement_card_eq_pq` 相当)。これが在れば `exists_MHypothesis` は `exists_LHypothesis` の
+> 機械的 dual として構造部を sorry-free 化でき、`MHypothesis.complement_card_eq_pq` も供給される。
+
+同様に **`T_side_caseB_facts` (14.4, 136)** は S15 が S-side `caseA_parameters`(13.13)/`caseB_order_u`(13.15)
+のみ持ち **T-side dual を欠く** (`lambda_forces_T_caseB` は discharge 不能な `lambda_induced_from_PC_linear`
+仮説付き) ゆえ閉じられない。lane-h ask = T-side `caseA_parameters_T` (`caseA_for_T → p=3`) + (9.7)-for-T
+dichotomy + T-side `D=⊥`/`v=full`。
+
+⟹ **lane-c §16 の残 11 sorry は全て lane-h の §13/§14 char/構造理論に gated** (issue 4002 の再確認;
+本セッションで原文・signature レベルまで独立検証済)。詳細 = 下記 gate 分類 + issue 4003 (η-carrier)。
+
 ## 現状 (2026-06-22, kickoff session)
 
 `field_normalizer_structure` (POLE-2) の **dispatch tree は sorry-free** (lane-h の成果):

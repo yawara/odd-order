@@ -12,6 +12,7 @@ import OddOrder.GroupTheory.WielandtAssembly
 import OddOrder.GroupTheory.WielandtPerFactorDischarge
 import OddOrder.GroupTheory.RepresentationTheory.WielandtKernelFPF
 import OddOrder.GroupTheory.RepresentationTheory.WielandtElabFrobenius
+import OddOrder.GroupTheory.RepresentationTheory.SingerField
 import OddOrder.GroupTheory.WielandtFixedPoint
 import OddOrder.GroupTheory.PiElementDecomposition
 import OddOrder.GroupTheory.RepresentationTheory.CharacterCount
@@ -675,6 +676,13 @@ set_option linter.style.longLine false in
 #assert_only_allowed_axioms OddOrder.RepresentationTheory.card_irreducibleCharacter_le
 -- RepresentationTheory: there are finitely many irreducible characters of a finite group.
 #assert_only_allowed_axioms OddOrder.RepresentationTheory.finite_irreducibleCharacter
+-- RepresentationTheory (Singer, commutativity as a hypothesis): an abelian group acting
+-- faithfully + irreducibly on a finite 𝔽_p-module is cyclic with order dividing |M| - 1.
+-- This is the `CommGroup`-instance-free Singer mechanism (Peterfalvi (12.12) / (14.2)(a) core),
+-- realized via the quotient field `𝔽_p[E] ⧸ I`; it accepts BG Thm 2.6(a)'s commutativity output.
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.isCyclic_and_card_dvd_of_faithful_irreducible_comm
+#assert_only_allowed_axioms OddOrder.RepresentationTheory.mul_comm_monoidAlgebra_of_comm
 -- RepresentationTheory: completeness of irreducible characters — `f ⊥ Irr G ⇒ f = 0`
 -- (regular representation + Maschke + Schur).
 #assert_only_allowed_axioms OddOrder.RepresentationTheory.classFunction_eq_zero_of_orthogonal
@@ -4753,6 +4761,15 @@ via sharp transitivity (Theorem 14.4). -/
 `R`-equivariance `Rsub_conj`) combined with Part A.  The type-`P` counting bound for Theorem 14.7. -/
 #assert_only_allowed_axioms OddOrder.BG.Ch4.S14.sigmaConjugacySaturation_Mtilde_ncard
 
+/-! **BG Lemma 14.11** (`S14_TypePCounting`, `exists_maximal_of_typeF_notMem_fitting`): for
+`M ∈ 𝓜_F`, `E` an `M_σ`-complement, `Q ∈ ℰ_q¹(E)` with `Q ⊄ F(E)`, there is `M* ∈ 𝓜` with either
+`q ∈ τ₂(M*) ∧ 𝓜(C_G(Q)) = {M*}` or `q ∈ κ(M*) ∧ M* ∈ 𝓜_{P₁}`.  Sorry-free + axiom-clean.  The
+supporting `exists_typeF_complement_cyclic_commutator` (cyclic-commutator bundle with `C_{K'}(Q)=1`)
+and `exists_elemAb_rank_two_le_E_containing_line` (the A-choice) are registered below. -/
+#assert_only_allowed_axioms OddOrder.BG.Ch4.S14.exists_maximal_of_typeF_notMem_fitting
+#assert_only_allowed_axioms OddOrder.BG.Ch4.S14.exists_typeF_complement_cyclic_commutator
+#assert_only_allowed_axioms OddOrder.BG.Ch4.S14.exists_elemAb_rank_two_le_E_containing_line
+
 /-! **σ-decomposition keystone** (`S14_TypePCounting`, `length_one_of_isPiElement_sigma`):
 a nonidentity `σ(M)`-element `x` has `ℓ_σ(x) = 1`.  Existence half of the σ-decomposition (BG §1):
 `⟨x⟩` is conjugate into `M_σ` (Cor 12.16(a)), so `𝓜_σ(x) ≠ ∅`.  Foundation for Lemma 14.6. -/
@@ -5586,3 +5603,8 @@ formula together with the prime computation `coprimeFrobeniusAction_card_eq_prim
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.S11.exists_characteristic_complement_to_sylow_of_nilpotent
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S11.exists_chiefFactor_seed
+-- The chief-factor kernel and its elementary-abelian + `U W₁`-irreducible + `U`-noncentral
+-- structure of `H̄ = H/N` is axiom-clean.  (`exists_chiefFactorData` / `chiefFactor_basic` assemble
+-- it but additionally carry `typeIII_IV_p_eq_W2`, which cites the still-`sorry`'d §12 prime-order
+-- result `theorem88_caseB_prime_orders`, so they are not yet axiom-clean.)
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S11.exists_chiefFactor_kernel
