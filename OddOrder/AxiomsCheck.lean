@@ -5641,3 +5641,4 @@ formula together with the prime computation `coprimeFrobeniusAction_card_eq_prim
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S11.forall_aInvariant_le_pointwise_smul
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S11.card_pointwise_smul
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S11.chiefFactor_clifford_dim_dvd_q
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S11.chiefFactor_clifford_U_dichotomy
