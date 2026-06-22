@@ -1507,6 +1507,58 @@ theorem chiefFactor_basic [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     have h2 : 2 ≤ p ^ data.q := le_trans hp.two_le (Nat.le_self_pow hq_ne p)
     omega
 
+/-! ### (9.7) The chief factor `H̄ = H/H₀` as an `𝔽ₚ[U W₁]`-module
+
+The Clifford dichotomy of (9.7) is read off the `𝔽ₚ`-dimension of `H̄`: it equals `q`, and `q` is
+prime, so under the restricted `U`-action `H̄` decomposes into `k` irreducible summands of a common
+dimension `d` with `q = k·d`, forcing `(k, d) ∈ {(1, q), (q, 1)}`.  The starting point is the order
+`|H̄| = p^q` (hence `dim_{𝔽ₚ} H̄ = q`). -/
+
+/-- The chief factor `H̄ = H/H₀ ≅ ↥H ⧸ N` has order `p^q`: `|H| = p^q·|H₀|` (`quotient_order`) and
+`|H₀| = |N|` (`H₀ = N.map H.subtype`), so `[H : N] = p^q`. -/
+theorem chiefFactor_quotient_card [Finite G] {M : Subgroup G} {data : TypesIIIIIIVSetup M}
+    (chief : ChiefFactorData data) :
+    Nat.card (↥data.H ⧸ chief.N) = chief.p ^ data.q := by
+  haveI := chief.N_normal
+  have hH0card : Nat.card ↥chief.H0 = Nat.card ↥chief.N := by
+    rw [chief.H0_eq]
+    exact (Nat.card_congr (Subgroup.equivMapOfInjective chief.N data.H.subtype
+      data.H.subtype_injective).toEquiv).symm
+  have key : chief.N.index * Nat.card ↥chief.N = chief.p ^ data.q * Nat.card ↥chief.N := by
+    rw [Subgroup.index_mul_card, chief.quotient_order, hH0card]
+  rw [(Subgroup.index_eq_card chief.N).symm]
+  exact Nat.eq_of_mul_eq_mul_right Nat.card_pos key
+
+/-- **(9.7) span step** (general form): in an irreducible `A`-action on a group `H` (every
+`A`-invariant subgroup is `⊥` or `⊤`), any nonzero subgroup `S₀` generates `H` under its
+`A`-orbit — `⨆_{a} φ(a) • S₀ = ⊤`.  The orbit join is `A`-invariant (reindex `a ↦ h·a`) and
+contains `S₀ ≠ ⊥`, hence is `⊤`.  Applied to the `U W₁`-irreducible chief factor `H̄` with `S₀` a
+minimal `U`-invariant piece, this shows `H̄` is spanned by the `W₁`-conjugates of `S₀` — the entry
+point to the Clifford decomposition. -/
+theorem iSup_smul_eq_top_of_irreducible {A H : Type*} [Group A] [Group H] {φ : A →* MulAut H}
+    (hirr : ∀ J : Subgroup H, IsAInvariant φ J → J = ⊥ ∨ J = ⊤)
+    {S₀ : Subgroup H} (hS₀ : S₀ ≠ ⊥) :
+    ⨆ (a : A), φ a • S₀ = ⊤ := by
+  set T := ⨆ (a : A), φ a • S₀ with hT
+  -- `T` is `φ`-invariant: `φ h • T = ⨆ a, φ (h·a) • S₀ = T` by reindexing `a ↦ h·a`.
+  have hTinv : IsAInvariant φ T := by
+    intro h
+    have h1 : φ h • T = ⨆ (a : A), φ (h * a) • S₀ := by
+      rw [hT, pointwise_mulAut_smul_eq_map, Subgroup.map_iSup]
+      exact iSup_congr fun a => by
+        rw [← pointwise_mulAut_smul_eq_map, smul_smul, ← map_mul]
+    rw [h1]
+    exact le_antisymm (iSup_le fun a => le_iSup_of_le (h * a) le_rfl)
+      (iSup_le fun a => le_iSup_of_le (h⁻¹ * a)
+        (le_of_eq (by rw [← mul_assoc, mul_inv_cancel, one_mul])))
+  -- `T ≠ ⊥` (contains the `a = 1` term `S₀`), so irreducibility forces `T = ⊤`.
+  have hTne : T ≠ ⊥ := by
+    intro hbot
+    refine hS₀ (le_bot_iff.mp (hbot ▸ ?_))
+    have := le_iSup (fun a : A => φ a • S₀) 1
+    rwa [map_one, one_smul] at this
+  exact (hirr T hTinv).resolve_left hTne
+
 /-- **Peterfalvi (9.7)**: the Clifford-theory dichotomy for the action on the
 chief factor `H/H_0`. -/
 theorem clifford_dichotomy [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
