@@ -8634,20 +8634,29 @@ private theorem Q_le_fittingInG_of_commutator_centralizesQ [Finite G]
 
 open OddOrder.BG.Ch3.S10 in
 /-- **BG Lemma 14.11, steps S4–S7**: under the Lemma 14.11 hypotheses (`M ∈ 𝓜_F`, `E` a
-`M_σ`-complement, `q ∈ π(E)`, `Q ∈ ℰ_q¹(E)`, `Q ⊄ F(E)`), the set `τ₂(M)` is nonempty.
+`M_σ`-complement, `q ∈ π(E)`, `Q ∈ ℰ_q¹(E)`, `Q ⊄ F(E)`), there is a nontrivial cyclic subgroup
+`K' = ⁅⁅E, Q⁆, Q⁆ ≤ E` that is normal in `M`, contained in `C_G(M_σ)`, has all primes in `τ₂(M)`
+(so `τ₂(M) ≠ ∅`), and on which `Q` acts fixed-point-freely (`C_{K'}(Q) = 1`).
 
 `K := ⁅E, Q⁆` is an abelian (Cor 12.10(b)) `q'`-subgroup of `M` normalized by `Q`; Proposition
 10.11(d) makes `K' := ⁅K, Q⁆` cyclic, normal in `M`, and contained in `C_G(M_σ)`.  If `K' = 1`
 then `⁅E, Q⁆ ≤ C_G(Q)` and `Q ≤ F(E)` (the S5 helper), contradicting `Q ⊄ F(E)`; so `K' ≠ 1`.
 A prime `p ∈ π(K')` lies in `τ₂(M)`: otherwise `p ∈ τ₁(M) ∪ τ₃(M)` has `r_p(M) = 1`, and a line
-`A ∈ ℰ_p¹` of `K' ≤ C_G(M_σ)` would have `C_{M_σ}(A) = M_σ ≠ 1`, contradicting Lemma 14.1. -/
-theorem exists_mem_tau2_of_typeF_complement [Finite G]
+`A ∈ ℰ_p¹` of `K' ≤ C_G(M_σ)` would have `C_{M_σ}(A) = M_σ ≠ 1`, contradicting Lemma 14.1.  The
+`C_{K'}(Q) = 1` fixed-point-freeness comes from the coprime identity `⁅K', Q⁆ = K'` (BG **G** 8.5.4,
+`commutator_commutator_right_eq` in `↥E`) and the coprime complement `fitting_coprime_abelian_decomp`. -/
+theorem exists_typeF_complement_cyclic_commutator [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     {M E E₁ E₂ E₃ Q : Subgroup G} {q : ℕ}
     (hsetup : SubgroupESetup M E E₁ E₂ E₃) (hF : IsTypeF M)
     (hq : q ∈ piSet E) (hQ : Q ∈ elemAbelianOfRank G q 1) (hQE : Q ≤ E)
     (hQF : ¬ Q ≤ OddOrder.BG.Ch2.S08.fittingInG E) :
-    ∃ p : ℕ, p ∈ tau2 M := by
+    ∃ K' : Subgroup G,
+      K' ≤ E ∧ K' ≠ ⊥ ∧ IsCyclic ↥K' ∧
+      K' ≤ Subgroup.centralizer (Msigma M : Set G) ∧
+      M ≤ Subgroup.normalizer (K' : Set G) ∧
+      (∀ p ∈ (Nat.card ↥K').primeFactors, p ∈ tau2 M) ∧
+      Subgroup.centralizer (Q : Set G) ⊓ K' = ⊥ := by
   classical
   have hqpf : q ∈ (Nat.card ↥E).primeFactors := hq
   haveI : Fact q.Prime := ⟨Nat.prime_of_mem_primeFactors hqpf⟩
@@ -8686,7 +8695,7 @@ theorem exists_mem_tau2_of_typeF_complement [Finite G]
   have hQNK : Q ≤ Subgroup.normalizer (K : Set G) ⊓ M :=
     le_inf (hQE.trans (hKdef ▸ Ch04.subgroup_le_normalizer_commutator_self E Q)) hQM
   -- Proposition 10.11(d): `K' := ⁅K, Q⁆ ≤ C_G(M_σ)`, cyclic, `M ≤ N_G(K')`.
-  obtain ⟨hK'cent, _hK'cyc, _hMNK'⟩ :=
+  obtain ⟨hK'cent, hK'cyc, hMNK'⟩ :=
     sigma_complement_commutator_cyclic_normal hG hsetup.mem_maximal hKM hKσ' hqτ1.1 hQ hQNK hCQ
       hKab hKq'
   set K' : Subgroup G := ⁅K, Q⁆ with hK'def
@@ -8699,49 +8708,75 @@ theorem exists_mem_tau2_of_typeF_complement [Finite G]
     have hQab : IsMulCommutative ↥Q := ⟨⟨hQ.1.comm⟩⟩
     rw [hK'def, Subgroup.commutator_eq_bot_iff_le_centralizer] at hbot
     exact Q_le_fittingInG_of_commutator_centralizesQ hQE hQab (hKdef ▸ hKab) (hKdef ▸ hbot)
-  -- A prime `p ∈ π(K')` lies in `τ₂(M)`.
-  have hcard1 : Nat.card ↥K' ≠ 1 := fun h => hK'ne (Subgroup.card_eq_one.mp h)
-  obtain ⟨p, hpp, hpd⟩ := Nat.exists_prime_and_dvd hcard1
-  refine ⟨p, ?_⟩
-  haveI : Fact p.Prime := ⟨hpp⟩
-  by_contra hpτ2
-  have hpE : p ∈ (Nat.card ↥E).primeFactors :=
-    Nat.mem_primeFactors.mpr ⟨hpp, hpd.trans (Subgroup.card_dvd_of_le hK'E), Nat.card_pos.ne'⟩
-  have hpτ : p ∈ tau1 M ∪ tau2 M ∪ tau3 M := hsetup.mem_tau_union_of_mem_primeFactors hG hpE
-  have hr1 : pRank ↥M p = 1 := by
-    rcases hpτ with (h | h) | h
-    · exact h.2.2
-    · exact absurd h hpτ2
-    · exact h.2.2
-  obtain ⟨a, hacard⟩ := exists_prime_orderOf_dvd_card' (G := ↥K') p hpd
-  set A : Subgroup G := Subgroup.zpowers (a : G) with hAdef
-  have hAK' : A ≤ K' := by rw [hAdef, Subgroup.zpowers_le]; exact a.2
-  have haGcard : orderOf (a : G) = p :=
-    (orderOf_injective K'.subtype K'.subtype_injective a).trans hacard
-  have hAcard : Nat.card ↥A = p := by rw [hAdef, Nat.card_zpowers]; exact haGcard
-  have hAelem : A.IsElementaryAbelian p := Subgroup.IsElementaryAbelian.of_card_prime hAcard
-  have hA : A ∈ elemAbelianOfRank G p (pRank ↥M p) := by
-    rw [hr1, mem_elemAbelianOfRank]; exact ⟨hAelem, by rw [hAcard, pow_one]⟩
-  have hpπ : p ∈ piSet M :=
-    Nat.mem_primeFactors.mpr ⟨hpp, hpd.trans (Subgroup.card_dvd_of_le (hK'E.trans hsetup.E_le)),
-      Nat.card_pos.ne'⟩
-  have hpσ : p ∉ sigma M := by
-    rcases hpτ with (h | h) | h
-    · exact tau1_subset_sigma_compl M h
-    · exact tau2_subset_sigma_compl M h
-    · exact tau3_subset_sigma_compl M h
-  have hpκ : p ∉ kappa M := by rw [hF]; exact Set.notMem_empty p
-  have hAM : A ≤ M := hAK'.trans (hK'E.trans hsetup.E_le)
-  obtain ⟨_, hCA, _⟩ := msigma_structure_of_notMem_sigma_kappa hG hsetup.mem_maximal hpπ hpσ hpκ hA hAM
-  have hAcent : A ≤ Subgroup.centralizer (Msigma M : Set G) := hAK'.trans hK'cent
-  have hMσcentA : Msigma M ≤ Subgroup.centralizer (A : Set G) := by
-    rw [← Subgroup.commutator_eq_bot_iff_le_centralizer, Subgroup.commutator_comm,
-      Subgroup.commutator_eq_bot_iff_le_centralizer]
-    exact hAcent
-  have hinf : Msigma M ⊓ Subgroup.centralizer (A : Set G) = Msigma M :=
-    inf_eq_left.mpr hMσcentA
-  rw [hCA] at hinf
-  exact Msigma_ne_bot hG hsetup.mem_maximal hinf.symm
+  -- Every prime of `K'` lies in `τ₂(M)`.
+  have hπτ2 : ∀ p ∈ (Nat.card ↥K').primeFactors, p ∈ tau2 M := by
+    intro p hp
+    obtain ⟨hpp, hpd, -⟩ := Nat.mem_primeFactors.mp hp
+    haveI : Fact p.Prime := ⟨hpp⟩
+    by_contra hpτ2
+    have hpE : p ∈ (Nat.card ↥E).primeFactors :=
+      Nat.mem_primeFactors.mpr ⟨hpp, hpd.trans (Subgroup.card_dvd_of_le hK'E), Nat.card_pos.ne'⟩
+    have hpτ : p ∈ tau1 M ∪ tau2 M ∪ tau3 M := hsetup.mem_tau_union_of_mem_primeFactors hG hpE
+    have hr1 : pRank ↥M p = 1 := by
+      rcases hpτ with (h | h) | h
+      · exact h.2.2
+      · exact absurd h hpτ2
+      · exact h.2.2
+    obtain ⟨a, hacard⟩ := exists_prime_orderOf_dvd_card' (G := ↥K') p hpd
+    set A : Subgroup G := Subgroup.zpowers (a : G) with hAdef
+    have hAK' : A ≤ K' := by rw [hAdef, Subgroup.zpowers_le]; exact a.2
+    have haGcard : orderOf (a : G) = p :=
+      (orderOf_injective K'.subtype K'.subtype_injective a).trans hacard
+    have hAcard : Nat.card ↥A = p := by rw [hAdef, Nat.card_zpowers]; exact haGcard
+    have hAelem : A.IsElementaryAbelian p := Subgroup.IsElementaryAbelian.of_card_prime hAcard
+    have hA : A ∈ elemAbelianOfRank G p (pRank ↥M p) := by
+      rw [hr1, mem_elemAbelianOfRank]; exact ⟨hAelem, by rw [hAcard, pow_one]⟩
+    have hpπ : p ∈ piSet M :=
+      Nat.mem_primeFactors.mpr ⟨hpp, hpd.trans (Subgroup.card_dvd_of_le (hK'E.trans hsetup.E_le)),
+        Nat.card_pos.ne'⟩
+    have hpσ : p ∉ sigma M := by
+      rcases hpτ with (h | h) | h
+      · exact tau1_subset_sigma_compl M h
+      · exact tau2_subset_sigma_compl M h
+      · exact tau3_subset_sigma_compl M h
+    have hpκ : p ∉ kappa M := by rw [hF]; exact Set.notMem_empty p
+    have hAM : A ≤ M := hAK'.trans (hK'E.trans hsetup.E_le)
+    obtain ⟨_, hCA, _⟩ := msigma_structure_of_notMem_sigma_kappa hG hsetup.mem_maximal hpπ hpσ hpκ hA hAM
+    have hAcent : A ≤ Subgroup.centralizer (Msigma M : Set G) := hAK'.trans hK'cent
+    have hMσcentA : Msigma M ≤ Subgroup.centralizer (A : Set G) := by
+      rw [← Subgroup.commutator_eq_bot_iff_le_centralizer, Subgroup.commutator_comm,
+        Subgroup.commutator_eq_bot_iff_le_centralizer]
+      exact hAcent
+    have hinf : Msigma M ⊓ Subgroup.centralizer (A : Set G) = Msigma M :=
+      inf_eq_left.mpr hMσcentA
+    rw [hCA] at hinf
+    exact Msigma_ne_bot hG hsetup.mem_maximal hinf.symm
+  -- `Q` acts fixed-point-freely on `K'`: coprime identity `⁅K', Q⁆ = K'`.
+  have hqprime : q.Prime := Fact.out
+  haveI hK'ab : IsMulCommutative ↥K' := isMulCommutative_of_le (hKdef ▸ hKab) hK'_le_K
+  have hQNK' : Q ≤ Subgroup.normalizer (K' : Set G) := hQM.trans hMNK'
+  have hqnK : ¬ q ∣ Nat.card ↥K := fun hdvd =>
+    hKq' q (Nat.mem_primeFactors.mpr ⟨hqprime, hdvd, Nat.card_pos.ne'⟩) rfl
+  have hQcard : Nat.card ↥Q = q := by rw [hQ.2, pow_one]
+  have hcopKQ : Nat.Coprime (Nat.card ↥K) (Nat.card ↥Q) := by
+    rw [hQcard]; exact (hqprime.coprime_iff_not_dvd.mpr hqnK).symm
+  have hqnK' : ¬ q ∣ Nat.card ↥K' := fun hdvd =>
+    hqnK (hdvd.trans (Subgroup.card_dvd_of_le hK'_le_K))
+  have hcopK'Q : Nat.Coprime (Nat.card ↥K') (Nat.card ↥Q) := by
+    rw [hQcard]; exact (hqprime.coprime_iff_not_dvd.mpr hqnK').symm
+  have hident : (⁅K', Q⁆ : Subgroup G) = K' := by
+    haveI : IsSolvable ↥M := hG.solvable_of_mem_maximalSubgroups hsetup.mem_maximal
+    haveI : IsSolvable ↥(K ⊔ Q) :=
+      solvable_of_solvable_injective (Subgroup.inclusion_injective (sup_le hKM hQM))
+    have hid := commutator_commutator_right_eq_of_le_normalizer (D := K) (Q := Q)
+      ‹IsSolvable ↥(K ⊔ Q)› (le_inf_iff.mp hQNK).1 hcopKQ
+    rw [← hK'def] at hid
+    exact hid
+  have hFPF : Subgroup.centralizer (Q : Set G) ⊓ K' = ⊥ := by
+    obtain ⟨hdisj, -⟩ :=
+      OddOrder.Isaacs.Ch05.fitting_coprime_abelian_decomp (P := K') (K := Q) hQNK' hcopK'Q
+    rwa [hident, inf_assoc, inf_idem] at hdisj
+  exact ⟨K', hK'E, hK'ne, hK'cyc, hK'cent, hMNK', hπτ2, hFPF⟩
 
 /-- **BG Lemma 14.11** (mmd L4086): for `M ∈ 𝓜_F` with `E` a complement of `M_σ` in `M`, a
 prime `q ∈ π(E)`, and `Q ∈ ℰ_q¹(E)` with `Q ⊄ F(E)`, there is `M* ∈ 𝓜` with either
