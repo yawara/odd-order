@@ -334,6 +334,57 @@ theorem exists_galoisField_repr {q : ℕ} (hq : q.Prime) [NeZero (Nat.card C : Z
       _ = (((Units.map (φ : data.K →+* GaloisField p q).toMonoidHom).comp data.μ) c :
             GaloisField p q) * (data.e.trans φ.toAddEquiv) x := by rw [hμc]; rfl
 
+omit [IsCyclic C] [Finite C] in
+/-- **Singer order bound.**  A (commutative) group `C` acting `𝔽_p`-linearly,
+faithfully, and irreducibly (`M` a *simple* `𝔽_p[C]`-module) on a finite module `M` is
+**cyclic**, and its order **divides `|M| - 1`**.
+
+`C` embeds (via `nonempty_singerFieldData`) in the multiplicative group `Kˣ` of the Singer
+field `K ≅ M`, which is cyclic of order `|K| - 1 = |M| - 1`; faithfulness makes the embedding
+`μ : C →* Kˣ` injective.
+
+This is the field-theoretic core of the irreducible case of **Peterfalvi (12.12)** (a Frobenius
+complement acting irreducibly on an elementary abelian Sylow subgroup `T` of order `p^2` is
+cyclic of order dividing `p^2 - 1`), and the order half of **(14.2)(a)**.
+
+`Finite C` is *derived* (the injection `μ : C →* Kˣ` lands in the finite `Kˣ`), so it is not
+assumed; neither `IsCyclic C` nor `Fact p.Prime` is needed. -/
+theorem isCyclic_and_card_dvd_card_sub_one_of_faithful_irreducible
+    [IsSimpleModule (MonoidAlgebra (ZMod p) C) M]
+    (hfaith : ∀ c : C, (∀ x : M, MonoidAlgebra.of (ZMod p) C c • x = x) → c = 1) :
+    IsCyclic C ∧ Nat.card C ∣ Nat.card M - 1 := by
+  classical
+  obtain ⟨data⟩ := nonempty_singerFieldData (p := p) (C := C) (M := M)
+  haveI : Fintype M := Fintype.ofFinite M
+  haveI : Fintype data.K := data.fintype
+  -- The realization `μ : C →* Kˣ` is injective by faithfulness.
+  have hμinj : Function.Injective data.μ := by
+    rw [injective_iff_map_eq_one]
+    intro c hc
+    apply hfaith c
+    intro x
+    have hcompat := data.compat c x
+    rw [hc, Units.val_one, one_mul] at hcompat
+    exact data.e.injective hcompat
+  -- `Kˣ` is cyclic (finite field), so its subgroup `range μ` is cyclic, hence so is `C`.
+  haveI : IsCyclic data.Kˣ := inferInstance
+  haveI : IsCyclic data.μ.range := inferInstance
+  have hCcyc : IsCyclic C :=
+    isCyclic_of_surjective (MonoidHom.ofInjective hμinj).symm.toMonoidHom
+      (MonoidHom.ofInjective hμinj).symm.surjective
+  refine ⟨hCcyc, ?_⟩
+  -- `|C| = |range μ|` divides `|Kˣ| = |K| - 1 = |M| - 1`.
+  have hcardC : Nat.card C = Nat.card data.μ.range :=
+    Nat.card_congr (MonoidHom.ofInjective hμinj).toEquiv
+  have hdvd : Nat.card data.μ.range ∣ Nat.card data.Kˣ :=
+    Subgroup.card_subgroup_dvd_card _
+  have hunits : Nat.card data.Kˣ = Nat.card data.K - 1 := by
+    rw [Nat.card_eq_fintype_card, Nat.card_eq_fintype_card, Fintype.card_units]
+  have hKM : Nat.card data.K = Nat.card M := (Nat.card_congr data.e.toEquiv).symm
+  rw [hunits, hKM] at hdvd
+  rw [hcardC]
+  exact hdvd
+
 end Irreducibility
 
 end OddOrder.RepresentationTheory
