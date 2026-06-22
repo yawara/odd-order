@@ -92,20 +92,41 @@ fails (blocker notes below). (b) realizing the field as `End_{𝔽_p[E]}(M)` via
 `Module.End.instMonoid` and the division-ring instance's monoid (hard type mismatch at the
 `Units.coeHom`/`isCyclic_of_injective_ringHom` seam + `whnf` timeout even at 800k heartbeats).
 
-## ▶ Next steps (the §12 program for lane-h)
+## ✅✅✅ (12.12) irreducible (Case B) core LANDED (2026-06-22 lane-h resume⁹ cont., commit `2cc5c997`)
 
-1. **Representation-level glue + full FPF rank-≤2 lemma** (in `S14_MaximalI`, where both
-   `SingerField` and S02 are importable — the glue needs `odd_two_dim_abelian` so it cannot live
-   in low-level `SingerField`):
-   - **irreducible rank-2**: `odd_two_dim_abelian` (BG 2.6(a), S02 ✓; `Representation (ZMod p) E V`,
-     `finrank = 2`, `Function.Injective ρ`, char hyp ⟹ `Std.Commutative (·*·)`) gives `hcomm`;
-     feed `hcomm.comm` + `IsSimpleModule (𝔽_p[E]) ρ.asModule` + `hfaith` (in the
-     `∀ e, (∀ x, of e • x = x) → e = 1` form) into the RESOLVED lemma with `M := ρ.asModule`,
-     then transport `|ρ.asModule| = |V|` (`Nat.card_congr ρ.asModuleEquiv.toEquiv`).
-     ⚠ to avoid the `Module (𝔽_p[E]) ρ.asModule` *binder*-synthesis failure, take irreducibility
-     as `[Representation.IsIrreducible ρ]` (needs `[Fact p.Prime]`; ZIrrFourier idiom), then
-     `haveI : IsSimpleModule … := inferInstance` inside the proof.
-   - rank 1 / reducible rank 2: `E ↪ Aut(ℤ/p) ≅ (ℤ/p)ˣ` cyclic, `|E| ∣ p−1`.
+**`isCyclic_and_card_dvd_of_odd_two_dim_irreducible`** (S14_MaximalI, sorry-free + axiom-clean,
+AxiomsCheck-registered): odd `E` acting **faithfully + irreducibly** on a 2-dim `𝔽_p`-space `V`
+with `p ∤ |E|` ⟹ `E` cyclic ∧ `|E| ∣ |V| − 1 = p² − 1`.  Proof = `odd_two_dim_abelian` (BG 2.6(a))
+→ `.comm` → RESOLVED comm-Singer lemma.  This is **Case B core of (12.12)**.
+
+🔑 **instance-handling that finally worked** (after the `ρ.asModule`-synthesis quagmire): take
+irreducibility as an **explicit** hypothesis `(hirr : Representation.IsIrreducible ρ)` (NOT an
+instance — an `[IsIrreducible ρ]` *instance* in scope wedges `Module (𝔽_p[E]) ρ.asModule`
+synthesis, confirmed), and put the module on `V` directly via
+`letI : Module (𝔽_p[E]) V := Module.compHom V (ρ.asAlgebraHom).toRingHom` (definitionally
+`ρ.asModule`'s instance) + `hsmul : of e • x = ρ e x` (via `asAlgebraHom_of`) + `IsSimpleModule`
+from `(irreducible_iff_isSimpleModule_asModule ρ).mp hirr`.  Apply comm-Singer with `M := V`
+(no `asModuleEquiv` transport needed).  `[Fact p.Prime]` required (for `IsIrreducible`'s `Field`).
+
+## ▶ Next steps — full (12.12) `complement_cyclic_order_dvd` (Pf 04.14 L67-74, §8-gated)
+
+The book proof of (12.12): let `P = O_p(H)`, `T = Ω₁(Z(P))` (elem-ab of order `p` or `p²`),
+`E` normalizes `T` and (by (12.10)) **acts FPF on `T`**.
+- **Case A** (`E` normalizes an order-`p` subgroup of `T`): `E ↪ Aut(ℤ/p) ≅ (ℤ/p)ˣ` ⟹ cyclic,
+  `e ∣ p−1`.  (ungated rep theory, once the `T`/FPF setup exists)
+- **Case B** (`|T| = p²`, `E` irreducible on `T`): ✅ **core landed** gives cyclic ∧ `e ∣ p²−1`.
+  **`p+1` refinement**: any `A ≤ E` with `|A| ∣ p−1` embeds in `𝔽_pˣ`, so normalizes every line
+  of `T`; in particular `⟨x⟩` (`x ∈ T = Ω₁(P_0)`), so `A ⊆ M` (by (12.9)), so `A = 1` (by (12.11)).
+  Hence `gcd(e, p−1) = 1`, and with `e ∣ p²−1 = (p−1)(p+1)` ⟹ `e ∣ p+1`.
+- **gate**: the `T`/FPF setup + the `A=1` refinement consume **(12.9)/(12.10)/(12.11)**, which are
+  the §8-gated counterexample scaffold ((8.12.a) Sylow-of-U rank ≤ 2, (8.13.c1) `L = L_F ⋊ (M∩L)`
+  — BG §16 consequences not yet extracted in repo S10) + `CounterexampleHypothesis`/`RankTwoWitnessData`
+  faithful-ization.  ⟹ (12.12) as a whole is blocked on that scaffold; the Case B *core* is the
+  ungated, reusable part and is done.
+
+Optional ungated fragments (small, reusable, but cannot close (12.12) without the scaffold):
+Case A lemma (`E` FPF + normalizes order-`p` line ⟹ `E ↪ (ℤ/p)ˣ`), and "an `𝔽_pˣ`-acting
+`A` normalizes every line".
 
    ### ⚠ Instance-engineering blocker (diagnosed 2026-06-22 — ✅ SUPERSEDED/RESOLVED, see "RESOLVED" block above; kept as a record of the dead ends)
    The clean composition is **blocked** because the Singer lemma requires `[CommGroup C]` but
