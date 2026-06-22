@@ -3103,6 +3103,36 @@ theorem Hypothesis.muGridAlpha_tau1_inner_muColumn [Finite G] {M : Subgroup G}
   linear_combination h45 - (d : ℂ) * h12
 
 open scoped FiniteInduce in
+/-- **Peterfalvi (10.6)(a), `(α_{ij}^τ, μ_j^{τ₁} − dζ̄^{τ₁}) = 1`** (diagonal): the coherent-side
+form of the G-side diagonal inner product `muGridAlpha_tau_inner_muColumn_self_sub_conj`.  Since
+`μ_j = ∑_i μ_{ij} ∈ S` (`muGrid_column_sum_mem_inducedFamily`) and `ζ̄ ∈ S`, the supported
+combination `(μ_j − dζ̄)^τ` splits as `μ_j^{τ₁} − dζ̄^{τ₁}` (`tau_muColumn_sub_conj_eq_tau1`).
+
+This is the reduction opening `1 = (α_{ij}^τ, μ_j^{τ₁} − dζ̄^{τ₁})` of Peterfalvi (10.6)(a);
+dropping the `⊥ Im σ` terms (`ζ^{τ₁}, ζ̄^{τ₁} ⊥ Im σ`, `ζ^{τ₁} ⊥ μ_j^{τ₁}`) gives
+`(δ(ω_{ij}^σ − ω_{i0}^σ), μ_j^{τ₁}) = 1`, and Peterfalvi (5.8) then yields the summed isometry
+`μ_j^{τ₁} = δ∑_i ω_{ij}^σ` (the (10.6)(a) conclusion, still gated on (5.8)). -/
+theorem Hypothesis.muGridAlpha_tau1_inner_muColumn_self_sub_conj [Finite G] {M : Subgroup G}
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis M) (hodd : Odd (Nat.card G))
+    (i : Fin hyp.w1) {j : Fin hyp.w2} (hj0 : j ≠ 0)
+    {params : CharacterParameters hyp} (coh : CoherentHypothesis hyp params)
+    {ζ : ClassFunction ↥M ℂ} (hζS : ζ ∈ inducedFamily M) (hζirr : IsIrreducibleCharacter ζ)
+    (hζne : ζ.conj ≠ ζ) {d : ℕ} {δ : ℤ} {n : ℕ}
+    (hdeg : hyp.muGrid hG hodd i j 1 = (d : ℂ)) (hμ0 : hyp.muGrid hG hodd i 0 1 = 1)
+    (hζ1 : ζ 1 = (hyp.w1 : ℂ)) (hnf : (n : ℤ) * (hyp.w1 : ℤ) = (d : ℤ) - δ)
+    (hδj : hyp.muColumnSign hG hodd j = δ) (h0ζ : hyp.muGrid hG hodd i 0 1 ≠ ζ 1)
+    (hjζ : ∀ i' : Fin hyp.w1, hyp.muGrid hG hodd i' j 1 ≠ ζ 1)
+    (hcol1 : ∀ i' : Fin hyp.w1, hyp.muGrid hG hodd i' j 1 = (d : ℂ))
+    (hdj1 : hyp.muGrid hG hodd 0 j 1 ≠ 1) :
+    ClassFunction.inner
+        (hyp.tau (hyp.muGrid hG hodd i j - (δ : ℂ) • hyp.muGrid hG hodd i 0 - (n : ℂ) • ζ))
+        (coh.tau1 (∑ i' : Fin hyp.w1, hyp.muGrid hG hodd i' j)
+          - (d : ℂ) • coh.tau1 ζ.conj) = 1 := by
+  have hG_side := hyp.muGridAlpha_tau_inner_muColumn_self_sub_conj hG hodd i hj0 hζS hζirr hζne
+    hdeg hμ0 hζ1 hnf hδj h0ζ hjζ hcol1
+  rwa [hyp.tau_muColumn_sub_conj_eq_tau1 hG hodd j coh hζS hζirr hcol1 hζ1 hdj1] at hG_side
+
+open scoped FiniteInduce in
 /-- **Peterfalvi (10.5), `‖μ_k^{τ₁}‖² = w₁`** (`0 < k < w₂`): the coherent extension `τ₁` is an
 isometry on `ℤ[S]`, and `μ_k = ∑_i μ_{ik} ∈ S` (`muGrid_column_sum_mem_inducedFamily`), so
 `‖μ_k^{τ₁}‖² = ‖μ_k‖² = w₁` (`coherent.extension_inner_eq` + `muGrid_column_sum_inner_self`).
