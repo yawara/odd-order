@@ -3738,6 +3738,63 @@ theorem tau_muGrid_columnSum_diff [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOd
   exact Finset.sum_congr rfl fun i _ =>
     tau_muGrid_column_diff hG coh hmu hos hzS hz1 hzconj hδpm hδj i hj0 hk0
 
+open scoped FiniteInduce in
+/-- **Peterfalvi (5.8)/(10.6)(a), `μ_k^{τ₁}` vanishes on `V`**: the coherent image of the column
+character `μ_k = ∑_i μ_{ik}` (`k ≠ 0`) vanishes on `V = typePV`.  This is the "vanishes on `V`"
+hypothesis of the (5.8) `σ`-coefficient full-column endgame `eq_smul_chiFam_column_of_vanishOnV`.
+
+Running Peterfalvi's (5.8) argument with `χ = ζ̄` (a degree-`w₁` irreducible of `S ∩ Irr(L)`, the
+conjugate of `ζ`): by (4.7) the combination `μ_k − dζ̄` is `A_0(M)`-supported
+(`muColumn_sub_conj_support`), so the Dade isometry restores its value on `V`
+(`tau_apply_of_mem_typePV`); both `μ_k` and `ζ̄` (induced from the normal `M'`) vanish at `v ∉ M'`
+(`typePData_typePV_not_mem_derived`), giving `(μ_k − dζ̄)^τ(v) = 0`.  Splitting
+`(μ_k − dζ̄)^τ = μ_k^{τ₁} − dζ̄^{τ₁}` (`tau_muColumn_sub_conj_eq_tau1`) and discharging the
+already-established `ζ̄^{τ₁}`-vanishing (`tau1_zeta_vanishes_on_typePV` for `ζ̄`) forces
+`μ_k^{τ₁}(v) = 0`.
+
+Crucially this route avoids the `ζ̄^{τ₁} ⊥ Im σ` (§5 (5.3.b)/(5.5)) input that the direct (10.6)(a)
+reduction would require: the `(5.5)`-for-columns decomposition determines `μ_k^{τ₁}` directly, and
+its vanishing on `V` uses only the (already-honest) single-character `ζ̄^{τ₁}`-vanishing plus (4.7). -/
+theorem Hypothesis.muColumn_tau1_vanishes_on_typePV [Finite G] {M : Subgroup G}
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis M) (hodd : Odd (Nat.card G))
+    (k : Fin hyp.w2) {params : CharacterParameters hyp} (coh : CoherentHypothesis hyp params)
+    {ζ : ClassFunction ↥M ℂ} (hζS : ζ ∈ inducedFamily M) (hζirr : IsIrreducibleCharacter ζ)
+    (hζne : ζ.conj ≠ ζ) {d : ℕ} (hcol1 : ∀ i, hyp.muGrid hG hodd i k 1 = (d : ℂ))
+    (hζ1 : ζ 1 = (hyp.w1 : ℂ)) (hdk1 : hyp.muGrid hG hodd 0 k 1 ≠ 1)
+    {v : G} (hv : v ∈ typePV M hyp.typeP) :
+    coh.tau1 (∑ i : Fin hyp.w1, hyp.muGrid hG hodd i k) v = 0 := by
+  haveI := hyp.finiteG
+  classical
+  have hvM : v ∈ M := typePData_W_le_self hyp.typeP (SetLike.mem_coe.mp hv.1)
+  -- `(μ_k − dζ̄)^τ(v) = 0`: `A_0`-supported (4.7), and `μ_k`, `ζ̄` vanish at `v ∉ M'`.
+  have hsupp := hyp.muColumn_sub_conj_support hG hodd k hζS hζirr hcol1 hζ1
+  have hτvan : hyp.tau ((∑ i : Fin hyp.w1, hyp.muGrid hG hodd i k) - (d : ℂ) • ζ.conj) v = 0 := by
+    rw [hyp.tau_apply_of_mem_typePV hsupp hv hvM]
+    obtain ⟨θ, _hθne, hζeq⟩ := hζS
+    have hKcomm : (derivedInG M).subgroupOf M = commutator ↥M := by
+      rw [derivedInG, Subgroup.subgroupOf,
+        Subgroup.comap_map_eq_self_of_injective M.subtype_injective]
+    haveI hKnormal : ((derivedInG M).subgroupOf M).Normal := by rw [hKcomm]; infer_instance
+    have hnotmem : (⟨v, hvM⟩ : ↥M) ∉ (derivedInG M).subgroupOf M := by
+      rw [Subgroup.mem_subgroupOf]
+      exact typePData_typePV_not_mem_derived hyp.typeP hv
+    have hμv : (∑ i : Fin hyp.w1, hyp.muGrid hG hodd i k) ⟨v, hvM⟩ = 0 :=
+      hyp.muGrid_column_sum_vanishes_off_derived hG hodd k hnotmem
+    have hζv : ζ ⟨v, hvM⟩ = 0 := by
+      rw [hζeq]; exact ClassFunction.induce_eq_zero_of_not_mem_normal _ hnotmem
+    simp only [ClassFunction.sub_apply, ClassFunction.smul_apply, ClassFunction.conj_apply, hμv,
+      hζv, star_zero, mul_zero, sub_zero]
+  -- split `(μ_k − dζ̄)^τ = μ_k^{τ₁} − dζ̄^{τ₁}` and discharge `ζ̄^{τ₁}(v) = 0`.
+  rw [hyp.tau_muColumn_sub_conj_eq_tau1 hG hodd k coh hζS hζirr hcol1 hζ1 hdk1] at hτvan
+  have hζcvan : coh.tau1 ζ.conj v = 0 := by
+    have hζcS : ζ.conj ∈ inducedFamily M := inducedFamily_closedUnderConjugate M hζS
+    have hζcne : ζ.conj.conj ≠ ζ.conj := by
+      intro h; rw [ClassFunction.conj_conj] at h; exact hζne h.symm
+    exact hyp.tau1_zeta_vanishes_on_typePV hG hodd coh hζcS hζirr.conj hζcne hv
+  simp only [ClassFunction.sub_apply, ClassFunction.smul_apply, hζcvan, mul_zero,
+    sub_zero] at hτvan
+  exact hτvan
+
 /-- **Peterfalvi (10.6)**: the sums of `omega_ij^sigma` describe the `tau1`
 images, and outside the tame support the value of `zeta^tau1` has norm at least
 one. -/
