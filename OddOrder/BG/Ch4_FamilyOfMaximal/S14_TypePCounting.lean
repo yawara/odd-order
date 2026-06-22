@@ -9234,6 +9234,53 @@ private theorem partner_inf_and_uniq [Finite G] (hG : OddOrder.BG.IsMinimalSimpl
   by_contra haMst
   exact hKNe (le_bot_iff.mp ((hTI a haMst) ▸ le_inf le_rfl hKa))
 
+/-- **BG `defUK`** (Coq `P2type_signalizer`, BGsection14.v L2329): for a type-`P₂` maximal
+subgroup `M` with cyclic Hall `κ(M)`-subgroup `K` and abelian `(κ(M) ∪ σ(M))'`-Hall complement
+`U` normalized by `K`, the commutator `⁅U, K⁆` equals `U`.
+
+The coprime decomposition `U = (C(K) ⊓ U) ⊔ ⁅U, K⁆` (`fitting_coprime_abelian_decomp`: `U`
+abelian, `K ≤ N(U)`, `gcd(|U|,|K|) = 1`) collapses because `C_U(K) = C(K) ⊓ U = ⊥`.  Indeed
+Theorem A(4) (`typeP_hall_inf_centralizer_kappaElement_eq_bot`) gives `U ⊓ C(k) = ⊥` for every
+`k ∈ K#`, and `C(K) ⊓ U ≤ C(k) ⊓ U` for any such `k` (one exists since `K ≠ ⊥`).  `K` is cyclic
+of prime order `q = |K|` by Proposition 14.2(g) (type-`P₂`). -/
+theorem typeP2_kappaHall_commutator_eq_self [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M K Kstar U : Subgroup G}
+    (hM : M ∈ maximalSubgroups G) (hP2 : IsTypeP2 M) (hKM : K ≤ M) (hUM : U ≤ M)
+    (hK : Ch03.IsHallSubgroup (kappa M) (K.subgroupOf M))
+    (hKstar : Kstar = OddOrder.BG.Ch3.S10.Msigma M ⊓ Subgroup.centralizer (K : Set G))
+    (hU : Ch03.IsHallSubgroup ((kappa M ∪ OddOrder.BG.Ch3.S10.sigma M)ᶜ) (U.subgroupOf M))
+    (hUab : ∀ a ∈ U, ∀ b ∈ U, a * b = b * a)
+    (hKNU : K ≤ Subgroup.normalizer (U : Set G)) :
+    (⁅U, K⁆ : Subgroup G) = U := by
+  classical
+  have hP : IsTypeP M := hP2.1
+  -- `|K| = q` is prime (Prop 14.2(g) for type-`P₂`), so `K` is cyclic.
+  obtain ⟨-, -, -, -, hP2struct, -, -⟩ := typeP_structure hG hM hP hKM hK hKstar hU
+  obtain ⟨-, q, hqprime, hKcard, -⟩ := hP2struct hP2
+  haveI : Fact q.Prime := ⟨hqprime⟩
+  haveI hKcyc : IsCyclic ↥K := isCyclic_of_prime_card hKcard
+  have hKne : K ≠ ⊥ := fun h => card_kappaHall_ne_one hP hKM hK (by rw [h, Subgroup.card_bot])
+  obtain ⟨k₀, hk₀K, hk₀ne⟩ := (Subgroup.bot_or_exists_ne_one K).resolve_left hKne
+  -- `C(K) ⊓ U = ⊥` from Theorem A(4) at `k₀ ∈ K#` (`C(K) ⊓ U ≤ C(k₀) ⊓ U = U ⊓ C(k₀) = ⊥`).
+  have hCUK_bot : Subgroup.centralizer (K : Set G) ⊓ U = ⊥ := by
+    have hA4 := typeP_hall_inf_centralizer_kappaElement_eq_bot hG hM hP hKM hUM hK hKstar hU
+      k₀ hk₀K hk₀ne
+    rw [eq_bot_iff, ← hA4]
+    exact le_inf inf_le_right
+      (inf_le_left.trans (Subgroup.centralizer_le (Set.singleton_subset_iff.mpr hk₀K)))
+  -- Coprime `|U|` (a `(κ∪σ)'`-number) and `|K|` (a `κ ⊆ κ∪σ` number).
+  have hcopUK : Nat.Coprime (Nat.card ↥U) (Nat.card ↥K) :=
+    Ch03.Nat.coprime_of_isPiGroup_of_isPiGroup_compl
+      (π := (kappa M ∪ OddOrder.BG.Ch3.S10.sigma M)ᶜ) Nat.card_pos.ne' Nat.card_pos.ne'
+      (fun p _ => hU.1 p (by rwa [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hUM).toEquiv]))
+      (fun p _ hpc => hpc (Or.inl (hK.1 p
+        (by rwa [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hKM).toEquiv]))))
+  -- Collapse the coprime decomposition `U = (C(K) ⊓ U) ⊔ ⁅U, K⁆`.
+  haveI hUcomm_inst : IsMulCommutative ↥U :=
+    ⟨⟨fun a b => Subtype.ext (hUab (a : G) a.2 (b : G) b.2)⟩⟩
+  have hd := (OddOrder.Isaacs.Ch05.fitting_coprime_abelian_decomp (P := U) (K := K) hKNU hcopUK).2
+  rwa [hCUK_bot, bot_sup_eq] at hd
+
 /-- **BG Corollary 14.12** (mmd L4035): for `M ∈ 𝓜_{P₂}` with `K`, `M*`, `K*` as in
 Theorem 14.7 and `U` as in Proposition 14.2(a), `r ∈ π(U)`, `R` the Sylow `r`-subgroup of the
 abelian `U`, and `H ∈ 𝓜(N_G(R))`: then `H ∈ 𝓜_F`, `U ⊆ H_σ`, `M ∩ H = U K`, `N_H(U) ⊄ M`,
