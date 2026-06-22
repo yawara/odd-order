@@ -185,28 +185,32 @@ conjugation centralizer core to P₀ acting on K, then passes to the order-`p` p
 **Residual = exactly two honest §8 obligations**:
 - **`counterexample_P0_K_structure` ((8.12.a), ABSENT)**: `P₀` abelian of rank 2 (every Sylow of the
   type-`I` complement abelian rank ≤ 2 — a BG §16 consequence not extracted in repo).
-- **`exists_second_maximal` ((8.17.a))**: the second maximal `L ≠ M` with `P₀ ⊆ L_s` — from
-  `bgTheoremE_cover_data` (`p ∈ π(G)` covered by some `π((M_i)_s)`) + `(8.11)`/Sylow conjugation.
-  `L ≠ M` is forced by `p ∣ |L_s|` ∧ `p ∤ |M_s| = |M_F|` (the coprimality just proved).
-  **⛔ cross-lane gated (issue 2015)**: the cover gives `L₀ = reps i` of **arbitrary type `tau i`**,
-  and the Sylow-conjugation step needs `HasPeterfalviType (tau i) (g • L₀)` — i.e. the **general
-  5-type conjugation-invariance**.  `MaximalSubgroupTypeConj.lean` only has **F/I**
-  (`isTypeI_pointwise_smul`, `TypeFData.conj`, `TypeIData.conj`); II/III/IV/V are ABSENT (shared
-  infra, not lane-h-owned).  Also bottoms out in `bgTheoremE_cover_data` (BG §16, sorried).  ⟹
-  filed HUB issue 2015; (8.17.a) is blocked on that infra + BG §16, not a clean lane-h leaf.
+- **`exists_second_maximal` ((8.17.a)) — ✅ DISCHARGED** (2026-06-23, commit `c0c11d1b`): the second
+  maximal `L ≠ M` with `P₀ ⊆ L_s`.  `p ∈ π(G)` (from `p ∣ [M:M_F] ∣ |M| ∣ |G|`) is covered by some
+  `π((reps i)_s)` (`bgTheoremE_cover_data`), giving `L₀` of type `Lt` with `p ∣ |（L₀)_s|`; by (8.11)
+  `(L₀)_s` is Hall ⟹ contains a Sylow `p` `Q` (new **`exists_sylow_le_of_hall`**: `v_p(|H|)=v_p(|G|)`
+  + `Sylow.ofCard`); `P₀ ≤ Q'`, `Q,Q'` conjugate, so `P₀ ⊆ conj g • (L₀)_s = (conj g • L₀)_s`
+  (**`mainSubgroup_pointwise_smul`**).  `L = conj g • L₀` maximal + type `Lt`
+  (**`hasPeterfalviType_pointwise_smul`**); `L ≠ M` via type exclusivity (`not_isTypeI_of_isTypeNonI`)
+  + coprimality.  Reduces to the cited `bgTheoremE_cover_data` (BG §16) + `hall_…` (8.11).
 
-## ⛔ lane-h §12/§15 frontier status (2026-06-23): genuinely gated after maximal de-gating
+  **Unblocked by the hub-assigned 5-type conjugation infra (issue 2015, commit `1255e479`)**: extended
+  `MaximalSubgroupTypeConj.lean` from F/I to all 5 types — `TypePData.conj`,
+  `TypeII/III/IV/VData.conj`, `isType{II..V}_pointwise_smul`, general `hasPeterfalviType_pointwise_smul`,
+  `mainSubgroup_pointwise_smul` + helpers (`derivedInG_pointwise_smul`, `secondDerivedInAmbient_…`,
+  `isNilpotent_…`, `fitting_map_subtype_…`).  All sorry-free + axiom-clean.
 
-`(12.9)` is maximally de-gated (honest assembly + (8.12.b) discharged + coprime/normalize/
-K-not-perfect proven inline).  The remaining lane-h work is **genuinely gated**:
-- `(12.9)` residual: **(8.12.a)** [`P₀` rank-2, absent BG §16 — lane-f/b] + **(8.17.a)** [cross-lane
-  5-type conj infra, issue 2015 + BG §16 cover data].
-- `(12.10)`/`(12.11)`/`(12.13)`–`(12.16)`: gated on absent §8 ((8.13.c1)/(8.1.b)/(8.1.c) — BG §16)
-  + char ((6.8)/(7.11)/(7.8) — lane-b).
-- §15 `basic_structure` etc.: gated on `(10.11)`/`(11.7)` (char/BG, lane-b) for `P_order = p^q`.
+## ✅ lane-h (12.9) status (2026-06-23): maximally de-gated — residual = exactly (8.12.a)
 
-Next genuine lane-h progress needs one of: the 5-type conj infra (issue 2015, lane-f/hub), the
-lane-b char facts, or the genuinely-absent (8.12.a) [BG §16].
+`(12.9) exists_rankTwoWitness` is sorry-free and bottoms out in **exactly one absent fact**:
+- **(8.12.a)** `counterexample_P0_K_structure` [`P₀` abelian of rank 2, absent BG §16 — lane-f/b].
+
+Everything else discharged: (8.12.b) (`centralizer_control_of_CKx`), coprime/normalize/K-not-perfect
+(inline), (8.17.a) (`exists_second_maximal`, cites cover data + Hall), and the genuine centralizer
+core (`exists_orderP_centralizer_witness`, axiom-clean).
+
+Remaining lane-h frontier (other than (8.12.a)): `(12.10)`/`(12.11)`/`(12.13)`–`(12.16)` gated on
+absent §8 ((8.13.c1)/(8.1.b/c)) + char (lane-b); §15 `basic_structure` gated on (10.11)/(11.7) (lane-b).
 
 ## ▶ Next steps — full (12.12) `complement_cyclic_order_dvd` (Pf 04.14 L67-74, §8-gated)
 
