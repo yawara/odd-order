@@ -192,6 +192,21 @@
 
 **意義**: W₁ の正規化群が (S の外で) exactly QW₂ に等しい → geometric constraint on T.
 
+**▶ 2026-06-23 lane-h 着手 — §8-free Wielandt step landed, full assembly は §13-gated (再調査不要)**:
+深掘りの結果、(13.16) full は当初の見立てより gating が深い。`normalizer_W1` (S15:827, `:= sorry`) は以下に bottom-out:
+- **Q elem-ab order q^p (Q abelian)** = `card_Q_eq` (S15:1113, sorried 残差 B1, **lane-f/b cross-lane gate**) + basic_structure T-side。Maschke (step 3) に必須。
+- **W₁ ⊆ Q** — Hypothesis field に無し (構造的 obligation 要)。
+- **Q# TI-subset with normalizer T** — step 1 の核、Hypothesis に無し (§13 obligation)。
+- **d = 1 (T-side of (13.12))** — `c_eq_one` は S-side のみ、T-side 不在 (obligation)。step 4 の K=1 に必須。
+- **KW₂ Frobenius kernel K** — step 4 の Wielandt 入力 (§13 obligation)。
+- **BG Lemma 3.2** — step 5 (K ⊆ C(W₁))、repo は Lemma 3.3 のみ (要 find/state)。
+- **module Maschke** = `OperatorMaschke.lean` ✓ (available)。
+⟹ full assembly は ~6 obligation の large scaffold (うち card_Q_eq は cross-lane) ゆえ「scaffold ≠ done」回避で full は保留。
+**✅ 但し step 4 の genuine §8-free Wielandt 核を landing** (commit `d11f7fe9`, axiom-clean):
+`OddOrder.GroupTheory.frobenius_kernel_centralizes_of_complement_fpf` (WielandtFixedPoint.lean) —
+Frobenius `U⋊E ≤ N_G(N)` coprime, `C_N(E)=1` ⟹ `U ≤ C_G(N)`。`wielandt_fixedPoint_trivial_E_fixed` の
+ambient form (= step 4 の「K centralizes Q₁」)。reusable。**(13.16) full は §13 structural facts (上記) 着地待ち。**
+
 **(13.17) Type II Frobenius Structure**:
 - If S is Type II, L = maximal ⊃ N_G(U), H = L_F. Then:
   - (a) **L is Frobenius group with kernel H**
