@@ -465,21 +465,57 @@ theorem counterexample_P0_K_structure [Finite G] (hG : OddOrder.BG.IsMinimalSimp
 `L` with `p ∣ |L_s|`; then `(8.11)`/`L_s ⊇ Sylow_p(G)` and Sylow conjugation place `P₀ ⊆ L_s`). -/
 theorem exists_second_maximal [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     (ctr : CounterexampleHypothesis (G := G)) :
-    ∃ (L : Subgroup G) (Lt : PeterfalviType), L ∈ maximalSubgroups G ∧
+    ∃ (L : Subgroup G) (Lt : PeterfalviType), L ∈ maximalSubgroups G ∧ L ≠ ctr.M ∧
       HasPeterfalviType Lt L ∧ ctr.P0 ≤ mainSubgroup L Lt := by
   sorry
 
-/-- **Peterfalvi (12.9), centralizer control** — a §8 obligation (`(8.12.b)`
-`typeI_or_typeII_centralizer_unique`, applied to the witness `x` with `C_K(x) ⊄ K'`): then
-`N_G(⟨x⟩) ⊆ M` and `C_G(x) ⊄ L`. -/
+/-- **Peterfalvi (12.9), centralizer control** — **discharged** from `(8.12.b)`
+(`typeI_or_typeII_centralizer_unique`) + `G` simple.
+
+Applying `(8.12.b)` with `U = M` and `X = {x}` (`x ∈ M^#`, and `C_K(x) ⊄ K'` gives
+`M_F ⊓ C_G(x) ≠ 1`) yields `C_G(x) ≤ M` together with `IsUniquelyMaximal (C_G(x))` — `M` is the
+*unique* maximal subgroup over `C_G(x)`.  Hence: `N_G(⟨x⟩) ⊇ C_G(x)` is a proper subgroup
+(`⟨x⟩` is a proper nontrivial subgroup of the nonabelian simple `G`, so not normal), so it lies
+in a maximal subgroup over `C_G(x)`, which must be `M`; and any maximal `L ≠ M` cannot contain
+`C_G(x)`. -/
 theorem centralizer_control_of_CKx [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     (ctr : CounterexampleHypothesis (G := G)) {L : Subgroup G} (hL : L ∈ maximalSubgroups G)
+    (hLM : L ≠ ctr.M)
     {Lt : PeterfalviType} (hLt : HasPeterfalviType Lt L) (hPL : ctr.P0 ≤ mainSubgroup L Lt)
     {x : G} (hx : x ∈ ctr.P0) (hxne : x ≠ 1)
     (hCKx : ¬ (Subgroup.centralizer ({x} : Set G) ⊓ ctr.K ≤ ctr.Kprime)) :
     Subgroup.normalizer ((Subgroup.closure ({x} : Set G) : Subgroup G) : Set G) ≤ ctr.M ∧
       ¬ (Subgroup.centralizer ({x} : Set G) ≤ L) := by
-  sorry
+  classical
+  haveI : IsSimpleGroup G := hG.simple
+  have hMcoatom : IsCoatom ctr.M := ctr.M_maximal
+  have hLcoatom : IsCoatom L := hL
+  have hxM : x ∈ ctr.M := ctr.P0_le_M hx
+  -- `M_F ⊓ C_G(x) ≠ ⊥` from `C_K(x) ⊄ K'`.
+  have hCKne : maxNilpotentNormalHall ctr.M ⊓ Subgroup.centralizer ({x} : Set G) ≠ ⊥ := by
+    intro hbot; apply hCKx; rw [ctr.K_eq_MF, inf_comm, hbot]; exact bot_le
+  have hxsharp : ({x} : Set G) ⊆ sharpSubgroup ctr.M := by
+    intro y hy; rw [Set.mem_singleton_iff] at hy; subst hy
+    exact ⟨hxM, fun h => hxne (Set.mem_singleton_iff.mp h)⟩
+  -- (8.12.b): `C_G(x) ≤ M` and uniquely maximal.
+  obtain ⟨hCxleM, huniq⟩ := OddOrder.Peterfalvi.S10.typeI_or_typeII_centralizer_unique hG
+    ctr.M_maximal (Or.inl ctr.M_typeI) (le_refl ctr.M) ({x} : Set G) (Set.singleton_nonempty x)
+    hxsharp hCKne
+  refine ⟨?_, fun hCxleL => hLM (huniq.eq_of_isCoatom_of_le hMcoatom hCxleM hLcoatom hCxleL).symm⟩
+  -- `N_G(⟨x⟩) ⊆ M`.
+  have hCx_le_Nx : Subgroup.centralizer ({x} : Set G) ≤
+      Subgroup.normalizer ((Subgroup.closure ({x} : Set G) : Subgroup G) : Set G) := by
+    rw [← Subgroup.centralizer_closure]; exact Subgroup.centralizer_le_normalizer _
+  have hcl_le_M : Subgroup.closure ({x} : Set G) ≤ ctr.M := Subgroup.closure_le _ |>.mpr (by
+    simpa using hxM)
+  have hNx_lt : Subgroup.normalizer ((Subgroup.closure ({x} : Set G) : Subgroup G) : Set G) ≠ ⊤ := by
+    intro htop
+    rcases (Subgroup.normalizer_eq_top_iff.mp htop).eq_bot_or_eq_top with hb | ht
+    · exact hxne (by simpa [hb] using Subgroup.subset_closure (Set.mem_singleton x))
+    · exact hMcoatom.1 (top_le_iff.mp (ht ▸ hcl_le_M))
+  obtain ⟨N, hNco, hNx_le_N⟩ := (eq_top_or_exists_le_coatom _).resolve_left hNx_lt
+  exact hNx_le_N.trans (le_of_eq
+    (huniq.eq_of_isCoatom_of_le hMcoatom hCxleM hNco (hCx_le_Nx.trans hNx_le_N)).symm)
 
 /-- **Peterfalvi (12.9)**: the counterexample has an abelian rank-two Sylow
 witness and an element whose centralizers force a second maximal subgroup.
@@ -495,8 +531,8 @@ theorem exists_rankTwoWitness [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
   obtain ⟨hab, hrank, hcop, hnorm, hperf⟩ := counterexample_P0_K_structure hG ctr
   refine ⟨hab, hrank, ?_⟩
   obtain ⟨x, hxP0, hxne, hxp, hCKx⟩ := exists_orderP_centralizer_witness ctr hab hcop hnorm hperf
-  obtain ⟨L, Lt, hLmax, hLt, hPL⟩ := exists_second_maximal hG ctr
-  obtain ⟨hNx, hCx⟩ := centralizer_control_of_CKx hG ctr hLmax hLt hPL hxP0 hxne hCKx
+  obtain ⟨L, Lt, hLmax, hLne, hLt, hPL⟩ := exists_second_maximal hG ctr
+  obtain ⟨hNx, hCx⟩ := centralizer_control_of_CKx hG ctr hLmax hLne hLt hPL hxP0 hxne hCKx
   exact ⟨{ L := L, L_maximal := hLmax, L_type := Lt, L_hasType := hLt, P0_le_Ls := hPL,
            x := x, x_mem_P0 := hxP0, x_ne_one := hxne, x_mem_omega1 := hxp,
            CKx_not_le_Kprime := hCKx, normalizer_closure_x_le_M := hNx,
