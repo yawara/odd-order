@@ -101,6 +101,14 @@ branch とも削除済み。旧 **A** / **D** も同様に退役済み (履歴�
 > / **レーン範囲逸脱（下記 step 1.5 = 自所有外の Pf/BG S-ファイルを編集; ユーザー方針 2026-06-22）**。
 > **非問題（通常継続）= ** 「変化なし」/ 新 decl の faithful scaffold sorry 増 / 独立追記コンフリクトの両保持解決
 > / 共有ファイル編集（AxiomsCheck.lean 追記・OddOrder.lean import・`OddOrder/GroupTheory/**` 共有 infra・notes・issues）。
+>
+> **♻ 問題解決後はループ自動再開（ユーザー方針 2026-06-23, 永続）**: 上記 ⛔ で停止した監視ループは、
+> **問題が解決したら必ず再開する**。具体的には: (a) 停止した問題（build 失敗 / コンフリクト / sorry
+> regression / 新規 axiom / push 失敗 / 想定外 git 状態 / レーン範囲逸脱）が、**ユーザーの指示か hub の
+> 修正で解消したことを確認したら**、(b) **監視 cron を `CronCreate` で再作成し**（停止時に `CronDelete`
+> したものを復活）、(c) 通常の tick に復帰する。「停止しっぱなし」にしない。再開時はサマリに
+> 「監視ループ再開（cron id <new-id>）」を 1 行記録する。**この stop→resolve→resume サイクルが監視ループの
+> 正規ライフサイクル**であり、停止は一時退避でしかない。
 
 > **🔒 レーン所有マップ（step 1.5 範囲逸脱チェック用、2026-06-22 frontier-cluster relane）**:
 > | lane | 所有 .lean（これ以外の Pf/BG S-ファイル編集 = 逸脱→停止） |
