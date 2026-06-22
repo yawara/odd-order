@@ -8778,6 +8778,58 @@ theorem exists_typeF_complement_cyclic_commutator [Finite G]
     rwa [hident, inf_assoc, inf_idem] at hdisj
   exact ⟨K', hK'E, hK'ne, hK'cyc, hK'cent, hMNK', hπτ2, hFPF⟩
 
+/-- **BG Lemma 14.11, A-choice**: for a normal line `L ◁ M` of order `p` with `p ∈ τ₂(M)` and
+`L ≤ E`, there is `A ∈ ℰ_p²(E)` with `L ≤ A`.
+
+`N_G(L) = M` (as `M ≤ N_G(L) < ⊤` and `M` is maximal), so BG Lemma 10.5
+(`pRank_eq_two_of_normalizer_le`) yields `A₀ ∈ ℰ_p²(G)` with `L ≤ A₀`; `A₀` is abelian and
+contains `L`, so `A₀ ≤ C_G(L) ≤ N_G(L) = M`.  As a `τ₂`-subgroup of `M`, `A₀` conjugates into the
+`τ₂`-Hall `E₂ ≤ E` by some `w ∈ M` (`exists_conj_smul_le_hallPiece`); `L` is `M`-invariant so
+`L = L^w ≤ A₀^w`, and `A₀^w ∈ ℰ_p²(E)`. -/
+theorem exists_elemAb_rank_two_le_E_containing_line [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    {M E E₁ E₂ E₃ L : Subgroup G} {p : ℕ} [Fact p.Prime]
+    (hsetup : SubgroupESetup M E E₁ E₂ E₃) (hp : p ∈ tau2 M)
+    (hLE : L ≤ E) (hLM_norm : M ≤ Subgroup.normalizer (L : Set G))
+    (hL : L ∈ elemAbelianOfRank G p 1) :
+    ∃ A ∈ elemAbelianOfRank G p 2, A ≤ E ∧ L ≤ A := by
+  classical
+  have hLM : L ≤ M := hLE.trans hsetup.E_le
+  have hLne : L ≠ ⊥ := ne_bot_of_mem_elemAbelianOfRank_one hL
+  have hM_coatom : IsCoatom M := hsetup.mem_maximal
+  -- `N_G(L) = M`.
+  have hNL_lt : Subgroup.normalizer (L : Set G) < ⊤ :=
+    normalizer_lt_top_of_le_of_ne_bot hG hsetup.mem_maximal hLM hLne
+  have hNLM : Subgroup.normalizer (L : Set G) ≤ M := by
+    rcases eq_or_lt_of_le hLM_norm with heq | hlt
+    · exact heq.ge
+    · exact absurd (hM_coatom.2 _ hlt) hNL_lt.ne
+  -- BG Lemma 10.5: `∃ A₀ ∈ ℰ_p²(G), L ≤ A₀`.
+  obtain ⟨-, -, A₀, hA₀, hLA₀⟩ :=
+    OddOrder.BG.Ch3.S10.pRank_eq_two_of_normalizer_le hG hsetup.mem_maximal
+      (tau2_subset_sigma_compl M hp) hL hNLM
+  have hA₀card : Nat.card ↥A₀ = p ^ 2 := hA₀.2
+  have hA₀ab : IsMulCommutative ↥A₀ := ⟨⟨hA₀.1.comm⟩⟩
+  -- `A₀ ≤ M` (abelian, contains `L`).
+  have hA₀M : A₀ ≤ M :=
+    (le_centralizer_of_le_of_le hA₀ab le_rfl hLA₀).trans
+      ((Subgroup.centralizer_le_normalizer _).trans hNLM)
+  -- `A₀` is a `τ₂(M)`-subgroup.
+  have hA₀pi : Ch03.Subgroup.IsPiGroup (tau2 M) (A₀.subgroupOf M) := by
+    intro r hr
+    rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hA₀M).toEquiv, hA₀card] at hr
+    obtain ⟨hr_prime, hr_dvd, -⟩ := Nat.mem_primeFactors.mp hr
+    rwa [(Nat.prime_dvd_prime_iff_eq hr_prime Fact.out).mp (hr_prime.dvd_of_dvd_pow hr_dvd)]
+  -- Conjugate `A₀` into the `τ₂`-Hall `E₂`.
+  obtain ⟨w, hwM, hw⟩ :=
+    exists_conj_smul_le_hallPiece hG hsetup hsetup.E₂_le hsetup.E₂_hall
+      (tau2_subset_sigma_compl M) hA₀M hA₀pi
+  refine ⟨MulAut.conj w • A₀, conj_smul_mem_elemAbelianOfRank w hA₀, hw.trans hsetup.E₂_le, ?_⟩
+  have hLfix : MulAut.conj w • L = L := conj_smul_eq_self_of_mem_normalizer (hLM_norm hwM)
+  calc L = MulAut.conj w • L := hLfix.symm
+    _ ≤ MulAut.conj w • A₀ := by
+        rw [mulAut_smul_eq_map, mulAut_smul_eq_map]; exact Subgroup.map_mono hLA₀
+
 /-- **BG Lemma 14.11** (mmd L4086): for `M ∈ 𝓜_F` with `E` a complement of `M_σ` in `M`, a
 prime `q ∈ π(E)`, and `Q ∈ ℰ_q¹(E)` with `Q ⊄ F(E)`, there is `M* ∈ 𝓜` with either
 (1) `q ∈ τ₂(M*)` and `𝓜(C_G(Q)) = {M*}`, or (2) `q ∈ κ(M*)` and `M* ∈ 𝓜_{P₁}`.
