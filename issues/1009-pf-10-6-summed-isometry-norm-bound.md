@@ -57,8 +57,14 @@ statement)。**S07_Coherence.lean に未形式化** — 本 issue の真の prer
       subH_normal, W2_le_subH, subH_le_K, A_covers, tic_W1/W2/V proofs を §10 type-P データから供給。大物だが
       **certainTypeR (image family) + certainTypeExtension (ν=δ∑ω^σ) + conjugate を一気に解禁**。
     - **route (B) §10-native conjugate identity**: `μ_k = Ind_K^M θ_k` (`muGrid_column_sum_mem_inducedFamily`)
-      ⟹ `μ_k.conj = Ind(θ_k.conj) = μ_{k'}` (要 `induce_conj` lemma + column↔Irr(K) 対応の全射性)。σ_L apparatus
-      回避できる可能性。image family を §10-native `hyp.tau` で組む (image_eq=`tau_muGrid_columnSum_diff` w/ k=k')。
+      ⟹ `μ_k.conj = Ind(θ_k.conj) = μ_{k'}`。**❌ 2026-06-23 棄却**: `columnFamily` は `chiColumn`/σ apparatus
+      経由の choice 定義 (`exists_columnSignedFamily`) ゆえ σ_L 回避不可。conjugate は §6 σ 機構に内在依存。
+    - **⭐ route (B') §6 conjugate 補題を `Hypothesis46`→`Hypothesis` に一般化 (HUB issue 1010, 推奨)**:
+      §6 conjugate 補題群 (`columnSum_conj_eq`/`column_inv_ne_self`/`certainType_columnSum_conj`/chain) は
+      **実際には Hypothesis-level 構造しか使わない** (chiColumn/sigma_chiColumn_eq_certainType/columnFamily/
+      W_odd は全て `namespace Hypothesis`)。1 回の機械的 refactor で §10 host (CertainType.toHypothesis)
+      に直接適用可 → conjugate + certainTypeR image family + ν を一気解禁。caller ~15 (§6+§8) 修正要 = cross-lane
+      ゆえ HUB。**lane-b は 1010 解決まで image-family 段を保留** (column-independence までは landed)。
   - **その後の σ-endgame reconcile** (route 共通): `eq_smul_chiFam_column_of_vanishOnV` (在) を当てるには
     `μ_{j₀}^τ₁` の sigmaCoeff 2-column {0,±δ} 構造 (要 (5.5) image-family 分解 + **2D chiFam 構造**
     `ω_ij^σ = chiFam(Q(i,j))`, Q が積 `(ρ(i),κ(j))`)。2D 構造の crux = `(omegaProdChar_h a b).comp e
