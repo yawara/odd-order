@@ -56,7 +56,26 @@ chiefFactor_basic (済) は `_holds` / `quotient_order` 経由ゆえ互換 (fiel
     |S₀|=p)` (case a)。証明 = `d∈{1,q}` を q 素数 (`data.nontrivial.2.1`) で読み、`d=q ⟹ |S₀|=p^q=|H̄| ⟹
     S₀=⊤` (`Subgroup.eq_top_of_card_eq`) + 極小性で U-既約、`d=1 ⟹ |S₀|=p`。**これが (9.7) の case 分け本体**。
 
-- **frontier = step 7 (CaseA/CaseB carrier 構成) — GATED**: `clifford_dichotomy` は
+- **step 7a DONE (2026-06-23, commit `e2a673bd`)** — **subgroup-level Singer 機構** (CaseB 体モデル核心、
+  sorry-free + axiom-clean):
+  - **`isCyclic_card_dvd_of_aInvariant_irreducible_faithful_comm`**: 有限**可換** A が有限 el-ab `p`-群 K に
+    **忠実・既約** (∀ φ-inv J, J=⊥∨⊤) 作用 ⟹ **A 巡回 ∧ |A| ∣ |K|-1**。= (9.7) case (b) の構造核心
+    (`U`-既約 chief factor ⟹ `Ū` 巡回・位数 ∣ p^q-1)。`elabRepresentation`→`Representation.asModule`→
+    `SingerField.isCyclic_and_card_dvd_of_faithful_irreducible_comm` を配線。
+  - **`elabRepresentation_isIrreducible`** (支持 bridge): `elabRepresentation p φ` の `Subrepresentation`
+    束が `IsSimpleOrder` ⟺ subgroup-level 既約。`Submodule (ZMod p)(Additive K) ≃o Subgroup K`
+    (`AddSubgroup.toZModSubmodule`/`toSubgroup'`) + `elabRepresentation_apply` で対応。
+  - **module-instance hell 突破 (重要知見)**: ① `set_option backward.isDefEq.respectTransparency false`
+    = `asModule` が ρ を無視する def ゆえ `Module k[G] asModule` の instance 探索が ρ を型から推論できない問題を
+    解消 (mathlib も同設定)。② 結論を `IsSimpleOrder (Subrepresentation …)` で直接述べる (`IsIrreducible`
+    abbrev は `[Field (ZMod p)]` 要 → `MonoidAlgebra` の ZMod Field/CommSemiring diamond)。③ module は
+    **instance arg** で渡す (ambient `CommGroup K` 上で構築; `IsElementaryAbelian.zmodModule` は
+    `IsMulCommutative` 経由で diamond)。
+
+- **frontier = step 7b/c (chief-factor 適用 + CaseA) — 一部 GATED**: Singer 核心は完成。残:
+  (7b) 上記を H̄ に適用 = faithful 像 `Ū = U/C_U(H̄)` を形成 + ambient module/faithfulness 供給
+  (in-lane plumbing、§8.5.b で U abelian)。(7c) CaseA の `a∣p-1` (order-p 片への作用 ↪ `(ZMod p)ˣ`)。
+  **その先 = step 7 (CaseA/CaseB carrier 構成) — GATED**: `clifford_dichotomy` は
   `chiefFactor_clifford_U_dichotomy` で case (a)/(b) に分岐できるが、`CliffordCaseAData`/`CliffordCaseBData`
   の**実フィールド**構成が残る:
   - **CaseB (case b) = `chars.u` に GATED (本質的)**: `u_coprime_p_sub_one : Coprime chars.u (p-1)` /

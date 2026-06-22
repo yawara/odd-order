@@ -12,6 +12,8 @@ import OddOrder.GroupTheory.MaximalSubgroupTypeConj
 import OddOrder.GroupTheory.AInvariantPiSubgroups
 import OddOrder.BG.Ch1_Preliminary.OperatorMaschke
 import OddOrder.BG.Ch4_FamilyOfMaximal.S15_MF
+import OddOrder.GroupTheory.RepresentationTheory.SingerField
+import OddOrder.GroupTheory.RepresentationTheory.WielandtElabBridge
 
 /-!
 # Peterfalvi Section 11: Maximal Subgroups of Types II, III, and IV
@@ -1697,6 +1699,88 @@ theorem card_pointwise_smul {A K : Type*} [Group A] [Group K] [Finite K]
     (φ : A →* MulAut K) (a : A) (S : Subgroup K) :
     Nat.card ↥(φ a • S) = Nat.card ↥S :=
   (Nat.card_congr (Subgroup.equivMapOfInjective S (φ a).toMonoidHom (φ a).injective).toEquiv).symm
+
+/-! ### (9.7) The Singer mechanism for the chief factor (Clifford case (b))
+
+When `U` acts irreducibly on the chief factor `H̄` (case (b)), the commutant `End_{𝔽ₚ[U]}(H̄)` is a
+field, so the image of `U` in `Aut(H̄)` is cyclic of order dividing `p^q - 1`.  We package this at
+the subgroup level via `SingerField`: an abelian group acting faithfully and irreducibly on an
+elementary abelian `p`-group is cyclic with order dividing `|K| - 1`. -/
+
+open OddOrder.RepresentationTheory in
+/-- The descended representation `elabRepresentation p φ` on `Additive K` is irreducible exactly when
+the `φ`-action is irreducible at the subgroup level (`K` nontrivial; every `φ`-invariant subgroup of
+`K` is `⊥` or `⊤`).  `ZMod p`-submodules of `Additive K` are the subgroups of `K`
+(`AddSubgroup.toZModSubmodule`/`toSubgroup'`) and the action correspondence is
+`elabRepresentation_apply`.  Stated as `IsSimpleOrder (Subrepresentation …)` (= `IsIrreducible`,
+definitionally) to avoid pulling in the `Field (ZMod p)` instance and its `ZMod`-semiring diamond. -/
+theorem elabRepresentation_isIrreducible {A K : Type*} [Group A] [CommGroup K] {p : ℕ}
+    [Module (ZMod p) (Additive K)] {φ : A →* MulAut K} (hnt : Nontrivial K)
+    (hirr : ∀ J : Subgroup K, IsAInvariant φ J → J = ⊥ ∨ J = ⊤) :
+    IsSimpleOrder (Subrepresentation (elabRepresentation p φ)) := by
+  classical
+  set Φ : Submodule (ZMod p) (Additive K) ≃o Subgroup K :=
+    (AddSubgroup.toZModSubmodule p).symm.trans AddSubgroup.toSubgroup' with hΦ
+  have hmem : ∀ (W : Submodule (ZMod p) (Additive K)) (x : K),
+      x ∈ Φ W ↔ Additive.ofMul x ∈ W := fun W x => by
+    simp only [hΦ, OrderIso.trans_apply, AddSubgroup.mem_toSubgroup',
+      AddSubgroup.toZModSubmodule_symm, Submodule.mem_toAddSubgroup]
+  have hbot_ne_top : (⊥ : Subrepresentation (elabRepresentation p φ)) ≠ ⊤ := by
+    haveI : Nontrivial (Additive K) := hnt
+    exact fun h => bot_ne_top (congrArg Subrepresentation.toSubmodule h)
+  haveI : Nontrivial (Subrepresentation (elabRepresentation p φ)) := ⟨⊥, ⊤, hbot_ne_top⟩
+  refine IsSimpleOrder.of_forall_eq_top fun S hSne => ?_
+  have hJinv : IsAInvariant φ (Φ S.toSubmodule) := by
+    rw [isAInvariant_iff_smul_mem]
+    intro a x hx
+    rw [hmem] at hx ⊢
+    exact S.apply_mem_toSubmodule a hx
+  rcases hirr _ hJinv with hJbot | hJtop
+  · refine absurd (Subrepresentation.toSubmodule_injective (show S.toSubmodule = ⊥ from ?_)) hSne
+    rw [← Φ.symm_apply_apply S.toSubmodule, hJbot]; exact Φ.symm.map_bot
+  · refine Subrepresentation.toSubmodule_injective (show S.toSubmodule = ⊤ from ?_)
+    rw [← Φ.symm_apply_apply S.toSubmodule, hJtop]; exact Φ.symm.map_top
+
+set_option backward.isDefEq.respectTransparency false in
+open OddOrder.RepresentationTheory Representation in
+/-- **Subgroup-level Singer mechanism.**  A finite *abelian* group `A` acting *faithfully* and
+*irreducibly* (every `φ`-invariant subgroup of `K` is `⊥` or `⊤`) on a finite elementary abelian
+`p`-group `K` is cyclic, with `|A|` dividing `|K| - 1`.  This is the structural heart of Peterfalvi
+(9.7) case (b): a `U`-irreducible chief factor makes the image `Ū` cyclic of order dividing
+`p^q - 1`.  Via `SingerField`: `K` becomes a simple `𝔽ₚ[A]`-module (`elabRepresentation_isIrreducible`),
+realized inside the units of the Singer field, so `A ↪ Kˣ` is cyclic. -/
+theorem isCyclic_card_dvd_of_aInvariant_irreducible_faithful_comm
+    {A K : Type*} [Group A] [Finite A] [CommGroup K] [Finite K] {p : ℕ}
+    [Module (ZMod p) (Additive K)] {φ : A →* MulAut K}
+    (hcomm : ∀ a b : A, a * b = b * a) (hnt : Nontrivial K)
+    (hirr : ∀ J : Subgroup K, IsAInvariant φ J → J = ⊥ ∨ J = ⊤)
+    (hfaith : ∀ a : A, (∀ x : K, φ a x = x) → a = 1) :
+    IsCyclic A ∧ Nat.card A ∣ Nat.card K - 1 := by
+  haveI hirrep : IsSimpleOrder (Subrepresentation (elabRepresentation p φ)) :=
+    elabRepresentation_isIrreducible hnt hirr
+  haveI hsimp :
+      IsSimpleModule (MonoidAlgebra (ZMod p) A) (elabRepresentation p φ).asModule := by
+    rw [isSimpleModule_iff]
+    exact (OrderIso.isSimpleOrder_iff
+      Subrepresentation.subrepresentationSubmoduleOrderIso).mp hirrep
+  haveI : Finite (elabRepresentation p φ).asModule := ‹Finite K›
+  have hM : Nat.card (elabRepresentation p φ).asModule = Nat.card K := rfl
+  -- Faithfulness in `𝔽ₚ[A]`-module terms: `of a • y = y` for all `y` ⟹ `φ a x = x` for all `x`.
+  have hfaith' : ∀ a : A, (∀ y : (elabRepresentation p φ).asModule,
+      MonoidAlgebra.of (ZMod p) A a • y = y) → a = 1 := by
+    intro a ha
+    refine hfaith a fun x => ?_
+    have key : (elabRepresentation p φ).asModuleEquiv
+        (MonoidAlgebra.of (ZMod p) A a •
+          (elabRepresentation p φ).asModuleEquiv.symm (Additive.ofMul x)) = Additive.ofMul x := by
+      rw [ha]; exact (elabRepresentation p φ).asModuleEquiv.apply_symm_apply _
+    rw [asModuleEquiv_map_smul, asAlgebraHom_of,
+      (elabRepresentation p φ).asModuleEquiv.apply_symm_apply, elabRepresentation_apply] at key
+    exact Additive.ofMul.injective key
+  obtain ⟨hcyc, hdvd⟩ :=
+    isCyclic_and_card_dvd_of_faithful_irreducible_comm
+      (E := A) (M := (elabRepresentation p φ).asModule) (p := p) hcomm hfaith'
+  exact ⟨hcyc, by rwa [hM] at hdvd⟩
 
 /-- **(9.7) Clifford dimension dichotomy** (the arithmetic heart of (9.7)).  Restricting the
 `U W₁`-action on the chief factor `H̄ = H/H₀` to `U`, there is a minimal `U`-invariant `S₀ ≠ ⊥` of
