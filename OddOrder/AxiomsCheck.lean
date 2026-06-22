@@ -3761,6 +3761,14 @@ set_option linter.style.longLine false in
 -- §5 Peterfalvi (3.8) corollary: a small-support separable coefficient grid is identically zero.
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S05.grid_eq_zero_of_ncard_support_lt
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S05.TICyclicHypothesis.sigmaCoeff_eq_zero_of_sigmaNC_lt
+-- §5 norm-`2` Dade-image trichotomy endgame (Peterfalvi (4.8)/(10.5)): the `TICyclicHypothesis`-level
+-- toolkit shared by the §6 certain-type isometry and the §10 (10.5) Dade-image identity.  A virtual
+-- character `X` with `‖X‖² = 2` whose difference with `s·(χ_{P₁} − χ_{P₂})` vanishes on `V` equals it.
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S05.TICyclicHypothesis.ncard_sigmaCoeff_ne_zero_le_two
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S05.TICyclicHypothesis.sigmaCoeff_eq_zero_or_one_of_inner_self_two
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S05.TICyclicHypothesis.sigmaCoeff_sub_smul_chiFam_diff
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S05.TICyclicHypothesis.eq_smul_chiFam_diff_of_all_sigmaCoeff_zero
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S05.TICyclicHypothesis.eq_smul_chiFam_diff_of_vanishOnV
 
 -- BG Theorem 3.6 (the vertex of the §3 subprogram and the engine of BG Theorem 10.6): `G`
 -- solvable of odd order, `H ◁ G` a normal Hall subgroup with complement `R`, `R₀ ≤ R` of prime

@@ -90,6 +90,42 @@ bottom-out** するので、clean 化には §15 foundation が先。真の順�
 
 ## 進捗ログ
 
+**2026-06-22 (cont.⁵) ✅ BG Lemma 14.11 — FPF bundle + A-choice landed (4 commits) — assembly は全補題特定済、残 gate = `C_{M*_σ}(Q)≠⊥`**
+(lane-f, commits `6cf7d246`/`ab96c39d`/`5642817d`/`13132807`, full build 3881 green):
+
+実装済 infrastructure (全 sorry-free):
+- **S5 helper** `Q_le_fittingInG_of_commutator_centralizesQ` (`6cf7d246`)
+- **K' bundle (FPF 込)** `exists_typeF_complement_cyclic_commutator` (`5642817d`): K'=⁅⁅E,Q⁆,Q⁆ ≤E,
+  ≠⊥, cyclic, ≤C(M_σ), M≤N(K'), π(K')⊆τ₂, **C_{K'}(Q)=⊥** (FPF: `commutator_commutator_right_eq_of_le_normalizer`
+  で ⁅K',Q⁆=K' + `Isaacs.Ch05.fitting_coprime_abelian_decomp`)
+- **A-choice** `exists_elemAb_rank_two_le_E_containing_line` (`13132807`): L◁M order-p (p∈τ₂)、L≤E ⟹
+  ∃A∈ℰ_p²(E), L≤A。BG Lemma 10.5 (`pRank_eq_two_of_normalizer_le`, N_G(L)=M 経由) + Hall 共役
+  (`exists_conj_smul_le_hallPiece`、L は M-invariant で固定)。**Sylow/pRank bookkeeping 回避**。
+
+**残 main assembly (`exists_maximal_of_typeF_notMem_fitting`) — 全補題特定済、機械実装 ~150行**:
+1. **署名に `hEM : E ≤ M` 追加**（`esetup_of_isComplement` 要求）。
+2. **L 構成**: K' から order-p 元 `a`、`L:=zpowers a`。`L.subgroupOf K'` は **cyclic 部分群ゆえ characteristic**
+   (`characteristic_of_subgroup_of_isCyclic`) → `M≤N(K')⟹M≤N(L)` (`mem_normalizer_map_subtype_of_characteristic`)。
+   `⁅L,Q⁆≠⊥`: `L⊓C(Q)≤K'⊓C(Q)=C_{K'}(Q)=⊥` (FPF) ⟹ L⊄C(Q)。L∈ℰ_p¹。
+3. **A-choice 適用** → A∈ℰ_p²(E), L≤A。`⁅A,Q⁆≠⊥` (⊇⁅L,Q⁆≠⊥, `commutator_mono`)。
+4. **Cor 12.9** `commutator_decomp_of_tau1_action` (要 q∈τ₁ M = phase 1, hCQ): A₀=⁅A,Q⁆∈ℰ_p¹/≤A/
+   =A⊓C(M_σ)/M≤N(A₀); ¬∃g conj g•A₀=A₁; A₁=A⊓C(Q)∈ℰ_p¹/≤A/¬(C(A₁)≤M)。
+5. **index `q|[E:C_E(A)]`**: **Q⊄C(A₀)** = ¬conj 節 (Q≤C(A₀)⟹A₀≤A⊓C(Q)=A₁⟹A₀=A₁[both ℰ_p¹]⟹g=1 矛盾)。
+   E≤N(A₀)(M≤N(A₀))、C_E(A₀)◁E、Q⊓C_E(A₀)=⊥(q 素数) ⟹ `card_dvd_of_injective` で q|[E:C_E(A₀)];
+   C_E(A)≤C_E(A₀) (A⊇A₀) ⟹ `index_dvd_of_le` で [E:C_E(A₀)]|[E:C_E(A)] ⟹ q|[E:C_E(A)]。
+6. **M*∈𝓜(N_G(A))** (N_G(A)<⊤ ∵ A⊄◁simple G; maximalSubgroupsContaining 非空)。
+7. **Lemma 12.11** `tau2_transfer_to_maximal`: conjunct1 p∈σ(M*)\β(M*); conjunct2 (q∈index 経由)
+   **q∈τ₁(M*)∪τ₂(M*)**。case split:
+   - **q∈τ₂(M*)**: Cor 12.10(e) (`nilpotent_sigmaComplement_abelian.2.2.2.2.2` for M*、要 M*-E-setup) で
+     𝓜(C_G(Q))={M*} (Or.inl)。
+   - **q∈τ₁(M*)**: q∈κ(M*) (witness Q, C_{M*_σ}(Q)≠⊥) + σ(M*)≠β(M*)→¬P2→IsTypeP1 M* (Or.inr)。
+
+**⛔ 残 gate (両 case 共通) = `C_{M*_σ}(Q) = M*_σ⊓C(Q) ≠ ⊥`** (BG「C_{M*_γ}(Q)⊇C_A(Q)=A₁⊃1」):
+要 **A₁≤M*_σ**。A₁=A⊓C(Q)∈ℰ_p¹, A₁≤A≤M*, p∈σ(M*)。だが p-部分群 A₁ が O_σ(M*)=M*_σ に入るのは
+**一般に非自明**（O_σ は normal σ-core）。BG の根拠（Lemma 12.11 の σ-theory 内部構造、A≤M*_σ か A₁ の
+M*-positioning）は**未再構成 = 真の残 math gate**。Lemma 12.11 proof / §12 σ-theory の精読要。これが解ければ
+両 case の witness が出て assembly 完結。**次セッションの最優先 = この gate の解明**（infrastructure は全完備）。
+
 **2026-06-22 (cont.⁴) ✅ BG Lemma 14.11 S5 helper + S4-S7 (τ₂(M)≠∅) landed — S8-S13 完全再構成**
 (lane-f, commits `6cf7d246` + `ab96c39d`, leaf build green):
 
