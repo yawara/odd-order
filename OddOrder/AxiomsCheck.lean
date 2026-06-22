@@ -692,6 +692,11 @@ set_option linter.style.longLine false in
 -- cyclic with order dividing p - 1 (End of a line ≅ 𝔽_p, so E ↪ (ℤ/p)ˣ).
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.S14.isCyclic_and_card_dvd_of_faithful_one_dim
+-- Peterfalvi (12.9) centralizer core: a noncyclic abelian group acting coprimely on a finite group
+-- with nontrivial abelianization has a nonidentity element whose fixed subgroup escapes [K, K]
+-- (BG Prop 1.16(1) on K/[K,K] + the coprime fixed-point lifting, Isaacs Cor 3.28).
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S14.exists_ne_one_actionFixedBy_not_le_commutator
 -- RepresentationTheory: completeness of irreducible characters — `f ⊥ Irr G ⇒ f = 0`
 -- (regular representation + Maschke + Schur).
 #assert_only_allowed_axioms OddOrder.RepresentationTheory.classFunction_eq_zero_of_orthogonal
