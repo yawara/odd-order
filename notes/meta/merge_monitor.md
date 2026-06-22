@@ -80,11 +80,34 @@ branch とも削除済み。旧 **A** / **D** も同様に退役済み (履歴�
 > **`CronList` で監視 cron の id を確認 → `CronDelete` でその場で停止** + 問題内容を明示報告し、
 > **以降のレーン処理・次 tick を行わない**（ユーザーが解消・再開指示するまで待つ）。黙って次 tick で
 > 同じ問題を繰り返さない。**問題 = ** build 失敗 / 内容コンフリクト（AxiomsCheck.lean・OddOrder.lean
-> の独立追記**以外**）/ sorry regression（証明済→sorry）/ 新規 `axiom` / push 失敗 / 想定外の git 状態。
-> **非問題（通常継続）= ** 「変化なし」/ 新 decl の faithful scaffold sorry 増 / 独立追記コンフリクトの両保持解決。
+> の独立追記**以外**）/ sorry regression（証明済→sorry）/ 新規 `axiom` / push 失敗 / 想定外の git 状態
+> / **レーン範囲逸脱（下記 step 1.5 = 自所有外の Pf/BG S-ファイルを編集; ユーザー方針 2026-06-22）**。
+> **非問題（通常継続）= ** 「変化なし」/ 新 decl の faithful scaffold sorry 増 / 独立追記コンフリクトの両保持解決
+> / 共有ファイル編集（AxiomsCheck.lean 追記・OddOrder.lean import・`OddOrder/GroupTheory/**` 共有 infra・notes・issues）。
+
+> **🔒 レーン所有マップ（step 1.5 範囲逸脱チェック用、2026-06-22 frontier-cluster relane）**:
+> | lane | 所有 .lean（これ以外の Pf/BG S-ファイル編集 = 逸脱→停止） |
+> |---|---|
+> | **F** (lane-f) | `OddOrder/BG/**`（BG 全体）+ `OddOrder/FeitThompson.lean` |
+> | **B** (lane-b) | `OddOrder/Peterfalvi/S0[3-9]*` + `S10*` + `S12*` + `S13*`（Pf char API + §12/§13; **S11 除く**） |
+> | **H** (lane-h) | `OddOrder/Peterfalvi/S14_MaximalI*` + `S15*`（type I + S&T） |
+> | **C** (lane-c) | `OddOrder/Peterfalvi/S11*`（Wielandt §9 / Clifford） |
+> | **共有（全 lane 可）** | `OddOrder/AxiomsCheck.lean` / `OddOrder.lean` / `OddOrder/GroupTheory/**` / `notes/**` / `issues/**` |
 
 1. 各レーンの未マージ確認: `git log --oneline main..<branch>`。
    **全レーン 0 なら「変化なし」1行報告で即終了**（build を走らせない）。
+1.5. **レーン範囲逸脱チェック（ユーザー方針 2026-06-22, 永続）**: 未マージがあるレーンについて、
+   **マージ前**に変更ファイルを `git diff --name-only main..<branch> -- '*.lean'` で取得し、上記
+   🔒 所有マップに照らす。**自所有でも共有でもない `.lean`（典型: 他レーンの Pf/BG S-ファイル）を
+   含むなら範囲逸脱** → そのレーンは**マージせず（trial merge も開始しない）**、⛔ に従いループ停止
+   （abort 不要 = まだ merge していない、`CronDelete` + 報告 + 以降の tick を行わない）。
+   報告には逸脱ファイル名 + lane + 所有者を明記。例 (lane=$b に対し):
+   ```
+   owned_re='…'   # lane ごとに 🔒 マップから (F=^OddOrder/BG/|^OddOrder/FeitThompson; B=^OddOrder/Peterfalvi/S(0[3-9]|10|12|13); H=^OddOrder/Peterfalvi/S(14_MaximalI|15); C=^OddOrder/Peterfalvi/S11)
+   shared_re='^OddOrder/AxiomsCheck\.lean$|^OddOrder\.lean$|^OddOrder/GroupTheory/'
+   git diff --name-only main..$b -- '*.lean' | grep -vE "$owned_re" | grep -vE "$shared_re" | grep . && echo "範囲逸脱 → STOP"
+   ```
+   逸脱なし（空）→ step 2 へ。共有ファイル・notes・issues のみの差分は逸脱でない。
 2. **F → B → H → C の順**で（独立レーンゆえ順序は形式的、上流→下流の自然順）、未マージがあれば自動合流:
    - マージ前の実 sorry 数を記録: `bin/count-sorry`
      （prose 偽陽性 [sorry-free / sorryAx / `sorry'd` / backtick 引用] を除外する判定器。
@@ -188,6 +211,7 @@ branch とも削除済み。旧 **A** / **D** も同様に退役済み (履歴�
 
 ## 現状メモ
 
+- **📌 レーン範囲逸脱 = ループ停止ルール追加 (ユーザー方針 2026-06-22, 永続)**: 各レーンが**自所有外の Pf/BG S-ファイルを編集**したら ⛔ stop-on-problem に従いループ停止 (CronDelete + 報告 + 待機)。検出 = step 1.5 (マージ前に `git diff --name-only main..<branch>` を 🔒 所有マップに照合)。共有ファイル (AxiomsCheck.lean 追記 / OddOrder.lean import / GroupTheory/** / notes / issues) は逸脱でない。cron prompt にも内蔵。
 - **📌 lane-c を §11 に再配置 (frontier-cluster relane, ユーザー裁可 2026-06-22, issue 4005)**: §16 監査で「starve は lane-c (§16 終点 consumer) のみ、lane-h 領域に ~16 独立 leaf」と判明 → lane-c を §16 から **Pf §11 (S11_MaximalII_III_IV, Wielandt §9 / Clifford 9.6-9.10)** へ。**S11 を H→C 移譲**、H は §14_MaximalI+§15 に集中、§16/§10 は driver 化 (常駐させず上流 landing 時に機会的 close)。レーン表・取り決め更新済。各レーン LAUNCH.md も更新 (git-excluded)。次 tick 以降この割当で運用。
 - **📌 標準監視ペース = 25 分（恒久、ユーザー指示 2026-06-22）**: cron 式 **`4,29,54 * * * *`**（:04/:29/:54、:00・:30 を回避）を**標準合流ペースとして恒久化**。ユーザーが各レーンを稼働 → 本ペースで監視・自動合流する。⚠ **cron 自体は本環境で session-scoped**（`durable: true` を渡しても runtime は session-only と報告; [[cron-dies-on-model-switch]]）→ **ペースの正本はこの行**。新セッション開始時・`/model` 切替後は `CronList` 確認の上、消えていれば同式・同 prompt で**即再作成**する（prompt は「各イテレーションの手順」を要約したもの、本ファイルが authority）。7 日 auto-expire 後も同様に再作成。
 - **2026-06-22 (続³) — 問題時ループ停止ルール化 + cron `24df1fb4` 再作成**: ユーザー「問題が起きたらループ止めて・永続化」→「各イテレーションの手順」冒頭に ⛔ banner 追加（commit `13ed2a87`）+ cron prompt に内蔵。旧 `b9df9002` を CronDelete → 新 cron **`24df1fb4`**（同式・stop-on-problem prompt 入り）。
