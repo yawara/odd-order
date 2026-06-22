@@ -69,9 +69,46 @@ order half of **(14.2)(a)**.  Reusable; deferred-payoff (consumed once (12.12) i
    `E` finite, `|E|` odd, acting faithfully + fixed-point-freely on elem-abelian `V`
    (`|V| ∈ {p, p²}`, `p` odd) ⟹ `E` cyclic, `|E| ∣ p²−1`.  Glue:
    - rank 1 / reducible rank 2: `E ↪ Aut(ℤ/p) ≅ (ℤ/p)ˣ` cyclic, `|E| ∣ p−1`.
-   - irreducible rank 2: **`odd_two_dim_abelian`** (BG 2.6(a), S02 ✓) abelianizes `E`,
-     then the Singer lemma above.  ⚠ requires `group-on-elem-abelian ↔ Representation (ZMod p) E V`
-     translation (instance-diamond care — see [[lean-type-synonym-fixes-instance-diamond]]).
+   - irreducible rank 2: **`odd_two_dim_abelian`** (BG 2.6(a), S02 ✓; takes a `Representation
+     (ZMod p) E V`, returns `Std.Commutative (·*·)`) abelianizes `E`, then the Singer lemma above.
+
+   ### ⚠ Instance-engineering blocker (diagnosed 2026-06-22, 3 confirmed walls)
+   The clean composition is **blocked** because the Singer lemma requires `[CommGroup C]` but
+   BG 2.6(a) yields commutativity as `IsMulCommutative` on a plain `[Group E]`.  Confirmed:
+   - `nonempty_singerFieldData` genuinely needs **`[CommGroup C]`** — it uses
+     `(MonoidAlgebra.of (ZMod p) C).toHomUnits` (`of c` must be a *unit* ⟹ needs `Group C`)
+     **and** a *direct* `CommMonoid C` (for `MonoidAlgebra` to be a `CommRing`).
+   - Weakening the file-level `variable` to `[CommMonoid C]` ⟹ `toHomUnits` fails (no Group).
+   - Weakening to `[Group C] [IsMulCommutative C]` ⟹ **whnf heartbeat timeout** in
+     `nonempty_singerFieldData` (the `CommMonoid` derived via the *scoped* `IsMulCommutative`
+     instance explodes during `MonoidAlgebra` `CommRing` / `Ideal.Quotient.field` resolution).
+   - In S14, `letI : CommGroup E := { ‹Group E› with mul_comm := … }` shadows `E`'s monoid and
+     breaks synthesis of `Module (MonoidAlgebra (ZMod p) E) ρ.asModule` (the `asModule` instance
+     is tied to the original `Group E` monoid).
+   - **Universe**: the Singer construction forces `C M : Type u` (same universe, since
+     `M ≅ K = 𝔽_p[C]/I`); fine for (12.12) since `E, T` are both subtypes of `G`.
+
+   **The `@`-explicit approach was tried (2026-06-22) and ALSO fails.**  Building
+   `cgE : CommGroup E := { ‹Group E› with mul_comm := hcomm.comm }` as a term and applying
+   `@isCyclic_…_faithful_irreducible p _ E ρ.asModule cgE _ _ _ hirr hfaith'`: TC synthesis
+   for the `Module (MonoidAlgebra (ZMod p) E) ρ.asModule` arg (registered for the *ambient*
+   `Group E`) will **not unfold the `let cgE`** to match, so both the Module `_` and `hirr`
+   (`IsSimpleModule … cgE` vs `… Group E`) mismatch.  The defeq exists but TC does not traverse it.
+   ✓ The pieces that DO work (worked out, reusable): `hfaith'` (from `Function.Injective ρ` via
+   `ρ.asModuleEquiv_symm_map_rho` + `ρ.asModuleEquiv.symm.injective`; finish with `map_one` then
+   `(1 : Module.End …) v` defeq `v`), `hchar` (`CharP (ZMod p) q ⟹ q = p` via `CharP.eq`/`ZMod.charP`,
+   contra `¬ p ∣ |E|`), the card step (`Module.card_eq_pow_finrank` + `ZMod.card`), and the
+   same-universe binders `{E V : Type u}` (autoBound — no universe error).
+
+   **Real path (next session):** the SingerField-reuse route is a dead end for the
+   `IsMulCommutative`-on-`Group` input.  Either (a) **re-derive the order bound natively in the
+   `Representation` framework**: for an irreducible faithful `Representation (ZMod p) C V` with
+   `[IsMulCommutative C]`, `End_{𝔽_p[C]}(V)` is a finite field (Schur + commutative ⟹ division
+   ring is a field), `V` is a 1-dim vector space over it, `C ↪ (End)ˣ` cyclic ⟹ `|C| ∣ |End|−1`;
+   no `MonoidAlgebra`/`CommGroup` plumbing.  Or (b) **transport via a `CommGroup` type-synonym**
+   `Eᶜ := E` carrying `CommGroup`, move the `Representation`/action across, apply the existing
+   Singer lemma there, transport `IsCyclic`/card back ([[lean-type-synonym-fixes-instance-diamond]]).
+   Both are multi-session.  See [[lean-coupled-engine-fields-and-beta]].
 2. **Faithful-ize** `CounterexampleHypothesis` / `RankTwoWitnessData` (replace opaque `Prop`
    fields with real statements).
 3. **State §8 obligations** (8.12.a), (8.13.c1) faithfully in S14 (cite BG §16) and prove
