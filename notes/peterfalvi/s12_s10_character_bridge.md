@@ -5,6 +5,24 @@
 > 上位文脈 = 記憶 [[ft-endgame-two-poles]] [[peterfalvi-s10-13-gated-on-bg-spine]]、
 > Lane H 視点の正本 = [`s10_13_maximal_structure.md`](s10_13_maximal_structure.md)。
 
+## ✅ 2026-06-23 更新¹⁰ — (10.6.a) column-independence 着地 + Hypothesis46 構造 gate 確定 (issue 1009)
+
+lane-b 再開セッション。(10.6.a) を「1 列の pin」に還元する **column-independence** を §10-native (Hypothesis46
+不要) で着地 + 残 linchpin の構造的正体を確定:
+
+- **`muColumn_tau1_diff_eq` DONE** (S12, commit `9d2fc5a0`, axiom-clean=§10 muGrid upstream gate のみ):
+  `μ_j^τ₁ − μ_k^τ₁ = δ(∑_i ω_ij^σ − ∑_i ω_ik^σ)` (j,k≠0)。`μ_j−μ_k=∑(α_ij−α_ik)` が A_0-supported
+  (`alpha_support`) → `extends_on_supported` → `tau_muGrid_columnSum_diff`(10.5) + `map_sub`。
+  ⟹ **full (10.6.a) は「1 列を pin すれば全列従う」に還元** (残 = (5.8) full-column endgame)。
+- **⚠⚠ 構造的 gate 確定 (次セッション必読)**: §10 muGrid は `CertainTypeHypothesis` 上、§6 conjugate/column 機構
+  (`columnSum_conj_eq`/`column_inv_ne_self`/`certainTypeR`/`certainTypeExtension`(ν)) は全て **`Hypothesis46` 上**
+  (`Hypothesis46 extends CertainTypeHypothesis extends Hypothesis`)。**§10 用 Hypothesis46 builder は不在**;
+  `certainType_mu_conj_bridge` は `sigma_chiColumn` (Hypothesis46 σ_L apparatus) に真に依存 ⟹ §6 conjugate を
+  §10 へ trivial 還元不可。= 更新⁸/⁹ の「§6↔§5 reconcile」の構造的正体。残 linchpin の前提 = **route (A) §10
+  Hypothesis46 組立** (image family + ν 一気解禁、大物) **or route (B) §10-native conjugate
+  `μ_k.conj=Ind(θ_k.conj)=μ_{k'}`** (σ_L 回避、要 `induce_conj`+column↔Irr(K) 全射)。詳細・両 route の field
+  リスト・σ-endgame 2D reconcile crux = **issue 1009「やること」冒頭 2 項** (正本)。
+
 ## ✅✅ 2026-06-22 更新⁹ — (5.8) endgame 仮説 2/4 着地 + §5-gate 回避経路を確立 (issue 1009)
 
 lane-b 再開セッション。(10.6.a) を **§5-gated `ζ̄^τ₁⊥Imσ` を通さず**閉じる column-(5.5) 経路を確定し、

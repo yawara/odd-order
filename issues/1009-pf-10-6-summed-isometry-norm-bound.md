@@ -37,6 +37,33 @@ statement)。**S07_Coherence.lean に未形式化** — 本 issue の真の prer
 
 ## やること
 
+- [x] **(10.6.a) column-independence DONE** (2026-06-23 lane-b 再開セッション, `muColumn_tau1_diff_eq`,
+  S12, commit `9d2fc5a0`, axiom-clean=§10 muGrid upstream gate のみ・自前 sorry 0): 任意の非自明列 j,k≠0 で
+  `μ_j^τ₁ − μ_k^τ₁ = δ·(∑_i ω_ij^σ − ∑_i ω_ik^σ)`、∴ 残差 `μ_j^τ₁ − δ∑_i ω_ij^σ` は**列 j に非依存**。
+  Hypothesis46 **不要** (§10-native): `μ_j − μ_k = ∑_i(α_ij − α_ik)` が A_0-supported
+  (`CharacterParameters.alpha_support`、δμ_i0/nζ tail 相殺) → `extends_on_supported` で τ₁=τ → 既landed
+  `tau_muGrid_columnSum_diff` (10.5) + `map_sub`。⟹ **full (10.6.a) を「1 列の pin」に還元** (残 = (5.8)
+  full-column endgame が single column を確定)。
+- ⚠⚠ **構造的発見 (2026-06-23, 次セッション必読)**: §10 muGrid は `CertainTypeHypothesis` 上
+  (`(hyp.toCertainTypeHypothesis hG hodd).toHypothesis : S06.Hypothesis ↥M`)、一方 §6 conjugate/column 機構
+  (`columnSum_conj_eq` / `column_inv_ne_self` / `certainType_columnSum_conj` / `certainTypeR` /
+  `certainTypeExtension`(ν)) は全て **`Hypothesis46` 上** (構造階層 `Hypothesis46 extends CertainTypeHypothesis
+  extends Hypothesis`)。**§10 用 `Hypothesis46` builder は存在しない** (§10 は意図的に避け alignedOmegaSigmaGrid 等
+  §10-native 版を作ってきた)。`certainType_mu_conj_bridge` は `sigma_chiColumn` (Hypothesis46 σ_L apparatus,
+  tic/dade0/tau 込み) に**真に依存**ゆえ §6 conjugate を §10 へ trivial 還元できない。= note の「§6↔§5 reconcile,
+  multi-session」の構造的正体。
+  - **∴ 残 linchpin の真の前提 = 以下のどちらか (次セッション着手点)**:
+    - **route (A) §10 `Hypothesis46` 組立**: tic=`typePData_toTICyclicHypothesis` (在), dade0, tau, subH,
+      subH_normal, W2_le_subH, subH_le_K, A_covers, tic_W1/W2/V proofs を §10 type-P データから供給。大物だが
+      **certainTypeR (image family) + certainTypeExtension (ν=δ∑ω^σ) + conjugate を一気に解禁**。
+    - **route (B) §10-native conjugate identity**: `μ_k = Ind_K^M θ_k` (`muGrid_column_sum_mem_inducedFamily`)
+      ⟹ `μ_k.conj = Ind(θ_k.conj) = μ_{k'}` (要 `induce_conj` lemma + column↔Irr(K) 対応の全射性)。σ_L apparatus
+      回避できる可能性。image family を §10-native `hyp.tau` で組む (image_eq=`tau_muGrid_columnSum_diff` w/ k=k')。
+  - **その後の σ-endgame reconcile** (route 共通): `eq_smul_chiFam_column_of_vanishOnV` (在) を当てるには
+    `μ_{j₀}^τ₁` の sigmaCoeff 2-column {0,±δ} 構造 (要 (5.5) image-family 分解 + **2D chiFam 構造**
+    `ω_ij^σ = chiFam(Q(i,j))`, Q が積 `(ρ(i),κ(j))`)。2D 構造の crux = `(omegaProdChar_h a b).comp e
+    = omegaProdChar_tic (transp a)(transp b)` (e が W1/W2 分解尊重)。`exists_alignedOmegaSigmaGrid_chiFam_family`
+    は per-row のみ (同列異行/2D 直交性を供給せず)。
 - [x] **(5.8) abstract combinatorial core DONE** (2026-06-22, `grid_eq_const_column_of_two_col`,
   `S05_GridTrichotomy.lean`, **axiom-clean** `[propext, Classical.choice, Quot.sound]`)。
   norm-w₁ full-column endgame の純代数核: separable grid `a:ι×κ→ℂ` + 2-column support {j,k} +
