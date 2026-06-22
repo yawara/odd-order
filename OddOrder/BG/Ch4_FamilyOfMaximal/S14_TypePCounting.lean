@@ -12,6 +12,7 @@ import OddOrder.BG.Ch3_MaximalSubgroups.S14_Prop142Support
 import OddOrder.BG.Ch1_Preliminary.S03c_Thm37
 import OddOrder.BG.Ch1_Preliminary.S03g_Thm310
 import OddOrder.GroupTheory.MaximalSubgroupType
+import OddOrder.GroupTheory.MaximalSubgroupTypeConj
 import OddOrder.GroupTheory.PiElementDecomposition
 
 /-!
@@ -9280,6 +9281,76 @@ theorem typeP2_kappaHall_commutator_eq_self [Finite G]
     ⟨⟨fun a b => Subtype.ext (hUab (a : G) a.2 (b : G) b.2)⟩⟩
   have hd := (OddOrder.Isaacs.Ch05.fitting_coprime_abelian_decomp (P := U) (K := K) hKNU hcopUK).2
   rwa [hCUK_bot, bot_sup_eq] at hd
+
+/-- **BG `kappaJ`** (conjugation-invariance of `κ`): `κ(M^g) = κ(M)`.  Each defining condition of
+`κ` is conjugation-stable: `τ₁(M) ∪ τ₃(M) = {p | p ∉ σ(M) ∧ r_p(M) = 1}` (with `σ`, `pRank`
+invariant), and a rank-one witness `P ≤ M` with `M_σ ⊓ C(P) ≠ 1` transports to `P^{g⁻¹}` (via
+`M_σ`, centralizer, and `ℰ_p¹` equivariance).  A prerequisite for the type-`P₁`/`P₂`
+conjugation-invariance used in BG Cor 14.12 (`typeP2_neighbor_is_typeF`, `sK_FD`). -/
+theorem kappa_conj_smul [Finite G] (g : G) (M : Subgroup G) :
+    kappa (MulAut.conj g • M) = kappa M := by
+  classical
+  -- One inclusion for all `a, N` suffices; the reverse follows with `a := g⁻¹`, `N := M^g`.
+  suffices h : ∀ (a : G) (N : Subgroup G), kappa (MulAut.conj a • N) ⊆ kappa N by
+    refine le_antisymm (h g M) (fun p hp => ?_)
+    have hMeq : MulAut.conj g⁻¹ • (MulAut.conj g • M) = M := by
+      rw [← mul_smul, ← map_mul, inv_mul_cancel, map_one, one_smul]
+    exact h g⁻¹ (MulAut.conj g • M) (hMeq.symm ▸ hp)
+  intro a N p hp
+  obtain ⟨hpp, hτ, P, hPelem, hPN, hPC⟩ := hp
+  haveI : Fact p.Prime := ⟨hpp⟩
+  have hinv : MulAut.conj a⁻¹ • (MulAut.conj a • N) = N := by
+    rw [← mul_smul, ← map_mul, inv_mul_cancel, map_one, one_smul]
+  refine ⟨hpp, ?_, MulAut.conj a⁻¹ • P, conj_smul_mem_elemAbelianOfRank a⁻¹ hPelem, ?_, ?_⟩
+  · -- `p ∈ τ₁(N) ∪ τ₃(N)`: from `hτ` extract `p ∉ σ ∧ r_p = 1`, transport, rebuild.
+    have hcommon : p ∉ OddOrder.BG.Ch3.S10.sigma (MulAut.conj a • N) ∧
+        pRank ↥(MulAut.conj a • N) p = 1 := by
+      rcases hτ with h1 | h3
+      · exact ⟨((mem_tau1_iff _ _).mp h1).1, ((mem_tau1_iff _ _).mp h1).2.2⟩
+      · exact ⟨((mem_tau3_iff _ _).mp h3).1, ((mem_tau3_iff _ _).mp h3).2.2⟩
+    have hσN : p ∉ OddOrder.BG.Ch3.S10.sigma N := by
+      have h1 := hcommon.1; rwa [sigma_conj_smul_eq] at h1
+    have hpRankN : pRank ↥N p = 1 := by
+      have heq : pRank ↥N p = pRank ↥(MulAut.conj a • N) p :=
+        pRank_eq_of_mulEquiv
+          (Subgroup.equivMapOfInjective N (MulAut.conj a).toMonoidHom (MulAut.conj a).injective)
+      rw [heq]; exact hcommon.2
+    by_cases hπ : p ∈ (Nat.card ↥(derivedInG N)).primeFactors
+    · exact Or.inr ((mem_tau3_iff _ _).mpr ⟨hσN, hπ, hpRankN⟩)
+    · exact Or.inl ((mem_tau1_iff _ _).mpr ⟨hσN, hπ, hpRankN⟩)
+  · -- `P^{a⁻¹} ≤ N` (apply `conj a⁻¹` to `P ≤ M^a`).
+    rw [← hinv]
+    exact Subgroup.pointwise_smul_le_pointwise_smul_iff.mpr hPN
+  · -- `M_σ(N) ⊓ C(P^{a⁻¹}) ≠ ⊥` (apply `conj a⁻¹` to `M_σ(M^a) ⊓ C(P) ≠ ⊥`).
+    have hbot : MulAut.conj a⁻¹ • (OddOrder.BG.Ch3.S10.Msigma (MulAut.conj a • N) ⊓
+        Subgroup.centralizer (P : Set G)) ≠ ⊥ := by
+      rw [Ne, pointwise_smul_eq_bot_iff]; exact hPC
+    rwa [Subgroup.smul_inf, centralizer_pointwise_smul, ← coe_pointwise_smul,
+      show MulAut.conj a⁻¹ • OddOrder.BG.Ch3.S10.Msigma (MulAut.conj a • N)
+        = OddOrder.BG.Ch3.S10.Msigma N from by rw [← Msigma_conj_smul, hinv]] at hbot
+
+/-- `π(M) ∖ σ(M)` (`sigmaComplementPrimes`) is conjugation-invariant. -/
+theorem sigmaComplementPrimes_conj_smul [Finite G] (g : G) (M : Subgroup G) :
+    sigmaComplementPrimes (MulAut.conj g • M) = sigmaComplementPrimes M := by
+  unfold sigmaComplementPrimes piSet
+  rw [card_pointwise_smul, sigma_conj_smul_eq]
+
+/-- **Type-`P` is conjugation-invariant** (`kappa_conj_smul`). -/
+theorem isTypeP_conj_smul [Finite G] (g : G) (M : Subgroup G) :
+    IsTypeP (MulAut.conj g • M) ↔ IsTypeP M := by
+  unfold IsTypeP; rw [kappa_conj_smul]
+
+/-- **Type-`P₁` is conjugation-invariant**. -/
+theorem isTypeP1_conj_smul [Finite G] (g : G) (M : Subgroup G) :
+    IsTypeP1 (MulAut.conj g • M) ↔ IsTypeP1 M := by
+  unfold IsTypeP1
+  rw [kappa_conj_smul, sigmaComplementPrimes_conj_smul, isTypeP_conj_smul]
+
+/-- **Type-`P₂` is conjugation-invariant**. -/
+theorem isTypeP2_conj_smul [Finite G] (g : G) (M : Subgroup G) :
+    IsTypeP2 (MulAut.conj g • M) ↔ IsTypeP2 M := by
+  unfold IsTypeP2
+  rw [kappa_conj_smul, sigmaComplementPrimes_conj_smul, isTypeP_conj_smul]
 
 /-- **BG Corollary 14.12** (mmd L4035): for `M ∈ 𝓜_{P₂}` with `K`, `M*`, `K*` as in
 Theorem 14.7 and `U` as in Proposition 14.2(a), `r ∈ π(U)`, `R` the Sylow `r`-subgroup of the
