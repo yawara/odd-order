@@ -90,6 +90,22 @@ bottom-out** するので、clean 化には §15 foundation が先。真の順�
 
 ## 進捗ログ
 
+**2026-06-22 (cont.⁷) ▶ NEXT = BG Cor 14.12 (`typeP2_neighbor_is_typeF`) で Thm C conjunct 2 を閉じる — Coq `P2type_signalizer` (BGsection14.v:2240) 精読で proof map 確定**:
+Thm C conjunct 2 (`N_G(U)⊄M`, S16:773 の type-P2 residual) = Cor 14.12 の `N_H(U)⊄M` clause (N_H(U)≤N_G(U) ゆえ ⟹ N_G(U)⊄M)。現状 `typeP2_neighbor_is_typeF` (S14:9001) は **conclusion に `N_H(U)⊄M` を含まず sorry** — 結論を BG full (`N_H(U)⊄M ∧ K⊆F(H∩M*) ∧ σ(H)'-Hall(H∩M*)`) に拡張 + 全証明が要る。**~160行の多段証明** (Coq P2type_signalizer 翻訳):
+- **setup**: `Ptype_embedding` (=typeP_duality) で M*=Mst + `uniqMst : 𝓜(C(K))={Mst}` (Prop 14.2(d))。`q:=|K|` prime (Prop 14.2(g))。
+- **`sK_uniqMst`**: `K⊆Mst^a ⟹ a∈Mst` (uniqueness, Prop 14.2(d) の `tiK_MstG`)。
+- **`snK_sMst`** (subnormal 帰納, ~8 Coq 行): `K<|<|L ⟹ L⊆Mst`。
+- **`sEH`**: E⊆H (R=O_r(U), N(R)⊆H, gFnorm_trans)。`sUH/sKH`: U,K⊆H。
+- **`notMGH`/`notMstGH`**: H≁M (r∈σ(H) vs r∉σ(M)) / H≁Mst (R∩=coprime TI 矛盾)。**`FmaxH`: H∈𝓜_F** (defPmax = Thm 14.7(g))。
+- **`s'H_K`**: K は σ(H)'-群 (`sigma_partition`)。`D`:= σ(H)'-Hall(H) ⊇K (`Hall_superset`)。
+- **`sK_FD`: K⊆F(D)** — ⊄F(D) なら **Lemma 14.11 (`exists_maximal_of_typeF_notMem_fitting`, ✅DONE)** で H* dichotomy → `uniqMst`/`defPmax`/q∈σ(Mst) で矛盾。**← ここで Lemma 14.11 を cite**。
+- **`sDMst`: D⊆Mst** (`nilpotent_subnormal (Fitting_nil D) sK_FD` → snK_sMst)。
+- **`defUK`: [U,K]=U** (`coprime_cent_prod` + `cent_semiregular regK`, C_U(K)=1)。
+- **`sUHs`: U⊆H_σ** (U=[U,K]⊆O_q(D)·H_σ, q^'-Hall 議論, sdprod_sigma)。
+- **最終**: `M⊓H=U⊔K`, `N_H(U)⊄M` (Lemma 14.1 `N_M(U)=UK`, H_σ⊆F(H))。`D≠H∩M*` ケース: C_{H_σ}(K)≠1 → q∈τ₂(H) → **Thm 12.5(e)** (`Msigma_nilpotent_of_tau2` 系) で H_σ∩M*=1 矛盾。
+- **要確認補題**: Thm 12.5(e) の正確な形 (S12_Theorem125), `coprime_cent_prod`/`semiregular` の Lean 等価, subnormal API (`Subgroup.Subnormal`?), `sigma_partition`。
+- ⟹ **大きい fresh-session タスク**。bottom-up helper (snK_sMst / FmaxH / sK_FD / sUHs) で分割推奨。署名拡張 (`N_H(U)⊄M` 追加) も要。
+
 **2026-06-22 (cont.⁶) ✅✅✅ BG Lemma 14.11 COMPLETE — `exists_maximal_of_typeF_notMem_fitting` sorry-free + axiom-clean** (`dc4c9055` + AxiomsCheck `6c562aa0`, full build 3881 green, FT-path sorry **131→130**):
 S8-S13 assembly 完結。**cont.⁵ で「残 gate」と誤判定した `C_{M*_σ}(Q)≠⊥` は resolvable だった** — MathComp `BGsection14.v` の `primes_non_Fitting_Ftype` (Coq Lemma 14.11) 精読で確定: **A は σ(M*)-subgroup ゆえ `A≤M*_σ`** (`sigma_subgroup_le_Msigma_of_isHall`; M*_σ は normal Hall σ-subgroup で全 σ-subgroup を含む — O_σ が任意 p-subgroup を含まないという私の懸念は誤り)、よって `C_{M*_σ}(Q)⊇A₁=A⊓C(Q)≠⊥`。
 - **assembly 鍵補題**: L=cyclic K' の order-p line (`characteristic_of_subgroup_of_isCyclic`+`mem_normalizer_map_subtype_of_characteristic` で M≤N(L)) / A E-normal (`elemAb_normal_in_E_of_tau2`) / index `q|[E:C_E(A)]` (`prime_dvd_index_of_sylow_not_le_of_normal`, Q⊄C(A) は ⁅A,Q⁆≠⊥ から直接) / Cor 12.9 で A₁∈ℰ_p¹ / Lemma 12.11 / τ₂(M*)=Cor 14.3 `maximalContaining_centralizer_eq_singleton_of_tau2_element` / κ(M*)=witness Q + ¬P2 (typeP_structure conj5 で σ=β、p∈σ\β と矛盾)。
