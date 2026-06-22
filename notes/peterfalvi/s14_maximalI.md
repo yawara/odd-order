@@ -112,8 +112,9 @@ from `(irreducible_iff_isSimpleModule_asModule ρ).mp hirr`.  Apply comm-Singer 
 
 The book proof of (12.12): let `P = O_p(H)`, `T = Ω₁(Z(P))` (elem-ab of order `p` or `p²`),
 `E` normalizes `T` and (by (12.10)) **acts FPF on `T`**.
-- **Case A** (`E` normalizes an order-`p` subgroup of `T`): `E ↪ Aut(ℤ/p) ≅ (ℤ/p)ˣ` ⟹ cyclic,
-  `e ∣ p−1`.  (ungated rep theory, once the `T`/FPF setup exists)
+- **Case A** (`E` normalizes an order-`p` subgroup of `T`, i.e. faithful on a line): ✅ **core
+  landed** (`isCyclic_and_card_dvd_of_faithful_one_dim`, commit `f13d57ca`) — `E ↪ End(line)ˣ ≅
+  (ℤ/p)ˣ` ⟹ cyclic, `e ∣ p−1`.
 - **Case B** (`|T| = p²`, `E` irreducible on `T`): ✅ **core landed** gives cyclic ∧ `e ∣ p²−1`.
   **`p+1` refinement**: any `A ≤ E` with `|A| ∣ p−1` embeds in `𝔽_pˣ`, so normalizes every line
   of `T`; in particular `⟨x⟩` (`x ∈ T = Ω₁(P_0)`), so `A ⊆ M` (by (12.9)), so `A = 1` (by (12.11)).
