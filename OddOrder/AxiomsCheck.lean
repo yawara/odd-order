@@ -5586,3 +5586,8 @@ formula together with the prime computation `coprimeFrobeniusAction_card_eq_prim
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.S11.exists_characteristic_complement_to_sylow_of_nilpotent
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S11.exists_chiefFactor_seed
+-- The chief-factor kernel and its elementary-abelian + `U W₁`-irreducible + `U`-noncentral
+-- structure of `H̄ = H/N` is axiom-clean.  (`exists_chiefFactorData` / `chiefFactor_basic` assemble
+-- it but additionally carry `typeIII_IV_p_eq_W2`, which cites the still-`sorry`'d §12 prime-order
+-- result `theorem88_caseB_prime_orders`, so they are not yet axiom-clean.)
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S11.exists_chiefFactor_kernel
