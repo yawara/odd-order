@@ -161,7 +161,26 @@ lane-f RESUME。Cor 14.12 残 = conjunct 2/3/4 (σ-decomposition of `H`) で `S1
 
 **✅✅✅ (b) sK_FD + 上半 infra DONE (commit `cde460a4`, full build 3881)**: `typeP2_neighbor_is_typeF` の refine 前に shared σ-decomposition infra を hoist。**`hsK_FE : K ≤ F(E)`（Coq sK_FD）完成** = Lemma 14.11 (`exists_maximal_of_typeF_notMem_fitting`) を `hEsetup.isComplement'_subgroupOf` (E-setup の補元) で適用 → case 1 (`huniqMst`+`tau2_subset_sigma_compl`) / case 2a (`isTypeP1_conj_smul`+`not_isTypeP1_and_isTypeP2`) / case 2b (`kappa_conj_smul`+`kappa_subset_sigmaCompl`)。同時に hoist: `hFmaxH`(conjunct 1)/`q,hKcard,hKcyc,hKelemq`/`defUK`/`hKMsigmaMst`/`hsH_K`/E-setup `⟨E,E₁,E₂,E₃,hEsetup,hKE,hE_pi⟩`/`hqσMst`/`huniqMst`。conjunct 1 は `hFmaxH` で配線済。残 conjunct 2/3/4 = sorry。
 
-**▶ 次 = (c) sUHs → conjunct 2 (`U ≤ Msigma H`)** = HsDq machinery（mechanical だが intricate、~50行）:
+**✅✅✅ (c) sUHs → conjunct 2 (`U ≤ Msigma H`) DONE (commit `00e05828`, full build 3881)**: HsDq machinery 完成。`HsDq := Msigma H ⊔ O_q(F(E))`; **HsDq◁H は quotient 不要**で `H=Msigma H⊔E≤N(HsDq)`（`M_σ(H)≤HsDq` + `E≤N(M_σ(H))⊓N(O_q(F(E)))` via `opiCoreInG_fittingInG_subgroupOf_normal`+`le_normalizer_sup`）。`U=⁅U,K⁆≤⁅H,HsDq⁆≤HsDq`（`commutator_le_of_le_normalizer`）、`M_σ(H)⊓O_q=⊥`⟹`M_σ(H)` は HsDq の normal {q}'-Hall（`[HsDq:M_σ(H)]=|O_q|` q-数、`card_sup_eq_mul_of_le_normalizer_of_disjoint`）⟹`isPiGroup_le_of_normal_isHallSubgroup`。+ refactor: `R`-char facts（hRcardU/hRUnorm/hPchar）を hKH から lift し `hUH:U≤H` 共有。**⟹ Cor 14.12 conjunct 1+2 完成、残 3/4。**
+
+**▶ 次 = (d)(e) conjunct 3/4** = `H∩Mst=E`（main equality）共有の coupled chunk（~80行、Coq L2362-2406）:
+- **`sDMst : E⊆Mst`** = `K<|<|E`（K⊆F(E)[hsK_FE]⟹K subnormal in nilpotent F(E)⟹subnormal in E）→ subnormal 帰納 `snK_sMst`（K<|<|L⟹L⊆Mst、`hsKuniq:K≤Mst^a⟹a∈Mst` を partner_inf_and_uniq から hoist 要、現 notMstGH 内 local）。
+- **`sHsFH : H_σ⊆F(H)`** = `nilpotent_normal_le_fitting`（H_σ nilpotent normal; type-F で H_σ nilpotent、Coq は Fitting_max+sigma'_kappa'_facts）。
+- **main equality `H∩Mst=E`** = `sdprod_sigma`(H=H_σ⋊E) + modular law + **wlog/Thm 12.5(e)**（`tau2_context` の Lean 等価未確定、`Msigma_nilpotent_of_tau2`(S12:101) 周辺; C_{H_σ}(K)≠1→q∈τ₂(H) 矛盾）。
+- **conjunct 3 (`M⊓H=U⊔K`)**: `Fu:=O_{(σ∪κ)'}(F(H))`, `U⊆Fu`(sUHs⊆H_σ⊆F(H)+`sub_Hall_pcore`), `M⊓Fu=U`, `defNMU:N_M(U)=U⊔K`(coprime_norm_cent), `M's E=U⊔K`(K≤N(U) ゆえ U<*>K=U⊔K)。
+- **conjunct 4 (`N_H(U)⊄M`)**: `N_H(U)≤M⟹H~M`(eq_mmax + nilpotent_sub_norm via Fu) vs notMGH。
+- **要 API 確認**: `tau2_context` 等価, subnormal trans/Fitting (Isaacs Ch02), `sub_Hall_pcore`(`Subgroup.IsPiGroup.le_oPiCore` 在), `nilpotent_sub_norm`。**~80行、1.5 session。**
+
+**★ conjuncts 3/4 精密 scope (session 末、Lean は末尾 2 clause [K⊆F(H∩Mst), σ(H)'-Hall] を省略ゆえ深い main equality [Thm 12.5e] は不要、Fu 構造のみ)**:
+- **`sHsFH : H_σ ⊆ F(H)`** = `Msigma_nilpotent_of_tau2`(S12_Theorem125:101, 要 `q∈τ₂(H)` + `A∈ℰ_q²(H)`) → `nilpotent_normal_le_fitting`(Isaacs Ch01:904)。⚠ **gate: `q∈τ₂(H)` の確立に subtlety** — Lean `kappa` def(S14:121)は centralizer 条件 `M_σ(H)⊓C(X)≠⊥` を含むので、Coq t2Hq(`partition_pi_sigma_compl`+`FtypeP`)の直訳は `M_σ(H)⊓C(K)≠⊥` を要し非自明(`pRank ↥H q = 2` を別途示すか、Coq \kappa def との差異を解消)。**最初に解くべき gate**。
+- **`defNMU : N_M(U) = U⊔K`** = ⚠ **`coprime_norm_cent`(coprime 作用 N=C)が repo に無い** — 要 locate/build。+ `Ω₁(R)⊆U`。conjunct 3 (`M⊓H=U⊔K`) の M⊓H⊆U⊔K 方向で使用。
+- **`eq_mmax : 極大 H≤M ⟹ H=M`** = ⚠ 直接補題無し(coatom 一意性から ~5行で導出可、reusable infra として建てるとよい)。conjunct 4 (`¬(H⊓N(U)≤M)`) で使用。
+- **Fu/defU**: `Fu:=opiCoreInG (σ∪κ)'ᶜ (F(H))` 的, `U⊆Fu`(U⊆H_σ⊆F(H)[sHsFH]+`Subgroup.IsPiGroup.le_oPiCore`), `M⊓Fu=U`(Hall), `Fu◁H`(char in F(H)◁H)。
+- **conjunct 4** 追加: `lt_normalizer_of_isNilpotent_of_lt_top`(Isaacs Ch01:410, nilpotent_sub_norm) + Fu。**conjunct 4 は defNMU 不要**(sHsFH/Fu/defU/eq_mmax のみ)ゆえ conjunct 3 より先に着手可。
+- `sDMst`(E⊆Mst, subnormal `K<|<|E`, `hsKuniq` を partner_inf_and_uniq から hoist)は **省略 2 clause 用**で Lean conjuncts 3/4 には不要。
+- **着手順**: ① `q∈τ₂(H)` 解決 → sHsFH → Fu/defU → ② `eq_mmax` 建てる → conjunct 4 → ③ `coprime_norm_cent` 建てる → defNMU → conjunct 3。**~70行 + 2 helper(eq_mmax, coprime_norm_cent)、1.5 session。**
+
+**(旧 sUHs plan、参考) HsDq machinery（DONE）**:
 - 反転: `U ≤ Msigma H` ⟸ `isPiGroup_le_of_normal_isHallSubgroup` を **↥HsDq 内**で適用（`HsDq := Msigma H ⊔ Oq`, `Oq := opiCoreInG {q} (fittingInG E)`; `(Msigma H).subgroupOf HsDq` が normal {q}ᶜ-Hall, `U.subgroupOf HsDq` が {q}ᶜ-群）。
 - `K ≤ Oq` = **`le_opiCoreInG_singleton_of_isPGroup_of_le_nilpotent`**(S08:460, K q-群 + `hsK_FE`(K≤F(E)) + F(E) nilpotent)。
 - `Msigma H ⊓ Oq = ⊥`（σ(H) vs q∉σ(H) coprime）⟹ `|HsDq|=|Msigma H|·|Oq|`（`Subgroup.card_HK_mul_card_inf_eq_card_mul_card`）⟹ Msigma H は {q}ᶜ-Hall of HsDq（[HsDq:Msigma H]=|Oq| は q-数, Msigma H q'-群 ∵ q∉σ(H)）。

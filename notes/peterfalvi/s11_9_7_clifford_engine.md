@@ -56,7 +56,42 @@ chiefFactor_basic (済) は `_holds` / `quotient_order` 経由ゆえ互換 (fiel
     |S₀|=p)` (case a)。証明 = `d∈{1,q}` を q 素数 (`data.nontrivial.2.1`) で読み、`d=q ⟹ |S₀|=p^q=|H̄| ⟹
     S₀=⊤` (`Subgroup.eq_top_of_card_eq`) + 極小性で U-既約、`d=1 ⟹ |S₀|=p`。**これが (9.7) の case 分け本体**。
 
-- **frontier = step 7 (CaseA/CaseB carrier 構成) — GATED**: `clifford_dichotomy` は
+- **step 7a DONE (2026-06-23, commit `e2a673bd`)** — **subgroup-level Singer 機構** (CaseB 体モデル核心、
+  sorry-free + axiom-clean):
+  - **`isCyclic_card_dvd_of_aInvariant_irreducible_faithful_comm`**: 有限**可換** A が有限 el-ab `p`-群 K に
+    **忠実・既約** (∀ φ-inv J, J=⊥∨⊤) 作用 ⟹ **A 巡回 ∧ |A| ∣ |K|-1**。= (9.7) case (b) の構造核心
+    (`U`-既約 chief factor ⟹ `Ū` 巡回・位数 ∣ p^q-1)。`elabRepresentation`→`Representation.asModule`→
+    `SingerField.isCyclic_and_card_dvd_of_faithful_irreducible_comm` を配線。
+  - **`elabRepresentation_isIrreducible`** (支持 bridge): `elabRepresentation p φ` の `Subrepresentation`
+    束が `IsSimpleOrder` ⟺ subgroup-level 既約。`Submodule (ZMod p)(Additive K) ≃o Subgroup K`
+    (`AddSubgroup.toZModSubmodule`/`toSubgroup'`) + `elabRepresentation_apply` で対応。
+  - **module-instance hell 突破 (重要知見)**: ① `set_option backward.isDefEq.respectTransparency false`
+    = `asModule` が ρ を無視する def ゆえ `Module k[G] asModule` の instance 探索が ρ を型から推論できない問題を
+    解消 (mathlib も同設定)。② 結論を `IsSimpleOrder (Subrepresentation …)` で直接述べる (`IsIrreducible`
+    abbrev は `[Field (ZMod p)]` 要 → `MonoidAlgebra` の ZMod Field/CommSemiring diamond)。③ module は
+    **instance arg** で渡す (ambient `CommGroup K` 上で構築; `IsElementaryAbelian.zmodModule` は
+    `IsMulCommutative` 経由で diamond)。
+
+- **step 7c DONE (2026-06-23, commit `4b4666de`)** — **CaseA bound `a∣p-1`**:
+  `card_range_dvd_card_sub_one_of_prime_card`: A が素数位数 p の K に作用 ⟹ `|φ.range| ∣ p-1`
+  (K 巡回 ⟹ `MulAut K≅(ZMod p)ˣ` 位数 p-1 [`IsCyclic.card_mulAut`+`Nat.totient_prime`]、`φ.range≤MulAut K`)。
+  sorry-free + axiom-clean。CaseA の `a=|U:C_U(H₁)|∣p-1`。
+
+- **(8.5.b) DONE (2026-06-23, commit `f4a49642`)** — **`typeP_commutator_U_centralizes_H`**:
+  `⁅data.U, data.U⁆ ≤ C_M(H)` (Ū=U/C_U(H) 可換)。sorry-free + axiom-clean。証明 = `⁅U,U⁆⊆M''=⁅M',M'⁆`
+  (`commutator_mono`+`derivedInG J=⁅J,J⁆` [`map_commutator`+`← MonoidHom.range_eq_map`+`range_subtype`]) +
+  `M''⊆F(M)=H⊔(U⊓C_M(H))` (`secondDerived_le_fitting` carrier field) + `K=U⊓C_M(H)≤C_M(H)≤N(H)` で
+  `↑(H⊔K)=↑H·↑K` (`coe_mul_of_right_le_normalizer_left`, `centralizer_le_normalizer (↑H:Set)`;
+  `Subgroup.normalizer` は Set 引数) + element-wise (x=h·c, h=x·c⁻¹∈U⊓H=⊥, x=c∈K)。
+  **(8.5.b) の "U' が H 中心化" は H 全体 (H̄ でなく) ゆえ H̄=H/N 上でも自動で中心化** (N≤H)。
+
+- **frontier = step 7b (chief-factor Singer 適用) — UNBLOCKED (now (8.5.b) 済)**: 7a Singer を H̄ に適用して
+  `Ū 巡回 ∧ |Ū|∣p^q-1`。A=`ψ.range` (ψ=`act.φ.comp act.U.subtype`、忠実像 Ū)、φ=`A.subtype`。
+  faithful=subtype 単射で自明、irreducible=case(b) から transfer、**可換=(8.5.b) で `⁅U_sub,U_sub⁆⊆ker ψ`**
+  (`⁅U,U⁆⊆C_M(H)`⟹H̄ 上自明作用)。module は ambient 構築。~100 行 plumbing (range 形成 + irreducible transfer +
+  abelian + module)。**注**: 7b 後も CaseB carrier の `u_coprime`/`u_dvd_norm` は **chars.u gated** のまま
+  (|Ū| でなく chars.u を参照)。CaseA は Hpart 型+q-indexing。
+  **その先 = step 7 (CaseA/CaseB carrier 構成) — GATED**: `clifford_dichotomy` は
   `chiefFactor_clifford_U_dichotomy` で case (a)/(b) に分岐できるが、`CliffordCaseAData`/`CliffordCaseBData`
   の**実フィールド**構成が残る:
   - **CaseB (case b) = `chars.u` に GATED (本質的)**: `u_coprime_p_sub_one : Coprime chars.u (p-1)` /

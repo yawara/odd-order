@@ -166,10 +166,47 @@ conjugation centralizer core to P₀ acting on K, then passes to the order-`p` p
 - `exists_second_maximal` ((8.17.a) `bgTheoremE_cover_data` + Sylow conjugation): L, L_type, P₀⊆L_s.
 - `centralizer_control_of_CKx` ((8.12.b) `typeI_or_typeII_centralizer_unique`): N_G(⟨x⟩)⊆M, C_G(x)⊄L.
 
-`exists_rankTwoWitness` assembles these into the witness.  **Discharging the 3 obligations is the
-residual §8 plumbing** (rank-2 is absent (8.12.a); (8.12.b)'s `N_G(⟨x⟩)⊆M` exceeds the available
-`typeI_or_typeII_centralizer_unique`; (8.17.a) needs cover-data extraction + Sylow conjugation —
-all hard/partly-absent BG §16 territory).
+`exists_rankTwoWitness` assembles these into the witness.
+
+**Two of the three obligations discharged** (2026-06-23 lane-h resume¹⁰ cont.², commits
+`c23b2134` / `cca59fcc`):
+- **`centralizer_control_of_CKx` ((8.12.b)) — sorry-free.** Apply `typeI_or_typeII_centralizer_unique`
+  with `U = M`, `X = {x}` ⟹ `C_G(x) ≤ M ∧ IsUniquelyMaximal (C_G(x))`.  Then `N_G(⟨x⟩) ⊆ M`
+  (⟨x⟩ proper [`x ∈ M < ⊤`] + nontrivial ⟹ not normal in simple `G` ⟹ `N_G(⟨x⟩) < ⊤` lies in a
+  maximal over `C_G(x)` = `M`) and `C_G(x) ⊄ L` (any maximal `L ≠ M` over `C_G(x)` would equal `M`).
+  `exists_second_maximal` strengthened to also yield `L ≠ M`.  ⚠ The earlier note "(8.12.b)'s
+  `N_G(⟨x⟩)⊆M` exceeds `typeI_or_typeII_centralizer_unique`" was wrong — the unique-maximal property
+  + `G` simple suffices.
+- **coprime / `P₀ ≤ N_G(K)` / `⁅K,K⁆ ≠ K` discharged inline** in `exists_rankTwoWitness`:
+  `(8.11)` (`hall_…`) ⟹ `M_F` Hall ⟹ `p ∤ |M_F|` (`p ∣ [M:M_F] ∣ [G:M_F]`) ⟹ p-group `P₀` coprime
+  to `K`; `P₀ ≤ M ≤ N_G(M_F)` (`maxNilpotentNormalHall_le_normalizer`); `K = M_F` nilpotent +
+  nontrivial (`TypeFData.H_nontrivial`) ⟹ `commutator ↥K < ⊤` ⟹ not perfect.
+
+**Residual = exactly two honest §8 obligations**:
+- **`counterexample_P0_K_structure` ((8.12.a), ABSENT)**: `P₀` abelian of rank 2 (every Sylow of the
+  type-`I` complement abelian rank ≤ 2 — a BG §16 consequence not extracted in repo).
+- **`exists_second_maximal` ((8.17.a))**: the second maximal `L ≠ M` with `P₀ ⊆ L_s` — from
+  `bgTheoremE_cover_data` (`p ∈ π(G)` covered by some `π((M_i)_s)`) + `(8.11)`/Sylow conjugation.
+  `L ≠ M` is forced by `p ∣ |L_s|` ∧ `p ∤ |M_s| = |M_F|` (the coprimality just proved).
+  **⛔ cross-lane gated (issue 2015)**: the cover gives `L₀ = reps i` of **arbitrary type `tau i`**,
+  and the Sylow-conjugation step needs `HasPeterfalviType (tau i) (g • L₀)` — i.e. the **general
+  5-type conjugation-invariance**.  `MaximalSubgroupTypeConj.lean` only has **F/I**
+  (`isTypeI_pointwise_smul`, `TypeFData.conj`, `TypeIData.conj`); II/III/IV/V are ABSENT (shared
+  infra, not lane-h-owned).  Also bottoms out in `bgTheoremE_cover_data` (BG §16, sorried).  ⟹
+  filed HUB issue 2015; (8.17.a) is blocked on that infra + BG §16, not a clean lane-h leaf.
+
+## ⛔ lane-h §12/§15 frontier status (2026-06-23): genuinely gated after maximal de-gating
+
+`(12.9)` is maximally de-gated (honest assembly + (8.12.b) discharged + coprime/normalize/
+K-not-perfect proven inline).  The remaining lane-h work is **genuinely gated**:
+- `(12.9)` residual: **(8.12.a)** [`P₀` rank-2, absent BG §16 — lane-f/b] + **(8.17.a)** [cross-lane
+  5-type conj infra, issue 2015 + BG §16 cover data].
+- `(12.10)`/`(12.11)`/`(12.13)`–`(12.16)`: gated on absent §8 ((8.13.c1)/(8.1.b)/(8.1.c) — BG §16)
+  + char ((6.8)/(7.11)/(7.8) — lane-b).
+- §15 `basic_structure` etc.: gated on `(10.11)`/`(11.7)` (char/BG, lane-b) for `P_order = p^q`.
+
+Next genuine lane-h progress needs one of: the 5-type conj infra (issue 2015, lane-f/hub), the
+lane-b char facts, or the genuinely-absent (8.12.a) [BG §16].
 
 ## ▶ Next steps — full (12.12) `complement_cyclic_order_dvd` (Pf 04.14 L67-74, §8-gated)
 
