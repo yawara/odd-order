@@ -1641,6 +1641,57 @@ theorem card_eq_pow_of_iSup_aInvariant_irreducible {K : Type*} [Group K] [Finite
     _ = ∏ _i : (t : Finset ι), n := Finset.prod_congr rfl (fun i _ => hfac i)
     _ = n ^ t.card := by rw [Finset.prod_const, Finset.card_univ, Fintype.card_coe]
 
+/-! ### (9.7) Clifford orbit: translates of a `U`-irreducible piece
+
+The Clifford decomposition restricts the `U W₁`-action on `H̄` to the normal kernel `U` and reads
+off the orbit of a minimal `U`-invariant `S₀` under the full action.  The three lemmas below are the
+group-theoretic core: an `A`-translate `φ a • S₀` of a `U`-invariant (resp. `U`-irreducible)
+subgroup is again `U`-invariant (resp. `U`-irreducible) when `U ◁ A`, and translation preserves
+order.  Combined with the spanning step `iSup_smul_eq_top_of_irreducible` and the order step
+`card_eq_pow_of_iSup_aInvariant_irreducible`, they give `|H̄| = |S₀|^k`, hence `q = d·k`. -/
+
+/-- **Clifford orbit, invariance.** If `U ◁ A` acts on `K` through `φ` and `S₀` is `U`-invariant
+(invariant under `φ` restricted to `U`), then every `A`-translate `φ a • S₀` is again `U`-invariant:
+for `u ∈ U`, `φ u • (φ a • S₀) = φ (u·a) • S₀ = φ a • (φ (a⁻¹·u·a) • S₀) = φ a • S₀` since
+`a⁻¹·u·a ∈ U`. -/
+theorem isAInvariant_comp_subtype_pointwise_smul {A K : Type*} [Group A] [Group K]
+    {φ : A →* MulAut K} {U : Subgroup A} (hU : U.Normal)
+    {S₀ : Subgroup K} (hS₀ : IsAInvariant (φ.comp U.subtype) S₀) (a : A) :
+    IsAInvariant (φ.comp U.subtype) (φ a • S₀) := by
+  intro u
+  show φ ↑u • (φ a • S₀) = φ a • S₀
+  have hmem : a⁻¹ * (↑u : A) * a ∈ U := by
+    have h := hU.conj_mem (↑u) u.2 a⁻¹; rwa [inv_inv] at h
+  rw [smul_smul, ← map_mul,
+    show (↑u : A) * a = a * (a⁻¹ * ↑u * a) by group, map_mul, ← smul_smul]
+  congr 1
+  exact hS₀ ⟨a⁻¹ * ↑u * a, hmem⟩
+
+/-- **Clifford orbit, irreducibility.** `A`-translates of a `U`-irreducible (minimal nonzero
+`U`-invariant) subgroup `S₀` are again `U`-irreducible: a `U`-invariant `J ≤ φ a • S₀` pulls back to
+`φ a⁻¹ • J ≤ S₀`, which is `⊥` or `S₀`, so `J = φ a • (φ a⁻¹ • J)` is `⊥` or `φ a • S₀`. -/
+theorem forall_aInvariant_le_pointwise_smul {A K : Type*} [Group A] [Group K]
+    {φ : A →* MulAut K} {U : Subgroup A} (hU : U.Normal) {S₀ : Subgroup K}
+    (hirr₀ : ∀ J : Subgroup K, IsAInvariant (φ.comp U.subtype) J → J ≤ S₀ → J = ⊥ ∨ J = S₀)
+    (a : A) (J : Subgroup K) (hJinv : IsAInvariant (φ.comp U.subtype) J) (hJle : J ≤ φ a • S₀) :
+    J = ⊥ ∨ J = φ a • S₀ := by
+  have hback : φ a • (φ a⁻¹ • J) = J := by
+    rw [smul_smul, ← map_mul, mul_inv_cancel, map_one, one_smul]
+  have hJ'inv : IsAInvariant (φ.comp U.subtype) (φ a⁻¹ • J) :=
+    isAInvariant_comp_subtype_pointwise_smul hU hJinv a⁻¹
+  have hJ'le : φ a⁻¹ • J ≤ S₀ := by
+    have h := (Subgroup.pointwise_smul_le_pointwise_smul_iff (a := φ a⁻¹)).mpr hJle
+    rwa [smul_smul, ← map_mul, inv_mul_cancel, map_one, one_smul] at h
+  rcases hirr₀ (φ a⁻¹ • J) hJ'inv hJ'le with h | h
+  · exact Or.inl (by rw [← hback, h, Subgroup.smul_bot])
+  · exact Or.inr (by rw [← hback, h])
+
+/-- **Clifford orbit, order.** Translation by an automorphism preserves order: `|φ a • S| = |S|`. -/
+theorem card_pointwise_smul {A K : Type*} [Group A] [Group K] [Finite K]
+    (φ : A →* MulAut K) (a : A) (S : Subgroup K) :
+    Nat.card ↥(φ a • S) = Nat.card ↥S :=
+  (Nat.card_congr (Subgroup.equivMapOfInjective S (φ a).toMonoidHom (φ a).injective).toEquiv).symm
+
 /-- **Peterfalvi (9.7)**: the Clifford-theory dichotomy for the action on the
 chief factor `H/H_0`. -/
 theorem clifford_dichotomy [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
