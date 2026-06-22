@@ -3250,6 +3250,55 @@ theorem Hypothesis.zeta_tau1_inner_self [Finite G] {M : Subgroup G}
     OddOrder.RepresentationTheory.irr_cf_inner hζirr hζirr, if_pos rfl]
 
 open scoped FiniteInduce in
+/-- **`ζ^{τ₁} ⊥ ζ̄^{τ₁}`** (Peterfalvi (10.6)(a) reduction): the coherent images of the degree-`w₁`
+irreducible `ζ` and its conjugate `ζ̄` are orthogonal.  As `ζ, ζ̄ ∈ 𝒮`
+(`inducedFamily_closedUnderConjugate`) and `τ₁ = coh.extension` is an isometry on `ℤ[𝒮]`
+(`extension_inner_eq`), `(ζ^{τ₁}, ζ̄^{τ₁}) = (ζ, ζ̄) = 0` (`ζ ≠ ζ̄`, both irreducible).
+
+One of the three orthogonalities dropping out of the (10.6)(a) reduction `(α_{ij}^τ, μ_j^{τ₁} −
+dζ̄^{τ₁}) = (δ(ω_{ij}^σ − ω_{i0}^σ), μ_j^{τ₁})`; the remaining `ζ̄^{τ₁} ⊥ Im σ`
+is the §5 (5.3.b)/(5.5) input still to be formalised. -/
+theorem Hypothesis.zeta_tau1_inner_conj [Finite G] {M : Subgroup G}
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis M) (hodd : Odd (Nat.card G))
+    {params : CharacterParameters hyp} (coh : CoherentHypothesis hyp params)
+    {ζ : ClassFunction ↥M ℂ} (hζS : ζ ∈ inducedFamily M) (hζirr : IsIrreducibleCharacter ζ)
+    (hζne : ζ.conj ≠ ζ) :
+    ClassFunction.inner (coh.tau1 ζ) (coh.tau1 ζ.conj) = 0 := by
+  have hζcS : ζ.conj ∈ inducedFamily M := inducedFamily_closedUnderConjugate M hζS
+  have hspan : ζ ∈ OddOrder.Peterfalvi.S07.zSpan hyp.Sset := Submodule.subset_span hζS
+  have hspanc : ζ.conj ∈ OddOrder.Peterfalvi.S07.zSpan hyp.Sset := Submodule.subset_span hζcS
+  show ClassFunction.inner (coh.coherent.extension ζ) (coh.coherent.extension ζ.conj) = 0
+  rw [coh.coherent.extension_inner_eq _ _ hspan hspanc,
+    OddOrder.RepresentationTheory.irr_cf_inner hζirr hζirr.conj, if_neg (Ne.symm hζne)]
+
+open scoped FiniteInduce in
+/-- **`ζ^{τ₁} ⊥ μ_k^{τ₁}`** (Peterfalvi (10.6)(a) reduction): the coherent image of the degree-`w₁`
+irreducible `ζ` is orthogonal to that of the column character `μ_k = ∑_i μ_{ik} ∈ 𝒮`.  By the
+isometry, `(ζ^{τ₁}, μ_k^{τ₁}) = (ζ, ∑_i μ_{ik}) = ∑_i (ζ, μ_{ik}) = 0`, each summand `0` by the
+degree mismatch `μ_{ik}(1) = d ≠ w₁ = ζ(1)` (`muGrid_inner_eq_zero_of_apply_one_ne` + conjugate
+symmetry).  A second orthogonality of the (10.6)(a) reduction (see `zeta_tau1_inner_conj`). -/
+theorem Hypothesis.zeta_tau1_inner_muColumn [Finite G] {M : Subgroup G}
+    [Invertible (Nat.card ↥M : ℂ)]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis M) (hodd : Odd (Nat.card G))
+    (k : Fin hyp.w2) {params : CharacterParameters hyp} (coh : CoherentHypothesis hyp params)
+    {ζ : ClassFunction ↥M ℂ} (hζS : ζ ∈ inducedFamily M) (hζirr : IsIrreducibleCharacter ζ)
+    (hkζ : ∀ i' : Fin hyp.w1, hyp.muGrid hG hodd i' k 1 ≠ ζ 1)
+    (hdk1 : hyp.muGrid hG hodd 0 k 1 ≠ 1) :
+    ClassFunction.inner (coh.tau1 ζ)
+        (coh.tau1 (∑ i : Fin hyp.w1, hyp.muGrid hG hodd i k)) = 0 := by
+  have hμkS := hyp.muGrid_column_sum_mem_inducedFamily hG hodd k hdk1
+  have hspanζ : ζ ∈ OddOrder.Peterfalvi.S07.zSpan hyp.Sset := Submodule.subset_span hζS
+  have hspanμ : (∑ i : Fin hyp.w1, hyp.muGrid hG hodd i k)
+      ∈ OddOrder.Peterfalvi.S07.zSpan hyp.Sset := Submodule.subset_span hμkS
+  show ClassFunction.inner (coh.coherent.extension ζ)
+    (coh.coherent.extension (∑ i : Fin hyp.w1, hyp.muGrid hG hodd i k)) = 0
+  rw [coh.coherent.extension_inner_eq _ _ hspanζ hspanμ,
+    OddOrder.RepresentationTheory.inner_sum_right]
+  refine Finset.sum_eq_zero (fun i _ => ?_)
+  have h0 := hyp.muGrid_inner_eq_zero_of_apply_one_ne hG hodd i k hζirr (hkζ i)
+  rw [OddOrder.RepresentationTheory.inner_conj_symm, h0, star_zero]
+
+open scoped FiniteInduce in
 /-- **Peterfalvi (10.5), `‖X‖² = 2` and `X ⊥ ζ^{τ₁}`** where `X = α_{ij}^τ + n·ζ^{τ₁}`: with
 `(α_{ij}^τ, ζ^{τ₁}) = −n` (`a = 0`, `muGridAlpha_tau1_zeta_eq_neg_n`), `‖α_{ij}^τ‖² = 2 + n²`
 (`muGridAlpha_tau_inner_self`) and `‖ζ^{τ₁}‖² = 1` (`zeta_tau1_inner_self`):

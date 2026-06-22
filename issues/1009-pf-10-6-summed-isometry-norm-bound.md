@@ -44,23 +44,44 @@ statement)。**S07_Coherence.lean に未形式化** — 本 issue の真の prer
   既存 norm-2 `eq_smul_chiFam_diff_of_vanishOnV` は constant-column を**排除**するが、これは逆に
   **採用** (separability+零列 q₀ で column-constant → Parseval mass → `a(i₀,j)²+a(i₀,k)²=1` →
   {0,±1} で片方のみ ±1)。= (5.8) proof step 4 を忠実に capture、reusable。
-- [ ] **(5.8) σ-level wrapper** (残 linchpin、下記スコープ参照; multi-piece): 上記 abstract core を
-  `TICyclicHypothesis`-level に wrap。要 (a) **Parseval** `‖X‖²=∑|sigmaCoeff X|²` (X∈chiFam span)、
-  (b) **(5.5)** で `μ_k^τ₁` を 2-column σ-combination に分解 (係数 {0,δ}/{0,−δ})、(c) (4.7) A-support、
-  (d) sigmaCoeff↔core の hsupp/hnorm 配線 (`sigmaCoeff_add_eq` で separability、(5.5) で係数 bound)。
-  - **🔎 resource (次セッション起点、2026-06-22 調査; 要 workability 検証 — 結論の存在≠infra 在庫)**:
-    S07 に (5.5) decomposition + Parseval 機構が既存。`S07_RetargetScaled.lean:451` の docstring
-    「(5.5) gives `X=∑_{α∈E}α` with `|E|=‖χ‖²` so `‖X‖²=‖χ‖²`」(= core の hnorm 供給源候補) +
-    `CharacterDifferenceImage` (`S07_Coherence.lean:395`、`imageSet`/`muClassFunction`/`difference`
-    = R(χ) 構造)。⚠ **真の gate は §6 certain-type μ ↔ §5 sigmaCoeff grid の reconcile**
-    (notes s12_s10 §更新⁴「deep gate (multi-session)」)。abstract core が hsupp/hnorm/係数 bound を
-    どう sigmaCoeff から受け取るかの interface を先に設計せよ。
+- [x] **(5.8) σ-level wrapper の (a) Parseval + (d) sigmaCoeff↔core 配線 DONE** (2026-06-22,
+  `S05_SigmaTrichotomy.lean`, 両 **axiom-clean** `[propext, Classical.choice, Quot.sound]`, full build
+  3881 green):
+  - **(a) Fourier 復元** `eq_sum_sigmaCoeff_smul_chiFam_of_inner_self_eq`: Parseval *等式*
+    `⟨X,X⟩ = ∑_pq sigmaCoeff(X) pq · conj(sigmaCoeff(X) pq)` (= X が Im σ ⊥ 成分を持たない、β=0)
+    ⟹ `X = ∑_pq sigmaCoeff(X) pq • χ_pq`。chiFam 直交性のみ依存。`span(chiFam)` を定義せず Parseval-等式を
+    仮説化したのが鍵 (norm-2 endgame は ‖·‖²=0 で coeff を消すが、(5.8) は復元が必要)。
+    ⚠ 設計知見: index 積型に global Fintype 無 (codebase は局所 `Fintype.ofFinite`) → 文の `∑ pq`
+    が Fintype を metavar 化 ⟹ 両 W1/W2 char-group の `[Fintype …]` を**instance 引数**に取る。
+  - **(d) σ-level full-column endgame** `eq_smul_chiFam_column_of_vanishOnV`: X が V で消え、sigmaCoeff が
+    2-column {jcol,kcol} support + {0,δ}/{0,−δ} entries + ⟨X,X⟩=w₁ + Parseval-等式 ⟹
+    `X = δ•∑_p χ_{(p,kcol)}` ∨ `X = −δ•∑_p χ_{(p,jcol)}`。abstract core `grid_eq_const_column_of_two_col`
+    (係数 grid → full column) + Fourier 復元 (full column → class-function 等式) を合成。
+    separability は `sigmaCoeff_add_eq` (V-消失) で供給、entries 実数性で `∑ s² = ∑ s·conj s` を橋渡し。
+    = norm-w₁ 版 `eq_smul_chiFam_diff_of_vanishOnV`。**(10.6.a) を (5.5) の出力に honest 還元**。
+- [ ] **残 linchpin = (5.8) wrapper の (b)(5.5) + (c)(4.7)**: 上記 endgame の仮説 (2-column support +
+  {0,±δ} entries + Parseval-等式 + ‖μ_k^τ₁‖²=w₁) を実際の `μ_k^τ₁` で**establish** する段階。
+  - (b) **(5.5)** `χ^τ₁ = ∑_{α∈R(χ)} α` を certain-type column μ_k に適用し R(μ_k)=2-column σ-構造を出す。
+  - (c) **(4.7) A-support** + μ_k^τ₁ vanishes on V (crux)。
+  - ⚠ **真の gate は §6 certain-type μ ↔ §5 sigmaCoeff grid の reconcile** (deep §6↔§5、multi-session)。
+    `IsCoherent` は abstract isometry で (5.5) を carry しない (2026-06-22 確認) — (5.5) を coherence
+    isometry に対し別途立てる必要。`S07_RetargetScaled.lean:451`/`CharacterDifferenceImage`
+    (`S07_Coherence.lean:395`) が R(χ) 機構の候補だが、§6 columnFamily R(μ_k) との reconcile が crux。
+  - ⚠ Explore 監査 (2026-06-22) は「400-500 行・blocker 無」と評価したが item B (μ_k 2-column 分解) を
+    「implicit」と認めており、これが linchpin。over-optimism に注意 ([[scaffold-sorry-free-not-done]] audit 版)。
 - [x] **(10.6.a) M→G→τ₁ reduction chain DONE** (2026-06-22, commits `88a95a70`/`3d9eb887`/`a2ff9e18`):
   - M-side diagonal IP `(α_ij, μ_j − dζ̄) = 1` (`muGridAlpha_inner_muColumn_self_sub_conj`)
   - G-side diagonal IP `(α_ij^τ, (μ_j − dζ̄)^τ) = 1` (`muGridAlpha_tau_inner_muColumn_self_sub_conj`)
   - τ/τ₁ split `(α_ij^τ, μ_j^τ₁ − dζ̄^τ₁) = 1` (`muGridAlpha_tau1_inner_muColumn_self_sub_conj`)
-  ⟹ (10.6.a) reduction opening 確立。残 = (1) ⊥Imσ 項落とし `(δ(ω_ij^σ−ω_i0^σ), μ_j^τ₁)=1`
-  (ζ^τ₁/ζ̄^τ₁⊥Imσ [tau1_zeta_vanishes 経由] + ζ^τ₁⊥μ_j^τ₁ [isometry+次数] + (10.5))、(2) (5.8) core。
+  ⟹ (10.6.a) reduction opening 確立。
+- **⊥落とし isometry orthogonality 2/3 DONE** (2026-06-22, S12, isometry pattern of `zeta_tau1_inner_self`):
+  - `zeta_tau1_inner_conj`: `(ζ^τ₁, ζ̄^τ₁)=0` (**完全 axiom-clean**; isometry + (ζ,ζ̄)=0, ζ̄≠ζ irr)。
+  - `zeta_tau1_inner_muColumn`: `(ζ^τ₁, μ_k^τ₁)=0` (sorryAx=upstream muGrid gate のみ=§10 全 muGrid lemma と同一、自前 sorry 0; isometry + ∑_i (ζ,μ_ik)=0 degree mismatch)。
+- ⚠ **訂正 (audit over-optimism)**: ⊥落とし の残 3 番目 orthogonality `ζ̄^τ₁⊥Imσ` は **in-stock でない**。
+  旧記述「tau1_zeta_vanishes 経由」は誤り — Pf (5.8) 原文では `χ^τ₁⊥Imσ ⟹ vanish on V (by 3.2.d)`
+  であって**逆ではない**。vanish-on-V から ⊥Imσ は出ず、これは **§5 (5.3.b)/(5.5) gated** (5.8 σ-wrapper
+  と同じゲート)。∴ ⊥落とし全体 = §5 gated; in-stock な 2 orthogonality のみ先行着地。
+  残 (10.6.a) = `ζ̄^τ₁⊥Imσ` (§5) + (5.8) σ-wrapper。
 - [ ] (10.6.a): diagonal IP + τ/τ₁ transfer (既存 `muGridAlpha_tau_inner_muColumn_sub_conj` 類比) +
       (5.8) → `μ_j^τ₁ = δ∑ω_ij^σ`。
 - [ ] `zeta_tau1_norm_bound` Prop を (10.6.b) の genuine 主張に materialize + 証明。

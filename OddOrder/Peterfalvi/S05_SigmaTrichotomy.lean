@@ -239,4 +239,186 @@ theorem eq_smul_chiFam_diff_of_vanishOnV (hyp : TICyclicHypothesis G) [Fintype h
     · exact (grid_no_constant_column (by rw [← Nat.card_eq_fintype_card, hcard1]; exact h3w1)
         Gr hG2 hG01 P1 P2 hPne hsc a hae hc (fun p => h1 p) (fun i j hj => h2 j i hj)).elim
 
+/-! ### Peterfalvi (5.8) preliminary: Fourier reconstruction along the `σ`-image family
+
+Where the norm-`2` endgame (`eq_smul_chiFam_diff_of_all_sigmaCoeff_zero`) drives a difference to
+zero *coefficientwise*, the norm-`w₁` (5.8) full-column endgame must instead *reconstruct* the
+class function from its `σ`-coefficients.  The following lemma is the reconstruction step: a class
+function whose self inner product is accounted for entirely by its `σ`-coefficients (the Parseval
+*equality*, i.e. no component orthogonal to `Im σ`) equals its `σ`-coefficient combination. -/
+
+open scoped Classical in
+/-- **Fourier reconstruction along the orthonormal `σ`-image family.**  If a class function `X`
+satisfies the Parseval *equality* `⟨X, X⟩ = ∑_pq sigmaCoeff(X) pq · conj(sigmaCoeff(X) pq)` —
+equivalently, `X` has no component orthogonal to `Im σ` — then `X` is recovered as its
+`σ`-coefficient combination `X = ∑_pq sigmaCoeff(X) pq • χ_pq`.
+
+Set `Y = ∑ sigmaCoeff·χ`.  Orthonormality of `chiFam` (`chiFam_spec`) makes
+`⟨Y, Y⟩ = ⟨X, Y⟩ = ⟨Y, X⟩ = ∑ sigmaCoeff·conj sigmaCoeff`, the same value the Parseval hypothesis
+assigns to `⟨X, X⟩`; hence `⟨X − Y, X − Y⟩ = 0`, so `X = Y` by positive-definiteness
+(`eq_zero_of_inner_self_re_eq_zero`).  This is the final step the (5.8) full-column endgame needs:
+once the coefficient grid is known to be a single constant full column (the abstract core
+`grid_eq_const_column_of_two_col`), this lemma turns that into the class-function identity
+`μ_k^{τ₁} = δ·∑_i ω_{ik}^σ`. -/
+theorem eq_sum_sigmaCoeff_smul_chiFam_of_inner_self_eq (hyp : TICyclicHypothesis G) [Fintype hyp.W]
+    [Invertible (Nat.card hyp.W : ℂ)] [Invertible (Nat.card G : ℂ)]
+    [Fintype ((hyp.W1.subgroupOf hyp.W) →* ℂˣ)] [Fintype ((hyp.W2.subgroupOf hyp.W) →* ℂˣ)]
+    (hVeq : hyp.V = hyp.Vdiff) (app : FullDadeApplication (G := G) hyp)
+    {X : ClassFunction G ℂ}
+    (hParseval : ClassFunction.inner X X
+      = ∑ pq, hyp.sigmaCoeff hVeq app X pq * star (hyp.sigmaCoeff hVeq app X pq)) :
+    X = ∑ pq, hyp.sigmaCoeff hVeq app X pq • hyp.chiFam hVeq app pq := by
+  classical
+  haveI : Finite G := Finite.of_fintype G
+  -- `sigmaCoeff` is by definition `⟨X, χ_pq⟩`.
+  have hXchi : ∀ pq, ClassFunction.inner X (hyp.chiFam hVeq app pq)
+      = hyp.sigmaCoeff hVeq app X pq := fun _ => rfl
+  set Y : ClassFunction G ℂ :=
+    ∑ pq, hyp.sigmaCoeff hVeq app X pq • hyp.chiFam hVeq app pq with hY
+  -- `⟨Y, Y⟩ = ∑ s·conj s` (orthonormality of `chiFam`).
+  have hYY : ClassFunction.inner Y Y
+      = ∑ pq, hyp.sigmaCoeff hVeq app X pq * star (hyp.sigmaCoeff hVeq app X pq) := by
+    rw [hY, inner_sum_smul_sum]
+    refine Finset.sum_congr rfl fun pq _ => ?_
+    rw [Finset.sum_eq_single pq
+      (fun ab _ hab => by
+        rw [(hyp.chiFam_spec hVeq app).2.2.1, if_neg (Ne.symm hab), mul_zero])
+      (fun h => absurd (Finset.mem_univ pq) h),
+      (hyp.chiFam_spec hVeq app).2.2.1, if_pos rfl, mul_one]
+  -- `⟨X, Y⟩ = ∑ s·conj s`.
+  have hXY : ClassFunction.inner X Y
+      = ∑ pq, hyp.sigmaCoeff hVeq app X pq * star (hyp.sigmaCoeff hVeq app X pq) := by
+    rw [hY, inner_sum_right]
+    refine Finset.sum_congr rfl fun pq _ => ?_
+    rw [OddOrder.RepresentationTheory.inner_smul_right, hXchi pq, mul_comm]
+  -- `⟨Y, X⟩ = ∑ s·conj s`.
+  have hYX : ClassFunction.inner Y X
+      = ∑ pq, hyp.sigmaCoeff hVeq app X pq * star (hyp.sigmaCoeff hVeq app X pq) := by
+    rw [hY, inner_sum_left]
+    refine Finset.sum_congr rfl fun pq _ => ?_
+    rw [ClassFunction.inner_smul_left, OddOrder.RepresentationTheory.inner_conj_symm, hXchi pq]
+  -- positive-definiteness on the difference `X − Y`.
+  have hzero : ClassFunction.inner (X - Y) (X - Y) = 0 := by
+    rw [ClassFunction.inner_sub_left, ClassFunction.inner_sub_right,
+      ClassFunction.inner_sub_right, hParseval, hXY, hYX, hYY]
+    ring
+  have hfin := eq_zero_of_inner_self_re_eq_zero (φ := X - Y)
+    (by rw [hzero]; exact Complex.zero_re)
+  rw [sub_eq_zero] at hfin
+  exact hfin.trans hY
+
+/-! ### Peterfalvi (5.8): the norm-`w₁` full-column Dade-image endgame
+
+The `σ`-coefficient analogue of `eq_smul_chiFam_diff_of_vanishOnV`, but *adopting* a single constant
+full column instead of excluding it.  Once (5.5) supplies the two-column support and `{0,±δ}` entries
+of `X = μ_k^{τ₁}`, this turns the norm-`w₁` data into the class-function identity
+`μ_k^{τ₁} = δ·∑_i ω_{ik}^σ` (Peterfalvi (5.8) / the (10.6) summed isometry). -/
+
+open scoped Classical in
+/-- **Peterfalvi (5.8), `σ`-coefficient full-column endgame.**  Let `X` be a class function of `G`
+that vanishes on `V` (so its `σ`-coefficient grid is additively separable, `sigmaCoeff_add_eq`),
+whose `σ`-coefficients are supported on two `W₂`-columns `jcol ≠ kcol`, with column-`kcol` entries in
+`{0, δ}` and column-`jcol` entries in `{0, −δ}` (`δ = ±1`), and which accounts for its full self
+inner product through its `σ`-coefficients (`hParseval`, the Parseval equality / no `Im σ`-orthogonal
+component) with `‖X‖² = w₁` (`hXnorm`, the coherence isometry).  Then `X` is a single constant full
+column: either `X = δ·∑_i χ_{(i,kcol)}` or `X = −δ·∑_i χ_{(i,jcol)}`.
+
+The abstract grid core `grid_eq_const_column_of_two_col` turns the two-column, `{0,±δ}`, mass-`w₁`
+data into a single constant full coefficient column; the Fourier reconstruction
+`eq_sum_sigmaCoeff_smul_chiFam_of_inner_self_eq` then turns that coefficient column back into the
+class-function identity.  This is the norm-`w₁` analogue of `eq_smul_chiFam_diff_of_vanishOnV`, and
+the (10.6) summed isometry `μ_k^{τ₁} = δ·∑_i ω_{ik}^σ` is the §10 application, once (5.5) supplies
+the two-column support and `{0,±δ}` entries. -/
+theorem eq_smul_chiFam_column_of_vanishOnV (hyp : TICyclicHypothesis G) [Fintype hyp.W]
+    [Invertible (Nat.card hyp.W : ℂ)] [Invertible (Nat.card G : ℂ)]
+    [Fintype ((hyp.W1.subgroupOf hyp.W) →* ℂˣ)] [Fintype ((hyp.W2.subgroupOf hyp.W) →* ℂˣ)]
+    (hVeq : hyp.V = hyp.Vdiff) (app : FullDadeApplication (G := G) hyp)
+    {X : ClassFunction G ℂ} (hψV : ∀ v ∈ hyp.V, X v = 0)
+    {jcol kcol : (hyp.W2.subgroupOf hyp.W) →* ℂˣ} (hjk : jcol ≠ kcol)
+    (hsupp : ∀ pq : ((hyp.W1.subgroupOf hyp.W) →* ℂˣ) × ((hyp.W2.subgroupOf hyp.W) →* ℂˣ),
+      pq.2 ≠ jcol → pq.2 ≠ kcol → hyp.sigmaCoeff hVeq app X pq = 0)
+    {δ : ℂ} (hδ : δ = 1 ∨ δ = -1)
+    (hk : ∀ p, hyp.sigmaCoeff hVeq app X (p, kcol) = 0 ∨ hyp.sigmaCoeff hVeq app X (p, kcol) = δ)
+    (hj : ∀ p, hyp.sigmaCoeff hVeq app X (p, jcol) = 0 ∨ hyp.sigmaCoeff hVeq app X (p, jcol) = -δ)
+    (hXnorm : ClassFunction.inner X X = (Nat.card hyp.W1 : ℂ))
+    (hParseval : ClassFunction.inner X X
+      = ∑ pq, hyp.sigmaCoeff hVeq app X pq * star (hyp.sigmaCoeff hVeq app X pq)) :
+    (X = δ • ∑ p, hyp.chiFam hVeq app (p, kcol)) ∨
+      (X = (-δ) • ∑ p, hyp.chiFam hVeq app (p, jcol)) := by
+  classical
+  haveI : Finite G := Finite.of_fintype G
+  -- every coefficient is real (`{0, ±δ}` with `δ = ±1`); off the two columns it vanishes.
+  have hstar : ∀ pq, star (hyp.sigmaCoeff hVeq app X pq) = hyp.sigmaCoeff hVeq app X pq := by
+    intro pq
+    by_cases hq : pq.2 = kcol
+    · obtain ⟨p, q⟩ := pq; subst hq
+      rcases hk p with h | h <;> rw [h]
+      · exact star_zero _
+      · rcases hδ with h' | h' <;> rw [h'] <;> simp
+    · by_cases hq' : pq.2 = jcol
+      · obtain ⟨p, q⟩ := pq; subst hq'
+        rcases hj p with h | h <;> rw [h]
+        · exact star_zero _
+        · rcases hδ with h' | h' <;> rw [h'] <;> simp
+      · rw [hsupp pq hq' hq, star_zero]
+  -- a third column `q₀ ∉ {jcol, kcol}` exists since `w₂ ≥ 3`.
+  obtain ⟨q₀, hq₀j, hq₀k⟩ : ∃ q₀ : (hyp.W2.subgroupOf hyp.W) →* ℂˣ, q₀ ≠ jcol ∧ q₀ ≠ kcol := by
+    by_contra hcon; push_neg at hcon
+    have hsub : (Finset.univ : Finset ((hyp.W2.subgroupOf hyp.W) →* ℂˣ)) ⊆ {jcol, kcol} := by
+      intro q _
+      rcases eq_or_ne q jcol with hq | hq
+      · simp [hq]
+      · simp [hcon q hq]
+    have hcard := Finset.card_le_card hsub
+    have h2 : ({jcol, kcol} : Finset ((hyp.W2.subgroupOf hyp.W) →* ℂˣ)).card ≤ 2 :=
+      (Finset.card_insert_le _ _).trans (by rw [Finset.card_singleton])
+    have h3 : 3 ≤ Fintype.card ((hyp.W2.subgroupOf hyp.W) →* ℂˣ) := by
+      rw [← Nat.card_eq_fintype_card, hyp.card_charGroup_subgroupOf hyp.W2_le_W]
+      exact hyp.three_le_card_W2
+    rw [Finset.card_univ] at hcard; omega
+  -- the mass identity `∑ (a pq)² = |Ŵ₁| = w₁`.
+  have hmass : ∑ pq, (hyp.sigmaCoeff hVeq app X pq) ^ 2
+      = (Fintype.card ((hyp.W1.subgroupOf hyp.W) →* ℂˣ) : ℂ) := by
+    have hsq : ∀ pq, (hyp.sigmaCoeff hVeq app X pq) ^ 2
+        = hyp.sigmaCoeff hVeq app X pq * star (hyp.sigmaCoeff hVeq app X pq) :=
+      fun pq => by rw [hstar pq]; ring
+    rw [Finset.sum_congr rfl (fun pq _ => hsq pq), ← hParseval, hXnorm,
+      ← Nat.card_eq_fintype_card, hyp.card_charGroup_subgroupOf hyp.W1_le_W]
+  -- apply the abstract two-column core (beta-reduce the grid `fun pq => sigmaCoeff X pq`).
+  have hcore := grid_eq_const_column_of_two_col (ι := (hyp.W1.subgroupOf hyp.W) →* ℂˣ)
+    (κ := (hyp.W2.subgroupOf hyp.W) →* ℂˣ) (fun pq => hyp.sigmaCoeff hVeq app X pq)
+    (fun i i' q q' => hyp.sigmaCoeff_add_eq hVeq app hψV i i' q q') hjk hq₀j hq₀k
+    (fun i q hqj hqk => hsupp (i, q) hqj hqk) hδ hk hj hmass
+  simp only [] at hcore
+  -- reconstruct `X` from its coefficients, then collapse to the surviving column.
+  have hXrec : X = ∑ pq, hyp.sigmaCoeff hVeq app X pq • hyp.chiFam hVeq app pq :=
+    hyp.eq_sum_sigmaCoeff_smul_chiFam_of_inner_self_eq hVeq app hParseval
+  -- collapse the double sum onto the single nonzero column `col`, where `sigmaCoeff (·, col) = val`.
+  have hcollapse : ∀ (col : (hyp.W2.subgroupOf hyp.W) →* ℂˣ) (val : ℂ),
+      (∀ p, hyp.sigmaCoeff hVeq app X (p, col) = val) →
+      (∀ p q, q ≠ col → hyp.sigmaCoeff hVeq app X (p, q) = 0) →
+      ∑ pq, hyp.sigmaCoeff hVeq app X pq • hyp.chiFam hVeq app pq
+        = val • ∑ p, hyp.chiFam hVeq app (p, col) := by
+    intro col val hcol hoff
+    rw [Fintype.sum_prod_type, Finset.smul_sum]
+    refine Finset.sum_congr rfl fun p _ => ?_
+    rw [Finset.sum_eq_single col
+      (fun q _ hq => by rw [hoff p q hq, zero_smul])
+      (fun h => absurd (Finset.mem_univ col) h), hcol p]
+  rcases hcore with ⟨hkcol, hjcol⟩ | ⟨hjcol, hkcol⟩
+  · -- column `kcol` is constantly `δ`, column `jcol` (and the rest) vanish.
+    refine Or.inl ?_
+    rw [hXrec, hcollapse kcol δ hkcol ?_]
+    intro p q hq
+    by_cases hqj : q = jcol
+    · rw [hqj]; exact hjcol p
+    · exact hsupp (p, q) hqj hq
+  · -- column `jcol` is constantly `−δ`, column `kcol` (and the rest) vanish.
+    refine Or.inr ?_
+    rw [hXrec, hcollapse jcol (-δ) hjcol ?_]
+    intro p q hq
+    by_cases hqk : q = kcol
+    · rw [hqk]; exact hkcol p
+    · exact hsupp (p, q) hq hqk
+
 end OddOrder.Peterfalvi.S05.TICyclicHypothesis
