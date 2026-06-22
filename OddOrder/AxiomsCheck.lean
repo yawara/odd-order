@@ -5662,3 +5662,4 @@ formula together with the prime computation `coprimeFrobeniusAction_card_eq_prim
   OddOrder.Peterfalvi.S11.isCyclic_card_dvd_of_aInvariant_irreducible_faithful_comm
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S11.card_range_dvd_card_sub_one_of_prime_card
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S11.typeP_commutator_U_centralizes_H
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S11.chiefFactor_caseB_image_cyclic
