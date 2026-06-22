@@ -701,6 +701,11 @@ set_option linter.style.longLine false in
 -- normalizing a coprime `K` with `⁅K, K⁆ ≠ K` has `x ∈ A^#` with `C_G(x) ⊓ K ⊄ ⁅K, K⁆`.
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.S14.exists_mem_centralizer_inf_not_le_commutator
+-- Peterfalvi (12.9) order-p centralizer witness (the §8-free heart of (12.9)): from the
+-- counterexample data (P₀ abelian, coprime to K = M_F, normalizing K, K not perfect) there is
+-- an order-p element x ∈ Ω₁(P₀)^# with C_K(x) ⊄ K' (centralizer core + order-p power).
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S14.exists_orderP_centralizer_witness
 -- RepresentationTheory: completeness of irreducible characters — `f ⊥ Irr G ⇒ f = 0`
 -- (regular representation + Maschke + Schur).
 #assert_only_allowed_axioms OddOrder.RepresentationTheory.classFunction_eq_zero_of_orthogonal
@@ -5318,6 +5323,16 @@ A signalizer-functor prerequisite for BG Cor 14.12 (`typeP2_neighbor_is_typeF`).
 
 #assert_only_allowed_axioms OddOrder.BG.Ch4.S14.typeP2_kappaHall_commutator_eq_self
 
+/-! **BG `kappaJ` / type conjugation-invariance** (`S14_TypePCounting`): `κ(M^g) = κ(M)`
+(`kappa_conj_smul`) and the type predicates `IsTypeP`/`IsTypeP1`/`IsTypeP2` transfer under
+conjugation (`isTypeP{,1,2}_conj_smul`).  Each `κ`-condition (`τ₁∪τ₃ = {p ∉ σ ∧ r_p=1}`, the
+rank-one centralizer witness) is conjugation-stable via `σ`/`M_σ`/`pRank`/`ℰ_p¹`/centralizer
+equivariance.  Prerequisite for BG Cor 14.12 (`sK_FD`).  Axiom-clean. -/
+
+#assert_only_allowed_axioms OddOrder.BG.Ch4.S14.kappa_conj_smul
+#assert_only_allowed_axioms OddOrder.BG.Ch4.S14.isTypeP1_conj_smul
+#assert_only_allowed_axioms OddOrder.BG.Ch4.S14.isTypeP2_conj_smul
+
 /-! **BG Theorem A(3) decomposition** (`S16_MainResults`, `typeP_maximal_eq_kappaHall_sup_U_sup_Msigma`):
 `M = K U M_σ` for a maximal `M` with Hall `κ`-subgroup `K ≤ M` and Hall `(κ∪σ)'`-subgroup `U ≤ M`.
 Type-F via the `K = ⊥` `SubgroupESetup`; type-P via the `M' = U M_σ`/`M'`-complements-`K` structure
@@ -5641,3 +5656,4 @@ formula together with the prime computation `coprimeFrobeniusAction_card_eq_prim
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S11.forall_aInvariant_le_pointwise_smul
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S11.card_pointwise_smul
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S11.chiefFactor_clifford_dim_dvd_q
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S11.chiefFactor_clifford_U_dichotomy

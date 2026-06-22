@@ -50,12 +50,30 @@ chiefFactor_basic (済) は `_holds` / `quotient_order` 経由ゆえ互換 (fiel
     `data.typeP.H` の defeq をインスタンス探索が展開せず action の `[N.Normal]` が見つからない →
     `@[reducible] TypesIIIIIIVSetup.H` で透過化 + `attribute [instance] ChiefFactorData.N_normal`
     (文中で `Subgroup (↥H⧸N)` を使うため; instance-field は自動でグローバル instance にならない)。
-  - **frontier = step 6/7 (CaseA/CaseB データ構成)**: `clifford_dichotomy` は `chiefFactor_clifford_dim_dvd_q`
-    で `d∈{1,q}` に分岐できるが、`CliffordCaseAData`/`CliffordCaseBData` の**実フィールド**構成が残る:
-    CaseA (d=1) = `Hpart : Fin q → Subgroup G` 各位数 `p` (H̄ の q 個の order-p ピースを G に引き戻し、
-    Schur–Zassenhaus 系の分割が要る) + `a∣p-1`; CaseB (d=q) = `u_coprime_p_sub_one` / `u_dvd_norm_quotient`
-    (`End_{F_p[U]}(H̄)` 体モデル + `Ū↪F*` 巡回 + FPF)。両者とも `Section11CharacterData` の `u`
-    (opaque `u_eq_card_quotient`) を pin する必要があり深い。**これらが本当の残務** (算術核心は完成)。
+- **step 6 DONE (2026-06-23, commit `deab3074`)** — **構造的 U-二分** (sorry-free + axiom-clean):
+  - `chiefFactor_clifford_dim_dvd_q` を enrich (S₀ の U-不変性 `hS₀inv` + U-既約性 `hirr₀` も返す)。
+  - **`chiefFactor_clifford_U_dichotomy`**: `(∀ J U-inv, J=⊥∨⊤)` (case b: U-既約) `∨` `(∃ S₀≠⊥ U-inv,
+    |S₀|=p)` (case a)。証明 = `d∈{1,q}` を q 素数 (`data.nontrivial.2.1`) で読み、`d=q ⟹ |S₀|=p^q=|H̄| ⟹
+    S₀=⊤` (`Subgroup.eq_top_of_card_eq`) + 極小性で U-既約、`d=1 ⟹ |S₀|=p`。**これが (9.7) の case 分け本体**。
+
+- **frontier = step 7 (CaseA/CaseB carrier 構成) — GATED**: `clifford_dichotomy` は
+  `chiefFactor_clifford_U_dichotomy` で case (a)/(b) に分岐できるが、`CliffordCaseAData`/`CliffordCaseBData`
+  の**実フィールド**構成が残る:
+  - **CaseB (case b) = `chars.u` に GATED (本質的)**: `u_coprime_p_sub_one : Coprime chars.u (p-1)` /
+    `u_dvd_norm_quotient : chars.u ∣ (p^q-1)/(p-1)` は `chars.u` を参照するが、`Section11CharacterData.u`
+    は **free field** (制約 `u_eq_card_quotient` は opaque Prop)。⟹ `chars.u` を pin (= `|Ū|` 等に固定)
+    しない限り**証明不能** ([[scaffold-sorry-free-not-done]]: 偽装構成は不可)。`Section11CharacterData` は
+    lane-b の S12 (`typeII_section11_coherence`:3774) が消費 (tau/S/support のみ、u は未使用) ゆえ `u` 固定は
+    **carrier 設計判断** (lane-b と要調整)。体モデル自体 (`End_{𝔽ₚ[U]}(H̄)` が体 → `Ū` 巡回 + `|Ū|∣p^q-1`)
+    は **ungated・in-lane buildable だが重い** (module bridge: `IsAInvariant`-既約 → `IsSimpleModule` を
+    `zmodModule`+`elabRepresentation`+`irreducible_iff_isSimpleModule_asModule` で組み、`SingerField`
+    `isCyclic_and_card_dvd_of_faithful_irreducible_comm` を適用; ~150-250 行・instance 注意)。
+  - **CaseA (case a) = 型問題 + 構成**: `Hpart : Fin q → Subgroup G` 各位数 `p` だが、H̄ の order-p ピースは
+    G に引き戻すと位数 `p|H₀|` ⟹ **`Subgroup G` で位数ちょうど p は不整合** (構造体 `Hpart` の型を
+    `Subgroup (↥H⧸N)` に直すか要検討、consumer は `caseA.a` のみ使用・Hpart 未使用)。`a∣p-1` は U の
+    order-p 片への作用が `U/C ↪ MulAut(order-p)≅(ZMod p)ˣ` (位数 p-1) ゆえ ungated・doable。
+  - **∴ clifford_dichotomy は honest には閉じられない (chars.u gate)**。ユーザー判断待ち: (i) `chars.u` を
+    pin (lane-b 調整) / (ii) 体モデル bridge を deferred infra として先行構築 / (iii) 別タスクへ。
 
 - **step 0 DONE (2026-06-22, commit `f69557a5`)**: `ChiefFactorData` の 3 opaque field を実構造に
   置換。`exists_chiefFactor_kernel` を強化し、kernel `N = W.comap (mk' N₀)` について
