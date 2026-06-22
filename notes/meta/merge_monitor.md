@@ -236,6 +236,14 @@ branch とも削除済み。旧 **A** / **D** も同様に退役済み (履歴�
 
 ## 現状メモ
 
+- **2026-06-22 (続⁴) — 監視再開 + 4 レーン全合流 (5 merge) + cron 再作成**: ユーザー「各レーンを監視します」で再開。前 cron は session 変化で消滅 (`CronList` 空) → 新 cron **`cf031d2e`** (`4,29,54 * * * *`, stop-on-problem prompt 入り) 再作成。全レーン範囲逸脱なし (3-dot 確認)、build 各 3881 green / AxiomsCheck OK / 新規 axiom 0。**実 sorry 130→128** (lane-f が -2):
+  - **lane-f** (2 merge): `8c98a1e9` BG Cor 14.12 conjunct 1 = `IsTypeF H` proven (notMGH + msigma_inf_partner_eq_kstar + defMsMstar kernel, 実 sorry -2) → セッション中追加バッチ `7eb88d6c` Thm A(4)/A(5) centralizer lemmas 再配置 S16→S14 (105 行純粋移動)。
+  - **lane-b** (`a5a2b1ae`): Pf (5.8) σ-level full-column endgame (Fourier 復元+σ-wrapper) + (10.6.a) reduction (ζ^τ₁⊥ζ̄^τ₁ / ⊥μ_k^τ₁)。sorry 不変。
+  - **lane-h** (`e52187d1`): Pf (12.12) Case-A core = faithful 1-dim ⟹ cyclic ∧ e∣p-1 → (12.12) ungated rep-theory 2 core 完成 (Case A+B)。sorry 不変。
+  - **lane-c** (`ad48a7de`): Pf (9.7) Clifford engine steps 1-2 (chief-factor dim |H̄|=p^q + orbit-span)。sorry 不変。
+  - ⚠ サイズ flag (>1500, 全 active frontier、分割 issue 既起票): S14_TypePCounting **9395** (0069) / S12_MaximalIII_IV_V 3830 (0076) / S11_MaximalII_III_IV 1641 (0077)。
+  - ⚠ **push 保留**: `git push origin main` が auto-mode classifier に拒否 (default branch 直 push = PR review 迂回、ユーザー指示は監視のみ)。merge は local main に commit 済 (HEAD `7eb88d6c`)。push はユーザー明示許可待ち。
+  - HUB 宛 issue: `4002-hub-feedback-lane-allocation` は既出 (lane-c starve diagnosis) で issue 4005 relane が substantive response 済 ⟹ 新規 ask なし。
 - **📌 レーン範囲逸脱 = ループ停止ルール追加 (ユーザー方針 2026-06-22, 永続)**: 各レーンが**自所有外の Pf/BG S-ファイルを編集**したら ⛔ stop-on-problem に従いループ停止 (CronDelete + 報告 + 待機)。検出 = step 1.5 (マージ前に **3-dot** `git diff --name-only main...<branch>` を 🔒 所有マップに照合; 2-dot は遅れ分を誤検出)。共有ファイル (AxiomsCheck.lean 追記 / OddOrder.lean import / GroupTheory/** / notes / issues) は逸脱でない。cron prompt にも内蔵。
 - **📌 lane-c を §11 に再配置 (frontier-cluster relane, ユーザー裁可 2026-06-22, issue 4005)**: §16 監査で「starve は lane-c (§16 終点 consumer) のみ、lane-h 領域に ~16 独立 leaf」と判明 → lane-c を §16 から **Pf §11 (S11_MaximalII_III_IV, Wielandt §9 / Clifford 9.6-9.10)** へ。**S11 を H→C 移譲**、H は §14_MaximalI+§15 に集中、§16/§10 は driver 化 (常駐させず上流 landing 時に機会的 close)。レーン表・取り決め更新済。各レーン LAUNCH.md も更新 (git-excluded)。次 tick 以降この割当で運用。
 - **📌 標準監視ペース = 25 分（恒久、ユーザー指示 2026-06-22）**: cron 式 **`4,29,54 * * * *`**（:04/:29/:54、:00・:30 を回避）を**標準合流ペースとして恒久化**。ユーザーが各レーンを稼働 → 本ペースで監視・自動合流する。⚠ **cron 自体は本環境で session-scoped**（`durable: true` を渡しても runtime は session-only と報告; [[cron-dies-on-model-switch]]）→ **ペースの正本はこの行**。新セッション開始時・`/model` 切替後は `CronList` 確認の上、消えていれば同式・同 prompt で**即再作成**する（prompt は「各イテレーションの手順」を要約したもの、本ファイルが authority）。7 日 auto-expire 後も同様に再作成。
