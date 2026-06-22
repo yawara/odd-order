@@ -4700,6 +4700,119 @@ theorem Hypothesis.muColumn_tau1_pin [Finite G]
   rw [Finset.smul_sum]
 
 open scoped FiniteInduce in
+/-- **Peterfalvi (10.6)(b) reduction identity** (the `Ã(M)`-independent half of (10.6)(b)):
+`τ(μ_0 − ζ) = ∑_i ω_{i0}^σ − ζ^{τ₁}` as a class function on `G`.
+
+Picks a fixed nontrivial column `k`; the `M`-level identity
+`δ(μ_0 − ζ) = (μ_k − dζ) − ∑_i α_{ik}` (from `α_{ik} = μ_{ik} − δμ_{i0} − nζ` and `d = w₁n + δ`)
+is mapped through the `ℤ`-linear Dade map `τ`.  Then `τ(μ_k − dζ) = δ∑_i ω_{ik}^σ − dζ^{τ₁}`
+(`μ_k − dζ = (μ_k − dζ̄) + d(ζ̄ − ζ)` reduces it to `tau_muColumn_sub_conj_eq_tau1` +
+`tau_zeta_sub_conj_eq_tau1`, then `muColumn_tau1_pin` for `μ_k^{τ₁}`) and
+`τ(α_{ik}) = δ(ω_{ik}^σ − ω_{i0}^σ) − nζ^{τ₁}` (`alpha_tau_image`); the `δ∑ω_{ik}^σ` cancel and
+`(w₁n − d)ζ^{τ₁} = −δζ^{τ₁}`, giving `δ·τ(μ_0 − ζ) = δ∑ω_{i0}^σ − δζ^{τ₁}`; cancel `δ` (`δ² = 1`).
+
+This is `STEP 1` of (10.6)(b) (issue 1009); the remaining `STEP 2` (`τ(μ_0 − ζ)` vanishes off `Ã(M)`,
+the tame support) + `STEP 3` parity then give `|ζ^{τ₁}(g)| ≥ 1`. -/
+theorem Hypothesis.tau_muColumnZero_sub_zeta_eq [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} {hyp : Hypothesis M}
+    {params : CharacterParameters hyp} (coh : CoherentHypothesis hyp params)
+    (hmu : params.mu = hyp.muGrid hG hG.odd)
+    (hos : params.omegaSigma = hyp.alignedOmegaSigmaGrid hG hG.odd)
+    (hzS : params.zeta ∈ inducedFamily M) (hz1 : params.zeta 1 = (hyp.w1 : ℂ))
+    (hzconj : params.zeta.conj ≠ params.zeta)
+    (hδpm : params.delta = 1 ∨ params.delta = -1)
+    (hδj : ∀ j : Fin hyp.w2, j ≠ 0 → hyp.muColumnSign hG hG.odd j = params.delta) :
+    hyp.tau ((∑ i : Fin hyp.w1, hyp.muGrid hG hG.odd i 0) - params.zeta)
+      = (∑ i : Fin hyp.w1, hyp.alignedOmegaSigmaGrid hG hG.odd i 0) - coh.tau1 params.zeta := by
+  haveI := hyp.finiteG
+  classical
+  have hodd : Odd (Nat.card G) := hG.odd
+  -- a fixed nontrivial column `k`.
+  have hw2 : 3 ≤ hyp.w2 := (typePData_toTICyclicHypothesis hyp.typeP hodd).three_le_card_W2
+  obtain ⟨k, hk0⟩ : ∃ k : Fin hyp.w2, k ≠ 0 :=
+    ⟨⟨1, by omega⟩, Fin.ne_of_val_ne (by simp)⟩
+  have hcolk : ∀ i, hyp.muGrid hG hodd i k 1 = (params.d : ℂ) := fun i => by
+    rw [← hmu]; exact params.degree_independent i k hk0
+  have hd1 : params.d ≠ 1 := by have := params.d_gt_one; omega
+  have hdk1 : hyp.muGrid hG hodd 0 k 1 ≠ 1 := by rw [hcolk 0]; exact_mod_cast hd1
+  have hd1k : ∀ jj : Fin hyp.w2, jj ≠ 0 → hyp.muGrid hG hodd 0 jj 1 ≠ 1 := fun jj hjj => by
+    rw [← hmu, params.degree_independent 0 jj hjj]; exact_mod_cast hd1
+  -- `d = w₁·n + δ`.
+  have hd : (params.d : ℂ) = (hyp.w1 : ℂ) * (params.n : ℂ) + (params.delta : ℂ) := by
+    have h : (params.n : ℂ) * (hyp.w1 : ℂ) = (params.d : ℂ) - (params.delta : ℂ) := by
+      exact_mod_cast params.n_formula
+    linear_combination -h
+  -- `τ` commutes with the natural scalar `d`.
+  have hsmul_tau : ∀ (x : ClassFunction ↥M ℂ),
+      hyp.tau ((params.d : ℂ) • x) = (params.d : ℂ) • hyp.tau x := fun x => by
+    rw [Nat.cast_smul_eq_nsmul, map_nsmul, ← Nat.cast_smul_eq_nsmul (R := ℂ)]
+  -- `τ(μ_k − dζ) = δ∑ω_{ik}^σ − dζ^{τ₁}` via the conjugate decomposition.
+  have htauμk : hyp.tau ((∑ i, hyp.muGrid hG hodd i k) - (params.d : ℂ) • params.zeta)
+      = (params.delta : ℂ) • (∑ i, hyp.alignedOmegaSigmaGrid hG hodd i k)
+        - (params.d : ℂ) • coh.tau1 params.zeta := by
+    have hdecomp : (∑ i, hyp.muGrid hG hodd i k) - (params.d : ℂ) • params.zeta
+        = ((∑ i, hyp.muGrid hG hodd i k) - (params.d : ℂ) • params.zeta.conj)
+          + (params.d : ℂ) • (params.zeta.conj - params.zeta) := by
+      rw [smul_sub]; abel
+    have htauzc : hyp.tau (params.zeta.conj - params.zeta)
+        = coh.tau1 params.zeta.conj - coh.tau1 params.zeta := by
+      rw [show params.zeta.conj - params.zeta = -(params.zeta - params.zeta.conj) by abel, map_neg,
+        hyp.tau_zeta_sub_conj_eq_tau1 hG hodd coh hzS params.zeta_irreducible]
+      abel
+    rw [hdecomp, map_add,
+      hyp.tau_muColumn_sub_conj_eq_tau1 hG hodd k coh hzS params.zeta_irreducible hcolk hz1 hdk1,
+      hsmul_tau, htauzc,
+      muColumn_tau1_pin hG coh hmu hos hzS hz1 hzconj hδpm hδj hd1k hk0]
+    module
+  -- `τ(α_{ik}) = δ(ω_{ik}^σ − ω_{i0}^σ) − nζ^{τ₁}` (the (10.5) Dade image).
+  have htauα : ∀ i, hyp.tau (params.alpha i k)
+      = (params.delta : ℂ) • (hyp.alignedOmegaSigmaGrid hG hodd i k
+          - hyp.alignedOmegaSigmaGrid hG hodd i 0) - (params.n : ℂ) • coh.tau1 params.zeta := by
+    intro i
+    have h := alpha_tau_image hG coh hmu hos hzS hz1 hzconj hδpm hδj i k hk0
+    rwa [hos] at h
+  -- the `M`-level identity `δ(μ_0 − ζ) = (μ_k − dζ) − ∑_i α_{ik}`.
+  have hMlevel : (params.delta : ℂ) • ((∑ i, hyp.muGrid hG hodd i 0) - params.zeta)
+      = ((∑ i, hyp.muGrid hG hodd i k) - (params.d : ℂ) • params.zeta) - ∑ i, params.alpha i k := by
+    have hαe : (∑ i, params.alpha i k)
+        = (∑ i, hyp.muGrid hG hodd i k) - (params.delta : ℂ) • (∑ i, hyp.muGrid hG hodd i 0)
+          - ((hyp.w1 : ℂ) * (params.n : ℂ)) • params.zeta := by
+      rw [Finset.sum_congr rfl (fun i _ => by rw [params.alpha_def, hmu]),
+        Finset.sum_sub_distrib, Finset.sum_sub_distrib, ← Finset.smul_sum, Finset.sum_const,
+        Finset.card_univ, Fintype.card_fin, ← Nat.cast_smul_eq_nsmul (R := ℂ), smul_smul]
+    rw [hαe, hd]; module
+  -- `∑_i (δ(ω_{ik}^σ − ω_{i0}^σ) − nζ^{τ₁}) = δ(∑ω_{ik}^σ − ∑ω_{i0}^σ) − (w₁n)ζ^{τ₁}`.
+  have hsum_α : (∑ i, ((params.delta : ℂ) • (hyp.alignedOmegaSigmaGrid hG hodd i k
+        - hyp.alignedOmegaSigmaGrid hG hodd i 0) - (params.n : ℂ) • coh.tau1 params.zeta))
+      = (params.delta : ℂ) • ((∑ i, hyp.alignedOmegaSigmaGrid hG hodd i k)
+          - ∑ i, hyp.alignedOmegaSigmaGrid hG hodd i 0)
+        - ((hyp.w1 : ℂ) * (params.n : ℂ)) • coh.tau1 params.zeta := by
+    rw [Finset.sum_sub_distrib]
+    congr 1
+    · rw [← Finset.smul_sum, Finset.sum_sub_distrib]
+    · rw [Finset.sum_const, Finset.card_univ, Fintype.card_fin, ← Nat.cast_smul_eq_nsmul (R := ℂ),
+        smul_smul]
+  -- map the `M`-level identity through `τ` and substitute the three images.
+  have hscaled : (params.delta : ℂ) • hyp.tau ((∑ i, hyp.muGrid hG hodd i 0) - params.zeta)
+      = (params.delta : ℂ) • ((∑ i, hyp.alignedOmegaSigmaGrid hG hodd i 0)
+          - coh.tau1 params.zeta) := by
+    have hkey := congrArg hyp.tau hMlevel
+    rw [Int.cast_smul_eq_zsmul, map_zsmul, ← Int.cast_smul_eq_zsmul (R := ℂ)] at hkey
+    rw [hkey, map_sub, htauμk, map_sum, Finset.sum_congr rfl (fun i _ => htauα i), hsum_α, hd]
+    module
+  -- cancel `δ` (`δ² = 1`).
+  have hδsq : (params.delta : ℂ) * (params.delta : ℂ) = 1 := by
+    rcases hδpm with h | h <;> rw [h] <;> norm_num
+  calc hyp.tau ((∑ i, hyp.muGrid hG hodd i 0) - params.zeta)
+      = (params.delta : ℂ) • ((params.delta : ℂ)
+          • hyp.tau ((∑ i, hyp.muGrid hG hodd i 0) - params.zeta)) := by
+        rw [smul_smul, hδsq, one_smul]
+    _ = (params.delta : ℂ) • ((params.delta : ℂ) • ((∑ i, hyp.alignedOmegaSigmaGrid hG hodd i 0)
+          - coh.tau1 params.zeta)) := by rw [hscaled]
+    _ = (∑ i, hyp.alignedOmegaSigmaGrid hG hodd i 0) - coh.tau1 params.zeta := by
+        rw [smul_smul, hδsq, one_smul]
+
+open scoped FiniteInduce in
 /-- **Peterfalvi (10.6)**: the sums of `omega_ij^sigma` describe the `tau1`
 images, and outside the tame support the value of `zeta^tau1` has norm at least
 one.

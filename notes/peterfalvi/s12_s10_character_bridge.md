@@ -23,8 +23,12 @@
   2D product `exists_alignedOmegaSigmaGrid_chiFam_product` / `exists_kappa_sum_chiFam_column_eq`) は
   **valid だが (10.6)(a) には未使用**。2D product は §10/§13 で再利用余地。
 
-**▶ 残り = (10.6)(b) parity bound** (`zeta_tau1_norm_bound` de-opaque + `ζ^τ₁(g)=∑ω_i0^σ(g)` + 偶奇)。
-詳細・材料在庫 = issue 1009「残り = (10.6)(b)」。
+**▶ (10.6)(b) も STEP 1 着地** (`tau_muColumnZero_sub_zeta_eq`, `4426b300`, axiom-clean):
+reduction identity `tau(μ_0−ζ) = ∑ω_i0^σ − ζ^τ₁` (Ã(M) 非依存)。M-level 恒等式
+`δ(μ_0−ζ)=(μ_k−dζ)−∑α_ik` を τ で送り、`tau(μ_k−dζ)` (共役分解+pin) + `tau(α_ik)` (alpha_tau_image) で展開。
+**残り = STEP 2 (Ã(M)=`dadeData.dade.dadeSupport`, vanishing `map_eq_zero_of_not_mem_dadeSupport` 在庫)
++ STEP 3 parity ((3.9.a/c) §5 未在庫=新規要, chiFam 経由可能性) + STEP 4 carrier de-opaque**。
+詳細・4-step 全マップ = issue 1009「残り = (10.6)(b)」。
 
 ## ✅✅✅✅ 2026-06-23 更新¹² — image family + (5.5) チェーン完成、残り = σ-endgame final step のみ
 
