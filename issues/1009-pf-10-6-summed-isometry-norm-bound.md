@@ -37,9 +37,13 @@ statement)。**S07_Coherence.lean に未形式化** — 本 issue の真の prer
 
 ## やること
 
-- [ ] **Peterfalvi (5.8) を S07_Coherence に形式化** (本 issue の prerequisite; 別 issue 化も可)。
-- [x] **M-side diagonal inner product** `(α_ij, μ_j − dζ̄) = 1` ✅ DONE (commit `88a95a70`,
-      `muGridAlpha_inner_muColumn_self_sub_conj`; within-column 正規直交で証明、(5.8) 不要)。
+- [ ] **Peterfalvi (5.8) combinatorial core** = 真の linchpin (下記スコープ参照; multi-piece)。
+- [x] **(10.6.a) M→G→τ₁ reduction chain DONE** (2026-06-22, commits `88a95a70`/`3d9eb887`/`a2ff9e18`):
+  - M-side diagonal IP `(α_ij, μ_j − dζ̄) = 1` (`muGridAlpha_inner_muColumn_self_sub_conj`)
+  - G-side diagonal IP `(α_ij^τ, (μ_j − dζ̄)^τ) = 1` (`muGridAlpha_tau_inner_muColumn_self_sub_conj`)
+  - τ/τ₁ split `(α_ij^τ, μ_j^τ₁ − dζ̄^τ₁) = 1` (`muGridAlpha_tau1_inner_muColumn_self_sub_conj`)
+  ⟹ (10.6.a) reduction opening 確立。残 = (1) ⊥Imσ 項落とし `(δ(ω_ij^σ−ω_i0^σ), μ_j^τ₁)=1`
+  (ζ^τ₁/ζ̄^τ₁⊥Imσ [tau1_zeta_vanishes 経由] + ζ^τ₁⊥μ_j^τ₁ [isometry+次数] + (10.5))、(2) (5.8) core。
 - [ ] (10.6.a): diagonal IP + τ/τ₁ transfer (既存 `muGridAlpha_tau_inner_muColumn_sub_conj` 類比) +
       (5.8) → `μ_j^τ₁ = δ∑ω_ij^σ`。
 - [ ] `zeta_tau1_norm_bound` Prop を (10.6.b) の genuine 主張に materialize + 証明。
