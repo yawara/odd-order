@@ -683,6 +683,15 @@ set_option linter.style.longLine false in
 #assert_only_allowed_axioms
   OddOrder.RepresentationTheory.isCyclic_and_card_dvd_of_faithful_irreducible_comm
 #assert_only_allowed_axioms OddOrder.RepresentationTheory.mul_comm_monoidAlgebra_of_comm
+-- Peterfalvi (12.12) irreducible-case core: an odd group acting faithfully + irreducibly on a
+-- 2-dimensional 𝔽_p-space is cyclic with order dividing |V| - 1 = p² - 1 (BG Thm 2.6(a) +
+-- the commutativity-free Singer mechanism).
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S14.isCyclic_and_card_dvd_of_odd_two_dim_irreducible
+-- Peterfalvi (12.12) Case-A core: a group acting faithfully on a 1-dimensional 𝔽_p-space is
+-- cyclic with order dividing p - 1 (End of a line ≅ 𝔽_p, so E ↪ (ℤ/p)ˣ).
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S14.isCyclic_and_card_dvd_of_faithful_one_dim
 -- RepresentationTheory: completeness of irreducible characters — `f ⊥ Irr G ⇒ f = 0`
 -- (regular representation + Maschke + Schur).
 #assert_only_allowed_axioms OddOrder.RepresentationTheory.classFunction_eq_zero_of_orthogonal
