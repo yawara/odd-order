@@ -5,6 +5,21 @@
 > 上位文脈 = 記憶 [[ft-endgame-two-poles]] [[peterfalvi-s10-13-gated-on-bg-spine]]、
 > Lane H 視点の正本 = [`s10_13_maximal_structure.md`](s10_13_maximal_structure.md)。
 
+## ✅✅✅ 2026-06-22 完了 — (10.5) Dade-image identity 締結 (issue 1007 CLOSED)
+
+mirror assembly + pinning 完成。(10.5) を grid + params 両 sorry-free に締結 (full build 3881 green、
+FT-path scaffold sorry 131→130)。正本 = `issues/closed/1007-pf-10-5-dade-image-bridge.md`「完了」節。
+
+- **S05_SigmaTrichotomy** 一般トリコトミー toolkit 3 本 (axiom-clean, §6 `certainType_diff_dade_eq` 抽象):
+  `sigmaCoeff_sub_smul_chiFam_diff` / `eq_smul_chiFam_diff_of_all_sigmaCoeff_zero` /
+  `eq_smul_chiFam_diff_of_vanishOnV` (norm-2 X + ψ vanish on V ⟹ X=s·(χ_P₁−χ_P₂))。commit `8c5c90a1`。
+- **`Hypothesis.tau_muGridAlpha_eq`** (grid-level (10.5)): X=α^τ+n·ζ^τ₁ → 一般トリコトミーで締結。
+  footprint=上流 gate (sorryAx Prop16.1/theoremA) のみ。
+- producer omegaSigma→**alignedOmegaSigmaGrid** + **`alpha_tau_image`** faithful corollary (sorry-free)。
+  commit `5f03d3d1`。
+- **残る honest gate = `hn2`(=(10.3) n 偶数, → issue 1008)**: §10 (10.5) chain 全体が担う genuine 算術入力
+  (cauchy-schwarz n<2 矛盾に必須)。`hzconj`(ζ̄≠ζ) は (1.1) で導出可だが chain 慣例で仮説化。
+
 ## ★★★★★ 2026-06-21 更新⁷ — a=0 の τ-isometry primitive + M-side + τ-side leg 完成 (6 補題)
 
 (10.5) a=0 論証の **(ii) τ-isometry transfer + (iii) M-side inner products + (iv) τ-side** を全形式化
