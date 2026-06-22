@@ -341,4 +341,80 @@ theorem grid_no_constant_row {ι κ : Type*} [Fintype ι] [Fintype κ]
     (fun x => a (x.2, x.1)) (fun x => ?_) hc (fun j => hrow j) (fun j i hi => hoff i j hi)
   simp only [ha, hflip]
 
+/-! ### Peterfalvi (5.8): the norm-`w₁` full-column endgame
+
+Where `grid_trichotomy` (3.8) *excludes* the constant-column/row branches for a norm-`2` Dade image,
+the §5 coherence lemma (5.8) *adopts* one: a coherence-isometry image `μ_k^{τ₁}` lands on a single
+full column.  Its `σ`-coefficient grid is additively separable (`sigmaCoeff_add_eq`, from vanishing
+on `V`), supported on the two columns `j, k = conj k` with entries in `{0, δ}` resp. `{0, −δ}`
+(Peterfalvi (5.5)), and has squared norm `w₁ = |ι|` (the isometry `τ₁`).  We isolate the abstract
+combinatorial core here, as the (5.8) counterpart of `grid_trichotomy`. -/
+
+/-- **Peterfalvi (5.8), abstract full-column core.**  Let `a : ι × κ → ℂ` be an additively separable
+grid (`a (i,q) + a (i',q') = a (i,q') + a (i',q)`) supported on two columns `j ≠ k` (every entry off
+`{j, k}` vanishes, witnessed by a third column `q₀ ∉ {j, k}`), with column-`k` entries in `{0, δ}`,
+column-`j` entries in `{0, −δ}` (`δ = ±1`), and total squared mass `∑_{p,q} a(p,q)² = |ι|`.  Then
+`a` is a single constant full column: either column `k` is constantly `δ` (column `j` zero), or
+column `j` is constantly `−δ` (column `k` zero).
+
+Separability together with the zero column `q₀` forces `a` to be column-constant
+(`a (i, q) = a (i₀, q)`), so the mass is `|ι| · (a(i₀,j)² + a(i₀,k)²) = |ι|`, i.e.
+`a(i₀,j)² + a(i₀,k)² = 1`; with the two entries in `{0, ±1}` exactly one is `±1`.  This is the (5.8)
+analogue of the norm-`2` endgame `eq_smul_chiFam_diff_of_vanishOnV` (which instead *kills* every
+coefficient). -/
+theorem grid_eq_const_column_of_two_col {ι κ : Type*} [Fintype ι] [Fintype κ] [Nonempty ι]
+    (a : ι × κ → ℂ)
+    (hadd : ∀ i i' (q q' : κ), a (i, q) + a (i', q') = a (i, q') + a (i', q))
+    {j k : κ} (hjk : j ≠ k) {q₀ : κ} (hq₀j : q₀ ≠ j) (hq₀k : q₀ ≠ k)
+    (hsupp : ∀ i q, q ≠ j → q ≠ k → a (i, q) = 0)
+    {δ : ℂ} (hδ : δ = 1 ∨ δ = -1)
+    (hk : ∀ i, a (i, k) = 0 ∨ a (i, k) = δ)
+    (hj : ∀ i, a (i, j) = 0 ∨ a (i, j) = -δ)
+    (hnorm : ∑ pq, (a pq) ^ 2 = (Fintype.card ι : ℂ)) :
+    ((∀ i, a (i, k) = δ) ∧ (∀ i, a (i, j) = 0)) ∨
+      ((∀ i, a (i, j) = -δ) ∧ (∀ i, a (i, k) = 0)) := by
+  classical
+  obtain ⟨i₀⟩ := ‹Nonempty ι›
+  -- separability + the zero column `q₀` make the grid column-constant
+  have hconst : ∀ i q, a (i, q) = a (i₀, q) := by
+    intro i q
+    have h := hadd i i₀ q q₀
+    rwa [hsupp i q₀ hq₀j hq₀k, hsupp i₀ q₀ hq₀j hq₀k, add_zero, zero_add] at h
+  -- each row's squared mass collapses to the two distinguished column entries
+  have hrow : ∀ i, ∑ q, (a (i, q)) ^ 2 = (a (i₀, j)) ^ 2 + (a (i₀, k)) ^ 2 := by
+    intro i
+    have step1 : ∑ q, (a (i, q)) ^ 2 = ∑ q, (a (i₀, q)) ^ 2 :=
+      Finset.sum_congr rfl (fun q _ => by rw [hconst i q])
+    have step2 : ∑ q, (a (i₀, q)) ^ 2 = ∑ q ∈ ({j, k} : Finset κ), (a (i₀, q)) ^ 2 := by
+      refine (Finset.sum_subset (Finset.subset_univ _) ?_).symm
+      intro q _ hq
+      simp only [Finset.mem_insert, Finset.mem_singleton, not_or] at hq
+      rw [hsupp i₀ q hq.1 hq.2]; ring
+    rw [step1, step2, Finset.sum_pair hjk]
+  -- total mass = |ι| · (a(i₀,j)² + a(i₀,k)²)
+  have hmass : ∑ pq, (a pq) ^ 2
+      = (Fintype.card ι : ℂ) * ((a (i₀, j)) ^ 2 + (a (i₀, k)) ^ 2) := by
+    rw [Fintype.sum_prod_type, Finset.sum_congr rfl (fun i _ => hrow i), Finset.sum_const,
+      Finset.card_univ, nsmul_eq_mul]
+  rw [hmass] at hnorm
+  have hcard0 : (Fintype.card ι : ℂ) ≠ 0 := by
+    have : 0 < Fintype.card ι := Fintype.card_pos
+    exact_mod_cast this.ne'
+  have hsum1 : (a (i₀, j)) ^ 2 + (a (i₀, k)) ^ 2 = 1 :=
+    mul_left_cancel₀ hcard0 (by rw [hnorm, mul_one])
+  have hδsq : δ ^ 2 = 1 := by rcases hδ with h | h <;> rw [h] <;> ring
+  rcases hk i₀ with hAk0 | hAkδ
+  · rcases hj i₀ with hAj0 | hAjδ
+    · -- both columns vanish ⟹ total mass `0 ≠ |ι|`
+      rw [hAk0, hAj0] at hsum1; norm_num at hsum1
+    · -- column `j` carries `−δ`, column `k` vanishes
+      exact Or.inr ⟨fun i => by rw [hconst i j]; exact hAjδ,
+        fun i => by rw [hconst i k]; exact hAk0⟩
+  · -- column `k` carries `δ`, forcing column `j` to vanish
+    rw [hAkδ, hδsq] at hsum1
+    have hAj0 : a (i₀, j) = 0 :=
+      mul_self_eq_zero.mp (by linear_combination hsum1)
+    exact Or.inl ⟨fun i => by rw [hconst i k]; exact hAkδ,
+      fun i => by rw [hconst i j]; exact hAj0⟩
+
 end OddOrder.Peterfalvi.S05

@@ -63,16 +63,51 @@ faithfulness; `Kˣ` cyclic ⟹ `C` cyclic; `|C| = |range μ| ∣ |Kˣ| = |K|−1
 This is the **field-theoretic core of (12.12)'s irreducible case** (`|E| ∣ p²−1`) and the
 order half of **(14.2)(a)**.  Reusable; deferred-payoff (consumed once (12.12) is assembled).
 
+## ✅✅ RESOLVED (2026-06-22 lane-h resume⁹, commit `6e9fa0a0`) — the instance blocker is gone
+
+**`isCyclic_and_card_dvd_of_faithful_irreducible_comm`** in `SingerField.lean` (sorry-free +
+axiom-clean, AxiomsCheck-registered): a finite group `E` acting **faithfully + irreducibly
+(`IsSimpleModule (𝔽_p[E]) M`) + commutatively** (commutativity as a *proof*
+`hcomm : ∀ a b, a*b = b*a`, **not** a `CommGroup` instance) on a finite module `M` ⟹ `E` cyclic
+and `|E| ∣ |M| − 1`.
+
+> **The whole instance-engineering blocker below is solved.**  BG 2.6(a)'s `Std.Commutative`
+> output now feeds straight in via `.comm` — no `CommGroup E`, no `MonoidAlgebra`-as-`CommRing`
+> instance, no `letI`-shadowing.
+
+**Working route (after two dead ends, see blocker notes below):** for abelian `E` the group
+algebra `𝔽_p[E]` *is* commutative (`mul_comm_monoidAlgebra_of_comm`, double `induction_linear`),
+so equip it with a `CommRing` built **on top of its existing `Ring`**:
+`letI : CommRing _ := { (inferInstance : Ring _) with mul_comm := … }` (no diamond — the `Ring`
+is reused).  Then `M` simple ⟹ `M ≅ 𝔽_p[E] ⧸ I` (`isSimpleModule_iff_quot_maximal`), `I` maximal,
+`K := 𝔽_p[E] ⧸ I` a field (`Ideal.Quotient.field`); `μ : E ↪ Kˣ` via
+`(Units.map (mk).toMonoidHom).comp (of …).toHomUnits`, injective by `hfaith` + the
+`map_smul`/`Algebra.smul_def`/`Ideal.Quotient.algebraMap_eq` compat; `Kˣ` cyclic ⟹ `E` cyclic;
+`|E| ∣ |Kˣ| = |K| − 1 = |M| − 1` (`Nat.card_units`, `Nat.card_congr lequiv`).
+
+⚠ **Two ruled-out routes (do not retry)**: (a) reusing the `[CommGroup C]`-based
+`isCyclic_and_card_dvd_card_sub_one_of_faithful_irreducible` — every CommGroup-instance bridge
+fails (blocker notes below). (b) realizing the field as `End_{𝔽_p[E]}(M)` via Schur
+(`Module.End.instDivisionRing`) + little Wedderburn — **catastrophic Monoid diamond** between
+`Module.End.instMonoid` and the division-ring instance's monoid (hard type mismatch at the
+`Units.coeHom`/`isCyclic_of_injective_ringHom` seam + `whnf` timeout even at 800k heartbeats).
+
 ## ▶ Next steps (the §12 program for lane-h)
 
-1. **Full FPF rank-≤2 lemma** (extend the above to be directly (12.12)-shaped):
-   `E` finite, `|E|` odd, acting faithfully + fixed-point-freely on elem-abelian `V`
-   (`|V| ∈ {p, p²}`, `p` odd) ⟹ `E` cyclic, `|E| ∣ p²−1`.  Glue:
+1. **Representation-level glue + full FPF rank-≤2 lemma** (in `S14_MaximalI`, where both
+   `SingerField` and S02 are importable — the glue needs `odd_two_dim_abelian` so it cannot live
+   in low-level `SingerField`):
+   - **irreducible rank-2**: `odd_two_dim_abelian` (BG 2.6(a), S02 ✓; `Representation (ZMod p) E V`,
+     `finrank = 2`, `Function.Injective ρ`, char hyp ⟹ `Std.Commutative (·*·)`) gives `hcomm`;
+     feed `hcomm.comm` + `IsSimpleModule (𝔽_p[E]) ρ.asModule` + `hfaith` (in the
+     `∀ e, (∀ x, of e • x = x) → e = 1` form) into the RESOLVED lemma with `M := ρ.asModule`,
+     then transport `|ρ.asModule| = |V|` (`Nat.card_congr ρ.asModuleEquiv.toEquiv`).
+     ⚠ to avoid the `Module (𝔽_p[E]) ρ.asModule` *binder*-synthesis failure, take irreducibility
+     as `[Representation.IsIrreducible ρ]` (needs `[Fact p.Prime]`; ZIrrFourier idiom), then
+     `haveI : IsSimpleModule … := inferInstance` inside the proof.
    - rank 1 / reducible rank 2: `E ↪ Aut(ℤ/p) ≅ (ℤ/p)ˣ` cyclic, `|E| ∣ p−1`.
-   - irreducible rank 2: **`odd_two_dim_abelian`** (BG 2.6(a), S02 ✓; takes a `Representation
-     (ZMod p) E V`, returns `Std.Commutative (·*·)`) abelianizes `E`, then the Singer lemma above.
 
-   ### ⚠ Instance-engineering blocker (diagnosed 2026-06-22, 3 confirmed walls)
+   ### ⚠ Instance-engineering blocker (diagnosed 2026-06-22 — ✅ SUPERSEDED/RESOLVED, see "RESOLVED" block above; kept as a record of the dead ends)
    The clean composition is **blocked** because the Singer lemma requires `[CommGroup C]` but
    BG 2.6(a) yields commutativity as `IsMulCommutative` on a plain `[Group E]`.  Confirmed:
    - `nonempty_singerFieldData` genuinely needs **`[CommGroup C]`** — it uses

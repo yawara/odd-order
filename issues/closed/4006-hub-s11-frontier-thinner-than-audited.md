@@ -54,3 +54,17 @@ engine 投資 (5-10 session) を是とするか別配分を検討 (要すれば�
 - `notes/peterfalvi/s11_9_7_clifford_engine.md` (9.7 engine 設計) / `s11_wielandt_91_design.md` (9.6 修正)
 - commit `95dbe3f9` ((9.6) + faithfulness 修正) / `7b01ed91` (engine 設計ノート)
 - `notes/meta/merge_monitor.md` (ownership map + direction→issue policy)
+
+---
+
+## HUB 解決 (2026-06-22)
+
+1. **§11 thinness を frontier 計画に反映**: §11 は「(9.6) 1 本 clean + (9.7) Clifford engine (5-10 session,
+   mathlib に置換層なし) + (9.8-11) 指標論」と確定。lane-c LAUNCH は既に §11 所有 + 9.6-9.11 を列挙済ゆえ変更不要。
+2. **監査 over-optimism の教訓を記録**: workability を「結論の存在」でなく「証明に要る infrastructure が在るか」で
+   判定する (4002/4005/4006 の 3 度目)。memory [[lane-c-s16-foundational-infra]] / [[scaffold-sorry-free-not-done]] に
+   audit 版として記録。今後の frontier-cluster 監査はこの基準。
+3. **(9.7) engine 投資の可否 → ユーザー裁可**: hub が AskUserQuestion で確認 → **「(9.7) engine をこのまま進める」**
+   (2026-06-22)。lane-c は §11 に留まり (9.7) Clifford decomposition engine を step 0 から構築する。再配分なし。
+
+完了条件 (1)(2)(3) 充足 → CLOSED。
