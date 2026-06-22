@@ -49,9 +49,14 @@ created: 2026-06-22
 - **STEP 2 = Ã(M)-vanishing** (in-stock 経路判明, 2026-06-23): **`Ã(M) = hyp.dadeData.dade.dadeSupport`**
   (S04 `dadeSupport : Set G`)。Dade map は `IsDadeMap.map_eq_zero_of_not_mem_dadeSupport` で dadeSupport
   外で消える (S04:362/395)。∴ `g ∉ dadeSupport` で `tau(μ_0−ζ)(g)=0` → STEP 1 と合わせ
-  `ζ^τ₁(g) = ∑_i ω_i0^σ(g)`。**当初「Ã(M) 不在」懸念は誤り — dadeSupport が正体**。`hyp.tau` の
-  `toDadeMap`/`IsDadeMap` インスタンスから vanishing を引く wiring が要 (要 API 確認: `hyp.tau` の
-  IntegralCharacterMap → DadeMap 経路の vanishing 公開度)。
+  `ζ^τ₁(g) = ∑_i ω_i0^σ(g)`。**当初「Ã(M) 不在」懸念は誤り — dadeSupport が正体**。
+  - ⚠ **subtlety**: `dadeIntegralCharacterMap` は supported 部分空間 (CF(L,A)) 外では**任意拡張**
+    (S07:5231) ゆえ vanishing には `(μ_0−ζ)` が **A_0-supported** であることが必要 (`dadeIntegralCharacterMap_apply_of_support` (S07:5243) で supported なら genuine dadeMap = vanishing)。
+  - ✅ **support 導出可能** (STEP 1 の副産物): M-level 恒等式 `δ(μ_0−ζ)=(μ_k−dζ)−∑α_ik` の RHS は
+    両項 A_0-supported (`muColumn_sub_conj_support`+`zeta_sub_conj_support` で `μ_k−dζ`、`alpha_support` で
+    `α_ik`) ⟹ `δ(μ_0−ζ)` A_0-supported ⟹ `(μ_0−ζ).support⊆A_0` (δ≠0)。
+  - 残 wiring: `(μ_0−ζ)∈zSupportedSpan` → `dadeIntegralCharacterMap_apply_of_support` → §4 dadeMap の
+    `map_eq_zero_of_not_mem_dadeSupport` → STEP 1 評価。~50-80 行。
 - **STEP 3 = parity**: ω_i0^σ(g)∈ℤ (3.9.c) + ω_00^σ=1_G ((3.2.b)=`sigma_trivial` ✅在庫) + i≠0 で
   ω̄_i0^σ=conj(ω_i0^σ) (3.9.a) かつ ω_i0 非実 (奇位数) ⟹ ∑_{i>0}∈2ℤ ⟹ ζ^τ₁(g)≡1 (mod 2) ⟹ |ζ^τ₁(g)|≥1。
   **⚠ (3.9.c)/(3.9.a) は §5 stock に明示的に無い** (S05 grep: `sigma_trivial`/`sigma_omega`/`sigma_mem_ZIrr`
