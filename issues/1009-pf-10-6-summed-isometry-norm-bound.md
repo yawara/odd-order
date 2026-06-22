@@ -38,8 +38,8 @@ statement)。**S07_Coherence.lean に未形式化** — 本 issue の真の prer
 ## やること
 
 - [ ] **Peterfalvi (5.8) を S07_Coherence に形式化** (本 issue の prerequisite; 別 issue 化も可)。
-- [ ] **M-side diagonal inner product** `(α_ij, μ_j − dζ̄) = 1` (= `muGridAlpha_inner_muColumn_sub_conj`
-      の diagonal 版; within-column 正規直交 `muGrid_inner_within_column` で provable NOW, (5.8) 不要)。
+- [x] **M-side diagonal inner product** `(α_ij, μ_j − dζ̄) = 1` ✅ DONE (commit `88a95a70`,
+      `muGridAlpha_inner_muColumn_self_sub_conj`; within-column 正規直交で証明、(5.8) 不要)。
 - [ ] (10.6.a): diagonal IP + τ/τ₁ transfer (既存 `muGridAlpha_tau_inner_muColumn_sub_conj` 類比) +
       (5.8) → `μ_j^τ₁ = δ∑ω_ij^σ`。
 - [ ] `zeta_tau1_norm_bound` Prop を (10.6.b) の genuine 主張に materialize + 証明。
