@@ -72,9 +72,17 @@ chiefFactor_basic (済) は `_holds` / `quotient_order` 経由ゆえ互換 (fiel
     **instance arg** で渡す (ambient `CommGroup K` 上で構築; `IsElementaryAbelian.zmodModule` は
     `IsMulCommutative` 経由で diamond)。
 
-- **frontier = step 7b/c (chief-factor 適用 + CaseA) — 一部 GATED**: Singer 核心は完成。残:
-  (7b) 上記を H̄ に適用 = faithful 像 `Ū = U/C_U(H̄)` を形成 + ambient module/faithfulness 供給
-  (in-lane plumbing、§8.5.b で U abelian)。(7c) CaseA の `a∣p-1` (order-p 片への作用 ↪ `(ZMod p)ˣ`)。
+- **step 7c DONE (2026-06-23, commit `4b4666de`)** — **CaseA bound `a∣p-1`**:
+  `card_range_dvd_card_sub_one_of_prime_card`: A が素数位数 p の K に作用 ⟹ `|φ.range| ∣ p-1`
+  (K 巡回 ⟹ `MulAut K≅(ZMod p)ˣ` 位数 p-1 [`IsCyclic.card_mulAut`+`Nat.totient_prime`]、`φ.range≤MulAut K`)。
+  sorry-free + axiom-clean。CaseA の `a=|U:C_U(H₁)|∣p-1`。
+
+- **frontier = step 7b (chief-factor Singer 適用) — GATED on (8.5.b)**: Singer 核心 (7a) を H̄ に適用して
+  `Ū 巡回 ∧ |Ū|∣p^q-1` を出すには A=`(act.φ.comp U.subtype).range`(忠実像=Ū) に Singer を適用。faithful は
+  range.subtype で自明、irreducible は case(b) から transfer 可だが、**`Ū` の可換性が必須** (comm-free Singer は
+  acting group 可換要)。`TypesIIIIIIVSetup` は `U_commutative` を持たず (type II/III の `TypeIIData`/`TypeIIIData`
+  にのみ存在、type IV は `U_not_commutative`)、`Ū` 可換は **Pf (8.5.b)「U' が H̄ を中心化」**(→ Ū は U/U' の商で
+  可換) に依存するが**未形式化** ⟹ 7b は (8.5.b) 形式化待ち (carrier/gate)。
   **その先 = step 7 (CaseA/CaseB carrier 構成) — GATED**: `clifford_dichotomy` は
   `chiefFactor_clifford_U_dichotomy` で case (a)/(b) に分岐できるが、`CliffordCaseAData`/`CliffordCaseBData`
   の**実フィールド**構成が残る:
