@@ -9019,11 +9019,10 @@ theorem typeP2_neighbor_is_typeF [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd
   have hrprime : r.Prime := Fact.out
   have hRM : R ≤ M := hRU.trans hUM
   -- `r ∉ σ(M)`: `r ∈ π(U)` and `U` is a `(κ(M) ∪ σ(M))'`-Hall subgroup of `M`.
-  have hrσM : r ∉ OddOrder.BG.Ch3.S10.sigma M := by
-    have hrU' : r ∈ (Nat.card ↥(U.subgroupOf M)).primeFactors := by
-      rwa [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hUM).toEquiv]
-    have hrc : r ∈ (kappa M ∪ OddOrder.BG.Ch3.S10.sigma M)ᶜ := hU.1 r hrU'
-    exact fun h => hrc (Or.inr h)
+  have hrU' : r ∈ (Nat.card ↥(U.subgroupOf M)).primeFactors := by
+    rwa [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hUM).toEquiv]
+  have hrκσ : r ∈ (kappa M ∪ OddOrder.BG.Ch3.S10.sigma M)ᶜ := hU.1 r hrU'
+  have hrσM : r ∉ OddOrder.BG.Ch3.S10.sigma M := fun h => hrκσ (Or.inr h)
   -- `R ≠ ⊥`: `r ∣ |U|` and (Hall) `r ∤ [U : R]`, so `r ∣ |R|`.
   have hRne : R ≠ ⊥ := by
     have hlag : Nat.card ↥(R.subgroupOf U) * (R.subgroupOf U).index = Nat.card ↥U :=
@@ -9054,7 +9053,60 @@ theorem typeP2_neighbor_is_typeF [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd
   -- `H` is not conjugate to `M` (`r ∈ σ(H) ∖ σ(M)`) nor to its partner `M*` (coprime `K`/`R`).
   -- These two non-conjugacies drive both the type-`F` classification and `σ(H)'`-membership of `K`.
   have notMGH : ¬ IsConjugateSubgroup H M := by
-    sorry
+    rintro ⟨a, ha⟩
+    -- `|R| = r ^ (|U|).factorization r` (`R` is a Sylow `r`-subgroup of `U`).
+    have hSU : Nat.card ↥(R.subgroupOf U) = Nat.card ↥R :=
+      Nat.card_congr (Subgroup.subgroupOfEquivOfLe hRU).toEquiv
+    have hRpow : Nat.card ↥R = r ^ (Nat.card ↥R).factorization r := by
+      apply Nat.eq_pow_of_factorization_eq_single Nat.card_pos.ne'
+      apply Finsupp.ext
+      intro q
+      rw [Finsupp.single_apply]
+      by_cases hq : r = q
+      · rw [if_pos hq, hq]
+      · rw [if_neg hq]
+        by_cases hqp : q.Prime
+        · refine Nat.factorization_eq_zero_of_not_dvd (fun hdvd => hq ?_)
+          have hmem : q ∈ (Nat.card ↥(R.subgroupOf U)).primeFactors :=
+            Nat.mem_primeFactors.mpr ⟨hqp, hSU ▸ hdvd, Nat.card_pos.ne'⟩
+          exact (Set.mem_singleton_iff.mp (hR.1 q hmem)).symm
+        · exact Nat.factorization_eq_zero_of_non_prime _ hqp
+    -- `(|U|).factorization r = (|R|).factorization r` (`r ∤ [U : R]`).
+    have hfUR : (Nat.card ↥U).factorization r = (Nat.card ↥R).factorization r := by
+      have hidxU : (R.subgroupOf U).index.factorization r = 0 :=
+        Nat.factorization_eq_zero_of_not_dvd (fun hdvd =>
+          hR.2 r (Nat.mem_primeFactors.mpr ⟨hrprime, hdvd, Subgroup.index_ne_zero_of_finite⟩) rfl)
+      have hlag := Subgroup.card_mul_index (R.subgroupOf U)
+      rw [← hlag, Nat.factorization_mul Nat.card_pos.ne' Subgroup.index_ne_zero_of_finite,
+        Finsupp.add_apply, hidxU, add_zero, hSU]
+    -- `(|U|).factorization r = (|M|).factorization r` (`r ∤ [M : U]`).
+    have hfUM : (Nat.card ↥U).factorization r = (Nat.card ↥M).factorization r := by
+      have hidxM : (U.subgroupOf M).index.factorization r = 0 :=
+        Nat.factorization_eq_zero_of_not_dvd (fun hdvd =>
+          hU.2 r (Nat.mem_primeFactors.mpr ⟨hrprime, hdvd, Subgroup.index_ne_zero_of_finite⟩) hrκσ)
+      have hUcard : Nat.card ↥(U.subgroupOf M) = Nat.card ↥U :=
+        Nat.card_congr (Subgroup.subgroupOfEquivOfLe hUM).toEquiv
+      have hlag := Subgroup.card_mul_index (U.subgroupOf M)
+      rw [← hlag, Nat.factorization_mul Nat.card_pos.ne' Subgroup.index_ne_zero_of_finite,
+        Finsupp.add_apply, hidxM, add_zero, hUcard]
+    -- `|H| = |M|` (conjugate subgroups).
+    have hcardHM : Nat.card ↥H = Nat.card ↥M := by
+      rw [← ha]; exact (Subgroup.card_map_of_injective (MulAut.conj a).injective).symm
+    -- `R` is a Sylow `r`-subgroup of `H`.
+    have hRsylH : Nat.card ↥(R.subgroupOf H) = r ^ (Nat.card ↥H).factorization r := by
+      rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hRH).toEquiv, hcardHM, ← hfUM, hfUR]
+      exact hRpow
+    -- `r ∈ σ(H)` (`R` Sylow `r` of `H`, `N_G(R) ≤ H`), hence `r ∈ σ(M)` (conjugacy), contradiction.
+    have hrH : r ∈ (Nat.card ↥H).primeFactors := by
+      rw [hcardHM]
+      exact Nat.mem_primeFactors.mpr ⟨hrprime,
+        (Nat.dvd_of_mem_primeFactors hr).trans (Subgroup.card_dvd_of_le hUM), Nat.card_pos.ne'⟩
+    have hrσH : r ∈ OddOrder.BG.Ch3.S10.sigma H := by
+      rw [OddOrder.BG.Ch3.S10.mem_sigma_iff]
+      refine ⟨hrH, Sylow.ofCard (R.subgroupOf H) hRsylH, ?_⟩
+      rw [Sylow.coe_ofCard, Subgroup.map_subgroupOf_eq_of_le hRH]
+      exact hNRH
+    exact hrσM (by have h := OddOrder.BG.Ch3.S10.sigma_conj (M := H) a hrσH; rwa [ha] at h)
   have notMstGH : ¬ IsConjugateSubgroup H Mst := by
     sorry
   refine ⟨H, hHmem, ?_, ?_, ?_, ?_⟩
