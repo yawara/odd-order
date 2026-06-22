@@ -8986,6 +8986,59 @@ theorem exists_maximal_of_typeF_notMem_fitting [Finite G]
       (hQMstar hXQ) hX1 hτ2cl (by rw [hCeq]; exact hCMσQ)
     rwa [hCeq] at hsingle
 
+/-- **`M_σ ∩ M* = K*`** (BG Theorem 14.7(d) kernel, Coq `defMsMstar`): for a type-`P₂` maximal
+`M` with `κ`-Hall `K`, `K* = M_σ ⊓ C(K)`, and the dual partner `M*` (`K ≤ M*_σ`, `K* ≤ M*`, `M`
+not conjugate to `M*`), the intersection `M_σ ⊓ M*` equals `K*`.
+
+`⊇` is immediate (`K* ≤ M_σ`, `K* ≤ M*`).  For `⊆`: any `y ∈ M_σ ⊓ M*` has `⁅⟨y⟩, K⁆ ≤ M_σ`
+(`K ≤ M ≤ N(M_σ)`, `y ∈ M_σ`) and `⁅⟨y⟩, K⁆ ≤ M*_σ` (`K ≤ M*_σ ◁ M*`, `y ∈ M* ≤ N(M*_σ)`), so
+`⁅⟨y⟩, K⁆ ≤ M_σ ⊓ M*_σ = ⊥` (Lemma 10.12, `M_σ` nilpotent for type-`P₂`); hence `y` centralizes
+`K`, i.e. `y ∈ M_σ ⊓ C(K) = K*`.  Avoids the embedding's σ(M)-Hall-of-M* clause. -/
+private theorem msigma_inf_partner_eq_kstar [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    {M K Kstar Mstar : Subgroup G} (hM : M ∈ maximalSubgroups G) (hP2 : IsTypeP2 M) (hKM : K ≤ M)
+    (hKstar : Kstar = OddOrder.BG.Ch3.S10.Msigma M ⊓ Subgroup.centralizer (K : Set G))
+    (hMstarmax : Mstar ∈ maximalSubgroups G)
+    (hKMsigmaMstar : K ≤ OddOrder.BG.Ch3.S10.Msigma Mstar) (hKstarMstar : Kstar ≤ Mstar)
+    (hnc : ¬ IsConjugateSubgroup M Mstar) :
+    OddOrder.BG.Ch3.S10.Msigma M ⊓ Mstar = Kstar := by
+  classical
+  -- `M_σ` nilpotent (type-`P₂`) ⟹ `M_σ ⊓ M*_σ = ⊥` (Lemma 10.12).
+  have hdisj : OddOrder.BG.Ch3.S10.Msigma M ⊓ OddOrder.BG.Ch3.S10.Msigma Mstar = ⊥ :=
+    ((OddOrder.BG.Ch3.S10.disjoint_of_not_conj hG hM hMstarmax (fun h => hnc h)).2
+      (msigma_isNilpotent_of_isTypeP2 hG hM hP2)).1
+  have hMN : M ≤ Subgroup.normalizer (OddOrder.BG.Ch3.S10.Msigma M : Set G) := by
+    rw [OddOrder.BG.Ch3.S10.Msigma]
+    exact le_normalizer_opiCoreInG (OddOrder.BG.Ch3.S10.sigma M) M
+  have hMstarN : Mstar ≤ Subgroup.normalizer (OddOrder.BG.Ch3.S10.Msigma Mstar : Set G) := by
+    rw [OddOrder.BG.Ch3.S10.Msigma]
+    exact le_normalizer_opiCoreInG (OddOrder.BG.Ch3.S10.sigma Mstar) Mstar
+  apply le_antisymm
+  · intro y hy
+    rw [Subgroup.mem_inf] at hy
+    obtain ⟨hyMσ, hyMstar⟩ := hy
+    rw [hKstar, Subgroup.mem_inf]
+    refine ⟨hyMσ, ?_⟩
+    have hcle : (⁅Subgroup.zpowers y, K⁆ : Subgroup G) ≤ ⊥ := by
+      rw [← hdisj, le_inf_iff]
+      refine ⟨Subgroup.commutator_le.mpr ?_, Subgroup.commutator_le.mpr ?_⟩
+      · intro a ha k hk
+        have haMσ : a ∈ OddOrder.BG.Ch3.S10.Msigma M := (Subgroup.zpowers_le.mpr hyMσ) ha
+        have hkN := (Subgroup.mem_normalizer_iff.mp (hMN (hKM hk))) a⁻¹
+        rw [commutatorElement_def]
+        have hconj : k * a⁻¹ * k⁻¹ ∈ OddOrder.BG.Ch3.S10.Msigma M := hkN.mp (inv_mem haMσ)
+        have : a * k * a⁻¹ * k⁻¹ = a * (k * a⁻¹ * k⁻¹) := by group
+        rw [this]; exact mul_mem haMσ hconj
+      · intro a ha k hk
+        have haMstarσ : a ∈ Mstar := (Subgroup.zpowers_le.mpr hyMstar) ha
+        have hkMσstar : k ∈ OddOrder.BG.Ch3.S10.Msigma Mstar := hKMsigmaMstar hk
+        rw [commutatorElement_def]
+        have hconj : a * k * a⁻¹ ∈ OddOrder.BG.Ch3.S10.Msigma Mstar :=
+          (Subgroup.mem_normalizer_iff.mp (hMstarN haMstarσ) k).mp hkMσstar
+        have : a * k * a⁻¹ * k⁻¹ = (a * k * a⁻¹) * k⁻¹ := by group
+        rw [this]; exact mul_mem hconj (inv_mem hkMσstar)
+    rw [le_bot_iff, Subgroup.commutator_eq_bot_iff_le_centralizer] at hcle
+    exact hcle (Subgroup.mem_zpowers y)
+  · exact le_inf (hKstar ▸ inf_le_left) hKstarMstar
 
 /-- **BG Corollary 14.12** (mmd L4035): for `M ∈ 𝓜_{P₂}` with `K`, `M*`, `K*` as in
 Theorem 14.7 and `U` as in Proposition 14.2(a), `r ∈ π(U)`, `R` the Sylow `r`-subgroup of the
@@ -9108,6 +9161,15 @@ theorem typeP2_neighbor_is_typeF [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd
       exact hNRH
     exact hrσM (by have h := OddOrder.BG.Ch3.S10.sigma_conj (M := H) a hrσH; rwa [ha] at h)
   have notMstGH : ¬ IsConjugateSubgroup H Mst := by
+    -- `M_σ ∩ M* = K*` (the embedding's conjunct (d) kernel, avoiding the σ(M)-Hall-of-M* clause).
+    have hKMsigmaMst : K ≤ OddOrder.BG.Ch3.S10.Msigma Mst :=
+      (le_of_eq hMstpair.2.2).trans inf_le_left
+    have hMsMst : OddOrder.BG.Ch3.S10.Msigma M ⊓ Mst = Kstar :=
+      msigma_inf_partner_eq_kstar hG hM hP2 hKM hKstardef hMstmax hKMsigmaMst hMstpair.1 hMnc
+    -- TODO (issue 7007): assemble `ziMMst : M ∩ M* = K ⊔ K*` from `hMsMst` via `N_{M*}(K*) = Z`
+    -- (cyclic `K*` characteristic line + `typeP_structure` of `M*`), then under `H = M*`,
+    -- `R ⊆ M ∩ M* = Z` is an `r`-group inside the `{κ,σ}`-group `Z` (`r ∉ κ(M) ∪ σ(M)`), forcing
+    -- `R = ⊥`, contradicting `R ≠ ⊥`.  Also needs `sK_uniqMst` (`K ⊆ M*^a ⟹ a ∈ M*`).
     sorry
   refine ⟨H, hHmem, ?_, ?_, ?_, ?_⟩
   · -- Conjunct 1 (`IsTypeF H`): by the covering (`hcover`), every type-`P` maximal is conjugate to
