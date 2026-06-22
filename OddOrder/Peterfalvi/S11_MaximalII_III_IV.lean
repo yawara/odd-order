@@ -1827,6 +1827,82 @@ theorem isCyclic_card_dvd_of_aInvariant_irreducible_faithful_comm
       (E := A) (M := (elabRepresentation p φ).asModule) (p := p) hcomm hfaith'
   exact ⟨hcyc, by rwa [hM] at hdvd⟩
 
+set_option backward.isDefEq.respectTransparency false in
+open OddOrder.RepresentationTheory Representation in
+/-- **Subgroup-level Singer fixed-point-free coprimality.**  Strengthens
+`isCyclic_card_dvd_of_aInvariant_irreducible_faithful_comm` with a fixed-point-free `σ : MulAut K`:
+if the only `a` whose action `φ a` commutes with `σ` is `a = 1`, then `|A|` is coprime to `p - 1`.
+
+This is Peterfalvi (9.7) case (b)'s coprimality `Coprime |Ū| (p - 1)`: the image `Ū = φ.range`
+embeds in the cyclic units `Kˣ` of the Singer field, and the prime subfield `𝔽ₚ*` (the
+`𝔽ₚ`-scalars, central in `Aut K`) meets `Ū` only in `1` because an `𝔽ₚ`-scalar commutes with
+`σ = φ(w)` and `σ` is fixed-point-free.  The `MulAut K`-action transports to the additive
+`MulEquiv.toAdditive σ` on `(elabRepresentation p φ).asModule`; the rest is
+`coprime_card_sub_one_of_faithful_irreducible_comm_fpf`. -/
+theorem coprime_card_sub_one_of_aInvariant_irreducible_faithful_comm_fpf
+    {A K : Type*} [Group A] [Finite A] [CommGroup K] [Finite K] {p : ℕ} [Fact p.Prime]
+    [Module (ZMod p) (Additive K)] {φ : A →* MulAut K}
+    (hcomm : ∀ a b : A, a * b = b * a) (hnt : Nontrivial K)
+    (hirr : ∀ J : Subgroup K, IsAInvariant φ J → J = ⊥ ∨ J = ⊤)
+    (hfaith : ∀ a : A, (∀ x : K, φ a x = x) → a = 1)
+    (σ : MulAut K)
+    (hfpf : ∀ a : A, (∀ x : K, σ (φ a x) = φ a (σ x)) → a = 1) :
+    Nat.Coprime (Nat.card A) (p - 1) := by
+  haveI hirrep : IsSimpleOrder (Subrepresentation (elabRepresentation p φ)) :=
+    elabRepresentation_isIrreducible hnt hirr
+  haveI hsimp :
+      IsSimpleModule (MonoidAlgebra (ZMod p) A) (elabRepresentation p φ).asModule := by
+    rw [isSimpleModule_iff]
+    exact (OrderIso.isSimpleOrder_iff
+      Subrepresentation.subrepresentationSubmoduleOrderIso).mp hirrep
+  haveI : Finite (elabRepresentation p φ).asModule := ‹Finite K›
+  -- Faithfulness in `𝔽ₚ[A]`-module terms (as in the cyclicity bridge).
+  have hfaith' : ∀ a : A, (∀ y : (elabRepresentation p φ).asModule,
+      MonoidAlgebra.of (ZMod p) A a • y = y) → a = 1 := by
+    intro a ha
+    refine hfaith a fun x => ?_
+    have key : (elabRepresentation p φ).asModuleEquiv
+        (MonoidAlgebra.of (ZMod p) A a •
+          (elabRepresentation p φ).asModuleEquiv.symm (Additive.ofMul x)) = Additive.ofMul x := by
+      rw [ha]; exact (elabRepresentation p φ).asModuleEquiv.apply_symm_apply _
+    rw [asModuleEquiv_map_smul, asAlgebraHom_of,
+      (elabRepresentation p φ).asModuleEquiv.apply_symm_apply, elabRepresentation_apply] at key
+    exact Additive.ofMul.injective key
+  -- The `MulAut K`-action `σ`, carried to an additive automorphism of `asModule = Additive K`.
+  let τ : (elabRepresentation p φ).asModule ≃+ (elabRepresentation p φ).asModule :=
+    { toFun := fun z => Additive.ofMul (σ (Additive.toMul z))
+      invFun := fun z => Additive.ofMul (σ.symm (Additive.toMul z))
+      left_inv := fun z => by simp
+      right_inv := fun z => by simp
+      map_add' := fun z w => by
+        show Additive.ofMul (σ (Additive.toMul (z + w)))
+          = Additive.ofMul (σ (Additive.toMul z)) + Additive.ofMul (σ (Additive.toMul w))
+        rw [show Additive.toMul (z + w) = Additive.toMul z * Additive.toMul w from rfl, map_mul]
+        rfl }
+  -- The action `of a • z` is `ρ a z` (the descended representation).
+  have hact : ∀ (a : A) (z : (elabRepresentation p φ).asModule),
+      MonoidAlgebra.of (ZMod p) A a • z = (elabRepresentation p φ) a z := by
+    intro a z
+    have h2 := asModuleEquiv_map_smul (ρ := elabRepresentation p φ)
+      (MonoidAlgebra.of (ZMod p) A a) z
+    rw [asAlgebraHom_of] at h2
+    simpa [Representation.asModuleEquiv] using h2
+  -- Fixed-point-freeness in `𝔽ₚ[A]`-module terms.
+  have hfpf' : ∀ a : A, (∀ y : (elabRepresentation p φ).asModule,
+      τ (MonoidAlgebra.of (ZMod p) A a • y)
+        = MonoidAlgebra.of (ZMod p) A a • τ y) → a = 1 := by
+    intro a ha
+    apply hfpf a
+    intro x
+    have h := ha (Additive.ofMul x)
+    rw [hact, hact, elabRepresentation_apply] at h
+    -- `h : τ (ofMul (φ a x)) = ρ a (τ (ofMul x))`, and `τ (ofMul w) = ofMul (σ w)`.
+    have hτ : ∀ w : K, τ (Additive.ofMul w) = Additive.ofMul (σ w) := fun w => rfl
+    rw [hτ, hτ, elabRepresentation_apply] at h
+    exact Additive.ofMul.injective h
+  exact coprime_card_sub_one_of_faithful_irreducible_comm_fpf
+    (E := A) (M := (elabRepresentation p φ).asModule) hcomm hfaith' τ hfpf'
+
 /-- **(9.7) case (a) bound.**  A group `A` acting on a group `K` of prime order `p` has its
 action-image `φ.range` of order dividing `p - 1`: `K` is cyclic, so `MulAut K ≅ (ZMod p)ˣ` has order
 `p - 1` (`IsCyclic.card_mulAut`), and `φ.range ≤ MulAut K`.  This is the `a ∣ p - 1` bound of

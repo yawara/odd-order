@@ -388,6 +388,58 @@ theorem isCyclic_and_card_dvd_card_sub_one_of_faithful_irreducible
 
 end Irreducibility
 
+/-! ## Coprimality from a trivial intersection in a cyclic group
+
+The fixed-point-free half of Peterfalvi (9.7)(b) supplies a *trivial intersection*
+`Ū ∩ 𝔽ₚ* = 1` inside the cyclic multiplicative group of the Singer field; the divisibility
+`|Ū| ∣ (p^q-1)/(p-1)` then needs `|Ū|` coprime to `p-1`.  In a cyclic group, a trivial
+intersection of two subgroups *does* force coprime orders (the converse of
+`Subgroup.inf_eq_bot_of_coprime`, which fails in general groups). -/
+
+/-- In a finite cyclic group, two subgroups with trivial intersection have coprime orders.
+
+Valid because a cyclic group has a *unique* subgroup of each order dividing the group order:
+with `g = gcd(|H|, |K|)`, the `g`-torsion subgroup `ker(x ↦ x^g)` has order `gcd(|Z|, g) = g`
+and lies in both `H` and `K` (each subgroup is its own `|·|`-torsion), hence in `H ⊓ K = ⊥`,
+forcing `g = 1`. -/
+theorem coprime_card_of_inf_eq_bot_isCyclic {Z : Type*} [CommGroup Z] [Finite Z] [IsCyclic Z]
+    {H K : Subgroup Z} (hdisj : H ⊓ K = ⊥) :
+    Nat.Coprime (Nat.card H) (Nat.card K) := by
+  classical
+  -- Each subgroup `J` is the kernel of `x ↦ x ^ |J|` (its `|J|`-torsion).
+  have htorsion : ∀ J : Subgroup Z, (powMonoidHom (Nat.card J) : Z →* Z).ker = J := by
+    intro J
+    have hsub : J ≤ (powMonoidHom (Nat.card J) : Z →* Z).ker := by
+      intro x hx
+      rw [MonoidHom.mem_ker, powMonoidHom_apply]
+      have hpow : ((⟨x, hx⟩ : J) ^ Nat.card J : J) = (1 : J) := pow_card_eq_one'
+      have := congrArg (Subgroup.subtype J) hpow
+      rw [map_pow, map_one] at this
+      exact this
+    have hcard : Nat.card (powMonoidHom (Nat.card J) : Z →* Z).ker = Nat.card J := by
+      rw [IsCyclic.card_powMonoidHom_ker, Nat.gcd_eq_right (Subgroup.card_subgroup_dvd_card J)]
+    exact (Subgroup.eq_of_le_of_card_ge hsub hcard.le).symm
+  -- `ker(x ↦ x^g)` is contained in both `H` and `K`, where `g = gcd(|H|,|K|)`.
+  set g := Nat.gcd (Nat.card H) (Nat.card K) with hg
+  have hgH : g ∣ Nat.card H := Nat.gcd_dvd_left _ _
+  have hgK : g ∣ Nat.card K := Nat.gcd_dvd_right _ _
+  have hkerle : ∀ (J : Subgroup Z), g ∣ Nat.card J →
+      (powMonoidHom g : Z →* Z).ker ≤ J := by
+    intro J hJ
+    rw [← htorsion J]
+    intro x hx
+    simp only [MonoidHom.mem_ker, powMonoidHom_apply] at hx ⊢
+    obtain ⟨k, hk⟩ := hJ
+    rw [hk, pow_mul, hx, one_pow]
+  have hbot : (powMonoidHom g : Z →* Z).ker ≤ ⊥ := by
+    rw [← hdisj]; exact le_inf (hkerle H hgH) (hkerle K hgK)
+  -- Its order is `gcd(|Z|, g) = g` (since `g ∣ |H| ∣ |Z|`), so `g = 1`.
+  have hgZ : g ∣ Nat.card Z := hgH.trans (Subgroup.card_subgroup_dvd_card H)
+  have : Nat.card (powMonoidHom g : Z →* Z).ker = 1 := by
+    rw [le_bot_iff.mp hbot, Subgroup.card_bot]
+  rw [IsCyclic.card_powMonoidHom_ker, Nat.gcd_eq_right hgZ] at this
+  exact this
+
 /-! ## Singer mechanism with commutativity supplied as a hypothesis
 
 `isCyclic_and_card_dvd_card_sub_one_of_faithful_irreducible` requires a `CommGroup`
@@ -472,6 +524,91 @@ theorem isCyclic_and_card_dvd_of_faithful_irreducible_comm [Finite E] [Finite M]
     _ = Nat.card (MonoidAlgebra (ZMod p) E ⧸ I) - 1 :=
         Nat.card_units (α := MonoidAlgebra (ZMod p) E ⧸ I)
     _ = Nat.card M - 1 := by rw [hKM]
+
+/-- **Peterfalvi (9.7)(b), the coprimality `Coprime |E| (p-1)`.**  Adds to the Singer hypotheses
+(`E` finite abelian acting faithfully, commutatively, and irreducibly on the finite `𝔽ₚ[E]`-module
+`M`) a fixed-point-free additive automorphism `σ` of `M`: the only `e` whose `𝔽ₚ[E]`-action
+commutes with `σ` is `e = 1`.  Then `|E|` is coprime to `p - 1`.
+
+This is the fixed-point-free input of (9.7)(b).  An `e ∈ E` whose realization `μ e ∈ Kˣ` lands in
+the prime subfield `𝔽ₚ* = algebraMap '' (ZMod p)ˣ` acts on `M` as an `𝔽ₚ`-scalar (an `nsmul`),
+hence commutes with the *additive* `σ`; fixed-point-freeness then forces `e = 1`.  So `E ↪ Kˣ` and
+`𝔽ₚ* ↪ Kˣ` intersect trivially in the cyclic group `Kˣ` of the Singer field `K`, and
+`coprime_card_of_inf_eq_bot_isCyclic` yields `Coprime |E| (p-1)`.
+
+In Peterfalvi's application `σ = φ(w)` is the action of a nontrivial `w ∈ W₁`: an `𝔽ₚ`-scalar is
+central in `Aut(H̄)`, so it is `W₁`-fixed, and `Ū ⋊ W₁` is Frobenius, so it is trivial. -/
+theorem coprime_card_sub_one_of_faithful_irreducible_comm_fpf [Fact p.Prime] [Finite E] [Finite M]
+    [IsSimpleModule (MonoidAlgebra (ZMod p) E) M]
+    (hcomm : ∀ a b : E, a * b = b * a)
+    (hfaith : ∀ e : E, (∀ x : M, MonoidAlgebra.of (ZMod p) E e • x = x) → e = 1)
+    (σ : M ≃+ M)
+    (hfpf : ∀ e : E, (∀ x : M, σ (MonoidAlgebra.of (ZMod p) E e • x)
+                              = MonoidAlgebra.of (ZMod p) E e • σ x) → e = 1) :
+    Nat.Coprime (Nat.card E) (p - 1) := by
+  classical
+  letI : CommRing (MonoidAlgebra (ZMod p) E) :=
+    { (inferInstance : Ring (MonoidAlgebra (ZMod p) E)) with
+      mul_comm := mul_comm_monoidAlgebra_of_comm hcomm }
+  obtain ⟨I, hImax, ⟨lequiv⟩⟩ :=
+    (isSimpleModule_iff_quot_maximal (R := MonoidAlgebra (ZMod p) E) (M := M)).mp ‹_›
+  haveI : I.IsMaximal := hImax
+  letI : Field (MonoidAlgebra (ZMod p) E ⧸ I) := Ideal.Quotient.field I
+  haveI : Finite (MonoidAlgebra (ZMod p) E ⧸ I) := Finite.of_equiv _ lequiv.toEquiv
+  -- `μ : E ↪ Kˣ` (Singer realization) and `ν : 𝔽ₚ* ↪ Kˣ` (prime subfield units).
+  let μ : E →* (MonoidAlgebra (ZMod p) E ⧸ I)ˣ :=
+    (Units.map (Ideal.Quotient.mk I : MonoidAlgebra (ZMod p) E →+* _).toMonoidHom).comp
+      (MonoidAlgebra.of (ZMod p) E).toHomUnits
+  let ν : (ZMod p)ˣ →* (MonoidAlgebra (ZMod p) E ⧸ I)ˣ :=
+    Units.map (algebraMap (ZMod p) (MonoidAlgebra (ZMod p) E ⧸ I)).toMonoidHom
+  -- The action of `a` is multiplication by `μ a` after `lequiv`.
+  have hcompat : ∀ (a : E) (x : M),
+      lequiv (MonoidAlgebra.of (ZMod p) E a • x)
+        = (↑(μ a) : MonoidAlgebra (ZMod p) E ⧸ I) * lequiv x := by
+    intro a x
+    rw [map_smul, Algebra.smul_def, Ideal.Quotient.algebraMap_eq]; rfl
+  have hμinj : Function.Injective μ := by
+    rw [injective_iff_map_eq_one]
+    intro e he
+    apply hfaith e
+    intro x
+    apply lequiv.injective
+    rw [hcompat e x, he, Units.val_one, one_mul]
+  have hνinj : Function.Injective ν :=
+    Units.map_injective (algebraMap (ZMod p) (MonoidAlgebra (ZMod p) E ⧸ I)).injective
+  haveI : IsCyclic (MonoidAlgebra (ZMod p) E ⧸ I)ˣ := inferInstance
+  -- Disjointness `μ.range ⊓ ν.range = ⊥`: a common unit makes `e` act as an `𝔽ₚ`-scalar, so FPF.
+  have hdisj : μ.range ⊓ ν.range = ⊥ := by
+    rw [Subgroup.eq_bot_iff_forall]
+    intro z hz
+    rw [Subgroup.mem_inf] at hz
+    obtain ⟨⟨e, he⟩, ⟨c, hc⟩⟩ := hz
+    have hμν : (↑(μ e) : MonoidAlgebra (ZMod p) E ⧸ I)
+        = algebraMap (ZMod p) (MonoidAlgebra (ZMod p) E ⧸ I) (c : ZMod p) := by
+      have heν : μ e = ν c := he.trans hc.symm
+      rw [heν, Units.coe_map]; rfl
+    -- `e` acts as the scalar `(c : ZMod p).val` (an `nsmul`).
+    have hscalar : ∀ x : M, MonoidAlgebra.of (ZMod p) E e • x = (c : ZMod p).val • x := by
+      intro x
+      apply lequiv.injective
+      rw [hcompat e x, hμν, map_nsmul, nsmul_eq_mul]
+      congr 1
+      conv_lhs => rw [← ZMod.natCast_zmod_val (c : ZMod p)]
+      rw [map_natCast]
+    -- Fixed-point-freeness: `σ` commutes with the scalar action, so `e = 1`.
+    have he1 : e = 1 := by
+      apply hfpf
+      intro x
+      rw [hscalar, hscalar, map_nsmul]
+    rw [← he, he1, map_one]
+  -- Conclude via cyclic coprimality, with `|μ.range| = |E|` and `|ν.range| = p - 1`.
+  have hcop := coprime_card_of_inf_eq_bot_isCyclic hdisj
+  have hcardμ : Nat.card μ.range = Nat.card E :=
+    (Nat.card_congr (MonoidHom.ofInjective hμinj).toEquiv).symm
+  have hcardν : Nat.card ν.range = p - 1 := by
+    rw [← Nat.card_congr (MonoidHom.ofInjective hνinj).toEquiv, Nat.card_eq_fintype_card,
+      ZMod.card_units_eq_totient, Nat.totient_prime (Fact.out)]
+  rwa [hcardμ, hcardν] at hcop
 
 end CommGroupFreeSinger
 
