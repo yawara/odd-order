@@ -37,7 +37,24 @@ statement)。**S07_Coherence.lean に未形式化** — 本 issue の真の prer
 
 ## やること
 
-- [ ] **Peterfalvi (5.8) combinatorial core** = 真の linchpin (下記スコープ参照; multi-piece)。
+- [x] **(5.8) abstract combinatorial core DONE** (2026-06-22, `grid_eq_const_column_of_two_col`,
+  `S05_GridTrichotomy.lean`, **axiom-clean** `[propext, Classical.choice, Quot.sound]`)。
+  norm-w₁ full-column endgame の純代数核: separable grid `a:ι×κ→ℂ` + 2-column support {j,k} +
+  係数 {0,δ}/{0,−δ} (δ=±1) + `∑(a)²=|ι|` ⟹ **単一 full column** (column k=δ / column j=−δ)。
+  既存 norm-2 `eq_smul_chiFam_diff_of_vanishOnV` は constant-column を**排除**するが、これは逆に
+  **採用** (separability+零列 q₀ で column-constant → Parseval mass → `a(i₀,j)²+a(i₀,k)²=1` →
+  {0,±1} で片方のみ ±1)。= (5.8) proof step 4 を忠実に capture、reusable。
+- [ ] **(5.8) σ-level wrapper** (残 linchpin、下記スコープ参照; multi-piece): 上記 abstract core を
+  `TICyclicHypothesis`-level に wrap。要 (a) **Parseval** `‖X‖²=∑|sigmaCoeff X|²` (X∈chiFam span)、
+  (b) **(5.5)** で `μ_k^τ₁` を 2-column σ-combination に分解 (係数 {0,δ}/{0,−δ})、(c) (4.7) A-support、
+  (d) sigmaCoeff↔core の hsupp/hnorm 配線 (`sigmaCoeff_add_eq` で separability、(5.5) で係数 bound)。
+  - **🔎 resource (次セッション起点、2026-06-22 調査; 要 workability 検証 — 結論の存在≠infra 在庫)**:
+    S07 に (5.5) decomposition + Parseval 機構が既存。`S07_RetargetScaled.lean:451` の docstring
+    「(5.5) gives `X=∑_{α∈E}α` with `|E|=‖χ‖²` so `‖X‖²=‖χ‖²`」(= core の hnorm 供給源候補) +
+    `CharacterDifferenceImage` (`S07_Coherence.lean:395`、`imageSet`/`muClassFunction`/`difference`
+    = R(χ) 構造)。⚠ **真の gate は §6 certain-type μ ↔ §5 sigmaCoeff grid の reconcile**
+    (notes s12_s10 §更新⁴「deep gate (multi-session)」)。abstract core が hsupp/hnorm/係数 bound を
+    どう sigmaCoeff から受け取るかの interface を先に設計せよ。
 - [x] **(10.6.a) M→G→τ₁ reduction chain DONE** (2026-06-22, commits `88a95a70`/`3d9eb887`/`a2ff9e18`):
   - M-side diagonal IP `(α_ij, μ_j − dζ̄) = 1` (`muGridAlpha_inner_muColumn_self_sub_conj`)
   - G-side diagonal IP `(α_ij^τ, (μ_j − dζ̄)^τ) = 1` (`muGridAlpha_tau_inner_muColumn_self_sub_conj`)
