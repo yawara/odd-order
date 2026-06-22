@@ -9579,15 +9579,81 @@ theorem typeP2_neighbor_is_typeF [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd
     have hHMst : H = Mst := hHeq.trans (Subgroup.conj_smul_eq_self_of_mem haInvMst)
     have hRZ : R ≤ K ⊔ Kstar := hziMMst ▸ le_inf hRM (hHMst ▸ hRH)
     exact hrnZ (hrR.trans (Subgroup.card_dvd_of_le hRZ))
-  refine ⟨H, hHmem, ?_, ?_, ?_, ?_⟩
-  · -- Conjunct 1 (`IsTypeF H`): by the covering (`hcover`), every type-`P` maximal is conjugate to
-    -- `M` or `M*`; `H` is conjugate to neither, hence not type-`P`, i.e. `κ(H) = ∅`.
+  -- ═══ Shared σ-decomposition infrastructure for conjuncts 2/3/4 (Coq `P2type_signalizer`) ═══
+  -- Conjunct 1 (`IsTypeF H`), hoisted (also the `hF` input to Lemma 14.11 below): every type-`P`
+  -- maximal is conjugate to `M` or `M*` (`hcover`), and `H` is conjugate to neither.
+  have hFmaxH : IsTypeF H := by
     show kappa H = ∅
     rw [← Set.not_nonempty_iff_eq_empty]
     intro hHP
     exact (hcover H hHmax hHP).elim notMGH notMstGH
-  · -- Conjunct 2 (`U ≤ M_σ(H)`): `U = [U,K] ≤ H_σ` via `K ⊆ F(D)`, `D ⊆ M*`, and the `q'`-Hall
-    -- structure of `H_σ · O_q(D)`.  Residual (needs `defUK`, the σ-decomposition of `H`).
+  -- `|K| = q` is prime (Prop 14.2(g), type-`P₂`), so `K` is cyclic of prime order.
+  obtain ⟨-, -, -, -, hP2struct, -, -⟩ := typeP_structure hG hM hP hKM hK hKstardef hU
+  obtain ⟨-, q, hqprime, hKcard, -⟩ := hP2struct hP2
+  haveI : Fact q.Prime := ⟨hqprime⟩
+  haveI hKcyc : IsCyclic ↥K := isCyclic_of_prime_card hKcard
+  have hKelemq : K ∈ elemAbelianOfRank G q 1 :=
+    mem_elemAbelianOfRank.mpr
+      ⟨Subgroup.IsElementaryAbelian.of_card_prime hKcard, by rw [hKcard, pow_one]⟩
+  -- `defUK : ⁅U, K⁆ = U` (BG `defUK`).
+  have defUK : (⁅U, K⁆ : Subgroup G) = U :=
+    typeP2_kappaHall_commutator_eq_self hG hM hP2 hKM hUM hK hKstardef hU hUab hKNU
+  -- `K ≤ M*_σ` and `K` is a `σ(H)'`-group (Thm 13.9: `σ(H) ∩ σ(M*) = ∅`, `H` not conj. to `M*`).
+  have hKMsigmaMst : K ≤ OddOrder.BG.Ch3.S10.Msigma Mst := hMstpair.2.2.le.trans inf_le_left
+  have hHMstdisj : Disjoint (OddOrder.BG.Ch3.S10.sigma H) (OddOrder.BG.Ch3.S10.sigma Mst) :=
+    sigma_disjoint_of_nonconjugate hG hHmax hMstmax notMstGH
+  have hsH_K : Subgroup.IsPiSubgroup (OddOrder.BG.Ch3.S10.sigma H)ᶜ K := by
+    intro p hp
+    rw [Set.mem_compl_iff]
+    intro hpσH
+    exact (Set.disjoint_left.mp hHMstdisj) hpσH
+      (OddOrder.BG.Ch3.S10.Msigma_isPiGroup Mst p
+        (Nat.primeFactors_mono (Subgroup.card_dvd_of_le hKMsigmaMst) Nat.card_pos.ne' hp))
+  -- `E`: a `σ(H)'`-Hall (E-setup) complement of `H_σ` in `H`, containing `K` (`Hall_superset`).
+  obtain ⟨E, E₁, E₂, E₃, hEsetup, hKE, hE_pi⟩ :=
+    OddOrder.BG.Ch3.S12.exists_subgroupESetup_with_le hG hHmax hKH hsH_K
+  -- `q = |K| ∈ σ(M*)` (`K ≤ M*_σ`).
+  have hqσMst : q ∈ OddOrder.BG.Ch3.S10.sigma Mst :=
+    OddOrder.BG.Ch3.S10.Msigma_isPiGroup Mst q
+      (Nat.mem_primeFactors.mpr ⟨hqprime, hKcard ▸ Subgroup.card_dvd_of_le hKMsigmaMst,
+        Nat.card_pos.ne'⟩)
+  -- `𝓜(C(K)) = {Mst}` (Prop 14.2(d) for `Mst`, whose dual `K*` is `K`): `typeP_structure`
+  -- conjunct 6 with the rank-one `K ∈ ℰ_q¹`.
+  have huniqMst : maximalSubgroupsContaining (Subgroup.centralizer (K : Set G)) = {Mst} := by
+    haveI hMstsol : IsSolvable ↥Mst := hG.solvable_of_mem_maximalSubgroups hMstmax
+    obtain ⟨UMst, hUMsthall⟩ : ∃ UMst : Subgroup G, Ch03.IsHallSubgroup
+        ((kappa Mst ∪ OddOrder.BG.Ch3.S10.sigma Mst)ᶜ) (UMst.subgroupOf Mst) := by
+      obtain ⟨U', hU'hall, -⟩ := Ch03.hall_D (G := ↥Mst)
+        (π := (kappa Mst ∪ OddOrder.BG.Ch3.S10.sigma Mst)ᶜ) (U := (⊥ : Subgroup ↥Mst))
+        (fun p hp => by simp at hp)
+      have hUeq : (U'.map Mst.subtype).subgroupOf Mst = U' :=
+        Subgroup.comap_map_eq_self_of_injective Mst.subtype_injective U'
+      exact ⟨U'.map Mst.subtype, by rw [hUeq]; exact hU'hall⟩
+    exact (typeP_structure hG hMstmax hMstP hMstpair.1 hMstpair.2.1 hMstpair.2.2
+      hUMsthall).2.2.2.2.2.1 q hqprime K hKelemq le_rfl
+  -- `K ⊆ F(E)` (Coq `sK_FD`): otherwise Lemma 14.11 (`exists_maximal_of_typeF_notMem_fitting`)
+  -- produces a maximal `M'` with `q ∈ τ₂(M')` and `𝓜(C(K)) = {M'}` (⟹ `M' = Mst`, but
+  -- `q ∈ τ₂(Mst) ∩ σ(Mst) = ∅`), or `q ∈ κ(M')` with `M'` type-`P₁` (⟹ `M' ∼ M` makes `M`
+  -- type-`P₁` against `M ∈ 𝓜_{P₂}`, or `M' ∼ Mst` gives `q ∈ κ(Mst) ⊆ σ(Mst)ᶜ`).
+  have hsK_FE : K ≤ OddOrder.BG.Ch2.S08.fittingInG E := by
+    by_contra hnotKFE
+    have hqpiE : q ∈ piSet E :=
+      Nat.mem_primeFactors.mpr ⟨hqprime, hKcard ▸ Subgroup.card_dvd_of_le hKE, Nat.card_pos.ne'⟩
+    obtain ⟨Mstar', hMstar'max, hdich⟩ := exists_maximal_of_typeF_notMem_fitting hG hHmax hFmaxH
+      hEsetup.isComplement'_subgroupOf hEsetup.E_le hqpiE hKelemq hKE hnotKFE
+    rcases hdich with ⟨hqτ2, huniq'⟩ | ⟨hqκ', hP1'⟩
+    · -- Case 1: `Mstar' = Mst` (both `= 𝓜(C(K))`), but `q ∈ τ₂(Mst)` and `q ∈ σ(Mst)`.
+      have hMstar'eq : Mstar' = Mst :=
+        Set.singleton_eq_singleton_iff.mp (huniq'.symm.trans huniqMst)
+      exact tau2_subset_sigma_compl Mst (hMstar'eq ▸ hqτ2) hqσMst
+    · -- Case 2: `Mstar'` type-`P₁`; `hcover` makes it conjugate to `M` or `Mst`.
+      rcases hcover Mstar' hMstar'max hP1'.1 with ⟨b, hb⟩ | ⟨b, hb⟩
+      · exact not_isTypeP1_and_isTypeP2 ⟨hb ▸ (isTypeP1_conj_smul b Mstar').mpr hP1', hP2⟩
+      · refine kappa_subset_sigmaCompl (M := Mst) ?_ hqσMst
+        rw [← hb, kappa_conj_smul]; exact hqκ'
+  refine ⟨H, hHmem, hFmaxH, ?_, ?_, ?_⟩
+  · -- Conjunct 2 (`U ≤ M_σ(H)`): `U = [U,K] ≤ H_σ` via `K ⊆ F(E)`, and the `q'`-Hall structure
+    -- of `H_σ · O_q(E)` (Coq `sUHs`).
     sorry
   · -- Conjunct 3 (`M ⊓ H = U ⊔ K`): `H ∩ M* = D`, `M ∩ Fu = U` with `Fu = O_{(σ∪κ)'}(F(H))`.
     -- Residual.
