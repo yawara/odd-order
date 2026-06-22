@@ -85,30 +85,40 @@ chiefFactor_basic (済) は `_holds` / `quotient_order` 経由ゆえ互換 (fiel
   `Subgroup.normalizer` は Set 引数) + element-wise (x=h·c, h=x·c⁻¹∈U⊓H=⊥, x=c∈K)。
   **(8.5.b) の "U' が H 中心化" は H 全体 (H̄ でなく) ゆえ H̄=H/N 上でも自動で中心化** (N≤H)。
 
-- **frontier = step 7b (chief-factor Singer 適用) — UNBLOCKED (now (8.5.b) 済)**: 7a Singer を H̄ に適用して
-  `Ū 巡回 ∧ |Ū|∣p^q-1`。A=`ψ.range` (ψ=`act.φ.comp act.U.subtype`、忠実像 Ū)、φ=`A.subtype`。
-  faithful=subtype 単射で自明、irreducible=case(b) から transfer、**可換=(8.5.b) で `⁅U_sub,U_sub⁆⊆ker ψ`**
-  (`⁅U,U⁆⊆C_M(H)`⟹H̄ 上自明作用)。module は ambient 構築。~100 行 plumbing (range 形成 + irreducible transfer +
-  abelian + module)。**注**: 7b 後も CaseB carrier の `u_coprime`/`u_dvd_norm` は **chars.u gated** のまま
-  (|Ū| でなく chars.u を参照)。CaseA は Hpart 型+q-indexing。
-  **その先 = step 7 (CaseA/CaseB carrier 構成) — GATED**: `clifford_dichotomy` は
-  `chiefFactor_clifford_U_dichotomy` で case (a)/(b) に分岐できるが、`CliffordCaseAData`/`CliffordCaseBData`
-  の**実フィールド**構成が残る:
-  - **CaseB (case b) = `chars.u` に GATED (本質的)**: `u_coprime_p_sub_one : Coprime chars.u (p-1)` /
-    `u_dvd_norm_quotient : chars.u ∣ (p^q-1)/(p-1)` は `chars.u` を参照するが、`Section11CharacterData.u`
-    は **free field** (制約 `u_eq_card_quotient` は opaque Prop)。⟹ `chars.u` を pin (= `|Ū|` 等に固定)
-    しない限り**証明不能** ([[scaffold-sorry-free-not-done]]: 偽装構成は不可)。`Section11CharacterData` は
-    lane-b の S12 (`typeII_section11_coherence`:3774) が消費 (tau/S/support のみ、u は未使用) ゆえ `u` 固定は
-    **carrier 設計判断** (lane-b と要調整)。体モデル自体 (`End_{𝔽ₚ[U]}(H̄)` が体 → `Ū` 巡回 + `|Ū|∣p^q-1`)
-    は **ungated・in-lane buildable だが重い** (module bridge: `IsAInvariant`-既約 → `IsSimpleModule` を
-    `zmodModule`+`elabRepresentation`+`irreducible_iff_isSimpleModule_asModule` で組み、`SingerField`
-    `isCyclic_and_card_dvd_of_faithful_irreducible_comm` を適用; ~150-250 行・instance 注意)。
-  - **CaseA (case a) = 型問題 + 構成**: `Hpart : Fin q → Subgroup G` 各位数 `p` だが、H̄ の order-p ピースは
-    G に引き戻すと位数 `p|H₀|` ⟹ **`Subgroup G` で位数ちょうど p は不整合** (構造体 `Hpart` の型を
-    `Subgroup (↥H⧸N)` に直すか要検討、consumer は `caseA.a` のみ使用・Hpart 未使用)。`a∣p-1` は U の
-    order-p 片への作用が `U/C ↪ MulAut(order-p)≅(ZMod p)ˣ` (位数 p-1) ゆえ ungated・doable。
-  - **∴ clifford_dichotomy は honest には閉じられない (chars.u gate)**。ユーザー判断待ち: (i) `chars.u` を
-    pin (lane-b 調整) / (ii) 体モデル bridge を deferred infra として先行構築 / (iii) 別タスクへ。
+- **step 7b DONE (2026-06-23, commit `e40c98f6`)** — **`chiefFactor_caseB_image_cyclic`** (chief-factor
+  Singer 適用, sorry-free + axiom-clean): case (b) (U-既約 chief factor) で **`Ū=φU.range` 巡回 ∧
+  `|Ū|∣p^q-1`**。7a Singer (`isCyclic_card_dvd_of_aInvariant_irreducible_faithful_comm`) を H̄ に適用。
+  A=`φU.range` (忠実像 Ū)、φ=`A.subtype` (subtype 単射=faithful)、irreducible=case(b) hyp から range 経由
+  transfer、**可換=(8.5.b)**: 任意 `⁅a,b⁆∈[U,U]⊆C(H)` ⟹ H̄ 上自明作用 (`hcentral_triv`) ⟹
+  `φU ⁅a,b⁆=1` ⟹ `Commute (φU a)(φU b)`。**instance 知見 (再利用大)**: ① `[Group][IsMulCommutative]→
+  CommGroup` は **scoped** (`open scoped IsMulCommutative`、zmodModule と一致させる)、② `Fact p.Prime` を
+  足すと `ZMod p` が Field 化し zmodModule の CommRing 経路と semiring diamond ⟹ **NeZero p のみ**使う、
+  ③ element commutator `⁅,⁆` も scoped (`open scoped commutatorElement`)。
+- **dvd_norm DONE (2026-06-23, commit `fa766efc`)** — **`chiefFactor_caseB_image_dvd_norm`**: FPF 入力
+  `Coprime |Ū| (p-1)` を仮定すれば step 7b の `|Ū|∣p^q-1` が **`|Ū|∣(p^q-1)/(p-1)`** に昇格 (sorry-free +
+  axiom-clean)。= (9.7)(b) mmd L69 の初等数論最終段 (`(p-1)∣(p^q-1)` via `p≡1 [MOD p-1]` + coprime ⟹
+  `|Ū|·(p-1)∣p^q-1` ⟹ 商整除)。**∴ case-(b) 整除条件 (`u_coprime`/`u_dvd_norm`) の残ハード入力は
+  `Coprime |Ū| (p-1)` 一点に縮約**。
+
+- **frontier = case-(b) FPF coprime (`Coprime |Ū| (p-1)`) = 体モデル同型 (9.7)(b) L51 — 重・multi-session**:
+  textbook (9.7)(b) L69 は `W₁ が Ū 上 FPF ⟹ U*∩𝔽ₚ=1 ⟹ coprime(u,p-1)`。これには **体 F=p^q と同型
+  `(H̄⋊Ū)⋊W₁ ≅ (F⋊U*)⋊Aut F`** (L51) を構築し W₁ を `Aut F`・`𝔽ₚ` を W₁-不変部分体と同定する必要。
+  Singer 機構 (7a) の体は `MonoidAlgebra(ZMod p)Ū⧸I` で W₁-作用を持たない ⟹ `End_{𝔽ₚ[U]}(H̄)` を体化
+  (Schur+Wedderburn) し W₁-Galois 作用を載せる新インフラ (~150-250+ 行) が要る。**これが case-(b) の真の長物**
+  (step 7b/dvd_norm で他は片付いた)。
+  **carrier 構成 (clifford_dichotomy 閉鎖) — 体モデル後に GATED**: `CliffordCaseBData` は `chars.u` を参照
+  (`u_coprime_p_sub_one : Coprime chars.u (p-1)`, `u_dvd_norm_quotient : chars.u ∣ (p^q-1)/(p-1)`) が
+  `Section11CharacterData.u` は **free field** (`u_eq_card_quotient` opaque)。**`chars.u=|Ū|` pin が要る**
+  (lane-b S12 は tau/S/support のみ消費・u 未使用ゆえ安全寄りだが **carrier signature 変更 = cross-lane、
+  hub 判断推奨** [[cross-lane-sync-via-notes]])。pin 後、上の `chiefFactor_caseB_image_*` (|Ū| 版) を
+  `chars.u` 版に乗せれば CaseB carrier が組める。
+  - **CaseA (case a) = 型問題 + 構成 (別 gate)**: `Hpart : Fin q → Subgroup G` 各位数 `p` だが H̄ の
+    order-p ピースは G 引き戻しで位数 `p|H₀|` ⟹ **`Subgroup G` で位数ちょうど p は不整合** (構造体 `Hpart`
+    型を `Subgroup (↥H⧸N)` に直す carrier 変更要、consumer は `caseA.a` のみ使用)。`a∣p-1` は **7c で済**
+    (`card_range_dvd_card_sub_one_of_prime_card`)。
+  - **∴ clifford_dichotomy は honest には閉じられない**: case-(b) は体モデル FPF + chars.u pin、case-(a) は
+    Hpart 型変更。いずれも単一 session 増分でない。**step 7b/dvd_norm で (9.7) の Singer 算術核心は完了**、
+    残りは体モデル建設 (大物) + carrier 設計判断 (hub)。
 
 - **step 0 DONE (2026-06-22, commit `f69557a5`)**: `ChiefFactorData` の 3 opaque field を実構造に
   置換。`exists_chiefFactor_kernel` を強化し、kernel `N = W.comap (mk' N₀)` について
