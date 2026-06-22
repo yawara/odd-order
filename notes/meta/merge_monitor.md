@@ -236,6 +236,27 @@ branch とも削除済み。旧 **A** / **D** も同様に退役済み (履歴�
 
 ## 現状メモ
 
+- **2026-06-23 (続⁵〜続¹⁴, セッション総括) — 監視継続 + 実 sorry 130→125 + HUB issue 2 件解決 + worktree 同期**:
+  単一監視セッションで複数 tick を回し、全レーンが活発に前進。cron = `cf031d2e` (`4,29,54 * * * *`, stop-on-problem)。
+  main HEAD = `c96ef7ba`。**実 sorry 130→125** (全 tick build 3881 green / AxiomsCheck OK / 新規 axiom 0 / 範囲逸脱 0):
+  - **F**: BG **Cor 14.12 全 conjunct 完成** (sorry-free + axiom-clean)。conjunct 1 (IsTypeF H) / 2 (U≤M_σ(H)) /
+    3 (M⊓H=U⊔K) / 4 (¬(N_H(U)≤M)) + defUK (⁅U,K⁆=U) + kappa_conj_smul + Thm A(4)/A(5) を S16→S14 移設。
+    次 frontier = Thm C conjunct 2 (matched (U,K) を Cor 14.12 cite 用に要する)。
+  - **B**: §6 conjugate を Hypothesis 一般化 (issue 1010) → §10 conjugate-column + σ-grid orthonormality +
+    **(5.5) for column μ_j → image family + (5.5) チェーン完成**。残 = (10.6.a) σ-endgame final step。
+  - **H**: (12.9) honest assembly → **(8.17.a) exists_second_maximal discharge** (cover data + 5-type conj) →
+    (12.9) residual = (8.12.a) のみ。**(12.12) combined FPF rep-theory core** (Case A/B 統合)。
+  - **C**: Pf (9.7) Clifford engine steps 1-7 (chief-factor dim → orbit → dichotomy → Singer → (8.5.b) Ū-abelian
+    → (9.7)(b) u∣(p^q-1)/(p-1) を FPF coprime に還元)。
+  - **HUB issue 2 件解決** (cross-lane 調停が実証明前進に直結): **1010** (§6→Hypothesis 一般化, 案 1 採用, lane-b 実装) +
+    **2015** (5-type HasPeterfalviType conj infra, lane-h が shared `MaximalSubgroupTypeConj.lean` に実装 → 同 infra で
+    (8.17.a) discharge)。両 CLOSED。
+  - ⚠ **サイズ flag 深刻化**: `S14_TypePCounting` **10037 行** (issue 0069)。lane-f が Cor 14.12 完成 = 自然な凍結境界 →
+    **次の F-idle tick で hub が prefix-split 実施推奨**。他 S12 4440 (0076) / S11 2162 (0077)。
+  - 🔸 **push 全保留**: `git push origin main` が auto-mode classifier に拒否され続け (default branch 直 push = PR
+    review 迂回、ユーザー指示は監視のみ)。全 merge は **local main に commit 済** (HEAD c96ef7ba)。push はユーザー明示許可待ち。
+  - **worktree 同期 (ユーザー指示)**: lane-f/h/c を `git merge --ff-only main` で main HEAD (c96ef7ba) に揃え + warmup
+    build (各 3881 green)。lane-b は稼働中ゆえ未変更。
 - **2026-06-22 (続⁴) — 監視再開 + 4 レーン全合流 (5 merge) + cron 再作成**: ユーザー「各レーンを監視します」で再開。前 cron は session 変化で消滅 (`CronList` 空) → 新 cron **`cf031d2e`** (`4,29,54 * * * *`, stop-on-problem prompt 入り) 再作成。全レーン範囲逸脱なし (3-dot 確認)、build 各 3881 green / AxiomsCheck OK / 新規 axiom 0。**実 sorry 130→128** (lane-f が -2):
   - **lane-f** (2 merge): `8c98a1e9` BG Cor 14.12 conjunct 1 = `IsTypeF H` proven (notMGH + msigma_inf_partner_eq_kstar + defMsMstar kernel, 実 sorry -2) → セッション中追加バッチ `7eb88d6c` Thm A(4)/A(5) centralizer lemmas 再配置 S16→S14 (105 行純粋移動)。
   - **lane-b** (`a5a2b1ae`): Pf (5.8) σ-level full-column endgame (Fourier 復元+σ-wrapper) + (10.6.a) reduction (ζ^τ₁⊥ζ̄^τ₁ / ⊥μ_k^τ₁)。sorry 不変。
