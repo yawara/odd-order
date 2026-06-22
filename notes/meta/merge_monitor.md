@@ -20,20 +20,29 @@
 変更** (Wielandt §9 は H の連結 chunk、§11 衝突解消)、B は §10/§12/§13 char grid に専念、C は §16 char
 endpoint を自走所有 (B 待ちにしない)。
 
-| レーン | branch | 機能 | 所有ファイル | 自動合流 |
-|---|---|---|---|---|
-| **F** | `lane-f` | **① BG 構造** | `S14_TypePCounting`/`S15_MF`/`S16_MainResults`/`S16_PairIntersection` + `FeitThompson.lean` の §16 producer。Theorem A-I / Prop 16.1 | ✅ |
-| **B** | `lane-b` | **② Dade char producer** | `S10_MinimalSimpleStructure`/`S12_MaximalIII_IV_V`/`S13_MaximalIII_IV`。char grids/parameters/`section16CharacterData`。**S11 は触らない (H 所有)** | ✅ |
-| **H** | `lane-h` | **① Wielandt §9 + §14-15** | **`S11_MaximalII_III_IV` (Wielandt §9 + 型分類, H 単独所有)** + `S14_MaximalI`/`S15_SAndT` (type I + S&T) | ✅ |
-| **C** | `lane-c` | **②endpoint + ③assembly** | `S16_NonExistenceG` (Core 凍結)。非存在 + **POLE-2** (issue 2009) + §16 char endpoint **de-opacify (自走)** | ✅ |
+**⚠ 2026-06-22 frontier-cluster 再配置 (ユーザー裁可、issue 4005 監査結果)**: 4-territory read-only audit で
+「節区切りは starve を生むが実害は lane-c (§16 終点 = pure consumer) のみ。F/H/B は productive frontier 上、
+lane-h 領域に ~16 独立 workable leaf 集中」と判明 → **lane-c を §16 から Pf §11 (Wielandt §9 / Clifford
+9.6-9.10 = Pf 最上流の独立 5-leaf cluster) に再配置**。**S11 を H → C に移譲** (H は §14_MaximalI+§15 に集中)。
+**§16 (S16_NonExistenceG) + §10 (S10) は driver 化** = 常駐レーンを置かず、上流 (BG §16 / S15) landing 時に
+機会的に閉じる (実施 owner = hub、または上流を landing させたレーンが続けて driver で close)。各レーンを
+productive な独立クラスタに乗せ、上流優先方針 (CLAUDE.md) にも合致。
 
-**signature-first interface**: 上流が sorried signature を export → 下流が cite。真の cross-lane 依存は narrow
-(§13 `basic_structure` レベル)。大半は自レーン内 (lane-c の §16 de-opacify 等)。signature 不足は notes/issue 経由。
+| レーン | branch | 機能 (frontier クラスタ) | 所有ファイル | 自動合流 |
+|---|---|---|---|---|
+| **F** | `lane-f` | **BG §14-16 構造** | `S14_TypePCounting`/`S15_MF`/`S16_MainResults`/`S16_PairIntersection` + `FeitThompson.lean` の §16 producer。Theorem A-I / Prop 16.1 | ✅ |
+| **B** | `lane-b` | **Pf §12/§13 Dade char-grid** | `S12_MaximalIII_IV_V`/`S13_MaximalIII_IV`。char grids/parameters。**`S10_MinimalSimpleStructure` は driver (BG §16 gated、pure wiring)、常駐作業しない** | ✅ |
+| **H** | `lane-h` | **Pf §14_MaximalI + §15 S&T** | `S14_MaximalI`/`S15_SAndT` (type I + S&T、~11 workable leaf)。**S11 は触らない (C 所有に移譲)** | ✅ |
+| **C** | `lane-c` | **Pf §11 Wielandt §9 / Clifford** | **`S11_MaximalII_III_IV` (Wielandt §9 + 型分類 9.6-9.10, C 単独所有)**。**`S16_NonExistenceG` は driver (上流 landing 時に機会的 close)、常駐作業しない** | ✅ |
+
+**signature-first interface**: 上流が sorried signature を export → 下流が cite。真の cross-lane 依存は narrow。
+signature 不足は notes/issue 経由。**driver (§16/§10)**: 常駐レーンを当てず、上流が landing したとき hub or
+担当レーンが続けて opportunistic に close する (pure consumer ゆえ常駐は starve)。
 
 **取り決め**: (1) 各レーンは**自所有ファイルのみ編集**、他は cite のみ (要望は notes/issue 経由)。
-**特に S11 は H のみ** (B/H 衝突源だった)。(2) **新規 `axiom` 宣言は abort+ユーザー承認**。
+**特に S11 は C のみ** (2026-06-22 H→C 移譲)。(2) **新規 `axiom` 宣言は abort+ユーザー承認**。
 (3) issue base: **B=1000 / H=2000 / C=4000 / F=7000**。(4) `notes/bg/*`=F、`notes/peterfalvi/*`=B/H/C。
-マージ順 = **F → B → H → C** (独立レーンゆえ順序は形式的、上流→下流の自然順)。
+マージ順 = **F → B → H → C** (独立レーンゆえ順序は形式的)。
 
 **H 固有の取り決め (2026-06-12)**: (1) H は **Lane B の §4–§9 coherence/certain-type ファイル
 (`S04_*`〜`S09_*`) を編集しない** (cite のみ)。(2) §10–13 は BG↔Pf interface (BG Thm A–E/I–II)
@@ -179,6 +188,7 @@ branch とも削除済み。旧 **A** / **D** も同様に退役済み (履歴�
 
 ## 現状メモ
 
+- **📌 lane-c を §11 に再配置 (frontier-cluster relane, ユーザー裁可 2026-06-22, issue 4005)**: §16 監査で「starve は lane-c (§16 終点 consumer) のみ、lane-h 領域に ~16 独立 leaf」と判明 → lane-c を §16 から **Pf §11 (S11_MaximalII_III_IV, Wielandt §9 / Clifford 9.6-9.10)** へ。**S11 を H→C 移譲**、H は §14_MaximalI+§15 に集中、§16/§10 は driver 化 (常駐させず上流 landing 時に機会的 close)。レーン表・取り決め更新済。各レーン LAUNCH.md も更新 (git-excluded)。次 tick 以降この割当で運用。
 - **📌 標準監視ペース = 25 分（恒久、ユーザー指示 2026-06-22）**: cron 式 **`4,29,54 * * * *`**（:04/:29/:54、:00・:30 を回避）を**標準合流ペースとして恒久化**。ユーザーが各レーンを稼働 → 本ペースで監視・自動合流する。⚠ **cron 自体は本環境で session-scoped**（`durable: true` を渡しても runtime は session-only と報告; [[cron-dies-on-model-switch]]）→ **ペースの正本はこの行**。新セッション開始時・`/model` 切替後は `CronList` 確認の上、消えていれば同式・同 prompt で**即再作成**する（prompt は「各イテレーションの手順」を要約したもの、本ファイルが authority）。7 日 auto-expire 後も同様に再作成。
 - **2026-06-22 (続³) — 問題時ループ停止ルール化 + cron `24df1fb4` 再作成**: ユーザー「問題が起きたらループ止めて・永続化」→「各イテレーションの手順」冒頭に ⛔ banner 追加（commit `13ed2a87`）+ cron prompt に内蔵。旧 `b9df9002` を CronDelete → 新 cron **`24df1fb4`**（同式・stop-on-problem prompt 入り）。
 - **2026-06-22 (続²) — tick: lane-b/c 合流**: lane-b (1, merge `c6c7de1b`): s05 norm-2 σ-coeff bounds (Pf (10.5) endgame) + §6 DRY。lane-c (2, merge `15c014f6`): s16 (14.6) caseB_for_S + (14.11) K_eq_V index-pq half close。**実 sorry 131→129**, build 3881 green / AxiomsCheck OK / 新規 axiom 0, push 済 (`13ed2a87`)。⚠ サイズ flag: S16_NonExistenceG 3394 行（issue 0072 既起票）。
