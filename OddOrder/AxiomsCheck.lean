@@ -5375,6 +5375,26 @@ condition in the nilpotent `Fu = O_{(κ∪σ)'}(F(H))`.  Axiom-clean. -/
 
 #assert_only_allowed_axioms OddOrder.BG.Ch4.S14.typeP2_neighbor_is_typeF
 
+/-! **Matched `κ`-Hall / `(κ∪σ)'`-Hall pair for type-`P₂`** (`S16_MainResults`,
+`typeP2_exists_matched_kappa_hall_pair`): the BG `kappa_complement` Frobenius factorisation
+`E = K ⋉ U` of Proposition 14.2(a), giving a `κ(M)`-Hall `K₀` and a nontrivial abelian
+`(κ(M)∪σ(M))'`-Hall `U₀` (both `≤ M`) with `K₀ ≤ N_G(U₀)` — since `U₀ = E₂E₃ ◁ E ∋ K₀`.  Type-`P₂`
+excludes the degenerate `κ`-group cases of the `E`-setup; `U₀` is identified as `[E:E₁]` and shown
+`(κ∪σ)'`-Hall via the index of the `κ`-Hall `E₁`, abelian by Lemma 15.1(b).  The matched pair that
+Corollary 14.12 consumes via its `K ≤ N(U)` hypothesis.  Axiom-clean. -/
+
+#assert_only_allowed_axioms OddOrder.BG.Ch4.S16.typeP2_exists_matched_kappa_hall_pair
+
+/-! **BG Theorem C** (`S16_MainResults`, `theoremC_paired_structure`): for `K ≠ 1`, a type-`P`
+maximal `M` has the full paired structure — `U` abelian; `N_G(U) ⊄ M` (conjunct 2 = BG C(1) /
+Corollary 14.12, via the matched `(K₀,U₀)` pair `typeP2_exists_matched_kappa_hall_pair` and the
+`M`-conjugacy transport of `(κ∪σ)'`-Hall subgroups); `K*` cyclic, `1 ⊂ K* ≤ M_F ≤ M''`, `M_F` not
+cyclic; `M' = U M_σ`; the unique non-conjugate type-`P` partner `M*` (Theorem 14.7); the
+`A_0(M)−A(M)` TI-set (conjunct 10); and the prime-order / `F(M)`-TI clauses (conjuncts 11, 12).
+Axiom-clean. -/
+
+#assert_only_allowed_axioms OddOrder.BG.Ch4.S16.theoremC_paired_structure
+
 /-! **BG Theorem A(3) decomposition** (`S16_MainResults`, `typeP_maximal_eq_kappaHall_sup_U_sup_Msigma`):
 `M = K U M_σ` for a maximal `M` with Hall `κ`-subgroup `K ≤ M` and Hall `(κ∪σ)'`-subgroup `U ≤ M`.
 Type-F via the `K = ⊥` `SubgroupESetup`; type-P via the `M' = U M_σ`/`M'`-complements-`K` structure
