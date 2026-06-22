@@ -824,6 +824,19 @@ theorem omegaProdChar_one_one (hyp : TICyclicHypothesis G) :
     hyp.omegaProdChar 1 1 = 1 := by
   rw [omegaProdChar, MonoidHom.one_comp, MonoidHom.one_comp, one_mul]
 
+/-- **`omegaProdChar` is bimultiplicative** (`Ŵ₁ × Ŵ₂ → Ŵ` is a group homomorphism): since the dual
+codomain `ℂˣ` is abelian, `ω_{(χ₁χ₁'),(χ₂χ₂')} = ω_{χ₁,χ₂} · ω_{χ₁',χ₂'}`.  With
+`omegaProdEquiv_symm_omegaProdChar` this makes the index-pair extraction `omegaProdEquiv.symm`
+multiplicative — the key step in showing a `W₁`-only character (trivial on `W₂`) has trivial
+`W₂`-index, used in the (10.6)(a) column-structure argument. -/
+theorem omegaProdChar_mul (hyp : TICyclicHypothesis G)
+    (χ₁ χ₁' : (hyp.W1.subgroupOf hyp.W) →* ℂˣ) (χ₂ χ₂' : (hyp.W2.subgroupOf hyp.W) →* ℂˣ) :
+    hyp.omegaProdChar (χ₁ * χ₁') (χ₂ * χ₂')
+      = hyp.omegaProdChar χ₁ χ₂ * hyp.omegaProdChar χ₁' χ₂' := by
+  ext w
+  simp only [omegaProdChar, MonoidHom.mul_apply, MonoidHom.comp_apply]
+  exact mul_mul_mul_comm _ _ _ _
+
 theorem omegaProdChar_inj (hyp : TICyclicHypothesis G)
     {χ₁ χ₁' : (hyp.W1.subgroupOf hyp.W) →* ℂˣ} {χ₂ χ₂' : (hyp.W2.subgroupOf hyp.W) →* ℂˣ}
     (h : hyp.omegaProdChar χ₁ χ₂ = hyp.omegaProdChar χ₁' χ₂') : χ₁ = χ₁' ∧ χ₂ = χ₂' :=
