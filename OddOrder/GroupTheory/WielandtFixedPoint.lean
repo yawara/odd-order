@@ -239,6 +239,56 @@ theorem isFrobenius_kernel_eq_bot_of_frobenius_subgroup {G : Type*} [Group G] [F
   have hcard := coprimeFrobeniusAction_card_eq_one act' hfixE hfixU
   exact Subgroup.card_eq_one.mp hcard
 
+/-- **Peterfalvi (9.1), the kernel-centralizes corollary (ambient form).**  Let a Frobenius group
+`U ⋊ E` (kernel `U`, complement `E`), realised as subgroups of `G` with `U ⊔ E ≤ N_G(N)`, act
+coprimely on a finite solvable subgroup `N`.  If the complement `E` acts **fixed-point-freely** on
+`N` (`C_N(E) = 1`), then the kernel `U` **centralizes** `N`.
+
+This is the form used in Peterfalvi (13.16): the Frobenius group `K W₂` (kernel `K`, complement
+`W₂`) with `C_{Q₁}(W₂) = 1` forces `K` to centralize the Maschke complement `Q₁` of `W₁` in `Q`.
+It is the ambient-subgroup packaging of `wielandt_fixedPoint_trivial_E_fixed` (`C_N(E) = 1 ⟹
+C_N(U) = N`), built through the conjugation action `U ⊔ E → MulAut N`. -/
+theorem frobenius_kernel_centralizes_of_complement_fpf {G : Type*} [Group G] [Finite G]
+    {N U E : Subgroup G} (hUEnorm : U ⊔ E ≤ Subgroup.normalizer (N : Set G))
+    (hUE : Ch06.IsFrobeniusGroup ↥(U ⊔ E) (U.subgroupOf (U ⊔ E)) (E.subgroupOf (U ⊔ E)))
+    (hsolv : IsSolvable ↥N)
+    (hcop : Nat.Coprime (Nat.card ↥N) (Nat.card ↥(U ⊔ E)))
+    (hEfpf : ∀ n ∈ N, (∀ e ∈ E, e * n * e⁻¹ = n) → n = 1) :
+    U ≤ Subgroup.centralizer (N : Set G) := by
+  classical
+  letI act : MulDistribMulAction ↥(U ⊔ E) ↥N :=
+    MulDistribMulAction.compHom (M := ↥(Subgroup.normalizer (N : Set G))) ↥N
+      (Subgroup.inclusion hUEnorm)
+  set φ : ↥(U ⊔ E) →* MulAut ↥N := MulDistribMulAction.toMulAut ↥(U ⊔ E) ↥N with hφ
+  have hφ_coe : ∀ (a : ↥(U ⊔ E)) (x : ↥N), ((φ a) x : G) = (a : G) * (x : G) * (a : G)⁻¹ :=
+    fun _ _ => rfl
+  let act' : CoprimeFrobeniusAction ↥(U ⊔ E) ↥N :=
+    { U := U.subgroupOf (U ⊔ E), E := E.subgroupOf (U ⊔ E), frobenius := hUE,
+      H_solvable := hsolv, φ := φ, coprime_order := hcop }
+  -- `C_N(E) = 1` ⟹ `act'.fixedByE = ⊥`.
+  have hE : act'.fixedByE = ⊥ := by
+    rw [eq_bot_iff]
+    intro n hn
+    rw [Subgroup.mem_bot]
+    refine OneMemClass.coe_eq_one.mp (hEfpf (n : G) n.2 (fun e he => ?_))
+    have heUE : e ∈ U ⊔ E := (le_sup_right : E ≤ U ⊔ E) he
+    have hfix := (mem_fixedSubgroup.mp hn) ⟨e, heUE⟩ (Subgroup.mem_subgroupOf.mpr he)
+    have hco := hφ_coe ⟨e, heUE⟩ n
+    rw [hfix] at hco
+    exact hco.symm
+  -- Wielandt (9.1): the kernel `U` then fixes all of `N`, i.e. `act'.fixedByU = ⊤`.
+  have hU : act'.fixedByU = ⊤ := wielandt_fixedPoint_trivial_E_fixed act' hE
+  -- Translate `fixedByU = ⊤` to `U ≤ C_G(N)`.
+  intro u hu
+  rw [Subgroup.mem_centralizer_iff]
+  intro n hn
+  have huUE : u ∈ U ⊔ E := (le_sup_left : U ≤ U ⊔ E) hu
+  have hnfix : (⟨n, hn⟩ : ↥N) ∈ act'.fixedByU := by rw [hU]; exact Subgroup.mem_top _
+  have hfix := (mem_fixedSubgroup.mp hnfix) ⟨u, huUE⟩ (Subgroup.mem_subgroupOf.mpr hu)
+  have hco := hφ_coe ⟨u, huUE⟩ ⟨n, hn⟩
+  rw [hfix] at hco
+  exact (mul_inv_eq_iff_eq_mul.mp hco.symm).symm
+
 end FrobeniusCentralizer
 
 end OddOrder.GroupTheory

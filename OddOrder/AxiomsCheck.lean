@@ -5659,6 +5659,10 @@ fully unconditional (axiom-clean).**  Likewise its corollaries and the (13.17.b)
 #assert_only_allowed_axioms OddOrder.GroupTheory.wielandt_fixedPoint_frobenius
 #assert_only_allowed_axioms OddOrder.GroupTheory.coprimeFrobeniusAction_card_eq_one
 #assert_only_allowed_axioms OddOrder.GroupTheory.isFrobenius_kernel_eq_bot_of_frobenius_subgroup
+-- Peterfalvi (9.1) kernel-centralizes corollary (ambient form): a Frobenius `U ⋊ E ≤ N_G(N)` acting
+-- coprimely on a finite solvable `N` with `C_N(E) = 1` has `U ≤ C_G(N)`.  The §8-free Wielandt step
+-- of (13.16): `K W₂` with `C_{Q₁}(W₂) = 1` ⟹ `K` centralizes the Maschke complement `Q₁`.
+#assert_only_allowed_axioms OddOrder.GroupTheory.frobenius_kernel_centralizes_of_complement_fpf
 
 /-! **(9.3) the order relation via Wielandt (9.1)** (`Peterfalvi.S11`).  Definition (8.4) makes
 `U W₁` a Frobenius group (kernel `U`) acting coprimely on `H = M_F` (`typeP_uW1_frobenius`,
