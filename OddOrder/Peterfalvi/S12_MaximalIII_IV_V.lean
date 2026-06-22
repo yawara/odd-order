@@ -4107,6 +4107,90 @@ theorem Hypothesis.exists_columnImageFamily [Finite G]
   exact ⟨j', hj'0, hj'j, ⟨hyp.columnImageFamily hG coh hmu hos hzS hz1 hzconj hδpm hδj hj0 hj'0
     (Ne.symm hj'j) hconj⟩⟩
 
+open scoped Classical FiniteInduce in
+/-- **§10 (5.5) for the column `μ_j`** (Peterfalvi (5.5) applied to the reducible column character):
+`μ_j^{τ₁} = ∑_{α ∈ E} α` for some `E ⊆ R(μ_j)` with `|E| = ‖μ_j‖² = w₁`.
+
+Builds the (5.4) `CharacterPsiDecomposition` for `(μ_j, ψ = 0)` against `τ = hyp.tau`,
+`τ₁ = coh.tau1` via `ofProjection` — the column `OrthonormalCharacterImageFamily`
+(`columnImageFamily`) supplies `R(μ_j)`; the coherence isometry `coh.coherent` supplies the
+lattice-relative inner-preservation (`extension_inner_eq`, on `ℤ[S] ⊇ {μ_j − μ̄_j, μ_j}`), the
+`τ`-agreement (`extends_on_supported`, `μ_j − μ̄_j` is `A_0`-supported), and the `ZIrr`-membership
+(`extension_mem_ZIrr`, `μ_j ∈ S`); the orthogonalities `⟨μ_j, 0⟩ = ⟨μ̄_j, 0⟩ = 0` are trivial and
+`⟨μ_j, μ̄_j⟩ = 0` is the cross-column Gram entry (`muGrid_inner_cross_column`, `j ≠ j'`).  Then
+`eq_sum_of_psi_eq_zero` extracts the (5.5) sum.  This is the second-to-last step of (10.6)(a); the
+final (5.8) full-column endgame then pins `E` to the single full column `{δ·ω_{ij}^σ}`. -/
+theorem Hypothesis.exists_muColumn_tau1_eq_sum_R [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} {hyp : Hypothesis M}
+    {params : CharacterParameters hyp} (coh : CoherentHypothesis hyp params)
+    (hmu : params.mu = hyp.muGrid hG hG.odd)
+    (hos : params.omegaSigma = hyp.alignedOmegaSigmaGrid hG hG.odd)
+    (hzS : params.zeta ∈ inducedFamily M) (hz1 : params.zeta 1 = (hyp.w1 : ℂ))
+    (hzconj : params.zeta.conj ≠ params.zeta)
+    (hδpm : params.delta = 1 ∨ params.delta = -1)
+    (hδj : ∀ j : Fin hyp.w2, j ≠ 0 → hyp.muColumnSign hG hG.odd j = params.delta)
+    (hd1 : ∀ jj : Fin hyp.w2, jj ≠ 0 → hyp.muGrid hG hG.odd 0 jj 1 ≠ 1)
+    {j : Fin hyp.w2} (hj0 : j ≠ 0) :
+    ∃ j' : Fin hyp.w2, j' ≠ 0 ∧ j' ≠ j ∧
+      ∃ E ⊆ Finset.univ.image (hyp.columnRImage hG hG.odd params.delta j j'),
+        coh.tau1 (∑ i : Fin hyp.w1, hyp.muGrid hG hG.odd i j) = ∑ α ∈ E, α ∧
+          (E.card : ℂ) = (hyp.w1 : ℂ) := by
+  haveI := hyp.finiteG
+  classical
+  obtain ⟨j', hj'0, hj'j, hconj⟩ := hyp.exists_conj_column hG hG.odd hj0
+  set χ := ∑ i : Fin hyp.w1, hyp.muGrid hG hG.odd i j with hχdef
+  have hχS : χ ∈ inducedFamily M := hyp.muGrid_column_sum_mem_inducedFamily hG hG.odd j (hd1 j hj0)
+  have hχcS : χ.conj ∈ inducedFamily M := by
+    rw [hχdef, hconj]; exact hyp.muGrid_column_sum_mem_inducedFamily hG hG.odd j' (hd1 j' hj'0)
+  -- `χ − χ̄ = ∑_i (α_{ij} − α_{ij'})` is `A_0`-supported and lies in `ℤ[S]`.
+  have hμdiff : χ - χ.conj
+      = ∑ i : Fin hyp.w1, (params.alpha i j - params.alpha i j') := by
+    rw [hχdef, hconj, ← Finset.sum_sub_distrib]
+    refine Finset.sum_congr rfl fun i _ => ?_
+    rw [params.alpha_def, params.alpha_def, hmu]; abel
+  have hsumsupp : ∀ s : Finset (Fin hyp.w1),
+      (∑ i ∈ s, (params.alpha i j - params.alpha i j')).support ⊆ hyp.A0 := by
+    intro s
+    induction s using Finset.induction with
+    | empty => rw [Finset.sum_empty, ClassFunction.support_zero]; exact Set.empty_subset _
+    | insert i s hi ih =>
+        rw [Finset.sum_insert hi]
+        refine (ClassFunction.support_add_subset _ _).trans (Set.union_subset ?_ ih)
+        exact (ClassFunction.support_sub_subset _ _).trans
+          (Set.union_subset (params.alpha_support i j hj0) (params.alpha_support i j' hj'0))
+  have hsuppmem : (χ - χ.conj) ∈ OddOrder.Peterfalvi.S07.zSupportedSpan hyp.Sset hyp.A0 :=
+    ⟨Submodule.sub_mem _ (Submodule.subset_span hχS) (Submodule.subset_span hχcS),
+      by rw [hμdiff]; exact hsumsupp Finset.univ⟩
+  -- the running coherence isometry preserves inner products on `ℤ[S] ⊇ zSpan {χ − χ̄, χ − 0}`.
+  have hspan : OddOrder.Peterfalvi.S07.zSpan (L := ↥M) {χ - χ.conj, χ - 0}
+      ≤ OddOrder.Peterfalvi.S07.zSpan hyp.Sset := by
+    apply Submodule.span_le.mpr
+    intro x hx
+    simp only [Set.mem_insert_iff, Set.mem_singleton_iff] at hx
+    rcases hx with rfl | rfl
+    · exact Submodule.sub_mem _ (Submodule.subset_span hχS) (Submodule.subset_span hχcS)
+    · rw [sub_zero]; exact Submodule.subset_span hχS
+  -- `⟨μ_j, μ̄_j⟩ = 0` (cross-column Gram entry).
+  have hχχbar : ClassFunction.inner χ χ.conj = 0 := by
+    rw [hχdef, hconj, OddOrder.RepresentationTheory.inner_sum_left]
+    refine Finset.sum_eq_zero fun i _ => ?_
+    rw [OddOrder.RepresentationTheory.inner_sum_right]
+    exact Finset.sum_eq_zero fun i' _ => hyp.muGrid_inner_cross_column hG hG.odd i i' hj'j.symm
+  -- assemble the (5.4) decomposition via `ofProjection` and apply (5.5).
+  let R := hyp.columnImageFamily hG coh hmu hos hzS hz1 hzconj hδpm hδj hj0 hj'0 (Ne.symm hj'j) hconj
+  let D : OddOrder.Peterfalvi.S07.CharacterPsiDecomposition hyp.tau χ 0 :=
+    OddOrder.Peterfalvi.S07.CharacterPsiDecomposition.ofProjection R coh.tau1
+      (fun φ ζ hφ hζ => coh.coherent.extension_inner_eq φ ζ (hspan hφ) (hspan hζ))
+      (coh.coherent.extends_on_supported _ hsuppmem)
+      (by rw [sub_zero]; exact coh.coherent.extension_mem_ZIrr χ (Submodule.subset_span hχS))
+      (by rw [ClassFunction.inner_zero_right])
+      (by rw [ClassFunction.inner_zero_right])
+      hχχbar
+  obtain ⟨_, hτ1, E, hEsub, hEsum, hEcard⟩ := D.eq_sum_of_psi_eq_zero
+  refine ⟨j', hj'0, hj'j, E, hEsub, ?_, ?_⟩
+  · rw [← hEsum]; exact hτ1
+  · rw [hEcard, hχdef, hyp.muGrid_column_sum_inner_self hG hG.odd j]
+
 open scoped FiniteInduce in
 /-- **§10 column-independent `τ₁`-residual** (the reduction step of Peterfalvi (10.6)(a)): for any
 two nontrivial columns `j, k ≠ 0`, the coherent images satisfy

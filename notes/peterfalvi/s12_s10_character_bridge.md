@@ -5,6 +5,22 @@
 > 上位文脈 = 記憶 [[ft-endgame-two-poles]] [[peterfalvi-s10-13-gated-on-bg-spine]]、
 > Lane H 視点の正本 = [`s10_13_maximal_structure.md`](s10_13_maximal_structure.md)。
 
+## ✅✅✅✅ 2026-06-23 更新¹² — image family + (5.5) チェーン完成、残り = σ-endgame final step のみ
+
+更新¹¹ の「次セッション」予定を**当セッション内で完走**: column image family 組立 → (5.5) 適用まで landed。
+**(10.6.a) は残り 1 step (σ-endgame で E を full column に pin) のみ**。
+
+- `columnImageFamily` + `exists_columnImageFamily` (`f6693952`): `OrthonormalCharacterImageFamily
+  hyp.tau (∑μ_ij)` 完成 (R(μ_j) 部品 `columnRImage`/`_inner`/`_injective`/`_sum` +
+  `alignedOmegaSigmaGrid_mem_ZIrr` を 4 field に discharge)。
+- **`exists_muColumn_tau1_eq_sum_R`** (`bd31dd8c`): (5.5) → **`μ_j^τ₁ = ∑_{α∈E} α`** (E⊆R(μ_j), |E|=w₁)。
+  ofProjection (extension_inner_eq/extends_on_supported/extension_mem_ZIrr + ⟨μ_j,μ̄_j⟩=0) +
+  eq_sum_of_psi_eq_zero。
+- **▶ 残り = σ-endgame final step**: `eq_smul_chiFam_column_of_vanishOnV` (在) に渡し E=full column pin。
+  **⚠ column 構造 P_i(j).2=κ(j) (product 構造) が必須** (orthonormality は joint inj で済んだが、σ-endgame の
+  sigmaCoeff 2-column support + 出力翻訳 ∑_p chiFam(p,kcol)=∑_i ω_ij^σ は product 要)。= 残る唯一の deep
+  2D-structure piece (`exists_alignedOmegaSigmaGrid_chiFam_family` を 2D 化 + W2-成分 i-独立)。正本 issue 1009。
+
 ## ✅✅✅ 2026-06-23 更新¹¹ — gate 解消 (issue 1010 CLOSED) + column image-family の全材料 landed
 
 更新¹⁰ の Hypothesis46 gate を **hub 裁可 (案 1) で解消し、column `OrthonormalCharacterImageFamily` の
