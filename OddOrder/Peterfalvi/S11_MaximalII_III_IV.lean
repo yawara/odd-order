@@ -421,6 +421,51 @@ theorem typeP_U_not_centralizes_H [Finite G] (data : TypePData M) (hU : data.U �
   have hUleH : data.U ≤ data.H := (le_sup_right.trans hM'eq.ge).trans hM'leH
   rw [← inf_of_le_left hUleH, inf_comm, typeP_H_inf_U data]
 
+/-- **Peterfalvi (8.5.b), first part**: `[U, U]` centralizes `H`, so `Ū = U/C_U(H)` is abelian — the
+structural input to Peterfalvi (9.7) case (b).
+
+`[U,U] ⊆ M'' = ⁅M', M'⁆` (`commutator_mono`, `U ≤ M' = derivedInG M`), and `M'' ⊆ F(M) =
+H ⊔ (U ⊓ C_M(H))` (`secondDerived_le_fitting`).  Since `[U,U] ⊆ U`, `U ⊓ H = ⊥`, and `K = U ⊓ C_M(H)`
+centralizes (hence normalizes) `H` — so `↑(H ⊔ K) = ↑H · ↑K` — any `x ∈ [U,U]` writes `x = h·c` with
+`h ∈ H`, `c ∈ K ⊆ U`; then `h = x·c⁻¹ ∈ U ⊓ H = ⊥`, so `x = c ∈ K ⊆ C_M(H)`. -/
+theorem typeP_commutator_U_centralizes_H (data : TypePData M) :
+    ⁅data.U, data.U⁆ ≤ Subgroup.centralizer (data.H : Set G) := by
+  set K := data.U ⊓ Subgroup.centralizer (data.H : Set G) with hK
+  -- `derivedInG J = ⁅J, J⁆`, so `M'' = secondDerivedInAmbient M = ⁅M', M'⁆`.
+  have hderiv : ∀ J : Subgroup G, derivedInG J = ⁅J, J⁆ := fun J => by
+    show (commutator ↥J).map J.subtype = ⁅J, J⁆
+    rw [commutator_def, Subgroup.map_commutator]
+    simp only [← MonoidHom.range_eq_map, Subgroup.range_subtype]
+  have hUU_M'' : ⁅data.U, data.U⁆ ≤ secondDerivedInAmbient M := by
+    show ⁅data.U, data.U⁆ ≤ derivedInG (derivedInG M)
+    rw [hderiv (derivedInG M)]
+    exact Subgroup.commutator_mono data.U_le data.U_le
+  have hUU_HK : ⁅data.U, data.U⁆ ≤ data.H ⊔ K := hUU_M''.trans data.secondDerived_le_fitting
+  have hUU_U : ⁅data.U, data.U⁆ ≤ data.U :=
+    Subgroup.commutator_le.mpr fun a ha b hb => by
+      rw [commutatorElement_def]
+      exact Subgroup.mul_mem _ (Subgroup.mul_mem _ (Subgroup.mul_mem _ ha hb)
+        (Subgroup.inv_mem _ ha)) (Subgroup.inv_mem _ hb)
+  -- `K ≤ C_M(H) ≤ N(H)`, so `↑(H ⊔ K) = ↑H · ↑K`.
+  have hKnorm : K ≤ Subgroup.normalizer data.H :=
+    inf_le_right.trans (Subgroup.centralizer_le_normalizer (data.H : Set G))
+  intro x hx
+  have hxU : x ∈ data.U := hUU_U hx
+  have hxHK : x ∈ (↑(data.H ⊔ K) : Set G) := hUU_HK hx
+  rw [Subgroup.coe_mul_of_right_le_normalizer_left data.H K hKnorm] at hxHK
+  obtain ⟨h, hh, c, hc, heq⟩ := Set.mem_mul.mp hxHK
+  have hcU : c ∈ data.U := (inf_le_left : K ≤ data.U) hc
+  have hhU : h ∈ data.U := by
+    have hheq : h = x * c⁻¹ := by rw [← heq]; group
+    rw [hheq]; exact Subgroup.mul_mem _ hxU (Subgroup.inv_mem _ hcU)
+  have hh1 : h = 1 := by
+    have hmem : h ∈ data.U ⊓ data.H := ⟨hhU, hh⟩
+    rw [inf_comm, typeP_H_inf_U data] at hmem
+    exact Subgroup.mem_bot.mp hmem
+  have hxc : x = c := by rw [← heq, hh1, one_mul]
+  rw [hxc]
+  exact (inf_le_right : K ≤ Subgroup.centralizer (data.H : Set G)) hc
+
 end Wielandt93
 
 /-! ### §8 inputs to (9.3)
