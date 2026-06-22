@@ -5591,3 +5591,5 @@ formula together with the prime computation `coprimeFrobeniusAction_card_eq_prim
 -- it but additionally carry `typeIII_IV_p_eq_W2`, which cites the still-`sorry`'d §12 prime-order
 -- result `theorem88_caseB_prime_orders`, so they are not yet axiom-clean.)
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S11.exists_chiefFactor_kernel
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S11.chiefFactor_quotient_card
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S11.iSup_smul_eq_top_of_irreducible

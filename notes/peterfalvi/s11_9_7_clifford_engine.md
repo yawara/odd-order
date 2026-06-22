@@ -65,15 +65,20 @@ Maschke = `exists_aInvariant_irreducible_summand_disjoint` (OperatorMaschke.lean
 - **step 1 着地分 (DONE)**: `chiefFactor_quotient_card : Nat.card (↥H ⧸ chief.N) = chief.p ^ data.q`
   (`quotient_order`+`H0_eq` から、instance 不要、sorry-free)。= dichotomy が読む「dim H̄ = q」基礎。
 
-**subgroup-level dichotomy 証明スケッチ** (次の実装対象):
+**subgroup-level dichotomy 証明スケッチ** (実装中):
 1. `S₀` := H̄ の極小 nonzero U-不変部分群 (`(Set.toFinite _).exists_minimal`, U-既約)。`d:=Nat.log p |S₀|`。
-2. `T := ⨆_{w∈W₁} (φ w)•S₀` (φ=`quotientMulAutHom N_aInvariant`、W₁-共役の join) は UW₁-不変・≠⊥
-   ⟹ `chief.quotient_chiefFactor` で `T=⊤`。**= H̄ は S₀ の W₁-共役で張られる** (要: 部分群への
-   W₁-作用 = pointwise `•` か `.map (φ w).toMonoidHom`、join の UW₁-不変性。`U◁UW₁` ゆえ各 `(φw)•S₀` は
-   U-不変、join も U-不変、W₁ は join を保つ)。
-3. 各 `(φ w)•S₀` は U-既約・`|·|=|S₀|=p^d` (共役は位数保存)。半単純 (Maschke) で H̄ は dim-d U-既約の
-   直和 ⟹ `|H̄|=(p^d)^k` ⟹ `q=dk` ⟹ `d∣q`。(「全 U-既約成分が dim d」: 成分は `⨆` の被加数の iso ⟹ 同 dim)。
+2. **✅ DONE (span step, commit 次)**: `iSup_smul_eq_top_of_irreducible` = **完全一般補題**
+   「既約 A-作用 (`∀ J, IsAInvariant φ J → J=⊥∨⊤`) で任意 nonzero `S₀` は軌道で全体を張る:
+   `⨆_{a:A} φ(a)•S₀ = ⊤`」。証明 = orbit join `T` は φ-不変 (reindex `a↦h·a`、`pointwise_mulAut_smul_eq_map`
+   +`Subgroup.map_iSup`+`smul_smul`) ∧ `S₀≤T` (a=1) ⟹ `T≠⊥` ⟹ 既約で `T=⊤`。**当初の「W₁-共役だけの join +
+   U◁UW₁」より簡単** — L=U⊔W1 全体の軌道 join で十分 (reindex が trivial)。`chief.quotient_chiefFactor` を
+   `H:=↥H⧸N`, `φ:=quotientMulAutHom N_aInvariant`, `S₀` で apply ⟹ H̄ は S₀ の (U⊔W1)-軌道で張られる。
+   (後で「W₁-共役で十分」= U◁ ゆえ各 `φ(uw)•S₀=φ(w)•S₀` は count 段で必要なら別途。)
+3. 各 `φ(g)•S₀` は U-既約・`|·|=|S₀|=p^d` (共役は位数保存)。半単純 (Maschke,
+   `exists_aInvariant_irreducible_summand_disjoint` 反復) で H̄ は dim-d U-既約の直和 ⟹ `|H̄|=(p^d)^k` ⟹
+   `q=dk` ⟹ `d∣q`。(「全 U-既約成分が dim d」: 成分は `⨆` の被加数の iso ⟹ 同 dim)。**← 次の実装対象**。
 4. `q` 素数: `d=q` (S₀=H̄=U-既約 ⟹ **CaseB**) か `d=1` (q 個の位数-p 成分 ⟹ **CaseA**)。
+   `chiefFactor_quotient_card` で `|H̄|=p^q`。
 
 ## アーキテクチャ (steps) — 旧 module-route (参考、上の subgroup-route を優先)
 
