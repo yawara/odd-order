@@ -187,8 +187,26 @@ conjugation centralizer core to P₀ acting on K, then passes to the order-`p` p
   type-`I` complement abelian rank ≤ 2 — a BG §16 consequence not extracted in repo).
 - **`exists_second_maximal` ((8.17.a))**: the second maximal `L ≠ M` with `P₀ ⊆ L_s` — from
   `bgTheoremE_cover_data` (`p ∈ π(G)` covered by some `π((M_i)_s)`) + `(8.11)`/Sylow conjugation.
-  `L ≠ M` is forced by `p ∣ |L_s|` ∧ `p ∤ |M_s| = |M_F|` (the coprimality just proved).  This needs
-  cover-data navigation + Hall + Sylow conjugation (~60-100 lines, the next attemptable obligation).
+  `L ≠ M` is forced by `p ∣ |L_s|` ∧ `p ∤ |M_s| = |M_F|` (the coprimality just proved).
+  **⛔ cross-lane gated (issue 2015)**: the cover gives `L₀ = reps i` of **arbitrary type `tau i`**,
+  and the Sylow-conjugation step needs `HasPeterfalviType (tau i) (g • L₀)` — i.e. the **general
+  5-type conjugation-invariance**.  `MaximalSubgroupTypeConj.lean` only has **F/I**
+  (`isTypeI_pointwise_smul`, `TypeFData.conj`, `TypeIData.conj`); II/III/IV/V are ABSENT (shared
+  infra, not lane-h-owned).  Also bottoms out in `bgTheoremE_cover_data` (BG §16, sorried).  ⟹
+  filed HUB issue 2015; (8.17.a) is blocked on that infra + BG §16, not a clean lane-h leaf.
+
+## ⛔ lane-h §12/§15 frontier status (2026-06-23): genuinely gated after maximal de-gating
+
+`(12.9)` is maximally de-gated (honest assembly + (8.12.b) discharged + coprime/normalize/
+K-not-perfect proven inline).  The remaining lane-h work is **genuinely gated**:
+- `(12.9)` residual: **(8.12.a)** [`P₀` rank-2, absent BG §16 — lane-f/b] + **(8.17.a)** [cross-lane
+  5-type conj infra, issue 2015 + BG §16 cover data].
+- `(12.10)`/`(12.11)`/`(12.13)`–`(12.16)`: gated on absent §8 ((8.13.c1)/(8.1.b)/(8.1.c) — BG §16)
+  + char ((6.8)/(7.11)/(7.8) — lane-b).
+- §15 `basic_structure` etc.: gated on `(10.11)`/`(11.7)` (char/BG, lane-b) for `P_order = p^q`.
+
+Next genuine lane-h progress needs one of: the 5-type conj infra (issue 2015, lane-f/hub), the
+lane-b char facts, or the genuinely-absent (8.12.a) [BG §16].
 
 ## ▶ Next steps — full (12.12) `complement_cyclic_order_dvd` (Pf 04.14 L67-74, §8-gated)
 
