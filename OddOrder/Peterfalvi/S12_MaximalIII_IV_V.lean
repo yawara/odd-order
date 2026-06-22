@@ -4033,6 +4033,80 @@ theorem Hypothesis.columnRImage_sum [Finite G] (hG : OddOrder.BG.IsMinimalSimple
   rw [← Finset.sum_add_distrib]
   exact Finset.sum_congr rfl (fun i _ => by abel)
 
+open scoped Classical FiniteInduce in
+/-- **§10 column `OrthonormalCharacterImageFamily`** (Peterfalvi (5.2.d) for the reducible column
+`μ_j`): the difference-image family `R(μ_j) = {δ·ω_{ij}^σ} ∪ {−δ·ω_{ij'}^σ}` of the column character
+`μ_j = ∑_i μ_{ij}` against the §10 Dade isometry `hyp.tau`.  This is the §10 analogue of the §6
+`certainTypeR`, built directly on `hyp.tau` (an `IntegralCharacterMap`) instead of the §6 Dade map.
+
+The `image_eq` field `hyp.tau(μ_j − μ̄_j) = ∑ R(μ_j)` combines the conjugate-column identity
+`μ̄_j = μ_{j'}` (`hconj`, from `exists_conj_column`), the (10.5) summed isometry
+`tau_muGrid_columnSum_diff` (`hyp.tau(μ_j − μ_{j'}) = δ(∑ω_{ij}^σ − ∑ω_{ij'}^σ)`), and
+`columnRImage_sum`; `orthonormal`/`mem_ZIrr` come from `columnRImage_inner`/`_injective` and
+`alignedOmegaSigmaGrid_mem_ZIrr`.  Feeding `ofProjection` (with `coh.tau1`, ψ = 0), the (5.5)
+`eq_sum_of_psi_eq_zero` then computes `μ_j^{τ₁} = ∑_{E ⊆ R(μ_j)} α`. -/
+noncomputable def Hypothesis.columnImageFamily [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} {hyp : Hypothesis M}
+    {params : CharacterParameters hyp} (coh : CoherentHypothesis hyp params)
+    (hmu : params.mu = hyp.muGrid hG hG.odd)
+    (hos : params.omegaSigma = hyp.alignedOmegaSigmaGrid hG hG.odd)
+    (hzS : params.zeta ∈ inducedFamily M) (hz1 : params.zeta 1 = (hyp.w1 : ℂ))
+    (hzconj : params.zeta.conj ≠ params.zeta)
+    (hδpm : params.delta = 1 ∨ params.delta = -1)
+    (hδj : ∀ j : Fin hyp.w2, j ≠ 0 → hyp.muColumnSign hG hG.odd j = params.delta)
+    {j j' : Fin hyp.w2} (hj0 : j ≠ 0) (hj'0 : j' ≠ 0) (hjj' : j ≠ j')
+    (hconj : (∑ i : Fin hyp.w1, hyp.muGrid hG hG.odd i j).conj
+      = ∑ i : Fin hyp.w1, hyp.muGrid hG hG.odd i j') :
+    OddOrder.Peterfalvi.S07.OrthonormalCharacterImageFamily hyp.tau
+      (∑ i : Fin hyp.w1, hyp.muGrid hG hG.odd i j) where
+  imageSet := Finset.univ.image (hyp.columnRImage hG hG.odd params.delta j j')
+  mem_ZIrr := by
+    intro α hα
+    rw [Finset.mem_image] at hα
+    obtain ⟨⟨b, i⟩, _, rfl⟩ := hα
+    cases b
+    · simp only [Hypothesis.columnRImage]
+      rw [Int.cast_smul_eq_zsmul]
+      exact (ZIrr G).smul_mem _ (hyp.alignedOmegaSigmaGrid_mem_ZIrr hG hG.odd i j)
+    · simp only [Hypothesis.columnRImage]
+      rw [neg_smul, Int.cast_smul_eq_zsmul]
+      exact neg_mem ((ZIrr G).smul_mem _ (hyp.alignedOmegaSigmaGrid_mem_ZIrr hG hG.odd i j'))
+  orthonormal := by
+    intro α hα β hβ
+    rw [Finset.mem_image] at hα hβ
+    obtain ⟨p, _, rfl⟩ := hα
+    obtain ⟨q, _, rfl⟩ := hβ
+    rw [hyp.columnRImage_inner hG hG.odd hδpm hjj']
+    by_cases hpq : p = q
+    · subst hpq; simp
+    · rw [if_neg hpq,
+        if_neg (fun he => hpq (hyp.columnRImage_injective hG hG.odd hδpm hjj' he))]
+  image_eq := by
+    rw [hconj, tau_muGrid_columnSum_diff hG coh hmu hos hzS hz1 hzconj hδpm hδj hj0 hj'0,
+      Finset.sum_image (fun p _ q _ hpq => hyp.columnRImage_injective hG hG.odd hδpm hjj' hpq),
+      hyp.columnRImage_sum, Finset.sum_sub_distrib]
+
+open scoped Classical FiniteInduce in
+/-- **§10 column image family exists** (issue 1009): the conjugate column `j'`
+(`exists_conj_column`) packages the column `OrthonormalCharacterImageFamily` for `μ_j` together with
+the `j' ≠ 0` datum (so the downstream `ofProjection`/(5.5) can read off `R(μ_j)`). -/
+theorem Hypothesis.exists_columnImageFamily [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} {hyp : Hypothesis M}
+    {params : CharacterParameters hyp} (coh : CoherentHypothesis hyp params)
+    (hmu : params.mu = hyp.muGrid hG hG.odd)
+    (hos : params.omegaSigma = hyp.alignedOmegaSigmaGrid hG hG.odd)
+    (hzS : params.zeta ∈ inducedFamily M) (hz1 : params.zeta 1 = (hyp.w1 : ℂ))
+    (hzconj : params.zeta.conj ≠ params.zeta)
+    (hδpm : params.delta = 1 ∨ params.delta = -1)
+    (hδj : ∀ j : Fin hyp.w2, j ≠ 0 → hyp.muColumnSign hG hG.odd j = params.delta)
+    {j : Fin hyp.w2} (hj0 : j ≠ 0) :
+    ∃ j' : Fin hyp.w2, j' ≠ 0 ∧ j' ≠ j ∧
+      Nonempty (OddOrder.Peterfalvi.S07.OrthonormalCharacterImageFamily hyp.tau
+        (∑ i : Fin hyp.w1, hyp.muGrid hG hG.odd i j)) := by
+  obtain ⟨j', hj'0, hj'j, hconj⟩ := hyp.exists_conj_column hG hG.odd hj0
+  exact ⟨j', hj'0, hj'j, ⟨hyp.columnImageFamily hG coh hmu hos hzS hz1 hzconj hδpm hδj hj0 hj'0
+    (Ne.symm hj'j) hconj⟩⟩
+
 open scoped FiniteInduce in
 /-- **§10 column-independent `τ₁`-residual** (the reduction step of Peterfalvi (10.6)(a)): for any
 two nontrivial columns `j, k ≠ 0`, the coherent images satisfy
