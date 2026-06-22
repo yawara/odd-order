@@ -1782,6 +1782,20 @@ theorem isCyclic_card_dvd_of_aInvariant_irreducible_faithful_comm
       (E := A) (M := (elabRepresentation p φ).asModule) (p := p) hcomm hfaith'
   exact ⟨hcyc, by rwa [hM] at hdvd⟩
 
+/-- **(9.7) case (a) bound.**  A group `A` acting on a group `K` of prime order `p` has its
+action-image `φ.range` of order dividing `p - 1`: `K` is cyclic, so `MulAut K ≅ (ZMod p)ˣ` has order
+`p - 1` (`IsCyclic.card_mulAut`), and `φ.range ≤ MulAut K`.  This is the `a ∣ p - 1` bound of
+Peterfalvi (9.7) case (a) for `a = |A : C_A(K)| = |φ.range|` (the `U`-action on an order-`p` Clifford
+factor `H₁` embeds `U/C_U(H₁)` into the cyclic `Aut(H₁)`). -/
+theorem card_range_dvd_card_sub_one_of_prime_card {A K : Type*} [Group A] [Group K] [Finite K]
+    (φ : A →* MulAut K) (hp : (Nat.card K).Prime) :
+    Nat.card ↥φ.range ∣ Nat.card K - 1 := by
+  haveI : Fact (Nat.card K).Prime := ⟨hp⟩
+  haveI : IsCyclic K := isCyclic_of_prime_card rfl
+  calc Nat.card ↥φ.range ∣ Nat.card (MulAut K) := Subgroup.card_subgroup_dvd_card _
+    _ = Nat.totient (Nat.card K) := IsCyclic.card_mulAut K
+    _ = Nat.card K - 1 := Nat.totient_prime hp
+
 /-- **(9.7) Clifford dimension dichotomy** (the arithmetic heart of (9.7)).  Restricting the
 `U W₁`-action on the chief factor `H̄ = H/H₀` to `U`, there is a minimal `U`-invariant `S₀ ≠ ⊥` of
 order `p^d` with `0 < d` and `d ∣ q`.  Since `q` is prime, `d ∈ {1, q}`: the dichotomy of (9.7),
