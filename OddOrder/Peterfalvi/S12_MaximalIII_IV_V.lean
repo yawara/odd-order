@@ -963,6 +963,86 @@ noncomputable def Hypothesis.alignedOmegaSigmaGrid [Finite G]
       (h.chiColumn χ₂ (finCongr hcardW1.symm i) : ClassFunction h.sdiffTICyclicHypothesis.W ℂ))
 
 open scoped FiniteInduce in
+/-- The canonical `(3.2)` Dade application of the type-`P` `TICyclicHypothesis`: the source of the
+`σ`-grids (`omegaSigmaGrid`, `alignedOmegaSigmaGrid`).  The TI-cyclic Dade hypothesis has trivial
+local subgroups (`HConjInvariant.of_forall_H_eq_bot`), so `Hypothesis.fullDadeIsometryData` applies.
+Definitionally equal to the `app` reconstructed inline in the grids, so any `σ`-machinery lemma
+(`chiFam`, `sigma`, `sigmaCoeff`) stated with this `app` aligns with the grids by `rfl`. -/
+noncomputable def Hypothesis.canonicalFullDadeApp [Finite G]
+    (_hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} (hyp : Hypothesis M)
+    (hodd : Odd (Nat.card G)) :
+    OddOrder.Peterfalvi.S05.TICyclicHypothesis.FullDadeApplication
+      (typePData_toTICyclicHypothesis hyp.typeP hodd) :=
+  ⟨(typePData_toTICyclicHypothesis hyp.typeP hodd).toDadeHypothesis.fullDadeIsometryData
+    (OddOrder.Peterfalvi.S04.Hypothesis.HConjInvariant.of_forall_H_eq_bot _ (fun _ => rfl))⟩
+
+open scoped FiniteInduce in
+/-- **Peterfalvi (10.5), aligned ω^σ-grid is a `χ`-family member** (the §10 analogue of the §6
+`certainTypeOmegaSigma_eq_chiFam`): `alignedOmegaSigmaGrid i j` is the `σ`-image of the irreducible
+(linear) character `η = compHom e (chiColumn χ₂ i)` of `tic.W` — `chiColumn` is `ω(omegaProdChar …)`
+hence a `linearIrreducibleCharacter`, and `compHom` of a linear character is again linear
+(`compHom_linearIrreducibleCharacter`).  By `sigma_irreducibleCharacter` it is the orthonormal family
+vector `χ_P` at the index `P = omegaIrrEquiv.symm η`.  This is what lets the (10.5) Dade-image
+trichotomy reuse the §6 `(4.8)` endgame (`sigmaCoeff_psi_eq`, `grid_trichotomy`). -/
+theorem Hypothesis.exists_alignedOmegaSigmaGrid_chiFam_family [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} (hyp : Hypothesis M)
+    (hodd : Odd (Nat.card G)) (i : Fin hyp.w1) :
+    ∃ P : Fin hyp.w2 →
+        (((typePData_toTICyclicHypothesis hyp.typeP hodd).W1.subgroupOf
+            (typePData_toTICyclicHypothesis hyp.typeP hodd).W) →* ℂˣ) ×
+          (((typePData_toTICyclicHypothesis hyp.typeP hodd).W2.subgroupOf
+            (typePData_toTICyclicHypothesis hyp.typeP hodd).W) →* ℂˣ),
+      Function.Injective P ∧
+        ∀ j, hyp.alignedOmegaSigmaGrid hG hodd i j
+          = (typePData_toTICyclicHypothesis hyp.typeP hodd).chiFam rfl
+              (hyp.canonicalFullDadeApp hG hodd) (P j) := by
+  haveI := hyp.finiteG
+  classical
+  -- reconstruct the lets of `alignedOmegaSigmaGrid`
+  let h := (hyp.toCertainTypeHypothesis hG hodd).toHypothesis
+  haveI : NeZero (Nat.card h.W1) := ⟨by have := h.one_lt_card_W1; omega⟩
+  haveI : IsCyclic ↥(h.W1 ⊔ h.W2) := h.isCyclic_sup
+  letI : CommGroup ↥(h.W1 ⊔ h.W2) := IsCyclic.commGroup
+  have hW1le : hyp.typeP.W1 ≤ M := hyp.typeP.W1_le
+  have hW2le : hyp.typeP.W2 ≤ M := typePData_W2_le_self hyp.typeP
+  have hcardW1 : Nat.card ↥h.W1 = hyp.w1 :=
+    Nat.card_congr (Subgroup.subgroupOfEquivOfLe hW1le).toEquiv
+  have hcardW2sub : Nat.card ↥(h.W2.subgroupOf (h.W1 ⊔ h.W2)) = hyp.w2 := by
+    rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe (le_sup_right)).toEquiv]
+    exact Nat.card_congr (Subgroup.subgroupOfEquivOfLe hW2le).toEquiv
+  haveI : NeZero (Nat.card ↥(h.W2.subgroupOf (h.W1 ⊔ h.W2))) := ⟨Nat.card_pos.ne'⟩
+  let χ₂ : Fin hyp.w2 → (h.W2.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ :=
+    fun j => finCardEquivCharacterGroup _ (finCongr hcardW2sub.symm j)
+  let tic := typePData_toTICyclicHypothesis hyp.typeP hodd
+  haveI : NeZero (Nat.card ↥tic.W1) := ⟨Nat.card_pos.ne'⟩
+  haveI : NeZero (Nat.card ↥tic.W2) := ⟨Nat.card_pos.ne'⟩
+  let e : ↥tic.W ≃* ↥(h.W1 ⊔ h.W2) :=
+    (Subgroup.subgroupOfEquivOfLe (typePData_W_le_self hyp.typeP)).symm.trans
+      (MulEquiv.subgroupCongr (typePData_sup_subgroupOf_eq hyp.typeP).symm)
+  -- the transported `chiColumn` is the linear (irreducible) character `η j` of `tic.W`.
+  let η : Fin hyp.w2 → IrreducibleCharacter ↥tic.W := fun j =>
+    linearIrreducibleCharacter
+      ((h.sdiffTICyclicHypothesis.omegaProdChar (h.w1CharEquiv (finCongr hcardW1.symm i)) (χ₂ j)).comp
+        e.toMonoidHom)
+  refine ⟨fun j => tic.omegaIrrEquiv.symm (η j), ?_, ?_⟩
+  · -- injectivity: peel off the injective maps `omegaIrrEquiv.symm`, `linearIrreducibleCharacter`,
+    -- precompose-`e`, `omegaProdChar(·, ·)`, `finCardEquivCharacterGroup`, `finCongr`.
+    intro j j' hjj'
+    have h1 : η j = η j' := tic.omegaIrrEquiv.symm.injective hjj'
+    have h2 := linearIrreducibleCharacter_injective h1
+    have h3 := (MonoidHom.cancel_right (MulEquiv.surjective e)).mp h2
+    have h4 := (h.sdiffTICyclicHypothesis.omegaProdChar_inj h3).2
+    exact (finCongr hcardW2sub.symm).injective ((finCardEquivCharacterGroup _).injective h4)
+  · -- value: `alignedOmegaSigmaGrid i j = σ(η j) = χ_{omegaIrrEquiv.symm (η j)}`.
+    intro j
+    have step1 : hyp.alignedOmegaSigmaGrid hG hodd i j
+        = tic.sigma rfl (hyp.canonicalFullDadeApp hG hodd) (η j : ClassFunction ↥tic.W ℂ) := by
+      change tic.sigmaIntegral rfl (hyp.canonicalFullDadeApp hG hodd) (η j : ClassFunction ↥tic.W ℂ)
+          = tic.sigma rfl (hyp.canonicalFullDadeApp hG hodd) (η j : ClassFunction ↥tic.W ℂ)
+      rw [OddOrder.Peterfalvi.S05.TICyclicHypothesis.sigmaIntegral_apply]
+    rw [step1, OddOrder.Peterfalvi.S05.TICyclicHypothesis.sigma_irreducibleCharacter]
+
+open scoped FiniteInduce in
 /-- **§10 within-column degree constancy** (Peterfalvi (4.5.a), the `i`-independence half of
 (10.3)): within a fixed `W₂`-column `j`, the degree `μ_{ij}(1)` of the materialized `μ`-grid does
 not depend on the row `i`.  This is the §6 fact `columnFamily_difference_apply_one` (the
