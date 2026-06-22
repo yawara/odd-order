@@ -1710,7 +1710,13 @@ step (`card_eq_pow_of_iSup_aInvariant_irreducible`): `|H̄| = |S₀|^k`, while `
 theorem chiefFactor_clifford_dim_dvd_q [Finite G] {M : Subgroup G}
     {data : TypesIIIIIIVSetup M} (chief : ChiefFactorData data) :
     ∃ (d : ℕ) (S₀ : Subgroup (↥data.H ⧸ chief.N)),
-      0 < d ∧ d ∣ data.q ∧ S₀ ≠ ⊥ ∧ Nat.card ↥S₀ = chief.p ^ d := by
+      0 < d ∧ d ∣ data.q ∧ S₀ ≠ ⊥ ∧ Nat.card ↥S₀ = chief.p ^ d ∧
+      IsAInvariant ((typeP_quotientCoprimeAction data.typeP data.nontrivial.1
+          chief.N_aInvariant).φ.comp (typeP_quotientCoprimeAction data.typeP data.nontrivial.1
+          chief.N_aInvariant).U.subtype) S₀ ∧
+      (∀ J, IsAInvariant ((typeP_quotientCoprimeAction data.typeP data.nontrivial.1
+          chief.N_aInvariant).φ.comp (typeP_quotientCoprimeAction data.typeP data.nontrivial.1
+          chief.N_aInvariant).U.subtype) J → J ≤ S₀ → J = ⊥ ∨ J = S₀) := by
   classical
   have hU : data.typeP.U ≠ ⊥ := data.nontrivial.1
   haveI : chief.N.Normal := chief.N_normal
@@ -1751,10 +1757,55 @@ theorem chiefFactor_clifford_dim_dvd_q [Finite G] {M : Subgroup G}
     rcases Nat.eq_zero_or_pos d with h0 | h
     · rw [h0, pow_zero] at hd; exact absurd (Subgroup.card_eq_one.mp hd) hS₀ne
     · exact h
-  exact ⟨d, S₀, hdpos, ⟨k, hdk⟩, hS₀ne, hd⟩
+  exact ⟨d, S₀, hdpos, ⟨k, hdk⟩, hS₀ne, hd, hS₀inv, hirr₀⟩
+
+/-- **(9.7) structural dichotomy** (the Clifford case split, read off the chief factor).  With
+`q = |W₁|` prime, the chief factor `H̄` is, under the restricted `U`-action, *either*
+`U`-irreducible (Clifford case (b): every `U`-invariant subgroup is `⊥` or `⊤`) *or* contains a
+`U`-invariant subgroup of order `p` (Clifford case (a)).
+
+This is the arithmetic dichotomy `d ∈ {1, q}` of `chiefFactor_clifford_dim_dvd_q` read through the
+primality of `q`: the minimal nonzero `U`-invariant piece `S₀` has order `p^d` with `d ∣ q`, so
+either `d = q` (`|S₀| = p^q = |H̄|`, hence `S₀ = ⊤`, and minimality forces `U`-irreducibility)
+or `d = 1` (`|S₀| = p`).  Packaging the two cases into the carriers `CliffordCaseAData` /
+`CliffordCaseBData` (the order-`p` factor pullback / the `End_{𝔽ₚ[U]}(H̄)` field model) is the
+remaining work of `clifford_dichotomy`. -/
+theorem chiefFactor_clifford_U_dichotomy [Finite G] {M : Subgroup G}
+    {data : TypesIIIIIIVSetup M} (chief : ChiefFactorData data) :
+    (∀ J : Subgroup (↥data.H ⧸ chief.N),
+        IsAInvariant ((typeP_quotientCoprimeAction data.typeP data.nontrivial.1
+          chief.N_aInvariant).φ.comp (typeP_quotientCoprimeAction data.typeP data.nontrivial.1
+          chief.N_aInvariant).U.subtype) J → J = ⊥ ∨ J = ⊤) ∨
+    (∃ S₀ : Subgroup (↥data.H ⧸ chief.N), S₀ ≠ ⊥ ∧
+        IsAInvariant ((typeP_quotientCoprimeAction data.typeP data.nontrivial.1
+          chief.N_aInvariant).φ.comp (typeP_quotientCoprimeAction data.typeP data.nontrivial.1
+          chief.N_aInvariant).U.subtype) S₀ ∧ Nat.card ↥S₀ = chief.p) := by
+  obtain ⟨d, S₀, _hdpos, hdq, hS₀ne, hcard, hS₀inv, hirr₀⟩ :=
+    chiefFactor_clifford_dim_dvd_q chief
+  -- `q = |W₁|` is prime and `d ∣ q`, so `d = 1` or `d = q`.
+  have hq_prime : (data.q).Prime := data.nontrivial.2.1
+  rcases hq_prime.eq_one_or_self_of_dvd d hdq with hd1 | hdq2
+  · -- `d = 1`: a `U`-invariant subgroup of order `p`.  Clifford case (a).
+    exact Or.inr ⟨S₀, hS₀ne, hS₀inv, by rw [hcard, hd1, pow_one]⟩
+  · -- `d = q`: `|S₀| = p^q = |H̄|` ⟹ `S₀ = ⊤`; minimality ⟹ `U`-irreducible.  Case (b).
+    have hS₀top : S₀ = ⊤ :=
+      Subgroup.eq_top_of_card_eq _ (by rw [hcard, hdq2, chiefFactor_quotient_card chief])
+    refine Or.inl fun J hJinv => ?_
+    by_cases hJ : J = ⊥
+    · exact Or.inl hJ
+    · exact Or.inr
+        (((hirr₀ J hJinv (le_top.trans_eq hS₀top.symm)).resolve_left hJ).trans hS₀top)
 
 /-- **Peterfalvi (9.7)**: the Clifford-theory dichotomy for the action on the
-chief factor `H/H_0`. -/
+chief factor `H/H_0`.
+
+The case split itself is `chiefFactor_clifford_U_dichotomy` (sorry-free): `U` acts on `H̄` either
+irreducibly (case (b)) or with a `U`-invariant order-`p` factor (case (a)).  What remains is to
+package each branch into its character-theoretic carrier — the `q` order-`p` factors and the bound
+`a ∣ p-1` for case (a), and the field-model divisibilities `Coprime u (p-1)`,
+`u ∣ (p^q-1)/(p-1)` for case (b).  The latter need the chief factor pinned as a 1-dimensional space
+over `End_{𝔽ₚ[U]}(H̄)` (a finite division ring, hence a field by `littleWedderburn`), and require
+`chars.u` to be tied to `|Ū|` (the carrier currently leaves `u` free via `u_eq_card_quotient`). -/
 theorem clifford_dichotomy [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     {M : Subgroup G} {data : TypesIIIIIIVSetup M} {chief : ChiefFactorData data}
     (chars : Section11CharacterData data chief) :
