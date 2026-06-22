@@ -144,7 +144,14 @@ lane-f RESUME。Cor 14.12 残 = conjunct 2/3/4 (σ-decomposition of `H`) で `S1
 - **`H∩M*=D`** = main equality (`sdprod_sigma` + Fitting-Hall; D≠H∩M* case は Thm 12.5(e) `Msigma_nilpotent_of_tau2` 系 + C_{H_σ}(K)≠1→q∈τ₂(H) 矛盾)。
 - conjunct 3 (`M⊓H=U⊔K`): Fu=O_{(σ∪κ)'}(F(H)), U⊆Fu, M∩Fu=U (Hall) + defNMU。conjunct 4 (`N_H(U)⊄M`): N_H(U)≤M⟹H~M (eq_mmax + nilpotent_sub_norm) vs notMGH。
 
-**解決済 API (grep 済)**: `Ch03.hall_D` (S03:1486, solvable Hall-superset) / `sigma_disjoint_of_nonconjugate` (S13_Theorem1310:159, Thm 13.9) / `Msigma_isPiGroup` (S10_HallStructureCore:227) / `fitting_coprime_abelian_decomp` (Isaacs Ch05:352) / `Msigma_isHall` (S10_HallStructure:584) / Lemma 14.11 (S14:8845)。**要探索 API**: σ-core sdprod 補元 (Msigma normal Hall の complement), O_q pcore + `coprime_mulGp_Hall`/`sub_Hall_pcore`/`sub_normal_Hall` の mathlib 名, subnormal (Isaacs Ch02_Subnormality), Thm 12.5(e) 正確形。**~150-200 行、2 session 規模**。
+**解決済 API (grep 済)**: `Ch03.hall_D` (S03:1486, solvable Hall-superset) / `sigma_disjoint_of_nonconjugate` (S13_Theorem1310:159, Thm 13.9) / `Msigma_isPiGroup` (S10_HallStructureCore:227) / `fitting_coprime_abelian_decomp` (Isaacs Ch05:352) / `Msigma_isHall` (S10_HallStructure:584) / Lemma 14.11 (S14:8845)。
+
+**★ de-risk 追補 (cont.¹¹ session 末、grep 確定)** — sK_FD の最大 gating だった `hE:IsComplement'` 構成が解消:
+- **`D` は `exists_subgroupESetup_with_le hG hHmax hKH hsH_K'` で取得**（S12_Proposition1215:260; `hsH_K'`=hsH_K を IsPiSubgroup 形に）→ `⟨E,E₁,E₂,E₃,hsetup,hKE,hE_pi⟩`、**E⊇K かつ σ(H)'-Hall かつ補元内蔵**。これで自前 hall_D の D 構成は不要（E を D に使う）。
+- **Lemma 14.11 の `hE` = `hsetup.isComplement'_subgroupOf`**（SubgroupESetup メソッド、Msigma-first 形 `(Msigma H).subgroupOf H).IsComplement' (E.subgroupOf H)`; S15_MF:608 が `.symm` で使用＝無印が Msigma-first）。`hEM`=`hsetup.E_le`。
+- **σ-core sdprod (sUHs/H∩M* 用) も E-setup の `E_compl_inf`/`E_compl_sup` から**（`Msigma H ⊓ E=⊥`, `Msigma H ⊔ E=M`=H）。別途 sdprod_sigma API 不要。
+- **subnormal (sDMst 用)** = `isSubnormal_of_isNilpotent_finite`（Isaacs Ch02_Subnormality/Main:94, nilpotent⟹subnormal）+ `Subgroup.IsSubnormal` の trans/Fitting API（同ファイル）。
+- **残・要探索 API（sUHs HsDq のみ）**: `O_q` pcore + `coprime_mulGp_Hall`（H_σ·O_q(D) の q'-Hall）/ `sub_Hall_pcore`（q群⊆O_q(F(D))）/ `sub_normal_Hall`（U q'群⊆H_σ）の mathlib 名。Thm 12.5(e)=`Msigma_nilpotent_of_tau2`(S12_Theorem125:101) が候補。**∴ 上半 (sK_FD/sDMst) は API 全解決、下半 sUHs の pcore-Hall 3 本のみ未確定。~120-180 行、1.5 session 規模**。
 
 **2026-06-22 (cont.¹⁰) ✅✅ BG Cor 14.12 conjunct 1 (`IsTypeF H`) 完全完成 — `notMstGH` close、sorry-free** (commit `81fba262`, full build 3881 green, FT-path sorry 133→132):
 
