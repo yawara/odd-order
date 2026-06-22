@@ -1,0 +1,34 @@
+---
+id: 77
+slug: s11-maximaliiiiv-split
+title: "S11_MaximalII_III_IV 分割 (1589 行, >1500 — C の (9.7) engine で増加見込み)"
+created: 2026-06-22
+---
+
+# S11_MaximalII_III_IV 分割 (1589 行, >1500 — C の (9.7) engine で増加見込み)
+
+## 背景
+
+`OddOrder/Peterfalvi/S11_MaximalII_III_IV.lean` が 2026-06-22 tick (merge `057953f5`,
+(9.7) Clifford engine step 0 = ChiefFactorData de-opacify) で **1589 行**に到達 (>1500)。
+現所有 = lane-c (2026-06-22 relane で H→C 移譲、Wielandt §9 / Clifford 9.6-9.11)。
+(9.7) Clifford decomposition engine は 5-10 session 規模 (issue 4006) ゆえ **今後さらに増える**。
+
+## やること
+
+- [ ] (9.7) engine が一段落して凍結境界ができたら、Wielandt §9 chain (9.1-9.6, 完成済) を
+      上流 leaf (例 `S11_Wielandt.lean`) に prefix-split し、active な (9.7)-(9.11) を残す
+- [ ] 新規 leaf を `OddOrder.lean` の root closure に追加
+- [ ] full build green + AxiomsCheck OK 確認
+- 実施 owner = hub (lane-c の frontier と衝突しない凍結境界で)。lane-c の default は「新主結果番号=新 leaf」
+
+## 完了条件
+
+S11_MaximalII_III_IV.lean が ~1500 行以下 (または topic-coherent な複数 leaf + hub)、full build green 維持。
+
+## 参照
+
+- merge_monitor.md「各イテレーションの手順」step 4 (サイズ watch)
+- issue 4006 ((9.7) Clifford engine = 5-10 session) / 4005 (relane H→C)
+- merge `057953f5` (1589 行到達)
+- [[feedback-record-deferred-hub-tasks-as-issues]]
