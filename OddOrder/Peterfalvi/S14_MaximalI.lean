@@ -444,20 +444,16 @@ theorem exists_orderP_centralizer_witness [Finite G]
     rintro z rfl
     exact Commute.pow_left (hg y rfl) n
 
-/-- **Peterfalvi (12.9), structural inputs for `P₀` and `K = M_F`** — a §8 obligation
-(`(8.12.a)` + Hypothesis `(12.8)` + `(8.11)`, all BG §16 consequences):
+/-- **Peterfalvi (12.9), the rank-two input for `P₀`** — the residual §8 obligation `(8.12.a)`
+(a BG §16 consequence, **absent** from the repo): every Sylow subgroup of the type-`I` complement
+`U` (`M = M_F ⋊ U`) is abelian of rank `≤ 2`; here, with `P₀` noncyclic (Hypothesis `(12.8)`,
+`ctr.P0_noncyclic`), this forces `P₀` abelian of rank exactly `2`.
 
-* `P₀` is **abelian of rank `2`** — `(8.12.a)` gives every Sylow of the type-`I` complement
-  abelian of rank `≤ 2`, and `P₀` noncyclic (`ctr.P0_noncyclic`) forces rank `2`;
-* `P₀` is **coprime to `K`** — `(8.11)` makes `M_F` a Hall subgroup and `p ∣ [M : M_F]`
-  (`ctr.p_dvd_index`) gives `p ∤ |M_F|`, so the `p`-group `P₀` is coprime to `K = M_F`;
-* `P₀ ≤ N_G(K)` (as `P₀ ≤ M` and `K = M_F ◁ M`); and `K` is **not perfect** (`M_F` is nilpotent
-  and nontrivial). -/
+(The other structural inputs `P₀` coprime to `K`, `P₀ ≤ N_G(K)`, `⁅K, K⁆ ≠ K` are discharged in
+`exists_rankTwoWitness` from `(8.11)` [`M_F` Hall] and `M_F ◁ M` nilpotent + nontrivial.) -/
 theorem counterexample_P0_K_structure [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     (ctr : CounterexampleHypothesis (G := G)) :
-    IsMulCommutative ↥ctr.P0 ∧ rank ↥ctr.P0 = 2 ∧
-      Nat.Coprime (Nat.card ↥ctr.P0) (Nat.card ↥ctr.K) ∧
-      ctr.P0 ≤ Subgroup.normalizer ctr.K ∧ ⁅ctr.K, ctr.K⁆ ≠ ctr.K := by
+    IsMulCommutative ↥ctr.P0 ∧ rank ↥ctr.P0 = 2 := by
   sorry
 
 /-- **Peterfalvi (12.9), existence of the second maximal `L`** — a §8 obligation
@@ -528,8 +524,42 @@ Honest assembly: the structural inputs `(8.12.a)`/`(8.11)` (`counterexample_P0_K
 theorem exists_rankTwoWitness [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     (ctr : CounterexampleHypothesis (G := G)) :
     IsMulCommutative ↥ctr.P0 ∧ rank ↥ctr.P0 = 2 ∧ Nonempty (RankTwoWitnessData ctr) := by
-  obtain ⟨hab, hrank, hcop, hnorm, hperf⟩ := counterexample_P0_K_structure hG ctr
+  obtain ⟨hab, hrank⟩ := counterexample_P0_K_structure hG ctr
   refine ⟨hab, hrank, ?_⟩
+  haveI : Fact ctr.p.Prime := ⟨ctr.p_prime⟩
+  have hKM : ctr.K ≤ ctr.M := ctr.K_eq_MF ▸ OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_le ctr.M
+  -- `P₀` coprime to `K`: `(8.11)` makes `M_F` Hall (`p ∤ |M_F|` from `p ∣ [M : M_F] ∣ [G : M_F]`).
+  have hcop : Nat.Coprime (Nat.card ↥ctr.P0) (Nat.card ↥ctr.K) := by
+    have hHall := (OddOrder.Peterfalvi.S10.hall_maxNilpotentNormalHall_and_mainSubgroup hG
+      ctr.M_maximal (tau := PeterfalviType.I) ctr.M_typeI).1
+    rw [← ctr.K_eq_MF] at hHall
+    have hp_idx : ctr.p ∣ ctr.K.index :=
+      ctr.p_dvd_index.trans (Subgroup.relIndex_dvd_index_of_le hKM)
+    have hcop_p : Nat.Coprime ctr.p (Nat.card ↥ctr.K) :=
+      Nat.Coprime.coprime_dvd_left hp_idx hHall.coprime_index.symm
+    obtain ⟨n, hn⟩ := IsPGroup.iff_card.mp ctr.P0_pGroup
+    rw [hn]; exact hcop_p.pow_left n
+  -- `P₀ ≤ N_G(K)` from `M_F ◁ M` (`maxNilpotentNormalHall_le_normalizer`).
+  have hnorm : ctr.P0 ≤ Subgroup.normalizer ctr.K := by
+    rw [ctr.K_eq_MF]
+    exact ctr.P0_le_M.trans (OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_le_normalizer ctr.M)
+  -- `⁅K, K⁆ ≠ K`: `K = M_F` is nilpotent and nontrivial, hence not perfect.
+  have hperf : ⁅ctr.K, ctr.K⁆ ≠ ctr.K := by
+    obtain ⟨tiData⟩ := ctr.M_typeI
+    have hKH : ctr.K = tiData.typeF.H := ctr.K_eq_MF.trans tiData.typeF.H_eq.symm
+    haveI : Nontrivial ↥ctr.K :=
+      ctr.K.nontrivial_iff_ne_bot.mpr (hKH ▸ tiData.typeF.H_nontrivial)
+    haveI : Group.IsNilpotent ↥ctr.K :=
+      ctr.K_eq_MF ▸ OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_isNilpotent ctr.M
+    have hlt : commutator ↥ctr.K < ⊤ :=
+      IsSolvable.commutator_lt_top_of_nontrivial (G := ↥ctr.K)
+    intro hEq
+    have htop_map : (⊤ : Subgroup ↥ctr.K).map ctr.K.subtype = ctr.K := by
+      ext g
+      simp only [Subgroup.mem_map, Subgroup.mem_top, true_and]
+      exact ⟨fun ⟨y, hy⟩ => hy ▸ y.2, fun hg => ⟨⟨g, hg⟩, rfl⟩⟩
+    exact hlt.ne (Subgroup.map_injective ctr.K.subtype_injective
+      (by rw [Subgroup.map_subtype_commutator, hEq, htop_map]))
   obtain ⟨x, hxP0, hxne, hxp, hCKx⟩ := exists_orderP_centralizer_witness ctr hab hcop hnorm hperf
   obtain ⟨L, Lt, hLmax, hLne, hLt, hPL⟩ := exists_second_maximal hG ctr
   obtain ⟨hNx, hCx⟩ := centralizer_control_of_CKx hG ctr hLmax hLne hLt hPL hxP0 hxne hCKx
