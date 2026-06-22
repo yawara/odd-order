@@ -141,6 +141,36 @@ conjugation [hard plumbing over `BGTheoremECoverData`]; (c) the centralizer conj
 (needs the `Ω₁(P₀)`-noncyclic + `M_F`-Hall-coprime setup); (d) `N_G(⟨x⟩) ⊆ M`, `C_G(x) ⊄ L` ←
 **(8.12.b)** (`typeI_or_typeII_centralizer_unique`).
 
+## ✅✅✅ (12.9) honest assembly LANDED (2026-06-23 lane-h resume¹⁰ cont., commits `c99cbe7e` / `cd9d8286`)
+
+The scaffold is **faithful-ized** and **(12.9) `exists_rankTwoWitness` is sorry-free**, honestly
+reduced to genuine math + faithful §8 obligations.
+
+**Faithful-ized** (`c99cbe7e`): `CounterexampleHypothesis` (opaque Props → `P0_pGroup`/`P0_sylow`
+[`IsPGroup` + `relIndex`], `P0_noncyclic`, `p_dvd_index` `p ∣ [M:M_F]`, `minimal_p` via new `InPi`
+predicate) and `RankTwoWitnessData` (`L_type`/`L_hasType` + `P0_le_Ls` `P₀⊆L_s`, `x_mem_omega1`
+`x^p=1`, `CKx_not_le_Kprime` `C_K(x)⊄K'`, `centralizer_x_not_le_L`).  (12.11) facts moved out of the
+witness to the honest conclusion of `intersection_complement_structure`.  (12.9) conclusion is now
+`IsMulCommutative P₀ ∧ rank P₀ = 2 ∧ Nonempty (RankTwoWitnessData)`.
+
+**Genuine, §8-free, axiom-clean** (`cd9d8286`, AxiomsCheck-registered):
+`exists_orderP_centralizer_witness` — from the counterexample data (P₀ abelian, coprime to K=M_F,
+normalizing K, K not perfect) ∃ order-`p` `x ∈ Ω₁(P₀)^#` with `C_K(x) ⊄ K'`.  Applies the
+conjugation centralizer core to P₀ acting on K, then passes to the order-`p` power `x = y^(|y|/p)`
+(its centralizer ⊇ `C_K(y)`, so still escapes K').  Uses `IsPGroup.iff_orderOf` + `orderOf_injective`
++ `Commute.pow_left`.
+
+**Faithful §8 obligations** (sorried, citing BG §16 / repo S10 — the residual §8-gate):
+- `counterexample_P0_K_structure` ((8.12.a)[ABSENT rank-2]+(8.11)[Hall coprime]): P₀ abelian rank 2,
+  coprime to K, normalizing K, K not perfect.
+- `exists_second_maximal` ((8.17.a) `bgTheoremE_cover_data` + Sylow conjugation): L, L_type, P₀⊆L_s.
+- `centralizer_control_of_CKx` ((8.12.b) `typeI_or_typeII_centralizer_unique`): N_G(⟨x⟩)⊆M, C_G(x)⊄L.
+
+`exists_rankTwoWitness` assembles these into the witness.  **Discharging the 3 obligations is the
+residual §8 plumbing** (rank-2 is absent (8.12.a); (8.12.b)'s `N_G(⟨x⟩)⊆M` exceeds the available
+`typeI_or_typeII_centralizer_unique`; (8.17.a) needs cover-data extraction + Sylow conjugation —
+all hard/partly-absent BG §16 territory).
+
 ## ▶ Next steps — full (12.12) `complement_cyclic_order_dvd` (Pf 04.14 L67-74, §8-gated)
 
 The book proof of (12.12): let `P = O_p(H)`, `T = Ω₁(Z(P))` (elem-ab of order `p` or `p²`),

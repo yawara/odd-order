@@ -701,6 +701,11 @@ set_option linter.style.longLine false in
 -- normalizing a coprime `K` with `⁅K, K⁆ ≠ K` has `x ∈ A^#` with `C_G(x) ⊓ K ⊄ ⁅K, K⁆`.
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.S14.exists_mem_centralizer_inf_not_le_commutator
+-- Peterfalvi (12.9) order-p centralizer witness (the §8-free heart of (12.9)): from the
+-- counterexample data (P₀ abelian, coprime to K = M_F, normalizing K, K not perfect) there is
+-- an order-p element x ∈ Ω₁(P₀)^# with C_K(x) ⊄ K' (centralizer core + order-p power).
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S14.exists_orderP_centralizer_witness
 -- RepresentationTheory: completeness of irreducible characters — `f ⊥ Irr G ⇒ f = 0`
 -- (regular representation + Maschke + Schur).
 #assert_only_allowed_axioms OddOrder.RepresentationTheory.classFunction_eq_zero_of_orthogonal

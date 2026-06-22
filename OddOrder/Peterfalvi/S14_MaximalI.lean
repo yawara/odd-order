@@ -385,12 +385,158 @@ theorem exists_mem_centralizer_inf_not_le_commutator
     obtain ⟨m, hm, hmn⟩ := Subgroup.mem_map.mp hmem
     exact hn_out (by rw [show n = m from Subtype.ext hmn.symm]; exact hm)
 
+/-- **Peterfalvi (12.9), the order-`p` centralizer witness** (the genuine, `§8`-free heart of
+(12.9)).  Given the counterexample data with `P₀` abelian, coprime to `K = M_F`, normalizing `K`,
+and `K` not perfect, there is an element `x ∈ Ω₁(P₀)^#` (order dividing `p`) with `C_K(x) ⊄ K'`.
+
+Proof: apply the centralizer core `exists_mem_centralizer_inf_not_le_commutator` to the abelian
+noncyclic `P₀` acting by conjugation on `K`, yielding `y ∈ P₀^#` with `C_K(y) ⊄ K'`; then pass to
+the order-`p` power `x = y ^ (|y| / p)` — its centralizer contains `C_K(y)`, so still escapes `K'`. -/
+theorem exists_orderP_centralizer_witness [Finite G]
+    (ctr : CounterexampleHypothesis (G := G))
+    (habelian : IsMulCommutative ↥ctr.P0)
+    (hcoprime : Nat.Coprime (Nat.card ↥ctr.P0) (Nat.card ↥ctr.K))
+    (hP0_norm : ctr.P0 ≤ Subgroup.normalizer ctr.K)
+    (hKperfect : ⁅ctr.K, ctr.K⁆ ≠ ctr.K) :
+    ∃ x : G, x ∈ ctr.P0 ∧ x ≠ 1 ∧ x ^ ctr.p = 1 ∧
+      ¬ (Subgroup.centralizer ({x} : Set G) ⊓ ctr.K ≤ ctr.Kprime) := by
+  classical
+  haveI : Fact ctr.p.Prime := ⟨ctr.p_prime⟩
+  haveI := habelian
+  haveI : Group.IsNilpotent ↥ctr.P0 := ctr.P0_pGroup.isNilpotent
+  -- `K' = ⁅K, K⁆`.
+  have hKprime : ctr.Kprime = ⁅ctr.K, ctr.K⁆ :=
+    ctr.Kprime_eq.trans (Subgroup.map_subtype_commutator ctr.K)
+  -- Centralizer core (A = P₀, abelian noncyclic, coprime, normalizing K, K not perfect).
+  obtain ⟨y, hyP0, hy_ne, hy_cent⟩ :=
+    exists_mem_centralizer_inf_not_le_commutator (A := ctr.P0) (K := ctr.K)
+      hP0_norm hcoprime (Or.inl inferInstance) ctr.P0_noncyclic hKperfect
+  -- `y` has `p`-power order `p ^ k` with `k ≥ 1`.
+  obtain ⟨k, hk⟩ := (IsPGroup.iff_orderOf.mp ctr.P0_pGroup) ⟨y, hyP0⟩
+  have hoy : orderOf y = ctr.p ^ k :=
+    (orderOf_injective ctr.P0.subtype ctr.P0.subtype_injective ⟨y, hyP0⟩).trans hk
+  have hk_pos : 1 ≤ k := by
+    rcases Nat.eq_zero_or_pos k with h0 | h
+    · rw [h0, pow_zero, orderOf_eq_one_iff] at hoy; exact absurd hoy hy_ne
+    · exact h
+  have hp_dvd : ctr.p ∣ orderOf y := hoy ▸ dvd_pow_self ctr.p (by omega)
+  have hord_pos : 0 < orderOf y := hoy ▸ pow_pos ctr.p_prime.pos k
+  -- The order-`p` power `x = y ^ (|y| / p)`.
+  set n := orderOf y / ctr.p with hn
+  have hnp : n * ctr.p = orderOf y := Nat.div_mul_cancel hp_dvd
+  have hn_pos : 0 < n := by
+    rw [hn]; exact Nat.div_pos (Nat.le_of_dvd hord_pos hp_dvd) ctr.p_prime.pos
+  have hn_lt : n < orderOf y := by
+    rw [hn]; exact Nat.div_lt_self hord_pos ctr.p_prime.one_lt
+  refine ⟨y ^ n, ctr.P0.pow_mem hyP0 n, ?_, ?_, ?_⟩
+  · -- `y ^ n ≠ 1`: else `|y| ∣ n < |y|`, impossible.
+    rw [Ne, ← orderOf_dvd_iff_pow_eq_one]
+    exact Nat.not_dvd_of_pos_of_lt hn_pos hn_lt
+  · -- `(y ^ n) ^ p = y ^ (n * p) = y ^ |y| = 1`.
+    rw [← pow_mul, hnp, pow_orderOf_eq_one]
+  · -- `C_K(y ^ n) ⊇ C_K(y) ⊄ K'`.
+    rw [hKprime]
+    intro hle
+    apply hy_cent
+    refine le_trans (inf_le_inf_right ctr.K ?_) hle
+    intro g hg
+    rw [Subgroup.mem_centralizer_iff] at hg ⊢
+    rintro z rfl
+    exact Commute.pow_left (hg y rfl) n
+
+/-- **Peterfalvi (12.9), structural inputs for `P₀` and `K = M_F`** — a §8 obligation
+(`(8.12.a)` + Hypothesis `(12.8)` + `(8.11)`, all BG §16 consequences):
+
+* `P₀` is **abelian of rank `2`** — `(8.12.a)` gives every Sylow of the type-`I` complement
+  abelian of rank `≤ 2`, and `P₀` noncyclic (`ctr.P0_noncyclic`) forces rank `2`;
+* `P₀` is **coprime to `K`** — `(8.11)` makes `M_F` a Hall subgroup and `p ∣ [M : M_F]`
+  (`ctr.p_dvd_index`) gives `p ∤ |M_F|`, so the `p`-group `P₀` is coprime to `K = M_F`;
+* `P₀ ≤ N_G(K)` (as `P₀ ≤ M` and `K = M_F ◁ M`); and `K` is **not perfect** (`M_F` is nilpotent
+  and nontrivial). -/
+theorem counterexample_P0_K_structure [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (ctr : CounterexampleHypothesis (G := G)) :
+    IsMulCommutative ↥ctr.P0 ∧ rank ↥ctr.P0 = 2 ∧
+      Nat.Coprime (Nat.card ↥ctr.P0) (Nat.card ↥ctr.K) ∧
+      ctr.P0 ≤ Subgroup.normalizer ctr.K ∧ ⁅ctr.K, ctr.K⁆ ≠ ctr.K := by
+  sorry
+
+/-- **Peterfalvi (12.9), existence of the second maximal `L`** — a §8 obligation
+(`(8.17.a)` `bgTheoremE_cover_data`: `p ∈ π(G)` is covered by some `π((M_i)_s)`, giving a maximal
+`L` with `p ∣ |L_s|`; then `(8.11)`/`L_s ⊇ Sylow_p(G)` and Sylow conjugation place `P₀ ⊆ L_s`). -/
+theorem exists_second_maximal [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (ctr : CounterexampleHypothesis (G := G)) :
+    ∃ (L : Subgroup G) (Lt : PeterfalviType), L ∈ maximalSubgroups G ∧ L ≠ ctr.M ∧
+      HasPeterfalviType Lt L ∧ ctr.P0 ≤ mainSubgroup L Lt := by
+  sorry
+
+/-- **Peterfalvi (12.9), centralizer control** — **discharged** from `(8.12.b)`
+(`typeI_or_typeII_centralizer_unique`) + `G` simple.
+
+Applying `(8.12.b)` with `U = M` and `X = {x}` (`x ∈ M^#`, and `C_K(x) ⊄ K'` gives
+`M_F ⊓ C_G(x) ≠ 1`) yields `C_G(x) ≤ M` together with `IsUniquelyMaximal (C_G(x))` — `M` is the
+*unique* maximal subgroup over `C_G(x)`.  Hence: `N_G(⟨x⟩) ⊇ C_G(x)` is a proper subgroup
+(`⟨x⟩` is a proper nontrivial subgroup of the nonabelian simple `G`, so not normal), so it lies
+in a maximal subgroup over `C_G(x)`, which must be `M`; and any maximal `L ≠ M` cannot contain
+`C_G(x)`. -/
+theorem centralizer_control_of_CKx [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (ctr : CounterexampleHypothesis (G := G)) {L : Subgroup G} (hL : L ∈ maximalSubgroups G)
+    (hLM : L ≠ ctr.M)
+    {Lt : PeterfalviType} (hLt : HasPeterfalviType Lt L) (hPL : ctr.P0 ≤ mainSubgroup L Lt)
+    {x : G} (hx : x ∈ ctr.P0) (hxne : x ≠ 1)
+    (hCKx : ¬ (Subgroup.centralizer ({x} : Set G) ⊓ ctr.K ≤ ctr.Kprime)) :
+    Subgroup.normalizer ((Subgroup.closure ({x} : Set G) : Subgroup G) : Set G) ≤ ctr.M ∧
+      ¬ (Subgroup.centralizer ({x} : Set G) ≤ L) := by
+  classical
+  haveI : IsSimpleGroup G := hG.simple
+  have hMcoatom : IsCoatom ctr.M := ctr.M_maximal
+  have hLcoatom : IsCoatom L := hL
+  have hxM : x ∈ ctr.M := ctr.P0_le_M hx
+  -- `M_F ⊓ C_G(x) ≠ ⊥` from `C_K(x) ⊄ K'`.
+  have hCKne : maxNilpotentNormalHall ctr.M ⊓ Subgroup.centralizer ({x} : Set G) ≠ ⊥ := by
+    intro hbot; apply hCKx; rw [ctr.K_eq_MF, inf_comm, hbot]; exact bot_le
+  have hxsharp : ({x} : Set G) ⊆ sharpSubgroup ctr.M := by
+    intro y hy; rw [Set.mem_singleton_iff] at hy; subst hy
+    exact ⟨hxM, fun h => hxne (Set.mem_singleton_iff.mp h)⟩
+  -- (8.12.b): `C_G(x) ≤ M` and uniquely maximal.
+  obtain ⟨hCxleM, huniq⟩ := OddOrder.Peterfalvi.S10.typeI_or_typeII_centralizer_unique hG
+    ctr.M_maximal (Or.inl ctr.M_typeI) (le_refl ctr.M) ({x} : Set G) (Set.singleton_nonempty x)
+    hxsharp hCKne
+  refine ⟨?_, fun hCxleL => hLM (huniq.eq_of_isCoatom_of_le hMcoatom hCxleM hLcoatom hCxleL).symm⟩
+  -- `N_G(⟨x⟩) ⊆ M`.
+  have hCx_le_Nx : Subgroup.centralizer ({x} : Set G) ≤
+      Subgroup.normalizer ((Subgroup.closure ({x} : Set G) : Subgroup G) : Set G) := by
+    rw [← Subgroup.centralizer_closure]; exact Subgroup.centralizer_le_normalizer _
+  have hcl_le_M : Subgroup.closure ({x} : Set G) ≤ ctr.M := Subgroup.closure_le _ |>.mpr (by
+    simpa using hxM)
+  have hNx_lt : Subgroup.normalizer ((Subgroup.closure ({x} : Set G) : Subgroup G) : Set G) ≠ ⊤ := by
+    intro htop
+    rcases (Subgroup.normalizer_eq_top_iff.mp htop).eq_bot_or_eq_top with hb | ht
+    · exact hxne (by simpa [hb] using Subgroup.subset_closure (Set.mem_singleton x))
+    · exact hMcoatom.1 (top_le_iff.mp (ht ▸ hcl_le_M))
+  obtain ⟨N, hNco, hNx_le_N⟩ := (eq_top_or_exists_le_coatom _).resolve_left hNx_lt
+  exact hNx_le_N.trans (le_of_eq
+    (huniq.eq_of_isCoatom_of_le hMcoatom hCxleM hNco (hCx_le_Nx.trans hNx_le_N)).symm)
+
 /-- **Peterfalvi (12.9)**: the counterexample has an abelian rank-two Sylow
-witness and an element whose centralizers force a second maximal subgroup. -/
+witness and an element whose centralizers force a second maximal subgroup.
+
+Honest assembly: the structural inputs `(8.12.a)`/`(8.11)` (`counterexample_P0_K_structure`) give
+`P₀` abelian of rank `2`, coprime to `K`, normalizing `K`, with `K` not perfect; the genuine
+`§8`-free `exists_orderP_centralizer_witness` then produces the order-`p` element `x` with
+`C_K(x) ⊄ K'`; `(8.17.a)` (`exists_second_maximal`) supplies `L`; and `(8.12.b)`
+(`centralizer_control_of_CKx`) the centralizer conditions. -/
 theorem exists_rankTwoWitness [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     (ctr : CounterexampleHypothesis (G := G)) :
     IsMulCommutative ↥ctr.P0 ∧ rank ↥ctr.P0 = 2 ∧ Nonempty (RankTwoWitnessData ctr) := by
-  sorry
+  obtain ⟨hab, hrank, hcop, hnorm, hperf⟩ := counterexample_P0_K_structure hG ctr
+  refine ⟨hab, hrank, ?_⟩
+  obtain ⟨x, hxP0, hxne, hxp, hCKx⟩ := exists_orderP_centralizer_witness ctr hab hcop hnorm hperf
+  obtain ⟨L, Lt, hLmax, hLne, hLt, hPL⟩ := exists_second_maximal hG ctr
+  obtain ⟨hNx, hCx⟩ := centralizer_control_of_CKx hG ctr hLmax hLne hLt hPL hxP0 hxne hCKx
+  exact ⟨{ L := L, L_maximal := hLmax, L_type := Lt, L_hasType := hLt, P0_le_Ls := hPL,
+           x := x, x_mem_P0 := hxP0, x_ne_one := hxne, x_mem_omega1 := hxp,
+           CKx_not_le_Kprime := hCKx, normalizer_closure_x_le_M := hNx,
+           centralizer_x_not_le_L := hCx }⟩
 
 /-- **Peterfalvi (12.10)**: the maximal subgroup `L` supplied by (12.9) is
 Frobenius with kernel `L_F`. -/
