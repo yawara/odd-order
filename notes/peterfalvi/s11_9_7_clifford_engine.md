@@ -100,11 +100,22 @@ chiefFactor_basic (済) は `_holds` / `quotient_order` 経由ゆえ互換 (fiel
   `|Ū|·(p-1)∣p^q-1` ⟹ 商整除)。**∴ case-(b) 整除条件 (`u_coprime`/`u_dvd_norm`) の残ハード入力は
   `Coprime |Ū| (p-1)` 一点に縮約**。
 
-- **frontier = case-(b) FPF coprime (`Coprime |Ū| (p-1)`) = 体モデル同型 (9.7)(b) L51 — 重・multi-session**:
-  textbook (9.7)(b) L69 は `W₁ が Ū 上 FPF ⟹ U*∩𝔽ₚ=1 ⟹ coprime(u,p-1)`。これには **体 F=p^q と同型
-  `(H̄⋊Ū)⋊W₁ ≅ (F⋊U*)⋊Aut F`** (L51) を構築し W₁ を `Aut F`・`𝔽ₚ` を W₁-不変部分体と同定する必要。
-  Singer 機構 (7a) の体は `MonoidAlgebra(ZMod p)Ū⧸I` で W₁-作用を持たない ⟹ `End_{𝔽ₚ[U]}(H̄)` を体化
-  (Schur+Wedderburn) し W₁-Galois 作用を載せる新インフラ (~150-250+ 行) が要る。**これが case-(b) の真の長物**
+- **frontier = case-(b) FPF coprime (`Coprime |Ū| (p-1)`) — 真の残務、substantial だが full Galois iso 不要**:
+  textbook (9.7)(b) L69 は `W₁ が Ū 上 FPF ⟹ U*∩𝔽ₚ=1 ⟹ coprime(u,p-1)`。
+  **⚠ 精緻化 (2026-06-23, lane-c): L51 の full 体モデル同型 `(H̄⋊Ū)⋊W₁≅(F⋊U*)⋊Aut F` は coprime には不要**。
+  必要なのは `Ū∩𝔽ₚ*=1` (cyclic `Kˣ` 内) のみで、これは **「𝔽ₚ-scalar は `Aut(H̄)=GL_q(𝔽ₚ)` の中心」+
+  W₁-FPF** で出る (W₁-Galois 同定は不要):
+  1. `ū∈Ū` が 𝔽ₚ-scalar `λ` として作用 ⟹ scalar は加法的自己同型 `act.φ(w)` (w∈W₁) と可換 (central) ⟹
+     `act.φ(w)·ū·act.φ(w)⁻¹=ū` ⟹ `⁅w,u⁆∈ker act.φ=C_U(H̄)` ⟹ Ū 内で `ū` は `w`-不変。
+  2. `Ū⋊W₁` Frobenius (`typeP_uW1_frobenius`, W₁≠1 ∵q素数) ⟹ FPF ⟹ `w`-不変 ū は ū=1。∴ `Ū∩𝔽ₚ*=1`。
+  3. step 7b の Singer `Ū↪Kˣ` (cyclic) + 𝔽ₚ*⊆Kˣ + 交わり 1 ⟹ `gcd(|Ū|,p-1)=1` (cyclic で位数-e 部分群一意)。
+  **残課題 (substantial, instance-heavy だが ~100-150 行見込)**: Singer 体 K=`MonoidAlgebra(ZMod p)Ū⧸I` の
+  **prime subfield 𝔽ₚ*⊆Kˣ** を露出し、`μ(ū)∈𝔽ₚ* ⟺ ū が H̄≅K 上 𝔽ₚ-scalar 作用` を H̄≅K module 同型で
+  橋渡し (step 3 の transport)。W₁ は K に自然作用しないが **必要なのは H̄ 上の act.φ(W₁) と scalar の可換性
+  のみ** (K への W₁ 作用は不要)。`SingerFieldData` (SingerField.lean) が体構造を carry。
+  **⚠ over-optimism 注意 ([[scaffold-sorry-free-not-done]] audit 版, issue 4006)**: 「full iso 不要」は本物の
+  簡約だが、Singer 体 K の prime-scalar 露出 + H̄≅K transport + central-scalar + FPF の配線は instance-hell
+  (7a/7b と同種) を再度通る。単一 session で landing する保証はない。**これが case-(b) の真の長物**
   (step 7b/dvd_norm で他は片付いた)。
   **carrier 構成 (clifford_dichotomy 閉鎖) — 体モデル後に GATED**: `CliffordCaseBData` は `chars.u` を参照
   (`u_coprime_p_sub_one : Coprime chars.u (p-1)`, `u_dvd_norm_quotient : chars.u ∣ (p^q-1)/(p-1)`) が
