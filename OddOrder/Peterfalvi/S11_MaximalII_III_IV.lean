@@ -1939,6 +1939,104 @@ theorem chiefFactor_clifford_U_dichotomy [Finite G] {M : Subgroup G}
     · exact Or.inr
         (((hirr₀ J hJinv (le_top.trans_eq hS₀top.symm)).resolve_left hJ).trans hS₀top)
 
+open OddOrder.RepresentationTheory Representation in
+open scoped commutatorElement IsMulCommutative in
+/-- **Peterfalvi (9.7) case (b), chief-factor Singer conclusion.**  When `U` acts irreducibly on
+the chief factor `H̄ = H/H₀` (Clifford case (b) — the left branch of
+`chiefFactor_clifford_U_dichotomy`), its image `Ū = φ_U(U) ≤ Aut(H̄)` is *cyclic*, of order
+dividing `p^q - 1`.
+
+`Ū` is abelian because `[U, U]` centralizes `H` (Peterfalvi (8.5.b),
+`typeP_commutator_U_centralizes_H`): a commutator `⁅a, b⁆ ∈ [U, U]` acts trivially on `H̄`, so
+`φ_U ⁅a, b⁆ = 1` and the image is commutative.  Faithfulness of the inclusion `Ū ↪ Aut(H̄)` and the
+irreducibility transferred from the case-(b) hypothesis feed the subgroup-level Singer mechanism
+`isCyclic_card_dvd_of_aInvariant_irreducible_faithful_comm`, with `H̄` the elementary abelian
+`p`-group of order `p^q` (`chiefFactor_quotient_card`).  This is the structural core behind the
+`Coprime u (p-1)` / `u ∣ (p^q-1)/(p-1)` divisibilities of `CliffordCaseBData` (which additionally
+pin `u = |Ū|` and use the `W₁`-fixed-point-free refinement). -/
+theorem chiefFactor_caseB_image_cyclic [Finite G] {M : Subgroup G}
+    {data : TypesIIIIIIVSetup M} (chief : ChiefFactorData data)
+    (hcaseB : ∀ J : Subgroup (↥data.H ⧸ chief.N),
+        IsAInvariant ((typeP_quotientCoprimeAction data.typeP data.nontrivial.1
+          chief.N_aInvariant).φ.comp (typeP_quotientCoprimeAction data.typeP data.nontrivial.1
+          chief.N_aInvariant).U.subtype) J → J = ⊥ ∨ J = ⊤) :
+    IsCyclic ↥(((typeP_quotientCoprimeAction data.typeP data.nontrivial.1
+          chief.N_aInvariant).φ.comp (typeP_quotientCoprimeAction data.typeP data.nontrivial.1
+          chief.N_aInvariant).U.subtype).range) ∧
+      Nat.card ↥(((typeP_quotientCoprimeAction data.typeP data.nontrivial.1
+          chief.N_aInvariant).φ.comp (typeP_quotientCoprimeAction data.typeP data.nontrivial.1
+          chief.N_aInvariant).U.subtype).range) ∣ chief.p ^ data.q - 1 := by
+  classical
+  have hU : data.typeP.U ≠ ⊥ := data.nontrivial.1
+  haveI : chief.N.Normal := chief.N_normal
+  haveI : NeZero chief.p := ⟨chief.p_prime.pos.ne'⟩
+  set act := typeP_quotientCoprimeAction data.typeP hU chief.N_aInvariant with hact
+  set φU := act.φ.comp act.U.subtype with hφU
+  -- `H̄ = ↥H ⧸ N` is finite elementary abelian `p`, nontrivial, of order `p^q`.
+  have hKcard : Nat.card (↥data.H ⧸ chief.N) = chief.p ^ data.q := chiefFactor_quotient_card chief
+  have hq_pos : 0 < data.q := Nat.card_pos
+  haveI hKnt : Nontrivial (↥data.H ⧸ chief.N) :=
+    Finite.one_lt_card_iff_nontrivial.mp (by
+      rw [hKcard]; exact Nat.one_lt_pow hq_pos.ne' chief.p_prime.one_lt)
+  -- Module instances for the Singer mechanism, from `chief.quotient_elementaryAbelian`.
+  letI : IsMulCommutative (↥data.H ⧸ chief.N) :=
+    IsMulCommutative.of_comm chief.quotient_elementaryAbelian.comm
+  letI : CommGroup (↥data.H ⧸ chief.N) := inferInstance
+  letI : Module (ZMod chief.p) (Additive (↥data.H ⧸ chief.N)) :=
+    chief.quotient_elementaryAbelian.zmodModule
+  -- An element of `U W₁` centralizing `H` acts trivially on `H̄`.
+  have hcentral_triv : ∀ g : ↥(data.typeP.U ⊔ data.typeP.W1),
+      (g : G) ∈ Subgroup.centralizer (data.typeP.H : Set G) → act.φ g = 1 := by
+    intro g hg
+    have hfix : ∀ x : ↥data.typeP.H, (typeP_conjAction data.typeP g) x = x := by
+      intro x
+      apply Subtype.ext
+      rw [typeP_conjAction_apply]
+      have hcom : (x : G) * (g : G) = (g : G) * (x : G) :=
+        (Subgroup.mem_centralizer_iff.mp hg) (x : G) x.2
+      rw [← hcom, mul_assoc, mul_inv_cancel, mul_one]
+    ext y
+    refine QuotientGroup.induction_on y ?_
+    intro x
+    show (act.φ g) (QuotientGroup.mk' chief.N x) = QuotientGroup.mk' chief.N x
+    have hstep : (act.φ g) (QuotientGroup.mk' chief.N x)
+        = QuotientGroup.mk' chief.N ((typeP_conjAction data.typeP g) x) := rfl
+    rw [hstep, hfix x]
+  -- `Ū = φU.range` is abelian: `φU ⁅a, b⁆ = 1` since `⁅a, b⁆` maps into `[U, U] ⊆ C(H)`.
+  have hComm : ∀ a b : ↥act.U, Commute (φU a) (φU b) := by
+    intro a b
+    refine commutatorElement_eq_one_iff_commute.mp ?_
+    rw [← map_commutatorElement φU a b]
+    show act.φ (act.U.subtype ⁅a, b⁆) = 1
+    apply hcentral_triv
+    change ((data.typeP.U ⊔ data.typeP.W1).subtype.comp act.U.subtype) ⁅a, b⁆
+        ∈ Subgroup.centralizer (data.typeP.H : Set G)
+    rw [map_commutatorElement]
+    exact typeP_commutator_U_centralizes_H data.typeP
+      (Subgroup.commutator_mem_commutator
+        (Subgroup.mem_subgroupOf.mp a.2) (Subgroup.mem_subgroupOf.mp b.2))
+  -- Package the data for the Singer mechanism.
+  have hAcomm : ∀ s t : ↥(φU.range), s * t = t * s := by
+    rintro ⟨_, a, rfl⟩ ⟨_, b, rfl⟩
+    exact Subtype.ext (hComm a b)
+  have hirr : ∀ J : Subgroup (↥data.H ⧸ chief.N),
+      IsAInvariant (φU.range).subtype J → J = ⊥ ∨ J = ⊤ := by
+    intro J hJ
+    apply hcaseB
+    intro a
+    exact hJ ⟨φU a, MonoidHom.mem_range.mpr ⟨a, rfl⟩⟩
+  have hfaith : ∀ a : ↥(φU.range),
+      (∀ x : (↥data.H ⧸ chief.N), ((φU.range).subtype a) x = x) → a = 1 := by
+    intro a ha
+    have hone : (a : MulAut (↥data.H ⧸ chief.N)) = 1 := by
+      ext x
+      simpa using ha x
+    exact Subtype.ext hone
+  obtain ⟨hcyc, hdvd⟩ := isCyclic_card_dvd_of_aInvariant_irreducible_faithful_comm
+    (A := ↥(φU.range)) (K := ↥data.H ⧸ chief.N) (p := chief.p)
+    (φ := (φU.range).subtype) hAcomm hKnt hirr hfaith
+  exact ⟨hcyc, by rwa [hKcard] at hdvd⟩
+
 /-- **Peterfalvi (9.7)**: the Clifford-theory dichotomy for the action on the
 chief factor `H/H_0`.
 
