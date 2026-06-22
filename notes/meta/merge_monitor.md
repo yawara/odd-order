@@ -43,6 +43,11 @@ signature 不足は notes/issue 経由。**driver (§16/§10)**: 常駐レーン
 **特に S11 は C のみ** (2026-06-22 H→C 移譲)。(2) **新規 `axiom` 宣言は abort+ユーザー承認**。
 (3) issue base: **B=1000 / H=2000 / C=4000 / F=7000**。(4) `notes/bg/*`=F、`notes/peterfalvi/*`=B/H/C。
 マージ順 = **F → B → H → C** (独立レーンゆえ順序は形式的)。
+**(5) 起動時 main 同期 = `git merge main` (ユーザー方針 2026-06-22, 全 LAUNCH 統一)**:
+各レーンはセッション開始時に **`git merge main`** (実 3-way、merge commit 可) で main 最新を取り込んでから
+作業する。**旧 `git merge --ff-only main` は廃止** — 自前 commit が 1 つでもあると ff 不能で失敗し、レーンが
+main に遅れ続ける (2026-06-22 実害: 全レーン 15-47 commits 遅れ → 古い文脈・2-dot 誤検出の原因)。
+コンフリクトは自所有ファイルなら解決、他レーン由来なら notes/issue で hub へ。`lake update` は禁止のまま。
 
 **🧭 方向性・cross-lane 判断は issue 起票 → hub 解決 (ユーザー方針 2026-06-22, 永続)**:
 レーンが (a) **方向性に迷った**とき (どの sorry を攻めるか・route 選択・faithfulness 解釈の迷い等)、
