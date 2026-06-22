@@ -5,6 +5,36 @@
 > 上位文脈 = 記憶 [[ft-endgame-two-poles]] [[peterfalvi-s10-13-gated-on-bg-spine]]、
 > Lane H 視点の正本 = [`s10_13_maximal_structure.md`](s10_13_maximal_structure.md)。
 
+## ✅✅ 2026-06-22 更新⁹ — (5.8) endgame 仮説 2/4 着地 + §5-gate 回避経路を確立 (issue 1009)
+
+lane-b 再開セッション。(10.6.a) を **§5-gated `ζ̄^τ₁⊥Imσ` を通さず**閉じる column-(5.5) 経路を確定し、
+(5.8) σ-endgame (`eq_smul_chiFam_column_of_vanishOnV`) の 4 仮説のうち 2 つを materialize:
+
+- **🔑 設計上の決定的発見**: `OrthonormalCharacterImageFamily` (S07_Coherence:766) は **2 元限定でなく汎用**
+  (`imageSet : Finset (CF G ℂ)` + `image_eq : τ(χ−χ̄) = ∑_{α∈R} α` のみ要求)。∴ column μ_k に直接適用でき、
+  R(μ_k) = signed σ-image 族 `{δ·ω_ik^σ}∪{−δ·ω_ik'^σ}` (2w₁ 元) で `CharacterPsiDecomposition` を組めば
+  (5.5) `eq_sum_of_psi_eq_zero` が μ_k^τ₁ = ∑_{E⊆R(μ_k)} α を直接出す。= note 旧「column-(5.5) を別途立てる」
+  (route ii) の具体化。**更新⁸ の `CharacterDifferenceImage` 一般化は不要** (汎用 `OrthonormalCharacterImageFamily`
+  を使えばよい)。
+- **column-difference DONE** (`tau_muGrid_column_diff` + `tau_muGrid_columnSum_diff`, commit `bd4c8340`):
+  `τ(μ_ij−μ_ik) = δ(ω_ij^σ−ω_ik^σ)` (+ summed)。`alpha_tau_image` の系 (α の `−δμ_i0−nζ` tail 相殺)。
+  = column image family の `image_eq` 材料 (= (4.9) summed Dade identity の §10 版)。
+- **μ_k^τ₁ vanishes on V DONE** (`Hypothesis.muColumn_tau1_vanishes_on_typePV`, commit `02ec7e03`):
+  (5.8) 原文の χ=ζ̄ ルート。(4.7) `muColumn_sub_conj_support` (μ_k−dζ̄ が A_0-supported) +
+  `tau_apply_of_mem_typePV` (τ が V で値復元) + 誘導指標 V-vanishing + `tau_muColumn_sub_conj_eq_tau1` +
+  完成済 `tau1_zeta_vanishes_on_typePV`(ζ̄)。両 commit axiom-clean (§10 muGrid 系と同じ upstream
+  Prop16.1/theoremA gate のみ、自前 sorry 0)。
+- **🔑 §5-gate 回避が確定**: `tau1_zeta_vanishes_on_typePV` が honest 完成 (norm-1 の NC≤2 トリックで §5 (3.8)
+  経由、sorry-free) ゆえ、column 経路は更新⁸ が懸念した §5-gated `ζ̄^τ₁⊥Imσ` を**通らない**。直接 (10.6.a)
+  reduction (`(δ(ω_ij^σ−ω_i0^σ), μ_j^τ₁))=1` 経由) は ζ̄^τ₁⊥Imσ を要したが、(5.5)-for-column 経路は
+  μ_k^τ₁ を直接分解し、その V-vanishing は単一指標 ζ̄^τ₁-vanishing + (4.7) のみで出る。
+- **残 = (5.8) 仮説 4/4 のうち最後 = sigmaCoeff 2-column structure**: column `OrthonormalCharacterImageFamily`
+  本体構築 (要 **conjugate-column** `conj(μ_k)=μ_{k'}` の §10 同定 + 2w₁ 個の signed σ-image の orthonormality)
+  → `CharacterPsiDecomposition.ofProjection` (ψ=0, tau1=coh.tau1; htau1_inner_eq=`coherent.extension_inner_eq`,
+  htau1_agrees=column-difference, htau1_mem=μ_k^τ₁∈ZIrr) → (5.5) → μ_k^τ₁=∑_E α → sigmaCoeff 翻訳
+  (R(μ_k) の元 ↔ chiFam 元、`exists_alignedOmegaSigmaGrid_chiFam_family` 経由) → σ-endgame 適用。
+  ‖μ_k^τ₁‖²=w₁ は既存 (`muColumn_tau1_inner_self`)。**次セッション = conjugate-column + image family**。
+
 ## ✅✅ 2026-06-22 更新⁸ — (5.8) σ-level full-column endgame 完成 (issue 1009) + (5.5) gate 精密 map
 
 (10.6.a) summed isometry の linchpin = (5.8) σ-wrapper のうち **(a) Parseval + (d) sigmaCoeff↔core
