@@ -28,9 +28,31 @@
 - `U_noncentral_on_quotient` → `C_H̄(U) ≠ ⊤` (action form)
 chiefFactor_basic (済) は `_holds` / `quotient_order` 経由ゆえ互換 (field 値を返すだけ)。
 
+## 進捗
+
+- **step 0 DONE (2026-06-22, commit `f69557a5`)**: `ChiefFactorData` の 3 opaque field を実構造に
+  置換。`exists_chiefFactor_kernel` を強化し、kernel `N = W.comap (mk' N₀)` について
+  `IsElementaryAbelian p (↥H ⧸ N)` + `UW₁`-既約 (`∀ J, IsAInvariant (quotientMulAutHom hN) J → J=⊥∨⊤`)
+  + `U`-非中心 (`fixedSubgroup (quotientMulAutHom hN) U ≠ ⊤`) を追加で返す。**sorry-free + axiom-clean**
+  (AxiomsCheck 登録)。`exists_chiefFactorData` が wire、`chiefFactor_basic` から再 launder 削除。
+  - **技法 (設計より単純化)**: 当初案の equivariant-iso transport (`H/N ≅ S`) は **不要**だった。
+    既約性は correspondence で: `J ≤ H̄` invariant を `J̃=J.comap(mk' N) ◁ H` に引き戻し
+    (`N≤J̃`)、`J̄=J̃.map(mk' N₀) ≤ V` に押し出し (`W≤J̄`)、`J̄⊓S ∈{⊥,S}` を Maschke summand の
+    `hirr` で分岐。非中心は `C_V(U) ≤ W` (U-fixed `a·b` は両成分 fixed、`C_S(U)=⊥`) → `C_H(U)≤N`
+    → `C_{H̄}(U)=⊥`。**element-wise + `map_fixedSubgroup_eq_fixedSubgroup_quotient` のみ**で iso 不要。
+  - **設計上の罠 (記録)**: ① `ChiefFactorData` は `[Finite G]` を**付けられない** (S13 `Hypothesis`
+    が `variable {G} [Group G]` のみで `chief : ChiefFactorData` を持つ → 壊れる)。よって action は
+    `typeP_quotientCoprimeAction` (要 Finite) でなく `quotientMulAutHom` (Finite 不要) で phrase。
+    ② 構造体は `typeP_quotientCoprimeAction`/`IsAInvariant`/`quotientMulAutHom` の定義・open より
+    **後ろ**に置く必要 (元 426 行→`exists_chiefFactorData` 直前へ移動)。③ `[N_normal : N.Normal]`
+    instance-field + `quotientMulAutHom (N := N) ...` で N を pin しないと instance 検索が N 未確定で失敗。
+  - **残依存**: `exists_chiefFactorData`/`chiefFactor_basic` は `typeIII_IV_p_eq_W2` フィールド経由で
+    §12 sorry (`theorem88_caseB_prime_orders` = lane-b (10.11)) に依存ゆえ axiom-clean でない (de-opacify
+    した 3 構造 field 自体は kernel 由来で clean)。
+
 ## アーキテクチャ (steps)
 
-0. **de-opacify ChiefFactorData** (上記)。実 H̄ 構造を露出。
+0. **de-opacify ChiefFactorData** (上記) — **DONE**。実 H̄ 構造を露出。
 1. **bridge**: `H̄ = Additive (↥data.H ⧸ H0')` を `ZMod p`-module 化 (`IsElementaryAbelian.zmodModule`,
    PRank.lean)、`dim = q` (`IsElementaryAbelian.card_eq_pow_finrank` + `|H̄|=p^q`)。`U`-conjugation を
    `F_p`-線形作用 (`typeP_quotientCoprimeAction` 既存; mathlib `Representation` へ橋渡し or 加群直接)。
