@@ -193,7 +193,20 @@ theorem typeI_frobenius [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
 
 /-! ## (12.8)--(12.12): minimal counterexample analysis -/
 
-/-- **Peterfalvi (12.8)**: the minimal counterexample hypothesis for (12.7). -/
+/-- **Peterfalvi (12.8), the prime set `π`**: `q ∈ π` when some type-`I` maximal subgroup `M'`
+has a **noncyclic Sylow `q`-subgroup in `M' / M'_F`**.  Encoded by a Sylow `q`-subgroup `P ≤ M'`
+(`q`-group with `q ∤ [M' : P]`) that is noncyclic and satisfies `q ∣ [M' : M'_F]` — so `P` is not
+contained in `M'_F` and its image in `M'/M'_F` is a noncyclic Sylow `q`-subgroup. -/
+def InPi (q : ℕ) : Prop :=
+  ∃ M' : Subgroup G, M' ∈ maximalSubgroups G ∧ IsTypeI M' ∧
+    ∃ P : Subgroup G, P ≤ M' ∧ IsPGroup q ↥P ∧ ¬ q ∣ P.relIndex M' ∧
+      ¬ IsCyclic ↥P ∧ q ∣ (maxNilpotentNormalHall M').relIndex M'
+
+/-- **Peterfalvi (12.8)**: the minimal counterexample hypothesis for (12.7).
+
+`M` is a type-`I` maximal subgroup whose Fitting kernel is `K = M_F` (`K' = [K, K]`), and `P₀`
+is a Sylow `p`-subgroup of `M` that is noncyclic with `p ∣ [M : M_F]` (so the image of `P₀` in
+`M/M_F` is a noncyclic Sylow `p`-subgroup, i.e. `p ∈ π`); `p` is the smallest element of `π`. -/
 structure CounterexampleHypothesis where
   p : ℕ
   p_prime : p.Prime
@@ -201,32 +214,47 @@ structure CounterexampleHypothesis where
   K : Subgroup G
   Kprime : Subgroup G
   P0 : Subgroup G
-  pi_nonempty : Prop
-  minimal_p : Prop
   M_maximal : M ∈ maximalSubgroups G
   M_typeI : IsTypeI M
   K_eq_MF : K = maxNilpotentNormalHall M
   Kprime_eq : Kprime = derivedInG K
   P0_le_M : P0 ≤ M
-  P0_sylow_quotient : Prop
-  P0_noncyclic_quotient : Prop
+  /-- `P₀` is a `p`-group… -/
+  P0_pGroup : IsPGroup p ↥P0
+  /-- …and a Sylow `p`-subgroup of `M` (`p ∤ [M : P₀]`). -/
+  P0_sylow : ¬ p ∣ P0.relIndex M
+  /-- The Sylow `p`-subgroup of `M/M_F` is noncyclic (so `P₀` is noncyclic). -/
+  P0_noncyclic : ¬ IsCyclic ↥P0
+  /-- …and `p ∣ [M : M_F]` (so `P₀ ⊄ M_F`; together with the Hall property this gives `p ∤ |M_F|`). -/
+  p_dvd_index : p ∣ K.relIndex M
+  /-- `p` is the smallest prime in `π`. -/
+  minimal_p : ∀ q : ℕ, q.Prime → InPi (G := G) q → p ≤ q
 
-/-- The rank-two witness extracted in Peterfalvi (12.9). -/
+/-- The rank-two witness extracted in Peterfalvi (12.9), with all fields stated faithfully.
+
+`L` is the second maximal subgroup with `P₀ ⊆ L_s` (`L_s = mainSubgroup L L_type`); `x` is the
+order-`p` element of `Ω₁(P₀)^#` whose centralizer in `K = M_F` escapes `K'`, controls `N_G(⟨x⟩)`,
+and escapes `L`. -/
 structure RankTwoWitnessData (ctr : CounterexampleHypothesis (G := G)) where
   L : Subgroup G
   L_maximal : L ∈ maximalSubgroups G
-  P0_le_Ls : Prop
+  /-- Peterfalvi's type attached to `L` (so `L_s = mainSubgroup L L_type`). -/
+  L_type : PeterfalviType
+  L_hasType : HasPeterfalviType L_type L
+  /-- `P₀ ⊆ L_s`. -/
+  P0_le_Ls : ctr.P0 ≤ mainSubgroup L L_type
   x : G
   x_mem_P0 : x ∈ ctr.P0
   x_ne_one : x ≠ 1
-  x_mem_omega1 : Prop
-  CKx_not_le_Kprime : Prop
+  /-- `x ∈ Ω₁(P₀)^#`: `x` has order dividing `p`. -/
+  x_mem_omega1 : x ^ ctr.p = 1
+  /-- `C_K(x) ⊄ K'` (equivalently `C_{K/K'}(x) ≠ 1`). -/
+  CKx_not_le_Kprime : ¬ (Subgroup.centralizer ({x} : Set G) ⊓ ctr.K ≤ ctr.Kprime)
+  /-- `N_G(⟨x⟩) ⊆ M`. -/
   normalizer_closure_x_le_M :
     Subgroup.normalizer ((Subgroup.closure ({x} : Set G) : Subgroup G) : Set G) ≤ ctr.M
-  centralizer_x_not_le_L : Prop
-  centralizer_x_not_le_L_holds : centralizer_x_not_le_L
-  M_inter_L_complements_K : Prop
-  M_inter_L_le_H : Prop
+  /-- `C_G(x) ⊄ L`. -/
+  centralizer_x_not_le_L : ¬ (Subgroup.centralizer ({x} : Set G) ≤ L)
 
 open OddOrder.Isaacs.Ch04.OddOrder.Isaacs.Ch03.IsAInvariant
   (quotientMulAutHom quotientMulAutHom_apply_mk') in
@@ -361,9 +389,7 @@ theorem exists_mem_centralizer_inf_not_le_commutator
 witness and an element whose centralizers force a second maximal subgroup. -/
 theorem exists_rankTwoWitness [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     (ctr : CounterexampleHypothesis (G := G)) :
-    IsMulCommutative ↥ctr.P0 ∧ rank ↥ctr.P0 = 2 ∧
-      ∃ data : RankTwoWitnessData ctr,
-        data.CKx_not_le_Kprime ∧ data.centralizer_x_not_le_L := by
+    IsMulCommutative ↥ctr.P0 ∧ rank ↥ctr.P0 = 2 ∧ Nonempty (RankTwoWitnessData ctr) := by
   sorry
 
 /-- **Peterfalvi (12.10)**: the maximal subgroup `L` supplied by (12.9) is
@@ -378,7 +404,8 @@ Fitting kernel `H` of the witness subgroup `L`. -/
 theorem intersection_complement_structure [Finite G]
     (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
     {ctr : CounterexampleHypothesis (G := G)} (data : RankTwoWitnessData ctr) :
-    data.M_inter_L_complements_K ∧ data.M_inter_L_le_H := by
+    Subgroup.IsComplement' (ctr.K.subgroupOf ctr.M) ((ctr.M ⊓ data.L).subgroupOf ctr.M) ∧
+      ctr.M ⊓ data.L ≤ maxNilpotentNormalHall data.L := by
   sorry
 
 /-- **(12.12) Case A core.**  A finite group `E` acting faithfully on a one-dimensional
