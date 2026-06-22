@@ -3961,6 +3961,112 @@ theorem alpha_tau_image [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : 
     hdeg hμ0 hz1 params.n_formula (hδj j hj0) hdζ h0ζ hkζ hcol1 hdk1 hδpm hw1 hn2
 
 open scoped FiniteInduce in
+/-- **Peterfalvi (10.6)(a) reduction**: `(ω_{ij}^σ − ω_{i0}^σ, μ_j^{τ₁}) = δ` for `0 < j < w₂`.
+
+This is the inner-product identity opening the (10.6)(a) proof:
+`1 = (α_{ij}, μ_j − dζ̄) = (α_{ij}^τ, μ_j^{τ₁} − dζ̄^{τ₁}) = (δ(ω_{ij}^σ − ω_{i0}^σ), μ_j^{τ₁})`.
+From the diagonal reduction `(α_{ij}^τ, μ_j^{τ₁} − dζ̄^{τ₁}) = 1`
+(`muGridAlpha_tau1_inner_muColumn_self_sub_conj`), the vanishing `(α_{ij}^τ, ζ̄^{τ₁}) = 0`
+(from `(α_{ij}^τ, ζ^{τ₁}) = −n` (`muGridAlpha_tau1_zeta_eq_neg_n`, the (10.5) `a = 0`) and
+`(α_{ij}^τ, ζ̄^{τ₁}) = (α_{ij}^τ, ζ^{τ₁}) + n` (`muGridAlpha_tau_inner_zeta_sub_conj`)), the (10.5)
+Dade image `α_{ij}^τ = δ(ω_{ij}^σ − ω_{i0}^σ) − nζ^{τ₁}` (`alpha_tau_image`) and `(ζ^{τ₁}, μ_j^{τ₁}) = 0`
+(`zeta_tau1_inner_muColumn`): `1 = (α_{ij}^τ, μ_j^{τ₁}) = δ(ω_{ij}^σ − ω_{i0}^σ, μ_j^{τ₁})`, hence
+`(ω_{ij}^σ − ω_{i0}^σ, μ_j^{τ₁}) = δ` (`δ² = 1`).  This pins the `j`-column coefficient of
+`μ_j^{τ₁}` along `ω_{ij}^σ` to `δ` for every `i`, which together with `‖μ_j^{τ₁}‖² = w₁` forces the
+(10.6)(a) summed isometry `μ_j^{τ₁} = δ∑_i ω_{ij}^σ` (see `muColumn_tau1_pin`).  Crucially this
+specialised reduction avoids Peterfalvi's general (5.8) machinery (separability / `σ`-coefficients):
+the diagonal inner product `= 1` directly determines the `j`-column. -/
+theorem Hypothesis.omegaSigmaDiff_inner_muColumn_tau1 [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} {hyp : Hypothesis M}
+    {params : CharacterParameters hyp} (coh : CoherentHypothesis hyp params)
+    (hmu : params.mu = hyp.muGrid hG hG.odd)
+    (hos : params.omegaSigma = hyp.alignedOmegaSigmaGrid hG hG.odd)
+    (hzS : params.zeta ∈ inducedFamily M) (hz1 : params.zeta 1 = (hyp.w1 : ℂ))
+    (hzconj : params.zeta.conj ≠ params.zeta)
+    (hδpm : params.delta = 1 ∨ params.delta = -1)
+    (hδj : ∀ j : Fin hyp.w2, j ≠ 0 → hyp.muColumnSign hG hG.odd j = params.delta)
+    {j : Fin hyp.w2} (hj0 : j ≠ 0) (i : Fin hyp.w1) :
+    ClassFunction.inner (hyp.alignedOmegaSigmaGrid hG hG.odd i j
+        - hyp.alignedOmegaSigmaGrid hG hG.odd i 0)
+        (coh.tau1 (∑ i' : Fin hyp.w1, hyp.muGrid hG hG.odd i' j)) = (params.delta : ℂ) := by
+  haveI := hyp.finiteG
+  classical
+  have hodd : Odd (Nat.card G) := hG.odd
+  -- discharge the standard (10.3) degree/parity hypotheses (cf. `alpha_tau_image`).
+  have hn2 : 2 ≤ params.n := params.two_le_n
+  have hw1 : 3 ≤ hyp.w1 := (typePData_toTICyclicHypothesis hyp.typeP hodd).three_le_card_W1
+  have hw2 : 3 ≤ hyp.w2 := (typePData_toTICyclicHypothesis hyp.typeP hodd).three_le_card_W2
+  obtain ⟨k, hjk, hk0⟩ : ∃ k : Fin hyp.w2, j ≠ k ∧ k ≠ 0 := by
+    have h1lt : 1 < hyp.w2 := by omega
+    have h2lt : 2 < hyp.w2 := by omega
+    by_cases h : j = ⟨1, h1lt⟩
+    · exact ⟨⟨2, h2lt⟩, by rw [h]; exact Fin.ne_of_val_ne (by simp), Fin.ne_of_val_ne (by simp)⟩
+    · exact ⟨⟨1, h1lt⟩, h, Fin.ne_of_val_ne (by simp)⟩
+  have hdeg : hyp.muGrid hG hodd i j 1 = (params.d : ℂ) := by
+    rw [← hmu]; exact params.degree_independent i j hj0
+  have hμ0 : hyp.muGrid hG hodd i 0 1 = 1 := hyp.muGrid_zero_column_apply_one hG hodd i
+  have hcolj : ∀ i' : Fin hyp.w1, hyp.muGrid hG hodd i' j 1 = (params.d : ℂ) := fun i' => by
+    rw [← hmu]; exact params.degree_independent i' j hj0
+  have hcolk : ∀ i' : Fin hyp.w1, hyp.muGrid hG hodd i' k 1 = (params.d : ℂ) := fun i' => by
+    rw [← hmu]; exact params.degree_independent i' k hk0
+  have hd1 : params.d ≠ 1 := by have := params.d_gt_one; omega
+  have hdj1 : hyp.muGrid hG hodd 0 j 1 ≠ 1 := by rw [hcolj 0]; exact_mod_cast hd1
+  have hdk1 : hyp.muGrid hG hodd 0 k 1 ≠ 1 := by rw [hcolk 0]; exact_mod_cast hd1
+  have hdw1 : params.d ≠ hyp.w1 := by
+    have hf : (params.d : ℤ) = (params.n : ℤ) * (hyp.w1 : ℤ) + params.delta := by
+      linarith [params.n_formula]
+    have hn2Z : (2 : ℤ) ≤ (params.n : ℤ) := by exact_mod_cast hn2
+    have hw1Z : (3 : ℤ) ≤ (hyp.w1 : ℤ) := by exact_mod_cast hw1
+    intro he
+    have heZ : (params.d : ℤ) = (hyp.w1 : ℤ) := by exact_mod_cast he
+    rcases hδpm with h | h <;> rw [h] at hf <;> nlinarith [hf, heZ, hn2Z, hw1Z]
+  have hdζ : hyp.muGrid hG hodd i j 1 ≠ params.zeta 1 := by rw [hdeg, hz1]; exact_mod_cast hdw1
+  have h0ζ : hyp.muGrid hG hodd i 0 1 ≠ params.zeta 1 := by
+    rw [hμ0, hz1]; intro he; have : hyp.w1 = 1 := by exact_mod_cast he.symm
+    omega
+  have hjζ : ∀ i' : Fin hyp.w1, hyp.muGrid hG hodd i' j 1 ≠ params.zeta 1 := fun i' => by
+    rw [hcolj i', hz1]; exact_mod_cast hdw1
+  have hkζ : ∀ i' : Fin hyp.w1, hyp.muGrid hG hodd i' k 1 ≠ params.zeta 1 := fun i' => by
+    rw [hcolk i', hz1]; exact_mod_cast hdw1
+  have hζirr := params.zeta_irreducible
+  have hδjj := hδj j hj0
+  -- (1) the diagonal reduction `(α^τ, μ_j^{τ₁} − dζ̄^{τ₁}) = 1`.
+  have hdiag := hyp.muGridAlpha_tau1_inner_muColumn_self_sub_conj hG hodd i hj0 coh hzS hζirr
+    hzconj hdeg hμ0 hz1 params.n_formula hδjj h0ζ hjζ hcolj hdj1
+  -- (2) `(α^τ, ζ^{τ₁}) = −n` (the (10.5) `a = 0`).
+  have haζ := hyp.muGridAlpha_tau1_zeta_eq_neg_n hG hodd i hj0 k hjk hk0 coh hzS hζirr hzconj
+    hdeg hμ0 hz1 params.n_formula hδjj hdζ h0ζ hkζ hcolk hdk1 hδpm hw1 hn2
+  -- (3) `(α^τ, ζ^{τ₁}) − (α^τ, ζ̄^{τ₁}) = −n`, hence `(α^τ, ζ̄^{τ₁}) = 0`.
+  have hzsc := hyp.muGridAlpha_tau_inner_zeta_sub_conj hG hodd i hj0 hzS hζirr hzconj
+    hdeg hμ0 hz1 params.n_formula hδjj hdζ h0ζ
+  rw [hyp.tau_zeta_sub_conj_eq_tau1 hG hodd coh hzS hζirr, ClassFunction.inner_sub_right] at hzsc
+  have haζbar : ClassFunction.inner
+      (hyp.tau (hyp.muGrid hG hodd i j - (params.delta : ℂ) • hyp.muGrid hG hodd i 0
+        - (params.n : ℂ) • params.zeta)) (coh.tau1 params.zeta.conj) = 0 := by
+    linear_combination haζ - hzsc
+  -- (4) `(α^τ, μ_j^{τ₁}) = 1`.
+  rw [ClassFunction.inner_sub_right, OddOrder.RepresentationTheory.inner_smul_right, haζbar,
+    mul_zero, sub_zero] at hdiag
+  -- (5) substitute the (10.5) Dade image and drop the `ζ^{τ₁}` term (`(ζ^{τ₁}, μ_j^{τ₁}) = 0`).
+  have hαimg := alpha_tau_image hG coh hmu hos hzS hz1 hzconj hδpm hδj i j hj0
+  rw [params.alpha_def, hmu, hos] at hαimg
+  have hζμ := hyp.zeta_tau1_inner_muColumn hG hodd j coh hzS hζirr hjζ hdj1
+  rw [hαimg, ClassFunction.inner_sub_left, ClassFunction.inner_smul_left,
+    ClassFunction.inner_smul_left, hζμ, mul_zero, sub_zero] at hdiag
+  -- `δ · (ω_{ij}^σ − ω_{i0}^σ, μ_j^{τ₁}) = 1`, so the inner product is `δ` (`δ² = 1`).
+  have hδsq : (params.delta : ℂ) * (params.delta : ℂ) = 1 := by
+    rcases hδpm with h | h <;> rw [h] <;> norm_num
+  calc ClassFunction.inner (hyp.alignedOmegaSigmaGrid hG hG.odd i j
+          - hyp.alignedOmegaSigmaGrid hG hG.odd i 0)
+        (coh.tau1 (∑ i' : Fin hyp.w1, hyp.muGrid hG hG.odd i' j))
+      = (params.delta : ℂ) * ((params.delta : ℂ) * ClassFunction.inner
+          (hyp.alignedOmegaSigmaGrid hG hG.odd i j - hyp.alignedOmegaSigmaGrid hG hG.odd i 0)
+          (coh.tau1 (∑ i' : Fin hyp.w1, hyp.muGrid hG hG.odd i' j))) := by
+        rw [← mul_assoc, hδsq, one_mul]
+    _ = (params.delta : ℂ) * 1 := by rw [hdiag]
+    _ = (params.delta : ℂ) := mul_one _
+
+open scoped FiniteInduce in
 /-- **Peterfalvi (10.5), column difference (per row)**: for two nontrivial columns `j, k ≠ 0`, the
 Dade image of the difference `μ_{ij} − μ_{ik}` of certain-type characters is
 `δ·(ω_{ij}^σ − ω_{ik}^σ)`.
@@ -4488,6 +4594,110 @@ theorem Hypothesis.muColumn_tau1_eq_of_single_column [Finite G]
           - coh.tau1 (∑ i : Fin hyp.w1, hyp.muGrid hG hG.odd i j₀))
         + coh.tau1 (∑ i : Fin hyp.w1, hyp.muGrid hG hG.odd i j₀) := by abel
   rw [hrw, hdiff, hpin, smul_sub]; abel
+
+open scoped Classical FiniteInduce in
+/-- **Peterfalvi (10.6)(a) summed isometry**: for every nontrivial column `0 < j < w₂`,
+`μ_j^{τ₁} = δ·∑_i ω_{ij}^σ`.
+
+This is the §10 specialisation of Peterfalvi's (5.8) — proved here *without* the general (5.8)
+machinery (separability / `σ`-coefficients), using only the (10.6)(a) reduction and a cardinality
+count.  By (5.5) (`exists_muColumn_tau1_eq_sum_R`), `μ_j^{τ₁} = ∑_{x ∈ T} R(x)` where
+`R = R(μ_j) = {δ·ω_{ij}^σ}∪{−δ·ω_{ij'}^σ}` (`columnRImage`, `j'` the conjugate column) is an
+orthonormal family and `|T| = ‖μ_j^{τ₁}‖² = w₁`.  The reduction
+`(ω_{ij}^σ − ω_{i0}^σ, μ_j^{τ₁}) = δ` (`omegaSigmaDiff_inner_muColumn_tau1`) computes, against the
+`T`-sum, to `δ·[(false, i) ∈ T]` (the cross-column `j'` and the trivial column `0` are orthogonal);
+since `δ ≠ 0`, every `(false, i) ∈ T`.  So `{false} × univ ⊆ T` with both of cardinality `w₁`, forcing
+`T = {false} × univ` and `μ_j^{τ₁} = ∑_i δ·ω_{ij}^σ = δ·∑_i ω_{ij}^σ`. -/
+theorem Hypothesis.muColumn_tau1_pin [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} {hyp : Hypothesis M}
+    {params : CharacterParameters hyp} (coh : CoherentHypothesis hyp params)
+    (hmu : params.mu = hyp.muGrid hG hG.odd)
+    (hos : params.omegaSigma = hyp.alignedOmegaSigmaGrid hG hG.odd)
+    (hzS : params.zeta ∈ inducedFamily M) (hz1 : params.zeta 1 = (hyp.w1 : ℂ))
+    (hzconj : params.zeta.conj ≠ params.zeta)
+    (hδpm : params.delta = 1 ∨ params.delta = -1)
+    (hδj : ∀ j : Fin hyp.w2, j ≠ 0 → hyp.muColumnSign hG hG.odd j = params.delta)
+    (hd1 : ∀ jj : Fin hyp.w2, jj ≠ 0 → hyp.muGrid hG hG.odd 0 jj 1 ≠ 1)
+    {j : Fin hyp.w2} (hj0 : j ≠ 0) :
+    coh.tau1 (∑ i : Fin hyp.w1, hyp.muGrid hG hG.odd i j)
+      = (params.delta : ℂ) • ∑ i : Fin hyp.w1, hyp.alignedOmegaSigmaGrid hG hG.odd i j := by
+  haveI := hyp.finiteG
+  classical
+  -- (5.5): `μ_j^{τ₁} = ∑_{α ∈ E} α` for `E ⊆ R(μ_j)`, `|E| = w₁`.
+  obtain ⟨j', hj'0, hj'j, E, hEsub, hEsum, hEcard⟩ :=
+    hyp.exists_muColumn_tau1_eq_sum_R hG coh hmu hos hzS hz1 hzconj hδpm hδj hd1 hj0
+  set R := hyp.columnRImage hG hG.odd params.delta j j' with hRdef
+  have hRinj : Function.Injective R := hyp.columnRImage_injective hG hG.odd hδpm (Ne.symm hj'j)
+  -- the preimage `T ⊆ Bool × Fin w₁` of `E` under the injective family `R`.
+  set T : Finset (Bool × Fin hyp.w1) := Finset.univ.filter (fun x => R x ∈ E) with hTdef
+  have hImT : T.image R = E := by
+    apply Finset.ext; intro α
+    simp only [Finset.mem_image, hTdef, Finset.mem_filter, Finset.mem_univ, true_and]
+    constructor
+    · rintro ⟨x, hx, rfl⟩; exact hx
+    · intro hα
+      obtain ⟨x, -, hx⟩ := Finset.mem_image.mp (hEsub hα)
+      exact ⟨x, by rw [hx]; exact hα, hx⟩
+  have hSumT : ∑ x ∈ T, R x = ∑ α ∈ E, α := by
+    rw [← hImT, Finset.sum_image (fun x _ y _ h => hRinj h)]
+  have hCardT : T.card = hyp.w1 := by
+    have hc : (T.image R).card = E.card := by rw [hImT]
+    rw [Finset.card_image_of_injOn (fun x _ y _ h => hRinj h)] at hc
+    rw [hc]; exact_mod_cast hEcard
+  -- `μ_j^{τ₁} = ∑_{x ∈ T} R x`.
+  have hμT : coh.tau1 (∑ i : Fin hyp.w1, hyp.muGrid hG hG.odd i j) = ∑ x ∈ T, R x := by
+    rw [hEsum, hSumT]
+  -- inner product of `ω_{ij}^σ − ω_{i0}^σ` against each `R(x)` (only `x = (false, i)` survives).
+  have hval : ∀ (i : Fin hyp.w1) (x : Bool × Fin hyp.w1),
+      ClassFunction.inner (hyp.alignedOmegaSigmaGrid hG hG.odd i j
+        - hyp.alignedOmegaSigmaGrid hG hG.odd i 0) (R x)
+      = if x = (false, i) then (params.delta : ℂ) else 0 := by
+    intro i x
+    have hδstar : star ((params.delta : ℂ)) = (params.delta : ℂ) := by
+      rcases hδpm with h | h <;> rw [h] <;> norm_num
+    obtain ⟨b, i'⟩ := x
+    cases b <;>
+      simp only [hRdef, Hypothesis.columnRImage, ClassFunction.inner_sub_left,
+        OddOrder.RepresentationTheory.inner_smul_right, hyp.alignedOmegaSigmaGrid_inner hG hG.odd,
+        hδstar, star_neg, Prod.mk.injEq, reduceCtorEq, false_and, true_and, and_true,
+        eq_self_iff_true, ↓reduceIte, mul_one, mul_zero, mul_neg, neg_mul, neg_neg]
+    · -- (false, i'): `δ · [i = i'] − δ · [i = i' ∧ 0 = j] = if i' = i then δ else 0`
+      rw [if_neg (show ¬(i = i' ∧ (0 : Fin hyp.w2) = j) from fun hh => hj0 hh.2.symm),
+        mul_zero, sub_zero]
+      by_cases hii : i = i'
+      · rw [if_pos hii, mul_one, if_pos hii.symm]
+      · rw [if_neg hii, mul_zero, if_neg (fun h => hii h.symm)]
+    · -- (true, i'): both columns orthogonal (`j ≠ j'`, `j' ≠ 0`)
+      rw [if_neg (show ¬(i = i' ∧ j = j') from fun hh => hj'j hh.2.symm),
+        if_neg (show ¬(i = i' ∧ (0 : Fin hyp.w2) = j') from fun hh => hj'0 hh.2.symm)]
+      ring
+  -- the (10.6)(a) reduction forces every `(false, i) ∈ T`.
+  have hfalseT : ∀ i : Fin hyp.w1, (false, i) ∈ T := by
+    intro i
+    by_contra hni
+    have hRi := hyp.omegaSigmaDiff_inner_muColumn_tau1 hG coh hmu hos hzS hz1 hzconj hδpm hδj hj0 i
+    rw [hμT, OddOrder.RepresentationTheory.inner_sum_right] at hRi
+    rw [show (∑ x ∈ T, ClassFunction.inner (hyp.alignedOmegaSigmaGrid hG hG.odd i j
+          - hyp.alignedOmegaSigmaGrid hG hG.odd i 0) (R x))
+        = if (false, i) ∈ T then (params.delta : ℂ) else 0 by
+      rw [Finset.sum_congr rfl (fun x _ => hval i x)]; exact Finset.sum_ite_eq' T (false, i) _,
+      if_neg hni] at hRi
+    rcases hδpm with h | h <;> rw [h] at hRi <;> norm_num at hRi
+  -- `{false} × univ ⊆ T` and `|T| = w₁ = |{false} × univ|`, so `T = {false} × univ`.
+  have hFsub : Finset.univ.image (fun i : Fin hyp.w1 => (false, i)) ⊆ T := by
+    intro x hx
+    obtain ⟨i, -, rfl⟩ := Finset.mem_image.mp hx
+    exact hfalseT i
+  have hFinj : Function.Injective (fun i : Fin hyp.w1 => (false, i)) :=
+    fun a b h => congrArg Prod.snd h
+  have hFcard : (Finset.univ.image (fun i : Fin hyp.w1 => (false, i))).card = hyp.w1 := by
+    rw [Finset.card_image_of_injective _ hFinj, Finset.card_univ, Fintype.card_fin]
+  have hTeq : T = Finset.univ.image (fun i : Fin hyp.w1 => (false, i)) :=
+    (Finset.eq_of_subset_of_card_le hFsub (by rw [hFcard, hCardT])).symm
+  -- conclude: `μ_j^{τ₁} = ∑_i δ·ω_{ij}^σ = δ·∑_i ω_{ij}^σ`.
+  rw [hμT, hTeq, Finset.sum_image (fun a _ b _ h => hFinj h)]
+  simp only [hRdef, Hypothesis.columnRImage]
+  rw [Finset.smul_sum]
 
 /-- **Peterfalvi (10.6)**: the sums of `omega_ij^sigma` describe the `tau1`
 images, and outside the tame support the value of `zeta^tau1` has norm at least
