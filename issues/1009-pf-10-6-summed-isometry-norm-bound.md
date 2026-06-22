@@ -7,6 +7,42 @@ created: 2026-06-22
 
 # Pf (10.6): summed isometry + ζ^τ₁ norm bound
 
+## ✅✅✅ 2026-06-23 — (10.6)(a) summed isometry COMPLETE (linchpin landed)
+
+(10.6)(a) `μ_j^τ₁ = δ∑_i ω_ij^σ` を **σ-endgame engine を使わず** honest に証明・wiring (lane-b)。
+σ-grid 2D product 構造 (`exists_alignedOmegaSigmaGrid_chiFam_product` / `exists_kappa_sum_chiFam_column_eq`)
+を経由する当初 route より大幅にシンプルな **§10 特化 route** を発見し完走。残り = (10.6)(b) parity bound のみ。
+
+- **`Hypothesis.omegaSigmaDiff_inner_muColumn_tau1`** ((10.6)(a) 還元, commit `b3393682`): `(ω_ij^σ − ω_i0^σ,
+  μ_j^τ₁) = δ`。`(α_ij^τ, μ_j^τ₁ − dζ̄^τ₁) = 1` (`muGridAlpha_tau1_inner_muColumn_self_sub_conj`) +
+  `(α_ij^τ, ζ̄^τ₁) = 0` (= (10.5) `a=0` `muGridAlpha_tau1_zeta_eq_neg_n` + `(α^τ,ζ̄^τ₁)=(α^τ,ζ^τ₁)+n`) +
+  (10.5) Dade image `alpha_tau_image` + `(ζ^τ₁,μ_j^τ₁)=0` (`zeta_tau1_inner_muColumn`) →
+  `1 = (α_ij^τ,μ_j^τ₁) = δ(ω_ij^σ−ω_i0^σ,μ_j^τ₁)`。**ζ^τ₁⊥Imσ を回避** (in-stock のみ)。
+- **`Hypothesis.muColumn_tau1_pin`** ((10.6)(a) summed isometry, 同 commit): `μ_j^τ₁ = δ∑_i ω_ij^σ`。
+  (5.5) `μ_j^τ₁ = ∑_{x∈T} R(x)` (R=`columnRImage` 直交族, |T|=w₁) に上記還元を当て、各 i で
+  `(ω_ij^σ−ω_i0^σ, μ_j^τ₁) = δ·[(false,i)∈T]` を計算 → 全 `(false,i)∈T` → cardinality count で
+  `T = {false}×univ` → `μ_j^τ₁ = ∑_i δ·ω_ij^σ`。**separability / σ-coefficients / σ-endgame engine 不要** —
+  対角内積 `=1` が直接 j-列を pin し、`|T|=w₁` が共役列を殺す。
+- **wiring** (commit `da77ee6f`): `tau1_values_and_norm_bound` conjunct (a) = `muColumn_tau1_pin`
+  (標準 bundle hmu/hos/hzS/hz1/hzconj/hδpm/hδj 追加、`[Finite G]`+FiniteInduce regime に統一)。
+  両 lemma axiom-clean modulo §10 muGrid 上流 gate (theoremA/Prop16.1、自前 sorry 0)。full build 3881 green。
+- **🔑 設計教訓**: §10 では (10.6)(a) 還元 `(δ(ω^σ−ω^σ),μ_j^τ₁)=1` が in-stock ゆえ、Peterfalvi の一般 (5.8)
+  (vanish-on-V + (3.7) separability) を**回避**できる。当初 route が要した σ-endgame engine
+  (`eq_smul_chiFam_column_of_vanishOnV`)・sigmaCoeff 翻訳・2D product (`exists_alignedOmegaSigmaGrid_chiFam_product`)
+  は**不要**になった (それらは valid だが (10.6)(a) には未使用; 2D product は §10/§13 で再利用余地あり)。
+
+## ▶ 残り = (10.6)(b) parity bound (次セッション)
+
+`zeta_tau1_norm_bound` (現 opaque `Prop` = `True`, producer S12:2690) を de-opaque して証明:
+`g ∈ G − Ã(M)`, `order g` coprime to `w₁` ⟹ `|ζ^τ₁(g)| ≥ 1`。原文 (04.12 l.63-67):
+- **算術恒等式** (in-stock 材料): `δ(μ_0−ζ)^τ = δ∑ω_i0^σ − δζ^τ₁`。
+  `(μ_j−dζ)^τ − ∑_i α_ij^τ` を (10.6)(a)`μ_j^τ₁` + (10.5)`α_ij^τ` で展開、`d=nw₁+δ` で `(nw₁−d)ζ^τ₁=−δζ^τ₁`。
+- **τ-vanishing**: `(μ_0−ζ)^τ` は `G − Ã(M)` で消える (τ 定義) ⟹ `ζ^τ₁(g) = ∑_i ω_i0^σ(g)`。
+- **parity**: ω_i0^σ(g)∈ℤ (3.9.c) + ω_00^σ=1_G ((3.2.b)=`sigma_trivial` ✅在庫) + i≠0 で
+  ω̄_i0^σ=conj(ω_i0^σ) (3.9.a) かつ ω_i0 非実 (奇位数) ⟹ ∑_{i>0}∈2ℤ ⟹ ζ^τ₁(g)≡1 (mod 2) ⟹ |ζ^τ₁(g)|≥1。
+- **要確認**: `Ã(M)` (tame support) の §10 表現、τ-vanishing on `G−Ã(M)` の在庫、(3.9.a)/(3.9.c)、
+  order-coprime 仮定の使い所。carrier de-opaque (`zeta_tau1_norm_bound` を genuine statement に) が必要。
+
 ## 背景
 
 (10.5) Dade-image identity 締結 (issue 1007/1008 CLOSED) に続く文書順次ターゲット。
