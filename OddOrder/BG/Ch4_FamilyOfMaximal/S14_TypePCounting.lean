@@ -192,6 +192,42 @@ theorem kappa_subset_sigmaCompl {M : Subgroup G} : kappa M ⊆ (OddOrder.BG.Ch3.
   · exact ((mem_tau1_iff M p).mp h).1
   · exact ((mem_tau3_iff M p).mp h).1
 
+/-- `κ(M) ⊆ π(M) ∖ σ(M)` (`sigmaComplementPrimes M`): a `κ`-prime divides `|M|` (it carries a
+rank-one elementary abelian witness `P ≤ M` of order `p`) and lies outside `σ(M)`
+(`kappa_subset_sigmaCompl`). -/
+theorem kappa_subset_sigmaComplementPrimes [Finite G] {M : Subgroup G} :
+    kappa M ⊆ sigmaComplementPrimes M := by
+  intro p hpκ
+  have hpsig : p ∈ (OddOrder.BG.Ch3.S10.sigma M)ᶜ := kappa_subset_sigmaCompl hpκ
+  obtain ⟨hpp, _, P, hPelem, hPM, _⟩ := hpκ
+  have hPcard : Nat.card ↥P = p := by rw [(mem_elemAbelianOfRank.mp hPelem).2, pow_one]
+  exact ⟨Nat.mem_primeFactors.mpr ⟨hpp, hPcard ▸ Subgroup.card_dvd_of_le hPM, Nat.card_pos.ne'⟩,
+    hpsig⟩
+
+/-- In a §12 `E`-setup, if the `σ(M)'`-complement `E` is a `κ(M)`-group (every prime divisor of
+`|E|` lies in `κ(M)`), then `M` is type-`P₁`: `κ(M) = π(M) ∖ σ(M)`.  `E` is a `σ(M)'`-Hall, so it
+carries every `σ(M)'`-prime of `M`; combined with `κ(M) ⊆ π(M) ∖ σ(M)` this forces equality.
+Used to exclude the degenerate cases (`κ(M) ∩ τ₃(M) ≠ ∅`, or `E₂E₃ = 1`) when building the
+matched `κ`-complement of a type-`P₂` maximal subgroup. -/
+theorem kappa_eq_sigmaComplementPrimes_of_isPiGroup_card_E [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M E E₁ E₂ E₃ : Subgroup G}
+    (h : OddOrder.BG.Ch3.S12.SubgroupESetup M E E₁ E₂ E₃)
+    (hEκ : ∀ p ∈ (Nat.card ↥E).primeFactors, p ∈ kappa M) :
+    kappa M = sigmaComplementPrimes M := by
+  refine le_antisymm kappa_subset_sigmaComplementPrimes (fun p hp => ?_)
+  obtain ⟨hpπ, hpσ⟩ := hp
+  have hpp : p.Prime := Nat.prime_of_mem_primeFactors hpπ
+  have hpM : p ∣ Nat.card ↥M := Nat.dvd_of_mem_primeFactors hpπ
+  -- `p ∤ |M_σ|` (`M_σ` is a `σ(M)`-group and `p ∉ σ(M)`).
+  have hpMσ : ¬ p ∣ Nat.card ↥(OddOrder.BG.Ch3.S10.Msigma M) := fun hd =>
+    hpσ (OddOrder.BG.Ch3.S10.Msigma_isPiGroup M p
+      (Nat.mem_primeFactors.mpr ⟨hpp, hd, Nat.card_pos.ne'⟩))
+  -- `p ∣ |E|` from `|M_σ| · |E| = |M|`.
+  have hcardM := h.card_Msigma_mul_card_E
+  have hpE : p ∣ Nat.card ↥E :=
+    (hpp.dvd_mul.mp (hcardM ▸ hpM)).resolve_left hpMσ
+  exact hEκ p (Nat.mem_primeFactors.mpr ⟨hpp, hpE, Nat.card_pos.ne'⟩)
+
 /-- **`M`-conjugacy invariance of the `κ`-witness condition**: for `m ∈ M`, since `M_σ ◁ M`,
 conjugation by `m` carries `M_σ ⊓ C_G(P)` to `M_σ ⊓ C_G(P^m)`, so `C_{M_σ}(P) ≠ 1` implies
 `C_{M_σ}(P^m) ≠ 1`.  Used in Proposition 14.2 to transport the `κ(M)`-witness across

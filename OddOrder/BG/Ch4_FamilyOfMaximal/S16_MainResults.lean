@@ -584,6 +584,150 @@ theorem a0_minus_a_subset_conj_zTilde [Finite G] (hG : OddOrder.BG.IsMinimalSimp
       exact hbκne (Subgroup.mem_bot.mp
         (kappaHall_inf_Kstar_eq_bot hKM hK hKstar ▸ Subgroup.mem_inf.mpr ⟨hbκK, hbκK'⟩))
 
+/-- **Matched `κ`-Hall / `(κ∪σ)'`-Hall pair for a type-`P₂` maximal subgroup** (BG `kappa_complement`;
+the Frobenius complement `E = K ⋉ U` of Proposition 14.2(a), with `U = E₂E₃` the `M_σ`-complement's
+derived subgroup).  There is a `κ(M)`-Hall `K₀` and a nontrivial abelian `(κ(M)∪σ(M))'`-Hall `U₀`,
+both `≤ M`, with `K₀ ≤ N_G(U₀)` — since `U₀ = E₂E₃ ◁ E` (`E23_normal`) and `K₀ = E₁ ≤ E`.
+
+This is exactly the matched pair consumed by Corollary 14.12 (`typeP2_neighbor_is_typeF`) via its
+`hKNU : K ≤ N(U)` hypothesis.  As all `(κ∪σ)'`-Hall subgroups of `M` are `M`-conjugate, the
+arbitrary `U` of Theorem C is `M`-conjugate to `U₀`, which transports `N_G(U) ⊄ M` between them.
+
+Construction: take a §12 `E`-setup (`E = E₁E₂E₃`, `E` a `σ(M)'`-complement of `M_σ`).  Type-`P₂`
+excludes the degenerate cases (`κ ∩ τ₃ ≠ ∅`, or `E₂E₃ = 1`) which both make `E` a `κ`-group, hence
+`κ(M) = π(M)∖σ(M)` (`kappa_eq_sigmaComplementPrimes_of_isPiGroup_card_E`), i.e. type-`P₁`.  In the
+remaining case `κ ⊆ τ₁`, `E₁` is the `κ`-Hall (`mem_kappa_of_mem_primeFactors_card_E1`) and
+`E₂E₃ = [E : E₁]` is the `(κ∪σ)'`-Hall (its prime divisors avoid `κ` as the index of the `κ`-Hall
+`E₁`, and `σ` as `E` is a `σ'`-group). -/
+theorem typeP2_exists_matched_kappa_hall_pair [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G}
+    (hM : M ∈ maximalSubgroups G) (hP2 : S14.IsTypeP2 M) :
+    ∃ K₀ U₀ : Subgroup G, K₀ ≤ M ∧ U₀ ≤ M ∧ U₀ ≠ ⊥ ∧
+      Ch03.IsHallSubgroup (S14.kappa M) (K₀.subgroupOf M) ∧
+      Ch03.IsHallSubgroup ((S14.kappa M ∪ OddOrder.BG.Ch3.S10.sigma M)ᶜ) (U₀.subgroupOf M) ∧
+      IsMulCommutative ↥U₀ ∧
+      K₀ ≤ Subgroup.normalizer (U₀ : Set G) := by
+  classical
+  have hP : S14.IsTypeP M := hP2.1
+  obtain ⟨E, E₁, E₂, E₃, hsetup⟩ := exists_subgroupESetup hG hM
+  -- `E` is a `σ(M)'`-group.
+  have hEσ' : Ch03.Subgroup.IsPiGroup (OddOrder.BG.Ch3.S10.sigma M)ᶜ E :=
+    hsetup.isPiGroup_sigma_compl hG
+  -- `κ(M) ∩ τ₃(M) = ∅` (else `E` is a `κ`-group, giving type-`P₁`, contradicting `hP2`).
+  have hτ3empty : ¬ (S14.kappa M ∩ tau3 M).Nonempty := by
+    rintro ⟨p, hpκ, hpτ3⟩
+    have hp : p.Prime := S14.prime_of_mem_kappa hpκ
+    obtain ⟨hE3ne, hreg⟩ := S14.E3_not_regular_of_mem_kappa_tau3 hG hsetup hp hpκ hpτ3
+    obtain ⟨_, _, hEprime, _⟩ := OddOrder.BG.Ch3.S13.E3_not_regular_consequences hG hsetup hE3ne hreg
+    obtain ⟨x, hxE3, hxne, hxC⟩ : ∃ x ∈ E₃, x ≠ 1 ∧
+        OddOrder.BG.Ch3.S10.Msigma M ⊓ Subgroup.centralizer ({x} : Set G) ≠ ⊥ := by
+      by_contra hcon; push_neg at hcon; exact hreg fun y hy hy1 => hcon y hy hy1
+    exact hP2.2 (S14.kappa_eq_sigmaComplementPrimes_of_isPiGroup_card_E hG hsetup
+      (fun q hq => S14.mem_kappa_of_mem_primeFactors_card_E hG hsetup hEprime hxE3 hxne hxC hq))
+  have hκτ1 : ∀ p ∈ S14.kappa M, p ∈ tau1 M := fun p hpκ =>
+    (S14.kappa_subset_tau1_union_tau3 hpκ).resolve_right (fun hpτ3 => hτ3empty ⟨p, hpκ, hpτ3⟩)
+  -- `E₁` acts prime/non-regularly on `M_σ`; `E₁` is the `κ`-Hall of `E`, hence of `M`.
+  obtain ⟨p₀, hp₀κ⟩ := hP
+  obtain ⟨hE1ne, hE1nonreg⟩ := S14.E1_not_regular_of_mem_kappa_tau1 hG hsetup
+    (S14.prime_of_mem_kappa hp₀κ) hp₀κ (hκτ1 p₀ hp₀κ)
+  have hE1prime := OddOrder.BG.Ch3.S13.E1_actsPrime hG hsetup hE1ne
+  have hCE1 : OddOrder.BG.Ch3.S10.Msigma M ⊓ Subgroup.centralizer (E₁ : Set G) ≠ ⊥ :=
+    S14.Msigma_inf_centralizer_E_ne_bot_of_actsPrime_nonregular hE1prime (le_refl E₁) hE1nonreg
+  have hE1HallκE : Ch03.IsHallSubgroup (S14.kappa M) (E₁.subgroupOf E) :=
+    ⟨fun p hp => S14.mem_kappa_of_mem_primeFactors_card_E1 hG hsetup hE1prime hCE1
+        (by rwa [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hsetup.E₁_le).toEquiv] at hp),
+      fun p hp hpκ => hsetup.E₁_hall.2 p hp (hκτ1 p hpκ)⟩
+  have hK₀ : Ch03.IsHallSubgroup (S14.kappa M) (E₁.subgroupOf M) :=
+    hallPiece_isHall_in_M hG hsetup hsetup.E₁_le hE1HallκE S14.kappa_subset_sigmaCompl
+  set U₀ : Subgroup G := E₂ ⊔ E₃ with hU₀def
+  have hU₀leE : U₀ ≤ E := sup_le hsetup.E₂_le hsetup.E₃_le
+  -- `|E| = |E₁| · |U₀|` (the `τ₁` vs `τ₂∪τ₃` factorisation; `E₁ ⊓ U₀ = 1` by coprimality).
+  have hc1E : Nat.card ↥(E₁.subgroupOf E) = Nat.card ↥E₁ :=
+    Nat.card_congr (Subgroup.subgroupOfEquivOfLe hsetup.E₁_le).toEquiv
+  have hc2E : Nat.card ↥(E₂.subgroupOf E) = Nat.card ↥E₂ :=
+    Nat.card_congr (Subgroup.subgroupOfEquivOfLe hsetup.E₂_le).toEquiv
+  have hc3E : Nat.card ↥(E₃.subgroupOf E) = Nat.card ↥E₃ :=
+    Nat.card_congr (Subgroup.subgroupOfEquivOfLe hsetup.E₃_le).toEquiv
+  have hcardE : Nat.card ↥E = Nat.card ↥E₁ * Nat.card ↥U₀ := by
+    have hEsup : E = E₁ ⊔ E₂ ⊔ E₃ := (subgroupE_basic hG hsetup).2.2.2.2.1.1
+    have hEnormE3 : E ≤ Subgroup.normalizer (E₃ : Set G) := (subgroupE_basic hG hsetup).2.1.2
+    have hcop2 : Nat.Coprime (Nat.card ↥E₁) (Nat.card ↥E₂) := by
+      by_contra hnc
+      obtain ⟨s, hs, hsm, hsn⟩ := Nat.Prime.not_coprime_iff_dvd.mp hnc
+      have := tau1_pRank_eq_one (hsetup.E₁_hall.1 s
+        (hc1E ▸ Nat.mem_primeFactors.mpr ⟨hs, hsm, Nat.card_pos.ne'⟩))
+      have := tau2_pRank_eq_two (hsetup.E₂_hall.1 s
+        (hc2E ▸ Nat.mem_primeFactors.mpr ⟨hs, hsn, Nat.card_pos.ne'⟩))
+      omega
+    have hcop3 : Nat.Coprime (Nat.card ↥E₁) (Nat.card ↥E₃) := by
+      by_contra hnc
+      obtain ⟨s, hs, hsm, hsn⟩ := Nat.Prime.not_coprime_iff_dvd.mp hnc
+      exact not_mem_tau3_of_mem_tau1
+        (hsetup.E₁_hall.1 s (hc1E ▸ Nat.mem_primeFactors.mpr ⟨hs, hsm, Nat.card_pos.ne'⟩))
+        (hsetup.E₃_hall.1 s (hc3E ▸ Nat.mem_primeFactors.mpr ⟨hs, hsn, Nat.card_pos.ne'⟩))
+    have hE23disj : E₂ ⊓ E₃ = ⊥ := by
+      have hd1 : Nat.card ↥(E₂ ⊓ E₃) ∣ Nat.card ↥E₂ := Subgroup.card_dvd_of_le inf_le_left
+      have hd2 : Nat.card ↥(E₂ ⊓ E₃) ∣ Nat.card ↥E₃ := Subgroup.card_dvd_of_le inf_le_right
+      have hcop23 : Nat.Coprime (Nat.card ↥E₂) (Nat.card ↥E₃) := by
+        by_contra hnc
+        obtain ⟨s, hs, hsm, hsn⟩ := Nat.Prime.not_coprime_iff_dvd.mp hnc
+        have := tau2_pRank_eq_two (hsetup.E₂_hall.1 s
+          (hc2E ▸ Nat.mem_primeFactors.mpr ⟨hs, hsm, Nat.card_pos.ne'⟩))
+        have := tau3_pRank_eq_one (hsetup.E₃_hall.1 s
+          (hc3E ▸ Nat.mem_primeFactors.mpr ⟨hs, hsn, Nat.card_pos.ne'⟩))
+        omega
+      exact Subgroup.card_eq_one.mp (Nat.dvd_one.mp (hcop23 ▸ Nat.dvd_gcd hd1 hd2))
+    have hcard23 : Nat.card ↥U₀ = Nat.card ↥E₂ * Nat.card ↥E₃ :=
+      card_sup_eq_mul_of_le_normalizer_of_disjoint (hsetup.E₂_le.trans hEnormE3) hE23disj
+    have hE1_23_disj : E₁ ⊓ U₀ = ⊥ := by
+      have hd1 : Nat.card ↥(E₁ ⊓ U₀) ∣ Nat.card ↥E₁ := Subgroup.card_dvd_of_le inf_le_left
+      have hd2 : Nat.card ↥(E₁ ⊓ U₀) ∣ Nat.card ↥U₀ := Subgroup.card_dvd_of_le inf_le_right
+      have hcop : Nat.Coprime (Nat.card ↥E₁) (Nat.card ↥U₀) :=
+        hcard23 ▸ Nat.Coprime.mul_right hcop2 hcop3
+      exact Subgroup.card_eq_one.mp (Nat.dvd_one.mp (hcop ▸ Nat.dvd_gcd hd1 hd2))
+    have hE1normU0 : E₁ ≤ Subgroup.normalizer (U₀ : Set G) :=
+      hsetup.E₁_le.trans (hsetup.E23_normal hG)
+    have hsupEq : E₁ ⊔ U₀ = E := by rw [hU₀def, ← sup_assoc, ← hEsup]
+    rw [← hsupEq, card_sup_eq_mul_of_le_normalizer_of_disjoint hE1normU0 hE1_23_disj]
+  -- index facts `[E:E₁] = |U₀|`, `[E:U₀] = |E₁|`.
+  have hidxE1 : (E₁.subgroupOf E).index = Nat.card ↥U₀ := by
+    have hmi := Subgroup.card_mul_index (E₁.subgroupOf E)
+    rw [hc1E] at hmi
+    exact Nat.eq_of_mul_eq_mul_left Nat.card_pos (by rw [hmi, hcardE])
+  have hidxU0 : (U₀.subgroupOf E).index = Nat.card ↥E₁ := by
+    have hmi := Subgroup.card_mul_index (U₀.subgroupOf E)
+    rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hU₀leE).toEquiv] at hmi
+    exact Nat.eq_of_mul_eq_mul_left Nat.card_pos (by rw [hmi, hcardE]; ring)
+  -- `U₀` is a `(κ∪σ)'`-Hall of `E`, hence of `M`.
+  have hU₀HallE : Ch03.IsHallSubgroup ((S14.kappa M ∪ OddOrder.BG.Ch3.S10.sigma M)ᶜ)
+      (U₀.subgroupOf E) := by
+    constructor
+    · intro p hp
+      have hpU₀ : p ∈ (Nat.card ↥U₀).primeFactors := by
+        rwa [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hU₀leE).toEquiv] at hp
+      rw [Set.mem_compl_iff, Set.mem_union, not_or]
+      refine ⟨fun hpκ => hE1HallκE.2 p (by rw [hidxE1]; exact hpU₀) hpκ, ?_⟩
+      exact hEσ' p (Nat.primeFactors_mono (Subgroup.card_dvd_of_le hU₀leE) Nat.card_pos.ne' hpU₀)
+    · intro p hp
+      rw [hidxU0] at hp
+      exact fun hc => hc (Set.mem_union_left _ (hE1HallκE.1 p (by rwa [hc1E])))
+  have hU₀ : Ch03.IsHallSubgroup ((S14.kappa M ∪ OddOrder.BG.Ch3.S10.sigma M)ᶜ) (U₀.subgroupOf M) :=
+    hallPiece_isHall_in_M hG hsetup hU₀leE hU₀HallE
+      (fun p hp hpσ => hp (Or.inr hpσ))
+  -- `U₀ ≠ ⊥` (else `E = E₁` is a `κ`-Hall covering all `σ'`-primes, giving type-`P₁`).
+  have hU₀ne : U₀ ≠ ⊥ := by
+    intro hU₀bot
+    refine hP2.2 (S14.kappa_eq_sigmaComplementPrimes_of_isPiGroup_card_E hG hsetup (fun q hq => ?_))
+    rw [hcardE, hU₀bot, Subgroup.card_bot, mul_one] at hq
+    exact hE1HallκE.1 q (by rwa [hc1E])
+  -- `U₀` abelian (Lemma 15.1(b)).
+  have hU₀ab : IsMulCommutative ↥U₀ :=
+    (S15.typeP_hall_derived_eq_and_abelian hG hM hsetup.E1_le_M (hU₀leE.trans hsetup.E_le)
+      hE1ne hK₀ hU₀).2
+  have hK₀NU₀ : E₁ ≤ Subgroup.normalizer (U₀ : Set G) :=
+    hsetup.E₁_le.trans (hsetup.E23_normal hG)
+  exact ⟨E₁, U₀, hsetup.E1_le_M, hU₀leE.trans hsetup.E_le, hU₀ne, hK₀, hU₀, hU₀ab, hK₀NU₀⟩
+
 /-- **BG Theorem C** (mmd L4303): when `K ≠ 1`, `M` has a paired maximal
 subgroup `Mstar`, the cyclic product `Z = K Kstar`, a TI set `Z_tilde`, and the
 associated type-P duality.
@@ -664,8 +808,49 @@ theorem theoremC_paired_structure [Finite G]
         intro h
         simp [Subgroup.mem_bot]
       exact (mem_maximalSubgroups.mp hM).1 (top_le_iff.mp (htop.trans hle))
-    · -- `U ≠ ⊥` (type-`P₂`): `N_G(U) ⊄ M` is BG Corollary 14.12.  Residual.
-      sorry
+    · -- `U ≠ ⊥` (type-`P₂`): `N_G(U) ⊄ M` is BG Corollary 14.12.  We produce a *matched*
+      -- `κ`-Hall / `(κ∪σ)'`-Hall pair `(K₀, U₀)` (with `K₀ ≤ N_G(U₀)`, the hypothesis Corollary
+      -- 14.12 consumes), apply 14.12 to get `N_G(U₀) ⊄ M`, then transport along the `M`-conjugacy
+      -- `U₀ ~ U` of `(κ∪σ)'`-Hall subgroups.
+      have hUne' : U.subgroupOf M ≠ ⊥ := by
+        rw [ne_eq, Subgroup.subgroupOf_eq_bot]
+        exact fun hd => hUbot (hd.eq_bot_of_le hUM)
+      have hP2 : S14.IsTypeP2 M := isTypeP2_of_hall_subgroupOf_ne_bot hP hU hUne'
+      obtain ⟨K₀, U₀, hK₀M, hU₀M, hU₀ne, hK₀, hU₀, hU₀ab, hK₀NU₀⟩ :=
+        typeP2_exists_matched_kappa_hall_pair hG hM hP2
+      haveI : IsSolvable ↥M := hG.solvable_of_mem_maximalSubgroups hM
+      haveI : IsSolvable ↥U₀ := solvable_of_solvable_injective (Subgroup.inclusion_injective hU₀M)
+      -- a prime `r ∣ |U₀|` and a Sylow (= Hall `{r}`) subgroup `R₀ ≤ U₀`.
+      have hU₀card : Nat.card ↥U₀ ≠ 1 := fun h => hU₀ne (Subgroup.card_eq_one.mp h)
+      obtain ⟨r, hr⟩ : (Nat.card ↥U₀).primeFactors.Nonempty :=
+        Nat.nonempty_primeFactors.mpr
+          (lt_of_le_of_ne (Nat.one_le_iff_ne_zero.mpr Nat.card_pos.ne') (Ne.symm hU₀card))
+      obtain ⟨R', hR'⟩ := Ch03.hall_E_exists (G := ↥U₀) ({r} : Set ℕ)
+      have hR₀sub : ((R'.map U₀.subtype).subgroupOf U₀) = R' :=
+        Subgroup.comap_map_eq_self_of_injective U₀.subtype_injective R'
+      have hR₀ : Ch03.IsHallSubgroup ({r} : Set ℕ) ((R'.map U₀.subtype).subgroupOf U₀) := by
+        rw [hR₀sub]; exact hR'
+      have hU₀ab' : ∀ a ∈ U₀, ∀ b ∈ U₀, a * b = b * a := fun a ha b hb =>
+        congrArg Subtype.val (isMulCommutative_iff.mp hU₀ab (⟨a, ha⟩ : ↥U₀) ⟨b, hb⟩)
+      obtain ⟨H, _, _, _, _, hHNU₀⟩ :=
+        S14.typeP2_neighbor_is_typeF hG hM hP2 hK₀M hU₀M hK₀ hU₀ hU₀ab' hr (Subgroup.map_subtype_le _)
+          hR₀ hK₀NU₀
+      -- Transport `N_G(U) ⊄ M` (assumed `≤`, for contradiction) to `N_G(U₀) ≤ M`.
+      intro hle
+      apply hHNU₀
+      obtain ⟨w, hwM, hw⟩ := OddOrder.BG.Ch1.S06.exists_conj_eq_of_isHall_subgroupOf
+        inferInstance hU₀M hUM hU₀ hU
+      refine le_trans inf_le_right ?_
+      intro n hn
+      have hn_fix : MulAut.conj n • U₀ = U₀ := conj_smul_eq_self_of_mem_normalizer hn
+      have hwinv : MulAut.conj w⁻¹ • U = U₀ := by
+        rw [← hw, ← mul_smul, ← map_mul, inv_mul_cancel, map_one, one_smul]
+      have hfix : MulAut.conj (w * n * w⁻¹) • U = U := by
+        rw [map_mul, map_mul, mul_smul, mul_smul, hwinv, hn_fix, hw]
+      have hwnwM : w * n * w⁻¹ ∈ M := hle (mem_normalizer_of_conj_smul_eq_self hfix)
+      have hn' : n = w⁻¹ * (w * n * w⁻¹) * w := by group
+      rw [hn']
+      exact M.mul_mem (M.mul_mem (M.inv_mem hwM) hwnwM) hwM
   · -- Conjunct 10 (BG Theorem C(9)): `A_0(M) - A(M) = 𝒞_M(Ẑ)` is a TI-subset of `M`.  Reduce to the
     -- structural inclusion `A_0(M) - A(M) ⊆ 𝒞_M(Ẑ)` (`a0_minus_a_subset_conj_zTilde`) plus the
     -- TI-ness of `Ẑ` (`typeP_duality`; `N_G(Ẑ) = K ⊔ K* ≤ M`), via the transport lemma.
