@@ -171,6 +171,8 @@ branch とも削除済み。旧 **A** / **D** も同様に退役済み (履歴�
 
 ## 現状メモ
 
+- **📌 標準監視ペース = 25 分（恒久、ユーザー指示 2026-06-22）**: cron 式 **`4,29,54 * * * *`**（:04/:29/:54、:00・:30 を回避）を**標準合流ペースとして恒久化**。ユーザーが各レーンを稼働 → 本ペースで監視・自動合流する。⚠ **cron 自体は本環境で session-scoped**（`durable: true` を渡しても runtime は session-only と報告; [[cron-dies-on-model-switch]]）→ **ペースの正本はこの行**。新セッション開始時・`/model` 切替後は `CronList` 確認の上、消えていれば同式・同 prompt で**即再作成**する（prompt は「各イテレーションの手順」を要約したもの、本ファイルが authority）。7 日 auto-expire 後も同様に再作成。
+- **2026-06-22 (続) — 25 分 cron 再作成**: 新 cron `b9df9002`（`4,29,54 * * * *`, recurring, push あり=合流成立時 `git push origin main`, 7日 auto-expire）。4 レーン (B/F/H/C) は前 tick で全合流済み・worktree は main に ff 同期済み（全 `65286d09`）、実 sorry **131**。
 - **2026-06-22 — 監視再開 + 4 レーン backlog 合流 + cron 再作成 + `coq/` submodule 追加**: ユーザー指示で
   監視再開。前 cron `e3dcf75f` は session 変化で消滅 → 新 cron `8e80cc9d` (`4,29,54 * * * *` = 25分間隔,
   session-only, push なし, 7日 auto-expire) 再作成。**4 レーン全合流** (F→B→H→C, build 各 3881 jobs green /
