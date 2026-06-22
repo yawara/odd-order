@@ -5,6 +5,8 @@ Authors: Yawara Ishida
 -/
 import OddOrder.Peterfalvi.S13_MaximalIII_IV
 import OddOrder.Peterfalvi.S10_CoherenceWiring
+import OddOrder.GroupTheory.RepresentationTheory.SingerField
+import Mathlib.RepresentationTheory.Irreducible
 
 /-!
 # Peterfalvi Section 14: Maximal Subgroups of Type I
@@ -249,6 +251,43 @@ theorem intersection_complement_structure [Finite G]
     {ctr : CounterexampleHypothesis (G := G)} (data : RankTwoWitnessData ctr) :
     data.M_inter_L_complements_K ∧ data.M_inter_L_le_H := by
   sorry
+
+/-- **(12.12) irreducible-case core.**  An odd-order group `E` acting faithfully and
+irreducibly on a two-dimensional `𝔽_p`-space `V` (with `p ∤ |E|`) is cyclic, with
+`|E| ∣ |V| - 1 = p² - 1`.  This is the rank-two irreducible case of Peterfalvi (12.12):
+BG Theorem 2.6(a) (`odd_two_dim_abelian`) abelianizes `E`, and the commutativity-free Singer
+mechanism (`isCyclic_and_card_dvd_of_faithful_irreducible_comm`) then realizes `E` inside the
+units of the Singer field `𝔽_p[E] ⧸ I ≅ 𝔽_{p²}`. -/
+theorem isCyclic_and_card_dvd_of_odd_two_dim_irreducible
+    {p : ℕ} [Fact p.Prime] {E V : Type*} [Group E] [Finite E] (hodd : Odd (Nat.card E))
+    [AddCommGroup V] [Module (ZMod p) V] [Finite V]
+    (ρ : Representation (ZMod p) E V) (hfaith : Function.Injective ρ)
+    (hirr : Representation.IsIrreducible ρ)
+    (hdim : Module.finrank (ZMod p) V = 2) (hp_ndvd : ¬ p ∣ Nat.card E) :
+    IsCyclic E ∧ Nat.card E ∣ Nat.card V - 1 := by
+  classical
+  haveI : Module.Finite (ZMod p) V := Module.Finite.of_finite
+  -- BG 2.6(a): a faithful odd two-dimensional representation has abelian image.
+  have hchar : ∀ q : ℕ, q.Prime → q ∣ Nat.card E → ¬ CharP (ZMod p) q := fun q _ hqdvd hcharq =>
+    hp_ndvd ((CharP.eq (ZMod p) hcharq (ZMod.charP p)) ▸ hqdvd)
+  have hcomm : ∀ a b : E, a * b = b * a :=
+    (OddOrder.BG.Ch1.S02.odd_two_dim_abelian hodd hdim ρ hfaith hchar).comm
+  -- Give `V` the `𝔽_p[E]`-module structure of the representation *directly* (this is
+  -- definitionally `ρ.asModule`'s instance, but stated on `V` so that instance synthesis does
+  -- not choke on the `ρ.asModule` notation — which it does once `IsIrreducible ρ` is around).
+  letI : Module (MonoidAlgebra (ZMod p) E) V := Module.compHom V (ρ.asAlgebraHom).toRingHom
+  have hsmul : ∀ (e : E) (x : V), MonoidAlgebra.of (ZMod p) E e • x = ρ e x := fun e x => by
+    show (ρ.asAlgebraHom) (MonoidAlgebra.of (ZMod p) E e) x = ρ e x
+    rw [Representation.asAlgebraHom_of]
+  haveI : IsSimpleModule (MonoidAlgebra (ZMod p) E) V :=
+    (Representation.irreducible_iff_isSimpleModule_asModule ρ).mp hirr
+  have hfaith' : ∀ e : E, (∀ x : V, MonoidAlgebra.of (ZMod p) E e • x = x) → e = 1 := by
+    intro e he
+    apply hfaith
+    ext v
+    rw [map_one, Module.End.one_apply, ← hsmul e v]
+    exact he v
+  exact isCyclic_and_card_dvd_of_faithful_irreducible_comm (M := V) hcomm hfaith'
 
 /-- **Peterfalvi (12.12)**: the Frobenius complement in the witness subgroup is
 cyclic, with order dividing `p - 1` or `p + 1`. -/
