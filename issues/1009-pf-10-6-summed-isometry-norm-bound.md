@@ -35,8 +35,8 @@ created: 2026-06-22
 
 `zeta_tau1_norm_bound` (現 opaque `Prop` = `True`, producer S12:2690) を de-opaque して証明:
 `g ∈ G − Ã(M)`, `order g` coprime to `w₁` ⟹ `|ζ^τ₁(g)| ≥ 1`。原文 (04.12 l.63-67):
-- **STEP 1 = reduction identity `tau(μ_0 − ζ) = ∑_i ω_i0^σ − ζ^τ₁`** (G-class-function 等式, **全材料
-  in-stock・Ã(M) 不要**, lane-b 2026-06-23 に全導出確定; 残作業は ~100 行 assembly のみ):
+- **✅ STEP 1 DONE** (`Hypothesis.tau_muColumnZero_sub_zeta_eq`, commit `4426b300`, axiom-clean):
+  reduction identity `tau(μ_0 − ζ) = ∑_i ω_i0^σ − ζ^τ₁` (G-class-function 等式, Ã(M) 不要)。以下の導出で実装:
   - 固定非自明列 k≠0 (w₂≥3) で **M-level 恒等式** `δ(μ_0 − ζ) = (μ_k − dζ) − ∑_i α_ik`
     (α_ik=μ_ik−δμ_i0−nζ より RHS=μ_k−dζ−μ_k+δμ_0+w₁nζ=δμ_0+(w₁n−d)ζ=δ(μ_0−ζ)、`w₁n−d=−δ`)。
   - `hyp.tau` 線形 ⟹ `δ·tau(μ_0−ζ) = tau(μ_k−dζ) − ∑_i tau(α_ik)`。
@@ -46,12 +46,19 @@ created: 2026-06-22
   - `tau(α_ik) = δ(ω_ik^σ−ω_i0^σ) − nζ^τ₁` = `alpha_tau_image`。
   - 代入+`δ²=1`,`w₁n−d=−δ` で `δ·tau(μ_0−ζ) = δ∑ω_i0^σ − δζ^τ₁`、δ 倍で reduction 完成。
   - ⚠ 注意点: `∑_i α_ik` の `∑_i nζ = (w₁:ℂ)(n:ℂ)•ζ` (Finset.sum_const + nsmul↔smul); `[Finite G]`+FiniteInduce regime。
-- **STEP 2 = Ã(M)-vanishing** (要 §10/§16 の tame-support `Ã(M)` 機構): `tau(μ_0−ζ)` は Dade map ゆえ
-  `G − Ã(M)` で消える (S04 `map_eq_zero_of_not_mem_conjugatesOfSet_of_forall_H_eq_bot` 系の vanishing) ⟹
-  STEP 1 と合わせ `g∈G−Ã(M)` で `ζ^τ₁(g) = ∑_i ω_i0^σ(g)`。**`Ã(M)` は §10 stock に無い** (S16 で参照) —
-  §10 表現の特定が要。
+- **STEP 2 = Ã(M)-vanishing** (in-stock 経路判明, 2026-06-23): **`Ã(M) = hyp.dadeData.dade.dadeSupport`**
+  (S04 `dadeSupport : Set G`)。Dade map は `IsDadeMap.map_eq_zero_of_not_mem_dadeSupport` で dadeSupport
+  外で消える (S04:362/395)。∴ `g ∉ dadeSupport` で `tau(μ_0−ζ)(g)=0` → STEP 1 と合わせ
+  `ζ^τ₁(g) = ∑_i ω_i0^σ(g)`。**当初「Ã(M) 不在」懸念は誤り — dadeSupport が正体**。`hyp.tau` の
+  `toDadeMap`/`IsDadeMap` インスタンスから vanishing を引く wiring が要 (要 API 確認: `hyp.tau` の
+  IntegralCharacterMap → DadeMap 経路の vanishing 公開度)。
 - **STEP 3 = parity**: ω_i0^σ(g)∈ℤ (3.9.c) + ω_00^σ=1_G ((3.2.b)=`sigma_trivial` ✅在庫) + i≠0 で
   ω̄_i0^σ=conj(ω_i0^σ) (3.9.a) かつ ω_i0 非実 (奇位数) ⟹ ∑_{i>0}∈2ℤ ⟹ ζ^τ₁(g)≡1 (mod 2) ⟹ |ζ^τ₁(g)|≥1。
+  **⚠ (3.9.c)/(3.9.a) は §5 stock に明示的に無い** (S05 grep: `sigma_trivial`/`sigma_omega`/`sigma_mem_ZIrr`
+  はあるが ω^σ の g-値整数性・共役互換は無い) — STEP 3 は新規形式化を要する可能性。order-coprime 仮定は
+  (3.9.c) の整数性で使う見込み。alignedOmegaSigmaGrid(=ω^σ) は §10 で chiFam 経由 (2D product
+  `exists_alignedOmegaSigmaGrid_chiFam_product` が ω_ij^σ=chiFam(ρ_i,κ_j) を供給) ゆえ、(3.9.c)/(3.9.a) を
+  chiFam の整数性・共役で書ける可能性 (= 残した 2D product lemma の再利用余地)。
 - **STEP 4 = carrier de-opaque**: `zeta_tau1_norm_bound : Prop`(現 `True`, producer S12:2690)を
   genuine statement `∀ g∈G−Ã(M), order g coprime w₁ → 1≤|ζ^τ₁(g)|` に。order-coprime 仮定の使い所要確認。
 - **着手順**: STEP 1 (Ã(M) 非依存・即着手可) → STEP 2 の Ã(M) 表現特定 → STEP 3/4。
