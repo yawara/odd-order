@@ -20,20 +20,46 @@
 変更** (Wielandt §9 は H の連結 chunk、§11 衝突解消)、B は §10/§12/§13 char grid に専念、C は §16 char
 endpoint を自走所有 (B 待ちにしない)。
 
-| レーン | branch | 機能 | 所有ファイル | 自動合流 |
-|---|---|---|---|---|
-| **F** | `lane-f` | **① BG 構造** | `S14_TypePCounting`/`S15_MF`/`S16_MainResults`/`S16_PairIntersection` + `FeitThompson.lean` の §16 producer。Theorem A-I / Prop 16.1 | ✅ |
-| **B** | `lane-b` | **② Dade char producer** | `S10_MinimalSimpleStructure`/`S12_MaximalIII_IV_V`/`S13_MaximalIII_IV`。char grids/parameters/`section16CharacterData`。**S11 は触らない (H 所有)** | ✅ |
-| **H** | `lane-h` | **① Wielandt §9 + §14-15** | **`S11_MaximalII_III_IV` (Wielandt §9 + 型分類, H 単独所有)** + `S14_MaximalI`/`S15_SAndT` (type I + S&T) | ✅ |
-| **C** | `lane-c` | **②endpoint + ③assembly** | `S16_NonExistenceG` (Core 凍結)。非存在 + **POLE-2** (issue 2009) + §16 char endpoint **de-opacify (自走)** | ✅ |
+**⚠ 2026-06-22 frontier-cluster 再配置 (ユーザー裁可、issue 4005 監査結果)**: 4-territory read-only audit で
+「節区切りは starve を生むが実害は lane-c (§16 終点 = pure consumer) のみ。F/H/B は productive frontier 上、
+lane-h 領域に ~16 独立 workable leaf 集中」と判明 → **lane-c を §16 から Pf §11 (Wielandt §9 / Clifford
+9.6-9.10 = Pf 最上流の独立 5-leaf cluster) に再配置**。**S11 を H → C に移譲** (H は §14_MaximalI+§15 に集中)。
+**§16 (S16_NonExistenceG) + §10 (S10) は driver 化** = 常駐レーンを置かず、上流 (BG §16 / S15) landing 時に
+機会的に閉じる (実施 owner = hub、または上流を landing させたレーンが続けて driver で close)。各レーンを
+productive な独立クラスタに乗せ、上流優先方針 (CLAUDE.md) にも合致。
 
-**signature-first interface**: 上流が sorried signature を export → 下流が cite。真の cross-lane 依存は narrow
-(§13 `basic_structure` レベル)。大半は自レーン内 (lane-c の §16 de-opacify 等)。signature 不足は notes/issue 経由。
+| レーン | branch | 機能 (frontier クラスタ) | 所有ファイル | 自動合流 |
+|---|---|---|---|---|
+| **F** | `lane-f` | **BG §14-16 構造** | `S14_TypePCounting`/`S15_MF`/`S16_MainResults`/`S16_PairIntersection` + `FeitThompson.lean` の §16 producer。Theorem A-I / Prop 16.1 | ✅ |
+| **B** | `lane-b` | **Pf §12/§13 Dade char-grid** | `S12_MaximalIII_IV_V`/`S13_MaximalIII_IV`。char grids/parameters。**`S10_MinimalSimpleStructure` は driver (BG §16 gated、pure wiring)、常駐作業しない** | ✅ |
+| **H** | `lane-h` | **Pf §14_MaximalI + §15 S&T** | `S14_MaximalI`/`S15_SAndT` (type I + S&T、~11 workable leaf)。**S11 は触らない (C 所有に移譲)** | ✅ |
+| **C** | `lane-c` | **Pf §11 Wielandt §9 / Clifford** | **`S11_MaximalII_III_IV` (Wielandt §9 + 型分類 9.6-9.10, C 単独所有)**。**`S16_NonExistenceG` は driver (上流 landing 時に機会的 close)、常駐作業しない** | ✅ |
+
+**signature-first interface**: 上流が sorried signature を export → 下流が cite。真の cross-lane 依存は narrow。
+signature 不足は notes/issue 経由。**driver (§16/§10)**: 常駐レーンを当てず、上流が landing したとき hub or
+担当レーンが続けて opportunistic に close する (pure consumer ゆえ常駐は starve)。
 
 **取り決め**: (1) 各レーンは**自所有ファイルのみ編集**、他は cite のみ (要望は notes/issue 経由)。
-**特に S11 は H のみ** (B/H 衝突源だった)。(2) **新規 `axiom` 宣言は abort+ユーザー承認**。
+**特に S11 は C のみ** (2026-06-22 H→C 移譲)。(2) **新規 `axiom` 宣言は abort+ユーザー承認**。
 (3) issue base: **B=1000 / H=2000 / C=4000 / F=7000**。(4) `notes/bg/*`=F、`notes/peterfalvi/*`=B/H/C。
-マージ順 = **F → B → H → C** (独立レーンゆえ順序は形式的、上流→下流の自然順)。
+マージ順 = **F → B → H → C** (独立レーンゆえ順序は形式的)。
+**(5) 起動時 main 同期 = `git merge main` (ユーザー方針 2026-06-22, 全 LAUNCH 統一)**:
+各レーンはセッション開始時に **`git merge main`** (実 3-way、merge commit 可) で main 最新を取り込んでから
+作業する。**旧 `git merge --ff-only main` は廃止** — 自前 commit が 1 つでもあると ff 不能で失敗し、レーンが
+main に遅れ続ける (2026-06-22 実害: 全レーン 15-47 commits 遅れ → 古い文脈・2-dot 誤検出の原因)。
+コンフリクトは自所有ファイルなら解決、他レーン由来なら notes/issue で hub へ。`lake update` は禁止のまま。
+
+**🧭 方向性・cross-lane 判断は issue 起票 → hub 解決 (ユーザー方針 2026-06-22, 永続)**:
+レーンが (a) **方向性に迷った**とき (どの sorry を攻めるか・route 選択・faithfulness 解釈の迷い等)、
+または (b) **レーンをまたぐ判断**が要るとき (他レーン所有ファイルの signature 変更要望・所有境界の移動・
+cross-lane gate・割当変更等) は、**独断で進めず／他レーンのファイルを触らず**、`bin/new-issue` で
+**HUB 宛 issue を起票**する (title に "HUB:" を冠する、宛先と判断内容と選択肢を明記)。
+**hub が解決する** (issue 4005 relane の前例; hub はユーザー裁可が要る構造判断はユーザーに上げる)。
+- **hub 側の責務**: 各 tick の merge で **新規 HUB 宛 issue** (`issues/` 直下に "HUB:" タイトル or
+  `4002/4005` 系の hub-ask) が入ったら、サマリで**別枠報告**し、hub が解決する (read-only 監査 +
+  必要ならユーザーへ AskUserQuestion)。黙って merge し続けない。
+- これは [[cross-lane-sync-via-notes]] (lane↔lane の軽い sync は notes 追記) の**上位版** = 判断を要する
+  ものは issue 化して hub に集約。軽微な signature 不足通知は従来どおり notes でよい。
 
 **H 固有の取り決め (2026-06-12)**: (1) H は **Lane B の §4–§9 coherence/certain-type ファイル
 (`S04_*`〜`S09_*`) を編集しない** (cite のみ)。(2) §10–13 は BG↔Pf interface (BG Thm A–E/I–II)
@@ -66,8 +92,41 @@ branch とも削除済み。旧 **A** / **D** も同様に退役済み (履歴�
 
 ## 各イテレーションの手順
 
+> **⛔ 問題発生時はループ停止（ユーザー方針 2026-06-22, 永続）**: 下記のいずれかが起きたら、
+> 進行中マージを `git merge --abort`（**冒頭ガード = 他マージ進行中の場合を除く**）し、
+> **`CronList` で監視 cron の id を確認 → `CronDelete` でその場で停止** + 問題内容を明示報告し、
+> **以降のレーン処理・次 tick を行わない**（ユーザーが解消・再開指示するまで待つ）。黙って次 tick で
+> 同じ問題を繰り返さない。**問題 = ** build 失敗 / 内容コンフリクト（AxiomsCheck.lean・OddOrder.lean
+> の独立追記**以外**）/ sorry regression（証明済→sorry）/ 新規 `axiom` / push 失敗 / 想定外の git 状態
+> / **レーン範囲逸脱（下記 step 1.5 = 自所有外の Pf/BG S-ファイルを編集; ユーザー方針 2026-06-22）**。
+> **非問題（通常継続）= ** 「変化なし」/ 新 decl の faithful scaffold sorry 増 / 独立追記コンフリクトの両保持解決
+> / 共有ファイル編集（AxiomsCheck.lean 追記・OddOrder.lean import・`OddOrder/GroupTheory/**` 共有 infra・notes・issues）。
+
+> **🔒 レーン所有マップ（step 1.5 範囲逸脱チェック用、2026-06-22 frontier-cluster relane）**:
+> | lane | 所有 .lean（これ以外の Pf/BG S-ファイル編集 = 逸脱→停止） |
+> |---|---|
+> | **F** (lane-f) | `OddOrder/BG/**`（BG 全体）+ `OddOrder/FeitThompson.lean` |
+> | **B** (lane-b) | `OddOrder/Peterfalvi/S0[3-9]*` + `S10*` + `S12*` + `S13*`（Pf char API + §12/§13; **S11 除く**） |
+> | **H** (lane-h) | `OddOrder/Peterfalvi/S14_MaximalI*` + `S15*`（type I + S&T） |
+> | **C** (lane-c) | `OddOrder/Peterfalvi/S11*`（Wielandt §9 / Clifford） |
+> | **共有（全 lane 可）** | `OddOrder/AxiomsCheck.lean` / `OddOrder.lean` / `OddOrder/GroupTheory/**` / `notes/**` / `issues/**` |
+
 1. 各レーンの未マージ確認: `git log --oneline main..<branch>`。
    **全レーン 0 なら「変化なし」1行報告で即終了**（build を走らせない）。
+1.5. **レーン範囲逸脱チェック（ユーザー方針 2026-06-22, 永続）**: 未マージがあるレーンについて、
+   **マージ前**に**そのレーンが実際に変更したファイル**を取得し、上記 🔒 所有マップに照らす。
+   **⚠ 必ず 3-dot `main...<branch>`（merge-base からの branch 側差分）を使う** — 2-dot `main..<branch>`
+   は端点差分で「レーンが main に遅れている分（他レーンの merge で main 側だけ進んだ S05/S06/S11 等）」を
+   **誤検出**する（line 192 の罠と同根; 2026-06-22 実害 = lane-f/b が 2-dot で false-positive 逸脱判定）。
+   **自所有でも共有でもない `.lean`（典型: 他レーンの Pf/BG S-ファイル）を含むなら範囲逸脱** → そのレーンは
+   **マージせず（trial merge も開始しない）**、⛔ に従いループ停止（abort 不要 = まだ merge していない、
+   `CronDelete` + 報告 + 以降の tick を行わない）。報告には逸脱ファイル名 + lane + 所有者を明記。例 (lane=$b):
+   ```
+   owned_re='…'   # 🔒 マップから (F=^OddOrder/BG/|^OddOrder/FeitThompson; B=^OddOrder/Peterfalvi/S(0[3-9]|10|12|13); H=^OddOrder/Peterfalvi/S(14_MaximalI|15); C=^OddOrder/Peterfalvi/S11)
+   shared_re='^OddOrder/AxiomsCheck\.lean$|^OddOrder\.lean$|^OddOrder/GroupTheory/'
+   git diff --name-only main...$b -- '*.lean' | grep -vE "$owned_re" | grep -vE "$shared_re" | grep . && echo "範囲逸脱 → STOP"
+   ```
+   逸脱なし（空）→ step 2 へ。共有ファイル・notes・issues のみの差分は逸脱でない。
 2. **F → B → H → C の順**で（独立レーンゆえ順序は形式的、上流→下流の自然順）、未マージがあれば自動合流:
    - マージ前の実 sorry 数を記録: `bin/count-sorry`
      （prose 偽陽性 [sorry-free / sorryAx / `sorry'd` / backtick 引用] を除外する判定器。
@@ -142,6 +201,12 @@ branch とも削除済み。旧 **A** / **D** も同様に退役済み (履歴�
   端点差分は「他レーンファイルの大量削除」という**幻**を見せる（実測 4149 deletions に見えたことがある）。
   実マージは merge-base からの 3-way ゆえ、それらは「main 側のみ追加」扱いで保持される。マージ内容の確認は
   必ず `git merge --no-ff --no-commit` 後の `git diff --cached --stat`（=実際に staged される加算分）で行う。
+  **step 1.5 の範囲逸脱チェックも同じ罠**: マージ前の「レーンが変更したファイル」は必ず 3-dot
+  `git diff --name-only main...<branch>`（merge-base からの branch 側）で取る（2-dot だと遅れている分を誤検出）。
+- **`axiom` 判定 grep は必ず `.lean` に scope する**: `git diff --cached | grep '^\+\s*axiom '` は
+  **issue/notes の markdown 中の散文（"axiom footprint = …" 等）を誤検出**する（2026-06-22 実害）。
+  正しくは `git diff --cached -- '*.lean' | grep -E '^\+axiom [A-Za-z_]+ *[:({]'`（行頭 `axiom <ident>` の
+  実宣言のみ; staged が markdown のみなら空）。sorry +/- 判定も同様に `-- '*.lean'` scope。
 - **worktree の working-tree grep (`cd <wt> && grep -rnE … OddOrder/`) は未コミット WIP も数える** →
   sorry 増の**誤報源**。lane が draft 中の未追跡/未コミット `.lean`（実例: Thm 3.6 stub `S03f_Thm36.lean`）の
   sorry も拾うため、worktree では +N に見えても branch HEAD（コミット済）は不変なことがある。**merge が運ぶのは
@@ -171,8 +236,12 @@ branch とも削除済み。旧 **A** / **D** も同様に退役済み (履歴�
 
 ## 現状メモ
 
+- **📌 レーン範囲逸脱 = ループ停止ルール追加 (ユーザー方針 2026-06-22, 永続)**: 各レーンが**自所有外の Pf/BG S-ファイルを編集**したら ⛔ stop-on-problem に従いループ停止 (CronDelete + 報告 + 待機)。検出 = step 1.5 (マージ前に **3-dot** `git diff --name-only main...<branch>` を 🔒 所有マップに照合; 2-dot は遅れ分を誤検出)。共有ファイル (AxiomsCheck.lean 追記 / OddOrder.lean import / GroupTheory/** / notes / issues) は逸脱でない。cron prompt にも内蔵。
+- **📌 lane-c を §11 に再配置 (frontier-cluster relane, ユーザー裁可 2026-06-22, issue 4005)**: §16 監査で「starve は lane-c (§16 終点 consumer) のみ、lane-h 領域に ~16 独立 leaf」と判明 → lane-c を §16 から **Pf §11 (S11_MaximalII_III_IV, Wielandt §9 / Clifford 9.6-9.10)** へ。**S11 を H→C 移譲**、H は §14_MaximalI+§15 に集中、§16/§10 は driver 化 (常駐させず上流 landing 時に機会的 close)。レーン表・取り決め更新済。各レーン LAUNCH.md も更新 (git-excluded)。次 tick 以降この割当で運用。
 - **📌 標準監視ペース = 25 分（恒久、ユーザー指示 2026-06-22）**: cron 式 **`4,29,54 * * * *`**（:04/:29/:54、:00・:30 を回避）を**標準合流ペースとして恒久化**。ユーザーが各レーンを稼働 → 本ペースで監視・自動合流する。⚠ **cron 自体は本環境で session-scoped**（`durable: true` を渡しても runtime は session-only と報告; [[cron-dies-on-model-switch]]）→ **ペースの正本はこの行**。新セッション開始時・`/model` 切替後は `CronList` 確認の上、消えていれば同式・同 prompt で**即再作成**する（prompt は「各イテレーションの手順」を要約したもの、本ファイルが authority）。7 日 auto-expire 後も同様に再作成。
-- **2026-06-22 (続) — 25 分 cron 再作成**: 新 cron `b9df9002`（`4,29,54 * * * *`, recurring, push あり=合流成立時 `git push origin main`, 7日 auto-expire）。4 レーン (B/F/H/C) は前 tick で全合流済み・worktree は main に ff 同期済み（全 `65286d09`）、実 sorry **131**。
+- **2026-06-22 (続³) — 問題時ループ停止ルール化 + cron `24df1fb4` 再作成**: ユーザー「問題が起きたらループ止めて・永続化」→「各イテレーションの手順」冒頭に ⛔ banner 追加（commit `13ed2a87`）+ cron prompt に内蔵。旧 `b9df9002` を CronDelete → 新 cron **`24df1fb4`**（同式・stop-on-problem prompt 入り）。
+- **2026-06-22 (続²) — tick: lane-b/c 合流**: lane-b (1, merge `c6c7de1b`): s05 norm-2 σ-coeff bounds (Pf (10.5) endgame) + §6 DRY。lane-c (2, merge `15c014f6`): s16 (14.6) caseB_for_S + (14.11) K_eq_V index-pq half close。**実 sorry 131→129**, build 3881 green / AxiomsCheck OK / 新規 axiom 0, push 済 (`13ed2a87`)。⚠ サイズ flag: S16_NonExistenceG 3394 行（issue 0072 既起票）。
+- **2026-06-22 (続) — 25 分 cron 再作成**: 新 cron `b9df9002`（→ 続³ で `24df1fb4` に置換）。当初 4 レーンは全合流済み・worktree main ff 同期、実 sorry 131。
 - **2026-06-22 — 監視再開 + 4 レーン backlog 合流 + cron 再作成 + `coq/` submodule 追加**: ユーザー指示で
   監視再開。前 cron `e3dcf75f` は session 変化で消滅 → 新 cron `8e80cc9d` (`4,29,54 * * * *` = 25分間隔,
   session-only, push なし, 7日 auto-expire) 再作成。**4 レーン全合流** (F→B→H→C, build 各 3881 jobs green /

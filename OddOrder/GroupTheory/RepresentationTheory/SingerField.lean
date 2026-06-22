@@ -6,6 +6,7 @@ Authors: Yawara Ishida
 import Mathlib.RingTheory.SimpleModule.Basic
 import Mathlib.RingTheory.Ideal.Quotient.Operations
 import Mathlib.Algebra.MonoidAlgebra.Basic
+import Mathlib.Data.Fintype.Units
 import Mathlib.FieldTheory.Finite.GaloisField
 import Mathlib.FieldTheory.Finite.Basic
 import Mathlib.Data.Nat.GCD.Basic
@@ -334,6 +335,144 @@ theorem exists_galoisField_repr {q : ℕ} (hq : q.Prime) [NeZero (Nat.card C : Z
       _ = (((Units.map (φ : data.K →+* GaloisField p q).toMonoidHom).comp data.μ) c :
             GaloisField p q) * (data.e.trans φ.toAddEquiv) x := by rw [hμc]; rfl
 
+omit [IsCyclic C] [Finite C] in
+/-- **Singer order bound.**  A (commutative) group `C` acting `𝔽_p`-linearly,
+faithfully, and irreducibly (`M` a *simple* `𝔽_p[C]`-module) on a finite module `M` is
+**cyclic**, and its order **divides `|M| - 1`**.
+
+`C` embeds (via `nonempty_singerFieldData`) in the multiplicative group `Kˣ` of the Singer
+field `K ≅ M`, which is cyclic of order `|K| - 1 = |M| - 1`; faithfulness makes the embedding
+`μ : C →* Kˣ` injective.
+
+This is the field-theoretic core of the irreducible case of **Peterfalvi (12.12)** (a Frobenius
+complement acting irreducibly on an elementary abelian Sylow subgroup `T` of order `p^2` is
+cyclic of order dividing `p^2 - 1`), and the order half of **(14.2)(a)**.
+
+`Finite C` is *derived* (the injection `μ : C →* Kˣ` lands in the finite `Kˣ`), so it is not
+assumed; neither `IsCyclic C` nor `Fact p.Prime` is needed. -/
+theorem isCyclic_and_card_dvd_card_sub_one_of_faithful_irreducible
+    [IsSimpleModule (MonoidAlgebra (ZMod p) C) M]
+    (hfaith : ∀ c : C, (∀ x : M, MonoidAlgebra.of (ZMod p) C c • x = x) → c = 1) :
+    IsCyclic C ∧ Nat.card C ∣ Nat.card M - 1 := by
+  classical
+  obtain ⟨data⟩ := nonempty_singerFieldData (p := p) (C := C) (M := M)
+  haveI : Fintype M := Fintype.ofFinite M
+  haveI : Fintype data.K := data.fintype
+  -- The realization `μ : C →* Kˣ` is injective by faithfulness.
+  have hμinj : Function.Injective data.μ := by
+    rw [injective_iff_map_eq_one]
+    intro c hc
+    apply hfaith c
+    intro x
+    have hcompat := data.compat c x
+    rw [hc, Units.val_one, one_mul] at hcompat
+    exact data.e.injective hcompat
+  -- `Kˣ` is cyclic (finite field), so its subgroup `range μ` is cyclic, hence so is `C`.
+  haveI : IsCyclic data.Kˣ := inferInstance
+  haveI : IsCyclic data.μ.range := inferInstance
+  have hCcyc : IsCyclic C :=
+    isCyclic_of_surjective (MonoidHom.ofInjective hμinj).symm.toMonoidHom
+      (MonoidHom.ofInjective hμinj).symm.surjective
+  refine ⟨hCcyc, ?_⟩
+  -- `|C| = |range μ|` divides `|Kˣ| = |K| - 1 = |M| - 1`.
+  have hcardC : Nat.card C = Nat.card data.μ.range :=
+    Nat.card_congr (MonoidHom.ofInjective hμinj).toEquiv
+  have hdvd : Nat.card data.μ.range ∣ Nat.card data.Kˣ :=
+    Subgroup.card_subgroup_dvd_card _
+  have hunits : Nat.card data.Kˣ = Nat.card data.K - 1 := by
+    rw [Nat.card_eq_fintype_card, Nat.card_eq_fintype_card, Fintype.card_units]
+  have hKM : Nat.card data.K = Nat.card M := (Nat.card_congr data.e.toEquiv).symm
+  rw [hunits, hKM] at hdvd
+  rw [hcardC]
+  exact hdvd
+
 end Irreducibility
+
+/-! ## Singer mechanism with commutativity supplied as a hypothesis
+
+`isCyclic_and_card_dvd_card_sub_one_of_faithful_irreducible` requires a `CommGroup`
+*instance*.  That is awkward to supply when commutativity is only available as a *proof*
+`∀ a b, a * b = b * a` — for example the conclusion of **BG Theorem 2.6(a)**
+(`odd_two_dim_abelian`), which abelianizes a plain `[Group E]` carrying a faithful
+two-dimensional representation.
+
+This variant takes the commutativity hypothesis directly.  For abelian `E` the group algebra
+`𝔽_p[E]` *is* commutative, so we give it a `CommRing` structure built on top of its existing
+`Ring` (no instance diamond, since the underlying `Ring` is reused), realize the Singer field
+as the quotient `K = 𝔽_p[E] ⧸ I` by a maximal ideal (`M ≅ K` because `M` is simple), and read
+off the injection `E ↪ Kˣ`.  As `Kˣ` is cyclic, so is `E`, and `|E| ∣ |K| - 1 = |M| - 1`. -/
+section CommGroupFreeSinger
+
+variable {p : ℕ} {E M : Type*} [Group E] [AddCommGroup M]
+  [Module (MonoidAlgebra (ZMod p) E) M]
+
+/-- For an abelian group `E`, the group algebra `𝔽_p[E]` is commutative. -/
+theorem mul_comm_monoidAlgebra_of_comm (hcomm : ∀ a b : E, a * b = b * a)
+    (x y : MonoidAlgebra (ZMod p) E) : x * y = y * x := by
+  have hsingle : ∀ (a : E) (c : ZMod p) (z : MonoidAlgebra (ZMod p) E),
+      MonoidAlgebra.single a c * z = z * MonoidAlgebra.single a c := by
+    intro a c z
+    induction z using MonoidAlgebra.induction_linear with
+    | zero => simp
+    | add f g hf hg => rw [mul_add, add_mul, hf, hg]
+    | single b d =>
+        rw [MonoidAlgebra.single_mul_single, MonoidAlgebra.single_mul_single,
+          hcomm a b, mul_comm c d]
+  induction x using MonoidAlgebra.induction_linear with
+  | zero => simp
+  | add f g hf hg => rw [add_mul, mul_add, hf, hg]
+  | single a c => exact hsingle a c y
+
+/-- **Singer mechanism, commutativity as a hypothesis.**  If a finite group `E` acts
+faithfully (`hfaith`), commutatively (`hcomm`), and irreducibly
+(`IsSimpleModule (𝔽_p[E]) M`) on a finite module `M`, then `E` is cyclic and `|E| ∣ |M| - 1`.
+
+Unlike `isCyclic_and_card_dvd_card_sub_one_of_faithful_irreducible`, this requires only a
+*proof* of commutativity, not a `CommGroup` instance: the commutative `CommRing (𝔽_p[E])` is
+supplied locally on top of the existing `Ring` and the Singer field is `𝔽_p[E] ⧸ I`. -/
+theorem isCyclic_and_card_dvd_of_faithful_irreducible_comm [Finite E] [Finite M]
+    [IsSimpleModule (MonoidAlgebra (ZMod p) E) M]
+    (hcomm : ∀ a b : E, a * b = b * a)
+    (hfaith : ∀ e : E, (∀ x : M, MonoidAlgebra.of (ZMod p) E e • x = x) → e = 1) :
+    IsCyclic E ∧ Nat.card E ∣ Nat.card M - 1 := by
+  classical
+  -- `𝔽_p[E]` is commutative; equip it with a `CommRing` built on its existing `Ring` (no diamond).
+  letI : CommRing (MonoidAlgebra (ZMod p) E) :=
+    { (inferInstance : Ring (MonoidAlgebra (ZMod p) E)) with
+      mul_comm := mul_comm_monoidAlgebra_of_comm hcomm }
+  -- `M` simple over `𝔽_p[E]` ⟹ `M ≅ 𝔽_p[E] ⧸ I` for a maximal ideal `I`; the quotient is a field.
+  obtain ⟨I, hImax, ⟨lequiv⟩⟩ :=
+    (isSimpleModule_iff_quot_maximal (R := MonoidAlgebra (ZMod p) E) (M := M)).mp ‹_›
+  haveI : I.IsMaximal := hImax
+  letI : Field (MonoidAlgebra (ZMod p) E ⧸ I) := Ideal.Quotient.field I
+  haveI : Finite (MonoidAlgebra (ZMod p) E ⧸ I) := Finite.of_equiv _ lequiv.toEquiv
+  -- `μ : E ↪ Kˣ` realizes `E` inside the units of the field `K = 𝔽_p[E] ⧸ I`.
+  let μ : E →* (MonoidAlgebra (ZMod p) E ⧸ I)ˣ :=
+    (Units.map (Ideal.Quotient.mk I : MonoidAlgebra (ZMod p) E →+* _).toMonoidHom).comp
+      (MonoidAlgebra.of (ZMod p) E).toHomUnits
+  have hμinj : Function.Injective μ := by
+    rw [injective_iff_map_eq_one]
+    intro e he
+    apply hfaith e
+    intro x
+    apply lequiv.injective
+    have hcompat : lequiv (MonoidAlgebra.of (ZMod p) E e • x)
+        = (↑(μ e) : MonoidAlgebra (ZMod p) E ⧸ I) * lequiv x := by
+      rw [map_smul, Algebra.smul_def, Ideal.Quotient.algebraMap_eq]; rfl
+    rw [hcompat, he, Units.val_one, one_mul]
+  haveI : IsCyclic (MonoidAlgebra (ZMod p) E ⧸ I)ˣ := inferInstance
+  haveI : IsCyclic μ.range := inferInstance
+  refine ⟨isCyclic_of_surjective (MonoidHom.ofInjective hμinj).symm.toMonoidHom
+      (MonoidHom.ofInjective hμinj).symm.surjective, ?_⟩
+  -- `|E| = |μ.range| ∣ |Kˣ| = |K| - 1 = |M| - 1`.
+  have hKM : Nat.card (MonoidAlgebra (ZMod p) E ⧸ I) = Nat.card M :=
+    (Nat.card_congr lequiv.toEquiv).symm
+  calc Nat.card E = Nat.card μ.range := Nat.card_congr (MonoidHom.ofInjective hμinj).toEquiv
+    _ ∣ Nat.card (MonoidAlgebra (ZMod p) E ⧸ I)ˣ := Subgroup.card_subgroup_dvd_card _
+    _ = Nat.card (MonoidAlgebra (ZMod p) E ⧸ I) - 1 :=
+        Nat.card_units (α := MonoidAlgebra (ZMod p) E ⧸ I)
+    _ = Nat.card M - 1 := by rw [hKM]
+
+end CommGroupFreeSinger
 
 end OddOrder.RepresentationTheory

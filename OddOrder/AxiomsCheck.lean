@@ -12,6 +12,7 @@ import OddOrder.GroupTheory.WielandtAssembly
 import OddOrder.GroupTheory.WielandtPerFactorDischarge
 import OddOrder.GroupTheory.RepresentationTheory.WielandtKernelFPF
 import OddOrder.GroupTheory.RepresentationTheory.WielandtElabFrobenius
+import OddOrder.GroupTheory.RepresentationTheory.SingerField
 import OddOrder.GroupTheory.WielandtFixedPoint
 import OddOrder.GroupTheory.PiElementDecomposition
 import OddOrder.GroupTheory.RepresentationTheory.CharacterCount
@@ -675,6 +676,13 @@ set_option linter.style.longLine false in
 #assert_only_allowed_axioms OddOrder.RepresentationTheory.card_irreducibleCharacter_le
 -- RepresentationTheory: there are finitely many irreducible characters of a finite group.
 #assert_only_allowed_axioms OddOrder.RepresentationTheory.finite_irreducibleCharacter
+-- RepresentationTheory (Singer, commutativity as a hypothesis): an abelian group acting
+-- faithfully + irreducibly on a finite 𝔽_p-module is cyclic with order dividing |M| - 1.
+-- This is the `CommGroup`-instance-free Singer mechanism (Peterfalvi (12.12) / (14.2)(a) core),
+-- realized via the quotient field `𝔽_p[E] ⧸ I`; it accepts BG Thm 2.6(a)'s commutativity output.
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.isCyclic_and_card_dvd_of_faithful_irreducible_comm
+#assert_only_allowed_axioms OddOrder.RepresentationTheory.mul_comm_monoidAlgebra_of_comm
 -- RepresentationTheory: completeness of irreducible characters — `f ⊥ Irr G ⇒ f = 0`
 -- (regular representation + Maschke + Schur).
 #assert_only_allowed_axioms OddOrder.RepresentationTheory.classFunction_eq_zero_of_orthogonal
@@ -3761,6 +3769,14 @@ set_option linter.style.longLine false in
 -- §5 Peterfalvi (3.8) corollary: a small-support separable coefficient grid is identically zero.
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S05.grid_eq_zero_of_ncard_support_lt
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S05.TICyclicHypothesis.sigmaCoeff_eq_zero_of_sigmaNC_lt
+-- §5 norm-`2` Dade-image trichotomy endgame (Peterfalvi (4.8)/(10.5)): the `TICyclicHypothesis`-level
+-- toolkit shared by the §6 certain-type isometry and the §10 (10.5) Dade-image identity.  A virtual
+-- character `X` with `‖X‖² = 2` whose difference with `s·(χ_{P₁} − χ_{P₂})` vanishes on `V` equals it.
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S05.TICyclicHypothesis.ncard_sigmaCoeff_ne_zero_le_two
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S05.TICyclicHypothesis.sigmaCoeff_eq_zero_or_one_of_inner_self_two
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S05.TICyclicHypothesis.sigmaCoeff_sub_smul_chiFam_diff
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S05.TICyclicHypothesis.eq_smul_chiFam_diff_of_all_sigmaCoeff_zero
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S05.TICyclicHypothesis.eq_smul_chiFam_diff_of_vanishOnV
 
 -- BG Theorem 3.6 (the vertex of the §3 subprogram and the engine of BG Theorem 10.6): `G`
 -- solvable of odd order, `H ◁ G` a normal Hall subgroup with complement `R`, `R₀ ≤ R` of prime
@@ -5587,3 +5603,8 @@ formula together with the prime computation `coprimeFrobeniusAction_card_eq_prim
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.S11.exists_characteristic_complement_to_sylow_of_nilpotent
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S11.exists_chiefFactor_seed
+-- The chief-factor kernel and its elementary-abelian + `U W₁`-irreducible + `U`-noncentral
+-- structure of `H̄ = H/N` is axiom-clean.  (`exists_chiefFactorData` / `chiefFactor_basic` assemble
+-- it but additionally carry `typeIII_IV_p_eq_W2`, which cites the still-`sorry`'d §12 prime-order
+-- result `theorem88_caseB_prime_orders`, so they are not yet axiom-clean.)
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S11.exists_chiefFactor_kernel

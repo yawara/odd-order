@@ -18,9 +18,11 @@ composite `ω_{ij}^σ = σ(ω_{ij})` of the integral (3.2) σ-map (`sigmaIntegra
 endpoint C) and the (3.3) ω-grid (`omegaGrid`, endpoint B): the virtual characters
 `ω_{ij}^σ ∈ ZIrr(G)` that appear throughout §10–16.
 
-This single grid is what **both** `S12.CharacterParameters.omegaSigma` and
-`S15.Hypothesis.eta` are pinned to (so the §10–16 owner cites one name for both,
-and `S15`'s (13.1.d) `eta_eq_tau_omega` is then `rfl`).
+This grid is what `S15.Hypothesis.eta` is pinned to (so `S15`'s (13.1.d)
+`eta_eq_tau_omega` is `rfl`).  `S12.CharacterParameters.omegaSigma` is pinned to the
+sibling *aligned* `σ`-image `S12.Hypothesis.alignedOmegaSigmaGrid` (the σ-image of the
+*same* `ω` that `muGrid` is built from) — the per-`(i,j)` alignment that the (10.5)
+Dade-image identity `tau_muGridAlpha_eq`/`alpha_tau_image` requires.
 
 **Scope note (endpoint E)**: `ω^σ` is the only part of `S12.CharacterParameters`
 supplied by §3–9 character theory.  The remaining `CharacterParameters` fields
@@ -45,8 +47,9 @@ variable (hyp : TICyclicHypothesis G) [Fintype hyp.W]
   [NeZero (Nat.card hyp.W1)] [NeZero (Nat.card hyp.W2)]
 
 /-- **Peterfalvi (3.6) `ω^σ`-grid** = `σ(ω)`: the integral-σ image of the (3.3)
-ω-grid, the virtual characters `ω_{ij}^σ` of `G`.  This is the family that both
-`S12.CharacterParameters.omegaSigma` and `S15.Hypothesis.eta` are pinned to. -/
+ω-grid, the virtual characters `ω_{ij}^σ` of `G`.  This is the family that
+`S15.Hypothesis.eta` is pinned to (`S12.CharacterParameters.omegaSigma` uses the
+aligned sibling `S12.Hypothesis.alignedOmegaSigmaGrid`). -/
 noncomputable def omegaSigmaGrid :
     Fin (Nat.card hyp.W1) → Fin (Nat.card hyp.W2) → ClassFunction G ℂ :=
   fun i j => hyp.sigmaIntegral hVeq app (hyp.omegaGrid i j)

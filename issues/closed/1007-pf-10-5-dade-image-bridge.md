@@ -453,3 +453,83 @@ have hVeq : tic.V = tic.Vdiff := rfl
 
 ⚠ endgame は alignedOmegaSigmaGrid (Prop16.1 sorryAx gate) 経由ゆえ axiom-clean にならない (上流 gate のみ)。
 最難 = piece 1 (η 既約 + defeq) と piece 4 (mirror assembly)。**次セッションで fresh context の focused unit 推奨**。
+
+## ✅✅ 進捗 (2026-06-22 lane-b 再開) — piece 2 (norm-2 σ-bounds) + piece 1 (hae) 完成
+
+endgame の 2 つの foundational piece を landing (full build 3881 green、両 commit とも axiom footprint 不変):
+
+- ✅ **piece 2 (commit `33c03853`)**: `S05_SigmaIsometry` に norm-`2` σ-coeff bounds の**一般版**を追加
+  (`ncard_inner_chiFam_ne_zero_le_one` の norm-2 類比):
+  - `TICyclicHypothesis.ncard_sigmaCoeff_ne_zero_le_two` — χ∈ZIrr, ‖χ‖²=2 ⟹ NC(χ)≤2。
+  - `TICyclicHypothesis.sigmaCoeff_eq_zero_or_one_of_inner_self_two` — σ-coeff ∈ {0,±1}。
+  両者 `mem_ZIrr_inner_self_eq_sum_sq`+`exists_pair_of_sum_sq_eq_two`+norm-1 補題で証明。
+  **DRY**: §6 `sigmaNC_dade_le_two`/`sigmaCoeff_dade_eq_zero_or_one` を新一般版 cite に refactor
+  (norm-1 が既に S05 一般版を §6 が cite する設計の踏襲)。**mirror の hG2/hG01 入力** = この 2 本を X に適用
+  (X∈ZIrr=`muGridAlpha_tau_mem_ZIrr`, ‖X‖²=2=`muGridAlpha_tau_X_inner`)。
+
+- ✅ **piece 1 (commit `7b1379f5`)**: `S12` に hae σ-isometry bridge を追加:
+  - `Hypothesis.canonicalFullDadeApp` — σ-grid 内部 inline app を named def 化 (defeq 一致、σ-machinery lemma を
+    この app で書けば grid と整合)。
+  - `Hypothesis.exists_alignedOmegaSigmaGrid_chiFam_family` — 各 row i で **injective** な index family
+    `P : Fin w₂ → Ŵ₁×Ŵ₂` + `alignedOmegaSigmaGrid i j = chiFam (P j)`。
+  - **核心 (W-alignment defeq trap 解消)**: `alignedOmegaSigmaGrid i j = σ(compHom e (chiColumn χ₂ i))`、
+    `compHom e (chiColumn χ₂ i)` は tic.W の**既約 (linear) 指標** — `chiColumn = ω(omegaProdChar…)`,
+    `ω = linearIrreducibleCharacter` (定義そのもの), `compHom_linearIrreducibleCharacter` (compHom of linear = linear, by `rfl`)
+    ⟹ `compHom e (chiColumn…) = (η:CF)` が **rfl**、`sigmaIntegral=sigma`、`sigma_irreducibleCharacter` で chiFam に着地。
+    injectivity = `omegaIrrEquiv.symm`/`linearIrreducibleCharacter_injective`/`MonoidHom.cancel_right`(e 全射)/
+    `omegaProdChar_inj`/`finCardEquivCharacterGroup`/`finCongr` 単射の合成。
+
+**▶ 残り = mirror assembly (piece 4/5) + pinning (piece 6)** — §6 `certainType_diff_dade_eq`
+(`S06_CertainTypeIsometry.lean:694-803`) を §10 で再現する**単一の大 proof** `Hypothesis.tau_muGridAlpha_eq`
+(grid-level (10.5); statement = `alpha_tau_image` の grid 版):
+```
+hyp.tau (muGrid i j − δ•muGrid i 0 − n•ζ) = δ•(alignedOmegaSigmaGrid i j − alignedOmegaSigmaGrid i 0) − n•coh.tau1 ζ
+```
+構造 (先例 = `tau1_zeta_vanishes_on_typePV` の tic/app reconstruction + §6 mirror):
+1. tic/app/hVeq reconstruct。`X := α^τ + n•τ1ζ` (⟨X,X⟩=2 by `muGridAlpha_tau_X_inner`、X∈ZIrr by `muGridAlpha_tau_mem_ZIrr` + τ1ζ∈ZIrr)。
+   goal を `ψ := X − δ•(aOSG ij − aOSG i0) = 0` に還元 (`sub_eq_zero`/`linear_combination`)。
+2. piece 1 で P (injective family) 取得 → Pij:=P j, Pi0:=P 0, hPne (j≠0 + injective)。
+3. **hae** (§6 `sigmaCoeff_psi_eq` 相当): `sigmaCoeff ψ pq = sigmaCoeff X pq − δ([Pij=pq]−[Pi0=pq])`。
+   `rw [hP j, hP 0]` で aOSG→chiFam、inner 線形 + chiFam 直交性 (`chiFam_spec.2.2.1`)。
+   ⟹ **S05 一般補題 `sigmaCoeff_sub_smul_chiFam_diff` (X, Pij, Pi0, s 任意) を切り出すと clean** (mirror が軽くなる)。
+4. hG2/hG01 = piece 2 を X に適用。hψV = `muGridPsi_vanishes_on_typePV` + `tau1_zeta_vanishes_on_typePV`。
+   hadd = `sigmaCoeff_add_eq`。hNC4 (≤4 = {G≠0}∪{Pij,Pi0})。card/gap/`grid_trichotomy`/`grid_no_constant_{column,row}`
+   (S05 public) → 全 coeff 0 → ψ=0 (§6 `_of_all_sigmaCoeff_zero` mirror = ‖ψ‖² 計算)。
+5. **pinning (piece 6)**: producer `exists_charParameters` の `omegaSigma := omegaSigmaGrid` を `alignedOmegaSigmaGrid`
+   に差替 + `params.alpha`/`zeta`/`delta`/`n` を grid に pin → `alpha_tau_image` を `tau_muGridAlpha_eq` の薄い corollary に。
+   多数の (10.3) 算術 hyp (hdeg/hμ0/hζ1/hnf/hδj/hdζ/h0ζ/hkζ/hcol1/hdk1/hδpm/hw1/hn2) を producer/CharacterParameters field から discharge。
+
+mirror は ~120-150 行の単一 proof (hyp 列が長い)。**piece 3 (`muGridPsi_vanishes_on_typePV`/`tau1_zeta_vanishes_on_typePV`)
+は既存**ゆえ全 input 在庫済み。fresh context で一気に書くのが推奨 (途中 commit 不可の単一定理)。
+
+## ✅✅✅✅✅✅✅✅✅ 完了 (2026-06-22 lane-b) — (10.5) Dade-image identity 締結 (grid + params 両 sorry-free)
+
+mirror assembly (piece 4/5) + pinning (piece 6) を完成し、**(10.5) Dade-image half を grid-level・
+params-level の両方で sorry-free に締結**。full build 3881 jobs green、FT-path scaffold sorry 131→130。
+
+**commit `8c5c90a1` — grid-level (10.5) + 一般トリコトミー toolkit**:
+- `S05_SigmaTrichotomy` に (4.8)/(10.5) Dade-image トリコトミー endgame の §5 一般補題 3 本
+  (§6 `certainType_diff_dade_eq` 系の TICyclicHypothesis-level 抽象、**全 axiom-clean**):
+  `sigmaCoeff_sub_smul_chiFam_diff` (hae) / `eq_smul_chiFam_diff_of_all_sigmaCoeff_zero` (全係数0→eq) /
+  `eq_smul_chiFam_diff_of_vanishOnV` (norm-2 X, ψ vanish on V ⟹ X=s·(χ_P₁−χ_P₂); grid_trichotomy +
+  grid_no_constant_{column,row} + norm-2 bounds)。§6 も将来この一般版に DRY-refactor 可。
+- `Hypothesis.tau_muGridAlpha_eq` (grid-level (10.5)): X=α^τ+n·ζ^τ₁ (‖X‖²=2), aligned grid=χ-family
+  member (piece 1), ψ vanish on V (muGridPsi + tau1_zeta_vanishes) → 一般トリコトミーで締結。
+  sorry-free、footprint = §10 muGrid 系上流 gate (sorryAx; Prop16.1/theoremA) のみ。
+- AxiomsCheck に toolkit 5 補題 (上記 3 + piece 2 の norm-2 bounds) 登録。
+
+**commit `5f03d3d1` — params-level corollary `alpha_tau_image`**:
+- producer `exists_charParameters`: omegaSigma を omegaSigmaGrid → **alignedOmegaSigmaGrid** に差替。
+- `alpha_tau_image` を faithful corollary に再構成 (sorry-free, footprint = 上流 gate のみ・自前 sorry 0):
+  grid-pinning (hmu/hos/hzS/hz1) + 符号 (hδpm/hδj) + (1.1) ζ非実 (hzconj) + (10.3) n偶数 (hn2) を仮説、
+  per-(i,j) 次数相異・補助列 k・w₁,w₂≥3 を (10.3) data + three_le_card から内部 discharge、
+  `params.alpha_def`+hmu+hos で `tau_muGridAlpha_eq` に帰着。
+
+**完了条件達成**: `alpha_tau_image` sorry-free + footprint = §10 muGrid 系と同じ上流 gate のみ +
+full build/AxiomsCheck green。
+
+**残る honest gate (本 issue の (10.5) 範囲外、§10 chain 全体の仕様)**: `hn2` = **(10.3) n が偶数**
+(⟹ n≥2)。これは (10.5) chain 全体 (`muGridAlpha_tau_X_inner`/`muGridAlpha_tau1_zeta_eq_neg_n` 等) が
+一律に仮説として担う genuine な (10.3) 算術入力で、本 issue で新たに hoist したものではない (cauchy-schwarz の
+n<2 矛盾に必須)。別途 (10.3) parity として形式化すべき follow-up。`hzconj` (ζ̄≠ζ) は (1.1)
+`not_isReal_of_ne_trivial_of_odd_card'` で原理的に導出可 (IsIrreducibleChar→IrreducibleChar bridge のみ)。

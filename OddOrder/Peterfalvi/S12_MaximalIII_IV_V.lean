@@ -5,6 +5,7 @@ Authors: Yawara Ishida
 -/
 import OddOrder.Peterfalvi.S11_MaximalII_III_IV
 import OddOrder.Peterfalvi.S05_OmegaSigmaGrid
+import OddOrder.Peterfalvi.S05_SigmaTrichotomy
 import Mathlib.GroupTheory.IsPerfect
 
 /-!
@@ -961,6 +962,86 @@ noncomputable def Hypothesis.alignedOmegaSigmaGrid [Finite G]
   exact tic.sigmaIntegral rfl app
     (ClassFunction.compHom e.toMonoidHom
       (h.chiColumn χ₂ (finCongr hcardW1.symm i) : ClassFunction h.sdiffTICyclicHypothesis.W ℂ))
+
+open scoped FiniteInduce in
+/-- The canonical `(3.2)` Dade application of the type-`P` `TICyclicHypothesis`: the source of the
+`σ`-grids (`omegaSigmaGrid`, `alignedOmegaSigmaGrid`).  The TI-cyclic Dade hypothesis has trivial
+local subgroups (`HConjInvariant.of_forall_H_eq_bot`), so `Hypothesis.fullDadeIsometryData` applies.
+Definitionally equal to the `app` reconstructed inline in the grids, so any `σ`-machinery lemma
+(`chiFam`, `sigma`, `sigmaCoeff`) stated with this `app` aligns with the grids by `rfl`. -/
+noncomputable def Hypothesis.canonicalFullDadeApp [Finite G]
+    (_hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} (hyp : Hypothesis M)
+    (hodd : Odd (Nat.card G)) :
+    OddOrder.Peterfalvi.S05.TICyclicHypothesis.FullDadeApplication
+      (typePData_toTICyclicHypothesis hyp.typeP hodd) :=
+  ⟨(typePData_toTICyclicHypothesis hyp.typeP hodd).toDadeHypothesis.fullDadeIsometryData
+    (OddOrder.Peterfalvi.S04.Hypothesis.HConjInvariant.of_forall_H_eq_bot _ (fun _ => rfl))⟩
+
+open scoped FiniteInduce in
+/-- **Peterfalvi (10.5), aligned ω^σ-grid is a `χ`-family member** (the §10 analogue of the §6
+`certainTypeOmegaSigma_eq_chiFam`): `alignedOmegaSigmaGrid i j` is the `σ`-image of the irreducible
+(linear) character `η = compHom e (chiColumn χ₂ i)` of `tic.W` — `chiColumn` is `ω(omegaProdChar …)`
+hence a `linearIrreducibleCharacter`, and `compHom` of a linear character is again linear
+(`compHom_linearIrreducibleCharacter`).  By `sigma_irreducibleCharacter` it is the orthonormal family
+vector `χ_P` at the index `P = omegaIrrEquiv.symm η`.  This is what lets the (10.5) Dade-image
+trichotomy reuse the §6 `(4.8)` endgame (`sigmaCoeff_psi_eq`, `grid_trichotomy`). -/
+theorem Hypothesis.exists_alignedOmegaSigmaGrid_chiFam_family [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} (hyp : Hypothesis M)
+    (hodd : Odd (Nat.card G)) (i : Fin hyp.w1) :
+    ∃ P : Fin hyp.w2 →
+        (((typePData_toTICyclicHypothesis hyp.typeP hodd).W1.subgroupOf
+            (typePData_toTICyclicHypothesis hyp.typeP hodd).W) →* ℂˣ) ×
+          (((typePData_toTICyclicHypothesis hyp.typeP hodd).W2.subgroupOf
+            (typePData_toTICyclicHypothesis hyp.typeP hodd).W) →* ℂˣ),
+      Function.Injective P ∧
+        ∀ j, hyp.alignedOmegaSigmaGrid hG hodd i j
+          = (typePData_toTICyclicHypothesis hyp.typeP hodd).chiFam rfl
+              (hyp.canonicalFullDadeApp hG hodd) (P j) := by
+  haveI := hyp.finiteG
+  classical
+  -- reconstruct the lets of `alignedOmegaSigmaGrid`
+  let h := (hyp.toCertainTypeHypothesis hG hodd).toHypothesis
+  haveI : NeZero (Nat.card h.W1) := ⟨by have := h.one_lt_card_W1; omega⟩
+  haveI : IsCyclic ↥(h.W1 ⊔ h.W2) := h.isCyclic_sup
+  letI : CommGroup ↥(h.W1 ⊔ h.W2) := IsCyclic.commGroup
+  have hW1le : hyp.typeP.W1 ≤ M := hyp.typeP.W1_le
+  have hW2le : hyp.typeP.W2 ≤ M := typePData_W2_le_self hyp.typeP
+  have hcardW1 : Nat.card ↥h.W1 = hyp.w1 :=
+    Nat.card_congr (Subgroup.subgroupOfEquivOfLe hW1le).toEquiv
+  have hcardW2sub : Nat.card ↥(h.W2.subgroupOf (h.W1 ⊔ h.W2)) = hyp.w2 := by
+    rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe (le_sup_right)).toEquiv]
+    exact Nat.card_congr (Subgroup.subgroupOfEquivOfLe hW2le).toEquiv
+  haveI : NeZero (Nat.card ↥(h.W2.subgroupOf (h.W1 ⊔ h.W2))) := ⟨Nat.card_pos.ne'⟩
+  let χ₂ : Fin hyp.w2 → (h.W2.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ :=
+    fun j => finCardEquivCharacterGroup _ (finCongr hcardW2sub.symm j)
+  let tic := typePData_toTICyclicHypothesis hyp.typeP hodd
+  haveI : NeZero (Nat.card ↥tic.W1) := ⟨Nat.card_pos.ne'⟩
+  haveI : NeZero (Nat.card ↥tic.W2) := ⟨Nat.card_pos.ne'⟩
+  let e : ↥tic.W ≃* ↥(h.W1 ⊔ h.W2) :=
+    (Subgroup.subgroupOfEquivOfLe (typePData_W_le_self hyp.typeP)).symm.trans
+      (MulEquiv.subgroupCongr (typePData_sup_subgroupOf_eq hyp.typeP).symm)
+  -- the transported `chiColumn` is the linear (irreducible) character `η j` of `tic.W`.
+  let η : Fin hyp.w2 → IrreducibleCharacter ↥tic.W := fun j =>
+    linearIrreducibleCharacter
+      ((h.sdiffTICyclicHypothesis.omegaProdChar (h.w1CharEquiv (finCongr hcardW1.symm i)) (χ₂ j)).comp
+        e.toMonoidHom)
+  refine ⟨fun j => tic.omegaIrrEquiv.symm (η j), ?_, ?_⟩
+  · -- injectivity: peel off the injective maps `omegaIrrEquiv.symm`, `linearIrreducibleCharacter`,
+    -- precompose-`e`, `omegaProdChar(·, ·)`, `finCardEquivCharacterGroup`, `finCongr`.
+    intro j j' hjj'
+    have h1 : η j = η j' := tic.omegaIrrEquiv.symm.injective hjj'
+    have h2 := linearIrreducibleCharacter_injective h1
+    have h3 := (MonoidHom.cancel_right (MulEquiv.surjective e)).mp h2
+    have h4 := (h.sdiffTICyclicHypothesis.omegaProdChar_inj h3).2
+    exact (finCongr hcardW2sub.symm).injective ((finCardEquivCharacterGroup _).injective h4)
+  · -- value: `alignedOmegaSigmaGrid i j = σ(η j) = χ_{omegaIrrEquiv.symm (η j)}`.
+    intro j
+    have step1 : hyp.alignedOmegaSigmaGrid hG hodd i j
+        = tic.sigma rfl (hyp.canonicalFullDadeApp hG hodd) (η j : ClassFunction ↥tic.W ℂ) := by
+      change tic.sigmaIntegral rfl (hyp.canonicalFullDadeApp hG hodd) (η j : ClassFunction ↥tic.W ℂ)
+          = tic.sigma rfl (hyp.canonicalFullDadeApp hG hodd) (η j : ClassFunction ↥tic.W ℂ)
+      rw [OddOrder.Peterfalvi.S05.TICyclicHypothesis.sigmaIntegral_apply]
+    rw [step1, OddOrder.Peterfalvi.S05.TICyclicHypothesis.sigma_irreducibleCharacter]
 
 open scoped FiniteInduce in
 /-- **§10 within-column degree constancy** (Peterfalvi (4.5.a), the `i`-independence half of
@@ -2063,6 +2144,11 @@ structure CharacterParameters {M : Subgroup G} (hyp : Hypothesis M) where
   /-- (10.3) the index relation `n = (d − δ)/w₁ ∈ ℕ`, in the cleared form `n·w₁ = d − δ`.
   De-opaqued from a placeholder `Prop`. -/
   n_formula : (n : ℤ) * (hyp.w1 : ℤ) = (d : ℤ) - delta
+  /-- (10.3) the parity input: `n` is even and positive, so `n ≥ 2`.  `d = μ_{ij}(1)` divides the
+  odd `|M|` (a character degree), hence is odd; with `δ = ±1`, `w₁` odd and `n·w₁ = d − δ`, `n` is
+  even, and `d > 1` forces `n > 0`.  This is the (10.3) fact used by (10.5)'s Cauchy–Schwarz
+  (`n < 2` contradiction); de-opaqued (no longer a carried hypothesis of the §10 (10.5) endpoint). -/
+  two_le_n : 2 ≤ n
   /-- (10.5): `α_{ij} = μ_{ij} − δ·μ_{i0} − n·ζ`.  De-opaqued from a free field + placeholder
   formula to the genuine definition in terms of the `μ`-grid, `δ`, `n` and `ζ`. -/
   alpha : Fin hyp.w1 → Fin hyp.w2 → ClassFunction ↥M ℂ :=
@@ -2161,7 +2247,7 @@ column sign; and the congruence `μ_{0 j₀}(1) ≡ δ (mod w₁)` (Peterfalvi (
 theorem Hypothesis.exists_charParamArith [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} (hyp : Hypothesis M)
     (hodd : Odd (Nat.card G)) :
-    ∃ (d : ℕ) (delta : ℤ) (n : ℕ), 1 < d ∧ (n : ℤ) * (hyp.w1 : ℤ) = (d : ℤ) - delta ∧
+    ∃ (d : ℕ) (delta : ℤ) (n : ℕ), 1 < d ∧ (n : ℤ) * (hyp.w1 : ℤ) = (d : ℤ) - delta ∧ 2 ≤ n ∧
       (∀ (i : Fin hyp.w1) (j : Fin hyp.w2), j ≠ 0 → hyp.muGrid hG hodd i j 1 = (d : ℂ)) ∧
       (∀ (j : Fin hyp.w2), j ≠ 0 → hyp.muColumnSign hG hodd j = delta) := by
   haveI := hyp.finiteG
@@ -2205,8 +2291,8 @@ theorem Hypothesis.exists_charParamArith [Finite G]
   have hKcomm : h.K = commutator ↥M := by
     rw [hKeq, derivedInG, Subgroup.subgroupOf,
       Subgroup.comap_map_eq_self_of_injective M.subtype_injective]
-  -- `d := μ_{0 j₀}(1) ∈ ℕ`.
-  obtain ⟨d, hd0, hdeg, -⟩ :=
+  -- `d := μ_{0 j₀}(1) ∈ ℕ`, with `d ∣ |M|` (a character degree divides the group order).
+  obtain ⟨d, hd0, hdeg, hdvd⟩ :=
     OddOrder.Peterfalvi.S03.exists_natDegree_characterDegree_dvd_card
       ((h.columnFamily χ₂).mu k₀)
   rw [OddOrder.Peterfalvi.S03.characterDegree_def] at hdeg
@@ -2242,13 +2328,37 @@ theorem Hypothesis.exists_charParamArith [Finite G]
     push_neg at hlt
     have hwa : (hyp.w1 : ℤ) * a < 0 := mul_neg_of_pos_of_neg hw1pos hlt
     linarith [hZ, hdsign, hwa]
+  -- (10.3): `n = a` is even (hence `≥ 2`).  `d = μ_{0 j₀}(1)` divides the odd `|M|` (a character
+  -- degree), so `d` is odd; with `δ = ±1` and `w₁` odd, `n·w₁ = d − δ` is even, forcing `n` even;
+  -- and `n > 0` (from `d > 1`), so `n ≥ 2`.  This is the parity input of (10.5)'s Cauchy–Schwarz.
+  have hModd : Odd (Nat.card ↥M) := hodd.of_dvd_nat (Subgroup.card_subgroup_dvd_card M)
+  have hdodd : Odd (d : ℤ) := by exact_mod_cast hModd.of_dvd_nat hdvd
+  have hw1odd : Odd (hyp.w1 : ℤ) := by
+    exact_mod_cast hModd.of_dvd_nat (Subgroup.card_dvd_of_le hyp.typeP.W1_le)
+  have hδodd : Odd ((h.columnFamily χ₂).sign) := by
+    rcases (h.columnFamily χ₂).sign_eq with hs | hs <;> rw [hs] <;> decide
+  have hwa : (hyp.w1 : ℤ) * a = (d : ℤ) - (h.columnFamily χ₂).sign := by linarith [hZ]
+  have haeven : Even a := by
+    have heven : Even ((hyp.w1 : ℤ) * a) := by rw [hwa]; exact hdodd.sub_odd hδodd
+    rcases Int.even_mul.mp heven with hcon | h
+    · obtain ⟨k, hk⟩ := hw1odd; obtain ⟨m, hm⟩ := hcon; omega
+    · exact h
+  have ha2 : 2 ≤ a := by
+    have hwapos : 0 < (hyp.w1 : ℤ) * a := by rw [hwa]; exact hdsign
+    have hapos' : 0 < a := by
+      rcases eq_or_lt_of_le hapos with h | h
+      · rw [← h, mul_zero] at hwapos; exact absurd hwapos (lt_irrefl 0)
+      · exact h
+    obtain ⟨b, hb⟩ := haeven
+    omega
+  have hn2 : 2 ≤ a.toNat := by omega
   -- degree independence (the materialized (10.3) constancy).
   have hdi : ∀ (i : Fin hyp.w1) (j : Fin hyp.w2), j ≠ 0 →
       hyp.muGrid hG hodd i j 1 = (d : ℂ) := by
     intro i j hj
     rw [hyp.muGrid_apply_one_eq hG hodd hw2 i 0 hj hj₀, hmg]
     exact hdeg
-  refine ⟨d, (h.columnFamily χ₂).sign, a.toNat, hd1, ?_, hdi, ?_⟩
+  refine ⟨d, (h.columnFamily χ₂).sign, a.toNat, hd1, ?_, hn2, hdi, ?_⟩
   · rw [Int.toNat_of_nonneg hapos, mul_comm]
     linarith [hZ]
   · -- `δ_k = δ_{j₀} = δ` for every nontrivial column `k` (the (10.3) sign-independence).
@@ -2282,7 +2392,7 @@ theorem Hypothesis.exists_charParameters [Finite G] (hG : OddOrder.BG.IsMinimalS
   have hodd : Odd (Nat.card G) := hG.odd
   obtain ⟨ζ, hζS, hζirr, hζdeg⟩ := exists_zeta_in_inducedFamily_degree_w1 hyp.typeP hodd
     (typePData_W1_hall_coprime hG hyp.maximal (hyp.bgTypeP hG) hyp.typeP)
-  obtain ⟨d, delta, n, hd1, hnf, hdi, hδindep⟩ := hyp.exists_charParamArith hG hodd
+  obtain ⟨d, delta, n, hd1, hnf, hn2, hdi, hδindep⟩ := hyp.exists_charParamArith hG hodd
   exact ⟨{ zeta := ζ
            zeta_mem_S := hζS
            zeta_irreducible := hζirr
@@ -2292,9 +2402,10 @@ theorem Hypothesis.exists_charParameters [Finite G] (hG : OddOrder.BG.IsMinimalS
            w2_prime := hyp.w2_prime hG
            d_gt_one := hd1
            mu := hyp.muGrid hG hodd
-           omegaSigma := hyp.omegaSigmaGrid hG hodd
+           omegaSigma := hyp.alignedOmegaSigmaGrid hG hodd
            degree_independent := hdi
            n_formula := hnf
+           two_le_n := hn2
            alpha_support := fun i j hj =>
              hyp.muGrid_alpha_support hG hodd hj hζS (hdi i j hj)
                (hyp.muGrid_zero_column_apply_one hG hodd i) hζdeg hnf (hδindep j hj)
@@ -2571,6 +2682,64 @@ theorem Hypothesis.muGridAlpha_inner_muColumn_sub_conj [Finite G]
     OddOrder.RepresentationTheory.inner_smul_right, hαζc, mul_zero, sub_zero]
 
 open scoped FiniteInduce in
+/-- **Peterfalvi (10.6)(a), `(α_{ij}, μ_j − dζ̄) = 1`** (M-side, `0 < j < w₂`): the diagonal
+companion of `muGridAlpha_inner_muColumn_sub_conj`, where `μ_j = ∑_{0≤i'<w₁} μ_{i'j}` is the
+`W₂`-column-`j` sum (the column of `μ_{ij}` itself).  Within column `j` the `μ_{i'j}` are
+orthonormal (`muGrid_inner_self`/`muGrid_inner_within_column`), so `(μ_{ij}, μ_j) = 1`; `μ_{i0}` and
+`ζ` are cross-column resp. degree-distinct from column `j` (`muGrid_inner_cross_column`, `hjζ`), so
+`(δμ_{i0}, μ_j) = (nζ, μ_j) = 0`, giving `(α_{ij}, μ_j) = 1`; and `(α_{ij}, ζ̄) = 0` (degree
+distinctness + `(ζ, ζ̄) = 0`).  Hence `(α_{ij}, μ_j − dζ̄) = 1`.
+
+This is the `M`-side opening `1 = (α_{ij}, μ_j − dζ̄)` of Peterfalvi (10.6)(a), feeding the
+`(δ(ω_{ij}^σ − ω_{i0}^σ), μ_j^{τ₁}) = 1` step (then Peterfalvi (5.8) gives the summed isometry
+`μ_j^{τ₁} = δ∑_i ω_{ij}^σ`). -/
+theorem Hypothesis.muGridAlpha_inner_muColumn_self_sub_conj [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} [Invertible (Nat.card ↥M : ℂ)]
+    (hyp : Hypothesis M) (hodd : Odd (Nat.card G)) (i : Fin hyp.w1) (j : Fin hyp.w2) (hj0 : j ≠ 0)
+    {ζ : ClassFunction ↥M ℂ} (hζirr : IsIrreducibleCharacter ζ) (hζne : ζ.conj ≠ ζ)
+    (hjζ : ∀ i' : Fin hyp.w1, hyp.muGrid hG hodd i' j 1 ≠ ζ 1)
+    (h0ζ : hyp.muGrid hG hodd i 0 1 ≠ ζ 1) {δ : ℤ} {n d : ℕ} :
+    ClassFunction.inner (hyp.muGrid hG hodd i j - (δ : ℂ) • hyp.muGrid hG hodd i 0 - (n : ℂ) • ζ)
+        ((∑ i' : Fin hyp.w1, hyp.muGrid hG hodd i' j) - (d : ℂ) • ζ.conj) = 1 := by
+  haveI := hyp.finiteG
+  classical
+  have hconjirr : IsIrreducibleCharacter ζ.conj := hζirr.conj
+  have hconj1 : ζ.conj 1 = ζ 1 := by
+    obtain ⟨nn, _, hn, _⟩ := hζirr.exists_natDegree_charValue_one_dvd_card
+    simp only [ClassFunction.conj_apply, hn, star_natCast]
+  -- `(α_{ij}, ζ̄) = 0`: `μ_{ij}, μ_{i0}` degree-distinct from `ζ̄`, and `(ζ, ζ̄) = 0`.
+  have hαζc : ClassFunction.inner
+      (hyp.muGrid hG hodd i j - (δ : ℂ) • hyp.muGrid hG hodd i 0 - (n : ℂ) • ζ) ζ.conj = 0 := by
+    have a1 := hyp.muGrid_inner_eq_zero_of_apply_one_ne hG hodd i j hconjirr
+      (by rw [hconj1]; exact hjζ i)
+    have a2 := hyp.muGrid_inner_eq_zero_of_apply_one_ne hG hodd i 0 hconjirr
+      (by rw [hconj1]; exact h0ζ)
+    have a3 : ClassFunction.inner ζ ζ.conj = 0 := by
+      rw [OddOrder.RepresentationTheory.irr_cf_inner hζirr hconjirr, if_neg (Ne.symm hζne)]
+    simp only [ClassFunction.inner_sub_left, ClassFunction.inner_smul_left, a1, a2, a3,
+      mul_zero, sub_zero]
+  -- `(α_{ij}, μ_{i'j}) = δ_{i,i'}`: within-column orthonormal; `μ_{i0}, ζ` off column `j`.
+  have hrow : ∀ i' : Fin hyp.w1,
+      ClassFunction.inner (hyp.muGrid hG hodd i j - (δ : ℂ) • hyp.muGrid hG hodd i 0 - (n : ℂ) • ζ)
+        (hyp.muGrid hG hodd i' j) = (if i = i' then (1 : ℂ) else 0) := by
+    intro i'
+    have h1 : ClassFunction.inner (hyp.muGrid hG hodd i j) (hyp.muGrid hG hodd i' j)
+        = (if i = i' then (1 : ℂ) else 0) := by
+      by_cases hii' : i = i'
+      · rw [if_pos hii', ← hii']; exact hyp.muGrid_inner_self hG hodd i j
+      · rw [if_neg hii']; exact hyp.muGrid_inner_within_column hG hodd j hii'
+    have h2 := hyp.muGrid_inner_cross_column hG hodd i i' (Ne.symm hj0)
+    have h3 : ClassFunction.inner ζ (hyp.muGrid hG hodd i' j) = 0 := by
+      rw [OddOrder.RepresentationTheory.inner_conj_symm (hyp.muGrid hG hodd i' j) ζ,
+        hyp.muGrid_inner_eq_zero_of_apply_one_ne hG hodd i' j hζirr (hjζ i'), star_zero]
+    simp only [ClassFunction.inner_sub_left, ClassFunction.inner_smul_left, h1, h2, h3,
+      mul_zero, sub_zero]
+  rw [ClassFunction.inner_sub_right, OddOrder.RepresentationTheory.inner_smul_right, hαζc,
+    mul_zero, sub_zero, OddOrder.RepresentationTheory.inner_sum_right,
+    Finset.sum_congr rfl (fun i' _ => hrow i')]
+  simp
+
+open scoped FiniteInduce in
 /-- **§10 support of `ζ − ζ̄`** (Peterfalvi (10.5), `a = 0` argument): the difference `ζ − ζ̄` of a
 degree-`w₁` irreducible `ζ ∈ S` and its conjugate is supported in `A_0(M)`.  Both `ζ` and `ζ̄` are
 induced from the normal `M' = [M,M]`, hence vanish off `M'`; and `(ζ − ζ̄)(1) = ζ(1) − ζ̄(1) = 0`
@@ -2740,6 +2909,36 @@ theorem Hypothesis.muGridAlpha_tau_inner_muColumn_sub_conj [Finite G]
   rw [hyp.tau_inner_eq_of_supported hαsupp hμsupp]
   exact hyp.muGridAlpha_inner_muColumn_sub_conj hG hodd i j k hjk hk0 hζirr hζne hkζ hdζ h0ζ
 
+open scoped FiniteInduce in
+/-- **Peterfalvi (10.6)(a), `(α_{ij}^τ, (μ_j − dζ̄)^τ) = 1`** (diagonal, `0 < j < w₂`): the
+Dade-image inner product transferred to the `M`-side.  Both `α_{ij}` (`muGrid_alpha_support`) and
+the diagonal column `μ_j − dζ̄` (`muColumn_sub_conj_support`) are `A_0`-supported, so `τ` preserves
+the inner product (`tau_inner_eq_of_supported`); the `M`-side value is `1` (the diagonal
+`muGridAlpha_inner_muColumn_self_sub_conj`, vs `0` for the off-diagonal companion).
+
+This is the opening `1 = (α_{ij}^τ, μ_j^{τ₁} − dζ̄^{τ₁})` of Peterfalvi (10.6)(a) (on the coherent
+side `(μ_j − dζ̄)^τ = μ_j^{τ₁} − dζ̄^{τ₁}`, `tau_muColumn_sub_conj_eq_tau1`), which by Peterfalvi
+(5.8) gives the summed isometry `μ_j^{τ₁} = δ∑_i ω_{ij}^σ` (the (10.6)(a) conclusion). -/
+theorem Hypothesis.muGridAlpha_tau_inner_muColumn_self_sub_conj [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} [Invertible (Nat.card ↥M : ℂ)]
+    (hyp : Hypothesis M) (hodd : Odd (Nat.card G)) (i : Fin hyp.w1) {j : Fin hyp.w2} (hj0 : j ≠ 0)
+    {ζ : ClassFunction ↥M ℂ} (hζS : ζ ∈ inducedFamily M) (hζirr : IsIrreducibleCharacter ζ)
+    (hζne : ζ.conj ≠ ζ) {d : ℕ} {δ : ℤ} {n : ℕ}
+    (hdeg : hyp.muGrid hG hodd i j 1 = (d : ℂ)) (hμ0 : hyp.muGrid hG hodd i 0 1 = 1)
+    (hζ1 : ζ 1 = (hyp.w1 : ℂ)) (hnf : (n : ℤ) * (hyp.w1 : ℤ) = (d : ℤ) - δ)
+    (hδj : hyp.muColumnSign hG hodd j = δ) (h0ζ : hyp.muGrid hG hodd i 0 1 ≠ ζ 1)
+    (hjζ : ∀ i' : Fin hyp.w1, hyp.muGrid hG hodd i' j 1 ≠ ζ 1)
+    (hcol1 : ∀ i' : Fin hyp.w1, hyp.muGrid hG hodd i' j 1 = (d : ℂ)) :
+    ClassFunction.inner
+        (hyp.tau (hyp.muGrid hG hodd i j - (δ : ℂ) • hyp.muGrid hG hodd i 0 - (n : ℂ) • ζ))
+        (hyp.tau ((∑ i' : Fin hyp.w1, hyp.muGrid hG hodd i' j) - (d : ℂ) • ζ.conj)) = 1 := by
+  haveI := hyp.finiteG
+  classical
+  have hαsupp := hyp.muGrid_alpha_support hG hodd hj0 hζS hdeg hμ0 hζ1 hnf hδj
+  have hμsupp := hyp.muColumn_sub_conj_support hG hodd j hζS hζirr hcol1 hζ1
+  rw [hyp.tau_inner_eq_of_supported hαsupp hμsupp]
+  exact hyp.muGridAlpha_inner_muColumn_self_sub_conj hG hodd i j hj0 hζirr hζne hjζ h0ζ
+
 /-- **§10 τ/τ₁ compatibility on `ζ − ζ̄`** (Peterfalvi (10.5), `a = 0` argument): the Dade image
 `(ζ − ζ̄)^τ` equals `ζ^{τ₁} − ζ̄^{τ₁}` for the coherent extension `τ₁`.  Since `ζ ∈ S` and
 `ζ̄ ∈ S` (`inducedFamily_closedUnderConjugate`), the difference `ζ − ζ̄` lies in the supported
@@ -2902,6 +3101,36 @@ theorem Hypothesis.muGridAlpha_tau1_inner_muColumn [Finite G] {M : Subgroup G}
     ClassFunction.inner_sub_right,
     OddOrder.RepresentationTheory.inner_smul_right, star_natCast] at h45
   linear_combination h45 - (d : ℂ) * h12
+
+open scoped FiniteInduce in
+/-- **Peterfalvi (10.6)(a), `(α_{ij}^τ, μ_j^{τ₁} − dζ̄^{τ₁}) = 1`** (diagonal): the coherent-side
+form of the G-side diagonal inner product `muGridAlpha_tau_inner_muColumn_self_sub_conj`.  Since
+`μ_j = ∑_i μ_{ij} ∈ S` (`muGrid_column_sum_mem_inducedFamily`) and `ζ̄ ∈ S`, the supported
+combination `(μ_j − dζ̄)^τ` splits as `μ_j^{τ₁} − dζ̄^{τ₁}` (`tau_muColumn_sub_conj_eq_tau1`).
+
+This is the reduction opening `1 = (α_{ij}^τ, μ_j^{τ₁} − dζ̄^{τ₁})` of Peterfalvi (10.6)(a);
+dropping the `⊥ Im σ` terms (`ζ^{τ₁}, ζ̄^{τ₁} ⊥ Im σ`, `ζ^{τ₁} ⊥ μ_j^{τ₁}`) gives
+`(δ(ω_{ij}^σ − ω_{i0}^σ), μ_j^{τ₁}) = 1`, and Peterfalvi (5.8) then yields the summed isometry
+`μ_j^{τ₁} = δ∑_i ω_{ij}^σ` (the (10.6)(a) conclusion, still gated on (5.8)). -/
+theorem Hypothesis.muGridAlpha_tau1_inner_muColumn_self_sub_conj [Finite G] {M : Subgroup G}
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis M) (hodd : Odd (Nat.card G))
+    (i : Fin hyp.w1) {j : Fin hyp.w2} (hj0 : j ≠ 0)
+    {params : CharacterParameters hyp} (coh : CoherentHypothesis hyp params)
+    {ζ : ClassFunction ↥M ℂ} (hζS : ζ ∈ inducedFamily M) (hζirr : IsIrreducibleCharacter ζ)
+    (hζne : ζ.conj ≠ ζ) {d : ℕ} {δ : ℤ} {n : ℕ}
+    (hdeg : hyp.muGrid hG hodd i j 1 = (d : ℂ)) (hμ0 : hyp.muGrid hG hodd i 0 1 = 1)
+    (hζ1 : ζ 1 = (hyp.w1 : ℂ)) (hnf : (n : ℤ) * (hyp.w1 : ℤ) = (d : ℤ) - δ)
+    (hδj : hyp.muColumnSign hG hodd j = δ) (h0ζ : hyp.muGrid hG hodd i 0 1 ≠ ζ 1)
+    (hjζ : ∀ i' : Fin hyp.w1, hyp.muGrid hG hodd i' j 1 ≠ ζ 1)
+    (hcol1 : ∀ i' : Fin hyp.w1, hyp.muGrid hG hodd i' j 1 = (d : ℂ))
+    (hdj1 : hyp.muGrid hG hodd 0 j 1 ≠ 1) :
+    ClassFunction.inner
+        (hyp.tau (hyp.muGrid hG hodd i j - (δ : ℂ) • hyp.muGrid hG hodd i 0 - (n : ℂ) • ζ))
+        (coh.tau1 (∑ i' : Fin hyp.w1, hyp.muGrid hG hodd i' j)
+          - (d : ℂ) • coh.tau1 ζ.conj) = 1 := by
+  have hG_side := hyp.muGridAlpha_tau_inner_muColumn_self_sub_conj hG hodd i hj0 hζS hζirr hζne
+    hdeg hμ0 hζ1 hnf hδj h0ζ hjζ hcol1
+  rwa [hyp.tau_muColumn_sub_conj_eq_tau1 hG hodd j coh hζS hζirr hcol1 hζ1 hdj1] at hG_side
 
 open scoped FiniteInduce in
 /-- **Peterfalvi (10.5), `‖μ_k^{τ₁}‖² = w₁`** (`0 < k < w₂`): the coherent extension `τ₁` is an
@@ -3267,18 +3496,142 @@ theorem Hypothesis.tau1_zeta_vanishes_on_typePV [Finite G] {M : Subgroup G}
     rw [(tic.chiFam_spec hVeq app).2.2.1, if_pos rfl]
   exact inner_left_eq_zero_of_inner_sub_eq_zero haZ hsZ ha1 hb1 hs1 hab hdiff
 
-/-- **Peterfalvi (10.5), Dade-image half**: under the coherent extension, `α_{ij}` has the stated
-Dade image `δ·(ω_{ij}^σ − ω_{i0}^σ) − n·ζ^{τ₁}`.  (The support half is `alpha_support`.) -/
-theorem alpha_tau_image [Finite G] [Fintype G]
-    (_hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} [Fintype ↥M]
-    [Invertible (Nat.card ↥M : ℂ)] [Invertible (Nat.card G : ℂ)]
-    {hyp : Hypothesis M} {params : CharacterParameters hyp}
-    (coh : CoherentHypothesis hyp params) :
+open scoped FiniteInduce in
+/-- **Peterfalvi (10.5), Dade-image half (grid level)**: the genuine `μ`-grid statement of the
+Dade-image identity, `α_{ij}^τ = δ·(ω_{ij}^σ − ω_{i0}^σ) − n·ζ^{τ₁}`, with `ω^σ` the *aligned*
+`σ`-grid `alignedOmegaSigmaGrid` and `α_{ij} = μ_{ij} − δ·μ_{i0} − n·ζ`.
+
+This is the full (10.5) endgame.  Writing `X = α_{ij}^τ + n·ζ^{τ₁}`, the goal reduces to
+`X = δ·(ω_{ij}^σ − ω_{i0}^σ)`.  Now `X` is a virtual character of `G` with `‖X‖² = 2`
+(`muGridAlpha_tau_X_inner`), the aligned `σ`-grid entries are members `χ_{P_{ij}}` of the
+orthonormal `σ`-image family (`exists_alignedOmegaSigmaGrid_chiFam_family`), and the difference
+`X − δ·(ω_{ij}^σ − ω_{i0}^σ)` vanishes on `V` (`muGridPsi_vanishes_on_typePV` together with the
+`ζ^{τ₁}`-vanishing `tau1_zeta_vanishes_on_typePV`).  The norm-`2` Dade-image trichotomy
+`eq_smul_chiFam_diff_of_vanishOnV` (the §5 generalisation of the §6 `(4.8)` endgame) then forces
+`X = δ·(χ_{P_{ij}} − χ_{P_{i0}})`.  (`alpha_tau_image` is the thin `CharacterParameters` corollary.) -/
+theorem Hypothesis.tau_muGridAlpha_eq [Finite G] {M : Subgroup G}
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis M) (hodd : Odd (Nat.card G))
+    (i : Fin hyp.w1) {j : Fin hyp.w2} (hj0 : j ≠ 0) (k : Fin hyp.w2) (hjk : j ≠ k) (hk0 : k ≠ 0)
+    {params : CharacterParameters hyp} (coh : CoherentHypothesis hyp params)
+    {ζ : ClassFunction ↥M ℂ} (hζS : ζ ∈ inducedFamily M) (hζirr : IsIrreducibleCharacter ζ)
+    (hζne : ζ.conj ≠ ζ) {d : ℕ} {δ : ℤ} {n : ℕ}
+    (hdeg : hyp.muGrid hG hodd i j 1 = (d : ℂ)) (hμ0 : hyp.muGrid hG hodd i 0 1 = 1)
+    (hζ1 : ζ 1 = (hyp.w1 : ℂ)) (hnf : (n : ℤ) * (hyp.w1 : ℤ) = (d : ℤ) - δ)
+    (hδj : hyp.muColumnSign hG hodd j = δ)
+    (hdζ : hyp.muGrid hG hodd i j 1 ≠ ζ 1) (h0ζ : hyp.muGrid hG hodd i 0 1 ≠ ζ 1)
+    (hkζ : ∀ i' : Fin hyp.w1, hyp.muGrid hG hodd i' k 1 ≠ ζ 1)
+    (hcol1 : ∀ i' : Fin hyp.w1, hyp.muGrid hG hodd i' k 1 = (d : ℂ))
+    (hdk1 : hyp.muGrid hG hodd 0 k 1 ≠ 1)
+    (hδpm : δ = 1 ∨ δ = -1) (hw1 : 3 ≤ hyp.w1) (hn2 : 2 ≤ n) :
+    hyp.tau (hyp.muGrid hG hodd i j - (δ : ℂ) • hyp.muGrid hG hodd i 0 - (n : ℂ) • ζ)
+      = (δ : ℂ) • (hyp.alignedOmegaSigmaGrid hG hodd i j - hyp.alignedOmegaSigmaGrid hG hodd i 0)
+        - (n : ℂ) • coh.tau1 ζ := by
+  haveI := hyp.finiteG
+  classical
+  -- `X = α_{ij}^τ + n·ζ^{τ₁}` has `‖X‖² = 2` and lies in `ℤ[Irr G]`.
+  have hXfacts := hyp.muGridAlpha_tau_X_inner hG hodd i hj0 k hjk hk0 coh hζS hζirr hζne
+    hdeg hμ0 hζ1 hnf hδj hdζ h0ζ hkζ hcol1 hdk1 hδpm hw1 hn2
+  have hτ1ζZ : coh.tau1 ζ ∈ ZIrr G :=
+    coh.coherent.extension_mem_ZIrr ζ (Submodule.subset_span hζS)
+  have hαZ := hyp.muGridAlpha_tau_mem_ZIrr hG hodd i hj0 hζS hζirr hdeg hμ0 hζ1 hnf hδj
+  have hXZ : hyp.tau (hyp.muGrid hG hodd i j - (δ : ℂ) • hyp.muGrid hG hodd i 0 - (n : ℂ) • ζ)
+      + (n : ℂ) • coh.tau1 ζ ∈ ZIrr G := by
+    refine Submodule.add_mem _ hαZ ?_
+    rw [Nat.cast_smul_eq_nsmul]; exact nsmul_mem hτ1ζZ n
+  -- the aligned `σ`-grid entries as `χ`-family members (piece 1).
+  obtain ⟨P, hPinj, hP⟩ := hyp.exists_alignedOmegaSigmaGrid_chiFam_family hG hodd i
+  let tic := typePData_toTICyclicHypothesis hyp.typeP hodd
+  haveI : NeZero (Nat.card ↥tic.W1) := ⟨Nat.card_pos.ne'⟩
+  haveI : NeZero (Nat.card ↥tic.W2) := ⟨Nat.card_pos.ne'⟩
+  let app := hyp.canonicalFullDadeApp hG hodd
+  have hVeq : tic.V = tic.Vdiff := rfl
+  have hPne : P j ≠ P 0 := fun h => hj0 (hPinj h)
+  have hPj' : tic.chiFam hVeq app (P j) = hyp.alignedOmegaSigmaGrid hG hodd i j := (hP j).symm
+  have hP0' : tic.chiFam hVeq app (P 0) = hyp.alignedOmegaSigmaGrid hG hodd i 0 := (hP 0).symm
+  -- `ψ = X − δ·(ω_{ij}^σ − ω_{i0}^σ)` vanishes on `V`.
+  have hζvanish : ∀ v ∈ typePV M hyp.typeP, coh.tau1 ζ v = 0 :=
+    fun v hv => hyp.tau1_zeta_vanishes_on_typePV hG hodd coh hζS hζirr hζne hv
+  have hψV : ∀ v ∈ tic.V,
+      (hyp.tau (hyp.muGrid hG hodd i j - (δ : ℂ) • hyp.muGrid hG hodd i 0 - (n : ℂ) • ζ)
+          + (n : ℂ) • coh.tau1 ζ
+        - (δ : ℂ) • (tic.chiFam hVeq app (P j) - tic.chiFam hVeq app (P 0))) v = 0 := by
+    intro v hv
+    rw [hPj', hP0']
+    exact hyp.muGridPsi_vanishes_on_typePV hG hodd hj0 hζS hdeg hμ0 hζ1 hnf hδj coh hζvanish hv
+  -- the norm-`2` Dade-image trichotomy.
+  rw [eq_sub_iff_add_eq, ← hPj', ← hP0']
+  exact tic.eq_smul_chiFam_diff_of_vanishOnV hVeq app hXZ hXfacts.2 hPne hδpm hψV
+
+open scoped FiniteInduce in
+/-- **Peterfalvi (10.5), Dade-image half** (`CharacterParameters` corollary).  For the (10.2)/(10.3)
+character data — the `μ`-grid (`hmu`), the aligned `σ`-grid (`hos`), the degree-`w₁` irreducible `ζ`
+of (10.2) (`hzS`/`hz1`) and the column sign `δ = ±1` (`hδpm`/`hδj`) — the Dade image of
+`α_{ij} = μ_{ij} − δ·μ_{i0} − n·ζ` is `δ·(ω_{ij}^σ − ω_{i0}^σ) − n·ζ^{τ₁}`.
+
+Thin corollary of the grid identity `tau_muGridAlpha_eq`.  All arithmetic inputs are discharged from
+the (10.3) data carried by `CharacterParameters` (`degree_independent`, `n_formula`, `d_gt_one`,
+`two_le_n`) and the structural bounds `w₁, w₂ ≥ 3` (`three_le_card_W1/W2`): the auxiliary nontrivial
+column `k ≠ j`, the degree distinctness `d ≠ w₁`/`1 ≠ w₁`, and the parity `n ≥ 2` (Peterfalvi (10.3),
+now `params.two_le_n`).  The only hypotheses beyond the (10.2)/(10.3) construction pins are `hzconj`
+— the non-realness `ζ̄ ≠ ζ` (Peterfalvi (1.1): a nontrivial irreducible of an odd-order group is not
+real; carried per the §10 (10.5) chain convention, derivable via
+`not_isReal_of_ne_trivial_of_odd_card'`). -/
+theorem alpha_tau_image [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G}
+    {hyp : Hypothesis M} {params : CharacterParameters hyp} (coh : CoherentHypothesis hyp params)
+    (hmu : params.mu = hyp.muGrid hG hG.odd)
+    (hos : params.omegaSigma = hyp.alignedOmegaSigmaGrid hG hG.odd)
+    (hzS : params.zeta ∈ inducedFamily M) (hz1 : params.zeta 1 = (hyp.w1 : ℂ))
+    (hzconj : params.zeta.conj ≠ params.zeta)
+    (hδpm : params.delta = 1 ∨ params.delta = -1)
+    (hδj : ∀ j : Fin hyp.w2, j ≠ 0 → hyp.muColumnSign hG hG.odd j = params.delta) :
     ∀ (i : Fin hyp.w1) (j : Fin hyp.w2), j ≠ 0 →
         hyp.tau (params.alpha i j) =
           (params.delta : ℂ) • (params.omegaSigma i j - params.omegaSigma i 0)
             - (params.n : ℂ) • coh.tau1 params.zeta := by
-  sorry
+  haveI := hyp.finiteG
+  classical
+  have hodd : Odd (Nat.card G) := hG.odd
+  have hn2 : 2 ≤ params.n := params.two_le_n
+  -- structural bounds `w₁, w₂ ≥ 3` from the §10 TI-cyclic hypothesis.
+  have hw1 : 3 ≤ hyp.w1 := (typePData_toTICyclicHypothesis hyp.typeP hodd).three_le_card_W1
+  have hw2 : 3 ≤ hyp.w2 := (typePData_toTICyclicHypothesis hyp.typeP hodd).three_le_card_W2
+  intro i j hj0
+  -- choose an auxiliary nontrivial column `k ≠ j` (possible as `w₂ ≥ 3`).
+  obtain ⟨k, hjk, hk0⟩ : ∃ k : Fin hyp.w2, j ≠ k ∧ k ≠ 0 := by
+    have h1lt : 1 < hyp.w2 := by omega
+    have h2lt : 2 < hyp.w2 := by omega
+    by_cases h : j = ⟨1, h1lt⟩
+    · exact ⟨⟨2, h2lt⟩, by rw [h]; exact Fin.ne_of_val_ne (by simp),
+        Fin.ne_of_val_ne (by simp)⟩
+    · exact ⟨⟨1, h1lt⟩, h, Fin.ne_of_val_ne (by simp)⟩
+  -- (10.3) degree facts on the `μ`-grid.
+  have hdeg : hyp.muGrid hG hodd i j 1 = (params.d : ℂ) := by
+    rw [← hmu]; exact params.degree_independent i j hj0
+  have hμ0 : hyp.muGrid hG hodd i 0 1 = 1 := hyp.muGrid_zero_column_apply_one hG hodd i
+  have hcol1 : ∀ i' : Fin hyp.w1, hyp.muGrid hG hodd i' k 1 = (params.d : ℂ) := fun i' => by
+    rw [← hmu]; exact params.degree_independent i' k hk0
+  have hd1 : params.d ≠ 1 := by have := params.d_gt_one; omega
+  have hdk1 : hyp.muGrid hG hodd 0 k 1 ≠ 1 := by rw [hcol1 0]; exact_mod_cast hd1
+  -- `d ≠ w₁` from `d = n·w₁ + δ`, `n ≥ 2`, `w₁ ≥ 3`, `δ = ±1`.
+  have hdw1 : params.d ≠ hyp.w1 := by
+    have hf : (params.d : ℤ) = (params.n : ℤ) * (hyp.w1 : ℤ) + params.delta := by
+      linarith [params.n_formula]
+    have hn2Z : (2 : ℤ) ≤ (params.n : ℤ) := by exact_mod_cast hn2
+    have hw1Z : (3 : ℤ) ≤ (hyp.w1 : ℤ) := by exact_mod_cast hw1
+    intro he
+    have heZ : (params.d : ℤ) = (hyp.w1 : ℤ) := by exact_mod_cast he
+    rcases hδpm with h | h <;> rw [h] at hf <;> nlinarith [hf, heZ, hn2Z, hw1Z]
+  have hdζ : hyp.muGrid hG hodd i j 1 ≠ params.zeta 1 := by
+    rw [hdeg, hz1]; exact_mod_cast hdw1
+  have h0ζ : hyp.muGrid hG hodd i 0 1 ≠ params.zeta 1 := by
+    rw [hμ0, hz1]; intro he; have : hyp.w1 = 1 := by exact_mod_cast he.symm
+    omega
+  have hkζ : ∀ i' : Fin hyp.w1, hyp.muGrid hG hodd i' k 1 ≠ params.zeta 1 := fun i' => by
+    rw [hcol1 i', hz1]; exact_mod_cast hdw1
+  -- discharge via the grid identity `tau_muGridAlpha_eq`.
+  rw [params.alpha_def, hmu, hos]
+  exact hyp.tau_muGridAlpha_eq hG hodd i hj0 k hjk hk0 coh hzS params.zeta_irreducible hzconj
+    hdeg hμ0 hz1 params.n_formula (hδj j hj0) hdζ h0ζ hkζ hcol1 hdk1 hδpm hw1 hn2
 
 /-- **Peterfalvi (10.6)**: the sums of `omega_ij^sigma` describe the `tau1`
 images, and outside the tame support the value of `zeta^tau1` has norm at least
