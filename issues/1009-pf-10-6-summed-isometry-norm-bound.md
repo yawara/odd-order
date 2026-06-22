@@ -59,10 +59,24 @@ statement)。**S07_Coherence.lean に未形式化** — 本 issue の真の prer
     (係数 grid → full column) + Fourier 復元 (full column → class-function 等式) を合成。
     separability は `sigmaCoeff_add_eq` (V-消失) で供給、entries 実数性で `∑ s² = ∑ s·conj s` を橋渡し。
     = norm-w₁ 版 `eq_smul_chiFam_diff_of_vanishOnV`。**(10.6.a) を (5.5) の出力に honest 還元**。
-- [ ] **残 linchpin = (5.8) wrapper の (b)(5.5) + (c)(4.7)**: 上記 endgame の仮説 (2-column support +
-  {0,±δ} entries + Parseval-等式 + ‖μ_k^τ₁‖²=w₁) を実際の `μ_k^τ₁` で**establish** する段階。
+- [x] **(5.8) endgame 仮説 2/4 DONE (2026-06-22 lane-b 再開セッション)** — §5-gate 回避経路を確立:
+  - **`OrthonormalCharacterImageFamily` (S07) は 2 元限定でなく汎用**と判明 (`imageSet : Finset`、
+    `image_eq : τ(χ−χ̄)=∑_{α∈R} α` のみ要求) ⟹ column μ_k に直接適用可。これが (5.5)-for-column の正路。
+  - **column-difference DONE** (`tau_muGrid_column_diff` + `tau_muGrid_columnSum_diff`, commit `bd4c8340`,
+    axiom-clean=§10 upstream gate のみ): `τ(μ_ij−μ_ik)=δ(ω_ij^σ−ω_ik^σ)` + summed `τ(μ_j−μ_k)=δ∑(...)`。
+    `alpha_tau_image` の系 (α tail 相殺)。= column image family の `image_eq` (R={δω_ij^σ}∪{−δω_ik^σ})。
+  - **μ_k^τ₁ vanishes on V DONE** (`muColumn_tau1_vanishes_on_typePV`, commit `02ec7e03`, axiom-clean):
+    (5.8) χ=ζ̄ ルート。(4.7)`muColumn_sub_conj_support` + `tau_apply_of_mem_typePV` + 誘導指標 vanishing
+    + `tau_muColumn_sub_conj_eq_tau1` + 完成済 `tau1_zeta_vanishes_on_typePV`(ζ̄)。
+  - 🔑 **§5-gate 回避が確定**: `tau1_zeta_vanishes_on_typePV` が honest 完成 (norm-1 NC≤2 トリック) ゆえ
+    column 経路は直接 reduction が要する §5-gated `ζ̄^τ₁⊥Imσ` を**通らない** — (5.5) が μ_k^τ₁ を直接決定し
+    V-vanishing は単一指標 vanishing + (4.7) で出る。‖μ_k^τ₁‖²=w₁ も既存 (`muColumn_tau1_inner_self`)。
+  - **残 = sigmaCoeff 2-column 構造** ((5.8) 仮説 4/4 のうち最後): column `OrthonormalCharacterImageFamily`
+    本体構築 (要 conjugate-column `conj(μ_k)=μ_{k'}` + orthonormality) → `CharacterPsiDecomposition.ofProjection`
+    (ψ=0, tau1=coh.tau1) → (5.5)`eq_sum_of_psi_eq_zero` → sigmaCoeff 翻訳 → σ-endgame 適用。
+- [ ] **残 linchpin = (5.8) wrapper の (b)(5.5)**: sigmaCoeff 2-column structure (上記「残」)。
   - (b) **(5.5)** `χ^τ₁ = ∑_{α∈R(χ)} α` を certain-type column μ_k に適用し R(μ_k)=2-column σ-構造を出す。
-  - (c) **(4.7) A-support** + μ_k^τ₁ vanishes on V (crux)。
+  - (c) ✅ **(4.7) A-support + μ_k^τ₁ vanishes on V DONE** (上記)。
   - ⚠ **真の gate は §6 certain-type μ ↔ §5 sigmaCoeff grid の reconcile** (deep §6↔§5、multi-session)。
     `IsCoherent` は abstract isometry で (5.5) を carry しない (2026-06-22 確認) — (5.5) を coherence
     isometry に対し別途立てる必要。`S07_RetargetScaled.lean:451`/`CharacterDifferenceImage`
