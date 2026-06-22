@@ -229,11 +229,28 @@ The book proof of (12.12): let `P = O_p(H)`, `T = Ω₁(Z(P))` (elem-ab of order
   dim 1 / dim-2-reducible (invariant line via `Subrepresentation`) ⟹ Case A; dim-2-irreducible ⟹
   Case B (`|E| ∣ p−1 ∣ p²−1` lift for the reducible case).  This is the **§8-free rep-theory input**
   that the full (12.12) consumes once its `T`/FPF setup lands.
-- **gate (remaining)**: the `T = Ω₁(Z(O_p(H)))` setup (|T|∈{p,p²} from (12.9) rank 2; `E` FPF on `T`
-  from (12.10) Frobenius; elem-ab→`Representation` conversion) + the `p+1` refinement (`A=1` via
-  (12.11)/(12.9)) consume **(12.10)/(12.11)** [char/§8-gated, lane-b] and the intricate `O_p/Z/Ω₁`
-  structure.  ⟹ `complement_cyclic_order_dvd` (full disjunction) stays gated; the rep-theory core is
-  the ungated reusable part and is **done + consumes the two cores**.
+- **✅✅ Conjugation-action bridges LANDED** (2026-06-23 lane-h resume¹¹, commit `9e322459`,
+  sorry-free + axiom-clean, AxiomsCheck-registered) — the elem-ab→`Representation` conversion is
+  **done**, lifting the dim≤2 core to the form the full (12.12) consumes:
+  - **`isCyclic_and_card_dvd_of_fpf_mulDistribMulAction`** (abstract): odd FPF `E` (`p∤|E|`) on an
+    elem-ab p-group `M` (`Module (ZMod p) (Additive M)`) of 𝔽_p-dim 1 or 2 ⟹ cyclic, `|E| ∣ |M|−1`.
+    Converts `MulDistribMulAction E M` → `Representation` via `Representation.ofDistribMulAction`
+    (FPF translated through `Additive.toMul`), applies `isCyclic_and_card_dvd_of_fpf_dim_le_two`.
+  - **`isCyclic_and_card_dvd_of_fpf_conj_elemAbelian`** (conjugation): `E ≤ N_G(T)` acting FPF by
+    conjugation on elem-ab `T` of order `p` or `p²` (|E| odd, coprime p) ⟹ cyclic, `|E| ∣ p−1 ∨ p²−1`.
+    Builds the conjugation `MulDistribMulAction ↥E ↥T` via `compHom` + mathlib's
+    `MulDistribMulAction (normalizer ↑T) ↥T`, uses `subgroupCommGroup`/`subgroupZmodModule` to dodge
+    the `Additive ↥T` diamond, recovers `finrank∈{1,2}` from `|T|∈{p,p²}` via
+    `FiniteField.pow_finrank_eq_natCard` + `Nat.pow_right_injective`.  **This is exactly the form
+    the full (12.12) `T`-setup feeds.**
+- **gate (remaining)**: only the `T = Ω₁(Z(O_p(H)))` **construction** (`|T|∈{p,p²}` from (12.9)
+  rank 2; `E` normalizes & acts FPF on `T` from (12.10) Frobenius) + the `p+1` refinement (`A=1` via
+  (12.11)/(12.9)) — these consume **(12.10)/(12.11)** [char/§8-gated, lane-b] and the intricate
+  `O_p/Z/Ω₁` p-group structure.  ⟹ `complement_cyclic_order_dvd` (full disjunction) stays gated;
+  the **rep-theory + conjugation bridge is the ungated reusable part and is now COMPLETE**
+  (`E`-FPF-on-elem-ab-rank≤2 ⟹ cyclic+order, the subgroup form, sorry-free).  Wiring (12.12) to
+  consume the bridge is "保険 skeleton" over a genuinely-blocked upstream ((12.10)) — defer per
+  ft_path_policy until (12.10) lands or by hub decision.
 
    ### ⚠ Instance-engineering blocker (diagnosed 2026-06-22 — ✅ SUPERSEDED/RESOLVED, see "RESOLVED" block above; kept as a record of the dead ends)
    The clean composition is **blocked** because the Singer lemma requires `[CommGroup C]` but
