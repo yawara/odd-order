@@ -3795,6 +3795,72 @@ theorem Hypothesis.muColumn_tau1_vanishes_on_typePV [Finite G] {M : Subgroup G}
     sub_zero] at hτvan
   exact hτvan
 
+open scoped FiniteInduce in
+/-- **§10 column-independent `τ₁`-residual** (the reduction step of Peterfalvi (10.6)(a)): for any
+two nontrivial columns `j, k ≠ 0`, the coherent images satisfy
+`μ_j^{τ₁} − μ_k^{τ₁} = δ·(∑_i ω_{ij}^σ − ∑_i ω_{ik}^σ)`, i.e. the residual
+`μ_j^{τ₁} − δ·∑_i ω_{ij}^σ` does **not depend on the column `j`**.
+
+This is the honest §10-native column reduction of (10.6)(a): the difference
+`μ_j − μ_k = ∑_i(α_{ij} − α_{ik})` is `A_0(M)`-supported (each `α_{ij} = μ_{ij} − δ·μ_{i0} − n·ζ` is,
+`CharacterParameters.alpha_support`), so the coherent extension agrees there with the Dade isometry
+`τ` (`CoherentHypothesis.coherent.extends_on_supported`), and
+`τ(μ_j − μ_k) = δ·(∑ω_{ij}^σ − ∑ω_{ik}^σ)` is the landed (10.5) column-sum identity
+`tau_muGrid_columnSum_diff`.  Combined with `map_sub` for `τ₁` this gives the column-independence,
+reducing the full (10.6)(a) `μ_j^{τ₁} = δ·∑_i ω_{ij}^σ` to a single column — the remaining content
+being the (5.8) full-column endgame that pins that one column. -/
+theorem Hypothesis.muColumn_tau1_diff_eq [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} {hyp : Hypothesis M}
+    {params : CharacterParameters hyp} (coh : CoherentHypothesis hyp params)
+    (hmu : params.mu = hyp.muGrid hG hG.odd)
+    (hos : params.omegaSigma = hyp.alignedOmegaSigmaGrid hG hG.odd)
+    (hzS : params.zeta ∈ inducedFamily M) (hz1 : params.zeta 1 = (hyp.w1 : ℂ))
+    (hzconj : params.zeta.conj ≠ params.zeta)
+    (hδpm : params.delta = 1 ∨ params.delta = -1)
+    (hδj : ∀ j : Fin hyp.w2, j ≠ 0 → hyp.muColumnSign hG hG.odd j = params.delta)
+    {j k : Fin hyp.w2} (hj0 : j ≠ 0) (hk0 : k ≠ 0)
+    (hdj1 : hyp.muGrid hG hG.odd 0 j 1 ≠ 1) (hdk1 : hyp.muGrid hG hG.odd 0 k 1 ≠ 1) :
+    coh.tau1 (∑ i : Fin hyp.w1, hyp.muGrid hG hG.odd i j)
+        - coh.tau1 (∑ i : Fin hyp.w1, hyp.muGrid hG hG.odd i k)
+      = (params.delta : ℂ) • (∑ i : Fin hyp.w1, hyp.alignedOmegaSigmaGrid hG hG.odd i j
+          - ∑ i : Fin hyp.w1, hyp.alignedOmegaSigmaGrid hG hG.odd i k) := by
+  haveI := hyp.finiteG
+  classical
+  -- `μ_j − μ_k = ∑_i (α_{ij} − α_{ik})` (the `δμ_{i0}`, `nζ` tails cancel).
+  have hμdiff : (∑ i : Fin hyp.w1, hyp.muGrid hG hG.odd i j)
+      - (∑ i : Fin hyp.w1, hyp.muGrid hG hG.odd i k)
+        = ∑ i : Fin hyp.w1, (params.alpha i j - params.alpha i k) := by
+    rw [← Finset.sum_sub_distrib]
+    refine Finset.sum_congr rfl fun i _ => ?_
+    rw [params.alpha_def, params.alpha_def, hmu]; abel
+  -- each partial sum `∑_{i∈s}(α_{ij} − α_{ik})` is `A_0`-supported (induction; `α_{ij}` is).
+  have hsumsupp : ∀ s : Finset (Fin hyp.w1),
+      (∑ i ∈ s, (params.alpha i j - params.alpha i k)).support ⊆ hyp.A0 := by
+    intro s
+    induction s using Finset.induction with
+    | empty => rw [Finset.sum_empty, ClassFunction.support_zero]; exact Set.empty_subset _
+    | insert i s hi ih =>
+        rw [Finset.sum_insert hi]
+        refine (ClassFunction.support_add_subset _ _).trans (Set.union_subset ?_ ih)
+        exact (ClassFunction.support_sub_subset _ _).trans
+          (Set.union_subset (params.alpha_support i j hj0) (params.alpha_support i k hk0))
+  -- `μ_j − μ_k ∈ ℤ[S, A_0]`: in `ℤ[S]` (both column sums lie in `S`), supported on `A_0`.
+  have hmem : (∑ i : Fin hyp.w1, hyp.muGrid hG hG.odd i j)
+        - (∑ i : Fin hyp.w1, hyp.muGrid hG hG.odd i k)
+      ∈ OddOrder.Peterfalvi.S07.zSupportedSpan hyp.Sset hyp.A0 := by
+    refine ⟨Submodule.sub_mem _
+      (Submodule.subset_span (hyp.muGrid_column_sum_mem_inducedFamily hG hG.odd j hdj1))
+      (Submodule.subset_span (hyp.muGrid_column_sum_mem_inducedFamily hG hG.odd k hdk1)), ?_⟩
+    rw [hμdiff]; exact hsumsupp Finset.univ
+  -- `τ₁(μ_j − μ_k) = τ(μ_j − μ_k) = δ·(∑ω_{ij}^σ − ∑ω_{ik}^σ)`.
+  have key : coh.tau1 ((∑ i : Fin hyp.w1, hyp.muGrid hG hG.odd i j)
+      - (∑ i : Fin hyp.w1, hyp.muGrid hG hG.odd i k))
+        = hyp.tau ((∑ i : Fin hyp.w1, hyp.muGrid hG hG.odd i j)
+          - (∑ i : Fin hyp.w1, hyp.muGrid hG hG.odd i k)) :=
+    coh.coherent.extends_on_supported _ hmem
+  rw [map_sub] at key
+  rw [key, tau_muGrid_columnSum_diff hG coh hmu hos hzS hz1 hzconj hδpm hδj hj0 hk0]
+
 /-- **Peterfalvi (10.6)**: the sums of `omega_ij^sigma` describe the `tau1`
 images, and outside the tame support the value of `zeta^tau1` has norm at least
 one. -/
