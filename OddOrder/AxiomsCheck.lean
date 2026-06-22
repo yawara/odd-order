@@ -683,6 +683,13 @@ set_option linter.style.longLine false in
 #assert_only_allowed_axioms
   OddOrder.RepresentationTheory.isCyclic_and_card_dvd_of_faithful_irreducible_comm
 #assert_only_allowed_axioms OddOrder.RepresentationTheory.mul_comm_monoidAlgebra_of_comm
+-- Peterfalvi (9.7)(b) coprimality core: a finite abelian group acting faithfully + irreducibly on
+-- a finite 𝔽_p-module, together with a fixed-point-free additive automorphism, has order coprime to
+-- p - 1 (the 𝔽_p-scalars `𝔽ₚ*` meet the image trivially in the cyclic Singer units).  The cyclic
+-- helper `coprime_card_of_inf_eq_bot_isCyclic` converts trivial intersection to coprime orders.
+#assert_only_allowed_axioms OddOrder.RepresentationTheory.coprime_card_of_inf_eq_bot_isCyclic
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.coprime_card_sub_one_of_faithful_irreducible_comm_fpf
 -- Peterfalvi (12.12) irreducible-case core: an odd group acting faithfully + irreducibly on a
 -- 2-dimensional 𝔽_p-space is cyclic with order dividing |V| - 1 = p² - 1 (BG Thm 2.6(a) +
 -- the commutativity-free Singer mechanism).
@@ -5699,3 +5706,5 @@ formula together with the prime computation `coprimeFrobeniusAction_card_eq_prim
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S11.typeP_commutator_U_centralizes_H
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S11.chiefFactor_caseB_image_cyclic
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S11.chiefFactor_caseB_image_dvd_norm
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S11.coprime_card_sub_one_of_aInvariant_irreducible_faithful_comm_fpf
