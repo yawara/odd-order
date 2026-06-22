@@ -2909,6 +2909,36 @@ theorem Hypothesis.muGridAlpha_tau_inner_muColumn_sub_conj [Finite G]
   rw [hyp.tau_inner_eq_of_supported hαsupp hμsupp]
   exact hyp.muGridAlpha_inner_muColumn_sub_conj hG hodd i j k hjk hk0 hζirr hζne hkζ hdζ h0ζ
 
+open scoped FiniteInduce in
+/-- **Peterfalvi (10.6)(a), `(α_{ij}^τ, (μ_j − dζ̄)^τ) = 1`** (diagonal, `0 < j < w₂`): the
+Dade-image inner product transferred to the `M`-side.  Both `α_{ij}` (`muGrid_alpha_support`) and
+the diagonal column `μ_j − dζ̄` (`muColumn_sub_conj_support`) are `A_0`-supported, so `τ` preserves
+the inner product (`tau_inner_eq_of_supported`); the `M`-side value is `1` (the diagonal
+`muGridAlpha_inner_muColumn_self_sub_conj`, vs `0` for the off-diagonal companion).
+
+This is the opening `1 = (α_{ij}^τ, μ_j^{τ₁} − dζ̄^{τ₁})` of Peterfalvi (10.6)(a) (on the coherent
+side `(μ_j − dζ̄)^τ = μ_j^{τ₁} − dζ̄^{τ₁}`, `tau_muColumn_sub_conj_eq_tau1`), which by Peterfalvi
+(5.8) gives the summed isometry `μ_j^{τ₁} = δ∑_i ω_{ij}^σ` (the (10.6)(a) conclusion). -/
+theorem Hypothesis.muGridAlpha_tau_inner_muColumn_self_sub_conj [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} [Invertible (Nat.card ↥M : ℂ)]
+    (hyp : Hypothesis M) (hodd : Odd (Nat.card G)) (i : Fin hyp.w1) {j : Fin hyp.w2} (hj0 : j ≠ 0)
+    {ζ : ClassFunction ↥M ℂ} (hζS : ζ ∈ inducedFamily M) (hζirr : IsIrreducibleCharacter ζ)
+    (hζne : ζ.conj ≠ ζ) {d : ℕ} {δ : ℤ} {n : ℕ}
+    (hdeg : hyp.muGrid hG hodd i j 1 = (d : ℂ)) (hμ0 : hyp.muGrid hG hodd i 0 1 = 1)
+    (hζ1 : ζ 1 = (hyp.w1 : ℂ)) (hnf : (n : ℤ) * (hyp.w1 : ℤ) = (d : ℤ) - δ)
+    (hδj : hyp.muColumnSign hG hodd j = δ) (h0ζ : hyp.muGrid hG hodd i 0 1 ≠ ζ 1)
+    (hjζ : ∀ i' : Fin hyp.w1, hyp.muGrid hG hodd i' j 1 ≠ ζ 1)
+    (hcol1 : ∀ i' : Fin hyp.w1, hyp.muGrid hG hodd i' j 1 = (d : ℂ)) :
+    ClassFunction.inner
+        (hyp.tau (hyp.muGrid hG hodd i j - (δ : ℂ) • hyp.muGrid hG hodd i 0 - (n : ℂ) • ζ))
+        (hyp.tau ((∑ i' : Fin hyp.w1, hyp.muGrid hG hodd i' j) - (d : ℂ) • ζ.conj)) = 1 := by
+  haveI := hyp.finiteG
+  classical
+  have hαsupp := hyp.muGrid_alpha_support hG hodd hj0 hζS hdeg hμ0 hζ1 hnf hδj
+  have hμsupp := hyp.muColumn_sub_conj_support hG hodd j hζS hζirr hcol1 hζ1
+  rw [hyp.tau_inner_eq_of_supported hαsupp hμsupp]
+  exact hyp.muGridAlpha_inner_muColumn_self_sub_conj hG hodd i j hj0 hζirr hζne hjζ h0ζ
+
 /-- **§10 τ/τ₁ compatibility on `ζ − ζ̄`** (Peterfalvi (10.5), `a = 0` argument): the Dade image
 `(ζ − ζ̄)^τ` equals `ζ^{τ₁} − ζ̄^{τ₁}` for the coherent extension `τ₁`.  Since `ζ ∈ S` and
 `ζ̄ ∈ S` (`inducedFamily_closedUnderConjugate`), the difference `ζ − ζ̄` lies in the supported
