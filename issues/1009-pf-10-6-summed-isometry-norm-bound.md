@@ -60,6 +60,24 @@ statement)。**S07_Coherence.lean に未形式化** — 本 issue の真の prer
     deep 2D-structure piece (`omegaProdChar.comp e` factorization、`exists_alignedOmegaSigmaGrid_chiFam_family`
     を 2D 化 + W2-成分 i-独立を証明)。在庫: vanish-on-V=`muColumn_tau1_vanishes_on_typePV`、
     norm=`muColumn_tau1_inner_self`。
+
+  - **🗺 column-structure の精密証明戦略 (2026-06-23 lane-b 導出、次セッション用)**: 完全 factorization
+    `c_ij = omegaProdChar_tic ρ_i κ_j` を直接出さず、**(A) W2-成分 i-非依存 + (B) injectivity+cardinality
+    で列の全射性** に分解すると tractable:
+    - 記号: `c_ij := (sdiff.omegaProdChar (w1CharEquiv i) (χ₂ j)).comp e` (e=alignedOmegaSigmaGrid 内の
+      `tic.W ≃ sdiff.W`)、`Q(i,j) := omegaProdEquiv_tic.symm(c_ij)` (∴ ω_ij^σ=chiFam(Q(i,j)))。
+    - **(A) `Q(i,j).2` は i に非依存**: `c_ij = c_{i'j} · ((w1 i)/(w1 i')).comp(wFst_sdiff.comp e)`。
+      後者は **W2_tic 上自明な「W1-only char」** (w∈tic.W2 ⟹ e(w)∈sdiff.W2 ⟹ wFst_sdiff(e w)=1、
+      `wFst_eq_one_of_mem_W2`)。omegaProdEquiv が**乗法的**(omegaProdChar 乗法性、要確立; ℂˣ abelian)ゆえ
+      `Q(i,j).2 = Q(i',j).2 · (omegaProdEquiv.symm(W1-only)).2`、W1-only char は `=omegaProdChar a 1`
+      (`omegaProdChar_one_right`) ⟹ `omegaProdEquiv.symm.2 = 1` (`omegaProdEquiv_symm_omegaProdChar`)。∴ κ(j):=Q(0,j).2。
+    - **(B) 列が full**: `i↦Q(i,j).1` は injective (alignedOmegaSigmaGrid_inner の joint inj から)、
+      `|W1char_tic|=w1` ゆえ全射 ⟹ `∑_i ω_ij^σ = ∑_i chiFam(Q(i,j).1, κj) = ∑_p chiFam(p, κj)`。
+    - **κ injective** (κ(j)≠κ(j')): 列 j≠j' の σ-image が直交 (alignedOmegaSigmaGrid_inner) ⟹ chiFam index
+      の W2 成分相異。
+    - **要 foundational lemma** (未整備、次セッションで先に): (1) omegaProdEquiv の乗法性 (or `.symm` の snd が
+      hom)、(2) `e(tic.W2)⊆sdiff.W2` (underlying G-element 保存 `coe`-pattern + W2 membership)、(3) W1-only char
+      の omegaProdEquiv.symm snd=1。これらが揃えば (A)(B) は各 ~20-30 行。**完全 factorization (~150 行) より軽い**。
 - [x] **(10.6.a) column-independence DONE** (2026-06-23 lane-b 再開セッション, `muColumn_tau1_diff_eq`,
   S12, commit `9d2fc5a0`, axiom-clean=§10 muGrid upstream gate のみ・自前 sorry 0): 任意の非自明列 j,k≠0 で
   `μ_j^τ₁ − μ_k^τ₁ = δ·(∑_i ω_ij^σ − ∑_i ω_ik^σ)`、∴ 残差 `μ_j^τ₁ − δ∑_i ω_ij^σ` は**列 j に非依存**。
