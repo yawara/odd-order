@@ -501,3 +501,35 @@ hyp.tau (muGrid i j − δ•muGrid i 0 − n•ζ) = δ•(alignedOmegaSigmaGri
 
 mirror は ~120-150 行の単一 proof (hyp 列が長い)。**piece 3 (`muGridPsi_vanishes_on_typePV`/`tau1_zeta_vanishes_on_typePV`)
 は既存**ゆえ全 input 在庫済み。fresh context で一気に書くのが推奨 (途中 commit 不可の単一定理)。
+
+## ✅✅✅✅✅✅✅✅✅ 完了 (2026-06-22 lane-b) — (10.5) Dade-image identity 締結 (grid + params 両 sorry-free)
+
+mirror assembly (piece 4/5) + pinning (piece 6) を完成し、**(10.5) Dade-image half を grid-level・
+params-level の両方で sorry-free に締結**。full build 3881 jobs green、FT-path scaffold sorry 131→130。
+
+**commit `8c5c90a1` — grid-level (10.5) + 一般トリコトミー toolkit**:
+- `S05_SigmaTrichotomy` に (4.8)/(10.5) Dade-image トリコトミー endgame の §5 一般補題 3 本
+  (§6 `certainType_diff_dade_eq` 系の TICyclicHypothesis-level 抽象、**全 axiom-clean**):
+  `sigmaCoeff_sub_smul_chiFam_diff` (hae) / `eq_smul_chiFam_diff_of_all_sigmaCoeff_zero` (全係数0→eq) /
+  `eq_smul_chiFam_diff_of_vanishOnV` (norm-2 X, ψ vanish on V ⟹ X=s·(χ_P₁−χ_P₂); grid_trichotomy +
+  grid_no_constant_{column,row} + norm-2 bounds)。§6 も将来この一般版に DRY-refactor 可。
+- `Hypothesis.tau_muGridAlpha_eq` (grid-level (10.5)): X=α^τ+n·ζ^τ₁ (‖X‖²=2), aligned grid=χ-family
+  member (piece 1), ψ vanish on V (muGridPsi + tau1_zeta_vanishes) → 一般トリコトミーで締結。
+  sorry-free、footprint = §10 muGrid 系上流 gate (sorryAx; Prop16.1/theoremA) のみ。
+- AxiomsCheck に toolkit 5 補題 (上記 3 + piece 2 の norm-2 bounds) 登録。
+
+**commit `5f03d3d1` — params-level corollary `alpha_tau_image`**:
+- producer `exists_charParameters`: omegaSigma を omegaSigmaGrid → **alignedOmegaSigmaGrid** に差替。
+- `alpha_tau_image` を faithful corollary に再構成 (sorry-free, footprint = 上流 gate のみ・自前 sorry 0):
+  grid-pinning (hmu/hos/hzS/hz1) + 符号 (hδpm/hδj) + (1.1) ζ非実 (hzconj) + (10.3) n偶数 (hn2) を仮説、
+  per-(i,j) 次数相異・補助列 k・w₁,w₂≥3 を (10.3) data + three_le_card から内部 discharge、
+  `params.alpha_def`+hmu+hos で `tau_muGridAlpha_eq` に帰着。
+
+**完了条件達成**: `alpha_tau_image` sorry-free + footprint = §10 muGrid 系と同じ上流 gate のみ +
+full build/AxiomsCheck green。
+
+**残る honest gate (本 issue の (10.5) 範囲外、§10 chain 全体の仕様)**: `hn2` = **(10.3) n が偶数**
+(⟹ n≥2)。これは (10.5) chain 全体 (`muGridAlpha_tau_X_inner`/`muGridAlpha_tau1_zeta_eq_neg_n` 等) が
+一律に仮説として担う genuine な (10.3) 算術入力で、本 issue で新たに hoist したものではない (cauchy-schwarz の
+n<2 矛盾に必須)。別途 (10.3) parity として形式化すべき follow-up。`hzconj` (ζ̄≠ζ) は (1.1)
+`not_isReal_of_ne_trivial_of_odd_card'` で原理的に導出可 (IsIrreducibleChar→IrreducibleChar bridge のみ)。

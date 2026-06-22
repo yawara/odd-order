@@ -5,6 +5,7 @@ Authors: Yawara Ishida
 -/
 import OddOrder.Peterfalvi.S11_MaximalII_III_IV
 import OddOrder.Peterfalvi.S05_OmegaSigmaGrid
+import OddOrder.Peterfalvi.S05_SigmaTrichotomy
 import Mathlib.GroupTheory.IsPerfect
 
 /-!
@@ -2372,7 +2373,7 @@ theorem Hypothesis.exists_charParameters [Finite G] (hG : OddOrder.BG.IsMinimalS
            w2_prime := hyp.w2_prime hG
            d_gt_one := hd1
            mu := hyp.muGrid hG hodd
-           omegaSigma := hyp.omegaSigmaGrid hG hodd
+           omegaSigma := hyp.alignedOmegaSigmaGrid hG hodd
            degree_independent := hdi
            n_formula := hnf
            alpha_support := fun i j hj =>
@@ -3347,18 +3348,142 @@ theorem Hypothesis.tau1_zeta_vanishes_on_typePV [Finite G] {M : Subgroup G}
     rw [(tic.chiFam_spec hVeq app).2.2.1, if_pos rfl]
   exact inner_left_eq_zero_of_inner_sub_eq_zero haZ hsZ ha1 hb1 hs1 hab hdiff
 
-/-- **Peterfalvi (10.5), Dade-image half**: under the coherent extension, `α_{ij}` has the stated
-Dade image `δ·(ω_{ij}^σ − ω_{i0}^σ) − n·ζ^{τ₁}`.  (The support half is `alpha_support`.) -/
-theorem alpha_tau_image [Finite G] [Fintype G]
-    (_hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} [Fintype ↥M]
-    [Invertible (Nat.card ↥M : ℂ)] [Invertible (Nat.card G : ℂ)]
-    {hyp : Hypothesis M} {params : CharacterParameters hyp}
-    (coh : CoherentHypothesis hyp params) :
+open scoped FiniteInduce in
+/-- **Peterfalvi (10.5), Dade-image half (grid level)**: the genuine `μ`-grid statement of the
+Dade-image identity, `α_{ij}^τ = δ·(ω_{ij}^σ − ω_{i0}^σ) − n·ζ^{τ₁}`, with `ω^σ` the *aligned*
+`σ`-grid `alignedOmegaSigmaGrid` and `α_{ij} = μ_{ij} − δ·μ_{i0} − n·ζ`.
+
+This is the full (10.5) endgame.  Writing `X = α_{ij}^τ + n·ζ^{τ₁}`, the goal reduces to
+`X = δ·(ω_{ij}^σ − ω_{i0}^σ)`.  Now `X` is a virtual character of `G` with `‖X‖² = 2`
+(`muGridAlpha_tau_X_inner`), the aligned `σ`-grid entries are members `χ_{P_{ij}}` of the
+orthonormal `σ`-image family (`exists_alignedOmegaSigmaGrid_chiFam_family`), and the difference
+`X − δ·(ω_{ij}^σ − ω_{i0}^σ)` vanishes on `V` (`muGridPsi_vanishes_on_typePV` together with the
+`ζ^{τ₁}`-vanishing `tau1_zeta_vanishes_on_typePV`).  The norm-`2` Dade-image trichotomy
+`eq_smul_chiFam_diff_of_vanishOnV` (the §5 generalisation of the §6 `(4.8)` endgame) then forces
+`X = δ·(χ_{P_{ij}} − χ_{P_{i0}})`.  (`alpha_tau_image` is the thin `CharacterParameters` corollary.) -/
+theorem Hypothesis.tau_muGridAlpha_eq [Finite G] {M : Subgroup G}
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis M) (hodd : Odd (Nat.card G))
+    (i : Fin hyp.w1) {j : Fin hyp.w2} (hj0 : j ≠ 0) (k : Fin hyp.w2) (hjk : j ≠ k) (hk0 : k ≠ 0)
+    {params : CharacterParameters hyp} (coh : CoherentHypothesis hyp params)
+    {ζ : ClassFunction ↥M ℂ} (hζS : ζ ∈ inducedFamily M) (hζirr : IsIrreducibleCharacter ζ)
+    (hζne : ζ.conj ≠ ζ) {d : ℕ} {δ : ℤ} {n : ℕ}
+    (hdeg : hyp.muGrid hG hodd i j 1 = (d : ℂ)) (hμ0 : hyp.muGrid hG hodd i 0 1 = 1)
+    (hζ1 : ζ 1 = (hyp.w1 : ℂ)) (hnf : (n : ℤ) * (hyp.w1 : ℤ) = (d : ℤ) - δ)
+    (hδj : hyp.muColumnSign hG hodd j = δ)
+    (hdζ : hyp.muGrid hG hodd i j 1 ≠ ζ 1) (h0ζ : hyp.muGrid hG hodd i 0 1 ≠ ζ 1)
+    (hkζ : ∀ i' : Fin hyp.w1, hyp.muGrid hG hodd i' k 1 ≠ ζ 1)
+    (hcol1 : ∀ i' : Fin hyp.w1, hyp.muGrid hG hodd i' k 1 = (d : ℂ))
+    (hdk1 : hyp.muGrid hG hodd 0 k 1 ≠ 1)
+    (hδpm : δ = 1 ∨ δ = -1) (hw1 : 3 ≤ hyp.w1) (hn2 : 2 ≤ n) :
+    hyp.tau (hyp.muGrid hG hodd i j - (δ : ℂ) • hyp.muGrid hG hodd i 0 - (n : ℂ) • ζ)
+      = (δ : ℂ) • (hyp.alignedOmegaSigmaGrid hG hodd i j - hyp.alignedOmegaSigmaGrid hG hodd i 0)
+        - (n : ℂ) • coh.tau1 ζ := by
+  haveI := hyp.finiteG
+  classical
+  -- `X = α_{ij}^τ + n·ζ^{τ₁}` has `‖X‖² = 2` and lies in `ℤ[Irr G]`.
+  have hXfacts := hyp.muGridAlpha_tau_X_inner hG hodd i hj0 k hjk hk0 coh hζS hζirr hζne
+    hdeg hμ0 hζ1 hnf hδj hdζ h0ζ hkζ hcol1 hdk1 hδpm hw1 hn2
+  have hτ1ζZ : coh.tau1 ζ ∈ ZIrr G :=
+    coh.coherent.extension_mem_ZIrr ζ (Submodule.subset_span hζS)
+  have hαZ := hyp.muGridAlpha_tau_mem_ZIrr hG hodd i hj0 hζS hζirr hdeg hμ0 hζ1 hnf hδj
+  have hXZ : hyp.tau (hyp.muGrid hG hodd i j - (δ : ℂ) • hyp.muGrid hG hodd i 0 - (n : ℂ) • ζ)
+      + (n : ℂ) • coh.tau1 ζ ∈ ZIrr G := by
+    refine Submodule.add_mem _ hαZ ?_
+    rw [Nat.cast_smul_eq_nsmul]; exact nsmul_mem hτ1ζZ n
+  -- the aligned `σ`-grid entries as `χ`-family members (piece 1).
+  obtain ⟨P, hPinj, hP⟩ := hyp.exists_alignedOmegaSigmaGrid_chiFam_family hG hodd i
+  let tic := typePData_toTICyclicHypothesis hyp.typeP hodd
+  haveI : NeZero (Nat.card ↥tic.W1) := ⟨Nat.card_pos.ne'⟩
+  haveI : NeZero (Nat.card ↥tic.W2) := ⟨Nat.card_pos.ne'⟩
+  let app := hyp.canonicalFullDadeApp hG hodd
+  have hVeq : tic.V = tic.Vdiff := rfl
+  have hPne : P j ≠ P 0 := fun h => hj0 (hPinj h)
+  have hPj' : tic.chiFam hVeq app (P j) = hyp.alignedOmegaSigmaGrid hG hodd i j := (hP j).symm
+  have hP0' : tic.chiFam hVeq app (P 0) = hyp.alignedOmegaSigmaGrid hG hodd i 0 := (hP 0).symm
+  -- `ψ = X − δ·(ω_{ij}^σ − ω_{i0}^σ)` vanishes on `V`.
+  have hζvanish : ∀ v ∈ typePV M hyp.typeP, coh.tau1 ζ v = 0 :=
+    fun v hv => hyp.tau1_zeta_vanishes_on_typePV hG hodd coh hζS hζirr hζne hv
+  have hψV : ∀ v ∈ tic.V,
+      (hyp.tau (hyp.muGrid hG hodd i j - (δ : ℂ) • hyp.muGrid hG hodd i 0 - (n : ℂ) • ζ)
+          + (n : ℂ) • coh.tau1 ζ
+        - (δ : ℂ) • (tic.chiFam hVeq app (P j) - tic.chiFam hVeq app (P 0))) v = 0 := by
+    intro v hv
+    rw [hPj', hP0']
+    exact hyp.muGridPsi_vanishes_on_typePV hG hodd hj0 hζS hdeg hμ0 hζ1 hnf hδj coh hζvanish hv
+  -- the norm-`2` Dade-image trichotomy.
+  rw [eq_sub_iff_add_eq, ← hPj', ← hP0']
+  exact tic.eq_smul_chiFam_diff_of_vanishOnV hVeq app hXZ hXfacts.2 hPne hδpm hψV
+
+open scoped FiniteInduce in
+/-- **Peterfalvi (10.5), Dade-image half** (`CharacterParameters` corollary).  For the (10.2)/(10.3)
+character data — the `μ`-grid (`hmu`), the aligned `σ`-grid (`hos`), the degree-`w₁` irreducible `ζ`
+of (10.2) (`hzS`/`hz1`) and the column sign `δ = ±1` (`hδpm`/`hδj`) — the Dade image of
+`α_{ij} = μ_{ij} − δ·μ_{i0} − n·ζ` is `δ·(ω_{ij}^σ − ω_{i0}^σ) − n·ζ^{τ₁}`.
+
+Thin corollary of the grid identity `tau_muGridAlpha_eq`.  Most inputs are discharged from the
+(10.3) data carried by `CharacterParameters` (`degree_independent`, `n_formula`, `d_gt_one`) and the
+structural bounds `w₁, w₂ ≥ 3` (`three_le_card_W1/W2`): the auxiliary nontrivial column `k ≠ j`, and
+the degree distinctness `d ≠ w₁`/`1 ≠ w₁`.  The remaining hypotheses beyond the (10.2)/(10.3)
+construction pins are `hzconj` — the non-realness `ζ̄ ≠ ζ` (Peterfalvi (1.1): a nontrivial
+irreducible of an odd-order group is not real) — and `hn2` — Peterfalvi (10.3)'s parity `n` even (so
+`n ≥ 2`).  Both are genuine arithmetic inputs carried throughout the §10 (10.5) chain
+(`muGridAlpha_tau_X_inner` etc.); `hn2` (n-evenness) is the one not yet separately formalized. -/
+theorem alpha_tau_image [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G}
+    {hyp : Hypothesis M} {params : CharacterParameters hyp} (coh : CoherentHypothesis hyp params)
+    (hmu : params.mu = hyp.muGrid hG hG.odd)
+    (hos : params.omegaSigma = hyp.alignedOmegaSigmaGrid hG hG.odd)
+    (hzS : params.zeta ∈ inducedFamily M) (hz1 : params.zeta 1 = (hyp.w1 : ℂ))
+    (hzconj : params.zeta.conj ≠ params.zeta)
+    (hδpm : params.delta = 1 ∨ params.delta = -1)
+    (hδj : ∀ j : Fin hyp.w2, j ≠ 0 → hyp.muColumnSign hG hG.odd j = params.delta)
+    (hn2 : 2 ≤ params.n) :
     ∀ (i : Fin hyp.w1) (j : Fin hyp.w2), j ≠ 0 →
         hyp.tau (params.alpha i j) =
           (params.delta : ℂ) • (params.omegaSigma i j - params.omegaSigma i 0)
             - (params.n : ℂ) • coh.tau1 params.zeta := by
-  sorry
+  haveI := hyp.finiteG
+  classical
+  have hodd : Odd (Nat.card G) := hG.odd
+  -- structural bounds `w₁, w₂ ≥ 3` from the §10 TI-cyclic hypothesis.
+  have hw1 : 3 ≤ hyp.w1 := (typePData_toTICyclicHypothesis hyp.typeP hodd).three_le_card_W1
+  have hw2 : 3 ≤ hyp.w2 := (typePData_toTICyclicHypothesis hyp.typeP hodd).three_le_card_W2
+  intro i j hj0
+  -- choose an auxiliary nontrivial column `k ≠ j` (possible as `w₂ ≥ 3`).
+  obtain ⟨k, hjk, hk0⟩ : ∃ k : Fin hyp.w2, j ≠ k ∧ k ≠ 0 := by
+    have h1lt : 1 < hyp.w2 := by omega
+    have h2lt : 2 < hyp.w2 := by omega
+    by_cases h : j = ⟨1, h1lt⟩
+    · exact ⟨⟨2, h2lt⟩, by rw [h]; exact Fin.ne_of_val_ne (by simp),
+        Fin.ne_of_val_ne (by simp)⟩
+    · exact ⟨⟨1, h1lt⟩, h, Fin.ne_of_val_ne (by simp)⟩
+  -- (10.3) degree facts on the `μ`-grid.
+  have hdeg : hyp.muGrid hG hodd i j 1 = (params.d : ℂ) := by
+    rw [← hmu]; exact params.degree_independent i j hj0
+  have hμ0 : hyp.muGrid hG hodd i 0 1 = 1 := hyp.muGrid_zero_column_apply_one hG hodd i
+  have hcol1 : ∀ i' : Fin hyp.w1, hyp.muGrid hG hodd i' k 1 = (params.d : ℂ) := fun i' => by
+    rw [← hmu]; exact params.degree_independent i' k hk0
+  have hd1 : params.d ≠ 1 := by have := params.d_gt_one; omega
+  have hdk1 : hyp.muGrid hG hodd 0 k 1 ≠ 1 := by rw [hcol1 0]; exact_mod_cast hd1
+  -- `d ≠ w₁` from `d = n·w₁ + δ`, `n ≥ 2`, `w₁ ≥ 3`, `δ = ±1`.
+  have hdw1 : params.d ≠ hyp.w1 := by
+    have hf : (params.d : ℤ) = (params.n : ℤ) * (hyp.w1 : ℤ) + params.delta := by
+      linarith [params.n_formula]
+    have hn2Z : (2 : ℤ) ≤ (params.n : ℤ) := by exact_mod_cast hn2
+    have hw1Z : (3 : ℤ) ≤ (hyp.w1 : ℤ) := by exact_mod_cast hw1
+    intro he
+    have heZ : (params.d : ℤ) = (hyp.w1 : ℤ) := by exact_mod_cast he
+    rcases hδpm with h | h <;> rw [h] at hf <;> nlinarith [hf, heZ, hn2Z, hw1Z]
+  have hdζ : hyp.muGrid hG hodd i j 1 ≠ params.zeta 1 := by
+    rw [hdeg, hz1]; exact_mod_cast hdw1
+  have h0ζ : hyp.muGrid hG hodd i 0 1 ≠ params.zeta 1 := by
+    rw [hμ0, hz1]; intro he; have : hyp.w1 = 1 := by exact_mod_cast he.symm
+    omega
+  have hkζ : ∀ i' : Fin hyp.w1, hyp.muGrid hG hodd i' k 1 ≠ params.zeta 1 := fun i' => by
+    rw [hcol1 i', hz1]; exact_mod_cast hdw1
+  -- discharge via the grid identity `tau_muGridAlpha_eq`.
+  rw [params.alpha_def, hmu, hos]
+  exact hyp.tau_muGridAlpha_eq hG hodd i hj0 k hjk hk0 coh hzS params.zeta_irreducible hzconj
+    hdeg hμ0 hz1 params.n_formula (hδj j hj0) hdζ h0ζ hkζ hcol1 hdk1 hδpm hw1 hn2
 
 /-- **Peterfalvi (10.6)**: the sums of `omega_ij^sigma` describe the `tau1`
 images, and outside the tame support the value of `zeta^tau1` has norm at least
