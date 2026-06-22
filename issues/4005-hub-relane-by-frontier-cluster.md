@@ -92,3 +92,23 @@ HUB が (1) 診断を検証し、(2) **frontier クラスタ区切り**に基づ
 - issue 4001 / 4004 (lane-c §16 frontier + T/V-side dual ask) / `notes/peterfalvi/s16_nonexistence_gate_map.md`
 - `notes/meta/merge_monitor.md` (4-レーン運用、spine = 線形チェーンの記述)
 - commit `aff0bc2a` (lane-c resume の 2 closure)、master roadmap (`notes/meta/ft_master_roadmap_*.md`)
+
+---
+
+## HUB 検証結果 (2026-06-22, 4-territory read-only audit)
+
+診断を **4 並列 Explore agent** で frontier 全 sorry を分類検証 (BG §14-16 / Pf §10·12·13 / Pf §11·14·15 / Pf §16)。
+
+**診断はおおむね正しいが、「節区切り全体が失敗」ではなく『lane-c (§16) だけが starve』に局所化される**:
+
+| 領域 (現レーン) | workable-now leaf | 判定 |
+|---|---|---|
+| BG §14-16 (F) | 複数 (Thm 14.7 `typeP_duality` は **sorry-free** 検証済 → §14 consequence は workable; §15 Thm 15.2 done) | ✅ productive |
+| Pf §11+§14+§15 (H) | **~16 independent leaf** (§11 Clifford 9.6-9.10=5 / §14_MaximalI 12.2-12.16=~7 / §15 S&T 群論=~4) | ✅ **最広 (やや過負荷)** |
+| Pf §12/§13 (B) | char-grid 構成 ((6.8) は **done** ゆえ cite 可、(10.5) 着地済) | ✅ productive |
+| Pf §10 (B の別半分) | 12 sorry 全て pure wiring、BG §16 に gated | ❌ §16 landing 待ち |
+| Pf §16 (C) | **~0** (`exists_MHypothesis` は `S15.typeII_overNormalizer_frobenius` V側 sorry に gated と検証) | ❌ **pure consumer / starve** |
+
+**結論**: 直列鎖を節で切った構造診断は正しい。但し実害は **§16 終点に置いた lane-c のみ** が starve すること。F/H/B は productive frontier 上にある。実 fan-out は狭くなく、むしろ **lane-h 領域に ~16 の独立 workable leaf** が集中 (§11 は §14/§15 と非衝突)。
+
+**HUB 推奨**: lane-c を §16 (consumer) から外し、(a) §16/§10 を driver 化 (上流 landing 時に機会的 close) + 上流の productive cluster (§11 = Pf 最上流の独立 5-leaf) に再配置、または (b) retire して 3 レーン (F/H/B)。ユーザー裁可待ち。
