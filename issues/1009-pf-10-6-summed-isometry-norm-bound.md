@@ -45,6 +45,31 @@ statement)。**S07_Coherence.lean に未形式化** — 本 issue の真の prer
 - [ ] `zeta_tau1_norm_bound` Prop を (10.6.b) の genuine 主張に materialize + 証明。
 - [ ] `tau1_values_and_norm_bound` を sorry-free に。
 
+## 📋 (5.8) 詳細スコープ (2026-06-22 lane-b 精読) — multi-session piece
+
+(5.8) [`04.7:119`] = coherence isometry τ₁ 下での certain-type column-char μ_k の像決定。原文証明の依存:
+1. **(5.5)** `χ^τ₁ = ∑_{α∈E} α (E⊆R(χ))` ← (5.4) with ψ=0。**(5.4) は repo S07 在庫**。R(μ_j)=
+   `{δ_j ω_ij^σ, −δ_j ω_ik^σ}` (2-column σ-構造, k=conj(j) 列) ← (5.3.b)/(4.9)。⟹ μ_k^τ₁ = ∑_i a_ik ω_ik^σ
+   + ∑_i a_ij ω_ij^σ, a_ik∈{0,δ_k}, a_ij∈{0,−δ_k}。
+2. **μ_k^τ₁ vanishes on V** (crux) ← χ∈S∩Irr(L)(=ζ deg w₁) + **(4.7)** `χ(1)μ_k−μ_k(1)χ ∈ ℤ[S,A]`
+   + **ζ^τ₁ vanishes on V (✅ `tau1_zeta_vanishes_on_typePV`)** + A∩V=∅ + τ 定義。
+3. **(3.7) separability** ⟹ a_ik=a_0k, a_ij=a_0j (row-constant)。repo S05 `sigmaCoeff_add_eq` 在庫。
+4. **‖μ_k^τ₁‖²=w₁** + coeffs∈{0,±1} ⟹ a_0k²+a_0j²=1 ⟹ 一方のみ ±1 ⟹ **full column** δ∑ω_ik^σ or −δ∑ω_ij^σ。
+5. uniqueness ("j,k のみ") ← Theorem (4.9) summed isometry (repo S06 `certainType_diff_dade_sum_eq` 在庫)。
+
+**在庫**: (5.4) [S07]、(4.9) summed isometry [S06]、(3.7)/(3.8) [S05]、ζ^τ₁/ζ̄^τ₁ vanish on V [S12]、
+diagonal IP `(α_ij,μ_j−dζ̄)=1` [✅本 issue]。**要新規**: (5.5) を certain-type column R(μ_j) で適用する形 +
+**(4.7) A-support of `w₁μ_j−dζ`** + **(5.8) combinatorial core** (2-column separable + norm-w₁ → full column,
+= 私の (10.5) `eq_smul_chiFam_diff_of_vanishOnV` の full-column 類比、grid 機構流用可) + assembly。
+
+**(10.6.a) §10-specialized route** (full (5.8) より tractable な可能性): reduction
+`(α_ij^τ, μ_j^τ₁−dζ̄^τ₁) = (δ(ω_ij^σ−ω_i0^σ), μ_j^τ₁)` は my infra (diagonal IP + ζ^τ₁⊥σ + isometry) で provable
+だが、最終 `= δ∑ω_ij^σ` は (5.8) core 必須。⟹ (5.8) combinatorial core (full-column trichotomy) が真の linchpin。
+
+**評価: (5.8) は §5-§8 coherence 機構に深く絡む multi-session piece** (上記 4 新規部品 + assembly、~数百行)。
+単発でなく focused 複数セッションで攻めるべき。次着手の clean entry = **(5.8) combinatorial core を S05 一般補題化**
+(my (10.5) trichotomy の full-column 類比、§5 σ-machinery のみ依存、reusable)。
+
 ## 完了条件
 
 `tau1_values_and_norm_bound` (S12) が sorry-free。axiom footprint = §10 muGrid 系上流 gate のみ。
