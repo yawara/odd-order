@@ -88,23 +88,27 @@ theorem omegaProdChar_inv (hyp : OddOrder.Peterfalvi.S05.TICyclicHypothesis G)
   simp only [OddOrder.Peterfalvi.S05.TICyclicHypothesis.omegaProdChar, MonoidHom.mul_apply,
     MonoidHom.comp_apply, MonoidHom.inv_apply, mul_inv]
 
-/-- The **row-inversion index** `i'`: the unique row with `w1CharEquiv i' = (w1CharEquiv i)⁻¹`. -/
-noncomputable def rowInv (h : Hypothesis46 A L) [NeZero (Nat.card h.W1)]
+/-- The **row-inversion index** `i'`: the unique row with `w1CharEquiv i' = (w1CharEquiv i)⁻¹`.
+
+Stated on the structural `Hypothesis ↥L` (not `Hypothesis46`): it only reads the `Hypothesis`-level
+data `w1CharEquiv`, so it is available to any `Hypothesis ↥L` (e.g. the §10 type-`P` host
+`(hyp.toCertainTypeHypothesis …).toHypothesis`); `Hypothesis46` callers pass `h.toHypothesis`. -/
+noncomputable def rowInv (h : Hypothesis ↥L) [NeZero (Nat.card h.W1)]
     (i : Fin (Nat.card h.W1)) : Fin (Nat.card h.W1) :=
   h.w1CharEquiv.symm ((h.w1CharEquiv i)⁻¹)
 
-@[simp] theorem w1CharEquiv_rowInv (h : Hypothesis46 A L) [NeZero (Nat.card h.W1)]
+@[simp] theorem w1CharEquiv_rowInv (h : Hypothesis ↥L) [NeZero (Nat.card h.W1)]
     (i : Fin (Nat.card h.W1)) :
     h.w1CharEquiv (rowInv h i) = (h.w1CharEquiv i)⁻¹ :=
   h.w1CharEquiv.apply_symm_apply _
 
 /-- `rowInv` is an **involution** (`(w1CharEquiv i)⁻¹` inverts), hence a permutation of the rows. -/
-theorem rowInv_rowInv (h : Hypothesis46 A L) [NeZero (Nat.card h.W1)] (i : Fin (Nat.card h.W1)) :
+theorem rowInv_rowInv (h : Hypothesis ↥L) [NeZero (Nat.card h.W1)] (i : Fin (Nat.card h.W1)) :
     rowInv h (rowInv h i) = i := by
   simp only [rowInv, Equiv.apply_symm_apply, inv_inv, Equiv.symm_apply_apply]
 
 /-- The row-inversion **permutation** `i ↦ rowInv i` (an involution). -/
-noncomputable def rowInvEquiv (h : Hypothesis46 A L) [NeZero (Nat.card h.W1)] :
+noncomputable def rowInvEquiv (h : Hypothesis ↥L) [NeZero (Nat.card h.W1)] :
     Fin (Nat.card h.W1) ≃ Fin (Nat.card h.W1) :=
   Function.Involutive.toPerm (rowInv h) (rowInv_rowInv h)
 
@@ -115,7 +119,7 @@ with the bridge iso `ticWEquivSdiffW`; inversion passes through the composition 
 acts coordinatewise on `omegaProdChar` (`omegaProdChar_inv`). -/
 theorem omegaProdCharTic_inv (h : Hypothesis46 A L) [NeZero (Nat.card h.W1)]
     (χ₂ : (h.W2.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ) (i : Fin (Nat.card h.W1)) :
-    (omegaProdCharTic h χ₂ i)⁻¹ = omegaProdCharTic h χ₂⁻¹ (rowInv h i) := by
+    (omegaProdCharTic h χ₂ i)⁻¹ = omegaProdCharTic h χ₂⁻¹ (rowInv h.toHypothesis i) := by
   ext w
   simp only [omegaProdCharTic, MonoidHom.comp_apply, w1CharEquiv_rowInv,
     OddOrder.Peterfalvi.S05.TICyclicHypothesis.omegaProdChar, MonoidHom.mul_apply,
@@ -130,7 +134,7 @@ theorem certainTypeOmegaSigma_conj_eq (h : Hypothesis46 A L) [NeZero (Nat.card h
     [Fintype (ticVdiff h).W] [Invertible (Nat.card (ticVdiff h).W : ℂ)]
     (χ₂ : (h.W2.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ) (i : Fin (Nat.card h.W1)) :
     ClassFunction.mapRingEquiv Complex.conjAe.toRingEquiv (certainTypeOmegaSigma h χ₂ i)
-      = certainTypeOmegaSigma h χ₂⁻¹ (rowInv h i) := by
+      = certainTypeOmegaSigma h χ₂⁻¹ (rowInv h.toHypothesis i) := by
   rw [certainTypeOmegaSigma_conj, certainTypeOmegaSigma]
   exact congrArg
     (fun c => (ticVdiff h).sigma rfl (ticVdiffFullDadeApplication h) ((ticVdiff h).omega c))
@@ -147,7 +151,7 @@ it to the conjugate-index grid character, and `σ_L` intertwines the Galois acti
 /-- **Conjugation of a column source character.**  `χ_{ij}̄ = χ_{i'j'}` at the conjugate index
 (`ω_{ij} = chiColumn χ₂ i`): the Galois action of complex conjugation sends `ω(χ₁, χ₂)` to
 `ω(χ₁⁻¹, χ₂⁻¹) = ω(w1CharEquiv (rowInv i), χ₂⁻¹)`, i.e. `chiColumn χ₂⁻¹ (rowInv i)`. -/
-theorem chiColumn_conj (h : Hypothesis46 A L) [NeZero (Nat.card h.W1)]
+theorem chiColumn_conj (h : Hypothesis ↥L) [NeZero (Nat.card h.W1)]
     (χ₂ : (h.W2.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ) (i : Fin (Nat.card h.W1)) :
     IrreducibleCharacter.galoisMap Complex.conjAe.toRingEquiv (h.chiColumn χ₂ i)
       = h.chiColumn χ₂⁻¹ (rowInv h i) := by
@@ -162,7 +166,7 @@ the `L`-side σ-image `σ_L(ω_{ij})` is `σ_L(ω_{i'j'})` at the conjugate grid
 (3.9) commutation `sigma_mapRingEquiv_comm` for `toTICyclicHypothesis` with `chiColumn_conj`.
 Together with (4.3.b) `sigma_chiColumn_eq_certainType` (`σ_L(ω_{ij}) = δ_j μ_{ij}`) this yields the
 `L`-character conjugation `δ_j μ_{ij}̄ = δ_{j'} μ_{i'j'}`. -/
-theorem sigma_chiColumn_conj (h : Hypothesis46 A L) [NeZero (Nat.card h.W1)]
+theorem sigma_chiColumn_conj (h : Hypothesis ↥L) [NeZero (Nat.card h.W1)]
     [Fintype ↥(h.W1 ⊔ h.W2)] [Invertible (Nat.card ↥(h.W1 ⊔ h.W2) : ℂ)]
     (χ₂ : (h.W2.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ) (i : Fin (Nat.card h.W1)) :
     ClassFunction.mapRingEquiv Complex.conjAe.toRingEquiv
@@ -180,7 +184,7 @@ to the (4.3.b) identity `σ_L(ω_{ij}) = δ_j·μ_{ij}`: the left side becomes `
 μ_{i'j'}` (`sigma_chiColumn_conj` then (4.3.b) again), the right side `δ_j·μ_{ij}̄`
 (`mapRingEquiv_zsmul`, `δ_j ∈ ℤ`).  Since the `μ` are genuine irreducible characters this forces
 `μ_{ij}̄ = μ_{i'j'}` (and `δ_j = δ_{j'}`), the heart of (4.9)(a). -/
-theorem certainType_mu_conj_bridge (h : Hypothesis46 A L) [NeZero (Nat.card h.W1)]
+theorem certainType_mu_conj_bridge (h : Hypothesis ↥L) [NeZero (Nat.card h.W1)]
     [Fintype ↥(h.W1 ⊔ h.W2)] [Invertible (Nat.card ↥(h.W1 ⊔ h.W2) : ℂ)]
     (χ₂ : (h.W2.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ) (i : Fin (Nat.card h.W1)) :
     (h.columnFamily χ₂).sign •
@@ -198,7 +202,7 @@ theorem certainType_mu_conj_bridge (h : Hypothesis46 A L) [NeZero (Nat.card h.W1
 δ_{j'}·μ_{i'j'}` forces the (genuine irreducible) characters equal: pairing both sides with
 `μ_{i'j'}` gives `δ_j·⟨μ_{ij}̄, μ_{i'j'}⟩ = δ_{j'}` (since `‖μ_{i'j'}‖² = 1`); as the inner product
 of two irreducibles is `0` or `1` and `δ_{j'} ≠ 0`, it must be `1`, i.e. `μ_{ij}̄ = μ_{i'j'}`. -/
-theorem certainType_mu_conj_eq (h : Hypothesis46 A L) [NeZero (Nat.card h.W1)]
+theorem certainType_mu_conj_eq (h : Hypothesis ↥L) [NeZero (Nat.card h.W1)]
     [Fintype ↥(h.W1 ⊔ h.W2)] [Invertible (Nat.card ↥(h.W1 ⊔ h.W2) : ℂ)]
     (χ₂ : (h.W2.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ) (i : Fin (Nat.card h.W1)) :
     IrreducibleCharacter.galoisMap Complex.conjAe.toRingEquiv ((h.columnFamily χ₂).mu i)
@@ -222,7 +226,7 @@ theorem certainType_mu_conj_eq (h : Hypothesis46 A L) [NeZero (Nat.card h.W1)]
 certain-type column character `μ_j = ∑_i μ_{ij}` is the conjugate column `μ_{j'} = ∑_i μ_{ij'}`
 (`j' = χ₂⁻¹`).  `mapRingEquiv conj` is additive (`map_sum`), each `μ_{ij}̄ = μ_{i'j'}`
 (`certainType_mu_conj_eq`), and the row reindexing `i ↦ rowInv i` is a permutation (`rowInvEquiv`). -/
-theorem certainType_columnSum_conj (h : Hypothesis46 A L) [NeZero (Nat.card h.W1)]
+theorem certainType_columnSum_conj (h : Hypothesis ↥L) [NeZero (Nat.card h.W1)]
     [Fintype ↥(h.W1 ⊔ h.W2)] [Invertible (Nat.card ↥(h.W1 ⊔ h.W2) : ℂ)]
     (χ₂ : (h.W2.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ) :
     ClassFunction.mapRingEquiv Complex.conjAe.toRingEquiv

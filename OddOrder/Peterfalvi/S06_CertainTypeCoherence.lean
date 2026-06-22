@@ -622,7 +622,7 @@ theorem columnSum_conj_eq (h : Hypothesis46 A L) [NeZero (Nat.card h.W1)]
     [Fintype ↥(h.W1 ⊔ h.W2)] [Invertible (Nat.card ↥(h.W1 ⊔ h.W2) : ℂ)]
     (χ₂ : (h.W2.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ) :
     (columnSum h χ₂).conj = columnSum h χ₂⁻¹ := by
-  rw [columnSum_def, columnSum_def, ← certainType_columnSum_conj h χ₂]
+  rw [columnSum_def, columnSum_def, ← certainType_columnSum_conj h.toHypothesis χ₂]
   ext g
   rw [ClassFunction.conj_apply, ClassFunction.mapRingEquiv_apply]
   rfl
