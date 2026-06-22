@@ -74,6 +74,18 @@ statement)。**S07_Coherence.lean に未形式化** — 本 issue の真の prer
   - **残 = sigmaCoeff 2-column 構造** ((5.8) 仮説 4/4 のうち最後): column `OrthonormalCharacterImageFamily`
     本体構築 (要 conjugate-column `conj(μ_k)=μ_{k'}` + orthonormality) → `CharacterPsiDecomposition.ofProjection`
     (ψ=0, tau1=coh.tau1) → (5.5)`eq_sum_of_psi_eq_zero` → sigmaCoeff 翻訳 → σ-endgame 適用。
+  - **🗺 次セッション設計 (§6 `certainTypeR` を雛形に)**: §6 は **column 用 `OrthonormalCharacterImageFamily`
+    の完全な雛形** `certainTypeR` (`S06_CertainTypeCoherence.lean:639`) を既に持つ — `imageSet =
+    image (certainTypeRImage χ₂ χ₂⁻¹)` (signed σ-image `±δ·ω^σ`)、`mem_ZIrr`/`orthonormal`
+    (`certainTypeRImage_inner`/`_injective`)、`image_eq` (`columnSum_conj_eq` + `dadeICM_columnDiff_eq_sum`)。
+    ⚠ これは §6 Hypothesis46 (dade0=W\W2) ベースゆえ §10 (hyp.tau=typePV) に**直流用不可** — §10 版を
+    mirror 構築する: (i) **conjugate-column** `conj(∑_i muGrid i k)=∑_i muGrid i k'` (§10 μ_k は §6
+    `columnSum χ₂(k)` に一致 → `columnSum_conj_eq`(`(columnSum χ₂).conj=columnSum χ₂⁻¹`) → k'=
+    `finCardEquivCharacterGroup⁻¹(χ₂(k)⁻¹)`; k≠k' は `column_inv_ne_self` 相当 = 奇位数で非実)、
+    (ii) signed §10 σ-image 族 (alignedOmegaSigmaGrid 由来) + orthonormality (chiFam 直交性)、
+    (iii) `image_eq` = `tau_muGrid_columnSum_diff` (本セッション済) + (i)、(iv) ofProjection の
+    `htau1_agrees` = column-diff + `coherent.extends_on_supported`、`htau1_mem` = `extension_mem_ZIrr`。
+    sigmaCoeff 翻訳は `exists_alignedOmegaSigmaGrid_chiFam_family` (R(μ_k) 元 ↔ chiFam 元) 経由。
 - [ ] **残 linchpin = (5.8) wrapper の (b)(5.5)**: sigmaCoeff 2-column structure (上記「残」)。
   - (b) **(5.5)** `χ^τ₁ = ∑_{α∈R(χ)} α` を certain-type column μ_k に適用し R(μ_k)=2-column σ-構造を出す。
   - (c) ✅ **(4.7) A-support + μ_k^τ₁ vanishes on V DONE** (上記)。
