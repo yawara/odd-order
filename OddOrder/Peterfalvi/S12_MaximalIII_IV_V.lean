@@ -1112,6 +1112,19 @@ theorem Hypothesis.alignedOmegaSigmaGrid_inner [Finite G]
   · rw [if_neg hij, if_neg fun he => hij (hηinj i j i' j' he)]
 
 open scoped FiniteInduce in
+/-- **§10 σ-grid lands in `ℤ[Irr G]`**: each `alignedOmegaSigmaGrid i j = chiFam(P_{ij}) ∈ ZIrr G`
+(`exists_alignedOmegaSigmaGrid_chiFam_family` + `chiFam_spec`).  The `mem_ZIrr` field of the column
+`OrthonormalCharacterImageFamily`. -/
+theorem Hypothesis.alignedOmegaSigmaGrid_mem_ZIrr [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} (hyp : Hypothesis M)
+    (hodd : Odd (Nat.card G)) (i : Fin hyp.w1) (j : Fin hyp.w2) :
+    hyp.alignedOmegaSigmaGrid hG hodd i j ∈ ZIrr G := by
+  obtain ⟨P, _, hP⟩ := hyp.exists_alignedOmegaSigmaGrid_chiFam_family hG hodd i
+  rw [hP j]
+  exact ((typePData_toTICyclicHypothesis hyp.typeP hodd).chiFam_spec rfl
+    (hyp.canonicalFullDadeApp hG hodd)).2.1 _
+
+open scoped FiniteInduce in
 /-- **§10 within-column degree constancy** (Peterfalvi (4.5.a), the `i`-independence half of
 (10.3)): within a fixed `W₂`-column `j`, the degree `μ_{ij}(1)` of the materialized `μ`-grid does
 not depend on the row `i`.  This is the §6 fact `columnFamily_difference_apply_one` (the
@@ -3956,6 +3969,69 @@ theorem Hypothesis.exists_conj_column [Finite G]
   · -- the conjugate identity, via the generalized §6 `certainType_columnSum_conj`
     rw [hbridge j, hbridge j', hconjbridge,
       OddOrder.Peterfalvi.S06.certainType_columnSum_conj h (χ₂ j), hj'χ]
+
+/-- **§10 `R(μ_j)` member family** (Peterfalvi (5.3.b) at §10).  Indexed by `Bool × Fin w₁`:
+`(false, i) ↦ δ·ω_{ij}^σ`, `(true, i) ↦ −δ·ω_{ij'}^σ` (sign `δ = params.delta`, columns `j`, `j'`).
+Its image is the orthonormal difference-image family `R(μ_j)` of the column
+`OrthonormalCharacterImageFamily`. -/
+noncomputable def Hypothesis.columnRImage [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    {M : Subgroup G} (hyp : Hypothesis M) (hodd : Odd (Nat.card G)) (δ : ℤ) (j j' : Fin hyp.w2) :
+    Bool × Fin hyp.w1 → ClassFunction G ℂ
+  | (false, i) => (δ : ℂ) • hyp.alignedOmegaSigmaGrid hG hodd i j
+  | (true, i) => (-(δ : ℂ)) • hyp.alignedOmegaSigmaGrid hG hodd i j'
+
+open scoped FiniteInduce in
+/-- **Orthonormality of `R(μ_j)`** at §10: the signed σ-image family `columnRImage` is orthonormal,
+`⟨R p, R q⟩ = δ_{p,q}`.  The sign `δ = ±1` gives `δ·δ̄ = 1`, the σ-grid orthonormality
+`alignedOmegaSigmaGrid_inner` supplies `⟨ω_{ij}^σ, ω_{i'j'}^σ⟩ = [i=i' ∧ j=j']`, and the two halves
+(`j ≠ j'`) are cross-orthogonal. -/
+theorem Hypothesis.columnRImage_inner [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    {M : Subgroup G} (hyp : Hypothesis M) (hodd : Odd (Nat.card G)) {δ : ℤ} (hδ : δ = 1 ∨ δ = -1)
+    {j j' : Fin hyp.w2} (hjj' : j ≠ j') (p q : Bool × Fin hyp.w1) :
+    ClassFunction.inner (hyp.columnRImage hG hodd δ j j' p) (hyp.columnRImage hG hodd δ j j' q)
+      = if p = q then (1 : ℂ) else 0 := by
+  have hδstar : star ((δ : ℂ)) = (δ : ℂ) := by rcases hδ with h | h <;> rw [h] <;> norm_num
+  have hδsq : (δ : ℂ) * (δ : ℂ) = 1 := by rcases hδ with h | h <;> rw [h] <;> norm_num
+  obtain ⟨bp, ip⟩ := p
+  obtain ⟨bq, iq⟩ := q
+  cases bp <;> cases bq <;>
+    simp only [Hypothesis.columnRImage, ClassFunction.inner_smul_left,
+      OddOrder.RepresentationTheory.inner_smul_right, hyp.alignedOmegaSigmaGrid_inner hG hodd,
+      hδstar, star_neg, mul_neg, neg_mul, neg_neg, Prod.mk.injEq, reduceCtorEq, false_and,
+      true_and, and_true, eq_self_iff_true, ↓reduceIte]
+  · -- (false,false): same column `j`, `δ²·[ip=iq] = [ip=iq]`
+    rw [← mul_assoc, hδsq, one_mul]
+  · -- (false,true): cross column `j ≠ j'`
+    rw [if_neg (fun hcon => hjj' hcon.2)]; ring
+  · -- (true,false): cross column `j' ≠ j`
+    rw [if_neg (fun hcon => hjj' hcon.2.symm)]; ring
+  · -- (true,true): same column `j'`, `δ²·[ip=iq] = [ip=iq]`
+    rw [← mul_assoc, hδsq, one_mul]
+
+open scoped FiniteInduce in
+/-- `R(μ_j)` is injective on `Bool × Fin w₁` (distinct orthonormal vectors are distinct). -/
+theorem Hypothesis.columnRImage_injective [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    {M : Subgroup G} (hyp : Hypothesis M) (hodd : Odd (Nat.card G)) {δ : ℤ} (hδ : δ = 1 ∨ δ = -1)
+    {j j' : Fin hyp.w2} (hjj' : j ≠ j') :
+    Function.Injective (hyp.columnRImage hG hodd δ j j') := by
+  intro p q hpq
+  by_contra hpqne
+  have h0 := hyp.columnRImage_inner hG hodd hδ hjj' p q
+  rw [if_neg hpqne, hpq, hyp.columnRImage_inner hG hodd hδ hjj', if_pos rfl] at h0
+  exact one_ne_zero h0
+
+open scoped FiniteInduce in
+/-- The sum of the §10 `R(μ_j)` family over `Bool × Fin w₁` is `δ·∑_i (ω_{ij}^σ − ω_{ij'}^σ)`, the
+image side of the (10.6)(a) summed isometry (`tau_muGrid_columnSum_diff`). -/
+theorem Hypothesis.columnRImage_sum [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    {M : Subgroup G} (hyp : Hypothesis M) (hodd : Odd (Nat.card G)) (δ : ℤ) (j j' : Fin hyp.w2) :
+    ∑ p : Bool × Fin hyp.w1, hyp.columnRImage hG hodd δ j j' p
+      = (δ : ℂ) • ∑ i : Fin hyp.w1, (hyp.alignedOmegaSigmaGrid hG hodd i j
+          - hyp.alignedOmegaSigmaGrid hG hodd i j') := by
+  rw [Fintype.sum_prod_type, Fintype.sum_bool, Finset.smul_sum]
+  simp only [Hypothesis.columnRImage, neg_smul, smul_sub]
+  rw [← Finset.sum_add_distrib]
+  exact Finset.sum_congr rfl (fun i _ => by abel)
 
 open scoped FiniteInduce in
 /-- **§10 column-independent `τ₁`-residual** (the reduction step of Peterfalvi (10.6)(a)): for any
