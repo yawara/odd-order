@@ -81,3 +81,18 @@ proof 化できる (cover data 自体は BG §16 sorry に bottom-out)。
 
 **lane-h への指示**: core (項目 1) を実装してよい。完了後 (8.17.a) `exists_second_maximal` を進める。
 de-private が要る optional は B 宛 issue を起票 (cross-lane、独断で S13 を触らない)。
+
+## ✅ DONE (2026-06-23, lane-h)
+
+実装完了 (commit `1255e479` infra + `c0c11d1b` consumer):
+- `MaximalSubgroupTypeConj.lean` に core 全実装: `TypePData.conj`/`typePNontrivialCore_conj`/
+  `TypeII/III/IV/VData.conj`/`isType{II..V}_pointwise_smul`/一般 `hasPeterfalviType_pointwise_smul`/
+  `mainSubgroup_pointwise_smul` + helper (`derivedInG_pointwise_smul`/`secondDerivedInAmbient_…`/
+  `isNilpotent_…`/`fitting_map_subtype_…`/`normalizer_image_…`)。全 sorry-free + axiom-clean。
+- **de-private 不要だった**: `derivedInG_pointwise_smul` を local に再証明 (S13 の private に非依存) →
+  optional の B 依頼 issue は不要に。
+- consumer: Pf (8.17.a) `exists_second_maximal` (S14_MaximalI) を discharge (commit `c0c11d1b`、
+  cited `bgTheoremE_cover_data`/`hall_…` に還元、body sorry-free)。`exists_sylow_le_of_hall`
+  (Hall→Sylow、reusable、axiom-clean) も新規。
+- full build 3881 green、AxiomsCheck 登録 (`hasPeterfalviType_pointwise_smul`/`mainSubgroup_pointwise_smul`/
+  `exists_sylow_le_of_hall`)。
