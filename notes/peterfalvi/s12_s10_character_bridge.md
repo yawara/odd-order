@@ -5,6 +5,36 @@
 > 上位文脈 = 記憶 [[ft-endgame-two-poles]] [[peterfalvi-s10-13-gated-on-bg-spine]]、
 > Lane H 視点の正本 = [`s10_13_maximal_structure.md`](s10_13_maximal_structure.md)。
 
+## ✅✅✅ 2026-06-23 更新¹¹ — gate 解消 (issue 1010 CLOSED) + column image-family の全材料 landed
+
+更新¹⁰ の Hypothesis46 gate を **hub 裁可 (案 1) で解消し、column `OrthonormalCharacterImageFamily` の
+全 4 材料を build-green で landed**。残りは image family の**組立** + (5.5) + σ-endgame のみ。
+
+- **§6 conjugate chain 一般化 DONE** (issue 1010, commit `9db31b2b`, 完全 axiom-clean): hub が「これらの
+  ファイルは lane-b 所有」と確認 → `certainType_columnSum_conj` chain を `Hypothesis46→Hypothesis` に binder
+  一般化 (proof 不変)。`column_inv_ne_self` は Hypothesis46 据置 (S08 caller 無変更)。
+- **§10 conjugate-column 恒等式 DONE** (`exists_conj_column`, commit `842c9116`): `(∑_i μ_ij).conj = ∑_i μ_ij'`
+  (j'≠0,j'≠j)。一般化 §6 lemma を §10 host に適用 + reindex + conj↔mapRingEquiv bridge + inline χ₂⁻¹≠χ₂。
+  = image family `image_eq` 材料 (χ.conj = μ_j')。
+- **§10 σ-grid orthonormality DONE** (`alignedOmegaSigmaGrid_inner`, commit `b97df920`): `⟨ω_ij^σ,ω_i'j'^σ⟩
+  = [i=i'∧j=j']`。ω_ij^σ=σ(η_ij)、σ 等長 (`sigma_inner_irreducibleCharacter`) + (i,j)↦η_ij joint inj
+  (omegaProdChar_inj 由来)。**重要: orthonormality には joint inj で十分、full product 構造 P_i(j).2=κ(j)
+  は不要**。= image family `orthonormal` 材料。
+- **column image family の全 4 材料 ready**: τ=**`hyp.tau`** (=`S07.IntegralCharacterMap ↥M G`, S12:178、
+  そのまま使用可) / image_eq=`tau_muGrid_columnSum_diff`(k=j')+`exists_conj_column` / orthonormal=
+  `alignedOmegaSigmaGrid_inner`(+sign δ) / mem_ZIrr=alignedOmegaSigmaGrid ZIrr。
+
+**▶ 次セッション = image family 組立 → (5.5) → σ-endgame**:
+1. **column `OrthonormalCharacterImageFamily hyp.tau (∑_i muGrid i j)` 構築** (§6 `certainTypeR` 雛形):
+   imageSet = `(univ.image (i↦δ•ω_ij^σ)) ∪ (univ.image (i↦−δ•ω_ij'^σ))` (2w₁ 元)、4 field を上記材料で。
+2. **`ofProjection`** (τ=hyp.tau, tau1=coh.tau1, ψ=0): htau1_inner_eq=`coherent.extension_inner_eq`,
+   htau1_agrees=`coherent.extends_on_supported` (μ_j−μ_j' が A0-supported), htau1_mem=`extension_mem_ZIrr`,
+   orthogonalities (ψ=0 は自明 + ⟨μ_j,μ_j.conj⟩=0)。→ `eq_sum_of_psi_eq_zero` (5.5) → μ_j^τ₁=∑_{E⊆R(μ_j)} α。
+3. **σ-endgame** `eq_smul_chiFam_column_of_vanishOnV`: ⚠ **残 gate = sigmaCoeff 翻訳 + 出力の column 同定**
+   (∑_p chiFam(p,kcol)=∑_i ω_ij^σ)。これは joint inj でなく **column 構造** P_i(j).2=κ(j) を要する (orthonormality
+   と違い、出力翻訳には product 構造が要る)。= 残る唯一の 2D-structure piece。完成後 `muColumn_tau1_eq_of_single_column`
+   で full (10.6.a)。正本 = issue 1009「やること」。
+
 ## ✅ 2026-06-23 更新¹⁰ — (10.6.a) column-independence 着地 + Hypothesis46 構造 gate 確定 (issue 1009)
 
 lane-b 再開セッション。(10.6.a) を「1 列の pin」に還元する **column-independence** を §10-native (Hypothesis46
