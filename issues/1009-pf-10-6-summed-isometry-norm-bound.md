@@ -35,13 +35,26 @@ created: 2026-06-22
 
 `zeta_tau1_norm_bound` (現 opaque `Prop` = `True`, producer S12:2690) を de-opaque して証明:
 `g ∈ G − Ã(M)`, `order g` coprime to `w₁` ⟹ `|ζ^τ₁(g)| ≥ 1`。原文 (04.12 l.63-67):
-- **算術恒等式** (in-stock 材料): `δ(μ_0−ζ)^τ = δ∑ω_i0^σ − δζ^τ₁`。
-  `(μ_j−dζ)^τ − ∑_i α_ij^τ` を (10.6)(a)`μ_j^τ₁` + (10.5)`α_ij^τ` で展開、`d=nw₁+δ` で `(nw₁−d)ζ^τ₁=−δζ^τ₁`。
-- **τ-vanishing**: `(μ_0−ζ)^τ` は `G − Ã(M)` で消える (τ 定義) ⟹ `ζ^τ₁(g) = ∑_i ω_i0^σ(g)`。
-- **parity**: ω_i0^σ(g)∈ℤ (3.9.c) + ω_00^σ=1_G ((3.2.b)=`sigma_trivial` ✅在庫) + i≠0 で
+- **STEP 1 = reduction identity `tau(μ_0 − ζ) = ∑_i ω_i0^σ − ζ^τ₁`** (G-class-function 等式, **全材料
+  in-stock・Ã(M) 不要**, lane-b 2026-06-23 に全導出確定; 残作業は ~100 行 assembly のみ):
+  - 固定非自明列 k≠0 (w₂≥3) で **M-level 恒等式** `δ(μ_0 − ζ) = (μ_k − dζ) − ∑_i α_ik`
+    (α_ik=μ_ik−δμ_i0−nζ より RHS=μ_k−dζ−μ_k+δμ_0+w₁nζ=δμ_0+(w₁n−d)ζ=δ(μ_0−ζ)、`w₁n−d=−δ`)。
+  - `hyp.tau` 線形 ⟹ `δ·tau(μ_0−ζ) = tau(μ_k−dζ) − ∑_i tau(α_ik)`。
+  - `tau(μ_k−dζ) = δ∑ω_ik^σ − dζ^τ₁`: **μ_k−dζ は A_0-supported** (`=(μ_k−dζ̄)+d(ζ̄−ζ)`、
+    `muColumn_sub_conj_support`+`zeta_sub_conj_support`) → `coherent.extends_on_supported` で τ=τ₁ →
+    `μ_k^τ₁−dζ^τ₁` → (10.6.a)`muColumn_tau1_pin`。
+  - `tau(α_ik) = δ(ω_ik^σ−ω_i0^σ) − nζ^τ₁` = `alpha_tau_image`。
+  - 代入+`δ²=1`,`w₁n−d=−δ` で `δ·tau(μ_0−ζ) = δ∑ω_i0^σ − δζ^τ₁`、δ 倍で reduction 完成。
+  - ⚠ 注意点: `∑_i α_ik` の `∑_i nζ = (w₁:ℂ)(n:ℂ)•ζ` (Finset.sum_const + nsmul↔smul); `[Finite G]`+FiniteInduce regime。
+- **STEP 2 = Ã(M)-vanishing** (要 §10/§16 の tame-support `Ã(M)` 機構): `tau(μ_0−ζ)` は Dade map ゆえ
+  `G − Ã(M)` で消える (S04 `map_eq_zero_of_not_mem_conjugatesOfSet_of_forall_H_eq_bot` 系の vanishing) ⟹
+  STEP 1 と合わせ `g∈G−Ã(M)` で `ζ^τ₁(g) = ∑_i ω_i0^σ(g)`。**`Ã(M)` は §10 stock に無い** (S16 で参照) —
+  §10 表現の特定が要。
+- **STEP 3 = parity**: ω_i0^σ(g)∈ℤ (3.9.c) + ω_00^σ=1_G ((3.2.b)=`sigma_trivial` ✅在庫) + i≠0 で
   ω̄_i0^σ=conj(ω_i0^σ) (3.9.a) かつ ω_i0 非実 (奇位数) ⟹ ∑_{i>0}∈2ℤ ⟹ ζ^τ₁(g)≡1 (mod 2) ⟹ |ζ^τ₁(g)|≥1。
-- **要確認**: `Ã(M)` (tame support) の §10 表現、τ-vanishing on `G−Ã(M)` の在庫、(3.9.a)/(3.9.c)、
-  order-coprime 仮定の使い所。carrier de-opaque (`zeta_tau1_norm_bound` を genuine statement に) が必要。
+- **STEP 4 = carrier de-opaque**: `zeta_tau1_norm_bound : Prop`(現 `True`, producer S12:2690)を
+  genuine statement `∀ g∈G−Ã(M), order g coprime w₁ → 1≤|ζ^τ₁(g)|` に。order-coprime 仮定の使い所要確認。
+- **着手順**: STEP 1 (Ã(M) 非依存・即着手可) → STEP 2 の Ã(M) 表現特定 → STEP 3/4。
 
 ## 背景
 
