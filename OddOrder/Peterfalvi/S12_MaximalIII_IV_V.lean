@@ -4699,19 +4699,39 @@ theorem Hypothesis.muColumn_tau1_pin [Finite G]
   simp only [hRdef, Hypothesis.columnRImage]
   rw [Finset.smul_sum]
 
+open scoped FiniteInduce in
 /-- **Peterfalvi (10.6)**: the sums of `omega_ij^sigma` describe the `tau1`
 images, and outside the tame support the value of `zeta^tau1` has norm at least
-one. -/
-theorem tau1_values_and_norm_bound [Finite G] [Fintype G]
-    (_hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} [Fintype ↥M]
-    [Invertible (Nat.card ↥M : ℂ)] [Invertible (Nat.card G : ℂ)]
+one.
+
+Conjunct (a) (the summed isometry) is now the genuine `muColumn_tau1_pin` (the §10 specialisation of
+(5.8)); conjunct (b) (`zeta_tau1_norm_bound`, the parity bound `|ζ^{τ₁}(g)| ≥ 1`) remains the (10.6)(b)
+target.  The (10.3)/(10.5) carrier pins (`hmu`/`hos`/`hzS`/`hz1`/`hzconj`/`hδpm`/`hδj`) are discharged
+by the constructed `params` (`w2_prime_and_parameter_independence`). -/
+theorem tau1_values_and_norm_bound [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G}
     {hyp : Hypothesis M} {params : CharacterParameters hyp}
-    (coh : CoherentHypothesis hyp params) :
+    (coh : CoherentHypothesis hyp params)
+    (hmu : params.mu = hyp.muGrid hG hG.odd)
+    (hos : params.omegaSigma = hyp.alignedOmegaSigmaGrid hG hG.odd)
+    (hzS : params.zeta ∈ inducedFamily M) (hz1 : params.zeta 1 = (hyp.w1 : ℂ))
+    (hzconj : params.zeta.conj ≠ params.zeta)
+    (hδpm : params.delta = 1 ∨ params.delta = -1)
+    (hδj : ∀ j : Fin hyp.w2, j ≠ 0 → hyp.muColumnSign hG hG.odd j = params.delta) :
     (∀ (j : Fin hyp.w2), j ≠ 0 →
         coh.tau1 (∑ i : Fin hyp.w1, params.mu i j) =
           (params.delta : ℂ) • ∑ i : Fin hyp.w1, params.omegaSigma i j) ∧
       params.zeta_tau1_norm_bound := by
-  sorry
+  have hd1 : ∀ jj : Fin hyp.w2, jj ≠ 0 → hyp.muGrid hG hG.odd 0 jj 1 ≠ 1 := by
+    intro jj hjj
+    rw [← hmu, params.degree_independent 0 jj hjj]
+    exact_mod_cast (by have := params.d_gt_one; omega : params.d ≠ 1)
+  refine ⟨fun j hj0 => ?_, ?_⟩
+  · -- (10.6)(a): the summed isometry `μ_j^{τ₁} = δ·∑_i ω_{ij}^σ`.
+    rw [hmu, hos]
+    exact hyp.muColumn_tau1_pin hG coh hmu hos hzS hz1 hzconj hδpm hδj hd1 hj0
+  · -- (10.6)(b): `|ζ^{τ₁}(g)| ≥ 1` (parity bound; `zeta_tau1_norm_bound` still opaque, gated).
+    sorry
 
 /-! ## (10.7)--(10.8): Type II derived Frobenius and non-coherence -/
 
