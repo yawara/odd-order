@@ -90,6 +90,36 @@ bottom-out** するので、clean 化には §15 foundation が先。真の順�
 
 ## 進捗ログ
 
+**2026-06-22 (cont.⁸) ▶ BG Cor 14.12 着手 — faithful statement + verified foundation + `notMGH` 完成** (commits `1cb13404` + `6934f97b`, full build 3881 green, FT-path sorry 130→133):
+
+`typeP2_neighbor_is_typeF` (S14:9004) を着手。**完成済 (sorry-free, 検証済)**:
+- **statement 拡張 (faithful, FT-path)**: 結論に **`¬ (H ⊓ N_G(U) ≤ M)`** (= BG `N_H(U) ⊄ M`) 追加 →
+  `N_H(U) ≤ N_G(U)` で Thm C conjunct 2 (`N_G(U) ⊄ M`) を供給。署名に `hKM : K ≤ M` / `hUM : U ≤ M` /
+  `hRU : R ≤ U` 追加 (BG-faithful; subgroupOf Hall は包含を含意しない)。consumer 0 ゆえ安全。BG の残 2 clause
+  (`K ⊆ F(H∩M*)` / `σ(H)'-Hall(H∩M*)`) は M* を署名に出す要があり未 consume ゆえ省略 (proof は `H∩M*=D` を
+  内部で立てるので導出可)。
+- **foundation**: `r ∉ σ(M)` (`hrσM`, U が (κ∪σ)'-Hall) / `R ≠ ⊥` (`r∣|U|`,`r∤[U:R]`⟹`r∣|R|`) /
+  dual partner `M*` を `typeP_duality` から抽出 (∃! unpack 検証) / witness `H ∈ 𝓜(N_G(R))` 構成
+  (`N_G(R) < ⊤` via `R≤M`,`R≠⊥`,simple G)。
+- **conjunct 1 (`IsTypeF H`)** を covering (`hcover`: 全 type-P maximal は M か M* に共役) 経由で
+  非共役 2 本に還元 (assembly 証明済)。
+- **✅ `notMGH : ¬ IsConjugateSubgroup H M` 完成** (sorry-free, ~50行): `H=M^a` ⟹ `|H|=|M|` ⟹
+  R が H の Sylow_r ⟹ `r∈σ(H)` ⟹ (`sigma_conj`) `r∈σ(M)` 矛盾。**reusable sub-facts**:
+  Hall {r}-subgroup card = r-part (`Nat.eq_pow_of_factorization_eq_single`+`factorization_mul`), `Sylow.ofCard`
+  で `Sylow r ↥H` witness 構成。
+
+**残 (次セッション、precise gap map)**:
+- **`notMstGH : ¬ IsConjugateSubgroup H Mst`** ← **`ziMMst : M ∩ M* = K ⊔ K*`** が要 (R⊆M∩M*=Z,
+  Z は {κ,σ}-群 r∤|Z| ⟹ R=⊥ 矛盾)。`⊇` は易 (K≤M⊓M*, K*≤M⊓M*) だが **`⊆` 方向は deep embedding fact で
+  repo 未収載** (`family_inf_msigma_union_eq` は `(K⊔K*)⊓M_σ(N)` で別物)。+ `sK_uniqMst` (K⊆M*^a⟹a∈M*,
+  Prop 14.2(d) TI for M*, `typeP_structure` を M* に適用すれば出る) も要。**notMstGH が閉じれば conjunct 1 完了**。
+- **conjunct 2/3/4 (analytic)**: `defUK : [U,K]=U` ← **`semiregular U K` (BG regK)** が要だが **現 Prop 14.2
+  (`typeP_structure`) は regK/semidirect 構造を露出していない** (Coq `kappa_compl_context` が Ptype_structure
+  から取る; Lean では Prop 14.2 拡張 or 別 lemma が要)。`commutator_eq_self_of_frobenius_DK` (S15:6073) は
+  FPF 条件があれば使える。`sUHs : U⊆H_σ` ← sdprod_sigma + pcore Hall。`defNMU : N_M(U)=E` ← coprime_norm_cent。
+  `sHsFH : H_σ⊆F(H)` ← Fitting_max。**`H∩M*=D`** = main equality (sdprod_sigma + Fitting-Hall)。
+- **新規発見の prerequisite 2 件**: (1) `ziMMst` (M∩M*=Z, ⊆ deep), (2) `semiregular U K` (Prop 14.2 拡張)。
+
 **2026-06-22 (cont.⁷) ▶ NEXT = BG Cor 14.12 (`typeP2_neighbor_is_typeF`) で Thm C conjunct 2 を閉じる — Coq `P2type_signalizer` (BGsection14.v:2240) 精読で proof map 確定**:
 Thm C conjunct 2 (`N_G(U)⊄M`, S16:773 の type-P2 residual) = Cor 14.12 の `N_H(U)⊄M` clause (N_H(U)≤N_G(U) ゆえ ⟹ N_G(U)⊄M)。現状 `typeP2_neighbor_is_typeF` (S14:9001) は **conclusion に `N_H(U)⊄M` を含まず sorry** — 結論を BG full (`N_H(U)⊄M ∧ K⊆F(H∩M*) ∧ σ(H)'-Hall(H∩M*)`) に拡張 + 全証明が要る。**~160行の多段証明** (Coq P2type_signalizer 翻訳):
 - **setup**: `Ptype_embedding` (=typeP_duality) で M*=Mst + `uniqMst : 𝓜(C(K))={Mst}` (Prop 14.2(d))。`q:=|K|` prime (Prop 14.2(g))。
