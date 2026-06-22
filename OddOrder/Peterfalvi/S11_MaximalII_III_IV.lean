@@ -1507,6 +1507,28 @@ theorem chiefFactor_basic [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     have h2 : 2 ≤ p ^ data.q := le_trans hp.two_le (Nat.le_self_pow hq_ne p)
     omega
 
+/-! ### (9.7) The chief factor `H̄ = H/H₀` as an `𝔽ₚ[U W₁]`-module
+
+The Clifford dichotomy of (9.7) is read off the `𝔽ₚ`-dimension of `H̄`: it equals `q`, and `q` is
+prime, so under the restricted `U`-action `H̄` decomposes into `k` irreducible summands of a common
+dimension `d` with `q = k·d`, forcing `(k, d) ∈ {(1, q), (q, 1)}`.  The starting point is the order
+`|H̄| = p^q` (hence `dim_{𝔽ₚ} H̄ = q`). -/
+
+/-- The chief factor `H̄ = H/H₀ ≅ ↥H ⧸ N` has order `p^q`: `|H| = p^q·|H₀|` (`quotient_order`) and
+`|H₀| = |N|` (`H₀ = N.map H.subtype`), so `[H : N] = p^q`. -/
+theorem chiefFactor_quotient_card [Finite G] {M : Subgroup G} {data : TypesIIIIIIVSetup M}
+    (chief : ChiefFactorData data) :
+    Nat.card (↥data.H ⧸ chief.N) = chief.p ^ data.q := by
+  haveI := chief.N_normal
+  have hH0card : Nat.card ↥chief.H0 = Nat.card ↥chief.N := by
+    rw [chief.H0_eq]
+    exact (Nat.card_congr (Subgroup.equivMapOfInjective chief.N data.H.subtype
+      data.H.subtype_injective).toEquiv).symm
+  have key : chief.N.index * Nat.card ↥chief.N = chief.p ^ data.q * Nat.card ↥chief.N := by
+    rw [Subgroup.index_mul_card, chief.quotient_order, hH0card]
+  rw [(Subgroup.index_eq_card chief.N).symm]
+  exact Nat.eq_of_mul_eq_mul_right Nat.card_pos key
+
 /-- **Peterfalvi (9.7)**: the Clifford-theory dichotomy for the action on the
 chief factor `H/H_0`. -/
 theorem clifford_dichotomy [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)

@@ -50,20 +50,41 @@ chiefFactor_basic (済) は `_holds` / `quotient_order` 経由ゆえ互換 (fiel
     §12 sorry (`theorem88_caseB_prime_orders` = lane-b (10.11)) に依存ゆえ axiom-clean でない (de-opacify
     した 3 構造 field 自体は kernel 由来で clean)。
 
-## アーキテクチャ (steps)
+## ⚑ 方針修正 (2026-06-22, step 1 着手で判明) — subgroup-level + cardinality
 
-0. **de-opacify ChiefFactorData** (上記) — **DONE**。実 H̄ 構造を露出。
-1. **bridge**: `H̄ = Additive (↥data.H ⧸ H0')` を `ZMod p`-module 化 (`IsElementaryAbelian.zmodModule`,
-   PRank.lean)、`dim = q` (`IsElementaryAbelian.card_eq_pow_finrank` + `|H̄|=p^q`)。`U`-conjugation を
-   `F_p`-線形作用 (`typeP_quotientCoprimeAction` 既存; mathlib `Representation` へ橋渡し or 加群直接)。
-2. **Maschke/半単純**: `p ∤ |U|` (coprime) ⟹ `F_p[U]` 半単純、`H̄|_U = ⊕ 既約` (mathlib
-   `RepresentationTheory/Maschke`, `Semisimple`, `RingTheory/SimpleModule/Isotypic`)。
-3. **Clifford permutation (新規, mathlib 不在)**: `W₁` が `U`-isotypic 成分を置換、`UW₁`-既約 ⟹ 推移的。
-   **ここが build の核心 (mathlib に無い)**。
-4. **dichotomy**: `q = dim = k·dim(成分)`、`q` 素数 ⟹ `k∈{1,q}`。
+**finrank/Representation で組むより subgroup-level (`IsAInvariant`/`fixedSubgroup` + cardinality) が圧倒的に楽。**
+理由: ① counting は全部 cardinality で済む — `|H̄|=p^q`、各 U-既約成分 `|S_i|=p^d`、半単純で
+`|H̄|=∏|S_i|=(p^d)^k=p^{dk}` ⟹ `q=dk` ⟹ `q` 素数で `d∈{1,q}`。**`finrank` 不要**。② repo の
+Maschke = `exists_aInvariant_irreducible_summand_disjoint` (OperatorMaschke.lean:368) は **subgroup-level**
+で module instance を内部隠蔽 — これを使えば下の instance 地獄を回避。
+- **finrank-instance 地獄 (記録、回避せよ)**: `chiefFactor_finrank` を `card_eq_pow_finrank` 経由で
+  作ろうとして放棄。`letI : CommGroup (↥H⧸N) := inferInstance` が量子化群 Group instance と噛み合わず
+  `CommGroup`/`Module`/`AddCommMonoid (Additive (↥H⧸N))` 合成が連鎖失敗。**el-ab → Additive module は
+  `↥H⧸N` のような quotient carrier では instance が通らない**。必要になったら module instance は
+  `exists_aInvariant_*` のように内部に閉じ込めるか、`Additive` を避け cardinality で回す。
+- **step 1 着地分 (DONE)**: `chiefFactor_quotient_card : Nat.card (↥H ⧸ chief.N) = chief.p ^ data.q`
+  (`quotient_order`+`H0_eq` から、instance 不要、sorry-free)。= dichotomy が読む「dim H̄ = q」基礎。
+
+**subgroup-level dichotomy 証明スケッチ** (次の実装対象):
+1. `S₀` := H̄ の極小 nonzero U-不変部分群 (`(Set.toFinite _).exists_minimal`, U-既約)。`d:=Nat.log p |S₀|`。
+2. `T := ⨆_{w∈W₁} (φ w)•S₀` (φ=`quotientMulAutHom N_aInvariant`、W₁-共役の join) は UW₁-不変・≠⊥
+   ⟹ `chief.quotient_chiefFactor` で `T=⊤`。**= H̄ は S₀ の W₁-共役で張られる** (要: 部分群への
+   W₁-作用 = pointwise `•` か `.map (φ w).toMonoidHom`、join の UW₁-不変性。`U◁UW₁` ゆえ各 `(φw)•S₀` は
+   U-不変、join も U-不変、W₁ は join を保つ)。
+3. 各 `(φ w)•S₀` は U-既約・`|·|=|S₀|=p^d` (共役は位数保存)。半単純 (Maschke) で H̄ は dim-d U-既約の
+   直和 ⟹ `|H̄|=(p^d)^k` ⟹ `q=dk` ⟹ `d∣q`。(「全 U-既約成分が dim d」: 成分は `⨆` の被加数の iso ⟹ 同 dim)。
+4. `q` 素数: `d=q` (S₀=H̄=U-既約 ⟹ **CaseB**) か `d=1` (q 個の位数-p 成分 ⟹ **CaseA**)。
+
+## アーキテクチャ (steps) — 旧 module-route (参考、上の subgroup-route を優先)
+
+0. **de-opacify ChiefFactorData** — **DONE**。実 H̄ 構造を露出。
+1. **dim H̄ = q** — **DONE (card 版)** `chiefFactor_quotient_card`。finrank 版は instance 地獄ゆえ不要化。
+2. **Maschke/半単純**: repo `exists_aInvariant_irreducible_summand_disjoint` (subgroup-level) を反復で
+   `H̄|_U = ⊕ 既約` に。mathlib `Representation` Maschke は instance 重く非推奨。
+3. **Clifford permutation (新規, mathlib 不在)**: 上スケッチ step 2-3 (`⨆ W₁-共役 = ⊤` + 同 dim)。**核心**。
+4. **dichotomy**: 上スケッチ step 4 (`q=dk`, `q` 素数 ⟹ `d∈{1,q}`)。
 5. **CaseA 構成 (k=q)**: `q` 成分を G-部分群 (`Hpart`, H̄→H→G 対応) に、位数 `p`、`a ∣ p-1`。
-6. **CaseB 構成 (k=1)**: Schur (End 体, mathlib `Irreducible.lean`?) + Wedderburn
-   (`RingTheory/SimpleModule/WedderburnArtin` 有限可除環=体)、`Ū` 巡回、整除性。
+6. **CaseB 構成 (k=1)**: Schur (End 体) + Wedderburn (有限可除環=体)、`Ū` 巡回、整除性。
 
 ## 再利用する infra
 
