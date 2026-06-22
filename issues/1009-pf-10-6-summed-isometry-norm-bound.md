@@ -37,6 +37,18 @@ statement)。**S07_Coherence.lean に未形式化** — 本 issue の真の prer
 
 ## やること
 
+- [x] **§6 conjugate chain 一般化 DONE + §10 conjugate-column 恒等式 DONE** (2026-06-23, issue 1010 CLOSED):
+  - §6 `certainType_columnSum_conj` chain を `Hypothesis46→Hypothesis` 一般化 (commit `9db31b2b`,
+    完全 axiom-clean)。`column_inv_ne_self` は Hypothesis46 据置 (S08 caller 無変更)。
+  - **`Hypothesis.exists_conj_column`** (S12, commit `842c9116`): `(∑_i μ_ij).conj = ∑_i μ_ij'`
+    (j'≠0, j'≠j)。= column image family の `image_eq` 材料 (χ.conj = μ_j')。
+  - **▶ 次 = column `OrthonormalCharacterImageFamily` 本体**: imageSet={δω_ij^σ}∪{−δω_ij'^σ},
+    image_eq=`tau_muGrid_columnSum_diff`(k=j')+`exists_conj_column`, **orthonormal=σ-grid の joint
+    injectivity** (重要見通し: `exists_alignedOmegaSigmaGrid_chiFam_family` を per-row→2D joint inj に強化、
+    `omegaProdChar_inj`+w1/χ₂ 単射性由来。full product 構造 P_i(j).2=κ(j) は不要、orthonormality には
+    joint inj で十分), mem_ZIrr=alignedOmegaSigmaGrid ZIrr。→ `ofProjection`(τ=hyp.tau, tau1=coh.tau1,
+    ψ=0) → (5.5)`eq_sum_of_psi_eq_zero` → μ_j^τ₁=∑_E α → σ-endgame `eq_smul_chiFam_column_of_vanishOnV`
+    で 1 列 pin → `muColumn_tau1_eq_of_single_column` で full (10.6.a)。
 - [x] **(10.6.a) column-independence DONE** (2026-06-23 lane-b 再開セッション, `muColumn_tau1_diff_eq`,
   S12, commit `9d2fc5a0`, axiom-clean=§10 muGrid upstream gate のみ・自前 sorry 0): 任意の非自明列 j,k≠0 で
   `μ_j^τ₁ − μ_k^τ₁ = δ·(∑_i ω_ij^σ − ∑_i ω_ik^σ)`、∴ 残差 `μ_j^τ₁ − δ∑_i ω_ij^σ` は**列 j に非依存**。
