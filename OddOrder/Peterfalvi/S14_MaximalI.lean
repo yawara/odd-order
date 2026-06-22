@@ -228,6 +228,135 @@ structure RankTwoWitnessData (ctr : CounterexampleHypothesis (G := G)) where
   M_inter_L_complements_K : Prop
   M_inter_L_le_H : Prop
 
+open OddOrder.Isaacs.Ch04.OddOrder.Isaacs.Ch03.IsAInvariant
+  (quotientMulAutHom quotientMulAutHom_apply_mk') in
+/-- **Group-theoretic core of Peterfalvi (12.9)** (fully general, `§8`-independent).
+
+If a **noncyclic abelian** group `A` acts **coprimely** on a finite group `K` whose
+abelianization is nontrivial (`[K, K] ≠ K`), then some **nontrivial** `a ∈ A` has a fixed
+subgroup `C_K(a)` that is *not* contained in the derived subgroup `[K, K]`.
+
+This is the abstract content of the centralizer step of (12.9): there Peterfalvi takes
+`A = Ω₁(P₀)` (elementary abelian of rank `2`, hence noncyclic) acting by conjugation on
+`K = M_F`, with `[K, K] = K'`, and concludes `∃ x ∈ Ω₁(P₀)^#` with `C_K(x) ⊄ K'`
+(equivalently `C_{K/K'}(x) ≠ 1`).
+
+Proof.  `[K, K]` is characteristic, hence `A`-invariant, so `A` acts on the quotient
+`K / [K, K]`.  By **BG Proposition 1.16(1)** (Isaacs 6.21,
+`nontrivialActionFixedByClosure_eq_top_of_not_isCyclic'`) applied to that quotient action,
+`K / [K, K] = ⟨ C_{K/[K,K]}(a) ∣ a ≠ 1 ⟩`.  Since `K / [K, K]` is nontrivial, some
+`a ≠ 1` has `C_{K/[K,K]}(a) ≠ 1`; the witnessing coset lifts, by the coprime fixed-point
+lifting (**Isaacs Cor 3.28**, `coprime_fixedPoints_quotient`), to an element of `C_K(a)`
+outside `[K, K]`. -/
+theorem exists_ne_one_actionFixedBy_not_le_commutator
+    {A K : Type*} [Group A] [Finite A] [IsMulCommutative A] [Group K] [Finite K]
+    (φ : A →* MulAut K) (hCop : Nat.Coprime (Nat.card A) (Nat.card K))
+    (hSolv : IsSolvable A ∨ IsSolvable K) (hNC : ¬ IsCyclic A)
+    (hK' : commutator K ≠ ⊤) :
+    ∃ a : A, a ≠ 1 ∧ ¬ (Ch06.actionFixedBy φ a ≤ commutator K) := by
+  classical
+  -- `[K, K]` is characteristic, hence `A`-invariant; let `ψ` be the induced quotient action.
+  have hN_inv : Ch03.IsAInvariant φ (commutator K) := Ch03.IsAInvariant.of_characteristic φ
+  set ψ := quotientMulAutHom hN_inv with hψ
+  -- Coprimality on the quotient: `|K / [K,K]|` divides `|K|`.
+  have hCopQ : Nat.Coprime (Nat.card A) (Nat.card (K ⧸ commutator K)) :=
+    hCop.coprime_dvd_right (commutator K).card_quotient_dvd_card
+  -- BG 1.16(1) on the quotient action: the nontrivial fixed-point closure is everything.
+  have htop : Ch06.nontrivialActionFixedByClosure ψ = ⊤ :=
+    OddOrder.BG.Ch1.S01.nontrivialActionFixedByClosure_eq_top_of_not_isCyclic' ψ hCopQ hNC
+  by_contra hcon
+  push_neg at hcon
+  -- `hcon : ∀ a, a ≠ 1 → C_K(a) ≤ [K, K]`.  Show the quotient closure is `⊥`.
+  have hquot_bot : Ch06.nontrivialActionFixedByClosure ψ ≤ ⊥ := by
+    rw [Ch06.nontrivialActionFixedByClosure_le_iff]
+    intro a ha q hq
+    -- `q ∈ C_{K/K'}(a)`: `q` is fixed by every element of `⟨a⟩`.
+    have hq_zp : q ∈ Ch06.actionFixedPoints ψ (Subgroup.zpowers a) := by
+      rw [← Ch06.actionFixedBy_eq_actionFixedPoints_zpowers]; exact hq
+    -- Lift `q = mk' g` and assemble the coset-fixed hypothesis on `⟨a⟩`.
+    obtain ⟨g, rfl⟩ := QuotientGroup.mk'_surjective (commutator K) q
+    have hg_fix : ∀ b : ↥(Subgroup.zpowers a), ∃ n ∈ commutator K, φ (b : A) g = g * n := by
+      intro b
+      have hb := (Ch06.mem_actionFixedPoints.mp hq_zp) b
+      rw [hψ, quotientMulAutHom_apply_mk', QuotientGroup.mk'_apply,
+        QuotientGroup.mk'_apply, QuotientGroup.eq] at hb
+      exact ⟨g⁻¹ * φ (b : A) g, by simpa using (commutator K).inv_mem hb, by group⟩
+    -- Coprime fixed-point lifting (Isaacs Cor 3.28) on the cyclic group `⟨a⟩`.
+    have hCop' : Nat.Coprime (Nat.card ↥(Subgroup.zpowers a)) (Nat.card K) :=
+      hCop.coprime_dvd_left (Subgroup.card_subgroup_dvd_card _)
+    have hSolv' : IsSolvable ↥(Subgroup.zpowers a) ∨ IsSolvable K := by
+      rcases hSolv with hA | hK
+      · haveI := hA; exact Or.inl inferInstance
+      · exact Or.inr hK
+    obtain ⟨c, hc_fix, n, hn, hcn⟩ :=
+      Ch04.coprime_fixedPoints_quotient hCop' hSolv'
+        (Ch03.IsAInvariant.of_characteristic (φ.comp (Subgroup.zpowers a).subtype)) hg_fix
+    -- `c` is fixed by `a`, hence `c ∈ C_K(a) ≤ [K, K]` by `hcon`.
+    have hca : φ a c = c := hc_fix ⟨a, Subgroup.mem_zpowers a⟩
+    have hc_mem : c ∈ commutator K := hcon a ha (Ch06.mem_actionFixedBy.mpr hca)
+    -- Then `g = c * n⁻¹ ∈ [K, K]`, so the coset `q = mk' g` is trivial.
+    have hg_mem : g ∈ commutator K := by
+      have : g = c * n⁻¹ := by rw [hcn]; group
+      rw [this]; exact (commutator K).mul_mem hc_mem ((commutator K).inv_mem hn)
+    rw [Subgroup.mem_bot, QuotientGroup.mk'_apply, QuotientGroup.eq_one_iff]
+    exact hg_mem
+  -- `⊤ ≤ ⊥` forces `K / [K, K]` trivial, i.e. `[K, K] = ⊤`, contradicting `hK'`.
+  have hbot : (⊤ : Subgroup (K ⧸ commutator K)) = ⊥ := le_bot_iff.mp (htop ▸ hquot_bot)
+  apply hK'
+  rw [Subgroup.eq_top_iff']
+  intro k
+  have hk1 : QuotientGroup.mk' (commutator K) k ∈ (⊥ : Subgroup (K ⧸ commutator K)) := by
+    rw [← hbot]; exact Subgroup.mem_top _
+  rw [Subgroup.mem_bot, QuotientGroup.mk'_apply, QuotientGroup.eq_one_iff] at hk1
+  exact hk1
+
+/-- **Conjugation form of the (12.9) centralizer core** (ambient subgroups, directly the
+form consumed by (12.9)).  If a **noncyclic abelian** subgroup `A ≤ G` normalizes a finite
+subgroup `K` of **coprime** order whose abelianization is nontrivial (`⁅K, K⁆ ≠ K`), then
+some `x ∈ A`, `x ≠ 1`, has `C_K(x) = C_G(x) ⊓ K` **not** contained in `⁅K, K⁆`.
+
+Specialization of `exists_ne_one_actionFixedBy_not_le_commutator` to the conjugation action
+`A → MulAut K` (`Subgroup.normalizerMonoidHom`): the abstract fixed subgroup `C_K(a)` becomes
+`C_G(a) ⊓ K` and `commutator ↥K` maps to `⁅K, K⁆` under `K.subtype`. -/
+theorem exists_mem_centralizer_inf_not_le_commutator
+    {A K : Subgroup G} [Finite ↥A] [IsMulCommutative ↥A] [Finite ↥K]
+    (hAK : A ≤ Subgroup.normalizer K) (hCop : Nat.Coprime (Nat.card ↥A) (Nat.card ↥K))
+    (hSolv : IsSolvable ↥A ∨ IsSolvable ↥K) (hNC : ¬ IsCyclic ↥A) (hK' : ⁅K, K⁆ ≠ K) :
+    ∃ x : G, x ∈ A ∧ x ≠ 1 ∧ ¬ (Subgroup.centralizer {x} ⊓ K ≤ ⁅K, K⁆) := by
+  classical
+  -- The conjugation action `φ : A → MulAut K` and the `K.subtype`-image of `[↥K, ↥K]`.
+  set φ : ↥A →* MulAut ↥K := (Subgroup.normalizerMonoidHom K).comp (Subgroup.inclusion hAK)
+    with hφ
+  have htop_map : (⊤ : Subgroup ↥K).map K.subtype = K := by
+    ext g
+    simp only [Subgroup.mem_map, Subgroup.mem_top, true_and]
+    constructor
+    · rintro ⟨y, rfl⟩; exact y.2
+    · intro hg; exact ⟨⟨g, hg⟩, rfl⟩
+  have hmap : (commutator ↥K).map K.subtype = ⁅K, K⁆ := by
+    rw [_root_.commutator_def, Subgroup.map_commutator, htop_map]
+  -- `[↥K, ↥K] ≠ ⊤`: else its `K.subtype`-image would be `⁅K, K⁆ = K`.
+  have hKtop : commutator ↥K ≠ ⊤ := by
+    intro h; exact hK' (by rw [← hmap, h, htop_map])
+  obtain ⟨a, ha_ne, hnle⟩ :=
+    exists_ne_one_actionFixedBy_not_le_commutator φ hCop hSolv hNC hKtop
+  -- Translate the abstract conclusion to ambient subgroups.
+  obtain ⟨n, hn_fix, hn_out⟩ := SetLike.not_le_iff_exists.mp hnle
+  refine ⟨(a : G), a.2, fun h => ha_ne (Subtype.ext h), SetLike.not_le_iff_exists.mpr
+    ⟨(n : G), ?_, ?_⟩⟩
+  · -- `n ∈ C_G(a) ⊓ K`: `a` conjugates `n` to itself, and `n ∈ K`.
+    rw [Ch06.mem_actionFixedBy] at hn_fix
+    have hval : (a : G) * (n : G) * (a : G)⁻¹ = (n : G) :=
+      congrArg (Subtype.val) hn_fix
+    refine Subgroup.mem_inf.mpr ⟨Subgroup.mem_centralizer_iff.mpr ?_, n.2⟩
+    rintro y rfl
+    exact mul_inv_eq_iff_eq_mul.mp hval
+  · -- `n ∉ ⁅K, K⁆`: else `n ∈ [↥K, ↥K]`, contradicting `hn_out`.
+    rw [← hmap]
+    intro hmem
+    obtain ⟨m, hm, hmn⟩ := Subgroup.mem_map.mp hmem
+    exact hn_out (by rw [show n = m from Subtype.ext hmn.symm]; exact hm)
+
 /-- **Peterfalvi (12.9)**: the counterexample has an abelian rank-two Sylow
 witness and an element whose centralizers force a second maximal subgroup. -/
 theorem exists_rankTwoWitness [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)

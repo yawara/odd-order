@@ -108,6 +108,39 @@ synthesis, confirmed), and put the module on `V` directly via
 from `(irreducible_iff_isSimpleModule_asModule ρ).mp hirr`.  Apply comm-Singer with `M := V`
 (no `asModuleEquiv` transport needed).  `[Fact p.Prime]` required (for `IsIrreducible`'s `Field`).
 
+## ✅✅ (12.9) centralizer core LANDED (2026-06-22 lane-h resume¹⁰, commits `6afee77c` / `b0a337ef`)
+
+The **§8-independent** group-theoretic heart of the centralizer step of (12.9), in two forms,
+both **sorry-free + axiom-clean** (AxiomsCheck-registered):
+
+1. **`exists_ne_one_actionFixedBy_not_le_commutator`** (abstract): a **noncyclic abelian** `A`
+   acting **coprimely** on a finite `K` with `[K, K] ≠ K` has `a ≠ 1` with
+   `actionFixedBy φ a ⊄ commutator K` (`C_K(a) ⊄ [K, K]`).
+2. **`exists_mem_centralizer_inf_not_le_commutator`** (conjugation/ambient — the form (12.9)
+   consumes): a noncyclic abelian `A ≤ G` normalizing a coprime `K ≤ G` with `⁅K, K⁆ ≠ K` has
+   `x ∈ A^#` with `C_G(x) ⊓ K ⊄ ⁅K, K⁆`.
+
+Proof: BG Prop 1.16(1) (Isaacs 6.21, `nontrivialActionFixedByClosure_eq_top_of_not_isCyclic'`)
+applied to the **induced action on `K / [K, K]`** ⟹ `K/[K,K] = ⟨C_{K/[K,K]}(a)⟩` is nontrivial
+⟹ some `C_{K/[K,K]}(a) ≠ 1`; the witnessing coset **lifts** (Isaacs Cor 3.28,
+`coprime_fixedPoints_quotient`) to a `c ∈ C_K(a)` outside `[K, K]`.  The ambient form bridges
+`actionFixedBy (normalizerMonoidHom) = C_G(·) ⊓ K` and `(commutator ↥K).map K.subtype = ⁅K, K⁆`
+(`map_commutator`).
+
+This **strengthens** the repo's pre-existing weaker conjugation form
+`exists_mem_inf_centralizer_ne_bot_of_not_isCyclic` (`S07_Transitivity`, gives only `C_K(x) ≠ 1`)
+to the `C_K(x) ⊄ K'` form that (12.9) genuinely needs (`C_{K/K'}(x) ≠ 1`).  Applied with
+`A = Ω₁(P₀)` (elem-ab rank 2, noncyclic), `K = M_F` (coprime to `p` since `M_F` is Hall),
+`⁅K,K⁆ = K'`, it gives `x ∈ Ω₁(P₀)^#` with `C_K(x) ⊄ K'` — the third conjunct of (12.9).
+
+**Remaining (12.9) assembly** (= `exists_rankTwoWitness`, §8-gated plumbing, NOT genuine new math):
+faithful-ize `CounterexampleHypothesis`/`RankTwoWitnessData`, then construct the witness data from
+(a) `P₀` rank 2 ← **(8.12.a)** [ABSENT — state faithfully, cite BG §16]; (b) the second maximal
+`L` with `P₀ ⊆ L_s` ← **(8.17.a)** (`bgTheoremE_cover_data`) + **(8.11)** (`hall_…`) + Sylow
+conjugation [hard plumbing over `BGTheoremECoverData`]; (c) the centralizer conjunct ← **this core**
+(needs the `Ω₁(P₀)`-noncyclic + `M_F`-Hall-coprime setup); (d) `N_G(⟨x⟩) ⊆ M`, `C_G(x) ⊄ L` ←
+**(8.12.b)** (`typeI_or_typeII_centralizer_unique`).
+
 ## ▶ Next steps — full (12.12) `complement_cyclic_order_dvd` (Pf 04.14 L67-74, §8-gated)
 
 The book proof of (12.12): let `P = O_p(H)`, `T = Ω₁(Z(P))` (elem-ab of order `p` or `p²`),
