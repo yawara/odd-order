@@ -5,6 +5,7 @@ Authors: Yawara Ishida
 -/
 import OddOrder.Peterfalvi.S11_MaximalII_III_IV
 import OddOrder.Peterfalvi.S05_OmegaSigmaGrid
+import OddOrder.Peterfalvi.S05_SigmaTrichotomy
 import Mathlib.GroupTheory.IsPerfect
 
 /-!
@@ -3346,6 +3347,72 @@ theorem Hypothesis.tau1_zeta_vanishes_on_typePV [Finite G] {M : Subgroup G}
       (tic.chiFam hVeq app (a', b')) = 1 := by
     rw [(tic.chiFam_spec hVeq app).2.2.1, if_pos rfl]
   exact inner_left_eq_zero_of_inner_sub_eq_zero haZ hsZ ha1 hb1 hs1 hab hdiff
+
+open scoped FiniteInduce in
+/-- **Peterfalvi (10.5), Dade-image half (grid level)**: the genuine `μ`-grid statement of the
+Dade-image identity, `α_{ij}^τ = δ·(ω_{ij}^σ − ω_{i0}^σ) − n·ζ^{τ₁}`, with `ω^σ` the *aligned*
+`σ`-grid `alignedOmegaSigmaGrid` and `α_{ij} = μ_{ij} − δ·μ_{i0} − n·ζ`.
+
+This is the full (10.5) endgame.  Writing `X = α_{ij}^τ + n·ζ^{τ₁}`, the goal reduces to
+`X = δ·(ω_{ij}^σ − ω_{i0}^σ)`.  Now `X` is a virtual character of `G` with `‖X‖² = 2`
+(`muGridAlpha_tau_X_inner`), the aligned `σ`-grid entries are members `χ_{P_{ij}}` of the
+orthonormal `σ`-image family (`exists_alignedOmegaSigmaGrid_chiFam_family`), and the difference
+`X − δ·(ω_{ij}^σ − ω_{i0}^σ)` vanishes on `V` (`muGridPsi_vanishes_on_typePV` together with the
+`ζ^{τ₁}`-vanishing `tau1_zeta_vanishes_on_typePV`).  The norm-`2` Dade-image trichotomy
+`eq_smul_chiFam_diff_of_vanishOnV` (the §5 generalisation of the §6 `(4.8)` endgame) then forces
+`X = δ·(χ_{P_{ij}} − χ_{P_{i0}})`.  (`alpha_tau_image` is the thin `CharacterParameters` corollary.) -/
+theorem Hypothesis.tau_muGridAlpha_eq [Finite G] {M : Subgroup G}
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis M) (hodd : Odd (Nat.card G))
+    (i : Fin hyp.w1) {j : Fin hyp.w2} (hj0 : j ≠ 0) (k : Fin hyp.w2) (hjk : j ≠ k) (hk0 : k ≠ 0)
+    {params : CharacterParameters hyp} (coh : CoherentHypothesis hyp params)
+    {ζ : ClassFunction ↥M ℂ} (hζS : ζ ∈ inducedFamily M) (hζirr : IsIrreducibleCharacter ζ)
+    (hζne : ζ.conj ≠ ζ) {d : ℕ} {δ : ℤ} {n : ℕ}
+    (hdeg : hyp.muGrid hG hodd i j 1 = (d : ℂ)) (hμ0 : hyp.muGrid hG hodd i 0 1 = 1)
+    (hζ1 : ζ 1 = (hyp.w1 : ℂ)) (hnf : (n : ℤ) * (hyp.w1 : ℤ) = (d : ℤ) - δ)
+    (hδj : hyp.muColumnSign hG hodd j = δ)
+    (hdζ : hyp.muGrid hG hodd i j 1 ≠ ζ 1) (h0ζ : hyp.muGrid hG hodd i 0 1 ≠ ζ 1)
+    (hkζ : ∀ i' : Fin hyp.w1, hyp.muGrid hG hodd i' k 1 ≠ ζ 1)
+    (hcol1 : ∀ i' : Fin hyp.w1, hyp.muGrid hG hodd i' k 1 = (d : ℂ))
+    (hdk1 : hyp.muGrid hG hodd 0 k 1 ≠ 1)
+    (hδpm : δ = 1 ∨ δ = -1) (hw1 : 3 ≤ hyp.w1) (hn2 : 2 ≤ n) :
+    hyp.tau (hyp.muGrid hG hodd i j - (δ : ℂ) • hyp.muGrid hG hodd i 0 - (n : ℂ) • ζ)
+      = (δ : ℂ) • (hyp.alignedOmegaSigmaGrid hG hodd i j - hyp.alignedOmegaSigmaGrid hG hodd i 0)
+        - (n : ℂ) • coh.tau1 ζ := by
+  haveI := hyp.finiteG
+  classical
+  -- `X = α_{ij}^τ + n·ζ^{τ₁}` has `‖X‖² = 2` and lies in `ℤ[Irr G]`.
+  have hXfacts := hyp.muGridAlpha_tau_X_inner hG hodd i hj0 k hjk hk0 coh hζS hζirr hζne
+    hdeg hμ0 hζ1 hnf hδj hdζ h0ζ hkζ hcol1 hdk1 hδpm hw1 hn2
+  have hτ1ζZ : coh.tau1 ζ ∈ ZIrr G :=
+    coh.coherent.extension_mem_ZIrr ζ (Submodule.subset_span hζS)
+  have hαZ := hyp.muGridAlpha_tau_mem_ZIrr hG hodd i hj0 hζS hζirr hdeg hμ0 hζ1 hnf hδj
+  have hXZ : hyp.tau (hyp.muGrid hG hodd i j - (δ : ℂ) • hyp.muGrid hG hodd i 0 - (n : ℂ) • ζ)
+      + (n : ℂ) • coh.tau1 ζ ∈ ZIrr G := by
+    refine Submodule.add_mem _ hαZ ?_
+    rw [Nat.cast_smul_eq_nsmul]; exact nsmul_mem hτ1ζZ n
+  -- the aligned `σ`-grid entries as `χ`-family members (piece 1).
+  obtain ⟨P, hPinj, hP⟩ := hyp.exists_alignedOmegaSigmaGrid_chiFam_family hG hodd i
+  let tic := typePData_toTICyclicHypothesis hyp.typeP hodd
+  haveI : NeZero (Nat.card ↥tic.W1) := ⟨Nat.card_pos.ne'⟩
+  haveI : NeZero (Nat.card ↥tic.W2) := ⟨Nat.card_pos.ne'⟩
+  let app := hyp.canonicalFullDadeApp hG hodd
+  have hVeq : tic.V = tic.Vdiff := rfl
+  have hPne : P j ≠ P 0 := fun h => hj0 (hPinj h)
+  have hPj' : tic.chiFam hVeq app (P j) = hyp.alignedOmegaSigmaGrid hG hodd i j := (hP j).symm
+  have hP0' : tic.chiFam hVeq app (P 0) = hyp.alignedOmegaSigmaGrid hG hodd i 0 := (hP 0).symm
+  -- `ψ = X − δ·(ω_{ij}^σ − ω_{i0}^σ)` vanishes on `V`.
+  have hζvanish : ∀ v ∈ typePV M hyp.typeP, coh.tau1 ζ v = 0 :=
+    fun v hv => hyp.tau1_zeta_vanishes_on_typePV hG hodd coh hζS hζirr hζne hv
+  have hψV : ∀ v ∈ tic.V,
+      (hyp.tau (hyp.muGrid hG hodd i j - (δ : ℂ) • hyp.muGrid hG hodd i 0 - (n : ℂ) • ζ)
+          + (n : ℂ) • coh.tau1 ζ
+        - (δ : ℂ) • (tic.chiFam hVeq app (P j) - tic.chiFam hVeq app (P 0))) v = 0 := by
+    intro v hv
+    rw [hPj', hP0']
+    exact hyp.muGridPsi_vanishes_on_typePV hG hodd hj0 hζS hdeg hμ0 hζ1 hnf hδj coh hζvanish hv
+  -- the norm-`2` Dade-image trichotomy.
+  rw [eq_sub_iff_add_eq, ← hPj', ← hP0']
+  exact tic.eq_smul_chiFam_diff_of_vanishOnV hVeq app hXZ hXfacts.2 hPne hδpm hψV
 
 /-- **Peterfalvi (10.5), Dade-image half**: under the coherent extension, `α_{ij}` has the stated
 Dade image `δ·(ω_{ij}^σ − ω_{i0}^σ) − n·ζ^{τ₁}`.  (The support half is `alpha_support`.) -/
