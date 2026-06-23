@@ -28,16 +28,20 @@
   **(3.8) trichotomy** ⟹ σ-part=∑ω_i0^σ ⟹ ‖χ‖²=1。**`ζ^τ₁⊥Imσ` を直接 gate せず norm 論法で出る**。
   - ✅ **(2.7) τ-adjunction-at-trivial 構築済**: `Hypothesis.tau_inner_trivial` (S12, **完全 axiom-clean**):
     A_0-supported φ で `⟨φ^τ,1_G⟩=⟨φ,1_M⟩`、§4 `adjoint_formula` (χ=1_G⟹平均=1_M) 経由。a_00=1 step に使う。
-  - ✅ (3.8) trichotomy `sigmaCoeff_trichotomy` (S05) + ‖μ_0−ζ‖²=w₁+1 部品 (`zeta_tau1_inner_self`) は在庫。
-  - ⚠⚠ **真の linchpin = (3.8) を (μ_0−ζ)^τ の σ-係数 grid に適用するための 2D chiFam 構造** (= a_pq=⟨(μ_0−ζ)^τ,
-    ω_ij^σ⟩ を sigmaCoeff/chiFam に同定する `ω_ij^σ=chiFam(ρ_i,κ_j)` の 2D product)。これは **(10.6.a) が §10
-    特化 route で意図的に回避した深い piece** (`exists_alignedOmegaSigmaGrid_chiFam_family` は per-row のみ、2D 化要)。
-    issue 1009「やること」の「🗺 column-structure 精密戦略」(W2-成分 i-非依存 + inj+card 全射) が攻略法。
-    ∴ (10.9) は ~100-150行でなく **2D 構造 (~150-250行) + 残 assembly の multi-session piece**。旧「最 actionable」評価は楽観。
-- **(10.10)/(10.11)** typeV 除去・case-B prime orders: opaque field + coherence、§6(6.8)/§8(8.7) 依存。
-- **∴ §10 残りは一様に deep**: (10.9)=2D chiFam 構造 linchpin、(10.7)/(10.8)=§8 (8.8/Type II 構造) prereq
-  (lane-f/§14 territory)。次の高価値 infra = **2D chiFam product 構造** (10.9 + trichotomy 系を解禁、reusable)。
-  (2.7) `tau_inner_trivial` は構築済の building block。
+  - ✅✅ **(10.9) は全主要部品 in-stock と確定 (2026-06-23 再訂正)** — 「2D 構造 linchpin が必要」は**誤り**だった
+    (前 commit の悲観も訂正)。**`exists_alignedOmegaSigmaGrid_chiFam_product` (S12:1163) が既に
+    `ω_ij^σ=chiFam(ρ_i,κ_j)` (ρ,κ inj) の 2D product を供給**、`exists_kappa_sum_chiFam_column_eq` (S12:1282)
+    が「single-column κ_j → ∑_i ω_ij^σ」を供給。在庫部品一覧:
+    - 2D product `exists_alignedOmegaSigmaGrid_chiFam_product` + column-sum `exists_kappa_sum_chiFam_column_eq` ✅
+    - (3.8) trichotomy `sigmaCoeff_trichotomy` (vanish-on-V + gap `w₁+2≤w₂` + `sigmaNC<2w₁` ⟹ 列/行/0) ✅
+    - (2.7) a_00: `tau_inner_trivial` (⟨ψ,1_G⟩=⟨μ_0−ζ,1_M⟩) ✅ + μ_00=1_L (`certainType_zero_column_anchor.2`) ✅
+    - ‖μ_0‖²=w₁ (`muGrid_column_sum_inner_self`) + ‖ζ‖²=1 ⟹ ‖μ_0−ζ‖²=w₁+1 ✅; STEP 1 分解 ✅
+  - ⚠ **残り確認/構築 (assembly 内)**: `sigmaNC<2w₁` 境界 (‖ψ‖²=w₁+1<2w₁ from w₁>1; sigmaNC≤‖ψ‖² Bessel 要確認)、
+    μ_0⊥ζ (degree mismatch)、ψ vanish on V (μ_0−ζ A_0-supported + 誘導 vanishing)、trichotomy 列同定。
+  - **∴ (10.9) = in-stock 部品の ~250-300 行 assembly** (深い新規構造 不要)。**文書順次・tractable な次 target**。
+    gap = sigmaNC bound + 小 orthogonality のみ。(2.7) `tau_inner_trivial` は構築済 building block。
+- **(10.10)/(10.11)** typeV 除去・case-B prime orders: opaque field + coherence、(10.8)/§6(6.8)/§8(8.7) 依存。
+- **∴ 次 = (10.9) assembly** (tractable, 全部品在庫)。(10.7)/(10.8) は §8 (8.8/Type II) prereq gated で light-touch。
 
 ## ✅✅✅✅✅ 2026-06-23 更新¹³ — (10.6)(a) summed isometry COMPLETE (linchpin landed, σ-endgame 回避)
 
