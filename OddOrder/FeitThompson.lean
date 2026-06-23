@@ -425,6 +425,70 @@ noncomputable def section16MaximalPair_of_isMinimalSimpleOdd {G : Type*} [Group 
       Z_cyclic := hZcyc
       K_lt_Kstar := hKlt }
 
+open scoped IsMulCommutative in
+/-- **`TypePData M` from a `K`-invariant `(κ∪σ)'`-Hall complement `U`** (`sorry`-free engine;
+POLE-1 carrier, issue 4008).
+
+Given a type-`P` maximal subgroup `M`, its cyclic κ-Hall `K`, and a `(κ∪σ)'`-Hall complement `U`
+*normalised by* `K` (`hKnorm`), this assembles the Peterfalvi type-`P` datum `TypePData M` with the
+**chosen** factors `data.W₁ = K`, `data.U = U` (definitionally — `…_W1`/`…_U`).  This is the
+*complement-specified* constructor that `typePData_of_isTypeNonI` cannot provide (it builds its own
+`U`), so it lets the §16 `Section16TypePStructure` carry a `TypePData` whose `W₁`/`U` agree with the
+maximal-pair factors — unblocking Peterfalvi `basic_structure` (13.2).
+
+All structural fields are discharged through lane-f's BG §14/15/16 machinery (sorry-free, cited):
+`isTypeP2_of_hall_subgroupOf_ne_bot` (type-`P₂` from the nontrivial `(κ∪σ)'`-Hall),
+`typeP2_mf_internal_fitting_decomposition` (the deep `M'`-complement/Fitting fields), and
+`typeP_hall_derived_eq_and_abelian` (`U` abelian, hence nilpotent), fed to
+`typePData_of_isTypeP_of_inputs`.  The two structural hypotheses — `K ≤ N_G(U)` and that `U` is the
+`(κ∪σ)'`-Hall — are the residual obligations of the §16 producer (issue 4008): for the canonical
+pair `K ≤ N_G(U)` is `exists_kappaHall_invariant_complement_to_MF`, and the `(κ∪σ)'`-Hall property
+is the remaining BG §14 alignment (the κ-Hall-invariant complement *is* the `(κ∪σ)'`-Hall). -/
+noncomputable def typePData_of_kappaHall_hallComplement {G : Type*} [Group G] [Finite G]
+    (hG : IsMinimalSimpleOdd G) {M K U : Subgroup G}
+    (hM : M ∈ maximalSubgroups G) (hP : BG.Ch4.S14.IsTypeP M) (hKM : K ≤ M) (hKne : K ≠ ⊥)
+    (hK : Ch03.IsHallSubgroup (BG.Ch4.S14.kappa M) (K.subgroupOf M))
+    (hUM : U ≤ M) (hUne : U.subgroupOf M ≠ ⊥)
+    (hUhall : Ch03.IsHallSubgroup ((BG.Ch4.S14.kappa M ∪ BG.Ch3.S10.sigma M)ᶜ) (U.subgroupOf M))
+    (hKnorm : K ≤ Subgroup.normalizer (U : Set G)) :
+    TypePData M :=
+  -- Term-mode (no `obtain`/`have` casesOn) so the `.W₁ = K`/`.U = U` projections reduce
+  -- definitionally past lane-f's tactic-built `typePData_of_isTypeP_of_inputs`
+  -- (memory: coupled engine fields + beta).
+  let hdec := BG.Ch4.S15.typeP2_mf_internal_fitting_decomposition hG hM
+    (BG.Ch4.S16.isTypeP2_of_hall_subgroupOf_ne_bot hP hUhall hUne) hKM hUM hKne hK hUhall
+  let hM'ab := BG.Ch4.S15.typeP_hall_derived_eq_and_abelian hG hM hKM hUM hKne hK hUhall
+  BG.Ch4.S16.typePData_of_isTypeP_of_inputs hG hM hP hKM hKne hK
+    (le_sup_left.trans_eq hM'ab.1.symm) hKnorm
+    (haveI := hM'ab.2; (inferInstance : Group.IsNilpotent ↥U))
+    hdec.1 hdec.2.1 hdec.2.2
+
+/-- The chosen cyclic factor: `data.W₁ = K` (definitional). -/
+theorem typePData_of_kappaHall_hallComplement_W1 {G : Type*} [Group G] [Finite G]
+    (hG : IsMinimalSimpleOdd G) {M K U : Subgroup G}
+    (hM : M ∈ maximalSubgroups G) (hP : BG.Ch4.S14.IsTypeP M) (hKM : K ≤ M) (hKne : K ≠ ⊥)
+    (hK : Ch03.IsHallSubgroup (BG.Ch4.S14.kappa M) (K.subgroupOf M))
+    (hUM : U ≤ M) (hUne : U.subgroupOf M ≠ ⊥)
+    (hUhall : Ch03.IsHallSubgroup ((BG.Ch4.S14.kappa M ∪ BG.Ch3.S10.sigma M)ᶜ) (U.subgroupOf M))
+    (hKnorm : K ≤ Subgroup.normalizer (U : Set G)) :
+    (typePData_of_kappaHall_hallComplement hG hM hP hKM hKne hK hUM hUne hUhall hKnorm).W1 = K := by
+  unfold typePData_of_kappaHall_hallComplement
+    BG.Ch4.S16.typePData_of_isTypeP_of_inputs BG.Ch4.S16.typePData_of_inputs
+  rfl
+
+/-- The chosen complement: `data.U = U` (definitional). -/
+theorem typePData_of_kappaHall_hallComplement_U {G : Type*} [Group G] [Finite G]
+    (hG : IsMinimalSimpleOdd G) {M K U : Subgroup G}
+    (hM : M ∈ maximalSubgroups G) (hP : BG.Ch4.S14.IsTypeP M) (hKM : K ≤ M) (hKne : K ≠ ⊥)
+    (hK : Ch03.IsHallSubgroup (BG.Ch4.S14.kappa M) (K.subgroupOf M))
+    (hUM : U ≤ M) (hUne : U.subgroupOf M ≠ ⊥)
+    (hUhall : Ch03.IsHallSubgroup ((BG.Ch4.S14.kappa M ∪ BG.Ch3.S10.sigma M)ᶜ) (U.subgroupOf M))
+    (hKnorm : K ≤ Subgroup.normalizer (U : Set G)) :
+    (typePData_of_kappaHall_hallComplement hG hM hP hKM hKne hK hUM hUne hUhall hKnorm).U = U := by
+  unfold typePData_of_kappaHall_hallComplement
+    BG.Ch4.S16.typePData_of_isTypeP_of_inputs BG.Ch4.S16.typePData_of_inputs
+  rfl
+
 /-- **Type-P structure engine from the type data** (`sorry`-free, gated-endpoint skeleton).
 
 Given the Peterfalvi type data (`TypePData`) of both members of the maximal pair, this assembles
