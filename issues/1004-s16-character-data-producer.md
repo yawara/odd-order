@@ -93,3 +93,17 @@ cd producer を精査し **feasible・全 character 理論 in-stock** と確定 
 - **残**: piece 3 nu_definition (T-side、S/T-shared-omega = 最難) / piece 5 tau3 / piece 6-7 free field / piece 8 pack。
   S-side machinery は対称ゆえ T-side で大半再利用可。engineering 教訓 (instance-desync は `exact` で締める 等) =
   更新¹⁸ に記録。
+
+## 進捗 (2026-06-23, lane-b 再開⁴) — piece 3 (nu/symmetry) transport infra + 攻略計画結晶化 (commit `93e02353`)
+
+piece 3 (最難所、S/T-shared-ω symmetry) の transport foundation を sorry-free + axiom-clean で landing。
+正本 = `notes/.../s12_s10_character_bridge.md` 更新¹⁹。
+
+- landed (4 補題、AxiomsCheck 登録、build 3869 green): `monoidHom_eq_of_eqOn_W1_W2` (generating-set 原理:
+  ↥tp.W linear char は W1/W2 restriction で決まる) / `gridEquivE_coe` (G-元保存 linchpin) /
+  `gridEquivE_mem_W1`/`_W2` (K/Kstar → certainTypeS.W1/W2 transport)。
+- 重複削除: 自作 cleanup lemma は既存 `ClassFunction.compHom_linearIrreducibleCharacter` と同一 → cite。
+- **🔑 攻略計画結晶化** (更新¹⁹ step A-F): omegaT の K/Kstar 指標を **omegaS restriction から抽出して T へ push**
+  すれば `omegaS=omegaT` が construction で従い **enumeration matching 不要**。step A chi2enum base-fix →
+  step B omegaProdChar restriction 値 → step D T-side mirror → step C/E symmetry → step F nu (muS_definition mirror)。
+- producer の sorry 不変 (building block)。残 = piece 3 残 (step A-F) / piece 5 tau3 / piece 6-8。

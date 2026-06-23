@@ -5892,3 +5892,17 @@ formula together with the prime computation `coprimeFrobeniusAction_card_eq_prim
 #assert_only_allowed_axioms OddOrder.induce_compHom_subgroupCongr
 #assert_only_allowed_axioms OddOrder.Section16CharacterData.tpW_subgroupOf_eq
 #assert_only_allowed_axioms OddOrder.Section16CharacterData.muS_definition
+-- S/T-shared-`ω` symmetry transport infrastructure (toward the `nu_definition` field, T-side).
+-- `monoidHom_eq_of_eqOn_W1_W2`: a linear character of `↥tp.W` is pinned by its `tp.W1`/`tp.W2`
+-- restrictions (the internal-product generating-set principle).  `gridEquivE_coe`: the S-side
+-- W-identification equiv preserves the ambient `G`-element.  `gridEquivE_mem_W1`/`_W2`: it carries
+-- `mp.K`/`mp.Kstar` elements into `certainTypeS.W1`/`W2`.  All axiom-clean.
+#assert_only_allowed_axioms OddOrder.Section16CharacterData.monoidHom_eq_of_eqOn_W1_W2
+#assert_only_allowed_axioms OddOrder.Section16CharacterData.gridEquivE_coe
+#assert_only_allowed_axioms OddOrder.Section16CharacterData.gridEquivE_mem_W1
+#assert_only_allowed_axioms OddOrder.Section16CharacterData.gridEquivE_mem_W2
+-- `omegaProdCharS_apply_mem_K`/`_Kstar`: `certainTypeS`'s product character, evaluated on a
+-- `gridEquivE`-transported `mp.K`/`mp.Kstar` element, keeps only the `W₁`/`W₂` factor (the
+-- `tp.W1`/`tp.W2`-restriction values feeding the symmetry).  Axiom-clean.
+#assert_only_allowed_axioms OddOrder.Section16CharacterData.omegaProdCharS_apply_mem_K
+#assert_only_allowed_axioms OddOrder.Section16CharacterData.omegaProdCharS_apply_mem_Kstar
