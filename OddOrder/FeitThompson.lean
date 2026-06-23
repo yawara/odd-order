@@ -1590,6 +1590,77 @@ theorem nuT_definition (i : Fin tp.q) (j : Fin tp.p) :
   simp only [deltaPrimeT, nuT, rowT_zero hG mp tp, Int.cast_smul_eq_zsmul]
   exact (mp.certainTypeT hG).induce_chiColumn_diff_mu_diff (colT hG mp tp i) (rowT hG mp tp j)
 
+/-! ### `tau3`: the real Dade σ-integral on `W = tp.W` (cd piece 5)
+
+The integral character map `τ₃ : ClassFunction ↥tp.W →ₗ[ℤ] ClassFunction G` is the Peterfalvi (3.2)
+σ-isometry of the **G-internal TI-cyclic structure** on `W = S ∩ T = mp.K ⊔ mp.Kstar`, supported on the
+regular set `Ẑ = W \ (W₁ ∪ W₂)` (`= S14.zTilde mp.K mp.Kstar`).  It must be the genuine Dade map (not a
+formal one): `η := τ₃ ∘ ω` is consumed downstream as a real virtual character (notes 更新¹⁷).  The TI-set
+fact is read off the proven `BG §14 typeP_duality` (Theorem 14.7), and the Dade isometry from the
+general §4 producer `S04.Hypothesis.fullDadeIsometryData` (all local `H(a) = ⊥`, so `HConjInvariant` is
+automatic).  Named `tau3W` to avoid the `Section16CharacterData.tau3` field projection. -/
+noncomputable def tau3W : OddOrder.Peterfalvi.S07.IntegralCharacterMap ↥tp.W G := by
+  classical
+  haveI : Fintype G := Fintype.ofFinite G
+  haveI : Invertible (Nat.card G : ℂ) :=
+    invertibleOfNonzero (Nat.cast_ne_zero.mpr Nat.card_pos.ne')
+  -- The `Ẑ = zTilde` TI-set fact for the canonical pair (BG Theorem 14.7).
+  have hZti : OddOrder.GroupTheory.IsTISubset (BG.Ch4.S14.zTilde mp.K mp.Kstar) (mp.K ⊔ mp.Kstar) := by
+    obtain ⟨Mst, hMstP⟩ :=
+      (BG.Ch4.S14.typeP_duality hG mp.S_maximal mp.S_typeP mp.K_le_S mp.K_hall mp.Kstar_eq).2.2.exists
+    exact hMstP.2.2.2.2.2.1
+  -- The G-internal TI-cyclic Hypothesis (3.1) for `W = tp.W`, support `V = W \ (W₁ ∪ W₂)`.
+  let tiW : OddOrder.Peterfalvi.S05.TICyclicHypothesis G :=
+    { W := tp.W
+      W1 := tp.W1
+      W2 := tp.W2
+      W1_le_W := by rw [tp.W_eq_join]; exact le_sup_left
+      W2_le_W := by rw [tp.W_eq_join]; exact le_sup_right
+      W1_nontrivial := by
+        rw [tp.W1_eq_K hG]
+        exact fun h => BG.Ch4.S14.card_kappaHall_ne_one mp.S_typeP mp.K_le_S mp.K_hall
+          (Subgroup.card_eq_one.mpr h)
+      W2_nontrivial := by
+        rw [tp.W2_eq_Kstar hG]
+        exact fun h => BG.Ch4.S14.card_kappaHall_ne_one mp.T_typeP mp.Kstar_le_T mp.Kstar_hall
+          (Subgroup.card_eq_one.mpr h)
+      W_sup := tp.W_eq_join.symm
+      W_disjoint := disjoint_iff.mpr tp.W1_inf_W2_eq_bot
+      W_card_coprime := by
+        rw [← tp.q_eq_card_W1, ← tp.p_eq_card_W2]
+        exact (Nat.coprime_primes tp.q_prime tp.p_prime).mpr (ne_of_lt tp.q_lt_p)
+      W_card_odd := hG.odd.of_dvd_nat (Subgroup.card_subgroup_dvd_card tp.W)
+      W_cyclic := tp.W_cyclic
+      V := (tp.W : Set G) \ ((tp.W1 : Set G) ∪ (tp.W2 : Set G))
+      V_subset_sharp := by
+        rintro x hx
+        rw [Set.mem_diff] at hx
+        obtain ⟨_, hxni⟩ := hx
+        simp only [Set.mem_union, SetLike.mem_coe, not_or] at hxni
+        change x ∈ Set.univ \ ({1} : Set G)
+        refine ⟨Set.mem_univ x, ?_⟩
+        simp only [Set.mem_singleton_iff]
+        exact fun h => hxni.1 (h ▸ one_mem tp.W1)
+      V_subset_W := Set.diff_subset
+      W_normalizes_V := by
+        intro w v hv
+        have hvW : v ∈ tp.W := hv.1
+        haveI := tp.W_cyclic
+        letI : CommGroup ↥tp.W := IsCyclic.commGroup
+        have hcg : (w : G) * v = v * (w : G) := by
+          have h := mul_comm w (⟨v, hvW⟩ : ↥tp.W)
+          have := congrArg (Subgroup.subtype tp.W) h
+          simpa using this
+        have heq : (w : G) * v * (w : G)⁻¹ = v := by rw [hcg]; group
+        rw [heq]; exact hv
+      V_ti := by
+        rw [tp.W_eq_kappa_join hG, tp.W1_eq_K hG, tp.W2_eq_Kstar hG]
+        exact hZti }
+  exact tiW.sigmaIntegral rfl
+    (OddOrder.Peterfalvi.S05.TICyclicHypothesis.FullDadeApplication.mk
+      (tiW.toDadeHypothesis.fullDadeIsometryData
+        (OddOrder.Peterfalvi.S04.Hypothesis.HConjInvariant.of_forall_H_eq_bot _ (fun _ => rfl))))
+
 end Section16CharacterData
 
 /-- **Peterfalvi §13 coherent Dade-grid producer** (`sorry`) — *lane-b*

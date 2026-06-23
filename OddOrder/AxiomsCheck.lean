@@ -5966,3 +5966,10 @@ formula together with the prime computation `coprimeFrobeniusAction_card_eq_prim
 #assert_only_allowed_axioms OddOrder.Section16CharacterData.rowT_zero
 #assert_only_allowed_axioms OddOrder.Section16CharacterData.omegaS_eq_omegaT
 #assert_only_allowed_axioms OddOrder.Section16CharacterData.nuT_definition
+-- **cd `tau3` (piece 5, real Dade σ-integral)** — `tau3W` is the Peterfalvi (3.2) σ-isometry of the
+-- G-internal TI-cyclic structure on `W = tp.W = mp.K ⊔ mp.Kstar` (support `Ẑ = W \ (W₁ ∪ W₂) =
+-- S14.zTilde`), as an `IntegralCharacterMap`.  The TI-set fact is read off the proven `BG §14
+-- typeP_duality` (Theorem 14.7), the Dade isometry from the general §4 producer
+-- `S04.Hypothesis.fullDadeIsometryData` (`HConjInvariant` automatic since all `H(a) = ⊥`).  The
+-- genuine (not formal) `τ₃` so that `η = τ₃ ∘ ω` is a real virtual character downstream.  Axiom-clean.
+#assert_only_allowed_axioms OddOrder.Section16CharacterData.tau3W
