@@ -3067,6 +3067,9 @@ set_option linter.style.longLine false in
 -- the chosen κ-Hall pairing factor, built from the BG §14/§16 type-`P` theory (complement +
 -- centralizer law).  Lets the cd producer index the `ω`/`μ`-grids by `tp.W₁ = mp.K` directly.
 #assert_only_allowed_axioms OddOrder.certainTypeHypothesis_of_typeP_kappaHall
+-- The two members' certain-type machinery wired to `mp` (S-side `W₁ = mp.K`, T-side `W₁ = mp.Kstar`).
+#assert_only_allowed_axioms OddOrder.Section16MaximalPair.certainTypeS
+#assert_only_allowed_axioms OddOrder.Section16MaximalPair.certainTypeT
 
 /-! ### BG Appendix C (finite-field norm-set argument). -/
 
