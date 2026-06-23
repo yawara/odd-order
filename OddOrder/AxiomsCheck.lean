@@ -5931,3 +5931,18 @@ formula together with the prime computation `coprimeFrobeniusAction_card_eq_prim
 #assert_only_allowed_axioms OddOrder.Section16CharacterData.gridEquivE_T_coe
 #assert_only_allowed_axioms OddOrder.Section16CharacterData.gridEquivE_T_mem_W1
 #assert_only_allowed_axioms OddOrder.Section16CharacterData.gridEquivE_T_mem_W2
+-- **cd `nu_definition` (piece 3, S/T-shared-`ω` symmetry)** — the harder of the two real Prop
+-- obligations of the cd producer.  The shared `ω`-grid is re-expressed through `certainTypeT` by
+-- transporting the S-side index characters along `eTS` (G-element-preserving): `eTS_gridEquivE_T` is
+-- the round-trip; `colT_apply_mem_K`/`rowDualT_apply_mem_Kstar` are the matching of the T-side duals
+-- with the S-side index characters; `rowDualT_zero`/`rowT_zero` pin the `j = 0` trivial base (needs the
+-- step-A `chi2enum_zero`).  `omegaS_eq_omegaT` is the symmetry (`monoidHom_eq_of_eqOn_W1_W2`), and
+-- `nuT_definition` is the `Ind_W^T(ω_{ij} − ω_{i0}) = δ'_i(ν_{ij} − ν_{i0})` identity (mirror of
+-- `muS_definition`, via `S06.induce_chiColumn_diff_mu_diff` T-side).  All axiom-clean.
+#assert_only_allowed_axioms OddOrder.Section16CharacterData.eTS_gridEquivE_T
+#assert_only_allowed_axioms OddOrder.Section16CharacterData.colT_apply_mem_K
+#assert_only_allowed_axioms OddOrder.Section16CharacterData.rowDualT_apply_mem_Kstar
+#assert_only_allowed_axioms OddOrder.Section16CharacterData.rowDualT_zero
+#assert_only_allowed_axioms OddOrder.Section16CharacterData.rowT_zero
+#assert_only_allowed_axioms OddOrder.Section16CharacterData.omegaS_eq_omegaT
+#assert_only_allowed_axioms OddOrder.Section16CharacterData.nuT_definition
