@@ -681,7 +681,30 @@ M*-positioning）は**未再構成 = 真の残 math gate**。Lemma 12.11 proof /
   - **残 = type-F の M'≤F(M) のみ・now ungated** (C_Y(E₁)=1 gate 消滅): `exists_subgroupESetup` (一般 M) → M'=Mσ⊔E' (`derivedInG_eq_Msigma_sup_derivedInG_complement`) → E'≤C(Mσ) (Lem 12.19 `derivedE_centralizes_betaComplement` + W=Mσ [π(Mσ)∩β=∅]) → E'≤C_G(Mσ)⊓M≤F(M) (`fitting_decomposition` F=(C⊔MF)) + Mσ≤F(M) ⟹ sup_le。**M' nilpotent 経由不要**、crux = W=Mσ の Hall plumbing のみ
 - [ ] Thm A `theoremA_maximal_structure` (S16:144) — Lemma 15.1 + Prop 14.2 + §15 で全 conjunct
 - [~] Thm C `theoremC_paired_structure` — **11/12 conjunct DONE** (conjunct 10 = BG C(9) `A0-A` TI を `491bdd3d` で完全証明、残 = conjunct 2 (Cor 14.12) のみ)。旧: 10/12 + faithfulness 修正 2 件 DONE (`8f636b54`/`ec711630`/`378e91cf`/`dc2fe378`, 2026-06-21)。残 = conjunct 2 (N(U)⊄M=Cor 14.12)/10 (A0-A TI=Thm A(3)(5)) のみ (conjunct 11 は 15.7(a) で close)
-- [ ] Prop 16.1 配線 `proposition_type_classification` (S16:894) + AxiomsCheck 登録
+- [~] Prop 16.1 配線 `proposition_type_classification` — **hFI 部分着地 (cont.¹², `078a0b88`)**: TI-case 完成、残 = ¬TI の BG 15.7(e)。他 6 bridge 未
+
+## cont.¹² (2026-06-23) — `hFI` (type-F ⟹ type-I) を bare sorry → 構造化
+
+`proposition_type_classification` の `case hFI` を bare sorry から `isTypeI_of_isTypeF` の cite に置換。
+**新 5 宣言 (S16_MainResults, commit `078a0b88`, full build 3881 green)**:
+
+- `normalizer_eq_self_of_subgroupOf_normal_of_ne_bot` (axiom-clean): nontrivial M-normal H ⟹ N_G(H)=M
+  (`normalizer_Msigma_eq_self` の一般化)。
+- `normalizer_fittingInAmbient_eq_self` (axiom-clean): N_G(F(M))=M (F(M)◁M + `fitting_ne_bot_of_solvable_nontrivial`)。
+- `maxNilpotentNormalHall_sharp_isTISubset_of_fittingIsTI` (axiom-clean): **Pf (8.3)(a) TI-case** =
+  `FittingIsTI M ⟹ M_F#` TI。M_F≤F(M) ⟹ M_F#-overlap が F(M)#-overlap ⟹ g∈N(F(M))=M≤N(M_F)。
+- `isTypeF_groupTheory_of_isTypeF`: `S14.IsTypeF M ⟹ GroupTheory.IsTypeF M` (TypeFData 構成、K=⊥ + (κ∪σ)'-Hall U、
+  **U≠⊥ = `SubgroupESetup.E_ne_bot`** = σ-complement 非自明)。typeFData_of_kappa_eq_bot 経由ゆえ Theorem A に transitive-gated。
+- `isTypeI_of_isTypeF`: hFI 組立 = TypeFData + `alternative` を `by_cases FittingIsTI M` で分割。**TI-case 実証明、¬TI-case sorry**。
+
+**⚠ cont.¹¹「hFI は hderF と同型・最も近い勝ち筋」は楽観だった**: `TypeIData.alternative` (Pf (8.3) 3-way: M_F# TI /
+M_F abelian rank 2 / exponent-cyclic) は hderF (TypeFData のみ) に無い deep field = **BG Thm 15.7(e) `nonTI_Fitting_structure`**
+(Coq BGsection15.v:939, ~150 行, `E1X_facts` rank-core + uniqueness theory)。`fitting_not_ti_cases` の (e) 選言は
+トートロジー `abelian∨¬abelian` に弱体化済ゆえ供給せず。
+
+**▶ 次 = BG Thm 15.7(e) ¬TI trichotomy 形式化**。missing major theory ではない (repo: `IsUniquelyMaximal`/S09_Theorem91=BG Thm 9.1/
+`rank_lt_three_of_le_two_maximals`)。multi-session、de-risk 推奨 (Coq 精読済 + ChatGPT consult)。
+**forward bridges 全て同 trichotomy 系 (hFI/hP1neIIIIV/hP1eqV); reverse bridges は forward + abstract 型 mutual-exclusivity (carrier=lane-c) に還元**。
 
 ## 完了条件
 
