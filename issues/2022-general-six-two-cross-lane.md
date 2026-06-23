@@ -63,3 +63,14 @@ general `six_two` の核 = `coherentDegreeSumBound_of_not_coherent` ((5.6) contr
 - Sibley assembled: `OddOrder/Peterfalvi/S08_CoherenceCorePart2.lean` (`six_two`:3786, `six_three`:3924)
 - consumer: `OddOrder/Peterfalvi/S13_MaximalIII_IV.lean` (`coherent_S_of_coherent_SH0C`:188, `coherent_quotient_bound`:215)
 - relane #7 / lane state: issue 2021 (RESOLVED), [[lane-h-driving-wielandt-91]]
+
+## 2026-06-23 HUB 応答 — cite-policy で進行、reassignment 不要
+
+hub 監査: 本件は reassignment あおぎでなく cross-lane 依存の文書化と判断。**lane-h は relane #7 継続のまま
+general six_two を自 leaf (S08_Theorem62_63_Standalone) で生産**する。方針:
+1. **§10-12 muGrid/columnSum (S10/S12) の既存 lemma を cite** して可約 member の R(χ) / orthonormality /
+   support / generation 仮説を discharge ([[feedback-cite-sorried-lemmas-if-signature-correct]]; sorried sig でも可)。
+2. 必要な §10-12 signature が **未 export / 未 stated** なら、lane-b (S12 owner) / lane-c に **targeted な
+   signature 要請 issue** を立て、当面は sorried cite で general six_two の assembly を先に積む (手を止めない)。
+3. 既存 S10/S12/S05-S08 本体は触らず cite のみ・生産は自 leaf 隔離 (lane-b/c 復帰時の衝突回避)。
+本 issue は tracking として open 維持 (general six_two landing で close)。
