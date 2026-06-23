@@ -58,3 +58,23 @@ cd producer を精査し **feasible・全 character 理論 in-stock** と確定 
 - 構築入口: `typePData_toS06Hypothesis` (`S12:660`), `typePData_of_isTypeNonI`, `Hypothesis.muGrid`/`chiColumn`
 - 上流前提: (6.8) `sibleySetup_is_coherent` (DONE)
 - 関連: 8014 (maximalPair✅) / 7005 (typeP_structure✅) / 2009 (POLE-2)
+
+## 進捗 (2026-06-23, lane-b 再開²) — HUB 1011 解決 + grid=real 確定 + 完全攻略計画
+
+正本 = `notes/peterfalvi/s12_s10_character_bridge.md` 更新¹⁷。要点:
+
+1. **✅ HUB 1011 (cd-grid индexing gate) を lemma で解決** (commit `c7bfe4a0`, build-green, 全 full build 3881 green):
+   `Section16TypePStructure.W1_eq_K`/`.W2_eq_Kstar`/`.W_eq_kappa_join` (任意 tp、producer reduction 不要、
+   cyclic-subgroup uniqueness)。cross-lane field-add は不要 (issue 1011 更新済 `e04b055e`)。
+   cd は `tp.W1_eq_K hG` cite で grid を mp.K に align 可能に。
+
+2. **⚠ 確定: cd grid は real character 必須** (formal grid 不可)。`hyp.base.eta`(=tau3∘omega) が
+   S16_NonExistenceG で `OddIntegerInner betaL (eta_{0j})` として consume され、これは `typeI_orthogonality_dichotomy`
+   (S15 現 sorry) 由来。lane-h が将来この sorry を埋める際 η が real でないと証明不能 ⟹ formal grid は POLE-2 を
+   unfulfillable 化 ([[scaffold-sorry-free-not-done]])。∴ real certain-type grid を組む。
+
+3. **完全攻略計画** (材料全 in-stock、多セッション): omega=certainTypeS.chiColumn transport / mu=columnFamily.mu /
+   delta=.sign / nu=certainTypeT (crux=S/T-shared-omega 同定) / mu_def/nu_def=induce_chiColumn_diff_mu_diff transport /
+   tau3=`TICyclicHypothesis.sigmaIntegral` of a W-in-G TICyclicHypothesis (real Dade、要§5/§13 TI-cyclic 構成) /
+   tauS/tauT/Sset/A0S=free field (§7 Dade / inducedFamily / supportInSubgroup)。
+   着手順: S-side (omega+mu+mu_def, χ₂(j) enumeration 要) → S/T-shared-omega (最難) → tau3 → free field → pack。

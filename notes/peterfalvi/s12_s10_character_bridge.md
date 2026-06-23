@@ -103,6 +103,60 @@ field 追加 (producer は rfl で discharge) or 補題提供。**HUB issue 起�
 - **W は OK**: tp.W = mp.S⊓mp.T = mp.K⊔mp.Kstar (`typeP_pair_W_structure` hWjoin) ⟹ cd.omega の codomain tp.W は
   mp.K の certain-type W と一致 (subgroup 等式で transport)。問題は **W₁/W₂ の direction (index)** のみ。
 
+## ★★★ 2026-06-23 更新¹⁷ — **HUB 1011 を lemma で解決 (field-add 不要) + cd grid は real が必須と確定 + 完全攻略計画**
+
+本セッション (lane-b 再開) 成果。
+
+### ✅ HUB 1011 RESOLVED (commit `c7bfe4a0`, build-green) — 更新¹⁶ の cross-lane gate が消滅
+
+更新¹⁶ の「tp.W₁ が mp.K に未 pin、cross-lane」は **lemma で lane-b 内部解決**。任意 `tp` に対し:
+- `Section16TypePStructure.W1_eq_K hG tp : tp.W1 = mp.K` / `.W2_eq_Kstar : tp.W2 = mp.Kstar`
+  / `.W_eq_kappa_join : tp.W = mp.K ⊔ mp.Kstar` (全 FeitThompson.lean, lane-b cd 領域)。
+- 証明: `tp.W = mp.S⊓mp.T` (field) `= mp.K⊔mp.Kstar` (`Section16MaximalPair.W_structure`=typeP_pair_W_structure ラッパ)、
+  W1/K は cyclic W の唯一の位数-q 部分群・W2/K* は唯一の位数-p (`Ch06.eq_of_card_eq_prime_of_isCyclic`)。
+  順序 q<p (q_lt_p) と |K|<|K*| (K_lt_Kstar) が labelling 一致。helper `card_mul_eq_of_disjoint_sup_le_isCyclic`。
+- **producer reduction 不要・構造改変不要**。HUB 1011 は CLOSED 済 (hub routing=lane-c field-add) だが、本 lemma 解で
+  **lane-c の field-add は不要** (issue 1011 に明記、commit `e04b055e`)。⟹ cd は grid を `tp.W1_eq_K` cite で align。
+
+### ⚠⚠ 確定: **cd grid は real character でなければならない** (formal grid は POLE-2 を証明不能化)
+
+S15.Hypothesis の grid 制約は `mu_definition`/`nu_definition`/`eta_eq_tau_omega`/`m_eq` のみ (Sset/tauS/A0S/tau3 は
+free field)。⟹ 「formal grid (μ:=Ind(ω), δ:=1) で mu_definition を trivial に満たす」誘惑がある。**だが不可**:
+- 下流調査: `hyp.base.eta` (= `tau3∘omega`) が **S16_NonExistenceG で consume** される
+  (`typeI_eta_axes_odd_of_caseB_gap` 等が `S15.OddIntegerInner betaL (eta_{0j})` = ⟨betaL, η⟩ が奇整数を主張)。
+- この OddIntegerInner は `orth : TypeIOrthogonalityData` 由来で、`typeI_orthogonality_dichotomy`
+  (S15_SAndT:1833, **現 sorry**) が hyp から構成。lane-h が将来この sorry を埋めるとき **η が real でないと証明不能**
+  (⟨betaL, 0⟩=0 は偶整数で OddIntegerInner 偽)。
+- ∴ formal grid は [[scaffold-sorry-free-not-done]] の罠 = POLE-2 を unfulfillable 化。**cd は real grid 必須**。
+
+### 完全攻略計画 (real grid、次セッション実行用)
+
+材料は全て in-stock。pieces:
+1. **omega** (`Fin tp.q → Fin tp.p → ClassFunction ↥tp.W ℂ`): `certainTypeS.chiColumn χ₂(j) i` を
+   `↥(certainTypeS.sdiffTICyclicHypothesis.W)` (=`(mp.K⊔mp.Kstar).subgroupOf mp.S`、`↥mp.S` 内) から
+   `↥tp.W` (G 内) へ transport (`tp.W=mp.K⊔mp.Kstar≤mp.S` ゆえ `map mp.S.subtype` / `subgroupOfEquivOfLe`)。
+   i-reindex: `Fin tp.q ≃ Fin (Nat.card certainTypeS.W1)` (tp.q=|mp.K|=|certainTypeS.W1|、`Fin.cast`/Equiv)。
+   **sdiffTICyclicHypothesis.W = h.W1⊔h.W2** を確認要 (`toTICyclicHypothesisOfV` の .W field)。
+2. **mu** (`↥mp.S`): `(certainTypeS.columnFamily χ₂(j)).mu i`、i-reindex。**delta**: `.sign`。
+3. **nu** (`↥mp.T`): `certainTypeT.columnFamily`。**crux = S/T-shared-omega**: nu_definition は mu と同じ omega を要す。
+   certainTypeS.chiColumn (↥mp.S 内) と certainTypeT.chiColumn (↥mp.T 内) が **同一 W-linear-char**であることを
+   示す要 (`TICyclicHypothesis.omega χ = linearIrreducibleCharacter χ` ambient 非依存、更新¹⁵ 論拠)。両者を
+   ↥tp.W に transport して一致させる。**最難所**。
+4. **mu_definition/nu_definition**: `S06.induce_chiColumn_diff_mu_diff` (済) を transport。`Ind` の codomain は
+   `tp.W.subgroupOf mp.S` (Section16CharacterData) vs `h.sdiffTICyclicHypothesis.W` (=同じ subgroup、要 W 同定)。
+   compHom transport + i-reindex の cast 整合。**Fintype binder desync 注意** (更新¹⁵ 警告: certain-type 級で組む)。
+5. **tau3** (`IntegralCharacterMap ↥tp.W G`): `TICyclicHypothesis.sigmaIntegral` (`S05_IntegralSigma:49`) of a
+   **TICyclicHypothesis G for W=tp.W** + `FullDadeApplication`。W=S∩T の G 内 TI-cyclic 構造 (§5/§13) を構成要。
+   eta:=tau3∘omega が real η に。
+6. **tauS/tauT** (`IntegralCharacterMap ↥mp.S G` / `↥mp.T G`): §7 maximal-subgroup Dade map (Sibley/Dade)。
+   **free field (Section16CharacterData に Prop 制約なし)** だが POLE-2 が将来 consume するか要確認 (eta と違い現状 consume 0)。
+7. **Sset/Tset/A0S/A0T**: `inducedFamily` / `supportInSubgroup (typePA0 …)` (更新¹⁵ 推奨)。**free field**。
+8. **pack** → `Section16CharacterData mp tp`。
+
+**着手順**: piece 1+2+4 (S-side、mu_definition) を先に固める (self-contained、χ₂(j) enumeration が要)。
+χ₂(j): cyclic W2 (位数 p) の dual を `Fin tp.p` で列挙 (生成元+原始 p 乗根、`Fin tp.p ≃ W2-dual`)。
+次に piece 3 (S/T-shared-omega、最難) → piece 5 (tau3) → 残 free field → pack。**多セッション**。
+
 ## ✅✅✅✅✅✅ 2026-06-23 更新¹⁴ — **Pf (10.6) + (2.7) + (10.9) COMPLETE** (1 session, sorry 5→3)
 
 **本セッション成果 (lane-b, 全 build-green + axiom-clean modulo §10 muGrid 上流 gate)**:
