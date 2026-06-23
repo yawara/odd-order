@@ -2187,7 +2187,33 @@ theorem proposition_type_classification [Finite G]
       (S15.MF M = OddOrder.BG.Ch3.S10.Msigma M ↔
         OddOrder.GroupTheory.IsTypeI M ∨ OddOrder.GroupTheory.IsTypeII M ∨
           OddOrder.GroupTheory.IsTypeV M) := by
-  sorry
+  -- Apply the `§14`/`§15`-independent assembly engine, supplying the inputs that are *proved*
+  -- (`hP2II` = `isTypeII_of_isTypeP2`, issue 7007 cont.¹¹; `hP_derived`/`hF_not_derived` = Theorem
+  -- C(3)/A(3); `h152a` = Theorem 15.2(a)) and leaving the genuinely-gated bridges as the residual.
+  -- The 7 remaining bridges (issue 8015) all bottom out on either the carrier `W₁`/`U`-Hall
+  -- characterization (`TypePData` carries `W₁`/`U` abstractly, so `π(W₁) ⊆ κ(M)` / `U = (κ∪σ)'`-Hall
+  -- need the BG structure theory — the `→ M_P` direction `hIIP2`/`hIIIIVP1`/`hVP1` and the reverse
+  -- `hIF`), or the deep Type-I/V trichotomies (`hFI` = Peterfalvi (8.3) = BG Theorem 15.7(d)(e)
+  -- `nonTI_Fitting_structure`, not yet formalized; `hP1neIIIIV`/`hP1eqV` = (8.3)/(8.8)).
+  refine proposition_type_classification_of_inputs
+    ?hFI (fun hP2 => isTypeII_of_isTypeP2 hG hM hP2) ?hP1neIIIIV ?hP1eqV ?hIF ?hIIP2 ?hIIIIVP1 ?hVP1
+    (typeP_exists_hall_derived_eq hG hM) (typeF_not_exists_hall_derived_eq hG hM)
+    (fun hne => isTypeP1_of_mf_ne_msigma hG hM hne)
+  -- `hFI` (Type F ⟹ Type I): Peterfalvi (8.3) trichotomy / BG Theorem 15.7(d)(e).
+  case hFI => sorry
+  -- `hP1neIIIIV` (Type P₁, `M_F ≠ M_σ` ⟹ Type III/IV): Peterfalvi (8.3) + Frattini.
+  case hP1neIIIIV => sorry
+  -- `hP1eqV` (Type P₁, `M_F = M_σ` ⟹ Type V): Peterfalvi (8.8) trichotomy.
+  case hP1eqV => sorry
+  -- `hIF` (Type I ⟹ Type F): read off `κ(M) = ∅` from the `TypeIData` (carrier-gated).
+  case hIF => sorry
+  -- `hIIP2` (Type II ⟹ Type P₂): `π(W₁) ⊆ κ(M)` (carrier `W₁ = κ`-Hall, issue 8015).
+  case hIIP2 => sorry
+  -- `hIIIIVP1` (Type III/IV ⟹ Type P₁ ∧ `M_F ≠ M_σ`): `π(W₁) ⊆ κ(M)` + `M_F ≠ M_σ` (carrier).
+  case hIIIIVP1 => sorry
+  -- `hVP1` (Type V ⟹ Type P₁ ∧ `M_F = M_σ`): `M_F = M_σ` proved (`mf_eq_msigma_of_typePData_U_eq_bot`),
+  -- but `IsTypeP1` still needs `π(W₁) ⊆ κ(M)` (carrier `W₁ = κ`-Hall, issue 8015).
+  case hVP1 => sorry
 
 /-- **Type I and non-Type-I are mutually exclusive** (corollary of Proposition
 16.1(a)–(d)).  A maximal subgroup of a minimal simple group of odd order that is
