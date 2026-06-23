@@ -31,8 +31,8 @@ productive な独立クラスタに乗せ、上流優先方針 (CLAUDE.md) に�
 | レーン | branch | 機能 (frontier クラスタ) | 所有ファイル | 自動合流 |
 |---|---|---|---|---|
 | **F** | `lane-f` | **BG §14-16 構造** | `S14_TypePCounting`/`S15_MF`/`S16_MainResults`/`S16_PairIntersection` + `FeitThompson.lean` の §16 producer。Theorem A-I / Prop 16.1 | ✅ |
-| **B** | `lane-b` | **Pf §12/§13 Dade char-grid** | `S12_MaximalIII_IV_V`/`S13_MaximalIII_IV`。char grids/parameters。**`S10_MinimalSimpleStructure` は driver (BG §16 gated、pure wiring)、常駐作業しない** | ✅ |
-| **H** | `lane-h` | **Pf §14_MaximalI (type I)** | `S14_MaximalI` (type I、15 sorry)。**S15_SAndT は触らない (2026-06-23 C 移譲)、S11 も触らない (driver)** | ✅ |
+| **B** | `lane-b` | **Pf §12 Dade char-grid + cd assembly** | `S12_MaximalIII_IV_V` + `section16CharacterData` (POLE-1 cd, §3-§13 束ね)。**`S13` を H 移譲 (2026-06-23)、`S10` は driver** | ✅ |
+| **H** | `lane-h` | **Pf §13 char-grid (type III/IV)** | `S13_MaximalIII_IV` (active, 8 sorry) + `S14_MaximalI` (driver, (12.9) は Prop16.1 待ち=自己復帰)。**S15/S11/S12 は触らない** | ✅ |
 | **C** | `lane-c` | **Pf §15 S&T** | **`S15_SAndT` (S&T 構造、36 sorry、2026-06-23 H→C 移譲)**。依存 §15→§14 ゆえ §14 を cite のみ。**`S11`/`S16_NonExistenceG` は driver (上流 landing 時に機会的 close)、常駐しない** | ✅ |
 
 > **⚠ 2026-06-23 relane (ユーザー裁可、issue 4007)**: lane-c の §11 ungated 枯渇 (9.1-9.7 完了) を受け hub が
@@ -40,6 +40,12 @@ productive な独立クラスタに乗せ、上流優先方針 (CLAUDE.md) に�
 > (S14_MaximalI 15 + S15_SAndT 36) を 2 レーンに分割**: **S15_SAndT を H→C 移譲**、H は S14_MaximalI に集中。
 > S15_SAndT は S14_MaximalI を import (依存方向 §15→§14) ゆえ signature-first 境界がクリーン (co-edit なし)。
 > §11 は driver 化 ((9.8)-(9.11) は lane-b char 待ち)。各 LAUNCH.md 更新済。
+
+> **⚠ 2026-06-23 relane #2 (hub 判断、issue 8018+2017、レーン等価方針)**: F と H が同時に ungated 枯渇を報告 →
+> hub が **価値+独立性**で再配置 (レーンに専門/強みは無く等価 [[lanes-are-equivalent-no-specialty]])。
+> **lane-f = hderF deep 投資** (Prop 16.1 hP2II 主 gate、ユーザー裁可)。**lane-h = §13 (S13_MaximalIII_IV) を
+> lane-b→H 移譲** (§13 は §12 下流・lane-b 非編集 ⟹ signature-first 独立、§13→POLE-1 cd で critical path)。
+> lane-h の S14_MaximalI は driver 化 ((12.9) は Prop 16.1 landing で自己復帰 close)。B は §12 + cd assembly に集中。
 
 **signature-first interface**: 上流が sorried signature を export → 下流が cite。真の cross-lane 依存は narrow。
 signature 不足は notes/issue 経由。**driver (§16/§10)**: 常駐レーンを当てず、上流が landing したとき hub or
@@ -126,8 +132,8 @@ branch とも削除済み。旧 **A** / **D** も同様に退役済み (履歴�
 > | lane | 所有 .lean（これ以外の Pf/BG S-ファイル編集 = 逸脱→停止） |
 > |---|---|
 > | **F** (lane-f) | `OddOrder/BG/**`（BG 全体）+ `OddOrder/FeitThompson.lean` |
-> | **B** (lane-b) | `OddOrder/Peterfalvi/S0[3-9]*` + `S10*` + `S12*` + `S13*`（Pf char API + §12/§13; **S11 除く**） |
-> | **H** (lane-h) | `OddOrder/Peterfalvi/S14_MaximalI*`（type I; 2026-06-23 S15 を C 移譲） |
+> | **B** (lane-b) | `OddOrder/Peterfalvi/S0[3-9]*` + `S10*` + `S12*`（Pf char API + §12 + cd assembly; **S11/S13 除く**, 2026-06-23 S13 を H 移譲） |
+> | **H** (lane-h) | `OddOrder/Peterfalvi/S13*` (active) + `S14_MaximalI*` (driver)（type III/IV char-grid + type I driver; 2026-06-23 S13 受領, S15 を C 移譲） |
 > | **C** (lane-c) | `OddOrder/Peterfalvi/S15*`（S&T = S15_SAndT; 2026-06-23 H→C 移譲。S11 は driver で非所有） |
 > | **共有（全 lane 可）** | `OddOrder/AxiomsCheck.lean` / `OddOrder.lean` / `OddOrder/GroupTheory/**` / `notes/**` / `issues/**` |
 
@@ -142,7 +148,7 @@ branch とも削除済み。旧 **A** / **D** も同様に退役済み (履歴�
    **マージせず（trial merge も開始しない）**、⛔ に従いループ停止（abort 不要 = まだ merge していない、
    `CronDelete` + 報告 + 以降の tick を行わない）。報告には逸脱ファイル名 + lane + 所有者を明記。例 (lane=$b):
    ```
-   owned_re='…'   # 🔒 マップから (F=^OddOrder/BG/|^OddOrder/FeitThompson; B=^OddOrder/Peterfalvi/S(0[3-9]|10|12|13); H=^OddOrder/Peterfalvi/S14_MaximalI; C=^OddOrder/Peterfalvi/S15)
+   owned_re='…'   # 🔒 マップから (F=^OddOrder/BG/|^OddOrder/FeitThompson; B=^OddOrder/Peterfalvi/S(0[3-9]|10|12); H=^OddOrder/Peterfalvi/S(13|14_MaximalI); C=^OddOrder/Peterfalvi/S15)
    shared_re='^OddOrder/AxiomsCheck\.lean$|^OddOrder\.lean$|^OddOrder/GroupTheory/'
    git diff --name-only main...$b -- '*.lean' | grep -vE "$owned_re" | grep -vE "$shared_re" | grep . && echo "範囲逸脱 → STOP"
    ```

@@ -53,3 +53,14 @@ hub が lane-f の次タスク (hderF 続行 or 再配置先) を裁定し、LAU
 - 本セッション commits: `c3fbf4a8` (分解+TypePData) / `8f1d897f` (hP2II 還元) / docs
 - memory [[ft-endgame-two-poles]] (cont.⁸⁻⁹ entry)
 - 関連 hub issue: 4002 (lane-allocation feedback) / 4007 (lane-c relane)
+
+---
+
+## 解決 (2026-06-23, ユーザー裁可)
+
+**ユーザー裁可 = (a) hderF を deep 投資 (推奨)**。lane-f は §16 構造 frontier の唯一の clean on-path gate
+`hderF` (= `IsTypeF (derivedInG M)`、gate=`maxNilpotentNormalHall M'=M_σ` = F(M)=M_σ / Y=⊥) に
+deep 投資して続行。閉じれば Prop 16.1 hP2II 完成 → (12.9)[H] も unblock。multi-session ゆえ **まず
+ChatGPT 相談 (最強モデル) + BG §15 (Cor 15.9/Thm 15.8 周辺 τ₂(M) 構造) 精読で de-risk** してから Lean。
+詰まったら sorry 退避せず STOP+報告。真に上流 prereq (Cor 15.9 等) に bottom-out したらそこを先に
+(上流優先)。lane-f LAUNCH.md に hub 裁定ブロック追記済。CLOSED。

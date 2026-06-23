@@ -58,3 +58,26 @@ lane-h (Pf §14_MaximalI + §15 S&T) は **自セグメント内の ungated clos
 - `notes/peterfalvi/s14_maximalI.md` 「(12.9) status (resume¹²)」
 - issue 2016 (12.9 ← Prop 16.1)
 - [[ft-endgame-two-poles]] (lane-f frontier = Prop 16.1) / [[peterfalvi-work-in-worktree]] (lane layout)
+
+---
+
+## 解決 (2026-06-23, hub 判断、レーン等価方針)
+
+**ユーザー方針: レーンは等価・専門なし** ([[lanes-are-equivalent-no-specialty]]) → 「lane-h は群論が得意」
+ではなく **価値+独立性**だけで判断。hub 再監査の結論:
+
+**lane-h active = `S13_MaximalIII_IV` (Pf §13、型 III/IV char-grid、8 sorry) を lane-b→H 移譲**。
+- §13 は §12 の下流 (import S12)・lane-b は §12 active で §13 非編集 ⟹ signature-first で独立。
+- §13 → POLE-1 cd producer (`section16CharacterData`) ⟹ FT critical path 上。
+- 着手順: 構造 leaf (`secondDerived_eq_HC`/`H_elementaryAbelian`/`core_structure`) から (§12 結合弱)、
+  char leaf は §12 sorried signature を cite。未 export signature は notes/issue で lane-b に依頼。
+- **S14_MaximalI は H 所有のまま driver 化**: (12.9) は Prop 16.1 (lane-f) landing で自己復帰モニター経由
+  auto-close (issue 2016、トリガ=issue 2016 closed)。
+- B は §12 + cd assembly に集中 (§13 leaf を H から cite して assemble)。
+
+⚠ 結合トレードオフ: §13 は §12 (lane-b active) に cite 依存ゆえ完全独立でない。signature-first + notes/issue
+sync で運用。lane-f が hderF を de-risk して decomposition が判明したら、lane-h を Prop 16.1 hP2II の
+非 hderF 入力 (hcommon/hderfit) 並走支援に pivot する選択肢も将来あり。
+
+反映: lane-h/lane-b/lane-f LAUNCH.md、merge_monitor.md (所有マップ+lane表+owned_re+relane#2 note)、
+cron (`31eab271`)。CLOSED。
