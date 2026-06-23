@@ -36,9 +36,11 @@ hub の解決は次のいずれかで main / worktree に現れる。**どちら
    BASE=$(git hash-object LAUNCH.md)   # 当時の LAUNCH.md 指紋
    N=<起票した HUB issue 番号>          # 例 4007
    ```
-2. resume-monitor cron を**自セッションで** arm (CronCreate, recurring, 既定 15 分間隔
-   `6,21,36,51 * * * *` = hub の :04/:29/:54 とずらす; 速い復帰が要れば 10〜12 分に詰めてよいが
-   毎発火がフルコンテキスト cache-miss ゆえ短すぎ厳禁)。prompt は下記テンプレに `<path>`/`<BASE>`/`<N>` を埋める。
+2. resume-monitor cron を**自セッションで** arm (CronCreate, recurring, **だいたい 5 分間隔**
+   `2-59/5 * * * *` = :02/:07/…/:57、:00・:30 と hub の :07/:27/:47 を概ね避ける; ユーザー指示 2026-06-23
+   永続方針 = hub に判断を移譲して停止したら ~5 分 timer で素早く自動復帰)。prompt は下記テンプレに
+   `<path>`/`<BASE>`/`<N>` を埋める。(注: 5 分は prompt cache TTL 境界ゆえ各発火は概ね cache-miss だが、
+   hub 解決を速く拾う優先でこの間隔を採用。)
 3. 1 行「hub 判断待ちで停止、自己復帰モニター arm (cron <id>, issue <N>)」を残して idle。
 
 ### resume-monitor cron prompt テンプレ

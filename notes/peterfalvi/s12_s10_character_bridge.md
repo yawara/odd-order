@@ -5,7 +5,19 @@
 > 上位文脈 = 記憶 [[ft-endgame-two-poles]] [[peterfalvi-s10-13-gated-on-bg-spine]]、
 > Lane H 視点の正本 = [`s10_13_maximal_structure.md`](s10_13_maximal_structure.md)。
 
-## ✅✅✅✅✅✅ 2026-06-23 更新¹⁴ — **Pf (10.6) 全体 COMPLETE** ((a)+(b)) + §10 frontier 評価
+## ✅✅✅✅✅✅ 2026-06-23 更新¹⁴ — **Pf (10.6) + (2.7) + (10.9) COMPLETE** (1 session, sorry 5→3)
+
+**本セッション成果 (lane-b, 全 build-green + axiom-clean modulo §10 muGrid 上流 gate)**:
+1. **(10.6) 全体 COMPLETE** (issue 1009 CLOSED): `tau1_values_and_norm_bound` sorry-free。下記詳細。
+2. **(2.7) `tau_inner_trivial`** (`39e35ae4`, 完全 axiom-clean): A_0-supported φ で ⟨φ^τ,1_G⟩=⟨φ,1_M⟩
+   (§4 adjoint_formula を χ=1_G で)。(10.9) の a_00 step に使用。
+3. **(10.9) COMPLETE** (`4c4d86cf`, de-opaque `orthogonality_w1_lt_w2`): w₁<w₂ で `ζ^τ₁ ⊥ (Irr W)^σ ∧ ‖ζ^τ₁‖²=1`。
+   ψ=(μ_0−ζ)^τ=∑ω_i0^σ−ζ^τ₁ (STEP 1) + **2D product `exists_alignedOmegaSigmaGrid_chiFam_product` (既存!)** +
+   a_00=1 ((2.7)+`muColumnZero_inner_trivial` 新 helper) + NC(ψ)≤w₁+1<2w₁ (support cover + `ncard_inner_chiFam_ne_zero_le_one`)
+   + (3.8) `sigmaCoeff_trichotomy` で single-column-κ0 に pin (all-zero/single-row 排除)。
+   - **🔑 教訓 (再)**: 「(10.9) は 2D 構造 linchpin 要・deep」は誤りだった (2D product は既に S12:1163 在庫)。本セッション
+     だけで「(5.8) gated」「(3.9) 新規」「2D 構造 missing」の 3 悲観評価が全て覆った。**§10 の gating ラベルは
+     在庫確認してから信じる** ([[scaffold-sorry-free-not-done]] の逆 = 悲観も誤りうる)。
 
 **(10.6) 完全形式化完了** (issue 1009 CLOSED): `tau1_values_and_norm_bound` (S12) sorry-free + axiom-clean
 (§10 muGrid 上流 gate のみ)。opaque carrier field `zeta_tau1_norm_bound : Prop` を削除。commits
@@ -38,10 +50,15 @@
     - ‖μ_0‖²=w₁ (`muGrid_column_sum_inner_self`) + ‖ζ‖²=1 ⟹ ‖μ_0−ζ‖²=w₁+1 ✅; STEP 1 分解 ✅
   - ⚠ **残り確認/構築 (assembly 内)**: `sigmaNC<2w₁` 境界 (‖ψ‖²=w₁+1<2w₁ from w₁>1; sigmaNC≤‖ψ‖² Bessel 要確認)、
     μ_0⊥ζ (degree mismatch)、ψ vanish on V (μ_0−ζ A_0-supported + 誘導 vanishing)、trichotomy 列同定。
-  - **∴ (10.9) = in-stock 部品の ~250-300 行 assembly** (深い新規構造 不要)。**文書順次・tractable な次 target**。
-    gap = sigmaNC bound + 小 orthogonality のみ。(2.7) `tau_inner_trivial` は構築済 building block。
-- **(10.10)/(10.11)** typeV 除去・case-B prime orders: opaque field + coherence、(10.8)/§6(6.8)/§8(8.7) 依存。
-- **∴ 次 = (10.9) assembly** (tractable, 全部品在庫)。(10.7)/(10.8) は §8 (8.8/Type II) prereq gated で light-touch。
+  - ✅✅✅ **(10.9) COMPLETE** (`4c4d86cf`)。上記「本セッション成果」参照。
+- **(10.10)/(10.11)** typeV 除去・case-B prime orders: opaque field + coherence、**(10.8)**/§6(6.5/6.8)/§8(8.7) 依存。
+  `typeV_forces_coherence` (S12:5751) は (6.8)[done]+(6.4)/(6.5) p-群還元+(8.7) Type V 構造 = §8-gated。
+- **∴ §10 残り 3 sorry ((10.7)/(10.8)/(10.10)) は一様に §8-gated/大型 analytic** ((10.9) が tractable な最後だった):
+  - (10.7) typeII_derived_frobenius = §8 (8.8/8.13/8.18) Type II 構造 + (5.8) full-column。
+  - (10.8) S_not_coherent (keystone) = (10.6.b)[done, 本セッション unblock] + (7.5)/(7.8.b) §7 counting + §8 + (10.7)。
+  - (10.10) typeV = (10.8) + (6.5)/(8.7)。
+  これらは §8 (8.8 Type II partner 等) prereq = **lane-f/§14 territory** に依存。lane-b char-API 単独では進めにくい
+  → hub と §8 prereq の所在/分担を相談 (HUB issue 候補)、または Pf §12/§13 char-grid の別 target へ。
 
 ## ✅✅✅✅✅ 2026-06-23 更新¹³ — (10.6)(a) summed isometry COMPLETE (linchpin landed, σ-endgame 回避)
 
