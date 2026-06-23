@@ -843,6 +843,131 @@ noncomputable def Section16MaximalPair.certainTypeT {G : Type*} [Group G] [Finit
       BG.Ch4.S14.card_kappaHall_ne_one mp.S_typeP mp.K_le_S mp.K_hall
         (Subgroup.card_eq_one.mpr hbot))
 
+/-- Helper: in a finite group, two complementary subgroups `A`, `B` of a cyclic subgroup `W`
+(`A ⊔ B = W`, `A ⊓ B = ⊥`) have `|A|·|B| = |W|`. -/
+theorem card_mul_eq_of_disjoint_sup_le_isCyclic {G : Type*} [Group G] [Finite G]
+    {W A B : Subgroup G} (hWcyc : IsCyclic ↥W) (hAW : A ≤ W) (hBW : B ≤ W)
+    (hsup : A ⊔ B = W) (hinf : A ⊓ B = ⊥) :
+    Nat.card ↥A * Nat.card ↥B = Nat.card ↥W := by
+  haveI := hWcyc
+  letI : CommGroup ↥W := IsCyclic.commGroup
+  haveI : (A.subgroupOf W).Normal := inferInstance
+  have hinf' : (A.subgroupOf W) ⊓ (B.subgroupOf W) = ⊥ := by
+    rw [eq_bot_iff]; intro x hx
+    obtain ⟨hxA, hxB⟩ := Subgroup.mem_inf.mp hx
+    rw [Subgroup.mem_subgroupOf] at hxA hxB
+    have hxAB : (x : G) ∈ A ⊓ B := ⟨hxA, hxB⟩
+    rw [hinf, Subgroup.mem_bot] at hxAB
+    rw [Subgroup.mem_bot]; exact Subtype.ext hxAB
+  have hsup' : (A.subgroupOf W) ⊔ (B.subgroupOf W) = ⊤ := by
+    rw [← Subgroup.subgroupOf_sup hAW hBW, hsup, Subgroup.subgroupOf_self]
+  have h := card_mul_card_of_complement_normal hinf' hsup'
+  rwa [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hAW).toEquiv,
+       Nat.card_congr (Subgroup.subgroupOfEquivOfLe hBW).toEquiv] at h
+
+/-- **W-structure of the canonical maximal pair** (BG Theorem 14.7, via `typeP_pair_W_structure`):
+`S ∩ T = K ⊔ K*` is cyclic, `K ⊓ K* = ⊥`, and `K`, `K*` commute.  A Hall `(κ ∪ σ)'`-subgroup of
+`S` (needed only to invoke the lemma) comes from Hall's theorem on the solvable `S`. -/
+theorem Section16MaximalPair.W_structure {G : Type*} [Group G] [Finite G]
+    (hG : IsMinimalSimpleOdd G) (mp : Section16MaximalPair G) :
+    mp.S ⊓ mp.T = mp.K ⊔ mp.Kstar ∧ IsCyclic ↥(mp.S ⊓ mp.T) ∧
+      mp.K ⊓ mp.Kstar = ⊥ ∧ (∀ x ∈ mp.K, ∀ y ∈ mp.Kstar, Commute x y) := by
+  haveI : IsSolvable ↥mp.S := hG.solvable_of_mem_maximalSubgroups mp.S_maximal
+  have hUex : ∃ U₀ : Subgroup G,
+      Ch03.IsHallSubgroup ((BG.Ch4.S14.kappa mp.S ∪ BG.Ch3.S10.sigma mp.S)ᶜ)
+        (U₀.subgroupOf mp.S) := by
+    obtain ⟨U', hU'⟩ := Ch03.hall_E_exists (G := ↥mp.S)
+      ((BG.Ch4.S14.kappa mp.S ∪ BG.Ch3.S10.sigma mp.S)ᶜ)
+    exact ⟨U'.map mp.S.subtype, by
+      rw [show (U'.map mp.S.subtype).subgroupOf mp.S = U' from
+        Subgroup.comap_map_eq_self_of_injective mp.S.subtype_injective U']
+      exact hU'⟩
+  exact BG.Ch4.S16.typeP_pair_W_structure hG mp.S_maximal mp.S_typeP mp.K_le_S mp.K_hall
+    mp.Kstar_eq hUex.choose_spec mp.T_maximal mp.T_typeP mp.S_T_not_conj mp.Kstar_le_T
+    mp.Kstar_hall mp.Z_cyclic mp.K_eq
+
+/-- **The type-`P` pairing factors are the maximal-pair κ-Hall factors** (`W₁ = mp.K`,
+`W₂ = mp.Kstar`) — the cd-grid indexing alignment (HUB 1011, resolved lane-b-internally; no
+producer reduction needed).  Both `W₁`/`K` are the unique order-`q` subgroup, and `W₂`/`K*` the
+unique order-`p` subgroup, of the cyclic `W = K ⊔ K*` (`eq_of_card_eq_prime_of_isCyclic`); the
+orderings `q < p` (`q_lt_p`) and `|K| < |K*|` (`K_lt_Kstar`) match the two labellings. -/
+theorem Section16TypePStructure.W1_eq_K_and_W2_eq_Kstar {G : Type*} [Group G] [Finite G]
+    (hG : IsMinimalSimpleOdd G) {mp : Section16MaximalPair G}
+    (tp : Section16TypePStructure mp) :
+    tp.W1 = mp.K ∧ tp.W2 = mp.Kstar := by
+  obtain ⟨hWjoin, _, hKbot, _⟩ := mp.W_structure hG
+  have hWeq : tp.W = mp.K ⊔ mp.Kstar := tp.W_eq_inter.trans hWjoin
+  haveI : IsCyclic ↥tp.W := tp.W_cyclic
+  have hKle : mp.K ≤ tp.W := hWeq ▸ le_sup_left
+  have hKstarle : mp.Kstar ≤ tp.W := hWeq ▸ le_sup_right
+  have hW1le : tp.W1 ≤ tp.W := tp.W_eq_join ▸ le_sup_left
+  have hW2le : tp.W2 ≤ tp.W := tp.W_eq_join ▸ le_sup_right
+  have hcardW : tp.q * tp.p = Nat.card ↥tp.W := by
+    rw [tp.q_eq_card_W1, tp.p_eq_card_W2]
+    exact card_mul_eq_of_disjoint_sup_le_isCyclic tp.W_cyclic hW1le hW2le tp.W_eq_join.symm
+      tp.W1_inf_W2_eq_bot
+  have hcardK : Nat.card ↥mp.K * Nat.card ↥mp.Kstar = Nat.card ↥tp.W :=
+    card_mul_eq_of_disjoint_sup_le_isCyclic tp.W_cyclic hKle hKstarle hWeq.symm hKbot
+  have hprod : Nat.card ↥mp.K * Nat.card ↥mp.Kstar = tp.q * tp.p := by rw [hcardK, ← hcardW]
+  have hKpos : 1 < Nat.card ↥mp.K := by
+    have hne := BG.Ch4.S14.card_kappaHall_ne_one mp.S_typeP mp.K_le_S mp.K_hall
+    have h0 := Nat.card_pos (α := ↥mp.K)
+    omega
+  -- arithmetic: `|K|·|K*| = q·p`, `|K| < |K*|`, `q < p` prime, `|K| > 1` give `|K| = q`, `|K*| = p`
+  have hcardKeq : Nat.card ↥mp.K = tp.q := by
+    have hlt : Nat.card ↥mp.K < Nat.card ↥mp.Kstar := mp.K_lt_Kstar
+    have hpdvd : tp.p ∣ Nat.card ↥mp.K * Nat.card ↥mp.Kstar := ⟨tp.q, by rw [hprod]; ring⟩
+    rcases (tp.p_prime.dvd_mul).mp hpdvd with hpa | hpb
+    · exfalso
+      have hple : tp.p ≤ Nat.card ↥mp.K := Nat.le_of_dvd (by omega) hpa
+      nlinarith [hprod, hlt, hple, tp.q_prime.two_le, tp.q_lt_p]
+    · obtain ⟨b'', hb''⟩ := hpb
+      have hKb : Nat.card ↥mp.K * b'' = tp.q := by
+        have h2 : (Nat.card ↥mp.K * b'') * tp.p = tp.q * tp.p := by
+          rw [mul_assoc, mul_comm b'' tp.p, ← hb'', hprod]
+        exact Nat.eq_of_mul_eq_mul_right tp.p_prime.pos h2
+      rcases (tp.q_prime.eq_one_or_self_of_dvd _ ⟨b'', hKb.symm⟩) with h1 | hq
+      · omega
+      · exact hq
+  have hcardKstareq : Nat.card ↥mp.Kstar = tp.p := by
+    have h2 : tp.q * Nat.card ↥mp.Kstar = tp.q * tp.p :=
+      calc tp.q * Nat.card ↥mp.Kstar = Nat.card ↥mp.K * Nat.card ↥mp.Kstar := by rw [hcardKeq]
+        _ = tp.q * tp.p := hprod
+    exact Nat.eq_of_mul_eq_mul_left tp.q_prime.pos h2
+  refine ⟨?_, ?_⟩
+  · have hW1card : Nat.card ↥(tp.W1.subgroupOf tp.W) = tp.q := by
+      rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hW1le).toEquiv, ← tp.q_eq_card_W1]
+    have hKcard : Nat.card ↥(mp.K.subgroupOf tp.W) = tp.q := by
+      rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hKle).toEquiv, hcardKeq]
+    have hinf := Subgroup.subgroupOf_inj.1
+      (Ch06.eq_of_card_eq_prime_of_isCyclic tp.q_prime hW1card hKcard)
+    rwa [inf_of_le_left hW1le, inf_of_le_left hKle] at hinf
+  · have hW2card : Nat.card ↥(tp.W2.subgroupOf tp.W) = tp.p := by
+      rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hW2le).toEquiv, ← tp.p_eq_card_W2]
+    have hKstarcard : Nat.card ↥(mp.Kstar.subgroupOf tp.W) = tp.p := by
+      rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hKstarle).toEquiv, hcardKstareq]
+    have hinf := Subgroup.subgroupOf_inj.1
+      (Ch06.eq_of_card_eq_prime_of_isCyclic tp.p_prime hW2card hKstarcard)
+    rwa [inf_of_le_left hW2le, inf_of_le_left hKstarle] at hinf
+
+/-- `W₁ = mp.K` (cd-grid `W₁`-index alignment; HUB 1011). -/
+theorem Section16TypePStructure.W1_eq_K {G : Type*} [Group G] [Finite G]
+    (hG : IsMinimalSimpleOdd G) {mp : Section16MaximalPair G}
+    (tp : Section16TypePStructure mp) : tp.W1 = mp.K :=
+  (tp.W1_eq_K_and_W2_eq_Kstar hG).1
+
+/-- `W₂ = mp.Kstar` (cd-grid `W₂`-index alignment; HUB 1011). -/
+theorem Section16TypePStructure.W2_eq_Kstar {G : Type*} [Group G] [Finite G]
+    (hG : IsMinimalSimpleOdd G) {mp : Section16MaximalPair G}
+    (tp : Section16TypePStructure mp) : tp.W2 = mp.Kstar :=
+  (tp.W1_eq_K_and_W2_eq_Kstar hG).2
+
+/-- `W = mp.K ⊔ mp.Kstar` — the cd-grid `ω`-codomain identification. -/
+theorem Section16TypePStructure.W_eq_kappa_join {G : Type*} [Group G] [Finite G]
+    (hG : IsMinimalSimpleOdd G) {mp : Section16MaximalPair G}
+    (tp : Section16TypePStructure mp) : tp.W = mp.K ⊔ mp.Kstar :=
+  tp.W_eq_inter.trans (mp.W_structure hG).1
+
 /-- **Peterfalvi §13 coherent Dade-grid producer** (`sorry`) — *lane-b*
 (Peterfalvi §3–§13 coherent grids).  Given the maximal pair and the type-P
 structure, constructs the character grids `ω, μ, ν`, the signs, the integral maps,
