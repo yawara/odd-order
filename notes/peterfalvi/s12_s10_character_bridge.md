@@ -157,6 +157,51 @@ free field)。⟹ 「formal grid (μ:=Ind(ω), δ:=1) で mu_definition を triv
 χ₂(j): cyclic W2 (位数 p) の dual を `Fin tp.p` で列挙 (生成元+原始 p 乗根、`Fin tp.p ≃ W2-dual`)。
 次に piece 3 (S/T-shared-omega、最難) → piece 5 (tau3) → 残 free field → pack。**多セッション**。
 
+## ✅✅✅ 2026-06-23 更新¹⁸ — **cd producer S-side grid + (13.1.e) mu_definition COMPLETE** (commit `a22c7364`)
+
+更新¹⁷ の完全攻略計画 **piece 1+2+4 (S-side) を全実装**。cd producer (`section16CharacterData`,
+POLE-1) の 2 つの実 Prop obligation (`mu_definition`/`nu_definition`) のうち **harder な S-side
+`mu_definition` を sorry-free + axiom-clean で landing** (全 `FeitThompson.lean` の
+`namespace Section16CharacterData`、AxiomsCheck 3 本登録)。**producer の sorry は不変** (building block
+landing、FT-path sorry 不変。CLAUDE.md「進捗は実質的証明で測る」)。
+
+**landed (全 axiom-clean, build 3881 green)**:
+- **`induce_compHom_subgroupCongr`** (top-level, reusable transport primitive): `A=B` で
+  `induce A (compHom (subgroupCongr hAB) ψ) = induce B ψ`。証明 = `subst hAB; rfl` (subgroupCongr rfl が
+  per-element で identity に collapse)。**cd grid transport の linchpin**。
+- `certainTypeS_W1_eq`/`_W2_eq` (= `mp.K/Kstar.subgroupOf mp.S`、`unfold ...; rfl`)、`kstar_le_S`
+  (mp.W_structure 経由)、`cardCertainTypeS_W1 = tp.q`/`_W2 = tp.p`、`eqQ` (Fin tp.q ≃ Fin |W₁|、0↦0、
+  finCongr)、`chi2enum` (Fin tp.p ≃ Ŵ₂、Pontryagin `card_charGroup_subgroupOf`、**sdiff.W₂/W form**
+  で defeq match)、`tpW_subgroupOf_eq` (= 更新¹⁷ piece の W 同定、Probe 3)、`gridEquivE`。
+- `omegaS`/`muS`/`deltaS` (S-side grid、certainTypeS の `chiColumn`/`columnFamily.mu`/`.sign` を transport)。
+- **`muS_definition`**: `Ind_W^S(ω_{ij}−ω_{0j}) = δ_j(μ_{ij}−μ_{0j})` = `S06.induce_chiColumn_diff_mu_diff`
+  を compHom/subgroupCongr collapse + W 同定 + reindex で配線。
+
+**🔑 再利用すべき engineering 教訓 (T-side で同じ罠)**:
+1. **instance-desync (最重要)**: `induce sdiff.W` の `Invertible` instance は `natCardInvC sdiff.W` (helper
+   経由) と `natCardInvC (h.W1⊔h.W2)` (`induce_chiColumn_diff_mu_diff` 内) で **defeq だが syntactic 非一致** →
+   **最終 step は `rw` でなく `exact` で締める** (exact は defeq match)。`rw [induce_chiColumn_diff_mu_diff]` は
+   "did not find pattern" で失敗する。
+2. **scope**: `open scoped OddOrder.Peterfalvi.S15.FiniteInduce` で `Fintype ↥H`+`Invertible (Nat.card ↥H:ℂ)`
+   が全 subgroup に供給 (FeitThompson の §16 section は既に open、71-1254)。
+3. **NeZero**: grid def は `[NeZero (Nat.card ↥(mp.certainTypeS hG).W1)]` を instance binder 化 (haveI-in-def を
+   避け unfold 可能に)。producer では `haveI := (mp.certainTypeS hG).neZero_card_W1`。
+4. **変数 inclusion**: body-only の hG は auto-include されない → `include hG in` (例 `kstar_le_S`)。
+5. **smul cast**: `(δ:ℤ)•x` (induce lemma) vs `(δ:ℂ)•x` (cd field) は `Int.cast_smul_eq_zsmul` で橋渡し。
+6. **subgroupCongr**: `MulEquiv.subgroupCongr (h : A=B) : ↥A ≃* ↥B` (element 上 identity、`subgroupCongr_apply`)。
+7. **compHom**: `compHom_comp` (rfl)、`compHom_sub`/`_smul` (linearity)。compHom collapse は `congr 1` が defeq で閉じる。
+
+**残 cd pieces (次セッション、多セッション)**:
+- **piece 3 = `nu_definition` (T-side) — 最難所**: cd の `omega` は単一 field。`nu_definition` は同じ omegaS の
+  **W₂-direction (j) 差分**を T へ induce して certainTypeT の μ-family に一致させる要 → **S/T-shared-omega**
+  (omegaS が certainTypeT.chiColumn の transport とも一致 = W=K×K* の積指標が S 側/T 側構成で同一、の証明)。
+  S-side machinery (上記) は構造対称ゆえ大半再利用可、核心は omegaProdChar_S(χ_K)(χ_K*) = omegaProdChar_T(χ_K*)(χ_K)
+  (W の intrinsic 指標) の symmetry。
+- **piece 5 = `tau3` (`IntegralCharacterMap ↥tp.W G`)**: W=S∩T の G 内 TI-cyclic 構造 (§5/§13) + `sigmaIntegral`。
+  eta:=tau3∘omega が real η に (更新¹⁷: formal grid 不可、POLE-2 が consume)。
+- **piece 6-7 = free field** (tauS/tauT `IntegralCharacterMap ↥mp.S/T G`、Sset/Tset=inducedFamily、A0=supportInSubgroup)。
+- **piece 8 = pack** → `Section16CharacterData mp tp` (producer の sorry を埋める)。
+
 ## ✅✅✅✅✅✅ 2026-06-23 更新¹⁴ — **Pf (10.6) + (2.7) + (10.9) COMPLETE** (1 session, sorry 5→3)
 
 **本セッション成果 (lane-b, 全 build-green + axiom-clean modulo §10 muGrid 上流 gate)**:

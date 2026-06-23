@@ -29,3 +29,13 @@ S15_SAndT.lean (および分割後の各 leaf) が <1500 行。full build green 
 - 同型先行例: [0071-s15-mf-split.md](0071-s15-mf-split.md) (S15_MF 7253 行、同じく active frontier ゆえ実施保留中)
 - merge_monitor.md 手順 3/4 (サイズ watch)
 - 実施 owner = hub。lane の frontier と衝突しない凍結境界で行う (S15_MF/0071 と同方針: frontier が active な間は起票のみ・実施保留)
+
+## ✅ 解決 (2026-06-23, lane-c, commit f38065ac)
+
+ユーザー裁可で lane-c が prefix-split を実施 (LAUNCH 認可済)。1970 → **1201 + 811 行**:
+- `S15_SAndT_Setup.lean` (811) = (13.1)-(13.15) setup/char/numeric。
+- `S15_SAndT.lean` (1201) = (13.16)-(13.19) normalizers/Frobenius/orthogonality、Setup を import。
+
+境界 = (13.16) section 開始 (topic-coherent: char/numeric 解析 vs 構造論)。prefix→suffix の実コード
+後方参照ゼロを検証。下流 import 透過 (S15_SAndT import で Setup を transitive 取得)。
+full build green (3882 jobs)、AxiomsCheck OK。完了条件達成。

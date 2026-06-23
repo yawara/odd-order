@@ -8,6 +8,42 @@
 
 ---
 
+## ✅ LIVE STATUS (2026-06-23 再開², 正本) — step-3 wiring 着地後の carrier consumer
+
+> 以下が現状の正本。下の「🔑 carrier 診断」「🔧 POLE-1 carrier 構築」節は **step-3 wiring 着地前の
+> 歴史的経緯** (carrier wall の診断・解消過程)。carrier は既に sorry-free 完成 (`exists_typePData_W1_eq_of_isTypeP2`)
+> + `Sdata` thread 済 + lane-h が `mp.S_typeP2` 着地 (commit `6ba0bce5`) で step-3 gate 解消済。
+
+### carrier consumer 成果 (本セッション)
+1. **`exists_typeI_maximal_overNormalizer_U` 本体 = sorry-free** (commit `7eeb4555`): 2 本の bare sorry を
+   `Sdata` carrier から実証明。F-ask `P⊓U=⊥` = `Sdata.derived_complement` の disjoint から; Hall-faithfulness
+   `|U|⟂[S:U]` = `[S:U]=|P|·|W₁|` index 分解 (`Sdata.card_W1_eq_derived_index`/`card_U_eq_index`) + `hcop` +
+   `coprime_card_kernel_complement` (U⋊W₁ Frobenius)。
+2. **`basic_structure` (13.2.a-c,e) = gated-endpoint skeleton 化** (commit `b0a60fbe`):
+   - **`S_typeP2 : IsTypeP2 S` を S15.Hypothesis に追加** (mp.S_typeP2 → Section16Inputs → S15.Hypothesis、
+     sorry-free thread)。型決定 (13.2.a) を `isTypeII_of_isTypeP2` (lane-f, axiom-clean) で **sorry-free 実証明**
+     (`S_typeII_or_typeIII`/`q_lt_p_forces_typeII` を type-II 側で)。
+   - **(13.2.b,c,e) M_F-構造を faithful producer `basic_structure_gated` に localize** (P が p^q el-ab、
+     U abelian + U⋊W₁ Frobenius、u-bound、A_0(S) TI)。§16 σ-structure (M_σ=M_F el-ab p^q、**repo 未形式化**) に gated。
+   - `basic_structure` 本体は sorry-free assembly。
+
+### 現フロンティア分類 (残 21 sorry、全て他レーン/未形式化 gated)
+- **char (lane-b §3-13 char API): 10** — `sibleyTarget_S`/`character_degree_analysis`/`lambda_forces_T_caseB`/
+  `tiSubset_character_orthogonality`/norm cascade 4本/`analytic_inequality`/`beta_support_norm_and_remainder`/
+  `typeI_orthogonality_dichotomy`。
+- **numeric (char-determined / 抽象 Prop scaffold): 4** — `numeric_bounds` q=3 (u/c は analytic 待ち + p≥5 不在)、
+  `c_eq_one`、`caseA_parameters`/`caseB_order_u` (`caseX_for_S : Prop` 抽象仮説ゆえ u の値は char が決定、honest 不可)。
+- **§13 counting / BG Thm E: 3** — `card_Q_eq`(|Q|=q^p)、`tConjugate_fitting_data`、`card_LF_coprime_pq`(BG Thm E=lane-f)。
+- **§16 σ-structure (未形式化): 2** — `basic_structure_gated` (P el-ab p^q + Frobenius、ユーザー裁可で skeleton 化、
+  本体は lane-f BG§14-16 領域)、`complement_inf_Q_structure`。
+- **T 側構造: 1** — `normalizer_W1` (Q⊔W2 = T 側 §16 構造)。
+
+⟹ **§15 の lane-c 単独 ungated closable work は枯渇** (carrier consumer は完遂、型決定は sorry-free)。
+残りは lane-b char / lane-f §16 σ-structure (ユーザーが新規形式化を保留) / §13 counting 待ち。
+次手 = 要 hub/ユーザー判断 (基準: [[lanes-are-equivalent-no-specialty]]、再配置 or gate 待ち self-resume)。
+
+---
+
 ## 🔑 lane-c carrier 診断 (2026-06-23, relane §11→§15 後の最初の精査)
 
 **owner = lane-c** (`S15_SAndT.lean`、2026-06-23 に H→C 移譲、issue 4007)。最初に文書順最上流

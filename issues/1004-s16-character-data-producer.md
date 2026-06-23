@@ -78,3 +78,18 @@ cd producer を精査し **feasible・全 character 理論 in-stock** と確定 
    tau3=`TICyclicHypothesis.sigmaIntegral` of a W-in-G TICyclicHypothesis (real Dade、要§5/§13 TI-cyclic 構成) /
    tauS/tauT/Sset/A0S=free field (§7 Dade / inducedFamily / supportInSubgroup)。
    着手順: S-side (omega+mu+mu_def, χ₂(j) enumeration 要) → S/T-shared-omega (最難) → tau3 → free field → pack。
+
+## 進捗 (2026-06-23, lane-b 再開³) — ✅ S-side grid + mu_definition COMPLETE (commit `a22c7364`)
+
+完全攻略計画 **piece 1+2+4 (S-side) 全実装**。2 つの実 Prop obligation のうち **harder な S-side
+`mu_definition` を sorry-free + axiom-clean で landing**。正本 = `notes/.../s12_s10_character_bridge.md` 更新¹⁸。
+
+- landed (全 `FeitThompson.lean` `namespace Section16CharacterData`、AxiomsCheck 3 本登録、build 3881 green):
+  `induce_compHom_subgroupCongr` (reusable transport primitive、`subst;rfl`)、`certainTypeS_W1_eq`/`_W2_eq`、
+  `kstar_le_S`、`cardCertainTypeS_W1/_W2`、`eqQ`/`chi2enum`、`tpW_subgroupOf_eq`、`gridEquivE`、
+  `omegaS`/`muS`/`deltaS`、**`muS_definition`** (= cd `mu_definition` field、S-side)。FeitThompson が
+  `import S06_MuColumnBridge` 追加。
+- **producer の sorry は不変** (building-block landing; FT-path sorry 不変、進捗は実質的証明で測る)。
+- **残**: piece 3 nu_definition (T-side、S/T-shared-omega = 最難) / piece 5 tau3 / piece 6-7 free field / piece 8 pack。
+  S-side machinery は対称ゆえ T-side で大半再利用可。engineering 教訓 (instance-desync は `exact` で締める 等) =
+  更新¹⁸ に記録。

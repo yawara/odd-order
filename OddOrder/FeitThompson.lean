@@ -1,5 +1,6 @@
 import OddOrder.BG.AppC_FinalContradiction
 import OddOrder.BG.Ch4_FamilyOfMaximal.S14_TypePComplement
+import OddOrder.Peterfalvi.S06_MuColumnBridge
 
 /-!
 # Feit-Thompson Theorem
@@ -106,6 +107,11 @@ structure Section16Inputs (G : Type*) [Group G] [Finite G] where
   S_nonI : IsTypeNonI S
   T_nonI : IsTypeNonI T
   one_typeII : IsTypeII S ∨ IsTypeII T
+  /-- **Peterfalvi (13.2.a) type determination (S-side)**: `S` is of BG type `P₂` (Peterfalvi type
+  II).  Sourced from the §16 maximal pair (`Section16MaximalPair.S_typeP2`, fixed by the κ-Hall
+  ordering `q < p`); threaded into `S15.Hypothesis` so §15 can read off `IsTypeII S` sorry-free
+  (`isTypeII_of_isTypeP2`). -/
+  S_typeP2 : OddOrder.BG.Ch4.S14.IsTypeP2 S
   theorem88_caseB :
     ∀ M : Subgroup G, M ∈ maximalSubgroups G →
       IsTypeI M ∨ (∃ g : G, MulAut.conj g • M = S) ∨
@@ -1058,6 +1064,133 @@ theorem Section16TypePStructure.W_eq_kappa_join {G : Type*} [Group G] [Finite G]
     (tp : Section16TypePStructure mp) : tp.W = mp.K ⊔ mp.Kstar :=
   tp.W_eq_inter.trans (mp.W_structure hG).1
 
+/-- **`Ind` is invariant under transporting the source subgroup along an equality** (the cd-grid
+transport primitive).  For `A = B` (subgroups of a finite group `K`), inducing the
+`MulEquiv.subgroupCongr`-pullback of `ψ : ClassFunction ↥B` from `A` equals inducing `ψ` from `B`.
+`subst` collapses `subgroupCongr rfl` to the identity (`compHom id ψ = ψ`). -/
+theorem induce_compHom_subgroupCongr {K : Type*} [Group K] [Fintype K]
+    {A B : Subgroup K} (hAB : A = B) (ψ : ClassFunction ↥B ℂ) :
+    ClassFunction.induce A (ClassFunction.compHom (MulEquiv.subgroupCongr hAB).toMonoidHom ψ)
+      = ClassFunction.induce B ψ := by
+  subst hAB
+  rfl
+
+namespace Section16CharacterData
+
+variable {G : Type*} [Group G] [Finite G] (hG : IsMinimalSimpleOdd G) (mp : Section16MaximalPair G)
+
+/-- `W₁` of `certainTypeS` is `mp.K.subgroupOf mp.S` (the κ-Hall factor of `S`). -/
+theorem certainTypeS_W1_eq : (mp.certainTypeS hG).W1 = mp.K.subgroupOf mp.S := by
+  unfold Section16MaximalPair.certainTypeS certainTypeHypothesis_of_typeP_kappaHall; rfl
+
+/-- `W₂` of `certainTypeS` is `mp.Kstar.subgroupOf mp.S` (the dual factor of `S`). -/
+theorem certainTypeS_W2_eq : (mp.certainTypeS hG).W2 = mp.Kstar.subgroupOf mp.S := by
+  unfold Section16MaximalPair.certainTypeS certainTypeHypothesis_of_typeP_kappaHall; rfl
+
+include hG in
+/-- `mp.Kstar ≤ mp.S` (it lies in `S ∩ T = K ⊔ K*`). -/
+theorem kstar_le_S : mp.Kstar ≤ mp.S := by
+  obtain ⟨hWjoin, -, -, -⟩ := mp.W_structure hG
+  have : mp.Kstar ≤ mp.S ⊓ mp.T := by rw [hWjoin]; exact le_sup_right
+  exact this.trans inf_le_left
+
+variable (tp : Section16TypePStructure mp)
+
+/-- `|certainTypeS.W₁| = tp.q` (both are `|mp.K|`). -/
+theorem cardCertainTypeS_W1 : Nat.card ↥(mp.certainTypeS hG).W1 = tp.q := by
+  rw [certainTypeS_W1_eq hG mp, Nat.card_congr (Subgroup.subgroupOfEquivOfLe mp.K_le_S).toEquiv,
+    ← tp.W1_eq_K hG, ← tp.q_eq_card_W1]
+
+/-- `|certainTypeS.W₂| = tp.p` (both are `|mp.Kstar|`). -/
+theorem cardCertainTypeS_W2 : Nat.card ↥(mp.certainTypeS hG).W2 = tp.p := by
+  rw [certainTypeS_W2_eq hG mp,
+    Nat.card_congr (Subgroup.subgroupOfEquivOfLe (kstar_le_S hG mp)).toEquiv,
+    ← tp.W2_eq_Kstar hG, ← tp.p_eq_card_W2]
+
+/-- `Fin tp.q ≃ Fin |certainTypeS.W₁|`, fixing `0 ↦ 0` (so the (13.1.e) anchor `⟨0, q_prime.pos⟩`
+matches `chiColumn`'s distinguished base index). -/
+noncomputable def eqQ : Fin tp.q ≃ Fin (Nat.card ↥(mp.certainTypeS hG).W1) :=
+  finCongr (cardCertainTypeS_W1 hG mp tp).symm
+
+/-- The `W₂`-column enumeration `Fin tp.p ≃ Ŵ₂` (Pontryagin: `|Ŵ₂| = |W₂| = tp.p`).  Stated in the
+`sdiffTICyclicHypothesis.W₂/W` forms (defeq to `certainTypeS.W₂` / `W₁ ⊔ W₂`) so that both `chiColumn`
+and `card_charGroup_subgroupOf` consume it directly. -/
+noncomputable def chi2enum :
+    Fin tp.p ≃ (((mp.certainTypeS hG).sdiffTICyclicHypothesis.W2.subgroupOf
+      (mp.certainTypeS hG).sdiffTICyclicHypothesis.W) →* ℂˣ) :=
+  haveI : Fintype (((mp.certainTypeS hG).sdiffTICyclicHypothesis.W2.subgroupOf
+      (mp.certainTypeS hG).sdiffTICyclicHypothesis.W) →* ℂˣ) := Fintype.ofFinite _
+  (Fintype.equivFinOfCardEq (by
+    rw [← Nat.card_eq_fintype_card,
+      (mp.certainTypeS hG).sdiffTICyclicHypothesis.card_charGroup_subgroupOf
+        (mp.certainTypeS hG).sdiffTICyclicHypothesis.W2_le_W]
+    exact cardCertainTypeS_W2 hG mp tp)).symm
+
+include hG in
+/-- The key subgroup identity: `tp.W.subgroupOf mp.S = certainTypeS.sdiff.W`.  Both equal
+`(mp.K ⊔ mp.Kstar).subgroupOf mp.S` (`tp.W = mp.K ⊔ mp.Kstar` and `certainTypeS.sdiff.W = W₁ ⊔ W₂`). -/
+theorem tpW_subgroupOf_eq :
+    tp.W.subgroupOf mp.S = (mp.certainTypeS hG).sdiffTICyclicHypothesis.W := by
+  show tp.W.subgroupOf mp.S = (mp.certainTypeS hG).W1 ⊔ (mp.certainTypeS hG).W2
+  rw [certainTypeS_W1_eq hG mp, certainTypeS_W2_eq hG mp,
+    ← Subgroup.subgroupOf_sup mp.K_le_S (kstar_le_S hG mp), tp.W_eq_kappa_join hG]
+
+/-- The `W`-identification equiv `↥tp.W ≃* ↥(certainTypeS.sdiff.W)`: `tp.W ≃ tp.W.subgroupOf mp.S`
+then transported along `tpW_subgroupOf_eq`.  The `≤` proof is the *same term* as in
+`Section16CharacterData.mu_definition`. -/
+noncomputable def gridEquivE :
+    ↥tp.W ≃* ↥(mp.certainTypeS hG).sdiffTICyclicHypothesis.W :=
+  (Subgroup.subgroupOfEquivOfLe ((le_of_eq tp.W_eq_inter).trans inf_le_left)).symm.trans
+    (MulEquiv.subgroupCongr (tpW_subgroupOf_eq hG mp tp))
+
+variable [NeZero (Nat.card ↥(mp.certainTypeS hG).W1)]
+
+/-- S-side `ω`-grid: the `certainTypeS` `chiColumn` transported to `↥tp.W`. -/
+noncomputable def omegaS (i : Fin tp.q) (j : Fin tp.p) : ClassFunction ↥tp.W ℂ :=
+  ClassFunction.compHom (gridEquivE hG mp tp).toMonoidHom
+    ((mp.certainTypeS hG).chiColumn (chi2enum hG mp tp j) (eqQ hG mp tp i) :
+      ClassFunction ↥(mp.certainTypeS hG).sdiffTICyclicHypothesis.W ℂ)
+
+/-- S-side `μ`-grid: the (4.3.b) certain-type characters of `certainTypeS`. -/
+noncomputable def muS (i : Fin tp.q) (j : Fin tp.p) : ClassFunction ↥mp.S ℂ :=
+  (((mp.certainTypeS hG).columnFamily (chi2enum hG mp tp j)).mu (eqQ hG mp tp i) :
+    ClassFunction ↥mp.S ℂ)
+
+/-- S-side signs `δ`. -/
+noncomputable def deltaS (j : Fin tp.p) : ℤ :=
+  ((mp.certainTypeS hG).columnFamily (chi2enum hG mp tp j)).sign
+
+/-- The `eqQ` reindex fixes the base index `0`. -/
+theorem eqQ_zero : eqQ hG mp tp ⟨0, tp.q_prime.pos⟩ = 0 := by
+  apply Fin.ext; simp [eqQ]
+
+/-- **The S-side (13.1.e) `mu_definition` identity** — the cd producer's `mu_definition` field for the
+S-side grid.  Inducing the transported `ω`-column difference `Ind_W^S(ω_{ij} − ω_{0j})` gives the
+signed `μ`-difference `δ_j (μ_{ij} − μ_{0j})`, via `S06.induce_chiColumn_diff_mu_diff` after the
+`compHom`/`subgroupCongr` transport collapse. -/
+theorem muS_definition (i : Fin tp.q) (j : Fin tp.p) :
+    ClassFunction.induce (tp.W.subgroupOf mp.S)
+        (ClassFunction.compHom
+          (Subgroup.subgroupOfEquivOfLe ((le_of_eq tp.W_eq_inter).trans inf_le_left)).toMonoidHom
+          (omegaS hG mp tp i j - omegaS hG mp tp ⟨0, tp.q_prime.pos⟩ j))
+      = (deltaS hG mp tp j : ℂ) • (muS hG mp tp i j - muS hG mp tp ⟨0, tp.q_prime.pos⟩ j) := by
+  have key : ∀ k : Fin tp.q,
+      ClassFunction.compHom
+          (Subgroup.subgroupOfEquivOfLe ((le_of_eq tp.W_eq_inter).trans inf_le_left)).toMonoidHom
+          (omegaS hG mp tp k j)
+        = ClassFunction.compHom (MulEquiv.subgroupCongr (tpW_subgroupOf_eq hG mp tp)).toMonoidHom
+            ((mp.certainTypeS hG).chiColumn (chi2enum hG mp tp j) (eqQ hG mp tp k) :
+              ClassFunction ↥(mp.certainTypeS hG).sdiffTICyclicHypothesis.W ℂ) := by
+    intro k
+    rw [omegaS, ClassFunction.compHom_comp]
+    congr 1
+  rw [ClassFunction.compHom_sub, key i, key ⟨0, tp.q_prime.pos⟩, ← ClassFunction.compHom_sub,
+    eqQ_zero hG mp tp, induce_compHom_subgroupCongr (tpW_subgroupOf_eq hG mp tp)]
+  simp only [deltaS, muS, eqQ_zero hG mp tp, Int.cast_smul_eq_zsmul]
+  exact (mp.certainTypeS hG).induce_chiColumn_diff_mu_diff (chi2enum hG mp tp j) (eqQ hG mp tp i)
+
+end Section16CharacterData
+
 /-- **Peterfalvi §13 coherent Dade-grid producer** (`sorry`) — *lane-b*
 (Peterfalvi §3–§13 coherent grids).  Given the maximal pair and the type-P
 structure, constructs the character grids `ω, μ, ν`, the signs, the integral maps,
@@ -1092,6 +1225,7 @@ noncomputable def section16Inputs_of_isMinimalSimpleOdd {G : Type*} [Group G] [F
     S_nonI := mp.S_nonI
     T_nonI := mp.T_nonI
     one_typeII := mp.one_typeII
+    S_typeP2 := mp.S_typeP2
     theorem88_caseB := mp.theorem88_caseB
     W_eq_inter := tp.W_eq_inter
     W_eq_join := tp.W_eq_join
@@ -1175,6 +1309,7 @@ noncomputable def sectionSixteenHypothesis_of_inputs {G : Type*} [Group G] [Fini
       S_nonI := inp.S_nonI
       T_nonI := inp.T_nonI
       one_typeII := inp.one_typeII
+      S_typeP2 := inp.S_typeP2
       theorem88_caseB := inp.theorem88_caseB
       W_eq_inter := inp.W_eq_inter
       W_eq_join := inp.W_eq_join
