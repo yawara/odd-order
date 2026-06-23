@@ -23,14 +23,21 @@
   (5.8) full-column endgame 要 → quick win でない。
 - **(10.8)** `S_not_coherent` (非coherence keystone): **(10.6.b) を使う** (私の今回成果が unblock!) が
   (7.5)/(7.8.b) §7 counting + (8.6.a)/(8.11)/(8.4.d) §8 + (10.7) も要 = 大型 analytic。memory の long-pole。
-- **(10.9)** `orthogonality_of_w1_lt_w2` (opaque field, w₁<w₂ で residual χ=ζ^τ₁ ⊥ Imσ ∧ ‖χ‖²=1):
-  **actionable・私の STEP 1/2 活用可** だが新 piece (~100-150行)。原文証明 = 直交分解 + a_00=1 **(2.7)** τ-adjunction +
-  ‖(μ_0−ζ)^τ‖²=w₁+1<w₂ **(3.8)** trichotomy ⟹ σ-part=∑ω_i0^σ ⟹ ‖χ‖²=1。**`ζ^τ₁⊥Imσ` を直接 gate せず**
-  norm 論法で出る (旧「§5-gated」懸念は不要の可能性)。要 in-stock 確認: (2.7) τ-adjunction-at-trivial, (3.8)/
-  grid_trichotomy, ‖μ_0−ζ‖²=w₁+1 (`zeta_tau1_inner_self`✅在庫)。**これが文書順次・最 actionable な §10 target**。
+- **(10.9)** `orthogonality_of_w1_lt_w2` (opaque field, consumer 0, w₁<w₂ で residual χ=ζ^τ₁ ⊥ Imσ ∧ ‖χ‖²=1):
+  原文証明 = (μ_0−ζ)^τ を σ-grid で直交分解 + a_00=1 **(2.7)** τ-adjunction + ‖(μ_0−ζ)^τ‖²=w₁+1<w₂ +
+  **(3.8) trichotomy** ⟹ σ-part=∑ω_i0^σ ⟹ ‖χ‖²=1。**`ζ^τ₁⊥Imσ` を直接 gate せず norm 論法で出る**。
+  - ✅ **(2.7) τ-adjunction-at-trivial 構築済**: `Hypothesis.tau_inner_trivial` (S12, **完全 axiom-clean**):
+    A_0-supported φ で `⟨φ^τ,1_G⟩=⟨φ,1_M⟩`、§4 `adjoint_formula` (χ=1_G⟹平均=1_M) 経由。a_00=1 step に使う。
+  - ✅ (3.8) trichotomy `sigmaCoeff_trichotomy` (S05) + ‖μ_0−ζ‖²=w₁+1 部品 (`zeta_tau1_inner_self`) は在庫。
+  - ⚠⚠ **真の linchpin = (3.8) を (μ_0−ζ)^τ の σ-係数 grid に適用するための 2D chiFam 構造** (= a_pq=⟨(μ_0−ζ)^τ,
+    ω_ij^σ⟩ を sigmaCoeff/chiFam に同定する `ω_ij^σ=chiFam(ρ_i,κ_j)` の 2D product)。これは **(10.6.a) が §10
+    特化 route で意図的に回避した深い piece** (`exists_alignedOmegaSigmaGrid_chiFam_family` は per-row のみ、2D 化要)。
+    issue 1009「やること」の「🗺 column-structure 精密戦略」(W2-成分 i-非依存 + inj+card 全射) が攻略法。
+    ∴ (10.9) は ~100-150行でなく **2D 構造 (~150-250行) + 残 assembly の multi-session piece**。旧「最 actionable」評価は楽観。
 - **(10.10)/(10.11)** typeV 除去・case-B prime orders: opaque field + coherence、§6(6.8)/§8(8.7) 依存。
-- **∴ 次セッション推奨 = (10.9)** (actionable, STEP 1/2 leverage, opaque-field de-opaque パターン既習)。(10.7)/(10.8)
-  は §8 prereq (lane-f/§14 territory) 待ちで light-touch。
+- **∴ §10 残りは一様に deep**: (10.9)=2D chiFam 構造 linchpin、(10.7)/(10.8)=§8 (8.8/Type II 構造) prereq
+  (lane-f/§14 territory)。次の高価値 infra = **2D chiFam product 構造** (10.9 + trichotomy 系を解禁、reusable)。
+  (2.7) `tau_inner_trivial` は構築済の building block。
 
 ## ✅✅✅✅✅ 2026-06-23 更新¹³ — (10.6)(a) summed isometry COMPLETE (linchpin landed, σ-endgame 回避)
 
