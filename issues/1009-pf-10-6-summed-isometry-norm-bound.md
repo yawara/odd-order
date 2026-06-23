@@ -71,16 +71,30 @@ STEP 1 (reduction identity) + Dade-vanishing-off-support の合成。残り = ST
   hyp.dadeData.dade.dadeSupport`、`g ∉ dadeSupport` で `ζ^τ₁(g) = ∑_i ω_i0^σ(g)`。3 補題 (vanishing /
   μ_0−ζ support / 合成)。**当初プランの「M-level 恒等式経由の support 導出」は不要だった** — `μ_0−ζ` は
   `muColumn_sub_conj_support` を直接ミラーして supported (M' 外消失 + (1) で w₁−w₁=0)。
-- **STEP 3 = parity**: ω_i0^σ(g)∈ℤ (3.9.c) + ω_00^σ=1_G ((3.2.b)=`sigma_trivial` ✅在庫) + i≠0 で
-  ω̄_i0^σ=conj(ω_i0^σ) (3.9.a) かつ ω_i0 非実 (奇位数) ⟹ ∑_{i>0}∈2ℤ ⟹ ζ^τ₁(g)≡1 (mod 2) ⟹ |ζ^τ₁(g)|≥1。
-  **⚠ (3.9.c)/(3.9.a) は §5 stock に明示的に無い** (S05 grep: `sigma_trivial`/`sigma_omega`/`sigma_mem_ZIrr`
-  はあるが ω^σ の g-値整数性・共役互換は無い) — STEP 3 は新規形式化を要する可能性。order-coprime 仮定は
-  (3.9.c) の整数性で使う見込み。alignedOmegaSigmaGrid(=ω^σ) は §10 で chiFam 経由 (2D product
-  `exists_alignedOmegaSigmaGrid_chiFam_product` が ω_ij^σ=chiFam(ρ_i,κ_j) を供給) ゆえ、(3.9.c)/(3.9.a) を
-  chiFam の整数性・共役で書ける可能性 (= 残した 2D product lemma の再利用余地)。
+- **STEP 3 = parity (✅✅ in-stock 確定, 2026-06-23 Explore+検証)**: `ζ^τ₁(g) = ∑_i ω_i0^σ(g)` (STEP 2) を入力に
+  ∑ が奇整数 ⟹ `|ζ^τ₁(g)| ≥ 1`。**⚠⚠ 旧「(3.9.c)/(3.9.a) は §5 stock に無い・新規形式化要」は誤り** (旧 grep が
+  `sigma_conj`/`sigma_omega` パターンで取りこぼし)。**実際は全 in-stock**:
+  - **(3.9.c) 整数性 = `TICyclicHypothesis.exists_intCast_sigma_omega_apply`** (`S05_SigmaIsometry.lean:1920`):
+    `(orderOf g).Coprime (orderOf ξ)` で `∃ n:ℤ, tic.sigma (omega ξ) g = (n:ℂ)`。alignedOmegaSigmaGrid i j
+    `= tic.sigma (omega ξ_ij)` (`omega := linearIrreducibleCharacter` 定義同値、η_ij が正にこの形)。
+    ξ_i0 = `(omegaProdChar (w1CharEquiv i) 1).comp e` ⟹ `orderOf ξ_i0 ∣ w₁` (W₁-only char)、order g coprime w₁ で適用可。
+  - **(3.9.a) 共役互換 = `TICyclicHypothesis.sigma_mapRingEquiv_comm`** (`S05_SigmaIsometry.lean:1708`):
+    `mapRingEquiv u (σ ω) = σ (galoisMap u ω)`、u=複素共役で `(σω).conj = σ(ω.conj)`。
+  - **row-conjugation involution = §6 `rowInv`/`rowInvEquiv`** (`S06_CertainTypeConjugation.lean:96/111`,
+    **`Hypothesis ↥L` レベル=§10 host 利用可**): `rowInv i = w1CharEquiv.symm((w1CharEquiv i)⁻¹)`、involution
+    (`rowInv_rowInv`)。+ `galoisMap_conj_omega`(σ前共役→ξ⁻¹)+`omegaProdChar_inv`(`ω(χ₁,χ₂)⁻¹=ω(χ₁⁻¹,χ₂⁻¹)`)+
+    `w1CharEquiv_rowInv` ⟹ **`mapRingEquiv conj (ω_i0^σ) = ω_{rowInv i,0}^σ`** (列 0 不変、χ₂0=1)。
+  - **ω_00^σ = trivial**: `omegaGrid 0 0 = trivialClassFunction`(S05_OmegaGrid:74)+`sigmaIntegral_trivial`
+    (S05_IntegralSigma:63) ⟹ value 1。alignedOmegaSigmaGrid (0,0) = trivial の §10 wrapper を要構築 (~15行)。
+  - **FPF**: 奇位数 ⟹ Ŵ₁ 奇 ⟹ `rowInv i = i ↔ i=0` (2-torsion 自明) ⟹ {i≠0} で rowInv は固定点なし involution
+    ⟹ ∑_{i≠0} ω_i0^σ(g) = 2·(orbit sum) ∈ 2ℤ。
+  - **実装計画 (~150-250 行, §6 の `let h/tic/e/χ₂` 再構成パターン流用)**: (A) alignedOmegaSigmaGrid_zero_zero=trivial,
+    (B) alignedOmegaSigmaGrid_conj_eq (row-conj), (C) ..._intCast (整数性), (D) parity assembly (FPF involution sum
+    even), (E) STEP 4 de-opaque。難所 = (B) index translation (Fin w₁ ↔ Fin card W1) + (D) involution-sum-even の
+    mathlib tool 選定。
 - **STEP 4 = carrier de-opaque**: `zeta_tau1_norm_bound : Prop`(現 `True`, producer S12:2690)を
-  genuine statement `∀ g∈G−Ã(M), order g coprime w₁ → 1≤|ζ^τ₁(g)|` に。order-coprime 仮定の使い所要確認。
-- **着手順**: STEP 1 (Ã(M) 非依存・即着手可) → STEP 2 の Ã(M) 表現特定 → STEP 3/4。
+  genuine statement `∀ g∈G−Ã(M), order g coprime w₁ → 1≤|ζ^τ₁(g)|` に。order-coprime 仮定は (3.9.c) 整数性で使う。
+- **着手順**: STEP 1 ✅ → STEP 2 ✅ → STEP 3 (A→B→C→D) → STEP 4。
 
 ## 背景
 
