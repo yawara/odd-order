@@ -1309,8 +1309,24 @@ theorem exists_typeI_maximal_overNormalizer_U [Finite G]
     ∃ L : Subgroup G, L ∈ maximalSubgroups G ∧ IsTypeI L ∧
       Subgroup.normalizer (hyp.U : Set G) ≤ L ∧ hyp.U ≤ maxNilpotentNormalHall L := by
   obtain ⟨tdata⟩ := hSTypeII
-  -- (Phase 0(b), F-ask) the configuration complement meets the Fitting kernel trivially.
-  have hdisj : hyp.P ⊓ hyp.U = ⊥ := sorry
+  -- The configuration complement meets the Fitting kernel trivially.  Now discharged from the
+  -- §16 carrier `hyp.Sdata` (the type-`P` data of `S`, reconciled `Sdata.U = U`, `Sdata.H = P`):
+  -- `U` complements `M_F = P` in `M' = [S,S]` (`Sdata.derived_complement`), so `P ⊓ U = ⊥`.
+  have hdisj : hyp.P ⊓ hyp.U = ⊥ := by
+    have key : hyp.Sdata.H ⊓ hyp.Sdata.U = ⊥ := by
+      have hd := disjoint_iff.mp hyp.Sdata.derived_complement.disjoint
+      rw [eq_bot_iff]
+      rintro x ⟨hxH, hxU⟩
+      have hxD : x ∈ derivedInG hyp.S := hyp.Sdata.H_le hxH
+      have hmem : (⟨x, hxD⟩ : ↥(derivedInG hyp.S)) ∈
+          (hyp.Sdata.H.subgroupOf (derivedInG hyp.S)) ⊓
+            (hyp.Sdata.U.subgroupOf (derivedInG hyp.S)) :=
+        ⟨Subgroup.mem_subgroupOf.mpr hxH, Subgroup.mem_subgroupOf.mpr hxU⟩
+      rw [hd, Subgroup.mem_bot] at hmem
+      rw [Subgroup.mem_bot]
+      simpa using Subtype.ext_iff.mp hmem
+    rw [hyp.P_eq_SF, ← hyp.Sdata.H_eq, ← hyp.Sdata_U_eq]
+    exact key
   have hcop : Nat.Coprime (Nat.card ↥hyp.U) (Nat.card ↥hyp.P) :=
     coprime_card_U_card_P_of_disjoint hyp tdata hdisj
   -- (Phase 1) the type-II property transferred to `hyp.U`: `N_G(U) ⊄ S`.
@@ -1359,7 +1375,36 @@ theorem exists_typeI_maximal_overNormalizer_U [Finite G]
     -- supplied at the §16 `Section16MaximalPair` (lane-f) but not pinned by the bare `Hypothesis`;
     -- see issue 2009 / `notes/peterfalvi/s13_17_structural_program.md`.
     obtain ⟨g, hg⟩ := _hLconjS
-    have hUhall_cop : Nat.Coprime (Nat.card ↥hyp.U) ((hyp.U.subgroupOf hyp.S).index) := sorry
+    -- `[S : U] = |P| · |W₁|` from the carrier complements (`U` complements `P` in `M'`,
+    -- `W₁` complements `M'` in `S`); coprimality is `|U| ⟂ |P|` (`hcop`) and `|U| ⟂ |W₁|` (the
+    -- Frobenius group `U ⋊ W₁` of (13.2.a), `coprime_card_kernel_complement`).
+    have hUhall_cop : Nat.Coprime (Nat.card ↥hyp.U) ((hyp.U.subgroupOf hyp.S).index) := by
+      obtain ⟨bdata, _⟩ := basic_structure _hG hyp
+      have frobcop : Nat.Coprime (Nat.card ↥hyp.U) (Nat.card ↥hyp.W1) := by
+        have h := bdata.UW1_frobenius.coprime_card_kernel_complement
+        rwa [Nat.card_congr
+            (Subgroup.subgroupOfEquivOfLe (le_sup_left : hyp.U ≤ hyp.U ⊔ hyp.W1)).toEquiv,
+          Nat.card_congr
+            (Subgroup.subgroupOfEquivOfLe (le_sup_right : hyp.W1 ≤ hyp.U ⊔ hyp.W1)).toEquiv] at h
+      have hPleM' : hyp.P ≤ derivedInG hyp.S := le_sup_left.trans hyp.S_deriv_eq_PU.ge
+      have hidxM' : ((derivedInG hyp.S).subgroupOf hyp.S).index = Nat.card ↥hyp.W1 := by
+        rw [← hyp.Sdata_W1_eq, ← hyp.Sdata.card_W1_eq_derived_index]
+      have hidxP : (hyp.P.subgroupOf (derivedInG hyp.S)).index = Nat.card ↥hyp.U := by
+        rw [hyp.P_eq_SF, ← hyp.Sdata.card_U_eq_index, hyp.Sdata_U_eq]
+      have hScard : Nat.card ↥hyp.S
+          = Nat.card ↥hyp.W1 * (Nat.card ↥hyp.U * Nat.card ↥hyp.P) := by
+        have e1 := ((derivedInG hyp.S).subgroupOf hyp.S).index_mul_card
+        have e2 := (hyp.P.subgroupOf (derivedInG hyp.S)).index_mul_card
+        rw [hidxM', Nat.card_congr (Subgroup.subgroupOfEquivOfLe hM'_le_S).toEquiv] at e1
+        rw [hidxP, Nat.card_congr (Subgroup.subgroupOfEquivOfLe hPleM').toEquiv] at e2
+        rw [← e1, ← e2]
+      have hidxU := (hyp.U.subgroupOf hyp.S).index_mul_card
+      rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hUleS).toEquiv] at hidxU
+      have hidxUeq : (hyp.U.subgroupOf hyp.S).index = Nat.card ↥hyp.P * Nat.card ↥hyp.W1 := by
+        apply Nat.eq_of_mul_eq_mul_right (Nat.card_pos (α := ↥hyp.U))
+        rw [hidxU, hScard]; ring
+      rw [hidxUeq]
+      exact hcop.mul_right frobcop
     exact absurd (normalizer_le_of_isHall_subgroupOf_of_conj
         (_hG.solvable_of_mem_maximalSubgroups hyp.S_maximal) hUleS
         (isHall_subgroupOf_primeFactors_of_coprime_index hUleS hUhall_cop) hg hNUL) hNUS
