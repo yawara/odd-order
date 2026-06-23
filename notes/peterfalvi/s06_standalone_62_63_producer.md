@@ -62,44 +62,75 @@ W₂⊆[H,H], coprime |H||W1|)。**⚠ kernel H は nilpotent + complement を�
 (typePA0 M typeP)` → `tau`/`Sset`/`A0` を honest projection で定義。`CertainTypeHypothesis (typePA0
 M typeP) M` 利用可 (S12:734)。coherence = `IsCoherent hyp.tau hyp.Sset hyp.A0` (5.1)。
 
-## 4. 🔑 中心 design question (rework 回避の要)
+## 4. 🔑 中心 design question — **RESOLVED (2026-06-23 実装セッション)**
 
-**既存 (6.2) core は `SibleyDadeHypothesis` (K=H nilpotent + complement, 6.8 形) で proven。
-しかし §13 consumer は general (6.1) 形 (K=M' solvable・非 nilpotent かも、CertainTypeHypothesis/
-DadeSupportHypothesisData ベース) で coherence を持つ。** この gap = 「repo の §6 は SibleyDadeHypothesis
-filtration 経由で standalone (6.1)-form が無い」(LAUNCH/S13 docstring) の正体。
+scoping 時の design question (「既存 core は SibleyDadeHypothesis 形、§13 は general (6.1) 形」) を
+実コード精査で**確定・訂正**した。結論:
 
-standalone (6.2)/(6.3) を生産するには次のいずれか (要次セッションで確定):
-- **(A) 既存 core を general (6.1) 設定に一般化** — `sum_re_div_normSq_SsubFiltration_eq` 等を
-  SibleyDadeHypothesis でなく「K solvable normal + S=Ind_K^L family + (5.6) coherence」だけで再証明。
-  core の証明が H_nilpotent/split/TI/cases をどこまで使うか精査が要 (degree-square sum 恒等式自体は
-  K normal + induction だけで出るはず; (c2) bound は (5.6)+filtration ⟹ 一般化可能性高)。
-- **(B) §13→SibleyDadeHypothesis bridge** — §13 の (6.3) 適用は H=HC nilpotent。但し SibleyDadeHypothesis
-  の kernel は (6.1) の K=M' に当たり、M' nilpotent でないと不成立 ⟹ 直接 bridge は無理筋の可能性大。
-- **(C) general (6.1) hypothesis を新規定義し (6.2)/(6.3) を直接証明** — (A) の徹底版。
+**general (6.2)/(6.3) の PIECES は既に general 形で `S08_CoherenceCorePart1`/`Part2` に存在する。
+欠けていたのは "K (solvable induced-family kernel) を H (nilpotent middle group) から分離した
+assembly" だけ。** (A)/(C) という二択でなく、**(A′) 既存 general ピースを K≠H で組み直す**が正解だった。
 
-**最有力 = (A)/(C)**: (6.2)/(6.3) は教科書で general (6.1) (K solvable) に対し述べられ、SibleyDadeHypothesis
-の nilpotent/complement/TI/cases は (6.8) capstone 固有。(6.2) 証明が実際に使うのは: K solvable (degree-1
-char 存在)、S/S(A) の induction 構造、(5.6) coherence extension、degree bound θ(1)≤|K:C|√|C:D| (Thm C)。
-これらを抽出した general 仮説 (≒ (6.1)) を立てるのが筋。
+確認した general ピース (いずれも SibleyDadeHypothesis 非依存):
+- `coherentDegreeSumBound_of_not_coherent` (CorePart1:2451) = **(5.6) contrapositive**。`S04.Hypothesis
+  G A L` + Dade map 上で general (consumer の `tau = dadeIntegralCharacterMap` と整合)。多数の
+  orthonormality/support/generation 仮説を取る。
+- `theta_degree_le_index_mul_sqrt_index` (CorePart1:557) = **(6.2) θ-bound** `θ(1)≤|K:C|√|C:D|`、
+  general (Thm C は既に完全形式化済; scoping 時「要特定」としたが repo に実在)。
+  `characterKernel_restrict_subgroupOf` (:596) が "θ trivial on B"→"Res_C θ trivial on B∩C" を bridge。
+- `sum_div_normSq_induce_kernelFilter_eq` (CorePart1:2526) = **degree-square sum**、H.Normal+A.Normal のみ。
+- `exists_coherentBreakPair` (CorePart1:952) = **(6.2) dichotomy (C.b)**、`τ`+Sa/Sb 上で general。
+- (6.3) descent ピース: `isNilpotent_normal_inf_center_ne_bot` (1100) / `exists_maximal_normal_between`
+  (1149) / `normal_central_of_maximal_normal_below` (1175) / `degreeBound_le_of_sqrt_bound` (2798) /
+  `six_three_HH1_le` (2862) = nilpotent-central + maximal-B + √-arithmetic、全 general。
 
-## 5. plan (次セッション)
+**フル assembled な `six_two`/`six_three` (CorePart2:3786/3924) は SibleyDadeHypothesis (K=H) 上**で、
+その SibleyDade 依存は実質 **(1) H_nilpotent と (2) `hF : IsFrobeniusGroup L H W₁`** のみ。`hF` が
+"induced member Ind_K^L θ は irreducible" を与え (5.2) 仮説 (orthonormality 等) を discharge する
+(`sMember_index_le_two_psi`)。§13 の K=M' solvable では member が reducible になり得て、ここが唯一の深い gap。
 
-1. **§5 Hypothesis (C) / (5.2) / Theorem (5.6) を特定** (`references/peterfalvi/04.7*` §5 + repo S05/S07)。
-   (6.1) が前提する (C) の正体と、degree bound `θ(1)≤|K:C|√|C:D|` (Thm C) の repo 所在を確定。
-2. **design question を確定** (A vs C): 既存 core lemma の hypothesis 依存を精査
-   (`sum_re_div_normSq_SsubFiltration_eq` / `sSubFiltration_sum_le_two_psi_caseB` が H_nilpotent/split/
-   cases を本当に使うか)。使わない部分が多ければ (A) で general 化、本質的なら (C) で新仮説。
-3. **新 leaf** `S08_Theorem62_63_Standalone.lean` (or §6 leaf) に standalone (6.2)/(6.3) を立てる。
-   上流優先: (6.2) を先に (degree-square sum + (5.6) bound + degree bound の assembly)、次に (6.3)
-   (filtration descent: minimal A / maximal B / nilpotent⟹central / (6.2) 適用 / √ 算術 contradiction)。
-4. lane-c が S13 `coherent_S_of_coherent_SH0C` / `coherent_quotient_bound` を cite して discharge
-   (producer→consumer、signature-first)。
-5. ⚠ 規約: §5-§8 は lane-b 名目領域 (dormant) ゆえ **既存 S05-S08 本体は触らず cite のみ、生産は新 leaf
-   に隔離** (lane-b 復帰時の衝突回避)。境界で迷ったら hub issue。
+### 🔻 真の残 gate = general `six_two` (reducible induced member の (6.2) bound)
 
-## 6. status
+K solvable で member が可約な場合の (6.2) bound = `coherentDegreeSumBound_of_not_coherent` の
+orthonormality/generation 仮説の discharge。これは §5 coherence theory を可約 member へ広げる作業で、
+**§10-12 の muGrid/columnSum 機構 (lane-b/c 領域) と絡む**。lane-h の §6/§8 スコープ単独では閉じない。
+→ この 1 点を `six_three_descent` の `h62` oracle として露出 (honest gate、sorry でなく仮説)。
 
-2026-06-23 relane #7 受領 + 本 scoping 完了 (consumer signature / Pf 原文 6.2/6.3 / 既存 core /
-design question の特定)。Lean 実装は次セッション (design question 確定 → 新 leaf assembly)。
-build green 3882 jobs (main merge 状態、Lean 変更なし)。
+## 5. 実装済み (2026-06-23, commit `27019099`) — 新 leaf `S08_Theorem62_63_Standalone.lean`
+
+sorry-free + axiom-clean + AxiomsCheck 登録済 (`IsCoherent.subset` / `six_three_descent`、3 標準 axiom のみ)。
+
+1. **`S07.IsCoherent.subset`** (monotonicity): `IsCoherent τ S A` + `S' ⊆ S` + nonzero supported
+   witness ⟹ `IsCoherent τ S' A`。同じ extension が `Submodule.span_mono` + `zSupportedSpan_mono_left`
+   で restrict、nonzero witness のみ再供給。(5.1) 述語の general 単調性 (従来欠落)。`noncomputable def`
+   (IsCoherent は data 構造)。
+2. **`S08.six_three_descent`** (general (6.1) 形 (6.3) の minimal-A descent): K solvable normal +
+   H≤K nilpotent (K≠H 可) + M≤H₁<H + S(H₁) coherent + |H:H₁|>4|L:K|²+1 ⟹ S(M) coherent。
+   (6.2) index bound を `h62` oracle として取り、それ以外 (minimal A / maximal B / S(B) not coherent /
+   A/B⊆Z(H/B) / [K/A,K/A]≠⊤ from K solvable) を完全証明。SibleyDade `six_three` の K=H 固定を K≠H に分離
+   = §13 が要求する形 ((6.3) を (L,K,M,H,H₁)=(M,M',1,HC,H₀C) で適用)。
+
+## 6. producer → consumer bridge (lane-c S13 への handoff)
+
+lane-c が S13 obligation を discharge する手順:
+
+- **`coherent_S_of_coherent_SH0C` (11.3 = (6.3))**: `six_three_descent` を
+  K=`(derivedInG M).subgroupOf M` (=M', solvable), H=`HC.subgroupOf M`/相当 (nilpotent),
+  M=⊥ (1), H₁=H₀C, SOf=induced-family-filter, τ=`hyp.base.tau`, A0=`hyp.base.A0` で適用。
+  - 要 bridge: `SOf ⊥ = hyp.base.Sset` (= S = S(1)) と `SOf H0C` が consumer の `hyp.SOf H0C` に一致。
+    現状 S13 の `SOf` は free field ゆえ lane-c は `SOf X = inducedFamily filter` に pin する enrich が要る
+    (または `hyp.SOf` を本 producer の SOf に合わせる)。
+  - 要供給: `h62` (= general `six_three_index_bound`; 下記 §7) と hbound (6.3.c、(9.6)/(11.1) から)。
+- **`coherent_quotient_bound` (11.4 = (6.2), C=D=HC)**: general `six_two` の C=D 特殊化
+  (√|C:D|=√1=1) で |M':H₁|−1 ≤ 2|M:HC|、§11 identity 2|M:HC|=2q|U:C| で結論。→ general `six_two` 待ち。
+
+**両 obligation とも最終的に general `six_two` (§4 の真の gate) に bottom out。**
+
+## 7. 次ステップ (lane-h §6/§8 スコープで可能)
+
+1. **general `six_three_index_bound`** を general `six_two` oracle + `six_three_HH1_le` から証明
+   (§8 arithmetic glue、muGrid 非依存)。index 変換 |K:A|=|K:H||H:A| / |L:H|=|L:K||K:H| が要。
+   これで `six_three_descent` の `h62` を埋め、gate を厳密に general `six_two` のみに絞る。
+2. **general `six_two`** (真の gate): `coherentDegreeSumBound_of_not_coherent` の reducible-member
+   discharge。§10-12 muGrid と要協調 → cross-lane (hub issue 検討)。
+3. ⚠ 規約: §5-§8 既存本体は触らず cite のみ、生産は本 leaf に隔離 (lane-b 復帰時衝突回避)。維持。
