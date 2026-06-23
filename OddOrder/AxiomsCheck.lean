@@ -2178,6 +2178,10 @@ set_option linter.style.longLine false in
 -- (maximal-`B` + nilpotency-forces-centrality + `√`-arithmetic) reduced to the (6.2) index oracle.
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S07.IsCoherent.subset
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S08.six_three_descent
+-- (6.3) per-step index bound, general form: tower index multiplicativity (`|K:A| = |H:A|·|K:H|`,
+-- `|L:H| = |K:H|·|L:K|`) feeding `six_three_HH1_le`; reduces the `six_three_descent` `h62` oracle to
+-- the general `six_two` (6.2) bound for a solvable `K` (the single remaining deep gate).
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S08.six_three_index_bound_general
 -- (6.5) chief-factor core + (6.5)(b) reduction: a Frobenius-acted abelian section obeying the (6.3)
 -- index bound `≤ 4|R|²+1` is a `p`-group (chief-factor argument via the `p`-primary component,
 -- `card_modEq_one` + `six_five_chief_factor_contradiction`); combined with the nilpotent
