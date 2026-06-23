@@ -523,28 +523,26 @@ Given a type-`P` maximal subgroup `M`, its cyclic κ-Hall `K`, and a `(κ∪σ)'
 maximal-pair factors — unblocking Peterfalvi `basic_structure` (13.2).
 
 All structural fields are discharged through lane-f's BG §14/15/16 machinery (sorry-free, cited):
-`isTypeP2_of_hall_subgroupOf_ne_bot` (type-`P₂` from the nontrivial `(κ∪σ)'`-Hall),
-`typeP2_mf_internal_fitting_decomposition` (the deep `M'`-complement/Fitting fields), and
+`typeP2_mf_internal_fitting_decomposition` (the deep `M'`-complement/Fitting fields) and
 `typeP_hall_derived_eq_and_abelian` (`U` abelian, hence nilpotent), fed to
 `typePData_of_isTypeP_of_inputs`.  The two structural hypotheses — `K ≤ N_G(U)` and that `U` is the
-`(κ∪σ)'`-Hall — are the residual obligations of the §16 producer (issue 4008): for the canonical
-pair `K ≤ N_G(U)` is `exists_kappaHall_invariant_complement_to_MF`, and the `(κ∪σ)'`-Hall property
-is the remaining BG §14 alignment (the κ-Hall-invariant complement *is* the `(κ∪σ)'`-Hall). -/
+`(κ∪σ)'`-Hall — are the residual obligations discharged for the canonical pair by
+`exists_kappaHall_invariant_complement_to_MF` (`K ≤ N_G(U)`) and
+`isHall_kappaSigmaCompl_of_isTypeP2_complement` (the `(κ∪σ)'`-Hall property), bundled in
+`exists_typePData_W1_eq_of_isTypeP2`. -/
 noncomputable def typePData_of_kappaHall_hallComplement {G : Type*} [Group G] [Finite G]
     (hG : IsMinimalSimpleOdd G) {M K U : Subgroup G}
-    (hM : M ∈ maximalSubgroups G) (hP : BG.Ch4.S14.IsTypeP M) (hKM : K ≤ M) (hKne : K ≠ ⊥)
-    (hK : Ch03.IsHallSubgroup (BG.Ch4.S14.kappa M) (K.subgroupOf M))
-    (hUM : U ≤ M) (hUne : U.subgroupOf M ≠ ⊥)
+    (hM : M ∈ maximalSubgroups G) (hP2 : BG.Ch4.S14.IsTypeP2 M) (hKM : K ≤ M) (hKne : K ≠ ⊥)
+    (hK : Ch03.IsHallSubgroup (BG.Ch4.S14.kappa M) (K.subgroupOf M)) (hUM : U ≤ M)
     (hUhall : Ch03.IsHallSubgroup ((BG.Ch4.S14.kappa M ∪ BG.Ch3.S10.sigma M)ᶜ) (U.subgroupOf M))
     (hKnorm : K ≤ Subgroup.normalizer (U : Set G)) :
     TypePData M :=
   -- Term-mode (no `obtain`/`have` casesOn) so the `.W₁ = K`/`.U = U` projections reduce
   -- definitionally past lane-f's tactic-built `typePData_of_isTypeP_of_inputs`
   -- (memory: coupled engine fields + beta).
-  let hdec := BG.Ch4.S15.typeP2_mf_internal_fitting_decomposition hG hM
-    (BG.Ch4.S16.isTypeP2_of_hall_subgroupOf_ne_bot hP hUhall hUne) hKM hUM hKne hK hUhall
+  let hdec := BG.Ch4.S15.typeP2_mf_internal_fitting_decomposition hG hM hP2 hKM hUM hKne hK hUhall
   let hM'ab := BG.Ch4.S15.typeP_hall_derived_eq_and_abelian hG hM hKM hUM hKne hK hUhall
-  BG.Ch4.S16.typePData_of_isTypeP_of_inputs hG hM hP hKM hKne hK
+  BG.Ch4.S16.typePData_of_isTypeP_of_inputs hG hM hP2.1 hKM hKne hK
     (le_sup_left.trans_eq hM'ab.1.symm) hKnorm
     (haveI := hM'ab.2; (inferInstance : Group.IsNilpotent ↥U))
     hdec.1 hdec.2.1 hdec.2.2
@@ -552,12 +550,11 @@ noncomputable def typePData_of_kappaHall_hallComplement {G : Type*} [Group G] [F
 /-- The chosen cyclic factor: `data.W₁ = K` (definitional). -/
 theorem typePData_of_kappaHall_hallComplement_W1 {G : Type*} [Group G] [Finite G]
     (hG : IsMinimalSimpleOdd G) {M K U : Subgroup G}
-    (hM : M ∈ maximalSubgroups G) (hP : BG.Ch4.S14.IsTypeP M) (hKM : K ≤ M) (hKne : K ≠ ⊥)
-    (hK : Ch03.IsHallSubgroup (BG.Ch4.S14.kappa M) (K.subgroupOf M))
-    (hUM : U ≤ M) (hUne : U.subgroupOf M ≠ ⊥)
+    (hM : M ∈ maximalSubgroups G) (hP2 : BG.Ch4.S14.IsTypeP2 M) (hKM : K ≤ M) (hKne : K ≠ ⊥)
+    (hK : Ch03.IsHallSubgroup (BG.Ch4.S14.kappa M) (K.subgroupOf M)) (hUM : U ≤ M)
     (hUhall : Ch03.IsHallSubgroup ((BG.Ch4.S14.kappa M ∪ BG.Ch3.S10.sigma M)ᶜ) (U.subgroupOf M))
     (hKnorm : K ≤ Subgroup.normalizer (U : Set G)) :
-    (typePData_of_kappaHall_hallComplement hG hM hP hKM hKne hK hUM hUne hUhall hKnorm).W1 = K := by
+    (typePData_of_kappaHall_hallComplement hG hM hP2 hKM hKne hK hUM hUhall hKnorm).W1 = K := by
   unfold typePData_of_kappaHall_hallComplement
     BG.Ch4.S16.typePData_of_isTypeP_of_inputs BG.Ch4.S16.typePData_of_inputs
   rfl
@@ -565,15 +562,34 @@ theorem typePData_of_kappaHall_hallComplement_W1 {G : Type*} [Group G] [Finite G
 /-- The chosen complement: `data.U = U` (definitional). -/
 theorem typePData_of_kappaHall_hallComplement_U {G : Type*} [Group G] [Finite G]
     (hG : IsMinimalSimpleOdd G) {M K U : Subgroup G}
-    (hM : M ∈ maximalSubgroups G) (hP : BG.Ch4.S14.IsTypeP M) (hKM : K ≤ M) (hKne : K ≠ ⊥)
-    (hK : Ch03.IsHallSubgroup (BG.Ch4.S14.kappa M) (K.subgroupOf M))
-    (hUM : U ≤ M) (hUne : U.subgroupOf M ≠ ⊥)
+    (hM : M ∈ maximalSubgroups G) (hP2 : BG.Ch4.S14.IsTypeP2 M) (hKM : K ≤ M) (hKne : K ≠ ⊥)
+    (hK : Ch03.IsHallSubgroup (BG.Ch4.S14.kappa M) (K.subgroupOf M)) (hUM : U ≤ M)
     (hUhall : Ch03.IsHallSubgroup ((BG.Ch4.S14.kappa M ∪ BG.Ch3.S10.sigma M)ᶜ) (U.subgroupOf M))
     (hKnorm : K ≤ Subgroup.normalizer (U : Set G)) :
-    (typePData_of_kappaHall_hallComplement hG hM hP hKM hKne hK hUM hUne hUhall hKnorm).U = U := by
+    (typePData_of_kappaHall_hallComplement hG hM hP2 hKM hKne hK hUM hUhall hKnorm).U = U := by
   unfold typePData_of_kappaHall_hallComplement
     BG.Ch4.S16.typePData_of_isTypeP_of_inputs BG.Ch4.S16.typePData_of_inputs
   rfl
+
+/-- **Matched `TypePData` for a type-`P₂` maximal subgroup** (`sorry`-free; POLE-1 carrier, issue
+4008).  Given a type-`P₂` maximal subgroup `M` and a cyclic κ-Hall `K`, the κ-Hall-invariant
+complement `U` to `M_F` in `M'` (`exists_kappaHall_invariant_complement_to_MF`, supplying
+`K ≤ N_G(U)`) is the `(κ∪σ)'`-Hall (`isHall_kappaSigmaCompl_of_isTypeP2_complement`), so
+`typePData_of_kappaHall_hallComplement` produces a `TypePData M` with the **chosen** factor
+`data.W₁ = K`.  This is the bridge the §16 producer needs to carry a `TypePData mp.S` whose `W₁` is
+the maximal-pair κ-Hall `mp.K` — the last carrier step before Peterfalvi `basic_structure` (13.2),
+the residual gate being only that the type-II member `mp.S` of the pair is type-`P₂` (Pf (13.2.a)). -/
+theorem exists_typePData_W1_eq_of_isTypeP2 {G : Type*} [Group G] [Finite G]
+    (hG : IsMinimalSimpleOdd G) {M K : Subgroup G}
+    (hM : M ∈ maximalSubgroups G) (hP2 : BG.Ch4.S14.IsTypeP2 M) (hKM : K ≤ M) (hKne : K ≠ ⊥)
+    (hK : Ch03.IsHallSubgroup (BG.Ch4.S14.kappa M) (K.subgroupOf M)) [IsCyclic ↥K] :
+    ∃ data : TypePData M, data.W1 = K := by
+  obtain ⟨U, hUsup, hKnorm, hUinf⟩ :=
+    BG.Ch4.S14.exists_kappaHall_invariant_complement_to_MF hG hM hP2.1 hKM hK
+  have hUM : U ≤ M := (le_sup_right.trans_eq hUsup.symm).trans (Subgroup.map_subtype_le _)
+  have hUhall := isHall_kappaSigmaCompl_of_isTypeP2_complement hG hM hP2 hUM hUsup hUinf
+  exact ⟨typePData_of_kappaHall_hallComplement hG hM hP2 hKM hKne hK hUM hUhall hKnorm,
+    typePData_of_kappaHall_hallComplement_W1 hG hM hP2 hKM hKne hK hUM hUhall hKnorm⟩
 
 /-- **Type-P structure engine from the type data** (`sorry`-free, gated-endpoint skeleton).
 
