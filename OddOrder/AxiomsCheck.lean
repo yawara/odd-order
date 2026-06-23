@@ -3888,6 +3888,12 @@ set_option linter.style.longLine false in
 -- BG Theorem 3.10 (c) GROUP form (issue 8013, piece 5 = §15.2 step-4 (g) `D'⊆C_D(Q̄)`): with the
 -- genuine `IsFrobeniusGroup` and `C_M(R)` cyclic, `K'` acts trivially on `M` (`∀ g∈⁅K,K⁆, g•m=m`).
 #assert_only_allowed_axioms OddOrder.BG.Ch1.S03.commutator_acts_trivially_of_elemAbelian_general
+-- BG Lemma 3.2 (§3A), general branch `K ⊄ N`: in a finite Frobenius group `G = K R` with solvable
+-- kernel `K`, a normal subgroup `N ⊴ G` with `K ⊄ N` meets the complement trivially (`N ⊓ R = ⊥`),
+-- is contained in `K` (`N < K`), and `Ḡ = G/N` is again Frobenius with kernel `K̄`, complement `R̄`.
+#assert_only_allowed_axioms OddOrder.BG.Ch1.S03.inf_complement_eq_bot_of_normal_not_le_kernel
+#assert_only_allowed_axioms OddOrder.BG.Ch1.S03.normal_le_kernel_of_not_le
+#assert_only_allowed_axioms OddOrder.BG.Ch1.S03.isFrobeniusGroup_quotient_of_normal_not_le_kernel
 -- BG Theorem 3.8 (§3D): `G = KR` solvable of odd order, `K ⊴ G`, `(|R|,|K|)=1`, `C_K(x)=C_K(R)` for
 -- `x ∈ R^#`, and `C_{F(K)}(R)=1`, gives `⁅K,R⁆ ⊆ F(K)`.  Unblocks BG §15 Theorem 15.2 (issue 8011).
 #assert_only_allowed_axioms OddOrder.BG.Ch1.S03h.thm38
@@ -5780,3 +5786,12 @@ formula together with the prime computation `coprimeFrobeniusAction_card_eq_prim
 -- structure of `U W₁` via Isaacs Cor 3.28 (`coprime_fixedPoints_quotient`).
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S11.chiefFactor_caseB_image_coprime
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S11.chiefFactor_caseB_image_dvd_norm
+-- Peterfalvi (9.7): the Clifford dichotomy, fully packaged into the carriers `CliffordCaseAData` /
+-- `CliffordCaseBData`.  Case (b) wires the Singer divisibilities (with `chars.u = |Ū|` pinned); case
+-- (a) builds the `q` order-`p` factors (the `SupIndep` orbit family) and the bound `a ∣ p-1` (the
+-- restricted `U`-action on an order-`p` factor).  All axiom-clean.
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S11.exists_supIndep_aInvariant_family_of_iSup
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S11.aInvariantRestrictAut_range_card_dvd
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S11.clifford_caseB_data
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S11.clifford_caseA_data
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S11.clifford_dichotomy

@@ -4813,6 +4813,128 @@ theorem Hypothesis.tau_muColumnZero_sub_zeta_eq [Finite G]
         rw [smul_smul, hδsq, one_smul]
 
 open scoped FiniteInduce in
+/-- **§10 Dade isometry vanishes off the tame support `Ã(M) = dadeSupport`.**  For a class function
+`φ` on `M` supported on `A_0(M)`, the Dade image `φ^τ = hyp.tau φ` *vanishes* at any
+`g ∉ Ã(M) = hyp.dadeData.dade.dadeSupport`.
+
+The genuine §10 Dade isometry `hyp.tau` is `S07.dadeIntegralCharacterMap hyp.dadeData.dade …`; on the
+supported subspace it agrees with the §4 Dade map `hyp.dadeData.dade.dadeMap`
+(`dadeIntegralCharacterMap_apply_of_support`), which vanishes off `dadeSupport`
+(`IsDadeMap.map_eq_zero_of_not_mem_dadeSupport`).  This is the general "vanishes off `Ã(M)`" companion
+of `dadeIntegralCharacterMap_apply_one_eq_zero` (the `g = 1` special case), and the `Ã(M)`-vanishing
+step of (10.6)(b) (issue 1009, STEP 2). -/
+theorem Hypothesis.tau_apply_eq_zero_of_not_mem_dadeSupport [Finite G] {M : Subgroup G}
+    (hyp : Hypothesis M) {φ : ClassFunction ↥M ℂ} (hφ : φ.support ⊆ hyp.A0)
+    {g : G} (hg : g ∉ hyp.dadeData.dade.dadeSupport) :
+    hyp.tau φ g = 0 := by
+  haveI := hyp.finiteG
+  classical
+  show OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap hyp.dadeData.dade
+      (hyp.dadeData.dade.fullDadeIsometryData hyp.hconj) φ g = 0
+  rw [OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap_apply_of_support hyp.dadeData.dade _ hφ]
+  exact (hyp.dadeData.dade.isDadeMap_dadeMap (k := ℂ)).map_eq_zero_of_not_mem_dadeSupport
+    (⟨φ, (ClassFunction.mem_supportedSubmodule).mpr hφ⟩ :
+      OddOrder.Peterfalvi.S04.SupportedClassFunctions (G := G) ℂ (typePA0 M hyp.typeP) M) g hg
+
+open scoped FiniteInduce in
+/-- **§10 support of `μ_0 − ζ`** (Peterfalvi (10.6)(b), the `Ã(M)`-vanishing leg): the column-`0`
+sum `μ_0 = ∑_i μ_{i0}` (an induced character of degree `w₁`, since each `μ_{i0}(1) = 1`) minus a
+degree-`w₁` irreducible `ζ ∈ S` (induced from `M'`) is supported in `A_0(M)`.
+
+Both `μ_0` and `ζ` are induced from the normal `M' = [M,M]`, hence vanish off `M'`
+(`muGrid_column_sum_vanishes_off_derived`; induced-from-`M'` for `ζ`); and the degrees cancel,
+`(μ_0 − ζ)(1) = w₁ − w₁ = 0` (`muGrid_zero_column_apply_one`), so the support lies in
+`M'^# ⊆ A(M) ⊆ A_0(M)`.
+
+This is the companion of `muColumn_sub_conj_support`/`zeta_sub_conj_support`: it makes `μ_0 − ζ`
+`A_0`-supported, so the Dade isometry `τ` vanishes on it off `Ã(M)`
+(`tau_apply_eq_zero_of_not_mem_dadeSupport`).  Together with the (10.6)(b) reduction identity
+`τ(μ_0 − ζ) = ∑_i ω_{i0}^σ − ζ^{τ₁}` (`tau_muColumnZero_sub_zeta_eq`) it yields the pointwise
+identity `ζ^{τ₁}(g) = ∑_i ω_{i0}^σ(g)` off `Ã(M)`. -/
+theorem Hypothesis.muColumnZero_sub_zeta_support [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} (hyp : Hypothesis M)
+    (hodd : Odd (Nat.card G)) {ζ : ClassFunction ↥M ℂ} (hζS : ζ ∈ inducedFamily M)
+    (hζ1 : ζ 1 = (hyp.w1 : ℂ)) :
+    ((∑ i : Fin hyp.w1, hyp.muGrid hG hodd i 0) - ζ).support ⊆ hyp.A0 := by
+  haveI := hyp.finiteG
+  classical
+  obtain ⟨θ, _hθne, hζeq⟩ := hζS
+  have hKcomm : (derivedInG M).subgroupOf M = commutator ↥M := by
+    rw [derivedInG, Subgroup.subgroupOf, Subgroup.comap_map_eq_self_of_injective M.subtype_injective]
+  haveI hKnormal : ((derivedInG M).subgroupOf M).Normal := by rw [hKcomm]; infer_instance
+  have hζvanish : ∀ {w : ↥M}, w ∉ (derivedInG M).subgroupOf M → ζ w = 0 := fun {w} hw => by
+    rw [hζeq]; exact ClassFunction.induce_eq_zero_of_not_mem_normal _ hw
+  have hsumapply : ∀ (w : ↥M), (∑ i : Fin hyp.w1, hyp.muGrid hG hodd i 0) w
+      = ∑ i : Fin hyp.w1, hyp.muGrid hG hodd i 0 w := by
+    intro w
+    refine Finset.univ.induction_on (motive := fun s =>
+      (∑ i ∈ s, hyp.muGrid hG hodd i 0) w = ∑ i ∈ s, hyp.muGrid hG hodd i 0 w) ?_ ?_
+    · simp
+    · intro a s ha ih
+      rw [Finset.sum_insert ha, Finset.sum_insert ha, ClassFunction.add_apply, ih]
+  intro z hz
+  rw [ClassFunction.mem_support] at hz
+  -- `z ∈ M'`: else `μ_0 z = ζ z = 0`.
+  have hzK : z ∈ (derivedInG M).subgroupOf M := by
+    by_contra hzK
+    apply hz
+    rw [ClassFunction.sub_apply, hyp.muGrid_column_sum_vanishes_off_derived hG hodd 0 hzK,
+      hζvanish hzK, sub_zero]
+  -- `z ≠ 1`: `(μ_0 − ζ)(1) = w₁ − w₁ = 0`.
+  have hz1 : z ≠ 1 := by
+    rintro rfl
+    apply hz
+    rw [ClassFunction.sub_apply, hζ1, hsumapply 1,
+      Finset.sum_congr rfl (fun i _ => hyp.muGrid_zero_column_apply_one hG hodd i),
+      Finset.sum_const, Finset.card_univ, Fintype.card_fin, nsmul_eq_mul, mul_one, sub_self]
+  have hzM' : (z : G) ∈ derivedInG M := Subgroup.mem_subgroupOf.mp hzK
+  show (z : G) ∈ typePA0 M hyp.typeP
+  unfold typePA0
+  rw [Set.mem_union]
+  left
+  exact ⟨hzM', fun h0 => hz1 (Subtype.ext h0), (z : G),
+    ⟨z.2, fun h0 => hz1 (Subtype.ext (Set.mem_singleton_iff.mp h0))⟩,
+    Subgroup.mem_centralizer_singleton_iff.mpr rfl⟩
+
+open scoped FiniteInduce in
+/-- **Peterfalvi (10.6)(b), STEP 2** (the `Ã(M)`-vanishing reduction): off the tame support
+`Ã(M) = dadeSupport`, the coherent image `ζ^{τ₁}` agrees with the column-`0` σ-sum,
+`ζ^{τ₁}(g) = ∑_i ω_{i0}^σ(g)` for `g ∉ hyp.dadeData.dade.dadeSupport`.
+
+Combines the (10.6)(b) reduction identity `τ(μ_0 − ζ) = ∑_i ω_{i0}^σ − ζ^{τ₁}`
+(`tau_muColumnZero_sub_zeta_eq`, STEP 1) with the vanishing of `τ(μ_0 − ζ)` off `Ã(M)`
+(`tau_apply_eq_zero_of_not_mem_dadeSupport`, since `μ_0 − ζ` is `A_0`-supported by
+`muColumnZero_sub_zeta_support`).  This is STEP 2 of (10.6)(b) (issue 1009); the remaining STEP 3
+(parity of `∑_i ω_{i0}^σ(g)` using `ω_{00}^σ = 1_G` and the conjugate-pairing of the `i > 0`
+terms) then gives `|ζ^{τ₁}(g)| ≥ 1`. -/
+theorem Hypothesis.zeta_tau1_apply_eq_omegaSigma_sum_of_not_mem_dadeSupport [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} {hyp : Hypothesis M}
+    {params : CharacterParameters hyp} (coh : CoherentHypothesis hyp params)
+    (hmu : params.mu = hyp.muGrid hG hG.odd)
+    (hos : params.omegaSigma = hyp.alignedOmegaSigmaGrid hG hG.odd)
+    (hzS : params.zeta ∈ inducedFamily M) (hz1 : params.zeta 1 = (hyp.w1 : ℂ))
+    (hzconj : params.zeta.conj ≠ params.zeta)
+    (hδpm : params.delta = 1 ∨ params.delta = -1)
+    (hδj : ∀ j : Fin hyp.w2, j ≠ 0 → hyp.muColumnSign hG hG.odd j = params.delta)
+    {g : G} (hg : g ∉ hyp.dadeData.dade.dadeSupport) :
+    coh.tau1 params.zeta g
+      = (∑ i : Fin hyp.w1, hyp.alignedOmegaSigmaGrid hG hG.odd i 0) g := by
+  haveI := hyp.finiteG
+  -- STEP 1: `τ(μ_0 − ζ) = ∑_i ω_{i0}^σ − ζ^{τ₁}` as class functions on `G`.
+  have hstep1 := hyp.tau_muColumnZero_sub_zeta_eq hG coh hmu hos hzS hz1 hzconj hδpm hδj
+  -- `μ_0 − ζ` is `A_0`-supported, so `τ(μ_0 − ζ)` vanishes off `Ã(M)`.
+  have hsupp := hyp.muColumnZero_sub_zeta_support hG hG.odd hzS hz1
+  have hvanish := hyp.tau_apply_eq_zero_of_not_mem_dadeSupport hsupp hg
+  -- Evaluate the STEP 1 identity at `g` (`ClassFunction` is a `CoeFun`, not `DFunLike`).
+  have heval : hyp.tau ((∑ i : Fin hyp.w1, hyp.muGrid hG hG.odd i 0) - params.zeta) g
+      = ((∑ i : Fin hyp.w1, hyp.alignedOmegaSigmaGrid hG hG.odd i 0)
+          - coh.tau1 params.zeta) g :=
+    congrArg (fun f : ClassFunction G ℂ => (f : G → ℂ) g) hstep1
+  -- Cancel the vanishing left-hand side.
+  rw [ClassFunction.sub_apply, hvanish] at heval
+  linear_combination heval
+
+open scoped FiniteInduce in
 /-- **Peterfalvi (10.6)**: the sums of `omega_ij^sigma` describe the `tau1`
 images, and outside the tame support the value of `zeta^tau1` has norm at least
 one.
