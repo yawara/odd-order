@@ -425,6 +425,70 @@ noncomputable def section16MaximalPair_of_isMinimalSimpleOdd {G : Type*} [Group 
       Z_cyclic := hZcyc
       K_lt_Kstar := hKlt }
 
+open scoped IsMulCommutative in
+/-- **`TypePData M` from a `K`-invariant `(κ∪σ)'`-Hall complement `U`** (`sorry`-free engine;
+POLE-1 carrier, issue 4008).
+
+Given a type-`P` maximal subgroup `M`, its cyclic κ-Hall `K`, and a `(κ∪σ)'`-Hall complement `U`
+*normalised by* `K` (`hKnorm`), this assembles the Peterfalvi type-`P` datum `TypePData M` with the
+**chosen** factors `data.W₁ = K`, `data.U = U` (definitionally — `…_W1`/`…_U`).  This is the
+*complement-specified* constructor that `typePData_of_isTypeNonI` cannot provide (it builds its own
+`U`), so it lets the §16 `Section16TypePStructure` carry a `TypePData` whose `W₁`/`U` agree with the
+maximal-pair factors — unblocking Peterfalvi `basic_structure` (13.2).
+
+All structural fields are discharged through lane-f's BG §14/15/16 machinery (sorry-free, cited):
+`isTypeP2_of_hall_subgroupOf_ne_bot` (type-`P₂` from the nontrivial `(κ∪σ)'`-Hall),
+`typeP2_mf_internal_fitting_decomposition` (the deep `M'`-complement/Fitting fields), and
+`typeP_hall_derived_eq_and_abelian` (`U` abelian, hence nilpotent), fed to
+`typePData_of_isTypeP_of_inputs`.  The two structural hypotheses — `K ≤ N_G(U)` and that `U` is the
+`(κ∪σ)'`-Hall — are the residual obligations of the §16 producer (issue 4008): for the canonical
+pair `K ≤ N_G(U)` is `exists_kappaHall_invariant_complement_to_MF`, and the `(κ∪σ)'`-Hall property
+is the remaining BG §14 alignment (the κ-Hall-invariant complement *is* the `(κ∪σ)'`-Hall). -/
+noncomputable def typePData_of_kappaHall_hallComplement {G : Type*} [Group G] [Finite G]
+    (hG : IsMinimalSimpleOdd G) {M K U : Subgroup G}
+    (hM : M ∈ maximalSubgroups G) (hP : BG.Ch4.S14.IsTypeP M) (hKM : K ≤ M) (hKne : K ≠ ⊥)
+    (hK : Ch03.IsHallSubgroup (BG.Ch4.S14.kappa M) (K.subgroupOf M))
+    (hUM : U ≤ M) (hUne : U.subgroupOf M ≠ ⊥)
+    (hUhall : Ch03.IsHallSubgroup ((BG.Ch4.S14.kappa M ∪ BG.Ch3.S10.sigma M)ᶜ) (U.subgroupOf M))
+    (hKnorm : K ≤ Subgroup.normalizer (U : Set G)) :
+    TypePData M :=
+  -- Term-mode (no `obtain`/`have` casesOn) so the `.W₁ = K`/`.U = U` projections reduce
+  -- definitionally past lane-f's tactic-built `typePData_of_isTypeP_of_inputs`
+  -- (memory: coupled engine fields + beta).
+  let hdec := BG.Ch4.S15.typeP2_mf_internal_fitting_decomposition hG hM
+    (BG.Ch4.S16.isTypeP2_of_hall_subgroupOf_ne_bot hP hUhall hUne) hKM hUM hKne hK hUhall
+  let hM'ab := BG.Ch4.S15.typeP_hall_derived_eq_and_abelian hG hM hKM hUM hKne hK hUhall
+  BG.Ch4.S16.typePData_of_isTypeP_of_inputs hG hM hP hKM hKne hK
+    (le_sup_left.trans_eq hM'ab.1.symm) hKnorm
+    (haveI := hM'ab.2; (inferInstance : Group.IsNilpotent ↥U))
+    hdec.1 hdec.2.1 hdec.2.2
+
+/-- The chosen cyclic factor: `data.W₁ = K` (definitional). -/
+theorem typePData_of_kappaHall_hallComplement_W1 {G : Type*} [Group G] [Finite G]
+    (hG : IsMinimalSimpleOdd G) {M K U : Subgroup G}
+    (hM : M ∈ maximalSubgroups G) (hP : BG.Ch4.S14.IsTypeP M) (hKM : K ≤ M) (hKne : K ≠ ⊥)
+    (hK : Ch03.IsHallSubgroup (BG.Ch4.S14.kappa M) (K.subgroupOf M))
+    (hUM : U ≤ M) (hUne : U.subgroupOf M ≠ ⊥)
+    (hUhall : Ch03.IsHallSubgroup ((BG.Ch4.S14.kappa M ∪ BG.Ch3.S10.sigma M)ᶜ) (U.subgroupOf M))
+    (hKnorm : K ≤ Subgroup.normalizer (U : Set G)) :
+    (typePData_of_kappaHall_hallComplement hG hM hP hKM hKne hK hUM hUne hUhall hKnorm).W1 = K := by
+  unfold typePData_of_kappaHall_hallComplement
+    BG.Ch4.S16.typePData_of_isTypeP_of_inputs BG.Ch4.S16.typePData_of_inputs
+  rfl
+
+/-- The chosen complement: `data.U = U` (definitional). -/
+theorem typePData_of_kappaHall_hallComplement_U {G : Type*} [Group G] [Finite G]
+    (hG : IsMinimalSimpleOdd G) {M K U : Subgroup G}
+    (hM : M ∈ maximalSubgroups G) (hP : BG.Ch4.S14.IsTypeP M) (hKM : K ≤ M) (hKne : K ≠ ⊥)
+    (hK : Ch03.IsHallSubgroup (BG.Ch4.S14.kappa M) (K.subgroupOf M))
+    (hUM : U ≤ M) (hUne : U.subgroupOf M ≠ ⊥)
+    (hUhall : Ch03.IsHallSubgroup ((BG.Ch4.S14.kappa M ∪ BG.Ch3.S10.sigma M)ᶜ) (U.subgroupOf M))
+    (hKnorm : K ≤ Subgroup.normalizer (U : Set G)) :
+    (typePData_of_kappaHall_hallComplement hG hM hP hKM hKne hK hUM hUne hUhall hKnorm).U = U := by
+  unfold typePData_of_kappaHall_hallComplement
+    BG.Ch4.S16.typePData_of_isTypeP_of_inputs BG.Ch4.S16.typePData_of_inputs
+  rfl
+
 /-- **Type-P structure engine from the type data** (`sorry`-free, gated-endpoint skeleton).
 
 Given the Peterfalvi type data (`TypePData`) of both members of the maximal pair, this assembles
@@ -559,6 +623,83 @@ noncomputable def section16TypePStructure_of_isMinimalSimpleOdd {G : Type*} [Gro
   exact section16TypePStructure_of_components mp.K mp.Kstar hScompl.choose hTcompl.choose
     hScompl.choose_spec.1 hTcompl.choose_spec.1 hprimes.1 hprimes.2
     hWjoin hWcyc hbot hcomm hScompl.choose_spec.2.1 hTcompl.choose_spec.2.1 mp.K_lt_Kstar
+
+/-- **Certain-type §6 hypothesis from κ-Hall pairing data** — *lane-b* (cd producer building block).
+
+For a type-`P` maximal `M` with cyclic κ-Hall `K` and the dual factor `K* = M_σ ⊓ C(K)` (cyclic,
+nontrivial), builds the Peterfalvi §6 certain-type Hypothesis (4.2) with `W₁ = K`, `W₂ = K*`,
+`K(§6) = M' = [M,M]`, all transported into `↥M`.  Structural fields are discharged from the
+BG §14/§16 type-`P` theory: `M = M' ⋊ K` (`typeP_derivedInG_isComplement_kappaHall`, BG 14.7(h)),
+the (4.2.b) centralizer law `C_{M'}(k) = K*` for `k ∈ K#`
+(`typeP_derivedInG_inf_centralizer_kappaElement_eq`, BG Thm C / Pf (8.4)), Hall coprimality
+(`IsHallSubgroup.coprime_index` with `[M:M'] = |K|`), and `K* ≤ M_σ ≤ M'`.
+
+Unlike `typePData_toS06Hypothesis` (which uses a `TypePData`'s *canonical* `W₁`), this builds the
+hypothesis with `W₁ = K` the *chosen pairing factor*, so the resulting `ω`/`μ`-grids are indexed by
+`tp.W₁ = mp.K`, `tp.W₂ = mp.Kstar` — exactly the indexing `Section16CharacterData` needs (no
+cross-construction `W`-identification).  Applied to `(mp.S; mp.K, mp.Kstar)` and the swapped
+`(mp.T; mp.Kstar, mp.K)`, it gives the two members' certain-type machinery for the cd producer. -/
+noncomputable def certainTypeHypothesis_of_typeP_kappaHall {G : Type*} [Group G] [Finite G]
+    (hG : IsMinimalSimpleOdd G) {M K Kstar : Subgroup G}
+    (hM : M ∈ maximalSubgroups G) (hP : BG.Ch4.S14.IsTypeP M) (hKM : K ≤ M)
+    (hK : Ch03.IsHallSubgroup (BG.Ch4.S14.kappa M) (K.subgroupOf M))
+    (hKstar : Kstar = BG.Ch3.S10.Msigma M ⊓ Subgroup.centralizer (K : Set G))
+    (hKcyc : IsCyclic ↥K) (hKstarcyc : IsCyclic ↥Kstar) (hKstarne : Kstar ≠ ⊥) :
+    OddOrder.Peterfalvi.S06.Hypothesis ↥M := by
+  haveI := hKcyc
+  haveI := hKstarcyc
+  have hM'le : derivedInG M ≤ M := Subgroup.map_subtype_le _
+  have hKstarM' : Kstar ≤ derivedInG M := by
+    rw [hKstar]; exact inf_le_left.trans (BG.Ch3.S10.Msigma_le_derived hG hM)
+  have hKstarM : Kstar ≤ M := hKstarM'.trans hM'le
+  have hcompl := BG.Ch4.S14.typeP_derivedInG_isComplement_kappaHall hG hM hP hKM hK
+  have hidx : (K.subgroupOf M).index = Nat.card ↥(derivedInG M) := by
+    rw [hcompl.index_eq_card]
+    exact Nat.card_congr (Subgroup.subgroupOfEquivOfLe hM'le).toEquiv
+  have hCop : Nat.Coprime (Nat.card ↥K) (Nat.card ↥(derivedInG M)) := by
+    have hco := hK.coprime_index
+    rwa [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hKM).toEquiv, hidx] at hco
+  exact
+    { K := (derivedInG M).subgroupOf M
+      W1 := K.subgroupOf M
+      W2 := Kstar.subgroupOf M
+      K_normal := by
+        rw [show (derivedInG M).subgroupOf M = commutator ↥M by
+          rw [derivedInG, Subgroup.subgroupOf,
+            Subgroup.comap_map_eq_self_of_injective M.subtype_injective]]
+        infer_instance
+      isComplement := hcompl
+      W1_nontrivial := by
+        rw [ne_eq, Subgroup.subgroupOf_eq_bot]
+        intro hdisj
+        exact BG.Ch4.S14.card_kappaHall_ne_one hP hKM hK
+          (Subgroup.card_eq_one.mpr (disjoint_self.mp (hdisj.mono_right hKM)))
+      W1_cyclic := isCyclic_of_injective (Subgroup.subgroupOfEquivOfLe hKM).toMonoidHom
+        (Subgroup.subgroupOfEquivOfLe hKM).injective
+      card_coprime := by
+        rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hM'le).toEquiv,
+          Nat.card_congr (Subgroup.subgroupOfEquivOfLe hKM).toEquiv]
+        exact hCop.symm
+      W2_nontrivial := by
+        rw [ne_eq, Subgroup.subgroupOf_eq_bot]
+        exact fun hdisj => hKstarne (disjoint_self.mp (hdisj.mono_right hKstarM))
+      W2_cyclic := isCyclic_of_injective (Subgroup.subgroupOfEquivOfLe hKstarM).toMonoidHom
+        (Subgroup.subgroupOfEquivOfLe hKstarM).injective
+      W2_le_K := Subgroup.comap_mono hKstarM'
+      centralizer_W2 := by
+        intro x hx1 hx2
+        have hxW1 : (x : G) ∈ K := Subgroup.mem_subgroupOf.mp hx1
+        have hxne : (x : G) ≠ 1 := fun h => hx2 (Subtype.ext h)
+        have hamb : Subgroup.centralizer ({(x : G)} : Set G) ⊓ derivedInG M = Kstar := by
+          rw [inf_comm]
+          exact BG.Ch4.S16.typeP_derivedInG_inf_centralizer_kappaElement_eq hG hM hP hKM hK hKstar
+            (x : G) hxW1 hxne
+        rw [OddOrder.BG.Ch1.S03h.centralizer_subgroupOf, Set.image_singleton]
+        simp only [Subgroup.subgroupOf, ← Subgroup.comap_inf, Subgroup.coe_subtype, hamb]
+      W_odd := by
+        rw [← Subgroup.subgroupOf_sup hKM hKstarM,
+          Nat.card_congr (Subgroup.subgroupOfEquivOfLe (sup_le hKM hKstarM)).toEquiv]
+        exact hG.odd.of_dvd_nat (Subgroup.card_subgroup_dvd_card (K ⊔ Kstar)) }
 
 /-- **Peterfalvi §13 coherent Dade-grid producer** (`sorry`) — *lane-b*
 (Peterfalvi §3–§13 coherent grids).  Given the maximal pair and the type-P

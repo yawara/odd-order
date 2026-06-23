@@ -31,9 +31,30 @@ created: 2026-06-18
 `section16CharacterData_of_isMinimalSimpleOdd` の `sorry` が消え、`lake build OddOrder` 緑。
 (深い character theory 依存ゆえ最後発の見込み。)
 
+## 進捗 (2026-06-23) — feasibility 確立、char 理論 in-stock (de-risk)
+
+cd producer を精査し **feasible・全 character 理論 in-stock** と確定 (「deep, last, gated」評価は誤り)。
+正本 = `notes/peterfalvi/s12_s10_character_bridge.md` 更新¹⁵。要点:
+
+- **cd の唯一の実 obligation = (13.1.e) `mu_definition`/`nu_definition`** (Explore + 原文 04.15)。`S16.Hypothesis
+  = S15.Hypothesis + (q<p)`、grid への Prop 制約は (13.1.e) + `eta_eq_tau_omega` (済) のみ。深い性質は下流
+  `BasicStructureData`/`CharacterDegreeData` に defer。
+- **(13.1.e) 数学 in-stock**: `S06.induce_omegaColumnDiff_mu_diff` (proven) + 本セッション landed
+  `S06.induce_chiColumn_diff_mu_diff` (grid-difference 形式 `Ind_W^S(ω−ω₀)=δ(μ−μ₀)`, axiom-clean) = cd の
+  `mu_definition` が literal に cite する形。
+- **omega は W に intrinsic** (`linearIrreducibleCharacter χ`) ⟹ S/T 両 side が同一 omega 共有 (agreement 不要)。
+- **type-II OK**: `typePData_toS06Hypothesis` は `TypePData` のみ要求 (type III/IV/V 不要)。
+- **構築レシピ**: 各 L∈{S,T} で `typePData_of_isTypeNonI`→`typePData_toS06Hypothesis`→chiColumn/columnFamily で
+  grid → (13.1.e) を `induce_chiColumn_diff_mu_diff` で discharge。Sset=`inducedFamily`、A0=`supportInSubgroup`。
+- **残 residual = structural transport** (新 char 理論でない): ① **tp.W (=`mp.S⊓mp.T`, tp.W1=mp.K) と certain-type
+  W (`data_L.W`) の cross-construction 同定** (crux、HUB/lane-f と相談候補)、② Fintype 決定性ゆえ cd は
+  certain-type 級で組む (Hypothesis-level muGrid 経由は Fintype binder desync で破綻)。~300-500 行 transport。
+
 ## 参照
 
-- skeleton commit `80f9aa39`、`OddOrder/FeitThompson.lean:235` (`structure Section16CharacterData mp tp`),
-  `:280` (producer)
-- 上流前提: (6.8) `sibleySetup_is_coherent` (`S08_CoherenceTheorems.lean:59`, lane-b 現タスク)
-- 関連: 8014 (maximalPair) / 7005 (typeP_structure) / 2009 (POLE-2)
+- skeleton commit `80f9aa39`、`OddOrder/FeitThompson.lean:259` (`structure Section16CharacterData mp tp`),
+  `:567` (producer、唯一の実 sorry)
+- (13.1.e): `S06.induce_chiColumn_diff_mu_diff` (NEW) / `S06.induce_omegaColumnDiff_mu_diff`
+- 構築入口: `typePData_toS06Hypothesis` (`S12:660`), `typePData_of_isTypeNonI`, `Hypothesis.muGrid`/`chiColumn`
+- 上流前提: (6.8) `sibleySetup_is_coherent` (DONE)
+- 関連: 8014 (maximalPair✅) / 7005 (typeP_structure✅) / 2009 (POLE-2)

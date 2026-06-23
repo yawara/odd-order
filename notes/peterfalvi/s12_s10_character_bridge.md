@@ -5,6 +5,80 @@
 > 上位文脈 = 記憶 [[ft-endgame-two-poles]] [[peterfalvi-s10-13-gated-on-bg-spine]]、
 > Lane H 視点の正本 = [`s10_13_maximal_structure.md`](s10_13_maximal_structure.md)。
 
+## ★★★ 2026-06-23 更新¹⁵ — **cd producer (POLE-1 charData) は feasible・全 char 理論 in-stock** (de-risk 1004)
+
+§10 残り 3 sorry ((10.7)/(10.8)/(10.10)) は §8-gated (更新¹⁴ で確定) → lane-b の真の FT-path frontier =
+**`section16CharacterData_of_isMinimalSimpleOdd`** (`FeitThompson.lean:569`、FeitThompson.lean 内で唯一の
+実 sorry、POLE-1 cd、issue 1004) に転換。本セッションは cd producer を**精査し feasibility を確立**した
+(「deep, last, gated character theory」評価は誤り; 残るは structural transport で新 char 理論は不要)。
+
+**確定事項 (Explore + 原文 04.15 + S06 精読)**:
+1. **cd の唯一の実 obligation = (13.1.e) `mu_definition`/`nu_definition`** (誘導恒等式)。`S16.Hypothesis =
+   S15.Hypothesis + (q<p)` で、grid (`omega`/`mu`/`nu`/`delta`/`deltaPrime`/`tau3`) への Prop 制約は
+   `mu_definition`/`nu_definition` + `eta_eq_tau_omega` のみ (後者は `sectionSixteenHypothesis_of_inputs` が
+   `eta:=τ₃∘ω`/`rfl` で discharge 済)。orthogonality/norm/irreducibility 等の深い性質は下流の
+   `BasicStructureData`/`CharacterDegreeData` (H/C 所有) に defer。⟹ cd は grid + (13.1.e) を出すだけ。
+2. **(13.1.e) の数学は in-stock**: `S06.induce_omegaColumnDiff_mu_diff` (proven) +
+   **本セッション landed `S06.induce_chiColumn_diff_mu_diff`** (`S06_MuColumnBridge.lean`, axiom-clean) =
+   **grid-difference 形式** `Ind_W^S(ω_{ij}−ω_{0j}) = δ_j(μ_{ij}−μ_{0j})` で、cd の `mu_definition` が
+   literal に cite する形 (ω=`chiColumn`, μ=`columnFamily.mu`, δ=`columnFamily.sign`)。
+3. **omega は W に intrinsic**: `TICyclicHypothesis.omega χ := linearIrreducibleCharacter χ` (ambient 非依存、
+   `χ w` の linear character)。⟹ cd.omega を tp.W 上に一度定義すれば S 側 (Ind→S) / T 側 (Ind→T) の両恒等式が
+   同一 omega を共有でき、**S-vs-T omega agreement 問題は消える**。
+4. **type-II member は OK**: `typePData_toS06Hypothesis : TypePData M → S06.Hypothesis ↥M`
+   (`S12:660`) + `exists_zeta_in_inducedFamily_degree_w1` (`S12:780`) は **`TypePData` のみ要求** (type III/IV/V
+   不要)。type-III/IV/V 制約は S12 `Hypothesis` wrapper の `type_alt` のみ; certain-type machinery (muGrid の中身)
+   は type-P 全体 (II 含む) で動く。cd は mp.S/mp.T の `TypePData` (= `typePData_of_isTypeNonI mp.L_nonI`) から
+   certain-type を建てればよい。
+
+**cd producer 構築レシピ** (次セッション): 各 L ∈ {mp.S, mp.T} で
+  `data_L := typePData_of_isTypeNonI mp.L_nonI` → `h_L := typePData_toS06Hypothesis data_L hodd hHall`
+  → omega=`h_L.chiColumn`, mu=`(h_L.columnFamily χ₂).mu`, delta=`.sign`, (13.1.e)=`induce_chiColumn_diff_mu_diff`。
+  Sset/Tset=`inducedFamily`、A0S/A0T=`supportInSubgroup (typePA0 …)`、tauS/tauT/tau3=Dade integral map。
+
+**残る residual = structural transport (新 char 理論ではない)**:
+- **W 同定 (crux)**: cd.omega は **tp.W** (=`mp.S ⊓ mp.T`, tp.W1=mp.K) 上。`typePData_of_isTypeNonI` は
+  *canonical* W1 を選ぶので `data_S.W1 ≠ mp.K` (両者 κ-Hall 補元で共役だが非等)。⟹ `typePData_of_isTypeNonI`
+  を**使わない**のが正道。
+  **推奨 path (uniqueness 論法回避)**: `S06.Hypothesis ↥mp.S` を **W1=mp.K.subgroupOf S, W2=mp.Kstar.subgroupOf S,
+  K=(derivedInG S).subgroupOf S で直接構成** (`typePData_toS06Hypothesis` の中身を mp/tp の κ-Hall データで再現)。
+  - mp.Kstar ≤ S は OK: `tp.W = mp.K ⊔ mp.Kstar ≤ S` (tp.W_eq_join + tp.W ≤ S)。
+  - 各 S06.Hypothesis field の discharge 元: `card_coprime`←mp.K_hall (κ-Hall coprime index)、`isComplement`←
+    BG Thm 14.7 typeP_derivedInG_isComplement_kappaHall、`centralizer_W2`←type-P pairing (BG §14、`C_{M'}(x)=W2`
+    on W1^#)、`W2_le_K`/`W_odd`←tp+odd。これらは大半 mp/tp に proven で在る (要 grep 確認)。
+  - ⟹ cd は S06.Hypothesis を S/T で 2 個建て、`chiColumn`/`columnFamily`/`induce_chiColumn_diff_mu_diff` で grid
+    + (13.1.e) を出す。tp.W ↔ S06 の W (=mp.K⊔mp.Kstar, subgroupOf S) は **構成的に一致**させられる
+    (data_L.W を後から同定するのでなく、最初から mp.K で建てる)。lane-b 単独で進められる (cross-lane 不要の見込み)。
+- **Fintype 決定性 (engineering)**: S12 `muGrid`/`muColumnSign` は Fintype ↥M / Fintype ↥(W₁⊔W₂) を**内部合成**。
+  Hypothesis-level (13.1.e) を書こうとすると、`induce_*` が要求する明示 `[Fintype ↥(W₁⊔W₂)]` binder が内部合成と
+  desync して `unfold;rfl` が破綻 (本セッション実証)。⟹ cd は **certain-type 級** (`h_L` + 全 instance binder) で
+  `induce_chiColumn_diff_mu_diff` を直接使うのが正道 (Hypothesis wrapper を経由しない)。S12 Hypothesis-level の
+  (13.1.e) de-opaque が要るなら muGrid/muColumnSign を Fintype-binder 化する refactor が前提。
+
+**∴ cd producer の見積もり訂正**: 「最後発・deep char theory」→ **char 理論は全部揃った; 残りは tp.W 同定 +
+reindex + 両 side assembly + Sset/A0/tau の packing (~300-500 行の transport)**。issue 1004 を de-risk。
+
+### ✅ Step A DONE (2026-06-23): `certainTypeHypothesis_of_typeP_kappaHall` (FeitThompson.lean, axiom-clean)
+
+cd producer の crux (W 同定) を解決する**構造部を landed**。`certainTypeHypothesis_of_typeP_kappaHall hG hM hP
+hKM hK hKstar hKcyc hKstarcyc hKstarne : S06.Hypothesis ↥M` — type-P 極大 M の κ-Hall K と dual K* から、
+**W₁=K, W₂=K*, K(§6)=M' の §6 certain-type Hypothesis を直接構成** (`typePData_of_isTypeNonI` の canonical W1
+を回避)。`typePData_toS06Hypothesis` を忠実にミラー、TypePData field の代わりに proven BG §14/§16 を cite:
+- `isComplement` ← `typeP_derivedInG_isComplement_kappaHall` (BG 14.7(h), axiom-clean)
+- `centralizer_W2` ← `typeP_derivedInG_inf_centralizer_kappaElement_eq` (BG Thm C/Pf 8.4, axiom-clean) + inf_comm
+  + `S03h.centralizer_subgroupOf` transport
+- `card_coprime` ← `hK.coprime_index` + `hcompl.index_eq_card` (= [M:M']=|K|)
+- `W1_nontrivial` ← `card_kappaHall_ne_one`、`W2_le_K` ← K*≤M_σ≤M'、`W_odd` ← Odd|G|
+- **初回ビルド成功・axiom-clean (3 axioms)**。AxiomsCheck assertion 付き。
+- **適用**: `(mp.S; K=mp.K, K*=mp.Kstar)` と swap した `(mp.T; K=mp.Kstar, K*=mp.K)` で 2 member 分。
+  全引数 mp から: mp.S_maximal/S_typeP/K_le_S/K_hall/Kstar_eq、Z_cyclic から IsCyclic、K_lt_Kstar から K*≠⊥。
+
+**残り Step B–E** (cd producer 本体): B=grid 定義 (ω=h.chiColumn on tp.W (=h.W₁⊔h.W₂=mp.K⊔mp.Kstar の subgroupOf S
+と defeq)、μ=columnFamily.mu、δ=sign、ν/δ' は T-side で row/col swap)、C=`mu_definition`/`nu_definition` を
+`S06.induce_chiColumn_diff_mu_diff` + compHom transport で discharge、D=Sset/Tset=inducedFamily・A0=supportInSubgroup・
+tauS/tauT/tau3=Dade map、E=`Section16CharacterData` に pack。**B の compHom transport (cd.omega on tp.W ↔ chiColumn
+on tp.W.subgroupOf S) が次の主作業** (FeitThompson に `import S06_MuColumnBridge` 要)。
+
 ## ✅✅✅✅✅✅ 2026-06-23 更新¹⁴ — **Pf (10.6) + (2.7) + (10.9) COMPLETE** (1 session, sorry 5→3)
 
 **本セッション成果 (lane-b, 全 build-green + axiom-clean modulo §10 muGrid 上流 gate)**:

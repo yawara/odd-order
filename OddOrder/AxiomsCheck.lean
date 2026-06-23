@@ -3063,6 +3063,11 @@ set_option linter.style.longLine false in
 -- menu — i.e. the §7–16 spine.  This assertion locks in that the assembly itself is axiom-clean.
 #assert_only_allowed_axioms OddOrder.sectionSixteenHypothesis_of_inputs
 
+-- cd producer (POLE-1 charData) building block: the §6 certain-type Hypothesis (4.2) with `W₁ = K`
+-- the chosen κ-Hall pairing factor, built from the BG §14/§16 type-`P` theory (complement +
+-- centralizer law).  Lets the cd producer index the `ω`/`μ`-grids by `tp.W₁ = mp.K` directly.
+#assert_only_allowed_axioms OddOrder.certainTypeHypothesis_of_typeP_kappaHall
+
 /-! ### BG Appendix C (finite-field norm-set argument). -/
 
 -- Peterfalvi §15/§16 standalone cyclotomic and growth arithmetic feeding the
@@ -3797,6 +3802,9 @@ set_option linter.style.longLine false in
 -- FT-path signature bridge (endpoint D, ft_path_policy.md §4): the certain-type μ-column
 -- (13.1.e) induction relation in explicit `δ·(μ_i − μ_0)` form (= §13 `S15.Hypothesis.mu_definition`).
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S06.Hypothesis.induce_omegaColumnDiff_mu_diff
+-- Same (13.1.e), in the `ω`/`μ`-grid difference form `Ind_W^S(ω_{ij} − ω_{0j}) = δ_j(μ_{ij} − μ_{0j})`
+-- consumed directly by the §13/§16 character-data producer (`Section16CharacterData.mu_definition`).
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S06.Hypothesis.induce_chiColumn_diff_mu_diff
 -- §5 (3.2.a) full: `σ` agrees with the Dade map `τ = Ind_W^G` on all of `CF(W, V)`.
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S05.TICyclicHypothesis.alphaBasis_apply
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S05.TICyclicHypothesis.induceLinear
@@ -5837,3 +5845,6 @@ formula together with the prime computation `coprimeFrobeniusAction_card_eq_prim
 -- the Frobenius kernel `U` centralizes the chief subgroup `H₀`.  The Wielandt content (lane-h's
 -- `frobenius_kernel_centralizes_of_complement_fpf`) is axiom-clean; the fpf input is the §8 gate.
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S13.U_centralizes_H0_of_W1_fpf
+-- Same clause restated against the cleaner subgroup gate `W₂ ⊓ H₀ = ⊥` (the fpf input reduces to it
+-- via `H ⊓ C_G(W₁) = W₂`); isolates the genuine §8/chief obligation.
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S13.U_centralizes_H0_of_W2_inf_H0_bot

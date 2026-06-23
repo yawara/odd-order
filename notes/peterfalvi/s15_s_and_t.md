@@ -80,6 +80,39 @@ clean な lane-local win は無い。内訳:
 
 ---
 
+## 🔧 POLE-1 TypePData carrier 構築 (2026-06-23 relane #3, issue 4008 = option A 裁定)
+
+hub が issue 4008 を **option A** で裁定 → lane-c が POLE-1 tp producer carrier を引き取り
+(`FeitThompson.lean` tp系 + `S14_TypePComplement.lean` complement 露出)。目標 = `Section16TypePStructure`
+に `Sdata`/`Tdata : TypePData` を carry させ、`basic_structure` の U-side 結論を carrier から実証明。
+
+### ✅ step 1: complement 性露出 (commit `1a807071`)
+`exists_aInvariant_complement_within_normal` (AInvariantComplement.lean) / `exists_kappaHall_invariant_complement_to_MF`
+(S14_TypePComplement.lean) の返り値に `M_F ⊓ U = ⊥` を追加 (内部 `IsComplement'` から、従来 `obtain ⟨U,-,…⟩` で破棄)。
+→ `typePData_of_isTypeP_of_inputs` の `hDcompl` 入力に必要。
+
+### ✅ step 2: sorry-free engine (commit `a82ca82a`)
+`typePData_of_kappaHall_hallComplement` (FeitThompson.lean):
+type-P M + cyclic κ-Hall K + K-invariant (κ∪σ)'-Hall complement U → `TypePData M` (`.W1 = K`, `.U = U` を
+definitionally 露出 = projection lemma `_W1`/`_U`)。全フィールドは lane-f の `typeP2_mf_internal_fitting_decomposition`
+/`isTypeP2_of_hall_subgroupOf_ne_bot`/`typeP_hall_derived_eq_and_abelian`/`typePData_of_isTypeP_of_inputs` で
+sorry-free に discharge (cite)。**`.W1=K` の rfl は term-mode 構成必須** (obtain/have の casesOn が lane-f の
+tactic-built def の projection reduce を阻む、[[lean-coupled-engine-fields-and-beta]])。
+
+### 🔜 残 step (次 session)
+1. **`hUhall` 残差**: engine の仮説 `U が (κ∪σ)'-Hall` を canonical pair で discharge。**order 算術で tractable**:
+   carried U は M_F=M_σ を M' で complement ⟹ `|U| = [M':M_σ]`; `|M_σ|`=σ-part, `|K|`=κ-part ⟹
+   `|U| = (κ∪σ)'-part of |M|` ⟹ U.subgroupOf M は (κ∪σ)ᶜ-Hall。要 BG §14 prime facts (M_σ avoids κ since σ∩κ=∅,
+   `|M_σ|` primes ⊆ σ, M' avoids κ)。`hKnorm` (K ≤ N(U)) は step 1 の `exists_kappaHall_invariant_complement_to_MF`。
+2. **step 3 wiring**: `Section16TypePStructure` に `Sdata`/`Tdata : TypePData` (+ `Sdata.U=U`/`Sdata.W1=K`
+   reconciliation、engine の `_W1`/`_U` で rfl) 追加 → `section16TypePStructure_of_components`/`_of_isMinimalSimpleOdd`
+   で engine 呼び出し (hUhall 供給) → `Section16Inputs` + `sectionSixteenHypothesis_of_inputs` + `S15.Hypothesis`
+   に thread → `S15.basic_structure` の `UW1_frobenius`/`U_commutative` を `Sdata` から実証明
+   (`typeP_uW1_frobenius Sdata`、型 II/III 判定後)。
+3. **co-edit 境界** (FeitThompson.lean は F/B/C 共有、def 単位): C=tp系 / F=mp+Prop16.1 / B=cd。互いに別 def。
+
+---
+
 ## 実装状況 (2026-06-05 更新, peterfalvi worktree)
 
 **注意**: 以下の大計画は 2026-05-22 の初版 (stale)。実体は `S15_SAndT.lean` の scaffold (18 sorry)。`Hypothesis` は **opaque-Prop convention** (m/u/c 等の値は usable な等式で pin されていない field 群) で、多くの数値結果は値の不透明性ゆえブロックされる。`Hypothesis` は **どこからも構成されない** (S16 が `base : S15.Hypothesis` で参照するのみ) ので field 改変は安全。
