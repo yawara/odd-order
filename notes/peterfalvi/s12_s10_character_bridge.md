@@ -226,11 +226,12 @@ axiom-clean で landing。**producer の sorry は不変** (building block; FT-p
 - **step A (chi2enum base-fix)**: `chi2enum_S ⟨0,p_prime.pos⟩ = 1` (trivial Kstar-char) を保証する版に差し替え
   (w1CharEquiv の `Equiv.swap` trick を mirror)。muS_definition は j 列固定ゆえ任意 chi2enum で不変 → 影響なし。
   ⟹ omega_{i0} の Kstar-restriction が trivial (nu_definition の j=0 base に必須)。
-- **step B (omegaProdChar restriction 値)**: `(certainTypeS).sdiffTICyclicHypothesis.omegaProdChar a b (gridEquivE w)`
-  を w∈K で `a⟨gridEquivE w,_⟩`、w∈Kstar で `b⟨_⟩` に計算 (`gridEquivE_mem_W1/_W2` + `wFst_W1_subtype`/
-  `wSnd_W1_subtype` (S05:751-788) + `omegaProdChar` 展開)。⚠ 型整合確認済: `sdiffTICyclicHypothesis.W1 = h.W1
-  = certainTypeS.W1` (`toTICyclicHypothesisOfV` の `W1 := h.W1`)。`omegaProdChar_comp_subtype` (S05_SigmaIsometry:1020)
-  /`omegaProdEquiv_symm_eq` (:1035) も restriction 抽出の在庫。
+- ✅ **step B DONE (commit `846df70a`)**: `omegaProdCharS_apply_mem_K`/`_Kstar` =
+  `(certainTypeS).sdiffTICyclicHypothesis.omegaProdChar a b (gridEquivE w)` を w∈K で `a⟨gridEquivE w,_⟩`、
+  w∈Kstar で `b⟨_⟩` に計算 (`gridEquivE_mem_W1/_W2` + `wFst_W1_subtype`/`wSnd_W1_subtype` (S05:751-788) +
+  omegaProdChar 展開、defeq は proof-irrelevance/`exact`)。型整合確認済: `sdiffTICyclicHypothesis.W1 = h.W1 =
+  certainTypeS.W1` (`toTICyclicHypothesisOfV` の `W1 := h.W1`)。`omegaProdChar_comp_subtype` (S05_SigmaIsometry:1020)
+  /`omegaProdEquiv_symm_eq` (:1035) も restriction 抽出の在庫 (T-side で使用候補)。
 - **step C (T 抽出 char)**: omegaS i j の K-restriction `aᵢ`/Kstar-restriction `bⱼ` を K,Kstar≤tp.W 上で取り、
   certainTypeT の W₂_T=K / W₁_T=Kstar 上 char `aᵢ^T`/`bⱼ^T` へ push (gridEquivE_T 経由、要 T-side mirror)。
 - **step D (T-side mirror)**: `certainTypeT_W1_eq`(=Kstar.subgroupOf T)/`_W2_eq`(=K.subgroupOf T)/`k_le_T`/
@@ -242,8 +243,10 @@ axiom-clean で landing。**producer の sorry は不変** (building block; FT-p
   ⟹ `induce_chiColumn_diff_mu_diff` (T-side) で nu identity。ν i j := `certainTypeT.columnFamily(aᵢ^T).mu(...)`、
   deltaPrime i := `.sign`。base j=0 = step A で trivial。**muS_definition の完全 mirror**。
 
-着手順 (次セッション): step A (小) → step B (omegaProdChar restriction、transport 補題を payoff に接続) →
-step D (T mirror boilerplate) → step C/E (symmetry 締め) → step F (nu)。**残 piece 5 tau3 / piece 6-8 は別**。
+着手順 (次セッション): ✅step B 済 → **step A (chi2enum base-fix, 小; omegaS/muS 再定義だが muS_definition は
+任意 chi2enum で不変)** → step D (T mirror boilerplate ~10 補題) → step C/E (symmetry 締め; step B の値 +
+`monoidHom_eq_of_eqOn_W1_W2`) → step F (nu, muS_definition mirror)。**残 piece 5 tau3 / piece 6-8 は別**。
+2026-06-23 再開⁴ で step B まで landing (transport foundation 完成、symmetry 半ば)。
 
 ## ✅✅✅✅✅✅ 2026-06-23 更新¹⁴ — **Pf (10.6) + (2.7) + (10.9) COMPLETE** (1 session, sorry 5→3)
 
