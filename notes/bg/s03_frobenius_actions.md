@@ -14,7 +14,7 @@ BG §3 は Isaacs Ch.6 "Frobenius Actions" を基盤として、**表現論的�
 | 番号 | 種別 | 行 | 内容 (1行要約) | Isaacs 対応 | 主要性 |
 |------|------|-----|----------------|-----------|---------|
 | **3.1** | Lemma | 797-819 | Frobenius 群の等価条件: KR 分解 ⇔ C_K(x)=1 ∀x∈R^# | 6.4 / 6.7 | ◎ 定義 |
-| **3.2** | Lemma | 820-843 | quotient Frobenius 保存: G=KR ⊳ N, K⊄N ⇒ G/N Frobenius | 6.2 + 6.7 | ◎ 精緻化 |
+| **3.2** | Lemma | 820-843 | quotient Frobenius 保存: G=KR ⊳ N, K⊄N ⇒ G/N Frobenius | 6.2 + 6.7 | ✅ 完了 |
 | **3.3** | Lemma | 845-862 | 表現論的 fixed point: K nontrivial on V, char∤\|K\| ⇒ C_V(R)≠0 | **Ch.6 拡張** | ◎ 新規 |
 | **3.4** | Theorem | 863-902 | odd order Hall: C_V(R)=0 ⇒ [R,K]⊆C_K(V) | **Ch.6 拡張** | ☆ 表現論的分析 |
 | **3.5** | Theorem | 903-951 | cyclic R, dim C_V(R)=1 ⇒ K'⊆C_K(V) | **Ch.6 拡張** | ★ 重要 |
@@ -240,6 +240,20 @@ Lemma 3.3 (簡潔, 15行) → Theorem 3.4 (大型, 40行) → Theorem 3.5 (中�
 3. **Phase 1 Ch.7 Thompson normal p-complement** (6.23) との連携: BG は L825 で statement のみ引用. Phase 1 でこれを完成させれば, BG 3.7 の証明を「solvable ⇒ general」へ自動拡張可. **Phase 1 終盤での調査要**.
 
 4. **Peterfalvi §10-§14 との同期**: Phase 2a 後半で Peterfalvi を開始する際, (9.1) Wielandt の正確な statement が BG 3.3 / Isaacs 6.2-3 のどちらと対応するか明確化. Peterfalvi 原論文 [22] の 確認有益かもしれない (Phase 2a 進行中に判断).
+
+## Landing log
+
+- **2026-06-23 (lane-h): BG Lemma 3.2 完全版 (K⊄N 枝) landed** (`S03_FrobeniusActions.lean`, sorry-free +
+  axiom-clean, AxiomsCheck 登録). repo は従来 Lemma 3.2 の **`N ≤ K` 枝のみ** だった
+  (`quotient_isFrobeniusGroup_of_le_kernel_of_*`); 未実装の一般枝 `K ⊄ N` を補完:
+  - `inf_complement_eq_bot_of_normal_not_le_kernel` — crux: `N ⊓ R = ⊥` (mmd L837-843)。証明 =
+    `Ĝ = G/(N⊓K)` を `N≤K` 枝で Frobenius 化 → `[N⊓R, K] ⊆ N⊓K` ゆえ `K̂` が像 `Ĵ` を中心化 →
+    `trivialIntersection` で `Ĵ ⊆ R̂ ⊓ R̂^x̂ = ⊥` → `N⊓R ⊆ N⊓K ⊆ K`, かつ `⊆ R` ゆえ `⊆ K⊓R = ⊥`。
+  - `normal_le_kernel_of_not_le` — 3.2(a): `N ≤ K` (crux + `kernel_eq_notConjugateSet` (Cor 6.6) + 正規性)。
+  - `isFrobeniusGroup_quotient_of_normal_not_le_kernel` — 3.2(a)+(b): `N < K` ∧ `Ḡ=G/N` Frobenius
+    (`N≤K` 枝に帰着)。仮説 = `[Finite G]` + `IsSolvable ↥K` (BG 同様; Thompson で solvable は本来不要)。
+  - 下流: Pf (13.16) `normalizer_W1` step 5 (K ⊆ C(W₁)) の obligation を解消 (但し (13.16) full は残 5
+    obligation が cross-lane gate)。reusable infra。
 
 ---
 

@@ -484,4 +484,146 @@ theorem quotient_isFrobeniusGroup_of_le_kernel_of_coprime_zpowers
     fixedPoint_lift_of_generator_quotient_fixed hNK (hCop x hxR hx_ne)
       (Or.inr hSolvK) hyK hgen
 
+/-! ### BG Lemma 3.2: the general branch `K ⊄ N`
+
+The `N ≤ K` branch above produces the Frobenius quotient as soon as `N ≤ K`.  The full
+statement of BG Lemma 3.2 reduces the *arbitrary* normal subgroup `N` (with `K ⊄ N`) to that
+branch by first proving `N ⊆ K`.  The crux is that `N` meets the complement `R` trivially. -/
+
+/-- **BG Lemma 3.2, crux step** (mmd L837-843): in a finite Frobenius group `G = K R` with
+solvable kernel `K`, if `N ⊴ G` and `K ⊄ N`, then `N ⊓ R = ⊥`.
+
+*Proof.*  Pass to `Ĝ = G / (N ⊓ K)`, which is a Frobenius group with kernel `K̂` and complement
+`R̂` by the `N ≤ K` branch (`quotient_isFrobeniusGroup_of_le_kernel_of_coprime_zpowers`, applied
+with the quotient subgroup `N ⊓ K ≤ K`).  The image `Ĵ` of `N ⊓ R` lies in `R̂` and is
+centralized by `K̂`, because `[N ⊓ R, K] ⊆ N ⊓ K`: for `x ∈ K`, `j ∈ N ⊓ R`, the element
+`x j x⁻¹ j⁻¹` lies in `N` (normality of `N`) and in `K` (normality of `K`).  Hence for any
+nonidentity `x̂ ∈ K̂` the conjugate `Ĵ^x̂` equals `Ĵ`, so `Ĵ ⊆ R̂ ⊓ R̂^x̂ = ⊥`
+(`trivialIntersection`).  Therefore `N ⊓ R ⊆ N ⊓ K ⊆ K`, and as `N ⊓ R ⊆ R` with
+`K ⊓ R = ⊥`, we get `N ⊓ R = ⊥`. -/
+theorem inf_complement_eq_bot_of_normal_not_le_kernel
+    {G : Type*} [Group G] [Finite G] {K R N : Subgroup G} [hN : N.Normal]
+    (h : IsFrobeniusGroup G K R) (hKN : ¬ K ≤ N) (hSolvK : IsSolvable ↥K) :
+    N ⊓ R = ⊥ := by
+  letI : K.Normal := h.isNormal
+  -- `N ⊓ K` is normal.
+  haveI hHnormal : (N ⊓ K).Normal := by
+    constructor
+    intro n hn g
+    rw [Subgroup.mem_inf] at hn ⊢
+    exact ⟨hN.conj_mem n hn.1 g, (inferInstance : K.Normal).conj_mem n hn.2 g⟩
+  -- Coprimality input for the quotient Frobenius assembly: every complement element generates a
+  -- cyclic group whose order divides `|R|`, hence is coprime to `|K|`.
+  have hCop : ∀ x, x ∈ R → x ≠ 1 →
+      Nat.Coprime (Nat.card ↥(Subgroup.zpowers x)) (Nat.card ↥K) := by
+    intro x hxR _
+    have hdvd : Nat.card ↥(Subgroup.zpowers x) ∣ Nat.card ↥R :=
+      Subgroup.card_dvd_of_le (Subgroup.zpowers_le.mpr hxR)
+    exact Nat.Coprime.coprime_dvd_left hdvd (h.coprime_card_kernel_complement).symm
+  -- `K ⊄ N ⊓ K` (else `K ≤ N`).
+  have hKH : ¬ K ≤ N ⊓ K := fun hKle => hKN (hKle.trans inf_le_left)
+  -- `Ĝ = G / (N ⊓ K)` is a Frobenius group with kernel `K̂` and complement `R̂`.
+  set mkH := QuotientGroup.mk' (N ⊓ K) with hmkH
+  have hFrobQ : IsFrobeniusGroup (G ⧸ (N ⊓ K)) (K.map mkH) (R.map mkH) :=
+    quotient_isFrobeniusGroup_of_le_kernel_of_coprime_zpowers h inf_le_right hKH hCop hSolvK
+  -- A nonidentity `x̂ ∈ K̂`, lifted to `x ∈ K`.
+  obtain ⟨xh, hxh_mem, hxh_ne⟩ :=
+    (K.map mkH).bot_or_exists_ne_one.resolve_left hFrobQ.ne_bot_kernel
+  obtain ⟨x, hxK, hx_eq⟩ := Subgroup.mem_map.mp hxh_mem
+  -- `x̂ ∉ R̂` (complement).
+  have hxh_not_R : xh ∉ R.map mkH := fun hmem =>
+    hxh_ne (Subgroup.disjoint_def.mp hFrobQ.isComplement.disjoint hxh_mem hmem)
+  -- Trivial intersection of `R̂` with its `x̂`-conjugate.
+  have hTI : R.map mkH ⊓ Subgroup.map (MulAut.conj xh).toMonoidHom (R.map mkH) = ⊥ :=
+    hFrobQ.trivialIntersection xh hxh_not_R
+  -- The image of `N ⊓ R` lands in `R̂ ⊓ R̂^x̂ = ⊥`.
+  have hJ_bot : (N ⊓ R).map mkH = ⊥ := by
+    rw [eq_bot_iff, ← hTI]
+    refine le_inf (Subgroup.map_mono inf_le_right) ?_
+    intro yh hyh
+    obtain ⟨j, hj, hj_eq⟩ := Subgroup.mem_map.mp hyh
+    have hjN : j ∈ N := (Subgroup.mem_inf.mp hj).1
+    have hjR : j ∈ R := (Subgroup.mem_inf.mp hj).2
+    -- `x j x⁻¹ j⁻¹ ∈ N ⊓ K`, so `x̂` centralizes the image `ŷ = mkH j`.
+    have hcomm : (x * j * x⁻¹) * j⁻¹ ∈ N ⊓ K := by
+      refine Subgroup.mem_inf.mpr ⟨?_, ?_⟩
+      · exact N.mul_mem (hN.conj_mem j hjN x) (N.inv_mem hjN)
+      · have hconjK : j * x⁻¹ * j⁻¹ ∈ K :=
+          (inferInstance : K.Normal).conj_mem x⁻¹ (K.inv_mem hxK) j
+        have hrw : x * j * x⁻¹ * j⁻¹ = x * (j * x⁻¹ * j⁻¹) := by group
+        rw [hrw]; exact K.mul_mem hxK hconjK
+    have hcent : mkH (x * j * x⁻¹) = mkH j := by
+      have h1 : mkH ((x * j * x⁻¹) * j⁻¹) = 1 := by
+        rw [hmkH, QuotientGroup.mk'_apply, QuotientGroup.eq_one_iff]; exact hcomm
+      rw [map_mul, map_inv] at h1
+      exact mul_inv_eq_one.mp h1
+    rw [Subgroup.mem_map]
+    refine ⟨yh, Subgroup.mem_map.mpr ⟨j, hjR, hj_eq⟩, ?_⟩
+    simp only [MulAut.conj_apply, MulEquiv.coe_toMonoidHom]
+    rw [← hx_eq, ← hj_eq, ← map_inv, ← map_mul, ← map_mul]
+    exact hcent
+  -- Conclude `N ⊓ R ⊆ N ⊓ K ⊆ K`, hence `N ⊓ R ⊆ K ⊓ R = ⊥`.
+  have hNR_le_H : N ⊓ R ≤ N ⊓ K := by
+    intro a ha
+    have hmk : mkH a = 1 := by
+      have hmem : mkH a ∈ (N ⊓ R).map mkH := Subgroup.mem_map_of_mem mkH ha
+      rw [hJ_bot, Subgroup.mem_bot] at hmem
+      exact hmem
+    rwa [hmkH, QuotientGroup.mk'_apply, QuotientGroup.eq_one_iff] at hmk
+  have hNR_le_K : N ⊓ R ≤ K := hNR_le_H.trans inf_le_right
+  exact disjoint_self.mp (Disjoint.mono hNR_le_K inf_le_right h.isComplement.disjoint)
+
+/-- **BG Lemma 3.2 (a)** (mmd L820-822, L837-843): in a finite Frobenius group `G = K R` with
+solvable kernel `K`, every normal subgroup `N ⊴ G` with `K ⊄ N` is contained in `K`.
+
+*Proof.*  By `inf_complement_eq_bot_of_normal_not_le_kernel`, `N ⊓ R = ⊥`.  By Cor 6.6
+(`kernel_eq_notConjugateSet`), `K` is the set of elements not conjugate to any nonidentity
+element of `R`.  If some `n ∈ N` were not in `K`, it would be conjugate to a nonidentity
+`a ∈ R`; but then `a ∈ N` (normality), so `a ∈ N ⊓ R = ⊥`, a contradiction. -/
+theorem normal_le_kernel_of_not_le
+    {G : Type*} [Group G] [Finite G] {K R N : Subgroup G} [hN : N.Normal]
+    (h : IsFrobeniusGroup G K R) (hKN : ¬ K ≤ N) (hSolvK : IsSolvable ↥K) :
+    N ≤ K := by
+  have hNR : N ⊓ R = ⊥ := inf_complement_eq_bot_of_normal_not_le_kernel h hKN hSolvK
+  intro n hn
+  by_contra hnK
+  have hn_notin : (n : G) ∉ notConjugateSet R := by
+    rw [← h.kernel_eq_notConjugateSet]
+    exact fun hc => hnK hc
+  simp only [notConjugateSet, Set.mem_setOf_eq, not_forall, not_not] at hn_notin
+  obtain ⟨a, haR, ha_ne, hconj⟩ := hn_notin
+  rw [isConj_iff] at hconj
+  obtain ⟨g, hg⟩ := hconj
+  have hag : a = g⁻¹ * n * g := by rw [← hg]; group
+  have ha_in_N : a ∈ N := by
+    rw [hag]
+    have := hN.conj_mem n hn g⁻¹
+    simpa using this
+  have hmem : a ∈ N ⊓ R := Subgroup.mem_inf.mpr ⟨ha_in_N, haR⟩
+  rw [hNR, Subgroup.mem_bot] at hmem
+  exact ha_ne hmem
+
+/-- **BG Lemma 3.2** (mmd L820-843): in a finite Frobenius group `G = K R` with solvable kernel
+`K`, every normal subgroup `N ⊴ G` with `K ⊄ N` satisfies `N < K`, and the quotient
+`Ḡ = G / N` is a Frobenius group with kernel `K̄ = K N / N` and complement `R̄ = R N / N`.
+
+This combines part (a) (`normal_le_kernel_of_not_le`) with the `N ≤ K` branch
+(`quotient_isFrobeniusGroup_of_le_kernel_of_coprime_zpowers`). -/
+theorem isFrobeniusGroup_quotient_of_normal_not_le_kernel
+    {G : Type*} [Group G] [Finite G] {K R N : Subgroup G} [N.Normal]
+    (h : IsFrobeniusGroup G K R) (hKN : ¬ K ≤ N) (hSolvK : IsSolvable ↥K) :
+    N < K ∧
+      IsFrobeniusGroup (G ⧸ N) (K.map (QuotientGroup.mk' N)) (R.map (QuotientGroup.mk' N)) := by
+  letI : K.Normal := h.isNormal
+  have hNK : N ≤ K := normal_le_kernel_of_not_le h hKN hSolvK
+  have hne : N ≠ K := by rintro rfl; exact hKN le_rfl
+  refine ⟨hNK.lt_of_ne hne, ?_⟩
+  have hCop : ∀ x, x ∈ R → x ≠ 1 →
+      Nat.Coprime (Nat.card ↥(Subgroup.zpowers x)) (Nat.card ↥K) := by
+    intro x hxR _
+    have hdvd : Nat.card ↥(Subgroup.zpowers x) ∣ Nat.card ↥R :=
+      Subgroup.card_dvd_of_le (Subgroup.zpowers_le.mpr hxR)
+    exact Nat.Coprime.coprime_dvd_left hdvd (h.coprime_card_kernel_complement).symm
+  exact quotient_isFrobeniusGroup_of_le_kernel_of_coprime_zpowers h hNK hKN hCop hSolvK
+
 end OddOrder.BG.Ch1.S03
