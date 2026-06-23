@@ -485,3 +485,12 @@ sorry-free 化には (a) 型一意性補題 (IsTypeI L ⟹ ¬conj S/T) + (b) FPF
 
 count-sorry 137→139 (新 producer 4 − 消えた gate 3/4 の 2 sorry)。full build 3869 jobs green。詳細 =
 `notes/peterfalvi/s13_17_structural_program.md`「Phase 2 cont. (2026-06-20³)」。
+
+## 2026-06-23 REACTIVATE (relane #5、ユーザー裁可) — pending → active
+
+hub 統合レビュー (4 レーン進捗統合) で、(13.2.a)/step-3 wiring/hP2II の landing 後に
+**FT endgame が lane-b character theory に収束 (POLE-1 残バレ sorry 2 本=card_kappaHall+cd は両方 lane-b)、
+lane-h のみ割当完遂で idle** と確定。ユーザー裁可で **lane-h を POLE-2 (本 issue) に復帰**。
+当面の workable-now = `field_normalizer_of_U_characteristic` (14.7) の Singer-field 核
+(c_eq_one から既約性 → 有限体モデル、§13 非依存=上記「Singer-field engine 着地」診断が正本)。
+L/M producers (14.3/14.10) は §13/Dade-gated ゆえ cite/defer。status: pending → **active** (issues/ へ移動)。
