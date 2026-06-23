@@ -558,7 +558,7 @@ noncomputable def section16TypePStructure_of_isMinimalSimpleOdd {G : Type*} [Gro
     mp.T_maximal mp.T_typeP mp.Kstar_le_T mp.Kstar_hall
   exact section16TypePStructure_of_components mp.K mp.Kstar hScompl.choose hTcompl.choose
     hScompl.choose_spec.1 hTcompl.choose_spec.1 hprimes.1 hprimes.2
-    hWjoin hWcyc hbot hcomm hScompl.choose_spec.2 hTcompl.choose_spec.2 mp.K_lt_Kstar
+    hWjoin hWcyc hbot hcomm hScompl.choose_spec.2.1 hTcompl.choose_spec.2.1 mp.K_lt_Kstar
 
 /-- **Peterfalvi §13 coherent Dade-grid producer** (`sorry`) — *lane-b*
 (Peterfalvi §3–§13 coherent grids).  Given the maximal pair and the type-P
