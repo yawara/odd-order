@@ -5,6 +5,33 @@
 > 上位文脈 = 記憶 [[ft-endgame-two-poles]] [[peterfalvi-s10-13-gated-on-bg-spine]]、
 > Lane H 視点の正本 = [`s10_13_maximal_structure.md`](s10_13_maximal_structure.md)。
 
+## ✅✅✅✅✅✅ 2026-06-23 更新¹⁴ — **Pf (10.6) 全体 COMPLETE** ((a)+(b)) + §10 frontier 評価
+
+**(10.6) 完全形式化完了** (issue 1009 CLOSED): `tau1_values_and_norm_bound` (S12) sorry-free + axiom-clean
+(§10 muGrid 上流 gate のみ)。opaque carrier field `zeta_tau1_norm_bound : Prop` を削除。commits
+`4c5d7011` (STEP 2) / `5f93ade3` (STEP 3 scoping 訂正) / `995ccfa0` (STEP 3+4 COMPLETE)。
+- (a) summed isometry = `muColumn_tau1_pin` (更新¹³、§10 特化 route で (5.8) 回避)。
+- (b) parity bound = `zeta_tau1_norm_ge_one`: `g∉Ã(M) ∧ order coprime w₁ → ζ^τ₁(g) 奇整数 (∴|·|≥1)`。
+  STEP 1 reduction `tau(μ_0−ζ)=∑ω_i0^σ−ζ^τ₁` + STEP 2 Ã(M)=dadeSupport vanishing + STEP 3 σ-grid parity
+  (4 補題: 整数性(3.9.c)/(0,0)=1_G/row-conj involution(3.9.a)/FPF-sum-even) + STEP 4 de-opaque。
+- **🔑 教訓 (再)**: 「(5.8) gated」「(3.9) 新規形式化要」は**両方とも誤りだった**。§10 特化 route + in-stock
+  σ-API (`exists_intCast_sigma_omega_apply`/`sigma_mapRingEquiv_comm`/§6 `rowInv`) で完走。issue の悲観評価に注意。
+
+**▶ §10 次 frontier 評価 (2026-06-23, textbook 04.12 精読)** — 残 S12 §10 sorry = 4 ((10.7)/(10.8)/(10.9)/(10.10.x)):
+- **(10.7)** `typeII_derived_frobenius` (S12, [S,S] Frobenius): **§8-gated 大型**。原文証明 = Thm(8.8)+(8.13.c4)+
+  (8.18.b)+(8.10)+(8.15)+(4.7)+Thm(4.5)+§9(9.10/9.8.b/9.9.b)+(5.7)+**(5.8)**+(4.1)/(5.3.b)。Type II 構造 +
+  (5.8) full-column endgame 要 → quick win でない。
+- **(10.8)** `S_not_coherent` (非coherence keystone): **(10.6.b) を使う** (私の今回成果が unblock!) が
+  (7.5)/(7.8.b) §7 counting + (8.6.a)/(8.11)/(8.4.d) §8 + (10.7) も要 = 大型 analytic。memory の long-pole。
+- **(10.9)** `orthogonality_of_w1_lt_w2` (opaque field, w₁<w₂ で residual χ=ζ^τ₁ ⊥ Imσ ∧ ‖χ‖²=1):
+  **actionable・私の STEP 1/2 活用可** だが新 piece (~100-150行)。原文証明 = 直交分解 + a_00=1 **(2.7)** τ-adjunction +
+  ‖(μ_0−ζ)^τ‖²=w₁+1<w₂ **(3.8)** trichotomy ⟹ σ-part=∑ω_i0^σ ⟹ ‖χ‖²=1。**`ζ^τ₁⊥Imσ` を直接 gate せず**
+  norm 論法で出る (旧「§5-gated」懸念は不要の可能性)。要 in-stock 確認: (2.7) τ-adjunction-at-trivial, (3.8)/
+  grid_trichotomy, ‖μ_0−ζ‖²=w₁+1 (`zeta_tau1_inner_self`✅在庫)。**これが文書順次・最 actionable な §10 target**。
+- **(10.10)/(10.11)** typeV 除去・case-B prime orders: opaque field + coherence、§6(6.8)/§8(8.7) 依存。
+- **∴ 次セッション推奨 = (10.9)** (actionable, STEP 1/2 leverage, opaque-field de-opaque パターン既習)。(10.7)/(10.8)
+  は §8 prereq (lane-f/§14 territory) 待ちで light-touch。
+
 ## ✅✅✅✅✅ 2026-06-23 更新¹³ — (10.6)(a) summed isometry COMPLETE (linchpin landed, σ-endgame 回避)
 
 更新¹² の「残り σ-endgame final step」を、**σ-endgame engine を使わない大幅に簡潔な §10 特化 route** で完走。

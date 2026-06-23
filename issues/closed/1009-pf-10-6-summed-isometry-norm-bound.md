@@ -7,6 +7,26 @@ created: 2026-06-22
 
 # Pf (10.6): summed isometry + ζ^τ₁ norm bound
 
+## ✅✅✅✅ 2026-06-23 — (10.6) COMPLETE (both (a) summed isometry + (b) parity bound) — ISSUE DONE
+
+`tau1_values_and_norm_bound` (S12) が **sorry-free + axiom-clean** (axiom footprint = §10 muGrid 上流 gate
+theoremA/Prop16.1 のみ・自前 sorry 0)。opaque carrier field `zeta_tau1_norm_bound : Prop` を**削除**し
+conjunct (b) を genuine 化。full build 3881 + AxiomsCheck green。**当初 gate と懸念していた Pf (5.8) も
+(3.9.a)/(3.9.c) 新規形式化も両方とも不要だった** (§10 特化 route + in-stock σ-API)。
+
+- **(a) summed isometry** `μ_j^τ₁ = δ∑_i ω_ij^σ` = `muColumn_tau1_pin` (下記、§10 特化 route で (5.8) 回避)。
+- **(b) parity bound** `g∉Ã(M) ∧ order coprime w₁ ⟹ ζ^τ₁(g) は奇整数 (∴ |·|≥1)` = `zeta_tau1_norm_ge_one`:
+  - STEP 1 `tau_muColumnZero_sub_zeta_eq` (reduction identity) + STEP 2 `zeta_tau1_apply_eq_omegaSigma_sum_of_not_mem_dadeSupport`
+    (Ã(M)=dadeSupport vanishing, `ζ^τ₁(g)=∑ω_i0^σ(g)`) + STEP 3 σ-grid parity 4 補題:
+    (C) `exists_intCast_alignedOmegaSigmaGrid_zero_column` (3.9.c 整数性, `exists_intCast_sigma_omega_apply` cite),
+    (A) `alignedOmegaSigmaGrid_zero_zero` (ω_00^σ=1_G), (B) `exists_rowInv_alignedOmegaSigma_conj` (3.9.a row-conj
+    involution, §6 rowInv + `sigma_mapRingEquiv_comm`/`galoisMap_conj_omega`), (D) `zeta_tau1_norm_ge_one`
+    (FPF involution sum-even via `Finset.sum_involution` in ZMod 2)。
+  - STEP 4 = opaque field 削除 + producer 修正 + conjunct (b) を `zeta_tau1_norm_ge_one` で discharge。
+- **下流配線**: `tau1_values_and_norm_bound` は現状 consumer 0 だが genuine (10.6) として §10 spine が cite すべき本物。
+
+---
+
 ## ✅✅✅ 2026-06-23 — (10.6)(a) summed isometry COMPLETE (linchpin landed)
 
 (10.6)(a) `μ_j^τ₁ = δ∑_i ω_ij^σ` を **σ-endgame engine を使わず** honest に証明・wiring (lane-b)。

@@ -444,17 +444,51 @@ theorem exists_orderP_centralizer_witness [Finite G]
     rintro z rfl
     exact Commute.pow_left (hg y rfl) n
 
-/-- **Peterfalvi (12.9), the rank-two input for `P₀`** — the residual §8 obligation `(8.12.a)`
-(a BG §16 consequence, **absent** from the repo): every Sylow subgroup of the type-`I` complement
-`U` (`M = M_F ⋊ U`) is abelian of rank `≤ 2`; here, with `P₀` noncyclic (Hypothesis `(12.8)`,
-`ctr.P0_noncyclic`), this forces `P₀` abelian of rank exactly `2`.
+/-- **Peterfalvi (12.9), the `(κ ∪ σ)ᶜ`-Hall complement obligation** — the precise BG §16
+(Proposition 16.1) bridge behind `(8.12.a)`.  For the type-`I` minimal-counterexample `M`, the
+Sylow `p`-subgroup `P₀` (with `p ∣ [M : M_F]`, hence `p ∤ |M_F|` as `M_F` is Hall) lies in a
+`(κ(M) ∪ σ(M))ᶜ`-Hall subgroup `U ≤ M`.
+
+*Why this is the gate (and not `(8.12.a)` itself).*  BG Theorem B(1)
+(`theoremB_U_sylow_abelian_rank_le_two`, already **proved** in the repo) says every Sylow of such
+a `U` is abelian of rank `≤ 2`; the only missing input is producing the complement `U`.  The
+type-`I` complement of `M_F` is `π(M_F)ᶜ`-Hall (immediate from `M_F` being a normal Hall
+subgroup), and Proposition 16.1's type-`I` classification (`κ(M) = ∅`, `σ(M) = π(M_σ)`,
+`M_F = M_σ`) identifies `π(M_F)ᶜ` with `(κ ∪ σ)ᶜ`.  So this existence statement is exactly the
+`§16`-gated residual; it becomes unconditional once Proposition 16.1 lands (lane-f).  Left
+unproved here (isolated). -/
+theorem exists_sigmaKappaCompl_hall_ge_P0 [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (ctr : CounterexampleHypothesis (G := G)) :
+    ∃ U : Subgroup G, ctr.P0 ≤ U ∧ U ≤ ctr.M ∧
+      Ch03.IsHallSubgroup
+        ((OddOrder.BG.Ch4.S14.kappa ctr.M ∪ OddOrder.BG.Ch3.S10.sigma ctr.M)ᶜ)
+        (U.subgroupOf ctr.M) := by
+  sorry
+
+/-- **Peterfalvi (12.9), the rank-two structure for `P₀`** = `(8.12.a)`.
+
+Every Sylow subgroup of the type-`I` complement `U` (`M = M_F ⋊ U`) is abelian of rank `≤ 2`
+(BG **Theorem B(1)**, `theoremB_U_sylow_abelian_rank_le_two`, **proved**); applied to the Sylow
+`p`-subgroup `P₀ ≤ U` and combined with `P₀` noncyclic (Hypothesis `(12.8)`, `ctr.P0_noncyclic`,
+giving `2 ≤ rank P₀` via `two_le_rank_of_noncyclic_pSubgroup`), this forces `P₀` abelian of rank
+exactly `2`.
+
+The substantive content (Theorem B(1) + the rank lower bound) is therefore **wired and
+load-bearing**; the only remaining gap is the `(κ ∪ σ)ᶜ`-Hall complement obligation
+`exists_sigmaKappaCompl_hall_ge_P0` (the BG §16 / Proposition 16.1 bridge, lane-f).
 
 (The other structural inputs `P₀` coprime to `K`, `P₀ ≤ N_G(K)`, `⁅K, K⁆ ≠ K` are discharged in
 `exists_rankTwoWitness` from `(8.11)` [`M_F` Hall] and `M_F ◁ M` nilpotent + nontrivial.) -/
 theorem counterexample_P0_K_structure [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     (ctr : CounterexampleHypothesis (G := G)) :
     IsMulCommutative ↥ctr.P0 ∧ rank ↥ctr.P0 = 2 := by
-  sorry
+  haveI : Fact ctr.p.Prime := ⟨ctr.p_prime⟩
+  obtain ⟨U, hP0U, hUM, hU⟩ := exists_sigmaKappaCompl_hall_ge_P0 hG ctr
+  obtain ⟨hrank_le, habelian⟩ :=
+    OddOrder.BG.Ch4.S16.theoremB_U_sylow_abelian_rank_le_two hG ctr.M_maximal hUM hU
+      ctr.p ctr.p_prime ctr.P0 hP0U ctr.P0_pGroup
+  exact ⟨habelian, le_antisymm hrank_le
+    (OddOrder.BG.Ch2.S09.two_le_rank_of_noncyclic_pSubgroup hG ctr.P0_pGroup ctr.P0_noncyclic)⟩
 
 /-- A `p`-Hall subgroup `H` (its order having only `p`-primary divisors among `π = π(|H|)`) with
 `p ∣ |H|` contains a Sylow `p`-subgroup of the ambient group `G`.
