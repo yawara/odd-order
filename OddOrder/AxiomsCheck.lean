@@ -5418,6 +5418,17 @@ Axiom-clean. -/
 
 #assert_only_allowed_axioms OddOrder.BG.Ch4.S16.typePData_of_isTypeP2
 
+/-! **`hP2II` reduced to the `M'`-type-`F` residual** (`S16_MainResults`,
+`isTypeII_of_isTypeP2_of_derived_typeF`, issue 7007): a type-`P₂` maximal subgroup whose derived
+subgroup `M'` is type `F` (with `F(M') = M_F`) is type II.  Discharges every `isTypeII_of_typePData`
+input that is BG-local for type `P₂` — the whole `TypePNontrivialCore` (`U ≠ ⊥`; `|W₁|` prime and
+the `M_σ`-`TI` both from Proposition 14.2(g), since `M_F = M_σ`), `U` abelian, and `N_G(U) ⊄ M`
+(Corollary 14.12) — leaving exactly the deep `M'`-type-`F` structure as hypotheses.  Corrects the
+stale belief that `|W₁|` prime is lane-b (10.11)-gated: that is the *partner* primality, not the
+type-`P₂` `κ`-Hall's.  Axiom-clean. -/
+
+#assert_only_allowed_axioms OddOrder.BG.Ch4.S16.isTypeII_of_isTypeP2_of_derived_typeF
+
 /-! **BG Theorem C** (`S16_MainResults`, `theoremC_paired_structure`): for `K ≠ 1`, a type-`P`
 maximal `M` has the full paired structure — `U` abelian; `N_G(U) ⊄ M` (conjunct 2 = BG C(1) /
 Corollary 14.12, via the matched `(K₀,U₀)` pair `typeP2_exists_matched_kappa_hall_pair` and the
