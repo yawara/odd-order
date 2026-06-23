@@ -3797,6 +3797,9 @@ set_option linter.style.longLine false in
 -- FT-path signature bridge (endpoint D, ft_path_policy.md §4): the certain-type μ-column
 -- (13.1.e) induction relation in explicit `δ·(μ_i − μ_0)` form (= §13 `S15.Hypothesis.mu_definition`).
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S06.Hypothesis.induce_omegaColumnDiff_mu_diff
+-- Same (13.1.e), in the `ω`/`μ`-grid difference form `Ind_W^S(ω_{ij} − ω_{0j}) = δ_j(μ_{ij} − μ_{0j})`
+-- consumed directly by the §13/§16 character-data producer (`Section16CharacterData.mu_definition`).
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S06.Hypothesis.induce_chiColumn_diff_mu_diff
 -- §5 (3.2.a) full: `σ` agrees with the Dade map `τ = Ind_W^G` on all of `CF(W, V)`.
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S05.TICyclicHypothesis.alphaBasis_apply
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S05.TICyclicHypothesis.induceLinear
