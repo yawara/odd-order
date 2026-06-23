@@ -248,6 +248,45 @@ axiom-clean で landing。**producer の sorry は不変** (building block; FT-p
 `monoidHom_eq_of_eqOn_W1_W2`) → step F (nu, muS_definition mirror)。**残 piece 5 tau3 / piece 6-8 は別**。
 2026-06-23 再開⁴ で step B まで landing (transport foundation 完成、symmetry 半ば)。
 
+## ✅✅✅✅ 2026-06-23 更新²⁰ — **cd `nu_definition` COMPLETE (piece 3 全達成、S/T-shared-ω symmetry)**
+
+更新¹⁹ の攻略計画 (step A→D→C/E→F) を **全実行し `nu_definition` を sorry-free + axiom-clean で landing**
+(lane-b 再開セッション, commits `33b85dfb` step A+D / `b4775e75` T-side step B / `c3c9875f` 本体)。
+**cd producer の 2 つの実 Prop obligation (`mu_definition`=更新¹⁸ / `nu_definition`=本更新) が両方 complete。**
+producer の sorry は不変 (building block; FT-path sorry 不変)。full build 3883 green、AxiomsCheck 全 OK。
+
+**🔑 核心 = enumeration-matching を回避する symmetry** (更新¹⁹ の洞察を実装): 共有 ω-grid (= omegaS) を
+certainTypeT の chiColumn 経由で再表現する際、S-side index 指標 (w1CharEquiv(eqQ i) / chi2enum j) を
+**G-元保存 equiv `eTS : ↥certainTypeT.sdiff.W ≃* ↥certainTypeS.sdiff.W` で T-side へ transport** し、
+T-side dual を構成。これで `omegaS = omegaT` が construction から従い、独立 enumeration の bijection 不要。
+
+**landed (全 `FeitThompson.lean` `namespace Section16CharacterData`, AxiomsCheck 17 本登録)**:
+- step A: `chi2baseEnum` (旧 chi2enum) + `chi2enum` (Equiv.swap 正規化, `finCardEquivCharacterGroup` の trick mirror)
+  + `chi2enum_zero` (column 0 = trivial; nu の j=0 base に必須)。muS_definition は column 固定ゆえ不変。
+- step D: T-side W-identification mirror (`certainTypeT_W1_eq`=Kstar / `_W2_eq`=K / `k_le_T` / `cardCertainTypeT_*` /
+  `tpW_subgroupOf_T_eq` / `gridEquivE_T` + `_coe`/`_mem_W1`/`_mem_W2`)。
+- T-side step B: `omegaProdCharT_apply_mem_K`/`_Kstar` (K=W2_T / Kstar=W1_T の restriction 値)。
+- step C/E/F: `eTS` + `eTS_gridEquivE_T` (round-trip) / `colT`(K-dual, i のみ) + `rowDualT`(K*-dual, j のみ) =
+  transport した single-factor product char の restriction (**🔑 `omegaProdChar_comp_subtype` 在庫が
+  reconstruction を供給** → subgroup-image plumbing 不要) / `colT_apply_mem_K`+`rowDualT_apply_mem_Kstar`
+  (S-side index 指標に同一 G-元で一致) / `rowDualT_zero`+`rowT_zero` (j=0 trivial base, step A 依存) /
+  `omegaT` + **`omegaS_eq_omegaT`** (symmetry crux: `monoidHom_eq_of_eqOn_W1_W2` + step B 両 side → lic) /
+  `nuT`+`deltaPrimeT` + **`nuT_definition`** (T-side `induce_chiColumn_diff_mu_diff`、muS_definition 完全 mirror)。
+
+**🔑 engineering 教訓 (再利用)**:
+1. comp_apply 後の `⇑e.toMonoidHom w` は apply 補題の `⇑e w` と syntactic 非一致 → `MulEquiv.coe_toMonoidHom`
+   を simp で正規化してから rw。
+2. rw chain の終端で両辺が「同一値・異なる membership 証明項」になり auto-rfl が閉じない → `exact (… ).symm`
+   (defeq + proof irrelevance) で締める ([[lean-induce-transport-instance-desync]] と同系)。
+3. `Subtype.val ⟨x,_⟩` 未簡約で rw pattern 不一致 → `change` (defeq) で簡約してから rw。
+4. `chiColumn`/`omega` の def 展開は `simp only [Peterfalvi.S06.Hypothesis.chiColumn,
+   Peterfalvi.S05.TICyclicHypothesis.omega]` → lic 化 → `compHom_linearIrreducibleCharacter`。
+
+**残 cd pieces (次セッション)**: piece 5 = `tau3` (`IntegralCharacterMap ↥tp.W G`, W=S∩T の G 内 TI-cyclic 構造 +
+`sigmaIntegral`; eta:=tau3∘omega が real η に, 更新¹⁷: formal grid 不可) / piece 6-7 = free field
+(`tauS`/`tauT`=§7 Dade map, `Sset`/`Tset`=inducedFamily, `A0S`/`A0T`=supportInSubgroup) / piece 8 = pack
+(producer の sorry を埋める)。omega/mu/nu/delta/deltaPrime/両 induction 恒等式は全て揃った。
+
 ## ✅✅✅✅✅✅ 2026-06-23 更新¹⁴ — **Pf (10.6) + (2.7) + (10.9) COMPLETE** (1 session, sorry 5→3)
 
 **本セッション成果 (lane-b, 全 build-green + axiom-clean modulo §10 muGrid 上流 gate)**:
