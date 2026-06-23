@@ -32,8 +32,14 @@ productive な独立クラスタに乗せ、上流優先方針 (CLAUDE.md) に�
 |---|---|---|---|---|
 | **F** | `lane-f` | **BG §14-16 構造** | `S14_TypePCounting`/`S15_MF`/`S16_MainResults`/`S16_PairIntersection` + `FeitThompson.lean` の §16 producer。Theorem A-I / Prop 16.1 | ✅ |
 | **B** | `lane-b` | **Pf §12/§13 Dade char-grid** | `S12_MaximalIII_IV_V`/`S13_MaximalIII_IV`。char grids/parameters。**`S10_MinimalSimpleStructure` は driver (BG §16 gated、pure wiring)、常駐作業しない** | ✅ |
-| **H** | `lane-h` | **Pf §14_MaximalI + §15 S&T** | `S14_MaximalI`/`S15_SAndT` (type I + S&T、~11 workable leaf)。**S11 は触らない (C 所有に移譲)** | ✅ |
-| **C** | `lane-c` | **Pf §11 Wielandt §9 / Clifford** | **`S11_MaximalII_III_IV` (Wielandt §9 + 型分類 9.6-9.10, C 単独所有)**。**`S16_NonExistenceG` は driver (上流 landing 時に機会的 close)、常駐作業しない** | ✅ |
+| **H** | `lane-h` | **Pf §14_MaximalI (type I)** | `S14_MaximalI` (type I、15 sorry)。**S15_SAndT は触らない (2026-06-23 C 移譲)、S11 も触らない (driver)** | ✅ |
+| **C** | `lane-c` | **Pf §15 S&T** | **`S15_SAndT` (S&T 構造、36 sorry、2026-06-23 H→C 移譲)**。依存 §15→§14 ゆえ §14 を cite のみ。**`S11`/`S16_NonExistenceG` は driver (上流 landing 時に機会的 close)、常駐しない** | ✅ |
+
+> **⚠ 2026-06-23 relane (ユーザー裁可、issue 4007)**: lane-c の §11 ungated 枯渇 (9.1-9.7 完了) を受け hub が
+> frontier 再監査 → 「負荷は H/F に偏在 (各 51 sorry)、3 が並列限界でない」と判明。**H の 51-sorry 負荷
+> (S14_MaximalI 15 + S15_SAndT 36) を 2 レーンに分割**: **S15_SAndT を H→C 移譲**、H は S14_MaximalI に集中。
+> S15_SAndT は S14_MaximalI を import (依存方向 §15→§14) ゆえ signature-first 境界がクリーン (co-edit なし)。
+> §11 は driver 化 ((9.8)-(9.11) は lane-b char 待ち)。各 LAUNCH.md 更新済。
 
 **signature-first interface**: 上流が sorried signature を export → 下流が cite。真の cross-lane 依存は narrow。
 signature 不足は notes/issue 経由。**driver (§16/§10)**: 常駐レーンを当てず、上流が landing したとき hub or
@@ -115,8 +121,8 @@ branch とも削除済み。旧 **A** / **D** も同様に退役済み (履歴�
 > |---|---|
 > | **F** (lane-f) | `OddOrder/BG/**`（BG 全体）+ `OddOrder/FeitThompson.lean` |
 > | **B** (lane-b) | `OddOrder/Peterfalvi/S0[3-9]*` + `S10*` + `S12*` + `S13*`（Pf char API + §12/§13; **S11 除く**） |
-> | **H** (lane-h) | `OddOrder/Peterfalvi/S14_MaximalI*` + `S15*`（type I + S&T） |
-> | **C** (lane-c) | `OddOrder/Peterfalvi/S11*`（Wielandt §9 / Clifford） |
+> | **H** (lane-h) | `OddOrder/Peterfalvi/S14_MaximalI*`（type I; 2026-06-23 S15 を C 移譲） |
+> | **C** (lane-c) | `OddOrder/Peterfalvi/S15*`（S&T = S15_SAndT; 2026-06-23 H→C 移譲。S11 は driver で非所有） |
 > | **共有（全 lane 可）** | `OddOrder/AxiomsCheck.lean` / `OddOrder.lean` / `OddOrder/GroupTheory/**` / `notes/**` / `issues/**` |
 
 1. 各レーンの未マージ確認: `git log --oneline main..<branch>`。
@@ -130,7 +136,7 @@ branch とも削除済み。旧 **A** / **D** も同様に退役済み (履歴�
    **マージせず（trial merge も開始しない）**、⛔ に従いループ停止（abort 不要 = まだ merge していない、
    `CronDelete` + 報告 + 以降の tick を行わない）。報告には逸脱ファイル名 + lane + 所有者を明記。例 (lane=$b):
    ```
-   owned_re='…'   # 🔒 マップから (F=^OddOrder/BG/|^OddOrder/FeitThompson; B=^OddOrder/Peterfalvi/S(0[3-9]|10|12|13); H=^OddOrder/Peterfalvi/S(14_MaximalI|15); C=^OddOrder/Peterfalvi/S11)
+   owned_re='…'   # 🔒 マップから (F=^OddOrder/BG/|^OddOrder/FeitThompson; B=^OddOrder/Peterfalvi/S(0[3-9]|10|12|13); H=^OddOrder/Peterfalvi/S14_MaximalI; C=^OddOrder/Peterfalvi/S15)
    shared_re='^OddOrder/AxiomsCheck\.lean$|^OddOrder\.lean$|^OddOrder/GroupTheory/'
    git diff --name-only main...$b -- '*.lean' | grep -vE "$owned_re" | grep -vE "$shared_re" | grep . && echo "範囲逸脱 → STOP"
    ```

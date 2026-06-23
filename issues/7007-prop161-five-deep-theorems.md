@@ -103,6 +103,23 @@ bottom-out** するので、clean 化には §15 foundation が先。真の順�
 
 ## 進捗ログ
 
+**2026-06-23 (cont.⁸) ✅✅✅ Prop 16.1 forward bridges の真の linchpin = M_F-internal Fitting 分解 (BG Cor 15.5) を type-`P₂` で完成 → TypePData carrier が全 type-`P₂` から構成可能化、sorry-free + axiom-clean** (lane-f RESUME、full build green、AxiomsCheck 3 本登録、FT-path sorry 124 不変=carrier 構成は honest 進捗で headline sorry は forward bridge 完了まで動かない):
+
+「5 deep theorems」frontier 精査で **Thm 15.7 (`fitting_not_ti_cases`) は既に完全 DONE** と確認 (type-F の `M'≤F(M)` は Lemma 12.19 + `fitting_decomposition` 経由で ungated 済、proof は S15:7824-7926 sorry なし)。LAUNCH.md item 3「M'=F(M) 一点に還元済」は stale。⟹ frontier は **Prop 16.1 forward bridges の 6 deep TypePData field** に集約、その最深 gate = `hDcompl`/`hSDfit`/`hFiteq` (M_F-internal complement = BG Cor 15.5)。本セッションでこれを完成:
+
+- **新 `typeP2_mf_internal_fitting_decomposition` (S15, sorry-free + axiom-clean)**: type-`P₂` maximal `M` + κ-Hall `K` + (κ∪σ)'-Hall `U` ⟹ 3 deep field を一括供給。
+  - `hDcompl` (M' = M_F × U complement in M'): `M_F = M_σ` (type-P2 ⟹ M_σ nilpotent) + `M' = U ⊔ M_σ` (Lemma 15.1b) + `U ⊓ M_σ = ⊥` (互素 Hall) ⟹ `isComplement'_of_disjoint_and_mul_eq_univ`。
+  - `hFiteq` (F(M) = M_F ⊔ (U⊓C_M(M_F))): crux = **Y := O_{σ'}(F(M)) ≤ U**。Y は τ₂-群 (Cor 15.5a)、`σ'` (opiCore) ∧ `κ'` (τ₂∩κ=∅ via rank: κ-prime rank 1 vs τ₂-prime rank 2)、normal in M ⟹ `normal_le_hall` で (κ∪σ)'-Hall U に含、かつ Y centralizes M_σ=M_F ⟹ `F = M_F ⊔ Y ≤ M_F ⊔ (U⊓C) ≤ F`。
+  - `hSDfit` (M'' ≤ ...): `M'' ≤ F(M)` (Cor 15.5) + hFiteq から自明。
+- **新 helper `opiCoreInG_sigmaCompl_fittingInAmbient_primeFactors_subset_tau2` (S15, axiom-clean)**: Cor 15.5(a) の τ₂-membership 形 (cyclic 形の sibling、Y の κ' を供給)。
+- **新 `typePData_of_isTypeP2` (S16, sorry-free + axiom-clean)**: matched-pair producer (`typeP2_exists_matched_kappa_hall_pair`: abelian U, K≤N(U)) + 上記分解 ⟹ `typePData_of_isTypeP_of_inputs` を type-`P₂` で**完全適用**。**∴ TypePData carrier が全 type-`P₂` maximal から sorry-free 構成可能** (= CLAUDE.md「carrier 構成可能性 = doneness」マイルストーン)。Type-valued def ゆえ Prop 存在子は `Exists.choose`/projection で抽出 (obtain 不可)。
+
+**▶ 次 = hP2II 仕上げ (type-II last mile) — ただし lane-f 単独では closeable でない (多レーン gated と確認 cont.⁸)**: `typePData_of_isTypeP2` で TypePData は完成ゆえ `hP2II : IsTypeP2 M → IsTypeII M` は `isTypeII_of_typePData` の残 4 入力に還元するが、各々の gate を精査:
+- ① **`hcommon` (`TypePNontrivialCore` = `U≠⊥ ∧ (card W1).Prime ∧ IsTISubset (sharp M_F) (N(M_F))`)** — 3 連言で gate が分散: `U≠⊥` は type-P2 で導出可 (matched U≠⊥、または M_F=M_σ⊊M')、しかし **`(card W1).Prime` は lane-b の (10.11) `theorem88_caseB_prime_orders` gated** ([[s16-typep-producer-unfillable]])、`IsTISubset (F(M))` は Thm C(8)/(9) 系の deep。**∴ hcommon は quick win でない**。
+- ② `hnorm` (N(U)⊄M) = Cor 14.12 `typeP2_neighbor_is_typeF` payload を matched U で transport (Thm C conjunct 2 で実証済の手法)。lane-f で close 可。
+- ③ **`hderF` (M' が type-F) = 真の deep residual** (Peterfalvi (8.6)、M' の type-F 構造)、deep §15/§16。④ `hderfit` (F(M')=M_F)。
+- ∴ hP2II 完全 close は (10.11)[lane-b] + hderF[deep §16] 待ち。**lane-f 所有の linchpin (M_F-internal 分解 + TypePData carrier) は cont.⁸ で完了**。次 lane-f タスクは hderF (M' type-F) か、(card W1).Prime を (10.11) cite (sorried OK [[feedback-cite-sorried-lemmas-if-signature-correct]]) で ② と組んで hP2II を (10.11)+hderF-conditional に積むか。hP1neIIIIV/hP1eqV (type-P1) は U=⊥ ゆえ別途 (`typePData_of_isTypeP_of_inputs` を U=⊥ で適用、分解自明)。
+
 **2026-06-23 ✅ Lemma 15.1 (`typeP_auxiliary_structure_gated`) は既に DONE と確認 — 早期勝ち筋は banked 済、AxiomsCheck 登録 + stale 表/docstring 修正** (commit に含む):
 
 「5 deep theorems」の早期勝ち筋調査 (ユーザー選択)。`#print axioms typeP_auxiliary_structure{,_gated}` = `[propext, Classical.choice, Quot.sound]` を確認 — **Lemma 15.1 は前セッションで既に sorry-free + axiom-clean** だった (4 conjunct が standalone clean lemma `typeP_hall_derived_eq_and_abelian`/`typeP_hall_small_subgroup_cyclic_tau2`/`typeP_centralizerGeneratedBySigma_isMulCommutative`/`typeP_hall_frobenius_factor` の term-mode cite、Thm 14.7 も clean)。表の `S15:704 sorry` は stale。→ AxiomsCheck に両者登録 (regression lock)、`typeP_auxiliary_structure` の "Proof status" docstring の "(sorried)" 記述を訂正。**5 deep theorems は 4/5 完了 (Thm A standalone のみ残、faithful 版は完成済)**。真の Prop 16.1 gate = 8 型 bridge (上表参照)。

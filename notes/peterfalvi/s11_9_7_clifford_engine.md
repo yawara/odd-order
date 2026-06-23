@@ -30,6 +30,38 @@ chiefFactor_basic (済) は `_holds` / `quotient_order` 経由ゆえ互換 (fiel
 
 ## 進捗
 
+- **✅✅✅ `clifford_dichotomy` (9.7) CLOSED (2026-06-23) — sorry-free + axiom-clean** (`[propext,
+  Classical.choice, Quot.sound]` のみ、AxiomsCheck 登録)。**carrier wiring を完遂し (9.7) を完全に閉じた**。
+  S11 sorry 5→4 (残 = (9.8)/(9.9)/(9.10) char-counts + (9.11) sibleyTarget = lane-b/§14 gate)。
+  - **`u` pin (carrier honesty)**: `Section11CharacterData.u_eq_card_quotient` を opaque `Prop`+`_holds`
+    から **genuine 等式** `u = Nat.card ↥(((quotientMulAutHom chief.N_aInvariant).comp (U.subgroupOf
+    (U⊔W1)).subtype).range)` (= `|Ū|`、Finite-free `quotientMulAutHom` 式) に置換。**cross-lane 安全を実証
+    確認**: S12 (lane-b consumer) は `tau`/`S`/`H0CprimeSupport` のみ消費・`u`/`u_eq_card_quotient` 未使用
+    ゆえ pin 後も S12 green (旧 notes の「hub 判断推奨」は保守的すぎた — 実証で safe 確定)。pin 式は lemma の
+    `typeP_quotientCoprimeAction.φ.comp ....U.subtype` 版と **defeq** (`.φ=quotientMulAutHom`/`.U=U.subgroupOf`
+    は構造 field) ゆえ `rw [chars.u_eq_card_quotient]; exact <caseB lemma>` で橋渡し。
+  - **case (b) `clifford_caseB_data`**: `hcaseB` (U-既約) から `chiefFactor_caseB_image_coprime`/
+    `_dvd_norm` を pin 経由で配線 → `CliffordCaseBData` 構成。`field_model`/`Ubar_cyclic` opaque Props は
+    `True` (load-bearing でない; 実 content = divisibilities は genuine)。
+  - **case (a) `clifford_caseA_data`**: 2 新インフラで構成 —
+    (1) **`exists_supIndep_aInvariant_family_of_iSup`** = `card_eq_pow_of_iSup_aInvariant_irreducible`
+    の **族を返す版** (極大 SupIndep family `t : Finset ι` を露出; 旧 card 版は corollary 化)。case (a) で
+    S₀ (位数 p) の (U⊔W1)-軌道族を取り `t.card = q` (=`|H̄|=p^q`) → `Fin q` reindex (`t.equivFin.trans
+    (finCongr ht_card_q)`) で `Hpart : Fin q → Subgroup (↥H⧸N)` 各位数 p (`card_pointwise_smul`)。
+    (2) **`aInvariantRestrictAut`** = `IsAInvariant φ S` から制限作用 hom `A →* MulAut ↥S` を構成
+    (`MulEquiv.subgroupMap (φ a) S |>.trans (subgroupCongr (smul=map+inv))`; map_one'/map_mul' は
+    `ext` で coe-level に落ちる→`coe_subgroupMap_apply`/`subgroupCongr_apply` (共 rfl) simp)。
+    `aInvariantRestrictAut_range_card_dvd` で `a=|range| ∣ |S₀|-1 = p-1` (7c 経由)。`a_pos=card_pos`。
+  - **`CliffordCaseAData.Hpart` 型変更**: `Subgroup G` → **`Subgroup (↥data.H ⧸ chief.N)`** (lane-c local、
+    consumer は `caseA.a` のみ; 旧型は H̄ の order-p ピースが G 引き戻しで位数 `p|H₀|` ゆえ不整合だった)。
+  - **dichotomy enrich**: `chiefFactor_clifford_U_dichotomy` の case-(a) に `hirr₀` (S₀ の U-既約性) を追加で
+    返すよう変更 (`chiefFactor_clifford_dim_dvd_q` 由来、既証明; consumer は `clifford_dichotomy` のみ)。
+  - **Lean 知見**: ① `Exists` は Type-valued def 内で `obtain`/`cases` 不可 (large elimination 不可、
+    `recursor Exists.casesOn can only eliminate into Prop`) → `.choose`/`.choose_spec` で取り出す。
+    ② MulAut 制限作用の `ext x` は MulEquiv ext を recursive 適用し coe-level `↑(f x)=↑(g x)` まで落とす
+    (`Subtype.ext` 不要、付けると型不一致)。
+  正本 = この note「clifford_dichotomy CLOSED」。
+
 - **steps 3–5 DONE (2026-06-22, commits `f90a435f` / `87395477` / `bd78654b`)** — Clifford 算術核心 **完成**
   (全 sorry-free + axiom-clean、AxiomsCheck 登録、full build 緑、FT sorry 130 不変):
   - **step 3 `card_eq_pow_of_iSup_aInvariant_irreducible`** (order step): 有限・要素可換な `K` が

@@ -3945,6 +3945,16 @@ set_option linter.style.longLine false in
 -- BG Corollary 15.5(a) (`S15_MF`, issue 8016): `O_{σ(M)'}(F(M))` is cyclic.  Extracted from the
 -- now-clean `fitting_decomposition`; the bridge that the A(8) `FittingIsTI` rank core consumes.
 #assert_only_allowed_axioms OddOrder.BG.Ch4.S15.opiCoreInG_sigmaCompl_fittingInAmbient_isCyclic
+-- BG Corollary 15.5(a), `τ₂`-membership form (`S15_MF`, issue 7007): `O_{σ(M)'}(F(M))` is a
+-- `τ₂(M)`-group.  Companion to the cyclic form; the `κ'` half of the `(κ∪σ)'`-group fact used by the
+-- `M_F`-internal Fitting decomposition (`τ₂ ∩ κ = ∅` by rank).  Sorry-free + axiom-clean.
+#assert_only_allowed_axioms OddOrder.BG.Ch4.S15.opiCoreInG_sigmaCompl_fittingInAmbient_primeFactors_subset_tau2
+-- BG Corollary 15.5, type-`P₂` `M_F`-internal Fitting decomposition (`S15_MF`, issue 7007): for a
+-- type-`P₂` maximal `M` with `κ`-Hall `K` and `(κ∪σ)'`-Hall `U`, `M' = M_F × U` (the complement
+-- `hDcompl`), `F(M) = M_F ⊔ (U ⊓ C_M(M_F))` (`hFiteq`), and `M'' ≤ F(M)` (`hSDfit`).  Discharges the
+-- three deep `M_F`-internal residuals of `typePData_of_isTypeP_of_inputs`; the shared linchpin of the
+-- Prop 16.1 forward bridges `hP2II`/`hP1neIIIIV`/`hP1eqV`.  Sorry-free + axiom-clean.
+#assert_only_allowed_axioms OddOrder.BG.Ch4.S15.typeP2_mf_internal_fitting_decomposition
 -- BG Theorem 15.7(a), the type-classification clause (`S15_MF`, issue 7007): a type-`P₂` maximal
 -- subgroup has a `TI` Fitting subgroup (contrapositive: `¬FittingIsTI ⟹ M` is type `F` or `P₁`).
 -- Sorry-free + axiom-clean.
@@ -5402,6 +5412,18 @@ Corollary 14.12 consumes via its `K ≤ N(U)` hypothesis.  Axiom-clean. -/
 
 #assert_only_allowed_axioms OddOrder.BG.Ch4.S16.typeP2_exists_matched_kappa_hall_pair
 
+/-! **`TypePData M` for a type-`P₂` maximal subgroup** (`S16_MainResults`, `typePData_of_isTypeP2`,
+issue 7007): every type-`P₂` maximal subgroup carries a Peterfalvi type-`P` datum, `sorry`-free.
+The carrier-constructibility milestone for Proposition 16.1's forward bridges: the matched pair
+`typeP2_exists_matched_kappa_hall_pair` (abelian `U`, `K ≤ N(U)`) and the `M_F`-internal Fitting
+decomposition `typeP2_mf_internal_fitting_decomposition` (the three deep `M'`-complement/Fitting
+fields) together fully discharge the gated-endpoint constructor `typePData_of_isTypeP_of_inputs`.
+This closes the deep `M_F`-internal residuals gating all three (`hP2II`/`hP1neIIIIV`/`hP1eqV`)
+forward bridges; `hP2II` now reduces to the type-`II` last mile (`isTypeII_of_typePData`).
+Axiom-clean. -/
+
+#assert_only_allowed_axioms OddOrder.BG.Ch4.S16.typePData_of_isTypeP2
+
 /-! **BG Theorem C** (`S16_MainResults`, `theoremC_paired_structure`): for `K ≠ 1`, a type-`P`
 maximal `M` has the full paired structure — `U` abelian; `N_G(U) ⊄ M` (conjunct 2 = BG C(1) /
 Corollary 14.12, via the matched `(K₀,U₀)` pair `typeP2_exists_matched_kappa_hall_pair` and the
@@ -5753,3 +5775,12 @@ formula together with the prime computation `coprimeFrobeniusAction_card_eq_prim
 -- structure of `U W₁` via Isaacs Cor 3.28 (`coprime_fixedPoints_quotient`).
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S11.chiefFactor_caseB_image_coprime
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S11.chiefFactor_caseB_image_dvd_norm
+-- Peterfalvi (9.7): the Clifford dichotomy, fully packaged into the carriers `CliffordCaseAData` /
+-- `CliffordCaseBData`.  Case (b) wires the Singer divisibilities (with `chars.u = |Ū|` pinned); case
+-- (a) builds the `q` order-`p` factors (the `SupIndep` orbit family) and the bound `a ∣ p-1` (the
+-- restricted `U`-action on an order-`p` factor).  All axiom-clean.
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S11.exists_supIndep_aInvariant_family_of_iSup
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S11.aInvariantRestrictAut_range_card_dvd
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S11.clifford_caseB_data
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S11.clifford_caseA_data
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S11.clifford_dichotomy
