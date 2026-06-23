@@ -1189,6 +1189,50 @@ theorem muS_definition (i : Fin tp.q) (j : Fin tp.p) :
   simp only [deltaS, muS, eqQ_zero hG mp tp, Int.cast_smul_eq_zsmul]
   exact (mp.certainTypeS hG).induce_chiColumn_diff_mu_diff (chi2enum hG mp tp j) (eqQ hG mp tp i)
 
+/-- **A linear character of `↥tp.W` is determined by its restrictions to `tp.W1` and `tp.W2`.**
+Since `tp.W = tp.W1 ⊔ tp.W2` is an internal product of two commuting subgroups, every `w : ↥tp.W`
+factors as `w = a * b` with `a ∈ tp.W1`, `b ∈ tp.W2`; two monoid homs agreeing on `tp.W1` and `tp.W2`
+therefore agree everywhere.  This is the generating-set half of the S/T-shared-`ω` symmetry. -/
+theorem monoidHom_eq_of_eqOn_W1_W2 {χ χ' : ↥tp.W →* ℂˣ}
+    (h1 : ∀ w : ↥tp.W, (w : G) ∈ tp.W1 → χ w = χ' w)
+    (h2 : ∀ w : ↥tp.W, (w : G) ∈ tp.W2 → χ w = χ' w) :
+    χ = χ' := by
+  haveI := tp.W_cyclic
+  letI : CommGroup ↥tp.W := IsCyclic.commGroup
+  have hW1le : tp.W1 ≤ tp.W := by rw [tp.W_eq_join]; exact le_sup_left
+  have hW2le : tp.W2 ≤ tp.W := by rw [tp.W_eq_join]; exact le_sup_right
+  have htop : (tp.W1.subgroupOf tp.W) ⊔ (tp.W2.subgroupOf tp.W) = ⊤ := by
+    rw [← Subgroup.subgroupOf_sup hW1le hW2le, ← tp.W_eq_join, Subgroup.subgroupOf_self]
+  ext w
+  have hmem : w ∈ (tp.W1.subgroupOf tp.W) ⊔ (tp.W2.subgroupOf tp.W) := htop ▸ Subgroup.mem_top w
+  rw [Subgroup.mem_sup] at hmem
+  obtain ⟨a, ha, b, hb, hab⟩ := hmem
+  rw [← hab, map_mul, map_mul, h1 a (Subgroup.mem_subgroupOf.mp ha),
+    h2 b (Subgroup.mem_subgroupOf.mp hb)]
+
+/-- **`gridEquivE` preserves the underlying `G`-element.**  It is the composite of the
+element-preserving subgroup equivs `subgroupOfEquivOfLe` and `subgroupCongr`, so transporting
+`w : ↥tp.W` into `certainTypeS`'s `W` does not move the ambient group element. -/
+theorem gridEquivE_coe (w : ↥tp.W) :
+    (((gridEquivE hG mp tp w : ↥(mp.certainTypeS hG).sdiffTICyclicHypothesis.W) :
+        ↥mp.S) : G) = (w : G) := rfl
+
+/-- A `tp.W`-element lying in `mp.K` transports under `gridEquivE` into `certainTypeS.W1`
+(`= mp.K.subgroupOf mp.S`). -/
+theorem gridEquivE_mem_W1 (w : ↥tp.W) (hw : (w : G) ∈ mp.K) :
+    gridEquivE hG mp tp w ∈ ((mp.certainTypeS hG).W1).subgroupOf
+      (mp.certainTypeS hG).sdiffTICyclicHypothesis.W := by
+  rw [Subgroup.mem_subgroupOf, certainTypeS_W1_eq hG mp, Subgroup.mem_subgroupOf, gridEquivE_coe]
+  exact hw
+
+/-- A `tp.W`-element lying in `mp.Kstar` transports under `gridEquivE` into `certainTypeS.W2`
+(`= mp.Kstar.subgroupOf mp.S`). -/
+theorem gridEquivE_mem_W2 (w : ↥tp.W) (hw : (w : G) ∈ mp.Kstar) :
+    gridEquivE hG mp tp w ∈ ((mp.certainTypeS hG).W2).subgroupOf
+      (mp.certainTypeS hG).sdiffTICyclicHypothesis.W := by
+  rw [Subgroup.mem_subgroupOf, certainTypeS_W2_eq hG mp, Subgroup.mem_subgroupOf, gridEquivE_coe]
+  exact hw
+
 end Section16CharacterData
 
 /-- **Peterfalvi §13 coherent Dade-grid producer** (`sorry`) — *lane-b*
