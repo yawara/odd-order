@@ -118,8 +118,14 @@ bottom-out** するので、clean 化には §15 foundation が先。真の順�
 - **`hcommon` (`TypePNontrivialCore`) は全体 lane-f-local** (cont.⁹ で確定): `U≠⊥`(matched) ∧ `(card W1).Prime`(**Prop 14.2(g) `typeP_structure` proven、lane-b 10.11 不要** — (10.11) は partner 側 primality であって type-P2 の κ-Hall ではない) ∧ `IsTISubset (sharp M_F) (N(M_F))`(**Prop 14.2(g) が `IsTISubset (sigmaSharp M) (N(M_σ))` を供給、M_F=M_σ ゆえ一致**)。
 - **`hnorm` (N(U)⊄M)** = Cor 14.12 を matched U の Sylow-r 部分群に適用。lane-f。
 - ⟹ `isTypeII_of_isTypeP2_of_derived_typeF` (cont.⁹, axiom-clean) が hcommon/hUcomm/hnorm/TypePData を全 discharge、**hP2II = この補題 + {`hderF`(M' type-F) + `hderfit`(F(M')=M_F)} だけ**。
-- ③ **真の唯一 gate = `hderF` (M' が type-F)** = Peterfalvi (8.6)、`IsTypeF (derivedInG M)` = `Nonempty (TypeFData M')`。既存 producer 無し (conjugation transport のみ)、deep §16 構造 (M'=M_σ⋊U の type-F carrier 構成: H'=F-kernel, U' Hall complement, Frobenius H'⋊U0', U1 centralizer control)。multi-session。④ `hderfit` も同 M'-構造から。
-- ∴ **次 lane-f タスク = `hderF` (M'-type-F 構造の構成)**。これが Prop 16.1 forward bridge hP2II の唯一の残 gate。hP1neIIIIV/hP1eqV (type-P1) は別 (U=SZ-complement、M'/M_F nilpotent deferred 経由)。
+- ③ **真の唯一 gate = `hderF` (M' が type-F)** = Peterfalvi (8.6)、`IsTypeF (derivedInG M)` = `Nonempty (TypeFData M')`。
+
+**▶ hderF 深掘り (cont.⁹、結論: 深い未形式化 §15/§16 構造補題、char-gate の可能性あり — 単純な template 流用は不可)**:
+- TypeFData(M') の構成は `typeFData_of_kappa_eq_bot` (type-F maximal の TypeFData) が template、materials = my decomposition の hDcompl (M'=M_σ⋊U complement) + Lemma 15.1(e) Frobenius (conjunct 8 of `typeP_auxiliary_structure`) + 15.1(d) U1。
+- **但し crux = `maxNilpotentNormalHall M' = M_σ` (= TypeFData.H_eq + hderfit)**。⊇ (M_σ は nilpotent normal Hall in M') は easy (`le_maxNilpotentNormalHall`)。**⊆ が深い**: `maxNilpotentNormalHall M' = F(M)` 一般 (F(M)≤M' for ¬type-F by Cor 15.5(d)、F(M) nilpotent normal Hall in M')、`= M_σ ⟺ Y:=O_{σ'}(F(M))=⊥ ⟺ F(M)=M_σ`。⚠ 私の decomposition で **Y≤U かつ Y≤C(M_σ)** ゆえ Y≠⊥ なら F(M)=M_σ×Y⊋M_σ で `maxNilpotentNormalHall M'≠M_σ` ⟹ **hderfit が偽**。
+- **∴ hderF/hderfit は `Y=⊥` (= F(M)=M_σ = full U が M_σ に FPF 作用 = M' が kernel M_σ の Frobenius) を要する**。これは **Lemma 15.1(e) の U0-Frobenius より深い** (U0≤U かつ exp U0=exp U だが U0≠U 一般、FPF は U0 のみ保証)。Peterfalvi 版 `typeII_derived_frobenius` (10.7, `S12_MaximalIII_IV_V:4983`) は **sorried + char-gated (CoherentHypothesis) + 弱 carrier (`kernel_is_SF : Prop` opaque)** ゆえ cite 不可。
+- **∴ hderF = 未形式化の deep §15/§16 構造補題「type-II/type-P2 で M'=M_σ⋊U が Frobenius (full U FPF on M_σ)」**。BG 構造版 (非 char) が存在するはずだが repo 未形式化。要 BG §15 精読 (Cor 15.5/15.9 周辺の τ₂/Frobenius 構造) または ChatGPT 相談。multi-session。**lane-f 単独で可能だが大物**。
+- ∴ **lane-f の §16 構造 frontier は本質的に「完了 or deep-gated」**: POLE-1 tp producer ✅assembly-complete (lane-b 10.11 待ち) / hP2II ✅{hderF}に還元 / hderF=deep未形式化 / 他 bridge=carrier-gated。**lane 再配置 (hub 判断) or hderF deep 投資の岐路**。hP1neIIIIV/hP1eqV (type-P1) も別 deep (U=SZ-complement、M'/M_F nilpotent deferred)。
 
 **2026-06-23 ✅ Lemma 15.1 (`typeP_auxiliary_structure_gated`) は既に DONE と確認 — 早期勝ち筋は banked 済、AxiomsCheck 登録 + stale 表/docstring 修正** (commit に含む):
 
