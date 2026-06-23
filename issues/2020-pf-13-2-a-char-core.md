@@ -48,6 +48,15 @@ theorem card_kappaHall_lt_of_isTypeP1 (hG : IsMinimalSimpleOdd G)
 ⟹ これは Pf §10–§11 の **character 理論** (coherence + Dade isometry norm bound)。repo 未形式化、
 lane-b 領域。文献に証明あり ([[feedback-dont-mislabel-formalization-as-research]]) = 形式化労力。
 
+**discharge target の所在 (lane-h 調査)**: (11.9) は repo **S13 `final_typeIII_conclusions`**
+(`S13_MaximalIII_IV.lean:386`、lane-h 所有、現 sorried) が
+`hyp.q > hyp.p ∧ hyp.caseB_of_97 ∧ IsTypeIII M` を結論 (= q>p の char 核)。但し single-maximal
+`Hypothesis M` (= Hyp (11.2)) + `OrthogonalityData hyp` (char data) を前提とする。⟹ `card_kappaHall_lt_of_isTypeP1`
+(pair level) への接続 bridge = [pair の type-P1 S → S の Hypothesis(11.2) 構成 (要 (10.1)+(10.10) Type III/IV
+判定)] + [`OrthogonalityData` 構成 (char)] + [hyp.q/hyp.p ↔ |K|/|K*| 同定] で、bridge 自体も char-gated。
+∴ 当 obligation は **fresh sorry のまま** が clean (接続層に sorry を移すと char infra 構築が二重化)。
+`final_typeIII_conclusions` の sorry-free 化 (lane-b char) が本命。
+
 ## やること
 
 - [ ] `card_kappaHall_lt_of_isTypeP1` を sorry-free 化 (Pf 10.10 + 11.9.b の形式化、または既存
