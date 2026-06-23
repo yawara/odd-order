@@ -407,19 +407,37 @@ theorem exists_section16MaximalPair_data {G : Type*} [Group G] [Finite G]
         · exact Or.inr (Or.inl hMc)
       · rw [sup_comm]; exact hcyc
 
-/-- **Peterfalvi (13.2.a), character core** (mmd §13, `references/peterfalvi/04.15_*`) — left as a
-faithful obligation, *owned by lane-b* (Peterfalvi §10–§11 coherence).
+/-- **Peterfalvi (11.9.b), character core** (faithful obligation, *owned by lane-b* — Peterfalvi §11
+coherence / Dade norm).  For a Type III/IV maximal subgroup `S` (the Hypothesis (11.2) case), with
+κ-Hall factor `K` and dual factor `K* = M_σ(S) ⊓ C_G(K)`, the coherence / norm-inequality bound on
+the character set `S(HC)` forces `q > p`, i.e. the dual factor is the smaller: `|K*| < |K|`
+(`q = |W₁| = |K|`, `p = |W₂| = |K*|`).
+
+This is the genuinely §11 character-theoretic half of Peterfalvi (13.2.a).  The Type-V exclusion of
+the (13.2.a) proof line (Theorem (10.10), `no_typeV_maximal`) is discharged in
+`card_kappaHall_lt_of_isTypeP1`, which reduces to this obligation via the type dictionary
+`proposition_type_classification`.  Repo-unformalized, lane-b §11 char API. -/
+theorem card_kappaHall_lt_of_isTypeIIIorIV {G : Type*} [Group G] [Finite G]
+    (hG : IsMinimalSimpleOdd G) {S K Kstar : Subgroup G}
+    (hS : S ∈ maximalSubgroups G) (hSP : BG.Ch4.S14.IsTypeP S) (hKS : K ≤ S)
+    (hK : Ch03.IsHallSubgroup (BG.Ch4.S14.kappa S) (K.subgroupOf S))
+    (hKstar : Kstar = BG.Ch3.S10.Msigma S ⊓ Subgroup.centralizer (K : Set G))
+    (hIIIorIV : IsTypeIII S ∨ IsTypeIV S) :
+    Nat.card ↥Kstar < Nat.card ↥K := sorry
+
+/-- **Peterfalvi (13.2.a), character core** (mmd §13, `references/peterfalvi/04.15_*`).
 
 For the type-`P` member `S` of a dual maximal pair (BG Theorem 14.7), with κ-Hall factor `K` and
 dual factor `K* = M_σ(S) ⊓ C_G(K)`, the type-`P₁` alternative (`S` of Type III/IV/V) carries the
 *larger* κ-Hall factor: `|K*| < |K|`.  In Peterfalvi's notation `q = |W₁| = |K|`, `p = |W₂| = |K*|`,
 this is "`S` of Type III ⟹ `q > p`".
 
-Peterfalvi's proof (the (13.2.a) proof line): Theorem (10.10) excludes Type V, and (11.9.b) — under
-the Type III/IV Hypothesis (11.2) — gives `q > p` from the coherence / norm-inequality bound on the
-character set `S(HC)`.  That character-theoretic content is owned by lane-b; surfaced here as a
-named obligation so the §16 maximal-pair producer can carry the determinate type `IsTypeP2 mp.S`
-(relane #4, issues 4009/2019).  Its only consumer is `isTypeP2_of_typeP_kappaHall_lt`. -/
+**Type-V exclusion discharged (Theorem (10.10), sorry-free here)**: by the type dictionary
+`proposition_type_classification`, a type-`P₁` `S` is Type III/IV (if `M_F ≠ M_σ`) or Type V (if
+`M_F = M_σ`); the latter is impossible by `no_typeV_maximal` (Peterfalvi (10.10)), so `S` is
+Type III/IV and the genuinely §11 character core `card_kappaHall_lt_of_isTypeIIIorIV` ((11.9.b),
+lane-b) applies.  Consumed by `isTypeP2_of_typeP_kappaHall_lt`
+(relane #4, issues 4009/2019; relane #6, issue 2020). -/
 theorem card_kappaHall_lt_of_isTypeP1 {G : Type*} [Group G] [Finite G]
     (hG : IsMinimalSimpleOdd G) {S K Kstar : Subgroup G}
     (hS : S ∈ maximalSubgroups G) (hSP : BG.Ch4.S14.IsTypeP S) (hKS : K ≤ S)
@@ -427,7 +445,13 @@ theorem card_kappaHall_lt_of_isTypeP1 {G : Type*} [Group G] [Finite G]
     (hKstar : Kstar = BG.Ch3.S10.Msigma S ⊓ Subgroup.centralizer (K : Set G))
     (hP1 : BG.Ch4.S14.IsTypeP1 S) :
     Nat.card ↥Kstar < Nat.card ↥K := by
-  sorry
+  -- Type dictionary: `S` type-`P₁` ⟹ Type III/IV (`M_F ≠ M_σ`) or Type V (`M_F = M_σ`).
+  obtain ⟨_, _, hcIII_IV, hdV, _, _⟩ := BG.Ch4.S16.proposition_type_classification hG hS
+  -- Type V is excluded by Theorem (10.10) `no_typeV_maximal`, so `M_F ≠ M_σ` and `S` is III/IV.
+  have hMF : BG.Ch4.S15.MF S ≠ BG.Ch3.S10.Msigma S := fun hMF =>
+    OddOrder.Peterfalvi.S12.no_typeV_maximal hG ⟨S, hS, hdV.mpr ⟨hP1, hMF⟩⟩
+  -- The genuinely §11 character core (11.9.b) gives `|K*| < |K|`.
+  exact card_kappaHall_lt_of_isTypeIIIorIV hG hS hSP hKS hK hKstar (hcIII_IV.mpr ⟨hP1, hMF⟩)
 
 /-- **Peterfalvi (13.2.a)** (mmd §13, `references/peterfalvi/04.15_*`): the type-`P` member `S` of a
 dual maximal pair whose κ-Hall factor `K` is the *smaller* of the two coprime factors of
