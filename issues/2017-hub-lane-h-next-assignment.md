@@ -7,6 +7,21 @@ created: 2026-06-23
 
 # HUB: lane-h next assignment — ungated work exhausted, all residuals cross-lane
 
+## ⏩ 更新 (2026-06-23): relane 4007 が場所を確定 — 残る問いは driver-mode の steady state
+
+本 issue 起票と相前後して hub が **relane 4007** (`ba893fba`、ユーザー裁可) を実施: lane-c の §11 枯渇を受け
+**S15_SAndT を H→C 移譲、lane-h = `S14_MaximalI` に集中**。⟹ lane-h の「場所」は確定 (S14_MaximalI のみ所有)。
+
+ただし下表の通り **S14_MaximalI は全 sorry が cross-lane gated** ((12.9)←Prop 16.1、(12.11)←(8.13.c1)、
+char←lane-b)。lane-h は現在 **driver モード**で main を監視し、上流 landing 時に機会的 close する運用
+(ユーザー指示「main を ~5 分監視」と整合):
+- **Prop 16.1** (lane-f) landing → (12.9) を `exists_sigmaKappaCompl_hall_ge_P0` discharge で close (issue 2016)
+- **lane-b char** landing → (12.2-5)/(12.13-16) close
+- **(8.13.c1)** (lane-f) landing → (12.11) close
+
+**hub への残る問い**: この「gated S14 上の driver-mode」が lane-h の意図された steady state でよいか、
+それとも lane-h を **lane-f Prop 16.1 の能動支援**に振り向けるべきか (Prop 16.1 が (12.9)+§16 の最大レバレッジ)。
+
 ## 判断を仰ぐ内容 (HUB へ)
 
 lane-h (Pf §14_MaximalI + §15 S&T) は **自セグメント内の ungated closable Lean work を出し尽くした**。
