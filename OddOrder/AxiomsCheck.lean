@@ -3955,6 +3955,14 @@ set_option linter.style.longLine false in
 -- three deep `M_F`-internal residuals of `typePData_of_isTypeP_of_inputs`; the shared linchpin of the
 -- Prop 16.1 forward bridges `hP2II`/`hP1neIIIIV`/`hP1eqV`.  Sorry-free + axiom-clean.
 #assert_only_allowed_axioms OddOrder.BG.Ch4.S15.typeP2_mf_internal_fitting_decomposition
+-- BG Corollary 15.5(b) consequence + Peterfalvi (8.6.b II) `(M')_F = H` reduction (`S15_MF`, issue
+-- 7007): for a type-`P₂` maximal `M` with `τ₂(M) = ∅`, `F(M) = M_σ` (the `Y = ⊥` half of Cor 15.5(b),
+-- since `Y = O_{σ'}(F(M))` is a `τ₂(M)`-group) and the Fitting core of the derived subgroup is `M_σ`
+-- (`maxNilpotentNormalHall M' = M_σ`, the `hderfit` input of `isTypeII_of_isTypeP2_of_derived_typeF`).
+-- Discharges `hderfit` down to the single residual gate `τ₂(M) = ∅` (BG Theorem 15.8,
+-- `tau2_transfer_constraint`).  Sorry-free + axiom-clean.
+#assert_only_allowed_axioms OddOrder.BG.Ch4.S15.fittingInAmbient_eq_Msigma_of_isTypeP2_of_tau2_empty
+#assert_only_allowed_axioms OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_derivedInG_eq_Msigma_of_isTypeP2_of_tau2_empty
 -- BG Theorem 15.7(a), the type-classification clause (`S15_MF`, issue 7007): a type-`P₂` maximal
 -- subgroup has a `TI` Fitting subgroup (contrapositive: `¬FittingIsTI ⟹ M` is type `F` or `P₁`).
 -- Sorry-free + axiom-clean.
