@@ -74,3 +74,22 @@ lane-c の carrier capstone `exists_typePData_W1_eq_of_isTypeP2` は既に `data
 **lane-b は `tp.W1_eq_K` を cite** して cd grid (ω/μ/ν) を mp.K に align。lane-c LAUNCH.md に task 追記済。
 
 CLOSED (hub routing 完了。field-add 実装は lane-c の通常 carrier 作業として進む)。
+
+## 更新 (2026-06-23, lane-b) — 別解で解決済、lane-c の field-add は不要
+
+lane-b が cd producer 着手時に、上記 routing (option A: lane-c が `Section16TypePStructure` に
+`W1_eq_K`/`W2_eq_Kstar` field 追加) **より良い別解**で本ゲートを解決した (commit `c7bfe4a0`):
+
+**`Section16TypePStructure.W1_eq_K` / `.W2_eq_Kstar` を補題として証明** (FeitThompson.lean, lane-b cd 領域、
+build-green)。任意の `tp : Section16TypePStructure mp` に対し:
+- `tp.W = mp.S ⊓ mp.T` (field `W_eq_inter`) `= mp.K ⊔ mp.Kstar` (`Section16MaximalPair.W_structure`
+  = `typeP_pair_W_structure` ラッパ、BG Thm 14.7)、
+- `tp.W1`/`mp.K` は共に cyclic `W` の唯一の位数-`q` 部分群、`tp.W2`/`mp.Kstar` は唯一の位数-`p` 部分群
+  (`eq_of_card_eq_prime_of_isCyclic`)。順序 `q<p` (`q_lt_p`) と `|K|<|K*|` (`K_lt_Kstar`) が labelling 一致。
+
+**⟹ producer reduction 不要・cross-lane 不要・構造改変不要**で `tp.W1 = mp.K` が cite 可能。
+
+**lane-c への影響**: **`Section16TypePStructure` への `W1_eq_K` field 追加は不要** (option A は実施しないでよい)。
+field を足すと全 producer (`section16TypePStructure_of_components` 等) が discharge を要し構造が膨らむだけで、
+上記補題が同じ結論を producer 非依存に与えるため無価値。lane-c は carrier 作業を継続でよい。
+cd (lane-b) は `tp.W1_eq_K hG` / `tp.W2_eq_Kstar hG` / `tp.W_eq_kappa_join hG` を cite して grid を align する。
