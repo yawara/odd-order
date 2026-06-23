@@ -5606,6 +5606,9 @@ the non-TI residual (BG Theorem 15.7(e)). -/
 #assert_only_allowed_axioms OddOrder.BG.Ch4.S16.normalizer_eq_self_of_subgroupOf_normal_of_ne_bot
 #assert_only_allowed_axioms OddOrder.BG.Ch4.S16.normalizer_fittingInAmbient_eq_self
 #assert_only_allowed_axioms OddOrder.BG.Ch4.S16.maxNilpotentNormalHall_sharp_isTISubset_of_fittingIsTI
+-- 15.7(e) conjunct A divisibility engine (Coq `regZq_dv_q1`): a `U0`-invariant order-`q` subgroup
+-- of the Frobenius kernel `M_F` forces `exp U ∣ q - 1` (Frobenius semiregular action).
+#assert_only_allowed_axioms OddOrder.BG.Ch4.S16.typeF_exponent_dvd_sub_one_of_invariant_card
 
 /-! # Peterfalvi Appendices (Lane H)
 

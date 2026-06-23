@@ -103,6 +103,15 @@ bottom-out** するので、clean 化には §15 foundation が先。真の順�
 
 ## 進捗ログ
 
+**2026-06-23 (cont.¹⁴) ✅✅ hFI ¬TI **非 abelian 枝 (c)** の 2 エンジン (conjunct B = cyclic O_{p'}、conjunct A = divisibility) を実証明で締結。残 = per-prime witness Z_q 構成のみ** (lane-f RESUME、commits `90a61f71` conjunct B + `3145be4c` conjunct A engine、full build 3881 green 88s、AxiomsCheck 4 本登録):
+
+- **✅ conjunct B 完全完成** = `typeF_nonabelian_cyclic_opiCore_compl` (S15_MF、sorry-free+axiom-clean): 非 abelian M_F で `p∈π(M_F) ∧ IsCyclic O_{p'}(M_F)`。
+  - **`not_cPP` 解決**: M_F = O_p ⊔ O_{p'} (`opiCoreInG_sup_compl_eq_of_isNilpotent`)、O_{p'}≤C(O_p)≤C(X₁) (p-core commute `opiCoreInG_commutator_compl_eq_bot` + commutator_comm) ⟹ O_{p'}≤C₁ abelian、O_p abelian なら M_F=O_p⊔O_{p'} abelian 矛盾 (新汎用 `isMulCommutative_sup_of_le_centralizer`)。
+  - **`cycHp'` 解決 + uniqueness API 訂正**: cont.¹³ が懸念した `centralizer_isUniquelyMaximal_of_two_le_rank` (S10 特化) は**不要**。**汎用版 `OddOrder.BG.Ch2.S09.isUniquelyMaximal_of_le_centralizer_of_two_le_rank` (= BG Cor 9.2) がまさに必要なもの** (L∈𝒰, K≤C(L), 2≤rank K ⟹ K∈𝒰)。rank O_{p'}≤1 (否なら D=M_F⊓C(O_p)∈𝒰 via Cor 9.2 + `nonabelian_pgroup_isUniquelyMaximal` ⟹ C₁∈𝒰 矛盾) + 新汎用 `isCyclic_of_isMulCommutative_of_rank_le_one` (odd abelian rank≤1⟹cyclic、各 Sylow を `two_le_pRank` 対偶で cyclic 化 → mathlib `IsZGroup.exponent_eq_card`+`IsCyclic.of_exponent_eq_card`)。
+- **✅ conjunct A divisibility engine 完成** = `typeF_exponent_dvd_sub_one_of_invariant_card` (S16、sorry-free+axiom-clean): TypeFData td + U0-invariant order-q 部分群 Z≤M_F ⟹ exp(U)∣q-1。`td.frobenius_HU0.conj_frobenius` を ↥(M_F⊔U0) から G-level FPF へ transport + `Subgroup.normalizerMonoidHom` で U0 の Z 共役作用 (smul は u·z·u⁻¹ に rfl) → `IsFrobeniusAction` → `card_dvd_sub_one_of_isFrobeniusAction` → exp(U)=exp(U0)∣|U0|∣q-1。
+- **✅ q=p de-risk (重要、cont.¹³ の Sylow-of-G 懸念を解消)**: q=p の |Ω₁(Z(O_p(M_F)))|=p は **rank C₁≤2 (=hrank3) から従い、Coq の Sylow-p-of-G (sylP_G/sigma_Hall_tame/mFT_rank2_Sylow_cprod) は不要**。B=X₁⊔Z₀ elem abelian (X₁,Z₀ commute、X₁⊓Z₀=⊥ ∵ X₁⊄Z₀ [X₁⊆Z₀⊆Z(P)⟹P≤C(X₁)⟹P≤C₁ abelian⟹P abelian 矛盾])、pRank B = 1+pRank Z₀ ≤ rank C₁ ≤ 2 ⟹ pRank Z₀≤1 ⟹ |Z₀|≤p、Z₀≠⊥ ⟹ |Z₀|=p。
+- **▶ 残 (c) = per-prime witness Z_q 構成のみ** (multi-session、下記): 各 q∈π(M_F) で order-q char 部分群 Z_q≤M_F (⟹ M-normal ⟹ U0-invariant) を作り engine 適用。**q≠p**: Z_q = O_q(M_F) の唯一 order-q 部分群 (O_q≤O_{p'} cyclic [conjunct B] ⟹ O_q cyclic)。**q=p**: Z_p=Ω₁(Z(O_p(M_F)))、|Z_p|=p (上記 rank 論法、要 not_cPP を expose or 再導出 + `Omega`/`center`/pRank の nested subgroup plumbing)。witness 後の wiring = S16:1391 `refine Or.inr (Or.inr ⟨witness+engine, typeF_nonabelian_cyclic_opiCore_compl⟩)`。
+
 **2026-06-23 (cont.¹³) ✅ hFI ¬TI **abelian 枝** (BG Thm 15.7(e) disjunct (b)) を実証明で締結 + 共有 witness infra 3 本** (lane-f RESUME、commit `dfdec279`、full build 3881 green 82s、AxiomsCheck 3 本登録):
 
 - **`isTypeI_of_isTypeF` (S16) の ¬TI 枝を `by_cases IsMulCommutative M_F` で 2 分割**。**abelian 枝 = disjunct (b) `rank M_F = 2` を実証明**: ≤2 は M_F abelian ⟹ M_F⊆C_G(X₁) ⟹ M_F⊓C_G(X₁)=M_F ⟹ rank<3、≥2 は O_p(M_F) abelian 非巡回 ⟹ 2≤pRank≤rank。**残 sorry = 非 abelian 枝 (c) のみ** (S16:1391)。
@@ -707,7 +716,7 @@ M*-positioning）は**未再構成 = 真の残 math gate**。Lemma 12.11 proof /
   - **残 = type-F の M'≤F(M) のみ・now ungated** (C_Y(E₁)=1 gate 消滅): `exists_subgroupESetup` (一般 M) → M'=Mσ⊔E' (`derivedInG_eq_Msigma_sup_derivedInG_complement`) → E'≤C(Mσ) (Lem 12.19 `derivedE_centralizes_betaComplement` + W=Mσ [π(Mσ)∩β=∅]) → E'≤C_G(Mσ)⊓M≤F(M) (`fitting_decomposition` F=(C⊔MF)) + Mσ≤F(M) ⟹ sup_le。**M' nilpotent 経由不要**、crux = W=Mσ の Hall plumbing のみ
 - [ ] Thm A `theoremA_maximal_structure` (S16:144) — Lemma 15.1 + Prop 14.2 + §15 で全 conjunct
 - [~] Thm C `theoremC_paired_structure` — **11/12 conjunct DONE** (conjunct 10 = BG C(9) `A0-A` TI を `491bdd3d` で完全証明、残 = conjunct 2 (Cor 14.12) のみ)。旧: 10/12 + faithfulness 修正 2 件 DONE (`8f636b54`/`ec711630`/`378e91cf`/`dc2fe378`, 2026-06-21)。残 = conjunct 2 (N(U)⊄M=Cor 14.12)/10 (A0-A TI=Thm A(3)(5)) のみ (conjunct 11 は 15.7(a) で close)
-- [~] Prop 16.1 配線 `proposition_type_classification` — **hFI: TI-case (cont.¹²) + ¬TI abelian 枝 (cont.¹³, `dfdec279`) 着地**。残 hFI = ¬TI 非 abelian 枝 (c) のみ (S16:1391、攻略計画↑ cont.¹³)。他 6 bridge 未
+- [~] Prop 16.1 配線 `proposition_type_classification` — **hFI: TI-case (cont.¹²) + ¬TI abelian 枝 (cont.¹³) + ¬TI 非abelian枝 2 エンジン (cont.¹⁴: conjunct B cyclic O_{p'} `90a61f71` + conjunct A divisibility engine `3145be4c`) 着地**。残 hFI = ¬TI 非abelian枝 (c) の per-prime witness Z_q 構成のみ (S16:1391、計画↑ cont.¹⁴)。他 6 bridge 未
 
 ## cont.¹² (2026-06-23) — `hFI` (type-F ⟹ type-I) を bare sorry → 構造化
 
