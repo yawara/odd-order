@@ -803,10 +803,54 @@ noncomputable def certainTypeHypothesis_of_typeP_kappaHall {G : Type*} [Group G]
           Nat.card_congr (Subgroup.subgroupOfEquivOfLe (sup_le hKM hKstarM)).toEquiv]
         exact hG.odd.of_dvd_nat (Subgroup.card_subgroup_dvd_card (K ⊔ Kstar)) }
 
+/-- The cyclic factors `mp.K`, `mp.Kstar` are cyclic (subgroups of the cyclic `Z = K ⊔ K*`). -/
+private theorem Section16MaximalPair.isCyclic_K {G : Type*} [Group G] [Finite G]
+    (mp : Section16MaximalPair G) : IsCyclic ↥mp.K :=
+  haveI : IsCyclic ↥(mp.K ⊔ mp.Kstar) := mp.Z_cyclic
+  isCyclic_of_injective (Subgroup.inclusion (le_sup_left : mp.K ≤ mp.K ⊔ mp.Kstar))
+    (Subgroup.inclusion_injective _)
+
+/-- The cyclic factors `mp.K`, `mp.Kstar` are cyclic (subgroups of the cyclic `Z = K ⊔ K*`). -/
+private theorem Section16MaximalPair.isCyclic_Kstar {G : Type*} [Group G] [Finite G]
+    (mp : Section16MaximalPair G) : IsCyclic ↥mp.Kstar :=
+  haveI : IsCyclic ↥(mp.K ⊔ mp.Kstar) := mp.Z_cyclic
+  isCyclic_of_injective (Subgroup.inclusion (le_sup_right : mp.Kstar ≤ mp.K ⊔ mp.Kstar))
+    (Subgroup.inclusion_injective _)
+
+/-- **The S-side §6 certain-type Hypothesis** (cd producer building block): `mp.S` with `W₁ = mp.K`,
+`W₂ = mp.Kstar`.  Wires `certainTypeHypothesis_of_typeP_kappaHall` to `mp`'s κ-Hall data
+(`mp.K_hall`, `mp.Kstar_eq`); the dual `mp.Kstar ≠ 1` is the κ-Hall nontriviality of `mp.T`. -/
+noncomputable def Section16MaximalPair.certainTypeS {G : Type*} [Group G] [Finite G]
+    (hG : IsMinimalSimpleOdd G) (mp : Section16MaximalPair G) :
+    OddOrder.Peterfalvi.S06.Hypothesis ↥mp.S :=
+  haveI := mp.isCyclic_K
+  haveI := mp.isCyclic_Kstar
+  certainTypeHypothesis_of_typeP_kappaHall hG mp.S_maximal mp.S_typeP mp.K_le_S mp.K_hall
+    mp.Kstar_eq inferInstance inferInstance (fun hbot =>
+      BG.Ch4.S14.card_kappaHall_ne_one mp.T_typeP mp.Kstar_le_T mp.Kstar_hall
+        (Subgroup.card_eq_one.mpr hbot))
+
+/-- **The T-side §6 certain-type Hypothesis** (cd producer building block): `mp.T` with `W₁ = mp.Kstar`,
+`W₂ = mp.K` (the roles of the two factors swap for the partner).  The pairing relation `mp.K =
+M_σ(T) ⊓ C(mp.Kstar)` is `mp.K_eq`. -/
+noncomputable def Section16MaximalPair.certainTypeT {G : Type*} [Group G] [Finite G]
+    (hG : IsMinimalSimpleOdd G) (mp : Section16MaximalPair G) :
+    OddOrder.Peterfalvi.S06.Hypothesis ↥mp.T :=
+  haveI := mp.isCyclic_K
+  haveI := mp.isCyclic_Kstar
+  certainTypeHypothesis_of_typeP_kappaHall hG mp.T_maximal mp.T_typeP mp.Kstar_le_T mp.Kstar_hall
+    mp.K_eq inferInstance inferInstance (fun hbot =>
+      BG.Ch4.S14.card_kappaHall_ne_one mp.S_typeP mp.K_le_S mp.K_hall
+        (Subgroup.card_eq_one.mpr hbot))
+
 /-- **Peterfalvi §13 coherent Dade-grid producer** (`sorry`) — *lane-b*
 (Peterfalvi §3–§13 coherent grids).  Given the maximal pair and the type-P
 structure, constructs the character grids `ω, μ, ν`, the signs, the integral maps,
-and the exceptional-character data with the induction identities. -/
+and the exceptional-character data with the induction identities.
+
+The grids are read off the certain-type machinery of `mp.S`/`mp.T`
+(`Section16MaximalPair.certainTypeS`/`certainTypeT`, built with `W₁ = mp.K`), so they are indexed by
+`mp.K`, `mp.Kstar`; aligning this with `tp.W₁`, `tp.W₂` is the residual (see notes 更新¹⁶). -/
 noncomputable def section16CharacterData_of_isMinimalSimpleOdd {G : Type*} [Group G] [Finite G]
     (hG : IsMinimalSimpleOdd G) (mp : Section16MaximalPair G) (tp : Section16TypePStructure mp) :
     Section16CharacterData mp tp := sorry
