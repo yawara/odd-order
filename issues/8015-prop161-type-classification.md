@@ -292,9 +292,35 @@ Msigma_inf_conj_isBetaCompl / centralizer_singleton_lt_top すべて allowlist 3
    (`commute_of_coprime_orderOf_of_isNilpotent` S10_LLC:679) ⟹ O_r(M_F)≤C_{M_F}(X₁) ⟹
    r_r(M_F)=r_r(O_r(M_F))<3 (`pRank_mono_of_le`/`pRank_sylow_eq`)。r=p は X cyclic 経由。
 
+## 2026-06-23 (cont., lane-f) — 配線済 + 残 7 bridge の精密 gate 分析
+
+**`proposition_type_classification` を engine に配線済** (commit `2c849316`): 4 input が proved で wire 済、
+残り 7 bridge を named inline residual に隔離 (gated-endpoint、宣言 sorry-count 不変、full build 3881 green)。
+
+**proved + wired (4/11)**:
+- `hP2II` = `isTypeII_of_isTypeP2` (cont.¹¹、issue 7007 で landing、type-P₂ ⟹ Type II 完成)
+- `hP_derived` = `typeP_exists_hall_derived_eq` (Thm C(3))
+- `hF_not_derived` = `typeF_not_exists_hall_derived_eq` (Thm A(3))
+- `h152a` = `isTypeP1_of_mf_ne_msigma` (Thm 15.2(a))
+
+**残 7 bridge (全て deep、2 系統)**:
+- **(A) deep trichotomy 系 (Thm 15.7(d)(e) = Coq `nonTI_Fitting_structure` 未形式化)**: `hFI` (type-F ⟹ I、
+  Pf (8.3): H# TI / H abelian rank 2 / exponent) / `hP1neIIIIV` (P1 ⟹ III/IV、(8.3)) / `hP1eqV`
+  (P1, M_F=M_σ ⟹ V、(8.8))。**`nonTI_Fitting_structure` (BGsection15.v:939, ~80行、deep deps:
+  Fitting_structure/sigma_complement/Cor 15.3(b)/p-core) の移植が必要 = lane-f 大物 multi-session**。
+  Lean 現状 = `fitting_not_ti_cases` (Thm 15.7 partial、(d)(e) の rank-2/exponent を欠く)。
+- **(B) carrier `W₁=κ-Hall` 系 ([[typep-w1-kappa-carrier-not-derivable]])**: `hIIP2`/`hIIIIVP1`/`hVP1`
+  (reverse → M_P) + `hIF` (I ⟹ F)。いずれも **`π(W₁) ⊆ κ(M)`** (`typePData_kappa_nonempty_of_rank1` の
+  `hrank` = W₁ primes rank-1) または **`U=(κ∪σ)'-Hall`** (`kappa_eq_sigmaComplementPrimes_of_hall_subgroupOf_eq_bot`
+  の仮説) に bottom-out。**`TypePData` が W₁/U を abstract subgroup として持ち Hall 特徴付けを field に持たない**ため
+  bare data から導出不可 (carrier=Section16MaximalPair のみ供給)。hVP1 の `M_F=M_σ` 半分は
+  `mf_eq_msigma_of_typePData_U_eq_bot` landed (残=IsTypeP1 の κ 半分)。
+  - **設計判断 (HUB 候補)**: `TypePData` に Hall 特徴付け field 追加 (enrich) or reverse 群を carrier 経由証明。
+    enrich は cross-lane (TypePData=GroupTheory、多数 consumer)。
+
 ## 完了条件
 
-`proposition_type_classification` (S16:894) が sorry-free。中間状態は各 input lemma が個別に landing し、
+`proposition_type_classification` (S16:2173) が sorry-free。中間状態は各 input lemma が個別に landing し、
 残りが正確に §16 hard-construction (Theorems A-E 連動) を named residual で指す状態を維持
 ([[feedback-gated-endpoint-skeleton-pattern]])。
 

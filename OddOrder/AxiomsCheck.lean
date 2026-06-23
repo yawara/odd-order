@@ -3067,6 +3067,9 @@ set_option linter.style.longLine false in
 -- the chosen κ-Hall pairing factor, built from the BG §14/§16 type-`P` theory (complement +
 -- centralizer law).  Lets the cd producer index the `ω`/`μ`-grids by `tp.W₁ = mp.K` directly.
 #assert_only_allowed_axioms OddOrder.certainTypeHypothesis_of_typeP_kappaHall
+-- The two members' certain-type machinery wired to `mp` (S-side `W₁ = mp.K`, T-side `W₁ = mp.Kstar`).
+#assert_only_allowed_axioms OddOrder.Section16MaximalPair.certainTypeS
+#assert_only_allowed_axioms OddOrder.Section16MaximalPair.certainTypeT
 
 /-! ### BG Appendix C (finite-field norm-set argument). -/
 
@@ -5555,6 +5558,24 @@ themselves cite no `sorry`. -/
 #assert_only_allowed_axioms OddOrder.BG.Ch4.S16.isTypeIII_or_IV_of_typePData
 #assert_only_allowed_axioms OddOrder.BG.Ch4.S16.isTypeII_of_typePData
 #assert_only_allowed_axioms OddOrder.BG.Ch4.S16.isTypeV_of_typePData
+
+/-! **Proposition 16.1(a) `hFI` infrastructure** (`S16_MainResults`): the self-normalizing helpers
+and the TI case of the type-I `alternative` trichotomy (Peterfalvi (8.3)(a)).
+
+* `normalizer_eq_self_of_subgroupOf_normal_of_ne_bot` — a nontrivial `M`-normal subgroup of a
+  maximal subgroup of a minimal simple group is self-normalizing (`N_G(H) = M`), generalizing
+  `normalizer_Msigma_eq_self`.
+* `normalizer_fittingInAmbient_eq_self` — the `H = F(M)` instance, `N_G(F(M)) = M`.
+* `maxNilpotentNormalHall_sharp_isTISubset_of_fittingIsTI` — `FittingIsTI M ⟹ M_F#` is a `TI`-subset
+  (the first disjunct of `TypeIData.alternative` in the `F(M)`-TI case of `hFI`).
+
+All three are unconditional / axiom-clean.  The `TypeFData` wrapper `isTypeF_groupTheory_of_isTypeF`
+and the assembled bridge `isTypeI_of_isTypeF` are *not* registered: the former is transitively
+conditional on the (sorried) Theorem A via `typeFData_of_kappa_eq_bot`, and the latter still carries
+the non-TI residual (BG Theorem 15.7(e)). -/
+#assert_only_allowed_axioms OddOrder.BG.Ch4.S16.normalizer_eq_self_of_subgroupOf_normal_of_ne_bot
+#assert_only_allowed_axioms OddOrder.BG.Ch4.S16.normalizer_fittingInAmbient_eq_self
+#assert_only_allowed_axioms OddOrder.BG.Ch4.S16.maxNilpotentNormalHall_sharp_isTISubset_of_fittingIsTI
 
 /-! # Peterfalvi Appendices (Lane H)
 
