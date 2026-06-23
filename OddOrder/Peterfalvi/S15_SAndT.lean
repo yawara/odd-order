@@ -92,6 +92,12 @@ structure Hypothesis where
   S_nonI : IsTypeNonI S
   T_nonI : IsTypeNonI T
   one_typeII : IsTypeII S ∨ IsTypeII T
+  /-- **Peterfalvi (13.2.a) type determination (S-side)**: `S` is of BG type `P₂` (Peterfalvi
+  type II).  This is the §16 carrier datum (`Section16MaximalPair.S_typeP2`, fixed by the κ-Hall
+  ordering `q < p`, threaded through `Section16Inputs`) that lets (13.2.a)'s "`S` is type II"
+  be read off sorry-free via `isTypeII_of_isTypeP2`; it pins the determinate side of the otherwise
+  disjunctive `one_typeII`. -/
+  S_typeP2 : OddOrder.BG.Ch4.S14.IsTypeP2 S
   theorem88_caseB :
     ∀ M : Subgroup G, M ∈ maximalSubgroups G →
       IsTypeI M ∨ (∃ g : G, MulAut.conj g • M = S) ∨
@@ -244,15 +250,81 @@ structure BasicStructureData (hyp : Hypothesis (G := G)) where
   tauS_eq_induction : Prop
   tauS_eq_induction_holds : tauS_eq_induction
 
+/-- **Peterfalvi (13.2.b,c,e) — the `M_F`-structure residual** (faithful obligation, §16-gated).
+
+The genuinely §16-structural half of (13.2): the Fitting kernel `P = S_F` is elementary abelian of
+order `p^q` (13.2.b,c), the complement `U` is abelian (13.2.a), `u ≤ (p^q − 1)/(p − 1)` (13.2.e),
+and `A_0(S)` is a TI-subset (13.2.e).
+
+Unlike the *type determination* and the `U W₁` *Frobenius structure* of (13.2.a) — both now read off
+sorry-free from the carrier (`isTypeII_of_isTypeP2`, `typeP_uW1_frobenius` on `Sdata`) — these are
+the σ-structure facts of the type-`P₂` member `S`: `M_σ = M_F` is the elementary-abelian `p`-group of
+rank `q` on which the prime-order `κ`-Hall factor `W₁` acts (BG §10/§14 σ-theory), giving the
+`u`-bound from the count of `W₁`-orbits.  No repo theorem yet states "`M_σ` elementary abelian of
+order `p^q`"; declared here as the localized faithful gate (the
+`card_Q_eq`/`coprime_card_U_card_P_of_disjoint` pattern) so that `basic_structure`'s assembly — its
+honest type determination and Frobenius structure — are `sorry`-free. -/
+structure BasicStructureGated (hyp : Hypothesis (G := G)) where
+  U_commutative : IsMulCommutative ↥hyp.U
+  P_elementaryAbelian : IsElementaryAbelian hyp.p ↥hyp.P
+  P_order : Nat.card ↥hyp.P = hyp.p ^ hyp.q
+  u_bound : hyp.u ≤ (hyp.p ^ hyp.q - 1) / (hyp.p - 1)
+  A0S_TI : Prop
+  A0S_TI_holds : A0S_TI
+  tauS_eq_induction : Prop
+  tauS_eq_induction_holds : tauS_eq_induction
+
+/-- **Peterfalvi (13.2.b,c,e)** structural producer: the `M_F`-structure of the type-`P₂` member
+`S`.  Faithful obligation gated on the §16 σ-structure (`BasicStructureGated` docstring). -/
+noncomputable def basic_structure_gated [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hyp : Hypothesis (G := G)) : BasicStructureGated hyp := sorry
+
 /-- **Peterfalvi (13.2.a--c,e)**: `S` is type II or III, `P` is elementary
-abelian of order `p^q`, `u` is bounded, and `A_0(S)` is a TI-subset. -/
+abelian of order `p^q`, `u` is bounded, and `A_0(S)` is a TI-subset.
+
+The **type determination** (13.2.a) is discharged `sorry`-free from the §16 carrier `S_typeP2`
+(`isTypeII_of_isTypeP2`): `S` is type II, hence the `IsTypeII ∨ IsTypeIII` and `q < p → IsTypeII`
+fields hold with the type-II side.  The remaining `M_F`-structure data (13.2.b,c,e) is read off the
+faithful §16-gated producer `basic_structure_gated`. -/
 theorem basic_structure [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
     (hyp : Hypothesis (G := G)) :
     ∃ data : BasicStructureData hyp,
       (IsTypeII hyp.S ∨ IsTypeIII hyp.S) ∧ IsElementaryAbelian hyp.p ↥hyp.P ∧
         Nat.card ↥hyp.P = hyp.p ^ hyp.q ∧
         hyp.u ≤ (hyp.p ^ hyp.q - 1) / (hyp.p - 1) ∧ data.A0S_TI := by
-  sorry
+  -- (13.2.a) type determination: `S` is type II, sorry-free from the carrier `S_typeP2`.
+  have hSII : IsTypeII hyp.S :=
+    OddOrder.BG.Ch4.S16.isTypeII_of_isTypeP2 _hG hyp.S_maximal hyp.S_typeP2
+  -- `U ≠ ⊥`: the carrier `Sdata.U` has the same order as the type-II witness's `typeP.U`
+  -- (`card_U_eq_index = [M' : M_F]`), and the latter is `≠ ⊥` (`TypePNontrivialCore`).
+  have tdata : TypeIIData hyp.S := hSII.some
+  have hSdataUne : hyp.Sdata.U ≠ ⊥ := by
+    intro hbot
+    have h1 : Nat.card ↥hyp.Sdata.U = Nat.card ↥tdata.typeP.U := by
+      rw [hyp.Sdata.card_U_eq_index, tdata.typeP.card_U_eq_index]
+    rw [hbot, Subgroup.card_bot] at h1
+    exact tdata.common.1 (Subgroup.card_eq_one.mp h1.symm)
+  -- (13.2.a) `U W₁` Frobenius: sorry-free from the carrier `Sdata` (`typeP_uW1_frobenius`,
+  -- reconciled `Sdata.U = U`, `Sdata.W1 = W1`).
+  have hUW1frob : OddOrder.Isaacs.Ch06.IsFrobeniusGroup
+      ↥(hyp.U ⊔ hyp.W1) (hyp.U.subgroupOf (hyp.U ⊔ hyp.W1))
+        (hyp.W1.subgroupOf (hyp.U ⊔ hyp.W1)) := by
+    have h := OddOrder.Peterfalvi.S11.typeP_uW1_frobenius hyp.Sdata hSdataUne
+    rwa [hyp.Sdata_U_eq, hyp.Sdata_W1_eq] at h
+  -- (13.2.b,c,e) `M_F`-structure: the localized faithful §16 producer.
+  let core := basic_structure_gated _hG hyp
+  refine ⟨{ S_typeII_or_typeIII := Or.inl hSII
+            q_lt_p_forces_typeII := fun _ => hSII
+            U_commutative := core.U_commutative
+            UW1_frobenius := hUW1frob
+            P_elementaryAbelian := core.P_elementaryAbelian
+            P_order := core.P_order
+            u_bound := core.u_bound
+            A0S_TI := core.A0S_TI
+            A0S_TI_holds := core.A0S_TI_holds
+            tauS_eq_induction := core.tauS_eq_induction
+            tauS_eq_induction_holds := core.tauS_eq_induction_holds }, ?_⟩
+  exact ⟨Or.inl hSII, core.P_elementaryAbelian, core.P_order, core.u_bound, core.A0S_TI_holds⟩
 
 /-- **Structural input for Peterfalvi (13.2.d) — §14-gated.**
 
