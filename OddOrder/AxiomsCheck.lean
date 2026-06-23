@@ -5901,3 +5901,8 @@ formula together with the prime computation `coprimeFrobeniusAction_card_eq_prim
 #assert_only_allowed_axioms OddOrder.Section16CharacterData.gridEquivE_coe
 #assert_only_allowed_axioms OddOrder.Section16CharacterData.gridEquivE_mem_W1
 #assert_only_allowed_axioms OddOrder.Section16CharacterData.gridEquivE_mem_W2
+-- `omegaProdCharS_apply_mem_K`/`_Kstar`: `certainTypeS`'s product character, evaluated on a
+-- `gridEquivE`-transported `mp.K`/`mp.Kstar` element, keeps only the `W₁`/`W₂` factor (the
+-- `tp.W1`/`tp.W2`-restriction values feeding the symmetry).  Axiom-clean.
+#assert_only_allowed_axioms OddOrder.Section16CharacterData.omegaProdCharS_apply_mem_K
+#assert_only_allowed_axioms OddOrder.Section16CharacterData.omegaProdCharS_apply_mem_Kstar

@@ -1233,6 +1233,48 @@ theorem gridEquivE_mem_W2 (w : ↥tp.W) (hw : (w : G) ∈ mp.Kstar) :
   rw [Subgroup.mem_subgroupOf, certainTypeS_W2_eq hG mp, Subgroup.mem_subgroupOf, gridEquivE_coe]
   exact hw
 
+/-- **Value of `certainTypeS`'s product character on a transported `mp.K`-element**: only the
+`W₁`-factor `a` survives (`wFst` is the identity, `wSnd` is trivial, on a `W₁`-element).  This is the
+`tp.W1`-restriction value used (with its `tp.W2` mirror) to discharge the S/T-shared-`ω` symmetry on
+the generators via `monoidHom_eq_of_eqOn_W1_W2`. -/
+theorem omegaProdCharS_apply_mem_K
+    (a : ((mp.certainTypeS hG).sdiffTICyclicHypothesis.W1.subgroupOf
+        (mp.certainTypeS hG).sdiffTICyclicHypothesis.W) →* ℂˣ)
+    (b : ((mp.certainTypeS hG).sdiffTICyclicHypothesis.W2.subgroupOf
+        (mp.certainTypeS hG).sdiffTICyclicHypothesis.W) →* ℂˣ)
+    (w : ↥tp.W) (hw : (w : G) ∈ mp.K) :
+    (mp.certainTypeS hG).sdiffTICyclicHypothesis.omegaProdChar a b (gridEquivE hG mp tp w)
+      = a ⟨gridEquivE hG mp tp w, gridEquivE_mem_W1 hG mp tp w hw⟩ := by
+  have mem := gridEquivE_mem_W1 hG mp tp w hw
+  have hfst : (mp.certainTypeS hG).sdiffTICyclicHypothesis.wFst (gridEquivE hG mp tp w)
+      = ⟨gridEquivE hG mp tp w, mem⟩ :=
+    (mp.certainTypeS hG).sdiffTICyclicHypothesis.wFst_W1_subtype ⟨gridEquivE hG mp tp w, mem⟩
+  have hsnd : (mp.certainTypeS hG).sdiffTICyclicHypothesis.wSnd (gridEquivE hG mp tp w) = 1 :=
+    (mp.certainTypeS hG).sdiffTICyclicHypothesis.wSnd_W1_subtype ⟨gridEquivE hG mp tp w, mem⟩
+  simp only [Peterfalvi.S05.TICyclicHypothesis.omegaProdChar, MonoidHom.mul_apply,
+    MonoidHom.comp_apply]
+  rw [hfst, hsnd, map_one, mul_one]
+
+/-- **Value of `certainTypeS`'s product character on a transported `mp.Kstar`-element**: only the
+`W₂`-factor `b` survives.  The `tp.W2`-restriction mirror of `omegaProdCharS_apply_mem_K`. -/
+theorem omegaProdCharS_apply_mem_Kstar
+    (a : ((mp.certainTypeS hG).sdiffTICyclicHypothesis.W1.subgroupOf
+        (mp.certainTypeS hG).sdiffTICyclicHypothesis.W) →* ℂˣ)
+    (b : ((mp.certainTypeS hG).sdiffTICyclicHypothesis.W2.subgroupOf
+        (mp.certainTypeS hG).sdiffTICyclicHypothesis.W) →* ℂˣ)
+    (w : ↥tp.W) (hw : (w : G) ∈ mp.Kstar) :
+    (mp.certainTypeS hG).sdiffTICyclicHypothesis.omegaProdChar a b (gridEquivE hG mp tp w)
+      = b ⟨gridEquivE hG mp tp w, gridEquivE_mem_W2 hG mp tp w hw⟩ := by
+  have mem := gridEquivE_mem_W2 hG mp tp w hw
+  have hfst : (mp.certainTypeS hG).sdiffTICyclicHypothesis.wFst (gridEquivE hG mp tp w) = 1 :=
+    (mp.certainTypeS hG).sdiffTICyclicHypothesis.wFst_W2_subtype ⟨gridEquivE hG mp tp w, mem⟩
+  have hsnd : (mp.certainTypeS hG).sdiffTICyclicHypothesis.wSnd (gridEquivE hG mp tp w)
+      = ⟨gridEquivE hG mp tp w, mem⟩ :=
+    (mp.certainTypeS hG).sdiffTICyclicHypothesis.wSnd_W2_subtype ⟨gridEquivE hG mp tp w, mem⟩
+  simp only [Peterfalvi.S05.TICyclicHypothesis.omegaProdChar, MonoidHom.mul_apply,
+    MonoidHom.comp_apply]
+  rw [hfst, hsnd, map_one, one_mul]
+
 end Section16CharacterData
 
 /-- **Peterfalvi §13 coherent Dade-grid producer** (`sorry`) — *lane-b*
