@@ -124,9 +124,15 @@ IntegralCharacterMap 構成から次セッションで着手。建てた signatu
 
 ## 5. 状態
 
-- ✅ 本セッション (scoping + engine deep-dive): 框組確認 + 設計 + scoping note + standalone signature
-  skeleton 設置 + **engine 経路確定 (base case 要・等次数=a=1・per-step plan)**。
-- ⏭ 次セッション (実装): (I) base-case single-pair coherence (IntegralCharacterMap 構成) → (II) induction →
-  (III) per-step discharge。signature に `hirr` (S⊆Irr L) 追加が faithful + 必要。
+- ✅ 本セッション (scoping + engine deep-dive + **base case 3/4 実装**): 框組確認 + 設計 + signature +
+  engine 経路確定 + **`isCoherent_pair_of_differenceImage` (base case) を構成** —
+  extension `pairExtension` + 5 value/helper lemma (`pairExtension_apply`/`_chi`/`_chiConj`/`_diff`) +
+  3/4 field (`nonzero`/`extends_on_supported`/`extension_mem_ZIrr`) sorry-free。
+  **残 1 sorry = `extension_inner_eq` (Parseval isometry)**: 数学は確定 (両辺 → `a·c̄+b·d̄`)、blocker =
+  **repo に `inner_smul_right` 欠落** (`inner` は 2nd-arg conj-linear、`inner_smul_left` のみ)。
+  discharge = `ClassFunction.inner_smul_right` (`inner u (c•v)=star c * inner u v`) を足す + 展開。
+- ⏭ 次セッション: (I) `extension_inner_eq` 完了 (inner_smul_right + Parseval) → (II) induction wrapper +
+  (III) per-step discharge で `coherent_of_constant_degree` 本体。signature に `hirr` (S⊆Irr L) 追加が
+  faithful + 必要。
 - 関連: lane-h `S08_Theorem62_63_Standalone.lean` (template、h62 oracle pattern)、
   issue 4012 (relane #8)、issue 2018 ((11.5) gate)、S13 `HC_le_secondDerived`。
