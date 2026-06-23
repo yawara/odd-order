@@ -111,7 +111,28 @@ defeq 強制; `hMFeq ▸ hUinf` を rw 引数にすると motive 不定 → `←
 **⟹ carrier 核心機構 (engine + hUhall + helpers) 完成・全 sorry-free。** engine は type-P2 input で
 完全に invocable (step 1 が hUsup/hKnorm/hUinf 供給、step 2.5 が hUhall)。
 
-### 🔜 残 step 3 (次 session) — wiring + (13.2.a) type 判定
+### ✅ step 2.7: carrier capstone (commit `a6faa39c`、main 同期で lane-f Prop 16.1 hP2II 取り込み済)
+**carrier 構成を単一 sorry-free lemma に集約完了。**
+- engine `typePData_of_kappaHall_hallComplement` を **`hP2` 直接入力に refactor** (旧 hP+hUne →
+  hP2; type-P2 input なら `isTypeP2_of_hall...` 不要ゆえ hUne wart 除去、`typeP2_mf_internal` は hP2 直取り)。
+- **compose lemma `exists_typePData_W1_eq_of_isTypeP2`** (sorry-free): `type-P2 M + cyclic κ-Hall K →
+  ∃ data : TypePData M, data.W1 = K` = exists_kappaHall_invariant_complement_to_MF + step 2.5 hUhall + engine。
+  **step 3 wiring が consume する「ready」形** (指定 κ-Hall を W1 に持つ matched TypePData)。
+
+⟹ **diagnosis が特定した U-reconciliation (元の blocker) の構成機構が完全に sorry-free で完成。**
+
+### 🚧 残 step 3 gate = (13.2.a) producer type 判定 (deep、要 hub/lane-f 判断)
+**唯一の gate**: producer (`section16TypePStructure_of_isMinimalSimpleOdd`) で `exists_typePData_W1_eq_of_isTypeP2`
+を mp.S に適用するには **mp.S が type-P2** が要る。pair 構成 (`exists_section16MaximalPair_data`, lane-f) は
+`IsTypeP2 S ∨ IsTypeP2 Mstar` (FeitThompson.lean:356) **disjunction のみ**で、どちらか不明。q<p (mp.K_lt_Kstar)
+で「smaller κ-Hall member = S が type-P2」を resolve するのが **Pf (13.2.a)「q<p ⟹ S type II」**だが、これは:
+- producer 文脈で必要 (basic_structure の上流ゆえ basic_structure では供給不可、循環)、かつ
+- 証明に §15-16 type 構造を要する deep result (現状未形式化)。
+**⟹ (13.2.a) は lane-f の §16 pair 構成 (disjunction を ordering で resolve) で閉じるのが自然か、
+lane-c §15 か = cross-lane 判断。lane-f が Prop 16.1 を進行中ゆえ、その完成で resolve する可能性。**
+**carrier 機構は完成・consume 待ち; (13.2.a) landing で step 3 wiring は機械的。**
+
+### 🔜 step 3 wiring (gate 解消後)
 1. **compose**: `exists_typePData_W1_eq_of_isTypeP2 (hP2) (K κ-Hall) : ∃ data : TypePData M, data.W1=K`
    = exists_kappaHall_invariant_complement_to_MF + step 2.5 hUhall + engine。残 sub-gate = `hUne` (U≠⊥;
    type-P2 ⟹ M_σ≠M' ⟹ U≠⊥、要小 lemma)。
