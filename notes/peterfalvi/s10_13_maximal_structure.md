@@ -345,3 +345,17 @@ FT-path sorry **122 不変** (vacuous opaque → 実ステートメント + 2 pr
 §6 coherence (Thm 6.3) の citeable 形。char API (gate #3) landing 時に §13 char 方向を一気に wiring。
 **lane-h 次手**: (11.6) の §9 sub-fact ((9.3)/(9.6) の正確な carrier 形) が S11 に未 export ⟹ S11 (driver) に
 追加するか lane-b 依頼。これらは §8-free 群論寄りなので lane-h で attemptable な可能性 (要 (9.1) Wielandt 適用調査)。
+
+**追記 (cite-reduction, ユーザー指示「cite して進められる」, commits `5a212bc4`/`0adb8560`)**:
+char leaf を sorried 上流の cite で sorry-free 化 ([[feedback-cite-sorried-lemmas-if-signature-correct]])。
+**重要発見: (10.8) `S12.S_not_coherent` は clean signature で citeable だが、Thm (6.3)「部分族 coherent
+⟹ S coherent」は repo に standalone 形が無い** (§6 coherence は `SibleyDadeHypothesis` filtration
+machinery `S08_Theorem63` 経由)。⟹ Thm (6.3) 適用を **named obligation** に切り出す方式:
+- **(11.3) `S_H0C_not_coherent` sorry-free**: `coherent_S_of_coherent_SH0C` (Thm 6.3 obligation) +
+  `S12.S_not_coherent` ((10.8)) cite → 矛盾。
+- **(11.5) `secondDerived_eq_HC` (`M''=HC`) sorry-free**: `secondDerived_le_HC` (proven ≤) +
+  `HC_le_secondDerived` (≥ obligation, (5.7)+(11.4)) の `le_antisymm`。
+残 gate = 2 named obligation (`coherent_S_of_coherent_SH0C`/`HC_le_secondDerived`) = lane-b §6 char。
+両定理は sorried 上流 cite ゆえ axiom-clean でない (登録せず、honest cite reduction)。FT-path sorry 122 不変。
+**残: (11.4)(=Thm 6.2 そのもの)/(11.6)残/(11.7)/(11.8)/(11.9) は char-gated or §8(|W₂|=p)。** §13 の構造側
+(11.3/11.5) は cite-reduce 完了、(11.6) clause2 Wielandt 核 landed、残りは genuinely lane-b char / §8 待ち。

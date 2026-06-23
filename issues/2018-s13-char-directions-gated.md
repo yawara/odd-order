@@ -21,10 +21,16 @@ faithful に STATE できる定理を全て実ステートメント化 + uncondi
 
 §13 の各 char-direction を、対応する lane-b/上流の成果が landing したら wire する:
 
-- [ ] **(11.3) `S_H0C_not_coherent`** / **(11.5) `≥` (`HC ⊆ M''`)** / **(11.4) `coherent_quotient_bound`**
-  ← Peterfalvi Thm (6.2)/(6.3) coherence (extension/quotient bound) の citeable 形 + (10.8)
-  `S12.S_not_coherent` (S12 に export 済 `OddOrder.Peterfalvi.S12.S_not_coherent`、sorried だが
-  signature-first で cite 可)。
+- **✅ (11.3) `S_H0C_not_coherent` は sorry-free 化済** (commit `5a212bc4`, cite-reduction):
+  `coherent_S_of_coherent_SH0C` (新 named obligation = Thm (6.3) 適用 `S(H₀C) coh ⟹ S coh`)
+  + `S12.S_not_coherent` ((10.8)) を cite → 矛盾。残 gate = `coherent_S_of_coherent_SH0C` のみ
+  (Thm (6.3)、repo の §6 は `SibleyDadeHypothesis` filtration machinery `S08_Theorem63` 経由で
+  standalone subfamily-extension 形が無い ⟹ lane-b §6 char で discharge)。
+- **✅ (11.5) `secondDerived_eq_HC` (`M''=HC`) は sorry-free 化済** (commit `0adb8560`):
+  `≤` = `secondDerived_le_HC` (proven, (8.5.a)), `≥` = `HC_le_secondDerived` (新 named obligation,
+  (5.7)+(11.4) coherence、char-gated)。残 gate = `HC_le_secondDerived` のみ。
+- [ ] **(11.4) `coherent_quotient_bound`** ← Peterfalvi Thm (6.2) quotient bound (= 本定理が
+  Thm 6.2 そのもの、obligation 化しても rename ゆえ未処理; lane-b §6 char で discharge)。
 - [ ] **(11.6) `core_structure`** 残 3 conjunct (`IsPGroup p H` / `U ≤ C_G(H₀)` / `H₀ = H'`)
   ← (9.3) [`U` centralizes `O_{p'}(H)`] + (9.6) [`C_{H₀}(W₁) = 1`] + (9.1) Wielandt (✅ done) +
   `[BG] 1.6(d)` + (11.5)。
