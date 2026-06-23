@@ -114,7 +114,11 @@ bottom-out** するので、clean 化には §15 foundation が先。真の順�
 - **新 helper `opiCoreInG_sigmaCompl_fittingInAmbient_primeFactors_subset_tau2` (S15, axiom-clean)**: Cor 15.5(a) の τ₂-membership 形 (cyclic 形の sibling、Y の κ' を供給)。
 - **新 `typePData_of_isTypeP2` (S16, sorry-free + axiom-clean)**: matched-pair producer (`typeP2_exists_matched_kappa_hall_pair`: abelian U, K≤N(U)) + 上記分解 ⟹ `typePData_of_isTypeP_of_inputs` を type-`P₂` で**完全適用**。**∴ TypePData carrier が全 type-`P₂` maximal から sorry-free 構成可能** (= CLAUDE.md「carrier 構成可能性 = doneness」マイルストーン)。Type-valued def ゆえ Prop 存在子は `Exists.choose`/projection で抽出 (obtain 不可)。
 
-**▶ 次 = hP2II 仕上げ (type-II last mile)**: `typePData_of_isTypeP2` で TypePData は完成ゆえ、`hP2II : IsTypeP2 M → IsTypeII M` は `isTypeII_of_typePData` の残 4 入力に還元: ① `hcommon` (TypePNontrivialCore — TypePData から導出可能か要確認) ② `hnorm` (N(U)⊄M = Cor 14.12 `typeP2_neighbor_is_typeF` payload、matched U で transport) ③ **`hderF` (M' が type-F) = 真の deep residual** (Peterfalvi (8.6)、M' の type-F 構造) ④ `hderfit`。①②は機会的に close 可、③が次の主 gate。hP1neIIIIV/hP1eqV (type-P1) は U=⊥ ゆえ別途 (typePData_of_isTypeP_of_inputs を U=⊥ で適用、分解自明)。
+**▶ 次 = hP2II 仕上げ (type-II last mile) — ただし lane-f 単独では closeable でない (多レーン gated と確認 cont.⁸)**: `typePData_of_isTypeP2` で TypePData は完成ゆえ `hP2II : IsTypeP2 M → IsTypeII M` は `isTypeII_of_typePData` の残 4 入力に還元するが、各々の gate を精査:
+- ① **`hcommon` (`TypePNontrivialCore` = `U≠⊥ ∧ (card W1).Prime ∧ IsTISubset (sharp M_F) (N(M_F))`)** — 3 連言で gate が分散: `U≠⊥` は type-P2 で導出可 (matched U≠⊥、または M_F=M_σ⊊M')、しかし **`(card W1).Prime` は lane-b の (10.11) `theorem88_caseB_prime_orders` gated** ([[s16-typep-producer-unfillable]])、`IsTISubset (F(M))` は Thm C(8)/(9) 系の deep。**∴ hcommon は quick win でない**。
+- ② `hnorm` (N(U)⊄M) = Cor 14.12 `typeP2_neighbor_is_typeF` payload を matched U で transport (Thm C conjunct 2 で実証済の手法)。lane-f で close 可。
+- ③ **`hderF` (M' が type-F) = 真の deep residual** (Peterfalvi (8.6)、M' の type-F 構造)、deep §15/§16。④ `hderfit` (F(M')=M_F)。
+- ∴ hP2II 完全 close は (10.11)[lane-b] + hderF[deep §16] 待ち。**lane-f 所有の linchpin (M_F-internal 分解 + TypePData carrier) は cont.⁸ で完了**。次 lane-f タスクは hderF (M' type-F) か、(card W1).Prime を (10.11) cite (sorried OK [[feedback-cite-sorried-lemmas-if-signature-correct]]) で ② と組んで hP2II を (10.11)+hderF-conditional に積むか。hP1neIIIIV/hP1eqV (type-P1) は U=⊥ ゆえ別途 (`typePData_of_isTypeP_of_inputs` を U=⊥ で適用、分解自明)。
 
 **2026-06-23 ✅ Lemma 15.1 (`typeP_auxiliary_structure_gated`) は既に DONE と確認 — 早期勝ち筋は banked 済、AxiomsCheck 登録 + stale 表/docstring 修正** (commit に含む):
 
