@@ -4011,6 +4011,12 @@ set_option linter.style.longLine false in
 -- 15.7(e) conjunct A divisibility crux (mathcomp `regular_norm_dvd_pred`, `IsFrobeniusAction` form):
 -- a Frobenius action of `A` on `N` gives `|A| ∣ |N| - 1`.
 #assert_only_allowed_axioms OddOrder.BG.Ch4.S15.card_dvd_sub_one_of_isFrobeniusAction
+-- 15.7(e) conjunct B (Coq `cycHp'`): `cyclic O_{p'}(M_F)` for non-abelian `M_F`, plus the two
+-- reusable group-theory lemmas it rests on (commuting commutative join is commutative; an odd
+-- commutative group of rank ≤ 1 is cyclic, via the `Z`-group `exponent = card` route).
+#assert_only_allowed_axioms OddOrder.BG.Ch4.S15.isMulCommutative_sup_of_le_centralizer
+#assert_only_allowed_axioms OddOrder.BG.Ch4.S15.isCyclic_of_isMulCommutative_of_rank_le_one
+#assert_only_allowed_axioms OddOrder.BG.Ch4.S15.typeF_nonabelian_cyclic_opiCore_compl
 -- BG **Lemma 15.1** (`S15_MF`, issue 7007): the auxiliary `U`-factor structure of an arbitrary
 -- maximal `M = K U M_σ` — `K ≠ 1 → M' = U M_σ ∧ U` abelian (15.1b); the cyclic-`τ₂` centralizer
 -- funnel (15.1c); `⟨C_U(x) | x ∈ M_σ#⟩` abelian (15.1d); the Frobenius factor `U₀ M_σ` (15.1e).
