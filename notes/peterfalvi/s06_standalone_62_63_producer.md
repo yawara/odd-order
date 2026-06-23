@@ -126,11 +126,25 @@ lane-c が S13 obligation を discharge する手順:
 
 **両 obligation とも最終的に general `six_two` (§4 の真の gate) に bottom out。**
 
-## 7. 次ステップ (lane-h §6/§8 スコープで可能)
+## 7. 次ステップ
 
-1. **general `six_three_index_bound`** を general `six_two` oracle + `six_three_HH1_le` から証明
-   (§8 arithmetic glue、muGrid 非依存)。index 変換 |K:A|=|K:H||H:A| / |L:H|=|L:K||K:H| が要。
-   これで `six_three_descent` の `h62` を埋め、gate を厳密に general `six_two` のみに絞る。
-2. **general `six_two`** (真の gate): `coherentDegreeSumBound_of_not_coherent` の reducible-member
-   discharge。§10-12 muGrid と要協調 → cross-lane (hub issue 検討)。
+1. ✅ **DONE (commit `0aec0d82`)** — **general `six_three_index_bound`** =
+   `six_three_index_bound_general` (本 leaf、sorry-free+axiom-clean+AxiomsCheck登録)。general `six_two`
+   の real-inequality (C=H,D=A: |K:A|−1 ≤ 2|L:H|√|H:A|) から |H:H₁|≤4|L:K|²+1 を導出。index 変換は
+   `Subgroup.relIndex_mul_relIndex` (A≤H≤K) + `Subgroup.relIndex_mul_index` (H≤K) → `six_three_HH1_le`。
+   ⟹ `six_three_descent` の `h62` を埋める道具が揃い、**両 §11 obligation は general `six_two` 一点に reduce**。
+2. **general `six_two`** (唯一残る深い gate): `coherentDegreeSumBound_of_not_coherent` ((5.6)
+   contrapositive、general 既存) の orthonormality/support/generation 仮説を induced family (可約 member 含む)
+   で discharge。Sibley は `hF : Frobenius` で member irreducible 化して discharge するが、§11 (K=M' solvable)
+   では μⱼ column 等の可約 member を §10-12 muGrid/columnSum 機構で扱う必要がある ⟹ **§5/§10-12 と entangle、
+   lane-h §6/§8 単独スコープ外 = cross-lane**。→ HUB issue で lane-b/c と協調 (issue 2022)。
 3. ⚠ 規約: §5-§8 既存本体は触らず cite のみ、生産は本 leaf に隔離 (lane-b 復帰時衝突回避)。維持。
+
+## 8. producer 完成度サマリ (2026-06-23 セッション終了時)
+
+lane-h §6/§8 スコープで生産可能な (6.2)/(6.3) 標準形 assembly は**完了**:
+- `S07.IsCoherent.subset` (monotonicity) ✅
+- `S08.six_three_descent` (general (6.3) minimal-A descent, K≠H) ✅
+- `S08.six_three_index_bound_general` (general (6.3) per-step index bound) ✅
+全て sorry-free + axiom-clean + AxiomsCheck 登録。両 §11 consumer obligation は **general `six_two`**
+一点に reduce 済。残作業 = general `six_two` (cross-lane, §10-12 muGrid) + lane-c の wiring (SOf/Sset pin)。
