@@ -5915,6 +5915,11 @@ formula together with the prime computation `coprimeFrobeniusAction_card_eq_prim
 -- `tp.W1`/`tp.W2`-restriction values feeding the symmetry).  Axiom-clean.
 #assert_only_allowed_axioms OddOrder.Section16CharacterData.omegaProdCharS_apply_mem_K
 #assert_only_allowed_axioms OddOrder.Section16CharacterData.omegaProdCharS_apply_mem_Kstar
+-- `omegaProdCharT_apply_mem_K`/`_Kstar`: the T-side mirror — `certainTypeT`'s product character on a
+-- `gridEquivE_T`-transported `mp.K`/`mp.Kstar` element keeps only the surviving factor (`mp.K` is the
+-- `W₂`-factor of `T`, `mp.Kstar` the `W₁`-factor).  Axiom-clean.
+#assert_only_allowed_axioms OddOrder.Section16CharacterData.omegaProdCharT_apply_mem_K
+#assert_only_allowed_axioms OddOrder.Section16CharacterData.omegaProdCharT_apply_mem_Kstar
 -- `chi2enum_zero` (step A): the `W₂`-column enumeration is normalized so column `0` is the trivial
 -- character (the `j = 0` base of `nu_definition`), mirroring the `w1CharEquiv 0 = 1` convention.
 #assert_only_allowed_axioms OddOrder.Section16CharacterData.chi2enum_zero
