@@ -5804,3 +5804,7 @@ formula together with the prime computation `coprimeFrobeniusAction_card_eq_prim
 -- (`M'' = HC`, `C = U'`) are the coherence content of (11.5)/(11.6), gated on Theorem (10.8).
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S13.Hypothesis.secondDerived_le_HC
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S13.Hypothesis.derivedU_le_C
+-- (11.6) the `U`-centralizes-`H₀` clause via Wielandt (9.1): given `C_{H₀}(W₁) = 1` and `U ≠ 1`,
+-- the Frobenius kernel `U` centralizes the chief subgroup `H₀`.  The Wielandt content (lane-h's
+-- `frobenius_kernel_centralizes_of_complement_fpf`) is axiom-clean; the fpf input is the §8 gate.
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S13.U_centralizes_H0_of_W1_fpf

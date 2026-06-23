@@ -210,6 +210,48 @@ theorem secondDerived_eq_HC [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
 
 /-! ## (11.6)--(11.7): the core structure of `H` and `U` -/
 
+/-- **Peterfalvi (11.6), the `U`-centralizes-`H_0` clause via Wielandt (9.1)**: if the cyclic
+factor `W_1` acts fixed-point-freely on the chief subgroup `H_0` (`C_{H_0}(W_1) = 1`), then the
+Frobenius kernel `U` centralizes `H_0`.
+
+This is the ambient-form Wielandt corollary `frobenius_kernel_centralizes_of_complement_fpf`
+(lane-h's (9.1)) applied to the Frobenius group `U W_1` (`typeP_uW1_frobenius`) acting coprimely
+on `H_0 ≤ H = M_F`.  The fixed-point-free hypothesis `hfpf` and `U ≠ 1` (`hU`) are the §8/carrier
+inputs (in Peterfalvi, `C_{H_0}(W_1) = 1` comes from (9.6) and `|W_2| = p`); the Wielandt content
+itself is unconditional and axiom-clean. -/
+theorem U_centralizes_H0_of_W1_fpf [Finite G] {M : Subgroup G} (hyp : Hypothesis M)
+    (hU : hyp.base.typeP.U ≠ ⊥)
+    (hfpf : ∀ n ∈ hyp.chief.H0,
+      (∀ w ∈ hyp.base.typeP.W1, w * n * w⁻¹ = n) → n = 1) :
+    hyp.U ≤ Subgroup.centralizer (hyp.chief.H0 : Set G) := by
+  -- `H_0 ≤ H = M_F` (the two type-`P` witnesses share `M_F = maxNilpotentNormalHall M`).
+  have hHH : hyp.s11Setup.typeP.H = hyp.base.typeP.H := by
+    rw [hyp.s11Setup.typeP.H_eq, hyp.base.typeP.H_eq]
+  have hH0le : hyp.chief.H0 ≤ hyp.base.typeP.H := hHH ▸ hyp.chief.H0_lt_H.le
+  -- `U ⊔ W_1 ≤ M ≤ N_G(H_0)`.
+  have hUM : hyp.base.typeP.U ≤ M := hyp.base.typeP.U_le.trans (Subgroup.map_subtype_le _)
+  have hUEnorm : hyp.base.typeP.U ⊔ hyp.base.typeP.W1 ≤
+      Subgroup.normalizer (hyp.chief.H0 : Set G) :=
+    sup_le (hUM.trans hyp.chief.H0_normalized_by_M)
+      (hyp.base.typeP.W1_le.trans hyp.chief.H0_normalized_by_M)
+  -- `H_0` is solvable (subgroup of the nilpotent Fitting-type Hall `M_F`).
+  haveI : Group.IsNilpotent ↥hyp.base.typeP.H := by
+    rw [hyp.base.typeP.H_eq]
+    exact OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_isNilpotent M
+  haveI : IsSolvable ↥hyp.base.typeP.H := IsNilpotent.to_isSolvable
+  haveI : IsSolvable ↥(hyp.chief.H0.subgroupOf hyp.base.typeP.H) := inferInstance
+  haveI hsolv : IsSolvable ↥hyp.chief.H0 :=
+    solvable_of_solvable_injective
+      (f := (Subgroup.subgroupOfEquivOfLe hH0le).symm.toMonoidHom)
+      (Subgroup.subgroupOfEquivOfLe hH0le).symm.injective
+  -- coprimality of `|H_0|` (dividing `|M_F|`) to `|U W_1|`.
+  have hcop : Nat.Coprime (Nat.card ↥hyp.chief.H0)
+      (Nat.card ↥(hyp.base.typeP.U ⊔ hyp.base.typeP.W1)) :=
+    Nat.Coprime.coprime_dvd_left (Subgroup.card_dvd_of_le hH0le)
+      (OddOrder.Peterfalvi.S11.typeP_coprime_H_uW1 hyp.base.typeP hU)
+  exact OddOrder.GroupTheory.frobenius_kernel_centralizes_of_complement_fpf hUEnorm
+    (OddOrder.Peterfalvi.S11.typeP_uW1_frobenius hyp.base.typeP hU) hsolv hcop hfpf
+
 /-- **Peterfalvi (11.6)**: `H` is a `p`-group, `U` centralizes `H_0`, `H_0 = H'`, and `C = U'`.
 
 The inclusion `U' ⊆ C` of the last clause is unconditional (`Hypothesis.derivedU_le_C`,
