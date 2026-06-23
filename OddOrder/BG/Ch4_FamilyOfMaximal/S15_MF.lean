@@ -8204,7 +8204,145 @@ theorem maxNilpotentNormalHall_derivedInG_eq_Msigma_of_isTypeP2_of_tau2_empty [F
       -- `[M' : M_σ] ∣ [M : M_σ]` via `card M_σ · [M':M_σ] = card M' ∣ card M = card M_σ · [M:M_σ]`.
       have hidxdvd : ((OddOrder.BG.Ch3.S10.Msigma M).subgroupOf (derivedInG M)).index ∣
           ((OddOrder.BG.Ch3.S10.Msigma M).subgroupOf M).index := by
-        have e1 := Subgroup.card_mul_index ((OddOrder.BG.Ch3.S10.Msigma M).subgroupOf (derivedInG M))
+        have e1 := Subgroup.card_mul_index
+          ((OddOrder.BG.Ch3.S10.Msigma M).subgroupOf (derivedInG M))
+        have e2 := Subgroup.card_mul_index ((OddOrder.BG.Ch3.S10.Msigma M).subgroupOf M)
+        rw [hcard'] at e1; rw [hcardM] at e2
+        have hM'dvdM : Nat.card ↥(derivedInG M) ∣ Nat.card ↥M := by
+          have h := Subgroup.card_subgroup_dvd_card ((derivedInG M).subgroupOf M)
+          rwa [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hM'M).toEquiv] at h
+        have hmul : Nat.card ↥(OddOrder.BG.Ch3.S10.Msigma M) *
+            ((OddOrder.BG.Ch3.S10.Msigma M).subgroupOf (derivedInG M)).index ∣
+            Nat.card ↥(OddOrder.BG.Ch3.S10.Msigma M) *
+            ((OddOrder.BG.Ch3.S10.Msigma M).subgroupOf M).index := by
+          rw [e1, e2]; exact hM'dvdM
+        exact (mul_dvd_mul_iff_left (Nat.card_pos
+          (α := ↥(OddOrder.BG.Ch3.S10.Msigma M))).ne').mp hmul
+      refine ⟨fun p hp => by rwa [hcard'] at hp, fun p hp hpπ => ?_⟩
+      have hpidxM : p ∈ (((OddOrder.BG.Ch3.S10.Msigma M).subgroupOf M).index).primeFactors := by
+        obtain ⟨hpp, hpd, -⟩ := Nat.mem_primeFactors.mp hp
+        exact Nat.mem_primeFactors.mpr ⟨hpp, hpd.trans hidxdvd, Subgroup.index_ne_zero_of_finite⟩
+      have hpσ : p ∈ OddOrder.BG.Ch3.S10.sigma M := hHallM.1 p (by rw [hcardM]; exact hpπ)
+      exact hHallM.2 p hpidxM hpσ
+
+/-- **Coprime order/index ⟹ self-`primeFactors`-Hall**: if `H ≤ V` and `|H|` is coprime to the
+relative index `[V : H]`, then `H` is a `π(H)`-Hall subgroup of `V` (the `π = π(H)` instance of
+`IsHallSubgroup`).  This is the BG-side mirror of the Peterfalvi helper
+`isHall_subgroupOf_primeFactors_of_coprime_index`. -/
+theorem isHallSubgroup_primeFactors_of_coprime_index [Finite G] {V H : Subgroup G}
+    (hHV : H ≤ V) (hcop : Nat.Coprime (Nat.card ↥H) ((H.subgroupOf V).index)) :
+    Ch03.IsHallSubgroup (Nat.card ↥H).primeFactors (H.subgroupOf V) := by
+  have hcard : Nat.card ↥(H.subgroupOf V) = Nat.card ↥H :=
+    Nat.card_congr (Subgroup.subgroupOfEquivOfLe hHV).toEquiv
+  refine ⟨fun p hp => by rw [hcard] at hp; exact hp, fun p hp hpπ => ?_⟩
+  have hp1 : p ∣ 1 := hcop ▸ Nat.dvd_gcd (Nat.mem_primeFactors.mp hpπ).2.1
+    (Nat.mem_primeFactors.mp hp).2.1
+  exact absurd (Nat.dvd_one.mp hp1) (Nat.mem_primeFactors.mp hp).1.ne_one
+
+/-- **Hall transitivity (coprime form)**: for `L ≤ Mid ≤ M`, if `|L|` is coprime to `[Mid : L]`
+and `|Mid|` is coprime to `[M : Mid]`, then `|L|` is coprime to `[M : L]`.  The relative index is
+multiplicative (`relIndex_mul_relIndex`), `|L| ∣ |Mid|`, and `|Mid|` coprime `[M:Mid]` transfers
+to `|L|`. -/
+theorem coprime_card_index_subgroupOf_trans [Finite G] {L Mid M : Subgroup G}
+    (hLMid : L ≤ Mid) (hMidM : Mid ≤ M)
+    (hL : Nat.Coprime (Nat.card ↥L) ((L.subgroupOf Mid).index))
+    (hMid : Nat.Coprime (Nat.card ↥Mid) ((Mid.subgroupOf M).index)) :
+    Nat.Coprime (Nat.card ↥L) ((L.subgroupOf M).index) := by
+  have hmul : (L.subgroupOf Mid).index * (Mid.subgroupOf M).index = (L.subgroupOf M).index := by
+    have h := Subgroup.relIndex_mul_relIndex L Mid M hLMid hMidM
+    simpa only [Subgroup.relIndex] using h
+  rw [← hmul]
+  exact Nat.Coprime.mul_right hL (hMid.coprime_dvd_left (Subgroup.card_dvd_of_le hLMid))
+
+/-- **`(M')_F = M_σ` for type-`P₂`, unconditional** (Coq `defM'F`, BGsection16.v l.1135; the
+`M'`_\F = H` conjunct of `of_typeII`).  For a type-`P₂` maximal `M` with cyclic `κ`-Hall `K`, the
+`F`-core of the derived subgroup `M' = M^{(1)}` is exactly `M_σ` — with **no** `τ₂(M) = ∅`
+hypothesis.
+
+The argument is elementary (and *avoids* the `τ₂(M) = ∅` route, which is moreover false for some
+type-`P₂` `M`, cf. Corollary 15.9's `N ∈ ℳ_𝓟₂` with `r ∈ τ₂(N)`):
+
+* `⊆`: `M' = M^{(1)}` complements the cyclic `κ`-Hall `K` in `M`
+  (`typeP_derivedInG_isComplement_kappaHall`), so `M'` is a `κ(M)'`-Hall subgroup of `M`.  Hence
+  `maxNilpotentNormalHall M'`, Hall in `M'` by `maxNilpotentNormalHall_isHall`, is — by Hall
+  transitivity — a nilpotent normal Hall subgroup of `M`, so `≤ M_F = M_σ`
+  (`le_maxNilpotentNormalHall`, `maxNilpotentNormalHall_eq_Msigma_iff_isNilpotent`).
+* `⊇`: `M_σ` is a nilpotent normal Hall subgroup of `M'` (`[M':M_σ] ∣ [M:M_σ]`).
+
+This discharges both the `hderfit` (`maxNilpotentNormalHall M' = maxNilpotentNormalHall M`) and the
+`TypeFData.H_eq` inputs of the type-`P₂ ⟹ II` bridge. -/
+theorem maxNilpotentNormalHall_derivedInG_eq_Msigma_of_isTypeP2 [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M K : Subgroup G} (hM : M ∈ maximalSubgroups G)
+    (hP2 : S14.IsTypeP2 M) (hKM : K ≤ M)
+    (hK : Ch03.IsHallSubgroup (S14.kappa M) (K.subgroupOf M)) [IsCyclic ↥K] :
+    maxNilpotentNormalHall (derivedInG M) = OddOrder.BG.Ch3.S10.Msigma M := by
+  classical
+  have hMσM' : OddOrder.BG.Ch3.S10.Msigma M ≤ derivedInG M :=
+    OddOrder.BG.Ch3.S10.Msigma_le_derived hG hM
+  have hM'M : derivedInG M ≤ M := Subgroup.map_subtype_le _
+  have hMσM : OddOrder.BG.Ch3.S10.Msigma M ≤ M := OddOrder.BG.Ch3.S10.Msigma_le M
+  haveI hMσnil : Group.IsNilpotent ↥(OddOrder.BG.Ch3.S10.Msigma M) :=
+    msigma_isNilpotent_of_isTypeP2 hG hM hP2
+  have hMσnormM : ((OddOrder.BG.Ch3.S10.Msigma M).subgroupOf M).Normal := by
+    rw [OddOrder.BG.Ch3.S10.Msigma_subgroupOf]; infer_instance
+  have hM'normM : ((derivedInG M).subgroupOf M).Normal := by
+    rw [Subgroup.normal_subgroupOf_iff_le_normalizer hM'M]
+    exact OddOrder.BG.Ch3.S10.le_normalizer_derivedInG M
+  -- `M_F = M_σ` for type-`P₂` (`M_σ` nilpotent).
+  have hMFMσ : maxNilpotentNormalHall M = OddOrder.BG.Ch3.S10.Msigma M :=
+    (maxNilpotentNormalHall_eq_Msigma_iff_isNilpotent hG hM).mpr hMσnil
+  -- `M' = M^{(1)}` complements the `κ`-Hall `K`, hence is `κ'`-Hall in `M`.
+  have hcompl := typeP_derivedInG_isComplement_kappaHall hG hM (isTypeP_of_isTypeP2 hP2) hKM hK
+  have hM'cop : Nat.Coprime (Nat.card ↥(derivedInG M)) (((derivedInG M).subgroupOf M).index) := by
+    have hcop_BA : Nat.Coprime (Nat.card ↥(K.subgroupOf M))
+        (Nat.card ↥((derivedInG M).subgroupOf M)) := by
+      have h := hK.coprime_index
+      rwa [hcompl.index_eq_card] at h
+    rw [← Nat.card_congr (Subgroup.subgroupOfEquivOfLe hM'M).toEquiv, hcompl.symm.index_eq_card]
+    exact hcop_BA.symm
+  refine le_antisymm ?_ ?_
+  · -- `⊆`: `maxNilpotentNormalHall M'` is nilpotent normal Hall in `M`, hence `≤ M_F = M_σ`.
+    have hLM' : maxNilpotentNormalHall (derivedInG M) ≤ derivedInG M :=
+      maxNilpotentNormalHall_le (derivedInG M)
+    have hLM : maxNilpotentNormalHall (derivedInG M) ≤ M := hLM'.trans hM'M
+    haveI : Group.IsNilpotent ↥(maxNilpotentNormalHall (derivedInG M)) :=
+      maxNilpotentNormalHall_isNilpotent (derivedInG M)
+    -- `maxNilpotentNormalHall M'` is coprime to `[M':·]` (Hall in `M'`).
+    have hLcopMid : Nat.Coprime (Nat.card ↥(maxNilpotentNormalHall (derivedInG M)))
+        (((maxNilpotentNormalHall (derivedInG M)).subgroupOf (derivedInG M)).index) := by
+      have h := (maxNilpotentNormalHall_isHall (derivedInG M)).coprime_index
+      rwa [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hLM').toEquiv] at h
+    -- transitivity ⟹ coprime to `[M:·]`.
+    have hLcopM : Nat.Coprime (Nat.card ↥(maxNilpotentNormalHall (derivedInG M)))
+        (((maxNilpotentNormalHall (derivedInG M)).subgroupOf M).index) :=
+      coprime_card_index_subgroupOf_trans hLM' hM'M hLcopMid hM'cop
+    have hLnorm : ((maxNilpotentNormalHall (derivedInG M)).subgroupOf M).Normal :=
+      maxNilpotentNormalHall_subgroupOf_normal_of_le_of_normal hM'M hM'normM
+    have hLnil : Group.IsNilpotent ↥((maxNilpotentNormalHall (derivedInG M)).subgroupOf M) :=
+      nilpotent_of_mulEquiv (Subgroup.subgroupOfEquivOfLe hLM).symm
+    have hLhall := isHallSubgroup_primeFactors_of_coprime_index hLM hLcopM
+    calc maxNilpotentNormalHall (derivedInG M)
+        ≤ maxNilpotentNormalHall M := le_maxNilpotentNormalHall hLM hLnorm hLnil hLhall
+      _ = OddOrder.BG.Ch3.S10.Msigma M := hMFMσ
+  · -- `⊇` : `M_σ` is a nilpotent normal Hall subgroup of `M'`.
+    refine le_maxNilpotentNormalHall hMσM' ?_ ?_ ?_
+    · rw [Subgroup.normal_subgroupOf_iff_le_normalizer hMσM']
+      exact hM'M.trans ((Subgroup.normal_subgroupOf_iff_le_normalizer hMσM).mp hMσnormM)
+    · exact nilpotent_of_mulEquiv (Subgroup.subgroupOfEquivOfLe hMσM').symm
+    · -- `M_σ` Hall in `M'`.
+      have hHallM : Ch03.IsHallSubgroup (OddOrder.BG.Ch3.S10.sigma M)
+          ((OddOrder.BG.Ch3.S10.Msigma M).subgroupOf M) :=
+        OddOrder.BG.Ch3.S10.Msigma_subgroupOf_isHall hG hM
+      have hcard' : Nat.card ↥((OddOrder.BG.Ch3.S10.Msigma M).subgroupOf (derivedInG M)) =
+          Nat.card ↥(OddOrder.BG.Ch3.S10.Msigma M) :=
+        Nat.card_congr (Subgroup.subgroupOfEquivOfLe hMσM').toEquiv
+      have hcardM : Nat.card ↥((OddOrder.BG.Ch3.S10.Msigma M).subgroupOf M) =
+          Nat.card ↥(OddOrder.BG.Ch3.S10.Msigma M) :=
+        Nat.card_congr (Subgroup.subgroupOfEquivOfLe hMσM).toEquiv
+      have hidxdvd : ((OddOrder.BG.Ch3.S10.Msigma M).subgroupOf (derivedInG M)).index ∣
+          ((OddOrder.BG.Ch3.S10.Msigma M).subgroupOf M).index := by
+        have e1 := Subgroup.card_mul_index
+          ((OddOrder.BG.Ch3.S10.Msigma M).subgroupOf (derivedInG M))
         have e2 := Subgroup.card_mul_index ((OddOrder.BG.Ch3.S10.Msigma M).subgroupOf M)
         rw [hcard'] at e1; rw [hcardM] at e2
         have hM'dvdM : Nat.card ↥(derivedInG M) ∣ Nat.card ↥M := by

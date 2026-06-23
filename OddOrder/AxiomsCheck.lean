@@ -3963,6 +3963,16 @@ set_option linter.style.longLine false in
 -- `tau2_transfer_constraint`).  Sorry-free + axiom-clean.
 #assert_only_allowed_axioms OddOrder.BG.Ch4.S15.fittingInAmbient_eq_Msigma_of_isTypeP2_of_tau2_empty
 #assert_only_allowed_axioms OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_derivedInG_eq_Msigma_of_isTypeP2_of_tau2_empty
+-- **`(M')_F = M_σ` for type-`P₂`, UNCONDITIONAL** (`S15_MF`, issue 7007 cont.¹¹; Coq `defM'F`,
+-- BGsection16.v l.1135 — the `M'`_\F = H` conjunct of `of_typeII`).  Supersedes the `_of_tau2_empty`
+-- reduction above: the `τ₂(M) = ∅` route was an unnecessary detour (and `τ₂(M) = ∅` is *false* for
+-- some type-`P₂` `M`, cf. Cor 15.9's `N ∈ ℳ_𝓟₂` with `r ∈ τ₂(N)`).  The Fitting core of `M'` equals
+-- `M_σ` by elementary `F`-core maximality + Hall transitivity: `M'` is `κ'`-Hall in `M` (complement to
+-- the cyclic `κ`-Hall `K`), so `maxNilpotentNormalHall M'` is a nilpotent normal Hall subgroup of `M`,
+-- hence `≤ M_F = M_σ`; conversely `M_σ` is nilpotent normal Hall in `M'`.  Sorry-free + axiom-clean.
+#assert_only_allowed_axioms OddOrder.BG.Ch4.S15.coprime_card_index_subgroupOf_trans
+#assert_only_allowed_axioms OddOrder.BG.Ch4.S15.isHallSubgroup_primeFactors_of_coprime_index
+#assert_only_allowed_axioms OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_derivedInG_eq_Msigma_of_isTypeP2
 -- BG Theorem 15.7(a), the type-classification clause (`S15_MF`, issue 7007): a type-`P₂` maximal
 -- subgroup has a `TI` Fitting subgroup (contrapositive: `¬FittingIsTI ⟹ M` is type `F` or `P₁`).
 -- Sorry-free + axiom-clean.
@@ -5442,6 +5452,17 @@ stale belief that `|W₁|` prime is lane-b (10.11)-gated: that is the *partner* 
 type-`P₂` `κ`-Hall's.  Axiom-clean. -/
 
 #assert_only_allowed_axioms OddOrder.BG.Ch4.S16.isTypeII_of_isTypeP2_of_derived_typeF
+
+/-! **`hderF` complete + `hP2II` COMPLETE** (`S16_MainResults`, issue 7007 cont.¹¹): `M'` is type `F`
+for every type-`P₂` maximal `M` (`isTypeF_derivedInG_of_isTypeP2`), assembling the *same* type-`F`
+data as the type-`F` maximal (`M' = M_σ ⋊ U` mirrors `M = M_σ ⋊ U`): the `M_σ ⋊ U` complement
+(`typeP2_mf_internal_fitting_decomposition`), abelian inertia `U₁` and Frobenius factor `M_σ ⋊ U₀`
+(Lemma 15.1(d)(e)), and `(M')_F = M_σ = M_F`
+(`maxNilpotentNormalHall_derivedInG_eq_Msigma_of_isTypeP2`).  Hence *every* type-`P₂` maximal is
+type II (`isTypeII_of_isTypeP2`), with **no** `τ₂(M) = ∅` / Theorem 15.8 gate.  Both axiom-clean. -/
+
+#assert_only_allowed_axioms OddOrder.BG.Ch4.S16.isTypeF_derivedInG_of_isTypeP2
+#assert_only_allowed_axioms OddOrder.BG.Ch4.S16.isTypeII_of_isTypeP2
 
 /-! **BG Theorem C** (`S16_MainResults`, `theoremC_paired_structure`): for `K ≠ 1`, a type-`P`
 maximal `M` has the full paired structure — `U` abelian; `N_G(U) ⊄ M` (conjunct 2 = BG C(1) /
