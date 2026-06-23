@@ -106,6 +106,11 @@ structure Section16Inputs (G : Type*) [Group G] [Finite G] where
   S_nonI : IsTypeNonI S
   T_nonI : IsTypeNonI T
   one_typeII : IsTypeII S ∨ IsTypeII T
+  /-- **Peterfalvi (13.2.a) type determination (S-side)**: `S` is of BG type `P₂` (Peterfalvi type
+  II).  Sourced from the §16 maximal pair (`Section16MaximalPair.S_typeP2`, fixed by the κ-Hall
+  ordering `q < p`); threaded into `S15.Hypothesis` so §15 can read off `IsTypeII S` sorry-free
+  (`isTypeII_of_isTypeP2`). -/
+  S_typeP2 : OddOrder.BG.Ch4.S14.IsTypeP2 S
   theorem88_caseB :
     ∀ M : Subgroup G, M ∈ maximalSubgroups G →
       IsTypeI M ∨ (∃ g : G, MulAut.conj g • M = S) ∨
@@ -1092,6 +1097,7 @@ noncomputable def section16Inputs_of_isMinimalSimpleOdd {G : Type*} [Group G] [F
     S_nonI := mp.S_nonI
     T_nonI := mp.T_nonI
     one_typeII := mp.one_typeII
+    S_typeP2 := mp.S_typeP2
     theorem88_caseB := mp.theorem88_caseB
     W_eq_inter := tp.W_eq_inter
     W_eq_join := tp.W_eq_join
@@ -1175,6 +1181,7 @@ noncomputable def sectionSixteenHypothesis_of_inputs {G : Type*} [Group G] [Fini
       S_nonI := inp.S_nonI
       T_nonI := inp.T_nonI
       one_typeII := inp.one_typeII
+      S_typeP2 := inp.S_typeP2
       theorem88_caseB := inp.theorem88_caseB
       W_eq_inter := inp.W_eq_inter
       W_eq_join := inp.W_eq_join
