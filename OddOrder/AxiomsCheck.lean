@@ -5885,6 +5885,12 @@ formula together with the prime computation `coprimeFrobeniusAction_card_eq_prim
 -- Same clause restated against the cleaner subgroup gate `W₂ ⊓ H₀ = ⊥` (the fpf input reduces to it
 -- via `H ⊓ C_G(W₁) = W₂`); isolates the genuine §8/chief obligation.
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S13.U_centralizes_H0_of_W2_inf_H0_bot
+-- (9.6)/(11.6) the genuine §8/chief input `W₂ ⊓ H₀ = ⊥`, discharged unconditionally: `|W₂| = p` prime
+-- + the chief-factor order `|C_{H̄}(W₁)| = |W̄₂| = p` (`coprimeFrobeniusChiefFactor_card`) show `W₂ ⊄ H₀`.
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S13.chief_W2_inf_H0_eq_bot
+-- (11.6) conjunct 2 fully assembled: `U` centralizes `H₀` with no character input (the above chief
+-- input feeds Wielandt (9.1)).  This is the unconditional half of `core_structure`.
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S13.U_centralizes_H0
 
 -- §16 character-data producer (`section16CharacterData`, POLE-1 `cd`) — S-side grid building blocks.
 -- `induce_compHom_subgroupCongr`: `Ind` is invariant under transporting the source subgroup along an

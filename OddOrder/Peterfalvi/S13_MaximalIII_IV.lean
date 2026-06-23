@@ -107,6 +107,12 @@ structure Hypothesis (M : Subgroup G) where
   type_alt : IsTypeIII M ∨ IsTypeIV M
   s11Setup : OddOrder.Peterfalvi.S11.TypesIIIIIIVSetup M
   chief : OddOrder.Peterfalvi.S11.ChiefFactorData s11Setup
+  /-- **(11.2)**: the §11 chief-factor setup and the §12 base hypothesis share the *same* type-`P`
+  structure `(H, U, W₁, W₂)`.  Peterfalvi (11.2) fixes a single such structure for `M`; this field
+  records that the chief factor `H̄ = H/H₀` (built on `s11Setup`) sits over the very same
+  `H = M_F`, `W₁`, `W₂` as the `base` (§12) hypothesis.  A faithful producer builds `s11Setup` from
+  `base.typeP`, so this holds by `rfl` there. -/
+  setup_typeP_eq : s11Setup.typeP = base.typeP
   C : Subgroup G
   C_le_U : C ≤ base.typeP.U
   /-- **(11.2)**: `C = C_U(H)`, the centralizer of `H` in `U`. -/
@@ -310,18 +316,109 @@ theorem U_centralizes_H0_of_W2_inf_H0_bot [Finite G] {M : Subgroup G} (hyp : Hyp
   rw [hbot] at hmem
   exact Subgroup.mem_bot.mp hmem
 
+/-- **Peterfalvi (9.6) for §13, the `W₂ ⊓ H₀ = ⊥` core**: the cyclic factor `W₂ = C_H(W₁)` meets the
+chief subgroup `H₀` trivially.
+
+Since `|W₂| = p` is prime (`ChiefFactorData.typeIII_IV_p_eq_W2`), `W₂ ⊓ H₀` is `⊥` or `W₂`.  The
+chief-factor computation `|C_{H̄}(W₁)| = p` (`coprimeFrobeniusChiefFactor_card`, the second component)
+shows the image `W̄₂` of `W₂` in `H̄ = H/H₀` is nontrivial, so `W₂ ⊄ H₀`, ruling out `W₂ ⊓ H₀ = W₂`.
+This is the genuine §8/chief input behind the fixed-point-free hypothesis `C_{H₀}(W₁) = 1` of
+`U_centralizes_H0_of_W2_inf_H0_bot`; it is unconditional (no character input). -/
+theorem chief_W2_inf_H0_eq_bot [Finite G] {M : Subgroup G} (hyp : Hypothesis M) :
+    hyp.s11Setup.typeP.W2 ⊓ hyp.chief.H0 = ⊥ := by
+  set data := hyp.s11Setup.typeP with hdata
+  have hU : data.U ≠ ⊥ := hyp.s11Setup.nontrivial.1
+  -- `F` = the `W₁`-fixed points of the conjugation action on `H`; `F` maps onto `W₂`, and `H₀` is the
+  -- image of the chief-factor kernel `N`.
+  set F : Subgroup ↥data.H :=
+    fixedSubgroup (OddOrder.Peterfalvi.S11.typeP_conjAction data)
+      (data.W1.subgroupOf (data.U ⊔ data.W1)) with hF
+  have hFW2 : F.map data.H.subtype = data.W2 := by
+    rw [hF, OddOrder.Peterfalvi.S11.typeP_fixedSubgroup_map data le_sup_right,
+      OddOrder.Peterfalvi.S11.typeP_H_inf_centralizer_W1]
+  have hH0 : hyp.chief.H0 = hyp.chief.N.map data.H.subtype := hyp.chief.H0_eq
+  -- the quotient chief-factor action and the order `|C_{H̄}(W₁)| = p`.
+  set act := OddOrder.Peterfalvi.S11.typeP_quotientCoprimeAction data hU hyp.chief.N_aInvariant
+    with hact
+  have hcopHW1 : Nat.Coprime
+      (Nat.card ↥(data.W1.subgroupOf (data.U ⊔ data.W1))) (Nat.card ↥data.H) :=
+    (OddOrder.Peterfalvi.S11.typeP_coprime_H_uW1 data hU).symm.coprime_dvd_left
+      (Subgroup.card_subgroup_dvd_card _)
+  haveI : IsSolvable ↥data.H := (OddOrder.Peterfalvi.S11.typeP_coprimeAction data hU).H_solvable
+  have hmap : F.map (QuotientGroup.mk' hyp.chief.N) = act.fixedByE :=
+    map_fixedSubgroup_eq_fixedSubgroup_quotient hyp.chief.N_aInvariant hcopHW1 (Or.inr inferInstance)
+  have hUnorm : act.U.Normal :=
+    (OddOrder.Peterfalvi.S11.typeP_uW1_frobenius data hU).isNormal
+  have hEcyc : IsCyclic ↥act.fixedByE :=
+    OddOrder.Peterfalvi.S11.typeP_quotient_fixedByE_cyclic data hU hyp.chief.N_aInvariant
+  have hK1 : Nat.card (↥data.H ⧸ hyp.chief.N) ≠ 1 := by
+    have hNtop : hyp.chief.N ≠ ⊤ := by
+      intro htop
+      have hH0H : hyp.chief.H0 = data.H := by
+        rw [hH0, htop, ← MonoidHom.range_eq_map, Subgroup.range_subtype]
+      exact absurd (hH0H ▸ hyp.chief.H0_lt_H) (lt_irrefl _)
+    exact fun h => hNtop (Subgroup.index_eq_one.mp h)
+  have hcardE : Nat.card ↥act.fixedByE = hyp.chief.p :=
+    (OddOrder.Peterfalvi.S11.coprimeFrobeniusChiefFactor_card act hUnorm hyp.chief.p_prime
+      hyp.chief.quotient_elementaryAbelian hyp.chief.quotient_chiefFactor
+      hyp.chief.U_noncentral_on_quotient hEcyc hK1).2
+  -- `|W₂| = p` prime, so `|W₂ ⊓ H₀|` divides `p`.
+  have hW2p : Nat.card ↥data.W2 = hyp.chief.p := hyp.chief.typeIII_IV_p_eq_W2 hyp.type_alt
+  have hp := hyp.chief.p_prime
+  have hdvd : Nat.card ↥(data.W2 ⊓ hyp.chief.H0 : Subgroup G) ∣ hyp.chief.p := by
+    rw [← hW2p]; exact Subgroup.card_dvd_of_le inf_le_left
+  rcases hp.eq_one_or_self_of_dvd _ hdvd with h1 | hpp
+  · exact Subgroup.card_eq_one.mp h1
+  · -- `|W₂ ⊓ H₀| = p = |W₂|` ⟹ `W₂ ⊆ H₀` ⟹ `F ≤ N` ⟹ `W̄₂ = ⊥`, contradicting `|C_{H̄}(W₁)| = p`.
+    exfalso
+    have hle : data.W2 ⊓ hyp.chief.H0 = data.W2 :=
+      Subgroup.eq_of_le_of_card_ge inf_le_left (le_of_eq (hW2p.trans hpp.symm))
+    have hW2H0 : data.W2 ≤ hyp.chief.H0 := hle ▸ inf_le_right
+    have hFN : F ≤ hyp.chief.N := by
+      have hmm : F.map data.H.subtype ≤ hyp.chief.N.map data.H.subtype := by
+        rw [hFW2, ← hH0]; exact hW2H0
+      exact (Subgroup.map_le_map_iff_of_injective data.H.subtype_injective).mp hmm
+    have hmapbot : F.map (QuotientGroup.mk' hyp.chief.N) = ⊥ := by
+      rw [Subgroup.map_eq_bot_iff, QuotientGroup.ker_mk']; exact hFN
+    rw [← hmap, hmapbot, Subgroup.card_bot] at hcardE
+    have := hp.one_lt
+    omega
+
+/-- **Peterfalvi (11.6), the `U` centralizes `H₀` clause, unconditional**: the Frobenius kernel `U`
+centralizes the chief subgroup `H₀`.
+
+This discharges the second conjunct of (11.6) with *no character input*.  Peterfalvi's chain is:
+`C_{H₀}(W₁) = 1` (here `chief_W2_inf_H0_eq_bot`, the `W₂ ⊓ H₀ = ⊥` form of (9.6)), so `U` centralizes
+`H₀` by Wielandt (9.1) (`U_centralizes_H0_of_W2_inf_H0_bot`).  The remaining (11.6) conjuncts
+(`H` a `p`-group, `H₀ = H'`, `C = U'`) stay gated on (11.5)/(9.3); see `core_structure`. -/
+theorem U_centralizes_H0 [Finite G] {M : Subgroup G} (hyp : Hypothesis M) :
+    hyp.U ≤ Subgroup.centralizer (hyp.chief.H0 : Set G) := by
+  have hU : hyp.base.typeP.U ≠ ⊥ := by
+    rw [← hyp.setup_typeP_eq]; exact hyp.s11Setup.nontrivial.1
+  refine U_centralizes_H0_of_W2_inf_H0_bot hyp hU ?_
+  rw [← hyp.setup_typeP_eq]
+  exact chief_W2_inf_H0_eq_bot hyp
+
 /-- **Peterfalvi (11.6)**: `H` is a `p`-group, `U` centralizes `H_0`, `H_0 = H'`, and `C = U'`.
 
-The inclusion `U' ⊆ C` of the last clause is unconditional (`Hypothesis.derivedU_le_C`,
-from (8.5.b)); the remaining content needs (9.3) [`U` centralizes `O_{p'}(H)`], (9.6)
-[`C_{H_0}(W_1) = 1`] with (9.1) Wielandt, `[BG] 1.6(d)`, and (11.5) `secondDerived_eq_HC`
-(itself coherence-gated). -/
+The second clause `U` centralizes `H_0` is now **unconditional** (`U_centralizes_H0`, via (9.6)/(9.1)),
+and the inclusion `U' ⊆ C` of the last clause is unconditional (`Hypothesis.derivedU_le_C`, from
+(8.5.b)).  The remaining three obligations are character-gated: `H` a `p`-group needs (9.3) [`U`
+centralizes `O_{p'}(H)`] + (11.5); `H_0 = H'` needs `[BG] 1.6(d)` + (11.5); and the reverse `C ⊆ U'`
+needs (11.5) `secondDerived_eq_HC` (itself coherence-gated). -/
 theorem core_structure [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
     {M : Subgroup G} (hyp : Hypothesis M) :
     IsPGroup hyp.p ↥hyp.H ∧
       hyp.U ≤ Subgroup.centralizer (hyp.chief.H0 : Set G) ∧
       hyp.chief.H0 = hyp.Hprime ∧ hyp.C = hyp.Uprime := by
-  sorry
+  -- Conjunct 2 (`U` centralizes `H_0`) is discharged; the other three stay character-gated.
+  refine ⟨?_, U_centralizes_H0 hyp, ?_, ?_⟩
+  · -- `H` is a `p`-group: (9.3) [`U` centralizes `O_{p'}(H)`] + (11.5).
+    sorry
+  · -- `H_0 = H'`: `[BG]` Proposition 1.6(d) + (11.5).
+    sorry
+  · -- `C = U'`: `U' ⊆ C` is `derivedU_le_C`; reverse `C ⊆ U'` is (11.5)-gated.
+    sorry
 
 /-- **Peterfalvi (11.7)**: `H` is elementary abelian of order `p^q`, and
 `H_0 = 1`. -/
