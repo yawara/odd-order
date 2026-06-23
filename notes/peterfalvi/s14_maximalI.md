@@ -34,7 +34,10 @@ The lane-h structural chain (12.9)–(12.12) is **gated on §8 facts that are BG
 and are NOT extracted in the repo**:
 
 - **(8.12.a)** "every Sylow of `U` is abelian of rank ≤ 2" — needed by (12.9) for `P_0` rank 2.
-  S10 has only **(8.12.b)** (`typeI_or_typeII_centralizer_unique`).
+  **⚠ NOT absent (2026-06-23 correction)**: this IS BG **Theorem B(1)**
+  `OddOrder.BG.Ch4.S16.theoremB_U_sylow_abelian_rank_le_two`, **proved** in the repo.  (12.9) now
+  cites it; the real residual is the `(κ∪σ)ᶜ`-Hall complement `U ⊇ P₀` = **Prop 16.1** (see the
+  "(12.9) status" section below).  S10 has (8.12.b) (`typeI_or_typeII_centralizer_unique`).
 - **(8.13.c1)** "`L = L_F ⋊ (M∩L)` and `C_G(x) = C_{L_F}(x) ⋊ C_M(x)`" — needed by (12.11) for
   "`M∩L` complements `K`".  S10's (8.13) (`escapingCentralizers_control`) gives (8.13.b/c4)
   [unique maximal of type I/II] but **not** (8.13.c1).
@@ -200,17 +203,31 @@ conjugation centralizer core to P₀ acting on K, then passes to the order-`p` p
   `mainSubgroup_pointwise_smul` + helpers (`derivedInG_pointwise_smul`, `secondDerivedInAmbient_…`,
   `isNilpotent_…`, `fitting_map_subtype_…`).  All sorry-free + axiom-clean.
 
-## ✅ lane-h (12.9) status (2026-06-23): maximally de-gated — residual = exactly (8.12.a)
+## ✅ lane-h (12.9) status (2026-06-23 resume¹²): residual = (κ∪σ)ᶜ-Hall complement (Prop 16.1), NOT "(8.12.a) absent"
 
-`(12.9) exists_rankTwoWitness` is sorry-free and bottoms out in **exactly one absent fact**:
-- **(8.12.a)** `counterexample_P0_K_structure` [`P₀` abelian of rank 2, absent BG §16 — lane-f/b].
+**⚠ STALE CORRECTION**: earlier notes said "(8.12.a) absent from repo".  **(8.12.a) is NOT absent** —
+BG **Theorem B(1)** `OddOrder.BG.Ch4.S16.theoremB_U_sylow_abelian_rank_le_two` ("every Sylow of the
+type-`I` complement `U` is abelian of rank ≤ 2") is **proved** in the repo (body sorry-free; landed by
+lane-f, in S14's import closure via `S10_MinimalSimpleStructure`).
 
-Everything else discharged: (8.12.b) (`centralizer_control_of_CKx`), coprime/normalize/K-not-perfect
-(inline), (8.17.a) (`exists_second_maximal`, cites cover data + Hall), and the genuine centralizer
+`(12.9) counterexample_P0_K_structure` is now a **gated-endpoint skeleton** (commit `96c793b0`): it
+**cites the proven Theorem B(1)** (rank ≤ 2 + abelian) + `two_le_rank_of_noncyclic_pSubgroup`
+(2 ≤ rank from `P0_noncyclic`) ⟹ rank = 2.  The substantive math is wired and load-bearing.
+
+**The real residual gate** is now the precise obligation `exists_sigmaKappaCompl_hall_ge_P0`
+(sorried): the type-`I` `M` has a `(κ(M) ∪ σ(M))ᶜ`-Hall complement `U ⊇ P₀`.  This is the BG §16 /
+**Proposition 16.1** bridge: the type-data complement of `M_F` is `π(M_F)ᶜ`-Hall (ungated, from
+`M_F` normal Hall), and Prop 16.1's type-`I` classification (κ=∅, σ=π(M_σ), M_F=M_σ) identifies
+`π(M_F)ᶜ` with `(κ∪σ)ᶜ`.  ⟹ **(12.9) auto-closes once lane-f lands Prop 16.1** (their active
+frontier) — no further lane-h math needed beyond discharging this Hall-complement existence.
+
+Everything else in (12.9) discharged: (8.12.b) (`centralizer_control_of_CKx`),
+coprime/normalize/K-not-perfect (inline), (8.17.a) (`exists_second_maximal`), genuine centralizer
 core (`exists_orderP_centralizer_witness`, axiom-clean).
 
-Remaining lane-h frontier (other than (8.12.a)): `(12.10)`/`(12.11)`/`(12.13)`–`(12.16)` gated on
-absent §8 ((8.13.c1)/(8.1.b/c)) + char (lane-b); §15 `basic_structure` gated on (10.11)/(11.7) (lane-b).
+Remaining lane-h frontier: `(12.10)`/`(12.11)`/`(12.13)`–`(12.16)` gated on absent §8
+((8.13.c1)/(8.1.b/c)) + char (lane-b); §15 `basic_structure` gated on (10.11)/(11.7) (lane-b).
+**lane-h has no ungated closable Lean work** — all residuals are cross-lane (lane-b char / lane-f §16).
 
 ## ▶ Next steps — full (12.12) `complement_cyclic_order_dvd` (Pf 04.14 L67-74, §8-gated)
 

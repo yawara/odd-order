@@ -1448,6 +1448,47 @@ noncomputable def typePData_of_isTypeP_of_inputs [Finite G]
     hWcyc hKne hk.1 hMcompl hKnorm hUnilp hDcompl hk.2.2.2.2 hSDfit hFiteq
     (typeP_derivedInG_inf_centralizer_kappaElement_eq hG hM hP hKM hK hKstar) hTI
 
+open scoped IsMulCommutative in
+/-- **`TypePData M` for a type-`P₂` maximal subgroup** — the carrier-constructibility milestone for
+Proposition 16.1's forward bridges: *every* type-`P₂` maximal subgroup carries a Peterfalvi
+type-`P` datum, `sorry`-free.
+
+Assembled from the matched `κ`-Hall / `(κ ∪ σ)'`-Hall pair
+(`typeP2_exists_matched_kappa_hall_pair`, supplying an abelian `U` with `K ≤ N_G(U)`) and the
+`M_F`-internal Fitting decomposition (`typeP2_mf_internal_fitting_decomposition`, supplying the
+three deep `M'`-complement/Fitting fields `hDcompl`/`hSDfit`/`hFiteq`), fed to the gated-endpoint
+constructor `typePData_of_isTypeP_of_inputs`.  This closes the deep `M_F`-internal residuals that
+were the linchpin of all three (`hP2II`/`hP1neIIIIV`/`hP1eqV`) forward bridges; the type-`P₂` bridge
+`hP2II` now reduces to the type-`II` last mile (`isTypeII_of_typePData`: `N_G(U) ⊄ M` via
+Corollary 14.12, and the type-`F` structure of `M'`). -/
+noncomputable def typePData_of_isTypeP2 [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G}
+    (hM : M ∈ maximalSubgroups G) (hP2 : S14.IsTypeP2 M) :
+    TypePData M := by
+  classical
+  -- Extract the matched pair via `Exists.choose` (the goal `TypePData M` is `Type`-valued, so
+  -- `obtain`/`rcases` on the `Prop`-existential cannot eliminate into it).
+  have hex := typeP2_exists_matched_kappa_hall_pair hG hM hP2
+  set K := hex.choose with hKdef
+  set U := hex.choose_spec.choose with hUdef
+  have hspec := hex.choose_spec.choose_spec
+  have hKM : K ≤ M := hspec.1
+  have hUM : U ≤ M := hspec.2.1
+  have hK : Ch03.IsHallSubgroup (S14.kappa M) (K.subgroupOf M) := hspec.2.2.2.1
+  have hU : Ch03.IsHallSubgroup ((S14.kappa M ∪ OddOrder.BG.Ch3.S10.sigma M)ᶜ) (U.subgroupOf M) :=
+    hspec.2.2.2.2.1
+  have hUcomm : IsMulCommutative ↥U := hspec.2.2.2.2.2.1
+  have hKnorm : K ≤ Subgroup.normalizer (U : Set G) := hspec.2.2.2.2.2.2
+  have hP : S14.IsTypeP M := hP2.1
+  have hKne : K ≠ ⊥ := fun h => card_kappaHall_ne_one hP hKM hK (by rw [h, Subgroup.card_bot])
+  have hM'eq := (typeP_hall_derived_eq_and_abelian hG hM hKM hUM hKne hK hU).1
+  have hUle : U ≤ derivedInG M := by rw [hM'eq]; exact le_sup_left
+  haveI := hUcomm
+  have hUnilp : Group.IsNilpotent ↥U := inferInstance
+  have hdec := typeP2_mf_internal_fitting_decomposition hG hM hP2 hKM hUM hKne hK hU
+  exact typePData_of_isTypeP_of_inputs hG hM hP hKM hKne hK hUle hKnorm hUnilp
+    hdec.1 hdec.2.1 hdec.2.2
+
 /-- **Prop 16.1 forward bridge, type III/IV last mile** (Peterfalvi (8.7)): a type-`P` datum whose
 `U`-factor has its normalizer inside `M` is of type III or IV, according as `U` is abelian or not.
 This is the clean part of the `hP1neIIIIV` bridge — no deep `alternative`/`derived_typeF` content,
@@ -1474,6 +1515,75 @@ theorem isTypeII_of_typePData {M : Subgroup G} (data : TypePData M)
     IsTypeII M :=
   ⟨{ typeP := data, common := hcommon, U_commutative := hUcomm,
      normalizer_not_le := hnorm, derived_typeF := hderF, derived_fitting_eq := hderfit }⟩
+
+open scoped IsMulCommutative in
+/-- **Prop 16.1 forward bridge `hP2II`, reduced to the `M'`-type-`F` residual** — a type-`P₂`
+maximal subgroup whose derived subgroup `M'` is of type `F` (with `F(M') = M_F`) is of type II.
+
+This discharges *every* `isTypeII_of_typePData` input that is BG-local for the type-`P₂` case,
+leaving exactly the genuinely-deep `M'`-type-`F` structure (`hderF`/`hderfit`, Peterfalvi (8.6)) as
+hypotheses.  Notably **the whole `TypePNontrivialCore` (`hcommon`) is lane-local, not lane-b**:
+`U ≠ ⊥` from the matched pair, `|W₁| = |K|` prime *and* the `M_σ`-`TI` condition both from
+Proposition 14.2(g) (`typeP_structure`, proved) — `M_F = M_σ` for type `P₂`, so its `sharp`-`TI`
+*is* the `σ#`-`TI`.  (Correcting the stale belief that `|W₁|` prime needs the lane-b (10.11)
+`theorem88_caseB_prime_orders`; that is the *partner* primality, not the type-`P₂` `κ`-Hall's.)
+`N_G(U) ⊄ M` is Corollary 14.12 (`typeP2_neighbor_is_typeF`) applied to a Sylow `r`-subgroup of the
+matched `U`; the `TypePData` itself is `typePData_of_isTypeP2`.  The single remaining gate for the
+`hP2II` bridge of `proposition_type_classification` is thus the type-`F` structure of `M'`. -/
+theorem isTypeII_of_isTypeP2_of_derived_typeF [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G}
+    (hM : M ∈ maximalSubgroups G) (hP2 : S14.IsTypeP2 M)
+    (hderF : OddOrder.GroupTheory.IsTypeF (derivedInG M))
+    (hderfit : maxNilpotentNormalHall (derivedInG M) = maxNilpotentNormalHall M) :
+    OddOrder.GroupTheory.IsTypeII M := by
+  classical
+  have hex := typeP2_exists_matched_kappa_hall_pair hG hM hP2
+  set K := hex.choose with hKdef
+  set U := hex.choose_spec.choose with hUdef
+  have hspec := hex.choose_spec.choose_spec
+  have hKM : K ≤ M := hspec.1
+  have hUM : U ≤ M := hspec.2.1
+  have hUne : U ≠ ⊥ := hspec.2.2.1
+  have hK : Ch03.IsHallSubgroup (S14.kappa M) (K.subgroupOf M) := hspec.2.2.2.1
+  have hU : Ch03.IsHallSubgroup ((S14.kappa M ∪ OddOrder.BG.Ch3.S10.sigma M)ᶜ) (U.subgroupOf M) :=
+    hspec.2.2.2.2.1
+  have hUcomm : IsMulCommutative ↥U := hspec.2.2.2.2.2.1
+  have hKnorm : K ≤ Subgroup.normalizer (U : Set G) := hspec.2.2.2.2.2.2
+  have hP : S14.IsTypeP M := hP2.1
+  have hKne : K ≠ ⊥ := fun h => card_kappaHall_ne_one hP hKM hK (by rw [h, Subgroup.card_bot])
+  have hM'eq := (typeP_hall_derived_eq_and_abelian hG hM hKM hUM hKne hK hU).1
+  have hUle : U ≤ derivedInG M := by rw [hM'eq]; exact le_sup_left
+  haveI := hUcomm
+  have hUnilp : Group.IsNilpotent ↥U := inferInstance
+  have hdec := typeP2_mf_internal_fitting_decomposition hG hM hP2 hKM hUM hKne hK hU
+  -- Proposition 14.2(g): `|K| = q` prime and `M_σ#` is `TI` (the `M_F#`-`TI` since `M_F = M_σ`).
+  obtain ⟨_, q, hqp, hKq, hMσTI⟩ := (S14.typeP_structure hG hM hP hKM hK rfl hU).2.2.2.2.1 hP2
+  have hMFMσ : maxNilpotentNormalHall M = OddOrder.BG.Ch3.S10.Msigma M :=
+    (maxNilpotentNormalHall_eq_Msigma_iff_isNilpotent hG hM).mpr
+      (S14.msigma_isNilpotent_of_isTypeP2 hG hM hP2)
+  have hUab : ∀ a ∈ U, ∀ b ∈ U, a * b = b * a := fun a ha b hb =>
+    congrArg Subtype.val (mul_comm (⟨a, ha⟩ : ↥U) (⟨b, hb⟩ : ↥U))
+  -- `N_G(U) ⊄ M`: Corollary 14.12 applied to a Sylow `r`-subgroup `R ≤ U` (`r ∈ π(U)`, `U ≠ ⊥`).
+  have hnorm : ¬ Subgroup.normalizer (U : Set G) ≤ M := by
+    obtain ⟨r, hrp, hrdvd⟩ := Nat.exists_prime_and_dvd
+      (show Nat.card ↥U ≠ 1 from fun h => hUne (Subgroup.card_eq_one.mp h))
+    have hrπU : r ∈ S14.piSet U := Nat.mem_primeFactors.mpr ⟨hrp, hrdvd, Nat.card_pos.ne'⟩
+    obtain ⟨R', hR'⟩ := Ch03.hall_E_exists (G := ↥U) ({r} : Set ℕ)
+    intro hNU
+    obtain ⟨H, _, _, _, _, hHnorm⟩ := S14.typeP2_neighbor_is_typeF hG hM hP2 hKM hUM hK hU hUab
+      hrπU (Subgroup.map_subtype_le R')
+      (by rw [show (R'.map U.subtype).subgroupOf U = R' from
+        Subgroup.comap_map_eq_self_of_injective U.subtype_injective R']; exact hR') hKnorm
+    exact hHnorm (le_trans inf_le_right hNU)
+  refine isTypeII_of_typePData
+    (typePData_of_isTypeP_of_inputs hG hM hP hKM hKne hK hUle hKnorm hUnilp hdec.1 hdec.2.1 hdec.2.2)
+    ⟨?_, ?_, ?_⟩ ?_ ?_ hderF ?_
+  · show U ≠ ⊥; exact hUne
+  · show (Nat.card ↥K).Prime; rw [hKq]; exact hqp
+  · rw [hMFMσ]; exact hMσTI
+  · show IsMulCommutative ↥U; exact hUcomm
+  · show ¬ Subgroup.normalizer (U : Set G) ≤ M; exact hnorm
+  · show maxNilpotentNormalHall (derivedInG M) = maxNilpotentNormalHall M; exact hderfit
 
 /-- **Prop 16.1 forward bridge, type V last mile** (Peterfalvi (8.8)): a type-`P` datum with
 `U = ⊥` and the Peterfalvi (8.8) trichotomy on `H = M_F` is of type V.  The `alternative`

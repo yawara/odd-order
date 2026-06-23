@@ -127,6 +127,14 @@ ROADMAP のチェックリストから対応する `notes/` にリンクして�
 
 章 / 節を別エージェントセッションで並行進行させるときは `git worktree` を使う。詳細手順は [`notes/meta/worktree_setup.md`](notes/meta/worktree_setup.md)。
 
+- **🔄 起動時 + 定期の main 同期 (最重要・全レーン必須, ユーザー方針 2026-06-22/06-23)**: worktree レーンの各セッションは
+  **(1) 開始時にまず `git merge main`** (実 3-way; merge commit 可) で main 最新を取り込んでから作業に入る。
+  **`git merge --ff-only main` は使わない** (自前 commit が 1 つでもあると ff 不能で失敗し、レーンが main に
+  遅れ続ける)。**(2) 長く走るセッションは「次の leaf に着手する前」「commit する前」にも `git merge main` で
+  再同期**する (開始時 1 回きりだと他レーンの合流で drift し、古い文脈・cite ずれ・2-dot 誤検出の原因になる)。
+  **(3) 取り込んだら `git rev-list --count HEAD..main` が 0 を確認**。コンフリクトは自所有ファイルなら解決、
+  他レーン由来なら notes/issue で hub へ。これは LAUNCH.md の「🔄 起動時 main 同期」ブロックの上位正本
+  (LAUNCH.md は git-excluded ゆえ、常時ロードされる本規約が確実な拠り所)。
 - worktree path = `/Users/ywr/odd-order-<slug>` (sibling), branch 名も `<slug>` (例: `isaacs-ch05`, `bg-s03`)
 - `.lake/packages` と `references` は main から **symlink で共有** (mathlib 6.5GB + 初回ビルド数分を節約)
 - `.lake/build/` は worktree ごとに独立 (並行 `lake build` 安全)

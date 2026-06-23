@@ -8,6 +8,49 @@
 
 ---
 
+## 🔑 lane-c carrier 診断 (2026-06-23, relane §11→§15 後の最初の精査)
+
+**owner = lane-c** (`S15_SAndT.lean`、2026-06-23 に H→C 移譲、issue 4007)。最初に文書順最上流
+`basic_structure` (13.2) を精査して判明した **carrier 設計の核心課題** (次 session の着手前提):
+
+### 課題: `Hypothesis` が type-P 分解を pinning していない
+- `Hypothesis` は S, T, U, V, W1, W2, P, Q を **raw subgroup** として持ち、`S_deriv_eq_PU :
+  derivedInG S = P ⊔ U` は **join のみ**で `U ⊓ P = ⊥` (complement 性) を持たない。
+- `typePData_of_isTypeNonI hyp.S_nonI` で `TypePData S` は取れる (public) が、その `.U`/`.W1` は
+  **新 witness** で `hyp.U`/`hyp.W1` と一致保証なし。complement は一意でないため、抽出 `TypePData.U`
+  ↔ `hyp.U` の **reconciliation は現フィールドから導出不能**。
+- ⟹ `basic_structure` の `UW1_frobenius` (= `typeP_uW1_frobenius` は `data.U`/`data.W1` 上) /
+  `U_commutative` が `hyp.U`/`hyp.W1` に転送できず **blocked**。
+- これは (13.1.b)「S = (P⋊U)⋊W₁」の**形式化が不完全** (型-P witness を carry していない) のが原因。
+
+### honest fix: `Hypothesis` を (13.1) に忠実 enrich (C 所有・安全)
+- `Hypothesis` は **producer なし** (S16 が `base : S15.Hypothesis` で**参照のみ**、構成しない) ⟹
+  field 追加は安全 (build 不変、S16 等は新 field を無視)。
+- **追加案**: `Sdata : TypePData hyp.S` + `Sdata_U : Sdata.U = hyp.U` + `Sdata_W1 : Sdata.W1 = hyp.W1`
+  + `Sdata_W2 : Sdata.W2 = hyp.W2` (T-side は対称: `Tdata.U = hyp.V`, `Tdata.W1 = hyp.W2`,
+  `Tdata.W2 = hyp.W1`)。**(13.1) が型-P 分解を固定するのに忠実、型 II/III 等の (13.2) 結論は hoist しない**
+  (TypePData は型を含まない共通構造)。`hyp.P = Sdata.H` は `P_eq_SF` + `H_eq` (両 = maxNilpotentNormalHall S)
+  で自動。
+
+### `basic_structure` (13.2) = 5 部 capstone (単一 leaf でなく複数 session)
+1. **carrier reconciliation** (上記 enrich; `hyp.U`=type-P U の pinning) → UW1_frobenius / U-side facts。
+2. **type II/III 判定** = 型 IV/V 除外。V= `no_typeV_maximal` (10.10, lane-b S12 sorried, cite 可)。
+   IV 除外 + 型確定は §15 解析 (cross-lane 寄り)。`one_typeII : IsTypeII S ∨ IsTypeII T` は片側のみ。
+3. **P el-ab 位数 `p^q`** = §15 固有 (chief factor = 全 Fitting, H₀=1; §11 の H=p^q·|H₀| より強い)。
+4. **u 上界** `u ≤ (p^q-1)/(p-1)` = (9.7) Singer (lane-c が 2026-06-23 に `clifford_dichotomy` で
+   `|Ū| ∣ (p^q-1)/(p-1)` を確立済 → u=|Ū| で landable)。
+5. **U_commutative** = type II/III の `TypeIIData`/`TypeIIIData.U_commutative` から (型確定後)。
+
+### 既に証明済 (sorry なし、再着手不要)
+`not_conj_of_isTypeI_of_isTypeNonI` (1179)、`isHall_subgroupOf_primeFactors_of_coprime_index` (1085)。
+
+### 次 session 推奨着手
+(A) carrier enrich (上記、committable faithful 基盤) → basic_structure を 5 部で grind、または
+(B) hyp の raw フィールドで完結する leaf (`typeI_U_le_fitting_of_coprime` 様式) で clean な勝ち。
+正本 = この節。
+
+---
+
 ## 実装状況 (2026-06-05 更新, peterfalvi worktree)
 
 **注意**: 以下の大計画は 2026-05-22 の初版 (stale)。実体は `S15_SAndT.lean` の scaffold (18 sorry)。`Hypothesis` は **opaque-Prop convention** (m/u/c 等の値は usable な等式で pin されていない field 群) で、多くの数値結果は値の不透明性ゆえブロックされる。`Hypothesis` は **どこからも構成されない** (S16 が `base : S15.Hypothesis` で参照するのみ) ので field 改変は安全。
@@ -199,9 +242,13 @@
 - **Q# TI-subset with normalizer T** — step 1 の核、Hypothesis に無し (§13 obligation)。
 - **d = 1 (T-side of (13.12))** — `c_eq_one` は S-side のみ、T-side 不在 (obligation)。step 4 の K=1 に必須。
 - **KW₂ Frobenius kernel K** — step 4 の Wielandt 入力 (§13 obligation)。
-- **BG Lemma 3.2** — step 5 (K ⊆ C(W₁))、repo は Lemma 3.3 のみ (要 find/state)。
+- **BG Lemma 3.2** — step 5 (K ⊆ C(W₁))。✅ **2026-06-23 完全版 landed** (`S03_FrobeniusActions.lean`,
+  axiom-clean): `isFrobeniusGroup_quotient_of_normal_not_le_kernel` (= 3.2(a)(b): `N◁G`, `K⊄N` ⟹ `N<K`
+  ∧ `Ḡ=G/N` Frobenius) + crux `inf_complement_eq_bot_of_normal_not_le_kernel` (`N⊓R=⊥`) +
+  `normal_le_kernel_of_not_le` (`N⊆K`)。repo は Lemma 3.2 の `N≤K` 枝のみ既存だった、未実装の `K⊄N`
+  枝を補完。⟹ step 5 obligation は解消 (残 5 obligation は依然 cross-lane gate)。
 - **module Maschke** = `OperatorMaschke.lean` ✓ (available)。
-⟹ full assembly は ~6 obligation の large scaffold (うち card_Q_eq は cross-lane) ゆえ「scaffold ≠ done」回避で full は保留。
+⟹ full assembly は残 ~5 obligation の large scaffold (うち card_Q_eq は cross-lane) ゆえ「scaffold ≠ done」回避で full は保留。
 **✅ 但し step 4 の genuine §8-free Wielandt 核を landing** (commit `d11f7fe9`, axiom-clean):
 `OddOrder.GroupTheory.frobenius_kernel_centralizes_of_complement_fpf` (WielandtFixedPoint.lean) —
 Frobenius `U⋊E ≤ N_G(N)` coprime, `C_N(E)=1` ⟹ `U ≤ C_G(N)`。`wielandt_fixedPoint_trivial_E_fixed` の

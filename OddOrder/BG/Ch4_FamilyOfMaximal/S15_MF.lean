@@ -7344,6 +7344,183 @@ theorem opiCoreInG_sigmaCompl_fittingInAmbient_isCyclic [Finite G]
     rw [← hkey, sup_comm, ← hF_eq2, inf_eq_right.mpr hDF]
   rw [hDY]; exact hYcyc
 
+/-- **BG Corollary 15.5(a), `τ₂`-membership form**: the `σ'`-part `O_{σ(M)'}(F(M))` of the Fitting
+subgroup is a `τ₂(M)`-group.  Companion to `opiCoreInG_sigmaCompl_fittingInAmbient_isCyclic`,
+extracted from `fitting_decomposition`'s cyclic witness `Y` (which equals `O_{σ'}(F(M))` by the
+modular argument). -/
+theorem opiCoreInG_sigmaCompl_fittingInAmbient_primeFactors_subset_tau2 [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} (hM : M ∈ maximalSubgroups G) :
+    ↑(Nat.card ↥(opiCoreInG (OddOrder.BG.Ch3.S10.sigma M)ᶜ (fittingInAmbient M))).primeFactors ⊆
+      tau2 M := by
+  classical
+  set σ := OddOrder.BG.Ch3.S10.sigma M with hσdef
+  set F := fittingInAmbient M with hFdef
+  obtain ⟨Y, _hYcyc, hYtau2, hYleF, _, _, hF_eq, _, hcomm, _, _, _⟩ := fitting_decomposition hG hM
+  have hOσ : opiCoreInG σ F = fittingInAmbient (OddOrder.BG.Ch3.S10.Msigma M) :=
+    opiCoreInG_sigma_fittingInAmbient_eq_fittingInAmbient_Msigma
+  have hF_eq2 : F = opiCoreInG σ F ⊔ Y := by rw [hOσ]; exact hF_eq
+  have hYnorm : (Y.subgroupOf F).Normal := by
+    refine (Subgroup.normal_subgroupOf_iff_le_normalizer hYleF).mpr ?_
+    rw [hF_eq]
+    refine sup_le ?_ Subgroup.le_normalizer
+    have h1 : fittingInAmbient (OddOrder.BG.Ch3.S10.Msigma M) ≤ Subgroup.centralizer (Y : Set G) :=
+      Subgroup.commutator_eq_bot_iff_le_centralizer.mp hcomm
+    exact h1.trans (Subgroup.centralizer_le_normalizer _)
+  have hYpi : Subgroup.IsPiSubgroup σᶜ Y := fun r hr => tau2_subset_sigma_compl M (hYtau2 hr)
+  have hYle : Y ≤ opiCoreInG σᶜ F := le_opiCoreInG_of_normal_of_isPiSubgroup hYleF hYnorm hYpi
+  have hinf : opiCoreInG σ F ⊓ opiCoreInG σᶜ F = ⊥ :=
+    OddOrder.GroupTheory.inf_eq_bot_of_isPiSubgroup_of_isPiSubgroup_compl
+      (OddOrder.GroupTheory.isPiSubgroup_opiCoreInG σ F)
+      (OddOrder.GroupTheory.isPiSubgroup_opiCoreInG σᶜ F)
+  have hEnorm : opiCoreInG σ F ≤ Subgroup.normalizer (Y : Set G) := by
+    rw [hOσ]
+    exact (Subgroup.commutator_eq_bot_iff_le_centralizer.mp hcomm).trans
+      (Subgroup.centralizer_le_normalizer _)
+  have hDF : opiCoreInG σᶜ F ≤ F := OddOrder.GroupTheory.opiCoreInG_le σᶜ F
+  have hDY : opiCoreInG σᶜ F = Y := by
+    have hkey := Subgroup.inf_sup_eq_of_le_normalizer_of_inf_eq_bot
+      (W := Y) (A := opiCoreInG σ F) (L := opiCoreInG σᶜ F) hYle hinf hEnorm
+    rw [← hkey, sup_comm, ← hF_eq2, inf_eq_right.mpr hDF]
+  rw [hDY]; exact hYtau2
+
+/-- **Type-`P₂` `M_F`-internal Fitting decomposition** (BG Corollary 15.5; the `M' = M_F × U`
+form feeding Proposition 16.1's forward bridges).  For a type-`P₂` maximal subgroup `M` with
+`κ`-Hall `K` and `(κ ∪ σ)'`-Hall `U`, the derived subgroup `M'` is the internal direct product of
+the Fitting kernel `M_F` and `U` (the complement `hDcompl`), the Fitting subgroup is
+`F(M) = M_F ⊔ (U ⊓ C_M(M_F))` (`hFiteq`), and `M'' ≤ F(M)` (`hSDfit`).
+
+This discharges the three genuinely-deep `M_F`-internal residuals (`hDcompl`/`hSDfit`/`hFiteq`)
+of `typePData_of_isTypeP_of_inputs`, the shared linchpin of the `hP2II`/`hP1neIIIIV`/`hP1eqV`
+forward bridges of `proposition_type_classification`.
+
+Proof: `M_F = M_σ` (`M_σ` nilpotent for type `P₂`) and `M' = U ⊔ M_σ` with `U ⊓ M_σ = ⊥`
+(Lemma 15.1(b)) give the complement.  The Fitting identity routes through `Y := O_{σ'}(F(M))`,
+the `τ₂`-part of `F(M)` (Corollary 15.5(a)): `Y` is a `(κ ∪ σ)'`-group normal in `M`
+(`π(Y) ⊆ τ₂`, and `τ₂ ∩ κ = ∅` by rank), hence `Y ≤ U`, and `Y` centralizes `M_σ = M_F`, so
+`F(M) = M_F ⊔ Y ≤ M_F ⊔ (U ⊓ C_M(M_F)) ≤ F(M)`. -/
+theorem typeP2_mf_internal_fitting_decomposition [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M K U : Subgroup G}
+    (hM : M ∈ maximalSubgroups G) (hP2 : S14.IsTypeP2 M) (hKM : K ≤ M) (hUM : U ≤ M)
+    (hKne : K ≠ ⊥)
+    (hK : Ch03.IsHallSubgroup (S14.kappa M) (K.subgroupOf M))
+    (hU : Ch03.IsHallSubgroup ((S14.kappa M ∪ OddOrder.BG.Ch3.S10.sigma M)ᶜ) (U.subgroupOf M)) :
+    Subgroup.IsComplement' ((maxNilpotentNormalHall M).subgroupOf (derivedInG M))
+        (U.subgroupOf (derivedInG M)) ∧
+      secondDerivedInAmbient M ≤ maxNilpotentNormalHall M ⊔
+        (U ⊓ Subgroup.centralizer (maxNilpotentNormalHall M : Set G)) ∧
+      (OddOrder.Isaacs.Ch01.fitting ↥M).map M.subtype = maxNilpotentNormalHall M ⊔
+        (U ⊓ Subgroup.centralizer (maxNilpotentNormalHall M : Set G)) := by
+  classical
+  set σ := OddOrder.BG.Ch3.S10.sigma M with hσdef
+  set Mσ := OddOrder.BG.Ch3.S10.Msigma M with hMσdef
+  set F := fittingInAmbient M with hFdef
+  haveI hFnil : Group.IsNilpotent ↥F := OddOrder.BG.Ch2.S08.fittingInG_isNilpotent M
+  -- `M_F = M_σ`: `M_σ` is nilpotent for type `P₂`.
+  haveI hMσnil : Group.IsNilpotent ↥Mσ := S14.msigma_isNilpotent_of_isTypeP2 hG hM hP2
+  have hMFMσ : maxNilpotentNormalHall M = Mσ :=
+    (maxNilpotentNormalHall_eq_Msigma_iff_isNilpotent hG hM).mpr hMσnil
+  -- Lemma 15.1(b): `M' = U ⊔ M_σ`.
+  obtain ⟨hM'eq, _hUab⟩ := typeP_hall_derived_eq_and_abelian hG hM hKM hUM hKne hK hU
+  have hMσ_le_M' : Mσ ≤ derivedInG M := OddOrder.BG.Ch3.S10.Msigma_le_derived hG hM
+  have hM'_le_M : derivedInG M ≤ M := Subgroup.map_subtype_le _
+  have hMσ_le_M : Mσ ≤ M := OddOrder.BG.Ch3.S10.Msigma_le M
+  have hU_le_M' : U ≤ derivedInG M := by rw [hM'eq]; exact le_sup_left
+  -- `U ⊓ M_σ = ⊥` (coprime Hall orders).
+  have hUMσ_bot : U ⊓ Mσ = ⊥ := by
+    have hMσHall : Ch03.IsHallSubgroup σ (Mσ.subgroupOf M) :=
+      OddOrder.BG.Ch3.S10.Msigma_subgroupOf_isHall hG hM
+    have hcop : Nat.Coprime (Nat.card ↥U) (Nat.card ↥Mσ) := by
+      refine Ch03.Nat.coprime_of_isPiGroup_of_isPiGroup_compl
+        (π := (S14.kappa M ∪ σ)ᶜ) Nat.card_pos.ne' Nat.card_pos.ne' ?_ ?_
+      · intro p hp
+        exact hU.1 p (by rwa [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hUM).toEquiv])
+      · intro p hp hpcompl
+        have hpMσ : p ∈ (Nat.card ↥(Mσ.subgroupOf M)).primeFactors := by
+          rwa [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hMσ_le_M).toEquiv]
+        exact hpcompl (Or.inr (hMσHall.1 p hpMσ))
+    exact Subgroup.inf_eq_bot_of_coprime hcop
+  -- `Y := O_{σ'}(F(M))`, the `τ₂`-part of `F(M)`.
+  set Y := opiCoreInG σᶜ F with hYdef
+  have hY_le_M : Y ≤ M :=
+    (OddOrder.GroupTheory.opiCoreInG_le σᶜ F).trans (OddOrder.BG.Ch2.S08.fittingInG_le M)
+  have hOσMσ : opiCoreInG σ F = Mσ := by
+    rw [opiCoreInG_sigma_fittingInAmbient_eq_fittingInAmbient_Msigma, ← hMσdef,
+      fittingInAmbient_eq_self_of_isNilpotent]
+  -- `Y` centralizes `M_σ`.
+  have hY_le_cent : Y ≤ Subgroup.centralizer (Mσ : Set G) := by
+    have hcomm : ⁅opiCoreInG σ F, Y⁆ = ⊥ := by
+      rw [hYdef]; exact OddOrder.BG.Ch2.S08.opiCoreInG_commutator_compl_eq_bot σ F
+    rw [hOσMσ, Subgroup.commutator_comm] at hcomm
+    exact Subgroup.commutator_eq_bot_iff_le_centralizer.mp hcomm
+  -- `Y ≤ U`: `Y` is a `(κ∪σ)'`-group normal in `M`, and `U` is the `(κ∪σ)'`-Hall.
+  have hY_le_U : Y ≤ U := by
+    have hY_pi : Ch03.Subgroup.IsPiGroup ((S14.kappa M ∪ σ)ᶜ) (Y.subgroupOf M) := by
+      intro p hp
+      have hpY : p ∈ (Nat.card ↥Y).primeFactors := by
+        rwa [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hY_le_M).toEquiv] at hp
+      have hpσ : p ∈ σᶜ := OddOrder.GroupTheory.isPiSubgroup_opiCoreInG σᶜ F p hpY
+      have hpτ2 : p ∈ tau2 M :=
+        opiCoreInG_sigmaCompl_fittingInAmbient_primeFactors_subset_tau2 hG hM hpY
+      rw [Set.mem_compl_iff, Set.mem_union]
+      rintro (hpκ | hpσ')
+      · have hr1 : pRank ↥M p = 1 := by
+          rcases S14.kappa_subset_tau1_union_tau3 hpκ with h | h
+          · exact ((mem_tau1_iff M p).mp h).2.2
+          · exact ((mem_tau3_iff M p).mp h).2.2
+        have hr2 : pRank ↥M p = 2 := ((mem_tau2_iff M p).mp hpτ2).2
+        rw [hr1] at hr2; exact absurd hr2 (by norm_num)
+      · exact hpσ hpσ'
+    haveI hYnorm_M : (Y.subgroupOf M).Normal := by
+      rw [hYdef]; exact OddOrder.BG.Ch2.S08.opiCoreInG_fittingInG_subgroupOf_normal σᶜ M
+    have hsub_le : Y.subgroupOf M ≤ U.subgroupOf M :=
+      Ch03.Subgroup.IsPiGroup.normal_le_hall hY_pi hU
+    have hmap := Subgroup.map_mono (f := M.subtype) hsub_le
+    rwa [Subgroup.map_subgroupOf_eq_of_le hY_le_M, Subgroup.map_subgroupOf_eq_of_le hUM] at hmap
+  -- `F(M) = M_F ⊔ Y`.
+  have hF_split : F = maxNilpotentNormalHall M ⊔ Y := by
+    have hsplit : opiCoreInG σ F ⊔ Y = F := by
+      rw [hYdef]; exact opiCoreInG_sup_compl_eq_of_isNilpotent σ
+    rw [← hsplit, hOσMσ, hMFMσ]
+  -- `M_F ≤ F(M)`.
+  have hMF_le_F : maxNilpotentNormalHall M ≤ F := by
+    haveI : Group.IsNilpotent ↥(maxNilpotentNormalHall M) := maxNilpotentNormalHall_isNilpotent M
+    exact le_fittingInAmbient_of_subgroupOf_normal_of_isNilpotent
+      (maxNilpotentNormalHall_le M) (maxNilpotentNormalHall_subgroupOf_normal M)
+  -- `F(M) = M_F ⊔ (U ⊓ C_M(M_F))`.
+  have hFiteq : F = maxNilpotentNormalHall M ⊔
+      (U ⊓ Subgroup.centralizer (maxNilpotentNormalHall M : Set G)) := by
+    apply le_antisymm
+    · rw [hF_split]
+      refine sup_le_sup_left (le_inf hY_le_U ?_) _
+      rw [hMFMσ]; exact hY_le_cent
+    · refine sup_le hMF_le_F ?_
+      have hFcent : F = (Subgroup.centralizer (maxNilpotentNormalHall M : Set G) ⊓ M) ⊔
+          maxNilpotentNormalHall M := by
+        obtain ⟨-, -, -, -, -, h, -, -, -, -, -, -⟩ := fitting_decomposition hG hM
+        exact h
+      rw [hFcent]
+      exact (le_inf inf_le_right (inf_le_left.trans hUM)).trans le_sup_left
+  refine ⟨?_, ?_, hFiteq⟩
+  · -- `hDcompl`: `M_F = M_σ` complements `U` in `M'`.
+    rw [hMFMσ]
+    haveI hMσnorm' : ((Mσ).subgroupOf (derivedInG M)).Normal :=
+      (Subgroup.normal_subgroupOf_iff_le_normalizer hMσ_le_M').mpr
+        (hM'_le_M.trans (OddOrder.GroupTheory.le_normalizer_opiCoreInG σ M))
+    refine Subgroup.isComplement'_of_disjoint_and_mul_eq_univ ?_ ?_
+    · rw [Subgroup.disjoint_def]
+      intro x hxMσ hxU
+      rw [Subgroup.mem_subgroupOf] at hxMσ hxU
+      have hx : (x : G) ∈ U ⊓ Mσ := ⟨hxU, hxMσ⟩
+      rw [hUMσ_bot, Subgroup.mem_bot] at hx
+      exact Subtype.ext hx
+    · rw [← Subgroup.normal_mul, ← Subgroup.subgroupOf_sup hMσ_le_M' hU_le_M',
+        sup_comm, ← hM'eq, Subgroup.subgroupOf_self, Subgroup.coe_top]
+  · -- `hSDfit`: `M'' ≤ F(M) = M_F ⊔ (U ⊓ C_M(M_F))`.
+    have hM''F : secondDerivedInAmbient M ≤ F := by
+      obtain ⟨-, -, -, -, h, -, -, -, -, -, -, -⟩ := fitting_decomposition hG hM
+      exact h
+    exact hM''F.trans (le_of_eq hFiteq)
+
 /-- In a finite cyclic group, a subgroup is determined by its cardinality (every subgroup is the
 kernel of `x ↦ x ^ |A|`, which depends only on `|A|`). -/
 theorem eq_of_card_eq_of_isCyclic {C : Type*} [Group C] [Finite C] [IsCyclic C]

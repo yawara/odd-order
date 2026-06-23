@@ -31,16 +31,34 @@ productive な独立クラスタに乗せ、上流優先方針 (CLAUDE.md) に�
 | レーン | branch | 機能 (frontier クラスタ) | 所有ファイル | 自動合流 |
 |---|---|---|---|---|
 | **F** | `lane-f` | **BG §14-16 構造** | `S14_TypePCounting`/`S15_MF`/`S16_MainResults`/`S16_PairIntersection` + `FeitThompson.lean` の §16 producer。Theorem A-I / Prop 16.1 | ✅ |
-| **B** | `lane-b` | **Pf §12/§13 Dade char-grid** | `S12_MaximalIII_IV_V`/`S13_MaximalIII_IV`。char grids/parameters。**`S10_MinimalSimpleStructure` は driver (BG §16 gated、pure wiring)、常駐作業しない** | ✅ |
-| **H** | `lane-h` | **Pf §14_MaximalI + §15 S&T** | `S14_MaximalI`/`S15_SAndT` (type I + S&T、~11 workable leaf)。**S11 は触らない (C 所有に移譲)** | ✅ |
-| **C** | `lane-c` | **Pf §11 Wielandt §9 / Clifford** | **`S11_MaximalII_III_IV` (Wielandt §9 + 型分類 9.6-9.10, C 単独所有)**。**`S16_NonExistenceG` は driver (上流 landing 時に機会的 close)、常駐作業しない** | ✅ |
+| **B** | `lane-b` | **Pf §12 Dade char-grid + cd assembly** | `S12_MaximalIII_IV_V` + `section16CharacterData` (POLE-1 cd, §3-§13 束ね)。**`S13` を H 移譲 (2026-06-23)、`S10` は driver** | ✅ |
+| **H** | `lane-h` | **Pf §13 char-grid (type III/IV)** | `S13_MaximalIII_IV` (active, 8 sorry) + `S14_MaximalI` (driver, (12.9) は Prop16.1 待ち=自己復帰)。**S15/S11/S12 は触らない** | ✅ |
+| **C** | `lane-c` | **Pf §15 S&T** | **`S15_SAndT` (S&T 構造、36 sorry、2026-06-23 H→C 移譲)**。依存 §15→§14 ゆえ §14 を cite のみ。**`S11`/`S16_NonExistenceG` は driver (上流 landing 時に機会的 close)、常駐しない** | ✅ |
+
+> **⚠ 2026-06-23 relane (ユーザー裁可、issue 4007)**: lane-c の §11 ungated 枯渇 (9.1-9.7 完了) を受け hub が
+> frontier 再監査 → 「負荷は H/F に偏在 (各 51 sorry)、3 が並列限界でない」と判明。**H の 51-sorry 負荷
+> (S14_MaximalI 15 + S15_SAndT 36) を 2 レーンに分割**: **S15_SAndT を H→C 移譲**、H は S14_MaximalI に集中。
+> S15_SAndT は S14_MaximalI を import (依存方向 §15→§14) ゆえ signature-first 境界がクリーン (co-edit なし)。
+> §11 は driver 化 ((9.8)-(9.11) は lane-b char 待ち)。各 LAUNCH.md 更新済。
+
+> **⚠ 2026-06-23 relane #2 (hub 判断、issue 8018+2017、レーン等価方針)**: F と H が同時に ungated 枯渇を報告 →
+> hub が **価値+独立性**で再配置 (レーンに専門/強みは無く等価 [[lanes-are-equivalent-no-specialty]])。
+> **lane-f = hderF deep 投資** (Prop 16.1 hP2II 主 gate、ユーザー裁可)。**lane-h = §13 (S13_MaximalIII_IV) を
+> lane-b→H 移譲** (§13 は §12 下流・lane-b 非編集 ⟹ signature-first 独立、§13→POLE-1 cd で critical path)。
+> lane-h の S14_MaximalI は driver 化 ((12.9) は Prop 16.1 landing で自己復帰 close)。B は §12 + cd assembly に集中。
 
 **signature-first interface**: 上流が sorried signature を export → 下流が cite。真の cross-lane 依存は narrow。
 signature 不足は notes/issue 経由。**driver (§16/§10)**: 常駐レーンを当てず、上流が landing したとき hub or
 担当レーンが続けて opportunistic に close する (pure consumer ゆえ常駐は starve)。
 
+**🔁 lane 自己復帰 (2026-06-23 導入)**: lane が hub 判断待ちで停止したら、自セッションで resume-monitor
+cron を arm し、hub の解決 (LAUNCH.md 変化 or 起票 issue の closed/ 移動) を検知して `git merge main` +
+作業再開する ([`lane_self_resume.md`](lane_self_resume.md))。**hub の合流手順は不変** — lane の自己復帰は
+通常の作業再開ゆえ区別不要。hub は「停止していた lane が自走で戻ることがある」と認識するだけでよい。
+
 **取り決め**: (1) 各レーンは**自所有ファイルのみ編集**、他は cite のみ (要望は notes/issue 経由)。
-**特に S11 は C のみ** (2026-06-22 H→C 移譲)。(2) **新規 `axiom` 宣言は abort+ユーザー承認**。
+**S15_SAndT は C のみ・S14_MaximalI は H のみ** (2026-06-23 relane)、**S11/§16/§10 は driver (常駐なし)**。
+(2) **新規 `axiom` 宣言は abort+ユーザー承認**。
 (3) issue base: **B=1000 / H=2000 / C=4000 / F=7000**。(4) `notes/bg/*`=F、`notes/peterfalvi/*`=B/H/C。
 マージ順 = **F → B → H → C** (独立レーンゆえ順序は形式的)。
 **(5) 起動時 main 同期 = `git merge main` (ユーザー方針 2026-06-22, 全 LAUNCH 統一)**:
@@ -114,9 +132,9 @@ branch とも削除済み。旧 **A** / **D** も同様に退役済み (履歴�
 > | lane | 所有 .lean（これ以外の Pf/BG S-ファイル編集 = 逸脱→停止） |
 > |---|---|
 > | **F** (lane-f) | `OddOrder/BG/**`（BG 全体）+ `OddOrder/FeitThompson.lean` |
-> | **B** (lane-b) | `OddOrder/Peterfalvi/S0[3-9]*` + `S10*` + `S12*` + `S13*`（Pf char API + §12/§13; **S11 除く**） |
-> | **H** (lane-h) | `OddOrder/Peterfalvi/S14_MaximalI*` + `S15*`（type I + S&T） |
-> | **C** (lane-c) | `OddOrder/Peterfalvi/S11*`（Wielandt §9 / Clifford） |
+> | **B** (lane-b) | `OddOrder/Peterfalvi/S0[3-9]*` + `S10*` + `S12*`（Pf char API + §12 + cd assembly; **S11/S13 除く**, 2026-06-23 S13 を H 移譲） |
+> | **H** (lane-h) | `OddOrder/Peterfalvi/S13*` (active) + `S14_MaximalI*` (driver)（type III/IV char-grid + type I driver; 2026-06-23 S13 受領, S15 を C 移譲） |
+> | **C** (lane-c) | `OddOrder/Peterfalvi/S15*`（S&T = S15_SAndT; 2026-06-23 H→C 移譲。S11 は driver で非所有） |
 > | **共有（全 lane 可）** | `OddOrder/AxiomsCheck.lean` / `OddOrder.lean` / `OddOrder/GroupTheory/**` / `notes/**` / `issues/**` |
 
 1. 各レーンの未マージ確認: `git log --oneline main..<branch>`。
@@ -130,7 +148,7 @@ branch とも削除済み。旧 **A** / **D** も同様に退役済み (履歴�
    **マージせず（trial merge も開始しない）**、⛔ に従いループ停止（abort 不要 = まだ merge していない、
    `CronDelete` + 報告 + 以降の tick を行わない）。報告には逸脱ファイル名 + lane + 所有者を明記。例 (lane=$b):
    ```
-   owned_re='…'   # 🔒 マップから (F=^OddOrder/BG/|^OddOrder/FeitThompson; B=^OddOrder/Peterfalvi/S(0[3-9]|10|12|13); H=^OddOrder/Peterfalvi/S(14_MaximalI|15); C=^OddOrder/Peterfalvi/S11)
+   owned_re='…'   # 🔒 マップから (F=^OddOrder/BG/|^OddOrder/FeitThompson; B=^OddOrder/Peterfalvi/S(0[3-9]|10|12); H=^OddOrder/Peterfalvi/S(13|14_MaximalI); C=^OddOrder/Peterfalvi/S15)
    shared_re='^OddOrder/AxiomsCheck\.lean$|^OddOrder\.lean$|^OddOrder/GroupTheory/'
    git diff --name-only main...$b -- '*.lean' | grep -vE "$owned_re" | grep -vE "$shared_re" | grep . && echo "範囲逸脱 → STOP"
    ```
@@ -275,7 +293,8 @@ branch とも削除済み。旧 **A** / **D** も同様に退役済み (履歴�
   - HUB 宛 issue: `4002-hub-feedback-lane-allocation` は既出 (lane-c starve diagnosis) で issue 4005 relane が substantive response 済 ⟹ 新規 ask なし。
 - **📌 レーン範囲逸脱 = ループ停止ルール追加 (ユーザー方針 2026-06-22, 永続)**: 各レーンが**自所有外の Pf/BG S-ファイルを編集**したら ⛔ stop-on-problem に従いループ停止 (CronDelete + 報告 + 待機)。検出 = step 1.5 (マージ前に **3-dot** `git diff --name-only main...<branch>` を 🔒 所有マップに照合; 2-dot は遅れ分を誤検出)。共有ファイル (AxiomsCheck.lean 追記 / OddOrder.lean import / GroupTheory/** / notes / issues) は逸脱でない。cron prompt にも内蔵。
 - **📌 lane-c を §11 に再配置 (frontier-cluster relane, ユーザー裁可 2026-06-22, issue 4005)**: §16 監査で「starve は lane-c (§16 終点 consumer) のみ、lane-h 領域に ~16 独立 leaf」と判明 → lane-c を §16 から **Pf §11 (S11_MaximalII_III_IV, Wielandt §9 / Clifford 9.6-9.10)** へ。**S11 を H→C 移譲**、H は §14_MaximalI+§15 に集中、§16/§10 は driver 化 (常駐させず上流 landing 時に機会的 close)。レーン表・取り決め更新済。各レーン LAUNCH.md も更新 (git-excluded)。次 tick 以降この割当で運用。
-- **📌 標準監視ペース = 25 分（恒久、ユーザー指示 2026-06-22）**: cron 式 **`4,29,54 * * * *`**（:04/:29/:54、:00・:30 を回避）を**標準合流ペースとして恒久化**。ユーザーが各レーンを稼働 → 本ペースで監視・自動合流する。⚠ **cron 自体は本環境で session-scoped**（`durable: true` を渡しても runtime は session-only と報告; [[cron-dies-on-model-switch]]）→ **ペースの正本はこの行**。新セッション開始時・`/model` 切替後は `CronList` 確認の上、消えていれば同式・同 prompt で**即再作成**する（prompt は「各イテレーションの手順」を要約したもの、本ファイルが authority）。7 日 auto-expire 後も同様に再作成。
+- **📌 標準監視ペース = 20 分（恒久、ユーザー指示 2026-06-23 で 25→20 分に更新）**: cron 式 **`7,27,47 * * * *`**（:07/:27/:47、:00・:30 を回避）を**標準合流ペースとして恒久化**。ユーザーが各レーンを稼働 → 本ペースで監視・自動合流する。⚠ **cron 自体は本環境で session-scoped**（`durable: true` を渡しても runtime は session-only と報告; [[cron-dies-on-model-switch]]）→ **ペースの正本はこの行**。新セッション開始時・`/model` 切替後は `CronList` 確認の上、消えていれば同式・同 prompt で**即再作成**する（prompt は「各イテレーションの手順」を要約したもの、本ファイルが authority）。7 日 auto-expire 後も同様に再作成。
+  - **lane 自己復帰 timer = だいたい 5 分（恒久、ユーザー指示 2026-06-23）**: lane が hub に判断を移譲して停止したときの resume-monitor cron は **5 分間隔** (`2-59/5 * * * *` = :02/:07/…/:57、:00・:30 回避)。hub の解決を素早く拾って自動再開する。正本 = [`lane_self_resume.md`](lane_self_resume.md)。
 - **2026-06-22 (続³) — 問題時ループ停止ルール化 + cron `24df1fb4` 再作成**: ユーザー「問題が起きたらループ止めて・永続化」→「各イテレーションの手順」冒頭に ⛔ banner 追加（commit `13ed2a87`）+ cron prompt に内蔵。旧 `b9df9002` を CronDelete → 新 cron **`24df1fb4`**（同式・stop-on-problem prompt 入り）。
 - **2026-06-22 (続²) — tick: lane-b/c 合流**: lane-b (1, merge `c6c7de1b`): s05 norm-2 σ-coeff bounds (Pf (10.5) endgame) + §6 DRY。lane-c (2, merge `15c014f6`): s16 (14.6) caseB_for_S + (14.11) K_eq_V index-pq half close。**実 sorry 131→129**, build 3881 green / AxiomsCheck OK / 新規 axiom 0, push 済 (`13ed2a87`)。⚠ サイズ flag: S16_NonExistenceG 3394 行（issue 0072 既起票）。
 - **2026-06-22 (続) — 25 分 cron 再作成**: 新 cron `b9df9002`（→ 続³ で `24df1fb4` に置換）。当初 4 レーンは全合流済み・worktree main ff 同期、実 sorry 131。
