@@ -2436,7 +2436,6 @@ structure CharacterParameters {M : Subgroup G} (hyp : Hypothesis M) where
   /-- (10.5), support half: for `0 < j < w₂`, `α_{ij}` is supported on `A_0(M)`.  De-opaqued (and
   dade0-free) — materialized in the producer from `Hypothesis.muGrid_alpha_support`. -/
   alpha_support : ∀ (i : Fin hyp.w1) (j : Fin hyp.w2), j ≠ 0 → (alpha i j).support ⊆ hyp.A0
-  orthogonality_w1_lt_w2 : Prop
   typeV_parameter_formula : Prop
   typeV_coherence_formula : Prop
 
@@ -2686,7 +2685,6 @@ theorem Hypothesis.exists_charParameters [Finite G] (hG : OddOrder.BG.IsMinimalS
            alpha_support := fun i j hj =>
              hyp.muGrid_alpha_support hG hodd hj hζS (hdi i j hj)
                (hyp.muGrid_zero_column_apply_one hG hodd i) hζdeg hnf (hδindep j hj)
-           orthogonality_w1_lt_w2 := True
            typeV_parameter_formula := True
            typeV_coherence_formula := True },
     ⟨hζS, hζirr, hζdeg⟩, hd1, hdi,
@@ -5457,13 +5455,296 @@ theorem S_not_coherent [Finite G] [Fintype G]
 
 /-! ## (10.9)--(10.11): the Type V elimination and the case-B remark -/
 
-/-- **Peterfalvi (10.9)**: when `w_1 < w_2`, the residual character in
-`(mu_0 - zeta)^tau` is orthogonal to `(Irr W)^sigma`. -/
+open scoped FiniteInduce in
+/-- **§10 column-`0` row-`0` is the trivial character** (the `μ_{00} = 1_M` anchor, Peterfalvi
+(4.3.a)/(4.5)): the `(0,0)` entry of the materialized `μ`-grid is the trivial class function of `M`.
+This is the §6 certain-type anchor `certainType_zero_column_anchor.2` read through the `muGrid`
+definition (same reconstruction as `muGrid_zero_column_apply_one`). -/
+theorem Hypothesis.muGrid_zero_zero_eq_trivial [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} (hyp : Hypothesis M)
+    (hodd : Odd (Nat.card G)) :
+    hyp.muGrid hG hodd 0 0 = trivialClassFunction (↥M) := by
+  haveI := hyp.finiteG
+  classical
+  let h := (hyp.toCertainTypeHypothesis hG hodd).toHypothesis
+  haveI hNeZ1 : NeZero (Nat.card h.W1) := ⟨by have := h.one_lt_card_W1; omega⟩
+  haveI hcyc : IsCyclic ↥(h.W1 ⊔ h.W2) := h.isCyclic_sup
+  letI : CommGroup ↥(h.W1 ⊔ h.W2) := IsCyclic.commGroup
+  have hW1le : hyp.typeP.W1 ≤ M := hyp.typeP.W1_le
+  have hW2le : hyp.typeP.W2 ≤ M := typePData_W2_le_self hyp.typeP
+  have hcardW1 : Nat.card ↥h.W1 = hyp.w1 :=
+    Nat.card_congr (Subgroup.subgroupOfEquivOfLe hW1le).toEquiv
+  have hcardW2sub : Nat.card ↥(h.W2.subgroupOf (h.W1 ⊔ h.W2)) = hyp.w2 := by
+    rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe (le_sup_right)).toEquiv]
+    exact Nat.card_congr (Subgroup.subgroupOfEquivOfLe hW2le).toEquiv
+  haveI hNeZ2 : NeZero (Nat.card ↥(h.W2.subgroupOf (h.W1 ⊔ h.W2))) := ⟨Nat.card_pos.ne'⟩
+  have hdual0 : finCardEquivCharacterGroup (h.W2.subgroupOf (h.W1 ⊔ h.W2))
+      (finCongr hcardW2sub.symm (0 : Fin hyp.w2)) = 1 := by
+    rw [show finCongr hcardW2sub.symm (0 : Fin hyp.w2) = 0 from by apply Fin.ext; simp,
+      finCardEquivCharacterGroup_zero]
+  have hrow0 : (finCongr hcardW1.symm (0 : Fin hyp.w1)) = 0 := by apply Fin.ext; simp
+  have e00 : hyp.muGrid hG hodd 0 0
+      = ((h.columnFamily (finCardEquivCharacterGroup _ (finCongr hcardW2sub.symm (0 : Fin hyp.w2)))).mu
+          (finCongr hcardW1.symm 0) : ClassFunction ↥M ℂ) := by
+    unfold Hypothesis.muGrid; rfl
+  rw [e00, hdual0, hrow0, h.certainType_zero_column_anchor.2]
+
+open scoped FiniteInduce in
+/-- **§10 `⟨μ_0, 1_M⟩ = 1`** (Peterfalvi (10.9), the `a_{00}` constant term, M-side): the column-`0`
+sum `μ_0 = ∑_i μ_{i0}` has principal multiplicity `1`, since `μ_{00} = 1_M` (anchor,
+`muGrid_zero_zero_eq_trivial`) contributes `1` and the remaining `μ_{i0}` (`i ≠ 0`) are orthogonal to
+`μ_{00}` (column-`0` orthonormality, `muGrid_inner_within_column`). -/
+theorem Hypothesis.muColumnZero_inner_trivial [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} [Invertible (Nat.card ↥M : ℂ)]
+    (hyp : Hypothesis M) (hodd : Odd (Nat.card G)) :
+    ClassFunction.inner (∑ i : Fin hyp.w1, hyp.muGrid hG hodd i 0)
+        (trivialClassFunction (↥M)) = 1 := by
+  haveI := hyp.finiteG
+  classical
+  haveI : NeZero hyp.w1 := ⟨by
+    have h3 : (3 : ℕ) ≤ hyp.w1 := (typePData_toTICyclicHypothesis hyp.typeP hodd).three_le_card_W1
+    omega⟩
+  rw [← hyp.muGrid_zero_zero_eq_trivial hG hodd, inner_sum_left]
+  rw [Finset.sum_eq_single (0 : Fin hyp.w1)]
+  · exact hyp.muGrid_inner_self hG hodd 0 0
+  · intro i _ hi
+    exact hyp.muGrid_inner_within_column hG hodd 0 hi
+  · intro h; exact absurd (Finset.mem_univ _) h
+
+open scoped FiniteInduce in
+/-- **Peterfalvi (10.9)**: when `w_1 < w_2`, the residual character `χ = ζ^{τ₁}` of the
+`(10.9)` decomposition `(μ_0 − ζ)^τ = ∑_i ω_{i0}^σ − χ` is orthogonal to the aligned `σ`-grid
+`(Irr W)^σ`, and `‖χ‖² = 1`.
+
+This is the keystone of the Type-V elimination (10.10): the column-`0` decomposition
+`τ(μ_0 − ζ) = ∑_i ω_{i0}^σ − ζ^{τ₁}` (STEP 1, `tau_muColumnZero_sub_zeta_eq`) determines the residual
+`ζ^{τ₁}`; the (3.8) trichotomy (`sigmaCoeff_trichotomy`) on `ψ = τ(μ_0 − ζ)` (which vanishes on `V`,
+has `NC(ψ) ≤ w₁ + 1 < 2w₁`, and the odd-order gap `w₁ + 2 ≤ w₂`) forces the `σ`-coefficient grid of
+`ψ` to be the *single constant column* `j = 0` with value `1` (the principal column, anchored by
+`a_{00} = ⟨ψ, 1_G⟩ = ⟨μ_0 − ζ, 1_M⟩ = 1` via the (2.7) adjoint `tau_inner_trivial`).  The single-row
+branch is excluded by `‖ζ^{τ₁}‖² = 1` (a `−1` row coefficient would force `‖ζ^{τ₁}‖² ≥ w₂ − 1 > 1`),
+and the all-zero branch by `a_{00} = 1 ≠ 0`.  In the surviving column branch
+`⟨ζ^{τ₁}, ω_{ij}^σ⟩ = (if j = 0 then 1 else 0) − a(ρ i, κ j) = 0`. -/
 theorem orthogonality_of_w1_lt_w2 [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
-    {M : Subgroup G} {hyp : Hypothesis M} (params : CharacterParameters hyp)
+    {M : Subgroup G} {hyp : Hypothesis M} {params : CharacterParameters hyp}
+    (coh : CoherentHypothesis hyp params)
+    (hmu : params.mu = hyp.muGrid hG hG.odd)
+    (hos : params.omegaSigma = hyp.alignedOmegaSigmaGrid hG hG.odd)
+    (hzS : params.zeta ∈ inducedFamily M) (hz1 : params.zeta 1 = (hyp.w1 : ℂ))
+    (hzconj : params.zeta.conj ≠ params.zeta)
+    (hδpm : params.delta = 1 ∨ params.delta = -1)
+    (hδj : ∀ j : Fin hyp.w2, j ≠ 0 → hyp.muColumnSign hG hG.odd j = params.delta)
     (hw : hyp.w1 < hyp.w2) :
-    params.orthogonality_w1_lt_w2 := by
-  sorry
+    (∀ (i : Fin hyp.w1) (j : Fin hyp.w2),
+        ClassFunction.inner (coh.tau1 params.zeta) (hyp.alignedOmegaSigmaGrid hG hG.odd i j) = 0)
+      ∧ ClassFunction.inner (coh.tau1 params.zeta) (coh.tau1 params.zeta) = 1 := by
+  haveI := hyp.finiteG
+  classical
+  have hodd : Odd (Nat.card G) := hG.odd
+  -- the §5 `G`-level TI-cyclic hypothesis + Dade application (the ready (10.5) `σ` pattern).
+  let tic := typePData_toTICyclicHypothesis hyp.typeP hodd
+  haveI : NeZero (Nat.card ↥tic.W1) := ⟨Nat.card_pos.ne'⟩
+  haveI : NeZero (Nat.card ↥tic.W2) := ⟨Nat.card_pos.ne'⟩
+  haveI : Fintype ((tic.W1.subgroupOf tic.W) →* ℂˣ) := Fintype.ofFinite _
+  haveI : Fintype ((tic.W2.subgroupOf tic.W) →* ℂˣ) := Fintype.ofFinite _
+  let app : OddOrder.Peterfalvi.S05.TICyclicHypothesis.FullDadeApplication tic :=
+    hyp.canonicalFullDadeApp hG hodd
+  have hVeq : tic.V = tic.Vdiff := rfl
+  have hcardW1 : Nat.card ↥tic.W1 = hyp.w1 := rfl
+  have hcardW2 : Nat.card ↥tic.W2 = hyp.w2 := rfl
+  -- the product structure `ω_{ij}^σ = chiFam(ρ i, κ j)`.
+  obtain ⟨ρ, κ, hρinj, hκinj, hprod⟩ := hyp.exists_alignedOmegaSigmaGrid_chiFam_product hG hodd
+  -- abbreviation: the `(μ_0 − ζ)^τ` virtual character `ψ`.
+  set ψ : ClassFunction G ℂ :=
+    hyp.tau ((∑ i : Fin hyp.w1, hyp.muGrid hG hodd i 0) - params.zeta) with hψ
+  -- STEP 1: `ψ = ∑_{i'} ω_{i'0}^σ − ζ^{τ₁}`.
+  have hstep1 : ψ = (∑ i : Fin hyp.w1, hyp.alignedOmegaSigmaGrid hG hodd i 0)
+      - coh.tau1 params.zeta := by
+    rw [hψ]; exact hyp.tau_muColumnZero_sub_zeta_eq hG coh hmu hos hzS hz1 hzconj hδpm hδj
+  -- `‖ζ^{τ₁}‖² = 1` (the second conjunct, used in both the row exclusion and the output).
+  have hnorm1 : ClassFunction.inner (coh.tau1 params.zeta) (coh.tau1 params.zeta) = 1 :=
+    hyp.zeta_tau1_inner_self hG hodd coh hzS params.zeta_irreducible
+  -- `ζ^{τ₁} ∈ ZIrr G`, norm `1`.
+  have hzZ : coh.tau1 params.zeta ∈ ZIrr G :=
+    coh.coherent.extension_mem_ZIrr params.zeta (Submodule.subset_span hzS)
+  -- the σ-coefficient of `ψ` at the *product* index `(ρ i, κ j)` equals `⟨ψ, ω_{ij}^σ⟩`.
+  have hcoeff_prod : ∀ i j, tic.sigmaCoeff hVeq app ψ (ρ i, κ j)
+      = ClassFunction.inner ψ (hyp.alignedOmegaSigmaGrid hG hodd i j) := by
+    intro i j
+    change ClassFunction.inner ψ (tic.chiFam hVeq app (ρ i, κ j))
+      = ClassFunction.inner ψ (hyp.alignedOmegaSigmaGrid hG hodd i j)
+    rw [hprod i j]
+  -- the value of `⟨ψ, ω_{ij}^σ⟩` via STEP 1 and σ-grid orthonormality.
+  have hpsiOmega : ∀ i j, ClassFunction.inner ψ (hyp.alignedOmegaSigmaGrid hG hodd i j)
+      = (if j = 0 then (1 : ℂ) else 0)
+        - ClassFunction.inner (coh.tau1 params.zeta) (hyp.alignedOmegaSigmaGrid hG hodd i j) := by
+    intro i j
+    rw [hstep1, ClassFunction.inner_sub_left, inner_sum_left]
+    congr 1
+    rw [Finset.sum_eq_single i]
+    · rw [hyp.alignedOmegaSigmaGrid_inner hG hodd i i 0 j]
+      by_cases hj : j = 0
+      · rw [if_pos ⟨rfl, hj.symm⟩, if_pos hj]
+      · rw [if_neg (fun hh => hj hh.2.symm), if_neg hj]
+    · intro i' _ hi'
+      rw [hyp.alignedOmegaSigmaGrid_inner hG hodd i' i 0 j, if_neg (fun hh => hi' hh.1)]
+    · intro h; exact absurd (Finset.mem_univ _) h
+  -- `a_{00} = 1`: `⟨ψ, ω_{00}^σ⟩ = ⟨ψ, 1_G⟩ = ⟨μ_0 − ζ, 1_M⟩ = 1`.
+  have hsupp : ((∑ i : Fin hyp.w1, hyp.muGrid hG hodd i 0) - params.zeta).support ⊆ hyp.A0 :=
+    hyp.muColumnZero_sub_zeta_support hG hodd hzS hz1
+  have hzeta_triv : ClassFunction.inner params.zeta (trivialClassFunction (↥M)) = 0 := by
+    have hzmem : params.zeta ∈ irreducibleCharacters (↥M) :=
+      mem_irreducibleCharacters.mpr params.zeta_irreducible
+    have htmem : trivialClassFunction (↥M) ∈ irreducibleCharacters (↥M) :=
+      mem_irreducibleCharacters.mpr trivialClassFunction_isIrreducible
+    rw [irr_cf_inner hzmem htmem, if_neg ?_]
+    intro hcontra
+    have h1 : params.zeta 1 = trivialClassFunction (↥M) 1 :=
+      congrArg (fun f : ClassFunction (↥M) ℂ => (f : (↥M) → ℂ) 1) hcontra
+    rw [hz1, trivialClassFunction_apply] at h1
+    have h3 : (3 : ℕ) ≤ hyp.w1 := hcardW1 ▸ tic.three_le_card_W1
+    have : (hyp.w1 : ℕ) = 1 := by exact_mod_cast h1
+    omega
+  have ha00 : ClassFunction.inner ψ (hyp.alignedOmegaSigmaGrid hG hodd 0 0) = 1 := by
+    rw [hyp.alignedOmegaSigmaGrid_zero_zero hG hodd, hψ, hyp.tau_inner_trivial hsupp,
+      ClassFunction.inner_sub_left, hyp.muColumnZero_inner_trivial hG hodd, hzeta_triv, sub_zero]
+  -- the σ-coefficient at the *product* `(ρ 0, κ 0)` is `1`.
+  have ha00coeff : tic.sigmaCoeff hVeq app ψ (ρ 0, κ 0) = 1 := by
+    rw [hcoeff_prod 0 0, ha00]
+  -- `ψ` vanishes on `V` (it is `A_0(M)`-supported, and the Dade isometry vanishes off the
+  -- `M`-conjugates of `A_0(M)`, which `V` avoids; more directly via `tau_apply_of_mem_typePV`).
+  have hpsiV : ∀ v ∈ tic.V, ψ v = 0 := by
+    intro v hv
+    have hvM : v ∈ M := typePData_W_le_self hyp.typeP (SetLike.mem_coe.mp hv.1)
+    rw [hψ, hyp.tau_apply_of_mem_typePV hsupp hv hvM]
+    -- `μ_0 − ζ` vanishes at `v ∈ V` (both `μ_0` and `ζ` are induced from the normal `M'`, `v ∉ M'`).
+    have hKcomm : (derivedInG M).subgroupOf M = commutator ↥M := by
+      rw [derivedInG, Subgroup.subgroupOf,
+        Subgroup.comap_map_eq_self_of_injective M.subtype_injective]
+    haveI hKnormal : ((derivedInG M).subgroupOf M).Normal := by rw [hKcomm]; infer_instance
+    have hnotmem : (⟨v, hvM⟩ : ↥M) ∉ (derivedInG M).subgroupOf M := by
+      rw [Subgroup.mem_subgroupOf]; exact typePData_typePV_not_mem_derived hyp.typeP hv
+    obtain ⟨θ, _hθne, hζeq⟩ := hzS
+    have hζv : params.zeta ⟨v, hvM⟩ = 0 := by
+      rw [hζeq]; exact ClassFunction.induce_eq_zero_of_not_mem_normal _ hnotmem
+    have hμv : (∑ i : Fin hyp.w1, hyp.muGrid hG hodd i 0) ⟨v, hvM⟩ = 0 :=
+      hyp.muGrid_column_sum_vanishes_off_derived hG hodd 0 hnotmem
+    rw [ClassFunction.sub_apply, hμv, hζv, sub_zero]
+  -- `NC(ψ) ≤ w₁ + 1 < 2·w₁`: the `σ`-coefficient support sits in
+  -- `{(ρ i, κ 0) | i} ∪ {pq | ⟨ζ^{τ₁}, χ_pq⟩ ≠ 0}`, of cardinalities `≤ w₁` and `≤ 1`.
+  have hNC : tic.sigmaNC hVeq app ψ < 2 * Nat.card ↥tic.W1 := by
+    have h3 : (3 : ℕ) ≤ hyp.w1 := hcardW1 ▸ tic.three_le_card_W1
+    -- the two covering sets: the column-`0` product indices, and the `ζ^{τ₁}` support.
+    set S0 : Set _ := Set.range (fun i : Fin hyp.w1 => (ρ i, κ 0)) with hS0
+    set Sz : Set _ :=
+      {pq | ClassFunction.inner (coh.tau1 params.zeta) (tic.chiFam hVeq app pq) ≠ 0} with hSz
+    have hsub : {pq | tic.sigmaCoeff hVeq app ψ pq ≠ 0} ⊆ S0 ∪ Sz := by
+      intro pq hpq
+      by_contra hcon
+      simp only [hS0, hSz, Set.mem_union, Set.mem_range, Set.mem_setOf_eq, not_or, not_not,
+        not_exists] at hcon
+      apply hpq
+      -- `⟨ψ, χ_pq⟩ = ∑_{i'} ⟨ω_{i'0}^σ, χ_pq⟩ − ⟨ζ^{τ₁}, χ_pq⟩`; the second term is `0` (hcon.2),
+      -- and `⟨ω_{i'0}^σ, χ_pq⟩ = ⟨χ_{(ρ i', κ 0)}, χ_pq⟩ = 0` since `pq ≠ (ρ i', κ 0)` (hcon.1).
+      show ClassFunction.inner ψ (tic.chiFam hVeq app pq) = 0
+      rw [hstep1, ClassFunction.inner_sub_left, hcon.2, sub_zero, inner_sum_left]
+      refine Finset.sum_eq_zero (fun i' _ => ?_)
+      rw [hprod i' 0,
+        show ClassFunction.inner (tic.chiFam hVeq app (ρ i', κ 0)) (tic.chiFam hVeq app pq)
+          = if (ρ i', κ 0) = pq then (1 : ℂ) else 0 from (tic.chiFam_spec hVeq app).2.2.1 _ _,
+        if_neg (fun he => hcon.1 i' he)]
+    have hS0card : S0.ncard ≤ hyp.w1 := by
+      rw [hS0, show (Set.range (fun i : Fin hyp.w1 => (ρ i, κ 0)))
+          = (fun i : Fin hyp.w1 => (ρ i, κ 0)) '' Set.univ from by rw [Set.image_univ]]
+      refine le_trans (Set.ncard_image_le (Set.finite_univ)) ?_
+      rw [Set.ncard_univ, Nat.card_eq_fintype_card, Fintype.card_fin]
+    have hSzcard : Sz.ncard ≤ 1 := tic.ncard_inner_chiFam_ne_zero_le_one hVeq app hzZ hnorm1
+    have hbound : tic.sigmaNC hVeq app ψ ≤ hyp.w1 + 1 := by
+      calc tic.sigmaNC hVeq app ψ
+          = {pq | tic.sigmaCoeff hVeq app ψ pq ≠ 0}.ncard := rfl
+        _ ≤ (S0 ∪ Sz).ncard := Set.ncard_le_ncard hsub (Set.toFinite _)
+        _ ≤ S0.ncard + Sz.ncard := Set.ncard_union_le _ _
+        _ ≤ hyp.w1 + 1 := by gcongr
+    rw [hcardW1]; omega
+  -- the odd-order gap `w₁ + 2 ≤ w₂`.
+  have hgap : Nat.card ↥tic.W1 + 2 ≤ Nat.card ↥tic.W2 := by
+    have hodd1 : Odd (Nat.card ↥tic.W1) :=
+      tic.W_card_odd.of_dvd_nat (Subgroup.card_dvd_of_le tic.W1_le_W)
+    have hodd2 : Odd (Nat.card ↥tic.W2) :=
+      tic.W_card_odd.of_dvd_nat (Subgroup.card_dvd_of_le tic.W2_le_W)
+    have hlt : Nat.card ↥tic.W1 < Nat.card ↥tic.W2 := by rw [hcardW1, hcardW2]; exact hw
+    obtain ⟨a, ha⟩ := hodd1
+    obtain ⟨b, hb⟩ := hodd2
+    omega
+  -- apply the (3.8) trichotomy to `ψ`.
+  rcases tic.sigmaCoeff_trichotomy hVeq app hpsiV hgap hNC with
+    hall | ⟨j₀, c, hc, hcol, hrest⟩ | ⟨i₀, c, hc, hrow, hrest⟩
+  · -- all-zero branch: contradicts `a_{00} = 1`.
+    exact absurd (ha00coeff.symm.trans (hall (ρ 0, κ 0))) one_ne_zero
+  · -- single-column branch: this is the desired conclusion.
+    -- `a_{00} ≠ 0` forces `κ 0 = j₀` and `c = 1`.
+    have hκ0 : κ 0 = j₀ := by
+      by_contra hne
+      exact absurd (ha00coeff.symm.trans (hrest (ρ 0) (κ 0) hne)) one_ne_zero
+    have hc1 : c = 1 := by
+      rw [hκ0] at ha00coeff; rw [hcol (ρ 0)] at ha00coeff; exact ha00coeff
+    refine ⟨fun i j => ?_, hnorm1⟩
+    -- `a(ρ i, κ j) = if κ j = j₀ then c else 0 = if j = 0 then 1 else 0`.
+    have hval : tic.sigmaCoeff hVeq app ψ (ρ i, κ j) = (if j = 0 then (1 : ℂ) else 0) := by
+      by_cases hj : j = 0
+      · subst hj; rw [hκ0, hcol (ρ i), hc1, if_pos rfl]
+      · rw [hrest (ρ i) (κ j) (fun he => hj (hκinj (he.trans hκ0.symm))), if_neg hj]
+    -- combine with `⟨ψ, ω_{ij}^σ⟩ = (if j=0 then 1 else 0) − ⟨ζ^{τ₁}, ω_{ij}^σ⟩`.
+    have h2 := hcoeff_prod i j
+    rw [hval, hpsiOmega i j] at h2
+    -- `(if j=0 then 1 else 0) = (if j=0 then 1 else 0) − ⟨ζ^{τ₁}, ω_{ij}^σ⟩` ⟹ `⟨…⟩ = 0`.
+    linear_combination h2
+  · -- single-row branch: excluded by `‖ζ^{τ₁}‖² = 1`.
+    -- `a_{00} ≠ 0` forces `ρ 0 = i₀` and `c = 1`, so `a(ρ 0, κ j) = 1` for all `j`;
+    -- hence `⟨ζ^{τ₁}, ω_{0j}^σ⟩ = -1 ≠ 0` for every `j ≠ 0`.  But `ζ^{τ₁}` is a norm-`1`
+    -- virtual character with at most ONE nonzero inner product against the orthonormal
+    -- `χ`-family (`ncard_inner_chiFam_ne_zero_le_one`), while `w₂ ≥ 3` supplies two distinct
+    -- such indices `(ρ 0, κ 1), (ρ 0, κ 2)` — contradiction.
+    exfalso
+    have hi0 : ρ 0 = i₀ := by
+      by_contra hne
+      exact absurd (ha00coeff.symm.trans (hrest (ρ 0) (κ 0) hne)) one_ne_zero
+    have hc1 : c = 1 := by rw [hi0] at ha00coeff; rw [hrow (κ 0)] at ha00coeff; exact ha00coeff
+    -- two distinct nonzero columns, from `w₂ ≥ 3`.
+    have h3w2 : (3 : ℕ) ≤ hyp.w2 := hcardW2 ▸ tic.three_le_card_W2
+    let j1 : Fin hyp.w2 := ⟨1, by omega⟩
+    let j2 : Fin hyp.w2 := ⟨2, by omega⟩
+    have hj1 : j1 ≠ 0 := Fin.ne_of_val_ne (by simp [j1])
+    have hj2 : j2 ≠ 0 := Fin.ne_of_val_ne (by simp [j2])
+    -- for any `j ≠ 0`: `⟨ζ^{τ₁}, χ_{(ρ 0, κ j)}⟩ = -1` (from `a(ρ 0, κ j) = 1`).
+    have hrowval : ∀ j : Fin hyp.w2, j ≠ 0 →
+        ClassFunction.inner (coh.tau1 params.zeta) (tic.chiFam hVeq app (ρ 0, κ j)) = -1 := by
+      intro j hj
+      have hacoeff : tic.sigmaCoeff hVeq app ψ (ρ 0, κ j) = 1 := by
+        rw [hi0, hrow (κ j), hc1]
+      have h2 := hcoeff_prod 0 j
+      rw [hacoeff, hpsiOmega 0 j, if_neg hj] at h2
+      -- `1 = -⟨ζ^{τ₁}, ω_{0j}^σ⟩`, and `ω_{0j}^σ = χ_{(ρ 0, κ j)}`.
+      have h3 : ClassFunction.inner (coh.tau1 params.zeta)
+          (hyp.alignedOmegaSigmaGrid hG hodd 0 j) = -1 := by linear_combination h2
+      rw [← hprod 0 j]; exact h3
+    have hP1 : (ρ 0, κ j1) ∈
+        {pq | ClassFunction.inner (coh.tau1 params.zeta) (tic.chiFam hVeq app pq) ≠ 0} := by
+      change ClassFunction.inner (coh.tau1 params.zeta) (tic.chiFam hVeq app (ρ 0, κ j1)) ≠ 0
+      rw [hrowval j1 hj1]; norm_num
+    have hP2 : (ρ 0, κ j2) ∈
+        {pq | ClassFunction.inner (coh.tau1 params.zeta) (tic.chiFam hVeq app pq) ≠ 0} := by
+      change ClassFunction.inner (coh.tau1 params.zeta) (tic.chiFam hVeq app (ρ 0, κ j2)) ≠ 0
+      rw [hrowval j2 hj2]; norm_num
+    -- the two indices are distinct (`κ` injective, `1 ≠ 2`).
+    have hPne : (ρ 0, κ j1) ≠ (ρ 0, κ j2) := by
+      intro he
+      have hκe : κ j1 = κ j2 := (Prod.ext_iff.mp he).2
+      have hjeq : j1 = j2 := hκinj hκe
+      exact absurd hjeq (by simp [j1, j2, Fin.ext_iff])
+    -- but the nonzero-coefficient set has `ncard ≤ 1` — contradiction.
+    have hle1 := tic.ncard_inner_chiFam_ne_zero_le_one hVeq app hzZ hnorm1
+    exact hPne ((Set.ncard_le_one_iff (Set.toFinite _)).mp hle1 hP1 hP2)
 
 /-- **Peterfalvi (10.10.1)--(10.10.4)**: if Hypothesis (10.1) holds with `M`
 of type V, then the Type V parameter calculation forces `S` to be coherent. -/
