@@ -72,10 +72,61 @@ theorem coherent_of_constant_degree
 orthogonality)。これは §13/§4 Dade machinery で、(5.7) producer とは別の consumer-side 仕事。(5.7) landing
 後に S13 側で組む (lane-c 自所有)。等次数は M'/M'' abelian から (S(M'') の characters が linear lift)。
 
+## 6. 実装 deep-dive (本セッション続行で engine 経路を確定)
+
+retarget engine を精読し、(5.7) 実装の正確な経路と労力を確定:
+
+**🔑 engine は完全 inductive、repo に base case 無し**:
+- `retarget_isCoherent` (core, S07:3262) / `retarget_isCoherent_of_decomposition` (:3737) /
+  `_of_decompositions` (:3911) / `_and_memberFamily` (:3979) は**全て `hS₁ : IsCoherent τ S₁ A` を要求** =
+  「coherent な S₁ に共役ペア `{χ,χ̄}` を 1 つ足す」inductive step。
+- ∴ (5.7) 実装は **(I) base case (single-pair coherence を scratch から) + (II) induction wrapper +
+  (III) per-step hypothesis discharge** の 3 部。repo は (II)(III) の step engine は持つが (I) base case と
+  full-induction wrapper は**無い** (lane-h の (6.2)/(6.3) と同様、producer が新規に組む)。
+
+**🔑 等次数の役割 = `a=1`**: engine の `Da : CharacterPsiDecomposition τ χ (a • chi1)` の `a` は次数比
+`χ(1)/χ₁(1)`。**等次数 ⟹ a=1** ⟹ `χ - a•χ₁ = χ - χ₁`、`hY : Da.Y = a•Da.tau1 χ₁` が `Y = χ₁^{τ₁}` に
+簡約。これが Pf (5.7) が等次数を使う箇所 (open question 解決)。member は irreducible (`‖χ‖²=1`、engine の
+`hχχ : inner χ χ = 1`) を要し、consumer の `S ⊆ Irr L` ((5.3.a)) が供給する ⟹ signature に
+`hirr : ∀ χ ∈ S, inner χ χ = 1` (or `S ⊆ Irr L`) を足すのが faithful + provable。
+
+**(I) base case = single-pair coherence (次セッション最初の sub-goal、構成は確定)**:
+`IsCoherent τ {χ,χ̄} A` を `CharacterDifferenceImage hχ` (5.2.d) から構成。
+**🔑 `IntegralCharacterMap L G = ClassFunction L ℂ →ₗ[ℤ] ClassFunction G ℂ` (ただの ℤ-linear map、S07:301)**
+ゆえ heavy bundle でない。repo に既存の **`innerLeftℤ η` (= `φ ↦ ⟨φ,η⟩` の ℤ-linear functional, S07:2631)**
++ `LinearMap.smulRight` で extension を直接構成:
+- `extension := (innerLeftℤ χ).smulRight (hχ.sign • (hχ.mu : ClassFunction G ℂ))`
+  `        + (innerLeftℤ χ̄).smulRight (hχ.sign • (hχ.nu : ClassFunction G ℂ))`
+  (i.e. `φ ↦ ⟨φ,χ⟩•(ε•μ) + ⟨φ,χ̄⟩•(ε•ν)`, ε=sign)。検算: `χ↦ε•μ`, `χ̄↦ε•ν`、
+  `(χ-χ̄)↦ε•(μ-ν)=τ(χ-χ̄)` (`image_eq`) ✓ (要 ‖χ‖²=1, χ⊥χ̄)。
+- `nonzero` = `χ-χ̄` (`chi_sub_conj_mem_zSpan_support` S07:1315 で supported、≠0 by (5.2.a) χ̄≠χ)。
+- `extension_mem_ZIrr` = `μ,ν ∈ ZIrr` (`hχ.mu.mem_ZIrr`) の ℤ-combo (`Submodule.smul_mem`/`add_mem`、
+  S07:907 パターン)。
+- `extension_inner_eq` (isometry) = orthonormal-basis Parseval: φ,ψ∈`zSpan{χ,χ̄}`=`span_ℤ{χ,χ̄}` を
+  `Submodule.mem_span_pair` で `φ=aχ+bχ̄` 表現 → `⟨φ,ψ⟩=⟨φ,χ⟩conj⟨ψ,χ⟩+⟨φ,χ̄⟩conj⟨ψ,χ̄⟩`
+  (χ⊥χ̄,‖χ‖²=1) と ext の Gram (`⟨εμ,εμ⟩=ε²=1`,`⟨εμ,εν⟩=0`) が一致。
+- **⚠ `extends_on_supported` subtlety (本セッション発見)**: ext は **χ-χ̄ 上でのみ** τ と一致 (χ,χ̄ 個別の τχ は
+  `image_eq` から不明)。∴ `zSupportedSpan{χ,χ̄}A ⊆ span_ℤ{χ-χ̄}` が要る。これは `Hypothesis (5.2)` が **A を
+  constrain しない** (構造体に A field 無し) ゆえ **追加 hypothesis or 導出が必要** — repo engine も同型の制御を
+  `hgen` (`zSupportedSpan(S₁∪{χ,χ̄})A ⊆ span(… ∪ {χ-χ̄,…})`) で要求。base-case lemma に
+  `hsupp : zSupportedSpan{χ,χ̄}A ⊆ Submodule.span ℤ {χ-χ̄}` を足す (Pf 設定では A=L^#, χ(1)≠0 ゆえ
+  a+b=0 強制で成立; standalone では hyp 化)。**⟹ base-case signature に `hsupp` 追加が必要**。
+- `extension_mem_ZIrr` = ℤ-combo of μ,ν∈ZIrr。容易。
+- **~100-130 行、本 producer の core 労力** (extension 構成は確定、isometry は Parseval、supported は hsupp 制御)。
+
+**(II)(III) induction**: S の共役ペア集合上で `Finset.induction`、各 step で `retarget_isCoherent_of_
+decompositions_and_memberFamily` を a=1 で適用。per-step discharge (D₀/Da 構成、hY collapse、member family
+orthogonality) が (III)、各々 (5.4)/(5.5) helper で組む。
+
+**⟹ 労力見積 = lane-h (6.2)/(6.3) 級の focused implementation session** (base plumbing + induction +
+discharge)。本セッション (resume + (11.6) win + relane + (5.7) deep scoping) は容量大ゆえ、(I) base case の
+IntegralCharacterMap 構成から次セッションで着手。建てた signature は cite-ready (sorried、[[feedback-cite-sorried-lemmas-if-signature-correct]])。
+
 ## 5. 状態
 
-- ✅ 本セッション (scoping): 框組確認 + 設計 + scoping note + standalone signature skeleton 設置。
-- ⏭ 次セッション (実装): `coherent_of_constant_degree` を retarget engine + (5.5) で実証明
-  (base case → inductive member 分解 → retarget)。open question (等次数の用途) を engine 前提で確定。
+- ✅ 本セッション (scoping + engine deep-dive): 框組確認 + 設計 + scoping note + standalone signature
+  skeleton 設置 + **engine 経路確定 (base case 要・等次数=a=1・per-step plan)**。
+- ⏭ 次セッション (実装): (I) base-case single-pair coherence (IntegralCharacterMap 構成) → (II) induction →
+  (III) per-step discharge。signature に `hirr` (S⊆Irr L) 追加が faithful + 必要。
 - 関連: lane-h `S08_Theorem62_63_Standalone.lean` (template、h62 oracle pattern)、
   issue 4012 (relane #8)、issue 2018 ((11.5) gate)、S13 `HC_le_secondDerived`。
