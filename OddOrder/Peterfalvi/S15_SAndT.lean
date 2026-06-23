@@ -171,6 +171,16 @@ structure Hypothesis where
   m : ℚ
   m_eq : m = 1 - 1 / ((q : ℚ) - 1) - ((q : ℚ) - 1) / (q : ℚ) ^ p +
     1 / (((q : ℚ) - 1) * (q : ℚ) ^ p)
+  /-- **Peterfalvi (13.1.b) carrier (S-side)**: the type-`P` structure data of `S`
+  (`S = (P ⋊ U) ⋊ W₁`), with its complement `U` and cyclic factor `W₁` reconciled to the
+  hypothesis's `U`/`W1` (`Sdata_U_eq`/`Sdata_W1_eq`).  This is the §16-construction witness
+  (`Section16TypePStructure.Sdata`, built from `mp.S_typeP2` = Pf (13.2.a)) that pins the otherwise
+  unconstrained relationship between the abstract `Hypothesis` fields `U`/`W1`/`P` and the intrinsic
+  type-`P` decomposition of `S`.  It supplies the U-side structural facts (`U` complements
+  `M_F = P`, `W₁ ≤ N_G(U)`, `U` nilpotent) that Peterfalvi §15 reads off `S`. -/
+  Sdata : TypePData S
+  Sdata_U_eq : Sdata.U = U
+  Sdata_W1_eq : Sdata.W1 = W1
 
 namespace Hypothesis
 
