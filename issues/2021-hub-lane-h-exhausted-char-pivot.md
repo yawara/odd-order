@@ -72,6 +72,36 @@ carrier F-ask に bottom-out。**lane-h の次手 (char pivot 可否・target・
 **(A) char pivot が価値最大** (critical path 直結)。ただし lane-b はユーザー直接管理ゆえ、target と所有境界の
 確定は hub/ユーザーの裁可が要る。それまで lane-h は自己復帰モニターで idle (本 issue close or LAUNCH.md 変化で復帰)。
 
+## 2026-06-23 UPDATE (本 issue は未 merge のまま hub が relane #6 を実施) — char pivot は MOOT
+
+本 issue を起票・自己復帰モニター arm 後、hub が **relane #6** (origin/main `53dbaa8f`,
+`chore(hub): relane #6 — lane-c を char ボトルネック支援に再配置 (issue 4011 RESOLVED)`) を実施。
+**この relane #6 は本 issue 2021 を見ずに** (ancestry 確認: `ee93e1ee` は `53dbaa8f` の祖先でない)、
+lane-c の HUB issue 4011 (lane-c も §15 枯渇) に応答したもの。内容 (issue 4011 の RESOLVED ブロック):
+
+- **S13_MaximalIII_IV.lean を lane-h→lane-c 移譲** (issue 2018、Pf §13 char-directions)。
+- **`card_kappaHall_lt_of_isTypeP1` を lane-b→lane-c 移譲** (issue 2020、POLE-1 char 核)。
+- ⟹ **char ボトルネックは lane-c が引き取った**。
+
+**含意 (本 issue の問いへの部分的回答)**:
+- 本 issue option (A)「lane-h を char に pivot」は **MOOT** — char は今や lane-c の領域。lane-h が char を
+  触ると lane-c と衝突する。⟹ lane-h は char に行ってはいけない。
+- relane #6 は lane-h の LAUNCH.md を S13 オーナーシップ注記のみ更新 (S13→lane-c、lane-h は cite のみ)。
+  **lane-h の現タスクは依然 stale な POLE-2 (14.7 = done) のまま**で、lane-h を実 actionable な仕事に
+  re-task していない。
+- lane-h は S13 を失い (char work が lane-c へ)、**残る ungated work = ゼロ** (POLE-2 全 char-gated、
+  その char producer は今 lane-c が作る → lane-h は consumer として待つだけ)。
+
+**sharpened ask (hub へ)**: relane #6 で char が lane-c に集約された前提で、lane-h はどうする?
+1. **idle + await POLE-2 unblock** — lane-c が POLE-2 の char producer (basic_structure/exists_MHypothesis/
+   U_cyclic 等) を landing したら lane-h が `field_normalizer_structure` を wire (consumer 復帰)。
+2. **非 char の FT-path task に re-task** — もし collision-free な non-char endpoint があれば (現時点で
+   lane-h は発見できず)。
+3. その他 hub 判断。
+
+lane-h は **option 1 (idle + await)** を既定として自己復帰モニターを継続 (新 baseline で re-arm)。
+hub の明示裁定 (本 issue close or LAUNCH.md 再 task) があれば従う。
+
 ## 完了条件
 
 hub が lane-h の次割当を決定し、`LAUNCH.md` 更新 or 本 issue を closed/ へ移動。lane-h はそれを検知して自己復帰。
