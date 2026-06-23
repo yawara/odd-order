@@ -65,3 +65,9 @@ faithful に STATE できる定理を全て実ステートメント化 + uncondi
 lane-h は POLE-2 (issue 2009) 移行で S13 を dormant 化 → **S13_MaximalIII_IV を lane-c へ移譲**
 (char ボトルネック支援、lanes 等価)。lane-c は lane-b coherence ((6.2)/(6.3)/(6.8)) + §11 char を
 cite して §13 char-direction を並列生産。lane-h は cite のみ。宛先 lane-h → **lane-c**。
+
+## 2026-06-23 UPSTREAM update (relane #7) — Thm 6.2/6.3 は lane-h が生産
+
+S13 のローカル obligation `coherent_S_of_coherent_SH0C` (Thm 6.3) / `coherent_quotient_bound` (Thm 6.2) の
+standalone 版を **lane-h が §6/§8 新 leaf で生産** (relane #7、issue 2021)。lane-c は landing したら cite して
+(11.3)/(11.4) を discharge。それまで sorried sig を cite して下流を積む ([[feedback-cite-sorried-lemmas-if-signature-correct]])。

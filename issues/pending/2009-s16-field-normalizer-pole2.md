@@ -494,3 +494,9 @@ lane-h のみ割当完遂で idle** と確定。ユーザー裁可で **lane-h �
 当面の workable-now = `field_normalizer_of_U_characteristic` (14.7) の Singer-field 核
 (c_eq_one から既約性 → 有限体モデル、§13 非依存=上記「Singer-field engine 着地」診断が正本)。
 L/M producers (14.3/14.10) は §13/Dade-gated ゆえ cite/defer。status: pending → **active** (issues/ へ移動)。
+
+## 2026-06-23 → pending 復帰 (relane #7) — POLE-2 は driver/await に降格
+
+relane #5 (lane-h→POLE-2) は stale-pointer エラーで無効と判明 (14.7 既に sorry-free、残は全 char-gated、issue 2021)。
+lane-h は §6 coherence producer に再配置 → POLE-2 は常駐レーン無しの driver/await に戻す。char (lane-b/lane-c) +
+Dade landing で auto-wire。status: active → **pending**。
