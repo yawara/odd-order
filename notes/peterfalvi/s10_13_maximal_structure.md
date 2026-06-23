@@ -359,3 +359,34 @@ machinery `S08_Theorem63` 経由)。⟹ Thm (6.3) 適用を **named obligation**
 両定理は sorried 上流 cite ゆえ axiom-clean でない (登録せず、honest cite reduction)。FT-path sorry 122 不変。
 **残: (11.4)(=Thm 6.2 そのもの)/(11.6)残/(11.7)/(11.8)/(11.9) は char-gated or §8(|W₂|=p)。** §13 の構造側
 (11.3/11.5) は cite-reduce 完了、(11.6) clause2 Wielandt 核 landed、残りは genuinely lane-b char / §8 待ち。
+
+---
+
+## relane #4 (2026-06-23, issue 2019+4009): Pf (13.2.a) 配線 — `IsTypeP2 mp.S` 供給
+
+> ※ (13.2.a) は **Pf §13** ("The Subgroups S and T", `04.15_*.mmd`) = **repo S15**。本 note は本来 Pf §8-11
+> だが、relane #4 の lane-h タスクゆえ handoff をここに記録 (s14_maximalI と並ぶ lane-h frontier 記録)。
+
+**経緯**: §13 (repo S13 = Pf §11) clean work 完遂で lane-h starve (issue 2019) ⟷ lane-c の POLE-1
+TypePData carrier 機構 (`exists_typePData_W1_eq_of_isTypeP2`) 完成で残る唯一 gate = `IsTypeP2 mp.S`
+(issue 4009)。ユーザー裁可で **lane-h が (13.2.a)「q<p ⟹ S は Type II (=type-P₂)」を担当** (relane #4)。
+
+**landed (`OddOrder/FeitThompson.lean`, commit `87068c22`)**:
+- `isTypeP2_of_typeP_kappaHall_lt` (character obligation 以外 sorry-free): S type-P + `|K|<|K*|`
+  ⟹ `IsTypeP2 S`。skeleton = `isTypeP_iff_isTypeP1_or_isTypeP2` で P₁∨P₂、P₁ 枝を下記 obligation で
+  排除、P₂ 残す。BG Thm 14.7 の disjunction (`IsTypeP2 S ∨ IsTypeP2 T`、**順序情報なし**) を
+  `K_lt_Kstar` で確定側に pin。
+- `Section16MaximalPair.S_typeP2 : IsTypeP2 S` field 新設 + producer fill ⟹ **`mp.S_typeP2`
+  available** ⟹ **lane-c §15 carrier wiring (step 3) unblock** (issue 4009 完了条件達成)。
+
+**重要な routing 訂正 (LAUNCH の想定と相違)**: LAUNCH は「BG §16 type API を cite / 必要なら lane-f BG」
+を想定したが、**調査の結果 BG は disjunction を density argument で導き順序を使わない** (`exists_typeP2_member`、
+`card_kappaHall_ne_card_Kstar` は `≠` のみ)。**順序による型決定 = Pf §10-11 character 理論** (Thm (10.10)
+[no Type V] + (11.9.b) [type III/IV ⟹ q>p via `S(HC)` coherence/norm bound])。⟹ 残 character 核は
+**lane-f (BG) でなく lane-b (Pf char)** に routing。faithful obligation `card_kappaHall_lt_of_isTypeP1`
+(型-P₁ ⟹ `|K*|<|K|`) に clean isolate → **issue 2020 で lane-b へ**。
+
+**lane-h frontier 状況**: relane #4 の in-lane 部 (型判定 skeleton + 配線) 完遂。残 (13.2.a) character 核は
+lane-b (issue 2020)、step 3 wiring は lane-c。S13/S14 は依然 char/Prop16.1 gated。
+full AxiomsCheck build 3881 green、FT-path sorry 122 不変 (disjunction→determinate `IsTypeP2 mp.S` の
+de-opacify、sorry 数でない [[scaffold-sorry-free-not-done]])。
