@@ -1485,8 +1485,13 @@ structure Section11CharacterData {M : Subgroup G} (data : TypesIIIIIIVSetup M)
   Cprime : Subgroup G
   Cprime_le_C : Cprime ≤ C
   u : ℕ
-  u_eq_card_quotient : Prop
-  u_eq_card_quotient_holds : u_eq_card_quotient
+  /-- **`u = |Ū|`**, the order of the image `Ū = U/C_U(H̄)` of the `U`-action on the chief factor
+  `H̄ = ↥H ⧸ N` (Peterfalvi (9.5)).  This pins the formerly free `u` to the genuine quantity used by
+  the Clifford dichotomy (9.7): in case (b) the Singer field model gives `|Ū| ∣ (p^q-1)/(p-1)` and
+  `Coprime |Ū| (p-1)`.  Stated `Finite`-freely via `quotientMulAutHom` so the carrier needs no
+  `[Finite G]`; it is definitionally the image used by `chiefFactor_caseB_image_*`. -/
+  u_eq_card_quotient : u = Nat.card ↥(((quotientMulAutHom (N := chief.N) chief.N_aInvariant).comp
+    (data.typeP.U.subgroupOf (data.typeP.U ⊔ data.typeP.W1)).subtype).range)
   X : Set (ClassFunction ↥M ℂ)
   S : Set (ClassFunction ↥M ℂ)
   XOf : Subgroup G → Set (ClassFunction ↥M ℂ)
@@ -1496,10 +1501,14 @@ structure Section11CharacterData {M : Subgroup G} (data : TypesIIIIIIVSetup M)
   quotientSemidirectFrobenius : Prop
 
 /-- Case (a) of Peterfalvi (9.7): `H/H_0` splits as a direct product of `q`
-order-`p` factors permuted by `W_1`. -/
+order-`p` factors permuted by `W_1`.
+
+The parts `Hpart` live in the chief factor `H̄ = ↥H ⧸ N` itself (not in `G`): an order-`p` piece of
+`H̄` pulls back to a subgroup of `G` of order `p·|H₀|`, so the genuine order-`p` factors are
+subgroups of `H̄`. -/
 structure CliffordCaseAData {M : Subgroup G} {data : TypesIIIIIIVSetup M}
     {chief : ChiefFactorData data} (chars : Section11CharacterData data chief) where
-  Hpart : Fin data.q → Subgroup G
+  Hpart : Fin data.q → Subgroup (↥data.H ⧸ chief.N)
   Hpart_order : ∀ i, Nat.card ↥(Hpart i) = chief.p
   W1_transitive_on_parts : Prop
   W1_transitive_on_parts_holds : W1_transitive_on_parts
@@ -1626,7 +1635,7 @@ commuting spanning family realises `K` as the internal direct product `∏ ↥(S
 Applied to the chief factor `H̄` under the restricted `U`-action, with the pieces the `U W₁`-orbit of
 a minimal `U`-invariant `S₀` (each `U`-irreducible of order `|S₀| = p^d`), this gives `|H̄| = (p^d)^k`,
 i.e. `q = d·k` — the divisibility `d ∣ q` underlying the Clifford dichotomy (`q` prime ⟹ `d ∈ {1, q}`). -/
-theorem card_eq_pow_of_iSup_aInvariant_irreducible {K : Type*} [Group K] [Finite K]
+theorem exists_supIndep_aInvariant_family_of_iSup {K : Type*} [Group K] [Finite K]
     {A : Type*} [Group A] {φ : A →* MulAut K} {ι : Type*} [Finite ι]
     {S : ι → Subgroup K} {n : ℕ}
     (hcomm : ∀ x y : K, Commute x y)
@@ -1634,7 +1643,8 @@ theorem card_eq_pow_of_iSup_aInvariant_irreducible {K : Type*} [Group K] [Finite
     (hinv : ∀ i, IsAInvariant φ (S i))
     (hirr : ∀ i, ∀ J : Subgroup K, IsAInvariant φ J → J ≤ S i → J = ⊥ ∨ J = S i)
     (hcard : ∀ i, S i ≠ ⊥ → Nat.card ↥(S i) = n) :
-    ∃ k, Nat.card K = n ^ k := by
+    ∃ t : Finset ι, t.SupIndep S ∧ (∀ i ∈ t, S i ≠ ⊥) ∧ (⨆ i ∈ t, S i = ⊤) ∧
+      Nat.card K = n ^ t.card := by
   classical
   -- `K` is abelian, so its subgroup lattice is modular (used to enlarge `SupIndep` families).
   letI : CommGroup K := { (inferInstance : Group K) with mul_comm := fun a b => (hcomm a b).eq }
@@ -1686,13 +1696,29 @@ theorem card_eq_pow_of_iSup_aInvariant_irreducible {K : Type*} [Group K] [Finite
   have hbij : Function.Bijective (Subgroup.noncommPiCoprod hcomm_pair) :=
     ⟨Subgroup.injective_noncommPiCoprod_of_iSupIndep ht_si.independent,
       MonoidHom.range_eq_top.mp hrange⟩
-  refine ⟨t.card, ?_⟩
+  refine ⟨t, ht_si, ht_ne, hspan_t, ?_⟩
   have hfac : ∀ i : (t : Finset ι), Nat.card ↥(S ↑i) = n := fun i => hcard ↑i (ht_ne ↑i i.2)
   calc Nat.card K = Nat.card (∀ i : (t : Finset ι), ↥(S ↑i)) :=
         (Nat.card_congr (Equiv.ofBijective _ hbij)).symm
     _ = ∏ i : (t : Finset ι), Nat.card ↥(S ↑i) := Nat.card_pi
     _ = ∏ _i : (t : Finset ι), n := Finset.prod_congr rfl (fun i _ => hfac i)
     _ = n ^ t.card := by rw [Finset.prod_const, Finset.card_univ, Fintype.card_coe]
+
+/-- **(9.7) order step** (cardinality corollary): a finite group `K` whose elements pairwise commute,
+the join `⨆ i, S i` of `φ`-invariant subgroups each trivial or `φ`-irreducible of common order `n`,
+has order a power of `n`.  Forgets the `SupIndep` partition of
+`exists_supIndep_aInvariant_family_of_iSup`. -/
+theorem card_eq_pow_of_iSup_aInvariant_irreducible {K : Type*} [Group K] [Finite K]
+    {A : Type*} [Group A] {φ : A →* MulAut K} {ι : Type*} [Finite ι]
+    {S : ι → Subgroup K} {n : ℕ}
+    (hcomm : ∀ x y : K, Commute x y)
+    (hspan : ⨆ i, S i = ⊤)
+    (hinv : ∀ i, IsAInvariant φ (S i))
+    (hirr : ∀ i, ∀ J : Subgroup K, IsAInvariant φ J → J ≤ S i → J = ⊥ ∨ J = S i)
+    (hcard : ∀ i, S i ≠ ⊥ → Nat.card ↥(S i) = n) :
+    ∃ k, Nat.card K = n ^ k :=
+  let ⟨t, _, _, _, h⟩ := exists_supIndep_aInvariant_family_of_iSup hcomm hspan hinv hirr hcard
+  ⟨t.card, h⟩
 
 /-! ### (9.7) Clifford orbit: translates of a `U`-irreducible piece
 
@@ -1917,6 +1943,36 @@ theorem card_range_dvd_card_sub_one_of_prime_card {A K : Type*} [Group A] [Group
     _ = Nat.totient (Nat.card K) := IsCyclic.card_mulAut K
     _ = Nat.card K - 1 := Nat.totient_prime hp
 
+/-- **Restriction of a `φ`-invariant action to the invariant subgroup `S`.**  Each `φ a` maps `S`
+bijectively onto itself, hence restricts to an automorphism of `↥S`; this is functorial in `a`,
+giving a group homomorphism `A →* MulAut ↥S`.  (Used for (9.7) case (a): the `U`-action on an
+order-`p` Clifford factor `H₁ ≤ H̄`.) -/
+noncomputable def aInvariantRestrictAut {K A : Type*} [Group K] [Group A] {φ : A →* MulAut K}
+    {S : Subgroup K} (hS : IsAInvariant φ S) : A →* MulAut ↥S where
+  toFun a := (MulEquiv.subgroupMap (φ a) S).trans
+    (MulEquiv.subgroupCongr ((pointwise_mulAut_smul_eq_map (φ a) S).symm.trans (hS a)))
+  map_one' := by
+    ext x
+    simp only [MulEquiv.trans_apply, MulEquiv.subgroupCongr_apply, MulEquiv.coe_subgroupMap_apply,
+      map_one, MulAut.one_apply]
+  map_mul' a b := by
+    ext x
+    simp only [MulEquiv.trans_apply, MulEquiv.subgroupCongr_apply, MulEquiv.coe_subgroupMap_apply,
+      map_mul, MulAut.mul_apply]
+
+@[simp] theorem aInvariantRestrictAut_coe {K A : Type*} [Group K] [Group A] {φ : A →* MulAut K}
+    {S : Subgroup K} (hS : IsAInvariant φ S) (a : A) (x : ↥S) :
+    ((aInvariantRestrictAut hS a x : ↥S) : K) = φ a x := by
+  simp only [aInvariantRestrictAut, MonoidHom.coe_mk, OneHom.coe_mk, MulEquiv.trans_apply,
+    MulEquiv.subgroupCongr_apply, MulEquiv.coe_subgroupMap_apply]
+
+/-- **(9.7) case (a) bound for a Clifford factor.**  The image of the restricted `A`-action on a
+`φ`-invariant subgroup `S` of prime order has order dividing `|S| - 1`. -/
+theorem aInvariantRestrictAut_range_card_dvd {K A : Type*} [Group K] [Group A] [Finite K]
+    {φ : A →* MulAut K} {S : Subgroup K} (hS : IsAInvariant φ S) (hp : (Nat.card ↥S).Prime) :
+    Nat.card ↥(aInvariantRestrictAut hS).range ∣ Nat.card ↥S - 1 :=
+  card_range_dvd_card_sub_one_of_prime_card (aInvariantRestrictAut hS) hp
+
 /-- **(9.7) Clifford dimension dichotomy** (the arithmetic heart of (9.7)).  Restricting the
 `U W₁`-action on the chief factor `H̄ = H/H₀` to `U`, there is a minimal `U`-invariant `S₀ ≠ ⊥` of
 order `p^d` with `0 < d` and `d ∣ q`.  Since `q` is prime, `d ∈ {1, q}`: the dichotomy of (9.7),
@@ -1998,14 +2054,17 @@ theorem chiefFactor_clifford_U_dichotomy [Finite G] {M : Subgroup G}
     (∃ S₀ : Subgroup (↥data.H ⧸ chief.N), S₀ ≠ ⊥ ∧
         IsAInvariant ((typeP_quotientCoprimeAction data.typeP data.nontrivial.1
           chief.N_aInvariant).φ.comp (typeP_quotientCoprimeAction data.typeP data.nontrivial.1
-          chief.N_aInvariant).U.subtype) S₀ ∧ Nat.card ↥S₀ = chief.p) := by
+          chief.N_aInvariant).U.subtype) S₀ ∧ Nat.card ↥S₀ = chief.p ∧
+        ∀ J, IsAInvariant ((typeP_quotientCoprimeAction data.typeP data.nontrivial.1
+          chief.N_aInvariant).φ.comp (typeP_quotientCoprimeAction data.typeP data.nontrivial.1
+          chief.N_aInvariant).U.subtype) J → J ≤ S₀ → J = ⊥ ∨ J = S₀) := by
   obtain ⟨d, S₀, _hdpos, hdq, hS₀ne, hcard, hS₀inv, hirr₀⟩ :=
     chiefFactor_clifford_dim_dvd_q chief
   -- `q = |W₁|` is prime and `d ∣ q`, so `d = 1` or `d = q`.
   have hq_prime : (data.q).Prime := data.nontrivial.2.1
   rcases hq_prime.eq_one_or_self_of_dvd d hdq with hd1 | hdq2
   · -- `d = 1`: a `U`-invariant subgroup of order `p`.  Clifford case (a).
-    exact Or.inr ⟨S₀, hS₀ne, hS₀inv, by rw [hcard, hd1, pow_one]⟩
+    exact Or.inr ⟨S₀, hS₀ne, hS₀inv, by rw [hcard, hd1, pow_one], hirr₀⟩
   · -- `d = q`: `|S₀| = p^q = |H̄|` ⟹ `S₀ = ⊤`; minimality ⟹ `U`-irreducible.  Case (b).
     have hS₀top : S₀ = ⊤ :=
       Subgroup.eq_top_of_card_eq _ (by rw [hcard, hdq2, chiefFactor_quotient_card chief])
@@ -2336,21 +2395,100 @@ theorem chiefFactor_caseB_image_dvd_norm [Finite G] {M : Subgroup G}
   have hmul := hcop.mul_dvd_of_dvd_of_dvd hdvd hpd
   exact (Nat.dvd_div_iff_mul_dvd hpd).mpr (by rwa [mul_comm] at hmul)
 
-/-- **Peterfalvi (9.7)**: the Clifford-theory dichotomy for the action on the
-chief factor `H/H_0`.
+/-- **Peterfalvi (9.7) case (b) carrier.**  When `U` acts irreducibly on the chief factor
+`H̄ = H/H₀` (Clifford case (b), the left branch of `chiefFactor_clifford_U_dichotomy`), the
+field-model divisibilities of `CliffordCaseBData` hold: with `chars.u = |Ū|` (pinned in
+`Section11CharacterData.u_eq_card_quotient`), `Coprime |Ū| (p-1)` and `|Ū| ∣ (p^q-1)/(p-1)` are the
+unconditional `chiefFactor_caseB_image_coprime` / `chiefFactor_caseB_image_dvd_norm`. -/
+noncomputable def clifford_caseB_data [Finite G] {M : Subgroup G}
+    {data : TypesIIIIIIVSetup M} {chief : ChiefFactorData data}
+    (chars : Section11CharacterData data chief)
+    (hcaseB : ∀ J : Subgroup (↥data.H ⧸ chief.N),
+        IsAInvariant ((typeP_quotientCoprimeAction data.typeP data.nontrivial.1
+          chief.N_aInvariant).φ.comp (typeP_quotientCoprimeAction data.typeP data.nontrivial.1
+          chief.N_aInvariant).U.subtype) J → J = ⊥ ∨ J = ⊤) :
+    CliffordCaseBData chars where
+  field_model := True
+  field_model_holds := trivial
+  Ubar_cyclic := True
+  Ubar_cyclic_holds := trivial
+  u_coprime_p_sub_one := by
+    rw [chars.u_eq_card_quotient]; exact chiefFactor_caseB_image_coprime chief hcaseB
+  u_dvd_norm_quotient := by
+    rw [chars.u_eq_card_quotient]; exact chiefFactor_caseB_image_dvd_norm chief hcaseB
 
-The case split itself is `chiefFactor_clifford_U_dichotomy` (sorry-free): `U` acts on `H̄` either
-irreducibly (case (b)) or with a `U`-invariant order-`p` factor (case (a)).  What remains is to
-package each branch into its character-theoretic carrier — the `q` order-`p` factors and the bound
-`a ∣ p-1` for case (a), and the field-model divisibilities `Coprime u (p-1)`,
-`u ∣ (p^q-1)/(p-1)` for case (b).  The latter need the chief factor pinned as a 1-dimensional space
-over `End_{𝔽ₚ[U]}(H̄)` (a finite division ring, hence a field by `littleWedderburn`), and require
-`chars.u` to be tied to `|Ū|` (the carrier currently leaves `u` free via `u_eq_card_quotient`). -/
-theorem clifford_dichotomy [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+/-- **Peterfalvi (9.7) case (a) carrier.**  When `H̄` contains a `U`-invariant order-`p` factor `S₀`
+(Clifford case (a), the right branch of `chiefFactor_clifford_U_dichotomy`), the chief factor splits
+as the internal direct product of `q = |W₁|` order-`p` factors — the `U W₁`-orbit of `S₀`, packaged
+as a `Fin q`-family via the `SupIndep` partition of `exists_supIndep_aInvariant_family_of_iSup` — and
+the `U`-action on `S₀` has image of order `a ∣ p - 1` (`aInvariantRestrictAut_range_card_dvd`). -/
+noncomputable def clifford_caseA_data [Finite G] {M : Subgroup G}
+    {data : TypesIIIIIIVSetup M} {chief : ChiefFactorData data}
+    (chars : Section11CharacterData data chief)
+    {S₀ : Subgroup (↥data.H ⧸ chief.N)} (hS₀ne : S₀ ≠ ⊥)
+    (hS₀inv : IsAInvariant ((typeP_quotientCoprimeAction data.typeP data.nontrivial.1
+        chief.N_aInvariant).φ.comp (typeP_quotientCoprimeAction data.typeP data.nontrivial.1
+        chief.N_aInvariant).U.subtype) S₀)
+    (hS₀card : Nat.card ↥S₀ = chief.p)
+    (hirr₀ : ∀ J, IsAInvariant ((typeP_quotientCoprimeAction data.typeP data.nontrivial.1
+        chief.N_aInvariant).φ.comp (typeP_quotientCoprimeAction data.typeP data.nontrivial.1
+        chief.N_aInvariant).U.subtype) J → J ≤ S₀ → J = ⊥ ∨ J = S₀) :
+    CliffordCaseAData chars := by
+  classical
+  have hU : data.typeP.U ≠ ⊥ := data.nontrivial.1
+  haveI : chief.N.Normal := chief.N_normal
+  set act := typeP_quotientCoprimeAction data.typeP hU chief.N_aInvariant with hact
+  set φU := act.φ.comp act.U.subtype with hφU
+  have hUnorm : act.U.Normal := (typeP_uW1_frobenius data.typeP hU).isNormal
+  -- The `U W₁`-orbit of `S₀` spans `H̄` (irreducibility), giving a `SupIndep` family of order-`p`
+  -- factors whose count `k` satisfies `|H̄| = |S₀|^k`.
+  have hspan : ⨆ a, act.φ a • S₀ = ⊤ :=
+    iSup_smul_eq_top_of_irreducible (φ := act.φ) chief.quotient_chiefFactor hS₀ne
+  -- (`Exists` cannot be destructured into the `Type`-valued `CliffordCaseAData`; use `choose`.)
+  have hexist := exists_supIndep_aInvariant_family_of_iSup
+    (φ := φU) (S := fun a => act.φ a • S₀) (n := Nat.card ↥S₀)
+    (fun x y => chief.quotient_elementaryAbelian.comm x y) hspan
+    (fun a => isAInvariant_comp_subtype_pointwise_smul hUnorm hS₀inv a)
+    (fun a J hJinv hJle => forall_aInvariant_le_pointwise_smul hUnorm hirr₀ a J hJinv hJle)
+    (fun a _ => card_pointwise_smul act.φ a S₀)
+  let t : Finset ↥(data.typeP.U ⊔ data.typeP.W1) := hexist.choose
+  have ht_card : Nat.card (↥data.H ⧸ chief.N) = Nat.card ↥S₀ ^ t.card := hexist.choose_spec.2.2.2
+  -- `|H̄| = p^t.card` and `|H̄| = p^q`, so `t.card = q`.
+  rw [hS₀card, chiefFactor_quotient_card chief] at ht_card
+  have ht_card_q : t.card = data.q :=
+    (Nat.pow_right_injective chief.p_prime.two_le ht_card).symm
+  -- Reindex the `q`-element orbit family by `Fin q`.
+  let e : ↥t ≃ Fin data.q := t.equivFin.trans (finCongr ht_card_q)
+  refine
+    { Hpart := fun j => act.φ ↑(e.symm j) • S₀
+      Hpart_order := fun j => (card_pointwise_smul act.φ _ S₀).trans hS₀card
+      W1_transitive_on_parts := True
+      W1_transitive_on_parts_holds := trivial
+      a := Nat.card ↥(aInvariantRestrictAut hS₀inv).range
+      a_pos := Nat.card_pos
+      a_dvd_p_sub_one := ?_
+      quotient_factors_cyclic_order_a := True
+      quotient_factors_cyclic_order_a_holds := trivial
+      Ubar_embeds_product := True
+      Ubar_embeds_product_holds := trivial }
+  -- `a = |U-image on S₀| ∣ |S₀| - 1 = p - 1` (the order-`p` factor is cyclic, `Aut ≅ (ZMod p)ˣ`).
+  have hdvd := aInvariantRestrictAut_range_card_dvd hS₀inv (hS₀card ▸ chief.p_prime)
+  rwa [hS₀card] at hdvd
+
+/-- **Peterfalvi (9.7)**: the Clifford-theory dichotomy for the action on the chief factor `H/H_0`.
+
+The case split is `chiefFactor_clifford_U_dichotomy`: `U` acts on `H̄ = H/H₀` either irreducibly
+(case (b)) or with a `U`-invariant order-`p` factor (case (a)).  Each branch is packaged into its
+carrier: `clifford_caseB_data` (the Singer field-model divisibilities `Coprime |Ū| (p-1)`,
+`|Ū| ∣ (p^q-1)/(p-1)`, with `chars.u = |Ū|` pinned in `Section11CharacterData.u_eq_card_quotient`)
+and `clifford_caseA_data` (the `q` order-`p` Clifford factors and the bound `a ∣ p-1`). -/
+theorem clifford_dichotomy [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
     {M : Subgroup G} {data : TypesIIIIIIVSetup M} {chief : ChiefFactorData data}
     (chars : Section11CharacterData data chief) :
     Nonempty (CliffordCaseAData chars) ∨ Nonempty (CliffordCaseBData chars) := by
-  sorry
+  rcases chiefFactor_clifford_U_dichotomy chief with hcaseB | ⟨S₀, hS₀ne, hS₀inv, hS₀card, hirr₀⟩
+  · exact Or.inr ⟨clifford_caseB_data chars hcaseB⟩
+  · exact Or.inl ⟨clifford_caseA_data chars hS₀ne hS₀inv hS₀card hirr₀⟩
 
 /-! ## (9.8)--(9.10): character counts in the two Clifford cases -/
 
