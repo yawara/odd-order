@@ -3995,6 +3995,13 @@ set_option linter.style.longLine false in
 -- since `π(M_σ) ∩ β = ∅`), so both summands lie in `F(M)` via `fitting_decomposition`.  Now fully
 -- sorry-free + axiom-clean (the type-`F` residual is closed; the `= F(M)` gate `C_Y(E₁) = 1` is gone).
 #assert_only_allowed_axioms OddOrder.BG.Ch4.S15.fitting_not_ti_cases
+-- BG **Theorem 15.7(e)** infrastructure (`S15_MF`, issue 7007, type-`F` trichotomy for `isTypeI_of_isTypeF`):
+-- the shared order-`p` non-TI witness extraction (`g ∉ M`, `p ∈ σ(M)`, order-`p` `X₁ ≤ M_σ ⊓ M_σ^g`,
+-- `rank (M_F ⊓ C_G(X₁)) < 3`); `O_p(M_F)` noncyclic at such a witness (Coq `not_cycMp`); and the additive
+-- `abelian_rank1_cyclic` (abelian noncyclic odd `p`-group ⟹ `2 ≤ pRank`).  All sorry-free + axiom-clean.
+#assert_only_allowed_axioms OddOrder.BG.Ch4.S15.exists_inf_conj_fitting_orderP_witness
+#assert_only_allowed_axioms OddOrder.BG.Ch4.S15.not_isCyclic_opiCore_mf_of_orderP_le_conj
+#assert_only_allowed_axioms OddOrder.BG.Ch4.S15.two_le_pRank_of_comm_isPGroup_not_isCyclic
 -- BG **Lemma 15.1** (`S15_MF`, issue 7007): the auxiliary `U`-factor structure of an arbitrary
 -- maximal `M = K U M_σ` — `K ≠ 1 → M' = U M_σ ∧ U` abelian (15.1b); the cyclic-`τ₂` centralizer
 -- funnel (15.1c); `⟨C_U(x) | x ∈ M_σ#⟩` abelian (15.1d); the Frobenius factor `U₀ M_σ` (15.1e).

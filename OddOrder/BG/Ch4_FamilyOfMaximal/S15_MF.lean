@@ -7733,6 +7733,208 @@ theorem rank_lt_three_of_le_two_maximals [Finite G] (hG : OddOrder.BG.IsMinimalS
     (not_lt.mp h)).eq_of_isCoatom_of_le (OddOrder.GroupTheory.mem_maximalSubgroups.mp hM) hCM
     (OddOrder.GroupTheory.mem_maximalSubgroups.mp hN) hCN)
 
+/-- **Order-`p` non-TI witness extraction** (shared infrastructure of BG Theorem 15.7(a)/(e)):
+from `¬FittingIsTI M` produce an element `g ∉ M`, a prime `p ∈ σ(M)`, and an order-`p` subgroup `X₁`
+of `M_σ` that is also contained in the conjugate `M_σ^g`, with `C_G(X₁) ⊄ M` and
+`rank (M_F ⊓ C_G(X₁)) < 3`.  This bundles the common prefix (steps 1, 3, 5–7) of
+`piSet_mf_inf_beta_disjoint_of_not_fittingIsTI`, so that both the rank-core (`M_F = M_σ`,
+Theorem 15.7(a)) and the type-`F` trichotomy (Theorem 15.7(e), `isTypeI_of_isTypeF`) can consume the
+same witness `X₁`.  The two conjugate-membership facts `X₁ ≤ M_σ` and `X₁ ≤ M_σ^g` drive the
+`O_p(M_σ)`-noncyclicity argument (Coq `not_cycMp`), and `rank (M_F ⊓ C_G(X₁)) < 3` is the
+`E1X_facts` rank bound. -/
+theorem exists_inf_conj_fitting_orderP_witness [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} (hM : M ∈ maximalSubgroups G)
+    (hnotTI : ¬ FittingIsTI M) :
+    ∃ (g : G) (p : ℕ) (X₁ : Subgroup G),
+      g ∉ M ∧ p.Prime ∧ p ∈ OddOrder.BG.Ch3.S10.sigma M ∧
+        Nat.card ↥X₁ = p ∧
+        X₁ ≤ OddOrder.BG.Ch3.S10.Msigma M ∧
+        X₁ ≤ MulAut.conj g • OddOrder.BG.Ch3.S10.Msigma M ∧
+        ¬ Subgroup.centralizer (X₁ : Set G) ≤ M ∧
+        rank ↥(MF M ⊓ Subgroup.centralizer (X₁ : Set G)) < 3 := by
+  classical
+  -- Setup: `g ∉ M`, `X = F(M) ⊓ F(M)^g ≠ ⊥`.
+  obtain ⟨g, hgM, hXne⟩ := exists_notMem_inf_conj_fitting_ne_bot_of_not_fittingIsTI hnotTI
+  have hXcard : Nat.card ↥(fittingInAmbient M ⊓ MulAut.conj g • fittingInAmbient M) ≠ 1 :=
+    fun h => hXne (Subgroup.card_eq_one.mp h)
+  obtain ⟨p, hp, hpdvd⟩ := Nat.exists_prime_and_dvd hXcard
+  haveI : Fact p.Prime := ⟨hp⟩
+  have hpσ : p ∈ OddOrder.BG.Ch3.S10.sigma M :=
+    mem_sigma_of_prime_dvd_card_inf_conj_fitting hG hM hgM hp hpdvd
+  -- An order-`p` subgroup `X₁ ≤ X`.
+  obtain ⟨x, hxord⟩ := exists_prime_orderOf_dvd_card'
+    (G := ↥(fittingInAmbient M ⊓ MulAut.conj g • fittingInAmbient M)) p hpdvd
+  set X₁ : Subgroup G :=
+    (Subgroup.zpowers x).map (fittingInAmbient M ⊓ MulAut.conj g • fittingInAmbient M).subtype
+    with hX₁def
+  have hX₁leX : X₁ ≤ fittingInAmbient M ⊓ MulAut.conj g • fittingInAmbient M :=
+    hX₁def ▸ Subgroup.map_subtype_le _
+  have hX₁card : Nat.card ↥X₁ = p := by
+    rw [hX₁def, Subgroup.card_map_of_injective
+      (fittingInAmbient M ⊓ MulAut.conj g • fittingInAmbient M).subtype_injective,
+      Nat.card_zpowers, hxord]
+  have hX₁ne : X₁ ≠ ⊥ := fun h => hp.one_lt.ne' (by rw [← hX₁card, h, Subgroup.card_bot])
+  have hX₁pg : IsPGroup p ↥X₁ := IsPGroup.of_card (n := 1) (by rw [hX₁card, pow_one])
+  have hX₁F : X₁ ≤ fittingInAmbient M := hX₁leX.trans inf_le_left
+  have hX₁cF : X₁ ≤ MulAut.conj g • fittingInAmbient M := hX₁leX.trans inf_le_right
+  have hX₁M : X₁ ≤ M := hX₁F.trans (OddOrder.BG.Ch2.S08.fittingInG_le M)
+  have hpσ_sub : ({p} : Set ℕ) ⊆ OddOrder.BG.Ch3.S10.sigma M := by
+    intro q hq; rw [Set.mem_singleton_iff] at hq; rw [hq]; exact hpσ
+  -- Generic helper: a `p`-subgroup of `F(M)` lies in `M_σ` (`O_p(F(M)) ≤ O_σ(F(M)) = F(M_σ) ≤ M_σ`).
+  have hMσ_of : ∀ Z : Subgroup G, Z ≤ fittingInAmbient M → IsPGroup p ↥Z →
+      Z ≤ OddOrder.BG.Ch3.S10.Msigma M := by
+    intro Z hZF hZp
+    have h1 : Z ≤ opiCoreInG ({p} : Set ℕ) (fittingInAmbient M) :=
+      OddOrder.BG.Ch2.S08.le_opiCoreInG_singleton_of_isPGroup_of_le_nilpotent
+        (OddOrder.BG.Ch2.S08.fittingInG_isNilpotent M) hZF hZp
+    have h2 : opiCoreInG ({p} : Set ℕ) (fittingInAmbient M)
+        ≤ opiCoreInG (OddOrder.BG.Ch3.S10.sigma M) (fittingInAmbient M) :=
+      Subgroup.map_mono (OddOrder.Isaacs.Ch03.oPiCore_mono hpσ_sub _)
+    have h3' : opiCoreInG (OddOrder.BG.Ch3.S10.sigma M) (fittingInAmbient M)
+        = fittingInAmbient (OddOrder.BG.Ch3.S10.Msigma M) :=
+      opiCoreInG_sigma_fittingInAmbient_eq_fittingInAmbient_Msigma
+    exact (h1.trans h2).trans (h3' ▸ OddOrder.BG.Ch2.S08.fittingInG_le _)
+  have hX₁Mσ : X₁ ≤ OddOrder.BG.Ch3.S10.Msigma M := hMσ_of X₁ hX₁F hX₁pg
+  -- `X₁ ≤ M_σ^g`: pull `X₁` back by `g⁻¹` into `F(M)`, apply `hMσ_of`, push forward by `g`.
+  have hY₁ : MulAut.conj g⁻¹ • X₁ ≤ fittingInAmbient M := by
+    have hle : MulAut.conj g⁻¹ • X₁ ≤ MulAut.conj g⁻¹ • (MulAut.conj g • fittingInAmbient M) :=
+      Subgroup.pointwise_smul_le_pointwise_smul_iff.mpr hX₁cF
+    rwa [← mul_smul, ← map_mul, inv_mul_cancel, map_one, one_smul] at hle
+  have hY₁pg : IsPGroup p ↥(MulAut.conj g⁻¹ • X₁) := by
+    have hcard : Nat.card ↥(MulAut.conj g⁻¹ • X₁) = p := by
+      rw [← Nat.card_congr (Subgroup.equivSMul (MulAut.conj g⁻¹) X₁).toEquiv, hX₁card]
+    exact IsPGroup.of_card (n := 1) (by rw [hcard, pow_one])
+  have hX₁cMσ : X₁ ≤ MulAut.conj g • OddOrder.BG.Ch3.S10.Msigma M := by
+    have hY₁Mσ : MulAut.conj g⁻¹ • X₁ ≤ OddOrder.BG.Ch3.S10.Msigma M := hMσ_of _ hY₁ hY₁pg
+    have hpush := (Subgroup.pointwise_smul_le_pointwise_smul_iff (a := MulAut.conj g)).mpr hY₁Mσ
+    rwa [← mul_smul, ← map_mul, mul_inv_cancel, map_one, one_smul] at hpush
+  -- Step 6: `C_G(X₁) ⊄ M` (Theorem 10.1(e)).
+  have hconj_g_inv : MulAut.conj g⁻¹ • X₁ ≤ M := hY₁.trans (OddOrder.BG.Ch2.S08.fittingInG_le M)
+  have hCGnotM : ¬ Subgroup.centralizer (X₁ : Set G) ≤ M := by
+    intro hCG
+    have he := (OddOrder.BG.Ch3.S10.fusion_control_of_mem_sigma hG hM hpσ hX₁ne hX₁pg).2.2.2.2
+    exact hgM (by simpa using inv_mem (he hX₁M hCG g⁻¹ hconj_g_inv))
+  -- Step 7: `rank (M_F ⊓ C_G(X₁)) < 3` (`C_{M_F}(X₁)` lies in `M` and in a coatom `N ≠ M`).
+  obtain ⟨x₀, hx₀ne⟩ := Subgroup.ne_bot_iff_exists_ne_one.mp hX₁ne
+  have hCGlt : Subgroup.centralizer (X₁ : Set G) < ⊤ :=
+    lt_of_le_of_lt
+      (Subgroup.centralizer_le (Set.singleton_subset_iff.mpr x₀.2))
+      (OddOrder.BG.Ch2.S09.centralizer_singleton_lt_top hG
+        (fun h => hx₀ne (Subtype.ext h)))
+  obtain ⟨N, hNco, hCGN⟩ :=
+    (eq_top_or_exists_le_coatom (Subgroup.centralizer (X₁ : Set G))).resolve_left hCGlt.ne
+  have hNmax : N ∈ maximalSubgroups G := mem_maximalSubgroups.mpr hNco
+  have hNneM : M ≠ N := fun h => hCGnotM (h ▸ hCGN)
+  have hrank3 : rank ↥(MF M ⊓ Subgroup.centralizer (X₁ : Set G)) < 3 :=
+    rank_lt_three_of_le_two_maximals hG hM hNmax hNneM
+      (inf_le_left.trans (maxNilpotentNormalHall_le M)) (inf_le_right.trans hCGN)
+  exact ⟨g, p, X₁, hgM, hp, hpσ, hX₁card, hX₁Mσ, hX₁cMσ, hCGnotM, hrank3⟩
+
+/-- **`O_p(M_F)` is noncyclic at a non-TI witness prime** (Coq `nonTI_Fitting_structure`, `not_cycMp`):
+if `M_F` contains an order-`p` subgroup `X₁` that is also contained in the conjugate `M_F^g` for some
+`g ∉ M`, then `O_p(M_F)` is not cyclic.  Were it cyclic, `X₁` would be its unique order-`p` subgroup,
+hence characteristic in `O_p(M_F) ⊴ M`, giving `N_G(X₁) = M`; applied to `g⁻¹·X₁·g ≤ O_p(M_F)` it gives
+`N_G(g⁻¹·X₁·g) = g⁻¹·M·g`, so `M = g⁻¹·M·g`, forcing `g ∈ M` — contradiction.  Both `X₁` and its
+`g⁻¹`-conjugate land in the *same* cyclic `O_p(M_F)`, so no cyclic-conjugate transfer is needed.
+
+This supplies the rank `≥ 2` lower bound of the abelian branch of Theorem 15.7(e)
+(`isTypeI_of_isTypeF`): an abelian noncyclic `p`-group has `p`-rank `≥ 2`. -/
+theorem not_isCyclic_opiCore_mf_of_orderP_le_conj [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} (hM : M ∈ maximalSubgroups G)
+    {g : G} {p : ℕ} {X₁ : Subgroup G} (hp : p.Prime) (hgM : g ∉ M)
+    (hX₁card : Nat.card ↥X₁ = p) (hX₁MF : X₁ ≤ MF M)
+    (hX₁cMF : X₁ ≤ MulAut.conj g • MF M) :
+    ¬ IsCyclic ↥(opiCoreInG ({p} : Set ℕ) (MF M)) := by
+  classical
+  intro hcyc
+  haveI : Fact p.Prime := ⟨hp⟩
+  set C : Subgroup G := opiCoreInG ({p} : Set ℕ) (MF M) with hCdef
+  haveI : IsCyclic ↥C := hcyc
+  -- `M ≤ N(C)` since `C = O_p(M_F)` is characteristic in `M_F ⊴ M`.
+  have hMNC : M ≤ Subgroup.normalizer (C : Set G) :=
+    le_normalizer_opiCoreInG_of_le_normalizer _ (maxNilpotentNormalHall_le_normalizer M)
+  have hX₁ne : X₁ ≠ ⊥ := fun h => hp.one_lt.ne' (by rw [← hX₁card, h, Subgroup.card_bot])
+  have hX₁pg : IsPGroup p ↥X₁ := IsPGroup.of_card (n := 1) (by rw [hX₁card, pow_one])
+  have hMFnil : Group.IsNilpotent ↥(MF M) := maxNilpotentNormalHall_isNilpotent M
+  have hX₁C : X₁ ≤ C :=
+    OddOrder.BG.Ch2.S08.le_opiCoreInG_singleton_of_isPGroup_of_le_nilpotent hMFnil hX₁MF hX₁pg
+  have hX₁M : X₁ ≤ M := hX₁MF.trans (maxNilpotentNormalHall_le M)
+  -- `M ≤ N(X₁)`, hence `N(X₁) = M`.
+  have hMNX₁ : M ≤ Subgroup.normalizer (X₁ : Set G) :=
+    le_normalizer_of_le_isCyclic_normalized hX₁C hMNC
+  have hNX₁ : Subgroup.normalizer (X₁ : Set G) = M :=
+    OddOrder.BG.Ch2.S08.normalizer_eq_of_normal_of_mem_maximal hG hM
+      ((Subgroup.normal_subgroupOf_iff_le_normalizer hX₁M).mpr hMNX₁) hX₁ne hX₁M
+  -- `X₁' := g⁻¹·X₁·g ≤ O_p(M_F)` too (it lies in `M_F` and is a `p`-group), so `M ≤ N(X₁')`.
+  set X₁' : Subgroup G := MulAut.conj g⁻¹ • X₁ with hX₁'def
+  have hX₁'card : Nat.card ↥X₁' = p := by
+    rw [hX₁'def, ← Nat.card_congr (Subgroup.equivSMul (MulAut.conj g⁻¹) X₁).toEquiv, hX₁card]
+  have hX₁'pg : IsPGroup p ↥X₁' := IsPGroup.of_card (n := 1) (by rw [hX₁'card, pow_one])
+  have hX₁'MF : X₁' ≤ MF M := by
+    have hle : X₁' ≤ MulAut.conj g⁻¹ • (MulAut.conj g • MF M) :=
+      hX₁'def ▸ Subgroup.pointwise_smul_le_pointwise_smul_iff.mpr hX₁cMF
+    rwa [← mul_smul, ← map_mul, inv_mul_cancel, map_one, one_smul] at hle
+  have hX₁'C : X₁' ≤ C :=
+    OddOrder.BG.Ch2.S08.le_opiCoreInG_singleton_of_isPGroup_of_le_nilpotent hMFnil hX₁'MF hX₁'pg
+  have hMNX₁' : M ≤ Subgroup.normalizer (X₁' : Set G) :=
+    le_normalizer_of_le_isCyclic_normalized hX₁'C hMNC
+  -- `N(X₁') = g⁻¹ • N(X₁) = g⁻¹ • M`.
+  have hNX₁'eq : Subgroup.normalizer (X₁' : Set G) = MulAut.conj g⁻¹ • M := by
+    rw [hX₁'def, ← hNX₁]
+    exact (Subgroup.map_normalizer_eq_of_bijective X₁ (MulAut.conj g⁻¹).bijective).symm
+  rw [hNX₁'eq] at hMNX₁'
+  have hcardM : Nat.card ↥(MulAut.conj g⁻¹ • M) = Nat.card ↥M :=
+    (Nat.card_congr (Subgroup.equivSMul (MulAut.conj g⁻¹) M).toEquiv).symm
+  have hMeq : MulAut.conj g⁻¹ • M = M :=
+    (Subgroup.eq_of_le_of_card_ge hMNX₁' (le_of_eq hcardM)).symm
+  -- `g⁻¹·M·g = M ⟹ g⁻¹ ∈ N_G(M) ≤ M ⟹ g ∈ M`, contradicting `g ∉ M`.
+  have hg_inv_N : g⁻¹ ∈ Subgroup.normalizer (M : Set G) := by
+    rw [Subgroup.mem_normalizer_iff'']
+    intro h
+    have hiff : h ∈ MulAut.conj g⁻¹ • M ↔ g * h * g⁻¹ ∈ M := by
+      rw [Subgroup.mem_pointwise_smul_iff_inv_smul_mem,
+        show ((MulAut.conj g⁻¹)⁻¹ • h : G) = g * h * g⁻¹ by
+          simp [MulAut.smul_def, ← map_inv, MulAut.conj_apply]]
+    rw [hMeq] at hiff
+    rw [inv_inv]; exact hiff
+  have hg_inv_M : g⁻¹ ∈ M :=
+    OddOrder.BG.Ch3.S10.maximal_normalizer_le_self hG hM hg_inv_N
+  exact hgM (by simpa using inv_mem hg_inv_M)
+
+/-- **An abelian noncyclic `p`-group (`p` odd) has `p`-rank `≥ 2`** (additive analogue of mathcomp's
+`abelian_rank1_cyclic`): a finite commutative `p`-group `R` with `p` odd that is not cyclic has
+`2 ≤ pRank R p`.  Noncyclicity gives `p < |Ω₁(R)|` (contrapositive of
+`isCyclic_of_card_omega1_le_prime`); `Ω₁(R)` is elementary abelian
+(`isElementaryAbelian_omega_one_of_comm`) and a `p`-group, so `p² ≤ |Ω₁(R)|` and hence
+`2 ≤ log_p|Ω₁(R)| ≤ pRank R p` (`le_pRank`).  Supplies the rank `≥ 2` lower bound of the abelian
+branch of BG Theorem 15.7(e) (`isTypeI_of_isTypeF`). -/
+theorem two_le_pRank_of_comm_isPGroup_not_isCyclic {R : Type*} [Group R] [Finite R]
+    {p : ℕ} [Fact p.Prime] (hp_odd : Odd p) (hcomm : ∀ x y : R, x * y = y * x)
+    (hR : IsPGroup p R) (hnc : ¬ IsCyclic R) : 2 ≤ pRank R p := by
+  have hp1 : 1 < p := (Fact.out : p.Prime).one_lt
+  -- `Ω₁(R)` is elementary abelian and a `p`-group.
+  have hΩea : (Omega R p 1).IsElementaryAbelian p :=
+    OddOrder.BG.Ch1_Preliminary.isElementaryAbelian_omega_one_of_comm hcomm
+  have hΩpg : IsPGroup p ↥(Omega R p 1) := fun g =>
+    (hR g.val).imp fun k hk =>
+      Subtype.ext (by rw [SubmonoidClass.coe_pow, OneMemClass.coe_one]; exact hk)
+  -- Noncyclicity ⟹ `p < |Ω₁(R)|`.
+  have hlt : p < Nat.card ↥(Omega R p 1) := by
+    by_contra hle
+    exact hnc (OddOrder.BG.Ch1.S04.isCyclic_of_card_omega1_le_prime hR hp_odd (not_lt.mp hle))
+  -- `|Ω₁(R)| = p^k` with `k ≥ 2`.
+  obtain ⟨k, hk⟩ := IsPGroup.iff_card.mp hΩpg
+  have hk2 : 2 ≤ k := by
+    by_contra h
+    push_neg at h
+    interval_cases k
+    · simp only [pow_zero] at hk; rw [hk] at hlt; omega
+    · simp only [pow_one] at hk; rw [hk] at hlt; omega
+  have hcard : p ^ 2 ≤ Nat.card ↥(Omega R p 1) := by
+    rw [hk]; exact Nat.pow_le_pow_right (le_of_lt hp1) hk2
+  -- `2 ≤ log_p|Ω₁(R)| ≤ pRank R p`.
+  exact le_trans (Nat.le_log_of_pow_le hp1 hcard) (le_pRank (Omega R p 1) hΩea)
+
 /-- **BG Theorem 15.7(a), rank-theoretic core** (mmd L4192-4198): if `F(M)` is not a TI-subgroup
 of `G`, then no prime divides `M_F` and lies in `β(M)`.
 

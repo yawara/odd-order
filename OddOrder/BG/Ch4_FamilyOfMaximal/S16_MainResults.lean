@@ -1343,10 +1343,52 @@ theorem isTypeI_of_isTypeF [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     refine Or.inl ?_
     rw [td.H_eq]
     exact maxNilpotentNormalHall_sharp_isTISubset_of_fittingIsTI hG hM hTI
-  · -- `F(M)` not TI ⟹ disjunct (b)/(c) via BG Theorem 15.7(e) (`nonTI_Fitting_structure`).
-    -- Deep residual (see docstring): `fitting_not_ti_cases`'s `(e)` is a tautology, so the
-    -- structured rank-2 / exponent-cyclic alternatives are not yet formalized.
-    sorry
+  · -- `F(M)` not TI ⟹ BG Theorem 15.7(e) trichotomy.  For type `F` the type-`P₁` case (e3) is
+    -- excluded, leaving disjunct (b) (`M_F` abelian of rank 2) or (c) (exponent / cyclic-`O_{p'}`).
+    rw [td.H_eq]
+    -- The non-TI witness: `g ∉ M`, prime `p ∈ σ(M)`, order-`p` `X₁ ≤ M_σ ⊓ M_σ^g`, `rank (M_F ⊓ C_G(X₁)) < 3`.
+    obtain ⟨g, p, X₁, hgM, hp, _hpσ, hX₁card, hX₁Mσ, hX₁cMσ, _hCGnotM, hrank3⟩ :=
+      exists_inf_conj_fitting_orderP_witness hG hM hTI
+    haveI : Fact p.Prime := ⟨hp⟩
+    have hMFeq : MF M = OddOrder.BG.Ch3.S10.Msigma M := mf_eq_msigma_of_not_fittingIsTI hG hM hTI
+    -- `X₁ ≤ M_F` and `X₁ ≤ M_F^g` (using `M_F = M_σ`).
+    have hX₁MF : X₁ ≤ MF M := le_trans hX₁Mσ (le_of_eq hMFeq.symm)
+    have hX₁cMF : X₁ ≤ MulAut.conj g • MF M := by rw [hMFeq]; exact hX₁cMσ
+    -- `p` is odd (`p ∣ |X₁| ∣ |G|`, `|G|` odd).
+    have hpdvdG : p ∣ Nat.card G := hX₁card ▸ Subgroup.card_subgroup_dvd_card X₁
+    have hpOdd : Odd p := by
+      rcases hp.eq_two_or_odd' with rfl | h
+      · exact absurd (even_iff_two_dvd.mpr hpdvdG) (Nat.not_even_iff_odd.mpr hG.odd)
+      · exact h
+    by_cases habel : IsMulCommutative ↥(MF M)
+    · -- abelian `M_F` ⟹ disjunct (b): `rank M_F = 2`.
+      refine Or.inr (Or.inl ⟨habel, ?_⟩)
+      show rank ↥(MF M) = 2
+      have hcommMF : ∀ a b : ↥(MF M), a * b = b * a := isMulCommutative_iff.mp habel
+      -- ≤ 2: `M_F` abelian ⟹ `M_F ≤ C_G(X₁)`, so `M_F ⊓ C_G(X₁) = M_F` and `rank M_F < 3`.
+      have hMFcentr : MF M ≤ Subgroup.centralizer (X₁ : Set G) := by
+        intro a ha
+        rw [Subgroup.mem_centralizer_iff]
+        intro y hy
+        simpa using congrArg Subtype.val (hcommMF ⟨y, hX₁MF hy⟩ ⟨a, ha⟩)
+      have hle3 : rank ↥(MF M) < 3 := (inf_eq_left.mpr hMFcentr) ▸ hrank3
+      -- ≥ 2: `O_p(M_F)` is abelian (`≤ M_F`) and noncyclic, so `2 ≤ pRank ≤ rank`.
+      have hOpMF : opiCoreInG ({p} : Set ℕ) (MF M) ≤ MF M := opiCoreInG_le {p} (MF M)
+      have hcommOp : ∀ x y : ↥(opiCoreInG ({p} : Set ℕ) (MF M)), x * y = y * x := fun x y =>
+        Subtype.ext (by simpa using congrArg Subtype.val (hcommMF ⟨(x : G), hOpMF x.2⟩ ⟨(y : G), hOpMF y.2⟩))
+      have hOpnc : ¬ IsCyclic ↥(opiCoreInG ({p} : Set ℕ) (MF M)) :=
+        not_isCyclic_opiCore_mf_of_orderP_le_conj hG hM hp hgM hX₁card hX₁MF hX₁cMF
+      have h2pRank : 2 ≤ pRank ↥(opiCoreInG ({p} : Set ℕ) (MF M)) p :=
+        two_le_pRank_of_comm_isPGroup_not_isCyclic hpOdd hcommOp
+          (isPGroup_opiCoreInG_singleton (MF M)) hOpnc
+      have hge2 : 2 ≤ rank ↥(MF M) :=
+        le_trans (le_trans h2pRank (pRank_le_rank p))
+          (rank_le_of_injective (Subgroup.inclusion_injective hOpMF))
+      omega
+    · -- non-abelian `M_F` ⟹ disjunct (c): exponent condition + cyclic `O_{p'}(M_F)`
+      -- (Frobenius semiregular action; BG Theorem 15.7(e2)).  Deferred residual.
+      refine Or.inr (Or.inr ?_)
+      sorry
 
 /-- **Type-`P` `V`-normalizer characterization** (the `normalizer_V` field of `TypePData`,
 Peterfalvi (8.4); BG records it as the self-normalizing exceptional set `M = N_G(V)`): if
