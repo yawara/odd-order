@@ -199,9 +199,13 @@
 - **Q# TI-subset with normalizer T** — step 1 の核、Hypothesis に無し (§13 obligation)。
 - **d = 1 (T-side of (13.12))** — `c_eq_one` は S-side のみ、T-side 不在 (obligation)。step 4 の K=1 に必須。
 - **KW₂ Frobenius kernel K** — step 4 の Wielandt 入力 (§13 obligation)。
-- **BG Lemma 3.2** — step 5 (K ⊆ C(W₁))、repo は Lemma 3.3 のみ (要 find/state)。
+- **BG Lemma 3.2** — step 5 (K ⊆ C(W₁))。✅ **2026-06-23 完全版 landed** (`S03_FrobeniusActions.lean`,
+  axiom-clean): `isFrobeniusGroup_quotient_of_normal_not_le_kernel` (= 3.2(a)(b): `N◁G`, `K⊄N` ⟹ `N<K`
+  ∧ `Ḡ=G/N` Frobenius) + crux `inf_complement_eq_bot_of_normal_not_le_kernel` (`N⊓R=⊥`) +
+  `normal_le_kernel_of_not_le` (`N⊆K`)。repo は Lemma 3.2 の `N≤K` 枝のみ既存だった、未実装の `K⊄N`
+  枝を補完。⟹ step 5 obligation は解消 (残 5 obligation は依然 cross-lane gate)。
 - **module Maschke** = `OperatorMaschke.lean` ✓ (available)。
-⟹ full assembly は ~6 obligation の large scaffold (うち card_Q_eq は cross-lane) ゆえ「scaffold ≠ done」回避で full は保留。
+⟹ full assembly は残 ~5 obligation の large scaffold (うち card_Q_eq は cross-lane) ゆえ「scaffold ≠ done」回避で full は保留。
 **✅ 但し step 4 の genuine §8-free Wielandt 核を landing** (commit `d11f7fe9`, axiom-clean):
 `OddOrder.GroupTheory.frobenius_kernel_centralizes_of_complement_fpf` (WielandtFixedPoint.lean) —
 Frobenius `U⋊E ≤ N_G(N)` coprime, `C_N(E)=1` ⟹ `U ≤ C_G(N)`。`wielandt_fixedPoint_trivial_E_fixed` の
