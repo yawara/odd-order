@@ -3995,6 +3995,13 @@ set_option linter.style.longLine false in
 -- since `π(M_σ) ∩ β = ∅`), so both summands lie in `F(M)` via `fitting_decomposition`.  Now fully
 -- sorry-free + axiom-clean (the type-`F` residual is closed; the `= F(M)` gate `C_Y(E₁) = 1` is gone).
 #assert_only_allowed_axioms OddOrder.BG.Ch4.S15.fitting_not_ti_cases
+-- BG **Theorem 15.7(e)** infrastructure (`S15_MF`, issue 7007, type-`F` trichotomy for `isTypeI_of_isTypeF`):
+-- the shared order-`p` non-TI witness extraction (`g ∉ M`, `p ∈ σ(M)`, order-`p` `X₁ ≤ M_σ ⊓ M_σ^g`,
+-- `rank (M_F ⊓ C_G(X₁)) < 3`); `O_p(M_F)` noncyclic at such a witness (Coq `not_cycMp`); and the additive
+-- `abelian_rank1_cyclic` (abelian noncyclic odd `p`-group ⟹ `2 ≤ pRank`).  All sorry-free + axiom-clean.
+#assert_only_allowed_axioms OddOrder.BG.Ch4.S15.exists_inf_conj_fitting_orderP_witness
+#assert_only_allowed_axioms OddOrder.BG.Ch4.S15.not_isCyclic_opiCore_mf_of_orderP_le_conj
+#assert_only_allowed_axioms OddOrder.BG.Ch4.S15.two_le_pRank_of_comm_isPGroup_not_isCyclic
 -- BG **Lemma 15.1** (`S15_MF`, issue 7007): the auxiliary `U`-factor structure of an arbitrary
 -- maximal `M = K U M_σ` — `K ≠ 1 → M' = U M_σ ∧ U` abelian (15.1b); the cyclic-`τ₂` centralizer
 -- funnel (15.1c); `⟨C_U(x) | x ∈ M_σ#⟩` abelian (15.1d); the Frobenius factor `U₀ M_σ` (15.1e).
@@ -5869,3 +5876,13 @@ formula together with the prime computation `coprimeFrobeniusAction_card_eq_prim
 -- Same clause restated against the cleaner subgroup gate `W₂ ⊓ H₀ = ⊥` (the fpf input reduces to it
 -- via `H ⊓ C_G(W₁) = W₂`); isolates the genuine §8/chief obligation.
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S13.U_centralizes_H0_of_W2_inf_H0_bot
+
+-- §16 character-data producer (`section16CharacterData`, POLE-1 `cd`) — S-side grid building blocks.
+-- `induce_compHom_subgroupCongr`: `Ind` is invariant under transporting the source subgroup along an
+-- equality (the cd-grid transport primitive).  `Section16CharacterData.muS_definition`: the S-side
+-- (13.1.e) `mu_definition` identity `Ind_W^S(ω_{ij} − ω_{0j}) = δ_j(μ_{ij} − μ_{0j})`, read off the
+-- `certainTypeS` certain-type machinery (`chiColumn`/`columnFamily`) via the `tpW_subgroupOf_eq`
+-- W-identification + the (4.3.b)/(1.4) bridge `S06.induce_chiColumn_diff_mu_diff`.  Both axiom-clean.
+#assert_only_allowed_axioms OddOrder.induce_compHom_subgroupCongr
+#assert_only_allowed_axioms OddOrder.Section16CharacterData.tpW_subgroupOf_eq
+#assert_only_allowed_axioms OddOrder.Section16CharacterData.muS_definition
