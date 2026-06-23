@@ -78,6 +78,22 @@ clean な lane-local win は無い。内訳:
 ⟹ **lane-c の S15 frontier は現在 ungated closable Lean work が無い。要 HUB/ユーザー判断** (cross-lane enrich
 を誰が所有するか、または lane-c を別 FT-path セグメントへ再配置)。正本 = この節 + issue 4008。
 
+### ✅ 確定 (2026-06-23 続, lane-c 再開 deep dive、ユーザー裁可 option 1): carrier wall を**原文+signature で厳密再確認**
+上の診断は憶測でなく確定。Pf (13.2) 証明本文 (`04.15_...mmd:35`) を読み、各 cite を repo 追跡:
+- (13.2.a) type II/III 分類 = (10.10)/(11.9.b,c); U abelian = 型定義; UW₁ Frobenius = (8.4.d)。
+- (13.2.b) P 基本可換 `p^q` = (10.11)/(11.7)。**(11.7)=`S13.H_elementaryAbelian` は `S13.Hypothesis M` 入力**
+  (rich carrier: `base.typeP`/`s11Setup`/`chief`)。「IsTypeII M → |M_F|=p^q」の直接 lemma は無く、必ず §13.Hyp 経由。
+- (13.2.c) `u≤(p^q-1)/(p-1)` = (9.7) `clifford_dichotomy` (sorry-free 既出, `|Ū|∣(p^q-1)/(p-1)`) + 算術。
+  hyp.u=|Ū| は Hypothesis field (`card_U_eq_uc`/`C_eq`) から def 上成立だが、(9.7) を hyp.S に適用するには
+  §11 chief-factor setup の reconciliation 要 → wall。
+- (13.2.e) TI-subset = (8.13)/(12.7) char/structural。
+**核心 = reconciliation wall**: `typePData_of_isTypeNonI hyp.S_nonI` で `TypePData hyp.S` は取れるが
+intrinsic `.U`/`.W1` が `hyp.U`/`hyp.W1` と一致する保証が bare Hypothesis に無い (`P_eq_SF` で `.H=hyp.P` だけ一致)。
+全上流が rich carrier 入力を要し、それを §15 Hypothesis から構成するには step-3 wiring = **lane-h の (13.2.a)
+`IsTypeP2 mp.S` 着地**が必要。**数学は全存在 (Pf 原文 + repo sorried) = 形式化順序の問題、研究 gap でない**
+([[feedback-dont-mislabel-formalization-as-research]])。⟹ deep dive は「§15 に lane-c sorry-free closable work
+無し」を厳密確定。**4 回目の再 deep-dive は不要** — 次手は lane-h 待ち (self-resume) か別作業再配置。
+
 ---
 
 ## 🔧 POLE-1 TypePData carrier 構築 (2026-06-23 relane #3, issue 4008 = option A 裁定)
