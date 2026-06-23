@@ -37,10 +37,18 @@
   Sset/Tset=`inducedFamily`、A0S/A0T=`supportInSubgroup (typePA0 …)`、tauS/tauT/tau3=Dade integral map。
 
 **残る residual = structural transport (新 char 理論ではない)**:
-- **W 同定**: cd.omega は **tp.W** (=`mp.S ⊓ mp.T`, `Section16TypePStructure` 由来、tp.W1=mp.K) 上。certain-type
-  の W は `data_L.W` (=`typePData_of_isTypeNonI` 由来)。両者は同じ type-P W だが cross-construction ⟹ `data_L.W =
-  tp.W` (or `tp.W1 = mp.K = data_S.W1`) の同定が crux。回避案: tp/mp のデータから直接 `TypePData mp.S` を W1=tp.W1
-  で構成 (uniqueness 論法を回避)。⟹ **HUB/lane-f と tp↔TypePData の W 整合を相談する候補**。
+- **W 同定 (crux)**: cd.omega は **tp.W** (=`mp.S ⊓ mp.T`, tp.W1=mp.K) 上。`typePData_of_isTypeNonI` は
+  *canonical* W1 を選ぶので `data_S.W1 ≠ mp.K` (両者 κ-Hall 補元で共役だが非等)。⟹ `typePData_of_isTypeNonI`
+  を**使わない**のが正道。
+  **推奨 path (uniqueness 論法回避)**: `S06.Hypothesis ↥mp.S` を **W1=mp.K.subgroupOf S, W2=mp.Kstar.subgroupOf S,
+  K=(derivedInG S).subgroupOf S で直接構成** (`typePData_toS06Hypothesis` の中身を mp/tp の κ-Hall データで再現)。
+  - mp.Kstar ≤ S は OK: `tp.W = mp.K ⊔ mp.Kstar ≤ S` (tp.W_eq_join + tp.W ≤ S)。
+  - 各 S06.Hypothesis field の discharge 元: `card_coprime`←mp.K_hall (κ-Hall coprime index)、`isComplement`←
+    BG Thm 14.7 typeP_derivedInG_isComplement_kappaHall、`centralizer_W2`←type-P pairing (BG §14、`C_{M'}(x)=W2`
+    on W1^#)、`W2_le_K`/`W_odd`←tp+odd。これらは大半 mp/tp に proven で在る (要 grep 確認)。
+  - ⟹ cd は S06.Hypothesis を S/T で 2 個建て、`chiColumn`/`columnFamily`/`induce_chiColumn_diff_mu_diff` で grid
+    + (13.1.e) を出す。tp.W ↔ S06 の W (=mp.K⊔mp.Kstar, subgroupOf S) は **構成的に一致**させられる
+    (data_L.W を後から同定するのでなく、最初から mp.K で建てる)。lane-b 単独で進められる (cross-lane 不要の見込み)。
 - **Fintype 決定性 (engineering)**: S12 `muGrid`/`muColumnSign` は Fintype ↥M / Fintype ↥(W₁⊔W₂) を**内部合成**。
   Hypothesis-level (13.1.e) を書こうとすると、`induce_*` が要求する明示 `[Fintype ↥(W₁⊔W₂)]` binder が内部合成と
   desync して `unfold;rfl` が破綻 (本セッション実証)。⟹ cd は **certain-type 級** (`h_L` + 全 instance binder) で
