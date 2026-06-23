@@ -176,14 +176,38 @@ end Hypothesis
 
 /-! ## (11.3)--(11.5): commutator-chain consequences -/
 
-/-- **Peterfalvi (11.3)**: `S(H_0 C)` is not coherent. -/
+/-- **Peterfalvi (11.3), the Theorem (6.3) coherence-extension input** (§13 instance): if the
+sub-family `S(H₀C)` is coherent, then so is the full family `S`.
+
+This is Peterfalvi's Theorem (6.3) applied with `(L, K, M, H, H₁) = (M, M', 1, HC, H₀C)`; its
+hypotheses hold in the §13 setup ((6.3.a) `HC` nilpotent — `H = M_F` nilpotent and `C = C_U(H)`
+centralizes `H`; (6.3.b) from the coherence of `S(H₀C)`; (6.3.c) from (9.6)/(11.1)).  Left as a
+named obligation: the repo's §6 coherence is packaged through the `SibleyDadeHypothesis`
+filtration machinery (`S08_Theorem63`), not as a standalone "subfamily-coherent ⟹ coherent"
+statement, so discharging this is §6 character theory (lane-b). -/
+theorem coherent_S_of_coherent_SH0C [Finite G] [Fintype G]
+    (_hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} [Fintype ↥M]
+    [Invertible (Nat.card ↥M : ℂ)] [Invertible (Nat.card G : ℂ)]
+    (hyp : Hypothesis M)
+    (_hcoh : Nonempty (OddOrder.Peterfalvi.S07.IsCoherent
+      hyp.base.tau (hyp.SOf hyp.H0C) hyp.base.A0)) :
+    Nonempty (OddOrder.Peterfalvi.S07.IsCoherent
+      hyp.base.tau hyp.base.Sset hyp.base.A0) := by
+  sorry
+
+/-- **Peterfalvi (11.3)**: `S(H_0 C)` is not coherent.
+
+If it were, Theorem (6.3) (`coherent_S_of_coherent_SH0C`) would make the full family `S` coherent,
+contradicting Theorem (10.8) (`S12.S_not_coherent`).  The theorem is thereby reduced, with no
+`sorry` of its own, to those two cited results. -/
 theorem S_H0C_not_coherent [Finite G] [Fintype G]
     (_hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} [Fintype ↥M]
     [Invertible (Nat.card ↥M : ℂ)] [Invertible (Nat.card G : ℂ)]
     (hyp : Hypothesis M) :
     ¬ Nonempty (OddOrder.Peterfalvi.S07.IsCoherent
-      hyp.base.tau (hyp.SOf hyp.H0C) hyp.base.A0) := by
-  sorry
+      hyp.base.tau (hyp.SOf hyp.H0C) hyp.base.A0) :=
+  fun hcoh => OddOrder.Peterfalvi.S12.S_not_coherent _hG hyp.base
+    (coherent_S_of_coherent_SH0C _hG hyp hcoh)
 
 /-- **Peterfalvi (11.4)**: if `S(H_1)` is coherent for a normal subgroup `H_1 < M'`,
 then `|M'/H_1| - 1 ≤ 2 q |U/C|` (the quotient bound from Theorem (6.2)), stated here in
