@@ -4811,6 +4811,48 @@ theorem Hypothesis.tau_muColumnZero_sub_zeta_eq [Finite G]
         rw [smul_smul, hδsq, one_smul]
 
 open scoped FiniteInduce in
+/-- **§10 (2.7) adjoint at the trivial character**: for an `A_0`-supported class function `φ` on `M`,
+the Dade image `φ^τ = hyp.tau φ` has the same trivial-character multiplicity as `φ`,
+`⟨φ^τ, 1_G⟩ = ⟨φ, 1_M⟩`.
+
+The genuine §10 Dade isometry `hyp.tau` agrees on the supported subspace with the §4 Dade map
+`hyp.dadeData.dade.dadeMap` (`dadeIntegralCharacterMap_apply_of_support`); the Peterfalvi (2.7) adjoint
+formula `adjoint_formula` with `χ = 1_G` gives `⟨dadeMap ⟨φ,_⟩, 1_G⟩ = ⟨φ, ψ⟩`, where the coset
+average `ψ = adjointAverageFun 1_G` is the constant `1` (`|H(a)|⁻¹·∑_{x ∈ H(a)} 1 = 1`), i.e. the
+trivial character `1_M`.  This is the `a_{00} = ((μ_0 − ζ)^τ, 1_G) = (μ_0 − ζ, 1_M)` computation
+underlying Peterfalvi (10.9). -/
+theorem Hypothesis.tau_inner_trivial [Finite G] {M : Subgroup G} (hyp : Hypothesis M)
+    {φ : ClassFunction ↥M ℂ} (hφ : φ.support ⊆ hyp.A0) :
+    ClassFunction.inner (hyp.tau φ) (trivialClassFunction G)
+      = ClassFunction.inner φ (trivialClassFunction (↥M)) := by
+  haveI := hyp.finiteG
+  classical
+  have hmem : φ ∈ ClassFunction.supportedSubmodule (G := ↥M) (k := ℂ)
+      (OddOrder.Peterfalvi.S04.supportInSubgroup (typePA0 M hyp.typeP) M) :=
+    (ClassFunction.mem_supportedSubmodule).mpr hφ
+  -- `hyp.tau φ = dadeMap ⟨φ, supported⟩` on the supported subspace.
+  have he : hyp.tau φ = hyp.dadeData.dade.dadeMap (k := ℂ) ⟨φ, hmem⟩ := by
+    change OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap hyp.dadeData.dade
+        (hyp.dadeData.dade.fullDadeIsometryData hyp.hconj) φ
+      = hyp.dadeData.dade.dadeMap (k := ℂ) ⟨φ, hmem⟩
+    rw [OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap_apply_of_support hyp.dadeData.dade _ hφ]
+  -- the coset average of `1_G` is the constant `1` (= `1_M`).
+  have hψ : ∀ a : {a : G // a ∈ typePA0 M hyp.typeP},
+      (trivialClassFunction (↥M)) ⟨a.1, hyp.dadeData.dade.subset_L a.2⟩
+        = OddOrder.Peterfalvi.S04.adjointAverageFun hyp.dadeData.dade (trivialClassFunction G)
+            ⟨a.1, hyp.dadeData.dade.subset_L a.2⟩ := by
+    intro a
+    rw [OddOrder.Peterfalvi.S04.adjointAverageFun, dif_pos a.2]
+    simp only [trivialClassFunction_apply, Finset.sum_const, nsmul_eq_mul, mul_one,
+      Finset.card_univ, ← Nat.card_eq_fintype_card]
+    rw [inv_mul_cancel₀]
+    exact_mod_cast Nat.card_pos.ne'
+  rw [he]
+  exact OddOrder.Peterfalvi.S04.adjoint_formula hyp.dadeData.dade hyp.dadeData.dade.dadeMap
+    (hyp.dadeData.dade.isDadeMap_dadeMap (k := ℂ)) hyp.hconj ⟨φ, hmem⟩ (trivialClassFunction G)
+    (trivialClassFunction (↥M)) hψ
+
+open scoped FiniteInduce in
 /-- **§10 Dade isometry vanishes off the tame support `Ã(M) = dadeSupport`.**  For a class function
 `φ` on `M` supported on `A_0(M)`, the Dade image `φ^τ = hyp.tau φ` *vanishes* at any
 `g ∉ Ã(M) = hyp.dadeData.dade.dadeSupport`.
