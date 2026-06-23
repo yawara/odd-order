@@ -85,3 +85,15 @@ hub 統合レビューで lane-c の §15 枯渇 → ユーザー裁可「char �
 (FeitThompson def 単位 C=tp+card_kappaHall)。証明 = `no_typeV_maximal` (S12:5767、Thm 10.10) cite +
 S13 (11.9.b) coherence/norm cite で (13.2.a) reduction。S13 も lane-c 所有 (issue 2018 移譲) ゆえ
 (11.9.b) signature 整備も lane-c 内で可能。宛先 lane-b → **lane-c**。
+
+## 2026-06-23 lane-c (relane #6): Type-V 排除を honest 実証明、gate を (11.9.b) III/IV 核に narrow
+
+lane-c が char ボトルネック支援 (relane #6, issue 4011) で本 obligation を引き取り。**(13.2.a) 証明の
+Type-V 排除ステップを sorry-free 実証明** (commit `eeb489f9`):
+- `card_kappaHall_lt_of_isTypeP1` は型辞書 `proposition_type_classification` (cite) + `no_typeV_maximal`
+  (Thm (10.10), proven) で「type-P₁ ⟹ M_F≠M_σ ⟹ Type III/IV」を実証明 → **sorry-free**。
+- 残 char 核を **`card_kappaHall_lt_of_isTypeIIIorIV`** (FeitThompson、新 faithful obligation) に localize:
+  `Type III/IV → |K*|<|K|` (= (11.9.b) coherence/norm on S(HC))。**これが lane-b の残タスク** (P₁→III/IV に narrow 済)。
+
+⟹ lane-b は `IsTypeP1` 全体でなく **Type III/IV 限定の (11.9.b) (q>p)** を埋めればよい (Type V は処理済)。
+S13 `final_typeIII_conclusions` (11.9) が `q>p` を与えるので、char API landing 後そこに wire 可能。
