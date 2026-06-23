@@ -99,17 +99,32 @@ definitionally 露出 = projection lemma `_W1`/`_U`)。全フィールドは lan
 sorry-free に discharge (cite)。**`.W1=K` の rfl は term-mode 構成必須** (obtain/have の casesOn が lane-f の
 tactic-built def の projection reduce を阻む、[[lean-coupled-engine-fields-and-beta]])。
 
-### 🔜 残 step (次 session)
-1. **`hUhall` 残差**: engine の仮説 `U が (κ∪σ)'-Hall` を canonical pair で discharge。**order 算術で tractable**:
-   carried U は M_F=M_σ を M' で complement ⟹ `|U| = [M':M_σ]`; `|M_σ|`=σ-part, `|K|`=κ-part ⟹
-   `|U| = (κ∪σ)'-part of |M|` ⟹ U.subgroupOf M は (κ∪σ)ᶜ-Hall。要 BG §14 prime facts (M_σ avoids κ since σ∩κ=∅,
-   `|M_σ|` primes ⊆ σ, M' avoids κ)。`hKnorm` (K ≤ N(U)) は step 1 の `exists_kappaHall_invariant_complement_to_MF`。
-2. **step 3 wiring**: `Section16TypePStructure` に `Sdata`/`Tdata : TypePData` (+ `Sdata.U=U`/`Sdata.W1=K`
-   reconciliation、engine の `_W1`/`_U` で rfl) 追加 → `section16TypePStructure_of_components`/`_of_isMinimalSimpleOdd`
-   で engine 呼び出し (hUhall 供給) → `Section16Inputs` + `sectionSixteenHypothesis_of_inputs` + `S15.Hypothesis`
-   に thread → `S15.basic_structure` の `UW1_frobenius`/`U_commutative` を `Sdata` から実証明
-   (`typeP_uW1_frobenius Sdata`、型 II/III 判定後)。
-3. **co-edit 境界** (FeitThompson.lean は F/B/C 共有、def 単位): C=tp系 / F=mp+Prop16.1 / B=cd。互いに別 def。
+### ✅ step 2.5: hUhall discharger (commit `f1d710a4`)
+`isHall_kappaSigmaCompl_of_isTypeP2_complement` (FeitThompson.lean, sorry-free): type-P2 M で carried U
+(M'=M_F⊔U, M_F⊓U=⊥) が (κ∪σ)'-Hall。証明: type-P2⟹M_F=M_σ; `typeP_exists_hall_derived_eq` が (κ∪σ)'-Hall
+U₀ (M'=U₀⊔M_σ) 供給; U と U₀ は共に normal M_σ を M' で complement ⟹ |M_σ|·|U|=|M'|=|M_σ|·|U₀| ⟹ |U|=|U₀|;
+IsHallSubgroup は order 決定 (`isHallSubgroup_of_card_eq` 新 helper) ⟹ U も (κ∪σ)'-Hall。支持 helper:
+`card_mul_card_of_complement_normal` (normal complement の card 積、`normal_mul`+`isComplement'_of_disjoint_and_mul_eq_univ`)。
+**Lean 知見**: `subgroupOf` は regular def ゆえ `← comap_inf` rw 不発 → `show … from (comap_inf _ _ _).symm` で
+defeq 強制; `hMFeq ▸ hUinf` を rw 引数にすると motive 不定 → `← hMFeq` で戻して `hUinf`。
+
+**⟹ carrier 核心機構 (engine + hUhall + helpers) 完成・全 sorry-free。** engine は type-P2 input で
+完全に invocable (step 1 が hUsup/hKnorm/hUinf 供給、step 2.5 が hUhall)。
+
+### 🔜 残 step 3 (次 session) — wiring + (13.2.a) type 判定
+1. **compose**: `exists_typePData_W1_eq_of_isTypeP2 (hP2) (K κ-Hall) : ∃ data : TypePData M, data.W1=K`
+   = exists_kappaHall_invariant_complement_to_MF + step 2.5 hUhall + engine。残 sub-gate = `hUne` (U≠⊥;
+   type-P2 ⟹ M_σ≠M' ⟹ U≠⊥、要小 lemma)。
+2. **(13.2.a) type 判定 (producer gate)**: producer で engine を mp.S に適用するには **mp.S が type-P2 (=type II)**
+   が要る。§16 carrier は q<p (`q_lt_p`) を持ち Pf (13.2.a)「q<p⟹S type II」だが、これは `BasicStructureData.q_lt_p_forces_typeII`
+   field = basic_structure 自身。**producer で独立に「q<p (= smaller κ-Hall member) ⟹ type-P2」を要する**
+   (Prop 16.1(b) の `IsTypeP2 S ∨ IsTypeP2 Mstar` disjunction を ordering で resolve、BG §16 の deep result、要調査)。
+3. **wiring**: `Section16TypePStructure` に `Sdata`/`Tdata : TypePData` (+ `.U=U`/`.W1=K` reconciliation、
+   engine `_W1`/`_U`) → producer で compose 呼び出し → `Section16Inputs`+`sectionSixteenHypothesis_of_inputs`+
+   `S15.Hypothesis` に thread → `S15.basic_structure` の `UW1_frobenius`/`U_commutative` を carried `Sdata` から
+   実証明 (`typeP_uW1_frobenius`)。**注意**: basic_structure の他 field (type 判定, P el-ab p^q, u 上界) は
+   carrier と別の deep obligation; carrier は U-side (UW1_frobenius/U_commutative = 診断が特定した元の blocker) を解く。
+4. **co-edit 境界** (FeitThompson.lean は F/B/C 共有、def 単位): C=tp系 / F=mp+Prop16.1 / B=cd。互いに別 def。
 
 ---
 
