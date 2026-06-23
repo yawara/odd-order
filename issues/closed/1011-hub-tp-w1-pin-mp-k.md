@@ -58,3 +58,19 @@ cd producer (lane-b) が `tp.W1 = mp.K` / `tp.W2 = mp.Kstar` を build-green に
 - 構造: `Section16TypePStructure` (FeitThompson.lean:220)、producer `section16TypePStructure_of_components` (:445) /
   `section16TypePStructure_of_isMinimalSimpleOdd` (:501)
 - 関連: 1004 (cd producer) / 7005 (typeP_structure, lane-f)
+
+---
+
+## 解決 (2026-06-23, hub routing — ユーザー裁可不要)
+
+issue の前提「tp producer = POLE-1 tp[F] = lane-f 所有」は **relane #3 (issue 4008) で stale**:
+`Section16TypePStructure` + producer (`section16TypePStructure_*`) は **2026-06-23 に lane-c へ移譲済**
+(POLE-1 tp carrier)。よって本要求は **lane-c の既存スコープ内**で解決でき、cross-lane の新規 hub 構造判断は不要。
+
+**hub routing (option A)**: **lane-c** が `Section16TypePStructure` に field
+`W1_eq_K : W1 = mp.K` (+ `W2_eq_Kstar : W2 = mp.Kstar`) を追加し、所有する producer
+(`section16TypePStructure_of_components`/`_of_isMinimalSimpleOdd`) で discharge (W1:=mp.K は真に設定済ゆえ容易)。
+lane-c の carrier capstone `exists_typePData_W1_eq_of_isTypeP2` は既に `data.W1 = K` を産出しており整合的。
+**lane-b は `tp.W1_eq_K` を cite** して cd grid (ω/μ/ν) を mp.K に align。lane-c LAUNCH.md に task 追記済。
+
+CLOSED (hub routing 完了。field-add 実装は lane-c の通常 carrier 作業として進む)。
