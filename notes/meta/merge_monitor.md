@@ -90,6 +90,15 @@ productive な独立クラスタに乗せ、上流優先方針 (CLAUDE.md) に�
 > (ユーザー直接管理) ゆえ既存ファイル本体は cite のみ・生産は新 leaf 隔離。POLE-2 (issue 2009) は driver/await に
 > 降格 (pending)。**教訓: relane で「workable-now」を指す前に実コードで sorry 状態を検証する** (issue note 鵜呑み禁止)。
 
+> **⚠ 2026-06-23 relane #8 (ユーザー裁可、issue 4012)**: lane-c が §13 ungated 群論 win 完遂 ((11.6)
+> conjunct 2 `U_centralizes_H0` char-free 実証明) → 3 度目の char 枯渇。判明: (11.5) `HC_le_secondDerived`
+> のブロッカー = **Pf (5.7)「M'/M'' abelian ⟹ S(M'') coherent」未形式化** (gated でなく未着手の上流前提)。
+> ユーザー裁可で **lane-c = Pf (5.7) coherence producer** に再配置 (§5/§7 新 leaf 隔離生産、consumer=S13(11.5))。
+> **lane-h の §6 (6.2)/(6.3) producer (relane #7) と対 = C:§5(5.7) / H:§6(6.2/6.3) coherence producer 並列**で
+> §13 を上流から unblock。S13/card_kappaHall/§15 は C 所有のまま driver/await。⚠ §5-§8 は lane-b 名目領域
+> (dormant) ゆえ既存本体 cite のみ・新 leaf 隔離。**体制: B=cd/coherence核 / C=§5(5.7) coherence producer /
+> F=Prop16.1 hFI ¬TI(BG 15.7e) / H=§6(6.2/6.3) coherence producer** — char critical path に 4 レーン縦並び。
+
 **signature-first interface**: 上流が sorried signature を export → 下流が cite。真の cross-lane 依存は narrow。
 signature 不足は notes/issue 経由。**driver (§16/§10)**: 常駐レーンを当てず、上流が landing したとき hub or
 担当レーンが続けて opportunistic に close する (pure consumer ゆえ常駐は starve)。

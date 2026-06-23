@@ -70,3 +70,13 @@ lane-c は self-resume monitor で解決を検知し自動再開する。
   `OddOrder/FeitThompson.lean:426` (`card_kappaHall_lt_of_isTypeIIIorIV`)
 - 原典: Pf §13 (11.x) = `references/peterfalvi/04.13_pp_64_68_*.mmd`; (5.7) = §5 (`04.3`/`04.7`)
 - notes: `notes/peterfalvi/s10_13_maximal_structure.md` (§13 gate map)
+
+## 2026-06-23 RESOLVED (ユーザー裁可) — option 2: Pf (5.7) を新規形式化 (relane #8)
+
+3 度目の char 枯渇 (§15→§13 char→§13 群論)。判明: (11.5) `HC_le_secondDerived` のブロッカー =
+Pf (5.7)「M'/M'' abelian ⟹ S(M'') coherent」未形式化 (gated でなく未着手の上流前提、§5 dormant)。
+ユーザー選択 = **lane-c = Pf (5.7) coherence producer** に再配置 (relane #8)。lane-h の §6 (6.2)/(6.3)
+producer (relane #7) と対 = C:§5 (5.7) / H:§6 = coherence producer 並列で §13 を上流から unblock。
+- lane-c は §5/§7 新 leaf に standalone (5.7) を生産 (既存 S05-S08 本体は cite のみ・新 leaf 隔離)。
+- consumer = S13 (11.5) (lane-c 自所有)。S13/card_kappaHall/§15 は driver/await に降格。
+LAUNCH.md (lane-c relane #8) 更新済 + merge_monitor relane #8。lane-c は self-resume で自動再開。CLOSED。
