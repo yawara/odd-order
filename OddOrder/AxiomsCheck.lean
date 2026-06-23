@@ -105,6 +105,7 @@ import OddOrder.Peterfalvi.S06_MuColumnBridge
 import OddOrder.Peterfalvi.S07_Coherence
 import OddOrder.Peterfalvi.S07_CoherenceGalois
 import OddOrder.Peterfalvi.S08_CoherenceTheorems
+import OddOrder.Peterfalvi.S08_Theorem62_63_Standalone
 import OddOrder.Peterfalvi.S09_NonexistenceCertain
 import OddOrder.Peterfalvi.S10_CoherenceWiring
 import OddOrder.FeitThompson
@@ -2170,6 +2171,13 @@ set_option linter.style.longLine false in
 -- combining the orbit-counted `sum_div_normSq_induce_image_eq` with the inflation degree-sum
 -- `sumInflatedDegreeSq_ntrivial` over the (conjugation-invariant, as `A ⊴ G`) kernel-filter `T`.
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S08.sum_div_normSq_induce_kernelFilter_eq
+-- Standalone general Hypothesis (6.1) coherence theorems (`K` solvable, `H ≤ K` nilpotent, `K ≠ H`),
+-- the form the §11/§13 maximal-subgroup analysis needs (the Sibley `six_two`/`six_three` have `K = H`).
+-- `IsCoherent.subset`: coherence is inherited by subsets with a nonzero supported witness (general
+-- monotonicity of the (5.1) predicate).  `six_three_descent`: Peterfalvi (6.3)'s minimal-`A` descent
+-- (maximal-`B` + nilpotency-forces-centrality + `√`-arithmetic) reduced to the (6.2) index oracle.
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S07.IsCoherent.subset
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S08.six_three_descent
 -- (6.5) chief-factor core + (6.5)(b) reduction: a Frobenius-acted abelian section obeying the (6.3)
 -- index bound `≤ 4|R|²+1` is a `p`-group (chief-factor argument via the `p`-primary component,
 -- `card_modEq_one` + `six_five_chief_factor_contradiction`); combined with the nilpotent
@@ -4011,6 +4019,12 @@ set_option linter.style.longLine false in
 -- 15.7(e) conjunct A divisibility crux (mathcomp `regular_norm_dvd_pred`, `IsFrobeniusAction` form):
 -- a Frobenius action of `A` on `N` gives `|A| ∣ |N| - 1`.
 #assert_only_allowed_axioms OddOrder.BG.Ch4.S15.card_dvd_sub_one_of_isFrobeniusAction
+-- 15.7(e) conjunct B (Coq `cycHp'`): `cyclic O_{p'}(M_F)` for non-abelian `M_F`, plus the two
+-- reusable group-theory lemmas it rests on (commuting commutative join is commutative; an odd
+-- commutative group of rank ≤ 1 is cyclic, via the `Z`-group `exponent = card` route).
+#assert_only_allowed_axioms OddOrder.BG.Ch4.S15.isMulCommutative_sup_of_le_centralizer
+#assert_only_allowed_axioms OddOrder.BG.Ch4.S15.isCyclic_of_isMulCommutative_of_rank_le_one
+#assert_only_allowed_axioms OddOrder.BG.Ch4.S15.typeF_nonabelian_cyclic_opiCore_compl
 -- BG **Lemma 15.1** (`S15_MF`, issue 7007): the auxiliary `U`-factor structure of an arbitrary
 -- maximal `M = K U M_σ` — `K ≠ 1 → M' = U M_σ ∧ U` abelian (15.1b); the cyclic-`τ₂` centralizer
 -- funnel (15.1c); `⟨C_U(x) | x ∈ M_σ#⟩` abelian (15.1d); the Frobenius factor `U₀ M_σ` (15.1e).
@@ -5885,6 +5899,12 @@ formula together with the prime computation `coprimeFrobeniusAction_card_eq_prim
 -- Same clause restated against the cleaner subgroup gate `W₂ ⊓ H₀ = ⊥` (the fpf input reduces to it
 -- via `H ⊓ C_G(W₁) = W₂`); isolates the genuine §8/chief obligation.
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S13.U_centralizes_H0_of_W2_inf_H0_bot
+-- (9.6)/(11.6) the genuine §8/chief input `W₂ ⊓ H₀ = ⊥`, discharged unconditionally: `|W₂| = p` prime
+-- + the chief-factor order `|C_{H̄}(W₁)| = |W̄₂| = p` (`coprimeFrobeniusChiefFactor_card`) show `W₂ ⊄ H₀`.
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S13.chief_W2_inf_H0_eq_bot
+-- (11.6) conjunct 2 fully assembled: `U` centralizes `H₀` with no character input (the above chief
+-- input feeds Wielandt (9.1)).  This is the unconditional half of `core_structure`.
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S13.U_centralizes_H0
 
 -- §16 character-data producer (`section16CharacterData`, POLE-1 `cd`) — S-side grid building blocks.
 -- `induce_compHom_subgroupCongr`: `Ind` is invariant under transporting the source subgroup along an

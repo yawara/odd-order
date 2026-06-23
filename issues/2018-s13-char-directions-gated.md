@@ -31,14 +31,16 @@ faithful に STATE できる定理を全て実ステートメント化 + uncondi
   (5.7)+(11.4) coherence、char-gated)。残 gate = `HC_le_secondDerived` のみ。
 - [ ] **(11.4) `coherent_quotient_bound`** ← Peterfalvi Thm (6.2) quotient bound (= 本定理が
   Thm 6.2 そのもの、obligation 化しても rename ゆえ未処理; lane-b §6 char で discharge)。
-- [ ] **(11.6) `core_structure`** 残 3 conjunct (`IsPGroup p H` / `U ≤ C_G(H₀)` / `H₀ = H'`)
-  ← (9.3) [`U` centralizes `O_{p'}(H)`] + (9.6) [`C_{H₀}(W₁) = 1`] + (9.1) Wielandt (✅ done) +
-  `[BG] 1.6(d)` + (11.5)。
-  - **✅ `U ≤ C_G(H₀)` clause の Wielandt 部分は landed** (commit `558619f2`,
-    `S13.U_centralizes_H0_of_W1_fpf`, axiom-clean): `C_{H₀}(W₁)=1` ∧ `U≠1` ⟹ `U ≤ C_G(H₀)`,
-    lane-h の (9.1) `frobenius_kernel_centralizes_of_complement_fpf` 経由。**残 gate = fpf 入力
-    `C_{H₀}(W₁)=1`** = `|W₂|=p` (§8 `S11.typeIIIorIV_W2_prime`, cites (8.8)) + coprime-quotient
-    (`C_H(W₁)=W₂` [TypePData `centralizer_W1`] + Cor 3.28 surj + (9.6) `|W̄₂|=p`)。
+- [ ] **(11.6) `core_structure`** 残 **2** conjunct (`IsPGroup p H` / `H₀ = H'`) + reverse `C ⊆ U'`
+  ← (9.3) [`U` centralizes `O_{p'}(H)`] + `[BG] 1.6(d)` + (11.5)。conjunct 2 (`U ≤ C_G(H₀)`) は ✅ done。
+  - **✅✅ `U ≤ C_G(H₀)` clause 完全 landed (2026-06-23 lane-c relane #6, axiom-clean)**:
+    `S13.U_centralizes_H0` (無条件、char 入力なし)。fpf 入力 `C_{H₀}(W₁)=1` を `chief_W2_inf_H0_eq_bot`
+    (`W₂ ⊓ H₀ = ⊥`) で discharge — `|W₂|=p` prime (`typeIII_IV_p_eq_W2`) + 連鎖因子位数
+    `|C_{H̄}(W₁)|=|W̄₂|=p` (`coprimeFrobeniusChiefFactor_card .2`) で `W₂ ⊄ H₀` を実証明 → `W₂⊓H₀∈{⊥,W₂}`
+    で `=⊥`。Wielandt 部分は既 landed の `U_centralizes_H0_of_W2_inf_H0_bot` を cite。**`core_structure`
+    に wire 済 (conjunct 2 = `U_centralizes_H0 hyp`、残 3 sorry は IsPGroup/H₀=H'/C=U'-reverse)**。
+    付随: `Hypothesis` に `setup_typeP_eq : s11Setup.typeP = base.typeP` 忠実性 field を追加 (Pf (11.2)
+    は単一 type-P 構造、producer は rfl)。AxiomsCheck 登録済 (`chief_W2_inf_H0_eq_bot`/`U_centralizes_H0`)。
   - `IsPGroup p H` ← (9.3)[U cent O_{p'}(H)]+(11.5); `H₀=H'` ← [BG]1.6(d)+(11.5)。両 (11.5)-gated。
 - [ ] **(11.7) `H_elementaryAbelian`** ← (11.5) + (11.6) 下流。
 - [ ] **(11.8.x)/(11.8)/(11.9)** + opaque rider field (`notOrthogonalFormula` /

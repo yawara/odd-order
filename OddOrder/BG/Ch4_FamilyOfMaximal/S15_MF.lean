@@ -8055,6 +8055,148 @@ theorem card_dvd_sub_one_of_isFrobeniusAction {A N : Type*} [Group A] [Finite A]
     simpa only [Nat.card_eq_fintype_card] using h.card_modEq_one
   exact (Nat.modEq_iff_dvd' Nat.card_pos).mp hmod.symm
 
+/-- **The join of two commuting commutative subgroups is commutative.**  Writing `A ⊔ B` as the
+closure of `↑A ∪ ↑B`, generators commute: two from `A` (abelian), two from `B` (abelian), or one of
+each (they centralize each other, `A ≤ C_G(B)`).  Used for `not_cPP` in BG Theorem 15.7(e): were
+`O_p(M_F)` abelian, then `M_F = O_p(M_F) ⊔ O_{p'}(M_F)` would be abelian (the `p'`-core is abelian
+and centralizes the `p`-core), contradicting non-abelianness of `M_F`. -/
+theorem isMulCommutative_sup_of_le_centralizer {A B : Subgroup G}
+    (hA : IsMulCommutative ↥A) (hB : IsMulCommutative ↥B)
+    (hAB : A ≤ Subgroup.centralizer (B : Set G)) :
+    IsMulCommutative ↥(A ⊔ B) := by
+  rw [Subgroup.sup_eq_closure]
+  refine Subgroup.isMulCommutative_closure fun x hx y hy => ?_
+  rcases hx with hx | hx <;> rcases hy with hy | hy
+  · simpa using congrArg Subtype.val (isMulCommutative_iff.mp hA ⟨x, hx⟩ ⟨y, hy⟩)
+  · exact (Subgroup.mem_centralizer_iff.mp (hAB hx) y hy).symm
+  · exact Subgroup.mem_centralizer_iff.mp (hAB hy) x hx
+  · simpa using congrArg Subtype.val (isMulCommutative_iff.mp hB ⟨x, hx⟩ ⟨y, hy⟩)
+
+/-- **A finite commutative group of odd order and rank `≤ 1` is cyclic** (additive converse of
+mathcomp's `abelian_rank1_cyclic`).  Each Sylow `q`-subgroup is an abelian `q`-group whose `pRank`
+is at most `rank N ≤ 1`, hence cyclic (contrapositive of
+`two_le_pRank_of_comm_isPGroup_not_isCyclic`, using that `q`, a divisor of the odd `|N|`, is odd);
+so `N` is a `Z`-group, and a finite commutative (hence nilpotent) `Z`-group is cyclic
+(`IsZGroup.exponent_eq_card` + `IsCyclic.of_exponent_eq_card`).  This is the rank-1 ⇒ cyclic step of
+the `cyclic O_{p'}(M_F)` conjunct of BG Theorem 15.7(e). -/
+theorem isCyclic_of_isMulCommutative_of_rank_le_one {N : Type*} [Group N] [Finite N]
+    (hcomm : ∀ x y : N, x * y = y * x) (hodd : Odd (Nat.card N)) (hrank : rank N ≤ 1) :
+    IsCyclic N := by
+  classical
+  haveI hmc : IsMulCommutative N := isMulCommutative_iff.mpr hcomm
+  haveI hZ : _root_.IsZGroup N := by
+    refine ⟨fun q hq P => ?_⟩
+    haveI : Fact q.Prime := ⟨hq⟩
+    by_contra hPnc
+    rcases subsingleton_or_nontrivial ↥(P : Subgroup N) with _ | hnt
+    · exact hPnc inferInstance
+    · have hPcomm : ∀ x y : ↥(P : Subgroup N), x * y = y * x := fun x y =>
+        Subtype.ext (hcomm (x : N) (y : N))
+      have hqdvd : q ∣ Nat.card N := by
+        obtain ⟨n, hn⟩ := IsPGroup.iff_card.mp P.isPGroup'
+        have h1 : 1 < Nat.card ↥(P : Subgroup N) := Finite.one_lt_card_iff_nontrivial.mpr hnt
+        have hn0 : n ≠ 0 := by rintro rfl; rw [pow_zero] at hn; omega
+        have hqP : q ∣ Nat.card ↥(P : Subgroup N) := by rw [hn]; exact dvd_pow_self q hn0
+        exact hqP.trans (Subgroup.card_subgroup_dvd_card _)
+      have hqodd : Odd q := by
+        rcases hq.eq_two_or_odd' with rfl | h
+        · exact absurd (even_iff_two_dvd.mpr hqdvd) (Nat.not_even_iff_odd.mpr hodd)
+        · exact h
+      have h2 : 2 ≤ pRank ↥(P : Subgroup N) q :=
+        two_le_pRank_of_comm_isPGroup_not_isCyclic hqodd hPcomm P.isPGroup' hPnc
+      have hle : pRank ↥(P : Subgroup N) q ≤ rank N :=
+        le_trans (pRank_mono_of_le (P : Subgroup N)) (pRank_le_rank q)
+      omega
+  exact IsCyclic.of_exponent_eq_card (_root_.IsZGroup.exponent_eq_card N)
+
+/-- **BG Theorem 15.7(e), conjunct B — `cyclic O_{p'}(M_F)`** (Coq `nonTI_Fitting_structure`,
+`cycHp'`): for the non-TI witness prime `p` (`X₁ ≤ M_F` of order `p`, `C_G(X₁) ⊄ M`) and a
+non-abelian Fitting subgroup `M_F`, the `p'`-core `O_{p'}(M_F)` is cyclic.
+
+`C₁ = C_{M_F}(X₁)` is abelian (`isMulCommutative_mf_inf_centralizer_of_not_le`) and not uniquely
+maximal (`not_isUniquelyMaximal_mf_inf_centralizer_of_not_le`).  The `p'`-core `R = O_{p'}(M_F)`
+centralizes the `p`-core `P = O_p(M_F) ⊇ X₁` (`opiCoreInG_commutator_compl_eq_bot`), so `R ≤ C₁`,
+hence `R` is abelian.  `P` is non-abelian (else `M_F = P ⊔ R` would be abelian,
+`isMulCommutative_sup_of_le_centralizer`), so `P ∈ 𝒰` (`nonabelian_pgroup_isUniquelyMaximal`).
+Were `rank R ≥ 2`, then `D = M_F ⊓ C_G(P) ⊇ R` would have `rank ≥ 2` and lie in `C_G(P)`, so
+`D ∈ 𝒰` (BG Corollary 9.2) and hence `C₁ ⊇ D` would be uniquely maximal — contradiction.  Thus
+`rank R ≤ 1`, and the odd abelian `R` is cyclic (`isCyclic_of_isMulCommutative_of_rank_le_one`). -/
+theorem typeF_nonabelian_cyclic_opiCore_compl [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} (hM : M ∈ maximalSubgroups G)
+    {p : ℕ} {X₁ : Subgroup G} (hp : p.Prime)
+    (hX₁card : Nat.card ↥X₁ = p) (hX₁MF : X₁ ≤ MF M)
+    (hCGnotM : ¬ Subgroup.centralizer (X₁ : Set G) ≤ M)
+    (hnab : ¬ IsMulCommutative ↥(MF M)) :
+    p ∈ (Nat.card ↥(MF M)).primeFactors ∧
+      IsCyclic ↥(opiCoreInG (({p} : Set ℕ)ᶜ) (MF M)) := by
+  classical
+  haveI : Fact p.Prime := ⟨hp⟩
+  have hX₁ne : X₁ ≠ ⊥ := fun h => hp.one_lt.ne' (by rw [← hX₁card, h, Subgroup.card_bot])
+  have hX₁pg : IsPGroup p ↥X₁ := IsPGroup.of_card (n := 1) (by rw [hX₁card, pow_one])
+  haveI hMFnil : Group.IsNilpotent ↥(MF M) := maxNilpotentNormalHall_isNilpotent M
+  -- `p ∈ π(M_F)`: `p = |X₁| ∣ |M_F|`.
+  have hpπ : p ∈ (Nat.card ↥(MF M)).primeFactors :=
+    Nat.mem_primeFactors.mpr ⟨hp, hX₁card ▸ Subgroup.card_dvd_of_le hX₁MF, Nat.card_pos.ne'⟩
+  set P : Subgroup G := opiCoreInG ({p} : Set ℕ) (MF M) with hPdef
+  set R : Subgroup G := opiCoreInG (({p} : Set ℕ)ᶜ) (MF M) with hRdef
+  -- `X₁ ≤ P = O_p(M_F)`.
+  have hX₁P : X₁ ≤ P :=
+    OddOrder.BG.Ch2.S08.le_opiCoreInG_singleton_of_isPGroup_of_le_nilpotent hMFnil hX₁MF hX₁pg
+  -- `R = O_{p'}(M_F) ≤ C_G(P)` (the `p`- and `p'`-cores of the nilpotent `M_F` commute).
+  have hcomm : ⁅R, P⁆ = ⊥ := by
+    rw [hRdef, hPdef, Subgroup.commutator_comm]
+    exact OddOrder.BG.Ch2.S08.opiCoreInG_commutator_compl_eq_bot ({p} : Set ℕ) (MF M)
+  have hRcP : R ≤ Subgroup.centralizer (P : Set G) :=
+    Subgroup.commutator_eq_bot_iff_le_centralizer.mp hcomm
+  have hRMF : R ≤ MF M := opiCoreInG_le _ _
+  have hCPCX : Subgroup.centralizer (P : Set G) ≤ Subgroup.centralizer (X₁ : Set G) :=
+    Subgroup.centralizer_le (SetLike.coe_subset_coe.mpr hX₁P)
+  have hRC1 : R ≤ MF M ⊓ Subgroup.centralizer (X₁ : Set G) := le_inf hRMF (hRcP.trans hCPCX)
+  -- `C₁` abelian ⟹ `R` abelian.
+  have hC1ab : IsMulCommutative ↥(MF M ⊓ Subgroup.centralizer (X₁ : Set G)) :=
+    isMulCommutative_mf_inf_centralizer_of_not_le hG hM hX₁ne hCGnotM
+  have hRab : ∀ x y : ↥R, x * y = y * x := fun x y =>
+    Subtype.ext (by
+      simpa using congrArg Subtype.val
+        (isMulCommutative_iff.mp hC1ab ⟨(x : G), hRC1 x.2⟩ ⟨(y : G), hRC1 y.2⟩))
+  -- `P` non-abelian (`not_cPP`): else `M_F = P ⊔ R` is abelian.
+  have hPRsup : P ⊔ R = MF M := opiCoreInG_sup_compl_eq_of_isNilpotent ({p} : Set ℕ)
+  have hPnab : ¬ IsMulCommutative ↥P := by
+    intro hPab
+    refine hnab (hPRsup ▸ isMulCommutative_sup_of_le_centralizer hPab ?_ ?_)
+    · exact isMulCommutative_iff.mpr hRab
+    · rw [Subgroup.commutator_comm] at hcomm
+      exact Subgroup.commutator_eq_bot_iff_le_centralizer.mp hcomm
+  have hPpg : IsPGroup p ↥P := isPGroup_opiCoreInG_singleton (MF M)
+  have hPU : OddOrder.GroupTheory.IsUniquelyMaximal P :=
+    nonabelian_pgroup_isUniquelyMaximal hG hPpg hPnab
+  -- `rank R ≤ 1`: else `C₁ ∈ 𝒰` via `D = M_F ⊓ C_G(P)`, contradicting `nonuniqC1`.
+  have hC1notU : ¬ OddOrder.GroupTheory.IsUniquelyMaximal
+      (MF M ⊓ Subgroup.centralizer (X₁ : Set G)) :=
+    not_isUniquelyMaximal_mf_inf_centralizer_of_not_le hG hM hX₁ne hCGnotM
+  have hrankR : rank ↥R ≤ 1 := by
+    by_contra hr
+    have h2R : 2 ≤ rank ↥R := by omega
+    have hRD : R ≤ MF M ⊓ Subgroup.centralizer (P : Set G) := le_inf hRMF hRcP
+    have h2D : 2 ≤ rank ↥(MF M ⊓ Subgroup.centralizer (P : Set G)) :=
+      le_trans h2R (rank_le_of_injective (Subgroup.inclusion_injective hRD))
+    have hDU : OddOrder.GroupTheory.IsUniquelyMaximal (MF M ⊓ Subgroup.centralizer (P : Set G)) :=
+      OddOrder.BG.Ch2.S09.isUniquelyMaximal_of_le_centralizer_of_two_le_rank hG hPU inf_le_right h2D
+    have hDC1 : MF M ⊓ Subgroup.centralizer (P : Set G) ≤
+        MF M ⊓ Subgroup.centralizer (X₁ : Set G) := le_inf inf_le_left (inf_le_right.trans hCPCX)
+    have hC1lt : MF M ⊓ Subgroup.centralizer (X₁ : Set G) < ⊤ :=
+      lt_of_le_of_lt (inf_le_left.trans (maxNilpotentNormalHall_le M))
+        (mem_maximalSubgroups.mp hM).lt_top
+    exact hC1notU (hDU.of_le_of_lt_top hDC1 hC1lt)
+  -- `R` is odd, abelian, of rank `≤ 1`, hence cyclic.
+  have hRodd : Odd (Nat.card ↥R) := by
+    rcases Nat.even_or_odd (Nat.card ↥R) with he | ho
+    · exact absurd
+        (even_iff_two_dvd.mpr ((even_iff_two_dvd.mp he).trans (Subgroup.card_subgroup_dvd_card R)))
+        (Nat.not_even_iff_odd.mpr hG.odd)
+    · exact ho
+  exact ⟨hpπ, isCyclic_of_isMulCommutative_of_rank_le_one hRab hRodd hrankR⟩
+
 /-- **BG Theorem 15.7(a), rank-theoretic core** (mmd L4192-4198): if `F(M)` is not a TI-subgroup
 of `G`, then no prime divides `M_F` and lies in `β(M)`.
 
