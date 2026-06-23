@@ -222,15 +222,24 @@ theorem coherent_quotient_bound [Finite G] [Fintype G]
     H1.relIndex (derivedInG M) ≤ 2 * hyp.q * hyp.C.relIndex hyp.U + 1 := by
   sorry
 
-/-- **Peterfalvi (11.5)**: the second derived subgroup is `H C`, i.e. `M'' = HC`. -/
+/-- **Peterfalvi (11.5), reverse inclusion `HC ⊆ M''`** (named obligation): the coherence content
+of (11.5).  Since `M'/M''` is abelian, `S(M'')` is coherent by (5.7); the quotient bound (11.4)
+together with (11.1)/(9.6) then forces `M'' = HC`.  Char-gated — it bottoms out in Theorem (10.8)
+via (11.3)/(11.4) — so it is left as a clean named subgroup-inclusion obligation. -/
+theorem HC_le_secondDerived [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    {M : Subgroup G} (hyp : Hypothesis M) :
+    hyp.HC ≤ secondDerivedInAmbient M := by
+  sorry
+
+/-- **Peterfalvi (11.5)**: the second derived subgroup is `H C`, i.e. `M'' = HC`.
+
+`M'' ⊆ HC` is unconditional ((8.5.a), `secondDerived_le_HC`); the reverse `HC ⊆ M''` is the
+coherence content carried by `HC_le_secondDerived`.  The theorem composes the two with no `sorry`
+of its own. -/
 theorem secondDerived_eq_HC [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
     {M : Subgroup G} (hyp : Hypothesis M) :
-    secondDerivedInAmbient M = hyp.HC := by
-  refine le_antisymm hyp.secondDerived_le_HC ?_
-  -- Reverse inclusion `HC ⊆ M''`: since `M'/M''` is abelian, `S(M'')` is coherent (5.7);
-  -- the quotient bound (11.4) with (11.1)/(9.6) forces `M'' = HC`.  Coherence-gated: this
-  -- bottoms out in Theorem (10.8) [`S12.S_not_coherent`] via (11.3)/(11.4).
-  sorry
+    secondDerivedInAmbient M = hyp.HC :=
+  le_antisymm hyp.secondDerived_le_HC (HC_le_secondDerived _hG hyp)
 
 /-! ## (11.6)--(11.7): the core structure of `H` and `U` -/
 
