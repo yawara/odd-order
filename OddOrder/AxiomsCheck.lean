@@ -5808,3 +5808,6 @@ formula together with the prime computation `coprimeFrobeniusAction_card_eq_prim
 -- the Frobenius kernel `U` centralizes the chief subgroup `H₀`.  The Wielandt content (lane-h's
 -- `frobenius_kernel_centralizes_of_complement_fpf`) is axiom-clean; the fpf input is the §8 gate.
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S13.U_centralizes_H0_of_W1_fpf
+-- Same clause restated against the cleaner subgroup gate `W₂ ⊓ H₀ = ⊥` (the fpf input reduces to it
+-- via `H ⊓ C_G(W₁) = W₂`); isolates the genuine §8/chief obligation.
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S13.U_centralizes_H0_of_W2_inf_H0_bot

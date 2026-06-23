@@ -252,6 +252,31 @@ theorem U_centralizes_H0_of_W1_fpf [Finite G] {M : Subgroup G} (hyp : Hypothesis
   exact OddOrder.GroupTheory.frobenius_kernel_centralizes_of_complement_fpf hUEnorm
     (OddOrder.Peterfalvi.S11.typeP_uW1_frobenius hyp.base.typeP hU) hsolv hcop hfpf
 
+/-- **Peterfalvi (11.6), the `U`-centralizes-`H_0` clause, gated on `W_2 ⊓ H_0 = ⊥`**: a cleaner
+restatement of `U_centralizes_H0_of_W1_fpf` whose hypothesis is the subgroup equation
+`W_2 ⊓ H_0 = ⊥` rather than the raw fixed-point-free condition.
+
+The fixed-point-free input `C_{H_0}(W_1) = 1` reduces to `W_2 ⊓ H_0 = ⊥`: any `n ∈ H_0` centralized
+by `W_1` lies in `H ⊓ C_G(W_1) = W_2` (`typeP_H_inf_centralizer_W1`), hence in `W_2 ⊓ H_0`.  This
+isolates the genuine §8/chief content (`W_2 ⊓ H_0 = ⊥`, which holds because `|W_2| = p` is prime —
+`typeIIIorIV_W2_prime` — and `W_2 ⊄ H_0` from the chief factor) as a single clean obligation. -/
+theorem U_centralizes_H0_of_W2_inf_H0_bot [Finite G] {M : Subgroup G} (hyp : Hypothesis M)
+    (hU : hyp.base.typeP.U ≠ ⊥)
+    (hbot : hyp.base.typeP.W2 ⊓ hyp.chief.H0 = ⊥) :
+    hyp.U ≤ Subgroup.centralizer (hyp.chief.H0 : Set G) := by
+  have hHH : hyp.s11Setup.typeP.H = hyp.base.typeP.H := by
+    rw [hyp.s11Setup.typeP.H_eq, hyp.base.typeP.H_eq]
+  have hH0le : hyp.chief.H0 ≤ hyp.base.typeP.H := hHH ▸ hyp.chief.H0_lt_H.le
+  refine U_centralizes_H0_of_W1_fpf hyp hU (fun n hn hcent => ?_)
+  have hnW2 : n ∈ hyp.base.typeP.W2 := by
+    rw [← OddOrder.Peterfalvi.S11.typeP_H_inf_centralizer_W1 hyp.base.typeP]
+    refine Subgroup.mem_inf.mpr ⟨hH0le hn, ?_⟩
+    rw [Subgroup.mem_centralizer_iff]
+    exact fun w hw => mul_inv_eq_iff_eq_mul.mp (hcent w hw)
+  have hmem : n ∈ hyp.base.typeP.W2 ⊓ hyp.chief.H0 := ⟨hnW2, hn⟩
+  rw [hbot] at hmem
+  exact Subgroup.mem_bot.mp hmem
+
 /-- **Peterfalvi (11.6)**: `H` is a `p`-group, `U` centralizes `H_0`, `H_0 = H'`, and `C = U'`.
 
 The inclusion `U' ⊆ C` of the last clause is unconditional (`Hypothesis.derivedU_le_C`,
