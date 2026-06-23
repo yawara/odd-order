@@ -5803,3 +5803,12 @@ formula together with the prime computation `coprimeFrobeniusAction_card_eq_prim
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S11.clifford_caseB_data
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S11.clifford_caseA_data
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S11.clifford_dichotomy
+
+-- Peterfalvi §13 (= repo `S13_MaximalIII_IV`, types III/IV) structural cluster.  After de-opacifying
+-- the `Hypothesis` scaffold (the `C = C_U(H)` field and the deleted opaque conclusion-Props), the
+-- two *unconditional* inclusions of (11.5)/(11.6) are axiom-clean: `secondDerived_le_HC`
+-- (`M'' ⊆ HC`, = (8.5.a) via `TypePData.secondDerived_le_fitting`) and `derivedU_le_C`
+-- (`U' ⊆ C`, = (8.5.b) via `S11.typeP_commutator_U_centralizes_H`).  The reverse inclusions
+-- (`M'' = HC`, `C = U'`) are the coherence content of (11.5)/(11.6), gated on Theorem (10.8).
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S13.Hypothesis.secondDerived_le_HC
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S13.Hypothesis.derivedU_le_C
