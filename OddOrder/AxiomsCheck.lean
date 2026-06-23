@@ -4023,6 +4023,12 @@ set_option linter.style.longLine false in
 -- 15.7(e) conjunct A divisibility crux (mathcomp `regular_norm_dvd_pred`, `IsFrobeniusAction` form):
 -- a Frobenius action of `A` on `N` gives `|A| ∣ |N| - 1`.
 #assert_only_allowed_axioms OddOrder.BG.Ch4.S15.card_dvd_sub_one_of_isFrobeniusAction
+-- 15.7(e) conjunct B (Coq `cycHp'`): `cyclic O_{p'}(M_F)` for non-abelian `M_F`, plus the two
+-- reusable group-theory lemmas it rests on (commuting commutative join is commutative; an odd
+-- commutative group of rank ≤ 1 is cyclic, via the `Z`-group `exponent = card` route).
+#assert_only_allowed_axioms OddOrder.BG.Ch4.S15.isMulCommutative_sup_of_le_centralizer
+#assert_only_allowed_axioms OddOrder.BG.Ch4.S15.isCyclic_of_isMulCommutative_of_rank_le_one
+#assert_only_allowed_axioms OddOrder.BG.Ch4.S15.typeF_nonabelian_cyclic_opiCore_compl
 -- BG **Lemma 15.1** (`S15_MF`, issue 7007): the auxiliary `U`-factor structure of an arbitrary
 -- maximal `M = K U M_σ` — `K ≠ 1 → M' = U M_σ ∧ U` abelian (15.1b); the cyclic-`τ₂` centralizer
 -- funnel (15.1c); `⟨C_U(x) | x ∈ M_σ#⟩` abelian (15.1d); the Frobenius factor `U₀ M_σ` (15.1e).
@@ -5897,6 +5903,12 @@ formula together with the prime computation `coprimeFrobeniusAction_card_eq_prim
 -- Same clause restated against the cleaner subgroup gate `W₂ ⊓ H₀ = ⊥` (the fpf input reduces to it
 -- via `H ⊓ C_G(W₁) = W₂`); isolates the genuine §8/chief obligation.
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S13.U_centralizes_H0_of_W2_inf_H0_bot
+-- (9.6)/(11.6) the genuine §8/chief input `W₂ ⊓ H₀ = ⊥`, discharged unconditionally: `|W₂| = p` prime
+-- + the chief-factor order `|C_{H̄}(W₁)| = |W̄₂| = p` (`coprimeFrobeniusChiefFactor_card`) show `W₂ ⊄ H₀`.
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S13.chief_W2_inf_H0_eq_bot
+-- (11.6) conjunct 2 fully assembled: `U` centralizes `H₀` with no character input (the above chief
+-- input feeds Wielandt (9.1)).  This is the unconditional half of `core_structure`.
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S13.U_centralizes_H0
 
 -- §16 character-data producer (`section16CharacterData`, POLE-1 `cd`) — S-side grid building blocks.
 -- `induce_compHom_subgroupCongr`: `Ind` is invariant under transporting the source subgroup along an
@@ -5921,6 +5933,11 @@ formula together with the prime computation `coprimeFrobeniusAction_card_eq_prim
 -- `tp.W1`/`tp.W2`-restriction values feeding the symmetry).  Axiom-clean.
 #assert_only_allowed_axioms OddOrder.Section16CharacterData.omegaProdCharS_apply_mem_K
 #assert_only_allowed_axioms OddOrder.Section16CharacterData.omegaProdCharS_apply_mem_Kstar
+-- `omegaProdCharT_apply_mem_K`/`_Kstar`: the T-side mirror — `certainTypeT`'s product character on a
+-- `gridEquivE_T`-transported `mp.K`/`mp.Kstar` element keeps only the surviving factor (`mp.K` is the
+-- `W₂`-factor of `T`, `mp.Kstar` the `W₁`-factor).  Axiom-clean.
+#assert_only_allowed_axioms OddOrder.Section16CharacterData.omegaProdCharT_apply_mem_K
+#assert_only_allowed_axioms OddOrder.Section16CharacterData.omegaProdCharT_apply_mem_Kstar
 -- `chi2enum_zero` (step A): the `W₂`-column enumeration is normalized so column `0` is the trivial
 -- character (the `j = 0` base of `nu_definition`), mirroring the `w1CharEquiv 0 = 1` convention.
 #assert_only_allowed_axioms OddOrder.Section16CharacterData.chi2enum_zero
