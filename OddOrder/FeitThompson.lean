@@ -624,6 +624,83 @@ noncomputable def section16TypePStructure_of_isMinimalSimpleOdd {G : Type*} [Gro
     hScompl.choose_spec.1 hTcompl.choose_spec.1 hprimes.1 hprimes.2
     hWjoin hWcyc hbot hcomm hScompl.choose_spec.2.1 hTcompl.choose_spec.2.1 mp.K_lt_Kstar
 
+/-- **Certain-type §6 hypothesis from κ-Hall pairing data** — *lane-b* (cd producer building block).
+
+For a type-`P` maximal `M` with cyclic κ-Hall `K` and the dual factor `K* = M_σ ⊓ C(K)` (cyclic,
+nontrivial), builds the Peterfalvi §6 certain-type Hypothesis (4.2) with `W₁ = K`, `W₂ = K*`,
+`K(§6) = M' = [M,M]`, all transported into `↥M`.  Structural fields are discharged from the
+BG §14/§16 type-`P` theory: `M = M' ⋊ K` (`typeP_derivedInG_isComplement_kappaHall`, BG 14.7(h)),
+the (4.2.b) centralizer law `C_{M'}(k) = K*` for `k ∈ K#`
+(`typeP_derivedInG_inf_centralizer_kappaElement_eq`, BG Thm C / Pf (8.4)), Hall coprimality
+(`IsHallSubgroup.coprime_index` with `[M:M'] = |K|`), and `K* ≤ M_σ ≤ M'`.
+
+Unlike `typePData_toS06Hypothesis` (which uses a `TypePData`'s *canonical* `W₁`), this builds the
+hypothesis with `W₁ = K` the *chosen pairing factor*, so the resulting `ω`/`μ`-grids are indexed by
+`tp.W₁ = mp.K`, `tp.W₂ = mp.Kstar` — exactly the indexing `Section16CharacterData` needs (no
+cross-construction `W`-identification).  Applied to `(mp.S; mp.K, mp.Kstar)` and the swapped
+`(mp.T; mp.Kstar, mp.K)`, it gives the two members' certain-type machinery for the cd producer. -/
+noncomputable def certainTypeHypothesis_of_typeP_kappaHall {G : Type*} [Group G] [Finite G]
+    (hG : IsMinimalSimpleOdd G) {M K Kstar : Subgroup G}
+    (hM : M ∈ maximalSubgroups G) (hP : BG.Ch4.S14.IsTypeP M) (hKM : K ≤ M)
+    (hK : Ch03.IsHallSubgroup (BG.Ch4.S14.kappa M) (K.subgroupOf M))
+    (hKstar : Kstar = BG.Ch3.S10.Msigma M ⊓ Subgroup.centralizer (K : Set G))
+    (hKcyc : IsCyclic ↥K) (hKstarcyc : IsCyclic ↥Kstar) (hKstarne : Kstar ≠ ⊥) :
+    OddOrder.Peterfalvi.S06.Hypothesis ↥M := by
+  haveI := hKcyc
+  haveI := hKstarcyc
+  have hM'le : derivedInG M ≤ M := Subgroup.map_subtype_le _
+  have hKstarM' : Kstar ≤ derivedInG M := by
+    rw [hKstar]; exact inf_le_left.trans (BG.Ch3.S10.Msigma_le_derived hG hM)
+  have hKstarM : Kstar ≤ M := hKstarM'.trans hM'le
+  have hcompl := BG.Ch4.S14.typeP_derivedInG_isComplement_kappaHall hG hM hP hKM hK
+  have hidx : (K.subgroupOf M).index = Nat.card ↥(derivedInG M) := by
+    rw [hcompl.index_eq_card]
+    exact Nat.card_congr (Subgroup.subgroupOfEquivOfLe hM'le).toEquiv
+  have hCop : Nat.Coprime (Nat.card ↥K) (Nat.card ↥(derivedInG M)) := by
+    have hco := hK.coprime_index
+    rwa [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hKM).toEquiv, hidx] at hco
+  exact
+    { K := (derivedInG M).subgroupOf M
+      W1 := K.subgroupOf M
+      W2 := Kstar.subgroupOf M
+      K_normal := by
+        rw [show (derivedInG M).subgroupOf M = commutator ↥M by
+          rw [derivedInG, Subgroup.subgroupOf,
+            Subgroup.comap_map_eq_self_of_injective M.subtype_injective]]
+        infer_instance
+      isComplement := hcompl
+      W1_nontrivial := by
+        rw [ne_eq, Subgroup.subgroupOf_eq_bot]
+        intro hdisj
+        exact BG.Ch4.S14.card_kappaHall_ne_one hP hKM hK
+          (Subgroup.card_eq_one.mpr (disjoint_self.mp (hdisj.mono_right hKM)))
+      W1_cyclic := isCyclic_of_injective (Subgroup.subgroupOfEquivOfLe hKM).toMonoidHom
+        (Subgroup.subgroupOfEquivOfLe hKM).injective
+      card_coprime := by
+        rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hM'le).toEquiv,
+          Nat.card_congr (Subgroup.subgroupOfEquivOfLe hKM).toEquiv]
+        exact hCop.symm
+      W2_nontrivial := by
+        rw [ne_eq, Subgroup.subgroupOf_eq_bot]
+        exact fun hdisj => hKstarne (disjoint_self.mp (hdisj.mono_right hKstarM))
+      W2_cyclic := isCyclic_of_injective (Subgroup.subgroupOfEquivOfLe hKstarM).toMonoidHom
+        (Subgroup.subgroupOfEquivOfLe hKstarM).injective
+      W2_le_K := Subgroup.comap_mono hKstarM'
+      centralizer_W2 := by
+        intro x hx1 hx2
+        have hxW1 : (x : G) ∈ K := Subgroup.mem_subgroupOf.mp hx1
+        have hxne : (x : G) ≠ 1 := fun h => hx2 (Subtype.ext h)
+        have hamb : Subgroup.centralizer ({(x : G)} : Set G) ⊓ derivedInG M = Kstar := by
+          rw [inf_comm]
+          exact BG.Ch4.S16.typeP_derivedInG_inf_centralizer_kappaElement_eq hG hM hP hKM hK hKstar
+            (x : G) hxW1 hxne
+        rw [OddOrder.BG.Ch1.S03h.centralizer_subgroupOf, Set.image_singleton]
+        simp only [Subgroup.subgroupOf, ← Subgroup.comap_inf, Subgroup.coe_subtype, hamb]
+      W_odd := by
+        rw [← Subgroup.subgroupOf_sup hKM hKstarM,
+          Nat.card_congr (Subgroup.subgroupOfEquivOfLe (sup_le hKM hKstarM)).toEquiv]
+        exact hG.odd.of_dvd_nat (Subgroup.card_subgroup_dvd_card (K ⊔ Kstar)) }
+
 /-- **Peterfalvi §13 coherent Dade-grid producer** (`sorry`) — *lane-b*
 (Peterfalvi §3–§13 coherent grids).  Given the maximal pair and the type-P
 structure, constructs the character grids `ω, μ, ν`, the signs, the integral maps,

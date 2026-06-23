@@ -58,6 +58,27 @@
 **∴ cd producer の見積もり訂正**: 「最後発・deep char theory」→ **char 理論は全部揃った; 残りは tp.W 同定 +
 reindex + 両 side assembly + Sset/A0/tau の packing (~300-500 行の transport)**。issue 1004 を de-risk。
 
+### ✅ Step A DONE (2026-06-23): `certainTypeHypothesis_of_typeP_kappaHall` (FeitThompson.lean, axiom-clean)
+
+cd producer の crux (W 同定) を解決する**構造部を landed**。`certainTypeHypothesis_of_typeP_kappaHall hG hM hP
+hKM hK hKstar hKcyc hKstarcyc hKstarne : S06.Hypothesis ↥M` — type-P 極大 M の κ-Hall K と dual K* から、
+**W₁=K, W₂=K*, K(§6)=M' の §6 certain-type Hypothesis を直接構成** (`typePData_of_isTypeNonI` の canonical W1
+を回避)。`typePData_toS06Hypothesis` を忠実にミラー、TypePData field の代わりに proven BG §14/§16 を cite:
+- `isComplement` ← `typeP_derivedInG_isComplement_kappaHall` (BG 14.7(h), axiom-clean)
+- `centralizer_W2` ← `typeP_derivedInG_inf_centralizer_kappaElement_eq` (BG Thm C/Pf 8.4, axiom-clean) + inf_comm
+  + `S03h.centralizer_subgroupOf` transport
+- `card_coprime` ← `hK.coprime_index` + `hcompl.index_eq_card` (= [M:M']=|K|)
+- `W1_nontrivial` ← `card_kappaHall_ne_one`、`W2_le_K` ← K*≤M_σ≤M'、`W_odd` ← Odd|G|
+- **初回ビルド成功・axiom-clean (3 axioms)**。AxiomsCheck assertion 付き。
+- **適用**: `(mp.S; K=mp.K, K*=mp.Kstar)` と swap した `(mp.T; K=mp.Kstar, K*=mp.K)` で 2 member 分。
+  全引数 mp から: mp.S_maximal/S_typeP/K_le_S/K_hall/Kstar_eq、Z_cyclic から IsCyclic、K_lt_Kstar から K*≠⊥。
+
+**残り Step B–E** (cd producer 本体): B=grid 定義 (ω=h.chiColumn on tp.W (=h.W₁⊔h.W₂=mp.K⊔mp.Kstar の subgroupOf S
+と defeq)、μ=columnFamily.mu、δ=sign、ν/δ' は T-side で row/col swap)、C=`mu_definition`/`nu_definition` を
+`S06.induce_chiColumn_diff_mu_diff` + compHom transport で discharge、D=Sset/Tset=inducedFamily・A0=supportInSubgroup・
+tauS/tauT/tau3=Dade map、E=`Section16CharacterData` に pack。**B の compHom transport (cd.omega on tp.W ↔ chiColumn
+on tp.W.subgroupOf S) が次の主作業** (FeitThompson に `import S06_MuColumnBridge` 要)。
+
 ## ✅✅✅✅✅✅ 2026-06-23 更新¹⁴ — **Pf (10.6) + (2.7) + (10.9) COMPLETE** (1 session, sorry 5→3)
 
 **本セッション成果 (lane-b, 全 build-green + axiom-clean modulo §10 muGrid 上流 gate)**:
