@@ -1131,15 +1131,89 @@ theorem cardCertainTypeS_W2 : Nat.card ↥(mp.certainTypeS hG).W2 = tp.p := by
     Nat.card_congr (Subgroup.subgroupOfEquivOfLe (kstar_le_S hG mp)).toEquiv,
     ← tp.W2_eq_Kstar hG, ← tp.p_eq_card_W2]
 
+/-! ### T-side mirror of the S-side identification infrastructure (cd `nu_definition`, step D)
+
+The partner `mp.T` carries the `certain-type` Hypothesis `certainTypeT` with the roles of the two
+factors swapped (`W₁ = mp.Kstar`, `W₂ = mp.K`).  These lemmas mirror the S-side
+(`certainTypeS_W1_eq`, …, `gridEquivE_mem_W2`) and supply the `↥tp.W ≃* ↥(certainTypeT.sdiff.W)`
+transport used to express the same `ω`-grid through `certainTypeT` (the S/T-shared-`ω` symmetry). -/
+
+/-- `W₁` of `certainTypeT` is `mp.Kstar.subgroupOf mp.T` (the κ-Hall factor of `T`; the roles of the
+two factors swap for the partner). -/
+theorem certainTypeT_W1_eq : (mp.certainTypeT hG).W1 = mp.Kstar.subgroupOf mp.T := by
+  unfold Section16MaximalPair.certainTypeT certainTypeHypothesis_of_typeP_kappaHall; rfl
+
+/-- `W₂` of `certainTypeT` is `mp.K.subgroupOf mp.T` (the dual factor of `T`). -/
+theorem certainTypeT_W2_eq : (mp.certainTypeT hG).W2 = mp.K.subgroupOf mp.T := by
+  unfold Section16MaximalPair.certainTypeT certainTypeHypothesis_of_typeP_kappaHall; rfl
+
+include hG in
+/-- `mp.K ≤ mp.T` (it lies in `S ∩ T = K ⊔ K*`). -/
+theorem k_le_T : mp.K ≤ mp.T := by
+  obtain ⟨hWjoin, -, -, -⟩ := mp.W_structure hG
+  have : mp.K ≤ mp.S ⊓ mp.T := by rw [hWjoin]; exact le_sup_left
+  exact this.trans inf_le_right
+
+/-- `|certainTypeT.W₁| = tp.p` (both are `|mp.Kstar|`). -/
+theorem cardCertainTypeT_W1 : Nat.card ↥(mp.certainTypeT hG).W1 = tp.p := by
+  rw [certainTypeT_W1_eq hG mp,
+    Nat.card_congr (Subgroup.subgroupOfEquivOfLe mp.Kstar_le_T).toEquiv,
+    ← tp.W2_eq_Kstar hG, ← tp.p_eq_card_W2]
+
+/-- `|certainTypeT.W₂| = tp.q` (both are `|mp.K|`). -/
+theorem cardCertainTypeT_W2 : Nat.card ↥(mp.certainTypeT hG).W2 = tp.q := by
+  rw [certainTypeT_W2_eq hG mp,
+    Nat.card_congr (Subgroup.subgroupOfEquivOfLe (k_le_T hG mp)).toEquiv,
+    ← tp.W1_eq_K hG, ← tp.q_eq_card_W1]
+
+include hG in
+/-- The key subgroup identity (T-side): `tp.W.subgroupOf mp.T = certainTypeT.sdiff.W`.  Both equal
+`(mp.Kstar ⊔ mp.K).subgroupOf mp.T` (`tp.W = mp.K ⊔ mp.Kstar` and `certainTypeT.sdiff.W = W₁ ⊔ W₂`). -/
+theorem tpW_subgroupOf_T_eq :
+    tp.W.subgroupOf mp.T = (mp.certainTypeT hG).sdiffTICyclicHypothesis.W := by
+  show tp.W.subgroupOf mp.T = (mp.certainTypeT hG).W1 ⊔ (mp.certainTypeT hG).W2
+  rw [certainTypeT_W1_eq hG mp, certainTypeT_W2_eq hG mp,
+    ← Subgroup.subgroupOf_sup mp.Kstar_le_T (k_le_T hG mp), sup_comm, ← tp.W_eq_kappa_join hG]
+
+/-- The `W`-identification equiv (T-side) `↥tp.W ≃* ↥(certainTypeT.sdiff.W)`: `tp.W ≃ tp.W.subgroupOf
+mp.T` then transported along `tpW_subgroupOf_T_eq`.  Mirrors `gridEquivE` with `inf_le_right`. -/
+noncomputable def gridEquivE_T :
+    ↥tp.W ≃* ↥(mp.certainTypeT hG).sdiffTICyclicHypothesis.W :=
+  (Subgroup.subgroupOfEquivOfLe ((le_of_eq tp.W_eq_inter).trans inf_le_right)).symm.trans
+    (MulEquiv.subgroupCongr (tpW_subgroupOf_T_eq hG mp tp))
+
+/-- **`gridEquivE_T` preserves the underlying `G`-element** (composite of the element-preserving
+`subgroupOfEquivOfLe` and `subgroupCongr`). -/
+theorem gridEquivE_T_coe (w : ↥tp.W) :
+    (((gridEquivE_T hG mp tp w : ↥(mp.certainTypeT hG).sdiffTICyclicHypothesis.W) :
+        ↥mp.T) : G) = (w : G) := rfl
+
+/-- A `tp.W`-element lying in `mp.Kstar` transports under `gridEquivE_T` into `certainTypeT.W1`
+(`= mp.Kstar.subgroupOf mp.T`). -/
+theorem gridEquivE_T_mem_W1 (w : ↥tp.W) (hw : (w : G) ∈ mp.Kstar) :
+    gridEquivE_T hG mp tp w ∈ ((mp.certainTypeT hG).W1).subgroupOf
+      (mp.certainTypeT hG).sdiffTICyclicHypothesis.W := by
+  rw [Subgroup.mem_subgroupOf, certainTypeT_W1_eq hG mp, Subgroup.mem_subgroupOf, gridEquivE_T_coe]
+  exact hw
+
+/-- A `tp.W`-element lying in `mp.K` transports under `gridEquivE_T` into `certainTypeT.W2`
+(`= mp.K.subgroupOf mp.T`). -/
+theorem gridEquivE_T_mem_W2 (w : ↥tp.W) (hw : (w : G) ∈ mp.K) :
+    gridEquivE_T hG mp tp w ∈ ((mp.certainTypeT hG).W2).subgroupOf
+      (mp.certainTypeT hG).sdiffTICyclicHypothesis.W := by
+  rw [Subgroup.mem_subgroupOf, certainTypeT_W2_eq hG mp, Subgroup.mem_subgroupOf, gridEquivE_T_coe]
+  exact hw
+
 /-- `Fin tp.q ≃ Fin |certainTypeS.W₁|`, fixing `0 ↦ 0` (so the (13.1.e) anchor `⟨0, q_prime.pos⟩`
 matches `chiColumn`'s distinguished base index). -/
 noncomputable def eqQ : Fin tp.q ≃ Fin (Nat.card ↥(mp.certainTypeS hG).W1) :=
   finCongr (cardCertainTypeS_W1 hG mp tp).symm
 
-/-- The `W₂`-column enumeration `Fin tp.p ≃ Ŵ₂` (Pontryagin: `|Ŵ₂| = |W₂| = tp.p`).  Stated in the
-`sdiffTICyclicHypothesis.W₂/W` forms (defeq to `certainTypeS.W₂` / `W₁ ⊔ W₂`) so that both `chiColumn`
-and `card_charGroup_subgroupOf` consume it directly. -/
-noncomputable def chi2enum :
+/-- The base `W₂`-column enumeration `Fin tp.p ≃ Ŵ₂` (Pontryagin: `|Ŵ₂| = |W₂| = tp.p`).  Stated in
+the `sdiffTICyclicHypothesis.W₂/W` forms (defeq to `certainTypeS.W₂` / `W₁ ⊔ W₂`) so that both
+`chiColumn` and `card_charGroup_subgroupOf` consume it directly.  An arbitrary bijection; the column-`0`
+normalization is applied in `chi2enum`. -/
+noncomputable def chi2baseEnum :
     Fin tp.p ≃ (((mp.certainTypeS hG).sdiffTICyclicHypothesis.W2.subgroupOf
       (mp.certainTypeS hG).sdiffTICyclicHypothesis.W) →* ℂˣ) :=
   haveI : Fintype (((mp.certainTypeS hG).sdiffTICyclicHypothesis.W2.subgroupOf
@@ -1149,6 +1223,23 @@ noncomputable def chi2enum :
       (mp.certainTypeS hG).sdiffTICyclicHypothesis.card_charGroup_subgroupOf
         (mp.certainTypeS hG).sdiffTICyclicHypothesis.W2_le_W]
     exact cardCertainTypeS_W2 hG mp tp)).symm
+
+/-- The `W₂`-column enumeration `Fin tp.p ≃ Ŵ₂` normalized so that column `0` is the trivial character
+(`chi2enum_zero`), mirroring the `w1CharEquiv` convention (`w1CharEquiv 0 = 1`).  Composing
+`chi2baseEnum` with the transposition swapping `⟨0, p_prime.pos⟩` and the preimage of `1` moves the
+trivial `W₂`-dual to the distinguished column index `0` — the `j = 0` base of the `nu_definition`
+(T-side) difference.  The `muS_definition` proof fixes the column `j` and is invariant under the choice
+of column enumeration, so this renormalization does not affect it. -/
+noncomputable def chi2enum :
+    Fin tp.p ≃ (((mp.certainTypeS hG).sdiffTICyclicHypothesis.W2.subgroupOf
+      (mp.certainTypeS hG).sdiffTICyclicHypothesis.W) →* ℂˣ) :=
+  (Equiv.swap (⟨0, tp.p_prime.pos⟩ : Fin tp.p) ((chi2baseEnum hG mp tp).symm 1)).trans
+    (chi2baseEnum hG mp tp)
+
+/-- The normalized column enumeration sends column `0` to the trivial character (Peterfalvi's
+column-`0` convention; the `j = 0` base of `nu_definition`). -/
+@[simp] theorem chi2enum_zero : chi2enum hG mp tp ⟨0, tp.p_prime.pos⟩ = 1 := by
+  rw [chi2enum, Equiv.trans_apply, Equiv.swap_apply_left, Equiv.apply_symm_apply]
 
 include hG in
 /-- The key subgroup identity: `tp.W.subgroupOf mp.S = certainTypeS.sdiff.W`.  Both equal
