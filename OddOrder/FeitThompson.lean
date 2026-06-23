@@ -160,6 +160,12 @@ structure Section16Inputs (G : Type*) [Group G] [Finite G] where
           (omega i j - omega i ⟨0, p_prime.pos⟩))
       = (deltaPrime i : ℂ) • (nu i j - nu i ⟨0, p_prime.pos⟩)
   q_lt_p : q < p
+  /-- **Peterfalvi (13.1.b) carrier (S-side)**: the type-`P` data of `S` with its complement `U`
+  and cyclic factor `W₁` reconciled to the menu's `U`/`W1`.  Sourced from the `tp` producer
+  (`Section16TypePStructure.Sdata`); threaded into `S15.Hypothesis` to discharge its U-side. -/
+  Sdata : TypePData S
+  Sdata_U_eq : Sdata.U = U
+  Sdata_W1_eq : Sdata.W1 = W1
 
 /-! ### Partition of `Section16Inputs` into three independent producer obligations
 
@@ -1124,7 +1130,10 @@ noncomputable def section16Inputs_of_isMinimalSimpleOdd {G : Type*} [Group G] [F
     tau3 := cd.tau3
     mu_definition := cd.mu_definition
     nu_definition := cd.nu_definition
-    q_lt_p := tp.q_lt_p }
+    q_lt_p := tp.q_lt_p
+    Sdata := tp.Sdata
+    Sdata_U_eq := tp.Sdata_U_eq
+    Sdata_W1_eq := tp.Sdata_W1_eq }
 
 /-- **Assembly of the Section 16 configuration from named inputs** (`sorry`-free).
 
@@ -1218,7 +1227,10 @@ noncomputable def sectionSixteenHypothesis_of_inputs {G : Type*} [Group G] [Fini
       nu_definition := inp.nu_definition
       m := 1 - 1 / ((inp.q : ℚ) - 1) - ((inp.q : ℚ) - 1) / (inp.q : ℚ) ^ inp.p +
         1 / (((inp.q : ℚ) - 1) * (inp.q : ℚ) ^ inp.p)
-      m_eq := rfl }
+      m_eq := rfl
+      Sdata := inp.Sdata
+      Sdata_U_eq := inp.Sdata_U_eq
+      Sdata_W1_eq := inp.Sdata_W1_eq }
   q_lt_p := inp.q_lt_p
 
 /-- **The one remaining upstream obligation.** From a minimal simple group of odd
