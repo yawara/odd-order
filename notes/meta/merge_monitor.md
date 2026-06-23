@@ -45,8 +45,14 @@ productive な独立クラスタに乗せ、上流優先方針 (CLAUDE.md) に�
 signature 不足は notes/issue 経由。**driver (§16/§10)**: 常駐レーンを当てず、上流が landing したとき hub or
 担当レーンが続けて opportunistic に close する (pure consumer ゆえ常駐は starve)。
 
+**🔁 lane 自己復帰 (2026-06-23 導入)**: lane が hub 判断待ちで停止したら、自セッションで resume-monitor
+cron を arm し、hub の解決 (LAUNCH.md 変化 or 起票 issue の closed/ 移動) を検知して `git merge main` +
+作業再開する ([`lane_self_resume.md`](lane_self_resume.md))。**hub の合流手順は不変** — lane の自己復帰は
+通常の作業再開ゆえ区別不要。hub は「停止していた lane が自走で戻ることがある」と認識するだけでよい。
+
 **取り決め**: (1) 各レーンは**自所有ファイルのみ編集**、他は cite のみ (要望は notes/issue 経由)。
-**特に S11 は C のみ** (2026-06-22 H→C 移譲)。(2) **新規 `axiom` 宣言は abort+ユーザー承認**。
+**S15_SAndT は C のみ・S14_MaximalI は H のみ** (2026-06-23 relane)、**S11/§16/§10 は driver (常駐なし)**。
+(2) **新規 `axiom` 宣言は abort+ユーザー承認**。
 (3) issue base: **B=1000 / H=2000 / C=4000 / F=7000**。(4) `notes/bg/*`=F、`notes/peterfalvi/*`=B/H/C。
 マージ順 = **F → B → H → C** (独立レーンゆえ順序は形式的)。
 **(5) 起動時 main 同期 = `git merge main` (ユーザー方針 2026-06-22, 全 LAUNCH 統一)**:
