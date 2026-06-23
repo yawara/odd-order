@@ -1130,6 +1130,81 @@ private theorem conj_smul_centralizerGeneratedBySigma {M U : Subgroup G} {u : G}
       le_iSup₂ (f := fun C' (_ : C' ∈ sigCentFam M U) => MulAut.conj u • C')
         ((MulAut.conj u)⁻¹ • C) hC'
 
+/-- **General helper (§14-independent, reusable).**  A nontrivial `M`-normal subgroup `H ⊴ M` of a
+maximal subgroup `M` of a minimal simple group is self-normalizing in `G`: `N_G(H) = M`.  `H ⊴ M`
+gives `M ≤ N_G(H)`; if the inclusion were proper, maximality forces `N_G(H) = G`, so `H ⊴ G`, and
+simplicity gives `H ∈ {⊥, ⊤}` — both excluded (`H ≠ ⊥` by hypothesis, `H ≤ M ⊊ G` rules out `⊤`).
+Generalizes `normalizer_Msigma_eq_self` (the `H = M_σ` instance) to any nontrivial `M`-normal `H`. -/
+theorem normalizer_eq_self_of_subgroupOf_normal_of_ne_bot [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M H : Subgroup G}
+    (hM : M ∈ maximalSubgroups G) (hHle : H ≤ M)
+    (hHnorm : (H.subgroupOf M).Normal) (hHne : H ≠ ⊥) :
+    Subgroup.normalizer (H : Set G) = M := by
+  have hle : M ≤ Subgroup.normalizer (H : Set G) :=
+    (Subgroup.normal_subgroupOf_iff_le_normalizer hHle).mp hHnorm
+  refine le_antisymm ?_ hle
+  rcases eq_or_lt_of_le hle with heq | hlt
+  · exact le_of_eq heq.symm
+  · have hnorm : H.Normal :=
+      Subgroup.normalizer_eq_top_iff.mp ((mem_maximalSubgroups.mp hM).2 _ hlt)
+    rcases hG.simple.eq_bot_or_eq_top_of_normal _ hnorm with hbot | htop
+    · exact absurd hbot hHne
+    · exact absurd (top_le_iff.mp (htop ▸ hHle)) (mem_maximalSubgroups.mp hM).1
+
+/-- **The Fitting subgroup of a maximal subgroup is self-normalizing**: `N_G(F(M)) = M` for a
+maximal `M` of a minimal simple group of odd order.  `F(M)` is normal in `M`
+(`fittingInG_subgroupOf_normal`) and nontrivial (`fitting_ne_bot_of_solvable_nontrivial`, as `M` is
+a nontrivial — `M_σ ≠ ⊥` — solvable proper subgroup); apply the self-normalizing helper. -/
+theorem normalizer_fittingInAmbient_eq_self [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} (hM : M ∈ maximalSubgroups G) :
+    Subgroup.normalizer (S15.fittingInAmbient M : Set G) = M := by
+  haveI : IsSolvable ↥M := hG.solvable_of_mem_maximalSubgroups hM
+  have hMne : M ≠ ⊥ := fun h =>
+    OddOrder.BG.Ch3.S10.Msigma_ne_bot hG hM (le_bot_iff.mp (h ▸ OddOrder.BG.Ch3.S10.Msigma_le M))
+  haveI : Nontrivial ↥M := (Subgroup.nontrivial_iff_ne_bot M).mpr hMne
+  have hFne : S15.fittingInAmbient M ≠ ⊥ := by
+    intro hbot
+    refine OddOrder.Isaacs.Ch01.fitting_ne_bot_of_solvable_nontrivial ↥M ?_
+    have hmap : (OddOrder.Isaacs.Ch01.fitting ↥M).map M.subtype
+        = (⊥ : Subgroup ↥M).map M.subtype := by
+      rw [Subgroup.map_bot]; exact hbot
+    exact Subgroup.map_injective M.subtype_injective hmap
+  exact normalizer_eq_self_of_subgroupOf_normal_of_ne_bot hG hM
+    (OddOrder.BG.Ch2.S08.fittingInG_le M) (OddOrder.BG.Ch2.S08.fittingInG_subgroupOf_normal M) hFne
+
+/-- **Prop 16.1(a) `alternative` disjunct (i), TI case** (Peterfalvi (8.3)(a)): if the Fitting
+subgroup `F(M)` of a maximal `M` is `TI` (`FittingIsTI M`), then its nilpotent normal Hall core
+`M_F#` is a `TI`-subset with normalizer `N_G(M_F)`.  Since `M_F ≤ F(M)`, an overlap `a, gag⁻¹ ∈ M_F#`
+is an overlap in `F(M)#`, so `FittingIsTI` forces `g ∈ N_G(F(M)) = M` (`normalizer_fittingInAmbient_eq_self`);
+and `M_F ⊴ M` gives `M ≤ N_G(M_F)`, whence `g ∈ N_G(M_F)`.  This supplies the first disjunct of the
+`TypeIData.alternative` field in the `F(M)`-TI case of the `hFI` bridge of `proposition_type_classification`
+(the non-TI case is the deeper BG Theorem 15.7(e) trichotomy, `fitting_not_ti_cases`). -/
+theorem maxNilpotentNormalHall_sharp_isTISubset_of_fittingIsTI [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} (hM : M ∈ maximalSubgroups G)
+    (hTI : S15.FittingIsTI M) :
+    IsTISubset (sharpSubgroup (maxNilpotentNormalHall M))
+      (Subgroup.normalizer (maxNilpotentNormalHall M : Set G)) := by
+  -- `M_F ≤ F(M)`.
+  have hMFleF : maxNilpotentNormalHall M ≤ S15.fittingInAmbient M :=
+    S15.maxNilpotentNormalHall_le_fittingInG M
+  -- `M ≤ N_G(M_F)` from `M_F ⊴ M`.
+  have hMnorm : M ≤ Subgroup.normalizer (maxNilpotentNormalHall M : Set G) :=
+    (Subgroup.normal_subgroupOf_iff_le_normalizer (maxNilpotentNormalHall_le M)).mp
+      (maxNilpotentNormalHall_subgroupOf_normal M)
+  -- `N_G(F(M)) = M`.
+  have hNF : Subgroup.normalizer (S15.fittingInAmbient M : Set G) = M :=
+    normalizer_fittingInAmbient_eq_self hG hM
+  intro g hg
+  obtain ⟨a, haMem, hgaMem⟩ := hg
+  rw [sharpSubgroup, Set.mem_diff] at haMem hgaMem
+  -- Lift the overlap from `M_F#` to `F(M)#`.
+  have ha' : a ∈ sharpSubgroup (S15.fittingInAmbient M) := by
+    rw [sharpSubgroup, Set.mem_diff]; exact ⟨hMFleF haMem.1, haMem.2⟩
+  have hga' : g * a * g⁻¹ ∈ sharpSubgroup (S15.fittingInAmbient M) := by
+    rw [sharpSubgroup, Set.mem_diff]; exact ⟨hMFleF hgaMem.1, hgaMem.2⟩
+  -- `FittingIsTI` ⟹ `g ∈ N_G(F(M)) = M ≤ N_G(M_F)`.
+  exact hMnorm (hNF ▸ hTI g ⟨a, ha', hga'⟩)
+
 /-- **Prop 16.1(a) forward bridge, core** (mmd L4480): a type-`F` maximal `M` (`κ(M) = ∅`, so the
 Hall `κ`-subgroup `K = ⊥`) carries the shared Peterfalvi type-`F` structure `TypeFData M`.
 
@@ -1214,6 +1289,64 @@ theorem typeFData_of_kappa_eq_bot [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOd
   · -- `frobenius_HU0`: rewrite `M_F = M_σ`, `M_F ⊔ U₀ = U₀ ⊔ M_σ` into the Frobenius datum.
     rw [hMFMσ, sup_comm]
     exact hfrob
+
+/-- **Prop 16.1(a) `TypeFData` construction wrapper**: a BG-local type-`F` maximal `M`
+(`S14.IsTypeF M`, i.e. `κ(M) = ∅`) carries the shared Peterfalvi type-`F` structure
+`GroupTheory.IsTypeF M`.  Specializes `typeFData_of_kappa_eq_bot` with `K = ⊥` (a `κ`-Hall since
+`κ(M) = ∅`) and a `(κ ∪ σ)'`-Hall `U` from Hall's theorem; `U ≠ ⊥` because the `σ`-complement of a
+maximal subgroup is nontrivial (`SubgroupESetup.E_ne_bot`: `E = U = ⊥` would force `M = M_σ ≤ M'`,
+contradicting `M' ⊊ M`).  This is the type-`F`-structure half of the `hFI` bridge of
+`proposition_type_classification`; the `alternative` trichotomy is added in `isTypeI_of_isTypeF`. -/
+theorem isTypeF_groupTheory_of_isTypeF [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    {M : Subgroup G} (hM : M ∈ maximalSubgroups G) (hF : S14.IsTypeF M) :
+    OddOrder.GroupTheory.IsTypeF M := by
+  classical
+  haveI : IsSolvable ↥M := hG.solvable_of_mem_maximalSubgroups hM
+  have hκ : S14.kappa M = ∅ := hF
+  -- `K = ⊥` is a `κ(M)`-Hall subgroup (`κ(M) = ∅`).
+  have hKhall : Ch03.IsHallSubgroup (S14.kappa M) ((⊥ : Subgroup G).subgroupOf M) := by
+    rw [Subgroup.bot_subgroupOf, Ch03.IsHallSubgroup.bot_iff]
+    intro p _; rw [hκ]; exact Set.notMem_empty p
+  -- A `(κ ∪ σ)'`-Hall subgroup `U` of `M` (Hall's theorem in the solvable `M`).
+  obtain ⟨U', hU'⟩ := Ch03.hall_E_exists (G := ↥M)
+    ((S14.kappa M ∪ OddOrder.BG.Ch3.S10.sigma M)ᶜ)
+  set U : Subgroup G := U'.map M.subtype with hUdef
+  have hUM : U ≤ M := hUdef ▸ Subgroup.map_subtype_le U'
+  have hUeq : U.subgroupOf M = U' :=
+    hUdef ▸ Subgroup.comap_map_eq_self_of_injective M.subtype_injective U'
+  have hU : Ch03.IsHallSubgroup ((S14.kappa M ∪ OddOrder.BG.Ch3.S10.sigma M)ᶜ) (U.subgroupOf M) :=
+    hUeq ▸ hU'
+  -- `U ≠ ⊥`: the `σ`-complement (`= U`, as `K = ⊥`) of the maximal subgroup is nontrivial.
+  obtain ⟨E₁, E₂, E₃, hsetup⟩ :=
+    subgroupESetup_of_isHall_kappa_eq_bot hG hM bot_le hUM hKhall rfl hU
+  have hUne : U ≠ ⊥ := hsetup.E_ne_bot hG
+  exact typeFData_of_kappa_eq_bot hG hM bot_le hUM hKhall rfl hU hUne
+
+/-- **Prop 16.1(a) forward bridge `hFI`** (Peterfalvi (8.3) / BG Theorem 15.7): a type-`F` maximal
+`M` is of type I.  The shared type-`F` structure `TypeFData M` is `isTypeF_groupTheory_of_isTypeF`;
+the `TypeIData.alternative` trichotomy splits on whether `F(M)` is `TI`:
+
+* `FittingIsTI M`: disjunct (a), `M_F#` is a `TI`-subset
+  (`maxNilpotentNormalHall_sharp_isTISubset_of_fittingIsTI`).
+* `¬FittingIsTI M`: disjuncts (b)/(c) (`M_F` abelian of rank 2, or the exponent–cyclic case) come
+  from the BG Theorem 15.7(e) trichotomy (`nonTI_Fitting_structure`, Coq `BGsection15`).  This is
+  the genuinely deep residual: the `(e)` clause of the landed `fitting_not_ti_cases` is currently
+  weakened to the tautology `abelian M_F ∨ ¬abelian M_F`, so the structured rank-2 / exponent
+  alternatives are not yet available and the non-TI case must await formalizing 15.7(e). -/
+theorem isTypeI_of_isTypeF [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    {M : Subgroup G} (hM : M ∈ maximalSubgroups G) (hF : S14.IsTypeF M) :
+    OddOrder.GroupTheory.IsTypeI M := by
+  obtain ⟨td⟩ := isTypeF_groupTheory_of_isTypeF hG hM hF
+  refine ⟨{ typeF := td, alternative := ?_ }⟩
+  by_cases hTI : S15.FittingIsTI M
+  · -- `F(M)` TI ⟹ disjunct (a): `M_F#` is a `TI`-subset.
+    refine Or.inl ?_
+    rw [td.H_eq]
+    exact maxNilpotentNormalHall_sharp_isTISubset_of_fittingIsTI hG hM hTI
+  · -- `F(M)` not TI ⟹ disjunct (b)/(c) via BG Theorem 15.7(e) (`nonTI_Fitting_structure`).
+    -- Deep residual (see docstring): `fitting_not_ti_cases`'s `(e)` is a tautology, so the
+    -- structured rank-2 / exponent-cyclic alternatives are not yet formalized.
+    sorry
 
 /-- **Type-`P` `V`-normalizer characterization** (the `normalizer_V` field of `TypePData`,
 Peterfalvi (8.4); BG records it as the self-normalizing exceptional set `M = N_G(V)`): if
@@ -2199,8 +2332,9 @@ theorem proposition_type_classification [Finite G]
     ?hFI (fun hP2 => isTypeII_of_isTypeP2 hG hM hP2) ?hP1neIIIIV ?hP1eqV ?hIF ?hIIP2 ?hIIIIVP1 ?hVP1
     (typeP_exists_hall_derived_eq hG hM) (typeF_not_exists_hall_derived_eq hG hM)
     (fun hne => isTypeP1_of_mf_ne_msigma hG hM hne)
-  -- `hFI` (Type F ⟹ Type I): Peterfalvi (8.3) trichotomy / BG Theorem 15.7(d)(e).
-  case hFI => sorry
+  -- `hFI` (Type F ⟹ Type I): the `TypeFData` is built (`isTypeF_groupTheory_of_isTypeF`) and the
+  -- `alternative` TI case is proved; only the `¬FittingIsTI` trichotomy (BG 15.7(e)) is residual.
+  case hFI => exact isTypeI_of_isTypeF hG hM
   -- `hP1neIIIIV` (Type P₁, `M_F ≠ M_σ` ⟹ Type III/IV): Peterfalvi (8.3) + Frattini.
   case hP1neIIIIV => sorry
   -- `hP1eqV` (Type P₁, `M_F = M_σ` ⟹ Type V): Peterfalvi (8.8) trichotomy.
