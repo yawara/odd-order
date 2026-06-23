@@ -1585,6 +1585,102 @@ theorem isTypeII_of_isTypeP2_of_derived_typeF [Finite G]
   · show ¬ Subgroup.normalizer (U : Set G) ≤ M; exact hnorm
   · show maxNilpotentNormalHall (derivedInG M) = maxNilpotentNormalHall M; exact hderfit
 
+/-- **Prop 16.1 / Peterfalvi (8.6.b II), the `M'`-type-`F` residual (`hderF`), unconditional** — the
+derived subgroup `M' = M^{(1)}` of a type-`P₂` maximal `M` is itself of type `F`.
+
+Structurally `M' = M_σ ⋊ U` is the type-`F`-shaped `M_σ ⋊ (complement)` inside `M` — exactly as the
+type-`F` *maximal* of `typeFData_of_kappa_eq_bot` is `M = M_σ ⋊ U` — so the *same* data assemble: the
+`M_σ ⋊ U` complement (`typeP2_mf_internal_fitting_decomposition`), the abelian inertia `U₁` and the
+Frobenius factor `M_σ ⋊ U₀` (Lemma 15.1(d)(e), `typeP_auxiliary_structure`), and the crucial `F`-core
+identity `(M')_F = M_σ = M_F` (`maxNilpotentNormalHall_derivedInG_eq_Msigma_of_isTypeP2`).  This last
+identity is the Coq `defM'F` step (`Fcore_max` + Hall transitivity): it needs **no** `τ₂(M) = ∅`
+hypothesis (which is in fact false for some type-`P₂` `M`, cf. Corollary 15.9). -/
+theorem isTypeF_derivedInG_of_isTypeP2 [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    {M K U : Subgroup G} (hM : M ∈ maximalSubgroups G) (hP2 : S14.IsTypeP2 M)
+    (hKM : K ≤ M) (hUM : U ≤ M) (hKne : K ≠ ⊥)
+    (hK : Ch03.IsHallSubgroup (S14.kappa M) (K.subgroupOf M)) [IsCyclic ↥K]
+    (hU : Ch03.IsHallSubgroup ((S14.kappa M ∪ OddOrder.BG.Ch3.S10.sigma M)ᶜ) (U.subgroupOf M))
+    (hUne : U ≠ ⊥) :
+    OddOrder.GroupTheory.IsTypeF (derivedInG M) := by
+  classical
+  have hMFMσ : maxNilpotentNormalHall M = OddOrder.BG.Ch3.S10.Msigma M :=
+    (maxNilpotentNormalHall_eq_Msigma_iff_isNilpotent hG hM).mpr
+      (S14.msigma_isNilpotent_of_isTypeP2 hG hM hP2)
+  have hMFM' : maxNilpotentNormalHall M = maxNilpotentNormalHall (derivedInG M) :=
+    hMFMσ.trans (maxNilpotentNormalHall_derivedInG_eq_Msigma_of_isTypeP2 hG hM hP2 hKM hK).symm
+  have hdec := typeP2_mf_internal_fitting_decomposition hG hM hP2 hKM hUM hKne hK hU
+  obtain ⟨_, _, _, _, hconj5, _, hU1comm, hU0clause⟩ :=
+    typeP_auxiliary_structure hG hM hKM hUM hK rfl hU
+  obtain ⟨hM'eq, _, _, _⟩ := hconj5 hKne
+  have hUle : U ≤ derivedInG M := by rw [hM'eq]; exact le_sup_left
+  obtain ⟨U0, hU0U, hexp, hfrob⟩ := hU0clause hUne
+  refine ⟨{
+    H := maxNilpotentNormalHall M
+    U := U
+    U1 := centralizerGeneratedBySigma M U
+    U0 := U0
+    H_eq := hMFM'
+    H_nontrivial := by rw [hMFMσ]; exact OddOrder.BG.Ch3.S10.Msigma_ne_bot hG hM
+    U_nontrivial := hUne
+    H_le := maxNilpotentNormalHall_le_derived hG hM
+    U_le := hUle
+    U1_le := by apply sSup_le; rintro C ⟨x, _, rfl⟩; exact inf_le_left
+    U0_le := hU0U
+    complement := hdec.1
+    U1_normal := ?_
+    U1_commutative := hU1comm
+    centralizer_le_U1 := by
+      intro x hx hx1
+      apply le_sSup
+      refine ⟨x, ?_, rfl⟩
+      rw [S14.sigmaSharp, sharpSubgroup, Set.mem_diff, SetLike.mem_coe, Set.mem_singleton_iff]
+      exact ⟨maxNilpotentNormalHall_le_Msigma hG hM hx, hx1⟩
+    exponent_eq := hexp
+    frobenius_HU0 := by rw [hMFMσ, sup_comm]; exact hfrob }⟩
+  · -- `U1_normal`: `U`-conjugation permutes the generators `C_U(x)` of `centralizerGeneratedBySigma`.
+    apply Subgroup.Normal.of_conjugate_fixed
+    intro h
+    rw [Subgroup.conj_smul_subgroupOf
+      (by apply sSup_le; rintro C ⟨x, _, rfl⟩; exact inf_le_left) h,
+      conj_smul_centralizerGeneratedBySigma (hUM h.2) h.2]
+
+/-- **BG Proposition 16.1(b) forward bridge `hP2II`, complete and unconditional** — *every*
+type-`P₂` maximal subgroup is of type II.  The two residuals of
+`isTypeII_of_isTypeP2_of_derived_typeF` are discharged: `hderF` by `isTypeF_derivedInG_of_isTypeP2`,
+and `hderfit` (`(M')_F = M_F`, both `= M_σ`) by
+`maxNilpotentNormalHall_derivedInG_eq_Msigma_of_isTypeP2`.  No `τ₂(M) = ∅` gate (the earlier
+reduction to BG Theorem 15.8 was unnecessary — and `τ₂(M) = ∅` is false for some type-`P₂` `M`,
+cf. Corollary 15.9). -/
+theorem isTypeII_of_isTypeP2 [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    {M : Subgroup G} (hM : M ∈ maximalSubgroups G) (hP2 : S14.IsTypeP2 M) :
+    OddOrder.GroupTheory.IsTypeII M := by
+  classical
+  have hex := typeP2_exists_matched_kappa_hall_pair hG hM hP2
+  set K := hex.choose with hKdef
+  set U := hex.choose_spec.choose with hUdef
+  have hspec := hex.choose_spec.choose_spec
+  have hKM : K ≤ M := hspec.1
+  have hUM : U ≤ M := hspec.2.1
+  have hUne : U ≠ ⊥ := hspec.2.2.1
+  have hK : Ch03.IsHallSubgroup (S14.kappa M) (K.subgroupOf M) := hspec.2.2.2.1
+  have hU : Ch03.IsHallSubgroup ((S14.kappa M ∪ OddOrder.BG.Ch3.S10.sigma M)ᶜ) (U.subgroupOf M) :=
+    hspec.2.2.2.2.1
+  have hP : S14.IsTypeP M := hP2.1
+  have hKne : K ≠ ⊥ := fun h => card_kappaHall_ne_one hP hKM hK (by rw [h, Subgroup.card_bot])
+  -- `K` cyclic (Theorem A(2) / Lemma 15.1(b), `typeP_auxiliary_structure` conjunct 2).
+  obtain ⟨_, hKcyc, _⟩ := typeP_auxiliary_structure hG hM hKM hUM hK rfl hU
+  haveI := hKcyc
+  -- `hderfit`: `(M')_F = M_F` (both `= M_σ`).
+  have hMFMσ : maxNilpotentNormalHall M = OddOrder.BG.Ch3.S10.Msigma M :=
+    (maxNilpotentNormalHall_eq_Msigma_iff_isNilpotent hG hM).mpr
+      (S14.msigma_isNilpotent_of_isTypeP2 hG hM hP2)
+  have hderfit : maxNilpotentNormalHall (derivedInG M) = maxNilpotentNormalHall M := by
+    rw [maxNilpotentNormalHall_derivedInG_eq_Msigma_of_isTypeP2 hG hM hP2 hKM hK, hMFMσ]
+  -- `hderF`: `M'` is of type `F`.
+  have hderF : OddOrder.GroupTheory.IsTypeF (derivedInG M) :=
+    isTypeF_derivedInG_of_isTypeP2 hG hM hP2 hKM hUM hKne hK hU hUne
+  exact isTypeII_of_isTypeP2_of_derived_typeF hG hM hP2 hderF hderfit
+
 /-- **Prop 16.1 forward bridge, type V last mile** (Peterfalvi (8.8)): a type-`P` datum with
 `U = ⊥` and the Peterfalvi (8.8) trichotomy on `H = M_F` is of type V.  The `alternative`
 disjunction is the deep named residual (BG §15.7(c) / Peterfalvi (8.8)). -/
