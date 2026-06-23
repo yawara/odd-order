@@ -210,6 +210,13 @@ structure Section16MaximalPair (G : Type*) [Group G] [Finite G] where
   `exists_section16MaximalPair_data` (`card_kappaHall_ne_card_Kstar` makes the two orders distinct,
   so one of the two labellings has `|K| < |K*|`).  This pins the otherwise-ambiguous `q < p`. -/
   K_lt_Kstar : Nat.card ↥K < Nat.card ↥Kstar
+  /-- **Peterfalvi (13.2.a)**: the smaller-κ member `S` of the pair (`|K| < |K*|`) is of type `P₂`
+  (Type II).  This pins the type-duality disjunction `IsTypeP2 S ∨ IsTypeP2 T` (BG Theorem 14.7,
+  which carries no order information) onto the side fixed by `K_lt_Kstar`.  Supplied by
+  `section16MaximalPair_of_isMinimalSimpleOdd` via `isTypeP2_of_typeP_kappaHall_lt`; it is the
+  determinate type the §15 `basic_structure` carrier wiring consumes
+  (`exists_typePData_W1_eq_of_isTypeP2`, relane #4 / issues 4009/2019). -/
+  S_typeP2 : BG.Ch4.S14.IsTypeP2 S
 
 /-- **BG §14 type-P duality / cyclic-counting output** — *owned by lane-f*.
 
@@ -378,6 +385,52 @@ theorem exists_section16MaximalPair_data {G : Type*} [Group G] [Finite G]
         · exact Or.inr (Or.inl hMc)
       · rw [sup_comm]; exact hcyc
 
+/-- **Peterfalvi (13.2.a), character core** (mmd §13, `references/peterfalvi/04.15_*`) — left as a
+faithful obligation, *owned by lane-b* (Peterfalvi §10–§11 coherence).
+
+For the type-`P` member `S` of a dual maximal pair (BG Theorem 14.7), with κ-Hall factor `K` and
+dual factor `K* = M_σ(S) ⊓ C_G(K)`, the type-`P₁` alternative (`S` of Type III/IV/V) carries the
+*larger* κ-Hall factor: `|K*| < |K|`.  In Peterfalvi's notation `q = |W₁| = |K|`, `p = |W₂| = |K*|`,
+this is "`S` of Type III ⟹ `q > p`".
+
+Peterfalvi's proof (the (13.2.a) proof line): Theorem (10.10) excludes Type V, and (11.9.b) — under
+the Type III/IV Hypothesis (11.2) — gives `q > p` from the coherence / norm-inequality bound on the
+character set `S(HC)`.  That character-theoretic content is owned by lane-b; surfaced here as a
+named obligation so the §16 maximal-pair producer can carry the determinate type `IsTypeP2 mp.S`
+(relane #4, issues 4009/2019).  Its only consumer is `isTypeP2_of_typeP_kappaHall_lt`. -/
+theorem card_kappaHall_lt_of_isTypeP1 {G : Type*} [Group G] [Finite G]
+    (hG : IsMinimalSimpleOdd G) {S K Kstar : Subgroup G}
+    (hS : S ∈ maximalSubgroups G) (hSP : BG.Ch4.S14.IsTypeP S) (hKS : K ≤ S)
+    (hK : Ch03.IsHallSubgroup (BG.Ch4.S14.kappa S) (K.subgroupOf S))
+    (hKstar : Kstar = BG.Ch3.S10.Msigma S ⊓ Subgroup.centralizer (K : Set G))
+    (hP1 : BG.Ch4.S14.IsTypeP1 S) :
+    Nat.card ↥Kstar < Nat.card ↥K := by
+  sorry
+
+/-- **Peterfalvi (13.2.a)** (mmd §13, `references/peterfalvi/04.15_*`): the type-`P` member `S` of a
+dual maximal pair whose κ-Hall factor `K` is the *smaller* of the two coprime factors of
+`W = K × K*` is of type `P₂` (BG) / Type II (Peterfalvi).
+
+This selects, out of the type-duality disjunction `IsTypeP2 S ∨ IsTypeP2 T` (BG Theorem 14.7,
+`typeP_duality`, which carries no order information), the determinate side `IsTypeP2 S` fixed by the
+ordering `|K| < |K*|`.  Skeleton proof: `S` is type-`P`, hence type `P₁` or `P₂`
+(`isTypeP_iff_isTypeP1_or_isTypeP2`); the `P₁` branch is excluded by `card_kappaHall_lt_of_isTypeP1`
+(the Pf §10–§11 character core, an obligation owned by lane-b), leaving `P₂`.
+
+Consumed by `section16MaximalPair_of_isMinimalSimpleOdd` to carry `Section16MaximalPair.S_typeP2`
+(relane #4, issues 4009/2019), which unblocks the §15 `basic_structure` `TypePData` carrier wiring
+(`exists_typePData_W1_eq_of_isTypeP2`). -/
+theorem isTypeP2_of_typeP_kappaHall_lt {G : Type*} [Group G] [Finite G]
+    (hG : IsMinimalSimpleOdd G) {S K Kstar : Subgroup G}
+    (hS : S ∈ maximalSubgroups G) (hSP : BG.Ch4.S14.IsTypeP S) (hKS : K ≤ S)
+    (hK : Ch03.IsHallSubgroup (BG.Ch4.S14.kappa S) (K.subgroupOf S))
+    (hKstar : Kstar = BG.Ch3.S10.Msigma S ⊓ Subgroup.centralizer (K : Set G))
+    (hlt : Nat.card ↥K < Nat.card ↥Kstar) :
+    BG.Ch4.S14.IsTypeP2 S := by
+  rcases BG.Ch4.S14.isTypeP_iff_isTypeP1_or_isTypeP2.mp hSP with hP1 | hP2
+  · exact absurd (card_kappaHall_lt_of_isTypeP1 hG hS hSP hKS hK hKstar hP1) (lt_asymm hlt)
+  · exact hP2
+
 /-- **BG §16 maximal-pair producer** — *lane-g* (BG §16 main results).
 Constructs the maximal pair `S, T`, their type classification, and the case-(b)
 trichotomy of (8.8) from a minimal simple group of odd order.
@@ -423,7 +476,8 @@ noncomputable def section16MaximalPair_of_isMinimalSimpleOdd {G : Type*} [Group 
       Kstar_hall := hKstarhall
       K_eq := hKeq
       Z_cyclic := hZcyc
-      K_lt_Kstar := hKlt }
+      K_lt_Kstar := hKlt
+      S_typeP2 := isTypeP2_of_typeP_kappaHall_lt hG hSmax hStypeP hKleS hKhall hKstareq hKlt }
 
 /-- `IsHallSubgroup` is order-determined: equal cardinality transfers the Hall property
 (`H.index` is `|ambient| / |H|`, so equal `|H|` gives equal index, and both Hall conditions are
