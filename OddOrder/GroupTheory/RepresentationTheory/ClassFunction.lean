@@ -345,6 +345,13 @@ theorem innerSum_smul_left (c : k) (φ ψ : ClassFunction G k) :
   refine Finset.sum_congr rfl fun g _ => ?_
   rw [smul_apply, mul_assoc]
 
+theorem innerSum_smul_right (c : k) (φ ψ : ClassFunction G k) :
+    innerSum φ (c • ψ) = star c * innerSum φ ψ := by
+  rw [innerSum, innerSum, Finset.mul_sum]
+  refine Finset.sum_congr rfl fun g _ => ?_
+  rw [smul_apply, star_mul']
+  exact mul_left_comm _ _ _
+
 theorem innerSum_neg_left (φ ψ : ClassFunction G k) :
     innerSum (-φ) ψ = -innerSum φ ψ := by
   simp [innerSum, neg_mul, Finset.sum_neg_distrib]
@@ -393,6 +400,12 @@ theorem inner_smul_left [Invertible (Nat.card G : k)]
   inner (c • φ) ψ = c * inner φ ψ := by
   rw [inner, innerSum_smul_left, inner]
   rw [← mul_assoc, mul_comm (⅟(Nat.card G : k)) c, mul_assoc]
+
+theorem inner_smul_right [Invertible (Nat.card G : k)]
+    (c : k) (φ ψ : ClassFunction G k) :
+  inner φ (c • ψ) = star c * inner φ ψ := by
+  rw [inner, innerSum_smul_right, inner]
+  rw [← mul_assoc, mul_comm (⅟(Nat.card G : k)) (star c), mul_assoc]
 
 theorem inner_neg_left [Invertible (Nat.card G : k)] (φ ψ : ClassFunction G k) :
     inner (-φ) ψ = -inner φ ψ := by

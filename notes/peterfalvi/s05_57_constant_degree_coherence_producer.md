@@ -124,15 +124,16 @@ IntegralCharacterMap 構成から次セッションで着手。建てた signatu
 
 ## 5. 状態
 
-- ✅ 本セッション (scoping + engine deep-dive + **base case 3/4 実装**): 框組確認 + 設計 + signature +
-  engine 経路確定 + **`isCoherent_pair_of_differenceImage` (base case) を構成** —
-  extension `pairExtension` + 5 value/helper lemma (`pairExtension_apply`/`_chi`/`_chiConj`/`_diff`) +
-  3/4 field (`nonzero`/`extends_on_supported`/`extension_mem_ZIrr`) sorry-free。
-  **残 1 sorry = `extension_inner_eq` (Parseval isometry)**: 数学は確定 (両辺 → `a·c̄+b·d̄`)、blocker =
-  **repo に `inner_smul_right` 欠落** (`inner` は 2nd-arg conj-linear、`inner_smul_left` のみ)。
-  discharge = `ClassFunction.inner_smul_right` (`inner u (c•v)=star c * inner u v`) を足す + 展開。
-- ⏭ 次セッション: (I) `extension_inner_eq` 完了 (inner_smul_right + Parseval) → (II) induction wrapper +
-  (III) per-step discharge で `coherent_of_constant_degree` 本体。signature に `hirr` (S⊆Irr L) 追加が
-  faithful + 必要。
+- ✅✅ 本セッション (scoping + engine deep-dive + **base case 完全実証明**): 框組確認 + 設計 + signature +
+  engine 経路確定 + **`isCoherent_pair_of_differenceImage` (base case = single-pair coherence) を
+  sorry-free 完成** — extension `pairExtension` + 5 value/helper lemma + **4/4 `IsCoherent` field 全実証明**
+  (`nonzero`/`extension_inner_eq`[Parseval isometry]/`extends_on_supported`/`extension_mem_ZIrr`)。
+  isometry の blocker だった `inner_smul_right` 欠落を **core `ClassFunction.lean` に汎用追加**
+  (`innerSum_smul_right`/`inner_smul_right`、`inner` は 2nd-arg conj-linear)。Parseval は
+  `Submodule.mem_span_pair` で `φ=a•χ+b•χ̄` 表現 → `← Int.cast_smul_eq_zsmul ℂ` + `inner_smul_left/right`
+  + `irreducibleCharacter_inner` で両辺 → `a·c+b·d`、sign は `sign_eq` case-split で concrete 化 → `ring`。
+- ⏭ 次セッション = **(II) induction wrapper + (III) per-step discharge** で `coherent_of_constant_degree`
+  本体 (base case を bootstrap に `retarget_isCoherent_of_decompositions_and_memberFamily` を共役ペアに
+  反復、等次数で a=1)。signature に `hirr` (S⊆Irr L) 追加が faithful + 必要。base case は cite-ready。
 - 関連: lane-h `S08_Theorem62_63_Standalone.lean` (template、h62 oracle pattern)、
   issue 4012 (relane #8)、issue 2018 ((11.5) gate)、S13 `HC_le_secondDerived`。

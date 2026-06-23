@@ -107,15 +107,33 @@ noncomputable def isCoherent_pair_of_differenceImage
       extension_inner_eq := ?_
       extends_on_supported := ?_
       extension_mem_ZIrr := ?_ }
-  · -- isometry on `ℤ[{χ,χ̄}]`: orthonormal-basis Parseval.  For `φ = a•χ+b•χ̄`, `ψ = c•χ+d•χ̄`
-    -- (`Submodule.mem_span_pair`), `ext φ = a•(εμ)+b•(εν)` (`pairExtension_chi`/`_chiConj` + `map`),
-    -- and both `⟨ext φ, ext ψ⟩` and `⟨φ, ψ⟩` reduce to `a·c̄ + b·d̄` via the orthonormalities
-    -- `⟨εμ,εμ⟩=⟨χ,χ⟩=1`, `⟨εμ,εν⟩=⟨χ,χ̄⟩=0` (`irreducibleCharacter_inner` / `hχχ` etc.).
-    -- ⚠ blocked on a missing general lemma `inner_smul_right` (`inner` is conjugate-linear in the 2nd
-    -- argument — `innerSum φ ψ = ∑ φ(g)·star(ψ(g))` — but the repo only has `inner_smul_left`).
-    -- Discharge = add `ClassFunction.inner_smul_right` (`inner φ (c•ψ) = star c * inner φ ψ`) +
-    -- expand.  Next session.
-    sorry
+  · -- isometry on `ℤ[{χ,χ̄}]`: orthonormal-basis Parseval.  For `φ = a•χ+b•χ̄`, `ψ = c•χ+d•χ̄`, both
+    -- `⟨ext φ, ext ψ⟩` and `⟨φ, ψ⟩` reduce to `a·c + b·d` via the orthonormalities
+    -- `⟨εμ,εμ⟩=⟨χ,χ⟩=1`, `⟨εμ,εν⟩=⟨χ,χ̄⟩=0`.
+    intro φ ψ hφ hψ
+    obtain ⟨a, b, rfl⟩ := Submodule.mem_span_pair.mp hφ
+    obtain ⟨c, d, rfl⟩ := Submodule.mem_span_pair.mp hψ
+    have hextφ : pairExtension hχ (a • χ + b • χ.conj)
+        = a • (hχ.sign • (hχ.mu : ClassFunction G ℂ)) + b • (hχ.sign • (hχ.nu : ClassFunction G ℂ)) := by
+      rw [map_add, map_zsmul, map_zsmul, pairExtension_chi hχ hχχ hortho,
+        pairExtension_chiConj hχ hχbar hortho']
+    have hextψ : pairExtension hχ (c • χ + d • χ.conj)
+        = c • (hχ.sign • (hχ.mu : ClassFunction G ℂ)) + d • (hχ.sign • (hχ.nu : ClassFunction G ℂ)) := by
+      rw [map_add, map_zsmul, map_zsmul, pairExtension_chi hχ hχχ hortho,
+        pairExtension_chiConj hχ hχbar hortho']
+    have hμμ0 : ClassFunction.inner (hχ.mu : ClassFunction G ℂ) (hχ.mu : ClassFunction G ℂ) = 1 := by
+      rw [irreducibleCharacter_inner, if_pos rfl]
+    have hμν0 : ClassFunction.inner (hχ.mu : ClassFunction G ℂ) (hχ.nu : ClassFunction G ℂ) = 0 := by
+      rw [irreducibleCharacter_inner, if_neg hχ.distinct]
+    have hνμ0 : ClassFunction.inner (hχ.nu : ClassFunction G ℂ) (hχ.mu : ClassFunction G ℂ) = 0 := by
+      rw [irreducibleCharacter_inner, if_neg (Ne.symm hχ.distinct)]
+    have hνν0 : ClassFunction.inner (hχ.nu : ClassFunction G ℂ) (hχ.nu : ClassFunction G ℂ) = 1 := by
+      rw [irreducibleCharacter_inner, if_pos rfl]
+    rw [hextφ, hextψ]
+    simp only [ClassFunction.inner_add_left, ClassFunction.inner_add_right,
+      ← Int.cast_smul_eq_zsmul ℂ, ClassFunction.inner_smul_left, ClassFunction.inner_smul_right,
+      star_intCast, hμμ0, hμν0, hνμ0, hνν0, hχχ, hortho, hortho', hχbar]
+    rcases hχ.sign_eq with hs | hs <;> rw [hs] <;> push_cast <;> ring
   · -- agreement with `τ` on the `A`-supported lattice (= multiples of `χ - χ̄`).
     intro φ hφ
     obtain ⟨k, rfl⟩ := Submodule.mem_span_singleton.mp (hsupp hφ)
