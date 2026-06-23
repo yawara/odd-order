@@ -103,7 +103,22 @@ bottom-out** するので、clean 化には §15 foundation が先。真の順�
 
 ## 進捗ログ
 
-**2026-06-23 (cont.¹⁰) ✅✅ hderF/hderfit gate を deep 投資で精査 → ① gate は Peterfalvi (8.6.b II) に忠実と確定 (矛盾でない) ② `hderfit` を単一の上流前提 `τ₂(M)=∅` (= BG Thm 15.8) に還元する 2 補題を landing、sorry-free + axiom-clean** (lane-f RESUME, issue 8018 hderF deep 投資, hub 推奨の BG §15 + Coq 精読で de-risk 後に Lean。full build 3881 green/82s, AxiomsCheck 2 本登録, FT-path sorry 124 不変):
+**2026-06-23 (cont.¹¹) ✅✅✅ hP2II COMPLETE — type-`P₂` ⟹ Type II を sorry-free + axiom-clean で締結、`τ₂(M)=∅`/Thm 15.8 は不要と判明 (cont.¹⁰ の還元は回り道だった)** (lane-f RESUME、commit `77287003`、full build 3881 green、AxiomsCheck 5 本登録):
+
+- **cont.¹⁰ の τ₂(M)=∅ 還元は誤誘導 (de-risk 再精読で判明)**: Coq 分類定理 `FTtypeP` (`BGsection16.v`) の type-2 case (`defM'F`, l.1135) を精読すると、`of_typeII` の `M'`_\F = H` 条件は **`Fcore_max` + Hall 推移性のみ**で証明されており τ₂ も Thm 15.8 も使っていない。決定打: **`τ₂(M)=∅` は一部の type-`P₂` `M` で偽** — **Cor 15.9** (`nonFtype_signalizer_base`, BGsection15.v:1399) は `N ∈ ℳ_𝓟₂` かつ `r ∈ τ₂(N)` を供給する。ゆえに「type-`P₂` ⟹ τ₂(M)=∅」は普遍的ルートになり得ず、cont.¹⁰ の 2 補題 (`*_of_tau2_empty`) は数学的に正しいが**条件付きで使えない**。真の residual `(M')_F = M_σ` は elementary に成立 (Y=⊥ は τ₂≠∅ でも F-core 極大性から従う)。
+
+- **新 (全 sorry-free + axiom-clean、AxiomsCheck 登録)**:
+  - **`maxNilpotentNormalHall_derivedInG_eq_Msigma_of_isTypeP2` (S15_MF, UNCONDITIONAL)**: `(M')_F = M_σ` を F-core 極大性 + Hall 推移性で (Coq `defM'F`)。`M' = M^{(1)}` は cyclic κ-Hall `K` の補元ゆえ `M` 内 κ'-Hall ⟹ `maxNilpotentNormalHall M'` は `M` の nilpotent normal Hall ⟹ `≤ M_F = M_σ`; 逆 `M_σ` は `M'` の nilpotent normal Hall。`_of_tau2_empty` 版を supersede。+ helper `coprime_card_index_subgroupOf_trans` (Hall 推移性 coprime 形) / `isHallSubgroup_primeFactors_of_coprime_index`。
+  - **`isTypeF_derivedInG_of_isTypeP2` (S16, `hderF`)**: `M'` type `F`。`M' = M_σ ⋊ U` が type-F maximal `M = M_σ ⋊ U` と構造同型ゆえ同じ data で組む (complement = `typeP2_mf_internal_fitting_decomposition`; U₁/Frobenius `M_σ ⋊ U₀` = Lemma 15.1(d)(e) `typeP_auxiliary_structure`; `(M')_F = M_σ` = 上記補題)。template = `typeFData_of_kappa_eq_bot` と差分 4 箇所のみ (H_eq/H_le/U_le/complement)。
+  - **`isTypeII_of_isTypeP2` (S16, `hP2II` 完成)**: 全 type-`P₂` maximal は type II。`isTypeII_of_isTypeP2_of_derived_typeF` の 2 residual を discharge。
+
+- **`tau2_transfer_constraint` (Thm 15.8) / `centralizer_escape_final_local` (Cor 15.9) は sorried のまま** (Cor 15.9 は Theorem D に依然必要な genuine BG 結果だが、hP2II の gate ではなくなった)。FT-path sorry 不変 (carrier/bridge 構成 = honest 進捗)。
+
+- **▶ 次フロンティア**: hP2II ✅ で Prop 16.1 forward bridge のうち type-II が完成。残り = ① **他 bridge** (`hFI` type-F→I / `hP1neIIIIV` type-P1→III/IV / `hP1eqV` type-P1→V) ② **reverse classifications** (`hIF`/`hIIP2`/`hIIIIVP1`/`hVP1`) ③ `hP_derived`/`hF_not_derived`/`h152a`。これらを埋めれば `proposition_type_classification` (real, S16:2173 現 sorry) が `proposition_type_classification_of_inputs` 経由で閉じる。hP1eqV/hP1neIIIIV は type-P1 構造 (U=⊥ or M_F≠M_σ) で別 deep。
+
+---
+
+**2026-06-23 (cont.¹⁰) ✅✅ hderF/hderfit gate を deep 投資で精査 → ① gate は Peterfalvi (8.6.b II) に忠実と確定 (矛盾でない) ② `hderfit` を単一の上流前提 `τ₂(M)=∅` (= BG Thm 15.8) に還元する 2 補題を landing、sorry-free + axiom-clean** (lane-f RESUME, issue 8018 hderF deep 投資, hub 推奨の BG §15 + Coq 精読で de-risk 後に Lean。full build 3881 green/82s, AxiomsCheck 2 本登録, FT-path sorry 124 不変)〔⚠ cont.¹¹ で τ₂ 還元は不要と判明〕:
 
 - **de-risk 精読の結論 (BG §15-16 + Coq BGsection15/16 + Peterfalvi (8.4)-(8.6),(8.12))**:
   - **gate は忠実 (⚠ [[typepdata-contradictory-finding]] 型のリスク無し)**: **Peterfalvi (8.6.b II)** = 「type II ⟺ type-`P` ∧ `U` abelian ∧ `N_G(U)⊄M` ∧ **`M'` が type `F` で `(M')_F = H`**」。Lean `TypeIIData` の `derived_typeF`(=hderF) + `derived_fitting_eq`(=hderfit, `maxNilpotentNormalHall M' = M_σ`) はこの定義そのもの。Coq `of_typeII` は `normedTI F(M)^#` 形で表現が違うだけ (Peterfalvi 版が Lean の採用形)。
