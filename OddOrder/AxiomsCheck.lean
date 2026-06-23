@@ -5869,3 +5869,13 @@ formula together with the prime computation `coprimeFrobeniusAction_card_eq_prim
 -- Same clause restated against the cleaner subgroup gate `W₂ ⊓ H₀ = ⊥` (the fpf input reduces to it
 -- via `H ⊓ C_G(W₁) = W₂`); isolates the genuine §8/chief obligation.
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S13.U_centralizes_H0_of_W2_inf_H0_bot
+
+-- §16 character-data producer (`section16CharacterData`, POLE-1 `cd`) — S-side grid building blocks.
+-- `induce_compHom_subgroupCongr`: `Ind` is invariant under transporting the source subgroup along an
+-- equality (the cd-grid transport primitive).  `Section16CharacterData.muS_definition`: the S-side
+-- (13.1.e) `mu_definition` identity `Ind_W^S(ω_{ij} − ω_{0j}) = δ_j(μ_{ij} − μ_{0j})`, read off the
+-- `certainTypeS` certain-type machinery (`chiColumn`/`columnFamily`) via the `tpW_subgroupOf_eq`
+-- W-identification + the (4.3.b)/(1.4) bridge `S06.induce_chiColumn_diff_mu_diff`.  Both axiom-clean.
+#assert_only_allowed_axioms OddOrder.induce_compHom_subgroupCongr
+#assert_only_allowed_axioms OddOrder.Section16CharacterData.tpW_subgroupOf_eq
+#assert_only_allowed_axioms OddOrder.Section16CharacterData.muS_definition
