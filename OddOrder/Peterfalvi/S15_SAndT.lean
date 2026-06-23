@@ -253,21 +253,19 @@ structure BasicStructureData (hyp : Hypothesis (G := G)) where
 /-- **Peterfalvi (13.2.b,c,e) — the `M_F`-structure residual** (faithful obligation, §16-gated).
 
 The genuinely §16-structural half of (13.2): the Fitting kernel `P = S_F` is elementary abelian of
-order `p^q` (13.2.b,c), the complement `U` is abelian and `U W₁` is a Frobenius group (13.2.a's
-abelian/Frobenius content), `u ≤ (p^q − 1)/(p − 1)` (13.2.e), and `A_0(S)` is a TI-subset (13.2.e).
+order `p^q` (13.2.b,c), the complement `U` is abelian (13.2.a), `u ≤ (p^q − 1)/(p − 1)` (13.2.e),
+and `A_0(S)` is a TI-subset (13.2.e).
 
-Unlike the *type determination* of (13.2.a) — which is now read off sorry-free from the carrier
-`S_typeP2` via `isTypeII_of_isTypeP2` — these are the σ-structure facts of the type-`P₂` member `S`:
-`M_σ = M_F` is the elementary-abelian `p`-group of rank `q` on which the prime-order `κ`-Hall factor
-`W₁` acts (BG §10/§14 σ-theory), giving the `U W₁` Frobenius action and the `u`-bound from the count
-of `W₁`-orbits.  No repo theorem yet states "`M_σ` elementary abelian of order `p^q`"; declared here
-as the localized faithful gate (the `card_Q_eq`/`coprime_card_U_card_P_of_disjoint` pattern) so that
-`basic_structure`'s assembly — and its honest type determination — are `sorry`-free. -/
+Unlike the *type determination* and the `U W₁` *Frobenius structure* of (13.2.a) — both now read off
+sorry-free from the carrier (`isTypeII_of_isTypeP2`, `typeP_uW1_frobenius` on `Sdata`) — these are
+the σ-structure facts of the type-`P₂` member `S`: `M_σ = M_F` is the elementary-abelian `p`-group of
+rank `q` on which the prime-order `κ`-Hall factor `W₁` acts (BG §10/§14 σ-theory), giving the
+`u`-bound from the count of `W₁`-orbits.  No repo theorem yet states "`M_σ` elementary abelian of
+order `p^q`"; declared here as the localized faithful gate (the
+`card_Q_eq`/`coprime_card_U_card_P_of_disjoint` pattern) so that `basic_structure`'s assembly — its
+honest type determination and Frobenius structure — are `sorry`-free. -/
 structure BasicStructureGated (hyp : Hypothesis (G := G)) where
   U_commutative : IsMulCommutative ↥hyp.U
-  UW1_frobenius : OddOrder.Isaacs.Ch06.IsFrobeniusGroup
-    ↥(hyp.U ⊔ hyp.W1) (hyp.U.subgroupOf (hyp.U ⊔ hyp.W1))
-      (hyp.W1.subgroupOf (hyp.U ⊔ hyp.W1))
   P_elementaryAbelian : IsElementaryAbelian hyp.p ↥hyp.P
   P_order : Nat.card ↥hyp.P = hyp.p ^ hyp.q
   u_bound : hyp.u ≤ (hyp.p ^ hyp.q - 1) / (hyp.p - 1)
@@ -297,12 +295,28 @@ theorem basic_structure [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
   -- (13.2.a) type determination: `S` is type II, sorry-free from the carrier `S_typeP2`.
   have hSII : IsTypeII hyp.S :=
     OddOrder.BG.Ch4.S16.isTypeII_of_isTypeP2 _hG hyp.S_maximal hyp.S_typeP2
+  -- `U ≠ ⊥`: the carrier `Sdata.U` has the same order as the type-II witness's `typeP.U`
+  -- (`card_U_eq_index = [M' : M_F]`), and the latter is `≠ ⊥` (`TypePNontrivialCore`).
+  have tdata : TypeIIData hyp.S := hSII.some
+  have hSdataUne : hyp.Sdata.U ≠ ⊥ := by
+    intro hbot
+    have h1 : Nat.card ↥hyp.Sdata.U = Nat.card ↥tdata.typeP.U := by
+      rw [hyp.Sdata.card_U_eq_index, tdata.typeP.card_U_eq_index]
+    rw [hbot, Subgroup.card_bot] at h1
+    exact tdata.common.1 (Subgroup.card_eq_one.mp h1.symm)
+  -- (13.2.a) `U W₁` Frobenius: sorry-free from the carrier `Sdata` (`typeP_uW1_frobenius`,
+  -- reconciled `Sdata.U = U`, `Sdata.W1 = W1`).
+  have hUW1frob : OddOrder.Isaacs.Ch06.IsFrobeniusGroup
+      ↥(hyp.U ⊔ hyp.W1) (hyp.U.subgroupOf (hyp.U ⊔ hyp.W1))
+        (hyp.W1.subgroupOf (hyp.U ⊔ hyp.W1)) := by
+    have h := OddOrder.Peterfalvi.S11.typeP_uW1_frobenius hyp.Sdata hSdataUne
+    rwa [hyp.Sdata_U_eq, hyp.Sdata_W1_eq] at h
   -- (13.2.b,c,e) `M_F`-structure: the localized faithful §16 producer.
   let core := basic_structure_gated _hG hyp
   refine ⟨{ S_typeII_or_typeIII := Or.inl hSII
             q_lt_p_forces_typeII := fun _ => hSII
             U_commutative := core.U_commutative
-            UW1_frobenius := core.UW1_frobenius
+            UW1_frobenius := hUW1frob
             P_elementaryAbelian := core.P_elementaryAbelian
             P_order := core.P_order
             u_bound := core.u_bound
