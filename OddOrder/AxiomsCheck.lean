@@ -5918,3 +5918,20 @@ formula together with the prime computation `coprimeFrobeniusAction_card_eq_prim
 -- `tp.W1`/`tp.W2`-restriction values feeding the symmetry).  Axiom-clean.
 #assert_only_allowed_axioms OddOrder.Section16CharacterData.omegaProdCharS_apply_mem_K
 #assert_only_allowed_axioms OddOrder.Section16CharacterData.omegaProdCharS_apply_mem_Kstar
+-- `chi2enum_zero` (step A): the `W₂`-column enumeration is normalized so column `0` is the trivial
+-- character (the `j = 0` base of `nu_definition`), mirroring the `w1CharEquiv 0 = 1` convention.
+#assert_only_allowed_axioms OddOrder.Section16CharacterData.chi2enum_zero
+-- T-side mirror of the W-identification infrastructure (step D), toward `nu_definition`.  `certainTypeT`
+-- carries `mp.T` with the factors swapped (`W₁ = mp.Kstar`, `W₂ = mp.K`): `certainTypeT_W1_eq`/`_W2_eq`
+-- pin the factors, `k_le_T` places `mp.K ≤ mp.T`, `cardCertainTypeT_W1`/`_W2` match `tp.p`/`tp.q`,
+-- `tpW_subgroupOf_T_eq` identifies `tp.W.subgroupOf mp.T` with `certainTypeT.sdiff.W`, and
+-- `gridEquivE_T_coe`/`_mem_W1`/`_mem_W2` are the element-preserving T-side transport.  All axiom-clean.
+#assert_only_allowed_axioms OddOrder.Section16CharacterData.certainTypeT_W1_eq
+#assert_only_allowed_axioms OddOrder.Section16CharacterData.certainTypeT_W2_eq
+#assert_only_allowed_axioms OddOrder.Section16CharacterData.k_le_T
+#assert_only_allowed_axioms OddOrder.Section16CharacterData.cardCertainTypeT_W1
+#assert_only_allowed_axioms OddOrder.Section16CharacterData.cardCertainTypeT_W2
+#assert_only_allowed_axioms OddOrder.Section16CharacterData.tpW_subgroupOf_T_eq
+#assert_only_allowed_axioms OddOrder.Section16CharacterData.gridEquivE_T_coe
+#assert_only_allowed_axioms OddOrder.Section16CharacterData.gridEquivE_T_mem_W1
+#assert_only_allowed_axioms OddOrder.Section16CharacterData.gridEquivE_T_mem_W2
