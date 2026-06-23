@@ -113,3 +113,15 @@ hub が lane-h の次割当を決定し、`LAUNCH.md` 更新 or 本 issue を cl
 - POLE-2 現状: `S16_NonExistenceG.lean` (14.7 sorry-free at :2384, `field_normalizer_structure` at :3369)
 - build: green 3882 jobs / AxiomsCheck OK at main merge (`98bf3929`)
 - 関連: [[ft-endgame-two-poles]] (POLE-1/POLE-2), [[lanes-are-equivalent-no-specialty]], [[feedback-flag-poor-progress]]
+
+## 2026-06-23 RESOLVED (ユーザー裁可) — §6 coherence producer (Thm 6.2/6.3) に再配置
+
+hub が実コードで検証: (14.7) `field_normalizer_of_U_characteristic` は `S16_NonExistenceG.lean:2384` で
+**sorry-free 確定** → relane #5 は hub の stale-pointer エラー (issue 2009 の古い note を未検証採用) と認定。
+ユーザー裁可で **lane-h = Pf §6 coherence producer** に再配置 (relane #7):
+- lane-h は **Thm 6.3 `coherent_S_of_coherent_SH0C` + Thm 6.2 `coherent_quotient_bound` の standalone 版**を
+  §6/§8 機構 (S08_Theorem63 等、現 lane-b 非編集=dormant) から **新 leaf に隔離して生産**。
+- lane-c の S13 (relane #6) がこれを cite して obligation を discharge (producer[lane-h] → consumer[lane-c])。
+- POLE-2 (issue 2009) は driver/await に降格 (pending へ戻す、char landing で auto-wire)。
+- ⚠ §5-§8 は lane-b 名目領域 (ユーザー直接管理) ゆえ既存ファイル本体は cite のみ・生産は新 leaf 隔離。
+LAUNCH.md (lane-h relane #7) 更新済 + merge_monitor relane #7。CLOSED。

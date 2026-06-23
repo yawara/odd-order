@@ -81,6 +81,15 @@ productive な独立クラスタに乗せ、上流優先方針 (CLAUDE.md) に�
 > S15_SAndT/S15_SAndT_Setup は C 所有のまま driver/await に降格**。FeitThompson def 単位 = F=mp+Prop16.1 /
 > B=cd / **C=tp+card_kappaHall** / H=POLE-2。lane-b/f/h は現状維持で適所。
 
+> **⚠ 2026-06-23 relane #7 (ユーザー裁可、issue 2021)**: relane #5 (lane-h→POLE-2) は **hub の stale-pointer
+> エラー**だった — 指した (14.7) Singer-field 核は既に sorry-free (`S16_NonExistenceG.lean:2384`, 06-18〜06-20
+> landing)、POLE-2 残 11 は全 char/Dade gated。lane-h が flag (issue 2021) → hub が実コード検証で確認 →
+> **lane-h = Pf §6 coherence producer** に再配置: lane-c の S13 が cite する **Thm 6.3 `coherent_S_of_coherent_SH0C`
+> + Thm 6.2 `coherent_quotient_bound` の standalone 版**を §6/§8 機構 (S08_Theorem63 等、現 lane-b dormant) から
+> **新 leaf に隔離して生産** (producer[lane-h §6/§8] → consumer[lane-c S13])。⚠ §5-§8 は lane-b 名目領域
+> (ユーザー直接管理) ゆえ既存ファイル本体は cite のみ・生産は新 leaf 隔離。POLE-2 (issue 2009) は driver/await に
+> 降格 (pending)。**教訓: relane で「workable-now」を指す前に実コードで sorry 状態を検証する** (issue note 鵜呑み禁止)。
+
 **signature-first interface**: 上流が sorried signature を export → 下流が cite。真の cross-lane 依存は narrow。
 signature 不足は notes/issue 経由。**driver (§16/§10)**: 常駐レーンを当てず、上流が landing したとき hub or
 担当レーンが続けて opportunistic に close する (pure consumer ゆえ常駐は starve)。
