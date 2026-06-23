@@ -27,8 +27,13 @@ faithful に STATE できる定理を全て実ステートメント化 + uncondi
   signature-first で cite 可)。
 - [ ] **(11.6) `core_structure`** 残 3 conjunct (`IsPGroup p H` / `U ≤ C_G(H₀)` / `H₀ = H'`)
   ← (9.3) [`U` centralizes `O_{p'}(H)`] + (9.6) [`C_{H₀}(W₁) = 1`] + (9.1) Wielandt (✅ done) +
-  `[BG] 1.6(d)` + (11.5)。**注**: (9.3)/(9.6) の正確な carrier 形は S11 に未 export ⟹ S11 (driver)
-  への追加 (lane-h で attemptable な §8-free 群論の可能性、要 (9.1) 適用調査) か lane-b 依頼。
+  `[BG] 1.6(d)` + (11.5)。
+  - **✅ `U ≤ C_G(H₀)` clause の Wielandt 部分は landed** (commit `558619f2`,
+    `S13.U_centralizes_H0_of_W1_fpf`, axiom-clean): `C_{H₀}(W₁)=1` ∧ `U≠1` ⟹ `U ≤ C_G(H₀)`,
+    lane-h の (9.1) `frobenius_kernel_centralizes_of_complement_fpf` 経由。**残 gate = fpf 入力
+    `C_{H₀}(W₁)=1`** = `|W₂|=p` (§8 `S11.typeIIIorIV_W2_prime`, cites (8.8)) + coprime-quotient
+    (`C_H(W₁)=W₂` [TypePData `centralizer_W1`] + Cor 3.28 surj + (9.6) `|W̄₂|=p`)。
+  - `IsPGroup p H` ← (9.3)[U cent O_{p'}(H)]+(11.5); `H₀=H'` ← [BG]1.6(d)+(11.5)。両 (11.5)-gated。
 - [ ] **(11.7) `H_elementaryAbelian`** ← (11.5) + (11.6) 下流。
 - [ ] **(11.8.x)/(11.8)/(11.9)** + opaque rider field (`notOrthogonalFormula` /
   `finalOrthogonalityFormula` / `caseB_of_97`) の de-opacify

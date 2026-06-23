@@ -323,6 +323,13 @@ opaque `quotientBoundFormula` field 削除、結論を実 index 不等式 `|M':H
 **∴ §13 で char API 無しに faithful に STATE できる定理は全 de-opacify 完了**。残 opaque field =
 (11.8)/(11.9) char rider (`notOrthogonalFormula`/`finalOrthogonalityFormula`/`caseB_of_97`、σ/ω/(Irr W) API 要) のみ。
 
+**追加 (commit `558619f2`): (11.6) `U ≤ C_G(H₀)` clause の Wielandt 部分を landing** —
+`U_centralizes_H0_of_W1_fpf` (axiom-clean, AxiomsCheck 登録): `C_{H₀}(W₁)=1` ∧ `U≠1` ⟹ `U ≤ C_G(H₀)`,
+lane-h の (9.1) `frobenius_kernel_centralizes_of_complement_fpf` を `U W₁` Frobenius (`typeP_uW1_frobenius`)
+が `H₀ ≤ M_F` に coprime 作用する形で適用。**残 gate = fpf 入力 `C_{H₀}(W₁)=1`** に縮小 = `|W₂|=p`
+(§8 `typeIIIorIV_W2_prime`←(8.8)) + coprime-quotient (`C_H(W₁)=W₂` [TypePData] + Cor 3.28 + (9.6)`|W̄₂|=p`)。
+∴ (11.6) clause 2 の substantive な群論核は済み、§8 prime fact 待ちに。
+
 FT-path sorry **122 不変** (vacuous opaque → 実ステートメント + 2 proven sublemma; CLAUDE.md「sorry≠進捗」)。
 
 **残 §13 gate (= cross-lane char、精密化済)**:
