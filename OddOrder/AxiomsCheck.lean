@@ -2178,6 +2178,10 @@ set_option linter.style.longLine false in
 -- (maximal-`B` + nilpotency-forces-centrality + `√`-arithmetic) reduced to the (6.2) index oracle.
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S07.IsCoherent.subset
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S08.six_three_descent
+-- (6.3) per-step index bound, general form: tower index multiplicativity (`|K:A| = |H:A|·|K:H|`,
+-- `|L:H| = |K:H|·|L:K|`) feeding `six_three_HH1_le`; reduces the `six_three_descent` `h62` oracle to
+-- the general `six_two` (6.2) bound for a solvable `K` (the single remaining deep gate).
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S08.six_three_index_bound_general
 -- (6.5) chief-factor core + (6.5)(b) reduction: a Frobenius-acted abelian section obeying the (6.3)
 -- index bound `≤ 4|R|²+1` is a `p`-group (chief-factor argument via the `p`-primary component,
 -- `card_modEq_one` + `six_five_chief_factor_contradiction`); combined with the nilpotent
@@ -5606,6 +5610,9 @@ the non-TI residual (BG Theorem 15.7(e)). -/
 #assert_only_allowed_axioms OddOrder.BG.Ch4.S16.normalizer_eq_self_of_subgroupOf_normal_of_ne_bot
 #assert_only_allowed_axioms OddOrder.BG.Ch4.S16.normalizer_fittingInAmbient_eq_self
 #assert_only_allowed_axioms OddOrder.BG.Ch4.S16.maxNilpotentNormalHall_sharp_isTISubset_of_fittingIsTI
+-- 15.7(e) conjunct A divisibility engine (Coq `regZq_dv_q1`): a `U0`-invariant order-`q` subgroup
+-- of the Frobenius kernel `M_F` forces `exp U ∣ q - 1` (Frobenius semiregular action).
+#assert_only_allowed_axioms OddOrder.BG.Ch4.S16.typeF_exponent_dvd_sub_one_of_invariant_card
 
 /-! # Peterfalvi Appendices (Lane H)
 
