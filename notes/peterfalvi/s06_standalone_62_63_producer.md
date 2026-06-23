@@ -114,17 +114,18 @@ sorry-free + axiom-clean + AxiomsCheck 登録済 (`IsCoherent.subset` / `six_thr
 
 lane-c が S13 obligation を discharge する手順:
 
-- **`coherent_S_of_coherent_SH0C` (11.3 = (6.3))**: `six_three_descent` を
+- **`coherent_S_of_coherent_SH0C` (11.3 = (6.3))**: **`six_three_of_six_two_oracle` を一本 cite**。
   K=`(derivedInG M).subgroupOf M` (=M', solvable), H=`HC.subgroupOf M`/相当 (nilpotent),
-  M=⊥ (1), H₁=H₀C, SOf=induced-family-filter, τ=`hyp.base.tau`, A0=`hyp.base.A0` で適用。
+  M=⊥ (1), H₁=H₀C, τ=`hyp.base.tau`, A0=`hyp.base.A0` で適用。producer 内部で C=H,D=A を instantiate 済。
   - 要 bridge: `SOf ⊥ = hyp.base.Sset` (= S = S(1)) と `SOf H0C` が consumer の `hyp.SOf H0C` に一致。
     現状 S13 の `SOf` は free field ゆえ lane-c は `SOf X = inducedFamily filter` に pin する enrich が要る
     (または `hyp.SOf` を本 producer の SOf に合わせる)。
-  - 要供給: `h62` (= general `six_three_index_bound`; 下記 §7) と hbound (6.3.c、(9.6)/(11.1) から)。
-- **`coherent_quotient_bound` (11.4 = (6.2), C=D=HC)**: general `six_two` の C=D 特殊化
-  (√|C:D|=√1=1) で |M':H₁|−1 ≤ 2|M:HC|、§11 identity 2|M:HC|=2q|U:C| で結論。→ general `six_two` 待ち。
+  - 要供給: per-section `h56` ((5.6) muGrid bound, lane-b) と hbound (6.3.c、(9.6)/(11.1) から)。
+- **`coherent_quotient_bound` (11.4 = (6.2), C=D=HC)**: **`six_two_general` を直接 cite** (C:=HC, D:=HC で
+  `D.subgroupOf C = ⊤` → √|C:D|=√1=1) で `|M':H₁|−1 ≤ 2|M:HC|`、§11 identity 2|M:HC|=2q|U:C| で結論。
+  centrality は `HC/B central in HC/B` (= HC/B abelian, 適切な B で). ✅ **`six_two_general` 自由 C,D 化済で直接対応**。
 
-**両 obligation とも最終的に general `six_two` (§4 の真の gate) に bottom out。**
+**両 obligation とも general `six_two` で served、残 gate は per-section `h56` ((5.6) muGrid, lane-b/c) のみ。**
 
 ## 7. 次ステップ
 
@@ -133,18 +134,43 @@ lane-c が S13 obligation を discharge する手順:
    の real-inequality (C=H,D=A: |K:A|−1 ≤ 2|L:H|√|H:A|) から |H:H₁|≤4|L:K|²+1 を導出。index 変換は
    `Subgroup.relIndex_mul_relIndex` (A≤H≤K) + `Subgroup.relIndex_mul_index` (H≤K) → `six_three_HH1_le`。
    ⟹ `six_three_descent` の `h62` を埋める道具が揃い、**両 §11 obligation は general `six_two` 一点に reduce**。
-2. **general `six_two`** (唯一残る深い gate): `coherentDegreeSumBound_of_not_coherent` ((5.6)
-   contrapositive、general 既存) の orthonormality/support/generation 仮説を induced family (可約 member 含む)
-   で discharge。Sibley は `hF : Frobenius` で member irreducible 化して discharge するが、§11 (K=M' solvable)
-   では μⱼ column 等の可約 member を §10-12 muGrid/columnSum 機構で扱う必要がある ⟹ **§5/§10-12 と entangle、
-   lane-h §6/§8 単独スコープ外 = cross-lane**。→ HUB issue で lane-b/c と協調 (issue 2022)。
-3. ⚠ 規約: §5-§8 既存本体は触らず cite のみ、生産は本 leaf に隔離 (lane-b 復帰時衝突回避)。維持。
+2. ✅ **DONE (2026-06-23 resume, commit pending)** — **general `six_two` ASSEMBLED** =
+   `six_two_general` (本 leaf、sorry-free+axiom-clean+AxiomsCheck登録)。Peterfalvi (6.2) 証明の
+   **break-pair より下流を一般に実証明**し、唯一残る reducible-member sensitive な (5.6) 核を clean な
+   oracle `h56` に isolate。具体的に landed (全 axiom-clean):
+   - `map_mk'_le_center_iff` — `D.map(mk' N) ≤ Z(Γ/N) ⟺ ∀d∈D,∀g, ⁅g,d⁆∈N` (中心性の commutator 特徴付け)。
+   - `inducedMember_re_le_general` — **(6.2) θ-degree bound for solvable kernel**, **自由 section
+     B≤D≤C≤K** で `ψ(1) ≤ |L:C|√|C:D|` (ψ=Ind_K^L θ, θ∈Irr K trivial-on-B)。Sibley central case (K=H=C,
+     `psi_degree_le_of_source_central`) と違い K⊋C ゆえ **Clifford a-half が必要** → general
+     `theta_degree_le_index_mul_sqrt_index` に CK=C.subgroupOf K, NB=(B.subgroupOf K).subgroupOf CK,
+     DK=(D.subgroupOf K).subgroupOf CK を供給。中心性は `subgroupOfEquivOfLe : ↥(C.subgroupOf K) ≃* ↥C`
+     (underlying ↥L 元保存) で ↥C→↥CK transport、index は `relIndex_subgroupOf` で `|CK|=|K:C|`/`|DK|=|C:D|`、
+     kernel は `characterKernel_restrict_subgroupOf`。
+   - `six_two_general` — (6.2) real-inequality **`|K:A|−1 ≤ 2|L:C|√|C:D|` (自由 C,D)** を `h56` oracle から
+     導出 (θ-bound + arithmetic)。**両 §11 obligation を直接 served**: 11.3 は (C,D)=(H,A) で
+     `six_three_index_bound_general` の `h62` に一致、11.4 は (C,D)=(HC,HC) (√1=1) で `|M':H₁|−1≤2|M:HC|`。
+   - `six_three_of_six_two_oracle` — **single-cite (6.3) producer**: `six_three_descent ∘
+     six_three_index_bound_general ∘ six_two_general(C=H,D=A)` を bundle。lane-c は **これ一本を cite**して
+     per-section `h56` を供給するだけ。**チェーン全体が型整合することを検証済**。
+3. 🔻 **唯一残 gate = `h56`** ((5.6) break-member oracle, **lane-b/c**): 各 section B≤A≤H₁ (A/B central in
+   H/B, S(A) coherent, S(B) not) に対し break θ∈Irr K (trivial-on-B) で `|K:A|−1 ≤ 2(Ind_K^L θ)(1).re`。
+   = 一般 solvable K の (5.6) norm-weighted coherence bound = case-B `sSubFiltration_sum_le_two_psi_caseB`
+   の **solvable-kernel 版** (§10-12 muGrid/columnSum, lane-b/c)。**lane-h §6/§8 スコープ外**。issue 2022 で要請。
+4. ⚠ 規約: §5-§8 既存本体は触らず cite のみ、生産は本 leaf に隔離 (lane-b 復帰時衝突回避)。維持。
 
-## 8. producer 完成度サマリ (2026-06-23 セッション終了時)
+## 8. producer 完成度サマリ (2026-06-23 resume²)
 
-lane-h §6/§8 スコープで生産可能な (6.2)/(6.3) 標準形 assembly は**完了**:
+lane-h §6/§8 スコープで生産可能な (6.2)/(6.3) 標準形 assembly は**完全完了**:
 - `S07.IsCoherent.subset` (monotonicity) ✅
 - `S08.six_three_descent` (general (6.3) minimal-A descent, K≠H) ✅
 - `S08.six_three_index_bound_general` (general (6.3) per-step index bound) ✅
-全て sorry-free + axiom-clean + AxiomsCheck 登録。両 §11 consumer obligation は **general `six_two`**
-一点に reduce 済。残作業 = general `six_two` (cross-lane, §10-12 muGrid) + lane-c の wiring (SOf/Sset pin)。
+- `S08.map_mk'_le_center_iff` (中心性 commutator 特徴付け) ✅
+- `S08.inducedMember_re_le_general` (general (6.2) θ-degree bound, 自由 section B≤D≤C≤K,
+  Clifford a-half + ↥C→↥CK centrality transport) ✅
+- `S08.six_two_general` (general (6.2) real-inequality `|K:A|−1≤2|L:C|√|C:D|`, 自由 C,D, → `h56` oracle) ✅
+- `S08.six_three_of_six_two_oracle` (single-cite (6.3) producer, h56 → S(M) coherent) ✅
+全て sorry-free + axiom-clean (3 標準 axiom) + AxiomsCheck 登録、full build 3883 green。
+**両 §11 consumer obligation は `six_two_general` で直接 served** (11.3=(C,D)=(H,A) via
+`six_three_of_six_two_oracle` / 11.4=(C,D)=(HC,HC)) — 残 gate は単一の per-section `h56`
+((5.6) muGrid bound for solvable K) のみ。これは genuine cross-lane (§10-12, lane-b/c)、lane-h scope
+では閉じない。残 = `h56` (lane-b/c) + lane-c の wiring (cite + SOf を induced-family に pin + h56 供給)。

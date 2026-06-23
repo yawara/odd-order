@@ -2182,6 +2182,19 @@ set_option linter.style.longLine false in
 -- `|L:H| = |K:H|·|L:K|`) feeding `six_three_HH1_le`; reduces the `six_three_descent` `h62` oracle to
 -- the general `six_two` (6.2) bound for a solvable `K` (the single remaining deep gate).
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S08.six_three_index_bound_general
+-- general `six_two` assembly: `map_mk'_le_center_iff` (image-in-centre ⟺ commutator condition);
+-- `inducedMember_re_le_general` (the (6.2) θ-degree bound `ψ(1) ≤ |L:H|·√|H:A|` for a member induced
+-- from the *solvable* kernel `K ⊋ H`, Clifford a-half + b-half via `theta_degree_le_index_mul_sqrt_index`,
+-- centrality transported across `↥(H.subgroupOf K) ≃* ↥H`); `six_two_general` (Peterfalvi (6.2), general
+-- (6.1) form: reduces `|K:A|−1 ≤ 2|L:H|·√|H:A|` to the (5.6) coherence oracle `h56` — the cross-lane
+-- §10–§12 muGrid bound, issue 2022 — by proving everything downstream of it).
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S08.map_mk'_le_center_iff
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S08.inducedMember_re_le_general
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S08.six_two_general
+-- `six_three_of_six_two_oracle`: the single-cite (6.3) producer for §11/§13 — bundles
+-- `six_three_descent ∘ six_three_index_bound_general ∘ six_two_general`, leaving the (5.6) break-member
+-- oracle `h56` (the §10–§12 muGrid bound) as the only character-theoretic hypothesis.
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S08.six_three_of_six_two_oracle
 -- (6.5) chief-factor core + (6.5)(b) reduction: a Frobenius-acted abelian section obeying the (6.3)
 -- index bound `≤ 4|R|²+1` is a `p`-group (chief-factor argument via the `p`-primary component,
 -- `card_modEq_one` + `six_five_chief_factor_contradiction`); combined with the nilpotent
