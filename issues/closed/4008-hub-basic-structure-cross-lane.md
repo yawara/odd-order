@@ -66,3 +66,24 @@ HUB が (A)/(B)/(C) を決定し、対応する LAUNCH.md / issue 7005 / relane 
   (`section16TypePStructure_of_isMinimalSimpleOdd` = lane-f POLE-1)
 - complement 源: `OddOrder/BG/Ch4_FamilyOfMaximal/S14_TypePComplement.lean:85`
 - 関連: issue 7005 (lane-f POLE-1 tp producer), issue 4007 (relane), 4003 (s15 eta carrier)
+
+---
+
+## 解決 (2026-06-23, ユーザー裁可 = (A))
+
+**ユーザー裁可 = (A) lane-c に POLE-1 carrier 構築を授権** (relane #3)。lanes 等価方針 ⟹ carrier/BG 作業も
+lane-c 可。POLE-1 tp producer carrier を **lane-f→lane-c 移譲**:
+
+- **lane-c 新スコープ**: `S14_TypePComplement.lean` (complement 性 `M_F⊓U=⊥` を返り値露出) +
+  `FeitThompson.lean` tp 系 def (`Section16TypePStructure`:220 / `section16TypePStructure_of_components`:445 /
+  `section16TypePStructure_of_isMinimalSimpleOdd`:501 / `Section16Inputs`:95 tp フィールド)。指定 complement U を
+  持つ `TypePData mp.S`/`mp.T` を構成 → `Section16TypePStructure` に `Sdata`/`Tdata` + reconciliation 追加 →
+  §15 `basic_structure` 系を unblock + **POLE-1 (critical path) 前進**。
+- **lane-f**: hderF/Prop16.1 に集中、tp carrier は cite のみ、`mp` は F のまま。
+- **co-edit 境界**: FeitThompson.lean は def 単位で F=mp+Prop16.1 / B=cd / C=tp の 3 者共有 (signature-first)。
+  `S14_TypePComplement` は F が cite、C が育てる。
+- 反映: lane-c/lane-f LAUNCH.md、merge_monitor.md (所有マップ + owned_re[C+=S14_TypePComplement] +
+  shared_re[+=FeitThompson] + relane#3 note)、cron (`36d0bfee`)。issue 7005 (lane-f POLE-1) は C が carrier を
+  landing したら consumer 側で解消に向かう。
+
+CLOSED。

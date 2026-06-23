@@ -47,6 +47,13 @@ productive な独立クラスタに乗せ、上流優先方針 (CLAUDE.md) に�
 > lane-b→H 移譲** (§13 は §12 下流・lane-b 非編集 ⟹ signature-first 独立、§13→POLE-1 cd で critical path)。
 > lane-h の S14_MaximalI は driver 化 ((12.9) は Prop 16.1 landing で自己復帰 close)。B は §12 + cd assembly に集中。
 
+> **⚠ 2026-06-23 relane #3 (ユーザー裁可、issue 4008)**: lane-c の §15 が全 cross-lane gated (carrier=lane-f POLE-1)
+> で2度目の starve → ユーザー裁可 (A) = **POLE-1 tp producer carrier を lane-f→C 移譲**。C は `S14_TypePComplement`
+> (complement 露出) + `FeitThompson.lean` の tp 系 def (`Section16TypePStructure`/`section16TypePStructure_*`/
+> `Section16Inputs` tp) を編集し、指定 complement を持つ `TypePData` を構成 (→ 自身の §15 unblock + POLE-1 前進)。
+> F は hderF/Prop16.1 に集中・tp carrier は cite のみ・mp は F のまま。FeitThompson.lean は def 単位で F=mp+Prop16.1 /
+> B=cd / C=tp の 3 者共有。lanes 等価ゆえ carrier 作業も C 可 [[lanes-are-equivalent-no-specialty]]。
+
 **signature-first interface**: 上流が sorried signature を export → 下流が cite。真の cross-lane 依存は narrow。
 signature 不足は notes/issue 経由。**driver (§16/§10)**: 常駐レーンを当てず、上流が landing したとき hub or
 担当レーンが続けて opportunistic に close する (pure consumer ゆえ常駐は starve)。
@@ -134,8 +141,8 @@ branch とも削除済み。旧 **A** / **D** も同様に退役済み (履歴�
 > | **F** (lane-f) | `OddOrder/BG/**`（BG 全体）+ `OddOrder/FeitThompson.lean` |
 > | **B** (lane-b) | `OddOrder/Peterfalvi/S0[3-9]*` + `S10*` + `S12*`（Pf char API + §12 + cd assembly; **S11/S13 除く**, 2026-06-23 S13 を H 移譲） |
 > | **H** (lane-h) | `OddOrder/Peterfalvi/S13*` (active) + `S14_MaximalI*` (driver)（type III/IV char-grid + type I driver; 2026-06-23 S13 受領, S15 を C 移譲） |
-> | **C** (lane-c) | `OddOrder/Peterfalvi/S15*`（S&T = S15_SAndT; 2026-06-23 H→C 移譲。S11 は driver で非所有） |
-> | **共有（全 lane 可）** | `OddOrder/AxiomsCheck.lean` / `OddOrder.lean` / `OddOrder/GroupTheory/**` / `notes/**` / `issues/**` |
+> | **C** (lane-c) | `OddOrder/Peterfalvi/S15*` (S&T, consumer) **+ POLE-1 carrier (2026-06-23 relane #3, issue 4008)**: `S14_TypePComplement.lean` + `FeitThompson.lean` の **tp 系 def** (`Section16TypePStructure`/`section16TypePStructure_*`/`Section16Inputs` tp) |
+> | **共有（全 lane 可）** | `OddOrder/AxiomsCheck.lean` / `OddOrder.lean` / `OddOrder/GroupTheory/**` / **`OddOrder/FeitThompson.lean`** (def 単位 F=mp+Prop16.1 / B=cd / C=tp) / `notes/**` / `issues/**` |
 
 1. 各レーンの未マージ確認: `git log --oneline main..<branch>`。
    **全レーン 0 なら「変化なし」1行報告で即終了**（build を走らせない）。
@@ -148,8 +155,8 @@ branch とも削除済み。旧 **A** / **D** も同様に退役済み (履歴�
    **マージせず（trial merge も開始しない）**、⛔ に従いループ停止（abort 不要 = まだ merge していない、
    `CronDelete` + 報告 + 以降の tick を行わない）。報告には逸脱ファイル名 + lane + 所有者を明記。例 (lane=$b):
    ```
-   owned_re='…'   # 🔒 マップから (F=^OddOrder/BG/|^OddOrder/FeitThompson; B=^OddOrder/Peterfalvi/S(0[3-9]|10|12); H=^OddOrder/Peterfalvi/S(13|14_MaximalI); C=^OddOrder/Peterfalvi/S15)
-   shared_re='^OddOrder/AxiomsCheck\.lean$|^OddOrder\.lean$|^OddOrder/GroupTheory/'
+   owned_re='…'   # 🔒 マップから (F=^OddOrder/BG/|^OddOrder/FeitThompson; B=^OddOrder/Peterfalvi/S(0[3-9]|10|12); H=^OddOrder/Peterfalvi/S(13|14_MaximalI); C=^OddOrder/Peterfalvi/S15|^OddOrder/BG/Ch4_FamilyOfMaximal/S14_TypePComplement)
+   shared_re='^OddOrder/AxiomsCheck\.lean$|^OddOrder\.lean$|^OddOrder/GroupTheory/|^OddOrder/FeitThompson'  # FeitThompson は F/B/C 共有 (def 単位協調)
    git diff --name-only main...$b -- '*.lean' | grep -vE "$owned_re" | grep -vE "$shared_re" | grep . && echo "範囲逸脱 → STOP"
    ```
    逸脱なし（空）→ step 2 へ。共有ファイル・notes・issues のみの差分は逸脱でない。
