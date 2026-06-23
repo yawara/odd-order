@@ -117,7 +117,6 @@ structure Hypothesis (M : Subgroup G) where
   Uprime : Subgroup G
   Uprime_eq : Uprime = derivedInG base.typeP.U
   SOf : Subgroup G → Set (ClassFunction ↥M ℂ)
-  quotientBoundFormula : Subgroup G → Prop
   notOrthogonalFormula : ClassFunction ↥M ℂ → Prop
   finalOrthogonalityFormula : ClassFunction ↥M ℂ → Prop
   caseB_of_97 : Prop
@@ -186,8 +185,9 @@ theorem S_H0C_not_coherent [Finite G] [Fintype G]
       hyp.base.tau (hyp.SOf hyp.H0C) hyp.base.A0) := by
   sorry
 
-/-- **Peterfalvi (11.4)**: if `S(H_1)` is coherent for a normal subgroup
-`H_1 < M'`, then the quotient bound from Theorem (6.2) holds. -/
+/-- **Peterfalvi (11.4)**: if `S(H_1)` is coherent for a normal subgroup `H_1 < M'`,
+then `|M'/H_1| - 1 ≤ 2 q |U/C|` (the quotient bound from Theorem (6.2)), stated here in
+the subtraction-free form `|M' : H_1| ≤ 2 q |U : C| + 1`. -/
 theorem coherent_quotient_bound [Finite G] [Fintype G]
     (_hG : OddOrder.BG.IsMinimalSimpleOdd G) {M H1 : Subgroup G} [Fintype ↥M]
     [Invertible (Nat.card ↥M : ℂ)] [Invertible (Nat.card G : ℂ)]
@@ -195,7 +195,7 @@ theorem coherent_quotient_bound [Finite G] [Fintype G]
     (hH1_lt : H1 < derivedInG M)
     (hcoh : Nonempty (OddOrder.Peterfalvi.S07.IsCoherent
       hyp.base.tau (hyp.SOf H1) hyp.base.A0)) :
-    hyp.quotientBoundFormula H1 := by
+    H1.relIndex (derivedInG M) ≤ 2 * hyp.q * hyp.C.relIndex hyp.U + 1 := by
   sorry
 
 /-- **Peterfalvi (11.5)**: the second derived subgroup is `H C`, i.e. `M'' = HC`. -/
