@@ -8038,6 +8038,23 @@ theorem isMulCommutative_mf_inf_centralizer_of_not_le [Finite G]
       rw [map_mul, map_mul]; exact (isMulCommutative_iff.mp hcomm) (hequiv a) (hequiv b)
   exact hC1notU ((nonabelian_pgroup_isUniquelyMaximal hG hP'p hP'nab).of_le_of_lt_top hP'le hC1lt)
 
+/-- **Frobenius complement order divides `|kernel| - 1`** (mathcomp `regular_norm_dvd_pred`, in the
+`IsFrobeniusAction` form): if a finite group `A` acts on a finite group `N` by automorphisms with no
+nonidentity element of `A` fixing a nonidentity element of `N` (`IsFrobeniusAction A N`), then
+`|A| ∣ |N| - 1`.  Immediate from `IsFrobeniusAction.card_modEq_one` (`|N| ≡ 1 [MOD |A|]`).
+
+This is the divisibility crux of the exponent condition (conjunct A) of BG Theorem 15.7(e2):
+applied to `N = Z_q = Ω₁(Z(O_q(M_σ)))` (order `q`) with `A = U₀` the Frobenius complement acting
+fixed-point-freely on the kernel `M_σ`, it gives `|U₀| ∣ q - 1`, hence `exp(U) = exp(U₀) ∣ q - 1`. -/
+theorem card_dvd_sub_one_of_isFrobeniusAction {A N : Type*} [Group A] [Finite A] [Group N]
+    [Finite N] [MulDistribMulAction A N] (h : OddOrder.Isaacs.Ch06.IsFrobeniusAction A N) :
+    Nat.card A ∣ Nat.card N - 1 := by
+  haveI : Fintype A := Fintype.ofFinite A
+  haveI : Fintype N := Fintype.ofFinite N
+  have hmod : Nat.card N ≡ 1 [MOD Nat.card A] := by
+    simpa only [Nat.card_eq_fintype_card] using h.card_modEq_one
+  exact (Nat.modEq_iff_dvd' Nat.card_pos).mp hmod.symm
+
 /-- **BG Theorem 15.7(a), rank-theoretic core** (mmd L4192-4198): if `F(M)` is not a TI-subgroup
 of `G`, then no prime divides `M_F` and lies in `β(M)`.
 
