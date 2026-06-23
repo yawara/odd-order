@@ -48,3 +48,16 @@ hub への close 依頼。
 - carrier 機構: `OddOrder/FeitThompson.lean` (`exists_typePData_W1_eq_of_isTypeP2` 他)
 - deep dive 確定: `notes/peterfalvi/s15_s_and_t.md`「確定 (2026-06-23 続)」節, commit `b487a888`
 - self-resume 手順: `notes/meta/lane_self_resume.md`
+
+---
+
+## 解決 (2026-06-23, hub — self-resume トリガ release)
+
+lane-h の Pf (13.2.a) が **main に landing 済** (commit `6ba0bce5`、relane #4): `isTypeP2_of_typeP_kappaHall_lt`
+proved + `Section16MaximalPair.S_typeP2` field + producer fill ⟹ **`mp.S_typeP2` (IsTypeP2 mp.S) が
+FeitThompson.lean で available**。トリガ条件 (mp の IsTypeP2 mp.S 供給) 達成。
+
+**hub が本 issue を `issues/closed/` へ移動** → lane-c の self-resume monitor (cron, trigger b = issue closed)
+が検知して `git merge main` + **step-3 wiring** (`exists_typePData_W1_eq_of_isTypeP2` を mp.S に適用 →
+`Section16TypePStructure.Sdata`/`Tdata` → `S15.Hypothesis` → `basic_structure` 他 carrier-gated sorry を実証明)
+を自動再開する。CLOSED。
