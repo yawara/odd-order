@@ -5747,3 +5747,12 @@ formula together with the prime computation `coprimeFrobeniusAction_card_eq_prim
 -- structure of `U W₁` via Isaacs Cor 3.28 (`coprime_fixedPoints_quotient`).
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S11.chiefFactor_caseB_image_coprime
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S11.chiefFactor_caseB_image_dvd_norm
+-- Peterfalvi (9.7): the Clifford dichotomy, fully packaged into the carriers `CliffordCaseAData` /
+-- `CliffordCaseBData`.  Case (b) wires the Singer divisibilities (with `chars.u = |Ū|` pinned); case
+-- (a) builds the `q` order-`p` factors (the `SupIndep` orbit family) and the bound `a ∣ p-1` (the
+-- restricted `U`-action on an order-`p` factor).  All axiom-clean.
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S11.exists_supIndep_aInvariant_family_of_iSup
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S11.aInvariantRestrictAut_range_card_dvd
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S11.clifford_caseB_data
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S11.clifford_caseA_data
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S11.clifford_dichotomy
