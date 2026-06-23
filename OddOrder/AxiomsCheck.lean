@@ -3063,6 +3063,11 @@ set_option linter.style.longLine false in
 -- menu — i.e. the §7–16 spine.  This assertion locks in that the assembly itself is axiom-clean.
 #assert_only_allowed_axioms OddOrder.sectionSixteenHypothesis_of_inputs
 
+-- cd producer (POLE-1 charData) building block: the §6 certain-type Hypothesis (4.2) with `W₁ = K`
+-- the chosen κ-Hall pairing factor, built from the BG §14/§16 type-`P` theory (complement +
+-- centralizer law).  Lets the cd producer index the `ω`/`μ`-grids by `tp.W₁ = mp.K` directly.
+#assert_only_allowed_axioms OddOrder.certainTypeHypothesis_of_typeP_kappaHall
+
 /-! ### BG Appendix C (finite-field norm-set argument). -/
 
 -- Peterfalvi §15/§16 standalone cyclotomic and growth arithmetic feeding the
