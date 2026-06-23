@@ -23,14 +23,27 @@
   `U_commutative` が `hyp.U`/`hyp.W1` に転送できず **blocked**。
 - これは (13.1.b)「S = (P⋊U)⋊W₁」の**形式化が不完全** (型-P witness を carry していない) のが原因。
 
-### honest fix: `Hypothesis` を (13.1) に忠実 enrich (C 所有・安全)
-- `Hypothesis` は **producer なし** (S16 が `base : S15.Hypothesis` で**参照のみ**、構成しない) ⟹
-  field 追加は安全 (build 不変、S16 等は新 field を無視)。
-- **追加案**: `Sdata : TypePData hyp.S` + `Sdata_U : Sdata.U = hyp.U` + `Sdata_W1 : Sdata.W1 = hyp.W1`
-  + `Sdata_W2 : Sdata.W2 = hyp.W2` (T-side は対称: `Tdata.U = hyp.V`, `Tdata.W1 = hyp.W2`,
-  `Tdata.W2 = hyp.W1`)。**(13.1) が型-P 分解を固定するのに忠実、型 II/III 等の (13.2) 結論は hoist しない**
-  (TypePData は型を含まない共通構造)。`hyp.P = Sdata.H` は `P_eq_SF` + `H_eq` (両 = maxNilpotentNormalHall S)
-  で自動。
+### ⚠️ 訂正 (2026-06-23 lane-c 再開時、main マージ後の精査): enrich は **lane-local でなく cross-lane**
+**上の数学的洞察 (U-reconciliation が必要) は正しい。が、当初の「`Hypothesis` は producer 無しゆえ
+field 追加は C 所有・安全」は誤り。** 実際には `S15.Hypothesis` は
+`sectionSixteenHypothesis_of_inputs` ([`OddOrder/FeitThompson.lean:655`]) で **record literal として
+明示構成**され、各フィールドを `inp : Section16Inputs G` (= lane-f の POLE-1, issue 7005) から取る。
+よって `S15.Hypothesis` に `Sdata : TypePData` を足すと:
+1. `FeitThompson.lean:655` の record literal が壊れる (**lane-c 非所有**);
+2. ソースとして `Section16Inputs` / `Section16TypePStructure` / `section16TypePStructure_of_components`
+   にフィールド追加が必要 (**すべて lane-f 所有 = FeitThompson.lean**);
+3. discharge には「**指定した complement `U` を持つ `TypePData mp.S` を構成する**」実作業が要る
+   (`typePData_of_isTypeNonI` は自前の `U` を作るので使えない)。`hyp.U` の源
+   `exists_kappaHall_invariant_complement_to_MF` ([`S14_TypePComplement.lean:85`]) は内部で
+   Schur–Zassenhaus complement (`M_F ⊓ U = ⊥`) を作りながら**返り値型で破棄** (`obtain ⟨U, -, …⟩`)
+   している。露出 + `TypePData` 化が lane-f の作業。
+
+⟹ **honest fix = cross-lane carrier enrich** (lane-f の `Section16TypePStructure` に
+`Sdata : TypePData mp.S` / `Tdata : TypePData mp.T` を reconciliation 付きで carry させ、
+`S15.Hypothesis` へ thread)。lane-f の POLE-1 producer は既に sorry なので obligation は吸収されるが、
+TypePData の complement 指定構成は実作業。**lane-c が独断で触れない (cross-lane judgment)** ⟹ HUB issue
+4008 で escalate。当初案の reconciliation 設計 (`Sdata.U = hyp.U`, `Sdata.W1 = hyp.W1`, T-side 対称)
+自体は正しい — 配置先が lane-c の `Hypothesis` でなく lane-f の `Section16TypePStructure`。
 
 ### `basic_structure` (13.2) = 5 部 capstone (単一 leaf でなく複数 session)
 1. **carrier reconciliation** (上記 enrich; `hyp.U`=type-P U の pinning) → UW1_frobenius / U-side facts。
@@ -42,12 +55,28 @@
 5. **U_commutative** = type II/III の `TypeIIData`/`TypeIIIData.U_commutative` から (型確定後)。
 
 ### 既に証明済 (sorry なし、再着手不要)
-`not_conj_of_isTypeI_of_isTypeNonI` (1179)、`isHall_subgroupOf_primeFactors_of_coprime_index` (1085)。
+`not_conj_of_isTypeI_of_isTypeNonI` (1179)、`isHall_subgroupOf_primeFactors_of_coprime_index` (1085)、
+`le_kernel_of_isMulCommutative_of_inf_ne_bot` (1162)、`typeI_U_le_fitting_of_coprime` (1196,
+basic_structure の sorried signature を cite)、`typeI_overNormalizer_U_le_fitting` (1267)、
+`q_not_dvd_kernel` (1645) 等。
 
-### 次 session 推奨着手
-(A) carrier enrich (上記、committable faithful 基盤) → basic_structure を 5 部で grind、または
-(B) hyp の raw フィールドで完結する leaf (`typeI_U_le_fitting_of_coprime` 様式) で clean な勝ち。
-正本 = この節。
+### frontier 全評価 (2026-06-23 lane-c, main マージ後) — 実 sorry 23 本は**全て cross-lane gated**
+clean な lane-local win は無い。内訳:
+- **基盤 (cross-lane carrier, lane-f)**: `basic_structure` (245, 上記訂正)、`sibleyTarget_S` (258, §14)、
+  `card_LF_coprime_pq` (1154, BG Thm E = F)、`exists_typeI_maximal_overNormalizer_U` の `hdisj`/`hUhall_cop`
+  (1303/1352, carrier faithfulness = F-ask)。
+- **char-theory (lane-b §3-13 char API)**: `character_degree_analysis` (300)、`lambda_forces_T_caseB` (309)、
+  `tiSubset_character_orthogonality` (332)、norm cascade (349/356/363/370)、`analytic_inequality` (379)、
+  `numeric_bounds` q=3 conjunct (523, p≥5 不在)、`c_eq_one` (529)、`caseA_parameters` (536)、
+  `caseB_order_u` (700)、`beta_support_norm_and_remainder` (1744)、`typeI_orthogonality_dichotomy` (1841)。
+- **§15 固有 Fitting 構造 (`|Q|=q^p` / chief factor、type-P carrier に bottom out)**: `card_Q_eq` (1115)、
+  `tConjugate_fitting_data` (1135)、`complement_inf_Q_structure` (1539)。`TypePData` は Fitting **位数**を
+  pin しない (`H = maxNilpotentNormalHall M` のみ) ので、これらは Singer rank + chief-factor 論を要し、
+  basic_structure の `P_order` と同じ carrier reconciliation に依存。
+- **§13 multi-obligation (lane-h 確認済)**: `normalizer_W1` (831, card_Q_eq + W₁⊆Q + Q# TI + d=1 + KW₂ Frobenius)。
+
+⟹ **lane-c の S15 frontier は現在 ungated closable Lean work が無い。要 HUB/ユーザー判断** (cross-lane enrich
+を誰が所有するか、または lane-c を別 FT-path セグメントへ再配置)。正本 = この節 + issue 4008。
 
 ---
 
