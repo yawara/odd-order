@@ -4002,8 +4002,12 @@ set_option linter.style.longLine false in
 #assert_only_allowed_axioms OddOrder.BG.Ch4.S15.exists_inf_conj_fitting_orderP_witness
 #assert_only_allowed_axioms OddOrder.BG.Ch4.S15.not_isCyclic_opiCore_mf_of_orderP_le_conj
 #assert_only_allowed_axioms OddOrder.BG.Ch4.S15.two_le_pRank_of_comm_isPGroup_not_isCyclic
--- 15.7(e) non-abelian branch (E1X_facts): `C_{M_F}(X₁)` not uniquely maximal from `¬ C_G(X₁) ≤ M`.
+-- 15.7(e) non-abelian branch (E1X_facts): `C_{M_F}(X₁)` not uniquely maximal from `¬ C_G(X₁) ≤ M`,
+-- abelian `C_{M_F}(X₁)` (nilpotent + Sylows abelian via uniqueness), and the abstract
+-- "nilpotent + Sylows abelian ⟹ abelian" lemma backing it.
 #assert_only_allowed_axioms OddOrder.BG.Ch4.S15.not_isUniquelyMaximal_mf_inf_centralizer_of_not_le
+#assert_only_allowed_axioms OddOrder.BG.Ch4.S15.isMulCommutative_of_isNilpotent_of_sylow_comm
+#assert_only_allowed_axioms OddOrder.BG.Ch4.S15.isMulCommutative_mf_inf_centralizer_of_not_le
 -- BG **Lemma 15.1** (`S15_MF`, issue 7007): the auxiliary `U`-factor structure of an arbitrary
 -- maximal `M = K U M_σ` — `K ≠ 1 → M' = U M_σ ∧ U` abelian (15.1b); the cyclic-`τ₂` centralizer
 -- funnel (15.1c); `⟨C_U(x) | x ∈ M_σ#⟩` abelian (15.1d); the Frobenius factor `U₀ M_σ` (15.1e).
@@ -5888,3 +5892,17 @@ formula together with the prime computation `coprimeFrobeniusAction_card_eq_prim
 #assert_only_allowed_axioms OddOrder.induce_compHom_subgroupCongr
 #assert_only_allowed_axioms OddOrder.Section16CharacterData.tpW_subgroupOf_eq
 #assert_only_allowed_axioms OddOrder.Section16CharacterData.muS_definition
+-- S/T-shared-`ω` symmetry transport infrastructure (toward the `nu_definition` field, T-side).
+-- `monoidHom_eq_of_eqOn_W1_W2`: a linear character of `↥tp.W` is pinned by its `tp.W1`/`tp.W2`
+-- restrictions (the internal-product generating-set principle).  `gridEquivE_coe`: the S-side
+-- W-identification equiv preserves the ambient `G`-element.  `gridEquivE_mem_W1`/`_W2`: it carries
+-- `mp.K`/`mp.Kstar` elements into `certainTypeS.W1`/`W2`.  All axiom-clean.
+#assert_only_allowed_axioms OddOrder.Section16CharacterData.monoidHom_eq_of_eqOn_W1_W2
+#assert_only_allowed_axioms OddOrder.Section16CharacterData.gridEquivE_coe
+#assert_only_allowed_axioms OddOrder.Section16CharacterData.gridEquivE_mem_W1
+#assert_only_allowed_axioms OddOrder.Section16CharacterData.gridEquivE_mem_W2
+-- `omegaProdCharS_apply_mem_K`/`_Kstar`: `certainTypeS`'s product character, evaluated on a
+-- `gridEquivE`-transported `mp.K`/`mp.Kstar` element, keeps only the `W₁`/`W₂` factor (the
+-- `tp.W1`/`tp.W2`-restriction values feeding the symmetry).  Axiom-clean.
+#assert_only_allowed_axioms OddOrder.Section16CharacterData.omegaProdCharS_apply_mem_K
+#assert_only_allowed_axioms OddOrder.Section16CharacterData.omegaProdCharS_apply_mem_Kstar

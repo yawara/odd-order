@@ -7968,6 +7968,76 @@ theorem not_isUniquelyMaximal_mf_inf_centralizer_of_not_le [Finite G]
       (hC1C.trans huniqC.le_uniqueMaximalSubgroup)
   exact hCGnotM (heq ▸ huniqC.le_uniqueMaximalSubgroup)
 
+/-- **A finite nilpotent group with all Sylow subgroups abelian is abelian.**  A finite nilpotent
+group is the internal direct product of its (normal) Sylow subgroups
+(`Sylow.directProductOfNormal`); if each factor is commutative the product is, and commutativity
+transports back across the isomorphism.  Used to prove `abelian C_{M_F}(X₁)` in the `E1X_facts`
+input to BG Theorem 15.7(e): each Sylow of the nilpotent `C_{M_F}(X₁)` is abelian (a non-abelian
+one would be uniquely maximal by `nonabelian_pgroup_isUniquelyMaximal`, contradicting
+`not_isUniquelyMaximal_mf_inf_centralizer_of_not_le`). -/
+theorem isMulCommutative_of_isNilpotent_of_sylow_comm {N : Type*} [Group N] [Finite N]
+    [Group.IsNilpotent N]
+    (h : ∀ (p : ℕ) [Fact p.Prime] (P : Sylow p N), IsMulCommutative ↥(P : Subgroup N)) :
+    IsMulCommutative N := by
+  classical
+  haveI : Fintype N := Fintype.ofFinite N
+  have hnorm : ∀ {p : ℕ} [Fact p.Prime] (P : Sylow p N), (↑P : Subgroup N).Normal :=
+    fun P => OddOrder.Isaacs.Ch01.Sylow.normal_of_isNilpotent P
+  let e := Sylow.directProductOfNormal (G := N) hnorm
+  -- The direct-product domain is commutative: each component `↥P` is.
+  have hDcomm : ∀ a b : (∀ p : (Nat.card N).primeFactors, ∀ P : Sylow p N, ↥(P : Subgroup N)),
+      a * b = b * a := by
+    intro a b
+    funext p P
+    haveI : Fact (p : ℕ).Prime := Fact.mk (Nat.prime_of_mem_primeFactors p.2)
+    exact (isMulCommutative_iff.mp (h p P)) (a p P) (b p P)
+  -- Transport commutativity across `e : (Π Sylows) ≃* N`.
+  refine isMulCommutative_iff.mpr fun x y => ?_
+  have hxy := congrArg e (hDcomm (e.symm x) (e.symm y))
+  rwa [map_mul, map_mul, e.apply_symm_apply, e.apply_symm_apply] at hxy
+
+/-- **`C_{M_F}(X₁)` is abelian** (Coq `nonTI_Fitting_structure`, `E1X_facts` clause `abelian C1`):
+if `C_G(X₁) ⊄ M` (with `X₁ ≠ 1`), the nilpotent subgroup `C_{M_F}(X₁) = M_F ⊓ C_G(X₁)` is abelian.
+
+Every Sylow `P` of the nilpotent `C_{M_F}(X₁)` is abelian: a non-abelian one would be uniquely
+maximal (`nonabelian_pgroup_isUniquelyMaximal`), and as `P ≤ C_{M_F}(X₁) < ⊤` this would force
+`C_{M_F}(X₁)` itself to be uniquely maximal (`IsUniquelyMaximal.of_le_of_lt_top`), contradicting
+`not_isUniquelyMaximal_mf_inf_centralizer_of_not_le`.  Then `isMulCommutative_of_isNilpotent_of_sylow_comm`
+gives abelianness.  This is the second `E1X_facts` input (with noncyclicity) to the non-abelian
+branch of BG Theorem 15.7(e). -/
+theorem isMulCommutative_mf_inf_centralizer_of_not_le [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} (hM : M ∈ maximalSubgroups G)
+    {X₁ : Subgroup G} (hX₁ne : X₁ ≠ ⊥)
+    (hCGnotM : ¬ Subgroup.centralizer (X₁ : Set G) ≤ M) :
+    IsMulCommutative ↥(MF M ⊓ Subgroup.centralizer (X₁ : Set G)) := by
+  classical
+  set C1 : Subgroup G := MF M ⊓ Subgroup.centralizer (X₁ : Set G) with hC1def
+  have hC1MF : C1 ≤ MF M := inf_le_left
+  -- `C1` is nilpotent (a subgroup of the nilpotent `M_F`).
+  haveI hMFnil : Group.IsNilpotent ↥(MF M) := maxNilpotentNormalHall_isNilpotent M
+  haveI : Group.IsNilpotent ↥(C1.subgroupOf (MF M)) := Subgroup.isNilpotent (C1.subgroupOf (MF M))
+  haveI hC1nil : Group.IsNilpotent ↥C1 :=
+    nilpotent_of_surjective (Subgroup.subgroupOfEquivOfLe hC1MF).toMonoidHom
+      (Subgroup.subgroupOfEquivOfLe hC1MF).surjective
+  -- `C1 < ⊤` and `C1` is not uniquely maximal.
+  have hC1notU : ¬ OddOrder.GroupTheory.IsUniquelyMaximal C1 :=
+    not_isUniquelyMaximal_mf_inf_centralizer_of_not_le hG hM hX₁ne hCGnotM
+  have hC1lt : C1 < ⊤ := lt_of_le_of_lt (hC1MF.trans (maxNilpotentNormalHall_le M))
+    (OddOrder.GroupTheory.mem_maximalSubgroups.mp hM).lt_top
+  -- Each Sylow of `C1` is abelian (else `C1` is uniquely maximal).
+  apply isMulCommutative_of_isNilpotent_of_sylow_comm
+  intro r _ P
+  by_contra hnab
+  set P' : Subgroup G := (P : Subgroup ↥C1).map C1.subtype with hP'def
+  have hP'le : P' ≤ C1 := hP'def ▸ Subgroup.map_subtype_le _
+  have hequiv : ↥(P : Subgroup ↥C1) ≃* ↥P' :=
+    Subgroup.equivMapOfInjective _ C1.subtype C1.subtype_injective
+  have hP'p : IsPGroup r ↥P' := P.isPGroup'.of_equiv hequiv
+  have hP'nab : ¬ IsMulCommutative ↥P' := fun hcomm => hnab <|
+    isMulCommutative_iff.mpr fun a b => hequiv.injective <| by
+      rw [map_mul, map_mul]; exact (isMulCommutative_iff.mp hcomm) (hequiv a) (hequiv b)
+  exact hC1notU ((nonabelian_pgroup_isUniquelyMaximal hG hP'p hP'nab).of_le_of_lt_top hP'le hC1lt)
+
 /-- **BG Theorem 15.7(a), rank-theoretic core** (mmd L4192-4198): if `F(M)` is not a TI-subgroup
 of `G`, then no prime divides `M_F` and lies in `β(M)`.
 

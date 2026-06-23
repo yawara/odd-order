@@ -120,12 +120,12 @@ goal (S16 `isTypeI_of_isTypeF` の ¬TI ∧ ¬IsMulCommutative M_F 枝、`refine
 **type-F 簡略化 (Coq 精読で確定、重要)**: Coq の (e3) p³ case は `M∈M_P1` 要求ゆえ **type F では排除**。また **`defX (X=X1)` も不要** (P1 case の |X| 同定用)。ゆえ Coq 290 行のうち type-F 必要部は大幅縮小。
 
 **① conjunct B (∃p cyclic O_{p'}(M_F))** — 順に:
-  1. **E1X_facts** (Coq 975-997): witness X₁ で `C_{M_F}(X₁) ∉ IsUniquelyMaximal` (= extraction の `¬C_G(X₁)≤M` + `def_uniq_mmax`/`sub_uniq_mmax` 相当 = `IsUniquelyMaximal` の `of_le_of_lt_top`/`le_uniqueMaximalSubgroup`) + `abelian C_{M_F}(X₁)` (C_{M_F}(X₁)≤M_F nilpotent = ∏O_r、各 O_r abelian else `nonabelian_pgroup_isUniquelyMaximal` ⟹ C∈𝒰 矛盾)。
-  2. `not_cPP`: O_p(M_F) 非 abelian (M_F=O_p×O_{p'} nilpotent 分解、M_F 非 abelian + O_{p'} abelian)。
-  3. **cycHp'** (Coq 1135-1141): cyclic O_{p'}(M_F)。`two_le_pRank...` の対偶 (abelian なので rank≤1⟺cyclic) + contra: r(O_{p'})≥2 なら `centralizer_isUniquelyMaximal_of_two_le_rank` + `nonabelian_pgroup_isUniquelyMaximal pP` ⟹ C_{M_F}(X₁)∈𝒰 矛盾。
-**② conjunct A (∀q exp(U)∣q-1)** — Frobenius semiregular (Coq 1156-1164, FmaxM 枝):
-  各 q∈π(M_F)、exp(M/M_F)=exp(U)=exp(U₀) (U₀=Frobenius 補元、**`TypeFData.frobenius_HU0` = M_σ⋊U₀ 既に手元**)、U₀ が Z_q:=Ω₁(Z(O_q(M_F))) (order q) に semiregular 作用 (Frobenius kernel-regularity) ⟹ exp(U)∣q-1。
-  **⚠ 要 ChatGPT de-risk**: `regular_norm_dvd_pred` 相当 (semiregular A on order-q group ⟹ |A|∣q-1、A↪Aut(ℤ/q)=ℤ/(q-1)) が repo/mathlib にあるか。Isaacs Ch06 `IsFrobeniusGroup` の kernel-regular API を確認 (`notes/meta/chatgpt_consult_via_chrome.md`、最強モデル)。
+  1. **✅ E1X_facts 完成** (commits `2fe4a35d`/`29dc1b25`、全 sorry-free+axiom-clean): `not_isUniquelyMaximal_mf_inf_centralizer_of_not_le` (C_{M_F}(X₁)∉𝒰 from witness の ¬C_G(X₁)≤M、`IsUniquelyMaximal.of_le_of_lt_top`/`eq_of_isCoatom_of_le`) + `isMulCommutative_mf_inf_centralizer_of_not_le` (abelian C_{M_F}(X₁)) + 汎用 `isMulCommutative_of_isNilpotent_of_sylow_comm` (nilpotent+全 Sylow abelian⟹abelian、`Sylow.directProductOfNormal`、各 Sylow を G に map し nonabelian⟹uniquely max⟹C1∈𝒰 矛盾)。
+  2. `not_cPP`: O_p(M_F) 非 abelian。**残**。M_F=O_p(M_F)×O_{p'}(M_F) の p-part/p'-part 分解 (nilpotent) + M_F 非 abelian + O_{p'} abelian (E1X_facts: O_{p'}≤C_{M_F}(X₁) abelian) ⟹ O_p 非 abelian。
+  3. **cycHp'** (Coq 1135-1141): cyclic O_{p'}(M_F)。**残**。`two_le_pRank...` 対偶 (O_{p'} abelian ゆえ rank≤1⟺cyclic) + contra: r(O_{p'})≥2 なら `centralizer_isUniquelyMaximal_of_two_le_rank` + `nonabelian_pgroup_isUniquelyMaximal` (P=O_p、not_cPP) ⟹ C_{M_F}(X₁)∈𝒰 矛盾。⚠ `centralizer_isUniquelyMaximal_of_two_le_rank` は BG §10 特化 sig (`alpha M`/`Malpha M`/`IsPiSubgroup (alpha M)ᶜ X`)、Coq の汎用 `cent_uniq_Uniqueness` から適応要。
+**② conjunct A (∀q exp(U)∣q-1)** — Frobenius semiregular (Coq 1156-1164, FmaxM 枝)。**残**:
+  各 q∈π(M_F)、exp(M/M_F)=exp(U)=exp(U₀) (U₀=Frobenius 補元、**`TypeFData.frobenius_HU0` = M_σ⋊U₀ 既に手元**)、U₀ が Z_q:=Ω₁(Z(O_q(M_F))) (order q、**q≠p では cyclic O_{p'}=conjunct B に依存**) に semiregular 作用 ⟹ exp(U)∣q-1。
+  **✅ de-risk 解決: crux `regular_norm_dvd_pred` 相当は IN-STOCK** = `IsFrobeniusAction.card_modEq_one` (FrobeniusActionTI.lean:146、`IsFrobeniusAction A N → |N|≡1 mod |A|`)。Z_q に `IsFrobeniusAction U₀ Z_q` を立てれば |U₀|∣q-1。残 plumbing = `MulDistribMulAction U₀ Z_q` (conjugation) setup + Frobenius FPF from `frobenius_HU0` + |U₀|∣q-1⟹exp(U)∣q-1。
 
 **repo uniqueness API (in-stock、確認済)**: `nonabelian_pgroup_isUniquelyMaximal` (S12_Theorem1213:862, =nonabelian_Uniqueness) / `centralizer_isUniquelyMaximal_of_two_le_rank` (S10_LocalCriteria:112, =cent_uniq_Uniqueness) / `rank_lt_three_of_le_two_maximals` (S15_MF, =rank3_Uniqueness) / `IsUniquelyMaximal` API (GroupTheory/MaximalSubgroup.lean: `of_le_of_lt_top`/`le_uniqueMaximalSubgroup`/`eq_of_isCoatom_of_le`/`uniqueMaximalSubgroup_isCoatom`)。
 

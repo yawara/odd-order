@@ -72,6 +72,15 @@ productive な独立クラスタに乗せ、上流優先方針 (CLAUDE.md) に�
 > c_eq_one から既約性)。**lane-h 所有 = `S16_NonExistenceG.lean` 追加** (編集所有者無し=driver だった)、`S13`/`S14` は
 > driver/参照に降格。lane-b/c/f は現状維持で適所 (B=char bottleneck / C=§15 consumer / F=Prop16.1 hFI ¬TI=BG 15.7(e))。
 
+> **⚠ 2026-06-23 relane #6 (ユーザー裁可、issue 4011)**: lane-c が §15 S15_SAndT の ungated work を完遂
+> (carrier consume / basic_structure skeleton / exists_typeI_maximal 実証明 / S15 分割[0075]) → §15 枯渇
+> (残 21 sorry 全て gated)。ユーザー選択 = **char ボトルネック支援に再配置**。carve: **S13_MaximalIII_IV を
+> lane-h→C 移譲** (issue 2018、Pf §13 char-directions、lane-h は POLE-2 で dormant) + **card_kappaHall_lt_of_isTypeP1
+> を lane-b→C 移譲** (issue 2020、POLE-1 バレ sorry、FeitThompson def 単位 C=tp+card_kappaHall)。lane-c は
+> lane-b coherence ((6.2)/(6.3)/(6.8)) を cite して §13 char を並列生産 (lane-b 能動 S12/cd と非衝突)。**§15
+> S15_SAndT/S15_SAndT_Setup は C 所有のまま driver/await に降格**。FeitThompson def 単位 = F=mp+Prop16.1 /
+> B=cd / **C=tp+card_kappaHall** / H=POLE-2。lane-b/f/h は現状維持で適所。
+
 **signature-first interface**: 上流が sorried signature を export → 下流が cite。真の cross-lane 依存は narrow。
 signature 不足は notes/issue 経由。**driver (§16/§10)**: 常駐レーンを当てず、上流が landing したとき hub or
 担当レーンが続けて opportunistic に close する (pure consumer ゆえ常駐は starve)。
