@@ -55,3 +55,27 @@ hub が lane-c の次の owner file / クラスタを決定し LAUNCH.md に反�
 - 残 sorry: `OddOrder/Peterfalvi/S11_MaximalII_III_IV.lean` (9.8)=2505 / (9.9)=2516 / (9.10)=2532 /
   (9.11)=2548
 - frontier マップ: [[ft-endgame-two-poles]] / notes/meta/merge_monitor.md
+
+---
+
+## 解決 (2026-06-23, hub + ユーザー裁可)
+
+**前 Explore 監査は「退役」を推奨したが、framing が過保護だった** (gated=unworkable と扱い、ユーザー方針
+[[feedback-cite-sorried-lemmas-if-signature-correct]] の「sorried signature を cite して下流を実証明可」を
+無視)。hub の sorry 負荷再監査で判明:
+
+- 負荷は3レーンに均等でなく **H/F に偏在** (各 51 sorry): H = S14_MaximalI 15 + S15_SAndT 36 / F =
+  S16_MainResults 25 + S15_MF 20 + S14_TypePCounting 6 / B = 41 / C = 6 (ungated 完了)。
+- 「3 が並列限界」は誤り。char API (§3-9 = 元々の wide な並列部分) 完成で残りが BG§14→16 → Pf§10→16 の
+  深い直列スパインになっただけ。frontier の幅が狭い ≠ レーンを増やせない。
+- 衝突は律速でない: signature-first (ファイル境界越し cite, co-edit なし) ゆえ分割の衝突リスク低。
+
+**決定 (ユーザー裁可)**: **lane-c を退役せず S15_SAndT に relane** (H の 51-sorry 負荷を 2 分割)。
+- C = `S15_SAndT.lean` (36 sorry、群論+解析、C の強みに合致) を H→C 移譲。
+- H = `S14_MaximalI.lean` に集中 (現在稼働中、不変)。
+- S15_SAndT が S14_MaximalI を import (依存 §15→§14) ⟹ signature-first 境界クリーン。
+- §11 は driver 化 ((9.8)-(9.11) は lane-b char family 着地時に hub/担当が機会的 close)。
+- 反映済: merge_monitor.md (所有マップ + lane テーブル + owned_re)、cron prompt (`ad0ac020`)、
+  lane-c/lane-h LAUNCH.md。S15_SAndT 分割 (issue 0075) は C が凍結境界で実施してよい。
+
+CLOSED.
