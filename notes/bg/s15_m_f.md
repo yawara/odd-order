@@ -377,5 +377,19 @@ BG と Peterfalvi (1984 paper) には**表記と視点の違い**がある：
 
 ---
 
-**最終更新**: 2026-05-22
-**Next Wave**: §16 Main Results (唯一の命題だが, アーキテクチャの山）
+## BG Thm 15.7(e) type-F trichotomy (hFI bridge, `isTypeI_of_isTypeF`) — 2026-06-23 cont.¹³
+
+`TypeIData.alternative` (Pf (8.3) 3-way) の ¬TI 枝 = BG Thm 15.7(e) (Coq `nonTI_Fitting_structure`,
+BGsection15.v:939-1240)。`by_cases IsMulCommutative M_F`:
+- **abelian 枝 = disjunct (b) `rank M_F=2`**: ✅ 締結 (commit `dfdec279`)。witness infra 3 本
+  (`exists_inf_conj_fitting_orderP_witness` / `not_isCyclic_opiCore_mf_of_orderP_le_conj` /
+  `two_le_pRank_of_comm_isPGroup_not_isCyclic`、全 sorry-free + axiom-clean)。
+- **非 abelian 枝 = disjunct (c)**: 残務 (S16:1391 sorry)。**完全攻略計画 = issue 7007 cont.¹³**
+  (① conjunct B cyclic O_{p'} = E1X_facts→not_cPP→cycHp'、uniqueness API in-stock ② conjunct A exponent =
+  Frobenius semiregular、`TypeFData.frobenius_HU0` 利用、`regular_norm_dvd_pred` 相当は要 ChatGPT de-risk)。
+  **type-F 簡略化**: (e3) p³ case 排除・defX 不要。
+
+---
+
+**最終更新**: 2026-06-23 (cont.¹³)
+**Next Wave**: hFI 非 abelian 枝 (c) — 正本 issue 7007 cont.¹³

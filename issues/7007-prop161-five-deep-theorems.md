@@ -103,6 +103,32 @@ bottom-out** するので、clean 化には §15 foundation が先。真の順�
 
 ## 進捗ログ
 
+**2026-06-23 (cont.¹³) ✅ hFI ¬TI **abelian 枝** (BG Thm 15.7(e) disjunct (b)) を実証明で締結 + 共有 witness infra 3 本** (lane-f RESUME、commit `dfdec279`、full build 3881 green 82s、AxiomsCheck 3 本登録):
+
+- **`isTypeI_of_isTypeF` (S16) の ¬TI 枝を `by_cases IsMulCommutative M_F` で 2 分割**。**abelian 枝 = disjunct (b) `rank M_F = 2` を実証明**: ≤2 は M_F abelian ⟹ M_F⊆C_G(X₁) ⟹ M_F⊓C_G(X₁)=M_F ⟹ rank<3、≥2 は O_p(M_F) abelian 非巡回 ⟹ 2≤pRank≤rank。**残 sorry = 非 abelian 枝 (c) のみ** (S16:1391)。
+- **新 S15_MF 補題 3 本 (全 sorry-free + axiom-clean)**:
+  - `exists_inf_conj_fitting_orderP_witness`: ¬FittingIsTI から共有 witness (g∉M, prime p∈σ(M), order-p X₁≤M_σ かつ ≤conj g•M_σ, ¬C_G(X₁)≤M, rank(M_F⊓C_G(X₁))<3)。既存 `piSet_mf_inf_beta_disjoint` の step1/3/5-7 を factor。
+  - `not_isCyclic_opiCore_mf_of_orderP_le_conj` (=Coq `not_cycMp`): O_p(M_F) 非巡回。X₁ と g⁻¹X₁g を同 cyclic O_p(M_F) に入れ N(X₁)=M / N(g⁻¹X₁g)=g⁻¹Mg ⟹ g∈M 矛盾。
+  - `two_le_pRank_of_comm_isPGroup_not_isCyclic` (=mathcomp `abelian_rank1_cyclic` 加法版): abelian 非巡回 odd p-群 ⟹ 2≤pRank (Ω₁ elem abelian, |Ω₁|≥p²)。
+- **✅ de-risk 完了 (LAUNCH 推奨)**: Coq `nonTI_Fitting_structure` (BGsection15.v:939-1240, 290行) 精読 + repo uniqueness API 写像確定 = **形式化労力** (missing theory でない)。
+
+### ▶ 残: hFI 非 abelian 枝 (c) = BG Thm 15.7(e2) 攻略計画 (次セッション、multi-session)
+
+goal (S16 `isTypeI_of_isTypeF` の ¬TI ∧ ¬IsMulCommutative M_F 枝、`refine Or.inr (Or.inr ?_)` 後):
+`(∀ q∈π(M_F), exp(td.U)∣q-1) ∧ (∃ p∈π(M_F), IsCyclic O_{p'}(M_F))`。
+
+**type-F 簡略化 (Coq 精読で確定、重要)**: Coq の (e3) p³ case は `M∈M_P1` 要求ゆえ **type F では排除**。また **`defX (X=X1)` も不要** (P1 case の |X| 同定用)。ゆえ Coq 290 行のうち type-F 必要部は大幅縮小。
+
+**① conjunct B (∃p cyclic O_{p'}(M_F))** — 順に:
+  1. **E1X_facts** (Coq 975-997): witness X₁ で `C_{M_F}(X₁) ∉ IsUniquelyMaximal` (= extraction の `¬C_G(X₁)≤M` + `def_uniq_mmax`/`sub_uniq_mmax` 相当 = `IsUniquelyMaximal` の `of_le_of_lt_top`/`le_uniqueMaximalSubgroup`) + `abelian C_{M_F}(X₁)` (C_{M_F}(X₁)≤M_F nilpotent = ∏O_r、各 O_r abelian else `nonabelian_pgroup_isUniquelyMaximal` ⟹ C∈𝒰 矛盾)。
+  2. `not_cPP`: O_p(M_F) 非 abelian (M_F=O_p×O_{p'} nilpotent 分解、M_F 非 abelian + O_{p'} abelian)。
+  3. **cycHp'** (Coq 1135-1141): cyclic O_{p'}(M_F)。`two_le_pRank...` の対偶 (abelian なので rank≤1⟺cyclic) + contra: r(O_{p'})≥2 なら `centralizer_isUniquelyMaximal_of_two_le_rank` + `nonabelian_pgroup_isUniquelyMaximal pP` ⟹ C_{M_F}(X₁)∈𝒰 矛盾。
+**② conjunct A (∀q exp(U)∣q-1)** — Frobenius semiregular (Coq 1156-1164, FmaxM 枝):
+  各 q∈π(M_F)、exp(M/M_F)=exp(U)=exp(U₀) (U₀=Frobenius 補元、**`TypeFData.frobenius_HU0` = M_σ⋊U₀ 既に手元**)、U₀ が Z_q:=Ω₁(Z(O_q(M_F))) (order q) に semiregular 作用 (Frobenius kernel-regularity) ⟹ exp(U)∣q-1。
+  **⚠ 要 ChatGPT de-risk**: `regular_norm_dvd_pred` 相当 (semiregular A on order-q group ⟹ |A|∣q-1、A↪Aut(ℤ/q)=ℤ/(q-1)) が repo/mathlib にあるか。Isaacs Ch06 `IsFrobeniusGroup` の kernel-regular API を確認 (`notes/meta/chatgpt_consult_via_chrome.md`、最強モデル)。
+
+**repo uniqueness API (in-stock、確認済)**: `nonabelian_pgroup_isUniquelyMaximal` (S12_Theorem1213:862, =nonabelian_Uniqueness) / `centralizer_isUniquelyMaximal_of_two_le_rank` (S10_LocalCriteria:112, =cent_uniq_Uniqueness) / `rank_lt_three_of_le_two_maximals` (S15_MF, =rank3_Uniqueness) / `IsUniquelyMaximal` API (GroupTheory/MaximalSubgroup.lean: `of_le_of_lt_top`/`le_uniqueMaximalSubgroup`/`eq_of_isCoatom_of_le`/`uniqueMaximalSubgroup_isCoatom`)。
+
 **2026-06-23 (cont.¹¹) ✅✅✅ hP2II COMPLETE — type-`P₂` ⟹ Type II を sorry-free + axiom-clean で締結、`τ₂(M)=∅`/Thm 15.8 は不要と判明 (cont.¹⁰ の還元は回り道だった)** (lane-f RESUME、commit `77287003`、full build 3881 green、AxiomsCheck 5 本登録):
 
 - **cont.¹⁰ の τ₂(M)=∅ 還元は誤誘導 (de-risk 再精読で判明)**: Coq 分類定理 `FTtypeP` (`BGsection16.v`) の type-2 case (`defM'F`, l.1135) を精読すると、`of_typeII` の `M'`_\F = H` 条件は **`Fcore_max` + Hall 推移性のみ**で証明されており τ₂ も Thm 15.8 も使っていない。決定打: **`τ₂(M)=∅` は一部の type-`P₂` `M` で偽** — **Cor 15.9** (`nonFtype_signalizer_base`, BGsection15.v:1399) は `N ∈ ℳ_𝓟₂` かつ `r ∈ τ₂(N)` を供給する。ゆえに「type-`P₂` ⟹ τ₂(M)=∅」は普遍的ルートになり得ず、cont.¹⁰ の 2 補題 (`*_of_tau2_empty`) は数学的に正しいが**条件付きで使えない**。真の residual `(M')_F = M_σ` は elementary に成立 (Y=⊥ は τ₂≠∅ でも F-core 極大性から従う)。
@@ -681,7 +707,7 @@ M*-positioning）は**未再構成 = 真の残 math gate**。Lemma 12.11 proof /
   - **残 = type-F の M'≤F(M) のみ・now ungated** (C_Y(E₁)=1 gate 消滅): `exists_subgroupESetup` (一般 M) → M'=Mσ⊔E' (`derivedInG_eq_Msigma_sup_derivedInG_complement`) → E'≤C(Mσ) (Lem 12.19 `derivedE_centralizes_betaComplement` + W=Mσ [π(Mσ)∩β=∅]) → E'≤C_G(Mσ)⊓M≤F(M) (`fitting_decomposition` F=(C⊔MF)) + Mσ≤F(M) ⟹ sup_le。**M' nilpotent 経由不要**、crux = W=Mσ の Hall plumbing のみ
 - [ ] Thm A `theoremA_maximal_structure` (S16:144) — Lemma 15.1 + Prop 14.2 + §15 で全 conjunct
 - [~] Thm C `theoremC_paired_structure` — **11/12 conjunct DONE** (conjunct 10 = BG C(9) `A0-A` TI を `491bdd3d` で完全証明、残 = conjunct 2 (Cor 14.12) のみ)。旧: 10/12 + faithfulness 修正 2 件 DONE (`8f636b54`/`ec711630`/`378e91cf`/`dc2fe378`, 2026-06-21)。残 = conjunct 2 (N(U)⊄M=Cor 14.12)/10 (A0-A TI=Thm A(3)(5)) のみ (conjunct 11 は 15.7(a) で close)
-- [~] Prop 16.1 配線 `proposition_type_classification` — **hFI 部分着地 (cont.¹², `078a0b88`)**: TI-case 完成、残 = ¬TI の BG 15.7(e)。他 6 bridge 未
+- [~] Prop 16.1 配線 `proposition_type_classification` — **hFI: TI-case (cont.¹²) + ¬TI abelian 枝 (cont.¹³, `dfdec279`) 着地**。残 hFI = ¬TI 非 abelian 枝 (c) のみ (S16:1391、攻略計画↑ cont.¹³)。他 6 bridge 未
 
 ## cont.¹² (2026-06-23) — `hFI` (type-F ⟹ type-I) を bare sorry → 構造化
 
