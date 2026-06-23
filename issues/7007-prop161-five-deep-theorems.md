@@ -103,6 +103,35 @@ bottom-out** するので、clean 化には §15 foundation が先。真の順�
 
 ## 進捗ログ
 
+**2026-06-23 (cont.¹¹) ✅✅✅ hP2II COMPLETE — type-`P₂` ⟹ Type II を sorry-free + axiom-clean で締結、`τ₂(M)=∅`/Thm 15.8 は不要と判明 (cont.¹⁰ の還元は回り道だった)** (lane-f RESUME、commit `77287003`、full build 3881 green、AxiomsCheck 5 本登録):
+
+- **cont.¹⁰ の τ₂(M)=∅ 還元は誤誘導 (de-risk 再精読で判明)**: Coq 分類定理 `FTtypeP` (`BGsection16.v`) の type-2 case (`defM'F`, l.1135) を精読すると、`of_typeII` の `M'`_\F = H` 条件は **`Fcore_max` + Hall 推移性のみ**で証明されており τ₂ も Thm 15.8 も使っていない。決定打: **`τ₂(M)=∅` は一部の type-`P₂` `M` で偽** — **Cor 15.9** (`nonFtype_signalizer_base`, BGsection15.v:1399) は `N ∈ ℳ_𝓟₂` かつ `r ∈ τ₂(N)` を供給する。ゆえに「type-`P₂` ⟹ τ₂(M)=∅」は普遍的ルートになり得ず、cont.¹⁰ の 2 補題 (`*_of_tau2_empty`) は数学的に正しいが**条件付きで使えない**。真の residual `(M')_F = M_σ` は elementary に成立 (Y=⊥ は τ₂≠∅ でも F-core 極大性から従う)。
+
+- **新 (全 sorry-free + axiom-clean、AxiomsCheck 登録)**:
+  - **`maxNilpotentNormalHall_derivedInG_eq_Msigma_of_isTypeP2` (S15_MF, UNCONDITIONAL)**: `(M')_F = M_σ` を F-core 極大性 + Hall 推移性で (Coq `defM'F`)。`M' = M^{(1)}` は cyclic κ-Hall `K` の補元ゆえ `M` 内 κ'-Hall ⟹ `maxNilpotentNormalHall M'` は `M` の nilpotent normal Hall ⟹ `≤ M_F = M_σ`; 逆 `M_σ` は `M'` の nilpotent normal Hall。`_of_tau2_empty` 版を supersede。+ helper `coprime_card_index_subgroupOf_trans` (Hall 推移性 coprime 形) / `isHallSubgroup_primeFactors_of_coprime_index`。
+  - **`isTypeF_derivedInG_of_isTypeP2` (S16, `hderF`)**: `M'` type `F`。`M' = M_σ ⋊ U` が type-F maximal `M = M_σ ⋊ U` と構造同型ゆえ同じ data で組む (complement = `typeP2_mf_internal_fitting_decomposition`; U₁/Frobenius `M_σ ⋊ U₀` = Lemma 15.1(d)(e) `typeP_auxiliary_structure`; `(M')_F = M_σ` = 上記補題)。template = `typeFData_of_kappa_eq_bot` と差分 4 箇所のみ (H_eq/H_le/U_le/complement)。
+  - **`isTypeII_of_isTypeP2` (S16, `hP2II` 完成)**: 全 type-`P₂` maximal は type II。`isTypeII_of_isTypeP2_of_derived_typeF` の 2 residual を discharge。
+
+- **`tau2_transfer_constraint` (Thm 15.8) / `centralizer_escape_final_local` (Cor 15.9) は sorried のまま** (Cor 15.9 は Theorem D に依然必要な genuine BG 結果だが、hP2II の gate ではなくなった)。FT-path sorry 不変 (carrier/bridge 構成 = honest 進捗)。
+
+- **▶ 次フロンティア**: hP2II ✅ で Prop 16.1 forward bridge のうち type-II が完成。残り = ① **他 bridge** (`hFI` type-F→I / `hP1neIIIIV` type-P1→III/IV / `hP1eqV` type-P1→V) ② **reverse classifications** (`hIF`/`hIIP2`/`hIIIIVP1`/`hVP1`) ③ `hP_derived`/`hF_not_derived`/`h152a`。これらを埋めれば `proposition_type_classification` (real, S16:2173 現 sorry) が `proposition_type_classification_of_inputs` 経由で閉じる。hP1eqV/hP1neIIIIV は type-P1 構造 (U=⊥ or M_F≠M_σ) で別 deep。
+
+---
+
+**2026-06-23 (cont.¹⁰) ✅✅ hderF/hderfit gate を deep 投資で精査 → ① gate は Peterfalvi (8.6.b II) に忠実と確定 (矛盾でない) ② `hderfit` を単一の上流前提 `τ₂(M)=∅` (= BG Thm 15.8) に還元する 2 補題を landing、sorry-free + axiom-clean** (lane-f RESUME, issue 8018 hderF deep 投資, hub 推奨の BG §15 + Coq 精読で de-risk 後に Lean。full build 3881 green/82s, AxiomsCheck 2 本登録, FT-path sorry 124 不変)〔⚠ cont.¹¹ で τ₂ 還元は不要と判明〕:
+
+- **de-risk 精読の結論 (BG §15-16 + Coq BGsection15/16 + Peterfalvi (8.4)-(8.6),(8.12))**:
+  - **gate は忠実 (⚠ [[typepdata-contradictory-finding]] 型のリスク無し)**: **Peterfalvi (8.6.b II)** = 「type II ⟺ type-`P` ∧ `U` abelian ∧ `N_G(U)⊄M` ∧ **`M'` が type `F` で `(M')_F = H`**」。Lean `TypeIIData` の `derived_typeF`(=hderF) + `derived_fitting_eq`(=hderfit, `maxNilpotentNormalHall M' = M_σ`) はこの定義そのもの。Coq `of_typeII` は `normedTI F(M)^#` 形で表現が違うだけ (Peterfalvi 版が Lean の採用形)。
+  - **crux 連鎖 (全て BG Cor 15.5 で確定)**: `hderfit (maxNilpotentNormalHall M' = M_σ)` ⟺ `F(M)=M_σ` ⟺ `Y:=O_{σ'}(F(M))=⊥` ⟺ **`τ₂(M)=∅`**。理由 = **Cor 15.5(a)**: `Y` は cyclic **`τ₂(M)`-群** (Lean `opiCoreInG_sigmaCompl_fittingInAmbient_primeFactors_subset_tau2`, 既証); **Cor 15.5(b)**: `F(M)=F(M_σ)×Y` (Lean `fitting_decomposition`, 既証); type-`P₂` で `M_σ` nilpotent ⟹ `F(M_σ)=M_σ`。
+  - **真の唯一上流 gate = BG Theorem 15.8 (Feit–Thompson 1991)** = Lean `tau2_transfer_constraint` (S15_MF, **現 sorry**) = Coq `tau2_P2type_signalizer` (BGsection15.v:1262, **証明済**, ~140行)。Coq は `P2type_signalizer` + §12 Cor 12.6 (`centralizer_le_E_of_tau2`, 既証) + `ex_tau2Elem` + Uniqueness Thm 等に依存 — 前提は概ね Lean に既存ゆえ Thm 15.8 は形式化可能 (multi-session 規模)。`tau2_transfer_constraint` 起動には `τ₂(H)≠∅` の近傍 maximal `H` (Cor 14.12) 供給が要 (要追加解析)。
+
+- **本セッション landing (S15_MF, sorry-free + axiom-clean, AxiomsCheck 登録)**:
+  - **`fittingInAmbient_eq_Msigma_of_isTypeP2_of_tau2_empty`** (BG Cor 15.5(b) 帰結): type-`P₂` + `τ₂(M)=∅` ⟹ `F(M)=M_σ`。`fitting_decomposition` の `F=F(M_σ)⊔Y` で `Y.primeFactors ⊆ τ₂(M)=∅ ⟹ Y=⊥`。
+  - **`maxNilpotentNormalHall_derivedInG_eq_Msigma_of_isTypeP2_of_tau2_empty`** (= **hderfit を `τ₂(M)=∅` に還元**): `⊆` = `maxNilpotentNormalHall M'` が `M`-normal (新 helper) ∧ nilpotent ⟹ `≤ F(M)=M_σ`; `⊇` = `M_σ` が `M'` の nilpotent normal Hall (`[M':M_σ]∣[M:M_σ]` + `M_σ` σ-Hall in `M`)。
+  - **新 reusable helper `maxNilpotentNormalHall_subgroupOf_normal_of_le_of_normal`**: `N◁M ⟹ maxNilpotentNormalHall N ◁ M` (equivariance `maxNilpotentNormalHall_pointwise_smul` 経由、a priori `N` 内 normal を `M` 内に格上げ)。
+
+- **▶ 次フロンティア (hP2II 完成への残り)**: ① **`hderF` (M' type F = `Nonempty (TypeFData M')`)** = TypeFData 構成。材料 = cont.⁸ decomposition (hDcompl) + Lemma 15.1(e) Frobenius + 15.1(d) U1 + **本 `maxNilpotentNormalHall M'=M_σ` (H_eq 供給)**。`τ₂(M)=∅` から構成可能の見込み (要 assembly, multi-session)。② **deep gate `τ₂(M)=∅` = Thm 15.8 `tau2_transfer_constraint`** の本体形式化 (Coq `tau2_P2type_signalizer` 移植, 主大物)。①②とも `τ₂(M)=∅` 経由で hP2II 完成。
+
 **2026-06-23 (cont.⁸) ✅✅✅ Prop 16.1 forward bridges の真の linchpin = M_F-internal Fitting 分解 (BG Cor 15.5) を type-`P₂` で完成 → TypePData carrier が全 type-`P₂` から構成可能化、sorry-free + axiom-clean** (lane-f RESUME、full build green、AxiomsCheck 3 本登録、FT-path sorry 124 不変=carrier 構成は honest 進捗で headline sorry は forward bridge 完了まで動かない):
 
 「5 deep theorems」frontier 精査で **Thm 15.7 (`fitting_not_ti_cases`) は既に完全 DONE** と確認 (type-F の `M'≤F(M)` は Lemma 12.19 + `fitting_decomposition` 経由で ungated 済、proof は S15:7824-7926 sorry なし)。LAUNCH.md item 3「M'=F(M) 一点に還元済」は stale。⟹ frontier は **Prop 16.1 forward bridges の 6 deep TypePData field** に集約、その最深 gate = `hDcompl`/`hSDfit`/`hFiteq` (M_F-internal complement = BG Cor 15.5)。本セッションでこれを完成:

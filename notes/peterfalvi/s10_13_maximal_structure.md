@@ -296,3 +296,66 @@ issue 2012 RESOLVED。教訓: obligation 化の前に grep + AxiomsCheck を確�
 (b) B の §3-§6 char API、(c) opaque carrier 材料化（B 寄り）に gated。faithful (10.1) tau は §4 Dade proven 補題
 (`dadeIntegralCharacterMap_inner_eq_on_supported_span` 等)を cite する土台になるが、(10.5)/(10.8) 等の materialization は
 Peterfalvi 原文の長い算術論法ゆえ substantial。
+
+### 10. §13 (`S13_MaximalIII_IV` = Pf §11 types III/IV) de-opacify (2026-06-23, lane-h relane #2, commit `81b633cc`)
+
+relane #2 (issue 8018+2017) で lane-h = **`S13_MaximalIII_IV`** (active) に再配置。hub 指定の着手口
+= 構造 leaf (11.5)/(11.6)/(11.7)。**重要: repo `S13` ファイルは Pf §11 (types III/IV, results (11.x), pp.64-68)**
+(file 番号は Pf §番号 -2; Pf §13 の (13.x) は repo `S15_SAndT`)。
+
+**診断**: `S13.Hypothesis` は「結論を opaque `Prop` field として*仮定*する」scaffold だった
+(`secondDerived_eq_HC`/`U_centralizes_H0`/`H0_eq_Hprime`/`C_eq_Uprime` opaque + `H_is_pgroup`/
+`H_elementaryAbelian`/`H_order_prime_power`/`H0_eq_bot` が (11.6)/(11.7) の結論を field で仮定)
+⟹ 定理は vacuous。**構成サイトは repo 全体に皆無、S14 は 8 定理を 1 つも消費しない** (grep 確認) ⟹ 改変安全。
+
+**landed (de-opacify + 2 unconditional fragment, axiom-clean, AxiomsCheck 登録)**:
+- `C_eq_centralizer` opaque → 実 (11.2) `C = U ⊓ C_G(H)` (assumption field、残す)。
+- conclusion-as-field 8 個削除。(11.5)/(11.6) を実ステートメントに:
+  - (11.5) `secondDerived_eq_HC` → `M'' = HC`。`≤` を **`secondDerived_le_HC`** (sorry-free) で load-bearing 証明、`≥` のみ char gate。
+  - (11.6) `core_structure` → `IsPGroup p H ∧ U ≤ C_G(H₀) ∧ H₀=H' ∧ C=U'` (実 conjunction、body sorry)。
+  - (11.7) `H_elementaryAbelian` 実ステートメント不変、冗長 carrier field 除去。
+- **`Hypothesis.secondDerived_le_HC`** : `M'' ⊆ HC` ← `TypePData.secondDerived_le_fitting` (=(8.5.a)) + `C_eq_centralizer`。
+- **`Hypothesis.derivedU_le_C`** : `U' ⊆ C` ← `S11.typeP_commutator_U_centralizes_H` (=(8.5.b)) + `map_subtype_le`。
+
+**追加 de-opacify (commit `04eb6f32`)**: (11.4) `coherent_quotient_bound` も実ステートメント化 —
+opaque `quotientBoundFormula` field 削除、結論を実 index 不等式 `|M':H₁| ≤ 2q|U:C| + 1`
+(`Subgroup.relIndex`、Pf `|M'/H₁|-1 ≤ 2q|U/C|` の減算回避形) に。証明は Thm (6.2)/(6.3) coherence (char) gate ゆえ sorry。
+**∴ §13 で char API 無しに faithful に STATE できる定理は全 de-opacify 完了**。残 opaque field =
+(11.8)/(11.9) char rider (`notOrthogonalFormula`/`finalOrthogonalityFormula`/`caseB_of_97`、σ/ω/(Irr W) API 要) のみ。
+
+**追加 (commit `558619f2`): (11.6) `U ≤ C_G(H₀)` clause の Wielandt 部分を landing** —
+`U_centralizes_H0_of_W1_fpf` (axiom-clean, AxiomsCheck 登録): `C_{H₀}(W₁)=1` ∧ `U≠1` ⟹ `U ≤ C_G(H₀)`,
+lane-h の (9.1) `frobenius_kernel_centralizes_of_complement_fpf` を `U W₁` Frobenius (`typeP_uW1_frobenius`)
+が `H₀ ≤ M_F` に coprime 作用する形で適用。**残 gate = fpf 入力 `C_{H₀}(W₁)=1`** に縮小 = `|W₂|=p`
+(§8 `typeIIIorIV_W2_prime`←(8.8)) + coprime-quotient (`C_H(W₁)=W₂` [TypePData] + Cor 3.28 + (9.6)`|W̄₂|=p`)。
+∴ (11.6) clause 2 の substantive な群論核は済み、§8 prime fact 待ちに。
+
+FT-path sorry **122 不変** (vacuous opaque → 実ステートメント + 2 proven sublemma; CLAUDE.md「sorry≠進捗」)。
+
+**残 §13 gate (= cross-lane char、精密化済)**:
+| 結果 | 残 gate | 担当 |
+|---|---|---|
+| (11.5) `≥` (`HC ⊆ M''`) | (11.4) quotient bound → Thm (6.3) coherence + (10.8) `S12.S_not_coherent` | lane-b char |
+| (11.6) 残 3 conjunct | (9.3) `U cent O_{p'}(H)` + (9.6) `C_{H₀}(W₁)=1`(+(9.1)✓ Wielandt) + [BG]1.6(d) + (11.5) | S11 sub-facts (未 export) + char |
+| (11.7) | (11.5)+(11.6) | 上記下流 |
+| (11.3) `S(H₀C)` not coh / (11.4) bound | Thm (6.3) + (10.8) | lane-b char |
+| (11.8.x)/(11.8)/(11.9) | σ/ω/μ/(Irr W) char API (gate #3) + (9.7)(9.8)(9.11) | lane-b char |
+
+**lane-b への signature 依頼 (issue 起票)**: (10.8) `S_not_coherent` の faithful signature (S12 export 済か要確認) +
+§6 coherence (Thm 6.3) の citeable 形。char API (gate #3) landing 時に §13 char 方向を一気に wiring。
+**lane-h 次手**: (11.6) の §9 sub-fact ((9.3)/(9.6) の正確な carrier 形) が S11 に未 export ⟹ S11 (driver) に
+追加するか lane-b 依頼。これらは §8-free 群論寄りなので lane-h で attemptable な可能性 (要 (9.1) Wielandt 適用調査)。
+
+**追記 (cite-reduction, ユーザー指示「cite して進められる」, commits `5a212bc4`/`0adb8560`)**:
+char leaf を sorried 上流の cite で sorry-free 化 ([[feedback-cite-sorried-lemmas-if-signature-correct]])。
+**重要発見: (10.8) `S12.S_not_coherent` は clean signature で citeable だが、Thm (6.3)「部分族 coherent
+⟹ S coherent」は repo に standalone 形が無い** (§6 coherence は `SibleyDadeHypothesis` filtration
+machinery `S08_Theorem63` 経由)。⟹ Thm (6.3) 適用を **named obligation** に切り出す方式:
+- **(11.3) `S_H0C_not_coherent` sorry-free**: `coherent_S_of_coherent_SH0C` (Thm 6.3 obligation) +
+  `S12.S_not_coherent` ((10.8)) cite → 矛盾。
+- **(11.5) `secondDerived_eq_HC` (`M''=HC`) sorry-free**: `secondDerived_le_HC` (proven ≤) +
+  `HC_le_secondDerived` (≥ obligation, (5.7)+(11.4)) の `le_antisymm`。
+残 gate = 2 named obligation (`coherent_S_of_coherent_SH0C`/`HC_le_secondDerived`) = lane-b §6 char。
+両定理は sorried 上流 cite ゆえ axiom-clean でない (登録せず、honest cite reduction)。FT-path sorry 122 不変。
+**残: (11.4)(=Thm 6.2 そのもの)/(11.6)残/(11.7)/(11.8)/(11.9) は char-gated or §8(|W₂|=p)。** §13 の構造側
+(11.3/11.5) は cite-reduce 完了、(11.6) clause2 Wielandt 核 landed、残りは genuinely lane-b char / §8 待ち。

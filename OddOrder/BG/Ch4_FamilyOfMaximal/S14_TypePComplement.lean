@@ -33,7 +33,7 @@ theorem exists_kappaHall_invariant_complement_to_MF (hG : OddOrder.BG.IsMinimalS
     {M K : Subgroup G} (hM : M ∈ maximalSubgroups G) (hP : IsTypeP M) (hKM : K ≤ M)
     (hK : Ch03.IsHallSubgroup (kappa M) (K.subgroupOf M)) [IsCyclic ↥K] :
     ∃ U : Subgroup G, derivedInG M = maxNilpotentNormalHall M ⊔ U ∧
-      K ≤ Subgroup.normalizer (U : Set G) := by
+      K ≤ Subgroup.normalizer (U : Set G) ∧ maxNilpotentNormalHall M ⊓ U = ⊥ := by
   classical
   haveI : IsSolvable ↥M := hG.solvable_of_mem_maximalSubgroups hM
   -- `M' ≤ M` is solvable.
@@ -82,9 +82,9 @@ theorem exists_kappaHall_invariant_complement_to_MF (hG : OddOrder.BG.IsMinimalS
     have hco := hK.coprime_index
     rwa [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hKM).toEquiv, hidx] at hco
   -- Invariant Schur–Zassenhaus.
-  obtain ⟨U, -, hUsup, hUnorm⟩ :=
+  obtain ⟨U, -, hUsup, hUnorm, hUinf⟩ :=
     OddOrder.GroupTheory.exists_aInvariant_complement_within_normal hMFle' hM'_norm_MF
       hK_norm_M' hK_norm_MF hMF_hall' hCop
-  exact ⟨U, hUsup.symm, hUnorm⟩
+  exact ⟨U, hUsup.symm, hUnorm, hUinf⟩
 
 end OddOrder.BG.Ch4.S14

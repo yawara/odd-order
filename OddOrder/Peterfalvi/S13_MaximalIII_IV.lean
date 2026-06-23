@@ -109,21 +109,14 @@ structure Hypothesis (M : Subgroup G) where
   chief : OddOrder.Peterfalvi.S11.ChiefFactorData s11Setup
   C : Subgroup G
   C_le_U : C ≤ base.typeP.U
-  C_eq_centralizer : Prop
+  /-- **(11.2)**: `C = C_U(H)`, the centralizer of `H` in `U`. -/
+  C_eq_centralizer :
+    C = base.typeP.U ⊓ Subgroup.centralizer (base.typeP.H : Set G)
   Hprime : Subgroup G
   Hprime_eq : Hprime = derivedInG base.typeP.H
   Uprime : Subgroup G
   Uprime_eq : Uprime = derivedInG base.typeP.U
   SOf : Subgroup G → Set (ClassFunction ↥M ℂ)
-  quotientBoundFormula : Subgroup G → Prop
-  secondDerived_eq_HC : Prop
-  H_is_pgroup : IsPGroup base.w2 ↥base.typeP.H
-  U_centralizes_H0 : Prop
-  H0_eq_Hprime : Prop
-  C_eq_Uprime : Prop
-  H_elementaryAbelian : IsElementaryAbelian base.w2 ↥base.typeP.H
-  H_order_prime_power : Nat.card ↥base.typeP.H = base.w2 ^ base.w1
-  H0_eq_bot : chief.H0 = ⊥
   notOrthogonalFormula : ClassFunction ↥M ℂ → Prop
   finalOrthogonalityFormula : ClassFunction ↥M ℂ → Prop
   caseB_of_97 : Prop
@@ -154,21 +147,71 @@ def H0C {M : Subgroup G} (hyp : Hypothesis M) : Subgroup G :=
 def HC {M : Subgroup G} (hyp : Hypothesis M) : Subgroup G :=
   hyp.H ⊔ hyp.C
 
+/-- **Peterfalvi (11.5), inclusion `M'' ⊆ HC` (= (8.4.c)/(8.5.a))**: the second derived
+subgroup is contained in `HC`.  This is the unconditional half of (11.5); it follows from
+the type-`P` Fitting bound `TypePData.secondDerived_le_fitting` (`M'' ≤ H ⊔ (U ∩ C_G(H))`,
+Peterfalvi (8.5.a)) together with `C = C_U(H) = U ∩ C_G(H)` (the `C_eq_centralizer` field).
+The reverse inclusion is the coherence content carried by `S13.secondDerived_eq_HC`. -/
+theorem secondDerived_le_HC {M : Subgroup G} (hyp : Hypothesis M) :
+    secondDerivedInAmbient M ≤ hyp.HC := by
+  change secondDerivedInAmbient M ≤ hyp.base.typeP.H ⊔ hyp.C
+  rw [hyp.C_eq_centralizer]
+  exact hyp.base.typeP.secondDerived_le_fitting
+
+/-- **Peterfalvi (11.6), inclusion `U' ⊆ C`**: the derived subgroup `U' = [U,U]` is contained
+in `C = C_U(H)`.  This is the unconditional half of the `C = U'` clause of (11.6): `[U,U]`
+centralizes `H` (Peterfalvi (8.5.b), `S11.typeP_commutator_U_centralizes_H`) and lies in `U`,
+so `U' = [U,U] ⊆ U ∩ C_G(H) = C`.  The reverse inclusion `C ⊆ U'` is the coherence content
+carried by `S13.core_structure`. -/
+theorem derivedU_le_C {M : Subgroup G} (hyp : Hypothesis M) :
+    derivedInG hyp.U ≤ hyp.C := by
+  change derivedInG hyp.base.typeP.U ≤ hyp.C
+  rw [hyp.C_eq_centralizer]
+  refine le_inf (Subgroup.map_subtype_le _) ?_
+  rw [show derivedInG hyp.base.typeP.U = ⁅hyp.base.typeP.U, hyp.base.typeP.U⁆
+        from Subgroup.map_subtype_commutator hyp.base.typeP.U]
+  exact OddOrder.Peterfalvi.S11.typeP_commutator_U_centralizes_H hyp.base.typeP
+
 end Hypothesis
 
 /-! ## (11.3)--(11.5): commutator-chain consequences -/
 
-/-- **Peterfalvi (11.3)**: `S(H_0 C)` is not coherent. -/
+/-- **Peterfalvi (11.3), the Theorem (6.3) coherence-extension input** (§13 instance): if the
+sub-family `S(H₀C)` is coherent, then so is the full family `S`.
+
+This is Peterfalvi's Theorem (6.3) applied with `(L, K, M, H, H₁) = (M, M', 1, HC, H₀C)`; its
+hypotheses hold in the §13 setup ((6.3.a) `HC` nilpotent — `H = M_F` nilpotent and `C = C_U(H)`
+centralizes `H`; (6.3.b) from the coherence of `S(H₀C)`; (6.3.c) from (9.6)/(11.1)).  Left as a
+named obligation: the repo's §6 coherence is packaged through the `SibleyDadeHypothesis`
+filtration machinery (`S08_Theorem63`), not as a standalone "subfamily-coherent ⟹ coherent"
+statement, so discharging this is §6 character theory (lane-b). -/
+theorem coherent_S_of_coherent_SH0C [Finite G] [Fintype G]
+    (_hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} [Fintype ↥M]
+    [Invertible (Nat.card ↥M : ℂ)] [Invertible (Nat.card G : ℂ)]
+    (hyp : Hypothesis M)
+    (_hcoh : Nonempty (OddOrder.Peterfalvi.S07.IsCoherent
+      hyp.base.tau (hyp.SOf hyp.H0C) hyp.base.A0)) :
+    Nonempty (OddOrder.Peterfalvi.S07.IsCoherent
+      hyp.base.tau hyp.base.Sset hyp.base.A0) := by
+  sorry
+
+/-- **Peterfalvi (11.3)**: `S(H_0 C)` is not coherent.
+
+If it were, Theorem (6.3) (`coherent_S_of_coherent_SH0C`) would make the full family `S` coherent,
+contradicting Theorem (10.8) (`S12.S_not_coherent`).  The theorem is thereby reduced, with no
+`sorry` of its own, to those two cited results. -/
 theorem S_H0C_not_coherent [Finite G] [Fintype G]
     (_hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} [Fintype ↥M]
     [Invertible (Nat.card ↥M : ℂ)] [Invertible (Nat.card G : ℂ)]
     (hyp : Hypothesis M) :
     ¬ Nonempty (OddOrder.Peterfalvi.S07.IsCoherent
-      hyp.base.tau (hyp.SOf hyp.H0C) hyp.base.A0) := by
-  sorry
+      hyp.base.tau (hyp.SOf hyp.H0C) hyp.base.A0) :=
+  fun hcoh => OddOrder.Peterfalvi.S12.S_not_coherent _hG hyp.base
+    (coherent_S_of_coherent_SH0C _hG hyp hcoh)
 
-/-- **Peterfalvi (11.4)**: if `S(H_1)` is coherent for a normal subgroup
-`H_1 < M'`, then the quotient bound from Theorem (6.2) holds. -/
+/-- **Peterfalvi (11.4)**: if `S(H_1)` is coherent for a normal subgroup `H_1 < M'`,
+then `|M'/H_1| - 1 ≤ 2 q |U/C|` (the quotient bound from Theorem (6.2)), stated here in
+the subtraction-free form `|M' : H_1| ≤ 2 q |U : C| + 1`. -/
 theorem coherent_quotient_bound [Finite G] [Fintype G]
     (_hG : OddOrder.BG.IsMinimalSimpleOdd G) {M H1 : Subgroup G} [Fintype ↥M]
     [Invertible (Nat.card ↥M : ℂ)] [Invertible (Nat.card G : ℂ)]
@@ -176,23 +219,108 @@ theorem coherent_quotient_bound [Finite G] [Fintype G]
     (hH1_lt : H1 < derivedInG M)
     (hcoh : Nonempty (OddOrder.Peterfalvi.S07.IsCoherent
       hyp.base.tau (hyp.SOf H1) hyp.base.A0)) :
-    hyp.quotientBoundFormula H1 := by
+    H1.relIndex (derivedInG M) ≤ 2 * hyp.q * hyp.C.relIndex hyp.U + 1 := by
   sorry
 
-/-- **Peterfalvi (11.5)**: the second derived subgroup is `H C`. -/
+/-- **Peterfalvi (11.5), reverse inclusion `HC ⊆ M''`** (named obligation): the coherence content
+of (11.5).  Since `M'/M''` is abelian, `S(M'')` is coherent by (5.7); the quotient bound (11.4)
+together with (11.1)/(9.6) then forces `M'' = HC`.  Char-gated — it bottoms out in Theorem (10.8)
+via (11.3)/(11.4) — so it is left as a clean named subgroup-inclusion obligation. -/
+theorem HC_le_secondDerived [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    {M : Subgroup G} (hyp : Hypothesis M) :
+    hyp.HC ≤ secondDerivedInAmbient M := by
+  sorry
+
+/-- **Peterfalvi (11.5)**: the second derived subgroup is `H C`, i.e. `M'' = HC`.
+
+`M'' ⊆ HC` is unconditional ((8.5.a), `secondDerived_le_HC`); the reverse `HC ⊆ M''` is the
+coherence content carried by `HC_le_secondDerived`.  The theorem composes the two with no `sorry`
+of its own. -/
 theorem secondDerived_eq_HC [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
     {M : Subgroup G} (hyp : Hypothesis M) :
-    hyp.secondDerived_eq_HC := by
-  sorry
+    secondDerivedInAmbient M = hyp.HC :=
+  le_antisymm hyp.secondDerived_le_HC (HC_le_secondDerived _hG hyp)
 
 /-! ## (11.6)--(11.7): the core structure of `H` and `U` -/
 
-/-- **Peterfalvi (11.6)**: `H` is a `p`-group, `U` centralizes `H_0`,
-`H_0 = H'`, and `C = U'`. -/
+/-- **Peterfalvi (11.6), the `U`-centralizes-`H_0` clause via Wielandt (9.1)**: if the cyclic
+factor `W_1` acts fixed-point-freely on the chief subgroup `H_0` (`C_{H_0}(W_1) = 1`), then the
+Frobenius kernel `U` centralizes `H_0`.
+
+This is the ambient-form Wielandt corollary `frobenius_kernel_centralizes_of_complement_fpf`
+(lane-h's (9.1)) applied to the Frobenius group `U W_1` (`typeP_uW1_frobenius`) acting coprimely
+on `H_0 ≤ H = M_F`.  The fixed-point-free hypothesis `hfpf` and `U ≠ 1` (`hU`) are the §8/carrier
+inputs (in Peterfalvi, `C_{H_0}(W_1) = 1` comes from (9.6) and `|W_2| = p`); the Wielandt content
+itself is unconditional and axiom-clean. -/
+theorem U_centralizes_H0_of_W1_fpf [Finite G] {M : Subgroup G} (hyp : Hypothesis M)
+    (hU : hyp.base.typeP.U ≠ ⊥)
+    (hfpf : ∀ n ∈ hyp.chief.H0,
+      (∀ w ∈ hyp.base.typeP.W1, w * n * w⁻¹ = n) → n = 1) :
+    hyp.U ≤ Subgroup.centralizer (hyp.chief.H0 : Set G) := by
+  -- `H_0 ≤ H = M_F` (the two type-`P` witnesses share `M_F = maxNilpotentNormalHall M`).
+  have hHH : hyp.s11Setup.typeP.H = hyp.base.typeP.H := by
+    rw [hyp.s11Setup.typeP.H_eq, hyp.base.typeP.H_eq]
+  have hH0le : hyp.chief.H0 ≤ hyp.base.typeP.H := hHH ▸ hyp.chief.H0_lt_H.le
+  -- `U ⊔ W_1 ≤ M ≤ N_G(H_0)`.
+  have hUM : hyp.base.typeP.U ≤ M := hyp.base.typeP.U_le.trans (Subgroup.map_subtype_le _)
+  have hUEnorm : hyp.base.typeP.U ⊔ hyp.base.typeP.W1 ≤
+      Subgroup.normalizer (hyp.chief.H0 : Set G) :=
+    sup_le (hUM.trans hyp.chief.H0_normalized_by_M)
+      (hyp.base.typeP.W1_le.trans hyp.chief.H0_normalized_by_M)
+  -- `H_0` is solvable (subgroup of the nilpotent Fitting-type Hall `M_F`).
+  haveI : Group.IsNilpotent ↥hyp.base.typeP.H := by
+    rw [hyp.base.typeP.H_eq]
+    exact OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_isNilpotent M
+  haveI : IsSolvable ↥hyp.base.typeP.H := IsNilpotent.to_isSolvable
+  haveI : IsSolvable ↥(hyp.chief.H0.subgroupOf hyp.base.typeP.H) := inferInstance
+  haveI hsolv : IsSolvable ↥hyp.chief.H0 :=
+    solvable_of_solvable_injective
+      (f := (Subgroup.subgroupOfEquivOfLe hH0le).symm.toMonoidHom)
+      (Subgroup.subgroupOfEquivOfLe hH0le).symm.injective
+  -- coprimality of `|H_0|` (dividing `|M_F|`) to `|U W_1|`.
+  have hcop : Nat.Coprime (Nat.card ↥hyp.chief.H0)
+      (Nat.card ↥(hyp.base.typeP.U ⊔ hyp.base.typeP.W1)) :=
+    Nat.Coprime.coprime_dvd_left (Subgroup.card_dvd_of_le hH0le)
+      (OddOrder.Peterfalvi.S11.typeP_coprime_H_uW1 hyp.base.typeP hU)
+  exact OddOrder.GroupTheory.frobenius_kernel_centralizes_of_complement_fpf hUEnorm
+    (OddOrder.Peterfalvi.S11.typeP_uW1_frobenius hyp.base.typeP hU) hsolv hcop hfpf
+
+/-- **Peterfalvi (11.6), the `U`-centralizes-`H_0` clause, gated on `W_2 ⊓ H_0 = ⊥`**: a cleaner
+restatement of `U_centralizes_H0_of_W1_fpf` whose hypothesis is the subgroup equation
+`W_2 ⊓ H_0 = ⊥` rather than the raw fixed-point-free condition.
+
+The fixed-point-free input `C_{H_0}(W_1) = 1` reduces to `W_2 ⊓ H_0 = ⊥`: any `n ∈ H_0` centralized
+by `W_1` lies in `H ⊓ C_G(W_1) = W_2` (`typeP_H_inf_centralizer_W1`), hence in `W_2 ⊓ H_0`.  This
+isolates the genuine §8/chief content (`W_2 ⊓ H_0 = ⊥`, which holds because `|W_2| = p` is prime —
+`typeIIIorIV_W2_prime` — and `W_2 ⊄ H_0` from the chief factor) as a single clean obligation. -/
+theorem U_centralizes_H0_of_W2_inf_H0_bot [Finite G] {M : Subgroup G} (hyp : Hypothesis M)
+    (hU : hyp.base.typeP.U ≠ ⊥)
+    (hbot : hyp.base.typeP.W2 ⊓ hyp.chief.H0 = ⊥) :
+    hyp.U ≤ Subgroup.centralizer (hyp.chief.H0 : Set G) := by
+  have hHH : hyp.s11Setup.typeP.H = hyp.base.typeP.H := by
+    rw [hyp.s11Setup.typeP.H_eq, hyp.base.typeP.H_eq]
+  have hH0le : hyp.chief.H0 ≤ hyp.base.typeP.H := hHH ▸ hyp.chief.H0_lt_H.le
+  refine U_centralizes_H0_of_W1_fpf hyp hU (fun n hn hcent => ?_)
+  have hnW2 : n ∈ hyp.base.typeP.W2 := by
+    rw [← OddOrder.Peterfalvi.S11.typeP_H_inf_centralizer_W1 hyp.base.typeP]
+    refine Subgroup.mem_inf.mpr ⟨hH0le hn, ?_⟩
+    rw [Subgroup.mem_centralizer_iff]
+    exact fun w hw => mul_inv_eq_iff_eq_mul.mp (hcent w hw)
+  have hmem : n ∈ hyp.base.typeP.W2 ⊓ hyp.chief.H0 := ⟨hnW2, hn⟩
+  rw [hbot] at hmem
+  exact Subgroup.mem_bot.mp hmem
+
+/-- **Peterfalvi (11.6)**: `H` is a `p`-group, `U` centralizes `H_0`, `H_0 = H'`, and `C = U'`.
+
+The inclusion `U' ⊆ C` of the last clause is unconditional (`Hypothesis.derivedU_le_C`,
+from (8.5.b)); the remaining content needs (9.3) [`U` centralizes `O_{p'}(H)`], (9.6)
+[`C_{H_0}(W_1) = 1`] with (9.1) Wielandt, `[BG] 1.6(d)`, and (11.5) `secondDerived_eq_HC`
+(itself coherence-gated). -/
 theorem core_structure [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
     {M : Subgroup G} (hyp : Hypothesis M) :
-    IsPGroup hyp.p ↥hyp.H ∧ hyp.U_centralizes_H0 ∧ hyp.H0_eq_Hprime ∧
-      hyp.C_eq_Uprime := by
+    IsPGroup hyp.p ↥hyp.H ∧
+      hyp.U ≤ Subgroup.centralizer (hyp.chief.H0 : Set G) ∧
+      hyp.chief.H0 = hyp.Hprime ∧ hyp.C = hyp.Uprime := by
   sorry
 
 /-- **Peterfalvi (11.7)**: `H` is elementary abelian of order `p^q`, and

@@ -3966,6 +3966,24 @@ set_option linter.style.longLine false in
 -- three deep `M_F`-internal residuals of `typePData_of_isTypeP_of_inputs`; the shared linchpin of the
 -- Prop 16.1 forward bridges `hP2II`/`hP1neIIIIV`/`hP1eqV`.  Sorry-free + axiom-clean.
 #assert_only_allowed_axioms OddOrder.BG.Ch4.S15.typeP2_mf_internal_fitting_decomposition
+-- BG Corollary 15.5(b) consequence + Peterfalvi (8.6.b II) `(M')_F = H` reduction (`S15_MF`, issue
+-- 7007): for a type-`P₂` maximal `M` with `τ₂(M) = ∅`, `F(M) = M_σ` (the `Y = ⊥` half of Cor 15.5(b),
+-- since `Y = O_{σ'}(F(M))` is a `τ₂(M)`-group) and the Fitting core of the derived subgroup is `M_σ`
+-- (`maxNilpotentNormalHall M' = M_σ`, the `hderfit` input of `isTypeII_of_isTypeP2_of_derived_typeF`).
+-- Discharges `hderfit` down to the single residual gate `τ₂(M) = ∅` (BG Theorem 15.8,
+-- `tau2_transfer_constraint`).  Sorry-free + axiom-clean.
+#assert_only_allowed_axioms OddOrder.BG.Ch4.S15.fittingInAmbient_eq_Msigma_of_isTypeP2_of_tau2_empty
+#assert_only_allowed_axioms OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_derivedInG_eq_Msigma_of_isTypeP2_of_tau2_empty
+-- **`(M')_F = M_σ` for type-`P₂`, UNCONDITIONAL** (`S15_MF`, issue 7007 cont.¹¹; Coq `defM'F`,
+-- BGsection16.v l.1135 — the `M'`_\F = H` conjunct of `of_typeII`).  Supersedes the `_of_tau2_empty`
+-- reduction above: the `τ₂(M) = ∅` route was an unnecessary detour (and `τ₂(M) = ∅` is *false* for
+-- some type-`P₂` `M`, cf. Cor 15.9's `N ∈ ℳ_𝓟₂` with `r ∈ τ₂(N)`).  The Fitting core of `M'` equals
+-- `M_σ` by elementary `F`-core maximality + Hall transitivity: `M'` is `κ'`-Hall in `M` (complement to
+-- the cyclic `κ`-Hall `K`), so `maxNilpotentNormalHall M'` is a nilpotent normal Hall subgroup of `M`,
+-- hence `≤ M_F = M_σ`; conversely `M_σ` is nilpotent normal Hall in `M'`.  Sorry-free + axiom-clean.
+#assert_only_allowed_axioms OddOrder.BG.Ch4.S15.coprime_card_index_subgroupOf_trans
+#assert_only_allowed_axioms OddOrder.BG.Ch4.S15.isHallSubgroup_primeFactors_of_coprime_index
+#assert_only_allowed_axioms OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_derivedInG_eq_Msigma_of_isTypeP2
 -- BG Theorem 15.7(a), the type-classification clause (`S15_MF`, issue 7007): a type-`P₂` maximal
 -- subgroup has a `TI` Fitting subgroup (contrapositive: `¬FittingIsTI ⟹ M` is type `F` or `P₁`).
 -- Sorry-free + axiom-clean.
@@ -5446,6 +5464,17 @@ type-`P₂` `κ`-Hall's.  Axiom-clean. -/
 
 #assert_only_allowed_axioms OddOrder.BG.Ch4.S16.isTypeII_of_isTypeP2_of_derived_typeF
 
+/-! **`hderF` complete + `hP2II` COMPLETE** (`S16_MainResults`, issue 7007 cont.¹¹): `M'` is type `F`
+for every type-`P₂` maximal `M` (`isTypeF_derivedInG_of_isTypeP2`), assembling the *same* type-`F`
+data as the type-`F` maximal (`M' = M_σ ⋊ U` mirrors `M = M_σ ⋊ U`): the `M_σ ⋊ U` complement
+(`typeP2_mf_internal_fitting_decomposition`), abelian inertia `U₁` and Frobenius factor `M_σ ⋊ U₀`
+(Lemma 15.1(d)(e)), and `(M')_F = M_σ = M_F`
+(`maxNilpotentNormalHall_derivedInG_eq_Msigma_of_isTypeP2`).  Hence *every* type-`P₂` maximal is
+type II (`isTypeII_of_isTypeP2`), with **no** `τ₂(M) = ∅` / Theorem 15.8 gate.  Both axiom-clean. -/
+
+#assert_only_allowed_axioms OddOrder.BG.Ch4.S16.isTypeF_derivedInG_of_isTypeP2
+#assert_only_allowed_axioms OddOrder.BG.Ch4.S16.isTypeII_of_isTypeP2
+
 /-! **BG Theorem C** (`S16_MainResults`, `theoremC_paired_structure`): for `K ≠ 1`, a type-`P`
 maximal `M` has the full paired structure — `U` abelian; `N_G(U) ⊄ M` (conjunct 2 = BG C(1) /
 Corollary 14.12, via the matched `(K₀,U₀)` pair `typeP2_exists_matched_kappa_hall_pair` and the
@@ -5806,3 +5835,19 @@ formula together with the prime computation `coprimeFrobeniusAction_card_eq_prim
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S11.clifford_caseB_data
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S11.clifford_caseA_data
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S11.clifford_dichotomy
+
+-- Peterfalvi §13 (= repo `S13_MaximalIII_IV`, types III/IV) structural cluster.  After de-opacifying
+-- the `Hypothesis` scaffold (the `C = C_U(H)` field and the deleted opaque conclusion-Props), the
+-- two *unconditional* inclusions of (11.5)/(11.6) are axiom-clean: `secondDerived_le_HC`
+-- (`M'' ⊆ HC`, = (8.5.a) via `TypePData.secondDerived_le_fitting`) and `derivedU_le_C`
+-- (`U' ⊆ C`, = (8.5.b) via `S11.typeP_commutator_U_centralizes_H`).  The reverse inclusions
+-- (`M'' = HC`, `C = U'`) are the coherence content of (11.5)/(11.6), gated on Theorem (10.8).
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S13.Hypothesis.secondDerived_le_HC
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S13.Hypothesis.derivedU_le_C
+-- (11.6) the `U`-centralizes-`H₀` clause via Wielandt (9.1): given `C_{H₀}(W₁) = 1` and `U ≠ 1`,
+-- the Frobenius kernel `U` centralizes the chief subgroup `H₀`.  The Wielandt content (lane-h's
+-- `frobenius_kernel_centralizes_of_complement_fpf`) is axiom-clean; the fpf input is the §8 gate.
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S13.U_centralizes_H0_of_W1_fpf
+-- Same clause restated against the cleaner subgroup gate `W₂ ⊓ H₀ = ⊥` (the fpf input reduces to it
+-- via `H ⊓ C_G(W₁) = W₂`); isolates the genuine §8/chief obligation.
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S13.U_centralizes_H0_of_W2_inf_H0_bot

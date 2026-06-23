@@ -23,14 +23,27 @@
   `U_commutative` が `hyp.U`/`hyp.W1` に転送できず **blocked**。
 - これは (13.1.b)「S = (P⋊U)⋊W₁」の**形式化が不完全** (型-P witness を carry していない) のが原因。
 
-### honest fix: `Hypothesis` を (13.1) に忠実 enrich (C 所有・安全)
-- `Hypothesis` は **producer なし** (S16 が `base : S15.Hypothesis` で**参照のみ**、構成しない) ⟹
-  field 追加は安全 (build 不変、S16 等は新 field を無視)。
-- **追加案**: `Sdata : TypePData hyp.S` + `Sdata_U : Sdata.U = hyp.U` + `Sdata_W1 : Sdata.W1 = hyp.W1`
-  + `Sdata_W2 : Sdata.W2 = hyp.W2` (T-side は対称: `Tdata.U = hyp.V`, `Tdata.W1 = hyp.W2`,
-  `Tdata.W2 = hyp.W1`)。**(13.1) が型-P 分解を固定するのに忠実、型 II/III 等の (13.2) 結論は hoist しない**
-  (TypePData は型を含まない共通構造)。`hyp.P = Sdata.H` は `P_eq_SF` + `H_eq` (両 = maxNilpotentNormalHall S)
-  で自動。
+### ⚠️ 訂正 (2026-06-23 lane-c 再開時、main マージ後の精査): enrich は **lane-local でなく cross-lane**
+**上の数学的洞察 (U-reconciliation が必要) は正しい。が、当初の「`Hypothesis` は producer 無しゆえ
+field 追加は C 所有・安全」は誤り。** 実際には `S15.Hypothesis` は
+`sectionSixteenHypothesis_of_inputs` ([`OddOrder/FeitThompson.lean:655`]) で **record literal として
+明示構成**され、各フィールドを `inp : Section16Inputs G` (= lane-f の POLE-1, issue 7005) から取る。
+よって `S15.Hypothesis` に `Sdata : TypePData` を足すと:
+1. `FeitThompson.lean:655` の record literal が壊れる (**lane-c 非所有**);
+2. ソースとして `Section16Inputs` / `Section16TypePStructure` / `section16TypePStructure_of_components`
+   にフィールド追加が必要 (**すべて lane-f 所有 = FeitThompson.lean**);
+3. discharge には「**指定した complement `U` を持つ `TypePData mp.S` を構成する**」実作業が要る
+   (`typePData_of_isTypeNonI` は自前の `U` を作るので使えない)。`hyp.U` の源
+   `exists_kappaHall_invariant_complement_to_MF` ([`S14_TypePComplement.lean:85`]) は内部で
+   Schur–Zassenhaus complement (`M_F ⊓ U = ⊥`) を作りながら**返り値型で破棄** (`obtain ⟨U, -, …⟩`)
+   している。露出 + `TypePData` 化が lane-f の作業。
+
+⟹ **honest fix = cross-lane carrier enrich** (lane-f の `Section16TypePStructure` に
+`Sdata : TypePData mp.S` / `Tdata : TypePData mp.T` を reconciliation 付きで carry させ、
+`S15.Hypothesis` へ thread)。lane-f の POLE-1 producer は既に sorry なので obligation は吸収されるが、
+TypePData の complement 指定構成は実作業。**lane-c が独断で触れない (cross-lane judgment)** ⟹ HUB issue
+4008 で escalate。当初案の reconciliation 設計 (`Sdata.U = hyp.U`, `Sdata.W1 = hyp.W1`, T-side 対称)
+自体は正しい — 配置先が lane-c の `Hypothesis` でなく lane-f の `Section16TypePStructure`。
 
 ### `basic_structure` (13.2) = 5 部 capstone (単一 leaf でなく複数 session)
 1. **carrier reconciliation** (上記 enrich; `hyp.U`=type-P U の pinning) → UW1_frobenius / U-side facts。
@@ -42,12 +55,97 @@
 5. **U_commutative** = type II/III の `TypeIIData`/`TypeIIIData.U_commutative` から (型確定後)。
 
 ### 既に証明済 (sorry なし、再着手不要)
-`not_conj_of_isTypeI_of_isTypeNonI` (1179)、`isHall_subgroupOf_primeFactors_of_coprime_index` (1085)。
+`not_conj_of_isTypeI_of_isTypeNonI` (1179)、`isHall_subgroupOf_primeFactors_of_coprime_index` (1085)、
+`le_kernel_of_isMulCommutative_of_inf_ne_bot` (1162)、`typeI_U_le_fitting_of_coprime` (1196,
+basic_structure の sorried signature を cite)、`typeI_overNormalizer_U_le_fitting` (1267)、
+`q_not_dvd_kernel` (1645) 等。
 
-### 次 session 推奨着手
-(A) carrier enrich (上記、committable faithful 基盤) → basic_structure を 5 部で grind、または
-(B) hyp の raw フィールドで完結する leaf (`typeI_U_le_fitting_of_coprime` 様式) で clean な勝ち。
-正本 = この節。
+### frontier 全評価 (2026-06-23 lane-c, main マージ後) — 実 sorry 23 本は**全て cross-lane gated**
+clean な lane-local win は無い。内訳:
+- **基盤 (cross-lane carrier, lane-f)**: `basic_structure` (245, 上記訂正)、`sibleyTarget_S` (258, §14)、
+  `card_LF_coprime_pq` (1154, BG Thm E = F)、`exists_typeI_maximal_overNormalizer_U` の `hdisj`/`hUhall_cop`
+  (1303/1352, carrier faithfulness = F-ask)。
+- **char-theory (lane-b §3-13 char API)**: `character_degree_analysis` (300)、`lambda_forces_T_caseB` (309)、
+  `tiSubset_character_orthogonality` (332)、norm cascade (349/356/363/370)、`analytic_inequality` (379)、
+  `numeric_bounds` q=3 conjunct (523, p≥5 不在)、`c_eq_one` (529)、`caseA_parameters` (536)、
+  `caseB_order_u` (700)、`beta_support_norm_and_remainder` (1744)、`typeI_orthogonality_dichotomy` (1841)。
+- **§15 固有 Fitting 構造 (`|Q|=q^p` / chief factor、type-P carrier に bottom out)**: `card_Q_eq` (1115)、
+  `tConjugate_fitting_data` (1135)、`complement_inf_Q_structure` (1539)。`TypePData` は Fitting **位数**を
+  pin しない (`H = maxNilpotentNormalHall M` のみ) ので、これらは Singer rank + chief-factor 論を要し、
+  basic_structure の `P_order` と同じ carrier reconciliation に依存。
+- **§13 multi-obligation (lane-h 確認済)**: `normalizer_W1` (831, card_Q_eq + W₁⊆Q + Q# TI + d=1 + KW₂ Frobenius)。
+
+⟹ **lane-c の S15 frontier は現在 ungated closable Lean work が無い。要 HUB/ユーザー判断** (cross-lane enrich
+を誰が所有するか、または lane-c を別 FT-path セグメントへ再配置)。正本 = この節 + issue 4008。
+
+---
+
+## 🔧 POLE-1 TypePData carrier 構築 (2026-06-23 relane #3, issue 4008 = option A 裁定)
+
+hub が issue 4008 を **option A** で裁定 → lane-c が POLE-1 tp producer carrier を引き取り
+(`FeitThompson.lean` tp系 + `S14_TypePComplement.lean` complement 露出)。目標 = `Section16TypePStructure`
+に `Sdata`/`Tdata : TypePData` を carry させ、`basic_structure` の U-side 結論を carrier から実証明。
+
+### ✅ step 1: complement 性露出 (commit `1a807071`)
+`exists_aInvariant_complement_within_normal` (AInvariantComplement.lean) / `exists_kappaHall_invariant_complement_to_MF`
+(S14_TypePComplement.lean) の返り値に `M_F ⊓ U = ⊥` を追加 (内部 `IsComplement'` から、従来 `obtain ⟨U,-,…⟩` で破棄)。
+→ `typePData_of_isTypeP_of_inputs` の `hDcompl` 入力に必要。
+
+### ✅ step 2: sorry-free engine (commit `a82ca82a`)
+`typePData_of_kappaHall_hallComplement` (FeitThompson.lean):
+type-P M + cyclic κ-Hall K + K-invariant (κ∪σ)'-Hall complement U → `TypePData M` (`.W1 = K`, `.U = U` を
+definitionally 露出 = projection lemma `_W1`/`_U`)。全フィールドは lane-f の `typeP2_mf_internal_fitting_decomposition`
+/`isTypeP2_of_hall_subgroupOf_ne_bot`/`typeP_hall_derived_eq_and_abelian`/`typePData_of_isTypeP_of_inputs` で
+sorry-free に discharge (cite)。**`.W1=K` の rfl は term-mode 構成必須** (obtain/have の casesOn が lane-f の
+tactic-built def の projection reduce を阻む、[[lean-coupled-engine-fields-and-beta]])。
+
+### ✅ step 2.5: hUhall discharger (commit `f1d710a4`)
+`isHall_kappaSigmaCompl_of_isTypeP2_complement` (FeitThompson.lean, sorry-free): type-P2 M で carried U
+(M'=M_F⊔U, M_F⊓U=⊥) が (κ∪σ)'-Hall。証明: type-P2⟹M_F=M_σ; `typeP_exists_hall_derived_eq` が (κ∪σ)'-Hall
+U₀ (M'=U₀⊔M_σ) 供給; U と U₀ は共に normal M_σ を M' で complement ⟹ |M_σ|·|U|=|M'|=|M_σ|·|U₀| ⟹ |U|=|U₀|;
+IsHallSubgroup は order 決定 (`isHallSubgroup_of_card_eq` 新 helper) ⟹ U も (κ∪σ)'-Hall。支持 helper:
+`card_mul_card_of_complement_normal` (normal complement の card 積、`normal_mul`+`isComplement'_of_disjoint_and_mul_eq_univ`)。
+**Lean 知見**: `subgroupOf` は regular def ゆえ `← comap_inf` rw 不発 → `show … from (comap_inf _ _ _).symm` で
+defeq 強制; `hMFeq ▸ hUinf` を rw 引数にすると motive 不定 → `← hMFeq` で戻して `hUinf`。
+
+**⟹ carrier 核心機構 (engine + hUhall + helpers) 完成・全 sorry-free。** engine は type-P2 input で
+完全に invocable (step 1 が hUsup/hKnorm/hUinf 供給、step 2.5 が hUhall)。
+
+### ✅ step 2.7: carrier capstone (commit `a6faa39c`、main 同期で lane-f Prop 16.1 hP2II 取り込み済)
+**carrier 構成を単一 sorry-free lemma に集約完了。**
+- engine `typePData_of_kappaHall_hallComplement` を **`hP2` 直接入力に refactor** (旧 hP+hUne →
+  hP2; type-P2 input なら `isTypeP2_of_hall...` 不要ゆえ hUne wart 除去、`typeP2_mf_internal` は hP2 直取り)。
+- **compose lemma `exists_typePData_W1_eq_of_isTypeP2`** (sorry-free): `type-P2 M + cyclic κ-Hall K →
+  ∃ data : TypePData M, data.W1 = K` = exists_kappaHall_invariant_complement_to_MF + step 2.5 hUhall + engine。
+  **step 3 wiring が consume する「ready」形** (指定 κ-Hall を W1 に持つ matched TypePData)。
+
+⟹ **diagnosis が特定した U-reconciliation (元の blocker) の構成機構が完全に sorry-free で完成。**
+
+### 🚧 残 step 3 gate = (13.2.a) producer type 判定 (deep、要 hub/lane-f 判断)
+**唯一の gate**: producer (`section16TypePStructure_of_isMinimalSimpleOdd`) で `exists_typePData_W1_eq_of_isTypeP2`
+を mp.S に適用するには **mp.S が type-P2** が要る。pair 構成 (`exists_section16MaximalPair_data`, lane-f) は
+`IsTypeP2 S ∨ IsTypeP2 Mstar` (FeitThompson.lean:356) **disjunction のみ**で、どちらか不明。q<p (mp.K_lt_Kstar)
+で「smaller κ-Hall member = S が type-P2」を resolve するのが **Pf (13.2.a)「q<p ⟹ S type II」**だが、これは:
+- producer 文脈で必要 (basic_structure の上流ゆえ basic_structure では供給不可、循環)、かつ
+- 証明に §15-16 type 構造を要する deep result (現状未形式化)。
+**⟹ (13.2.a) は lane-f の §16 pair 構成 (disjunction を ordering で resolve) で閉じるのが自然か、
+lane-c §15 か = cross-lane 判断。lane-f が Prop 16.1 を進行中ゆえ、その完成で resolve する可能性。**
+**carrier 機構は完成・consume 待ち; (13.2.a) landing で step 3 wiring は機械的。**
+
+### 🔜 step 3 wiring (gate 解消後)
+1. **compose**: `exists_typePData_W1_eq_of_isTypeP2 (hP2) (K κ-Hall) : ∃ data : TypePData M, data.W1=K`
+   = exists_kappaHall_invariant_complement_to_MF + step 2.5 hUhall + engine。残 sub-gate = `hUne` (U≠⊥;
+   type-P2 ⟹ M_σ≠M' ⟹ U≠⊥、要小 lemma)。
+2. **(13.2.a) type 判定 (producer gate)**: producer で engine を mp.S に適用するには **mp.S が type-P2 (=type II)**
+   が要る。§16 carrier は q<p (`q_lt_p`) を持ち Pf (13.2.a)「q<p⟹S type II」だが、これは `BasicStructureData.q_lt_p_forces_typeII`
+   field = basic_structure 自身。**producer で独立に「q<p (= smaller κ-Hall member) ⟹ type-P2」を要する**
+   (Prop 16.1(b) の `IsTypeP2 S ∨ IsTypeP2 Mstar` disjunction を ordering で resolve、BG §16 の deep result、要調査)。
+3. **wiring**: `Section16TypePStructure` に `Sdata`/`Tdata : TypePData` (+ `.U=U`/`.W1=K` reconciliation、
+   engine `_W1`/`_U`) → producer で compose 呼び出し → `Section16Inputs`+`sectionSixteenHypothesis_of_inputs`+
+   `S15.Hypothesis` に thread → `S15.basic_structure` の `UW1_frobenius`/`U_commutative` を carried `Sdata` から
+   実証明 (`typeP_uW1_frobenius`)。**注意**: basic_structure の他 field (type 判定, P el-ab p^q, u 上界) は
+   carrier と別の deep obligation; carrier は U-side (UW1_frobenius/U_commutative = 診断が特定した元の blocker) を解く。
+4. **co-edit 境界** (FeitThompson.lean は F/B/C 共有、def 単位): C=tp系 / F=mp+Prop16.1 / B=cd。互いに別 def。
 
 ---
 

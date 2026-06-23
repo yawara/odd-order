@@ -82,7 +82,8 @@ theorem exists_aInvariant_complement_within_normal {G : Type*} [Group G] [Finite
     (hK_norm_N : K ≤ Subgroup.normalizer (N : Set G))
     (hN_hall : IsHallSubgroup (Nat.card ↥N).primeFactors (N.subgroupOf M'))
     (hCop : Nat.Coprime (Nat.card ↥K) (Nat.card ↥M')) :
-    ∃ U : Subgroup G, U ≤ M' ∧ N ⊔ U = M' ∧ K ≤ Subgroup.normalizer (U : Set G) := by
+    ∃ U : Subgroup G, U ≤ M' ∧ N ⊔ U = M' ∧ K ≤ Subgroup.normalizer (U : Set G) ∧
+      N ⊓ U = ⊥ := by
   classical
   -- The conjugation action of `K` on `M'` (via the normalizer monoid hom).
   set φ : ↥K →* MulAut ↥M' :=
@@ -109,7 +110,7 @@ theorem exists_aInvariant_complement_within_normal {G : Type*} [Group G] [Finite
   -- Apply the invariant Schur–Zassenhaus complement.
   obtain ⟨U', hU'compl, hU'inv⟩ :=
     exists_aInvariant_complement_of_normal_isHall hCop hN'_inv hhall
-  refine ⟨U'.map M'.subtype, Subgroup.map_subtype_le U', ?_, ?_⟩
+  refine ⟨U'.map M'.subtype, Subgroup.map_subtype_le U', ?_, ?_, ?_⟩
   · -- `N ⊔ U'.map M'.subtype = M'`, by mapping the complement equality `N' ⊔ U' = ⊤` up to `M'`.
     have hsup : (N.subgroupOf M') ⊔ U' = ⊤ := hU'compl.sup_eq_top
     have := congrArg (Subgroup.map M'.subtype) hsup
@@ -118,5 +119,10 @@ theorem exists_aInvariant_complement_within_normal {G : Type*} [Group G] [Finite
   · -- `K ≤ N_G(U'.map M'.subtype)`, from `φ`-invariance of `U'` and `φ a` = conjugation.
     intro k hk
     exact OddOrder.BG.Ch1.S03f.mem_normalizer_map_subtype_of_smul_val hU'inv (hφval ⟨k, hk⟩)
+  · -- `N ⊓ U'.map M'.subtype = ⊥`, mapping the complement disjointness `N' ⊓ U' = ⊥` up to `M'`.
+    have hdisj : (N.subgroupOf M') ⊓ U' = ⊥ := disjoint_iff.mp hU'compl.disjoint
+    have := congrArg (Subgroup.map M'.subtype) hdisj
+    rwa [Subgroup.map_inf _ _ M'.subtype M'.subtype_injective, Subgroup.subgroupOf_map_subtype,
+      inf_eq_left.mpr hN_le, Subgroup.map_bot] at this
 
 end OddOrder.GroupTheory

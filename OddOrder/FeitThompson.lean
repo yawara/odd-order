@@ -425,6 +425,172 @@ noncomputable def section16MaximalPair_of_isMinimalSimpleOdd {G : Type*} [Group 
       Z_cyclic := hZcyc
       K_lt_Kstar := hKlt }
 
+/-- `IsHallSubgroup` is order-determined: equal cardinality transfers the Hall property
+(`H.index` is `|ambient| / |H|`, so equal `|H|` gives equal index, and both Hall conditions are
+prime-factor conditions on `|H|` and `H.index`). -/
+theorem isHallSubgroup_of_card_eq {H : Type*} [Group H] [Finite H] {π : Set ℕ}
+    {A B : Subgroup H} (hB : Ch03.IsHallSubgroup π B) (hc : Nat.card A = Nat.card B) :
+    Ch03.IsHallSubgroup π A := by
+  have hidx : A.index = B.index := by
+    have key : Nat.card A * A.index = Nat.card B * B.index := by
+      rw [Subgroup.card_mul_index, Subgroup.card_mul_index]
+    rw [hc] at key
+    exact Nat.eq_of_mul_eq_mul_left Nat.card_pos key
+  exact ⟨fun p hp => hB.1 p (hc ▸ hp), fun p hp => hB.2 p (hidx ▸ hp)⟩
+
+/-- A subgroup `V` complementing the normal `N` in `H` (`N ⊓ V = ⊥`, `N ⊔ V = ⊤`) has
+`|N| * |V| = |H|` — built as an `IsComplement'` (normal product is the join). -/
+theorem card_mul_card_of_complement_normal {H : Type*} [Group H] [Finite H] {N V : Subgroup H}
+    [N.Normal] (hinf : N ⊓ V = ⊥) (hsup : N ⊔ V = ⊤) :
+    Nat.card N * Nat.card V = Nat.card H :=
+  (Subgroup.isComplement'_of_disjoint_and_mul_eq_univ (disjoint_iff.mpr hinf)
+    (by rw [← Subgroup.normal_mul, hsup, Subgroup.coe_top])).card_mul
+
+/-- **The `K`-invariant complement `U` to `M_F` is the `(κ∪σ)'`-Hall** (type-`P₂`; POLE-1 carrier,
+issue 4008).  For a type-`P₂` maximal subgroup `M`, `M_F = M_σ`, and the complement `U` to `M_σ` in
+`M'` produced by `exists_kappaHall_invariant_complement_to_MF` shares the order `[M':M_σ]` with the
+`(κ∪σ)'`-Hall of `typeP_exists_hall_derived_eq` (which also complements `M_σ` in `M'`).  Since
+`IsHallSubgroup` is order-determined (`isHallSubgroup_of_card_eq`), `U` is the `(κ∪σ)'`-Hall.  This
+discharges the `hUhall` hypothesis of `typePData_of_kappaHall_hallComplement` for the canonical
+type-`II` (= type-`P₂`) member of the §16 maximal pair. -/
+theorem isHall_kappaSigmaCompl_of_isTypeP2_complement {G : Type*} [Group G] [Finite G]
+    (hG : IsMinimalSimpleOdd G) {M U : Subgroup G}
+    (hM : M ∈ maximalSubgroups G) (hP2 : BG.Ch4.S14.IsTypeP2 M) (hUM : U ≤ M)
+    (hUsup : derivedInG M = maxNilpotentNormalHall M ⊔ U)
+    (hUinf : maxNilpotentNormalHall M ⊓ U = ⊥) :
+    Ch03.IsHallSubgroup ((BG.Ch4.S14.kappa M ∪ BG.Ch3.S10.sigma M)ᶜ) (U.subgroupOf M) := by
+  -- `M_F = M_σ` (type-`P₂`: `M_σ` nilpotent), and a `(κ∪σ)'`-Hall `U₀` with `M' = U₀ ⊔ M_σ`.
+  have hMFeq : maxNilpotentNormalHall M = BG.Ch3.S10.Msigma M :=
+    (BG.Ch4.S15.maxNilpotentNormalHall_eq_Msigma_iff_isNilpotent hG hM).mpr
+      (BG.Ch4.S14.msigma_isNilpotent_of_isTypeP2 hG hM hP2)
+  obtain ⟨U₀, hU₀hall, hU₀sup⟩ := BG.Ch4.S16.typeP_exists_hall_derived_eq hG hM hP2.1
+  -- containments in `M'`
+  have hMσM' : BG.Ch3.S10.Msigma M ≤ derivedInG M := hMFeq ▸ hUsup ▸ le_sup_left
+  have hUM' : U ≤ derivedInG M := hUsup ▸ le_sup_right
+  have hU₀M' : U₀ ≤ derivedInG M := hU₀sup ▸ le_sup_left
+  -- `M_σ` is normal in `M'` (it is normal in `M ⊇ M'`).
+  have hMnorm : M ≤ Subgroup.normalizer (BG.Ch3.S10.Msigma M : Set G) := by
+    rw [BG.Ch3.S10.Msigma]
+    exact OddOrder.GroupTheory.le_normalizer_opiCoreInG (BG.Ch3.S10.sigma M) M
+  haveI hMσ'normal : ((BG.Ch3.S10.Msigma M).subgroupOf (derivedInG M)).Normal :=
+    (Subgroup.normal_subgroupOf_iff_le_normalizer hMσM').mpr
+      ((Subgroup.map_subtype_le _).trans hMnorm)
+  -- `M_σ ⊓ U₀ = ⊥` by coprimality (`|U₀|` a `(κ∪σ)'`-number, `|M_σ|` a `σ`-number).
+  have hMσHall : Ch03.IsHallSubgroup (BG.Ch3.S10.sigma M) ((BG.Ch3.S10.Msigma M).subgroupOf M) :=
+    BG.Ch3.S10.Msigma_subgroupOf_isHall hG hM
+  have hcopU₀ : Nat.Coprime (Nat.card ↥U₀) (Nat.card ↥(BG.Ch3.S10.Msigma M)) := by
+    refine Ch03.Nat.coprime_of_isPiGroup_of_isPiGroup_compl
+      (π := (BG.Ch4.S14.kappa M ∪ BG.Ch3.S10.sigma M)ᶜ) Nat.card_pos.ne' Nat.card_pos.ne' ?_ ?_
+    · intro p hp
+      exact hU₀hall.1 p (by rwa [Nat.card_congr (Subgroup.subgroupOfEquivOfLe
+        (le_trans hU₀M' (Subgroup.map_subtype_le _))).toEquiv])
+    · intro p _ hpc
+      exact hpc (Or.inr (hMσHall.1 p (by rwa [Nat.card_congr
+        (Subgroup.subgroupOfEquivOfLe (BG.Ch3.S10.Msigma_le M)).toEquiv])))
+  -- both `U`, `U₀` complement the normal `M_σ` in `M'`: `|M_σ|·|U| = |M'| = |M_σ|·|U₀|`, so `|U|=|U₀|`.
+  have hsupU : (BG.Ch3.S10.Msigma M).subgroupOf (derivedInG M) ⊔ U.subgroupOf (derivedInG M) = ⊤ := by
+    rw [← Subgroup.subgroupOf_sup hMσM' hUM', ← hMFeq, ← hUsup, Subgroup.subgroupOf_self]
+  have hinfU : (BG.Ch3.S10.Msigma M).subgroupOf (derivedInG M) ⊓ U.subgroupOf (derivedInG M) = ⊥ := by
+    rw [show (BG.Ch3.S10.Msigma M).subgroupOf (derivedInG M) ⊓ U.subgroupOf (derivedInG M)
+        = (BG.Ch3.S10.Msigma M ⊓ U).subgroupOf (derivedInG M) from (Subgroup.comap_inf _ _ _).symm,
+      ← hMFeq, hUinf, Subgroup.bot_subgroupOf]
+  have hsupU₀ : (BG.Ch3.S10.Msigma M).subgroupOf (derivedInG M) ⊔ U₀.subgroupOf (derivedInG M) = ⊤ := by
+    rw [← Subgroup.subgroupOf_sup hMσM' hU₀M', sup_comm, ← hU₀sup, Subgroup.subgroupOf_self]
+  have hinfU₀ : (BG.Ch3.S10.Msigma M).subgroupOf (derivedInG M) ⊓ U₀.subgroupOf (derivedInG M) = ⊥ := by
+    rw [show (BG.Ch3.S10.Msigma M).subgroupOf (derivedInG M) ⊓ U₀.subgroupOf (derivedInG M)
+        = (BG.Ch3.S10.Msigma M ⊓ U₀).subgroupOf (derivedInG M) from (Subgroup.comap_inf _ _ _).symm,
+      Subgroup.inf_eq_bot_of_coprime (by rw [Nat.coprime_comm]; exact hcopU₀), Subgroup.bot_subgroupOf]
+  have hcU := card_mul_card_of_complement_normal hinfU hsupU
+  have hcU₀ := card_mul_card_of_complement_normal hinfU₀ hsupU₀
+  have hcard : Nat.card ↥(U.subgroupOf (derivedInG M)) = Nat.card ↥(U₀.subgroupOf (derivedInG M)) :=
+    Nat.eq_of_mul_eq_mul_left Nat.card_pos (hcU.trans hcU₀.symm)
+  -- transfer the Hall property from `U₀` (order-determined).
+  refine isHallSubgroup_of_card_eq (B := U₀.subgroupOf M) hU₀hall ?_
+  rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hUM).toEquiv,
+    Nat.card_congr (Subgroup.subgroupOfEquivOfLe (le_trans hU₀M' (Subgroup.map_subtype_le _))).toEquiv,
+    ← Nat.card_congr (Subgroup.subgroupOfEquivOfLe hUM').toEquiv,
+    ← Nat.card_congr (Subgroup.subgroupOfEquivOfLe hU₀M').toEquiv, hcard]
+
+open scoped IsMulCommutative in
+/-- **`TypePData M` from a `K`-invariant `(κ∪σ)'`-Hall complement `U`** (`sorry`-free engine;
+POLE-1 carrier, issue 4008).
+
+Given a type-`P` maximal subgroup `M`, its cyclic κ-Hall `K`, and a `(κ∪σ)'`-Hall complement `U`
+*normalised by* `K` (`hKnorm`), this assembles the Peterfalvi type-`P` datum `TypePData M` with the
+**chosen** factors `data.W₁ = K`, `data.U = U` (definitionally — `…_W1`/`…_U`).  This is the
+*complement-specified* constructor that `typePData_of_isTypeNonI` cannot provide (it builds its own
+`U`), so it lets the §16 `Section16TypePStructure` carry a `TypePData` whose `W₁`/`U` agree with the
+maximal-pair factors — unblocking Peterfalvi `basic_structure` (13.2).
+
+All structural fields are discharged through lane-f's BG §14/15/16 machinery (sorry-free, cited):
+`typeP2_mf_internal_fitting_decomposition` (the deep `M'`-complement/Fitting fields) and
+`typeP_hall_derived_eq_and_abelian` (`U` abelian, hence nilpotent), fed to
+`typePData_of_isTypeP_of_inputs`.  The two structural hypotheses — `K ≤ N_G(U)` and that `U` is the
+`(κ∪σ)'`-Hall — are the residual obligations discharged for the canonical pair by
+`exists_kappaHall_invariant_complement_to_MF` (`K ≤ N_G(U)`) and
+`isHall_kappaSigmaCompl_of_isTypeP2_complement` (the `(κ∪σ)'`-Hall property), bundled in
+`exists_typePData_W1_eq_of_isTypeP2`. -/
+noncomputable def typePData_of_kappaHall_hallComplement {G : Type*} [Group G] [Finite G]
+    (hG : IsMinimalSimpleOdd G) {M K U : Subgroup G}
+    (hM : M ∈ maximalSubgroups G) (hP2 : BG.Ch4.S14.IsTypeP2 M) (hKM : K ≤ M) (hKne : K ≠ ⊥)
+    (hK : Ch03.IsHallSubgroup (BG.Ch4.S14.kappa M) (K.subgroupOf M)) (hUM : U ≤ M)
+    (hUhall : Ch03.IsHallSubgroup ((BG.Ch4.S14.kappa M ∪ BG.Ch3.S10.sigma M)ᶜ) (U.subgroupOf M))
+    (hKnorm : K ≤ Subgroup.normalizer (U : Set G)) :
+    TypePData M :=
+  -- Term-mode (no `obtain`/`have` casesOn) so the `.W₁ = K`/`.U = U` projections reduce
+  -- definitionally past lane-f's tactic-built `typePData_of_isTypeP_of_inputs`
+  -- (memory: coupled engine fields + beta).
+  let hdec := BG.Ch4.S15.typeP2_mf_internal_fitting_decomposition hG hM hP2 hKM hUM hKne hK hUhall
+  let hM'ab := BG.Ch4.S15.typeP_hall_derived_eq_and_abelian hG hM hKM hUM hKne hK hUhall
+  BG.Ch4.S16.typePData_of_isTypeP_of_inputs hG hM hP2.1 hKM hKne hK
+    (le_sup_left.trans_eq hM'ab.1.symm) hKnorm
+    (haveI := hM'ab.2; (inferInstance : Group.IsNilpotent ↥U))
+    hdec.1 hdec.2.1 hdec.2.2
+
+/-- The chosen cyclic factor: `data.W₁ = K` (definitional). -/
+theorem typePData_of_kappaHall_hallComplement_W1 {G : Type*} [Group G] [Finite G]
+    (hG : IsMinimalSimpleOdd G) {M K U : Subgroup G}
+    (hM : M ∈ maximalSubgroups G) (hP2 : BG.Ch4.S14.IsTypeP2 M) (hKM : K ≤ M) (hKne : K ≠ ⊥)
+    (hK : Ch03.IsHallSubgroup (BG.Ch4.S14.kappa M) (K.subgroupOf M)) (hUM : U ≤ M)
+    (hUhall : Ch03.IsHallSubgroup ((BG.Ch4.S14.kappa M ∪ BG.Ch3.S10.sigma M)ᶜ) (U.subgroupOf M))
+    (hKnorm : K ≤ Subgroup.normalizer (U : Set G)) :
+    (typePData_of_kappaHall_hallComplement hG hM hP2 hKM hKne hK hUM hUhall hKnorm).W1 = K := by
+  unfold typePData_of_kappaHall_hallComplement
+    BG.Ch4.S16.typePData_of_isTypeP_of_inputs BG.Ch4.S16.typePData_of_inputs
+  rfl
+
+/-- The chosen complement: `data.U = U` (definitional). -/
+theorem typePData_of_kappaHall_hallComplement_U {G : Type*} [Group G] [Finite G]
+    (hG : IsMinimalSimpleOdd G) {M K U : Subgroup G}
+    (hM : M ∈ maximalSubgroups G) (hP2 : BG.Ch4.S14.IsTypeP2 M) (hKM : K ≤ M) (hKne : K ≠ ⊥)
+    (hK : Ch03.IsHallSubgroup (BG.Ch4.S14.kappa M) (K.subgroupOf M)) (hUM : U ≤ M)
+    (hUhall : Ch03.IsHallSubgroup ((BG.Ch4.S14.kappa M ∪ BG.Ch3.S10.sigma M)ᶜ) (U.subgroupOf M))
+    (hKnorm : K ≤ Subgroup.normalizer (U : Set G)) :
+    (typePData_of_kappaHall_hallComplement hG hM hP2 hKM hKne hK hUM hUhall hKnorm).U = U := by
+  unfold typePData_of_kappaHall_hallComplement
+    BG.Ch4.S16.typePData_of_isTypeP_of_inputs BG.Ch4.S16.typePData_of_inputs
+  rfl
+
+/-- **Matched `TypePData` for a type-`P₂` maximal subgroup** (`sorry`-free; POLE-1 carrier, issue
+4008).  Given a type-`P₂` maximal subgroup `M` and a cyclic κ-Hall `K`, the κ-Hall-invariant
+complement `U` to `M_F` in `M'` (`exists_kappaHall_invariant_complement_to_MF`, supplying
+`K ≤ N_G(U)`) is the `(κ∪σ)'`-Hall (`isHall_kappaSigmaCompl_of_isTypeP2_complement`), so
+`typePData_of_kappaHall_hallComplement` produces a `TypePData M` with the **chosen** factor
+`data.W₁ = K`.  This is the bridge the §16 producer needs to carry a `TypePData mp.S` whose `W₁` is
+the maximal-pair κ-Hall `mp.K` — the last carrier step before Peterfalvi `basic_structure` (13.2),
+the residual gate being only that the type-II member `mp.S` of the pair is type-`P₂` (Pf (13.2.a)). -/
+theorem exists_typePData_W1_eq_of_isTypeP2 {G : Type*} [Group G] [Finite G]
+    (hG : IsMinimalSimpleOdd G) {M K : Subgroup G}
+    (hM : M ∈ maximalSubgroups G) (hP2 : BG.Ch4.S14.IsTypeP2 M) (hKM : K ≤ M) (hKne : K ≠ ⊥)
+    (hK : Ch03.IsHallSubgroup (BG.Ch4.S14.kappa M) (K.subgroupOf M)) [IsCyclic ↥K] :
+    ∃ data : TypePData M, data.W1 = K := by
+  obtain ⟨U, hUsup, hKnorm, hUinf⟩ :=
+    BG.Ch4.S14.exists_kappaHall_invariant_complement_to_MF hG hM hP2.1 hKM hK
+  have hUM : U ≤ M := (le_sup_right.trans_eq hUsup.symm).trans (Subgroup.map_subtype_le _)
+  have hUhall := isHall_kappaSigmaCompl_of_isTypeP2_complement hG hM hP2 hUM hUsup hUinf
+  exact ⟨typePData_of_kappaHall_hallComplement hG hM hP2 hKM hKne hK hUM hUhall hKnorm,
+    typePData_of_kappaHall_hallComplement_W1 hG hM hP2 hKM hKne hK hUM hUhall hKnorm⟩
+
 /-- **Type-P structure engine from the type data** (`sorry`-free, gated-endpoint skeleton).
 
 Given the Peterfalvi type data (`TypePData`) of both members of the maximal pair, this assembles
@@ -558,7 +724,7 @@ noncomputable def section16TypePStructure_of_isMinimalSimpleOdd {G : Type*} [Gro
     mp.T_maximal mp.T_typeP mp.Kstar_le_T mp.Kstar_hall
   exact section16TypePStructure_of_components mp.K mp.Kstar hScompl.choose hTcompl.choose
     hScompl.choose_spec.1 hTcompl.choose_spec.1 hprimes.1 hprimes.2
-    hWjoin hWcyc hbot hcomm hScompl.choose_spec.2 hTcompl.choose_spec.2 mp.K_lt_Kstar
+    hWjoin hWcyc hbot hcomm hScompl.choose_spec.2.1 hTcompl.choose_spec.2.1 mp.K_lt_Kstar
 
 /-- **Certain-type §6 hypothesis from κ-Hall pairing data** — *lane-b* (cd producer building block).
 
