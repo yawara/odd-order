@@ -73,11 +73,35 @@ hKM hK hKstar hKcyc hKstarcyc hKstarne : S06.Hypothesis ↥M` — type-P 極大 
 - **適用**: `(mp.S; K=mp.K, K*=mp.Kstar)` と swap した `(mp.T; K=mp.Kstar, K*=mp.K)` で 2 member 分。
   全引数 mp から: mp.S_maximal/S_typeP/K_le_S/K_hall/Kstar_eq、Z_cyclic から IsCyclic、K_lt_Kstar から K*≠⊥。
 
-**残り Step B–E** (cd producer 本体): B=grid 定義 (ω=h.chiColumn on tp.W (=h.W₁⊔h.W₂=mp.K⊔mp.Kstar の subgroupOf S
-と defeq)、μ=columnFamily.mu、δ=sign、ν/δ' は T-side で row/col swap)、C=`mu_definition`/`nu_definition` を
-`S06.induce_chiColumn_diff_mu_diff` + compHom transport で discharge、D=Sset/Tset=inducedFamily・A0=supportInSubgroup・
-tauS/tauT/tau3=Dade map、E=`Section16CharacterData` に pack。**B の compHom transport (cd.omega on tp.W ↔ chiColumn
-on tp.W.subgroupOf S) が次の主作業** (FeitThompson に `import S06_MuColumnBridge` 要)。
+**残り Step B–E** (cd producer 本体): B=grid 定義 (ω=h.chiColumn on tp.W、μ=columnFamily.mu、δ=sign、ν/δ' は
+T-side で row/col swap)、C=`mu_definition`/`nu_definition` を `S06.induce_chiColumn_diff_mu_diff` + compHom transport
+で discharge、D=Sset/Tset=inducedFamily・A0=supportInSubgroup・tauS/tauT/tau3=Dade map、E=`Section16CharacterData`
+に pack。FeitThompson に `import S06_MuColumnBridge` 要。
+
+### ✅ 更新¹⁶ (2026-06-23) — certainTypeS/T landed + ⚠ **architectural gap: tp.W₁ が mp.K に未 pin (cross-lane)**
+
+**landed (build-green + axiom-clean)**: `Section16MaximalPair.certainTypeS`/`certainTypeT` (FeitThompson.lean) —
+Step A を mp に wire (S-side W₁=mp.K, T-side W₁=mp.Kstar、引数全て mp から、nontriviality=card_kappaHall_ne_one)。
+cd producer の 2 member grid source。
+
+**⚠ 判明した architectural gap (cd producer の真の blocker)**: cd producer は**任意の**
+`tp : Section16TypePStructure mp` を取るが、grid は **tp.W₁ で index** される必要がある (mu_definition は
+tp.W₁-direction が row)。一方 certainTypeS の grid は **mp.K で index**。両者は:
+- **tp.W₁ = mp.K であるべき** (S の自然な exceptional char 分解 = κ-Hall complement 方向)。
+- だが `Section16TypePStructure` に **W₁ を mp.K に pin する field が無い** (W₁ は prime cyclic factor of W=S∩T
+  という制約のみ; mp.K と**共役だが等しい保証なし**)。
+- 実 `tp = section16TypePStructure_of_isMinimalSimpleOdd hG mp` は `_of_components mp.K mp.Kstar` で W₁:=mp.K と
+  **真には設定している**が、producer の `obtain`/casesOn が reduction を block ⟹ **`tp.W₁ = mp.K` が rfl 不可**
+  (実証: cd に `(hW1 : tp.W₁=mp.K)` 追加 + section16Inputs で `rfl` → type mismatch)。
+
+**∴ cross-lane**: tp producer (`section16TypePStructure_of_*`) は **POLE-1 tp[F] = lane-f 所有**。cd (lane-b) が
+grid を組むには tp が `tp.W₁ = mp.K` (and W₂=mp.Kstar) を accessibly 露出する要 — Section16TypePStructure に
+field 追加 (producer は rfl で discharge) or 補題提供。**HUB issue 起票済 (lane-f 宛)**。
+- 回避案 (lane-b 単独): cd を `(hW1: tp.W₁=mp.K) (hW2: tp.W₂=mp.Kstar)` 条件付きにし Step B-E を hW1/hW2 仮定で
+  genuine に組む → 残 sorry = section16Inputs での hW1/hW2 discharge (lane-f obligation)。grid transport の本作業は
+  この hyp 下で進められる。
+- **W は OK**: tp.W = mp.S⊓mp.T = mp.K⊔mp.Kstar (`typeP_pair_W_structure` hWjoin) ⟹ cd.omega の codomain tp.W は
+  mp.K の certain-type W と一致 (subgroup 等式で transport)。問題は **W₁/W₂ の direction (index)** のみ。
 
 ## ✅✅✅✅✅✅ 2026-06-23 更新¹⁴ — **Pf (10.6) + (2.7) + (10.9) COMPLETE** (1 session, sorry 5→3)
 
