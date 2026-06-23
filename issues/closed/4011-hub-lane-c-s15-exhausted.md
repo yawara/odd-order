@@ -63,3 +63,11 @@ lane-c は self-resume monitor で解決を検知し自動再開する。
 - 旧 lane-c 宛 issue: 4001 (s16 frontier), 4003 (η-grid carrier), 4004 (T/V duals) — relane 前
 - POLE-1 = [[ft-endgame-two-poles]] / issue 4008 (CLOSED)
 - 本セッション commits: 7eeb4555 / b0a60fbe / b934221a / f38065ac / 44762d03
+
+## 2026-06-23 RESOLVED (ユーザー裁可) — option 1: char ボトルネック支援に再配置
+
+hub がユーザーに 4 案を上げ、ユーザー選択 = **char ボトルネック支援に再配置**。carve:
+- **S13_MaximalIII_IV.lean を lane-h→C 移譲** (issue 2018、Pf §13 char-directions)。
+- **card_kappaHall_lt_of_isTypeP1 を lane-b→C 移譲** (issue 2020、POLE-1 バレ sorry、FeitThompson def 単位)。
+lane-b 能動ファイル (S12 / cd) 非衝突、FT critical path 直結。§15 S15_SAndT は driver/await に降格。
+LAUNCH.md (lane-c, lane-h) 更新済 + merge_monitor relane #6。lane-c は self-resume で自動再開。CLOSED。

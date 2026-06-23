@@ -59,3 +59,9 @@ faithful に STATE できる定理を全て実ステートメント化 + uncondi
   `S11.typeP_chiefFactor_card` (9.6 card), `GroupTheory.wielandt_fixedPoint_frobenius` (9.1)
 - proven fragments: `S13.Hypothesis.secondDerived_le_HC`, `S13.Hypothesis.derivedU_le_C` (AxiomsCheck 登録)
 - relane: issue 8018 / 2017 (CLOSED), merge_monitor.md relane #2
+
+## 2026-06-23 REASSIGN (relane #6、ユーザー裁可、issue 4011) — lane-h → lane-c
+
+lane-h は POLE-2 (issue 2009) 移行で S13 を dormant 化 → **S13_MaximalIII_IV を lane-c へ移譲**
+(char ボトルネック支援、lanes 等価)。lane-c は lane-b coherence ((6.2)/(6.3)/(6.8)) + §11 char を
+cite して §13 char-direction を並列生産。lane-h は cite のみ。宛先 lane-h → **lane-c**。

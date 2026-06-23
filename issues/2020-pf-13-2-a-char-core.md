@@ -77,3 +77,11 @@ lane-b 領域。文献に証明あり ([[feedback-dont-mislabel-formalization-as
   issue 2018 (§13 char gate map), issue 2010 (Pf §10-13 cite-split)
 - 原典: Pf (13.2.a)/(10.10)/(11.9.b) = `references/peterfalvi/04.15_*` / `04.12_*` / `04.13_*`
 - repo 対応: (10.10)→S12, (11.7)/(11.9)→S13 (lane-h 所有、構造片は landed、character 核は未)
+
+## 2026-06-23 REASSIGN (relane #6、ユーザー裁可、issue 4011) — lane-b → lane-c
+
+hub 統合レビューで lane-c の §15 枯渇 → ユーザー裁可「char ボトルネック支援に再配置」。
+本 obligation (card_kappaHall_lt_of_isTypeP1、POLE-1 残バレ sorry) を **lane-c が引き取り**
+(FeitThompson def 単位 C=tp+card_kappaHall)。証明 = `no_typeV_maximal` (S12:5767、Thm 10.10) cite +
+S13 (11.9.b) coherence/norm cite で (13.2.a) reduction。S13 も lane-c 所有 (issue 2018 移譲) ゆえ
+(11.9.b) signature 整備も lane-c 内で可能。宛先 lane-b → **lane-c**。
