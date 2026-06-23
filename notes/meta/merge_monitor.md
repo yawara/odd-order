@@ -54,6 +54,15 @@ productive な独立クラスタに乗せ、上流優先方針 (CLAUDE.md) に�
 > F は hderF/Prop16.1 に集中・tp carrier は cite のみ・mp は F のまま。FeitThompson.lean は def 単位で F=mp+Prop16.1 /
 > B=cd / C=tp の 3 者共有。lanes 等価ゆえ carrier 作業も C 可 [[lanes-are-equivalent-no-specialty]]。
 
+> **⚠ 2026-06-23 relane #4 (ユーザー裁可、issue 2019+4009)**: lane-c の POLE-1 carrier 機構が完成
+> (`exists_typePData_W1_eq_of_isTypeP2` sorry-free) → 残る wiring gate = `IsTypeP2 mp.S` (Pf (13.2.a)
+> 「q<p ⟹ S type-P2」)。同時に lane-h が §13 clean work 完遂で starve (issue 2019)。**両者を 1 割当で解決:
+> lane-h が (13.2.a) を担当** (FeitThompson.lean で証明 + tp producer に IsTypeP2 mp.S 供給)。type-determination
+> ゆえ lane-h type 構造の延長・§6 char (B) 非衝突・critical path 直結。**owned_re 変更なし** (FeitThompson は
+> 既に shared)。FeitThompson.lean は def 単位 **F=mp+Prop16.1 / B=cd / C=tp / H=(13.2.a)** の 4 者共有。
+> lane-h が (13.2.a) に要する BG §15-16 下流補題は lane-f に notes/issue で依頼 (F が BG owner)。
+> 完了で lane-c が carrier wiring (step 3) 機械的に進む → §15 unblock + POLE-1。
+
 **signature-first interface**: 上流が sorried signature を export → 下流が cite。真の cross-lane 依存は narrow。
 signature 不足は notes/issue 経由。**driver (§16/§10)**: 常駐レーンを当てず、上流が landing したとき hub or
 担当レーンが続けて opportunistic に close する (pure consumer ゆえ常駐は starve)。
@@ -142,7 +151,7 @@ branch とも削除済み。旧 **A** / **D** も同様に退役済み (履歴�
 > | **B** (lane-b) | `OddOrder/Peterfalvi/S0[3-9]*` + `S10*` + `S12*`（Pf char API + §12 + cd assembly; **S11/S13 除く**, 2026-06-23 S13 を H 移譲） |
 > | **H** (lane-h) | `OddOrder/Peterfalvi/S13*` (active) + `S14_MaximalI*` (driver)（type III/IV char-grid + type I driver; 2026-06-23 S13 受領, S15 を C 移譲） |
 > | **C** (lane-c) | `OddOrder/Peterfalvi/S15*` (S&T, consumer) **+ POLE-1 carrier (2026-06-23 relane #3, issue 4008)**: `S14_TypePComplement.lean` + `FeitThompson.lean` の **tp 系 def** (`Section16TypePStructure`/`section16TypePStructure_*`/`Section16Inputs` tp) |
-> | **共有（全 lane 可）** | `OddOrder/AxiomsCheck.lean` / `OddOrder.lean` / `OddOrder/GroupTheory/**` / **`OddOrder/FeitThompson.lean`** (def 単位 F=mp+Prop16.1 / B=cd / C=tp) / `notes/**` / `issues/**` |
+> | **共有（全 lane 可）** | `OddOrder/AxiomsCheck.lean` / `OddOrder.lean` / `OddOrder/GroupTheory/**` / **`OddOrder/FeitThompson.lean`** (def 単位 F=mp+Prop16.1 / B=cd / C=tp / H=(13.2.a) IsTypeP2 mp.S) / `notes/**` / `issues/**` |
 
 1. 各レーンの未マージ確認: `git log --oneline main..<branch>`。
    **全レーン 0 なら「変化なし」1行報告で即終了**（build を走らせない）。

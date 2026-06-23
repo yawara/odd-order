@@ -61,3 +61,17 @@ hub が lane-h の次タスク (再配置先 or stand by) を裁定し、LAUNCH.
 - relane #3 (commit `50b2e2c9`, lane-c 再配置) — 同型 starve の処理例
 - 本セッション commits: `81b633cc`/`04eb6f32`/`558619f2`/`abefd919`/`5a212bc4`/`0adb8560` + docs
 - memory [[lane-h-driving-wielandt-91]] resume¹³
+
+---
+
+## 解決 (2026-06-23, ユーザー裁可 = lane-h が (13.2.a) 担当, relane #4)
+
+issue 2019 (lane-h starve) と issue 4009 (carrier wiring gate = IsTypeP2 mp.S) を **1 割当で同時解決**:
+**lane-h が Pf (13.2.a)「q<p ⟹ mp.S は type-P2」を担当**。
+- 作業場所 = `FeitThompson.lean` (mp 定義 + tp producer consume 地点、shared_re 内ゆえ lane-h 編集可、owned_re 変更なし)。
+- (13.2.a) 証明 → `IsTypeP2 mp.S` 供給 → tp producer が `exists_typePData_W1_eq_of_isTypeP2` を mp.S に適用可能化
+  → lane-c が carrier wiring (step 3) 機械的に進む → §15 basic_structure unblock + POLE-1 前進。
+- type-determination ゆえ lane-h type 構造の延長、§6 char (ユーザー管理 B) と非衝突、critical path 直結。
+- deep BG §15-16 下流補題が要れば lane-h が lane-f に notes/issue で依頼 (F が BG owner)。
+- FeitThompson.lean は def 単位 F=mp+Prop16.1 / B=cd / C=tp / H=(13.2.a) の 4 者共有。
+反映: lane-h/lane-f LAUNCH.md、merge_monitor.md (relane #4 note + FeitThompson F/B/C/H)、cron (6efde802)。CLOSED。
