@@ -7935,6 +7935,39 @@ theorem two_le_pRank_of_comm_isPGroup_not_isCyclic {R : Type*} [Group R] [Finite
   -- `2 ≤ log_p|Ω₁(R)| ≤ pRank R p`.
   exact le_trans (Nat.le_log_of_pow_le hp1 hcard) (le_pRank (Omega R p 1) hΩea)
 
+/-- **`C_{M_F}(X₁)` is not uniquely maximal** (Coq `nonTI_Fitting_structure`, `E1X_facts` clause
+`C1 ∉ 'U`): if the centralizer `C_G(X₁)` of a nontrivial subgroup `X₁` is not contained in `M`, then
+`C_{M_F}(X₁) = M_F ⊓ C_G(X₁)` is not uniquely maximal.
+
+Were it uniquely maximal, then since `C_{M_F}(X₁) ≤ C_G(X₁) < ⊤`, the overgroup `C_G(X₁)` would also
+be uniquely maximal (`IsUniquelyMaximal.of_le_of_lt_top`); and the unique maximal subgroup over
+`C_{M_F}(X₁)` is `M` (a coatom containing it), so `C_G(X₁) ≤ M`, contradicting the hypothesis.
+This is the `E1X_facts` input feeding the non-abelian branch of Theorem 15.7(e)
+(`abelian C_{M_F}(X₁)` and `cyclic O_{p'}(M_F)`). -/
+theorem not_isUniquelyMaximal_mf_inf_centralizer_of_not_le [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} (hM : M ∈ maximalSubgroups G)
+    {X₁ : Subgroup G} (hX₁ne : X₁ ≠ ⊥)
+    (hCGnotM : ¬ Subgroup.centralizer (X₁ : Set G) ≤ M) :
+    ¬ OddOrder.GroupTheory.IsUniquelyMaximal (MF M ⊓ Subgroup.centralizer (X₁ : Set G)) := by
+  intro huniq
+  -- `C₁ ≤ M`, `C₁ ≤ C_G(X₁)`, and `C_G(X₁) < ⊤`.
+  have hC1M : MF M ⊓ Subgroup.centralizer (X₁ : Set G) ≤ M :=
+    inf_le_left.trans (maxNilpotentNormalHall_le M)
+  have hC1C : MF M ⊓ Subgroup.centralizer (X₁ : Set G) ≤ Subgroup.centralizer (X₁ : Set G) :=
+    inf_le_right
+  obtain ⟨x₀, hx₀ne⟩ := Subgroup.ne_bot_iff_exists_ne_one.mp hX₁ne
+  have hCGlt : Subgroup.centralizer (X₁ : Set G) < ⊤ :=
+    lt_of_le_of_lt (Subgroup.centralizer_le (Set.singleton_subset_iff.mpr x₀.2))
+      (OddOrder.BG.Ch2.S09.centralizer_singleton_lt_top hG (fun h => hx₀ne (Subtype.ext h)))
+  -- `C_G(X₁)` is uniquely maximal, with the same unique maximal subgroup `M` as `C₁`.
+  have huniqC : OddOrder.GroupTheory.IsUniquelyMaximal (Subgroup.centralizer (X₁ : Set G)) :=
+    huniq.of_le_of_lt_top hC1C hCGlt
+  have hMco : IsCoatom M := OddOrder.GroupTheory.mem_maximalSubgroups.mp hM
+  have heq : M = huniqC.uniqueMaximalSubgroup :=
+    huniq.eq_of_isCoatom_of_le hMco hC1M huniqC.uniqueMaximalSubgroup_isCoatom
+      (hC1C.trans huniqC.le_uniqueMaximalSubgroup)
+  exact hCGnotM (heq ▸ huniqC.le_uniqueMaximalSubgroup)
+
 /-- **BG Theorem 15.7(a), rank-theoretic core** (mmd L4192-4198): if `F(M)` is not a TI-subgroup
 of `G`, then no prime divides `M_F` and lies in `β(M)`.
 
