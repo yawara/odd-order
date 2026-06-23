@@ -53,6 +53,38 @@ theorem induce_omegaColumnDiff_mu_diff {L : Type*} [Group L] [Fintype L]
           ((h.columnFamily χ₂).classFunction i - (h.columnFamily χ₂).classFunction 0) := by
   rw [h.induce_omegaColumnDiff_eq χ₂ (h.w1CharEquiv i), Equiv.symm_apply_apply]
 
+/-- **Peterfalvi (13.1.e), the `ω`/`μ`-grid difference form** — the exact shape consumed by the
+§13 character grids (`Section16CharacterData.mu_definition` / `S15.Hypothesis.mu_definition`).
+
+Inducing the `W₂`-column `ω`-grid difference `ω_{ij} − ω_{0j}` of the certain-type
+`W = W₁ ⊔ W₂` up to `L` yields the signed `μ`-grid difference `δ_j (μ_{ij} − μ_{0j})`, where the
+`ω`-grid is the column `i ↦ chiColumn χ₂ i = ω(omegaProdChar (e i) χ₂)` and the `μ`-grid is the
+`(4.3.b)` certain-type family `columnFamily χ₂ |>.mu`.  This restates
+`induce_omegaColumnDiff_mu_diff` with the `chiColumn`-difference on the left and the irreducible
+`μ_{ij}` (not the abstract `classFunction`) on the right — the literal `Ind_W^S(ω_{ij} − ω_{0j}) =
+δ_j(μ_{ij} − μ_{0j})` of (13.1.e), so a §13/§16 grid producer reading off `ω`/`μ`/`δ` from a
+certain-type member can discharge `mu_definition` by this lemma plus the column reindexing. -/
+theorem induce_chiColumn_diff_mu_diff {L : Type*} [Group L] [Fintype L]
+    [Invertible (Nat.card L : ℂ)] (h : Hypothesis L) [NeZero (Nat.card h.W1)]
+    [Fintype (h.W1 ⊔ h.W2 : Subgroup L)]
+    [Invertible (Nat.card (h.W1 ⊔ h.W2 : Subgroup L) : ℂ)]
+    (χ₂ : (h.W2.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ) (i : Fin (Nat.card h.W1)) :
+    ClassFunction.induce h.sdiffTICyclicHypothesis.W
+        ((h.chiColumn χ₂ i : ClassFunction h.sdiffTICyclicHypothesis.W ℂ)
+          - (h.chiColumn χ₂ 0 : ClassFunction h.sdiffTICyclicHypothesis.W ℂ))
+      = (h.columnFamily χ₂).sign •
+          (((h.columnFamily χ₂).mu i : ClassFunction L ℂ)
+            - ((h.columnFamily χ₂).mu 0 : ClassFunction L ℂ)) := by
+  have hchi : (h.chiColumn χ₂ i : ClassFunction h.sdiffTICyclicHypothesis.W ℂ)
+        - (h.chiColumn χ₂ 0 : ClassFunction h.sdiffTICyclicHypothesis.W ℂ)
+      = (h.omegaColumnDiff (h.w1CharEquiv i) 1 χ₂ :
+          ClassFunction h.sdiffTICyclicHypothesis.W ℂ) := by
+    rw [h.omegaColumnDiff_coe, h.chiColumn_zero]
+    rfl
+  rw [hchi, h.induce_omegaColumnDiff_mu_diff χ₂ i,
+    SignedIrreducibleDifferenceFamily.classFunction_apply,
+    SignedIrreducibleDifferenceFamily.classFunction_apply]
+
 end Hypothesis
 
 end OddOrder.Peterfalvi.S06
