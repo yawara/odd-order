@@ -63,6 +63,15 @@ productive な独立クラスタに乗せ、上流優先方針 (CLAUDE.md) に�
 > lane-h が (13.2.a) に要する BG §15-16 下流補題は lane-f に notes/issue で依頼 (F が BG owner)。
 > 完了で lane-c が carrier wiring (step 3) 機械的に進む → §15 unblock + POLE-1。
 
+> **⚠ 2026-06-23 relane #5 (ユーザー裁可、issue 2009、hub 統合レビュー)**: relane #4 の (13.2.a) `IsTypeP2 mp.S`
+> landing (`87068c22`/`5041855f`、4009+2019 CLOSED) + lane-c step-3 wiring landing (`13b883d1`/`b31a3dd6`、4010
+> CLOSED) + lane-f hP2II COMPLETE (`77287003`) を統合 → 「**FT endgame は lane-b char に収束** (POLE-1 残バレ
+> sorry 2 本 `card_kappaHall_lt_of_isTypeP1`[424、issue 2020] + `section16CharacterData`[1071、issue 1004] は
+> 両方 lane-b)、lane-h のみ割当完遂で idle」と確定。**lane-h を POLE-2 (`field_normalizer_structure` cascade、
+> `S16_NonExistenceG.lean`、issue 2009 pending→active) に復帰**。workable-now = 14.7 Singer-field 核 (§13 非依存、
+> c_eq_one から既約性)。**lane-h 所有 = `S16_NonExistenceG.lean` 追加** (編集所有者無し=driver だった)、`S13`/`S14` は
+> driver/参照に降格。lane-b/c/f は現状維持で適所 (B=char bottleneck / C=§15 consumer / F=Prop16.1 hFI ¬TI=BG 15.7(e))。
+
 **signature-first interface**: 上流が sorried signature を export → 下流が cite。真の cross-lane 依存は narrow。
 signature 不足は notes/issue 経由。**driver (§16/§10)**: 常駐レーンを当てず、上流が landing したとき hub or
 担当レーンが続けて opportunistic に close する (pure consumer ゆえ常駐は starve)。
