@@ -185,8 +185,8 @@ branch とも削除済み。旧 **A** / **D** も同様に退役済み (履歴�
 > |---|---|
 > | **F** (lane-f) | `OddOrder/BG/**`（BG 全体）+ `OddOrder/FeitThompson.lean` |
 > | **B** (lane-b) | `OddOrder/Peterfalvi/S0[3-9]*` + `S10*` + `S12*`（Pf char API + §12 + cd assembly; **S11/S13 除く**, 2026-06-23 S13 を H 移譲） |
-> | **H** (lane-h) | `OddOrder/Peterfalvi/S13*` (active) + `S14_MaximalI*` (driver)（type III/IV char-grid + type I driver; 2026-06-23 S13 受領, S15 を C 移譲） |
-> | **C** (lane-c) | `OddOrder/Peterfalvi/S15*` (S&T, consumer) **+ POLE-1 carrier (2026-06-23 relane #3, issue 4008)**: `S14_TypePComplement.lean` + `FeitThompson.lean` の **tp 系 def** (`Section16TypePStructure`/`section16TypePStructure_*`/`Section16Inputs` tp) |
+> | **H** (lane-h) | **relane #7 (issue 2021): Pf §6 coherence producer = `OddOrder/Peterfalvi/S08_Theorem62_63_Standalone.lean` (新 leaf, active)**。+ `S13*`/`S14_MaximalI*` は driver/await に降格 (S13 は C 移譲済, relane #6/#8) |
+> | **C** (lane-c) | **relane #8 (issue 4012): Pf (5.7) coherence producer = `OddOrder/Peterfalvi/S07_CoherenceConstantDegree.lean` (新 leaf, active)**。+ `S15*` (S&T) / `S13*` / `card_kappaHall_lt_of_isTypeP1` (FeitThompson tp+card) は driver/await。POLE-1 carrier (`S14_TypePComplement.lean` + FeitThompson tp 系 def) も C 所有 |
 > | **共有（全 lane 可）** | `OddOrder/AxiomsCheck.lean` / `OddOrder.lean` / `OddOrder/GroupTheory/**` / **`OddOrder/FeitThompson.lean`** (def 単位 F=mp+Prop16.1 / B=cd / C=tp / H=(13.2.a) IsTypeP2 mp.S) / `notes/**` / `issues/**` |
 
 1. 各レーンの未マージ確認: `git log --oneline main..<branch>`。
@@ -313,6 +313,25 @@ branch とも削除済み。旧 **A** / **D** も同様に退役済み (履歴�
   (索敵: theirs が取り込まれたか。base==ours で theirs 変更なら theirs 採用が正)。
 
 ## 現状メモ
+
+- **2026-06-24 — 監視再開 + 4 レーン全合流 (4 merge) + cron 再作成 + 🔒 表を relane #7/#8 に同期**:
+  ユーザー「各レーンを監視します」で再開。前 cron は session 変化で消滅 (`CronList` 空) → 新 cron **`0f508206`**
+  (`8,23,38,53 * * * *` = 15分間隔, stop-on-problem prompt 内蔵, **relane #7/#8 所有マップ反映**)。
+  全レーン範囲逸脱なし (3-dot 確認)、単一 full build **3884 jobs green / AxiomsCheck OK / 新規 axiom 0** (247s
+  = lane-c が共有 `ClassFunction.lean` 変更で広範再ビルド)。**実 sorry 128→129** (許可された scaffold +1):
+  - **F** (`2f62a406`): BG Thm 15.7(e) hFI ¬TI 非abelian枝 (c) を S16_MainResults:1391 で配線 (deferred residual
+    sorry 除去) + S15_MF per-prime order-q witness Z_q (q≠p 枝 実証明 / q=p 枝 scaffold)。net sorry 0。
+  - **B** (`41403682`): §16 cd tau3 COMPLETE — real Dade σ-integral on W=S∩T (FeitThompson, issue 1004 piece 5)。sorry 不変。
+  - **H** (`cecedbd0`): Pf §6 general six_two ASSEMBLED (自由 C,D) — (6.2) θ-degree bound for solvable kernel
+    (S08_Theorem62_63_Standalone +190, 全 sorry-free)。残 gate = oracle `h56` (lane-b/c 領域, issue 2022 に signature)。
+  - **C** (`df52aebf`): Pf (5.7) base case 完全実証明 (single-pair coherence) + 汎用 `inner_smul_right` を core
+    `ClassFunction.lean` 追加 (S07_CoherenceConstantDegree 新 leaf, 残 = induction wrapper scaffold)。sorry +1。
+  - ⚠ **サイズ flag** (touched >1500): S15_MF 8923 (0071) / S16_MainResults 2840 (0078) / **FeitThompson 1958 (新規 issue 0079 起票** —
+    4 レーン def-unit 共編集ゆえ split 実施は全 idle 時に hub が)。
+  - 🔸 **push 保留**: local main は origin/main より 15 commits 先行 (今回 4 + 既存保留分)。default-branch 直 push は
+    auto-mode classifier 拒否、ユーザー明示許可待ち。merge は全て local main に commit 済 (HEAD `d5850925`)。
+  - cross-lane: lane-h が general six_two producer 完了 → 残 oracle `h56` を precise Lean signature で issue 2022 に記録
+    (lane-b/c 宛, hub は dbf1e2fa で cite-policy 応答済)。新規 HUB ブロッキング ask なし。
 
 - **2026-06-23 (続⁵〜続¹⁴, セッション総括) — 監視継続 + 実 sorry 130→125 + HUB issue 2 件解決 + worktree 同期**:
   単一監視セッションで複数 tick を回し、全レーンが活発に前進。cron = `cf031d2e` (`4,29,54 * * * *`, stop-on-problem)。

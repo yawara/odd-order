@@ -215,4 +215,194 @@ theorem six_three_index_bound_general
     _ ≤ 2 * ((H.relIndex K : ℝ) * (K.index : ℝ)) * s := by push_cast at h62 ⊢; linarith [h62]
     _ = 2 * (K.index : ℝ) * (H.relIndex K : ℝ) * s := by ring
 
+/-- **Image in the centre of a quotient ⟺ commutator condition.**
+
+For `N ◁ Γ` and `D ≤ Γ`, the image `D ⧸ N ↦ Γ ⧸ N` lands in the centre `Z(Γ ⧸ N)` iff every
+`d ∈ D` commutes with every `g ∈ Γ` modulo `N` (`g d g⁻¹ d⁻¹ ∈ N`).  This is the elementwise
+characterisation of "`D ⧸ N` central in `Γ ⧸ N`", letting the centrality hypothesis be transported
+across the natural isomorphism `↥(H.subgroupOf K) ≃* ↥H` in `inducedMember_re_le_general`. -/
+theorem map_mk'_le_center_iff {Γ : Type*} [Group Γ] {N D : Subgroup Γ} [N.Normal] :
+    D.map (QuotientGroup.mk' N) ≤ Subgroup.center (Γ ⧸ N) ↔
+      ∀ d ∈ D, ∀ g : Γ, g * d * g⁻¹ * d⁻¹ ∈ N := by
+  rw [Subgroup.map_le_iff_le_comap]
+  constructor
+  · intro hle d hd g
+    have hmem : QuotientGroup.mk' N d ∈ Subgroup.center (Γ ⧸ N) :=
+      Subgroup.mem_comap.mp (hle hd)
+    rw [Subgroup.mem_center_iff] at hmem
+    have h2 := hmem (QuotientGroup.mk' N g)
+    rw [← QuotientGroup.ker_mk' N, MonoidHom.mem_ker]
+    simp only [map_mul, map_inv]
+    rw [h2]; group
+  · intro hcomm d hd
+    rw [Subgroup.mem_comap, Subgroup.mem_center_iff]
+    intro q
+    obtain ⟨g, rfl⟩ := QuotientGroup.mk'_surjective N q
+    have hthis : QuotientGroup.mk' N (g * d * g⁻¹ * d⁻¹) = 1 := by
+      rw [← MonoidHom.mem_ker, QuotientGroup.ker_mk']; exact hcomm d hd g
+    simp only [map_mul, map_inv] at hthis
+    rw [mul_inv_eq_one] at hthis
+    calc QuotientGroup.mk' N g * QuotientGroup.mk' N d
+        = (QuotientGroup.mk' N g * QuotientGroup.mk' N d * (QuotientGroup.mk' N g)⁻¹)
+            * QuotientGroup.mk' N g := by group
+      _ = QuotientGroup.mk' N d * QuotientGroup.mk' N g := by rw [hthis]
+
+open scoped Classical in
+omit [Fintype G] [Invertible (Nat.card G : ℂ)] [Invertible (Nat.card ↥L : ℂ)] in
+/-- **Peterfalvi (6.2) θ-bound for an induced member of a general (solvable) kernel `K`.**
+
+For a section `B ≤ D ≤ C ≤ K` (Peterfalvi's `B ⊂ D ⊂ C ⊂ K`) and an irreducible character `θ` of `K`
+trivial on `B`, with `D ⧸ B` central in `C ⧸ B`, the induced member `ψ = Ind_K^L θ` has degree
+bounded by `ψ(1) ≤ |L:C|·√|C:D|`.  The §11/§13 consumer applies this two ways: `(C, D) = (H, A)`
+(the central case feeding (6.3)) and `(C, D) = (HC, HC)` (Peterfalvi (11.4), `√1 = 1`).
+
+This is the half of `(6.2)` the consumer needs in its **general** form: the kernel `K` (the derived
+subgroup `M'`, solvable) is strictly larger than the section group `C`, so unlike the Sibley central
+case (`psi_degree_le_of_source_central`, `K = H = C`) the Clifford a-half is required.  The proof
+feeds the fully general `theta_degree_le_index_mul_sqrt_index` (a-half + b-half) the section
+`CK = C.subgroupOf K`, `NB = (B.subgroupOf K).subgroupOf CK ≤ DK = (D.subgroupOf K).subgroupOf CK`:
+
+* the kernel hypothesis `NB ⊆ Ker(Res_{CK} θ)` is `characterKernel_restrict_subgroupOf`;
+* the index identities `|CK| = |K:C|` and `|DK| = |C:D|` are `rfl` / `relIndex_subgroupOf`;
+* the centrality `DK ⧸ NB ⊆ Z(CK ⧸ NB)` is transported from the given `D ⧸ B ⊆ Z(C ⧸ B)` across the
+  natural isomorphism `e : ↥CK ≃* ↥C` (`subgroupOfEquivOfLe`, which preserves the underlying `↥L`
+  element) using the commutator characterisation `map_mk'_le_center_iff`;
+* `ψ(1) = |L:K|·θ(1)` (`induce_apply_one`) and `|L:K|·|K:C| = |L:C|` (`relIndex_mul_index`). -/
+theorem inducedMember_re_le_general
+    {K C D B : Subgroup ↥L} [Invertible (Nat.card ↥K : ℂ)] [B.Normal]
+    (hBD : B ≤ D) (hCK : C ≤ K)
+    (θ : IrreducibleCharacter ↥K)
+    (hθB : (↑(B.subgroupOf K) : Set ↥K) ⊆ OddOrder.Peterfalvi.S03.characterKernel
+        (θ : ClassFunction ↥K ℂ))
+    (hcentral : (D.subgroupOf C).map (QuotientGroup.mk' (B.subgroupOf C)) ≤
+        Subgroup.center (↥C ⧸ B.subgroupOf C)) :
+    (ClassFunction.induce K (θ : ClassFunction ↥K ℂ) 1).re ≤
+      (C.index : ℝ) * Real.sqrt (Nat.card (↥C ⧸ D.subgroupOf C) : ℝ) := by
+  haveI : Fintype ↥K := Fintype.ofFinite _
+  haveI : (B.subgroupOf C).Normal := (‹B.Normal›).subgroupOf C
+  set CK : Subgroup ↥K := C.subgroupOf K with hCK_def
+  haveI : Fintype ↥CK := Fintype.ofFinite _
+  haveI : Invertible (Nat.card ↥CK : ℂ) :=
+    invertibleOfNonzero (by exact_mod_cast (Nat.card_pos (α := ↥CK)).ne')
+  haveI : (B.subgroupOf K).Normal := (‹B.Normal›).subgroupOf K
+  set NB : Subgroup ↥CK := (B.subgroupOf K).subgroupOf CK with hNB
+  set DK : Subgroup ↥CK := (D.subgroupOf K).subgroupOf CK with hDK
+  haveI : NB.Normal := (‹(B.subgroupOf K).Normal›).subgroupOf CK
+  have hNBDK : NB ≤ DK := Subgroup.subgroupOf_mono CK (Subgroup.subgroupOf_mono K hBD)
+  -- the kernel hypothesis: `θ` trivial on `B` ⟹ `Res_{C∩K} θ` trivial on `NB`.
+  have hθNB : (↑NB : Set ↥CK) ⊆ OddOrder.Peterfalvi.S03.characterKernel
+      (ClassFunction.restrict CK (θ : ClassFunction ↥K ℂ)) :=
+    characterKernel_restrict_subgroupOf CK hθB
+  -- centrality transport `D ⧸ B ⊆ Z(C ⧸ B)` ⟹ `DK ⧸ NB ⊆ Z(CK ⧸ NB)` across `e : ↥CK ≃* ↥C`.
+  have hcentralCK : DK.map (QuotientGroup.mk' NB) ≤ Subgroup.center (↥CK ⧸ NB) := by
+    rw [map_mk'_le_center_iff]
+    rw [map_mk'_le_center_iff] at hcentral
+    intro d hd c
+    set e := Subgroup.subgroupOfEquivOfLe hCK with he_def
+    have hcoe : ∀ x : ↥CK, ((e x : ↥C) : ↥L) = ((x : ↥K) : ↥L) := fun _ => rfl
+    have hdD : e d ∈ D.subgroupOf C := by
+      rw [Subgroup.mem_subgroupOf, hcoe]
+      exact Subgroup.mem_subgroupOf.mp (Subgroup.mem_subgroupOf.mp hd)
+    have key : (e c) * (e d) * (e c)⁻¹ * (e d)⁻¹ ∈ B.subgroupOf C := hcentral (e d) hdD (e c)
+    have hcomm : (e c) * (e d) * (e c)⁻¹ * (e d)⁻¹ = e (c * d * c⁻¹ * d⁻¹) := by
+      simp only [map_mul, map_inv]
+    rw [hcomm, Subgroup.mem_subgroupOf, hcoe] at key
+    rw [hNB, Subgroup.mem_subgroupOf, Subgroup.mem_subgroupOf]
+    exact key
+  -- the general (6.2) θ-bound: `θ(1) ≤ |K:C|·√|C:D|`.
+  have hθbound :=
+    theta_degree_le_index_mul_sqrt_index (K := ↥K) θ CK (N := NB) DK hNBDK hθNB hcentralCK
+  -- index identities `|CK| = |K:C|` and `|DK| = |C:D|`.
+  have hCKindex : CK.index = C.relIndex K := rfl
+  have hDKindex : DK.index = Nat.card (↥C ⧸ D.subgroupOf C) := by
+    have hd0 : DK.index = (D.subgroupOf K).relIndex CK := rfl
+    rw [hd0, hCK_def, Subgroup.relIndex_subgroupOf hCK]; rfl
+  -- `ψ(1) = |L:K|·θ(1)`.
+  have hind : (ClassFunction.induce K (θ : ClassFunction ↥K ℂ) 1).re
+      = (K.index : ℝ) * ((θ : ClassFunction ↥K ℂ) 1).re := by
+    rw [ClassFunction.induce_apply_one, Complex.mul_re, Complex.natCast_re, Complex.natCast_im]
+    ring
+  rw [hind]
+  calc (K.index : ℝ) * ((θ : ClassFunction ↥K ℂ) 1).re
+      ≤ (K.index : ℝ) * ((CK.index : ℝ) * Real.sqrt (DK.index : ℝ)) :=
+        mul_le_mul_of_nonneg_left hθbound (Nat.cast_nonneg _)
+    _ = (C.index : ℝ) * Real.sqrt (Nat.card (↥C ⧸ D.subgroupOf C) : ℝ) := by
+        rw [hDKindex, hCKindex, ← Subgroup.relIndex_mul_index hCK]; push_cast; ring
+
+omit [Fintype G] [Invertible (Nat.card G : ℂ)] [Invertible (Nat.card ↥L : ℂ)] in
+/-- **Peterfalvi (6.2), general Hypothesis (6.1) form** (`K` solvable, section `B ⊆ D ⊆ C ⊆ K`).
+
+Given the **(5.6) norm-weighted coherence bound** `h56` — the genuinely character-theoretic core,
+which for a general solvable `K` with possibly-*reducible* induced members `Ind_K^L θ` bottoms out
+in the §10–§12 `muGrid`/`columnSum` machinery (the cross-lane oracle, see issue 2022) — this
+produces the (6.2) real-inequality `|K:A| − 1 ≤ 2|L:C|·√|C:D|`.  The §11/§13 consumer instantiates
+it two ways: `(C, D) = (H, A)` feeds `six_three_index_bound_general` (hence (6.3) /
+`S13.coherent_S_of_coherent_SH0C`, Peterfalvi (11.3)); `(C, D) = (HC, HC)` (`√1 = 1`) gives
+`|M':H₁| − 1 ≤ 2|M:HC|`, Peterfalvi (11.4) `S13.coherent_quotient_bound`.
+
+The oracle `h56` packages the break member as `ψ = Ind_K^L θ` (`θ ∈ Irr K`, `θ` trivial on `B`,
+`θ ≠ 1`; every member of the induced family `S` has this shape) with the degree bound
+`|K:A| − 1 ≤ 2ψ(1)`.  Everything *downstream* of `h56` is proved here generally: the θ-degree bound
+`ψ(1) ≤ |L:C|·√|C:D|` (`inducedMember_re_le_general`) and the arithmetic, so the §11/§13 consumer's
+remaining obligation is exactly `h56`. -/
+theorem six_two_general
+    {K A C D B : Subgroup ↥L} [Invertible (Nat.card ↥K : ℂ)] [B.Normal]
+    (hBD : B ≤ D) (hCK : C ≤ K)
+    (hcentral : (D.subgroupOf C).map (QuotientGroup.mk' (B.subgroupOf C)) ≤
+        Subgroup.center (↥C ⧸ B.subgroupOf C))
+    (h56 : ∃ θ : IrreducibleCharacter ↥K,
+        (↑(B.subgroupOf K) : Set ↥K) ⊆ OddOrder.Peterfalvi.S03.characterKernel
+            (θ : ClassFunction ↥K ℂ) ∧
+        (Nat.card (↥K ⧸ A.subgroupOf K) : ℝ) - 1 ≤
+            2 * (ClassFunction.induce K (θ : ClassFunction ↥K ℂ) 1).re) :
+    (Nat.card (↥K ⧸ A.subgroupOf K) : ℝ) - 1 ≤
+        2 * (C.index : ℝ) * Real.sqrt (Nat.card (↥C ⧸ D.subgroupOf C) : ℝ) := by
+  obtain ⟨θ, hθB, hψbound⟩ := h56
+  have hdeg := inducedMember_re_le_general hBD hCK θ hθB hcentral
+  calc (Nat.card (↥K ⧸ A.subgroupOf K) : ℝ) - 1
+      ≤ 2 * (ClassFunction.induce K (θ : ClassFunction ↥K ℂ) 1).re := hψbound
+    _ ≤ 2 * ((C.index : ℝ) * Real.sqrt (Nat.card (↥C ⧸ D.subgroupOf C) : ℝ)) := by linarith [hdeg]
+    _ = 2 * (C.index : ℝ) * Real.sqrt (Nat.card (↥C ⧸ D.subgroupOf C) : ℝ) := by ring
+
+/-- **Peterfalvi (6.3), general (6.1) form, reduced to the (5.6) coherence oracle** — the
+single-cite producer for the §11/§13 consumer.
+
+Bundles the full standalone chain `six_three_descent ∘ six_three_index_bound_general ∘
+six_two_general`: with `K` solvable normal, `H ≤ K` nilpotent (`K ≠ H` allowed), `M ≤ H₁ < H`, if
+`S(H₁)` is coherent, `|H:H₁| > 4|L:K|² + 1`, **and** the per-section **(5.6) break-member oracle**
+`h56` holds, then `S(M)` is coherent.
+
+`h56` is the only remaining hypothesis with genuine character-theoretic content: for each section
+`B ≤ A ≤ H₁` with `A ⧸ B` central in `H ⧸ B`, `S(A)` coherent and `S(B)` not, it asks for a break
+member `ψ = Ind_K^L θ` (`θ ∈ Irr K` trivial on `B`) with `|K:A| − 1 ≤ 2ψ(1)`.  For a general
+solvable `K` this is the §10–§12 `muGrid`/`columnSum` bound (cross-lane, issue 2022).  Everything
+else — minimal-`A`/maximal-`B` descent, nilpotency-forces-centrality, the θ-degree bound, and the
+`√`-arithmetic — is discharged here.  This is the theorem `S13.coherent_S_of_coherent_SH0C`
+(Peterfalvi (11.3)) cites, applied with `(L,K,M,H,H₁) = (M, M', 1, HC, H₀C)`. -/
+theorem six_three_of_six_two_oracle
+    {K H M H₁ : Subgroup ↥L} [Group.IsNilpotent ↥H] [IsSolvable ↥K]
+    [Invertible (Nat.card ↥K : ℂ)]
+    [M.Normal] [H₁.Normal] (hHnorm : H.Normal)
+    (hMH₁ : M ≤ H₁) (hH₁H : H₁ < H) (hHK : H ≤ K)
+    (τ : OddOrder.Peterfalvi.S07.IntegralCharacterMap ↥L G) (A0 : Set ↥L)
+    (SOf : Subgroup ↥L → Set (ClassFunction ↥L ℂ))
+    (h56 : ∀ (A B : Subgroup ↥L) [A.Normal] [B.Normal], B ≤ A → A ≤ H₁ →
+        (A.subgroupOf H).map (QuotientGroup.mk' (B.subgroupOf H)) ≤
+          Subgroup.center (↥H ⧸ B.subgroupOf H) →
+        Nonempty (OddOrder.Peterfalvi.S07.IsCoherent τ (SOf A) A0) →
+        ¬ Nonempty (OddOrder.Peterfalvi.S07.IsCoherent τ (SOf B) A0) →
+        ∃ θ : IrreducibleCharacter ↥K,
+          (↑(B.subgroupOf K) : Set ↥K) ⊆ OddOrder.Peterfalvi.S03.characterKernel
+              (θ : ClassFunction ↥K ℂ) ∧
+          (Nat.card (↥K ⧸ A.subgroupOf K) : ℝ) - 1 ≤
+              2 * (ClassFunction.induce K (θ : ClassFunction ↥K ℂ) 1).re)
+    (hcoh : Nonempty (OddOrder.Peterfalvi.S07.IsCoherent τ (SOf H₁) A0))
+    (hbound : 4 * K.index ^ 2 + 1 < Nat.card (↥H ⧸ H₁.subgroupOf H)) :
+    Nonempty (OddOrder.Peterfalvi.S07.IsCoherent τ (SOf M) A0) := by
+  refine six_three_descent hHnorm hMH₁ hH₁H hHK τ A0 SOf ?_ hcoh hbound
+  intro A B _ _ hBA hAH₁ _hAcomm hcentral hAcoh hBncoh
+  exact six_three_index_bound_general hAH₁ (hAH₁.trans hH₁H.le) hHK
+    (six_two_general (A := A) (C := H) (D := A) (B := B) hBA hHK hcentral
+      (h56 A B hBA hAH₁ hcentral hAcoh hBncoh))
+
 end OddOrder.Peterfalvi.S08
