@@ -1322,6 +1322,47 @@ theorem isTypeF_groupTheory_of_isTypeF [Finite G] (hG : OddOrder.BG.IsMinimalSim
   have hUne : U ≠ ⊥ := hsetup.E_ne_bot hG
   exact typeFData_of_kappa_eq_bot hG hM bot_le hUM hKhall rfl hU hUne
 
+/-- **BG Theorem 15.7(e), conjunct A divisibility per prime** (Coq `regZq_dv_q1`): for a type-`F`
+datum `td` and a `td.U0`-invariant order-`q` subgroup `Z` of the Frobenius kernel `td.H = M_F`, the
+exponent of the complement `U` divides `q - 1`.
+
+`td.U0` acts on `Z` by conjugation (`Subgroup.normalizerMonoidHom`, valid since `td.U0 ≤ N_G(Z)`);
+the action is fixed-point-free because `td.H ⋊ td.U0` is a Frobenius group with kernel `td.H ⊇ Z`
+(`td.frobenius_HU0.conj_frobenius`).  Hence `IsFrobeniusAction td.U0 Z`, giving
+`|U0| ∣ |Z| - 1 = q - 1` (`card_dvd_sub_one_of_isFrobeniusAction`), and
+`exp U = exp U0 ∣ |U0| ∣ q - 1` (`td.exponent_eq`, `Group.exponent_dvd_nat_card`).  This is the
+divisibility engine of the exponent conjunct (c) of `isTypeI_of_isTypeF`; the per-prime witness `Z`
+(order-`q` characteristic subgroup of `M_F`) is supplied separately. -/
+theorem typeF_exponent_dvd_sub_one_of_invariant_card [Finite G] {M : Subgroup G}
+    (td : OddOrder.GroupTheory.TypeFData M) {Z : Subgroup G} {q : ℕ}
+    (hZH : Z ≤ td.H) (hZcard : Nat.card ↥Z = q)
+    (hU0NZ : td.U0 ≤ Subgroup.normalizer (Z : Set G)) :
+    Monoid.exponent ↥td.U ∣ q - 1 := by
+  classical
+  -- `G`-level fixed-point-freeness of the conjugation action of `U0` on the kernel `td.H`.
+  have hfpf : ∀ u ∈ td.U0, u ≠ 1 → ∀ z ∈ td.H, z ≠ 1 → u * z * u⁻¹ ≠ z := by
+    intro u hu hu1 z hz hz1 hconj
+    have huK : u ∈ td.H ⊔ td.U0 := (le_sup_right : td.U0 ≤ td.H ⊔ td.U0) hu
+    have hzK : z ∈ td.H ⊔ td.U0 := (le_sup_left : td.H ≤ td.H ⊔ td.U0) hz
+    refine td.frobenius_HU0.conj_frobenius ⟨u, huK⟩ ((Subgroup.mem_subgroupOf).mpr hu)
+      (fun h => hu1 (by simpa using Subtype.ext_iff.mp h)) ⟨z, hzK⟩
+      ((Subgroup.mem_subgroupOf).mpr hz)
+      (fun h => hz1 (by simpa using Subtype.ext_iff.mp h)) ?_
+    exact Subtype.ext (by simpa using hconj)
+  -- Conjugation action of `U0` on `Z` (`U0 ≤ N_G(Z)`).
+  letI : MulDistribMulAction ↥td.U0 ↥Z :=
+    MulDistribMulAction.compHom ↥Z (Z.normalizerMonoidHom.comp (Subgroup.inclusion hU0NZ))
+  have hFA : OddOrder.Isaacs.Ch06.IsFrobeniusAction ↥td.U0 ↥Z := by
+    intro u hu z hz hfix
+    have h1 : ((u • z : ↥Z) : G) = (u : G) * (z : G) * (u : G)⁻¹ := rfl
+    refine hfpf (u : G) u.2 (fun h => hu (Subtype.ext h)) (z : G) (hZH z.2)
+      (fun h => hz (Subtype.ext h)) ?_
+    rw [← h1]; exact congrArg Subtype.val hfix
+  have hdvd : Nat.card ↥td.U0 ∣ q - 1 :=
+    hZcard ▸ OddOrder.BG.Ch4.S15.card_dvd_sub_one_of_isFrobeniusAction hFA
+  rw [← td.exponent_eq]
+  exact Group.exponent_dvd_nat_card.trans hdvd
+
 /-- **Prop 16.1(a) forward bridge `hFI`** (Peterfalvi (8.3) / BG Theorem 15.7): a type-`F` maximal
 `M` is of type I.  The shared type-`F` structure `TypeFData M` is `isTypeF_groupTheory_of_isTypeF`;
 the `TypeIData.alternative` trichotomy splits on whether `F(M)` is `TI`:

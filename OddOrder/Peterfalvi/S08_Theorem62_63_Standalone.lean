@@ -168,4 +168,51 @@ theorem six_three_descent
     omega
   rw [← hAeqM]; exact hAcoh
 
+set_option linter.unusedFintypeInType false in
+omit [Fintype G] [Invertible (Nat.card G : ℂ)] [Invertible (Nat.card ↥L : ℂ)] in
+/-- **Peterfalvi (6.3) per-step index bound, general (6.1) form** (`K` solvable, `H ≤ K`, `K ≠ H`).
+
+The arithmetic glue from the (6.2) bound to the (6.3) index bound, separating `K` (the
+induced-family kernel) from `H` (the nilpotent middle group).  The Sibley `six_three_index_bound`
+has `K = H` (`|K:H| = 1`); here `K ≠ H` is allowed.  Given the (6.2) consequence for the section
+`C = H, D = A` — `|K:A| − 1 ≤ 2|L:H|·√|H:A|` (`h62`) — the index `|H:H₁|` is at most `4|L:K|² + 1`.
+
+Rewrites `|K:A| = |H:A|·|K:H|` (`relindex_mul_relindex`, `A ≤ H ≤ K`) and `|L:H| = |K:H|·|L:K|`
+(`relindex_mul_index`, `H ≤ K`) into the `|K:H|·|H:A| − 1 ≤ 2|L:K|·|K:H|·√|H:A|` form consumed by
+the arithmetic core `six_three_HH1_le` (`LK = |L:K|`, `KH = |K:H|`, `HA = |H:A|`).
+
+Composing this with `six_three_descent` (supply `h62 := fun A B _ _ _ _ hA hB =>
+six_three_index_bound_general … (six_two A B … hA hB)`) leaves the single remaining gate the general
+`six_two` (the (6.2) bound for the possibly-reducible induced members of a solvable `K`). -/
+theorem six_three_index_bound_general
+    {K H A H₁ : Subgroup ↥L} (hAH₁ : A ≤ H₁) (hAH : A ≤ H) (hHK : H ≤ K)
+    (h62 : (Nat.card (↥K ⧸ A.subgroupOf K) : ℝ) - 1 ≤
+        2 * (H.index : ℝ) * Real.sqrt (Nat.card (↥H ⧸ A.subgroupOf H) : ℝ)) :
+    Nat.card (↥H ⧸ H₁.subgroupOf H) ≤ 4 * K.index ^ 2 + 1 := by
+  -- `relindex`/`Nat.card`-quotient identities (`relindex H K = (H.subgroupOf K).index`).
+  have hcardKA : Nat.card (↥K ⧸ A.subgroupOf K) = A.relIndex K := (Subgroup.index_eq_card _).symm
+  have hcardHA : Nat.card (↥H ⧸ A.subgroupOf H) = A.relIndex H := (Subgroup.index_eq_card _).symm
+  have hcardHH1 : Nat.card (↥H ⧸ H₁.subgroupOf H) = H₁.relIndex H := (Subgroup.index_eq_card _).symm
+  -- tower index multiplicativity: `|K:A| = |H:A|·|K:H|` and `|L:H| = |K:H|·|L:K|`.
+  have key1 : A.relIndex K = A.relIndex H * H.relIndex K :=
+    (Subgroup.relIndex_mul_relIndex A H K hAH hHK).symm
+  have key2 : H.index = H.relIndex K * K.index := (Subgroup.relIndex_mul_index hHK).symm
+  -- `1 ≤ |K:H|`.
+  have hKHpos : 0 < H.relIndex K := by
+    rw [show H.relIndex K = Nat.card (↥K ⧸ H.subgroupOf K) from (Subgroup.index_eq_card _).symm]
+    exact Nat.card_pos
+  -- `|H:H₁| ≤ |H:A|` (from `A ≤ H₁`, `A∩H ≤ H₁∩H`).
+  have hHH1le : H₁.relIndex H ≤ A.relIndex H :=
+    Nat.le_of_dvd Nat.card_pos (Subgroup.index_dvd_of_le (Subgroup.subgroupOf_mono H hAH₁))
+  rw [hcardHH1]
+  refine six_three_HH1_le (LK := K.index) (KH := H.relIndex K) (HA := A.relIndex H)
+    (HH1 := H₁.relIndex H) hKHpos hHH1le ?_
+  -- the (6.2) real bound, recast into the `six_three_HH1_le` shape.
+  rw [hcardKA, key1, key2, hcardHA] at h62
+  set s : ℝ := Real.sqrt (A.relIndex H : ℝ) with hs
+  calc (H.relIndex K : ℝ) * (A.relIndex H : ℝ) - 1
+      = (A.relIndex H : ℝ) * (H.relIndex K : ℝ) - 1 := by ring
+    _ ≤ 2 * ((H.relIndex K : ℝ) * (K.index : ℝ)) * s := by push_cast at h62 ⊢; linarith [h62]
+    _ = 2 * (K.index : ℝ) * (H.relIndex K : ℝ) * s := by ring
+
 end OddOrder.Peterfalvi.S08

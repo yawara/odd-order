@@ -2178,6 +2178,10 @@ set_option linter.style.longLine false in
 -- (maximal-`B` + nilpotency-forces-centrality + `√`-arithmetic) reduced to the (6.2) index oracle.
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S07.IsCoherent.subset
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S08.six_three_descent
+-- (6.3) per-step index bound, general form: tower index multiplicativity (`|K:A| = |H:A|·|K:H|`,
+-- `|L:H| = |K:H|·|L:K|`) feeding `six_three_HH1_le`; reduces the `six_three_descent` `h62` oracle to
+-- the general `six_two` (6.2) bound for a solvable `K` (the single remaining deep gate).
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S08.six_three_index_bound_general
 -- (6.5) chief-factor core + (6.5)(b) reduction: a Frobenius-acted abelian section obeying the (6.3)
 -- index bound `≤ 4|R|²+1` is a `p`-group (chief-factor argument via the `p`-primary component,
 -- `card_modEq_one` + `six_five_chief_factor_contradiction`); combined with the nilpotent
@@ -5606,6 +5610,9 @@ the non-TI residual (BG Theorem 15.7(e)). -/
 #assert_only_allowed_axioms OddOrder.BG.Ch4.S16.normalizer_eq_self_of_subgroupOf_normal_of_ne_bot
 #assert_only_allowed_axioms OddOrder.BG.Ch4.S16.normalizer_fittingInAmbient_eq_self
 #assert_only_allowed_axioms OddOrder.BG.Ch4.S16.maxNilpotentNormalHall_sharp_isTISubset_of_fittingIsTI
+-- 15.7(e) conjunct A divisibility engine (Coq `regZq_dv_q1`): a `U0`-invariant order-`q` subgroup
+-- of the Frobenius kernel `M_F` forces `exp U ∣ q - 1` (Frobenius semiregular action).
+#assert_only_allowed_axioms OddOrder.BG.Ch4.S16.typeF_exponent_dvd_sub_one_of_invariant_card
 
 /-! # Peterfalvi Appendices (Lane H)
 
@@ -5951,3 +5958,18 @@ formula together with the prime computation `coprimeFrobeniusAction_card_eq_prim
 #assert_only_allowed_axioms OddOrder.Section16CharacterData.gridEquivE_T_coe
 #assert_only_allowed_axioms OddOrder.Section16CharacterData.gridEquivE_T_mem_W1
 #assert_only_allowed_axioms OddOrder.Section16CharacterData.gridEquivE_T_mem_W2
+-- **cd `nu_definition` (piece 3, S/T-shared-`ω` symmetry)** — the harder of the two real Prop
+-- obligations of the cd producer.  The shared `ω`-grid is re-expressed through `certainTypeT` by
+-- transporting the S-side index characters along `eTS` (G-element-preserving): `eTS_gridEquivE_T` is
+-- the round-trip; `colT_apply_mem_K`/`rowDualT_apply_mem_Kstar` are the matching of the T-side duals
+-- with the S-side index characters; `rowDualT_zero`/`rowT_zero` pin the `j = 0` trivial base (needs the
+-- step-A `chi2enum_zero`).  `omegaS_eq_omegaT` is the symmetry (`monoidHom_eq_of_eqOn_W1_W2`), and
+-- `nuT_definition` is the `Ind_W^T(ω_{ij} − ω_{i0}) = δ'_i(ν_{ij} − ν_{i0})` identity (mirror of
+-- `muS_definition`, via `S06.induce_chiColumn_diff_mu_diff` T-side).  All axiom-clean.
+#assert_only_allowed_axioms OddOrder.Section16CharacterData.eTS_gridEquivE_T
+#assert_only_allowed_axioms OddOrder.Section16CharacterData.colT_apply_mem_K
+#assert_only_allowed_axioms OddOrder.Section16CharacterData.rowDualT_apply_mem_Kstar
+#assert_only_allowed_axioms OddOrder.Section16CharacterData.rowDualT_zero
+#assert_only_allowed_axioms OddOrder.Section16CharacterData.rowT_zero
+#assert_only_allowed_axioms OddOrder.Section16CharacterData.omegaS_eq_omegaT
+#assert_only_allowed_axioms OddOrder.Section16CharacterData.nuT_definition

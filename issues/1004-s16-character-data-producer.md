@@ -107,3 +107,18 @@ piece 3 (最難所、S/T-shared-ω symmetry) の transport foundation を sorry-
   すれば `omegaS=omegaT` が construction で従い **enumeration matching 不要**。step A chi2enum base-fix →
   step B omegaProdChar restriction 値 → step D T-side mirror → step C/E symmetry → step F nu (muS_definition mirror)。
 - producer の sorry 不変 (building block)。残 = piece 3 残 (step A-F) / piece 5 tau3 / piece 6-8。
+
+## 進捗 (2026-06-23, lane-b 再開⁵) — ✅✅ cd `nu_definition` COMPLETE (piece 3 全達成)
+
+更新¹⁹ 攻略計画 (step A→D→C/E→F) を全実行し **`nu_definition` を sorry-free + axiom-clean で landing**
+(commits `33b85dfb` step A+D / `b4775e75` T-side step B / `c3c9875f` 本体)。正本 =
+`notes/peterfalvi/s12_s10_character_bridge.md` 更新²⁰。**⟹ cd producer の 2 実 Prop obligation
+(`mu_definition`=更新¹⁸ / `nu_definition`=本回) が両方 complete。**
+
+- 核心 = G-元保存 equiv `eTS` で S-side index 指標を T-side へ transport → `omegaS = omegaT` が construction
+  から従い enumeration-matching 不要 (`omegaProdChar_comp_subtype` 在庫が reconstruction を供給、subgroup-image
+  plumbing 回避)。`omegaS_eq_omegaT` (symmetry crux) → `nuT_definition` (muS_definition 完全 mirror)。
+- AxiomsCheck 17 本登録 (chi2enum_zero / T-mirror 9 本 / omegaProdCharT 2 本 / symmetry 7 本)、full build
+  3883 green、producer の sorry 不変 (building block)。
+- **残 cd piece**: 5=`tau3` (W=S∩T の G 内 TI-cyclic + sigmaIntegral, real η) / 6-7=free field
+  (tauS,tauT,Sset,Tset,A0S,A0T) / 8=pack (producer の sorry 解消)。grid (omega/mu/nu/delta/deltaPrime/両恒等式) 完備。
