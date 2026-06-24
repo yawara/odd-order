@@ -134,3 +134,25 @@ piece 3 (最難所、S/T-shared-ω symmetry) の transport foundation を sorry-
   mp.S は TI-cyclic でないため tau3W mirror 不可; induction は scaffold ゆえ不可)**。
 - ⟹ **cd grid の数学 hard core 完了** (omega/mu/nu/delta/deltaPrime/両誘導恒等式/tau3)。closing (piece 8) は
   tauS/tauT の §7 honest 構成が前提 = 次の substantial piece。
+
+## 進捗 (2026-06-24, lane-b 再開⁷) — ✅✅✅ COMPLETE: cd producer sorry-free + axiom-clean (commit `c57ed7ad`)
+
+**producer `section16CharacterData_of_isMinimalSimpleOdd` を sorry-free + axiom-clean で landing**
+= POLE-1 の 3 producer (mp/tp/charData) のうち **charData 完成**。完了条件 (producer の sorry 消滅 +
+full build 緑) 達成。
+
+- **honesty 再判定 (ユーザー裁可、再開⁶ 判断を更新)**: tauS/tauT/Sset/Tset/A0S/A0T の 6 フィールドが
+  **FT 経路で完全に未消費 = vestigial と網羅検証で確定**。S16_NonExistenceG の §13/§16 矛盾は
+  `eta = τ₃∘ω` (W-side) 経由で、sorried な下流定理 (betaM_expansion / orthogonality_switch) も全て
+  eta を使い、**tauS/tauT (S/T-side) は一切参照しない**。tauS/tauT が現れるのは S15_SAndT_Setup の
+  3 lemma (329-330 opaque Prop / 344 sorried+uncited / 355 sorried coherence) のみ = 全て off-path。
+  `Hypothesis` 自体は 6 フィールドに Prop 制約を持たない。
+  ⟹ 再開⁶ の「§7 maximal-coherent Dade honest 構成が前提」は over-conservative。**§7 構成は現 FT 経路では
+  off-path (real だが FT が transitively 必要としない) ゆえ、FT-path 限定方針では vestigial を honest
+  placeholder (∅/0) で埋めて producer を閉じるのが正**。ユーザーが option A を選択 (2026-06-24)。
+- pack 内訳: omega:=omegaS / mu:=muS / nu:=nuT / delta:=deltaS / deltaPrime:=deltaPrimeT /
+  tau3:=tau3W / mu_definition:=muS_definition / nu_definition:=nuT_definition (全 proven building block)。
+  `NeZero |certainType{S,T}.W₁|` を card=tp.q/tp.p prime から haveI 供給 (tactic モード)。
+- AxiomsCheck 登録: `section16CharacterData_of_isMinimalSimpleOdd` = 3 axioms (allowlist)。full build 3883 green。
+- **CLOSE**: 本 issue の完了条件達成。FeitThompson 残 sorry = `card_kappaHall_lt_of_isTypeIIIorIV` のみ
+  (issue 2020 residual、別タスク)。
