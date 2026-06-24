@@ -5993,3 +5993,13 @@ formula together with the prime computation `coprimeFrobeniusAction_card_eq_prim
 -- `S04.Hypothesis.fullDadeIsometryData` (`HConjInvariant` automatic since all `H(a) = ⊥`).  The
 -- genuine (not formal) `τ₃` so that `η = τ₃ ∘ ω` is a real virtual character downstream.  Axiom-clean.
 #assert_only_allowed_axioms OddOrder.Section16CharacterData.tau3W
+
+-- **cd producer (POLE-1 `charData`)** — `section16CharacterData_of_isMinimalSimpleOdd` packs the
+-- proven grid building blocks (`omegaS`/`muS`/`nuT`/`deltaS`/`deltaPrimeT`/`tau3W` with the
+-- `(13.1.e)` identities `muS_definition`/`nuT_definition`) into the `Section16CharacterData` carrier.
+-- The fields `Sset`/`Tset`/`A0S`/`A0T`/`tauS`/`tauT` carry honest placeholders (`∅`/`0`): they are
+-- verified-vestigial on the FT path (the §13/§16 contradiction in `S16_NonExistenceG` routes through
+-- `eta = τ₃ ∘ ω`, never the S/T-side coherent isometries), and `Hypothesis` places no `Prop` on them,
+-- so the placeholders add no unsound dependency.  Axiom-clean: closes one of the three POLE-1
+-- producers (`mp`/`tp`/`charData`).
+#assert_only_allowed_axioms OddOrder.section16CharacterData_of_isMinimalSimpleOdd

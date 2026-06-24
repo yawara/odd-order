@@ -1663,17 +1663,58 @@ noncomputable def tau3W : OddOrder.Peterfalvi.S07.IntegralCharacterMap ↥tp.W G
 
 end Section16CharacterData
 
-/-- **Peterfalvi §13 coherent Dade-grid producer** (`sorry`) — *lane-b*
+/-- **Peterfalvi §13 coherent Dade-grid producer** (`sorry`-free) — *lane-b*
 (Peterfalvi §3–§13 coherent grids).  Given the maximal pair and the type-P
-structure, constructs the character grids `ω, μ, ν`, the signs, the integral maps,
-and the exceptional-character data with the induction identities.
+structure, constructs the character grids `ω, μ, ν`, the signs `δ, δ'`, the integral
+maps, and the induction identities (13.1.d/e).
 
-The grids are read off the certain-type machinery of `mp.S`/`mp.T`
-(`Section16MaximalPair.certainTypeS`/`certainTypeT`, built with `W₁ = mp.K`), so they are indexed by
-`mp.K`, `mp.Kstar`; aligning this with `tp.W₁`, `tp.W₂` is the residual (see notes 更新¹⁶). -/
+The mathematically substantive fields are the genuine §13 grid:
+* `omega := omegaS` — the shared `ω`-grid, materialized from the certain-type machinery of
+  `mp.S` (`certainTypeS`, indexed by `mp.K`, `mp.Kstar` and aligned to `tp.W₁, tp.W₂` via
+  `tp.W1_eq_K`/`W2_eq_Kstar`).  `omegaS_eq_omegaT` proves it equals the T-side reconstruction, so
+  the single `ω`-field satisfies *both* induction identities;
+* `mu := muS`, `nu := nuT`, `delta := deltaS`, `deltaPrime := deltaPrimeT` — the induced
+  exceptional characters and signs read off `certainTypeS`/`certainTypeT`'s `columnFamily`;
+* `tau3 := tau3W` — the genuine §3.2 Dade σ-integral of the G-internal TI-cyclic structure on
+  `W = S ∩ T`, supported on `Ẑ = W \ (W₁ ∪ W₂)` (built from the proven BG Theorem 14.7 TI fact and
+  the general §4 Dade producer; `#print axioms` is `sorryAx`-free);
+* `mu_definition := muS_definition`, `nu_definition := nuT_definition` — Peterfalvi (13.1.e),
+  proven `sorry`-free.
+
+**Vestigial fields** `Sset, Tset, A0S, A0T, tauS, tauT` carry honest placeholders (`∅`, `0`).
+These are *not* consumed on the FT critical path: the §13/§16 contradiction in
+`Peterfalvi.S16` (`S16_NonExistenceG`) is routed entirely through `eta = τ₃ ∘ ω` (the W-side
+Dade grid), never through the S/T-side maximal-coherent isometries `τ_S, τ_T`.  The only
+references to `tauS`/`tauT` are the (currently `sorry`-stubbed, *uncited*) coherence-wiring
+lemmas in `S15_SAndT_Setup`, which lie off the FT path.  `Hypothesis` itself places no `Prop`
+constraint on these six fields, so the placeholders introduce no unsound dependency — they are
+genuine values of the right type for fields the formalized contradiction does not read.  (User
+decision 2026-06-24, issue 1004: close the producer on the verified-vestigial finding rather
+than build the off-path §7 maximal-coherent Dade theory.) -/
 noncomputable def section16CharacterData_of_isMinimalSimpleOdd {G : Type*} [Group G] [Finite G]
     (hG : IsMinimalSimpleOdd G) (mp : Section16MaximalPair G) (tp : Section16TypePStructure mp) :
-    Section16CharacterData mp tp := sorry
+    Section16CharacterData mp tp := by
+  -- The grid building blocks carry `[NeZero |certainType{S,T}.W₁|]` (the prime base-index
+  -- normalization); discharge both from `|certainTypeS.W₁| = tp.q`, `|certainTypeT.W₁| = tp.p`.
+  haveI : NeZero (Nat.card ↥(mp.certainTypeS hG).W1) :=
+    ⟨by rw [Section16CharacterData.cardCertainTypeS_W1 hG mp tp]; exact tp.q_prime.pos.ne'⟩
+  haveI : NeZero (Nat.card ↥(mp.certainTypeT hG).W1) :=
+    ⟨by rw [Section16CharacterData.cardCertainTypeT_W1 hG mp tp]; exact tp.p_prime.pos.ne'⟩
+  exact
+    { Sset := ∅
+      Tset := ∅
+      A0S := ∅
+      A0T := ∅
+      tauS := 0
+      tauT := 0
+      omega := Section16CharacterData.omegaS hG mp tp
+      mu := Section16CharacterData.muS hG mp tp
+      nu := Section16CharacterData.nuT hG mp tp
+      delta := Section16CharacterData.deltaS hG mp tp
+      deltaPrime := Section16CharacterData.deltaPrimeT hG mp tp
+      tau3 := Section16CharacterData.tau3W hG mp tp
+      mu_definition := Section16CharacterData.muS_definition hG mp tp
+      nu_definition := Section16CharacterData.nuT_definition hG mp tp }
 
 /-- **Assembly of `Section16Inputs` from the three lane producers** (`sorry`-free).
 Each field of `Section16Inputs` is sourced from exactly one of `mp` / `tp` / `cd`;
