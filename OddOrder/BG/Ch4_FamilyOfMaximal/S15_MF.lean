@@ -8197,6 +8197,69 @@ theorem typeF_nonabelian_cyclic_opiCore_compl [Finite G]
     · exact ho
   exact ⟨hpπ, isCyclic_of_isMulCommutative_of_rank_le_one hRab hRodd hrankR⟩
 
+/-- **BG Theorem 15.7(e), conjunct A per-prime witness** (Coq `oZ`: `|Ω₁(Z(O_q(H)))| = q`): for the
+non-TI witness data and a non-abelian `M_F`, every prime `q ∈ π(M_F)` has an order-`q` subgroup `Z`
+of `M_F` that is normal in `M` (hence `td.U0`-invariant), feeding
+`typeF_exponent_dvd_sub_one_of_invariant_card`.
+
+* `q ≠ p`: `O_q(M_F) ≤ O_{p'}(M_F)` is cyclic (`typeF_nonabelian_cyclic_opiCore_compl`), so its unique
+  order-`q` subgroup `Ω₁(O_q(M_F))` is characteristic (`characteristic_of_subgroup_of_isCyclic`) in
+  `O_q(M_F)`, characteristic in `M_F`, hence normal in `M`.
+* `q = p`: `Z = Ω₁(Z(O_p(M_F)))`; `|Z| = p` because `B = X₁ ⊔ Z` is elementary abelian of `p`-rank
+  `≤ rank (M_F ⊓ C_G(X₁)) < 3`, forcing `pRank Z ≤ 1`, and `Z ≠ ⊥` (`O_p(M_F)` is a nontrivial
+  `p`-group); `X₁ ⊄ Z` because `O_p(M_F)` is non-abelian (else `M_F = O_p ⊔ O_{p'}` abelian). -/
+theorem exists_orderQ_le_mf_normal_in_M_of_not_fittingIsTI [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} (hM : M ∈ maximalSubgroups G)
+    {p : ℕ} {X₁ : Subgroup G} (hp : p.Prime)
+    (hX₁card : Nat.card ↥X₁ = p) (hX₁MF : X₁ ≤ MF M)
+    (hCGnotM : ¬ Subgroup.centralizer (X₁ : Set G) ≤ M)
+    (hrank3 : rank ↥(MF M ⊓ Subgroup.centralizer (X₁ : Set G)) < 3)
+    (hnab : ¬ IsMulCommutative ↥(MF M))
+    {q : ℕ} (hq : q.Prime) (hqπ : q ∈ (Nat.card ↥(MF M)).primeFactors) :
+    ∃ Z : Subgroup G, Z ≤ MF M ∧ Nat.card ↥Z = q ∧
+      M ≤ Subgroup.normalizer (Z : Set G) := by
+  classical
+  haveI : Fact p.Prime := ⟨hp⟩
+  haveI : Fact q.Prime := ⟨hq⟩
+  haveI hMFnil : Group.IsNilpotent ↥(MF M) := maxNilpotentNormalHall_isNilpotent M
+  have hMNMF : M ≤ Subgroup.normalizer ((MF M : Subgroup G) : Set G) :=
+    maxNilpotentNormalHall_le_normalizer M
+  by_cases hqp : q = p
+  · -- `q = p`: `Z = Ω₁(Z(O_p(M_F)))`, `|Z| = p` by the rank argument.
+    sorry
+  · -- `q ≠ p`: `O_q(M_F) ≤ O_{p'}(M_F)` is cyclic; take its order-`q` subgroup.
+    have hqdvd : q ∣ Nat.card ↥(MF M) := (Nat.mem_primeFactors.mp hqπ).2.1
+    obtain ⟨x, hxord⟩ := exists_prime_orderOf_dvd_card' (G := ↥(MF M)) q hqdvd
+    set Z : Subgroup G := (Subgroup.zpowers x).map (MF M).subtype with hZdef
+    have hZcard : Nat.card ↥Z = q := by
+      rw [hZdef, Subgroup.card_map_of_injective (MF M).subtype_injective, Nat.card_zpowers, hxord]
+    have hZMF : Z ≤ MF M := hZdef ▸ Subgroup.map_subtype_le _
+    have hZpg : IsPGroup q ↥Z := IsPGroup.of_card (n := 1) (by rw [hZcard, pow_one])
+    -- `Z ≤ O_q(M_F)` (a `q`-group inside the nilpotent `M_F`).
+    have hZOq : Z ≤ opiCoreInG ({q} : Set ℕ) (MF M) :=
+      OddOrder.BG.Ch2.S08.le_opiCoreInG_singleton_of_isPGroup_of_le_nilpotent hMFnil hZMF hZpg
+    -- `O_q(M_F) ≤ O_{p'}(M_F)` (as `q ≠ p`), and `O_{p'}(M_F)` is cyclic, so `O_q(M_F)` is cyclic.
+    have hcyc : IsCyclic ↥(opiCoreInG (({p} : Set ℕ)ᶜ) (MF M)) :=
+      (typeF_nonabelian_cyclic_opiCore_compl hG hM hp hX₁card hX₁MF hCGnotM hnab).2
+    have hOqle : opiCoreInG ({q} : Set ℕ) (MF M) ≤ opiCoreInG (({p} : Set ℕ)ᶜ) (MF M) :=
+      Subgroup.map_mono (OddOrder.Isaacs.Ch03.oPiCore_mono
+        (Set.singleton_subset_iff.mpr (Set.mem_compl_singleton_iff.mpr hqp)) ↥(MF M))
+    haveI : IsCyclic ↥(opiCoreInG (({p} : Set ℕ)ᶜ) (MF M)) := hcyc
+    haveI hOqcyc : IsCyclic ↥(opiCoreInG ({q} : Set ℕ) (MF M)) := Subgroup.isCyclic_of_le hOqle
+    -- `Z.subgroupOf O_q(M_F)` is characteristic (subgroup of a cyclic group).
+    haveI hWchar : (Z.subgroupOf (opiCoreInG ({q} : Set ℕ) (MF M))).Characteristic :=
+      OddOrder.Isaacs.Ch04.characteristic_of_subgroup_of_isCyclic _
+    -- `M ≤ N(O_q(M_F)) ≤ N(Z)`.
+    have hMNOq : M ≤ Subgroup.normalizer ((opiCoreInG ({q} : Set ℕ) (MF M) : Subgroup G) : Set G) :=
+      le_normalizer_opiCoreInG_of_le_normalizer ({q} : Set ℕ) hMNMF
+    have hZeq : (Z.subgroupOf (opiCoreInG ({q} : Set ℕ) (MF M))).map
+        (opiCoreInG ({q} : Set ℕ) (MF M)).subtype = Z :=
+      Subgroup.map_subgroupOf_eq_of_le hZOq
+    have hMNZ : M ≤ Subgroup.normalizer (Z : Set G) := by
+      rw [← hZeq]
+      exact hMNOq.trans (OddOrder.Isaacs.Ch07.normalizer_le_normalizer_map_of_characteristic)
+    exact ⟨Z, hZMF, hZcard, hMNZ⟩
+
 /-- **BG Theorem 15.7(a), rank-theoretic core** (mmd L4192-4198): if `F(M)` is not a TI-subgroup
 of `G`, then no prime divides `M_F` and lies in `β(M)`.
 

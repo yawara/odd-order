@@ -287,6 +287,35 @@ T-side dual を構成。これで `omegaS = omegaT` が construction から従�
 (`tauS`/`tauT`=§7 Dade map, `Sset`/`Tset`=inducedFamily, `A0S`/`A0T`=supportInSubgroup) / piece 8 = pack
 (producer の sorry を埋める)。omega/mu/nu/delta/deltaPrime/両 induction 恒等式は全て揃った。
 
+## ✅✅✅ 2026-06-23 更新²¹ — **cd `tau3` COMPLETE (piece 5, real Dade σ-integral) + tauS/tauT honesty 確定**
+
+piece 5 (`tau3`) を **genuine な Dade σ-integral として sorry-free + axiom-clean で landing** (commit `dc36a2bd`)。
+producer の sorry 不変 (building block)。full build 3883 green。
+
+- **`tau3W` = `tiW.sigmaIntegral rfl app`** (FeitThompson)。`tiW : S05.TICyclicHypothesis G` を W=tp.W=mp.K⊔mp.Kstar、
+  **support V = `W \ (W₁∪W₂)` = `S14.zTilde mp.K mp.Kstar`** (cyclic W の Dade regular elements) で構成。`hVeq : V=Vdiff` rfl。
+- **🔑 V_ti (G 内 TI 性) = proven `BG §14 typeP_duality` (Thm 14.7) から抽出** (mp.S 適用、`∃! Mstar` の
+  zTilde-TI conjunct `.2.2.2.2.2.1`、S16:858 と同手法)。Dade 等長 = 一般 producer `S04.Hypothesis.fullDadeIsometryData`
+  (全 H(a)=⊥ ゆえ `HConjInvariant.of_forall_H_eq_bot` 自動)。
+- **`#print axioms tau3W = {propext, Classical.choice, Quot.sound}` (sorryAx 無し)** ⟹ typeP_duality も §4 Dade 等長も
+  fully proven。AxiomsCheck 登録済。
+- engineering: `TICyclicHypothesis G` の `[Fintype G]` は inline `let tiW`+haveI で回避; `Invertible (Nat.card G:ℂ)`
+  =invertibleOfNonzero; TI 抽出 `obtain` は **data tactic block で Exists 消去不可 → Prop `have` 内へ**。
+
+### 🔑 tauS/tauT/Sset/A0S の honesty 確定 (closing 判断の根拠)
+
+下流調査: **`.tauS`/`.tauT`/`.Sset`/`.Tset`/`.A0S`/`.A0T` は S16_NonExistenceG / S15 で使用 0** (vestigial)、
+一方 **`.eta` は S16 で 5 箇所 consume** (tau3 を real にした理由、tau3W で対応済)。assembly が S16.Hypothesis に課す
+Prop は mu_definition/nu_definition/eta_eq_tau_omega(rfl)/m_eq(rfl) のみ ⟹ Sset/tauS 等は **Prop 制約なしの opaque data**。
+- **Sset/Tset = `inducedFamily mp.S/T` (S12:69), A0S/A0T = `supportInSubgroup _ mp.S/T` (S04:137)** = cheap・honest・in-stock。
+- **tauS/tauT = §7 maximal-subgroup coherent Dade (Sibley)** = mp.S は TI-cyclic でない (大きな極大) ゆえ tau3W の §5
+  mirror では作れない deep。SibleyDadeHypothesis + (6.8) coherence 組立が要る別 sub-project。**induction で埋めるのは
+  [[scaffold-sorry-free-not-done]] (intended object でない) ゆえ不可**。
+- ⟹ **closing (piece 8) は tauS/tauT の §7 honest 構成が前提**。cd grid の数学 hard core (omega/mu/nu/delta/deltaPrime/
+  両誘導恒等式/tau3) は完了したが、producer 全体は §7 maximal Dade 待ち。
+
+**残**: piece 6 = tauS/tauT (§7 coherent Dade、substantial) / Sset/Tset/A0S/A0T (cheap, in-stock) / piece 8 = pack。
+
 ## ✅✅✅✅✅✅ 2026-06-23 更新¹⁴ — **Pf (10.6) + (2.7) + (10.9) COMPLETE** (1 session, sorry 5→3)
 
 **本セッション成果 (lane-b, 全 build-green + axiom-clean modulo §10 muGrid 上流 gate)**:

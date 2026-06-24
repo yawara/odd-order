@@ -1426,10 +1426,19 @@ theorem isTypeI_of_isTypeF [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
         le_trans (le_trans h2pRank (pRank_le_rank p))
           (rank_le_of_injective (Subgroup.inclusion_injective hOpMF))
       omega
-    · -- non-abelian `M_F` ⟹ disjunct (c): exponent condition + cyclic `O_{p'}(M_F)`
-      -- (Frobenius semiregular action; BG Theorem 15.7(e2)).  Deferred residual.
-      refine Or.inr (Or.inr ?_)
-      sorry
+    · -- non-abelian `M_F` ⟹ disjunct (c): the exponent condition (conjunct A, via the Frobenius
+      -- divisibility engine + per-prime order-`q` witnesses) and cyclic `O_{p'}(M_F)` (conjunct B).
+      refine Or.inr (Or.inr ⟨fun q _hq hqπ => ?_, ?_⟩)
+      · -- conjunct A: `exp U ∣ q - 1` for each `q ∈ π(M_F)`.
+        obtain ⟨Z, hZMF, hZcard, hMNZ⟩ :=
+          exists_orderQ_le_mf_normal_in_M_of_not_fittingIsTI hG hM hp hX₁card hX₁MF _hCGnotM
+            hrank3 habel _hq hqπ
+        exact typeF_exponent_dvd_sub_one_of_invariant_card td (by rw [td.H_eq]; exact hZMF)
+          hZcard ((td.U0_le.trans td.U_le).trans hMNZ)
+      · -- conjunct B: `∃ p ∈ π(M_F), IsCyclic O_{p'}(M_F)`.
+        exact ⟨p, hp,
+          (typeF_nonabelian_cyclic_opiCore_compl hG hM hp hX₁card hX₁MF _hCGnotM habel).1,
+          (typeF_nonabelian_cyclic_opiCore_compl hG hM hp hX₁card hX₁MF _hCGnotM habel).2⟩
 
 /-- **Type-`P` `V`-normalizer characterization** (the `normalizer_V` field of `TypePData`,
 Peterfalvi (8.4); BG records it as the self-normalizing exceptional set `M = N_G(V)`): if

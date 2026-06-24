@@ -2182,6 +2182,19 @@ set_option linter.style.longLine false in
 -- `|L:H| = |K:H|·|L:K|`) feeding `six_three_HH1_le`; reduces the `six_three_descent` `h62` oracle to
 -- the general `six_two` (6.2) bound for a solvable `K` (the single remaining deep gate).
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S08.six_three_index_bound_general
+-- general `six_two` assembly: `map_mk'_le_center_iff` (image-in-centre ⟺ commutator condition);
+-- `inducedMember_re_le_general` (the (6.2) θ-degree bound `ψ(1) ≤ |L:H|·√|H:A|` for a member induced
+-- from the *solvable* kernel `K ⊋ H`, Clifford a-half + b-half via `theta_degree_le_index_mul_sqrt_index`,
+-- centrality transported across `↥(H.subgroupOf K) ≃* ↥H`); `six_two_general` (Peterfalvi (6.2), general
+-- (6.1) form: reduces `|K:A|−1 ≤ 2|L:H|·√|H:A|` to the (5.6) coherence oracle `h56` — the cross-lane
+-- §10–§12 muGrid bound, issue 2022 — by proving everything downstream of it).
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S08.map_mk'_le_center_iff
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S08.inducedMember_re_le_general
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S08.six_two_general
+-- `six_three_of_six_two_oracle`: the single-cite (6.3) producer for §11/§13 — bundles
+-- `six_three_descent ∘ six_three_index_bound_general ∘ six_two_general`, leaving the (5.6) break-member
+-- oracle `h56` (the §10–§12 muGrid bound) as the only character-theoretic hypothesis.
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S08.six_three_of_six_two_oracle
 -- (6.5) chief-factor core + (6.5)(b) reduction: a Frobenius-acted abelian section obeying the (6.3)
 -- index bound `≤ 4|R|²+1` is a `p`-group (chief-factor argument via the `p`-primary component,
 -- `card_modEq_one` + `six_five_chief_factor_contradiction`); combined with the nilpotent
@@ -5973,3 +5986,20 @@ formula together with the prime computation `coprimeFrobeniusAction_card_eq_prim
 #assert_only_allowed_axioms OddOrder.Section16CharacterData.rowT_zero
 #assert_only_allowed_axioms OddOrder.Section16CharacterData.omegaS_eq_omegaT
 #assert_only_allowed_axioms OddOrder.Section16CharacterData.nuT_definition
+-- **cd `tau3` (piece 5, real Dade σ-integral)** — `tau3W` is the Peterfalvi (3.2) σ-isometry of the
+-- G-internal TI-cyclic structure on `W = tp.W = mp.K ⊔ mp.Kstar` (support `Ẑ = W \ (W₁ ∪ W₂) =
+-- S14.zTilde`), as an `IntegralCharacterMap`.  The TI-set fact is read off the proven `BG §14
+-- typeP_duality` (Theorem 14.7), the Dade isometry from the general §4 producer
+-- `S04.Hypothesis.fullDadeIsometryData` (`HConjInvariant` automatic since all `H(a) = ⊥`).  The
+-- genuine (not formal) `τ₃` so that `η = τ₃ ∘ ω` is a real virtual character downstream.  Axiom-clean.
+#assert_only_allowed_axioms OddOrder.Section16CharacterData.tau3W
+
+-- **cd producer (POLE-1 `charData`)** — `section16CharacterData_of_isMinimalSimpleOdd` packs the
+-- proven grid building blocks (`omegaS`/`muS`/`nuT`/`deltaS`/`deltaPrimeT`/`tau3W` with the
+-- `(13.1.e)` identities `muS_definition`/`nuT_definition`) into the `Section16CharacterData` carrier.
+-- The fields `Sset`/`Tset`/`A0S`/`A0T`/`tauS`/`tauT` carry honest placeholders (`∅`/`0`): they are
+-- verified-vestigial on the FT path (the §13/§16 contradiction in `S16_NonExistenceG` routes through
+-- `eta = τ₃ ∘ ω`, never the S/T-side coherent isometries), and `Hypothesis` places no `Prop` on them,
+-- so the placeholders add no unsound dependency.  Axiom-clean: closes one of the three POLE-1
+-- producers (`mp`/`tp`/`charData`).
+#assert_only_allowed_axioms OddOrder.section16CharacterData_of_isMinimalSimpleOdd
