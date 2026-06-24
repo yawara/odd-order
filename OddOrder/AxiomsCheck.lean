@@ -103,6 +103,7 @@ import OddOrder.Peterfalvi.S06_CertainTypeIsometry
 import OddOrder.Peterfalvi.S06_CertainTypeConjugation
 import OddOrder.Peterfalvi.S06_MuColumnBridge
 import OddOrder.Peterfalvi.S07_Coherence
+import OddOrder.Peterfalvi.S07_CoherenceConstantDegree
 import OddOrder.Peterfalvi.S07_CoherenceGalois
 import OddOrder.Peterfalvi.S08_CoherenceTheorems
 import OddOrder.Peterfalvi.S08_Theorem62_63_Standalone
@@ -6015,3 +6016,18 @@ formula together with the prime computation `coprimeFrobeniusAction_card_eq_prim
 -- so the placeholders add no unsound dependency.  Axiom-clean: closes one of the three POLE-1
 -- producers (`mp`/`tp`/`charData`).
 #assert_only_allowed_axioms OddOrder.section16CharacterData_of_isMinimalSimpleOdd
+
+-- **Peterfalvi (5.7) standalone constant-degree coherence producer** —
+-- `coherent_of_constant_degree`: under Hypothesis (5.2) + equal degree, `S` is coherent.  Proven by
+-- the one-shot auxiliary isometry `χⱼ ↦ β − (χ₀ − χⱼ)^τ` (`β = χ₀^{τ₁}` the common `R(χ₀)`-projection,
+-- independent of the auxiliary member by the (5.4.b) two-sided norm argument `pairDecomp_two_sided`
+-- and the 4-case independence `commonImage_inner`), fed to `coherentEqualDegree`; single-pair `S`
+-- routes to the (5.2.d) base case `isCoherent_pair_of_differenceImage`.  All Dade-specific data
+-- (ℤ[Irr G]-membership of supported differences, support, `1 ∉ A`) are explicit hypotheses
+-- discharged by the §13 consumer.  Axiom-clean.
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S07.isCoherent_pair_of_differenceImage
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S07.pairDecomp_two_sided
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S07.commonImage_self
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S07.commonImage_inner
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S07.xFamily_inner
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S07.coherent_of_constant_degree
