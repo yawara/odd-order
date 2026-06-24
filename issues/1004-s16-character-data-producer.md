@@ -122,3 +122,15 @@ piece 3 (最難所、S/T-shared-ω symmetry) の transport foundation を sorry-
   3883 green、producer の sorry 不変 (building block)。
 - **残 cd piece**: 5=`tau3` (W=S∩T の G 内 TI-cyclic + sigmaIntegral, real η) / 6-7=free field
   (tauS,tauT,Sset,Tset,A0S,A0T) / 8=pack (producer の sorry 解消)。grid (omega/mu/nu/delta/deltaPrime/両恒等式) 完備。
+
+## 進捗 (2026-06-23, lane-b 再開⁶) — ✅ cd `tau3` COMPLETE (piece 5) + tauS/tauT honesty 確定
+
+**piece 5 (`tau3`) を genuine な Dade σ-integral で sorry-free + axiom-clean landing** (commit `dc36a2bd`)。
+正本 = `notes/.../s12_s10_character_bridge.md` 更新²¹。
+- `tau3W` = `tiW.sigmaIntegral` (W=tp.W, support `zTilde`=W\(W₁∪W₂))。**V_ti は proven `typeP_duality` から抽出**、
+  Dade 等長は一般 producer `fullDadeIsometryData`。`#print axioms = {propext,choice,Quot.sound}` (sorryAx 無し)。
+- **honesty 確定**: tauS/tauT/Sset/A0S は下流で使用 0 (vestigial、eta のみ 5 箇所 consume→tau3W で対応)。
+  Sset/A0S=inducedFamily/supportInSubgroup (cheap)、**tauS/tauT=§7 maximal coherent Dade (deep、別 sub-project;
+  mp.S は TI-cyclic でないため tau3W mirror 不可; induction は scaffold ゆえ不可)**。
+- ⟹ **cd grid の数学 hard core 完了** (omega/mu/nu/delta/deltaPrime/両誘導恒等式/tau3)。closing (piece 8) は
+  tauS/tauT の §7 honest 構成が前提 = 次の substantial piece。
