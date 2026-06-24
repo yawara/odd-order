@@ -16,15 +16,16 @@ The §11/§13 maximal-subgroup analysis (Peterfalvi (11.5), repo `S13_MaximalIII
 needs this: since `M'/M''` is abelian, the constituents of `S(M'')` all have equal degree, so (5.7)
 makes `S(M'')` coherent — the coherence content of `M'' = HC`.
 
-**Status (lane-c relane #8, issue 4012): scoping + signature skeleton.**  All the proof ingredients
-already live in `S07_Coherence`: the (5.2) hypothesis carrier `S07.Hypothesis`, the (5.4)
-decomposition `CharacterPsiDecomposition`, the (5.4.b)/(5.5) norm lemmas
-(`norm_eq_and_X_eq_sum_of_norm_Y_ge` / `eq_sum_of_psi_eq_zero`), and the coherence constructor
-`retarget_isCoherent_of_decompositions`.  So (5.7) is an *assembly*, not a missing-machinery gap
-(unlike lane-h's (6.2) which needed the `h62` index oracle).  The proof (base case `|S| = 2` from
-(5.2.d); inductive build of the auxiliary isometry `τ₁` via per-member `ψ = 0` decompositions, then
-`retarget_isCoherent_of_decompositions`) is the next session's work; design + framework mapping are
-in `notes/peterfalvi/s05_57_constant_degree_coherence_producer.md`.
+**Status (lane-c relane #8, issue 4012): COMPLETE — `coherent_of_constant_degree` sorry-free +
+axiom-clean.**  The proof follows Peterfalvi (5.7) directly rather than the inductive `retarget`
+chain: the auxiliary isometry `τ₁` is built in *one shot* (`χ₀ ↦ β`, `χⱼ ↦ β − (χ₀ − χⱼ)^τ`).  Because
+all members share a degree, every difference `χ₀ − χⱼ` is supported, so `τ₁`'s decompositions use the
+fixed Dade map `τ` itself (no running-extension/Gram–Schmidt residual), and the orthonormal target
+family feeds the equal-degree coherence builder `coherentEqualDegree`.  The common image `β` (a single
+element of `R(χ₀)`) is independent of the auxiliary member by the (5.4.b) two-sided norm argument
+(`pairDecomp_two_sided`) and the 4-case independence (`commonImage_inner`); a single conjugate pair `S`
+routes to the (5.2.d) base case.  Design + framework mapping are in
+`notes/peterfalvi/s05_57_constant_degree_coherence_producer.md`.
 -/
 
 namespace OddOrder.Peterfalvi.S07
