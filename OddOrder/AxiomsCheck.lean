@@ -5622,14 +5622,19 @@ and the TI case of the type-I `alternative` trichotomy (Peterfalvi (8.3)(a)).
 * `maxNilpotentNormalHall_sharp_isTISubset_of_fittingIsTI` — `FittingIsTI M ⟹ M_F#` is a `TI`-subset
   (the first disjunct of `TypeIData.alternative` in the `F(M)`-TI case of `hFI`).
 
-All three are unconditional / axiom-clean.  The `TypeFData` wrapper `isTypeF_groupTheory_of_isTypeF`
-and the assembled bridge `isTypeI_of_isTypeF` are *not* registered: both are transitively conditional
-on the (sorried) Theorem A via `typeFData_of_kappa_eq_bot`.  (The other former gate — the non-TI
-residual BG Theorem 15.7(e) — is now closed: its per-prime witness
-`exists_orderQ_le_mf_normal_in_M_of_not_fittingIsTI` is sorry-free + axiom-clean, registered above.) -/
+All three are unconditional / axiom-clean.  **The full `hFI` bridge `isTypeI_of_isTypeF` (type `F ⟹`
+type I) is now axiom-clean**, together with its `TypeFData` construction `typeFData_of_kappa_eq_bot`
+and the wrapper `isTypeF_groupTheory_of_isTypeF`: both former gates are closed — the non-TI residual
+(BG Theorem 15.7(e)) by the per-prime witness `exists_orderQ_le_mf_normal_in_M_of_not_fittingIsTI`
+(registered above), and the Theorem A dependency by routing `typeFData_of_kappa_eq_bot`'s A(3)/A(8)
+through `typeP_maximal_eq_kappaHall_sup_U_sup_Msigma` + `isTypeP1_kappaSigma_compl_hall_subgroupOf_eq_bot`
+(Thm 15.2) instead of the `sorry` standalone `theoremA_maximal_structure`. -/
 #assert_only_allowed_axioms OddOrder.BG.Ch4.S16.normalizer_eq_self_of_subgroupOf_normal_of_ne_bot
 #assert_only_allowed_axioms OddOrder.BG.Ch4.S16.normalizer_fittingInAmbient_eq_self
 #assert_only_allowed_axioms OddOrder.BG.Ch4.S16.maxNilpotentNormalHall_sharp_isTISubset_of_fittingIsTI
+#assert_only_allowed_axioms OddOrder.BG.Ch4.S16.typeFData_of_kappa_eq_bot
+#assert_only_allowed_axioms OddOrder.BG.Ch4.S16.isTypeF_groupTheory_of_isTypeF
+#assert_only_allowed_axioms OddOrder.BG.Ch4.S16.isTypeI_of_isTypeF
 -- 15.7(e) conjunct A divisibility engine (Coq `regZq_dv_q1`): a `U0`-invariant order-`q` subgroup
 -- of the Frobenius kernel `M_F` forces `exp U ∣ q - 1` (Frobenius semiregular action).
 #assert_only_allowed_axioms OddOrder.BG.Ch4.S16.typeF_exponent_dvd_sub_one_of_invariant_card

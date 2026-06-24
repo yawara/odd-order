@@ -1205,6 +1205,35 @@ theorem maxNilpotentNormalHall_sharp_isTISubset_of_fittingIsTI [Finite G]
   -- `FittingIsTI` ⟹ `g ∈ N_G(F(M)) = M ≤ N_G(M_F)`.
   exact hMnorm (hNF ▸ hTI g ⟨a, ha', hga'⟩)
 
+/-- **Theorem A(8) `U = ⊥` core, from type `P₁`** (mmd L4274): for a type-`P₁` maximal subgroup,
+the Hall `(κ(M) ∪ σ(M))ᶜ`-complement `U` is trivial.  Type `P₁` means `κ(M) = π(M) ∖ σ(M)`
+(`IsTypeP1.2`), so `π(M) ⊆ κ(M) ∪ σ(M)` and the prime set `(κ(M) ∪ σ(M))ᶜ` meets `π(M)` only in
+`∅`; a Hall `(κ ∪ σ)ᶜ`-subgroup of `M` therefore has order coprime to `|M|`, i.e. trivial.
+
+This is the `U = ⊥` conjunct of Theorem A(8) (`theoremA_maximal_structure`), now **derivable from
+`Thm 15.2 (mf_ne_msigma_typeP1_structure)`** via `isTypeP1_of_mf_ne_msigma`: `M_F ≠ M_σ ⟹ IsTypeP1 ⟹
+U = ⊥`.  Together with `|K| = p` (also a Thm 15.2 output) this leaves only `FittingIsTI M` for the
+full A(8).  Stated for the relative `U.subgroupOf M` (which is what the Hall hypothesis constrains);
+when `U ≤ M` it gives `U = ⊥`. -/
+theorem isTypeP1_kappaSigma_compl_hall_subgroupOf_eq_bot [Finite G] {M U : Subgroup G}
+    (hP1 : S14.IsTypeP1 M)
+    (hU : Ch03.IsHallSubgroup ((S14.kappa M ∪ OddOrder.BG.Ch3.S10.sigma M)ᶜ) (U.subgroupOf M)) :
+    U.subgroupOf M = ⊥ := by
+  rw [← Subgroup.card_eq_one]
+  by_contra hne
+  obtain ⟨p, hpp, hpdvd⟩ := Nat.exists_prime_and_dvd hne
+  -- `p ∈ (κ ∪ σ)ᶜ` (Hall) and `p ∈ π(M)` (`|U.subgroupOf M| ∣ |M|`).
+  have hpcompl : p ∈ (S14.kappa M ∪ OddOrder.BG.Ch3.S10.sigma M)ᶜ :=
+    hU.1 p (Nat.mem_primeFactors.mpr ⟨hpp, hpdvd, Nat.card_pos.ne'⟩)
+  have hpM : p ∈ (Nat.card ↥M).primeFactors :=
+    Nat.mem_primeFactors.mpr ⟨hpp,
+      hpdvd.trans (Subgroup.card_subgroup_dvd_card (U.subgroupOf M)), Nat.card_pos.ne'⟩
+  -- but `π(M) ⊆ κ(M) ∪ σ(M)` for type `P₁`.
+  refine hpcompl ?_
+  by_cases hpσ : p ∈ OddOrder.BG.Ch3.S10.sigma M
+  · exact Set.mem_union_right _ hpσ
+  · exact Set.mem_union_left _ (hP1.2 ▸ ⟨hpM, hpσ⟩)
+
 /-- **Prop 16.1(a) forward bridge, core** (mmd L4480): a type-`F` maximal `M` (`κ(M) = ∅`, so the
 Hall `κ`-subgroup `K = ⊥`) carries the shared Peterfalvi type-`F` structure `TypeFData M`.
 
@@ -1214,8 +1243,9 @@ from `typeP_auxiliary_structure` (mmd 15.1(d)(e)); `H = M_F = M_σ` from Theorem
 out the `M_F ≠ M_σ` branch); `M = U M_σ` from Theorem A(3) with `K = ⊥`; `centralizer_le_U1` is
 `le_sSup` over `M_F# ⊆ M_σ#`; and `U1_normal` (`⟨C_U(x) | x ∈ M_σ#⟩ ◁ U`) is `U`-conjugation
 invariance of the generating set `{U ⊓ C_G(x) : x ∈ M_σ#}` (`conj_smul_centralizerGeneratedBySigma`,
-as `M_σ ◁ M`).  Sorry-free in its own body; transitively conditional on the (sorried) Theorem A and
-the gated half of `typeP_auxiliary_structure`. -/
+as `M_σ ◁ M`).  **Axiom-clean**: A(3) is `typeP_maximal_eq_kappaHall_sup_U_sup_Msigma` and the A(8)
+`U = ⊥` exclusion routes through `isTypeP1_kappaSigma_compl_hall_subgroupOf_eq_bot` (Thm 15.2), not
+the `sorry` standalone `theoremA_maximal_structure`; `typeP_auxiliary_structure` is itself clean. -/
 theorem typeFData_of_kappa_eq_bot [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     {M K U : Subgroup G} (hM : M ∈ maximalSubgroups G) (hKM : K ≤ M) (hUM : U ≤ M)
     (hK : Ch03.IsHallSubgroup (S14.kappa M) (K.subgroupOf M)) (hKbot : K = ⊥)
@@ -1224,12 +1254,17 @@ theorem typeFData_of_kappa_eq_bot [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOd
     OddOrder.GroupTheory.IsTypeF M := by
   classical
   set Mσ := OddOrder.BG.Ch3.S10.Msigma M with hMσdef
-  -- Theorem A: the decomposition `M = K U M_σ` (A3) and the `M_F ≠ M_σ` branch (A8).
-  obtain ⟨_, _, hA3, _, _, _, _, _, _, _, hA8⟩ := theoremA_maximal_structure hG hM hK rfl hU
-  -- `M_F = M_σ`: `U ≠ ⊥` excludes A(8)'s `M_F ≠ M_σ ⟹ U = ⊥` conclusion.
+  -- Theorem A(3) decomposition `M = K U M_σ` (axiom-clean, via `hKM`/`hUM`; avoids the `sorry`
+  -- standalone `theoremA_maximal_structure`).
+  have hA3 : M = K ⊔ U ⊔ Mσ := typeP_maximal_eq_kappaHall_sup_U_sup_Msigma hG hM hKM hUM hK hU
+  -- `M_F = M_σ`: `U ≠ ⊥` excludes the type-`P₁` `U = ⊥` (Theorem A(8), via Thm 15.2).
   have hMFMσ : S15.MF M = Mσ := by
     by_contra hne
-    exact hUne (hA8 hne).1
+    have hUsub : U.subgroupOf M = ⊥ :=
+      isTypeP1_kappaSigma_compl_hall_subgroupOf_eq_bot (isTypeP1_of_mf_ne_msigma hG hM hne) hU
+    have h := Subgroup.map_subgroupOf_eq_of_le hUM
+    rw [hUsub, Subgroup.map_bot] at h
+    exact hUne h.symm
   -- `M = U M_σ` (A3 with `K = ⊥`).
   have hMU : M = U ⊔ Mσ := by rw [hA3, hKbot, bot_sup_eq]
   -- `typeP_auxiliary_structure`: `U1` abelian (15.1(d)) + the Frobenius `U₀ M_σ` (15.1(e)).
@@ -2056,35 +2091,6 @@ theorem typePData_kappa_nonempty_of_rank1 [Finite G]
       exact Commute.zpow_left (hy (g : G) (Set.mem_singleton _)) n
     exact fun hbot => hCne (le_bot_iff.mp ((inf_le_inf_left _ hCle).trans hbot.le))
 
-/-- **Theorem A(8) `U = ⊥` core, from type `P₁`** (mmd L4274): for a type-`P₁` maximal subgroup,
-the Hall `(κ(M) ∪ σ(M))ᶜ`-complement `U` is trivial.  Type `P₁` means `κ(M) = π(M) ∖ σ(M)`
-(`IsTypeP1.2`), so `π(M) ⊆ κ(M) ∪ σ(M)` and the prime set `(κ(M) ∪ σ(M))ᶜ` meets `π(M)` only in
-`∅`; a Hall `(κ ∪ σ)ᶜ`-subgroup of `M` therefore has order coprime to `|M|`, i.e. trivial.
-
-This is the `U = ⊥` conjunct of Theorem A(8) (`theoremA_maximal_structure`), now **derivable from
-`Thm 15.2 (mf_ne_msigma_typeP1_structure)`** via `isTypeP1_of_mf_ne_msigma`: `M_F ≠ M_σ ⟹ IsTypeP1 ⟹
-U = ⊥`.  Together with `|K| = p` (also a Thm 15.2 output) this leaves only `FittingIsTI M` for the
-full A(8).  Stated for the relative `U.subgroupOf M` (which is what the Hall hypothesis constrains);
-when `U ≤ M` it gives `U = ⊥`. -/
-theorem isTypeP1_kappaSigma_compl_hall_subgroupOf_eq_bot [Finite G] {M U : Subgroup G}
-    (hP1 : S14.IsTypeP1 M)
-    (hU : Ch03.IsHallSubgroup ((S14.kappa M ∪ OddOrder.BG.Ch3.S10.sigma M)ᶜ) (U.subgroupOf M)) :
-    U.subgroupOf M = ⊥ := by
-  rw [← Subgroup.card_eq_one]
-  by_contra hne
-  obtain ⟨p, hpp, hpdvd⟩ := Nat.exists_prime_and_dvd hne
-  -- `p ∈ (κ ∪ σ)ᶜ` (Hall) and `p ∈ π(M)` (`|U.subgroupOf M| ∣ |M|`).
-  have hpcompl : p ∈ (S14.kappa M ∪ OddOrder.BG.Ch3.S10.sigma M)ᶜ :=
-    hU.1 p (Nat.mem_primeFactors.mpr ⟨hpp, hpdvd, Nat.card_pos.ne'⟩)
-  have hpM : p ∈ (Nat.card ↥M).primeFactors :=
-    Nat.mem_primeFactors.mpr ⟨hpp,
-      hpdvd.trans (Subgroup.card_subgroup_dvd_card (U.subgroupOf M)), Nat.card_pos.ne'⟩
-  -- but `π(M) ⊆ κ(M) ∪ σ(M)` for type `P₁`.
-  refine hpcompl ?_
-  by_cases hpσ : p ∈ OddOrder.BG.Ch3.S10.sigma M
-  · exact Set.mem_union_right _ hpσ
-  · exact Set.mem_union_left _ (hP1.2 ▸ ⟨hpM, hpσ⟩)
-
 /-- **Theorem A(8), the `FittingIsTI`-free part** (mmd L4274): for `M_F ≠ M_σ`, the Hall
 `(κ ∪ σ)ᶜ`-complement `U` is trivial and `|K| = p` is prime.  Both follow from
 `mf_ne_msigma_typeP1_structure` (Theorem 15.2): `M_F ≠ M_σ ⟹ IsTypeP1 M`
@@ -2413,13 +2419,13 @@ theorem proposition_type_classification [Finite G]
         OddOrder.GroupTheory.IsTypeI M ∨ OddOrder.GroupTheory.IsTypeII M ∨
           OddOrder.GroupTheory.IsTypeV M) := by
   -- Apply the `§14`/`§15`-independent assembly engine, supplying the inputs that are *proved*
-  -- (`hP2II` = `isTypeII_of_isTypeP2`, issue 7007 cont.¹¹; `hP_derived`/`hF_not_derived` = Theorem
-  -- C(3)/A(3); `h152a` = Theorem 15.2(a)) and leaving the genuinely-gated bridges as the residual.
-  -- The 7 remaining bridges (issue 8015) all bottom out on either the carrier `W₁`/`U`-Hall
-  -- characterization (`TypePData` carries `W₁`/`U` abstractly, so `π(W₁) ⊆ κ(M)` / `U = (κ∪σ)'`-Hall
-  -- need the BG structure theory — the `→ M_P` direction `hIIP2`/`hIIIIVP1`/`hVP1` and the reverse
-  -- `hIF`), or the deep Type-I/V trichotomies (`hFI` = Peterfalvi (8.3) = BG Theorem 15.7(d)(e)
-  -- `nonTI_Fitting_structure`, not yet formalized; `hP1neIIIIV`/`hP1eqV` = (8.3)/(8.8)).
+  -- (`hFI` = `isTypeI_of_isTypeF`, axiom-clean, issue 7007 cont.¹⁶; `hP2II` = `isTypeII_of_isTypeP2`,
+  -- axiom-clean, cont.¹¹; `hP_derived`/`hF_not_derived` = Theorem C(3)/A(3); `h152a` = Theorem
+  -- 15.2(a)) and leaving the genuinely-gated bridges as the residual.  The 6 remaining bridges
+  -- (issue 8015) bottom out on either the carrier `W₁`/`U`-Hall characterization (`TypePData` carries
+  -- `W₁`/`U` abstractly, so `π(W₁) ⊆ κ(M)` / `U = (κ∪σ)'`-Hall need the BG structure theory — the
+  -- reverse `hIF`/`hIIP2`/`hIIIIVP1`/`hVP1`), or the type-`P₁` Type III/IV/V data construction
+  -- (`hP1neIIIIV`/`hP1eqV` = Peterfalvi (8.3)/(8.8), needing a type-`P₁` `TypePData`).
   refine proposition_type_classification_of_inputs
     ?hFI (fun hP2 => isTypeII_of_isTypeP2 hG hM hP2) ?hP1neIIIIV ?hP1eqV ?hIF ?hIIP2 ?hIIIIVP1 ?hVP1
     (typeP_exists_hall_derived_eq hG hM) (typeF_not_exists_hall_derived_eq hG hM)
