@@ -5444,6 +5444,41 @@ theorem typeII_derived_frobenius [Finite G] [Fintype G]
     ∃ data : DerivedFrobeniusData S, data.kernel_is_SF := by
   sorry
 
+/-- **Closing arithmetic contradiction of Peterfalvi (10.8)** — the numerical heart of the
+non-coherence proof, isolated from the character machinery.
+
+The structural facts derived (under the *coherence* assumption) for the Type-II partner `S` are:
+* `w₁ ≥ 3` and the Frobenius bound `|U| ≥ 2w₂+1 ≥ 7` (since `UW₂` is Frobenius and `w₂ ≥ 3`);
+* the lower bound `|M'| ≥ (2w₁+1)·w₂`, from `|M'/M''| ≥ 2w₁+1` (the odd Frobenius group
+  `(M'/M'')⋊W₁`, Peterfalvi (8.4.d)) and `|M''| ≥ w₂`.
+
+The `(7.5)`/`(7.8.b)`/`(10.6.b)` norm-counting estimate, after the `G₁ ⊆ (H#)^G ∪ V^G` bound,
+yields `w₁w₂/|M'| > 1 − 1/w₁ − 1/|U|`.  Its right side exceeds `1 − 1/3 − 1/7 > 1/2`, forcing
+`|M'| < 2w₁w₂`; this contradicts `|M'| ≥ (2w₁+1)w₂ = 2w₁w₂ + w₂`.  Pure arithmetic over `ℚ`. -/
+theorem typeII_noncoherence_arithmetic
+    {w₁ w₂ u Mp : ℕ} (hw1 : 3 ≤ w₁) (hu : 7 ≤ u) (hw2 : 1 ≤ w₂)
+    (hMp : (2 * w₁ + 1) * w₂ ≤ Mp)
+    (hbound : (1 : ℚ) - 1 / (w₁ : ℚ) - 1 / (u : ℚ) < (w₁ : ℚ) * (w₂ : ℚ) / (Mp : ℚ)) :
+    False := by
+  have hw1q : (3 : ℚ) ≤ (w₁ : ℚ) := by exact_mod_cast hw1
+  have huq : (7 : ℚ) ≤ (u : ℚ) := by exact_mod_cast hu
+  have hw2q : (1 : ℚ) ≤ (w₂ : ℚ) := by exact_mod_cast hw2
+  have hMppos : 0 < Mp := lt_of_lt_of_le (Nat.mul_pos (by omega) (by omega)) hMp
+  have hMpq : (0 : ℚ) < (Mp : ℚ) := by exact_mod_cast hMppos
+  -- `1/w₁ ≤ 1/3` and `1/u ≤ 1/7`, so the coherence bound exceeds `1 − 1/3 − 1/7 > 1/2`.
+  have h1 : 1 / (w₁ : ℚ) ≤ 1 / 3 := one_div_le_one_div_of_le (by norm_num) hw1q
+  have h2 : 1 / (u : ℚ) ≤ 1 / 7 := one_div_le_one_div_of_le (by norm_num) huq
+  have hhalf : (1 : ℚ) / 2 < (w₁ : ℚ) * (w₂ : ℚ) / (Mp : ℚ) := by
+    have h112 : (1 : ℚ) - 1 / 3 - 1 / 7 > 1 / 2 := by norm_num
+    linarith
+  -- Clear the denominator: `Mp < 2·w₁w₂`.
+  have hhalf' : (1 : ℚ) / 2 * (Mp : ℚ) < (w₁ : ℚ) * (w₂ : ℚ) := (lt_div_iff₀ hMpq).mp hhalf
+  -- The lower bound `(2w₁+1)w₂ = 2·w₁w₂ + w₂ ≤ Mp` contradicts it.
+  have hMpcast : 2 * ((w₁ : ℚ) * (w₂ : ℚ)) + (w₂ : ℚ) ≤ (Mp : ℚ) := by
+    have : ((2 * w₁ + 1) * w₂ : ℚ) ≤ (Mp : ℚ) := by exact_mod_cast hMp
+    push_cast at this; linarith
+  linarith
+
 /-- **Peterfalvi (10.8)**: under Hypothesis (10.1), the character family `S` is
 not coherent. -/
 theorem S_not_coherent [Finite G] [Fintype G]
