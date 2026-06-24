@@ -28,6 +28,19 @@ size watch (merge_monitor.md step 4) で検出: `OddOrder/FeitThompson.lean` が
 FeitThompson.lean が ~1500 行以下、または def-unit 単位で複数 leaf に分割され hub が束ねる。
 build-green 維持。
 
+## 2026-06-24 lane-b note — cd cluster が frozen (split candidate)
+
+issue 1004 完了 (commit `c57ed7ad`) で **cd `section16CharacterData` cluster が完成・frozen**。
+具体的には `namespace Section16CharacterData` (building blocks, FeitThompson.lean ~1102–1664) +
+producer `section16CharacterData_of_isMinimalSimpleOdd` (~1694–1710) = **~620 行が lane-b の凍結境界**。
+lane-b はこの cluster で今後 active frontier を持たない (producer 完成)。
+
+⟹ **hub への提案**: この cd cluster を別 leaf (例 `OddOrder/FeitThompson/CharacterData.lean`) へ
+prefix-split すれば FeitThompson.lean が ~1380 行に収まる。ただし cluster は `Section16MaximalPair`
+(mp, lane-f) / `Section16TypePStructure` (tp, lane-c) 型に依存し、下流 `section16Inputs_of_isMinimalSimpleOdd`
+(~1750) が producer を消費する ⟹ core(mp/tp 構造) → cd-leaf → assembly(inputs/hypothesis) の 3-way split に
+なる。**実施は hub 判断** (4 レーン co-edit ゆえ; 本 note は frozen 境界の通知のみ)。
+
 ## 参照
 
 - `notes/meta/merge_monitor.md` step 4 (size watch) + 🔒 所有マップ (FeitThompson 共有)
