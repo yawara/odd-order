@@ -174,3 +174,13 @@ lane-h §6/§8 スコープで生産可能な (6.2)/(6.3) 標準形 assembly は
 `six_three_of_six_two_oracle` / 11.4=(C,D)=(HC,HC)) — 残 gate は単一の per-section `h56`
 ((5.6) muGrid bound for solvable K) のみ。これは genuine cross-lane (§10-12, lane-b/c)、lane-h scope
 では閉じない。残 = `h56` (lane-b/c) + lane-c の wiring (cite + SOf を induced-family に pin + h56 供給)。
+
+## 9. 2026-06-24 resume — producer 完了確認 → lane-h idle (frontier char-saturated)
+
+resume セッションで上記を再確認 (別 Explore で h56 が既存 exported S10/S12 lemma では discharge 不可 =
+新 lemma 要と独立確認)。さらに**正確な frontier 調査** (comment-stripping; `grep -c sorry` は docstring の
+"sorry'd statement"/"scaffold-sorry"/"sorry-free" を誤カウントする点に注意): 実 sorry タクティク = 122、
+**BG 群論 spine §1-13 は完全 sorry-free**、残 122 は全て lane-f (BG §14-16) / lane-b,c (Pf §10-16 char) /
+off-path appendices に属す。⟹ lane-h が clean に pivot できる ungated・uncollided・FT-path タスクは現存せず。
+ユーザー裁可で **idle + 自己復帰モニター** を選択 (issue 2023、monitor cron `e471bef5` session-only、
+baseline LAUNCH.md=`59bf0db4`)。再開トリガ = LAUNCH.md (lane-h) 更新 or issue 2023 close。
