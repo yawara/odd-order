@@ -74,3 +74,42 @@ general six_two を自 leaf (S08_Theorem62_63_Standalone) で生産**する。�
    signature 要請 issue** を立て、当面は sorried cite で general six_two の assembly を先に積む (手を止めない)。
 3. 既存 S10/S12/S05-S08 本体は触らず cite のみ・生産は自 leaf 隔離 (lane-b/c 復帰時の衝突回避)。
 本 issue は tracking として open 維持 (general six_two landing で close)。
+
+## 2026-06-23 lane-h resume — general six_two ASSEMBLED, gate narrowed to `h56` (lane-b/c)
+
+hub 方針通り、§10-12 muGrid に gated な reducible-member 核を clean oracle に isolate し、それ以外の
+general (6.2) を**全実証明**した。`OddOrder/Peterfalvi/S08_Theorem62_63_Standalone.lean` に landed
+(全 sorry-free + axiom-clean + AxiomsCheck 登録、full build 3883 green):
+
+- `map_mk'_le_center_iff` — 中心性 ⟺ commutator 条件。
+- **`inducedMember_re_le_general`** — (6.2) θ-degree bound `ψ(1) ≤ |L:C|√|C:D|` for `ψ = Ind_K^L θ`
+  from a **solvable** kernel `K ⊋ C`, **自由 section `B ≤ D ≤ C ≤ K`** (Clifford a-half via general
+  `theta_degree_le_index_mul_sqrt_index`, 中心性は `subgroupOfEquivOfLe` で ↥C→↥(C.subgroupOf K) transport)。
+  ← Sibley は central case K=C のみ。
+- **`six_two_general`** — (6.2) real-inequality `|K:A|−1 ≤ 2|L:C|√|C:D|`, **自由 C,D**, oracle `h56` から導出。
+  **両 §11 obligation を直接 served**: 11.3 = (C,D)=(H,A) (→ `six_three_index_bound_general` の `h62`)、
+  11.4 = (C,D)=(HC,HC) (`√1=1` → `|M':H₁|−1≤2|M:HC|`)。
+- **`six_three_of_six_two_oracle`** — **single-cite (6.3) producer** for §11/§13 (11.3):
+  `six_three_descent ∘ six_three_index_bound_general ∘ six_two_general(C=H,D=A)` を bundle。
+
+⟹ **両 §11 obligation は `six_two_general` で served、残は単一の per-section `h56`** のみ。**`h56` =
+solvable kernel の (5.6) norm-weighted coherence bound = lane-b/c ask** (下記)。
+
+### lane-b/c への targeted 要請 (`h56` の signature)
+
+`six_three_of_six_two_oracle` (および `six_two_general`) が要求する per-section oracle。各 section
+`B ≤ A ≤ H₁` (`A ⧸ B` central in `H ⧸ B`, `S(A)` coherent, `S(B)` not coherent) に対し:
+
+```lean
+∃ θ : IrreducibleCharacter ↥K,
+  (↑(B.subgroupOf K) : Set ↥K) ⊆ OddOrder.Peterfalvi.S03.characterKernel (θ : ClassFunction ↥K ℂ) ∧
+  (Nat.card (↥K ⧸ A.subgroupOf K) : ℝ) - 1 ≤ 2 * (ClassFunction.induce K (θ : ClassFunction ↥K ℂ) 1).re
+```
+
+= break member `ψ = Ind_K^L θ ∈ S(B)` (θ∈Irr K trivial-on-B) で `|K:A| − 1 ≤ 2ψ(1)`。これは
+case-B `S08_Theorem63.sSubFiltration_sum_le_two_psi_caseB` (Sibley nilpotent kernel H + Hypothesis46) の
+**general solvable kernel `K = M'` 版**。核 = `coherentDegreeSumBound_of_not_coherent` ((5.6)
+contrapositive, general 既存) の orthonormality/support/generation 仮説を可約 induced member の
+constituent (= §10-12 muGrid/columnSum) で discharge すること。**lane-h §6/§8 スコープ外、lane-b/c 領域。**
+
+本 issue は open 維持 (`h56` landing で close)。lane-h の producer 側は完了。
