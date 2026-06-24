@@ -103,6 +103,14 @@ bottom-out** するので、clean 化には §15 foundation が先。真の順�
 
 ## 進捗ログ
 
+**2026-06-24 (cont.¹⁶) ✅✅✅ hFI bridge `isTypeI_of_isTypeF` (type-F ⟹ type-I) を完全 axiom-clean 化 — Prop 16.1 の 8 bridge で最初の完全 honest 化** (lane-f RESUME、full build 3871 jobs green 89s、AxiomsCheck に 3 本登録):
+
+- **`isTypeI_of_isTypeF` = `[propext, Classical.choice, Quot.sound]`** (`typeFData_of_kappa_eq_bot` / `isTypeF_groupTheory_of_isTypeF` も同様)。cont.¹⁵ で 2 ゲートのうち「非-TI residual = BG Thm 15.7(e)」を閉じた後、残る「sorried Theorem A」ゲートを **TypeFData 構成の再配線**で解消。
+- **再配線 (S16 `typeFData_of_kappa_eq_bot`)**: 旧 `theoremA_maximal_structure` (sorry standalone) 呼び出しを廃し、A(3) 分解は `typeP_maximal_eq_kappaHall_sup_U_sup_Msigma` (clean、`hKM`/`hUM` を活用)、A(8) の `U = ⊥` 排除は `isTypeP1_kappaSigma_compl_hall_subgroupOf_eq_bot ∘ isTypeP1_of_mf_ne_msigma` (Thm 15.2、clean) に置換。`typeFData_of_kappa_eq_bot` は既に `hKM`/`hUM` を hypothesis に持つため faithful 経路がそのまま通る。
+- **`isTypeP1_kappaSigma_compl_hall_subgroupOf_eq_bot` を `typeFData_of_kappa_eq_bot` の前方へ移動** (self-contained・clean、forward-ref 解消のため)。
+- **AxiomsCheck 登録**: `typeFData_of_kappa_eq_bot` / `isTypeF_groupTheory_of_isTypeF` / `isTypeI_of_isTypeF` を `#assert_only_allowed_axioms`、hFI 注記を訂正。
+- **意義**: `proposition_type_classification` の `hFI` case (`case hFI => exact isTypeI_of_isTypeF hG hM`) が axiom-clean 経路に。残る forward bridge = `hP2II` (cont.¹¹ で完成済だが `derived_typeF` 経由で Theorem A 依存があれば要確認) / `hP1neIIIIV` / `hP1eqV`、reverse 4 本。**注**: standalone `theoremA_maximal_structure` 自体は cross-lane caller 用に sorry のまま (faithful 版 `theoremA_maximal_structure_faithful` は cont.² で clean 完成済)。
+
 **2026-06-24 (cont.¹⁵) ✅✅✅ hFI ¬TI 非 abelian 枝 (c) の per-prime witness `q = p` ケース完成 → BG Theorem 15.7(e) per-prime witness (Coq `oZ`) 全体が sorry-free + axiom-clean で締結** (lane-f RESUME、full build 3871 jobs green 89s、AxiomsCheck 2 本登録、FT-path sorry: witness の唯一残 sorry を消化):
 
 - **✅ `exists_orderQ_le_mf_normal_in_M_of_not_fittingIsTI` の `q = p` ケース完成** (S15_MF、旧 8229 sorry)。`#print axioms` = `[propext, Classical.choice, Quot.sound]` で **witness 全体が axiom-clean**。`Z := Ω₁(Z(O_p(M_F)))` を **既存 `OddOrder.BG.Ch3.S10.omega1CenterInG P p`** (= `(Ω₁(Z(↥P))).map P.subtype`) で構成 (自前 plumbing 不要)。`|Z| = p` を rank 論法で:
@@ -729,7 +737,7 @@ M*-positioning）は**未再構成 = 真の残 math gate**。Lemma 12.11 proof /
   - **残 = type-F の M'≤F(M) のみ・now ungated** (C_Y(E₁)=1 gate 消滅): `exists_subgroupESetup` (一般 M) → M'=Mσ⊔E' (`derivedInG_eq_Msigma_sup_derivedInG_complement`) → E'≤C(Mσ) (Lem 12.19 `derivedE_centralizes_betaComplement` + W=Mσ [π(Mσ)∩β=∅]) → E'≤C_G(Mσ)⊓M≤F(M) (`fitting_decomposition` F=(C⊔MF)) + Mσ≤F(M) ⟹ sup_le。**M' nilpotent 経由不要**、crux = W=Mσ の Hall plumbing のみ
 - [ ] Thm A `theoremA_maximal_structure` (S16:144) — Lemma 15.1 + Prop 14.2 + §15 で全 conjunct
 - [~] Thm C `theoremC_paired_structure` — **11/12 conjunct DONE** (conjunct 10 = BG C(9) `A0-A` TI を `491bdd3d` で完全証明、残 = conjunct 2 (Cor 14.12) のみ)。旧: 10/12 + faithfulness 修正 2 件 DONE (`8f636b54`/`ec711630`/`378e91cf`/`dc2fe378`, 2026-06-21)。残 = conjunct 2 (N(U)⊄M=Cor 14.12)/10 (A0-A TI=Thm A(3)(5)) のみ (conjunct 11 は 15.7(a) で close)
-- [~] Prop 16.1 配線 `proposition_type_classification` — **hFI: TI-case (cont.¹²) + ¬TI abelian 枝 (cont.¹³) + ¬TI 非abelian枝 完全配線 (cont.¹⁴) + per-prime witness 全完成 (cont.¹⁵)**。`isTypeI_of_isTypeF` 群論部 (BG Thm 15.7(e) = witness `exists_orderQ_le_mf_normal_in_M_of_not_fittingIsTI`) は **sorry-free + axiom-clean**。残 hFI ゲート = `typeFData_of_kappa_eq_bot` 経由の **sorried Theorem A のみ** (`isTypeI_of_isTypeF` は Theorem A 由来 sorryAx)。他 6 bridge 未
+- [~] Prop 16.1 配線 `proposition_type_classification` — **hFI bridge `isTypeI_of_isTypeF` (type-F⟹I) 完全 axiom-clean (cont.¹⁶)** = `[propext, Classical.choice, Quot.sound]`、AxiomsCheck 登録。経緯: TI-case (cont.¹²) + ¬TI abelian 枝 (cont.¹³) + ¬TI 非abelian枝配線 (cont.¹⁴) + per-prime witness (cont.¹⁵) + TypeFData 構成の faithful 経路再配線 (cont.¹⁶、Theorem A ゲート解消)。**8 bridge で最初の完全 honest 化**。他 7 bridge (hP2II 要再確認 / hP1neIIIIV / hP1eqV / reverse 4) 未
 
 ## cont.¹² (2026-06-23) — `hFI` (type-F ⟹ type-I) を bare sorry → 構造化
 
