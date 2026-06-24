@@ -5,6 +5,33 @@
 > 上位文脈 = 記憶 [[ft-endgame-two-poles]] [[peterfalvi-s10-13-gated-on-bg-spine]]、
 > Lane H 視点の正本 = [`s10_13_maximal_structure.md`](s10_13_maximal_structure.md)。
 
+## ★★★ 2026-06-24 更新²² — **cd producer COMPLETE → 次 = (10.8) `S_not_coherent`。§7 は S09 に formalize 済み (「§7 gated」評価を訂正)、arithmetic foothold landed**
+
+cd producer (issue 1004) を sorry-free + axiom-clean で完成 (commit `c57ed7ad`、[[ft-endgame-two-poles]] 更新)。
+ユーザー裁可で次 lane-b task = **(10.8) `S_not_coherent`** (S12、lane-c S13 が cite する高価値 upstream)。
+
+**🔑 重要訂正: §7 ρ-machinery は formalize 済み**。下の更新 (343/369 行) は (10.8) が「(7.5)/(7.8.b) §7
+counting に gated」とするが**誤り** — Pf §7 (7.1)-(7.8) は **`S09_NonexistenceCertain.lean` に sorry-free で
+実装済み** (lane-b 所有): ρ-map `chiRho`、(7.2.a) `chiRho_dadeImage_eq`、(7.5) `family_inequality`、
+(7.8) `Hypothesis78` (NormEstimates=(7.8.b)/chiRho_norm_sq_eq_card_ratio_mul=(7.8.c.ii) は outright proven、
+BetaDecomp/chiRho_eq_inner_beta=(7.8.a)/(7.8.c.i) は certificate field)。⟹ §7 は blocker でない。
+
+**(10.8) 証明の正確な依存マップ** (原文 04.12 lines 77-101 精読):
+- **deep char part** (bound `w₁w₂/|M'| > 1−1/w₁−1/|U|` を出す): 要 §7 `Hypothesis71`/`Hypothesis78` を **M に
+  対して構成** (BetaDecomp certificate が主作業) → (7.5) family_inequality + (7.8.b) NormEstimates → (10.6.b)
+  `zeta_tau1_norm_ge_one`[done] → G₁ counting (G₁⊆(H#)^G∪V^G via (10.7)/(8.6.a)/(8.11)/(2.1))。
+- **(8.8) Type-II partner**: `theorem88_caseB_holds` (S14) 在庫 — partner facts (S∩M=W / S=[S,S]⋊W₂ /
+  C_{[S,S]}(W₂)=W₁) を CaseB carrier から抽出する bridge が要 ((10.7) と共有 setup)。
+- **(10.7)** `typeII_derived_frobenius` (S12、sorried、lane-b): (10.8) が cite。これ自体 §8 (8.13/8.18) + (5.8)
+  full-column = 別 multi-session。当面 sorried cite 可 ([[feedback-cite-sorried-lemmas-if-signature-correct]])。
+- **✅ arithmetic foothold landed** (commit 次): `typeII_noncoherence_arithmetic` (S12、sorry-free、純 ℚ): 構造境界
+  (w₁≥3 / |U|≥2w₂+1≥7 / |M'|≥(2w₁+1)w₂) ⟹ bound と矛盾 (RHS>1−1/3−1/7>1/2 ⟹ |M'|<2w₁w₂ vs ≥2w₁w₂+w₂)。
+  (10.8) の steps 9-10 を char machinery から isolate。
+
+**次セッション攻略順**: (1) (8.8) partner-fact bridge (CaseB→S∩M=W 等、(10.7)/(10.8) 共有) → (2) §7
+Hypothesis78-for-M 構成 (BetaDecomp が crux) → (3) G₁ counting + (7.5)/(7.8.b)/(10.6.b) で bound → (4)
+`typeII_noncoherence_arithmetic` で close。(10.7) は sorried cite で先送り可。
+
 ## ★★★ 2026-06-23 更新¹⁵ — **cd producer (POLE-1 charData) は feasible・全 char 理論 in-stock** (de-risk 1004)
 
 §10 残り 3 sorry ((10.7)/(10.8)/(10.10)) は §8-gated (更新¹⁴ で確定) → lane-b の真の FT-path frontier =
