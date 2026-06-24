@@ -145,6 +145,129 @@ noncomputable def isCoherent_pair_of_differenceImage
       pairExtension_chiConj hχ hχbar hortho']
     exact Submodule.add_mem _ (Submodule.smul_mem _ _ hεμ) (Submodule.smul_mem _ _ hεν)
 
+/-! ### (5.7) inductive case: the common projection `β` and its two facts
+
+Following Peterfalvi (5.7) directly: fix a distinguished member `χ₀ ∈ S`, build the auxiliary
+isometry `τ₁` in **one shot** with `χ₀^{τ₁} = β` (a single element of `R(χ₀)`) and
+`ζ^{τ₁} = β − (χ₀ − ζ)^τ` for every other member `ζ`.  Because all members share a degree, the
+differences `χ₀ − ζ` are supported, so the auxiliary isometry needed by the (5.4) decompositions is
+just the fixed Dade map `τ` itself (`tau1 := τ`) — no running-extension/Gram–Schmidt residual.  The
+orthonormal target family `X = {β} ∪ {β − (χ₀ − ζ)^τ}` then feeds `coherentEqualDegree`.
+
+The only genuinely new content is the (5.4.b) **two-sided** norm argument forcing `‖β‖² = 1` and the
+independence of `β` from the auxiliary member, packaged in `pairDecomp_X_norm_one` /
+`pairDecomp_Y_eq` below.  Everything ZIrr/Dade-specific is abstracted into explicit hypotheses
+(`τ(χ − ζ) ∈ ℤ[Irr G]` for supported differences), discharged by the §13 consumer. -/
+
+open OddOrder.RepresentationTheory
+
+/-- The orthonormal image family `R(χ) = {ε·μ, −ε·ν}` of a member `χ ∈ S`, from the (5.2.d)
+difference image carried by the hypothesis. -/
+noncomputable abbrev imageFam (hyp : Hypothesis (L := L) (G := G) S A)
+    {χ : ClassFunction L ℂ} (hχ : χ ∈ S) :
+    OrthonormalCharacterImageFamily (L := L) (G := G) hyp.tau χ :=
+  (hyp.difference_image hχ).toOrthonormalImage
+
+/-- **(5.7) per-pair decomposition.**  For members `χ, ζ ∈ S` with `⟨χ,ζ⟩ = ⟨χ̄,ζ⟩ = 0` and the
+supported-difference virtual-character fact `(χ − ζ)^τ ∈ ℤ[Irr G]`, the (5.4) decomposition of
+`(χ − ζ)^τ` against `R(χ)`, built against the fixed Dade isometry `τ` (`tau1 := τ`, whose isometry
+and `χ − χ̄` agreement are immediate from `hyp.tau_isometry`). -/
+noncomputable def pairDecomp (hyp : Hypothesis (L := L) (G := G) S A)
+    {χ ζ : ClassFunction L ℂ} (hχ : χ ∈ S)
+    (hχζ : ClassFunction.inner χ ζ = 0) (hχbarζ : ClassFunction.inner χ.conj ζ = 0)
+    (hZ : hyp.tau (χ - ζ) ∈ ZIrr G) :
+    CharacterPsiDecomposition (L := L) (G := G) hyp.tau χ ζ :=
+  CharacterPsiDecomposition.ofProjection (imageFam hyp hχ) hyp.tau
+    (fun φ ψ _ _ => hyp.tau_isometry.inner_eq φ ψ)
+    rfl hZ hχζ hχbarζ
+    (hyp.pairwise_orthogonal hχ (hyp.conjugate_mem hχ) (hyp.ne_conj hχ))
+
+/-- `⟨D.X, D'.X⟩ = 0` when the image families are orthogonal (`R(χ) ⊥ R(χ')`, the (5.2.e) input):
+lift the per-element orthogonality `⟨D.X, α⟩ = 0` (`α ∈ R(χ')`) to the `ℤ`-combination
+`D'.X = ∑_{α ∈ R(χ')} coeff α • α`. -/
+theorem inner_X_X'_eq_zero {τ : IntegralCharacterMap L G}
+    {χ χ' ψ ψ' : ClassFunction L ℂ}
+    (D : CharacterPsiDecomposition (L := L) (G := G) τ χ ψ)
+    (D' : CharacterPsiDecomposition (L := L) (G := G) τ χ' ψ')
+    (hortho : D.imageFamily.Orthogonal D'.imageFamily) :
+    ClassFunction.inner D.X D'.X = 0 := by
+  rw [D'.X_eq, inner_sum_right]
+  refine Finset.sum_eq_zero fun α hα => ?_
+  rw [OddOrder.RepresentationTheory.inner_smul_right,
+    D.inner_X_orthogonal_imageSet_of_orthogonal D'.imageFamily hortho hα, mul_zero]
+
+/-- Inner-self products are real: `⟨φ,φ⟩ = (⟨φ,φ⟩.re : ℂ)`. -/
+theorem inner_self_re_cast (φ : ClassFunction G ℂ) :
+    ClassFunction.inner φ φ = ((ClassFunction.inner φ φ).re : ℂ) := by
+  apply Complex.ext
+  · rw [Complex.ofReal_re]
+  · rw [Complex.ofReal_im, inner_self_eq_realCast, Complex.ofReal_im]
+
+/-- **Peterfalvi (5.7) two-sided norm core.**  For two members `χ, ζ` in *different* conjugate
+pairs (so `R(χ) ⊥ R(ζ)`, both norm-one, both differences supported and virtual), the (5.4)
+decomposition `D` of `(χ − ζ)^τ` against `R(χ)` and the symmetric `D'` of `(ζ − χ)^τ` against `R(ζ)`
+satisfy `‖D.X‖² = 1` and `D.Y = D'.X`.
+
+This is Peterfalvi's "`‖X‖² = ‖χ‖²`" and "`Y = 0`" combined: the (5.4.b) hypothesis `‖Y‖² ≥ ‖ζ‖²`
+is supplied by the symmetric `D'` through `‖D.Y − D'.X‖² ≥ 0` together with the identity
+`⟨D.Y, D'.X⟩ = ‖D'.X‖² ≥ ‖ζ‖²` (which holds because `D.Y = D.X − (χ − ζ)^τ`, `(χ − ζ)^τ = D'.Y − D'.X`,
+`⟨D.X, D'.X⟩ = 0` and `⟨D'.X, D'.Y⟩ = 0`).  Once `‖D.Y‖² = ‖ζ‖²` is forced, `‖D.Y − D'.X‖² = 0`. -/
+theorem pairDecomp_two_sided
+    {τ : IntegralCharacterMap L G} {χ ζ : ClassFunction L ℂ}
+    (D : CharacterPsiDecomposition (L := L) (G := G) τ χ ζ)
+    (D' : CharacterPsiDecomposition (L := L) (G := G) τ ζ χ)
+    (hχχ : ClassFunction.inner χ χ = 1) (hζζ : ClassFunction.inner ζ ζ = 1)
+    (hortho : D.imageFamily.Orthogonal D'.imageFamily)
+    (himgD : τ (χ - ζ) = D.X - D.Y) (himgD' : τ (ζ - χ) = D'.X - D'.Y) :
+    ClassFunction.inner D.X D.X = 1 ∧ D.Y = D'.X := by
+  -- `⟨D.X, D'.X⟩ = 0` (cross-family) and `⟨D'.Y, D'.X⟩ = 0` (image ⊥ residual).
+  have hXX' : ClassFunction.inner D.X D'.X = 0 := inner_X_X'_eq_zero D D' hortho
+  have hYX' : ClassFunction.inner D'.Y D'.X = 0 := by
+    rw [OddOrder.RepresentationTheory.inner_conj_symm, D'.inner_X_Y, star_zero]
+  -- `D.Y = D.X − (χ−ζ)^τ`, and `(χ−ζ)^τ = D'.Y − D'.X`.
+  have hDYval : D.Y = D.X - τ (χ - ζ) := by rw [himgD]; abel
+  have hτχζ : τ (χ - ζ) = D'.Y - D'.X := by
+    have hneg : χ - ζ = -(ζ - χ) := by abel
+    rw [hneg, map_neg, himgD']; abel
+  -- `⟨D.Y, D'.X⟩ = ‖D'.X‖²`.
+  have hYX'_eq : ClassFunction.inner D.Y D'.X = ClassFunction.inner D'.X D'.X := by
+    rw [hDYval, ClassFunction.inner_sub_left, hXX', hτχζ, ClassFunction.inner_sub_left, hYX']
+    ring
+  -- `‖D'.X‖².re ≥ ‖ζ‖².re = 1` from (5.4.a) on `D'`.
+  have hD'Xge : (1 : ℝ) ≤ (ClassFunction.inner D'.X D'.X).re := by
+    have h := D'.inner_self_chi_re_le_inner_self_X
+    rw [hζζ] at h; simpa using h
+  -- `‖D.Y − D'.X‖².re = ‖D.Y‖².re − ‖D'.X‖².re`.
+  have hdiffre : (ClassFunction.inner (D.Y - D'.X) (D.Y - D'.X)).re
+      = (ClassFunction.inner D.Y D.Y).re - (ClassFunction.inner D'.X D'.X).re := by
+    have hexp : ClassFunction.inner (D.Y - D'.X) (D.Y - D'.X)
+        = ClassFunction.inner D.Y D.Y - ClassFunction.inner D.Y D'.X
+          - ClassFunction.inner D'.X D.Y + ClassFunction.inner D'.X D'.X := by
+      rw [ClassFunction.inner_sub_left, ClassFunction.inner_sub_right,
+        ClassFunction.inner_sub_right]; ring
+    rw [hexp, hYX'_eq, OddOrder.RepresentationTheory.inner_conj_symm D.Y D'.X, hYX'_eq]
+    simp only [Complex.add_re, Complex.sub_re, Complex.star_def, Complex.conj_re]; ring
+  have hDYge : (1 : ℝ) ≤ (ClassFunction.inner D.Y D.Y).re := by
+    have hnn := inner_self_re_nonneg (D.Y - D'.X)
+    rw [hdiffre] at hnn; linarith
+  -- (5.4.b) on `D` with `‖ζ‖².re ≤ ‖D.Y‖².re`.
+  have hY : (ClassFunction.inner ζ ζ).re ≤ (ClassFunction.inner D.Y D.Y).re := by
+    rw [hζζ]; simpa using hDYge
+  obtain ⟨hXnorm, hYnorm, _⟩ := D.norm_eq_and_X_eq_sum_of_norm_Y_ge hY
+  refine ⟨?_, ?_⟩
+  · -- `‖D.X‖² = 1` (ℂ): `‖χ‖².re = ‖D.X‖².re` and `‖χ‖² = 1`.
+    have hXre : (ClassFunction.inner D.X D.X).re = 1 := by rw [← hXnorm, hχχ]; simp
+    rw [inner_self_re_cast D.X, hXre]; exact Complex.ofReal_one
+  · -- `D.Y = D'.X`: both norm `1`, and `‖D.Y − D'.X‖².re = 0`.
+    have hDY1 : (ClassFunction.inner D.Y D.Y).re = 1 := by rw [← hYnorm, hζζ]; simp
+    have hDX'1 : (ClassFunction.inner D'.X D'.X).re = 1 := by
+      have hnn := inner_self_re_nonneg (D.Y - D'.X)
+      rw [hdiffre] at hnn; linarith
+    have hdz : D.Y - D'.X = 0 := by
+      apply eq_zero_of_inner_self_re_eq_zero
+      rw [hdiffre, hDY1, hDX'1]; ring
+    exact sub_eq_zero.mp hdz
+
 /-- **Peterfalvi (5.7), standalone form**: under the (5.2) coherence hypotheses, if every member of
 `S` has the same degree `χ(1)`, then `(S, A, τ)` is coherent.
 
