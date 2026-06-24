@@ -16,15 +16,16 @@ The §11/§13 maximal-subgroup analysis (Peterfalvi (11.5), repo `S13_MaximalIII
 needs this: since `M'/M''` is abelian, the constituents of `S(M'')` all have equal degree, so (5.7)
 makes `S(M'')` coherent — the coherence content of `M'' = HC`.
 
-**Status (lane-c relane #8, issue 4012): scoping + signature skeleton.**  All the proof ingredients
-already live in `S07_Coherence`: the (5.2) hypothesis carrier `S07.Hypothesis`, the (5.4)
-decomposition `CharacterPsiDecomposition`, the (5.4.b)/(5.5) norm lemmas
-(`norm_eq_and_X_eq_sum_of_norm_Y_ge` / `eq_sum_of_psi_eq_zero`), and the coherence constructor
-`retarget_isCoherent_of_decompositions`.  So (5.7) is an *assembly*, not a missing-machinery gap
-(unlike lane-h's (6.2) which needed the `h62` index oracle).  The proof (base case `|S| = 2` from
-(5.2.d); inductive build of the auxiliary isometry `τ₁` via per-member `ψ = 0` decompositions, then
-`retarget_isCoherent_of_decompositions`) is the next session's work; design + framework mapping are
-in `notes/peterfalvi/s05_57_constant_degree_coherence_producer.md`.
+**Status (lane-c relane #8, issue 4012): COMPLETE — `coherent_of_constant_degree` sorry-free +
+axiom-clean.**  The proof follows Peterfalvi (5.7) directly rather than the inductive `retarget`
+chain: the auxiliary isometry `τ₁` is built in *one shot* (`χ₀ ↦ β`, `χⱼ ↦ β − (χ₀ − χⱼ)^τ`).  Because
+all members share a degree, every difference `χ₀ − χⱼ` is supported, so `τ₁`'s decompositions use the
+fixed Dade map `τ` itself (no running-extension/Gram–Schmidt residual), and the orthonormal target
+family feeds the equal-degree coherence builder `coherentEqualDegree`.  The common image `β` (a single
+element of `R(χ₀)`) is independent of the auxiliary member by the (5.4.b) two-sided norm argument
+(`pairDecomp_two_sided`) and the 4-case independence (`commonImage_inner`); a single conjugate pair `S`
+routes to the (5.2.d) base case.  Design + framework mapping are in
+`notes/peterfalvi/s05_57_constant_degree_coherence_producer.md`.
 -/
 
 namespace OddOrder.Peterfalvi.S07
@@ -464,24 +465,153 @@ theorem commonImage_inner (hyp : Hypothesis (L := L) (G := G) S A)
     ⟨fun h => hc2 h.symm, fun h => hc3 (by rw [h, ClassFunction.conj_conj] : ζ₀.conj = ζ).symm⟩
   exact commonImage_inner_other hyp hirr hZIrr hdp hχ₀ hζ₀ hζ hdpχ hdpζ
 
-/-- **Peterfalvi (5.7), standalone form**: under the (5.2) coherence hypotheses, if every member of
-`S` has the same degree `χ(1)`, then `(S, A, τ)` is coherent.
+/-- **(5.7) the retargeted family is an isometric image of the source.**  For the auxiliary isometry
+`τ₁` of (5.7) given by `χⱼ^{τ₁} = X j := β − (χ₀ − χⱼ)^τ` (`χ₀ := χ 0`, `β = χ₀^{τ₁}`), one has
+`⟨Xᵢ, Xⱼ⟩ = ⟨χᵢ, χⱼ⟩`, from `‖β‖² = 1` (A), the uniform fact `⟨β, (χ₀ − χⱼ)^τ⟩ = 1 − ⟨χ₀, χⱼ⟩`
+(B), and `τ` being an isometry.  (Hence `τ₁` is an isometry — Peterfalvi's closing remark.) -/
+theorem xFamily_inner {τ : IntegralCharacterMap L G} {n : ℕ} [NeZero n]
+    (χ : Fin n → ClassFunction L ℂ)
+    (β : ClassFunction G ℂ) (hτiso : IsIntegralIsometry (L := L) (G := G) τ)
+    (hββ : ClassFunction.inner β β = 1)
+    (hB : ∀ j, ClassFunction.inner β (τ (χ 0 - χ j)) = 1 - ClassFunction.inner (χ 0) (χ j))
+    (i j : Fin n) :
+    ClassFunction.inner (β - τ (χ 0 - χ i)) (β - τ (χ 0 - χ j))
+      = ClassFunction.inner (χ i) (χ j) := by
+  have hχ00 : ClassFunction.inner (χ 0) (χ 0) = 1 := by
+    have h := hB 0; rw [sub_self, map_zero, ClassFunction.inner_zero_right] at h
+    linear_combination h
+  have hai : ClassFunction.inner (τ (χ 0 - χ i)) β = 1 - ClassFunction.inner (χ i) (χ 0) := by
+    rw [OddOrder.RepresentationTheory.inner_conj_symm, hB i, star_sub, star_one,
+      ← OddOrder.RepresentationTheory.inner_conj_symm]
+  rw [ClassFunction.inner_sub_left, ClassFunction.inner_sub_right, ClassFunction.inner_sub_right,
+    hββ, hB j, hai, hτiso.inner_eq (χ 0 - χ i) (χ 0 - χ j), ClassFunction.inner_sub_left,
+    ClassFunction.inner_sub_right, ClassFunction.inner_sub_right, hχ00]
+  ring
 
-The constant-degree hypothesis `hconst` is stated faithfully (Peterfalvi assumes it); pinning down
-exactly which step of the assembly consumes it — versus its being needed only for the equal-degree
-*application* — is part of the implementation (see the design note).  `hne` is the nondegeneracy
-witness of the (5.1) coherence predicate (an `A`-supported nonzero element of `ℤ[S]`).
+/-- `D.X ∈ ℤ[Irr G]` (`X = ∑_{R(χ)} coeff α • α`, each `α ∈ ℤ[Irr G]`). -/
+theorem CharacterPsiDecomposition_X_mem_ZIrr {τ : IntegralCharacterMap L G}
+    {χ ψ : ClassFunction L ℂ} (D : CharacterPsiDecomposition (L := L) (G := G) τ χ ψ) :
+    D.X ∈ ZIrr G := by
+  rw [D.X_eq]
+  refine Submodule.sum_mem _ fun α hα => ?_
+  rw [Int.cast_smul_eq_zsmul]
+  exact Submodule.smul_mem _ _ (D.imageFamily.mem_ZIrr α hα)
+
+/-- **Peterfalvi (5.7), standalone form**: under the (5.2) coherence hypotheses, if every member of
+`S` has the same degree, then `(S, A, τ)` is coherent.
+
+Faithful to Peterfalvi: `hirr` (`S ⊆ Irr L`, the (5.3.a) setting), `hconst` (equal degree), and the
+Dade-side facts `hZIrr` (`τ` maps supported member differences into `ℤ[Irr G]`), `h1A` (`1 ∉ A`,
+i.e. `A = L^#`) and `hsuppdiff` (member differences are `A`-supported) are discharged by the §13
+consumer from the Dade isometry.  The proof follows (5.7) directly: if `S` is a single conjugate pair
+it is the (5.2.d) base case; otherwise the auxiliary isometry `χⱼ ↦ β − (χ₀ − χⱼ)^τ` (with
+`β = χ₀^{τ₁}` the common `R(χ₀)`-projection, independent of the auxiliary member) is an orthonormal
+retargeting, fed to the equal-degree coherence builder `coherentEqualDegree`.
 
 This is the producer that `S13_MaximalIII_IV.HC_le_secondDerived` (Peterfalvi (11.5)) will cite, once
 a `Hypothesis (5.2)` instance for `S(M'')` is constructed on the §13 Dade side. -/
 theorem coherent_of_constant_degree
-    (hyp : Hypothesis (L := L) (G := G) S A)
-    (hconst : ∀ χ ∈ S, ∀ ψ ∈ S, χ 1 = ψ 1)
-    (hne : ∃ φ : ClassFunction L ℂ, φ ∈ zSupportedSpan (L := L) S A ∧ φ ≠ 0) :
+    (hyp : Hypothesis (L := L) (G := G) S A) (hSfin : S.Finite) (hcard : 2 ≤ S.ncard)
+    (hirr : ∀ ζ ∈ S, ClassFunction.inner ζ ζ = 1)
+    (hZIrr : ∀ a ∈ S, ∀ b ∈ S, hyp.tau (a - b) ∈ ZIrr G)
+    (hconst : ∀ a ∈ S, ∀ b ∈ S,
+      ((a : ClassFunction L ℂ) : L → ℂ) 1 = ((b : ClassFunction L ℂ) : L → ℂ) 1)
+    (hdeg0 : ∀ a ∈ S, ((a : ClassFunction L ℂ) : L → ℂ) 1 ≠ 0) (h1A : (1 : L) ∉ A)
+    (hsuppdiff : ∀ a ∈ S, ∀ b ∈ S, ((a - b : ClassFunction L ℂ)).support ⊆ A) :
     Nonempty (IsCoherent hyp.tau S A) := by
-  -- Assembly over `S07_Coherence`: base case `|S| = 2` from (5.2.d); inductive build of the
-  -- auxiliary isometry via `eq_sum_of_psi_eq_zero` (5.5) per member, then
-  -- `retarget_isCoherent_of_decompositions`.  See the design note.
-  sorry
+  classical
+  by_cases hex : ∃ a ∈ S, ∃ b ∈ S, DiffPair a b
+  · -- `|S| ≥ 4`: retargeting via `commonImage` + `coherentEqualDegree`.
+    obtain ⟨a, ha, b, hb, hdpab⟩ := hex
+    -- enumerate `S` as `χ : Fin n → CF(L)`.
+    set n := hSfin.toFinset.card with hndef
+    set χ : Fin n → ClassFunction L ℂ := fun i => ↑(hSfin.toFinset.equivFin.symm i) with hχdef
+    have hmem : ∀ i, χ i ∈ S := fun i => hSfin.mem_toFinset.mp (hSfin.toFinset.equivFin.symm i).2
+    have hinj : Function.Injective χ := fun i j hij =>
+      hSfin.toFinset.equivFin.symm.injective (Subtype.ext hij)
+    have hn2 : 2 ≤ n := by
+      have hne : n = S.ncard := by rw [hndef]; exact (Set.ncard_eq_toFinset_card S hSfin).symm
+      omega
+    haveI : NeZero n := ⟨by omega⟩
+    have hrange : Set.range χ = S := by
+      apply Set.eq_of_subset_of_subset
+      · rintro _ ⟨i, rfl⟩; exact hmem i
+      · intro x hx
+        exact ⟨hSfin.toFinset.equivFin ⟨x, hSfin.mem_toFinset.mpr hx⟩, by simp [hχdef]⟩
+    -- a reference `ζ₀` in a different conjugate pair from `χ 0`.
+    obtain ⟨ζ₀, hζ₀S, hdp0⟩ : ∃ ζ₀ ∈ S, DiffPair (χ 0) ζ₀ := by
+      by_cases ha0 : DiffPair (χ 0) a
+      · exact ⟨a, ha, ha0⟩
+      by_cases hb0 : DiffPair (χ 0) b
+      · exact ⟨b, hb, hb0⟩
+      exfalso
+      simp only [DiffPair, not_and_or, not_not] at ha0 hb0
+      rcases ha0 with h1 | h1 <;> rcases hb0 with h2 | h2
+      · exact hdpab.1 (h1 ▸ h2)
+      · exact hdpab.2 (h1 ▸ h2)
+      · exact hdpab.2 (by rw [← ClassFunction.conj_conj a, ← h1, h2])
+      · exact hdpab.1 (by rw [← ClassFunction.conj_conj a, ← h1, h2, ClassFunction.conj_conj])
+    set β := commonImage hyp hZIrr hdp0 (hmem 0) hζ₀S with hβdef
+    set X : Fin n → ClassFunction G ℂ := fun j => β - hyp.tau (χ 0 - χ j) with hXdef
+    -- the uniform form of (B): `⟨β, (χ₀ − χⱼ)^τ⟩ = 1 − ⟨χ₀, χⱼ⟩`.
+    have hB : ∀ j, ClassFunction.inner β (hyp.tau (χ 0 - χ j))
+        = 1 - ClassFunction.inner (χ 0) (χ j) := by
+      intro j
+      by_cases hj : χ j = χ 0
+      · rw [hj, sub_self, map_zero, ClassFunction.inner_zero_right, hirr (χ 0) (hmem 0)]; ring
+      · rw [hβdef, commonImage_inner hyp hirr hZIrr hdp0 (hmem 0) hζ₀S (hmem j) hj,
+          hyp.pairwise_orthogonal (hmem 0) (hmem j) (Ne.symm hj)]; ring
+    have horthχ : ∀ i j, ClassFunction.inner (χ i) (χ j) = if i = j then (1 : ℂ) else 0 := by
+      intro i j
+      by_cases hij : i = j
+      · rw [if_pos hij, hij]; exact hirr (χ j) (hmem j)
+      · rw [if_neg hij]; exact hyp.pairwise_orthogonal (hmem i) (hmem j) (fun h => hij (hinj h))
+    have hcoh : IsCoherent hyp.tau (Set.range χ) A := by
+      refine coherentEqualDegree (χ := χ) (X := X) hn2 horthχ ?_ ?_ ?_ ?_
+        (hdeg0 (χ 0) (hmem 0)) h1A ?_
+      · -- `horthX`: `⟨Xᵢ, Xⱼ⟩ = ⟨χᵢ, χⱼ⟩` (`xFamily_inner`), then `horthχ`.
+        intro i j
+        rw [hXdef,
+          xFamily_inner χ β hyp.tau_isometry (commonImage_self hyp hirr hZIrr hdp0 (hmem 0) hζ₀S)
+            hB i j]
+        exact horthχ i j
+      · -- `himg`: `(χⱼ − χ₀)^τ = Xⱼ − X₀`.
+        intro j
+        simp only [hXdef, sub_self, map_zero, sub_zero]
+        rw [show χ j - χ 0 = -(χ 0 - χ j) from by abel, map_neg]; abel
+      · -- `hXZ`: `Xⱼ ∈ ℤ[Irr G]`.
+        intro j
+        exact Submodule.sub_mem _ (CharacterPsiDecomposition_X_mem_ZIrr _)
+          (hZIrr (χ 0) (hmem 0) (χ j) (hmem j))
+      · -- `hdeg`: equal degree.
+        intro j; exact hconst (χ j) (hmem j) (χ 0) (hmem 0)
+      · -- `hsuppdiff`.
+        intro j; exact hsuppdiff (χ j) (hmem j) (χ 0) (hmem 0)
+    rw [hrange] at hcoh
+    exact ⟨hcoh⟩
+  · -- `S` is a single conjugate pair `{χ₀, χ̄₀}`: the (5.2.d) base case.
+    obtain ⟨χ₀, hχ₀⟩ : S.Nonempty := Set.nonempty_of_ncard_ne_zero (by omega)
+    have hcm : χ₀.conj ∈ S := hyp.conjugate_mem hχ₀
+    have hSeq : S = {χ₀, χ₀.conj} := by
+      apply Set.eq_of_subset_of_subset
+      · intro z hz
+        by_contra hzn
+        rw [Set.mem_insert_iff, Set.mem_singleton_iff, not_or] at hzn
+        exact hex ⟨χ₀, hχ₀, z, hz, fun h => hzn.1 h.symm,
+          fun h => hzn.2 (by rw [h, ClassFunction.conj_conj])⟩
+      · intro z hz
+        rcases hz with rfl | rfl
+        · exact hχ₀
+        · exact hcm
+    have hbase : IsCoherent hyp.tau ({χ₀, χ₀.conj} : Set (ClassFunction L ℂ)) A :=
+      isCoherent_pair_of_differenceImage (hyp.difference_image hχ₀)
+        (hirr χ₀ hχ₀) (hirr χ₀.conj hcm)
+        (hyp.pairwise_orthogonal hχ₀ hcm (hyp.ne_conj hχ₀))
+        (hyp.pairwise_orthogonal hcm hχ₀ (Ne.symm (hyp.ne_conj hχ₀))) (hyp.ne_conj hχ₀)
+        (hsuppdiff χ₀ hχ₀ χ₀.conj hcm)
+        (zSupportedSpan_pair_subset_span (hdeg0 χ₀ hχ₀)
+          (hconst χ₀ hχ₀ χ₀.conj hcm).symm h1A)
+    rw [← hSeq] at hbase
+    exact ⟨hbase⟩
 
 end OddOrder.Peterfalvi.S07

@@ -124,16 +124,28 @@ IntegralCharacterMap 構成から次セッションで着手。建てた signatu
 
 ## 5. 状態
 
-- ✅✅ 本セッション (scoping + engine deep-dive + **base case 完全実証明**): 框組確認 + 設計 + signature +
-  engine 経路確定 + **`isCoherent_pair_of_differenceImage` (base case = single-pair coherence) を
-  sorry-free 完成** — extension `pairExtension` + 5 value/helper lemma + **4/4 `IsCoherent` field 全実証明**
-  (`nonzero`/`extension_inner_eq`[Parseval isometry]/`extends_on_supported`/`extension_mem_ZIrr`)。
-  isometry の blocker だった `inner_smul_right` 欠落を **core `ClassFunction.lean` に汎用追加**
-  (`innerSum_smul_right`/`inner_smul_right`、`inner` は 2nd-arg conj-linear)。Parseval は
-  `Submodule.mem_span_pair` で `φ=a•χ+b•χ̄` 表現 → `← Int.cast_smul_eq_zsmul ℂ` + `inner_smul_left/right`
-  + `irreducibleCharacter_inner` で両辺 → `a·c+b·d`、sign は `sign_eq` case-split で concrete 化 → `ring`。
-- ⏭ 次セッション = **(II) induction wrapper + (III) per-step discharge** で `coherent_of_constant_degree`
-  本体 (base case を bootstrap に `retarget_isCoherent_of_decompositions_and_memberFamily` を共役ペアに
-  反復、等次数で a=1)。signature に `hirr` (S⊆Irr L) 追加が faithful + 必要。base case は cite-ready。
-- 関連: lane-h `S08_Theorem62_63_Standalone.lean` (template、h62 oracle pattern)、
-  issue 4012 (relane #8)、issue 2018 ((11.5) gate)、S13 `HC_le_secondDerived`。
+- ✅✅✅ **(5.7) producer COMPLETE (sorry-free + axiom-clean、AxiomsCheck 登録)** — `coherent_of_constant_degree`
+  本体まで完遂。**設計を engine 反復 (II)(III) から「Peterfalvi 原文どおり一発構成」に切替**: (5.7) 原文は
+  inductive な `retarget` chain でなく、補助等長 `τ₁` を **χ₀↦β, χⱼ↦β−(χ₀−χⱼ)^τ** で一発に建てる。等次数ゆえ
+  差は全 supported → `tau1=τ` (固定 Dade 写像) で全分解が建ち、running-extension/Gram–Schmidt 残差は不要。
+  ⟹ engine (`retarget_isCoherent_of_*`) は **不使用**、代わりに既存 `coherentEqualDegree` (= (1.1)+(1.4)
+  等次数 coherence) に X-family を投入。
+- 実装 (S07_CoherenceConstantDegree.lean):
+  - **base case** `isCoherent_pair_of_differenceImage` (single pair、(5.2.d))。
+  - **H1** `pairDecomp`/`pairDecomp'` (DiffPair 版、`ofProjection` tau1=τ) + `inner_X_X'_eq_zero`。
+  - **H2** `pairDecomp_two_sided` (最難所): 異ペア χ,ζ で `‖D.X‖²=1 ∧ D.Y=D'.X` を正定値性で実証明
+    ((5.4.b) 両側、Bessel/CS 不要)。
+  - **H3** `commonImage` (β = R(χ₀)-射影、基準 ζ₀) + (A) `commonImage_self` `⟨β,β⟩=1` + (B)
+    `commonImage_inner` `∀ζ≠χ₀, ⟨β,(χ₀−ζ)^τ⟩=1` (独立性 4 ケース: χ̄₀/ζ₀/ζ̄₀/第3ペア)。
+  - **H4** `xFamily_inner` `⟨Xᵢ,Xⱼ⟩=⟨χᵢ,χⱼ⟩` (τ₁ 等長) + `CharacterPsiDecomposition_X_mem_ZIrr`。
+  - **H5** `coherent_of_constant_degree`: 単一ペア→base case / |S|≥4→Fin n 列挙+commonImage+coherentEqualDegree。
+- **faithful signature**: `(hyp : Hypothesis S A)(hSfin)(hcard:2≤S.ncard)(hirr:S⊆Irr)(hZIrr:τ supported diff
+  →ℤ[Irr G])(hconst:等次数)(hdeg0)(h1A:1∉A)(hsuppdiff)`。Dade-side の hZIrr/hsuppdiff/h1A は **§13 consumer が
+  discharge** (= base map が ℤ[S,L^#]→ℤ[Irr G]、Pf 設定で自明)。`hne` は不要 (coherentEqualDegree/base が内部供給)。
+- 🔑 **engine deep-dive (§6) の (II)(III) 路線は不採用** — engine は running-extension を tau1 に要求し
+  Gram–Schmidt 残差で重い。一発構成は tau1=τ で軽量、これが原文に忠実かつ Lean で最短だった。
+- ⏭ **次 = consumer wiring (S13 (11.5) `HC_le_secondDerived`)**: `S(M'')` に対する `Hypothesis (5.2)`
+  instance を §13/§4 Dade machinery で構成し (Dade τ / R(χ) (5.2.d) / orthogonality + 上記 Dade-side hyp)、
+  (5.7) を cite。等次数は M'/M'' abelian から (S(M'') の linear lift)。producer とは別の consumer-side 仕事。
+- 関連: lane-h `S08_Theorem62_63_Standalone.lean` (template)、issue 4012 (relane #8, RESOLVED 条件達成)、
+  issue 2018 ((11.5) gate)、S13 `HC_le_secondDerived`。
