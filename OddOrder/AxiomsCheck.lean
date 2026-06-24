@@ -4042,6 +4042,12 @@ set_option linter.style.longLine false in
 #assert_only_allowed_axioms OddOrder.BG.Ch4.S15.isMulCommutative_sup_of_le_centralizer
 #assert_only_allowed_axioms OddOrder.BG.Ch4.S15.isCyclic_of_isMulCommutative_of_rank_le_one
 #assert_only_allowed_axioms OddOrder.BG.Ch4.S15.typeF_nonabelian_cyclic_opiCore_compl
+-- 15.7(e) shared "`O_p(M_F)` non-abelian" step (Coq `not_cPP`), and the completed per-prime witness
+-- (Coq `oZ`): every `q ∈ π(M_F)` has an `M`-normal order-`q` subgroup `Z ≤ M_F`.  `q ≠ p` uses the
+-- cyclic `O_{p'}(M_F)`; `q = p` takes `Z = Ω₁(Z(O_p(M_F)))`, of order `p` by the rank-`< 3` argument
+-- on `B = X₁ × Z ≤ C_{M_F}(X₁)` (Sylow-of-`G` free).  Both sorry-free + axiom-clean.
+#assert_only_allowed_axioms OddOrder.BG.Ch4.S15.opiCore_singleton_not_isMulCommutative_of_witness
+#assert_only_allowed_axioms OddOrder.BG.Ch4.S15.exists_orderQ_le_mf_normal_in_M_of_not_fittingIsTI
 -- BG **Lemma 15.1** (`S15_MF`, issue 7007): the auxiliary `U`-factor structure of an arbitrary
 -- maximal `M = K U M_σ` — `K ≠ 1 → M' = U M_σ ∧ U` abelian (15.1b); the cyclic-`τ₂` centralizer
 -- funnel (15.1c); `⟨C_U(x) | x ∈ M_σ#⟩` abelian (15.1d); the Frobenius factor `U₀ M_σ` (15.1e).
@@ -5616,13 +5622,19 @@ and the TI case of the type-I `alternative` trichotomy (Peterfalvi (8.3)(a)).
 * `maxNilpotentNormalHall_sharp_isTISubset_of_fittingIsTI` — `FittingIsTI M ⟹ M_F#` is a `TI`-subset
   (the first disjunct of `TypeIData.alternative` in the `F(M)`-TI case of `hFI`).
 
-All three are unconditional / axiom-clean.  The `TypeFData` wrapper `isTypeF_groupTheory_of_isTypeF`
-and the assembled bridge `isTypeI_of_isTypeF` are *not* registered: the former is transitively
-conditional on the (sorried) Theorem A via `typeFData_of_kappa_eq_bot`, and the latter still carries
-the non-TI residual (BG Theorem 15.7(e)). -/
+All three are unconditional / axiom-clean.  **The full `hFI` bridge `isTypeI_of_isTypeF` (type `F ⟹`
+type I) is now axiom-clean**, together with its `TypeFData` construction `typeFData_of_kappa_eq_bot`
+and the wrapper `isTypeF_groupTheory_of_isTypeF`: both former gates are closed — the non-TI residual
+(BG Theorem 15.7(e)) by the per-prime witness `exists_orderQ_le_mf_normal_in_M_of_not_fittingIsTI`
+(registered above), and the Theorem A dependency by routing `typeFData_of_kappa_eq_bot`'s A(3)/A(8)
+through `typeP_maximal_eq_kappaHall_sup_U_sup_Msigma` + `isTypeP1_kappaSigma_compl_hall_subgroupOf_eq_bot`
+(Thm 15.2) instead of the `sorry` standalone `theoremA_maximal_structure`. -/
 #assert_only_allowed_axioms OddOrder.BG.Ch4.S16.normalizer_eq_self_of_subgroupOf_normal_of_ne_bot
 #assert_only_allowed_axioms OddOrder.BG.Ch4.S16.normalizer_fittingInAmbient_eq_self
 #assert_only_allowed_axioms OddOrder.BG.Ch4.S16.maxNilpotentNormalHall_sharp_isTISubset_of_fittingIsTI
+#assert_only_allowed_axioms OddOrder.BG.Ch4.S16.typeFData_of_kappa_eq_bot
+#assert_only_allowed_axioms OddOrder.BG.Ch4.S16.isTypeF_groupTheory_of_isTypeF
+#assert_only_allowed_axioms OddOrder.BG.Ch4.S16.isTypeI_of_isTypeF
 -- 15.7(e) conjunct A divisibility engine (Coq `regZq_dv_q1`): a `U0`-invariant order-`q` subgroup
 -- of the Frobenius kernel `M_F` forces `exp U ∣ q - 1` (Frobenius semiregular action).
 #assert_only_allowed_axioms OddOrder.BG.Ch4.S16.typeF_exponent_dvd_sub_one_of_invariant_card
