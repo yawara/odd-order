@@ -5976,6 +5976,44 @@ theorem residual_alignedOmegaSigma_inner_eq_zero_of_w1_lt_w2 [Finite G]
     rw [hyp.alignedOmegaSigmaGrid_inner hG hG.odd i' i 0 j, if_neg (fun hh => hi' hh.1)]
   · intro h; exact absurd (Finset.mem_univ _) h
 
+open scoped FiniteInduce in
+/-- **Peterfalvi (11.9.b), the `q > p` reduction** (modulo (11.8)).  For an irreducible
+`ζ ∈ S = inducedFamily M` of degree `w₁`, given the genuine (11.8) non-orthogonality `h118`
+(`(μ_0 − ζ)^τ − ∑ ω_{i0}^σ` is **not** orthogonal to `(Irr W)^σ`), it follows that `w₂ < w₁`
+(i.e. `q > p`).
+
+This is the textbook (11.9.b) argument "follows from (10.9) and (11.8)": were `w₁ < w₂`, the
+coherence-free (10.9) (`residual_alignedOmegaSigma_inner_eq_zero_of_w1_lt_w2`) would make the
+residual orthogonal to `(Irr W)^σ`, contradicting `h118`; and `w₁ ≠ w₂` because `|W₁|, |W₂|` are
+coprime with `w₁ ≥ 3`.  The hypothesis `h118` is the genuine (11.8) statement, here an explicit
+obligation; its honest proof (Peterfalvi (11.8.1)–(11.8.6)) is the remaining §11 character content
+(lane-b W3, issue 2020), and the consumer is `card_kappaHall_lt_of_isTypeIIIorIV`
+(`|K*| < |K|`, `q = |W₁| = |K|`, `p = |W₂| = |K*|`). -/
+theorem w2_lt_w1_of_residual_not_orthogonal [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} (hyp : Hypothesis M)
+    {ζ : ClassFunction ↥M ℂ} (hzS : ζ ∈ inducedFamily M) (hzirr : IsIrreducibleCharacter ζ)
+    (hz1 : ζ 1 = (hyp.w1 : ℂ))
+    (h118 : ¬ ∀ (i : Fin hyp.w1) (j : Fin hyp.w2),
+      ClassFunction.inner
+        ((hyp.tau ((∑ i' : Fin hyp.w1, hyp.muGrid hG hG.odd i' 0) - ζ))
+          - ∑ i' : Fin hyp.w1, hyp.alignedOmegaSigmaGrid hG hG.odd i' 0)
+        (hyp.alignedOmegaSigmaGrid hG hG.odd i j) = 0) :
+    hyp.w2 < hyp.w1 := by
+  haveI := hyp.finiteG
+  have h3 : (3 : ℕ) ≤ hyp.w1 := (typePData_toTICyclicHypothesis hyp.typeP hG.odd).three_le_card_W1
+  have hne : hyp.w1 ≠ hyp.w2 := by
+    intro he
+    have hcop : Nat.Coprime hyp.w1 hyp.w2 := typePData_coprime_card_W1_W2 hyp.typeP
+    rw [← he] at hcop
+    have hgcd : Nat.gcd hyp.w1 hyp.w1 = 1 := hcop
+    rw [Nat.gcd_self] at hgcd
+    omega
+  rcases lt_trichotomy hyp.w1 hyp.w2 with hlt | heq | hgt
+  · exact absurd
+      (residual_alignedOmegaSigma_inner_eq_zero_of_w1_lt_w2 hG hyp hzS hzirr hz1 hlt) h118
+  · exact absurd heq hne
+  · exact hgt
+
 /-- **Peterfalvi (10.10.1)--(10.10.4)**: if Hypothesis (10.1) holds with `M`
 of type V, then the Type V parameter calculation forces `S` to be coherent. -/
 theorem typeV_forces_coherence [Finite G] [Fintype G]

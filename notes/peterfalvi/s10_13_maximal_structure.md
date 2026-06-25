@@ -424,7 +424,9 @@ and (11.8)"。
 2. **genuine (11.8)** — 現 `S13.not_orthogonal_mu0_sub_zeta` は opaque `notOrthogonalFormula` field 結論。
    de-opacify して "residual NOT ⊥ (Irr W)^σ" の実 ClassFunction 形に。証明は (11.8.1)-(11.8.6) 経由
    (deep: (9.11)/(5.8)/(4.9)/σ-grid; **これが Part 3 の主負荷**)。
-3. **reduction**: 上記 ζ で coherence-free (10.9) [residual ⊥] vs (11.8) [residual ¬⊥] 矛盾 ⟹ ¬(w₁<w₂)
-   ⟹ (w₁≠w₂: coprime+both>1 より) w₁>w₂。
+3. **reduction** ✅ **landed** (`S12.w2_lt_w1_of_residual_not_orthogonal`): ζ (degree-w₁) + genuine (11.8)
+   仮説 `h118` (residual ¬⊥ の実 ClassFunction 形、opaque でない explicit obligation) ⟹ `hyp.w2 < hyp.w1`。
+   証明 = lt_trichotomy: w₁<w₂ なら coherence-free (10.9) [residual ⊥] が h118 と矛盾、w₁=w₂ は coprime+w₁≥3
+   で排除、∴ w₂<w₁。**(11.9.b) の reduction 論理は完成**、残 = `h118` (= genuine (11.8)) の discharge (step 2)。
 4. **carrier 構成 + 翻訳**: type III/IV maximal S → `exists_hypothesis_of_typeIIIorIVorV` で S12.Hypothesis、
    q=w₁=|K|, p=w₂=|K*| に翻訳 → `card_kappaHall_lt_of_isTypeIIIorIV` (FeitThompson:426)。
