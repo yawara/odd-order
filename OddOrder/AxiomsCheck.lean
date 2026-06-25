@@ -739,6 +739,14 @@ set_option linter.style.longLine false in
 -- Hall ⟹ contains Sylow: a `p`-Hall subgroup with `p ∣ |H|` contains a Sylow `p`-subgroup of `G`
 -- (`v_p(|H|) = v_p(|G|)` since `p ∤ [G:H]`; `Sylow.ofCard`).
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S14.exists_sylow_le_of_hall
+-- Pf (12.1)/(12.2.b): the genuine type-I family `S = {Ind_H^L θ}` (`H = L_F`) is closed under
+-- complex conjugation (`Ind_H^L θ̄ ∈ S`), the `χ̄ ∈ S` input to (12.2.b).  Axiom-clean.
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S14.Sset_closedUnderConjugate
+-- Pf (8.2.b) Frobenius realization for the type-I/F tower step (consumed by (12.10) step 2 /
+-- (12.16) `π = ∅` case): a type-F/I maximal whose complement `U` is a Z-group (all Sylow cyclic)
+-- is Frobenius with kernel `M_F`, via `IsZGroup.exponent_eq_card` + `typeF_frobenius_of_card_eq_exponent`.
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S14.typeF_frobenius_of_isZGroup_complement
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S14.typeI_frobenius_of_isZGroup_complement
 -- RepresentationTheory: completeness of irreducible characters — `f ⊥ Irr G ⇒ f = 0`
 -- (regular representation + Maschke + Schur).
 #assert_only_allowed_axioms OddOrder.RepresentationTheory.classFunction_eq_zero_of_orthogonal
@@ -5591,6 +5599,20 @@ via the Dedekind law (`eq_sup_inf_of_le_normalizer`, `K* ≤ M'`, `K ⊓ M' = �
 foundation feeding all three forward bridges hP2II/hP1neIIIIV/hP1eqV.  Axiom-clean. -/
 
 #assert_only_allowed_axioms OddOrder.BG.Ch4.S16.typePData_of_isTypeP_of_inputs
+
+/-! **Prop 16.1 reverse — `r_q(M) = 1` machinery + type V ⟹ type P** (`S16_MainResults`, issue 8015
+W1 frontier, relane #9): the `π(W₁) ⊆ κ(M)` rank-one ingredient for the reverse type bridges.
+`typePData_isCyclic_isElementaryAbelian_of_not_dvd_card_derived`: for a type-`P` datum and `q ∤ |M'|`,
+every elementary abelian `q`-subgroup of `↥M` is cyclic (it embeds in the cyclic abelianization
+`↥M ⧸ M' ≃* ↥W₁` via the `M_complement` field).  `typePData_pRank_eq_one_of_not_dvd_card_derived`:
+hence `r_q(M) = 1` for `q ∣ |W₁|, q ∤ |M'|`.  `isTypeP_of_isTypeV`: a structurally type-`V` maximal
+subgroup is BG type `P` — `U = ⊥` makes `M' = M_F` Hall, so `q ∤ |M'|` for all `q ∣ |W₁|`, giving the
+rank-one input for `typePData_kappa_nonempty_of_rank1`.  All axiom-clean. -/
+
+#assert_only_allowed_axioms
+  OddOrder.BG.Ch4.S16.typePData_isCyclic_isElementaryAbelian_of_not_dvd_card_derived
+#assert_only_allowed_axioms OddOrder.BG.Ch4.S16.typePData_pRank_eq_one_of_not_dvd_card_derived
+#assert_only_allowed_axioms OddOrder.BG.Ch4.S16.isTypeP_of_isTypeV
 
 /-! **BG Proposition 16.1 — type-`P` data construction layer** (`S16_MainResults`): the shared
 `TypePData` core and the type II/III/IV/V "last-mile" bridges feeding

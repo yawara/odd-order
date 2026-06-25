@@ -1958,6 +1958,126 @@ theorem one_le_norm_signed_paired_sum {ι : Type*} [Fintype ι]
     rcases abs_cases (2 * m + 1 : ℤ) with ⟨h1, _⟩ | ⟨h1, _⟩ <;> rw [h1] <;> omega
   exact_mod_cast hh
 
+/-- Negation `i ↦ -i ≡ (n − i) (mod n)` on `Fin n`, for `0 < n`.  This is the index map
+realizing the conjugation pairing `(i,j) ↦ (−i,−j)` of the Dade `η`-grid in (3.9.a)/(14.11.3). -/
+def finNeg {n : ℕ} (hn : 0 < n) (i : Fin n) : Fin n :=
+  ⟨(n - i.val) % n, Nat.mod_lt _ hn⟩
+
+@[simp] theorem finNeg_val {n : ℕ} (hn : 0 < n) (i : Fin n) :
+    (finNeg hn i).val = (n - i.val) % n := rfl
+
+theorem finNeg_involutive {n : ℕ} (hn : 0 < n) : Function.Involutive (finNeg hn) := by
+  intro i
+  apply Fin.ext
+  rw [finNeg_val, finNeg_val]
+  rcases Nat.eq_zero_or_pos i.val with h0 | hpos
+  · rw [h0, Nat.sub_zero, Nat.mod_self, Nat.sub_zero, Nat.mod_self]
+  · have hlt : i.val < n := i.isLt
+    have h1 : (n - i.val) % n = n - i.val := Nat.mod_eq_of_lt (by omega)
+    rw [h1]
+    have h2 : n - (n - i.val) = i.val := by omega
+    rw [h2, Nat.mod_eq_of_lt hlt]
+
+theorem finNeg_eq_self_iff {n : ℕ} (hn : 0 < n) (hodd : Odd n) (i : Fin n) :
+    finNeg hn i = i ↔ i = ⟨0, hn⟩ := by
+  rw [Fin.ext_iff, Fin.ext_iff, finNeg_val]
+  show (n - i.val) % n = i.val ↔ i.val = 0
+  constructor
+  · intro h
+    rcases Nat.eq_zero_or_pos i.val with h0 | hpos
+    · exact h0
+    · have hlt : i.val < n := i.isLt
+      have h1 : (n - i.val) % n = n - i.val := Nat.mod_eq_of_lt (by omega)
+      rw [h1] at h
+      rcases hodd with ⟨k, hk⟩
+      omega
+  · intro h
+    rw [h, Nat.sub_zero, Nat.mod_self]
+
+/-- **Arithmetic core of Peterfalvi (14.11.3), specialised to the `η`-grid.**  An integer-valued
+`q × p` grid `n` that pairs under the conjugation `(i,j) ↦ (−i,−j)` (`finNeg`) with principal value
+`n₀₀ = 1`, summed against a `±1`-sign grid `ε`, has complex norm `≥ 1`.
+
+This packages the conjugation involution `(i,j) ↦ (−i,−j)` on `Fin q × Fin p` (whose unique fixed
+point is `(0,0)`, since `q`, `p` are odd) and feeds it to `one_le_norm_signed_paired_sum`.  It is the
+exact arithmetic consumed by `generic_character_bound` (14.11.3) and the dual (14.16) parity
+contradiction once the `(3.9)` integrality/pairing facts of the `η`-grid are supplied. -/
+theorem one_le_norm_eta_grid_signed_sum {q p : ℕ} (hq : 0 < q) (hp : 0 < p)
+    (hqodd : Odd q) (hpodd : Odd p) (n ε : Fin q → Fin p → ℤ)
+    (hε : ∀ i j, ε i j = 1 ∨ ε i j = -1)
+    (hpair : ∀ i j, n (finNeg hq i) (finNeg hp j) = n i j)
+    (h00 : n ⟨0, hq⟩ ⟨0, hp⟩ = 1) :
+    1 ≤ ‖(∑ i : Fin q, ∑ j : Fin p, (ε i j : ℂ) * (n i j : ℂ))‖ := by
+  classical
+  have hinv : Function.Involutive
+      (fun x : Fin q × Fin p => (finNeg hq x.1, finNeg hp x.2)) := by
+    intro x
+    show (finNeg hq (finNeg hq x.1), finNeg hp (finNeg hp x.2)) = x
+    rw [finNeg_involutive hq x.1, finNeg_involutive hp x.2]
+  have key := one_le_norm_signed_paired_sum
+    (fun x : Fin q × Fin p => n x.1 x.2) (fun x => ε x.1 x.2)
+    hinv.toPerm (⟨0, hq⟩, ⟨0, hp⟩) (fun x => hε x.1 x.2)
+    (by rw [Function.Involutive.coe_toPerm]; exact hinv)
+    (by
+      intro x
+      rw [Function.Involutive.coe_toPerm]
+      constructor
+      · intro h
+        have h1 : finNeg hq x.1 = x.1 := (Prod.ext_iff.mp h).1
+        have h2 : finNeg hp x.2 = x.2 := (Prod.ext_iff.mp h).2
+        exact Prod.ext ((finNeg_eq_self_iff hq hqodd x.1).mp h1)
+          ((finNeg_eq_self_iff hp hpodd x.2).mp h2)
+      · intro h
+        rw [h]
+        exact Prod.ext ((finNeg_eq_self_iff hq hqodd _).mpr rfl)
+          ((finNeg_eq_self_iff hp hpodd _).mpr rfl))
+    (by intro x; rw [Function.Involutive.coe_toPerm]; exact hpair x.1 x.2)
+    h00
+  have hsum : (∑ i : Fin q, ∑ j : Fin p, (ε i j : ℂ) * (n i j : ℂ))
+      = ∑ x : Fin q × Fin p, (ε x.1 x.2 : ℂ) * (n x.1 x.2 : ℂ) := by
+    rw [Fintype.sum_prod_type]
+  rw [hsum]
+  exact key
+
+/-- Pointwise evaluation of a finite sum of class functions: `(∑ i ∈ s, f i) g = ∑ i ∈ s, f i g`.
+General-purpose `ClassFunction` plumbing (hoistable to `ClassFunction.lean`). -/
+theorem classFunction_sum_apply {ι : Type*} {k : Type*} [CommRing k]
+    (s : Finset ι) (f : ι → ClassFunction G k) (g : G) :
+    (∑ i ∈ s, f i) g = ∑ i ∈ s, f i g := by
+  classical
+  induction s using Finset.induction_on with
+  | empty => simp
+  | @insert a s ha ih =>
+      rw [Finset.sum_insert ha, ClassFunction.add_apply, ih, Finset.sum_insert ha]
+
+/-- **Peterfalvi (3.9.a,c) for the `η`-grid on the generic set `G₀`** (faithful §3 Dade obligation).
+For `g ∈ G₀` (an element of order prime to `pq` lying outside `Ã(M)`):
+
+* (3.9.c) each grid value `η_ij(g)` is a rational integer (`eta_int`);
+* (3.9.a) the grid is invariant under the conjugation `(i,j) ↦ (−i,−j)` (`finNeg`), i.e. the values
+  pair up (`eta_pair`), with principal value `η₀₀(g) = 1` (`eta_principal`);
+* `β_M^τ(g) = 0`, since `g ∉ Ã(M)` (`betaM_vanish`).
+
+These are the Dade-character integrality/symmetry facts of Peterfalvi (3.9) specialised to the
+`M`-grid plus the support vanishing of (14.10); their honest construction lives in the §3/§4
+Dade-isometry layer (the abstract §16 `ω`/`η`/`tau3` carriers do not yet pin it). -/
+structure EtaGenericData (hyp : Hypothesis (G := G)) (Mdata : MHypothesis hyp) where
+  eta_int : ∀ g ∈ Mdata.G0, ∀ (i : Fin hyp.base.q) (j : Fin hyp.base.p),
+    ∃ m : ℤ, hyp.base.eta i j g = (m : ℂ)
+  eta_pair : ∀ g ∈ Mdata.G0, ∀ (i : Fin hyp.base.q) (j : Fin hyp.base.p),
+    hyp.base.eta (finNeg hyp.base.q_prime.pos i) (finNeg hyp.base.p_prime.pos j) g
+      = hyp.base.eta i j g
+  eta_principal : ∀ g ∈ Mdata.G0,
+    hyp.base.eta ⟨0, hyp.base.q_prime.pos⟩ ⟨0, hyp.base.p_prime.pos⟩ g = 1
+  betaM_vanish : ∀ g ∈ Mdata.G0, Mdata.betaM g = 0
+
+/-- **Peterfalvi (3.9)/(14.10) generic-set producer.**  Faithful §3/§4 Dade obligation supplying the
+`η`-grid integrality/symmetry on `G₀` and the support vanishing of `β_M^τ` (`EtaGenericData`
+docstring). -/
+theorem eta_generic_data [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hyp : Hypothesis (G := G)) (Mdata : MHypothesis hyp) :
+    EtaGenericData hyp Mdata := sorry
+
 /-- **Peterfalvi (14.11.3)**: on the generic set `G_0`, the extended character `ψ^{τ₁}` has
 absolute value at least one: `|ψ^{τ₁}(g)| ≥ 1` for `g ∈ G_0`.
 
@@ -1969,9 +2089,53 @@ Dade extension `τ₁` applied to `ψ`.  Proof recipe (Pf p.89): for `g ∈ G_0`
 `Σ(±η_ij(g)) ∈ 2ℤ+1`, giving absolute value `≥ 1`.  Depends on `betaM_expansion` (14.11.2). -/
 theorem generic_character_bound [Finite G]
     (_hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
-    (Mdata : MHypothesis hyp) :
+    (Mdata : MHypothesis hyp) (hne : Mdata.K ≠ hyp.base.V) :
     ∀ g : G, g ∈ Mdata.G0 → 1 ≤ ‖(Mdata.tau1 Mdata.psi) g‖ := by
-  sorry
+  classical
+  -- (14.11.2): the signed `η`-grid expansion of `β_M^τ`.
+  obtain ⟨_he, ε, hε, χ, hχnorm, hexp⟩ := betaM_expansion _hG hyp Mdata hne
+  -- (3.9)/(14.10): the `η`-grid is integral and conjugation-symmetric on `G₀`, and `β_M^τ`
+  -- vanishes there.
+  have hdata := eta_generic_data _hG hyp Mdata
+  intro g hg
+  -- (3.9.c) integer values of the `η`-grid at `g`.
+  choose n hn using hdata.eta_int g hg
+  -- Evaluate the (14.11.2) expansion at `g` pointwise.
+  have happ : Mdata.betaM g
+      = (∑ i : Fin hyp.base.q, ∑ j : Fin hyp.base.p,
+          (ε i j : ℂ) * (hyp.base.eta i j g)) - χ g := by
+    rw [hexp, ClassFunction.sub_apply, classFunction_sum_apply]
+    congr 1
+    refine Finset.sum_congr rfl (fun i _ => ?_)
+    rw [classFunction_sum_apply]
+    refine Finset.sum_congr rfl (fun j _ => ?_)
+    rw [ClassFunction.smul_apply]
+  -- `β_M^τ(g) = 0` gives `χ(g) = Σ ε_ij η_ij(g) = Σ ε_ij (n_ij : ℂ)`.
+  have hχ2 : χ g = ∑ i : Fin hyp.base.q, ∑ j : Fin hyp.base.p, (ε i j : ℂ) * (n i j : ℂ) := by
+    have h0 : (∑ i : Fin hyp.base.q, ∑ j : Fin hyp.base.p,
+        (ε i j : ℂ) * (hyp.base.eta i j g)) - χ g = 0 := by
+      rw [← happ]; exact hdata.betaM_vanish g hg
+    rw [(sub_eq_zero.mp h0).symm]
+    refine Finset.sum_congr rfl (fun i _ => Finset.sum_congr rfl (fun j _ => ?_))
+    rw [hn i j]
+  -- (3.9.a) the integer grid pairs under negation with principal value `1`.
+  have hpair : ∀ i j,
+      n (finNeg hyp.base.q_prime.pos i) (finNeg hyp.base.p_prime.pos j) = n i j := by
+    intro i j
+    have he := hdata.eta_pair g hg i j
+    rw [hn, hn] at he
+    exact_mod_cast he
+  have h00 : n ⟨0, hyp.base.q_prime.pos⟩ ⟨0, hyp.base.p_prime.pos⟩ = 1 := by
+    have he := hdata.eta_principal g hg
+    rw [hn] at he
+    exact_mod_cast he
+  -- The signed paired sum has norm `≥ 1` (14.11.3 arithmetic core), and `‖χ‖ = ‖ψ^{τ₁}‖`.
+  calc (1 : ℝ)
+      ≤ ‖∑ i : Fin hyp.base.q, ∑ j : Fin hyp.base.p, (ε i j : ℂ) * (n i j : ℂ)‖ :=
+        one_le_norm_eta_grid_signed_sum hyp.base.q_prime.pos hyp.base.p_prime.pos
+          hyp.base.q_odd hyp.base.p_odd n ε hε hpair h00
+    _ = ‖χ g‖ := by rw [hχ2]
+    _ = ‖(Mdata.tau1 Mdata.psi) g‖ := hχnorm g
 
 /-- **Peterfalvi (14.11.2)+(14.11.3) ⇒ (14.11.4)**: the character-theoretic norm
 calculation.  Combining the `beta_M^tau` expansion (14.11.2) with the generic
@@ -1987,7 +2151,7 @@ theorem normCascadeBound_of_charData [Finite G]
   -- (14.11.2): `e = p q` together with the signed `eta_ij` expansion of `beta_M^tau`.
   have _hbeta := betaM_expansion _hG hyp Mdata hne
   -- (14.11.3): the generic lower bound `|psi^tau_1(g)| ≥ 1` on `G_0`.
-  have _hgen := generic_character_bound _hG hyp Mdata
+  have _hgen := generic_character_bound _hG hyp Mdata hne
   sorry
 
 /-- **Peterfalvi (14.11.4)**: the norm inequality cascade contradicts `K != V`.
