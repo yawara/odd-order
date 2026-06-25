@@ -5600,6 +5600,20 @@ foundation feeding all three forward bridges hP2II/hP1neIIIIV/hP1eqV.  Axiom-cle
 
 #assert_only_allowed_axioms OddOrder.BG.Ch4.S16.typePData_of_isTypeP_of_inputs
 
+/-! **Prop 16.1 reverse — `r_q(M) = 1` machinery + type V ⟹ type P** (`S16_MainResults`, issue 8015
+W1 frontier, relane #9): the `π(W₁) ⊆ κ(M)` rank-one ingredient for the reverse type bridges.
+`typePData_isCyclic_isElementaryAbelian_of_not_dvd_card_derived`: for a type-`P` datum and `q ∤ |M'|`,
+every elementary abelian `q`-subgroup of `↥M` is cyclic (it embeds in the cyclic abelianization
+`↥M ⧸ M' ≃* ↥W₁` via the `M_complement` field).  `typePData_pRank_eq_one_of_not_dvd_card_derived`:
+hence `r_q(M) = 1` for `q ∣ |W₁|, q ∤ |M'|`.  `isTypeP_of_isTypeV`: a structurally type-`V` maximal
+subgroup is BG type `P` — `U = ⊥` makes `M' = M_F` Hall, so `q ∤ |M'|` for all `q ∣ |W₁|`, giving the
+rank-one input for `typePData_kappa_nonempty_of_rank1`.  All axiom-clean. -/
+
+#assert_only_allowed_axioms
+  OddOrder.BG.Ch4.S16.typePData_isCyclic_isElementaryAbelian_of_not_dvd_card_derived
+#assert_only_allowed_axioms OddOrder.BG.Ch4.S16.typePData_pRank_eq_one_of_not_dvd_card_derived
+#assert_only_allowed_axioms OddOrder.BG.Ch4.S16.isTypeP_of_isTypeV
+
 /-! **BG Proposition 16.1 — type-`P` data construction layer** (`S16_MainResults`): the shared
 `TypePData` core and the type II/III/IV/V "last-mile" bridges feeding
 `proposition_type_classification`'s forward bridges.
@@ -6039,3 +6053,11 @@ formula together with the prime computation `coprimeFrobeniusAction_card_eq_prim
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S07.commonImage_inner
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S07.xFamily_inner
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S07.coherent_of_constant_degree
+
+-- Peterfalvi §10 (10.9) coherence-free support: the general Bessel `NC` bound
+-- `sigmaNC ψ ≤ ‖ψ‖²` (`ψ ∈ ZIrr G`, `⟨ψ, ψ⟩ = N ⟹ NC ≤ N`), generalising the norm-1/2 `σ`-image
+-- support bounds.  Fully axiom-clean (the σ-grid orthonormality + integer Parseval).  Used by the
+-- coherence-free (10.9) `inner_tau_muColumnZero_sub_zeta_alignedOmegaSigma_of_w1_lt_w2` (lane-b W3,
+-- which is itself char-gated, so not registered here).
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S05.TICyclicHypothesis.ncard_sigmaCoeff_ne_zero_le_of_inner_self_natCast
