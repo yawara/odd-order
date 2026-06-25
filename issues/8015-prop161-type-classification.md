@@ -333,3 +333,24 @@ Msigma_inf_conj_isBetaCompl / centralizer_singleton_lt_top すべて allowlist 3
 - mmd `references/bg/local-analysis.mmd` L4478-4536 (Prop 16.1 statement + proof)。
 - memory [[bg-s16-gated-on-typedata-construction]] (§16 type-data construction gate)。
 - issue 8012 (closed): Thm 15.2 (= input 11 h152a の供給元)。
+
+## ✅ 2026-06-25 進捗 — reverse IsTypeP 半分を全型完成 (lane-f, commits 032eab7c + 2a4be9bb)
+
+**重要訂正: rank-1 条件は carrier-gated でなかった。** 上の 2026-06-20 分析が "carrier-gated・真の残 crux"
+とした「π(W₁) の prime が M で rank 1」は、**純群論 (char gate 無し・carrier 不要) で解ける**:
+
+- **核心**: FT-critical consumer `not_isTypeI_of_isTypeNonI` (S16) は各 .mp から `IsTypeP` のみ抽出
+  (P₁/P₂ 精密化・MF 関係を捨てる)。⟹ reverse bridge の FT 本質 = `IsTypeNonI → IsTypeP` (κ≠∅) だけ。
+- **type V** `isTypeP_of_isTypeV`: U=⊥ ⟹ M'=M_F Hall ⟹ q∤|M'| ⟹ Sylow_q cyclic ⟹ rank 1。
+- **type II/III/IV** `isTypeP_of_typePData_of_card_W1_prime`: |W₁|=q 素数 (TypePNontrivialCore) +
+  `centralizer_W1` (C_{M'}(x)=W₂) + p-群固定点合同 `prime_dvd_card_inf_centralizer_of_mem_normalizer`
+  (q-元 x 正規化 N∧q∣|N| ⟹ q∣|C_N(x)|、`IsPGroup.card_modEq_card_fixedPoints` 経由・reusable) ⟹
+  q∤|M'| (∵ q∤|W₂| via cyclic W、`typePData_not_dvd_card_W2_of_card_W1_prime`) ⟹ rank 1。
+- 補助: `typePData_pRank_eq_one_of_not_dvd_card_derived` (q∤|M'|⟹pRank=1)、
+  `typePData_isCyclic_isElementaryAbelian_of_not_dvd_card_derived`、`pRank_le_one_of_forall_isElementaryAbelian_isCyclic`
+  (GroupTheory/PRank)。全 sorry-free + axiom-clean (AxiomsCheck 10 本登録)。
+- 統合 = `isTypeP_of_isTypeNonI` (IsTypeNonI → IsTypeP、全 4 型)。
+
+**残**: (1) `hIF` (型I⟹κ=∅、TypeFData→Frobenius/M_σ 論法、別系統 — 次の最大 W1 win)、
+(2) P₁/P₂ 精密化 (κ=π∖σ vs ≠、proposition_type_classification の bridge を完全に閉じるのに必要だが
+consumer 非使用)、(3) `not_isTypeI_of_isTypeNonI` を `isTypeP_of_isTypeNonI`+`hIF` で再配線 (6 sorry→1)。
