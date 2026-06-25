@@ -358,6 +358,88 @@ def InPi (q : ℕ) : Prop :=
     ∃ P : Subgroup G, P ≤ M' ∧ IsPGroup q ↥P ∧ ¬ q ∣ P.relIndex M' ∧
       ¬ IsCyclic ↥P ∧ q ∣ (maxNilpotentNormalHall M').relIndex M'
 
+/-- **Peterfalvi (12.7), the `π = ∅` case** (the first sentence of the proof of (12.16)): if the
+prime set `π` of (12.8) is empty, every type-I maximal `M` is a Frobenius group with kernel `M_F`.
+
+`M_F = H` is a normal Hall subgroup (8.11), so its complement `U` has `|U| = [M : M_F]` coprime
+to `|M_F|`; hence every Sylow `q`-subgroup `P` of `U` has full `q`-order in `M`.  Were `P`
+noncyclic, its `M`-image `P.map U.subtype` would be a noncyclic Sylow `q`-subgroup of `M` with
+`q ∣ [M : M_F]`, i.e. `q ∈ π` — contradicting `π = ∅`.  So `U` is a Z-group and the bridge
+`typeI_frobenius_of_isZGroup_complement` applies.  Its only gap is the (8.11) Hall input. -/
+theorem typeI_frobenius_of_pi_empty [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hpi : ∀ q : ℕ, q.Prime → ¬ InPi (G := G) q)
+    {M : Subgroup G} (hM : M ∈ maximalSubgroups G) (data : TypeIData M) :
+    OddOrder.Isaacs.Ch06.IsFrobeniusGroup ↥M (data.typeF.H.subgroupOf M)
+      (data.typeF.U.subgroupOf M) := by
+  classical
+  refine typeI_frobenius_of_isZGroup_complement data ?_
+  set H := data.typeF.H with hHdef
+  set U := data.typeF.U with hUdef
+  have hUM : U ≤ M := data.typeF.U_le
+  -- `[M : H] = |U|` (complement) and `|M| = |H| * |U|`.
+  have hrel : H.relIndex M = Nat.card ↥U := by
+    rw [Subgroup.relIndex, data.typeF.complement.symm.index_eq_card,
+      Nat.card_congr (Subgroup.subgroupOfEquivOfLe hUM).toEquiv]
+  have hMcard : Nat.card ↥M = Nat.card ↥H * Nat.card ↥U := by
+    rw [← (H.subgroupOf M).card_mul_index,
+      Nat.card_congr (Subgroup.subgroupOfEquivOfLe data.typeF.H_le).toEquiv,
+      ← Subgroup.relIndex, hrel]
+  -- `H = M_F` is Hall in `G` (8.11), so `|H|` is coprime to `[M : H] = |U|`.
+  have hHall := (OddOrder.Peterfalvi.S10.hall_maxNilpotentNormalHall_and_mainSubgroup hG hM
+    (tau := PeterfalviType.I) ⟨data⟩).1
+  rw [← data.typeF.H_eq] at hHall
+  have hcop : Nat.Coprime (Nat.card ↥H) (Nat.card ↥U) :=
+    hHall.coprime_index.coprime_dvd_right
+      (hrel ▸ Subgroup.relIndex_dvd_index_of_le data.typeF.H_le)
+  -- Every Sylow `q`-subgroup `P` of `U` is cyclic.
+  refine ⟨fun q hq P => ?_⟩
+  haveI : Fact q.Prime := ⟨hq⟩
+  by_contra hnc
+  -- `P ≠ ⊥`, so `q ∣ |U|`, and `|H|` has no `q`.
+  have hPcard : Nat.card ↥(P : Subgroup ↥U) = q ^ (Nat.card ↥U).factorization q :=
+    P.card_eq_multiplicity
+  have hPne : (P : Subgroup ↥U) ≠ ⊥ := fun h => hnc (h ▸ inferInstance)
+  have hfacU_pos : 0 < (Nat.card ↥U).factorization q := by
+    rcases Nat.eq_zero_or_pos ((Nat.card ↥U).factorization q) with h0 | h
+    · exact absurd (Subgroup.card_eq_one.mp (by rw [hPcard, h0, pow_zero])) hPne
+    · exact h
+  have hqU : q ∣ Nat.card ↥U := Nat.dvd_of_factorization_pos hfacU_pos.ne'
+  have hHfac0 : (Nat.card ↥H).factorization q = 0 :=
+    Nat.factorization_eq_zero_of_not_dvd
+      (hq.coprime_iff_not_dvd.mp (hcop.coprime_dvd_right hqU).symm)
+  have hMfac : (Nat.card ↥M).factorization q = (Nat.card ↥U).factorization q := by
+    rw [hMcard, Nat.factorization_mul (Nat.card_pos (α := ↥H)).ne'
+      (Nat.card_pos (α := ↥U)).ne', Finsupp.add_apply, hHfac0, zero_add]
+  -- `Pm = P.map U.subtype`: a noncyclic `q`-subgroup of `M` of full `q`-order.
+  set Pm := (P : Subgroup ↥U).map U.subtype with hPmdef
+  have hPmM : Pm ≤ M := (Subgroup.map_subtype_le _).trans hUM
+  have hPmcard : Nat.card ↥Pm = q ^ (Nat.card ↥M).factorization q := by
+    rw [hPmdef, Subgroup.card_map_of_injective U.subtype_injective, hPcard, hMfac]
+  have hPmsub : Nat.card ↥(Pm.subgroupOf M) = q ^ (Nat.card ↥M).factorization q := by
+    rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hPmM).toEquiv, hPmcard]
+  have hPmP : IsPGroup q ↥Pm := (IsPGroup.iff_card).mpr ⟨_, hPmcard⟩
+  refine hpi q hq ⟨M, hM, ⟨data⟩, Pm, hPmM, hPmP, ?_, ?_, ?_⟩
+  · -- `¬ q ∣ Pm.relIndex M`: `Pm` has the full `q`-part of `|M|`.
+    rw [Subgroup.relIndex]
+    intro hdvd
+    have hsplit : (Nat.card ↥M).factorization q
+        = (Nat.card ↥(Pm.subgroupOf M)).factorization q
+          + ((Pm.subgroupOf M).index).factorization q := by
+      conv_lhs => rw [← (Pm.subgroupOf M).card_mul_index]
+      rw [Nat.factorization_mul (Nat.card_pos (α := ↥(Pm.subgroupOf M))).ne'
+        Subgroup.index_ne_zero_of_finite, Finsupp.add_apply]
+    rw [hPmsub, hq.factorization_pow, Finsupp.single_eq_same] at hsplit
+    exact absurd (Nat.Prime.factorization_pos_of_dvd hq Subgroup.index_ne_zero_of_finite hdvd)
+      (by omega)
+  · -- `¬ IsCyclic ↥Pm`: `Pm ≃* P` and `P` is noncyclic.
+    intro hc
+    haveI := hc
+    exact hnc (isCyclic_of_surjective
+      (Subgroup.equivMapOfInjective (P : Subgroup ↥U) U.subtype U.subtype_injective).symm.toMonoidHom
+      (Subgroup.equivMapOfInjective (P : Subgroup ↥U) U.subtype U.subtype_injective).symm.surjective)
+  · -- `q ∣ (maxNilpotentNormalHall M).relIndex M = [M : H] = |U|`.
+    rw [← data.typeF.H_eq, hrel]; exact hqU
+
 /-- **Peterfalvi (12.8)**: the minimal counterexample hypothesis for (12.7).
 
 `M` is a type-`I` maximal subgroup whose Fitting kernel is `K = M_F` (`K' = [K, K]`), and `P₀`
