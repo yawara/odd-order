@@ -496,6 +496,21 @@ theorem exists_isElementaryAbelian_not_isCyclic_of_two_le_pRank [Finite G] {p : 
       (G := G) (p := p) (n := 2) (by norm_num) hpRank
   exact ⟨A, hA, not_isCyclic_of_isElementaryAbelian_of_two_le_log_card hA hlog⟩
 
+/-- **`pRank ≤ 1` from cyclic elementary abelian subgroups** (`[Finite G]`): if every
+elementary abelian `p`-subgroup of `G` is cyclic, then `pRank G p ≤ 1`.
+
+A cyclic elementary abelian `p`-group has order `1` or `p`, so its `log_p`-size is `≤ 1`
+(`not_isCyclic_of_isElementaryAbelian_of_two_le_log_card` rules out size `≥ 2`).  The Sylow
+form of "rank one" (`p`-Sylow cyclic) feeds in through this, since every elementary abelian
+`p`-subgroup embeds in a (cyclic) Sylow `p`-subgroup. -/
+theorem pRank_le_one_of_forall_isElementaryAbelian_isCyclic [Finite G]
+    (h : ∀ A : Subgroup G, A.IsElementaryAbelian p → IsCyclic ↥A) :
+    pRank G p ≤ 1 := by
+  rw [pRank_le_iff]
+  intro A hA
+  by_contra hlt
+  exact not_isCyclic_of_isElementaryAbelian_of_two_le_log_card hA (by omega) (h A hA)
+
 /-- **`pRank` lower bound** (`[Finite G]`, `p` prime): an elementary abelian subgroup of
 order `p ^ n` witnesses `n ≤ pRank G p`. This is the existence-side companion to the
 evaluation lemma `pRank_le_iff`. -/

@@ -2091,6 +2091,105 @@ theorem typePData_kappa_nonempty_of_rank1 [Finite G]
       exact Commute.zpow_left (hy (g : G) (Set.mem_singleton _)) n
     exact fun hbot => hCne (le_bot_iff.mp ((inf_le_inf_left _ hCle).trans hbot.le))
 
+/-- **Prop 16.1 reverse, cyclicity ingredient for `r_q(M) = 1`** (mmd L4478): for a type-`P`
+datum and a prime `q ∤ |M'|`, every elementary abelian `q`-subgroup `A` of `↥M` is cyclic.
+
+The abelianization `↥M ⧸ M'` is cyclic — the `M_complement` field makes the cyclic factor `W₁`
+(`W1_cyclic`) a complement of `M' = [M,M]` in `M`, so `↥M ⧸ M' ≃* ↥W₁`
+(`IsComplement'.QuotientMulEquiv`).  Since `q ∤ |M'|` and `A` is a `q`-group, `A ⊓ M' = ⊥`
+(coprime orders), so the quotient map embeds `A` into the cyclic `↥M ⧸ M'`, forcing `A` cyclic.
+This is the `q`-rank-one half of `π(W₁) ⊆ κ(M)` once `q ∤ |M'|` is in hand (Hall for type V, the
+`centralizer_W1` fixed-point argument for types II–IV). -/
+theorem typePData_isCyclic_isElementaryAbelian_of_not_dvd_card_derived [Finite G]
+    {M : Subgroup G} (data : TypePData M) {q : ℕ} (hq : q.Prime)
+    (hndvd : ¬ q ∣ Nat.card ↥(derivedInG M))
+    {A : Subgroup ↥M} (hA : A.IsElementaryAbelian q) : IsCyclic ↥A := by
+  haveI : Fact q.Prime := ⟨hq⟩
+  haveI : IsCyclic ↥data.W1 := data.W1_cyclic
+  set N : Subgroup ↥M := (derivedInG M).subgroupOf M with hNdef
+  -- `N = commutator ↥M`, hence normal.
+  have hN_eq : N = commutator ↥M := by
+    rw [hNdef, derivedInG, Subgroup.subgroupOf,
+      Subgroup.comap_map_eq_self_of_injective M.subtype_injective]
+  haveI hNnorm : N.Normal := by rw [hN_eq]; infer_instance
+  -- `↥M ⧸ N ≃* ↥(W₁.subgroupOf M)` is cyclic.
+  haveI : IsCyclic ↥(data.W1.subgroupOf M) := by
+    have e : ↥(data.W1.subgroupOf M) ≃* ↥data.W1 := Subgroup.subgroupOfEquivOfLe data.W1_le
+    exact isCyclic_of_surjective e.symm e.symm.surjective
+  have ecyc : (↥M ⧸ N) ≃* ↥(data.W1.subgroupOf M) := (data.M_complement.symm).QuotientMulEquiv
+  haveI : IsCyclic (↥M ⧸ N) := isCyclic_of_surjective ecyc.symm ecyc.symm.surjective
+  -- `A ⊓ N = ⊥`: `|A|` is a `q`-power and `q ∤ |N| = |M'|`.
+  have hNcard : Nat.card ↥N = Nat.card ↥(derivedInG M) :=
+    Nat.card_congr (Subgroup.subgroupOfEquivOfLe (Subgroup.map_subtype_le _)).toEquiv
+  obtain ⟨k, hk⟩ := IsPGroup.iff_card.mp hA.isPGroup
+  have hcop : Nat.Coprime (Nat.card ↥A) (Nat.card ↥N) := by
+    rw [hk, hNcard]
+    exact Nat.Coprime.pow_left k ((hq.coprime_iff_not_dvd).mpr hndvd)
+  have hAN : A ⊓ N = ⊥ := Subgroup.inf_eq_bot_of_coprime hcop
+  -- `A` injects into the cyclic `↥M ⧸ N`.
+  set φ : ↥A →* (↥M ⧸ N) := (QuotientGroup.mk' N).comp A.subtype with hφ
+  have hφinj : Function.Injective φ := by
+    rw [← MonoidHom.ker_eq_bot_iff, eq_bot_iff]
+    intro a ha
+    rw [MonoidHom.mem_ker, hφ, MonoidHom.comp_apply, QuotientGroup.mk'_apply,
+      QuotientGroup.eq_one_iff] at ha
+    have hmem : (a : ↥M) ∈ A ⊓ N := ⟨a.2, ha⟩
+    rw [hAN, Subgroup.mem_bot] at hmem
+    exact Subgroup.mem_bot.mpr (Subtype.ext hmem)
+  haveI : IsCyclic ↥φ.range := inferInstance
+  exact isCyclic_of_surjective (MonoidHom.ofInjective hφinj).symm
+    (MonoidHom.ofInjective hφinj).symm.surjective
+
+/-- **Prop 16.1 reverse, `r_q(M) = 1` from `q ∤ |M'|`** (mmd L4478): for a type-`P` datum and a
+prime `q ∣ |W₁|` with `q ∤ |M'|`, the `q`-rank of `M` is one.  Upper bound: every elementary
+abelian `q`-subgroup is cyclic (`typePData_isCyclic_isElementaryAbelian_of_not_dvd_card_derived`),
+so `pRank ↥M q ≤ 1`.  Lower bound: `q ∣ |W₁| ∣ |M|` gives an order-`q` element, an elementary
+abelian `q`-subgroup of order `q`, so `1 ≤ pRank ↥M q`.  This is the rank-one input that
+`typePData_kappa_nonempty_of_rank1` needs to place the `W₁`-primes in `κ(M)`. -/
+theorem typePData_pRank_eq_one_of_not_dvd_card_derived [Finite G]
+    {M : Subgroup G} (data : TypePData M) {q : ℕ} (hq : q.Prime)
+    (hqW1 : q ∣ Nat.card ↥data.W1)
+    (hndvd : ¬ q ∣ Nat.card ↥(derivedInG M)) :
+    pRank ↥M q = 1 := by
+  haveI : Fact q.Prime := ⟨hq⟩
+  refine le_antisymm ?_ ?_
+  · exact pRank_le_one_of_forall_isElementaryAbelian_isCyclic (fun A hA =>
+      typePData_isCyclic_isElementaryAbelian_of_not_dvd_card_derived data hq hndvd hA)
+  · have hqM : q ∣ Nat.card ↥M := hqW1.trans (Subgroup.card_dvd_of_le data.W1_le)
+    obtain ⟨g, hg⟩ := exists_prime_orderOf_dvd_card' (G := ↥M) q hqM
+    have hcard : Nat.card ↥(Subgroup.zpowers g) = q := by rw [Nat.card_zpowers, hg]
+    exact pow_le_card_of_le_pRank (Subgroup.zpowers g)
+      (Subgroup.IsElementaryAbelian.of_card_prime hcard) (by rw [hcard, pow_one])
+
+/-- **Prop 16.1 reverse, type V ⟹ type `P`** (mmd L4478, clause (d) `.mp`): a structurally
+type-`V` maximal subgroup is type `P` (`κ(M) ≠ ∅`).  Type `V` has `U = ⊥`, so `M' = M_F` is the
+nilpotent normal Hall subgroup `maxNilpotentNormalHall M`; Hall coprimality gives `q ∤ |M'|` for
+every `q ∣ |W₁| = [M : M']`, whence `r_q(M) = 1`
+(`typePData_pRank_eq_one_of_not_dvd_card_derived`).  Feeding this rank-one fact to
+`typePData_kappa_nonempty_of_rank1` places `π(W₁) ⊆ κ(M)`, so `κ(M) ≠ ∅`.  This is the type-V
+branch of the `hVP1` reverse bridge (the `IsTypeP` half) of Proposition 16.1. -/
+theorem isTypeP_of_isTypeV [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G}
+    (hM : M ∈ maximalSubgroups G) (hV : OddOrder.GroupTheory.IsTypeV M) : S14.IsTypeP M := by
+  obtain ⟨v⟩ := hV
+  -- `M' = M_F` (`U = ⊥`).
+  have hM'eq : derivedInG M = maxNilpotentNormalHall M := by
+    rw [v.typeP.derivedInG_eq_fitting_sup_U, v.U_eq_bot, sup_bot_eq]
+  have hHall := maxNilpotentNormalHall_isHall M
+  refine typePData_kappa_nonempty_of_rank1 hG hM v.typeP (fun q hq => ?_)
+  have hqp : q.Prime := Nat.prime_of_mem_primeFactors hq
+  have hqW1 : q ∣ Nat.card ↥v.typeP.W1 := Nat.dvd_of_mem_primeFactors hq
+  have hndvd : ¬ q ∣ Nat.card ↥(derivedInG M) := by
+    rw [hM'eq]
+    intro hdvd
+    have hqMF : q ∈ (Nat.card ↥(maxNilpotentNormalHall M)).primeFactors :=
+      Nat.mem_primeFactors.mpr ⟨hqp, hdvd, Nat.card_pos.ne'⟩
+    have hidx : ((maxNilpotentNormalHall M).subgroupOf M).index = Nat.card ↥v.typeP.W1 := by
+      rw [← hM'eq]; exact (v.typeP.card_W1_eq_derived_index).symm
+    have hqIdx : q ∈ ((maxNilpotentNormalHall M).subgroupOf M).index.primeFactors := by
+      rw [hidx]; exact Nat.mem_primeFactors.mpr ⟨hqp, hqW1, Nat.card_pos.ne'⟩
+    exact (hHall.2 q hqIdx) hqMF
+  exact typePData_pRank_eq_one_of_not_dvd_card_derived v.typeP hqp hqW1 hndvd
+
 /-- **Theorem A(8), the `FittingIsTI`-free part** (mmd L4274): for `M_F ≠ M_σ`, the Hall
 `(κ ∪ σ)ᶜ`-complement `U` is trivial and `|K| = p` is prime.  Both follow from
 `mf_ne_msigma_typeP1_structure` (Theorem 15.2): `M_F ≠ M_σ ⟹ IsTypeP1 M`
