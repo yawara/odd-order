@@ -171,6 +171,37 @@ theorem exists_typeI_hypothesis [Finite G]
       fun h => dadeData.dade.L_normalizes_A l h⟩
   exact ⟨{ maximal := hL, typeI := data, dadeData := dadeData, hconj := hconj }⟩
 
+open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
+/-- **The type-I family `S = {Ind_H^L θ}` is closed under complex conjugation**
+(Peterfalvi §12, the `χ̄ ∈ S` input to (12.2.b)): for `χ = Ind_H^L θ ∈ S` with
+`θ ∈ Irr H`, `θ ≠ 1`, the conjugate is `χ̄ = Ind_H^L θ̄` (`ClassFunction.induce_conj`),
+and `θ̄` is again a non-trivial irreducible of `H = L_F`. -/
+theorem Sset_closedUnderConjugate [Finite G] {L : Subgroup G} (hyp : Hypothesis L) :
+    OddOrder.Peterfalvi.S03.ClosedUnderConjugate hyp.Sset := by
+  classical
+  intro φ hφ
+  simp only [Hypothesis.Sset, Set.mem_setOf_eq] at hφ ⊢
+  obtain ⟨θ, hθ_ne, hφeq⟩ := hφ
+  refine ⟨⟨(θ : ClassFunction ↥((hyp.typeI.typeF.H).subgroupOf L) ℂ).conj,
+    θ.isIrreducible.conj⟩, ?_, ?_⟩
+  · -- `θ̄ ≠ 1`: else `θ = θ̄̄ = 1̄ = 1` (the trivial character is real).
+    intro h
+    apply hθ_ne
+    have hcoe : (θ : ClassFunction ↥((hyp.typeI.typeF.H).subgroupOf L) ℂ).conj
+        = trivialClassFunction ↥((hyp.typeI.typeF.H).subgroupOf L) := by
+      simpa using congrArg
+        (fun c : IrreducibleCharacter ↥((hyp.typeI.typeF.H).subgroupOf L) =>
+          (c : ClassFunction ↥((hyp.typeI.typeF.H).subgroupOf L) ℂ)) h
+    apply Subtype.ext
+    show (θ : ClassFunction ↥((hyp.typeI.typeF.H).subgroupOf L) ℂ)
+      = trivialClassFunction ↥((hyp.typeI.typeF.H).subgroupOf L)
+    rw [← ClassFunction.conj_conj
+      (θ : ClassFunction ↥((hyp.typeI.typeF.H).subgroupOf L) ℂ), hcoe]
+    exact trivialClassFunction_isReal
+  · rw [hφeq]
+    simpa using ClassFunction.induce_conj ((hyp.typeI.typeF.H).subgroupOf L)
+      (θ : ClassFunction ↥((hyp.typeI.typeF.H).subgroupOf L) ℂ)
+
 /-! ## (12.2): character decomposition and Dade domain -/
 
 /-- Carrier for the decomposition of `chi in S` used in Peterfalvi (12.2). -/

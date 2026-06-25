@@ -739,6 +739,9 @@ set_option linter.style.longLine false in
 -- Hall ⟹ contains Sylow: a `p`-Hall subgroup with `p ∣ |H|` contains a Sylow `p`-subgroup of `G`
 -- (`v_p(|H|) = v_p(|G|)` since `p ∤ [G:H]`; `Sylow.ofCard`).
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S14.exists_sylow_le_of_hall
+-- Pf (12.1)/(12.2.b): the genuine type-I family `S = {Ind_H^L θ}` (`H = L_F`) is closed under
+-- complex conjugation (`Ind_H^L θ̄ ∈ S`), the `χ̄ ∈ S` input to (12.2.b).  Axiom-clean.
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S14.Sset_closedUnderConjugate
 -- RepresentationTheory: completeness of irreducible characters — `f ⊥ Irr G ⇒ f = 0`
 -- (regular representation + Maschke + Schur).
 #assert_only_allowed_axioms OddOrder.RepresentationTheory.classFunction_eq_zero_of_orthogonal
