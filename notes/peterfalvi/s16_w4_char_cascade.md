@@ -66,23 +66,33 @@ Dade ρ-machinery** に bottom-out する。原文 (mmd `04.9` pp.38-43) で確�
   (`Γ ⊥ S^ν∪{1_G}`)、`e≤(h−1)/2 ⟹ ‖Γ‖²≤e−1` (7.8.b)。`betaM` の η-展開 + `Σa_ij²≤e−1` はこの
   instance。±1 は (7.8) の `a∈ℤ` + Dade 合同。
 
-⟹ **W4 の genuine foundation = §7 ρ-machinery (7.1)-(7.8) の形式化** (CF(L,A)、ρ map、norm 分解、
-coherence-to-expansion)。**大型・multi-session・lane-c の §5/§7 所有と重複**。着手は hub 調整必須。
-本セッションの貢献 (parity-core 特化 + `generic_character_bound`) はこの foundation の **上** に乗り、
-done 算術コア + faithful Dade producer で繋いだもの。
+### ✅✅ 重要訂正 (2026-06-25): §7 ρ-machinery は S09 に既に形式化済み・cite 可能
 
-## 次手候補 (優先順・未着手)
+当初「§7 ρ-machinery を新規形式化要・lane-c §7 重複」と評価したが**誤り**。**`S09_NonexistenceCertain.lean`
+に (7.1)-(7.8) がほぼ完全 sorry-free で実在** (全ファイル実 sorry 1 個): `Hypothesis71`/`chiRho` (ρ map,
+7.1-7.3) / `FamilyHypothesis71`/**`family_inequality` (7.5, sorry-free)** / `Hypothesis76` (7.6-7.7) /
+`Hypothesis78`/**`beta` (7.8, sorry-free)**。S09 は S10→…→S16 で推移 import 済 ⟹ **S16 から cite 可能**。
+lane-c の §7 は coherence (S07_*) で**別ファイル = 衝突なし**。
 
-1. **§7 ρ-machinery (7.5)/(7.8) 形式化** (上記、真の foundation): `normCascadeBound_of_charData` /
-   `betaM_expansion` を unblock。**hub 調整必須** (lane-c §7 重複)。`exists_MHypothesis` (14.10) も
-   M-side Dade data 構成にこれを要する。
-2. **betaM_expansion (14.11.2) de-opacify**: `all_pm_one_and_card_of_odd_sq_sum_le` (done) で ±1 導出。
-   ⚠ full-grid (conclusion) vs non-principal (parity core, pq−1) の index bookkeeping (η₀₀/χ の
-   principal split) が必要。faithful producer が (7.8) 内容を一部 restate しがち → generic_character_bound
-   ほど clean でない。(7.8) 形式化を待つ方が honest。
-3. **(14.16) dual** `caseB_character_contradiction_of_gap_inequalities`: β_L^τ の axes parity
-   (`TypeIOrthogonalityData.caseC2_eta0j_odd`, citeable) を使う。**full-grid でなく axes** ゆえ
-   `one_le_norm_eta_grid_signed_sum` は直接適用不可 (別 tool)。β_L 展開 (= (7.8) instance) が必要。
+⟹ **W4 の genuine 残作業 = §16 MHypothesis → S09 bridge** (lane-c 協調不要な lane-h §16 work):
+`Hypothesis71`/`Hypothesis78` は concrete `S04.Hypothesis`+`S04.DadeMap` を要求 / MHypothesis は abstract
+`tau` のみ ⟹ type-I M の Dade extension (14.10) から faithful に bridge carrier を供給 (S04 concrete 構成
+=§3/§4 が discharge)。本セッションの貢献 (parity-core 特化 + `generic_character_bound`) はこの上に乗る。
+詳細手順 = issue 2024。
+
+## 次手候補 (優先順・未着手) — 全て lane-h §16 work (lane-c 協調不要)
+
+正本手順 = **issue 2024**。共通の鍵 = MHypothesis → S09 bridge carrier (faithful `Hypothesis71`/`Hypothesis78`)。
+
+1. **bridge carrier** (最上流): MHypothesis に `Hypothesis71 G (A M) M` / `FamilyHypothesis71 G 1` /
+   `Hypothesis78 G (A M) M` を faithful 供給 (type-I M の Dade extension 14.10 から)。`eta_generic_data`
+   と同パターン。これが揃えば 2/3/4 は S09 cite + 算術で de-opacify 可。
+2. **`normCascadeBound_of_charData` (14.11.4)**: `family_inequality` (7.5, S09 cite) +
+   `generic_character_bound` (本セッション) + (7.7) 内積式 → `normCascadeBound`。(14.11.4) 算術が intricate。
+3. **`betaM_expansion` (14.11.2)**: `Hypothesis78.beta`/(7.8.a) (S09 cite) を η-grid 形に identify +
+   `all_pm_one_and_card_of_odd_sq_sum_le` (done) で ±1。⚠ full-grid vs non-principal の index split。
+4. **(14.16) dual** `caseB_character_contradiction_of_gap_inequalities`: β_L の (7.8) expansion で同様。
+   axes parity (`TypeIOrthogonalityData.caseC2_eta0j_odd`) は citeable・既 proven。
 
 ## cross-lane (lane-c / §3-owner 宛)
 
