@@ -97,3 +97,26 @@ Type-V 排除ステップを sorry-free 実証明** (commit `eeb489f9`):
 
 ⟹ lane-b は `IsTypeP1` 全体でなく **Type III/IV 限定の (11.9.b) (q>p)** を埋めればよい (Type V は処理済)。
 S13 `final_typeIII_conclusions` (11.9) が `q>p` を与えるので、char API landing 後そこに wire 可能。
+
+## 2026-06-25 lane-b (relane #9, W3): coherence-free (10.9) landed — (11.9.b) `q>p` の半分
+
+W3 (= lane-b、正本 `notes/meta/ft_frontier_remap_2026_06_25.md`) 再開。残 char 核 =
+`card_kappaHall_lt_of_isTypeIIIorIV` (FeitThompson:426, Pf (11.9.b) "type III/IV ⟹ q>p")。
+textbook 証明 = "follows from (10.9) and (11.8)"。
+
+**landed (commit このコミット、full build 3884 green)**:
+- `S05.TICyclicHypothesis.ncard_sigmaCoeff_ne_zero_le_of_inner_self_natCast` — 一般 Bessel NC bound
+  `sigmaNC ψ ≤ ‖ψ‖²`。**axiom-clean、AxiomsCheck 登録**。
+- `S12.inner_tau_muColumnZero_sub_zeta_alignedOmegaSigma_of_w1_lt_w2` + `…residual_alignedOmegaSigma_inner_eq_zero…`
+  — **coherence-free (10.9)** (σ-coeff 形 + 直交補形)。既存 `orthogonality_of_w1_lt_w2` は
+  `coh : CoherentHypothesis` 要 → (10.8) で S 非 coherent ゆえ (11.9.b) に使えなかった障害を解消。
+  NC bound を Bessel 化、row-branch 排除を `NC≥w₂>w₁+1` で coh-free 化。新規 sorry なし
+  ([[feedback-cite-sorried-lemmas-if-signature-correct]]、sorryAx は既存 §10 carrier 由来 = 既存 (10.9) と同 taint)。
+
+**残 Part 3 ((11.9.b) 完成 → 当 obligation)** — 詳細 = `notes/peterfalvi/s10_13_maximal_structure.md` §11:
+1. ∃ ζ ∈ S(HC) of degree w₁ (genuine §11 fact、(10.2) の S(HC) 版)。
+2. **genuine (11.8)** = de-opacify `S13.notOrthogonalFormula` + 実証明 ((11.8.1)-(11.8.6)、deep、**主負荷**)。
+3. reduction: coherence-free (10.9) [residual ⊥] vs (11.8) [¬⊥] 矛盾 ⟹ w₁>w₂。
+4. carrier 構成 (`exists_hypothesis_of_typeIIIorIVorV`) + q=w₁=|K|, p=w₂=|K*| 翻訳。
+
+⟹ (11.9.b) の **(10.9)-half は完成**、残 = (11.8)-half (genuine de-opacify + 証明) + reduction wiring。

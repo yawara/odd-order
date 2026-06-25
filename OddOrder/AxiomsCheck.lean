@@ -739,6 +739,14 @@ set_option linter.style.longLine false in
 -- Hall ⟹ contains Sylow: a `p`-Hall subgroup with `p ∣ |H|` contains a Sylow `p`-subgroup of `G`
 -- (`v_p(|H|) = v_p(|G|)` since `p ∤ [G:H]`; `Sylow.ofCard`).
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S14.exists_sylow_le_of_hall
+-- Pf (12.1)/(12.2.b): the genuine type-I family `S = {Ind_H^L θ}` (`H = L_F`) is closed under
+-- complex conjugation (`Ind_H^L θ̄ ∈ S`), the `χ̄ ∈ S` input to (12.2.b).  Axiom-clean.
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S14.Sset_closedUnderConjugate
+-- Pf (8.2.b) Frobenius realization for the type-I/F tower step (consumed by (12.10) step 2 /
+-- (12.16) `π = ∅` case): a type-F/I maximal whose complement `U` is a Z-group (all Sylow cyclic)
+-- is Frobenius with kernel `M_F`, via `IsZGroup.exponent_eq_card` + `typeF_frobenius_of_card_eq_exponent`.
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S14.typeF_frobenius_of_isZGroup_complement
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S14.typeI_frobenius_of_isZGroup_complement
 -- RepresentationTheory: completeness of irreducible characters — `f ⊥ Irr G ⇒ f = 0`
 -- (regular representation + Maschke + Schur).
 #assert_only_allowed_axioms OddOrder.RepresentationTheory.classFunction_eq_zero_of_orthogonal
@@ -6064,3 +6072,11 @@ formula together with the prime computation `coprimeFrobeniusAction_card_eq_prim
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S07.commonImage_inner
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S07.xFamily_inner
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S07.coherent_of_constant_degree
+
+-- Peterfalvi §10 (10.9) coherence-free support: the general Bessel `NC` bound
+-- `sigmaNC ψ ≤ ‖ψ‖²` (`ψ ∈ ZIrr G`, `⟨ψ, ψ⟩ = N ⟹ NC ≤ N`), generalising the norm-1/2 `σ`-image
+-- support bounds.  Fully axiom-clean (the σ-grid orthonormality + integer Parseval).  Used by the
+-- coherence-free (10.9) `inner_tau_muColumnZero_sub_zeta_alignedOmegaSigma_of_w1_lt_w2` (lane-b W3,
+-- which is itself char-gated, so not registered here).
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S05.TICyclicHypothesis.ncard_sigmaCoeff_ne_zero_le_of_inner_self_natCast

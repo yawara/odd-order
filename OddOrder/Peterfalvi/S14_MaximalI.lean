@@ -38,24 +38,23 @@ variable {G : Type*} [Group G]
 
 /-! ## (12.1): the type-I hypothesis -/
 
+open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
 /-- **Peterfalvi (12.1)**: setup for a maximal subgroup `L` of type I.
 
-`Sset` is the family `{Ind_H^L theta | theta in Irr H, theta != 1_H}`.
-`R chi` is the union of the two-element image blocks `R_1(phi)` appearing in
-(12.2).  The fields whose names end in `Formula` name the character calculations
-proved across (12.2)--(12.5). -/
+`G` is finite (carried as the instance field `finiteG`, the `S12`/`S15`
+`FiniteInduce` pattern), so the *genuine* Dade isometry `tau`, the induced family
+`Sset = {Ind_H^L θ | θ ∈ Irr H, θ ≠ 1_H}` (`H = L_F`), and the support `A = A(L)`
+are honest projections (`Hypothesis.tau`, `Hypothesis.Sset`, `Hypothesis.A`)
+rather than unconstrained data.  `dadeData` is the (8.15) Dade support hypothesis
+for `A(L)` (supplied by `S10.dadeSupportHypotheses_typeI`), and `hconj` is its
+`L`-conjugation invariance; together they build the Dade isometry relative to
+`(A(L), L, G)` (Peterfalvi (12.1)). -/
 structure Hypothesis (L : Subgroup G) where
+  [finiteG : Finite G]
   maximal : L ∈ maximalSubgroups G
   typeI : TypeIData L
-  Sset : Set (ClassFunction ↥L ℂ)
-  A : Set ↥L
-  tau : OddOrder.Peterfalvi.S07.IntegralCharacterMap ↥L G
-  R : ClassFunction ↥L ℂ → Set (ClassFunction G ℂ)
-  decompositionFormula : ClassFunction ↥L ℂ → Prop
-  dadeDomainFormula : ClassFunction ↥L ℂ → Prop
-  characterOrthogonalToR : ClassFunction G ℂ → Prop
-  rhoConstantFormula : ClassFunction G ℂ → Prop
-  integerValueFormula : ClassFunction G ℂ → Prop
+  dadeData : OddOrder.Peterfalvi.S10.DadeSupportHypothesisData L (typeIA L typeI)
+  hconj : dadeData.dade.HConjInvariant
 
 namespace Hypothesis
 
@@ -71,7 +70,137 @@ def Hprime {L : Subgroup G} (hyp : Hypothesis L) : Subgroup G :=
 def ambientA {L : Subgroup G} (hyp : Hypothesis L) : Set G :=
   typeIA L hyp.typeI
 
+/-- Peterfalvi's support `A(L)` restricted to `L` (the `supportInSubgroup` of the
+ambient `A(L)`), the genuine support of the Dade isometry, no longer an
+unconstrained field. -/
+def A {L : Subgroup G} (hyp : Hypothesis L) : Set ↥L :=
+  OddOrder.Peterfalvi.S04.supportInSubgroup (typeIA L hyp.typeI) L
+
+open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
+/-- Peterfalvi's family `S = {Ind_H^L θ | θ ∈ Irr H, θ ≠ 1_H}` of (12.1),
+`H = L_F`, induced via the canonical `ClassFunction.induce`.  No longer an
+unconstrained field. -/
+noncomputable def Sset {L : Subgroup G} (hyp : Hypothesis L) :
+    Set (ClassFunction ↥L ℂ) :=
+  haveI := hyp.finiteG
+  { χ | ∃ θ : IrreducibleCharacter ↥((hyp.typeI.typeF.H).subgroupOf L),
+      θ ≠ trivialIrreducibleCharacter ↥((hyp.typeI.typeF.H).subgroupOf L) ∧
+      χ = ClassFunction.induce ((hyp.typeI.typeF.H).subgroupOf L)
+        (θ : ClassFunction ↥((hyp.typeI.typeF.H).subgroupOf L) ℂ) }
+
+open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
+/-- Peterfalvi's Dade isometry `τ` relative to `(A(L), L, G)` of (12.1), pinned to
+the genuine `S07.dadeIntegralCharacterMap` of the (8.15) support data `dadeData`.
+No longer an unconstrained field. -/
+noncomputable def tau {L : Subgroup G} (hyp : Hypothesis L) :
+    OddOrder.Peterfalvi.S07.IntegralCharacterMap ↥L G :=
+  haveI := hyp.finiteG
+  OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap hyp.dadeData.dade
+    (hyp.dadeData.dade.fullDadeIsometryData hyp.hconj)
+
 end Hypothesis
+
+/-- Conjugation transports the centralizer of a singleton:
+`g · C_G(a) · g⁻¹ = C_G(g a g⁻¹)` (S14-local copy of the S12 helper; pure group theory). -/
+private theorem conj_smul_centralizer_singleton (g a : G) :
+    MulAut.conj g • Subgroup.centralizer ({a} : Set G)
+      = Subgroup.centralizer ({g * a * g⁻¹} : Set G) := by
+  ext y
+  rw [Subgroup.mem_pointwise_smul_iff_inv_smul_mem, Subgroup.mem_centralizer_iff,
+      Subgroup.mem_centralizer_iff]
+  have hinv : (MulAut.conj g)⁻¹ • y = g⁻¹ * y * g := by
+    rw [← map_inv, MulAut.smul_def, MulAut.conj_apply, inv_inv]
+  simp only [Set.mem_singleton_iff, forall_eq, hinv]
+  constructor
+  · intro h
+    calc g * a * g⁻¹ * y
+        = g * (a * (g⁻¹ * y * g)) * g⁻¹ := by group
+      _ = g * (g⁻¹ * y * g * a) * g⁻¹ := by rw [h]
+      _ = y * (g * a * g⁻¹) := by group
+  · intro h
+    calc a * (g⁻¹ * y * g)
+        = g⁻¹ * (g * a * g⁻¹ * y) * g := by group
+      _ = g⁻¹ * (y * (g * a * g⁻¹)) * g := by rw [h]
+      _ = g⁻¹ * y * g * a := by group
+
+/-- **Peterfalvi (8.14)/(8.15)**: the support kernel `R(x)` is `M`-conjugation equivariant
+(S14-local copy of the S12 helper).  `supportKernel M M X (g x g⁻¹) = g · supportKernel M M X x`
+for `g ∈ M` and `X` an `M`-invariant set. -/
+private theorem supportKernel_conj_invariant {M : Subgroup G} {X : Set G} {g x : G}
+    (hg : g ∈ M) (hmem : g * x * g⁻¹ ∈ X ↔ x ∈ X) :
+    supportKernel M M X (g * x * g⁻¹) = MulAut.conj g • supportKernel M M X x := by
+  have hMfix : MulAut.conj g • maxNilpotentNormalHall M = maxNilpotentNormalHall M :=
+    conj_smul_eq_self_of_mem_normalizer
+      (OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_le_normalizer M hg)
+  have hMself : MulAut.conj g • M = M :=
+    conj_smul_eq_self_of_mem_normalizer (Subgroup.le_normalizer hg)
+  have hcent : (Subgroup.centralizer ({g * x * g⁻¹} : Set G) ≤ M)
+      ↔ (Subgroup.centralizer ({x} : Set G) ≤ M) := by
+    rw [← conj_smul_centralizer_singleton]
+    conv_lhs => rw [← hMself]
+    exact Subgroup.pointwise_smul_le_pointwise_smul_iff
+  have hescape : (g * x * g⁻¹ ∈ escapingCentralizerSet M X)
+      ↔ (x ∈ escapingCentralizerSet M X) := by
+    simp only [escapingCentralizerSet, Set.mem_setOf_eq, hmem, hcent]
+  unfold supportKernel
+  by_cases hx : x ∈ escapingCentralizerSet M X
+  · rw [if_pos (hescape.mpr hx), if_pos hx, Subgroup.smul_inf, hMfix,
+        conj_smul_centralizer_singleton]
+  · rw [if_neg (fun h => hx (hescape.mp h)), if_neg hx, Subgroup.smul_bot]
+
+open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
+/-- **Peterfalvi (12.1), existence**: every type-I maximal subgroup `L` carries the
+(12.1) Hypothesis.  The Dade isometry, induced family, and support are the genuine
+`S07.dadeIntegralCharacterMap`, `Sset`, and `A(L)`; the only inputs are the (8.15)
+Dade support data (`S10.dadeSupportHypotheses_typeI`) and the conjugation
+invariance `hconj` of the support kernels (a (8.14)/(8.15) fact).  Mirrors
+`S12.exists_hypothesis_of_typeIIIorIVorV`. -/
+theorem exists_typeI_hypothesis [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {L : Subgroup G}
+    (hL : L ∈ maximalSubgroups G) (hType : IsTypeI L) :
+    Nonempty (Hypothesis L) := by
+  obtain ⟨data⟩ := hType
+  obtain ⟨dadeData⟩ :=
+    (OddOrder.Peterfalvi.S10.dadeSupportHypotheses_typeI hG hL data).1
+  -- (8.14)/(8.15): the support kernels `R(a)` are `L`-conjugation invariant.
+  have hconj : dadeData.dade.HConjInvariant := by
+    intro a l
+    simp only [dadeData.H_eq_supportKernel]
+    refine supportKernel_conj_invariant l.2 ?_
+    exact ⟨fun h => by simpa using dadeData.dade.L_normalizes_A l⁻¹ h,
+      fun h => dadeData.dade.L_normalizes_A l h⟩
+  exact ⟨{ maximal := hL, typeI := data, dadeData := dadeData, hconj := hconj }⟩
+
+open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
+/-- **The type-I family `S = {Ind_H^L θ}` is closed under complex conjugation**
+(Peterfalvi §12, the `χ̄ ∈ S` input to (12.2.b)): for `χ = Ind_H^L θ ∈ S` with
+`θ ∈ Irr H`, `θ ≠ 1`, the conjugate is `χ̄ = Ind_H^L θ̄` (`ClassFunction.induce_conj`),
+and `θ̄` is again a non-trivial irreducible of `H = L_F`. -/
+theorem Sset_closedUnderConjugate [Finite G] {L : Subgroup G} (hyp : Hypothesis L) :
+    OddOrder.Peterfalvi.S03.ClosedUnderConjugate hyp.Sset := by
+  classical
+  intro φ hφ
+  simp only [Hypothesis.Sset, Set.mem_setOf_eq] at hφ ⊢
+  obtain ⟨θ, hθ_ne, hφeq⟩ := hφ
+  refine ⟨⟨(θ : ClassFunction ↥((hyp.typeI.typeF.H).subgroupOf L) ℂ).conj,
+    θ.isIrreducible.conj⟩, ?_, ?_⟩
+  · -- `θ̄ ≠ 1`: else `θ = θ̄̄ = 1̄ = 1` (the trivial character is real).
+    intro h
+    apply hθ_ne
+    have hcoe : (θ : ClassFunction ↥((hyp.typeI.typeF.H).subgroupOf L) ℂ).conj
+        = trivialClassFunction ↥((hyp.typeI.typeF.H).subgroupOf L) := by
+      simpa using congrArg
+        (fun c : IrreducibleCharacter ↥((hyp.typeI.typeF.H).subgroupOf L) =>
+          (c : ClassFunction ↥((hyp.typeI.typeF.H).subgroupOf L) ℂ)) h
+    apply Subtype.ext
+    show (θ : ClassFunction ↥((hyp.typeI.typeF.H).subgroupOf L) ℂ)
+      = trivialClassFunction ↥((hyp.typeI.typeF.H).subgroupOf L)
+    rw [← ClassFunction.conj_conj
+      (θ : ClassFunction ↥((hyp.typeI.typeF.H).subgroupOf L) ℂ), hcoe]
+    exact trivialClassFunction_isReal
+  · rw [hφeq]
+    simpa using ClassFunction.induce_conj ((hyp.typeI.typeF.H).subgroupOf L)
+      (θ : ClassFunction ↥((hyp.typeI.typeF.H).subgroupOf L) ℂ)
 
 /-! ## (12.2): character decomposition and Dade domain -/
 
@@ -112,10 +241,10 @@ structure CrossOrthogonalityData {L1 L2 : Subgroup G}
   chi1_mem : chi1 ∈ hyp1.Sset
   chi2 : ClassFunction ↥L2 ℂ
   chi2_mem : chi2 ∈ hyp2.Sset
+  /-- The family `R(χ₁)` from (12.2) (the union of the two-element Dade-image blocks). -/
   R1 : Set (ClassFunction G ℂ)
-  R1_eq : R1 = hyp1.R chi1
+  /-- The family `R(χ₂)` from (12.2). -/
   R2 : Set (ClassFunction G ℂ)
-  R2_eq : R2 = hyp2.R chi2
   orthogonal : Prop
   orthogonal_holds : orthogonal
 
@@ -128,20 +257,27 @@ theorem nonconjugate_typeI_R_orthogonal [Finite G]
     ∃ data : CrossOrthogonalityData hyp1 hyp2, data.orthogonal := by
   sorry
 
-/-- **Peterfalvi (12.4)**: a class function orthogonal to every type-I
-`R(chi)` is constant on each coset `xH` with `x in L - H`. -/
+open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
+/-- **Peterfalvi (12.4)**: a class function `ψ` orthogonal to every type-I family
+`R(χ)` (`χ ∈ S`) is constant on each coset `xH` with `x ∈ L − H`.  The orthogonality
+hypothesis is now the genuine `⟨ψ, α⟩ = 0` for `α ∈ R(χ)`, no longer an opaque
+field (`R` is the (12.2) family). -/
 theorem orthogonal_character_constant_on_coset [Finite G]
     (_hG : OddOrder.BG.IsMinimalSimpleOdd G) {L : Subgroup G} (hyp : Hypothesis L)
-    {psi : ClassFunction G ℂ} (horth : hyp.characterOrthogonalToR psi)
+    {R : ClassFunction ↥L ℂ → Set (ClassFunction G ℂ)} {psi : ClassFunction G ℂ}
+    (horth : ∀ χ ∈ hyp.Sset, ∀ α ∈ R χ, ClassFunction.inner psi α = 0)
     {x : G} (hxL : x ∈ L) (hxH : x ∉ hyp.H) :
     ∀ h : G, h ∈ hyp.H → psi (x * h) = psi x := by
   sorry
 
-/-- **Peterfalvi (12.5)**: after the rho-reduction, the resulting character is
-constant on `H - H'`. -/
+open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
+/-- **Peterfalvi (12.5)**: after the rho-reduction, a class function `ψ` orthogonal
+to every type-I family `R(χ)` is constant on `H − H'`.  The orthogonality hypothesis
+is the genuine `⟨ψ, α⟩ = 0` for `α ∈ R(χ)`, no longer an opaque field. -/
 theorem rho_constant_on_H_minus_Hprime [Finite G]
     (_hG : OddOrder.BG.IsMinimalSimpleOdd G) {L : Subgroup G} (hyp : Hypothesis L)
-    {psi : ClassFunction G ℂ} (hrho : hyp.rhoConstantFormula psi) :
+    {R : ClassFunction ↥L ℂ → Set (ClassFunction G ℂ)} {psi : ClassFunction G ℂ}
+    (horth : ∀ χ ∈ hyp.Sset, ∀ α ∈ R χ, ClassFunction.inner psi α = 0) :
     ∀ h : G, h ∈ hyp.H → h ∉ hyp.Hprime → psi h = psi 1 := by
   sorry
 
@@ -184,6 +320,26 @@ theorem frobenius_typeI_coherent [Finite G] [Fintype G]
     Nonempty (OddOrder.Peterfalvi.S07.IsCoherent hyp.tau hyp.Sset hyp.A) :=
   CoherenceWiring.coherent_of_sibleyTarget (sibleyTarget_frobI hyp hfrob)
 
+/-- **Frobenius realization bridge for type `F`** (the (8.2.b) consumer behind (12.10)/(12.16)).
+A type-`F` maximal `M` whose complement `U` is a **Z-group** (every Sylow subgroup cyclic) is a
+Frobenius group with kernel `M_F`.  By `IsZGroup.exponent_eq_card`, `|U| = exp(U)`, so Peterfalvi
+(8.2.b) (`S10.typeF_frobenius_of_card_eq_exponent`) applies.  `sorry`-free + axiom-clean. -/
+theorem typeF_frobenius_of_isZGroup_complement [Finite G] {M : Subgroup G}
+    (data : TypeFData M) (hZ : _root_.IsZGroup ↥data.U) :
+    OddOrder.Isaacs.Ch06.IsFrobeniusGroup ↥M (data.H.subgroupOf M) (data.U.subgroupOf M) := by
+  haveI := hZ
+  exact OddOrder.Peterfalvi.S10.typeF_frobenius_of_card_eq_exponent data
+    (_root_.IsZGroup.exponent_eq_card (G := ↥data.U)).symm
+
+/-- **Frobenius realization bridge for type I** (the `kernel = M_F` form consumed by (12.10)).
+A type-I maximal `M` whose complement `U = M/M_F` is a **Z-group** is a Frobenius group with kernel
+`M_F = typeF.H`.  Wraps `typeF_frobenius_of_isZGroup_complement` on `data.typeF`. -/
+theorem typeI_frobenius_of_isZGroup_complement [Finite G] {M : Subgroup G}
+    (data : TypeIData M) (hZ : _root_.IsZGroup ↥data.typeF.U) :
+    OddOrder.Isaacs.Ch06.IsFrobeniusGroup ↥M (data.typeF.H.subgroupOf M)
+      (data.typeF.U.subgroupOf M) :=
+  typeF_frobenius_of_isZGroup_complement data.typeF hZ
+
 /-- **Peterfalvi (12.7)**: every maximal subgroup of type I is Frobenius, with
 kernel equal to `M_F`. -/
 theorem typeI_frobenius [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
@@ -201,6 +357,88 @@ def InPi (q : ℕ) : Prop :=
   ∃ M' : Subgroup G, M' ∈ maximalSubgroups G ∧ IsTypeI M' ∧
     ∃ P : Subgroup G, P ≤ M' ∧ IsPGroup q ↥P ∧ ¬ q ∣ P.relIndex M' ∧
       ¬ IsCyclic ↥P ∧ q ∣ (maxNilpotentNormalHall M').relIndex M'
+
+/-- **Peterfalvi (12.7), the `π = ∅` case** (the first sentence of the proof of (12.16)): if the
+prime set `π` of (12.8) is empty, every type-I maximal `M` is a Frobenius group with kernel `M_F`.
+
+`M_F = H` is a normal Hall subgroup (8.11), so its complement `U` has `|U| = [M : M_F]` coprime
+to `|M_F|`; hence every Sylow `q`-subgroup `P` of `U` has full `q`-order in `M`.  Were `P`
+noncyclic, its `M`-image `P.map U.subtype` would be a noncyclic Sylow `q`-subgroup of `M` with
+`q ∣ [M : M_F]`, i.e. `q ∈ π` — contradicting `π = ∅`.  So `U` is a Z-group and the bridge
+`typeI_frobenius_of_isZGroup_complement` applies.  Its only gap is the (8.11) Hall input. -/
+theorem typeI_frobenius_of_pi_empty [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hpi : ∀ q : ℕ, q.Prime → ¬ InPi (G := G) q)
+    {M : Subgroup G} (hM : M ∈ maximalSubgroups G) (data : TypeIData M) :
+    OddOrder.Isaacs.Ch06.IsFrobeniusGroup ↥M (data.typeF.H.subgroupOf M)
+      (data.typeF.U.subgroupOf M) := by
+  classical
+  refine typeI_frobenius_of_isZGroup_complement data ?_
+  set H := data.typeF.H with hHdef
+  set U := data.typeF.U with hUdef
+  have hUM : U ≤ M := data.typeF.U_le
+  -- `[M : H] = |U|` (complement) and `|M| = |H| * |U|`.
+  have hrel : H.relIndex M = Nat.card ↥U := by
+    rw [Subgroup.relIndex, data.typeF.complement.symm.index_eq_card,
+      Nat.card_congr (Subgroup.subgroupOfEquivOfLe hUM).toEquiv]
+  have hMcard : Nat.card ↥M = Nat.card ↥H * Nat.card ↥U := by
+    rw [← (H.subgroupOf M).card_mul_index,
+      Nat.card_congr (Subgroup.subgroupOfEquivOfLe data.typeF.H_le).toEquiv,
+      ← Subgroup.relIndex, hrel]
+  -- `H = M_F` is Hall in `G` (8.11), so `|H|` is coprime to `[M : H] = |U|`.
+  have hHall := (OddOrder.Peterfalvi.S10.hall_maxNilpotentNormalHall_and_mainSubgroup hG hM
+    (tau := PeterfalviType.I) ⟨data⟩).1
+  rw [← data.typeF.H_eq] at hHall
+  have hcop : Nat.Coprime (Nat.card ↥H) (Nat.card ↥U) :=
+    hHall.coprime_index.coprime_dvd_right
+      (hrel ▸ Subgroup.relIndex_dvd_index_of_le data.typeF.H_le)
+  -- Every Sylow `q`-subgroup `P` of `U` is cyclic.
+  refine ⟨fun q hq P => ?_⟩
+  haveI : Fact q.Prime := ⟨hq⟩
+  by_contra hnc
+  -- `P ≠ ⊥`, so `q ∣ |U|`, and `|H|` has no `q`.
+  have hPcard : Nat.card ↥(P : Subgroup ↥U) = q ^ (Nat.card ↥U).factorization q :=
+    P.card_eq_multiplicity
+  have hPne : (P : Subgroup ↥U) ≠ ⊥ := fun h => hnc (h ▸ inferInstance)
+  have hfacU_pos : 0 < (Nat.card ↥U).factorization q := by
+    rcases Nat.eq_zero_or_pos ((Nat.card ↥U).factorization q) with h0 | h
+    · exact absurd (Subgroup.card_eq_one.mp (by rw [hPcard, h0, pow_zero])) hPne
+    · exact h
+  have hqU : q ∣ Nat.card ↥U := Nat.dvd_of_factorization_pos hfacU_pos.ne'
+  have hHfac0 : (Nat.card ↥H).factorization q = 0 :=
+    Nat.factorization_eq_zero_of_not_dvd
+      (hq.coprime_iff_not_dvd.mp (hcop.coprime_dvd_right hqU).symm)
+  have hMfac : (Nat.card ↥M).factorization q = (Nat.card ↥U).factorization q := by
+    rw [hMcard, Nat.factorization_mul (Nat.card_pos (α := ↥H)).ne'
+      (Nat.card_pos (α := ↥U)).ne', Finsupp.add_apply, hHfac0, zero_add]
+  -- `Pm = P.map U.subtype`: a noncyclic `q`-subgroup of `M` of full `q`-order.
+  set Pm := (P : Subgroup ↥U).map U.subtype with hPmdef
+  have hPmM : Pm ≤ M := (Subgroup.map_subtype_le _).trans hUM
+  have hPmcard : Nat.card ↥Pm = q ^ (Nat.card ↥M).factorization q := by
+    rw [hPmdef, Subgroup.card_map_of_injective U.subtype_injective, hPcard, hMfac]
+  have hPmsub : Nat.card ↥(Pm.subgroupOf M) = q ^ (Nat.card ↥M).factorization q := by
+    rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hPmM).toEquiv, hPmcard]
+  have hPmP : IsPGroup q ↥Pm := (IsPGroup.iff_card).mpr ⟨_, hPmcard⟩
+  refine hpi q hq ⟨M, hM, ⟨data⟩, Pm, hPmM, hPmP, ?_, ?_, ?_⟩
+  · -- `¬ q ∣ Pm.relIndex M`: `Pm` has the full `q`-part of `|M|`.
+    rw [Subgroup.relIndex]
+    intro hdvd
+    have hsplit : (Nat.card ↥M).factorization q
+        = (Nat.card ↥(Pm.subgroupOf M)).factorization q
+          + ((Pm.subgroupOf M).index).factorization q := by
+      conv_lhs => rw [← (Pm.subgroupOf M).card_mul_index]
+      rw [Nat.factorization_mul (Nat.card_pos (α := ↥(Pm.subgroupOf M))).ne'
+        Subgroup.index_ne_zero_of_finite, Finsupp.add_apply]
+    rw [hPmsub, hq.factorization_pow, Finsupp.single_eq_same] at hsplit
+    exact absurd (Nat.Prime.factorization_pos_of_dvd hq Subgroup.index_ne_zero_of_finite hdvd)
+      (by omega)
+  · -- `¬ IsCyclic ↥Pm`: `Pm ≃* P` and `P` is noncyclic.
+    intro hc
+    haveI := hc
+    exact hnc (isCyclic_of_surjective
+      (Subgroup.equivMapOfInjective (P : Subgroup ↥U) U.subtype U.subtype_injective).symm.toMonoidHom
+      (Subgroup.equivMapOfInjective (P : Subgroup ↥U) U.subtype U.subtype_injective).symm.surjective)
+  · -- `q ∣ (maxNilpotentNormalHall M).relIndex M = [M : H] = |U|`.
+    rw [← data.typeF.H_eq, hrel]; exact hqU
 
 /-- **Peterfalvi (12.8)**: the minimal counterexample hypothesis for (12.7).
 
