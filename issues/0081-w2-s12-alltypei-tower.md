@@ -51,9 +51,22 @@ FT フロンティア再設計 (2026-06-25 relane #9、正本 `notes/meta/ft_fro
   (S12 で private; cross-lane 編集回避)。
 - full build 3884 green。
 
-**残 (downstream, 引き続き W2)**: (12.6) coherence dispatch (Sibley/(5.7)/(6.5.c) carrier)、
-群論 tower (12.10)-(12.12) (lane-b char/un-isolated §8 gate)、char leaves (12.2)-(12.5),
-(12.14)-(12.16)、エンドポイント `typeI_frobenius` (12.7) / `theorem88_caseB_holds` (12.17, +(7.11))。
+**landing 2 (commits `643e42af`/`a5e64336`、ユーザー裁可で群論 tower 着手)**:
+- `typeF_frobenius_of_isZGroup_complement` / `typeI_frobenius_of_isZGroup_complement` (sorry-free +
+  axiom-clean、AxiomsCheck 登録) = (12.10) step 2/(12.16) π=∅ が消費する Frobenius 実現 bridge。
+  **知見: 「全 Sylow 巡回 ⟹ card U=exp U」は mathlib `IsZGroup.exponent_eq_card` で無料** (Z-群=全
+  Sylow 巡回)。完成済 (8.2.b) `typeF_frobenius_of_card_eq_exponent` に投入。
+- **`typeI_frobenius_of_pi_empty` (sorry-free 本体) = (12.7) の易しい方向**「π=∅ ⟹ 型 I は Frobenius」
+  (Pf (12.16) 証明第一文)。M_F=H 正規 Hall (8.11) ⟹ complement U 互素 ⟹ U の Sylow-q が M で full
+  q-order ⟹ 非巡回なら InPi q で π≠∅ 矛盾 ⟹ U は Z-群 ⟹ bridge。`exists_sylow_le_of_hall` の
+  factorization パターン再利用。axiom=sorryAx ((8.11) cite、AxiomsCheck 非登録)。
+
+**tower 着手で判明した entanglement**: (12.10) の残り (難しい方向) は深い: type II 排除=(8.16)+x∈A(L)、
+type III/IV 排除=**(11.9.c) [char/lane-b]**+(9.7.b)+(8.6.a) [un-isolated §8]、(12.7) 難方向=(12.8)-(12.16)
+counterexample machinery。これらは char/un-isolated-§8 gated。
+
+**残 (downstream, 引き続き W2)**: (12.6) coherence dispatch、(12.10) 難方向 (type 判定) + (12.11)/(12.12)、
+char leaves (12.2)-(12.5)/(12.14)-(12.16)、エンドポイント (12.7) 難方向 / `theorem88_caseB_holds` (12.17, +(7.11))。
 
 ## 参照
 
