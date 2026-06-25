@@ -320,6 +320,26 @@ theorem frobenius_typeI_coherent [Finite G] [Fintype G]
     Nonempty (OddOrder.Peterfalvi.S07.IsCoherent hyp.tau hyp.Sset hyp.A) :=
   CoherenceWiring.coherent_of_sibleyTarget (sibleyTarget_frobI hyp hfrob)
 
+/-- **Frobenius realization bridge for type `F`** (the (8.2.b) consumer behind (12.10)/(12.16)).
+A type-`F` maximal `M` whose complement `U` is a **Z-group** (every Sylow subgroup cyclic) is a
+Frobenius group with kernel `M_F`.  By `IsZGroup.exponent_eq_card`, `|U| = exp(U)`, so Peterfalvi
+(8.2.b) (`S10.typeF_frobenius_of_card_eq_exponent`) applies.  `sorry`-free + axiom-clean. -/
+theorem typeF_frobenius_of_isZGroup_complement [Finite G] {M : Subgroup G}
+    (data : TypeFData M) (hZ : _root_.IsZGroup ↥data.U) :
+    OddOrder.Isaacs.Ch06.IsFrobeniusGroup ↥M (data.H.subgroupOf M) (data.U.subgroupOf M) := by
+  haveI := hZ
+  exact OddOrder.Peterfalvi.S10.typeF_frobenius_of_card_eq_exponent data
+    (_root_.IsZGroup.exponent_eq_card (G := ↥data.U)).symm
+
+/-- **Frobenius realization bridge for type I** (the `kernel = M_F` form consumed by (12.10)).
+A type-I maximal `M` whose complement `U = M/M_F` is a **Z-group** is a Frobenius group with kernel
+`M_F = typeF.H`.  Wraps `typeF_frobenius_of_isZGroup_complement` on `data.typeF`. -/
+theorem typeI_frobenius_of_isZGroup_complement [Finite G] {M : Subgroup G}
+    (data : TypeIData M) (hZ : _root_.IsZGroup ↥data.typeF.U) :
+    OddOrder.Isaacs.Ch06.IsFrobeniusGroup ↥M (data.typeF.H.subgroupOf M)
+      (data.typeF.U.subgroupOf M) :=
+  typeF_frobenius_of_isZGroup_complement data.typeF hZ
+
 /-- **Peterfalvi (12.7)**: every maximal subgroup of type I is Frobenius, with
 kernel equal to `M_F`. -/
 theorem typeI_frobenius [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
