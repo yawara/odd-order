@@ -1579,6 +1579,84 @@ theorem ncard_sigmaCoeff_ne_zero_le_two (hyp : TICyclicHypothesis G) [Fintype hy
       (hyp.ncard_inner_chiFam_ne_zero_le_one hVeq app hαZ hα1)
       (hyp.ncard_inner_chiFam_ne_zero_le_one hVeq app hβZ hβ1)
 
+open scoped Classical in
+/-- **Bessel `NC` bound** (general norm): a virtual character `χ ∈ ZIrr(G)` with squared norm `N`
+has at most `N` nonzero `σ`-image coefficients, `NC(χ) ≤ N`.  Writing `χ = ∑_a c_a·a` over its
+irreducible constituents (`mem_ZIrr_inner_self_eq_sum_sq`), every index `pq` of the `σ`-coefficient
+support has some constituent `a` with `⟨a, χ_{pq}⟩ ≠ 0`; the per-constituent supports each have
+`≤ 1` element (`ncard_inner_chiFam_ne_zero_le_one`), so `NC(χ) ≤ |supp(c)| ≤ ∑_a c_a² = ‖χ‖² = N`
+(each nonzero `c_a` contributes `c_a² ≥ 1`).  The norm-`1` (`…le_one`) and norm-`2` (`…le_two`)
+support bounds are special cases; this is the form used by the coherence-free (10.9) `NC < 2w₁`
+estimate (`NC ≤ w₁ + 1`). -/
+theorem ncard_sigmaCoeff_ne_zero_le_of_inner_self_natCast (hyp : TICyclicHypothesis G)
+    [Fintype hyp.W] [Invertible (Nat.card hyp.W : ℂ)] [Invertible (Nat.card G : ℂ)]
+    (hVeq : hyp.V = hyp.Vdiff) (app : FullDadeApplication (G := G) hyp)
+    {χ : ClassFunction G ℂ} {N : ℕ} (hχ : χ ∈ ZIrr G)
+    (hχN : ClassFunction.inner χ χ = (N : ℂ)) :
+    hyp.sigmaNC hVeq app χ ≤ N := by
+  haveI : Finite G := Finite.of_fintype G
+  haveI : Fintype ((hyp.W1.subgroupOf hyp.W) →* ℂˣ) := Fintype.ofFinite _
+  haveI : Fintype ((hyp.W2.subgroupOf hyp.W) →* ℂˣ) := Fintype.ofFinite _
+  obtain ⟨c, hsupp, hrepr, hsq⟩ := mem_ZIrr_inner_self_eq_sum_sq hχ
+  -- `∑_a c_a² = N` as integers.
+  have hsumZ : ∑ a ∈ c.support, c a ^ 2 = (N : ℤ) := by
+    have h : (∑ a ∈ c.support, (c a : ℂ) ^ 2) = (N : ℂ) := hsq.symm.trans hχN
+    have hcast : ((∑ a ∈ c.support, c a ^ 2 : ℤ) : ℂ) = (N : ℂ) := by push_cast; exact h
+    exact_mod_cast hcast
+  rw [TICyclicHypothesis.sigmaNC,
+    show {pq : ((hyp.W1.subgroupOf hyp.W) →* ℂˣ) × ((hyp.W2.subgroupOf hyp.W) →* ℂˣ) |
+        hyp.sigmaCoeff hVeq app χ pq ≠ 0}
+      = ↑(Finset.univ.filter (fun pq => hyp.sigmaCoeff hVeq app χ pq ≠ 0)) by
+        ext pq
+        simp only [Set.mem_setOf_eq, Finset.mem_coe, Finset.mem_filter, Finset.mem_univ, true_and],
+    Set.ncard_coe_finset]
+  calc (Finset.univ.filter (fun pq => hyp.sigmaCoeff hVeq app χ pq ≠ 0)).card
+      ≤ (c.support.biUnion (fun a => Finset.univ.filter
+            (fun pq => ClassFunction.inner a (hyp.chiFam hVeq app pq) ≠ 0))).card := by
+        refine Finset.card_le_card (fun pq hpq => ?_)
+        simp only [Finset.mem_filter, Finset.mem_univ, true_and] at hpq
+        rw [Finset.mem_biUnion]
+        by_contra hcon
+        push_neg at hcon
+        apply hpq
+        change ClassFunction.inner χ (hyp.chiFam hVeq app pq) = 0
+        rw [hrepr, inner_sum_left]
+        refine Finset.sum_eq_zero (fun a ha => ?_)
+        have := hcon a ha
+        simp only [Finset.mem_filter, Finset.mem_univ, true_and, not_not] at this
+        rw [ClassFunction.inner_smul_left, this, mul_zero]
+    _ ≤ ∑ a ∈ c.support, (Finset.univ.filter
+            (fun pq => ClassFunction.inner a (hyp.chiFam hVeq app pq) ≠ 0)).card :=
+        Finset.card_biUnion_le
+    _ ≤ ∑ a ∈ c.support, 1 := by
+        refine Finset.sum_le_sum (fun a ha => ?_)
+        have haZ : a ∈ ZIrr G :=
+          IrreducibleCharacter.mem_ZIrr (⟨a, hsupp (Finset.mem_coe.mpr ha)⟩ : IrreducibleCharacter G)
+        have ha1 : ClassFunction.inner a a = 1 := by
+          have := irreducibleCharacter_inner_eq_ite
+            (⟨a, hsupp (Finset.mem_coe.mpr ha)⟩ : IrreducibleCharacter G)
+            ⟨a, hsupp (Finset.mem_coe.mpr ha)⟩
+          rwa [if_pos rfl] at this
+        have hle := hyp.ncard_inner_chiFam_ne_zero_le_one hVeq app haZ ha1
+        rwa [show {pq : ((hyp.W1.subgroupOf hyp.W) →* ℂˣ) × ((hyp.W2.subgroupOf hyp.W) →* ℂˣ) |
+            ClassFunction.inner a (hyp.chiFam hVeq app pq) ≠ 0}
+          = ↑(Finset.univ.filter (fun pq => ClassFunction.inner a (hyp.chiFam hVeq app pq) ≠ 0))
+          by
+            ext pq
+            simp only [Set.mem_setOf_eq, Finset.mem_coe, Finset.mem_filter, Finset.mem_univ,
+              true_and], Set.ncard_coe_finset] at hle
+    _ = c.support.card := by rw [Finset.sum_const, smul_eq_mul, mul_one]
+    _ ≤ N := by
+        have hb : (c.support.card : ℤ) ≤ ∑ a ∈ c.support, c a ^ 2 := by
+          rw [Finset.card_eq_sum_ones, Nat.cast_sum]
+          refine Finset.sum_le_sum (fun a ha => ?_)
+          have hne : c a ≠ 0 := Finsupp.mem_support_iff.mp ha
+          have h0 : (0 : ℤ) ≤ c a ^ 2 := sq_nonneg _
+          have hnz : c a ^ 2 ≠ 0 := pow_ne_zero 2 hne
+          push_cast; omega
+        rw [hsumZ] at hb
+        exact_mod_cast hb
+
 /-- **(3.9)(a)-norm-`2` coefficient bound**: the `σ`-image coefficients of a norm-`2` virtual
 character `χ ∈ ZIrr(G)` lie in `{0, ±1}`.  Writing `χ = ε_α·α + ε_β·β` (norm-`2` ⟹ two constituents)
 and `χ_{pq} = ε·ν` (norm-`1` classifier), the coefficient `⟨χ, χ_{pq}⟩` is `ε_α·ε` if `ν = α`,

@@ -6031,3 +6031,11 @@ formula together with the prime computation `coprimeFrobeniusAction_card_eq_prim
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S07.commonImage_inner
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S07.xFamily_inner
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S07.coherent_of_constant_degree
+
+-- Peterfalvi §10 (10.9) coherence-free support: the general Bessel `NC` bound
+-- `sigmaNC ψ ≤ ‖ψ‖²` (`ψ ∈ ZIrr G`, `⟨ψ, ψ⟩ = N ⟹ NC ≤ N`), generalising the norm-1/2 `σ`-image
+-- support bounds.  Fully axiom-clean (the σ-grid orthonormality + integer Parseval).  Used by the
+-- coherence-free (10.9) `inner_tau_muColumnZero_sub_zeta_alignedOmegaSigma_of_w1_lt_w2` (lane-b W3,
+-- which is itself char-gated, so not registered here).
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S05.TICyclicHypothesis.ncard_sigmaCoeff_ne_zero_le_of_inner_self_natCast

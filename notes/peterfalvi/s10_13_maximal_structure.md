@@ -390,3 +390,41 @@ TypePData carrier 機構 (`exists_typePData_W1_eq_of_isTypeP2`) 完成で残る�
 lane-b (issue 2020)、step 3 wiring は lane-c。S13/S14 は依然 char/Prop16.1 gated。
 full AxiomsCheck build 3881 green、FT-path sorry 122 不変 (disjunction→determinate `IsTypeP2 mp.S` の
 de-opacify、sorry 数でない [[scaffold-sorry-free-not-done]])。
+
+---
+
+## 11. Coherence-free (10.9) landed — unblocks (11.9.b) `q > p` (2026-06-25, lane-b W3, relane #9)
+
+W3 (= lane-b, 正本 `notes/meta/ft_frontier_remap_2026_06_25.md`) の臨界路最狭点 = `card_kappaHall_lt_of_isTypeIIIorIV`
+(FeitThompson.lean:426, Pf (11.9.b) = "type III/IV ⟹ q>p")。textbook (11.9.b) の証明 = "follows from (10.9)
+and (11.8)"。
+
+**問題 (coherence carrier 障害)**: 既存 `orthogonality_of_w1_lt_w2` (S12) は `coh : CoherentHypothesis hyp params`
+を要求するが、(10.8) `S_not_coherent` により S は coherent でない ⟹ `CoherentHypothesis` は uninhabitable
+⟹ (11.9.b) に**直接使えない**。textbook (10.9) の証明 (04.12 lines 105-109) は実は **coherence-free**:
+χ は (μ₀-ζ)^τ の (Irr W)^σ 直交補にすぎず、ζ^{τ₁} 同定 (coh 依存) は不要。
+
+**landed (commit この commit)**:
+- `S05.TICyclicHypothesis.ncard_sigmaCoeff_ne_zero_le_of_inner_self_natCast` — 一般 **Bessel NC bound**
+  `sigmaNC ψ ≤ ‖ψ‖²` (ψ∈ZIrr G, ⟨ψ,ψ⟩=(N:ℂ) ⟹ NC≤N)。norm-1/2 特殊版 (`…le_one`/`…le_two`) の一般化。
+  証明 = χ=∑c_a·a の per-constituent support (各 ≤1) で被覆 + #supp ≤ ∑c_a²。**fully axiom-clean、AxiomsCheck 登録済**。
+- `S12.inner_tau_muColumnZero_sub_zeta_alignedOmegaSigma_of_w1_lt_w2` — **coherence-free (10.9)** σ-coeff 形:
+  w₁<w₂ ⟹ ∀ i j, ⟨(μ₀-ζ)^τ, ω_{ij}^σ⟩ = if j=0 then 1 else 0 (ζ∈inducedFamily, irreducible, ζ(1)=w₁)。
+  既存 (10.9) の coherence-free core を抽出 + 2 置換: (i) NC bound を Bessel 化
+  (‖ψ‖²=‖μ₀-ζ‖²=w₁+1<2w₁、Dade `tau_inner_eq_of_supported` + `muGrid_column_sum_inner_self` + 次数不一致
+  `⟨μ_{i0},ζ⟩=0`)、(ii) row-branch 排除を `NC≥w₂>w₁+1` で (full row が w₂ 個の非零係数; coh の ‖ζ^{τ₁}‖²=1 不要)。
+- `S12.residual_alignedOmegaSigma_inner_eq_zero_of_w1_lt_w2` — **直交補形**: residual `(μ₀-ζ)^τ - ∑ω_{i0}^σ`
+  が (Irr W)^σ に直交。これが (11.9.b) が (11.8) と矛盾させる直交性。
+- sorryAx は既存 §10 carrier 機構由来 (既存 (10.9) も同一 taint、`tau_apply_of_mem_typePV` 等は clean) で
+  **新規 sorry 導入なし** ([[feedback-cite-sorried-lemmas-if-signature-correct]])。full build 3884 green。
+
+**残 Part 3 ((11.9.b) `q>p` reduction → `card_kappaHall_lt_of_isTypeIIIorIV`)**: 以下が要 (issue 2020):
+1. **∃ ζ ∈ S(HC) of degree w₁** ((10.2) の S(HC)=`{χ∈S|HC⊆Ker χ}` 版、genuine §11 fact)。
+   (10.2) producer `exists_zeta_in_inducedFamily_degree_w1` は S∩Irr の degree-w₁ ζ を供給するが、S(HC) 制約付きは別途。
+2. **genuine (11.8)** — 現 `S13.not_orthogonal_mu0_sub_zeta` は opaque `notOrthogonalFormula` field 結論。
+   de-opacify して "residual NOT ⊥ (Irr W)^σ" の実 ClassFunction 形に。証明は (11.8.1)-(11.8.6) 経由
+   (deep: (9.11)/(5.8)/(4.9)/σ-grid; **これが Part 3 の主負荷**)。
+3. **reduction**: 上記 ζ で coherence-free (10.9) [residual ⊥] vs (11.8) [residual ¬⊥] 矛盾 ⟹ ¬(w₁<w₂)
+   ⟹ (w₁≠w₂: coprime+both>1 より) w₁>w₂。
+4. **carrier 構成 + 翻訳**: type III/IV maximal S → `exists_hypothesis_of_typeIIIorIVorV` で S12.Hypothesis、
+   q=w₁=|K|, p=w₂=|K*| に翻訳 → `card_kappaHall_lt_of_isTypeIIIorIV` (FeitThompson:426)。
