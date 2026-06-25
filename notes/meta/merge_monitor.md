@@ -99,6 +99,21 @@ productive な独立クラスタに乗せ、上流優先方針 (CLAUDE.md) に�
 > (dormant) ゆえ既存本体 cite のみ・新 leaf 隔離。**体制: B=cd/coherence核 / C=§5(5.7) coherence producer /
 > F=Prop16.1 hFI ¬TI(BG 15.7e) / H=§6(6.2/6.3) coherence producer** — char critical path に 4 レーン縦並び。
 
+> **⚠ 2026-06-25 relane #9 (ユーザー裁可、全 lane フロンティア再設計)**: workflow `wf_33ba58ab-bf5`
+> (6 並列 map + 4 adversarial verify) で honest FT 経路の真の構造を再マッピング。**旧モデルの 3 誤りを訂正**:
+> (i) S10–S16 は `extends` spine でなく `S15.Hypothesis` は flat record、honest 構成は 3 producer mp/tp/cd の
+> flat assembly。(ii) App.C は §16 を bypass しない — POLE-2 `field_normalizer_structure` を genuine 消費 (Arm B)。
+> (iii) 群論 runway は枯渇でなく BG §14-16 carrier へ移動。honest 経路 = **~27 sorry / 数学的に独立な 4 フロント**
+> (検証 CLAIM B: 1-2 でなく 3-4 独立)。**relane #1-#8 のファイル所有はこの 4 フロントとズレており idle の正体**。
+> ⟹ **レーン所有を W1-W4 へ再カット** (lanes 等価ゆえ現在地で transition 最小化):
+> **W1=lane-f** (BG §16 Prop 16.1 6 bridge + type-P carrier、純群論・最優先) /
+> **W2=lane-c** (§12 all-Type-I tower → theorem88_caseB_holds) /
+> **W3=lane-b** (§10-11 中心 char 核 = 唯一の bare FT sorry (11.9.b) card_kappaHall + no_typeV、issue 2020 保持) /
+> **W4=lane-h** (POLE-2 field_normalizer §14-16 cascade + §15 S&T、独立アーム)。
+> **凍結**: appendix 23 sorry (import closure 外、provably off-path) + §9/§13 内部矛盾 endpoint (App.C 経由ゆえ未使用)
+> + これ以上の §5/§6 coherence supply (完成済、binding constraint は consumer へ移動)。優先 = **W1 先頭 + W3 早期**。
+> 正本 = [`ft_frontier_remap_2026_06_25.md`](ft_frontier_remap_2026_06_25.md)、issue 0080-0083。
+
 **signature-first interface**: 上流が sorried signature を export → 下流が cite。真の cross-lane 依存は narrow。
 signature 不足は notes/issue 経由。**driver (§16/§10)**: 常駐レーンを当てず、上流が landing したとき hub or
 担当レーンが続けて opportunistic に close する (pure consumer ゆえ常駐は starve)。
@@ -180,14 +195,16 @@ branch とも削除済み。旧 **A** / **D** も同様に退役済み (履歴�
 > 「監視ループ再開（cron id <new-id>）」を 1 行記録する。**この stop→resolve→resume サイクルが監視ループの
 > 正規ライフサイクル**であり、停止は一時退避でしかない。
 
-> **🔒 レーン所有マップ（step 1.5 範囲逸脱チェック用、2026-06-22 frontier-cluster relane）**:
-> | lane | 所有 .lean（これ以外の Pf/BG S-ファイル編集 = 逸脱→停止） |
-> |---|---|
-> | **F** (lane-f) | `OddOrder/BG/**`（BG 全体）+ `OddOrder/FeitThompson.lean` |
-> | **B** (lane-b) | `OddOrder/Peterfalvi/S0[3-9]*` + `S10*` + `S12*`（Pf char API + §12 + cd assembly; **S11/S13 除く**, 2026-06-23 S13 を H 移譲） |
-> | **H** (lane-h) | **relane #7 (issue 2021): Pf §6 coherence producer = `OddOrder/Peterfalvi/S08_Theorem62_63_Standalone.lean` (新 leaf, active)**。+ `S13*`/`S14_MaximalI*` は driver/await に降格 (S13 は C 移譲済, relane #6/#8) |
-> | **C** (lane-c) | **relane #8 (issue 4012): Pf (5.7) coherence producer = `OddOrder/Peterfalvi/S07_CoherenceConstantDegree.lean` (新 leaf, active)**。+ `S15*` (S&T) / `S13*` / `card_kappaHall_lt_of_isTypeP1` (FeitThompson tp+card) は driver/await。POLE-1 carrier (`S14_TypePComplement.lean` + FeitThompson tp 系 def) も C 所有 |
-> | **共有（全 lane 可）** | `OddOrder/AxiomsCheck.lean` / `OddOrder.lean` / `OddOrder/GroupTheory/**` / **`OddOrder/FeitThompson.lean`** (def 単位 F=mp+Prop16.1 / B=cd / C=tp / H=(13.2.a) IsTypeP2 mp.S) / `notes/**` / `issues/**` |
+> **🔒 レーン所有マップ（step 1.5 範囲逸脱チェック用、2026-06-25 relane #9 = フロント W1-W4 再カット）**:
+> 正本 = [`ft_frontier_remap_2026_06_25.md`](ft_frontier_remap_2026_06_25.md)。フロントは中核 sorry で定義、
+> 下記ファイルは主所有の目安 (lane が refine、本マップが逸脱ゲート)。
+> | lane | フロント | 所有 .lean（これ以外の Pf/BG S-ファイル編集 = 逸脱→停止） |
+> |---|---|---|
+> | **F** (lane-f) | **W1** BG §16 Prop 16.1 + type-P carrier [純群論・最優先] | `OddOrder/BG/**`（BG 全体）+ `OddOrder/FeitThompson.lean` の mp/carrier 宣言 |
+> | **C** (lane-c) | **W2** §12 all-Type-I tower → theorem88_caseB_holds | `OddOrder/Peterfalvi/S14_MaximalI.lean` |
+> | **B** (lane-b) | **W3** §10-11 中心 char 核 (11.9.b + no_typeV) [臨界路最狭点] | `OddOrder/Peterfalvi/S0[3-9]*` + `S10*` + `S11*` + `S12*` + `S13*` + `OddOrder/FeitThompson.lean:426` (card_kappaHall_lt_of_isTypeIIIorIV) |
+> | **H** (lane-h) | **W4** POLE-2 field_normalizer §14-16 + §15 S&T [独立アーム B] | `OddOrder/Peterfalvi/{S15_SAndT, S15_SAndT_Setup, S16_NonExistenceG}.lean` |
+> | **共有（全 lane 可）** | — | `OddOrder/AxiomsCheck.lean` / `OddOrder.lean` / `OddOrder/GroupTheory/**` / **`OddOrder/FeitThompson.lean`** (宣言単位: W1=mp/carrier、W3=:426 bare sorry、prefix-split で衝突回避) / `notes/**` / `issues/**` |
 
 1. 各レーンの未マージ確認: `git log --oneline main..<branch>`。
    **全レーン 0 なら「変化なし」1行報告で即終了**（build を走らせない）。
@@ -200,7 +217,7 @@ branch とも削除済み。旧 **A** / **D** も同様に退役済み (履歴�
    **マージせず（trial merge も開始しない）**、⛔ に従いループ停止（abort 不要 = まだ merge していない、
    `CronDelete` + 報告 + 以降の tick を行わない）。報告には逸脱ファイル名 + lane + 所有者を明記。例 (lane=$b):
    ```
-   owned_re='…'   # 🔒 マップから (F=^OddOrder/BG/|^OddOrder/FeitThompson; B=^OddOrder/Peterfalvi/S(0[3-9]|10|12); H=^OddOrder/Peterfalvi/S(13|14_MaximalI); C=^OddOrder/Peterfalvi/S15|^OddOrder/BG/Ch4_FamilyOfMaximal/S14_TypePComplement)
+   owned_re='…'   # 🔒 マップ (relane #9) から (F/W1=^OddOrder/BG/|^OddOrder/FeitThompson; C/W2=^OddOrder/Peterfalvi/S14_MaximalI; B/W3=^OddOrder/Peterfalvi/S(0[3-9]|1[0-3])|^OddOrder/FeitThompson; H/W4=^OddOrder/Peterfalvi/S(15_SAndT|16_NonExistenceG))
    shared_re='^OddOrder/AxiomsCheck\.lean$|^OddOrder\.lean$|^OddOrder/GroupTheory/|^OddOrder/FeitThompson'  # FeitThompson は F/B/C 共有 (def 単位協調)
    git diff --name-only main...$b -- '*.lean' | grep -vE "$owned_re" | grep -vE "$shared_re" | grep . && echo "範囲逸脱 → STOP"
    ```

@@ -179,18 +179,22 @@ producer（§14/§6 構造 obligation）= issue 7001**。standalone な positive
 
 ---
 
-## 5. lane 割当（FT-aligned, 2026-06-15）
+## 5. lane 割当（2026-06-25 relane #9 = 4 独立フロント W1-W4。正本 = [`ft_frontier_remap_2026_06_25.md`](ft_frontier_remap_2026_06_25.md)）
 
-| lane | branch | Track | focus（FT 経路上のみ） |
-|---|---|---|---|
-| **B** | lane-b | C（§3–§9 char API） | endpoint A の proof = **(6.8) `sibleySetup_is_coherent`**（現 frontier）+ B/C/D/E signature pin。**full §6 certain-type completeness はやめ、§10–16 consume surface に絞る** |
-| **F** | lane-f | L | BG §13 ✅ done → 次 FT-path（要指示） |
-| **G** | lane-g | L | BG §15 M_F + §16 main results（G1 endpoint 製造） |
-| **H** | lane-h | L | BG §14 Type-P |
-| 合流 | — | — | Pf §10–16 の opaque→cite 置換（signature pin 後; B or §10–16 owner） |
+honest FT 経路 (~27 sorry) を **数学的に独立な 4 フロント**に再カット (検証 `wf_33ba58ab-bf5`)。
+旧「ファイル所有ベース 4 レーン」は 4 フロントとズレており relane #1-#8 の idle の正体だった。
 
-> B の mission 再定義: 「full Pf §6 を完成」ではなく「**§10–16 が consume する G2 surface
-> （A coherence producer + B/C/D/E index 族）を供給**」。これが FT-upstream の本体。
+| lane | フロント | Arm | focus | gate |
+|---|---|---|---|---|
+| **F** (lane-f) | **W1** BG §16 Prop 16.1 6 bridge + type-P carrier | A (mp) | `proposition_type_classification` (純群論・最大 fan-out) | **無 (今すぐ・最優先)** |
+| **C** (lane-c) | **W2** §12 all-Type-I tower | A (mp) | `theorem88_caseB_holds` (§12 char、上流 producer 済) | 無 |
+| **B** (lane-b) | **W3** §10-11 中心 char 核 | A | **唯一の bare FT sorry** `card_kappaHall_lt_of_isTypeIIIorIV` (11.9.b) + `no_typeV` (10.8/10.10) | 無 (臨界路最狭点・早期着手) |
+| **H** (lane-h) | **W4** POLE-2 field_normalizer §14-16 + §15 S&T | B | `field_normalizer_structure` cascade (独立アーム) | 無 |
+
+> **2 アーム構造**: Arm A = `sectionSixteenHypothesis_of_inputs` で S16.Hypothesis を 3 producer (mp/tp/cd)
+> から flat 構成 (W1/W2/W3)。Arm B = `final_contradiction → nonexistence_of_G → field_normalizer_structure`
+> (W4)。**W1 と W4 は upstream gate を共有しない完全独立**。4 フロントは最後にアーム合流。
+> **凍結**: appendix 23 sorry (import closure 外) + §9/§13 内部矛盾 endpoint + これ以上の §5/§6 coherence supply。
 
 ---
 
