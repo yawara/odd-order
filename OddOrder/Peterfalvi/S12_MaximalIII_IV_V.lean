@@ -5782,6 +5782,38 @@ theorem orthogonality_of_w1_lt_w2 [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOd
     exact hPne ((Set.ncard_le_one_iff (Set.toFinite _)).mp hle1 hP1 hP2)
 
 open scoped FiniteInduce in
+/-- **Peterfalvi (10.9)/(11.8.4) norm**: `‖μ_0 − ζ‖² = w₁ + 1` for an irreducible `ζ ∈ S` of degree
+`w₁`, where `μ_0 = ∑_i μ_{i0}` is the column-`0` sum.  Expand: `‖μ_0‖² = w₁` (orthonormality of the
+`μ_{i0}`, `muGrid_column_sum_inner_self`), `⟨μ_0, ζ⟩ = 0` (the degree mismatch `μ_{i0}(1) = 1 ≠ w₁`,
+`muGrid_inner_eq_zero_of_apply_one_ne`), and `‖ζ‖² = 1`.  This is the `M`-side norm used by the
+coherence-free (10.9) (`‖(μ_0 − ζ)^τ‖² = w₁ + 1` via the Dade isometry, hence `NC ≤ w₁ + 1`) and by
+Peterfalvi (11.8.4) (`‖χ‖² = ‖μ_0 − ζ‖² − q = 1`). -/
+theorem inner_muColumnZero_sub_zeta_self [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    {M : Subgroup G} (hyp : Hypothesis M) {ζ : ClassFunction ↥M ℂ}
+    (hzirr : IsIrreducibleCharacter ζ) (hz1 : ζ 1 = (hyp.w1 : ℂ)) :
+    ClassFunction.inner ((∑ i : Fin hyp.w1, hyp.muGrid hG hG.odd i 0) - ζ)
+        ((∑ i : Fin hyp.w1, hyp.muGrid hG hG.odd i 0) - ζ) = ((hyp.w1 + 1 : ℕ) : ℂ) := by
+  haveI := hyp.finiteG
+  have hodd : Odd (Nat.card G) := hG.odd
+  have h3 : (3 : ℕ) ≤ hyp.w1 := (typePData_toTICyclicHypothesis hyp.typeP hodd).three_le_card_W1
+  have hμ0perp : ClassFunction.inner (∑ i : Fin hyp.w1, hyp.muGrid hG hodd i 0) ζ = 0 := by
+    rw [inner_sum_left]
+    refine Finset.sum_eq_zero (fun i _ => ?_)
+    refine hyp.muGrid_inner_eq_zero_of_apply_one_ne hG hodd i 0 hzirr ?_
+    rw [hyp.muGrid_zero_column_apply_one hG hodd i, hz1]
+    intro he
+    have : (hyp.w1 : ℕ) = 1 := by exact_mod_cast he.symm
+    omega
+  have hζμ0 : ClassFunction.inner ζ (∑ i : Fin hyp.w1, hyp.muGrid hG hodd i 0) = 0 := by
+    rw [OddOrder.RepresentationTheory.inner_conj_symm, hμ0perp, star_zero]
+  have hζζ : ClassFunction.inner ζ ζ = 1 := by
+    have hzmem : ζ ∈ irreducibleCharacters (↥M) := mem_irreducibleCharacters.mpr hzirr
+    rw [irr_cf_inner hzmem hzmem, if_pos rfl]
+  rw [ClassFunction.inner_sub_left, ClassFunction.inner_sub_right, ClassFunction.inner_sub_right,
+    hyp.muGrid_column_sum_inner_self hG hodd 0, hμ0perp, hζμ0, hζζ]
+  push_cast; ring
+
+open scoped FiniteInduce in
 /-- **Peterfalvi (10.9), coherence-free σ-coefficient form**.  Under Hypothesis (10.1), for any
 irreducible `ζ ∈ S = inducedFamily M` of degree `ζ(1) = w₁`, if `w₁ < w₂` then the `σ`-coefficient
 grid of `ψ = (μ_0 − ζ)^τ` is the single constant column `j = 0` with value `1`:
@@ -5875,25 +5907,9 @@ theorem inner_tau_muColumnZero_sub_zeta_alignedOmegaSigma_of_w1_lt_w2 [Finite G]
     rw [hψ]
     exact OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap_mem_ZIrr_of_supported
       hyp.dadeData.dade hyp.hconj hsupp hdiffZ
-  have hμ0perp : ClassFunction.inner (∑ i : Fin hyp.w1, hyp.muGrid hG hodd i 0) ζ = 0 := by
-    rw [inner_sum_left]
-    refine Finset.sum_eq_zero (fun i _ => ?_)
-    refine hyp.muGrid_inner_eq_zero_of_apply_one_ne hG hodd i 0 hzirr ?_
-    rw [hyp.muGrid_zero_column_apply_one hG hodd i, hz1]
-    have h3 : (3 : ℕ) ≤ hyp.w1 := hcardW1 ▸ tic.three_le_card_W1
-    intro he
-    have : (hyp.w1 : ℕ) = 1 := by exact_mod_cast he.symm
-    omega
-  have hζμ0 : ClassFunction.inner ζ (∑ i : Fin hyp.w1, hyp.muGrid hG hodd i 0) = 0 := by
-    rw [OddOrder.RepresentationTheory.inner_conj_symm, hμ0perp, star_zero]
-  have hζζ : ClassFunction.inner ζ ζ = 1 := by
-    have hzmem : ζ ∈ irreducibleCharacters (↥M) := mem_irreducibleCharacters.mpr hzirr
-    rw [irr_cf_inner hzmem hzmem, if_pos rfl]
   have hψnorm : ClassFunction.inner ψ ψ = ((hyp.w1 + 1 : ℕ) : ℂ) := by
     rw [hψ, hyp.tau_inner_eq_of_supported hsupp hsupp,
-      ClassFunction.inner_sub_left, ClassFunction.inner_sub_right, ClassFunction.inner_sub_right,
-      hyp.muGrid_column_sum_inner_self hG hodd 0, hμ0perp, hζμ0, hζζ]
-    push_cast; ring
+      inner_muColumnZero_sub_zeta_self hG hyp hzirr hz1]
   -- NC bound (Bessel) and the `< 2w₁` form.
   have hNC : tic.sigmaNC hVeq app ψ ≤ hyp.w1 + 1 :=
     tic.ncard_sigmaCoeff_ne_zero_le_of_inner_self_natCast hVeq app hψZ hψnorm

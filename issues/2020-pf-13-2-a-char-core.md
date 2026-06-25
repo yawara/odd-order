@@ -120,3 +120,21 @@ textbook 証明 = "follows from (10.9) and (11.8)"。
 4. carrier 構成 (`exists_hypothesis_of_typeIIIorIVorV`) + q=w₁=|K|, p=w₂=|K*| 翻訳。
 
 ⟹ (11.9.b) の **(10.9)-half は完成**、残 = (11.8)-half (genuine de-opacify + 証明) + reduction wiring。
+
+## 2026-06-25 lane-b (cont.): (11.8) missing page 復元 + full proof 文書化 + norm lemma 抽出
+
+`card_kappaHall` の唯一の deep gate = genuine (11.8)。mmd `04.13` の (11.8.1)-(11.8.4) は
+`[MISSING_PAGE_FAIL:3]` (p.66) で欠落していたため **PDF (pages 2-3) から復元** ([[nougat-missing-page-recovery]])。
+**正本ノート新設: `notes/peterfalvi/s13_11_8_orthogonality.md`** に (11.8.1)-(11.8.6) 全文 + 形式化プラン +
+carrier bridge 調査を記録。
+
+**(11.8) の構造 (要点)**: S₁=S(HC) は定数次数 q の既約 (u−1)/q 個 ((U/C)⋊W₁ Frobenius) ⟹ **(5.7)
+`coherent_of_constant_degree` で coherent** (τ₁ 取得)。証明は背理法: residual が直交すると仮定 → (11.8.4)
+で `(μ₀−ζ)^τ=∑ω_{i0}^σ−ζ^{τ₁}` 正規化 (← landed (10.9) 直結) → (11.8.6) で S(C) coherent → **(11.3)
+`S_H0C_not_coherent` (✅ proven) と矛盾**。残 gate = §9 (9.8/9.9/9.11) carrier + S(HC)/S₂ 材料化。
+
+**code 増分 (commit)**: `S12.inner_muColumnZero_sub_zeta_self` (= ‖μ₀−ζ‖²=w₁+1、(10.9) から抽出、
+(11.8.4) で再利用)。(10.9) を本 lemma cite に refactor (de-dup)。
+
+**carrier bridge**: |K|=w₁ ✅ (`card_kappaHall_eq_derived_index`+`card_W1_eq_derived_index`、両者 M' complement)。
+|Kstar|=w₂ は type-P duality (`card_kappaHall_sup_Kstar`+|K⊔Kstar|=|W|) 経由。∃ζ∈S(HC) degree-w₁ は自動。
