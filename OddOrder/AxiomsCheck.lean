@@ -5614,6 +5614,25 @@ rank-one input for `typePData_kappa_nonempty_of_rank1`.  All axiom-clean. -/
 #assert_only_allowed_axioms OddOrder.BG.Ch4.S16.typePData_pRank_eq_one_of_not_dvd_card_derived
 #assert_only_allowed_axioms OddOrder.BG.Ch4.S16.isTypeP_of_isTypeV
 
+/-! **Prop 16.1 reverse — types II–IV ⟹ type P + `IsTypeNonI ⟹ IsTypeP`** (`S16_MainResults`, issue
+8015 W1 frontier, relane #9): the `q`-element fixed-point machinery closing the rank-one gate for
+prime `|W₁|`.  `prime_dvd_card_inf_centralizer_of_mem_normalizer`: a `q`-element `x` normalizing `N`
+with `q ∣ |N|` has `q ∣ |C_N(x)|` (conjugation action `conjActionOfMemNormalizer`,
+`IsPGroup.card_modEq_card_fixedPoints`).  `typePData_not_dvd_card_W2_of_card_W1_prime`: prime
+`q = |W₁|` ⟹ `q ∤ |W₂|` (cyclic `W = W₁W₂`).  `isTypeP_of_typePData_of_card_W1_prime`: chains these
+to `q ∤ |M'|` (`centralizer_W1`: `C_{M'}(x) = W₂`) ⟹ `r_q(M) = 1` ⟹ `κ(M) ≠ ∅`.
+`isTypeP_of_isType{II,III,IV}` + `isTypeP_of_isTypeNonI`: the assembled reverse `IsTypeP` halves of
+Proposition 16.1 clauses (b)–(d) `.mp` — exactly what `not_isTypeI_of_isTypeNonI` consumes (P₁/P₂
+refinement discarded).  All axiom-clean. -/
+
+#assert_only_allowed_axioms OddOrder.BG.Ch4.S16.prime_dvd_card_inf_centralizer_of_mem_normalizer
+#assert_only_allowed_axioms OddOrder.BG.Ch4.S16.typePData_not_dvd_card_W2_of_card_W1_prime
+#assert_only_allowed_axioms OddOrder.BG.Ch4.S16.isTypeP_of_typePData_of_card_W1_prime
+#assert_only_allowed_axioms OddOrder.BG.Ch4.S16.isTypeP_of_isTypeII
+#assert_only_allowed_axioms OddOrder.BG.Ch4.S16.isTypeP_of_isTypeIII
+#assert_only_allowed_axioms OddOrder.BG.Ch4.S16.isTypeP_of_isTypeIV
+#assert_only_allowed_axioms OddOrder.BG.Ch4.S16.isTypeP_of_isTypeNonI
+
 /-! **BG Proposition 16.1 — type-`P` data construction layer** (`S16_MainResults`): the shared
 `TypePData` core and the type II/III/IV/V "last-mile" bridges feeding
 `proposition_type_classification`'s forward bridges.

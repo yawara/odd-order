@@ -2190,6 +2190,190 @@ theorem isTypeP_of_isTypeV [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M
     exact (hHall.2 q hqIdx) hqMF
   exact typePData_pRank_eq_one_of_not_dvd_card_derived v.typeP hqp hqW1 hndvd
 
+/-- Conjugation action of the cyclic group `⟨x⟩` on a subgroup `N` it normalizes. -/
+def conjActionOfMemNormalizer {N : Subgroup G} {x : G}
+    (hx : x ∈ Subgroup.normalizer (N : Set G)) :
+    ↥(Subgroup.zpowers x) →* MulAut ↥N :=
+  N.normalizerMonoidHom.comp (Subgroup.inclusion (Subgroup.zpowers_le.mpr hx))
+
+theorem conjActionOfMemNormalizer_apply {N : Subgroup G} {x : G}
+    (hx : x ∈ Subgroup.normalizer (N : Set G))
+    (a : ↥(Subgroup.zpowers x)) (n : ↥N) :
+    ((conjActionOfMemNormalizer hx a) n : G) = (a : G) * (n : G) * (a : G)⁻¹ := rfl
+
+/-- Fixed points of the cyclic conjugation action on `N` are the elements of `N` centralizing `x`. -/
+theorem fixedPoints_conjActionOfMemNormalizer_eq {N : Subgroup G} {x : G}
+    (hx : x ∈ Subgroup.normalizer (N : Set G)) :
+    Subgroup.fixedPointsOfMulAut (conjActionOfMemNormalizer hx) =
+      (N ⊓ Subgroup.centralizer ({x} : Set G)).subgroupOf N := by
+  ext n
+  constructor
+  · intro hn
+    rw [Subgroup.mem_subgroupOf]
+    refine ⟨n.2, Subgroup.mem_centralizer_iff.mpr ?_⟩
+    intro y hy
+    rw [Set.mem_singleton_iff] at hy; subst hy
+    have hfixG := congrArg Subtype.val
+      (Subgroup.mem_fixedPointsOfMulAut.mp hn ⟨y, Subgroup.mem_zpowers y⟩)
+    rw [conjActionOfMemNormalizer_apply] at hfixG
+    calc y * (n : G) = (y * (n : G) * y⁻¹) * y := by group
+      _ = (n : G) * y := by rw [hfixG]
+  · intro hn
+    rw [Subgroup.mem_fixedPointsOfMulAut]
+    intro a
+    apply Subtype.ext
+    rw [conjActionOfMemNormalizer_apply]
+    have hncent : (n : G) ∈ Subgroup.centralizer ({x} : Set G) :=
+      (Subgroup.mem_subgroupOf.mp hn).2
+    have hcomm : Commute (x : G) (n : G) :=
+      Subgroup.mem_centralizer_iff.mp hncent x (Set.mem_singleton x)
+    obtain ⟨k, hk⟩ := Subgroup.mem_zpowers_iff.mp a.2
+    have hacomm : (a : G) * (n : G) = (n : G) * (a : G) := by
+      rw [← hk]; exact (hcomm.zpow_left k)
+    calc (a : G) * (n : G) * (a : G)⁻¹ = (n : G) * (a : G) * (a : G)⁻¹ := by rw [hacomm]
+      _ = (n : G) := by group
+
+/-- **`p`-element fixed-point count** (`[Finite G]`): if a `q`-element `x` normalizes `N` and
+`q ∣ |N|`, then `q ∣ |C_N(x)|`.  The `q`-group `⟨x⟩` acts on `N` by conjugation, so
+`|N| ≡ |C_N(x)| (mod q)` (`IsPGroup.card_modEq_card_fixedPoints`, the fixed points being
+`N ⊓ C(x)`); since `q ∣ |N|`, also `q ∣ |C_N(x)|`.  Used to show `q ∤ |M'|` for the type-II–IV
+reverse bridges: `C_{M'}(x) = W₂` has order coprime to `q = |W₁|`. -/
+theorem prime_dvd_card_inf_centralizer_of_mem_normalizer [Finite G]
+    {N : Subgroup G} {x : G} {q : ℕ} [Fact q.Prime]
+    (hx : x ∈ Subgroup.normalizer (N : Set G))
+    (hxq : IsPGroup q ↥(Subgroup.zpowers x))
+    (hdvd : q ∣ Nat.card ↥N) :
+    q ∣ Nat.card ↥(N ⊓ Subgroup.centralizer ({x} : Set G)) := by
+  letI : MulAction ↥(Subgroup.zpowers x) ↥N :=
+    MulAction.compHom ↥N (conjActionOfMemNormalizer hx)
+  have hmod := hxq.card_modEq_card_fixedPoints (α := ↥N)
+  -- The fixed points of the conjugation action are `N ⊓ C(x)`.
+  have hcard : Nat.card (MulAction.fixedPoints ↥(Subgroup.zpowers x) ↥N)
+      = Nat.card ↥(N ⊓ Subgroup.centralizer ({x} : Set G)) := by
+    refine Nat.card_congr (Equiv.trans (Equiv.subtypeEquivRight (fun n => ?_))
+      (Subgroup.subgroupOfEquivOfLe (inf_le_left :
+        N ⊓ Subgroup.centralizer ({x} : Set G) ≤ N)).toEquiv)
+    rw [← fixedPoints_conjActionOfMemNormalizer_eq hx, Subgroup.mem_fixedPointsOfMulAut]
+    exact Iff.rfl
+  rw [hcard] at hmod
+  exact Nat.modEq_zero_iff_dvd.mp (hmod.symm.trans (Nat.modEq_zero_iff_dvd.mpr hdvd))
+
+/-- **`q ∤ |W₂|` for prime `|W₁| = q`** (type II–IV): `W₁` and `W₂` are subgroups of the cyclic
+`W = W₁W₂` with `W₁ ⊓ W₂ = ⊥` (`W₂ ≤ M_F ≤ M'` and `W₁ ⊓ M' = ⊥` by `M_complement`).  If `q ∣ |W₂|`,
+order-`q` elements `x ∈ W₁`, `y ∈ W₂` generate the *same* order-`q` subgroup of the cyclic `W`
+(`cyclic_subgroup_eq_of_card_eq`), so `x ∈ ⟨y⟩ ≤ W₂`, forcing `x ∈ W₁ ⊓ W₂ = ⊥`, contra. -/
+theorem typePData_not_dvd_card_W2_of_card_W1_prime [Finite G] {M : Subgroup G}
+    (data : TypePData M) (hq : (Nat.card ↥data.W1).Prime) :
+    ¬ (Nat.card ↥data.W1) ∣ Nat.card ↥data.W2 := by
+  intro hdvd
+  haveI : Fact (Nat.card ↥data.W1).Prime := ⟨hq⟩
+  haveI : IsCyclic ↥data.W := data.W_cyclic
+  have hW2leM' : data.W2 ≤ derivedInG M := le_trans data.W2_le (le_trans inf_le_left data.H_le)
+  have hW1W2 : data.W1 ⊓ data.W2 = ⊥ := by
+    rw [eq_bot_iff]
+    intro g hg
+    have hmem : (⟨g, data.W1_le (Subgroup.mem_inf.mp hg).1⟩ : ↥M) ∈
+        ((derivedInG M).subgroupOf M) ⊓ (data.W1.subgroupOf M) :=
+      ⟨Subgroup.mem_subgroupOf.mpr (hW2leM' (Subgroup.mem_inf.mp hg).2),
+        Subgroup.mem_subgroupOf.mpr (Subgroup.mem_inf.mp hg).1⟩
+    rw [disjoint_iff.mp data.M_complement.disjoint, Subgroup.mem_bot] at hmem
+    exact Subgroup.mem_bot.mpr (congrArg Subtype.val hmem)
+  obtain ⟨x, hx⟩ := exists_prime_orderOf_dvd_card' (G := ↥data.W1) (Nat.card ↥data.W1) dvd_rfl
+  obtain ⟨y, hy⟩ := exists_prime_orderOf_dvd_card' (G := ↥data.W2) (Nat.card ↥data.W1) hdvd
+  have hxord : orderOf ((x : G)) = Nat.card ↥data.W1 :=
+    (orderOf_injective data.W1.subtype data.W1.subtype_injective x).trans hx
+  have hyord : orderOf ((y : G)) = Nat.card ↥data.W1 :=
+    (orderOf_injective data.W2.subtype data.W2.subtype_injective y).trans hy
+  have hxne : (x : G) ≠ 1 := fun hc => hq.ne_one (by rw [← hxord, hc, orderOf_one])
+  have hW1leW : data.W1 ≤ data.W := le_sup_left.trans data.W_eq.ge
+  have hW2leW : data.W2 ≤ data.W := le_sup_right.trans data.W_eq.ge
+  have hxW : (x : G) ∈ data.W := hW1leW x.2
+  have hyW : (y : G) ∈ data.W := hW2leW y.2
+  have h1 : (Subgroup.zpowers (x : G)).subgroupOf data.W
+      = (Subgroup.zpowers (y : G)).subgroupOf data.W := by
+    refine OddOrder.BG.Ch3.S10.cyclic_subgroup_eq_of_card_eq ?_
+    rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe (Subgroup.zpowers_le.mpr hxW)).toEquiv,
+      Nat.card_congr (Subgroup.subgroupOfEquivOfLe (Subgroup.zpowers_le.mpr hyW)).toEquiv,
+      Nat.card_zpowers, Nat.card_zpowers, hxord, hyord]
+  have hxin : (x : G) ∈ Subgroup.zpowers (y : G) := by
+    have hm : (⟨(x : G), hxW⟩ : ↥data.W) ∈ (Subgroup.zpowers (x : G)).subgroupOf data.W :=
+      Subgroup.mem_subgroupOf.mpr (Subgroup.mem_zpowers (x : G))
+    rw [h1] at hm
+    exact Subgroup.mem_subgroupOf.mp hm
+  have hmem : (x : G) ∈ data.W1 ⊓ data.W2 := ⟨x.2, (Subgroup.zpowers_le.mpr y.2) hxin⟩
+  rw [hW1W2, Subgroup.mem_bot] at hmem
+  exact hxne hmem
+
+/-- **Prop 16.1 reverse, type II–IV ⟹ type `P`** (mmd L4478): a type-`P` datum whose cyclic
+factor `W₁` has *prime* order `q = |W₁|` (the `TypePNontrivialCore` of types II/III/IV) is BG type
+`P`.  `q ∤ |M'|`: else the `q`-element `x ∈ W₁#` normalizing `M'` would give `q ∣ |C_{M'}(x)| = |W₂|`
+(`prime_dvd_card_inf_centralizer_of_mem_normalizer`, `centralizer_W1`), contradicting `q ∤ |W₂|`
+(`typePData_not_dvd_card_W2_of_card_W1_prime`).  Then `r_q(M) = 1`
+(`typePData_pRank_eq_one_of_not_dvd_card_derived`) and `κ(M) ≠ ∅`
+(`typePData_kappa_nonempty_of_rank1`). -/
+theorem isTypeP_of_typePData_of_card_W1_prime [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    {M : Subgroup G} (hM : M ∈ maximalSubgroups G) (data : TypePData M)
+    (hqprime : (Nat.card ↥data.W1).Prime) : S14.IsTypeP M := by
+  haveI : Fact (Nat.card ↥data.W1).Prime := ⟨hqprime⟩
+  refine typePData_kappa_nonempty_of_rank1 hG hM data (fun p hp => ?_)
+  have hpq : p = Nat.card ↥data.W1 := by
+    rcases hqprime.eq_one_or_self_of_dvd p (Nat.dvd_of_mem_primeFactors hp) with h | h
+    · exact absurd h (Nat.prime_of_mem_primeFactors hp).ne_one
+    · exact h
+  subst hpq
+  have hndvd : ¬ Nat.card ↥data.W1 ∣ Nat.card ↥(derivedInG M) := by
+    intro hdvd
+    obtain ⟨x, hx⟩ := exists_prime_orderOf_dvd_card' (G := ↥data.W1) (Nat.card ↥data.W1) dvd_rfl
+    have hxord : orderOf ((x : G)) = Nat.card ↥data.W1 :=
+      (orderOf_injective data.W1.subtype data.W1.subtype_injective x).trans hx
+    have hxne : (x : G) ≠ 1 := fun hc => hqprime.ne_one (by rw [← hxord, hc, orderOf_one])
+    have hsubeq : (derivedInG M).subgroupOf M = commutator ↥M := by
+      rw [derivedInG, Subgroup.subgroupOf,
+        Subgroup.comap_map_eq_self_of_injective M.subtype_injective]
+    have hle : derivedInG M ≤ M := Subgroup.map_subtype_le _
+    haveI hnorm : ((derivedInG M).subgroupOf M).Normal := by rw [hsubeq]; infer_instance
+    have hxnorm : (x : G) ∈ Subgroup.normalizer (derivedInG M : Set G) :=
+      (Subgroup.normal_subgroupOf_iff_le_normalizer hle).mp hnorm (data.W1_le x.2)
+    have hxpg : IsPGroup (Nat.card ↥data.W1) ↥(Subgroup.zpowers (x : G)) :=
+      IsPGroup.of_card (n := 1) (by rw [Nat.card_zpowers, hxord, pow_one])
+    have hdvdW2 : Nat.card ↥data.W1 ∣ Nat.card ↥data.W2 := by
+      have hd := prime_dvd_card_inf_centralizer_of_mem_normalizer hxnorm hxpg hdvd
+      rwa [data.centralizer_W1 (x : G) x.2 hxne] at hd
+    exact typePData_not_dvd_card_W2_of_card_W1_prime data hqprime hdvdW2
+  exact typePData_pRank_eq_one_of_not_dvd_card_derived data hqprime dvd_rfl hndvd
+
+/-- **Prop 16.1 reverse, type II ⟹ type `P`** (clause (b) `.mp`, `IsTypeP` half): immediate from
+`isTypeP_of_typePData_of_card_W1_prime` and the `TypePNontrivialCore` primality of `|W₁|`. -/
+theorem isTypeP_of_isTypeII [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G}
+    (hM : M ∈ maximalSubgroups G) (hII : OddOrder.GroupTheory.IsTypeII M) : S14.IsTypeP M := by
+  obtain ⟨d⟩ := hII
+  exact isTypeP_of_typePData_of_card_W1_prime hG hM d.typeP d.common.2.1
+
+/-- **Prop 16.1 reverse, type III ⟹ type `P`** (clause (c) `.mp`, `IsTypeP` half). -/
+theorem isTypeP_of_isTypeIII [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G}
+    (hM : M ∈ maximalSubgroups G) (hIII : OddOrder.GroupTheory.IsTypeIII M) : S14.IsTypeP M := by
+  obtain ⟨d⟩ := hIII
+  exact isTypeP_of_typePData_of_card_W1_prime hG hM d.typeP d.common.2.1
+
+/-- **Prop 16.1 reverse, type IV ⟹ type `P`** (clause (c) `.mp`, `IsTypeP` half). -/
+theorem isTypeP_of_isTypeIV [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G}
+    (hM : M ∈ maximalSubgroups G) (hIV : OddOrder.GroupTheory.IsTypeIV M) : S14.IsTypeP M := by
+  obtain ⟨d⟩ := hIV
+  exact isTypeP_of_typePData_of_card_W1_prime hG hM d.typeP d.common.2.1
+
+/-- **Prop 16.1 reverse, every non-type-I maximal subgroup is type `P`** (mmd L4478): the common
+`IsTypeP` half of clauses (b)–(d) `.mp`.  Types II/III/IV reduce to the prime-`|W₁|` argument
+(`isTypeP_of_typePData_of_card_W1_prime`); type V to the Hall argument (`isTypeP_of_isTypeV`).
+This is exactly what `not_isTypeI_of_isTypeNonI` consumes (it discards the `P₁`/`P₂` refinement),
+so it closes the FT-critical content of the reverse type bridges modulo `hIF` (type I ⟹ type F). -/
+theorem isTypeP_of_isTypeNonI [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G}
+    (hM : M ∈ maximalSubgroups G) (h : OddOrder.GroupTheory.IsTypeNonI M) : S14.IsTypeP M := by
+  rcases h with hII | hIII | hIV | hV
+  · exact isTypeP_of_isTypeII hG hM hII
+  · exact isTypeP_of_isTypeIII hG hM hIII
+  · exact isTypeP_of_isTypeIV hG hM hIV
+  · exact isTypeP_of_isTypeV hG hM hV
+
 /-- **Theorem A(8), the `FittingIsTI`-free part** (mmd L4274): for `M_F ≠ M_σ`, the Hall
 `(κ ∪ σ)ᶜ`-complement `U` is trivial and `|K| = p` is prime.  Both follow from
 `mf_ne_msigma_typeP1_structure` (Theorem 15.2): `M_F ≠ M_σ ⟹ IsTypeP1 M`
