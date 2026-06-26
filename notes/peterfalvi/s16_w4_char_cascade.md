@@ -59,9 +59,25 @@ bare `sorry` を **faithful carrier + 実 Lean 証明 + axiom-clean S09 cite bri
 S09 §7 cite 経路: `S09_NonexistenceCertain` は S16 import closure 内 (S11→S10_MinimalSimpleStructure→S09
 経由、python closure 検証済 275 modules)。full build 3872 jobs green, 21s。
 
-**次手** = `normCascadeBound_of_charData` (14.11.4): `family_inequality` (7.5, S09 cite) +
-`generic_character_bound` + (7.7) で `normCascadeBound` rational 不等式を導出 (intricate 算術)。同 bridge
-carrier (`Hypothesis78`/`FamilyHypothesis71` 供給) が共通鍵。
+### ✅ normCascadeBound_of_charData (14.11.4) — two-sided ρ-norm carrier (本セッション)
+
+原文 (14.11.4 p.90) の構造を忠実に分離。導出 = (7.5) family inequality を ψ^τ₁ (norm 1) に適用 →
+`‖ψ^{τ₁ρ}‖²` の two-sided bound → rational 不等式:
+
+- **`NormCascadeData hyp Mdata`** (faithful carrier): `rhoNormSq:ℚ` + `lower` ((7.5)+(14.11.3):
+  `1−pq/k ≤ ‖ψ^{τ₁ρ}‖²`) + `upper` ((7.5)+(7.8.b): `‖ψ^{τ₁ρ}‖² ≤ 1−1/p−1/q+2/(pq)+1/(uq)+1/(vp)`、
+  原文の `(|P|−1)/|P|≤1` 等で loosen 済)。two-sided 構造が textbook の 2 段導出を反映。
+- **`normCascadeData`** (faithful producer, `noncomputable def := sorry`): (7.1) ρ-map for (M,A(M)) +
+  (7.5) `FamilyHypothesis71` + (7.8.b)/(14.11.3) norm bounds。§7 Dade layer で discharge。
+- **`normCascadeBound_of_charData` 本体** = 実 `linarith`: lower+upper の transitivity から
+  `1/p+1/q ≤ pq/k+2/(pq)+1/(uq)+1/(vp)` = `normCascadeBound`。bare sorry → faithful producer のみ isolate。
+
+注: betaM (14.11.2) と違い axiom-clean S09 bridge lemma は未付随 ((7.5) の lower bound 導出は
+`family_inequality` の real-analysis 出力を `1−pq/k` に同定する要で、FamilyHypothesis71 構成の重い
+instance plumbing 要)。modest だが honest な de-opacification (実 linarith + faithful carrier)。
+
+**次手** = (14.16) dual `caseB_character_contradiction_of_gap_inequalities` (β_L の (7.8) expansion、
+`BetaMExpansionData` の β_L アナログ再利用可) / `normCascadeData` の (7.5) lower-bound bridge (重い)。
 
 ### ✅ generic_character_bound (14.11.3) — honest assembly (commit `483a5716`)
 

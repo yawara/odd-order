@@ -2218,22 +2218,61 @@ theorem generic_character_bound [Finite G]
     _ = ‖χ g‖ := by rw [hχ2]
     _ = ‖(Mdata.tau1 Mdata.psi) g‖ := hχnorm g
 
-/-- **Peterfalvi (14.11.2)+(14.11.3) ⇒ (14.11.4)**: the character-theoretic norm
-calculation.  Combining the `beta_M^tau` expansion (14.11.2) with the generic
-lower bound `|psi^tau_1| ≥ 1` (14.11.3) and the Frobenius inner-product formula
-(7.5) yields the displayed rational inequality `normCascadeBound hyp k`.  This is
-the *sole* genuinely character-theoretic input to the (14.11.4) contradiction;
-everything downstream of it is the arithmetic cascade already discharged in
-`norm_cascade_contradiction`. -/
+/-- **Faithful §7 carrier for the `ρ`-norm two-sided bound of Peterfalvi (14.11.4).**
+
+The character theory of (14.11.4) reduces to a two-sided bound on `‖ψ^{τ₁ρ}‖²`, where `ρ` is the
+Hypothesis (7.1) map for `(M, A(M))` (Pf (14.11.4), p.90):
+
+* `lower` — **(7.5) + (14.11.3)**: applying the (7.5) family inequality to the norm-one character
+  `ψ^{τ₁}` and using `|ψ^{τ₁}(g)| ≥ 1` on `G_0` (`generic_character_bound`) gives
+  `1 − pq/k ≤ ‖ψ^{τ₁ρ}‖²`.
+* `upper` — **(7.5) + (7.8.b)**: the same (7.5) inequality together with the (7.8.b) norm bound
+  `Σ a_ij² ≤ e − 1` gives the displayed estimate, loosened by `(|P|−1)/|P| ≤ 1`,
+  `(|Q|−1)/|Q| ≤ 1`, `(k−1)/k ≤ 1` (Pf line 14.11.4) to the `normCascadeBound` error terms
+  `2/(pq) + 1/(uq) + 1/(vp)`.
+
+The two-sided structure mirrors the textbook's two-step derivation; the genuine §7 Dade content
+(the (7.5) family inequality for `M` and the (7.8.b) norm bound) is the remaining obligation,
+isolated in `normCascadeData`. -/
+structure NormCascadeData (hyp : Hypothesis (G := G)) (Mdata : MHypothesis hyp) where
+  /-- `‖ψ^{τ₁ρ}‖²`, the squared `L`-norm of the Hypothesis (7.1) `ρ`-image of `ψ^{τ₁}`. -/
+  rhoNormSq : ℚ
+  /-- **(7.5) + (14.11.3)** lower bound: `1 − pq/k ≤ ‖ψ^{τ₁ρ}‖²`. -/
+  lower :
+    (1 : ℚ) - ((hyp.base.p * hyp.base.q : ℕ) : ℚ) / (Mdata.k : ℚ) ≤ rhoNormSq
+  /-- **(7.5) + (7.8.b)** upper bound (loosened to the `normCascadeBound` error terms). -/
+  upper :
+    rhoNormSq ≤ 1 - (1 : ℚ) / (hyp.base.p : ℚ) - 1 / (hyp.base.q : ℚ)
+      + 2 / ((hyp.base.p * hyp.base.q : ℕ) : ℚ)
+      + 1 / ((hyp.base.u * hyp.base.q : ℕ) : ℚ)
+      + 1 / ((hyp.base.v * hyp.base.p : ℕ) : ℚ)
+
+/-- **Faithful §7 Dade producer for (14.11.4).**  Under `K ≠ V`, the (7.1) `ρ`-map for `(M, A(M))`,
+the (7.5) family inequality, and the (7.8.b)/(14.11.3) norm bounds supply the two-sided
+`NormCascadeData` bound on `‖ψ^{τ₁ρ}‖²`.  The construction is the §7 Dade-coherence layer (the (7.5)
+family hypothesis `S09.FamilyHypothesis71` for `M` plus `generic_character_bound`, the latter already
+honest modulo `betaM_expansion_data`). -/
+noncomputable def normCascadeData [Finite G]
+    (_hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
+    (Mdata : MHypothesis hyp) (hne : Mdata.K ≠ hyp.base.V) :
+    NormCascadeData hyp Mdata := sorry
+
+/-- **Peterfalvi (14.11.4)**: the character-theoretic norm calculation produces the displayed
+rational inequality `normCascadeBound hyp k`.
+
+De-opacified (W4 §16→§7 bridge, lane-h): the genuine character theory is the two-sided `ρ`-norm
+bound `NormCascadeData` (the (7.5) family inequality + (14.11.3)/(7.8.b) norm estimates); the
+passage to `normCascadeBound` is then the pure rational rearrangement
+`1 − pq/k ≤ ‖ψ^{τ₁ρ}‖² ≤ 1 − 1/p − 1/q + 2/(pq) + 1/(uq) + 1/(vp)` ⟹
+`1/p + 1/q ≤ pq/k + 2/(pq) + 1/(uq) + 1/(vp)` (`linarith`).  Everything downstream of
+`normCascadeBound` is the arithmetic cascade already discharged in `norm_cascade_contradiction`. -/
 theorem normCascadeBound_of_charData [Finite G]
     (_hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
     (Mdata : MHypothesis hyp) (hne : Mdata.K ≠ hyp.base.V) :
     normCascadeBound hyp Mdata.k := by
-  -- (14.11.2): `e = p q` together with the signed `eta_ij` expansion of `beta_M^tau`.
-  have _hbeta := betaM_expansion _hG hyp Mdata hne
-  -- (14.11.3): the generic lower bound `|psi^tau_1(g)| ≥ 1` on `G_0`.
-  have _hgen := generic_character_bound _hG hyp Mdata hne
-  sorry
+  obtain ⟨R, hlower, hupper⟩ := normCascadeData _hG hyp Mdata hne
+  unfold normCascadeBound
+  linarith [hlower, hupper]
 
 /-- **Peterfalvi (14.11.4)**: the norm inequality cascade contradicts `K != V`.
 
