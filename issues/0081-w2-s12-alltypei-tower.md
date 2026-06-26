@@ -7,6 +7,12 @@ created: 2026-06-25
 
 # W2 (lane-c): §12 all-Type-I 非存在 tower → theorem88_caseB_holds
 
+> **⚠ 2026-06-26 status (relane #10→#11)**: W2 owner は lane-c→lane-h (relane #10) →
+> **driver/await に降格 (relane #11, 常駐レーンなし)**。監査 `wf_1cb6284d-bb2` で §12 tower の 14 sorry が
+> 全て lane-b §11 char に従属 (ungated 0) と判明 → lane-h は独立価値の高い W1 carrier (issue 2027) へ移動。
+> **W2 (`theorem88_caseB_holds`, S14_MaximalI) は lane-b の §11 char landing 時に driver で機会的 close**。
+> タイトルの「(lane-c)」は旧 (relane #9)。本 issue は char-gated await item。
+
 ## 背景
 
 FT フロンティア再設計 (2026-06-25 relane #9、正本 `notes/meta/ft_frontier_remap_2026_06_25.md`)
@@ -132,6 +138,39 @@ tau_restriction_domain/difference_image_formula/R_eq_union、`CrossOrthogonality
 [[scaffold-sorry-free-not-done]] ゆえ unblock しない marginal de-opacify は commit のため作らない方針。
 **次セッション (fresh budget)**: 最高価値 = `theorem88_caseB_holds` (12.17) の W4-style de-opacify
 (char 7.11 counting + BG 8.8 partner を faithful producer に isolate、FT consumer 直結)。
+
+### 2026-06-26 (lane-h fresh budget): ✅ (12.17) `theorem88_caseB_holds` を honest reduction 化
+
+前セッション推奨の (12.17) de-opacify を完遂。**bare sorry を消し、書籍の証明構造に忠実な honest
+reduction に置換** (S14_MaximalI.lean、leaf 3846 + full build 3884 green、AxiomsCheck OK)。重要な発見:
+**FT consumer (`FeitThompson:361`) は `hall` (全 type-I) 枝で `cb.S/S_maximal/S_nonI` のみ消費して
+矛盾を導く** = 真に必要なのは「非 type-I な極大が存在」だけ (full pairing は consumer が第2枝で独自再構成)。
+原文 (12.17) の証明構造 = 全 type-I 仮定 → 各 type-I maximal は Frobenius (kernel `L_F`, (12.7)) +
+`N_G(L_F)=L` → Hypothesis (7.10) 組立 → Theorem (7.11) で矛盾。
+
+**重要: (7.11)/(7.10) は repo に既存・citable**:
+- (7.10) `S09.FrobeniusFamily` carrier 完備、(7.11) `S09.not_trivial_G0` (`FrobeniusFamily`+`G0={1}`→`False`、
+  char content は `card_G0_lower_bound`=`CharacterEstimateData` に既に isolate 済) を**直接 cite 可能**
+  ⟹ survey が想定した「(7.11) を新 producer に isolate」は不要、既存定理を cite するだけで済んだ。
+
+**landed (3 sorry-free + 2 faithful obligation)**:
+- **`maximalSubgroup_eq_normalizer_maxNilpotentNormalHall`** (sorry-free + **axiom-clean**, AxiomsCheck 登録)
+  = (12.17) の genuine group-theory 核「極大 L (L_F≠⊥) ⟹ L=N_G(L_F)」。`maxNilpotentNormalHall_le_normalizer`
+  (L≤N) + simplicity (N=⊤⟹L_F⊴G⟹⊥/⊤ 排除) + coatom (L≤N<⊤⟹=)。汎用・再利用可。
+- **`not_all_maximal_typeI`** (12.17 本体、sorry-free given carrier) = `TypeICovering` から `FrobeniusFamily`
+  を組立 (`normalizer_eq`←bridge / `isFrobenius`←(12.7) / `kernel_le` を**実証明**) → covering から `G0={1}`
+  導出 → `not_trivial_G0` (7.11) で `False`。
+- **`theorem88_caseB_holds`** (sorry-free) = `theorem88_dichotomy.resolve_left not_all_maximal_typeI`。
+- **isolated obligation 2 本** (faithful, 正しい所在に): `exists_typeICovering` (§8 carrier: reps/two_le/isTI←8.13.c1/
+  coprime←8.17/covers←8.17.a, BG Theorem E) + `theorem88_dichotomy` (8.8 BG §16 dichotomy)。
+- carrier `TypeICovering` = §8/§17 covering 入力を faithful にパッケージ (lane-b/c/f への精密 hand-off)。
+
+**評価**: sorry 数 1→2 だが [[scaffold-sorry-free-not-done]] 基準で genuine 前進 — bare sorry が隠していた
+(12.17) の group-theory 本体 (normalizer bridge + Frobenius-family 組立 + (7.11) 接続) を**実証明**し、
+照射不能な char (7.11 内 `card_G0_lower_bound`)・§8 (covering)・§16 (8.8 dichotomy) のみを faithful
+obligation に分離。relane #11 の「W2 = char 従属で ungated 0」評価に反し、(12.17) は **ungated group-theory
+核を持っていた** (bridge は axiom-clean)。**lane-h は relane #11 で W1 (issue 2027) へ移動**、本成果で W2
+の FT-critical endpoint は honest reduction として残置 (driver/await、残 = §8 covering producer + 8.8 dichotomy)。
 
 ## 参照
 

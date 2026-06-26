@@ -5549,6 +5549,21 @@ Axiom-clean. -/
 
 #assert_only_allowed_axioms OddOrder.BG.Ch4.S16.typePData_of_isTypeP2
 
+/-! **Type-`P₁` structure: `M' = M_σ`, `F(M) = M_F`, and the type-V `TypePData`** (`S16_MainResults`,
+issue 8015, the FT-critical `hP1eqV` forward bridge).  For a type-`P₁` maximal subgroup the Hall
+`(κ ∪ σ)'`-complement is trivial, so Lemma 15.1(b) collapses to `M' = M_σ`
+(`isTypeP1_derivedInG_eq_Msigma`); when additionally `M_F = M_σ`, Corollary 15.5(d) (`F(M) ≤ M'`)
+plus `M_F ≤ F(M)` give the type-V Fitting collapse `F(M) = M_F`
+(`fittingInAmbient_eq_maxNilpotentNormalHall_of_isTypeP1_mf_eq_msigma`).  Together these fully
+construct the type-V Peterfalvi datum `typePData_of_isTypeP1_mf_eq_msigma` (`U = ⊥`), the
+carrier-constructibility milestone reducing `hP1eqV` to the lone Peterfalvi (8.8) trichotomy
+residual.  All three axiom-clean. -/
+
+#assert_only_allowed_axioms OddOrder.BG.Ch4.S16.isTypeP1_derivedInG_eq_Msigma
+#assert_only_allowed_axioms
+  OddOrder.BG.Ch4.S16.fittingInAmbient_eq_maxNilpotentNormalHall_of_isTypeP1_mf_eq_msigma
+#assert_only_allowed_axioms OddOrder.BG.Ch4.S16.typePData_of_isTypeP1_mf_eq_msigma
+
 /-! **`hP2II` reduced to the `M'`-type-`F` residual** (`S16_MainResults`,
 `isTypeII_of_isTypeP2_of_derived_typeF`, issue 7007): a type-`P₂` maximal subgroup whose derived
 subgroup `M'` is type `F` (with `F(M') = M_F`) is type II.  Discharges every `isTypeII_of_typePData`
@@ -6148,3 +6163,15 @@ formula together with the prime computation `coprimeFrobeniusAction_card_eq_prim
 -- construction + the (13.1.d)/(3.9) η-grid identification.  Axiom-clean (pure `rw` from the S09
 -- (7.8.a) cite).
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S16.betaMExpansionData_of_hypothesis78
+
+-- **W2 §12 (12.17) normalizer bridge (lane-h)** — `maximalSubgroup_eq_normalizer_maxNilpotentNormalHall`:
+-- a maximal subgroup `L` of a minimal simple group of odd order equals `N_G(L_F)` whenever
+-- `L_F = maxNilpotentNormalHall L ≠ ⊥`.  `L ≤ N_G(L_F)` is `maxNilpotentNormalHall_le_normalizer`;
+-- `N_G(L_F) = ⊤` would make `L_F ⊴ G`, excluded by simplicity (`L_F ≠ ⊥`, `L_F ≤ L < ⊤`); `L`
+-- coatom upgrades `L ≤ N_G(L_F) < ⊤` to equality.  This is the genuine group-theoretic core of the
+-- Peterfalvi (12.17) Frobenius-family assembly `not_all_maximal_typeI` (the `normalizer_eq` field of
+-- `S09.FrobeniusFamily`), which together with the (8.8) dichotomy `theorem88_dichotomy` (BG §16)
+-- discharges `theorem88_caseB_holds` — the all-Type-I non-existence the Feit–Thompson endgame
+-- consumes.  Axiom-clean.
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S14.maximalSubgroup_eq_normalizer_maxNilpotentNormalHall
