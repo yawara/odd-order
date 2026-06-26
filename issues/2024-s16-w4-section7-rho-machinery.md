@@ -28,19 +28,23 @@ S09 は S10→...→S16 で**推移的 import 済み = S16 から cite 可能**�
 abstract carrier (`tau : S07.IntegralCharacterMap`, `psi`, `betaM`, `G0`) を S09 の `Hypothesis71` /
 `Hypothesis78` (concrete `S04.Hypothesis` + `S04.DadeMap` を要求) に橋渡し:
 
-- [ ] **bridge carrier**: MHypothesis に faithful field を追加 (or 派生 producer) で `Hypothesis71 G (A M) M`
-      / `FamilyHypothesis71 G 1` / `Hypothesis78 G (A M) M` を供給。type-I M の Dade extension (14.10) は
-      genuine に存在 → faithful。S04 Dade concrete 構成 (§3/§4 layer) が discharge。
+- [~] **bridge carrier** (betaM 側着手済): `Hypothesis78 G A M` → `BetaMExpansionData` の bridge lemma
+      `betaMExpansionData_of_hypothesis78` を axiom-clean 実装 (S09 (7.8.a) cite で `betaM_seven_eight` 導出)。
+      残: `Hypothesis71 G (A M) M` / `FamilyHypothesis71 G 1` の供給 (normCascadeBound 側で要、type-I M の
+      Dade extension 14.10 から faithful)。
 - [ ] **`normCascadeBound_of_charData` (14.11.4)**: `family_inequality` (7.5, cite) + `generic_character_bound`
-      (|ψ^τ₁|≥1 on G_0、本セッション landed) + (7.7) 内積式で rational 不等式 `normCascadeBound` を導く。
-- [ ] **`betaM_expansion` (14.11.2)**: `Hypothesis78.beta` / (7.8.a) expansion (cite) を η-grid 形に identify
-      + `all_pm_one_and_card_of_odd_sq_sum_le` (done) で ±1 導出。
-- [ ] **(14.16) dual** `caseB_character_contradiction_of_gap_inequalities`: β_L の (7.8) expansion で同様。
+      (|ψ^τ₁|≥1 on G_0、landed) + (7.7) 内積式で rational 不等式 `normCascadeBound` を導く。
+- [x] **`betaM_expansion` (14.11.2)** ✅: `BetaMExpansionData` faithful carrier ((7.8.a) `β_M=1_G−χ+Δ` +
+      η-grid id `1_G+Δ=Σεη`, χ generic で 2 branch 忠実) + `betaM_expansion_data` producer + axiom-clean
+      bridge `betaMExpansionData_of_hypothesis78` (S09 `beta_eq_constOne_sub_zetaImage_add_delta` cite)。
+      本体は実 Lean 証明 (`e=pq`=field cite、grid 展開=`abel`)。bare sorry → faithful producer のみ isolate。
+- [ ] **(14.16) dual** `caseB_character_contradiction_of_gap_inequalities`: β_L の (7.8) expansion で同様
+      (`BetaMExpansionData` の β_L アナログを再利用可)。
 
 ## 完了条件
 
 `normCascadeBound_of_charData` / `betaM_expansion` が S09 cite による honest assembly になり、
-直接 sorry が bridge carrier (faithful) のみに帰着。
+直接 sorry が bridge carrier (faithful) のみに帰着。**betaM_expansion 達成済** (2026-06-26)。
 
 ## 参照
 

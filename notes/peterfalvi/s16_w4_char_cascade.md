@@ -33,6 +33,52 @@ faithful producer として lane-h で実装。repo の established pattern (lan
 
 ## 進捗
 
+### ✅ betaM_expansion (14.11.2) — S09 §7 bridge de-opacification (lane-h resume, this session)
+
+bare `sorry` を **faithful carrier + 実 Lean 証明 + axiom-clean S09 cite bridge** に分解
+(`S16_NonExistenceG.lean`):
+
+- **`BetaMExpansionData hyp Mdata`** (faithful data carrier, `structure`): (7.8.a) decomposition
+  `β_M^τ = 1_G − χ + Δ` (`betaM_seven_eight`) + η-grid 同定 `1_G + Δ = Σ_{ij} ε_ij η_ij` (`grid_eq`,
+  signs ±1) を ClassFunction レベルで carry。**χ は generic field** (`chi` + `chi_norm:‖χ‖=‖ψ^τ₁‖`)
+  ゆえ原文 (14.11.2) の 2 branch (`χ=ψ^τ₁` / `χ=−ψ̄^τ₁`) を両方忠実カバー。data 構造ゆえ
+  `noncomputable def` 製 (Prop でないので theorem 不可。`EtaGenericData` は全 Prop fields で Prop ゆえ
+  theorem 可だった差分に注意)。
+- **`betaM_expansion_data`** (faithful producer, `noncomputable def := sorry`): type-I M が (7.8)
+  Dade-coherence 構造を持つ事実。§3/§4 Dade-isometry layer で discharge。`EtaGenericData` と同パターン。
+- **`betaMExpansionData_of_hypothesis78`** (✅ **axiom-clean** bridge lemma, AxiomsCheck 登録、3 axioms):
+  concrete `S09.Hypothesis78 G A M` + 同定 (`β_M=β`, `ψ^τ₁=ζ^ν`) + η-grid id から `BetaMExpansionData`
+  を構成。`betaM_seven_eight` を **S09 `beta_eq_constOne_sub_zetaImage_add_delta` (β=1_G−ζ^ν+Δ) の
+  pure `rw`** で導出 ⟹ (7.8.a) rearrangement が S09 §7 の genuine consequence と certify (独立仮説でない)。
+  obligation を §3/§4 Dade 構成 + (13.1.d) η-grid 同定に縮約。
+- **`betaM_expansion` 本体** = 実 Lean 証明: `e=pq` は field `MHypothesis.complement_card_eq_pq`
+  (cite)、η-grid 展開は `betaM_seven_eight` + `grid_eq` の `abel` rearrangement、χ:=carrier の `chi`、
+  `‖χ‖=‖ψ^τ₁‖` は `chi_norm`。bare sorry → faithful producer のみに isolate。`generic_character_bound`
+  (14.11.3) は本 betaM_expansion をそのまま consume (destructure 形 `⟨_he,ε,hε,χ,hχnorm,hexp⟩` 不変)。
+
+S09 §7 cite 経路: `S09_NonexistenceCertain` は S16 import closure 内 (S11→S10_MinimalSimpleStructure→S09
+経由、python closure 検証済 275 modules)。full build 3872 jobs green, 21s。
+
+### ✅ normCascadeBound_of_charData (14.11.4) — two-sided ρ-norm carrier (本セッション)
+
+原文 (14.11.4 p.90) の構造を忠実に分離。導出 = (7.5) family inequality を ψ^τ₁ (norm 1) に適用 →
+`‖ψ^{τ₁ρ}‖²` の two-sided bound → rational 不等式:
+
+- **`NormCascadeData hyp Mdata`** (faithful carrier): `rhoNormSq:ℚ` + `lower` ((7.5)+(14.11.3):
+  `1−pq/k ≤ ‖ψ^{τ₁ρ}‖²`) + `upper` ((7.5)+(7.8.b): `‖ψ^{τ₁ρ}‖² ≤ 1−1/p−1/q+2/(pq)+1/(uq)+1/(vp)`、
+  原文の `(|P|−1)/|P|≤1` 等で loosen 済)。two-sided 構造が textbook の 2 段導出を反映。
+- **`normCascadeData`** (faithful producer, `noncomputable def := sorry`): (7.1) ρ-map for (M,A(M)) +
+  (7.5) `FamilyHypothesis71` + (7.8.b)/(14.11.3) norm bounds。§7 Dade layer で discharge。
+- **`normCascadeBound_of_charData` 本体** = 実 `linarith`: lower+upper の transitivity から
+  `1/p+1/q ≤ pq/k+2/(pq)+1/(uq)+1/(vp)` = `normCascadeBound`。bare sorry → faithful producer のみ isolate。
+
+注: betaM (14.11.2) と違い axiom-clean S09 bridge lemma は未付随 ((7.5) の lower bound 導出は
+`family_inequality` の real-analysis 出力を `1−pq/k` に同定する要で、FamilyHypothesis71 構成の重い
+instance plumbing 要)。modest だが honest な de-opacification (実 linarith + faithful carrier)。
+
+**次手** = (14.16) dual `caseB_character_contradiction_of_gap_inequalities` (β_L の (7.8) expansion、
+`BetaMExpansionData` の β_L アナログ再利用可) / `normCascadeData` の (7.5) lower-bound bridge (重い)。
+
 ### ✅ generic_character_bound (14.11.3) — honest assembly (commit `483a5716`)
 
 opaque `sorry` を honest assembly に置換。**直接 sorry 不使用**。新規:
