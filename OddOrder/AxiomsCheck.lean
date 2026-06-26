@@ -5219,6 +5219,14 @@ of `(c)`) is also axiom-clean. -/
 
 #assert_only_allowed_axioms OddOrder.BG.Ch4.S14.Msigma_inf_normalizer_eq_bot_of_tau2
 
+/-! **BG Theorem 14.4, `C_G(x)`-witness sharp transitivity + Cor 15.3(b) `hconj` input**
+(`S14_TypePCounting`): `exists_conj_centralizer_of_mem_maximalSigma` strengthens the
+`isConjugateSubgroup` transitivity to keep the conjugator in `C_G(x)`; `mf_hall_conj_realized_in_M`
+is the §14.4 half of BG Corollary 15.3(b) — for `H ≤ M_σ`, `G`-conjugate elements of `H` are
+`M`-conjugate (via `N_G(M) = M`).  Axiom-clean. -/
+#assert_only_allowed_axioms OddOrder.BG.Ch4.S14.exists_conj_centralizer_of_mem_maximalSigma
+#assert_only_allowed_axioms OddOrder.BG.Ch4.S14.mf_hall_conj_realized_in_M
+
 /-! **BG Theorem 14.7, type-`P₁` Hall complement card** (`S14_TypePCounting`, `typeP1_card_eq`):
 for a type-`P₁` maximal `N` with Hall `κ(N)`-subgroup `K_N`, `|N| = |N_σ|·|K_N|` (the σ-part
 uniqueness; `K_N` Hall `σ(N)′` complements the normal Hall `σ(N)`-subgroup `N_σ`).  Feeds the

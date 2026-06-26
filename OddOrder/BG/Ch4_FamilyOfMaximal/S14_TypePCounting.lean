@@ -4331,6 +4331,73 @@ theorem isConjugateSubgroup_of_mem_maximalSigma [Finite G]
     rw [ha, Set.mem_singleton_iff] at hL hL'
     rw [hL, hL']
 
+/-- **Sharp transitivity, `C_G(x)`-witness form** (BG Theorem 14.4, strengthening
+`isConjugateSubgroup_of_mem_maximalSigma`): for a `σ`-length-one `x`, `R(x) = N_σ ∩ C_G(x)` acts
+transitively on `𝓜_σ(x)`, so any two `σ`-maximals `L, L'` of `x` satisfy `L' = L^c` for some
+`c ∈ C_G(x)` — not merely some `c ∈ G`.  This `C_G(x)`-conjugacy is the form BG Corollary 15.3(b)
+consumes (after `N_G(M) = M` it forces the conjugator into `M`). -/
+theorem exists_conj_centralizer_of_mem_maximalSigma [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (D : SigmaDecompositionData G) {x : G}
+    (hlen : D.length x = 1) {L L' : Subgroup G}
+    (hL : L ∈ maximalSigmaSubgroupsOfElement x) (hL' : L' ∈ maximalSigmaSubgroupsOfElement x) :
+    ∃ c ∈ Subgroup.centralizer ({x} : Set G), MulAut.conj c • L = L' := by
+  classical
+  have hx : x ≠ 1 := ((D.length_one_iff x).mp hlen).1
+  by_cases hgt : 1 < (maximalSigmaSubgroupsOfElement x).ncard
+  · have spec := ((sigmaLength_one_centralizer_structure hG D hx hlen).2 hgt).exists.choose_spec
+    obtain ⟨r, hr, -⟩ := (spec.2.2.2.2.2.2 L hL).2.2.2 L' hL'
+    exact ⟨r, (Subgroup.mem_inf.mp hr.1).2, hr.2⟩
+  · have hne : (maximalSigmaSubgroupsOfElement x).Nonempty := ((D.length_one_iff x).mp hlen).2
+    have h1 : (maximalSigmaSubgroupsOfElement x).ncard = 1 := by
+      have hpos : 0 < (maximalSigmaSubgroupsOfElement x).ncard := by
+        rw [Set.ncard_pos (Set.toFinite _)]; exact hne
+      omega
+    obtain ⟨a, ha⟩ := Set.ncard_eq_one.mp h1
+    rw [ha, Set.mem_singleton_iff] at hL hL'
+    exact ⟨1, Subgroup.one_mem _, by rw [hL, hL', map_one, one_smul]⟩
+
+/-- **BG Corollary 15.3(b), `hconj` input** (the `§14.4` half): for a maximal `M` and
+`H ≤ M_σ`, any two elements `x, y ∈ H` that are conjugate in `G` are already conjugate by an
+element of `M`.  (`N_M(H)`-control is then obtained from this via the Frattini argument in the
+`H ⋬ M` case.)
+
+Proof.  If `x = 1` then `y = 1` and `m = 1` works.  Otherwise `x ∈ M_σ` has `σ`-length one, with
+`M ∈ 𝓜_σ(x)` and `M^{g⁻¹} ∈ 𝓜_σ(x)` (as `x = g⁻¹yg ∈ (M_σ)^{g⁻¹}`).  Theorem 14.4's sharp
+transitivity (`exists_conj_centralizer_of_mem_maximalSigma`) yields `c ∈ C_G(x)` with
+`M^{cg⁻¹} = M`, so `cg⁻¹ ∈ N_G(M) = M`; then `m = (cg⁻¹)⁻¹ = gc⁻¹ ∈ M` and
+`m x m⁻¹ = g(c⁻¹xc)g⁻¹ = gxg⁻¹ = y`. -/
+theorem mf_hall_conj_realized_in_M [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (D : SigmaDecompositionData G) {M H : Subgroup G}
+    (hM : M ∈ maximalSubgroups G) (hHMσ : H ≤ OddOrder.BG.Ch3.S10.Msigma M) :
+    ∀ x ∈ H, ∀ y ∈ H, ∀ g : G, y = g * x * g⁻¹ → ∃ m ∈ M, y = m * x * m⁻¹ := by
+  classical
+  intro x hx y hy g hyg
+  by_cases hx1 : x = 1
+  · exact ⟨1, M.one_mem, by rw [hyg, hx1]; group⟩
+  · have hxMσ : x ∈ OddOrder.BG.Ch3.S10.Msigma M := hHMσ hx
+    have hMmem : M ∈ maximalSigmaSubgroupsOfElement x := ⟨hM, hxMσ⟩
+    have hgM_max : MulAut.conj g⁻¹ • M ∈ maximalSubgroups G :=
+      mem_maximalSubgroups_of_isConjugateSubgroup hM ⟨g⁻¹, rfl⟩
+    have hxgMσ : x ∈ OddOrder.BG.Ch3.S10.Msigma (MulAut.conj g⁻¹ • M) := by
+      rw [Msigma_conj_smul, Subgroup.mem_pointwise_smul_iff_inv_smul_mem]
+      have heq : (MulAut.conj g⁻¹)⁻¹ • x = y := by
+        rw [map_inv, inv_inv, MulAut.smul_def, MulAut.conj_apply]; exact hyg.symm
+      rw [heq]; exact hHMσ hy
+    have hgMmem : MulAut.conj g⁻¹ • M ∈ maximalSigmaSubgroupsOfElement x := ⟨hgM_max, hxgMσ⟩
+    have hlen : D.length x = 1 := (D.length_one_iff x).mpr ⟨hx1, ⟨M, hMmem⟩⟩
+    obtain ⟨c, hcC, hcconj⟩ :=
+      exists_conj_centralizer_of_mem_maximalSigma hG D hlen hgMmem hMmem
+    have hcg : MulAut.conj (c * g⁻¹) • M = M := by rw [map_mul, mul_smul]; exact hcconj
+    have hcgM : c * g⁻¹ ∈ M := by
+      rw [← normalizer_eq_self_of_mem_maximalSubgroups hG hM]
+      exact mem_normalizer_of_conj_smul_eq_self hcg
+    have hcomm : x * c = c * x := (Subgroup.mem_centralizer_iff.mp hcC) x (Set.mem_singleton x)
+    have hcx' : c⁻¹ * x * c = x := by rw [mul_assoc, hcomm, inv_mul_cancel_left]
+    refine ⟨(c * g⁻¹)⁻¹, M.inv_mem hcgM, ?_⟩
+    calc y = g * x * g⁻¹ := hyg
+      _ = g * (c⁻¹ * x * c) * g⁻¹ := by rw [hcx']
+      _ = (c * g⁻¹)⁻¹ * x * ((c * g⁻¹)⁻¹)⁻¹ := by group
+
 /-- A conjugacy-saturation `𝒞_G(M_σ^#)` element is nonidentity (it is conjugate to some
 `t ∈ M_σ^#`, and conjugation fixes the identity). -/
 theorem ne_one_of_mem_sigmaConjugacySaturation {M : Subgroup G} {x : G}
