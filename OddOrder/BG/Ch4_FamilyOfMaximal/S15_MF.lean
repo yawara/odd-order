@@ -2447,6 +2447,66 @@ theorem hall_subgroupOf_normal_of_msigma_nilpotent [Finite G]
     exact OddOrder.GroupTheory.le_normalizer_opiCoreInG_of_le_normalizer π hM_norm_Mσ
   exact (Subgroup.normal_subgroupOf_iff_le_normalizer hHM).mpr hM_norm_H
 
+/-- **A Hall `π`-subgroup of a finite nilpotent group is its `π`-core** (hence characteristic).
+General-`Γ` form of the core step inside `hall_subgroupOf_normal_of_msigma_nilpotent`: in a
+nilpotent group every `π`-subgroup lies in `O_π(Γ)` (`isPiGroup_le_of_normal_isHallSubgroup`,
+`O_π` being a normal Hall `π`-subgroup), and a Hall `π`-subgroup exhausts `O_π` by orders. -/
+theorem isHallSubgroup_eq_oPiCore_of_nilpotent {Γ : Type*} [Group Γ] [Finite Γ]
+    [Group.IsNilpotent Γ] {π : Set ℕ} {H : Subgroup Γ} (hHall : Ch03.IsHallSubgroup π H) :
+    H = Ch03.oPiCore π Γ := by
+  have hOHall : Ch03.IsHallSubgroup π (Ch03.oPiCore π Γ) :=
+    OddOrder.BG.Ch3.S10.oPiCore_isHall_of_isNilpotent π
+  have hOpi : Ch03.Subgroup.IsPiGroup π (Ch03.oPiCore π Γ) := Ch03.oPiCore.isPiGroup π
+  have hHpi : Ch03.Subgroup.IsPiGroup π H := fun p hp => hHall.1 p hp
+  haveI : (Ch03.oPiCore π Γ).Normal := inferInstance
+  have hHle : H ≤ Ch03.oPiCore π Γ :=
+    OddOrder.BG.Ch3.S10.isPiGroup_le_of_normal_isHallSubgroup hOHall hHpi
+  have hdvd : Nat.card ↥(Ch03.oPiCore π Γ) ∣ Nat.card ↥H := hHall.card_dvd_of_isPiGroup hOpi
+  exact Subgroup.eq_of_le_of_card_ge hHle (Nat.le_of_dvd Nat.card_pos hdvd)
+
+/-- **The image of a Hall `π`-subgroup under a quotient map is Hall `π` in the quotient.**
+`|H̄| ∣ |H|` keeps the `π`-group property; and `[Γ/N : H̄] = [Γ : HN]` divides `[Γ : H]`
+(as `H ≤ HN`), a `π'`-number. -/
+theorem isHallSubgroup_map_mk' {Γ : Type*} [Group Γ] [Finite Γ] {N : Subgroup Γ} [N.Normal]
+    {π : Set ℕ} {H : Subgroup Γ} (hHall : Ch03.IsHallSubgroup π H) :
+    Ch03.IsHallSubgroup π (H.map (QuotientGroup.mk' N)) := by
+  refine ⟨?_, ?_⟩
+  · -- `π`-group: `|H̄| ∣ |H|`.
+    intro p hp
+    have hdvd : Nat.card ↥(H.map (QuotientGroup.mk' N)) ∣ Nat.card ↥H :=
+      Subgroup.card_map_dvd _ _
+    rw [Nat.mem_primeFactors] at hp
+    exact hHall.1 p (Nat.mem_primeFactors.mpr ⟨hp.1, hp.2.1.trans hdvd, Nat.card_pos.ne'⟩)
+  · -- `π'`-index: `[Γ/N : H̄] = [Γ : NH] ∣ [Γ : H]`.
+    intro p hp
+    have hidx : (H.map (QuotientGroup.mk' N)).index = (N ⊔ H).index := by
+      rw [← QuotientGroup.comap_map_mk' N H,
+        Subgroup.index_comap_of_surjective _ (QuotientGroup.mk'_surjective N)]
+    have hdvd : (N ⊔ H).index ∣ H.index := Subgroup.index_dvd_of_le le_sup_right
+    rw [hidx, Nat.mem_primeFactors] at hp
+    exact hHall.2 p (Nat.mem_primeFactors.mpr
+      ⟨hp.1, hp.2.1.trans hdvd, Subgroup.index_ne_zero_of_finite⟩)
+
+/-- **`N ⊔ H` is characteristic when `Γ/N` is nilpotent** (`N` characteristic, `H` a Hall
+`π`-subgroup).  The image `H̄ = H.map (mk' N)` is the Hall `π`-subgroup of the nilpotent `Γ/N`,
+hence equals `O_π(Γ/N)` (characteristic, `isHallSubgroup_eq_oPiCore_of_nilpotent`), and
+`N ⊔ H = (mk' N)⁻¹(H̄)` is characteristic as the preimage of a characteristic subgroup under the
+quotient by the characteristic `N` (`Subgroup.Characteristic.comap_quotient_mk`).
+
+This is the BG Corollary 15.3 step "`QH ◁ M` because `M_σ/Q` is nilpotent" (mmd L4213), applied
+with `Γ = ↥M_σ`, `N = Q.subgroupOf M_σ` (`= O_q(M_σ)`, characteristic), `H = H.subgroupOf M_σ`. -/
+theorem characteristic_sup_hall_of_quotient_nilpotent {Γ : Type*} [Group Γ] [Finite Γ]
+    {N : Subgroup Γ} [N.Characteristic] (hNil : Group.IsNilpotent (Γ ⧸ N)) {π : Set ℕ}
+    {H : Subgroup Γ} (hHall : Ch03.IsHallSubgroup π H) : (N ⊔ H).Characteristic := by
+  haveI := hNil
+  have hHbar : Ch03.IsHallSubgroup π (H.map (QuotientGroup.mk' N)) := isHallSubgroup_map_mk' hHall
+  have hHbar_eq : H.map (QuotientGroup.mk' N) = Ch03.oPiCore π (Γ ⧸ N) :=
+    isHallSubgroup_eq_oPiCore_of_nilpotent hHbar
+  haveI hHbar_char : (H.map (QuotientGroup.mk' N)).Characteristic := by
+    rw [hHbar_eq]; exact Ch03.oPiCore.characteristic π (Γ ⧸ N)
+  rw [← QuotientGroup.comap_map_mk' N H]
+  exact Subgroup.Characteristic.comap_quotient_mk hHbar_char
+
 /-- **§14-independent assembly engine for BG Corollary 15.3** (mmd L4204).  Packages the
 *logic* of Corollary 15.3 with its `§14`/`§15` inputs taken as named hypotheses, so that once
 those land (Lane H), the wrapper `mf_hall_centralizer_control` discharges each by a single

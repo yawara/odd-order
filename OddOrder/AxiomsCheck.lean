@@ -4005,6 +4005,17 @@ set_option linter.style.longLine false in
 -- `M_σ` is normal in `M` (`H = O_{π(H)}(M_σ)`, characteristic).  Contrapositive: `H ⋬ M ⟹ M_σ` not
 -- nilpotent `⟹ M_F ≠ M_σ`, the `hfratt` entry.  Sorry-free + axiom-clean.
 #assert_only_allowed_axioms OddOrder.BG.Ch4.S15.hall_subgroupOf_normal_of_msigma_nilpotent
+-- BG Corollary 15.3(b) `QH ◁ M` core (`S15_MF`, issue 2025): three reusable nilpotent-quotient
+-- facts for the step "`QH ◁ M` because `M_σ/Q` is nilpotent" (mmd L4213).
+-- `isHallSubgroup_eq_oPiCore_of_nilpotent`: a Hall `π`-subgroup of a finite nilpotent group equals
+-- its characteristic `π`-core `O_π`.  `isHallSubgroup_map_mk'`: the image of a Hall subgroup under a
+-- quotient map is Hall in the quotient.  `characteristic_sup_hall_of_quotient_nilpotent`:
+-- `N` characteristic, `Γ/N` nilpotent, `H` Hall `π` ⟹ `N ⊔ H` characteristic (the preimage of
+-- `O_π(Γ/N)`).  Instantiated at `Γ = ↥M_σ`, `N = O_q(M_σ)` they make `QH` characteristic in `M_σ`,
+-- hence normal in `M`.  All sorry-free + axiom-clean.
+#assert_only_allowed_axioms OddOrder.BG.Ch4.S15.isHallSubgroup_eq_oPiCore_of_nilpotent
+#assert_only_allowed_axioms OddOrder.BG.Ch4.S15.isHallSubgroup_map_mk'
+#assert_only_allowed_axioms OddOrder.BG.Ch4.S15.characteristic_sup_hall_of_quotient_nilpotent
 -- BG Theorem A(8) `FittingIsTI` (`S15_MF`, issue 8016): `M_F ≠ M_σ ⟹ F(M)` is a `TI`-subgroup.
 -- Now **fully axiom-clean** — the last sorryAx (via `fitting_decomposition`'s cite of the sorried
 -- general Corollary 15.3) is eliminated by routing through `mf_centralizer_msigma_decomp`.
