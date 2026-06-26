@@ -5557,6 +5557,16 @@ coprimely.  Discharges the `hUle`/`hKnorm`/`hDcompl`/`U ≠ ⊥` `TypePData` fie
 
 #assert_only_allowed_axioms OddOrder.BG.Ch4.S16.exists_typeP1_mf_complement
 
+/-! **Type-`P₁` (`M_F ≠ M_σ`) `TypePNontrivialCore`** (`S16_MainResults`,
+`typePData_nontrivialCore_of_isTypeP1_mf_ne_msigma`): the common type II--IV hypotheses
+(`U ≠ ⊥`, `|W₁|` prime, `M_F#` `TI`) of a type-`P₁` (`M_F ≠ M_σ`) `TypePData` with `U ≠ ⊥`.
+`|W₁| = [M:M'] = |K| = p` prime from Theorem A(8) (`theoremA8_structure`); `M_F#`-`TI` from the
+`FittingIsTI M` clause (`fitting_isTI_of_mf_ne_msigma`).  Discharges the `hcommon` input of the type
+III/IV last mile `isTypeIII_or_IV_of_typePData`.  Axiom-clean. -/
+
+#assert_only_allowed_axioms
+  OddOrder.BG.Ch4.S16.typePData_nontrivialCore_of_isTypeP1_mf_ne_msigma
+
 /-! **`hP2II` reduced to the `M'`-type-`F` residual** (`S16_MainResults`,
 `isTypeII_of_isTypeP2_of_derived_typeF`, issue 7007): a type-`P₂` maximal subgroup whose derived
 subgroup `M'` is type `F` (with `F(M') = M_F`) is type II.  Discharges every `isTypeII_of_typePData`

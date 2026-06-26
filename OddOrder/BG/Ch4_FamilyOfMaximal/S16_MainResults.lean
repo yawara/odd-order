@@ -2625,6 +2625,48 @@ theorem theoremA8_structure [Finite G]
     theoremA8_complement_eq_bot_and_kappa_prime hG hM hKM hK hKstar hU hne
   exact ⟨hUbot, S15.fitting_isTI_of_mf_ne_msigma hG hM hne, hKp⟩
 
+/-- **Type-`P₁` (`M_F ≠ M_σ`) `TypePNontrivialCore`** (the common type II--IV hypotheses of Peterfalvi
+(8.6), for the type III/IV case): a `TypePData` of a type-`P₁` maximal subgroup with `M_F ≠ M_σ` and
+nontrivial complement `U` satisfies `U ≠ ⊥`, `|W₁|` prime, and `M_F#` is a `TI`-subset.
+
+The `|W₁|` primality is Theorem A(8) (`theoremA8_structure`: `M_F ≠ M_σ ⟹ |K| = p` prime, with
+`|W₁| = |K| = [M:M']`); the `M_F#`-`TI` is the `FittingIsTI M` clause of A(8)
+(`fitting_isTI_of_mf_ne_msigma`) read through `maxNilpotentNormalHall_sharp_isTISubset_of_fittingIsTI`.
+Discharges the `hcommon` input of the type III/IV last mile `isTypeIII_or_IV_of_typePData`, so once
+the type-`P₁` `TypePData` is constructed (`exists_typeP1_mf_complement` plus the deep
+nilpotency/Fitting fields) and `N_G(U) ⊆ M` is supplied, the `hP1neIIIIV` bridge closes. -/
+theorem typePData_nontrivialCore_of_isTypeP1_mf_ne_msigma [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} (hM : M ∈ maximalSubgroups G)
+    (hP1 : S14.IsTypeP1 M) (hne : S15.MF M ≠ OddOrder.BG.Ch3.S10.Msigma M)
+    (data : TypePData M) (hUne : data.U ≠ ⊥) :
+    TypePNontrivialCore M data := by
+  classical
+  haveI : IsSolvable ↥M := hG.solvable_of_mem_maximalSubgroups hM
+  refine ⟨hUne, ?_, ?_⟩
+  · -- `|W₁| = [M:M'] = |K| = p` prime (Theorem A(8)).
+    obtain ⟨K', hK'⟩ := Ch03.hall_E_exists (G := ↥M) (S14.kappa M)
+    set K : Subgroup G := K'.map M.subtype with hKdef
+    have hKM : K ≤ M := Subgroup.map_subtype_le K'
+    have hKeq : K.subgroupOf M = K' :=
+      Subgroup.comap_map_eq_self_of_injective M.subtype_injective K'
+    have hK : Ch03.IsHallSubgroup (S14.kappa M) (K.subgroupOf M) := by rw [hKeq]; exact hK'
+    -- The trivial `(κ ∪ σ)'`-Hall `U = ⊥` (type `P₁`: `π(M) ⊆ κ ∪ σ`).
+    have hU : Ch03.IsHallSubgroup ((S14.kappa M ∪ OddOrder.BG.Ch3.S10.sigma M)ᶜ)
+        ((⊥ : Subgroup G).subgroupOf M) := by
+      rw [Subgroup.bot_subgroupOf, Ch03.IsHallSubgroup.bot_iff]
+      intro p hp
+      simp only [Set.mem_compl_iff, not_not]
+      by_cases hpσ : p ∈ OddOrder.BG.Ch3.S10.sigma M
+      · exact Set.mem_union_right _ hpσ
+      · exact Set.mem_union_left _ (hP1.2 ▸ ⟨hp, hpσ⟩)
+    haveI : IsCyclic ↥K := (typeP_auxiliary_structure hG hM hKM bot_le hK rfl hU).2.1
+    obtain ⟨_, _, p, hp, hKp⟩ := theoremA8_structure hG hM hKM hK rfl hU hne
+    rw [data.card_W1_eq_derived_index, ← card_kappaHall_eq_derived_index hG hM hP1.1 hKM hK, hKp]
+    exact hp
+  · -- `M_F#` is `TI` (`FittingIsTI M` from `M_F ≠ M_σ`).
+    exact maxNilpotentNormalHall_sharp_isTISubset_of_fittingIsTI hG hM
+      (S15.fitting_isTI_of_mf_ne_msigma hG hM hne)
+
 /-- **BG Theorem A(7), first clause — `M'' ⊆ F(M)`** (mmd L4354), as a standalone `sorry`-free
 lemma for *any* maximal `M`.  No longer `M_F ≠ M_σ`-gated: Theorem 15.2's closing (issue 8012)
 supplies the type-`P₁` half, so a case split on `M_F = M_σ` discharges both branches.
