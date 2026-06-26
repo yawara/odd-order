@@ -6080,3 +6080,13 @@ formula together with the prime computation `coprimeFrobeniusAction_card_eq_prim
 -- which is itself char-gated, so not registered here).
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.S05.TICyclicHypothesis.ncard_sigmaCoeff_ne_zero_le_of_inner_self_natCast
+
+-- **W4 §16→§7 bridge (lane-h, βM (14.11.2) de-opacification)** — `betaMExpansionData_of_hypothesis78`
+-- certifies that the (7.8.a) field of `BetaMExpansionData` (`β_M = 1_G − χ + Δ`) is a genuine
+-- consequence of the S09 §7 Dade decomposition
+-- `S09.Hypothesis78.beta_eq_constOne_sub_zetaImage_add_delta` (`β = 1_G − ζ^ν + Δ`), given `M`
+-- instantiating `S09.Hypothesis78` with `β_M = β` and `ψ^{τ₁} = ζ^ν` (the `χ = ζ^ν` branch, so
+-- `chi_norm` is `rfl`).  Reduces the faithful `betaM_expansion_data` obligation to the §3/§4 Dade
+-- construction + the (13.1.d)/(3.9) η-grid identification.  Axiom-clean (pure `rw` from the S09
+-- (7.8.a) cite).
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S16.betaMExpansionData_of_hypothesis78

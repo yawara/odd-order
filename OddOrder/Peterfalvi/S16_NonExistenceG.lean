@@ -1864,17 +1864,93 @@ theorem all_pm_one_and_card_of_odd_sq_sum_le {ι : Type*} [Fintype ι]
   · left; linarith
   · right; linarith
 
+/-- **Faithful §7/§3 Dade carrier for the `β_M` expansion of Peterfalvi (14.11.2).**
+
+This is the `M`-instance of the (7.8) Dade-coherence decomposition specialised to the `η`-grid,
+isolating the genuine character-theoretic content of (14.11.2) away from the pure algebra:
+
+* `betaM_seven_eight` — **Peterfalvi (7.8.a)** for `M`: `β_M^τ = 1_G − χ + Δ`, the Dade-isometry
+  image of `β_M = Ind_K^M 1_K − ψ` decomposed against the principal character `1_G` and the removed
+  unit-norm coherent image `χ` (`= ψ^{τ₁}` or `−ψ̄^{τ₁}`, recorded only through the
+  branch-independent `chi_norm`).  In the `χ = ψ^{τ₁} = ζ^ν` branch this is exactly the `M`-instance
+  of `S09.Hypothesis78.beta_eq_constOne_sub_zetaImage_add_delta` (`β = 1_G − ζ^ν + Δ`); see the
+  bridge lemma `betaMExpansionData_of_hypothesis78` below.
+* `grid_eq` — **Peterfalvi (13.1.d)/(7.8.b)** `η`-grid identification: `1_G + Δ = Σ_{ij} ε_ij η_ij`.
+  The principal `η₀₀` carries the `1_G`, the off-principal grid realizes the residual `Δ`, and the
+  `±1` signs come from the Dade congruence `a_ij ≡ 1 (mod 2)` (13.19.c / 7.8.c) with
+  `Σ a_ij² ≤ e − 1` and `e = p q` (`all_pm_one_and_card_of_odd_sq_sum_le`).
+
+All fields are genuine facts about the type-I maximal subgroup `M` (its Dade isometry and coherent
+extension exist by the §3/§4/§5 machinery); their concrete construction is the remaining §3/§4
+Dade-isometry obligation.  Cf. `EtaGenericData` for the dual generic-set carrier. -/
+structure BetaMExpansionData (hyp : Hypothesis (G := G)) (Mdata : MHypothesis hyp) where
+  /-- The residual `Δ` of the (7.8.a) Dade expansion `β_M = 1_G − χ + Δ`. -/
+  delta : ClassFunction G ℂ
+  /-- The removed unit-norm character `χ` (`= ψ^{τ₁}` or `−ψ̄^{τ₁}`). -/
+  chi : ClassFunction G ℂ
+  /-- `χ` has the same pointwise absolute value as `ψ^{τ₁}` (holds for both branches, since
+  `|z| = |z̄|`) — exactly what (14.11.3) consumes. -/
+  chi_norm : ∀ g : G, ‖chi g‖ = ‖(Mdata.tau1 Mdata.psi) g‖
+  /-- **Peterfalvi (7.8.a)** for `M`: `β_M^τ = 1_G − χ + Δ`. -/
+  betaM_seven_eight :
+    Mdata.betaM = OddOrder.Peterfalvi.S09.Hypothesis71.constOne G - chi + delta
+  /-- The `±1` signs of the `η`-grid expansion. -/
+  signs : Fin hyp.base.q → Fin hyp.base.p → ℤ
+  signs_pm_one : ∀ i j, signs i j = 1 ∨ signs i j = -1
+  /-- **Peterfalvi (13.1.d)/(7.8.b)** `η`-grid identification: `1_G + Δ = Σ_{ij} ε_ij η_ij`. -/
+  grid_eq :
+    OddOrder.Peterfalvi.S09.Hypothesis71.constOne G + delta =
+      ∑ i : Fin hyp.base.q, ∑ j : Fin hyp.base.p, (signs i j : ℂ) • hyp.base.eta i j
+
+/-- **Faithful §3/§7 Dade producer for (14.11.2).**  Under `K ≠ V`, the type-I maximal subgroup `M`
+carries the (7.8) Dade-coherence decomposition `BetaMExpansionData` of `β_M^τ` against the `η`-grid.
+The construction is the §3/§4 Dade-isometry layer (the abstract §16 `τ`/`τ₁`/`betaM` carriers do not
+yet pin it); see the bridge lemma `betaMExpansionData_of_hypothesis78`, which reduces this to a
+concrete `S09.Hypothesis78` for `M` plus the `η`-grid identification (3.9)/(13.1.d). -/
+noncomputable def betaM_expansion_data [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hyp : Hypothesis (G := G)) (Mdata : MHypothesis hyp) (hne : Mdata.K ≠ hyp.base.V) :
+    BetaMExpansionData hyp Mdata := sorry
+
+/-- **§16 → §7 bridge for the `β_M` (7.8.a) decomposition.**  Given a concrete `S09.Hypothesis78`
+for `M` whose Dade image `β` and coherent image `ζ^ν` are identified with the abstract §16 carriers
+`β_M` and `ψ^{τ₁}`, the (7.8.a) field of `BetaMExpansionData` is exactly the `M`-instance of
+`S09.Hypothesis78.beta_eq_constOne_sub_zetaImage_add_delta` (`β = 1_G − ζ^ν + Δ`).
+
+This reduces the `betaM_expansion_data` obligation to (i) `M` instantiating `S09.Hypothesis78` with
+`β_M = β` and `ψ^{τ₁} = ζ^ν`, and (ii) the `η`-grid identification `1_G + Δ = Σ ε_ij η_ij`
+(3.9)/(13.1.d) — the genuine §3/§4 Dade content — and certifies that the (7.8.a) rearrangement is a
+real S09 consequence, not an independent assumption.  The `χ = ζ^ν = ψ^{τ₁}` branch; `chi_norm` is
+then `rfl`.  Axiom-clean. -/
+noncomputable def betaMExpansionData_of_hypothesis78 [Finite G]
+    (hyp : Hypothesis (G := G)) (Mdata : MHypothesis hyp)
+    {A : Set G} [Fintype G] [Fintype ↥Mdata.M]
+    [Invertible (Nat.card ↥Mdata.M : ℂ)] [Invertible (Nat.card G : ℂ)]
+    (H78 : OddOrder.Peterfalvi.S09.Hypothesis78 G A Mdata.M)
+    (hbeta : Mdata.betaM = H78.beta)
+    (hchi : Mdata.tau1 Mdata.psi = H78.nu (H78.hyp76.zeta H78.zetaDistinct))
+    (signs : Fin hyp.base.q → Fin hyp.base.p → ℤ)
+    (hsigns : ∀ i j, signs i j = 1 ∨ signs i j = -1)
+    (hgrid : OddOrder.Peterfalvi.S09.Hypothesis71.constOne G + H78.delta =
+      ∑ i : Fin hyp.base.q, ∑ j : Fin hyp.base.p, (signs i j : ℂ) • hyp.base.eta i j) :
+    BetaMExpansionData hyp Mdata where
+  delta := H78.delta
+  chi := Mdata.tau1 Mdata.psi
+  chi_norm := fun _ => rfl
+  betaM_seven_eight := by
+    rw [hbeta, H78.beta_eq_constOne_sub_zetaImage_add_delta, hchi]
+  signs := signs
+  signs_pm_one := hsigns
+  grid_eq := hgrid
+
 /-- **Peterfalvi (14.11.2)**: under `K ≠ V`, `e = p q` and `β_M^τ` is a signed sum of the
 `η_ij` grid with one unit-norm character `χ` removed:
 `β_M^τ = Σ_{0≤i<q, 0≤j<p} (±η_ij) − χ`, where `χ = ψ^{τ₁}` or `−ψ̄^{τ₁}`.
 
-De-opacified (lane-c §16 char-endpoint): the former opaque carrier field
-`betaM_expansion_formula : Prop` is dropped and the conclusion is stated concretely.  The signs
-are an explicit `ε : Fin q → Fin p → ℤ` with values `±1`; `χ` is recorded by the
-downstream-relevant, branch-independent property `∀ g, ‖χ g‖ = ‖ψ^{τ₁} g‖` (which holds whether
-`χ = ψ^{τ₁}` or `χ = −ψ̄^{τ₁}`, since `|z| = |z̄|`) — exactly the input (14.11.3) consumes.
-Proof (Pf p.88-89, sorried): the Dade-isometry inner-product parities `a_ij ≡ 1 (mod 2)`
-(13.19.c / 7.8 / 3.7) with `Σ a_ij² ≤ e − 1` and `e ≤ pq` force `e = pq`, `a_ij = ±1`. -/
+De-opacified (W4 §16→§7 bridge, lane-h): the `e = p q` half is the structural field
+`MHypothesis.complement_card_eq_pq` (Pf (14.11)), and the `η`-grid expansion is the pure-algebra
+rearrangement of the faithful `BetaMExpansionData` (7.8.a) decomposition `β_M = 1_G − χ + Δ`
+together with the `η`-grid identification `1_G + Δ = Σ ε_ij η_ij`.  The genuine character theory
+(the (7.8) Dade decomposition for `M`) is confined to `betaM_expansion_data`. -/
 theorem betaM_expansion [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
     (hyp : Hypothesis (G := G)) (Mdata : MHypothesis hyp)
     (hne : Mdata.K ≠ hyp.base.V) :
@@ -1886,7 +1962,12 @@ theorem betaM_expansion [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
           Mdata.betaM =
             (∑ i : Fin hyp.base.q, ∑ j : Fin hyp.base.p,
               (ε i j : ℂ) • hyp.base.eta i j) - χ := by
-  sorry
+  refine ⟨Mdata.complement_card_eq_pq, ?_⟩
+  obtain ⟨delta, chi, hchi_norm, hbeta, signs, hsigns, hgrid⟩ :=
+    betaM_expansion_data _hG hyp Mdata hne
+  refine ⟨signs, hsigns, chi, hchi_norm, ?_⟩
+  rw [hbeta, ← hgrid]
+  abel
 
 /-- **Parity core of Peterfalvi (3.9)/(14.11.3)**: a `±1`-signed sum of an integer-valued grid
 that pairs under a conjugation involution has complex norm `≥ 1`.
