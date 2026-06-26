@@ -41,9 +41,17 @@ wrapper `mf_hall_centralizer_control` (S15:2483, sorry) は 3 input を discharg
 ## やること
 
 - [ ] `ha` 一般 Hall H 版: `C_M(H)` κ'-群 lemma (新規) → SZ 分解 (H=M_σ template `mf_centralizer_msigma_decomp` を一般化)。
-- [ ] `hconj`: Theorem 14.4 (conjugacy realized in M) を citeable に + `normalizer_eq_self` で wire。
+- [x] **`hconj`: 完了 (2026-06-26)** — `mf_hall_conj_realized_in_M` (S14_TypePCounting, sorry-free + axiom-clean)。
+      Theorem 14.4 = `sigmaLength_one_centralizer_structure` (proven) は sharp transitivity を持つが
+      conjugator の C_G(x) 所属を捨てていた → 新 helper `exists_conj_centralizer_of_mem_maximalSigma`
+      で C_G(x)-witness を保持 → `normalizer_eq_self_of_mem_maximalSubgroups` で `cg⁻¹∈M` を導出。
+      D は param 化 (caller が `dummySigmaDecomposition G` 等を供給)。
 - [ ] `hfratt`: Theorem 15.2 O_q + Frattini argument。
 - [ ] 3 input を `mf_hall_centralizer_control_of_inputs` に wire → wrapper sorry-free 化。
+- [ ] ⚠ **wrapper signature gap**: `mf_hall_centralizer_control` (S15:2483) は `H ≤ M_σ` を欠く
+      (`hH : IsHallSubgroup (piSet H) (H.subgroupOf M_σ)` からは導出不可)。hconj/ha は `H ≤ M_σ` 要 →
+      wrapper に `hHMσ : H ≤ Msigma M` を追加要 (consumer S16:2890 [lane-f hot] + S15:2795 [lane-c] の
+      call site に 1 引数追加; S16 編集 = lane-f 調整要)。
 
 ## 完了条件
 
