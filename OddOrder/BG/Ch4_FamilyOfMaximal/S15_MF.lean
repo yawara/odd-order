@@ -2404,6 +2404,49 @@ theorem frattini_factorization [Finite G] {M Q H : Subgroup G}
   apply mem_normalizer_of_conj_smul_eq_self
   rw [map_mul, mul_smul, hlift, ← mul_smul, ← map_mul, mul_inv_cancel, map_one, one_smul]
 
+/-- **A Hall subgroup of a nilpotent `M_σ` is normal in `M`** (BG Corollary 15.3(b) entry, mmd
+L4213 "Then `M_σ` is not nilpotent").  If `M_σ = O_σ(M)` is nilpotent and `H` is a Hall subgroup of
+`M_σ`, then `H = O_{π(H)}(M_σ)` (the `π`-core of the nilpotent `M_σ`, hence characteristic), so the
+`M`-normalizer of `M_σ` normalizes `H`; thus `H ⊴ M`.
+
+Contrapositive: if `H ⋬ M` (the case `hfratt` handles), then `M_σ` is **not** nilpotent, i.e.
+`M_F ≠ M_σ`, which lets Theorem 15.2 supply the normal `q`-subgroup `Q`. -/
+theorem hall_subgroupOf_normal_of_msigma_nilpotent [Finite G]
+    {M H : Subgroup G} (hHMσ : H ≤ OddOrder.BG.Ch3.S10.Msigma M)
+    (hHhall : Ch03.IsHallSubgroup (S14.piSet H) (H.subgroupOf (OddOrder.BG.Ch3.S10.Msigma M)))
+    (hnil : Group.IsNilpotent ↥(OddOrder.BG.Ch3.S10.Msigma M)) :
+    (H.subgroupOf M).Normal := by
+  classical
+  set Mσ : Subgroup G := OddOrder.BG.Ch3.S10.Msigma M with hMσdef
+  set π : Set ℕ := S14.piSet H with hπdef
+  have hHM : H ≤ M := hHMσ.trans (OddOrder.BG.Ch3.S10.Msigma_le M)
+  -- `H ≤ O_π(M_σ)` (a `π`-subgroup of the nilpotent `M_σ`).
+  have hH_le_Oπ : H ≤ OddOrder.GroupTheory.opiCoreInG π Mσ :=
+    OddOrder.BG.Ch3.S12.piGroup_le_opiCoreInG_of_nilpotent (fun r hr => hr) hHMσ
+  -- `O_π(M_σ)` is a `π`-group, and `H` is Hall `π` in `M_σ`, so `|O_π| ∣ |H|`; with `H ≤ O_π`,
+  -- `H = O_π(M_σ)`.
+  have hOπMσ : OddOrder.GroupTheory.opiCoreInG π Mσ ≤ Mσ := OddOrder.GroupTheory.opiCoreInG_le _ _
+  have hOπ_pi_Mσ : Ch03.Subgroup.IsPiGroup π
+      ((OddOrder.GroupTheory.opiCoreInG π Mσ).subgroupOf Mσ) := by
+    intro r hr
+    rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hOπMσ).toEquiv] at hr
+    exact OddOrder.GroupTheory.isPiSubgroup_opiCoreInG π Mσ r hr
+  have hcard_dvd : Nat.card ↥((OddOrder.GroupTheory.opiCoreInG π Mσ).subgroupOf Mσ)
+      ∣ Nat.card ↥(H.subgroupOf Mσ) := hHhall.card_dvd_of_isPiGroup hOπ_pi_Mσ
+  have hcard_dvd' : Nat.card ↥(OddOrder.GroupTheory.opiCoreInG π Mσ) ∣ Nat.card ↥H := by
+    rwa [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hOπMσ).toEquiv,
+      Nat.card_congr (Subgroup.subgroupOfEquivOfLe hHMσ).toEquiv] at hcard_dvd
+  have hHeq : H = OddOrder.GroupTheory.opiCoreInG π Mσ :=
+    Subgroup.eq_of_le_of_card_ge hH_le_Oπ (Nat.le_of_dvd Nat.card_pos hcard_dvd')
+  -- `M ≤ N_G(M_σ) ⟹ M ≤ N_G(O_π(M_σ)) = N_G(H)`, hence `H.subgroupOf M ⊴ M`.
+  have hM_norm_Mσ : M ≤ Subgroup.normalizer (Mσ : Set G) := by
+    rw [hMσdef, OddOrder.BG.Ch3.S10.Msigma]
+    exact OddOrder.GroupTheory.le_normalizer_opiCoreInG (OddOrder.BG.Ch3.S10.sigma M) M
+  have hM_norm_H : M ≤ Subgroup.normalizer (H : Set G) := by
+    rw [hHeq]
+    exact OddOrder.GroupTheory.le_normalizer_opiCoreInG_of_le_normalizer π hM_norm_Mσ
+  exact (Subgroup.normal_subgroupOf_iff_le_normalizer hHM).mpr hM_norm_H
+
 /-- **§14-independent assembly engine for BG Corollary 15.3** (mmd L4204).  Packages the
 *logic* of Corollary 15.3 with its `§14`/`§15` inputs taken as named hypotheses, so that once
 those land (Lane H), the wrapper `mf_hall_centralizer_control` discharges each by a single

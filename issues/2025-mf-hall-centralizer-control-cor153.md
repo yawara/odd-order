@@ -78,11 +78,27 @@ wrapper `mf_hall_centralizer_control` (S15:2483, sorry) は 3 input を discharg
       - `kstar_le_fittingInAmbient_of_inputs` (S15:1893) + `kstar_le_opiCore_of_le_fittingInAmbient`
         (S15:1930): K*⊆F(M_σ)⊆O_q(M)=Q を of_inputs で供給 (Theorem 3.8 `S03h_Thm38` + Lemma 6.3a
         `S06_Additional` 既存)。
-      残 = **assembly** (deep gate でなく多段組み立て、~1 session): (1) `H⋬M ⟹ M_σ 非冪零` (M_σ 冪零なら
-      Hall H char ⟹ H⊴M の対偶) → `M_F≠M_σ` (`maxNilpotentNormalHall_eq_Msigma_iff_isNilpotent` S15:231);
-      (2) M 型-P₁ の input (hcompl=M=KM_σ, hcond2=prime action, hq=|K*| prime) を discharge し Q=O_q(M) を
-      4 property 付きで構成; (3) M_σ/Q nilpotent + Q⊴M + H Hall ⟹ QH⊴M ⟹ Q∩H=1 ⟹ Frattini。
-      型-P₁ input は Theorem 15.2 が M_F≠M_σ から導く (型決定は順序型でなく density、lane 非依存)。
+      残 = **assembly** (deep gate でなく多段組み立て、~1 session):
+      - **✅ step 1 完了 (2026-06-26, commit `7c199a70`)**: `hall_subgroupOf_normal_of_msigma_nilpotent`
+        (S15_MF, sorry-free + axiom-clean) = M_σ 冪零で H Hall なら H=O_{π(H)}(M_σ) char ⟹ H⊴M。
+        対偶で `H⋬M ⟹ M_σ 非冪零 ⟹ M_F≠M_σ` (`isTypeP1_of_mf_ne_msigma` S15:2098 sorry-free が型-P₁ を供給)。
+      - **step 2 (Q 構成) = 既存で済む**: `mf_ne_msigma_typeP1_structure` (S15:6595, sorry-free) が M_F≠M_σ +
+        Hall κ K から Q=O_q(M) を全 property (Q≤M_σ, M≤N(Q), K*≤Q, D nilpotent complement of Q in M_σ)
+        付きで供給。⟹ M_σ/Q nilpotent は D-complement (M_σ/Q≅D) または `msigma_quotient_isNilpotent_of_inputs`。
+        K (Hall κ) は `exists_isHallSubgroup_kappa_ge` 等で取得。
+      - **step 3 (QH⊴M) = 残る核 (~50-70 行, novel)**。**鍵の発見 (2026-06-26)**: **Q = M_σ の normal
+        Sylow_q ⟹ Q char in M_σ** (Thm 15.2(c): Q=normal Sylow_q(M), q∈σ ⟹ |Q|=q-part of |M_σ| ⟹
+        Q=Sylow_q(M_σ); `Sylow.characteristic_of_normal`)。⟹ QH⊴M の 2 経路:
+        (A) **推奨経路 (全 lemma 確定済)**: Q char in M_σ = `Q=O_q(M_σ)=opiCoreInG{q}M_σ` ゆえ
+            `oPiCore.characteristic` (Q⊴M_σ q-群⊆O_q(M_σ); O_q(M_σ) char⊴M⊆O_q(M)=Q で Q=O_q(M_σ))。
+            QH.subgroupOf M_σ = `(oPiCore π̄ (M_σ/Q)).comap(mk')` (image=O_π を card 論法、π=π(H));
+            `oPiCore.characteristic` + `Subgroup.Characteristic.comap_quotient_mk` (mathlib QuotientGroup/
+            Basic:395、kernel char + K char ⟹ comap char) ⟹ QH.subgroupOf M_σ char in M_σ;
+            `normal_of_characteristic_subgroupOf` (S04d:116) + M_σ⊴M ⟹ QH⊴M。残 card 論法 = image=O_π のみ;
+        (B) `normal_sup_sylow_of_quotient_nilpotent` (S10_BetaRadical:458, Sylow 版 template) を Hall 化
+            (証明同型、Sylow→Hall=O_π) → QH⊴M_σ → Q char で ⊴M lift。
+      - **step 4**: q∉π(H) (q∈π(H) なら Q≤Syl_q(M_σ)≤H, QH=H⊴M で H⋬M に矛盾) ⟹ Q∩H=1 + coprime。
+      - **step 5**: `frattini_factorization` で M=N_M(H)Q。
 - [ ] 3 input を `mf_hall_centralizer_control_of_inputs` に wire → wrapper sorry-free 化。
 - [ ] ⚠ **wrapper signature gap**: `mf_hall_centralizer_control` (S15:2483) は `H ≤ M_σ` を欠く
       (`hH : IsHallSubgroup (piSet H) (H.subgroupOf M_σ)` からは導出不可)。hconj/ha は `H ≤ M_σ` 要 →
