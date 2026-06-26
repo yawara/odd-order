@@ -6,6 +6,7 @@ Authors: Yawara Ishida
 import OddOrder.Peterfalvi.S11_MaximalII_III_IV
 import OddOrder.Peterfalvi.S05_OmegaSigmaGrid
 import OddOrder.Peterfalvi.S05_SigmaTrichotomy
+import OddOrder.Peterfalvi.S08_CaseBEndgame
 import Mathlib.GroupTheory.IsPerfect
 
 /-!
@@ -5485,14 +5486,105 @@ non-coherence arithmetic `typeII_noncoherence_arithmetic`).
 Peterfalvi's "By (8.4.d), `(M'/M'')⋊W₁` is a Frobenius group of odd order; it follows that
 `|M':M''| ≥ 2w₁+1`": the cyclic Hall complement `W₁` acts on the abelian section `M'/M''`
 fixed-point-freely (its fixed points on `M'` are `C_{M'}(x) = W₂` by `TypePData.centralizer_W1`, and
-`W₂ ⊆ M''` by `TypePData.W2_le`), so `w₁ ∣ |M':M''| − 1` (`W1_dvd_index_of_fixedPoints_le`); with all
-orders odd and `M'' < M'` this forces `|M':M''| ≥ 2w₁+1` (`two_mul_add_one_le_of_odd_dvd`).  Then
-`|M'| = |M''|·|M':M''| ≥ w₂·(2w₁+1)` since `w₂ = |W₂| ≤ |M''|`.  Pure group theory; left as a named
-obligation (the `W₁`-on-`M'/M''` conjugation-action transport is the remaining work). -/
+`W₂ ⊆ M''` by `TypePData.W2_le`), so `w₁ ∣ |M':M''| − 1` (`S08.caseB_W1_dvd_index_of_centralizer_le`,
+the `W₁`-conjugation action on `H = M'.subgroupOf M` with `M'' = ⁅H,H⁆`); with all orders odd and
+`M'' < M'` (`M'` solvable nontrivial, `IsSolvable.commutator_lt_top_of_nontrivial`) this forces
+`|M':M''| ≥ 2w₁+1` (`S08.two_mul_add_one_le_of_odd_dvd`).  Then `|M'| = |M''|·|M':M''| ≥ w₂·(2w₁+1)`
+(`Subgroup.index_mul_card`) since `w₂ = |W₂| ≤ |M''|` (`W₂ ⊆ M''`).  Genuine group theory, **proven**
+(sorryAx only via the upstream `typePData_W1_hall_coprime`, the shared §10 type-P coprimality). -/
 theorem Hypothesis.card_derived_ge [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} (hyp : Hypothesis M) :
     (2 * hyp.w1 + 1) * hyp.w2 ≤ Nat.card ↥(derivedInG M) := by
-  sorry
+  haveI := hyp.finiteG
+  classical
+  have hM'le : derivedInG M ≤ M := Subgroup.map_subtype_le _
+  -- `derivedInG K = ⁅K, K⁆` (the commutator of `K` with itself in `G`).
+  have hderiv : ∀ K : Subgroup G, derivedInG K = ⁅K, K⁆ := fun K => by
+    rw [derivedInG, commutator_def, Subgroup.map_commutator, ← MonoidHom.range_eq_map,
+      Subgroup.range_subtype]
+  -- `H = M'` realised inside `↥M`; normal, `H.map subtype = M'`, `⁅H,H⁆.map subtype = M''`.
+  set H : Subgroup ↥M := (derivedInG M).subgroupOf M with hHdef
+  have hKcomm : H = _root_.commutator ↥M := by
+    rw [hHdef, derivedInG, Subgroup.subgroupOf,
+      Subgroup.comap_map_eq_self_of_injective M.subtype_injective]
+  haveI hHnorm : H.Normal := by rw [hKcomm]; infer_instance
+  have hHmap : H.map M.subtype = derivedInG M := by
+    rw [hHdef, Subgroup.subgroupOf_map_subtype, inf_eq_left.mpr hM'le]
+  have hmapcomm : (⁅H, H⁆ : Subgroup ↥M).map M.subtype = secondDerivedInAmbient M := by
+    rw [Subgroup.map_commutator, hHmap, ← hderiv]; rfl
+  have hW2leM' : hyp.typeP.W2 ≤ derivedInG M :=
+    (hyp.typeP.W2_le.trans inf_le_right).trans (Subgroup.map_subtype_le _)
+  -- `↥H` is solvable and nontrivial, so `M'' = ⁅H,H⁆ < H` and the index is `> 1`.
+  haveI : IsSolvable ↥M := hG.solvable_of_mem_maximalSubgroups hyp.maximal
+  haveI hHsolv : IsSolvable ↥H :=
+    solvable_of_solvable_injective (f := H.subtype) (Subgroup.subtype_injective H)
+  haveI hHnt : Nontrivial ↥H := by
+    have h1 : 1 < Nat.card ↥H := by
+      rw [hHdef, Nat.card_congr (Subgroup.subgroupOfEquivOfLe hM'le).toEquiv]
+      calc 1 < Nat.card ↥hyp.typeP.W2 :=
+            (Subgroup.one_lt_card_iff_ne_bot _).mpr hyp.typeP.W2_nontrivial
+        _ ≤ Nat.card ↥(derivedInG M) := Subgroup.card_le_of_le hW2leM'
+    exact Finite.one_lt_card_iff_nontrivial.mp h1
+  -- the FPF divisibility `w₁ ∣ |H : ⁅H,H⁆| − 1`.
+  have hcardW1 : Nat.card ↥(hyp.W1.subgroupOf M) = hyp.w1 :=
+    Nat.card_congr (Subgroup.subgroupOfEquivOfLe hyp.typeP.W1_le).toEquiv
+  have hcop : Nat.Coprime (Nat.card ↥(hyp.W1.subgroupOf M)) (Nat.card ↥H) := by
+    rw [hcardW1, hHdef, Nat.card_congr (Subgroup.subgroupOfEquivOfLe hM'le).toEquiv]
+    exact (typePData_W1_hall_coprime hG hyp.maximal (hyp.bgTypeP hG) hyp.typeP).symm
+  have hdvd : Nat.card ↥(hyp.W1.subgroupOf M) ∣ (_root_.commutator ↥H).index - 1 := by
+    refine OddOrder.Peterfalvi.S08.caseB_W1_dvd_index_of_centralizer_le (hyp.W1.subgroupOf M) hcop
+      (_root_.commutator ↥H) ?_
+    intro a ha x hcomm
+    have haW1 : ((↑(↑a : ↥M) : G)) ∈ hyp.W1 := Subgroup.mem_subgroupOf.mp a.2
+    have hane : ((↑(↑a : ↥M) : G)) ≠ 1 := fun h => ha (Subtype.ext (Subtype.ext h))
+    have hxM' : ((↑(↑x : ↥M) : G)) ∈ derivedInG M :=
+      Subgroup.mem_subgroupOf.mp (hHdef ▸ x.2)
+    have hcommG : ((↑(↑x : ↥M) : G)) * ((↑(↑a : ↥M) : G))
+        = ((↑(↑a : ↥M) : G)) * ((↑(↑x : ↥M) : G)) := by
+      simpa using (congrArg (fun t : ↥M => (↑t : G)) hcomm).symm
+    have hxW2 : ((↑(↑x : ↥M) : G)) ∈ hyp.typeP.W2 := by
+      rw [← hyp.typeP.centralizer_W1 _ haW1 hane]
+      exact Subgroup.mem_inf.mpr ⟨hxM', Subgroup.mem_centralizer_singleton_iff.mpr hcommG⟩
+    have key : (↑x : ↥M) ∈ (⁅H, H⁆ : Subgroup ↥M) := by
+      refine (Subgroup.mem_map_iff_mem M.subtype_injective).mp ?_
+      rw [hmapcomm]
+      exact (hyp.typeP.W2_le.trans inf_le_right) hxW2
+    exact OddOrder.Peterfalvi.S08.commutator_subgroupOf_self H ▸ Subgroup.mem_subgroupOf.mpr key
+  -- `|H : ⁅H,H⁆| ≥ 2w₁ + 1` (odd Frobenius bound).
+  have hidxgt : 1 < (_root_.commutator ↥H).index := by
+    have hne1 : (_root_.commutator ↥H).index ≠ 1 := by
+      rw [Ne, Subgroup.index_eq_one]
+      exact (IsSolvable.commutator_lt_top_of_nontrivial ↥H).ne
+    have hpos : (_root_.commutator ↥H).index ≠ 0 :=
+      Subgroup.index_ne_zero_of_finite
+    omega
+  have hidxge : 2 * hyp.w1 + 1 ≤ (_root_.commutator ↥H).index := by
+    have hw1odd : Odd hyp.w1 := hG.odd.of_dvd_nat (Subgroup.card_subgroup_dvd_card hyp.W1)
+    have hidxodd : Odd (_root_.commutator ↥H).index :=
+      hG.odd.of_dvd_nat (dvd_trans (Subgroup.index_dvd_card _)
+        (dvd_trans (Subgroup.card_subgroup_dvd_card H) (Subgroup.card_subgroup_dvd_card M)))
+    exact OddOrder.Peterfalvi.S08.two_mul_add_one_le_of_odd_dvd hw1odd hidxodd
+      (hcardW1 ▸ hdvd) hidxgt
+  -- `|⁅H,H⁆| = |M''| ≥ w₂`.
+  have hcommle : (⁅H, H⁆ : Subgroup ↥M) ≤ H := by
+    rw [Subgroup.commutator_le]
+    intro p hp q hq
+    rw [commutatorElement_def]
+    exact H.mul_mem (H.mul_mem (H.mul_mem hp hq) (H.inv_mem hp)) (H.inv_mem hq)
+  have hcardge : hyp.w2 ≤ Nat.card ↥(_root_.commutator ↥H) := by
+    have eMap := Subgroup.equivMapOfInjective (⁅H, H⁆ : Subgroup ↥M) M.subtype M.subtype_injective
+    rw [← OddOrder.Peterfalvi.S08.commutator_subgroupOf_self,
+      Nat.card_congr (Subgroup.subgroupOfEquivOfLe hcommle).toEquiv,
+      Nat.card_congr eMap.toEquiv, hmapcomm]
+    exact Subgroup.card_le_of_le (hyp.typeP.W2_le.trans inf_le_right)
+  -- combine: `|M'| = |H| = |⁅H,H⁆|·|H:⁅H,H⁆| ≥ w₂·(2w₁+1)`.
+  have hHcard : Nat.card ↥H = Nat.card ↥(derivedInG M) := by
+    rw [hHdef]; exact Nat.card_congr (Subgroup.subgroupOfEquivOfLe hM'le).toEquiv
+  calc (2 * hyp.w1 + 1) * hyp.w2
+      ≤ (_root_.commutator ↥H).index * Nat.card ↥(_root_.commutator ↥H) :=
+        Nat.mul_le_mul hidxge hcardge
+    _ = Nat.card ↥H := (_root_.commutator ↥H).index_mul_card
+    _ = Nat.card ↥(derivedInG M) := hHcard
 
 open scoped FiniteInduce in
 /-- **Peterfalvi (10.8), norm-counting estimate** (the §7 analytic heart, the `hbound` input to
