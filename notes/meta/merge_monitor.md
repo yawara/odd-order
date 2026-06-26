@@ -195,15 +195,18 @@ branch とも削除済み。旧 **A** / **D** も同様に退役済み (履歴�
 > 「監視ループ再開（cron id <new-id>）」を 1 行記録する。**この stop→resolve→resume サイクルが監視ループの
 > 正規ライフサイクル**であり、停止は一時退避でしかない。
 
-> **🔒 レーン所有マップ（step 1.5 範囲逸脱チェック用、2026-06-25 relane #9 = フロント W1-W4 再カット）**:
-> 正本 = [`ft_frontier_remap_2026_06_25.md`](ft_frontier_remap_2026_06_25.md)。フロントは中核 sorry で定義、
-> 下記ファイルは主所有の目安 (lane が refine、本マップが逸脱ゲート)。
+> **🔒 レーン所有マップ（step 1.5 範囲逸脱チェック用、2026-06-26 relane #10 = C↔H スワップ反映）**:
+> 正本 = [`ft_frontier_remap_2026_06_25.md`](ft_frontier_remap_2026_06_25.md) + issue 2026 RESOLUTION (relane #10)。
+> **relane #10 (2026-06-26, ユーザー裁可 option C + hub一任)**: lane-c が W2(S14_MaximalI)→W1(BG §15 Cor 15.3,
+> S14_TypePCounting) へ pivot 容認 → 空いた **S14_MaximalI を lane-h が継承** (lane-h の W4 char work 枯渇, issue 2026)。
+> **combined owned_re は不変** (S14_MaximalI も BG も元々 owned_re 内) ゆえ cron 監視式・逸脱チェックは無改訂。
+> 下記は per-lane の主所有ラベル更新 (documentation; 逸脱ゲートは combined owned_re で不変)。
 > | lane | フロント | 所有 .lean（これ以外の Pf/BG S-ファイル編集 = 逸脱→停止） |
 > |---|---|---|
-> | **F** (lane-f) | **W1** BG §16 Prop 16.1 + type-P carrier [純群論・最優先] | `OddOrder/BG/**`（BG 全体）+ `OddOrder/FeitThompson.lean` の mp/carrier 宣言 |
-> | **C** (lane-c) | **W2** §12 all-Type-I tower → theorem88_caseB_holds | `OddOrder/Peterfalvi/S14_MaximalI.lean` |
+> | **F** (lane-f) | **W1-a** BG §16 Prop 16.1 + type-P carrier [純群論・最優先] | `OddOrder/BG/**`（BG 全体、特に S16_MainResults）+ `OddOrder/FeitThompson.lean` の mp/carrier 宣言 |
+> | **C** (lane-c) | **W1-b** BG §15 Cor 15.3 mf_hall_centralizer_control (W2→W1 pivot 容認, relane #10) | `OddOrder/BG/Ch4_FamilyOfMaximal/S14_TypePCounting.lean`（BG 内、f とは別ファイル分担; 同一ファイル衝突時は調整）|
 > | **B** (lane-b) | **W3** §10-11 中心 char 核 (11.9.b + no_typeV) [臨界路最狭点] | `OddOrder/Peterfalvi/S0[3-9]*` + `S10*` + `S11*` + `S12*` + `S13*` + `OddOrder/FeitThompson.lean:426` (card_kappaHall_lt_of_isTypeIIIorIV) |
-> | **H** (lane-h) | **W4** POLE-2 field_normalizer §14-16 + §15 S&T [独立アーム B] | `OddOrder/Peterfalvi/{S15_SAndT, S15_SAndT_Setup, S16_NonExistenceG}.lean` |
+> | **H** (lane-h) | **W2** §12 all-Type-I tower → theorem88_caseB_holds (relane #10, c から継承) | `OddOrder/Peterfalvi/S14_MaximalI.lean`（旧 W4 = S15_SAndT/S15_SAndT_Setup/S16_NonExistenceG は driver/await に降格, char/Dade gated）|
 > | **共有（全 lane 可）** | — | `OddOrder/AxiomsCheck.lean` / `OddOrder.lean` / `OddOrder/GroupTheory/**` / **`OddOrder/FeitThompson.lean`** (宣言単位: W1=mp/carrier、W3=:426 bare sorry、prefix-split で衝突回避) / `notes/**` / `issues/**` |
 
 1. 各レーンの未マージ確認: `git log --oneline main..<branch>`。
@@ -330,6 +333,23 @@ branch とも削除済み。旧 **A** / **D** も同様に退役済み (履歴�
   (索敵: theirs が取り込まれたか。base==ours で theirs 変更なら theirs 採用が正)。
 
 ## 現状メモ
+
+- **2026-06-26 (続) — アクティブ合流 + relane #10 (C↔H スワップ, issue 2026 RESOLVED)**: lanes 稼働再開で複数 tick
+  合流。**実 sorry 126→124** (全 build 3884 green / AxiomsCheck OK / 新規 axiom 0 / 範囲逸脱 0)。主成果:
+  - **F**: ★ **hIF bridge 完全完成** (型I⟹κ=∅, sorry-free + axiom-clean, helper B κ-element placement 実証明) + crux
+    再カット (Frobenius FPF 核心実証明)。`not_isTypeI_of_isTypeNonI` axiom-clean 登録。
+  - **B**: ★ **唯一の bare `feitThompson` sorry 除去** (`card_kappaHall_lt_of_isTypeIIIorIV` → carrier bridge
+    `card_Msigma_inf_centralizer_eq_card_W2` で配線、residual を S12 char-theoretic 新 decl に適所移設) +
+    `exists_typeII_maximal_with_w2_of_typeP` 証明。
+  - **H**: §16 char endpoint de-opacify ((14.16) caseB 等)。→ **W4 char work 枯渇を HUB issue 2026 で報告**。
+  - **C**: (12.9) Hall complement sorry-free (W2) → **W1 (Cor 15.3) へ pivot** (S14_TypePCounting, issue 2025)。
+  - **🔀 relane #10 (ユーザー裁可 AskUserQuestion)**: issue 2026 で lane-h の残 W4 が全 char/Dade gated と判明 →
+    **option C** (lane-h 別セグメント再配置) + **lane-c hub一任** (W1 pivot 容認)。**C↔H スワップ**: lane-c が空けた
+    **W2 (S14_MaximalI) を lane-h が継承**、lane-c は W1 (BG §15 Cor 15.3) 専念。全レーン非重複: f=BG§16 / c=BG§15 /
+    b=Pf§10-13 / h=Pf§12(S14_MaximalI)。**combined owned_re 不変ゆえ cron 無改訂**。issue 2026 → closed、
+    両 LAUNCH.md (worktree) 更新で self-resume 発火。🔒 map (relane #10) 反映済。
+  - ⚠ サイズ flag (>1500, 既起票): S14_TypePCounting 10140 (0069) / S12 6161 (0076) / S16_NonExistenceG 3762 (0072) /
+    S16_MainResults 3305 (0078) / FeitThompson 2023 (0079)。push 全成立 (origin = `07502f02`+本 notes commit)。
 
 - **2026-06-26 — 監視再開 (変化なし) + cron 再作成 (relane #9 所有マップ反映)**: ユーザー「各レーンを監視します」
   で再開。起動時点で **全 4 レーン (f/b/h/c) 0 unmerged** (前セッションで F→B→H→C 全合流済み, main HEAD
