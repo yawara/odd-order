@@ -375,3 +375,22 @@ M_F-centralizer trivial。**genuine に深い**:
   経由の semidirect 計算、または **Coq `BGsection16` の structure→κ correspondence (`of_typeF ⟹ K=1`)** を移植。
 - **次の一手**: Coq `BGsection16`/`BGsummaryI` の of_typeF⟹kappa 証明精査、または ChatGPT consult
   ([[feedback-ask-chatgpt-for-elided-gaps]]、self-contained プロンプト + 厳密検証)。
+
+## ✅ 2026-06-26² 進捗 — hIF crux の核心 Frobenius FPF を実証明 (axiom-clean)、crux を正しい helper 2 本に再カット (commit 2bcdced5)
+
+Coq `BGsection16.v:1031` 精査 (Explore) で hIF の正しい証明構造が判明: **前回 docstring の crux
+`M_F⊓C(K)=⊥` は誤定式化、正しくは U₀ の κ-element X 経由** (K⊄H⊔U₀ 問題を回避)。crux を 2 helper に再カット:
+- **`typeFData_fitting_inf_centralizer_eq_bot` (sorry-free + axiom-clean, AxiomsCheck 登録)**: 核心
+  Frobenius FPF。`X ≤ U₀` (≠⊥) ⟹ `M_F ⊓ C_G(X) = ⊥`。`frobenius_HU0` (kernel M_F, complement U₀) を
+  ↥(M_F⊔U₀) に lift (⟨x,_⟩, ⟨y,_⟩) → `centralizer_complement_le` で C∈U₀ → `M_F⊓U₀=⊥` (complement) 締結。
+- **`typeFData_exists_kappaElement_le_kappaHall` (sorry, 残 residual)**: p∈κ ⟹ ∃ X≤U₀ p-group≠⊥ ⊆ κ-Hall K。
+- **`isTypeF_of_isTypeI` (hIF) sorry-free 本体に書き換え**: X∈U₀ で M_F⊓C(X)=⊥ (helper A)、X⊆K で
+  C(K)⊆C(X)、K*≤M_F ∧ K*≤C(K) (theoremC) ⟹ K*⊆M_F⊓C(X)=⊥ で K*≠⊥ と矛盾。
+
+**残 helper B = tractable (building block 全在庫、次セッション ~50 行で hIF 完全 sorry-free 化可能)**:
+- Hall superset (κ-group X ⊆ κ-Hall K) = **`hall_D` (Isaacs 3C.1 Wielandt, `Ch03_SplitExtensions/Main.lean:1486`)**:
+  `(∀ q ∈ π(|U|), q ∈ π) ⟹ ∃ H, IsHallSubgroup π H ∧ U ≤ H`。X.subgroupOf M に適用。
+- p∈π(U₀): p∈κ ⟹ p∉σ (`kappa_subset_sigmaCompl`) + p∈π(M)、M_F⊆M_σ (`maxNilpotentNormalHall_le_Msigma`) +
+  M_σ σ-Hall (`Msigma_isHall`) で p∤|M_F|、`td.complement` で |M|=|M_F||U| ⟹ p∣|U|、`td.exponent_eq`
+  (exp U₀=exp U) で π(U₀)=π(U) ∋ p (Cauchy: p∣|G|⟺p∣exp G)。
+- X = Sylow `p` of U₀ (≠⊥ since p∈π(U₀))。
