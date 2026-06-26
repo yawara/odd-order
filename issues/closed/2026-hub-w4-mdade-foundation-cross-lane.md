@@ -69,3 +69,30 @@ hub が上記 (A)-(D) いずれかで lane-h の次タスクを決定し、LAUNC
 - 関連 issue: 2024 (W4 §16→S09 bridge, checklist 3/4)、0083 (relane #9 W4)、過去 boundary 2021/2023
 - gating sorry: `exists_MHypothesis` (S16:3706)、`complement_inf_Q_structure` (S15:892)
 - producer (cite 待ち): `betaM_expansion_data`/`eta_generic_data`/`normCascadeData`/`caseB_contradiction_data` (S16)
+
+## ✅ RESOLUTION (2026-06-26, hub + ユーザー裁可 AskUserQuestion = **option C**)
+
+ユーザー裁可: **(C)** lane-h を別の非衝突セグメントに再配置 (hub が価値+独立性で選定)。
+同時に **lane-c = hub 一任** (lane-c は relane #9 公式割当 W2=S14_MaximalI から W1 (Cor 15.3,
+`S14_TypePCounting`) へ pivot 済、issue 2025; 容認)。
+
+**lane-h の再配置先 = W2 (`S14_MaximalI`, §12 all-Type-I tower → `theorem88_caseB_holds`)**:
+lane-c が W1 へ pivot して **S14_MaximalI を空けた**ため、lane-h がこれを継承。`theorem88_caseB_holds`
+(S14_MaximalI:1040) は FT 臨界 consumer (all-Type-I 枝排除)。lane-h 検証で自所有 W4 ファイル
+(S15_SAndT/S16_NonExistenceG) の残 sorry は全て char/Dade gated (`V_cyclic` 等 = Lane B obligation)
+ゆえ ungated solo work 枯渇 → S14_MaximalI へ移動が最良の非衝突配置。
+
+**再カット後の全レーン (非重複)**:
+- **f** = W1-a: BG §16 Prop 16.1 (`S16_MainResults` 等)
+- **c** = W1-b: BG §15 Cor 15.3 (`S14_TypePCounting`) — pivot 容認
+- **b** = W3: Peterfalvi §10-13 char core
+- **h** = W2: Peterfalvi §12 `S14_MaximalI` (c から継承) ← **本 issue の決定**
+- h の旧 W4 ファイル (S15_SAndT/S15_SAndT_Setup/S16_NonExistenceG) は driver/await に降格
+  (char/Dade gated, 上流 lane-b/c landing で機会的 close)。
+
+combined owned_re は全ファイル被覆済みゆえ **cron 監視は不変** (S14_MaximalI は元々 owned_re 内)。
+M-Dade foundation (`exists_MHypothesis` 等の producer cite 待ち) は lane-b/c の §3-§7 Dade layer
+landing で自然解消する await item として残置 (option A の cite 機構は signature 確定済)。
+
+→ 本 issue を `issues/closed/` へ。lane-h は LAUNCH.md 更新 + 本 issue closed で自己復帰モニター発火、
+S14_MaximalI で再開。
