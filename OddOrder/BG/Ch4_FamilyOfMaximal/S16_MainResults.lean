@@ -2072,12 +2072,16 @@ type-`P₁` maximal subgroup with `M_F = M_σ` is of type V.
 
 The type-`P` datum is the fully-constructed `typePData_of_isTypeP1_mf_eq_msigma` (`U = ⊥`,
 `sorry`-free — the type-V carrier-constructibility milestone); `isTypeV_of_typePData` then reduces to
-the `alternative` disjunction.  The sole remaining residual is the genuinely-deep **Peterfalvi (8.8)
-/ BG Theorem 15.7(d)(e) trichotomy** on `H = M_F` (Coq `BGsection15` `nonTI_Fitting_structure`):
-either `M_F#` is a `TI`-subset, or `M_F` is abelian of rank 2 with `|W₁| ∣ p - 1`, or `O_p(M_F)` has
-order `p³` with `|W₁| ∣ p + 1` (the Suzuki/`SL₂`-type structures).  The Lean `fitting_not_ti_cases`
-currently provides only the weakened `abelian ∨ ¬abelian` split, so the structured rank-2 / exponent
-alternatives await formalizing 15.7(e).
+the `alternative` disjunction on `H = M_F`.  As for the type-`F` bridge `isTypeI_of_isTypeF`, the
+`FittingIsTI M` case is discharged directly (disjunct (a): `M_F#` is a `TI`-subset, via
+`maxNilpotentNormalHall_sharp_isTISubset_of_fittingIsTI`).
+
+The sole remaining residual is thus the genuinely-deep **`¬FittingIsTI` case of Peterfalvi (8.8) /
+BG Theorem 15.7(d)(e)** (Coq `BGsection15` `nonTI_Fitting_structure`): either `M_F` abelian of rank 2
+with `|W₁| ∣ p - 1`, or `O_p(M_F)` of order `p³` with `|W₁| ∣ p + 1` (the Suzuki/`SL₂`-type
+structures).  Unlike the type-`F` trichotomy (`isTypeI_of_isTypeF`, whose non-TI cases are `rank = 2`
+/ `exp U ∣ p - 1`), the type-V alternatives carry the `W₁`-Frobenius divisibilities `|W₁| ∣ p ∓ 1`,
+which need the `W₁`-action analysis of (8.8) not yet formalized.
 
 (`hP1neIIIIV`, the sibling `M_F ≠ M_σ ⟹ III/IV` bridge, needs no trichotomy but instead the full
 nilpotent `M_F`-complement `U ≠ ⊥`, gated on `M'/M_F` nilpotent.) -/
@@ -2086,8 +2090,12 @@ theorem isTypeV_of_isTypeP1_mf_eq_msigma [Finite G]
     (hP1 : S14.IsTypeP1 M) (hmf : S15.MF M = OddOrder.BG.Ch3.S10.Msigma M) :
     OddOrder.GroupTheory.IsTypeV M := by
   refine isTypeV_of_typePData (typePData_of_isTypeP1_mf_eq_msigma hG hM hP1 hmf) rfl ?_
-  -- Residual: the Peterfalvi (8.8) trichotomy on `M_F` (deep, Coq `nonTI_Fitting_structure`).
-  sorry
+  by_cases hTI : S15.FittingIsTI M
+  · -- `F(M)` TI ⟹ disjunct (a): `M_F#` is a `TI`-subset (same as the type-`F` bridge).
+    exact Or.inl (maxNilpotentNormalHall_sharp_isTISubset_of_fittingIsTI hG hM hTI)
+  · -- `¬FittingIsTI` ⟹ the deep Peterfalvi (8.8) Suzuki cases (b)/(c): `M_F` rank-2 abelian with
+    -- `|W₁| ∣ p - 1`, or `O_p(M_F) = p³` with `|W₁| ∣ p + 1` (Coq `nonTI_Fitting_structure`).
+    sorry
 
 /-- **Prop 16.1(d)/(f) reverse, `M_F = M_σ` from `U = ⊥`** (the `M_F = M_σ` conjunct of `hVP1`,
 mmd L4478): a type-`P` datum with trivial complement `U = ⊥` has `M_F = M_σ`.  Sandwiching:

@@ -16,14 +16,21 @@ FT フロンティア再設計 (2026-06-25 relane #9、正本 `notes/meta/ft_fro
 
 ## やること
 
-- [ ] `proposition_type_classification` (`OddOrder/BG/Ch4_FamilyOfMaximal/S16_MainResults.lean:2404`)
-      の 6 inline bridge (@2437-2448) を埋める。engine `proposition_type_classification_of_inputs`
-      + 4 input (`isTypeI_of_isTypeF` 等) は sorry-free 済。
-  - forward 2 (`hP1neIIIIV`/`hP1eqV`): 型-P₁ `TypePData` 構成 (Pf (8.3)/(8.8))
-  - reverse 4 (`hIF`/`hIIP2`/`hIIIIVP1`/`hVP1`): carrier-level `π(W₁) ⊆ κ(M)` / W₁=κ-Hall
-    characterization (**issue 8015**)
-- [ ] **検証残し**: `theoremA_maximal_structure` (S16_MainResults.lean:144) が真に on-path か確定
-      (ft-assembly「Yes, S12:632 経由」 vs verifier「docstring 参照のみで off-path」)。off-path なら凍結。
+- [ ] `proposition_type_classification` の 6 inline bridge を埋める。engine
+      `proposition_type_classification_of_inputs` + 4 input は sorry-free 済。
+  - **forward `hP1eqV` (型 P₁∧MF=Mσ → V)**: ✅ **2026-06-26⁵ 配線済** (型 V TypePData 完全構成
+    `typePData_of_isTypeP1_mf_eq_msigma` + FittingIsTI ケース discharge)。残差 = ¬FittingIsTI の
+    Peterfalvi (8.8) Suzuki trichotomy (`nonTI_Fitting_structure`, deep)。詳細 issue 8015。
+  - **forward `hP1neIIIIV` (型 P₁∧MF≠Mσ → III/IV)**: 残。TypePData(P₁,U≠⊥) を要し M'/M_F nilpotent
+    (Coq `Fcore_structure`) が核 gate。詳細 issue 8015。
+  - reverse 4 (`hIF`✅/`hIIP2`/`hIIIIVP1`/`hVP1`): FeitThompson 未使用 (off-path、`.mpr` のみ使用)。
+- [x] **検証残し 解決 (2026-06-26⁵)**: `theoremA_maximal_structure` (S16:144, sorry) は
+      **`Peterfalvi/S12_MaximalIII_IV_V.lean:632` で cite = on-path** (verifier の「docstring のみ」は誤り)。
+      ただし用途は **`.2.1` = A(2) `IsCyclic ↥K` のみ**で、これは sorry-free な
+      `typeP_auxiliary_structure hG hM hKM hUM hK rfl hU |>.2.1` (conj 2) で置換可能
+      (hKM=`Subgroup.map_subtype_le`, hUM 同様)。⟹ **凍結不要・dependency は除去可能**。
+      `theoremA_maximal_structure` の唯一の cross-lane caller ゆえ、swap 後は dead で削除可。
+      **lane-b (W3) タスク**: S12:632 の citation を `typeP_auxiliary_structure` に swap。
 
 ## 完了条件
 
