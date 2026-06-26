@@ -5681,9 +5681,12 @@ through `typeP_maximal_eq_kappaHall_sup_U_sup_Msigma` + `isTypeP1_kappaSigma_com
 #assert_only_allowed_axioms OddOrder.BG.Ch4.S16.typeFData_of_kappa_eq_bot
 #assert_only_allowed_axioms OddOrder.BG.Ch4.S16.isTypeF_groupTheory_of_isTypeF
 #assert_only_allowed_axioms OddOrder.BG.Ch4.S16.isTypeI_of_isTypeF
--- Prop 16.1(a) reverse engine (`hIF`): the type-`F` Frobenius FPF against a `U₀`-element
--- (`M_F ⊓ C_G(X) = ⊥` for `X ≤ U₀`), the `sorry`-free core of `isTypeF_of_isTypeI`.
+-- Prop 16.1(a) reverse bridge `hIF` (type I ⟹ `κ(M) = ∅`), now fully `sorry`-free: the type-`F`
+-- Frobenius FPF against a `U₀`-element (`M_F ⊓ C_G(X) = ⊥` for `X ≤ U₀`), the `κ`-element placement
+-- (`p ∈ κ ⟹ ∃ X ≤ U₀` `p`-group `⊆ κ`-Hall `K`, via Hall-D), and the assembled bridge.
 #assert_only_allowed_axioms OddOrder.BG.Ch4.S16.typeFData_fitting_inf_centralizer_eq_bot
+#assert_only_allowed_axioms OddOrder.BG.Ch4.S16.typeFData_exists_kappaElement_le_kappaHall
+#assert_only_allowed_axioms OddOrder.BG.Ch4.S16.isTypeF_of_isTypeI
 -- 15.7(e) conjunct A divisibility engine (Coq `regZq_dv_q1`): a `U0`-invariant order-`q` subgroup
 -- of the Frobenius kernel `M_F` forces `exp U ∣ q - 1` (Frobenius semiregular action).
 #assert_only_allowed_axioms OddOrder.BG.Ch4.S16.typeF_exponent_dvd_sub_one_of_invariant_card
