@@ -70,12 +70,19 @@ wrapper `mf_hall_centralizer_control` (S15:2483, sorry) は 3 input を discharg
       conjugator の C_G(x) 所属を捨てていた → 新 helper `exists_conj_centralizer_of_mem_maximalSigma`
       で C_G(x)-witness を保持 → `normalizer_eq_self_of_mem_maximalSubgroups` で `cg⁻¹∈M` を導出。
       D は param 化 (caller が `dummySigmaDecomposition G` 等を供給)。
-- [ ] `hfratt`: Theorem 15.2 O_q + Frattini argument。**調査 (2026-06-26)**: `frattini_factorization`
-      (S15:2316, sorry-free) が hfratt の `∀ m∈M, ∃ n a, …` 結論を**そのまま供給** (要 hQHnorm + hcop)。
-      残 gate = Theorem 15.2 の Q (M_σ/Q nilpotent)。`H⋬M ⟺ M_σ 非冪零 ⟺ M_F≠M_σ ⟺ 型 III/IV`
-      (`maxNilpotentNormalHall_eq_Msigma_iff_isNilpotent` S15:231 + Prop 16.1 clause c)。Q は
-      `msigma_quotient_isNilpotent_of_inputs` (S15:4496, 型-P の of_inputs gated skeleton) 経由 ⟹
-      Q の inputs (hP/hKM/hK/hKstar/…) discharge が deep gate。
+- [ ] `hfratt` = **次の W1 大型ユニット (workable-hard, gated でない)**。Theorem 15.2 (c)/(d) の Q=O_q(M)
+      組み立て + Frattini。**精査 (2026-06-26, mmd L4180-4213)**: 全インフラ sorry-free で在庫:
+      - `frattini_factorization` (S15:2316): `∀m∈M,∃n a,…` 結論を供給 (要 hQHnorm + hcop)。
+      - `msigma_quotient_isNilpotent_of_inputs` (S15:4627, **sorry-free skeleton**): Q (hQMσ/hMnormQ/
+        hKstarQ/hQneMσ/Normal) が揃えば M_σ/Q nilpotent を FPF (prime action) から証明。
+      - `kstar_le_fittingInAmbient_of_inputs` (S15:1893) + `kstar_le_opiCore_of_le_fittingInAmbient`
+        (S15:1930): K*⊆F(M_σ)⊆O_q(M)=Q を of_inputs で供給 (Theorem 3.8 `S03h_Thm38` + Lemma 6.3a
+        `S06_Additional` 既存)。
+      残 = **assembly** (deep gate でなく多段組み立て、~1 session): (1) `H⋬M ⟹ M_σ 非冪零` (M_σ 冪零なら
+      Hall H char ⟹ H⊴M の対偶) → `M_F≠M_σ` (`maxNilpotentNormalHall_eq_Msigma_iff_isNilpotent` S15:231);
+      (2) M 型-P₁ の input (hcompl=M=KM_σ, hcond2=prime action, hq=|K*| prime) を discharge し Q=O_q(M) を
+      4 property 付きで構成; (3) M_σ/Q nilpotent + Q⊴M + H Hall ⟹ QH⊴M ⟹ Q∩H=1 ⟹ Frattini。
+      型-P₁ input は Theorem 15.2 が M_F≠M_σ から導く (型決定は順序型でなく density、lane 非依存)。
 - [ ] 3 input を `mf_hall_centralizer_control_of_inputs` に wire → wrapper sorry-free 化。
 - [ ] ⚠ **wrapper signature gap**: `mf_hall_centralizer_control` (S15:2483) は `H ≤ M_σ` を欠く
       (`hH : IsHallSubgroup (piSet H) (H.subgroupOf M_σ)` からは導出不可)。hconj/ha は `H ≤ M_σ` 要 →
