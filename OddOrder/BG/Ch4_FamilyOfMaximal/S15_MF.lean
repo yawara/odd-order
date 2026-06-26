@@ -2743,6 +2743,22 @@ theorem mf_centralizer_hall_decomp_of_kappaCompl [Finite G]
     rw [hMσinfC_eq] at hCeq0
     exact hCeq0.symm
 
+/-- **BG Corollary 15.3(a) for a general nontrivial Hall subgroup `H` of `M_σ`** (mmd L4209),
+*sorry-free* and unconditional.  The `ha` input of `mf_hall_centralizer_control`, with the `κ(M)'`
+hypothesis of `mf_centralizer_hall_decomp_of_kappaCompl` now discharged by
+`centralizer_hall_isPiSubgroup_kappa_compl` (= BG Prop 14.2(b1)(e), the κ'-fact whose final gate was
+Prop 14.2(e) `S ⊄ K*`).  Generalizes `mf_centralizer_msigma_decomp` (`H = M_σ`) to any Hall `H`. -/
+theorem mf_centralizer_hall_decomp [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M H : Subgroup G} (hM : M ∈ maximalSubgroups G)
+    (hHMσ : H ≤ OddOrder.BG.Ch3.S10.Msigma M)
+    (hHhall : Ch03.IsHallSubgroup (S14.piSet H) (H.subgroupOf (OddOrder.BG.Ch3.S10.Msigma M)))
+    (hHne : H ≠ ⊥) :
+    ∃ X : Subgroup G, IsCyclic ↥X ∧ (↑(Nat.card ↥X).primeFactors ⊆ tau2 M) ∧
+      Subgroup.centralizer (H : Set G) ⊓ M =
+        (Subgroup.centralizer (H : Set G) ⊓ OddOrder.BG.Ch3.S10.Msigma M) ⊔ X :=
+  mf_centralizer_hall_decomp_of_kappaCompl hG hM hHMσ hHne
+    (centralizer_hall_isPiSubgroup_kappa_compl hG hM hHMσ hHhall hHne)
+
 /-- **General helper (§14-independent, reusable).**  A nonidentity maximal subgroup of a minimal
 simple group is self-normalizing: `N_G(M) = M`.  If `M ⊊ N_G(M)`, maximality forces `N_G(M) = G`,
 so `M ⊴ G`; simplicity then gives `M = ⊥` or `M = ⊤`, both excluded.  This is the step of BG
