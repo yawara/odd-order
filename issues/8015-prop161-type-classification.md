@@ -451,11 +451,14 @@ Coq `BGsection16` `typePfacts`/`Fcore_structure` 併読で type-P₁ の正確�
 が FPF でない (K*=C_{M_F}(K)≠⊥) ため型 F の U₀-Frobenius (`typeF_exponent_dvd_sub_one_of_invariant_card`)
 を直接再利用不可。
 
-### 残 hP1neIIIIV (型 III/IV、MF≠Mσ) の精密 gate (次セッション)
+### 残 hP1neIIIIV (型 III/IV、MF≠Mσ) の精密 gate
 TypePData(P₁, U≠⊥) を要する。M' = M_σ 内の M_F-complement U を構成:
-- **construction**: `exists_aInvariant_complement_within_normal` (GroupTheory/AInvariantComplement)
-  が K-invariant complement U (U≤M', M_F⊔U=M', K≤N(U), M_F⊓U=⊥) を供給。hN_hall (M_F が M' で Hall)・
-  hCop (|K| coprime |M_σ|) は dischargeable。⟹ hUle/hKnorm/hDcompl/U≠⊥ は achievable。
+- ✅ **2026-06-26⁶ construction landed**: **`exists_typeP1_mf_complement`** (sorry-free + axiom-clean、
+  AxiomsCheck 登録) が K-invariant complement U (U≤M', M_F⊔U=M', K≤N(U), M_F⊓U=⊥) を供給。
+  `exists_aInvariant_complement_within_normal` (GroupTheory/AInvariantComplement) に M'=M_σ (solvable)・
+  M_F が M' で Hall (`maxNilpotentNormalHall_isHall` を index-divisibility `relIndex_mul_relIndex` で transfer)・
+  |K| coprime |M_σ| (κ⊆σᶜ via `kappa_subset_sigmaCompl`、`coprime_of_isPiGroup_of_isPiGroup_compl`) を供給。
+  ⟹ **hUle/hKnorm/hDcompl/U≠⊥ は achievable** (構成核 = Coq `of_typeP` の U 構成に対応)。
 - **deep 残差 3 本** (全て Coq `Fcore_structure` の MF≠Mσ branch に entangle):
   - **hUnilp (U nilpotent)** ← **M'/M_F nilpotent** (Coq `Fcore_structure` の `nilpotent(M'/M_F)`、
     Lean 未形式化 "deferred quotient API")。U ≅ M'/M_F ゆえ。**最深 gate**。

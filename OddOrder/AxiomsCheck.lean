@@ -5546,6 +5546,17 @@ residual.  All three axiom-clean. -/
   OddOrder.BG.Ch4.S16.fittingInAmbient_eq_maxNilpotentNormalHall_of_isTypeP1_mf_eq_msigma
 #assert_only_allowed_axioms OddOrder.BG.Ch4.S16.typePData_of_isTypeP1_mf_eq_msigma
 
+/-! **Type-`P₁` `M_F`-internal complement** (`S16_MainResults`, `exists_typeP1_mf_complement`, the
+construction core of the FT-critical `hP1neIIIIV` bridge): `M_F` has a `K`-invariant complement `U`
+inside `M' = M_σ` (`M_F ⊔ U = M'`, `K ≤ N_G(U)`, `M_F ⊓ U = ⊥`).  The `K`-invariant
+Schur–Zassenhaus complement (`exists_aInvariant_complement_within_normal`) applied to the `σ`-Hall
+`M' = M_σ`, with `M_F ◁ M` Hall in `M'` (index-divisibility transfer) and `K` (`σ'`-group) acting
+coprimely.  Discharges the `hUle`/`hKnorm`/`hDcompl`/`U ≠ ⊥` `TypePData` fields; the residual fields
+(`U` nilpotent `= M'/M_F` nilpotent, the `F(M)` decomposition) and `N_G(U) ⊆ M` are the deep Coq
+`Fcore_structure` content.  Axiom-clean. -/
+
+#assert_only_allowed_axioms OddOrder.BG.Ch4.S16.exists_typeP1_mf_complement
+
 /-! **`hP2II` reduced to the `M'`-type-`F` residual** (`S16_MainResults`,
 `isTypeII_of_isTypeP2_of_derived_typeF`, issue 7007): a type-`P₂` maximal subgroup whose derived
 subgroup `M'` is type `F` (with `F(M') = M_F`) is type II.  Discharges every `isTypeII_of_typePData`
