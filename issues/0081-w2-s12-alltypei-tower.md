@@ -83,6 +83,16 @@ char leaves (12.2)-(12.5)/(12.14)-(12.16)、エンドポイント (12.7) 難方�
 - 配置: (12.7) theorem を依存先 (12.16) より後ろへ移動 (Lean 順序; 書籍 (12.7) は前だが proof は後)。
   元位置にはポインタコメント。full build 3884 green、AxiomsCheck 緑。
 
+### 2026-06-26 (lane-c 再開³, W1 寄与): (12.9) Hall complement discharge
+
+ユーザー裁可で lane-c を最上流 W1 (Prop 16.1) へ振り向け。§12 (12.9) の gate そのものが Prop 16.1 の
+Hall complement (issue 2016) ゆえ、lane-c 自ファイル (S14) で衝突なく W1 に寄与:
+- **`exists_sigmaKappaCompl_hall_ge_P0` を sorry-free 化** (issue 2016 CLOSED)。型 I⟹型 F (κ=∅, clause a)
+  + M_F=M_σ (clause f) を cite、M_σ σ-Hall (`S10.isHall_Msigma_Malpha`, proven) で p∉σ、`Ch03.hall_D` で
+  P₀ を (κ∪σ)ᶜ-Hall U に格納。**(12.9) `counterexample_P0_K_structure`/`exists_rankTwoWitness` が
+  unconditional 化** (§16 cite modulo)。残 gate = prop_classification の型 I clauses (lane-f issue 8015)。
+- full build 3884 green。
+
 **§12 ungated runway 評価**: 残りは全て char (lane-b) / BG §16 (lane-f) / 未抽出 §8 gated と再確認:
 (12.6)=`sibleyTarget_frobI` は `SibleyDadeHypothesis` (6.8) full 構成要 (deep char/Dade)、
 (12.9) Hall complement=Prop 16.1 (lane-f/W1)、(12.10)/(12.11)=未抽出 §8 ((8.13.c1)) + char、

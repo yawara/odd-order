@@ -45,3 +45,16 @@ hence `(12.9) exists_rankTwoWitness` become unconditional (axiom-clean modulo th
   (proven), `proposition_type_classification` (Prop 16.1, lane-f frontier).
 - `notes/peterfalvi/s14_maximalI.md` — "(12.9) status (resume¹²)".
 - **Trigger**: lane-f lands Prop 16.1 (its active frontier per `ft-endgame-two-poles`).
+
+## 完了 (2026-06-26, lane-c W1 寄与)
+
+`exists_sigmaKappaCompl_hall_ge_P0` を **sorry-free 化** (S14_MaximalI.lean)。route = issue の
+やること通り:
+- `proposition_type_classification` clause (a) で κ(M)=∅ (型 I⟹型 F)、clause (f) で M_F=M_σ を cite。
+- `maxNilpotentNormalHall_isHall` + `ctr.p_dvd_index` で p∤|M_F|=|M_σ|。
+- `S10.isHall_Msigma_Malpha` (M_σ は σ-Hall in G、**proven**) で p∤|M_σ| ⟹ p∉σ(M)。
+- κ=∅ と合わせ p∈(κ∪σ)ᶜ ⟹ p-群 P₀ を `Ch03.hall_D` (Hall D、solvable M) で (κ∪σ)ᶜ-Hall U に格納。
+
+⟹ **(12.9) `counterexample_P0_K_structure` / `exists_rankTwoWitness` が unconditional 化** (§16 cite
+modulo)。残 gate = cited prop_classification の型 I clauses (hIF 等、lane-f issue 8015)。full build
+3884 green。**CLOSED**。
