@@ -138,3 +138,29 @@ carrier bridge 調査を記録。
 
 **carrier bridge**: |K|=w₁ ✅ (`card_kappaHall_eq_derived_index`+`card_W1_eq_derived_index`、両者 M' complement)。
 |Kstar|=w₂ は type-P duality (`card_kappaHall_sup_Kstar`+|K⊔Kstar|=|W|) 経由。∃ζ∈S(HC) degree-w₁ は自動。
+
+## 2026-06-26 lane-b (W3): bare FT sorry ELIMINATED — carrier translation fully wired
+
+**`card_kappaHall_lt_of_isTypeIIIorIV` (FeitThompson:426) is no longer a bare sorry.** `FeitThompson.lean`
+is now **sorry-free in its own body** (grep: 0 real sorries). The唯一の残 FT-path char gate は
+`S12.exists_zeta_residual_not_orthogonal` (= genuine Peterfalvi (11.8)) に isolate された。full build 3884 green。
+
+**landed (this commit)**:
+- **`card_Msigma_inf_centralizer_eq_card_W2`** (FeitThompson.lean、**axiom-clean**、AxiomsCheck 登録):
+  type-P 極大 S・κ-Hall K (cyclic)・任意 TypePData d で `|M_σ(S) ⊓ C(K)| = |W₂| = w₂`。
+  これが `|Kstar|=w₂` carrier bridge の **完全証明** (旧 note の「type-P duality 経由」予想を、より直接的な
+  centralizer 論法で実証)。証明: `W₂ = M' ⊓ C(W₁)` (`centralizer_W1`) を `W₂ ≤ M_F ≤ M_σ ≤ M'`
+  (`W2_le`/`H_eq`/`maxNilpotentNormalHall_le_Msigma`/`Msigma_le_derived`) で sandwich → `M_σ ⊓ C(W₁) = W₂`;
+  K と W₁ は M' (normal Hall) の complement ゆえ S-共役 (Schur–Zassenhaus `exists_conj_of_coprime`);
+  `M_σ ⊓ C(K)` を共役 (M_σ は S-不変) で `W₂` に移し card 一致。**char 不要の純群論**。
+  helper 2 本 (`centralizer_eq_of_generator`、`map_subtype_conj_smul`、private)。
+- **`S12.exists_zeta_residual_not_orthogonal`** (genuine (11.8) obligation, sorried) + **`S12.w2_lt_w1_of_hypothesis`**
+  (sorry-free wrapper、(11.8) + 既存 reduction `w2_lt_w1_of_residual_not_orthogonal` を結合)。
+- **`card_kappaHall_lt_of_isTypeIIIorIV` の実証明**: `typeP_duality` で `IsCyclic K`、
+  `exists_hypothesis_of_typeIIIorIVorV` で hyp 構成、`|K|=w₁` (`card_kappaHall_eq_derived_index` +
+  `card_W1_eq_derived_index`)、`|Kstar|=w₂` (bridge)、`w2_lt_w1_of_hypothesis` で締結。
+
+**意義 (sorry 数でなく実質)**: `|Kstar|=w₂` は W3 critical path の群論ゲートだったが、これで完全に閉じた
+(axiom-clean)。残 W3 = **genuine (11.8) の単一 char obligation** (`exists_zeta_residual_not_orthogonal`、
+S12、lane-b)。これは documented "main load" (11.8.1)-(11.8.6) = §9 char counting + S(HC)/τ₁ materialization
+依存の deep multi-step。詳細 = `notes/peterfalvi/s13_11_8_orthogonality.md`。
