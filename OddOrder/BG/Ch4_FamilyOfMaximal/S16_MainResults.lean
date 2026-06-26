@@ -2746,7 +2746,70 @@ theorem typeFData_exists_kappaElement_le_kappaHall [Finite G]
     (hM : M ∈ maximalSubgroups G) (td : OddOrder.GroupTheory.TypeFData M)
     {p : ℕ} (hp : p ∈ S14.kappa M) :
     ∃ X K : Subgroup G, X ≤ td.U0 ∧ X ≠ ⊥ ∧ X ≤ K ∧ K ≤ M ∧
-      Ch03.IsHallSubgroup (S14.kappa M) (K.subgroupOf M) := sorry
+      Ch03.IsHallSubgroup (S14.kappa M) (K.subgroupOf M) := by
+  classical
+  haveI : IsSolvable ↥M := hG.solvable_of_mem_maximalSubgroups hM
+  obtain ⟨hp_prime, hp_tau, P, hP_elem, hP_le, hP_centr⟩ := hp
+  haveI : Fact p.Prime := ⟨hp_prime⟩
+  -- `p ∈ π(M)`: `|P| = p` and `P ≤ M`.
+  obtain ⟨_, hPcard⟩ := mem_elemAbelianOfRank.mp hP_elem
+  rw [pow_one] at hPcard
+  have hp_dvd_M : p ∣ Nat.card ↥M := hPcard ▸ Subgroup.card_dvd_of_le hP_le
+  -- `p ∉ σ(M)`.
+  have hp_not_sigma : p ∉ OddOrder.BG.Ch3.S10.sigma M :=
+    hp_tau.elim (fun h => tau1_subset_sigma_compl M h) (fun h => tau3_subset_sigma_compl M h)
+  -- `p ∤ |M_F|` (`M_F ≤ M_σ`, and `M_σ` is `σ`-Hall).
+  have hMFMσ : td.H ≤ OddOrder.BG.Ch3.S10.Msigma M :=
+    td.H_eq ▸ maxNilpotentNormalHall_le_Msigma hG hM
+  have hp_not_dvd_MF : ¬ p ∣ Nat.card ↥td.H := fun hdvd =>
+    hp_not_sigma ((OddOrder.BG.Ch3.S10.Msigma_isHall hG hM).primeFactors_card_subset p
+      (Nat.mem_primeFactors.mpr ⟨hp_prime, hdvd.trans (Subgroup.card_dvd_of_le hMFMσ),
+        Nat.card_pos.ne'⟩))
+  -- `p ∣ |U|`: `|M_F| · |U| = |M|`.
+  have hcard : Nat.card ↥td.H * Nat.card ↥td.U = Nat.card ↥M := by
+    have h := td.complement.card_mul
+    rwa [Nat.card_congr (Subgroup.subgroupOfEquivOfLe td.H_le).toEquiv,
+      Nat.card_congr (Subgroup.subgroupOfEquivOfLe td.U_le).toEquiv] at h
+  have hp_dvd_U : p ∣ Nat.card ↥td.U :=
+    (hp_prime.dvd_mul.mp (hcard ▸ hp_dvd_M)).resolve_left hp_not_dvd_MF
+  -- `p ∣ |U₀|`: a `p`-element of `U` gives `p ∣ exponent U = exponent U₀ ∣ |U₀|`.
+  have hp_dvd_U0 : p ∣ Nat.card ↥td.U0 := by
+    haveI : Fintype ↥td.U := Fintype.ofFinite _
+    obtain ⟨g, hg⟩ := exists_prime_orderOf_dvd_card (G := ↥td.U) p
+      (by rwa [Nat.card_eq_fintype_card] at hp_dvd_U)
+    exact (td.exponent_eq ▸ (hg ▸ Monoid.order_dvd_exponent g : p ∣ Monoid.exponent ↥td.U)).trans
+      Group.exponent_dvd_nat_card
+  -- A `p`-element `g ∈ U₀` generates a nontrivial `p`-subgroup `X = ⟨g⟩ ≤ U₀`.
+  haveI : Fintype ↥td.U0 := Fintype.ofFinite _
+  obtain ⟨g, hg⟩ := exists_prime_orderOf_dvd_card (G := ↥td.U0) p
+    (by rwa [Nat.card_eq_fintype_card] at hp_dvd_U0)
+  have hXMle : (Subgroup.zpowers g).map td.U0.subtype ≤ M :=
+    (Subgroup.map_subtype_le _).trans (td.U0_le.trans td.U_le)
+  have hXcard : Nat.card ↥((Subgroup.zpowers g).map td.U0.subtype) = p := by
+    rw [Nat.card_congr (Subgroup.equivMapOfInjective _ _ td.U0.subtype_injective).symm.toEquiv,
+      Nat.card_zpowers, hg]
+  -- `X` is a `κ(M)`-group (`|X| = p ∈ κ`), so Hall-D places it in a `κ(M)`-Hall `K`.
+  have hX_kappa :
+      ∀ q ∈ (Nat.card ↥(((Subgroup.zpowers g).map td.U0.subtype).subgroupOf M)).primeFactors,
+      q ∈ S14.kappa M := by
+    intro q hq
+    rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hXMle).toEquiv, hXcard,
+      hp_prime.primeFactors, Finset.mem_singleton] at hq
+    rw [hq]; exact ⟨hp_prime, hp_tau, P, hP_elem, hP_le, hP_centr⟩
+  obtain ⟨K', hK'_hall, hXK'⟩ := Ch03.hall_D (G := ↥M) hX_kappa
+  refine ⟨(Subgroup.zpowers g).map td.U0.subtype, K'.map M.subtype,
+    Subgroup.map_subtype_le _, ?_, ?_, Subgroup.map_subtype_le _, ?_⟩
+  · -- `X ≠ ⊥` (`|X| = p ≠ 1`).
+    intro hbot
+    rw [hbot, Subgroup.card_bot] at hXcard
+    exact hp_prime.ne_one hXcard.symm
+  · -- `X ≤ K'.map subtype` from `X.subgroupOf M ≤ K'`.
+    rw [← Subgroup.map_subgroupOf_eq_of_le hXMle]
+    exact Subgroup.map_mono hXK'
+  · -- `IsHallSubgroup κ ((K'.map subtype).subgroupOf M)` reduces to `hK'_hall` on `K'`.
+    show Ch03.IsHallSubgroup (S14.kappa M) ((K'.map M.subtype).comap M.subtype)
+    rw [Subgroup.comap_map_eq_self_of_injective M.subtype_injective]
+    exact hK'_hall
 
 /-- **Proposition 16.1(a), reverse direction — type I ⟹ type `F`** (mmd L4486): a Type I maximal
 subgroup `M` has `κ(M) = ∅`.  This is the `hIF` bridge of `proposition_type_classification`, and

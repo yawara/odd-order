@@ -5681,9 +5681,16 @@ through `typeP_maximal_eq_kappaHall_sup_U_sup_Msigma` + `isTypeP1_kappaSigma_com
 #assert_only_allowed_axioms OddOrder.BG.Ch4.S16.typeFData_of_kappa_eq_bot
 #assert_only_allowed_axioms OddOrder.BG.Ch4.S16.isTypeF_groupTheory_of_isTypeF
 #assert_only_allowed_axioms OddOrder.BG.Ch4.S16.isTypeI_of_isTypeF
--- Prop 16.1(a) reverse engine (`hIF`): the type-`F` Frobenius FPF against a `U₀`-element
--- (`M_F ⊓ C_G(X) = ⊥` for `X ≤ U₀`), the `sorry`-free core of `isTypeF_of_isTypeI`.
+-- Prop 16.1(a) reverse bridge `hIF` (type I ⟹ `κ(M) = ∅`), now fully `sorry`-free: the type-`F`
+-- Frobenius FPF against a `U₀`-element (`M_F ⊓ C_G(X) = ⊥` for `X ≤ U₀`), the `κ`-element placement
+-- (`p ∈ κ ⟹ ∃ X ≤ U₀` `p`-group `⊆ κ`-Hall `K`, via Hall-D), and the assembled bridge.
 #assert_only_allowed_axioms OddOrder.BG.Ch4.S16.typeFData_fitting_inf_centralizer_eq_bot
+#assert_only_allowed_axioms OddOrder.BG.Ch4.S16.typeFData_exists_kappaElement_le_kappaHall
+#assert_only_allowed_axioms OddOrder.BG.Ch4.S16.isTypeF_of_isTypeI
+-- The FT-critical consumer `not_isTypeI_of_isTypeNonI` (a non-Type-I maximal is not Type I), now
+-- axiom-clean: it routes through `isTypeF_of_isTypeI` + `isTypeP_of_isTypeNonI` only, no longer
+-- citing the `sorry`-bearing §16 type-classification reverse bridges.
+#assert_only_allowed_axioms OddOrder.BG.Ch4.S16.not_isTypeI_of_isTypeNonI
 -- 15.7(e) conjunct A divisibility engine (Coq `regZq_dv_q1`): a `U0`-invariant order-`q` subgroup
 -- of the Frobenius kernel `M_F` forces `exp U ∣ q - 1` (Frobenius semiregular action).
 #assert_only_allowed_axioms OddOrder.BG.Ch4.S16.typeF_exponent_dvd_sub_one_of_invariant_card
@@ -5760,8 +5767,9 @@ Every structural datum of `TypeFData`/`TypeIData` transfers along `φ : MulAut G
 type (`isTypeI_of_conj`).  This is the unconditional, axiom-clean **gate-4 piece 1** infrastructure
 of Peterfalvi (13.17.b).  Its downstream application
 `OddOrder.Peterfalvi.S15.not_conj_of_isTypeI_of_isTypeNonI` (a type-`I` maximal subgroup is
-non-conjugate to the non-I `S`, `T`) has a sorry-free *proof* but transitively cites the still
-sorried §16 type classification `not_isTypeI_of_isTypeNonI`, so it is not registered here. -/
+non-conjugate to the non-I `S`, `T`) has a sorry-free *proof*; its §16 dependency
+`not_isTypeI_of_isTypeNonI` is now axiom-clean (registered above), so registering it is left to the
+Peterfalvi lane that owns it. -/
 
 #assert_only_allowed_axioms
   OddOrder.GroupTheory.TypeFData.conj
