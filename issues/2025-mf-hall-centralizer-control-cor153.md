@@ -40,7 +40,7 @@ wrapper `mf_hall_centralizer_control` (S15:2483, sorry) は 3 input を discharg
 
 ## やること
 
-- [~] **`ha` の SZ 分解部 完了 (2026-06-26)**: `mf_centralizer_hall_decomp_of_kappaCompl`
+- [x] **`ha` 完了 (2026-06-26, κ'-fact 実証明)**: `mf_centralizer_hall_decomp_of_kappaCompl`
       (S15_MF, sorry-free + axiom-clean) = H=M_σ template `mf_centralizer_msigma_decomp` を一般 Hall H に
       一般化。κ'-性は **hypothesis `hkappa : IsPiSubgroup (kappa M)ᶜ (C_G(H)⊓M)` として取る** (=「C_M(H) κ'」)、
       `C_{M_σ}(X)≠1` は `H ≤ M_σ⊓C_G(X)` (X≤C_G(H)) + `H≠⊥` で導出。⟹ **ha の残 gate = 単一事実
@@ -54,21 +54,35 @@ wrapper `mf_hall_centralizer_control` (S15:2483, sorry) は 3 input を discharg
       (4) q∈piSet(H)⊆π(K*) (H≤K*, H≠1)。**Prop 14.2(e)**: p∈π(K*) なら M_σ の Sylow ⊄ K* ⟹ 矛盾。
       ⟹ 要 repo: Prop 14.2(b1) `N_M(X)=K×K*` + (e) `Sylow_p(M_σ)⊄K*` + Hall⊇Sylow。
       **可用性 (2026-06-26 確認)**: (b1) は `typeP_structure` (S14:1808) の conjunct 3 (`hb1`) で**可用**。
-      **(e) は未発見** (`typeP_structure` は (b1)/(c)/`K*≠M_σ` を持つが (e) `Sylow⊄K*` は無し)。H=M_σ 版
-      (`centralizer_msigma_isPiSubgroup_kappa_compl`) は (e) を回避 (M_σ≤K⊔K* で **M_σ=K*** の強い矛盾、
-      K*≠M_σ と衝突) が、一般 H⊊M_σ では H≤K* どまりで (e) 必須。⟹ **κ'-fact の最終 gate = Prop 14.2(e)
-      の証明/抽出** (deep)。これが解ければ ha 完了 (decomp は済)。
+      **✅✅ ha 完了 (2026-06-26, commits `37a15204` + `d742451a`)**: (e) を含む 4 lemma を実証明
+      (全 sorry-free + axiom-clean、AxiomsCheck 登録)。
+      - `typeP_sylow_not_le_kstar` (S14, Prop 14.2(e) 第2節 `S⊄K*`): Part A (ℳ(K*)≠{M}, Lemma 13.13)
+        + Part B (S≤K* なら Lemma 13.6 `ℳ(S)={M}` と矛盾)。`kstar_ne_msigma_aux` を corollary 化。
+      - `exists_typePESetup_kappaHall` (S14): Hall κ K → E-setup (E₁≤K≤E) (Prop 14.2 preamble)。
+      - `typeP_sylow_not_le_kstar_of_isHall` (S14): (e) を typeP-packaged 形に。
+      - `centralizer_hall_isPiSubgroup_kappa_compl` (S14): **κ'-fact** (H≤K* via b1+Dedekind →
+        Sylow_q(M_σ)≤H≤K* が (e) に矛盾)。
+      - `mf_centralizer_hall_decomp` (S15): general `ha` を **unconditional 化**
+        (`mf_centralizer_hall_decomp_of_kappaCompl` の κ' 仮説を κ'-fact で discharge)。
+      ⟹ **ha gate 閉鎖**。残 = hfratt + wrapper signature gap (下記)。
 - [x] **`hconj`: 完了 (2026-06-26)** — `mf_hall_conj_realized_in_M` (S14_TypePCounting, sorry-free + axiom-clean)。
       Theorem 14.4 = `sigmaLength_one_centralizer_structure` (proven) は sharp transitivity を持つが
       conjugator の C_G(x) 所属を捨てていた → 新 helper `exists_conj_centralizer_of_mem_maximalSigma`
       で C_G(x)-witness を保持 → `normalizer_eq_self_of_mem_maximalSubgroups` で `cg⁻¹∈M` を導出。
       D は param 化 (caller が `dummySigmaDecomposition G` 等を供給)。
-- [ ] `hfratt`: Theorem 15.2 O_q + Frattini argument。**調査 (2026-06-26)**: `frattini_factorization`
-      (S15:2316, sorry-free) が hfratt の `∀ m∈M, ∃ n a, …` 結論を**そのまま供給** (要 hQHnorm + hcop)。
-      残 gate = Theorem 15.2 の Q (M_σ/Q nilpotent)。`H⋬M ⟺ M_σ 非冪零 ⟺ M_F≠M_σ ⟺ 型 III/IV`
-      (`maxNilpotentNormalHall_eq_Msigma_iff_isNilpotent` S15:231 + Prop 16.1 clause c)。Q は
-      `msigma_quotient_isNilpotent_of_inputs` (S15:4496, 型-P の of_inputs gated skeleton) 経由 ⟹
-      Q の inputs (hP/hKM/hK/hKstar/…) discharge が deep gate。
+- [ ] `hfratt` = **次の W1 大型ユニット (workable-hard, gated でない)**。Theorem 15.2 (c)/(d) の Q=O_q(M)
+      組み立て + Frattini。**精査 (2026-06-26, mmd L4180-4213)**: 全インフラ sorry-free で在庫:
+      - `frattini_factorization` (S15:2316): `∀m∈M,∃n a,…` 結論を供給 (要 hQHnorm + hcop)。
+      - `msigma_quotient_isNilpotent_of_inputs` (S15:4627, **sorry-free skeleton**): Q (hQMσ/hMnormQ/
+        hKstarQ/hQneMσ/Normal) が揃えば M_σ/Q nilpotent を FPF (prime action) から証明。
+      - `kstar_le_fittingInAmbient_of_inputs` (S15:1893) + `kstar_le_opiCore_of_le_fittingInAmbient`
+        (S15:1930): K*⊆F(M_σ)⊆O_q(M)=Q を of_inputs で供給 (Theorem 3.8 `S03h_Thm38` + Lemma 6.3a
+        `S06_Additional` 既存)。
+      残 = **assembly** (deep gate でなく多段組み立て、~1 session): (1) `H⋬M ⟹ M_σ 非冪零` (M_σ 冪零なら
+      Hall H char ⟹ H⊴M の対偶) → `M_F≠M_σ` (`maxNilpotentNormalHall_eq_Msigma_iff_isNilpotent` S15:231);
+      (2) M 型-P₁ の input (hcompl=M=KM_σ, hcond2=prime action, hq=|K*| prime) を discharge し Q=O_q(M) を
+      4 property 付きで構成; (3) M_σ/Q nilpotent + Q⊴M + H Hall ⟹ QH⊴M ⟹ Q∩H=1 ⟹ Frattini。
+      型-P₁ input は Theorem 15.2 が M_F≠M_σ から導く (型決定は順序型でなく density、lane 非依存)。
 - [ ] 3 input を `mf_hall_centralizer_control_of_inputs` に wire → wrapper sorry-free 化。
 - [ ] ⚠ **wrapper signature gap**: `mf_hall_centralizer_control` (S15:2483) は `H ≤ M_σ` を欠く
       (`hH : IsHallSubgroup (piSet H) (H.subgroupOf M_σ)` からは導出不可)。hconj/ha は `H ≤ M_σ` 要 →
