@@ -2679,39 +2679,86 @@ theorem typeP_exists_hall_derived_eq [Finite G]
     (S14.isTypeF_iff_not_isTypeP.mp (isTypeF_of_isHall_kappa_eq_bot hKM hK h)) hP
   exact ⟨U, hU, (typeP_hall_derived_eq_and_abelian hG hM hKM hUM hKne hK hU).1⟩
 
-/-- **Proposition 16.1(a) reverse crux — type-`F` Frobenius FPF against a `κ`-Hall** (mmd L4486):
-for a type-`I` (hence type-`F`) maximal `M`, the Fitting kernel `M_F` and any `κ`-Hall subgroup `K`
-have trivial centralizer intersection, `M_F ⊓ C_G(K) = ⊥`.
+/-- **Type-`F` Frobenius FPF against a `U₀`-element** (mmd L4486, the engine of `isTypeF_of_isTypeI`,
+following the Coq `BGsection16` argument): a nontrivial `X ≤ U₀` of the Frobenius complement has
+trivial `M_F`-centralizer, `M_F ⊓ C_G(X) = ⊥`.  Any `M_F`-element `y` centralizing some `x ∈ X# ⊆ U₀#`
+lifts to `↥(M_F ⊔ U₀)`, where `frobenius_HU0` (kernel `M_F = H`, complement `U₀`) and
+`centralizer_complement_le` place it in `U₀`; then `y ∈ M_F ⊓ U₀ = ⊥` (the `complement` field with
+`U₀ ≤ U`).  This is the `C_H(K) = 1` half of the BG argument, applied to a `U₀`-element `X ⊆ K` rather
+than to the `κ`-Hall `K` itself (which need not lie in `H ⊔ U₀`). -/
+theorem typeFData_fitting_inf_centralizer_eq_bot [Finite G]
+    {M : Subgroup G} (td : OddOrder.GroupTheory.TypeFData M) {X : Subgroup G}
+    (hXU0 : X ≤ td.U0) (hXne : X ≠ ⊥) :
+    td.H ⊓ Subgroup.centralizer (X : Set G) = ⊥ := by
+  classical
+  -- `M_F ⊓ U₀ = ⊥` from the complement (`U₀ ≤ U`, `M_F.subgroupOf M ⊓ U.subgroupOf M = ⊥`).
+  have hHU0 : td.H ⊓ td.U0 = ⊥ := by
+    rw [eq_bot_iff]
+    intro z hz
+    obtain ⟨hzH, hzU0⟩ := Subgroup.mem_inf.mp hz
+    have hzM : z ∈ M := td.H_le hzH
+    have hmem : (⟨z, hzM⟩ : ↥M) ∈ (td.H.subgroupOf M) ⊓ (td.U.subgroupOf M) :=
+      Subgroup.mem_inf.mpr ⟨(Subgroup.mem_subgroupOf).mpr hzH,
+        (Subgroup.mem_subgroupOf).mpr (td.U0_le hzU0)⟩
+    rw [td.complement.disjoint.eq_bot, Subgroup.mem_bot] at hmem
+    rw [Subgroup.mem_bot]
+    simpa using congrArg Subtype.val hmem
+  rw [eq_bot_iff]
+  intro y hy
+  obtain ⟨hyH, hyC⟩ := Subgroup.mem_inf.mp hy
+  obtain ⟨x, hxX, hxne⟩ : ∃ x ∈ X, x ≠ 1 := by
+    by_contra hc
+    push_neg at hc
+    exact hXne (eq_bot_iff.mpr fun z hz => Subgroup.mem_bot.mpr (hc z hz))
+  have hxU0 : x ∈ td.U0 := hXU0 hxX
+  have hyHU0 : y ∈ td.H ⊔ td.U0 := Subgroup.mem_sup_left hyH
+  have hxHU0 : x ∈ td.H ⊔ td.U0 := Subgroup.mem_sup_right hxU0
+  -- `y` and `x` commute in `G` (`y ∈ C_G(X)`, `x ∈ X`).
+  have hcomm : y * x = x * y := (Subgroup.mem_centralizer_iff.mp hyC x hxX).symm
+  -- lift to `↥(M_F ⊔ U₀)` and apply `centralizer_complement_le`.
+  have hxmem : (⟨x, hxHU0⟩ : ↥(td.H ⊔ td.U0)) ∈ (td.U0).subgroupOf (td.H ⊔ td.U0) :=
+    (Subgroup.mem_subgroupOf).mpr hxU0
+  have hxne' : (⟨x, hxHU0⟩ : ↥(td.H ⊔ td.U0)) ≠ 1 := by
+    rw [ne_eq, Subtype.ext_iff]; simpa using hxne
+  have hymem : (⟨y, hyHU0⟩ : ↥(td.H ⊔ td.U0)) ∈
+      Subgroup.centralizer ({(⟨x, hxHU0⟩ : ↥(td.H ⊔ td.U0))} : Set ↥(td.H ⊔ td.U0)) := by
+    rw [Subgroup.mem_centralizer_singleton_iff]
+    apply Subtype.ext
+    simp only [Subgroup.coe_mul]
+    exact hcomm
+  have hyU0' := td.frobenius_HU0.centralizer_complement_le _ hxmem hxne' hymem
+  have hyU0 : y ∈ td.U0 := (Subgroup.mem_subgroupOf).mp hyU0'
+  rw [← hHU0]
+  exact Subgroup.mem_inf.mpr ⟨hyH, hyU0⟩
 
-This is the BG "condition (Iiii) implies `C_H(K) = 1`" step.  `M = M_F ⋊ U` carries the Frobenius
-complement realization `H ⊔ U₀` (`TypeFData.frobenius_HU0`, the Coq `is_typeF_complement` clause with
-`exponent U₀ = exponent U`).  A `κ`-Hall `K` meets `M_F` trivially (`κ(M) ∩ σ(M) = ∅`, `M_F ⊆ M_σ`),
-so a nontrivial `x ∈ M_F ⊓ C_G(K)` gives `K ⊆ C_G(x)`.
+/-- **Type-`F` `κ`-element placement** (mmd L4486, the Coq `Hall_superset` + `kappa_pi` step; the
+last residual of `isTypeF_of_isTypeI`): from `p ∈ κ(M)` and the type-`F` datum, produce a nontrivial
+`p`-subgroup `X ≤ U₀` (inside the Frobenius complement, where
+`typeFData_fitting_inf_centralizer_eq_bot` applies) together with a `κ(M)`-Hall `K ⊇ X`.
 
-**Residual (genuinely deep).**  `K ⊄ H ⊔ U₀` directly: `K` is a `κ`-Hall while `H ⊔ U₀` is a
-`κ'`-group (`H ⊆ M_σ` is `σ`, `U₀ ⊆ U` is `(κ∪σ)'`), so `Ch06.…centralizer_kernel_le`
-(`C_{H⊔U₀}(x) ⊆ H` for `x ∈ H#`) does *not* apply to `K` verbatim.  The genuine BG step routes
-`C_G(x)` through the `M = M_F ⋊ U` action together with `is_typeF_inertia` (`C_U(x) ⊆ U₁`), or
-equivalently through the Coq `BGsection16` structure-to-`κ` correspondence (`of_typeF ⟹ K = 1`).
-This is the only residual; the rest of `isTypeF_of_isTypeI` is `sorry`-free modulo this. -/
-theorem typeF_mf_inf_centralizer_kappaHall_eq_bot [Finite G]
-    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M K : Subgroup G}
-    (hM : M ∈ maximalSubgroups G) (hI : OddOrder.GroupTheory.IsTypeI M)
-    (hKM : K ≤ M) (hKne : K ≠ ⊥)
-    (hK : Ch03.IsHallSubgroup (S14.kappa M) (K.subgroupOf M)) :
-    S15.MF M ⊓ Subgroup.centralizer (K : Set G) = ⊥ := sorry
+The construction (Coq `BGsection16.v:1031`): `p ∈ κ(M) ⟹ p ∉ σ(M)` (`kappa_subset_sigmaCompl`) and
+`p ∈ π(M)`, so `p ∤ |M_F|` (`M_F ⊆ M_σ`) and `p ∣ |U| = [M : M_F]`; since `exponent U₀ = exponent U`,
+`p ∈ π(U₀)`, giving a Sylow `p`-subgroup `X ≤ U₀`, `X ≠ ⊥`.  Then `X` is a `κ`-group, so Hall's
+theorem in the solvable `M` (`hall_E_exists` + Hall conjugacy) places it in a `κ(M)`-Hall `K`.  This
+is the only residual; the rest of `isTypeF_of_isTypeI` is `sorry`-free modulo this. -/
+theorem typeFData_exists_kappaElement_le_kappaHall [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G}
+    (hM : M ∈ maximalSubgroups G) (td : OddOrder.GroupTheory.TypeFData M)
+    {p : ℕ} (hp : p ∈ S14.kappa M) :
+    ∃ X K : Subgroup G, X ≤ td.U0 ∧ X ≠ ⊥ ∧ X ≤ K ∧ K ≤ M ∧
+      Ch03.IsHallSubgroup (S14.kappa M) (K.subgroupOf M) := sorry
 
 /-- **Proposition 16.1(a), reverse direction — type I ⟹ type `F`** (mmd L4486): a Type I maximal
 subgroup `M` has `κ(M) = ∅`.  This is the `hIF` bridge of `proposition_type_classification`, and
 together with `isTypeP_of_isTypeNonI` it is everything the FT-critical `not_isTypeI_of_isTypeNonI`
 consumes (it lets a non-Type-I `M` be placed in `ℳ_𝓟`, which a Type I `M` cannot also be).
 
-**Proof** (BG L4486, by contradiction): suppose `κ(M) ≠ ∅`.  Take a `κ(M)`-Hall `K` (nonempty since
-`κ(M) ≠ ∅`, via `isTypeF_of_isHall_kappa_eq_bot`) and a `(κ ∪ σ)ᶜ`-Hall `U` of the solvable `M`
-(Hall's theorem).  Theorem C(2) (`theoremC_paired_structure`) gives the nonempty `K* = M_σ ⊓ C_G(K)`
-with `K* ≤ M_F`.  But the type-`F` Frobenius structure forces `M_F ⊓ C_G(K) = ⊥`
-(`typeF_mf_inf_centralizer_kappaHall_eq_bot`); since `K* ≤ M_F` and `K* ≤ C_G(K)`, this places
-`K* ≤ M_F ⊓ C_G(K) = ⊥`, contradicting `K* ≠ ⊥`. -/
+**Proof** (BG L4486, by contradiction): suppose `κ(M) ≠ ∅`, witnessed by `p ∈ κ(M)`.
+`typeFData_exists_kappaElement_le_kappaHall` produces a nontrivial `p`-subgroup `X ≤ U₀` and a
+`κ(M)`-Hall `K ⊇ X`.  Theorem C(2) (`theoremC_paired_structure`) gives `K* = M_σ ⊓ C_G(K) ≠ ⊥` with
+`K* ≤ M_F`.  But `typeFData_fitting_inf_centralizer_eq_bot` forces `M_F ⊓ C_G(X) = ⊥`, and since
+`X ≤ K`, `K* ≤ C_G(K) ≤ C_G(X)` together with `K* ≤ M_F` place `K* ≤ M_F ⊓ C_G(X) = ⊥`, contradicting
+`K* ≠ ⊥`. -/
 theorem isTypeF_of_isTypeI [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G}
     (hM : M ∈ maximalSubgroups G) (hI : OddOrder.GroupTheory.IsTypeI M) :
@@ -2720,13 +2767,11 @@ theorem isTypeF_of_isTypeI [Finite G]
   intro hP
   classical
   haveI : IsSolvable ↥M := hG.solvable_of_mem_maximalSubgroups hM
-  -- A `κ(M)`-Hall subgroup `K` of the solvable `M` (Hall's theorem).
-  obtain ⟨K', hK'⟩ := Ch03.hall_E_exists (G := ↥M) (S14.kappa M)
-  set K : Subgroup G := K'.map M.subtype with hKdef
-  have hKM : K ≤ M := hKdef ▸ Subgroup.map_subtype_le K'
-  have hKeq : K.subgroupOf M = K' :=
-    hKdef ▸ Subgroup.comap_map_eq_self_of_injective M.subtype_injective K'
-  have hK : Ch03.IsHallSubgroup (S14.kappa M) (K.subgroupOf M) := hKeq ▸ hK'
+  obtain ⟨td⟩ := hI
+  obtain ⟨p, hp⟩ := hP
+  -- A nontrivial `p`-subgroup `X ≤ U₀` and a `κ(M)`-Hall `K ⊇ X`.
+  obtain ⟨X, K, hXU0, hXne, hXK, hKM, hK⟩ :=
+    typeFData_exists_kappaElement_le_kappaHall hG hM td.typeF hp
   -- A `(κ ∪ σ)'`-Hall subgroup `U` of `M`.
   obtain ⟨U', hU'⟩ := Ch03.hall_E_exists (G := ↥M)
     ((S14.kappa M ∪ OddOrder.BG.Ch3.S10.sigma M)ᶜ)
@@ -2736,15 +2781,19 @@ theorem isTypeF_of_isTypeI [Finite G]
     hUdef ▸ Subgroup.comap_map_eq_self_of_injective M.subtype_injective U'
   have hU : Ch03.IsHallSubgroup ((S14.kappa M ∪ OddOrder.BG.Ch3.S10.sigma M)ᶜ) (U.subgroupOf M) :=
     hUeq ▸ hU'
-  -- `K ≠ ⊥` (else `M` would be type-`F`, i.e. `κ(M) = ∅`, contradicting `IsTypeP M`).
-  have hKne : K ≠ ⊥ := fun h =>
-    (S14.isTypeF_iff_not_isTypeP.mp (isTypeF_of_isHall_kappa_eq_bot hKM hK h)) hP
+  -- `K ≠ ⊥` (since `X ≠ ⊥` and `X ≤ K`).
+  have hKne : K ≠ ⊥ := fun h => hXne (le_bot_iff.mp (hXK.trans h.le))
   -- Theorem C(2): `K* = M_σ ⊓ C_G(K)` is nonempty and contained in `M_F`.
   obtain ⟨_, _, hKsne, _, hKsMF, _, _, _, _, _, _, _⟩ :=
     theoremC_paired_structure hG hM hKne hKM hUM hK rfl hU
-  -- But the type-`F` Frobenius structure gives `M_F ⊓ C_G(K) = ⊥`, while `K* ≤ M_F ⊓ C_G(K)`.
-  have hcrux := typeF_mf_inf_centralizer_kappaHall_eq_bot hG hM hI hKM hKne hK
-  exact hKsne (le_bot_iff.mp (hcrux ▸ le_inf hKsMF inf_le_right))
+  -- The type-`F` Frobenius structure gives `M_F ⊓ C_G(X) = ⊥`; with `X ≤ K`, `K* ≤ M_F ⊓ C_G(X)`.
+  have hAX := typeFData_fitting_inf_centralizer_eq_bot td.typeF hXU0 hXne
+  apply hKsne
+  rw [← le_bot_iff, ← hAX, td.typeF.H_eq]
+  refine le_inf hKsMF (inf_le_right.trans ?_)
+  intro g hg
+  rw [Subgroup.mem_centralizer_iff] at hg ⊢
+  exact fun x hx => hg x (hXK hx)
 
 /-- **BG Proposition 16.1** (mmd L4478): the §14--§15 local families are exactly
 the shared Type I--V maximal-subgroup predicates consumed downstream by Peterfalvi.
