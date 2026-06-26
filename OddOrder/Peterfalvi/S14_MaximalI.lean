@@ -340,12 +340,10 @@ theorem typeI_frobenius_of_isZGroup_complement [Finite G] {M : Subgroup G}
       (data.typeF.U.subgroupOf M) :=
   typeF_frobenius_of_isZGroup_complement data.typeF hZ
 
-/-- **Peterfalvi (12.7)**: every maximal subgroup of type I is Frobenius, with
-kernel equal to `M_F`. -/
-theorem typeI_frobenius [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
-    {M : Subgroup G} (hM : M ∈ maximalSubgroups G) (hType : IsTypeI M) :
-    ∃ data : TypeIFrobeniusData M, data.kernel_eq_MF := by
-  sorry
+/-! The headline **(12.7)** (`typeI_frobenius`: every type-I maximal is a Frobenius group with
+kernel `M_F`) is proved at the end of this section, after the minimal-counterexample machinery
+(12.8)–(12.16) on which it depends: the `π = ∅` case is the easy direction
+`typeI_frobenius_of_pi_empty`, and `π = ∅` itself (`pi_empty`) is the content of (12.16). -/
 
 /-! ## (12.8)--(12.12): minimal counterexample analysis -/
 
@@ -467,6 +465,36 @@ structure CounterexampleHypothesis where
   p_dvd_index : p ∣ K.relIndex M
   /-- `p` is the smallest prime in `π`. -/
   minimal_p : ∀ q : ℕ, q.Prime → InPi (G := G) q → p ≤ q
+
+/-- **Peterfalvi (12.8), existence of the minimal counterexample.**  If the prime set `π` of
+(12.8) is nonempty, its least element `p = Nat.find` yields a `CounterexampleHypothesis`: the
+`InPi` witness for `p` supplies a type-`I` maximal `M'` with a noncyclic Sylow `p`-subgroup `P₀`
+that has `p ∣ [M' : M'_F]`, and `Nat.find_min'` records that `p` is the smallest prime in `π`.
+
+This is the well-ordering step that opens the minimal-counterexample analysis of (12.7); it is
+`§8`-free and unconditional (its only input is `InPi` for some prime). -/
+theorem exists_counterexampleHypothesis [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (h : ∃ q : ℕ, q.Prime ∧ InPi (G := G) q) :
+    Nonempty (CounterexampleHypothesis (G := G)) := by
+  classical
+  obtain ⟨hp_prime, M', hM', hM'I, P, hPle, hPpg, hPsyl, hPnc, hqdvd⟩ := Nat.find_spec h
+  exact ⟨{
+    p := Nat.find h
+    p_prime := hp_prime
+    M := M'
+    K := maxNilpotentNormalHall M'
+    Kprime := derivedInG (maxNilpotentNormalHall M')
+    P0 := P
+    M_maximal := hM'
+    M_typeI := hM'I
+    K_eq_MF := rfl
+    Kprime_eq := rfl
+    P0_le_M := hPle
+    P0_pGroup := hPpg
+    P0_sylow := hPsyl
+    P0_noncyclic := hPnc
+    p_dvd_index := hqdvd
+    minimal_p := fun q hq hqInPi => Nat.find_min' h ⟨hq, hqInPi⟩ }⟩
 
 /-- The rank-two witness extracted in Peterfalvi (12.9), with all fields stated faithfully.
 
@@ -1270,6 +1298,32 @@ theorem counterexample_contradiction [Finite G]
     (ctr : CounterexampleHypothesis (G := G)) :
     False := by
   sorry
+
+/-- **Peterfalvi (12.7), `π = ∅`** (the headline consequence of (12.16)): no prime lies in the
+set `π` of (12.8).  Were `π` nonempty, (12.8) (`exists_counterexampleHypothesis`) would build a
+minimal counterexample, contradicting (12.16) (`counterexample_contradiction`). -/
+theorem pi_empty [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G) :
+    ∀ q : ℕ, q.Prime → ¬ InPi (G := G) q := by
+  by_contra h
+  push_neg at h
+  obtain ⟨ctr⟩ := exists_counterexampleHypothesis hG h
+  exact counterexample_contradiction hG ctr
+
+/-- **Peterfalvi (12.7)**: every maximal subgroup of type I is Frobenius, with kernel `M_F`.
+
+Since `π = ∅` by (12.16) (`pi_empty`), the easy direction `typeI_frobenius_of_pi_empty` applies
+and gives the Frobenius decomposition with kernel `M_F = typeF.H` and complement `typeF.U`.  (The
+`kernel_eq_MF` carrier is vacuous here: the `frobenius` field already names `typeF.H = M_F` as the
+kernel, so the identification holds definitionally.) -/
+theorem typeI_frobenius [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    {M : Subgroup G} (hM : M ∈ maximalSubgroups G) (hType : IsTypeI M) :
+    ∃ data : TypeIFrobeniusData M, data.kernel_eq_MF := by
+  obtain ⟨data⟩ := hType
+  exact ⟨{ typeI := data
+           complement := data.typeF.U.subgroupOf M
+           kernel_eq_MF := True
+           kernel_eq_MF_holds := trivial
+           frobenius := typeI_frobenius_of_pi_empty hG (pi_empty hG) hM data }, trivial⟩
 
 /-! ## (12.17): forcing case (b) of Theorem (8.8) -/
 

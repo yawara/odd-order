@@ -747,6 +747,10 @@ set_option linter.style.longLine false in
 -- is Frobenius with kernel `M_F`, via `IsZGroup.exponent_eq_card` + `typeF_frobenius_of_card_eq_exponent`.
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S14.typeF_frobenius_of_isZGroup_complement
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S14.typeI_frobenius_of_isZGroup_complement
+-- Pf (12.8) minimal-counterexample existence: a nonempty prime set `π` yields a
+-- `CounterexampleHypothesis` at its least element `p = Nat.find` (the `InPi` witness + `Nat.find_min'`
+-- minimality).  The §8-free well-ordering step opening the minimal-counterexample analysis of (12.7).
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S14.exists_counterexampleHypothesis
 -- RepresentationTheory: completeness of irreducible characters — `f ⊥ Irr G ⇒ f = 0`
 -- (regular representation + Maschke + Schur).
 #assert_only_allowed_axioms OddOrder.RepresentationTheory.classFunction_eq_zero_of_orthogonal
@@ -6091,3 +6095,13 @@ formula together with the prime computation `coprimeFrobeniusAction_card_eq_prim
 -- `feitThompson` sorry `card_kappaHall_lt_of_isTypeIIIorIV` (whose residual is now only the genuine
 -- Peterfalvi (11.8), `S12.exists_zeta_residual_not_orthogonal`).  Axiom-clean.
 #assert_only_allowed_axioms OddOrder.card_Msigma_inf_centralizer_eq_card_W2
+
+-- **W4 §16→§7 bridge (lane-h, βM (14.11.2) de-opacification)** — `betaMExpansionData_of_hypothesis78`
+-- certifies that the (7.8.a) field of `BetaMExpansionData` (`β_M = 1_G − χ + Δ`) is a genuine
+-- consequence of the S09 §7 Dade decomposition
+-- `S09.Hypothesis78.beta_eq_constOne_sub_zetaImage_add_delta` (`β = 1_G − ζ^ν + Δ`), given `M`
+-- instantiating `S09.Hypothesis78` with `β_M = β` and `ψ^{τ₁} = ζ^ν` (the `χ = ζ^ν` branch, so
+-- `chi_norm` is `rfl`).  Reduces the faithful `betaM_expansion_data` obligation to the §3/§4 Dade
+-- construction + the (13.1.d)/(3.9) η-grid identification.  Axiom-clean (pure `rw` from the S09
+-- (7.8.a) cite).
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S16.betaMExpansionData_of_hypothesis78
