@@ -68,6 +68,28 @@ counterexample machinery。これらは char/un-isolated-§8 gated。
 **残 (downstream, 引き続き W2)**: (12.6) coherence dispatch、(12.10) 難方向 (type 判定) + (12.11)/(12.12)、
 char leaves (12.2)-(12.5)/(12.14)-(12.16)、エンドポイント (12.7) 難方向 / `theorem88_caseB_holds` (12.17, +(7.11))。
 
+### 2026-06-26 (lane-c 再開²): (12.7) headline を minimal-counterexample 経由で wire + (12.8) 構成
+
+**landed (commit 予定)**:
+- **(12.7) `typeI_frobenius` (headline) を bare `sorry` → honest reduction 化** (S14_MaximalI.lean)。
+  書籍の最小反例論法を Lean 化: `π = ∅` (`pi_empty`) を (12.16) `counterexample_contradiction`
+  から導き、易方向 `typeI_frobenius_of_pi_empty` (完成済) で各型 I maximal の Frobenius 分解を得る。
+  唯一の残 gate = (12.16) char 反例 (citing sorried lemma; 真の hard content の正しい所在)。
+  ⚠ `TypeIFrobeniusData` 構造は触らず (S15:1057 が構築); `kernel_eq_MF := True` (frobenius field が
+  `typeF.H = M_F` を kernel に既に名指すゆえ vacuous)。S15 consumer (516/1037) 不変 (full build green)。
+- **(12.8) `exists_counterexampleHypothesis` NEW (sorry-free + axiom-clean、AxiomsCheck 登録)**: π≠∅ ⟹
+  最小元 `p = Nat.find` で `CounterexampleHypothesis` 構成 (InPi witness + `Nat.find_min'` minimality)。
+  §8-free well-ordering step = 最小反例論法の入口。これが genuine な新規 group-theory content。
+- 配置: (12.7) theorem を依存先 (12.16) より後ろへ移動 (Lean 順序; 書籍 (12.7) は前だが proof は後)。
+  元位置にはポインタコメント。full build 3884 green、AxiomsCheck 緑。
+
+**§12 ungated runway 評価**: 残りは全て char (lane-b) / BG §16 (lane-f) / 未抽出 §8 gated と再確認:
+(12.6)=`sibleyTarget_frobI` は `SibleyDadeHypothesis` (6.8) full 構成要 (deep char/Dade)、
+(12.9) Hall complement=Prop 16.1 (lane-f/W1)、(12.10)/(12.11)=未抽出 §8 ((8.13.c1)) + char、
+char leaves=lane-b、(12.16)=char 反例の核、(12.17) `theorem88_caseB_holds`=∃ non-type-I maximal
+(char (7.11)/(12.17) Frobenius counting) + (8.8) partner assembly (BG §16)。FT consumer
+(`FeitThompson:361`) は `cb.S`/`S_maximal`/`S_nonI` のみ消費 (all-type-I 排除)。
+
 ## 参照
 
 - 正本: `notes/meta/ft_frontier_remap_2026_06_25.md` §2 (W2)

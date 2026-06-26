@@ -331,6 +331,15 @@ branch とも削除済み。旧 **A** / **D** も同様に退役済み (履歴�
 
 ## 現状メモ
 
+- **2026-06-26 — 監視再開 (変化なし) + cron 再作成 (relane #9 所有マップ反映)**: ユーザー「各レーンを監視します」
+  で再開。起動時点で **全 4 レーン (f/b/h/c) 0 unmerged** (前セッションで F→B→H→C 全合流済み, main HEAD
+  `844927ae` に merge commit 3 本)。local main = origin/main = `844927ae` (push 同期済み・保留なし)、`git` クリーン
+  (MERGE_HEAD なし)、`bin/count-sorry` baseline = **126**。前 cron は session 変化で消滅 (`CronList` 空,
+  [[cron-dies-on-model-switch]]) → 新 cron **`eaf3ccc5`** (`8,23,38,53 * * * *` = 標準 15 分, stop-on-problem prompt
+  内蔵, **relane #9 = W1-W4 所有マップ反映**: F/W1=BG全体+FeitThompson mp/carrier, C/W2=S14_MaximalI,
+  B/W3=S0[3-9]/S1[0-3]+FeitThompson:426, H/W4=S15_SAndT/S16_NonExistenceG)。新規 HUB ask issue なし
+  (issues/ 直下に "HUB:" タイトル 0)。build は未マージ 0 ゆえ走らせず (手順 step 1 = 「全レーン 0 なら変化なし即終了」)。
+
 - **2026-06-24 — 監視再開 + 4 レーン全合流 (4 merge) + cron 再作成 + 🔒 表を relane #7/#8 に同期**:
   ユーザー「各レーンを監視します」で再開。前 cron は session 変化で消滅 (`CronList` 空) → 新 cron **`0f508206`**
   (`8,23,38,53 * * * *` = 15分間隔, stop-on-problem prompt 内蔵, **relane #7/#8 所有マップ反映**)。

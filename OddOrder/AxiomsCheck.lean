@@ -747,6 +747,10 @@ set_option linter.style.longLine false in
 -- is Frobenius with kernel `M_F`, via `IsZGroup.exponent_eq_card` + `typeF_frobenius_of_card_eq_exponent`.
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S14.typeF_frobenius_of_isZGroup_complement
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S14.typeI_frobenius_of_isZGroup_complement
+-- Pf (12.8) minimal-counterexample existence: a nonempty prime set `π` yields a
+-- `CounterexampleHypothesis` at its least element `p = Nat.find` (the `InPi` witness + `Nat.find_min'`
+-- minimality).  The §8-free well-ordering step opening the minimal-counterexample analysis of (12.7).
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S14.exists_counterexampleHypothesis
 -- RepresentationTheory: completeness of irreducible characters — `f ⊥ Irr G ⇒ f = 0`
 -- (regular representation + Maschke + Schur).
 #assert_only_allowed_axioms OddOrder.RepresentationTheory.classFunction_eq_zero_of_orthogonal
