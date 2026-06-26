@@ -1683,30 +1683,33 @@ theorem E23_ne_bot_of_isTypeP2_caseTau1 [Finite G]
         ⟨hpp, hEeq ▸ (hpp.dvd_mul.mp hdvdME).resolve_left hpnMσ, Nat.card_pos.ne'⟩
     exact mem_kappa_of_mem_primeFactors_card_E1 hG h hE1prime hCE1 hpE1
 
-/-- **BG Proposition 14.2(e), reduced to `K* ⊊ M_σ`** (mmd L3846, non-circular core).  In a
-type-`P` `E`-setup whose `τ₁`-Hall `E₁` is contained in the `κ(M)`-subgroup `K` (so `K` is a
-`τ₁∪τ₃`-group and `K* = C_{M_σ}(K)`), the centralizer `K*` is a **proper** subgroup of `M_σ`.
+/-- **BG Proposition 14.2(e), second clause `S ⊄ K*`** (mmd L3828, proof L3846).  In a type-`P`
+`E`-setup whose `τ₁`-Hall `E₁` lies in the `κ(M)`-subgroup `K` (so `K` is a `τ₁∪τ₃`-group and
+`K* = C_{M_σ}(K)`), no Sylow `q`-subgroup `S` of `M_σ` is contained in `K*`.
 
-This is the non-circular replacement for the Corollary 15.6 route (`typeP_kstar_in_mf`, which
-carries `sorryAx` via `fitting_decomposition`); it is the linchpin of Corollary 15.3(a) — with
-`K* ⊊ M_σ` one shows `C_M(M_σ)` is a `κ(M)'`-group.
+This is the linchpin of Corollary 15.3(a): with it one shows `C_M(H)` is a `κ(M)'`-group for every
+nontrivial Hall subgroup `H` of `M_σ` (if `H ≤ K*`, a Sylow `S ≤ H ≤ K*` of `M_σ` violates this).
+It strengthens — and now subsumes — `kstar_ne_msigma_aux` (`K* ≠ M_σ`).
 
-Proof.  Pick `p₀ ∈ π(K)` and `X ∈ ℰ_{p₀}¹(K)`.  Then `C_{M_σ}(X) ⊇ K* ≠ 1`, so Lemma 13.13
-(`mem_sigma_of_tau1_tau3_centralize`), applied to a maximal `Mi ⊇ N_G(X)`, gives `p₀ ∈ σ(Mi)`;
-as `p₀ ∈ τ₁∪τ₃ ⊆ σ(M)'`, `Mi ≠ M`, and `K* ≤ C_G(X) ≤ N_G(X) ≤ Mi`, so `ℳ(K*) ≠ {M}`.  If
-`K* = M_σ`, pick `p ∈ π(M_σ)`, `X_S ∈ ℰ_p¹(K*)`, and a Sylow `S = Syl_p(M_σ)`; Lemma 13.6
-(`maximalContaining_eq_singleton_of_E1`, `P = E₁ ≤ K`) gives `ℳ(S) = {M}`, but
-`S ≤ M_σ = K* ≤ Mi` forces `Mi = M`, a contradiction. -/
-theorem kstar_ne_msigma_aux [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+Proof (BG L3846).  **Part A** (`ℳ(K*) ≠ {M}`): pick `p₀ ∈ π(K)` and `X ∈ ℰ_{p₀}¹(K)`; then
+`C_{M_σ}(X) ⊇ K* ≠ 1`, so Lemma 13.13 (`mem_sigma_of_tau1_tau3_centralize`), applied to a maximal
+`Mi ⊇ N_G(X)`, gives `p₀ ∈ σ(Mi)`; as `p₀ ∈ τ₁∪τ₃ ⊆ σ(M)'` we get `Mi ≠ M`, and
+`K* ≤ C_G(X) ≤ N_G(X) ≤ Mi`.  **Part B**: if `S ≤ K*`, take `X_S ∈ ℰ_q¹(S) ⊆ ℰ_q¹(K*)`; since
+`E₁ ≤ K`, `X_S ≤ M_σ ⊓ C(E₁)`, so Lemma 13.6 (`maximalContaining_eq_singleton_of_E1`, `P = E₁`)
+gives `ℳ(S) = {M}`; but `S ≤ K* ≤ Mi` forces `Mi ∈ ℳ(S) = {M}`, i.e. `Mi = M`, a contradiction. -/
+theorem typeP_sylow_not_le_kstar [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     {M E E₁ E₂ E₃ K Kstar : Subgroup G} (h : SubgroupESetup M E E₁ E₂ E₃)
     (hE1K : E₁ ≤ K) (hKE : K ≤ E) (hE1ne : E₁ ≠ ⊥) (hKne : K ≠ ⊥)
     (hKpi13 : ∀ p ∈ (Nat.card ↥K).primeFactors, p ∈ tau1 M ∪ tau3 M)
     (hKstar : Kstar = OddOrder.BG.Ch3.S10.Msigma M ⊓ Subgroup.centralizer (K : Set G))
-    (hKstar_ne : Kstar ≠ ⊥) :
-    Kstar ≠ OddOrder.BG.Ch3.S10.Msigma M := by
+    (hKstar_ne : Kstar ≠ ⊥)
+    {q : ℕ} [Fact q.Prime] {S : Subgroup G} (hSne : S ≠ ⊥)
+    (hSle : S ≤ OddOrder.BG.Ch3.S10.Msigma M) (hSq : IsPGroup q ↥S)
+    (hSmax : ∀ T : Subgroup G, T ≤ OddOrder.BG.Ch3.S10.Msigma M → IsPGroup q ↥T → S ≤ T → S = T) :
+    ¬ S ≤ Kstar := by
   classical
+  intro hSK
   -- ## Part A: `ℳ(K*) ≠ {M}` — some maximal `Mi ≠ M` contains `K*`.
-  -- Pick `p₀ ∈ π(K)` and a rank-one `X ∈ ℰ_{p₀}¹(K)`.
   obtain ⟨p₀, hp₀, hp₀dvd⟩ :=
     (Nat.card ↥K).exists_prime_and_dvd (fun hc => hKne (Subgroup.card_eq_one.mp hc))
   haveI : Fact p₀.Prime := ⟨hp₀⟩
@@ -1721,7 +1724,6 @@ theorem kstar_ne_msigma_aux [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
   have hXM : Subgroup.zpowers (w : G) ≤ M := (hXK.trans hKE).trans h.E_le
   have hp₀τ13 : p₀ ∈ tau1 M ∪ tau3 M :=
     hKpi13 p₀ (Nat.mem_primeFactors.mpr ⟨hp₀, hp₀dvd, Nat.card_pos.ne'⟩)
-  -- `K* ≤ M_σ ⊓ C(X)`, so `C_{M_σ}(X) ≠ 1`.
   have hKstar_le_inf : Kstar ≤ OddOrder.BG.Ch3.S10.Msigma M ⊓
       Subgroup.centralizer ((Subgroup.zpowers (w : G)) : Set G) := by
     rw [hKstar]
@@ -1729,7 +1731,6 @@ theorem kstar_ne_msigma_aux [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
   have hCX : OddOrder.BG.Ch3.S10.Msigma M ⊓
       Subgroup.centralizer ((Subgroup.zpowers (w : G)) : Set G) ≠ ⊥ :=
     fun hbot => hKstar_ne (le_bot_iff.mp (hKstar_le_inf.trans hbot.le))
-  -- A maximal `Mi ⊇ N_G(X)`.
   have hNlt : Subgroup.normalizer ((Subgroup.zpowers (w : G)) : Set G) < ⊤ :=
     normalizer_lt_top_of_le_of_ne_bot hG h.mem_maximal hXM hXne
   obtain ⟨Mi, hMico, hNMi⟩ :=
@@ -1737,57 +1738,83 @@ theorem kstar_ne_msigma_aux [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
       hNlt.ne
   have hMimem : Mi ∈ maximalSubgroupsContaining
       (Subgroup.normalizer ((Subgroup.zpowers (w : G)) : Set G)) := ⟨hMico, hNMi⟩
-  -- Lemma 13.13: `p₀ ∈ σ(Mi)`.
   have hp₀σMi : p₀ ∈ OddOrder.BG.Ch3.S10.sigma Mi :=
     mem_sigma_of_tau1_tau3_centralize hG h hp₀τ13 hXelem ((hXK.trans hKE)) hCX hMimem
-  -- `Mi ≠ M`:  `p₀ ∈ σ(Mi)` but `p₀ ∈ τ₁∪τ₃ ⊆ σ(M)'`.
   have hMineM : Mi ≠ M := by
     intro hMieq
     have hp₀σM : p₀ ∈ OddOrder.BG.Ch3.S10.sigma M := hMieq ▸ hp₀σMi
     have hp₀nσM : p₀ ∉ OddOrder.BG.Ch3.S10.sigma M :=
       hp₀τ13.elim (fun hh => tau1_subset_sigma_compl M hh) (fun hh => tau3_subset_sigma_compl M hh)
     exact hp₀nσM hp₀σM
-  -- `K* ≤ C_G(X) ≤ N_G(X) ≤ Mi`.
   have hKstar_le_Mi : Kstar ≤ Mi :=
     ((hKstar_le_inf.trans inf_le_right).trans (Subgroup.centralizer_le_normalizer _)).trans hNMi
-  -- ## Part B:  if `K* = M_σ`, derive a contradiction via Lemma 13.6.
-  intro hKMσ
-  -- Pick `p ∈ π(M_σ)`.
-  have hMσne : OddOrder.BG.Ch3.S10.Msigma M ≠ ⊥ := OddOrder.BG.Ch3.S10.Msigma_ne_bot hG h.mem_maximal
-  obtain ⟨p, hp, hpdvd⟩ := (Nat.card ↥(OddOrder.BG.Ch3.S10.Msigma M)).exists_prime_and_dvd
-    (fun hc => hMσne (Subgroup.card_eq_one.mp hc))
-  haveI : Fact p.Prime := ⟨hp⟩
-  have hpσ : p ∈ OddOrder.BG.Ch3.S10.sigma M :=
-    OddOrder.BG.Ch3.S10.Msigma_isPiGroup M p (Nat.mem_primeFactors.mpr ⟨hp, hpdvd, Nat.card_pos.ne'⟩)
-  -- A rank-one `X_S ∈ ℰ_p¹(K*)` (`= ℰ_p¹(M_σ)`).
-  have hpdvdK : p ∣ Nat.card ↥Kstar := by rw [hKMσ]; exact hpdvd
-  obtain ⟨v, hv⟩ := exists_prime_orderOf_dvd_card' p hpdvdK
-  have hXScard : Nat.card ↥(Subgroup.zpowers (v : G)) = p := by
+  -- ## Part B: `S ≤ K*` contradicts `ℳ(S) = {M}` (Lemma 13.6).
+  -- `q ∣ |S|` (nontrivial `q`-group), so pick `X_S ∈ ℰ_q¹(S)`.
+  have hqdvdS : q ∣ Nat.card ↥S := by
+    obtain ⟨k, hk⟩ := IsPGroup.iff_card.mp hSq
+    rw [hk]
+    refine dvd_pow_self q ?_
+    rintro rfl
+    rw [pow_zero] at hk
+    exact hSne (Subgroup.card_eq_one.mp hk)
+  obtain ⟨v, hv⟩ := exists_prime_orderOf_dvd_card' q hqdvdS
+  have hXScard : Nat.card ↥(Subgroup.zpowers (v : G)) = q := by
     rw [Nat.card_zpowers]
-    exact (orderOf_injective _ Kstar.subtype_injective v).trans hv
-  have hXSelem : Subgroup.zpowers (v : G) ∈ elemAbelianOfRank G p 1 :=
+    exact (orderOf_injective _ S.subtype_injective v).trans hv
+  have hXSelem : Subgroup.zpowers (v : G) ∈ elemAbelianOfRank G q 1 :=
     ⟨Subgroup.IsElementaryAbelian.of_card_prime hXScard, by rw [hXScard, pow_one]⟩
-  have hXS_le_Kstar : Subgroup.zpowers (v : G) ≤ Kstar := Subgroup.zpowers_le.mpr v.2
-  -- `X_S ≤ M_σ ⊓ C(E₁)`  (`X_S ≤ K* = M_σ ⊓ C(K) ≤ M_σ ⊓ C(E₁)`, since `E₁ ≤ K`).
+  have hXS_le_S : Subgroup.zpowers (v : G) ≤ S := Subgroup.zpowers_le.mpr v.2
+  have hXS_le_Kstar : Subgroup.zpowers (v : G) ≤ Kstar := hXS_le_S.trans hSK
+  -- `X_S ≤ M_σ ⊓ C(E₁)` (`X_S ≤ K* = M_σ ⊓ C(K) ≤ M_σ ⊓ C(E₁)`, since `E₁ ≤ K`).
   have hXC : Subgroup.zpowers (v : G) ≤ OddOrder.BG.Ch3.S10.Msigma M ⊓
       Subgroup.centralizer (E₁ : Set G) := by
     have h1 : Subgroup.zpowers (v : G) ≤
         OddOrder.BG.Ch3.S10.Msigma M ⊓ Subgroup.centralizer (K : Set G) := hKstar ▸ hXS_le_Kstar
     exact le_inf (h1.trans inf_le_left)
       ((h1.trans inf_le_right).trans (Subgroup.centralizer_le (SetLike.coe_subset_coe.mpr hE1K)))
-  -- A Sylow `p`-subgroup `S` of `M_σ`; Lemma 13.6 gives `ℳ(S) = {M}`.
+  -- `q ∈ σ(M)` (`X_S ≤ M_σ`).
+  have hqσ : q ∈ OddOrder.BG.Ch3.S10.sigma M :=
+    OddOrder.BG.Ch3.S10.Msigma_isPiGroup M q (Nat.mem_primeFactors.mpr
+      ⟨Fact.out, hqdvdS.trans (Subgroup.card_dvd_of_le hSle), Nat.card_pos.ne'⟩)
+  -- Lemma 13.6: `ℳ(S) = {M}`.
+  have hMS : maximalSubgroupsContaining S = {M} :=
+    (maximalContaining_eq_singleton_of_E1 hG h hqσ (le_refl E₁) hE1ne hXSelem hXC hSle hSq hSmax).2
+  -- `S ≤ K* ≤ Mi`, so `Mi ∈ ℳ(S) = {M}`, i.e. `Mi = M`, contradicting `Mi ≠ M`.
+  have hMiS : Mi ∈ maximalSubgroupsContaining S := ⟨hMico, hSK.trans hKstar_le_Mi⟩
+  rw [hMS, Set.mem_singleton_iff] at hMiS
+  exact hMineM hMiS
+
+/-- **BG Proposition 14.2(e), `K* ⊊ M_σ` form** (mmd L3846).  Immediate corollary of
+`typeP_sylow_not_le_kstar`: a Sylow `S` of `M_σ` cannot lie in `K*`, so `K* ≠ M_σ` (else every
+`S ≤ M_σ = K*`).  Retained as a named lemma for the `typeP_structure` `(e)` conjunct. -/
+theorem kstar_ne_msigma_aux [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    {M E E₁ E₂ E₃ K Kstar : Subgroup G} (h : SubgroupESetup M E E₁ E₂ E₃)
+    (hE1K : E₁ ≤ K) (hKE : K ≤ E) (hE1ne : E₁ ≠ ⊥) (hKne : K ≠ ⊥)
+    (hKpi13 : ∀ p ∈ (Nat.card ↥K).primeFactors, p ∈ tau1 M ∪ tau3 M)
+    (hKstar : Kstar = OddOrder.BG.Ch3.S10.Msigma M ⊓ Subgroup.centralizer (K : Set G))
+    (hKstar_ne : Kstar ≠ ⊥) :
+    Kstar ≠ OddOrder.BG.Ch3.S10.Msigma M := by
+  classical
+  intro hKMσ
+  -- Pick `p ∈ π(M_σ)` and a Sylow `S = Syl_p(M_σ)`; then `S ≤ M_σ = K*`, contradicting
+  -- `typeP_sylow_not_le_kstar` (`S ⊄ K*`).
+  have hMσne : OddOrder.BG.Ch3.S10.Msigma M ≠ ⊥ :=
+    OddOrder.BG.Ch3.S10.Msigma_ne_bot hG h.mem_maximal
+  obtain ⟨p, hp, hpdvd⟩ := (Nat.card ↥(OddOrder.BG.Ch3.S10.Msigma M)).exists_prime_and_dvd
+    (fun hc => hMσne (Subgroup.card_eq_one.mp hc))
+  haveI : Fact p.Prime := ⟨hp⟩
   obtain ⟨S, hSMσ, hSq, _, hScard⟩ := exists_einvariant_sylow_Msigma hG h p
   have hSmax : ∀ T : Subgroup G, T ≤ OddOrder.BG.Ch3.S10.Msigma M → IsPGroup p ↥T → S ≤ T → S = T :=
     fun T hTM hTq hST => eq_of_le_of_isPGroup_card_eq_factorization hScard hTM hTq hST
-  have hMS : maximalSubgroupsContaining S = {M} :=
-    (maximalContaining_eq_singleton_of_E1 hG h hpσ (le_refl E₁) hE1ne hXSelem hXC hSMσ hSq hSmax).2
-  -- `S ≤ M_σ = K* ≤ Mi`, so `Mi ∈ ℳ(S) = {M}`, i.e. `Mi = M`, contradicting `Mi ≠ M`.
-  have hS_le_Mi : S ≤ Mi := by
-    have hSK : S ≤ Kstar := by rw [hKMσ]; exact hSMσ
-    exact hSK.trans hKstar_le_Mi
-  have hMiS : Mi ∈ maximalSubgroupsContaining S := ⟨hMico, hS_le_Mi⟩
-  rw [hMS, Set.mem_singleton_iff] at hMiS
-  exact hMineM hMiS
+  have hSne : S ≠ ⊥ := by
+    intro hSbot
+    have hpdvdS : p ∣ Nat.card ↥S := by
+      rw [hScard]
+      exact dvd_pow_self p (hp.factorization_pos_of_dvd Nat.card_pos.ne' hpdvd).ne'
+    rw [Subgroup.card_eq_one.mpr hSbot] at hpdvdS
+    exact hp.one_lt.ne' (Nat.dvd_one.mp hpdvdS)
+  exact typeP_sylow_not_le_kstar hG h hE1K hKE hE1ne hKne hKpi13 hKstar hKstar_ne
+    hSne hSMσ hSq hSmax (by rw [hKMσ]; exact hSMσ)
 
 /-- **BG Proposition 14.2** (mmd L3778): structure of a type-`P` maximal subgroup
 ("nearly everything proved in §13" about `M ∈ 𝓜_𝓟`).

@@ -3967,10 +3967,14 @@ set_option linter.style.longLine false in
 -- The proved half of the rank core `piSet_mf_inf_beta_disjoint_of_not_fittingIsTI`; sorry-free +
 -- axiom-clean.
 #assert_only_allowed_axioms OddOrder.BG.Ch4.S15.three_le_pRank_mf_of_mem_beta
--- BG Proposition 14.2(e) core (`S14_TypePCounting`, issue 8016): in a type-`P` `E`-setup with the
--- `κ`-Hall `K` playing the `E₁`-role, `K* = C_{M_σ}(K) ⊊ M_σ`.  Proven *non-circularly* (Lemma
--- 13.13 ⟹ `ℳ(K*) ≠ {M}`, Lemma 13.6 ⟹ `ℳ(Syl_p M_σ) = {M}`), replacing the circular Cor 15.6
--- route.  Exposed as the 7th conjunct of `typeP_structure`.  Sorry-free + axiom-clean.
+-- BG Proposition 14.2(e), second clause (`S14_TypePCounting`, issue 2025): in a type-`P` `E`-setup
+-- with the `κ`-Hall `K` playing the `E₁`-role, no Sylow `q`-subgroup `S` of `M_σ` lies in
+-- `K* = C_{M_σ}(K)`.  Proven non-circularly (Lemma 13.13 ⟹ `ℳ(K*) ≠ {M}`, Lemma 13.6 ⟹
+-- `ℳ(S) = {M}`).  The linchpin of the general-Hall κ'-fact for Cor 15.3(a).  Sorry-free + axiom-clean.
+#assert_only_allowed_axioms OddOrder.BG.Ch4.S14.typeP_sylow_not_le_kstar
+-- BG Proposition 14.2(e) core (`S14_TypePCounting`, issue 8016/2025): `K* = C_{M_σ}(K) ⊊ M_σ`.  Now
+-- an immediate corollary of `typeP_sylow_not_le_kstar` (a Sylow `S ≤ M_σ = K*` would violate it).
+-- Exposed as the 7th conjunct of `typeP_structure`.  Sorry-free + axiom-clean.
 #assert_only_allowed_axioms OddOrder.BG.Ch4.S14.kstar_ne_msigma_aux
 -- BG Corollary 15.3 step (`S14_TypePCounting`, issue 8016): `C_M(M_σ)` is a `κ(M)'`-group.  The
 -- exact statement BG cites at the start of Cor 15.3's proof (mmd L4209).  Sorry-free + axiom-clean.
