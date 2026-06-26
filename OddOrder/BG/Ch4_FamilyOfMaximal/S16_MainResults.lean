@@ -6,6 +6,7 @@ Authors: Yawara Ishida
 import OddOrder.BG.Ch4_FamilyOfMaximal.S15_MF
 import OddOrder.BG.Ch4_FamilyOfMaximal.S16_PairIntersection
 import OddOrder.GroupTheory.MaximalSubgroupType
+import OddOrder.GroupTheory.AInvariantComplement
 
 /-!
 # BG §16: The Main Results
@@ -1274,6 +1275,72 @@ theorem isTypeP1_derivedInG_eq_Msigma [Finite G] (hG : OddOrder.BG.IsMinimalSimp
   -- Lemma 15.1(b): `M' = U ⊔ M_σ = ⊥ ⊔ M_σ = M_σ`.
   have haux := typeP_auxiliary_structure hG hM hKM hUM hK rfl hU
   rw [(haux.2.2.2.2.1 hKne).1, hUbot, bot_sup_eq]
+
+/-- **Type-`P₁` `M_F`-internal complement** (the `M' = M_F ⋊ U` factorisation of Peterfalvi (8.4.b)
+/ Coq `of_typeP`): for a type-`P₁` maximal subgroup `M` with Hall `κ(M)`-subgroup `K`, the Fitting
+kernel `M_F` has a `K`-invariant complement `U` inside `M' = M_σ` (`M_F ⊔ U = M'`, `K ≤ N_G(U)`,
+`M_F ⊓ U = ⊥`).
+
+Construction: `M' = M_σ` (`isTypeP1_derivedInG_eq_Msigma`) is solvable, `M_F ◁ M` is a Hall subgroup
+of `M'` (`maxNilpotentNormalHall_isHall`, transferred from `M` via index-divisibility), and `K` (a
+`σ'`-group, `κ ⊆ σᶜ`) acts coprimely on the `σ`-group `M'`; the `K`-invariant Schur–Zassenhaus
+complement (`exists_aInvariant_complement_within_normal`) supplies `U`.  This discharges the
+`hUle`/`hKnorm`/`hDcompl`/`U ≠ ⊥` `TypePData` fields of the FT-critical `hP1neIIIIV` bridge; the
+remaining `TypePData` fields (`U` nilpotent `= M'/M_F` nilpotent, the `F(M) = M_F ⊔ (U ⊓ C_M(M_F))`
+decomposition) and `N_G(U) ⊆ M` are the deeper Coq `Fcore_structure` content. -/
+theorem exists_typeP1_mf_complement [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    {M K : Subgroup G} (hM : M ∈ maximalSubgroups G) (hP1 : S14.IsTypeP1 M) (hKM : K ≤ M)
+    (hK : Ch03.IsHallSubgroup (S14.kappa M) (K.subgroupOf M)) :
+    ∃ U : Subgroup G, U ≤ derivedInG M ∧
+      maxNilpotentNormalHall M ⊔ U = derivedInG M ∧
+      K ≤ Subgroup.normalizer (U : Set G) ∧
+      maxNilpotentNormalHall M ⊓ U = ⊥ := by
+  classical
+  haveI : IsSolvable ↥M := hG.solvable_of_mem_maximalSubgroups hM
+  set M' := derivedInG M with hM'def
+  set N := maxNilpotentNormalHall M with hNdef
+  have hM'_le_M : M' ≤ M := Subgroup.map_subtype_le _
+  have hM'σ : M' = OddOrder.BG.Ch3.S10.Msigma M := isTypeP1_derivedInG_eq_Msigma hG hM hP1
+  haveI : IsSolvable ↥M' :=
+    solvable_of_solvable_injective (f := (Subgroup.inclusion hM'_le_M))
+      (Subgroup.inclusion_injective hM'_le_M)
+  -- `N = M_F ≤ M' = M_σ`.
+  have hN_le : N ≤ M' := by rw [hM'σ]; exact maxNilpotentNormalHall_le_Msigma hG hM
+  -- Normalizer facts (`M_F ◁ M`, `M' ◁ M`, `K ≤ M`).
+  have hM'_norm_N : M' ≤ Subgroup.normalizer (N : Set G) :=
+    hM'_le_M.trans (maxNilpotentNormalHall_le_normalizer M)
+  have hK_norm_M' : K ≤ Subgroup.normalizer (M' : Set G) :=
+    hKM.trans (OddOrder.BG.Ch3.S10.le_normalizer_derivedInG M)
+  have hK_norm_N : K ≤ Subgroup.normalizer (N : Set G) :=
+    hKM.trans (maxNilpotentNormalHall_le_normalizer M)
+  -- `M_F` is a Hall subgroup of `M'` (transfer from `M`, since `[M':M_F] ∣ [M:M_F]`).
+  have hN_hall : Ch03.IsHallSubgroup (Nat.card ↥N).primeFactors (N.subgroupOf M') := by
+    obtain ⟨h1, h2⟩ := maxNilpotentNormalHall_isHall M
+    refine ⟨fun p hp => ?_, fun p hp => ?_⟩
+    · rwa [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hN_le).toEquiv] at hp
+    · apply h2 p
+      have hmul := Subgroup.relIndex_mul_relIndex N M' M hN_le hM'_le_M
+      have hdvd : (N.subgroupOf M').index ∣ (N.subgroupOf M).index :=
+        ⟨M'.relIndex M, hmul.symm⟩
+      exact Nat.primeFactors_mono hdvd Subgroup.index_ne_zero_of_finite hp
+  -- `K` (a `σ'`-group) acts coprimely on `M' = M_σ` (a `σ`-group).
+  have hCop : Nat.Coprime (Nat.card ↥K) (Nat.card ↥M') := by
+    refine Ch03.Nat.coprime_of_isPiGroup_of_isPiGroup_compl (π := (OddOrder.BG.Ch3.S10.sigma M)ᶜ)
+      Nat.card_pos.ne' Nat.card_pos.ne' (fun p hp => ?_) (fun p hp => ?_)
+    · -- `p ∈ π(K) ⊆ κ ⊆ σᶜ`.
+      have hpκ : p ∈ S14.kappa M := by
+        apply hK.1
+        rwa [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hKM).toEquiv]
+      exact S14.kappa_subset_sigmaCompl hpκ
+    · -- `p ∈ π(M') = π(M_σ) ⊆ σ`, so `p ∉ σᶜ`.
+      simp only [Set.mem_compl_iff, not_not]
+      have hpMσ : p ∈ (Nat.card ↥((OddOrder.BG.Ch3.S10.Msigma M).subgroupOf M)).primeFactors := by
+        rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe (OddOrder.BG.Ch3.S10.Msigma_le M)).toEquiv,
+          ← hM'σ]
+        exact hp
+      exact (OddOrder.BG.Ch3.S10.Msigma_subgroupOf_isHall hG hM).1 p hpMσ
+  exact OddOrder.GroupTheory.exists_aInvariant_complement_within_normal
+    hN_le hM'_norm_N hK_norm_M' hK_norm_N hN_hall hCop
 
 /-- **Prop 16.1(a) forward bridge, core** (mmd L4480): a type-`F` maximal `M` (`κ(M) = ∅`, so the
 Hall `κ`-subgroup `K = ⊥`) carries the shared Peterfalvi type-`F` structure `TypeFData M`.
