@@ -164,3 +164,17 @@ is now **sorry-free in its own body** (grep: 0 real sorries). The唯一の残 FT
 (axiom-clean)。残 W3 = **genuine (11.8) の単一 char obligation** (`exists_zeta_residual_not_orthogonal`、
 S12、lane-b)。これは documented "main load" (11.8.1)-(11.8.6) = §9 char counting + S(HC)/τ₁ materialization
 依存の deep multi-step。詳細 = `notes/peterfalvi/s13_11_8_orthogonality.md`。
+
+## bridge-enabled next step (recorded 2026-06-26)
+
+The new `card_Msigma_inf_centralizer_eq_card_W2` (|K*|=w₂) directly enables proving
+`S10.exists_typeII_maximal_with_w2_of_typeP` (S10:148, the (8.8) Type-II partner, **on FT path** —
+consumed by S11 (9.3) / S12 (10.3) `w2_prime`): the `typeP_duality` partner `Mstar` is Type II with
+`[Mstar:Mstar'] = |Kstar| = |W₂|`. To land it: (1) **relocate the bridge** from `FeitThompson` to `S10`
+(upstream; S10 transitively imports its deps via `S16_MainResults`; better reusable home), then
+FeitThompson + AxiomsCheck cite `S10.card_Msigma_inf_centralizer_eq_card_W2`; (2) get
+`BG.Ch4.S14.IsTypeP M` (= κ≠∅, **distinct** from `Nonempty (TypePData M)`) from M type III/IV/V via
+non-I (`notTypeI_imp_typeP` + type exclusivity); (3) cite `proposition_type_classification` (W1, sorried)
+twice — M not P₂ (⟹ partner is P₂) and P₂ partner ⟹ Type II. This swaps the current "gated on
+theorem88_caseB_holds (W2)" sorry for "gated on proposition_type_classification (W1, actively-worked) +
+axiom-clean bridge" — a cleaner gate. Distinct unit; not started.
