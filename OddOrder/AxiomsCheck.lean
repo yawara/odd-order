@@ -3979,6 +3979,16 @@ set_option linter.style.longLine false in
 -- BG Corollary 15.3 step (`S14_TypePCounting`, issue 8016): `C_M(M_σ)` is a `κ(M)'`-group.  The
 -- exact statement BG cites at the start of Cor 15.3's proof (mmd L4209).  Sorry-free + axiom-clean.
 #assert_only_allowed_axioms OddOrder.BG.Ch4.S14.centralizer_msigma_isPiSubgroup_kappa_compl
+-- §12 `E`-setup adapted to a `κ(M)`-Hall `K` (`S14_TypePCounting`, issue 2025): the preamble of
+-- Prop 14.2's proof, producing an `E`-setup with `E₁ ≤ K ≤ E`.  Sorry-free + axiom-clean.
+#assert_only_allowed_axioms OddOrder.BG.Ch4.S14.exists_typePESetup_kappaHall
+-- BG Prop 14.2(e) packaged for `typeP_structure` inputs (`S14_TypePCounting`, issue 2025): `S ⊄ K*`
+-- with `M` maximal type-`P`, `K` a Hall `κ(M)`-subgroup (no raw `E`-setup).  Sorry-free + axiom-clean.
+#assert_only_allowed_axioms OddOrder.BG.Ch4.S14.typeP_sylow_not_le_kstar_of_isHall
+-- BG Corollary 15.3(a) `κ'`-fact for general Hall `H` (`S14_TypePCounting`, issue 2025): `C_M(H)` is a
+-- `κ(M)'`-group for every nontrivial Hall `H ≤ M_σ`.  Via Prop 14.2(b1) + (e); the general analogue
+-- of `centralizer_msigma_isPiSubgroup_kappa_compl`.  Sorry-free + axiom-clean.
+#assert_only_allowed_axioms OddOrder.BG.Ch4.S14.centralizer_hall_isPiSubgroup_kappa_compl
 -- BG Corollary 15.3(a) for `H = M_σ` (`S15_MF`, issue 8016): `C_M(M_σ) = (C_G(M_σ) ⊓ M_σ) ⊔ X`,
 -- `X` cyclic `τ₂`.  The `ha` input that `fitting_decomposition` consumes; assembled from the
 -- `κ'`-group property + Schur–Zassenhaus + Lemma 15.1(c).  Sorry-free + axiom-clean.
@@ -3987,6 +3997,10 @@ set_option linter.style.longLine false in
 -- single `κ(M)'` fact — given `C_M(H)` is `κ'`, `C_M(H) = (C_G(H) ⊓ M_σ) ⊔ X` with `X` cyclic `τ₂`.
 -- Generalizes `mf_centralizer_msigma_decomp` (κ' via hypothesis; `C_{M_σ}(X) ≠ 1` from `H ≠ ⊥`).
 #assert_only_allowed_axioms OddOrder.BG.Ch4.S15.mf_centralizer_hall_decomp_of_kappaCompl
+-- BG Corollary 15.3(a) for general Hall `H` of `M_σ`, **unconditional** (`S15_MF`, issue 2025): the
+-- `ha` input of `mf_hall_centralizer_control` with the `κ(M)'` hypothesis now discharged by
+-- `centralizer_hall_isPiSubgroup_kappa_compl`.  Closes the `ha` gate of Cor 15.3.  Sorry-free + axiom-clean.
+#assert_only_allowed_axioms OddOrder.BG.Ch4.S15.mf_centralizer_hall_decomp
 -- BG Theorem A(8) `FittingIsTI` (`S15_MF`, issue 8016): `M_F ≠ M_σ ⟹ F(M)` is a `TI`-subgroup.
 -- Now **fully axiom-clean** — the last sorryAx (via `fitting_decomposition`'s cite of the sorried
 -- general Corollary 15.3) is eliminated by routing through `mf_centralizer_msigma_decomp`.
