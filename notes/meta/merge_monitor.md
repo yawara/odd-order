@@ -195,7 +195,7 @@ branch とも削除済み。旧 **A** / **D** も同様に退役済み (履歴�
 > 「監視ループ再開（cron id <new-id>）」を 1 行記録する。**この stop→resolve→resume サイクルが監視ループの
 > 正規ライフサイクル**であり、停止は一時退避でしかない。
 
-> **🔒 レーン所有マップ（step 1.5 範囲逸脱チェック用、2026-06-26 relane #11 = lane-h W2→W1 carrier）**:
+> **🔒 レーン所有マップ（step 1.5 範囲逸脱チェック用、2026-06-26 relane #12 = lane-h W1 carrier moot→W2 復帰）**:
 > 正本 = [`ft_frontier_remap_2026_06_25.md`](ft_frontier_remap_2026_06_25.md) + issue 2026/2027 + relane #10/#11。
 > **relane #11 (2026-06-26, ユーザー裁可「W1 に火力集中」, 監査 workflow `wf_1cb6284d-bb2` verdict=minor-adjust)**:
 > 監査で「FT frontier は char-bound で狭く、4 レーン中 3 つ (b/c/h) が ungated 0 で starve、唯一 lane-f の W1 群論が
@@ -205,10 +205,10 @@ branch とも削除済み。旧 **A** / **D** も同様に退役済み (履歴�
 > **combined owned_re は不変** (S16_PairIntersection も S14_MaximalI も BG/Pf で元々 owned_re 内) ゆえ cron 監視式は無改訂。
 > | lane | フロント | 所有 .lean（これ以外の Pf/BG S-ファイル編集 = 逸脱→停止） |
 > |---|---|---|
-> | **F** (lane-f) | **W1-a** BG §16 Prop 16.1 forward pair (hP1neIIIIV/hP1eqV) + reverse 本体 [最優先・最大 fan-out] | `OddOrder/BG/**`（特に S16_MainResults）+ `OddOrder/FeitThompson.lean` の mp/carrier 宣言 |
-> | **C** (lane-c) | **W1-b** BG §15 Cor 15.3 (input 所在 audit 先行、不明なら新規 lemma 形式化) | `OddOrder/BG/Ch4_FamilyOfMaximal/S14_TypePCounting.lean` + `S15_MF.lean`（BG 内、f/h と別ファイル）|
-> | **B** (lane-b) | **W3** §10-13 char 核 = (11.8) exists_zeta_residual_not_orthogonal + Dade-norm engine [S10 11本は W1-gated driver] | `OddOrder/Peterfalvi/S0[3-9]*` + `S10*`〜`S13*` + `OddOrder/FeitThompson.lean:426` |
-> | **H** (lane-h) | **W1 carrier** reverse-bridge rank-1 crux π(W₁)⊆κ(M) (relane #11, issue 2027) | `OddOrder/BG/Ch4_FamilyOfMaximal/S16_PairIntersection.lean` or 新 BG leaf（f の S16_MainResults と別ファイル隔離; 旧 W2=S14_MaximalI / W4=S15_SAndT/S16_NonExistenceG は driver/await）|
+> | **F** (lane-f) | **W1-a** BG §16 Prop 16.1 forward pair + **reverse P1/P2 wiring 単独** (relane #12, carrier moot) | `OddOrder/BG/**`（特に S16_MainResults）+ `OddOrder/FeitThompson.lean` の mp/carrier 宣言 |
+> | **C** (lane-c) | **W1-b** BG §15 Cor 15.3 (ha gate 閉鎖済、残 hfratt/Thm 15.2) | `OddOrder/BG/Ch4_FamilyOfMaximal/S14_TypePCounting.lean` + `S15_MF.lean`（BG 内、f/h と別ファイル）|
+> | **B** (lane-b) | **W3** §10-13 char 核 = (11.8) + Dade-norm engine ((10.8) 3 分解化済) [S10 11本は W1-gated driver] | `OddOrder/Peterfalvi/S0[3-9]*` + `S10*`〜`S13*` + `OddOrder/FeitThompson.lean:426` |
+> | **H** (lane-h) | **W2** §12 all-Type-I tower 群論 (relane #12, W1 carrier moot で W2 復帰; 監査の char 従属評価は誤り) | `OddOrder/Peterfalvi/S14_MaximalI.lean`（旧 W4=S15_SAndT/S16_NonExistenceG は driver/await; reverse wiring は lane-f）|
 > | **共有（全 lane 可）** | — | `OddOrder/AxiomsCheck.lean` / `OddOrder.lean` / `OddOrder/GroupTheory/**` / **`OddOrder/FeitThompson.lean`** (宣言単位: W1=mp/carrier、W3=:426 bare sorry、prefix-split で衝突回避) / `notes/**` / `issues/**` |
 
 1. 各レーンの未マージ確認: `git log --oneline main..<branch>`。
@@ -335,6 +335,18 @@ branch とも削除済み。旧 **A** / **D** も同様に退役済み (履歴�
   (索敵: theirs が取り込まれたか。base==ours で theirs 変更なら theirs 採用が正)。
 
 ## 現状メモ
+
+- **2026-06-26 (続³) — relane #11 着地検証 → relane #12 (lane-h W2 復帰、carrier moot)**: relane #11 後の初稼働で
+  4 レーン合流 (実 sorry 125→126、build 3884 green)。**主成果**: F=hP1eqV を Suzuki ケースに縮小 / B=(10.8)
+  S_not_coherent 忠実 3 分解 (relane #11 の Dade-engine 指示が奏功) / C=Cor 15.3(a) ha gate を Prop 14.2(e) で
+  実証明閉鎖 (relane #11 の input audit 指示が奏功) / H=W1 carrier survey。**⚠ lane-h survey が relane #11 の 2 前提
+  を反証**: (1) rank-1 carrier は lane-f が 2026-06-25 に carrier 不要で完成済 (issue 8015 の 06-20 DAG を監査が鵜呑み)、
+  (2) W2 は char 従属でなく ungated 群論が実在 (lane-h の theorem88_caseB reduction が実証)。reverse 真の残=P1/P2 判定は
+  S16_MainResults (lane-f) 内=file-disjoint ピースなし。**ユーザー「hub 一任」→ relane #12**: lane-h を W2
+  (S14_MaximalI) に復帰 (価値+独立性: file-disjoint で衝突ゼロ、ungated runway 実在)。**reverse P1/P2 wiring は
+  lane-f が S16_MainResults 単独担当** (carrier 専任レーン廃止)。relane #11 の b/c 明確化は維持。issue 2027 → closed
+  (stale)、0081 (W2) → lane-h 再開、LAUNCH×2 + 🔒 map (relane #12) 更新。**教訓: 監査エージェントの「workable/gated」
+  判定も実コード (#print axioms) で再検証する** ([[scaffold-sorry-free-not-done]]、relane #5 stale-pointer と同根)。
 
 - **2026-06-26 (続²) — relane #10 健全性監査 (workflow) → relane #11 (lane-h W2→W1 carrier 火力集中)**: ユーザー
   「各レーンの分割は問題ない？再考したほうが良さそう？」+ ultracode ON → 6 エージェント並列監査 workflow

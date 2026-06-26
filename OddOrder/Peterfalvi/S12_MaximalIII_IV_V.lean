@@ -5479,14 +5479,77 @@ theorem typeII_noncoherence_arithmetic
     push_cast at this; linarith
   linarith
 
+/-- **Peterfalvi (10.8), structural lower bound** `(2w₁+1)·w₂ ≤ |M'|` (the `hMp` input to the
+non-coherence arithmetic `typeII_noncoherence_arithmetic`).
+
+Peterfalvi's "By (8.4.d), `(M'/M'')⋊W₁` is a Frobenius group of odd order; it follows that
+`|M':M''| ≥ 2w₁+1`": the cyclic Hall complement `W₁` acts on the abelian section `M'/M''`
+fixed-point-freely (its fixed points on `M'` are `C_{M'}(x) = W₂` by `TypePData.centralizer_W1`, and
+`W₂ ⊆ M''` by `TypePData.W2_le`), so `w₁ ∣ |M':M''| − 1` (`W1_dvd_index_of_fixedPoints_le`); with all
+orders odd and `M'' < M'` this forces `|M':M''| ≥ 2w₁+1` (`two_mul_add_one_le_of_odd_dvd`).  Then
+`|M'| = |M''|·|M':M''| ≥ w₂·(2w₁+1)` since `w₂ = |W₂| ≤ |M''|`.  Pure group theory; left as a named
+obligation (the `W₁`-on-`M'/M''` conjugation-action transport is the remaining work). -/
+theorem Hypothesis.card_derived_ge [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} (hyp : Hypothesis M) :
+    (2 * hyp.w1 + 1) * hyp.w2 ≤ Nat.card ↥(derivedInG M) := by
+  sorry
+
+open scoped FiniteInduce in
+/-- **Peterfalvi (10.8), norm-counting estimate** (the §7 analytic heart, the `hbound` input to
+`typeII_noncoherence_arithmetic`).
+
+Under the coherence assumption, Peterfalvi's character-sum estimate produces a Type-II partner `S`
+(Theorem (8.8)) whose Frobenius factor `U` satisfies `|U| ≥ 2w₂+1 ≥ 7` (as `UW₂` is Frobenius),
+together with the inequality `1 − 1/w₁ − 1/|U| < w₁w₂/|M'|`.  The derivation combines:
+* the family inequality (7.5) (`S09.family_inequality`) over `G₀ ∪ G₁`;
+* (10.6.b) (`tau1_values_and_norm_bound`, **proven**) bounding the character values off `Ã(M)`;
+* (7.8.b) giving `‖χ^ρ‖² ≥ 1 − ŵ₁/|M'|`;
+* the TI-counting `G₁ ⊆ (H#)^G ∪ V^G` (using (8.6.a)/(8.11)/(10.7) for the partner `S`).
+
+Isolated here as the single remaining genuine character-theoretic gate of (10.8) (lane-b W3): the
+arithmetic closer and the structural bound `|M'| ≥ (2w₁+1)w₂` are discharged separately.  The `u`
+is the partner's `|U|`; bundled existentially because (10.8) only consumes `∃ u ≥ 7` with the bound.
+See `notes/peterfalvi/s12_10_8_noncoherence.md`. -/
+theorem typeII_coherence_contradiction_estimate [Finite G] [Fintype G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} [Fintype ↥M]
+    [Invertible (Nat.card ↥M : ℂ)] [Invertible (Nat.card G : ℂ)]
+    {hyp : Hypothesis M} {params : CharacterParameters hyp}
+    (coh : CoherentHypothesis hyp params) :
+    ∃ u : ℕ, 7 ≤ u ∧
+      (1 : ℚ) - 1 / (hyp.w1 : ℚ) - 1 / (u : ℚ)
+        < (hyp.w1 : ℚ) * (hyp.w2 : ℚ) / (Nat.card ↥(derivedInG M) : ℚ) := by
+  sorry
+
 /-- **Peterfalvi (10.8)**: under Hypothesis (10.1), the character family `S` is
-not coherent. -/
+not coherent.
+
+The proof is Peterfalvi's contradiction, assembled from its three faithful pieces: assuming `S`
+coherent, build the `(10.4)` coherent-extension datum (`CoherentHypothesis`, with the `(10.3)`
+parameters from `w2_prime_and_parameter_independence`); the structural bound
+`|M'| ≥ (2w₁+1)w₂` (`card_derived_ge`), the norm-counting estimate
+`1 − 1/w₁ − 1/|U| < w₁w₂/|M'|` with `|U| ≥ 7` (`typeII_coherence_contradiction_estimate`), and the
+pure-`ℚ` arithmetic contradiction (`typeII_noncoherence_arithmetic`) together give `False`. -/
 theorem S_not_coherent [Finite G] [Fintype G]
-    (_hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} [Fintype ↥M]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} [Fintype ↥M]
     [Invertible (Nat.card ↥M : ℂ)] [Invertible (Nat.card G : ℂ)]
     (hyp : Hypothesis M) :
     ¬ Nonempty (OddOrder.Peterfalvi.S07.IsCoherent hyp.tau hyp.Sset hyp.A0) := by
-  sorry
+  rintro ⟨hcoh⟩
+  obtain ⟨params, -⟩ := w2_prime_and_parameter_independence hG hyp
+  let coh : CoherentHypothesis hyp params := ⟨hcoh⟩
+  -- structural inputs to the (10.8) arithmetic.  `w₁ ≥ 3`: `w₁ = |W₁|` is odd (divides `|G|`) and
+  -- `> 1` (`W₁ ≠ ⊥`), hence `≥ 3` — derived without the `FiniteInduce`-scoped `tic` to avoid the
+  -- explicit-vs-scoped `Fintype G` clash.
+  have hw1odd : Odd hyp.w1 :=
+    hG.odd.of_dvd_nat (Subgroup.card_subgroup_dvd_card hyp.W1)
+  have hw1gt : 1 < hyp.w1 :=
+    (Subgroup.one_lt_card_iff_ne_bot _).mpr hyp.typeP.W1_nontrivial
+  have hw1 : 3 ≤ hyp.w1 := by
+    obtain ⟨k, hk⟩ := hw1odd; omega
+  have hw2 : 1 ≤ hyp.w2 := Nat.card_pos
+  have hMp : (2 * hyp.w1 + 1) * hyp.w2 ≤ Nat.card ↥(derivedInG M) := hyp.card_derived_ge hG
+  obtain ⟨u, hu7, hbound⟩ := typeII_coherence_contradiction_estimate hG coh
+  exact typeII_noncoherence_arithmetic hw1 hu7 hw2 hMp hbound
 
 /-! ## (10.9)--(10.11): the Type V elimination and the case-B remark -/
 

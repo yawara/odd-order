@@ -193,3 +193,40 @@ now **sorry-free** (S10 real sorry 12→11). full build 3884 green.
   ⟹ P₂ Mstar ⟹ IsTypeII Mstar; `[Mstar:Mstar']=|K*|` (`card_kappaHall_eq_derived_index`) `=|W₂|`
   (bridge). Cites sorried `proposition_type_classification` (W1, lane-f, actively-closed) —
   **swaps the old "gated on theorem88_caseB_holds (W2)" for the cleaner W1 gate + axiom-clean bridge**.
+
+## 2026-06-26 lane-b (W3): frontier re-targeting — true upstream keystone = (10.8), now structured
+
+**Re-targeting (correction to the W3 frontier map).** The live memory listed the W3 gate as
+`S12.exists_zeta_residual_not_orthogonal` (= Pf (11.8)) + `no_typeV`. Dependency tracing shows the
+**true upstream keystone is Pf (10.8) `S12.S_not_coherent`** (`S` not coherent): it is cited by
+**both** (11.3) `S13.S_H0C_not_coherent` (which feeds (11.8)) **and** (10.10) `no_typeV_maximal`.
+(10.8) was itself a single opaque `sorry`. By document order + upstream-first, (10.8) — not (11.8) —
+is the correct W3 target.
+
+Moreover the §9 Clifford counts (9.8)/(9.9)/(9.10) that (11.8) ultimately needs are stated against
+the **opaque, never-constructed** carrier `S11.Section11CharacterData` (`S`/`SOf`/`tau` are free
+fields with no producer), so (11.8) is doubly blocked at the §9 root. (10.8)'s machinery, by
+contrast, is largely in place (the arithmetic closer and (10.6.b) are proven; §7 (7.5)/(7.8.b) live
+in S09), so (10.8) is the actionable upstream piece.
+
+**Landed (commit 664a158b): (10.8) structured into Peterfalvi's faithful 3-part decomposition.**
+`S_not_coherent` is now a **sorry-free assembly**:
+- `typeII_noncoherence_arithmetic` (pure-ℚ closer, pre-proven) wired;
+- `(10.3)` params + `CoherentHypothesis` built genuinely from the coherence assumption;
+- `w₁ ≥ 3` (|W₁| odd + ≠⊥, derived without the FiniteInduce-scoped `tic` to dodge the
+  explicit-vs-scoped `Fintype G` clash) and `w₂ ≥ 1` proven inline;
+- two gates isolated precisely:
+  * `Hypothesis.card_derived_ge` : `(2w₁+1)·w₂ ≤ |M'|` — **routine group theory** (W₁-on-M'/M'' FPF
+    via `caseB_W1_dvd_index_of_centralizer_le` + `commutator_subgroupOf_self`/`map_commutator`
+    transport + W₂⊆M''; mechanism fully scoped in `notes/peterfalvi/s12_10_8_noncoherence.md`);
+  * `typeII_coherence_contradiction_estimate` : `∃ u≥7, 1−1/w₁−1/u < w₁w₂/|M'|` — **the single
+    genuine remaining §10 character gate** (§7 norm-counting: (7.5)+(7.8.b)+(10.6.b)+TI-counting,
+    needs (10.7) `typeII_derived_frobenius` for the Type-II partner's `UW₂` Frobenius).
+
+`no_typeV_maximal`/`S_H0C_not_coherent` unchanged (cite (10.8) by signature). full build 3884 green.
+正本 = `notes/peterfalvi/s12_10_8_noncoherence.md`.
+
+**Next (W3, priority order)**: (1) discharge `card_derived_ge` (mechanical, scoped); (2) `(10.7)`
+`typeII_derived_frobenius` (partner Frobenius, upstream of the estimate); (3) the §7 estimate
+`typeII_coherence_contradiction_estimate` (the genuine §10 analytic heart). Separately, (11.8)
+remains blocked on materializing the §9 `Section11CharacterData` carrier.

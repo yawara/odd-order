@@ -7,11 +7,12 @@ created: 2026-06-25
 
 # W2 (lane-c): §12 all-Type-I 非存在 tower → theorem88_caseB_holds
 
-> **⚠ 2026-06-26 status (relane #10→#11)**: W2 owner は lane-c→lane-h (relane #10) →
-> **driver/await に降格 (relane #11, 常駐レーンなし)**。監査 `wf_1cb6284d-bb2` で §12 tower の 14 sorry が
-> 全て lane-b §11 char に従属 (ungated 0) と判明 → lane-h は独立価値の高い W1 carrier (issue 2027) へ移動。
-> **W2 (`theorem88_caseB_holds`, S14_MaximalI) は lane-b の §11 char landing 時に driver で機会的 close**。
-> タイトルの「(lane-c)」は旧 (relane #9)。本 issue は char-gated await item。
+> **⚠ 2026-06-26 status (relane #10→#11→#12)**: W2 owner = lane-c→lane-h (relane #10) →一時 driver/await
+> (relane #11) → **lane-h 再開 (relane #12)**。relane #11 で監査が「W2=char 従属・ungated 0」と評価し lane-h を
+> W1 carrier に移したが、**lane-h の theorem88_caseB honest reduction (commit 503d2bd1) が W2 に ungated 群論が
+> 実在することを実証** + W1 carrier 前提も stale 判明 (issue 2027) → **lane-h を W2 に戻す (relane #12)**。
+> lane-h が S14_MaximalI で §12 tower の ungated 群論 (theorem88_dichotomy/exists_typeICovering 系) を進める。
+> §8/char boundary に当たったら自己 flag。タイトルの「(lane-c)」は旧 (relane #9)、現 owner=lane-h。
 
 ## 背景
 
