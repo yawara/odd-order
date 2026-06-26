@@ -354,3 +354,24 @@ Msigma_inf_conj_isBetaCompl / centralizer_singleton_lt_top すべて allowlist 3
 **残**: (1) `hIF` (型I⟹κ=∅、TypeFData→Frobenius/M_σ 論法、別系統 — 次の最大 W1 win)、
 (2) P₁/P₂ 精密化 (κ=π∖σ vs ≠、proposition_type_classification の bridge を完全に閉じるのに必要だが
 consumer 非使用)、(3) `not_isTypeI_of_isTypeNonI` を `isTypeP_of_isTypeNonI`+`hIF` で再配線 (6 sorry→1)。
+
+## ✅ 2026-06-26 進捗 — hIF (型I⟹型F) 骨格を実証明 + FT-critical surface を crux 1 本に縮小 (lane-f, commit 043a6fb0)
+
+上の戦略 (3) を landed。**`isTypeF_of_isTypeI` (型 I ⟹ κ(M)=∅) を実証明** (背理法、BG mmd L4486):
+- κ≠∅ ⟹ κ-Hall K≠⊥ (`isTypeF_of_isHall_kappa_eq_bot` の対偶) + (κ∪σ)ᶜ-Hall U を構成 (Hall's thm)。
+- **`theoremC_paired_structure` (axiom-clean)** で `K*=M_σ⊓C(K)≠⊥` かつ `K*≤M_F`。
+- crux `M_F⊓C(K)=⊥` と合わせ `K*≤M_F⊓C(K)=⊥` で `K*≠⊥` と矛盾。
+- **`not_isTypeI_of_isTypeNonI` を再配線**: `proposition_type_classification` (6 sorry) 経由 →
+  `isTypeF_of_isTypeI`+`isTypeP_of_isTypeNonI` のみに依存。**FT が透過的に触る §16 type-classification
+  の sorry が 6 → crux 1 本に縮小**。`proposition_type_classification` の hIF case も cite。
+- full build 3884 green、AxiomsCheck OK (新 2 定理は crux 経由 sorryAx ゆえ未登録)。
+
+**残 crux = `typeF_mf_inf_centralizer_kappaHall_eq_bot` (S16, sorry)**: type-F の M で κ-Hall K の
+M_F-centralizer trivial。**genuine に深い**:
+- TypeFData の Frobenius は **H⊔U0 のみ** (`is_typeF_complement`)、M 全体でない。
+- `centralizer_kernel_le` (Ch06/FrobeniusGroup:503、↥(H⊔U0) 内 `C(x)⊆kernel` for x∈H#) は在庫だが、
+  **K⊄H⊔U0** (K は κ-part、H⊔U0 は κ'-group = H σ-part + U0 (κ∪σ)'-part) ゆえ verbatim 適用不可。
+- 正しい議論 = BG condition (Iiii) の C_H(K)=1: K の M=M_F⋊U action + `is_typeF_inertia` (C_U(x)⊆U1)
+  経由の semidirect 計算、または **Coq `BGsection16` の structure→κ correspondence (`of_typeF ⟹ K=1`)** を移植。
+- **次の一手**: Coq `BGsection16`/`BGsummaryI` の of_typeF⟹kappa 証明精査、または ChatGPT consult
+  ([[feedback-ask-chatgpt-for-elided-gaps]]、self-contained プロンプト + 厳密検証)。

@@ -2683,14 +2683,17 @@ theorem typeP_exists_hall_derived_eq [Finite G]
 for a type-`I` (hence type-`F`) maximal `M`, the Fitting kernel `M_F` and any `κ`-Hall subgroup `K`
 have trivial centralizer intersection, `M_F ⊓ C_G(K) = ⊥`.
 
-This is the BG "condition (Iiii) implies `C_H(K) = 1`" step.  Since `M = M_F ⋊ U` carries the
-Frobenius complement realization `H ⊔ U₀` (`TypeFData.frobenius_HU0`, the Coq `is_typeF_complement`
-clause with `exponent U₀ = exponent U`), the kernel-centralizer of any `x ∈ M_F#` stays inside the
-kernel, `C_{H ⊔ U₀}(x) ⊆ H = M_F`.  A `κ`-Hall `K` meets `M_F` trivially (`κ(M) ∩ σ(M) = ∅` and
-`M_F ⊆ M_σ`), so a nontrivial `x ∈ M_F ⊓ C_G(K)` gives `K ⊆ C_G(x)`; placing `K ⊆ H ⊔ U₀` up to
-`M`-conjugacy (the `κ`-Hall of `M` lands in the Frobenius complement via `exponent U₀ = exponent U`)
-forces `K ⊆ C_{H ⊔ U₀}(x) ⊆ M_F`, contradicting `K ∩ M_F = 1`, `K ≠ ⊥`.  The Frobenius-`H ⊔ U₀`
-placement of `K` is the residual; the rest of `isTypeF_of_isTypeI` is `sorry`-free modulo this. -/
+This is the BG "condition (Iiii) implies `C_H(K) = 1`" step.  `M = M_F ⋊ U` carries the Frobenius
+complement realization `H ⊔ U₀` (`TypeFData.frobenius_HU0`, the Coq `is_typeF_complement` clause with
+`exponent U₀ = exponent U`).  A `κ`-Hall `K` meets `M_F` trivially (`κ(M) ∩ σ(M) = ∅`, `M_F ⊆ M_σ`),
+so a nontrivial `x ∈ M_F ⊓ C_G(K)` gives `K ⊆ C_G(x)`.
+
+**Residual (genuinely deep).**  `K ⊄ H ⊔ U₀` directly: `K` is a `κ`-Hall while `H ⊔ U₀` is a
+`κ'`-group (`H ⊆ M_σ` is `σ`, `U₀ ⊆ U` is `(κ∪σ)'`), so `Ch06.…centralizer_kernel_le`
+(`C_{H⊔U₀}(x) ⊆ H` for `x ∈ H#`) does *not* apply to `K` verbatim.  The genuine BG step routes
+`C_G(x)` through the `M = M_F ⋊ U` action together with `is_typeF_inertia` (`C_U(x) ⊆ U₁`), or
+equivalently through the Coq `BGsection16` structure-to-`κ` correspondence (`of_typeF ⟹ K = 1`).
+This is the only residual; the rest of `isTypeF_of_isTypeI` is `sorry`-free modulo this. -/
 theorem typeF_mf_inf_centralizer_kappaHall_eq_bot [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M K : Subgroup G}
     (hM : M ∈ maximalSubgroups G) (hI : OddOrder.GroupTheory.IsTypeI M)
