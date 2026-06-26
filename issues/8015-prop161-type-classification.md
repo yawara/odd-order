@@ -422,3 +422,50 @@ helper B `typeFData_exists_kappaElement_le_kappaHall` を実証明 (sorry-free +
 
 ⟹ **残 W1 FT-critical = `hP1neIIIIV`/`hP1eqV`** = type-P₁ `TypeXData` 構成 (Pf (8.3)/(8.8))。issue の
 「hard 方向 (1-4,9) = type-data CONSTRUCTION、§16 endpoint A-E 連動」に該当。hub 委譲でなく W1 で埋める。
+
+## ✅ 2026-06-26⁵ 進捗 — hP1eqV (型 V) を型 V TypePData 完全構成で trichotomy 残差 1 本に還元 (lane-f, commit 52f132b1 + 後続)
+
+Coq `BGsection16` `typePfacts`/`Fcore_structure` 併読で type-P₁ の正確な構造を確定:
+- **型 P₁ では M' = M_σ** (outer (κ∪σ)'-Hall U=⊥)、**M_F = M_σ ⟺ inner-U = 1** (型 V ⟺ U=1)、
+  **M_F ≠ M_σ → prime|K| ∧ normedTI F(M)#** = Coq `(*8*)` = Lean `theoremA8_structure` (既存)、
+  **型 P₁ で U≠1 ⟹ N(U)⊆M** (P₁ 特性)。
+
+**landed (3 定理すべて sorry-free + axiom-clean, AxiomsCheck 登録)**:
+- **`isTypeP1_derivedInG_eq_Msigma`**: 型 P₁ で M' = M_σ。`typeP_auxiliary_structure` conj5 (M'=U⊔M_σ)
+  + `isTypeP1_kappaSigma_compl_hall_subgroupOf_eq_bot` (U=⊥) で collapse。両 P₁ bridge の基盤。
+- **`fittingInAmbient_eq_maxNilpotentNormalHall_of_isTypeP1_mf_eq_msigma`**: 型 V の F(M)=M_F。
+  `fitting_decomposition` (Cor 15.5(d)) の `¬IsTypeF→F(M)≤M'` + M'=M_σ=M_F + M_F≤F(M) で締結。
+- **`typePData_of_isTypeP1_mf_eq_msigma`**: 型 V (P₁∧MF=Mσ) の TypePData を **U=⊥ で完全構成**。
+  M'=M_F ゆえ全 U-field 自明化 (hKnorm=N(⊥)=⊤ / hUnilp=⊥ nilpotent / hDcompl=IsComplement' ⊤ ⊥ /
+  hSDfit=M''≤M_F / hFiteq=F(M)=M_F)。型 P₂ の `typePData_of_isTypeP2` に対応する
+  **carrier-constructibility milestone**。
+
+**`isTypeV_of_isTypeP1_mf_eq_msigma`** で `proposition_type_classification` の **hP1eqV case を配線**
+(`case hP1eqV => exact isTypeV_of_isTypeP1_mf_eq_msigma hG hM`)。さらに型 I bridge `isTypeI_of_isTypeF`
+と同様 **FittingIsTI ケースを実証明**で discharge (disjunct (a) = M_F# TI via
+`maxNilpotentNormalHall_sharp_isTISubset_of_fittingIsTI`)。
+
+⟹ **hP1eqV 残差 = ¬FittingIsTI の Peterfalvi (8.8) Suzuki ケースのみ** (M_F rank-2 abelian で |W₁|∣p-1、
+または O_p(M_F)=p³ で |W₁|∣p+1、Coq `nonTI_Fitting_structure`)。型 I の non-TI ケース (rank=2 / exp U∣p-1)
+と違い **|W₁|-Frobenius 整除条件** (|W₁|∣p∓1) を要し、(8.8) の W₁-action 解析が未形式化。型 V は K-action
+が FPF でない (K*=C_{M_F}(K)≠⊥) ため型 F の U₀-Frobenius (`typeF_exponent_dvd_sub_one_of_invariant_card`)
+を直接再利用不可。
+
+### 残 hP1neIIIIV (型 III/IV、MF≠Mσ) の精密 gate (次セッション)
+TypePData(P₁, U≠⊥) を要する。M' = M_σ 内の M_F-complement U を構成:
+- **construction**: `exists_aInvariant_complement_within_normal` (GroupTheory/AInvariantComplement)
+  が K-invariant complement U (U≤M', M_F⊔U=M', K≤N(U), M_F⊓U=⊥) を供給。hN_hall (M_F が M' で Hall)・
+  hCop (|K| coprime |M_σ|) は dischargeable。⟹ hUle/hKnorm/hDcompl/U≠⊥ は achievable。
+- **deep 残差 3 本** (全て Coq `Fcore_structure` の MF≠Mσ branch に entangle):
+  - **hUnilp (U nilpotent)** ← **M'/M_F nilpotent** (Coq `Fcore_structure` の `nilpotent(M'/M_F)`、
+    Lean 未形式化 "deferred quotient API")。U ≅ M'/M_F ゆえ。**最深 gate**。
+  - **hSDfit/hFiteq** (Fitting 分解 F(M)=M_F⊔(U⊓C(M_F)) の U≠⊥ 版)。
+  - **N(U)≤M** (P₁ 特性、Coq `typePfacts` の `M∈M_P1 ⟺ U=1∨N(U)⊆M`、embedding 由来)。
+- TypePNontrivialCore の |W₁| prime + M_F# TI は `theoremA8_structure` + 
+  `maxNilpotentNormalHall_sharp_isTISubset_of_fittingIsTI` で achievable (data があれば)。
+- III/IV last mile = `isTypeIII_or_IV_of_typePData` (既存、U abelian で III/IV split)。
+
+⟹ hP1neIIIIV と hP1eqV-trichotomy は**両方 Coq `Fcore_structure`/`nonTI_Fitting_structure` の
+深い §15/§16 構造定理**に bottom-out。次の実質前進 = (i) **M'/M_F nilpotent** を Fcore_structure から
+形式化 (hP1neIIIIV の核 gate を解く、再利用性高) または (ii) **(8.8) trichotomy の W₁-action 解析**
+(hP1eqV を完全 close)。どちらも multi-session。
