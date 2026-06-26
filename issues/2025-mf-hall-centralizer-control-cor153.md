@@ -40,7 +40,12 @@ wrapper `mf_hall_centralizer_control` (S15:2483, sorry) は 3 input を discharg
 
 ## やること
 
-- [ ] `ha` 一般 Hall H 版: `C_M(H)` κ'-群 lemma (新規) → SZ 分解 (H=M_σ template `mf_centralizer_msigma_decomp` を一般化)。
+- [~] **`ha` の SZ 分解部 完了 (2026-06-26)**: `mf_centralizer_hall_decomp_of_kappaCompl`
+      (S15_MF, sorry-free + axiom-clean) = H=M_σ template `mf_centralizer_msigma_decomp` を一般 Hall H に
+      一般化。κ'-性は **hypothesis `hkappa : IsPiSubgroup (kappa M)ᶜ (C_G(H)⊓M)` として取る** (=「C_M(H) κ'」)、
+      `C_{M_σ}(X)≠1` は `H ≤ M_σ⊓C_G(X)` (X≤C_G(H)) + `H≠⊥` で導出。⟹ **ha の残 gate = 単一事実
+      「C_M(H) が κ'-群」(一般 Hall H、BG Prop 14.2(b1)(e)、subtle prime-set 論法、新 math)**。
+      M_σ 版 `centralizer_msigma_isPiSubgroup_kappa_compl` は H=M_σ 専用で一般化不可。
 - [x] **`hconj`: 完了 (2026-06-26)** — `mf_hall_conj_realized_in_M` (S14_TypePCounting, sorry-free + axiom-clean)。
       Theorem 14.4 = `sigmaLength_one_centralizer_structure` (proven) は sharp transitivity を持つが
       conjugator の C_G(x) 所属を捨てていた → 新 helper `exists_conj_centralizer_of_mem_maximalSigma`
