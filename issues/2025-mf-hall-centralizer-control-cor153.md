@@ -46,6 +46,18 @@ wrapper `mf_hall_centralizer_control` (S15:2483, sorry) は 3 input を discharg
       `C_{M_σ}(X)≠1` は `H ≤ M_σ⊓C_G(X)` (X≤C_G(H)) + `H≠⊥` で導出。⟹ **ha の残 gate = 単一事実
       「C_M(H) が κ'-群」(一般 Hall H、BG Prop 14.2(b1)(e)、subtle prime-set 論法、新 math)**。
       M_σ 版 `centralizer_msigma_isPiSubgroup_kappa_compl` は H=M_σ 専用で一般化不可。
+      **「C_M(H) κ'」の証明路 (2026-06-26 原文精読で確定、BG Cor 15.3 proof + Prop 14.2)**:
+      背理。p∈κ∩π(C_M(H)) と仮定、x'∈C_M(H) order p、X'=⟨x'⟩∈E¹(K) (K=κ-Hall)。
+      (1) **Prop 14.2(b1)**: N_M(X')=K×K* (K*=C_{M_σ}(K))。
+      (2) H ≤ C_M(x') ≤ C_M(X') ≤ N_M(X')=K×K*。H は σ-群 ⟹ H ≤ (K×K* の σ-部)=K* (K は σ')。
+      (3) H は M_σ の Hall ⟹ q∈piSet(H) で H ⊇ (M_σ の Sylow q)。H≤K* ⟹ Sylow q ⊆ K*。
+      (4) q∈piSet(H)⊆π(K*) (H≤K*, H≠1)。**Prop 14.2(e)**: p∈π(K*) なら M_σ の Sylow ⊄ K* ⟹ 矛盾。
+      ⟹ 要 repo: Prop 14.2(b1) `N_M(X)=K×K*` + (e) `Sylow_p(M_σ)⊄K*` + Hall⊇Sylow。
+      **可用性 (2026-06-26 確認)**: (b1) は `typeP_structure` (S14:1808) の conjunct 3 (`hb1`) で**可用**。
+      **(e) は未発見** (`typeP_structure` は (b1)/(c)/`K*≠M_σ` を持つが (e) `Sylow⊄K*` は無し)。H=M_σ 版
+      (`centralizer_msigma_isPiSubgroup_kappa_compl`) は (e) を回避 (M_σ≤K⊔K* で **M_σ=K*** の強い矛盾、
+      K*≠M_σ と衝突) が、一般 H⊊M_σ では H≤K* どまりで (e) 必須。⟹ **κ'-fact の最終 gate = Prop 14.2(e)
+      の証明/抽出** (deep)。これが解ければ ha 完了 (decomp は済)。
 - [x] **`hconj`: 完了 (2026-06-26)** — `mf_hall_conj_realized_in_M` (S14_TypePCounting, sorry-free + axiom-clean)。
       Theorem 14.4 = `sigmaLength_one_centralizer_structure` (proven) は sharp transitivity を持つが
       conjugator の C_G(x) 所属を捨てていた → 新 helper `exists_conj_centralizer_of_mem_maximalSigma`
