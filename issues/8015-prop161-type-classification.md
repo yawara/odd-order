@@ -459,6 +459,15 @@ TypePData(P₁, U≠⊥) を要する。M' = M_σ 内の M_F-complement U を構
   M_F が M' で Hall (`maxNilpotentNormalHall_isHall` を index-divisibility `relIndex_mul_relIndex` で transfer)・
   |K| coprime |M_σ| (κ⊆σᶜ via `kappa_subset_sigmaCompl`、`coprime_of_isPiGroup_of_isPiGroup_compl`) を供給。
   ⟹ **hUle/hKnorm/hDcompl/U≠⊥ は achievable** (構成核 = Coq `of_typeP` の U 構成に対応)。
+- ✅ **2026-06-26⁶ hcommon landed**: **`typePData_nontrivialCore_of_isTypeP1_mf_ne_msigma`**
+  (sorry-free+axiom-clean、AxiomsCheck 登録) = 型 P₁(MF≠Mσ)・U≠⊥ の TypePData が TypePNontrivialCore
+  (U≠⊥ ∧ |W₁| prime ∧ M_F# TI) を満たす。|W₁|=|K|=[M:M']=p prime (`theoremA8_structure`) + M_F# TI
+  (`fitting_isTI_of_mf_ne_msigma`+`maxNilpotentNormalHall_sharp_isTISubset_of_fittingIsTI`)。
+  ⟹ III/IV last mile `isTypeIII_or_IV_of_typePData` の hcommon 入力を供給。
+- **⟹ hP1neIIIIV の achievable 部分は全 discharge** (complement + hcommon)。**残 deep residual = TypePData
+  の U-fields (hUnilp=M'/M_F nilpotent / hSDfit / hFiteq) + N(U)≤M、全て Coq `Fcore_structure` 内容**。
+  次セッション = gated `typePData_of_isTypeP1_mf_ne_msigma_of_inputs` (complement の hDcompl 変換 +
+  3 deep residual を hypothesis) で wire、または M'/M_F nilpotent を Fcore_structure から形式化。
 - **deep 残差 3 本** (全て Coq `Fcore_structure` の MF≠Mσ branch に entangle):
   - **hUnilp (U nilpotent)** ← **M'/M_F nilpotent** (Coq `Fcore_structure` の `nilpotent(M'/M_F)`、
     Lean 未形式化 "deferred quotient API")。U ≅ M'/M_F ゆえ。**最深 gate**。
