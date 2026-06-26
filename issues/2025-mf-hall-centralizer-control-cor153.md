@@ -40,7 +40,7 @@ wrapper `mf_hall_centralizer_control` (S15:2483, sorry) は 3 input を discharg
 
 ## やること
 
-- [~] **`ha` の SZ 分解部 完了 (2026-06-26)**: `mf_centralizer_hall_decomp_of_kappaCompl`
+- [x] **`ha` 完了 (2026-06-26, κ'-fact 実証明)**: `mf_centralizer_hall_decomp_of_kappaCompl`
       (S15_MF, sorry-free + axiom-clean) = H=M_σ template `mf_centralizer_msigma_decomp` を一般 Hall H に
       一般化。κ'-性は **hypothesis `hkappa : IsPiSubgroup (kappa M)ᶜ (C_G(H)⊓M)` として取る** (=「C_M(H) κ'」)、
       `C_{M_σ}(X)≠1` は `H ≤ M_σ⊓C_G(X)` (X≤C_G(H)) + `H≠⊥` で導出。⟹ **ha の残 gate = 単一事実
@@ -54,10 +54,17 @@ wrapper `mf_hall_centralizer_control` (S15:2483, sorry) は 3 input を discharg
       (4) q∈piSet(H)⊆π(K*) (H≤K*, H≠1)。**Prop 14.2(e)**: p∈π(K*) なら M_σ の Sylow ⊄ K* ⟹ 矛盾。
       ⟹ 要 repo: Prop 14.2(b1) `N_M(X)=K×K*` + (e) `Sylow_p(M_σ)⊄K*` + Hall⊇Sylow。
       **可用性 (2026-06-26 確認)**: (b1) は `typeP_structure` (S14:1808) の conjunct 3 (`hb1`) で**可用**。
-      **(e) は未発見** (`typeP_structure` は (b1)/(c)/`K*≠M_σ` を持つが (e) `Sylow⊄K*` は無し)。H=M_σ 版
-      (`centralizer_msigma_isPiSubgroup_kappa_compl`) は (e) を回避 (M_σ≤K⊔K* で **M_σ=K*** の強い矛盾、
-      K*≠M_σ と衝突) が、一般 H⊊M_σ では H≤K* どまりで (e) 必須。⟹ **κ'-fact の最終 gate = Prop 14.2(e)
-      の証明/抽出** (deep)。これが解ければ ha 完了 (decomp は済)。
+      **✅✅ ha 完了 (2026-06-26, commits `37a15204` + `d742451a`)**: (e) を含む 4 lemma を実証明
+      (全 sorry-free + axiom-clean、AxiomsCheck 登録)。
+      - `typeP_sylow_not_le_kstar` (S14, Prop 14.2(e) 第2節 `S⊄K*`): Part A (ℳ(K*)≠{M}, Lemma 13.13)
+        + Part B (S≤K* なら Lemma 13.6 `ℳ(S)={M}` と矛盾)。`kstar_ne_msigma_aux` を corollary 化。
+      - `exists_typePESetup_kappaHall` (S14): Hall κ K → E-setup (E₁≤K≤E) (Prop 14.2 preamble)。
+      - `typeP_sylow_not_le_kstar_of_isHall` (S14): (e) を typeP-packaged 形に。
+      - `centralizer_hall_isPiSubgroup_kappa_compl` (S14): **κ'-fact** (H≤K* via b1+Dedekind →
+        Sylow_q(M_σ)≤H≤K* が (e) に矛盾)。
+      - `mf_centralizer_hall_decomp` (S15): general `ha` を **unconditional 化**
+        (`mf_centralizer_hall_decomp_of_kappaCompl` の κ' 仮説を κ'-fact で discharge)。
+      ⟹ **ha gate 閉鎖**。残 = hfratt + wrapper signature gap (下記)。
 - [x] **`hconj`: 完了 (2026-06-26)** — `mf_hall_conj_realized_in_M` (S14_TypePCounting, sorry-free + axiom-clean)。
       Theorem 14.4 = `sigmaLength_one_centralizer_structure` (proven) は sharp transitivity を持つが
       conjugator の C_G(x) 所属を捨てていた → 新 helper `exists_conj_centralizer_of_mem_maximalSigma`
