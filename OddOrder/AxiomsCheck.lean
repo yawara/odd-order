@@ -4001,6 +4001,10 @@ set_option linter.style.longLine false in
 -- `ha` input of `mf_hall_centralizer_control` with the `κ(M)'` hypothesis now discharged by
 -- `centralizer_hall_isPiSubgroup_kappa_compl`.  Closes the `ha` gate of Cor 15.3.  Sorry-free + axiom-clean.
 #assert_only_allowed_axioms OddOrder.BG.Ch4.S15.mf_centralizer_hall_decomp
+-- BG Corollary 15.3(b) entry helper (`S15_MF`, issue 2025): a Hall subgroup `H` of a *nilpotent*
+-- `M_σ` is normal in `M` (`H = O_{π(H)}(M_σ)`, characteristic).  Contrapositive: `H ⋬ M ⟹ M_σ` not
+-- nilpotent `⟹ M_F ≠ M_σ`, the `hfratt` entry.  Sorry-free + axiom-clean.
+#assert_only_allowed_axioms OddOrder.BG.Ch4.S15.hall_subgroupOf_normal_of_msigma_nilpotent
 -- BG Theorem A(8) `FittingIsTI` (`S15_MF`, issue 8016): `M_F ≠ M_σ ⟹ F(M)` is a `TI`-subgroup.
 -- Now **fully axiom-clean** — the last sorryAx (via `fitting_decomposition`'s cite of the sorried
 -- general Corollary 15.3) is eliminated by routing through `mf_centralizer_msigma_decomp`.
