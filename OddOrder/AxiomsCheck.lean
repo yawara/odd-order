@@ -3979,6 +3979,10 @@ set_option linter.style.longLine false in
 -- `X` cyclic `τ₂`.  The `ha` input that `fitting_decomposition` consumes; assembled from the
 -- `κ'`-group property + Schur–Zassenhaus + Lemma 15.1(c).  Sorry-free + axiom-clean.
 #assert_only_allowed_axioms OddOrder.BG.Ch4.S15.mf_centralizer_msigma_decomp
+-- BG Corollary 15.3(a) for general Hall `H` of `M_σ` (`S15_MF`, issue 2025): `ha` input modulo the
+-- single `κ(M)'` fact — given `C_M(H)` is `κ'`, `C_M(H) = (C_G(H) ⊓ M_σ) ⊔ X` with `X` cyclic `τ₂`.
+-- Generalizes `mf_centralizer_msigma_decomp` (κ' via hypothesis; `C_{M_σ}(X) ≠ 1` from `H ≠ ⊥`).
+#assert_only_allowed_axioms OddOrder.BG.Ch4.S15.mf_centralizer_hall_decomp_of_kappaCompl
 -- BG Theorem A(8) `FittingIsTI` (`S15_MF`, issue 8016): `M_F ≠ M_σ ⟹ F(M)` is a `TI`-subgroup.
 -- Now **fully axiom-clean** — the last sorryAx (via `fitting_decomposition`'s cite of the sorried
 -- general Corollary 15.3) is eliminated by routing through `mf_centralizer_msigma_decomp`.
