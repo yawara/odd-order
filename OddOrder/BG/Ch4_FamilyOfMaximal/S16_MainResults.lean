@@ -2679,6 +2679,70 @@ theorem typeP_exists_hall_derived_eq [Finite G]
     (S14.isTypeF_iff_not_isTypeP.mp (isTypeF_of_isHall_kappa_eq_bot hKM hK h)) hP
   exact ⟨U, hU, (typeP_hall_derived_eq_and_abelian hG hM hKM hUM hKne hK hU).1⟩
 
+/-- **Proposition 16.1(a) reverse crux — type-`F` Frobenius FPF against a `κ`-Hall** (mmd L4486):
+for a type-`I` (hence type-`F`) maximal `M`, the Fitting kernel `M_F` and any `κ`-Hall subgroup `K`
+have trivial centralizer intersection, `M_F ⊓ C_G(K) = ⊥`.
+
+This is the BG "condition (Iiii) implies `C_H(K) = 1`" step.  Since `M = M_F ⋊ U` carries the
+Frobenius complement realization `H ⊔ U₀` (`TypeFData.frobenius_HU0`, the Coq `is_typeF_complement`
+clause with `exponent U₀ = exponent U`), the kernel-centralizer of any `x ∈ M_F#` stays inside the
+kernel, `C_{H ⊔ U₀}(x) ⊆ H = M_F`.  A `κ`-Hall `K` meets `M_F` trivially (`κ(M) ∩ σ(M) = ∅` and
+`M_F ⊆ M_σ`), so a nontrivial `x ∈ M_F ⊓ C_G(K)` gives `K ⊆ C_G(x)`; placing `K ⊆ H ⊔ U₀` up to
+`M`-conjugacy (the `κ`-Hall of `M` lands in the Frobenius complement via `exponent U₀ = exponent U`)
+forces `K ⊆ C_{H ⊔ U₀}(x) ⊆ M_F`, contradicting `K ∩ M_F = 1`, `K ≠ ⊥`.  The Frobenius-`H ⊔ U₀`
+placement of `K` is the residual; the rest of `isTypeF_of_isTypeI` is `sorry`-free modulo this. -/
+theorem typeF_mf_inf_centralizer_kappaHall_eq_bot [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M K : Subgroup G}
+    (hM : M ∈ maximalSubgroups G) (hI : OddOrder.GroupTheory.IsTypeI M)
+    (hKM : K ≤ M) (hKne : K ≠ ⊥)
+    (hK : Ch03.IsHallSubgroup (S14.kappa M) (K.subgroupOf M)) :
+    S15.MF M ⊓ Subgroup.centralizer (K : Set G) = ⊥ := sorry
+
+/-- **Proposition 16.1(a), reverse direction — type I ⟹ type `F`** (mmd L4486): a Type I maximal
+subgroup `M` has `κ(M) = ∅`.  This is the `hIF` bridge of `proposition_type_classification`, and
+together with `isTypeP_of_isTypeNonI` it is everything the FT-critical `not_isTypeI_of_isTypeNonI`
+consumes (it lets a non-Type-I `M` be placed in `ℳ_𝓟`, which a Type I `M` cannot also be).
+
+**Proof** (BG L4486, by contradiction): suppose `κ(M) ≠ ∅`.  Take a `κ(M)`-Hall `K` (nonempty since
+`κ(M) ≠ ∅`, via `isTypeF_of_isHall_kappa_eq_bot`) and a `(κ ∪ σ)ᶜ`-Hall `U` of the solvable `M`
+(Hall's theorem).  Theorem C(2) (`theoremC_paired_structure`) gives the nonempty `K* = M_σ ⊓ C_G(K)`
+with `K* ≤ M_F`.  But the type-`F` Frobenius structure forces `M_F ⊓ C_G(K) = ⊥`
+(`typeF_mf_inf_centralizer_kappaHall_eq_bot`); since `K* ≤ M_F` and `K* ≤ C_G(K)`, this places
+`K* ≤ M_F ⊓ C_G(K) = ⊥`, contradicting `K* ≠ ⊥`. -/
+theorem isTypeF_of_isTypeI [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G}
+    (hM : M ∈ maximalSubgroups G) (hI : OddOrder.GroupTheory.IsTypeI M) :
+    S14.IsTypeF M := by
+  rw [S14.isTypeF_iff_not_isTypeP]
+  intro hP
+  classical
+  haveI : IsSolvable ↥M := hG.solvable_of_mem_maximalSubgroups hM
+  -- A `κ(M)`-Hall subgroup `K` of the solvable `M` (Hall's theorem).
+  obtain ⟨K', hK'⟩ := Ch03.hall_E_exists (G := ↥M) (S14.kappa M)
+  set K : Subgroup G := K'.map M.subtype with hKdef
+  have hKM : K ≤ M := hKdef ▸ Subgroup.map_subtype_le K'
+  have hKeq : K.subgroupOf M = K' :=
+    hKdef ▸ Subgroup.comap_map_eq_self_of_injective M.subtype_injective K'
+  have hK : Ch03.IsHallSubgroup (S14.kappa M) (K.subgroupOf M) := hKeq ▸ hK'
+  -- A `(κ ∪ σ)'`-Hall subgroup `U` of `M`.
+  obtain ⟨U', hU'⟩ := Ch03.hall_E_exists (G := ↥M)
+    ((S14.kappa M ∪ OddOrder.BG.Ch3.S10.sigma M)ᶜ)
+  set U : Subgroup G := U'.map M.subtype with hUdef
+  have hUM : U ≤ M := hUdef ▸ Subgroup.map_subtype_le U'
+  have hUeq : U.subgroupOf M = U' :=
+    hUdef ▸ Subgroup.comap_map_eq_self_of_injective M.subtype_injective U'
+  have hU : Ch03.IsHallSubgroup ((S14.kappa M ∪ OddOrder.BG.Ch3.S10.sigma M)ᶜ) (U.subgroupOf M) :=
+    hUeq ▸ hU'
+  -- `K ≠ ⊥` (else `M` would be type-`F`, i.e. `κ(M) = ∅`, contradicting `IsTypeP M`).
+  have hKne : K ≠ ⊥ := fun h =>
+    (S14.isTypeF_iff_not_isTypeP.mp (isTypeF_of_isHall_kappa_eq_bot hKM hK h)) hP
+  -- Theorem C(2): `K* = M_σ ⊓ C_G(K)` is nonempty and contained in `M_F`.
+  obtain ⟨_, _, hKsne, _, hKsMF, _, _, _, _, _, _, _⟩ :=
+    theoremC_paired_structure hG hM hKne hKM hUM hK rfl hU
+  -- But the type-`F` Frobenius structure gives `M_F ⊓ C_G(K) = ⊥`, while `K* ≤ M_F ⊓ C_G(K)`.
+  have hcrux := typeF_mf_inf_centralizer_kappaHall_eq_bot hG hM hI hKM hKne hK
+  exact hKsne (le_bot_iff.mp (hcrux ▸ le_inf hKsMF inf_le_right))
+
 /-- **BG Proposition 16.1** (mmd L4478): the §14--§15 local families are exactly
 the shared Type I--V maximal-subgroup predicates consumed downstream by Peterfalvi.
 Six clauses = mmd (a)-(f): (a) Type I ⟺ `M ∈ ℳ_𝓕`, (b) Type II ⟺ `M ∈ ℳ_𝓟₂`,
@@ -2701,14 +2765,13 @@ theorem proposition_type_classification [Finite G]
       (S15.MF M = OddOrder.BG.Ch3.S10.Msigma M ↔
         OddOrder.GroupTheory.IsTypeI M ∨ OddOrder.GroupTheory.IsTypeII M ∨
           OddOrder.GroupTheory.IsTypeV M) := by
-  -- Apply the `§14`/`§15`-independent assembly engine, supplying the inputs that are *proved*
-  -- (`hFI` = `isTypeI_of_isTypeF`, axiom-clean, issue 7007 cont.¹⁶; `hP2II` = `isTypeII_of_isTypeP2`,
-  -- axiom-clean, cont.¹¹; `hP_derived`/`hF_not_derived` = Theorem C(3)/A(3); `h152a` = Theorem
-  -- 15.2(a)) and leaving the genuinely-gated bridges as the residual.  The 6 remaining bridges
-  -- (issue 8015) bottom out on either the carrier `W₁`/`U`-Hall characterization (`TypePData` carries
-  -- `W₁`/`U` abstractly, so `π(W₁) ⊆ κ(M)` / `U = (κ∪σ)'`-Hall need the BG structure theory — the
-  -- reverse `hIF`/`hIIP2`/`hIIIIVP1`/`hVP1`), or the type-`P₁` Type III/IV/V data construction
-  -- (`hP1neIIIIV`/`hP1eqV` = Peterfalvi (8.3)/(8.8), needing a type-`P₁` `TypePData`).
+  -- Apply the `§14`/`§15`-independent assembly engine.  The proved inputs: `hFI` =
+  -- `isTypeI_of_isTypeF` (axiom-clean), `hP2II` = `isTypeII_of_isTypeP2` (axiom-clean), `hIF` =
+  -- `isTypeF_of_isTypeI` (BG L4486 reverse, modulo the Frobenius FPF crux), `hP_derived` /
+  -- `hF_not_derived` = Theorem C(3)/A(3), `h152a` = Theorem 15.2(a).  The 5 residual bridges
+  -- (issue 8015) bottom out on the carrier `W₁`/`U`-Hall characterization (reverse `hIIP2` /
+  -- `hIIIIVP1` / `hVP1`) or the type-`P₁` data construction (`hP1neIIIIV` / `hP1eqV` = Peterfalvi
+  -- (8.3)/(8.8)).
   refine proposition_type_classification_of_inputs
     ?hFI (fun hP2 => isTypeII_of_isTypeP2 hG hM hP2) ?hP1neIIIIV ?hP1eqV ?hIF ?hIIP2 ?hIIIIVP1 ?hVP1
     (typeP_exists_hall_derived_eq hG hM) (typeF_not_exists_hall_derived_eq hG hM)
@@ -2720,8 +2783,9 @@ theorem proposition_type_classification [Finite G]
   case hP1neIIIIV => sorry
   -- `hP1eqV` (Type P₁, `M_F = M_σ` ⟹ Type V): Peterfalvi (8.8) trichotomy.
   case hP1eqV => sorry
-  -- `hIF` (Type I ⟹ Type F): read off `κ(M) = ∅` from the `TypeIData` (carrier-gated).
-  case hIF => sorry
+  -- `hIF` (Type I ⟹ Type F): `isTypeF_of_isTypeI` (BG L4486 reverse direction), modulo the
+  -- type-`F` Frobenius FPF crux.
+  case hIF => exact isTypeF_of_isTypeI hG hM
   -- `hIIP2` (Type II ⟹ Type P₂): `π(W₁) ⊆ κ(M)` (carrier `W₁ = κ`-Hall, issue 8015).
   case hIIP2 => sorry
   -- `hIIIIVP1` (Type III/IV ⟹ Type P₁ ∧ `M_F ≠ M_σ`): `π(W₁) ⊆ κ(M)` + `M_F ≠ M_σ` (carrier).
@@ -2748,15 +2812,12 @@ theorem not_isTypeI_of_isTypeNonI [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOd
     (hNonI : OddOrder.GroupTheory.IsTypeNonI M) :
     ¬ OddOrder.GroupTheory.IsTypeI M := by
   intro hI
-  obtain ⟨hIa, hIIb, hIII_IVc, hVd, _, _⟩ := proposition_type_classification hG hM
-  -- Type I forces `M ∈ ℳ_𝓕`, hence `M ∉ ℳ_𝓟`.
-  refine S14.isTypeF_iff_not_isTypeP.mp (hIa.mp hI) ?_
-  -- but each non-Type-I alternative places `M ∈ ℳ_𝓟`.
-  rcases hNonI with hII | hIII | hIV | hV
-  · exact S14.isTypeP_of_isTypeP2 (hIIb.mp hII)
-  · exact S14.isTypeP_of_isTypeP1 (hIII_IVc.mp (Or.inl hIII)).1
-  · exact S14.isTypeP_of_isTypeP1 (hIII_IVc.mp (Or.inr hIV)).1
-  · exact S14.isTypeP_of_isTypeP1 (hVd.mp hV).1
+  -- Type I forces `κ(M) = ∅` (`isTypeF_of_isTypeI`), i.e. `M ∉ ℳ_𝓟`; but every non-Type-I `M` is
+  -- type `P` (`isTypeP_of_isTypeNonI`).  This routes around the other five
+  -- `proposition_type_classification` bridges, leaving the FT-critical surface gated on the single
+  -- `hIF` crux (`typeF_mf_inf_centralizer_kappaHall_eq_bot`).
+  exact (S14.isTypeF_iff_not_isTypeP.mp (isTypeF_of_isTypeI hG hM hI))
+    (isTypeP_of_isTypeNonI hG hM hNonI)
 
 /-! ## Theorems I and II: the BG output consumed by Peterfalvi -/
 
