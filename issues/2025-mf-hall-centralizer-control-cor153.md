@@ -89,8 +89,12 @@ wrapper `mf_hall_centralizer_control` (S15:2483, sorry) は 3 input を discharg
       - **step 3 (QH⊴M) = 残る核 (~50-70 行, novel)**。**鍵の発見 (2026-06-26)**: **Q = M_σ の normal
         Sylow_q ⟹ Q char in M_σ** (Thm 15.2(c): Q=normal Sylow_q(M), q∈σ ⟹ |Q|=q-part of |M_σ| ⟹
         Q=Sylow_q(M_σ); `Sylow.characteristic_of_normal`)。⟹ QH⊴M の 2 経路:
-        (A) QH=comap_{M_σ→M_σ/Q}(O_π(M_σ/Q)); O_π char in M_σ/Q + Q char in M_σ ⟹ QH char in M_σ;
-            char in M_σ⊴M ⟹ QH⊴M (要: comap-of-char-with-char-kernel lemma);
+        (A) **推奨経路 (全 lemma 確定済)**: Q char in M_σ = `Q=O_q(M_σ)=opiCoreInG{q}M_σ` ゆえ
+            `oPiCore.characteristic` (Q⊴M_σ q-群⊆O_q(M_σ); O_q(M_σ) char⊴M⊆O_q(M)=Q で Q=O_q(M_σ))。
+            QH.subgroupOf M_σ = `(oPiCore π̄ (M_σ/Q)).comap(mk')` (image=O_π を card 論法、π=π(H));
+            `oPiCore.characteristic` + `Subgroup.Characteristic.comap_quotient_mk` (mathlib QuotientGroup/
+            Basic:395、kernel char + K char ⟹ comap char) ⟹ QH.subgroupOf M_σ char in M_σ;
+            `normal_of_characteristic_subgroupOf` (S04d:116) + M_σ⊴M ⟹ QH⊴M。残 card 論法 = image=O_π のみ;
         (B) `normal_sup_sylow_of_quotient_nilpotent` (S10_BetaRadical:458, Sylow 版 template) を Hall 化
             (証明同型、Sylow→Hall=O_π) → QH⊴M_σ → Q char で ⊴M lift。
       - **step 4**: q∉π(H) (q∈π(H) なら Q≤Syl_q(M_σ)≤H, QH=H⊴M で H⋬M に矛盾) ⟹ Q∩H=1 + coprime。
