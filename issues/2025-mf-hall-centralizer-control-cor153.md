@@ -46,7 +46,12 @@ wrapper `mf_hall_centralizer_control` (S15:2483, sorry) は 3 input を discharg
       conjugator の C_G(x) 所属を捨てていた → 新 helper `exists_conj_centralizer_of_mem_maximalSigma`
       で C_G(x)-witness を保持 → `normalizer_eq_self_of_mem_maximalSubgroups` で `cg⁻¹∈M` を導出。
       D は param 化 (caller が `dummySigmaDecomposition G` 等を供給)。
-- [ ] `hfratt`: Theorem 15.2 O_q + Frattini argument。
+- [ ] `hfratt`: Theorem 15.2 O_q + Frattini argument。**調査 (2026-06-26)**: `frattini_factorization`
+      (S15:2316, sorry-free) が hfratt の `∀ m∈M, ∃ n a, …` 結論を**そのまま供給** (要 hQHnorm + hcop)。
+      残 gate = Theorem 15.2 の Q (M_σ/Q nilpotent)。`H⋬M ⟺ M_σ 非冪零 ⟺ M_F≠M_σ ⟺ 型 III/IV`
+      (`maxNilpotentNormalHall_eq_Msigma_iff_isNilpotent` S15:231 + Prop 16.1 clause c)。Q は
+      `msigma_quotient_isNilpotent_of_inputs` (S15:4496, 型-P の of_inputs gated skeleton) 経由 ⟹
+      Q の inputs (hP/hKM/hK/hKstar/…) discharge が deep gate。
 - [ ] 3 input を `mf_hall_centralizer_control_of_inputs` に wire → wrapper sorry-free 化。
 - [ ] ⚠ **wrapper signature gap**: `mf_hall_centralizer_control` (S15:2483) は `H ≤ M_σ` を欠く
       (`hH : IsHallSubgroup (piSet H) (H.subgroupOf M_σ)` からは導出不可)。hconj/ha は `H ≤ M_σ` 要 →
