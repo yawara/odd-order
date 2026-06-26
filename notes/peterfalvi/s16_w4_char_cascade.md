@@ -76,8 +76,31 @@ S09 §7 cite 経路: `S09_NonexistenceCertain` は S16 import closure 内 (S11�
 `family_inequality` の real-analysis 出力を `1−pq/k` に同定する要で、FamilyHypothesis71 構成の重い
 instance plumbing 要)。modest だが honest な de-opacification (実 linarith + faithful carrier)。
 
-**次手** = (14.16) dual `caseB_character_contradiction_of_gap_inequalities` (β_L の (7.8) expansion、
-`BetaMExpansionData` の β_L アナログ再利用可) / `normCascadeData` の (7.5) lower-bound bridge (重い)。
+### ✅ caseB_character_contradiction_of_gap_inequalities (14.16) — β_L 展開+直交性 carrier (本セッション)
+
+原文 (14.16 p.92) の case-(b) 最終矛盾を忠実分離。bare sorry (`False`) を **faithful carrier + 実
+inner-product assembly** に:
+
+- **`CaseBContradictionData nc`** (faithful carrier, `[Fintype G][Invertible (Nat.card G:ℂ)]`):
+  `betaL`/`chiL`/`signs`(±1) + `betaL_expansion` ((14.16): β_L^τ = Σ ε η − χ_L、(14.11.2)/(13.19.c) 由来)
+  + `eta_orthogonal_psi` ((η_ij, ψ^τ₁)=0、ψ^τ₁ は (14.11.2) で除去される直交成分) + `chiL_orthogonal_psi`
+  ((χ_L, ψ^τ₁)=0、(4.1) L^τ₁⊥M^τ₁) + `pairing_ne_zero` ((β_L^τ,ψ^τ₁)≠0、(14.14.b) case-b)。
+  ψ^τ₁ = `nc.Mdata.tau1 nc.Mdata.psi`。
+- **`caseB_contradiction_data`** (faithful producer, `noncomputable def := sorry`): case-b+gap から
+  expansion+直交性+pairing を assemble。expansion は §3/§4 Dade layer + 既 proven
+  `exists_typeI_eta_axes_odd_of_caseB_gap` (axes-odd) に bottom-out。
+- **`inner_finset_sum_left`** (sorry-free reusable helper): `inner (Σ f i) ψ = Σ inner (f i) ψ`
+  (`inner_add_left` 帰納、hoistable to ClassFunction.lean)。
+- **本体** = 実 inner 計算: `(β_L^τ,ψ^τ₁) = (Σ ε η − χ_L, ψ^τ₁) = Σ ε·(η,ψ)−(χ_L,ψ) = Σε·0−0 = 0`
+  (`inner_sub_left`+`inner_finset_sum_left`×2+`inner_smul_left`+直交性)、`pairing_ne_zero` と矛盾。
+  instance = `Fintype.ofFinite`+`invertibleOfNonzero (Nat.card_pos.ne')`。
+
+bare sorry (`False`) → faithful producer のみに isolate。**§16 char endpoint 3 本 (14.11.2/14.11.4/14.16)
+de-opacify 完了** (issue 2024 checklist 3/4)。
+
+**次手** = §3/§4 Dade concrete 構成 (`betaM_expansion_data`/`eta_generic_data`/`normCascadeData`/
+`caseB_contradiction_data` 共通の最終 obligation) / `normCascadeData` の (7.5) lower-bound bridge (重い) /
+`exists_MHypothesis` (14.10)。
 
 ### ✅ generic_character_bound (14.11.3) — honest assembly (commit `483a5716`)
 

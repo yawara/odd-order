@@ -38,8 +38,9 @@ abstract carrier (`tau : S07.IntegralCharacterMap`, `psi`, `betaM`, `G0`) を S0
       η-grid id `1_G+Δ=Σεη`, χ generic で 2 branch 忠実) + `betaM_expansion_data` producer + axiom-clean
       bridge `betaMExpansionData_of_hypothesis78` (S09 `beta_eq_constOne_sub_zetaImage_add_delta` cite)。
       本体は実 Lean 証明 (`e=pq`=field cite、grid 展開=`abel`)。bare sorry → faithful producer のみ isolate。
-- [ ] **(14.16) dual** `caseB_character_contradiction_of_gap_inequalities`: β_L の (7.8) expansion で同様
-      (`BetaMExpansionData` の β_L アナログを再利用可)。
+- [x] **(14.16) dual** `caseB_character_contradiction_of_gap_inequalities` ✅: `CaseBContradictionData`
+      faithful carrier (β_L=Σ±η−χ_L 展開 + η/χ_L ⊥ ψ^τ₁ 直交性 + (β_L,ψ^τ₁)≠0 case-b) + `caseB_contradiction_data`
+      producer + `inner_finset_sum_left` helper。本体は実 inner 計算 `(β_L,ψ^τ₁)=Σε·0−0=0` で pairing≠0 と矛盾。
 
 ## 完了条件
 
