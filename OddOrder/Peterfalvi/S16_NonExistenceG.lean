@@ -3496,11 +3496,85 @@ theorem exists_typeI_eta_axes_odd_of_caseB_gap
   exact ⟨orth, typeI_eta_axes_odd_of_caseB_gap orth horth.2.2.2.1 horth.2.2.2.2
     (hH_of_orth orth) (he_of_orth orth) hhv hvu⟩
 
+/-- Pointwise-in-the-left additivity of the canonical class-function inner product over a finite
+sum: `(∑ i ∈ s, f i, ψ) = ∑ i ∈ s, (f i, ψ)`.  General-purpose `ClassFunction.inner` plumbing
+(hoistable to `ClassFunction.lean`). -/
+theorem inner_finset_sum_left {ι : Type*} [Fintype G]
+    [Invertible (Nat.card G : ℂ)] (s : Finset ι)
+    (f : ι → ClassFunction G ℂ) (ψ : ClassFunction G ℂ) :
+    ClassFunction.inner (∑ i ∈ s, f i) ψ = ∑ i ∈ s, ClassFunction.inner (f i) ψ := by
+  classical
+  induction s using Finset.induction_on with
+  | empty => simp
+  | @insert a s ha ih =>
+      rw [Finset.sum_insert ha, ClassFunction.inner_add_left, ih, Finset.sum_insert ha]
+
+/-- **Faithful §16 carrier for the (14.16) case-(b) contradiction inputs.**
+
+Under case-(b) of (14.14) (`(β_L^τ, ψ^{τ₁}) ≠ 0`, `q = 3`, `p = 5`) and the two strict gap
+inequalities, the §16 character theory supplies (Pf (14.16), p.92):
+
+* `betaL_expansion` — the (14.11.2)-style signed `η`-grid expansion `β_L^τ = Σ_{ij} ±η_ij − χ_L`
+  (`χ_L = φ^{τ₁}` or `−φ̄^{τ₁}`), derived from `(13.19.c)` applied on both the S- and T-sides
+  (`exists_typeI_eta_axes_odd_of_caseB_gap`) plus the vanishing of `β_L^τ` on `W − (W₁ ∪ W₂)`;
+* `eta_orthogonal_psi` — `(η_ij, ψ^{τ₁}) = 0`: `ψ^{τ₁}` is the unit-norm component removed from the
+  `η`-grid in the M-side expansion (14.11.2), hence orthogonal to the whole grid;
+* `chiL_orthogonal_psi` — `(χ_L, ψ^{τ₁}) = 0`: by (4.1), `L^{τ₁}` is orthogonal to `M^{τ₁}`, and
+  `χ_L ∈ L^{τ₁}`, `ψ^{τ₁} ∈ M^{τ₁}`;
+* `pairing_ne_zero` — `(β_L^τ, ψ^{τ₁}) ≠ 0`, the defining property of case-(b) (14.14.b).
+
+The genuine character theory (the expansion via (14.11.2)/(13.19.c), the orthogonalities via
+(14.11.2)/(4.1), and the case-(b) pairing via (14.14)) is isolated here; the contradiction itself
+is then the pure inner-product computation `(β_L^τ, ψ^{τ₁}) = 0`. -/
+structure CaseBContradictionData {hyp : Hypothesis (G := G)}
+    (nc : NonConjugateHypothesis hyp) [Fintype G] [Invertible (Nat.card G : ℂ)] where
+  /-- The L-side virtual character `β_L^τ`. -/
+  betaL : ClassFunction G ℂ
+  /-- The removed unit-norm L-side character `χ_L` (`= φ^{τ₁}` or `−φ̄^{τ₁}`). -/
+  chiL : ClassFunction G ℂ
+  /-- The `±1` signs of the `η`-grid expansion. -/
+  signs : Fin hyp.base.q → Fin hyp.base.p → ℤ
+  signs_pm_one : ∀ i j, signs i j = 1 ∨ signs i j = -1
+  /-- **(14.16)** signed `η`-grid expansion `β_L^τ = Σ_{ij} ε_ij η_ij − χ_L`. -/
+  betaL_expansion :
+    betaL =
+      (∑ i : Fin hyp.base.q, ∑ j : Fin hyp.base.p, (signs i j : ℂ) • hyp.base.eta i j) - chiL
+  /-- **(14.11.2)**: `ψ^{τ₁}` is orthogonal to the `η`-grid. -/
+  eta_orthogonal_psi : ∀ (i : Fin hyp.base.q) (j : Fin hyp.base.p),
+    ClassFunction.inner (hyp.base.eta i j) (nc.Mdata.tau1 nc.Mdata.psi) = 0
+  /-- **(4.1)**: `χ_L ∈ L^{τ₁}` is orthogonal to `ψ^{τ₁} ∈ M^{τ₁}`. -/
+  chiL_orthogonal_psi :
+    ClassFunction.inner chiL (nc.Mdata.tau1 nc.Mdata.psi) = 0
+  /-- **(14.14.b)**: the case-(b) nonzero pairing `(β_L^τ, ψ^{τ₁}) ≠ 0`. -/
+  pairing_ne_zero :
+    ClassFunction.inner betaL (nc.Mdata.tau1 nc.Mdata.psi) ≠ 0
+
+/-- **Faithful §16 producer for the (14.16) case-(b) contradiction inputs.**  Under case-(b) and the
+two gap inequalities, the (14.11.2)/(13.19.c) expansion of `β_L^τ`, the (4.1) orthogonality, and the
+(14.14.b) pairing assemble into `CaseBContradictionData`.  The expansion bottoms out in the §3/§4
+Dade-isometry layer (as for `betaM_expansion_data`); the axes-odd input is the already-honest
+`exists_typeI_eta_axes_odd_of_caseB_gap`. -/
+noncomputable def caseB_contradiction_data [Finite G] [Fintype G]
+    [Invertible (Nat.card G : ℂ)] (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    {hyp : Hypothesis (G := G)} {nc : NonConjugateHypothesis hyp}
+    (data : OrthogonalitySwitchData nc) (hcaseB : data.caseB)
+    (hhv :
+      ((nc.h - 1 : ℕ) : ℚ) / ((hyp.base.p * hyp.base.q : ℕ) : ℚ) >
+        ((hyp.base.v - 1 : ℕ) : ℚ) / (hyp.base.p : ℚ))
+    (hvu :
+      ((hyp.base.v - 1 : ℕ) : ℚ) / (hyp.base.p : ℚ) >
+        ((hyp.base.u - 1 : ℕ) : ℚ) / (hyp.base.q : ℚ)) :
+    CaseBContradictionData nc := sorry
+
 /-- **Peterfalvi (14.16)**: character-theoretic endpoint of the exceptional
 case.  The two strict gap inequalities let (13.19.c) be applied on both the
 S- and T-sides, giving the same signed `eta_ij` expansion as in (14.11.2) for
 `beta_L^tau`; this contradicts the nonzero pairing in case-(b) of (14.14).
-This is the remaining genuinely character-theoretic frontier of (14.16). -/
+
+De-opacified (W4 §16, lane-h): the genuine character theory (the `β_L^τ` expansion, the `η`-grid /
+`χ_L` orthogonalities to `ψ^{τ₁}`, and the case-(b) pairing) is the faithful `CaseBContradictionData`;
+the contradiction itself is the pure inner-product computation `(β_L^τ, ψ^{τ₁}) = (Σ ±η_ij − χ_L, ψ^{τ₁})
+= Σ ±·0 − 0 = 0`, contradicting `(β_L^τ, ψ^{τ₁}) ≠ 0`. -/
 theorem caseB_character_contradiction_of_gap_inequalities
     [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
     {hyp : Hypothesis (G := G)} {nc : NonConjugateHypothesis hyp}
@@ -3512,9 +3586,19 @@ theorem caseB_character_contradiction_of_gap_inequalities
       ((hyp.base.v - 1 : ℕ) : ℚ) / (hyp.base.p : ℚ) >
         ((hyp.base.u - 1 : ℕ) : ℚ) / (hyp.base.q : ℚ)) :
     False := by
-  -- (13.19.c) applied to `S` and `T`, followed by the (14.11.2)-style
-  -- signed `eta_ij` expansion of `beta_L^tau`.
-  sorry
+  haveI : Fintype G := Fintype.ofFinite G
+  haveI : Invertible (Nat.card G : ℂ) :=
+    invertibleOfNonzero (Nat.cast_ne_zero.mpr Nat.card_pos.ne')
+  -- The (14.11.2)-style signed `eta_ij` expansion of `beta_L^tau` and its orthogonalities.
+  obtain ⟨betaL, chiL, signs, _hsigns, hexp, heta_orth, hchiL_orth, hpair_ne⟩ :=
+    caseB_contradiction_data _hG data hcaseB hhv hvu
+  -- `(beta_L^tau, psi^tau_1) = 0` by linearity + orthogonality, contradicting case-(b).
+  refine hpair_ne ?_
+  rw [hexp, ClassFunction.inner_sub_left, hchiL_orth, sub_zero, inner_finset_sum_left]
+  refine Finset.sum_eq_zero (fun i _ => ?_)
+  rw [inner_finset_sum_left]
+  refine Finset.sum_eq_zero (fun j _ => ?_)
+  rw [ClassFunction.inner_smul_left, heta_orth i j, mul_zero]
 
 /-- **Peterfalvi (14.16)**: consumer form of the exceptional case-(b) branch
 under `H > U`.  All numerical work in the paragraph is discharged here; only
