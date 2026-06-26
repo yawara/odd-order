@@ -1234,6 +1234,47 @@ theorem isTypeP1_kappaSigma_compl_hall_subgroupOf_eq_bot [Finite G] {M U : Subgr
   · exact Set.mem_union_right _ hpσ
   · exact Set.mem_union_left _ (hP1.2 ▸ ⟨hpM, hpσ⟩)
 
+/-- **For a type-`P₁` maximal subgroup, `M' = M_σ`** (Coq `BGsection16` `typePfacts`: for
+`M ∈ ℳ_𝓟₁`, `Ms = M^(1)`; BG Theorem C(3) collapse with the trivial `(κ ∪ σ)'`-complement).
+Since `κ(M) = π(M) ∖ σ(M)` for type `P₁`, the Hall `(κ ∪ σ)'`-subgroup `U` of `M` is trivial
+(`isTypeP1_kappaSigma_compl_hall_subgroupOf_eq_bot`), so Lemma 15.1(b)'s decomposition `M' = U M_σ`
+(`typeP_auxiliary_structure` conjunct 5) collapses to `M' = M_σ`.
+
+This is the structural fact underlying the type-`P₁` half of Proposition 16.1's forward bridges: the
+`TypePData` complement `U` (`M' = M_F ⊔ U`) lives inside `M_σ = M'`, and (Coq `typePfacts`)
+`U = ⊥ ⟺ M_F = M_σ` distinguishes type V (`U = ⊥`) from types III/IV (`U ≠ ⊥`). -/
+theorem isTypeP1_derivedInG_eq_Msigma [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    {M : Subgroup G} (hM : M ∈ maximalSubgroups G) (hP1 : S14.IsTypeP1 M) :
+    derivedInG M = OddOrder.BG.Ch3.S10.Msigma M := by
+  classical
+  haveI : IsSolvable ↥M := hG.solvable_of_mem_maximalSubgroups hM
+  -- A Hall `κ(M)`-subgroup `K` and a Hall `(κ ∪ σ)'`-subgroup `U` of `M`.
+  obtain ⟨K', hK'⟩ := Ch03.hall_E_exists (G := ↥M) (S14.kappa M)
+  set K : Subgroup G := K'.map M.subtype with hKdef
+  have hKM : K ≤ M := Subgroup.map_subtype_le K'
+  have hKeq : K.subgroupOf M = K' :=
+    Subgroup.comap_map_eq_self_of_injective M.subtype_injective K'
+  have hK : Ch03.IsHallSubgroup (S14.kappa M) (K.subgroupOf M) := by rw [hKeq]; exact hK'
+  obtain ⟨U', hU'⟩ := Ch03.hall_E_exists (G := ↥M)
+    ((S14.kappa M ∪ OddOrder.BG.Ch3.S10.sigma M)ᶜ)
+  set U : Subgroup G := U'.map M.subtype with hUdef
+  have hUM : U ≤ M := Subgroup.map_subtype_le U'
+  have hUeq : U.subgroupOf M = U' :=
+    Subgroup.comap_map_eq_self_of_injective M.subtype_injective U'
+  have hU : Ch03.IsHallSubgroup ((S14.kappa M ∪ OddOrder.BG.Ch3.S10.sigma M)ᶜ)
+      (U.subgroupOf M) := by rw [hUeq]; exact hU'
+  -- `K ≠ ⊥` (type `P` has nonempty `κ`).
+  have hKne : K ≠ ⊥ := fun h =>
+    card_kappaHall_ne_one hP1.1 hKM hK (by rw [h, Subgroup.card_bot])
+  -- `U = ⊥` (type `P₁`): the `(κ ∪ σ)'`-Hall is trivial.
+  have hUbot : U = ⊥ := by
+    have h0 : U.subgroupOf M = ⊥ := isTypeP1_kappaSigma_compl_hall_subgroupOf_eq_bot hP1 hU
+    rw [← Subgroup.card_eq_one] at h0 ⊢
+    rwa [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hUM).toEquiv] at h0
+  -- Lemma 15.1(b): `M' = U ⊔ M_σ = ⊥ ⊔ M_σ = M_σ`.
+  have haux := typeP_auxiliary_structure hG hM hKM hUM hK rfl hU
+  rw [(haux.2.2.2.2.1 hKne).1, hUbot, bot_sup_eq]
+
 /-- **Prop 16.1(a) forward bridge, core** (mmd L4480): a type-`F` maximal `M` (`κ(M) = ∅`, so the
 Hall `κ`-subgroup `K = ⊥`) carries the shared Peterfalvi type-`F` structure `TypeFData M`.
 
@@ -1749,6 +1790,76 @@ noncomputable def typePData_of_isTypeP2 [Finite G]
   exact typePData_of_isTypeP_of_inputs hG hM hP hKM hKne hK hUle hKnorm hUnilp
     hdec.1 hdec.2.1 hdec.2.2
 
+/-- **For a type-`P₁` maximal subgroup with `M_F = M_σ`, `F(M) = M_F`** (the type-V Fitting
+collapse, Coq `BGsection16` `typePfacts` `U = 1` branch).  Corollary 15.5(d)
+(`fitting_decomposition`) gives `F(M) ≤ M'` since `M` is type `P` (not type `F`); `M' = M_σ`
+(`isTypeP1_derivedInG_eq_Msigma`) `= M_F` (hypothesis), and `M_F ≤ F(M)` always
+(`maxNilpotentNormalHall_le_fittingInG`), so `F(M) = M_F`.  This discharges the deepest field
+(`fitting_eq`) of the type-V `TypePData`, where `U = ⊥` makes `F(M) = M_F ⊔ (⊥ ⊓ C_M(M_F)) = M_F`. -/
+theorem fittingInAmbient_eq_maxNilpotentNormalHall_of_isTypeP1_mf_eq_msigma [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} (hM : M ∈ maximalSubgroups G)
+    (hP1 : S14.IsTypeP1 M) (hmf : S15.MF M = OddOrder.BG.Ch3.S10.Msigma M) :
+    S15.fittingInAmbient M = S15.MF M := by
+  have hnotF : ¬ S14.IsTypeF M := fun hF => (S14.isTypeF_iff_not_isTypeP.mp hF) hP1.1
+  obtain ⟨_, _, _, _, _, _, _, _, _, _, hFle, _⟩ := S15.fitting_decomposition hG hM
+  have hM'σ : derivedInG M = OddOrder.BG.Ch3.S10.Msigma M :=
+    isTypeP1_derivedInG_eq_Msigma hG hM hP1
+  refine le_antisymm ?_ (S15.maxNilpotentNormalHall_le_fittingInG M)
+  exact (hFle hnotF).trans_eq (hM'σ.trans hmf.symm)
+
+open scoped IsMulCommutative in
+/-- **`TypePData M` for a type-`P₁` maximal subgroup with `M_F = M_σ`** — the type-V
+carrier-constructibility milestone: such a maximal subgroup carries a Peterfalvi type-`P` datum with
+*trivial* complement `U = ⊥`, `sorry`-free.
+
+For type `P₁`, `M' = M_σ` (`isTypeP1_derivedInG_eq_Msigma`); with `M_F = M_σ` this gives
+`M' = M_F`, so the `M_F`-internal complement collapses to `U = ⊥` (Coq `typePfacts`:
+`M_F = M_σ ⟺ U = 1`).  Every `U`-field of `typePData_of_isTypeP_of_inputs` then trivializes:
+`U ⊴ M'` and `K ≤ N_G(U)` are vacuous (`U = ⊥` normal), `hDcompl` is `IsComplement' ⊤ ⊥`
+(`M_F.subgroupOf M' = ⊤` since `M' = M_F`), `hSDfit` is `M'' ≤ M' = M_F`, and `hFiteq` is the
+type-V Fitting collapse `F(M) = M_F`
+(`fittingInAmbient_eq_maxNilpotentNormalHall_of_isTypeP1_mf_eq_msigma`).  Feeds the `hP1eqV` bridge:
+`isTypeV_of_typePData` reduces type V to the genuinely-deep Peterfalvi (8.8) `alternative`
+trichotomy on `M_F`. -/
+noncomputable def typePData_of_isTypeP1_mf_eq_msigma [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G}
+    (hM : M ∈ maximalSubgroups G) (hP1 : S14.IsTypeP1 M)
+    (hmf : S15.MF M = OddOrder.BG.Ch3.S10.Msigma M) :
+    TypePData M := by
+  classical
+  haveI : IsSolvable ↥M := hG.solvable_of_mem_maximalSubgroups hM
+  -- A Hall `κ(M)`-subgroup `K` (the cyclic `W₁ = K`).  The goal `TypePData M` is `Type`-valued,
+  -- so we extract via `Exists.choose` (not `obtain`, which cannot eliminate a `Prop` into `Type`).
+  have hKex := Ch03.hall_E_exists (G := ↥M) (S14.kappa M)
+  set K : Subgroup G := hKex.choose.map M.subtype with hKdef
+  have hKM : K ≤ M := Subgroup.map_subtype_le hKex.choose
+  have hKeq : K.subgroupOf M = hKex.choose :=
+    Subgroup.comap_map_eq_self_of_injective M.subtype_injective hKex.choose
+  have hK : Ch03.IsHallSubgroup (S14.kappa M) (K.subgroupOf M) := by
+    rw [hKeq]; exact hKex.choose_spec
+  have hKne : K ≠ ⊥ := fun h =>
+    card_kappaHall_ne_one hP1.1 hKM hK (by rw [h, Subgroup.card_bot])
+  -- `M' = M_σ = M_F`, `F(M) = M_F`.
+  have hM'σ : derivedInG M = OddOrder.BG.Ch3.S10.Msigma M :=
+    isTypeP1_derivedInG_eq_Msigma hG hM hP1
+  have hM'MF : derivedInG M = maxNilpotentNormalHall M := hM'σ.trans hmf.symm
+  -- Build with `U = ⊥`; every `U`-field trivializes.
+  refine typePData_of_isTypeP_of_inputs hG hM hP1.1 hKM hKne hK (U := ⊥) bot_le ?_ ?_ ?_ ?_ ?_
+  · -- `hKnorm`: `K ≤ N_G(⊥) = ⊤`.
+    exact le_top.trans_eq (Subgroup.normalizer_eq_top (H := (⊥ : Subgroup G))).symm
+  · -- `hUnilp`: `⊥` is nilpotent.
+    infer_instance
+  · -- `hDcompl`: `IsComplement' ⊤ ⊥` (`M_F.subgroupOf M' = ⊤` since `M' = M_F`).
+    rw [Subgroup.bot_subgroupOf,
+      Subgroup.subgroupOf_eq_top.mpr (le_of_eq hM'MF)]
+    exact Subgroup.isComplement'_top_left.mpr rfl
+  · -- `hSDfit`: `M'' ≤ M_F` (`M'' ≤ M' = M_F`).
+    rw [bot_inf_eq, sup_bot_eq]
+    exact (Subgroup.map_subtype_le _ : secondDerivedInAmbient M ≤ derivedInG M).trans_eq hM'MF
+  · -- `hFiteq`: `F(M) = M_F` (type-V Fitting collapse).
+    rw [bot_inf_eq, sup_bot_eq]
+    exact fittingInAmbient_eq_maxNilpotentNormalHall_of_isTypeP1_mf_eq_msigma hG hM hP1 hmf
+
 /-- **Prop 16.1 forward bridge, type III/IV last mile** (Peterfalvi (8.7)): a type-`P` datum whose
 `U`-factor has its normalizer inside `M` is of type III or IV, according as `U` is abelian or not.
 This is the clean part of the `hP1neIIIIV` bridge — no deep `alternative`/`derived_typeF` content,
@@ -1955,6 +2066,28 @@ theorem isTypeV_of_typePData {M : Subgroup G} (data : TypePData M)
         IsCyclic ↥(opiCoreInG {p}ᶜ data.H))) :
     IsTypeV M :=
   ⟨{ typeP := data, U_eq_bot := hUbot, alternative := halt }⟩
+
+/-- **Prop 16.1 forward bridge `hP1eqV`, reduced to the Peterfalvi (8.8) trichotomy residual** — a
+type-`P₁` maximal subgroup with `M_F = M_σ` is of type V.
+
+The type-`P` datum is the fully-constructed `typePData_of_isTypeP1_mf_eq_msigma` (`U = ⊥`,
+`sorry`-free — the type-V carrier-constructibility milestone); `isTypeV_of_typePData` then reduces to
+the `alternative` disjunction.  The sole remaining residual is the genuinely-deep **Peterfalvi (8.8)
+/ BG Theorem 15.7(d)(e) trichotomy** on `H = M_F` (Coq `BGsection15` `nonTI_Fitting_structure`):
+either `M_F#` is a `TI`-subset, or `M_F` is abelian of rank 2 with `|W₁| ∣ p - 1`, or `O_p(M_F)` has
+order `p³` with `|W₁| ∣ p + 1` (the Suzuki/`SL₂`-type structures).  The Lean `fitting_not_ti_cases`
+currently provides only the weakened `abelian ∨ ¬abelian` split, so the structured rank-2 / exponent
+alternatives await formalizing 15.7(e).
+
+(`hP1neIIIIV`, the sibling `M_F ≠ M_σ ⟹ III/IV` bridge, needs no trichotomy but instead the full
+nilpotent `M_F`-complement `U ≠ ⊥`, gated on `M'/M_F` nilpotent.) -/
+theorem isTypeV_of_isTypeP1_mf_eq_msigma [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} (hM : M ∈ maximalSubgroups G)
+    (hP1 : S14.IsTypeP1 M) (hmf : S15.MF M = OddOrder.BG.Ch3.S10.Msigma M) :
+    OddOrder.GroupTheory.IsTypeV M := by
+  refine isTypeV_of_typePData (typePData_of_isTypeP1_mf_eq_msigma hG hM hP1 hmf) rfl ?_
+  -- Residual: the Peterfalvi (8.8) trichotomy on `M_F` (deep, Coq `nonTI_Fitting_structure`).
+  sorry
 
 /-- **Prop 16.1(d)/(f) reverse, `M_F = M_σ` from `U = ⊥`** (the `M_F = M_σ` conjunct of `hVP1`,
 mmd L4478): a type-`P` datum with trivial complement `U = ⊥` has `M_F = M_σ`.  Sandwiching:
@@ -2896,8 +3029,10 @@ theorem proposition_type_classification [Finite G]
   case hFI => exact isTypeI_of_isTypeF hG hM
   -- `hP1neIIIIV` (Type P₁, `M_F ≠ M_σ` ⟹ Type III/IV): Peterfalvi (8.3) + Frattini.
   case hP1neIIIIV => sorry
-  -- `hP1eqV` (Type P₁, `M_F = M_σ` ⟹ Type V): Peterfalvi (8.8) trichotomy.
-  case hP1eqV => sorry
+  -- `hP1eqV` (Type P₁, `M_F = M_σ` ⟹ Type V): the type-V `TypePData` is fully constructed
+  -- (`typePData_of_isTypeP1_mf_eq_msigma`, `U = ⊥`); the sole residual is the Peterfalvi (8.8)
+  -- trichotomy on `M_F` (isolated in `isTypeV_of_isTypeP1_mf_eq_msigma`).
+  case hP1eqV => exact isTypeV_of_isTypeP1_mf_eq_msigma hG hM
   -- `hIF` (Type I ⟹ Type F): `isTypeF_of_isTypeI` (BG L4486 reverse direction), modulo the
   -- type-`F` Frobenius FPF crux.
   case hIF => exact isTypeF_of_isTypeI hG hM
