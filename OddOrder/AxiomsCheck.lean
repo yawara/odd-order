@@ -6130,3 +6130,15 @@ formula together with the prime computation `coprimeFrobeniusAction_card_eq_prim
 -- construction + the (13.1.d)/(3.9) η-grid identification.  Axiom-clean (pure `rw` from the S09
 -- (7.8.a) cite).
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S16.betaMExpansionData_of_hypothesis78
+
+-- **W2 §12 (12.17) normalizer bridge (lane-h)** — `maximalSubgroup_eq_normalizer_maxNilpotentNormalHall`:
+-- a maximal subgroup `L` of a minimal simple group of odd order equals `N_G(L_F)` whenever
+-- `L_F = maxNilpotentNormalHall L ≠ ⊥`.  `L ≤ N_G(L_F)` is `maxNilpotentNormalHall_le_normalizer`;
+-- `N_G(L_F) = ⊤` would make `L_F ⊴ G`, excluded by simplicity (`L_F ≠ ⊥`, `L_F ≤ L < ⊤`); `L`
+-- coatom upgrades `L ≤ N_G(L_F) < ⊤` to equality.  This is the genuine group-theoretic core of the
+-- Peterfalvi (12.17) Frobenius-family assembly `not_all_maximal_typeI` (the `normalizer_eq` field of
+-- `S09.FrobeniusFamily`), which together with the (8.8) dichotomy `theorem88_dichotomy` (BG §16)
+-- discharges `theorem88_caseB_holds` — the all-Type-I non-existence the Feit–Thompson endgame
+-- consumes.  Axiom-clean.
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S14.maximalSubgroup_eq_normalizer_maxNilpotentNormalHall

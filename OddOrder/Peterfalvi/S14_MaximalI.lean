@@ -1389,12 +1389,150 @@ theorem typeI_frobenius [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
            kernel_eq_MF_holds := trivial
            frobenius := typeI_frobenius_of_pi_empty hG (pi_empty hG) hM data }, trivial⟩
 
-/-! ## (12.17): forcing case (b) of Theorem (8.8) -/
+/-! ## (12.17): forcing case (b) of Theorem (8.8) — the all-type-I non-existence argument
 
-/-- **Peterfalvi (12.17)**: the all-type-I case of Theorem (8.8) is impossible,
-so the case-(b) data of (8.8) exists. -/
-theorem theorem88_caseB_holds [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G) :
-    Nonempty (OddOrder.Peterfalvi.S12.Theorem88CaseBData G) := by
+Peterfalvi (12.17) shows that case (a) of Theorem (8.8) — *every* maximal subgroup of `G` being of
+type I — is impossible.  The argument assembles the type-I maximals into a Frobenius family in the
+sense of (7.10) (`S09.FrobeniusFamily`) and derives the contradiction from (7.11)
+(`S09.not_trivial_G0`).  Combined with the (8.8) dichotomy (`theorem88_dichotomy`, BG §16), this
+forces the case-(b) pairing data `Theorem88CaseBData`, which the Feit–Thompson endgame consumes.
+
+The genuinely group-theoretic content of the family — the Frobenius structure (from (12.7)) and the
+self-normalizing identity `L = N_G(L_F)` — is proved here.  The remaining §8/§10 covering inputs
+(TI sharp-sets via (8.13.c1), coprime kernels and the `G#` cover via (8.17)) are isolated in the
+faithful carrier `TypeICovering`. -/
+
+section Theorem1217
+
+variable [Finite G]
+
+/-- **Normalizer bridge for Peterfalvi (12.17)**: a maximal subgroup `L` of a minimal simple group
+of odd order is the normalizer of its maximal nilpotent normal Hall subgroup `L_F`, as soon as
+`L_F ≠ ⊥`.
+
+`L ≤ N_G(L_F)` is `maxNilpotentNormalHall_le_normalizer`.  If `N_G(L_F) = ⊤` then `L_F ⊴ G`, so by
+simplicity `L_F = ⊥` or `⊤`; both are excluded (`L_F ≠ ⊥` by hypothesis, `L_F ≤ L < ⊤`).  Hence
+`L ≤ N_G(L_F) < ⊤`, and `L` being a coatom upgrades the containment to equality. -/
+theorem maximalSubgroup_eq_normalizer_maxNilpotentNormalHall
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {L : Subgroup G} (hL : L ∈ maximalSubgroups G)
+    (hne : maxNilpotentNormalHall L ≠ ⊥) :
+    L = Subgroup.normalizer (maxNilpotentNormalHall L : Set G) := by
+  have hco : IsCoatom L := hL
+  have hLleN : L ≤ Subgroup.normalizer (maxNilpotentNormalHall L : Set G) :=
+    OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_le_normalizer L
+  refine le_antisymm hLleN ?_
+  rcases hLleN.lt_or_eq with hlt | heq
+  · -- `L < N_G(L_F)` would force `N_G(L_F) = ⊤`, making `L_F ⊴ G`, which simplicity excludes.
+    exfalso
+    have hNtop : Subgroup.normalizer (maxNilpotentNormalHall L : Set G) = ⊤ := hco.2 _ hlt
+    haveI hHnormal : (maxNilpotentNormalHall L).Normal := Subgroup.normalizer_eq_top_iff.mp hNtop
+    rcases hG.simple.eq_bot_or_eq_top_of_normal (maxNilpotentNormalHall L) hHnormal with hb | ht
+    · exact hne hb
+    · have hle : maxNilpotentNormalHall L ≤ L := OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_le L
+      rw [ht] at hle
+      exact hco.1 (top_le_iff.mp hle)
+  · exact heq.ge
+
+/-- **§8/§10 covering inputs to Peterfalvi (12.17)** — the all-type-I case of Theorem (8.8).
+
+When every maximal subgroup of `G` is of type I, the §8 covering theory (BG Theorem E, (8.17), and
+the escaping-centralizer control (8.13.c1)) supplies a finite family of conjugacy-class
+representatives `reps i` whose maximal nilpotent normal Hall subgroups `(reps i)_F`:
+* number at least two (`two_le`);
+* have TI sharp-sets `((reps i)_F)#` (`isTI`, via (8.13.c1)+(2.3));
+* are pairwise of coprime order (`coprime`, via the (8.17) prime partition);
+* cover `G#` up to conjugacy (`covers`, the (8.17.a) type-I covering).
+
+These are exactly the inputs the (12.17) argument feeds to (7.11), beyond the genuinely
+group-theoretic family facts (Frobenius structure, `reps i = N_G((reps i)_F)`) discharged in
+`not_all_maximal_typeI`. -/
+structure TypeICovering (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hall : ∀ M : Subgroup G, M ∈ maximalSubgroups G → IsTypeI M) where
+  /-- Number of conjugacy classes of maximal subgroups. -/
+  k : ℕ
+  /-- Conjugacy-class representatives of the maximal subgroups. -/
+  reps : Fin k → Subgroup G
+  /-- Each representative is maximal. -/
+  reps_maximal : ∀ i, reps i ∈ maximalSubgroups G
+  /-- (7.10): at least two members. -/
+  two_le : 2 ≤ k
+  /-- (8.13.c1)+(2.3): each kernel sharp-set is a TI-subset. -/
+  isTI : ∀ i, IsTISubset ((maxNilpotentNormalHall (reps i) : Set G) \ {1}) (reps i)
+  /-- (8.17): the kernels have pairwise-coprime order. -/
+  coprime : ∀ ⦃i j⦄, i ≠ j →
+    Nat.Coprime (Nat.card ↥(maxNilpotentNormalHall (reps i)))
+      (Nat.card ↥(maxNilpotentNormalHall (reps j)))
+  /-- (8.17.a): the conjugates of the kernels cover every nonidentity element. -/
+  covers : ∀ x : G, x ≠ 1 →
+    ∃ i, ∃ g : G, g * x * g⁻¹ ∈ (maxNilpotentNormalHall (reps i) : Set G) \ {1}
+
+/-- **Peterfalvi (8.17)/(8.13.c1), all-type-I case**: the §8 covering inputs of (12.17) exist.
+
+This is the genuine §8/§10 content behind (12.17): BG Theorem E (`S10.bgTheoremE_cover_data`, the
+type-I covering branch (8.17.a)) together with the escaping-centralizer control (8.13.c1) that makes
+each kernel sharp-set a TI-subset.  It is the single isolated upstream obligation behind the
+otherwise group-theoretic (12.17) reduction in `not_all_maximal_typeI`. -/
+theorem exists_typeICovering (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hall : ∀ M : Subgroup G, M ∈ maximalSubgroups G → IsTypeI M) :
+    Nonempty (TypeICovering hG hall) :=
   sorry
+
+/-- **Peterfalvi (12.17), non-existence half**: in a minimal simple group of odd order, not every
+maximal subgroup is of type I.
+
+*Proof.*  Assume otherwise.  The §8 covering theory (`exists_typeICovering`) provides the family of
+conjugacy-class representatives `reps i` of the maximal subgroups, whose kernels `(reps i)_F` are
+pairwise-coprime TI-subsets covering `G#`.  Each `reps i` is a Frobenius group with kernel
+`(reps i)_F` by (12.7) (`typeI_frobenius`) and equals its own `N_G((reps i)_F)`
+(`maximalSubgroup_eq_normalizer_maxNilpotentNormalHall`), so these data assemble into a Frobenius
+family in the sense of (7.10) (`S09.FrobeniusFamily`).  The covering makes `G₀ = {1}`, contradicting
+(7.11) (`S09.not_trivial_G0`). -/
+theorem not_all_maximal_typeI (hG : OddOrder.BG.IsMinimalSimpleOdd G) :
+    ¬ (∀ M : Subgroup G, M ∈ maximalSubgroups G → IsTypeI M) := by
+  intro hall
+  obtain ⟨cov⟩ := exists_typeICovering hG hall
+  let F : OddOrder.Peterfalvi.S09.FrobeniusFamily G cov.k :=
+    { L := cov.reps
+      H := fun i => maxNilpotentNormalHall (cov.reps i)
+      two_le := cov.two_le
+      kernel_le := fun i => OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_le (cov.reps i)
+      isFrobenius := fun i => by
+        obtain ⟨fd, -⟩ := typeI_frobenius hG (cov.reps_maximal i) (hall _ (cov.reps_maximal i))
+        refine ⟨fd.complement, ?_⟩
+        rw [← fd.typeI.typeF.H_eq]
+        exact fd.frobenius
+      normalizer_eq := fun i =>
+        maximalSubgroup_eq_normalizer_maxNilpotentNormalHall hG (cov.reps_maximal i) (by
+          obtain ⟨td⟩ := hall _ (cov.reps_maximal i)
+          rw [← td.typeF.H_eq]
+          exact td.typeF.H_nontrivial)
+      isTI := cov.isTI
+      coprime_kernel := cov.coprime }
+  have hG0 : F.G0 = {(1 : G)} := by
+    refine Set.eq_singleton_iff_unique_mem.mpr ⟨F.one_mem_G0, fun x hx => ?_⟩
+    by_contra hx1
+    obtain ⟨i, g, hg⟩ := cov.covers x hx1
+    exact (F.mem_G0_iff.mp hx) i ⟨g, hg⟩
+  exact OddOrder.Peterfalvi.S09.not_trivial_G0 F hG.odd hG0
+
+end Theorem1217
+
+/-! ## (12.17) → (8.8): the case-(b) dichotomy -/
+
+/-- **Theorem (8.8) dichotomy** (BG §16): for a minimal simple group of odd order, either every
+maximal subgroup is of type I, or the case-(b) pairing data `Theorem88CaseBData` exists.  This is
+the BG §16 structural output of Theorem (8.8); Peterfalvi (12.17) (`not_all_maximal_typeI`) refutes
+the first alternative, forcing the second. -/
+theorem theorem88_dichotomy [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G) :
+    (∀ M : Subgroup G, M ∈ maximalSubgroups G → IsTypeI M) ∨
+      Nonempty (OddOrder.Peterfalvi.S12.Theorem88CaseBData G) :=
+  sorry
+
+/-- **Peterfalvi (12.17)**: the all-type-I case of Theorem (8.8) is impossible, so the case-(b)
+data of (8.8) exists.  Immediate from the (8.8) dichotomy (`theorem88_dichotomy`) and the
+non-existence half `not_all_maximal_typeI`. -/
+theorem theorem88_caseB_holds [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G) :
+    Nonempty (OddOrder.Peterfalvi.S12.Theorem88CaseBData G) :=
+  (theorem88_dichotomy hG).resolve_left (not_all_maximal_typeI hG)
 
 end OddOrder.Peterfalvi.S14
