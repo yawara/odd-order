@@ -100,8 +100,41 @@ char leaves=lane-b、(12.16)=char 反例の核、(12.17) `theorem88_caseB_holds`
 (char (7.11)/(12.17) Frobenius counting) + (8.8) partner assembly (BG §16)。FT consumer
 (`FeitThompson:361`) は `cb.S`/`S_maximal`/`S_nonI` のみ消費 (all-type-I 排除)。
 
+### 2026-06-26 (lane-h 継承, relane #10 / issue 2026 = option C): §12 frontier survey 確定
+
+relane #10 で **lane-h が S14_MaximalI を lane-c から継承** (lane-c は W1 Cor 15.3 へ pivot)。
+lane-h 起動時 survey (自己復帰モニター発火 → main 取込 → S14_MaximalI leaf green 3846 jobs) で
+**§12 全 14 sorry の gating を確定マップ** (lane-c 評価「全 char/BG/§8-gated」を独立確認):
+
+| 行 | 書籍 | theorem/def | gating |
+|---|---|---|---|
+| 232 | (12.2) | `character_decomposition_and_dade_domain` | char (Clifford 分解) |
+| 258 | (12.3) | `nonconjugate_typeI_R_orthogonal` | char (R(χ) 直交性) |
+| 271 | (12.4) | `orthogonal_character_constant_on_coset` | char (ρ-reduction、仮説は de-opacify 済) |
+| 282 | (12.5) | `rho_constant_on_H_minus_Hprime` | char (同上) |
+| 306 | (12.6) | `sibleyTarget_frobI` | Sibley/Dade `SibleyDadeHypothesis` (6.8) full |
+| 1040 | (12.10) | `witness_L_frobenius` | char (型 II/III/IV 排除 = 11.9.c) + §8 (9.7.b/8.6.a) |
+| 1049 | (12.11) | `intersection_complement_structure` | char + 未抽出 §8 (8.13.c1) |
+| 1315 | (12.12) | `complement_cyclic_order_dvd` | rep-theory (lane-c の FPF core 済) + T=Ω₁(Z(O_p)) setup |
+| 1343 | (12.14) | `psi_constant_on_xK` | char (Dade ρ) |
+| 1352 | (12.15) | `rhoM_integer_values` | char/Dade (ρ_M 整数性) |
+| 1360 | (12.16) | `counterexample_contradiction` | **char 反例の核** (最小反例の最終 Dade 矛盾) |
+| 1369 | (12.7) | `pi_empty` | (12.16) cite |
+| 1383 | (12.7) | `typeI_frobenius` | pi_empty cite (lane-c が headline を reduction 化済) |
+| 1396 | (12.17) | `theorem88_caseB_holds` | char (7.11 Frobenius counting) + BG §16 (8.8 partner)。**FT consumer** |
+
+**結論**: §12 の ungated §8-free runway は lane-c が抽出済で**枯渇**。残 14 sorry は全て
+char (lane-b §10-13) / Dade (6.8) / 未抽出 §8 / BG §16 (lane-f) gated。lane-h の honest work は
+**(1) deep char de-opacify** (残 opaque Prop 9 個: `CharacterDecompositionData` の equal_degree/
+tau_restriction_domain/difference_image_formula/R_eq_union、`CrossOrthogonalityData.orthogonal`、
+`DadeNotation` の e_eq_index/rhoFormula/rhoMFormula — いずれも concrete char 内容の特定要、e_eq_index
+のみ `e=|L:H|` で clean) か **(2) lane-b/c char landing 後の consumer wiring** で、fresh budget 向き。
+[[scaffold-sorry-free-not-done]] ゆえ unblock しない marginal de-opacify は commit のため作らない方針。
+**次セッション (fresh budget)**: 最高価値 = `theorem88_caseB_holds` (12.17) の W4-style de-opacify
+(char 7.11 counting + BG 8.8 partner を faithful producer に isolate、FT consumer 直結)。
+
 ## 参照
 
-- 正本: `notes/meta/ft_frontier_remap_2026_06_25.md` §2 (W2)
-- 主所有: `OddOrder/Peterfalvi/S14_MaximalI.lean`
-- 関連: `notes/peterfalvi/s10_13_maximal_structure.md`、issue 2018 (§13 char direction)
+- 正本: `notes/meta/ft_frontier_remap_2026_06_25.md` §2 (W2)、relane #10 (LAUNCH.md 冒頭、issue 2026)
+- 主所有: `OddOrder/Peterfalvi/S14_MaximalI.lean` (lane-h、2026-06-26 lane-c から継承)
+- 関連: `notes/peterfalvi/s10_13_maximal_structure.md`、issue 2018 (§13 char direction)、2026 (W4→W2 relane)
