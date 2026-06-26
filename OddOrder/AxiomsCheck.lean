@@ -6091,6 +6091,17 @@ formula together with the prime computation `coprimeFrobeniusAction_card_eq_prim
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.S05.TICyclicHypothesis.ncard_sigmaCoeff_ne_zero_le_of_inner_self_natCast
 
+-- **`|K*| = w₂` carrier bridge** (lane-b W3, BG §14 group theory) —
+-- `card_Msigma_inf_centralizer_eq_card_W2`: for a type-`P` maximal `S`, κ-Hall `K` cyclic, and any
+-- `TypePData d`, the dual factor `K* = M_σ(S) ⊓ C(K)` has order `|W₂| = w₂`.  `W₂ = M' ⊓ C(W₁)`
+-- (`centralizer_W1`) is sandwiched by `W₂ ≤ M_F ≤ M_σ ≤ M'`; `K` and `W₁` both complement the normal
+-- Hall `M'`, so are `S`-conjugate (Schur–Zassenhaus), and conjugating `M_σ ⊓ C(K)` onto
+-- `M_σ ⊓ C(W₁) = W₂` (with `M_σ` `S`-invariant) gives the order.  No character theory; this is the
+-- group-theoretic half that, paired with the §11 reduction `w₂ < w₁`, closes the unique bare
+-- `feitThompson` sorry `card_kappaHall_lt_of_isTypeIIIorIV` (whose residual is now only the genuine
+-- Peterfalvi (11.8), `S12.exists_zeta_residual_not_orthogonal`).  Axiom-clean.
+#assert_only_allowed_axioms OddOrder.card_Msigma_inf_centralizer_eq_card_W2
+
 -- **W4 §16→§7 bridge (lane-h, βM (14.11.2) de-opacification)** — `betaMExpansionData_of_hypothesis78`
 -- certifies that the (7.8.a) field of `BetaMExpansionData` (`β_M = 1_G − χ + Δ`) is a genuine
 -- consequence of the S09 §7 Dade decomposition

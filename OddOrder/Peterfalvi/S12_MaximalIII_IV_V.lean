@@ -6030,6 +6030,43 @@ theorem w2_lt_w1_of_residual_not_orthogonal [Finite G]
   · exact absurd heq hne
   · exact hgt
 
+open scoped FiniteInduce in
+/-- **Peterfalvi (11.8), the genuine non-orthogonality** (lane-b W3 obligation, issue 2020).
+
+Under Hypothesis (10.1), there is an irreducible `ζ ∈ S = inducedFamily M` of degree `w₁` —
+Peterfalvi's `ζ ∈ S(HC)`, a degree-`q` constituent of the constant-degree family `S₁ = S(HC)`
+(the `(U/C) ⋊ W₁` Frobenius gives `(u−1)/q` irreducibles of degree `q`) — for which the residual
+`(μ₀ − ζ)^τ − ∑_i ω_{i0}^σ` is **not** orthogonal to `(Irr W)^σ`.
+
+This is the deep orthogonality calculation Peterfalvi (11.8.1)–(11.8.6): by contradiction, assuming
+the residual orthogonal makes `S(C)` coherent (via the `τ₁`/`τ₂` extensions from (5.7)/(11.7) and the
+`σ`-grid identities), contradicting (11.3) (`S13.S_H0C_not_coherent`).  It is the **sole** remaining
+genuine §11 character content of (11.9.b): the `w₂ < w₁` reduction it feeds
+(`w2_lt_w1_of_residual_not_orthogonal`) and the carrier translation (`|K| = w₁` from the derived
+index, `|K*| = w₂` from `card_Msigma_inf_centralizer_eq_card_W2`) are proven, so discharging this
+closes `card_kappaHall_lt_of_isTypeIIIorIV` (the unique bare `feitThompson` sorry).  See
+`notes/peterfalvi/s13_11_8_orthogonality.md` for the full formalization plan. -/
+theorem exists_zeta_residual_not_orthogonal [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} (hyp : Hypothesis M) :
+    ∃ ζ : ClassFunction ↥M ℂ, ζ ∈ inducedFamily M ∧ IsIrreducibleCharacter ζ ∧
+      ζ 1 = (hyp.w1 : ℂ) ∧
+      ¬ ∀ (i : Fin hyp.w1) (j : Fin hyp.w2),
+        ClassFunction.inner
+          ((hyp.tau ((∑ i' : Fin hyp.w1, hyp.muGrid hG hG.odd i' 0) - ζ))
+            - ∑ i' : Fin hyp.w1, hyp.alignedOmegaSigmaGrid hG hG.odd i' 0)
+          (hyp.alignedOmegaSigmaGrid hG hG.odd i j) = 0 := by
+  sorry
+
+open scoped FiniteInduce in
+/-- **Peterfalvi (11.9.b)**: for the §10 hypothesis on a type-III/IV/V maximal subgroup, `w₂ < w₁`
+(`q > p`).  Combines the genuine (11.8) (`exists_zeta_residual_not_orthogonal`) with the
+coherence-free `w₂ < w₁` reduction (`w2_lt_w1_of_residual_not_orthogonal`). -/
+theorem w2_lt_w1_of_hypothesis [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} (hyp : Hypothesis M) :
+    hyp.w2 < hyp.w1 := by
+  obtain ⟨ζ, hζS, hζirr, hζ1, h118⟩ := exists_zeta_residual_not_orthogonal hG hyp
+  exact w2_lt_w1_of_residual_not_orthogonal hG hyp hζS hζirr hζ1 h118
+
 /-- **Peterfalvi (10.10.1)--(10.10.4)**: if Hypothesis (10.1) holds with `M`
 of type V, then the Type V parameter calculation forces `S` to be coherent. -/
 theorem typeV_forces_coherence [Finite G] [Fintype G]
