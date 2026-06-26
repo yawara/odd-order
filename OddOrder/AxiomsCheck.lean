@@ -3967,10 +3967,14 @@ set_option linter.style.longLine false in
 -- The proved half of the rank core `piSet_mf_inf_beta_disjoint_of_not_fittingIsTI`; sorry-free +
 -- axiom-clean.
 #assert_only_allowed_axioms OddOrder.BG.Ch4.S15.three_le_pRank_mf_of_mem_beta
--- BG Proposition 14.2(e) core (`S14_TypePCounting`, issue 8016): in a type-`P` `E`-setup with the
--- `κ`-Hall `K` playing the `E₁`-role, `K* = C_{M_σ}(K) ⊊ M_σ`.  Proven *non-circularly* (Lemma
--- 13.13 ⟹ `ℳ(K*) ≠ {M}`, Lemma 13.6 ⟹ `ℳ(Syl_p M_σ) = {M}`), replacing the circular Cor 15.6
--- route.  Exposed as the 7th conjunct of `typeP_structure`.  Sorry-free + axiom-clean.
+-- BG Proposition 14.2(e), second clause (`S14_TypePCounting`, issue 2025): in a type-`P` `E`-setup
+-- with the `κ`-Hall `K` playing the `E₁`-role, no Sylow `q`-subgroup `S` of `M_σ` lies in
+-- `K* = C_{M_σ}(K)`.  Proven non-circularly (Lemma 13.13 ⟹ `ℳ(K*) ≠ {M}`, Lemma 13.6 ⟹
+-- `ℳ(S) = {M}`).  The linchpin of the general-Hall κ'-fact for Cor 15.3(a).  Sorry-free + axiom-clean.
+#assert_only_allowed_axioms OddOrder.BG.Ch4.S14.typeP_sylow_not_le_kstar
+-- BG Proposition 14.2(e) core (`S14_TypePCounting`, issue 8016/2025): `K* = C_{M_σ}(K) ⊊ M_σ`.  Now
+-- an immediate corollary of `typeP_sylow_not_le_kstar` (a Sylow `S ≤ M_σ = K*` would violate it).
+-- Exposed as the 7th conjunct of `typeP_structure`.  Sorry-free + axiom-clean.
 #assert_only_allowed_axioms OddOrder.BG.Ch4.S14.kstar_ne_msigma_aux
 -- BG Corollary 15.3 step (`S14_TypePCounting`, issue 8016): `C_M(M_σ)` is a `κ(M)'`-group.  The
 -- exact statement BG cites at the start of Cor 15.3's proof (mmd L4209).  Sorry-free + axiom-clean.
@@ -5531,6 +5535,21 @@ Axiom-clean. -/
 
 #assert_only_allowed_axioms OddOrder.BG.Ch4.S16.typePData_of_isTypeP2
 
+/-! **Type-`P₁` structure: `M' = M_σ`, `F(M) = M_F`, and the type-V `TypePData`** (`S16_MainResults`,
+issue 8015, the FT-critical `hP1eqV` forward bridge).  For a type-`P₁` maximal subgroup the Hall
+`(κ ∪ σ)'`-complement is trivial, so Lemma 15.1(b) collapses to `M' = M_σ`
+(`isTypeP1_derivedInG_eq_Msigma`); when additionally `M_F = M_σ`, Corollary 15.5(d) (`F(M) ≤ M'`)
+plus `M_F ≤ F(M)` give the type-V Fitting collapse `F(M) = M_F`
+(`fittingInAmbient_eq_maxNilpotentNormalHall_of_isTypeP1_mf_eq_msigma`).  Together these fully
+construct the type-V Peterfalvi datum `typePData_of_isTypeP1_mf_eq_msigma` (`U = ⊥`), the
+carrier-constructibility milestone reducing `hP1eqV` to the lone Peterfalvi (8.8) trichotomy
+residual.  All three axiom-clean. -/
+
+#assert_only_allowed_axioms OddOrder.BG.Ch4.S16.isTypeP1_derivedInG_eq_Msigma
+#assert_only_allowed_axioms
+  OddOrder.BG.Ch4.S16.fittingInAmbient_eq_maxNilpotentNormalHall_of_isTypeP1_mf_eq_msigma
+#assert_only_allowed_axioms OddOrder.BG.Ch4.S16.typePData_of_isTypeP1_mf_eq_msigma
+
 /-! **`hP2II` reduced to the `M'`-type-`F` residual** (`S16_MainResults`,
 `isTypeII_of_isTypeP2_of_derived_typeF`, issue 7007): a type-`P₂` maximal subgroup whose derived
 subgroup `M'` is type `F` (with `F(M') = M_F`) is type II.  Discharges every `isTypeII_of_typePData`
@@ -6130,3 +6149,15 @@ formula together with the prime computation `coprimeFrobeniusAction_card_eq_prim
 -- construction + the (13.1.d)/(3.9) η-grid identification.  Axiom-clean (pure `rw` from the S09
 -- (7.8.a) cite).
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S16.betaMExpansionData_of_hypothesis78
+
+-- **W2 §12 (12.17) normalizer bridge (lane-h)** — `maximalSubgroup_eq_normalizer_maxNilpotentNormalHall`:
+-- a maximal subgroup `L` of a minimal simple group of odd order equals `N_G(L_F)` whenever
+-- `L_F = maxNilpotentNormalHall L ≠ ⊥`.  `L ≤ N_G(L_F)` is `maxNilpotentNormalHall_le_normalizer`;
+-- `N_G(L_F) = ⊤` would make `L_F ⊴ G`, excluded by simplicity (`L_F ≠ ⊥`, `L_F ≤ L < ⊤`); `L`
+-- coatom upgrades `L ≤ N_G(L_F) < ⊤` to equality.  This is the genuine group-theoretic core of the
+-- Peterfalvi (12.17) Frobenius-family assembly `not_all_maximal_typeI` (the `normalizer_eq` field of
+-- `S09.FrobeniusFamily`), which together with the (8.8) dichotomy `theorem88_dichotomy` (BG §16)
+-- discharges `theorem88_caseB_holds` — the all-Type-I non-existence the Feit–Thompson endgame
+-- consumes.  Axiom-clean.
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S14.maximalSubgroup_eq_normalizer_maxNilpotentNormalHall
