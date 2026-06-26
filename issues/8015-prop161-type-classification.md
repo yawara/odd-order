@@ -406,7 +406,19 @@ helper B `typeFData_exists_kappaElement_le_kappaHall` を実証明 (sorry-free +
 ⟹ **`not_isTypeI_of_isTypeNonI` (FT-critical consumer、FeitThompson:334 producer が cite) も axiom-clean**。
 ⟹ **FT が透過的に必要とする §16 type-classification 依存が完全 honest**。
 
-**残 W1 = `proposition_type_classification` の他 5 bridge** (hP1neIIIIV/hP1eqV = forward type-P₁ data 構成,
-hIIP2/hIIIIVP1/hVP1 = reverse の P₁/P₂ 精密化)。これらは **FT consumer (not_isTypeI) 非使用ゆえ非 critical**
-(consumer は各 .mp から IsTypeP のみ抽出、P₁/P₂ 精密化・MF 関係を捨てる)。Prop 16.1 を完全に閉じるには必要だが、
-FT 経路上の優先度は下がる ([[scaffold-sorry-free-not-done]] doneness: FT-critical 部分は完全 honest 化済)。
+### ⚠ 2026-06-26⁴ 訂正 — 残 bridge の FT 必要性を依存追跡で精査 (ユーザー指摘)
+
+前の「残 5 bridge 非 critical」は**誤り** (依存を grep せず断言、CLAUDE.md が戒める FT-orphaned 言い回し)。
+正確には FeitThompson.lean を辿ると **2 bridge が FT-critical**:
+- **`hP1neIIIIV` (forward P₁∧MF≠Mσ → III/IV)**: `typeP_imp_nonI` (FeitThompson:356, `hcIII_IV.mpr`) +
+  `card_kappaHall_lt_of_isTypeP1` (:602) が使用。mp producer `exists_section16MaximalPair_data` の核心。
+- **`hP1eqV` (forward P₁∧MF=Mσ → V)**: `typeP_imp_nonI` (:355, `hdV.mpr`) + no_typeV 経路 (:600) が使用。
+
+`typeP_imp_nonI` (:348-359) は「type-P 極大 ⟹ 非 type-I」を proposition_type_classification の **forward
+`.mpr` 方向** (hP1neIIIIV/hP1eqV/hP2II) で示す。hP2II は proved ゆえ残 sorry は hP1neIIIIV/hP1eqV の 2 本。
+
+**off-path (FeitThompson 未使用)**: `hIIP2`/`hIIIIVP1`/`hVP1` (reverse, clause `.mp`)。FeitThompson は
+`.mpr`=forward のみ使い、`hbII.mpr`=hP2II (proved); reverse は S12.bgTypeP の char 機構のみが cite。
+
+⟹ **残 W1 FT-critical = `hP1neIIIIV`/`hP1eqV`** = type-P₁ `TypeXData` 構成 (Pf (8.3)/(8.8))。issue の
+「hard 方向 (1-4,9) = type-data CONSTRUCTION、§16 endpoint A-E 連動」に該当。hub 委譲でなく W1 で埋める。
