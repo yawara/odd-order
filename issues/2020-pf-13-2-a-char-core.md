@@ -178,3 +178,18 @@ non-I (`notTypeI_imp_typeP` + type exclusivity); (3) cite `proposition_type_clas
 twice — M not P₂ (⟹ partner is P₂) and P₂ partner ⟹ Type II. This swaps the current "gated on
 theorem88_caseB_holds (W2)" sorry for "gated on proposition_type_classification (W1, actively-worked) +
 axiom-clean bridge" — a cleaner gate. Distinct unit; not started.
+
+## 2026-06-26 (cont.): bridge-enabled `exists_typeII_maximal_with_w2_of_typeP` LANDED
+
+The "next step" above is **done**. `S10.exists_typeII_maximal_with_w2_of_typeP` (S10:148, (8.8)
+Type-II partner, FT-path — consumed by S11 (9.3) `typeIIIorIV_W2_prime` / S12 (10.3) `w2_prime`) is
+now **sorry-free** (S10 real sorry 12→11). full build 3884 green.
+
+- **Relocated** `card_Msigma_inf_centralizer_eq_card_W2` (+ 2 helpers) from `FeitThompson` to `S10`
+  (upstream/reusable home; FeitThompson + AxiomsCheck re-cite `S10.card_Msigma_inf_centralizer_eq_card_W2`,
+  still axiom-clean + registered).
+- **Proof** = `typeP_duality` partner `Mstar` + bridge: M type III/IV/V ⟹ IsTypeP1 (via
+  `proposition_type_classification`) ⟹ κ≠∅ + ¬P₂; κ-Hall K via `hall_E_exists`; duality disjunction
+  ⟹ P₂ Mstar ⟹ IsTypeII Mstar; `[Mstar:Mstar']=|K*|` (`card_kappaHall_eq_derived_index`) `=|W₂|`
+  (bridge). Cites sorried `proposition_type_classification` (W1, lane-f, actively-closed) —
+  **swaps the old "gated on theorem88_caseB_holds (W2)" for the cleaner W1 gate + axiom-clean bridge**.
