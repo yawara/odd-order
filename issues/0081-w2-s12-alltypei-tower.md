@@ -7,6 +7,12 @@ created: 2026-06-25
 
 # W2 (lane-c): §12 all-Type-I 非存在 tower → theorem88_caseB_holds
 
+> **⚠ 2026-06-26 status (relane #10→#11)**: W2 owner は lane-c→lane-h (relane #10) →
+> **driver/await に降格 (relane #11, 常駐レーンなし)**。監査 `wf_1cb6284d-bb2` で §12 tower の 14 sorry が
+> 全て lane-b §11 char に従属 (ungated 0) と判明 → lane-h は独立価値の高い W1 carrier (issue 2027) へ移動。
+> **W2 (`theorem88_caseB_holds`, S14_MaximalI) は lane-b の §11 char landing 時に driver で機会的 close**。
+> タイトルの「(lane-c)」は旧 (relane #9)。本 issue は char-gated await item。
+
 ## 背景
 
 FT フロンティア再設計 (2026-06-25 relane #9、正本 `notes/meta/ft_frontier_remap_2026_06_25.md`)
