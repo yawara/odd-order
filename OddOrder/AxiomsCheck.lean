@@ -6093,8 +6093,10 @@ formula together with the prime computation `coprimeFrobeniusAction_card_eq_prim
 -- `M_σ ⊓ C(W₁) = W₂` (with `M_σ` `S`-invariant) gives the order.  No character theory; this is the
 -- group-theoretic half that, paired with the §11 reduction `w₂ < w₁`, closes the unique bare
 -- `feitThompson` sorry `card_kappaHall_lt_of_isTypeIIIorIV` (whose residual is now only the genuine
--- Peterfalvi (11.8), `S12.exists_zeta_residual_not_orthogonal`).  Axiom-clean.
-#assert_only_allowed_axioms OddOrder.card_Msigma_inf_centralizer_eq_card_W2
+-- Peterfalvi (11.8), `S12.exists_zeta_residual_not_orthogonal`); it also supplies, with
+-- `typeP_duality`, the (8.8) Type-II partner `S10.exists_typeII_maximal_with_w2_of_typeP`.
+-- Axiom-clean.
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S10.card_Msigma_inf_centralizer_eq_card_W2
 
 -- **W4 §16→§7 bridge (lane-h, βM (14.11.2) de-opacification)** — `betaMExpansionData_of_hypothesis78`
 -- certifies that the (7.8.a) field of `BetaMExpansionData` (`β_M = 1_G − χ + Δ`) is a genuine
