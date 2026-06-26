@@ -394,3 +394,19 @@ Coq `BGsection16.v:1031` 精査 (Explore) で hIF の正しい証明構造が判
   M_σ σ-Hall (`Msigma_isHall`) で p∤|M_F|、`td.complement` で |M|=|M_F||U| ⟹ p∣|U|、`td.exponent_eq`
   (exp U₀=exp U) で π(U₀)=π(U) ∋ p (Cauchy: p∣|G|⟺p∣exp G)。
 - X = Sylow `p` of U₀ (≠⊥ since p∈π(U₀))。
+
+## ✅✅✅ 2026-06-26³ hIF bridge 完全 sorry-free + axiom-clean COMPLETE (commit 9cf19fdf + 1104acb1)
+
+helper B `typeFData_exists_kappaElement_le_kappaHall` を実証明 (sorry-free + axiom-clean、AxiomsCheck 登録):
+- p∈π(U₀): p∈κ ⟹ p∉σ (`tau1/tau3_subset_sigma_compl`) + P 経由 p∈π(M)、M_F⊆M_σ σ-Hall で p∤|M_F|、
+  `complement.card_mul` で p∣|U|、`exponent_eq` + Cauchy (`exists_prime_orderOf_dvd_card` + `Monoid.order_dvd_exponent`) で p∣|U₀|。
+- X=⟨g⟩ (order-p element of U₀)、K=κ-Hall⊇X (`Ch03.hall_D` = Isaacs 3C.1 Wielandt, Hall superset)。
+
+⟹ **`isTypeF_of_isTypeI` (型 I ⟹ κ(M)=∅) が完全 sorry-free + axiom-clean** (helper A + B + theoremC)。
+⟹ **`not_isTypeI_of_isTypeNonI` (FT-critical consumer、FeitThompson:334 producer が cite) も axiom-clean**。
+⟹ **FT が透過的に必要とする §16 type-classification 依存が完全 honest**。
+
+**残 W1 = `proposition_type_classification` の他 5 bridge** (hP1neIIIIV/hP1eqV = forward type-P₁ data 構成,
+hIIP2/hIIIIVP1/hVP1 = reverse の P₁/P₂ 精密化)。これらは **FT consumer (not_isTypeI) 非使用ゆえ非 critical**
+(consumer は各 .mp から IsTypeP のみ抽出、P₁/P₂ 精密化・MF 関係を捨てる)。Prop 16.1 を完全に閉じるには必要だが、
+FT 経路上の優先度は下がる ([[scaffold-sorry-free-not-done]] doneness: FT-critical 部分は完全 honest 化済)。
