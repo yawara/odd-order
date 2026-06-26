@@ -719,17 +719,81 @@ Sylow `p`-subgroup `P₀` (with `p ∣ [M : M_F]`, hence `p ∤ |M_F|` as `M_F` 
 (`theoremB_U_sylow_abelian_rank_le_two`, already **proved** in the repo) says every Sylow of such
 a `U` is abelian of rank `≤ 2`; the only missing input is producing the complement `U`.  The
 type-`I` complement of `M_F` is `π(M_F)ᶜ`-Hall (immediate from `M_F` being a normal Hall
-subgroup), and Proposition 16.1's type-`I` classification (`κ(M) = ∅`, `σ(M) = π(M_σ)`,
-`M_F = M_σ`) identifies `π(M_F)ᶜ` with `(κ ∪ σ)ᶜ`.  So this existence statement is exactly the
-`§16`-gated residual; it becomes unconditional once Proposition 16.1 lands (lane-f).  Left
-unproved here (isolated). -/
+subgroup), and Proposition 16.1's type-`I` classification (`κ(M) = ∅` and `M_F = M_σ`)
+identifies `π(M_F)ᶜ` with `(κ ∪ σ)ᶜ`.
+
+**Proof (issue 2016).**  Write `M = ctr.M`, `p = ctr.p`.  Proposition 16.1 (clause (a)) gives
+`κ(M) = ∅` for the type-`I` `M`, and (clause (f)) gives `M_F = M_σ`.  Since `M_F` is `π(M_F)`-Hall
+in `M` (`maxNilpotentNormalHall_isHall`) and `p ∣ [M : M_F]`, we have `p ∤ |M_F| = |M_σ|`.  As
+`M_σ` is `σ(M)`-Hall in `G` (`S10.isHall_Msigma_Malpha`), `p ∤ |M_σ|` forces `p ∉ σ(M)` (else
+`p` would divide the `σ`-part `|M_σ|` of `|G|`).  With `κ(M) = ∅` this gives `p ∈ (κ ∪ σ)ᶜ`, so
+the `p`-group `P₀` is a `(κ ∪ σ)ᶜ`-subgroup of the solvable `M` and Hall's theorem D
+(`Ch03.hall_D`) places it in a `(κ ∪ σ)ᶜ`-Hall subgroup `U` of `M`.  The only `§16`-gated inputs
+are the cited Proposition 16.1 type-`I` clauses (lane-f frontier, issue 8015). -/
 theorem exists_sigmaKappaCompl_hall_ge_P0 [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     (ctr : CounterexampleHypothesis (G := G)) :
     ∃ U : Subgroup G, ctr.P0 ≤ U ∧ U ≤ ctr.M ∧
       Ch03.IsHallSubgroup
         ((OddOrder.BG.Ch4.S14.kappa ctr.M ∪ OddOrder.BG.Ch3.S10.sigma ctr.M)ᶜ)
         (U.subgroupOf ctr.M) := by
-  sorry
+  classical
+  haveI : Fact ctr.p.Prime := ⟨ctr.p_prime⟩
+  haveI hMsolv : IsSolvable ↥ctr.M := hG.solvable_of_mem_maximalSubgroups ctr.M_maximal
+  -- κ(M) = ∅ (Type I ⟹ Type F, Prop 16.1 clause (a)).
+  have hκ : OddOrder.BG.Ch4.S14.kappa ctr.M = ∅ :=
+    (OddOrder.BG.Ch4.S16.proposition_type_classification hG ctr.M_maximal).1.mp ctr.M_typeI
+  -- M_F = M_σ (Prop 16.1 clause (f)).
+  have hMFσ : maxNilpotentNormalHall ctr.M = OddOrder.BG.Ch3.S10.Msigma ctr.M :=
+    (OddOrder.BG.Ch4.S16.proposition_type_classification hG ctr.M_maximal).2.2.2.2.2.mpr
+      (Or.inl ctr.M_typeI)
+  -- `p ∤ |M_F|`: `M_F` is `π(M_F)`-Hall in `M` and `p ∣ [M : M_F]`.
+  have hpidx : ctr.p ∣ ((maxNilpotentNormalHall ctr.M).subgroupOf ctr.M).index := by
+    have h := ctr.p_dvd_index
+    rwa [ctr.K_eq_MF, Subgroup.relIndex] at h
+  have hMFhall := OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_isHall ctr.M
+  have hp_not_dvd_MF : ¬ ctr.p ∣ Nat.card ↥(maxNilpotentNormalHall ctr.M) := fun hdvd =>
+    hMFhall.index_no_pi ctr.p
+      (Nat.mem_primeFactors.mpr ⟨ctr.p_prime, hpidx, Subgroup.index_ne_zero_of_finite⟩)
+      (Nat.mem_primeFactors.mpr ⟨ctr.p_prime, hdvd, Nat.card_pos.ne'⟩)
+  have hp_not_dvd_Mσ : ¬ ctr.p ∣ Nat.card ↥(OddOrder.BG.Ch3.S10.Msigma ctr.M) :=
+    hMFσ ▸ hp_not_dvd_MF
+  -- `p ∣ |G|` (`p ∣ [M : M_F] ∣ |M| ∣ |G|`).
+  have hp_dvd_G : ctr.p ∣ Nat.card G :=
+    (hpidx.trans (Subgroup.index_dvd_card _)).trans (Subgroup.card_subgroup_dvd_card ctr.M)
+  -- `p ∉ σ(M)`: `M_σ` is `σ(M)`-Hall in `G`, and `p ∤ |M_σ|` with `p ∣ |G| = |M_σ|·[G:M_σ]`.
+  have hσHall := (OddOrder.BG.Ch3.S10.isHall_Msigma_Malpha hG ctr.M_maximal).1
+  have hp_not_sigma : ctr.p ∉ OddOrder.BG.Ch3.S10.sigma ctr.M := by
+    intro hpσ
+    refine hp_not_dvd_Mσ ?_
+    have hpmul : ctr.p ∣ Nat.card ↥(OddOrder.BG.Ch3.S10.Msigma ctr.M)
+        * (OddOrder.BG.Ch3.S10.Msigma ctr.M).index := by
+      rw [Subgroup.card_mul_index]; exact hp_dvd_G
+    rcases (Nat.Prime.dvd_mul ctr.p_prime).mp hpmul with h | h
+    · exact h
+    · exact absurd hpσ (hσHall.index_no_pi ctr.p
+        (Nat.mem_primeFactors.mpr ⟨ctr.p_prime, h, Subgroup.index_ne_zero_of_finite⟩))
+  -- `p ∈ (κ ∪ σ)ᶜ`.
+  have hp_compl : ctr.p ∈ (OddOrder.BG.Ch4.S14.kappa ctr.M
+      ∪ OddOrder.BG.Ch3.S10.sigma ctr.M)ᶜ := by
+    simp only [Set.mem_compl_iff, Set.mem_union, not_or]
+    exact ⟨hκ ▸ Set.notMem_empty ctr.p, hp_not_sigma⟩
+  -- Every prime divisor of `|P₀|` (a `p`-power) is `p ∈ (κ ∪ σ)ᶜ`; place `P₀` via Hall D.
+  have hcond : ∀ q ∈ (Nat.card ↥(ctr.P0.subgroupOf ctr.M)).primeFactors,
+      q ∈ (OddOrder.BG.Ch4.S14.kappa ctr.M ∪ OddOrder.BG.Ch3.S10.sigma ctr.M)ᶜ := by
+    intro q hq
+    obtain ⟨n, hn⟩ := (IsPGroup.iff_card.mp ctr.P0_pGroup)
+    rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe ctr.P0_le_M).toEquiv, hn] at hq
+    obtain ⟨hqp, hqdvd, _⟩ := Nat.mem_primeFactors.mp hq
+    rw [(Nat.prime_dvd_prime_iff_eq hqp ctr.p_prime).mp (hqp.dvd_of_dvd_pow hqdvd)]
+    exact hp_compl
+  obtain ⟨V, hVhall, hPV⟩ := Ch03.hall_D (G := ↥ctr.M) hcond
+  refine ⟨V.map ctr.M.subtype, ?_, Subgroup.map_subtype_le V, ?_⟩
+  · rw [show ctr.P0 = (ctr.P0.subgroupOf ctr.M).map ctr.M.subtype from
+      (Subgroup.map_subgroupOf_eq_of_le ctr.P0_le_M).symm]
+    exact Subgroup.map_mono hPV
+  · have hUeq : (V.map ctr.M.subtype).subgroupOf ctr.M = V :=
+      Subgroup.comap_map_eq_self_of_injective ctr.M.subtype_injective V
+    rw [hUeq]; exact hVhall
 
 /-- **Peterfalvi (12.9), the rank-two structure for `P₀`** = `(8.12.a)`.
 
