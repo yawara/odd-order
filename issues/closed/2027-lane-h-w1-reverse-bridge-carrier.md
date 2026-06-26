@@ -83,6 +83,21 @@ scaffold) は作らない方針。
   normalizer bridge axiom-clean) — relane #11 の「W2=char 従属で独立価値低」評価に反し ungated group-theory 核が
   実在した。issue 0081 参照。
 
+## ✅ RESOLUTION (2026-06-26, relane #12, ユーザー裁可「hub 一任」)
+
+lane-h survey で本 issue の前提が **stale** と確定 (rank-1 carrier は lane-f が 2026-06-25 に carrier 不要・
+sorry-free で完成済、reverse の真の残=P1/P2 判定は S16_MainResults 内=file-disjoint ピースなし)。
+ユーザー「hub 一任」→ **価値+独立性**で判断:
+
+**relane #12 = lane-h を W2 (S14_MaximalI) に戻す** (relane #11 の lane-h 部分のみ撤回; b/c の明確化は維持):
+- **独立性**: W2 は完全 file-disjoint (co-edit 衝突ゼロ)。co-edit S16_MainResults は 3400 行 hot file で衝突リスク継続。
+- **価値**: P1/P2 wiring は深い BG 分類で lane-f の機械と不可分 → **lane-f が S16_MainResults 内で担当** (W1-a の一部)。
+  lane-h は theorem88_caseB の文脈を既に保持。監査の「W2=char 従属」は lane-h 自身の theorem88 reduction で反証済
+  (ungated 群論が実在)。
+- **本 issue (file-disjoint rank-1 carrier) は moot ゆえ close**。reverse P1/P2 wiring は lane-f が issue 8015 で継続。
+- **教訓**: 監査エージェントが issue 8015 の古い (06-20) DAG を鵜呑みにし lane-f の 06-25 supersede を見落とした。
+  lane-h の #print axioms 検証付き survey が捕捉 ([[scaffold-sorry-free-not-done]] / 実コード検証の教訓)。
+
 ## 参照
 
 - 親 issue: 8015 (Prop 16.1 type-classification, lane-f 所有。本 issue は reverse carrier 半分を lane-h が担当)
