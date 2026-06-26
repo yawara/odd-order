@@ -20,21 +20,22 @@ from three pieces — **the keystone is now a sorry-free assembly** citing them:
    `|M'| ≥ (2w₁+1)w₂ = 2w₁w₂ + w₂`).
 
 2. **structural lower bound** `Hypothesis.card_derived_ge` — `(2w₁+1)·w₂ ≤ |M'|`. Pure group
-   theory (the `hMp` input). **Status: faithful obligation** (the `W₁`-on-`M'/M''` FPF
-   conjugation-action transport is the remaining work; mechanism below). Proof plan:
-   - `W₁` (cyclic Hall complement) acts on the abelian section `M'/M''` fixed-point-freely:
-     its fixed points on `M'` are `C_{M'}(x) = W₂` (`TypePData.centralizer_W1`), and `W₂ ⊆ M''`
-     (`TypePData.W2_le`, `W₂ ≤ H ⊓ M''`), so the only fixed point mod `M''` is trivial.
-   - hence `w₁ ∣ |M':M''| − 1` (`W1_dvd_index_of_fixedPoints_le`, S08_CaseBEndgame — needs import,
-     or `caseB_W1_dvd_index_of_centralizer_le` with `L=M`, `H=M'.subgroupOf M`, `M=commutator ↥H`);
-   - all orders odd and `M'' < M'`, so `|M':M''| ≥ 2w₁+1` (`two_mul_add_one_le_of_odd_dvd`);
-   - `|M'| = |M''|·|M':M''| ≥ w₂·(2w₁+1)`, using `w₂ = |W₂| ≤ |M''|` (W₂ ⊆ M''), with
-     `|M''| = Nat.card ↥(commutator ↥(derivedInG M))` (the second derived, `.map` of the
-     commutator of `↥M'`) and `Subgroup.index_mul_card`.
-   - **transport friction**: `commutator ↥((derivedInG M).subgroupOf M)` ↔ `commutator ↥(derivedInG M)`
-     via `Subgroup.subgroupOfEquivOfLe`. Working on the group `↥((derivedInG M).subgroupOf M)`
-     (so `caseB_W1_dvd_index_of_centralizer_le` gives the index divisibility with **no index
-     transport**) leaves only a card transport for the `|M''| ≥ w₂` half.
+   theory (the `hMp` input). **Status: PROVEN** (2026-06-26, commit below; sorryAx only via the
+   shared upstream `typePData_W1_hall_coprime`). The proof, working on the group `H = M'.subgroupOf M`
+   (`≅ ↥M'`):
+   - `derivedInG K = ⁅K,K⁆` (helper `hderiv`); `H = commutator ↥M`, `H.map subtype = M'`,
+     `⁅H,H⁆.map subtype = M''` (`Subgroup.subgroupOf_map_subtype`, `Subgroup.map_commutator`);
+   - `W₁` acts on `↥H` by conjugation fixed-point-freely: a fixed `x` has `(x:G) ∈ C_{M'}(a) = W₂`
+     (`TypePData.centralizer_W1`) `⊆ M'' = ⁅H,H⁆.map subtype`, so `x ∈ commutator ↥H`
+     (`commutator_subgroupOf_self` + `Subgroup.mem_map_iff_mem`); hence `w₁ ∣ |H:⁅H,H⁆| − 1` by
+     **`S08.caseB_W1_dvd_index_of_centralizer_le`** (axiom-clean), with `hcop` from
+     `typePData_W1_hall_coprime`;
+   - `↥M' ` solvable (`hG.solvable_of_mem_maximalSubgroups` + `solvable_of_solvable_injective`) and
+     nontrivial (`|H| ≥ |W₂| > 1`), so `⁅H,H⁆ < ⊤` (`IsSolvable.commutator_lt_top_of_nontrivial`),
+     giving `|H:⁅H,H⁆| > 1`; all orders odd ⟹ `|H:⁅H,H⁆| ≥ 2w₁+1` (`S08.two_mul_add_one_le_of_odd_dvd`);
+   - `|⁅H,H⁆| = |M''| ≥ |W₂| = w₂` (`Subgroup.card_le_of_le`, `W₂ ⊆ M''`); then
+     `|M'| = |H| = |H:⁅H,H⁆|·|⁅H,H⁆| ≥ (2w₁+1)·w₂` (`Subgroup.index_mul_card`).
+   - **import**: added `OddOrder.Peterfalvi.S08_CaseBEndgame` to S12 (acyclic; §8 < §10).
 
 3. **norm-counting estimate** `typeII_coherence_contradiction_estimate` — the §7 analytic heart
    (the `hbound` input, with `|U| ≥ 7` bundled). **Status: the single remaining genuine
@@ -61,9 +62,11 @@ the W3 frontier from "(10.8) is a black box" to "(10.8) needs only the §7 norm-
 
 ## Next steps
 
-- **discharge `card_derived_ge`** (routine group theory; import `W1_dvd_index_of_fixedPoints_le`
-  or `caseB_W1_dvd_index_of_centralizer_le` and do the `subgroupOf`/commutator card transport).
-- **`typeII_coherence_contradiction_estimate`** is the genuine remaining §10 char content: build a
-  §7 Hypothesis71/78 instance for the §10 Type-II partner and assemble (7.5)+(7.8.b)+(10.6.b)+the
-  TI-counting. Also needs (10.7) `typeII_derived_frobenius` (currently sorried) for the partner's
-  `UW₂` Frobenius structure and the `x ∈ HU ⟹ x ∈ H` step.
+- ~~discharge `card_derived_ge`~~ **DONE** (2026-06-26). (10.8) now reduces to the **single**
+  genuine §7 gate below.
+- **(10.7) `typeII_derived_frobenius`** (currently sorried) — upstream of the estimate: the
+  Type-II partner `S` has `[S,S]` Frobenius with kernel `S_F`, giving the `UW₂` Frobenius structure
+  (`|U| ≥ 7`) and the `x ∈ HU ⟹ x ∈ H` step.
+- **`typeII_coherence_contradiction_estimate`** — the genuine remaining §10 char content (the only
+  S12 sorry on the (10.8) path now): build a §7 Hypothesis71/78 instance for the §10 Type-II
+  partner and assemble (7.5)+(7.8.b)+(10.6.b)+the TI-counting `G₁ ⊆ (H#)^G ∪ V^G`.

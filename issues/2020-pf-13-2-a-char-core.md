@@ -230,3 +230,15 @@ in S09), so (10.8) is the actionable upstream piece.
 `typeII_derived_frobenius` (partner Frobenius, upstream of the estimate); (3) the §7 estimate
 `typeII_coherence_contradiction_estimate` (the genuine §10 analytic heart). Separately, (11.8)
 remains blocked on materializing the §9 `Section11CharacterData` carrier.
+
+## 2026-06-26 lane-b (cont.): card_derived_ge PROVEN — (10.8) は §7 gate 単独に
+
+`Hypothesis.card_derived_ge` (`(2w₁+1)·w₂ ≤ |M'|`) を**完全証明** (commit b9314c52)。
+W₁ の `↥(M'.subgroupOf M)` 上 FPF conjugation (`S08.caseB_W1_dvd_index_of_centralizer_le`,
+axiom-clean) + M' solvable-nontrivial による `⁅H,H⁆<⊤` + `W₂⊆M''` + `index_mul_card`。
+sorryAx は共有上流 `typePData_W1_hall_coprime` のみ。S08_CaseBEndgame を S12 に import (acyclic)。
+
+⟹ **(10.8) `S_not_coherent` の残 sorry は genuine な §7 norm-counting 推定
+`typeII_coherence_contradiction_estimate` 単独** (算術 closer + 構造的下界 + params/coh は全 genuine)。
+**次手 = (10.7) `typeII_derived_frobenius` (partner Frobenius、§7 estimate の上流) → §7 estimate 本体**
+(Hypothesis71/78 instance を §10 Type-II partner に構築 + (7.5)+(7.8.b)+(10.6.b)+TI-counting)。
