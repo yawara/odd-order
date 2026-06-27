@@ -303,6 +303,18 @@ branch とも削除済み。旧 **A** / **D** も同様に退役済み (履歴�
   必ず `git merge --no-ff --no-commit` 後の `git diff --cached --stat`（=実際に staged される加算分）で行う。
   **step 1.5 の範囲逸脱チェックも同じ罠**: マージ前の「レーンが変更したファイル」は必ず 3-dot
   `git diff --name-only main...<branch>`（merge-base からの branch 側）で取る（2-dot だと遅れている分を誤検出）。
+- **⚠ 3-dot でも "multiple merge bases" 警告時は誤検出しうる（2026-06-28 実害, lane-f が S11=lane-b 所有を逸脱と誤判定）**:
+  レーンが `git merge main` を繰り返すと main↔lane 間に **merge base が複数**でき、`git diff main...<branch>` は
+  その中から**1 つ（しばしば古い方）を自動選択**する（`warning: multiple merge bases, using <old-sha>` が出る）。
+  古い base を選ぶと「その base 以降に main 側へ入った他レーンの成果」が branch 側差分に紛れ込み、**自所有外
+  ファイル（例 S11）が逸脱判定に出る**。これは genuine 逸脱と見分けがつかないので、**即 STOP せず以下で誤検出を排除**:
+  (1) **分岐元 merge-base との diff**: `git merge-base --all main <branch>` で全 base を出し、各 base に対し
+     `git diff <base> <branch> -- <疑い file>` が **0 行**なら、そのレーンはそのファイルを**一切編集していない**
+     （古い base 由来の見かけの差分）。(2) **疑い commit の per-commit 確認**: `git show <lane-HEAD> -- <疑い file>`
+     が `+theorem/+lemma/+def` を含まない（merge で取り込んだだけ）なら自作編集でない。(3) **最終確定 = trial-merge
+     staged**: `git merge --no-ff --no-commit <branch>` 後 `git diff --cached --name-only` に疑い file が
+     **含まれなければ**、3-way が main 側（最新）を保持＝逸脱なし。staged に疑い file が出て内容が絡むなら genuine 逸脱で abort+STOP。
+  - 要するに **3-dot の逸脱フラグは「疑い」止まり**。分岐元 base diff=0 + trial-merge staged に無し、で誤検出を排除して合流可。
 - **`axiom` 判定 grep は必ず `.lean` に scope する**: `git diff --cached | grep '^\+\s*axiom '` は
   **issue/notes の markdown 中の散文（"axiom footprint = …" 等）を誤検出**する（2026-06-22 実害）。
   正しくは `git diff --cached -- '*.lean' | grep -E '^\+axiom [A-Za-z_]+ *[:({]'`（行頭 `axiom <ident>` の
