@@ -481,3 +481,29 @@ TypePData(P₁, U≠⊥) を要する。M' = M_σ 内の M_F-complement U を構
 深い §15/§16 構造定理**に bottom-out。次の実質前進 = (i) **M'/M_F nilpotent** を Fcore_structure から
 形式化 (hP1neIIIIV の核 gate を解く、再利用性高) または (ii) **(8.8) trichotomy の W₁-action 解析**
 (hP1eqV を完全 close)。どちらも multi-session。
+
+### ✅ 2026-06-27 (lane-f): hP1neIIIIV の deep residual 3 本を全 close — TypePData 完全構成 (Cor 15.5)
+
+前項が「最深 gate・multi-session」とした **M'/M_F nilpotent (hUnilp) / hSDfit / hFiteq を全て実証明**
+(BG Cor 15.5)。型 `P₁` (`M_F≠M_σ`) 極大の **完全な TypePData が sorry-free+axiom-clean で構成可能**に
+(type III/IV carrier-constructibility milestone、`typePData_of_isTypeP2` の P₁ 版)。残 gate は
+**N(U)≤M (Pf 8.7) のみ**。commit `5671e77a`/`29c5f5bf`/`7f5d784f`/`33c58fa8`。
+
+新規 (全 sorry-free+axiom-clean、AxiomsCheck 登録済):
+- `isNilpotent_complement_of_isTypeP1_mf_ne_msigma` (hUnilp): U≅M_σ/M_F、Thm 15.2 の `Q⋊D=M_σ`
+  (D nilpotent) ⟹ M_σ/M_F は D の商写像像で nilpotent ⟹ U nilpotent。**前項の "deferred quotient
+  API" は不要だった** — `nilpotent_of_surjective` + `MulEquiv.ofBijective` で直接。
+- `isComplement'_mf_complement_of_sup_inf` (hDcompl): sup/inf + M_F◁M' から第二同型 (`relIndex_sup_right`)
+  + `isComplement'_of_card_mul_and_disjoint`。`fitting_decomposition` 非依存。
+- `mem_centralizer_of_inner_conj_of_coprime` (再利用可能 coprime-action 核): x が N を normalize +
+  conj_x が inner (=conj_n) + orderOf x ⊥ |N| ⟹ x∈C(N) (`normalizerMonoidHom` の像位数論法)。
+- `fittingInAmbient_eq_mf_sup_inf_of_isTypeP1_mf_ne_msigma` (hFiteq+hSDfit): F(M)=M_F⊔(U⊓C(M_F))。
+  F(M) nilpotent + M_F normal Hall ⟹ Dedekind で F(M)=M_F⊔(U⊓F(M)); crux U⊓F(M)⊆C(M_F) は
+  F(M)=C_M(M_F)·M_F 分解 + 上記 coprime 核。hSDfit は M''≤F(M) (fitting_decomposition) 経由。
+- `typePData_of_isTypeP1_mf_ne_msigma`: 上記 + `exists_typeP1_mf_complement` を
+  `typePData_of_isTypeP_of_inputs` に供給して完全構成。
+- `isTypeIII_or_IV_of_isTypeP1_mf_ne_msigma`: bridge 配線 (hP1eqV/hFI と同パターン)。`case hP1neIIIIV`
+  を wire、残 sorry = N(U)≤M のみ (Pf 8.7、type II と区別する complement 自己正規化性)。
+
+⟹ **残 W1 forward = hP1eqV trichotomy (8.8 W₁-action) + hP1neIIIIV の N(U)≤M (8.7)**。両者は char/Coq
+`Fcore_structure` の complement uniqueness。reverse 4 bridge (π(W₁)⊆κ carrier) は別 (lane-b char gate)。
