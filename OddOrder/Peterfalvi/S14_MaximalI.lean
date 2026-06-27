@@ -1701,14 +1701,85 @@ end Theorem1217
 
 /-! ## (12.17) → (8.8): the case-(b) dichotomy -/
 
+/-- **Type-`P` ⟹ non-Type-I** (Proposition 16.1(b)(c)(d)): a type-`P` maximal subgroup of a minimal
+simple group of odd order is one of the Types II–V.  Split `κ(M)` against `π(M) - σ(M)`: equal gives
+`P₁`, which is Type V (`M_F = M_σ`) or Type III/IV (`M_F ≠ M_σ`); unequal gives `P₂` = Type II.  This
+is the local `typeP_imp_nonI` of BG Theorem I's dichotomy proof, isolated here for
+`theorem88_dichotomy`. -/
+private theorem isTypeNonI_of_isTypeP [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    {N : Subgroup G} (hN : N ∈ maximalSubgroups G)
+    (hP : OddOrder.BG.Ch4.S14.IsTypeP N) : IsTypeNonI N := by
+  obtain ⟨_, hbII, hcIII_IV, hdV, _, _⟩ :=
+    OddOrder.BG.Ch4.S16.proposition_type_classification hG hN
+  by_cases hk : OddOrder.BG.Ch4.S14.kappa N = OddOrder.BG.Ch4.S14.sigmaComplementPrimes N
+  · have hP1 : OddOrder.BG.Ch4.S14.IsTypeP1 N := ⟨hP, hk⟩
+    by_cases hMF : OddOrder.BG.Ch4.S15.MF N = OddOrder.BG.Ch3.S10.Msigma N
+    · exact Or.inr (Or.inr (Or.inr (hdV.mpr ⟨hP1, hMF⟩)))
+    · rcases hcIII_IV.mpr ⟨hP1, hMF⟩ with hIII | hIV
+      · exact Or.inr (Or.inl hIII)
+      · exact Or.inr (Or.inr (Or.inl hIV))
+  · exact Or.inl (hbII.mpr ⟨hP, hk⟩)
+
 /-- **Theorem (8.8) dichotomy** (BG §16): for a minimal simple group of odd order, either every
-maximal subgroup is of type I, or the case-(b) pairing data `Theorem88CaseBData` exists.  This is
-the BG §16 structural output of Theorem (8.8); Peterfalvi (12.17) (`not_all_maximal_typeI`) refutes
-the first alternative, forcing the second. -/
+maximal subgroup is of type I, or the case-(b) pairing data `Theorem88CaseBData` exists.
+
+*Proof.*  If some maximal `S` is not type I, then it is type `P` (Proposition 16.1(a): `TypeI ⟺
+TypeF`, and `TypeF ⟺ κ(S) = ∅`).  BG Theorem 14.7 duality (`typeP_duality`) applied to `S` with a
+`κ(S)`-Hall subgroup `K` produces the complement `S = S' ⋊ K` (first conjunct), the dual maximal
+`T = M*`, the cyclic factor `W = K ⊔ K*`, the type-II witness, and the `κ(M*)`-Hall `K*`.  Applying
+the duality again at `M*` gives the second complement `T = T' ⋊ K*`.  The `κ`-Hall complement `K`
+plays the role of the case-(b) factor `W₁` (both `K` and the type-`P` `W₁` complement `S'`, Peterfalvi
+(8.8.b1)).  Cites the merged BG §16 `typeP_duality` and `proposition_type_classification`; the
+remaining hard content lives in their (issue-8015) residuals. -/
 theorem theorem88_dichotomy [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G) :
     (∀ M : Subgroup G, M ∈ maximalSubgroups G → IsTypeI M) ∨
-      Nonempty (OddOrder.Peterfalvi.S12.Theorem88CaseBData G) :=
-  sorry
+      Nonempty (OddOrder.Peterfalvi.S12.Theorem88CaseBData G) := by
+  classical
+  by_cases hall : ∀ M : Subgroup G, M ∈ maximalSubgroups G → IsTypeI M
+  · exact Or.inl hall
+  · refine Or.inr ?_
+    push_neg at hall
+    obtain ⟨S, hS, hSnotI⟩ := hall
+    haveI : IsSolvable ↥S := hG.solvable_of_mem_maximalSubgroups hS
+    -- `S` not type I ⟹ `S` type `P` (Prop 16.1(a): `TypeI ⟺ TypeF`, `TypeF ⟺ κ(S) = ∅`).
+    have hSP : OddOrder.BG.Ch4.S14.IsTypeP S := by
+      have hiff := (OddOrder.BG.Ch4.S16.proposition_type_classification hG hS).1
+      have hnotF : ¬ OddOrder.BG.Ch4.S14.IsTypeF S := fun hF => hSnotI (hiff.mpr hF)
+      rw [OddOrder.BG.Ch4.S14.IsTypeP, Set.nonempty_iff_ne_empty]
+      exact fun he => hnotF he
+    -- A `κ(S)`-Hall subgroup `K` of `S` (Hall's theorem in the solvable `S`).
+    obtain ⟨K', hK'⟩ := Ch03.hall_E_exists (G := ↥S) (OddOrder.BG.Ch4.S14.kappa S)
+    set K : Subgroup G := K'.map S.subtype with hKdef
+    have hKeq : K.subgroupOf S = K' :=
+      Subgroup.comap_map_eq_self_of_injective S.subtype_injective K'
+    have hK : Ch03.IsHallSubgroup (OddOrder.BG.Ch4.S14.kappa S) (K.subgroupOf S) := by
+      rw [hKeq]; exact hK'
+    set Kstar : Subgroup G :=
+      OddOrder.BG.Ch3.S10.Msigma S ⊓ Subgroup.centralizer (K : Set G) with hKstardef
+    -- BG Theorem 14.7 duality at `S`: `S = S' ⋊ K` (`hScompl`), the dual `M*`, its data.
+    obtain ⟨hScompl, _, Mstar, ⟨hMstarMem, hMstarP, hSnconjMstar,
+        ⟨hKstarMstar, hKstar_hall, hK_eq⟩, hcyc, _, hP2disj, _⟩, _⟩ :=
+      OddOrder.BG.Ch4.S14.typeP_duality hG hS hSP (Subgroup.map_subtype_le K') hK hKstardef
+    -- Apply duality again at `M*` with its `κ`-Hall `K*`: `M* = (M*)' ⋊ K*` (`hTcompl`).
+    obtain ⟨hTcompl, _⟩ :=
+      OddOrder.BG.Ch4.S14.typeP_duality hG hMstarMem hMstarP hKstarMstar hKstar_hall hK_eq
+    exact ⟨{
+      S := S, T := Mstar, W1 := K, W2 := Kstar, W := K ⊔ Kstar
+      S_maximal := hS, T_maximal := hMstarMem
+      S_ne_T := by
+        intro hST
+        rw [hST] at hSnconjMstar
+        exact hSnconjMstar (OddOrder.BG.Ch4.S14.IsConjugateSubgroup.refl Mstar)
+      W_eq := rfl, W_cyclic := hcyc
+      S_nonI := isTypeNonI_of_isTypeP hG hS hSP
+      T_nonI := isTypeNonI_of_isTypeP hG hMstarMem hMstarP
+      one_typeII := hP2disj.imp
+        (fun h => (OddOrder.BG.Ch4.S16.proposition_type_classification hG hS).2.1.mpr h)
+        (fun h => (OddOrder.BG.Ch4.S16.proposition_type_classification hG hMstarMem).2.1.mpr h)
+      W1_le_S := Subgroup.map_subtype_le K'
+      W2_le_T := hKstarMstar
+      S_compl := hScompl
+      T_compl := hTcompl }⟩
 
 /-- **Peterfalvi (12.17)**: the all-type-I case of Theorem (8.8) is impossible, so the case-(b)
 data of (8.8) exists.  Immediate from the (8.8) dichotomy (`theorem88_dichotomy`) and the
