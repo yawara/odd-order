@@ -320,3 +320,28 @@ The natural way to land the estimate is a **faithful de-opacification** of
 `typeII_coherence_contradiction_estimate`: write its body as [family_inequality → line 83 (steps 1-4,
 mechanical)] + [(7.8.b) named obligation] + [line 87 + chain] + [hB named obligation], isolating the
 two deep gates as named `sorry`s.  All the non-gate steps are now backed by proven lemmas.
+
+## 2026-06-27 (cont.⁴) — line 83 PROVEN (the mechanical (7.5)+G₀-drop step)
+
+`Hypothesis.chiRhoNormSq_zeta_le_line83` landed (full build 3884 green): Peterfalvi (10.8) 04.12
+lines 81→83, `‖ζ^{τ₁,ρ}‖² ≤ |A(M)|/|M| + (|famG₀|−|G₀|)/|G|`.  This is the "mechanical, all inputs
+ready" step from cont.³ — now actually proven:
+- `S09.family_inequality` (7.5) on the self-contained `toFamilyHypothesis71` (norm-one =
+  `inner_tau1_zeta_self_eq_one`) → line 81;
+- `G₀ ⊆ famG₀` (`dadeSupport_restrict_subset`) + `‖·‖²≥0` lift `sum_zeta_tau1_normSq_ge_card`
+  ((10.6.b)) to `famG₀` → line 83; `mul_sub`+`linarith` close.
+- **Not AxiomsCheck-registered**: inherits the existing §10 `Hypothesis`-carrier `sorryAx` taint via
+  `sum_zeta_tau1_normSq_ge_card`/`tau1_values_and_norm_bound` (same status as (10.9)); no new sorry.
+
+**(10.8) progress map now**:
+- lines 79-83: **proven** (`chiRhoNormSq_zeta_le_line83`).
+- line 87 = line 83 + (7.8.b) [`‖ζ^{τ₁,ρ}‖² ≥ 1−ŵ₁/|M'|`, deep] + `card_typePA_div_card_lt_inv_w1`
+  [proven] + `card_derived_ge` [proven].  **Blocked only on (7.8.b).**
+- lines 89-99: the `|G₁| = |famG₀|−|G₀|` TI-counting (`hB`) + partner `|U|≥7`/`|S|=|H||U|w₂`
+  (from (10.7)) → `typeII_coherence_estimate_chain` → `typeII_noncoherence_arithmetic` → `False`.
+  **§9-blocked** (the `S11.Section11CharacterData` carrier, shared with (11.8)).
+
+So the *entire* mechanical/arithmetic spine of (10.8) is now proven; the two remaining gates are
+exactly **(7.8.b)** (the `Hypothesis78` instance for `(M, A(M))`, `H=M'`) and the **§9 carrier**
+(`hB`/(10.7), shared with (11.8)).  Next genuine target: (7.8.b) — its config (`H=M'`,
+`family=inducedFamily M`, `ν=coh.tau1`) is fixed; the (7.7.a)/(7.8.c.i) certificates are the content.
