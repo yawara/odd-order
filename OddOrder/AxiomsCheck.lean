@@ -6221,6 +6221,10 @@ formula together with the prime computation `coprimeFrobeniusAction_card_eq_prim
 -- FPF engine apply to genuine `Irr(H̄)` characters (realization-free inertia route for (9.9)).
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.S11.exists_units_monoidHom_of_isIrreducibleCharacter_of_isMulCommutative
+-- (9.9.a) character-side inertia `I_U(θ) ⊆ C`: a nontrivial irreducible character of the chief
+-- factor `H̄`, invariant under `φ_U(g)`, forces `φ_U(g) = 1` (`g ∈ C`).  Realization-free
+-- (FPF core + abelian Irr↔Hom bridge + char-side FPF engine).
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S11.chiefFactor_caseB_char_inertia
 -- §9 degree infrastructure: `[M:HU] = q` (`HU = M'`, `[M:M'] = |W₁|`) and the resulting
 -- `(Ind_{HU}^M χ)(1) = q·χ(1)` — the degree formula every (9.8)/(9.9) count uses.
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S11.huSub_index_eq_q

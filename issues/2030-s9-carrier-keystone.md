@@ -203,6 +203,20 @@ assembly step (4) の degree 計算の足回りを実証明 (axiom-clean+AxiomsC
 ⟹ **char-engine (commit 25ee31ba) は off-path でなく on-path に昇格** (bridge で接続)。FPF 核も degree infra も
 on-path。残 = inflation 接続 (conjBy↔φU) + Clifford 誘導次数。
 
+## 2026-06-28 (cont.⁴): char-side inertia `I_U(θ) ⊆ C` を実証明 (realization-free) — 核心 landed
+
+**`chiefFactor_caseB_char_inertia`** (S11、axiom-clean+AxiomsCheck): case-(b) で θ∈Irr(H̄) nontrivial が
+φU(g)-invariant (`∀x, θ(φU(g)x)=θ x`) ⟹ **φU(g)=1** (= g∈C)。= Peterfalvi (9.9.a) の character-side
+inertia `I_U(θ)⊆C`。全 engine 統合 (背理法 φU(g)≠1 → FPF `chiefFactor_caseB_action_fpf` → bridge で θ を
+Hom 化 → char-engine `eq_one_of_invariant_of_fixedPointFree` で θ trivial → nontrivial に矛盾)。
+**抽象 quotient ↥data.H⧸chief.N + 抽象 φU のまま、H̄-as-subgroup realize 完全不要**。char-engine を
+`[CommGroup K]`→`[Group K]` に緩和 (商の CommGroup instance 構成を回避、証明は abelian 不要だった)。
+
+⟹ **(9.9.a) の inertia 核 (I_U(θ)⊆C) は完全に proven**。残 (9.9.a) = (i) (9.9) の χ∈Irr(HU) の Res_H
+component θ が H̄ 経由 (nontrivial) であることの取り出し + 「u∈I_HU(θ) ⟺ θ̄ φU(u)-invariant」の inflation
+接続 (この char_inertia が後者の右辺を閉じる)、(ii) Clifford 誘導次数 χ=Ind_{HC}^{HU}(linear) degree u →
+Ind^M qu (degree infra 済)。**inertia の数学核は終わり、残は Clifford 取り出し/誘導の formalization**。
+
 **carrier genuinization の保留** (honest-architecture note): `CliffordCaseBData.field_model`/`Ubar_cyclic`
 (True placeholder) を FPF/IsCyclic に genuine 化しようとしたが、**struct field type が
 `typeP_quotientCoprimeAction` を参照 → `[Finite G]` + `[chief.N.Normal]` instance を要し、structure 宣言

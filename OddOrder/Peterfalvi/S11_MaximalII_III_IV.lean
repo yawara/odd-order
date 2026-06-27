@@ -2133,7 +2133,7 @@ and `θ (x / α x) = θ x / θ (α x) = 1` by invariance, so `θ` vanishes on al
 **character-side fixed-point-freeness** of the Frobenius action `H̄ ⋊ Ū` — for a nontrivial linear
 character `θ ∈ Irr(H̄)` and `g ∉ C = C_U(H̄)` (so `φ_U(g)` is FPF by `chiefFactor_caseB_action_fpf`),
 `θ` is *not* `φ_U(g)`-invariant, giving the inertia `I_U(θ) = C` underlying Peterfalvi (9.9). -/
-theorem eq_one_of_invariant_of_fixedPointFree {K M' : Type*} [CommGroup K] [Finite K] [CommGroup M']
+theorem eq_one_of_invariant_of_fixedPointFree {K M' : Type*} [Group K] [Finite K] [CommGroup M']
     {α : MulAut K} (hα : MonoidHom.FixedPointFree α) {θ : K →* M'}
     (hinv : ∀ x : K, θ (α x) = θ x) : θ = 1 := by
   ext y
@@ -2153,7 +2153,7 @@ Irreducible representations of a commutative group are `1`-dimensional
 characters of the abelian chief factor `H̄`, giving the inertia `I_U(θ) = C` of Peterfalvi (9.9)
 without realizing `H̄` as a subgroup. -/
 theorem exists_units_monoidHom_of_isIrreducibleCharacter_of_isMulCommutative
-    {Γ : Type} [Group Γ] [Finite Γ] [IsMulCommutative Γ]
+    {Γ : Type*} [Group Γ] [Finite Γ] [IsMulCommutative Γ]
     {φ : ClassFunction Γ ℂ} (hφ : IsIrreducibleCharacter φ) :
     ∃ θ : Γ →* ℂˣ, ∀ g, (θ g : ℂ) = φ g := by
   obtain ⟨V, _, _, _, ρ, hρ, hχ⟩ := hφ
@@ -2804,6 +2804,55 @@ theorem chiefFactor_caseB_action_fpf [Finite G] {M : Subgroup G}
       (Subgroup.commutator_mem_commutator
         (Subgroup.mem_subgroupOf.mp a.2) (Subgroup.mem_subgroupOf.mp b.2))
   exact fixedPointFree_of_aInvariant_irreducible_comm hComm hcaseB _ hg x hx
+
+/-- **Peterfalvi (9.9): the `U`-action on `Irr(H̄)` is fixed-point-free off `C`.**  In Clifford
+case (b), if a nontrivial irreducible character `θ` of the chief factor `H̄ = ↥H ⧸ N` is invariant
+under the `U`-action `φ_U(g)`, then `g` acts trivially (`φ_U(g) = 1`, i.e. `g ∈ C = C_U(H̄)`).
+
+This is the **character-side inertia** `I_U(θ) ⊆ C` of Peterfalvi (9.9.a), proven *realization-free*:
+the abelian `Irr ↔ Hom` bridge (`exists_units_monoidHom_of_isIrreducibleCharacter_of_isMulCommutative`)
+turns `θ` into a linear character `θ̂`, and a `φ_U(g)`-invariant `θ̂` with `φ_U(g)` fixed-point-free
+(`chiefFactor_caseB_action_fpf`, valid for `g ∉ C`) is trivial
+(`eq_one_of_invariant_of_fixedPointFree`), contradicting `θ` nontrivial.  No realization of `H̄` as
+a subgroup is needed; it works on the abstract quotient `↥H ⧸ N` with the abstract action `φ_U`. -/
+theorem chiefFactor_caseB_char_inertia [Finite G] {M : Subgroup G}
+    {data : TypesIIIIIIVSetup M} {chief : ChiefFactorData data}
+    (hcaseB : ∀ J : Subgroup (↥data.H ⧸ chief.N),
+        IsAInvariant ((typeP_quotientCoprimeAction data.typeP data.nontrivial.1
+          chief.N_aInvariant).φ.comp (typeP_quotientCoprimeAction data.typeP data.nontrivial.1
+          chief.N_aInvariant).U.subtype) J → J = ⊥ ∨ J = ⊤)
+    {θ : IrreducibleCharacter (↥data.H ⧸ chief.N)}
+    (hθ : (θ : ClassFunction (↥data.H ⧸ chief.N) ℂ) ≠ trivialClassFunction _)
+    (g : ↥(typeP_quotientCoprimeAction data.typeP data.nontrivial.1 chief.N_aInvariant).U)
+    (hinv : ∀ x, (θ : ClassFunction (↥data.H ⧸ chief.N) ℂ)
+        (((typeP_quotientCoprimeAction data.typeP data.nontrivial.1 chief.N_aInvariant).φ.comp
+          (typeP_quotientCoprimeAction data.typeP data.nontrivial.1
+            chief.N_aInvariant).U.subtype) g x)
+          = (θ : ClassFunction (↥data.H ⧸ chief.N) ℂ) x) :
+    ((typeP_quotientCoprimeAction data.typeP data.nontrivial.1 chief.N_aInvariant).φ.comp
+      (typeP_quotientCoprimeAction data.typeP data.nontrivial.1 chief.N_aInvariant).U.subtype) g
+        = 1 := by
+  classical
+  haveI : IsMulCommutative (↥data.H ⧸ chief.N) :=
+    IsMulCommutative.of_comm chief.quotient_elementaryAbelian.comm
+  by_contra hne
+  have hfpf : MonoidHom.FixedPointFree
+      (((typeP_quotientCoprimeAction data.typeP data.nontrivial.1 chief.N_aInvariant).φ.comp
+        (typeP_quotientCoprimeAction data.typeP data.nontrivial.1
+          chief.N_aInvariant).U.subtype) g) :=
+    chiefFactor_caseB_action_fpf chief hcaseB g hne
+  obtain ⟨θhom, hθhom⟩ :=
+    exists_units_monoidHom_of_isIrreducibleCharacter_of_isMulCommutative θ.isIrreducible
+  have hinvhom : ∀ x, θhom (((typeP_quotientCoprimeAction data.typeP data.nontrivial.1
+      chief.N_aInvariant).φ.comp (typeP_quotientCoprimeAction data.typeP data.nontrivial.1
+      chief.N_aInvariant).U.subtype) g x) = θhom x := fun x =>
+    Units.ext (by rw [hθhom, hθhom]; exact hinv x)
+  have h1 : θhom = 1 := eq_one_of_invariant_of_fixedPointFree hfpf hinvhom
+  apply hθ
+  ext x
+  have hx := hθhom x
+  rw [h1] at hx
+  simpa using hx.symm
 
 /-- **Peterfalvi (9.7) case (b) carrier.**  When `U` acts irreducibly on the chief factor
 `H̄ = H/H₀` (Clifford case (b), the left branch of `chiefFactor_clifford_U_dichotomy`), the
