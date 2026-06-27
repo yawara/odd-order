@@ -124,6 +124,10 @@ sorried, but now reduces to exactly:
     long argument below was unnecessary (kept for the record).  ⟹ **all 7 (10.6.b) conditions are now
     establishable** (`hmu`/`hos` = rfl, `hzS`/`hz1`/`hδj` supplied, `hδpm` from
     `muColumnSign_eq_one_or_neg_one`, **`hzconj` = `zeta_conj_ne`**).
+  - **✅ `Hypothesis.exists_charParameters_full` LANDED** (2026-06-27, sorry-free): the single producer
+    of `params` **with all 7 (10.6.b) conditions** (`mu=muGrid`, `omegaSigma=alignedΩΣ`, `ζ∈S`,
+    `ζ(1)=w₁`, `ζ̄≠ζ`, `δ=±1`, `δ_j=δ`).  The (10.8) line-83 step consumes this (re-wrapping the
+    coherence `⟨coh.coherent⟩` for the produced `params`).
   - (superseded, kept for record) `hzconj` via the orbit argument — every degree-`w₁` `ζ` is non-real
     (de-risks `hzconj` from "deep unknown" to a concrete formalization task).  `ζ = Ind_{M'}^M θ`
     (`θ` nontrivial linear on `M' = [M,M]`, `θ` in general position so `ζ` irreducible of degree
