@@ -13,6 +13,7 @@ import OddOrder.GroupTheory.WielandtPerFactorDischarge
 import OddOrder.GroupTheory.RepresentationTheory.WielandtKernelFPF
 import OddOrder.GroupTheory.RepresentationTheory.WielandtElabFrobenius
 import OddOrder.GroupTheory.RepresentationTheory.SingerField
+import OddOrder.GroupTheory.RepresentationTheory.ExtraspecialSinger
 import OddOrder.GroupTheory.WielandtFixedPoint
 import OddOrder.GroupTheory.PiElementDecomposition
 import OddOrder.GroupTheory.RepresentationTheory.CharacterCount
@@ -6511,3 +6512,16 @@ formula together with the prime computation `coprimeFrobeniusAction_card_eq_prim
   OddOrder.BG.Ch4.S16.isNarrow_opiCore_of_three_le_pRank
 #assert_only_allowed_axioms
   OddOrder.BG.Ch4.S16.pRank_opiCore_le_two_of_kappaHall
+
+-- **W1 §16 disjunct 3, route B `|W₁| ∣ p+1` (lane-f, issue 8015)** — the Singer/symplectic
+-- divisibility for the type-V case.  A cyclic `p'`-group `K` (`p` odd) acting on an extraspecial
+-- `P` of order `p³`, fixed-point-freely on `V = P/Z(P)`, centralizing `Z(P)`, with `¬|K| ∣ p−1`,
+-- has `|K| ∣ p+1`: `V` is a `2`-dim `𝔽_p`-space, the action is irreducible (else the split-torus
+-- case gives `|K| ∣ p−1`), Singer realizes `V ≅ 𝔽_{p²}` with `μ : K ↪ 𝔽_{p²}ˣ`, `K` preserves the
+-- commutator symplectic form so `det ρ(k) = 1`, but `det ρ(k) = N(μ k) = μ(k)^{p+1}`, whence
+-- `|K| ∣ p+1`.  All axiom-clean (`det_eq_one_of_compLinearMap_alternating` is the pure-linear-algebra
+-- "preserved nonzero alternating top-form ⟹ det = 1").
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.card_dvd_succ_of_primeAction_extraspecial
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.det_eq_one_of_compLinearMap_alternating
