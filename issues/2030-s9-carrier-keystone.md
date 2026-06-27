@@ -144,11 +144,33 @@ imprecision を Peterfalvi (04.11) に対し総点検・修正。**consumer 0 �
   証明 = displacement `x↦x/αx` が surjective (mathlib `commutatorMap_surjective`) ⟹ θ は im=K 上で
   消える。**これが inertia I_U(θ)=C の character-side 核**: nontrivial θ∈Irr(H̄) と g∉C で φU(g) FPF
   (`chiefFactor_caseB_action_fpf`) ⟹ θ は φU(g)-invariant でない ⟹ g∉I_U(θ) ⟹ I_U(θ)⊆C。
-- **残 (9.9.a) = inertia API wiring + Clifford degree**: 上記 engine (FPF + character-noninvariance) を
-  repo の `ClassFunction.inertia`/`conjBy` + `mem_inertia_compHom_iff` (ConjugationBrauer InertiaTransfer、
-  θ=θ̄∘q の inertia ↔ quotient θ̄ の inertia) に wire して I(θ)∩U=C を得る → (1.7.a) で χ=Ind_{HC}^{HU}(θλ)
-  irreducible degree |U:C|=u (θλ linear、C'⊆Ker χ) → Ind_{HU}^M degree qu。**ここが残る intricate な
-  multi-step** (Irr(H̄)↔Hom(H̄,ℂˣ) bridge + 商 inflation realization)。
+## 2026-06-28 (cont.): (9.9.a) inertia path 完全 mapping — **全 infra 存在を確認** (de-risked)
+
+(9.9.a) の inertia `I_U(θ)=C` を repo infra で組む経路を完全に特定。**全部品が既存**と確認 (新規証明 0):
+- **abelian fixed-class bridge = 既存** `ConjugationBrauer.card_fixedPoints_conjClassPerm_eq_one_of_commute_of_centralizer_inf_eq_bot`
+  (H̄ abelian `hcomm` + `C_G({g})⊓H̄=⊥` `hbot` ⟹ `#fixedClasses=1`)。**コメントが「(6.8)(c2) replacement for
+  the full Frobenius condition、abelian 商 H̄ 用」と明記** = まさに (9.9) 用に作られている。
+- **inertia 除外 = 既存** `not_mem_inertia_of_ne_trivial_of_card_fixedClasses_eq_one` (#fixedClasses=1 +
+  nontrivial θ̄ ⟹ g∉inertia(θ̄))。
+- **商 inflation 移送 = 既存** `mem_inertia_compHom_iff` (θ=θ̄∘q の inertia in G ⟺ mk' M g の inertia in G/M)。
+- **Clifford 誘導次数 = 既存** `InducedIrreducible.isIrreducibleCharacter_induce_of_inertia_eq` /
+  `card_filter_induce_eq_index_inertia` (Ind from inertia irreducible、degree=index)。
+
+**∴ 残 (9.9.a) = 純 assembly (新 math 0、intricate な realization)**: (1) G'=HU/H₀ 実現 (H̄=H/H₀⊴G'、
+q:H→*H̄)、(2) **`hbot` を FPF から**: u∉C で `C_{HU/H₀}({mk' u})⊓H̄=⊥` ⟺ φU(u) FPF (mk' h∈C(mk' u) ⟺
+φU(u)(h̄)=h̄、`chiefFactor_caseB_action_fpf` で =1) — φU を HU/H₀ の conjugation に同定する realization が核、
+(3) bridge→not_mem_inertia→mem_inertia_compHom_iff で I(θ)∩U=C、(4) χ=Ind_{HC}^{HU}(θλ) degree u → Ind^M qu。
+これは multi-session の **assembly** (各 step は既存補題、繋ぎが realization-heavy)。
+
+**route 訂正 (honest)**: 上記 (2) の `hbot` 経路 (centralizer-inf-bot) が repo の inertia API と直結で、
+本セッションの `eq_one_of_invariant_of_fixedPointFree` (char-as-Hom engine) は **不要**になる見込み
+(後者は Irr(H̄)↔Hom(H̄,ℂˣ) bridge を要し遠回り; centralizer route は bridge 不要)。`eq_one_of_invariant_of_fixedPointFree`
+は valid な汎用 lemma として残すが (9.9) critical path 上では centralizer route を使う。**FPF 構造核
+`chiefFactor_caseB_action_fpf` は (2) `hbot` に必須**ゆえ critical path 上。
+
+- **残 (9.9.a) = inertia API wiring + Clifford degree** (上記 de-risked plan で実行可能): engine
+  (FPF) → centralizer-inf-bot `hbot` → `card_fixedPoints_...` → `not_mem_inertia_...` →
+  `mem_inertia_compHom_iff` → I(θ)∩U=C → (1.7.a) χ=Ind_{HC}^{HU}(θλ) degree u → Ind_{HU}^M degree qu。
 
 **carrier genuinization の保留** (honest-architecture note): `CliffordCaseBData.field_model`/`Ubar_cyclic`
 (True placeholder) を FPF/IsCyclic に genuine 化しようとしたが、**struct field type が
