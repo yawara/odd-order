@@ -117,7 +117,14 @@ sorried, but now reduces to exactly:
     field) — they hold only for the specific params from `Hypothesis.exists_charParameters`
     (`hmu`/`hos` are `rfl`; `hzS`/`hz1` and `hδj`/`hδpm` are now establishable per above; the lone
     deep gap is **`hzconj` (ζ non-real)**, which S12 currently *assumes* everywhere).
-  - **✅ `hzconj` math SOLVED (clean argument, 2026-06-27) — every degree-`w₁` `ζ` is non-real**
+  - **✅✅ `hzconj` PROVEN (2026-06-27) — `Hypothesis.zeta_conj_ne`, sorry-free.**  The route is
+    **direct via Peterfalvi (1.1)** (`OddOrder.RepresentationTheory.not_isReal_of_ne_trivial_of_odd_card'`):
+    `ζ` is a *nontrivial* (degree `w₁ > 1`, from `hz1`) irreducible character of the *odd-order* `M`,
+    so it is not real, i.e. `ζ.conj ≠ ζ`.  **No induced-character / orbit argument is needed** — the
+    long argument below was unnecessary (kept for the record).  ⟹ **all 7 (10.6.b) conditions are now
+    establishable** (`hmu`/`hos` = rfl, `hzS`/`hz1`/`hδj` supplied, `hδpm` from
+    `muColumnSign_eq_one_or_neg_one`, **`hzconj` = `zeta_conj_ne`**).
+  - (superseded, kept for record) `hzconj` via the orbit argument — every degree-`w₁` `ζ` is non-real
     (de-risks `hzconj` from "deep unknown" to a concrete formalization task).  `ζ = Ind_{M'}^M θ`
     (`θ` nontrivial linear on `M' = [M,M]`, `θ` in general position so `ζ` irreducible of degree
     `w₁ = [M:M']`); `ζ̄ = Ind θ̄` (`induce_conj`, as in `inducedFamily_closedUnderConjugate`).  By the
