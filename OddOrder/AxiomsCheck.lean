@@ -5612,6 +5612,20 @@ trichotomy to the lone `|W₁| ∣ p ∓ 1` `W₁`-action divisibility.  Both ax
 #assert_only_allowed_axioms
   OddOrder.BG.Ch4.S16.exists_prime_cyclic_opiCore_compl_of_isTypeV
 
+/-! **Type-V trichotomy disjunct (e2) — the `|W₁| ∣ p − 1` Frobenius divisibility** (`S16_MainResults`,
+issue 8015): the two engines that close disjunct 2 of the Peterfalvi (8.8) `(e2)/(e3)` dichotomy.
+`C_{M_σ}(k) = K*` for `k ∈ K#` (`centralizer_msigma_kappaElement_eq_kstar`: `K` acts primely on `M_σ`,
+Proposition 14.2, so the fixed points are constant `= K*`), and a `κ`-Hall `K` normalizing an
+`M`-normal order-`p` subgroup `Z ≤ M_σ` with `Z ⊓ K* = ⊥` acts on `Z` as a Frobenius group, giving
+`|K| ∣ p − 1` (`kappaHall_card_dvd_sub_one_of_inf_kstar_eq_bot`, via
+`card_dvd_sub_one_of_isFrobeniusAction`).  These reduce the `hP1eqV` trichotomy residual to the lone
+deep `(e3)` Singer/`SL₂(p)` case `Z ≤ K*` (`|O_p(M_F)| = p³`, `|W₁| ∣ p + 1`).  Both axiom-clean. -/
+
+#assert_only_allowed_axioms
+  OddOrder.BG.Ch4.S16.centralizer_msigma_kappaElement_eq_kstar
+#assert_only_allowed_axioms
+  OddOrder.BG.Ch4.S16.kappaHall_card_dvd_sub_one_of_inf_kstar_eq_bot
+
 /-! **Type-`P₁` `M_F`-internal complement** (`S16_MainResults`, `exists_typeP1_mf_complement`, the
 construction core of the FT-critical `hP1neIIIIV` bridge): `M_F` has a `K`-invariant complement `U`
 inside `M' = M_σ` (`M_F ⊔ U = M'`, `K ≤ N_G(U)`, `M_F ⊓ U = ⊥`).  The `K`-invariant
