@@ -898,3 +898,31 @@ route B 着手準備で精査し、前項スコープの **coprime ルート ((9
 新規大規模ポート不要だが multi-session。**次セッション = L0-L1 (V=P/Z(P) Representation) から**、L5 の
 alternating-form-det は必要なら ChatGPT consult (文献→Coq 済、`repr_extraspecial_prime_sdprod_cycle` の
 elementary 再構成)。
+
+### 🔧 2026-06-28 (lane-f 再開² cont.²): route B 完全 roadmap — rep 構成テンプレート確定、残る難所は det=1 form のみ
+
+route B L0-L1 (V=P/Z(P) Representation) の構成を精査し、**完全にテンプレート化されている**ことを確認:
+- **テンプレート = `S16_NonExistenceG.lean:674-694`** (U の P 上共役作用 → `Representation (ZMod p) ↥U
+  (Additive ↥P)` → `exists_galoisField_repr` Singer)。同パターンで K の V 上作用を構成。
+- **P/Z(P) descent = `quotientMulAutHom`** (Isaacs Ch04、`A →* MulAut (P ⧸ N)`、N=A-invariant)。
+  **extraspecial では commutator ↥P = Z(↥P)** ゆえ V := `Additive (↥P ⧸ commutator ↥P)` = P/Z(P)。
+  `quotientMulAutHom hZinv : K →* MulAut(↥P ⧸ commutator ↥P)` (Z(P) characteristic ⟹ A-invariant)。
+- **rep = `(mulAutToEnd (↥P ⧸ commutator ↥P) p).comp (quotientMulAutHom hZinv)`** (OperatorMaschke
+  `mulAutToEnd : MulAut W →* End`、要 `[IsMulCommutative W]` (P/P' abelian ✓) + `[Module (ZMod p)
+  (Additive W)]`)。
+- **V module = `AddCommGroup.zmodModule`** (P/P'=P/Φ elem abelian via `quotient_frattini_isElementaryAbelian`
+  + extraspecial frattini=center)。
+- **L2 faithful = S16 template の hfaith パターン** (kernel = C_K(P) = ⊥ = brick4)。
+- **L3 irreducible**: ¬|K|∣p-1 + semisimple (split torus 排除) — 要小補題。
+- **L4 |K|∣p²-1 = `S14.isCyclic_and_card_dvd_of_odd_two_dim_irreducible`** (Representation 入力)。
+- **L5 = `card_dvd_of_injective_to_cyclic_forall_pow`** (landed 済) で det=1 ⟹ |K|∣p+1。
+
+**残る唯一の真の新規難所 = L5-det (det(k)=1)**: extraspecial commutator [.,.]:P×P→Z(P)≅F_p が
+b:V×V→F_p の非退化 alternating form に降下、K が Z(P) 中心化 ⟹ b 保存、dim2 で b(kv,kw)=det(k)b(v,w)
+⟹ det(k)=1。**この commutator-form 構成 (quotient 上の双線型形式 + K-不変 + dim2 det 変換) が
+~60-80 行の intricate な新規インフラ**。mathlib の BilinForm/alternating/det + Singer の
+`algebraMap_norm_eq_pow` で det=norm=μ(k)^(p+1)。
+
+**次セッション = route B を 1 本の lemma `kappaHall_card_dvd_succ_of_extraspecial_action` として構築**
+(rep テンプレート L0-L4 ~100 行 + det=1 form L5-det ~80 行)。全テンプレート/補題所在確定、新規大規模
+ポート不要。det=1 form が唯一の intricate 新規部。一体構成ゆえ fresh context 推奨。
