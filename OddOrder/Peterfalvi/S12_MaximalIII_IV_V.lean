@@ -2902,6 +2902,31 @@ theorem w2_prime_and_parameter_independence [Finite G]
   obtain ⟨params, -, h2⟩ := hyp.exists_charParameters hG
   exact ⟨params, hyp.w2_prime hG, h2⟩
 
+/-- **`ζ` is non-real (`ζ̄ ≠ ζ`)** — the `hzconj` input to the (10.6.b) Dade-value lemmas, **directly
+from Peterfalvi (1.1)**.  The degree-`w₁` `ζ` is a *nontrivial* (degree `w₁ > 1`) irreducible
+character of the *odd-order* group `M`, so by `not_isReal_of_ne_trivial_of_odd_card'`
+(the only self-conjugate irreducible of an odd group is the trivial one) `ζ` is not real, i.e.
+`ζ.conj ≠ ζ`.  No induced-character / orbit argument is needed — `ζ` itself being a nontrivial
+odd-group irreducible suffices.  Takes `hz1 : ζ(1) = w₁` (one of the (10.6.b) conditions, supplied by
+`exists_charParameters`) to witness `ζ ≠ 1_M`. -/
+theorem Hypothesis.zeta_conj_ne [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} (hyp : Hypothesis M)
+    {params : CharacterParameters hyp} (hz1 : params.zeta 1 = (hyp.w1 : ℂ)) :
+    (params.zeta).conj ≠ params.zeta := by
+  haveI := hyp.finiteG
+  have hModd : Odd (Nat.card ↥M) := hG.odd.of_dvd_nat (Subgroup.card_subgroup_dvd_card M)
+  have hw1 : 1 < hyp.w1 := (Subgroup.one_lt_card_iff_ne_bot _).mpr hyp.typeP.W1_nontrivial
+  have hne : (⟨params.zeta, params.zeta_irreducible⟩ : IrreducibleCharacter ↥M)
+      ≠ trivialIrreducibleCharacter ↥M := by
+    intro h
+    have hz : params.zeta 1 = (1 : ℂ) := by
+      have hcoe := congrArg (fun c : IrreducibleCharacter ↥M => (c : ClassFunction ↥M ℂ) 1) h
+      simpa using hcoe
+    rw [hz1] at hz
+    have : hyp.w1 = 1 := by exact_mod_cast hz
+    omega
+  exact OddOrder.RepresentationTheory.not_isReal_of_ne_trivial_of_odd_card' hModd hne
+
 /-! ## (10.5)--(10.6): Dade-isometry calculations -/
 
 /-- **Peterfalvi (10.5), support half**: for `0 < j < w₂`, the virtual character `α_{ij}` is
