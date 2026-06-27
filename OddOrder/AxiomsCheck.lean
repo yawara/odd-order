@@ -6216,6 +6216,10 @@ formula together with the prime computation `coprimeFrobeniusAction_card_eq_prim
 -- `commutatorMap_surjective`.
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.S11.eq_one_of_invariant_of_fixedPointFree
+-- §9 degree infrastructure: `[M:HU] = q` (`HU = M'`, `[M:M'] = |W₁|`) and the resulting
+-- `(Ind_{HU}^M χ)(1) = q·χ(1)` — the degree formula every (9.8)/(9.9) count uses.
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S11.huSub_index_eq_q
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S11.induceHU_apply_one_eq_q_mul
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S11.card_range_dvd_card_sub_one_of_prime_card
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S11.typeP_commutator_U_centralizes_H
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S11.chiefFactor_caseB_image_cyclic

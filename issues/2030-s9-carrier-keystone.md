@@ -162,6 +162,17 @@ q:H→*H̄)、(2) **`hbot` を FPF から**: u∉C で `C_{HU/H₀}({mk' u})⊓H
 (3) bridge→not_mem_inertia→mem_inertia_compHom_iff で I(θ)∩U=C、(4) χ=Ind_{HC}^{HU}(θλ) degree u → Ind^M qu。
 これは multi-session の **assembly** (各 step は既存補題、繋ぎが realization-heavy)。
 
+## 2026-06-28 (cont.²): §9 degree infrastructure landed (上記 (4) の足回り)
+
+assembly step (4) の degree 計算の足回りを実証明 (axiom-clean+AxiomsCheck 登録、full build green):
+- **`huSub_index_eq_q`**: `[M:HU] = q` = `|W₁|`。`HU = H⊔U = M' = derivedInG M` (型P 相補性
+  `derivedInG_eq_fitting_sup_U`+`H_eq`) + `[M:M']=|W₁|` (`M_complement.index_eq_card`)。
+- **`induceHU_apply_one_eq_q_mul`**: `(Ind_{HU}^M χ)(1) = q·χ(1)` (`induceHU_apply_one` の index を q に解決)。
+
+⟹ **全 §9 count の degree 文 (μ_j(1)=qu、(9.8.c) qu、(9.8.d) qa、(9.9.a) qu) が `φ∈𝒮(Y) ⟹ φ(1)=q·χ(1)`
+で `χ(1)=u`/`a` (Clifford 部) に reduce 可能**。(9.9.a) なら `induceHU_apply_one_eq_q_mul` で
+`φ(1)=qu ⟺ χ(1)=u` に縮小 (χ(1)=u は inertia/Clifford = 残 assembly)。degree 側は完全に塞いだ。
+
 **route 訂正 (honest)**: 上記 (2) の `hbot` 経路 (centralizer-inf-bot) が repo の inertia API と直結で、
 本セッションの `eq_one_of_invariant_of_fixedPointFree` (char-as-Hom engine) は **不要**になる見込み
 (後者は Irr(H̄)↔Hom(H̄,ℂˣ) bridge を要し遠回り; centralizer route は bridge 不要)。`eq_one_of_invariant_of_fixedPointFree`
