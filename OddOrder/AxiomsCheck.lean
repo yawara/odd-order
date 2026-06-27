@@ -5590,6 +5590,18 @@ coprimely.  Discharges the `hUle`/`hKnorm`/`hDcompl`/`U ≠ ⊥` `TypePData` fie
 
 #assert_only_allowed_axioms OddOrder.BG.Ch4.S16.exists_typeP1_mf_complement
 
+/-! **Type-`P₁` (`M_F ≠ M_σ`) `M_F`-complement is nilpotent** (`S16_MainResults`,
+`isNilpotent_complement_of_isTypeP1_mf_ne_msigma`): any complement `U` of `M_F` inside `M' = M_σ`
+(`M_F ⊔ U = M'`, `M_F ⊓ U = ⊥`) is nilpotent.  Theorem 15.2 (`mf_ne_msigma_typeP1_structure`)
+supplies `Q ⋊ D = M_σ` with `Q ≤ M_F` and `D` nilpotent, so `M_σ/M_F` is the nilpotent image of `D`
+(`nilpotent_of_surjective`); the restricted quotient map `Ū → M_σ/M_F` is bijective, so `U` is
+nilpotent.  Discharges the `U` nilpotent residual `TypePData` field deferred by
+`exists_typeP1_mf_complement` (the deferred half of Corollary 15.5(c)) for the `hP1neIIIIV` bridge.
+Axiom-clean. -/
+
+#assert_only_allowed_axioms
+  OddOrder.BG.Ch4.S16.isNilpotent_complement_of_isTypeP1_mf_ne_msigma
+
 /-! **Type-`P₁` (`M_F ≠ M_σ`) `TypePNontrivialCore`** (`S16_MainResults`,
 `typePData_nontrivialCore_of_isTypeP1_mf_ne_msigma`): the common type II--IV hypotheses
 (`U ≠ ⊥`, `|W₁|` prime, `M_F#` `TI`) of a type-`P₁` (`M_F ≠ M_σ`) `TypePData` with `U ≠ ⊥`.
