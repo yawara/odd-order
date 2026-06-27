@@ -2480,6 +2480,64 @@ theorem isTypeV_of_typePData {M : Subgroup G} (data : TypePData M)
     IsTypeV M :=
   ⟨{ typeP := data, U_eq_bot := hUbot, alternative := halt }⟩
 
+/-- **`M_σ`-centralizer of a `κ`-element is `K*`** (the prime-action constancy of fixed points): for
+a type-`P` maximal `M` with Hall `κ`-subgroup `K` and `K* = M_σ ⊓ C(K)`, every `k ∈ K#` has
+`C_{M_σ}(k) = K*`.  `K` acts *primely* on `M_σ` (Proposition 14.2, `typeP_structure` conjunct 1,
+`ActsPrimeOn (M_σ) K`), so the fixed subgroup `C_{M_σ}(k) = fixedByElement (M_σ) k` equals
+`fixedBy (M_σ) K = M_σ ⊓ C(K) = K*` for every nonidentity `k ∈ K`. -/
+theorem centralizer_msigma_kappaElement_eq_kstar [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M K Kstar U : Subgroup G}
+    (hM : M ∈ maximalSubgroups G) (hP : S14.IsTypeP M) (hKM : K ≤ M)
+    (hK : Ch03.IsHallSubgroup (S14.kappa M) (K.subgroupOf M))
+    (hKstar : Kstar = OddOrder.BG.Ch3.S10.Msigma M ⊓ Subgroup.centralizer (K : Set G))
+    (hU : Ch03.IsHallSubgroup ((S14.kappa M ∪ OddOrder.BG.Ch3.S10.sigma M)ᶜ) (U.subgroupOf M))
+    [IsCyclic ↥K] {k : G} (hk : k ∈ K) (hk1 : k ≠ 1) :
+    OddOrder.BG.Ch3.S10.Msigma M ⊓ Subgroup.centralizer ({k} : Set G) = Kstar := by
+  have hprime : OddOrder.BG.Ch3.S13.ActsPrimeOn (OddOrder.BG.Ch3.S10.Msigma M) K :=
+    (S14.typeP_structure hG hM hP hKM hK hKstar hU).1
+  -- `fixedByElement (M_σ) k = fixedBy (M_σ) K`, both defeq to the centralizer forms.
+  have heq := hprime k hk hk1
+  rw [hKstar]
+  exact heq
+
+/-- **`|K| ∣ p - 1` from `K` acting Frobenius on an `M`-normal order-`p` subgroup** (the
+divisibility engine for type-V disjunct (e2), Coq `regZq_dv_q1`): if the Hall `κ`-subgroup `K`
+normalizes an order-`p` subgroup `Z ≤ M_σ` with `Z ⊓ K* = ⊥`, then `K` acts on `Z` as a Frobenius
+group — every `k ∈ K#` centralizes only `1` in `Z`, since `C_{M_σ}(k) = K*`
+(`centralizer_msigma_kappaElement_eq_kstar`) and `Z ⊓ K* = ⊥` — so `card_dvd_sub_one_of_isFrobeniusAction`
+gives `|K| ∣ |Z| - 1 = p - 1`. -/
+theorem kappaHall_card_dvd_sub_one_of_inf_kstar_eq_bot [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M K Kstar U Z : Subgroup G} {p : ℕ}
+    (hM : M ∈ maximalSubgroups G) (hP : S14.IsTypeP M) (hKM : K ≤ M)
+    (hK : Ch03.IsHallSubgroup (S14.kappa M) (K.subgroupOf M))
+    (hKstar : Kstar = OddOrder.BG.Ch3.S10.Msigma M ⊓ Subgroup.centralizer (K : Set G))
+    (hU : Ch03.IsHallSubgroup ((S14.kappa M ∪ OddOrder.BG.Ch3.S10.sigma M)ᶜ) (U.subgroupOf M))
+    [IsCyclic ↥K]
+    (hZMσ : Z ≤ OddOrder.BG.Ch3.S10.Msigma M) (hZcard : Nat.card ↥Z = p)
+    (hKNZ : K ≤ Subgroup.normalizer (Z : Set G)) (hZK : Z ⊓ Kstar = ⊥) :
+    Nat.card ↥K ∣ p - 1 := by
+  classical
+  letI : MulDistribMulAction ↥K ↥Z :=
+    MulDistribMulAction.compHom ↥Z (Z.normalizerMonoidHom.comp (Subgroup.inclusion hKNZ))
+  have hFA : OddOrder.Isaacs.Ch06.IsFrobeniusAction ↥K ↥Z := by
+    intro u hu z hz hfix
+    have h1 : ((u • z : ↥Z) : G) = (u : G) * (z : G) * (u : G)⁻¹ := rfl
+    have hconj : (u : G) * (z : G) * (u : G)⁻¹ = (z : G) := by
+      rw [← h1]; exact congrArg Subtype.val hfix
+    have hcomm : (u : G) * (z : G) = (z : G) * (u : G) := mul_inv_eq_iff_eq_mul.mp hconj
+    have huK1 : (u : G) ≠ 1 := fun h => hu (Subtype.ext h)
+    have hzKstar : (z : G) ∈ Kstar := by
+      rw [← centralizer_msigma_kappaElement_eq_kstar hG hM hP hKM hK hKstar hU u.2 huK1]
+      exact Subgroup.mem_inf.mpr ⟨hZMσ z.2,
+        Subgroup.mem_centralizer_iff.mpr (fun x hx => by
+          rw [Set.mem_singleton_iff] at hx; subst hx; exact hcomm)⟩
+    have hz1 : (z : G) = 1 := by
+      have hmem : (z : G) ∈ Z ⊓ Kstar := Subgroup.mem_inf.mpr ⟨z.2, hzKstar⟩
+      rw [hZK, Subgroup.mem_bot] at hmem; exact hmem
+    exact hz (Subtype.ext hz1)
+  have hdvd := OddOrder.BG.Ch4.S15.card_dvd_sub_one_of_isFrobeniusAction hFA
+  rwa [hZcard] at hdvd
+
 /-- **`M_F` is non-abelian for a type-V maximal** (the abelian-`H` exclusion of Coq
 `nonTI_Fitting_structure`, the `P1maxM` branch): a type-`P₁` maximal subgroup `M` with `M_F = M_σ`
 has non-abelian `M_F`.  The type-`P` datum's `W₂ = C_{M'}(W₁#)` is nontrivial (`W2_nontrivial`) and
@@ -2552,20 +2610,60 @@ theorem isTypeV_of_isTypeP1_mf_eq_msigma [Finite G]
   by_cases hTI : S15.FittingIsTI M
   · -- `F(M)` TI ⟹ disjunct (a): `M_F#` is a `TI`-subset (same as the type-`F` bridge).
     exact Or.inl (maxNilpotentNormalHall_sharp_isTISubset_of_fittingIsTI hG hM hTI)
-  · -- `¬FittingIsTI` ⟹ disjuncts (e2)/(e3): the witness prime `p` with cyclic `O_{p'}(M_F)`
-    -- (`exists_prime_cyclic_opiCore_compl_of_isTypeV`, Coq `cycHp'`), and the deep `|W₁| ∣ p ∓ 1`
-    -- divisibility distinguishing the two (Coq `regZq_dv_q1` + the `p³` `Z₀` analysis).
-    obtain ⟨p, hp, hpπ, hcyc⟩ := exists_prime_cyclic_opiCore_compl_of_isTypeV hG hM hP1 hmf hTI
+  · -- `¬FittingIsTI` ⟹ disjuncts (e2)/(e3).  The non-TI witness `X₁` (order `p`, `C_G(X₁) ⊄ M`),
+    -- the cyclic `O_{p'}(M_F)` (Coq `cycHp'`), and the `M`-normal order-`p` `Z = Ω₁(Z(O_p(M_F)))`
+    -- (Coq `oZ`, `exists_orderQ_le_mf_normal_in_M_of_not_fittingIsTI`).
+    haveI : IsSolvable ↥M := hG.solvable_of_mem_maximalSubgroups hM
+    have hnab := not_isMulCommutative_mf_of_isTypeP1_mf_eq_msigma hG hM hP1 hmf
+    obtain ⟨g, p, X₁, -, hp, -, hX₁card, hX₁Mσ, -, hCGnotM, hrank3⟩ :=
+      S15.exists_inf_conj_fitting_orderP_witness hG hM hTI
+    haveI : Fact p.Prime := ⟨hp⟩
+    have hX₁MF : X₁ ≤ S15.MF M := by
+      rw [S15.mf_eq_msigma_of_not_fittingIsTI hG hM hTI]; exact hX₁Mσ
+    obtain ⟨hpπ, hcyc⟩ :=
+      S15.typeF_nonabelian_cyclic_opiCore_compl hG hM hp hX₁card hX₁MF hCGnotM hnab
     have hHMF : data.H = S15.MF M := data.H_eq
-    -- **Residual** (the genuinely-deep `W₁`-action core, Coq `nonTI_Fitting_structure` (e2)/(e3)):
-    -- `W₁ = K` acts on `Z_p = Ω₁(Z(O_p(M_F)))` with `|W₁| ∣ p − 1`, unless `|O_p(M_F)| = p³` and
-    -- `|W₁| ∣ p + 1` (the `SL₂(p)`/Suzuki case).  Needs `|Z₀|` prime (Lemma 10.13(b)/Cor 15.3(b)).
-    have hdiv : Nat.card ↥data.W1 ∣ p - 1 ∨
-        (Nat.card ↥(opiCoreInG ({p} : Set ℕ) data.H) = p ^ 3 ∧ Nat.card ↥data.W1 ∣ p + 1) := by
-      sorry
-    rcases hdiv with h1 | ⟨h3, h1⟩
-    · exact Or.inr (Or.inl ⟨p, hp, hHMF ▸ hpπ, h1, hHMF ▸ hcyc⟩)
-    · exact Or.inr (Or.inr ⟨p, hp, hHMF ▸ hpπ, h3, h1, hHMF ▸ hcyc⟩)
+    -- Reconstruct a Hall `κ`-subgroup `K` (cyclic), the trivial `(κ ∪ σ)'`-Hall `U = ⊥`, and `K*`.
+    obtain ⟨K', hK'⟩ := Ch03.hall_E_exists (G := ↥M) (S14.kappa M)
+    set K : Subgroup G := K'.map M.subtype with hKdef
+    have hKM : K ≤ M := Subgroup.map_subtype_le K'
+    have hKeq : K.subgroupOf M = K' :=
+      Subgroup.comap_map_eq_self_of_injective M.subtype_injective K'
+    have hK : Ch03.IsHallSubgroup (S14.kappa M) (K.subgroupOf M) := by rw [hKeq]; exact hK'
+    have hU : Ch03.IsHallSubgroup ((S14.kappa M ∪ OddOrder.BG.Ch3.S10.sigma M)ᶜ)
+        ((⊥ : Subgroup G).subgroupOf M) := by
+      rw [Subgroup.bot_subgroupOf, Ch03.IsHallSubgroup.bot_iff]
+      intro q hq
+      simp only [Set.mem_compl_iff, not_not]
+      by_cases hqσ : q ∈ OddOrder.BG.Ch3.S10.sigma M
+      · exact Set.mem_union_right _ hqσ
+      · exact Set.mem_union_left _ (hP1.2 ▸ ⟨hq, hqσ⟩)
+    haveI hKcyc : IsCyclic ↥K := (typeP_auxiliary_structure hG hM hKM bot_le hK rfl hU).2.1
+    -- `|W₁| = [M:M'] = |K|`.
+    have hW1K : Nat.card ↥data.W1 = Nat.card ↥K :=
+      (data.card_W1_eq_derived_index).trans
+        (card_kappaHall_eq_derived_index hG hM hP1.1 hKM hK).symm
+    -- The `M`-normal order-`p` `Z ≤ M_F = M_σ` normalized by `K`.
+    obtain ⟨Z, hZMF, hZcard, hZnorm⟩ :=
+      S15.exists_orderQ_le_mf_normal_in_M_of_not_fittingIsTI hG hM hp hX₁card hX₁MF hCGnotM
+        hrank3 hnab (q := p) hp hpπ
+    have hZMσ : Z ≤ OddOrder.BG.Ch3.S10.Msigma M := hmf ▸ hZMF
+    have hKNZ : K ≤ Subgroup.normalizer (Z : Set G) := hKM.trans hZnorm
+    set Kstar : Subgroup G :=
+      OddOrder.BG.Ch3.S10.Msigma M ⊓ Subgroup.centralizer (K : Set G) with hKstardef
+    -- (e2) vs (e3) dichotomy: `Z ⊓ K* = ⊥` (Frobenius, `|K| ∣ p − 1`) or `Z ≤ K*` (the deep
+    -- Singer/`p³` case `Z = Z₀ = K*`).
+    by_cases hZK : Z ⊓ Kstar = ⊥
+    · -- (e2): `K` acts Frobenius on `Z`, so `|W₁| = |K| ∣ p − 1`.
+      refine Or.inr (Or.inl ⟨p, hp, hHMF ▸ hpπ, ?_, hHMF ▸ hcyc⟩)
+      rw [hW1K]
+      exact kappaHall_card_dvd_sub_one_of_inf_kstar_eq_bot hG hM hP1.1 hKM hK hKstardef hU
+        hZMσ hZcard hKNZ hZK
+    · -- (e3): `Z ≤ K*` (`|O_p(M_F)| = p³`, `|W₁| ∣ p + 1`) — the deep Singer/`SL₂(p)` case
+      -- (Coq `defKs`/`defZP`/`rPle2`/`oZ0`, the genuinely-deep residual).
+      refine Or.inr (Or.inr ⟨p, hp, hHMF ▸ hpπ, ?_, ?_, hHMF ▸ hcyc⟩)
+      · sorry
+      · sorry
 
 /-- **Prop 16.1(d)/(f) reverse, `M_F = M_σ` from `U = ⊥`** (the `M_F = M_σ` conjunct of `hVP1`,
 mmd L4478): a type-`P` datum with trivial complement `U = ⊥` has `M_F = M_σ`.  Sandwiching:

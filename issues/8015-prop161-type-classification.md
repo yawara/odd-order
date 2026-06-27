@@ -614,3 +614,23 @@ divisibility のみ」に縮小。新規 (全 axiom-clean、AxiomsCheck 登録�
 
 ⟹ **次セッション = disjunct 2 を上記 path で landing** (σ-decomp helper + Frobenius setup、
 sorry を Z≤Kstar/disjunct-3 case のみに縮小)、その後 disjunct 3 の Singer 解析。
+
+### ✅✅ 2026-06-27⁶ (lane-f): hP1eqV disjunct 2 (|W₁|∣p-1) を実証明 — 残を disjunct 3 (Singer p³) のみに (commit 9024ad0d)
+
+上の path 通り **disjunct 2 を完全 landing**。⟹ `isTypeV_of_isTypeP1_mf_eq_msigma` の残 sorry が
+**disjunct 3 (Z≤Kstar, |O_p(M_F)|=p³ ∧ |W₁|∣p+1, deep Singer/SL₂(p)) の 2 本のみ**に。新 engine
+(全 axiom-clean、AxiomsCheck 登録、S16_MainResults):
+- **`centralizer_msigma_kappaElement_eq_kstar`**: k∈K# で C_{M_σ}(k)=Kstar。σ-decomp は modular law
+  (非可換で無効) でなく **`ActsPrimeOn` (Prop 14.2 typeP_structure.1) + `S13.fixedBy_eq`** で直接
+  (fixedByElement(M_σ,k)=fixedBy(M_σ,K)=Kstar、全 defeq、~5行)。
+- **`kappaHall_card_dvd_sub_one_of_inf_kstar_eq_bot`**: κ-Hall K が M-normal order-p Z≤M_σ を
+  normalize ∧ Z⊓Kstar=⊥ ⟹ K は Z に Frobenius 作用 (C_Z(k)≤Z⊓Kstar=⊥) ⟹
+  `card_dvd_sub_one_of_isFrobeniusAction` (typeF engine の U0→K 流用) で |K|∣p-1。
+
+wiring (isTypeV ¬FittingIsTI case): witness (exists_inf_conj) + cycHp' + |Z0|=p (exists_orderQ 再利用) +
+|data.W1|=|K| + **by_cases Z⊓Kstar=⊥**: ⊥ なら disjunct 2 (engine)、≠⊥ (Z≤Kstar) なら disjunct 3 sorry。
+
+**残 = disjunct 3 (Singer p³) のみ = 真の最深部**: Z⊆Kstar (=Z0=Ks) ⟹ K が Z(P) を中心化 ⟹
+P=O_p(M_F) extraspecial of order p³ + K⊆Singer cyclic ⟹ |K|∣p+1。要 extraspecial 群論 +
+Singer cycle/GL₂(p) 作用 (Coq defKs/defZP/rPle2 + `basic_p2maxElem_structure`)。**次セッション =
+disjunct 3 の extraspecial/Singer 形式化** (genuine 最深、新インフラ大)。
