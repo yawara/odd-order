@@ -92,8 +92,14 @@ carrier を genuine 化したことで、free-field 時代に **vacuous だっ�
   (qu)** に修正、または XOf(𝒳) を参照すべき ((9.8) は両所 qu で consistent)。
 - **(9.10) hypothesis** `¬∃ χ ∈ SOf C, χ 1 = qu` ⚠: Peterfalvi (9.10) は **𝒮(H₀C')** (=Cprime) で記述。
   Lean は `SOf chars.C` (=C)。⟹ C/Cprime 要確認。
-- 一般に SOf(𝒮, degree q·src) と XOf(𝒳, degree src) の使い分け・C/Cprime/H₀ 引数を Peterfalvi
+- **(9.8.c)/(9.8.d)/(9.9) の `SOf` 引数が H₀ join を省略** ⚠ (systematic): Peterfalvi は 𝒮(H₀C)/
+  𝒮(H₀U')/𝒮(H₀C') (H₀ との join) を使うが、Lean は `SOf chars.C`/`SOf chars.Uprime`/`SOf chars.Cprime`
+  (C/U'/C' 単独)。`sOf data Y` = {χ | Y⊆Ker} ゆえ H₀⊆Ker を要求しない → 別物。⟹ `SOf (chief.H0 ⊔ chars.C)`
+  等に修正すべき (`chief.H0`/`chars.C` は共に `Subgroup G` ゆえ `⊔` 可)。((9.8.b) の `SOf chief.H0` は
+  H₀ 単独で正しい。)
+- 一般に SOf(𝒮, degree q·src) と XOf(𝒳, degree src) の使い分け・H₀ join・C/Cprime 引数を Peterfalvi
   (9.5)-(9.10) に対し総点検すること。これは genuine carrier 化の正の副産物 (scaffold 時代は検出不能)。
+  **A' は count 証明 (B/C) の前提**: 文が正確になって初めて Clifford/Dade 証明が意味を持つ。
 
 ## やること (research-grade, multi-session)
 
