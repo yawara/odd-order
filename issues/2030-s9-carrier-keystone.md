@@ -183,6 +183,26 @@ assembly step (4) の degree 計算の足回りを実証明 (axiom-clean+AxiomsC
   (FPF) → centralizer-inf-bot `hbot` → `card_fixedPoints_...` → `not_mem_inertia_...` →
   `mem_inertia_compHom_iff` → I(θ)∩U=C → (1.7.a) χ=Ind_{HC}^{HU}(θλ) degree u → Ind_{HU}^M degree qu。
 
+## 2026-06-28 (cont.³): abelian Irr↔Hom bridge landed — char-engine route が realization-free に
+
+**`exists_units_monoidHom_of_isIrreducibleCharacter_of_isMulCommutative`** (S11、axiom-clean+AxiomsCheck):
+有限 abelian Γ の irreducible character (`IsIrreducibleCharacter`) は linear character `θ:Γ→*ℂˣ`
+(`(θ g:ℂ)=φ g`)。証明 = 既約表現が 1 次元 (`finrank_eq_one_of_isMulCommutative`) ⟹ 各 ρg は scalar
+`θ g` (`exists_smul_eq_of_finrank_eq_one`) ⟹ `φ g = trace(ρ g) = θ g`。
+
+**route 再訂正 (cont. の訂正を更新)**: cont. で「char-engine は不要・遠回り」としたが、本 bridge で
+**Irr(H̄)↔Hom bridge を実装したので char-engine route が viable かつ realization-free に**。
+- char-engine route: θ̄∈Irr(H̄) を bridge で Hom 化 → `eq_one_of_invariant_of_fixedPointFree` (FPF φU(u) +
+  invariant ⟹ trivial) で「nontrivial θ̄ は φU(u)-invariant でない」。**H̄ を subgroup に realize せず、抽象
+  quotient ↥data.H⧸chief.N + 抽象 φU のまま**動く (conjByPerm/centralizer-inf-bot の realize 不要)。
+- ⟹ 2 route が並立: (A) centralizer-inf-bot (conjByPerm、要 H̄-as-subgroup realize) / (B) char-engine+bridge
+  (realization-free)。**(B) が realize plumbing を避けるぶん有利見込み**。
+- **両 route 共通の残接続** = 「u∈I(θ) (ClassFunction.conjBy in HU) ⟺ θ̄∘φU(u)=θ̄ (inflation)」= θ が H̄
+  経由 (H₀⊆ker) であることの conjBy↔φU 接続。これ + Clifford degree (Ind from inertia) が残 assembly。
+
+⟹ **char-engine (commit 25ee31ba) は off-path でなく on-path に昇格** (bridge で接続)。FPF 核も degree infra も
+on-path。残 = inflation 接続 (conjBy↔φU) + Clifford 誘導次数。
+
 **carrier genuinization の保留** (honest-architecture note): `CliffordCaseBData.field_model`/`Ubar_cyclic`
 (True placeholder) を FPF/IsCyclic に genuine 化しようとしたが、**struct field type が
 `typeP_quotientCoprimeAction` を参照 → `[Finite G]` + `[chief.N.Normal]` instance を要し、structure 宣言

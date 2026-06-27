@@ -2141,6 +2141,67 @@ theorem eq_one_of_invariant_of_fixedPointFree {K M' : Type*} [CommGroup K] [Fini
   rw [MonoidHom.commutatorMap_apply] at hx
   rw [MonoidHom.one_apply, ← hx, map_div, hinv, div_self']
 
+open OddOrder.RepresentationTheory Representation in
+/-- **An irreducible character of a finite abelian group is a linear character.**  For a finite
+commutative group `Γ`, any irreducible character `φ` (`IsIrreducibleCharacter`) arises from a
+homomorphism `θ : Γ →* ℂˣ` with `(θ g : ℂ) = φ g`.
+
+Irreducible representations of a commutative group are `1`-dimensional
+(`finrank_eq_one_of_isMulCommutative`), so each `ρ g` acts as a nonzero scalar `θ g` (extracted by
+`exists_smul_eq_of_finrank_eq_one`), and the character `φ g = trace(ρ g) = θ g`.  This abelian
+`Irr ↔ Hom(·, ℂˣ)` bridge lets `eq_one_of_invariant_of_fixedPointFree` apply to genuine irreducible
+characters of the abelian chief factor `H̄`, giving the inertia `I_U(θ) = C` of Peterfalvi (9.9)
+without realizing `H̄` as a subgroup. -/
+theorem exists_units_monoidHom_of_isIrreducibleCharacter_of_isMulCommutative
+    {Γ : Type} [Group Γ] [Finite Γ] [IsMulCommutative Γ]
+    {φ : ClassFunction Γ ℂ} (hφ : IsIrreducibleCharacter φ) :
+    ∃ θ : Γ →* ℂˣ, ∀ g, (θ g : ℂ) = φ g := by
+  obtain ⟨V, _, _, _, ρ, hρ, hχ⟩ := hφ
+  haveI : ρ.IsIrreducible := hρ
+  have hfin : Module.finrank ℂ V = 1 :=
+    Representation.IsIrreducible.finrank_eq_one_of_isMulCommutative ρ
+  haveI : FiniteDimensional ℂ V := .of_finrank_eq_succ hfin
+  haveI : Nontrivial V := Module.nontrivial_of_finrank_eq_succ hfin
+  obtain ⟨x, hx⟩ := exists_ne (0 : V)
+  -- `span {x} = ⊤` (1-dimensional), so a linear map is determined by its value on `x`.
+  have hspan : Submodule.span ℂ ({x} : Set V) = ⊤ := by
+    apply Submodule.eq_top_of_finrank_eq
+    rw [hfin]; exact finrank_span_singleton hx
+  -- The scalar `c g` with `ρ g x = c g • x`.
+  choose c hc using fun g => exists_smul_eq_of_finrank_eq_one hfin hx ((ρ g) x)
+  -- `ρ g = c g • id` (agree on the spanning vector `x`).
+  have hρeq : ∀ g, (ρ g : V →ₗ[ℂ] V) = c g • LinearMap.id := fun g => by
+    refine LinearMap.ext_on hspan fun y hy => ?_
+    rw [Set.mem_singleton_iff] at hy; subst hy
+    simpa [LinearMap.smul_apply] using (hc g).symm
+  -- `c` is multiplicative and unital, and never zero (`ρ g` is invertible).
+  have hc1 : c 1 = 1 := by
+    have h := hc 1
+    rw [map_one, Module.End.one_apply] at h
+    have h2 : c 1 • x = (1 : ℂ) • x := by rw [one_smul]; exact h
+    exact smul_left_injective ℂ hx h2
+  have hcmul : ∀ g h, c (g * h) = c g * c h := fun g h => by
+    have e1 : (ρ (g * h)) x = (c g * c h) • x := by
+      rw [map_mul]
+      show (ρ g) ((ρ h) x) = (c g * c h) • x
+      rw [← hc h, map_smul, ← hc g, smul_smul, mul_comm]
+    have key : c (g * h) • x = (c g * c h) • x := by rw [hc (g * h)]; exact e1
+    exact smul_left_injective ℂ hx key
+  have hcne : ∀ g, c g ≠ 0 := fun g hc0 => by
+    have hρ0 : (ρ g : V →ₗ[ℂ] V) = 0 := by rw [hρeq g, hc0, zero_smul]
+    have h1 : (ρ (g⁻¹) * ρ g : V →ₗ[ℂ] V) = ρ 1 := by rw [← map_mul, inv_mul_cancel]
+    rw [hρ0, mul_zero, map_one] at h1
+    exact zero_ne_one h1
+  -- `φ g = trace(ρ g) = c g · finrank = c g`.
+  have hφc : ∀ g, φ g = c g := fun g => by
+    have hco : φ g = LinearMap.trace ℂ V (ρ g) := congrFun hχ g
+    rw [hco, hρeq g, map_smul, LinearMap.trace_id, hfin]
+    simp
+  exact ⟨{ toFun := fun g => Units.mk0 (c g) (hcne g)
+           map_one' := Units.ext (by simpa using hc1)
+           map_mul' := fun g h => Units.ext (by simpa using hcmul g h) },
+        fun g => by simpa using (hφc g).symm⟩
+
 set_option backward.isDefEq.respectTransparency false in
 open OddOrder.RepresentationTheory Representation in
 /-- **Subgroup-level Singer fixed-point-free coprimality.**  Strengthens

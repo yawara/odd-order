@@ -6216,6 +6216,11 @@ formula together with the prime computation `coprimeFrobeniusAction_card_eq_prim
 -- `commutatorMap_surjective`.
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.S11.eq_one_of_invariant_of_fixedPointFree
+-- abelian `Irr ↔ Hom(·,ℂˣ)` bridge: an irreducible character of a finite commutative group is a
+-- linear character (1-dim rep ⟹ scalar action ⟹ character = the scalar hom).  Lets the char-side
+-- FPF engine apply to genuine `Irr(H̄)` characters (realization-free inertia route for (9.9)).
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S11.exists_units_monoidHom_of_isIrreducibleCharacter_of_isMulCommutative
 -- §9 degree infrastructure: `[M:HU] = q` (`HU = M'`, `[M:M'] = |W₁|`) and the resulting
 -- `(Ind_{HU}^M χ)(1) = q·χ(1)` — the degree formula every (9.8)/(9.9) count uses.
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S11.huSub_index_eq_q
