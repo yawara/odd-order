@@ -242,3 +242,31 @@ sorryAx は共有上流 `typePData_W1_hall_coprime` のみ。S08_CaseBEndgame �
 `typeII_coherence_contradiction_estimate` 単独** (算術 closer + 構造的下界 + params/coh は全 genuine)。
 **次手 = (10.7) `typeII_derived_frobenius` (partner Frobenius、§7 estimate の上流) → §7 estimate 本体**
 (Hypothesis71/78 instance を §10 Type-II partner に構築 + (7.5)+(7.8.b)+(10.6.b)+TI-counting)。
+
+## 2026-06-27 lane-b (W3): (10.8) estimate decomposed — analytic chain + V^G TI-counting landed
+
+`typeII_coherence_contradiction_estimate` (the sole remaining S12 gate of (10.8)) is **Peterfalvi's
+chain (04.12 lines 79-99)**, not one opaque step.  Two genuinely-provable pieces are now **proven,
+sorry-free, full build green** (commit on lane-b, `S12_MaximalIII_IV_V.lean`):
+
+- **`typeII_coherence_estimate_chain`** — pure-ℚ analytic combination (lines 87-99): from the §7
+  output (line 87) + TI-counting bound + `|S|=|H||U|w₂`, derives `1−1/w₁−1/u < w₁w₂/|M'|`.
+- **`typePData_card_W`** (`|W|=w₁w₂`), **`typePData_typePV_ncard`** (`|V|=w₁w₂−w₁−w₂+1`),
+  **`typePData_W_normalizes_typePV`** (W-stab of V), **`typePData_conjClassSet_typePV_ncard`**
+  (`|V^G|=|G:W|·(w₁w₂−w₁−w₂+1)`, via `ncard_conjClassSet_of_isTISubset` + existing `typePData_V_ti`).
+
+These are fundamental reusable type-P torus facts (ω-grid on W=W₁×W₂, (4.5) reducibles, A_0(M)⊇V^G).
+
+**Estimate now reduces precisely to**:
+- **(A) §7 output (line 87)** = (7.5)+(7.8.b)+(10.6.b) for (M, A(M)) — needs a `S09.Hypothesis71`
+  instance for (M, A(M)).  Feasible: §7 (7.1)-(7.8) sorry-free in S09; §10 `Hypothesis.tau` is a
+  genuine Dade map for A_0(M); `S10.dadeSupportHypotheses_typeP` gives the A(M) Dade data;
+  `HConjInvariant`-for-A(M) resolvable via `S04.HConjInvariant.restrict` (A(M)⊆A_0(M)).  **Cleanest
+  next upstream step.**
+- **(B1) inclusion G₁ ⊆ (H#)^G ∪ V^G** — gated on **(10.7) `typeII_derived_frobenius`**, itself
+  §9-blocked (Peterfalvi's (10.7) proof cites (9.8.b)/(9.9.b)/(9.10) against the opaque
+  `S11.Section11CharacterData` carrier — same root as (11.8); no structural shortcut, since
+  `TypeFData.frobenius_HU0` only gives `H⊔U₀` Frobenius, not full `[S,S]`).
+- **(B2) (H#)^G count** — partner analogue of the V^G count, once partner H#-TI + N_G(H#)=S available.
+
+正本ノート = `notes/peterfalvi/s12_10_8_noncoherence.md` (2026-06-27 section).
