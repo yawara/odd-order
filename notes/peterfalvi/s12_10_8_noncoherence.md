@@ -225,3 +225,22 @@ In Peterfalvi (10.8) the (7.8.b) coherence bound `‖χ^ρ‖² ≥ 1 − ŵ₁/
 building (ii)**, read Pf (10.8) 04.12 lines 81–87 to fix *which* `(A, L)` / normal `H` the (7.8.b)
 instance is for; the "`Hypothesis78` for `M`" phrasing in earlier notes is imprecise on this point.
 The `(7.5)`-for-`(M, A(M))` side (line 81) is exactly the part `normalizer_typePA_eq` unblocks.
+
+### ✅ CORRECTION (2026-06-27, supersedes the design finding above): `A(M) = (M')#` IS `H#`
+
+The "design finding" above (that `A(M)` is centralizer-support, **not** `H#`, so (7.8.b) applies to a
+different config) is **WRONG** and is hereby corrected.  Reading Peterfalvi (10.8) 04.12 line 79
+confirms `ρ` is defined with `L = M, A = A(M)`, and **both** (7.5) (line 81) and (7.8.b) (line 85) use
+this *same* `ρ` — so (7.8.b) is for `(M, A(M))`, exactly as (7.5).
+
+The resolution: **`typePA M = sharpSubgroup (derivedInG M) = (M')#`** (proven:
+`GroupTheory.typePA_eq_sharpSubgroup_derivedInG`).  The `centralizerSupport (M#) M'` definition's
+centralizer condition is *vacuous* on `(M')#` — every `y ∈ (M')# ⊆ M#` self-centralizes (`x = y`).
+So `A(M)` **is** the sharp of the **normal** subgroup `M' = derivedInG M ⊴ M`; the `Hypothesis78`
+(7.8.b) `A = H#` requirement is satisfied with `H = M'`, `L = M`.  No alternative config is needed.
+
+⟹ the (7.8.b) instance for `(M, A(M))` is the `H = M'` Hypothesis78 (the family `T = inducedFamily M
+= S`, the coherent extension `ν = coh.tau1`, the (7.7.a)/(7.8.c.i) certificates) — this is the genuine
+remaining §7 piece (ii).  `|A(M)| = |M'| − 1` (sharp of `M'`), so the line-87 arithmetic
+`|A(M)|/|M| < 1/w₁` follows from `[M : M'] = w₁` (`TypePData.card_W1_eq_derived_index`):
+`(|M'|−1)/(|M'|·w₁) < 1/w₁`.
