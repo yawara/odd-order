@@ -3013,6 +3013,61 @@ theorem typePData_nontrivialCore_of_isTypeP1_mf_ne_msigma [Finite G]
     exact maxNilpotentNormalHall_sharp_isTISubset_of_fittingIsTI hG hM
       (S15.fitting_isTI_of_mf_ne_msigma hG hM hne)
 
+/-- **Prop 16.1 forward bridge `hP1neIIIIV`, reduced to the Peterfalvi (8.7) normalizer residual** —
+a type-`P₁` maximal subgroup with `M_F ≠ M_σ` is of type III or IV.
+
+The type-`P` datum is now fully constructed (`typePData_of_isTypeP1_mf_ne_msigma`, the type III/IV
+carrier-constructibility milestone, BG Corollary 15.5): the nilpotent `M_F`-complement `U ≠ ⊥` with
+`F(M) = M_F ⊔ (U ⊓ C_M(M_F))`.  The complement is built transparently here (rather than via the
+opaque constructor) so that `U ≠ ⊥` (`hcommon`) and the normalizer condition are statable for the
+*specific* `U`.  `isTypeIII_or_IV_of_typePData` then splits on `IsMulCommutative ↥U` (III vs IV).
+
+The sole remaining residual is the genuinely-deep **type III/IV last mile `N_G(U) ⊆ M`** (Peterfalvi
+(8.7) / Coq `BGsection15` `Fcore_structure`): this self-normalizing property of the `M_F`-complement
+is exactly what distinguishes type III/IV (`normalizer_le`) from type II (`normalizer_not_le`), and
+needs the BG uniqueness analysis of the complement not yet formalized. -/
+theorem isTypeIII_or_IV_of_isTypeP1_mf_ne_msigma [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} (hM : M ∈ maximalSubgroups G)
+    (hP1 : S14.IsTypeP1 M) (hne : S15.MF M ≠ OddOrder.BG.Ch3.S10.Msigma M) :
+    OddOrder.GroupTheory.IsTypeIII M ∨ OddOrder.GroupTheory.IsTypeIV M := by
+  classical
+  haveI : IsSolvable ↥M := hG.solvable_of_mem_maximalSubgroups hM
+  obtain ⟨K', hK'⟩ := Ch03.hall_E_exists (G := ↥M) (S14.kappa M)
+  set K : Subgroup G := K'.map M.subtype with hKdef
+  have hKM : K ≤ M := Subgroup.map_subtype_le K'
+  have hKeq : K.subgroupOf M = K' :=
+    Subgroup.comap_map_eq_self_of_injective M.subtype_injective K'
+  have hK : Ch03.IsHallSubgroup (S14.kappa M) (K.subgroupOf M) := by rw [hKeq]; exact hK'
+  have hKne : K ≠ ⊥ := fun h =>
+    card_kappaHall_ne_one hP1.1 hKM hK (by rw [h, Subgroup.card_bot])
+  obtain ⟨U, hUle, hsup, hKnorm, hinf⟩ := exists_typeP1_mf_complement hG hM hP1 hKM hK
+  have hUnilp : Group.IsNilpotent ↥U :=
+    isNilpotent_complement_of_isTypeP1_mf_ne_msigma hG hM hP1 hne hsup hinf
+  have hDcompl := isComplement'_mf_complement_of_sup_inf hsup hinf
+  have hFiteq := fittingInAmbient_eq_mf_sup_inf_of_isTypeP1_mf_ne_msigma hG hM hP1 hsup hinf
+  have hSDfit : secondDerivedInAmbient M ≤
+      maxNilpotentNormalHall M ⊔ (U ⊓ Subgroup.centralizer (maxNilpotentNormalHall M : Set G)) := by
+    obtain ⟨_, -, -, -, hM''F, -, -, -, -, -, -, -⟩ := S15.fitting_decomposition hG hM
+    rw [← hFiteq]; exact hM''F
+  -- `U ≠ ⊥`: else `M_F = M' = M_σ`, contradicting `hne`.
+  have hUne : U ≠ ⊥ := by
+    rintro rfl
+    refine hne ?_
+    have hM'σ : derivedInG M = OddOrder.BG.Ch3.S10.Msigma M :=
+      isTypeP1_derivedInG_eq_Msigma hG hM hP1
+    have hMF' : maxNilpotentNormalHall M = derivedInG M := by rw [← hsup, sup_bot_eq]
+    rw [hM'σ] at hMF'; exact hMF'
+  set data : TypePData M :=
+    typePData_of_isTypeP_of_inputs hG hM hP1.1 hKM hKne hK hUle hKnorm hUnilp hDcompl hSDfit hFiteq
+    with hdata
+  have hdataU : data.U = U := rfl
+  have hcommon : TypePNontrivialCore M data :=
+    typePData_nontrivialCore_of_isTypeP1_mf_ne_msigma hG hM hP1 hne data (hdataU ▸ hUne)
+  refine isTypeIII_or_IV_of_typePData data hcommon ?_
+  rw [hdataU]
+  -- `N_G(U) ⊆ M` — Peterfalvi (8.7) / Coq `Fcore_structure` (the type III/IV last mile).
+  sorry
+
 /-- **BG Theorem A(7), first clause — `M'' ⊆ F(M)`** (mmd L4354), as a standalone `sorry`-free
 lemma for *any* maximal `M`.  No longer `M_F ≠ M_σ`-gated: Theorem 15.2's closing (issue 8012)
 supplies the type-`P₁` half, so a case split on `M_F = M_σ` discharges both branches.
@@ -3490,8 +3545,10 @@ theorem proposition_type_classification [Finite G]
   -- `hFI` (Type F ⟹ Type I): the `TypeFData` is built (`isTypeF_groupTheory_of_isTypeF`) and the
   -- `alternative` TI case is proved; only the `¬FittingIsTI` trichotomy (BG 15.7(e)) is residual.
   case hFI => exact isTypeI_of_isTypeF hG hM
-  -- `hP1neIIIIV` (Type P₁, `M_F ≠ M_σ` ⟹ Type III/IV): Peterfalvi (8.3) + Frattini.
-  case hP1neIIIIV => sorry
+  -- `hP1neIIIIV` (Type P₁, `M_F ≠ M_σ` ⟹ Type III/IV): the `TypePData` is fully constructed
+  -- (`typePData_of_isTypeP1_mf_ne_msigma`, BG Cor 15.5, `U ≠ ⊥` nilpotent); the sole residual is the
+  -- Peterfalvi (8.7) normalizer `N_G(U) ⊆ M` (isolated in `isTypeIII_or_IV_of_isTypeP1_mf_ne_msigma`).
+  case hP1neIIIIV => exact isTypeIII_or_IV_of_isTypeP1_mf_ne_msigma hG hM
   -- `hP1eqV` (Type P₁, `M_F = M_σ` ⟹ Type V): the type-V `TypePData` is fully constructed
   -- (`typePData_of_isTypeP1_mf_eq_msigma`, `U = ⊥`); the sole residual is the Peterfalvi (8.8)
   -- trichotomy on `M_F` (isolated in `isTypeV_of_isTypeP1_mf_eq_msigma`).
