@@ -179,6 +179,33 @@ noncomputable def tau {M : Subgroup G} (hyp : Hypothesis M) :
   OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap hyp.dadeData.dade
     (hyp.dadeData.dade.fullDadeIsometryData hyp.hconj)
 
+open scoped FiniteInduce in
+/-- **The Peterfalvi (7.1) `ρ`-machinery data for `(L, A) = (M, A(M))`** — the §7 input to the
+(10.8) non-coherence estimate.
+
+Built genuinely from the §10 Dade isometry on `A_0(M)` (carried by `hyp.dadeData`/`hyp.hconj`) by
+restricting to the `M`-stable subset `A(M) = typePA ⊆ A_0(M) = typePA0` (`Set.subset_union_left`):
+`FullDadeIsometryData.restrict` restricts the Dade map and its `IsDadeMap` certificate, and
+`S04.HConjInvariant.restrict` restricts the `L`-equivariance.  The `M`-stability
+`hN : N_G(A(M)) = M` (Peterfalvi (8.16) for type `P`, from `S10.dadeSupportHypotheses_typeP`) is
+taken as a parameter, so this construction is **sorry-free**; the caller supplies `hN`.
+
+This is the foundational `S09.Hypothesis71` instance that lets the §10 estimate apply the family
+inequality (7.5) `S09.family_inequality` and the coherence norm estimate (7.8.b)
+`S09.Hypothesis78.NormEstimates` to `M` (Peterfalvi (10.8), 04.12 line 79). -/
+noncomputable def toHypothesis71 {M : Subgroup G} [Finite G] (hyp : Hypothesis M)
+    (hN : Subgroup.normalizer (typePA M hyp.typeP) = M) :
+    OddOrder.Peterfalvi.S09.Hypothesis71 G (typePA M hyp.typeP) M :=
+  have hnorm : ∀ (l : ↥M) ⦃a : G⦄, a ∈ typePA M hyp.typeP →
+      (↑l : G) * a * (↑l : G)⁻¹ ∈ typePA M hyp.typeP := fun l a ha =>
+    ((Subgroup.mem_set_normalizer_iff).mp (by rw [hN]; exact l.2) a).mp ha
+  { hyp := hyp.dadeData.dade.restrict Set.subset_union_left hnorm
+    τ := ((hyp.dadeData.dade.fullDadeIsometryData hyp.hconj).restrict
+      Set.subset_union_left hnorm).toDadeMap
+    isDadeMap := ((hyp.dadeData.dade.fullDadeIsometryData hyp.hconj).restrict
+      Set.subset_union_left hnorm).toDadeIsometryData.isDadeMap
+    hConjInvariant := hyp.hconj.restrict Set.subset_union_left hnorm }
+
 end Hypothesis
 
 /-- Conjugation transports the centralizer of a singleton: `g · C_G(a) · g⁻¹ = C_G(g a g⁻¹)`.
