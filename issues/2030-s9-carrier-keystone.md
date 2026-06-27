@@ -108,8 +108,10 @@ carrier を genuine 化したことで、free-field 時代に **vacuous だっ�
 - [x] **A**: carrier 再設計 = families (commit `9c41978a`) + subgroups (commit `153e866a`) 全 genuine。
       残 free field = u (pin 済) / tau・H0CprimeSupport (S12-Dade layer) / quotientSemidirectFrobenius
       ((9.10) output) / CliffordCaseBData.field_model・Ubar_cyclic (下記、struct instance plumbing で True 据置)。
-- [ ] **B: case-(b) (9.9)/(9.10)** — Singer field model。**✅ 構造核 (FPF) landed** (2026-06-28、下記節)。
-      残 = FPF→inertia I(θ)∩U=C → (9.9.a) degree-u Clifford (`isIrreducibleCharacter_induce_of_inertia_eq`)、
+- [ ] **B: case-(b) (9.9)/(9.10)** — Singer field model。**✅ 構造核 FPF + character-side FPF landed**
+      (2026-06-28、下記節): `chiefFactor_caseB_action_fpf` (H̄⋊Ū Frobenius) + `eq_one_of_invariant_of_fixedPointFree`
+      (FPF ⟹ nontrivial char 非invariant)。残 = これらを `ClassFunction.inertia`/`mem_inertia_compHom_iff`
+      に wire して I(θ)∩U=C → (9.9.a) degree-u Clifford (`isIrreducibleCharacter_induce_of_inertia_eq`)、
       `|𝒮(H₀)| reducible-count = p−1` = (4.5)/(4.7) Dade on L=M/H₀ (S06 cite + 商 inflation)、(9.9.c) 例外含意。
 - [ ] **C: case-(a) (9.8)** — (9.8.b,c) = (8.4.d)+(4.5)/(4.7) Dade for L=M/H₀ + θ=θ₁…θ_q1_C 構成;
       (9.8.d) = degree-qa 構成 + inertia counting (`card_filter_induce_eq_index_inertia`)。
@@ -135,6 +137,18 @@ imprecision を Peterfalvi (04.11) に対し総点検・修正。**consumer 0 �
 - **`chiefFactor_caseB_action_fpf`** (case-(b) 系、S11): case-(b) (hcaseB irreducible) で φU g≠1 (g∉C) ⟹
   H̄ 上 FPF。`hComm` (像可換、`chiefFactor_caseB_image_cyclic` と同じ `⁅a,b⁆∈[U,U]⊆C(H)`) + hcaseB を
   一般補題に渡す。これが (9.9) の degree-u Clifford 解析 (I(θ)∩U=C) の構造的入力。
+
+**character-side FPF engine landed** (commit `4efc27ae` の次 commit、axiom-clean+AxiomsCheck 登録):
+- **`eq_one_of_invariant_of_fixedPointFree`** (S11): FPF automorphism α (mathlib `MonoidHom.FixedPointFree`)
+  が有限 abelian K に作用するとき、α-invariant な character θ:K→*M' (`∀x, θ(αx)=θx`) は trivial。
+  証明 = displacement `x↦x/αx` が surjective (mathlib `commutatorMap_surjective`) ⟹ θ は im=K 上で
+  消える。**これが inertia I_U(θ)=C の character-side 核**: nontrivial θ∈Irr(H̄) と g∉C で φU(g) FPF
+  (`chiefFactor_caseB_action_fpf`) ⟹ θ は φU(g)-invariant でない ⟹ g∉I_U(θ) ⟹ I_U(θ)⊆C。
+- **残 (9.9.a) = inertia API wiring + Clifford degree**: 上記 engine (FPF + character-noninvariance) を
+  repo の `ClassFunction.inertia`/`conjBy` + `mem_inertia_compHom_iff` (ConjugationBrauer InertiaTransfer、
+  θ=θ̄∘q の inertia ↔ quotient θ̄ の inertia) に wire して I(θ)∩U=C を得る → (1.7.a) で χ=Ind_{HC}^{HU}(θλ)
+  irreducible degree |U:C|=u (θλ linear、C'⊆Ker χ) → Ind_{HU}^M degree qu。**ここが残る intricate な
+  multi-step** (Irr(H̄)↔Hom(H̄,ℂˣ) bridge + 商 inflation realization)。
 
 **carrier genuinization の保留** (honest-architecture note): `CliffordCaseBData.field_model`/`Ubar_cyclic`
 (True placeholder) を FPF/IsCyclic に genuine 化しようとしたが、**struct field type が
