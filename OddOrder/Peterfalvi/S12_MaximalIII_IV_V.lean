@@ -5893,6 +5893,21 @@ theorem Hypothesis.sum_zeta_tau1_normSq_ge_card [Finite G]
   rw [Finset.mem_filter] at hg
   exact (tau1_values_and_norm_bound hG coh hmu hos hzS hz1 hzconj hδpm hδj).2 g hg.2.1 hg.2.2
 
+/-- **Restricting the Dade support shrinks it**: for `A₁ ⊆ A`, the Dade support of the restricted
+hypothesis `hyp.restrict` is contained in that of `hyp` (`mem_dadeSupport_iff`: a witness
+`a ∈ A₁, h ∈ H(a)` for the restriction is a witness `⟨a, _⟩ ∈ A` for `hyp`, since
+`(hyp.restrict ..).H a = hyp.H ⟨a, _⟩`).  In the (10.8) line-83 step this gives `G₀ ⊆ famG₀`: the
+`A_0(M)`-support complement `G₀` is inside the `A(M)`-support complement `famG₀` (the family `(7.4)`
+support for `A(M) = typePA ⊆ typePA0 = A_0(M)`). -/
+theorem dadeSupport_restrict_subset {A A₁ : Set G} {L : Subgroup G} [Fintype G]
+    (hyp : OddOrder.Peterfalvi.S04.Hypothesis G A L) (hA₁A : A₁ ⊆ A)
+    (hA₁_norm : ∀ (l : L) ⦃a : G⦄, a ∈ A₁ → (l : G) * a * (l : G)⁻¹ ∈ A₁) :
+    (hyp.restrict hA₁A hA₁_norm).dadeSupport ⊆ hyp.dadeSupport := by
+  intro g hg
+  rw [OddOrder.Peterfalvi.S04.Hypothesis.mem_dadeSupport_iff] at hg ⊢
+  obtain ⟨a, h, hh, hconj⟩ := hg
+  exact ⟨⟨a.1, hA₁A a.2⟩, h, hh, hconj⟩
+
 /-- **Peterfalvi (10.8), the analytic chain** (04.12 p.61, lines 87--99) — the pure-`ℚ` assembly
 that turns the §7 norm output (line 87) and the §8 TI-counting bound (lines 89--91) into the
 coherence bound `1 − 1/w₁ − 1/u < w₁w₂/|M'|`.
