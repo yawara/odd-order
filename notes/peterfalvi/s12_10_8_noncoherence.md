@@ -276,3 +276,47 @@ final contradiction still needs `hB` (TI-counting, lines 89–99) which is **§9
 **Next session**: build the (7.8.b) `Hypothesis78` instance for `(M, A(M))`, `H = M'` (the family is
 `inducedFamily M`, `ν = coh.tau1`; the (7.7.a)/(7.8.c.i) certificates are the work).  After that, the
 line 81→87 assembly is mechanical, leaving only the §9-gated `hB`/(10.7)/(11.8) keystone.
+
+## 2026-06-27 (cont.³) — §7 input prerequisites COMPLETE; line-83 assembly fully scoped
+
+`Hypothesis.inner_tau1_zeta_self_eq_one` (`‖ζ^{τ₁}‖² = 1`) landed (axiom-clean).  **The entire §7
+*input* side of (10.8) is now proven** — the only remaining §7 piece is the (7.8.b) `‖χ^ρ‖²` bound
+(deep certificate).  Proven inputs (all axiom-clean):
+
+| input | lemma | rôle in (10.8) lines 81-99 |
+|---|---|---|
+| (7.5) applicable to `(M,A(M))` | `normalizer_typePA_eq` (8.16) ⟹ `toFamilyHypothesis71` self-contained | line 81 |
+| `‖ζ^{τ₁}‖² = 1` | `inner_tau1_zeta_self_eq_one` | (7.5)'s norm-one arg |
+| `A(M) = (M')#` | `typePA_eq_sharpSubgroup_derivedInG` | `A=H#` for (7.8.b), `\|A\|=\|M'\|−1` |
+| G₀-drop | `sum_zeta_tau1_normSq_ge_card` ((10.6.b)) | line 83 |
+| `G₀ ⊆ famG₀` | `dadeSupport_restrict_subset` | line 83 |
+| `\|A(M)\|/\|M\| < 1/w₁` | `card_typePA_div_card_lt_inv_w1` | line 87 |
+| `(2w₁+1)w₂ ≤ \|M'\|` | `card_derived_ge` | the closer's `hMp` |
+| ℚ chain (87→bound) | `typeII_coherence_estimate_chain` | line 99 |
+| closer | `typeII_noncoherence_arithmetic` | `False` |
+
+**Precise line-83 assembly plan** (mechanical, all inputs ready; the remaining work is Finset
+bookkeeping, not new mathematics).  For `F = hyp.toFamilyHypothesis71` (`k = 1`),
+`χ = coh.tau1 params.zeta`, `hχ = inner_tau1_zeta_self_eq_one`:
+1. `family_inequality F χ hχ` gives line 81:
+   `|G|⁻¹·(Σ_{F.G0}‖χ‖² − |F.G0|) + (F.chiRhoNormSq χ 0 − |A(M)|/|M|) ≤ 0`.
+2. `G₀set := filter (g ∉ hyp.dadeData.dade.dadeSupport ∧ (ord g).Coprime w₁) ⊆ F.G0`
+   (`dadeSupport_restrict_subset`: `(F.hyp71 0).hyp.dadeSupport ⊆ hyp.dadeData.dade.dadeSupport`).
+3. `Σ_{F.G0}‖χ‖² ≥ Σ_{G₀set}‖χ‖²` (`Finset.sum_le_sum_of_subset_of_nonneg`, `‖·‖²≥0`)
+   `≥ |G₀set|` (`sum_zeta_tau1_normSq_ge_card`).
+4. ⟹ `Σ_{F.G0}‖χ‖² − |F.G0| ≥ |G₀set| − |F.G0| = −(|F.G0|−|G₀set|)`, so line 83:
+   `F.chiRhoNormSq χ 0 − |A(M)|/|M| ≤ (|F.G0| − |G₀set|)/|G|`  (with `|G₁| := |F.G0| − |G₀set|`).
+5. line 87 = line 83 + (7.8.b) `F.chiRhoNormSq χ 0 ≥ 1 − ŵ₁/|M'|` + `card_typePA_div_card_lt_inv_w1`.
+6. then `typeII_coherence_estimate_chain` + the `|U| ≥ 7` Frobenius bound on the partner.
+
+**The two genuine gates that remain** (both deep, both already isolated):
+- **(7.8.b)** `F.chiRhoNormSq χ 0 ≥ 1 − ŵ₁/|M'|` = an `S09.Hypothesis78` instance for `(M, A(M))`,
+  `H = M'` (family `inducedFamily M`, `ν = coh.tau1`; the (7.7.a)/(7.8.c.i) certificates are the deep
+  content).  This is the cleanest next genuine target.
+- **`|G₁| = |F.G0| − |G₀set|` TI-counting** (lines 89-99) = `hB`, **§9-blocked** via (10.7)
+  (`S11.Section11CharacterData` carrier, shared with (11.8) — the W3 keystone).
+
+The natural way to land the estimate is a **faithful de-opacification** of
+`typeII_coherence_contradiction_estimate`: write its body as [family_inequality → line 83 (steps 1-4,
+mechanical)] + [(7.8.b) named obligation] + [line 87 + chain] + [hB named obligation], isolating the
+two deep gates as named `sorry`s.  All the non-gate steps are now backed by proven lemmas.

@@ -304,3 +304,13 @@ proven.  **The one genuine remaining §7 piece** = the (7.8.b) `Hypothesis78` in
 After that the line 81→87 assembly is mechanical; the final contradiction still needs `hB` (TI-counting)
 which is §9-blocked via (10.7) — the `S11.Section11CharacterData` carrier (W3 keystone, shared with
 (11.8)).  正本 = `notes/peterfalvi/s12_10_8_noncoherence.md` (2026-06-27 cont.² section).
+
+## 2026-06-27 lane-b (W3, cont.³): §7 input prerequisites COMPLETE
+
+`inner_tau1_zeta_self_eq_one` (‖ζ^{τ₁}‖²=1) landed.  **All (10.8) §7 *inputs* are now proven**
+(normalizer_typePA_eq/typePA=(M')#/card_typePA_div/inner_tau1/card_derived_ge/G₀-drop/ℚ chain).
+The line-83 assembly is fully scoped & mechanical (Finset bookkeeping; see note).  Two deep gates
+remain, both isolated: (7.8.b) Hypothesis78 instance for (M,A(M)) H=M' (the (7.7.a)/(7.8.c.i)
+certificates) — cleanest next target; and hB TI-counting (§9-blocked via (10.7), the
+S11.Section11CharacterData carrier = W3 keystone, shared with (11.8)).  正本 =
+notes/peterfalvi/s12_10_8_noncoherence.md (2026-06-27 cont.³).

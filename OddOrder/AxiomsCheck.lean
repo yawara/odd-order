@@ -6337,6 +6337,14 @@ formula together with the prime computation `coprimeFrobeniusAction_card_eq_prim
 -- (10.8) uses at line 87.  Axiom-clean.
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S12.Hypothesis.card_typePA_div_card_lt_inv_w1
 
+-- **`‖ζ^{τ₁}‖² = 1`** (lane-b W3, Pf (10.8) line-81 input) —
+-- `Hypothesis.inner_tau1_zeta_self_eq_one`: the coherent extension `τ₁` is a lattice isometry on
+-- `ℤ[S]` (`coh.coherent.extension_inner_eq`) and `ζ = params.zeta ∈ S` is irreducible, so `‖ζ^{τ₁}‖²
+-- = ‖ζ‖² = 1`.  This is the norm-one hypothesis `S09.family_inequality` (7.5) requires of `χ =
+-- ζ^{τ₁}`, bridging the self-contained `toFamilyHypothesis71` to the (10.8) line-81 inequality.
+-- Axiom-clean.
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S12.Hypothesis.inner_tau1_zeta_self_eq_one
+
 -- **W4 §16→§7 bridge (lane-h, βM (14.11.2) de-opacification)** — `betaMExpansionData_of_hypothesis78`
 -- certifies that the (7.8.a) field of `BetaMExpansionData` (`β_M = 1_G − χ + Δ`) is a genuine
 -- consequence of the S09 §7 Dade decomposition
