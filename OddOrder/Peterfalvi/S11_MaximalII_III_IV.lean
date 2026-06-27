@@ -1569,6 +1569,42 @@ theorem sOf_antitone [Finite G] (data : TypesIIIIIIVSetup M) {Y Y' : Subgroup G}
     sOf data Y' ⊆ sOf data Y := fun _ ⟨χ, hχ, hφ⟩ =>
   ⟨χ, xiOf_antitone data hY hχ, hφ⟩
 
+/-! ### The genuine subgroups `C = C_U(H̄)`, `U' = [U,U]`, `C' = [C,C]` of Peterfalvi (9.5) -/
+
+/-- The `U`-action on the chief factor `H̄ = ↥H ⧸ N` (Peterfalvi (9.5)), as the hom from `U` (realised
+inside `U ⊔ W₁`) to `Aut(H̄)`.  Its range has order `u` (`u_eq_card_quotient`); its kernel is
+`C = C_U(H̄)`. -/
+noncomputable def uActionHom (data : TypesIIIIIIVSetup M) (chief : ChiefFactorData data) :=
+  (quotientMulAutHom (N := chief.N) chief.N_aInvariant).comp
+    (data.typeP.U.subgroupOf (data.typeP.U ⊔ data.typeP.W1)).subtype
+
+/-- **Peterfalvi's `C = C_U(H̄)`** (9.5): the kernel of the `U`-action on the chief factor `H̄`,
+realised as a subgroup of `G` with `C ≤ U`.  By the first isomorphism theorem `|U : C| = u`
+(`u_eq_card_quotient`'s range). -/
+noncomputable def cSub (data : TypesIIIIIIVSetup M) (chief : ChiefFactorData data) : Subgroup G :=
+  ((uActionHom data chief).ker.map
+      (data.typeP.U.subgroupOf (data.typeP.U ⊔ data.typeP.W1)).subtype).map
+    (data.typeP.U ⊔ data.typeP.W1).subtype
+
+theorem cSub_le_U (data : TypesIIIIIIVSetup M) (chief : ChiefFactorData data) :
+    cSub data chief ≤ data.U :=
+  (Subgroup.map_mono (Subgroup.map_subtype_le _)).trans <| by
+    rw [Subgroup.subgroupOf_map_subtype]; exact inf_le_left
+
+/-- **Peterfalvi's `U' = [U, U]`** (9.5), realised in `G` as `derivedInG U`. -/
+def uprimeSub (data : TypesIIIIIIVSetup M) : Subgroup G := derivedInG data.U
+
+theorem uprimeSub_le_U (data : TypesIIIIIIVSetup M) : uprimeSub data ≤ data.U :=
+  Subgroup.map_subtype_le _
+
+/-- **Peterfalvi's `C' = [C, C]`** (9.5), realised in `G` as `derivedInG C`. -/
+noncomputable def cprimeSub (data : TypesIIIIIIVSetup M) (chief : ChiefFactorData data) : Subgroup G :=
+  derivedInG (cSub data chief)
+
+theorem cprimeSub_le_C (data : TypesIIIIIIVSetup M) (chief : ChiefFactorData data) :
+    cprimeSub data chief ≤ cSub data chief :=
+  Subgroup.map_subtype_le _
+
 /-- The character-theoretic setup of Peterfalvi (9.5).
 
 `C`, `U'`, and `C'` denote the centralizer, commutator subgroup, and its
@@ -1579,12 +1615,6 @@ counts and (9.11) coherence are stated against Peterfalvi's honest families
 `𝒳 = {χ ∈ Irr(HU) | H ⊄ Ker χ}`, `𝒮 = Ind_{HU}^M 𝒳`, `𝒳(Y)`, `𝒮(Y)`. -/
 structure Section11CharacterData {M : Subgroup G} (data : TypesIIIIIIVSetup M)
     (chief : ChiefFactorData data) where
-  C : Subgroup G
-  C_le_U : C ≤ data.U
-  Uprime : Subgroup G
-  Uprime_le_U : Uprime ≤ data.U
-  Cprime : Subgroup G
-  Cprime_le_C : Cprime ≤ C
   u : ℕ
   /-- **`u = |Ū|`**, the order of the image `Ū = U/C_U(H̄)` of the `U`-action on the chief factor
   `H̄ = ↥H ⧸ N` (Peterfalvi (9.5)).  This pins the formerly free `u` to the genuine quantity used by
@@ -1600,6 +1630,25 @@ structure Section11CharacterData {M : Subgroup G} (data : TypesIIIIIIVSetup M)
 namespace Section11CharacterData
 
 variable {M : Subgroup G} {data : TypesIIIIIIVSetup M} {chief : ChiefFactorData data}
+
+/-- **Peterfalvi's `C = C_U(H̄)`** (9.5), genuine: the kernel of the `U`-action on the chief
+factor (`cSub`), no longer a free field. -/
+noncomputable def C (_chars : Section11CharacterData data chief) : Subgroup G := cSub data chief
+
+theorem C_le_U (chars : Section11CharacterData data chief) : chars.C ≤ data.U := cSub_le_U data chief
+
+/-- **Peterfalvi's `U' = [U, U]`** (9.5), genuine (`uprimeSub`). -/
+def Uprime (_chars : Section11CharacterData data chief) : Subgroup G := uprimeSub data
+
+theorem Uprime_le_U (chars : Section11CharacterData data chief) : chars.Uprime ≤ data.U :=
+  uprimeSub_le_U data
+
+/-- **Peterfalvi's `C' = [C, C]`** (9.5), genuine (`cprimeSub`). -/
+noncomputable def Cprime (_chars : Section11CharacterData data chief) : Subgroup G :=
+  cprimeSub data chief
+
+theorem Cprime_le_C (chars : Section11CharacterData data chief) : chars.Cprime ≤ chars.C :=
+  cprimeSub_le_C data chief
 
 /-- The genuine family `𝒳 = {χ ∈ Irr(HU) | H ⊄ Ker χ}` (Peterfalvi (9.5)), pinned to `xiSet`. -/
 def X (_chars : Section11CharacterData data chief) : Set (IrreducibleCharacter ↥(huSub data)) :=
