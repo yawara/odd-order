@@ -2970,6 +2970,43 @@ theorem conjBy_compHom_hInHuEquivH {M : Subgroup G} (data : TypesIIIIIIVSetup M)
     Subgroup.coe_mul, Subgroup.coe_inv]
   rw [hag]
 
+/-- **Peterfalvi (9.9.a), concrete inertia ⟹ `g ∈ C`.**  The capstone combining the realization
+(`conjBy_compHom_hInHuEquivH`) with the abstract reduction (`caseB_char_inertia_inflation`): in
+Clifford case (b), if `g ∈ HU` (with `G`-image that of a `U`-element `a`) fixes the realized
+inflation `Res`-constituent `compHom (hInHuEquivH) (compHom (mk' N) θ̄)` of a nontrivial
+`θ̄ ∈ Irr(H̄)` (i.e. `g ∈ I_{HU}(θ)`), then `a` acts trivially on the chief factor: `φ_U(a) = 1`
+(`a ∈ C`).  This is exactly the character-side inertia `I_U(θ) ⊆ C` of (9.9.a), now fully
+concrete: the realization translates `conjBy` into `typeP_conjAction`-invariance, inflation strips
+`compHom (hInHuEquivH)` and `compHom (mk' N)`, and `chiefFactor_caseB_char_inertia` concludes. -/
+theorem caseB_inertia_realized [Finite G] {M : Subgroup G}
+    {data : TypesIIIIIIVSetup M} {chief : ChiefFactorData data}
+    (hcaseB : ∀ J : Subgroup (↥data.H ⧸ chief.N),
+        IsAInvariant ((typeP_quotientCoprimeAction data.typeP data.nontrivial.1
+          chief.N_aInvariant).φ.comp (typeP_quotientCoprimeAction data.typeP data.nontrivial.1
+          chief.N_aInvariant).U.subtype) J → J = ⊥ ∨ J = ⊤)
+    {θbar : IrreducibleCharacter (↥data.H ⧸ chief.N)}
+    (hθbar : (θbar : ClassFunction (↥data.H ⧸ chief.N) ℂ) ≠ trivialClassFunction _)
+    (a : ↥(typeP_quotientCoprimeAction data.typeP data.nontrivial.1 chief.N_aInvariant).U)
+    (g : ↥(huSub data))
+    (hag : ((g : ↥M) : G) =
+      (((typeP_quotientCoprimeAction data.typeP data.nontrivial.1
+        chief.N_aInvariant).U.subtype a : ↥(data.typeP.U ⊔ data.typeP.W1)) : G))
+    (hfix : ClassFunction.conjBy g
+        (ClassFunction.compHom (hInHuEquivH data).toMonoidHom
+          (ClassFunction.compHom (QuotientGroup.mk' chief.N)
+            (θbar : ClassFunction (↥data.H ⧸ chief.N) ℂ)))
+      = ClassFunction.compHom (hInHuEquivH data).toMonoidHom
+          (ClassFunction.compHom (QuotientGroup.mk' chief.N)
+            (θbar : ClassFunction (↥data.H ⧸ chief.N) ℂ))) :
+    ((typeP_quotientCoprimeAction data.typeP data.nontrivial.1 chief.N_aInvariant).φ.comp
+      (typeP_quotientCoprimeAction data.typeP data.nontrivial.1
+        chief.N_aInvariant).U.subtype) a = 1 := by
+  rw [conjBy_compHom_hInHuEquivH data
+    ((typeP_quotientCoprimeAction data.typeP data.nontrivial.1 chief.N_aInvariant).U.subtype a)
+    g hag] at hfix
+  exact caseB_char_inertia_inflation hcaseB hθbar a
+    (ClassFunction.compHom_injective_of_surjective (hInHuEquivH data).surjective hfix)
+
 /-- **Peterfalvi (9.7) case (b) carrier.**  When `U` acts irreducibly on the chief factor
 `H̄ = H/H₀` (Clifford case (b), the left branch of `chiefFactor_clifford_U_dichotomy`), the
 field-model divisibilities of `CliffordCaseBData` hold: with `chars.u = |Ū|` (pinned in
