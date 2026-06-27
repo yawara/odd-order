@@ -5637,6 +5637,16 @@ contradicting `X₁ ⊄ Z`.  This is the faithfulness input to `pRank_opiCore_le
 #assert_only_allowed_axioms
   OddOrder.BG.Ch4.S16.kappaHall_inf_centralizer_opiCore_eq_bot
 
+/-! **Type-V disjunct-3 Sylow input** (`S16_MainResults`, `exists_sylow_eq_opiCore_of_mf_eq_msigma`,
+issue 8015): for `M_F = M_σ` and `p ∈ σ(M)`, `P = O_p(M_F)` is a Sylow `p`-subgroup of `G` (Coq
+`sylP_G`).  `P` is a `{p}`-Hall (Sylow) of the nilpotent `M_F = M_σ`, so `|P| = p^{v_p(|M_σ|)}`; as
+`M_σ` is the `σ`-Hall with `p ∈ σ`, this is `p^{v_p(|G|)}`, and `Sylow.ofCard` exhibits the Sylow.
+This is the Sylow input to `mFT_rank2_Sylow_cprod` (`card_opiCore_eq_prime_cube_singer`).
+Axiom-clean. -/
+
+#assert_only_allowed_axioms
+  OddOrder.BG.Ch4.S16.exists_sylow_eq_opiCore_of_mf_eq_msigma
+
 /-! **Type-`P₁` `M_F`-internal complement** (`S16_MainResults`, `exists_typeP1_mf_complement`, the
 construction core of the FT-critical `hP1neIIIIV` bridge): `M_F` has a `K`-invariant complement `U`
 inside `M' = M_σ` (`M_F ⊔ U = M'`, `K ≤ N_G(U)`, `M_F ⊓ U = ⊥`).  The `K`-invariant
