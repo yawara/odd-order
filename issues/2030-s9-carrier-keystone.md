@@ -108,13 +108,14 @@ carrier を genuine 化したことで、free-field 時代に **vacuous だっ�
 - [x] **A**: carrier 再設計 = families (commit `9c41978a`) + subgroups (commit `153e866a`) 全 genuine。
       残 free field = u (pin 済) / tau・H0CprimeSupport (S12-Dade layer) / quotientSemidirectFrobenius
       ((9.10) output) / CliffordCaseBData.field_model・Ubar_cyclic (下記、struct instance plumbing で True 据置)。
-- [ ] **B: case-(b) (9.9)/(9.10)** — Singer field model。**✅ 構造核 FPF + char-side FPF + inertia 核 +
-      abstract inertia reduction landed** (2026-06-28、下記節): `chiefFactor_caseB_action_fpf` (H̄⋊Ū Frobenius) +
-      `chiefFactor_caseB_char_inertia` (θ̄ φU(g)-inv ⟹ φU(g)=1) + `caseB_char_inertia_inflation` (cont.⁵:
-      typeP_conjAction-inv ⟹ φU(g)=1)。**(9.9.a) inertia は単一の残 step に縮小** = conjBy↔typeP_conjAction
-      realization (H-in-HU ≅ ↥H 同定)。残 = その realization + (9.9.a) degree-u Clifford
-      (`isIrreducibleCharacter_induce_of_inertia_eq`)、`|𝒮(H₀)| reducible-count = p−1` = (4.5)/(4.7) Dade on
-      L=M/H₀ (S06 cite + 商 inflation)、(9.9.c) 例外含意。
+- [ ] **B: case-(b) (9.9)/(9.10)** — Singer field model。**✅✅ (9.9.a) inertia `I_U(θ)⊆C` 完全 proven**
+      (2026-06-28 cont.⁴⁻⁶、全 axiom-clean): `chiefFactor_caseB_action_fpf` (FPF) →
+      `chiefFactor_caseB_char_inertia` (抽象 char inertia) → `compHom_typeP_conjAction_inflation` +
+      `caseB_char_inertia_inflation` (inflation 還元) → `hInHuEquivH`/`conjBy_compHom_hInHuEquivH` (realization)
+      → `caseB_inertia_realized` (capstone: concrete g∈I_{HU}(θ) ⟹ φU=1)。**残 = Clifford 次数のみ**:
+      χ∈Irr(HU) の Res_H から realized-inflation 形 constituent θ 取り出し + 誘導次数 χ(1)=u (general Clifford
+      correspondence、inertia=HC from 誘導、新規構築要)。+ `|𝒮(H₀)| reducible-count = p−1` = (4.5)/(4.7) Dade、
+      (9.9.c) 例外含意。
 - [ ] **C: case-(a) (9.8)** — (9.8.b,c) = (8.4.d)+(4.5)/(4.7) Dade for L=M/H₀ + θ=θ₁…θ_q1_C 構成;
       (9.8.d) = degree-qa 構成 + inertia counting (`card_filter_induce_eq_index_inertia`)。
       case-(a) factor 構造 (`CliffordCaseAData.Hpart`/`a`) を使う。
@@ -251,6 +252,31 @@ S08 `inertia_eq_H_of_c2` が (6.8)(c2) で同型の realization を `mem_inertia
 **残 (9.9.a)** = (i) conjBy↔typeP_conjAction realization (上記、唯一の plumbing 残)、(ii) χ∈Irr(HU) の
 Res_H から nontrivial constituent θ (H₀⊆ker) を取り出す + Clifford 誘導次数 χ=Ind_{HC}^{HU}(linear) degree u →
 Ind^M qu (degree infra `induceHU_apply_one_eq_q_mul` 済)。**inertia 数学核は完了、残は realization + Clifford 取り出し**。
+
+## 2026-06-28 (cont.⁶): (9.9.a) realization + capstone — inertia 部分が完全に proven (commits `260b4926`+`d55be36f`)
+
+cont.⁵ で「唯一の残 plumbing」とした conjBy↔typeP_conjAction realization を締め、inertia 全 chain を完結
+(全 sorry-free + axiom-clean + AxiomsCheck 登録、full build 3884 green):
+
+- **`hInHu_normal`** (instance): H ⊴ HU (`maxNilpotentNormalHall_subgroupOf_normal` + `Normal.subgroupOf`)。conjBy に必須。
+- **`hInHuEquivH`** (def): realization iso `↥(hInHu) ≃* ↥H` = 2 つの `subgroupOfEquivOfLe` 合成 (H.subgroupOf M ≤ HU, H ≤ M)。
+- **`hInHuEquivH_coe`** (rfl): iso は underlying G-元を保存。
+- **`conjBy_compHom_hInHuEquivH`** (realization 核): iso の下で concrete `conjBy g` (g∈HU) ↔ abstract
+  `typeP_conjAction a` (a∈UW₁, ↑g=↑a)。両者とも同じ G-元共役ゆえ `g·h·g⁻¹=a·h·a⁻¹` に帰着。
+- **`caseB_inertia_realized`** (capstone): case-(b) で g∈HU (↑g=↑a, a∈U) が nontrivial θ̄∈Irr(H̄) の
+  realized inflation `compHom (hInHuEquivH) (compHom (mk' N) θ̄)` を固定 ⟹ φU(a)=1 (a∈C)。
+  = **Peterfalvi (9.9.a) の character-side inertia `I_U(θ)⊆C`、完全に concrete & axiom-clean**。
+  証明 = realization で conjBy→typeP_conjAction-inv → inflation injectivity (hInHuEquivH surjective) で
+  compHom 剥がし → `caseB_char_inertia_inflation` で φU=1。
+
+**∴ (9.9.a) の inertia `I_U(θ)⊆C` は完全に proven** (FPF → 抽象 char inertia → inflation 還元 → realization
+→ capstone の全 chain が axiom-clean)。
+
+**残 (9.9.a) = Clifford 次数のみ** (inertia 終了): χ∈Irr(HU) の Res_H から `caseB_inertia_realized` が要求する
+realized-inflation 形の nontrivial constituent θ (H₀⊆ker θ) を取り出す (`exists_liesOver` + θ̄ への factoring) +
+**Clifford 誘導次数** χ=Ind_{HC}^{HU}(ψ), χ(1)=[HU:HC]·ψ(1)=u·1=u → Ind^M で qu。これは **general Clifford
+correspondence** (inertia=HC からの誘導 + ψ linear extension) を要し、repo は `isIrreducibleCharacter_induce_of_inertia_eq`
+(inertia=H 特殊形) のみ所持 = 一般形 (誘導 from 一般 inertia + degree formula + extension) は新規構築要。次の大ピース。
 
 ## 完了条件
 
