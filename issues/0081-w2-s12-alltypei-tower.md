@@ -173,8 +173,45 @@ obligation に分離。relane #11 の「W2 = char 従属で ungated 0」評価�
 核を持っていた** (bridge は axiom-clean)。**lane-h は relane #11 で W1 (issue 2027) へ移動**、本成果で W2
 の FT-critical endpoint は honest reduction として残置 (driver/await、残 = §8 covering producer + 8.8 dichotomy)。
 
+### 2026-06-27 (lane-h 再開, relane #12): ✅ exists_typeICovering covering 構成 — 4/6 field discharge
+
+relane #12 の指示「`exists_typeICovering` の covering 構成」を完遂。bare sorry の §8 carrier を
+**BG Theorem E (`S10.bgTheoremE_cover_data`) を cite する honest reduction** に置換 (commits
+`827a6195` + `8a7d7143`、full build 3884 green、AxiomsCheck OK)。
+
+**sorry-free + axiom-clean helper 2本 (covering 構成の構造的核、AxiomsCheck 登録)**:
+- `supportKernel_le_maxNilpotentNormalHall`: §8 thickening kernel `R(x)` (Pf 8.14) は常に
+  `≤ L_F` (定義の両分岐 `L_F ⊓ C(x)` / `⊥` とも)。
+- `thickenedSupport_subset_conjClassSet_maxNilpotentNormalHall`: support set `X ⊆ L_F` なら
+  thickened support `⋃_{z∈X}(z R(z))^G` は `𝒞_G(L_F)` に着地 (coset 因子 `z∈X⊆L_F` × kernel 因子
+  `r∈R(z)⊆L_F` が `L_F` 内)。**「型I被覆 `A_1(M_i)=(M_i)_F#` が共役を法として `(M_i)_F#` 被覆になる」
+  理由** = (12.17) covering の数学的核。
+
+**exists_typeICovering の discharge (6 field 中 4 + 索引)**:
+- type-exclusivity: 各代表は型I (`hall`) ⟹ `data.tau i = I` (`not_isTypeI_of_isTypeNonI` の対偶、BG §16)
+  ⟹ `mainSubgroup (M_i)(τ_i) = (M_i)_F`。
+- `covers`: 上記 helper + cover_nonidentity で実証明。
+- `coprime`: (8.17) 素因子分割 disjoint → `Nat.disjoint_primeFactors`。
+- `two_le` ((7.10) ≥2-classes): **disjoint-union counting 不要のクリーン経路で実証明**。card=0 は
+  空被覆 vs Nontrivial-G 非単位元で矛盾、card=1 は `⋃=thickenedA1(M)` 単一化 ⟹
+  `|G#|=(|M_s|-1)|G:M| ≤ |G|-|G:M| ≤ |G|-2 < |G|-1=|G#|` で矛盾 (`card_le_of_le`/`card_mul_index`/
+  index≥2 + omega)。
+- plumbing: `Fin k` 索引 (universe `.{_,0}` pin で `data.ι : Type 0`)。
+
+**残 residual 2本 (faithful isolation、いずれも他ドメイン gated)**:
+- `isTI`: kernel sharp-set `((M_i)_F)#` の TI 性 = (8.13.c1)+(2.3) 未抽出 §8。
+- branch-selection: `hall` 下で BG Theorem E が type-I branch を返す = (8.8.a) dichotomy (BG §16、
+  `theorem88_dichotomy` と parallel、lane-f 領域)。
+
+**§12 ungated runway 評価**: 本 covering 構成で **S14_MaximalI の ungated 群論 runway は実質枯渇**。
+残 §12 sorry は全て char/Dade (lane-b: (12.2)-(12.6),(12.10),(12.11),(12.14)-(12.16))・未抽出 §8
+((8.13.c1) for isTI/(12.11))・BG §16 (lane-f: branch-selection/theorem88_dichotomy) gated。
+exists_typeICovering の covers/coprime/two_le 実証明は genuine な FT 群論前進だが、エンドポイント
+(theorem88_caseB_holds) は依然 isTI+branch+8.8-dichotomy に gate。**hub 再判断推奨** (次の ungated
+セグメントへ relane、or isTI の Frobenius-TI 角度を §8 として lane-f/別レーンへ)。
+
 ## 参照
 
-- 正本: `notes/meta/ft_frontier_remap_2026_06_25.md` §2 (W2)、relane #10 (LAUNCH.md 冒頭、issue 2026)
+- 正本: `notes/meta/ft_frontier_remap_2026_06_25.md` §2 (W2)、relane #12 (LAUNCH.md 冒頭、issue 2027)
 - 主所有: `OddOrder/Peterfalvi/S14_MaximalI.lean` (lane-h、2026-06-26 lane-c から継承)
 - 関連: `notes/peterfalvi/s10_13_maximal_structure.md`、issue 2018 (§13 char direction)、2026 (W4→W2 relane)

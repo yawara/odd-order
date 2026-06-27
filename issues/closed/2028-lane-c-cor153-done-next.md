@@ -46,3 +46,21 @@ hub が lane-c の次フロントを指示 (LAUNCH.md 更新 or 本 issue クロ
 - 下流: `S16_MainResults.lean:3362` (Thm I, lane-f) / `Peterfalvi/S14_MaximalI.lean:1534`
   (`theorem88_caseB_holds`, lane-h)。
 - 関連: 0080 (W1 Prop 16.1, lane-f) / 8015 (Prop 16.1 type classification) / 0081 (W2) / 0082 (W3) / 0083 (W4)。
+
+## ✅ RESOLUTION (2026-06-27, hub 調査 + ユーザー裁可「4→3 レーン集約」)
+
+hub が候補を実コード検証 (Explore + 直接 read) で精査:
+
+1. **option 1 (Cor 15.5(c) producer) は moot** — lane-f が今セッションで Cor 15.5(c) の deferred half
+   (`isNilpotent_complement_of_isTypeP1_mf_ne_msigma`) を S16_MainResults:1353 に **インライン自前証明済**。
+2. **代替候補 W₁ rank-1 carrier (`typePData_W1_pRank_eq_one`) も moot** — `isTypeP_of_typePData_of_card_W1_prime`
+   (S16:2868) が |W₁| 素数から rank-1 を **carrier 不要**で導出し、`isTypeP_of_isTypeII/III/IV/V` が IsTypeP 半分を
+   完成済。reverse 3 bridge (hIIP2/hIIIIVP1/hVP1, S16:3503/3505/3508) の真の残は **κ vs σ' 型判定**で、全て
+   S16_MainResults (lane-f 所有) 内 = **file-disjoint な lane-c ピース無し** (issue 2027 relane #12 survey と一致)。
+   ⚠ 当初 Explore agent は (2) を「lane-c の高価値 producer」と誤推奨 → 実コード検証で覆した
+   ([[scaffold-sorry-free-not-done]] / 実コード検証の教訓、relane #5/#11 stale-pointer と同根)。
+3. **frontier は char-bound で狭く lane-c は繰り返し starve** (relane #3/#6/#8/#10/#11)。
+
+⟹ **ユーザー裁可「4→3 レーンに集約」**: lane-c 退役。残 3 レーン = lane-f (W1) / lane-b (W3 char 核) /
+lane-h (W2 §12)。lane-c 所有ファイル (S15_MF/S14_TypePCounting) の今後の §15/§16 群論 need は lane-f が
+BG owner として担当。lane-c LAUNCH.md に退役バナー設置済、hub 監視 cron を f/b/h に縮小。close。
