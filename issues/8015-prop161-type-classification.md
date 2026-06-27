@@ -746,3 +746,31 @@ route B (|K|∣p+1) を更に精読。**Singer 機構は `OddOrder/GroupTheory/R
 **残る genuine 工 (sorry 1 後)**: 既約性判定 (step 3)、symplectic form + det=norm (step 5)。
 両者とも mathlib の Representation/Algebra.norm + IsExtraspecial 構造で形式化可能 (multi-session だが
 全ピース所在確定、ChatGPT 不要)。**次セッション = sorry 1 (|P|=p³) を Thm 5.5(b) + Blackburn で着手**。
+
+### ✅✅ 2026-06-27¹⁰ (lane-f): disjunct 3 assembly 着手 — rPle2 gate を実証明 (de-risk 検証成功)
+
+de-risk 後、構造 assembly を上流から brick 化。**3 brick landed (全 sorry-free + axiom-clean、
+AxiomsCheck 登録)**:
+1. `IsExtraspecial.of_card_eq_prime_cube` (p3group_extraspecial、commit `6dadd6bb`)
+2. **`isNarrow_opiCore_of_three_le_pRank`** (commit `5e2b0345`): P=O_p(M_F) は pRank≥3 で narrow。
+   witness X₁ + hrank3 (E1X rank) を S05 narrow 特徴付けに供給。**Sylow/β plumbing 不要**。
+3. **`pRank_opiCore_le_two_of_kappaHall`** (rPle2、commit `85ad96d8`): **当初「appendix Aut_narrow
+   未ポート」と誤評価した r(P)≤2 gate を実証明**。by_contra pRank≥3 → IsNarrow → faithful φ:↥K→MulAut↥P
+   (A=K 直接、quotient 不要) → Thm 5.5(b) `solvableAut_of_narrow` → |K|∣p-1 矛盾。
+   **= de-risk (Thm 5.5 ポート済 → rPle2 到達) の実証**。
+
+**|P|=p³ の構造定理も発見済ポート: `blackburnRankTwoClassification` (S04f, BG Thm 4.16)** —
+rank≤2 + [R,A]=R + 非可換 ⟹ central product (extraspecial p³ ∘ cyclic)。A=V (p'-Hall of N_G(P))
+で適用。
+
+**rPle2 の唯一の input = faithfulness (K⊓C_G(P)=⊥) は全て導出可能と確定** (次 brick):
+- semiprime `centralizer_msigma_kappaElement_eq_kstar` (S16:2488) ✓
+- **Kstar=Z**: `kstar_card_prime_of_inputs` (S16, BG Thm C(8), U=⊥⟹|K*| prime) + Z≤Kstar (hZK) +
+  |Z|=p ⟹ |Kstar|=p ⟹ Kstar=Z ✓
+- **X₁⊄Z**: `isMulCommutative_mf_inf_centralizer_of_not_le` (C_{M_F}(X₁) abelian) + Brick 1 (P 非可換)
+  — X₁⊆Z⟹P⊆C_{M_F}(X₁) abelian ⟹ P abelian 矛盾 ✓
+- C_K(P) 論法: x∈K⊓C_G(P)# ⟹ X₁≤C_{M_σ}(x)=Kstar=Z、X₁⊓Z=⊥ ⟹ X₁=⊥ 矛盾。
+
+**残 brick (全ピース located)**: (4) faithfulness、(5) |P|=p³ (P=Sylow_p(G) + Thm 4.16 + |Z(P)|=p、
+|Z(P)|=p は Z(P)⊆Kstar=Z 経由で coprime_odd_faithful_Ohm1 [K が Ω₁(Z(P))=Z を中心化 ⟹ Z(P) 中心化]
+が唯一の未ポート、汎用 coprime-action 事実)、(6) route B (|K|∣p+1、SingerField + symplectic det=1)。

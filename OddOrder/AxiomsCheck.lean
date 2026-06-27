@@ -6357,3 +6357,14 @@ formula together with the prime computation `coprimeFrobeniusAction_card_eq_prim
   OddOrder.GroupTheory.IsExtraspecial.of_card_eq_prime_cube
 #assert_only_allowed_axioms
   OddOrder.GroupTheory.isCyclic_of_isCyclic_quotient_frattini
+
+-- **W1 §16 disjunct 3, `r(O_p(M_F)) ≤ 2` assembly (lane-f, issue 8015)** — two bricks toward the
+-- type-V Singer case's `|O_p(M_F)| = p³`, both axiom-clean:
+-- * `isNarrow_opiCore_of_three_le_pRank`: `P = O_p(M_F)` is narrow once `pRank P ≥ 3` (the non-TI
+--   witness `X₁` with `rank(M_F ⊓ C_G(X₁)) < 3` realizes the BG §5 narrow characterization).
+-- * `pRank_opiCore_le_two_of_kappaHall`: `r(P) ≤ 2` (Coq `rPle2`) — a faithfully-acting cyclic `κ`-Hall
+--   `K` with `|K| ∤ p−1` forces `pRank P ≤ 2` via BG Theorem 5.5(b) (`solvableAut_of_narrow`).
+#assert_only_allowed_axioms
+  OddOrder.BG.Ch4.S16.isNarrow_opiCore_of_three_le_pRank
+#assert_only_allowed_axioms
+  OddOrder.BG.Ch4.S16.pRank_opiCore_le_two_of_kappaHall
