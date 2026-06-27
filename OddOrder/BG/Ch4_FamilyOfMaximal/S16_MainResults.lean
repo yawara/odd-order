@@ -1872,7 +1872,7 @@ theorem isTypeI_of_isTypeF [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
       -- divisibility engine + per-prime order-`q` witnesses) and cyclic `O_{p'}(M_F)` (conjunct B).
       refine Or.inr (Or.inr ⟨fun q _hq hqπ => ?_, ?_⟩)
       · -- conjunct A: `exp U ∣ q - 1` for each `q ∈ π(M_F)`.
-        obtain ⟨Z, hZMF, hZcard, hMNZ⟩ :=
+        obtain ⟨Z, hZMF, hZcard, hMNZ, -⟩ :=
           exists_orderQ_le_mf_normal_in_M_of_not_fittingIsTI hG hM hp hX₁card hX₁MF _hCGnotM
             hrank3 habel _hq hqπ
         exact typeF_exponent_dvd_sub_one_of_invariant_card td (by rw [td.H_eq]; exact hZMF)
@@ -2538,6 +2538,57 @@ theorem kappaHall_card_dvd_sub_one_of_inf_kstar_eq_bot [Finite G]
   have hdvd := OddOrder.BG.Ch4.S15.card_dvd_sub_one_of_isFrobeniusAction hFA
   rwa [hZcard] at hdvd
 
+/-- **`K` acts faithfully on `P = O_p(M_F)` in the type-V Singer case** (Coq `defKs`/`defZP`:
+`K* = Z` forces `C_K(P) = 1`).  For a type-`P₁` maximal `M` with Hall `κ`-subgroup `K`,
+`K* = M_σ ⊓ C(K)`, and an order-`p` subgroup `Z ≤ K*` with `X₁ ⊄ Z` (the non-TI witness `X₁` of order
+`p`, `X₁ ≤ M_F`), the centralizer of `P` in `K` is trivial.
+
+A nonidentity `x ∈ K ⊓ C_G(P)` centralizes `P ⊇ X₁`, so `X₁ ≤ M_σ ⊓ C_G(x) = K*`
+(`centralizer_msigma_kappaElement_eq_kstar`).  But `K* = Z`: `|K*|` is prime
+(`kstar_card_prime_of_inputs`), `Z ≤ K*`, and `|Z| = p`, so `|K*| = p` and `Z = K*`.  Hence
+`X₁ ≤ Z`, contradicting `X₁ ⊄ Z`.  This is the faithfulness input `K ⊓ C_G(P) = ⊥` to
+`pRank_opiCore_le_two_of_kappaHall` (`rPle2`) for the type-V disjunct-3 (Singer/`SL₂(p)`) case. -/
+theorem kappaHall_inf_centralizer_opiCore_eq_bot [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M K Kstar U : Subgroup G}
+    (hM : M ∈ maximalSubgroups G) (hP1 : S14.IsTypeP1 M) (hKM : K ≤ M)
+    (hK : Ch03.IsHallSubgroup (S14.kappa M) (K.subgroupOf M))
+    (hKstar : Kstar = OddOrder.BG.Ch3.S10.Msigma M ⊓ Subgroup.centralizer (K : Set G))
+    (hU : Ch03.IsHallSubgroup ((S14.kappa M ∪ OddOrder.BG.Ch3.S10.sigma M)ᶜ) (U.subgroupOf M))
+    [IsCyclic ↥K]
+    {p : ℕ} {X₁ Z : Subgroup G} (hp : p.Prime)
+    (hX₁card : Nat.card ↥X₁ = p) (hX₁MF : X₁ ≤ S15.MF M)
+    (hZKstar : Z ≤ Kstar) (hZcard : Nat.card ↥Z = p) (hX₁notZ : ¬ X₁ ≤ Z) :
+    K ⊓ Subgroup.centralizer (↑(opiCoreInG ({p} : Set ℕ) (S15.MF M)) : Set G) = ⊥ := by
+  classical
+  haveI : Fact p.Prime := ⟨hp⟩
+  set P : Subgroup G := opiCoreInG ({p} : Set ℕ) (S15.MF M) with hPdef
+  -- `K* = Z`: `|K*|` prime, `Z ≤ K*`, `|Z| = p`.
+  have hKstarPrime : (Nat.card ↥Kstar).Prime :=
+    S15.kstar_card_prime_of_inputs hG hM hP1 hKM hK hKstar
+  have hKstarEqZ : Kstar = Z := by
+    have hdvd : p ∣ Nat.card ↥Kstar := hZcard ▸ Subgroup.card_dvd_of_le hZKstar
+    have hcard : Nat.card ↥Kstar = p := ((Nat.prime_dvd_prime_iff_eq hp hKstarPrime).mp hdvd).symm
+    exact (Subgroup.eq_of_le_of_card_ge hZKstar (le_of_eq (hcard.trans hZcard.symm))).symm
+  -- `X₁ ≤ P` (`p`-subgroup of the nilpotent `M_F`).
+  haveI hMFnil : Group.IsNilpotent ↥(S15.MF M) := S15.maxNilpotentNormalHall_isNilpotent M
+  have hX₁pg : IsPGroup p ↥X₁ := IsPGroup.of_card (n := 1) (by rw [hX₁card, pow_one])
+  have hX₁P : X₁ ≤ P :=
+    OddOrder.BG.Ch2.S08.le_opiCoreInG_singleton_of_isPGroup_of_le_nilpotent hMFnil hX₁MF hX₁pg
+  -- A nonidentity `x ∈ K ⊓ C_G(P)` forces `X₁ ≤ K* = Z`, contradicting `X₁ ⊄ Z`.
+  rw [Subgroup.eq_bot_iff_forall]
+  intro x hx
+  by_contra hx1
+  obtain ⟨hxK, hxCP⟩ := Subgroup.mem_inf.mp hx
+  refine hX₁notZ ?_
+  rw [← hKstarEqZ,
+    ← centralizer_msigma_kappaElement_eq_kstar hG hM hP1.1 hKM hK hKstar hU hxK hx1]
+  refine le_inf (hX₁MF.trans (S15.maxNilpotentNormalHall_le_Msigma hG hM)) (fun g hg => ?_)
+  rw [Subgroup.mem_centralizer_iff]
+  intro y hy
+  rw [Set.mem_singleton_iff] at hy
+  subst hy
+  exact (Subgroup.mem_centralizer_iff.mp hxCP g (hX₁P hg)).symm
+
 /-- **`M_F` is non-abelian for a type-V maximal** (the abelian-`H` exclusion of Coq
 `nonTI_Fitting_structure`, the `P1maxM` branch): a type-`P₁` maximal subgroup `M` with `M_F = M_σ`
 has non-abelian `M_F`.  The type-`P` datum's `W₂ = C_{M'}(W₁#)` is nontrivial (`W2_nontrivial`) and
@@ -2690,6 +2741,76 @@ theorem pRank_opiCore_le_two_of_kappaHall [Finite G]
   rw [← hKcard] at hgdvd
   exact hKp1 hgdvd
 
+/-- **`O_p(M_F)` is a Sylow `p`-subgroup of `G`** (Coq `sylP_G`): for a maximal `M` with
+`M_F = M_σ` and `p ∈ σ(M)`, the `p`-core `P = O_p(M_F)` is a Sylow `p`-subgroup of `G`.
+
+`P` is a `{p}`-Hall (hence Sylow) subgroup of the nilpotent `M_F = M_σ`
+(`oPiCore_isHall_of_isNilpotent`: `p ∤ [M_F : P]`), so `|P| = p^{v_p(|M_F|)}` is the full `p`-part of
+`|M_σ|`; and since `M_σ` is the `σ`-Hall of `G` with `p ∈ σ` (`Msigma_isHall`: `p ∤ [G : M_σ]`), that
+`p`-part equals `v_p(|G|)`.  Thus `|P| = p^{v_p(|G|)}`, so `Sylow.ofCard` exhibits `P` as a Sylow
+`p`-subgroup of `G`.  This is the `mFT_rank2_Sylow_cprod` Sylow input for the type-V Singer case
+(`card_opiCore_eq_prime_cube_singer`). -/
+theorem exists_sylow_eq_opiCore_of_mf_eq_msigma [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} (hM : M ∈ maximalSubgroups G)
+    (hmf : S15.MF M = OddOrder.BG.Ch3.S10.Msigma M) {p : ℕ} (hp : p.Prime)
+    (hpσ : p ∈ OddOrder.BG.Ch3.S10.sigma M) :
+    ∃ S : Sylow p G, (S : Subgroup G) = opiCoreInG ({p} : Set ℕ) (S15.MF M) := by
+  classical
+  haveI : Fact p.Prime := ⟨hp⟩
+  haveI hMFnil : Group.IsNilpotent ↥(S15.MF M) := S15.maxNilpotentNormalHall_isNilpotent M
+  set P : Subgroup G := opiCoreInG ({p} : Set ℕ) (S15.MF M) with hPdef
+  -- `P` is a `p`-group: `|P| = p^a`.
+  have hPpg : IsPGroup p ↥P := isPGroup_opiCoreInG_singleton (S15.MF M)
+  obtain ⟨a, ha⟩ := IsPGroup.iff_card.mp hPpg
+  suffices hcard : Nat.card ↥P = p ^ (Nat.card G).factorization p by
+    exact ⟨Sylow.ofCard P hcard, Sylow.coe_ofCard P hcard⟩
+  -- `v_p(|M_F|) = a`: `P = O_p(M_F)` is a `{p}`-Hall of `M_F` (`p ∤ [M_F : P]`).
+  have hP'hall : Ch03.IsHallSubgroup ({p} : Set ℕ) (Ch03.oPiCore ({p} : Set ℕ) ↥(S15.MF M)) :=
+    OddOrder.BG.Ch3.S10.oPiCore_isHall_of_isNilpotent _
+  have hPcard : Nat.card ↥P = Nat.card ↥(Ch03.oPiCore ({p} : Set ℕ) ↥(S15.MF M)) :=
+    Subgroup.card_map_of_injective (S15.MF M).subtype_injective
+  have hpidxP : ¬ p ∣ (Ch03.oPiCore ({p} : Set ℕ) ↥(S15.MF M)).index := fun h =>
+    hP'hall.2 p (Nat.mem_primeFactors.mpr ⟨hp, h, Subgroup.index_ne_zero_of_finite⟩)
+      (Set.mem_singleton_iff.mpr rfl)
+  have hMFfact : (Nat.card ↥(S15.MF M)).factorization p = a := by
+    rw [← Subgroup.card_mul_index (Ch03.oPiCore ({p} : Set ℕ) ↥(S15.MF M)),
+      Nat.factorization_mul Nat.card_pos.ne' Subgroup.index_ne_zero_of_finite, Finsupp.add_apply,
+      Nat.factorization_eq_zero_of_not_dvd hpidxP, add_zero, ← hPcard, ha,
+      Nat.factorization_pow_self hp]
+  -- `v_p(|G|) = v_p(|M_σ|)`: `M_σ` is the `σ`-Hall of `G`, `p ∈ σ`, so `p ∤ [G : M_σ]`.
+  have hσHall := OddOrder.BG.Ch3.S10.Msigma_isHall hG hM
+  have hpidxσ : ¬ p ∣ (OddOrder.BG.Ch3.S10.Msigma M).index := fun h =>
+    hσHall.2 p (Nat.mem_primeFactors.mpr ⟨hp, h, Subgroup.index_ne_zero_of_finite⟩) hpσ
+  have hGa : (Nat.card G).factorization p = a := by
+    rw [← Subgroup.card_mul_index (OddOrder.BG.Ch3.S10.Msigma M),
+      Nat.factorization_mul Nat.card_pos.ne' Subgroup.index_ne_zero_of_finite, Finsupp.add_apply,
+      Nat.factorization_eq_zero_of_not_dvd hpidxσ, add_zero, ← hmf, hMFfact]
+  rw [ha, hGa]
+
+/-- **`|O_p(M_F)| = p³` in the type-V Singer case** (BG Theorem 15.7(e), Coq `dimP`/`oP`): the order
+of `P = O_p(M_F)` is `p³`.  The inputs `r(P) ≤ 2` (`hrPle2`, the `rPle2` step, discharged via the
+faithfulness brick `kappaHall_inf_centralizer_opiCore_eq_bot` + `pRank_opiCore_le_two_of_kappaHall`)
+and `P` non-abelian (`hPnab`) are in hand.
+
+The Sylow input `P = O_p(M_F)` is a Sylow `p`-subgroup of `G` is now discharged
+(`exists_sylow_eq_opiCore_of_mf_eq_msigma`, Coq `sylP_G`).  The remaining content is the **Blackburn
+rank-2 Sylow central-product structure** (`mFT_rank2_Sylow_cprod`, Coq §10.7b; Lean
+`S10.sylow_structure_b`, currently `private`): a Sylow `P` with `r(P) ≤ 2` and `P` non-abelian is a
+central product `S ∘ C` of a nonabelian `p³` `S = Ω₁` with cyclic `C`; with `Z(P) = K* = Ω₁(Z(P))` of
+order `p` (Coq `defZP`/`oZ0`, needing the coprime-action fact `coprime_odd_faithful_Ohm1`) the cyclic
+factor `C` collapses into `Z(P)`, leaving `|P| = |S| = p³`.  This is the genuinely-deep residual of
+disjunct 3 (issue 8015); `r(P) ≤ 2`, `P` non-abelian, and `P` Sylow of `G` are the discharged
+prerequisites. -/
+theorem card_opiCore_eq_prime_cube_singer [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} (hM : M ∈ maximalSubgroups G)
+    (hP1 : S14.IsTypeP1 M) (hmf : S15.MF M = OddOrder.BG.Ch3.S10.Msigma M)
+    {p : ℕ} (hp : p.Prime) (hpσ : p ∈ OddOrder.BG.Ch3.S10.sigma M)
+    (hpπ : p ∈ (Nat.card ↥(S15.MF M)).primeFactors)
+    (hrPle2 : pRank ↥(opiCoreInG ({p} : Set ℕ) (S15.MF M)) p ≤ 2)
+    (hPnab : ¬ IsMulCommutative ↥(opiCoreInG ({p} : Set ℕ) (S15.MF M))) :
+    Nat.card ↥(opiCoreInG ({p} : Set ℕ) (S15.MF M)) = p ^ 3 := by
+  sorry
+
 /-- **Prop 16.1 forward bridge `hP1eqV`, reduced to the Peterfalvi (8.8) trichotomy residual** — a
 type-`P₁` maximal subgroup with `M_F = M_σ` is of type V.
 
@@ -2722,7 +2843,7 @@ theorem isTypeV_of_isTypeP1_mf_eq_msigma [Finite G]
     -- (Coq `oZ`, `exists_orderQ_le_mf_normal_in_M_of_not_fittingIsTI`).
     haveI : IsSolvable ↥M := hG.solvable_of_mem_maximalSubgroups hM
     have hnab := not_isMulCommutative_mf_of_isTypeP1_mf_eq_msigma hG hM hP1 hmf
-    obtain ⟨g, p, X₁, -, hp, -, hX₁card, hX₁Mσ, -, hCGnotM, hrank3⟩ :=
+    obtain ⟨g, p, X₁, -, hp, hpσ, hX₁card, hX₁Mσ, -, hCGnotM, hrank3⟩ :=
       S15.exists_inf_conj_fitting_orderP_witness hG hM hTI
     haveI : Fact p.Prime := ⟨hp⟩
     have hX₁MF : X₁ ≤ S15.MF M := by
@@ -2751,7 +2872,7 @@ theorem isTypeV_of_isTypeP1_mf_eq_msigma [Finite G]
       (data.card_W1_eq_derived_index).trans
         (card_kappaHall_eq_derived_index hG hM hP1.1 hKM hK).symm
     -- The `M`-normal order-`p` `Z ≤ M_F = M_σ` normalized by `K`.
-    obtain ⟨Z, hZMF, hZcard, hZnorm⟩ :=
+    obtain ⟨Z, hZMF, hZcard, hZnorm, hX₁notZ⟩ :=
       S15.exists_orderQ_le_mf_normal_in_M_of_not_fittingIsTI hG hM hp hX₁card hX₁MF hCGnotM
         hrank3 hnab (q := p) hp hpπ
     have hZMσ : Z ≤ OddOrder.BG.Ch3.S10.Msigma M := hmf ▸ hZMF
@@ -2771,8 +2892,41 @@ theorem isTypeV_of_isTypeP1_mf_eq_msigma [Finite G]
       have hZK : Z ⊓ Kstar ≠ ⊥ := fun h => hdvd
         (hW1K ▸ kappaHall_card_dvd_sub_one_of_inf_kstar_eq_bot hG hM hP1.1 hKM hK hKstardef hU
           hZMσ hZcard hKNZ h)
+      -- `r(O_p(M_F)) ≤ 2` (Coq `rPle2`): faithfulness `K ⊓ C_G(P) = ⊥`
+      -- (`kappaHall_inf_centralizer_opiCore_eq_bot`, brick 4) + `pRank_opiCore_le_two_of_kappaHall`.
+      have hpodd : Odd p :=
+        hG.odd.of_dvd_nat ((Nat.dvd_of_mem_primeFactors hpπ).trans
+          (Subgroup.card_subgroup_dvd_card _))
+      have hKp' : ¬ p ∣ Nat.card ↥K := by
+        intro hdvdK
+        have hpfK : p ∈ (Nat.card ↥(K.subgroupOf M)).primeFactors := by
+          rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hKM).toEquiv]
+          exact Nat.mem_primeFactors.mpr ⟨hp, hdvdK, Nat.card_pos.ne'⟩
+        exact (S14.kappa_subset_sigmaCompl (hK.primeFactors_card_subset p hpfK)) hpσ
+      have hKnormP : K ≤ Subgroup.normalizer
+          (↑(opiCoreInG ({p} : Set ℕ) (S15.MF M)) : Set G) :=
+        hKM.trans (le_normalizer_opiCoreInG_of_le_normalizer ({p} : Set ℕ)
+          (S15.maxNilpotentNormalHall_le_normalizer M))
+      have hZKstar : Z ≤ Kstar := by
+        have hd : Nat.card ↥(Z ⊓ Kstar) ∣ p := hZcard ▸ Subgroup.card_dvd_of_le inf_le_left
+        rcases (Nat.dvd_prime hp).mp hd with h1 | hpp
+        · exact absurd (Subgroup.eq_bot_of_card_eq _ h1) hZK
+        · exact inf_eq_left.mp (Subgroup.eq_of_le_of_card_ge inf_le_left
+            (le_of_eq (hZcard.trans hpp.symm)))
+      have hrPle2 : pRank ↥(opiCoreInG ({p} : Set ℕ) (S15.MF M)) p ≤ 2 :=
+        pRank_opiCore_le_two_of_kappaHall hG hM hp hpodd hX₁card hX₁MF hrank3 hKp' hKnormP
+          (kappaHall_inf_centralizer_opiCore_eq_bot hG hM hP1 hKM hK hKstardef hU hp hX₁card hX₁MF
+            hZKstar hZcard hX₁notZ)
+          (hW1K ▸ hdvd)
+      -- `O_p(M_F)` is non-abelian (`opiCore_singleton_not_isMulCommutative_of_witness`).
+      have hPnab : ¬ IsMulCommutative ↥(opiCoreInG ({p} : Set ℕ) (S15.MF M)) :=
+        S15.opiCore_singleton_not_isMulCommutative_of_witness hG hM hp hX₁card hX₁MF hCGnotM hnab
       refine Or.inr (Or.inr ⟨p, hp, hHMF ▸ hpπ, ?_, ?_, hHMF ▸ hcyc⟩)
-      · sorry
+      · -- (sorry 1) `|O_p(M_F)| = p³`.  `r(P) ≤ 2` (`hrPle2`) and `P` non-abelian (`hPnab`) are in
+        -- hand; the residual is the `mFT_rank2_Sylow_cprod` central-product structure (Coq §10.7b,
+        -- Lean `sylow_structure_b`) once `P = O_p(M_F)` is a Sylow `p`-subgroup of `G`, together
+        -- with `|Z(P)| = p` (Coq `defZP`/`oZ0`).  Isolated in `card_opiCore_eq_prime_cube_singer`.
+        exact card_opiCore_eq_prime_cube_singer hG hM hP1 hmf hp hpσ hpπ hrPle2 hPnab
       · sorry
 
 /-- **Prop 16.1(d)/(f) reverse, `M_F = M_σ` from `U = ⊥`** (the `M_F = M_σ` conjunct of `hVP1`,
