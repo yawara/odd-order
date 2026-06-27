@@ -176,3 +176,52 @@ sorried, but now reduces to exactly:
 **Upstream-first priority for the next session**: (A) [§7 `Hypothesis71` construction for `(M,A(M))`,
 feasible] is the cleanest genuine next step; (10.7)/(B1) bottoms out on the §9 `Section11CharacterData`
 carrier (deep, shared with (11.8)).
+
+## 2026-06-27 (cont.) — (8.16) `N_G(A(M)) = M` proven; the §7 family input is now self-contained
+
+The upstream prerequisite of the §7 input (A) — the `M`-stability `hN : N_G(A(M)) = M` that
+`toHypothesis71` / `toFamilyHypothesis71` took as a *free parameter* — is now **proven**
+(`S12.Hypothesis.normalizer_typePA_eq`, axiom-clean, full build 3884 green, commit on lane-b).
+
+- **Statement** = Peterfalvi (8.16) for the type-`P` support `A(M) = typePA M`: for the genuine (10.1)
+  `Hypothesis M`, `Subgroup.normalizer (typePA M hyp.typeP) = M`.
+- **Proof** (pure group theory, no character data): the carried (8.15) datum gives
+  `N_G(A_0(M)) = M` (`hyp.dadeData.normalizer_eq`), where `A_0(M) = A(M) ∪ V^G`
+  (`typePA0 = typePA ∪ conjClassSet (typePV)`).
+  * `⊆`: `V^G = 𝒞_G(V)` is invariant under conjugation by **every** `g ∈ G` (new reusable
+    `OddOrder.GroupTheory.mem_conjClassSet_conj_iff`, `N_G(𝒞_G(T)) = G`), so an element normalizing
+    `A(M)` automatically normalizes the union `A_0(M)`, hence `N_G(A(M)) ⊆ N_G(A_0(M)) = M`.
+  * `⊇`: `A(M) = centralizerSupport (M#) M'` is `M`-invariant (`M` normalizes `M' = derivedInG M` by
+    `derivedInG_pointwise_smul` + `Subgroup.conj_smul_eq_self_of_mem`, permutes `M# = sharpSubgroup M`
+    by `image_sharpSubgroup`, and conjugates the `C_G({x})` condition elementwise).
+- **Effect**: `toHypothesis71` / `toFamilyHypothesis71` no longer take `hN`; they derive it internally
+  from `normalizer_typePA_eq`.  So **`hyp.toFamilyHypothesis71 : S09.FamilyHypothesis71 G 1` is now a
+  closed term from the genuine `Hypothesis`**, and `S09.family_inequality (hyp.toFamilyHypothesis71) χ hχ`
+  (Peterfalvi (10.8) line 81, the (7.5) family inequality for `(M, A(M))`) is directly applicable with
+  no external hypothesis.
+
+**Remaining for (A), after this** (unchanged otherwise): (ii) the `S09.Hypothesis78` (7.8.b) instance
+for `M` (the coherent extension `ν` from `coh` + the (7.8.c.i) `chiRho_eq_inner_beta` certificate),
+and (iii) the line-83 norm assembly [`family_inequality` (now applicable) + the landed `G₀`-drop
+`sum_zeta_tau1_normSq_ge_card` + `dadeSupport_restrict_subset` for `G₀ ⊆ famG₀` + sum monotonicity],
+then line 83 → 87 via `|A(M)|/|M| < 1/w₁` + (7.8.b).  (B1)/(10.7) remain §9-blocked
+(`S11.Section11CharacterData` carrier, shared with (11.8)).
+
+**Next**: the cleanest genuine next step is the `Hypothesis78` (7.8.b) instance for `M` (ii) — the
+last §7-input piece before the line-83 assembly; the deep `Section11CharacterData` carrier (the shared
+root of (10.7)/(11.8)) remains the W3 keystone.
+
+### ⚠ design finding for the next §7 step (ii) — the (7.8.b) `A = H#` requirement
+
+`S09.Hypothesis78` (and its base `Hypothesis76` (7.6)) requires `A = H \ {1}` for a **normal subgroup
+`H ⊴ L`** (`Hypothesis76.A_eq_H_sharp` / `H_normal_in_L`).  But `A(M) = typePA M =
+centralizerSupport (M#) M'` is a *centralizer-support* set, **not** `H#` for any single normal
+subgroup, so (7.8.b) does **not** apply to `(M, A(M))` directly — unlike (7.5), which needs only the
+(7.1)/(7.4) Dade data and so *does* apply to `(M, A(M))` (now enabled by `normalizer_typePA_eq`).
+
+In Peterfalvi (10.8) the (7.8.b) coherence bound `‖χ^ρ‖² ≥ 1 − ŵ₁/|M'|` is therefore applied to a
+**different normal-subgroup configuration** (the `ŵ₁/|M'|` form points at `H = M'` / the
+`(M'/M'')⋊W₁` Frobenius section, an `(M')#`-style `A`), not the type-`P` support `A(M)`.  ⟹ **before
+building (ii)**, read Pf (10.8) 04.12 lines 81–87 to fix *which* `(A, L)` / normal `H` the (7.8.b)
+instance is for; the "`Hypothesis78` for `M`" phrasing in earlier notes is imprecise on this point.
+The `(7.5)`-for-`(M, A(M))` side (line 81) is exactly the part `normalizer_typePA_eq` unblocks.

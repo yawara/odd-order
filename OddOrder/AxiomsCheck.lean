@@ -6308,6 +6308,21 @@ formula together with the prime computation `coprimeFrobeniusAction_card_eq_prim
 -- Axiom-clean.
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S10.card_Msigma_inf_centralizer_eq_card_W2
 
+-- **`𝒞_G(T)` conjugation-invariance** (shared `GroupTheory`) — `mem_conjClassSet_conj_iff`:
+-- `g * h * g⁻¹ ∈ 𝒞_G(T) ↔ h ∈ 𝒞_G(T)`, i.e. `N_G(𝒞_G(T)) = G`.  Pure group theory.  Used to prove
+-- the (8.16) normalizer fact below (the `V^G` half of `A_0(M) = A(M) ∪ V^G`).  Axiom-clean.
+#assert_only_allowed_axioms OddOrder.GroupTheory.mem_conjClassSet_conj_iff
+
+-- **Peterfalvi (8.16) for the type-`P` support `A(M)`** (lane-b W3, §7-input prerequisite) —
+-- `Hypothesis.normalizer_typePA_eq`: `N_G(A(M)) = M` for the genuine (10.1) `Hypothesis`.  From the
+-- carried `N_G(A_0(M)) = M` (`hyp.dadeData.normalizer_eq`, `A_0(M) = A(M) ∪ V^G`): `A(M) =
+-- centralizerSupport (M#) M'` is `M`-invariant (`derivedInG_pointwise_smul` /
+-- `conj_smul_eq_self_of_mem` / `image_sharpSubgroup`) and `V^G = 𝒞_G(V)` is conjugation-invariant
+-- under all of `G` (`mem_conjClassSet_conj_iff`), so `N_G(A(M)) ⊆ N_G(A_0(M)) = M ⊆ N_G(A(M))`.
+-- Pure group theory; discharges the formerly-parametrized `hN` of the §7 inputs
+-- `toHypothesis71` / `toFamilyHypothesis71` (Peterfalvi (10.8) line 79).  Axiom-clean.
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S12.Hypothesis.normalizer_typePA_eq
+
 -- **W4 §16→§7 bridge (lane-h, βM (14.11.2) de-opacification)** — `betaMExpansionData_of_hypothesis78`
 -- certifies that the (7.8.a) field of `BetaMExpansionData` (`β_M = 1_G − χ + Δ`) is a genuine
 -- consequence of the S09 §7 Dade decomposition
