@@ -2480,6 +2480,51 @@ theorem isTypeV_of_typePData {M : Subgroup G} (data : TypePData M)
     IsTypeV M :=
   ⟨{ typeP := data, U_eq_bot := hUbot, alternative := halt }⟩
 
+/-- **`M_F` is non-abelian for a type-V maximal** (the abelian-`H` exclusion of Coq
+`nonTI_Fitting_structure`, the `P1maxM` branch): a type-`P₁` maximal subgroup `M` with `M_F = M_σ`
+has non-abelian `M_F`.  The type-`P` datum's `W₂ = C_{M'}(W₁#)` is nontrivial (`W2_nontrivial`) and
+lies in `M''` (`W2_le`); but `M' = M_σ = M_F` here, so `M'' = (M_F)'`, whence `(M_F)' ⊇ W₂ ≠ ⊥`,
+i.e. `M_F` is non-abelian.  (Equivalently: were `M_F` abelian, `M'' = ⊥` would force `W₂ = ⊥`.) -/
+theorem not_isMulCommutative_mf_of_isTypeP1_mf_eq_msigma [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} (hM : M ∈ maximalSubgroups G)
+    (hP1 : S14.IsTypeP1 M) (hmf : S15.MF M = OddOrder.BG.Ch3.S10.Msigma M) :
+    ¬ IsMulCommutative ↥(S15.MF M) := by
+  intro hab
+  haveI := hab
+  set data := typePData_of_isTypeP1_mf_eq_msigma hG hM hP1 hmf with hdata
+  -- `M' = M_σ = M_F`, so `M'' = (M_F)' = ⊥` (were `M_F` abelian).
+  have hM'MF : derivedInG M = S15.MF M :=
+    (isTypeP1_derivedInG_eq_Msigma hG hM hP1).trans hmf.symm
+  have hM''bot : secondDerivedInAmbient M = ⊥ := by
+    rw [secondDerivedInAmbient, hM'MF,
+      show derivedInG (S15.MF M) = (commutator ↥(S15.MF M)).map (S15.MF M).subtype from rfl,
+      commutator_eq_bot, Subgroup.map_bot]
+  exact data.W2_nontrivial (le_bot_iff.mp ((data.W2_le.trans inf_le_right).trans hM''bot.le))
+
+/-- **Common part of the Peterfalvi (8.8) trichotomy for type V** (Coq `cycHp'` + non-TI witness):
+a type-`P₁` maximal `M` with `M_F = M_σ` and `¬FittingIsTI M` has a prime `p ∈ π(M_F)` with cyclic
+`p'`-core `O_{p'}(M_F)` — the shared conclusion of disjuncts `(e2)`/`(e3)` of BG Theorem 15.7(e).
+`M_F` is non-abelian (`not_isMulCommutative_mf_of_isTypeP1_mf_eq_msigma`); the non-TI witness
+`X₁ ≤ M_σ = M_F` with `C_G(X₁) ⊄ M` (`exists_inf_conj_fitting_orderP_witness`) then feeds the
+`cycHp'` building block `typeF_nonabelian_cyclic_opiCore_compl`.  The remaining `|W₁| ∣ p ∓ 1`
+divisibility (which distinguishes disjunct 2 from disjunct 3) is the genuinely-deep `W₁`-action
+residual. -/
+theorem exists_prime_cyclic_opiCore_compl_of_isTypeV [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} (hM : M ∈ maximalSubgroups G)
+    (hP1 : S14.IsTypeP1 M) (hmf : S15.MF M = OddOrder.BG.Ch3.S10.Msigma M)
+    (hnotTI : ¬ S15.FittingIsTI M) :
+    ∃ p : ℕ, p.Prime ∧ p ∈ (Nat.card ↥(S15.MF M)).primeFactors ∧
+      IsCyclic ↥(opiCoreInG (({p} : Set ℕ)ᶜ) (S15.MF M)) := by
+  have hnab := not_isMulCommutative_mf_of_isTypeP1_mf_eq_msigma hG hM hP1 hmf
+  obtain ⟨g, p, X₁, -, hp, -, hX₁card, hX₁Mσ, -, hCGnotM, -⟩ :=
+    S15.exists_inf_conj_fitting_orderP_witness hG hM hnotTI
+  -- `X₁ ≤ M_σ = M_F` (`mf_eq_msigma_of_not_fittingIsTI`).
+  have hX₁MF : X₁ ≤ S15.MF M := by
+    rw [S15.mf_eq_msigma_of_not_fittingIsTI hG hM hnotTI]; exact hX₁Mσ
+  obtain ⟨hpπ, hcyc⟩ :=
+    S15.typeF_nonabelian_cyclic_opiCore_compl hG hM hp hX₁card hX₁MF hCGnotM hnab
+  exact ⟨p, hp, hpπ, hcyc⟩
+
 /-- **Prop 16.1 forward bridge `hP1eqV`, reduced to the Peterfalvi (8.8) trichotomy residual** — a
 type-`P₁` maximal subgroup with `M_F = M_σ` is of type V.
 
@@ -2502,13 +2547,25 @@ theorem isTypeV_of_isTypeP1_mf_eq_msigma [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} (hM : M ∈ maximalSubgroups G)
     (hP1 : S14.IsTypeP1 M) (hmf : S15.MF M = OddOrder.BG.Ch3.S10.Msigma M) :
     OddOrder.GroupTheory.IsTypeV M := by
-  refine isTypeV_of_typePData (typePData_of_isTypeP1_mf_eq_msigma hG hM hP1 hmf) rfl ?_
+  set data := typePData_of_isTypeP1_mf_eq_msigma hG hM hP1 hmf with hdata
+  refine isTypeV_of_typePData data rfl ?_
   by_cases hTI : S15.FittingIsTI M
   · -- `F(M)` TI ⟹ disjunct (a): `M_F#` is a `TI`-subset (same as the type-`F` bridge).
     exact Or.inl (maxNilpotentNormalHall_sharp_isTISubset_of_fittingIsTI hG hM hTI)
-  · -- `¬FittingIsTI` ⟹ the deep Peterfalvi (8.8) Suzuki cases (b)/(c): `M_F` rank-2 abelian with
-    -- `|W₁| ∣ p - 1`, or `O_p(M_F) = p³` with `|W₁| ∣ p + 1` (Coq `nonTI_Fitting_structure`).
-    sorry
+  · -- `¬FittingIsTI` ⟹ disjuncts (e2)/(e3): the witness prime `p` with cyclic `O_{p'}(M_F)`
+    -- (`exists_prime_cyclic_opiCore_compl_of_isTypeV`, Coq `cycHp'`), and the deep `|W₁| ∣ p ∓ 1`
+    -- divisibility distinguishing the two (Coq `regZq_dv_q1` + the `p³` `Z₀` analysis).
+    obtain ⟨p, hp, hpπ, hcyc⟩ := exists_prime_cyclic_opiCore_compl_of_isTypeV hG hM hP1 hmf hTI
+    have hHMF : data.H = S15.MF M := data.H_eq
+    -- **Residual** (the genuinely-deep `W₁`-action core, Coq `nonTI_Fitting_structure` (e2)/(e3)):
+    -- `W₁ = K` acts on `Z_p = Ω₁(Z(O_p(M_F)))` with `|W₁| ∣ p − 1`, unless `|O_p(M_F)| = p³` and
+    -- `|W₁| ∣ p + 1` (the `SL₂(p)`/Suzuki case).  Needs `|Z₀|` prime (Lemma 10.13(b)/Cor 15.3(b)).
+    have hdiv : Nat.card ↥data.W1 ∣ p - 1 ∨
+        (Nat.card ↥(opiCoreInG ({p} : Set ℕ) data.H) = p ^ 3 ∧ Nat.card ↥data.W1 ∣ p + 1) := by
+      sorry
+    rcases hdiv with h1 | ⟨h3, h1⟩
+    · exact Or.inr (Or.inl ⟨p, hp, hHMF ▸ hpπ, h1, hHMF ▸ hcyc⟩)
+    · exact Or.inr (Or.inr ⟨p, hp, hHMF ▸ hpπ, h3, h1, hHMF ▸ hcyc⟩)
 
 /-- **Prop 16.1(d)/(f) reverse, `M_F = M_σ` from `U = ⊥`** (the `M_F = M_σ` conjunct of `hVP1`,
 mmd L4478): a type-`P` datum with trivial complement `U = ⊥` has `M_F = M_σ`.  Sandwiching:

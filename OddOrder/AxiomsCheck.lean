@@ -5598,6 +5598,20 @@ residual.  All three axiom-clean. -/
   OddOrder.BG.Ch4.S16.fittingInAmbient_eq_maxNilpotentNormalHall_of_isTypeP1_mf_eq_msigma
 #assert_only_allowed_axioms OddOrder.BG.Ch4.S16.typePData_of_isTypeP1_mf_eq_msigma
 
+/-! **Type-V trichotomy common part** (`S16_MainResults`, issue 8015, the `hP1eqV` (8.8) residual):
+the two proved building blocks of the Peterfalvi (8.8) `(e2)/(e3)` disjunction.  `M_F` is non-abelian
+for any type-V maximal (`not_isMulCommutative_mf_of_isTypeP1_mf_eq_msigma`: the datum's
+`W₂ ⊆ M'' = (M_F)'` is nontrivial, the Coq abelian-`H` exclusion), and `¬FittingIsTI` yields a
+witness prime `p ∈ π(M_F)` with cyclic `O_{p'}(M_F)`
+(`exists_prime_cyclic_opiCore_compl_of_isTypeV`: the shared non-TI witness
+`exists_inf_conj_fitting_orderP_witness` fed to the `cycHp'` block).  These reduce the `hP1eqV`
+trichotomy to the lone `|W₁| ∣ p ∓ 1` `W₁`-action divisibility.  Both axiom-clean. -/
+
+#assert_only_allowed_axioms
+  OddOrder.BG.Ch4.S16.not_isMulCommutative_mf_of_isTypeP1_mf_eq_msigma
+#assert_only_allowed_axioms
+  OddOrder.BG.Ch4.S16.exists_prime_cyclic_opiCore_compl_of_isTypeV
+
 /-! **Type-`P₁` `M_F`-internal complement** (`S16_MainResults`, `exists_typeP1_mf_complement`, the
 construction core of the FT-critical `hP1neIIIIV` bridge): `M_F` has a `K`-invariant complement `U`
 inside `M' = M_σ` (`M_F ⊔ U = M'`, `K ≤ N_G(U)`, `M_F ⊓ U = ⊥`).  The `K`-invariant
