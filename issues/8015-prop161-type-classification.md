@@ -721,3 +721,28 @@ quasi-regular cyclic eigenspace Prop 2.4) で faithful ポートは大仕事 (S0
 5. |K|∣p+1: route B (SL₂(p) symplectic torus、初等)。最大の残工。
 
 これは bounded な assembly + SL₂ torus 論で、「§2.5 repr の multi-week ポート」ではない。
+
+### 2026-06-27⁹ (lane-f): route B の Singer 段は `SingerField.lean` でポート済 — 追加 de-risk
+
+route B (|K|∣p+1) を更に精読。**Singer 機構は `OddOrder/GroupTheory/RepresentationTheory/SingerField.lean`
+にポート済**で、SL₂ torus 経路が大幅短縮:
+- `nonempty_singerFieldData` (SingerField:101): 有限 abelian `C` が elem abelian p-群 `M` に **F_p-既約**
+  作用 (`IsSimpleModule (MonoidAlgebra (ZMod p) C) M`) ⟹ M は体 `K`、C は乗法作用 (`μ : C →* Kˣ`, compat)。
+- `nonempty_ringEquiv_galoisField` (SingerField:83): |M|=p^n ⟹ K ≅ GF(p^n)。
+- `card_K_eq`: |K|=|M|。
+
+⟹ **route B 整理 (上流順、sorry 1 |P|=p³ が前提)**:
+1. **|P|=p³ (sorry 1) 先決**: rPle2 (Thm 5.5(b) `solvableAut_of_narrow`) → |P|=p³ (Blackburn §4 +
+   `of_card_eq_prime_cube`)。route B の V=P/Z(P)≅F_p² module setup の前提。
+2. V=P/Z(P): extraspecial ⟹ |V|=p², elem abelian。K-action (共役)。
+3. **既約性**: K cyclic semisimple (coprime p)、FPF (prime action C_P(k)=Z(P))、¬|K|∣p-1 ⟹ V 既約
+   (可約なら split torus で |K|∣p-1 矛盾)。= `IsSimpleModule (MonoidAlgebra (ZMod p) K) V`。
+4. **Singer**: `nonempty_singerFieldData` + galoisField ⟹ V≅GF(p²)、μ: K↪GF(p²)ˣ (faithful ゆえ injective)。
+5. **det 1 ⟹ μ(k)^(p+1)=1**: extraspecial 交換子 ⟹ V に symplectic form、K 保存 (Z(P) 中心化) ⟹
+   det(K-action)=1。det = Algebra.norm(μ k) = (μ k)^(1+p) (GF(p²) norm) ⟹ μ(k)^(p+1)=1。
+6. **|K|∣p+1**: K cyclic gen g、|K|=orderOf g = orderOf(μ g) (μ inj, `orderOf_injective`)、
+   (μ g)^(p+1)=1 ⟹ orderOf(μ g)∣p+1 (`orderOf_dvd_of_pow_eq_one`) ⟹ |K|∣p+1。
+
+**残る genuine 工 (sorry 1 後)**: 既約性判定 (step 3)、symplectic form + det=norm (step 5)。
+両者とも mathlib の Representation/Algebra.norm + IsExtraspecial 構造で形式化可能 (multi-session だが
+全ピース所在確定、ChatGPT 不要)。**次セッション = sorry 1 (|P|=p³) を Thm 5.5(b) + Blackburn で着手**。
