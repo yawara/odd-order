@@ -222,6 +222,34 @@ theorem commutator_sup_pow_closure_le_frattini
     rintro _ ⟨x, rfl⟩
     exact pow_mem_frattini hR x
 
+/-! ## Burnside basis (cyclic case) -/
+
+/-- **Burnside basis theorem (cyclic case)**: a finite group whose Frattini quotient is cyclic is
+itself cyclic.  If `R/Φ(R) = ⟨ḡ⟩` with `ḡ = ḡ` the image of `g`, then `⟨g⟩ ⊔ Φ(R)` maps onto
+`R/Φ(R)` and contains `ker = Φ(R)`, so it is all of `R`; `frattini_nongenerating` then upgrades
+`⟨g⟩ ⊔ Φ(R) = ⊤` to `⟨g⟩ = ⊤`.
+
+Stated for any finite group (the `p`-group hypotheses of this namespace are unused); kept here as
+the natural home of the Frattini-quotient API.  Used in `IsExtraspecial.of_card_eq_prime_cube`. -/
+theorem _root_.OddOrder.GroupTheory.isCyclic_of_isCyclic_quotient_frattini {G : Type*} [Group G]
+    [Finite G] (h : IsCyclic (G ⧸ frattini G)) : IsCyclic G := by
+  haveI := h
+  obtain ⟨gbar, hgbar⟩ := IsCyclic.exists_generator (α := G ⧸ frattini G)
+  obtain ⟨g, rfl⟩ := QuotientGroup.mk'_surjective (frattini G) gbar
+  have htop : Subgroup.zpowers g ⊔ frattini G = ⊤ := by
+    rw [eq_top_iff]
+    intro x _
+    obtain ⟨n, hn⟩ := Subgroup.mem_zpowers_iff.mp (hgbar (QuotientGroup.mk' (frattini G) x))
+    -- `hn : (mk' g) ^ n = mk' x`, so `(gⁿ)⁻¹ x ∈ ker (mk') = Φ(G)`.
+    have hφ : (g ^ n)⁻¹ * x ∈ frattini G := by
+      rw [← QuotientGroup.ker_mk' (N := frattini G), MonoidHom.mem_ker, map_mul, map_inv, map_zpow,
+        hn, inv_mul_cancel]
+    have hx : x = g ^ n * ((g ^ n)⁻¹ * x) := by group
+    rw [hx]
+    exact Subgroup.mul_mem_sup (Subgroup.mem_zpowers_iff.mpr ⟨n, rfl⟩) hφ
+  have hgtop : Subgroup.zpowers g = ⊤ := frattini_nongenerating htop
+  exact ⟨g, fun x => hgtop.ge (Subgroup.mem_top x)⟩
+
 end IsPGroup
 
 end OddOrder.GroupTheory

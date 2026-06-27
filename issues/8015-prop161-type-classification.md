@@ -634,3 +634,90 @@ wiring (isTypeV ¬FittingIsTI case): witness (exists_inf_conj) + cycHp' + |Z0|=p
 P=O_p(M_F) extraspecial of order p³ + K⊆Singer cyclic ⟹ |K|∣p+1。要 extraspecial 群論 +
 Singer cycle/GL₂(p) 作用 (Coq defKs/defZP/rPle2 + `basic_p2maxElem_structure`)。**次セッション =
 disjunct 3 の extraspecial/Singer 形式化** (genuine 最深、新インフラ大)。
+
+### 2026-06-27⁷ (lane-f): disjunct 3 着手 — by_cases 再構成 + `p3group_extraspecial` 前提を実証明
+
+disjunct 3 (Singer p³) の formalization に着手。深い 3 BG 前提に bottom-out すると確定したため、上流の
+再利用可能 prerequisite から積み上げ開始。
+
+**landed (2 commit):**
+1. **`isTypeV_of_isTypeP1_mf_eq_msigma` の (e3) ケースを `by_cases |W₁|∣p-1` に再構成** (commit `99c49650`,
+   build green): Coq `nonTI_Fitting_structure` の実分岐 (`Ks=Z0 → |K|∣p-1`) に整合。
+   - |W₁|∣p-1 成立 → disjunct (e2) 直接 (cyclic O_{p'} = hcyc)。
+   - ¬(|W₁|∣p-1) → disjunct (e3)。このとき Z⊓Kstar≠⊥ (Frobenius engine の対偶) ⟹ Z≤Kstar=Z0=Z(P)。
+   - **正しさの改善**: 旧コードは Z⊓Kstar≠⊥ ∧ |K|∣p-1 の sub-case で偽の goal |K|∣p+1 を追っていた。
+     新構成で (e3) 枝が Singer 仮説 `¬(|W₁|∣p-1)` を保持。
+2. **`IsExtraspecial.of_card_eq_prime_cube` (= Coq `p3group_extraspecial`) を実証明** (sorry-free +
+   axiom-clean、AxiomsCheck 登録、`OddOrder/GroupTheory/IsExtraspecial.lean`): **非可換 p³ 群は
+   extraspecial** (`Z=[G,G]=Φ(G)`, `|Z|=p`)。disjunct 3 で P=O_p(M_F) を extraspecial に格上げする構造ステップ。
+   - |Z|=p: `card_center_eq_prime_pow` (|Z|=p^k, k>0) + k=3 排除 (Z=⊤⟹abelian) + k=2 排除
+     (G/Z cyclic⟹abelian, `commutative_of_cyclic_center_quotient`)。
+   - [G,G]=Z: G/Z 位数 p² ⟹ abelian (`IsPGroup.commutative_of_card_eq_prime_sq`) ⟹ [G,G]≤Z; 非可換ゆえ
+     [G,G]≠⊥; |Z|=p prime ⟹ =Z。
+   - Φ=Z: Z=[G,G]≤Φ (`commutator_sup_pow_closure_le_frattini`); |Φ|=p² 排除は新 helper Burnside basis。
+   - **新 Burnside helper `isCyclic_of_isCyclic_quotient_frattini`** (`FrattiniPGroup.lean`、汎用 finite
+     group、sorry-free+axiom-clean+AxiomsCheck): G/Φ cyclic ⟹ G cyclic (`frattini_nongenerating` 経由)。
+
+**インフラ調査結論 (Explore + 手動、disjunct 3 の depth 確定)**:
+OddOrder に**既存**: `IsExtraspecial`/`IsCentralProduct`/`IsNarrow` (NarrowPGroup) + narrow 特徴付け
+(`S05_NarrowCharacterization`, BG §5 Lem 5.2) + `IsFrobeniusAction`+`card_dvd_sub_one_of_isFrobeniusAction`
+(p-1 engine) + GL₂(p) 位数 (`S7A1_JpGL2p`, `card_gl2_zmod_prime`=p(p-1)²(p+1)) + p-群 small-rank 大量
+(`S04_PGroupsSmallRank`/`S04d_GorThm415`=`pRank_le_two_of_scn3_empty`/`S04f_Blackburn`)。
+**未ポート (Coq のみ、disjunct 3 の真の gate)**:
+- **`mFT_rank2_Sylow_cprod`** (BG §10.7b, `coq/BGsection10.v:699`): 非可換 rank≤2 p-群 = extraspecial p³ ∘
+  cyclic の中心積。`rank2_coprime_comm_cprod` (BGappendix) に依存。→ **sorry 1 (|P|=p³)** の核。
+- **`repr_extraspecial_prime_sdprod_cycle`** (BG §2.5, `coq/BGsection2.v:580`): extraspecial P ⋊ cyclic K
+  (prime action C_P(k)=Z(P)) ⟹ |K| ∣ p^n±1。→ **sorry 2 (|K|∣p+1)** の核。
+- **`Aut_narrow`** (BGappendix): narrow p-群の coprime odd cyclic 自己同型は r(P)>2 で |K|∣p-1。
+  → Coq `rPle2` (r(P)≤2) の gate (¬|K|∣p-1 と矛盾)。
+
+**sorry 2 (|K|∣p+1) の数学的核心 (確定)**: K cyclic が P/Z(P)≅F_p² に prime action (C_P(k)=Z) で作用
+⟹ K↪GL₂(p) を FPF (固有値1なし) + **K は交換子形式を保存** (K が Z(P)=Ks を中心化) ⟹ **K≤Sp₂=SL₂(p)**、
+かつ既約 (¬|K|∣p-1 ⟹ split torus 排除) ⟹ K≤Singer F_{p²}^*、**SL₂∩Singer=norm-1 部分群=位数 p+1** ⟹ |K|∣p+1。
+mathlib に `GaloisField` (F_{p²}) はあるが Singer torus/Schur/non-split torus は未整備 → 要新インフラ。
+
+**残 = disjunct 3 の 2 sorry (genuine multi-week)**: `S16_MainResults.lean` の
+`isTypeV_of_isTypeP1_mf_eq_msigma` (e3) 枝、`Nat.card ↥(opiCoreInG {p} (S15.MF M)) = p³` と
+`Nat.card ↥data.W1 ∣ p+1`。両者とも上記 3 BG 前提 (appendix Aut_narrow + §2.5 Singer + §10.7b cprod) の
+ポートを要する。次の上流ステップ候補: (a) `mFT_rank2_Sylow_cprod` (rank-2 Sylow cprod、narrow 特徴付け
+S05 + Blackburn を活用)、(b) SL₂∩Singer divisibility (F_{p²} non-split torus、`p3group_extraspecial` の
+extraspecial 構造を入力)。`p3group_extraspecial` は (b) の P-extraspecial 入力を供給する down-payment。
+
+### 2026-06-27⁸ (lane-f): disjunct 3 de-risk — 文献+Coq 精読で scope 大幅縮小 (ユーザー方針: 文献→Coq→必要なら ChatGPT)
+
+ユーザー裁可「まず文献と Coq で確認、gap が埋まらなければ ChatGPT」に従い disjunct 3 の 3 前提を精読。
+**「multi-week の §2/§10/appendix 未ポート」評価を訂正** — 主要機構はポート済で scope は大幅縮小:
+
+**重要訂正 1: `Aut_narrow` は appendix でなく BG §5、かつ完全ポート済**。
+`solvableAut_of_narrow` (`S05_NarrowAutomorphisms.lean:976` = BG Thm 5.5) が:
+- (a) A/O_p(A) abelian p'-群
+- **(b) `3 ≤ pRank R p → ∀ a:A, Coprime(orderOf a) p → orderOf a ∣ (p-1)`** ← Coq `rPle2` の核心
+- **(c) `(card A).Prime → ¬card A∣p(p-1) → card A ∣ (p+1)/2 ∧ (R=[R,A] ∧ ¬abelian R → card R = p³)`**
+を供給。⟹ **rPle2 (r(P)≤2) は Thm 5.5(b) で到達可能** (r(P)>2 ⟹ |K|∣p-1 で ¬|K|∣p-1 と矛盾)。
+
+**重要訂正 2: |P|=p³ は BG §4 Blackburn 部品で到達可能**。`S04f_Blackburn`:
+- `card_le_prime_cube_of_pRank_le_two_of_exponent_prime` (rank≤2 + exp p ⟹ card≤p³)
+- `omega1_large_card_eq_prime_cube_and_pow_eq_one` (p>3, rank≤2, |Ω₁|>p² ⟹ |Ω₁|=p³)
++ Thm 5.5(c) の `card R = p³`。`mFT_rank2_Sylow_cprod` (Coq §10.7b) も最終ステップで
+**`p3group_extraspecial` を使用** (BGsection10.v:717、`have[||[]]:=p3group_extraspecial pS`) = 私の
+`of_card_eq_prime_cube` が genuine prerequisite と裏付け。
+
+**残る真の gap = |K|∣p+1 (sorry 2)**: Coq は `repr_extraspecial_prime_sdprod_cycle` (BG §2.5 Thm 2.5,
+`BGsection2.v:580`) を使うが、これは **重い matrix 表現論** (`mx_irreducible`/`mx_Maschke`/`rfix_mx`/
+quasi-regular cyclic eigenspace Prop 2.4) で faithful ポートは大仕事 (S02_Representations は §2E stub)。
+**⟹ 回避ルート (route B) = 初等的 SL₂(p) symplectic torus 経路**:
+- P extraspecial p³ ⟹ V=P/Z(P)≅F_p² + 交換子 symplectic form。
+- K acts on V (共役)、K が Z(P) を中心化 ⟹ form 保存 ⟹ **K↪Sp₂(p)=SL₂(p)**。
+- prime action C_P(k)=Z(P) ⟹ K FPF on V (固有値1なし)。
+- K cyclic semisimple (coprime p) ⟹ split/non-split torus。¬|K|∣p-1 ⟹ non-split ⟹ **|K|∣p+1**。
+- `S7A1_JpGL2p` (Isaacs Ch07) の GL₂(p) 機構 (`card_gl2_zmod_prime`=p(p-1)²(p+1)、SL₂、`sl2_unique_involution`)
+  を活用。SL₂(p) torus 分類 (cyclic abelian ⟹ split∣p-1 / non-split∣p+1) を要形式化。
+
+**⟹ 改訂計画 (上流順、全て gap 埋まる、ChatGPT 不要)**:
+1. `IsNarrow p P` 確立 (P=O_p(M_F)、B=X₁×Z0 が p2maxElem rank 2 から) — Thm 5.5 適用の前提。
+2. K の P への faithful 作用 (K→MulAut P、C_K(P)=1) setup。
+3. rPle2: Thm 5.5(b) で r(P)≤2 (¬|K|∣p-1 contra)。
+4. |P|=p³: Blackburn (rank≤2 + nonabelian + |Z|=p) + `of_card_eq_prime_cube` で extraspecial。
+5. |K|∣p+1: route B (SL₂(p) symplectic torus、初等)。最大の残工。
+
+これは bounded な assembly + SL₂ torus 論で、「§2.5 repr の multi-week ポート」ではない。
