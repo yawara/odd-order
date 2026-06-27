@@ -108,11 +108,13 @@ carrier を genuine 化したことで、free-field 時代に **vacuous だっ�
 - [x] **A**: carrier 再設計 = families (commit `9c41978a`) + subgroups (commit `153e866a`) 全 genuine。
       残 free field = u (pin 済) / tau・H0CprimeSupport (S12-Dade layer) / quotientSemidirectFrobenius
       ((9.10) output) / CliffordCaseBData.field_model・Ubar_cyclic (下記、struct instance plumbing で True 据置)。
-- [ ] **B: case-(b) (9.9)/(9.10)** — Singer field model。**✅ 構造核 FPF + character-side FPF landed**
-      (2026-06-28、下記節): `chiefFactor_caseB_action_fpf` (H̄⋊Ū Frobenius) + `eq_one_of_invariant_of_fixedPointFree`
-      (FPF ⟹ nontrivial char 非invariant)。残 = これらを `ClassFunction.inertia`/`mem_inertia_compHom_iff`
-      に wire して I(θ)∩U=C → (9.9.a) degree-u Clifford (`isIrreducibleCharacter_induce_of_inertia_eq`)、
-      `|𝒮(H₀)| reducible-count = p−1` = (4.5)/(4.7) Dade on L=M/H₀ (S06 cite + 商 inflation)、(9.9.c) 例外含意。
+- [ ] **B: case-(b) (9.9)/(9.10)** — Singer field model。**✅ 構造核 FPF + char-side FPF + inertia 核 +
+      abstract inertia reduction landed** (2026-06-28、下記節): `chiefFactor_caseB_action_fpf` (H̄⋊Ū Frobenius) +
+      `chiefFactor_caseB_char_inertia` (θ̄ φU(g)-inv ⟹ φU(g)=1) + `caseB_char_inertia_inflation` (cont.⁵:
+      typeP_conjAction-inv ⟹ φU(g)=1)。**(9.9.a) inertia は単一の残 step に縮小** = conjBy↔typeP_conjAction
+      realization (H-in-HU ≅ ↥H 同定)。残 = その realization + (9.9.a) degree-u Clifford
+      (`isIrreducibleCharacter_induce_of_inertia_eq`)、`|𝒮(H₀)| reducible-count = p−1` = (4.5)/(4.7) Dade on
+      L=M/H₀ (S06 cite + 商 inflation)、(9.9.c) 例外含意。
 - [ ] **C: case-(a) (9.8)** — (9.8.b,c) = (8.4.d)+(4.5)/(4.7) Dade for L=M/H₀ + θ=θ₁…θ_q1_C 構成;
       (9.8.d) = degree-qa 構成 + inertia counting (`card_filter_induce_eq_index_inertia`)。
       case-(a) factor 構造 (`CliffordCaseAData.Hpart`/`a`) を使う。
@@ -223,6 +225,32 @@ Ind^M qu (degree infra 済)。**inertia の数学核は終わり、残は Cliffo
 コンテキストで供給不能** (haveI 不可)。⟹ True 据置、FPF は standalone lemma で供給。B の (9.9) 証明では
 `caseB_character_counts` に hcaseB を追加引数する (or clifford_dichotomy 経由) ことで `chiefFactor_caseB_action_fpf`
 を cite して FPF を得る (struct plumbing を避ける pragmatic な access pattern)。
+
+## 2026-06-28 (cont.⁵): abstract inertia reduction landed — (9.9.a) inertia が単一 step に縮小 (commit `599c9dad`)
+
+cont.⁴ の inertia 核 `chiefFactor_caseB_char_inertia` (abstract: θ̄ φU(g)-invariant ⟹ φU(g)=1) を、
+concrete な χ∈Irr(HU) の inertia 解析へ繋ぐ抽象側の bridge を 2 補題で締めた (両 sorry-free +
+axiom-clean + AxiomsCheck 登録、full build 3884 green):
+
+- **`compHom_typeP_conjAction_inflation`** (Lemma A、純代数、証明 `rfl`): 膨張
+  `compHom (mk' N) : ClassFunction(↥H/N) → ClassFunction ↥H` が共役作用 `typeP_conjAction a` (↥H 上) と
+  降下作用 `quotientMulAutHom a` (chief factor ↥H/N 上) を **intertwine** する
+  (`compHom (typeP_conjAction a) (compHom (mk' N) θ̄) = compHom (mk' N) (compHom (quotientMulAutHom a) θ̄)`)。
+  `quotientMulAutHom_apply_mk'` (`mk' N (a·h) = a·(mk' N h)`、rfl) が核。
+- **`caseB_char_inertia_inflation`** (Lemma B): case-(b) で nontrivial irreducible θ̄ の膨張が
+  `typeP_conjAction ((act.U.subtype) g)`-invariant ⟹ **φU(g)=1** (g∈C)。Lemma A で invariance を
+  `compHom (mk' N) (φU(g)·θ̄) = compHom (mk' N) θ̄` に書換 → `compHom_injective_of_surjective` (mk' N 全射) で
+  θ̄ が φU(g)-invariant → `chiefFactor_caseB_char_inertia` で φU(g)=1。
+
+**∴ (9.9.a) の character-side inertia `I_U(θ)⊆C` は単一の残 step に縮小**: concrete HU-conjugation inertia
+(`ClassFunction.conjBy in HU` 上、χ∈Irr(HU) の Res_H constituent θ の inertia) から Lemma B の入力
+(`typeP_conjAction`-invariance of the inflation) を生む **conjBy↔typeP_conjAction realization**
+(= H-in-HU `(H.subgroupOf M).subgroupOf HU` ≅ ↥data.H の同定 + conjBy(u:HU) = typeP_conjAction(u) の照合)。
+S08 `inertia_eq_H_of_c2` が (6.8)(c2) で同型の realization を `mem_inertia_compHom_iff` 経由で実装済 = template。
+
+**残 (9.9.a)** = (i) conjBy↔typeP_conjAction realization (上記、唯一の plumbing 残)、(ii) χ∈Irr(HU) の
+Res_H から nontrivial constituent θ (H₀⊆ker) を取り出す + Clifford 誘導次数 χ=Ind_{HC}^{HU}(linear) degree u →
+Ind^M qu (degree infra `induceHU_apply_one_eq_q_mul` 済)。**inertia 数学核は完了、残は realization + Clifford 取り出し**。
 
 ## 完了条件
 
