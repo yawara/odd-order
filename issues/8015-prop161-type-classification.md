@@ -774,3 +774,36 @@ rank≤2 + [R,A]=R + 非可換 ⟹ central product (extraspecial p³ ∘ cyclic)
 **残 brick (全ピース located)**: (4) faithfulness、(5) |P|=p³ (P=Sylow_p(G) + Thm 4.16 + |Z(P)|=p、
 |Z(P)|=p は Z(P)⊆Kstar=Z 経由で coprime_odd_faithful_Ohm1 [K が Ω₁(Z(P))=Z を中心化 ⟹ Z(P) 中心化]
 が唯一の未ポート、汎用 coprime-action 事実)、(6) route B (|K|∣p+1、SingerField + symplectic det=1)。
+
+### ✅✅ 2026-06-27¹¹ (lane-f 再開): brick (4) faithfulness + rPle2 (r(P)≤2) + sylP_G を実証明 (3 axiom-clean lemma)
+
+de-risk 後の構造 assembly を上流から 3 brick landing。**全 sorry-free + axiom-clean + AxiomsCheck 登録**
+(commits `07005949` + `3724d448`、full build 3884/3872 green)。
+
+1. **brick (4) `kappaHall_inf_centralizer_opiCore_eq_bot`** (Coq `tiKcP`/`defKs`): 型V Singer ケースで
+   κ-Hall K が P=O_p(M_F) に faithful 作用 (K ⊓ C_G(P) = ⊥)。nonidentity x∈K⊓C_G(P) は P⊇X₁ を中心化
+   ⟹ X₁≤M_σ⊓C_G(x)=K*=Z (`centralizer_msigma_kappaElement_eq_kstar` + `kstar_card_prime_of_inputs`
+   で |K*|=p=|Z|)、X₁⊄Z と矛盾。**S15 refactor**: `exists_orderQ_le_mf_normal_in_M_of_not_fittingIsTI`
+   の結論に `¬ X₁ ≤ Z` を追加 (q=p は内部 hX₁notZ、q≠p は coprimality で自明)、faithfulness に供給。
+2. **rPle2 (r(P)≤2) を (e3) ブランチで実証明**: brick (4) faithfulness + `pRank_opiCore_le_two_of_kappaHall`
+   を配線、hpodd/hKp' (κ∩σ=∅ via `kappa_subset_sigmaCompl`)/hKnormP/hZKstar を導出。
+   `hrPle2 : pRank (O_p(M_F)) p ≤ 2` を sorry-free 確立。`hPnab` (P 非可換) も `opiCore_singleton_…`。
+3. **sylP_G `exists_sylow_eq_opiCore_of_mf_eq_msigma`** (Coq `sylP_G`): M_F=M_σ ∧ p∈σ ⟹
+   P=O_p(M_F) は Sylow_p(G)。{p}-Hall of nilpotent M_F (`oPiCore_isHall_of_isNilpotent`、p∤[M_F:P])
+   ⟹ |P|=p^{v_p(|M_σ|)}; M_σ σ-Hall・p∈σ (`Msigma_isHall`、p∤[G:M_σ]) ⟹ =p^{v_p(|G|)} ⟹ `Sylow.ofCard`。
+
+⟹ sorry 1 (|P|=p³) を gate `card_opiCore_eq_prime_cube_singer` に縮小 (**r(P)≤2 + P非可換 + P=Sylow_p(G)
+が全て discharged の hypothesis**)。残 gate residual + 検証済み次手:
+
+- **真のボトルネック = |Z(P)|=p = Coq `defZP`** ← **`coprime_odd_faithful_Ohm1` (BG Thm 1.11,
+  BGsection1.v:429)** の port。これは §3/§4/§11/§13/§15 で多用される汎用 §1 coprime-action 定理だが
+  **未ポート、かつ prereq `coprime_cent_prod` (G=C_G(A)·[G,A]) と `abelian_charsimple_special` も
+  repo/mathlib に不在** ⟹ **multi-session port** (special group + binomial)。これが gate の本当の gate。
+- **mFT_rank2_Sylow_cprod** = Lean `S10.sylow_structure_b` (Cor 10.7b、**private**) に実在。適用には
+  (i) de-privatize、(ii) V=p'-Hall of N_G(P) complement 構成 (Schur-Zassenhaus、`sylow_structure_a` 経由)、
+  (iii) **rank 変換**: sylow_structure_b は `rank P ≤ 2` を要求するが hrPle2 は `pRank P p ≤ 2`。
+  p-群で rank=pRank: **`rank_le_pRank_of_isPGroup` (S09:571、private)** + `pRank_le_rank` で変換可。
+  ただし central-product → |P|=p³ 抽出は (i)|Z(P)|=p を要するので、結局 coprime_odd_faithful_Ohm1 待ち。
+- **次セッション最優先 = `coprime_odd_faithful_Ohm1` (BG Thm 1.11) の port** (high-value reusable §1
+  インフラ、disjunct-3 |P|=p³ の唯一の真の gate)。その後 sylow_structure_b de-privatize + V + 抽出で
+  gate 完了、最後に sorry 2 (route B Singer、|P|=p³ 下流)。
