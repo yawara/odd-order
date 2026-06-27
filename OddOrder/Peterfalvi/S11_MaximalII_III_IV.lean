@@ -2100,6 +2100,23 @@ theorem fixedPointFree_of_aInvariant_irreducible_comm
       have hy : y ∈ F := htop ▸ Subgroup.mem_top y
       rw [MulAut.one_apply]; exact hy) ha
 
+/-- **A fixed-point-free automorphism leaves no nontrivial character invariant** (abelian case).
+If `α` is a fixed-point-free automorphism of a finite abelian group `K`, then any homomorphism
+`θ : K →* M'` to a commutative group that is `α`-invariant (`θ (α x) = θ x` for all `x`) is trivial.
+
+The displacement `x ↦ x / α x` is surjective (`MonoidHom.FixedPointFree.commutatorMap_surjective`),
+and `θ (x / α x) = θ x / θ (α x) = 1` by invariance, so `θ` vanishes on all of `K`.  This is the
+**character-side fixed-point-freeness** of the Frobenius action `H̄ ⋊ Ū` — for a nontrivial linear
+character `θ ∈ Irr(H̄)` and `g ∉ C = C_U(H̄)` (so `φ_U(g)` is FPF by `chiefFactor_caseB_action_fpf`),
+`θ` is *not* `φ_U(g)`-invariant, giving the inertia `I_U(θ) = C` underlying Peterfalvi (9.9). -/
+theorem eq_one_of_invariant_of_fixedPointFree {K M' : Type*} [CommGroup K] [Finite K] [CommGroup M']
+    {α : MulAut K} (hα : MonoidHom.FixedPointFree α) {θ : K →* M'}
+    (hinv : ∀ x : K, θ (α x) = θ x) : θ = 1 := by
+  ext y
+  obtain ⟨x, hx⟩ := hα.commutatorMap_surjective y
+  rw [MonoidHom.commutatorMap_apply] at hx
+  rw [MonoidHom.one_apply, ← hx, map_div, hinv, div_self']
+
 set_option backward.isDefEq.respectTransparency false in
 open OddOrder.RepresentationTheory Representation in
 /-- **Subgroup-level Singer fixed-point-free coprimality.**  Strengthens
