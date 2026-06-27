@@ -1541,6 +1541,30 @@ theorem induceHU_apply_one [Finite G] (data : TypesIIIIIIVSetup M)
     invertibleOfNonzero (Nat.cast_ne_zero.mpr Nat.card_pos.ne')
   exact ClassFunction.induce_apply_one (huSub data) χ
 
+/-- **`[M : HU] = q = |W₁|`.**  `HU = H ⊔ U = M' = derivedInG M` (the type-`P` complementarity
+`derived_complement`, `derivedInG_eq_fitting_sup_U`), and `W₁` complements `M'` in `M`
+(`M_complement`), so `[M : HU] = [M : M'] = |W₁| = q`.  This pins the index that
+`induceHU_apply_one` leaves abstract: every `𝒮`-member `Ind_{HU}^M χ` has degree `q · χ(1)`. -/
+theorem huSub_index_eq_q [Finite G] (data : TypesIIIIIIVSetup M) :
+    (huSub data).index = data.q := by
+  have hsup : data.H ⊔ data.U = derivedInG M := by
+    simp only [TypesIIIIIIVSetup.H, TypesIIIIIIVSetup.U]
+    rw [data.typeP.derivedInG_eq_fitting_sup_U, data.typeP.H_eq]
+  have hidx : ((derivedInG M).subgroupOf M).index = data.q := by
+    simp only [TypesIIIIIIVSetup.q, TypesIIIIIIVSetup.W1]
+    rw [data.typeP.M_complement.symm.index_eq_card,
+      Nat.card_congr (Subgroup.subgroupOfEquivOfLe data.typeP.W1_le).toEquiv]
+  show ((data.H ⊔ data.U).subgroupOf M).index = data.q
+  rw [hsup]; exact hidx
+
+/-- The induced degree, with the index resolved: `(Ind_{HU}^M χ)(1) = q · χ(1)` (`q = |W₁|`).  This
+is the degree formula the §9 counts (9.8)/(9.9) use directly (`𝒮`-members of source degree `s` have
+degree `q·s`, e.g. `qu`, `qa`). -/
+theorem induceHU_apply_one_eq_q_mul [Finite G] (data : TypesIIIIIIVSetup M)
+    (χ : ClassFunction ↥(huSub data) ℂ) :
+    induceHU data χ (1 : ↥M) = (data.q : ℂ) * χ (1 : ↥(huSub data)) := by
+  rw [induceHU_apply_one, huSub_index_eq_q]
+
 /-- **Peterfalvi (9.5)'s family `𝒮`**: `{Ind_{HU}^M χ | χ ∈ 𝒳}`. -/
 noncomputable def sSet [Finite G] (data : TypesIIIIIIVSetup M) : Set (ClassFunction ↥M ℂ) :=
   { φ | ∃ χ ∈ xiSet data, φ = induceHU data (χ : ClassFunction ↥(huSub data) ℂ) }
