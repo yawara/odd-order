@@ -5658,6 +5658,19 @@ to `|P| = p³` (`card_opiCore_eq_prime_cube_singer`).  Axiom-clean. -/
 #assert_only_allowed_axioms
   OddOrder.BG.Ch4.S16.card_center_opiCore_eq_prime_of_omega1Center_le_kstar
 
+/-! **Type-V disjunct-3 `|O_p(M_F)| = p³`** (`S16_MainResults`, `card_opiCore_eq_prime_cube_singer`,
+issue 8015): the order of `P = O_p(M_F)` in the Singer case (BG Theorem 15.7(e), Coq `dimP`/`oP`).
+All four inputs are discharged — `r(P) ≤ 2` (`pRank_opiCore_le_two_of_kappaHall`), `P` non-abelian,
+`P` Sylow of `G` (`exists_sylow_eq_opiCore_of_mf_eq_msigma`), `|Z(P)| = p`
+(`card_center_opiCore_eq_prime_of_omega1Center_le_kstar`) — and the **Blackburn rank-2 Sylow
+central-product structure** (`S10.sylow_structure`, Cor 10.7(b)) gives `P = P₁ ∘ P₂` with `P₁`
+extraspecial of order `p³` and `P₂` cyclic; `|Z(P)| = p` collapses the cyclic factor `P₂ = Z(P₁)` into
+`P₁`, leaving `|P| = |P₁| = p³`.  This closes the first of the two type-V `(e3)` residuals.
+Axiom-clean. -/
+
+#assert_only_allowed_axioms
+  OddOrder.BG.Ch4.S16.card_opiCore_eq_prime_cube_singer
+
 /-! **Type-`P₁` `M_F`-internal complement** (`S16_MainResults`, `exists_typeP1_mf_complement`, the
 construction core of the FT-critical `hP1neIIIIV` bridge): `M_F` has a `K`-invariant complement `U`
 inside `M' = M_σ` (`M_F ⊔ U = M'`, `K ≤ N_G(U)`, `M_F ⊓ U = ⊥`).  The `K`-invariant
