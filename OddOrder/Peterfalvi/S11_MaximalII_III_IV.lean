@@ -2133,13 +2133,74 @@ and `θ (x / α x) = θ x / θ (α x) = 1` by invariance, so `θ` vanishes on al
 **character-side fixed-point-freeness** of the Frobenius action `H̄ ⋊ Ū` — for a nontrivial linear
 character `θ ∈ Irr(H̄)` and `g ∉ C = C_U(H̄)` (so `φ_U(g)` is FPF by `chiefFactor_caseB_action_fpf`),
 `θ` is *not* `φ_U(g)`-invariant, giving the inertia `I_U(θ) = C` underlying Peterfalvi (9.9). -/
-theorem eq_one_of_invariant_of_fixedPointFree {K M' : Type*} [CommGroup K] [Finite K] [CommGroup M']
+theorem eq_one_of_invariant_of_fixedPointFree {K M' : Type*} [Group K] [Finite K] [CommGroup M']
     {α : MulAut K} (hα : MonoidHom.FixedPointFree α) {θ : K →* M'}
     (hinv : ∀ x : K, θ (α x) = θ x) : θ = 1 := by
   ext y
   obtain ⟨x, hx⟩ := hα.commutatorMap_surjective y
   rw [MonoidHom.commutatorMap_apply] at hx
   rw [MonoidHom.one_apply, ← hx, map_div, hinv, div_self']
+
+open OddOrder.RepresentationTheory Representation in
+/-- **An irreducible character of a finite abelian group is a linear character.**  For a finite
+commutative group `Γ`, any irreducible character `φ` (`IsIrreducibleCharacter`) arises from a
+homomorphism `θ : Γ →* ℂˣ` with `(θ g : ℂ) = φ g`.
+
+Irreducible representations of a commutative group are `1`-dimensional
+(`finrank_eq_one_of_isMulCommutative`), so each `ρ g` acts as a nonzero scalar `θ g` (extracted by
+`exists_smul_eq_of_finrank_eq_one`), and the character `φ g = trace(ρ g) = θ g`.  This abelian
+`Irr ↔ Hom(·, ℂˣ)` bridge lets `eq_one_of_invariant_of_fixedPointFree` apply to genuine irreducible
+characters of the abelian chief factor `H̄`, giving the inertia `I_U(θ) = C` of Peterfalvi (9.9)
+without realizing `H̄` as a subgroup. -/
+theorem exists_units_monoidHom_of_isIrreducibleCharacter_of_isMulCommutative
+    {Γ : Type*} [Group Γ] [Finite Γ] [IsMulCommutative Γ]
+    {φ : ClassFunction Γ ℂ} (hφ : IsIrreducibleCharacter φ) :
+    ∃ θ : Γ →* ℂˣ, ∀ g, (θ g : ℂ) = φ g := by
+  obtain ⟨V, _, _, _, ρ, hρ, hχ⟩ := hφ
+  haveI : ρ.IsIrreducible := hρ
+  have hfin : Module.finrank ℂ V = 1 :=
+    Representation.IsIrreducible.finrank_eq_one_of_isMulCommutative ρ
+  haveI : FiniteDimensional ℂ V := .of_finrank_eq_succ hfin
+  haveI : Nontrivial V := Module.nontrivial_of_finrank_eq_succ hfin
+  obtain ⟨x, hx⟩ := exists_ne (0 : V)
+  -- `span {x} = ⊤` (1-dimensional), so a linear map is determined by its value on `x`.
+  have hspan : Submodule.span ℂ ({x} : Set V) = ⊤ := by
+    apply Submodule.eq_top_of_finrank_eq
+    rw [hfin]; exact finrank_span_singleton hx
+  -- The scalar `c g` with `ρ g x = c g • x`.
+  choose c hc using fun g => exists_smul_eq_of_finrank_eq_one hfin hx ((ρ g) x)
+  -- `ρ g = c g • id` (agree on the spanning vector `x`).
+  have hρeq : ∀ g, (ρ g : V →ₗ[ℂ] V) = c g • LinearMap.id := fun g => by
+    refine LinearMap.ext_on hspan fun y hy => ?_
+    rw [Set.mem_singleton_iff] at hy; subst hy
+    simpa [LinearMap.smul_apply] using (hc g).symm
+  -- `c` is multiplicative and unital, and never zero (`ρ g` is invertible).
+  have hc1 : c 1 = 1 := by
+    have h := hc 1
+    rw [map_one, Module.End.one_apply] at h
+    have h2 : c 1 • x = (1 : ℂ) • x := by rw [one_smul]; exact h
+    exact smul_left_injective ℂ hx h2
+  have hcmul : ∀ g h, c (g * h) = c g * c h := fun g h => by
+    have e1 : (ρ (g * h)) x = (c g * c h) • x := by
+      rw [map_mul]
+      show (ρ g) ((ρ h) x) = (c g * c h) • x
+      rw [← hc h, map_smul, ← hc g, smul_smul, mul_comm]
+    have key : c (g * h) • x = (c g * c h) • x := by rw [hc (g * h)]; exact e1
+    exact smul_left_injective ℂ hx key
+  have hcne : ∀ g, c g ≠ 0 := fun g hc0 => by
+    have hρ0 : (ρ g : V →ₗ[ℂ] V) = 0 := by rw [hρeq g, hc0, zero_smul]
+    have h1 : (ρ (g⁻¹) * ρ g : V →ₗ[ℂ] V) = ρ 1 := by rw [← map_mul, inv_mul_cancel]
+    rw [hρ0, mul_zero, map_one] at h1
+    exact zero_ne_one h1
+  -- `φ g = trace(ρ g) = c g · finrank = c g`.
+  have hφc : ∀ g, φ g = c g := fun g => by
+    have hco : φ g = LinearMap.trace ℂ V (ρ g) := congrFun hχ g
+    rw [hco, hρeq g, map_smul, LinearMap.trace_id, hfin]
+    simp
+  exact ⟨{ toFun := fun g => Units.mk0 (c g) (hcne g)
+           map_one' := Units.ext (by simpa using hc1)
+           map_mul' := fun g h => Units.ext (by simpa using hcmul g h) },
+        fun g => by simpa using (hφc g).symm⟩
 
 set_option backward.isDefEq.respectTransparency false in
 open OddOrder.RepresentationTheory Representation in
@@ -2743,6 +2804,55 @@ theorem chiefFactor_caseB_action_fpf [Finite G] {M : Subgroup G}
       (Subgroup.commutator_mem_commutator
         (Subgroup.mem_subgroupOf.mp a.2) (Subgroup.mem_subgroupOf.mp b.2))
   exact fixedPointFree_of_aInvariant_irreducible_comm hComm hcaseB _ hg x hx
+
+/-- **Peterfalvi (9.9): the `U`-action on `Irr(H̄)` is fixed-point-free off `C`.**  In Clifford
+case (b), if a nontrivial irreducible character `θ` of the chief factor `H̄ = ↥H ⧸ N` is invariant
+under the `U`-action `φ_U(g)`, then `g` acts trivially (`φ_U(g) = 1`, i.e. `g ∈ C = C_U(H̄)`).
+
+This is the **character-side inertia** `I_U(θ) ⊆ C` of Peterfalvi (9.9.a), proven *realization-free*:
+the abelian `Irr ↔ Hom` bridge (`exists_units_monoidHom_of_isIrreducibleCharacter_of_isMulCommutative`)
+turns `θ` into a linear character `θ̂`, and a `φ_U(g)`-invariant `θ̂` with `φ_U(g)` fixed-point-free
+(`chiefFactor_caseB_action_fpf`, valid for `g ∉ C`) is trivial
+(`eq_one_of_invariant_of_fixedPointFree`), contradicting `θ` nontrivial.  No realization of `H̄` as
+a subgroup is needed; it works on the abstract quotient `↥H ⧸ N` with the abstract action `φ_U`. -/
+theorem chiefFactor_caseB_char_inertia [Finite G] {M : Subgroup G}
+    {data : TypesIIIIIIVSetup M} {chief : ChiefFactorData data}
+    (hcaseB : ∀ J : Subgroup (↥data.H ⧸ chief.N),
+        IsAInvariant ((typeP_quotientCoprimeAction data.typeP data.nontrivial.1
+          chief.N_aInvariant).φ.comp (typeP_quotientCoprimeAction data.typeP data.nontrivial.1
+          chief.N_aInvariant).U.subtype) J → J = ⊥ ∨ J = ⊤)
+    {θ : IrreducibleCharacter (↥data.H ⧸ chief.N)}
+    (hθ : (θ : ClassFunction (↥data.H ⧸ chief.N) ℂ) ≠ trivialClassFunction _)
+    (g : ↥(typeP_quotientCoprimeAction data.typeP data.nontrivial.1 chief.N_aInvariant).U)
+    (hinv : ∀ x, (θ : ClassFunction (↥data.H ⧸ chief.N) ℂ)
+        (((typeP_quotientCoprimeAction data.typeP data.nontrivial.1 chief.N_aInvariant).φ.comp
+          (typeP_quotientCoprimeAction data.typeP data.nontrivial.1
+            chief.N_aInvariant).U.subtype) g x)
+          = (θ : ClassFunction (↥data.H ⧸ chief.N) ℂ) x) :
+    ((typeP_quotientCoprimeAction data.typeP data.nontrivial.1 chief.N_aInvariant).φ.comp
+      (typeP_quotientCoprimeAction data.typeP data.nontrivial.1 chief.N_aInvariant).U.subtype) g
+        = 1 := by
+  classical
+  haveI : IsMulCommutative (↥data.H ⧸ chief.N) :=
+    IsMulCommutative.of_comm chief.quotient_elementaryAbelian.comm
+  by_contra hne
+  have hfpf : MonoidHom.FixedPointFree
+      (((typeP_quotientCoprimeAction data.typeP data.nontrivial.1 chief.N_aInvariant).φ.comp
+        (typeP_quotientCoprimeAction data.typeP data.nontrivial.1
+          chief.N_aInvariant).U.subtype) g) :=
+    chiefFactor_caseB_action_fpf chief hcaseB g hne
+  obtain ⟨θhom, hθhom⟩ :=
+    exists_units_monoidHom_of_isIrreducibleCharacter_of_isMulCommutative θ.isIrreducible
+  have hinvhom : ∀ x, θhom (((typeP_quotientCoprimeAction data.typeP data.nontrivial.1
+      chief.N_aInvariant).φ.comp (typeP_quotientCoprimeAction data.typeP data.nontrivial.1
+      chief.N_aInvariant).U.subtype) g x) = θhom x := fun x =>
+    Units.ext (by rw [hθhom, hθhom]; exact hinv x)
+  have h1 : θhom = 1 := eq_one_of_invariant_of_fixedPointFree hfpf hinvhom
+  apply hθ
+  ext x
+  have hx := hθhom x
+  rw [h1] at hx
+  simpa using hx.symm
 
 /-- **Peterfalvi (9.7) case (b) carrier.**  When `U` acts irreducibly on the chief factor
 `H̄ = H/H₀` (Clifford case (b), the left branch of `chiefFactor_clifford_U_dichotomy`), the
