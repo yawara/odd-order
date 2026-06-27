@@ -2691,40 +2691,69 @@ theorem clifford_dichotomy [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
 
 /-! ## (9.8)--(9.10): character counts in the two Clifford cases -/
 
-/-- **Peterfalvi (9.8)**: character-count consequences in Clifford case (a). -/
+/-- **Peterfalvi (9.8)**: character-count consequences in Clifford case (a).
+
+Faithful to Peterfalvi (9.8.b,c,d) (count-statement audit, issue 2030):
+* **(b)** `𝒮(H₀)` contains exactly `p-1` *reducible* characters; each has degree `qu` and lies
+  in `𝒮(H₀C)`.
+* **(c)** `𝒮(H₀C)` contains an *irreducible* character of degree `qu`.
+* **(d)** `𝒮(H₀U')` contains at least `((p-1)/a)·(|U|/(a|U'|))` irreducible characters of
+  degree `qa`.
+
+All `𝒮(H₀·)` sets carry the `H₀`-join (`chief.H0 ⊔ ·`): Peterfalvi's `𝒮(H₀C)`/`𝒮(H₀U')` require
+`H₀C`/`H₀U'` in the kernel, not `C`/`U'` alone.  Reducibility/irreducibility is
+`IsIrreducibleCharacter`. -/
 theorem caseA_character_counts [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     {M : Subgroup G} {data : TypesIIIIIIVSetup M} {chief : ChiefFactorData data}
     (chars : Section11CharacterData data chief) (caseA : CliffordCaseAData chars) :
-    (∃ μ : Fin (chief.p - 1) → ClassFunction ↥M ℂ,
-      Set.range μ ⊆ chars.SOf chief.H0 ∧
-        ∀ j, μ j 1 = ((data.q * chars.u : ℕ) : ℂ)) ∧
-      (∃ χ ∈ chars.SOf chars.C, χ 1 = ((data.q * chars.u : ℕ) : ℂ)) ∧
+    {φ ∈ chars.SOf chief.H0 | ¬ IsIrreducibleCharacter φ}.ncard = chief.p - 1 ∧
+      (∀ φ ∈ chars.SOf chief.H0, ¬ IsIrreducibleCharacter φ →
+        φ 1 = ((data.q * chars.u : ℕ) : ℂ) ∧ φ ∈ chars.SOf (chief.H0 ⊔ chars.C)) ∧
+      (∃ χ ∈ chars.SOf (chief.H0 ⊔ chars.C), IsIrreducibleCharacter χ ∧
+        χ 1 = ((data.q * chars.u : ℕ) : ℂ)) ∧
       ((chief.p - 1) / caseA.a) * (Nat.card ↥data.U / (caseA.a * Nat.card ↥chars.Uprime)) ≤
-        (chars.SOf chars.Uprime).ncard := by
+        {χ ∈ chars.SOf (chief.H0 ⊔ chars.Uprime) |
+          IsIrreducibleCharacter χ ∧ χ 1 = ((data.q * caseA.a : ℕ) : ℂ)}.ncard := by
   sorry
 
-/-- **Peterfalvi (9.9)**: character-count consequences in Clifford case (b). -/
+/-- **Peterfalvi (9.9)**: character-count consequences in Clifford case (b).
+
+Faithful to Peterfalvi (9.9.a,b,c) (count-statement audit, issue 2030):
+* **(a)** every member of `𝒮(H₀C')` has degree `qu` (each `χ ∈ 𝒳(H₀C')` has `χ(1)=u`, so its
+  induction `Ind_{HU}^M χ` has degree `[M:HU]·u = qu`).
+* **(b)** `𝒮(H₀)` contains exactly `p-1` reducible characters; each has degree `qu` and lies in
+  `𝒮(H₀C)`.
+* **(c)** if `𝒮(H₀C')` contains *no irreducible character*, then `C = 1` and `u = (p^q-1)/(p-1)`.
+
+`𝒮(H₀C')`/`𝒮(H₀C)` carry the `H₀`-join (`chief.H0 ⊔ chars.Cprime` / `chief.H0 ⊔ chars.C`).  The
+former vacuous `u ∣ qu` (always true) and the false `(𝒮(H₀)).ncard = p-1` (`𝒮(H₀)` also has
+irreducibles) are replaced by the genuine (9.9.a)/(9.9.b) statements; the (9.9.c) trigger is
+"contains no irreducible" (not `ncard = 0`: in the exceptional case `𝒮(H₀C') = 𝒮(H₀)` is
+nonempty). -/
 theorem caseB_character_counts [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     {M : Subgroup G} {data : TypesIIIIIIVSetup M} {chief : ChiefFactorData data}
     (chars : Section11CharacterData data chief) (caseB : CliffordCaseBData chars) :
-    chars.u ∣ data.q * chars.u ∧
-      -- `𝒮(C')` is the *induced* family, so its members have degree `[M:HU]·u = qu`
-      -- (Peterfalvi's degree-`u` characters live in `𝒳(H₀C')`; their inductions have degree `qu`,
-      -- matching (9.8.c) and the (9.10) hypothesis).  See issue 2030 count-statement audit.
-      (∃ χ ∈ chars.SOf chars.Cprime, χ 1 = ((data.q * chars.u : ℕ) : ℂ)) ∧
-      (chars.SOf chief.H0).ncard = chief.p - 1 ∧
-      ((chars.SOf chars.Cprime).ncard = 0 →
+    (∀ φ ∈ chars.SOf (chief.H0 ⊔ chars.Cprime), φ 1 = ((data.q * chars.u : ℕ) : ℂ)) ∧
+      {φ ∈ chars.SOf chief.H0 | ¬ IsIrreducibleCharacter φ}.ncard = chief.p - 1 ∧
+      (∀ φ ∈ chars.SOf chief.H0, ¬ IsIrreducibleCharacter φ →
+        φ 1 = ((data.q * chars.u : ℕ) : ℂ) ∧ φ ∈ chars.SOf (chief.H0 ⊔ chars.C)) ∧
+      ((¬ ∃ χ ∈ chars.SOf (chief.H0 ⊔ chars.Cprime), IsIrreducibleCharacter χ) →
         chars.C = ⊥ ∧ chars.u = (chief.p ^ data.q - 1) / (chief.p - 1)) := by
   sorry
 
-/-- **Peterfalvi (9.10)**: in the exceptional case with no degree-`q u`
-characters induced from `H C`, the quotient semidirect product is Frobenius; in
-type II the full `H U` subgroup is Frobenius with kernel `H`. -/
+/-- **Peterfalvi (9.10)**: in the exceptional case where `𝒮(H₀C')` contains no irreducible
+character of degree `qu`, the quotient semidirect product is Frobenius; in type II the full `H U`
+subgroup is Frobenius with kernel `H`, and `u = (p^q-1)/(p-1)`.
+
+The trigger set is `𝒮(H₀C')` (`chief.H0 ⊔ chars.Cprime`) — the `H₀C'` join, not `C` alone
+(count-statement audit, issue 2030); the missing character is required *irreducible* of degree `qu`
+(matching the negation of the (9.8.c)/(9.9) existence). -/
 theorem exceptional_case_frobenius_realization [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G}
     {data : TypesIIIIIIVSetup M} {chief : ChiefFactorData data}
     (chars : Section11CharacterData data chief) (caseB : CliffordCaseBData chars)
-    (hno : ¬ ∃ χ ∈ chars.SOf chars.C, χ 1 = ((data.q * chars.u : ℕ) : ℂ)) :
+    (hno : ¬ ∃ χ ∈ chars.SOf (chief.H0 ⊔ chars.Cprime),
+        IsIrreducibleCharacter χ ∧ χ 1 = ((data.q * chars.u : ℕ) : ℂ)) :
     chars.quotientSemidirectFrobenius ∧
       chars.u = (chief.p ^ data.q - 1) / (chief.p - 1) ∧
       (IsTypeII M →
