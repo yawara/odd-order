@@ -2583,6 +2583,55 @@ theorem exists_prime_cyclic_opiCore_compl_of_isTypeV [Finite G]
     S15.typeF_nonabelian_cyclic_opiCore_compl hG hM hp hX₁card hX₁MF hCGnotM hnab
   exact ⟨p, hp, hpπ, hcyc⟩
 
+/-- **`O_p(M_F)` is narrow once its `p`-rank reaches 3** (BG Theorem 15.7(e), the narrow input for
+the `r(P) ≤ 2` step of the type-V Singer case).  For `P = O_p(M_F)` with `pRank P ≥ 3`, the order-`p`
+non-TI witness `X₁ ≤ M_F` whose `M_F`-centralizer has rank `< 3` (the `E1X_facts` rank bound from
+`exists_inf_conj_fitting_orderP_witness`) realizes the narrow characterization
+`narrow_iff_exists_card_prime_centralizer_pRank_le_two`: `X₁ ≤ P`
+(`le_opiCoreInG_singleton_of_isPGroup_of_le_nilpotent`) and `C_P(X₁) = (C_G(X₁)).subgroupOf P` has
+`pRank ≤ rank(M_F ⊓ C_G(X₁)) < 3` (it embeds into `M_F ⊓ C_G(X₁)` as `P ≤ M_F`).  No Sylow/`β`
+plumbing is needed: the `pRank ≥ 3` hypothesis is exactly the contradiction branch of `r(P) ≤ 2`. -/
+theorem isNarrow_opiCore_of_three_le_pRank [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} (hM : M ∈ maximalSubgroups G)
+    {p : ℕ} {X₁ : Subgroup G} (hp : p.Prime) (hpodd : Odd p)
+    (hX₁card : Nat.card ↥X₁ = p) (hX₁MF : X₁ ≤ S15.MF M)
+    (hrank3 : rank ↥(S15.MF M ⊓ Subgroup.centralizer (X₁ : Set G)) < 3)
+    (h3 : 3 ≤ pRank ↥(opiCoreInG ({p} : Set ℕ) (S15.MF M)) p) :
+    OddOrder.GroupTheory.IsNarrow p ↥(opiCoreInG ({p} : Set ℕ) (S15.MF M)) := by
+  classical
+  haveI : Fact p.Prime := ⟨hp⟩
+  set P : Subgroup G := opiCoreInG ({p} : Set ℕ) (S15.MF M) with hPdef
+  have hPMF : P ≤ S15.MF M := opiCoreInG_le _ _
+  have hPpg : IsPGroup p ↥P := isPGroup_opiCoreInG_singleton (q := p) (S15.MF M)
+  have hX₁pg : IsPGroup p ↥X₁ := IsPGroup.of_card (n := 1) (by rw [hX₁card, pow_one])
+  haveI hMFnil : Group.IsNilpotent ↥(S15.MF M) := S15.maxNilpotentNormalHall_isNilpotent M
+  have hX₁P : X₁ ≤ P :=
+    OddOrder.BG.Ch2.S08.le_opiCoreInG_singleton_of_isPGroup_of_le_nilpotent hMFnil hX₁MF hX₁pg
+  rw [OddOrder.BG.Ch1.S05.narrow_iff_exists_card_prime_centralizer_pRank_le_two hpodd hPpg h3]
+  refine ⟨X₁.subgroupOf P,
+    (Nat.card_congr (Subgroup.subgroupOfEquivOfLe hX₁P).toEquiv).trans hX₁card, ?_⟩
+  -- `C_{↥P}(X₁.subgroupOf P) = (C_G(X₁)).subgroupOf P`.
+  have himg_set : (P.subtype : ↥P → G) '' (↑(X₁.subgroupOf P) : Set ↥P) = (X₁ : Set G) := by
+    rw [← Subgroup.coe_map, Subgroup.map_subgroupOf_eq_of_le hX₁P]
+  have hcent : Subgroup.centralizer (↑(X₁.subgroupOf P) : Set ↥P)
+      = (Subgroup.centralizer (X₁ : Set G)).subgroupOf P := by
+    rw [OddOrder.BG.Ch1.S03h.centralizer_subgroupOf, himg_set]
+  rw [hcent]
+  -- `↥((C_G(X₁)).subgroupOf P)` embeds into `M_F ⊓ C_G(X₁)` (image is `P ⊓ C_G(X₁) ≤ M_F ⊓ C_G(X₁)`).
+  have hsub : ((Subgroup.centralizer (X₁ : Set G)).subgroupOf P).map P.subtype
+      ≤ S15.MF M ⊓ Subgroup.centralizer (X₁ : Set G) := by
+    simp only [Subgroup.subgroupOf, Subgroup.map_comap_eq, Subgroup.range_subtype]
+    exact le_inf (inf_le_left.trans hPMF) inf_le_right
+  calc pRank ↥((Subgroup.centralizer (X₁ : Set G)).subgroupOf P) p
+      ≤ pRank ↥(((Subgroup.centralizer (X₁ : Set G)).subgroupOf P).map P.subtype) p :=
+        pRank_le_of_injective
+          (f := (Subgroup.equivMapOfInjective _ P.subtype P.subtype_injective).toMonoidHom)
+          (Subgroup.equivMapOfInjective _ P.subtype P.subtype_injective).injective
+    _ ≤ pRank ↥(S15.MF M ⊓ Subgroup.centralizer (X₁ : Set G)) p :=
+        pRank_le_of_injective (Subgroup.inclusion_injective hsub)
+    _ ≤ rank ↥(S15.MF M ⊓ Subgroup.centralizer (X₁ : Set G)) := pRank_le_rank p
+    _ ≤ 2 := by omega
+
 /-- **Prop 16.1 forward bridge `hP1eqV`, reduced to the Peterfalvi (8.8) trichotomy residual** — a
 type-`P₁` maximal subgroup with `M_F = M_σ` is of type V.
 
