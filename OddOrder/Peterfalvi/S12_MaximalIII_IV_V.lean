@@ -1890,6 +1890,35 @@ theorem Hypothesis.muColumnSign_zero [Finite G]
   exact h.certainType_zero_column_anchor.1
 
 open scoped FiniteInduce in
+/-- **Peterfalvi (10.3), the sign `δ_j ∈ {±1}`**: every column sign `δ_j = muColumnSign j` is a unit
+(`±1`).  Immediate from the §6 certain-type `columnFamily`'s `.sign_eq` (the Pontryagin sign of a
+linear character is `±1`).  Combined with the `(10.3)` `δ_j`-independence and `δ_j = δ` (the
+`muColumnSign j = δ` returned by `exists_charParamArith`), this gives the `δ = ±1` (`hδpm`) input to
+the (10.6) Dade-value lemmas `tau1_values_and_norm_bound` / `zeta_tau1_norm_ge_one`. -/
+theorem Hypothesis.muColumnSign_eq_one_or_neg_one [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} (hyp : Hypothesis M)
+    (hodd : Odd (Nat.card G)) (j : Fin hyp.w2) :
+    hyp.muColumnSign hG hodd j = 1 ∨ hyp.muColumnSign hG hodd j = -1 := by
+  haveI := hyp.finiteG
+  classical
+  let h := (hyp.toCertainTypeHypothesis hG hodd).toHypothesis
+  haveI hNeZ1 : NeZero (Nat.card h.W1) := ⟨by have := h.one_lt_card_W1; omega⟩
+  haveI hcyc : IsCyclic ↥(h.W1 ⊔ h.W2) := h.isCyclic_sup
+  letI : CommGroup ↥(h.W1 ⊔ h.W2) := IsCyclic.commGroup
+  have hW2le : hyp.typeP.W2 ≤ M :=
+    (hyp.typeP.W2_le.trans inf_le_left).trans (hyp.typeP.H_le.trans (Subgroup.map_subtype_le _))
+  have hcardW2sub : Nat.card ↥(h.W2.subgroupOf (h.W1 ⊔ h.W2)) = hyp.w2 := by
+    rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe (le_sup_right)).toEquiv]
+    exact Nat.card_congr (Subgroup.subgroupOfEquivOfLe hW2le).toEquiv
+  haveI hNeZ2 : NeZero (Nat.card ↥(h.W2.subgroupOf (h.W1 ⊔ h.W2))) := ⟨Nat.card_pos.ne'⟩
+  have esign : hyp.muColumnSign hG hodd j
+      = (h.columnFamily (finCardEquivCharacterGroup _
+          (finCongr hcardW2sub.symm j))).sign := by
+    unfold Hypothesis.muColumnSign; rfl
+  rw [esign]
+  exact (h.columnFamily (finCardEquivCharacterGroup _ (finCongr hcardW2sub.symm j))).sign_eq
+
+open scoped FiniteInduce in
 /-- **§10 μ-grid normalization** (Peterfalvi (4.1)/(4.3.b)): each materialized certain-type
 character `μ_{ij}` is an irreducible character of `M`, hence has norm one, `(μ_{ij}, μ_{ij}) = 1`.
 Read off the §6 `columnFamily` (whose `mu` are irreducible) through the `muGrid` reconstruction. -/
