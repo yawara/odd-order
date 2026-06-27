@@ -1439,6 +1439,52 @@ theorem isNilpotent_complement_of_isTypeP1_mf_ne_msigma [Finite G]
     nilpotent_of_mulEquiv (MulEquiv.ofBijective g ⟨hginj, hgsurj⟩).symm
   exact nilpotent_of_mulEquiv (Subgroup.subgroupOfEquivOfLe hUMσ)
 
+/-- **Type-`P₁` `M_F`-complement is a genuine complement in `M'`** (the `hDcompl` `TypePData` field):
+any `U` with `M_F ⊔ U = M'` and `M_F ⊓ U = ⊥` gives
+`IsComplement' (M_F.subgroupOf M') (U.subgroupOf M')`.
+
+`M_F ◁ M ⊇ M'`, so `M_F.subgroupOf M'` is normal in `↥M'`; with `M_F ⊓ U = ⊥` (disjoint) and
+`M_F ⊔ U = M'` (codisjoint, i.e. `⊤` in `↥M'`) the internal product is the whole of `↥M'`.  Card
+route: `[M':M_F] = M_F.relIndex M' = M_F.relIndex U = |U|` (second isomorphism theorem
+`relIndex_sup_right`, then `M_F ⊓ U = ⊥`), so `|M_F.subgroupOf M'|·|U.subgroupOf M'| = |M'|`, and
+`isComplement'_of_card_mul_and_disjoint` concludes.  Purely from `hsup`/`hinf` (no type-`P₁`
+hypothesis); discharges the deepest *non*-Fitting `U`-field gated by `exists_typeP1_mf_complement`. -/
+theorem isComplement'_mf_complement_of_sup_inf [Finite G] {M U : Subgroup G}
+    (hsup : maxNilpotentNormalHall M ⊔ U = derivedInG M)
+    (hinf : maxNilpotentNormalHall M ⊓ U = ⊥) :
+    Subgroup.IsComplement' ((maxNilpotentNormalHall M).subgroupOf (derivedInG M))
+      (U.subgroupOf (derivedInG M)) := by
+  classical
+  set M' := derivedInG M with hM'def
+  set N := maxNilpotentNormalHall M with hNdef
+  have hNle : N ≤ M' := hsup ▸ le_sup_left
+  have hUle : U ≤ M' := hsup ▸ le_sup_right
+  -- `N.subgroupOf M'` is normal in `↥M'` (`M' ≤ M ≤ N_G(N)`).
+  have hM'M : M' ≤ M := Subgroup.map_subtype_le _
+  have hNnormM' : M' ≤ Subgroup.normalizer (N : Set G) :=
+    hM'M.trans (maxNilpotentNormalHall_le_normalizer M)
+  haveI hN'norm : (N.subgroupOf M').Normal :=
+    (Subgroup.normal_subgroupOf_iff_le_normalizer hNle).mpr hNnormM'
+  -- Disjointness and codisjointness in `↥M'`.
+  have hdisj : Disjoint (N.subgroupOf M') (U.subgroupOf M') := by
+    rw [disjoint_iff, eq_bot_iff]
+    intro a ha
+    rw [Subgroup.mem_inf] at ha
+    have hval : (a : G) ∈ N ⊓ U :=
+      ⟨Subgroup.mem_subgroupOf.mp ha.1, Subgroup.mem_subgroupOf.mp ha.2⟩
+    rw [hinf, Subgroup.mem_bot] at hval
+    rw [Subgroup.mem_bot]; exact Subtype.ext hval
+  have hsup' : N.subgroupOf M' ⊔ U.subgroupOf M' = ⊤ := by
+    rw [← Subgroup.subgroupOf_sup hNle hUle, hsup, Subgroup.subgroupOf_self]
+  -- `[M':M_F] = |U.subgroupOf M'|` (second iso theorem, then disjointness).
+  have hidx : (N.subgroupOf M').index = Nat.card ↥(U.subgroupOf M') := by
+    have key : (N.subgroupOf M').relIndex (U.subgroupOf M') = Nat.card ↥(U.subgroupOf M') := by
+      rw [Subgroup.relIndex, Subgroup.subgroupOf_eq_bot.mpr hdisj, Subgroup.index_bot]
+    rw [← key, ← Subgroup.relIndex_sup_right, sup_comm, hsup', Subgroup.relIndex_top_right]
+  have hcard : Nat.card ↥(N.subgroupOf M') * Nat.card ↥(U.subgroupOf M') = Nat.card ↥M' := by
+    rw [← hidx, Subgroup.card_mul_index]
+  exact Subgroup.isComplement'_of_card_mul_and_disjoint hcard hdisj
+
 /-- **Prop 16.1(a) forward bridge, core** (mmd L4480): a type-`F` maximal `M` (`κ(M) = ∅`, so the
 Hall `κ`-subgroup `K = ⊥`) carries the shared Peterfalvi type-`F` structure `TypeFData M`.
 

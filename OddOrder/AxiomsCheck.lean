@@ -5602,6 +5602,17 @@ Axiom-clean. -/
 #assert_only_allowed_axioms
   OddOrder.BG.Ch4.S16.isNilpotent_complement_of_isTypeP1_mf_ne_msigma
 
+/-! **`M_F`-complement is a genuine `M'`-complement** (`S16_MainResults`,
+`isComplement'_mf_complement_of_sup_inf`): `M_F ⊔ U = M'` and `M_F ⊓ U = ⊥` give
+`IsComplement' (M_F.subgroupOf M') (U.subgroupOf M')`.  `M_F.subgroupOf M'` is normal in `↥M'`
+(`M' ≤ M ≤ N_G(M_F)`); the second isomorphism theorem (`relIndex_sup_right`) plus disjointness give
+`[M':M_F] = |U.subgroupOf M'|`, hence `|M_F.subgroupOf M'|·|U.subgroupOf M'| = |M'|`, and
+`isComplement'_of_card_mul_and_disjoint` concludes.  Discharges the deepest non-Fitting `U`-field
+(`hDcompl`) of the type-`P₁` (`M_F ≠ M_σ`) `TypePData` gated by `exists_typeP1_mf_complement`.
+Axiom-clean. -/
+
+#assert_only_allowed_axioms OddOrder.BG.Ch4.S16.isComplement'_mf_complement_of_sup_inf
+
 /-! **Type-`P₁` (`M_F ≠ M_σ`) `TypePNontrivialCore`** (`S16_MainResults`,
 `typePData_nontrivialCore_of_isTypeP1_mf_ne_msigma`): the common type II--IV hypotheses
 (`U ≠ ⊥`, `|W₁|` prime, `M_F#` `TI`) of a type-`P₁` (`M_F ≠ M_σ`) `TypePData` with `U ≠ ⊥`.
