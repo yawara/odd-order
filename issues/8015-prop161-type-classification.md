@@ -807,3 +807,36 @@ de-risk 後の構造 assembly を上流から 3 brick landing。**全 sorry-free
 - **次セッション最優先 = `coprime_odd_faithful_Ohm1` (BG Thm 1.11) の port** (high-value reusable §1
   インフラ、disjunct-3 |P|=p³ の唯一の真の gate)。その後 sylow_structure_b de-privatize + V + 抽出で
   gate 完了、最後に sorry 2 (route B Singer、|P|=p³ 下流)。
+
+### ✅✅✅ 2026-06-28 (lane-f 再開²): disjunct 3 sorry 1 (|O_p(M_F)|=p³) を完全閉鎖 — 5 axiom-clean lemma
+
+**前項「coprime_odd_faithful_Ohm1 未ポート・multi-session」評価は誤りだった**。再開²で
+disjunct 3 を一気に前進し、**sorry 1 (|O_p(M_F)|=p³) を完全に閉鎖**。残は sorry 2 (|W₁|∣p+1,
+route B) のみ。commits `07005949`/`3724d448`/`c470922f`/`7789442f`/`9ea8c44f`、full build 3884 green、
+全 axiom-clean (3 標準のみ)。
+
+**重要訂正 2 件**:
+1. **BG Thm 1.11 (coprime Ω₁-rigidity) は既ポート** = `actsTrivially_on_of_fixes_omega1`
+   (`S01c_Omega1Rigidity.lean`)。検索で Lean 名を見落としていた。|Z(P)|=p の唯一の gate が解消。
+2. **mFT_rank2_Sylow_cprod も de-privatize 不要** = `S10.sylow_structure` (public、Cor 10.7 統合、
+   V を内部 `exists_sylow_complement_normalizer` で Schur-Zassenhaus 構成) の (b) 成分が central-product
+   二分法を直接供給。rank 変換も `three_le_pRank_of_isPGroup_of_three_le_rank` (S09 public) の対偶で可。
+
+**landed bricks (全 sorry-free + axiom-clean + AxiomsCheck 登録)**:
+- (4) `kappaHall_inf_centralizer_opiCore_eq_bot` (faithfulness K⊓C_G(P)=⊥, Coq tiKcP)。
+- rPle2: (e3) で `pRank_opiCore_le_two_of_kappaHall` 配線 ⟹ r(P)≤2。
+- (5a) `exists_sylow_eq_opiCore_of_mf_eq_msigma` (sylP_G: P=Sylow_p(G))。
+- (5b) `card_center_opiCore_eq_prime_of_omega1Center_le_kstar` (|Z(P)|=p, Coq defZP via Thm 1.11)。
+- (5c) `card_opiCore_eq_prime_cube_singer` (|P|=p³, sylow_structure central product + collapse)。
+  collapse: P₂ central ⟹ |P₂|≤|Z(P)|=p、Ω₁(P₂)=Z(P₁) order p ⟹ |P₂|≥p ⟹ |P₂|=p ⟹
+  P₂=Z(P₁)≤P₁ ⟹ P=P₁⊔P₂=P₁ ⟹ |P|=p³。
+- S15 refactor: witness lemma に `¬X₁≤Z` と `(q=p → Z=Ω₁(Z(P)))` を露出 (faithfulness/|Z(P)|=p に供給)。
+
+**残 = sorry 2 (|W₁|∣p+1, route B Singer/SL₂(p))** = `isTypeV_of_isTypeP1_mf_eq_msigma` の最後の sorry。
+route B 計画 (2026-06-27⁹、SingerField.lean):
+1. P extraspecial p³ (|P|=p³ + 非可換 ⟹ `IsExtraspecial.of_card_eq_prime_cube`、在庫)。
+2. V=P/Z(P)≅F_p² (extraspecial ⟹ |V|=p²、elem abelian)、K-action (共役)。
+3. 既約性: K cyclic semisimple (coprime p)、FPF (prime action C_P(k)=Z(P))、¬|K|∣p-1 ⟹ V 既約。
+4. Singer (`nonempty_singerFieldData`+galoisField): V≅GF(p²)、μ: K↪GF(p²)ˣ injective。
+5. det 1 ⟹ μ(k)^(p+1)=1 (extraspecial symplectic form, K 保存) ⟹ |K|=orderOf(μ g)∣p+1。
+真の残工 = 既約性判定 (step 3) + symplectic form/det=norm (step 5)。全ピース所在確定、ChatGPT 不要。
