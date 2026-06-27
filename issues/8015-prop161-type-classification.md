@@ -591,3 +591,26 @@ divisibility のみ」に縮小。新規 (全 axiom-clean、AxiomsCheck 登録�
 `card_dvd_sub_one_of_isFrobeniusAction` (S15:8354 在庫) を K-on-Z_p Frobenius 作用に適用、disjunct3
 (|K|∣p+1) は Singer/GL₂(p) 作用 (別 engine)。S05 に omega1Center prime lemma 在庫 (要 p2maxElem 接続)。
 **次セッション = |Z0| prime の p2maxElem 形式化 (上流)、その後 Frobenius/Singer 作用で divisibility**。
+
+### 🔬 2026-06-27⁵ divisibility core の精密 mapping — disjunct 2 は到達可能、disjunct 3 が deep Singer
+
+**重要発見 1: `|Z0|=p` は既に形式化済み**。`exists_orderQ_le_mf_normal_in_M_of_not_fittingIsTI`
+(S15:8562、Coq `oZ` の q=p case) が「∀q∈π(M_F), order-q の Z≤M_F が M-normal」を供給
+(q=p で Z=Ω₁(Z(O_p))、|Z|=p を rank≤2 bound で証明済)。⟹ |Z0|=p の自前再構築は**不要**。
+
+**重要発見 2: disjunct 2 (`|W₁|∣p-1`) は到達可能** (path 確定):
+- data.W1 = K (κ-Hall、type-V `typePData_of_inputs (W1:=K)` line 2113)。
+- `exists_orderQ` で Z order p (=witness)、M-normal。K≤M が Z に作用。
+- **semiprime** `M⊓C(k)=K⊔Kstar` (`typeP_centralizer_kappaElement_eq` S14:9333) ⟹
+  C_{M_F}(k)≤M_σ∩(K⊔Kstar)=Kstar (σ-decomp)。
+- **by_cases Z⊓Kstar=⊥**: ⊥ なら C_Z(k)≤Z∩Kstar=⊥ ∀k∈K# ⟹ K FPF on Z ⟹
+  `card_dvd_sub_one_of_isFrobeniusAction` で `|K|∣p-1` = **disjunct 2**。
+- 残 helper: (i) `M_σ∩(K⊔Kstar)=Kstar` σ-decomp (~40行、K σ'-Hall + Kstar σ、未在庫) (ii)
+  IsFrobeniusAction K-on-Z setup (~50行、`typeF_exponent_dvd_sub_one_of_invariant_card` S16:1778 の
+  U0-on-Z pattern を K に流用)。
+
+**disjunct 3 (Z⊓Kstar≠⊥ ⟺ Z≤Kstar=Z0)**: `|O_p(M_F)|=p³ ∧ |W₁|∣p+1` = deep Singer/GL₂(p) 作用
+(Coq defZP/rPle2/oZ0 + `basic_p2maxElem_structure`)。**真に残る最深部**。
+
+⟹ **次セッション = disjunct 2 を上記 path で landing** (σ-decomp helper + Frobenius setup、
+sorry を Z≤Kstar/disjunct-3 case のみに縮小)、その後 disjunct 3 の Singer 解析。
