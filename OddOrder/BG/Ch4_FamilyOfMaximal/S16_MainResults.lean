@@ -2632,6 +2632,64 @@ theorem isNarrow_opiCore_of_three_le_pRank [Finite G]
     _ ≤ rank ↥(S15.MF M ⊓ Subgroup.centralizer (X₁ : Set G)) := pRank_le_rank p
     _ ≤ 2 := by omega
 
+/-- **`r(O_p(M_F)) ≤ 2` for the type-V Singer case** (BG Theorem 15.7(e), Coq `rPle2`).  A
+`κ`-Hall `K` (cyclic, `p'`, normalizing `P = O_p(M_F)`) that acts *faithfully* on `P`
+(`K ⊓ C_G(P) = ⊥`) with `|K| ∤ p − 1` forces `pRank P ≤ 2`: were `pRank P ≥ 3`, `P` would be narrow
+(`isNarrow_opiCore_of_three_le_pRank`), and BG Theorem 5.5(b) (`solvableAut_of_narrow`, applied to
+the faithful `φ : K → MulAut P`) would give that every `p'`-element of `K` has order dividing
+`p − 1`; the cyclic generator of `K` then yields `|K| ∣ p − 1`, contradicting `|K| ∤ p − 1`.
+
+The faithfulness `K ⊓ C_G(P) = ⊥` is the `defZP`/`Kstar = Z(P)` content of the Singer case
+(supplied separately). -/
+theorem pRank_opiCore_le_two_of_kappaHall [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} (hM : M ∈ maximalSubgroups G)
+    {p : ℕ} {X₁ K : Subgroup G} (hp : p.Prime) (hpodd : Odd p)
+    (hX₁card : Nat.card ↥X₁ = p) (hX₁MF : X₁ ≤ S15.MF M)
+    (hrank3 : rank ↥(S15.MF M ⊓ Subgroup.centralizer (X₁ : Set G)) < 3)
+    [IsCyclic ↥K] (hKp' : ¬ p ∣ Nat.card ↥K)
+    (hKnormP : K ≤ Subgroup.normalizer (↑(opiCoreInG ({p} : Set ℕ) (S15.MF M)) : Set G))
+    (hKfaithful : K ⊓ Subgroup.centralizer (↑(opiCoreInG ({p} : Set ℕ) (S15.MF M)) : Set G) = ⊥)
+    (hKp1 : ¬ Nat.card ↥K ∣ p - 1) :
+    pRank ↥(opiCoreInG ({p} : Set ℕ) (S15.MF M)) p ≤ 2 := by
+  classical
+  haveI : Fact p.Prime := ⟨hp⟩
+  set P : Subgroup G := opiCoreInG ({p} : Set ℕ) (S15.MF M) with hPdef
+  have hPpg : IsPGroup p ↥P := isPGroup_opiCoreInG_singleton (q := p) (S15.MF M)
+  haveI : IsSolvable ↥K := by
+    obtain ⟨g, hg⟩ := IsCyclic.exists_generator (α := ↥K)
+    refine isSolvable_of_comm fun a b => ?_
+    obtain ⟨m, rfl⟩ := Subgroup.mem_zpowers_iff.mp (hg a)
+    obtain ⟨n, rfl⟩ := Subgroup.mem_zpowers_iff.mp (hg b)
+    rw [← zpow_add, ← zpow_add, add_comm]
+  by_contra hcon
+  rw [not_le] at hcon
+  have h3 : 3 ≤ pRank ↥P p := hcon
+  have hPnarrow : OddOrder.GroupTheory.IsNarrow p ↥P :=
+    isNarrow_opiCore_of_three_le_pRank hG hM hp hpodd hX₁card hX₁MF hrank3 h3
+  -- The faithful conjugation action `φ : ↥K → MulAut ↥P`.
+  set φ : ↥K →* MulAut ↥P :=
+    (Subgroup.normalizerMonoidHom P).comp (Subgroup.inclusion hKnormP) with hφdef
+  have hφinj : Function.Injective φ := by
+    rw [injective_iff_map_eq_one]
+    intro k hk
+    rw [hφdef, MonoidHom.comp_apply] at hk
+    have hkmem : (Subgroup.inclusion hKnormP k) ∈ (Subgroup.normalizerMonoidHom P).ker :=
+      MonoidHom.mem_ker.mpr hk
+    rw [Subgroup.normalizerMonoidHom_ker, Subgroup.mem_subgroupOf] at hkmem
+    have hmem : (k : G) ∈ K ⊓ Subgroup.centralizer (↑P : Set G) :=
+      Subgroup.mem_inf.mpr ⟨k.2, hkmem⟩
+    rw [hKfaithful, Subgroup.mem_bot] at hmem
+    exact Subtype.ext hmem
+  haveI hKodd : Odd (Nat.card ↥K) := hG.odd.of_dvd_nat (Subgroup.card_subgroup_dvd_card K)
+  obtain ⟨-, -, hb, -⟩ :=
+    OddOrder.BG.Ch1.S05.solvableAut_of_narrow hpodd hPpg hPnarrow φ hφinj hKodd
+  obtain ⟨g, hg⟩ := IsCyclic.exists_generator (α := ↥K)
+  have hKcard : Nat.card ↥K = orderOf g := (orderOf_eq_card_of_forall_mem_zpowers hg).symm
+  have hgcop : Nat.Coprime (orderOf g) p := hKcard ▸ (hp.coprime_iff_not_dvd.mpr hKp').symm
+  have hgdvd : orderOf g ∣ p - 1 := hb h3 g hgcop
+  rw [← hKcard] at hgdvd
+  exact hKp1 hgdvd
+
 /-- **Prop 16.1 forward bridge `hP1eqV`, reduced to the Peterfalvi (8.8) trichotomy residual** — a
 type-`P₁` maximal subgroup with `M_F = M_σ` is of type V.
 
