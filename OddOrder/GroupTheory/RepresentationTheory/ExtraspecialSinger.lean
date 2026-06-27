@@ -316,9 +316,10 @@ open scoped IsMulCommutative in
 set_option maxHeartbeats 1600000 in
 /-- **Route B (BG Theorem 15.7(e), disjunct 3): `|K| ∣ p + 1`.**
 
-A cyclic `p'`-group `K` (`p` odd) acting on an extraspecial group `P` of order `p³` so that the
-fixed points on `V = P/Z(P)` are trivial (`hfpf`, the prime-action `C_P(k) = Z(P)`), `K`
-centralizes `Z(P)` (`hcentZ`), and `¬ |K| ∣ p - 1`, has `|K| ∣ p + 1`.
+A cyclic `p'`-group `K` (`p` odd) acting on an extraspecial group `P` of order `p³` with the
+prime action `C_P(k) ⊆ Z(P)` for `k ≠ 1` (`hfpf`), `K` centralizing `Z(P)` (`hcentZ`), and
+`¬ |K| ∣ p - 1`, has `|K| ∣ p + 1`.  (`hfpf` is `C_P(k) ⊆ Z(P)` at the `P`-level; coprimality
+lifts it to fixed-point-freeness on `V = P/Z(P)` internally.)
 
 `V` is a `2`-dimensional `𝔽_p`-space, the action is fixed-point-free hence faithful, and
 irreducible (else the split-torus / line case gives `|K| ∣ p - 1`).  Singer realizes
@@ -326,7 +327,7 @@ irreducible (else the split-torus / line case gives `|K| ∣ p - 1`).  Singer re
 `det ρ(k) = 1`; but `det ρ(k) = N(μ k) = μ(k)^{p+1}`, whence `|K| ∣ p + 1`. -/
 theorem card_dvd_succ_of_primeAction_extraspecial (hodd : Odd p)
     (hP : IsExtraspecial p P) (hPcard : Nat.card P = p ^ 3) (φ : K →* MulAut P)
-    (hfpf : ∀ k : K, k ≠ 1 → ∀ x : P, x⁻¹ * (φ k) x ∈ commutator P → x ∈ commutator P)
+    (hfpf : ∀ k : K, k ≠ 1 → ∀ x : P, (φ k) x = x → x ∈ commutator P)
     (hcentZ : ∀ k : K, ∀ z : P, z ∈ commutator P → (φ k) z = z)
     (hKcyc : IsCyclic K) (hKp' : ¬ p ∣ Nat.card K) (hndvd : ¬ Nat.card K ∣ p - 1) :
     Nat.card K ∣ p + 1 := by
@@ -365,18 +366,56 @@ theorem card_dvd_succ_of_primeAction_extraspecial (hodd : Odd p)
     have := Module.natCard_eq_pow_finrank (K := ZMod p) (V := Additive (P ⧸ commutator P))
     rw [hVcard, Nat.card_eq_fintype_card (α := ZMod p), ZMod.card] at this
     exact (Nat.pow_right_injective (Fact.out (p := p.Prime)).two_le this.symm)
-  -- Fixed-point-freeness of `ρ` (from the prime action `hfpf`).
+  -- Fixed-point-freeness of `ρ` on `V` (the prime action `hfpf` is `C_P(k) ⊆ Z(P)`; coprimality
+  -- of `⟨k⟩` on the `p`-group `P` lifts it to `C_{P/Z}(k) = 0` via Isaacs Cor 3.28).
   have hfpfρ : ∀ k : K, k ≠ 1 → ∀ v : Additive (P ⧸ commutator P), ρ k v = v → v = 0 := by
     intro k hk v hv
     obtain ⟨q, rfl⟩ := Additive.ofMul.surjective v
     obtain ⟨x, rfl⟩ := QuotientGroup.mk_surjective q
     rw [hρmk] at hv
-    have heq : (QuotientGroup.mk ((φ k) x) : P ⧸ commutator P) = QuotientGroup.mk x :=
+    have heqmk : (QuotientGroup.mk ((φ k) x) : P ⧸ commutator P) = QuotientGroup.mk x :=
       Additive.ofMul.injective hv
-    rw [QuotientGroup.eq] at heq
-    have heq2 : x⁻¹ * (φ k) x ∈ commutator P := by
-      simpa [mul_inv_rev] using (commutator P).inv_mem heq
-    have hxZ : x ∈ commutator P := hfpf k hk x heq2
+    have hxZ : x ∈ commutator P := by
+      set A := Subgroup.zpowers k with hAdef
+      let φ' : ↥A →* MulAut P := φ.comp A.subtype
+      have hAinv : OddOrder.Isaacs.Ch03.IsAInvariant φ' (commutator P) :=
+        OddOrder.Isaacs.Ch03.IsAInvariant.of_characteristic _
+      have hKp : ¬ p ∣ orderOf k := fun h => hKp' (h.trans (orderOf_dvd_natCard k))
+      have hcop : Nat.Coprime (Nat.card ↥A) (Nat.card P) := by
+        rw [hPcard, hAdef, Nat.card_zpowers]
+        exact Nat.Coprime.pow_right 3
+          ((Nat.coprime_comm.mp ((Fact.out (p := p.Prime)).coprime_iff_not_dvd.mpr hKp)))
+      -- `mk x` is fixed by `qhom k`, hence by every `(qhom k)^j`.
+      have hfixq : qhom k (QuotientGroup.mk x) = QuotientGroup.mk x := heqmk
+      have hfixqinv : (qhom k)⁻¹ (QuotientGroup.mk x) = QuotientGroup.mk x := by
+        conv_lhs => rw [← hfixq]
+        simp
+      have hfixj : ∀ j : ℤ, ((qhom k) ^ j) (QuotientGroup.mk x) = QuotientGroup.mk x := by
+        intro j
+        refine Int.induction_on j ?_ (fun n ih => ?_) (fun n ih => ?_)
+        · simp
+        · rw [zpow_add_one, MulAut.mul_apply, hfixq]; exact ih
+        · rw [zpow_sub_one, MulAut.mul_apply, hfixqinv]; exact ih
+      have hgfix : ∀ a : ↥A, ∃ n ∈ commutator P, φ' a x = x * n := by
+        rintro ⟨a, ha⟩
+        obtain ⟨j, rfl⟩ := Subgroup.mem_zpowers_iff.mp ha
+        have h2 : (QuotientGroup.mk ((φ (k ^ j)) x) : P ⧸ commutator P) = QuotientGroup.mk x := by
+          have h3 : qhom (k ^ j) (QuotientGroup.mk x) = QuotientGroup.mk x := by
+            rw [map_zpow]; exact hfixj j
+          exact h3
+        rw [QuotientGroup.eq] at h2
+        refine ⟨x⁻¹ * (φ (k ^ j)) x, by simpa [mul_inv_rev] using (commutator P).inv_mem h2, ?_⟩
+        show φ (k ^ j) x = x * (x⁻¹ * (φ (k ^ j)) x)
+        group
+      obtain ⟨c, hc, n, hn, hcn⟩ :=
+        OddOrder.Isaacs.Ch04.coprime_fixedPoints_quotient hcop
+          (Or.inr (haveI : Group.IsNilpotent P := hP.isPGroup.isNilpotent; inferInstance))
+          hAinv hgfix
+      have hck : (φ k) c = c := hc ⟨k, Subgroup.mem_zpowers k⟩
+      have hcZ : c ∈ commutator P := hfpf k hk c hck
+      have hxc : x = c * n⁻¹ := by rw [hcn]; group
+      rw [hxc]
+      exact (commutator P).mul_mem hcZ ((commutator P).inv_mem hn)
     show Additive.ofMul (QuotientGroup.mk x) = 0
     rw [show (QuotientGroup.mk x : P ⧸ commutator P) = 1 from
       (QuotientGroup.eq_one_iff x).mpr hxZ]

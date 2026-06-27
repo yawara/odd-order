@@ -6217,6 +6217,26 @@ formula together with the prime computation `coprimeFrobeniusAction_card_eq_prim
 -- `commutatorMap_surjective`.
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.S11.eq_one_of_invariant_of_fixedPointFree
+-- abelian `Irr ↔ Hom(·,ℂˣ)` bridge: an irreducible character of a finite commutative group is a
+-- linear character (1-dim rep ⟹ scalar action ⟹ character = the scalar hom).  Lets the char-side
+-- FPF engine apply to genuine `Irr(H̄)` characters (realization-free inertia route for (9.9)).
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S11.exists_units_monoidHom_of_isIrreducibleCharacter_of_isMulCommutative
+-- (9.9.a) character-side inertia `I_U(θ) ⊆ C`: a nontrivial irreducible character of the chief
+-- factor `H̄`, invariant under `φ_U(g)`, forces `φ_U(g) = 1` (`g ∈ C`).  Realization-free
+-- (FPF core + abelian Irr↔Hom bridge + char-side FPF engine).
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S11.chiefFactor_caseB_char_inertia
+-- (9.9.a) inflation equivariance + abstract inertia reduction: the inflation `compHom (mk' N)`
+-- intertwines the conjugation action `typeP_conjAction a` upstairs with the descended `φ_U` action
+-- downstairs, reducing the concrete conjugation invariance of an inflated character to the abstract
+-- `φ_U`-invariance that `chiefFactor_caseB_char_inertia` consumes (`typeP_conjAction`-inv ⟹ `φ_U=1`).
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S11.compHom_typeP_conjAction_inflation
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S11.caseB_char_inertia_inflation
+-- (9.9.a) realization: the iso `↥(H-in-HU) ≃* ↥H` preserves the underlying `G`-element, so it
+-- intertwines the concrete `HU`-conjugation `conjBy g` with the abstract `typeP_conjAction a`
+-- (same `G`-image `↑g = ↑a`).  This is the last realization step feeding `caseB_char_inertia_inflation`.
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S11.hInHuEquivH_coe
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S11.conjBy_compHom_hInHuEquivH
 -- §9 degree infrastructure: `[M:HU] = q` (`HU = M'`, `[M:M'] = |W₁|`) and the resulting
 -- `(Ind_{HU}^M χ)(1) = q·χ(1)` — the degree formula every (9.8)/(9.9) count uses.
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S11.huSub_index_eq_q
