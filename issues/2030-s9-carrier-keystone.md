@@ -56,6 +56,43 @@ created: 2026-06-27
 - [ ] **C: case-(a) (9.8)** — `H̄ = ⊕ q` 個の order-`p` 因子 + `W₁`-置換カウント。
 - [ ] **D: (9.11) `sibleyTarget_H0C`** 構造 witness。
 
+## 2026-06-27 lane-b (W3): task A の character-family 部分 COMPLETE (commit `9c41978a`)
+
+**`Section11CharacterData` の character field を genuine 化** (full build 3884 green)。issue 冒頭の
+「character field は全て FREE → §9 counts は genuine に証明不可」を直接解消した:
+
+- **genuine families 新規** (S11, all sorry-free, `S12.inducedFamily` パターン):
+  `huSub` (HU=H⊔U を ↥M 内に realise) / `hInHu` (H の HU 内表現) / `xiSet` (𝒳={χ∈Irr(HU)|H⊄Ker χ}) /
+  `xiOf` (𝒳(Y)={χ∈𝒳|Y⊆Ker χ}) / `induceHU` (Ind_{HU}^M, canonical Invertible bake-in で desync 回避) /
+  `induceHU_apply_one` (degree [M:HU]·χ(1)) / `sSet` (𝒮=Ind 𝒳) / `sOf` (𝒮(Y)=Ind 𝒳(Y))。
+  基礎 API: `xiOf_subset_xiSet`/`mem_xiOf`/`xiOf_antitone`/`mem_sSet`/`mem_sOf`/`sOf_subset_sSet`/`sOf_antitone`。
+- **carrier 再設計**: free な `X`/`S`/`XOf`/`SOf` field を削除 → genuine namespace defs
+  (`X=xiSet`,`XOf=xiOf`,`S=sSet`,`SOf=sOf`) + `X_eq`/`XOf_eq`/`S_eq`/`SOf_eq` (rfl simp)。
+  ⟹ (9.8)/(9.9)/(9.10) と (9.11) coherence consumer は Peterfalvi の **honest families** を参照
+  (以前は free field ゆえ原理的に証明不能)。consumer (S12 `typeII_section11_coherence`,
+  `sibleyTarget_H0C`) は `chars.S`/`tau`/`H0CprimeSupport` のみ使用で signature 不変、producer 不在ゆえ
+  field 削除も安全。
+
+**残 task A (carrier の部分群)**: `C=C_U(H̄)` (= U-action map `(quotientMulAutHom chief.N_aInvariant).comp
+(U.subgroupOf(U⊔W1)).subtype` の `MonoidHom.ker` を G の部分群へ map-down、`u_eq_card_quotient` の range
+と双対) / `Uprime=[U,U]=derivedInG U` / `Cprime=[C,C]=derivedInG C` を free field → genuine def 化。
+counts が `chars.C`/`chars.Uprime`/`chars.Cprime` に量化するため、これらを pin しないと (9.8)/(9.9) は
+genuine families に対しても未証明。pinning 自体は count を unlock しない (count は下記 B/C の deep Clifford)
+が、count 証明の prerequisite。**fiddly だが honest-architecture prerequisite、次 brick**。
+
+## やること (research-grade, multi-session)
+
+- [x] **A (character-family 部分)**: families genuine 化 + carrier 再設計 (commit `9c41978a`)。
+- [ ] **A (subgroup 部分)**: `C`/`Uprime`/`Cprime` を genuine def 化 (上記)。
+- [ ] **B: case-(b) (9.9)/(9.10)** — Singer field model (`Ū ⊂ 𝔽_{p^q}^×`)。既存の
+      `chiefFactor_caseB_image_*` (unconditional: `|Ū| ∣ (p^q−1)/(p−1)`, `Coprime |Ū| (p−1)`) を活用。
+      (9.9.a) の `u ∣ qu` は `dvd_mul_left` で trivial、残りは Clifford。
+- [ ] **C: case-(a) (9.8)** — (9.8.a) `a ∣ χ(1)` = Clifford 誘導 (irred component θ of Res_H χ,
+      χ=Ind_{I(θ)∩HU}, I(θ)∩U⊆C_U(H_i) ゆえ a=|U:C_U(H_i)| ∣ χ(1)); (9.8.b,c) = (8.4.d)+(4.5)/(4.7)
+      Dade for L=M/H₀; (9.8.d) = degree-qa 構成。Clifford 誘導は `Clifford.lean`/`InducedIrreducible.lean`
+      (`IrreducibleCharacter.LiesOver`/inertia) を要する deep multi-step。
+- [ ] **D: (9.11) `sibleyTarget_H0C`** 構造 witness。
+
 ## 完了条件
 
 (9.8)/(9.9)/(9.10) が genuine な carrier に対し sorry-free。これで (10.7)→(10.8)`hB` と (11.8) の
@@ -63,8 +100,11 @@ created: 2026-06-27
 
 ## 参照
 
-- carrier: `OddOrder/Peterfalvi/S11_MaximalII_III_IV.lean:1479`; counts 2495/2507/2518;
-  case-(b) Singer infra 2092/2189/2376; `ChiefFactorData` producer 1408。
+- carrier: `OddOrder/Peterfalvi/S11_MaximalII_III_IV.lean` `Section11CharacterData` (~1578);
+  genuine families `xiSet`/`xiOf`/`sSet`/`sOf` (~1486-1570); counts `caseA_character_counts`(~2626)/
+  `caseB_character_counts`(~2638)/`exceptional_case_frobenius_realization`(~2651);
+  case-(b) Singer infra `chiefFactor_caseB_image_*` (~2092/2189/2376); `ChiefFactorData` producer
+  `exists_chiefFactorData` (~1406)。
 - consumers: `S12.typeII_derived_frobenius` (5765), `S12.exists_zeta_residual_not_orthogonal` (~6580),
   S13 type III/IV。
 - 原典: Pf §9 = `references/peterfalvi/04.11` + (9.7)-(9.11); (10.7) 証明 = `04.12` line 71。
