@@ -2949,6 +2949,28 @@ theorem card_opiCore_eq_prime_cube_singer [Finite G]
     -- `P = P₁ ⊔ P₂ = P₁`, so `|P| = |P₁| = p³`.
     rw [hcp.sup_eq, sup_eq_left.mpr hP₂P₁, hP₁card]
 
+/-- **`|K| ∣ n` from a Singer embedding into a cyclic group all of whose `K`-images are `n`-th roots
+of unity** (the final arithmetic step of the type-V Singer divisibility, route B step L5).  If a
+finite group `K` embeds (`hμ`) into a finite cyclic group `C` and every image `μ k` is killed by `n`,
+then `K` is cyclic and `|K| ∣ n`.
+
+In the type-V disjunct-3 application `C = 𝔽_{p²}ˣ` (Singer field units of `V = P/Z(P)`), `μ` is the
+Singer realization `K ↪ 𝔽_{p²}ˣ`, and `μ k ^ (p+1) = 1` is the determinant-one / symplectic condition
+`det(k) = N(μ k) = μ(k)^{p+1} = 1` (`algebraMap_norm_eq_pow`): `K` preserves the alternating
+commutator form on `V`, so `K ⊆ Sp(V) = SL₂` and `det = 1`.  Then `|K| ∣ p+1`. -/
+theorem card_dvd_of_injective_to_cyclic_forall_pow {K C : Type*} [Group K] [Finite K]
+    [Group C] [Finite C] [IsCyclic C] (μ : K →* C) (hμ : Function.Injective μ)
+    {n : ℕ} (h : ∀ k : K, μ k ^ n = 1) : Nat.card K ∣ n := by
+  -- `μ` injective ⟹ `∀ k, k ^ n = 1`.
+  have hKn : ∀ k : K, k ^ n = 1 := fun k => hμ (by rw [map_pow, h k, map_one])
+  -- `K ≃* μ.range ≤ C` is cyclic.
+  haveI : IsCyclic ↥μ.range := inferInstance
+  haveI : IsCyclic K := isCyclic_of_surjective (MonoidHom.ofInjective hμ).symm.toMonoidHom
+    (MonoidHom.ofInjective hμ).symm.surjective
+  obtain ⟨g, hg⟩ := IsCyclic.exists_generator (α := K)
+  rw [(orderOf_eq_card_of_forall_mem_zpowers hg).symm]
+  exact orderOf_dvd_of_pow_eq_one (hKn g)
+
 /-- **Prop 16.1 forward bridge `hP1eqV`, reduced to the Peterfalvi (8.8) trichotomy residual** — a
 type-`P₁` maximal subgroup with `M_F = M_σ` is of type V.
 
