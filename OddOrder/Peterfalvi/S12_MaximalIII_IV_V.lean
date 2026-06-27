@@ -6030,6 +6030,66 @@ theorem dadeSupport_restrict_subset {A A₁ : Set G} {L : Subgroup G} [Fintype G
   obtain ⟨a, h, hh, hconj⟩ := hg
   exact ⟨⟨a.1, hA₁A a.2⟩, h, hh, hconj⟩
 
+open scoped Classical FiniteInduce in
+/-- **Peterfalvi (10.8), line 83** (the mechanical `(7.5)`+`(10.6.b)` combination): the `ρ`-norm of
+`ζ^{τ₁}` for the one-member family `{(M, A(M))}` is bounded by `|A(M)|/|M|` plus the `|G₁|/|G|`-term
+`(|famG₀| − |G₀|)/|G|`.
+
+This is Peterfalvi (10.8) 04.12 line 81 → 83: apply the family inequality (7.5)
+(`S09.family_inequality` on the now-self-contained `toFamilyHypothesis71`, with the norm-one
+`inner_tau1_zeta_self_eq_one`) and drop the `G₀`-part of the sum via the `(10.6.b)` bound
+(`sum_zeta_tau1_normSq_ge_card`, using `G₀ ⊆ famG₀` from `dadeSupport_restrict_subset` and
+`‖·‖² ≥ 0` on the rest).  Pure real-arithmetic bookkeeping over the family inequality; the genuine
+`‖ζ^{τ₁,ρ}‖²` lower bound (7.8.b) and the `|G₁|`-count (TI-counting, §9) are the remaining gates that
+turn this into line 87 and the contradiction.  Here `famG₀ = (toFamilyHypothesis71).G0` is the
+`A(M)`-support complement and `G₀ = {g ∉ Ã(M), (ord g).Coprime w₁}` the `A_0(M)`-support coprime
+subset (`G₀ ⊆ famG₀`). -/
+theorem Hypothesis.chiRhoNormSq_zeta_le_line83 [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G}
+    {hyp : Hypothesis M} {params : CharacterParameters hyp} (coh : CoherentHypothesis hyp params)
+    (hmu : params.mu = hyp.muGrid hG hG.odd)
+    (hos : params.omegaSigma = hyp.alignedOmegaSigmaGrid hG hG.odd)
+    (hzS : params.zeta ∈ inducedFamily M) (hz1 : params.zeta 1 = (hyp.w1 : ℂ))
+    (hzconj : params.zeta.conj ≠ params.zeta)
+    (hδpm : params.delta = 1 ∨ params.delta = -1)
+    (hδj : ∀ j : Fin hyp.w2, j ≠ 0 → hyp.muColumnSign hG hG.odd j = params.delta) :
+    (hyp.toFamilyHypothesis71).chiRhoNormSq (coh.tau1 params.zeta) 0
+      ≤ (Nat.card ↥(typePA M hyp.typeP) : ℝ) / (Nat.card ↥M : ℝ)
+        + (Nat.card G : ℝ)⁻¹ * ((Nat.card (hyp.toFamilyHypothesis71).G0 : ℝ)
+          - ((Finset.univ.filter (fun g : G => g ∉ hyp.dadeData.dade.dadeSupport
+              ∧ (orderOf g).Coprime hyp.w1)).card : ℝ)) := by
+  haveI := hyp.finiteG
+  -- `F.A 0 = A(M)`, `F.L 0 = M` (structure projections).
+  have hA0 : (hyp.toFamilyHypothesis71).A 0 = typePA M hyp.typeP := rfl
+  have hL0 : (hyp.toFamilyHypothesis71).L 0 = M := rfl
+  -- (7.5) line 81 (single member, `k = 1`).
+  have h81 := OddOrder.Peterfalvi.S09.family_inequality (hyp.toFamilyHypothesis71)
+    (coh.tau1 params.zeta) (hyp.inner_tau1_zeta_self_eq_one coh)
+  rw [Fin.sum_univ_one, hA0, hL0] at h81
+  -- `G₀ ⊆ famG₀`: a `g` off the `A_0(M)`-support is off the restricted `A(M)`-support.
+  have hsub : Finset.univ.filter (fun g : G => g ∉ hyp.dadeData.dade.dadeSupport
+        ∧ (orderOf g).Coprime hyp.w1)
+      ⊆ Finset.univ.filter (fun g : G => g ∈ (hyp.toFamilyHypothesis71).G0) := by
+    intro g hg
+    rw [Finset.mem_filter] at hg ⊢
+    refine ⟨Finset.mem_univ g, fun i => ?_⟩
+    have hsupp : ((hyp.toFamilyHypothesis71).hyp71 i).hyp.dadeSupport
+        ⊆ hyp.dadeData.dade.dadeSupport :=
+      dadeSupport_restrict_subset hyp.dadeData.dade Set.subset_union_left _
+    exact fun hmem => hg.2.1 (hsupp hmem)
+  -- drop the `G₀`-part: `|G₀| ≤ Σ_{G₀} ‖χ‖² ≤ Σ_{famG₀} ‖χ‖²`.
+  have hdrop : ((Finset.univ.filter (fun g : G => g ∉ hyp.dadeData.dade.dadeSupport
+        ∧ (orderOf g).Coprime hyp.w1)).card : ℝ)
+      ≤ ∑ g ∈ Finset.univ.filter (fun g : G => g ∈ (hyp.toFamilyHypothesis71).G0),
+          ‖(coh.tau1 params.zeta : G → ℂ) g‖ ^ 2 := by
+    refine le_trans (hyp.sum_zeta_tau1_normSq_ge_card hG coh hmu hos hzS hz1 hzconj hδpm hδj) ?_
+    exact Finset.sum_le_sum_of_subset_of_nonneg hsub (fun g _ _ => by positivity)
+  -- rearrange the family inequality.
+  have hGinv : (0 : ℝ) ≤ (Nat.card G : ℝ)⁻¹ := by positivity
+  have hcS := mul_le_mul_of_nonneg_left hdrop hGinv
+  rw [mul_sub] at h81 ⊢
+  linarith [h81, hcS]
+
 /-- **Peterfalvi (10.8), the analytic chain** (04.12 p.61, lines 87--99) — the pure-`ℚ` assembly
 that turns the §7 norm output (line 87) and the §8 TI-counting bound (lines 89--91) into the
 coherence bound `1 − 1/w₁ − 1/u < w₁w₂/|M'|`.

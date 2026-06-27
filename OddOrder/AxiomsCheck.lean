@@ -6345,6 +6345,13 @@ formula together with the prime computation `coprimeFrobeniusAction_card_eq_prim
 -- Axiom-clean.
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S12.Hypothesis.inner_tau1_zeta_self_eq_one
 
+-- **Peterfalvi (10.8) line 83** `Hypothesis.chiRhoNormSq_zeta_le_line83` (lane-b W3): the mechanical
+-- (7.5)+(10.6.b) combination `‖ζ^{τ₁,ρ}‖² ≤ |A(M)|/|M| + (|famG₀|−|G₀|)/|G|`.  Applies
+-- `S09.family_inequality` (7.5) to the self-contained `toFamilyHypothesis71` (norm-one via
+-- `inner_tau1_zeta_self_eq_one`) and drops the `G₀`-part via `sum_zeta_tau1_normSq_ge_card`.  **Not
+-- AxiomsCheck-registered**: it cites `sum_zeta_tau1_normSq_ge_card`/`tau1_values_and_norm_bound`,
+-- which carry the existing §10 `Hypothesis`-carrier `sorryAx` taint (same as (10.9)); no *new* sorry.
+
 -- **W4 §16→§7 bridge (lane-h, βM (14.11.2) de-opacification)** — `betaMExpansionData_of_hypothesis78`
 -- certifies that the (7.8.a) field of `BetaMExpansionData` (`β_M = 1_G − χ + Δ`) is a genuine
 -- consequence of the S09 §7 Dade decomposition
