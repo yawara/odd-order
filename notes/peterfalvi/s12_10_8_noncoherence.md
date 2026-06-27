@@ -210,3 +210,18 @@ then line 83 → 87 via `|A(M)|/|M| < 1/w₁` + (7.8.b).  (B1)/(10.7) remain §9
 **Next**: the cleanest genuine next step is the `Hypothesis78` (7.8.b) instance for `M` (ii) — the
 last §7-input piece before the line-83 assembly; the deep `Section11CharacterData` carrier (the shared
 root of (10.7)/(11.8)) remains the W3 keystone.
+
+### ⚠ design finding for the next §7 step (ii) — the (7.8.b) `A = H#` requirement
+
+`S09.Hypothesis78` (and its base `Hypothesis76` (7.6)) requires `A = H \ {1}` for a **normal subgroup
+`H ⊴ L`** (`Hypothesis76.A_eq_H_sharp` / `H_normal_in_L`).  But `A(M) = typePA M =
+centralizerSupport (M#) M'` is a *centralizer-support* set, **not** `H#` for any single normal
+subgroup, so (7.8.b) does **not** apply to `(M, A(M))` directly — unlike (7.5), which needs only the
+(7.1)/(7.4) Dade data and so *does* apply to `(M, A(M))` (now enabled by `normalizer_typePA_eq`).
+
+In Peterfalvi (10.8) the (7.8.b) coherence bound `‖χ^ρ‖² ≥ 1 − ŵ₁/|M'|` is therefore applied to a
+**different normal-subgroup configuration** (the `ŵ₁/|M'|` form points at `H = M'` / the
+`(M'/M'')⋊W₁` Frobenius section, an `(M')#`-style `A`), not the type-`P` support `A(M)`.  ⟹ **before
+building (ii)**, read Pf (10.8) 04.12 lines 81–87 to fix *which* `(A, L)` / normal `H` the (7.8.b)
+instance is for; the "`Hypothesis78` for `M`" phrasing in earlier notes is imprecise on this point.
+The `(7.5)`-for-`(M, A(M))` side (line 81) is exactly the part `normalizer_typePA_eq` unblocks.
