@@ -6345,3 +6345,15 @@ formula together with the prime computation `coprimeFrobeniusAction_card_eq_prim
   OddOrder.Peterfalvi.S14.supportKernel_le_maxNilpotentNormalHall
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.S14.thickenedSupport_subset_conjClassSet_maxNilpotentNormalHall
+
+-- **W1 §16 Prop 16.1 `hP1eqV` disjunct 3 (Singer/`SL₂(p)`) prerequisite (lane-f, issue 8015)** —
+-- `IsExtraspecial.of_card_eq_prime_cube`: a nonabelian group of order `p³` is extraspecial
+-- (`Z(G) = [G,G] = Φ(G)`, `|Z(G)| = p`); Coq mathcomp `p3group_extraspecial`.  This is the structural
+-- step that promotes `O_p(M_F)` of order `p³` to extraspecial in the type-V Singer case, reusable for
+-- any nonabelian `p`-group of order `p³`.  Its Burnside-basis helper
+-- `isCyclic_of_isCyclic_quotient_frattini` (a finite group with cyclic Frattini quotient is itself
+-- cyclic) discharges the `|Φ| = p²` exclusion.  Both axiom-clean.
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.IsExtraspecial.of_card_eq_prime_cube
+#assert_only_allowed_axioms
+  OddOrder.GroupTheory.isCyclic_of_isCyclic_quotient_frattini

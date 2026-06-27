@@ -634,3 +634,51 @@ wiring (isTypeV ¬FittingIsTI case): witness (exists_inf_conj) + cycHp' + |Z0|=p
 P=O_p(M_F) extraspecial of order p³ + K⊆Singer cyclic ⟹ |K|∣p+1。要 extraspecial 群論 +
 Singer cycle/GL₂(p) 作用 (Coq defKs/defZP/rPle2 + `basic_p2maxElem_structure`)。**次セッション =
 disjunct 3 の extraspecial/Singer 形式化** (genuine 最深、新インフラ大)。
+
+### 2026-06-27⁷ (lane-f): disjunct 3 着手 — by_cases 再構成 + `p3group_extraspecial` 前提を実証明
+
+disjunct 3 (Singer p³) の formalization に着手。深い 3 BG 前提に bottom-out すると確定したため、上流の
+再利用可能 prerequisite から積み上げ開始。
+
+**landed (2 commit):**
+1. **`isTypeV_of_isTypeP1_mf_eq_msigma` の (e3) ケースを `by_cases |W₁|∣p-1` に再構成** (commit `99c49650`,
+   build green): Coq `nonTI_Fitting_structure` の実分岐 (`Ks=Z0 → |K|∣p-1`) に整合。
+   - |W₁|∣p-1 成立 → disjunct (e2) 直接 (cyclic O_{p'} = hcyc)。
+   - ¬(|W₁|∣p-1) → disjunct (e3)。このとき Z⊓Kstar≠⊥ (Frobenius engine の対偶) ⟹ Z≤Kstar=Z0=Z(P)。
+   - **正しさの改善**: 旧コードは Z⊓Kstar≠⊥ ∧ |K|∣p-1 の sub-case で偽の goal |K|∣p+1 を追っていた。
+     新構成で (e3) 枝が Singer 仮説 `¬(|W₁|∣p-1)` を保持。
+2. **`IsExtraspecial.of_card_eq_prime_cube` (= Coq `p3group_extraspecial`) を実証明** (sorry-free +
+   axiom-clean、AxiomsCheck 登録、`OddOrder/GroupTheory/IsExtraspecial.lean`): **非可換 p³ 群は
+   extraspecial** (`Z=[G,G]=Φ(G)`, `|Z|=p`)。disjunct 3 で P=O_p(M_F) を extraspecial に格上げする構造ステップ。
+   - |Z|=p: `card_center_eq_prime_pow` (|Z|=p^k, k>0) + k=3 排除 (Z=⊤⟹abelian) + k=2 排除
+     (G/Z cyclic⟹abelian, `commutative_of_cyclic_center_quotient`)。
+   - [G,G]=Z: G/Z 位数 p² ⟹ abelian (`IsPGroup.commutative_of_card_eq_prime_sq`) ⟹ [G,G]≤Z; 非可換ゆえ
+     [G,G]≠⊥; |Z|=p prime ⟹ =Z。
+   - Φ=Z: Z=[G,G]≤Φ (`commutator_sup_pow_closure_le_frattini`); |Φ|=p² 排除は新 helper Burnside basis。
+   - **新 Burnside helper `isCyclic_of_isCyclic_quotient_frattini`** (`FrattiniPGroup.lean`、汎用 finite
+     group、sorry-free+axiom-clean+AxiomsCheck): G/Φ cyclic ⟹ G cyclic (`frattini_nongenerating` 経由)。
+
+**インフラ調査結論 (Explore + 手動、disjunct 3 の depth 確定)**:
+OddOrder に**既存**: `IsExtraspecial`/`IsCentralProduct`/`IsNarrow` (NarrowPGroup) + narrow 特徴付け
+(`S05_NarrowCharacterization`, BG §5 Lem 5.2) + `IsFrobeniusAction`+`card_dvd_sub_one_of_isFrobeniusAction`
+(p-1 engine) + GL₂(p) 位数 (`S7A1_JpGL2p`, `card_gl2_zmod_prime`=p(p-1)²(p+1)) + p-群 small-rank 大量
+(`S04_PGroupsSmallRank`/`S04d_GorThm415`=`pRank_le_two_of_scn3_empty`/`S04f_Blackburn`)。
+**未ポート (Coq のみ、disjunct 3 の真の gate)**:
+- **`mFT_rank2_Sylow_cprod`** (BG §10.7b, `coq/BGsection10.v:699`): 非可換 rank≤2 p-群 = extraspecial p³ ∘
+  cyclic の中心積。`rank2_coprime_comm_cprod` (BGappendix) に依存。→ **sorry 1 (|P|=p³)** の核。
+- **`repr_extraspecial_prime_sdprod_cycle`** (BG §2.5, `coq/BGsection2.v:580`): extraspecial P ⋊ cyclic K
+  (prime action C_P(k)=Z(P)) ⟹ |K| ∣ p^n±1。→ **sorry 2 (|K|∣p+1)** の核。
+- **`Aut_narrow`** (BGappendix): narrow p-群の coprime odd cyclic 自己同型は r(P)>2 で |K|∣p-1。
+  → Coq `rPle2` (r(P)≤2) の gate (¬|K|∣p-1 と矛盾)。
+
+**sorry 2 (|K|∣p+1) の数学的核心 (確定)**: K cyclic が P/Z(P)≅F_p² に prime action (C_P(k)=Z) で作用
+⟹ K↪GL₂(p) を FPF (固有値1なし) + **K は交換子形式を保存** (K が Z(P)=Ks を中心化) ⟹ **K≤Sp₂=SL₂(p)**、
+かつ既約 (¬|K|∣p-1 ⟹ split torus 排除) ⟹ K≤Singer F_{p²}^*、**SL₂∩Singer=norm-1 部分群=位数 p+1** ⟹ |K|∣p+1。
+mathlib に `GaloisField` (F_{p²}) はあるが Singer torus/Schur/non-split torus は未整備 → 要新インフラ。
+
+**残 = disjunct 3 の 2 sorry (genuine multi-week)**: `S16_MainResults.lean` の
+`isTypeV_of_isTypeP1_mf_eq_msigma` (e3) 枝、`Nat.card ↥(opiCoreInG {p} (S15.MF M)) = p³` と
+`Nat.card ↥data.W1 ∣ p+1`。両者とも上記 3 BG 前提 (appendix Aut_narrow + §2.5 Singer + §10.7b cprod) の
+ポートを要する。次の上流ステップ候補: (a) `mFT_rank2_Sylow_cprod` (rank-2 Sylow cprod、narrow 特徴付け
+S05 + Blackburn を活用)、(b) SL₂∩Singer divisibility (F_{p²} non-split torus、`p3group_extraspecial` の
+extraspecial 構造を入力)。`p3group_extraspecial` は (b) の P-extraspecial 入力を供給する down-payment。

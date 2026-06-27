@@ -7,7 +7,9 @@ import Mathlib.GroupTheory.PGroup
 import Mathlib.GroupTheory.Commutator.Basic
 import Mathlib.GroupTheory.Frattini
 import Mathlib.GroupTheory.Subgroup.Center
+import Mathlib.GroupTheory.SpecificGroups.Cyclic
 import OddOrder.GroupTheory.ElementaryAbelian
+import OddOrder.GroupTheory.FrattiniPGroup
 
 /-!
 # Extraspecial p-Groups
@@ -54,6 +56,8 @@ mathlib v4.29.1 に `IsExtraspecial` 不在を確認済 (0 hits in `Mathlib/`,
 Phase 2a 第 1 波 audit 2026-05-23 で新規 shared module 候補として確定.
 詳細は `notes/meta/bg_phase2a_wave1_audit_2026_05_23.md`.
 -/
+
+open scoped commutatorElement
 
 namespace OddOrder.GroupTheory
 
@@ -159,6 +163,128 @@ theorem commutator_card (h : IsExtraspecial p G) : Nat.card (commutator G) = p :
 /-- The Frattini subgroup of an extraspecial group has cardinality `p`. -/
 theorem frattini_card (h : IsExtraspecial p G) : Nat.card (frattini G) = p := by
   rw [h.frattini_eq_center]; exact h.center_card
+
+/-- **A nonabelian group of order `p³` is extraspecial** (Coq mathcomp `p3group_extraspecial`).
+A finite group `G` of order `p³` (`p` prime) that is nonabelian is extraspecial:
+`Z(G) = [G, G] = Φ(G)` and `|Z(G)| = p`.
+
+*Proof outline.* The centre has order `p^k`, `0 < k ≤ 3` (`card_center_eq_prime_pow`); `k = 3` makes
+`Z = ⊤` (so `G` abelian) and `k = 2` makes `G/Z` cyclic (hence `G` abelian,
+`commutative_of_cyclic_center_quotient`), both excluded, so `|Z| = p`.  Then `G/Z` has order `p²`,
+hence abelian, giving `[G, G] ≤ Z`; nontriviality of `[G, G]` (nonabelian) and `|Z| = p` prime force
+`[G, G] = Z`.  Finally `Z = [G, G] ≤ Φ(G)` (`commutator_sup_pow_closure_le_frattini`), and `Φ(G)` is
+proper (`frattini_le_coatom`); were `|Φ| = p²` then `|G/Φ| = p` so `G/Φ` is cyclic, forcing `G`
+cyclic (`isCyclic_of_isCyclic_quotient_frattini`, Burnside basis) hence abelian — excluded.  So
+`|Φ| = p = |Z|`, whence `Φ = Z`.
+
+This is Coq `p3group_extraspecial`, used for BG Theorem 15.7(e) disjunct 3 (the `O_p(M_F)` of order
+`p³` Singer/`SL₂(p)` case) and reusable for any nonabelian `p`-group of order `p³`. -/
+theorem of_card_eq_prime_cube [Finite G] [Fact p.Prime]
+    (hcard : Nat.card G = p ^ 3) (hnonab : ¬ ∀ a b : G, a * b = b * a) :
+    IsExtraspecial p G := by
+  have hp : p.Prime := Fact.out
+  have hpg : IsPGroup p G := IsPGroup.of_card hcard
+  haveI : Nontrivial G := by
+    rcases subsingleton_or_nontrivial G with hs | hn
+    · exact absurd (fun a b => Subsingleton.elim _ _) hnonab
+    · exact hn
+  -- Step 1: `|Z(G)| = p`.
+  obtain ⟨k, hk0, hk⟩ := IsPGroup.card_center_eq_prime_pow hcard (by norm_num)
+  have hk3 : k ≤ 3 := by
+    have hle : Nat.card (Subgroup.center G) ≤ Nat.card G :=
+      Nat.le_of_dvd Nat.card_pos (Subgroup.card_subgroup_dvd_card _)
+    rw [hk, hcard] at hle
+    exact (Nat.pow_le_pow_iff_right hp.one_lt).mp hle
+  have hcardZ : Nat.card (Subgroup.center G) = p := by
+    have hkne3 : k ≠ 3 := by
+      rintro rfl
+      have htop : Subgroup.center G = ⊤ := Subgroup.eq_top_of_card_eq _ (by rw [hk, hcard])
+      exact hnonab fun a b => by
+        have ha : a ∈ Subgroup.center G := htop ▸ Subgroup.mem_top a
+        exact (Subgroup.mem_center_iff.mp ha b).symm
+    have hkne2 : k ≠ 2 := by
+      rintro rfl
+      have hcardQ : Nat.card (G ⧸ Subgroup.center G) = p := by
+        have heq := Subgroup.card_eq_card_quotient_mul_card_subgroup (Subgroup.center G)
+        rw [hcard, hk] at heq
+        have hmul : Nat.card (G ⧸ Subgroup.center G) * p ^ 2 = p * p ^ 2 := by rw [← heq]; ring
+        exact Nat.eq_of_mul_eq_mul_right (pow_pos hp.pos 2) hmul
+      haveI : IsCyclic (G ⧸ Subgroup.center G) := isCyclic_of_prime_card hcardQ
+      exact hnonab (commutative_of_cyclic_center_quotient (QuotientGroup.mk' (Subgroup.center G))
+        (QuotientGroup.ker_mk' _).le)
+    have hk1 : k = 1 := by omega
+    rw [hk, hk1, pow_one]
+  -- Step 2: `[G, G] = Z(G)`.
+  have hcardQ2 : Nat.card (G ⧸ Subgroup.center G) = p ^ 2 := by
+    have heq := Subgroup.card_eq_card_quotient_mul_card_subgroup (Subgroup.center G)
+    rw [hcard, hcardZ] at heq
+    have hmul : Nat.card (G ⧸ Subgroup.center G) * p = p ^ 2 * p := by rw [← heq]; ring
+    exact Nat.eq_of_mul_eq_mul_right hp.pos hmul
+  have hcomm_le_center : commutator G ≤ Subgroup.center G := by
+    rw [commutator_def, Subgroup.commutator_le]
+    intro x _ y _
+    have hQcomm := IsPGroup.commutative_of_card_eq_prime_sq hcardQ2
+    have hpi : (QuotientGroup.mk' (Subgroup.center G)) ⁅x, y⁆ = 1 := by
+      rw [map_commutatorElement, commutatorElement_eq_one_iff_commute]
+      exact hQcomm _ _
+    exact (QuotientGroup.eq_one_iff _).mp hpi
+  have hcomm_ne_bot : commutator G ≠ ⊥ := by
+    obtain ⟨a, b, hab⟩ : ∃ a b : G, a * b ≠ b * a := by
+      by_contra hc
+      refine hnonab fun a b => ?_
+      by_contra h
+      exact hc ⟨a, b, h⟩
+    intro hbot
+    refine hab (commutatorElement_eq_one_iff_commute.mp ?_)
+    have hmem : ⁅a, b⁆ ∈ commutator G := by
+      rw [commutator_def]
+      exact Subgroup.commutator_mem_commutator (Subgroup.mem_top a) (Subgroup.mem_top b)
+    rwa [hbot, Subgroup.mem_bot] at hmem
+  have hcomm_eq_center : commutator G = Subgroup.center G := by
+    have hdvd : Nat.card (commutator G) ∣ Nat.card (Subgroup.center G) :=
+      Subgroup.card_dvd_of_le hcomm_le_center
+    rw [hcardZ] at hdvd
+    have hne1 : Nat.card (commutator G) ≠ 1 := fun h1 =>
+      hcomm_ne_bot (Subgroup.card_eq_one.mp h1)
+    have hcardC : Nat.card (commutator G) = p := ((Nat.dvd_prime hp).mp hdvd).resolve_left hne1
+    exact Subgroup.eq_of_le_of_card_ge hcomm_le_center (by rw [hcardZ, hcardC])
+  -- Step 3: `Φ(G) = Z(G)`.
+  have hZle : Subgroup.center G ≤ frattini G :=
+    hcomm_eq_center ▸ le_sup_left.trans (IsPGroup.commutator_sup_pow_closure_le_frattini hpg)
+  have hfr_ne_top : frattini G ≠ ⊤ := by
+    obtain ⟨M, hM, _⟩ :=
+      (IsCoatomic.eq_top_or_exists_le_coatom (⊥ : Subgroup G)).resolve_left bot_lt_top.ne
+    exact fun htop => hM.1 (le_antisymm le_top (htop ▸ frattini_le_coatom hM))
+  have hcardFr : Nat.card (frattini G) = p := by
+    have hple : p ≤ Nat.card (frattini G) := by
+      rw [← hcardZ]; exact Nat.le_of_dvd Nat.card_pos (Subgroup.card_dvd_of_le hZle)
+    have hdvd : Nat.card (frattini G) ∣ p ^ 3 := by
+      rw [← hcard]; exact Subgroup.card_subgroup_dvd_card _
+    obtain ⟨j, hj3, hj⟩ := (Nat.dvd_prime_pow hp).mp hdvd
+    have hj0 : j ≠ 0 := by
+      rintro rfl
+      rw [hj, pow_zero] at hple
+      have := hp.one_lt; omega
+    have hjne3 : j ≠ 3 := fun h =>
+      hfr_ne_top (Subgroup.eq_top_of_card_eq _ (by rw [hj, h, hcard]))
+    have hjne2 : j ≠ 2 := by
+      intro h
+      have hcardQF : Nat.card (G ⧸ frattini G) = p := by
+        have heq := Subgroup.card_eq_card_quotient_mul_card_subgroup (frattini G)
+        rw [hcard, hj, h] at heq
+        have hmul : Nat.card (G ⧸ frattini G) * p ^ 2 = p * p ^ 2 := by rw [← heq]; ring
+        exact Nat.eq_of_mul_eq_mul_right (pow_pos hp.pos 2) hmul
+      haveI : IsCyclic (G ⧸ frattini G) := isCyclic_of_prime_card hcardQF
+      haveI : IsCyclic G := OddOrder.GroupTheory.isCyclic_of_isCyclic_quotient_frattini ‹_›
+      obtain ⟨g, hg⟩ := IsCyclic.exists_generator (α := G)
+      refine hnonab fun a b => ?_
+      obtain ⟨m, rfl⟩ := Subgroup.mem_zpowers_iff.mp (hg a)
+      obtain ⟨n, rfl⟩ := Subgroup.mem_zpowers_iff.mp (hg b)
+      rw [← zpow_add, ← zpow_add, add_comm]
+    have : j = 1 := by omega
+    rw [hj, this, pow_one]
+  exact ⟨hpg, hcomm_eq_center,
+    (Subgroup.eq_of_le_of_card_ge hZle (by rw [hcardZ, hcardFr])).symm, hcardZ⟩
 
 /-- **A nonabelian special group with cyclic centre is extraspecial.**
 A special `p`-group `G` (`IsSpecial p G`) that is *not* elementary abelian (equivalently,
