@@ -96,11 +96,30 @@ sorried, but now reduces to exactly:
     (supplied by `exact`, defeq through proof-irrelevance of the `hnorm` argument) and vacuous
     `pairwise_disjoint` over `Fin 1`.  **The entire input side of (7.5) for `M` is now built**:
     `S09.family_inequality (hyp.toFamilyHypothesis71 hN) χ hχ` gives line 81 directly.
-  - **Remaining for (A)**: (i) apply `family_inequality` (7.5) [now a one-liner on
-    `toFamilyHypothesis71`]; (ii) the `Hypothesis78` (7.8.b) instance for `M`; (iii) **the deep
-    norm-connection** — specialise `χ = ζ^{τ₁}`, identify `G₀`/`G₁` (order prime to `w₁`), and
-    connect `chiRhoNormSq`/`|G₀|`/`|A(M)|/|M|` to the group quantities of line 87.  Steps (ii)/(iii)
-    are the genuine remaining §7 character content (multi-step).
+  - **✅ `card_le_sum_normSq_of_forall_eq_odd_intCast` LANDED** (2026-06-27, sorry-free, general):
+    the analytic core of line 83 — if `χ : ι → ℂ` takes **odd integer** values on a finite `S`, then
+    `|S| ≤ Σ_{S} ‖χ‖²` (per element, `‖(m:ℂ)‖² = |m|² ≥ 1` via `Complex.norm_intCast`; `Σ_S 1 = |S|`).
+    General/reusable (no §10 hyps).  In (10.8) it is applied to `χ = ζ^{τ₁}` on
+    `G₀ = {g | g ∉ Ã(M), (ord g).Coprime w₁}` with the per-`g` bound (10.6.b) `zeta_tau1_norm_ge_one`,
+    dropping the `G₀`-part of the (7.5) sum.
+  - **Remaining for (A)**: (i) apply `family_inequality` (7.5) [one-liner on `toFamilyHypothesis71`];
+    (ii) the `Hypothesis78` (7.8.b) instance for `M`; (iii) **the deep norm-connection assembly** —
+    instantiate `card_le_sum_…` for `ζ^{τ₁}` on `G₀` via (10.6.b) `tau1_values_and_norm_bound`,
+    combine with (7.5) [`famG₀ = G − Ã(M)` sum, `G₀ ⊆ famG₀` via `A(M)-support ⊆ A_0(M)-support`]
+    → line 83; then `|A(M)|/|M| < 1/w₁` + (7.8.b) → line 87.
+  - **⚠ signature-threading finding (2026-06-27)**: `tau1_values_and_norm_bound` / `zeta_tau1_norm_ge_one`
+    (10.6.b) require **7 parameter conditions** `hmu : params.mu = hyp.muGrid`, `hos`, `hzS`, `hz1`,
+    `hzconj`, `hδpm`, `hδj` that are **NOT fields of `CharacterParameters`** (which has a *free* `mu`
+    field) — they hold only for the specific params from `Hypothesis.exists_charParameters`.  The
+    estimate's signature takes an **arbitrary implicit `{params}`** (the one `coh` is for), so to
+    invoke (10.6.b) inside it these 7 conditions must be **threaded** `exists_charParameters →
+    `w2_prime_and_parameter_independence` → `S_not_coherent` → the estimate (add them as hypotheses,
+    have `exists_charParameters` expose them).  This is a design+proof step spanning 3 declarations,
+    the real entry cost of (iii).
+  - **deepest W3 root**: even with all of (A) done, the estimate needs **(B1)** = (10.7), which is
+    **§9-blocked** (`S11.Section11CharacterData` carrier, shared with (11.8)).  The §7 foundation
+    above is genuine reusable infrastructure for the honest (10.8) proof, but the headline estimate
+    will not close until the §9 carrier is materialised.
 - **(B1) the inclusion `G₁ ⊆ (H#)^G ∪ V^G`** (lines 89): needs **(10.7) `typeII_derived_frobenius`**
   (the `x ∈ HU ⟹ x ∈ H` step) + (8.6.a)/(8.11)/(2.1).  `(10.7)` is the §9-blocked piece (its
   Peterfalvi proof cites the §9 Clifford counts `(9.8.b)/(9.9.b)/(9.10)`, which are stated against
