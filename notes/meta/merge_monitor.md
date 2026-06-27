@@ -336,6 +336,21 @@ branch とも削除済み。旧 **A** / **D** も同様に退役済み (履歴�
 
 ## 現状メモ
 
+- **2026-06-27 (続²) — lane-c 退役で 4→3 レーン集約 (ユーザー裁可)**: lane-c が hub-ask (issue 2028, Cor 15.3 完了→
+  次配置相談) を起票。hub が候補を実コード検証:
+  - option 1 (Cor 15.5(c) producer) は **lane-f が S16 内インライン自前証明済で moot**。
+  - 代替 W₁ rank-1 carrier (`typePData_W1_pRank_eq_one`) も **moot** — `isTypeP_of_typePData_of_card_W1_prime`
+    (S16:2868) が |W₁| 素数から rank-1 を carrier 不要で導出済、reverse 3 bridge (hIIP2/hIIIIVP1/hVP1) の真の残は
+    **κ vs σ' 型判定**で全て S16_MainResults (lane-f 所有) 内 = file-disjoint な lane-c ピース無し (issue 2027
+    relane #12 survey と一致、再検証で確認)。⚠ Explore agent が rank-1 carrier を高価値と**誤推奨**→実コード検証で
+    覆した ([[grep-sorry-docstring-contamination]] / 実コード検証の教訓、relane #5/#11 と同根)。
+  - frontier は char-bound で狭く lane-c は relane #3/#6/#8/#10/#11 と繰り返し starve。
+  - **⟹ ユーザー裁可「4→3 レーンに集約」**: lane-c 退役 (全量合流済・WIP なし確認済)。残 3 レーン = **lane-f (W1=BG
+    §16 Prop 16.1 reverse κ-determination + char-gated hP1neIIIIV) / lane-b (W3=Pf §10-13 char 核, 唯一の bare FT
+    sorry) / lane-h (W2=§12 type-I tower)**。lane-c 所有 (S15_MF/S14_TypePCounting) の今後の §15/§16 群論 need は
+    lane-f が BG owner として担当。lane-c LAUNCH.md に退役バナー設置 (self-resume cron 停止指示)、issue 2028 closed。
+    **監視 cron を f/b/h の 3 レーンに縮小** (新 cron id は再開時に記録)。worktree/branch の物理削除は別途 (soft retire)。
+
 - **2026-06-27 (続) — 4 commit 合流 (F×2/H/C) + 範囲逸脱 STOP→例外承認→再開**: ユーザー監視下で複数 tick。
   **F**: hP1neIIIIV の U nilpotent / hDcompl residual を sorry-free+axiom-clean 化 (issue 8015、各 1 commit)。
   **H**: (12.17) `exists_typeICovering` を bare sorry→実証明展開 (issue 0081、新 helper 2 個 sorry-free
