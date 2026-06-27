@@ -314,3 +314,13 @@ remain, both isolated: (7.8.b) Hypothesis78 instance for (M,A(M)) H=M' (the (7.7
 certificates) — cleanest next target; and hB TI-counting (§9-blocked via (10.7), the
 S11.Section11CharacterData carrier = W3 keystone, shared with (11.8)).  正本 =
 notes/peterfalvi/s12_10_8_noncoherence.md (2026-06-27 cont.³).
+
+## 2026-06-27 lane-b (W3, cont.⁴): line 83 PROVEN
+
+`chiRhoNormSq_zeta_le_line83` landed (the mechanical (7.5)+G₀-drop step, full build 3884 green).
+**The entire mechanical/arithmetic spine of (10.8) is now proven** (lines 79-83 + the line-87
+arithmetic + the ℚ chain + the closer).  The two remaining gates are exactly: (7.8.b) `‖ζ^{τ₁,ρ}‖²`
+lower bound (the `Hypothesis78` instance for (M,A(M)), H=M' — config fixed, (7.7.a)/(7.8.c.i)
+certificates are the content) and `hB` TI-counting (§9-blocked via (10.7), the
+`S11.Section11CharacterData` carrier = W3 keystone, shared with (11.8)).  正本 =
+notes/peterfalvi/s12_10_8_noncoherence.md (2026-06-27 cont.⁴).
