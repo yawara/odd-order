@@ -1485,6 +1485,162 @@ theorem isComplement'_mf_complement_of_sup_inf [Finite G] {M U : Subgroup G}
     rw [← hidx, Subgroup.card_mul_index]
   exact Subgroup.isComplement'_of_card_mul_and_disjoint hcard hdisj
 
+/-- **Coprime inner-induced conjugation is trivial**: if `x` normalizes `N`, `orderOf x` is coprime
+to `|N|`, and conjugation by `x` agrees on `N` with conjugation by some `n ∈ N` (so `x` induces an
+*inner* automorphism of `N`), then `x` centralizes `N`.
+
+The induced automorphism `φ(x) ∈ Aut(N)` (via `normalizerMonoidHom`) equals `φ(n)`, an inner
+automorphism by `n ∈ N`, so `orderOf (φ x)` divides both `orderOf x` and `|N|` (as
+`orderOf (φ n) ∣ orderOf n ∣ |N|`); coprimality forces `orderOf (φ x) = 1`, i.e. `φ x = 1`, i.e.
+`x ∈ ker (normalizerMonoidHom N) = C_G(N)`.  This is the coprime-action core of the type-`P₁`
+`M_F`-internal Fitting decomposition (`F(M) ⊓ U ⊆ C(M_F)`). -/
+theorem mem_centralizer_of_inner_conj_of_coprime [Finite G] {N : Subgroup G} {x n : G}
+    (hxN : x ∈ Subgroup.normalizer (N : Set G)) (hn : n ∈ N)
+    (hcop : Nat.Coprime (orderOf x) (Nat.card ↥N))
+    (hconj : ∀ y ∈ N, x * y * x⁻¹ = n * y * n⁻¹) :
+    x ∈ Subgroup.centralizer (N : Set G) := by
+  classical
+  have hnN : n ∈ Subgroup.normalizer (N : Set G) := Subgroup.le_normalizer hn
+  set φ := N.normalizerMonoidHom with hφ
+  -- `φ ⟨x⟩ = φ ⟨n⟩`: conjugation by `x` and by `n` agree on `N`.
+  have hφeq : φ ⟨x, hxN⟩ = φ ⟨n, hnN⟩ := by
+    ext y
+    exact hconj (y : G) y.2
+  -- `orderOf (φ ⟨x⟩) ∣ orderOf x`.
+  have hdvd_x : orderOf (φ ⟨x, hxN⟩) ∣ orderOf x := by
+    have h1 := orderOf_map_dvd φ ⟨x, hxN⟩
+    rwa [Subgroup.orderOf_mk] at h1
+  -- `orderOf (φ ⟨x⟩) = orderOf (φ ⟨n⟩) ∣ orderOf n ∣ |N|`.
+  have hdvd_N : orderOf (φ ⟨x, hxN⟩) ∣ Nat.card ↥N := by
+    rw [hφeq]
+    refine (orderOf_map_dvd φ ⟨n, hnN⟩).trans ?_
+    rw [Subgroup.orderOf_mk]
+    exact Subgroup.orderOf_dvd_natCard N hn
+  -- Coprimality forces the induced automorphism to be trivial.
+  have h1 : orderOf (φ ⟨x, hxN⟩) = 1 := Nat.eq_one_of_dvd_coprimes hcop hdvd_x hdvd_N
+  have hker : (⟨x, hxN⟩ : ↥(Subgroup.normalizer (N : Set G))) ∈ φ.ker := by
+    rw [MonoidHom.mem_ker, ← orderOf_eq_one_iff]; exact h1
+  rw [hφ, Subgroup.normalizerMonoidHom_ker, Subgroup.mem_subgroupOf] at hker
+  exact hker
+
+/-- **Type-`P₁` (`M_F ≠ M_σ`) `M_F`-internal Fitting decomposition** (BG Corollary 15.5, the
+`M' = M_σ` form): for a type-`P₁` maximal `M` with `M_F`-complement `U` in `M' = M_σ`
+(`M_F ⊔ U = M'`, `M_F ⊓ U = ⊥`), the Fitting subgroup is `F(M) = M_F ⊔ (U ⊓ C_M(M_F))`.
+
+`F(M)` is nilpotent with `M_F` a normal Hall subgroup (Hall in `M`, hence in `F(M)`) and
+`F(M) ≤ M'` (`M` is not type `F`).  By the modular law `F(M) = M_F ⊔ (U ⊓ F(M))` (`M_F ≤ F(M)`,
+`F(M) ≤ M' = M_F ⊔ U`).  The crux `U ⊓ F(M) ⊆ C(M_F)`: each `x ∈ U ⊓ F(M)` decomposes (Corollary
+15.5, `F(M) = C_M(M_F) · M_F`) as `x = a · b` with `a ∈ C(M_F)`, `b ∈ M_F`, so conjugation by `x`
+agrees on `M_F` with conjugation by `b` (inner); as `|U|` is coprime to `|M_F|` (`M_F` Hall),
+`mem_centralizer_of_inner_conj_of_coprime` forces `x ∈ C(M_F)`.  Discharges the `hFiteq` (and hence
+`hSDfit`, via `M'' ≤ F(M)`) residual of the type-`P₁` `TypePData` for the `hP1neIIIIV` bridge. -/
+theorem fittingInAmbient_eq_mf_sup_inf_of_isTypeP1_mf_ne_msigma [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M U : Subgroup G} (hM : M ∈ maximalSubgroups G)
+    (hP1 : S14.IsTypeP1 M)
+    (hsup : maxNilpotentNormalHall M ⊔ U = derivedInG M)
+    (hinf : maxNilpotentNormalHall M ⊓ U = ⊥) :
+    (OddOrder.Isaacs.Ch01.fitting ↥M).map M.subtype =
+      maxNilpotentNormalHall M ⊔
+        (U ⊓ Subgroup.centralizer (maxNilpotentNormalHall M : Set G)) := by
+  classical
+  haveI : IsSolvable ↥M := hG.solvable_of_mem_maximalSubgroups hM
+  set N := maxNilpotentNormalHall M with hNdef
+  set M' := derivedInG M with hM'def
+  set F := S15.fittingInAmbient M with hFdef
+  have hnotF : ¬ S14.IsTypeF M := fun hF => (S14.isTypeF_iff_not_isTypeP.mp hF) hP1.1
+  obtain ⟨_Y, -, -, -, _hM''F, hFcent, -, -, -, _hNM', hFle, -⟩ := S15.fitting_decomposition hG hM
+  have hFleM' : F ≤ M' := hFle hnotF
+  have hM'M : M' ≤ M := Subgroup.map_subtype_le _
+  have hFM : F ≤ M := hFleM'.trans hM'M
+  have hNF : N ≤ F := S15.maxNilpotentNormalHall_le_fittingInG M
+  have hNM : N ≤ M := maxNilpotentNormalHall_le M
+  have hUle : U ≤ M' := hsup ▸ le_sup_right
+  -- `coprime |U| |N|`: `|U| ∣ [M:N]` (complement card), `N` Hall in `M`.
+  have hcompl := isComplement'_mf_complement_of_sup_inf hsup hinf
+  have hcard0 := (Subgroup.isComplement'_iff_card_mul_and_disjoint.mp hcompl).1
+  rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe (show N ≤ M' from hNF.trans hFleM')).toEquiv,
+    Nat.card_congr (Subgroup.subgroupOfEquivOfLe hUle).toEquiv] at hcard0
+  -- `hcard0 : |N| * |U| = |M'|`.
+  have hcop : Nat.Coprime (Nat.card ↥U) (Nat.card ↥N) := by
+    have hHall := maxNilpotentNormalHall_isHall M
+    have hci := hHall.coprime_index
+    rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hNM).toEquiv] at hci
+    -- `hci : coprime |N| (N.subgroupOf M).index`.
+    have hMeq : Nat.card ↥N * (N.subgroupOf M).index = Nat.card ↥M := by
+      rw [← Nat.card_congr (Subgroup.subgroupOfEquivOfLe hNM).toEquiv]
+      exact Subgroup.card_mul_index (N.subgroupOf M)
+    have hM'dvdM : Nat.card ↥M' ∣ Nat.card ↥M := by
+      rw [← Nat.card_congr (Subgroup.subgroupOfEquivOfLe hM'M).toEquiv]
+      exact Subgroup.card_subgroup_dvd_card (M'.subgroupOf M)
+    have hUdvd : Nat.card ↥U ∣ (N.subgroupOf M).index := by
+      have hdvd : Nat.card ↥N * Nat.card ↥U ∣ Nat.card ↥N * (N.subgroupOf M).index := by
+        rw [hcard0, hMeq]; exact hM'dvdM
+      exact (mul_dvd_mul_iff_left (Nat.card_pos (α := ↥N)).ne').mp hdvd
+    exact (hci.coprime_dvd_right hUdvd).symm
+  -- `F = N ⊔ (U ⊓ F)` (Dedekind modular law, via `M' = N ⋊ U` and `N ≤ F ≤ M'`).
+  have hNnormM' : M' ≤ Subgroup.normalizer (N : Set G) :=
+    hM'M.trans (maxNilpotentNormalHall_le_normalizer M)
+  haveI hNnorm' : (N.subgroupOf M').Normal :=
+    (Subgroup.normal_subgroupOf_iff_le_normalizer (hNF.trans hFleM')).mpr hNnormM'
+  have hmod : F = N ⊔ (U ⊓ F) := by
+    apply le_antisymm
+    · intro f hf
+      have hfM' : f ∈ M' := hFleM' hf
+      have hmemsup : (⟨f, hfM'⟩ : ↥M') ∈ N.subgroupOf M' ⊔ U.subgroupOf M' := by
+        rw [← Subgroup.subgroupOf_sup (hNF.trans hFleM') hUle, hsup, Subgroup.subgroupOf_self]
+        exact Subgroup.mem_top _
+      obtain ⟨n, hn, u, hu, hnu⟩ := Subgroup.mem_sup_of_normal_left.mp hmemsup
+      have hnN : (n : G) ∈ N := Subgroup.mem_subgroupOf.mp hn
+      have huU : (u : G) ∈ U := Subgroup.mem_subgroupOf.mp hu
+      have hfnu : f = (n : G) * (u : G) := by
+        have h := congrArg Subtype.val hnu; simpa using h.symm
+      have huF : (u : G) ∈ F := by
+        rw [show (u : G) = (n : G)⁻¹ * f by rw [hfnu]; group]
+        exact F.mul_mem (F.inv_mem (hNF hnN)) hf
+      rw [hfnu]
+      exact Subgroup.mul_mem_sup hnN (Subgroup.mem_inf.mpr ⟨huU, huF⟩)
+    · exact sup_le hNF inf_le_right
+  -- Crux: `U ⊓ F ≤ C(N)`.
+  have hFUcent : U ⊓ F ≤ Subgroup.centralizer (N : Set G) := by
+    intro x hx
+    rw [Subgroup.mem_inf] at hx
+    obtain ⟨hxU, hxF⟩ := hx
+    have hxM : x ∈ M := hFM hxF
+    haveI hNnorm : (N.subgroupOf M).Normal := maxNilpotentNormalHall_subgroupOf_normal M
+    have hxFM : (⟨x, hxM⟩ : ↥M) ∈
+        (Subgroup.centralizer (N : Set G) ⊓ M).subgroupOf M ⊔ N.subgroupOf M := by
+      rw [← Subgroup.subgroupOf_sup inf_le_right hNM, Subgroup.mem_subgroupOf]
+      show x ∈ Subgroup.centralizer (N : Set G) ⊓ M ⊔ N
+      rw [← hFcent]; exact hxF
+    obtain ⟨a, ha, b, hb, hab⟩ := Subgroup.mem_sup_of_normal_right.mp hxFM
+    have haC : (a : G) ∈ Subgroup.centralizer (N : Set G) :=
+      (Subgroup.mem_inf.mp (Subgroup.mem_subgroupOf.mp ha)).1
+    have hbN : (b : G) ∈ N := Subgroup.mem_subgroupOf.mp hb
+    have hxab : x = (a : G) * (b : G) := by
+      have h := congrArg (Subtype.val) hab
+      simpa using h.symm
+    have hxnorm : x ∈ Subgroup.normalizer (N : Set G) := maxNilpotentNormalHall_le_normalizer M hxM
+    have hcopx : Nat.Coprime (orderOf x) (Nat.card ↥N) :=
+      Nat.Coprime.coprime_dvd_left (Subgroup.orderOf_dvd_natCard U hxU) hcop
+    refine mem_centralizer_of_inner_conj_of_coprime hxnorm hbN hcopx ?_
+    intro y hy
+    have hbyb : (b : G) * y * (b : G)⁻¹ ∈ N := N.mul_mem (N.mul_mem hbN hy) (N.inv_mem hbN)
+    have hcomm := (Subgroup.mem_centralizer_iff.mp haC) _ hbyb
+    rw [hxab]
+    calc (a : G) * (b : G) * y * ((a : G) * (b : G))⁻¹
+        = (a : G) * ((b : G) * y * (b : G)⁻¹) * (a : G)⁻¹ := by group
+      _ = (b : G) * y * (b : G)⁻¹ * (a : G) * (a : G)⁻¹ := by rw [← hcomm]
+      _ = (b : G) * y * (b : G)⁻¹ := by group
+  -- Assemble `F = N ⊔ (U ⊓ C(N))`.
+  show F = N ⊔ (U ⊓ Subgroup.centralizer (N : Set G))
+  apply le_antisymm
+  · rw [hmod]
+    exact sup_le_sup_left (le_inf inf_le_left hFUcent) N
+  · refine sup_le hNF ?_
+    have hle : U ⊓ Subgroup.centralizer (N : Set G) ≤ Subgroup.centralizer (N : Set G) ⊓ M :=
+      le_inf inf_le_right (inf_le_left.trans (hUle.trans hM'M))
+    exact hle.trans (le_sup_left.trans_eq hFcent.symm)
+
 /-- **Prop 16.1(a) forward bridge, core** (mmd L4480): a type-`F` maximal `M` (`κ(M) = ∅`, so the
 Hall `κ`-subgroup `K = ⊥`) carries the shared Peterfalvi type-`F` structure `TypeFData M`.
 
@@ -2069,6 +2225,53 @@ noncomputable def typePData_of_isTypeP1_mf_eq_msigma [Finite G]
   · -- `hFiteq`: `F(M) = M_F` (type-V Fitting collapse).
     rw [bot_inf_eq, sup_bot_eq]
     exact fittingInAmbient_eq_maxNilpotentNormalHall_of_isTypeP1_mf_eq_msigma hG hM hP1 hmf
+
+/-- **`TypePData M` for a type-`P₁` maximal subgroup with `M_F ≠ M_σ`** — the type III/IV
+carrier-constructibility milestone: every such maximal subgroup carries a Peterfalvi type-`P` datum,
+`sorry`-free.
+
+The `M_F`-internal complement `U` (`M' = M_σ = M_F ⊔ U`, `M_F ⊓ U = ⊥`, `K ≤ N_G(U)`) is supplied by
+`exists_typeP1_mf_complement` (`K`-invariant Schur–Zassenhaus); the four deep `U`/Fitting fields are
+the new BG Corollary 15.5 lemmas: `U` is nilpotent (`isNilpotent_complement_of_isTypeP1_mf_ne_msigma`,
+`U ≅ M_σ/M_F`), `U` is a genuine `M'`-complement (`isComplement'_mf_complement_of_sup_inf`), and the
+Fitting decomposition `F(M) = M_F ⊔ (U ⊓ C_M(M_F))` (`fittingInAmbient_eq_mf_sup_inf_of_…`, whence
+`M'' ≤ F(M)` gives `hSDfit`).  Fed to the gated-endpoint `typePData_of_isTypeP_of_inputs`.  Mirrors
+`typePData_of_isTypeP2`; together they construct the type-`P` datum for every non-type-V type-`P`
+maximal, leaving the `hP1neIIIIV` bridge gated only on the type III/IV last mile `N_G(U) ⊆ M`. -/
+noncomputable def typePData_of_isTypeP1_mf_ne_msigma [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G}
+    (hM : M ∈ maximalSubgroups G) (hP1 : S14.IsTypeP1 M)
+    (hne : S15.MF M ≠ OddOrder.BG.Ch3.S10.Msigma M) :
+    TypePData M := by
+  classical
+  haveI : IsSolvable ↥M := hG.solvable_of_mem_maximalSubgroups hM
+  -- A Hall `κ(M)`-subgroup `K` (`Type`-valued goal: extract via `Exists.choose`).
+  have hKex := Ch03.hall_E_exists (G := ↥M) (S14.kappa M)
+  set K : Subgroup G := hKex.choose.map M.subtype with hKdef
+  have hKM : K ≤ M := Subgroup.map_subtype_le hKex.choose
+  have hKeq : K.subgroupOf M = hKex.choose :=
+    Subgroup.comap_map_eq_self_of_injective M.subtype_injective hKex.choose
+  have hK : Ch03.IsHallSubgroup (S14.kappa M) (K.subgroupOf M) := by rw [hKeq]; exact hKex.choose_spec
+  have hKne : K ≠ ⊥ := fun h =>
+    card_kappaHall_ne_one hP1.1 hKM hK (by rw [h, Subgroup.card_bot])
+  -- The `K`-invariant `M_F`-complement `U` in `M' = M_σ` (`Type`-valued goal: `Exists.choose`).
+  have hUex := exists_typeP1_mf_complement hG hM hP1 hKM hK
+  set U := hUex.choose with hUdef
+  have hUspec := hUex.choose_spec
+  have hUle : U ≤ derivedInG M := hUspec.1
+  have hsup : maxNilpotentNormalHall M ⊔ U = derivedInG M := hUspec.2.1
+  have hKnorm : K ≤ Subgroup.normalizer (U : Set G) := hUspec.2.2.1
+  have hinf : maxNilpotentNormalHall M ⊓ U = ⊥ := hUspec.2.2.2
+  -- The four deep `U`/Fitting fields (BG Corollary 15.5).
+  have hUnilp : Group.IsNilpotent ↥U :=
+    isNilpotent_complement_of_isTypeP1_mf_ne_msigma hG hM hP1 hne hsup hinf
+  have hDcompl := isComplement'_mf_complement_of_sup_inf hsup hinf
+  have hFiteq := fittingInAmbient_eq_mf_sup_inf_of_isTypeP1_mf_ne_msigma hG hM hP1 hsup hinf
+  have hSDfit : secondDerivedInAmbient M ≤
+      maxNilpotentNormalHall M ⊔ (U ⊓ Subgroup.centralizer (maxNilpotentNormalHall M : Set G)) := by
+    obtain ⟨_, -, -, -, hM''F, -, -, -, -, -, -, -⟩ := S15.fitting_decomposition hG hM
+    rw [← hFiteq]; exact hM''F
+  exact typePData_of_isTypeP_of_inputs hG hM hP1.1 hKM hKne hK hUle hKnorm hUnilp hDcompl hSDfit hFiteq
 
 /-- **Prop 16.1 forward bridge, type III/IV last mile** (Peterfalvi (8.7)): a type-`P` datum whose
 `U`-factor has its normalizer inside `M` is of type III or IV, according as `U` is abelian or not.

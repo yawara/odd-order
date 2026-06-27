@@ -5613,6 +5613,38 @@ Axiom-clean. -/
 
 #assert_only_allowed_axioms OddOrder.BG.Ch4.S16.isComplement'_mf_complement_of_sup_inf
 
+/-! **Coprime inner-induced conjugation is trivial** (`S16_MainResults`,
+`mem_centralizer_of_inner_conj_of_coprime`): if `x` normalizes `N`, `orderOf x` is coprime to `|N|`,
+and conjugation by `x` agrees on `N` with conjugation by some `n ∈ N` (inner), then `x ∈ C_G(N)`.
+The induced automorphism `φ(x) = φ(n) ∈ Inn(N)` (via `normalizerMonoidHom`) has order dividing both
+`orderOf x` and `|N|`; coprimality forces `φ(x) = 1`, i.e. `x ∈ ker = C_G(N)`.  Reusable
+coprime-action core of the type-`P₁` `M_F`-internal Fitting decomposition.  Axiom-clean. -/
+
+#assert_only_allowed_axioms OddOrder.BG.Ch4.S16.mem_centralizer_of_inner_conj_of_coprime
+
+/-! **Type-`P₁` (`M_F ≠ M_σ`) `M_F`-internal Fitting decomposition** (`S16_MainResults`,
+`fittingInAmbient_eq_mf_sup_inf_of_isTypeP1_mf_ne_msigma`, BG Corollary 15.5): for a type-`P₁`
+maximal `M` with `M_F`-complement `U` in `M' = M_σ`, `F(M) = M_F ⊔ (U ⊓ C_M(M_F))`.  `F(M)` is
+nilpotent with `M_F` normal Hall (so `F(M) = M_F ⊔ (U ⊓ F(M))` by the Dedekind law); the crux
+`U ⊓ F(M) ⊆ C(M_F)` is the coprime-action core (`mem_centralizer_of_inner_conj_of_coprime`) applied
+to the `F(M) = C_M(M_F)·M_F` factorisation.  Discharges the `hFiteq`/`hSDfit` residuals.
+Axiom-clean. -/
+
+#assert_only_allowed_axioms
+  OddOrder.BG.Ch4.S16.fittingInAmbient_eq_mf_sup_inf_of_isTypeP1_mf_ne_msigma
+
+/-! **`TypePData M` for a type-`P₁` maximal subgroup with `M_F ≠ M_σ`** (`S16_MainResults`,
+`typePData_of_isTypeP1_mf_ne_msigma`): the type III/IV carrier-constructibility milestone — every
+such maximal subgroup carries a Peterfalvi type-`P` datum, `sorry`-free.  The `K`-invariant
+`M_F`-complement `U` (`exists_typeP1_mf_complement`) is fed to `typePData_of_isTypeP_of_inputs` with
+the four deep `U`/Fitting fields discharged by the new BG Corollary 15.5 lemmas
+(`isNilpotent_complement_…`, `isComplement'_mf_complement_…`,
+`fittingInAmbient_eq_mf_sup_inf_…`).  Mirrors `typePData_of_isTypeP2`; together they construct the
+type-`P` datum for every non-type-V type-`P` maximal, leaving the `hP1neIIIIV` bridge gated only on
+the type III/IV last mile `N_G(U) ⊆ M`.  Axiom-clean. -/
+
+#assert_only_allowed_axioms OddOrder.BG.Ch4.S16.typePData_of_isTypeP1_mf_ne_msigma
+
 /-! **Type-`P₁` (`M_F ≠ M_σ`) `TypePNontrivialCore`** (`S16_MainResults`,
 `typePData_nontrivialCore_of_isTypeP1_mf_ne_msigma`): the common type II--IV hypotheses
 (`U ≠ ⊥`, `|W₁|` prime, `M_F#` `TI`) of a type-`P₁` (`M_F ≠ M_σ`) `TypePData` with `U ≠ ⊥`.
