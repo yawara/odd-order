@@ -1872,7 +1872,7 @@ theorem isTypeI_of_isTypeF [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
       -- divisibility engine + per-prime order-`q` witnesses) and cyclic `O_{p'}(M_F)` (conjunct B).
       refine Or.inr (Or.inr ⟨fun q _hq hqπ => ?_, ?_⟩)
       · -- conjunct A: `exp U ∣ q - 1` for each `q ∈ π(M_F)`.
-        obtain ⟨Z, hZMF, hZcard, hMNZ, -⟩ :=
+        obtain ⟨Z, hZMF, hZcard, hMNZ, -, -⟩ :=
           exists_orderQ_le_mf_normal_in_M_of_not_fittingIsTI hG hM hp hX₁card hX₁MF _hCGnotM
             hrank3 habel _hq hqπ
         exact typeF_exponent_dvd_sub_one_of_invariant_card td (by rw [td.H_eq]; exact hZMF)
@@ -2741,6 +2741,82 @@ theorem pRank_opiCore_le_two_of_kappaHall [Finite G]
   rw [← hKcard] at hgdvd
   exact hKp1 hgdvd
 
+/-- **`|Z(O_p(M_F))| = p` in the type-V Singer case** (BG Theorem 15.7(e), Coq `defZP`/`oZ0`): the
+centre of `P = O_p(M_F)` has order `p`.  The cyclic `κ`-Hall `K` (a `p′`-group acting on `P`)
+centralizes `Ω₁(Z(P))` — it equals `K* = M_σ ⊓ C(K)` and `Ω₁(Z(P)) ≤ K*` (the `(e3)` Singer
+hypothesis) — so by **BG Theorem 1.11** (`actsTrivially_on_of_fixes_omega1`, the coprime `Ω₁`-rigidity)
+`K` centralizes all of `Z(P)`.  Hence `Z(P) ≤ M_σ ⊓ C(K) = K* = Ω₁(Z(P)) ≤ Z(P)`, i.e.
+`Z(P) = Ω₁(Z(P))`, whose order is `p`.  This is the `|Z(P)| = p` input to the central-product
+collapse `mFT_rank2_Sylow_cprod` (`card_opiCore_eq_prime_cube_singer`).
+
+The hypotheses `hZKstar`/`hZcard` are about the explicit `Ω₁(Z(P)) = omega1CenterInG P p`; in the
+type-V branch they come from the witness `Z` (which equals `Ω₁(Z(P))`, exposed by
+`exists_orderQ_le_mf_normal_in_M_of_not_fittingIsTI`) together with `Z ≤ K*`. -/
+theorem card_center_opiCore_eq_prime_of_omega1Center_le_kstar [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M K Kstar : Subgroup G}
+    (hM : M ∈ maximalSubgroups G) (hP1 : S14.IsTypeP1 M)
+    (hmf : S15.MF M = OddOrder.BG.Ch3.S10.Msigma M) (hKM : K ≤ M)
+    (hK : Ch03.IsHallSubgroup (S14.kappa M) (K.subgroupOf M))
+    (hKstar : Kstar = OddOrder.BG.Ch3.S10.Msigma M ⊓ Subgroup.centralizer (K : Set G))
+    {p : ℕ} (hp : p.Prime) (hpodd : Odd p) (hKp' : ¬ p ∣ Nat.card ↥K)
+    (hKnormP : K ≤ Subgroup.normalizer (↑(opiCoreInG ({p} : Set ℕ) (S15.MF M)) : Set G))
+    (hZKstar : OddOrder.BG.Ch3.S10.omega1CenterInG (opiCoreInG ({p} : Set ℕ) (S15.MF M)) p ≤ Kstar)
+    (hZcard : Nat.card ↥(OddOrder.BG.Ch3.S10.omega1CenterInG
+      (opiCoreInG ({p} : Set ℕ) (S15.MF M)) p) = p) :
+    Nat.card ↥(Subgroup.center ↥(opiCoreInG ({p} : Set ℕ) (S15.MF M))) = p := by
+  classical
+  haveI : Fact p.Prime := ⟨hp⟩
+  set P : Subgroup G := opiCoreInG ({p} : Set ℕ) (S15.MF M) with hPdef
+  set Z : Subgroup G := OddOrder.BG.Ch3.S10.omega1CenterInG P p with hZdef
+  have hPpg : IsPGroup p ↥P := isPGroup_opiCoreInG_singleton (S15.MF M)
+  -- `K* = Z` (= `Ω₁(Z(P))`): `|K*|` prime, `Z ≤ K*`, `|Z| = p`.
+  have hKstarEqZ : Kstar = Z := by
+    have hKstarPrime : (Nat.card ↥Kstar).Prime :=
+      S15.kstar_card_prime_of_inputs hG hM hP1 hKM hK hKstar
+    have hdvd : p ∣ Nat.card ↥Kstar := hZcard ▸ Subgroup.card_dvd_of_le hZKstar
+    have hc : Nat.card ↥Kstar = p := ((Nat.prime_dvd_prime_iff_eq hp hKstarPrime).mp hdvd).symm
+    exact (Subgroup.eq_of_le_of_card_ge hZKstar (le_of_eq (hc.trans hZcard.symm))).symm
+  -- Conjugation action `φ : ↥K →* MulAut ↥P`.
+  set φ : ↥K →* MulAut ↥P :=
+    (Subgroup.normalizerMonoidHom P).comp (Subgroup.inclusion hKnormP) with hφdef
+  have hp2 : p ≠ 2 := by rintro rfl; exact (by decide : ¬ Odd 2) hpodd
+  -- `K` fixes `Z(P)` pointwise (Theorem 1.11): it fixes `Ω₁(Z(P)) = Z ≤ K* ≤ C(K)`.
+  have htriv : ∀ a : ↥K, ∀ g ∈ Subgroup.center ↥P, φ a g = g := by
+    refine OddOrder.BG.Ch1.S01.actsTrivially_on_of_fixes_omega1 hp2 hPpg hKp' φ
+      (OddOrder.Isaacs.Ch03.IsAInvariant.of_characteristic φ) ?_
+    intro a g hg hgp
+    have hgZ : (g : G) ∈ Z := by
+      rw [hZdef, OddOrder.BG.Ch3.S10.omega1CenterInG, Subgroup.mem_map]
+      exact ⟨g, mem_omega1OfAbelian.mpr ⟨hg, hgp⟩, rfl⟩
+    have hgC : (g : G) ∈ Subgroup.centralizer (K : Set G) := by
+      have hgKstar : (g : G) ∈ Kstar := by rw [hKstarEqZ]; exact hgZ
+      rw [hKstar] at hgKstar; exact (Subgroup.mem_inf.mp hgKstar).2
+    apply Subtype.ext
+    show (a : G) * (g : G) * (a : G)⁻¹ = (g : G)
+    have hcomm : (a : G) * (g : G) = (g : G) * (a : G) :=
+      Subgroup.mem_centralizer_iff.mp hgC (a : G) a.2
+    rw [hcomm, mul_inv_cancel_right]
+  -- `Z(P) ≤ K* = Z`: `Z(P) ≤ M_σ` and `K` centralizes `Z(P)`.
+  have hcent_le : (Subgroup.center ↥P).map P.subtype ≤ Z := by
+    rw [← hKstarEqZ, hKstar]
+    refine le_inf ((Subgroup.map_subtype_le _).trans
+      ((opiCoreInG_le _ _).trans (hmf ▸ S15.maxNilpotentNormalHall_le_Msigma hG hM))) ?_
+    intro x hx
+    obtain ⟨g, hg, rfl⟩ := Subgroup.mem_map.mp hx
+    rw [Subgroup.mem_centralizer_iff]
+    intro k hk
+    have h2 : k * (g : G) * k⁻¹ = (g : G) := congrArg (fun z : ↥P => (z : G)) (htriv ⟨k, hk⟩ g hg)
+    exact mul_inv_eq_iff_eq_mul.mp h2
+  -- `Z = Ω₁(Z(P)) ≤ Z(P)`.
+  have hZ_le_cent : Z ≤ (Subgroup.center ↥P).map P.subtype := by
+    rw [hZdef, OddOrder.BG.Ch3.S10.omega1CenterInG]
+    exact Subgroup.map_mono omega1OfAbelian_le
+  have hcent_eq : (Subgroup.center ↥P).map P.subtype = Z := le_antisymm hcent_le hZ_le_cent
+  have hmapcard : Nat.card ↥((Subgroup.center ↥P).map P.subtype) = Nat.card ↥(Subgroup.center ↥P) :=
+    Subgroup.card_map_of_injective P.subtype_injective
+  rw [hcent_eq] at hmapcard
+  rw [← hmapcard, hZcard]
+
 /-- **`O_p(M_F)` is a Sylow `p`-subgroup of `G`** (Coq `sylP_G`): for a maximal `M` with
 `M_F = M_σ` and `p ∈ σ(M)`, the `p`-core `P = O_p(M_F)` is a Sylow `p`-subgroup of `G`.
 
@@ -2792,22 +2868,24 @@ of `P = O_p(M_F)` is `p³`.  The inputs `r(P) ≤ 2` (`hrPle2`, the `rPle2` step
 faithfulness brick `kappaHall_inf_centralizer_opiCore_eq_bot` + `pRank_opiCore_le_two_of_kappaHall`)
 and `P` non-abelian (`hPnab`) are in hand.
 
-The Sylow input `P = O_p(M_F)` is a Sylow `p`-subgroup of `G` is now discharged
-(`exists_sylow_eq_opiCore_of_mf_eq_msigma`, Coq `sylP_G`).  The remaining content is the **Blackburn
-rank-2 Sylow central-product structure** (`mFT_rank2_Sylow_cprod`, Coq §10.7b; Lean
-`S10.sylow_structure_b`, currently `private`): a Sylow `P` with `r(P) ≤ 2` and `P` non-abelian is a
-central product `S ∘ C` of a nonabelian `p³` `S = Ω₁` with cyclic `C`; with `Z(P) = K* = Ω₁(Z(P))` of
-order `p` (Coq `defZP`/`oZ0`, needing the coprime-action fact `coprime_odd_faithful_Ohm1`) the cyclic
-factor `C` collapses into `Z(P)`, leaving `|P| = |S| = p³`.  This is the genuinely-deep residual of
-disjunct 3 (issue 8015); `r(P) ≤ 2`, `P` non-abelian, and `P` Sylow of `G` are the discharged
-prerequisites. -/
+All four inputs are now discharged: `r(P) ≤ 2` (`hrPle2`), `P` non-abelian (`hPnab`), `P` Sylow of
+`G` (`exists_sylow_eq_opiCore_of_mf_eq_msigma`, Coq `sylP_G`), and `|Z(P)| = p` (`hZPcard`,
+`card_center_opiCore_eq_prime_of_omega1Center_le_kstar`, Coq `defZP` via BG Theorem 1.11).  The sole
+remaining content is the **Blackburn rank-2 Sylow central-product structure** (`mFT_rank2_Sylow_cprod`,
+Coq §10.7b; Lean `S10.sylow_structure_b`, currently `private`): a Sylow `P` with `r(P) ≤ 2` and `P`
+non-abelian is a central product `S ∘ C` of a nonabelian `p³` `S = Ω₁` with cyclic `C`; with
+`|Z(P)| = p` the cyclic factor `C = Z(P)` collapses into `Z(S)`, leaving `|P| = |S| = p³`.  To finish:
+de-privatize/expose `sylow_structure_b`, build the `p′`-Hall complement `V` of `P` in `N_G(P)`
+(Schur–Zassenhaus), convert `pRank ≤ 2` to `rank ≤ 2` (`rank_le_pRank_of_isPGroup`), and collapse the
+central product using `hZPcard`. -/
 theorem card_opiCore_eq_prime_cube_singer [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} (hM : M ∈ maximalSubgroups G)
     (hP1 : S14.IsTypeP1 M) (hmf : S15.MF M = OddOrder.BG.Ch3.S10.Msigma M)
     {p : ℕ} (hp : p.Prime) (hpσ : p ∈ OddOrder.BG.Ch3.S10.sigma M)
     (hpπ : p ∈ (Nat.card ↥(S15.MF M)).primeFactors)
     (hrPle2 : pRank ↥(opiCoreInG ({p} : Set ℕ) (S15.MF M)) p ≤ 2)
-    (hPnab : ¬ IsMulCommutative ↥(opiCoreInG ({p} : Set ℕ) (S15.MF M))) :
+    (hPnab : ¬ IsMulCommutative ↥(opiCoreInG ({p} : Set ℕ) (S15.MF M)))
+    (hZPcard : Nat.card ↥(Subgroup.center ↥(opiCoreInG ({p} : Set ℕ) (S15.MF M))) = p) :
     Nat.card ↥(opiCoreInG ({p} : Set ℕ) (S15.MF M)) = p ^ 3 := by
   sorry
 
@@ -2872,9 +2950,12 @@ theorem isTypeV_of_isTypeP1_mf_eq_msigma [Finite G]
       (data.card_W1_eq_derived_index).trans
         (card_kappaHall_eq_derived_index hG hM hP1.1 hKM hK).symm
     -- The `M`-normal order-`p` `Z ≤ M_F = M_σ` normalized by `K`.
-    obtain ⟨Z, hZMF, hZcard, hZnorm, hX₁notZ⟩ :=
+    obtain ⟨Z, hZMF, hZcard, hZnorm, hX₁notZ, hZeq⟩ :=
       S15.exists_orderQ_le_mf_normal_in_M_of_not_fittingIsTI hG hM hp hX₁card hX₁MF hCGnotM
         hrank3 hnab (q := p) hp hpπ
+    -- `Z = Ω₁(Z(O_p(M_F)))` (Coq `Z0`), exposed for the type-V Singer `|Z(P)| = p` argument.
+    have hZomega : Z = OddOrder.BG.Ch3.S10.omega1CenterInG
+        (opiCoreInG ({p} : Set ℕ) (S15.MF M)) p := hZeq rfl
     have hZMσ : Z ≤ OddOrder.BG.Ch3.S10.Msigma M := hmf ▸ hZMF
     have hKNZ : K ≤ Subgroup.normalizer (Z : Set G) := hKM.trans hZnorm
     set Kstar : Subgroup G :=
@@ -2921,12 +3002,17 @@ theorem isTypeV_of_isTypeP1_mf_eq_msigma [Finite G]
       -- `O_p(M_F)` is non-abelian (`opiCore_singleton_not_isMulCommutative_of_witness`).
       have hPnab : ¬ IsMulCommutative ↥(opiCoreInG ({p} : Set ℕ) (S15.MF M)) :=
         S15.opiCore_singleton_not_isMulCommutative_of_witness hG hM hp hX₁card hX₁MF hCGnotM hnab
+      -- `|Z(P)| = p` (Coq `defZP`, via BG Theorem 1.11): the witness `Z = Ω₁(Z(P))` (`hZomega`)
+      -- lies in `K*` (`hZKstar`), so `K` centralizes `Z(P)`, forcing `Z(P) = Ω₁(Z(P))`.
+      have hZPcard : Nat.card ↥(Subgroup.center ↥(opiCoreInG ({p} : Set ℕ) (S15.MF M))) = p :=
+        card_center_opiCore_eq_prime_of_omega1Center_le_kstar hG hM hP1 hmf hKM hK hKstardef
+          hp hpodd hKp' hKnormP (hZomega ▸ hZKstar) (hZomega ▸ hZcard)
       refine Or.inr (Or.inr ⟨p, hp, hHMF ▸ hpπ, ?_, ?_, hHMF ▸ hcyc⟩)
-      · -- (sorry 1) `|O_p(M_F)| = p³`.  `r(P) ≤ 2` (`hrPle2`) and `P` non-abelian (`hPnab`) are in
-        -- hand; the residual is the `mFT_rank2_Sylow_cprod` central-product structure (Coq §10.7b,
-        -- Lean `sylow_structure_b`) once `P = O_p(M_F)` is a Sylow `p`-subgroup of `G`, together
-        -- with `|Z(P)| = p` (Coq `defZP`/`oZ0`).  Isolated in `card_opiCore_eq_prime_cube_singer`.
-        exact card_opiCore_eq_prime_cube_singer hG hM hP1 hmf hp hpσ hpπ hrPle2 hPnab
+      · -- (sorry 1) `|O_p(M_F)| = p³`.  All four inputs (`r(P) ≤ 2`, `P` non-abelian, `P` Sylow of
+        -- `G`, `|Z(P)| = p`) are discharged; the residual is the `mFT_rank2_Sylow_cprod`
+        -- central-product structure (Coq §10.7b, Lean `sylow_structure_b`), isolated in
+        -- `card_opiCore_eq_prime_cube_singer`.
+        exact card_opiCore_eq_prime_cube_singer hG hM hP1 hmf hp hpσ hpπ hrPle2 hPnab hZPcard
       · sorry
 
 /-- **Prop 16.1(d)/(f) reverse, `M_F = M_σ` from `U = ⊥`** (the `M_F = M_σ` conjunct of `hVP1`,
