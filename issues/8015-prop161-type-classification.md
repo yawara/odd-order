@@ -926,3 +926,44 @@ b:V×V→F_p の非退化 alternating form に降下、K が Z(P) 中心化 ⟹ 
 **次セッション = route B を 1 本の lemma `kappaHall_card_dvd_succ_of_extraspecial_action` として構築**
 (rep テンプレート L0-L4 ~100 行 + det=1 form L5-det ~80 行)。全テンプレート/補題所在確定、新規大規模
 ポート不要。det=1 form が唯一の intricate 新規部。一体構成ゆえ fresh context 推奨。
+
+### ✅✅✅ 2026-06-28 (lane-f 再開¹³): hP1eqV 完全完成 — route B 実装 + 配線で |W₁|∣p+1 sorry 閉鎖
+
+前セッション (再開² cont.²) が「次セッション = route B を 1 本の lemma として構築、det=1 form が
+唯一の intricate 新規部」とした計画を**完遂**。`isTypeV_of_isTypeP1_mf_eq_msigma` (Prop 16.1 forward
+bridge hP1eqV) が**完全 sorry-free + axiom-clean** (#print axioms = propext/Classical.choice/Quot.sound)。
+
+**新 leaf `OddOrder/GroupTheory/RepresentationTheory/ExtraspecialSinger.lean` (~640 行、全 axiom-clean)**
+(commit `cfeea2d6`):
+- **主 lemma `card_dvd_succ_of_primeAction_extraspecial`**: cyclic p'-群 K (p 奇) が extraspecial P
+  (|P|=p³) に作用、prime action C_P(k)⊆Z(P) (k≠1)、Z(P) 中心化、¬|K|∣p-1 ⟹ |K|∣p+1。
+- L0-L1: V=P/Z(P)=Additive(↥P⧸commutator↥P) を 2 次元 𝔽_p 化 (P/Φ elementary abelian)、共役を
+  Representation ρ (quotientMulAutHom + mulAutToEnd)。
+- L2/L3: P-level C_P(k)⊆Z を **coprime 作用 (Isaacs Cor 3.28 `coprime_fixedPoints_quotient`、⟨k⟩ zpow
+  固定点反復)** で V 上 FPF に lift → faithful + reducible 排除 (split-torus 枝で |K|∣p-1)。
+- **L5 det=1 (新規 intricate)**: extraspecial commutator [.,.]:P×P→Z(P)≅𝔽_p が V 上 alternating form
+  `commPairing` に降下 (class-2 双線型性 `commBihom2`, ζ=`commMulEquiv`)、K が Z(P) 中心化 ⟹ form 保存
+  ⟹ **dim 2 で det=1** (`det_eq_one_of_compLinearMap_alternating`: 保存される非零 top-alternating form
+  ⟹ det=1、`AlternatingMap.eq_smul_basis_det`+`Basis.det_comp`)。
+- Singer: irreducible ⟹ V≅𝔽_{p²} (comm-proof 経由で μ:K↪𝔽_{p²}ˣ 露出、CommGroup K diamond 回避)、
+  det ρ(k)=N(μk)=μ(k)^(p+1) (`Algebra.norm_apply`+`algebraMap_norm_eq_pow`)、det=1 ⟹ |K|∣p+1
+  (`card_dvd_of_injective_to_cyclic_forall_pow`)。
+
+**配線 (S16_MainResults:3098、commit `5ab66f36`)**: 8 仮説を call site で discharge:
+- extraspecial P=O_p(M_F): `IsExtraspecial.of_card_eq_prime_cube` (|P|=p³ via card_opiCore_eq_prime_cube_singer
+  [sorry 1、再開² 済] + 非可換)。
+- 共役作用 φ: ↥K →* MulAut ↥P (`Subgroup.normalizerMonoidHom` ∘ inclusion、K≤N(P)=hKnormP)。
+- prime action C_P(k)⊆Z(P): φk x=x ⟹ x∈C_G(k) ⟹ x∈M_σ⊓C_G(k)=K* (`centralizer_msigma_kappaElement_eq_kstar`)
+  =Z (kstar_card_prime + |Z|=p、brick4 パターン) ⟹ x∈Ω₁(Z(P))⊆Z(↥P)=commutator↥P。
+- K が Z(P) 中心化: z∈center↥P ⟹ (z:G)∈Z⊆K*⊆C_G(K) ⟹ k が z 中心化。
+
+**∴ Prop 16.1 forward bridge 5 本 (hFI/hP2II/hP1neIIIIV/hP1eqV/hIF) 全て honest 化完了**。
+`proposition_type_classification` 残 sorry = reverse 3 本 (hIIP2/hIIIIVP1/hVP1)、全て carrier
+`π(W₁)⊆κ(M)` 待ち = **off-path** (FT consumer `typeP_imp_nonI` は forward のみ使用)。
+両 headline lemma + isTypeV を AxiomsCheck 登録。full build 3885 green (1m27s)。
+
+**reusable インフラ** (将来 mathlib 適性): `det_eq_one_of_compLinearMap_alternating` (純 LA)、
+`bilinToAlt` (bilinear→degree-2 alternating)、`commMulEquiv`/`commPairing`/`commBihom2` (extraspecial
+commutator symplectic form)、class-2 commutator multiplicativity helper (`commutatorElement_mul_*_of_le_center`)。
+
+**lane-f W1-a forward = 完了**。次候補 = reverse carrier (off-path、low priority) or hub 再判断。
