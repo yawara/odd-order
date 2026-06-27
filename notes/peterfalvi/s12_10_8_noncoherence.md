@@ -107,10 +107,18 @@ sorried, but now reduces to exactly:
     instantiate `card_le_sum_…` for `ζ^{τ₁}` on `G₀` via (10.6.b) `tau1_values_and_norm_bound`,
     combine with (7.5) [`famG₀ = G − Ã(M)` sum, `G₀ ⊆ famG₀` via `A(M)-support ⊆ A_0(M)-support`]
     → line 83; then `|A(M)|/|M| < 1/w₁` + (7.8.b) → line 87.
+  - **✅ `Hypothesis.muColumnSign_eq_one_or_neg_one` LANDED** (2026-06-27, sorry-free): the (10.3)
+    fact `δ_j = muColumnSign j ∈ {±1}` (from the §6 `columnFamily`'s `.sign_eq`).  With `hδj`
+    (`muColumnSign j = δ`, returned by `exists_charParamArith`) this gives **`hδpm` (δ = ±1)** — one
+    of the 3 not-yet-exposed (10.6.b) conditions now established.  Still open: `hzconj` (ζ non-real).
   - **⚠ signature-threading finding (2026-06-27)**: `tau1_values_and_norm_bound` / `zeta_tau1_norm_ge_one`
     (10.6.b) require **7 parameter conditions** `hmu : params.mu = hyp.muGrid`, `hos`, `hzS`, `hz1`,
     `hzconj`, `hδpm`, `hδj` that are **NOT fields of `CharacterParameters`** (which has a *free* `mu`
-    field) — they hold only for the specific params from `Hypothesis.exists_charParameters`.  The
+    field) — they hold only for the specific params from `Hypothesis.exists_charParameters`
+    (`hmu`/`hos` are `rfl`; `hzS`/`hz1` and `hδj`/`hδpm` are now establishable per above; the lone
+    deep gap is **`hzconj` (ζ non-real)**, which S12 currently *assumes* everywhere — it needs the
+    cyclic-character realness argument, since the degree-`w₁` `ζ = Ind θ` has `ζ ≠ ζ̄` only for a
+    non-real `W₁`-orbit of `θ`).  The
     estimate's signature takes an **arbitrary implicit `{params}`** (the one `coh` is for), so to
     invoke (10.6.b) inside it these 7 conditions must be **threaded** `exists_charParameters →
     `w2_prime_and_parameter_independence` → `S_not_coherent` → the estimate (add them as hypotheses,
