@@ -8572,7 +8572,8 @@ theorem exists_orderQ_le_mf_normal_in_M_of_not_fittingIsTI [Finite G]
     (hnab : ¬ IsMulCommutative ↥(MF M))
     {q : ℕ} (hq : q.Prime) (hqπ : q ∈ (Nat.card ↥(MF M)).primeFactors) :
     ∃ Z : Subgroup G, Z ≤ MF M ∧ Nat.card ↥Z = q ∧
-      M ≤ Subgroup.normalizer (Z : Set G) ∧ ¬ X₁ ≤ Z := by
+      M ≤ Subgroup.normalizer (Z : Set G) ∧ ¬ X₁ ≤ Z ∧
+      (q = p → Z = OddOrder.BG.Ch3.S10.omega1CenterInG (opiCoreInG ({p} : Set ℕ) (MF M)) p) := by
   classical
   haveI : Fact p.Prime := ⟨hp⟩
   haveI : Fact q.Prime := ⟨hq⟩
@@ -8719,7 +8720,7 @@ theorem exists_orderQ_le_mf_normal_in_M_of_not_fittingIsTI [Finite G]
     have hMNZ : M ≤ Subgroup.normalizer (Z : Set G) := by
       rw [hZdef]
       exact hMNP.trans (OddOrder.BG.Ch3.S10.normalizer_le_normalizer_omega1CenterInG P p)
-    exact ⟨Z, hZMF, hZcard.trans hqp.symm, hMNZ, hX₁notZ⟩
+    exact ⟨Z, hZMF, hZcard.trans hqp.symm, hMNZ, hX₁notZ, fun _ => hZdef⟩
   · -- `q ≠ p`: `O_q(M_F) ≤ O_{p'}(M_F)` is cyclic; take its order-`q` subgroup.
     have hqdvd : q ∣ Nat.card ↥(MF M) := (Nat.mem_primeFactors.mp hqπ).2.1
     obtain ⟨x, hxord⟩ := exists_prime_orderOf_dvd_card' (G := ↥(MF M)) q hqdvd
@@ -8757,7 +8758,7 @@ theorem exists_orderQ_le_mf_normal_in_M_of_not_fittingIsTI [Finite G]
       have hdvd : p ∣ q := by
         have h := Subgroup.card_dvd_of_le hle; rwa [hX₁card, hZcard] at h
       exact hqp ((Nat.prime_dvd_prime_iff_eq hp hq).mp hdvd).symm
-    exact ⟨Z, hZMF, hZcard, hMNZ, hX₁notZ⟩
+    exact ⟨Z, hZMF, hZcard, hMNZ, hX₁notZ, fun h => absurd h hqp⟩
 
 /-- **BG Theorem 15.7(a), rank-theoretic core** (mmd L4192-4198): if `F(M)` is not a TI-subgroup
 of `G`, then no prime divides `M_F` and lies in `β(M)`.

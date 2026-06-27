@@ -5647,6 +5647,17 @@ Axiom-clean. -/
 #assert_only_allowed_axioms
   OddOrder.BG.Ch4.S16.exists_sylow_eq_opiCore_of_mf_eq_msigma
 
+/-! **Type-V disjunct-3 centre order** (`S16_MainResults`,
+`card_center_opiCore_eq_prime_of_omega1Center_le_kstar`, issue 8015): `|Z(O_p(M_F))| = p` (Coq
+`defZP`/`oZ0`).  The cyclic `κ`-Hall `K` centralizes `Ω₁(Z(P)) = K*`, so by **BG Theorem 1.11**
+(`actsTrivially_on_of_fixes_omega1`, coprime `Ω₁`-rigidity, Gorenstein 5.3.10 — already ported) `K`
+centralizes all of `Z(P)`; then `Z(P) ≤ M_σ ⊓ C(K) = K* = Ω₁(Z(P)) ≤ Z(P)`, so `Z(P) = Ω₁(Z(P))`
+has order `p`.  This is the `|Z(P)| = p` input collapsing the `mFT_rank2_Sylow_cprod` central product
+to `|P| = p³` (`card_opiCore_eq_prime_cube_singer`).  Axiom-clean. -/
+
+#assert_only_allowed_axioms
+  OddOrder.BG.Ch4.S16.card_center_opiCore_eq_prime_of_omega1Center_le_kstar
+
 /-! **Type-`P₁` `M_F`-internal complement** (`S16_MainResults`, `exists_typeP1_mf_complement`, the
 construction core of the FT-critical `hP1neIIIIV` bridge): `M_F` has a `K`-invariant complement `U`
 inside `M' = M_σ` (`M_F ⊔ U = M'`, `K ≤ N_G(U)`, `M_F ⊓ U = ⊥`).  The `K`-invariant
