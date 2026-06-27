@@ -6236,6 +6236,10 @@ formula together with the prime computation `coprimeFrobeniusAction_card_eq_prim
 -- (same `G`-image `↑g = ↑a`).  This is the last realization step feeding `caseB_char_inertia_inflation`.
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S11.hInHuEquivH_coe
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S11.conjBy_compHom_hInHuEquivH
+-- (9.9.a) capstone: concrete `HU`-inertia of the realized inflation of a nontrivial `θ̄ ∈ Irr(H̄)`
+-- forces `φ_U(a) = 1` (`a ∈ C`) — the character-side inertia `I_U(θ) ⊆ C`, fully concrete
+-- (realization + inflation injectivity + `chiefFactor_caseB_char_inertia`).
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S11.caseB_inertia_realized
 -- §9 degree infrastructure: `[M:HU] = q` (`HU = M'`, `[M:M'] = |W₁|`) and the resulting
 -- `(Ind_{HU}^M χ)(1) = q·χ(1)` — the degree formula every (9.8)/(9.9) count uses.
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S11.huSub_index_eq_q
