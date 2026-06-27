@@ -6517,3 +6517,13 @@ formula together with the prime computation `coprimeFrobeniusAction_card_eq_prim
   OddOrder.GroupTheory.card_dvd_succ_of_primeAction_extraspecial
 #assert_only_allowed_axioms
   OddOrder.GroupTheory.det_eq_one_of_compLinearMap_alternating
+
+-- **W1 §16 Prop 16.1 forward bridge `hP1eqV` COMPLETE (lane-f, issue 8015)** — a type-`P₁`
+-- maximal `M` with `M_F = M_σ` is of type V, now **fully `sorry`-free + axiom-clean**.  Both
+-- type-V disjunct-3 (Singer/`SL₂(p)`) residuals are closed: `|O_p(M_F)| = p³`
+-- (`card_opiCore_eq_prime_cube_singer`) and `|W₁| ∣ p + 1` (route B, wiring the abstract
+-- `card_dvd_succ_of_primeAction_extraspecial`: extraspecial `P = O_p(M_F)`, conjugation action of
+-- the κ-Hall `K`, prime action `C_P(k) ⊆ Z(P)` from `centralizer_msigma_kappaElement_eq_kstar`
+-- (`K* = Z`), `K` centralizing `Z(P)` from `Z ≤ K* ≤ C_G(K)`).
+#assert_only_allowed_axioms
+  OddOrder.BG.Ch4.S16.isTypeV_of_isTypeP1_mf_eq_msigma
