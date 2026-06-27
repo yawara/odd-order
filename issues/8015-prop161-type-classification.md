@@ -507,3 +507,32 @@ TypePData(P₁, U≠⊥) を要する。M' = M_σ 内の M_F-complement U を構
 
 ⟹ **残 W1 forward = hP1eqV trichotomy (8.8 W₁-action) + hP1neIIIIV の N(U)≤M (8.7)**。両者は char/Coq
 `Fcore_structure` の complement uniqueness。reverse 4 bridge (π(W₁)⊆κ carrier) は別 (lane-b char gate)。
+
+### ✅✅✅ 2026-06-27² (lane-f): hP1neIIIIV bridge を完全 close — N(U)≤M (Pf 8.7) を実証明 (axiom-clean)
+
+前項が「最深 gate・char/Coq `Fcore_structure`」とした **N(U)≤M を完全に実証明**。⟹
+**`isTypeIII_or_IV_of_isTypeP1_mf_ne_msigma` (hP1neIIIIV) が完全 sorry-free + axiom-clean**
+(`#print axioms` = `[propext, Classical.choice, Quot.sound]` のみ)。Coq `BGsection16` `typePfacts`
+(P1maxM/U≠1 枝) の ~10 行論法を移植。前項の「multi-session 深い構造定理」評価は過大評価だった —
+σ-Sylow normalizer uniqueness (BG §10、repo 在庫) で済む。
+
+**重要訂正**: 前 entry が hP1neIIIIV を「char/Coq `Fcore_structure` complement uniqueness」に
+bottom-out するとしたのは**誤り**。正しくは N(U)⊆M は **Coq `typePfacts` の純群論論法** (Sylow-of-U の
+一意性 + σ-Sylow normalizer ⊆ M) で、char gate も `Fcore_structure` の depth も不要。
+
+新規 (全 sorry-free + axiom-clean、AxiomsCheck 登録、`S16_MainResults`):
+- **`normalizer_le_normalizer_map_sylow_of_isNilpotent`** (汎用・再利用可): U nilpotent ⟹ Sylow_p(U)=P̄
+  が一意 (`Ch01.Sylow.normal_of_isNilpotent` + `Sylow.unique_of_normal`) ⟹ N_G(U) ≤ N_G(P̄)
+  (g∈N(U) が U の唯一 Sylow を保存)。Coq の `char_norms (pcore_char p U)` ステップ。
+- **`typeP1_complement_mem_sigma_and_factorization`**: 型 P₁ の M_F-complement U と p∈π(U) について
+  (1) p∈σ(M) (p∣|U|∣|M_σ|、`Msigma_subgroupOf_isHall`) (2) p-part|U|=p-part|M| (= Sylow_p(U) は
+  σ-Sylow of M)。[M:U]=[M':U]·[M:M']、[M':U]=|M_F| (`IsComplement'.index_eq_card`)、p∤|M_F|
+  (M_F Hall in M + |U|∣[M:M_F])、p∤[M:M_σ] (σ-Hall)。Coq の `sMp`/`sylP` ステップ。
+- **`isTypeIII_or_IV_of_isTypeP1_mf_ne_msigma`** 本体を sorry-free 化: p∣|U| を取り P̄=Sylow_p(U)、
+  helper で N(U)≤N(P̄)、P̄ を `Sylow.ofCard` で `Sylow p ↥M` に package、
+  `normalizer_sylow_map_le_of_mem_sigma` (BG §10) で N(P̄)≤M。
+
+⟹ **`proposition_type_classification` の hP1neIIIIV case が axiom-clean に閉じた** (full build 3884
+green、AxiomsCheck OK)。**残 W1 forward = hP1eqV trichotomy (8.8 W₁-action) のみ** (`isTypeV_…` 2511、
+¬FittingIsTI の Suzuki/SL₂ 構造 |W₁|∣p∓1 = Coq `nonTI_Fitting_structure`)。reverse 4 bridge
+(hIIP2/hIIIIVP1/hVP1、π(W₁)⊆κ carrier) は別系統 (lane-b char、FeitThompson 未使用)。
