@@ -5745,6 +5745,25 @@ theorem Hypothesis.card_derived_ge [Finite G]
     _ = Nat.card ↥H := (_root_.commutator ↥H).index_mul_card
     _ = Nat.card ↥(derivedInG M) := hHcard
 
+/-- **The `(10.6.b)`-summed bound** (the analytic core of Peterfalvi (10.8) line 83): if a function
+`χ : G → ℂ` takes **odd integer** values on a finite set `S` (in particular `|χ(g)| ≥ 1` there), then
+`|S| ≤ Σ_{g ∈ S} ‖χ(g)‖²`.  General and reusable (no §10 hypotheses): per element, an odd integer
+`m ≠ 0` has `‖(m : ℂ)‖² = |m|² ≥ 1`, and `Σ_S 1 = |S|`.  In the (10.8) proof this is applied to
+`χ = ζ^{τ₁}` on `G₀ = {g | g ∉ Ã(M), (ord g).Coprime w₁}` via (10.6.b) `zeta_tau1_norm_ge_one`,
+dropping the `G₀`-part of the (7.5) sum to reach line 83. -/
+theorem card_le_sum_normSq_of_forall_eq_odd_intCast {ι : Type*} (S : Finset ι) {χ : ι → ℂ}
+    (h : ∀ g ∈ S, ∃ m : ℤ, χ g = (m : ℂ) ∧ Odd m) :
+    (S.card : ℝ) ≤ ∑ g ∈ S, ‖χ g‖ ^ 2 := by
+  calc (S.card : ℝ) = ∑ _g ∈ S, (1 : ℝ) := by rw [Finset.sum_const, nsmul_eq_mul, mul_one]
+    _ ≤ ∑ g ∈ S, ‖χ g‖ ^ 2 := by
+        refine Finset.sum_le_sum (fun g hg => ?_)
+        obtain ⟨m, hm, hodd⟩ := h g hg
+        have hm0 : m ≠ 0 := by obtain ⟨k, hk⟩ := hodd; omega
+        have hnorm : ‖χ g‖ = |(m : ℝ)| := by rw [hm, Complex.norm_intCast]
+        have h1 : (1 : ℝ) ≤ |(m : ℝ)| := by
+          rw [← Int.cast_abs]; exact_mod_cast Int.one_le_abs hm0
+        rw [hnorm]; nlinarith [h1, abs_nonneg ((m : ℝ))]
+
 /-- **Peterfalvi (10.8), the analytic chain** (04.12 p.61, lines 87--99) — the pure-`ℚ` assembly
 that turns the §7 norm output (line 87) and the §8 TI-counting bound (lines 89--91) into the
 coherence bound `1 − 1/w₁ − 1/u < w₁w₂/|M'|`.
