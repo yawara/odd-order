@@ -60,13 +60,47 @@ the W3 frontier from "(10.8) is a black box" to "(10.8) needs only the §7 norm-
 (+ a routine FPF index bound)". `no_typeV_maximal` and `S_H0C_not_coherent` are unchanged
 (they cite (10.8) by signature).
 
-## Next steps
+## 2026-06-27 — estimate decomposed: analytic chain + `V^G` TI-counting landed (genuine)
 
-- ~~discharge `card_derived_ge`~~ **DONE** (2026-06-26). (10.8) now reduces to the **single**
-  genuine §7 gate below.
-- **(10.7) `typeII_derived_frobenius`** (currently sorried) — upstream of the estimate: the
-  Type-II partner `S` has `[S,S]` Frobenius with kernel `S_F`, giving the `UW₂` Frobenius structure
-  (`|U| ≥ 7`) and the `x ∈ HU ⟹ x ∈ H` step.
-- **`typeII_coherence_contradiction_estimate`** — the genuine remaining §10 char content (the only
-  S12 sorry on the (10.8) path now): build a §7 Hypothesis71/78 instance for the §10 Type-II
-  partner and assemble (7.5)+(7.8.b)+(10.6.b)+the TI-counting `G₁ ⊆ (H#)^G ∪ V^G`.
+The single remaining gate `typeII_coherence_contradiction_estimate` is **Peterfalvi's chain
+(10.8) lines 79--99**, not one opaque step.  Two genuinely-provable pieces of that chain are now
+**proven, sorry-free, full-build green** (all in `S12_MaximalIII_IV_V.lean`):
+
+1. **`typeII_coherence_estimate_chain`** — the pure-`ℚ` analytic combination (lines 87--99): from
+   the §7 output `hA` (line 87, `w₁/|M'| > 1 − |G₁|/|G| − 1/w₁`), the TI-counting bound `hB`
+   (`|G₁|/|G| ≤ (|H|−1)/|S| + (w₁w₂−w₁−w₂+1)/(w₁w₂)`), and `|S| = |H|·|U|·w₂`, derives
+   `1 − 1/w₁ − 1/u < w₁w₂/|M'|` (the `hbound` that `typeII_noncoherence_arithmetic` then closes).
+2. **the `V^G` TI-counting** (the `(w₁w₂−w₁−w₂+1)/(w₁w₂)` numerator of `hB`):
+   - `typePData_card_W` : `|W| = w₁·w₂` (type-`P` torus order, `card_sup_eq_card_mul_card_of_disjoint_normal` in `↥W`);
+   - `typePData_typePV_ncard` : `|V| = w₁w₂ − w₁ − w₂ + 1`;
+   - `typePData_W_normalizes_typePV` : `l ∈ W ⟹ conj l • V = V` (`normalizer_V` with `X = V`);
+   - `typePData_conjClassSet_typePV_ncard` : **`|V^G| = |G:W|·(w₁w₂−w₁−w₂+1)`** via
+     `ncard_conjClassSet_of_isTISubset` + `typePData_V_ti` (the `V`-TI fact already in S12).
+   These are fundamental, reusable type-`P` torus facts (the `ω`-grid lives on `W = W₁ × W₂`, the
+   (4.5) reducible characters, the Dade support `A_0(M) ⊇ V^G`), not estimate-only scaffolding.
+
+**Remaining gates of the estimate (precise, after this decomposition)** — the estimate stays
+sorried, but now reduces to exactly:
+- **(A) the §7 output (line 87)** = `family_inequality` (7.5) + `Hypothesis78.NormEstimates` (7.8.b)
+  + (10.6.b), for `(L, A) = (M, A(M))`.  This needs a `S09.Hypothesis71`/`FamilyHypothesis71`/
+  `Hypothesis78` **instance for `(M, A(M))`**.  Investigation findings (this session): the §7
+  machinery `(7.1)`--`(7.8)` is sorry-free in `S09_NonexistenceCertain.lean`; the §10 `Hypothesis M`
+  carries a genuine Dade map for **`A_0(M)`** (`Hypothesis.tau`, via `dadeData`/`hconj`), and
+  `S10.dadeSupportHypotheses_typeP` (sorried but signature-correct) supplies a
+  `DadeSupportHypothesisData M (typePA M)` for **`A(M)` directly**.  The `HConjInvariant`-for-`A(M)`
+  snag is **resolvable** via `S04.HConjInvariant.restrict` (`A(M) ⊆ A_0(M)`).  So building the
+  `Hypothesis71` for `(M, A(M))` is feasible (S04/S07 Dade-map plumbing), and is the right next
+  upstream target for closing the §7 half.
+- **(B1) the inclusion `G₁ ⊆ (H#)^G ∪ V^G`** (lines 89): needs **(10.7) `typeII_derived_frobenius`**
+  (the `x ∈ HU ⟹ x ∈ H` step) + (8.6.a)/(8.11)/(2.1).  `(10.7)` is the §9-blocked piece (its
+  Peterfalvi proof cites the §9 Clifford counts `(9.8.b)/(9.9.b)/(9.10)`, which are stated against
+  the **opaque, never-constructed** carrier `S11.Section11CharacterData` — same root blockage as
+  (11.8)).  No structural shortcut: `TypeFData.frobenius_HU0` only gives `H ⊔ U₀` Frobenius
+  (`U₀` an exponent-proxy), not the full `[S,S] = H ⋊ U` Frobenius that (10.7) asserts.
+- **(B2) the `(H#)^G` count** `|(H#)^G| = |G:S|·(|H|−1)`: the partner analogue of the `V^G` count
+  above, once the Type-II partner `S`'s `H# = S_F#` TI-ness (8.6.a) and `N_G(H#) = S` are available
+  (partner structure, from a richer (8.8) than the proven `exists_typeII_maximal_with_w2`).
+
+**Upstream-first priority for the next session**: (A) [§7 `Hypothesis71` construction for `(M,A(M))`,
+feasible] is the cleanest genuine next step; (10.7)/(B1) bottoms out on the §9 `Section11CharacterData`
+carrier (deep, shared with (11.8)).
