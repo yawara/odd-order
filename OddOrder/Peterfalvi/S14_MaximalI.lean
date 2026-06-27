@@ -1500,10 +1500,15 @@ theorem thickenedSupport_subset_conjClassSet_maxNilpotentNormalHall
 
 /-- **Peterfalvi (8.17)/(8.13.c1), all-type-I case**: the §8 covering inputs of (12.17) exist.
 
-This is the genuine §8/§10 content behind (12.17): BG Theorem E (`S10.bgTheoremE_cover_data`, the
-type-I covering branch (8.17.a)) together with the escaping-centralizer control (8.13.c1) that makes
-each kernel sharp-set a TI-subset.  It is the single isolated upstream obligation behind the
-otherwise group-theoretic (12.17) reduction in `not_all_maximal_typeI`. -/
+Built as an honest reduction from BG Theorem E (`S10.bgTheoremE_cover_data`): in the all-type-I case
+every representative `M_i` has `data.tau i = .I` (type exclusivity, `not_isTypeI_of_isTypeNonI`), so
+`mainSubgroup (M_i) (τ_i) = (M_i)_F`.  The `reps`/`reps_maximal` plumbing, `coprime` (the (8.17)
+prime-factor partition is disjoint, hence the kernels are coprime), `two_le` (a single class would
+make `|G#| = (|M_s|-1)|G:M| < |G|-1 = |G#|`), and `covers` (the thickened cover lands in
+`(M_i)_F`-conjugates, `thickenedSupport_subset_conjClassSet_maxNilpotentNormalHall`) are all
+discharged.  Two upstream facts remain isolated as residual sorries: `isTI`, the escaping-centralizer
+control (8.13.c1)+(2.3) making each kernel sharp-set a TI-subset; and the selection of the type-I
+cover branch under `hall`, the (8.8.a) dichotomy (BG §16, parallel to `theorem88_dichotomy`). -/
 theorem exists_typeICovering (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     (hall : ∀ M : Subgroup G, M ∈ maximalSubgroups G → IsTypeI M) :
     Nonempty (TypeICovering hG hall) := by
@@ -1542,10 +1547,68 @@ theorem exists_typeICovering (hG : OddOrder.BG.IsMinimalSimpleOdd G)
       isTI := ?_
       coprime := ?_
       covers := ?_ }⟩
-    · -- `two_le`: at least two conjugacy classes of maximal subgroups (7.10).  This is the
-      -- (8.17) counting fact `|G#| = Σ_i (|(M_i)_s| - 1)|G : M_i|`, impossible with one member.
-      -- §8 counting residual.
-      sorry
+    · -- **`two_le`** (discharged): at least two conjugacy classes of maximal subgroups (7.10).
+      -- A single class would force `|G#| = |thickenedA1(M)| = (|M_s| - 1)|G : M|`; but
+      -- `(|M_s| - 1)|G : M| ≤ (|M| - 1)|G : M| = |G| - |G : M| ≤ |G| - 2 < |G| - 1 = |G#|`, and an
+      -- empty class would force `|G#| = 0`, both impossible.  No counting of disjoint unions is
+      -- needed: a one-element index makes the cover `⋃ᵢ thickenedA1(Mᵢ)` equal to a single
+      -- `thickenedA1(M)`, whose cardinality is strictly below `|G#|`.
+      haveI : Nontrivial G := hG.simple.toNontrivial
+      by_contra hlt
+      rw [Nat.not_le] at hlt
+      have hcard01 : Fintype.card data.ι = 0 ∨ Fintype.card data.ι = 1 := by omega
+      rcases hcard01 with h0 | h1
+      · -- empty index: the cover is empty, but `G#` contains a nonidentity element.
+        rw [Fintype.card_eq_zero_iff] at h0
+        have hempty : (⋃ i, thickenedA1 (data.reps i) (data.reps i) (data.tau i)) = ∅ :=
+          Set.iUnion_of_empty _
+        rw [← hTypeI.cover_nonidentity] at hempty
+        obtain ⟨b, hb⟩ := exists_ne (1 : G)
+        have hbmem : b ∈ sharpSubgroup (⊤ : Subgroup G) := by
+          simp only [sharpSubgroup, Subgroup.coe_top, Set.mem_diff, Set.mem_univ, true_and,
+            Set.mem_singleton_iff]
+          exact hb
+        rw [hempty] at hbmem
+        exact hbmem.elim
+      · -- one class: `⋃ᵢ thickenedA1(Mᵢ) = thickenedA1(M)`, of cardinality `< |G#|`.
+        obtain ⟨i₀, hi₀⟩ := Fintype.card_eq_one_iff.mp h1
+        have hunion : (⋃ i, thickenedA1 (data.reps i) (data.reps i) (data.tau i))
+            = thickenedA1 (data.reps i₀) (data.reps i₀) (data.tau i₀) := by
+          ext x
+          simp only [Set.mem_iUnion]
+          exact ⟨fun ⟨i, hi⟩ => by rwa [hi₀ i] at hi, fun hx => ⟨i₀, hx⟩⟩
+        rw [← hTypeI.cover_nonidentity] at hunion
+        have hcard_eq : Nat.card ↥(thickenedA1 (data.reps i₀) (data.reps i₀) (data.tau i₀))
+            = Nat.card G - 1 := by
+          rw [Nat.card_coe_set_eq, ← hunion]
+          show ((↑(⊤ : Subgroup G) : Set G) \ {1}).ncard = Nat.card G - 1
+          rw [Subgroup.coe_top, Set.ncard_diff_singleton_of_mem (Set.mem_univ 1), Set.ncard_univ]
+        rw [data.thickenedA1_card i₀] at hcard_eq
+        -- Arithmetic contradiction.
+        have hmain_le : mainSubgroup (data.reps i₀) (data.tau i₀) ≤ data.reps i₀ :=
+          (hMF i₀).le.trans (OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_le (data.reps i₀))
+        have ham : Nat.card ↥(mainSubgroup (data.reps i₀) (data.tau i₀))
+            ≤ Nat.card ↥(data.reps i₀) := Subgroup.card_le_of_le hmain_le
+        have hidx0 : (data.reps i₀).index ≠ 0 := Subgroup.index_ne_zero_of_finite
+        have hidx1 : (data.reps i₀).index ≠ 1 :=
+          fun h => (data.maximal i₀).1 (Subgroup.index_eq_one.mp h)
+        have hidx : 2 ≤ (data.reps i₀).index := by omega
+        have hmidx : Nat.card ↥(data.reps i₀) * (data.reps i₀).index = Nat.card G :=
+          Subgroup.card_mul_index (data.reps i₀)
+        have hm_pos : 0 < Nat.card ↥(data.reps i₀) := Nat.card_pos
+        have hG2 : 2 ≤ Nat.card G :=
+          le_trans hidx (hmidx ▸ Nat.le_mul_of_pos_left (data.reps i₀).index hm_pos)
+        have hb1 : (Nat.card ↥(mainSubgroup (data.reps i₀) (data.tau i₀)) - 1)
+            * (data.reps i₀).index
+            ≤ (Nat.card ↥(data.reps i₀) - 1) * (data.reps i₀).index :=
+          Nat.mul_le_mul_right _ (Nat.sub_le_sub_right ham 1)
+        have hrhs : (Nat.card ↥(data.reps i₀) - 1) * (data.reps i₀).index
+            = Nat.card G - (data.reps i₀).index := by rw [Nat.sub_one_mul, hmidx]
+        rw [hrhs] at hb1
+        -- `hcard_eq : P = |G| - 1`, `hb1 : P ≤ |G| - idx`, `idx ≥ 2`, `|G| ≥ 2` ⟹ `False`.
+        set P := (Nat.card ↥(mainSubgroup (data.reps i₀) (data.tau i₀)) - 1)
+          * (data.reps i₀).index with hP
+        omega
     · -- `isTI`: each kernel sharp-set `((M_i)_F)#` is a TI-subset, by (8.13.c1)+(2.3).
       -- Escaping-centralizer §8 residual.
       intro j
@@ -1590,9 +1653,10 @@ theorem exists_typeICovering (hG : OddOrder.BG.IsMinimalSimpleOdd G)
       exact hx1 (by rw [← hgtx, ht1]; group)
   · -- **(8.8.b) non-type-I cover branch**: ruled out when every maximal subgroup is type I.
     -- This is the all-type-I case of the (8.8) dichotomy (`theorem88_dichotomy`); under `hall`
-    -- the cover is the type-I cover, never the two-exceptional-subgroup case.  BG §16 residual.
+    -- BG Theorem E returns the type-I cover, never the two-exceptional-subgroup case (the
+    -- exceptional `W` of `hNonTypeI` is the normalizer of a non-type-I maximal).  Isolating that
+    -- is the BG §16 (8.8.a) residual.
     exfalso
-    obtain ⟨_⟩ := hNonTypeI
     sorry
 
 /-- **Peterfalvi (12.17), non-existence half**: in a minimal simple group of odd order, not every
