@@ -336,6 +336,15 @@ branch とも削除済み。旧 **A** / **D** も同様に退役済み (履歴�
 
 ## 現状メモ
 
+- **2026-06-27 — 監視再開 (変化なし) + cron 再作成**: ユーザー「各レーンを監視します」で再開。起動時点で
+  **全 4 レーン (f/b/h/c) 0 unmerged** (前セッションで全合流済み、main HEAD `7b14c8d1`)。local main = origin/main
+  (unpushed 0)、git クリーン (MERGE_HEAD なし)、`bin/count-sorry` baseline = **125**。前 cron は session 変化で消滅
+  (`CronList` 空、[[cron-dies-on-model-switch]]) → 新 cron **`2766c09c`** (`8,23,38,53 * * * *` = 標準 15 分,
+  stop-on-problem prompt 内蔵, **relane #12 = lane-h W2 復帰の所有マップ反映**: F/W1=BG全体+FeitThompson mp/carrier,
+  C/W1-b=S14_TypePCounting+S15_MF, B/W3=S0[3-9]/S1[0-3]+FeitThompson:426, H/W2=S14_MaximalI)。新規 HUB ask issue
+  なし (issues/ 直下 "HUB:" タイトル 0、4002 は 2026-06-22 の既対応 diagnosis)。build は未マージ 0 ゆえ走らせず
+  (手順 step 1)。
+
 - **2026-06-26 (続³) — relane #11 着地検証 → relane #12 (lane-h W2 復帰、carrier moot)**: relane #11 後の初稼働で
   4 レーン合流 (実 sorry 125→126、build 3884 green)。**主成果**: F=hP1eqV を Suzuki ケースに縮小 / B=(10.8)
   S_not_coherent 忠実 3 分解 (relane #11 の Dade-engine 指示が奏功) / C=Cor 15.3(a) ha gate を Prop 14.2(e) で
