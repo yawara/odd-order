@@ -128,6 +128,12 @@ sorried, but now reduces to exactly:
     of `params` **with all 7 (10.6.b) conditions** (`mu=muGrid`, `omegaSigma=alignedΩΣ`, `ζ∈S`,
     `ζ(1)=w₁`, `ζ̄≠ζ`, `δ=±1`, `δ_j=δ`).  The (10.8) line-83 step consumes this (re-wrapping the
     coherence `⟨coh.coherent⟩` for the produced `params`).
+  - **✅ `Hypothesis.sum_zeta_tau1_normSq_ge_card` LANDED** (2026-06-27, sorry-free): the `(10.6.b)`-
+    summed bound `|G₀| ≤ Σ_{g∈G₀} ‖ζ^{τ₁}(g)‖²` over `G₀ = {g | g∉Ã(M), (ord g).Coprime w₁}`, via
+    `card_le_sum_normSq_of_forall_eq_odd_intCast ∘ tau1_values_and_norm_bound`.  This is the `G₀`-drop
+    term for line 83.  **Remaining line-83 wiring**: `G₀ ⊆ famG₀` (restricted `A(M)`-support ⊆
+    `A_0`-support — derive), the (7.5)-combination (family_inequality + this bound + sum monotonicity
+    + `|famG₀| = |G₀| + |G₁|`).
   - (superseded, kept for record) `hzconj` via the orbit argument — every degree-`w₁` `ζ` is non-real
     (de-risks `hzconj` from "deep unknown" to a concrete formalization task).  `ζ = Ind_{M'}^M θ`
     (`θ` nontrivial linear on `M' = [M,M]`, `θ` in general position so `ζ` irreducible of degree

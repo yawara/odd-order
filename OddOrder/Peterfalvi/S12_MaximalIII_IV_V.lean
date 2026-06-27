@@ -5866,6 +5866,48 @@ theorem card_le_sum_normSq_of_forall_eq_odd_intCast {ι : Type*} (S : Finset ι)
           rw [← Int.cast_abs]; exact_mod_cast Int.one_le_abs hm0
         rw [hnorm]; nlinarith [h1, abs_nonneg ((m : ℝ))]
 
+open scoped Classical FiniteInduce in
+/-- **The `(10.6.b)`-summed bound for `ζ^{τ₁}`** — `|G₀| ≤ Σ_{g ∈ G₀} ‖ζ^{τ₁}(g)‖²` over
+`G₀ = {g | g ∉ Ã(M), (ord g).Coprime w₁}`.  Composes `card_le_sum_normSq_of_forall_eq_odd_intCast`
+(the analytic core) with the per-`g` (10.6.b) bound `tau1_values_and_norm_bound` (`ζ^{τ₁}(g)` is an
+odd integer off `Ã(M)` at orders prime to `w₁`).  The 7 parameter conditions are exactly those
+supplied by `exists_charParameters_full`.  This is the `G₀`-drop term Peterfalvi (10.8) uses to pass
+from the family inequality (7.5) (line 81) to line 83. -/
+theorem Hypothesis.sum_zeta_tau1_normSq_ge_card [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G}
+    {hyp : Hypothesis M} {params : CharacterParameters hyp} (coh : CoherentHypothesis hyp params)
+    (hmu : params.mu = hyp.muGrid hG hG.odd)
+    (hos : params.omegaSigma = hyp.alignedOmegaSigmaGrid hG hG.odd)
+    (hzS : params.zeta ∈ inducedFamily M) (hz1 : params.zeta 1 = (hyp.w1 : ℂ))
+    (hzconj : params.zeta.conj ≠ params.zeta)
+    (hδpm : params.delta = 1 ∨ params.delta = -1)
+    (hδj : ∀ j : Fin hyp.w2, j ≠ 0 → hyp.muColumnSign hG hG.odd j = params.delta) :
+    ((Finset.univ.filter
+        (fun g : G => g ∉ hyp.dadeData.dade.dadeSupport ∧ (orderOf g).Coprime hyp.w1)).card : ℝ)
+      ≤ ∑ g ∈ Finset.univ.filter
+          (fun g : G => g ∉ hyp.dadeData.dade.dadeSupport ∧ (orderOf g).Coprime hyp.w1),
+          ‖coh.tau1 params.zeta g‖ ^ 2 := by
+  classical
+  apply card_le_sum_normSq_of_forall_eq_odd_intCast
+  intro g hg
+  rw [Finset.mem_filter] at hg
+  exact (tau1_values_and_norm_bound hG coh hmu hos hzS hz1 hzconj hδpm hδj).2 g hg.2.1 hg.2.2
+
+/-- **Restricting the Dade support shrinks it**: for `A₁ ⊆ A`, the Dade support of the restricted
+hypothesis `hyp.restrict` is contained in that of `hyp` (`mem_dadeSupport_iff`: a witness
+`a ∈ A₁, h ∈ H(a)` for the restriction is a witness `⟨a, _⟩ ∈ A` for `hyp`, since
+`(hyp.restrict ..).H a = hyp.H ⟨a, _⟩`).  In the (10.8) line-83 step this gives `G₀ ⊆ famG₀`: the
+`A_0(M)`-support complement `G₀` is inside the `A(M)`-support complement `famG₀` (the family `(7.4)`
+support for `A(M) = typePA ⊆ typePA0 = A_0(M)`). -/
+theorem dadeSupport_restrict_subset {A A₁ : Set G} {L : Subgroup G} [Fintype G]
+    (hyp : OddOrder.Peterfalvi.S04.Hypothesis G A L) (hA₁A : A₁ ⊆ A)
+    (hA₁_norm : ∀ (l : L) ⦃a : G⦄, a ∈ A₁ → (l : G) * a * (l : G)⁻¹ ∈ A₁) :
+    (hyp.restrict hA₁A hA₁_norm).dadeSupport ⊆ hyp.dadeSupport := by
+  intro g hg
+  rw [OddOrder.Peterfalvi.S04.Hypothesis.mem_dadeSupport_iff] at hg ⊢
+  obtain ⟨a, h, hh, hconj⟩ := hg
+  exact ⟨⟨a.1, hA₁A a.2⟩, h, hh, hconj⟩
+
 /-- **Peterfalvi (10.8), the analytic chain** (04.12 p.61, lines 87--99) — the pure-`ℚ` assembly
 that turns the §7 norm output (line 87) and the §8 TI-counting bound (lines 89--91) into the
 coherence bound `1 − 1/w₁ − 1/u < w₁w₂/|M'|`.
