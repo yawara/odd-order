@@ -6308,6 +6308,13 @@ formula together with the prime computation `coprimeFrobeniusAction_card_eq_prim
 -- Axiom-clean.
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S10.card_Msigma_inf_centralizer_eq_card_W2
 
+-- **type-`P` support is the derived sharp** (shared `GroupTheory`) —
+-- `typePA_eq_sharpSubgroup_derivedInG`: `A(M) = typePA M = sharpSubgroup (derivedInG M) = (M')#`.
+-- The `centralizerSupport (M#) M'` definition collapses on `(M')#` (each `y ∈ (M')# ⊆ M#`
+-- self-centralizes), so `A(M)` is the sharp of the normal `M' ⊴ M` — the `A = H#` shape Peterfalvi
+-- (10.8) uses to apply the (7.6)/(7.8.b) coherence estimate.  Pure set theory.  Axiom-clean.
+#assert_only_allowed_axioms OddOrder.GroupTheory.typePA_eq_sharpSubgroup_derivedInG
+
 -- **`𝒞_G(T)` conjugation-invariance** (shared `GroupTheory`) — `mem_conjClassSet_conj_iff`:
 -- `g * h * g⁻¹ ∈ 𝒞_G(T) ↔ h ∈ 𝒞_G(T)`, i.e. `N_G(𝒞_G(T)) = G`.  Pure group theory.  Used to prove
 -- the (8.16) normalizer fact below (the `V^G` half of `A_0(M) = A(M) ∪ V^G`).  Axiom-clean.
@@ -6322,6 +6329,13 @@ formula together with the prime computation `coprimeFrobeniusAction_card_eq_prim
 -- Pure group theory; discharges the formerly-parametrized `hN` of the §7 inputs
 -- `toHypothesis71` / `toFamilyHypothesis71` (Peterfalvi (10.8) line 79).  Axiom-clean.
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S12.Hypothesis.normalizer_typePA_eq
+
+-- **Peterfalvi (10.8) line-87 arithmetic** (lane-b W3, §7-estimate input) —
+-- `Hypothesis.card_typePA_div_card_lt_inv_w1`: `|A(M)|/|M| < 1/w₁`.  From `A(M) = (M')#`
+-- (`typePA_eq_sharpSubgroup_derivedInG`, `|A(M)| = |M'|−1`) and `|M| = w₁·|M'|`
+-- (`card_W1_eq_derived_index` + `index_mul_card`): `(|M'|−1)/(w₁|M'|) < 1/w₁`.  The strict bound
+-- (10.8) uses at line 87.  Axiom-clean.
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S12.Hypothesis.card_typePA_div_card_lt_inv_w1
 
 -- **W4 §16→§7 bridge (lane-h, βM (14.11.2) de-opacification)** — `betaMExpansionData_of_hypothesis78`
 -- certifies that the (7.8.a) field of `BetaMExpansionData` (`β_M = 1_G − χ + Δ`) is a genuine

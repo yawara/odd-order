@@ -288,3 +288,19 @@ This is a genuine upstream prerequisite of the honest (10.8) §7 estimate (not a
 正本 = `notes/peterfalvi/s12_10_8_noncoherence.md` (2026-06-27 cont. section).  Remaining (10.8) §7:
 `S09.Hypothesis78` (7.8.b) instance for `M` + the line-83 norm assembly; (10.7)/(11.8) stay §9-blocked
 on the `S11.Section11CharacterData` carrier (the W3 keystone).
+
+## 2026-06-27 lane-b (W3, cont.²): §7-estimate inputs rounded out; (7.8.b) config clarified
+
+Continuing the (10.8) §7 side.  Two more genuine inputs proven (axiom-clean, full build 3884 green):
+- `typePA_eq_sharpSubgroup_derivedInG`: **`A(M) = (M')#`** (the centralizer-support def collapses on
+  `(M')#`).  ⟹ `A = H#` with `H = M'` normal — **corrects** the earlier "A ≠ H#" finding; the (7.8.b)
+  `Hypothesis78` for `(M, A(M))` is the `H = M'` instance.
+- `Hypothesis.card_typePA_div_card_lt_inv_w1`: `|A(M)|/|M| < 1/w₁` (line-87 strict bound).
+
+With the earlier `normalizer_typePA_eq` (8.16), the §7 input side of (10.8) is now: (7.5)-for-`(M,A(M))`
+applicable (line 81), `card_derived_ge`, the G₀-drop, the ℚ chain, and the line-87 arithmetic — all
+proven.  **The one genuine remaining §7 piece** = the (7.8.b) `Hypothesis78` instance for `(M, A(M))`,
+`H = M'` (family `inducedFamily M`, `ν = coh.tau1`, the (7.7.a)/(7.8.c.i) certificates = the deep part).
+After that the line 81→87 assembly is mechanical; the final contradiction still needs `hB` (TI-counting)
+which is §9-blocked via (10.7) — the `S11.Section11CharacterData` carrier (W3 keystone, shared with
+(11.8)).  正本 = `notes/peterfalvi/s12_10_8_noncoherence.md` (2026-06-27 cont.² section).

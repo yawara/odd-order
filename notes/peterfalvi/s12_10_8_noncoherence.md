@@ -225,3 +225,54 @@ In Peterfalvi (10.8) the (7.8.b) coherence bound `‖χ^ρ‖² ≥ 1 − ŵ₁/
 building (ii)**, read Pf (10.8) 04.12 lines 81–87 to fix *which* `(A, L)` / normal `H` the (7.8.b)
 instance is for; the "`Hypothesis78` for `M`" phrasing in earlier notes is imprecise on this point.
 The `(7.5)`-for-`(M, A(M))` side (line 81) is exactly the part `normalizer_typePA_eq` unblocks.
+
+### ✅ CORRECTION (2026-06-27, supersedes the design finding above): `A(M) = (M')#` IS `H#`
+
+The "design finding" above (that `A(M)` is centralizer-support, **not** `H#`, so (7.8.b) applies to a
+different config) is **WRONG** and is hereby corrected.  Reading Peterfalvi (10.8) 04.12 line 79
+confirms `ρ` is defined with `L = M, A = A(M)`, and **both** (7.5) (line 81) and (7.8.b) (line 85) use
+this *same* `ρ` — so (7.8.b) is for `(M, A(M))`, exactly as (7.5).
+
+The resolution: **`typePA M = sharpSubgroup (derivedInG M) = (M')#`** (proven:
+`GroupTheory.typePA_eq_sharpSubgroup_derivedInG`).  The `centralizerSupport (M#) M'` definition's
+centralizer condition is *vacuous* on `(M')#` — every `y ∈ (M')# ⊆ M#` self-centralizes (`x = y`).
+So `A(M)` **is** the sharp of the **normal** subgroup `M' = derivedInG M ⊴ M`; the `Hypothesis78`
+(7.8.b) `A = H#` requirement is satisfied with `H = M'`, `L = M`.  No alternative config is needed.
+
+⟹ the (7.8.b) instance for `(M, A(M))` is the `H = M'` Hypothesis78 (the family `T = inducedFamily M
+= S`, the coherent extension `ν = coh.tau1`, the (7.7.a)/(7.8.c.i) certificates) — this is the genuine
+remaining §7 piece (ii).  `|A(M)| = |M'| − 1` (sharp of `M'`), so the line-87 arithmetic
+`|A(M)|/|M| < 1/w₁` follows from `[M : M'] = w₁` (`TypePData.card_W1_eq_derived_index`):
+`(|M'|−1)/(|M'|·w₁) < 1/w₁`.
+
+## 2026-06-27 (cont.²) — §7-estimate inputs rounded out; remaining (10.8) §7 = the (7.8.b) instance
+
+Status of the (10.8) §7 estimate `typeII_coherence_contradiction_estimate` (still one `sorry`, but its
+genuine inputs are being proven ahead of the assembly, mirroring `card_derived_ge`):
+
+**Proven this session (all axiom-clean, full build 3884 green)**:
+- `Hypothesis.normalizer_typePA_eq` (8.16) `N_G(A(M)) = M` ⟹ `toFamilyHypothesis71` self-contained ⟹
+  **(7.5) for `(M, A(M))` (line 81) is applicable** with no external hypothesis.
+- `typePA_eq_sharpSubgroup_derivedInG`: `A(M) = (M')#` ⟹ `A = H#` with `H = M'` normal (the (7.8.b)
+  config; corrects the earlier wrong "A ≠ H#" finding).
+- `Hypothesis.card_typePA_div_card_lt_inv_w1` (line 87): `|A(M)|/|M| < 1/w₁`.
+- (earlier) `card_derived_ge`: `(2w₁+1)w₂ ≤ |M'|`; `sum_zeta_tau1_normSq_ge_card` (G₀-drop);
+  `dadeSupport_restrict_subset` (`G₀ ⊆ famG₀`); `typeII_coherence_estimate_chain` (the ℚ chain);
+  `typeII_noncoherence_arithmetic` (the closer).
+
+**Remaining for `hA` (line 87) — the one genuine §7 piece left**:
+- **(7.8.b) `‖χ^ρ‖² ≥ 1 − ŵ₁/|M'|`** = an `S09.Hypothesis78` instance for `(A, L) = (A(M), M)` with
+  `H = M'`.  Its `Hypothesis76` (7.6) data: `hyp71 = toHypothesis71` (have it), `H = M' = derivedInG M`
+  (normal in `M` ✓), `A = A(M) = (M')# ` ✓ (`typePA_eq_sharpSubgroup_derivedInG`), the family
+  `T = inducedFamily M = S` (the `ζ_i`), the (7.7.a) certificate; then `ν = coh.tau1` and the
+  (7.8.c.i) `chiRho_eq_inner_beta` certificate.  **The two certificates are the deep content** (the
+  coherence-based reduction); this is the next genuine multi-step piece.
+
+**Then line 81 → 83 → 87** (mechanical given the above): (7.5) [line 81] + `sum_zeta_tau1_normSq_ge_card`
++ `Σ_{G₁}|χ|² ≥ 0` ⟹ line 83; + (7.8.b) + `card_typePA_div_card_lt_inv_w1` ⟹ `hA` (line 87).  The
+final contradiction still needs `hB` (TI-counting, lines 89–99) which is **§9-blocked via (10.7)**
+(the `S11.Section11CharacterData` carrier, shared with (11.8) — the W3 keystone).
+
+**Next session**: build the (7.8.b) `Hypothesis78` instance for `(M, A(M))`, `H = M'` (the family is
+`inducedFamily M`, `ν = coh.tau1`; the (7.7.a)/(7.8.c.i) certificates are the work).  After that, the
+line 81→87 assembly is mechanical, leaving only the §9-gated `hB`/(10.7)/(11.8) keystone.
