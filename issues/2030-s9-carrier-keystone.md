@@ -43,19 +43,6 @@ created: 2026-06-27
   (`Hypothesis76.zeta : Fin (n+1) → …` の degree-ratio 構造) 自体が同じ §9 chief-factor Clifford
   構造に支配される。
 
-## やること (research-grade, multi-session)
-
-- [ ] **A: carrier 再設計** — character field を genuine 化 (`S = S(HC)` 等を kernel-restricted
-      induced family + `data`/`chief` に紐づく property field で; または producer を持つ genuine な
-      `S12.Hypothesis` + `ChiefFactorData` (S11:1408) に対して定義). `U` の chief factor `H̄=H/N`
-      への作用とその既約成分が核心対象。**S11/S12/S13 consumer に波及する signature 変更ゆえ landing
-      前に HUB 確認を検討** (cross-file)。
-- [ ] **B: case-(b) (9.9)/(9.10)** — Singer field model (`Ū ⊂ 𝔽_{p^q}^×`)。既存の
-      `chiefFactor_caseB_image_*` (S11:2092/2189/2376, unconditional: `|Ū| ∣ (p^q−1)/(p−1)`,
-      `Coprime |Ū| (p−1)`) を活用。
-- [ ] **C: case-(a) (9.8)** — `H̄ = ⊕ q` 個の order-`p` 因子 + `W₁`-置換カウント。
-- [ ] **D: (9.11) `sibleyTarget_H0C`** 構造 witness。
-
 ## 2026-06-27 lane-b (W3): task A の character-family 部分 COMPLETE (commit `9c41978a`)
 
 **`Section11CharacterData` の character field を genuine 化** (full build 3884 green)。issue 冒頭の
@@ -93,8 +80,24 @@ genuine families に対しても未証明。pinning 自体は count を unlock �
   `induce_eq_induce_iff_conj` (Ind 一致 ⟺ 共役) / `card_filter_induce_eq_index_inertia` /
   `sum_div_normSq_induce_image_eq`。§4 Dade は `S06_CertainType*` に (4.3)-(4.9) 実在。
 
+## 2026-06-27 lane-b (cont.²): genuinization が露呈した count 文の imprecision (重要)
+
+carrier を genuine 化したことで、free-field 時代に **vacuous だった (9.8)/(9.9)/(9.10) の文**が実内容を
+持ち、Peterfalvi に対する **imprecision** が露呈した (build は green = `sorry` body ゆえ; ただし文が
+不正確だと proof 不能)。count 証明前に Peterfalvi (`04.11`) に対し**文の再導出**が必要:
+
+- **(9.9) conjunct 2** `∃ χ ∈ SOf Cprime, χ 1 = u` ⚠: SOf=𝒮 は induced family ゆえ member の degree は
+  `[M:HU]·(source) = q·u = qu`((9.8.c) と同じ、(9.10) の "degree qu" とも整合)。Peterfalvi (9.9.a)
+  「χ(1)=u」は **𝒳(H₀C')**-member (HU 文字) の degree であり、𝒮-member ではない。⟹ **`u` → `data.q*u`
+  (qu)** に修正、または XOf(𝒳) を参照すべき ((9.8) は両所 qu で consistent)。
+- **(9.10) hypothesis** `¬∃ χ ∈ SOf C, χ 1 = qu` ⚠: Peterfalvi (9.10) は **𝒮(H₀C')** (=Cprime) で記述。
+  Lean は `SOf chars.C` (=C)。⟹ C/Cprime 要確認。
+- 一般に SOf(𝒮, degree q·src) と XOf(𝒳, degree src) の使い分け・C/Cprime/H₀ 引数を Peterfalvi
+  (9.5)-(9.10) に対し総点検すること。これは genuine carrier 化の正の副産物 (scaffold 時代は検出不能)。
+
 ## やること (research-grade, multi-session)
 
+- [ ] **A': count 文監査** — 上記 imprecision を Peterfalvi に対し総点検・修正 (count 証明の前提)。
 - [x] **A**: carrier 再設計 = families (commit `9c41978a`) + subgroups (commit `153e866a`) 全 genuine。
       残 free field = u (pin 済) / tau・H0CprimeSupport (S12-Dade layer) / quotientSemidirectFrobenius
       ((9.10) output)。
