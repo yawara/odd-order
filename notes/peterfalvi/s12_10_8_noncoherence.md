@@ -345,3 +345,20 @@ So the *entire* mechanical/arithmetic spine of (10.8) is now proven; the two rem
 exactly **(7.8.b)** (the `Hypothesis78` instance for `(M, A(M))`, `H=M'`) and the **§9 carrier**
 (`hB`/(10.7), shared with (11.8)).  Next genuine target: (7.8.b) — its config (`H=M'`,
 `family=inducedFamily M`, `ν=coh.tau1`) is fixed; the (7.7.a)/(7.8.c.i) certificates are the content.
+
+## 2026-06-27 (cont.⁵) — W3 keystone precisely scoped (issue 2030)
+
+With the (10.8) mechanical spine done, the **single remaining keystone** for all of W3 is the §9
+Clifford character theory.  Finding: `S11.Section11CharacterData` is **scaffold-by-design** (free
+character fields `S/X/SOf/XOf/tau/quotientSemidirectFrobenius`), and (9.8)/(9.9)/(9.10) are all
+`sorry` (S11:2505/2516/2532) — *unprovable* against the current carrier.  Both W3 obligations
+((10.8)`hB`/(10.7) and (11.8)), **and** the last §7 gate (7.8.b) (whose `Hypothesis78` family
+enumeration is §9-governed), converge here.
+
+The genuine fix = **redesign the carrier** (genuine `S(HC)` etc. with property fields, or define
+against the producer-backed `S12.Hypothesis`+`ChiefFactorData`) + **prove (9.8)/(9.9)/(9.10)** (the
+(9.7)(a)/(b) Clifford dichotomy; case (b) Singer model has reusable infra `chiefFactor_caseB_image_*`).
+Research-grade, multi-session.  **Full scoping + decomposition (sub-tasks A-D) = issue 2030.**
+
+This session (cont.¹-⁵) took W3 from "(10.8) is a black-box estimate" to "(10.8)/(11.8) need only the
+§9 keystone (issue 2030)", proving the entire §7-input + line-83 + arithmetic spine en route.
