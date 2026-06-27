@@ -2927,6 +2927,54 @@ theorem Hypothesis.zeta_conj_ne [Finite G]
     omega
   exact OddOrder.RepresentationTheory.not_isReal_of_ne_trivial_of_odd_card' hModd hne
 
+/-- **Parameter package with all (10.6.b) hypotheses** (the `tau1_values_and_norm_bound` /
+`zeta_tau1_norm_ge_one` inputs).  Strengthens `exists_charParameters` to also expose the seven
+conditions those Dade-value lemmas require, now that each is establishable: `mu`/`omegaSigma` are the
+materialized grids (`rfl`), `ζ ∈ S` and `ζ(1) = w₁` come from `(10.2)`, `δ_j = δ` from
+`exists_charParamArith`, `δ = ±1` from `muColumnSign_eq_one_or_neg_one`, and `ζ̄ ≠ ζ` from
+`zeta_conj_ne` (Peterfalvi (1.1)).  This is the single producer the `(10.8)` line-83 step consumes
+(via the re-wrapped coherence `⟨coh.coherent⟩` for this `params`). -/
+theorem Hypothesis.exists_charParameters_full [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} (hyp : Hypothesis M) :
+    ∃ params : CharacterParameters hyp,
+      params.mu = hyp.muGrid hG hG.odd ∧
+      params.omegaSigma = hyp.alignedOmegaSigmaGrid hG hG.odd ∧
+      params.zeta ∈ inducedFamily M ∧ params.zeta 1 = (hyp.w1 : ℂ) ∧
+      params.zeta.conj ≠ params.zeta ∧
+      (params.delta = 1 ∨ params.delta = -1) ∧
+      (∀ j : Fin hyp.w2, j ≠ 0 → hyp.muColumnSign hG hG.odd j = params.delta) := by
+  haveI := hyp.finiteG
+  classical
+  obtain ⟨ζ, hζS, hζirr, hζdeg⟩ := exists_zeta_in_inducedFamily_degree_w1 hyp.typeP hG.odd
+    (typePData_W1_hall_coprime hG hyp.maximal (hyp.bgTypeP hG) hyp.typeP)
+  obtain ⟨d, delta, n, hd1, hnf, hn2, hdi, hδindep⟩ := hyp.exists_charParamArith hG hG.odd
+  refine ⟨{ zeta := ζ
+            zeta_mem_S := hζS
+            zeta_irreducible := hζirr
+            d := d
+            delta := delta
+            n := n
+            w2_prime := hyp.w2_prime hG
+            d_gt_one := hd1
+            mu := hyp.muGrid hG hG.odd
+            omegaSigma := hyp.alignedOmegaSigmaGrid hG hG.odd
+            degree_independent := hdi
+            n_formula := hnf
+            two_le_n := hn2
+            alpha_support := fun i j hj =>
+              hyp.muGrid_alpha_support hG hG.odd hj hζS (hdi i j hj)
+                (hyp.muGrid_zero_column_apply_one hG hG.odd i) hζdeg hnf (hδindep j hj)
+            typeV_parameter_formula := True
+            typeV_coherence_formula := True },
+    rfl, rfl, hζS, hζdeg, ?_, ?_, hδindep⟩
+  · exact hyp.zeta_conj_ne hG hζdeg
+  · have hw2 : 2 ≤ hyp.w2 := (hyp.w2_prime hG).two_le
+    have hj : (⟨1, by omega⟩ : Fin hyp.w2) ≠ 0 := by simp [Fin.ext_iff]
+    have hde := hδindep ⟨1, by omega⟩ hj
+    have hs := hyp.muColumnSign_eq_one_or_neg_one hG hG.odd ⟨1, by omega⟩
+    rw [hde] at hs
+    exact hs
+
 /-! ## (10.5)--(10.6): Dade-isometry calculations -/
 
 /-- **Peterfalvi (10.5), support half**: for `0 < j < w₂`, the virtual character `α_{ij}` is
