@@ -1342,6 +1342,149 @@ theorem exists_typeP1_mf_complement [Finite G] (hG : OddOrder.BG.IsMinimalSimple
   exact OddOrder.GroupTheory.exists_aInvariant_complement_within_normal
     hN_le hM'_norm_N hK_norm_M' hK_norm_N hN_hall hCop
 
+/-- **Type-`P₁` (`M_F ≠ M_σ`) `M_F`-complement is nilpotent** (`M'/M_F` nilpotent, the deferred half
+of Corollary 15.5(c)): any complement `U` of `M_F` in `M' = M_σ` is nilpotent.
+
+Theorem 15.2 (`mf_ne_msigma_typeP1_structure`) supplies `Q ⋊ D = M_σ` with `Q ≤ M_F` and `D`
+nilpotent; hence `M_σ = M_F · D`, so `M_σ/M_F` is the image of the nilpotent `D` under the
+quotient map (`nilpotent_of_surjective`), hence nilpotent.  The complement `U` (`U ⊓ M_F = ⊥`,
+`U ⊔ M_F = M_σ`) is isomorphic to `M_σ/M_F` (the restricted quotient map is bijective), so `U` is
+nilpotent.  Discharges the `hUnilp` field of the type-`P₁` `TypePData` for the `hP1neIIIIV` bridge. -/
+theorem isNilpotent_complement_of_isTypeP1_mf_ne_msigma [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M U : Subgroup G} (hM : M ∈ maximalSubgroups G)
+    (hP1 : S14.IsTypeP1 M) (hne : S15.MF M ≠ OddOrder.BG.Ch3.S10.Msigma M)
+    (hsup : maxNilpotentNormalHall M ⊔ U = derivedInG M)
+    (hinf : maxNilpotentNormalHall M ⊓ U = ⊥) :
+    Group.IsNilpotent ↥U := by
+  classical
+  haveI : IsSolvable ↥M := hG.solvable_of_mem_maximalSubgroups hM
+  set Mσ := OddOrder.BG.Ch3.S10.Msigma M with hMσ
+  have hM'σ : derivedInG M = Mσ := isTypeP1_derivedInG_eq_Msigma hG hM hP1
+  rw [hM'σ] at hsup
+  have hMFMσ : maxNilpotentNormalHall M ≤ Mσ := S15.maxNilpotentNormalHall_le_Msigma hG hM
+  have hUMσ : U ≤ Mσ := hsup ▸ le_sup_right
+  -- `M̄F = M_F.subgroupOf Mσ` is normal in `↥Mσ`.
+  have hMFnormMσ : Mσ ≤ Subgroup.normalizer (maxNilpotentNormalHall M : Set G) :=
+    (OddOrder.BG.Ch3.S10.Msigma_le M).trans (S15.maxNilpotentNormalHall_le_normalizer M)
+  haveI hMFbarNorm : ((maxNilpotentNormalHall M).subgroupOf Mσ).Normal :=
+    (Subgroup.normal_subgroupOf_iff_le_normalizer hMFMσ).mpr hMFnormMσ
+  -- Theorem 15.2: `Q ⋊ D = M_σ`, `Q ≤ M_F`, `D` nilpotent.
+  obtain ⟨K', hK'⟩ := Ch03.hall_E_exists (G := ↥M) (S14.kappa M)
+  set K : Subgroup G := K'.map M.subtype with hKdef
+  have hKM : K ≤ M := Subgroup.map_subtype_le K'
+  have hKeq : K.subgroupOf M = K' :=
+    Subgroup.comap_map_eq_self_of_injective M.subtype_injective K'
+  have hK : Ch03.IsHallSubgroup (S14.kappa M) (K.subgroupOf M) := by rw [hKeq]; exact hK'
+  obtain ⟨_, Q, _, D, _, _, _, _, _, _, _, _, _, hQMF, _, hQDcompl, hDnil, _⟩ :=
+    S15.mf_ne_msigma_typeP1_structure hG hM hne hKM hK rfl
+  -- `M̄F ⊔ D̄ = ⊤` in `↥Mσ` (`Q̄ ⊔ D̄ = ⊤`, `Q̄ ≤ M̄F`).
+  have hMFDbarTop : (maxNilpotentNormalHall M).subgroupOf Mσ ⊔ D.subgroupOf Mσ = ⊤ :=
+    top_le_iff.mp (hQDcompl.sup_eq_top ▸ sup_le_sup_right (Subgroup.subgroupOf_mono Mσ hQMF) _)
+  -- `D̄ = D.subgroupOf Mσ` is nilpotent (`≅ D ⊓ Mσ ≤ D`).
+  haveI hDnilI : Group.IsNilpotent ↥D := hDnil
+  haveI hDbarNil : Group.IsNilpotent ↥(D.subgroupOf Mσ) := by
+    rw [← Subgroup.inf_subgroupOf_right]
+    exact nilpotent_of_mulEquiv
+      ((Subgroup.subgroupOfEquivOfLe (inf_le_left : D ⊓ Mσ ≤ D)).trans
+        (Subgroup.subgroupOfEquivOfLe (inf_le_right : D ⊓ Mσ ≤ Mσ)).symm)
+  -- `M_σ/M_F` is nilpotent: the quotient map restricts to a surjection `D̄ ↠ M_σ/M_F`.
+  haveI hquotNil : Group.IsNilpotent (↥Mσ ⧸ (maxNilpotentNormalHall M).subgroupOf Mσ) := by
+    have hsurj : Function.Surjective
+        (((QuotientGroup.mk' ((maxNilpotentNormalHall M).subgroupOf Mσ)).comp
+          (D.subgroupOf Mσ).subtype)) := by
+      intro y
+      obtain ⟨g, rfl⟩ := QuotientGroup.mk_surjective y
+      obtain ⟨m, hm, d, hd, hmd⟩ :=
+        Subgroup.mem_sup_of_normal_left.mp (hMFDbarTop ▸ Subgroup.mem_top g)
+      refine ⟨⟨d, hd⟩, ?_⟩
+      change QuotientGroup.mk (d : ↥Mσ) = QuotientGroup.mk g
+      rw [← hmd, QuotientGroup.mk_mul, (QuotientGroup.eq_one_iff _).mpr hm, one_mul]
+    exact nilpotent_of_surjective _ hsurj
+  -- `U ≅ M_σ/M_F`: the restricted quotient map `Ū → M_σ/M_F` is bijective.
+  have hŪsup : U.subgroupOf Mσ ⊔ (maxNilpotentNormalHall M).subgroupOf Mσ = ⊤ := by
+    rw [← Subgroup.subgroupOf_sup hUMσ hMFMσ, sup_comm, hsup, Subgroup.subgroupOf_self]
+  set g : ↥(U.subgroupOf Mσ) →* (↥Mσ ⧸ (maxNilpotentNormalHall M).subgroupOf Mσ) :=
+    (QuotientGroup.mk' ((maxNilpotentNormalHall M).subgroupOf Mσ)).comp (U.subgroupOf Mσ).subtype
+    with hgdef
+  have hUbarInf : U.subgroupOf Mσ ⊓ (maxNilpotentNormalHall M).subgroupOf Mσ = ⊥ := by
+    rw [eq_bot_iff]
+    intro a ha
+    rw [Subgroup.mem_inf] at ha
+    have hval : (a : G) ∈ maxNilpotentNormalHall M ⊓ U :=
+      ⟨Subgroup.mem_subgroupOf.mp ha.2, Subgroup.mem_subgroupOf.mp ha.1⟩
+    rw [hinf, Subgroup.mem_bot] at hval
+    rw [Subgroup.mem_bot]
+    exact Subtype.ext hval
+  have hginj : Function.Injective g := by
+    intro x y hxy
+    have hdiv : (x : ↥Mσ)⁻¹ * (y : ↥Mσ) ∈ (maxNilpotentNormalHall M).subgroupOf Mσ :=
+      (QuotientGroup.eq.mp hxy)
+    have hxinv : (x : ↥Mσ)⁻¹ ∈ U.subgroupOf Mσ := inv_mem x.2
+    have hUmem : (x : ↥Mσ)⁻¹ * (y : ↥Mσ) ∈ U.subgroupOf Mσ := mul_mem hxinv y.2
+    have hmem : (x : ↥Mσ)⁻¹ * (y : ↥Mσ) ∈
+        U.subgroupOf Mσ ⊓ (maxNilpotentNormalHall M).subgroupOf Mσ :=
+      ⟨hUmem, hdiv⟩
+    rw [hUbarInf, Subgroup.mem_bot, mul_eq_one_iff_inv_eq, inv_inv] at hmem
+    exact Subtype.ext hmem
+  have hgsurj : Function.Surjective g := by
+    intro y
+    obtain ⟨z, rfl⟩ := QuotientGroup.mk_surjective y
+    have hz : z ∈ U.subgroupOf Mσ ⊔ (maxNilpotentNormalHall M).subgroupOf Mσ := by
+      rw [hŪsup]; exact Subgroup.mem_top z
+    obtain ⟨u, hu, m, hm, hum⟩ := Subgroup.mem_sup_of_normal_right.mp hz
+    refine ⟨⟨u, hu⟩, ?_⟩
+    change QuotientGroup.mk (u : ↥Mσ) = QuotientGroup.mk z
+    rw [← hum, QuotientGroup.mk_mul, (QuotientGroup.eq_one_iff _).mpr hm, mul_one]
+  haveI : Group.IsNilpotent ↥(U.subgroupOf Mσ) :=
+    nilpotent_of_mulEquiv (MulEquiv.ofBijective g ⟨hginj, hgsurj⟩).symm
+  exact nilpotent_of_mulEquiv (Subgroup.subgroupOfEquivOfLe hUMσ)
+
+/-- **Type-`P₁` `M_F`-complement is a genuine complement in `M'`** (the `hDcompl` `TypePData` field):
+any `U` with `M_F ⊔ U = M'` and `M_F ⊓ U = ⊥` gives
+`IsComplement' (M_F.subgroupOf M') (U.subgroupOf M')`.
+
+`M_F ◁ M ⊇ M'`, so `M_F.subgroupOf M'` is normal in `↥M'`; with `M_F ⊓ U = ⊥` (disjoint) and
+`M_F ⊔ U = M'` (codisjoint, i.e. `⊤` in `↥M'`) the internal product is the whole of `↥M'`.  Card
+route: `[M':M_F] = M_F.relIndex M' = M_F.relIndex U = |U|` (second isomorphism theorem
+`relIndex_sup_right`, then `M_F ⊓ U = ⊥`), so `|M_F.subgroupOf M'|·|U.subgroupOf M'| = |M'|`, and
+`isComplement'_of_card_mul_and_disjoint` concludes.  Purely from `hsup`/`hinf` (no type-`P₁`
+hypothesis); discharges the deepest *non*-Fitting `U`-field gated by `exists_typeP1_mf_complement`. -/
+theorem isComplement'_mf_complement_of_sup_inf [Finite G] {M U : Subgroup G}
+    (hsup : maxNilpotentNormalHall M ⊔ U = derivedInG M)
+    (hinf : maxNilpotentNormalHall M ⊓ U = ⊥) :
+    Subgroup.IsComplement' ((maxNilpotentNormalHall M).subgroupOf (derivedInG M))
+      (U.subgroupOf (derivedInG M)) := by
+  classical
+  set M' := derivedInG M with hM'def
+  set N := maxNilpotentNormalHall M with hNdef
+  have hNle : N ≤ M' := hsup ▸ le_sup_left
+  have hUle : U ≤ M' := hsup ▸ le_sup_right
+  -- `N.subgroupOf M'` is normal in `↥M'` (`M' ≤ M ≤ N_G(N)`).
+  have hM'M : M' ≤ M := Subgroup.map_subtype_le _
+  have hNnormM' : M' ≤ Subgroup.normalizer (N : Set G) :=
+    hM'M.trans (maxNilpotentNormalHall_le_normalizer M)
+  haveI hN'norm : (N.subgroupOf M').Normal :=
+    (Subgroup.normal_subgroupOf_iff_le_normalizer hNle).mpr hNnormM'
+  -- Disjointness and codisjointness in `↥M'`.
+  have hdisj : Disjoint (N.subgroupOf M') (U.subgroupOf M') := by
+    rw [disjoint_iff, eq_bot_iff]
+    intro a ha
+    rw [Subgroup.mem_inf] at ha
+    have hval : (a : G) ∈ N ⊓ U :=
+      ⟨Subgroup.mem_subgroupOf.mp ha.1, Subgroup.mem_subgroupOf.mp ha.2⟩
+    rw [hinf, Subgroup.mem_bot] at hval
+    rw [Subgroup.mem_bot]; exact Subtype.ext hval
+  have hsup' : N.subgroupOf M' ⊔ U.subgroupOf M' = ⊤ := by
+    rw [← Subgroup.subgroupOf_sup hNle hUle, hsup, Subgroup.subgroupOf_self]
+  -- `[M':M_F] = |U.subgroupOf M'|` (second iso theorem, then disjointness).
+  have hidx : (N.subgroupOf M').index = Nat.card ↥(U.subgroupOf M') := by
+    have key : (N.subgroupOf M').relIndex (U.subgroupOf M') = Nat.card ↥(U.subgroupOf M') := by
+      rw [Subgroup.relIndex, Subgroup.subgroupOf_eq_bot.mpr hdisj, Subgroup.index_bot]
+    rw [← key, ← Subgroup.relIndex_sup_right, sup_comm, hsup', Subgroup.relIndex_top_right]
+  have hcard : Nat.card ↥(N.subgroupOf M') * Nat.card ↥(U.subgroupOf M') = Nat.card ↥M' := by
+    rw [← hidx, Subgroup.card_mul_index]
+  exact Subgroup.isComplement'_of_card_mul_and_disjoint hcard hdisj
+
 /-- **Prop 16.1(a) forward bridge, core** (mmd L4480): a type-`F` maximal `M` (`κ(M) = ∅`, so the
 Hall `κ`-subgroup `K = ⊥`) carries the shared Peterfalvi type-`F` structure `TypeFData M`.
 
