@@ -5948,6 +5948,27 @@ theorem Hypothesis.card_typePA_div_card_lt_inv_w1 [Finite G]
   push_cast
   nlinarith [hmq, hwq]
 
+open scoped FiniteInduce in
+/-- **`‖ζ^{τ₁}‖² = 1`** (Peterfalvi (10.8) line 81 input): the coherent extension `τ₁` of the Dade
+isometry is an isometry on `ℤ[S]` (`coh.coherent.extension_inner_eq`), and `ζ = params.zeta ∈ S` is
+irreducible (`params.zeta_irreducible`, `params.zeta_mem_S`), so `‖ζ^{τ₁}‖² = ‖ζ‖² = 1`.
+
+This is the norm-one hypothesis that `S09.family_inequality` (7.5) demands of its character argument
+`χ = ζ^{τ₁}`, so it is the bridge that lets the now-self-contained `toFamilyHypothesis71` feed the
+(10.8) line-81 inequality. -/
+theorem Hypothesis.inner_tau1_zeta_self_eq_one [Finite G] [Fintype G] {M : Subgroup G} [Fintype ↥M]
+    [Invertible (Nat.card ↥M : ℂ)] [Invertible (Nat.card G : ℂ)]
+    {hyp : Hypothesis M} {params : CharacterParameters hyp} (coh : CoherentHypothesis hyp params) :
+    ClassFunction.inner (coh.tau1 params.zeta) (coh.tau1 params.zeta) = 1 := by
+  have hspan : params.zeta ∈ OddOrder.Peterfalvi.S07.zSpan (L := ↥M) hyp.Sset :=
+    Submodule.subset_span params.zeta_mem_S
+  show ClassFunction.inner (coh.coherent.extension params.zeta)
+    (coh.coherent.extension params.zeta) = 1
+  rw [coh.coherent.extension_inner_eq params.zeta params.zeta hspan hspan]
+  simpa using OddOrder.RepresentationTheory.irreducibleCharacter_inner_eq_ite
+    (⟨params.zeta, params.zeta_irreducible⟩ : OddOrder.RepresentationTheory.IrreducibleCharacter ↥M)
+    (⟨params.zeta, params.zeta_irreducible⟩ : OddOrder.RepresentationTheory.IrreducibleCharacter ↥M)
+
 /-- **The `(10.6.b)`-summed bound** (the analytic core of Peterfalvi (10.8) line 83): if a function
 `χ : G → ℂ` takes **odd integer** values on a finite set `S` (in particular `|χ(g)| ≥ 1` there), then
 `|S| ≤ Σ_{g ∈ S} ‖χ(g)‖²`.  General and reusable (no §10 hypotheses): per element, an odd integer
