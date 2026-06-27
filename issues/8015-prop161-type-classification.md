@@ -570,3 +570,24 @@ M''=1 矛盾)、必ず非 abelian H = (e2)/(e3) (Suzuki/SL₂)。⟹ disjunct 1 
 IsCyclic O_{p'}) を sorry-free 化、(b) deep core (|Z0| prime ← Lemma 10.13(b)/Cor 15.3(b)、
 |W₁|∣p∓1 ← W₁-action) を named residual に isolate or 上流形式化。Coq `BGsection15.v:939-1095+`
 精読が必須。**multi-session、上流から (|Z0| prime か W₁-action engine から)**。
+
+### ✅ 2026-06-27⁴ (lane-f): hP1eqV type-V trichotomy の共通部分を実証明、残差を |W₁|∣p∓1 に縮小 (commit 8a7f544e)
+
+上 (a) を landed。**型 V `TypeVData.alternative` (Pf (8.8) (e2)/(e3)) の共通項を実証明** ⟹
+`isTypeV_of_isTypeP1_mf_eq_msigma` の ¬FittingIsTI sorry が「alternative 全体」→「`|W₁|∣p∓1`
+divisibility のみ」に縮小。新規 (全 axiom-clean、AxiomsCheck 登録、S16_MainResults):
+- **`not_isMulCommutative_mf_of_isTypeP1_mf_eq_msigma`**: 型 V で M_F 非abelian (Coq abelian-H 排除)。
+  TypePData の W₂=C_{M'}(W₁#) が nontrivial かつ ⊆ M''、型V で M'=M_σ=M_F ⟹ M''=(M_F)'⊇W₂≠⊥
+  (`commutator_eq_bot` + `secondDerivedInAmbient`)。**過去 entry の「Ks≤M'' (Ptype_cyclics) が要・未形式化」
+  は不要だった** — TypePData.W2_le が直接 W₂≤M'' を供給。
+- **`exists_prime_cyclic_opiCore_compl_of_isTypeV`**: 型 V ¬FittingIsTI で ∃p∈π(M_F), IsCyclic O_{p'}(M_F)。
+  **既存 `exists_inf_conj_fitting_orderP_witness` (S15、witness 抽出 — 自前重複 `exists_nonTI_witness` は
+  削除、CLAUDE.md 重複回避)** を `typeF_nonabelian_cyclic_opiCore_compl` (cycHp') に供給。
+- `isTypeV_of_isTypeP1_mf_eq_msigma` ¬FittingIsTI case 再構成: 共通項 proved、残 sorry =
+  `|W₁|∣p-1 ∨ (|O_p(M_F)|=p³ ∧ |W₁|∣p+1)` のみ。
+
+**残 deep core (検証済み深い、Lean 未形式化)**: `|Z0|=p` (Z0=Ω₁(Z(O_p(M_F))))= Coq `basic_p2maxElem_structure`
+(B=X1×Z0, r_p(B)=2, oZ0=p) + Lemma 10.13(b)/Cor 15.3(b)。`|W₁|∣p∓1` engine: disjunct2 は
+`card_dvd_sub_one_of_isFrobeniusAction` (S15:8354 在庫) を K-on-Z_p Frobenius 作用に適用、disjunct3
+(|K|∣p+1) は Singer/GL₂(p) 作用 (別 engine)。S05 に omega1Center prime lemma 在庫 (要 p2maxElem 接続)。
+**次セッション = |Z0| prime の p2maxElem 形式化 (上流)、その後 Frobenius/Singer 作用で divisibility**。
