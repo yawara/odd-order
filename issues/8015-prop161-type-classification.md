@@ -870,3 +870,31 @@ coprime action で「k が P/Φ(P) 中心化 ⟹ k が P 中心化」、かつ C
 (2) faithful (上記)、(3) irreducible (上記)、(4) p+1 crux (det ルート推奨: symplectic form 設定 +
 K 保存 + algebraMap_norm_eq_pow)**。(1) が最大の新規工 (quotient module + Representation)。
 multi-session だが新規大規模ポート不要・全ピース所在確定。次セッション = (1) Representation 構成から。
+
+### ⚠ 2026-06-28 (lane-f 再開² cont.): route B 訂正 — FPF coprimality ルートは型V に不適用、det=symplectic 必須
+
+route B 着手準備で精査し、前項スコープの **coprime ルート ((9.7)(b) FPF σ) は型V disjunct 3 に
+適用不可**と判明 (訂正):
+- `coprime_card_sub_one_of_faithful_irreducible_comm_fpf` の σ は「acting group E と別の群 W₁ の作用」
+  (Pf (9.7): E=Ū, σ=φ(w), w∈W₁、E≠W₁)。**型V では V=P/Z(P) に作用するのが K=W₁ 自身**で、別の σ
+  供給源がない。K abelian ゆえ全 k が任意の K-作用 σ と可換 → hfpf が「∀e, commute → e=1」を全 e に課し破綻。
+- かつ算術的に **|K|∣p²-1 ∧ ¬|K|∣p-1 だけでは |K|∣p+1 は出ない** (反例 p=5, |K|=12∣24, ¬12∣4, 12∤6)。
+  ⟹ **det=1 (K⊆SL₂, norm-1 torus 位数きっかり p+1) が本質的に必須**。
+
+**∴ route B 確定ルート = det=symplectic**:
+1. L0-L1: V=P/Z(P) を ZMod p-module 化 (`IsElementaryAbelian.zmodModule`/`subgroupZmodModule` 在庫) +
+   K-共役を Representation ρ:K→GL(V) に。S14 `isCyclic_and_card_dvd_of_odd_two_dim_irreducible`
+   (Representation 入力) が consumer。
+2. L2 faithful: ker = {k:[P,k]≤Z(P)=Φ(P)}、coprime action で =C_K(P)=⊥ (brick4)。
+3. L3 irreducible: ¬|K|∣p-1 + semisimple ⟹ split torus 排除。
+4. L4: S14 template で |K|∣p²-1。
+5. **L5 det=1 (crux)**: extraspecial commutator [.,.]:P×P→Z(P)≅F_p が V×V→F_p の alternating form b に
+   降下、K が Z(P) 中心化 ⟹ K が b 保存 (b(kv,kw)=b(v,w))。**dim 2 で alternating form は det で変換**
+   (b(kv,kw)=det(k)·b(v,w))、b 非退化 ⟹ **det(k)=1**。Singer V≅GF(p²) で det=Algebra.norm(μ k)=μ(k)^(p+1)
+   (`algebraMap_norm_eq_pow`) ⟹ μ(k)^(p+1)=1 ⟹ |K|=orderOf(μ g)∣p+1。
+   **full Sp₂=SL₂ 機構は不要** — 「dim 2 alternating form は det 倍」+ b 非退化で十分。
+
+残工 = L0-L1 Representation 構成 (最大) + L2/L3 + L5 (alternating form 降下 + det 変換 + Singer det=norm)。
+新規大規模ポート不要だが multi-session。**次セッション = L0-L1 (V=P/Z(P) Representation) から**、L5 の
+alternating-form-det は必要なら ChatGPT consult (文献→Coq 済、`repr_extraspecial_prime_sdprod_cycle` の
+elementary 再構成)。
