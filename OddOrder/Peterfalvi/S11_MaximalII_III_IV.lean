@@ -2854,6 +2854,72 @@ theorem chiefFactor_caseB_char_inertia [Finite G] {M : Subgroup G}
   rw [h1] at hx
   simpa using hx.symm
 
+/-- **Inflation equivariance for the chief-factor action.**  The inflation map
+`compHom (mk' N) : ClassFunction (↥H/N) → ClassFunction ↥H` intertwines the conjugation action
+`typeP_conjAction a` on `↥H` (upstairs) with the descended action `quotientMulAutHom a` on the
+chief factor `↥H/N` (downstairs): inflating `θ̄` and acting by `a` upstairs equals acting by `a`
+downstairs and then inflating.  Immediate from `quotientMulAutHom_apply_mk'`
+(`mk' N (a · h) = a · (mk' N h)`).
+
+This is the algebraic core that turns the *concrete* conjugation invariance of an inflated
+character into the *abstract* `φ_U`-invariance consumed by `chiefFactor_caseB_char_inertia`,
+without realizing `H̄` as a subgroup. -/
+theorem compHom_typeP_conjAction_inflation [Finite G] {M : Subgroup G}
+    {data : TypesIIIIIIVSetup M} {chief : ChiefFactorData data}
+    (a : ↥(data.typeP.U ⊔ data.typeP.W1))
+    (θbar : ClassFunction (↥data.H ⧸ chief.N) ℂ) :
+    ClassFunction.compHom (typeP_conjAction data.typeP a).toMonoidHom
+        (ClassFunction.compHom (QuotientGroup.mk' chief.N) θbar)
+      = ClassFunction.compHom (QuotientGroup.mk' chief.N)
+          (ClassFunction.compHom (quotientMulAutHom chief.N_aInvariant a).toMonoidHom θbar) :=
+  rfl
+
+/-- **Peterfalvi (9.9.a), abstract inertia reduction.**  In Clifford case (b), if the inflation
+`compHom (mk' N) θ̄` of a nontrivial irreducible `θ̄ ∈ Irr(H̄)` is invariant under the conjugation
+action `typeP_conjAction (g : U)` (i.e. `g` lies in the inertia of the inflated character, once
+it is realized inside `HU`), then `g` acts trivially on the chief factor: `φ_U(g) = 1`
+(`g ∈ C`).
+
+Proof: `compHom_typeP_conjAction_inflation` rewrites the invariance to
+`compHom (mk' N) (φ_U(g)·θ̄) = compHom (mk' N) θ̄`; inflation is injective
+(`compHom_injective_of_surjective`, `mk' N` surjective), so `θ̄` is `φ_U(g)`-invariant, and
+`chiefFactor_caseB_char_inertia` gives `φ_U(g) = 1`.  This reduces the character-side inertia
+`I_U(θ) ⊆ C` of (9.9.a) to the single remaining step of producing the
+`typeP_conjAction`-invariance from the concrete `HU`-conjugation inertia (the `conjBy`-realization
+of `H̄`). -/
+theorem caseB_char_inertia_inflation [Finite G] {M : Subgroup G}
+    {data : TypesIIIIIIVSetup M} {chief : ChiefFactorData data}
+    (hcaseB : ∀ J : Subgroup (↥data.H ⧸ chief.N),
+        IsAInvariant ((typeP_quotientCoprimeAction data.typeP data.nontrivial.1
+          chief.N_aInvariant).φ.comp (typeP_quotientCoprimeAction data.typeP data.nontrivial.1
+          chief.N_aInvariant).U.subtype) J → J = ⊥ ∨ J = ⊤)
+    {θbar : IrreducibleCharacter (↥data.H ⧸ chief.N)}
+    (hθbar : (θbar : ClassFunction (↥data.H ⧸ chief.N) ℂ) ≠ trivialClassFunction _)
+    (g : ↥(typeP_quotientCoprimeAction data.typeP data.nontrivial.1 chief.N_aInvariant).U)
+    (hfix : ClassFunction.compHom (typeP_conjAction data.typeP
+              ((typeP_quotientCoprimeAction data.typeP data.nontrivial.1
+                chief.N_aInvariant).U.subtype g)).toMonoidHom
+              (ClassFunction.compHom (QuotientGroup.mk' chief.N)
+                (θbar : ClassFunction (↥data.H ⧸ chief.N) ℂ))
+            = ClassFunction.compHom (QuotientGroup.mk' chief.N)
+                (θbar : ClassFunction (↥data.H ⧸ chief.N) ℂ)) :
+    ((typeP_quotientCoprimeAction data.typeP data.nontrivial.1 chief.N_aInvariant).φ.comp
+      (typeP_quotientCoprimeAction data.typeP data.nontrivial.1
+        chief.N_aInvariant).U.subtype) g = 1 := by
+  rw [compHom_typeP_conjAction_inflation] at hfix
+  have hfix2 := ClassFunction.compHom_injective_of_surjective
+    (QuotientGroup.mk'_surjective chief.N) hfix
+  apply chiefFactor_caseB_char_inertia hcaseB hθbar g
+  intro x
+  rw [show ((typeP_quotientCoprimeAction data.typeP data.nontrivial.1
+        chief.N_aInvariant).φ.comp (typeP_quotientCoprimeAction data.typeP data.nontrivial.1
+        chief.N_aInvariant).U.subtype) g
+      = quotientMulAutHom chief.N_aInvariant
+          ((typeP_quotientCoprimeAction data.typeP data.nontrivial.1
+            chief.N_aInvariant).U.subtype g) from rfl]
+  exact congrFun (congrArg (fun f : ClassFunction (↥data.H ⧸ chief.N) ℂ =>
+    (f : (↥data.H ⧸ chief.N) → ℂ)) hfix2) x
+
 /-- **Peterfalvi (9.7) case (b) carrier.**  When `U` acts irreducibly on the chief factor
 `H̄ = H/H₀` (Clifford case (b), the left branch of `chiefFactor_clifford_U_dichotomy`), the
 field-model divisibilities of `CliffordCaseBData` hold: with `chars.u = |Ū|` (pinned in
