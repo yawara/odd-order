@@ -5,6 +5,7 @@ Authors: Yawara Ishida
 -/
 import OddOrder.BG.Ch4_FamilyOfMaximal.S15_MF
 import OddOrder.BG.Ch4_FamilyOfMaximal.S16_PairIntersection
+import OddOrder.GroupTheory.RepresentationTheory.ExtraspecialSinger
 import OddOrder.GroupTheory.MaximalSubgroupType
 import OddOrder.GroupTheory.AInvariantComplement
 
@@ -3095,7 +3096,75 @@ theorem isTypeV_of_isTypeP1_mf_eq_msigma [Finite G]
         -- central-product structure (Coq §10.7b, Lean `sylow_structure_b`), isolated in
         -- `card_opiCore_eq_prime_cube_singer`.
         exact card_opiCore_eq_prime_cube_singer hG hM hP1 hmf hp hpσ hpπ hrPle2 hPnab hZPcard
-      · sorry
+      · -- (sorry 2) `|W₁| ∣ p + 1` via route B (Singer/`SL₂(p)` symplectic divisibility).
+        haveI : Fact p.Prime := ⟨hp⟩
+        have hPcard3 : Nat.card ↥(opiCoreInG ({p} : Set ℕ) (S15.MF M)) = p ^ 3 :=
+          card_opiCore_eq_prime_cube_singer hG hM hP1 hmf hp hpσ hpπ hrPle2 hPnab hZPcard
+        set P : Subgroup G := opiCoreInG ({p} : Set ℕ) (S15.MF M) with hPdef
+        have hPextra : OddOrder.GroupTheory.IsExtraspecial p ↥P :=
+          OddOrder.GroupTheory.IsExtraspecial.of_card_eq_prime_cube hPcard3 (fun h => hPnab ⟨⟨h⟩⟩)
+        have hPMσ : P ≤ OddOrder.BG.Ch3.S10.Msigma M :=
+          (opiCoreInG_le _ _).trans (S15.maxNilpotentNormalHall_le_Msigma hG hM)
+        -- conjugation action `φ : K → Aut P`.
+        let φ : ↥K →* MulAut ↥P :=
+          (Subgroup.normalizerMonoidHom (H := P)).comp (Subgroup.inclusion hKnormP)
+        have hφ : ∀ (k : ↥K) (x : ↥P), ((φ k x : ↥P) : G) = (k : G) * (x : G) * (k : G)⁻¹ :=
+          fun _ _ => rfl
+        -- `K* = Z`.
+        have hKstarEqZ : Kstar = Z := by
+          have hKstarPrime : (Nat.card ↥Kstar).Prime :=
+            S15.kstar_card_prime_of_inputs hG hM hP1 hKM hK hKstardef
+          have hd : p ∣ Nat.card ↥Kstar := hZcard ▸ Subgroup.card_dvd_of_le hZKstar
+          have hc : Nat.card ↥Kstar = p :=
+            ((Nat.prime_dvd_prime_iff_eq hp hKstarPrime).mp hd).symm
+          exact (Subgroup.eq_of_le_of_card_ge hZKstar (le_of_eq (hc.trans hZcard.symm))).symm
+        -- `Z = Ω₁(Z(P))` as a subgroup of `↥P`-center mapped to `G`.
+        have hZmem : ∀ {g : G}, g ∈ Z → ∃ z : ↥P, z ∈ Subgroup.center ↥P ∧ (z : G) = g := by
+          intro g hg
+          rw [hZomega] at hg
+          simp only [OddOrder.BG.Ch3.S10.omega1CenterInG, Subgroup.mem_map,
+            Subgroup.coe_subtype] at hg
+          obtain ⟨z, hzΩ, hzg⟩ := hg
+          exact ⟨z, OddOrder.GroupTheory.omega1OfAbelian_le hzΩ, hzg⟩
+        -- `hfpf`: `φ k x = x ⟹ x ∈ commutator P` (`x` centralizes `k`, so lands in `K* = Z`).
+        have hfpf : ∀ k : ↥K, k ≠ 1 → ∀ x : ↥P, (φ k) x = x → x ∈ commutator ↥P := by
+          intro k hk1 x hfix
+          have hkne : (k : G) ≠ 1 := fun h => hk1 (Subtype.ext h)
+          have hcm : (k : G) * (x : G) * (k : G)⁻¹ = (x : G) := by
+            have h := congrArg Subtype.val hfix; rwa [hφ k x] at h
+          have hcomm : (k : G) * (x : G) = (x : G) * (k : G) := mul_inv_eq_iff_eq_mul.mp hcm
+          have hxKstar : (x : G) ∈ Kstar := by
+            rw [← centralizer_msigma_kappaElement_eq_kstar hG hM hP1.1 hKM hK hKstardef hU k.2 hkne]
+            refine Subgroup.mem_inf.mpr ⟨hPMσ x.2, ?_⟩
+            rw [Subgroup.mem_centralizer_iff]
+            rintro g rfl
+            exact hcomm
+          obtain ⟨z, hzc, hzx⟩ := hZmem (hKstarEqZ ▸ hxKstar)
+          have hzx' : z = x := Subtype.ext hzx
+          rw [hPextra.commutator_eq_center, ← hzx']; exact hzc
+        -- `hcentZ`: `K` centralizes `Z(P) = commutator P`.
+        have hcentZ : ∀ k : ↥K, ∀ z : ↥P, z ∈ commutator ↥P → (φ k) z = z := by
+          intro k z hz
+          rw [hPextra.commutator_eq_center] at hz
+          have hzZ : (z : G) ∈ Z := by
+            rw [hZomega]
+            simp only [OddOrder.BG.Ch3.S10.omega1CenterInG, Subgroup.mem_map, Subgroup.coe_subtype]
+            refine ⟨z, (OddOrder.GroupTheory.mem_omega1OfAbelian).mpr ⟨hz, ?_⟩, rfl⟩
+            have hdz : orderOf z ∣ p := by
+              have h1 : orderOf (⟨z, hz⟩ : ↥(Subgroup.center ↥P)) ∣
+                  Nat.card ↥(Subgroup.center ↥P) := orderOf_dvd_natCard _
+              rw [hZPcard] at h1
+              rwa [← orderOf_injective (Subgroup.center ↥P).subtype
+                Subtype.coe_injective ⟨z, hz⟩] at h1
+            exact orderOf_dvd_iff_pow_eq_one.mp hdz
+          have hzcK : (z : G) ∈ Subgroup.centralizer (K : Set G) :=
+            (hZKstar.trans (hKstardef ▸ inf_le_right)) hzZ
+          have hcomm : (k : G) * (z : G) = (z : G) * (k : G) :=
+            Subgroup.mem_centralizer_iff.mp hzcK (k : G) k.2
+          apply Subtype.ext
+          rw [hφ k z, hcomm, mul_inv_cancel_right]
+        exact hW1K ▸ OddOrder.GroupTheory.card_dvd_succ_of_primeAction_extraspecial hpodd
+          hPextra hPcard3 φ hfpf hcentZ hKcyc hKp' (hW1K ▸ hdvd)
 
 /-- **Prop 16.1(d)/(f) reverse, `M_F = M_σ` from `U = ⊥`** (the `M_F = M_σ` conjunct of `hVP1`,
 mmd L4478): a type-`P` datum with trivial complement `U = ⊥` has `M_F = M_σ`.  Sandwiching:
