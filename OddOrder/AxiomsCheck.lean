@@ -5626,6 +5626,17 @@ deep `(e3)` Singer/`SL₂(p)` case `Z ≤ K*` (`|O_p(M_F)| = p³`, `|W₁| ∣ p
 #assert_only_allowed_axioms
   OddOrder.BG.Ch4.S16.kappaHall_card_dvd_sub_one_of_inf_kstar_eq_bot
 
+/-! **Type-V disjunct-3 faithfulness brick** (`S16_MainResults`,
+`kappaHall_inf_centralizer_opiCore_eq_bot`, issue 8015): in the Singer `(e3)` case the cyclic `κ`-Hall
+`K` acts *faithfully* on `P = O_p(M_F)`, i.e. `K ⊓ C_G(P) = ⊥` (Coq `tiKcP`/`defKs`).  A nonidentity
+`x ∈ K ⊓ C_G(P)` would centralize `P ⊇ X₁`, forcing `X₁ ≤ M_σ ⊓ C_G(x) = K* = Z`
+(`centralizer_msigma_kappaElement_eq_kstar` + `kstar_card_prime_of_inputs`, `|K*| = p = |Z|`),
+contradicting `X₁ ⊄ Z`.  This is the faithfulness input to `pRank_opiCore_le_two_of_kappaHall`
+(`rPle2`).  Axiom-clean. -/
+
+#assert_only_allowed_axioms
+  OddOrder.BG.Ch4.S16.kappaHall_inf_centralizer_opiCore_eq_bot
+
 /-! **Type-`P₁` `M_F`-internal complement** (`S16_MainResults`, `exists_typeP1_mf_complement`, the
 construction core of the FT-critical `hP1neIIIIV` bridge): `M_F` has a `K`-invariant complement `U`
 inside `M' = M_σ` (`M_F ⊔ U = M'`, `K ≤ N_G(U)`, `M_F ⊓ U = ⊥`).  The `K`-invariant
