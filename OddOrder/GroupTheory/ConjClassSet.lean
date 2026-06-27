@@ -4,6 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
 import Mathlib.Algebra.Group.Subgroup.Lattice
+import Mathlib.Tactic.Group
 
 /-!
 # Conjugacy-closure of a subset `𝒞_G(T)`
@@ -45,5 +46,22 @@ theorem subset_conjClassSet {T : Set G} : T ⊆ conjClassSet T :=
 /-- `𝒞_G` is monotone in the subset. -/
 theorem conjClassSet_mono {S T : Set G} (h : S ⊆ T) : conjClassSet S ⊆ conjClassSet T :=
   fun _ ⟨t, ht, g, hg⟩ => ⟨t, h ht, g, hg⟩
+
+/-- **`𝒞_G(T)` is invariant under conjugation by any element**: `g * h * g⁻¹ ∈ 𝒞_G(T) ↔ h ∈ 𝒞_G(T)`.
+Conjugation by `g` permutes the `G`-conjugacy classes, fixing their union, so `𝒞_G(T)` is normalized
+by all of `G` (`N_G(𝒞_G(T)) = G`). -/
+theorem mem_conjClassSet_conj_iff {T : Set G} (g h : G) :
+    g * h * g⁻¹ ∈ conjClassSet T ↔ h ∈ conjClassSet T := by
+  constructor
+  · rintro ⟨t, ht, b, hb⟩
+    refine ⟨t, ht, g⁻¹ * b, ?_⟩
+    have hconj : g * ((g⁻¹ * b) * t * (g⁻¹ * b)⁻¹) * g⁻¹ = g * h * g⁻¹ := by
+      have e : g * ((g⁻¹ * b) * t * (g⁻¹ * b)⁻¹) * g⁻¹ = b * t * b⁻¹ := by group
+      exact e.trans hb
+    exact mul_left_cancel (mul_right_cancel hconj)
+  · rintro ⟨t, ht, b, hb⟩
+    refine ⟨t, ht, g * b, ?_⟩
+    have e : g * b * t * (g * b)⁻¹ = g * (b * t * b⁻¹) * g⁻¹ := by group
+    rw [e, hb]
 
 end OddOrder.GroupTheory
