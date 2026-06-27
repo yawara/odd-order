@@ -5671,6 +5671,16 @@ Axiom-clean. -/
 #assert_only_allowed_axioms
   OddOrder.BG.Ch4.S16.card_opiCore_eq_prime_cube_singer
 
+/-! **Type-V disjunct-3 route-B final arithmetic (L5)** (`S16_MainResults`,
+`card_dvd_of_injective_to_cyclic_forall_pow`, issue 8015): if a finite group `K` embeds into a finite
+cyclic group `C` with every image an `n`-th root of unity, then `|K| ∣ n`.  In the Singer application
+`C = 𝔽_{p²}ˣ` and `μ k ^ (p+1) = 1` is the determinant-one (`= N(μ k) = μ(k)^{p+1}`) symplectic
+condition, giving `|W₁| = |K| ∣ p+1`.  The reusable last step of the `(e3)` Singer divisibility;
+axiom-clean. -/
+
+#assert_only_allowed_axioms
+  OddOrder.BG.Ch4.S16.card_dvd_of_injective_to_cyclic_forall_pow
+
 /-! **Type-`P₁` `M_F`-internal complement** (`S16_MainResults`, `exists_typeP1_mf_complement`, the
 construction core of the FT-critical `hP1neIIIIV` bridge): `M_F` has a `K`-invariant complement `U`
 inside `M' = M_σ` (`M_F ⊔ U = M'`, `K ≤ N_G(U)`, `M_F ⊓ U = ⊥`).  The `K`-invariant
