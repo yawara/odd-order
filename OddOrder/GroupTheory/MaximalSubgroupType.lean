@@ -309,6 +309,25 @@ def typePV (M : Subgroup G) (data : TypePData M) : Set G :=
 def typePA0 (M : Subgroup G) (data : TypePData M) : Set G :=
   typePA M data ∪ conjClassSet (typePV M data)
 
+/-- **The type-`P` support is the sharp of the derived subgroup**: `A(M) = (M')#`.
+
+`typePA M = centralizerSupport (M#) M'` is by definition `{y ∈ M' | y ≠ 1 ∧ ∃ x ∈ M#, y ∈ C_G(x)}`,
+but the centralizer condition is vacuous on `(M')#`: every `y ∈ (M')# ⊆ M#` centralizes itself
+(`x = y`).  Hence `A(M) = (M')# = sharpSubgroup (derivedInG M)`, the sharp of the **normal** subgroup
+`M' = derivedInG M ⊴ M`.  This is the `A = H#` shape (with `H = M'`) that Peterfalvi (10.8) needs to
+apply the (7.6)/(7.8.b) coherence norm estimate to `(M, A(M))`. -/
+theorem typePA_eq_sharpSubgroup_derivedInG (M : Subgroup G) (data : TypePData M) :
+    typePA M data = sharpSubgroup (derivedInG M) := by
+  ext y
+  simp only [typePA, centralizerSupport, sharpSubgroup, Set.mem_setOf_eq, Set.mem_diff_singleton]
+  constructor
+  · rintro ⟨h1, h2, -⟩
+    exact ⟨h1, h2⟩
+  · rintro ⟨h1, h2⟩
+    exact ⟨h1, h2, y, ⟨Subgroup.map_subtype_le _ h1, h2⟩,
+      Subgroup.mem_centralizer_iff.mpr fun g hg => by
+        rw [Set.mem_singleton_iff] at hg; subst hg; rfl⟩
+
 /-- Peterfalvi (8.14), the thickened `A_1(M)` attached to a supporting maximal
 subgroup `L`. -/
 noncomputable def thickenedA1 (L M : Subgroup G) (tau : PeterfalviType) : Set G :=

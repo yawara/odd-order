@@ -6308,6 +6308,13 @@ formula together with the prime computation `coprimeFrobeniusAction_card_eq_prim
 -- Axiom-clean.
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S10.card_Msigma_inf_centralizer_eq_card_W2
 
+-- **type-`P` support is the derived sharp** (shared `GroupTheory`) —
+-- `typePA_eq_sharpSubgroup_derivedInG`: `A(M) = typePA M = sharpSubgroup (derivedInG M) = (M')#`.
+-- The `centralizerSupport (M#) M'` definition collapses on `(M')#` (each `y ∈ (M')# ⊆ M#`
+-- self-centralizes), so `A(M)` is the sharp of the normal `M' ⊴ M` — the `A = H#` shape Peterfalvi
+-- (10.8) uses to apply the (7.6)/(7.8.b) coherence estimate.  Pure set theory.  Axiom-clean.
+#assert_only_allowed_axioms OddOrder.GroupTheory.typePA_eq_sharpSubgroup_derivedInG
+
 -- **`𝒞_G(T)` conjugation-invariance** (shared `GroupTheory`) — `mem_conjClassSet_conj_iff`:
 -- `g * h * g⁻¹ ∈ 𝒞_G(T) ↔ h ∈ 𝒞_G(T)`, i.e. `N_G(𝒞_G(T)) = G`.  Pure group theory.  Used to prove
 -- the (8.16) normalizer fact below (the `V^G` half of `A_0(M) = A(M) ∪ V^G`).  Axiom-clean.
