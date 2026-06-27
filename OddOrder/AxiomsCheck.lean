@@ -5674,6 +5674,22 @@ III/IV last mile `isTypeIII_or_IV_of_typePData`.  Axiom-clean. -/
 #assert_only_allowed_axioms
   OddOrder.BG.Ch4.S16.typePData_nontrivialCore_of_isTypeP1_mf_ne_msigma
 
+/-! **`hP1neIIIIV` bridge COMPLETE** (`S16_MainResults`, issue 8015): *every* type-`P₁` maximal
+subgroup with `M_F ≠ M_σ` is of type III or IV — `isTypeIII_or_IV_of_isTypeP1_mf_ne_msigma` is now
+fully `sorry`-free and axiom-clean.  The former Peterfalvi (8.7) / Coq `Fcore_structure` residual
+`N_G(U) ⊆ M` is discharged via the Coq `typePfacts` argument: a prime `p ∣ |U|`, the unique Sylow
+`p`-subgroup `P̄` of the nilpotent complement `U` (so `N_G(U) ≤ N_G(P̄)`,
+`normalizer_le_normalizer_map_sylow_of_isNilpotent`), and the fact that `P̄` is a `σ`-Sylow of `M`
+(`typeP1_complement_mem_sigma_and_factorization`), whence `N_G(P̄) ≤ M`
+(`normalizer_sylow_map_le_of_mem_sigma`).  Two reusable axiom-clean helpers plus the bridge. -/
+
+#assert_only_allowed_axioms
+  OddOrder.BG.Ch4.S16.normalizer_le_normalizer_map_sylow_of_isNilpotent
+#assert_only_allowed_axioms
+  OddOrder.BG.Ch4.S16.typeP1_complement_mem_sigma_and_factorization
+#assert_only_allowed_axioms
+  OddOrder.BG.Ch4.S16.isTypeIII_or_IV_of_isTypeP1_mf_ne_msigma
+
 /-! **`hP2II` reduced to the `M'`-type-`F` residual** (`S16_MainResults`,
 `isTypeII_of_isTypeP2_of_derived_typeF`, issue 7007): a type-`P₂` maximal subgroup whose derived
 subgroup `M'` is type `F` (with `F(M') = M_F`) is type II.  Discharges every `isTypeII_of_typePData`

@@ -3013,6 +3013,127 @@ theorem typePData_nontrivialCore_of_isTypeP1_mf_ne_msigma [Finite G]
     exact maxNilpotentNormalHall_sharp_isTISubset_of_fittingIsTI hG hM
       (S15.fitting_isTI_of_mf_ne_msigma hG hM hne)
 
+/-- **Normalizer of a finite nilpotent subgroup is contained in the normalizer of each of its Sylow
+subgroups** (the `char_norms (pcore_char p U)` step of Coq `BGsection16` `typePfacts`): for a finite
+nilpotent `U ≤ G` and a Sylow `p`-subgroup `P` of `↥U`, the `G`-normalizer of `U` lies in the
+`G`-normalizer of `P̄ = P.map U.subtype`.  Since `U` is nilpotent, `P` is normal — hence the *unique*
+Sylow `p`-subgroup of `↥U` (`Sylow.unique_of_normal`) — so conjugation by any `g ∈ N_G(U)` (which
+permutes `U`'s Sylow `p`-subgroups) fixes `P̄`.  Reusable. -/
+theorem normalizer_le_normalizer_map_sylow_of_isNilpotent [Finite G] {U : Subgroup G}
+    (hUnil : Group.IsNilpotent ↥U) {p : ℕ} [Fact p.Prime] (P : Sylow p ↥U) :
+    Subgroup.normalizer (U : Set G) ≤
+      Subgroup.normalizer (((P : Subgroup ↥U).map U.subtype : Subgroup G) : Set G) := by
+  classical
+  haveI := hUnil
+  haveI hPnormal : (P : Subgroup ↥U).Normal := Ch01.Sylow.normal_of_isNilpotent P
+  letI : Unique (Sylow p ↥U) := P.unique_of_normal hPnormal
+  set Pbar : Subgroup G := (P : Subgroup ↥U).map U.subtype with hPbardef
+  have hPbar_le_U : Pbar ≤ U := Subgroup.map_subtype_le _
+  -- `|P̄|` is the full `p`-part of `|U|`.
+  have hcardPbar : Nat.card ↥Pbar = p ^ (Nat.card ↥U).factorization p := by
+    rw [hPbardef, Subgroup.card_map_of_injective U.subtype_injective]
+    exact P.card_eq_multiplicity
+  intro g hg
+  have hgU : MulAut.conj g • U = U := conj_smul_eq_self_of_mem_normalizer hg
+  -- `conj g • P̄ ≤ U` (since `g` normalizes `U`).
+  have hconj_le_U : MulAut.conj g • Pbar ≤ U := by
+    rw [pointwise_mulAut_smul_eq_map]
+    calc (Pbar.map (MulAut.conj g : G →* G))
+        ≤ U.map (MulAut.conj g : G →* G) := Subgroup.map_mono hPbar_le_U
+      _ = MulAut.conj g • U := (pointwise_mulAut_smul_eq_map _ _).symm
+      _ = U := hgU
+  -- `(conj g • P̄).subgroupOf U` is a Sylow `p` of `↥U`, hence `= P` by uniqueness.
+  have hcardConj : Nat.card ↥((MulAut.conj g • Pbar).subgroupOf U)
+      = p ^ (Nat.card ↥U).factorization p := by
+    rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hconj_le_U).toEquiv,
+      pointwise_mulAut_smul_eq_map, Subgroup.card_map_of_injective (MulAut.conj g).injective,
+      hcardPbar]
+  set Q : Sylow p ↥U := Sylow.ofCard ((MulAut.conj g • Pbar).subgroupOf U) hcardConj with hQdef
+  have hQP : (Q : Subgroup ↥U) = (P : Subgroup ↥U) := by rw [Subsingleton.elim Q P]
+  have h2 : (Q : Subgroup ↥U) = (MulAut.conj g • Pbar).subgroupOf U := Sylow.coe_ofCard _ _
+  -- Transport back to `G`: `conj g • P̄ = P̄`, so `g ∈ N_G(P̄)`.
+  have hfix : MulAut.conj g • Pbar = Pbar := by
+    have h1 : ((MulAut.conj g • Pbar).subgroupOf U).map U.subtype = MulAut.conj g • Pbar :=
+      Subgroup.map_subgroupOf_eq_of_le hconj_le_U
+    rw [← h1, ← h2, hQP]
+  exact mem_normalizer_of_conj_smul_eq_self hfix
+
+/-- **A prime dividing the type-`P₁` `M_F`-complement is a `σ`-prime that `U` carries fully**
+(the `sMp`/`sylP` steps of Coq `BGsection16` `typePfacts`): for a type-`P₁` maximal `M` and an
+`M_F`-complement `U` in `M' = M_σ` (`M_F ⊔ U = M'`, `M_F ⊓ U = ⊥`), every prime `p ∣ |U|` lies in
+`σ(M)` and the `p`-part of `|U|` equals the `p`-part of `|M|`.
+
+`p ∈ σ(M)`: `p ∣ |U| ∣ |M_σ|` and `M_σ` is the `σ`-Hall (`Msigma_subgroupOf_isHall`).
+`p`-parts agree: `|M| = |U| · [M:U]` and `p ∤ [M:U] = [M':U]·[M:M']`.  Here `[M':U] = |M_F|`
+(`IsComplement'.index_eq_card`) and `p ∤ |M_F|` because `M_F` is a Hall subgroup of `M`
+(`maxNilpotentNormalHall_isHall`) with `|U| ∣ [M:M_F]`, while `[M:M'] = [M:M_σ]` is a `σ'`-number
+(`p ∈ σ`).  Hence a Sylow `p`-subgroup of `U` is a Sylow `p`-subgroup of `M`. -/
+theorem typeP1_complement_mem_sigma_and_factorization [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M U : Subgroup G} (hM : M ∈ maximalSubgroups G)
+    (hP1 : S14.IsTypeP1 M)
+    (hsup : maxNilpotentNormalHall M ⊔ U = derivedInG M)
+    (hinf : maxNilpotentNormalHall M ⊓ U = ⊥)
+    {p : ℕ} (hp : p ∈ (Nat.card ↥U).primeFactors) :
+    p ∈ OddOrder.BG.Ch3.S10.sigma M ∧
+      (Nat.card ↥U).factorization p = (Nat.card ↥M).factorization p := by
+  classical
+  have hpp : p.Prime := Nat.prime_of_mem_primeFactors hp
+  have hpU : p ∣ Nat.card ↥U := Nat.dvd_of_mem_primeFactors hp
+  set M' := derivedInG M with hM'def
+  have hM'σ : M' = OddOrder.BG.Ch3.S10.Msigma M := isTypeP1_derivedInG_eq_Msigma hG hM hP1
+  have hUle' : U ≤ M' := hsup ▸ le_sup_right
+  have hMFle' : maxNilpotentNormalHall M ≤ M' := hsup ▸ le_sup_left
+  have hM'M : M' ≤ M := Subgroup.map_subtype_le _
+  have hUM : U ≤ M := hUle'.trans hM'M
+  have hDcompl := isComplement'_mf_complement_of_sup_inf hsup hinf
+  -- (1) `p ∈ σ(M)`: `p ∣ |U| ∣ |M'| = |M_σ|`, and `π(M_σ) ⊆ σ`.
+  have hpMσ : p ∈ (Nat.card ↥((OddOrder.BG.Ch3.S10.Msigma M).subgroupOf M)).primeFactors := by
+    rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe (OddOrder.BG.Ch3.S10.Msigma_le M)).toEquiv]
+    exact Nat.mem_primeFactors.mpr
+      ⟨hpp, hpU.trans (hM'σ ▸ Subgroup.card_dvd_of_le hUle'), Nat.card_pos.ne'⟩
+  have hpσ : p ∈ OddOrder.BG.Ch3.S10.sigma M := (OddOrder.BG.Ch3.S10.Msigma_subgroupOf_isHall hG hM).1 p hpMσ
+  refine ⟨hpσ, ?_⟩
+  -- (2) `p`-parts agree.  `[M:U] = [M':U]·[M:M']`.
+  have hidx_split : (U.subgroupOf M').index * (M'.subgroupOf M).index = (U.subgroupOf M).index :=
+    Subgroup.relIndex_mul_relIndex U M' M hUle' hM'M
+  -- `p ∤ [M':U] = |M_F|`.
+  have hp_not_UM' : ¬ p ∣ (U.subgroupOf M').index := by
+    rw [hDcompl.index_eq_card,
+      Nat.card_congr (Subgroup.subgroupOfEquivOfLe hMFle').toEquiv]
+    intro hdvd
+    -- `|U| ∣ [M:M_F]` (since `[M':M_F] = |U|` and `[M:M_F] = [M':M_F]·[M:M']`).
+    have hMF'idx : ((maxNilpotentNormalHall M).subgroupOf M').index = Nat.card ↥U := by
+      rw [hDcompl.symm.index_eq_card,
+        Nat.card_congr (Subgroup.subgroupOfEquivOfLe hUle').toEquiv]
+    have hsplit2 : ((maxNilpotentNormalHall M).subgroupOf M').index * (M'.subgroupOf M).index
+        = ((maxNilpotentNormalHall M).subgroupOf M).index :=
+      Subgroup.relIndex_mul_relIndex _ M' M hMFle' hM'M
+    have hUdvd : Nat.card ↥U ∣ ((maxNilpotentNormalHall M).subgroupOf M).index :=
+      ⟨(M'.subgroupOf M).index, by rw [← hsplit2, hMF'idx]⟩
+    have hp_idxMF : p ∈ (((maxNilpotentNormalHall M).subgroupOf M).index).primeFactors :=
+      Nat.mem_primeFactors.mpr ⟨hpp, hpU.trans hUdvd, Subgroup.index_ne_zero_of_finite⟩
+    exact (maxNilpotentNormalHall_isHall M).2 p hp_idxMF
+      (Nat.mem_primeFactors.mpr ⟨hpp, hdvd, Nat.card_pos.ne'⟩)
+  -- `p ∤ [M:M'] = [M:M_σ]` (`σ`-Hall, `p ∈ σ`).
+  have hp_not_M'M : ¬ p ∣ (M'.subgroupOf M).index := by
+    intro hdvd
+    refine (OddOrder.BG.Ch3.S10.Msigma_subgroupOf_isHall hG hM).2 p ?_ hpσ
+    rw [hM'σ] at hdvd
+    exact Nat.mem_primeFactors.mpr ⟨hpp, hdvd, Subgroup.index_ne_zero_of_finite⟩
+  -- `p ∤ [M:U]`.
+  have hp_not_UM : ¬ p ∣ (U.subgroupOf M).index := by
+    rw [← hidx_split]
+    intro h
+    rcases (Nat.Prime.dvd_mul hpp).mp h with h1 | h2
+    · exact hp_not_UM' h1
+    · exact hp_not_M'M h2
+  -- conclude.  `|M| = |U| · [M:U]`, `factorization p [M:U] = 0`.
+  have hlag : Nat.card ↥U * (U.subgroupOf M).index = Nat.card ↥M := by
+    have h := Subgroup.card_mul_index (U.subgroupOf M)
+    rwa [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hUM).toEquiv] at h
+  rw [← hlag, Nat.factorization_mul Nat.card_pos.ne' Subgroup.index_ne_zero_of_finite,
+    Finsupp.add_apply, Nat.factorization_eq_zero_of_not_dvd hp_not_UM, add_zero]
+
 /-- **Prop 16.1 forward bridge `hP1neIIIIV`, reduced to the Peterfalvi (8.7) normalizer residual** —
 a type-`P₁` maximal subgroup with `M_F ≠ M_σ` is of type III or IV.
 
@@ -3065,8 +3186,31 @@ theorem isTypeIII_or_IV_of_isTypeP1_mf_ne_msigma [Finite G]
     typePData_nontrivialCore_of_isTypeP1_mf_ne_msigma hG hM hP1 hne data (hdataU ▸ hUne)
   refine isTypeIII_or_IV_of_typePData data hcommon ?_
   rw [hdataU]
-  -- `N_G(U) ⊆ M` — Peterfalvi (8.7) / Coq `Fcore_structure` (the type III/IV last mile).
-  sorry
+  -- `N_G(U) ⊆ M` (Peterfalvi (8.7), Coq `typePfacts`): pick a prime `p ∣ |U|` and `P = Sylow_p(U)`.
+  -- `N_G(U) ≤ N_G(P̄)` (`P̄` unique in the nilpotent `U`) and `P̄` is a `σ`-Sylow of `M`, so
+  -- `N_G(P̄) ≤ M` (`normalizer_sylow_map_le_of_mem_sigma`).
+  obtain ⟨p, hpp, hpdvd⟩ := Nat.exists_prime_and_dvd
+    (show Nat.card ↥U ≠ 1 from fun h => hUne (Subgroup.card_eq_one.mp h))
+  have hpπU : p ∈ (Nat.card ↥U).primeFactors :=
+    Nat.mem_primeFactors.mpr ⟨hpp, hpdvd, Nat.card_pos.ne'⟩
+  haveI : Fact p.Prime := ⟨hpp⟩
+  obtain ⟨hpσ, hfact⟩ :=
+    typeP1_complement_mem_sigma_and_factorization hG hM hP1 hsup hinf hpπU
+  have hUM : U ≤ M := hUle.trans (Subgroup.map_subtype_le _)
+  have P : Sylow p ↥U := default
+  have hPbarM : ((P : Subgroup ↥U).map U.subtype) ≤ M :=
+    (Subgroup.map_subtype_le _).trans hUM
+  have hcardPbar : Nat.card ↥(((P : Subgroup ↥U).map U.subtype).subgroupOf M)
+      = p ^ (Nat.card ↥M).factorization p := by
+    rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hPbarM).toEquiv,
+      Subgroup.card_map_of_injective U.subtype_injective, P.card_eq_multiplicity, hfact]
+  set Q : Sylow p ↥M := Sylow.ofCard (((P : Subgroup ↥U).map U.subtype).subgroupOf M) hcardPbar
+    with hQdef
+  refine le_trans (normalizer_le_normalizer_map_sylow_of_isNilpotent hUnilp P) ?_
+  have hQmap : (Q : Subgroup ↥M).map M.subtype = (P : Subgroup ↥U).map U.subtype := by
+    rw [hQdef, Sylow.coe_ofCard, Subgroup.map_subgroupOf_eq_of_le hPbarM]
+  have hnorm := OddOrder.BG.Ch3.S10.normalizer_sylow_map_le_of_mem_sigma hpσ Q
+  rwa [hQmap] at hnorm
 
 /-- **BG Theorem A(7), first clause — `M'' ⊆ F(M)`** (mmd L4354), as a standalone `sorry`-free
 lemma for *any* maximal `M`.  No longer `M_F ≠ M_σ`-gated: Theorem 15.2's closing (issue 8012)

@@ -507,3 +507,66 @@ TypePData(P₁, U≠⊥) を要する。M' = M_σ 内の M_F-complement U を構
 
 ⟹ **残 W1 forward = hP1eqV trichotomy (8.8 W₁-action) + hP1neIIIIV の N(U)≤M (8.7)**。両者は char/Coq
 `Fcore_structure` の complement uniqueness。reverse 4 bridge (π(W₁)⊆κ carrier) は別 (lane-b char gate)。
+
+### ✅✅✅ 2026-06-27² (lane-f): hP1neIIIIV bridge を完全 close — N(U)≤M (Pf 8.7) を実証明 (axiom-clean)
+
+前項が「最深 gate・char/Coq `Fcore_structure`」とした **N(U)≤M を完全に実証明**。⟹
+**`isTypeIII_or_IV_of_isTypeP1_mf_ne_msigma` (hP1neIIIIV) が完全 sorry-free + axiom-clean**
+(`#print axioms` = `[propext, Classical.choice, Quot.sound]` のみ)。Coq `BGsection16` `typePfacts`
+(P1maxM/U≠1 枝) の ~10 行論法を移植。前項の「multi-session 深い構造定理」評価は過大評価だった —
+σ-Sylow normalizer uniqueness (BG §10、repo 在庫) で済む。
+
+**重要訂正**: 前 entry が hP1neIIIIV を「char/Coq `Fcore_structure` complement uniqueness」に
+bottom-out するとしたのは**誤り**。正しくは N(U)⊆M は **Coq `typePfacts` の純群論論法** (Sylow-of-U の
+一意性 + σ-Sylow normalizer ⊆ M) で、char gate も `Fcore_structure` の depth も不要。
+
+新規 (全 sorry-free + axiom-clean、AxiomsCheck 登録、`S16_MainResults`):
+- **`normalizer_le_normalizer_map_sylow_of_isNilpotent`** (汎用・再利用可): U nilpotent ⟹ Sylow_p(U)=P̄
+  が一意 (`Ch01.Sylow.normal_of_isNilpotent` + `Sylow.unique_of_normal`) ⟹ N_G(U) ≤ N_G(P̄)
+  (g∈N(U) が U の唯一 Sylow を保存)。Coq の `char_norms (pcore_char p U)` ステップ。
+- **`typeP1_complement_mem_sigma_and_factorization`**: 型 P₁ の M_F-complement U と p∈π(U) について
+  (1) p∈σ(M) (p∣|U|∣|M_σ|、`Msigma_subgroupOf_isHall`) (2) p-part|U|=p-part|M| (= Sylow_p(U) は
+  σ-Sylow of M)。[M:U]=[M':U]·[M:M']、[M':U]=|M_F| (`IsComplement'.index_eq_card`)、p∤|M_F|
+  (M_F Hall in M + |U|∣[M:M_F])、p∤[M:M_σ] (σ-Hall)。Coq の `sMp`/`sylP` ステップ。
+- **`isTypeIII_or_IV_of_isTypeP1_mf_ne_msigma`** 本体を sorry-free 化: p∣|U| を取り P̄=Sylow_p(U)、
+  helper で N(U)≤N(P̄)、P̄ を `Sylow.ofCard` で `Sylow p ↥M` に package、
+  `normalizer_sylow_map_le_of_mem_sigma` (BG §10) で N(P̄)≤M。
+
+⟹ **`proposition_type_classification` の hP1neIIIIV case が axiom-clean に閉じた** (full build 3884
+green、AxiomsCheck OK)。**残 W1 forward = hP1eqV trichotomy (8.8 W₁-action) のみ** (`isTypeV_…` 2511、
+¬FittingIsTI の Suzuki/SL₂ 構造 |W₁|∣p∓1 = Coq `nonTI_Fitting_structure`)。reverse 4 bridge
+(hIIP2/hIIIIVP1/hVP1、π(W₁)⊆κ carrier) は別系統 (lane-b char、FeitThompson 未使用)。
+
+### 🔬 2026-06-27³ hP1eqV (残 W1 forward) の精密 scoping — 次セッションの entry point
+
+**FT 必要性の確定**: `typeP_imp_nonI` (FeitThompson:355) は型 P₁∧M_F=M_σ で `hdV.mpr` (hP1eqV) ⟹
+`IsTypeV` を構成し `no_typeV_maximal` (Pf 10.10) で背理。`IsTypeNonI := IsTypeII∨III∨IV∨V`
+(positive disjunction) ゆえ型 V を**構成**する必要があり、`TypeVData` の `alternative` field を埋める
+=trichotomy 証明が要る。**`alternative` の値自体は FT-path で読まれない** (consumer は
+`MaximalSubgroupTypeConj` の equivariance のみ; dade chain/`typeV_forces_coherence` は `typeP`/
+`type_alt` のみ消費) が、`TypeVData` を inhabit するには field を埋めねばならず bypass 不可
+(carrier `TypeVData` 定義変更は cross-lane で blast radius 大、かつ Thm 15.7(d)(e) は genuine BG 数学)。
+
+**型 V 固有の単純化**: 型 V は型 P₁ ⟹ Coq の abelian-H 枝 (e1=型F, rank 2) は**排除** (P1 で K_s≠1∧
+M''=1 矛盾)、必ず非 abelian H = (e2)/(e3) (Suzuki/SL₂)。⟹ disjunct 1 (FittingIsTI) は別途 handle 済、
+**残 = disjunct 2 (|W₁|∣p-1) ∨ disjunct 3 (|O_p(M_F)|=p³ ∧ |W₁|∣p+1)** のみ。
+
+**既存 building blocks (S15_MF、過去 lane-f、全 sorry-free)**:
+- `not_isCyclic_opiCore_mf_of_orderP_le_conj` (8147、Coq `not_cycMp`): O_p(M_F) 非 cyclic。
+- `not_isUniquelyMaximal_mf_inf_centralizer_of_not_le` (8252、Coq `E1X_facts` C1∉𝒰)。
+- `isMulCommutative_mf_inf_centralizer_of_not_le` (8313、Coq `E1X_facts` abelian C1)。
+- **`typeF_nonabelian_cyclic_opiCore_compl` (8475、Coq `cycHp'`)**: `IsCyclic (O_{p}ᶜ M_F)` —
+  **両 disjunct の共通項を直接供給** (要 wire)。
+
+**残 deep core (genuine multi-session、Lean 未形式化)**:
+1. **|Z0| prime** (Z0=Ω₁(Z(O_p(M_F)))): Coq は Lemma 10.13(b) + **Cor 15.3(b)** (B maximal in G,
+   text 未言及) で導出。最深。
+2. **|W₁| ∣ p∓1** (W₁=K の B=X1×Z0 への作用の Frobenius 整除性) + disjunct 2 vs 3 の choice。
+   ⚠ **型 F の U₀-Frobenius engine `typeF_exponent_dvd_sub_one_of_invariant_card` は K-action が
+   FPF でない (K*=C_{M_F}(K)≠⊥) ため直接再利用不可** ([[ft-endgame-two-poles]] 2026-06-26⁵)。
+3. **|O_p(M_F)| = p³** (disjunct 3、SL₂(p) 型 Sylow)。
+
+⟹ 次セッション: (a) `not_cycMp`/`E1X_facts`/`cycHp'` を wire して disjunct の共通項 (p∈π(M_F)+
+IsCyclic O_{p'}) を sorry-free 化、(b) deep core (|Z0| prime ← Lemma 10.13(b)/Cor 15.3(b)、
+|W₁|∣p∓1 ← W₁-action) を named residual に isolate or 上流形式化。Coq `BGsection15.v:939-1095+`
+精読が必須。**multi-session、上流から (|Z0| prime か W₁-action engine から)**。
