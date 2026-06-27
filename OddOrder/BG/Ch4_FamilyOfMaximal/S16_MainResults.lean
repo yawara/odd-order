@@ -2887,7 +2887,30 @@ theorem card_opiCore_eq_prime_cube_singer [Finite G]
     (hPnab : ¬ IsMulCommutative ↥(opiCoreInG ({p} : Set ℕ) (S15.MF M)))
     (hZPcard : Nat.card ↥(Subgroup.center ↥(opiCoreInG ({p} : Set ℕ) (S15.MF M))) = p) :
     Nat.card ↥(opiCoreInG ({p} : Set ℕ) (S15.MF M)) = p ^ 3 := by
-  sorry
+  classical
+  haveI : Fact p.Prime := ⟨hp⟩
+  -- `P = O_p(M_F)` is a Sylow `p`-subgroup of `G` (`sylP_G`).
+  obtain ⟨S, hS⟩ := exists_sylow_eq_opiCore_of_mf_eq_msigma hG hM hmf hp hpσ
+  set P : Subgroup G := opiCoreInG ({p} : Set ℕ) (S15.MF M) with hPdef
+  have hPpg : IsPGroup p ↥P := isPGroup_opiCoreInG_singleton (S15.MF M)
+  -- `rank P ≤ 2` from `pRank P p ≤ 2` (a `p`-group has `rank = pRank` at `p`).
+  have hrankP : rank ↥P ≤ 2 := by
+    by_contra hc
+    exact absurd (OddOrder.BG.Ch2.S09.three_le_pRank_of_isPGroup_of_three_le_rank hPpg
+      (by omega)) (by omega)
+  -- **Blackburn rank-2 Sylow central-product dichotomy** (Cor 10.7(b), `sylow_structure`): `P` is
+  -- abelian (excluded by `hPnab`) or a central product `P₁ ∘ P₂` with `P₁` exponent-`p`
+  -- extraspecial of order `p³` and `P₂` cyclic with `Ω₁(P₂) = Z(P₁)`.
+  have hrankS : rank ↥(S : Subgroup G) ≤ 2 := by rw [hS]; exact hrankP
+  have hdich := (OddOrder.BG.Ch3.S10.sylow_structure hG S).2.1 hrankS
+  rw [hS] at hdich
+  rcases hdich with hab | ⟨P₁, P₂, hP₁P, hP₂P, hP₁es, hP₁card, hP₂cyc, hΩeq, hcp⟩
+  · exact absurd hab hPnab
+  · -- **Collapse** (Coq `dimP`): `P₂` is central in `P` (it centralizes `P₁` and is abelian), so
+    -- `P₂ ≤ Z(P)` and `|P₂| ≤ |Z(P)| = p`; conversely `Ω₁(P₂) = Z(P₁)` has order `p` (`P₁`
+    -- extraspecial), so `|P₂| ≥ p`.  Hence `|P₂| = p`, `P₂ = Ω₁(P₂) = Z(P₁) ≤ P₁`, and
+    -- `P = P₁ ⊔ P₂ = P₁`, giving `|P| = |P₁| = p³`.
+    sorry
 
 /-- **Prop 16.1 forward bridge `hP1eqV`, reduced to the Peterfalvi (8.8) trichotomy residual** — a
 type-`P₁` maximal subgroup with `M_F = M_σ` is of type V.
