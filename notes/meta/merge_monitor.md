@@ -336,6 +336,31 @@ branch とも削除済み。旧 **A** / **D** も同様に退役済み (履歴�
 
 ## 現状メモ
 
+- **2026-06-27 (続) — 4 commit 合流 (F×2/H/C) + 範囲逸脱 STOP→例外承認→再開**: ユーザー監視下で複数 tick。
+  **F**: hP1neIIIIV の U nilpotent / hDcompl residual を sorry-free+axiom-clean 化 (issue 8015、各 1 commit)。
+  **H**: (12.17) `exists_typeICovering` を bare sorry→実証明展開 (issue 0081、新 helper 2 個 sorry-free
+  `supportKernel_le_maxNilpotentNormalHall`/`thickenedSupport_subset_conjClassSet_maxNilpotentNormalHall`、
+  coprime/covers honest discharge、残 3 isolated = two_le/isTI/non-type-I 枝、sorry 125→127 scaffold)。
+  **C**: Cor 15.3 `mf_hall_centralizer_control` を完全 sorry-free+axiom-clean 化 (issue 2025 CLOSED、sorry 127→126)。
+  全 build 3884 green / AxiomsCheck OK / 新規 axiom 0。最終 sorry = **126**。
+  - **⚠ 一時例外 (issue 2025, ユーザー裁可 2026-06-27): lane-c の S16_MainResults 1 行 caller 適応を許容合流**。
+    lane-c が自所有 S15_MF で `mf_hall_centralizer_control` に `hHMσ` (H≤Mσ) 引数追加 → 唯一の呼び出し元が
+    S16_MainResults:3397 (lane-f 所有) にあり新シグネチャ適応の 1 行修正。**build-necessary** (修正なしで lane-c
+    合流時 main build 破綻) ゆえ範囲逸脱の一時例外として合流許可 (issue 8001 de-private / 0065 caller 健全化と同型)。
+    STOP→AskUserQuestion「例外承認して合流」→ 合流→再開。S16 変更は合流で consume 済 (lane-f が次 sync で吸収、再発なし)。
+    **教訓: 自所有 lemma の signature 変更で唯一の caller が他レーン所有ファイルにある場合、build-necessary な
+    caller 適応は範囲逸脱判定に hit するが一時例外で合流可** (内容 logic でなく機械的 1 行に限る)。
+  - サイズ flag (>1500, 全既起票): S15_MF 9592 (0071) / S16_MainResults 3700 (0078) / S14_MaximalI 1656 (0084)。
+
+- **2026-06-27 — 監視再開 (変化なし) + cron 再作成**: ユーザー「各レーンを監視します」で再開。起動時点で
+  **全 4 レーン (f/b/h/c) 0 unmerged** (前セッションで全合流済み、main HEAD `7b14c8d1`)。local main = origin/main
+  (unpushed 0)、git クリーン (MERGE_HEAD なし)、`bin/count-sorry` baseline = **125**。前 cron は session 変化で消滅
+  (`CronList` 空、[[cron-dies-on-model-switch]]) → 新 cron **`2766c09c`** (`8,23,38,53 * * * *` = 標準 15 分,
+  stop-on-problem prompt 内蔵, **relane #12 = lane-h W2 復帰の所有マップ反映**: F/W1=BG全体+FeitThompson mp/carrier,
+  C/W1-b=S14_TypePCounting+S15_MF, B/W3=S0[3-9]/S1[0-3]+FeitThompson:426, H/W2=S14_MaximalI)。新規 HUB ask issue
+  なし (issues/ 直下 "HUB:" タイトル 0、4002 は 2026-06-22 の既対応 diagnosis)。build は未マージ 0 ゆえ走らせず
+  (手順 step 1)。
+
 - **2026-06-26 (続³) — relane #11 着地検証 → relane #12 (lane-h W2 復帰、carrier moot)**: relane #11 後の初稼働で
   4 レーン合流 (実 sorry 125→126、build 3884 green)。**主成果**: F=hP1eqV を Suzuki ケースに縮小 / B=(10.8)
   S_not_coherent 忠実 3 分解 (relane #11 の Dade-engine 指示が奏功) / C=Cor 15.3(a) ha gate を Prop 14.2(e) で

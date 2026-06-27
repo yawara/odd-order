@@ -3657,7 +3657,7 @@ theorem theoremI_nilpotentHall_conjugacy_and_type_dichotomy [Finite G]
             (H.subgroupOf (OddOrder.BG.Ch3.S10.Msigma M)) :=
           isHallSubgroup_subgroupOf_of_le hHall hHMσ
         -- Corollary 15.3(b): `N_M(H)`-fusion control; `N_M(H) ⊆ N_G(H)`.
-        obtain ⟨_, hfusion⟩ := S15.mf_hall_centralizer_control hG hM hHall' hHne
+        obtain ⟨_, hfusion⟩ := S15.mf_hall_centralizer_control hG hM hHMσ hHall' hHne
         exact hfusion x hx y hy ⟨g, hg⟩
     · -- `←`: `N_G(H)`-conjugacy is in particular `G`-conjugacy.
       rintro ⟨n, _, hn⟩

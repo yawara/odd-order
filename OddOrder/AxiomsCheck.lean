@@ -4016,6 +4016,25 @@ set_option linter.style.longLine false in
 #assert_only_allowed_axioms OddOrder.BG.Ch4.S15.isHallSubgroup_eq_oPiCore_of_nilpotent
 #assert_only_allowed_axioms OddOrder.BG.Ch4.S15.isHallSubgroup_map_mk'
 #assert_only_allowed_axioms OddOrder.BG.Ch4.S15.characteristic_sup_hall_of_quotient_nilpotent
+-- BG Corollary 15.3 reusable plumbing (`S15_MF`, issue 2025).  `opiCoreInG_eq_of_normal_le`:
+-- `O_π(M) = O_π(N)` when `N ◁ M` and `O_π(M) ≤ N` (identifies `Q = O_q(M)` with `O_q(M_σ)`).
+-- `normal_subgroupOf_of_characteristic_subgroupOf_le`: a characteristic subgroup of an `M`-normal
+-- `N` is `M`-normal (lifts `QH` char-in-`M_σ` to `QH ◁ M`).  `normal_isPiGroup_le_isHall`: a normal
+-- `π`-subgroup lies in every Hall `π`-subgroup (places `Q = O_q(M_σ) ≤ H` when `q ∈ π(H)`).
+-- All sorry-free + axiom-clean.
+#assert_only_allowed_axioms OddOrder.BG.Ch4.S15.opiCoreInG_eq_of_normal_le
+#assert_only_allowed_axioms OddOrder.BG.Ch4.S15.normal_subgroupOf_of_characteristic_subgroupOf_le
+#assert_only_allowed_axioms OddOrder.BG.Ch4.S15.normal_isPiGroup_le_isHall
+-- BG Corollary 15.3(b) `hfratt` input (`S15_MF`, issue 2025): for `H ≤ M_σ` Hall with `H ⋬ M`, the
+-- Frattini factorization `M = N_M(H)·Q` (`Q = O_q(M)`, `Q ∩ H = 1`).  `M_σ` non-nilpotent ⟹ type
+-- `P₁` ⟹ `Q` with `M_σ/Q` nilpotent (Thm 15.2 engine), `QH ◁ M` (char-in-`M_σ` lift), `q ∉ π(H)`,
+-- Frattini.  Sorry-free + axiom-clean.
+#assert_only_allowed_axioms OddOrder.BG.Ch4.S15.hfratt_of_hall_not_normal
+-- BG Corollary 15.3 itself (`S15_MF`, issue 2025): `C_M(H) = C_{M_σ}(H)·X` (cyclic `τ₂`) **and**
+-- `N_M(H)`-fusion control, for `H ≤ M_σ` a nonidentity Hall subgroup.  **Now fully sorry-free +
+-- axiom-clean** — the three inputs (`ha`/`hconj`/`hfratt`) are all discharged.  Resolves the BG
+-- Theorem I fusion gate consumed by Peterfalvi (8.8) → `theorem88_caseB_holds`.
+#assert_only_allowed_axioms OddOrder.BG.Ch4.S15.mf_hall_centralizer_control
 -- BG Theorem A(8) `FittingIsTI` (`S15_MF`, issue 8016): `M_F ≠ M_σ ⟹ F(M)` is a `TI`-subgroup.
 -- Now **fully axiom-clean** — the last sorryAx (via `fitting_decomposition`'s cite of the sorried
 -- general Corollary 15.3) is eliminated by routing through `mf_centralizer_msigma_decomp`.
@@ -6266,3 +6285,19 @@ formula together with the prime computation `coprimeFrobeniusAction_card_eq_prim
 -- consumes.  Axiom-clean.
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.S14.maximalSubgroup_eq_normalizer_maxNilpotentNormalHall
+
+-- **W2 §12 (12.17) type-I covering core (lane-h)** — the structural heart of the (8.17.a) type-I
+-- covering, isolated as two reusable group-theory lemmas behind `exists_typeICovering`'s `covers`
+-- field:
+-- * `supportKernel_le_maxNilpotentNormalHall`: the §8 thickening kernel `R(x)` of Peterfalvi (8.14)
+--   is always `≤ L_F = maxNilpotentNormalHall L` (both branches of its definition are).
+-- * `thickenedSupport_subset_conjClassSet_maxNilpotentNormalHall`: if a support set `X ⊆ L_F`, then
+--   the thickened support `⋃_{z ∈ X} (z R(z))^G` lands in `𝒞_G(L_F)` — the coset factor `z ∈ X ⊆ L_F`
+--   and the kernel factor `r ∈ R(z) ⊆ L_F` multiply into `L_F`.
+-- This is why the `A_1(M_i) = (M_i)_F#` thickened cover is, up to conjugacy, a cover by `(M_i)_F#`:
+-- the genuine group-theoretic content discharging the `covers` field of `exists_typeICovering`
+-- (Peterfalvi (12.17), all-type-I case).  Both axiom-clean.
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S14.supportKernel_le_maxNilpotentNormalHall
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S14.thickenedSupport_subset_conjClassSet_maxNilpotentNormalHall

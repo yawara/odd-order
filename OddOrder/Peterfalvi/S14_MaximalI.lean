@@ -1466,16 +1466,198 @@ structure TypeICovering (hG : OddOrder.BG.IsMinimalSimpleOdd G)
   covers : ∀ x : G, x ≠ 1 →
     ∃ i, ∃ g : G, g * x * g⁻¹ ∈ (maxNilpotentNormalHall (reps i) : Set G) \ {1}
 
+omit [Finite G] in
+/-- **§8 thickening kernel containment.**  The subgroup `R(x) = supportKernel L M X x` of
+Peterfalvi (8.14) is always contained in `L_F = maxNilpotentNormalHall L`: on the
+escaping-centralizer set it is `L_F ⊓ C_G(x) ≤ L_F`, and elsewhere it is `⊥`. -/
+theorem supportKernel_le_maxNilpotentNormalHall (L M : Subgroup G) (X : Set G) (x : G) :
+    supportKernel L M X x ≤ maxNilpotentNormalHall L := by
+  classical
+  unfold supportKernel
+  split
+  · exact inf_le_left
+  · exact bot_le
+
+/-- **The type-I thickened cover lands in `L_F`-conjugates.**  If a support set `X` is contained in
+`L_F = maxNilpotentNormalHall L`, then every element of the thickened support
+`⋃_{z ∈ X} (z R(z))^G` (`thickenedSupport L M X`) is conjugate to an element of `L_F`: the coset
+factor `z ∈ X ⊆ L_F` and the kernel factor `r ∈ R(z) ⊆ L_F`
+(`supportKernel_le_maxNilpotentNormalHall`) multiply into `L_F`, which `𝒞_G` saturates.
+
+This is the structural heart of the (12.17) type-I covering: the thickening `R(z)` never escapes
+`L_F`, so the `A_1(L) = (L_F)#` cover by thickened sets is, up to conjugacy, a cover by `L_F`. -/
+theorem thickenedSupport_subset_conjClassSet_maxNilpotentNormalHall
+    {L M : Subgroup G} {X : Set G} (hX : X ⊆ (maxNilpotentNormalHall L : Set G)) :
+    thickenedSupport L M X ⊆ conjClassSet (maxNilpotentNormalHall L : Set G) := by
+  rintro y ⟨z, hz, hyz⟩
+  obtain ⟨w, hw, g, hgwy⟩ := hyz
+  obtain ⟨r, hr, hzrw⟩ := hw
+  have hzMF : z ∈ maxNilpotentNormalHall L := hX hz
+  have hrMF : r ∈ maxNilpotentNormalHall L :=
+    supportKernel_le_maxNilpotentNormalHall L M X z (SetLike.mem_coe.mp hr)
+  have hwMF : w ∈ maxNilpotentNormalHall L := hzrw ▸ mul_mem hzMF hrMF
+  exact ⟨w, SetLike.mem_coe.mpr hwMF, g, hgwy⟩
+
 /-- **Peterfalvi (8.17)/(8.13.c1), all-type-I case**: the §8 covering inputs of (12.17) exist.
 
-This is the genuine §8/§10 content behind (12.17): BG Theorem E (`S10.bgTheoremE_cover_data`, the
-type-I covering branch (8.17.a)) together with the escaping-centralizer control (8.13.c1) that makes
-each kernel sharp-set a TI-subset.  It is the single isolated upstream obligation behind the
-otherwise group-theoretic (12.17) reduction in `not_all_maximal_typeI`. -/
+Built as an honest reduction from BG Theorem E (`S10.bgTheoremE_cover_data`): in the all-type-I case
+every representative `M_i` has `data.tau i = .I` (type exclusivity, `not_isTypeI_of_isTypeNonI`), so
+`mainSubgroup (M_i) (τ_i) = (M_i)_F`.  The `reps`/`reps_maximal` plumbing, `coprime` (the (8.17)
+prime-factor partition is disjoint, hence the kernels are coprime), `two_le` (a single class would
+make `|G#| = (|M_s|-1)|G:M| < |G|-1 = |G#|`), and `covers` (the thickened cover lands in
+`(M_i)_F`-conjugates, `thickenedSupport_subset_conjClassSet_maxNilpotentNormalHall`) are all
+discharged.  Two upstream facts remain isolated as residual sorries: `isTI`, the escaping-centralizer
+control (8.13.c1)+(2.3) making each kernel sharp-set a TI-subset; and the selection of the type-I
+cover branch under `hall`, the (8.8.a) dichotomy (BG §16, parallel to `theorem88_dichotomy`). -/
 theorem exists_typeICovering (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     (hall : ∀ M : Subgroup G, M ∈ maximalSubgroups G → IsTypeI M) :
-    Nonempty (TypeICovering hG hall) :=
-  sorry
+    Nonempty (TypeICovering hG hall) := by
+  classical
+  -- `BGTheoremECoverData.ι : Type*` is universe-polymorphic; pin the index type to `Type 0`.
+  obtain ⟨data, hcover⟩ := OddOrder.Peterfalvi.S10.bgTheoremE_cover_data.{_, 0} hG
+  haveI : Fintype data.ι := data.finite_index
+  -- **Every representative is type I**, so `data.tau i = .I` and hence
+  -- `mainSubgroup (M_i) (τ_i) = (M_i)_F`.  Type exclusivity is
+  -- `not_isTypeI_of_isTypeNonI` (BG §16): a type-`P` (= non-type-I) maximal is not type I.
+  have hMF : ∀ i, mainSubgroup (data.reps i) (data.tau i)
+      = maxNilpotentNormalHall (data.reps i) := by
+    intro i
+    have hI : IsTypeI (data.reps i) := hall _ (data.maximal i)
+    have htau := data.typed i
+    have htauI : data.tau i = PeterfalviType.I := by
+      by_contra hne
+      have hNonI : IsTypeNonI (data.reps i) := by
+        cases hc : data.tau i with
+        | I => exact absurd hc hne
+        | II => rw [hc] at htau; exact Or.inl htau
+        | III => rw [hc] at htau; exact Or.inr (Or.inl htau)
+        | IV => rw [hc] at htau; exact Or.inr (Or.inr (Or.inl htau))
+        | V => rw [hc] at htau; exact Or.inr (Or.inr (Or.inr htau))
+      exact OddOrder.BG.Ch4.S16.not_isTypeI_of_isTypeNonI hG (data.maximal i) hNonI hI
+    simp only [htauI, mainSubgroup]
+  -- The `Fin k`-indexing of the representatives (`e : data.ι ≃ Fin k`).
+  set e := Fintype.equivFin data.ι with he
+  rcases hcover with hTypeI | hNonTypeI
+  · -- **(8.8.a) type-I cover branch.**
+    refine ⟨{
+      k := Fintype.card data.ι
+      reps := fun j => data.reps (e.symm j)
+      reps_maximal := fun j => data.maximal (e.symm j)
+      two_le := ?_
+      isTI := ?_
+      coprime := ?_
+      covers := ?_ }⟩
+    · -- **`two_le`** (discharged): at least two conjugacy classes of maximal subgroups (7.10).
+      -- A single class would force `|G#| = |thickenedA1(M)| = (|M_s| - 1)|G : M|`; but
+      -- `(|M_s| - 1)|G : M| ≤ (|M| - 1)|G : M| = |G| - |G : M| ≤ |G| - 2 < |G| - 1 = |G#|`, and an
+      -- empty class would force `|G#| = 0`, both impossible.  No counting of disjoint unions is
+      -- needed: a one-element index makes the cover `⋃ᵢ thickenedA1(Mᵢ)` equal to a single
+      -- `thickenedA1(M)`, whose cardinality is strictly below `|G#|`.
+      haveI : Nontrivial G := hG.simple.toNontrivial
+      by_contra hlt
+      rw [Nat.not_le] at hlt
+      have hcard01 : Fintype.card data.ι = 0 ∨ Fintype.card data.ι = 1 := by omega
+      rcases hcard01 with h0 | h1
+      · -- empty index: the cover is empty, but `G#` contains a nonidentity element.
+        rw [Fintype.card_eq_zero_iff] at h0
+        have hempty : (⋃ i, thickenedA1 (data.reps i) (data.reps i) (data.tau i)) = ∅ :=
+          Set.iUnion_of_empty _
+        rw [← hTypeI.cover_nonidentity] at hempty
+        obtain ⟨b, hb⟩ := exists_ne (1 : G)
+        have hbmem : b ∈ sharpSubgroup (⊤ : Subgroup G) := by
+          simp only [sharpSubgroup, Subgroup.coe_top, Set.mem_diff, Set.mem_univ, true_and,
+            Set.mem_singleton_iff]
+          exact hb
+        rw [hempty] at hbmem
+        exact hbmem.elim
+      · -- one class: `⋃ᵢ thickenedA1(Mᵢ) = thickenedA1(M)`, of cardinality `< |G#|`.
+        obtain ⟨i₀, hi₀⟩ := Fintype.card_eq_one_iff.mp h1
+        have hunion : (⋃ i, thickenedA1 (data.reps i) (data.reps i) (data.tau i))
+            = thickenedA1 (data.reps i₀) (data.reps i₀) (data.tau i₀) := by
+          ext x
+          simp only [Set.mem_iUnion]
+          exact ⟨fun ⟨i, hi⟩ => by rwa [hi₀ i] at hi, fun hx => ⟨i₀, hx⟩⟩
+        rw [← hTypeI.cover_nonidentity] at hunion
+        have hcard_eq : Nat.card ↥(thickenedA1 (data.reps i₀) (data.reps i₀) (data.tau i₀))
+            = Nat.card G - 1 := by
+          rw [Nat.card_coe_set_eq, ← hunion]
+          show ((↑(⊤ : Subgroup G) : Set G) \ {1}).ncard = Nat.card G - 1
+          rw [Subgroup.coe_top, Set.ncard_diff_singleton_of_mem (Set.mem_univ 1), Set.ncard_univ]
+        rw [data.thickenedA1_card i₀] at hcard_eq
+        -- Arithmetic contradiction.
+        have hmain_le : mainSubgroup (data.reps i₀) (data.tau i₀) ≤ data.reps i₀ :=
+          (hMF i₀).le.trans (OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_le (data.reps i₀))
+        have ham : Nat.card ↥(mainSubgroup (data.reps i₀) (data.tau i₀))
+            ≤ Nat.card ↥(data.reps i₀) := Subgroup.card_le_of_le hmain_le
+        have hidx0 : (data.reps i₀).index ≠ 0 := Subgroup.index_ne_zero_of_finite
+        have hidx1 : (data.reps i₀).index ≠ 1 :=
+          fun h => (data.maximal i₀).1 (Subgroup.index_eq_one.mp h)
+        have hidx : 2 ≤ (data.reps i₀).index := by omega
+        have hmidx : Nat.card ↥(data.reps i₀) * (data.reps i₀).index = Nat.card G :=
+          Subgroup.card_mul_index (data.reps i₀)
+        have hm_pos : 0 < Nat.card ↥(data.reps i₀) := Nat.card_pos
+        have hG2 : 2 ≤ Nat.card G :=
+          le_trans hidx (hmidx ▸ Nat.le_mul_of_pos_left (data.reps i₀).index hm_pos)
+        have hb1 : (Nat.card ↥(mainSubgroup (data.reps i₀) (data.tau i₀)) - 1)
+            * (data.reps i₀).index
+            ≤ (Nat.card ↥(data.reps i₀) - 1) * (data.reps i₀).index :=
+          Nat.mul_le_mul_right _ (Nat.sub_le_sub_right ham 1)
+        have hrhs : (Nat.card ↥(data.reps i₀) - 1) * (data.reps i₀).index
+            = Nat.card G - (data.reps i₀).index := by rw [Nat.sub_one_mul, hmidx]
+        rw [hrhs] at hb1
+        -- `hcard_eq : P = |G| - 1`, `hb1 : P ≤ |G| - idx`, `idx ≥ 2`, `|G| ≥ 2` ⟹ `False`.
+        set P := (Nat.card ↥(mainSubgroup (data.reps i₀) (data.tau i₀)) - 1)
+          * (data.reps i₀).index with hP
+        omega
+    · -- `isTI`: each kernel sharp-set `((M_i)_F)#` is a TI-subset, by (8.13.c1)+(2.3).
+      -- Escaping-centralizer §8 residual.
+      intro j
+      sorry
+    · -- **`coprime`** (discharged): the kernels have pairwise-coprime order because the (8.17)
+      -- partition makes their prime-factor sets disjoint.
+      intro j j' hjj'
+      have hne : e.symm j ≠ e.symm j' := fun h => hjj' (e.symm.injective h)
+      have hdisj := data.primeFactors_disjoint (e.symm j) (e.symm j') hne
+      simp only [hMF] at hdisj
+      have hcard1 : Nat.card ↥(maxNilpotentNormalHall (data.reps (e.symm j))) ≠ 0 :=
+        Nat.card_pos.ne'
+      have hcard2 : Nat.card ↥(maxNilpotentNormalHall (data.reps (e.symm j'))) ≠ 0 :=
+        Nat.card_pos.ne'
+      exact (Nat.disjoint_primeFactors hcard1 hcard2).mp hdisj
+    · -- **`covers`** (discharged): the genuine type-I covering.  Every nonidentity `x` lies in
+      -- some thickened `A_1(M_i)` (the (8.17.a) cover), and that thickened set lands in the
+      -- conjugates of `(M_i)_F#` because the §8 thickening kernel `R(z) ≤ (M_i)_F`
+      -- (`thickenedSupport_subset_conjClassSet_maxNilpotentNormalHall`).
+      intro x hx1
+      have hxsharp : x ∈ sharpSubgroup (⊤ : Subgroup G) := by
+        simp only [sharpSubgroup, Subgroup.coe_top, Set.mem_diff, Set.mem_univ, true_and,
+          Set.mem_singleton_iff]
+        exact hx1
+      rw [hTypeI.cover_nonidentity] at hxsharp
+      obtain ⟨i, hxi⟩ := Set.mem_iUnion.mp hxsharp
+      have hX : A1 (data.reps i) (data.tau i)
+          ⊆ (maxNilpotentNormalHall (data.reps i) : Set G) := by
+        show sharpSubgroup (mainSubgroup (data.reps i) (data.tau i))
+          ⊆ (maxNilpotentNormalHall (data.reps i) : Set G)
+        rw [hMF i]
+        exact Set.diff_subset
+      have hxconj : x ∈ conjClassSet (maxNilpotentNormalHall (data.reps i) : Set G) :=
+        thickenedSupport_subset_conjClassSet_maxNilpotentNormalHall hX hxi
+      obtain ⟨t, htMF, g, hgtx⟩ := hxconj
+      refine ⟨e i, g⁻¹, ?_⟩
+      have hreps : data.reps (e.symm (e i)) = data.reps i := by rw [Equiv.symm_apply_apply]
+      have hconj : g⁻¹ * x * (g⁻¹)⁻¹ = t := by rw [inv_inv, ← hgtx]; group
+      simp only [hreps, hconj, Set.mem_diff, Set.mem_singleton_iff]
+      refine ⟨htMF, ?_⟩
+      intro ht1
+      exact hx1 (by rw [← hgtx, ht1]; group)
+  · -- **(8.8.b) non-type-I cover branch**: ruled out when every maximal subgroup is type I.
+    -- This is the all-type-I case of the (8.8) dichotomy (`theorem88_dichotomy`); under `hall`
+    -- BG Theorem E returns the type-I cover, never the two-exceptional-subgroup case (the
+    -- exceptional `W` of `hNonTypeI` is the normalizer of a non-type-I maximal).  Isolating that
+    -- is the BG §16 (8.8.a) residual.
+    exfalso
+    sorry
 
 /-- **Peterfalvi (12.17), non-existence half**: in a minimal simple group of odd order, not every
 maximal subgroup is of type I.
