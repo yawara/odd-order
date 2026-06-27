@@ -206,6 +206,28 @@ noncomputable def toHypothesis71 {M : Subgroup G} [Finite G] (hyp : Hypothesis M
       Set.subset_union_left hnorm).toDadeIsometryData.isDadeMap
     hConjInvariant := hyp.hconj.restrict Set.subset_union_left hnorm }
 
+open scoped FiniteInduce in
+/-- **The Peterfalvi (7.4) one-member family `{(M, A(M))}`** — the direct input to the family
+inequality (7.5) `S09.family_inequality` for the (10.8) estimate.  The single member's (7.1) data is
+`toHypothesis71`; the `IsDadeIsometry` certificate is the restricted Dade isometry's
+(`FullDadeIsometryData.toDadeIsometryData.isDadeIsometry`), and `pairwise_disjoint` is vacuous over
+`Fin 1`.  Sorry-free given `hN : N_G(A(M)) = M`. -/
+noncomputable def toFamilyHypothesis71 {M : Subgroup G} [Finite G] (hyp : Hypothesis M)
+    (hN : Subgroup.normalizer (typePA M hyp.typeP) = M) :
+    OddOrder.Peterfalvi.S09.FamilyHypothesis71 G 1 where
+  L := fun _ => M
+  A := fun _ => typePA M hyp.typeP
+  fintypeL := fun _ => inferInstance
+  invertibleL := fun _ => inferInstance
+  hyp71 := fun _ => hyp.toHypothesis71 hN
+  isDadeIsometry := fun _ => by
+    have hnorm : ∀ (l : ↥M) ⦃a : G⦄, a ∈ typePA M hyp.typeP →
+        (↑l : G) * a * (↑l : G)⁻¹ ∈ typePA M hyp.typeP := fun l a ha =>
+      ((Subgroup.mem_set_normalizer_iff).mp (by rw [hN]; exact l.2) a).mp ha
+    exact ((hyp.dadeData.dade.fullDadeIsometryData hyp.hconj).restrict
+      Set.subset_union_left hnorm).toDadeIsometryData.isDadeIsometry
+  pairwise_disjoint := fun i j hij => absurd (Subsingleton.elim i j) hij
+
 end Hypothesis
 
 /-- Conjugation transports the centralizer of a singleton: `g · C_G(a) · g⁻¹ = C_G(g a g⁻¹)`.
