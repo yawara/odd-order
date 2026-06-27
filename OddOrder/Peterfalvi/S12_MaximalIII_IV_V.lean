@@ -5866,6 +5866,33 @@ theorem card_le_sum_normSq_of_forall_eq_odd_intCast {ι : Type*} (S : Finset ι)
           rw [← Int.cast_abs]; exact_mod_cast Int.one_le_abs hm0
         rw [hnorm]; nlinarith [h1, abs_nonneg ((m : ℝ))]
 
+open scoped Classical FiniteInduce in
+/-- **The `(10.6.b)`-summed bound for `ζ^{τ₁}`** — `|G₀| ≤ Σ_{g ∈ G₀} ‖ζ^{τ₁}(g)‖²` over
+`G₀ = {g | g ∉ Ã(M), (ord g).Coprime w₁}`.  Composes `card_le_sum_normSq_of_forall_eq_odd_intCast`
+(the analytic core) with the per-`g` (10.6.b) bound `tau1_values_and_norm_bound` (`ζ^{τ₁}(g)` is an
+odd integer off `Ã(M)` at orders prime to `w₁`).  The 7 parameter conditions are exactly those
+supplied by `exists_charParameters_full`.  This is the `G₀`-drop term Peterfalvi (10.8) uses to pass
+from the family inequality (7.5) (line 81) to line 83. -/
+theorem Hypothesis.sum_zeta_tau1_normSq_ge_card [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G}
+    {hyp : Hypothesis M} {params : CharacterParameters hyp} (coh : CoherentHypothesis hyp params)
+    (hmu : params.mu = hyp.muGrid hG hG.odd)
+    (hos : params.omegaSigma = hyp.alignedOmegaSigmaGrid hG hG.odd)
+    (hzS : params.zeta ∈ inducedFamily M) (hz1 : params.zeta 1 = (hyp.w1 : ℂ))
+    (hzconj : params.zeta.conj ≠ params.zeta)
+    (hδpm : params.delta = 1 ∨ params.delta = -1)
+    (hδj : ∀ j : Fin hyp.w2, j ≠ 0 → hyp.muColumnSign hG hG.odd j = params.delta) :
+    ((Finset.univ.filter
+        (fun g : G => g ∉ hyp.dadeData.dade.dadeSupport ∧ (orderOf g).Coprime hyp.w1)).card : ℝ)
+      ≤ ∑ g ∈ Finset.univ.filter
+          (fun g : G => g ∉ hyp.dadeData.dade.dadeSupport ∧ (orderOf g).Coprime hyp.w1),
+          ‖coh.tau1 params.zeta g‖ ^ 2 := by
+  classical
+  apply card_le_sum_normSq_of_forall_eq_odd_intCast
+  intro g hg
+  rw [Finset.mem_filter] at hg
+  exact (tau1_values_and_norm_bound hG coh hmu hos hzS hz1 hzconj hδpm hδj).2 g hg.2.1 hg.2.2
+
 /-- **Peterfalvi (10.8), the analytic chain** (04.12 p.61, lines 87--99) — the pure-`ℚ` assembly
 that turns the §7 norm output (line 87) and the §8 TI-counting bound (lines 89--91) into the
 coherence bound `1 − 1/w₁ − 1/u < w₁w₂/|M'|`.
