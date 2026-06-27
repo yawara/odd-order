@@ -6231,6 +6231,11 @@ formula together with the prime computation `coprimeFrobeniusAction_card_eq_prim
 -- `φ_U`-invariance that `chiefFactor_caseB_char_inertia` consumes (`typeP_conjAction`-inv ⟹ `φ_U=1`).
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S11.compHom_typeP_conjAction_inflation
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S11.caseB_char_inertia_inflation
+-- (9.9.a) realization: the iso `↥(H-in-HU) ≃* ↥H` preserves the underlying `G`-element, so it
+-- intertwines the concrete `HU`-conjugation `conjBy g` with the abstract `typeP_conjAction a`
+-- (same `G`-image `↑g = ↑a`).  This is the last realization step feeding `caseB_char_inertia_inflation`.
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S11.hInHuEquivH_coe
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S11.conjBy_compHom_hInHuEquivH
 -- §9 degree infrastructure: `[M:HU] = q` (`HU = M'`, `[M:M'] = |W₁|`) and the resulting
 -- `(Ind_{HU}^M χ)(1) = q·χ(1)` — the degree formula every (9.8)/(9.9) count uses.
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S11.huSub_index_eq_q

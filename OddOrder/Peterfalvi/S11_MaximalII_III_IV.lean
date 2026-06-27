@@ -2920,6 +2920,56 @@ theorem caseB_char_inertia_inflation [Finite G] {M : Subgroup G}
   exact congrFun (congrArg (fun f : ClassFunction (↥data.H ⧸ chief.N) ℂ =>
     (f : (↥data.H ⧸ chief.N) → ℂ)) hfix2) x
 
+/-! ### (9.9.a) realization: concrete `HU`-conjugation ↔ abstract `typeP_conjAction`
+
+The (9.9.a) inertia of a constituent of `Res^{HU}_H χ` is computed by `ClassFunction.conjBy` in
+`HU = (H ⊔ U).subgroupOf M`, with `H` realized as `hInHu data = (H.subgroupOf M).subgroupOf HU`.
+The realization iso `hInHuEquivH : ↥(hInHu) ≃* ↥H` (composite of two `subgroupOfEquivOfLe`)
+preserves the underlying `G`-element, so it intertwines `conjBy g` (for `g ∈ HU`) with the
+abstract `typeP_conjAction a` (for `a ∈ U W₁` with the same `G`-image).  This is the last
+realization step of (9.9.a)'s `I_U(θ) ⊆ C`: it turns a concrete `HU`-inertia hypothesis into the
+`typeP_conjAction`-invariance consumed by `caseB_char_inertia_inflation`. -/
+
+/-- `H ⊴ HU`: the realization `hInHu data = (H.subgroupOf M).subgroupOf HU` of `H = M_F` inside
+`HU` is normal (`M_F ◁ M`, descended along the inclusions). -/
+instance hInHu_normal {M : Subgroup G} (data : TypesIIIIIIVSetup M) :
+    (hInHu data).Normal := by
+  have h1 : (data.H.subgroupOf M).Normal := by
+    rw [show data.H = maxNilpotentNormalHall M from data.typeP.H_eq]
+    exact OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_subgroupOf_normal M
+  exact h1.subgroupOf (huSub data)
+
+/-- The realization iso `↥(H-in-HU) ≃* ↥H`: `H` realized inside `HU = H ⊔ U` is `H`, via the
+composite of `subgroupOfEquivOfLe (H.subgroupOf M ≤ HU)` and `subgroupOfEquivOfLe (H ≤ M)`. -/
+noncomputable def hInHuEquivH {M : Subgroup G} (data : TypesIIIIIIVSetup M) :
+    ↥(hInHu data) ≃* ↥data.H :=
+  (Subgroup.subgroupOfEquivOfLe
+      (Subgroup.subgroupOf_mono M (le_sup_left : data.H ≤ data.H ⊔ data.U))).trans
+    (Subgroup.subgroupOfEquivOfLe (data.typeP.H_le.trans (derivedInG_le_self M)))
+
+/-- The realization iso preserves the underlying `G`-element. -/
+theorem hInHuEquivH_coe {M : Subgroup G} (data : TypesIIIIIIVSetup M) (h : ↥(hInHu data)) :
+    ((hInHuEquivH data h : ↥data.H) : G) = (((h : ↥(huSub data)) : ↥M) : G) := rfl
+
+/-- **(9.9.a) realization, conjugation equivariance.**  Under the iso
+`hInHuEquivH : ↥(hInHu) ≃* ↥H`, the concrete conjugation `conjBy g` in `HU` (for `g ∈ HU`)
+corresponds to the abstract conjugation `typeP_conjAction a` on `↥H` (for `a ∈ U W₁` with the same
+`G`-image `↑g = ↑a`).  Both are conjugation by the same `G`-element, so the equality reduces to
+`g·h·g⁻¹ = a·h·a⁻¹` in `G`. -/
+theorem conjBy_compHom_hInHuEquivH {M : Subgroup G} (data : TypesIIIIIIVSetup M)
+    (a : ↥(data.typeP.U ⊔ data.typeP.W1)) (g : ↥(huSub data))
+    (hag : ((g : ↥M) : G) = (a : G)) (θ : ClassFunction ↥data.H ℂ) :
+    ClassFunction.conjBy g (ClassFunction.compHom (hInHuEquivH data).toMonoidHom θ)
+      = ClassFunction.compHom (hInHuEquivH data).toMonoidHom
+          (ClassFunction.compHom (typeP_conjAction data.typeP a).toMonoidHom θ) := by
+  ext h
+  rw [ClassFunction.conjBy_apply, ClassFunction.compHom_apply, ClassFunction.compHom_apply,
+    ClassFunction.compHom_apply]
+  refine congrArg _ (Subtype.ext ?_)
+  simp only [MulEquiv.coe_toMonoidHom, hInHuEquivH_coe, typeP_conjAction_apply,
+    Subgroup.coe_mul, Subgroup.coe_inv]
+  rw [hag]
+
 /-- **Peterfalvi (9.7) case (b) carrier.**  When `U` acts irreducibly on the chief factor
 `H̄ = H/H₀` (Clifford case (b), the left branch of `chiefFactor_clifford_U_dichotomy`), the
 field-model divisibilities of `CliffordCaseBData` hold: with `chars.u = |Ū|` (pinned in
