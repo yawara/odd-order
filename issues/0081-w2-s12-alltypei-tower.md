@@ -210,6 +210,37 @@ exists_typeICovering の covers/coprime/two_le 実証明は genuine な FT 群�
 (theorem88_caseB_holds) は依然 isTI+branch+8.8-dichotomy に gate。**hub 再判断推奨** (次の ungated
 セグメントへ relane、or isTI の Frobenius-TI 角度を §8 として lane-f/別レーンへ)。
 
+### 2026-06-27 (lane-h 再開²): ✅ `theorem88_dichotomy` を typeP_duality 経由で honest 構成 (bare sorry 除去)
+
+手動再開で main から **16 commit 合流** (lane-f が W1 §16 を大きく前進: `typeP_duality` /
+`theoremI_nilpotentHall_conjugacy_and_type_dichotomy` / Cor 15.5、lane-c 退役で 4→3 レーン)。前 entry
+「branch-selection/theorem88_dichotomy は BG §16 gated」を**部分的に覆す consumer-wiring 機会**を発見:
+
+- **`theorem88_dichotomy` (S14_MaximalI、旧 bare sorry) を honest construction 化** (commit `3ec86cc9`)。
+  決め手 = 合流した lane-f **`OddOrder.BG.Ch4.S14.typeP_duality` の第1連言が `IsComplement'
+  ((derivedInG M).subgroupOf M) (K.subgroupOf M)`** を返すこと (κ-Hall K が M' を complement、Pf (8.8.b1))。
+  これは `Theorem88CaseBData.S_compl` そのもの。`by_cases hall` → 非 type-I 極大 S → type-P (Prop 16.1(a))
+  → S に duality 適用 (S_compl + 双対 M* + κ-Hall K*) → M* に再適用 (T_compl) → `Theorem88CaseBData` 完全構成。
+- private helper `isTypeNonI_of_isTypeP` (type-P ⟹ 非 type-I、BG Theorem I dichotomy 内 local を isolate)。
+- `theorem88_dichotomy` body sorry-free、`theorem88_caseB_holds` も sorry-free body
+  (= `dichotomy.resolve_left not_all_maximal_typeI`)。残 hard content は cite した upstream
+  (`typeP_duality`/`proposition_type_classification` = lane-f issue 8015) に bottom-out。
+  axiom-clean でない (sorryAx 透過) ので AxiomsCheck 非登録。full build 3884 green、bin/count-sorry 125→124。
+
+**runway 再評価 (再々確認、これで genuinely 枯渇)**: theorem88_dichotomy 後、S14_MaximalI 残 sorry は
+**全て char/§8/§10 gated** で ungated 群論ゼロ:
+- (12.2)-(12.6),(12.14)-(12.16): char/Dade (lane-b)。
+- (12.10) `witness_L_frobenius`/(12.11): char (11.9.c) + 未抽出 §8 (8.13.c1) (lane-b)。
+- (12.12) `complement_cyclic_order_dvd`: **§8-free 核 `isCyclic_and_card_dvd_of_fpf_conj_elemAbelian` は
+  既に DONE** (sorry-free)。残 wiring は FPF 入力を **(12.10) char/§8 gated** から得、p+1 refinement も
+  (12.9)/(12.11) gated ⟹ ungated 部分なし。
+- exists_typeICovering の isTI (8.13.c1 §8)/branch-selection: lane-b §8 + `bgTheoremE_cover_data`
+  (S10、lane-b 所有・それ自体 sorry。`BGTheoremENonTypeICovering` は「W=非type-I 極大の normalizer」を
+  field 化していないので `hall` から直接矛盾不可 = 構造強化要、lane-b 領域)。
+
+⟹ **hub 再判断推奨を維持** (今回 1 件 consumer-wiring を拾えたが、それで ungated 群論は尽きた)。次の
+ungated セグメントへ relane、or lane-b の char/§8 landing 待ち (landing 後に (12.x) consumer-wiring 再訪)。
+
 ## 参照
 
 - 正本: `notes/meta/ft_frontier_remap_2026_06_25.md` §2 (W2)、relane #12 (LAUNCH.md 冒頭、issue 2027)
