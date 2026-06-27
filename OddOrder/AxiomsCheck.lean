@@ -6330,6 +6330,13 @@ formula together with the prime computation `coprimeFrobeniusAction_card_eq_prim
 -- `toHypothesis71` / `toFamilyHypothesis71` (Peterfalvi (10.8) line 79).  Axiom-clean.
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S12.Hypothesis.normalizer_typePA_eq
 
+-- **Peterfalvi (10.8) line-87 arithmetic** (lane-b W3, §7-estimate input) —
+-- `Hypothesis.card_typePA_div_card_lt_inv_w1`: `|A(M)|/|M| < 1/w₁`.  From `A(M) = (M')#`
+-- (`typePA_eq_sharpSubgroup_derivedInG`, `|A(M)| = |M'|−1`) and `|M| = w₁·|M'|`
+-- (`card_W1_eq_derived_index` + `index_mul_card`): `(|M'|−1)/(w₁|M'|) < 1/w₁`.  The strict bound
+-- (10.8) uses at line 87.  Axiom-clean.
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S12.Hypothesis.card_typePA_div_card_lt_inv_w1
+
 -- **W4 §16→§7 bridge (lane-h, βM (14.11.2) de-opacification)** — `betaMExpansionData_of_hypothesis78`
 -- certifies that the (7.8.a) field of `BetaMExpansionData` (`β_M = 1_G − χ + Δ`) is a genuine
 -- consequence of the S09 §7 Dade decomposition

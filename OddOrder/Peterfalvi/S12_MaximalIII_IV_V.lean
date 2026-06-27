@@ -5912,6 +5912,42 @@ theorem Hypothesis.card_derived_ge [Finite G]
     _ = Nat.card ↥H := (_root_.commutator ↥H).index_mul_card
     _ = Nat.card ↥(derivedInG M) := hHcard
 
+/-- **Peterfalvi (10.8), line-87 strict bound** `|A(M)|/|M| < 1/w₁`.
+
+Since `A(M) = typePA M = (M')#` (`typePA_eq_sharpSubgroup_derivedInG`), `|A(M)| = |M'| − 1`; and
+`|M| = w₁·|M'|` because `[M : M'] = w₁` (`TypePData.card_W1_eq_derived_index`,
+`Subgroup.index_mul_card`).  Hence `|A(M)|/|M| = (|M'|−1)/(w₁·|M'|) < 1/w₁` (as `|M'| ≥ 1`, `w₁ ≥ 1`).
+This is the strict inequality Peterfalvi (10.8) uses at line 87 to turn `w₁/|M'| ≥ 1 − |G₁|/|G| −
+|A(M)|/|M|` into `> 1 − |G₁|/|G| − 1/w₁` (the `hA` consumed by `typeII_coherence_estimate_chain`). -/
+theorem Hypothesis.card_typePA_div_card_lt_inv_w1 [Finite G]
+    {M : Subgroup G} (hyp : Hypothesis M) :
+    (Nat.card ↥(typePA M hyp.typeP) : ℚ) / (Nat.card ↥M : ℚ) < 1 / (hyp.w1 : ℚ) := by
+  haveI := hyp.finiteG
+  have hM'le : derivedInG M ≤ M := Subgroup.map_subtype_le _
+  -- `|A(M)| = |M'| − 1` (sharp of the derived subgroup).
+  have hcardA : Nat.card ↥(typePA M hyp.typeP) = Nat.card ↥(derivedInG M) - 1 := by
+    rw [typePA_eq_sharpSubgroup_derivedInG, Nat.card_coe_set_eq]
+    have hc : Nat.card ↥(derivedInG M) = ((derivedInG M : Set G)).ncard := by
+      rw [← Nat.card_coe_set_eq]; exact Nat.card_congr (Equiv.refl _)
+    rw [sharpSubgroup, Set.ncard_diff (Set.singleton_subset_iff.mpr (derivedInG M).one_mem),
+      Set.ncard_singleton, hc]
+  -- `|M| = w₁·|M'|` since `[M : M'] = w₁`.
+  have hcardM : Nat.card ↥M = hyp.w1 * Nat.card ↥(derivedInG M) := by
+    have hidx : ((derivedInG M).subgroupOf M).index = hyp.w1 := by
+      rw [Hypothesis.w1, Hypothesis.W1]; exact hyp.typeP.card_W1_eq_derived_index.symm
+    have hsub : Nat.card ↥((derivedInG M).subgroupOf M) = Nat.card ↥(derivedInG M) :=
+      Nat.card_congr (Subgroup.subgroupOfEquivOfLe hM'le).toEquiv
+    rw [← Subgroup.index_mul_card ((derivedInG M).subgroupOf M), hidx, hsub]
+  -- arithmetic over `ℚ`.
+  have hm1 : 1 ≤ Nat.card ↥(derivedInG M) := Nat.card_pos
+  have hw1 : 1 ≤ hyp.w1 := Nat.card_pos
+  rw [hcardA, hcardM, Nat.cast_sub hm1, Nat.cast_mul]
+  have hmq : (0 : ℚ) < (Nat.card ↥(derivedInG M) : ℚ) := by exact_mod_cast hm1
+  have hwq : (0 : ℚ) < (hyp.w1 : ℚ) := by exact_mod_cast hw1
+  rw [div_lt_div_iff₀ (by positivity) hwq]
+  push_cast
+  nlinarith [hmq, hwq]
+
 /-- **The `(10.6.b)`-summed bound** (the analytic core of Peterfalvi (10.8) line 83): if a function
 `χ : G → ℂ` takes **odd integer** values on a finite set `S` (in particular `|χ(g)| ≥ 1` there), then
 `|S| ≤ Σ_{g ∈ S} ‖χ(g)‖²`.  General and reusable (no §10 hypotheses): per element, an odd integer
