@@ -6197,6 +6197,10 @@ formula together with the prime computation `coprimeFrobeniusAction_card_eq_prim
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S11.elabRepresentation_isIrreducible
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.S11.isCyclic_card_dvd_of_aInvariant_irreducible_faithful_comm
+-- (9.7)(b) structural core: an irreducible action with commuting image is fixed-point-free off the
+-- kernel (the Frobenius structure `H̄ ⋊ Ū`).  Pure group theory — no Singer field model needed.
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S11.fixedPointFree_of_aInvariant_irreducible_comm
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S11.card_range_dvd_card_sub_one_of_prime_card
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S11.typeP_commutator_U_centralizes_H
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S11.chiefFactor_caseB_image_cyclic
@@ -6207,6 +6211,9 @@ formula together with the prime computation `coprimeFrobeniusAction_card_eq_prim
 -- structure of `U W₁` via Isaacs Cor 3.28 (`coprime_fixedPoints_quotient`).
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S11.chiefFactor_caseB_image_coprime
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S11.chiefFactor_caseB_image_dvd_norm
+-- (9.7)(b): the `U`-action on `H̄` is fixed-point-free off `C = C_U(H̄)` (Frobenius `H̄ ⋊ Ū`),
+-- the structural input of Peterfalvi (9.9)'s degree-`u` Clifford analysis.
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S11.chiefFactor_caseB_action_fpf
 -- Peterfalvi (9.7): the Clifford dichotomy, fully packaged into the carriers `CliffordCaseAData` /
 -- `CliffordCaseBData`.  Case (b) wires the Singer divisibilities (with `chars.u = |Ū|` pinned); case
 -- (a) builds the `q` order-`p` factors (the `SupIndep` orbit family) and the bound `a ∣ p-1` (the
