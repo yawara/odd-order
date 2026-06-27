@@ -352,6 +352,85 @@ theorem typePData_typePV_nonempty {M : Subgroup G} (data : TypePData M) :
       rw [he]; exact mul_mem hxy (inv_mem hyW2)
     exact hxne (Subgroup.mem_bot.mp (hdisj ▸ Subgroup.mem_inf.mpr ⟨hxW1, hx1⟩))
 
+/-- **The type-`P` torus has order `|W| = w₁·w₂`** (`W = W₁ × W₂`).  The factors `W₁`, `W₂` are
+disjoint (`typePData_disjoint_W1_W2`) subgroups of the cyclic — hence abelian — `W`
+(`W = W₁ ⊔ W₂`), so realised inside `↥W` they are a normal complement pair and the order is the
+product (`card_sup_eq_card_mul_card_of_disjoint_normal`).  Fundamental structural fact of the
+type-`P` torus, used throughout §10--§11 (the `(4.5)` reducible characters, the `V^G` counting). -/
+theorem typePData_card_W [Finite G] {M : Subgroup G} (data : TypePData M) :
+    Nat.card ↥data.W = Nat.card ↥data.W1 * Nat.card ↥data.W2 := by
+  haveI hcyc : IsCyclic ↥data.W := data.W_cyclic
+  letI : CommGroup ↥data.W := hcyc.commGroup
+  have hW1le : data.W1 ≤ data.W := data.W_eq ▸ le_sup_left
+  have hW2le : data.W2 ≤ data.W := data.W_eq ▸ le_sup_right
+  haveI hBnorm : (data.W2.subgroupOf data.W).Normal := ⟨fun n hn g => by
+    have h : g * n * g⁻¹ = n := by rw [mul_comm g n]; group
+    rw [h]; exact hn⟩
+  have hdisjAB : data.W1.subgroupOf data.W ⊓ data.W2.subgroupOf data.W = ⊥ := by
+    rw [eq_bot_iff]
+    intro x hx
+    rw [Subgroup.mem_inf] at hx
+    have h1 : ((x : ↥data.W) : G) ∈ data.W1 := Subgroup.mem_subgroupOf.mp hx.1
+    have h2 : ((x : ↥data.W) : G) ∈ data.W2 := Subgroup.mem_subgroupOf.mp hx.2
+    have hmem : ((x : ↥data.W) : G) ∈ data.W1 ⊓ data.W2 := ⟨h1, h2⟩
+    rw [disjoint_iff.mp (typePData_disjoint_W1_W2 data), Subgroup.mem_bot] at hmem
+    exact Subgroup.mem_bot.mpr (Subtype.ext hmem)
+  have hsupAB : data.W1.subgroupOf data.W ⊔ data.W2.subgroupOf data.W = ⊤ := by
+    rw [← Subgroup.subgroupOf_sup hW1le hW2le, ← data.W_eq, Subgroup.subgroupOf_self]
+  have hcard := OddOrder.BG.Ch1.S01.card_sup_eq_card_mul_card_of_disjoint_normal
+    (T := data.W1.subgroupOf data.W) (M := data.W2.subgroupOf data.W) hdisjAB
+  rw [hsupAB, Nat.card_congr (Subgroup.topEquiv (G := ↥data.W)).toEquiv,
+    Nat.card_congr (Subgroup.subgroupOfEquivOfLe hW1le).toEquiv,
+    Nat.card_congr (Subgroup.subgroupOfEquivOfLe hW2le).toEquiv] at hcard
+  exact hcard
+
+/-- **The exceptional set `V = W − (W₁ ∪ W₂)` has `|V| = w₁w₂ − w₁ − w₂ + 1`.**  Since `W₁, W₂ ⊆ W`
+their union lies in `W`, so `|V| = |W| − |W₁ ∪ W₂|`; the factors meet only in `1`
+(`typePData_disjoint_W1_W2`), so `|W₁ ∪ W₂| = w₁ + w₂ − 1`, and `|W| = w₁w₂`
+(`typePData_card_W`).  This is the `|V^G| = |G:W|·(w₁w₂−w₁−w₂+1)` numerator of Peterfalvi (10.8). -/
+theorem typePData_typePV_ncard [Finite G] {M : Subgroup G} (data : TypePData M) :
+    (typePV M data).ncard
+      = Nat.card ↥data.W1 * Nat.card ↥data.W2 - Nat.card ↥data.W1 - Nat.card ↥data.W2 + 1 := by
+  classical
+  haveI : Fintype G := Fintype.ofFinite G
+  have hW1le : data.W1 ≤ data.W := data.W_eq ▸ le_sup_left
+  have hW2le : data.W2 ≤ data.W := data.W_eq ▸ le_sup_right
+  -- set cardinalities of the subgroups
+  have hcW1 : ((data.W1 : Set G)).ncard = Nat.card ↥data.W1 := (Nat.card_coe_set_eq _).symm
+  have hcW2 : ((data.W2 : Set G)).ncard = Nat.card ↥data.W2 := (Nat.card_coe_set_eq _).symm
+  have hcW : ((data.W : Set G)).ncard = Nat.card ↥data.W := (Nat.card_coe_set_eq _).symm
+  -- `W₁ ∪ W₂ ⊆ W`
+  have hsub : ((data.W1 : Set G) ∪ (data.W2 : Set G)) ⊆ (data.W : Set G) :=
+    Set.union_subset hW1le hW2le
+  -- `W₂ \ W₁ = W₂ \ {1}`: for `x ∈ W₂`, `x ∈ W₁ ↔ x = 1` (disjointness).
+  have hW2diff : (data.W2 : Set G) \ (data.W1 : Set G) = (data.W2 : Set G) \ {1} := by
+    ext x
+    simp only [Set.mem_diff, Set.mem_singleton_iff, SetLike.mem_coe]
+    refine ⟨fun ⟨hx2, hx1⟩ => ⟨hx2, fun h => hx1 (h ▸ data.W1.one_mem)⟩,
+      fun ⟨hx2, hxne⟩ => ⟨hx2, fun hx1 => hxne ?_⟩⟩
+    have hmem : x ∈ data.W1 ⊓ data.W2 := ⟨hx1, hx2⟩
+    rw [disjoint_iff.mp (typePData_disjoint_W1_W2 data), Subgroup.mem_bot] at hmem
+    exact hmem
+  -- `|W₁ ∪ W₂| = w₁ + w₂ − 1` (decompose `W₁ ∪ W₂ = W₁ ⊔ (W₂ \ W₁)`, disjoint).
+  have hunion : ((data.W1 : Set G) ∪ (data.W2 : Set G)).ncard
+      = Nat.card ↥data.W1 + Nat.card ↥data.W2 - 1 := by
+    have h2pos : 1 ≤ Nat.card ↥data.W2 := Nat.card_pos
+    rw [← Set.union_diff_self (s := (data.W1 : Set G)) (t := (data.W2 : Set G)),
+      Set.ncard_union_eq disjoint_sdiff_self_right (Set.toFinite _) (Set.toFinite _), hW2diff,
+      Set.ncard_diff (Set.singleton_subset_iff.mpr data.W2.one_mem), Set.ncard_singleton,
+      hcW1, hcW2]
+    omega
+  -- `V = W \ (W₁ ∪ W₂)` has `|V| = |W| − |W₁ ∪ W₂|`
+  have hdiff : (typePV M data).ncard = ((data.W : Set G)).ncard
+      - ((data.W1 : Set G) ∪ (data.W2 : Set G)).ncard := by
+    rw [typePV, Set.ncard_diff hsub]
+  rw [hdiff, hunion, hcW, typePData_card_W]
+  have hw1ge : 1 < Nat.card ↥data.W1 := (Subgroup.one_lt_card_iff_ne_bot _).mpr data.W1_nontrivial
+  have hw2ge : 1 < Nat.card ↥data.W2 := (Subgroup.one_lt_card_iff_ne_bot _).mpr data.W2_nontrivial
+  have hprod : Nat.card ↥data.W1 + Nat.card ↥data.W2 ≤ Nat.card ↥data.W1 * Nat.card ↥data.W2 :=
+    Nat.add_le_mul hw1ge hw2ge
+  omega
+
 /-- An element of the exceptional set `V = W − (W₁ ∪ W₂)` of a type-`P` maximal subgroup lies
 outside the derived subgroup `M' = [M,M]`.
 
@@ -496,6 +575,37 @@ theorem typePData_V_ti [Finite G] {M : Subgroup G} (data : TypePData M) :
   intro h
   simp only [typePV, Set.mem_diff, Set.mem_union, SetLike.mem_coe]
   rw [hgW h, hstab data.W1 hW1le h, hstab data.W2 hW2le h]
+
+/-- For a type-`P` maximal subgroup, every `l ∈ W` stabilises the exceptional set `V` under
+conjugation: `l ∈ N_G(V) = W` (`TypePData.normalizer_V` with `X = V`), so `(MulAut.conj l) • V = V`.
+This is the `W`-stability input to the `|V^G|` TI-orbit count `ncard_conjClassSet_of_isTISubset`. -/
+theorem typePData_W_normalizes_typePV [Finite G] {M : Subgroup G} (data : TypePData M) :
+    ∀ l ∈ data.W, MulAut.conj l • (typePV M data) = typePV M data := by
+  intro l hl
+  have hlN : l ∈ Subgroup.normalizer (typePV M data) := by
+    rw [data.normalizer_V (typePV M data) (typePData_typePV_nonempty data) Set.Subset.rfl]
+    exact hl
+  rw [Subgroup.mem_set_normalizer_iff] at hlN
+  ext x
+  simp only [Set.mem_smul_set, MulAut.smul_def, MulAut.conj_apply]
+  constructor
+  · rintro ⟨v, hv, rfl⟩
+    exact (hlN v).mp hv
+  · intro hx
+    exact ⟨l⁻¹ * x * l, (hlN _).mpr (by rw [show l * (l⁻¹ * x * l) * l⁻¹ = x by group]; exact hx),
+      by group⟩
+
+/-- **The conjugacy-saturation `V^G` of the exceptional set has `|V^G| = |G:W|·(w₁w₂−w₁−w₂+1)`.**
+`V` is a TI-subset with normalizer `W` (`typePData_V_ti` + `typePData_W_normalizes_typePV`), so the
+orbit count is `|V|·|G:W|` (`ncard_conjClassSet_of_isTISubset`), with `|V| = w₁w₂−w₁−w₂+1`
+(`typePData_typePV_ncard`).  This is the `|V^G|` numerator of the Peterfalvi (10.8) TI-counting
+(lines 89--91, the `(w₁w₂−w₁−w₂+1)/(w₁w₂)` term once divided by `|G|`). -/
+theorem typePData_conjClassSet_typePV_ncard [Finite G] {M : Subgroup G} (data : TypePData M) :
+    (conjClassSet (typePV M data)).ncard
+      = (Nat.card ↥data.W1 * Nat.card ↥data.W2 - Nat.card ↥data.W1 - Nat.card ↥data.W2 + 1)
+        * data.W.index := by
+  rw [OddOrder.BG.Ch4.S14.ncard_conjClassSet_of_isTISubset (typePData_V_ti data)
+    (typePData_W_normalizes_typePV data), typePData_typePV_ncard]
 
 /-- `W₂ ≤ M` for type-`P` data (`W₂ ≤ H ⊓ M'' ≤ M' ≤ M`). -/
 theorem typePData_W2_le_self {M : Subgroup G} (data : TypePData M) : data.W2 ≤ M :=
@@ -5585,6 +5695,60 @@ theorem Hypothesis.card_derived_ge [Finite G]
         Nat.mul_le_mul hidxge hcardge
     _ = Nat.card ↥H := (_root_.commutator ↥H).index_mul_card
     _ = Nat.card ↥(derivedInG M) := hHcard
+
+/-- **Peterfalvi (10.8), the analytic chain** (04.12 p.61, lines 87--99) — the pure-`ℚ` assembly
+that turns the §7 norm output (line 87) and the §8 TI-counting bound (lines 89--91) into the
+coherence bound `1 − 1/w₁ − 1/u < w₁w₂/|M'|`.
+
+Faithful inputs (with `Mp = |M'|`, `cardH = |H| = |S_F|`, `cardS = |S|`, `u = |U|`, `g1g = |G₁|/|G|`):
+* `hA` — the §7 output `w₁/|M'| > 1 − |G₁|/|G| − 1/w₁` (Peterfalvi line 87, from (7.5), (7.8.b),
+  (10.6.b), and `|M'| ≥ 2w₁+1`);
+* `hB` — the TI-counting bound `|G₁|/|G| ≤ (|H|−1)/|S| + (w₁w₂−w₁−w₂+1)/(w₁w₂)` (from the inclusion
+  `G₁ ⊆ (H#)^G ∪ V^G` and the orbit cardinalities, Peterfalvi lines 89--91);
+* `hS` — `|S| = |H|·|U|·w₂` (the Type-II partner `S = (H ⋊ U) ⋊ W₂`).
+
+The derivation substitutes `(w₁w₂−w₁−w₂+1)/(w₁w₂) = 1 − 1/w₂ − 1/w₁ + 1/(w₁w₂)` and
+`(|H|−1)/|S| ≤ |H|/|S| = 1/(|U|w₂)`, yielding `w₁/|M'| > 1/w₂ − 1/(w₁w₂) − 1/(|U|w₂)`, then
+multiplies by `w₂`.  Pure arithmetic over `ℚ`; the genuine character/group inputs are `hA`/`hB`. -/
+theorem typeII_coherence_estimate_chain
+    {w₁ w₂ u cardH cardS Mp : ℕ} {g1g : ℚ}
+    (hw1 : 1 ≤ w₁) (hw2 : 1 ≤ w₂) (hu : 1 ≤ u) (hH : 1 ≤ cardH)
+    (hMp : 1 ≤ Mp) (hS : cardS = cardH * u * w₂)
+    (hA : 1 - g1g - 1 / (w₁ : ℚ) < (w₁ : ℚ) / (Mp : ℚ))
+    (hB : g1g ≤ ((cardH : ℚ) - 1) / (cardS : ℚ)
+        + ((w₁ : ℚ) * w₂ - w₁ - w₂ + 1) / ((w₁ : ℚ) * w₂)) :
+    (1 : ℚ) - 1 / (w₁ : ℚ) - 1 / (u : ℚ) < (w₁ : ℚ) * w₂ / (Mp : ℚ) := by
+  have hw1q : (0 : ℚ) < w₁ := by exact_mod_cast hw1
+  have hw2q : (0 : ℚ) < w₂ := by exact_mod_cast hw2
+  have huq : (0 : ℚ) < u := by exact_mod_cast hu
+  have hHq : (0 : ℚ) < cardH := by exact_mod_cast hH
+  have hMpq : (0 : ℚ) < Mp := by exact_mod_cast hMp
+  have hw1ne : (w₁ : ℚ) ≠ 0 := ne_of_gt hw1q
+  have hw2ne : (w₂ : ℚ) ≠ 0 := ne_of_gt hw2q
+  have hune : (u : ℚ) ≠ 0 := ne_of_gt huq
+  have hScast : (cardS : ℚ) = (cardH : ℚ) * u * w₂ := by exact_mod_cast hS
+  -- `(|H|−1)/|S| ≤ 1/(|U|w₂)` (drop the `−1`, then cancel `|H|`).
+  have hHS : ((cardH : ℚ) - 1) / (cardS : ℚ) ≤ 1 / ((u : ℚ) * w₂) := by
+    rw [hScast, div_le_div_iff₀ (by positivity) (by positivity)]
+    nlinarith [mul_pos huq hw2q]
+  -- `(w₁w₂−w₁−w₂+1)/(w₁w₂) = 1 − 1/w₂ − 1/w₁ + 1/(w₁w₂)`.
+  have hident : ((w₁ : ℚ) * w₂ - w₁ - w₂ + 1) / ((w₁ : ℚ) * w₂)
+      = 1 - 1 / w₂ - 1 / w₁ + 1 / ((w₁ : ℚ) * w₂) := by
+    field_simp
+  -- `w₁/|M'| > 1/w₂ − 1/(w₁w₂) − 1/(|U|w₂)`.
+  have hKey : 1 / (w₂ : ℚ) - 1 / ((w₁ : ℚ) * w₂) - 1 / ((u : ℚ) * w₂) < (w₁ : ℚ) / Mp := by
+    rw [hident] at hB
+    linarith [hA, hB, hHS]
+  -- multiply by `w₂` and simplify the four products.
+  have e1 : (w₂ : ℚ) * (1 / w₂) = 1 := by rw [mul_one_div, div_self hw2ne]
+  have e2 : (w₂ : ℚ) * (1 / ((w₁ : ℚ) * w₂)) = 1 / w₁ := by
+    rw [mul_one_div, mul_comm (w₁ : ℚ) w₂, div_mul_eq_div_div, div_self hw2ne]
+  have e3 : (w₂ : ℚ) * (1 / ((u : ℚ) * w₂)) = 1 / u := by
+    rw [mul_one_div, mul_comm (u : ℚ) w₂, div_mul_eq_div_div, div_self hw2ne]
+  have e4 : (w₂ : ℚ) * ((w₁ : ℚ) / Mp) = (w₁ : ℚ) * w₂ / Mp := by ring
+  have hmul := mul_lt_mul_of_pos_left hKey hw2q
+  rw [mul_sub, mul_sub, e1, e2, e3, e4] at hmul
+  linarith [hmul]
 
 open scoped FiniteInduce in
 /-- **Peterfalvi (10.8), norm-counting estimate** (the §7 analytic heart, the `hbound` input to
