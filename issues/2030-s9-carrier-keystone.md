@@ -80,18 +80,32 @@ counts が `chars.C`/`chars.Uprime`/`chars.Cprime` に量化するため、こ�
 genuine families に対しても未証明。pinning 自体は count を unlock しない (count は下記 B/C の deep Clifford)
 が、count 証明の prerequisite。**fiddly だが honest-architecture prerequisite、次 brick**。
 
+## 2026-06-27 lane-b (cont.): task A 完了 (subgroups genuine 化) + 文字基盤 (commits `153e866a`+本)
+
+- **subgroup genuine 化** (commit `153e866a`): carrier の free な `C`/`Uprime`/`Cprime` (+ `_le_`) を
+  削除し genuine def へ: `uActionHom` (U の H̄ 作用 hom) / `cSub` = C_U(H̄) = uActionHom の kernel を G へ
+  map-down (`cSub_le_U`、first iso で |U:C|=u) / `uprimeSub`=derivedInG U / `cprimeSub`=derivedInG C +
+  le 定理。⟹ **task A (carrier 再設計) 完了** = families + subgroups 全 genuine。
+- **文字基盤** (本 commit): `induceHU_mem_ZIrr` (𝒮-member ∈ ℤ[Irr M]) + `sSet_subset_ZIrr` — counts が
+  𝒮 を character として扱う foundation (`ClassFunction.induce_mem_ZIrr` cite)。
+- **count 用 infra を特定**: Clifford inertia-induction が `InducedIrreducible.lean` に実在 =
+  `isIrreducibleCharacter_induce_of_inertia_eq` (inertia=H ⟹ Ind irreducible) /
+  `induce_eq_induce_iff_conj` (Ind 一致 ⟺ 共役) / `card_filter_induce_eq_index_inertia` /
+  `sum_div_normSq_induce_image_eq`。§4 Dade は `S06_CertainType*` に (4.3)-(4.9) 実在。
+
 ## やること (research-grade, multi-session)
 
-- [x] **A (character-family 部分)**: families genuine 化 + carrier 再設計 (commit `9c41978a`)。
-- [ ] **A (subgroup 部分)**: `C`/`Uprime`/`Cprime` を genuine def 化 (上記)。
-- [ ] **B: case-(b) (9.9)/(9.10)** — Singer field model (`Ū ⊂ 𝔽_{p^q}^×`)。既存の
-      `chiefFactor_caseB_image_*` (unconditional: `|Ū| ∣ (p^q−1)/(p−1)`, `Coprime |Ū| (p−1)`) を活用。
-      (9.9.a) の `u ∣ qu` は `dvd_mul_left` で trivial、残りは Clifford。
-- [ ] **C: case-(a) (9.8)** — (9.8.a) `a ∣ χ(1)` = Clifford 誘導 (irred component θ of Res_H χ,
-      χ=Ind_{I(θ)∩HU}, I(θ)∩U⊆C_U(H_i) ゆえ a=|U:C_U(H_i)| ∣ χ(1)); (9.8.b,c) = (8.4.d)+(4.5)/(4.7)
-      Dade for L=M/H₀; (9.8.d) = degree-qa 構成。Clifford 誘導は `Clifford.lean`/`InducedIrreducible.lean`
-      (`IrreducibleCharacter.LiesOver`/inertia) を要する deep multi-step。
-- [ ] **D: (9.11) `sibleyTarget_H0C`** 構造 witness。
+- [x] **A**: carrier 再設計 = families (commit `9c41978a`) + subgroups (commit `153e866a`) 全 genuine。
+      残 free field = u (pin 済) / tau・H0CprimeSupport (S12-Dade layer) / quotientSemidirectFrobenius
+      ((9.10) output)。
+- [ ] **B: case-(b) (9.9)/(9.10)** — Singer field model。`chiefFactor_caseB_image_*` (|Ū|∣(p^q−1)/(p−1),
+      Coprime) 活用。(9.9.a) `u∣qu` は trivial。(9.9) の `∃χ∈𝒮(C'), χ1=u` = Ind_{HC}^{HU}(linear, inertia=C)
+      irreducible (degree |U:C|=u) を `isIrreducibleCharacter_induce_of_inertia_eq` で構成; `|𝒮(H₀)|=p−1`
+      = (4.5)/(4.7) Dade on L=M/H₀ (S06 cite + 商 inflation)。
+- [ ] **C: case-(a) (9.8)** — (9.8.b,c) = (8.4.d)+(4.5)/(4.7) Dade for L=M/H₀ + θ=θ₁…θ_q1_C 構成;
+      (9.8.d) = degree-qa 構成 + inertia counting (`card_filter_induce_eq_index_inertia`)。
+      case-(a) factor 構造 (`CliffordCaseAData.Hpart`/`a`) を使う。
+- [ ] **D: (9.11) `sibleyTarget_H0C`** 構造 witness (現状 (6.8)/Sibley 経由で §14-gated)。
 
 ## 完了条件
 
