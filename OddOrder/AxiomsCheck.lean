@@ -6234,3 +6234,19 @@ formula together with the prime computation `coprimeFrobeniusAction_card_eq_prim
 -- consumes.  Axiom-clean.
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.S14.maximalSubgroup_eq_normalizer_maxNilpotentNormalHall
+
+-- **W2 §12 (12.17) type-I covering core (lane-h)** — the structural heart of the (8.17.a) type-I
+-- covering, isolated as two reusable group-theory lemmas behind `exists_typeICovering`'s `covers`
+-- field:
+-- * `supportKernel_le_maxNilpotentNormalHall`: the §8 thickening kernel `R(x)` of Peterfalvi (8.14)
+--   is always `≤ L_F = maxNilpotentNormalHall L` (both branches of its definition are).
+-- * `thickenedSupport_subset_conjClassSet_maxNilpotentNormalHall`: if a support set `X ⊆ L_F`, then
+--   the thickened support `⋃_{z ∈ X} (z R(z))^G` lands in `𝒞_G(L_F)` — the coset factor `z ∈ X ⊆ L_F`
+--   and the kernel factor `r ∈ R(z) ⊆ L_F` multiply into `L_F`.
+-- This is why the `A_1(M_i) = (M_i)_F#` thickened cover is, up to conjugacy, a cover by `(M_i)_F#`:
+-- the genuine group-theoretic content discharging the `covers` field of `exists_typeICovering`
+-- (Peterfalvi (12.17), all-type-I case).  Both axiom-clean.
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S14.supportKernel_le_maxNilpotentNormalHall
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S14.thickenedSupport_subset_conjClassSet_maxNilpotentNormalHall
