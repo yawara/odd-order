@@ -1720,7 +1720,13 @@ structure CliffordCaseAData {M : Subgroup G} {data : TypesIIIIIIVSetup M}
   Ubar_embeds_product_holds : Ubar_embeds_product
 
 /-- Case (b) of Peterfalvi (9.7): `U` acts irreducibly on `H/H_0`, modeled by
-the multiplicative group of a field of order `p^q`. -/
+the multiplicative group of a field of order `p^q`.
+
+The genuine consequences of this case are supplied by standalone lemmas (which carry the required
+`[Finite G]`/`chief.N.Normal` instances that a `structure` field type cannot): the fixed-point-free
+Frobenius action `H̄ ⋊ Ū` by `chiefFactor_caseB_action_fpf` (the structural input of Peterfalvi
+(9.9)), the Singer cyclicity of `Ū` by `chiefFactor_caseB_image_cyclic`, and the divisibilities
+`u_coprime_p_sub_one`/`u_dvd_norm_quotient` carried here. -/
 structure CliffordCaseBData {M : Subgroup G} {data : TypesIIIIIIVSetup M}
     {chief : ChiefFactorData data} (chars : Section11CharacterData data chief) where
   field_model : Prop
@@ -2051,6 +2057,48 @@ theorem isCyclic_card_dvd_of_aInvariant_irreducible_faithful_comm
     isCyclic_and_card_dvd_of_faithful_irreducible_comm
       (E := A) (M := (elabRepresentation p φ).asModule) (p := p) hcomm hfaith'
   exact ⟨hcyc, by rwa [hM] at hdvd⟩
+
+/-- **Fixed-point-freeness of an irreducible action with commuting image.**  If a group `A` acts on
+a group `K` via `φ : A →* MulAut K` whose image is commutative (`hcomm : Commute (φ a) (φ b)`) and
+irreducible (the only `A`-invariant subgroups are `⊥`/`⊤`, `hirr`), then every `a` with nontrivial
+action `φ a ≠ 1` acts **fixed-point-freely**: `φ a x = x → x = 1`.
+
+The fixed-point subgroup `Fix(φ a) = {y | φ a y = y}` is `A`-invariant — for `y` fixed by `φ a` and
+any `b`, `φ a (φ b y) = φ b (φ a y) = φ b y` since `φ a`, `φ b` commute (`hcomm`) — so by
+irreducibility it is `⊥` or `⊤`, and `⊤` would make `φ a = 1`.  This is the structural core of the
+Frobenius action `H̄ ⋊ Ū` of Peterfalvi (9.7)(b)/(9.9): no Singer field model is needed, only the
+irreducibility already supplied by Clifford case (b) and the commuting image (`U/C_U(H̄)` abelian).
+The hypothesis is on the *image* (`Commute (φ a) (φ b)`), not on `A`, so it applies to the
+`U`-action even though `U` itself is non-abelian. -/
+theorem fixedPointFree_of_aInvariant_irreducible_comm
+    {A K : Type*} [Group A] [Group K] {φ : A →* MulAut K}
+    (hcomm : ∀ a b : A, Commute (φ a) (φ b))
+    (hirr : ∀ J : Subgroup K, IsAInvariant φ J → J = ⊥ ∨ J = ⊤)
+    (a : A) (ha : φ a ≠ 1) (x : K) (hx : φ a x = x) : x = 1 := by
+  -- The fixed-point subgroup of `φ a`.
+  let F : Subgroup K :=
+    { carrier := {y | φ a y = y}
+      one_mem' := map_one (φ a)
+      mul_mem' := fun {y z} hy hz => by
+        show φ a (y * z) = y * z
+        rw [map_mul, show φ a y = y from hy, show φ a z = z from hz]
+      inv_mem' := fun {y} hy => by
+        show φ a y⁻¹ = y⁻¹
+        rw [map_inv, show φ a y = y from hy] }
+  have hxF : x ∈ F := hx
+  -- `Fix(φ a)` is `A`-invariant: `φ a` commutes with every `φ b` (image of `φ` abelian).
+  have hAinv : IsAInvariant φ F := isAInvariant_iff_smul_mem.mpr fun b y hy => by
+    show φ a (φ b y) = φ b y
+    have he : (φ a * φ b) y = (φ b * φ a) y := by rw [(hcomm a b).eq]
+    rw [MulAut.mul_apply, MulAut.mul_apply, show φ a y = y from hy] at he
+    exact he
+  rcases hirr F hAinv with hbot | htop
+  · -- `Fix(φ a) = ⊥`: the fixed point `x` is trivial.
+    rw [hbot] at hxF; exact Subgroup.mem_bot.mp hxF
+  · -- `Fix(φ a) = ⊤`: `φ a` is the identity, contradicting `φ a ≠ 1`.
+    exact absurd (MulEquiv.ext fun y => by
+      have hy : y ∈ F := htop ▸ Subgroup.mem_top y
+      rw [MulAut.one_apply]; exact hy) ha
 
 set_option backward.isDefEq.respectTransparency false in
 open OddOrder.RepresentationTheory Representation in
@@ -2593,6 +2641,67 @@ theorem chiefFactor_caseB_image_dvd_norm [Finite G] {M : Subgroup G}
   -- `|Ū|·(p-1) ∣ p^q-1` (coprime), hence `|Ū| ∣ (p^q-1)/(p-1)`.
   have hmul := hcop.mul_dvd_of_dvd_of_dvd hdvd hpd
   exact (Nat.dvd_div_iff_mul_dvd hpd).mpr (by rwa [mul_comm] at hmul)
+
+open scoped commutatorElement in
+/-- **Peterfalvi (9.7) case (b): the `U`-action on `H̄` is fixed-point-free off `C = C_U(H̄)`.**
+When `U` acts irreducibly on the chief factor `H̄ = H/H₀` (Clifford case (b)), any `g ∈ U` whose
+image `φ_U(g)` is nontrivial (i.e. `g ∉ C`) acts fixed-point-freely on `H̄`: `φ_U(g)·x = x → x = 1`.
+
+This is the structural heart of Peterfalvi (9.9) — `H̄ ⋊ Ū` is a Frobenius group, so a nontrivial
+character `θ` of `H̄` has inertia `I(θ) ∩ U = C`, giving the degree `u = |U:C|` of the irreducible
+characters of `HU` in `𝒳(H₀C')`.  The proof is pure Clifford theory: the image `Ū = φ_U(U)` is
+abelian (`hComm`: `⁅a,b⁆ ∈ [U,U] ⊆ C_M(H)`) and acts irreducibly (`hcaseB`), so
+`fixedPointFree_of_aInvariant_irreducible_comm` applies; the Singer field model is *not* needed. -/
+theorem chiefFactor_caseB_action_fpf [Finite G] {M : Subgroup G}
+    {data : TypesIIIIIIVSetup M} (chief : ChiefFactorData data)
+    (hcaseB : ∀ J : Subgroup (↥data.H ⧸ chief.N),
+        IsAInvariant ((typeP_quotientCoprimeAction data.typeP data.nontrivial.1
+          chief.N_aInvariant).φ.comp (typeP_quotientCoprimeAction data.typeP data.nontrivial.1
+          chief.N_aInvariant).U.subtype) J → J = ⊥ ∨ J = ⊤)
+    (g : ↥(typeP_quotientCoprimeAction data.typeP data.nontrivial.1 chief.N_aInvariant).U)
+    (hg : ((typeP_quotientCoprimeAction data.typeP data.nontrivial.1
+          chief.N_aInvariant).φ.comp (typeP_quotientCoprimeAction data.typeP data.nontrivial.1
+          chief.N_aInvariant).U.subtype) g ≠ 1)
+    (x : ↥data.H ⧸ chief.N)
+    (hx : ((typeP_quotientCoprimeAction data.typeP data.nontrivial.1
+          chief.N_aInvariant).φ.comp (typeP_quotientCoprimeAction data.typeP data.nontrivial.1
+          chief.N_aInvariant).U.subtype) g x = x) : x = 1 := by
+  classical
+  haveI : chief.N.Normal := chief.N_normal
+  set act := typeP_quotientCoprimeAction data.typeP data.nontrivial.1 chief.N_aInvariant with hact
+  set φU := act.φ.comp act.U.subtype with hφU
+  -- An element of `U W₁` centralizing `H` acts trivially on `H̄`.
+  have hcentral_triv : ∀ c : ↥(data.typeP.U ⊔ data.typeP.W1),
+      (c : G) ∈ Subgroup.centralizer (data.typeP.H : Set G) → act.φ c = 1 := by
+    intro c hc
+    have hfix : ∀ z : ↥data.typeP.H, (typeP_conjAction data.typeP c) z = z := by
+      intro z
+      apply Subtype.ext
+      rw [typeP_conjAction_apply]
+      have hcom : (z : G) * (c : G) = (c : G) * (z : G) :=
+        (Subgroup.mem_centralizer_iff.mp hc) (z : G) z.2
+      rw [← hcom, mul_assoc, mul_inv_cancel, mul_one]
+    ext y
+    refine QuotientGroup.induction_on y ?_
+    intro z
+    show (act.φ c) (QuotientGroup.mk' chief.N z) = QuotientGroup.mk' chief.N z
+    have hstep : (act.φ c) (QuotientGroup.mk' chief.N z)
+        = QuotientGroup.mk' chief.N ((typeP_conjAction data.typeP c) z) := rfl
+    rw [hstep, hfix z]
+  -- `Ū = φU(U)` is abelian: `φU ⁅a, b⁆ = 1` since `⁅a, b⁆` maps into `[U, U] ⊆ C(H)`.
+  have hComm : ∀ a b : ↥act.U, Commute (φU a) (φU b) := by
+    intro a b
+    refine commutatorElement_eq_one_iff_commute.mp ?_
+    rw [← map_commutatorElement φU a b]
+    show act.φ (act.U.subtype ⁅a, b⁆) = 1
+    apply hcentral_triv
+    change ((data.typeP.U ⊔ data.typeP.W1).subtype.comp act.U.subtype) ⁅a, b⁆
+        ∈ Subgroup.centralizer (data.typeP.H : Set G)
+    rw [map_commutatorElement]
+    exact typeP_commutator_U_centralizes_H data.typeP
+      (Subgroup.commutator_mem_commutator
+        (Subgroup.mem_subgroupOf.mp a.2) (Subgroup.mem_subgroupOf.mp b.2))
+  exact fixedPointFree_of_aInvariant_irreducible_comm hComm hcaseB _ hg x hx
 
 /-- **Peterfalvi (9.7) case (b) carrier.**  When `U` acts irreducibly on the chief factor
 `H̄ = H/H₀` (Clifford case (b), the left branch of `chiefFactor_clifford_U_dichotomy`), the
