@@ -82,15 +82,25 @@ The single remaining gate `typeII_coherence_contradiction_estimate` is **Peterfa
 **Remaining gates of the estimate (precise, after this decomposition)** — the estimate stays
 sorried, but now reduces to exactly:
 - **(A) the §7 output (line 87)** = `family_inequality` (7.5) + `Hypothesis78.NormEstimates` (7.8.b)
-  + (10.6.b), for `(L, A) = (M, A(M))`.  This needs a `S09.Hypothesis71`/`FamilyHypothesis71`/
-  `Hypothesis78` **instance for `(M, A(M))`**.  Investigation findings (this session): the §7
-  machinery `(7.1)`--`(7.8)` is sorry-free in `S09_NonexistenceCertain.lean`; the §10 `Hypothesis M`
-  carries a genuine Dade map for **`A_0(M)`** (`Hypothesis.tau`, via `dadeData`/`hconj`), and
-  `S10.dadeSupportHypotheses_typeP` (sorried but signature-correct) supplies a
-  `DadeSupportHypothesisData M (typePA M)` for **`A(M)` directly**.  The `HConjInvariant`-for-`A(M)`
-  snag is **resolvable** via `S04.HConjInvariant.restrict` (`A(M) ⊆ A_0(M)`).  So building the
-  `Hypothesis71` for `(M, A(M))` is feasible (S04/S07 Dade-map plumbing), and is the right next
-  upstream target for closing the §7 half.
+  + (10.6.b), for `(L, A) = (M, A(M))`.
+  - **✅ `Hypothesis.toHypothesis71` LANDED** (2026-06-27, sorry-free): the §7 (7.1) ρ-machinery data
+    `S09.Hypothesis71 G (typePA M) M`, built by restricting the §10 `A_0(M)` Dade isometry
+    (`hyp.dadeData`/`hyp.hconj`) to `A(M) = typePA ⊆ typePA0` via `FullDadeIsometryData.restrict`
+    (Dade map + `IsDadeMap`) and `S04.HConjInvariant.restrict` (equivariance).  Takes
+    `hN : N_G(A(M)) = M` (Pf (8.16), `S10.dadeSupportHypotheses_typeP`) as a parameter, so the
+    construction itself is sorry-free.  Uses the `FiniteInduce` scope for the canonical
+    `Fintype`/`Invertible` instances (avoids the instance-desync of explicit ones).
+  - **✅ `Hypothesis.toFamilyHypothesis71` LANDED** (2026-06-27, sorry-free): the `(7.4)` one-member
+    family `S09.FamilyHypothesis71 G 1` for `{(M, A(M))}`, built from `toHypothesis71` (its single
+    member), with `IsDadeIsometry` from the restricted fdi's `toDadeIsometryData.isDadeIsometry`
+    (supplied by `exact`, defeq through proof-irrelevance of the `hnorm` argument) and vacuous
+    `pairwise_disjoint` over `Fin 1`.  **The entire input side of (7.5) for `M` is now built**:
+    `S09.family_inequality (hyp.toFamilyHypothesis71 hN) χ hχ` gives line 81 directly.
+  - **Remaining for (A)**: (i) apply `family_inequality` (7.5) [now a one-liner on
+    `toFamilyHypothesis71`]; (ii) the `Hypothesis78` (7.8.b) instance for `M`; (iii) **the deep
+    norm-connection** — specialise `χ = ζ^{τ₁}`, identify `G₀`/`G₁` (order prime to `w₁`), and
+    connect `chiRhoNormSq`/`|G₀|`/`|A(M)|/|M|` to the group quantities of line 87.  Steps (ii)/(iii)
+    are the genuine remaining §7 character content (multi-step).
 - **(B1) the inclusion `G₁ ⊆ (H#)^G ∪ V^G`** (lines 89): needs **(10.7) `typeII_derived_frobenius`**
   (the `x ∈ HU ⟹ x ∈ H` step) + (8.6.a)/(8.11)/(2.1).  `(10.7)` is the §9-blocked piece (its
   Peterfalvi proof cites the §9 Clifford counts `(9.8.b)/(9.9.b)/(9.10)`, which are stated against
