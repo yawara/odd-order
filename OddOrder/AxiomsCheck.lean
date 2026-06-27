@@ -2571,6 +2571,10 @@ set_option linter.style.longLine false in
 -- Frobenius-group consumer form of [Is] Thm 6.34, used by Peterfalvi (6.8) case c1.
 #assert_only_allowed_axioms
   OddOrder.RepresentationTheory.isIrreducibleCharacter_induce_of_frobeniusGroup
+-- Degree side of Clifford's theorem: `χ(1) = ∑_θ ⟨Res χ,θ⟩·θ(1)` (Fourier expansion of `Res χ`).
+-- The degree component of the (9.9.a) Clifford-degree assembly (issue 2031).
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.apply_one_eq_sum_restrictionMultiplicity_mul
 
 -- Peterfalvi (6.8) T6/Y-family consumer side: degree-one induced families have common degree,
 -- supported differences on `H#`, irreducibility from c1/c2 inertia, and equal-degree coherence.
