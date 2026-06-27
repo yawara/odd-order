@@ -70,3 +70,19 @@ hub が lane-h の次タスク (relane 先 or await 体制 or 集約) を LAUNCH
 - lane-h topic: memory `lane-h-driving-wielandt-91.md` 2026-06-27 entry
 - 関連 HUB issue (過去の同型 starvation): 2021 / 2023 / 2026 / 2027
 - 主所有: `OddOrder/Peterfalvi/S14_MaximalI.lean` のみ (W2)
+
+## ✅ RESOLUTION (2026-06-27, ユーザー裁可「await + consumer-wiring を公式化」)
+
+hub が lane-h の 3 選択肢を提示 (AskUserQuestion) → ユーザー裁可 = **option (B) await + consumer-wiring を公式化**。
+
+- **lane-h = W2 (S14_MaximalI) を保持**、ただし **await + consumer-wiring モードに公式移行**。独立駆動はしないが、
+  上流 (lane-b char/§8、lane-f BG) landing で §12 consumer-wiring が開いたら機会的に拾う (今 tick の
+  theorem88_dichotomy がこのパターン)。
+- **再開トリガ** (S14_MaximalI の consumer-wiring が開く landing): (12.10) `witness_L_frobenius` char 核 (lane-b) /
+  (8.13.c1) §8 (lane-b) / `bgTheoremE_cover_data` 強化 (lane-b S10) / lane-f BG §16-15 の duality/分類 clean 化。
+- **平常は自己復帰モニターで待機** (投機的 scaffold は作らない [[scaffold-sorry-free-not-done]])。トリガ長期不在で
+  実質ゼロ稼働が続けば HUB issue で報告 (3→2 集約の再検討材料)。
+- **所有 = S14_MaximalI のみ不変** ⟹ cron 監視マップ無改訂 (lane-h は引き続き f/b/h の監視対象)。
+- lane-h LAUNCH.md に await 公式化バナー設置済。close。
+
+(3→2 集約 [option C] や投機的 W1 producer [option A, lane-c rank-1 と同じ moot リスク] は不採択。)

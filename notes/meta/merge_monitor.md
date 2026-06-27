@@ -336,6 +336,17 @@ branch とも削除済み。旧 **A** / **D** も同様に退役済み (履歴�
 
 ## 現状メモ
 
+- **2026-06-27 (続³) — lane-h を await + consumer-wiring モードに公式化 (issue 2029, ユーザー裁可)**: lane-h が
+  `theorem88_dichotomy` honest 構成 (commit `3ec86cc9`, bare sorry 除去、lane-f の `typeP_duality` landing を拾う) 後、
+  S14_MaximalI の残 sorry が全て char/§8/§10 gated (lane-b 領域) で ungated 群論ゼロに再枯渇 (5 回目の構造的
+  starvation, issues 2021/2023/2026/2027/2029) → HUB-ask issue 2029。hub が 3 選択肢提示 (await / 3→2 集約 /
+  投機 W1 producer) → **ユーザー裁可 = await + consumer-wiring 公式化**。lane-h = W2 (S14_MaximalI) 保持・所有不変
+  (cron 無改訂)、平常は自己復帰モニター待機、**上流 landing で §12 consumer-wiring が開いたら機会的に拾う**
+  (トリガ = lane-b の (12.10) char 核 / (8.13.c1) §8 / `bgTheoremE_cover_data` 強化、または lane-f BG §16-15 landing)。
+  投機的 scaffold は作らない。トリガ長期不在で実質ゼロ稼働が続けば HUB issue で 3→2 集約再検討。lane-h LAUNCH.md に
+  await 公式化バナー設置、issue 2029 closed。**この tick の合流**: F (hP1neIIIIV bridge 完全 close = N(U)≤M Pf 8.7
+  実証明 axiom-clean、sorry 124→123) / B ((10.8) analytic core) / H (theorem88_dichotomy honest + 2029 docs)。push 済。
+
 - **2026-06-27 (続²) — lane-c 退役で 4→3 レーン集約 (ユーザー裁可)**: lane-c が hub-ask (issue 2028, Cor 15.3 完了→
   次配置相談) を起票。hub が候補を実コード検証:
   - option 1 (Cor 15.5(c) producer) は **lane-f が S16 内インライン自前証明済で moot**。
