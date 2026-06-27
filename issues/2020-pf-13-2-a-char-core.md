@@ -270,3 +270,21 @@ These are fundamental reusable type-P torus facts (ω-grid on W=W₁×W₂, (4.5
 - **(B2) (H#)^G count** — partner analogue of the V^G count, once partner H#-TI + N_G(H#)=S available.
 
 正本ノート = `notes/peterfalvi/s12_10_8_noncoherence.md` (2026-06-27 section).
+
+## 2026-06-27 lane-b (W3, cont.): (8.16) `N_G(A(M))=M` proven — §7 input self-contained
+
+Continuing the (10.8) `no_typeV` path (the other on-path W3 obligation besides (11.8)).  The §7
+estimate input (A) had an upstream prerequisite carried as a *free parameter*: the `M`-stability
+`hN : N_G(A(M)) = M` of `toHypothesis71` / `toFamilyHypothesis71`.  **Now proven** as
+`S12.Hypothesis.normalizer_typePA_eq` (Peterfalvi (8.16), axiom-clean, full build 3884 green):
+
+- From the carried `N_G(A_0(M)) = M` (`hyp.dadeData.normalizer_eq`, `A_0(M) = A(M) ∪ V^G`): `A(M)` is
+  `M`-invariant and `V^G = 𝒞_G(V)` is conjugation-invariant under all of `G` (new reusable
+  `OddOrder.GroupTheory.mem_conjClassSet_conj_iff`), so `N_G(A(M)) ⊆ N_G(A_0(M)) = M ⊆ N_G(A(M))`.
+- `toHypothesis71` / `toFamilyHypothesis71` now derive `hN` internally ⟹ the (7.5) family inequality
+  for `(M, A(M))` (Pf (10.8) line 81) is applicable directly from the genuine `Hypothesis`.
+
+This is a genuine upstream prerequisite of the honest (10.8) §7 estimate (not a sorry-count change).
+正本 = `notes/peterfalvi/s12_10_8_noncoherence.md` (2026-06-27 cont. section).  Remaining (10.8) §7:
+`S09.Hypothesis78` (7.8.b) instance for `M` + the line-83 norm assembly; (10.7)/(11.8) stay §9-blocked
+on the `S11.Section11CharacterData` carrier (the W3 keystone).
