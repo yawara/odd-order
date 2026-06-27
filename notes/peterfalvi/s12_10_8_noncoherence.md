@@ -117,7 +117,24 @@ sorried, but now reduces to exactly:
     field) — they hold only for the specific params from `Hypothesis.exists_charParameters`
     (`hmu`/`hos` are `rfl`; `hzS`/`hz1` and `hδj`/`hδpm` are now establishable per above; the lone
     deep gap is **`hzconj` (ζ non-real)**, which S12 currently *assumes* everywhere).
-  - **✅ `hzconj` math SOLVED (clean argument, 2026-06-27) — every degree-`w₁` `ζ` is non-real**
+  - **✅✅ `hzconj` PROVEN (2026-06-27) — `Hypothesis.zeta_conj_ne`, sorry-free.**  The route is
+    **direct via Peterfalvi (1.1)** (`OddOrder.RepresentationTheory.not_isReal_of_ne_trivial_of_odd_card'`):
+    `ζ` is a *nontrivial* (degree `w₁ > 1`, from `hz1`) irreducible character of the *odd-order* `M`,
+    so it is not real, i.e. `ζ.conj ≠ ζ`.  **No induced-character / orbit argument is needed** — the
+    long argument below was unnecessary (kept for the record).  ⟹ **all 7 (10.6.b) conditions are now
+    establishable** (`hmu`/`hos` = rfl, `hzS`/`hz1`/`hδj` supplied, `hδpm` from
+    `muColumnSign_eq_one_or_neg_one`, **`hzconj` = `zeta_conj_ne`**).
+  - **✅ `Hypothesis.exists_charParameters_full` LANDED** (2026-06-27, sorry-free): the single producer
+    of `params` **with all 7 (10.6.b) conditions** (`mu=muGrid`, `omegaSigma=alignedΩΣ`, `ζ∈S`,
+    `ζ(1)=w₁`, `ζ̄≠ζ`, `δ=±1`, `δ_j=δ`).  The (10.8) line-83 step consumes this (re-wrapping the
+    coherence `⟨coh.coherent⟩` for the produced `params`).
+  - **✅ `Hypothesis.sum_zeta_tau1_normSq_ge_card` LANDED** (2026-06-27, sorry-free): the `(10.6.b)`-
+    summed bound `|G₀| ≤ Σ_{g∈G₀} ‖ζ^{τ₁}(g)‖²` over `G₀ = {g | g∉Ã(M), (ord g).Coprime w₁}`, via
+    `card_le_sum_normSq_of_forall_eq_odd_intCast ∘ tau1_values_and_norm_bound`.  This is the `G₀`-drop
+    term for line 83.  **Remaining line-83 wiring**: `G₀ ⊆ famG₀` (restricted `A(M)`-support ⊆
+    `A_0`-support — derive), the (7.5)-combination (family_inequality + this bound + sum monotonicity
+    + `|famG₀| = |G₀| + |G₁|`).
+  - (superseded, kept for record) `hzconj` via the orbit argument — every degree-`w₁` `ζ` is non-real
     (de-risks `hzconj` from "deep unknown" to a concrete formalization task).  `ζ = Ind_{M'}^M θ`
     (`θ` nontrivial linear on `M' = [M,M]`, `θ` in general position so `ζ` irreducible of degree
     `w₁ = [M:M']`); `ζ̄ = Ind θ̄` (`induce_conj`, as in `inducedFamily_closedUnderConjugate`).  By the

@@ -2902,6 +2902,79 @@ theorem w2_prime_and_parameter_independence [Finite G]
   obtain ⟨params, -, h2⟩ := hyp.exists_charParameters hG
   exact ⟨params, hyp.w2_prime hG, h2⟩
 
+/-- **`ζ` is non-real (`ζ̄ ≠ ζ`)** — the `hzconj` input to the (10.6.b) Dade-value lemmas, **directly
+from Peterfalvi (1.1)**.  The degree-`w₁` `ζ` is a *nontrivial* (degree `w₁ > 1`) irreducible
+character of the *odd-order* group `M`, so by `not_isReal_of_ne_trivial_of_odd_card'`
+(the only self-conjugate irreducible of an odd group is the trivial one) `ζ` is not real, i.e.
+`ζ.conj ≠ ζ`.  No induced-character / orbit argument is needed — `ζ` itself being a nontrivial
+odd-group irreducible suffices.  Takes `hz1 : ζ(1) = w₁` (one of the (10.6.b) conditions, supplied by
+`exists_charParameters`) to witness `ζ ≠ 1_M`. -/
+theorem Hypothesis.zeta_conj_ne [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} (hyp : Hypothesis M)
+    {params : CharacterParameters hyp} (hz1 : params.zeta 1 = (hyp.w1 : ℂ)) :
+    (params.zeta).conj ≠ params.zeta := by
+  haveI := hyp.finiteG
+  have hModd : Odd (Nat.card ↥M) := hG.odd.of_dvd_nat (Subgroup.card_subgroup_dvd_card M)
+  have hw1 : 1 < hyp.w1 := (Subgroup.one_lt_card_iff_ne_bot _).mpr hyp.typeP.W1_nontrivial
+  have hne : (⟨params.zeta, params.zeta_irreducible⟩ : IrreducibleCharacter ↥M)
+      ≠ trivialIrreducibleCharacter ↥M := by
+    intro h
+    have hz : params.zeta 1 = (1 : ℂ) := by
+      have hcoe := congrArg (fun c : IrreducibleCharacter ↥M => (c : ClassFunction ↥M ℂ) 1) h
+      simpa using hcoe
+    rw [hz1] at hz
+    have : hyp.w1 = 1 := by exact_mod_cast hz
+    omega
+  exact OddOrder.RepresentationTheory.not_isReal_of_ne_trivial_of_odd_card' hModd hne
+
+/-- **Parameter package with all (10.6.b) hypotheses** (the `tau1_values_and_norm_bound` /
+`zeta_tau1_norm_ge_one` inputs).  Strengthens `exists_charParameters` to also expose the seven
+conditions those Dade-value lemmas require, now that each is establishable: `mu`/`omegaSigma` are the
+materialized grids (`rfl`), `ζ ∈ S` and `ζ(1) = w₁` come from `(10.2)`, `δ_j = δ` from
+`exists_charParamArith`, `δ = ±1` from `muColumnSign_eq_one_or_neg_one`, and `ζ̄ ≠ ζ` from
+`zeta_conj_ne` (Peterfalvi (1.1)).  This is the single producer the `(10.8)` line-83 step consumes
+(via the re-wrapped coherence `⟨coh.coherent⟩` for this `params`). -/
+theorem Hypothesis.exists_charParameters_full [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} (hyp : Hypothesis M) :
+    ∃ params : CharacterParameters hyp,
+      params.mu = hyp.muGrid hG hG.odd ∧
+      params.omegaSigma = hyp.alignedOmegaSigmaGrid hG hG.odd ∧
+      params.zeta ∈ inducedFamily M ∧ params.zeta 1 = (hyp.w1 : ℂ) ∧
+      params.zeta.conj ≠ params.zeta ∧
+      (params.delta = 1 ∨ params.delta = -1) ∧
+      (∀ j : Fin hyp.w2, j ≠ 0 → hyp.muColumnSign hG hG.odd j = params.delta) := by
+  haveI := hyp.finiteG
+  classical
+  obtain ⟨ζ, hζS, hζirr, hζdeg⟩ := exists_zeta_in_inducedFamily_degree_w1 hyp.typeP hG.odd
+    (typePData_W1_hall_coprime hG hyp.maximal (hyp.bgTypeP hG) hyp.typeP)
+  obtain ⟨d, delta, n, hd1, hnf, hn2, hdi, hδindep⟩ := hyp.exists_charParamArith hG hG.odd
+  refine ⟨{ zeta := ζ
+            zeta_mem_S := hζS
+            zeta_irreducible := hζirr
+            d := d
+            delta := delta
+            n := n
+            w2_prime := hyp.w2_prime hG
+            d_gt_one := hd1
+            mu := hyp.muGrid hG hG.odd
+            omegaSigma := hyp.alignedOmegaSigmaGrid hG hG.odd
+            degree_independent := hdi
+            n_formula := hnf
+            two_le_n := hn2
+            alpha_support := fun i j hj =>
+              hyp.muGrid_alpha_support hG hG.odd hj hζS (hdi i j hj)
+                (hyp.muGrid_zero_column_apply_one hG hG.odd i) hζdeg hnf (hδindep j hj)
+            typeV_parameter_formula := True
+            typeV_coherence_formula := True },
+    rfl, rfl, hζS, hζdeg, ?_, ?_, hδindep⟩
+  · exact hyp.zeta_conj_ne hG hζdeg
+  · have hw2 : 2 ≤ hyp.w2 := (hyp.w2_prime hG).two_le
+    have hj : (⟨1, by omega⟩ : Fin hyp.w2) ≠ 0 := by simp [Fin.ext_iff]
+    have hde := hδindep ⟨1, by omega⟩ hj
+    have hs := hyp.muColumnSign_eq_one_or_neg_one hG hG.odd ⟨1, by omega⟩
+    rw [hde] at hs
+    exact hs
+
 /-! ## (10.5)--(10.6): Dade-isometry calculations -/
 
 /-- **Peterfalvi (10.5), support half**: for `0 < j < w₂`, the virtual character `α_{ij}` is
@@ -5792,6 +5865,48 @@ theorem card_le_sum_normSq_of_forall_eq_odd_intCast {ι : Type*} (S : Finset ι)
         have h1 : (1 : ℝ) ≤ |(m : ℝ)| := by
           rw [← Int.cast_abs]; exact_mod_cast Int.one_le_abs hm0
         rw [hnorm]; nlinarith [h1, abs_nonneg ((m : ℝ))]
+
+open scoped Classical FiniteInduce in
+/-- **The `(10.6.b)`-summed bound for `ζ^{τ₁}`** — `|G₀| ≤ Σ_{g ∈ G₀} ‖ζ^{τ₁}(g)‖²` over
+`G₀ = {g | g ∉ Ã(M), (ord g).Coprime w₁}`.  Composes `card_le_sum_normSq_of_forall_eq_odd_intCast`
+(the analytic core) with the per-`g` (10.6.b) bound `tau1_values_and_norm_bound` (`ζ^{τ₁}(g)` is an
+odd integer off `Ã(M)` at orders prime to `w₁`).  The 7 parameter conditions are exactly those
+supplied by `exists_charParameters_full`.  This is the `G₀`-drop term Peterfalvi (10.8) uses to pass
+from the family inequality (7.5) (line 81) to line 83. -/
+theorem Hypothesis.sum_zeta_tau1_normSq_ge_card [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G}
+    {hyp : Hypothesis M} {params : CharacterParameters hyp} (coh : CoherentHypothesis hyp params)
+    (hmu : params.mu = hyp.muGrid hG hG.odd)
+    (hos : params.omegaSigma = hyp.alignedOmegaSigmaGrid hG hG.odd)
+    (hzS : params.zeta ∈ inducedFamily M) (hz1 : params.zeta 1 = (hyp.w1 : ℂ))
+    (hzconj : params.zeta.conj ≠ params.zeta)
+    (hδpm : params.delta = 1 ∨ params.delta = -1)
+    (hδj : ∀ j : Fin hyp.w2, j ≠ 0 → hyp.muColumnSign hG hG.odd j = params.delta) :
+    ((Finset.univ.filter
+        (fun g : G => g ∉ hyp.dadeData.dade.dadeSupport ∧ (orderOf g).Coprime hyp.w1)).card : ℝ)
+      ≤ ∑ g ∈ Finset.univ.filter
+          (fun g : G => g ∉ hyp.dadeData.dade.dadeSupport ∧ (orderOf g).Coprime hyp.w1),
+          ‖coh.tau1 params.zeta g‖ ^ 2 := by
+  classical
+  apply card_le_sum_normSq_of_forall_eq_odd_intCast
+  intro g hg
+  rw [Finset.mem_filter] at hg
+  exact (tau1_values_and_norm_bound hG coh hmu hos hzS hz1 hzconj hδpm hδj).2 g hg.2.1 hg.2.2
+
+/-- **Restricting the Dade support shrinks it**: for `A₁ ⊆ A`, the Dade support of the restricted
+hypothesis `hyp.restrict` is contained in that of `hyp` (`mem_dadeSupport_iff`: a witness
+`a ∈ A₁, h ∈ H(a)` for the restriction is a witness `⟨a, _⟩ ∈ A` for `hyp`, since
+`(hyp.restrict ..).H a = hyp.H ⟨a, _⟩`).  In the (10.8) line-83 step this gives `G₀ ⊆ famG₀`: the
+`A_0(M)`-support complement `G₀` is inside the `A(M)`-support complement `famG₀` (the family `(7.4)`
+support for `A(M) = typePA ⊆ typePA0 = A_0(M)`). -/
+theorem dadeSupport_restrict_subset {A A₁ : Set G} {L : Subgroup G} [Fintype G]
+    (hyp : OddOrder.Peterfalvi.S04.Hypothesis G A L) (hA₁A : A₁ ⊆ A)
+    (hA₁_norm : ∀ (l : L) ⦃a : G⦄, a ∈ A₁ → (l : G) * a * (l : G)⁻¹ ∈ A₁) :
+    (hyp.restrict hA₁A hA₁_norm).dadeSupport ⊆ hyp.dadeSupport := by
+  intro g hg
+  rw [OddOrder.Peterfalvi.S04.Hypothesis.mem_dadeSupport_iff] at hg ⊢
+  obtain ⟨a, h, hh, hconj⟩ := hg
+  exact ⟨⟨a.1, hA₁A a.2⟩, h, hh, hconj⟩
 
 /-- **Peterfalvi (10.8), the analytic chain** (04.12 p.61, lines 87--99) — the pure-`ℚ` assembly
 that turns the §7 norm output (line 87) and the §8 TI-counting bound (lines 89--91) into the
