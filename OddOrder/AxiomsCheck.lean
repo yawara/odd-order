@@ -6211,6 +6211,11 @@ formula together with the prime computation `coprimeFrobeniusAction_card_eq_prim
 -- kernel (the Frobenius structure `H̄ ⋊ Ū`).  Pure group theory — no Singer field model needed.
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.S11.fixedPointFree_of_aInvariant_irreducible_comm
+-- character-side FPF: a fixed-point-free automorphism of a finite abelian group leaves no nontrivial
+-- character invariant (the inertia `I_U(θ) = C` engine of Peterfalvi (9.9)), via mathlib's
+-- `commutatorMap_surjective`.
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S11.eq_one_of_invariant_of_fixedPointFree
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S11.card_range_dvd_card_sub_one_of_prime_card
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S11.typeP_commutator_U_centralizes_H
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S11.chiefFactor_caseB_image_cyclic
