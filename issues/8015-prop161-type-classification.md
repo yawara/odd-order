@@ -840,3 +840,33 @@ route B 計画 (2026-06-27⁹、SingerField.lean):
 4. Singer (`nonempty_singerFieldData`+galoisField): V≅GF(p²)、μ: K↪GF(p²)ˣ injective。
 5. det 1 ⟹ μ(k)^(p+1)=1 (extraspecial symplectic form, K 保存) ⟹ |K|=orderOf(μ g)∣p+1。
 真の残工 = 既約性判定 (step 3) + symplectic form/det=norm (step 5)。全ピース所在確定、ChatGPT 不要。
+
+### 🔬 2026-06-28 (lane-f 再開²): route B (sorry 2 |W₁|∣p+1) 精密スコープ — 大幅 de-risk
+
+sorry 1 閉鎖後、route B (Singer/SL₂(p)) のインフラを精査。**S14 にテンプレート、mathlib に norm 設備**が
+あり、faithful/irreducible も既存 brick から導出可能と判明 (det/symplectic の新規大規模ポートは不要):
+
+**|K| ∣ p²-1 (Singer) のテンプレート在庫**: `S14_MaximalI.isCyclic_and_card_dvd_of_odd_two_dim_irreducible`
+(Representation ρ:E→GL(V) faithful + irreducible + dim 2 + odd + p∤|E| ⟹ IsCyclic E ∧ |E|∣|V|-1)。
+これに V=P/Z(P) を流す。
+
+**faithful 導出可能**: K→GL(V=P/Z(P)) の kernel = {k:[P,k]≤Z(P)}。Z(P)=Φ(P) (extraspecial)、
+coprime action で「k が P/Φ(P) 中心化 ⟹ k が P 中心化」、かつ C_K(P)=⊥ (**brick 4
+`kappaHall_inf_centralizer_opiCore_eq_bot` 在庫**) ⟹ kernel=⊥。
+
+**irreducible 導出可能**: V 可約なら K-不変直線 L ⟹ K は p'-群 semisimple ゆえ split torus に対角化
+⟹ |K|∣p-1、¬|K|∣p-1 (e3 仮説) と矛盾 ⟹ V 既約。
+
+**p+1 への精密化 (crux) = 2 ルート、いずれも設備あり**:
+- (det ルート) K ⊆ Sp(V)=SL₂(p) (K が Z(P) 中心化 ⟹ extraspecial commutator form 保存)。
+  V≅GF(p²) (Singer)、det(k)=Algebra.norm(μ k)=μ(k)^(p+1) (**mathlib `algebraMap_norm_eq_pow`
+  GaloisField.lean:225**)、det=1 ⟹ μ(k)^(p+1)=1 ⟹ |K|∣p+1。要 symplectic form on V from
+  extraspecial commutator + K 保存。
+- (coprime ルート) `SingerField.coprime_card_sub_one_of_faithful_irreducible_comm_fpf`
+  (FPF additive σ ⟹ Coprime |K| (p-1))、|K|∣p²-1 ∧ Coprime|K|(p-1) ⟹ |K|∣p+1
+  (`Nat.Coprime.dvd_of_dvd_mul_left`)。FPF σ の所在が type-V で要確認。
+
+**残工 = (1) K→GL(P/Z(P)) Representation 構成 (P/Z(P) を ZMod p-module 化 + 共役を linear 化)、
+(2) faithful (上記)、(3) irreducible (上記)、(4) p+1 crux (det ルート推奨: symplectic form 設定 +
+K 保存 + algebraMap_norm_eq_pow)**。(1) が最大の新規工 (quotient module + Representation)。
+multi-session だが新規大規模ポート不要・全ピース所在確定。次セッション = (1) Representation 構成から。
