@@ -103,18 +103,45 @@ carrier を genuine 化したことで、free-field 時代に **vacuous だっ�
 
 ## やること (research-grade, multi-session)
 
-- [ ] **A': count 文監査** — 上記 imprecision を Peterfalvi に対し総点検・修正 (count 証明の前提)。
+- [x] **A': count 文監査 COMPLETE** (2026-06-28, commit `c170dd32`) — (9.8)/(9.9)/(9.10) を Peterfalvi
+      忠実化 (H₀-join / C/C' / `IsIrreducibleCharacter` / 3 vacuity trap 除去)。下記「2026-06-28」節。
 - [x] **A**: carrier 再設計 = families (commit `9c41978a`) + subgroups (commit `153e866a`) 全 genuine。
       残 free field = u (pin 済) / tau・H0CprimeSupport (S12-Dade layer) / quotientSemidirectFrobenius
-      ((9.10) output)。
-- [ ] **B: case-(b) (9.9)/(9.10)** — Singer field model。`chiefFactor_caseB_image_*` (|Ū|∣(p^q−1)/(p−1),
-      Coprime) 活用。(9.9.a) `u∣qu` は trivial。(9.9) の `∃χ∈𝒮(C'), χ1=u` = Ind_{HC}^{HU}(linear, inertia=C)
-      irreducible (degree |U:C|=u) を `isIrreducibleCharacter_induce_of_inertia_eq` で構成; `|𝒮(H₀)|=p−1`
-      = (4.5)/(4.7) Dade on L=M/H₀ (S06 cite + 商 inflation)。
+      ((9.10) output) / CliffordCaseBData.field_model・Ubar_cyclic (下記、struct instance plumbing で True 据置)。
+- [ ] **B: case-(b) (9.9)/(9.10)** — Singer field model。**✅ 構造核 (FPF) landed** (2026-06-28、下記節)。
+      残 = FPF→inertia I(θ)∩U=C → (9.9.a) degree-u Clifford (`isIrreducibleCharacter_induce_of_inertia_eq`)、
+      `|𝒮(H₀)| reducible-count = p−1` = (4.5)/(4.7) Dade on L=M/H₀ (S06 cite + 商 inflation)、(9.9.c) 例外含意。
 - [ ] **C: case-(a) (9.8)** — (9.8.b,c) = (8.4.d)+(4.5)/(4.7) Dade for L=M/H₀ + θ=θ₁…θ_q1_C 構成;
       (9.8.d) = degree-qa 構成 + inertia counting (`card_filter_induce_eq_index_inertia`)。
       case-(a) factor 構造 (`CliffordCaseAData.Hpart`/`a`) を使う。
 - [ ] **D: (9.11) `sibleyTarget_H0C`** 構造 witness (現状 (6.8)/Sibley 経由で §14-gated)。
+
+## 2026-06-28 lane-b (W3): A' count 文監査 COMPLETE + B 構造核 (FPF) landed
+
+**A' 完了** (commit `c170dd32`、full build 3884 green): carrier genuine 化で露呈した (9.8)/(9.9)/(9.10) の
+imprecision を Peterfalvi (04.11) に対し総点検・修正。**consumer 0 ゆえ statement 改変は安全** (grep 確認)。
+- **H₀-join (systematic)**: `𝒮(H₀C)`/`𝒮(H₀U')`/`𝒮(H₀C')` を `chars.SOf (chief.H0 ⊔ ·)` に修正。
+- **C/C'**: (9.10) hypothesis を `C`→`Cprime` (Pf は 𝒮(H₀C') 記述)、(9.9.c) も C' 統一。
+- **`IsIrreducibleCharacter`**: 「irreducible」「contains an irreducible」箇所に導入 (9.8.c/9.8.d/9.9.c/9.10)。
+- **vacuity trap 除去**: (9.9) 恒真 `u∣qu` → genuine (9.9.a)「∀φ∈𝒮(H₀C'), φ(1)=qu」(定数次数=(5.7) 入力);
+  偽 `(𝒮(H₀)).ncard=p−1` → `{φ∈𝒮(H₀)|¬irred}.ncard=p−1` (reducible-count); 恒偽傾向 `ncard=0` trigger →
+  「contains no irreducible」(exceptional case で 𝒮(H₀C')=𝒮(H₀)≠∅)。
+
+**B 構造核 = FPF (Frobenius `H̄⋊Ū`) landed** (本 commit、両 axiom-clean+AxiomsCheck 登録):
+- **`fixedPointFree_of_aInvariant_irreducible_comm`** (一般、S11): A が K に φ:A→*MulAut K で作用し
+  **像可換** (`Commute (φ a)(φ b)`) + irreducible (A-invariant は ⊥/⊤) なら φa≠1 ⟹ FPF (φa x=x→x=1)。
+  証明 = Fix(φa) は A-invariant 部分群 (φa,φb 可換) ⟹ ⊥/⊤、⊤ なら φa=1。**Singer field model 不要・純群論**。
+  像可換が仮説ゆえ U 非可換でも適用可 (Ū=U/C は可換)。
+- **`chiefFactor_caseB_action_fpf`** (case-(b) 系、S11): case-(b) (hcaseB irreducible) で φU g≠1 (g∉C) ⟹
+  H̄ 上 FPF。`hComm` (像可換、`chiefFactor_caseB_image_cyclic` と同じ `⁅a,b⁆∈[U,U]⊆C(H)`) + hcaseB を
+  一般補題に渡す。これが (9.9) の degree-u Clifford 解析 (I(θ)∩U=C) の構造的入力。
+
+**carrier genuinization の保留** (honest-architecture note): `CliffordCaseBData.field_model`/`Ubar_cyclic`
+(True placeholder) を FPF/IsCyclic に genuine 化しようとしたが、**struct field type が
+`typeP_quotientCoprimeAction` を参照 → `[Finite G]` + `[chief.N.Normal]` instance を要し、structure 宣言
+コンテキストで供給不能** (haveI 不可)。⟹ True 据置、FPF は standalone lemma で供給。B の (9.9) 証明では
+`caseB_character_counts` に hcaseB を追加引数する (or clifford_dichotomy 経由) ことで `chiefFactor_caseB_action_fpf`
+を cite して FPF を得る (struct plumbing を避ける pragmatic な access pattern)。
 
 ## 完了条件
 
