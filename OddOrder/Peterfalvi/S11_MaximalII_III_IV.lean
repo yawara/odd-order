@@ -1470,12 +1470,113 @@ theorem exists_chiefFactorData [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G
 
 /-! ## (9.5)--(9.7): Clifford-theory data over the selected chief factor -/
 
+/-! ### The genuine character families `𝒳`, `𝒮` of Peterfalvi (9.5)
+
+We realise Peterfalvi's families honestly (following the `S12.inducedFamily` pattern), so the
+formerly free `Section11CharacterData` fields are pinned to genuine constructions.  `HU = H ⊔ U`
+is realised inside `↥M` as `(H ⊔ U).subgroupOf M`; then
+
+* `𝒳 = {χ ∈ Irr(HU) | H ⊄ Ker χ}` (`xiSet`),
+* `𝒮 = {Ind_{HU}^M χ | χ ∈ 𝒳}` (`sSet`),
+
+with the restricted families `𝒳(Y) = {χ ∈ 𝒳 | Y ⊆ Ker χ}` (`xiOf`) and `𝒮(Y) = Ind 𝒳(Y)` (`sOf`)
+for a subgroup `Y` (the cases `Y = H₀, H₀C, H₀C', H₀U'` of (9.8)/(9.9)). -/
+
+/-- `HU = H ⊔ U`, realised as a subgroup of `↥M`. -/
+def huSub (data : TypesIIIIIIVSetup M) : Subgroup ↥M :=
+  (data.H ⊔ data.U).subgroupOf M
+
+/-- `H`, realised as a subgroup of `HU = H ⊔ U` inside `↥M`.  Used to state the kernel condition
+`H ⊄ Ker χ` defining `𝒳`. -/
+def hInHu (data : TypesIIIIIIVSetup M) : Subgroup ↥(huSub data) :=
+  (data.H.subgroupOf M).subgroupOf (huSub data)
+
+/-- **Peterfalvi (9.5)'s family `𝒳`**: the irreducible characters of `HU = H ⊔ U` (realised inside
+`↥M`) that do not contain `H` in their kernel. -/
+def xiSet (data : TypesIIIIIIVSetup M) : Set (IrreducibleCharacter ↥(huSub data)) :=
+  { χ | ¬ ((hInHu data : Set ↥(huSub data)) ⊆
+      OddOrder.Peterfalvi.S03.characterKernel (χ : ClassFunction ↥(huSub data) ℂ)) }
+
+/-- **Peterfalvi (9.5)'s family `𝒳(Y)`**: the members of `𝒳` containing `Y` in their kernel.  For
+`Y ≤ HU`, `Y` is realised inside `HU` as `(Y.subgroupOf M).subgroupOf (huSub data)`. -/
+def xiOf (data : TypesIIIIIIVSetup M) (Y : Subgroup G) :
+    Set (IrreducibleCharacter ↥(huSub data)) :=
+  { χ ∈ xiSet data | ((Y.subgroupOf M).subgroupOf (huSub data) : Set ↥(huSub data)) ⊆
+      OddOrder.Peterfalvi.S03.characterKernel (χ : ClassFunction ↥(huSub data) ℂ) }
+
+theorem xiOf_subset_xiSet (data : TypesIIIIIIVSetup M) (Y : Subgroup G) :
+    xiOf data Y ⊆ xiSet data :=
+  fun _ h => h.1
+
+theorem mem_xiOf {data : TypesIIIIIIVSetup M} {Y : Subgroup G}
+    {χ : IrreducibleCharacter ↥(huSub data)} :
+    χ ∈ xiOf data Y ↔ χ ∈ xiSet data ∧
+      ((Y.subgroupOf M).subgroupOf (huSub data) : Set ↥(huSub data)) ⊆
+        OddOrder.Peterfalvi.S03.characterKernel (χ : ClassFunction ↥(huSub data) ℂ) :=
+  Iff.rfl
+
+/-- `𝒳(Y)` is antitone in `Y`: a larger kernel demand `Y ⊆ Ker χ` selects fewer characters. -/
+theorem xiOf_antitone (data : TypesIIIIIIVSetup M) {Y Y' : Subgroup G} (hY : Y ≤ Y') :
+    xiOf data Y' ⊆ xiOf data Y := fun _ hχ =>
+  ⟨hχ.1, subset_trans (SetLike.coe_subset_coe.mpr
+    (Subgroup.subgroupOf_mono (huSub data) (Subgroup.subgroupOf_mono M hY))) hχ.2⟩
+
+/-- `Ind_{HU}^M χ`, the induction of a class function of `HU = H ⊔ U` to `↥M`.  The required
+`Invertible (Nat.card ↥HU : ℂ)` is constructed from `[Finite G]` and baked in here so that `sSet`
+and `sOf` share one canonical instance (avoiding the induce-instance desync). -/
+noncomputable def induceHU [Finite G] (data : TypesIIIIIIVSetup M)
+    (χ : ClassFunction ↥(huSub data) ℂ) : ClassFunction ↥M ℂ :=
+  letI : Fintype ↥M := Fintype.ofFinite _
+  letI : Invertible (Nat.card ↥(huSub data) : ℂ) :=
+    invertibleOfNonzero (Nat.cast_ne_zero.mpr Nat.card_pos.ne')
+  ClassFunction.induce (huSub data) χ
+
+/-- The induced degree: `(Ind_{HU}^M χ)(1) = [M : HU] · χ(1)` (Peterfalvi's `Ind` raises degrees by
+the index `[M : HU]`). -/
+theorem induceHU_apply_one [Finite G] (data : TypesIIIIIIVSetup M)
+    (χ : ClassFunction ↥(huSub data) ℂ) :
+    induceHU data χ (1 : ↥M) = ((huSub data).index : ℂ) * χ (1 : ↥(huSub data)) := by
+  letI : Fintype ↥M := Fintype.ofFinite _
+  letI : Invertible (Nat.card ↥(huSub data) : ℂ) :=
+    invertibleOfNonzero (Nat.cast_ne_zero.mpr Nat.card_pos.ne')
+  exact ClassFunction.induce_apply_one (huSub data) χ
+
+/-- **Peterfalvi (9.5)'s family `𝒮`**: `{Ind_{HU}^M χ | χ ∈ 𝒳}`. -/
+noncomputable def sSet [Finite G] (data : TypesIIIIIIVSetup M) : Set (ClassFunction ↥M ℂ) :=
+  { φ | ∃ χ ∈ xiSet data, φ = induceHU data (χ : ClassFunction ↥(huSub data) ℂ) }
+
+/-- **Peterfalvi (9.5)'s family `𝒮(Y)`**: `{Ind_{HU}^M χ | χ ∈ 𝒳(Y)}`. -/
+noncomputable def sOf [Finite G] (data : TypesIIIIIIVSetup M) (Y : Subgroup G) :
+    Set (ClassFunction ↥M ℂ) :=
+  { φ | ∃ χ ∈ xiOf data Y, φ = induceHU data (χ : ClassFunction ↥(huSub data) ℂ) }
+
+theorem mem_sSet [Finite G] {data : TypesIIIIIIVSetup M} {φ : ClassFunction ↥M ℂ} :
+    φ ∈ sSet data ↔ ∃ χ ∈ xiSet data, φ = induceHU data (χ : ClassFunction ↥(huSub data) ℂ) :=
+  Iff.rfl
+
+theorem mem_sOf [Finite G] {data : TypesIIIIIIVSetup M} {Y : Subgroup G}
+    {φ : ClassFunction ↥M ℂ} :
+    φ ∈ sOf data Y ↔ ∃ χ ∈ xiOf data Y, φ = induceHU data (χ : ClassFunction ↥(huSub data) ℂ) :=
+  Iff.rfl
+
+/-- `𝒮(Y) ⊆ 𝒮`: every character induced from `𝒳(Y)` is induced from `𝒳` (since `𝒳(Y) ⊆ 𝒳`). -/
+theorem sOf_subset_sSet [Finite G] (data : TypesIIIIIIVSetup M) (Y : Subgroup G) :
+    sOf data Y ⊆ sSet data := fun _ ⟨χ, hχ, hφ⟩ =>
+  ⟨χ, xiOf_subset_xiSet data Y hχ, hφ⟩
+
+/-- `𝒮(Y)` is antitone in `Y` (inherited from `xiOf_antitone`). -/
+theorem sOf_antitone [Finite G] (data : TypesIIIIIIVSetup M) {Y Y' : Subgroup G} (hY : Y ≤ Y') :
+    sOf data Y' ⊆ sOf data Y := fun _ ⟨χ, hχ, hφ⟩ =>
+  ⟨χ, xiOf_antitone data hY hχ, hφ⟩
+
 /-- The character-theoretic setup of Peterfalvi (9.5).
 
 `C`, `U'`, and `C'` denote the centralizer, commutator subgroup, and its
-intersection with `C` used in the text.  The sets `X`, `S`, `XOf`, and `SOf`
-record Peterfalvi's families of irreducible characters attached to subgroups
-between `H_0` and `H U`. -/
+intersection with `C` used in the text.  The families of irreducible characters
+`X`, `S`, `XOf`, and `SOf` are no longer free carrier fields: they are *genuine*
+definitions (`Section11CharacterData.X = xiSet data` etc.), so the (9.8)/(9.9)
+counts and (9.11) coherence are stated against Peterfalvi's honest families
+`𝒳 = {χ ∈ Irr(HU) | H ⊄ Ker χ}`, `𝒮 = Ind_{HU}^M 𝒳`, `𝒳(Y)`, `𝒮(Y)`. -/
 structure Section11CharacterData {M : Subgroup G} (data : TypesIIIIIIVSetup M)
     (chief : ChiefFactorData data) where
   C : Subgroup G
@@ -1492,13 +1593,42 @@ structure Section11CharacterData {M : Subgroup G} (data : TypesIIIIIIVSetup M)
   `[Finite G]`; it is definitionally the image used by `chiefFactor_caseB_image_*`. -/
   u_eq_card_quotient : u = Nat.card ↥(((quotientMulAutHom (N := chief.N) chief.N_aInvariant).comp
     (data.typeP.U.subgroupOf (data.typeP.U ⊔ data.typeP.W1)).subtype).range)
-  X : Set (ClassFunction ↥M ℂ)
-  S : Set (ClassFunction ↥M ℂ)
-  XOf : Subgroup G → Set (ClassFunction ↥M ℂ)
-  SOf : Subgroup G → Set (ClassFunction ↥M ℂ)
   H0CprimeSupport : Set ↥M
   tau : OddOrder.Peterfalvi.S07.IntegralCharacterMap ↥M G
   quotientSemidirectFrobenius : Prop
+
+namespace Section11CharacterData
+
+variable {M : Subgroup G} {data : TypesIIIIIIVSetup M} {chief : ChiefFactorData data}
+
+/-- The genuine family `𝒳 = {χ ∈ Irr(HU) | H ⊄ Ker χ}` (Peterfalvi (9.5)), pinned to `xiSet`. -/
+def X (_chars : Section11CharacterData data chief) : Set (IrreducibleCharacter ↥(huSub data)) :=
+  xiSet data
+
+/-- The genuine family `𝒳(Y) = {χ ∈ 𝒳 | Y ⊆ Ker χ}` (Peterfalvi (9.5)), pinned to `xiOf`. -/
+def XOf (_chars : Section11CharacterData data chief) (Y : Subgroup G) :
+    Set (IrreducibleCharacter ↥(huSub data)) :=
+  xiOf data Y
+
+/-- The genuine family `𝒮 = Ind_{HU}^M 𝒳` (Peterfalvi (9.5)), pinned to `sSet`. -/
+noncomputable def S [Finite G] (_chars : Section11CharacterData data chief) :
+    Set (ClassFunction ↥M ℂ) :=
+  sSet data
+
+/-- The genuine family `𝒮(Y) = Ind_{HU}^M 𝒳(Y)` (Peterfalvi (9.5)), pinned to `sOf`. -/
+noncomputable def SOf [Finite G] (_chars : Section11CharacterData data chief) (Y : Subgroup G) :
+    Set (ClassFunction ↥M ℂ) :=
+  sOf data Y
+
+@[simp] theorem X_eq (chars : Section11CharacterData data chief) : chars.X = xiSet data := rfl
+@[simp] theorem XOf_eq (chars : Section11CharacterData data chief) (Y : Subgroup G) :
+    chars.XOf Y = xiOf data Y := rfl
+@[simp] theorem S_eq [Finite G] (chars : Section11CharacterData data chief) :
+    chars.S = sSet data := rfl
+@[simp] theorem SOf_eq [Finite G] (chars : Section11CharacterData data chief) (Y : Subgroup G) :
+    chars.SOf Y = sOf data Y := rfl
+
+end Section11CharacterData
 
 /-- Case (a) of Peterfalvi (9.7): `H/H_0` splits as a direct product of `q`
 order-`p` factors permuted by `W_1`.

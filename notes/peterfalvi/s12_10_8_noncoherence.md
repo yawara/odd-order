@@ -362,3 +362,16 @@ Research-grade, multi-session.  **Full scoping + decomposition (sub-tasks A-D) =
 
 This session (cont.¹-⁵) took W3 from "(10.8) is a black-box estimate" to "(10.8)/(11.8) need only the
 §9 keystone (issue 2030)", proving the entire §7-input + line-83 + arithmetic spine en route.
+
+## 2026-06-27 (cont.⁶) — §9 keystone: character families genuinized (issue 2030, commit 9c41978a)
+
+First brick of the §9 keystone (issue 2030, the convergence point of (10.8)`hB`/(10.7) and (11.8)).
+`S11.Section11CharacterData`'s formerly free, scaffold-by-design character fields are now **genuine**:
+new sorry-free defs `xiSet` (𝒳={χ∈Irr(HU)|H⊄Ker χ}), `xiOf` (𝒳(Y)), `induceHU`/`induceHU_apply_one`
+(Ind_{HU}^M + degree), `sSet` (𝒮), `sOf` (𝒮(Y)) + foundational API; the carrier's `X`/`S`/`XOf`/`SOf`
+are replaced by namespace defs pinned to these (`S=sSet data` etc.).  ⟹ (9.8)/(9.9)/(9.10) counts and
+the (9.11) coherence consumer now reference Peterfalvi's **honest families** (previously unprovable
+against free fields).  Full build 3884 green; consumers (S12 `typeII_section11_coherence`,
+`sibleyTarget_H0C`) unaffected (signature-stable, no producer to break).  **Remaining §9** (issue 2030):
+genuinize carrier subgroups `C=C_U(H̄)`/`U'=[U,U]`/`C'=[C,C]` (fiddly prerequisite, doesn't unlock a
+proof; best bundled with the counts) + the deep Clifford/Dade proofs of (9.8)/(9.9)/(9.10).
