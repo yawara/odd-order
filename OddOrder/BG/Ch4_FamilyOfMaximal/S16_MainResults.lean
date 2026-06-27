@@ -2651,16 +2651,19 @@ theorem isTypeV_of_isTypeP1_mf_eq_msigma [Finite G]
     have hKNZ : K ≤ Subgroup.normalizer (Z : Set G) := hKM.trans hZnorm
     set Kstar : Subgroup G :=
       OddOrder.BG.Ch3.S10.Msigma M ⊓ Subgroup.centralizer (K : Set G) with hKstardef
-    -- (e2) vs (e3) dichotomy: `Z ⊓ K* = ⊥` (Frobenius, `|K| ∣ p − 1`) or `Z ≤ K*` (the deep
-    -- Singer/`p³` case `Z = Z₀ = K*`).
-    by_cases hZK : Z ⊓ Kstar = ⊥
-    · -- (e2): `K` acts Frobenius on `Z`, so `|W₁| = |K| ∣ p − 1`.
-      refine Or.inr (Or.inl ⟨p, hp, hHMF ▸ hpπ, ?_, hHMF ▸ hcyc⟩)
-      rw [hW1K]
-      exact kappaHall_card_dvd_sub_one_of_inf_kstar_eq_bot hG hM hP1.1 hKM hK hKstardef hU
-        hZMσ hZcard hKNZ hZK
-    · -- (e3): `Z ≤ K*` (`|O_p(M_F)| = p³`, `|W₁| ∣ p + 1`) — the deep Singer/`SL₂(p)` case
-      -- (Coq `defKs`/`defZP`/`rPle2`/`oZ0`, the genuinely-deep residual).
+    -- (e2) vs (e3) dichotomy on the Frobenius divisibility `|W₁| ∣ p − 1` (matching Coq's
+    -- `Ks = Z₀ → |K| ∣ p-1` split): if it holds, disjunct (e2) directly; otherwise the genuine
+    -- Singer/`SL₂(p)` case (e3), where the `K`-action on `Z` is *not* Frobenius so `Z ⊓ K* ≠ ⊥`,
+    -- i.e. `Z ≤ K* = Z₀ = Z(P)` (Coq `defKs`).
+    by_cases hdvd : Nat.card ↥data.W1 ∣ p - 1
+    · -- (e2): `|W₁| ∣ p − 1` directly (the cyclic `O_{p'}(M_F)` is `hcyc`).
+      exact Or.inr (Or.inl ⟨p, hp, hHMF ▸ hpπ, hdvd, hHMF ▸ hcyc⟩)
+    · -- (e3): `¬(|W₁| ∣ p − 1)`, the genuine Singer case.  Then `Z ⊓ K* ≠ ⊥` (else the Frobenius
+      -- engine `kappaHall_card_dvd_sub_one_of_inf_kstar_eq_bot` would give `|K| = |W₁| ∣ p − 1`),
+      -- hence `Z ≤ K* = Z₀ = Z(P)` (Coq `defKs`/`defZP`/`rPle2`/`oZ0`, the genuinely-deep residual).
+      have hZK : Z ⊓ Kstar ≠ ⊥ := fun h => hdvd
+        (hW1K ▸ kappaHall_card_dvd_sub_one_of_inf_kstar_eq_bot hG hM hP1.1 hKM hK hKstardef hU
+          hZMσ hZcard hKNZ h)
       refine Or.inr (Or.inr ⟨p, hp, hHMF ▸ hpπ, ?_, ?_, hHMF ▸ hcyc⟩)
       · sorry
       · sorry
