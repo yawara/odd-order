@@ -682,3 +682,42 @@ mathlib に `GaloisField` (F_{p²}) はあるが Singer torus/Schur/non-split to
 ポートを要する。次の上流ステップ候補: (a) `mFT_rank2_Sylow_cprod` (rank-2 Sylow cprod、narrow 特徴付け
 S05 + Blackburn を活用)、(b) SL₂∩Singer divisibility (F_{p²} non-split torus、`p3group_extraspecial` の
 extraspecial 構造を入力)。`p3group_extraspecial` は (b) の P-extraspecial 入力を供給する down-payment。
+
+### 2026-06-27⁸ (lane-f): disjunct 3 de-risk — 文献+Coq 精読で scope 大幅縮小 (ユーザー方針: 文献→Coq→必要なら ChatGPT)
+
+ユーザー裁可「まず文献と Coq で確認、gap が埋まらなければ ChatGPT」に従い disjunct 3 の 3 前提を精読。
+**「multi-week の §2/§10/appendix 未ポート」評価を訂正** — 主要機構はポート済で scope は大幅縮小:
+
+**重要訂正 1: `Aut_narrow` は appendix でなく BG §5、かつ完全ポート済**。
+`solvableAut_of_narrow` (`S05_NarrowAutomorphisms.lean:976` = BG Thm 5.5) が:
+- (a) A/O_p(A) abelian p'-群
+- **(b) `3 ≤ pRank R p → ∀ a:A, Coprime(orderOf a) p → orderOf a ∣ (p-1)`** ← Coq `rPle2` の核心
+- **(c) `(card A).Prime → ¬card A∣p(p-1) → card A ∣ (p+1)/2 ∧ (R=[R,A] ∧ ¬abelian R → card R = p³)`**
+を供給。⟹ **rPle2 (r(P)≤2) は Thm 5.5(b) で到達可能** (r(P)>2 ⟹ |K|∣p-1 で ¬|K|∣p-1 と矛盾)。
+
+**重要訂正 2: |P|=p³ は BG §4 Blackburn 部品で到達可能**。`S04f_Blackburn`:
+- `card_le_prime_cube_of_pRank_le_two_of_exponent_prime` (rank≤2 + exp p ⟹ card≤p³)
+- `omega1_large_card_eq_prime_cube_and_pow_eq_one` (p>3, rank≤2, |Ω₁|>p² ⟹ |Ω₁|=p³)
++ Thm 5.5(c) の `card R = p³`。`mFT_rank2_Sylow_cprod` (Coq §10.7b) も最終ステップで
+**`p3group_extraspecial` を使用** (BGsection10.v:717、`have[||[]]:=p3group_extraspecial pS`) = 私の
+`of_card_eq_prime_cube` が genuine prerequisite と裏付け。
+
+**残る真の gap = |K|∣p+1 (sorry 2)**: Coq は `repr_extraspecial_prime_sdprod_cycle` (BG §2.5 Thm 2.5,
+`BGsection2.v:580`) を使うが、これは **重い matrix 表現論** (`mx_irreducible`/`mx_Maschke`/`rfix_mx`/
+quasi-regular cyclic eigenspace Prop 2.4) で faithful ポートは大仕事 (S02_Representations は §2E stub)。
+**⟹ 回避ルート (route B) = 初等的 SL₂(p) symplectic torus 経路**:
+- P extraspecial p³ ⟹ V=P/Z(P)≅F_p² + 交換子 symplectic form。
+- K acts on V (共役)、K が Z(P) を中心化 ⟹ form 保存 ⟹ **K↪Sp₂(p)=SL₂(p)**。
+- prime action C_P(k)=Z(P) ⟹ K FPF on V (固有値1なし)。
+- K cyclic semisimple (coprime p) ⟹ split/non-split torus。¬|K|∣p-1 ⟹ non-split ⟹ **|K|∣p+1**。
+- `S7A1_JpGL2p` (Isaacs Ch07) の GL₂(p) 機構 (`card_gl2_zmod_prime`=p(p-1)²(p+1)、SL₂、`sl2_unique_involution`)
+  を活用。SL₂(p) torus 分類 (cyclic abelian ⟹ split∣p-1 / non-split∣p+1) を要形式化。
+
+**⟹ 改訂計画 (上流順、全て gap 埋まる、ChatGPT 不要)**:
+1. `IsNarrow p P` 確立 (P=O_p(M_F)、B=X₁×Z0 が p2maxElem rank 2 から) — Thm 5.5 適用の前提。
+2. K の P への faithful 作用 (K→MulAut P、C_K(P)=1) setup。
+3. rPle2: Thm 5.5(b) で r(P)≤2 (¬|K|∣p-1 contra)。
+4. |P|=p³: Blackburn (rank≤2 + nonabelian + |Z|=p) + `of_card_eq_prime_cube` で extraspecial。
+5. |K|∣p+1: route B (SL₂(p) symplectic torus、初等)。最大の残工。
+
+これは bounded な assembly + SL₂ torus 論で、「§2.5 repr の multi-week ポート」ではない。
