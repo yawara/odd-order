@@ -2507,6 +2507,92 @@ theorem characteristic_sup_hall_of_quotient_nilpotent {Γ : Type*} [Group Γ] [F
   rw [← QuotientGroup.comap_map_mk' N H]
   exact Subgroup.Characteristic.comap_quotient_mk hHbar_char
 
+/-- **`O_π(M) = O_π(N)`** when `N ◁ M` (in the ambient sense `M ≤ N_G(N)`) and `O_π(M) ≤ N`
+(BG Corollary 15.3 plumbing).  `O_π(M)` is a normal `π`-subgroup of `N`, so `≤ O_π(N)`;
+conversely `O_π(N)` is characteristic in `N`, hence (as `N ◁ M`) a normal `π`-subgroup of `M`,
+so `≤ O_π(M)`.  Used to identify `Q = O_q(M)` (which lies in `M_σ`) with `O_q(M_σ)`, which makes
+`Q.subgroupOf M_σ` characteristic in `↥M_σ`. -/
+theorem opiCoreInG_eq_of_normal_le [Finite G] {π : Set ℕ} {M N : Subgroup G}
+    (hNM : N ≤ M) (hMN : M ≤ Subgroup.normalizer (N : Set G))
+    (hQN : opiCoreInG π M ≤ N) :
+    opiCoreInG π M = opiCoreInG π N := by
+  refine le_antisymm ?_ ?_
+  · exact le_opiCoreInG_of_normal_of_isPiSubgroup hQN
+      ((Subgroup.normal_subgroupOf_iff_le_normalizer hQN).mpr
+        (hNM.trans (le_normalizer_opiCoreInG π M))) (isPiSubgroup_opiCoreInG π M)
+  · have hON_le_M : opiCoreInG π N ≤ M := (opiCoreInG_le π N).trans hNM
+    exact le_opiCoreInG_of_normal_of_isPiSubgroup hON_le_M
+      ((Subgroup.normal_subgroupOf_iff_le_normalizer hON_le_M).mpr
+        (le_normalizer_opiCoreInG_of_le_normalizer π hMN)) (isPiSubgroup_opiCoreInG π N)
+
+/-- **A characteristic subgroup of an `M`-normal subgroup is `M`-normal** (relative version of the
+private `normal_of_characteristic_subgroupOf`, for `N ◁ M` rather than `N ◁ G`).  If `N ≤ M` with
+`M ≤ N_G(N)`, `A ≤ N`, and `A.subgroupOf N` is characteristic in `↥N`, then `A.subgroupOf M` is
+normal in `↥M`.  Each `x ∈ M` restricts to an automorphism `ψ` of `↥N`; it fixes the characteristic
+`A.subgroupOf N`, so conjugation by `x` fixes `A = (A.subgroupOf N).map N.subtype`.  This lifts the
+`QH` characteristic-in-`M_σ` step (`characteristic_sup_hall_of_quotient_nilpotent`) to `QH ◁ M`. -/
+theorem normal_subgroupOf_of_characteristic_subgroupOf_le {M N A : Subgroup G}
+    (hNM : N ≤ M) (hMN : M ≤ Subgroup.normalizer (N : Set G)) (hAN : A ≤ N)
+    (hchar : (A.subgroupOf N).Characteristic) : (A.subgroupOf M).Normal := by
+  refine (Subgroup.normal_subgroupOf_iff_le_normalizer (hAN.trans hNM)).mpr ?_
+  intro x hx
+  rw [Subgroup.mem_normalizer_iff]
+  intro y
+  have hxN : x ∈ Subgroup.normalizer (N : Set G) := hMN hx
+  let ψ : MulAut ↥N := N.normalizerMonoidHom ⟨x, hxN⟩
+  have hAeq : (A.subgroupOf N).map N.subtype = A := Subgroup.map_subgroupOf_eq_of_le hAN
+  have hfix := Subgroup.characteristic_iff_comap_eq.mp hchar ψ
+  rw [← hAeq]
+  constructor
+  · rintro ⟨z, hz, rfl⟩
+    refine ⟨ψ z, ?_, ?_⟩
+    · have hzc : z ∈ (A.subgroupOf N).comap ψ.toMonoidHom := by rw [hfix]; exact hz
+      exact Subgroup.mem_comap.mp hzc
+    · change (ψ z : G) = x * (z : G) * x⁻¹
+      rfl
+  · intro hy
+    obtain ⟨z, hz, hz_eq⟩ := hy
+    have hyN : y ∈ N := (Subgroup.mem_normalizer_iff.mp hxN y).mpr (hz_eq ▸ z.2)
+    have hzy : z = ψ.toMonoidHom ⟨y, hyN⟩ := by
+      apply Subtype.ext; change (z : G) = x * y * x⁻¹; exact hz_eq
+    have hyc : (⟨y, hyN⟩ : ↥N) ∈ (A.subgroupOf N).comap ψ.toMonoidHom := by
+      rw [Subgroup.mem_comap, ← hzy]; exact hz
+    rw [hfix] at hyc
+    exact ⟨⟨y, hyN⟩, hyc, rfl⟩
+
+/-- **A normal `π`-subgroup is contained in every Hall `π`-subgroup** (finite group).  `L ⊔ K`
+is a `π`-group (`L` normal, so `↑L · ↑K = ↑(L ⊔ K)`), and `K` is a maximal `π`-subgroup (Hall),
+so `L ⊔ K = K`.  Dual of `isPiGroup_le_of_normal_isHallSubgroup` (which assumes the *Hall*
+subgroup normal); here the normal `π`-subgroup `L` need not be Hall and `K` need not be normal.
+Used in BG Corollary 15.3(b) to place `Q = O_q(M_σ) ≤ H` when `q ∈ π(H)`. -/
+theorem normal_isPiGroup_le_isHall {Γ : Type*} [Group Γ] [Finite Γ] {π : Set ℕ}
+    {L K : Subgroup Γ} [L.Normal] (hL : Ch03.Subgroup.IsPiGroup π L)
+    (hK : Ch03.IsHallSubgroup π K) : L ≤ K := by
+  have hSup_pi : Ch03.Subgroup.IsPiGroup π (L ⊔ K : Subgroup Γ) := by
+    intro r hr
+    rw [Nat.mem_primeFactors] at hr
+    obtain ⟨hr_prime, hr_dvd, _⟩ := hr
+    have h_card_eq : Nat.card ↥(L ⊔ K : Subgroup Γ) * Nat.card ↥(L ⊓ K : Subgroup Γ)
+        = Nat.card ↥L * Nat.card ↥K := by
+      have h_hk := Subgroup.card_HK_mul_card_inf_eq_card_mul_card L K
+      rwa [show (↑L * ↑K : Set Γ) = ↑(L ⊔ K : Subgroup Γ) from
+        (Subgroup.normal_mul L K).symm] at h_hk
+    have h_dvd_prod : r ∣ Nat.card ↥L * Nat.card ↥K := by
+      rw [← h_card_eq]; exact hr_dvd.mul_right _
+    rcases hr_prime.dvd_mul.mp h_dvd_prod with hL_dvd | hK_dvd
+    · exact hL r (Nat.mem_primeFactors.mpr ⟨hr_prime, hL_dvd, Nat.card_pos.ne'⟩)
+    · exact hK.1 r (Nat.mem_primeFactors.mpr ⟨hr_prime, hK_dvd, Nat.card_pos.ne'⟩)
+  have h_card_dvd : Nat.card ↥(L ⊔ K : Subgroup Γ) ∣ Nat.card ↥K :=
+    hK.card_dvd_of_isPiGroup hSup_pi
+  have h_card_ge : Nat.card ↥K ≤ Nat.card ↥(L ⊔ K : Subgroup Γ) :=
+    Nat.card_le_card_of_injective _ (Subgroup.inclusion_injective (le_sup_right (a := L)))
+  have h_sup_eq : (L ⊔ K : Subgroup Γ) = K :=
+    (Subgroup.eq_of_le_of_card_ge le_sup_right
+      (Nat.le_antisymm (Nat.le_of_dvd Nat.card_pos h_card_dvd) h_card_ge).le).symm
+  intro x hx
+  have hx_sup : x ∈ (L ⊔ K : Subgroup Γ) := Subgroup.mem_sup_left hx
+  rwa [h_sup_eq] at hx_sup
+
 /-- **§14-independent assembly engine for BG Corollary 15.3** (mmd L4204).  Packages the
 *logic* of Corollary 15.3 with its `§14`/`§15` inputs taken as named hypotheses, so that once
 those land (Lane H), the wrapper `mf_hall_centralizer_control` discharges each by a single
@@ -2575,24 +2661,6 @@ theorem mf_hall_centralizer_control_of_inputs [Finite G]
       have := mul_eq_one_iff_eq_inv.mp hwx1
       rw [this]; group
     rw [hyw, hwx]
-
-/-- **BG Corollary 15.3** (mmd L4204): for a nonidentity Hall subgroup `H` of `M_σ`,
-(a) `C_M(H) = C_{M_σ}(H)·X` with `X` a cyclic `τ₂(M)`-subgroup, and (b) any two elements
-of `H` conjugate in `G` are already conjugate in `N_M(H)` (`N_M(H)`-fusion control).
-
-Faithfulness fix (Lane G 2026-06-14): the previous scaffold here stated an unrelated
-centralizer-escape claim (`C_G(X) ≤ M ∨ …`), not the `C_M(H)`/fusion content the docstring
-("centralizer and conjugacy control") names; restated to mmd L4204. Uncited, sorry-neutral. -/
-theorem mf_hall_centralizer_control [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
-    {M H : Subgroup G} (hM : M ∈ maximalSubgroups G)
-    (hH : Ch03.IsHallSubgroup (S14.piSet H) (H.subgroupOf (OddOrder.BG.Ch3.S10.Msigma M)))
-    (hHne : H ≠ ⊥) :
-    (∃ X : Subgroup G, IsCyclic ↥X ∧ (↑(Nat.card ↥X).primeFactors ⊆ tau2 M) ∧
-      Subgroup.centralizer (H : Set G) ⊓ M =
-        (Subgroup.centralizer (H : Set G) ⊓ OddOrder.BG.Ch3.S10.Msigma M) ⊔ X) ∧
-    (∀ x ∈ H, ∀ y ∈ H, (∃ g : G, y = g * x * g⁻¹) →
-      ∃ n ∈ Subgroup.normalizer (H : Set G), y = n * x * n⁻¹) := by
-  sorry
 
 /-- **BG Corollary 15.3(a) for `H = M_σ`** (mmd L4204-4209), *sorry-free*.  The centralizer
 `C_M(M_σ)` decomposes as `(C_G(M_σ) ⊓ M_σ) ⊔ X` with `X` a cyclic `τ₂(M)`-subgroup.
@@ -3025,8 +3093,11 @@ theorem sylow_le_Msigma_of_le_centralizer_sylow [Finite G]
   · -- `q ∉ σ(M)`: derive a contradiction (so this branch is vacuous, but we conclude `≤ M_σ`).
     exfalso
     -- Corollary 15.3(a): `C_M(S) = C_{M_σ}(S) ⊔ X`, `X` cyclic with `π(X) ⊆ τ₂(M)`.
-    obtain ⟨⟨X, hXcyc, hXτ₂, hCeq⟩, _⟩ :=
-      mf_hall_centralizer_control hG hM
+    -- (Cite `mf_centralizer_hall_decomp` — the `ha` half of Corollary 15.3 — directly, since only
+    -- the centralizer decomposition is needed here; this keeps `sylow_le_Msigma` independent of the
+    -- full `mf_hall_centralizer_control` whose `hfratt` input lands later in the file.)
+    obtain ⟨X, hXcyc, hXτ₂, hCeq⟩ :=
+      mf_centralizer_hall_decomp hG hM hSMσ
         (sylow_isHall_piSet_subgroupOf_Msigma S hSne hSMσ) hSne
     set A : Subgroup G := Subgroup.centralizer (S : Set G) ⊓ OddOrder.BG.Ch3.S10.Msigma M with hA
     set C : Subgroup G := Subgroup.centralizer (S : Set G) ⊓ M with hC
@@ -9337,5 +9408,185 @@ theorem centralizer_escape_final_local [Finite G]
         ∃ r : ℕ, r.Prime ∧ r ∈ tau2 N ∧
           Subgroup.normalizer (Subgroup.closure ({x} : Set G)) ≤ E ⊓ N := by
   sorry
+
+/-- **The `hfratt` input of `mf_hall_centralizer_control_of_inputs`** (BG Corollary 15.3(b),
+mmd L4213): when a nonidentity Hall subgroup `H ≤ M_σ` is **not** normal in `M`, the Frattini
+factorization `M = N_M(H)·Q` holds for the normal `q`-subgroup `Q = O_q(M)`.
+
+Proof (BG L4213).  `H ⋬ M` forces `M_σ` non-nilpotent (`hall_subgroupOf_normal_of_msigma_nilpotent`),
+i.e. `M_F ≠ M_σ`, so `M` is type `P₁` (`isTypeP1_of_mf_ne_msigma`) and Theorem 15.2's machinery
+supplies the normal `q`-subgroup `Q = O_q(M) ≤ M_σ` with `M_σ/Q` nilpotent
+(`msigma_quotient_isNilpotent_of_inputs`).  Since `Q = O_q(M_σ)` (`opiCoreInG_eq_of_normal_le`),
+`Q.subgroupOf M_σ = O_q(↥M_σ)` is characteristic; with `M_σ/Q` nilpotent and `H` a Hall subgroup,
+`characteristic_sup_hall_of_quotient_nilpotent` makes `QH` characteristic in `M_σ`, hence (as
+`M_σ ◁ M`) `QH ◁ M` (`normal_subgroupOf_of_characteristic_subgroupOf_le`).  Finally `q ∉ π(H)`
+(else `Q = O_q(M_σ) ≤ H` by `normal_isPiGroup_le_isHall`, so `QH = H ◁ M`, contradiction), giving
+`Q ∩ H = 1` and `gcd(|Q|, |H|) = 1`, so the Frattini argument (`frattini_factorization`) applies. -/
+theorem hfratt_of_hall_not_normal [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M K Kstar H : Subgroup G}
+    (hM : M ∈ maximalSubgroups G) (hKM : K ≤ M)
+    (hK : Ch03.IsHallSubgroup (S14.kappa M) (K.subgroupOf M))
+    (hKstar : Kstar = OddOrder.BG.Ch3.S10.Msigma M ⊓ Subgroup.centralizer (K : Set G))
+    (hHMσ : H ≤ OddOrder.BG.Ch3.S10.Msigma M)
+    (hHhall : Ch03.IsHallSubgroup (S14.piSet H) (H.subgroupOf (OddOrder.BG.Ch3.S10.Msigma M)))
+    (hHne : H ≠ ⊥) (hHnotnorm : ¬ (H.subgroupOf M).Normal) :
+    ∃ Q : Subgroup G, Q ≤ M ∧ (Q.subgroupOf M).Normal ∧ Disjoint Q H ∧
+      ∀ m ∈ M, ∃ n a : G, n ∈ Subgroup.normalizer (H : Set G) ∧ a ∈ Q ∧ m = n * a := by
+  classical
+  haveI : IsSolvable ↥M := hG.solvable_of_mem_maximalSubgroups hM
+  have hMσM : OddOrder.BG.Ch3.S10.Msigma M ≤ M := OddOrder.BG.Ch3.S10.Msigma_le M
+  have hMnormMσ : M ≤ Subgroup.normalizer (OddOrder.BG.Ch3.S10.Msigma M : Set G) :=
+    OddOrder.GroupTheory.le_normalizer_opiCoreInG _ M
+  have hHM : H ≤ M := hHMσ.trans hMσM
+  -- `M_σ` not nilpotent (else `H ⊴ M`); `M_F ≠ M_σ`.
+  have hMσnotnil : ¬ Group.IsNilpotent ↥(OddOrder.BG.Ch3.S10.Msigma M) := fun hnil =>
+    hHnotnorm (hall_subgroupOf_normal_of_msigma_nilpotent hHMσ hHhall hnil)
+  have hne : MF M ≠ OddOrder.BG.Ch3.S10.Msigma M := fun heq =>
+    hMσnotnil ((maxNilpotentNormalHall_eq_Msigma_iff_isNilpotent hG hM).mp heq)
+  -- **Setup** (= the Theorem 15.2 `Q = O_q(M)` construction, mmd L4188-4202).
+  set q : ℕ := Nat.card ↥Kstar with hqdef
+  have hP1 : S14.IsTypeP1 M := isTypeP1_of_mf_ne_msigma hG hM hne
+  have hP : S14.IsTypeP M := hP1.1
+  have hq_prime : q.Prime := kstar_card_prime_of_inputs hG hM hP1 hKM hK hKstar
+  haveI : Fact q.Prime := ⟨hq_prime⟩
+  have hMσderived : OddOrder.BG.Ch3.S10.Msigma M = derivedInG M :=
+    typeP1_msigma_eq_derivedInG hG hM hP1 hKM hK hKstar
+  obtain ⟨hcomplDer, _, _⟩ := S14.typeP_duality hG hM hP hKM hK hKstar
+  have hcomplMσ : Subgroup.IsComplement' ((OddOrder.BG.Ch3.S10.Msigma M).subgroupOf M)
+      (K.subgroupOf M) := by rw [hMσderived]; exact hcomplDer
+  have hKstarMσ : Kstar ≤ OddOrder.BG.Ch3.S10.Msigma M := by rw [hKstar]; exact inf_le_left
+  have hqMσ : q ∣ Nat.card ↥(OddOrder.BG.Ch3.S10.Msigma M) := by
+    rw [hqdef]; exact Subgroup.card_dvd_of_le hKstarMσ
+  have hqσ : q ∈ OddOrder.BG.Ch3.S10.sigma M :=
+    OddOrder.BG.Ch3.S10.Msigma_isPiGroup M q
+      (Nat.mem_primeFactors.mpr ⟨hq_prime, hqMσ, Nat.card_pos.ne'⟩)
+  set Q : Subgroup G := opiCoreInG ({q} : Set ℕ) M with hQdef
+  have hQMσ : Q ≤ OddOrder.BG.Ch3.S10.Msigma M := by
+    rw [hQdef]; exact OddOrder.BG.Ch3.S10.opiCoreInG_singleton_le_Msigma_of_mem_sigma hqσ
+  have hMnormQ : M ≤ Subgroup.normalizer (Q : Set G) := by
+    rw [hQdef]; exact OddOrder.GroupTheory.le_normalizer_opiCoreInG _ M
+  have hQM : Q ≤ M := hQMσ.trans hMσM
+  have hcop_sub : Nat.Coprime (Nat.card ↥((OddOrder.BG.Ch3.S10.Msigma M).subgroupOf M))
+      (Nat.card ↥(K.subgroupOf M)) := by
+    have h := coprime_card_derived_kappaHall_of_isComplement' hK hcomplDer
+    rwa [hMσderived]
+  have hcond2 := actsPrimeManner_subgroupOf_of_typeP hG hM hP hKM hK hKstar
+  have hqG : (Nat.card ↥(OddOrder.BG.Ch3.S10.Msigma M
+      ⊓ Subgroup.centralizer (K : Set G))).Prime := by rw [← hKstar]; exact hq_prime
+  have hKstarQ : Kstar ≤ Q := by
+    have h := kstar_le_opiCore_of_inputs hG hM hKM hcomplMσ hcop_sub.symm hcond2 hne hqG
+    rw [← hKstar, ← hqdef, ← hQdef] at h; exact h
+  have hcopKMσ : Nat.Coprime (Nat.card ↥K) (Nat.card ↥(OddOrder.BG.Ch3.S10.Msigma M)) := by
+    have e1 : Nat.card ↥(K.subgroupOf M) = Nat.card ↥K :=
+      Nat.card_congr (Subgroup.subgroupOfEquivOfLe hKM).toEquiv
+    have e2 : Nat.card ↥((OddOrder.BG.Ch3.S10.Msigma M).subgroupOf M)
+        = Nat.card ↥(OddOrder.BG.Ch3.S10.Msigma M) :=
+      Nat.card_congr (Subgroup.subgroupOfEquivOfLe hMσM).toEquiv
+    rw [e1, e2] at hcop_sub; exact hcop_sub.symm
+  have hKMσdisj : Disjoint K (OddOrder.BG.Ch3.S10.Msigma M) := by
+    rw [disjoint_iff]
+    exact Subgroup.card_eq_one.mp (Nat.eq_one_of_dvd_coprimes hcopKMσ
+      (Subgroup.card_dvd_of_le inf_le_left) (Subgroup.card_dvd_of_le inf_le_right))
+  have hKne : K ≠ ⊥ := by
+    intro hK0
+    apply hMσnotnil
+    have hKstareq : Kstar = OddOrder.BG.Ch3.S10.Msigma M := by
+      rw [hKstar, hK0]
+      have hc : Subgroup.centralizer ((⊥ : Subgroup G) : Set G) = ⊤ := by
+        rw [Subgroup.coe_bot]; ext g; simp [Subgroup.mem_centralizer_iff]
+      rw [hc, inf_top_eq]
+    have hcardMσ : Nat.card ↥(OddOrder.BG.Ch3.S10.Msigma M) = q ^ 1 := by
+      rw [pow_one, hqdef, hKstareq]
+    exact (IsPGroup.of_card hcardMσ).isNilpotent
+  have hQpg : IsPGroup q ↥Q := by rw [hQdef]; exact isPGroup_opiCoreInG_singleton M
+  have hQneMσ : Q ≠ OddOrder.BG.Ch3.S10.Msigma M := by
+    intro hQeq; exact hMσnotnil (hQeq ▸ hQpg.isNilpotent)
+  -- **`M_σ/Q` nilpotent** (Theorem 15.2 chief-factor engine).
+  haveI hQnMσ : (Q.subgroupOf (OddOrder.BG.Ch3.S10.Msigma M)).Normal :=
+    (Subgroup.normal_subgroupOf_iff_le_normalizer hQMσ).mpr (hMσM.trans hMnormQ)
+  haveI hNilMσQ : Group.IsNilpotent (↥(OddOrder.BG.Ch3.S10.Msigma M) ⧸
+      Q.subgroupOf (OddOrder.BG.Ch3.S10.Msigma M)) :=
+    msigma_quotient_isNilpotent_of_inputs hG hM hP hKM hK hKstar hQMσ hMnormQ hKstarQ hQneMσ hKne
+      hKMσdisj hcopKMσ
+  -- **`Q = O_q(M_σ)`**, so `Q.subgroupOf M_σ` is characteristic in `↥M_σ`.
+  have hQeqMσ : opiCoreInG ({q} : Set ℕ) M = opiCoreInG ({q} : Set ℕ)
+      (OddOrder.BG.Ch3.S10.Msigma M) :=
+    opiCoreInG_eq_of_normal_le hMσM hMnormMσ (hQdef ▸ hQMσ)
+  haveI hQchar : (Q.subgroupOf (OddOrder.BG.Ch3.S10.Msigma M)).Characteristic := by
+    rw [hQdef, hQeqMσ, OddOrder.BG.Ch3.S10.opiCoreInG_subgroupOf]
+    exact Ch03.oPiCore.characteristic _ _
+  -- **`QH ◁ M`**: `QH` characteristic in `M_σ`, lifted along `M_σ ◁ M`.
+  have hQHchar : (Q.subgroupOf (OddOrder.BG.Ch3.S10.Msigma M)
+      ⊔ H.subgroupOf (OddOrder.BG.Ch3.S10.Msigma M)).Characteristic :=
+    characteristic_sup_hall_of_quotient_nilpotent hNilMσQ hHhall
+  have hQHnorm : ((Q ⊔ H).subgroupOf M).Normal := by
+    refine normal_subgroupOf_of_characteristic_subgroupOf_le hMσM hMnormMσ
+      (sup_le hQMσ hHMσ) ?_
+    rw [Subgroup.subgroupOf_sup hQMσ hHMσ]; exact hQHchar
+  -- **`q ∉ π(H)`** (else `Q ≤ H` and `QH = H ◁ M`).
+  have hqnotπH : q ∉ S14.piSet H := by
+    intro hqπ
+    apply hHnotnorm
+    have hQsub_pi : Ch03.Subgroup.IsPiGroup (S14.piSet H)
+        (Q.subgroupOf (OddOrder.BG.Ch3.S10.Msigma M)) := by
+      intro r hr
+      rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hQMσ).toEquiv] at hr
+      obtain ⟨n, hn⟩ := hQpg.exists_card_eq
+      rw [hn, Nat.mem_primeFactors] at hr
+      have hrq : r = q := (Nat.prime_dvd_prime_iff_eq hr.1 hq_prime).mp
+        (hr.1.dvd_of_dvd_pow hr.2.1)
+      rw [hrq]; exact hqπ
+    have hQH_sub := normal_isPiGroup_le_isHall hQsub_pi hHhall
+    have hQH : Q ≤ H := by
+      have hmap := Subgroup.map_mono (f := (OddOrder.BG.Ch3.S10.Msigma M).subtype) hQH_sub
+      rwa [Subgroup.map_subgroupOf_eq_of_le hQMσ, Subgroup.map_subgroupOf_eq_of_le hHMσ] at hmap
+    exact (sup_eq_right.mpr hQH) ▸ hQHnorm
+  -- **`Q ∩ H = 1`, coprime orders, Frattini.**
+  have hqndvdH : ¬ q ∣ Nat.card ↥H := fun hdvd => hqnotπH (by
+    rw [S14.piSet, Set.mem_setOf_eq]
+    exact Nat.mem_primeFactors.mpr ⟨hq_prime, hdvd, Nat.card_pos.ne'⟩)
+  have hcopQH : Nat.Coprime (Nat.card ↥Q) (Nat.card ↥H) := by
+    obtain ⟨n, hn⟩ := hQpg.exists_card_eq
+    rw [hn]; exact ((Nat.Prime.coprime_iff_not_dvd hq_prime).mpr hqndvdH).pow_left n
+  have hdisjQH : Disjoint Q H := by
+    rw [disjoint_iff]
+    exact Subgroup.card_eq_one.mp (Nat.eq_one_of_dvd_coprimes hcopQH
+      (Subgroup.card_dvd_of_le inf_le_left) (Subgroup.card_dvd_of_le inf_le_right))
+  have hQnorm : (Q.subgroupOf M).Normal :=
+    (Subgroup.normal_subgroupOf_iff_le_normalizer hQM).mpr hMnormQ
+  exact ⟨Q, hQM, hQnorm, hdisjQH,
+    frattini_factorization hQM hHM hQnorm hQHnorm hdisjQH hcopQH ‹IsSolvable ↥M›⟩
+
+/-- **BG Corollary 15.3** (mmd L4204): for a nonidentity Hall subgroup `H` of `M_σ`,
+(a) `C_M(H) = C_{M_σ}(H)·X` with `X` a cyclic `τ₂(M)`-subgroup, and (b) any two elements of `H`
+conjugate in `G` are already conjugate in `N_M(H)` (`N_M(H)`-fusion control).
+
+*sorry-free.*  Discharges the three inputs of `mf_hall_centralizer_control_of_inputs`:
+* `ha` ← `mf_centralizer_hall_decomp` (Proposition 14.2(b1)(e) + Lemma 15.1(c));
+* `hconj` ← `mf_hall_conj_realized_in_M` (Theorem 14.4 + `N_G(M) = M`);
+* `hfratt` ← `hfratt_of_hall_not_normal` (Theorem 15.2's normal `Q = O_q(M)` with `M_σ/Q`
+  nilpotent, then the Frattini argument), with a `κ(M)`-Hall `K` produced from the trivial
+  `κ`-witness `⊥` (`exists_isHallSubgroup_kappa_ge`).
+
+The `H ≤ M_σ` hypothesis (BG: "`H` a Hall subgroup of `M_σ`") is what the inputs require;
+consumers (Corollary 15.4 in `nilpotent_hall_embeds_in_msigma`, Theorem I in §16) supply it
+after placing `H ≤ M_σ`. -/
+theorem mf_hall_centralizer_control [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    {M H : Subgroup G} (hM : M ∈ maximalSubgroups G)
+    (hHMσ : H ≤ OddOrder.BG.Ch3.S10.Msigma M)
+    (hH : Ch03.IsHallSubgroup (S14.piSet H) (H.subgroupOf (OddOrder.BG.Ch3.S10.Msigma M)))
+    (hHne : H ≠ ⊥) :
+    (∃ X : Subgroup G, IsCyclic ↥X ∧ (↑(Nat.card ↥X).primeFactors ⊆ tau2 M) ∧
+      Subgroup.centralizer (H : Set G) ⊓ M =
+        (Subgroup.centralizer (H : Set G) ⊓ OddOrder.BG.Ch3.S10.Msigma M) ⊔ X) ∧
+    (∀ x ∈ H, ∀ y ∈ H, (∃ g : G, y = g * x * g⁻¹) →
+      ∃ n ∈ Subgroup.normalizer (H : Set G), y = n * x * n⁻¹) := by
+  refine mf_hall_centralizer_control_of_inputs (hHMσ.trans (OddOrder.BG.Ch3.S10.Msigma_le M))
+    (mf_centralizer_hall_decomp hG hM hHMσ hH hHne)
+    (mf_hall_conj_realized_in_M hG (dummySigmaDecomposition G) hM hHMσ) ?_
+  intro hHnotnorm
+  obtain ⟨K, hKM, hK, -⟩ := exists_isHallSubgroup_kappa_ge hG hM (X := ⊥) bot_le (by
+    intro q hq; rw [Subgroup.card_bot] at hq; simp at hq)
+  exact hfratt_of_hall_not_normal hG hM hKM hK rfl hHMσ hH hHne hHnotnorm
 
 end OddOrder.BG.Ch4.S15
