@@ -1569,6 +1569,26 @@ theorem sOf_antitone [Finite G] (data : TypesIIIIIIVSetup M) {Y Y' : Subgroup G}
     sOf data Y' ⊆ sOf data Y := fun _ ⟨χ, hχ, hφ⟩ =>
   ⟨χ, xiOf_antitone data hY hχ, hφ⟩
 
+/-- Every `𝒮`-member is a genuine virtual character of `M`: `Ind_{HU}^M χ ∈ ℤ[Irr M]` for
+`χ ∈ Irr(HU)` (`ClassFunction.induce_mem_ZIrr`).  This is the foundation on which the (9.8)/(9.9)
+degree and inner-product counts treat `𝒮`-members as characters. -/
+theorem induceHU_mem_ZIrr [Finite G] (data : TypesIIIIIIVSetup M)
+    (χ : IrreducibleCharacter ↥(huSub data)) :
+    induceHU data (χ : ClassFunction ↥(huSub data) ℂ) ∈ ZIrr ↥M := by
+  letI : Fintype ↥M := Fintype.ofFinite _
+  letI : Fintype ↥(huSub data) := Fintype.ofFinite _
+  letI : Invertible (Nat.card ↥M : ℂ) :=
+    invertibleOfNonzero (Nat.cast_ne_zero.mpr Nat.card_pos.ne')
+  letI : Invertible (Nat.card ↥(huSub data) : ℂ) :=
+    invertibleOfNonzero (Nat.cast_ne_zero.mpr Nat.card_pos.ne')
+  exact ClassFunction.induce_mem_ZIrr (huSub data) χ.mem_ZIrr
+
+/-- `𝒮 ⊆ ℤ[Irr M]`: the whole induced family consists of virtual characters of `M`. -/
+theorem sSet_subset_ZIrr [Finite G] (data : TypesIIIIIIVSetup M) :
+    sSet data ⊆ (ZIrr ↥M : Set (ClassFunction ↥M ℂ)) := by
+  rintro _ ⟨χ, -, rfl⟩
+  exact induceHU_mem_ZIrr data χ
+
 /-! ### The genuine subgroups `C = C_U(H̄)`, `U' = [U,U]`, `C' = [C,C]` of Peterfalvi (9.5) -/
 
 /-- The `U`-action on the chief factor `H̄ = ↥H ⧸ N` (Peterfalvi (9.5)), as the hom from `U` (realised
@@ -2688,7 +2708,10 @@ theorem caseB_character_counts [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G
     {M : Subgroup G} {data : TypesIIIIIIVSetup M} {chief : ChiefFactorData data}
     (chars : Section11CharacterData data chief) (caseB : CliffordCaseBData chars) :
     chars.u ∣ data.q * chars.u ∧
-      (∃ χ ∈ chars.SOf chars.Cprime, χ 1 = ((chars.u : ℕ) : ℂ)) ∧
+      -- `𝒮(C')` is the *induced* family, so its members have degree `[M:HU]·u = qu`
+      -- (Peterfalvi's degree-`u` characters live in `𝒳(H₀C')`; their inductions have degree `qu`,
+      -- matching (9.8.c) and the (9.10) hypothesis).  See issue 2030 count-statement audit.
+      (∃ χ ∈ chars.SOf chars.Cprime, χ 1 = ((data.q * chars.u : ℕ) : ℂ)) ∧
       (chars.SOf chief.H0).ncard = chief.p - 1 ∧
       ((chars.SOf chars.Cprime).ncard = 0 →
         chars.C = ⊥ ∧ chars.u = (chief.p ^ data.q - 1) / (chief.p - 1)) := by
