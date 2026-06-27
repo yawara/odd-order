@@ -2708,7 +2708,10 @@ theorem caseB_character_counts [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G
     {M : Subgroup G} {data : TypesIIIIIIVSetup M} {chief : ChiefFactorData data}
     (chars : Section11CharacterData data chief) (caseB : CliffordCaseBData chars) :
     chars.u ∣ data.q * chars.u ∧
-      (∃ χ ∈ chars.SOf chars.Cprime, χ 1 = ((chars.u : ℕ) : ℂ)) ∧
+      -- `𝒮(C')` is the *induced* family, so its members have degree `[M:HU]·u = qu`
+      -- (Peterfalvi's degree-`u` characters live in `𝒳(H₀C')`; their inductions have degree `qu`,
+      -- matching (9.8.c) and the (9.10) hypothesis).  See issue 2030 count-statement audit.
+      (∃ χ ∈ chars.SOf chars.Cprime, χ 1 = ((data.q * chars.u : ℕ) : ℂ)) ∧
       (chars.SOf chief.H0).ncard = chief.p - 1 ∧
       ((chars.SOf chars.Cprime).ncard = 0 →
         chars.C = ⊥ ∧ chars.u = (chief.p ^ data.q - 1) / (chief.p - 1)) := by
