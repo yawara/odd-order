@@ -105,7 +105,28 @@ wrapper `mf_hall_centralizer_control` (S15:2483, sorry) は 3 input を discharg
       wrapper に `hHMσ : H ≤ Msigma M` を追加要 (consumer S16:2890 [lane-f hot] + S15:2795 [lane-c] の
       call site に 1 引数追加; S16 編集 = lane-f 調整要)。
 
-## 完了条件
+## ✅ 完了 (2026-06-27, commit b9061586) — CLOSED
+
+**`mf_hall_centralizer_control` (BG Cor 15.3) 完全 sorry-free + axiom-clean** 化で完了条件達成。
+`#print axioms mf_hall_centralizer_control` = `[propext, Classical.choice, Quot.sound]`
+⟹ 依存する §14/§15 チェーン全体が sorry-free。
+
+実装 (S15_MF, 全 sorry-free + axiom-clean, AxiomsCheck 登録):
+- **hfratt = `hfratt_of_hall_not_normal`** (上記 step 1-5 を実証明)。step 3 は推奨経路 (A) を採用:
+  Q=O_q(M_σ) を新 `opiCoreInG_eq_of_normal_le` で同定 → `opiCoreInG_subgroupOf` で
+  Q.subgroupOf M_σ = oPiCore = characteristic → `characteristic_sup_hall_of_quotient_nilpotent`
+  (前セッションの QH 核) で QH char in M_σ → 新 `normal_subgroupOf_of_characteristic_subgroupOf_le`
+  (M_σ◁M 相対 char→normal lift, private `normal_of_characteristic_subgroupOf` の public 版) で QH◁M。
+  step 4 の Q≤H は新 `normal_isPiGroup_le_isHall` (normal π ⊆ Hall π)。
+- **3 input wire + wrapper sorry-free**: ha=`mf_centralizer_hall_decomp`, hconj=`mf_hall_conj_realized_in_M`
+  (+`dummySigmaDecomposition`), hfratt (K は ⊥-witness で `exists_isHallSubgroup_kappa_ge`)。
+- **wrapper signature gap 解消**: `hHMσ : H ≤ Msigma M` 追加。S15 consumer
+  `sylow_le_Msigma_of_le_centralizer_sylow` は wrapper `.1` のみ使用ゆえ `mf_centralizer_hall_decomp`
+  直接 cite に切替 (wrapper 末尾移動を可能化); S16 (lane-f) は既 bind 済 `hHMσ` を 1-arg 追加。
+
+⟹ BG Theorem I (first assertion) fusion gate 解消 → Pf (8.8) → `theorem88_caseB_holds`。full build 3884 green。
+
+## 完了条件 (達成済)
 
 `mf_hall_centralizer_control` が sorry-free ⟹ BG Theorem I (first assertion) の fusion gate 解消
 → Pf (8.8) dichotomy → `theorem88_caseB_holds` (FT endpoint) の (8.8) 入力に前進。
