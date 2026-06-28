@@ -2587,6 +2587,11 @@ set_option linter.style.longLine false in
 -- `equivLinearMapAsModule` + `LinearEquiv.ofInjective` + `char_iso`); issue 2031 補題4 core.
 #assert_only_allowed_axioms
   OddOrder.RepresentationTheory.exists_simpleSubmodule_character_eq_of_ne_zero_intertwiner
+-- **Clifford's theorem, single-orbit (character level)** ([Is] Thm 6.5, first clause): for a
+-- `G`-irreducible χ and `H ⊴ G`, the constituents of `Res^G_H χ` form a single `G`-conjugation
+-- orbit.  Discharges the `RestrictionConstituentsSingleOrbit` scaffold hypothesis (issue 2031).
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.restrictionConstituentsSingleOrbit_of_isIrreducible
 
 -- Peterfalvi (6.8) T6/Y-family consumer side: degree-one induced families have common degree,
 -- supported differences on `H#`, irreducibility from c1/c2 inertia, and equal-degree coherence.

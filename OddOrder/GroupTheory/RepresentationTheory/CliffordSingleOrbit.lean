@@ -4,6 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
 import OddOrder.GroupTheory.RepresentationTheory.CliffordConjugateChar
+import OddOrder.GroupTheory.RepresentationTheory.Clifford
 
 /-!
 # Clifford's theorem: the constituents of a restriction form a single conjugation orbit
@@ -102,5 +103,62 @@ theorem exists_simpleSubmodule_character_eq_of_ne_zero_intertwiner [FiniteDimens
       (equivOfAsModuleEquiv
         ((subRepAsModuleEquiv (resRep ρ H) (LinearMap.range fam)).symm.trans
           (LinearEquiv.ofInjective fam hinj).symm))
+
+set_option backward.isDefEq.respectTransparency false in
+/-- **Clifford's theorem, single-orbit (character level)** ([Isaacs] Thm 6.5, first clause): for a
+`G`-irreducible character `χ` and a normal subgroup `H ⊴ G`, the irreducible constituents of
+`Res^G_H χ` form a single `G`-conjugation orbit.  This discharges the
+`RestrictionConstituentsSingleOrbit` hypothesis that `clifford_decomposition` was parametrized on,
+and is the input the (9.9.a) Clifford-degree assembly needs (with
+`hasCommonRestrictionMultiplicity_of_singleOrbit`).
+
+Proof: realize `χ` by a `G`-irreducible `ρ`.  A constituent `ψ` of `Res χ` has nonzero restriction
+multiplicity, hence (`restrictionMultiplicity_eq_finrank_intertwiningMap`) a nonzero `H`-intertwiner
+`σ_ψ → Res ρ`, which (`exists_simpleSubmodule_character_eq_of_ne_zero_intertwiner`) yields a simple
+`k[H]`-submodule `N_ψ` of `Res ρ` with `χ_{N_ψ} = ψ`.  For two constituents `θ`, `η` the submodules
+`N_θ`, `N_η` are `G`-conjugate (`character_conj_of_simpleSubmodule`), giving `g` with
+`θ(h) = η(g⁻¹ h g)`, i.e. `conjBy g θ = η`. -/
+theorem restrictionConstituentsSingleOrbit_of_isIrreducible
+    {H : Subgroup G} [hH : H.Normal] [Fintype ↥H] [Invertible (Nat.card ↥H : ℂ)]
+    (χ : IrreducibleCharacter G) :
+    IrreducibleCharacter.RestrictionConstituentsSingleOrbit (G := G) (H := H) χ := by
+  classical
+  obtain ⟨V, _, _, _, ρ, hρirr, hρchar⟩ := χ.isIrreducible
+  haveI := hρirr
+  -- Every constituent `ψ` of `Res χ` is the character of a simple `k[H]`-submodule of `Res ρ`.
+  have wrapper : ∀ ψ : IrreducibleCharacter ↥H, IrreducibleCharacter.LiesOver (G := G) (H := H) χ ψ →
+      ∃ N : Submodule ℂ[↥H] (resRep ρ H).asModule, IsSimpleModule ℂ[↥H] ↥N ∧
+        ((Subrepresentation.ofSubmodule' N).toRepresentation).character
+          = (ψ : ClassFunction ↥H ℂ) := by
+    intro ψ hψ
+    obtain ⟨W, _, _, _, σ, hσirr, hσchar⟩ := ψ.isIrreducible
+    haveI := hσirr
+    have hfr := ClassFunction.restrictionMultiplicity_eq_finrank_intertwiningMap (H := H) ρ σ hρchar hσchar
+    have hfr_ne : Module.finrank ℂ (Representation.IntertwiningMap σ (ρ.comp H.subtype)) ≠ 0 :=
+      fun h0 => hψ (by rw [hfr, h0, Nat.cast_zero])
+    haveI : Nontrivial (Representation.IntertwiningMap σ (ρ.comp H.subtype)) :=
+      Module.nontrivial_of_finrank_pos (Nat.pos_of_ne_zero hfr_ne)
+    obtain ⟨f, hf⟩ := exists_ne (0 : Representation.IntertwiningMap σ (ρ.comp H.subtype))
+    obtain ⟨N, hNsimple, hNchar⟩ :=
+      exists_simpleSubmodule_character_eq_of_ne_zero_intertwiner ρ σ hf
+    exact ⟨N, hNsimple, hNchar.trans hσchar.symm⟩
+  intro θ η hθ hη
+  obtain ⟨Nθ, hNθsimple, hNθchar⟩ := wrapper θ hθ
+  obtain ⟨Nη, hNηsimple, hNηchar⟩ := wrapper η hη
+  haveI := hNθsimple
+  haveI := hNηsimple
+  have hNη_ne : Nη ≠ ⊥ := Nη.nontrivial_iff_ne_bot.mp (IsSimpleModule.nontrivial ℂ[↥H] ↥Nη)
+  obtain ⟨g, hg⟩ := character_conj_of_simpleSubmodule ρ Nη Nθ hNη_ne
+  -- `hg : χ_{N_θ} = fun h => χ_{N_η} (g⁻¹ h g)`; substitute the constituent characters.
+  rw [hNθchar, hNηchar] at hg
+  refine ⟨g, ?_⟩
+  apply IrreducibleCharacter.ext
+  ext h
+  rw [IrreducibleCharacter.coe_conjBy, ClassFunction.conjBy_apply]
+  -- `θ(g h g⁻¹) = η(h)`: rewrite `θ` via `hg`, then `g⁻¹ (g h g⁻¹) g = h`.
+  rw [hg]
+  refine congrArg _ (Subtype.ext ?_)
+  simp only [conjNormalMulAut_apply_coe]
+  group
 
 end OddOrder.RepresentationTheory
