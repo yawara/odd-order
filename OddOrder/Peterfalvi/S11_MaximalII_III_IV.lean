@@ -1872,6 +1872,14 @@ structure CliffordCaseBData {M : Subgroup G} {data : TypesIIIIIIVSetup M}
   Ubar_cyclic_holds : Ubar_cyclic
   u_coprime_p_sub_one : Nat.Coprime chars.u (chief.p - 1)
   u_dvd_norm_quotient : chars.u ∣ (chief.p ^ data.q - 1) / (chief.p - 1)
+  /-- The defining property of case (b): `U` acts **irreducibly** on the chief factor `H̄ = H/H_0`,
+  i.e. the only `U`-invariant subgroups of `H̄` are `⊥` and `⊤`.  Stated `Finite`-freely via the
+  `U`-action hom `uActionHom` (definitionally `(typeP_quotientCoprimeAction …).φ.comp (…).U.subtype`,
+  which needs `[Finite G]`).  This is the hypothesis the Clifford degree analysis (9.8.c)/(9.9.a)
+  consumes through `inertia_eq_hcInHu` (it computes the inertia group `I_{HU}(θ₀) = HC` of a
+  nontrivial chief-factor character). -/
+  actsIrreducibly : ∀ J : Subgroup (↥data.H ⧸ chief.N),
+      IsAInvariant (uActionHom data chief) J → J = ⊥ ∨ J = ⊤
 
 /-- **Peterfalvi (9.6)**: after choosing `H_0`, the induced `U`-action is non-trivial (`U` does not
 centralize `H`), `H̄ = H/H_0` is a chief factor of `M`, `|H̄| = p^q`, and (types III/IV) `|W_2| = p`.
@@ -3234,6 +3242,7 @@ noncomputable def clifford_caseB_data [Finite G] {M : Subgroup G}
     rw [chars.u_eq_card_quotient]; exact chiefFactor_caseB_image_coprime chief hcaseB
   u_dvd_norm_quotient := by
     rw [chars.u_eq_card_quotient]; exact chiefFactor_caseB_image_dvd_norm chief hcaseB
+  actsIrreducibly := hcaseB
 
 /-- **Peterfalvi (9.7) case (a) carrier.**  When `H̄` contains a `U`-invariant order-`p` factor `S₀`
 (Clifford case (a), the right branch of `chiefFactor_clifford_U_dichotomy`), the chief factor splits

@@ -2613,6 +2613,11 @@ set_option linter.style.longLine false in
   OddOrder.RepresentationTheory.coe_eq_induce_of_liesOver_of_isIrreducibleCharacter_induce
 #assert_only_allowed_axioms
   OddOrder.RepresentationTheory.apply_one_eq_index_mul_of_liesOver_of_isIrreducibleCharacter_induce
+-- **Constituent degree bound**: an irreducible `χ` lying over `ψ ∈ Irr I` has degree `χ(1) ≤
+-- (Ind_I^G ψ)(1)` (genuine-character Fourier expansion + nonneg multiplicities).  Unlike the Clifford
+-- correspondence it needs no irreducibility of `Ind ψ`; it forces `e = 1` in (9.9.a) (issue 2031).
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.apply_one_le_induce_apply_one_of_liesOver
 
 -- Peterfalvi (6.8) T6/Y-family consumer side: degree-one induced families have common degree,
 -- supported differences on `H#`, irreducibility from c1/c2 inertia, and equal-degree coherence.

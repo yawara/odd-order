@@ -267,4 +267,93 @@ theorem apply_one_eq_index_mul_of_liesOver_of_isIrreducibleCharacter_induce
   rw [coe_eq_induce_of_liesOver_of_isIrreducibleCharacter_induce χ ψ hind hover,
     ClassFunction.induce_apply_one]
 
+open scoped ComplexOrder in
+/-- **Constituent degree bound.**  If an irreducible character `χ` of `G` lies over an irreducible
+character `ψ` of a subgroup `I ≤ G` (equivalently, `χ` is a constituent of the induced character
+`Ind_I^G ψ`), then `χ(1) ≤ (Ind_I^G ψ)(1)`.
+
+The induced character is a genuine character, hence a non-negative integer combination
+`Ind_I^G ψ = ∑_η ⟨Ind ψ, η⟩ · η` over `Irr G` (`sum_inner_irreducibleCharacter_smul`).  Frobenius
+reciprocity (`inner_induce_eq_inner_restrict`) identifies each coefficient `⟨Ind ψ, η⟩` with the
+non-negative integer restriction multiplicity `⟨Res η, ψ⟩` (`restrictionMultiplicity_natCast`), so
+evaluating at `1` every summand `⟨Ind ψ, η⟩ · η(1)` is `≥ 0`; the `χ`-summand is
+`≥ 1 · χ(1) = χ(1)` because `χ` occurs with multiplicity `≥ 1`.
+
+Unlike `coe_eq_induce_of_liesOver_of_isIrreducibleCharacter_induce` (which needs `Ind ψ` to be
+*irreducible*), this only needs the lies-over relation.  Peterfalvi uses it in (9.8.c)/(9.9.a):
+together with the Clifford lower bound `χ(1) = e · [G:I_G(θ₀)] · θ₀(1)` it forces the constituent
+multiplicity `e = 1`, so an `H₀C'`-kernel character of `HU` has degree exactly `[HU:HC] = u`. -/
+theorem apply_one_le_induce_apply_one_of_liesOver
+    [Fintype G] [Invertible (Nat.card G : ℂ)] [Fintype (IrreducibleCharacter G)]
+    {I : Subgroup G} [Fintype ↥I] [Invertible (Nat.card ↥I : ℂ)]
+    (χ : IrreducibleCharacter G) (ψ : IrreducibleCharacter ↥I)
+    (hover : IrreducibleCharacter.LiesOver I χ ψ) :
+    (χ : ClassFunction G ℂ) (1 : G) ≤
+      ClassFunction.induce I (ψ : ClassFunction ↥I ℂ) (1 : G) := by
+  classical
+  -- For each irreducible `η` of `G`, the coefficient `⟨Ind ψ, η⟩` equals the restriction
+  -- multiplicity `⟨Res η, ψ⟩` (Frobenius + the real-valuedness of the multiplicity).
+  have hcoeff : ∀ η : IrreducibleCharacter G,
+      ClassFunction.inner (ClassFunction.induce I (ψ : ClassFunction ↥I ℂ))
+          (η : ClassFunction G ℂ)
+        = ClassFunction.restrictionMultiplicity I (η : ClassFunction G ℂ)
+            (ψ : ClassFunction ↥I ℂ) := by
+    intro η
+    obtain ⟨k, hk⟩ := IrreducibleCharacter.restrictionMultiplicity_natCast (H := I) η ψ
+    rw [ClassFunction.inner_induce_eq_inner_restrict I (ψ : ClassFunction ↥I ℂ)
+        (η : ClassFunction G ℂ),
+      inner_conj_symm (ClassFunction.restrict I (η : ClassFunction G ℂ))
+        (ψ : ClassFunction ↥I ℂ)]
+    show star (ClassFunction.restrictionMultiplicity I (η : ClassFunction G ℂ)
+        (ψ : ClassFunction ↥I ℂ)) = _
+    rw [hk, star_natCast]
+  -- Fourier expansion of `Ind ψ` at `1`: degree = `∑_η ⟨Ind ψ, η⟩ · η(1)`.
+  have hsumapp : ∀ (s : Finset (IrreducibleCharacter G))
+      (F : IrreducibleCharacter G → ClassFunction G ℂ),
+      (∑ η ∈ s, F η) (1 : G) = ∑ η ∈ s, (F η) (1 : G) := by
+    intro s F
+    induction s using Finset.induction_on with
+    | empty => simp
+    | insert a s ha ih =>
+        rw [Finset.sum_insert ha, Finset.sum_insert ha, ClassFunction.add_apply, ih]
+  have hexp := sum_inner_irreducibleCharacter_smul (G := G)
+    (ClassFunction.induce I (ψ : ClassFunction ↥I ℂ))
+  have key := congrArg (fun f : ClassFunction G ℂ => f (1 : G)) hexp
+  simp only [hsumapp, ClassFunction.smul_apply, smul_eq_mul] at key
+  -- Every summand `⟨Ind ψ, η⟩ · η(1)` is `≥ 0`.
+  have hnn : ∀ η ∈ (Finset.univ : Finset (IrreducibleCharacter G)),
+      (0 : ℂ) ≤ ClassFunction.inner (ClassFunction.induce I (ψ : ClassFunction ↥I ℂ))
+          (η : ClassFunction G ℂ) * (η : ClassFunction G ℂ) (1 : G) := by
+    intro η _
+    have h1 : (0 : ℂ) ≤ ClassFunction.inner (ClassFunction.induce I (ψ : ClassFunction ↥I ℂ))
+        (η : ClassFunction G ℂ) := by
+      rw [hcoeff η]
+      exact ClassFunction.restrictionMultiplicity_nonneg I η.isIrreducible ψ.isIrreducible
+    obtain ⟨d, _, hd⟩ := irreducibleCharacter_apply_one_eq_pos_natCast η
+    rw [hd]
+    exact mul_nonneg h1 (by positivity)
+  -- The `χ`-summand dominates `χ(1)`.
+  obtain ⟨dχ, _, hdχ⟩ := irreducibleCharacter_apply_one_eq_pos_natCast χ
+  obtain ⟨kχ, hkχ⟩ := IrreducibleCharacter.restrictionMultiplicity_natCast (H := I) χ ψ
+  have hχ_coeff_ne : ClassFunction.inner (ClassFunction.induce I (ψ : ClassFunction ↥I ℂ))
+      (χ : ClassFunction G ℂ) ≠ 0 :=
+    (IrreducibleCharacter.inner_induce_ne_zero_iff_liesOver I χ ψ).mpr hover
+  have hkχ_pos : 1 ≤ kχ := by
+    rcases Nat.eq_zero_or_pos kχ with h | h
+    · exact absurd (by rw [hcoeff χ, hkχ, h, Nat.cast_zero]) hχ_coeff_ne
+    · exact h
+  have hχterm : (χ : ClassFunction G ℂ) (1 : G) ≤
+      ClassFunction.inner (ClassFunction.induce I (ψ : ClassFunction ↥I ℂ))
+        (χ : ClassFunction G ℂ) * (χ : ClassFunction G ℂ) (1 : G) := by
+    rw [hcoeff χ, hkχ, hdχ, ← Nat.cast_mul, Nat.cast_le]
+    exact Nat.le_mul_of_pos_left dχ hkχ_pos
+  calc (χ : ClassFunction G ℂ) (1 : G)
+      ≤ ClassFunction.inner (ClassFunction.induce I (ψ : ClassFunction ↥I ℂ))
+          (χ : ClassFunction G ℂ) * (χ : ClassFunction G ℂ) (1 : G) := hχterm
+    _ ≤ ∑ η : IrreducibleCharacter G,
+          ClassFunction.inner (ClassFunction.induce I (ψ : ClassFunction ↥I ℂ))
+            (η : ClassFunction G ℂ) * (η : ClassFunction G ℂ) (1 : G) :=
+        Finset.single_le_sum hnn (Finset.mem_univ χ)
+    _ = ClassFunction.induce I (ψ : ClassFunction ↥I ℂ) (1 : G) := key
+
 end OddOrder.RepresentationTheory
