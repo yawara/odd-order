@@ -2094,6 +2094,11 @@ set_option linter.style.longLine false in
 -- D/N central in G/N ⟹ φ(1)² ≤ |G:D|, via inflation to G/N + the central degree bound.
 set_option linter.style.longLine false in
 #assert_only_allowed_axioms OddOrder.RepresentationTheory.degree_sq_le_index_of_central_quotient
+-- An irreducible character trivial on `N ⊴ G` with abelian quotient `G/N` is linear (degree 1),
+-- via inflation/descent + abelian degree-one.  Peterfalvi (9.9.a) `(θλ)(1)=1` (issue 2031/2030).
+set_option linter.style.longLine false in
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.apply_one_eq_one_of_subset_characterKernel_of_isMulCommutative_quotient
 
 -- Coefficientwise Galois transport for class functions, irreducible-character indices,
 -- virtual-character lattices, and S07 coherence data.  Galois conjugates of irreducible
@@ -2596,6 +2601,13 @@ set_option linter.style.longLine false in
 -- constituent `θ₀` (degree expansion + single-orbit + common multiplicity + orbit size). issue 2031.
 #assert_only_allowed_axioms
   OddOrder.RepresentationTheory.apply_one_eq_restrictionMultiplicity_mul_index_inertia
+-- **Clifford correspondence** ([Is] Thm 6.11): an irreducible `χ` lying over `ψ ∈ Irr I` whose
+-- induction `Ind_I^G ψ` is irreducible equals that induction, so `χ(1) = [G:I]·ψ(1)`.  This is the
+-- (9.9.a) "induced from a linear character of `HC`, degree `u`" route (issue 2031/2030).
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.coe_eq_induce_of_liesOver_of_isIrreducibleCharacter_induce
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.apply_one_eq_index_mul_of_liesOver_of_isIrreducibleCharacter_induce
 
 -- Peterfalvi (6.8) T6/Y-family consumer side: degree-one induced families have common degree,
 -- supported differences on `H#`, irreducibility from c1/c2 inertia, and equal-degree coherence.

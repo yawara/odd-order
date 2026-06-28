@@ -119,6 +119,43 @@ linear extend する構造 (HC/H = C, coprime) から。`CliffordMultiplicityOne
 残 deep 数学は e=1 (multiplicity-one) のみ。
 - [ ] (9.9.a) consumer wiring (S11 `caseB_character_counts` 第1連言)。
 
+## 2026-06-28 cont.: ★★ 一般 Clifford 対応 2 keystone landed — e=1 を「ψ linear」に再フレーム (lane-b 再開)
+
+原文 (9.9.a) 精読 (`04.11` L99) で **degree-formula の e=1 経由でなく直接ルートが Peterfalvi 忠実**と判明:
+χ∈𝒳(H₀C') ⟹ ψ=θλ を Res_{HC} χ の既約成分に取り、I(ψ)∩U=C ⟹ **Ind_{HC}^{HU}(ψ) 既約 = χ**、
+**C'⊆Ker χ ⟹ (θλ)(1)=1** ⟹ χ(1)=[HU:HC]·1=u。e=1 ⟺ ψ linear ⟺ ψ(1)=1 で同値だが、後者は
+**commutator 論法で直接**: [HC,HC]⊆Ker ψ ([H,H]⊆H₀=chief.N (H̄ abelian)、[H,C]⊆H₀ (C=C_U(H̄)=cSub)、
+[C,C]=C'⊆Ker χ) ⟹ HC/[HC,HC] abelian。中心積指標論 (θ⊗λ) を回避。
+
+**2 reusable keystone landed (axiom-clean、両 AxiomsCheck 登録)**:
+- **`coe_eq_induce_of_liesOver_of_isIrreducibleCharacter_induce`** (commit `8c32413d`, CliffordSingleOrbit):
+  [Is] Thm 6.11 = ψ∈Irr(I), Ind_I^G ψ 既約, χ が ψ の上 ⟹ (χ:ClassFunction)=Ind_I^G ψ。
+  証明 = Frobenius reciprocity (`inner_induce_ne_zero_iff_liesOver`) で ⟨Ind ψ,χ⟩≠0 + 既約直交性
+  (`irreducibleCharacter_inner_eq_ite`) ⟹ 一致。**I の正規性不要** (Ind ψ 既約は仮説)。
+  degree 系 `apply_one_eq_index_mul_of_liesOver_of_isIrreducibleCharacter_induce`: χ(1)=[G:I]·ψ(1)。
+- **`apply_one_eq_one_of_subset_characterKernel_of_isMulCommutative_quotient`** (commit `73b1e0d0`,
+  InflationCharacter, +import LinearCharacter acyclic): ψ∈Irr(G), N⊴G, N⊆characterKernel ψ,
+  IsMulCommutative (G⧸N) ⟹ ψ(1)=1。証明 = `exists_inflate_eq_of_subset_characterKernel` で K⧸N へ
+  descend → `apply_one_eq_one_of_isMulCommutative` → `inflate_apply_one` degree 保存。
+
+⟹ **(9.9.a) χ(1)=u の概念的内容は完了** (e=1=ψ linear を含め)。残 = **全て carrier realization plumbing**。
+
+### 残 (9.9.a) = carrier realization (S11、multi-session、概念的に easy だが plumbing-heavy)
+
+carrier goal: **χ∈xiOf data (chief.H0⊔chars.Cprime) ⟹ (χ:IrreducibleCharacter ↥(huSub data)) 1 = chars.u**
+(これで φ=induceHU χ の φ(1)=q·χ(1)=qu、第1連言成立)。Γ=↥(huSub data)=HU、I=HC realized で 2 keystone 適用:
+1. **HC を HU 内に realize** = `(HC.subgroupOf M).subgroupOf (huSub data)`、HC=data.H⊔cSub (Subgroup G)。
+2. **HC ⊴ HU**: [HU,HC]⊆HC via H⊴HU (`hInHu_normal`) + [U,C]⊆C (**C=cSub=ker(uActionHom)⊴U 自動**=hom の核) + [H,C]⊆H₀。
+3. **ψ∈Irr(HC) を Res_{HC} χ の成分に** (`exists_liesOver`) + **χ lies over ψ**。
+4. **ψ(1)=1**: [HC,HC]⊆characterKernel ψ (上記 commutator 3 facts、H₀=chief.N realized⊆Ker χ も要) → keystone 2。
+5. **Ind_{HC}^{HU} ψ 既約**: `isIrreducibleCharacter_induce_of_inertia_eq` (HU,HC,ψ) 要 inertia_HU(ψ)=HC。
+   ⟵ **caseB_inertia_realized** (I_U(θ̄)⊆C、abstract φ 形) を ψ (HC-char) の inertia に lift + Dedekind
+   I=H·(I∩U)=HC。**= realization の真の crux** (abstract φ-inertia ↔ IrreducibleCharacter.inertia of ψ)。
+6. **[HU:HC]=u** = chars.u (cSub の `u_eq_card_quotient` range + [HU:HC]=[U:C]=u first-iso)。
+7. 2 keystone 合成: χ=Ind ψ ⟹ χ(1)=[HU:HC]·ψ(1)=u·1=u。
+
+**次セッション = 上記 realization** (HC realize+normality が最初の brick、inertia lift (step 5) が crux)。
+
 ## 完了条件
 
 `RestrictionConstituentsSingleOrbit` が irreducible χ に対し定理化 (hypothesis 除去) され、(9.9.a)
