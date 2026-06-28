@@ -435,6 +435,30 @@ char/§8-gated で手詰まり」評価は**誤り**(= 新方針が根絶する�
 - (12.5) `rho_constant_on_H_minus_Hprime` (S14:395): θ₁,θ₂∈Irr H 同次数、χᵢ=Ind θᵢ、(5.7) coherence、
   (5.5) で (χ₁−χ₂)^τ∈ℤ[R(χ₁)∪R(χ₂)]⟹(Res_H ψ^ρ,θ₁−θ₂)=0。(1.7.b)+Ind_{H'}^H λ が H−H' で消える。
 
+## 2026-06-29 (lane-b=β loop⁴): (12.4) 完成 (genuine、3 pin modulo) + 残 frontier 整理
+
+**(12.4) `orthogonal_character_constant_on_coset` genuine 証明完了** (commits c83e47f2 + 56e6bba6):
+- Fourier 展開 (sum_inner_irreducibleCharacter_smul) で Res_L ψ=γ+β に分割 (InHKernel 述語)。
+  γ (H⊆ker) coset-const = apply_mul_eq_of_mem_characterKernel (既存)。β (H⊄ker) L−H 消失。
+- **pin (c) discharge 済**: β-vanishing を genuine 化。off-kernel sum を S(χ) partition で regroup
+  (Finset.sum_biUnion + Sset_coeff_equal 係数一定 + decomp + Sset_vanishes_off_H)。
+- 補助 genuine: `Sset_vanishes_off_H` (S 元が L−H で 0)、`Sset_coeff_equal` (ψ⊥R(χ)⟹S(χ) 係数一定、
+  Frobenius inner_induce_eq_inner_restrict + pin a,b)、`classFunction_sum_apply`。
+
+**残 (12.4) pin = 3 純 cross-section faithful obligation**:
+- (a) `constituent_diff_tau_mem_span`: (φ₁−φ₂)^τ∈ℤ[R(χ)] ((1.4) global coherence)。discharge には
+  n-ary (1.4) 再導入 + per-φ R₁(φ) との reconciliation 要 (ℤ-span は一致するが μ 対応付けが involved)。
+- (b) `constituent_diff_tau_eq_induce`: (φ₁−φ₂)^τ=Ind_L^G(φ₁−φ₂) ([Is]7.7 τ=Ind on TI)。repo の
+  S05 `tau_eq_induce` は TI-cyclic 用で型 I 不適用。Dade-on-TI 一般化要。
+- (c') `exists_offKernel_constituent_partition`: {φ:H⊄ker}=⊔S(χ) ([Is]6.2 capturing + uniqueness)。
+  Clifford theory (CliffordSingleOrbit 等) 部分在庫 → 比較的 tractable か。
+
+**(12.5) は ρ-blocked (要判断)**: repo statement `psi h=psi 1` は **unfaithful** (ρ 無 + =psi 1 が
+constant-on-H−H' でない)。book は「ψ^ρ が H−H' で constant」。ρ (Hypothesis 7.1, A=A(L)) は repo 未
+形式化 (S09 chiRho/FamilyHypothesis71 は family 特化、型 I A(L) 一般 ρ 不在)。faithful 化には §7 ρ
+machinery 構築 (大、§7 prerequisite) 要。**次イテレーション判断: pin(c')/(b)/(a) discharge を優先 vs
+ρ 構築 vs hub 相談**。
+
 ## 2026-06-29 (lane-b=β loop³): Sset_vanishes_off_H + (12.4) 精密 reduction 設計
 
 **`Sset_vanishes_off_H` 完成** (commit 66aac2b5): χ=Ind_H^L θ∈S は H=L_F normal (Fitting,
