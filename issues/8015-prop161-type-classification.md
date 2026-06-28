@@ -967,3 +967,24 @@ bridge hP1eqV) が**完全 sorry-free + axiom-clean** (#print axioms = propext/C
 commutator symplectic form)、class-2 commutator multiplicativity helper (`commutatorElement_mul_*_of_le_center`)。
 
 **lane-f W1-a forward = 完了**。次候補 = reverse carrier (off-path、low priority) or hub 再判断。
+
+### ✅ 2026-06-28 (lane-f 再開¹³ cont.): reverse bridge hVP1 を閉鎖 (exclusivity 経由、3→2)
+
+ユーザー裁可「まよったら書籍の順番で」(= 上流優先 + 文書順) に従い、forward 完遂後の reverse bridge に着手。
+**hVP1 (Type V ⟹ IsTypeP1 ∧ MF=Msigma) を閉鎖** (commit `af96e9ec`、full build 3885 green)。
+κ=π∖σ の直接判定 (深い未形式化 BG 構造定理) を回避し **type exclusivity** で:
+- MF=Msigma: Type V の U=⊥ ⟹ `mf_eq_msigma_of_typePData_U_eq_bot`。
+- IsTypeP1: `isTypeP_of_isTypeV` で IsTypeP ⟹ P₁∨P₂; P₂⟹II (`isTypeII_of_isTypeP2`) は Type V と
+  排他 (新 helper `not_isTypeII_of_isTypeV`) ゆえ ¬P₂ ⟹ P₁。
+- `not_isTypeII_of_isTypeV`: V は U=⊥⟹M'=M_F、II は TypePNontrivialCore で U≠⊥⟹M'⊋M_F。
+  両 Data の H=maxNilpotentNormalHall 共通 ⟹ V witness が II の U≤H 強制 ⟹ disjoint で U=⊥ ⟹ 矛盾。
+
+**残 reverse = hIIP2 / hIIIIVP1** (両者 **Type II ⟷ III/IV exclusivity** に帰着):
+- hIIP2 (II⟹P₂): II⟹IsTypeP⟹P₁∨P₂; P₁∧(MF≠Msigma, U≠⊥より)⟹III/IV、II≠III/IV で矛盾 ⟹ P₂。
+- hIIIIVP1 (III/IV⟹P₁∧MF≠Msigma): III/IV⟹IsTypeP⟹P₁∨P₂; P₂⟹II、II≠III/IV で矛盾 ⟹ P₁。MF≠Msigma は U≠⊥+P₁ の M'=M_σ から。
+- **II≠III/IV の証明路 (確定、要実装)**: II は N(U_II)⊄M (`normalizer_not_le`)、III/IV は N(U_III)≤M
+  (`normalizer_le`)。U_II, U_III は M_F の M'-complement (`derived_complement`) で coprime (M_F Hall)
+  ⟹ **SZ 共役** (`IsComplement'.exists_conj_of_coprime`、`OddOrder/Mathlib/SchurZassenhausConj.lean` 在庫)
+  で ∃ n∈M_F, U_III = n·U_II·n⁻¹ ⟹ N(U_III)=n·N(U_II)·n⁻¹、n∈M_F≤M ⟹ N(U_III)≤M ⟺ N(U_II)≤M で矛盾。
+  実装は ↥M' での共役を G へ翻訳 (subgroupOf↔G map/conj) が intricate (~80-120 行)。次セッション。
+
