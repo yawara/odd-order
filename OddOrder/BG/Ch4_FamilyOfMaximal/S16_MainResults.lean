@@ -163,6 +163,15 @@ theorem FT_signalizer_le_centralizer (x : G) :
     FT_signalizer x ≤ Subgroup.centralizer ({x} : Set G) :=
   inf_le_right
 
+/-- **Trivial branch** (Coq: `#|M_σ[x]| ≤ 1 ⟹ R(x) = 1`): when `x` has at most one `σ`-maximal (or
+no maximal lies over `C_G(x)`), `N[x] = ⊥` so `R(x) = (N[x])_σ ⊓ C_G(x) = ⊥`. -/
+theorem FT_signalizer_eq_bot_of_not_branch {x : G}
+    (h : ¬ (1 < (maximalSigmaSubgroupsOfElement x).ncard ∧
+      (maximalSubgroupsContaining (Subgroup.centralizer ({x} : Set G))).Nonempty)) :
+    FT_signalizer x = ⊥ := by
+  have hb : FT_signalizerBase x = ⊥ := dif_neg h
+  simp only [FT_signalizer, hb, le_bot_iff.mp (OddOrder.BG.Ch3.S10.Msigma_le ⊥), bot_inf_eq]
+
 /-- In the nontrivial branch, `N[x]` is a maximal subgroup containing `C_G(x)`. -/
 theorem centralizer_le_FT_signalizerBase {x : G}
     (h : 1 < (maximalSigmaSubgroupsOfElement x).ncard ∧

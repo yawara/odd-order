@@ -6721,5 +6721,6 @@ first structural facts: `R(x) ≤ C_G(x)`, `C_G(x) ≤ N[x]` (nontrivial branch)
 remaining content.  All axiom-clean. -/
 
 #assert_only_allowed_axioms OddOrder.BG.Ch4.S16.FT_signalizer_le_centralizer
+#assert_only_allowed_axioms OddOrder.BG.Ch4.S16.FT_signalizer_eq_bot_of_not_branch
 #assert_only_allowed_axioms OddOrder.BG.Ch4.S16.centralizer_le_FT_signalizerBase
 #assert_only_allowed_axioms OddOrder.BG.Ch4.S16.FT_signalizer_normal_in_centralizer
