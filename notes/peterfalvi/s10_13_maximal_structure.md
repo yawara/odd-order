@@ -467,3 +467,23 @@ sorry-free。⟹ §9 counts (9.8/9.9/9.10) は genuine に証明可能 (carrier 
 
 **次手 (上流順)**: obligation 4 残 (機械的、すぐ) → obligation 3 (構造 commutator) → caseB_degree_qu
 sorry-free。その後 (9.9) `caseB_character_counts` / (9.8) `caseA_character_counts` → (11.8)/(10.7) へ。
+
+### §12 追補 (lane-a /loop): obligation 4 完了 + obligation 3 精密化
+
+- ✅ **obligation 4 完了** (commit f522c634): `[HU:HC]=u`。(A) `index_hcInHu_eq_relindex_cInHu`
+  (第2同型 `quotientInfEquivProdNormalQuotient` + card 分解、`U⊓HC=C`) + (C)
+  `index_cInHu_subgroupOf_uInHu_eq_u` (第1同型 `quotientKerEquivRange`、`u=[U:C]`) + card 補題群
+  (`card_uInHu_eq`/`card_cInHu_eq`/`card_cSub_eq_card_ker`)。crux+B (62fce025) を消費。
+- ⬜ **obligation 3 (ψ linearity)** = `caseB_degree_qu` 唯一の残 sorry。`apply_one_eq_one_of_subset_
+  characterKernel_of_isMulCommutative_quotient` (N=`commutator ↥HC`) + kernel 継承 (`liesOver_mem_
+  characterKernel`) で、核心は **`⁅HC,HC⁆ ⊆ realized-(H₀ ⊔ C')`** (⊆ ker χ ∵ χ∈𝒳(H₀C'))。
+  - ✅ fact 1 `derivedInG_H_le_H0` (`⁅H,H⁆≤H₀`, commit bf689bc7)。
+  - ⬜ fact 2 `⁅C,H⁆≤H₀`: c∈C=ker(uActionHom) ⟹ c が H̄ 中心化 ⟹ `c h c⁻¹ ≡ h (mod N)` ⟹ ⁅c,h⁆∈H₀。
+    `quotientMulAutHom_apply_mk'` + `QuotientGroup.eq` で N-membership を G に transport。
+    ⚠ mk-coset 方向 (`y⁻¹h∈N` vs `yh⁻¹∈N`) は N 正規で両立 (conj_mem)。
+  - ⬜ fact 3 `⁅C,C⁆=C'` (= `derivedInG cSub` = `cprimeSub`、ほぼ定義)。
+  - ⬜ **assembly**: 鍵洞察 = **K=H₀C' は HC で正規** (`[H,C']⊆[H,C]⊆H₀` ⟹ H が K を正規化、
+    C は C'◁C で K 正規化)。C' 単独は HC-正規でないが H₀C' は正規。⟹ HC/K で生成元 H,C の像が
+    可換 (fact1/2/3 が mod K で commute) ⟹ HC/K abelian ⟹ `⁅HC,HC⁆≤K`。
+    sup 上の commutator 直接分配は不可 ([[lean-normal-closure-good-elements]]) ゆえ商可換経由。
+- caseB_degree_qu 完了で → (9.9) caseB_character_counts (9.9.b/c) → (9.8) → (11.8)/(10.7)。
