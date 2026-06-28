@@ -204,75 +204,10 @@ theorem Sset_closedUnderConjugate [Finite G] {L : Subgroup G} (hyp : Hypothesis 
 
 /-! ## (12.2): character decomposition and Dade domain -/
 
-open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
-/-- **Peterfalvi (12.2.b)**: the (1.4) orthonormal difference-pair structure applied to the Dade
-isometry `τ = hyp.tau`.  For a degree-equal injective family of constituents `φ : Fin n → Irr L`
-(`n ≥ 2`, e.g. an enumeration of `S(χ) ∪ S(χ̄)`), each supported in `A(L) ∪ {1}`, the differences
-`φ_i − φ_0` are supported in the Dade domain `A(L)` (the common degree cancels at `1`).  Hence the
-Dade isometry sends them to a signed irreducible-difference family of `G` (Peterfalvi (1.4) via
-`isometry_difference_pair_structure`): there are irreducibles `μ_i` of `G` and a sign `ε` with
-`(φ_i − φ_0)^τ = ε(μ_i − μ_0)`.  The three (1.4) hypotheses are discharged by the Dade package on
-the supported differences (`dadeIntegralCharacterMap_mem_ZIrr_of_supported`, `_apply_one_eq_zero`,
-`_inner_eq_on_supported_span`). -/
-theorem exists_signedFamily_of_constituents {L : Subgroup G}
-    (hyp : Hypothesis L) {n : ℕ} [NeZero n] (_hn : 2 ≤ n)
-    (φ : Fin n → IrreducibleCharacter ↥L) (hinj : Function.Injective φ)
-    (hdeg : ∀ i, ((φ i : ClassFunction ↥L ℂ) : ↥L → ℂ) 1
-      = ((φ 0 : ClassFunction ↥L ℂ) : ↥L → ℂ) 1)
-    (hsupp : ∀ i, (φ i : ClassFunction ↥L ℂ).support ⊆
-      OddOrder.Peterfalvi.S04.supportInSubgroup hyp.ambientA L ∪ {1}) :
-    ∃ data : OddOrder.RepresentationTheory.SignedIrreducibleDifferenceFamily G n,
-      ∀ i, hyp.tau ((φ i : ClassFunction ↥L ℂ) - (φ 0 : ClassFunction ↥L ℂ))
-        = data.signedDifference i := by
-  haveI := hyp.finiteG
-  classical
-  -- The differences `φ_i − φ_0` are supported in `A(L)` (degree cancels at `1`).
-  have hdiff_supp : ∀ i,
-      (OddOrder.RepresentationTheory.irreducibleCharacterDifference φ i).support
-      ⊆ OddOrder.Peterfalvi.S04.supportInSubgroup hyp.ambientA L := by
-    intro i x hx
-    have hx0 : ((φ i : ClassFunction ↥L ℂ) - (φ 0 : ClassFunction ↥L ℂ)) x ≠ 0 := hx
-    have hxU : x ∈ (φ i : ClassFunction ↥L ℂ).support ∪ (φ 0 : ClassFunction ↥L ℂ).support :=
-      ClassFunction.support_sub_subset _ _ hx
-    have hxA : x ∈ OddOrder.Peterfalvi.S04.supportInSubgroup hyp.ambientA L ∪ {1} := by
-      rcases hxU with h | h
-      · exact hsupp i h
-      · exact hsupp 0 h
-    rcases hxA with h | h
-    · exact h
-    · exfalso
-      rw [Set.mem_singleton_iff] at h
-      subst h
-      exact hx0 (by simp only [ClassFunction.sub_apply]; rw [hdeg i]; ring)
-  -- The three (1.4) hypotheses, from the Dade package on the supported differences.
-  have h_virtual :
-      OddOrder.RepresentationTheory.IsometryDifferenceImagesAreVirtual hyp.tau φ := fun i =>
-    OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap_mem_ZIrr_of_supported
-      hyp.dadeData.dade hyp.hconj (hdiff_supp i)
-      (Submodule.sub_mem _ (φ i).mem_ZIrr (φ 0).mem_ZIrr)
-  have h_vanish :
-      OddOrder.RepresentationTheory.IsometryDifferenceImagesVanishAtOne hyp.tau φ := fun i =>
-    OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap_apply_one_eq_zero
-      hyp.dadeData.dade hyp.hconj (hdiff_supp i)
-  have h_isom : ∀ i j,
-      ClassFunction.inner (OddOrder.RepresentationTheory.isometryDifferenceImage hyp.tau φ i)
-        (OddOrder.RepresentationTheory.isometryDifferenceImage hyp.tau φ j) =
-      ClassFunction.inner (OddOrder.RepresentationTheory.irreducibleCharacterDifference φ i)
-        (OddOrder.RepresentationTheory.irreducibleCharacterDifference φ j) := fun i j =>
-    OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap_inner_eq_on_supported_span
-      hyp.dadeData.dade hyp.hconj
-      (S := Set.range (OddOrder.RepresentationTheory.irreducibleCharacterDifference φ))
-      (by rintro s ⟨k, rfl⟩; exact hdiff_supp k)
-      (Submodule.subset_span ⟨i, rfl⟩) (Submodule.subset_span ⟨j, rfl⟩)
-  obtain ⟨data, hdata⟩ := OddOrder.RepresentationTheory.isometry_difference_pair_structure
-    _hn φ hinj hdeg hyp.tau h_virtual h_vanish h_isom
-  exact ⟨data, hdata⟩
-
 /-- **Peterfalvi (12.2)**, genuine carrier: the constituent decomposition of `χ ∈ S`.
 `S(χ) = constituents` is the (finite, nonempty) set of irreducible constituents of `χ`, all of
 equal degree ((12.2.a)), each non-real (so `φ ≠ φ̄`) and supported in `A(L) ∪ {1}` (so the
-differences `φ − φ̄` lie in the Dade domain `A(L)`, feeding (12.2.b)
-`exists_signedFamily_of_constituents`). -/
+differences `φ − φ̄` lie in the Dade domain `A(L)`, feeding (12.2.b) `R1`/`Rset`). -/
 structure CharacterDecompositionData {L : Subgroup G} (hyp : Hypothesis L)
     (chi : ClassFunction ↥L ℂ) where
   chi_mem : chi ∈ hyp.Sset
@@ -311,8 +246,7 @@ theorem typeI_induced_char_constituents [Finite G] {L : Subgroup G} (hyp : Hypot
 /-- **Peterfalvi (12.2.a)**: each `χ ∈ S` decomposes (multiplicity one) into irreducible
 constituents of equal degree, each non-real and supported in `A(L) ∪ {1}`.  The §12 assembly:
 unpack the type-`F` constituent structure (`typeI_induced_char_constituents`) into the genuine
-`CharacterDecompositionData` carrier — whose R(χ) blocks of (12.2.b) then come from
-`exists_signedFamily_of_constituents`.  The deep type-`F` Clifford content ((8.2.c) inertia +
+`CharacterDecompositionData` carrier — whose R(χ) blocks of (12.2.b) then come from `R1`/`Rset`.  The deep type-`F` Clifford content ((8.2.c) inertia +
 (1.7.c)/(1.5.a)/(1.2)) is isolated in the obligation, keeping this assembly `sorry`-free. -/
 theorem character_decomposition_and_dade_domain [Finite G]
     (_hG : OddOrder.BG.IsMinimalSimpleOdd G) {L : Subgroup G} (hyp : Hypothesis L)
@@ -321,97 +255,65 @@ theorem character_decomposition_and_dade_domain [Finite G]
   obtain ⟨S, hne, hdecomp, hdeg, hreal, hsupp⟩ := typeI_induced_char_constituents hyp hchi
   exact ⟨⟨hchi, S, hne, hdecomp, hdeg, hreal, hsupp⟩, rfl⟩
 
-/-! ## (12.3)--(12.5): orthogonality and rho-constancy -/
-
-/-- The complex-conjugate constituent `φ̄` of a constituent `φ ∈ Irr L`, again irreducible
-(the `Sset_closedUnderConjugate` pattern).  Used to feed the (1.4) difference-pair machinery on
-`{φ, φ̄}` (Fin 2), producing the orthonormal Dade-image block `R₁(φ)` of (12.2.b). -/
-noncomputable def conjConstituent {L : Subgroup G} [Finite ↥L] (φ : IrreducibleCharacter ↥L) :
-    IrreducibleCharacter ↥L :=
-  ⟨(φ : ClassFunction ↥L ℂ).conj, φ.isIrreducible.conj⟩
-
-@[simp] theorem coe_conjConstituent {L : Subgroup G} [Finite ↥L] (φ : IrreducibleCharacter ↥L) :
-    (conjConstituent φ : ClassFunction ↥L ℂ) = (φ : ClassFunction ↥L ℂ).conj := rfl
-
-/-- `φ̄` has the same support as `φ` (complex conjugation preserves the support). -/
-theorem support_conjConstituent {L : Subgroup G} [Finite ↥L] (φ : IrreducibleCharacter ↥L) :
-    (conjConstituent φ : ClassFunction ↥L ℂ).support = (φ : ClassFunction ↥L ℂ).support := by
-  ext x
-  simp only [coe_conjConstituent, ClassFunction.mem_support, ne_eq,
-    ClassFunction.conj_apply, star_eq_zero]
-
-/-- `φ̄(1) = φ(1)`: the degree is a positive natural number, fixed by conjugation. -/
-theorem conjConstituent_apply_one {L : Subgroup G} [Finite ↥L] (φ : IrreducibleCharacter ↥L) :
-    ((conjConstituent φ : ClassFunction ↥L ℂ) : ↥L → ℂ) 1
-      = ((φ : ClassFunction ↥L ℂ) : ↥L → ℂ) 1 := by
-  rw [coe_conjConstituent, ClassFunction.conj_apply]
-  obtain ⟨d, _, hd⟩ := irreducibleCharacter_apply_one_eq_pos_natCast φ
-  rw [hd, star_natCast]
-
-/-- A non-real constituent differs from its conjugate: `¬ IsReal φ → φ ≠ φ̄`. -/
-theorem ne_conjConstituent {L : Subgroup G} [Finite ↥L] {φ : IrreducibleCharacter ↥L}
-    (h : ¬ ClassFunction.IsReal (φ : ClassFunction ↥L ℂ)) : φ ≠ conjConstituent φ := by
-  intro heq
-  apply h
-  have hc : (φ : ClassFunction ↥L ℂ).conj = (φ : ClassFunction ↥L ℂ) := by
-    rw [← coe_conjConstituent, ← heq]
-  exact hc
+/-! ## (12.2.b): the orthonormal Dade-image families `R₁(φ)` and `R(χ)` -/
 
 open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
-/-- **Peterfalvi (12.2.b), per-constituent `R₁(φ)`**: for a constituent `φ ∈ S(χ)`, applying the
-(1.4) machinery (`exists_signedFamily_of_constituents`) to the family `![φ, φ̄]` (Fin 2) yields a
-signed irreducible-difference family `sd` of `G` with `(φ_i − φ_0)^τ = sd.signedDifference i`.  The
-three (1.4) hypotheses are discharged from the `conjConstituent` lemmas: `φ ≠ φ̄`
-(`ne_conjConstituent` ← `not_real`), equal degree (`conjConstituent_apply_one`), and support
-(`support_conjConstituent` + `supported`).  The orthonormal block `R₁(φ) = {sd.μ 0, sd.μ 1}` of
-(12.2.b) lives in this `sd`. -/
-theorem signedFamily_exists {L : Subgroup G} [Fintype G] [Invertible (Nat.card G : ℂ)]
-    [Invertible (Nat.card ↥L : ℂ)] {hyp : Hypothesis L} {chi : ClassFunction ↥L ℂ}
-    (data : CharacterDecompositionData hyp chi)
-    {φ : IrreducibleCharacter ↥L} (hφ : φ ∈ data.constituents) :
-    ∃ sd : OddOrder.RepresentationTheory.SignedIrreducibleDifferenceFamily G 2,
-      ∀ i, hyp.tau ((![φ, conjConstituent φ] i : ClassFunction ↥L ℂ)
-        - (![φ, conjConstituent φ] 0 : ClassFunction ↥L ℂ)) = sd.signedDifference i := by
-  haveI := hyp.finiteG
-  refine exists_signedFamily_of_constituents hyp (le_refl 2) ![φ, conjConstituent φ] ?_ ?_ ?_
-  · -- injective: `![φ, φ̄]` is injective since `φ ≠ φ̄`
-    intro i j hij
-    fin_cases i <;> fin_cases j <;>
-      simp_all [Matrix.cons_val_zero, Matrix.cons_val_one, Matrix.head_cons,
-        ne_conjConstituent (data.not_real φ hφ),
-        (ne_conjConstituent (data.not_real φ hφ)).symm]
-  · -- equal degree: `φ̄(1) = φ(1)`
-    intro i
-    fin_cases i
-    · rfl
-    · simpa only [Matrix.cons_val_one, Matrix.head_cons, Matrix.cons_val_zero]
-        using conjConstituent_apply_one φ
-  · -- support: `φ` and `φ̄` are supported in `A(L) ∪ {1}`
-    intro i
-    fin_cases i
-    · simpa only [Matrix.cons_val_zero] using data.supported φ hφ
-    · show (conjConstituent φ : ClassFunction ↥L ℂ).support ⊆ _
-      rw [support_conjConstituent]
-      exact data.supported φ hφ
-
-open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
-/-- The chosen signed Dade-image family `R₁(φ)` of a constituent `φ ∈ S(χ)`
-(`signedFamily_exists`); `(φ − φ̄)^τ = R₁(φ).signedDifference`. -/
-noncomputable def signedFamily {L : Subgroup G} [Fintype G] [Invertible (Nat.card G : ℂ)]
-    [Invertible (Nat.card ↥L : ℂ)] {hyp : Hypothesis L} {chi : ClassFunction ↥L ℂ}
+/-- The constituent difference `φ̄ − φ` (`φ ∈ S(χ)`) is supported in the Dade domain
+`A(L) = supportInSubgroup (A(L)) L`: `φ` is supported in `A(L) ∪ {1}` (`data.supported`), `φ̄` has
+the same support (conjugation preserves it), and the value at `1` cancels (`φ̄(1) = φ(1)`, the
+degree being a real natural number).  Feeds the difference-support constructor
+`S07.dadeOrthonormalCharacterImageFamilyOfDiff` for the orthonormal block `R₁(φ)`. -/
+theorem R1_diffsupp {L : Subgroup G} {hyp : Hypothesis L} {chi : ClassFunction ↥L ℂ}
     (data : CharacterDecompositionData hyp chi) {φ : IrreducibleCharacter ↥L}
     (hφ : φ ∈ data.constituents) :
-    OddOrder.RepresentationTheory.SignedIrreducibleDifferenceFamily G 2 :=
-  (signedFamily_exists data hφ).choose
+    ((φ : ClassFunction ↥L ℂ).conj - (φ : ClassFunction ↥L ℂ)).support ⊆
+      OddOrder.Peterfalvi.S04.supportInSubgroup hyp.ambientA L := by
+  haveI := hyp.finiteG
+  have hsupp_eq : (φ : ClassFunction ↥L ℂ).conj.support = (φ : ClassFunction ↥L ℂ).support := by
+    ext y
+    simp only [ClassFunction.mem_support, ne_eq, ClassFunction.conj_apply, star_eq_zero]
+  intro x hx
+  have hx0 : ((φ : ClassFunction ↥L ℂ).conj - (φ : ClassFunction ↥L ℂ)) x ≠ 0 := hx
+  have hxsupp : x ∈ (φ : ClassFunction ↥L ℂ).support := by
+    have hxU := ClassFunction.support_sub_subset _ _ hx
+    rwa [hsupp_eq, Set.union_self] at hxU
+  rcases data.supported φ hφ hxsupp with h | h
+  · exact h
+  · exfalso
+    rw [Set.mem_singleton_iff] at h
+    subst h
+    obtain ⟨d, _, hd⟩ := irreducibleCharacter_apply_one_eq_pos_natCast φ
+    exact hx0 (by rw [ClassFunction.sub_apply, ClassFunction.conj_apply, hd, star_natCast, sub_self])
 
+open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
+/-- **Peterfalvi (12.2.b), the orthonormal block `R₁(φ)`**: for a constituent `φ ∈ S(χ)`, the
+orthonormal Dade-image family of `φ − φ̄`, "an orthonormal subset of `ℤ[Irr G]` of cardinality 2"
+with `(φ − φ̄)^τ = ∑_{α ∈ R₁(φ)} α` (the `image_eq` field).  Built directly from the Dade isometry
+`τ = hyp.tau` via the difference-support constructor `S07.dadeOrthonormalCharacterImageFamilyOfDiff`
+(`φ` is non-real by `data.not_real`, and `φ̄ − φ` is supported in `A(L)` by `R1_diffsupp`); the
+`(1.4)` keystone is internal to that constructor.  This is the `imageFamily` the
+`CharacterPsiDecomposition` engine of (12.4)/(12.5) consumes. -/
+noncomputable def R1 {L : Subgroup G} {hyp : Hypothesis L} {chi : ClassFunction ↥L ℂ}
+    (data : CharacterDecompositionData hyp chi) {φ : IrreducibleCharacter ↥L}
+    (hφ : φ ∈ data.constituents) :
+    haveI := hyp.finiteG
+    OddOrder.Peterfalvi.S07.OrthonormalCharacterImageFamily (L := ↥L) (G := G)
+      hyp.tau (φ : ClassFunction ↥L ℂ) :=
+  haveI := hyp.finiteG
+  OddOrder.Peterfalvi.S07.dadeOrthonormalCharacterImageFamilyOfDiff
+    hyp.dadeData.dade hyp.hconj φ (data.not_real φ hφ) (R1_diffsupp data hφ)
+
+open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
 /-- **Peterfalvi (12.2.b)**: `R(χ) = ⋃_{φ ∈ S(χ)} R₁(φ)`, the union of the two-element orthonormal
-Dade-image blocks of the constituents.  A class function `ψ` is "orthogonal to `R(χ)`" iff
-`⟨ψ, μ⟩ = 0` for every `μ = R₁(φ).μ i` ((12.4)/(12.5)). -/
-noncomputable def Rset {L : Subgroup G} [Fintype G] [Invertible (Nat.card G : ℂ)]
-    [Invertible (Nat.card ↥L : ℂ)] {hyp : Hypothesis L} {chi : ClassFunction ↥L ℂ}
+Dade-image blocks `R₁(φ) = (R1 data hφ).imageSet` of the constituents.  A class function `ψ` is
+"orthogonal to `R(χ)`" iff `⟨ψ, α⟩ = 0` for every `α ∈ R₁(φ)`, `φ ∈ S(χ)` ((12.4)/(12.5)). -/
+noncomputable def Rset {L : Subgroup G} {hyp : Hypothesis L} {chi : ClassFunction ↥L ℂ}
     (data : CharacterDecompositionData hyp chi) : Set (ClassFunction G ℂ) :=
-  {α | ∃ (φ : IrreducibleCharacter ↥L) (hφ : φ ∈ data.constituents) (i : Fin 2),
-    α = ((signedFamily data hφ).mu i : ClassFunction G ℂ)}
+  haveI := hyp.finiteG
+  {α | ∃ (φ : IrreducibleCharacter ↥L) (_hφ : φ ∈ data.constituents),
+    α ∈ (R1 data _hφ).imageSet}
+
+/-! ## (12.3)--(12.5): orthogonality and rho-constancy -/
 
 /-- **Peterfalvi (12.3)**: for non-conjugate type-I maximal subgroups `L₁, L₂`, the families
 `R(χ₁) = Rset data1` and `R(χ₂) = Rset data2` are mutually orthogonal.  Proof (a §12 char
