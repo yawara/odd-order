@@ -1764,6 +1764,75 @@ theorem hcInHu_normal (data : TypesIIIIIIVSetup M) (chief : ChiefFactorData data
   sup_normal_of_normal_left_of_normal_subgroupOf (cInHu_le_uInHu data chief)
     (hInHu_sup_uInHu_eq_top data)
 
+section
+open scoped IsMulCommutative
+
+/-- **`H ⊓ U ≤ C = C_U(H̄)`** (realized form `hInHu ⊓ uInHu ≤ cInHu`).  An element lying in both
+`H` and `U` centralizes the chief factor `H̄ = H/H₀`: conjugation by an `H`-element descends to an
+inner automorphism of the *abelian* `H̄`, hence is trivial, so the element lies in
+`C = ker(U → Aut H̄)`.  This is the index input of (9.9.a)'s `[HU : HC] = u`. -/
+theorem hInHu_inf_uInHu_le_cInHu [Finite G] {M : Subgroup G} (data : TypesIIIIIIVSetup M)
+    (chief : ChiefFactorData data) :
+    hInHu data ⊓ uInHu data ≤ cInHu data chief := by
+  haveI : IsMulCommutative (↥data.H ⧸ chief.N) := ⟨⟨chief.quotient_elementaryAbelian.1⟩⟩
+  intro x hx
+  obtain ⟨hxH, hxU⟩ := hx
+  have hgH : (((x : ↥(huSub data)) : ↥M) : G) ∈ data.H := by
+    simp only [hInHu, Subgroup.mem_subgroupOf] at hxH; exact hxH
+  have hgU : (((x : ↥(huSub data)) : ↥M) : G) ∈ data.typeP.U := by
+    simp only [uInHu, Subgroup.mem_subgroupOf] at hxU; exact hxU
+  have hgUW1 : (((x : ↥(huSub data)) : ↥M) : G) ∈ data.typeP.U ⊔ data.typeP.W1 :=
+    Subgroup.mem_sup_left hgU
+  -- the `U`-action element with the same `G`-coordinate
+  set a : ↥(data.typeP.U.subgroupOf (data.typeP.U ⊔ data.typeP.W1)) :=
+    ⟨⟨(((x : ↥(huSub data)) : ↥M) : G), hgUW1⟩, Subgroup.mem_subgroupOf.mpr hgU⟩ with ha_def
+  -- `a ∈ ker(uActionHom)`: conjugation by an `H`-element is trivial on the abelian `H̄`.
+  have hker : a ∈ (uActionHom data chief).ker := by
+    rw [MonoidHom.mem_ker]
+    ext q
+    induction q using QuotientGroup.induction_on with
+    | _ h =>
+      rw [uActionHom, MonoidHom.comp_apply,
+        OddOrder.Isaacs.Ch04.OddOrder.Isaacs.Ch03.IsAInvariant.quotientMulAutHom_apply,
+        MulAut.one_apply]
+      have hconj : (typeP_conjAction data.typeP
+          ((data.typeP.U.subgroupOf (data.typeP.U ⊔ data.typeP.W1)).subtype a) h)
+          = (⟨_, hgH⟩ : ↥data.H) * h * (⟨_, hgH⟩ : ↥data.H)⁻¹ := by
+        apply Subtype.ext
+        rw [typeP_conjAction_apply]
+        simp only [Subgroup.coe_mul, Subgroup.coe_inv]
+        rfl
+      rw [hconj]
+      simp only [← QuotientGroup.mk'_apply, map_mul, map_inv]
+      rw [mul_comm (QuotientGroup.mk' chief.N ⟨_, hgH⟩) (QuotientGroup.mk' chief.N h),
+        mul_assoc, mul_inv_cancel, mul_one]
+  simp only [cInHu, Subgroup.mem_subgroupOf, cSub, Subgroup.mem_map]
+  exact ⟨_, ⟨a, hker, rfl⟩, rfl⟩
+
+end
+
+/-- **`U ⊓ HC = C`** (realized: `uInHu ⊓ (hInHu ⊔ cInHu) = cInHu`).  The `U`-part of the inertia
+subgroup `HC` is exactly `C`.  `⊇` is `C ≤ U` and `C ≤ HC`; `⊆` decomposes `x = h·c`
+(`H ◁ HU`, `mem_sup_of_normal_left`) with `c ∈ C ≤ U`, so `h = x·c⁻¹ ∈ U`, whence
+`h ∈ H ⊓ U ≤ C` (`hInHu_inf_uInHu_le_cInHu`) and `x = h·c ∈ C`.  This is the `[HU:HC] = [U:C]`
+input of (9.9.a). -/
+theorem uInHu_inf_hcInHu_eq_cInHu [Finite G] {M : Subgroup G} (data : TypesIIIIIIVSetup M)
+    (chief : ChiefFactorData data) :
+    uInHu data ⊓ (hInHu data ⊔ cInHu data chief) = cInHu data chief := by
+  haveI := hInHu_normal data
+  apply le_antisymm
+  · rintro x ⟨hxU, hxHC⟩
+    obtain ⟨hh, hhmem, cc, ccmem, rfl⟩ := Subgroup.mem_sup_of_normal_left.mp hxHC
+    have hcc_u : cc ∈ uInHu data := cInHu_le_uInHu data chief ccmem
+    have hh_u : hh ∈ uInHu data := by
+      have h1 : hh * cc * cc⁻¹ ∈ uInHu data :=
+        (uInHu data).mul_mem hxU ((uInHu data).inv_mem hcc_u)
+      rwa [mul_inv_cancel_right] at h1
+    have hh_c : hh ∈ cInHu data chief :=
+      hInHu_inf_uInHu_le_cInHu data chief (Subgroup.mem_inf.mpr ⟨hhmem, hh_u⟩)
+    exact (cInHu data chief).mul_mem hh_c ccmem
+  · exact le_inf (cInHu_le_uInHu data chief) le_sup_right
+
 /-- The character-theoretic setup of Peterfalvi (9.5).
 
 `C`, `U'`, and `C'` denote the centralizer, commutator subgroup, and its
