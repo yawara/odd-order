@@ -103,11 +103,12 @@ linear extend する構造 (HC/H = C, coprime) から。`CliffordMultiplicityOne
 - [x] **degree formula** = `apply_one_eq_restrictionMultiplicity_mul_index_inertia` (commit `9b3363d2`):
       `χ(1) = ⟨Res χ,θ₀⟩·[G:I_G(θ₀)]·θ₀(1)`。degree-side + single-orbit + common-mult + orbit-size を
       Finset.sum_filter + sum_const + cardinality bridge で集約。**= 一般 Clifford 次数機構 完成**。
-- [ ] **e=1** (multiplicity-one、別 track、(9.9.a) 固有): θ₀ が inertia HC へ linear extend ⟹ Res χ
-      multiplicity-free。Gallagher/extension or Skolem-Noether in inertia。**残る deep 数学**。
-- [ ] (9.9.a) consumer wiring: G=HU, H=H, θ₀ = chief factor の nontrivial constituent。
-      `caseB_inertia_realized` (issue 2030) で I_HU(θ)=HC ⟹ [HU:I]=[HU:HC]=u (typeP_H_inf_U)、
-      θ₀(1)=1 (H̄ abelian ⟹ linear)、e=1 → degree formula で χ(1)=u → S11 caseB_character_counts 第1連言。
+- [x] **e=1** (multiplicity-one): **Route B で解決** (2026-06-28 再開²、`apply_one_eq_index_of_liesOver_linear_inertia`)。
+      Gallagher/Skolem-Noether 不要 — degree-formula 下界 `e·[G:I]` と constituent 上界 `[G:I]` の
+      sandwich で e=1 を強制 (deep 数学でなかった)。
+- [ ] (9.9.a) consumer wiring: G=HU, H=H, θ₀ = chief factor の nontrivial constituent (inflation form)。
+      `apply_one_eq_index_of_liesOver_linear_inertia` へ S11 carrier を wire — 上の「残り = S11
+      realization wiring」4 obligation (θ₀ inflation extraction / θ₀(1)=1 / ψ(1)=1 / [HU:HC]=u)。**残**。
 
 ## 2026-06-28: ★ 一般 Clifford 次数機構 完成 (single-orbit 定理化 + degree formula)
 
@@ -176,6 +177,45 @@ carrier goal: **χ∈xiOf data (chief.H0⊔chars.Cprime) ⟹ (χ:IrreducibleChar
 7. 2 keystone 合成: χ=Ind ψ ⟹ χ(1)=[HU:HC]·ψ(1)=u·1=u。
 
 **次セッション = step 3-7** (step 1-2 = realize+normality 完了)。残 crux = step 5 inertia lift。
+
+## 2026-06-28 (lane-b 再開²): ★★ (9.9.a) MATH CORE COMPLETE — Route B 採用、汎用 3 補題 axiom-clean
+
+route を **Route B (degree-formula sandwich)** に確定し、(9.9.a) `χ(1)=u` の**数学的核心を完全に
+landing**。commits `ea798dc8` + `6ebddd15` (full build 3886 green、全 axiom-clean、AxiomsCheck 登録)。
+Route B は nested-subgroup restriction (Route A の inertia bridge `inertia(ψ)=HC`) を**完全回避**:
+すべてを Γ=HU の直接部分群 (θ₀∈Irr(hInHu)、ψ∈Irr(hcInHu)、crux で inertia_Γ(θ₀)=HC) で扱う。
+
+**汎用 3 補題 (CliffordSingleOrbit.lean、再利用可)**:
+1. `apply_one_le_induce_apply_one_of_liesOver` (degree bound): χ∈Irr(G) が ψ∈Irr(I) の上 ⟹
+   `χ(1) ≤ (Ind_I^G ψ)(1)`。Ind ψ の Fourier 展開 (`sum_inner_irreducibleCharacter_smul`) +
+   nonneg multiplicity (Frobenius `inner_induce_eq_inner_restrict` + `restrictionMultiplicity_natCast`)。
+   **Ind ψ の既約性不要** = Route B の肝。
+2. `apply_one_eq_index_of_liesOver_linear_inertia` (e=1 sandwich): H◁G, I≤G, χ が **linear** θ₀∈Irr(H)
+   (inertia_G(θ₀)=I) の上 + **linear** ψ∈Irr(I) の上 ⟹ `χ(1)=[G:I]`。下界 `χ(1)=e·[G:I]` (degree
+   formula、e≥1) と上界 `χ(1)≤[G:I]` (補題1+ψ(1)=1) で sandwich ⟹ e=1。**(9.9.a) の抽象核**。
+3. (既存) `restrictionConstituentsSingleOrbit_of_isIrreducible` / `apply_one_eq_restrictionMultiplicity_mul_index_inertia`。
+
+**carrier 強化 (S11)**: `CliffordCaseBData.actsIrreducibly` 追加 = case (b) の定義 (U が H̄ に既約作用)
+を Finite-free に `uActionHom` 経由で carry (crux の typeP_quotientCoprimeAction 形と defeq、
+`clifford_caseB_data` が populate)。⟹ `caseB_character_counts` 内で crux `inertia_eq_hcInHu` が使える。
+
+### 残り = S11 realization wiring のみ (multi-session、数学は完了)
+
+`apply_one_eq_index_of_liesOver_linear_inertia` を Γ=huSub, H=hInHu, I=hcInHu で適用するための
+S11-specific plumbing (4 obligation、いずれも realization 機械作業):
+1. **θ₀ inflation-form extraction**: χ∈xiOf(H₀⊔C') ⟹ ∃θbar∈Irr(H̄) nontrivial, χ が θ₀=
+   `compHom hInHuEquivH (compHom (mk' N) θbar)` の上。`exists_constituent_not_subset_characterKernel`
+   (A=B=hInHu) で nontrivial H-constituent → H₀⊆Ker χ で H̄ 経由 factoring → inflation 同定。
+2. **θ₀(1)=1**: inflation 次数保存 + θbar∈Irr(H̄ 可換) linear。
+3. **ψ(1)=1**: `exists_liesOver` で ψ∈Irr(hcInHu) 取得 + [HC,HC]⊆Ker χ (commutator facts:
+   [H,H]⊆H₀, [H,C]⊆H₀ (C=C_U(H̄)), C'⊆Ker χ) → [HC,HC]⊆Ker ψ → keystone 2
+   (`apply_one_eq_one_of_subset_characterKernel_of_isMulCommutative_quotient`)。
+4. **[HU:HC]=u**: `hcInHu.index = chars.u` = [U:C] (first-iso, u=|range uActionHom|, C=ker)。純群論。
+   + instance letI (Fintype/Invertible/Fintype-Irr for huSub) + 最終組立
+   (induceHU_apply_one_eq_q_mul で φ(1)=q·χ(1)=q·u)。
+
+**∴ 数学的 hard part は完了** (e=1 Clifford 論法)。残は abstract 補題への carrier wiring (realization、
+issue が当初 "~150-200行 multi-session" と見積もった部分)。次セッションは obligation 1-4 を順に。
 
 ## 完了条件
 
