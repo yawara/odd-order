@@ -479,6 +479,74 @@ theorem card_signalizer_eq_card_maximalSigma [Finite G] (hG : OddOrder.BG.IsMini
       exact ⟨⟨r, hrR⟩, Subtype.ext hrB.symm⟩
   rw [Nat.card_congr (Equiv.ofBijective f hbij), Nat.card_coe_set_eq, hSeq]
 
+/-- **BG Lemma 14.5(a), `σ`-cover disjointness** (Coq `sigma_cover_disjoint`, `_of_inputs` form): for
+two distinct `σ`-length-one elements `x, y` with signalizer data, the cosets `x·R(x)` and `y·R(y)`
+(`R(·) = (N_·)_σ ⊓ C_G(·)`) are disjoint.  If `g = x·r = y·s` were common, the `σ`-decomposition
+`{x} ∪ {r}^# = σ(g) = {y} ∪ {s}^#` (`sigma_cover_decomposition_signalizer`) forces `y = r` (as `y ≠ x`)
+and `s = x`; so `y ∈ (N_x)_σ` puts `N_x ∈ 𝓜_σ(y)`, and `x ∈ R(y) ∩ (N_x ⊓ C_G(y))` lands in the
+trivial intersection of the `y`-complement (`signalizer_centralizer_isComplement` at `M' = N_x`),
+forcing `x = 1` — contradiction.  The deep core of the `R(x)`-cover trivIset behind Lemma 14.5(c). -/
+theorem sigma_cover_disjoint_of_inputs [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    {Mx Nx My Ny : Subgroup G} (hMx : Mx ∈ maximalSubgroups G) (hNx : Nx ∈ maximalSubgroups G)
+    (hMy : My ∈ maximalSubgroups G) (hNy : Ny ∈ maximalSubgroups G) {x y : G}
+    (hxMx : x ∈ OddOrder.BG.Ch3.S10.Msigma Mx) (hx1 : x ≠ 1)
+    (hyMy : y ∈ OddOrder.BG.Ch3.S10.Msigma My) (hy1 : y ≠ 1)
+    (hxτ2 : ∀ p ∈ S14.piSet (Subgroup.closure ({x} : Set G)), p ∈ tau2 Nx)
+    (hyτ2 : ∀ p ∈ S14.piSet (Subgroup.closure ({y} : Set G)), p ∈ tau2 Ny)
+    (hCxNx : Subgroup.centralizer ({x} : Set G) ≤ Nx)
+    (hCyNy : Subgroup.centralizer ({y} : Set G) ≤ Ny)
+    (hy_compl : ∀ M' ∈ S14.maximalSigmaSubgroupsOfElement y,
+      Subgroup.IsComplement' ((OddOrder.BG.Ch3.S10.Msigma Ny).subgroupOf Ny)
+        ((M' ⊓ Ny).subgroupOf Ny))
+    (hxy : x ≠ y) :
+    Disjoint
+      {g : G | ∃ r ∈ (OddOrder.BG.Ch3.S10.Msigma Nx ⊓ Subgroup.centralizer ({x} : Set G)),
+        g = x * r}
+      {g : G | ∃ s ∈ (OddOrder.BG.Ch3.S10.Msigma Ny ⊓ Subgroup.centralizer ({y} : Set G)),
+        g = y * s} := by
+  rw [Set.disjoint_left]
+  rintro g ⟨r, hr, rfl⟩ ⟨s, hs, hgs⟩
+  obtain ⟨hrMσ, hrC⟩ := Subgroup.mem_inf.mp hr
+  obtain ⟨hsMσ, hsC⟩ := Subgroup.mem_inf.mp hs
+  have hrcomm : Commute x r := (Subgroup.mem_centralizer_singleton_iff.mp hrC).symm
+  have hscomm : Commute y s := (Subgroup.mem_centralizer_singleton_iff.mp hsC).symm
+  -- `σ`-decompositions of the two cover elements.
+  have hdecx : S14.sigmaDecomposition (x * r) = insert x ({r} \ {1}) :=
+    S14.sigma_cover_decomposition_signalizer hG hMx hNx hxMx hx1 hxτ2 hrMσ hrcomm
+  -- `y` is a `σ`-part of `g = x·r` (since `g = y·s`).
+  have hymem : y ∈ S14.sigmaDecomposition (x * r) := by
+    rw [hgs]
+    exact S14.mem_sigma_cover_decomposition_signalizer hG hMy hNy hyMy hy1 hyτ2 hsMσ hscomm
+  rw [hdecx, Set.mem_insert_iff] at hymem
+  have hyr : y = r := by
+    rcases hymem with h | h
+    · exact absurd h.symm hxy
+    · exact Set.mem_singleton_iff.mp h.1
+  -- `N_x ∈ 𝓜_σ(y)` and `s = x`.
+  have hyMσNx : y ∈ OddOrder.BG.Ch3.S10.Msigma Nx := hyr ▸ hrMσ
+  have hNxMSy : Nx ∈ S14.maximalSigmaSubgroupsOfElement y := ⟨hNx, hyMσNx⟩
+  have hsx : s = x := by
+    rw [← hyr] at hgs
+    have hcomm_xy : x * y = y * x := hyr.symm ▸ hrcomm
+    rw [hcomm_xy] at hgs
+    exact (mul_left_cancel hgs).symm
+  -- final contradiction via the `y`-centralizer complement at `M' = N_x`.
+  have hxRy : x ∈ OddOrder.BG.Ch3.S10.Msigma Ny ⊓ Subgroup.centralizer ({y} : Set G) := hsx ▸ hs
+  have hxCy : x ∈ Subgroup.centralizer ({y} : Set G) := (Subgroup.mem_inf.mp hxRy).2
+  have hyNx : y ∈ Nx := OddOrder.BG.Ch3.S10.Msigma_le Nx hyMσNx
+  have hxNx : x ∈ Nx := hCxNx (Subgroup.mem_centralizer_singleton_iff.mpr rfl)
+  have hcompl_C := signalizer_centralizer_isComplement (hy_compl Nx hNxMSy) hCyNy hyNx
+  have hmem : (⟨x, hxCy⟩ : Subgroup.centralizer ({y} : Set G)) ∈
+      ((Nx ⊓ Subgroup.centralizer ({y} : Set G)).subgroupOf
+        (Subgroup.centralizer ({y} : Set G))) ⊓
+      ((OddOrder.BG.Ch3.S10.Msigma Ny ⊓ Subgroup.centralizer ({y} : Set G)).subgroupOf
+        (Subgroup.centralizer ({y} : Set G))) :=
+    Subgroup.mem_inf.mpr
+      ⟨Subgroup.mem_subgroupOf.mpr (Subgroup.mem_inf.mpr ⟨hxNx, hxCy⟩),
+        Subgroup.mem_subgroupOf.mpr hxRy⟩
+  rw [hcompl_C.disjoint.eq_bot, Subgroup.mem_bot] at hmem
+  exact hx1 (Subtype.ext_iff.mp hmem)
+
 /-! ## Theorems A--E -/
 
 /-- **BG Theorem A** (mmd L4274): the basic structure of a maximal subgroup:

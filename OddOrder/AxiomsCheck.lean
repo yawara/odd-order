@@ -6764,3 +6764,11 @@ sharp-transitive `R`-action (`ConjSharplyTransitiveOn`) closed on `𝓜_σ(x)` (
 the bijection `R ≃ 𝓜_σ(x)`, hence `|R| = |𝓜_σ(x)|` — the cardinality conjunct of the signalizer
 first block, foundation of BG Theorem E's Lemma 14.5(c) count.  Axiom-clean. -/
 #assert_only_allowed_axioms OddOrder.BG.Ch4.S16.card_signalizer_eq_card_maximalSigma
+
+/-! **BG Lemma 14.5(a) `σ`-cover disjointness** (`S16_MainResults`, Coq `sigma_cover_disjoint`,
+`_of_inputs` form; lane δ, issue 8020).  Distinct `σ`-length-one `x, y` give disjoint cover cosets
+`x·R(x)`, `y·R(y)`: a common `g = x·r = y·s` makes `{x}∪{r}^# = σ(g) = {y}∪{s}^#`, forcing `y = r`,
+`s = x`, whence `x` lands in the trivial intersection of the `y`-centralizer complement at `M' = N_x`
+(`signalizer_centralizer_isComplement`) — contradiction.  The deep core of the 14.5(c) `R(x)`-cover
+trivIset.  Axiom-clean. -/
+#assert_only_allowed_axioms OddOrder.BG.Ch4.S16.sigma_cover_disjoint_of_inputs

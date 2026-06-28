@@ -421,3 +421,16 @@ general ℓ_σ=1 は 𝓜_σ(x)≠∅ から M 抽出)。
   `.disjoint` で x=1 矛盾。 (5) ⚠ branch: |𝓜_σ(x)|=1 (R_x=⊥) では x·R_x={x}; この場合の disjoint も要処理。
 - ⚠ **長い grind 継続中** (14.5a→14.5c→theoremE→bgTheoremE→spine)。高速代替 = cross-lane refactor
   (card_LF を partition-only 化、lane c 協調) を hub/user 判断で検討推奨。
+
+## ✅ 進捗 (lane d, 2026-06-29 cont.¹⁴ — /loop): **BG Lemma 14.5(a) core 完成** (sigma_cover_disjoint_of_inputs)
+
+**`sigma_cover_disjoint_of_inputs`** (S16、axiom-clean、cluster 最難ピース): 異なる ℓ_σ=1 元 x,y の
+cover coset `x·R(x)`, `y·R(y)` (R=Msigma N⊓C) は disjoint。証明 = 共通元 g=x·r=y·s ⟹
+σ-decomp で `{x}∪{r}^#={y}∪{s}^#` ⟹ y=r, s=x ⟹ x が y-centralizer complement (M'=N_x) の自明交差に
+落ちる (`signalizer_centralizer_isComplement`) ⟹ x=1 矛盾。`_of_inputs` 形 (structure data を hyp、choose 回避)。
+plan 通り完遂 (1 build fix: `Set.mem_diff.mp`→`.1`)。
+
+**残 14.5c**: (1) wrapper (structure 抽出で cover の canonical R に接続) (2) **14.5c cardinality**: cover
+identity (M̃^G=⋃x·R(x)) + trivIset (14.5a ✅) + double-count (|R|=|𝓜_σ| ✅ `card_signalizer`) +
+orbit-stabilizer ([G:M] `ncard_conjugates_eq_index_of_normalizer_eq_self` S14:4749) (3) theoremE assemble。
+**14.5c cluster の数学核 (consttM/cover-decomp/14.5a) 完了; 残は assembly 寄り**。次 = 14.5c cardinality 組立。
