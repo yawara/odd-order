@@ -6732,3 +6732,13 @@ remaining content.  All axiom-clean. -/
 #assert_only_allowed_axioms OddOrder.BG.Ch4.S16.maximalSigmaSubgroupsOfElement_eq_singleton_of_centralizer_le
 #assert_only_allowed_axioms OddOrder.BG.Ch4.S16.conjSharplyTransitiveOn_of_pointed
 #assert_only_allowed_axioms OddOrder.BG.Ch4.S16.RData_of_inputs
+
+/-! **Theorem D(3) conjunct 3, the centralizer complement** (`S16_MainResults`, Coq Theorem 14.4(b)
+`R ⋊ C_(M∩N)(x) = C(x)`; lane δ, issue 8020).  `Subgroup.IsComplement'.inf_centralizer_of_normalizer`
+is the general mathcomp `subcent_sdprod` engine (a complement descends to centralizers when the
+centralized element normalizes both factors); `signalizer_centralizer_isComplement` applies it to the
+proven structure's `N`-complement, discharging the one genuinely-deep `RData` input;
+`RData_of_gt_one` assembles the full `|𝓜_σ(x)| > 1` branch of Theorem D(3).  All axiom-clean. -/
+#assert_only_allowed_axioms Subgroup.IsComplement'.inf_centralizer_of_normalizer
+#assert_only_allowed_axioms OddOrder.BG.Ch4.S16.signalizer_centralizer_isComplement
+#assert_only_allowed_axioms OddOrder.BG.Ch4.S16.RData_of_gt_one
