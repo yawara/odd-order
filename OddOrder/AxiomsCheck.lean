@@ -5966,6 +5966,21 @@ through `typeP_maximal_eq_kappaHall_sup_U_sup_Msigma` + `isTypeP1_kappaSigma_com
 -- axiom-clean: it routes through `isTypeF_of_isTypeI` + `isTypeP_of_isTypeNonI` only, no longer
 -- citing the `sorry`-bearing §16 type-classification reverse bridges.
 #assert_only_allowed_axioms OddOrder.BG.Ch4.S16.not_isTypeI_of_isTypeNonI
+-- **Prop 16.1 reverse bridges `hIIP2` / `hIIIIVP1` / `hVP1` — the type II/III/IV/V mutual-exclusivity
+-- layer, now fully `sorry`-free + axiom-clean.**  `not_isTypeV_of_typePData_U_ne_bot` (the `U = ⊥`
+-- core, generalising `not_isTypeII_of_isTypeV`) gives `III/IV ≠ V`; `typePData_exists_conj_U`
+-- (Schur–Zassenhaus inside `↥M'`: both `U` complement the nilpotent normal Hall `M_F`, coprime) and
+-- `typePData_normalizer_U_le_iff` (normalizer transfer) give `II ≠ III/IV`
+-- (`not_isTypeII_of_isTypeIII_or_IV`).  These refine `IsTypeNonI ⟹ IsTypeP` (`= P₁ ∨ P₂`) to the
+-- exact type, closing the last two bridges — so **`proposition_type_classification` (BG Prop 16.1) is
+-- fully `sorry`-free and axiom-clean.**
+#assert_only_allowed_axioms OddOrder.BG.Ch4.S16.not_isTypeV_of_typePData_U_ne_bot
+#assert_only_allowed_axioms OddOrder.BG.Ch4.S16.not_isTypeII_of_isTypeV
+#assert_only_allowed_axioms OddOrder.BG.Ch4.S16.not_isTypeV_of_isTypeIII_or_IV
+#assert_only_allowed_axioms OddOrder.BG.Ch4.S16.typePData_exists_conj_U
+#assert_only_allowed_axioms OddOrder.BG.Ch4.S16.typePData_normalizer_U_le_iff
+#assert_only_allowed_axioms OddOrder.BG.Ch4.S16.not_isTypeII_of_isTypeIII_or_IV
+#assert_only_allowed_axioms OddOrder.BG.Ch4.S16.proposition_type_classification
 -- 15.7(e) conjunct A divisibility engine (Coq `regZq_dv_q1`): a `U0`-invariant order-`q` subgroup
 -- of the Frobenius kernel `M_F` forces `exp U ∣ q - 1` (Frobenius semiregular action).
 #assert_only_allowed_axioms OddOrder.BG.Ch4.S16.typeF_exponent_dvd_sub_one_of_invariant_card

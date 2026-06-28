@@ -3182,31 +3182,163 @@ theorem mf_eq_msigma_of_typePData_U_eq_bot [Finite G] (hG : OddOrder.BG.IsMinima
   refine le_antisymm (S15.maxNilpotentNormalHall_le_Msigma hG hM) ?_
   exact hderiv ▸ OddOrder.BG.Ch3.S10.Msigma_le_derived hG hM
 
-/-- **Type V and Type II are mutually exclusive** (the `U = ⊥` vs `U ≠ ⊥` dichotomy): a type-V
-maximal has `M' = M_F` (trivial complement `U = ⊥`), while a type-II maximal has `M' ⊋ M_F`
-(nontrivial complement `U ≠ ⊥`, `TypePNontrivialCore`).  Since `M' = M_F ⊔ U` and `U` is a
-complement of `M_F = H` in `M'`, both data structures fix the *same* `H = maxNilpotentNormalHall M`,
-so a type-V witness forces the type-II complement `U ≤ H`, hence (disjointness) `U = ⊥` — a
-contradiction.  Supplies the `¬ M_P2` half of the reverse bridge `hVP1`. -/
-theorem not_isTypeII_of_isTypeV {M : Subgroup G} :
-    OddOrder.GroupTheory.IsTypeV M → ¬ OddOrder.GroupTheory.IsTypeII M := by
-  rintro ⟨dV⟩ ⟨dII⟩
+/-- **Type V vs a nontrivial complement** (general `U = ⊥` exclusivity core): a maximal subgroup
+cannot be both type `V` (a `TypeVData`, so `U = ⊥` and `M' = M_F`) and carry a `TypePData` with
+`U ≠ ⊥`.  Both data fix the *same* `H = maxNilpotentNormalHall M` and present `U` as a complement of
+`H` in `M' = M_F ⊔ U`; the type-V witness forces `M' = M_F`, so the other `U ≤ H`, hence
+(disjointness of the complement) `U = ⊥`.  Generalises the `not_isTypeII_of_isTypeV` argument and is
+the common core of the `III/IV ≠ V` exclusivity used in the reverse bridges. -/
+theorem not_isTypeV_of_typePData_U_ne_bot {M : Subgroup G}
+    (hV : OddOrder.GroupTheory.IsTypeV M) (data : TypePData M) (hU : data.U ≠ ⊥) : False := by
+  obtain ⟨dV⟩ := hV
   have hMV : derivedInG M = maxNilpotentNormalHall M := by
     rw [dV.typeP.derivedInG_eq_fitting_sup_U, dV.U_eq_bot, sup_bot_eq]
-  have hUH : dII.typeP.U ≤ dII.typeP.H := by
-    rw [dII.typeP.H_eq]
-    have hsup : maxNilpotentNormalHall M ⊔ dII.typeP.U = maxNilpotentNormalHall M := by
-      rw [← dII.typeP.derivedInG_eq_fitting_sup_U, hMV]
+  have hUH : data.U ≤ data.H := by
+    rw [data.H_eq]
+    have hsup : maxNilpotentNormalHall M ⊔ data.U = maxNilpotentNormalHall M := by
+      rw [← data.derivedInG_eq_fitting_sup_U, hMV]
     exact le_sup_right.trans (le_of_eq hsup)
-  have hdisj : Disjoint (dII.typeP.H.subgroupOf (derivedInG M))
-      (dII.typeP.U.subgroupOf (derivedInG M)) := dII.typeP.derived_complement.disjoint
-  have hUsub : dII.typeP.U.subgroupOf (derivedInG M) = ⊥ := by
+  have hdisj : Disjoint (data.H.subgroupOf (derivedInG M))
+      (data.U.subgroupOf (derivedInG M)) := data.derived_complement.disjoint
+  have hUsub : data.U.subgroupOf (derivedInG M) = ⊥ := by
     rw [← inf_of_le_left (Subgroup.subgroupOf_mono (derivedInG M) hUH), inf_comm,
       disjoint_iff.mp hdisj]
-  have hUbot : dII.typeP.U = ⊥ :=
-    (inf_of_le_left dII.typeP.U_le).symm.trans
+  have hUbot : data.U = ⊥ :=
+    (inf_of_le_left data.U_le).symm.trans
       (disjoint_iff.mp (Subgroup.subgroupOf_eq_bot.mp hUsub))
-  exact dII.common.1 hUbot
+  exact hU hUbot
+
+/-- **Type V and Type II are mutually exclusive** (the `U = ⊥` vs `U ≠ ⊥` dichotomy): a type-II
+maximal has a nontrivial complement `U ≠ ⊥` (`TypePNontrivialCore`), ruled out against a type-V
+witness by `not_isTypeV_of_typePData_U_ne_bot`.  Supplies the `¬ M_P2` half of `hVP1`. -/
+theorem not_isTypeII_of_isTypeV {M : Subgroup G} :
+    OddOrder.GroupTheory.IsTypeV M → ¬ OddOrder.GroupTheory.IsTypeII M :=
+  fun hV ⟨dII⟩ => not_isTypeV_of_typePData_U_ne_bot hV dII.typeP dII.common.1
+
+/-- **Type III/IV and Type V are mutually exclusive** (the `U ≠ ⊥` vs `U = ⊥` dichotomy): types III
+and IV carry a `TypePData` with nontrivial complement `U ≠ ⊥` (`TypePNontrivialCore`), ruled out
+against a type-V witness by `not_isTypeV_of_typePData_U_ne_bot`.  Used in the `hIIIIVP1` reverse
+bridge to force `M_F ≠ M_σ` (else the type would be V). -/
+theorem not_isTypeV_of_isTypeIII_or_IV {M : Subgroup G}
+    (h : OddOrder.GroupTheory.IsTypeIII M ∨ OddOrder.GroupTheory.IsTypeIV M) :
+    ¬ OddOrder.GroupTheory.IsTypeV M := by
+  intro hV
+  rcases h with hd | hd
+  · exact not_isTypeV_of_typePData_U_ne_bot hV hd.some.typeP hd.some.common.1
+  · exact not_isTypeV_of_typePData_U_ne_bot hV hd.some.typeP hd.some.common.1
+
+/-- **Type-`P` complements are `M`-conjugate** (Schur–Zassenhaus): for any two `TypePData` on a
+maximal subgroup `M`, the complements `U` are conjugate by an element of `M`.  Both `U_i` complement
+the nilpotent normal Hall subgroup `H = M_F` in `M' = [M,M]` (the `derived_complement` field, with
+`H` witness-independent via `H_eq`).  `H` is a Hall subgroup of `M`
+(`maxNilpotentNormalHall_isHall`), hence Hall in `M'` (its `M'`-index divides its `M`-index), so
+`|H|` and `[M' : H] = |U|` are coprime; Schur–Zassenhaus conjugacy of complements of a normal Hall
+subgroup (`IsComplement'.exists_conj_of_coprime`, applied inside `↥M'`) gives `n ∈ H ≤ M` with
+`n · U_1 · n⁻¹ = U_2`.  This is the engine behind the `II ≠ III/IV` exclusivity
+(`not_isTypeII_of_isTypeIII_or_IV`): it transfers the normalizer condition `N_G(U) ≤ M` between
+witnesses. -/
+theorem typePData_exists_conj_U [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    {M : Subgroup G} (hM : M ∈ maximalSubgroups G) (d1 d2 : TypePData M) :
+    ∃ n : G, n ∈ M ∧ MulAut.conj n • d1.U = d2.U := by
+  have hH_le : maxNilpotentNormalHall M ≤ derivedInG M := maxNilpotentNormalHall_le_derived hG hM
+  have hH_le_M : maxNilpotentNormalHall M ≤ M := maxNilpotentNormalHall_le M
+  have hM'_le_M : derivedInG M ≤ M := Subgroup.map_subtype_le _
+  have hU1_le : d1.U ≤ derivedInG M := d1.U_le
+  have hU2_le : d2.U ≤ derivedInG M := d2.U_le
+  -- Solvability of `↥M'` (transport along the inclusion `↥M' ↪ ↥M`).
+  haveI hMsolv : IsSolvable ↥M := hG.solvable_of_mem_maximalSubgroups hM
+  haveI hM'solv : IsSolvable ↥(derivedInG M) :=
+    solvable_of_solvable_injective (Subgroup.inclusion_injective hM'_le_M)
+  -- `H ◁ M'` (set-form normalizer, `M' ≤ M ≤ N_G(H)`).
+  have hM'_le_NH : derivedInG M ≤ Subgroup.normalizer (maxNilpotentNormalHall M : Set G) :=
+    hM'_le_M.trans (maxNilpotentNormalHall_le_normalizer M)
+  haveI hHn_normal : ((maxNilpotentNormalHall M).subgroupOf (derivedInG M)).Normal :=
+    (Subgroup.normal_subgroupOf_iff_le_normalizer hH_le).mpr hM'_le_NH
+  -- Both `U_i` complement `H` in `M'` (`derived_complement`, rewritten via `H = M_F`).
+  have hK1 : ((maxNilpotentNormalHall M).subgroupOf (derivedInG M)).IsComplement'
+      (d1.U.subgroupOf (derivedInG M)) := by rw [← d1.H_eq]; exact d1.derived_complement
+  have hK2 : ((maxNilpotentNormalHall M).subgroupOf (derivedInG M)).IsComplement'
+      (d2.U.subgroupOf (derivedInG M)) := by rw [← d2.H_eq]; exact d2.derived_complement
+  -- Coprimality `|H|` vs `[M' : H]`: `[M' : H] ∣ [M : H]` and `H` is Hall in `M`.
+  have hdvd' : ((maxNilpotentNormalHall M).subgroupOf (derivedInG M)).index ∣
+      ((maxNilpotentNormalHall M).subgroupOf M).index := by
+    have hmul := Subgroup.relIndex_mul_relIndex (maxNilpotentNormalHall M) (derivedInG M) M
+      hH_le hM'_le_M
+    exact ⟨(derivedInG M).relIndex M, hmul.symm⟩
+  have hcardEq : Nat.card ↥((maxNilpotentNormalHall M).subgroupOf (derivedInG M))
+      = Nat.card ↥((maxNilpotentNormalHall M).subgroupOf M) := by
+    rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hH_le).toEquiv,
+      Nat.card_congr (Subgroup.subgroupOfEquivOfLe hH_le_M).toEquiv]
+  have hcop : Nat.Coprime
+      (Nat.card ↥((maxNilpotentNormalHall M).subgroupOf (derivedInG M)))
+      ((maxNilpotentNormalHall M).subgroupOf (derivedInG M)).index := by
+    rw [hcardEq]
+    exact ((maxNilpotentNormalHall_isHall M).coprime_index).coprime_dvd_right hdvd'
+  -- Schur–Zassenhaus inside `↥M'`: `n ∈ H` with `(U_1)ᶜᵒⁿʲ = U_2`.
+  obtain ⟨n, hnH, hnconj⟩ :=
+    Subgroup.IsComplement'.exists_conj_of_coprime hcop (Or.inl inferInstance) hK1 hK2
+  -- Translate the conjugacy back to `G` (intertwine `M'.subtype` with `conj`).
+  have hintertwine : (derivedInG M).subtype.comp (MulAut.conj n).toMonoidHom =
+      (MulAut.conj (n : G)).toMonoidHom.comp (derivedInG M).subtype := by
+    ext ⟨y, hy⟩; rfl
+  have hsmul_map : ∀ K : Subgroup G,
+      MulAut.conj (n : G) • K = K.map (MulAut.conj (n : G)).toMonoidHom := by
+    intro K; rw [Subgroup.pointwise_smul_def]; rfl
+  have hLHS : ((d1.U.subgroupOf (derivedInG M)).map (MulAut.conj n).toMonoidHom).map
+      (derivedInG M).subtype = MulAut.conj (n : G) • d1.U := by
+    rw [Subgroup.map_map, hintertwine, ← Subgroup.map_map,
+      Subgroup.map_subgroupOf_eq_of_le hU1_le, hsmul_map]
+  have hRHS : (d2.U.subgroupOf (derivedInG M)).map (derivedInG M).subtype = d2.U :=
+    Subgroup.map_subgroupOf_eq_of_le hU2_le
+  refine ⟨(n : G), hM'_le_M n.2, ?_⟩
+  calc MulAut.conj (n : G) • d1.U
+      = ((d1.U.subgroupOf (derivedInG M)).map (MulAut.conj n).toMonoidHom).map
+          (derivedInG M).subtype := hLHS.symm
+    _ = (d2.U.subgroupOf (derivedInG M)).map (derivedInG M).subtype := by rw [hnconj]
+    _ = d2.U := hRHS
+
+/-- **Normalizer condition transfers between type-`P` complements** (mmd L4478 reverse): for two
+`TypePData` on a maximal `M`, `N_G(U_1) ≤ M ⟺ N_G(U_2) ≤ M`.  The complements are `M`-conjugate
+(`typePData_exists_conj_U`), and conjugation by `n ∈ M` fixes `M`
+(`conj_smul_eq_self_of_mem_normalizer`) and intertwines normalizers (`normalizer_conj_smul`).  This
+is the bridge that makes the type-II condition `¬ N_G(U) ≤ M` and the type-III/IV condition
+`N_G(U) ≤ M` contradictory on the same `M`. -/
+theorem typePData_normalizer_U_le_iff [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    {M : Subgroup G} (hM : M ∈ maximalSubgroups G) (d1 d2 : TypePData M) :
+    Subgroup.normalizer (d1.U : Set G) ≤ M ↔ Subgroup.normalizer (d2.U : Set G) ≤ M := by
+  obtain ⟨n, hnM, hconj⟩ := typePData_exists_conj_U hG hM d1 d2
+  have hnorm : Subgroup.normalizer (d2.U : Set G)
+      = MulAut.conj n • Subgroup.normalizer (d1.U : Set G) := by
+    rw [← hconj]; exact (normalizer_conj_smul n d1.U).symm
+  have hMfix : MulAut.conj n • M = M :=
+    conj_smul_eq_self_of_mem_normalizer (Subgroup.le_normalizer hnM)
+  rw [hnorm]
+  constructor
+  · intro h1
+    calc MulAut.conj n • Subgroup.normalizer (d1.U : Set G)
+        ≤ MulAut.conj n • M := Subgroup.pointwise_smul_le_pointwise_smul_iff.mpr h1
+      _ = M := hMfix
+  · intro h2
+    have h3 : MulAut.conj n • Subgroup.normalizer (d1.U : Set G) ≤ MulAut.conj n • M := by
+      rw [hMfix]; exact h2
+    exact Subgroup.pointwise_smul_le_pointwise_smul_iff.mp h3
+
+/-- **Type II and Type III/IV are mutually exclusive** (mmd L4478 reverse): the type-II condition
+`¬ N_G(U) ≤ M` (`TypeIIData.normalizer_not_le`) and the type-III/IV condition `N_G(U) ≤ M`
+(`TypeIIIData.normalizer_le`/`TypeIVData.normalizer_le`) cannot both hold on a maximal `M`, since the
+complements `U` are `M`-conjugate (`typePData_normalizer_U_le_iff`).  This is the exclusivity that
+refines `IsTypeP` (`= IsTypeP1 ∨ IsTypeP2`) into the precise type for the reverse bridges
+`hIIP2`/`hIIIIVP1`. -/
+theorem not_isTypeII_of_isTypeIII_or_IV [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    {M : Subgroup G} (hM : M ∈ maximalSubgroups G)
+    (h : OddOrder.GroupTheory.IsTypeIII M ∨ OddOrder.GroupTheory.IsTypeIV M) :
+    ¬ OddOrder.GroupTheory.IsTypeII M := by
+  rintro ⟨dII⟩
+  rcases h with hd | hd
+  · exact dII.normalizer_not_le
+      ((typePData_normalizer_U_le_iff hG hM dII.typeP hd.some.typeP).mpr hd.some.normalizer_le)
+  · exact dII.normalizer_not_le
+      ((typePData_normalizer_U_le_iff hG hM dII.typeP hd.some.typeP).mpr hd.some.normalizer_le)
 
 /-- **Prop 16.1 reverse, centralizer half of `π(W₁) ⊆ κ(M)`** (mmd L4478, `1 ⊂ C_H(W₁) ⊆
 C_{M_σ}(W₁)`): for a type-`P` datum and a nonidentity `x ∈ W₁`, the `M_σ`-centralizer of `x` is
@@ -4382,10 +4514,34 @@ theorem proposition_type_classification [Finite G]
   -- `hIF` (Type I ⟹ Type F): `isTypeF_of_isTypeI` (BG L4486 reverse direction), modulo the
   -- type-`F` Frobenius FPF crux.
   case hIF => exact isTypeF_of_isTypeI hG hM
-  -- `hIIP2` (Type II ⟹ Type P₂): `π(W₁) ⊆ κ(M)` (carrier `W₁ = κ`-Hall, issue 8015).
-  case hIIP2 => sorry
-  -- `hIIIIVP1` (Type III/IV ⟹ Type P₁ ∧ `M_F ≠ M_σ`): `π(W₁) ⊆ κ(M)` + `M_F ≠ M_σ` (carrier).
-  case hIIIIVP1 => sorry
+  -- `hIIP2` (Type II ⟹ Type P₂): Type II is non-Type-I, so `IsTypeP` (`= P₁ ∨ P₂`,
+  -- `isTypeP_of_isTypeNonI`).  The `P₁` branch is excluded: with `M_F = M_σ` it is Type V
+  -- (`hP1eqV`, contradicting II via `not_isTypeII_of_isTypeV`); with `M_F ≠ M_σ` it is Type III/IV
+  -- (`hP1neIIIIV`, contradicting II via `not_isTypeII_of_isTypeIII_or_IV`).  Hence `P₂`.
+  case hIIP2 =>
+    intro hII
+    rcases isTypeP_iff_isTypeP1_or_isTypeP2.mp (isTypeP_of_isTypeNonI hG hM (Or.inl hII))
+      with hP1 | hP2
+    · by_cases hmf : S15.MF M = OddOrder.BG.Ch3.S10.Msigma M
+      · exact absurd hII
+          (not_isTypeII_of_isTypeV (isTypeV_of_isTypeP1_mf_eq_msigma hG hM hP1 hmf))
+      · exact absurd hII (not_isTypeII_of_isTypeIII_or_IV hG hM
+          (isTypeIII_or_IV_of_isTypeP1_mf_ne_msigma hG hM hP1 hmf))
+    · exact hP2
+  -- `hIIIIVP1` (Type III/IV ⟹ Type P₁ ∧ `M_F ≠ M_σ`): Type III/IV is non-Type-I, so `IsTypeP`.
+  -- The `P₂` branch is excluded (`P₂ ⟹ II`, contradicting III/IV via
+  -- `not_isTypeII_of_isTypeIII_or_IV`), giving `P₁`; and `M_F = M_σ` would make it Type V (`hP1eqV`,
+  -- contradicting III/IV via `not_isTypeV_of_isTypeIII_or_IV`), so `M_F ≠ M_σ`.
+  case hIIIIVP1 =>
+    intro h34
+    have hP : S14.IsTypeP M := isTypeP_of_isTypeNonI hG hM
+      (h34.elim (fun h => Or.inr (Or.inl h)) (fun h => Or.inr (Or.inr (Or.inl h))))
+    have hP1 : S14.IsTypeP1 M := by
+      rcases isTypeP_iff_isTypeP1_or_isTypeP2.mp hP with hP1 | hP2
+      · exact hP1
+      · exact absurd (isTypeII_of_isTypeP2 hG hM hP2) (not_isTypeII_of_isTypeIII_or_IV hG hM h34)
+    exact ⟨hP1, fun hmf =>
+      not_isTypeV_of_isTypeIII_or_IV h34 (isTypeV_of_isTypeP1_mf_eq_msigma hG hM hP1 hmf)⟩
   -- `hVP1` (Type V ⟹ Type P₁ ∧ `M_F = M_σ`): `M_F = M_σ` from `U = ⊥`
   -- (`mf_eq_msigma_of_typePData_U_eq_bot`); `IsTypeP1` (not `P₂`) because `P₂ ⟹ Type II`
   -- (`isTypeII_of_isTypeP2`) contradicts `Type V` (`not_isTypeII_of_isTypeV`).
