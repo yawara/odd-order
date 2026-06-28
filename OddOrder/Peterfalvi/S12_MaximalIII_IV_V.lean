@@ -114,6 +114,18 @@ theorem conjBy_conj {K : Type*} [Group K] {H : Subgroup K} [H.Normal]
   ext h
   simp only [ClassFunction.conj_apply, ClassFunction.conjBy_apply]
 
+/-- **The complex-conjugation involution `conjPerm` commutes with `M`-conjugation `conjBy`** on the
+irreducible characters of a normal subgroup `H ⊴ K`.  Lifts `conjBy_conj` to `IrreducibleCharacter`
+via the coercion lemmas.  This is what makes the conjugation orbit `conjByOrbit θ` invariant under
+`conjPerm`, the key to the odd-order non-reality of `Ind_{M'}^M θ`. -/
+theorem conjPerm_conjBy_comm {K : Type*} [Group K] {H : Subgroup K} [H.Normal] [Finite ↥H]
+    (g : K) (θ : IrreducibleCharacter ↥H) :
+    IrreducibleCharacter.conjPerm ↥H (IrreducibleCharacter.conjBy g θ)
+      = IrreducibleCharacter.conjBy g (IrreducibleCharacter.conjPerm ↥H θ) := by
+  refine IrreducibleCharacter.ext ?_
+  simp only [IrreducibleCharacter.conjPerm_apply_coe, IrreducibleCharacter.coe_conjBy]
+  exact conjBy_conj g (θ : ClassFunction ↥H ℂ)
+
 /-! ## (10.1): the type III/IV/V hypothesis -/
 
 open scoped FiniteInduce in
