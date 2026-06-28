@@ -177,3 +177,34 @@ x∈sigmaSharp M で structure が直接適用可能。
 genuineSigmaDecomposition+Msigma_ell1 経由) → (B) hD3 の RData: R◁C[x] (既証移植) + C_M(x) Hall + complement(b) +
 set 関係 (maximalConjugatesContaining↔M_σ[x]) → (C) hD4 の MF/ASet/P2 gap。my `FT_signalizer_isHall`/`_normal`
 は structure と整合 (重複でなく N 接続待ち)。
+
+## 進捗ログ (lane d, 7-9 回目 — /loop Chunk 2: RData 機構 + assembly skeleton)
+
+**2026-06-29 cont.⁴ (/loop iter 5-8): RData assembly skeleton 完成 — conjuncts 2,4 を機構で discharge。**
+commits: 一般 normality (`bd27057d`) / set-relation `maximalConjugatesContaining_eq_maximalSigma`
+(`a188294d`) / sharp-transitivity core `conjSharplyTransitiveOn_of_pointed` (`6566921c`) /
+**`RData_of_inputs`** assembly (`da6ed003`)。全 axiom-clean、full build green。
+
+**Theorem D(3) RData の現状 (S16_MainResults)**:
+- **conjunct 2 (R◁C[x])** ✅ = `centralizer_le_normalizer_Msigma_inf_centralizer` (任意 C[x]≤N)。
+- **conjunct 4 (sharp transitivity on `maximalConjugatesContaining M x`)** ✅ =
+  `maximalConjugatesContaining_eq_maximalSigma` (=M_σ[x]) + `conjSharplyTransitiveOn_of_pointed`
+  (structure の from-M transitivity から full、r=b·a⁻¹)。
+- **`RData_of_inputs`**: structure の (N, C[x]≤N, hsharp) + 深い M-side inputs (conjunct 1,3) から
+  RData 全 4 連言を組立 (sorry-free skeleton)。**hD3 の >1 枝を conjunct 1,3 に結晶化**。
+
+**⚠ 残 conjunct 1 (C_M(x) σ(M)-Hall in C[x]) の正確な性質 (高 context での誤判定回避メモ)**:
+`mf_centralizer_hall_decomp` (S15) は C_M(⟨x⟩)=(C[x]⊓M_σ)⊔X (X cyclic, primes⊆τ2(M))。
+**τ2(M)⊆σ(M)ᶜ** (`tau2_subset_sigma_compl`、def `tau2={p∉σ ∧ pRank=2}`) ゆえ X は σ 外。
+**だが x∈M_σ^# では X=1**: τ2-element は M_σ-element を中心化しない (Thm 12.5
+`Msigma_nilpotent_of_tau2`: p∈τ2 で C_{M_σ}(rank-2 elem-ab)=1)。⟹ C_M(x)=C[x]⊓M_σ で σ(M)-group。
+∴ conjunct 1 ⟺ (a) M⊓C[x]=M_σ⊓C[x] [no-τ2-centralizer、Thm 12.5] + (b) M_σ⊓C[x] σ(M)-Hall in C[x]。
+**conjunct 1 は偽ではない** — careful な τ2-centralizer 解析が要るだけ。
+
+**⚠ 残 conjunct 3 (R⋊C_M(x)=C[x]、Coq part b)** = Frobenius complement の regular-action 構造。深い。
+
+**次の上流順 work (fresh context 推奨)**: (1) `M⊓C[x]=M_σ⊓C[x]` for x∈M_σ^# (Thm 12.5 経由) →
+conjunct 1 の (a) / (2) `M_σ⊓C[x] σ(M)-Hall in C[x]` = conjunct 1 (b) / (3) conjunct 3 (part b) /
+(4) structure 適用 wiring (signalizer_structure_of_mem_sigmaSharp で N/hsharp 取得) + |M_σ[x]|=1 枝
+(C[x]≤M, R=⊥) → hD3 完成 / (5) hD4 の MF=Msigma / x∈ASet / TypeP2→Frobenius gaps。
+assembly skeleton `RData_of_inputs` は ready、残は M-side 構造の本体証明。
