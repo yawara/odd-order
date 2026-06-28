@@ -1,179 +1,33 @@
-# main 合流モニター — A/B/D レーン自動合流の運用手順
+# main 合流モニター — a/b/c/d レーン自動合流の運用手順
 
-> 横断運用ドキュメント。`/loop 15m` から参照される。main worktree = `/home/ywr/odd-order`。
-> ユーザー方針 (2026-06-08): **「検証通過は自動合流」**。build green + axiom-clean + sorry 不増を
-> 満たすレーンを `--no-ff` で自動マージ。満たさなければ `git merge --abort` して報告。
-> **2026-06-11 追加**: 合流 commit が成立したら最後に `git push origin main` (cron job `a8824a71`;
-> 変化なし/全 abort 時は push しない)。
+> 横断運用ドキュメント。15 分間隔の監視 cron から参照される。main worktree = `/home/ywr/odd-order`。
+> ユーザー方針: **「検証通過は自動合流」** — build green + axiom-clean + sorry regression なし + 新 axiom なしを
+> 満たすレーンを `--no-ff` で自動マージ。満たさなければ `git merge --abort` で報告。合流成立時は最後に
+> `git push origin main`（変化なし/全 abort なら push しない）。
+>
+> **レーン配分の正本 = [`ft_lane_reallocation_2026_06_28.md`](ft_lane_reallocation_2026_06_28.md)**
+> (ゲートなし・signature contract 方式)。本ファイルは hub 側の合流手順 + gotcha 集。
 
-## レーン (2026-06-21 最新⁵: **B+F+H+C の 4 レーン体制**、branch = lane-b/f/h/c — FT frontier の大セグメント分割)
+## レーン (2026-06-28 再配分: 4 レーン a/b/c/d)
 
-**4-lane 再編 (ユーザー裁可 2026-06-21)**: FT spine が深い線形チェーン (BG §14→16 → Pf §10→16) で char API
-(Pf §3-9) は完成済みと判明 → FT frontier (102 sorry) を **signature-first で大セグメントに分割**。隣接ファイルの
-重なり (旧 B/H が両方 Pf §10-16) を解消し、各レーンを contiguous な非重複セグメントに。
+| lane | branch | worktree | クラスタ | 主所有 .lean | issue base |
+|---|---|---|---|---|---|
+| **a** | `a` | `odd-order-a` | α Pf §10–13 中央指標核 (bare spine sorry 11.8) | `Peterfalvi/S(0[3-9]|1[0-3])*` + `FeitThompson.lean:426` | 1000 |
+| **b** | `b` | `odd-order-b` | β Pf §12 Dade tower (12.16) | `Peterfalvi/S14_MaximalI.lean` | 2000 |
+| **c** | `c` | `odd-order-c` | γ POLE-2 §14–16 + §15 (最長 pole) | `Peterfalvi/{S15_SAndT,S15_SAndT_Setup,S16_NonExistenceG}.lean` | 3000 |
+| **d** | `d` | `odd-order-d` | δ BG §14–16 局所解析 + carrier | `BG/**`（特に Ch4_FamilyOfMaximal/{S14_TypePCounting,S15_MF,S16_MainResults,S16_PairIntersection}）+ `FeitThompson.lean` carrier 宣言 | 4000 |
 
-| レーン | branch | セグメント | 所有ファイル | 自動合流 |
-|---|---|---|---|---|
-**⚠ 2026-06-22 最小修正 (ユーザー裁可、機能再割当)**: lane-c issue 4002 + S11 衝突 ×2 → hub 深掘り
-([`lane_functional_split_analysis.md`](lane_functional_split_analysis.md)) → §-分割が 3 機能 (群構造/Dade char/assembly)
-を散乱させていたと判明。ユーザー選択「最小修正」(file-split なし、機能で再割当): **S11 を H 単独所有に
-変更** (Wielandt §9 は H の連結 chunk、§11 衝突解消)、B は §10/§12/§13 char grid に専念、C は §16 char
-endpoint を自走所有 (B 待ちにしない)。
+**signature-first interface (ゲートは幻)**: 上流が sorried signature を export → 下流が cite。各レーンは独立クラスタを
+正面から埋め、cross-cluster は signature contract で媒介 (待たない)。詳細 = ft_lane_reallocation_2026_06_28.md。
 
-**⚠ 2026-06-22 frontier-cluster 再配置 (ユーザー裁可、issue 4005 監査結果)**: 4-territory read-only audit で
-「節区切りは starve を生むが実害は lane-c (§16 終点 = pure consumer) のみ。F/H/B は productive frontier 上、
-lane-h 領域に ~16 独立 workable leaf 集中」と判明 → **lane-c を §16 から Pf §11 (Wielandt §9 / Clifford
-9.6-9.10 = Pf 最上流の独立 5-leaf cluster) に再配置**。**S11 を H → C に移譲** (H は §14_MaximalI+§15 に集中)。
-**§16 (S16_NonExistenceG) + §10 (S10) は driver 化** = 常駐レーンを置かず、上流 (BG §16 / S15) landing 時に
-機会的に閉じる (実施 owner = hub、または上流を landing させたレーンが続けて driver で close)。各レーンを
-productive な独立クラスタに乗せ、上流優先方針 (CLAUDE.md) にも合致。
+**取り決め**: (1) 各レーンは**自所有ファイルのみ編集**、他は cite (要望は notes/issue 経由)。
+(2) **新規 `axiom` 宣言は abort + ユーザー承認**。(3) **起動時 main 同期** = `git merge main` (3-way、`--ff-only` 禁止)。
+`lake update` 禁止。コミットは main のみ。マージ順 = **a → b → c → d** (独立ゆえ形式的)。
 
-| レーン | branch | 機能 (frontier クラスタ) | 所有ファイル | 自動合流 |
-|---|---|---|---|---|
-| **F** | `lane-f` | **BG §14-16 構造** | `S14_TypePCounting`/`S15_MF`/`S16_MainResults`/`S16_PairIntersection` + `FeitThompson.lean` の §16 producer。Theorem A-I / Prop 16.1 | ✅ |
-| **B** | `lane-b` | **Pf §12 Dade char-grid + cd assembly** | `S12_MaximalIII_IV_V` + `section16CharacterData` (POLE-1 cd, §3-§13 束ね)。**`S13` を H 移譲 (2026-06-23)、`S10` は driver** | ✅ |
-| **H** | `lane-h` | **Pf §13 char-grid (type III/IV)** | `S13_MaximalIII_IV` (active, 8 sorry) + `S14_MaximalI` (driver, (12.9) は Prop16.1 待ち=自己復帰)。**S15/S11/S12 は触らない** | ✅ |
-| **C** | `lane-c` | **Pf §15 S&T** | **`S15_SAndT` (S&T 構造、36 sorry、2026-06-23 H→C 移譲)**。依存 §15→§14 ゆえ §14 を cite のみ。**`S11`/`S16_NonExistenceG` は driver (上流 landing 時に機会的 close)、常駐しない** | ✅ |
-
-> **⚠ 2026-06-23 relane (ユーザー裁可、issue 4007)**: lane-c の §11 ungated 枯渇 (9.1-9.7 完了) を受け hub が
-> frontier 再監査 → 「負荷は H/F に偏在 (各 51 sorry)、3 が並列限界でない」と判明。**H の 51-sorry 負荷
-> (S14_MaximalI 15 + S15_SAndT 36) を 2 レーンに分割**: **S15_SAndT を H→C 移譲**、H は S14_MaximalI に集中。
-> S15_SAndT は S14_MaximalI を import (依存方向 §15→§14) ゆえ signature-first 境界がクリーン (co-edit なし)。
-> §11 は driver 化 ((9.8)-(9.11) は lane-b char 待ち)。各 LAUNCH.md 更新済。
-
-> **⚠ 2026-06-23 relane #2 (hub 判断、issue 8018+2017、レーン等価方針)**: F と H が同時に ungated 枯渇を報告 →
-> hub が **価値+独立性**で再配置 (レーンに専門/強みは無く等価 [[lanes-are-equivalent-no-specialty]])。
-> **lane-f = hderF deep 投資** (Prop 16.1 hP2II 主 gate、ユーザー裁可)。**lane-h = §13 (S13_MaximalIII_IV) を
-> lane-b→H 移譲** (§13 は §12 下流・lane-b 非編集 ⟹ signature-first 独立、§13→POLE-1 cd で critical path)。
-> lane-h の S14_MaximalI は driver 化 ((12.9) は Prop 16.1 landing で自己復帰 close)。B は §12 + cd assembly に集中。
-
-> **⚠ 2026-06-23 relane #3 (ユーザー裁可、issue 4008)**: lane-c の §15 が全 cross-lane gated (carrier=lane-f POLE-1)
-> で2度目の starve → ユーザー裁可 (A) = **POLE-1 tp producer carrier を lane-f→C 移譲**。C は `S14_TypePComplement`
-> (complement 露出) + `FeitThompson.lean` の tp 系 def (`Section16TypePStructure`/`section16TypePStructure_*`/
-> `Section16Inputs` tp) を編集し、指定 complement を持つ `TypePData` を構成 (→ 自身の §15 unblock + POLE-1 前進)。
-> F は hderF/Prop16.1 に集中・tp carrier は cite のみ・mp は F のまま。FeitThompson.lean は def 単位で F=mp+Prop16.1 /
-> B=cd / C=tp の 3 者共有。lanes 等価ゆえ carrier 作業も C 可 [[lanes-are-equivalent-no-specialty]]。
-
-> **⚠ 2026-06-23 relane #4 (ユーザー裁可、issue 2019+4009)**: lane-c の POLE-1 carrier 機構が完成
-> (`exists_typePData_W1_eq_of_isTypeP2` sorry-free) → 残る wiring gate = `IsTypeP2 mp.S` (Pf (13.2.a)
-> 「q<p ⟹ S type-P2」)。同時に lane-h が §13 clean work 完遂で starve (issue 2019)。**両者を 1 割当で解決:
-> lane-h が (13.2.a) を担当** (FeitThompson.lean で証明 + tp producer に IsTypeP2 mp.S 供給)。type-determination
-> ゆえ lane-h type 構造の延長・§6 char (B) 非衝突・critical path 直結。**owned_re 変更なし** (FeitThompson は
-> 既に shared)。FeitThompson.lean は def 単位 **F=mp+Prop16.1 / B=cd / C=tp / H=(13.2.a)** の 4 者共有。
-> lane-h が (13.2.a) に要する BG §15-16 下流補題は lane-f に notes/issue で依頼 (F が BG owner)。
-> 完了で lane-c が carrier wiring (step 3) 機械的に進む → §15 unblock + POLE-1。
-
-> **⚠ 2026-06-23 relane #5 (ユーザー裁可、issue 2009、hub 統合レビュー)**: relane #4 の (13.2.a) `IsTypeP2 mp.S`
-> landing (`87068c22`/`5041855f`、4009+2019 CLOSED) + lane-c step-3 wiring landing (`13b883d1`/`b31a3dd6`、4010
-> CLOSED) + lane-f hP2II COMPLETE (`77287003`) を統合 → 「**FT endgame は lane-b char に収束** (POLE-1 残バレ
-> sorry 2 本 `card_kappaHall_lt_of_isTypeP1`[424、issue 2020] + `section16CharacterData`[1071、issue 1004] は
-> 両方 lane-b)、lane-h のみ割当完遂で idle」と確定。**lane-h を POLE-2 (`field_normalizer_structure` cascade、
-> `S16_NonExistenceG.lean`、issue 2009 pending→active) に復帰**。workable-now = 14.7 Singer-field 核 (§13 非依存、
-> c_eq_one から既約性)。**lane-h 所有 = `S16_NonExistenceG.lean` 追加** (編集所有者無し=driver だった)、`S13`/`S14` は
-> driver/参照に降格。lane-b/c/f は現状維持で適所 (B=char bottleneck / C=§15 consumer / F=Prop16.1 hFI ¬TI=BG 15.7(e))。
-
-> **⚠ 2026-06-23 relane #6 (ユーザー裁可、issue 4011)**: lane-c が §15 S15_SAndT の ungated work を完遂
-> (carrier consume / basic_structure skeleton / exists_typeI_maximal 実証明 / S15 分割[0075]) → §15 枯渇
-> (残 21 sorry 全て gated)。ユーザー選択 = **char ボトルネック支援に再配置**。carve: **S13_MaximalIII_IV を
-> lane-h→C 移譲** (issue 2018、Pf §13 char-directions、lane-h は POLE-2 で dormant) + **card_kappaHall_lt_of_isTypeP1
-> を lane-b→C 移譲** (issue 2020、POLE-1 バレ sorry、FeitThompson def 単位 C=tp+card_kappaHall)。lane-c は
-> lane-b coherence ((6.2)/(6.3)/(6.8)) を cite して §13 char を並列生産 (lane-b 能動 S12/cd と非衝突)。**§15
-> S15_SAndT/S15_SAndT_Setup は C 所有のまま driver/await に降格**。FeitThompson def 単位 = F=mp+Prop16.1 /
-> B=cd / **C=tp+card_kappaHall** / H=POLE-2。lane-b/f/h は現状維持で適所。
-
-> **⚠ 2026-06-23 relane #7 (ユーザー裁可、issue 2021)**: relane #5 (lane-h→POLE-2) は **hub の stale-pointer
-> エラー**だった — 指した (14.7) Singer-field 核は既に sorry-free (`S16_NonExistenceG.lean:2384`, 06-18〜06-20
-> landing)、POLE-2 残 11 は全 char/Dade gated。lane-h が flag (issue 2021) → hub が実コード検証で確認 →
-> **lane-h = Pf §6 coherence producer** に再配置: lane-c の S13 が cite する **Thm 6.3 `coherent_S_of_coherent_SH0C`
-> + Thm 6.2 `coherent_quotient_bound` の standalone 版**を §6/§8 機構 (S08_Theorem63 等、現 lane-b dormant) から
-> **新 leaf に隔離して生産** (producer[lane-h §6/§8] → consumer[lane-c S13])。⚠ §5-§8 は lane-b 名目領域
-> (ユーザー直接管理) ゆえ既存ファイル本体は cite のみ・生産は新 leaf 隔離。POLE-2 (issue 2009) は driver/await に
-> 降格 (pending)。**教訓: relane で「workable-now」を指す前に実コードで sorry 状態を検証する** (issue note 鵜呑み禁止)。
-
-> **⚠ 2026-06-23 relane #8 (ユーザー裁可、issue 4012)**: lane-c が §13 ungated 群論 win 完遂 ((11.6)
-> conjunct 2 `U_centralizes_H0` char-free 実証明) → 3 度目の char 枯渇。判明: (11.5) `HC_le_secondDerived`
-> のブロッカー = **Pf (5.7)「M'/M'' abelian ⟹ S(M'') coherent」未形式化** (gated でなく未着手の上流前提)。
-> ユーザー裁可で **lane-c = Pf (5.7) coherence producer** に再配置 (§5/§7 新 leaf 隔離生産、consumer=S13(11.5))。
-> **lane-h の §6 (6.2)/(6.3) producer (relane #7) と対 = C:§5(5.7) / H:§6(6.2/6.3) coherence producer 並列**で
-> §13 を上流から unblock。S13/card_kappaHall/§15 は C 所有のまま driver/await。⚠ §5-§8 は lane-b 名目領域
-> (dormant) ゆえ既存本体 cite のみ・新 leaf 隔離。**体制: B=cd/coherence核 / C=§5(5.7) coherence producer /
-> F=Prop16.1 hFI ¬TI(BG 15.7e) / H=§6(6.2/6.3) coherence producer** — char critical path に 4 レーン縦並び。
-
-> **⚠ 2026-06-25 relane #9 (ユーザー裁可、全 lane フロンティア再設計)**: workflow `wf_33ba58ab-bf5`
-> (6 並列 map + 4 adversarial verify) で honest FT 経路の真の構造を再マッピング。**旧モデルの 3 誤りを訂正**:
-> (i) S10–S16 は `extends` spine でなく `S15.Hypothesis` は flat record、honest 構成は 3 producer mp/tp/cd の
-> flat assembly。(ii) App.C は §16 を bypass しない — POLE-2 `field_normalizer_structure` を genuine 消費 (Arm B)。
-> (iii) 群論 runway は枯渇でなく BG §14-16 carrier へ移動。honest 経路 = **~27 sorry / 数学的に独立な 4 フロント**
-> (検証 CLAIM B: 1-2 でなく 3-4 独立)。**relane #1-#8 のファイル所有はこの 4 フロントとズレており idle の正体**。
-> ⟹ **レーン所有を W1-W4 へ再カット** (lanes 等価ゆえ現在地で transition 最小化):
-> **W1=lane-f** (BG §16 Prop 16.1 6 bridge + type-P carrier、純群論・最優先) /
-> **W2=lane-c** (§12 all-Type-I tower → theorem88_caseB_holds) /
-> **W3=lane-b** (§10-11 中心 char 核 = 唯一の bare FT sorry (11.9.b) card_kappaHall + no_typeV、issue 2020 保持) /
-> **W4=lane-h** (POLE-2 field_normalizer §14-16 cascade + §15 S&T、独立アーム)。
-> **凍結**: appendix 23 sorry (import closure 外、provably off-path) + §9/§13 内部矛盾 endpoint (App.C 経由ゆえ未使用)
-> + これ以上の §5/§6 coherence supply (完成済、binding constraint は consumer へ移動)。優先 = **W1 先頭 + W3 早期**。
-> 正本 = [`ft_frontier_remap_2026_06_25.md`](ft_frontier_remap_2026_06_25.md)、issue 0080-0083。
-
-**signature-first interface**: 上流が sorried signature を export → 下流が cite。真の cross-lane 依存は narrow。
-signature 不足は notes/issue 経由。**driver (§16/§10)**: 常駐レーンを当てず、上流が landing したとき hub or
-担当レーンが続けて opportunistic に close する (pure consumer ゆえ常駐は starve)。
-
-**🔁 lane 自己復帰 (2026-06-23 導入)**: lane が hub 判断待ちで停止したら、自セッションで resume-monitor
-cron を arm し、hub の解決 (LAUNCH.md 変化 or 起票 issue の closed/ 移動) を検知して `git merge main` +
-作業再開する ([`lane_self_resume.md`](lane_self_resume.md))。**hub の合流手順は不変** — lane の自己復帰は
-通常の作業再開ゆえ区別不要。hub は「停止していた lane が自走で戻ることがある」と認識するだけでよい。
-
-**取り決め**: (1) 各レーンは**自所有ファイルのみ編集**、他は cite のみ (要望は notes/issue 経由)。
-**S15_SAndT は C のみ・S14_MaximalI は H のみ** (2026-06-23 relane)、**S11/§16/§10 は driver (常駐なし)**。
-(2) **新規 `axiom` 宣言は abort+ユーザー承認**。
-(3) issue base: **B=1000 / H=2000 / C=4000 / F=7000**。(4) `notes/bg/*`=F、`notes/peterfalvi/*`=B/H/C。
-マージ順 = **F → B → H → C** (独立レーンゆえ順序は形式的)。
-**(5) 起動時 main 同期 = `git merge main` (ユーザー方針 2026-06-22, 全 LAUNCH 統一)**:
-各レーンはセッション開始時に **`git merge main`** (実 3-way、merge commit 可) で main 最新を取り込んでから
-作業する。**旧 `git merge --ff-only main` は廃止** — 自前 commit が 1 つでもあると ff 不能で失敗し、レーンが
-main に遅れ続ける (2026-06-22 実害: 全レーン 15-47 commits 遅れ → 古い文脈・2-dot 誤検出の原因)。
-コンフリクトは自所有ファイルなら解決、他レーン由来なら notes/issue で hub へ。`lake update` は禁止のまま。
-
-**🧭 方向性・cross-lane 判断は issue 起票 → hub 解決 (ユーザー方針 2026-06-22, 永続)**:
-レーンが (a) **方向性に迷った**とき (どの sorry を攻めるか・route 選択・faithfulness 解釈の迷い等)、
-または (b) **レーンをまたぐ判断**が要るとき (他レーン所有ファイルの signature 変更要望・所有境界の移動・
-cross-lane gate・割当変更等) は、**独断で進めず／他レーンのファイルを触らず**、`bin/new-issue` で
-**HUB 宛 issue を起票**する (title に "HUB:" を冠する、宛先と判断内容と選択肢を明記)。
-**hub が解決する** (issue 4005 relane の前例; hub はユーザー裁可が要る構造判断はユーザーに上げる)。
-- **hub 側の責務**: 各 tick の merge で **新規 HUB 宛 issue** (`issues/` 直下に "HUB:" タイトル or
-  `4002/4005` 系の hub-ask) が入ったら、サマリで**別枠報告**し、hub が解決する (read-only 監査 +
-  必要ならユーザーへ AskUserQuestion)。黙って merge し続けない。
-- これは [[cross-lane-sync-via-notes]] (lane↔lane の軽い sync は notes 追記) の**上位版** = 判断を要する
-  ものは issue 化して hub に集約。軽微な signature 不足通知は従来どおり notes でよい。
-
-**H 固有の取り決め (2026-06-12)**: (1) H は **Lane B の §4–§9 coherence/certain-type ファイル
-(`S04_*`〜`S09_*`) を編集しない** (cite のみ)。(2) §10–13 は BG↔Pf interface (BG Thm A–E/I–II)
-に gate されるため、H が interface を **新規 forward axiom 化する commit は従来どおり
-abort+ユーザー承認** (G の issue 8000 と同型; H の issue base = 2000)。(3)
-`notes/peterfalvi/s10_13_maximal_structure.md` は H 所有。
-
-**📌 一時例外 (issue 8001, 2026-06-12): G の S12_ECore de-private を許容合流**。
-G の履歴に `chore(s12): de-private sylow_le_derived_of_mem_tau3` (commit `4b92778f`, S12_ECore.lean
-5 行, **user裁可 issue 8001**) が含まれる。G が de-axiom 後にマージする際、上記「G が S12_E 系を
-編集 → abort」ゲートがこれに hit するが、**この de-private のみなら例外的に合流許可**
-(`git diff main..bg-s13 -- '*S12_E*'` の差分が `private` 削除 + cite 1 箇所のみなら OK)。
-それ以外の S12_E/S12_ECore 内容変更が混じれば通常どおり abort。
-
-**📌 一時例外 (issue 0065, 2026-06-12): F の cor12.16 statement +2 sorry を許容合流**。
-hub→F 依頼で F が S12_E に BG Cor 12.16(a)(b) の **faithful statement 2 個を sorry'd で追加**する
-(`sigma_subgroup_pRank_normalizer_le_one` + `sigma_subgroup_not_mem_primeFactors_derived_of_tau1`)。
-これは G の forward axiom `cor1216×2` を de-axiom するための健全化ゆえ、**通常の sorry 増=abort の
-例外として +2 を許容してマージする**。判定: F の commit message に「issue 0065」があり、増えた sorry が
-上記 2 statement のみなら合格。それ以外の sorry 増は通常どおり abort。完了後 G が de-axiom すれば
-forward axiom が消え G の HOLD も解除 (issue 0065 のハンドシェイク参照)。
-
-**E (`bg-local`) は 2026-06-11 退役** — 任務完遂 (Lem 10.4(b) de-axiom / Lem 10.13 / Thm 11.5 /
-Cor 11.6 / **Thm 11.7 = §11 完結**)。全量 main 合流 (merge `77ab5173`) を検証の上 worktree・
-branch とも削除済み。旧 **A** / **D** も同様に退役済み (履歴は main の merge commit に全残存)。
-
-**forward-axiom ポリシー**: 残存 forward axiom **0 本** (10.4(b) は E が実証明化済)。レーンが
-**新規の** forward axiom を導入する commit は自動合流しない — 報告してユーザー承認を待つ
-([[scaffold-sorry-free-not-done]])。island は縮小方向のみ自動合流可。
+**🧭 方向性・cross-lane 判断は HUB 宛 issue 起票 → hub 解決** (title に "HUB:" 冠、選択肢明記)。hub は各 tick で
+新 HUB issue を別枠報告し解決 (read-only 監査 + 必要ならユーザーへ)。軽微な signature 不足通知は notes でよい
+([[cross-lane-sync-via-notes]] の上位版)。**🔁 lane 自己復帰**: lane が hub 待ちで停止しても自走再開しうる
+(hub の合流手順は不変、lane の自己復帰は通常の作業再開ゆえ区別不要)。
 
 ## 各イテレーションの手順
 
@@ -195,22 +49,15 @@ branch とも削除済み。旧 **A** / **D** も同様に退役済み (履歴�
 > 「監視ループ再開（cron id <new-id>）」を 1 行記録する。**この stop→resolve→resume サイクルが監視ループの
 > 正規ライフサイクル**であり、停止は一時退避でしかない。
 
-> **🔒 レーン所有マップ（step 1.5 範囲逸脱チェック用、2026-06-26 relane #12 = lane-h W1 carrier moot→W2 復帰）**:
-> 正本 = [`ft_frontier_remap_2026_06_25.md`](ft_frontier_remap_2026_06_25.md) + issue 2026/2027 + relane #10/#11。
-> **relane #11 (2026-06-26, ユーザー裁可「W1 に火力集中」, 監査 workflow `wf_1cb6284d-bb2` verdict=minor-adjust)**:
-> 監査で「FT frontier は char-bound で狭く、4 レーン中 3 つ (b/c/h) が ungated 0 で starve、唯一 lane-f の W1 群論が
-> ungated」と判明 → **lane-h を W2(S14_MaximalI, char 飽和で従属) から lane-f の W1 reverse-bridge carrier 生産へ振替**
-> (issue 2027、π(W₁)⊆κ(M) rank-1 crux を file-disjoint 生産)。**W2 (S14_MaximalI) は driver/await に降格** (常駐なし)。
-> b/c は task 明確化のみ (配置維持; b=(11.8)+Dade-engine 焦点 S10=driver、c=Cor 15.3 input 所在 audit 先行)。
-> **combined owned_re は不変** (S16_PairIntersection も S14_MaximalI も BG/Pf で元々 owned_re 内) ゆえ cron 監視式は無改訂。
-> | lane | フロント | 所有 .lean（これ以外の Pf/BG S-ファイル編集 = 逸脱→停止） |
+> **🔒 レーン所有マップ (step 1.5 範囲逸脱チェック用、2026-06-28 再配分 a/b/c/d)**:
+> 正本 = [`ft_lane_reallocation_2026_06_28.md`](ft_lane_reallocation_2026_06_28.md)。
+> | lane | クラスタ | 所有 .lean（これ以外の Pf/BG S-ファイル編集 = 逸脱→停止） |
 > |---|---|---|
-> | **F** (lane-f) | **W1-a** BG §16 Prop 16.1 forward pair + **reverse P1/P2 wiring 単独** (relane #12, carrier moot) | `OddOrder/BG/**`（特に S16_MainResults）+ `OddOrder/FeitThompson.lean` の mp/carrier 宣言 |
-> | **C** (lane-c) | **W1-b** BG §15 Cor 15.3 (ha gate 閉鎖済、残 hfratt/Thm 15.2) | `OddOrder/BG/Ch4_FamilyOfMaximal/S14_TypePCounting.lean` + `S15_MF.lean`（BG 内、f/h と別ファイル）|
-> | **B** (lane-b) | **W3** §10-13 char 核 = (11.8) + Dade-norm engine ((10.8) 3 分解化済) [S10 11本は W1-gated driver] | `OddOrder/Peterfalvi/S0[3-9]*` + `S10*`〜`S13*` + `OddOrder/FeitThompson.lean:426` |
-> | **H** (lane-h) | **W2** §12 all-Type-I tower 群論 (relane #12, W1 carrier moot で W2 復帰; 監査の char 従属評価は誤り) | `OddOrder/Peterfalvi/S14_MaximalI.lean`（旧 W4=S15_SAndT/S16_NonExistenceG は driver/await; reverse wiring は lane-f）|
-> | **共有（全 lane 可）** | — | `OddOrder/AxiomsCheck.lean` / `OddOrder.lean` / `OddOrder/GroupTheory/**` / **`OddOrder/FeitThompson.lean`** (宣言単位: W1=mp/carrier、W3=:426 bare sorry、prefix-split で衝突回避) / `notes/**` / `issues/**` |
-
+> | **a** | α Pf §10–13 中央指標核 | `OddOrder/Peterfalvi/S(0[3-9]|1[0-3])*` + `OddOrder/FeitThompson.lean:426` |
+> | **b** | β Pf §12 Dade tower | `OddOrder/Peterfalvi/S14_MaximalI.lean` |
+> | **c** | γ POLE-2 §14–16 + §15 | `OddOrder/Peterfalvi/S1[56]*`（S15_SAndT/S15_SAndT_Setup/S16_NonExistenceG）|
+> | **d** | δ BG §14–16 + carrier | `OddOrder/BG/**` + `OddOrder/FeitThompson.lean` carrier 宣言 |
+> | **共有（全 lane 可）** | — | `OddOrder/AxiomsCheck.lean` / `OddOrder.lean` / `OddOrder/GroupTheory/**` / **`OddOrder/FeitThompson.lean`**（宣言単位: a=:426、d=carrier、prefix-split で衝突回避）/ `notes/**` / `issues/**` |
 1. 各レーンの未マージ確認: `git log --oneline main..<branch>`。
    **全レーン 0 なら「変化なし」1行報告で即終了**（build を走らせない）。
 1.5. **レーン範囲逸脱チェック（ユーザー方針 2026-06-22, 永続）**: 未マージがあるレーンについて、
@@ -222,12 +69,12 @@ branch とも削除済み。旧 **A** / **D** も同様に退役済み (履歴�
    **マージせず（trial merge も開始しない）**、⛔ に従いループ停止（abort 不要 = まだ merge していない、
    `CronDelete` + 報告 + 以降の tick を行わない）。報告には逸脱ファイル名 + lane + 所有者を明記。例 (lane=$b):
    ```
-   owned_re='…'   # 🔒 マップ (relane #9) から (F/W1=^OddOrder/BG/|^OddOrder/FeitThompson; C/W2=^OddOrder/Peterfalvi/S14_MaximalI; B/W3=^OddOrder/Peterfalvi/S(0[3-9]|1[0-3])|^OddOrder/FeitThompson; H/W4=^OddOrder/Peterfalvi/S(15_SAndT|16_NonExistenceG))
-   shared_re='^OddOrder/AxiomsCheck\.lean$|^OddOrder\.lean$|^OddOrder/GroupTheory/|^OddOrder/FeitThompson'  # FeitThompson は F/B/C 共有 (def 単位協調)
+   owned_re='^OddOrder/Peterfalvi/S(0[3-9]|1[0-6])|^OddOrder/BG/|^OddOrder/FeitThompson'  # 全 Pf S03-16 + BG を許容; per-lane 厳密判定は 🔒 マップ (a=S03-13/b=S14_MaximalI/c=S15-16/d=BG)
+   shared_re='^OddOrder/AxiomsCheck\.lean$|^OddOrder\.lean$|^OddOrder/GroupTheory/|^OddOrder/FeitThompson'  # FeitThompson は a/d 共有 (def 単位協調)
    git diff --name-only main...$b -- '*.lean' | grep -vE "$owned_re" | grep -vE "$shared_re" | grep . && echo "範囲逸脱 → STOP"
    ```
    逸脱なし（空）→ step 2 へ。共有ファイル・notes・issues のみの差分は逸脱でない。
-2. **F → B → H → C の順**で（独立レーンゆえ順序は形式的、上流→下流の自然順）、未マージがあれば自動合流:
+2. **a → b → c → d の順**で（独立レーンゆえ順序は形式的、上流→下流の自然順）、未マージがあれば自動合流:
    - マージ前の実 sorry 数を記録: `bin/count-sorry`
      （prose 偽陽性 [sorry-free / sorryAx / `sorry'd` / backtick 引用] を除外する判定器。
        旧 `grep '(^|[^a-zA-Z-])sorry'` は 259 と過大計上したが count-sorry は 146 ≈ 実 141。
@@ -348,382 +195,8 @@ branch とも削除済み。旧 **A** / **D** も同様に退役済み (履歴�
 
 ## 現状メモ
 
-- **2026-06-27 (続³) — lane-h を await + consumer-wiring モードに公式化 (issue 2029, ユーザー裁可)**: lane-h が
-  `theorem88_dichotomy` honest 構成 (commit `3ec86cc9`, bare sorry 除去、lane-f の `typeP_duality` landing を拾う) 後、
-  S14_MaximalI の残 sorry が全て char/§8/§10 gated (lane-b 領域) で ungated 群論ゼロに再枯渇 (5 回目の構造的
-  starvation, issues 2021/2023/2026/2027/2029) → HUB-ask issue 2029。hub が 3 選択肢提示 (await / 3→2 集約 /
-  投機 W1 producer) → **ユーザー裁可 = await + consumer-wiring 公式化**。lane-h = W2 (S14_MaximalI) 保持・所有不変
-  (cron 無改訂)、平常は自己復帰モニター待機、**上流 landing で §12 consumer-wiring が開いたら機会的に拾う**
-  (トリガ = lane-b の (12.10) char 核 / (8.13.c1) §8 / `bgTheoremE_cover_data` 強化、または lane-f BG §16-15 landing)。
-  投機的 scaffold は作らない。トリガ長期不在で実質ゼロ稼働が続けば HUB issue で 3→2 集約再検討。lane-h LAUNCH.md に
-  await 公式化バナー設置、issue 2029 closed。**この tick の合流**: F (hP1neIIIIV bridge 完全 close = N(U)≤M Pf 8.7
-  実証明 axiom-clean、sorry 124→123) / B ((10.8) analytic core) / H (theorem88_dichotomy honest + 2029 docs)。push 済。
-
-- **2026-06-27 (続²) — lane-c 退役で 4→3 レーン集約 (ユーザー裁可)**: lane-c が hub-ask (issue 2028, Cor 15.3 完了→
-  次配置相談) を起票。hub が候補を実コード検証:
-  - option 1 (Cor 15.5(c) producer) は **lane-f が S16 内インライン自前証明済で moot**。
-  - 代替 W₁ rank-1 carrier (`typePData_W1_pRank_eq_one`) も **moot** — `isTypeP_of_typePData_of_card_W1_prime`
-    (S16:2868) が |W₁| 素数から rank-1 を carrier 不要で導出済、reverse 3 bridge (hIIP2/hIIIIVP1/hVP1) の真の残は
-    **κ vs σ' 型判定**で全て S16_MainResults (lane-f 所有) 内 = file-disjoint な lane-c ピース無し (issue 2027
-    relane #12 survey と一致、再検証で確認)。⚠ Explore agent が rank-1 carrier を高価値と**誤推奨**→実コード検証で
-    覆した ([[grep-sorry-docstring-contamination]] / 実コード検証の教訓、relane #5/#11 と同根)。
-  - frontier は char-bound で狭く lane-c は relane #3/#6/#8/#10/#11 と繰り返し starve。
-  - **⟹ ユーザー裁可「4→3 レーンに集約」**: lane-c 退役 (全量合流済・WIP なし確認済)。残 3 レーン = **lane-f (W1=BG
-    §16 Prop 16.1 reverse κ-determination + char-gated hP1neIIIIV) / lane-b (W3=Pf §10-13 char 核, 唯一の bare FT
-    sorry) / lane-h (W2=§12 type-I tower)**。lane-c 所有 (S15_MF/S14_TypePCounting) の今後の §15/§16 群論 need は
-    lane-f が BG owner として担当。lane-c LAUNCH.md に退役バナー設置 (self-resume cron 停止指示)、issue 2028 closed。
-    **監視 cron を f/b/h の 3 レーンに縮小** (新 cron id は再開時に記録)。worktree/branch の物理削除は別途 (soft retire)。
-
-- **2026-06-27 (続) — 4 commit 合流 (F×2/H/C) + 範囲逸脱 STOP→例外承認→再開**: ユーザー監視下で複数 tick。
-  **F**: hP1neIIIIV の U nilpotent / hDcompl residual を sorry-free+axiom-clean 化 (issue 8015、各 1 commit)。
-  **H**: (12.17) `exists_typeICovering` を bare sorry→実証明展開 (issue 0081、新 helper 2 個 sorry-free
-  `supportKernel_le_maxNilpotentNormalHall`/`thickenedSupport_subset_conjClassSet_maxNilpotentNormalHall`、
-  coprime/covers honest discharge、残 3 isolated = two_le/isTI/non-type-I 枝、sorry 125→127 scaffold)。
-  **C**: Cor 15.3 `mf_hall_centralizer_control` を完全 sorry-free+axiom-clean 化 (issue 2025 CLOSED、sorry 127→126)。
-  全 build 3884 green / AxiomsCheck OK / 新規 axiom 0。最終 sorry = **126**。
-  - **⚠ 一時例外 (issue 2025, ユーザー裁可 2026-06-27): lane-c の S16_MainResults 1 行 caller 適応を許容合流**。
-    lane-c が自所有 S15_MF で `mf_hall_centralizer_control` に `hHMσ` (H≤Mσ) 引数追加 → 唯一の呼び出し元が
-    S16_MainResults:3397 (lane-f 所有) にあり新シグネチャ適応の 1 行修正。**build-necessary** (修正なしで lane-c
-    合流時 main build 破綻) ゆえ範囲逸脱の一時例外として合流許可 (issue 8001 de-private / 0065 caller 健全化と同型)。
-    STOP→AskUserQuestion「例外承認して合流」→ 合流→再開。S16 変更は合流で consume 済 (lane-f が次 sync で吸収、再発なし)。
-    **教訓: 自所有 lemma の signature 変更で唯一の caller が他レーン所有ファイルにある場合、build-necessary な
-    caller 適応は範囲逸脱判定に hit するが一時例外で合流可** (内容 logic でなく機械的 1 行に限る)。
-  - サイズ flag (>1500, 全既起票): S15_MF 9592 (0071) / S16_MainResults 3700 (0078) / S14_MaximalI 1656 (0084)。
-
-- **2026-06-27 — 監視再開 (変化なし) + cron 再作成**: ユーザー「各レーンを監視します」で再開。起動時点で
-  **全 4 レーン (f/b/h/c) 0 unmerged** (前セッションで全合流済み、main HEAD `7b14c8d1`)。local main = origin/main
-  (unpushed 0)、git クリーン (MERGE_HEAD なし)、`bin/count-sorry` baseline = **125**。前 cron は session 変化で消滅
-  (`CronList` 空、[[cron-dies-on-model-switch]]) → 新 cron **`2766c09c`** (`8,23,38,53 * * * *` = 標準 15 分,
-  stop-on-problem prompt 内蔵, **relane #12 = lane-h W2 復帰の所有マップ反映**: F/W1=BG全体+FeitThompson mp/carrier,
-  C/W1-b=S14_TypePCounting+S15_MF, B/W3=S0[3-9]/S1[0-3]+FeitThompson:426, H/W2=S14_MaximalI)。新規 HUB ask issue
-  なし (issues/ 直下 "HUB:" タイトル 0、4002 は 2026-06-22 の既対応 diagnosis)。build は未マージ 0 ゆえ走らせず
-  (手順 step 1)。
-
-- **2026-06-26 (続³) — relane #11 着地検証 → relane #12 (lane-h W2 復帰、carrier moot)**: relane #11 後の初稼働で
-  4 レーン合流 (実 sorry 125→126、build 3884 green)。**主成果**: F=hP1eqV を Suzuki ケースに縮小 / B=(10.8)
-  S_not_coherent 忠実 3 分解 (relane #11 の Dade-engine 指示が奏功) / C=Cor 15.3(a) ha gate を Prop 14.2(e) で
-  実証明閉鎖 (relane #11 の input audit 指示が奏功) / H=W1 carrier survey。**⚠ lane-h survey が relane #11 の 2 前提
-  を反証**: (1) rank-1 carrier は lane-f が 2026-06-25 に carrier 不要で完成済 (issue 8015 の 06-20 DAG を監査が鵜呑み)、
-  (2) W2 は char 従属でなく ungated 群論が実在 (lane-h の theorem88_caseB reduction が実証)。reverse 真の残=P1/P2 判定は
-  S16_MainResults (lane-f) 内=file-disjoint ピースなし。**ユーザー「hub 一任」→ relane #12**: lane-h を W2
-  (S14_MaximalI) に復帰 (価値+独立性: file-disjoint で衝突ゼロ、ungated runway 実在)。**reverse P1/P2 wiring は
-  lane-f が S16_MainResults 単独担当** (carrier 専任レーン廃止)。relane #11 の b/c 明確化は維持。issue 2027 → closed
-  (stale)、0081 (W2) → lane-h 再開、LAUNCH×2 + 🔒 map (relane #12) 更新。**教訓: 監査エージェントの「workable/gated」
-  判定も実コード (#print axioms) で再検証する** ([[scaffold-sorry-free-not-done]]、relane #5 stale-pointer と同根)。
-
-- **2026-06-26 (続²) — relane #10 健全性監査 (workflow) → relane #11 (lane-h W2→W1 carrier 火力集中)**: ユーザー
-  「各レーンの分割は問題ない？再考したほうが良さそう？」+ ultracode ON → 6 エージェント並列監査 workflow
-  `wf_1cb6284d-bb2` (4 lane frontier + cross-lane/FT-path map + 統合)。**verdict = minor-adjust**:
-  - **構造は健全**: f↔c は producer→consumer (c=Cor 15.3 上流、f=S16 下流、別ファイル非重複)、FeitThompson.lean の
-    bare sorry = 実測 0 本 (card_kappaHall 除去成功・residual は正しく lane-b S12 (11.8) へ)、依存非循環。
-  - **実行面の starve**: 4 レーン中 3 つ (b/c/h) が ungated 作業ほぼ 0・starve HIGH。唯一 lane-f が ungated runway
-    (hP1neIIIIV/hP1eqV 純群論) を持つ。**FT frontier は char-bound で狭く、W1 群論が全 char を gate する 1 点ボトルネック**。
-    特に lane-h の W2 (S14_MaximalI) は lane-b char に完全従属で独立価値が低い (W4 char 飽和→W2 char 飽和に着地)。
-  - **ユーザー裁可 (AskUserQuestion) = 「W1 に火力集中」→ relane #11**: lane-h を W2 から **lane-f の reverse-bridge
-    carrier 生産 (π(W₁)⊆κ(M) の rank-1 crux、issue 2027)** に振替。file-disjoint (S16_PairIntersection or 新 leaf、
-    lane-f は S16_MainResults 保持)。**W2 (S14_MaximalI) は driver/await に降格**。b/c は task 明確化のみ (配置維持):
-    b=(11.8)+Dade-engine 焦点・S10=driver、c=Cor 15.3 input (Thm 14.4/Prop 14.2(e)) 所在 audit 先行→不明なら新規 lemma 化。
-  - **反映**: issue 2027 起票 (lane-h W1 carrier)、4 LAUNCH.md に relane #11 block 前置 (self-resume トリガ)、
-    🔒 map (relane #11) 更新、memory 更新。combined owned_re 不変ゆえ cron 無改訂。
-  - 付帯 (hub 軽微修正): issue 0081 (W2) は lane-h 離脱で driver/await を明記。
-
-- **2026-06-26 (続) — アクティブ合流 + relane #10 (C↔H スワップ, issue 2026 RESOLVED)**: lanes 稼働再開で複数 tick
-  合流。**実 sorry 126→124** (全 build 3884 green / AxiomsCheck OK / 新規 axiom 0 / 範囲逸脱 0)。主成果:
-  - **F**: ★ **hIF bridge 完全完成** (型I⟹κ=∅, sorry-free + axiom-clean, helper B κ-element placement 実証明) + crux
-    再カット (Frobenius FPF 核心実証明)。`not_isTypeI_of_isTypeNonI` axiom-clean 登録。
-  - **B**: ★ **唯一の bare `feitThompson` sorry 除去** (`card_kappaHall_lt_of_isTypeIIIorIV` → carrier bridge
-    `card_Msigma_inf_centralizer_eq_card_W2` で配線、residual を S12 char-theoretic 新 decl に適所移設) +
-    `exists_typeII_maximal_with_w2_of_typeP` 証明。
-  - **H**: §16 char endpoint de-opacify ((14.16) caseB 等)。→ **W4 char work 枯渇を HUB issue 2026 で報告**。
-  - **C**: (12.9) Hall complement sorry-free (W2) → **W1 (Cor 15.3) へ pivot** (S14_TypePCounting, issue 2025)。
-  - **🔀 relane #10 (ユーザー裁可 AskUserQuestion)**: issue 2026 で lane-h の残 W4 が全 char/Dade gated と判明 →
-    **option C** (lane-h 別セグメント再配置) + **lane-c hub一任** (W1 pivot 容認)。**C↔H スワップ**: lane-c が空けた
-    **W2 (S14_MaximalI) を lane-h が継承**、lane-c は W1 (BG §15 Cor 15.3) 専念。全レーン非重複: f=BG§16 / c=BG§15 /
-    b=Pf§10-13 / h=Pf§12(S14_MaximalI)。**combined owned_re 不変ゆえ cron 無改訂**。issue 2026 → closed、
-    両 LAUNCH.md (worktree) 更新で self-resume 発火。🔒 map (relane #10) 反映済。
-  - ⚠ サイズ flag (>1500, 既起票): S14_TypePCounting 10140 (0069) / S12 6161 (0076) / S16_NonExistenceG 3762 (0072) /
-    S16_MainResults 3305 (0078) / FeitThompson 2023 (0079)。push 全成立 (origin = `07502f02`+本 notes commit)。
-
-- **2026-06-26 — 監視再開 (変化なし) + cron 再作成 (relane #9 所有マップ反映)**: ユーザー「各レーンを監視します」
-  で再開。起動時点で **全 4 レーン (f/b/h/c) 0 unmerged** (前セッションで F→B→H→C 全合流済み, main HEAD
-  `844927ae` に merge commit 3 本)。local main = origin/main = `844927ae` (push 同期済み・保留なし)、`git` クリーン
-  (MERGE_HEAD なし)、`bin/count-sorry` baseline = **126**。前 cron は session 変化で消滅 (`CronList` 空,
-  [[cron-dies-on-model-switch]]) → 新 cron **`eaf3ccc5`** (`8,23,38,53 * * * *` = 標準 15 分, stop-on-problem prompt
-  内蔵, **relane #9 = W1-W4 所有マップ反映**: F/W1=BG全体+FeitThompson mp/carrier, C/W2=S14_MaximalI,
-  B/W3=S0[3-9]/S1[0-3]+FeitThompson:426, H/W4=S15_SAndT/S16_NonExistenceG)。新規 HUB ask issue なし
-  (issues/ 直下に "HUB:" タイトル 0)。build は未マージ 0 ゆえ走らせず (手順 step 1 = 「全レーン 0 なら変化なし即終了」)。
-
-- **2026-06-24 — 監視再開 + 4 レーン全合流 (4 merge) + cron 再作成 + 🔒 表を relane #7/#8 に同期**:
-  ユーザー「各レーンを監視します」で再開。前 cron は session 変化で消滅 (`CronList` 空) → 新 cron **`0f508206`**
-  (`8,23,38,53 * * * *` = 15分間隔, stop-on-problem prompt 内蔵, **relane #7/#8 所有マップ反映**)。
-  全レーン範囲逸脱なし (3-dot 確認)、単一 full build **3884 jobs green / AxiomsCheck OK / 新規 axiom 0** (247s
-  = lane-c が共有 `ClassFunction.lean` 変更で広範再ビルド)。**実 sorry 128→129** (許可された scaffold +1):
-  - **F** (`2f62a406`): BG Thm 15.7(e) hFI ¬TI 非abelian枝 (c) を S16_MainResults:1391 で配線 (deferred residual
-    sorry 除去) + S15_MF per-prime order-q witness Z_q (q≠p 枝 実証明 / q=p 枝 scaffold)。net sorry 0。
-  - **B** (`41403682`): §16 cd tau3 COMPLETE — real Dade σ-integral on W=S∩T (FeitThompson, issue 1004 piece 5)。sorry 不変。
-  - **H** (`cecedbd0`): Pf §6 general six_two ASSEMBLED (自由 C,D) — (6.2) θ-degree bound for solvable kernel
-    (S08_Theorem62_63_Standalone +190, 全 sorry-free)。残 gate = oracle `h56` (lane-b/c 領域, issue 2022 に signature)。
-  - **C** (`df52aebf`): Pf (5.7) base case 完全実証明 (single-pair coherence) + 汎用 `inner_smul_right` を core
-    `ClassFunction.lean` 追加 (S07_CoherenceConstantDegree 新 leaf, 残 = induction wrapper scaffold)。sorry +1。
-  - ⚠ **サイズ flag** (touched >1500): S15_MF 8923 (0071) / S16_MainResults 2840 (0078) / **FeitThompson 1958 (新規 issue 0079 起票** —
-    4 レーン def-unit 共編集ゆえ split 実施は全 idle 時に hub が)。
-  - 🔸 **push 保留**: local main は origin/main より 15 commits 先行 (今回 4 + 既存保留分)。default-branch 直 push は
-    auto-mode classifier 拒否、ユーザー明示許可待ち。merge は全て local main に commit 済 (HEAD `d5850925`)。
-  - cross-lane: lane-h が general six_two producer 完了 → 残 oracle `h56` を precise Lean signature で issue 2022 に記録
-    (lane-b/c 宛, hub は dbf1e2fa で cite-policy 応答済)。新規 HUB ブロッキング ask なし。
-
-- **2026-06-23 (続⁵〜続¹⁴, セッション総括) — 監視継続 + 実 sorry 130→125 + HUB issue 2 件解決 + worktree 同期**:
-  単一監視セッションで複数 tick を回し、全レーンが活発に前進。cron = `cf031d2e` (`4,29,54 * * * *`, stop-on-problem)。
-  main HEAD = `c96ef7ba`。**実 sorry 130→125** (全 tick build 3881 green / AxiomsCheck OK / 新規 axiom 0 / 範囲逸脱 0):
-  - **F**: BG **Cor 14.12 全 conjunct 完成** (sorry-free + axiom-clean)。conjunct 1 (IsTypeF H) / 2 (U≤M_σ(H)) /
-    3 (M⊓H=U⊔K) / 4 (¬(N_H(U)≤M)) + defUK (⁅U,K⁆=U) + kappa_conj_smul + Thm A(4)/A(5) を S16→S14 移設。
-    次 frontier = Thm C conjunct 2 (matched (U,K) を Cor 14.12 cite 用に要する)。
-  - **B**: §6 conjugate を Hypothesis 一般化 (issue 1010) → §10 conjugate-column + σ-grid orthonormality +
-    **(5.5) for column μ_j → image family + (5.5) チェーン完成**。残 = (10.6.a) σ-endgame final step。
-  - **H**: (12.9) honest assembly → **(8.17.a) exists_second_maximal discharge** (cover data + 5-type conj) →
-    (12.9) residual = (8.12.a) のみ。**(12.12) combined FPF rep-theory core** (Case A/B 統合)。
-  - **C**: Pf (9.7) Clifford engine steps 1-7 (chief-factor dim → orbit → dichotomy → Singer → (8.5.b) Ū-abelian
-    → (9.7)(b) u∣(p^q-1)/(p-1) を FPF coprime に還元)。
-  - **HUB issue 2 件解決** (cross-lane 調停が実証明前進に直結): **1010** (§6→Hypothesis 一般化, 案 1 採用, lane-b 実装) +
-    **2015** (5-type HasPeterfalviType conj infra, lane-h が shared `MaximalSubgroupTypeConj.lean` に実装 → 同 infra で
-    (8.17.a) discharge)。両 CLOSED。
-  - ⚠ **サイズ flag 深刻化**: `S14_TypePCounting` **10037 行** (issue 0069)。lane-f が Cor 14.12 完成 = 自然な凍結境界 →
-    **次の F-idle tick で hub が prefix-split 実施推奨**。他 S12 4440 (0076) / S11 2162 (0077)。
-  - 🔸 **push 全保留**: `git push origin main` が auto-mode classifier に拒否され続け (default branch 直 push = PR
-    review 迂回、ユーザー指示は監視のみ)。全 merge は **local main に commit 済** (HEAD c96ef7ba)。push はユーザー明示許可待ち。
-  - **worktree 同期 (ユーザー指示)**: lane-f/h/c を `git merge --ff-only main` で main HEAD (c96ef7ba) に揃え + warmup
-    build (各 3881 green)。lane-b は稼働中ゆえ未変更。
-- **2026-06-22 (続⁴) — 監視再開 + 4 レーン全合流 (5 merge) + cron 再作成**: ユーザー「各レーンを監視します」で再開。前 cron は session 変化で消滅 (`CronList` 空) → 新 cron **`cf031d2e`** (`4,29,54 * * * *`, stop-on-problem prompt 入り) 再作成。全レーン範囲逸脱なし (3-dot 確認)、build 各 3881 green / AxiomsCheck OK / 新規 axiom 0。**実 sorry 130→128** (lane-f が -2):
-  - **lane-f** (2 merge): `8c98a1e9` BG Cor 14.12 conjunct 1 = `IsTypeF H` proven (notMGH + msigma_inf_partner_eq_kstar + defMsMstar kernel, 実 sorry -2) → セッション中追加バッチ `7eb88d6c` Thm A(4)/A(5) centralizer lemmas 再配置 S16→S14 (105 行純粋移動)。
-  - **lane-b** (`a5a2b1ae`): Pf (5.8) σ-level full-column endgame (Fourier 復元+σ-wrapper) + (10.6.a) reduction (ζ^τ₁⊥ζ̄^τ₁ / ⊥μ_k^τ₁)。sorry 不変。
-  - **lane-h** (`e52187d1`): Pf (12.12) Case-A core = faithful 1-dim ⟹ cyclic ∧ e∣p-1 → (12.12) ungated rep-theory 2 core 完成 (Case A+B)。sorry 不変。
-  - **lane-c** (`ad48a7de`): Pf (9.7) Clifford engine steps 1-2 (chief-factor dim |H̄|=p^q + orbit-span)。sorry 不変。
-  - ⚠ サイズ flag (>1500, 全 active frontier、分割 issue 既起票): S14_TypePCounting **9395** (0069) / S12_MaximalIII_IV_V 3830 (0076) / S11_MaximalII_III_IV 1641 (0077)。
-  - ⚠ **push 保留**: `git push origin main` が auto-mode classifier に拒否 (default branch 直 push = PR review 迂回、ユーザー指示は監視のみ)。merge は local main に commit 済 (HEAD `7eb88d6c`)。push はユーザー明示許可待ち。
-  - HUB 宛 issue: `4002-hub-feedback-lane-allocation` は既出 (lane-c starve diagnosis) で issue 4005 relane が substantive response 済 ⟹ 新規 ask なし。
-- **📌 レーン範囲逸脱 = ループ停止ルール追加 (ユーザー方針 2026-06-22, 永続)**: 各レーンが**自所有外の Pf/BG S-ファイルを編集**したら ⛔ stop-on-problem に従いループ停止 (CronDelete + 報告 + 待機)。検出 = step 1.5 (マージ前に **3-dot** `git diff --name-only main...<branch>` を 🔒 所有マップに照合; 2-dot は遅れ分を誤検出)。共有ファイル (AxiomsCheck.lean 追記 / OddOrder.lean import / GroupTheory/** / notes / issues) は逸脱でない。cron prompt にも内蔵。
-- **📌 lane-c を §11 に再配置 (frontier-cluster relane, ユーザー裁可 2026-06-22, issue 4005)**: §16 監査で「starve は lane-c (§16 終点 consumer) のみ、lane-h 領域に ~16 独立 leaf」と判明 → lane-c を §16 から **Pf §11 (S11_MaximalII_III_IV, Wielandt §9 / Clifford 9.6-9.10)** へ。**S11 を H→C 移譲**、H は §14_MaximalI+§15 に集中、§16/§10 は driver 化 (常駐させず上流 landing 時に機会的 close)。レーン表・取り決め更新済。各レーン LAUNCH.md も更新 (git-excluded)。次 tick 以降この割当で運用。
-- **📌 標準監視ペース (定期取り込み) = 15 分（恒久、ユーザー指示 2026-06-23 で 25→20→15 分に更新）**: cron 式 **`8,23,38,53 * * * *`**（:08/:23/:38/:53、:00・:30 + lane 自己復帰の /5 マークを回避）を**標準合流ペースとして恒久化**。ユーザーが各レーンを稼働 → 本ペースで監視・自動合流する。⚠ **cron 自体は本環境で session-scoped**（`durable: true` を渡しても runtime は session-only と報告; [[cron-dies-on-model-switch]]）→ **ペースの正本はこの行**。新セッション開始時・`/model` 切替後は `CronList` 確認の上、消えていれば同式・同 prompt で**即再作成**する（prompt は「各イテレーションの手順」を要約したもの、本ファイルが authority）。7 日 auto-expire 後も同様に再作成。
-  - **lane 自己復帰 timer = だいたい 5 分（恒久、ユーザー指示 2026-06-23）**: lane が hub に判断を移譲して停止したときの resume-monitor cron は **5 分間隔** (`2-59/5 * * * *` = :02/:07/…/:57、:00・:30 回避)。hub の解決を素早く拾って自動再開する。正本 = [`lane_self_resume.md`](lane_self_resume.md)。
-- **2026-06-22 (続³) — 問題時ループ停止ルール化 + cron `24df1fb4` 再作成**: ユーザー「問題が起きたらループ止めて・永続化」→「各イテレーションの手順」冒頭に ⛔ banner 追加（commit `13ed2a87`）+ cron prompt に内蔵。旧 `b9df9002` を CronDelete → 新 cron **`24df1fb4`**（同式・stop-on-problem prompt 入り）。
-- **2026-06-22 (続²) — tick: lane-b/c 合流**: lane-b (1, merge `c6c7de1b`): s05 norm-2 σ-coeff bounds (Pf (10.5) endgame) + §6 DRY。lane-c (2, merge `15c014f6`): s16 (14.6) caseB_for_S + (14.11) K_eq_V index-pq half close。**実 sorry 131→129**, build 3881 green / AxiomsCheck OK / 新規 axiom 0, push 済 (`13ed2a87`)。⚠ サイズ flag: S16_NonExistenceG 3394 行（issue 0072 既起票）。
-- **2026-06-22 (続) — 25 分 cron 再作成**: 新 cron `b9df9002`（→ 続³ で `24df1fb4` に置換）。当初 4 レーンは全合流済み・worktree main ff 同期、実 sorry 131。
-- **2026-06-22 — 監視再開 + 4 レーン backlog 合流 + cron 再作成 + `coq/` submodule 追加**: ユーザー指示で
-  監視再開。前 cron `e3dcf75f` は session 変化で消滅 → 新 cron `8e80cc9d` (`4,29,54 * * * *` = 25分間隔,
-  session-only, push なし, 7日 auto-expire) 再作成。**4 レーン全合流** (F→B→H→C, build 各 3881 jobs green /
-  AxiomsCheck OK / 新規 axiom 0, 実 sorry **134→133**):
-  - **lane-f** (3, merge `5566f34f`): BG Thm 15.7 `fitting_not_ti_cases` close — type-F conjunct (c) を
-    印刷版 `M'=F(M)` でなく faithful な `M'≤F(M)` に弱め sorry-free+axiom-clean (issue 7007; MathComp
-    `nonTI_Fitting_structure` 交差検証)。sorry -1。
-  - **lane-b** (1 実質, merge `b7f9a9eb`): Pf (10.5) ψ-vanish precursor (ψ が V 上で消える, issue 1007)。
-  - **lane-h** (5, merge `491cc249`): Pf §11 (9.4) chief-factor kernel `exists_chiefFactor_kernel`
-    (Maschke+Wielandt) → `exists_chiefFactorData` assembled (残=elementary-abelian seed) + `eq_top_of_forall_sylow_le`
-    (Sylow 生成補題)。**import 帯の独立追記衝突を union 解決** (main: MaximalSubgroupTypeConj/AInvariantPiSubgroups +
-    lane-h: OperatorMaschke)。
-  - **lane-c** (1 実質, merge `648740b9`): Pf §16 MHypothesis carrier de-opacify (e_eq_index + (14.11.2/.3) bound)。
-  - **⚠ サイズ flag** (>1500, 全て active frontier、分割 issue 0068-0075 既起票・凍結境界待ち、新規起票なし):
-    S15_MF 7955 / S16_NonExistenceG 3265 / S12_MaximalIII_IV_V 3258 / S16_MainResults 2124。
-  - **`coq/` submodule 追加** (`a69da089`, main 直下): [math-comp/odd-order](https://github.com/math-comp/odd-order)
-    を教科書の行間補完参照用に取込 (CeCILL-B 公開, pin master 6afa795b; `notes/meta/coq_odd_order_reference.md`)。
-    BG §N / Pf §N の原文を読む際に `coq/theories/{BG,PF}sectionN.v` のコメントを併読。レーンは coq/ を非編集ゆえ合流に影響なし。
-
-- **2026-06-21 (後刻) — 4-lane 再編 (ユーザー裁可): FT frontier を大セグメント分割 + lane-c 新設**:
-  ユーザー問「もっと並列化できるか (大きな分割・signature-first で衝突回避)」を受け hub が FT 構造を実地調査。
-  判明: (1) FT spine は深い線形チェーン (BG §14→16 → Pf §10→16)、(2) char API (Pf §3-9) は完成済 (S04-S08
-  全 0 sorry, (6.8) capstone complete)、(3) FT frontier 102 sorry = BG §14-16(18) + Pf §10-13(34) + Pf §14-16(50)。
-  → ユーザー選択 = **4 レーン (Pf §14-16 を §15↔§16 で分割)**。F=BG §14-16 / B=Pf §10-13 / H=Pf §14-15 /
-  **C=Pf §16+POLE-2 (新設)**。§15→§16 cut は clean (S16 が S15 を named cite、調査済)。**新 worktree
-  `/home/ywr/odd-order-lane-c` 作成** (branch lane-c @ main `8da2766c`、lake/references symlink + olean warm-start、
-  build 3881 green 確認)。LAUNCH.md: lane-c 新規 + lane-b/h に再編ブロック prepend (lane-f 不変)。issue base
-  C=4000。handoff: H の §11 (9.3) → B、H の §16 → C。**cron は 4 レーン (F→B→H→C) で要再作成**
-  (ユーザーが lane-c セッションを起動したら稼働開始)。
-- **2026-06-21 — 監視再開 + 固定 25分 cron (ユーザー要望「25分おきで」) + dead-merge 復旧**:
-  ユーザー指示で監視再開。**動的 15-30 分 (2026-06-18) を固定 25 分間隔に上書き**。cron job
-  `e3dcf75f` (`4,29,54 * * * *` = 25分間隔 + :54→:04 の 10分 wrap、session-only、push なし、7日
-  auto-expire)。/model 切替で消えるのは従来同様 ([[cron-dies-on-model-switch]])。
-  - **開始時に前セッションの dead-merge を復旧**: `.git/MERGE_HEAD` = `c5fc73a5` (lane-f の**古い**状態、
-    現 lane-f HEAD は 8 commits 先行) の stale な mid-merge が残存 (コンフリクト解決・staged 済だが
-    未 commit)。コンフリクトマーカー残存なしを確認 → 混在していた未ステージ issue doc 変更
-    (`2013-s1317-...md`、既コミット作業の trailing 記録) を退避 → `git merge --abort` で
-    クリーン main へ → issue doc を standalone commit (`040fae9d`) → lane-f を**現 HEAD から fresh
-    full merge** (古い MERGE_HEAD でなく) で S14+S15+S16 を一括取込。
-  - **4 レーン backlog 合流** (F→B→H、build 各 3872/3872/3876/3876 jobs green / AxiomsCheck OK /
-    新 axiom 0、実 sorry **137→135**):
-    - **lane-f** (4 合流): BG Thm A faithful monolith complete (A(2)-(7) + 11-conjunct assembly,
-      issue 8017 CLOSED) + Cor 15.3(a)/de-axiom A(8) FittingIsTI (issue 8016 CLOSED) + Prop 14.2(e)
-      core + C_M(M_σ)=κ(M)'-group。
-    - **lane-b** (1 合流): Pf §12 (10.3) δ_j-independence 完成 + (10.2)/(10.3) producer materialize
-      + (10.5) support half `Supp(α_ij)⊆A_0(M)` (dade0-free)。sorry net -2。
-    - **lane-h** (1 合流): **Wielandt (9.1) 群論層 完全完成** — 新 leaf 4 本 (CoprimeFixedPoints /
-      MinimalInvariantNormal / WielandtElabBridge[OddOrder root 配線] / WielandtAssembly)、全 sorry-free。
-      残 = (†) module wiring (`wielandt_fixedPoint_frobenius` CoprimeAction:156)、消費側 Pf §11 未配線。
-  - **⚠ サイズ flag**: `S12_MaximalIII_IV_V.lean` 1847 行 (>1500) — lane-b の active frontier
-    ((10.x) Dade 加筆中) ゆえ分割は凍結境界待ちで**起票保留**。なお S14 (8525)/S15 (7788) 等の巨大
-    frontier が筆頭で、分割 issue 0068-0075 が既に滞留。
-- **2026-06-18 (最新⁴) — 監視間隔を動的化 (15-30分、ユーザー要望「うざいから動的に」)**: 固定 15分
-  recurring cron を廃止し、**活動量に応じた動的間隔の自己再スケジュール式**に変更。各 tick の末尾で
-  次回をスケジュール: **合流あり→15分後 / 変化なし(or 全 skip)→30分後**。実装 = one-shot cron
-  (`recurring:false`) を `date -d '+N minutes'` で now+N に作成し、プロンプト末尾に「同一プロンプトで
-  次 one-shot を作る」自己再スケジュール step を埋め込む (チェーンが自走)。⚠ チェーンが切れると停止する
-  (one-shot は recurring と違い自動継続しない) ので、tick で再スケジュールに失敗したら手動で再作成。
-  /model 切替で消えるのは従来同様。push なしは不変。
-- **2026-06-18 (最新³) — lane-g 退役 → BG を F に集約 (ユーザー裁可)**: レーン分担が「B,H=Peterfalvi /
-  F,G=BG」に整理された後、F↔G の BG 内分割 (G=§16 main results / F=§14+POLE-1 構造) が
-  ハンドシェイク待ち (issue 7006 の enrich を G が、producer discharge を F が担当) で **3h 停滞**して
-  いたため、ユーザー裁可で **lane-g を退役し BG 全域を F に集約**。手順: (1) G 最終 commit `f492e046`
-  (forward-half `kappa_join_kstar_le_pair_inf` 削除、lane-f の `typeP_pair_inf_eq` が supersede) を合流
-  (merge `0c2470fd`, build 緑 3860 jobs / AxiomsCheck OK / 実 sorry 140 不変)、(2) `git worktree remove`
-  + `git branch -d lane-g` (全成果 main 合流済を確認の上)。**F が BG §16 option-1 チェーンを端から端まで
-  単独で回せる** (②`Section16MaximalPair` enrich + dichotomy clause 復活 → ③`section16TypePStructure`
-  producer discharge)。issue 7006 (旧 lane-g/hub) は F に移管、8000 番 issue も F が継承。lane table +
-  F LAUNCH.md REASSIGN #3 更新済。残レーン = **B + F + H** の 3 体制。cron は session-only ゆえ要再作成
-  (B/F/H、push なし)。
-- **2026-06-18 (後刻) — POLE-1 設計訂正 + option-1 再タスク + 4 レーン合流**: cron 再消滅 (`/model` 切替) →
-  新 cron `9fb5aff8` (`4,19,34,49 * * * *`, session-only, push なし) 再作成。**4 レーン合流** (f→g→b→h, clean,
-  build 緑 3859 jobs / AxiomsCheck OK / 実 sorry **141→140**): 目玉 = **lane-g が `section16MaximalPair`
-  producer 証明** (`651a2bae`, issue 8014 close, POLE-1 §16 obligation 1 本 discharge)。
-  **🔑 POLE-1 設計判断**: lane-f が「`section16TypePStructure_of_isMinimalSimpleOdd` は現仕様で型レベル充足不能」
-  と指摘 (issue 7005) → **hub 独立検証 (3レンズ高確度 CONFIRMED)**: 出力が `W_eq_inter : W = mp.S ⊓ mp.T`
-  cyclic を要求するが入力 `Section16MaximalPair` は W を持たず公理が共役不変 (共役 partner `Mstar^g` が全公理
-  充足の反例)。真の missing math = **逆包含 `M⊓Mstar ≤ K⊔Kstar` = BG Thm I clause(2) `S∩T=W`** (Lean の
-  `theoremI`/`maximalSubgroup_type_dichotomy` `S16_MainResults:950` が drop した unfaithful transcription;
-  forward `K⊔Kstar≤M⊓Mstar` は `typeP_duality` `S14:7961` から既出)。姉妹 `section16MaximalPair` は非ブロック。
-  **ユーザー裁可 = option 1 (難所に正面)**: ① lane-f が逆包含を新 leaf `S16_PairIntersection.lean` で形式化
-  (caveat: 上流 §16 prereq=Prop 16.1 等に bottom-out したら sorry 退避せず STOP+報告) → ② lane-g が `S∩T=W`
-  clause を dichotomy に復活 + `Section16MaximalPair` を W で enrich → ③ lane-f が typeP producer を discharge。
-  両 LAUNCH (f/g) に REASSIGN #2 記載済。フィードバック「並列化は適度な粒度で」([[feedback-reasonable-parallelism-granularity]]) 記録。
-- **2026-06-18 (監視再開) — cron 再作成 + f/g stall flag**: `/model` 切替で旧 cron (`8922498c`) 消滅
-  ([[cron-dies-on-model-switch]]) → 新 cron `aa439f22` (`3,18,33,48 * * * *`, session-only, **push なし**=
-  2026-06-18 standing policy) を再作成。tick 時点: **全レーン未マージ 0** (b/f/g/h の成果は main 合流済、
-  main HEAD `10dcec96`、実 sorry `bin/count-sorry`=141)。FT critical path は `Section16Inputs` の 3 producer
-  skeleton (`FeitThompson.lean:267` section16MaximalPair=G / `:274` section16TypePStructure=F / `:282`
-  section16CharacterData=B) + POLE-2 (`S16_NonExistenceG` field_normalizer_structure=H) に底打ち。
-  - **lane-b**: 稼働中 (S08_CaseBAnchoredSeed.lean 編集, 83min 前 commit `2ef62cc8`)。(6.8) capstone case-B 継続。
-  - **lane-h**: POLE-2 tractable 部 (`field_normalizer_structure` sorry-free + cyclotomic 算術核 `e7cc9ddc`) を
-    landing し**自己 VERDICT=STOP**(残 14.7 finite-field model は §10-13 char theory gate=明示 stop trigger)。正常停止。
-  - **⚠ lane-f / lane-g = 3h 静止**: 再配分 `a79a331b` 以降コミット・ファイル編集とも無し (b/h は同点以降に前進)。
-    sessions 未起動 or 即ブロックの疑い。g=section16MaximalPair (§16 main results が type-data construction
-    4-bridge に gate=大物)、f=section16TypePStructure (g の `mp` 入力前提)。要ユーザー判断 (再起動 or 再割当)。
-- **2026-06-17 (夜²) — G を §16 skeleton pre-positioning に転換 (ユーザー裁可 + feasibility audit `a8b3835fd`)**:
-  §15.2 の §14-非依存 skeleton が depleted (conjunct 3 landing 済 `d2961075`、残 conjunct 2/4/5 は σ-gap/§14
-  gated で空転) とコード検証 (audit `lane-g 監査`) で確定 → ユーザー裁可で **G を §16 (`S16_MainResults.lean`) に
-  転換**。F が Wielandt I-1 へ pivot して §16 が空いたため衝突なし (F は §16 復帰せず Wielandt 継続; H が
-  typeP_duality landing で F が §16/POLE-2 復帰する際に ownership 再調整)。G の objective = §16 主結果を `_of_inputs`
-  skeleton 化、価値順 3 ユニット: (1) `proposition_type_classification` (`S16_MainResults:495`, typeP_duality
-  非依存, ~1 session, 最初の一手) (2) `theoremI_type_dichotomy_of_inputs` (`:527-635`, typeP_duality named-hyp,
-  FT path 直結, ~1-2 session) (3) `theoremII_tame_embedding_of_inputs` (`:685-803`, ~1 session)。⚠ G は
-  **editable 部のみ** (frozen `S16_NonExistenceGCore` は不可)、F 既済 skeleton
-  (`theoremD_..._of_inputs`/`theoremII_conjunct1_of_inputs`) は複製しない。**「G = §15 専念 / S16_MainResults
-  編集禁止」の旧取り決めは G に限り解除** (F が Wielandt にいる間)。G VERDICT: STOP→LOOP_THEN_STOP。
-- **2026-06-17 (夜) — レーン自律 loop ポリシー導入 ([`lane_loop_policy.md`](lane_loop_policy.md))**: ユーザー要望で
-  「各レーンが LAUNCH.md の記述を見て妥当なタイミングで自律的に `/loop` を選べる」仕組みを構築。各 worktree の
-  `LAUNCH.md` 冒頭に「▶ LOOP GATE」ブロック (VERDICT = LOOP / LOOP_THEN_STOP / STOP + objective + develop leaf +
-  stop-when + gates) を配置。判定の正本 = `lane_loop_policy.md`。**ハブは他セッションに loop を注入できない**
-  (`send_message` は承認必須 + unsupervised 不可) ゆえ判定を外在化し、レーン自身が起動時に評価する。初回 VERDICT
-  (8-agent code-verified + 敵対的検証 audit `woudrwk45`): **H**=LOOP_THEN_STOP (>½|G| count + 補題抽出) /
-  **B**=LOOP_THEN_STOP (brick 3→4、S08:59 で停止) / **G**=STOP (conjunct 2-5 は σ-gap+§14 gated、連続 loop は
-  σ-gap ローカル discharge で空転 — 残務は条件付き `_of_inputs` skeleton 離散ユニットのみ) / **F**=STOP→**LOOP_THEN_STOP**
-  (ユーザー裁可 2026-06-17 で **I-1 critical path に pivot**; off-path の step 3 は後回し、build order
-  I-3→step2→系(i)→I-2 を loop、I-1 modular Brauer hard wall ~6-9 session で escalate=最強モデル+ChatGPT)。
-  ハブは上記手順 7 で gate 解除時に VERDICT を更新。
-- **2026-06-17 — B の (6.8) §6 gap ブロッカーはユーザー直接対応 (再 flag しない)**: B の session 49 RECON で
-  (6.8) capstone の最終 obligation `hXanchored` が「純 wiring」でなく未形式化の §6 certain-type structure
-  theory (5 gap: p-group reduction / selection positivity / weight identity / hXmixed all-y / A/B dispatch)
-  と判明し B が loop STOP。hub が方向を AskUserQuestion したところ、ユーザーは「**B レーンが直接やりとりする
-  から大丈夫**」と回答。⟹ **B の停滞は既知・ユーザー管理下ゆえ、merge tick の stall 検出で B を再 thumbs-down
-  しない**（commit が notes のみ/0 でも黙って合流継続）。B が Lean を再開したら通常合流に戻る。
-
-- **2026-06-16 (夜³) — F REACTIVATED → Wielandt (9.1) (ユーザー裁可, hub code-verified)**: ユーザー問
-  「F はまだ standby が正着か」を受け hub が実コード再検証。2 long pole（H `typeP_duality`
-  `S14:4729` / B `(6.8)` `S08_CoherenceTheorems`）は**両方とも未達を確認**（standby の前提は真）。
-  だが「F に ungated 作業不在」は誤りと判明: **Wielandt (9.1) `CoprimeAction.lean` の 3 実 sorry**
-  （`wielandt_fixedPoint_frobenius`/`_trivial_E_fixed`/`_trivial_U_fixed`）は FT closure 内・依存的に
-  ungated（入力=`IsFrobeniusGroup`+coprime のみ）・非衝突（消費側 Pf §11 は docstring 参照のみ、term 未配線）。
-  ⟹ ユーザー裁可で **F を Wielandt (9.1) に reactivate**（issue 7004, base 7000, hard 多 session）。
-  **⚠ cron の「F=0 は STANDBY ゆえ正常」は失効** — F は今後 producing。次 cron で F-status 行を訂正
-  （reactivate 直後 1-2 tick は F=0 でも stall でない＝first commit まで）。再開トリガー = H が
-  `typeP_duality` landing → §16 解禁で F を §16/POLE-2 に呼び戻し（Wielandt 進捗 commit して pivot）。
-
-- **2026-06-16 — F STANDBY (ユーザー裁可, 2 scout で code-verified) [上で superseded]**: F は §16 集約後 POLE-1 +
-  Thm II hDsub/Conjunct1 skeleton を landing したが、残 §16 はすべて上流 gated (S16 Thm A-E/II = §14/§15、
-  POLE-2 = Pf §10-13 char theory) と確定 → **ungated FT-critical task 無し ⟹ STANDBY**。**merge tick で F=0 は正常、
-  flag しない**。再開トリガー: H が §14 Thm A-E feeder/14.7 を landing (→S16 解禁) / B が (6.8)+Pf §10-13 char API
-  (→POLE-2 解禁)。hub はこれを検出したら F を reactivate。B/G/H は継続活発 (sorry 142, Prop 14.2 完了済)。
-
-- **2026-06-15 (夜²) — §16 集約 re-split (F↔G, ユーザー裁可) + Prop 14.2 COMPLETE**:
-  H が **BG Prop 14.2 `typeP_structure` を sorry-free + axiom-clean で COMPLETE** (`f031f7bc`, (g) discharge,
-  issue 2007 close) = long pole funnel keystone。実 sorry 144→143。次 long-pole gate = Thm 14.7 `typeP_duality`
-  (§16 structure = Mstar ∃!/M̃/Lem 14.6 に cross-lane gated)。
-  - **F の POLE-2 は deeply gated 判明** (F deep-dive: arith cascade 既証明、全 dispatch が sorried producer
-    funnel) → scout で ungated task 精査 → 唯一 = Thm II cite-compress だが G の file (collision)。
-  - **⟹ §16 を F に集約 (ownership re-split, ユーザー裁可)**: **F = BG §16 全体** (`S16_MainResults` +
-    `S16_NonExistenceG` + `FeitThompson` POLE-1)。即時 = Thm II cite-compress (issue 8009, G→F 移管)。
-    POLE-2 は §16 character cascade landing 後に同所有で再開。**G = §15 専念** (`S15_MF` のみ)。
-    G は今後 `S16_MainResults` を触らない (cite のみ)。clean handoff (G の §16 WIP は合流済・残無し)。
-
-- **2026-06-15 (夜) — レーン再配分 (11-agent code-verified review + ユーザー裁可) + S16 prefix-split**:
-  全レーン synced + warm (main `b66af8aa`)。再配分レビューで判明・確定:
-  - **✅ Thm 3.10(a) は完了済** (`S03g_Thm310.lean:75` `prime_card_complement_of_frobenius_conj`、
-    Core/Module とも 0 sorry)。「真の long pole = 3.10(a) §3 rep-theory」は **stale**。
-  - 真の binding long pole = **§14 funnel** = Lem 12.17 TI clause → Prop 14.2 (g) `S14:1796` →
-    Thm 14.7 `typeP_duality` `S14:1964` (~2-3.5 session の §12/§14 wiring)。`typeP_duality` は下流
-    (S15_MF:785/795/1976, S16:437) が consume する唯一の §14 定理。
-  - **配分**: H = long pole 単独 (別 lane 投入は S14:1796/S12_E 衝突ゆえ不可)。B = Pf §6 (6.8) 継続。
-    G = §15/§16 `_of_inputs` skeleton 前倒し (cite-compress drift 停止)。F = POLE-1 skeleton
-    (`FeitThompson.lean:70`, hub split 不要) + POLE-2 secondary。
-  - **⚠ S12_E 一時 grant → H**: H が Lem 12.17 TI clause を `S12_E*.lean` に追加する (F が §12 から
-    退いたため実質 unowned)。従来「G/他レーンは S12_E 編集禁止」は維持、**H に限り 12.17 clause 追加を許可**
-    (issue 2007 / base 2000)。それ以外の S12_E 変更は通常どおり abort+承認。
-  - **hub split 実施済**: `S16_NonExistenceG.lean` (6860→1979) を `end FieldNormalizerData` で prefix-split
-    → 凍結 Core `S16_NonExistenceGCore.lean` (4917 行) + F の POLE-2 tail (1979 行)。de-private 1 件
-    (`p_pow_sub_two_lt_q_sq_of_pow_lt_mul_sq`)。merge `b66af8aa`、build 3830 green。
-  - **deferred hub task**: `S14_TypePCounting.lean` (2069 行) split は H が (g) から離れるまで保留 (issue 0069)。
-    `S16_NonExistenceG.lean` tail (1979 行 >1500) は F の coherent frontier ゆえ現状維持。
-  - cron はこの再配分後に再作成 (`/model` 切替で旧 session cron 消滅 [[cron-dies-on-model-switch]])。
-
-- **2026-06-11 (夜) — §11 完結・E 退役・F 再開 (12.18 先行)**: E の最終成果 Thm 11.7
-  (`S11_MsigmaANormal.lean` 977 行 leaf) を合流 (merge `77ab5173`, 実 sorry 266→264) し
-  **BG §1-§11 が proof レベル完結**。E は worktree+branch 削除で退役 (ユーザー裁可)。
-  B (4.5.b) Brauer counting bound も合流 (merge `cc81837b`)。**F 再開方針 (ユーザー裁可) =
-  12.18 先行**: skeleton (notes/bg/s12_subgroup_e.md「Lane F session 1」) が鮮度の高いうちに
-  Fable 5 (1M) で組立 → 着地後 cascade 12.3→12.16 (Thm 11.7 着地で全解禁済) を Opus 4.8 で回収
-  → §13 Prime Action (notes/bg/s13_prime_action.md, S13 ファイル新設 ~800-1100 行)。
-  cron は B+F 監視に更新 (job 旧 `a8824a71` → 新 `d87f439a`; F→B 順, push 込み)。ゲートに root closure 検査 (手順 3b)
-  を追加 — E の「root 登録ギャップ」gotcha のメカニズム化。hub 保留タスク = 分割 issue
-  0063 (S10_LocalLemmas 2364 行) / 0064 (S05_NarrowPGroups 4039 行) の実施 (全 BG §4/§5/§10
-  ファイルが凍結済みの今が安全窓)。
-- **2026-06-11 (cron 再開) — 監視 loop 再開、自動合流対象 = B・E のみ**: ユーザー指示で
-  15min cron (`2,17,32,47 * * * *`, session-only/durable=false, 7 日 auto-expire, job `a8824a71`,
-  合流成立時 `git push origin main` 込み — 2026-06-11 ユーザー指示で追加)
-  を再作成。再開巡で B (`d9d2b9da` Pf (4.5.b) 土台) と F (`6f6d7afc` BG 12.18 infra) を各 1 commit
-  合流 (merge `004f6ae3` / `3336dc31`; build 3632 緑 / AxiomsCheck OK / 実 sorry 266 不増)。
-  **F (bg-s12) は今回 1 回だけ手動合流し、以降の cron 監視対象からは外す** (ユーザー選択)。
-  E (bg-local) は未マージ 0。⚠ サイズ flag: `S10_LocalLemmas.lean` 2364 行 (>1500) →
-  分割 issue `0063-s10-locallemmas-split.md` 既起票済み (新規起票不要; E の active frontier ゆえ
-  凍結境界が定まるまで実施は保留)。
-- **2026-06-11 — レーン再編成 (B+E の 2 レーン体制)**: A/D 退役 (worktree 削除・branch 残置)、
-  B は main へ fast-forward 同期 (`f608143c`) + LAUNCH.md を session-22 現在地に刷新、
-  **E (`bg-local`) 新設** (issue base **6000**, LAUNCH.md 配置済み): Lem 10.4(b)→de-axiom→
-  Lem 10.13→§11.5-7。モデル配分 = E: Fable 5 (1M) / B: Opus 4.8 (1M) ((4.4) kernel と停滞時は
-  Fable 5) / hub: Fable 5。10.13 着地後に F (`bg-s12`, base 7000) 増設予定。
-- **2026-06-10 — Thm 3.6 完成 → D 合流 → de-axiom 完了。D の「報告のみ」規約は役目を終了**:
-  Lane A が BG Thm 3.6 を完成 (`18a12a88`) → main 合流 (merge `36eb07db`)。ユーザー承認のもと
-  **D (`bg-s10-fwd`) 全 67 commits を合流** (merge `2794232f`) し、`S10_ForwardFromKeystone.lean` の
-  Thm 3.6 forward axiom を `Ch1.S03f.thm36` への bridge theorem に置換 (de-axiom, `fabd8efd`)。
-  §10 spine の island は **Lem 10.4(b) axiom 1 本のみ**に縮小 (AxiomsCheck 1343 checks green)。
-  **以後 D に新規 commit が来た場合の auto-merge 可否はユーザー未決** — 条件付き定理は引き続き
-  10.4(b) island になるため、当面は従来どおり報告して指示を仰ぐ。同日 B も (4.3.b)→(4.3) COMPLETE
-  →(4.4) anchor を連続合流 (`404d8814`/`1368e8fb`/`7c7045cc`/`f3eb00eb`/`4752484d`)。
-  監視 loop はユーザー指示で停止中 (再開時は CronCreate 再作成)。
-  ⚠ 実務知見: (1) `lake build … | tail` は exit code をマスクする — 判定には
-  `; exit ${PIPESTATUS[0]}` を付ける。(2) de-axiom で S03f を import すると
-  `OddOrder.GroupTheory.IsZGroup` が closure に入り、`open OddOrder.GroupTheory` 下の bare
-  `IsZGroup` が mathlib 版と ambiguous になる → `_root_.IsZGroup` 修飾で解消 (型不変)。
-- **2026-06-09 (後刻) — A: BG Thm 3.5 landed, 通常合流に復帰**: faithful 枝が sorry-free に到達
-  (`S03e_Thm35.lean` real sorry = 0, commit `f51e4e85` "faithful-branch assembly COMPLETE
-  (thm35_algClosed done)")。**BG Thm 3.5 を任意体で完全形式化**し main へ合流済 (merge `e42f4260`,
-  build 3616 green / AxiomsCheck 違反なし / 実 sorry 273 不増)。⟹ 下の「A=報告のみ」特例は**失効**。
-  A は通常の自動合流対象に戻る。**次の A frontier = BG Thm 3.6** (これが landed されると §10.6 keystone
-  + Lane D の forward-axiom de-axiom が解禁され、D を手動合流できる)。それまで D は従来どおり報告のみ。
-- ~~**2026-06-09 — A=現状維持 (ユーザー判断)**: faithful 枝に hard-core sorry 1 個ゆえ報告のみ~~
-  (上記で解消・失効)。
+- **2026-06-28 — レーン再配分 (a/b/c/d) + 監視再開**: ゲートなし・signature contract 方式へ全面再配分
+  (正本 `ft_lane_reallocation_2026_06_28.md`)。worktree を `odd-order-{a,b,c,d}` に rename (`git worktree move`/
+  repair、`.lake/build` cache 流用、coq submodule back-pointer 修復済)。全 4 レーン main `5f1c0be2` に同期・
+  **0 unmerged** で監視開始。旧 relane #1-#12 / lane f/b/h/c の詳細履歴は `ft_frontier_remap_2026_06_25.md`
+  + git log に温存 (本ファイルからは除去してクリーン化)。
