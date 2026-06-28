@@ -576,3 +576,21 @@ obligation 1 (θ₀ inflation 抽出)・3 (linearity)・4 ([HU:HC]=u) 全完了�
 
 **次手**: (9.9) `caseB_character_counts` の (9.9.a) conjunct を proven caseB_degree_qu で wire
 (残 (9.9.b)/(9.9.c))、(9.8) `caseA_character_counts`、→ (11.8)/(10.7) → card_kappaHall。
+
+### §12 追補⁶ (lane-a /loop iter8): (9.9) に (9.9.a) wire + 残 §9 counts frontier 評価
+
+(9.9.a)=caseB_degree_qu を `caseB_character_counts` の第1 conjunct に wire (honest)。残 §9 counts の評価:
+
+**残 §9 counts (全て深い Peterfalvi character-counting、次反復の deep 着手対象)**:
+- **(9.9.b)** `caseB_character_counts` 第2/3 conjunct: `{φ∈𝒮(H₀)|¬irr}.ncard = p-1` (reducible count) +
+  reducible は degree qu かつ 𝒮(H₀C) に入る。Clifford counting (どの θ̄∈Irr(H̄) が reducible Ind を生むか)
+  + inflation 機構 (obligation 1 で構築済) で着手可か要分析。
+- **(9.9.c)** 第4 conjunct: `(𝒮(H₀C') に irr 無) → C=⊥ ∧ u=(p^q-1)/(p-1)` (exceptional case)。
+- **(9.8)** `caseA_character_counts` (S11:3479): case (a) の counts ((9.8.b/c/d))、parallel to (9.9)。
+- **(9.10)** `exceptional_case_frobenius_realization` (S11:3913): ⚠ 第1 conjunct
+  `chars.quotientSemidirectFrobenius` は **opaque Prop field** ([[scaffold-sorry-free-not-done]]、
+  de-opacify 要)。第2/3 は exceptional u + HU Frobenius (深い)。
+- **(9.11)** `sibleyTarget_H0C` (S11:3936): §14-gated ((6.8) + Sibley Dade witness)、lane-b/d 寄り。
+
+これらは (10.7) typeII_derived_frobenius / (11.8) を unblock する (両者 §9 counts 依存)。次反復は (9.9.b)
+reducible count を deep 分析 (tractable か §3-§7 char API gate か、原文 04.13 (9.8.b)/(9.9.b) 読んで判定)。
