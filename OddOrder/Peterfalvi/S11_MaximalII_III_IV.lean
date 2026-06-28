@@ -3489,6 +3489,23 @@ theorem caseA_character_counts [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G
           IsIrreducibleCharacter χ ∧ χ 1 = ((data.q * caseA.a : ℕ) : ℂ)}.ncard := by
   sorry
 
+section
+open scoped IsMulCommutative
+
+/-- **`⁅H, H⁆ ≤ H₀`** (the chief factor `H̄ = H/H₀` is abelian): `derivedInG H ≤ H₀`.  Since
+`↥H ⧸ N` is elementary abelian, `commutator ↥H ≤ N`, and mapping into `G` gives `derivedInG H ≤ H₀`.
+A structural input of the (9.9.a) `⁅HC,HC⁆ ⊆ 𝒮(H₀C')`-kernel linearity. -/
+theorem derivedInG_H_le_H0 {M : Subgroup G} (data : TypesIIIIIIVSetup M)
+    (chief : ChiefFactorData data) :
+    derivedInG data.H ≤ chief.H0 := by
+  haveI : IsMulCommutative (↥data.H ⧸ chief.N) := ⟨⟨chief.quotient_elementaryAbelian.1⟩⟩
+  rw [derivedInG, chief.H0_eq]
+  apply Subgroup.map_mono
+  rw [← QuotientGroup.ker_mk' chief.N]
+  exact Abelianization.commutator_subset_ker (QuotientGroup.mk' chief.N)
+
+end
+
 /-- **(9.9.a) index step (C): `[U:C] = u`** realized form `(cInHu.subgroupOf uInHu).index = u`.
 First isomorphism `U/C ≃ Ū` (the `U`-action image on the chief factor), with `u = |Ū|`. -/
 theorem index_cInHu_subgroupOf_uInHu_eq_u [Finite G] {M : Subgroup G}
