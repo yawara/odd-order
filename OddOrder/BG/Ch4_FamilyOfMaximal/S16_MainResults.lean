@@ -1011,6 +1011,38 @@ theorem sigma_reps_pairwise_disjoint [Finite G] (hG : OddOrder.BG.IsMinimalSimpl
   exact hne ((huniq Mi ⟨hMi, S14.IsConjugateSubgroup.refl Mi⟩).trans
     (huniq Mj ⟨hMj, hconj⟩).symm)
 
+/-- **BG Theorem E, the `π(G)` cover** (mmd L4370, clause (a1)): for a system of conjugacy-class
+representatives `reps` of the maximal subgroups, a prime `p` divides `|G|` iff `p ∈ σ(Mᵢ)` for some
+representative `Mᵢ`.  Forward: a prime `p ∣ |G|` is a `σ`-prime of *some* maximal subgroup `M`
+(`exists_mem_sigma_of_prime_dvd_card`, BG §1 — a Sylow `p`-subgroup is non-normal, so its normalizer
+lies in a maximal `M` with `p ∈ σ(M)`), and `σ` is conjugation-equivariant (`sigma_conj`), so the
+representative `Mᵢ` conjugate to `M` also has `p ∈ σ(Mᵢ)`.  Reverse: `σ(Mᵢ) ⊆ π(|Mᵢ|)`
+(`mem_sigma_iff`) and `|Mᵢ| ∣ |G|` (Lagrange).  Together with `sigma_reps_pairwise_disjoint`
+(clause (a2)) this is the full `π(G)` partition by the `σ(Mᵢ)` — the partition core of BG Theorem E
+(`theoremE_sigma_partition_and_counting`, issue 8019). -/
+theorem sigma_reps_prime_cover [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    {reps : Set (Subgroup G)}
+    (hrepsMax : ∀ Mi ∈ reps, Mi ∈ maximalSubgroups G)
+    (hreps : ∀ H : Subgroup G, H ∈ maximalSubgroups G →
+      ∃! Mi : Subgroup G, Mi ∈ reps ∧ S14.IsConjugateSubgroup H Mi)
+    (p : ℕ) :
+    p ∈ (Nat.card G).primeFactors ↔ ∃ Mi : Subgroup G, Mi ∈ reps ∧ p ∈ OddOrder.BG.Ch3.S10.sigma Mi := by
+  constructor
+  · -- `p ∣ |G|` ⟹ `p ∈ σ(M)` for some maximal `M` ⟹ `p ∈ σ(Mᵢ)` for its representative.
+    intro hp
+    haveI : Fact p.Prime := ⟨Nat.prime_of_mem_primeFactors hp⟩
+    obtain ⟨M, hMmax, hpM⟩ :=
+      S14.exists_mem_sigma_of_prime_dvd_card hG (Nat.dvd_of_mem_primeFactors hp)
+    obtain ⟨Mi, ⟨hMirep, g, hg⟩, _⟩ := hreps M hMmax
+    exact ⟨Mi, hMirep, hg ▸ OddOrder.BG.Ch3.S10.sigma_conj g hpM⟩
+  · -- `p ∈ σ(Mᵢ) ⊆ π(|Mᵢ|)` and `|Mᵢ| ∣ |G|`.
+    rintro ⟨Mi, hMirep, hpMi⟩
+    have hpMiPF : p ∈ (Nat.card ↥Mi).primeFactors :=
+      ((OddOrder.BG.Ch3.S10.mem_sigma_iff Mi p).mp hpMi).1
+    exact Nat.mem_primeFactors.mpr ⟨Nat.prime_of_mem_primeFactors hpMiPF,
+      (Nat.dvd_of_mem_primeFactors hpMiPF).trans (Subgroup.card_subgroup_dvd_card Mi),
+      (Nat.card_pos).ne'⟩
+
 /-- **BG Theorem E** (mmd L4370): with `R(x)` as in Theorem D and
 `\widetilde M = ⋃_{x ∈ M_sigma#} xR(x)`, the conjugacy saturation of
 `\widetilde M` has the stated size, the representative maximal subgroups give a
