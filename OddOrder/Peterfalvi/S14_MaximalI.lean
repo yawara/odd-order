@@ -323,6 +323,32 @@ theorem character_decomposition_and_dade_domain [Finite G]
 
 /-! ## (12.3)--(12.5): orthogonality and rho-constancy -/
 
+/-- The complex-conjugate constituent `φ̄` of a constituent `φ ∈ Irr L`, again irreducible
+(the `Sset_closedUnderConjugate` pattern).  Used to feed the (1.4) difference-pair machinery on
+`{φ, φ̄}` (Fin 2), producing the orthonormal Dade-image block `R₁(φ)` of (12.2.b). -/
+noncomputable def conjConstituent {L : Subgroup G} [Finite ↥L] (φ : IrreducibleCharacter ↥L) :
+    IrreducibleCharacter ↥L :=
+  ⟨(φ : ClassFunction ↥L ℂ).conj, φ.isIrreducible.conj⟩
+
+@[simp] theorem coe_conjConstituent {L : Subgroup G} [Finite ↥L] (φ : IrreducibleCharacter ↥L) :
+    (conjConstituent φ : ClassFunction ↥L ℂ) = (φ : ClassFunction ↥L ℂ).conj := rfl
+
+/-- `φ̄` has the same support as `φ` (complex conjugation preserves the support). -/
+theorem support_conjConstituent {L : Subgroup G} [Finite ↥L] (φ : IrreducibleCharacter ↥L) :
+    (conjConstituent φ : ClassFunction ↥L ℂ).support = (φ : ClassFunction ↥L ℂ).support := by
+  ext x
+  simp only [coe_conjConstituent, ClassFunction.mem_support, ne_eq,
+    ClassFunction.conj_apply, star_eq_zero]
+
+/-- A non-real constituent differs from its conjugate: `¬ IsReal φ → φ ≠ φ̄`. -/
+theorem ne_conjConstituent {L : Subgroup G} [Finite ↥L] {φ : IrreducibleCharacter ↥L}
+    (h : ¬ ClassFunction.IsReal (φ : ClassFunction ↥L ℂ)) : φ ≠ conjConstituent φ := by
+  intro heq
+  apply h
+  have hc : (φ : ClassFunction ↥L ℂ).conj = (φ : ClassFunction ↥L ℂ) := by
+    rw [← coe_conjConstituent, ← heq]
+  exact hc
+
 /-- Carrier for Peterfalvi (12.3), comparing two non-conjugate type-I maximal
 subgroups. -/
 structure CrossOrthogonalityData {L1 L2 : Subgroup G}
