@@ -1565,9 +1565,11 @@ theorem T_typeII [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
 
 /-! ## (14.10)--(14.11): the subgroup `M` over `N_G(V)` -/
 
+open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
 /-- **Peterfalvi (14.10)**: the type-I maximal subgroup `M` containing
 `N_G(V)`, its Fitting kernel `K`, the Dade extension, and `beta_M`. -/
 structure MHypothesis (hyp : Hypothesis (G := G)) where
+  [finiteG : Finite G]
   M : Subgroup G
   K : Subgroup G
   M_maximal : M ∈ maximalSubgroups G
@@ -1580,6 +1582,14 @@ structure MHypothesis (hyp : Hypothesis (G := G)) where
   bridge `M` to the §7 ρ-machinery (`S09.Hypothesis71`/`FamilyHypothesis71`/`family_inequality`),
   the common §3/§4 Dade foundation of the (14.11) norm-cascade producers. -/
   typeIHyp : OddOrder.Peterfalvi.S14.Hypothesis M
+  /-- **Peterfalvi (7.8) for `M`**: the §7 coherence data (`S09.Hypothesis78`) of the type-I
+  maximal subgroup `M` on its Dade support `A(M) = typeIA M`.  Its (7.8.a) `β`-decomposition and
+  (7.8.b) norm estimates feed the (14.11) cascade producers (`betaM_expansion_data` via
+  `betaMExpansionData_of_hypothesis78`; `normCascadeData` via `family_inequality`).  The genuine
+  M-coherence supply (Pf §5–§8 + §13/§14), isolated here as the single honest obligation that
+  `exists_MHypothesis` discharges. -/
+  h78 : OddOrder.Peterfalvi.S09.Hypothesis78 G
+    (OddOrder.GroupTheory.typeIA M typeIHyp.typeI) M
   Mset : Set (ClassFunction ↥M ℂ)
   tau : OddOrder.Peterfalvi.S07.IntegralCharacterMap ↥M G
   tau1 : OddOrder.Peterfalvi.S07.IntegralCharacterMap ↥M G
@@ -1604,6 +1614,17 @@ structure MHypothesis (hyp : Hypothesis (G := G)) where
   instance plumbing needed to spell `Ind_K^M 1_K` inside a field type (lane-c §16). -/
   betaM_formula : Prop
   betaM_formula_holds : betaM_formula
+  /-- **Peterfalvi (7.8.a) for `M`**: `β_M^τ` is the Dade image `β` carried by `h78`. -/
+  betaM_eq : betaM = h78.beta
+  /-- **Peterfalvi (14.10)/(7.8)**: `ψ^{τ₁}` is the coherent image `ζ^ν` of the distinguished `ζ`. -/
+  psi_tau1_eq : tau1 psi = h78.nu (h78.hyp76.zeta h78.zetaDistinct)
+  /-- **Peterfalvi (13.1.d)/(3.9)**: the `±1` signs of the `η`-grid expansion of `1_G + Δ`. -/
+  betaSigns : Fin hyp.base.q → Fin hyp.base.p → ℤ
+  betaSigns_pm : ∀ i j, betaSigns i j = 1 ∨ betaSigns i j = -1
+  /-- **Peterfalvi (13.1.d)**: `1_G + Δ = Σ ε_ij η_ij` ties the residual `Δ` of `h78`'s (7.8.a)
+  decomposition to the §13 `η`-grid. -/
+  betaGrid : OddOrder.Peterfalvi.S09.Hypothesis71.constOne G + h78.delta =
+    ∑ i : Fin hyp.base.q, ∑ j : Fin hyp.base.p, (betaSigns i j : ℂ) • hyp.base.eta i j
   G0 : Set G
 
 namespace MHypothesis
@@ -1943,14 +1964,23 @@ structure BetaMExpansionData (hyp : Hypothesis (G := G)) (Mdata : MHypothesis hy
     OddOrder.Peterfalvi.S09.Hypothesis71.constOne G + delta =
       ∑ i : Fin hyp.base.q, ∑ j : Fin hyp.base.p, (signs i j : ℂ) • hyp.base.eta i j
 
+open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
 /-- **Faithful §3/§7 Dade producer for (14.11.2).**  Under `K ≠ V`, the type-I maximal subgroup `M`
 carries the (7.8) Dade-coherence decomposition `BetaMExpansionData` of `β_M^τ` against the `η`-grid.
 The construction is the §3/§4 Dade-isometry layer (the abstract §16 `τ`/`τ₁`/`betaM` carriers do not
 yet pin it); see the bridge lemma `betaMExpansionData_of_hypothesis78`, which reduces this to a
 concrete `S09.Hypothesis78` for `M` plus the `η`-grid identification (3.9)/(13.1.d). -/
 noncomputable def betaM_expansion_data [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
-    (hyp : Hypothesis (G := G)) (Mdata : MHypothesis hyp) (hne : Mdata.K ≠ hyp.base.V) :
-    BetaMExpansionData hyp Mdata := sorry
+    (hyp : Hypothesis (G := G)) (Mdata : MHypothesis hyp) (_hne : Mdata.K ≠ hyp.base.V) :
+    BetaMExpansionData hyp Mdata where
+  delta := Mdata.h78.delta
+  chi := Mdata.tau1 Mdata.psi
+  chi_norm := fun _ => rfl
+  betaM_seven_eight := by
+    rw [Mdata.betaM_eq, Mdata.h78.beta_eq_constOne_sub_zetaImage_add_delta, Mdata.psi_tau1_eq]
+  signs := Mdata.betaSigns
+  signs_pm_one := Mdata.betaSigns_pm
+  grid_eq := Mdata.betaGrid
 
 /-- **§16 → §7 bridge for the `β_M` (7.8.a) decomposition.**  Given a concrete `S09.Hypothesis78`
 for `M` whose Dade image `β` and coherent image `ζ^ν` are identified with the abstract §16 carriers
