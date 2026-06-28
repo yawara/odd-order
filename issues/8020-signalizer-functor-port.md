@@ -92,3 +92,29 @@ genuine def/補題が個別 landing し、scaffold free-field/dummy を順次置
 - Lean scaffold: `SigmaDecompositionData` (S14:1197)、`RData` (S16:114)、`sigmaSharp` (S14:1145)。
 - 上流 issue 8019 (Theorem E)。consumer chain = card_LF_coprime_pq → POLE-2。
 - [[scaffold-sorry-free-not-done]] [[verify-port-state-by-number-not-coq-name]]
+
+## 進捗ログ (lane d)
+
+**2026-06-28 (lane d 立ち上げ初回): Chunk 1 の核心 genuine 構成 landed** — commits `bd4607b1` +
+`f143b370` (全 axiom-clean、AxiomsCheck 登録、full build green)。
+
+- **重要発見**: element π-part 分解は `OddOrder.GroupTheory.PiElementDecomposition` に既存
+  (`exists_isPiElement_mul` 存在 + `isPiElement_mul_unique` 一意性)。これを土台に Chunk 1 を構成。
+- **commit 1 (`bd4607b1`)**: `piPart π g` (element の π-part を**関数化** = unique 分解の
+  `Classical.choose`)、`piPart_conj` (conj-equivariance via uniqueness)、`sigmaPart M x` (Coq
+  `x.`_σ(M)`)、`sigmaDecomposition x` / `sigmaLength x` (genuine `Set G` / `ℕ` defs)、
+  **`sigmaLength_eq_zero_iff`** (Coq `ell_sigma0P`: ℓ_σ(x)=0 ↔ x=1、forward は
+  `exists_mem_sigma_of_prime_dvd_card`)、**`sigmaLength_conj`** (Coq `ell_sigmaJ`)。
+- **commit 2 (`f143b370`)**: `piPart_self_of_isPiElement` / `piPart_eq_one_of_isPiElement_compl`、
+  `isPiElement_sigma_of_mem_Msigma` (x∈M_σ ⟹ σ(M)-element)、
+  `sigmaPart_eq_self_or_one_of_isPiElement_sigma` (σ(M)-element の σ(L)-part は x か 1: conj なら
+  σ(L)=σ(M)、非 conj なら `sigma_disjoint_of_nonconjugate` で disjoint)、**`Msigma_ell1`**
+  (x∈M_σ^# ⟹ ℓ_σ(x)=1、scaffold `length_one_of_isPiElement_sigma` の posit を genuine 証明化)。
+
+**残 Chunk 1**: `sigmaMmaxOf X = {M∈ℳ : X≤M_σ}` def + conj-不変 (FT_signalizer_base 用)、
+`sigma_decomposition_subG` (x∈H ⟹ decomp⊆H)、`prod_sigma_decomposition` (∏ σ-parts = x、深め)。
+**次の上流 = Chunk 2** = `FT_signalizer x` (= R(x)) def + `FT_signalizer_context` 第1連言。
+Cor 12.14 (`maximalContaining_centralizer_and_someSylow_eq_singleton`、ported) で C[x] 一意極大。
+**注**: genuine `sigmaLength` は scaffold `SigmaDecompositionData.length_one_iff` を満たさない
+(後者は `ℓ_σ(x)=1 ↔ x≠1 ∧ ∃M,x∈M_σ` だが genuine は length=2 もあり得る) ⟹ scaffold 完全置換は
+別途 (reverse `ell1 ⟹ ∃M,x∈M_σ` = deep、`prod_sigma_decomposition` 経由)。[[scaffold-sorry-free-not-done]]
