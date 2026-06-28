@@ -441,6 +441,21 @@ theorem lambda_forces_T_caseB [Finite G]
 
 /-! ## (13.5)--(13.10): norm estimates -/
 
+/-- **Self inner-sum as a real squared-norm sum** (general `ClassFunction` identity).
+
+For any class function `α : H → ℂ`, the unscaled self inner sum `Σ_g α(g)·conj(α(g))` equals the
+real sum of squared norms `Σ_g ‖α(g)‖²` cast to `ℂ`.  This is the bridge between the abstract
+`ClassFunction.innerSum`/`inner` API and the concrete `Σ |α(g)|²` quantities of Peterfalvi's norm
+estimates (13.6)–(13.10); combined with `Σ_{H#} = Σ_H − |α(1)|²` it converts every Dade-norm
+inequality into an elementary squared-norm sum.  A general fact for any finite group `H`. -/
+theorem innerSum_self_eq_sum_normSq {H : Type*} [Group H] [Fintype H]
+    (α : ClassFunction H ℂ) :
+    ClassFunction.innerSum α α = ((∑ g : H, ‖α g‖ ^ 2 : ℝ) : ℂ) := by
+  rw [ClassFunction.innerSum, Complex.ofReal_sum]
+  refine Finset.sum_congr rfl fun g _ => ?_
+  rw [← starRingEnd_apply, RCLike.mul_conj]
+  norm_cast
+
 /-- **Inflation norm lower bound — the carrier-free core of Peterfalvi (13.5.c)**.
 
 If a function `α : H → ℂ` is constant on a finite subgroup `P ≤ H` (equal to `α 1` on all of `P`)
