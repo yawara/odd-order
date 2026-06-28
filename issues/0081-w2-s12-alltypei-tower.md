@@ -241,6 +241,24 @@ exists_typeICovering の covers/coprime/two_le 実証明は genuine な FT 群�
 ⟹ **hub 再判断推奨を維持** (今回 1 件 consumer-wiring を拾えたが、それで ungated 群論は尽きた)。次の
 ungated セグメントへ relane、or lane-b の char/§8 landing 待ち (landing 後に (12.x) consumer-wiring 再訪)。
 
+### 2026-06-28 (await 復帰): ✅ Prop 16.1 完成トリガで theorem88_dichotomy + (12.9) 核を axiom-clean 認証
+
+issue 2029 = hub option B (await + consumer-wiring) で待機中、自己復帰モニターが **トリガ (A) 発火**を検知:
+lane-f が **Prop 16.1 (`proposition_type_classification`) を完全 sorry-free + axiom-clean 化** (issue 8015
+CLOSED、reverse bridges hIIP2/hIIIIVP1/hVP1 全閉鎖)。await 復帰して consumer-wiring を拾う (commit `071965c9`):
+
+- **`theorem88_dichotomy` を axiom-clean 認証** (AxiomsCheck 登録): cite 先 proposition_type_classification
+  (Prop 16.1) + typeP_duality (Thm 14.7) が両方 axiom-clean になったため、(8.8) dichotomy → Theorem88CaseBData
+  構成が honest に証明 (sorryAx 非依存)。**FT-critical endpoint の (8.8) dichotomy が doneness 到達**。
+- **`exists_sigmaKappaCompl_hall_ge_P0` (12.9 Hall complement)** + **`counterexample_P0_K_structure` (12.9
+  P₀ rank-2 構造)** も axiom-clean 認証: 唯一の §16 gate だった Prop 16.1 型 I clause (a)/(f) が閉鎖したため。
+- `exists_rankTwoWitness` は別の §12/§16 cite 経由で sorryAx 残ゆえ非登録。`theorem88_caseB_holds` も
+  not_all_maximal_typeI → exists_typeICovering/typeI_frobenius の §8/char residual ゆえ未 axiom-clean。
+
+await + consumer-wiring モードの価値を再実証 (2 件目の genuine 前進)。[[scaffold-sorry-free-not-done]] 基準で
+doneness 認証 (honest proof の axiom footprint 確定)。残トリガ = (B) bgTheoremE 強化 / (C) (12.10) char核+(8.13.c1) §8。
+自己復帰モニターを残トリガ (B)/(C)/再ルートで再 arm。full build green / AxiomsCheck OK。
+
 ## 参照
 
 - 正本: `notes/meta/ft_frontier_remap_2026_06_25.md` §2 (W2)、relane #12 (LAUNCH.md 冒頭、issue 2027)
