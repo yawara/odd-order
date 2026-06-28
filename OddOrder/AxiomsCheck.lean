@@ -6690,6 +6690,8 @@ foundational facts: `sigmaLength_eq_zero_iff` (Coq `ell_sigma0P`: `ℓ_σ(x) = 0
 #assert_only_allowed_axioms OddOrder.BG.Ch4.S14.sigma_cover_decomposition
 #assert_only_allowed_axioms OddOrder.BG.Ch4.S14.not_conj_of_mem_Msigma_of_tau2
 #assert_only_allowed_axioms OddOrder.BG.Ch4.S14.sigma_cover_decomposition_signalizer
+#assert_only_allowed_axioms OddOrder.BG.Ch4.S14.mem_sigma_cover_decomposition_signalizer
+#assert_only_allowed_axioms OddOrder.BG.Ch4.S14.sigmaLength_cover_le_two_signalizer
 #assert_only_allowed_axioms OddOrder.BG.Ch4.S14.sigmaPart_conj
 #assert_only_allowed_axioms OddOrder.BG.Ch4.S14.sigmaLength_eq_zero_iff
 #assert_only_allowed_axioms OddOrder.BG.Ch4.S14.sigmaLength_conj

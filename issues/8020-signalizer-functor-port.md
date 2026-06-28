@@ -398,3 +398,10 @@ card_LF_coprime_pq (spine, lane c)  ←  bgTheoremE_cover_data (Pf 8.17, Peterfa
 **14.5c cluster 進捗**: consttM ✅ → sigma_cover_decomposition ✅ → cover-decomp 配線 ✅ → **[残] 14.5a
 sigma_cover_disjoint** (signalizer for 2 elements x,y + sdprod 自明交差) → 14.5c (cover+count+orbit) → theoremE。
 次 = 14.5a。
+
+**cont.¹² 追記**: cover-decomp の corollary 2 本 (axiom-clean): `mem_sigma_cover_decomposition_signalizer`
+(x∈σ-decomp(x*x')、14.5a 部品) + **`sigmaLength_cover_le_two_signalizer` = BG Cor 14.10** (ℓ_σ(x*x')≤2、
+σ-decomp={x}∪{x'}^# が ≤2 元)。**14.5a の core (2-element signalizer + sdprod、~100 行 intricate) は次セッション**:
+g∈x·R(x)∩y·R(y) ⟹ y=x' (cover-decomp) ⟹ x∈R(y)∩(N[x]⊓C[y]) = ⊥ (signalizer_centralizer_isComplement
+を M'=N[x]/y に適用) ⟹ x=1 矛盾。structure を x,y 両方に適用 (signalizer_structure_of_mem_sigmaSharp、
+general ℓ_σ=1 は 𝓜_σ(x)≠∅ から M 抽出)。
