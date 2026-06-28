@@ -594,3 +594,23 @@ obligation 1 (θ₀ inflation 抽出)・3 (linearity)・4 ([HU:HC]=u) 全完了�
 
 これらは (10.7) typeII_derived_frobenius / (11.8) を unblock する (両者 §9 counts 依存)。次反復は (9.9.b)
 reducible count を deep 分析 (tractable か §3-§7 char API gate か、原文 04.13 (9.8.b)/(9.9.b) 読んで判定)。
+
+### §12 追補⁷ (lane-a /loop iter9): 残 §9 counts は §4 Theorem (4.5)/(4.7) gated (要判断)
+
+原文 04.11 (9.8.b,c)/(9.9.b) 精読の結論: **§9 の reducible COUNT 系は §4 Dade framework gated**で、
+(9.9.a)=caseB_degree_qu (純 Clifford, DONE) とは本質的に異なる。
+- **(9.9.b)** `𝒮(H₀) は exactly p-1 reducible μ_j` の証明 = 「By (4.7) and Theorem (4.5), 𝒮(H₀)/𝒮(H₀C)
+  contain exactly p-1 reducible characters」。⟹ **§4 Theorem (4.5) + (4.7)** (Dade family の
+  reducible/exceptional count = |W₂|-1 = p-1) + **(8.4.d)** (Hypothesis (4.2) for M/H₀) に依存。
+- **(9.8.b)** 同様 ((4.7)+(4.5))。**(9.10)** = (9.8.c)+(9.9.a,c)+(9.7)、(9.9.c) は (9.9.b) 依存。
+- **repo 確認**: §4-§7 (S04-S07) に Theorem (4.5)/(4.7) の reducible-count 定理は **citeable な形で不在**
+  (Dade isometry・omega/muGrid・certain-type Clifford はあるが「p-1 reducible」count 定理は無い)。
+  (8.4.d) (Hypothesis 4.2 for M/H₀) も S10 に不在。
+
+**⟹ lane-a の §9 char 内訳**: 純 Clifford な (9.9.a) は DONE。reducible counts ((9.9.b)/(9.8.b)/(9.10))
+は §4 Theorem (4.5)/(4.7) (Dade reducible-count, 未形式化) gated。これは lane-a の S10-13 cluster の
+**上流** (§4 = S04 Dade foundational)。(10.7)/(11.8) も §9 counts 経由でここに bottom-out。
+
+**要判断 (ユーザー/hub)**: (a) §4 Theorem (4.5)/(4.7) を formalize (上流優先だが S04 で大物・scope 外気味)、
+(b) §4 signature を pin して (9.9.b) で cite (policy 可、但し (4.5) statement は複雑)、(c) lane-a を
+§4-gated でない別 FT-path 作業へ redirect。lane-a の非-§4-gated な §9 char 内容 ((9.9.a)) は完了済。
