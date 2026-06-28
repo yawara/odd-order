@@ -2306,17 +2306,19 @@ The two-sided structure mirrors the textbook's two-step derivation; the genuine 
 (the (7.5) family inequality for `M` and the (7.8.b) norm bound) is the remaining obligation,
 isolated in `normCascadeData`. -/
 structure NormCascadeData (hyp : Hypothesis (G := G)) (Mdata : MHypothesis hyp) where
-  /-- `‖ψ^{τ₁ρ}‖²`, the squared `L`-norm of the Hypothesis (7.1) `ρ`-image of `ψ^{τ₁}`. -/
-  rhoNormSq : ℚ
+  /-- `‖ψ^{τ₁ρ}‖²`, the squared `L`-norm of the Hypothesis (7.1) `ρ`-image of `ψ^{τ₁}`.
+  Real-valued (matching `S09.FamilyHypothesis71.chiRhoNormSq : ℝ`), so the (7.5)/(7.8.b)
+  derivation lives in `ℝ`; the passage to the rational `normCascadeBound` is a final cast. -/
+  rhoNormSq : ℝ
   /-- **(7.5) + (14.11.3)** lower bound: `1 − pq/k ≤ ‖ψ^{τ₁ρ}‖²`. -/
   lower :
-    (1 : ℚ) - ((hyp.base.p * hyp.base.q : ℕ) : ℚ) / (Mdata.k : ℚ) ≤ rhoNormSq
+    (1 : ℝ) - ((hyp.base.p * hyp.base.q : ℕ) : ℝ) / (Mdata.k : ℝ) ≤ rhoNormSq
   /-- **(7.5) + (7.8.b)** upper bound (loosened to the `normCascadeBound` error terms). -/
   upper :
-    rhoNormSq ≤ 1 - (1 : ℚ) / (hyp.base.p : ℚ) - 1 / (hyp.base.q : ℚ)
-      + 2 / ((hyp.base.p * hyp.base.q : ℕ) : ℚ)
-      + 1 / ((hyp.base.u * hyp.base.q : ℕ) : ℚ)
-      + 1 / ((hyp.base.v * hyp.base.p : ℕ) : ℚ)
+    rhoNormSq ≤ 1 - (1 : ℝ) / (hyp.base.p : ℝ) - 1 / (hyp.base.q : ℝ)
+      + 2 / ((hyp.base.p * hyp.base.q : ℕ) : ℝ)
+      + 1 / ((hyp.base.u * hyp.base.q : ℕ) : ℝ)
+      + 1 / ((hyp.base.v * hyp.base.p : ℕ) : ℝ)
 
 /-- **Faithful §7 Dade producer for (14.11.4).**  Under `K ≠ V`, the (7.1) `ρ`-map for `(M, A(M))`,
 the (7.5) family inequality, and the (7.8.b)/(14.11.3) norm bounds supply the two-sided
@@ -2343,6 +2345,10 @@ theorem normCascadeBound_of_charData [Finite G]
     normCascadeBound hyp Mdata.k := by
   obtain ⟨R, hlower, hupper⟩ := normCascadeData _hG hyp Mdata hne
   unfold normCascadeBound
+  -- The two-sided `ℝ` bound `1 − pq/k ≤ R ≤ 1 − 1/p − 1/q + 2/(pq) + 1/(uq) + 1/(vp)` gives the
+  -- displayed rational inequality; lift the `ℚ` goal to `ℝ` and close by `linarith`.
+  rw [← Rat.cast_le (K := ℝ)]
+  push_cast at hlower hupper ⊢
   linarith [hlower, hupper]
 
 /-- **Peterfalvi (14.11.4)**: the norm inequality cascade contradicts `K != V`.

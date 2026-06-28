@@ -216,3 +216,17 @@ upper/lower) に加え、**family_inequality の support が toFamilyHypothesis7
 family_inequality 出力の `Σ_{G0}` から W#/P#/Q# 寄与を分離する counting が要る (S12 (10.8) の
 `sum_zeta_tau1_normSq_ge_card`+`dadeSupport_restrict_subset` に対応)。**normCascadeData は betaM より深い**。
 次は `S12.chiRhoNormSq_zeta_le_line83` (`S12:6047`) を type-I M 版に移植する形で着手するのが定石。
+
+### cont.² (lane c=γ /loop): normCascadeData ℚ/ℝ 土台 commit (25006c10)
+
+本丸着手の準備として **NormCascadeData.rhoNormSq を ℚ→ℝ 化** (S09 `FamilyHypothesis71.chiRhoNormSq : ℝ`
+に対応、(7.5)/(7.8.b) 導出を ℝ で行えるように)。`normCascadeBound_of_charData` は ℝ lower/upper から
+ℚ `normCascadeBound` へ **`rw [← Rat.cast_le (K := ℝ)]; push_cast; linarith`** で降下 (build-green)。
+`normCascadeData` 本体は依然 sorry。**本丸 (次セッション、fresh context 推奨、複数ターン)**:
+1. `rhoNormSq := (Mdata.toFamilyHypothesis71).chiRhoNormSq (Mdata.tau1 Mdata.psi) 0`。
+2. **ψ^τ₁ norm-one**: `family_inequality` の `hχ : inner (tau1 psi) (tau1 psi) = 1` 入力 = MHypothesis に
+   norm-one carrier 追加 (tau1 isometry + psi Irr、betaM の h78 carrier と同パターン)。
+3. **lower** (1−pq/k ≤ rhoNormSq): `family_inequality` + (14.11.3) `generic_character_bound`
+   (‖ψ^τ₁‖≥1 on G0) で `S12.chiRhoNormSq_zeta_le_line83` を type-I M 移植 (support set counting)。
+4. **upper** (rhoNormSq ≤ …): `family_inequality` + (7.8.b) `h78.NormEstimates`。
+全 piece は h78 carrier (commit 7c8af266) + toFamilyHypothesis71 (commit 95bcc13e) から接続済。
