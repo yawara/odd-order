@@ -99,6 +99,95 @@ theorem IsComplement'.subgroupOf_of_le {N K U : Subgroup G} [N.Normal]
     refine ⟨⟨n, hnU⟩, mem_subgroupOf.mpr hn, ⟨k, hkU⟩, mem_subgroupOf.mpr hk, ?_⟩
     ext; simpa using hnk
 
+/-! ### Centralizer descends through a complement (mathcomp `subcent_sdprod`) -/
+
+/-- **Centralizer descends through a complement** (mathcomp `subcent_sdprod`): if `K` and `H`
+complement each other inside `N` (`IsComplement'` of `K.subgroupOf N` / `H.subgroupOf N`, with
+`K ◁ N`), an element `a` normalizes both `K` and `H`, and `C_G(a) ≤ N`, then inside the centralizer
+`C_G(a)` the subgroups `K ⊓ C_G(a)` and `H ⊓ C_G(a)` complement each other.
+
+For `g ∈ C_G(a)`, factor `g = k·h` (`k ∈ K`, `h ∈ H`) via the `N`-complement; conjugating by `a`
+gives `g = (a k a⁻¹)(a h a⁻¹)`, a second `K·H` factorization, so the uniqueness from `K ⊓ H = ⊥`
+forces `a k a⁻¹ = k` and `a h a⁻¹ = h`, i.e. `k, h ∈ C_G(a)`.  This is the engine behind BG
+Theorem 14.4(b) (`R ⋊ C_(M∩N)(x) = C(x)`), the complement conjunct of the FT signalizer `RData`. -/
+theorem IsComplement'.inf_centralizer_of_normalizer {N K H : Subgroup G} {a : G}
+    (hComp : IsComplement' (K.subgroupOf N) (H.subgroupOf N))
+    (hKnorm : (K.subgroupOf N).Normal) (hKN : K ≤ N)
+    (hCaN : Subgroup.centralizer ({a} : Set G) ≤ N)
+    (haK : a ∈ Subgroup.normalizer (K : Set G)) (haH : a ∈ Subgroup.normalizer (H : Set G)) :
+    IsComplement'
+      ((K ⊓ Subgroup.centralizer ({a} : Set G)).subgroupOf (Subgroup.centralizer ({a} : Set G)))
+      ((H ⊓ Subgroup.centralizer ({a} : Set G)).subgroupOf
+        (Subgroup.centralizer ({a} : Set G))) := by
+  haveI := hKnorm
+  -- `K ⊓ H = ⊥` in `G`, from the `↥N`-disjointness of the complement.
+  have hKHbot : Disjoint K H := by
+    rw [disjoint_iff, eq_bot_iff]
+    intro x hx
+    rw [mem_inf] at hx
+    have hxN : x ∈ N := hKN hx.1
+    have hmem : (⟨x, hxN⟩ : N) ∈ (K.subgroupOf N) ⊓ (H.subgroupOf N) :=
+      mem_inf.mpr ⟨mem_subgroupOf.mpr hx.1, mem_subgroupOf.mpr hx.2⟩
+    rw [hComp.disjoint.eq_bot, mem_bot] at hmem
+    rw [mem_bot]; exact Subtype.ext_iff.mp hmem
+  apply isComplement'_of_disjoint_and_mul_eq_univ
+  · -- Disjoint inside the centralizer: `(K ⊓ Ca) ⊓ (H ⊓ Ca) ≤ K ⊓ H = ⊥`.
+    rw [disjoint_iff, eq_bot_iff]
+    rintro ⟨y, hyC⟩ hy
+    rw [mem_inf, mem_subgroupOf, mem_subgroupOf] at hy
+    have hyKH : (y : G) ∈ K ⊓ H := mem_inf.mpr ⟨(mem_inf.mp hy.1).1, (mem_inf.mp hy.2).1⟩
+    rw [hKHbot.eq_bot, mem_bot] at hyKH
+    rw [mem_bot]; exact Subtype.ext hyKH
+  · -- Product fills the centralizer.
+    rw [Set.eq_univ_iff_forall]
+    rintro ⟨g, hgC⟩
+    have hgN : g ∈ N := hCaN hgC
+    -- factor `g = k'·h'` via the `N`-complement (`K.subgroupOf N` normal).
+    have hgtop : (⟨g, hgN⟩ : N) ∈ (K.subgroupOf N) ⊔ (H.subgroupOf N) := by
+      rw [hComp.sup_eq_top]; trivial
+    rw [mem_sup_of_normal_left] at hgtop
+    obtain ⟨k', hk', h', hh', hkh'⟩ := hgtop
+    have hkK : (k' : G) ∈ K := mem_subgroupOf.mp hk'
+    have hhH : (h' : G) ∈ H := mem_subgroupOf.mp hh'
+    have hgkh : (k' : G) * (h' : G) = g := by
+      have h2 := congrArg (N.subtype) hkh'
+      rw [map_mul] at h2
+      simpa using h2
+    -- centralizer / normalizer facts.
+    have hcomm_g : g * a = a * g := mem_centralizer_singleton_iff.mp hgC
+    have hga : a * g * a⁻¹ = g := by rw [← hcomm_g]; group
+    have hakK : a * (k' : G) * a⁻¹ ∈ K := (mem_normalizer_iff.mp haK _).mp hkK
+    have hahH : a * (h' : G) * a⁻¹ ∈ H := (mem_normalizer_iff.mp haH _).mp hhH
+    have hfact : a * (k' : G) * a⁻¹ * (a * (h' : G) * a⁻¹) = g := by
+      have hrw : a * (k' : G) * a⁻¹ * (a * (h' : G) * a⁻¹)
+          = a * ((k' : G) * (h' : G)) * a⁻¹ := by group
+      rw [hrw, hgkh]; exact hga
+    -- uniqueness of the factorization forces `a·(·)·a⁻¹` to fix both factors.
+    have hstep : (k' : G) * ((h' : G) * (a * (h' : G) * a⁻¹)⁻¹) = a * (k' : G) * a⁻¹ := by
+      rw [← mul_assoc, hgkh, ← hfact]; group
+    have huH_eq : (k' : G)⁻¹ * (a * (k' : G) * a⁻¹) = (h' : G) * (a * (h' : G) * a⁻¹)⁻¹ := by
+      rw [← hstep]; group
+    have huK : (k' : G)⁻¹ * (a * (k' : G) * a⁻¹) ∈ K := K.mul_mem (K.inv_mem hkK) hakK
+    have huH : (k' : G)⁻¹ * (a * (k' : G) * a⁻¹) ∈ H := by
+      rw [huH_eq]; exact H.mul_mem hhH (H.inv_mem hahH)
+    have hu1 : (k' : G)⁻¹ * (a * (k' : G) * a⁻¹) = 1 := by
+      have : (k' : G)⁻¹ * (a * (k' : G) * a⁻¹) ∈ K ⊓ H := mem_inf.mpr ⟨huK, huH⟩
+      rw [hKHbot.eq_bot, mem_bot] at this; exact this
+    have hapa : a * (k' : G) * a⁻¹ = (k' : G) := (inv_mul_eq_one.mp hu1).symm
+    have haqa : a * (h' : G) * a⁻¹ = (h' : G) := by
+      have h := hfact; rw [hapa, ← hgkh] at h; exact mul_left_cancel h
+    -- hence both factors centralize `a`.
+    have hpCa : (k' : G) ∈ Subgroup.centralizer ({a} : Set G) :=
+      mem_centralizer_singleton_iff.mpr (by conv_lhs => rw [← hapa]
+                                            group)
+    have hqCa : (h' : G) ∈ Subgroup.centralizer ({a} : Set G) :=
+      mem_centralizer_singleton_iff.mpr (by conv_lhs => rw [← haqa]
+                                            group)
+    refine ⟨⟨(k' : G), hpCa⟩, ?_, ⟨(h' : G), hqCa⟩, ?_, ?_⟩
+    · exact mem_subgroupOf.mpr (mem_inf.mpr ⟨hkK, hpCa⟩)
+    · exact mem_subgroupOf.mpr (mem_inf.mpr ⟨hhH, hqCa⟩)
+    · ext; simpa using hgkh
+
 /-! ### Main induction (Isaacs Thm 3.12) -/
 
 universe u

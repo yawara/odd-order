@@ -389,6 +389,55 @@ theorem RData_of_inputs [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : 
   · rw [maximalConjugatesContaining_eq_maximalSigma hG hM hxMσ hx1]
     exact conjSharplyTransitiveOn_of_pointed hsharp
 
+/-- **Theorem D(3) conjunct 3, the centralizer complement** (Coq Theorem 14.4(b),
+`R ⋊ C_(M∩N)(x) = C(x)`): from the proven structure's `N`-complement `(N)_σ ⋊ (M ∩ N) = N`
+(`hMcompl`), inside `C_G(x)` the subgroups `C_M(x) = M ⊓ C_G(x)` and `R = (N)_σ ⊓ C_G(x)` complement
+each other.  This is the engine `IsComplement'.inf_centralizer_of_normalizer` (mathcomp `subcent_sdprod`)
+applied with `K = (N)_σ` (normal in `N`), `H = M ∩ N`, and `a = x`: `x` normalizes `(N)_σ` (it lies in
+`N` since `C_G(x) ≤ N`, and `(N)_σ ◁ N`) and `M ∩ N` (it lies in `M ∩ N`).  Discharges the one
+genuinely-deep `RData` input of `RData_of_inputs`. -/
+theorem signalizer_centralizer_isComplement {M N : Subgroup G} {x : G}
+    (hMcompl : Subgroup.IsComplement' ((OddOrder.BG.Ch3.S10.Msigma N).subgroupOf N)
+      ((M ⊓ N).subgroupOf N))
+    (hCN : Subgroup.centralizer ({x} : Set G) ≤ N) (hxM : x ∈ M) :
+    Subgroup.IsComplement'
+      ((M ⊓ Subgroup.centralizer ({x} : Set G)).subgroupOf (Subgroup.centralizer ({x} : Set G)))
+      ((OddOrder.BG.Ch3.S10.Msigma N ⊓ Subgroup.centralizer ({x} : Set G)).subgroupOf
+        (Subgroup.centralizer ({x} : Set G))) := by
+  have hxN : x ∈ N := hCN (Subgroup.mem_centralizer_singleton_iff.mpr rfl)
+  haveI hKnorm : ((OddOrder.BG.Ch3.S10.Msigma N).subgroupOf N).Normal := by
+    rw [OddOrder.BG.Ch3.S10.Msigma_subgroupOf]; infer_instance
+  have haK : x ∈ Subgroup.normalizer (OddOrder.BG.Ch3.S10.Msigma N : Set G) :=
+    ((Subgroup.normal_subgroupOf_iff_le_normalizer (OddOrder.BG.Ch3.S10.Msigma_le N)).mp hKnorm) hxN
+  have haH : x ∈ Subgroup.normalizer ((M ⊓ N : Subgroup G) : Set G) :=
+    Subgroup.le_normalizer (Subgroup.mem_inf.mpr ⟨hxM, hxN⟩)
+  have hgen := hMcompl.inf_centralizer_of_normalizer hKnorm
+    (OddOrder.BG.Ch3.S10.Msigma_le N) hCN haK haH
+  rw [show (M ⊓ N) ⊓ Subgroup.centralizer ({x} : Set G)
+      = M ⊓ Subgroup.centralizer ({x} : Set G) from by
+      rw [inf_assoc, inf_eq_right.mpr hCN]] at hgen
+  exact hgen.symm
+
+/-- **BG Theorem D(3) for the `|𝓜_σ(x)| > 1` branch** (`∃ R, RData M x R`): when `x ∈ M_σ^#` has more
+than one `σ`-maximal, the proven `signalizer_structure_of_mem_sigmaSharp` supplies the unique maximal
+`N ≥ C_G(x)`, the Hall property of `R = (N)_σ ⊓ C_G(x)` and the sharp transitivity from `M`; the
+centralizer complement (conjunct 3) is `signalizer_centralizer_isComplement`, and `RData_of_inputs`
+assembles all four `RData` conjuncts.  This is the genuinely-deep half of `hD3`; the remaining
+`|𝓜_σ(x)| ≤ 1` branch needs `C_G(x) ≤ M` (the deep converse of
+`maximalSigmaSubgroupsOfElement_eq_singleton_of_centralizer_le`). -/
+theorem RData_of_gt_one [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G}
+    (hM : M ∈ maximalSubgroups G) {x : G} (hxM : x ∈ S14.sigmaSharp M)
+    (hgt : 1 < (S14.maximalSigmaSubgroupsOfElement x).ncard) :
+    ∃ R : Subgroup G, RData M x R := by
+  have hxMσ : x ∈ OddOrder.BG.Ch3.S10.Msigma M := hxM.1
+  have hx1 : x ≠ 1 := hxM.2
+  have hxM_mem : x ∈ M := OddOrder.BG.Ch3.S10.Msigma_le M hxMσ
+  obtain ⟨N, hN, -⟩ := signalizer_structure_of_mem_sigmaSharp hG hM hxM hgt
+  obtain ⟨_, hCN, _, hRhall, _, _, hforall⟩ := hN
+  obtain ⟨_, _, hMcompl, hMsharp⟩ := hforall M ⟨hM, hxMσ⟩
+  exact ⟨_, RData_of_inputs hG hM hxMσ hx1 hCN hMsharp hRhall
+    (signalizer_centralizer_isComplement hMcompl hCN hxM_mem)⟩
+
 /-! ## Theorems A--E -/
 
 /-- **BG Theorem A** (mmd L4274): the basic structure of a maximal subgroup:
