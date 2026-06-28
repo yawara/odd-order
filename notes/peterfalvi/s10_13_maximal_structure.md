@@ -535,3 +535,23 @@ hHC' (commutator_comm), hCC=⁅C,C⁆≤K (bridge, =cprimeSub)。
 3. obligation 3 wiring: `apply_one_eq_one_of_subset_characterKernel_of_isMulCommutative_quotient`
    (N=commutator ↥HC) + `liesOver_mem_characterKernel` で commutator ↥HC ⊆ ker ψ
    (← (g:huSub) G-coord ∈ ⁅H⊔C,H⊔C⁆≤K [assembly] ⊆ ker χ [hχker]; map_commutatorElement で transport)。
+
+### §12 追補⁴ (lane-a /loop iter6): obligation 3 assembly 障害確定 + ↥M-level 修正案
+
+obligation 3 (`caseB_degree_qu` ψ linearity = `⁅HC,HC⁆ ⊆ ker χ`) の assembly を複数アプローチで試行、
+全て revert (clean 状態 green、committed 進捗保持)。**確定した障害**:
+- `Subgroup.mem_sup` (積形 `∃y∈s,z∈t, y*z=x`) は **可換性必須** (Lattice.lean:586 は CommGroup 節)。
+  ⟹ K=H₀⊔C' の元 k を `k=h₀·c'` 分解できない (G 非可換、H₀/C' は G-非正規)。
+- `closure_induction` (k∈closure(↑H₀∪↑C')) は正しいツールだが case body で "failed to synthesize
+  instance" (未解明、motive dependent + bracket/coercion 絡み)。
+- ∴ commutator-over-sup (非正規 summand) は [[lean-normal-closure-good-elements]] の gap 直撃。
+
+**次反復の修正案 (↥M-level)**: H₀ ◁ M (`H0_normalized_by_M`) ⟹ `chief.H0.subgroupOf M` は **↥M で正規**。
+⟹ ↥M レベルで `mem_sup_of_normal_left` 使用可で k=h₀·c' 分解が通る。assembly を ↥M-subgroup
+(`(data.H).subgroupOf M` 等) で証明し huSub へ transport (huSub ≤ ↥M)。OR `closure_induction` の
+real error を live で特定して修正。確定 lemma 名は §12追補³ 参照。
+
+**進捗総括 (この /loop セッション)**: caseB_degree_qu (Pf 9.9.a) の obligation 1 (θ₀抽出)・obligation 4
+([HU:HC]=u)・obligation 3 facts 1,2 + bridge を committed (6 commits)。残 = obligation 3 assembly のみ
+(機械的だが mathlib gap で高コスト)。難所の数学は全完了、残りは群論 plumbing。caseB_degree_qu は
+signature 正しく cite 可。
