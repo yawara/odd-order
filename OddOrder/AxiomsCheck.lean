@@ -6697,6 +6697,8 @@ and the σ-decomposition collapses to `{x}`, giving `sigmaLength x = 1`.  All ax
 
 #assert_only_allowed_axioms OddOrder.BG.Ch4.S14.piPart_self_of_isPiElement
 #assert_only_allowed_axioms OddOrder.BG.Ch4.S14.piPart_eq_one_of_isPiElement_compl
+#assert_only_allowed_axioms OddOrder.BG.Ch4.S14.piPart_mem_zpowers
 #assert_only_allowed_axioms OddOrder.BG.Ch4.S14.isPiElement_sigma_of_mem_Msigma
 #assert_only_allowed_axioms OddOrder.BG.Ch4.S14.sigmaPart_eq_self_or_one_of_isPiElement_sigma
+#assert_only_allowed_axioms OddOrder.BG.Ch4.S14.sigmaDecomposition_subset
 #assert_only_allowed_axioms OddOrder.BG.Ch4.S14.Msigma_ell1
