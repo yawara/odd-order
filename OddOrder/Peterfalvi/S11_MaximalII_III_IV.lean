@@ -3901,7 +3901,11 @@ theorem caseB_character_counts [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G
         φ 1 = ((data.q * chars.u : ℕ) : ℂ) ∧ φ ∈ chars.SOf (chief.H0 ⊔ chars.C)) ∧
       ((¬ ∃ χ ∈ chars.SOf (chief.H0 ⊔ chars.Cprime), IsIrreducibleCharacter χ) →
         chars.C = ⊥ ∧ chars.u = (chief.p ^ data.q - 1) / (chief.p - 1)) := by
-  sorry
+  -- (9.9.a) is the proven `caseB_degree_qu`; (9.9.b)/(9.9.c) remain (reducible count / exceptional).
+  refine ⟨caseB_degree_qu hG chars caseB, ?_, ?_, ?_⟩
+  · sorry
+  · sorry
+  · sorry
 
 /-- **Peterfalvi (9.10)**: in the exceptional case where `𝒮(H₀C')` contains no irreducible
 character of degree `qu`, the quotient semidirect product is Frobenius; in type II the full `H U`
