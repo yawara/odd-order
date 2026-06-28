@@ -2094,6 +2094,11 @@ set_option linter.style.longLine false in
 -- D/N central in G/N ⟹ φ(1)² ≤ |G:D|, via inflation to G/N + the central degree bound.
 set_option linter.style.longLine false in
 #assert_only_allowed_axioms OddOrder.RepresentationTheory.degree_sq_le_index_of_central_quotient
+-- An irreducible character trivial on `N ⊴ G` with abelian quotient `G/N` is linear (degree 1),
+-- via inflation/descent + abelian degree-one.  Peterfalvi (9.9.a) `(θλ)(1)=1` (issue 2031/2030).
+set_option linter.style.longLine false in
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.apply_one_eq_one_of_subset_characterKernel_of_isMulCommutative_quotient
 
 -- Coefficientwise Galois transport for class functions, irreducible-character indices,
 -- virtual-character lattices, and S07 coherence data.  Galois conjugates of irreducible
