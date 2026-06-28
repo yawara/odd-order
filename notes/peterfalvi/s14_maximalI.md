@@ -391,6 +391,13 @@ char/§8-gated で手詰まり」評価は**誤り**(= 新方針が根絶する�
 
 **残 = (12.3)-(12.5) 証明本体** (次イテレーション、§12 char obligation):
 - (12.4)/(12.5) = `CharacterPsiDecomposition` (S07:1110) 型 I 適用 + §8 ((8.12.c) TI) + §1 ((1.4)) +
-  [Is] 6.2/7.7。engine statement 確認から。
+  [Is] 6.2/7.7。**engine 構造 (2026-06-29 確認)**: CharacterPsiDecomposition は **単一 χ** の
+  `imageFamily : OrthonormalCharacterImageFamily τ χ` + smart ctor (`ofProjection` S07:1160) が
+  **`(χ−ψ)^τ₁∈ZIrr G`** 単一入力から X/Y/coeff を computed (R(χ) への直交射影)。⟹ (12.4)/(12.5) は
+  **各 constituent φ** で CharacterPsiDecomposition(φ,ψ) 構成 (imageFamily=R₁(φ)=signedFamily の
+  OrthonormalCharacterImageFamily 化が要、入力 (φ−ψ)^τ₁∈ZIrr) → ψ⊥R(χ) で各 X=0 → Res_H ψ が
+  θ_φ-成分を持たない → ψ は L−H で γ (H⊆Ker) のみ → xH/H−H' constant。§12-specific = φ-family 集約。
+  **次の壁**: R₁(φ) は現状 SignedIrreducibleDifferenceFamily、engine は OrthonormalCharacterImageFamily
+  要 (signed→orthonormal 変換 helper を S14 に要実装)。
 - (12.3) = (8.18.c) Ã disjoint + (5.9) + Supp disjoint + 共役論法。§8 cross fact は β 範囲外 (pin)。
 - その後 (12.6) sibleyTarget / (12.10)-(12.15) / (12.16) 最終矛盾 (+(1.10) congruence)。
