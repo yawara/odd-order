@@ -581,6 +581,55 @@ theorem not_inHKernel_iff {L : Subgroup G} [Finite G] (hyp : Hypothesis L)
     fun ⟨χ, hχ, hmem⟩ => constituents_not_inHKernel hyp hχ (data χ hχ) hmem⟩
 
 open scoped Classical OddOrder.Peterfalvi.S12.FiniteInduce in
+/-- **Toward (12.4) pin (c'), disjointness** (genuine, Clifford single-orbit): a `φ` that is a
+constituent of both `χ, χ' ∈ S` forces `χ = χ'`.  Writing `χ = Ind_H^L θ`, `χ' = Ind_H^L θ'`, both
+witnesses `θ, θ'` lie under `φ` (`⟨Res_H φ, θ⟩ = ⟨φ, χ⟩ ≠ 0`, Frobenius); by Clifford single-orbit
+(`restrictionConstituentsSingleOrbit_of_isIrreducible` + `.exists_conj`) they are `L`-conjugate,
+`conjBy g θ = θ'`, so `Ind θ = Ind θ'` (`induce_conjBy_eq`, Peterfalvi (1.5.a)).  This is the
+`PairwiseDisjoint` content of `exists_offKernel_constituent_partition`. -/
+theorem constituents_eq_of_mem {L : Subgroup G} [Finite G] (hyp : Hypothesis L)
+    {χ χ' : ClassFunction ↥L ℂ} (hχ : χ ∈ hyp.Sset) (hχ' : χ' ∈ hyp.Sset)
+    (dχ : CharacterDecompositionData hyp χ) (dχ' : CharacterDecompositionData hyp χ')
+    {φ : IrreducibleCharacter ↥L} (hmem : φ ∈ dχ.constituents) (hmem' : φ ∈ dχ'.constituents) :
+    χ = χ' := by
+  haveI := hyp.finiteG
+  classical
+  haveI hKnormal : ((hyp.typeI.typeF.H).subgroupOf L).Normal := by
+    rw [hyp.typeI.typeF.H_eq]
+    exact OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_subgroupOf_normal L
+  obtain ⟨θ, hθ_ne, rfl⟩ := hχ
+  obtain ⟨θ', hθ'_ne, rfl⟩ := hχ'
+  -- `θ`, `θ'` lie under `φ`: `⟨Res_K φ, η⟩ = ⟨φ, Ind_K η⟩ = 1 ≠ 0` for a constituent.
+  have key : ∀ (η : IrreducibleCharacter ↥((hyp.typeI.typeF.H).subgroupOf L))
+      (dη : CharacterDecompositionData hyp
+        (ClassFunction.induce ((hyp.typeI.typeF.H).subgroupOf L) (η : ClassFunction _ ℂ)))
+      (_ : φ ∈ dη.constituents),
+      IrreducibleCharacter.LiesOver ((hyp.typeI.typeF.H).subgroupOf L) φ η := by
+    intro η dη hη
+    rw [IrreducibleCharacter.LiesOver, ClassFunction.restrictionMultiplicity_def]
+    have hval : ClassFunction.inner (φ : ClassFunction ↥L ℂ)
+        (ClassFunction.induce ((hyp.typeI.typeF.H).subgroupOf L) (η : ClassFunction _ ℂ)) = 1 := by
+      rw [dη.decomp, inner_sum_right,
+        Finset.sum_eq_single_of_mem φ hη (fun φ' _ hne => by
+          rw [irreducibleCharacter_inner, if_neg (Ne.symm hne)]),
+        irreducibleCharacter_inner, if_pos rfl]
+    have hrel : ClassFunction.inner (φ : ClassFunction ↥L ℂ)
+        (ClassFunction.induce ((hyp.typeI.typeF.H).subgroupOf L) (η : ClassFunction _ ℂ))
+        = ClassFunction.inner
+          (ClassFunction.restrict ((hyp.typeI.typeF.H).subgroupOf L) (φ : ClassFunction ↥L ℂ))
+          (η : ClassFunction _ ℂ) := by
+      rw [OddOrder.RepresentationTheory.inner_conj_symm,
+        ClassFunction.inner_induce_eq_inner_restrict,
+        OddOrder.RepresentationTheory.inner_conj_symm, star_star]
+    rw [← hrel, hval]; exact one_ne_zero
+  obtain ⟨g, hg⟩ :=
+    (restrictionConstituentsSingleOrbit_of_isIrreducible φ).exists_conj
+      (key θ dχ hmem) (key θ' dχ' hmem')
+  rw [← hg]
+  exact (ClassFunction.induce_conjBy_eq (H := (hyp.typeI.typeF.H).subgroupOf L) g
+    (θ : ClassFunction ↥((hyp.typeI.typeF.H).subgroupOf L) ℂ)).symm
+
+open scoped Classical OddOrder.Peterfalvi.S12.FiniteInduce in
 /-- **Peterfalvi (12.4), the off-kernel regroup** (genuine, from the [Is] 6.2 partition pin): the
 off-kernel Fourier part `β = ∑_{φ : H ⊄ ker φ} ⟨Res_L ψ, φ⟩·φ` of `Res_L ψ` vanishes on `L − H`.
 Regroup the off-kernel irreducibles by the partition into `S(χ)`
