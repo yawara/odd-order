@@ -2596,6 +2596,13 @@ set_option linter.style.longLine false in
 -- constituent `θ₀` (degree expansion + single-orbit + common multiplicity + orbit size). issue 2031.
 #assert_only_allowed_axioms
   OddOrder.RepresentationTheory.apply_one_eq_restrictionMultiplicity_mul_index_inertia
+-- **Clifford correspondence** ([Is] Thm 6.11): an irreducible `χ` lying over `ψ ∈ Irr I` whose
+-- induction `Ind_I^G ψ` is irreducible equals that induction, so `χ(1) = [G:I]·ψ(1)`.  This is the
+-- (9.9.a) "induced from a linear character of `HC`, degree `u`" route (issue 2031/2030).
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.coe_eq_induce_of_liesOver_of_isIrreducibleCharacter_induce
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.apply_one_eq_index_mul_of_liesOver_of_isIrreducibleCharacter_induce
 
 -- Peterfalvi (6.8) T6/Y-family consumer side: degree-one induced families have common degree,
 -- supported differences on `H#`, irreducibility from c1/c2 inertia, and equal-degree coherence.

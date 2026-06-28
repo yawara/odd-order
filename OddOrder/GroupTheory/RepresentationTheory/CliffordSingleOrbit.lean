@@ -219,4 +219,52 @@ theorem apply_one_eq_restrictionMultiplicity_mul_index_inertia
   rw [hcard]
   ring
 
+/-- **Clifford correspondence** ([Isaacs] Thm 6.11, degree form).  If `ψ ∈ Irr I` (for a subgroup
+`I ≤ G`) has an *irreducible* induction `Ind_I^G ψ`, and the irreducible `χ ∈ Irr G` lies over `ψ`
+(i.e. `ψ` is a constituent of `Res_I χ`), then `χ` **is** that induction: `χ = Ind_I^G ψ` as class
+functions.
+
+Proof: `χ` lies over `ψ`, so `⟨Ind_I^G ψ, χ⟩ ≠ 0` by Frobenius reciprocity
+(`inner_induce_ne_zero_iff_liesOver`).  Both `Ind_I^G ψ` (by hypothesis) and `χ` are irreducible,
+and distinct irreducible characters are orthogonal (`irreducibleCharacter_inner_eq_ite`), so the
+nonzero inner product forces them to coincide.
+
+This is the half of the Clifford correspondence that Peterfalvi's (9.8)/(9.9) degree computations
+use: an irreducible character that lies over `ψ` and whose induced character is irreducible *equals*
+that induced character, so its degree is `[G:I]·ψ(1)`. -/
+theorem coe_eq_induce_of_liesOver_of_isIrreducibleCharacter_induce
+    [Fintype G] [Invertible (Nat.card G : ℂ)]
+    {I : Subgroup G} [Fintype ↥I] [Invertible (Nat.card ↥I : ℂ)]
+    (χ : IrreducibleCharacter G) (ψ : IrreducibleCharacter I)
+    (hind : IsIrreducibleCharacter (ClassFunction.induce I (ψ : ClassFunction ↥I ℂ)))
+    (hover : IrreducibleCharacter.LiesOver I χ ψ) :
+    (χ : ClassFunction G ℂ) = ClassFunction.induce I (ψ : ClassFunction ↥I ℂ) := by
+  have hne : ClassFunction.inner (ClassFunction.induce I (ψ : ClassFunction ↥I ℂ))
+      (χ : ClassFunction G ℂ) ≠ 0 :=
+    (IrreducibleCharacter.inner_induce_ne_zero_iff_liesOver I χ ψ).mpr hover
+  have heq : (⟨ClassFunction.induce I (ψ : ClassFunction ↥I ℂ), hind⟩ : IrreducibleCharacter G)
+      = χ := by
+    by_contra h
+    apply hne
+    have hite := irreducibleCharacter_inner_eq_ite
+      (⟨ClassFunction.induce I (ψ : ClassFunction ↥I ℂ), hind⟩ : IrreducibleCharacter G) χ
+    rw [IrreducibleCharacter.coe_mk] at hite
+    rw [hite, if_neg h]
+  rw [← heq, IrreducibleCharacter.coe_mk]
+
+/-- **Clifford correspondence, degree** ([Isaacs] Thm 6.11).  Under the hypotheses of
+`coe_eq_induce_of_liesOver_of_isIrreducibleCharacter_induce` (the irreducible `χ` lies over `ψ`
+whose induction is irreducible), the degree is `χ(1) = [G:I]·ψ(1)`.  Combined with `ψ(1) = 1` this
+is Peterfalvi's "induced from a linear character of `HC`, of degree `u = [HU:HC]`" conclusion in
+(9.8.c)/(9.9.a). -/
+theorem apply_one_eq_index_mul_of_liesOver_of_isIrreducibleCharacter_induce
+    [Fintype G] [Invertible (Nat.card G : ℂ)]
+    {I : Subgroup G} [Fintype ↥I] [Invertible (Nat.card ↥I : ℂ)]
+    (χ : IrreducibleCharacter G) (ψ : IrreducibleCharacter I)
+    (hind : IsIrreducibleCharacter (ClassFunction.induce I (ψ : ClassFunction ↥I ℂ)))
+    (hover : IrreducibleCharacter.LiesOver I χ ψ) :
+    (χ : ClassFunction G ℂ) (1 : G) = (I.index : ℂ) * (ψ : ClassFunction ↥I ℂ) (1 : ↥I) := by
+  rw [coe_eq_induce_of_liesOver_of_isIrreducibleCharacter_induce χ ψ hind hover,
+    ClassFunction.induce_apply_one]
+
 end OddOrder.RepresentationTheory
