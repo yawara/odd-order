@@ -591,6 +591,44 @@ theorem m_value_q_three_gt_49_hundredths {p : ℕ} (hp : 5 ≤ p) :
   rw [hexpr]
   linarith [hsmall]
 
+/-- **Numerical core shared by Peterfalvi (13.12) and (13.15)**: the upper estimate
+`m < q·p / ((2q+1)(p-1))` — obtained from `c ≥ 2q+1` (13.12) resp. the divisor `x ≥ 2q+1`
+(13.15) together with the analytic inequality (13.10) and `u ≤ (p^q-1)/(p-1)` (13.2.c) — combined
+with the (13.11) lower bounds on `m` forces `q = 3`.
+
+Self-contained `ℚ`-arithmetic over an abstract `m` satisfying the (13.11.a,b) lower bounds; `p`, `q`
+are odd primes so `p = 3 ∨ p ≥ 5` and `q = 3 ∨ q ≥ 5`, as supplied by the callers.
+
+* `p ≥ 5`: `m < q·p/((2q+1)(p-1)) < (1/2)(5/4) = 5/8 < 7/10`, against `m > 7/10` (13.11.b).
+* `p = 3`, `q ≥ 7`: `m < 3q/(2(2q+1)) < 3/4 < 8/10`, against `m > 8/10` (13.11.a).
+* `p = 3`, `5 ≤ q < 7`: `m < 3q/(2(2q+1)) < 7/10`, against `m > 7/10` (13.11.b). -/
+theorem caseB_numeric_forces_q_three {p q : ℕ} {m : ℚ}
+    (hp : p = 3 ∨ 5 ≤ p) (hq : q = 3 ∨ 5 ≤ q)
+    (hm5 : 5 ≤ q → (7 : ℚ) / 10 < m) (hm7 : 7 ≤ q → (8 : ℚ) / 10 < m)
+    (hbound : m < (q : ℚ) * (p : ℚ) / ((2 * (q : ℚ) + 1) * ((p : ℚ) - 1))) :
+    q = 3 := by
+  rcases hq with hq3 | hq5
+  · exact hq3
+  exfalso
+  have hqR : (5 : ℚ) ≤ (q : ℚ) := by exact_mod_cast hq5
+  have hm7over : (7 : ℚ) / 10 < m := hm5 hq5
+  rcases hp with rfl | hp5
+  · -- `p = 3`
+    have hden : (0 : ℚ) < (2 * (q : ℚ) + 1) * (((3 : ℕ) : ℚ) - 1) := by
+      rw [show (((3 : ℕ) : ℚ)) = 3 by norm_num]; nlinarith [hqR]
+    have hb := (lt_div_iff₀ hden).mp hbound
+    rw [show (((3 : ℕ) : ℚ)) = 3 by norm_num] at hb
+    by_cases hq7 : 7 ≤ q
+    · have h87 : (8 : ℚ) / 10 < m := hm7 hq7
+      nlinarith [hb, h87, hqR]
+    · have hqlt7 : (q : ℚ) < 7 := by exact_mod_cast (show q < 7 by omega)
+      nlinarith [hb, hm7over, hqR, hqlt7]
+  · -- `p ≥ 5`
+    have hpR5 : (5 : ℚ) ≤ (p : ℚ) := by exact_mod_cast hp5
+    have hden : (0 : ℚ) < (2 * (q : ℚ) + 1) * ((p : ℚ) - 1) := by nlinarith [hqR, hpR5]
+    have hb := (lt_div_iff₀ hden).mp hbound
+    nlinarith [hb, hm7over, hqR, hpR5]
+
 namespace Hypothesis
 
 /-- **Peterfalvi (13.11.a)** at the Section 15 hypothesis level: if `q ≥ 7`,
