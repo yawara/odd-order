@@ -51,11 +51,17 @@ carrier-free な一般補題として抽出・実証明できる**。これが**
 
 **⟹ cheap carrier-free arithmetic cores はほぼ枯渇** (starved でなく「土台が建った」)。**残る genuine work は 2 系統**、
 いずれもより重い/cross-lane:
-1. **重い character-theoretic core** (carrier-free だが API 構築要、lane-c solo grind 中): 13.18.b Frobenius
-   induced-trivial norm `(u-1)/q+1`。**✅ 着手** — `induce_one_apply` (置換指標値 `(Ind_H^G 1)(g)=⅟|H|·|{x:x⁻¹gx∈H}|`)
-   を landing (commit `6c471a7c`、`induce_apply_eq_sum_filter` + `trivialClassFunction` 上)。残: Frobenius
-   reciprocity (`inner_induce_eq_inner_restrict` 既存) で `‖Ind_E^F 1‖²=⅟|E|·∑_{e∈E}(Ind 1)(e)` 化 → Frobenius
-   centralizer count (e=1↦|F|, e∈E#↦|E|: C_F(e)⊆E 要) → 算術。13.9.b の [Is] 3.14 は代数的整数論 (より重い)。
+1. **重い character-theoretic core** (carrier-free、lane-c solo grind 中): 13.18.b Frobenius
+   induced-trivial norm `‖Ind_A^F 1‖²=(|N|−1)/|A|+1`。**✅ 3 value piece 完成** (γ の値):
+   - `induce_one_apply` (置換指標値 `(Ind_H^G 1)(g)=⅟|H|·|{x:x⁻¹gx∈H}|`、commit `6c471a7c`)
+   - `induce_one_eq_zero_of_mem_normal_inf_bot` (γ=0 on N#、N normal+complement only、commit `7c…`)
+   - `induce_one_eq_one_of_mem_complement` (γ=1 on A#、**repo の `IsFrobeniusGroup.trivialIntersection`
+     = malnormality が既存だったので即 cite**、commit `7f52e07c`)
+   - (γ(1)=|N| は `induce_apply_one` cite)
+   **残 = reciprocity assembly のみ**: `inner_induce_eq_inner_restrict` (既存) で
+   `‖γ‖²=inner triv (restrict A γ)=⅟|A|·∑_{a:↥A} star(γ ↑a)` 化 → star-drop (γ 値は実 = ⅟|A|·↑count;
+   `star_natCast`+`star_invOf`) → sum を a=1 (|N|) と A# ((|A|−1)·1) に split → 算術
+   `⅟|A|·(|N|+|A|−1)=(|N|−1)/|A|+1`。**次 /loop で capstone**。13.9.b ([Is] 3.14) は代数的整数論 (より重い、後回し)。
 2. **carrier/grid enrichment** (cross-lane、**issue 3002 で hub escalate 済**): 全 cascade wrapper を
    Hypothesis の grid τ₃-isometry/ω-orthonormality field から faithful 化 (toolkit 完成済ゆえ field が入れば
    組める)。FeitThompson constructor + §16 carrier (lanes B/D) に波及。consumer-side で contract pin も可。
