@@ -184,6 +184,43 @@ theorem conjPerm_conjPerm {L : Type*} [Group L] [Finite L] (χ : IrreducibleChar
   rw [IrreducibleCharacter.conjPerm_apply_coe, IrreducibleCharacter.conjPerm_apply_coe,
     ClassFunction.conj_conj]
 
+/-- **A nontrivial character is not conjugate to its complex conjugate, in odd order** (the orbit
+form of Peterfalvi (1.1)).  The conjugation orbit `conjByOrbit θ` has odd cardinality `[K : I_θ]`
+(`card_conjByOrbit_eq_index_inertia`, a divisor of the odd `|K|`); were `θ̄ ∈ conjByOrbit θ`, the
+involution `σ = conjPerm` would restrict to it, and by `card_fixedPoints_modEq` (`p = 2`) an
+involution on an odd-cardinality set has a fixed point — a real, hence trivial, character in the
+orbit, impossible by `conjPerm_ne_self_of_mem_conjByOrbit`. -/
+theorem conjPerm_not_mem_conjByOrbit {K : Type*} [Group K] [Finite K] {H : Subgroup K} [H.Normal]
+    (hodd : Odd (Nat.card K)) {θ : IrreducibleCharacter ↥H}
+    (hθ : θ ≠ trivialIrreducibleCharacter ↥H) :
+    IrreducibleCharacter.conjPerm ↥H θ ∉ IrreducibleCharacter.conjByOrbit (G := K) θ := by
+  intro hmem
+  classical
+  haveI : Fintype K := Fintype.ofFinite K
+  haveI : Fintype ↥H := Fintype.ofFinite ↥H
+  haveI : Invertible (Nat.card K : ℂ) := invertibleOfNonzero (by exact_mod_cast Nat.card_pos.ne')
+  haveI : Invertible (Nat.card ↥H : ℂ) := invertibleOfNonzero (by exact_mod_cast Nat.card_pos.ne')
+  haveI : Fintype ↥(IrreducibleCharacter.conjByOrbit (G := K) θ) := Fintype.ofFinite _
+  have hoddH : Odd (Nat.card ↥H) := hodd.of_dvd_nat (Subgroup.card_subgroup_dvd_card H)
+  set f : Function.End ↥(IrreducibleCharacter.conjByOrbit (G := K) θ) :=
+    fun η => ⟨IrreducibleCharacter.conjPerm ↥H η.1, conjPerm_mem_conjByOrbit hmem η.2⟩ with hf
+  have hf2 : f ^ 2 = 1 := by
+    funext η
+    show f (f η) = η
+    exact Subtype.ext (conjPerm_conjPerm η.1)
+  have hmod := Equiv.Perm.card_fixedPoints_modEq (f := f) (p := 2) (n := 1) (by simpa using hf2)
+  have hodd_orbit : Odd (Fintype.card ↥(IrreducibleCharacter.conjByOrbit (G := K) θ)) := by
+    rw [← Nat.card_eq_fintype_card, card_conjByOrbit_eq_index_inertia]
+    exact hodd.of_dvd_nat (Subgroup.index_dvd_card _)
+  have hfp_pos : 0 < Fintype.card f.fixedPoints := by
+    have h1 := Nat.odd_iff.mp hodd_orbit
+    rw [Nat.ModEq] at hmod
+    omega
+  obtain ⟨x⟩ := Fintype.card_pos_iff.mp hfp_pos
+  have hxf : f x.1 = x.1 := x.2
+  have hfix : IrreducibleCharacter.conjPerm ↥H x.1.1 = x.1.1 := Subtype.ext_iff.mp hxf
+  exact conjPerm_ne_self_of_mem_conjByOrbit hoddH hθ x.1.2 hfix
+
 /-! ## (10.1): the type III/IV/V hypothesis -/
 
 open scoped FiniteInduce in
