@@ -438,6 +438,47 @@ theorem RData_of_gt_one [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : 
   exact ⟨_, RData_of_inputs hG hM hxMσ hx1 hCN hMsharp hRhall
     (signalizer_centralizer_isComplement hMcompl hCN hxM_mem)⟩
 
+/-- **BG Theorem D(3), `|R(x)| = |𝓜_σ(x)|`** (Coq `oR`, the cardinality conjunct of the
+`FT_signalizer_context` first block): `R` acts sharply transitively (`ConjSharplyTransitiveOn`) on
+`maximalConjugatesContaining M x = 𝓜_σ(x)`, and `R ≤ C_G(x)` makes that action *closed* on `𝓜_σ(x)`
+(for `r ∈ R ≤ C_G(x)`, `Mʳ ∈ 𝓜_σ(x)` since `r⁻¹xr = x ∈ M`), so `r ↦ Mʳ` is a bijection
+`R ≃ 𝓜_σ(x)` (surjective + injective from the sharp `∃!`), giving `|R| = |𝓜_σ(x)|`.  This is the
+count behind BG Theorem E's `|M̃| = (|M_σ| − 1)·[G:M]` (Lemma 14.5(c)). -/
+theorem card_signalizer_eq_card_maximalSigma [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    {M : Subgroup G} (hM : M ∈ maximalSubgroups G) {x : G}
+    (hxMσ : x ∈ OddOrder.BG.Ch3.S10.Msigma M) (hx1 : x ≠ 1) {R : Subgroup G}
+    (hRle : R ≤ Subgroup.centralizer ({x} : Set G))
+    (hsharp : ConjSharplyTransitiveOn R (maximalConjugatesContaining M x)) :
+    Nat.card ↥R = (S14.maximalSigmaSubgroupsOfElement x).ncard := by
+  classical
+  have hSeq : maximalConjugatesContaining M x = S14.maximalSigmaSubgroupsOfElement x :=
+    maximalConjugatesContaining_eq_maximalSigma hG hM hxMσ hx1
+  have hMmem : M ∈ maximalConjugatesContaining M x := by rw [hSeq]; exact ⟨hM, hxMσ⟩
+  -- closure: `r ∈ R ⟹ Mʳ ∈ maximalConjugatesContaining M x` (uses `R ≤ C_G(x)`).
+  have hclosure : ∀ r : G, r ∈ R → MulAut.conj r • M ∈ maximalConjugatesContaining M x := by
+    intro r hr
+    refine ⟨r, rfl, ?_⟩
+    rw [Subgroup.mem_pointwise_smul_iff_inv_smul_mem]
+    have hcalc : (MulAut.conj r)⁻¹ • x = r⁻¹ * x * r := by
+      change (MulAut.conj r).symm x = _; rw [MulAut.conj_symm_apply]
+    rw [hcalc]
+    have hcx : r * x = x * r := Subgroup.mem_centralizer_singleton_iff.mp (hRle hr)
+    have hfix : r⁻¹ * x * r = x := by rw [mul_assoc, ← hcx]; group
+    rw [hfix]; exact OddOrder.BG.Ch3.S10.Msigma_le M hxMσ
+  -- bijection `↥R ≃ ↥(maximalConjugatesContaining M x)`.
+  let f : ↥R → ↥(maximalConjugatesContaining M x) :=
+    fun r => ⟨MulAut.conj (r : G) • M, hclosure r r.2⟩
+  have hbij : Function.Bijective f := by
+    refine ⟨fun r₁ r₂ hf => ?_, fun B => ?_⟩
+    · have hval : MulAut.conj (r₁ : G) • M = MulAut.conj (r₂ : G) • M := Subtype.ext_iff.mp hf
+      obtain ⟨_, _, huniq⟩ := hsharp M hMmem (MulAut.conj (r₁ : G) • M) (hclosure r₁ r₁.2)
+      have e1 := huniq (r₁ : G) ⟨r₁.2, rfl⟩
+      have e2 := huniq (r₂ : G) ⟨r₂.2, hval⟩
+      exact Subtype.ext (e1.trans e2.symm)
+    · obtain ⟨r, ⟨hrR, hrB⟩, _⟩ := hsharp M hMmem (B : Subgroup G) B.2
+      exact ⟨⟨r, hrR⟩, Subtype.ext hrB.symm⟩
+  rw [Nat.card_congr (Equiv.ofBijective f hbij), Nat.card_coe_set_eq, hSeq]
+
 /-! ## Theorems A--E -/
 
 /-- **BG Theorem A** (mmd L4274): the basic structure of a maximal subgroup:

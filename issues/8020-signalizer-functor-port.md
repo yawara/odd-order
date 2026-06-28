@@ -322,3 +322,31 @@ self-normalizing) のみ**。
 gaps; ただし dichotomy が `¬(C[x]≤M)⟹>1` も供給ゆえ structure 適用は可能、残は `∃!N` の N-構造 gaps)。
 **教訓 (再): 「deep」は証明戦略依存** — 2 度連続で BG §16 の「deep」評価が誤りだった (conjunct 3 / dichotomy)。
 原文の証明本体を読み、正しい補題 (`subcent_sdprod` / 直接 2-element argument) を確認すれば浅い。
+
+## ✅ 進捗 (lane d, 2026-06-29 cont.⁸ — /loop): `|R(x)|=|𝓜_σ(x)|` (Coq oR) + FT-path 解剖
+
+**`card_signalizer_eq_card_maximalSigma`** (S16、axiom-clean): RData の sharp transitivity
+(`ConjSharplyTransitiveOn`) を `R ≤ C_G(x)` の closure と合わせ bijection `R ≃ 𝓜_σ(x)` を構成 →
+`|R|=|𝓜_σ(x)|` (Coq `oR`)。⟹ **FT_signalizer_context 第1連言ブロック完成** (transitive ✓ / `|R|=|𝓜_σ(x)|`
+✓ / `R◁C[x]` ✓ / Hall ✓)。BG Theorem E の `|M̃|=(|M_σ|−1)·[G:M]` (Lemma 14.5c) の count 基盤。
+
+**🔑 FT-path 解剖 (重要・次セッション handoff)**: spine consumer = `card_LF_coprime_pq`
+(`Peterfalvi/S15_SAndT:463`, lane c, sorry)。依存鎖:
+```
+card_LF_coprime_pq (spine, lane c)  ←  bgTheoremE_cover_data (Pf 8.17, Peterfalvi/S10:570, sorry, owner=δ)
+  ←  BG Theorem E (theoremE_sigma_partition_and_counting, S16:1598, sorry, lane d)
+    ←  RData / hD3 ✅ (本セッション完成)
+```
+- **`card_LF_coprime_pq` が実際に使うのは `BGTheoremECoverData.primeFactors_disjoint` のみ** (S15_SAndT:455
+  derivation note)。partition core は **既に proven** (`sigma_reps_pairwise_disjoint` /
+  `sigma_reps_prime_cover` / `exists_reps_sigma_partition`、S16)。
+- **だが `bgTheoremE_cover_data` (S10:570) は full struct を要求**: `primeFactors_disjoint` (partition ✅) +
+  **`thickenedA1_card` (14.5c R(x) cardinality、deep)** + G# cover (`BGTheoremETypeICovering` 等)。
+  しかも struct fields は Peterfalvi `mainSubgroup`/`π` 表現 (BG `σ(Mᵢ)`/`Msigma` でなく) ⟹ 翻訳要
+  (`(Mᵢ)_s=M_F` for type I)。
+- **⟹ 次の FT-path 選択肢**: (A) **14.5c (thickenedA1_card) を port** = `|R|=|𝓜_σ(x)|` (本セッション) を土台に
+  `|M̃|=(|M_σ|−1)·[G:M]` の coset count (deep、BG Lemma 14.5c) → theoremE → bgTheoremE_cover_data 完成 →
+  spine unblock。 (B) **cross-lane: `card_LF_coprime_pq` を partition-only lemma に refactor** (lane c 協調要、
+  bgTheoremE_cover_data の deep cardinality を bypass、最短 spine unblock だが lane 境界越え)。 (C) hD4
+  (theoremD 完成だが δ-internal、spine 非直結)。**推奨 = (A)** (genuine 上流・lane-d 単独・hD3 の自然な続き)。
+**教訓: spine consumer が full struct を cite していても、実使用 field を grep 確認** (card_LF は disjoint のみ)。

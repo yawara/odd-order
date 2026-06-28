@@ -6750,3 +6750,9 @@ full `∀ x ∈ M_σ^#, ∃ R, RData M x R` (`exists_RData_of_mem_sigmaSharp`), 
 conjunct of Theorem D.  All axiom-clean. -/
 #assert_only_allowed_axioms OddOrder.BG.Ch4.S16.centralizer_le_of_maximalSigma_le_one
 #assert_only_allowed_axioms OddOrder.BG.Ch4.S16.exists_RData_of_mem_sigmaSharp
+
+/-! **Theorem D(3) `|R(x)| = |𝓜_σ(x)|`** (`S16_MainResults`, Coq `oR`; lane δ, issue 8020).  The
+sharp-transitive `R`-action (`ConjSharplyTransitiveOn`) closed on `𝓜_σ(x)` (via `R ≤ C_G(x)`) gives
+the bijection `R ≃ 𝓜_σ(x)`, hence `|R| = |𝓜_σ(x)|` — the cardinality conjunct of the signalizer
+first block, foundation of BG Theorem E's Lemma 14.5(c) count.  Axiom-clean. -/
+#assert_only_allowed_axioms OddOrder.BG.Ch4.S16.card_signalizer_eq_card_maximalSigma
