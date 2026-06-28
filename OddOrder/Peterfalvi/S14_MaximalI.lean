@@ -340,6 +340,14 @@ theorem support_conjConstituent {L : Subgroup G} [Finite ↥L] (φ : Irreducible
   simp only [coe_conjConstituent, ClassFunction.mem_support, ne_eq,
     ClassFunction.conj_apply, star_eq_zero]
 
+/-- `φ̄(1) = φ(1)`: the degree is a positive natural number, fixed by conjugation. -/
+theorem conjConstituent_apply_one {L : Subgroup G} [Finite ↥L] (φ : IrreducibleCharacter ↥L) :
+    ((conjConstituent φ : ClassFunction ↥L ℂ) : ↥L → ℂ) 1
+      = ((φ : ClassFunction ↥L ℂ) : ↥L → ℂ) 1 := by
+  rw [coe_conjConstituent, ClassFunction.conj_apply]
+  obtain ⟨d, _, hd⟩ := irreducibleCharacter_apply_one_eq_pos_natCast φ
+  rw [hd, star_natCast]
+
 /-- A non-real constituent differs from its conjugate: `¬ IsReal φ → φ ≠ φ̄`. -/
 theorem ne_conjConstituent {L : Subgroup G} [Finite ↥L] {φ : IrreducibleCharacter ↥L}
     (h : ¬ ClassFunction.IsReal (φ : ClassFunction ↥L ℂ)) : φ ≠ conjConstituent φ := by
