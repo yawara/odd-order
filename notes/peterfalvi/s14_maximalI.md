@@ -475,7 +475,18 @@ machinery 構築 (大、§7 prerequisite) 要。
 
 **残 §12 char frontier (全て deeper cross-section/§7/§8 machinery)**:
 - pin (a) `constituent_diff_tau_mem_span` (S14:400): (φ₁−φ₂)^τ∈ℤ[R(χ)] ((1.4) global coherence +
-  per-φ R₁(φ) reconciliation)。
+  per-φ R₁(φ) reconciliation)。**concrete 3-piece plan (2026-06-29 確認)**:
+  1. **n-ary (1.4)**: `isometry_difference_pair_structure` (IsometryDifferencePair:730) を constituent
+     family に適用 ⟹ global SignedIrreducibleDifferenceFamily で τ(φᵢ−φ₀)=ε(μᵢ−μ₀) ⟹
+     τ(φ₁−φ₂)=ε(μ_{φ₁}−μ_{φ₂})。(削除した exists_signedFamily_of_constituents の再導入)。
+  2. **difference-uniqueness reconciliation**: global μ_{φ₁} は τ(φ₁−φ̄₁) の既約成分。R1cdi の
+     image_eq: τ(φ₁−φ̄₁)=ε_cdi(μ_cdi−ν_cdi)。両者 = 同じ τ(φ₁−φ̄₁) ⟹ ε(μ_{φ₁}−μ_{φ̄₁})=
+     ε_cdi(μ_cdi−ν_cdi) ⟹ `linearIndependent_irreducibleCharacter` (CharacterCount:86) で
+     {μ_{φ₁},μ_{φ̄₁}}={μ_cdi,ν_cdi} ⟹ μ_{φ₁}∈{μ_cdi,ν_cdi} ⟹ ±(R1cdi.toOrthonormalImage.imageSet member)
+     ∈ ℤ[Rset]。要 difference-uniqueness lemma (s(α−β)=s'(γ−δ), 既約 distinct ⟹ pair 一致、
+     線形独立から、~30 行、新規)。
+  3. **span assembly**: τ(φ₁−φ₂)=ε(μ_{φ₁}−μ_{φ₂})、μ_{φᵢ}∈ℤ[Rset] ⟹ ∈ℤ[Rset]。
+  深い multi-iteration proof (~100+ 行)。次イテレーションで piece 1 から bottom-up。
 - pin (b) `constituent_diff_tau_eq_induce` (S14:413): (φ₁−φ₂)^τ=Ind_L^G ([Is]7.7 τ=Ind on TI、Dade
   machinery; S05 tau_eq_induce は TI-cyclic 用で型 I 不適用)。
 - (12.2.a) `typeI_induced_char_constituents` (S14:235): §8 型 F Clifford ((8.2.c) inertia + (1.7.c))。
