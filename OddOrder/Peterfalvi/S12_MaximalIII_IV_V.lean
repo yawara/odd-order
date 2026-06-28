@@ -160,6 +160,23 @@ theorem trivial_not_mem_conjByOrbit {K : Type*} [Group K] {H : Subgroup K} [H.No
     rw [← hg]; exact (IrreducibleCharacter.conjBy_inv_conjBy g θ).symm
   rw [this, conjBy_trivial]
 
+/-- **No `conjPerm`-fixed point in the conjugation orbit of a nontrivial character** (odd order).
+A fixed point `η` of `conjPerm` is real (`conjPerm_eq_self_iff`), hence trivial in odd order
+(`not_isReal_of_ne_trivial_of_odd_card'`); but the trivial character is not in `conjByOrbit θ` for
+`θ ≠ 1` (`trivial_not_mem_conjByOrbit`). -/
+theorem conjPerm_ne_self_of_mem_conjByOrbit {K : Type*} [Group K] {H : Subgroup K} [H.Normal]
+    [Finite ↥H] (hodd : Odd (Nat.card ↥H)) {θ : IrreducibleCharacter ↥H}
+    (hθ : θ ≠ trivialIrreducibleCharacter ↥H) {η : IrreducibleCharacter ↥H}
+    (hη : η ∈ IrreducibleCharacter.conjByOrbit (G := K) θ) :
+    IrreducibleCharacter.conjPerm ↥H η ≠ η := by
+  intro hfix
+  have hreal : ClassFunction.IsReal (η : ClassFunction ↥H ℂ) :=
+    (IrreducibleCharacter.conjPerm_eq_self_iff η).mp hfix
+  have htriv : η = trivialIrreducibleCharacter ↥H := by
+    by_contra hne
+    exact OddOrder.RepresentationTheory.not_isReal_of_ne_trivial_of_odd_card' hodd hne hreal
+  exact trivial_not_mem_conjByOrbit hθ (htriv ▸ hη)
+
 /-! ## (10.1): the type III/IV/V hypothesis -/
 
 open scoped FiniteInduce in
