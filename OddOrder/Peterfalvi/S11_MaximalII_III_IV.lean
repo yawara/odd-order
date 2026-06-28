@@ -3504,6 +3504,40 @@ theorem derivedInG_H_le_H0 {M : Subgroup G} (data : TypesIIIIIIVSetup M)
   rw [← QuotientGroup.ker_mk' chief.N]
   exact Abelianization.commutator_subset_ker (QuotientGroup.mk' chief.N)
 
+/-- **`⁅C, H⁆ ≤ H₀`** (`C = C_U(H̄)` centralizes the chief factor): for `c ∈ C` and `h ∈ H`,
+`c` acts trivially on `H̄ = H/H₀`, so `c h c⁻¹ ≡ h (mod H₀)` and `⁅c,h⁆ ∈ H₀`.  A structural
+input of the (9.9.a) `⁅HC,HC⁆ ⊆ 𝒮(H₀C')`-kernel linearity. -/
+theorem commutator_cSub_H_le_H0 [Finite G] {M : Subgroup G} (data : TypesIIIIIIVSetup M)
+    (chief : ChiefFactorData data) :
+    ⁅cSub data chief, data.H⁆ ≤ chief.H0 := by
+  haveI := chief.N_normal
+  rw [Subgroup.commutator_le]
+  intro c hc h hh
+  -- `c` is the `G`-image of a kernel element `z ∈ U W₁` (`uActionHom z = 1`).
+  simp only [cSub, Subgroup.mem_map] at hc
+  obtain ⟨z, ⟨a, ha_ker, ha_z⟩, hz_c⟩ := hc
+  have hz1 : quotientMulAutHom chief.N_aInvariant z = 1 := by
+    rw [← ha_z]; exact MonoidHom.mem_ker.mp ha_ker
+  set hH : ↥data.H := ⟨h, hh⟩ with hhH
+  set W : ↥data.H := typeP_conjAction data.typeP z hH * hH⁻¹ with hW
+  -- `W ∈ N`: `mk W = (φ_U z)(mk h) · (mk h)⁻¹ = mk h · (mk h)⁻¹ = 1`.
+  have hWN : W ∈ chief.N := by
+    have hmk : (QuotientGroup.mk' chief.N) W = 1 := by
+      rw [hW, map_mul, map_inv,
+        ← OddOrder.Isaacs.Ch04.OddOrder.Isaacs.Ch03.IsAInvariant.quotientMulAutHom_apply_mk'
+          chief.N_aInvariant z hH, hz1, MulAut.one_apply, mul_inv_cancel]
+    have hker := MonoidHom.mem_ker.mpr hmk
+    rwa [QuotientGroup.ker_mk'] at hker
+  -- `⁅c,h⁆ = (W : G) ∈ H₀`.
+  rw [chief.H0_eq]
+  refine ⟨W, hWN, ?_⟩
+  have hzc : ((z : ↥(data.typeP.U ⊔ data.typeP.W1)) : G) = c := hz_c
+  rw [hW, commutatorElement_def, map_mul, map_inv,
+    show data.H.subtype (typeP_conjAction data.typeP z hH)
+      = ((typeP_conjAction data.typeP z hH : ↥data.H) : G) from rfl,
+    typeP_conjAction_apply, hzc]
+  simp [hhH]
+
 end
 
 /-- **(9.9.a) index step (C): `[U:C] = u`** realized form `(cInHu.subgroupOf uInHu).index = u`.
