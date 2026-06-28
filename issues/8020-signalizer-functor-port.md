@@ -277,3 +277,27 @@ HUB 裁定 (δ-internal、再設計可) を受け修正完了 (commits `dcd1ace9
 **教訓 (hub 記録済)**: 「shared contract で無断改変不可」と escalate する前に、def が実際に cross-lane / on-spine で cite されているか grep 検証する。δ-internal な def は owner が再設計してよい。
 
 **残 work (上流順)**: (1) **conjunct 3 (Coq part b: R ⋊ C_M(x) = C[x])** = 唯一の deep input、Frobenius/regular-action complement / (2) structure 適用 wiring (signalizer_structure で N/hRhall/hsharp/hCN 取得) + |M_σ[x]|=1 枝 (case-split lemma 済) → hD3 完成 / (3) hD4 の MF/ASet/P2 gaps。
+
+## ✅ 進捗 (lane d, 2026-06-29 cont.⁶ — /loop): conjunct 3 (centralizer complement) 完全 proven + hD3 の >1 枝 完成
+
+**前ノートが「唯一の deep input・Frobenius/regular-action・modular-law descent 不可」とした conjunct 3
+(`R ⋊ C_M(x) = C[x]`, Coq Thm 14.4(b)) は実は deep でなかった。** Coq 原文 (BGsection14:944 `defCx`) は
+`subcent_sdprod defN` の 1 行で、**centralizer が complement を通って降下する** (factorization uniqueness)
+だけ。前評価は誤った証明戦略 (modular law 直接適用) に対するもので、正しい engine は `subcent_sdprod`。
+
+**landed (全 axiom-clean、full build green)**:
+1. **`Subgroup.IsComplement'.inf_centralizer_of_normalizer`** (`OddOrder/Mathlib/SchurZassenhausConj.lean`)
+   = 汎用 `subcent_sdprod`: `K`,`H` が `N` 内で complement (`K ◁ N`)、`a` が両者を normalize、`C_G(a) ≤ N`
+   ⟹ `C_G(a)` 内で `K ⊓ C_G(a)` と `H ⊓ C_G(a)` が complement。証明核 = `g ∈ C(a)` を `g=k·h` 分解 →
+   `a` で共役すると `g=(aka⁻¹)(aha⁻¹)` が第2の `K·H` 分解 → uniqueness (`K⊓H=⊥`) で `aka⁻¹=k`/`aha⁻¹=h`
+   ⟹ `k,h ∈ C(a)`。汎用・再利用可 (signalizer theory 全般、`IsComplement'.subgroupOf_of_le` の隣)。
+2. **`signalizer_centralizer_isComplement`** (S16) = conjunct 3 本体: structure の `N`-complement
+   `(N)_σ ⋊ (M∩N) = N` に engine を適用 (K=(N)_σ normal, H=M∩N, a=x; x∈N は `C_G(x)≤N`、x∈M∩N)。
+3. **`RData_of_gt_one`** (S16) = **hD3 の `|𝓜_σ(x)|>1` 枝 完全 assembled** (sorry-free): structure +
+   `RData_of_inputs` + conjunct 3 で `∃R, RData M x R`。
+
+**∴ conjunct 3 (前ノートの「唯一の deep input」) は解決済。残 hD3 = `|𝓜_σ(x)| ≤ 1` 枝のみ** =
+`C_G(x) ≤ M` (dichotomy `not_sCX_M` の逆向き = `maximalSigmaSubgroupsOfElement_eq_singleton_of_centralizer_le`
+の逆、Coq の transitive `C(X)`-action + orbit-count、deep)。これが closed すれば hD3 完全。
+**教訓**: 「deep」評価は証明戦略依存 — 正しい engine (`subcent_sdprod`) を Coq で確認すれば tractable だった
+([[scaffold-sorry-free-not-done]] と同系、原文の証明本体を読め)。次 = (1) ≤1 枝 (hard direction) or (2) hD4 gaps。
