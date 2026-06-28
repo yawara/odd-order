@@ -91,10 +91,17 @@ linear extend する構造 (HC/H = C, coprime) から。`CliffordMultiplicityOne
       `subRep_isIrreducible` (CliffordConjugateChar 既存)。
 - [x] **補題3 (conjugate-character)** = `character_subRep_conj` (CliffordConjugateChar 既存)。
 - [x] **module-level single-orbit** = `character_conj_of_simpleSubmodule` (commit `0d7d573f`、本 leaf)。
-- [ ] **補題4 (constituent ⟺ simple submodule)** — IntertwiningMap → simple submodule 抽出 (Schur +
-      range-as-asModule-submodule)。**残る唯一の deep gate**、次の焦点。
-- [ ] **character-level single-orbit 組立** → `restrictionConstituentsSingleOrbit_of_isIrreducible`
-      (補題4 + `character_conj_of_simpleSubmodule`、補題4 入れば即)。
+- [x] **補題4 core** = `exists_simpleSubmodule_character_eq_of_ne_zero_intertwiner` (commit `d076fce1`):
+      nonzero intertwiner σ→Res ρ (σ 既約) ⟹ simple 部分加群 N で char(ofSubmodule' N)=χ_σ
+      (Schur `injective_of_ne_zero` + `equivLinearMapAsModule` + `LinearEquiv.ofInjective` + `char_iso`)。
+      **= IntertwiningMap→単純部分加群抽出 (deep content) 完了**。
+- [ ] **補題4 wrapper** (LiesOver χ θ ⟹ ∃ simple submodule with char θ): χ から ρ 抽出
+      (`χ.isIrreducible`) + θ から σ_θ + `restrictionMultiplicity_eq_finrank_intertwiningMap` で
+      finrank≠0 ⟹ nonzero f (`Module.nontrivial_of_finrank_pos`+`exists_ne`) ⟹ 補題4 core。mechanical。
+- [ ] **character-level single-orbit 組立** → `restrictionConstituentsSingleOrbit_of_isIrreducible`:
+      ρ を χ から1回抽出 → N_θ,N_η (wrapper) → `character_conj_of_simpleSubmodule ρ N_η N_θ` で
+      ∃g χ_{N_θ}=χ_{N_η}(g⁻¹·g) → θ=conjBy g⁻¹ η → conjBy g θ=η (IrreducibleCharacter.conjBy 接続 =
+      char-as-function ↔ conjByEquiv + ext)。mechanical だが coercion friction あり。
 - [ ] **degree assembly**: 基底展開 + common-mult + orbit-size + 次数保存 → `χ(1)=e·u·θ₀(1)`。
 - [ ] **e=1** (別 track、Gallagher/extension or Skolem-Noether in inertia)。
 - [ ] (9.9.a) consumer wiring (S11 `caseB_character_counts` 第1連言)。
