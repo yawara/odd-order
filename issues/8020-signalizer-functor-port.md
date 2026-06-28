@@ -111,10 +111,24 @@ genuine def/補題が個別 landing し、scaffold free-field/dummy を順次置
   σ(L)=σ(M)、非 conj なら `sigma_disjoint_of_nonconjugate` で disjoint)、**`Msigma_ell1`**
   (x∈M_σ^# ⟹ ℓ_σ(x)=1、scaffold `length_one_of_isPiElement_sigma` の posit を genuine 証明化)。
 
-**残 Chunk 1**: `sigmaMmaxOf X = {M∈ℳ : X≤M_σ}` def + conj-不変 (FT_signalizer_base 用)、
-`sigma_decomposition_subG` (x∈H ⟹ decomp⊆H)、`prod_sigma_decomposition` (∏ σ-parts = x、深め)。
-**次の上流 = Chunk 2** = `FT_signalizer x` (= R(x)) def + `FT_signalizer_context` 第1連言。
-Cor 12.14 (`maximalContaining_centralizer_and_someSylow_eq_singleton`、ported) で C[x] 一意極大。
-**注**: genuine `sigmaLength` は scaffold `SigmaDecompositionData.length_one_iff` を満たさない
-(後者は `ℓ_σ(x)=1 ↔ x≠1 ∧ ∃M,x∈M_σ` だが genuine は length=2 もあり得る) ⟹ scaffold 完全置換は
-別途 (reverse `ell1 ⟹ ∃M,x∈M_σ` = deep、`prod_sigma_decomposition` 経由)。[[scaffold-sorry-free-not-done]]
+**残 Chunk 1**: `sigma_decomposition_subG` (x∈H ⟹ decomp⊆H) **✅ landed**、`prod_sigma_decomposition`
+(∏ σ-parts = x、深め、未着手 = 当面不要)。
+**訂正**: 前ノートの「genuine sigmaLength は length_one_iff を満たさない」は**誤り**だった。Coq
+`ell_sigma1P` (`ℓ_σ=1 ↔ x≠1 ∧ 𝓜_σ(x)≠∅`) が **まさに** scaffold の `length_one_iff`。`sigmaLength_eq_one_iff`
+で証明し **`genuineSigmaDecomposition : SigmaDecompositionData G` を構成 (commit `c2e82ea9`、axiom-clean)**
+= scaffold carrier の genuine 実現。`dummySigmaDecomposition` は consumer で genuine に差し替え可。
+
+## 進捗ログ (lane d, 2 回目 — /loop)
+
+**2026-06-28 cont. (/loop): Chunk 1 完全完了 — genuine SigmaDecompositionData carrier 実現** (commits
+`bf63b78b`(subG/mem_zpowers) + `c2e82ea9`(ell_sigma1P + carrier)、全 axiom-clean、full build green)。
+- `prime_dvd_orderOf_piPart` / `exists_mem_Msigma_of_isPiElement_sigma` (存在半を `length_one_of_isPiElement_sigma`
+  から抽出、後者は委譲に refactor) / `sigmaLength_eq_one_iff` (ell_sigma1P) / **`genuineSigmaDecomposition`**。
+- **上流判定 (重要)**: Cor 14.9 `nonidentity_covered_by_sigma_pieces` (S14、"faithfulness で証明禁止"、M̃ 要) も
+  Cor 14.10 `exists_sigmaDecomposition_length_le_two` (σ-length≤2) も **signalizer functor R(x)/M̃ の下流**
+  (covering→ℓ_σ≤2 が R(x) 依存)。∴ §14-16 の残 sorry の genuine 上流は **signalizer functor (Chunk 2)** に集約。
+**次 = Chunk 2 (FT_signalizer R(x) 構成)**: Coq `FT_signalizer_context` (BGsection14:866) を精読済。構造 =
+ℓ_σ(x)=1 で [第1連言: R 推移的 on M_σ[x] / |R|=|M_σ[x]| / R◁C[x] / Hall] ∧ [|M_σ[x]|>1 ⟹ N=一意極大 etc.]。
+`FT_signalizer_base x` (=N[x]) / `FT_signalizer x` (=R[x]=C_{N_σ}[x]) def → 第1連言の trivial case
+(|M_σ[x]|≤1 で R=1) から着手、hard case は sigma_group_trans (`fusion_control_of_mem_sigma`) + Cor 12.14。
+[[scaffold-sorry-free-not-done]]
