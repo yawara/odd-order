@@ -468,6 +468,29 @@ theorem sum_normSq_eq_card_mul_inner {H : Type*} [Group H] [Fintype H]
     ((∑ g : H, ‖α g‖ ^ 2 : ℝ) : ℂ) = (Nat.card H : ℂ) * ClassFunction.inner α α := by
   rw [← innerSum_self_eq_sum_normSq, ClassFunction.card_mul_inner]
 
+open scoped Classical in
+/-- **Permutation-character value**: `(Ind_H^G 1_H)(g) = |H|⁻¹ · |{x ∈ G : x⁻¹gx ∈ H}|`.
+
+The induced trivial character is the permutation character of `G` acting on the cosets `G/H`; at
+`g` its value is `|H|⁻¹` times the number of conjugators carrying `g` into `H`.  Every summand of
+the induction sum over that conjugator set is `1` (the trivial character is constant `1`), so the
+sum is the cardinality.  Foundation for the Frobenius induced-trivial-character norm of Peterfalvi
+(13.18.b) `‖Ind_E^F 1‖² = (|K|−1)/|E| + 1` (via Frobenius reciprocity + the Frobenius
+double-coset count). -/
+theorem induce_one_apply {G : Type*} [Group G] [Fintype G] (H : Subgroup G)
+    [Invertible (Nat.card ↥H : ℂ)] (g : G) :
+    ClassFunction.induce H (trivialClassFunction ↥H) g
+      = ⅟(Nat.card ↥H : ℂ) *
+        ((Finset.univ.filter (fun x : G => x⁻¹ * g * x ∈ H)).card : ℂ) := by
+  rw [ClassFunction.induce_apply_eq_sum_filter]
+  congr 1
+  rw [Finset.sum_congr rfl (g := fun _ => (1 : ℂ))
+      (fun x hx => by
+        rw [Finset.mem_filter] at hx
+        rw [ClassFunction.induceTerm_of_mem (trivialClassFunction ↥H) hx.2]
+        rfl),
+    Finset.sum_const, nsmul_eq_mul, mul_one]
+
 /-- **Inflation norm lower bound — the carrier-free core of Peterfalvi (13.5.c)**.
 
 If a function `α : H → ℂ` is constant on a finite subgroup `P ≤ H` (equal to `α 1` on all of `P`)
