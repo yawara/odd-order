@@ -371,16 +371,19 @@ theorem RData_of_inputs [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : 
     (hsharp : ∀ L ∈ S14.maximalSigmaSubgroupsOfElement x,
       ∃! r : G, (r ∈ OddOrder.BG.Ch3.S10.Msigma N ⊓ Subgroup.centralizer ({x} : Set G)) ∧
         MulAut.conj r • M = L)
-    (hconj1 : Nat.Coprime
-      (Nat.card ↥((M ⊓ Subgroup.centralizer ({x} : Set G)).subgroupOf
+    (hRhall : Ch03.IsHallSubgroup (OddOrder.BG.Ch3.S10.sigma N)
+      ((OddOrder.BG.Ch3.S10.Msigma N ⊓ Subgroup.centralizer ({x} : Set G)).subgroupOf
         (Subgroup.centralizer ({x} : Set G))))
-      ((M ⊓ Subgroup.centralizer ({x} : Set G)).subgroupOf (Subgroup.centralizer ({x} : Set G))).index)
     (hconj3 : Subgroup.IsComplement'
       ((M ⊓ Subgroup.centralizer ({x} : Set G)).subgroupOf (Subgroup.centralizer ({x} : Set G)))
       ((OddOrder.BG.Ch3.S10.Msigma N ⊓ Subgroup.centralizer ({x} : Set G)).subgroupOf
         (Subgroup.centralizer ({x} : Set G)))) :
     RData M x (OddOrder.BG.Ch3.S10.Msigma N ⊓ Subgroup.centralizer ({x} : Set G)) := by
-  refine ⟨hconj1, ?_, hconj3, ?_⟩
+  refine ⟨?_, ?_, hconj3, ?_⟩
+  · -- conjunct 1 (`C_M(x)` a Hall subgroup of `C_G(x)`): from `R` Hall + the complement, the order of
+    -- `C_M(x)` (= the index of `R`) is coprime to its index (= the order of `R`).
+    have hcop := hRhall.coprime_index
+    rwa [hconj3.index_eq_card, Nat.coprime_comm, ← hconj3.symm.index_eq_card] at hcop
   · exact (Subgroup.normal_subgroupOf_iff_le_normalizer inf_le_right).mpr
       (centralizer_le_normalizer_Msigma_inf_centralizer hCN)
   · rw [maximalConjugatesContaining_eq_maximalSigma hG hM hxMσ hx1]
