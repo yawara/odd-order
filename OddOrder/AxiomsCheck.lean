@@ -2592,6 +2592,10 @@ set_option linter.style.longLine false in
 -- orbit.  Discharges the `RestrictionConstituentsSingleOrbit` scaffold hypothesis (issue 2031).
 #assert_only_allowed_axioms
   OddOrder.RepresentationTheory.restrictionConstituentsSingleOrbit_of_isIrreducible
+-- **Clifford's theorem, degree formula** ([Is] Thm 6.5): `χ(1) = ⟨Res χ,θ₀⟩·[G:I_G(θ₀)]·θ₀(1)` for a
+-- constituent `θ₀` (degree expansion + single-orbit + common multiplicity + orbit size). issue 2031.
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.apply_one_eq_restrictionMultiplicity_mul_index_inertia
 
 -- Peterfalvi (6.8) T6/Y-family consumer side: degree-one induced families have common degree,
 -- supported differences on `H#`, irreducibility from c1/c2 inertia, and equal-degree coherence.

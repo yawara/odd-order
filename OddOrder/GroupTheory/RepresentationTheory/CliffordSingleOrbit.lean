@@ -5,6 +5,7 @@ Authors: Yawara Ishida
 -/
 import OddOrder.GroupTheory.RepresentationTheory.CliffordConjugateChar
 import OddOrder.GroupTheory.RepresentationTheory.Clifford
+import OddOrder.GroupTheory.RepresentationTheory.InducedIrreducible
 
 /-!
 # Clifford's theorem: the constituents of a restriction form a single conjugation orbit
@@ -160,5 +161,62 @@ theorem restrictionConstituentsSingleOrbit_of_isIrreducible
   refine congrArg _ (Subtype.ext ?_)
   simp only [conjNormalMulAut_apply_coe]
   group
+
+set_option backward.isDefEq.respectTransparency false in
+/-- **Clifford's theorem, degree formula** ([Isaacs] Thm 6.5).  For a `G`-irreducible character `χ`,
+a normal subgroup `H ⊴ G`, and a constituent `θ₀` of `Res^G_H χ`, the degree factors as
+`χ(1) = ⟨Res χ, θ₀⟩ · [G : I_G(θ₀)] · θ₀(1)`.  Assembles the degree expansion
+(`apply_one_eq_sum_restrictionMultiplicity_mul`), single-orbit
+(`restrictionConstituentsSingleOrbit_of_isIrreducible`), common multiplicity
+(`hasCommonRestrictionMultiplicity_of_singleOrbit`), and orbit size
+(`card_conjByOrbit_eq_index_inertia`): in `∑_θ ⟨Res χ,θ⟩·θ(1)` only the `[G:I]`-element orbit of `θ₀`
+contributes, each term equal to `⟨Res χ,θ₀⟩·θ₀(1)` (common multiplicity, conjugation-invariant
+degree). -/
+theorem apply_one_eq_restrictionMultiplicity_mul_index_inertia
+    [Fintype G] [Invertible (Nat.card G : ℂ)]
+    {H : Subgroup G} [hH : H.Normal] [Fintype ↥H] [Invertible (Nat.card ↥H : ℂ)]
+    [Fintype (IrreducibleCharacter ↥H)]
+    (χ : IrreducibleCharacter G) (θ₀ : IrreducibleCharacter ↥H)
+    (hθ₀ : IrreducibleCharacter.LiesOver (G := G) (H := H) χ θ₀) :
+    (χ : ClassFunction G ℂ) (1 : G)
+      = ClassFunction.restrictionMultiplicity H (χ : ClassFunction G ℂ) (θ₀ : ClassFunction ↥H ℂ)
+          * ((IrreducibleCharacter.inertia (G := G) (H := H) θ₀).index : ℂ)
+          * (θ₀ : ClassFunction ↥H ℂ) 1 := by
+  classical
+  have hsingle := restrictionConstituentsSingleOrbit_of_isIrreducible (G := G) (H := H) χ
+  have hcommon :=
+    IrreducibleCharacter.hasCommonRestrictionMultiplicity_of_singleOrbit (H := H) hsingle
+  rw [apply_one_eq_sum_restrictionMultiplicity_mul (H := H) (χ : ClassFunction G ℂ)]
+  have key : ∀ θ : IrreducibleCharacter ↥H,
+      ClassFunction.restrictionMultiplicity H (χ : ClassFunction G ℂ) (θ : ClassFunction ↥H ℂ)
+          * (θ : ClassFunction ↥H ℂ) 1
+        = if θ ∈ IrreducibleCharacter.conjByOrbit (G := G) (H := H) θ₀ then
+            ClassFunction.restrictionMultiplicity H (χ : ClassFunction G ℂ)
+                (θ₀ : ClassFunction ↥H ℂ) * (θ₀ : ClassFunction ↥H ℂ) 1
+          else 0 := by
+    intro θ
+    by_cases hmem : θ ∈ IrreducibleCharacter.conjByOrbit (G := G) (H := H) θ₀
+    · rw [if_pos hmem]
+      obtain ⟨g, rfl⟩ := IrreducibleCharacter.mem_conjByOrbit.mp hmem
+      rw [IrreducibleCharacter.HasCommonRestrictionMultiplicity.eq_of_liesOver hcommon
+        (IrreducibleCharacter.liesOver_conjBy hθ₀ g) hθ₀, conjBy_apply_one]
+    · rw [if_neg hmem]
+      have hm0 : ClassFunction.restrictionMultiplicity H (χ : ClassFunction G ℂ)
+          (θ : ClassFunction ↥H ℂ) = 0 := by
+        by_contra hm
+        exact hmem (IrreducibleCharacter.mem_conjByOrbit.mpr (hsingle θ₀ θ hθ₀ hm))
+      rw [hm0, zero_mul]
+  rw [Finset.sum_congr rfl (fun θ _ => key θ), ← Finset.sum_filter, Finset.sum_const,
+    nsmul_eq_mul]
+  have hcard : (Finset.univ.filter
+      (fun θ => θ ∈ IrreducibleCharacter.conjByOrbit (G := G) (H := H) θ₀)).card
+      = (IrreducibleCharacter.inertia (G := G) (H := H) θ₀).index := by
+    rw [← card_conjByOrbit_eq_index_inertia (G := G) (H := H) θ₀,
+      Nat.card_eq_fintype_card, ← Set.toFinset_card]
+    congr 1
+    ext θ
+    simp [Set.mem_toFinset]
+  rw [hcard]
+  ring
 
 end OddOrder.RepresentationTheory
