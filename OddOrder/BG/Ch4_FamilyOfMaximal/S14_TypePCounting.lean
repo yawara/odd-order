@@ -1256,6 +1256,20 @@ theorem piPart_conj [Finite G] (π : Set ℕ) (h x : G) :
   exact (isPiElement_mul_unique hmul' hcomm' hpiA' hpiB' hprod hBcomm
     (isPiElement_conj h hxpiA) (isPiElement_conj h hxpiB)).1
 
+/-- A `π`-element is its own `π`-part. -/
+theorem piPart_self_of_isPiElement [Finite G] {π : Set ℕ} {g : G} (hg : IsPiElement π g) :
+    piPart π g = g := by
+  obtain ⟨b, hmul, hcomm, hpiA, hpiB, -, -⟩ := piPart_spec π g
+  exact (isPiElement_mul_unique hmul hcomm hpiA hpiB (mul_one g) (Commute.one_right g)
+    hg (isPiElement_one πᶜ)).1
+
+/-- A `π′`-element has trivial `π`-part. -/
+theorem piPart_eq_one_of_isPiElement_compl [Finite G] {π : Set ℕ} {g : G}
+    (hg : IsPiElement πᶜ g) : piPart π g = 1 := by
+  obtain ⟨b, hmul, hcomm, hpiA, hpiB, -, -⟩ := piPart_spec π g
+  exact (isPiElement_mul_unique hmul hcomm hpiA hpiB (one_mul g) (Commute.one_left g)
+    (isPiElement_one π) hg).1
+
 /-- The `σ(M)`-part of an element `x` (Coq `x.`_{σ(M)}`): its `σ(M)`-component in the two-block
 π-part decomposition. -/
 noncomputable def sigmaPart [Finite G] (M : Subgroup G) (x : G) : G :=
@@ -1296,6 +1310,55 @@ theorem sigmaLength_conj [Finite G] (h x : G) :
         exact ⟨M, hMmax, (sigmaPart_conj M h x).symm⟩
     · rw [Set.image_singleton]; simp
   rw [sigmaLength, sigmaLength, hconjset, Set.ncard_image_of_injective _ hinj]
+
+/-- Every element of `M_σ` is a `σ(M)`-element (its order divides `|M_σ|`, a `σ(M)`-number). -/
+theorem isPiElement_sigma_of_mem_Msigma [Finite G] {M : Subgroup G} {x : G}
+    (hx : x ∈ OddOrder.BG.Ch3.S10.Msigma M) :
+    IsPiElement (OddOrder.BG.Ch3.S10.sigma M) x := by
+  intro p hp
+  have horx : orderOf x = orderOf (⟨x, hx⟩ : ↥(OddOrder.BG.Ch3.S10.Msigma M)) := by
+    simpa using orderOf_injective (OddOrder.BG.Ch3.S10.Msigma M).subtype
+      (OddOrder.BG.Ch3.S10.Msigma M).subtype_injective ⟨x, hx⟩
+  have hdvd : orderOf x ∣ Nat.card ↥(OddOrder.BG.Ch3.S10.Msigma M) := by
+    rw [horx]; exact orderOf_dvd_natCard _
+  exact OddOrder.BG.Ch3.S10.Msigma_isPiGroup M p
+    (Nat.primeFactors_mono hdvd (Nat.card_pos).ne' hp)
+
+/-- For a `σ(M)`-element `x`, every `σ(L)`-part (`L` maximal) is either `x` or `1`: if `L` is
+conjugate to `M` then `σ(L) = σ(M)` contains all primes of `x` (`sigmaPart L x = x`); otherwise
+`σ(M) ∩ σ(L) = ∅` (`sigma_disjoint_of_nonconjugate`) so `x` avoids `σ(L)` (`sigmaPart L x = 1`). -/
+theorem sigmaPart_eq_self_or_one_of_isPiElement_sigma [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} (hM : M ∈ maximalSubgroups G)
+    {x : G} (hx : IsPiElement (OddOrder.BG.Ch3.S10.sigma M) x) {L : Subgroup G}
+    (hL : L ∈ maximalSubgroups G) :
+    sigmaPart L x = x ∨ sigmaPart L x = 1 := by
+  simp only [sigmaPart]
+  by_cases hconj : ∃ g : G, MulAut.conj g • M = L
+  · obtain ⟨g, rfl⟩ := hconj
+    exact Or.inl (piPart_self_of_isPiElement (fun p hp => by
+      haveI : Fact p.Prime := ⟨Nat.prime_of_mem_primeFactors hp⟩
+      exact OddOrder.BG.Ch3.S10.sigma_conj g (hx p hp)))
+  · refine Or.inr (piPart_eq_one_of_isPiElement_compl (fun p hp hpL => ?_))
+    exact Set.disjoint_left.mp (sigma_disjoint_of_nonconjugate hG hM hL hconj) (hx p hp) hpL
+
+/-- **BG `Msigma_ell1`** (Coq BGsection14): a nonidentity element of `M_σ` has σ-length `1`.  As a
+`σ(M)`-element, its σ-decomposition collapses to the single block `{x}`: every `σ(L)`-part is `x`
+or `1` (`sigmaPart_eq_self_or_one_of_isPiElement_sigma`), and `sigmaPart M x = x ≠ 1`.  This is the
+genuine form of the `ℓ_σ(x) = 1` property that the `SigmaDecompositionData` scaffold posits for
+`x ∈ M_σ^#` (`length_one_of_isPiElement_sigma`). -/
+theorem Msigma_ell1 [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G}
+    (hM : M ∈ maximalSubgroups G) {x : G} (hx : x ∈ OddOrder.BG.Ch3.S10.Msigma M) (hx1 : x ≠ 1) :
+    sigmaLength x = 1 := by
+  have hxσ : IsPiElement (OddOrder.BG.Ch3.S10.sigma M) x := isPiElement_sigma_of_mem_Msigma hx
+  have hself : sigmaPart M x = x := piPart_self_of_isPiElement hxσ
+  have hset : sigmaDecomposition x = {x} := by
+    refine Set.eq_singleton_iff_unique_mem.mpr ⟨⟨⟨M, hM, hself.symm⟩, ?_⟩, ?_⟩
+    · simp only [Set.mem_singleton_iff]; exact hx1
+    · rintro y ⟨⟨L, hL, rfl⟩, hy⟩
+      rcases sigmaPart_eq_self_or_one_of_isPiElement_sigma hG hM hxσ hL with h | h
+      · exact h
+      · exact absurd (Set.mem_singleton_iff.mpr h) hy
+  rw [sigmaLength, hset, Set.ncard_singleton]
 
 /-- A named carrier for the sigma-decomposition / sigma-length data of BG §14.
 

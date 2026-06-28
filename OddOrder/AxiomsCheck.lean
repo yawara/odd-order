@@ -6687,3 +6687,16 @@ foundational facts: `sigmaLength_eq_zero_iff` (Coq `ell_sigma0P`: `ℓ_σ(x) = 0
 #assert_only_allowed_axioms OddOrder.BG.Ch4.S14.sigmaPart_conj
 #assert_only_allowed_axioms OddOrder.BG.Ch4.S14.sigmaLength_eq_zero_iff
 #assert_only_allowed_axioms OddOrder.BG.Ch4.S14.sigmaLength_conj
+
+/-! **`Msigma_ell1` and the σ-part collapse** (`S14_TypePCounting`, Coq `Msigma_ell1`; lane δ
+signalizer-functor port Chunk 1 cont., issue 8020).  The genuine bridge to the
+`SigmaDecompositionData` scaffold's posited `ℓ_σ(x) = 1` for `x ∈ M_σ^#`: an `M_σ`-element is a
+`σ(M)`-element (`isPiElement_sigma_of_mem_Msigma`), so each `σ(L)`-part is `x` or `1`
+(`sigmaPart_eq_self_or_one_of_isPiElement_sigma`, via `sigma_conj` / `sigma_disjoint_of_nonconjugate`)
+and the σ-decomposition collapses to `{x}`, giving `sigmaLength x = 1`.  All axiom-clean. -/
+
+#assert_only_allowed_axioms OddOrder.BG.Ch4.S14.piPart_self_of_isPiElement
+#assert_only_allowed_axioms OddOrder.BG.Ch4.S14.piPart_eq_one_of_isPiElement_compl
+#assert_only_allowed_axioms OddOrder.BG.Ch4.S14.isPiElement_sigma_of_mem_Msigma
+#assert_only_allowed_axioms OddOrder.BG.Ch4.S14.sigmaPart_eq_self_or_one_of_isPiElement_sigma
+#assert_only_allowed_axioms OddOrder.BG.Ch4.S14.Msigma_ell1
