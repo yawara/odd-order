@@ -15,7 +15,7 @@
 > 実際には「上流 sorried を cite する」「genuine な arithmetic core を抽出する」だけで closable work は在る。
 > 技術的な carrier 診断 (U/W₂ reconciliation の所在) は今も有効な参照。
 
-### 本セッション成果 (2026-06-29, 2 commits)
+### 本セッション成果 (2026-06-29, **5 commits** — carrier-free norm toolkit を構築中)
 1. **(13.2.b) 位数 `|P|=p^q` = 実証明** (`Hypothesis.card_P_eq`, commit `a1e59e84`):
    §11 の Wielandt 順序関係 `typeII_III_IV_order_relations` (type-II 側) を `typeP := Sdata` の
    `TypesIIIIIIVSetup` に適用。nontrivial-core (U≠⊥ via 不変 index / |W₁| prime / A₀(S) TI) は type-II
@@ -25,17 +25,46 @@
 2. **(13.12)/(13.15) 数値核 = 抽出** (`caseB_numeric_forces_q_three`, commit `389650dd`):
    `m < qp/((2q+1)(p-1))` + (13.11) 下界 ⟹ `q=3` の純 ℚ-arithmetic (3 ケース)。`m_value_*` 族と同様の
    self-contained 補題、(13.12) c=1 と (13.15) u 値の両者が consume する再利用核。
+3. **(13.5.c) inflation norm bound = 実証明** (`sum_normSq_erase_one_ge_of_const_on_subgroup`, commit `c038fc59`):
+   `∑_{x∈H#}|α(x)|² ≥ (|P|−1)α(1)²` (α が P 上 α(1) に定値 = P が α の全 constituent の kernel に入る inflation
+   状況)。**任意有限群 H + 部分群 P の carrier-free 一般補題** — Dade 機構も Hypothesis carrier も不要
+   (α=α(1) on P + 二乗ノルム非負 only)。`H=↥hyp.H`, `P=S_F` で (13.5) に特化。
+4. **innerSum self-identity = 実証明** (`innerSum_self_eq_sum_normSq`, commit `56886c1c`):
+   `ClassFunction.innerSum α α = ↑(∑_g ‖α g‖²)` — 抽象 inner-product API と具体 `∑|α|²` の**橋**
+   (API に欠けていた)。`RCLike.mul_conj` 経由、任意有限群 H。norm cascade 全 step が依存。
+5. **(13.6) quadratic 非負 = 実証明** (`caseB_quadratic_nonneg`, commit `54a1784f`):
+   `0 ≤ (|P|−1)b² − 2ub` (u ≤ (|P|−1)/2)。`α(1)=qb` 代入で (13.6) の補正項
+   `q²((|P|−1)b²−2ub) ≥ 0` を与える、純 ℤ-arithmetic 核。`(|P|−1−2u)b² + 2u·b(b−1)` 分解。
 
-### frontier の正しい見立て (ゲートなし方針)
-§15 の残 sorry は 2 種:
-- **(A) Dade norm cascade ((13.5)-(13.10) + (13.3)/(13.4))** = §15 の **genuine hard core**。`Hypothesis` の
-  opaque grid (`omega`/`eta`/`mu`/`nu`) が **τ-isometry / 直交性 / 指標次数** を property として carry して
-  いないのが障害。`IsDadeIsometry`/`FullDadeIsometryData` (S04, 既存) + §5 grid producer (`S05_*Grid`,
-  `S05_IntegralSigma`, 既存) の性質を `Hypothesis` に enrich して norm 評価を実証明するのが**次の本丸**
-  (lane-c 所有の `Hypothesis` + §13 定理。ただし enrich は FeitThompson の 2 constructor + §5 性質補題に波及)。
-  → **次 /loop iteration の最優先候補** (難所回避せず本丸へ)。
-- **(B) 後半 arithmetic ((13.12)/(13.13)/(13.15))** = (A) の (13.10) に gated だが、数値核は抽出済 (上記 2)。
-  (13.10) を cite + c/x-構造 (FPF) + (9.7.b) endgame を足せば closable に近づく (構造入力が残課題)。
+### ★ 生産的手法 (2026-06-29) — **carrier-free core 抽出** (9 commit で実証、arithmetic toolkit ≈完成)
+norm cascade ((13.5)-(13.10)) は「Hypothesis の opaque grid が τ-isometry/直交性/次数を carry しない」ため
+**wrapper 定理 (∃ data, opaqueProp 形) は carrier-gated**。だが **各 cascade step の genuine な数学的核は
+carrier-free な一般補題として抽出・実証明できる**。これが**待たずに本丸を進める正攻法**
+(reallocation §2 の consumer-side prescribed path; STOP(c) の sorry-shuffle でない — 実定理・実証明・再利用可)。
+**着地済 toolkit** (§15 norm-cascade + endgame の arithmetic は網羅):
+- `caseB_u_bound_arith` = 13.2.c 橋 `(p−1)^{q−1}≤(p^q−1)/(p−1)` (9.7 FPF 下界 → u≤(|P|−1)/2)
+- `sum_normSq_erase_one_ge_of_const_on_subgroup` = 13.5.c (inflation 下界 `∑_{H#}|α|²≥(|P|−1)d²`)
+- `innerSum_self_eq_sum_normSq` = innerSum↔∑‖·‖² の橋 + `sum_normSq_eq_card_mul_inner` = Parseval `∑_H=|H|⟨α,α⟩`
+- `caseB_quadratic_nonneg` = 13.6 quadratic 非負 `0≤(|P|−1)b²−2ub` (**13.8 も `b↦±b` で被覆**)
+- `caseB_eta_norm_core` = 13.7 不等式核 `∑_{H#}|η₁₀|²≥|H#|` (Parseval + 13.5.c + n≥1/abelian)
+- (既出) `caseB_numeric_forces_q_three` = 13.12/13.15 数値核、`card_P_eq` = 13.2.b 位数
+
+**⟹ cheap carrier-free arithmetic cores はほぼ枯渇** (starved でなく「土台が建った」)。**残る genuine work は 2 系統**、
+いずれもより重い/cross-lane:
+1. **重い character-theoretic core** (carrier-free だが API 構築要): 13.18.b Frobenius induced-trivial norm
+   `(u-1)/q+1` = `‖Ind_E^F 1‖²=|E\F/E|` (Mackey 二重剰余類 + Frobenius malnormal count — 誘導指標 norm/Mackey
+   API が repo 未整備)、13.9.b の [Is] Lemma 3.14 (∑_{⟨x⟩-class}|χ|²≥count、代数的整数論)。
+2. **carrier/grid enrichment** (cross-lane): 13.5.b 分解・13.9 covering・13.10 assembly と全 wrapper は
+   Hypothesis に τ₃-isometry/ω-orthonormality (§5 producer の性質) を field 追加して faithful 化する要あり
+   → FeitThompson の 2 constructor + §16 carrier (lane-d) に波及。**次 /loop はこの 2 系統のどちらか** (1 を
+   優先=単独可、但し API 構築から; 2 は hub coordination 要)。
+
+### frontier (ゲートなし方針)
+- **(A) Dade norm cascade ((13.5)-(13.10) + (13.3)/(13.4))** = §15 hard core。wrapper は carrier-gated だが
+  **carrier-free core は上記手法で抽出可** (13.5.c 着地)。完全な wrapper 化には Hypothesis enrich
+  (FeitThompson 2 constructor + §5 性質補題に波及、cross-lane = issue で hub escalate)。
+- **(B) 後半 arithmetic ((13.12)/(13.13)/(13.15))** = (A) の (13.10) に gated だが数値核抽出済 (上記 2)。
+  abstract `caseX_for_S : Prop` 仮説が残課題 (scaffold design)。
 
 ---
 

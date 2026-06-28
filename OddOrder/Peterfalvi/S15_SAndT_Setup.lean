@@ -441,6 +441,142 @@ theorem lambda_forces_T_caseB [Finite G]
 
 /-! ## (13.5)--(13.10): norm estimates -/
 
+/-- **Self inner-sum as a real squared-norm sum** (general `ClassFunction` identity).
+
+For any class function `α : H → ℂ`, the unscaled self inner sum `Σ_g α(g)·conj(α(g))` equals the
+real sum of squared norms `Σ_g ‖α(g)‖²` cast to `ℂ`.  This is the bridge between the abstract
+`ClassFunction.innerSum`/`inner` API and the concrete `Σ |α(g)|²` quantities of Peterfalvi's norm
+estimates (13.6)–(13.10); combined with `Σ_{H#} = Σ_H − |α(1)|²` it converts every Dade-norm
+inequality into an elementary squared-norm sum.  A general fact for any finite group `H`. -/
+theorem innerSum_self_eq_sum_normSq {H : Type*} [Group H] [Fintype H]
+    (α : ClassFunction H ℂ) :
+    ClassFunction.innerSum α α = ((∑ g : H, ‖α g‖ ^ 2 : ℝ) : ℂ) := by
+  rw [ClassFunction.innerSum, Complex.ofReal_sum]
+  refine Finset.sum_congr rfl fun g _ => ?_
+  rw [← starRingEnd_apply, RCLike.mul_conj]
+  norm_cast
+
+/-- **Parseval identity for class functions** (general): `Σ_g ‖α(g)‖² = |H| · ⟨α, α⟩`.
+
+The full squared-norm sum equals `|H|` times the normalized self inner product `⟨α,α⟩ = ‖α‖²`.
+Combined with `Σ_{H#} = Σ_H − ‖α(1)‖²` this is precisely the Parseval relation `s + d² = |H|·n`
+consumed by `caseB_eta_norm_core` (the (13.7) core): it lets the cascade read off `s = ∑_{H#}|α|²`
+from the abstract inner product `n = ⟨α,α⟩`.  Immediate from `innerSum_self_eq_sum_normSq` and
+`ClassFunction.card_mul_inner`. -/
+theorem sum_normSq_eq_card_mul_inner {H : Type*} [Group H] [Fintype H]
+    [Invertible (Nat.card H : ℂ)] (α : ClassFunction H ℂ) :
+    ((∑ g : H, ‖α g‖ ^ 2 : ℝ) : ℂ) = (Nat.card H : ℂ) * ClassFunction.inner α α := by
+  rw [← innerSum_self_eq_sum_normSq, ClassFunction.card_mul_inner]
+
+/-- **Inflation norm lower bound — the carrier-free core of Peterfalvi (13.5.c)**.
+
+If a function `α : H → ℂ` is constant on a finite subgroup `P ≤ H` (equal to `α 1` on all of `P`)
+— the situation when `P` lies in the kernel of every irreducible constituent of `α`, so `α` is
+inflated from `H/P` — then its squared-norm sum over the nonidentity elements `H#` is at least
+`(|P| − 1)·|α(1)|²`.  This is exactly Peterfalvi (13.5.c)
+`∑_{x∈H#} |α(x)|² ≥ (|P|−1)·α(1)²` in self-contained, carrier-free form: it uses only that `α`
+equals `α 1` on `P` and that the remaining squared norms are nonnegative (one sums over the
+nonidentity elements of `P` alone, `P# ⊆ H#`).  Specialises to `H = ↥hyp.H`, `P = S_F` in the full
+(13.5) TI-subset calculation. -/
+theorem sum_normSq_erase_one_ge_of_const_on_subgroup {H : Type*} [Group H] [Fintype H]
+    (P : Subgroup H) (α : H → ℂ) (hP : ∀ x ∈ P, α x = α 1) :
+    ((Nat.card ↥P : ℝ) - 1) * ‖α 1‖ ^ 2 ≤ (∑ x : H, ‖α x‖ ^ 2) - ‖α 1‖ ^ 2 := by
+  classical
+  -- card of the subgroup as a filtered finset.
+  have hcard : (Finset.univ.filter (· ∈ P)).card = Nat.card ↥P := by
+    rw [Nat.card_eq_fintype_card]; simp [Fintype.card_subtype]
+  -- the `P`-sum equals `|P|·‖α 1‖²` (every term is `‖α 1‖²`).
+  have hPsum : ∑ x ∈ Finset.univ.filter (· ∈ P), ‖α x‖ ^ 2 = (Nat.card ↥P : ℝ) * ‖α 1‖ ^ 2 := by
+    rw [Finset.sum_congr rfl (g := fun _ => ‖α 1‖ ^ 2)
+        (fun x hx => by rw [hP x (Finset.mem_filter.mp hx).2]),
+      Finset.sum_const, nsmul_eq_mul, hcard]
+  -- the `P`-sum is at most the full sum (squared norms nonnegative).
+  have hmono : ∑ x ∈ Finset.univ.filter (· ∈ P), ‖α x‖ ^ 2 ≤ ∑ x : H, ‖α x‖ ^ 2 :=
+    Finset.sum_le_sum_of_subset_of_nonneg (Finset.subset_univ _) (fun x _ _ => by positivity)
+  have hkey : (Nat.card ↥P : ℝ) * ‖α 1‖ ^ 2 ≤ ∑ x : H, ‖α x‖ ^ 2 := hPsum ▸ hmono
+  have hexp : ((Nat.card ↥P : ℝ) - 1) * ‖α 1‖ ^ 2
+      = (Nat.card ↥P : ℝ) * ‖α 1‖ ^ 2 - ‖α 1‖ ^ 2 := by ring
+  rw [hexp]; linarith [hkey]
+
+/-- **Arithmetic bridge of Peterfalvi (13.2.c)**: `(p−1)^{q−1} ≤ (p^q − 1)/(p − 1)`.
+
+Peterfalvi (13.2.c) gets `u ≤ (p^q − 1)/(p − 1)` from the fixed-point-free bound `u ≤ (p−1)^{q−1}`
+(of (9.7)) via this inequality.  Pure ℕ-arithmetic: `(p−1)^{q−1}·(p−1) = (p−1)^q < p^q`, so
+`(p−1)^q ≤ p^q − 1`, and dividing by `p−1` gives the claim.  Together with `|P| = p^q` and `p ≥ 3`
+this yields `u ≤ (|P|−1)/2` — the hypothesis of `caseB_quadratic_nonneg` (and hence of the (13.6)
+norm bound). -/
+theorem caseB_u_bound_arith {p q : ℕ} (hp : 2 ≤ p) (hq : 1 ≤ q) :
+    (p - 1) ^ (q - 1) ≤ (p ^ q - 1) / (p - 1) := by
+  have hp1 : 0 < p - 1 := by omega
+  rw [Nat.le_div_iff_mul_le hp1]
+  have hpow : (p - 1) ^ (q - 1) * (p - 1) = (p - 1) ^ q := by
+    rw [← pow_succ]; congr 1; omega
+  rw [hpow]
+  have hlt : (p - 1) ^ q < p ^ q := Nat.pow_lt_pow_left (by omega) (by omega)
+  omega
+
+/-- **Key nonnegativity of Peterfalvi (13.6)**: the quadratic correction term is `≥ 0`.
+
+In (13.6) the inflation degree satisfies `α(1) = q·b` for an integer `b`, and the bound reduces to
+`(|P|−1)·α(1)² − 2·λ(1)·α(1) = q²·((|P|−1)·b² − 2u·b) ≥ 0`, using `u ≤ (|P|−1)/2` from (13.2.c).
+This is exactly that nonnegativity `0 ≤ (|P|−1)·b² − 2u·b` (here `Pm1 = |P| − 1`), pure ℤ-arithmetic:
+`(|P|−1)b² − 2ub = (|P|−1−2u)·b² + 2u·b(b−1)`, both summands `≥ 0` (the first by `2u ≤ |P|−1`, the
+second since consecutive integers `b(b−1) ≥ 0`).  Carrier-free core of the (13.6) estimate. -/
+theorem caseB_quadratic_nonneg {Pm1 u : ℕ} (hu : 2 * u ≤ Pm1) (b : ℤ) :
+    0 ≤ (Pm1 : ℤ) * b ^ 2 - 2 * (u : ℤ) * b := by
+  have h2u : (2 * u : ℤ) ≤ (Pm1 : ℤ) := by exact_mod_cast hu
+  have hb : 0 ≤ b * (b - 1) := by
+    by_cases h : 1 ≤ b
+    · exact mul_nonneg (by linarith) (by linarith)
+    · push_neg at h
+      calc 0 ≤ (-b) * (-(b - 1)) := mul_nonneg (by omega) (by omega)
+        _ = b * (b - 1) := by ring
+  nlinarith [mul_nonneg (by linarith : (0 : ℤ) ≤ (Pm1 : ℤ) - 2 * u) (sq_nonneg b),
+    mul_nonneg (by positivity : (0 : ℤ) ≤ 2 * (u : ℤ)) hb]
+
+/-- **Arithmetic core of Peterfalvi (13.7)**: the norm lower bound `∑_{x∈H#}|η₁₀(x)|² ≥ |H#|`.
+
+In (13.7), for `α = η₁₀` on `H#` with `α(1) = d` and squared norm `‖α‖² = n`, one has:
+* the Parseval relation `s + d² = |H|·n` where `s = ∑_{H#}|α|²` (from `∑_{x∈H}|α|² = |H|‖α‖²`);
+* the inflation bound `(|P|−1)·d² ≤ s` (Peterfalvi (13.5.c));
+* `n ≥ 1` (`α` a nonzero virtual character), `|P| ≥ 2`, and — `H` being abelian — `n = 1 ⟹ d² = 1`.
+
+Then `s ≥ |H| − 1 = |H#|`.  Carrier-free arithmetic core (`H, P, d, n, s` abstract naturals; the
+character-theoretic inputs are supplied by the cascade).  Proof: `n = 1` gives `s = |H| − 1`
+directly; for `n ≥ 2`, multiplying through by `|P|` reduces to `|P|(|H|−1) ≤ |H|n(|P|−1)`
+(true since `n, |P| ≥ 2`) together with `|P|·d² ≤ |H|n` (from the inflation bound). -/
+theorem caseB_eta_norm_core {H P d n s : ℕ}
+    (hP : 2 ≤ P) (hn : 1 ≤ n) (hParseval : s + d ^ 2 = H * n)
+    (hInflation : (P - 1) * d ^ 2 ≤ s) (habelian : n = 1 → d ^ 2 = 1) :
+    H - 1 ≤ s := by
+  by_cases hn2 : 2 ≤ n
+  · -- `n ≥ 2`
+    have hPos : 1 ≤ P := by omega
+    have hcast_infl : ((P : ℤ) - 1) * (d : ℤ) ^ 2 ≤ (s : ℤ) := by
+      have h : ((P - 1 : ℕ) : ℤ) * (d : ℤ) ^ 2 ≤ (s : ℤ) := by exact_mod_cast hInflation
+      rwa [Nat.cast_sub hPos, Nat.cast_one] at h
+    have hPar : (s : ℤ) + (d : ℤ) ^ 2 = (H : ℤ) * n := by exact_mod_cast hParseval
+    have hH : (0 : ℤ) ≤ (H : ℤ) := by positivity
+    have hn2' : (2 : ℤ) ≤ (n : ℤ) := by exact_mod_cast hn2
+    have hP2' : (2 : ℤ) ≤ (P : ℤ) := by exact_mod_cast hP
+    have hPd2 : (P : ℤ) * (d : ℤ) ^ 2 ≤ (H : ℤ) * n := by nlinarith [hcast_infl, hPar]
+    have hkey : (P : ℤ) * ((H : ℤ) - 1) ≤ (H : ℤ) * n * ((P : ℤ) - 1) := by
+      nlinarith [mul_nonneg (mul_nonneg hH (by linarith : (0:ℤ) ≤ (n:ℤ) - 2))
+          (by linarith : (0:ℤ) ≤ (P:ℤ) - 1),
+        mul_nonneg hH (by linarith : (0:ℤ) ≤ (P:ℤ) - 2), hP2']
+    have hs_eq : (s : ℤ) = (H : ℤ) * n - (d : ℤ) ^ 2 := by linarith [hPar]
+    have hPpos : (0 : ℤ) < (P : ℤ) := by linarith
+    have hmul : (P : ℤ) * ((H : ℤ) - 1) ≤ (P : ℤ) * (s : ℤ) := by
+      rw [hs_eq]; nlinarith [hkey, hPd2]
+    have hfin : (H : ℤ) - 1 ≤ (s : ℤ) := le_of_mul_le_mul_left hmul hPpos
+    omega
+  · -- `n = 1`
+    have hn_eq : n = 1 := by omega
+    subst hn_eq
+    rw [mul_one] at hParseval
+    have hd : d ^ 2 = 1 := habelian rfl
+    omega
+
 /-- Carrier for Peterfalvi (13.5), the TI-subset orthogonality calculation. -/
 structure TISubsetOrthogonalityData (hyp : Hypothesis (G := G)) where
   S1 : Set (ClassFunction ↥hyp.S ℂ)
