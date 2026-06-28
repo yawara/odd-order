@@ -170,3 +170,31 @@ lane-h は §16 (lane-h owned) 内で **§3/§4 Dade obligation を faithful pro
 Dade-isometry concrete 構成 (lane-c §5/§7 coherence 機構と連続) で discharge される。**現状 §3-§7
 ファイル未編集ゆえ衝突なし**。(7.5) norm を §7 に置く場合は事前に notes で調整。
 [[cross-lane-sync-via-notes]] [[feedback-cite-sorried-lemmas-if-signature-correct]]
+
+## ✅ 2026-06-28 (lane c=γ 新体制初): MHypothesis Dade carrier 化 + `toFamilyHypothesis71` — POLE-2 §7 接続点 sorry-free landing
+
+「次手候補 1 = bridge carrier (最上流)」の**実装核を landing**。POLE-2 全 producer
+(`normCascadeData`/`eta_generic_data`/`betaM_expansion_data`/`caseB_contradiction_data`) が共通に
+bottom-out する §7 接続点を確立 (`S16_NonExistenceG.lean`, sorry-free, leaf+full build green):
+
+- **MHypothesis に `typeIHyp : OddOrder.Peterfalvi.S14.Hypothesis M` carrier 追加** = type-I maximal
+  `M` (over N_G(V)) の genuine Dade setup (`TypeIData` + (8.15) Dade support `dadeData` for
+  `A(M)=typeIA M` + 共役不変 `hconj`)。S14 (lane b 所有) の `exists_typeI_hypothesis` (**sorry-free**)
+  で将来供給可能 = honest carrier (scaffold でない; [[scaffold-sorry-free-not-done]] の doneness 基準
+  「carrier の構成可能性」を満たす)。consumer は exists_MHypothesis (既 sorry) のみ ⟹ 影響限局。
+- **`MHypothesis.toFamilyHypothesis71` (sorry-free)** = `S12.Hypothesis.toFamilyHypothesis71` の
+  type-I 版移植 (typeIA support ゆえ A_0→A restrict 不要、より直接的)。`S09.FamilyHypothesis71 G 1`
+  を構成 → `S09.family_inequality` (7.5, sorry-free) を `M` に直接適用可能に。
+
+**残 (normCascadeData 14.11.4 honest 化、次セッション最優先)** — 道筋確定済、3 課題:
+1. **ℚ/ℝ bridge**: `NormCascadeData.rhoNormSq : ℚ` を `(toFamilyHypothesis71).chiRhoNormSq (ψ^τ₁) 0 : ℝ`
+   に同定 (norm² は有理数だが型が違う、cast 補題要)。
+2. **ψ^τ₁ の norm-one**: `family_inequality` の `hχ : inner χ χ = 1` 入力。MHypothesis の `tau1`/`psi` を
+   §13.3 τ₁ Dade isometry + `psi ∈ Mset` (Irr) として characterize する carrier 強化が要 (S12 の
+   `inner_tau1_zeta_self_eq_one` に相当)。
+3. **upper/lower 導出**: upper = family_inequality + `generic_character_bound` (‖ψ^τ₁‖≥1 on G0、landed) +
+   `|A(M)|/|M|` 評価; lower (1−pq/k) = (7.8.b) coherence norm formula (重い)。S12 の
+   `chiRhoNormSq_zeta_le_line83` (`S12:6047`) が type-P 版の完全テンプレート。
+
+de-opacify 後は `eta_generic_data`/`betaM_expansion_data` も同 `typeIHyp` carrier から S09 cite で連鎖。
+[[scaffold-sorry-free-not-done]] [[feedback-cite-sorried-lemmas-if-signature-correct]] [[feedback-no-avoiding-hard-parts]]
