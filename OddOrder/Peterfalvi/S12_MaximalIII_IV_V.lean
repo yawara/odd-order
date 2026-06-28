@@ -221,6 +221,49 @@ theorem conjPerm_not_mem_conjByOrbit {K : Type*} [Group K] [Finite K] {H : Subgr
   have hfix : IrreducibleCharacter.conjPerm ↥H x.1.1 = x.1.1 := Subtype.ext_iff.mp hxf
   exact conjPerm_ne_self_of_mem_conjByOrbit hoddH hθ x.1.2 hfix
 
+set_option maxHeartbeats 1000000 in
+open scoped FiniteInduce in
+/-- **The induced family `S = inducedFamily M` has no real characters** (Peterfalvi §10, the
+`no_real_characters` clause of the §7 coherence hypothesis for `S`).  Every `Ind_{M'}^M θ`
+(`θ ∈ Irr M'`, `θ ≠ 1`) of the odd-order group `M` is non-real: its conjugate
+`(Ind θ)‾ = Ind θ̄` (`induce_conj`) is orthogonal to `Ind θ`, because `θ̄ = conjPerm θ` is not
+`M`-conjugate to `θ` (`conjPerm_not_mem_conjByOrbit`) so `inner_induce_eq_zero_of_not_conj` gives
+`⟨Ind θ, Ind θ̄⟩ = 0`; but `⟨Ind θ, Ind θ⟩ ≠ 0` (`card_mul_inner_self_induce_eq_card_inertia`,
+`|I_θ| ≠ 0`), and the two coincide when `Ind θ` is real. -/
+theorem inducedFamily_hasNoRealCharacters {M : Subgroup G} [Finite G]
+    (hodd : Odd (Nat.card ↥M)) :
+    OddOrder.Peterfalvi.S03.HasNoRealCharacters (inducedFamily M) := by
+  classical
+  intro χ hχ hreal
+  obtain ⟨θ, hθne, rfl⟩ := hχ
+  haveI : ((derivedInG M).subgroupOf M).Normal := by
+    rw [derivedInG, Subgroup.subgroupOf,
+      Subgroup.comap_map_eq_self_of_injective M.subtype_injective]
+    infer_instance
+  have hnotconj : ∀ g : ↥M, IrreducibleCharacter.conjBy g θ
+      ≠ IrreducibleCharacter.conjPerm ↥((derivedInG M).subgroupOf M) θ :=
+    fun g hg => conjPerm_not_mem_conjByOrbit hodd hθne ⟨g, hg⟩
+  have hzero := inner_induce_eq_zero_of_not_conj θ
+    (IrreducibleCharacter.conjPerm ↥((derivedInG M).subgroupOf M) θ) hnotconj
+  have hconjeq : (ClassFunction.induce ((derivedInG M).subgroupOf M) θ.toClassFunction).conj
+      = ClassFunction.induce ((derivedInG M).subgroupOf M)
+        (IrreducibleCharacter.conjPerm ↥((derivedInG M).subgroupOf M) θ).toClassFunction := by
+    rw [ClassFunction.induce_conj, IrreducibleCharacter.conjPerm_apply_coe]
+  unfold ClassFunction.IsReal at hreal
+  have heq : ClassFunction.induce ((derivedInG M).subgroupOf M) θ.toClassFunction
+      = ClassFunction.induce ((derivedInG M).subgroupOf M)
+        (IrreducibleCharacter.conjPerm ↥((derivedInG M).subgroupOf M) θ).toClassFunction :=
+    hreal.symm.trans hconjeq
+  have hself0 : ClassFunction.inner
+      (ClassFunction.induce ((derivedInG M).subgroupOf M) θ.toClassFunction)
+      (ClassFunction.induce ((derivedInG M).subgroupOf M) θ.toClassFunction) = 0 :=
+    (congrArg (ClassFunction.inner
+      (ClassFunction.induce ((derivedInG M).subgroupOf M) θ.toClassFunction)) heq).trans hzero
+  have hc := card_mul_inner_self_induce_eq_card_inertia θ
+  rw [hself0, mul_zero] at hc
+  exact (show (Nat.card ↥(ClassFunction.inertia θ.toClassFunction) : ℂ) ≠ 0 by
+    exact_mod_cast Nat.card_pos.ne') hc.symm
+
 /-! ## (10.1): the type III/IV/V hypothesis -/
 
 open scoped FiniteInduce in
