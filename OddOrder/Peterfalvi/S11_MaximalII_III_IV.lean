@@ -3111,6 +3111,108 @@ theorem caseB_inertia_realized [Finite G] {M : Subgroup G}
   exact caseB_char_inertia_inflation hcaseB hθbar a
     (ClassFunction.compHom_injective_of_surjective (hInHuEquivH data).surjective hfix)
 
+/-! ### (9.9.a) inertia lift: `I_{HU}(θ₀) = HC`
+
+For the (9.9.a) Clifford degree we need the inertia in `HU` of the realized chief-factor character
+`θ₀ = compHom (hInHuEquivH) (compHom (mk' N) θ̄)` to be exactly `HC = hInHu ⊔ cInHu`.  The two
+inclusions:
+
+* `cInHu ≤ I(θ₀)` (`cInHu_le_inertia`): `C = C_U(H̄)` acts trivially on the chief factor, so it fixes
+  `θ₀` (the *easy* direction — `compHom_typeP_conjAction_inflation` + `quotientMulAutHom = 1` on the
+  kernel `cSub`);
+* `I(θ₀) ⊓ uInHu ≤ cInHu` (`inertia_inf_uInHu_le_cInHu`): the *hard* direction, exactly
+  `caseB_inertia_realized` (any `U`-element fixing `θ₀` acts trivially on `H̄`).
+
+Together with `H ≤ I(θ₀)` (automatic) and `H ⊔ U = ⊤`, the modular decomposition
+`I(θ₀) = H ⊔ (I(θ₀) ⊓ U)` gives `I(θ₀) = HC` (`inertia_eq_hcInHu`). -/
+
+/-- **`C ≤ I_{HU}(θ₀)`**: `C = C_U(H̄)` fixes the realized chief-factor character `θ₀` (it acts
+trivially on `H̄`, so `quotientMulAutHom = 1` on `cSub = ker(uActionHom)`, and the inflation is
+unchanged).  The easy half of the (9.9.a) inertia lift. -/
+theorem cInHu_le_inertia [Finite G] {M : Subgroup G} (data : TypesIIIIIIVSetup M)
+    (chief : ChiefFactorData data) {θbar : IrreducibleCharacter (↥data.H ⧸ chief.N)} :
+    cInHu data chief ≤ ClassFunction.inertia (G := ↥(huSub data)) (H := hInHu data)
+        (ClassFunction.compHom (hInHuEquivH data).toMonoidHom
+          (ClassFunction.compHom (QuotientGroup.mk' chief.N)
+            (θbar : ClassFunction (↥data.H ⧸ chief.N) ℂ))) := by
+  intro c hc
+  rw [ClassFunction.mem_inertia]
+  have hcG : ((c : ↥M) : G) ∈ cSub data chief := by
+    simp only [cInHu, Subgroup.mem_subgroupOf] at hc; exact hc
+  simp only [cSub, Subgroup.mem_map] at hcG
+  obtain ⟨w, ⟨ĉ', hĉ', hĉ'w⟩, hwc⟩ := hcG
+  have hq1 : quotientMulAutHom chief.N_aInvariant w = 1 := by rw [← hĉ'w]; exact hĉ'
+  have hag : ((c : ↥M) : G) = (w : G) := hwc.symm
+  rw [conjBy_compHom_hInHuEquivH data w c hag, compHom_typeP_conjAction_inflation, hq1]
+  rfl
+
+/-- **`I_{HU}(θ₀) ⊓ U ≤ C`**: any `U`-element of `HU` fixing the realized chief-factor character
+`θ₀` acts trivially on `H̄`, i.e. lies in `C` — exactly `caseB_inertia_realized`, with the action
+element constructed from the `U`-realized `g`.  The hard half of the (9.9.a) inertia lift. -/
+theorem inertia_inf_uInHu_le_cInHu [Finite G] {M : Subgroup G} (data : TypesIIIIIIVSetup M)
+    (chief : ChiefFactorData data)
+    (hcaseB : ∀ J : Subgroup (↥data.H ⧸ chief.N),
+        IsAInvariant ((typeP_quotientCoprimeAction data.typeP data.nontrivial.1
+          chief.N_aInvariant).φ.comp (typeP_quotientCoprimeAction data.typeP data.nontrivial.1
+          chief.N_aInvariant).U.subtype) J → J = ⊥ ∨ J = ⊤)
+    {θbar : IrreducibleCharacter (↥data.H ⧸ chief.N)}
+    (hθbar : (θbar : ClassFunction (↥data.H ⧸ chief.N) ℂ) ≠ trivialClassFunction _) :
+    ClassFunction.inertia (G := ↥(huSub data)) (H := hInHu data)
+        (ClassFunction.compHom (hInHuEquivH data).toMonoidHom
+          (ClassFunction.compHom (QuotientGroup.mk' chief.N)
+            (θbar : ClassFunction (↥data.H ⧸ chief.N) ℂ))) ⊓ uInHu data
+      ≤ cInHu data chief := by
+  rintro g ⟨hgin, hgu⟩
+  have hgU : ((g : ↥M) : G) ∈ data.typeP.U := by
+    simp only [uInHu, Subgroup.mem_subgroupOf] at hgu; exact hgu
+  have hgUW1 : ((g : ↥M) : G) ∈ data.typeP.U ⊔ data.typeP.W1 := Subgroup.mem_sup_left hgU
+  set a : ↥((typeP_quotientCoprimeAction data.typeP data.nontrivial.1 chief.N_aInvariant).U) :=
+    ⟨⟨((g : ↥M) : G), hgUW1⟩, Subgroup.mem_subgroupOf.mpr hgU⟩ with ha_def
+  have hag : ((g : ↥M) : G)
+      = (((typeP_quotientCoprimeAction data.typeP data.nontrivial.1
+          chief.N_aInvariant).U.subtype a : ↥(data.typeP.U ⊔ data.typeP.W1)) : G) := rfl
+  have hker : a ∈ (uActionHom data chief).ker :=
+    caseB_inertia_realized hcaseB hθbar a g hag (ClassFunction.mem_inertia.mp hgin)
+  simp only [cInHu, Subgroup.mem_subgroupOf, cSub, Subgroup.mem_map]
+  exact ⟨_, ⟨a, hker, rfl⟩, rfl⟩
+
+/-- **Peterfalvi (9.9.a), the inertia lift: `I_{HU}(θ₀) = HC`.**  The inertia in `HU` of the
+realized chief-factor character `θ₀` is exactly the inertia subgroup `HC = hInHu ⊔ cInHu`.  `⊇` from
+`H ≤ I(θ₀)` (automatic) and `cInHu_le_inertia`; `⊆` by decomposing `g ∈ I(θ₀)` as `h·u`
+(`H ⊔ U = ⊤`, `H ◁ HU`), where `u = h⁻¹ g ∈ I(θ₀) ⊓ U ≤ C` (`inertia_inf_uInHu_le_cInHu`).  With
+`HC ◁ HU` (`hcInHu_normal`) this makes `Ind_{HC}^{HU}` of an `HC`-character over `θ₀` irreducible. -/
+theorem inertia_eq_hcInHu [Finite G] {M : Subgroup G} (data : TypesIIIIIIVSetup M)
+    (chief : ChiefFactorData data)
+    (hcaseB : ∀ J : Subgroup (↥data.H ⧸ chief.N),
+        IsAInvariant ((typeP_quotientCoprimeAction data.typeP data.nontrivial.1
+          chief.N_aInvariant).φ.comp (typeP_quotientCoprimeAction data.typeP data.nontrivial.1
+          chief.N_aInvariant).U.subtype) J → J = ⊥ ∨ J = ⊤)
+    {θbar : IrreducibleCharacter (↥data.H ⧸ chief.N)}
+    (hθbar : (θbar : ClassFunction (↥data.H ⧸ chief.N) ℂ) ≠ trivialClassFunction _) :
+    ClassFunction.inertia (G := ↥(huSub data)) (H := hInHu data)
+        (ClassFunction.compHom (hInHuEquivH data).toMonoidHom
+          (ClassFunction.compHom (QuotientGroup.mk' chief.N)
+            (θbar : ClassFunction (↥data.H ⧸ chief.N) ℂ)))
+      = hInHu data ⊔ cInHu data chief := by
+  set θ₀ := ClassFunction.compHom (hInHuEquivH data).toMonoidHom
+    (ClassFunction.compHom (QuotientGroup.mk' chief.N)
+      (θbar : ClassFunction (↥data.H ⧸ chief.N) ℂ)) with hθ₀
+  apply le_antisymm
+  · intro g hg
+    have hgtop : g ∈ hInHu data ⊔ uInHu data := hInHu_sup_uInHu_eq_top data ▸ Subgroup.mem_top g
+    rw [Subgroup.mem_sup_of_normal_left] at hgtop
+    obtain ⟨h, hh, u, hu, rfl⟩ := hgtop
+    have hh_in : h ∈ ClassFunction.inertia (H := hInHu data) θ₀ :=
+      ClassFunction.subgroup_le_inertia θ₀ hh
+    have hu_in : u ∈ ClassFunction.inertia (H := hInHu data) θ₀ := by
+      have hmem : h⁻¹ * (h * u) ∈ ClassFunction.inertia (H := hInHu data) θ₀ :=
+        mul_mem (inv_mem hh_in) hg
+      rwa [inv_mul_cancel_left] at hmem
+    exact mul_mem (Subgroup.mem_sup_left hh)
+      (Subgroup.mem_sup_right (inertia_inf_uInHu_le_cInHu data chief hcaseB hθbar ⟨hu_in, hu⟩))
+  · rw [sup_le_iff]
+    exact ⟨ClassFunction.subgroup_le_inertia θ₀, cInHu_le_inertia data chief⟩
+
 /-- **Peterfalvi (9.7) case (b) carrier.**  When `U` acts irreducibly on the chief factor
 `H̄ = H/H₀` (Clifford case (b), the left branch of `chiefFactor_clifford_U_dichotomy`), the
 field-model divisibilities of `CliffordCaseBData` hold: with `chars.u = |Ū|` (pinned in
