@@ -6684,6 +6684,14 @@ foundational facts: `sigmaLength_eq_zero_iff` (Coq `ell_sigma0P`: `ℓ_σ(x) = 0
 #assert_only_allowed_axioms OddOrder.BG.Ch4.S14.isPiElement_compl_of_piPart_eq_one
 #assert_only_allowed_axioms OddOrder.BG.Ch4.S14.isPiElement_conj
 #assert_only_allowed_axioms OddOrder.BG.Ch4.S14.piPart_conj
+#assert_only_allowed_axioms OddOrder.BG.Ch4.S14.piPart_mul_of_commute
+#assert_only_allowed_axioms OddOrder.BG.Ch4.S14.sigmaPart_eq_self_of_conj
+#assert_only_allowed_axioms OddOrder.BG.Ch4.S14.sigmaPart_eq_one_of_not_conj
+#assert_only_allowed_axioms OddOrder.BG.Ch4.S14.sigma_cover_decomposition
+#assert_only_allowed_axioms OddOrder.BG.Ch4.S14.not_conj_of_mem_Msigma_of_tau2
+#assert_only_allowed_axioms OddOrder.BG.Ch4.S14.sigma_cover_decomposition_signalizer
+#assert_only_allowed_axioms OddOrder.BG.Ch4.S14.mem_sigma_cover_decomposition_signalizer
+#assert_only_allowed_axioms OddOrder.BG.Ch4.S14.sigmaLength_cover_le_two_signalizer
 #assert_only_allowed_axioms OddOrder.BG.Ch4.S14.sigmaPart_conj
 #assert_only_allowed_axioms OddOrder.BG.Ch4.S14.sigmaLength_eq_zero_iff
 #assert_only_allowed_axioms OddOrder.BG.Ch4.S14.sigmaLength_conj
@@ -6742,3 +6750,25 @@ proven structure's `N`-complement, discharging the one genuinely-deep `RData` in
 #assert_only_allowed_axioms Subgroup.IsComplement'.inf_centralizer_of_normalizer
 #assert_only_allowed_axioms OddOrder.BG.Ch4.S16.signalizer_centralizer_isComplement
 #assert_only_allowed_axioms OddOrder.BG.Ch4.S16.RData_of_gt_one
+
+/-! **Theorem D(3) full `hD3`** (`S16_MainResults`; lane δ, issue 8020).  The `|𝓜_σ(x)| ≤ 1 ⟹
+C_G(x) ≤ M` dichotomy (`centralizer_le_of_maximalSigma_le_one`, the shallow converse of the
+singleton lemma, Coq `not_sCX_M` direction) plus the `> 1` branch (`RData_of_gt_one`) assemble the
+full `∀ x ∈ M_σ^#, ∃ R, RData M x R` (`exists_RData_of_mem_sigmaSharp`), discharging the `hD3`
+conjunct of Theorem D.  All axiom-clean. -/
+#assert_only_allowed_axioms OddOrder.BG.Ch4.S16.centralizer_le_of_maximalSigma_le_one
+#assert_only_allowed_axioms OddOrder.BG.Ch4.S16.exists_RData_of_mem_sigmaSharp
+
+/-! **Theorem D(3) `|R(x)| = |𝓜_σ(x)|`** (`S16_MainResults`, Coq `oR`; lane δ, issue 8020).  The
+sharp-transitive `R`-action (`ConjSharplyTransitiveOn`) closed on `𝓜_σ(x)` (via `R ≤ C_G(x)`) gives
+the bijection `R ≃ 𝓜_σ(x)`, hence `|R| = |𝓜_σ(x)|` — the cardinality conjunct of the signalizer
+first block, foundation of BG Theorem E's Lemma 14.5(c) count.  Axiom-clean. -/
+#assert_only_allowed_axioms OddOrder.BG.Ch4.S16.card_signalizer_eq_card_maximalSigma
+
+/-! **BG Lemma 14.5(a) `σ`-cover disjointness** (`S16_MainResults`, Coq `sigma_cover_disjoint`,
+`_of_inputs` form; lane δ, issue 8020).  Distinct `σ`-length-one `x, y` give disjoint cover cosets
+`x·R(x)`, `y·R(y)`: a common `g = x·r = y·s` makes `{x}∪{r}^# = σ(g) = {y}∪{s}^#`, forcing `y = r`,
+`s = x`, whence `x` lands in the trivial intersection of the `y`-centralizer complement at `M' = N_x`
+(`signalizer_centralizer_isComplement`) — contradiction.  The deep core of the 14.5(c) `R(x)`-cover
+trivIset.  Axiom-clean. -/
+#assert_only_allowed_axioms OddOrder.BG.Ch4.S16.sigma_cover_disjoint_of_inputs

@@ -438,6 +438,115 @@ theorem RData_of_gt_one [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : 
   exact ⟨_, RData_of_inputs hG hM hxMσ hx1 hCN hMsharp hRhall
     (signalizer_centralizer_isComplement hMcompl hCN hxM_mem)⟩
 
+/-- **BG Theorem D(3), `|R(x)| = |𝓜_σ(x)|`** (Coq `oR`, the cardinality conjunct of the
+`FT_signalizer_context` first block): `R` acts sharply transitively (`ConjSharplyTransitiveOn`) on
+`maximalConjugatesContaining M x = 𝓜_σ(x)`, and `R ≤ C_G(x)` makes that action *closed* on `𝓜_σ(x)`
+(for `r ∈ R ≤ C_G(x)`, `Mʳ ∈ 𝓜_σ(x)` since `r⁻¹xr = x ∈ M`), so `r ↦ Mʳ` is a bijection
+`R ≃ 𝓜_σ(x)` (surjective + injective from the sharp `∃!`), giving `|R| = |𝓜_σ(x)|`.  This is the
+count behind BG Theorem E's `|M̃| = (|M_σ| − 1)·[G:M]` (Lemma 14.5(c)). -/
+theorem card_signalizer_eq_card_maximalSigma [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    {M : Subgroup G} (hM : M ∈ maximalSubgroups G) {x : G}
+    (hxMσ : x ∈ OddOrder.BG.Ch3.S10.Msigma M) (hx1 : x ≠ 1) {R : Subgroup G}
+    (hRle : R ≤ Subgroup.centralizer ({x} : Set G))
+    (hsharp : ConjSharplyTransitiveOn R (maximalConjugatesContaining M x)) :
+    Nat.card ↥R = (S14.maximalSigmaSubgroupsOfElement x).ncard := by
+  classical
+  have hSeq : maximalConjugatesContaining M x = S14.maximalSigmaSubgroupsOfElement x :=
+    maximalConjugatesContaining_eq_maximalSigma hG hM hxMσ hx1
+  have hMmem : M ∈ maximalConjugatesContaining M x := by rw [hSeq]; exact ⟨hM, hxMσ⟩
+  -- closure: `r ∈ R ⟹ Mʳ ∈ maximalConjugatesContaining M x` (uses `R ≤ C_G(x)`).
+  have hclosure : ∀ r : G, r ∈ R → MulAut.conj r • M ∈ maximalConjugatesContaining M x := by
+    intro r hr
+    refine ⟨r, rfl, ?_⟩
+    rw [Subgroup.mem_pointwise_smul_iff_inv_smul_mem]
+    have hcalc : (MulAut.conj r)⁻¹ • x = r⁻¹ * x * r := by
+      change (MulAut.conj r).symm x = _; rw [MulAut.conj_symm_apply]
+    rw [hcalc]
+    have hcx : r * x = x * r := Subgroup.mem_centralizer_singleton_iff.mp (hRle hr)
+    have hfix : r⁻¹ * x * r = x := by rw [mul_assoc, ← hcx]; group
+    rw [hfix]; exact OddOrder.BG.Ch3.S10.Msigma_le M hxMσ
+  -- bijection `↥R ≃ ↥(maximalConjugatesContaining M x)`.
+  let f : ↥R → ↥(maximalConjugatesContaining M x) :=
+    fun r => ⟨MulAut.conj (r : G) • M, hclosure r r.2⟩
+  have hbij : Function.Bijective f := by
+    refine ⟨fun r₁ r₂ hf => ?_, fun B => ?_⟩
+    · have hval : MulAut.conj (r₁ : G) • M = MulAut.conj (r₂ : G) • M := Subtype.ext_iff.mp hf
+      obtain ⟨_, _, huniq⟩ := hsharp M hMmem (MulAut.conj (r₁ : G) • M) (hclosure r₁ r₁.2)
+      have e1 := huniq (r₁ : G) ⟨r₁.2, rfl⟩
+      have e2 := huniq (r₂ : G) ⟨r₂.2, hval⟩
+      exact Subtype.ext (e1.trans e2.symm)
+    · obtain ⟨r, ⟨hrR, hrB⟩, _⟩ := hsharp M hMmem (B : Subgroup G) B.2
+      exact ⟨⟨r, hrR⟩, Subtype.ext hrB.symm⟩
+  rw [Nat.card_congr (Equiv.ofBijective f hbij), Nat.card_coe_set_eq, hSeq]
+
+/-- **BG Lemma 14.5(a), `σ`-cover disjointness** (Coq `sigma_cover_disjoint`, `_of_inputs` form): for
+two distinct `σ`-length-one elements `x, y` with signalizer data, the cosets `x·R(x)` and `y·R(y)`
+(`R(·) = (N_·)_σ ⊓ C_G(·)`) are disjoint.  If `g = x·r = y·s` were common, the `σ`-decomposition
+`{x} ∪ {r}^# = σ(g) = {y} ∪ {s}^#` (`sigma_cover_decomposition_signalizer`) forces `y = r` (as `y ≠ x`)
+and `s = x`; so `y ∈ (N_x)_σ` puts `N_x ∈ 𝓜_σ(y)`, and `x ∈ R(y) ∩ (N_x ⊓ C_G(y))` lands in the
+trivial intersection of the `y`-complement (`signalizer_centralizer_isComplement` at `M' = N_x`),
+forcing `x = 1` — contradiction.  The deep core of the `R(x)`-cover trivIset behind Lemma 14.5(c). -/
+theorem sigma_cover_disjoint_of_inputs [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    {Mx Nx My Ny : Subgroup G} (hMx : Mx ∈ maximalSubgroups G) (hNx : Nx ∈ maximalSubgroups G)
+    (hMy : My ∈ maximalSubgroups G) (hNy : Ny ∈ maximalSubgroups G) {x y : G}
+    (hxMx : x ∈ OddOrder.BG.Ch3.S10.Msigma Mx) (hx1 : x ≠ 1)
+    (hyMy : y ∈ OddOrder.BG.Ch3.S10.Msigma My) (hy1 : y ≠ 1)
+    (hxτ2 : ∀ p ∈ S14.piSet (Subgroup.closure ({x} : Set G)), p ∈ tau2 Nx)
+    (hyτ2 : ∀ p ∈ S14.piSet (Subgroup.closure ({y} : Set G)), p ∈ tau2 Ny)
+    (hCxNx : Subgroup.centralizer ({x} : Set G) ≤ Nx)
+    (hCyNy : Subgroup.centralizer ({y} : Set G) ≤ Ny)
+    (hy_compl : ∀ M' ∈ S14.maximalSigmaSubgroupsOfElement y,
+      Subgroup.IsComplement' ((OddOrder.BG.Ch3.S10.Msigma Ny).subgroupOf Ny)
+        ((M' ⊓ Ny).subgroupOf Ny))
+    (hxy : x ≠ y) :
+    Disjoint
+      {g : G | ∃ r ∈ (OddOrder.BG.Ch3.S10.Msigma Nx ⊓ Subgroup.centralizer ({x} : Set G)),
+        g = x * r}
+      {g : G | ∃ s ∈ (OddOrder.BG.Ch3.S10.Msigma Ny ⊓ Subgroup.centralizer ({y} : Set G)),
+        g = y * s} := by
+  rw [Set.disjoint_left]
+  rintro g ⟨r, hr, rfl⟩ ⟨s, hs, hgs⟩
+  obtain ⟨hrMσ, hrC⟩ := Subgroup.mem_inf.mp hr
+  obtain ⟨hsMσ, hsC⟩ := Subgroup.mem_inf.mp hs
+  have hrcomm : Commute x r := (Subgroup.mem_centralizer_singleton_iff.mp hrC).symm
+  have hscomm : Commute y s := (Subgroup.mem_centralizer_singleton_iff.mp hsC).symm
+  -- `σ`-decompositions of the two cover elements.
+  have hdecx : S14.sigmaDecomposition (x * r) = insert x ({r} \ {1}) :=
+    S14.sigma_cover_decomposition_signalizer hG hMx hNx hxMx hx1 hxτ2 hrMσ hrcomm
+  -- `y` is a `σ`-part of `g = x·r` (since `g = y·s`).
+  have hymem : y ∈ S14.sigmaDecomposition (x * r) := by
+    rw [hgs]
+    exact S14.mem_sigma_cover_decomposition_signalizer hG hMy hNy hyMy hy1 hyτ2 hsMσ hscomm
+  rw [hdecx, Set.mem_insert_iff] at hymem
+  have hyr : y = r := by
+    rcases hymem with h | h
+    · exact absurd h.symm hxy
+    · exact Set.mem_singleton_iff.mp h.1
+  -- `N_x ∈ 𝓜_σ(y)` and `s = x`.
+  have hyMσNx : y ∈ OddOrder.BG.Ch3.S10.Msigma Nx := hyr ▸ hrMσ
+  have hNxMSy : Nx ∈ S14.maximalSigmaSubgroupsOfElement y := ⟨hNx, hyMσNx⟩
+  have hsx : s = x := by
+    rw [← hyr] at hgs
+    have hcomm_xy : x * y = y * x := hyr.symm ▸ hrcomm
+    rw [hcomm_xy] at hgs
+    exact (mul_left_cancel hgs).symm
+  -- final contradiction via the `y`-centralizer complement at `M' = N_x`.
+  have hxRy : x ∈ OddOrder.BG.Ch3.S10.Msigma Ny ⊓ Subgroup.centralizer ({y} : Set G) := hsx ▸ hs
+  have hxCy : x ∈ Subgroup.centralizer ({y} : Set G) := (Subgroup.mem_inf.mp hxRy).2
+  have hyNx : y ∈ Nx := OddOrder.BG.Ch3.S10.Msigma_le Nx hyMσNx
+  have hxNx : x ∈ Nx := hCxNx (Subgroup.mem_centralizer_singleton_iff.mpr rfl)
+  have hcompl_C := signalizer_centralizer_isComplement (hy_compl Nx hNxMSy) hCyNy hyNx
+  have hmem : (⟨x, hxCy⟩ : Subgroup.centralizer ({y} : Set G)) ∈
+      ((Nx ⊓ Subgroup.centralizer ({y} : Set G)).subgroupOf
+        (Subgroup.centralizer ({y} : Set G))) ⊓
+      ((OddOrder.BG.Ch3.S10.Msigma Ny ⊓ Subgroup.centralizer ({y} : Set G)).subgroupOf
+        (Subgroup.centralizer ({y} : Set G))) :=
+    Subgroup.mem_inf.mpr
+      ⟨Subgroup.mem_subgroupOf.mpr (Subgroup.mem_inf.mpr ⟨hxNx, hxCy⟩),
+        Subgroup.mem_subgroupOf.mpr hxRy⟩
+  rw [hcompl_C.disjoint.eq_bot, Subgroup.mem_bot] at hmem
+  exact hx1 (Subtype.ext_iff.mp hmem)
+
 /-! ## Theorems A--E -/
 
 /-- **BG Theorem A** (mmd L4274): the basic structure of a maximal subgroup:
@@ -1336,6 +1445,105 @@ theorem Msigma_inf_conj_isCyclic [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd
       hG hM hg hApσ hAp hAne hAmeet hCA
   exact S15.isCyclic_of_isMulCommutative_of_rank_le_one habelian hodd hrank
 
+/-- **Dichotomy `|𝓜_σ(x)| ≤ 1 ⟹ C_G(x) ≤ M`** (the converse of
+`maximalSigmaSubgroupsOfElement_eq_singleton_of_centralizer_le`, Coq Theorem 14.4's `not_sCX_M`
+direction): for `x ∈ M_σ^#` with at most one `σ`-maximal, `C_G(x) ≤ M`.  If some `c ∈ C_G(x)` escaped
+`M`, then `Mᶜ` would be a second `σ`-maximal of `x` — `x ∈ Mᶜ` (as `c⁻¹xc = x ∈ M`), so `Mᶜ` is a
+maximal conjugate containing `x`, hence in `𝓜_σ(x)` (`maximalConjugatesContaining_eq_maximalSigma`),
+and `Mᶜ ≠ M` (else `c ∈ N_G(M) = M`) — contradicting `|𝓜_σ(x)| ≤ 1`.  Much shallower than the Coq
+proof's `C(X)`-orbit count: this direction needs only `N_G(M) = M` (maximal self-normalizing,
+inlined). -/
+theorem centralizer_le_of_maximalSigma_le_one [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    {M : Subgroup G} (hM : M ∈ maximalSubgroups G) {x : G}
+    (hxMσ : x ∈ OddOrder.BG.Ch3.S10.Msigma M) (hx1 : x ≠ 1)
+    (hle : (S14.maximalSigmaSubgroupsOfElement x).ncard ≤ 1) :
+    Subgroup.centralizer ({x} : Set G) ≤ M := by
+  have hMne : M ≠ ⊥ := fun h =>
+    OddOrder.BG.Ch3.S10.Msigma_ne_bot hG hM (le_bot_iff.mp (h ▸ OddOrder.BG.Ch3.S10.Msigma_le M))
+  -- `N_G(M) = M`: `M ≤ N_G(M)`, and a proper inclusion forces `M ◁ G` (maximality), excluded by
+  -- simplicity (`M ≠ ⊥, ⊤`).
+  have hNM : Subgroup.normalizer (M : Set G) = M := by
+    refine le_antisymm ?_ Subgroup.le_normalizer
+    rcases eq_or_lt_of_le (Subgroup.le_normalizer (H := M)) with heq | hlt
+    · exact le_of_eq heq.symm
+    · have hnorm : M.Normal :=
+        Subgroup.normalizer_eq_top_iff.mp ((mem_maximalSubgroups.mp hM).2 _ hlt)
+      rcases hG.simple.eq_bot_or_eq_top_of_normal _ hnorm with hbot | htop
+      · exact absurd hbot hMne
+      · exact absurd htop (mem_maximalSubgroups.mp hM).1
+  -- `conj c • M = M → c ∈ N_G(M)`.
+  have hconj_mem : ∀ c : G, MulAut.conj c • M = M → c ∈ Subgroup.normalizer (M : Set G) := by
+    intro c hcfix
+    rw [Subgroup.mem_normalizer_iff]
+    intro n
+    have key : MulAut.conj c • n ∈ MulAut.conj c • M ↔ n ∈ M :=
+      Subgroup.smul_mem_pointwise_smul_iff
+    rw [hcfix, show (MulAut.conj c • n) = (MulAut.conj c) n from rfl, MulAut.conj_apply] at key
+    exact key.symm
+  intro c hc
+  by_contra hcM
+  have hMmem : M ∈ S14.maximalSigmaSubgroupsOfElement x := ⟨hM, hxMσ⟩
+  -- `Mᶜ ∈ 𝓜_σ(x)`: `x ∈ Mᶜ` since `c⁻¹xc = x ∈ M`.
+  have hxcM : x ∈ MulAut.conj c • M := by
+    rw [Subgroup.mem_pointwise_smul_iff_inv_smul_mem]
+    have hcalc : (MulAut.conj c)⁻¹ • x = c⁻¹ * x * c := by
+      change (MulAut.conj c).symm x = _
+      rw [MulAut.conj_symm_apply]
+    rw [hcalc]
+    have hcx : c * x = x * c := Subgroup.mem_centralizer_singleton_iff.mp hc
+    have hxconj : c⁻¹ * x * c = x := by rw [mul_assoc, ← hcx]; group
+    rw [hxconj]
+    exact OddOrder.BG.Ch3.S10.Msigma_le M hxMσ
+  have hconjmem : MulAut.conj c • M ∈ S14.maximalSigmaSubgroupsOfElement x := by
+    rw [← maximalConjugatesContaining_eq_maximalSigma hG hM hxMσ hx1]
+    exact ⟨c, rfl, hxcM⟩
+  -- two members of a `≤ 1`-element set coincide, so `c ∈ N_G(M) = M`.
+  have heq : MulAut.conj c • M = M :=
+    (Set.ncard_le_one (Set.toFinite _)).mp hle _ hconjmem _ hMmem
+  exact hcM (hNM ▸ hconj_mem c heq)
+
+/-- **BG Theorem D(3), full `hD3`** (`∀ x ∈ M_σ^#, ∃ R, RData M x R`): combine the two branches of
+the `|𝓜_σ(x)|` dichotomy.  When `|𝓜_σ(x)| > 1`, `RData_of_gt_one` supplies the signalizer `R(x)`;
+when `|𝓜_σ(x)| ≤ 1`, the dichotomy gives `C_G(x) ≤ M`, whereupon `R = ⊥` works: `C_M(x) = C_G(x)`
+is all of `C_G(x)` (conjunct 1 trivial, conjunct 3 is `⊤ ⋊ ⊥`), `⊥ ◁ C_G(x)`, and `𝓜_σ(x) = {M}`
+makes sharp transitivity vacuous. -/
+theorem exists_RData_of_mem_sigmaSharp [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    {M : Subgroup G} (hM : M ∈ maximalSubgroups G) :
+    ∀ x : G, x ∈ S14.sigmaSharp M → ∃ R : Subgroup G, RData M x R := by
+  intro x hx
+  have hxMσ : x ∈ OddOrder.BG.Ch3.S10.Msigma M := hx.1
+  have hx1 : x ≠ 1 := hx.2
+  by_cases hgt : 1 < (S14.maximalSigmaSubgroupsOfElement x).ncard
+  · exact RData_of_gt_one hG hM hx hgt
+  · have hCxM : Subgroup.centralizer ({x} : Set G) ≤ M :=
+      centralizer_le_of_maximalSigma_le_one hG hM hxMσ hx1 (not_lt.mp hgt)
+    have hMCx : M ⊓ Subgroup.centralizer ({x} : Set G) = Subgroup.centralizer ({x} : Set G) :=
+      inf_eq_right.mpr hCxM
+    have hc1 : Nat.Coprime
+        (Nat.card ↥((M ⊓ Subgroup.centralizer ({x} : Set G)).subgroupOf
+          (Subgroup.centralizer ({x} : Set G))))
+        ((M ⊓ Subgroup.centralizer ({x} : Set G)).subgroupOf
+          (Subgroup.centralizer ({x} : Set G))).index := by
+      rw [hMCx, Subgroup.subgroupOf_self, Subgroup.index_top]; exact Nat.coprime_one_right _
+    have hc2 : ((⊥ : Subgroup G).subgroupOf (Subgroup.centralizer ({x} : Set G))).Normal := by
+      rw [Subgroup.bot_subgroupOf]; infer_instance
+    have hc3 : Subgroup.IsComplement'
+        ((M ⊓ Subgroup.centralizer ({x} : Set G)).subgroupOf (Subgroup.centralizer ({x} : Set G)))
+        ((⊥ : Subgroup G).subgroupOf (Subgroup.centralizer ({x} : Set G))) := by
+      rw [hMCx, Subgroup.subgroupOf_self, Subgroup.bot_subgroupOf]
+      exact Subgroup.isComplement'_top_bot
+    have hc4 : ConjSharplyTransitiveOn (⊥ : Subgroup G) (maximalConjugatesContaining M x) := by
+      have hsingle : maximalConjugatesContaining M x = {M} := by
+        rw [maximalConjugatesContaining_eq_maximalSigma hG hM hxMσ hx1]
+        exact maximalSigmaSubgroupsOfElement_eq_singleton_of_centralizer_le hG hM hxMσ hx1 hCxM
+      rw [hsingle]
+      intro A hA B hB
+      rw [Set.mem_singleton_iff] at hA hB
+      subst hA; subst hB
+      exact ⟨1, ⟨Subgroup.mem_bot.mpr rfl, by rw [map_one, one_smul]⟩,
+        fun r hr => Subgroup.mem_bot.mp hr.1⟩
+    exact ⟨⊥, hc1, hc2, hc3, hc4⟩
+
 /-- **BG Theorem D** (mmd L4317, recovered tail L4368): conjugacy and centralizer
 control for `M_sigma`, including the `R(x)` normal complement, its sharply transitive
 action, and the unique maximal subgroup attached to escaping centralizers.
@@ -1373,7 +1581,7 @@ theorem theoremD_msigma_conjugacy_and_centralizers [Finite G]
   -- (`Msigma_inf_conj_isCyclic`, Lemma 12.17) are proven; D(3)/D(4) are the deep `R(x)`
   -- signalizer normal complement (issue 8019, multi-session).
   refine ⟨msigma_fusion_control hG hM, fun g hg => Msigma_inf_conj_isCyclic hG hM hg, ?_, ?_⟩
-  · sorry
+  · exact exists_RData_of_mem_sigmaSharp hG hM
   · sorry
 
 /-- **BG Theorem E, `σ(Mᵢ)`-disjointness conjunct** (mmd L4370): distinct

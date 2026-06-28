@@ -1286,6 +1286,37 @@ theorem prime_dvd_orderOf_piPart [Finite G] {π : Set ℕ} {p : ℕ} (hp : p.Pri
   · exact h
   · exact absurd hpπ (hpiB p (Nat.mem_primeFactors.mpr ⟨hp, h, (orderOf_pos b).ne'⟩))
 
+/-- **The `π`-part is multiplicative on commuting elements** (Coq `consttM`): for commuting `x, y`,
+`piPart π (x * y) = piPart π x * piPart π y`.  Both `π`-parts are powers of `x`, `y`, so they commute
+(as do the two `π′`-parts and the cross pairs), letting `x * y = (xπ yπ)(xπ′ yπ′)` be rearranged into
+a commuting `π`-element times `π′`-element; uniqueness of the `π`-decomposition
+(`isPiElement_mul_unique`) identifies its `π`-part with `xπ yπ`.  The computational tool behind the
+`σ`-decomposition of a `σ`-cover element `x · R(x)` (BG Lemma 14.5). -/
+theorem piPart_mul_of_commute [Finite G] {π : Set ℕ} {x y : G} (hcomm : Commute x y) :
+    piPart π (x * y) = piPart π x * piPart π y := by
+  obtain ⟨cx, hxmul, hxc, hxπ, hxπ', hxz, hcxz⟩ := piPart_spec π x
+  obtain ⟨cy, hymul, hyc, hyπ, hyπ', hyz, hcyz⟩ := piPart_spec π y
+  obtain ⟨c, hmul, hc, hπ, hπ', -, -⟩ := piPart_spec π (x * y)
+  -- powers of `x` commute with powers of `y` (as `x, y` commute).
+  have hcross : ∀ {a b : G}, a ∈ Subgroup.zpowers x → b ∈ Subgroup.zpowers y → Commute a b := by
+    intro a b ha hb
+    obtain ⟨m, rfl⟩ := Subgroup.mem_zpowers_iff.mp ha
+    obtain ⟨n, rfl⟩ := Subgroup.mem_zpowers_iff.mp hb
+    exact hcomm.zpow_zpow m n
+  have hcyx : Commute (piPart π y) cx := (hcross hcxz hyz).symm
+  have hprod : (piPart π x * piPart π y) * (cx * cy) = x * y := by
+    calc (piPart π x * piPart π y) * (cx * cy)
+        = piPart π x * (piPart π y * cx) * cy := by group
+      _ = piPart π x * (cx * piPart π y) * cy := by rw [hcyx]
+      _ = (piPart π x * cx) * (piPart π y * cy) := by group
+      _ = x * y := by rw [hxmul, hymul]
+  have hABcomm : Commute (piPart π x * piPart π y) (cx * cy) :=
+    Commute.mul_left (Commute.mul_right hxc (hcross hxz hcyz))
+      (Commute.mul_right (hcross hcxz hyz).symm hyc)
+  exact (isPiElement_mul_unique hmul hc hπ hπ' hprod hABcomm
+    (isPiElement_mul_of_commute (hcross hxz hyz) hxπ hyπ)
+    (isPiElement_mul_of_commute (hcross hcxz hcyz) hxπ' hyπ')).1
+
 /-- The `σ(M)`-part of an element `x` (Coq `x.`_{σ(M)}`): its `σ(M)`-component in the two-block
 π-part decomposition. -/
 noncomputable def sigmaPart [Finite G] (M : Subgroup G) (x : G) : G :=
@@ -1363,6 +1394,144 @@ theorem sigmaPart_eq_self_or_one_of_isPiElement_sigma [Finite G]
       exact OddOrder.BG.Ch3.S10.sigma_conj g (hx p hp)))
   · refine Or.inr (piPart_eq_one_of_isPiElement_compl (fun p hp hpL => ?_))
     exact Set.disjoint_left.mp (sigma_disjoint_of_nonconjugate hG hM hL hconj) (hx p hp) hpL
+
+/-- **Directed `sigmaPart`, conjugate case**: a `σ(M)`-element is fixed by the `σ(L)`-part when `L`
+is `M`-conjugate (`σ(L) = σ(M)`). -/
+theorem sigmaPart_eq_self_of_conj [Finite G] {M : Subgroup G} {x : G}
+    (hx : IsPiElement (OddOrder.BG.Ch3.S10.sigma M) x) {L : Subgroup G}
+    (hconj : ∃ g : G, MulAut.conj g • M = L) : sigmaPart L x = x := by
+  simp only [sigmaPart]
+  obtain ⟨g, rfl⟩ := hconj
+  exact piPart_self_of_isPiElement (fun p hp => by
+    haveI : Fact p.Prime := ⟨Nat.prime_of_mem_primeFactors hp⟩
+    exact OddOrder.BG.Ch3.S10.sigma_conj g (hx p hp))
+
+/-- **Directed `sigmaPart`, non-conjugate case**: a `σ(M)`-element has trivial `σ(L)`-part when `L`
+is *not* `M`-conjugate (`σ(M) ∩ σ(L) = ∅`). -/
+theorem sigmaPart_eq_one_of_not_conj [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    {M : Subgroup G} (hM : M ∈ maximalSubgroups G) {x : G}
+    (hx : IsPiElement (OddOrder.BG.Ch3.S10.sigma M) x) {L : Subgroup G}
+    (hL : L ∈ maximalSubgroups G) (hnconj : ¬ ∃ g : G, MulAut.conj g • M = L) :
+    sigmaPart L x = 1 := by
+  simp only [sigmaPart]
+  exact piPart_eq_one_of_isPiElement_compl (fun p hp hpL =>
+    Set.disjoint_left.mp (sigma_disjoint_of_nonconjugate hG hM hL hnconj) (hx p hp) hpL)
+
+/-- **σ-decomposition of a `σ`-cover element** (Coq `sigma_cover_decomposition`, BG remark above
+Lemma 14.5): for a nonidentity `σ(M)`-element `x`, a `σ(N)`-element `x'` with `M`, `N`
+non-conjugate, and `x`, `x'` commuting, `sigma_decomposition (x * x') = {x} ∪ {x'}^#`.  Each `σ(L)`-part
+of `x * x'` is `sigmaPart L x · sigmaPart L x'` (`piPart_mul_of_commute`); as `M`, `N` are
+non-conjugate, no `L` is conjugate to both, so that part is `x` (`L ∼ M`), `x'` (`L ∼ N`) or `1`. -/
+theorem sigma_cover_decomposition [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    {M N : Subgroup G} (hM : M ∈ maximalSubgroups G) (hN : N ∈ maximalSubgroups G)
+    (hMN : ¬ ∃ g : G, MulAut.conj g • M = N)
+    {x x' : G} (hxM : x ∈ OddOrder.BG.Ch3.S10.Msigma M) (hx1 : x ≠ 1)
+    (hx'N : x' ∈ OddOrder.BG.Ch3.S10.Msigma N) (hcomm : Commute x x') :
+    sigmaDecomposition (x * x') = insert x ({x'} \ {1}) := by
+  classical
+  have hxσ : IsPiElement (OddOrder.BG.Ch3.S10.sigma M) x := isPiElement_sigma_of_mem_Msigma hxM
+  have hx'σ : IsPiElement (OddOrder.BG.Ch3.S10.sigma N) x' := isPiElement_sigma_of_mem_Msigma hx'N
+  -- conjugacy is symmetric, so `N` is not `M`-conjugate either.
+  have hNM : ¬ ∃ g : G, MulAut.conj g • N = M := by
+    rintro ⟨g, hg⟩
+    exact hMN ⟨g⁻¹, by rw [← hg, ← mul_smul, ← map_mul, inv_mul_cancel, map_one, one_smul]⟩
+  have hpart : ∀ L : Subgroup G, sigmaPart L (x * x') = sigmaPart L x * sigmaPart L x' := fun L => by
+    simp only [sigmaPart]; exact piPart_mul_of_commute hcomm
+  ext y
+  simp only [sigmaDecomposition, Set.mem_diff, Set.mem_setOf_eq, Set.mem_singleton_iff,
+    Set.mem_insert_iff]
+  constructor
+  · rintro ⟨⟨L, hL, rfl⟩, hne⟩
+    rw [hpart L] at hne ⊢
+    by_cases hLM : ∃ g : G, MulAut.conj g • M = L
+    · by_cases hLN : ∃ g : G, MulAut.conj g • N = L
+      · exfalso
+        obtain ⟨g, hg⟩ := hLM; obtain ⟨h, hh⟩ := hLN
+        refine hMN ⟨h⁻¹ * g, ?_⟩
+        have hgh : MulAut.conj g • M = MulAut.conj h • N := hg.trans hh.symm
+        rw [map_mul, mul_smul, hgh, ← mul_smul, ← map_mul, inv_mul_cancel, map_one, one_smul]
+      · left
+        rw [sigmaPart_eq_self_of_conj hxσ hLM,
+          sigmaPart_eq_one_of_not_conj hG hN hx'σ hL hLN, mul_one]
+    · by_cases hLN : ∃ g : G, MulAut.conj g • N = L
+      · right
+        have hval : sigmaPart L x * sigmaPart L x' = x' := by
+          rw [sigmaPart_eq_one_of_not_conj hG hM hxσ hL hLM,
+            sigmaPart_eq_self_of_conj hx'σ hLN, one_mul]
+        exact ⟨hval, hval ▸ hne⟩
+      · exact absurd (by rw [sigmaPart_eq_one_of_not_conj hG hM hxσ hL hLM,
+          sigmaPart_eq_one_of_not_conj hG hN hx'σ hL hLN, mul_one]) hne
+  · rintro (rfl | ⟨rfl, hne⟩)
+    · refine ⟨⟨M, hM, ?_⟩, hx1⟩
+      rw [hpart M, sigmaPart_eq_self_of_conj hxσ ⟨1, by rw [map_one, one_smul]⟩,
+        sigmaPart_eq_one_of_not_conj hG hN hx'σ hM hNM, mul_one]
+    · refine ⟨⟨N, hN, ?_⟩, hne⟩
+      rw [hpart N, sigmaPart_eq_one_of_not_conj hG hM hxσ hN hMN,
+        sigmaPart_eq_self_of_conj hx'σ ⟨1, by rw [map_one, one_smul]⟩, one_mul]
+
+/-- **The signalizer maximal is not `M`-conjugate** (the `M, N` non-conjugacy behind the cover
+decomposition): a nonidentity `σ(M)`-element `x` that is also a `τ₂(N)`-element forces `M`, `N`
+non-conjugate.  If `M ∼ N` then `σ(M) = σ(N)`, so a prime `q ∣ |x|` lies in `σ(N)`; but `q ∈ τ₂(N) ⊆
+σ(N)ᶜ` (`tau2_subset_sigma_compl`) — contradiction.  In the FT signalizer context `x ∈ M_σ^#` is a
+`τ₂(N)`-element for the signalizer maximal `N` (`signalizer_structure_of_mem_sigmaSharp`). -/
+theorem not_conj_of_mem_Msigma_of_tau2 [Finite G] {M N : Subgroup G}
+    {x : G} (hxM : x ∈ OddOrder.BG.Ch3.S10.Msigma M) (hx1 : x ≠ 1)
+    (hxτ2 : ∀ p ∈ piSet (Subgroup.closure ({x} : Set G)), p ∈ tau2 N) :
+    ¬ ∃ g : G, MulAut.conj g • M = N := by
+  rintro ⟨g, hg⟩
+  obtain ⟨q, hqp, hqdvd⟩ :=
+    (orderOf x).exists_prime_and_dvd (fun h => hx1 (orderOf_eq_one_iff.mp h))
+  haveI : Fact q.Prime := ⟨hqp⟩
+  have hqσM : q ∈ OddOrder.BG.Ch3.S10.sigma M :=
+    isPiElement_sigma_of_mem_Msigma hxM q (Nat.mem_primeFactors.mpr ⟨hqp, hqdvd, (orderOf_pos x).ne'⟩)
+  have hqσN : q ∈ OddOrder.BG.Ch3.S10.sigma N := hg ▸ OddOrder.BG.Ch3.S10.sigma_conj g hqσM
+  have hcardx : Nat.card ↥(Subgroup.closure ({x} : Set G)) = orderOf x := by
+    rw [← Subgroup.zpowers_eq_closure, Nat.card_zpowers]
+  have hqπ : q ∈ piSet (Subgroup.closure ({x} : Set G)) := by
+    rw [piSet, Set.mem_setOf_eq, hcardx]
+    exact Nat.mem_primeFactors.mpr ⟨hqp, hqdvd, (orderOf_pos x).ne'⟩
+  exact tau2_subset_sigma_compl N (hxτ2 q hqπ) hqσN
+
+/-- **σ-decomposition of a cover element in the signalizer context** (`sigma_cover_decomposition`
+specialized to `N` = the signalizer maximal): for `x ∈ M_σ^#` a `τ₂(N)`-element and `x' ∈ N_σ`
+commuting with `x`, `sigma_decomposition (x * x') = {x} ∪ {x'}^#`.  The `M, N` non-conjugacy needed by
+`sigma_cover_decomposition` is supplied by `not_conj_of_mem_Msigma_of_tau2`.  Discharges the cover
+decomposition that BG Lemma 14.5(a) (`sigma_cover_disjoint`) reads off. -/
+theorem sigma_cover_decomposition_signalizer [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    {M N : Subgroup G} (hM : M ∈ maximalSubgroups G) (hN : N ∈ maximalSubgroups G)
+    {x x' : G} (hxM : x ∈ OddOrder.BG.Ch3.S10.Msigma M) (hx1 : x ≠ 1)
+    (hxτ2 : ∀ p ∈ piSet (Subgroup.closure ({x} : Set G)), p ∈ tau2 N)
+    (hx'N : x' ∈ OddOrder.BG.Ch3.S10.Msigma N) (hcomm : Commute x x') :
+    sigmaDecomposition (x * x') = insert x ({x'} \ {1}) :=
+  sigma_cover_decomposition hG hM hN (not_conj_of_mem_Msigma_of_tau2 hxM hx1 hxτ2) hxM hx1 hx'N hcomm
+
+/-- **`x` is a `σ`-part of the cover element `x · x'`** (Coq `mem_sigma_cover_decomposition`): immediate
+from `sigma_cover_decomposition_signalizer`, `x ∈ {x} ∪ {x'}^#`.  Used in BG Lemma 14.5(a). -/
+theorem mem_sigma_cover_decomposition_signalizer [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    {M N : Subgroup G} (hM : M ∈ maximalSubgroups G) (hN : N ∈ maximalSubgroups G)
+    {x x' : G} (hxM : x ∈ OddOrder.BG.Ch3.S10.Msigma M) (hx1 : x ≠ 1)
+    (hxτ2 : ∀ p ∈ piSet (Subgroup.closure ({x} : Set G)), p ∈ tau2 N)
+    (hx'N : x' ∈ OddOrder.BG.Ch3.S10.Msigma N) (hcomm : Commute x x') :
+    x ∈ sigmaDecomposition (x * x') := by
+  rw [sigma_cover_decomposition_signalizer hG hM hN hxM hx1 hxτ2 hx'N hcomm]
+  exact Set.mem_insert x _
+
+/-- **BG Corollary 14.10 (cover form): `ℓ_σ(x · x') ≤ 2`** (Coq `ell_sigma_cover`): a `σ`-cover
+element has `σ`-length at most two, since its `σ`-decomposition `{x} ∪ {x'}^#` has at most two
+elements (`sigma_cover_decomposition_signalizer`). -/
+theorem sigmaLength_cover_le_two_signalizer [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    {M N : Subgroup G} (hM : M ∈ maximalSubgroups G) (hN : N ∈ maximalSubgroups G)
+    {x x' : G} (hxM : x ∈ OddOrder.BG.Ch3.S10.Msigma M) (hx1 : x ≠ 1)
+    (hxτ2 : ∀ p ∈ piSet (Subgroup.closure ({x} : Set G)), p ∈ tau2 N)
+    (hx'N : x' ∈ OddOrder.BG.Ch3.S10.Msigma N) (hcomm : Commute x x') :
+    sigmaLength (x * x') ≤ 2 := by
+  rw [sigmaLength, sigma_cover_decomposition_signalizer hG hM hN hxM hx1 hxτ2 hx'N hcomm]
+  have h1 : ({x'} \ {1} : Set G).ncard ≤ 1 :=
+    (Set.ncard_le_ncard Set.diff_subset (Set.finite_singleton x')).trans
+      (le_of_eq (Set.ncard_singleton x'))
+  calc (insert x ({x'} \ {1} : Set G)).ncard
+      ≤ ({x'} \ {1} : Set G).ncard + 1 := Set.ncard_insert_le x _
+    _ ≤ 2 := by omega
 
 /-- **BG `Msigma_ell1`** (Coq BGsection14): a nonidentity element of `M_σ` has σ-length `1`.  As a
 `σ(M)`-element, its σ-decomposition collapses to the single block `{x}`: every `σ(L)`-part is `x`

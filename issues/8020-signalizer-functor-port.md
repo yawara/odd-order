@@ -301,3 +301,136 @@ HUB 裁定 (δ-internal、再設計可) を受け修正完了 (commits `dcd1ace9
 の逆、Coq の transitive `C(X)`-action + orbit-count、deep)。これが closed すれば hD3 完全。
 **教訓**: 「deep」評価は証明戦略依存 — 正しい engine (`subcent_sdprod`) を Coq で確認すれば tractable だった
 ([[scaffold-sorry-free-not-done]] と同系、原文の証明本体を読め)。次 = (1) ≤1 枝 (hard direction) or (2) hD4 gaps。
+
+## ✅ 進捗 (lane d, 2026-06-29 cont.⁷ — /loop): full hD3 完成 — theoremD の hD3 conjunct を discharge
+
+**前ノートが「deep (Coq `not_sCX_M` 逆向き、C(X)-transitive-action port 要)」とした dichotomy
+`|𝓜_σ(x)| ≤ 1 ⟹ C_G(x) ≤ M` も実は浅かった** (conjunct 3 に続く 2 度目の過大評価)。直接論法:
+`c ∈ C[x]\M` なら `Mᶜ ∈ 𝓜_σ(x)` (`x∈Mᶜ` ∵ `c⁻¹xc=x∈M`、`maximalConjugatesContaining_eq_maximalSigma`)
+かつ `Mᶜ≠M` (∵ `c∉N(M)=M`) ⟹ `|𝓜_σ(x)|≥2`。**C(X)-orbit count 不要、`N(M)=M` (maximal
+self-normalizing) のみ**。
+
+**landed (axiom-clean、full build green)**:
+- `centralizer_le_of_maximalSigma_le_one` (S16): dichotomy (`≤1 ⟹ C[x]≤M`、`N(M)=M` inline)。
+- `exists_RData_of_mem_sigmaSharp` (S16): **full hD3** = `>1` 枝 (`RData_of_gt_one`) + `≤1` 枝
+  (`C[x]≤M ⟹ R=⊥`: `C_M(x)=C[x]` で conjunct 1 trivial / conjunct 3 = `⊤⋊⊥` / `𝓜_σ(x)={M}` で
+  sharp trans vacuous)。
+- **`theoremD_msigma_conjugacy_and_centralizers` の hD3 conjunct を discharge** (S16, `· sorry` →
+  `· exact exists_RData_of_mem_sigmaSharp hG hM`)。
+
+**∴ Theorem D(3) (hD3) 完全 proven。残 theoremD = hD4 のみ** (`∃!N` with `MF=Msigma`/`ASet`/`P2→Frobenius`
+gaps; ただし dichotomy が `¬(C[x]≤M)⟹>1` も供給ゆえ structure 適用は可能、残は `∃!N` の N-構造 gaps)。
+**教訓 (再): 「deep」は証明戦略依存** — 2 度連続で BG §16 の「deep」評価が誤りだった (conjunct 3 / dichotomy)。
+原文の証明本体を読み、正しい補題 (`subcent_sdprod` / 直接 2-element argument) を確認すれば浅い。
+
+## ✅ 進捗 (lane d, 2026-06-29 cont.⁸ — /loop): `|R(x)|=|𝓜_σ(x)|` (Coq oR) + FT-path 解剖
+
+**`card_signalizer_eq_card_maximalSigma`** (S16、axiom-clean): RData の sharp transitivity
+(`ConjSharplyTransitiveOn`) を `R ≤ C_G(x)` の closure と合わせ bijection `R ≃ 𝓜_σ(x)` を構成 →
+`|R|=|𝓜_σ(x)|` (Coq `oR`)。⟹ **FT_signalizer_context 第1連言ブロック完成** (transitive ✓ / `|R|=|𝓜_σ(x)|`
+✓ / `R◁C[x]` ✓ / Hall ✓)。BG Theorem E の `|M̃|=(|M_σ|−1)·[G:M]` (Lemma 14.5c) の count 基盤。
+
+**🔑 FT-path 解剖 (重要・次セッション handoff)**: spine consumer = `card_LF_coprime_pq`
+(`Peterfalvi/S15_SAndT:463`, lane c, sorry)。依存鎖:
+```
+card_LF_coprime_pq (spine, lane c)  ←  bgTheoremE_cover_data (Pf 8.17, Peterfalvi/S10:570, sorry, owner=δ)
+  ←  BG Theorem E (theoremE_sigma_partition_and_counting, S16:1598, sorry, lane d)
+    ←  RData / hD3 ✅ (本セッション完成)
+```
+- **`card_LF_coprime_pq` が実際に使うのは `BGTheoremECoverData.primeFactors_disjoint` のみ** (S15_SAndT:455
+  derivation note)。partition core は **既に proven** (`sigma_reps_pairwise_disjoint` /
+  `sigma_reps_prime_cover` / `exists_reps_sigma_partition`、S16)。
+- **だが `bgTheoremE_cover_data` (S10:570) は full struct を要求**: `primeFactors_disjoint` (partition ✅) +
+  **`thickenedA1_card` (14.5c R(x) cardinality、deep)** + G# cover (`BGTheoremETypeICovering` 等)。
+  しかも struct fields は Peterfalvi `mainSubgroup`/`π` 表現 (BG `σ(Mᵢ)`/`Msigma` でなく) ⟹ 翻訳要
+  (`(Mᵢ)_s=M_F` for type I)。
+- **⟹ 次の FT-path 選択肢**: (A) **14.5c (thickenedA1_card) を port** = `|R|=|𝓜_σ(x)|` (本セッション) を土台に
+  `|M̃|=(|M_σ|−1)·[G:M]` の coset count (deep、BG Lemma 14.5c) → theoremE → bgTheoremE_cover_data 完成 →
+  spine unblock。 (B) **cross-lane: `card_LF_coprime_pq` を partition-only lemma に refactor** (lane c 協調要、
+  bgTheoremE_cover_data の deep cardinality を bypass、最短 spine unblock だが lane 境界越え)。 (C) hD4
+  (theoremD 完成だが δ-internal、spine 非直結)。**推奨 = (A)** (genuine 上流・lane-d 単独・hD3 の自然な続き)。
+**教訓: spine consumer が full struct を cite していても、実使用 field を grep 確認** (card_LF は disjoint のみ)。
+
+## ✅ 進捗 (lane d, 2026-06-29 cont.⁹ — /loop): `piPart_mul_of_commute` (Coq consttM) — 14.5c cluster の基礎工具
+
+14.5c (cardinality) cluster の依存を Coq で精査:
+```
+14.5c card_class_support_sigma (|M̃^G|=(|M_σ|−1)·[G:M])
+  ← 14.5a sigma_cover_disjoint (x·R[x] ∩ y·R[y]=∅)  ← FT_signalizer uniqueness (∃!N) + sdprod tiRyNx + σ-cover-decomp
+  + cover identity (M̃^G = ⋃ x·R[x]) + exchange_big double-count + orbit-stabilizer ([G:M])
+  ← sigma_cover_decomposition (σ-decomp(x·x')={x,x'}, Coq Remark @BGsection14:1055)  ← **consttM (π-part of commuting product)**
+```
+**`piPart_mul_of_commute`** (S14、axiom-clean、AxiomsCheck 登録): `Commute x y ⟹ piPart π (x*y)=piPart π x · piPart π y`。
+証明 = 両 π-part/π′-part は x,y の冪ゆえ pairwise commute (`hcomm.zpow_zpow`) → `x*y=(xπ yπ)(xπ′ yπ′)` を rearrange →
+`isPiElement_mul_unique` で π-part 同定。汎用・再利用可 (Coq consttM)。
+
+**残 14.5c cluster (上流順、全 deep multi-session)**:
+1. **`sigma_cover_decomposition`** (σ-decomp(x·x')={x}∪{x'}^# for ℓ_σ(x)=1, x'∈R[x]): `piPart_mul_of_commute`
+   (本セッション) で `sigmaPart L (x·x') = sigmaPart L x · sigmaPart L x'` 化 + structure の σ(M)/σ(N)/τ2 関係
+   (x は τ2(N)-elt, x' は σ(N)-elt) で {x,x'} に collapse。**structure type info 要**。
+2. **14.5a `sigma_cover_disjoint`**: 上記 + FT_signalizer uniqueness (∃!N, structure 供給) + sdprod 自明交差
+   (`signalizer_centralizer_isComplement` の IsComplement' = disjoint)。
+3. **14.5c**: cover identity (set 操作) + double-count (`|R|=|𝓜_σ(x)|` ✅ 本セッション + 14.5a disjoint で trivIset) +
+   orbit-stabilizer for [G:M] (`ncard_conjugates_eq_index_of_normalizer_eq_self` S14:4749 在庫)。
+**次 = sigma_cover_decomposition** (piPart_mul_of_commute の自然な consumer)。
+
+## ✅ 進捗 (lane d, 2026-06-29 cont.¹⁰ — /loop): `sigma_cover_decomposition` (Coq BGsection14:1055)
+
+**`sigma_cover_decomposition`** (S14、axiom-clean): `M,N` non-conj・`x∈M_σ^#`・`x'∈N_σ`・`Commute x x'`
+⟹ `sigma_decomposition (x*x') = {x} ∪ {x'}^#`。**Coq の `constt'` route を回避し直接証明**:
+`sigmaPart L (x*x') = sigmaPart L x · sigmaPart L x'` (piPart_mul_of_commute) で各 σ(L)-part を分解、
+`L∼M`/`L∼N`/どちらでもない の by_cases (M,N non-conj で「両方」を排除) → part は `x`/`x'`/`1`。
+- 補助 (directed `sigmaPart`): `sigmaPart_eq_self_of_conj` (L∼M ⟹ sigmaPart L x=x) /
+  `sigmaPart_eq_one_of_not_conj` (L≁M ⟹ sigmaPart L x=1、σ-disjoint 経由)。再利用可。
+
+**残 14.5c cluster (上流順)**: 1. **14.5a `sigma_cover_disjoint`** (`x·R[x] ∩ y·R[y]=∅`): sigma_cover_decomposition
+(本) で共通元の σ-decomp を {x}∪{x'} と {y}∪{y'} に同定 → x=y or 矛盾 (FT_signalizer uniqueness ∃!N
+[structure] + sdprod 自明交差 [`signalizer_centralizer_isComplement`])。 2. 14.5c (cover identity + double-count
+[`card_signalizer_eq_card_maximalSigma` ✅] + orbit [S14:4749])。3. theoremE assemble → bgTheoremE_cover_data。
+**次 = 14.5a sigma_cover_disjoint**。但し cover 文脈では M,N non-conj を structure t2Nx (x τ2(N)-elt vs σ(M)-elt) で要供給。
+
+## ✅ 進捗 (lane d, 2026-06-29 cont.¹¹ — /loop): cover-decomp の structure 配線 (14.5a 直前)
+
+- **`not_conj_of_mem_Msigma_of_tau2`** (S14、axiom-clean、reusable): x∈M_σ^# が τ2(N)-elt ⟹ M,N non-conj
+  (M∼N なら σM=σN ∋ q|x, だが q∈τ2(N)⊆σ(N)ᶜ 矛盾)。**14.5a も使う M,N 非共役の核**。
+- **`sigma_cover_decomposition_signalizer`** (S14): 上記 + `sigma_cover_decomposition` の合成 = structure
+  context での cover decomp (x∈M_σ^#・τ2(N)・x'∈N_σ・commute ⟹ σ-decomp(x*x')={x}∪{x'}^#)。
+**14.5c cluster 進捗**: consttM ✅ → sigma_cover_decomposition ✅ → cover-decomp 配線 ✅ → **[残] 14.5a
+sigma_cover_disjoint** (signalizer for 2 elements x,y + sdprod 自明交差) → 14.5c (cover+count+orbit) → theoremE。
+次 = 14.5a。
+
+**cont.¹² 追記**: cover-decomp の corollary 2 本 (axiom-clean): `mem_sigma_cover_decomposition_signalizer`
+(x∈σ-decomp(x*x')、14.5a 部品) + **`sigmaLength_cover_le_two_signalizer` = BG Cor 14.10** (ℓ_σ(x*x')≤2、
+σ-decomp={x}∪{x'}^# が ≤2 元)。**14.5a の core (2-element signalizer + sdprod、~100 行 intricate) は次セッション**:
+g∈x·R(x)∩y·R(y) ⟹ y=x' (cover-decomp) ⟹ x∈R(y)∩(N[x]⊓C[y]) = ⊥ (signalizer_centralizer_isComplement
+を M'=N[x]/y に適用) ⟹ x=1 矛盾。structure を x,y 両方に適用 (signalizer_structure_of_mem_sigmaSharp、
+general ℓ_σ=1 は 𝓜_σ(x)≠∅ から M 抽出)。
+
+**🔑 cont.¹³ scoping (14.5a 実装 key insight, 次セッションの土台)**:
+- **structure の R (`Msigma N_x ⊓ C[x]`, N_x = ∃!N を `choose`) を使う; canonical `FT_signalizer` を使わない**
+  ⟹ `FT_signalizerBase x = N_x` の uniqueness bridge (`𝓜('C[x])={N}`, hD4 linchpin, deep) を**回避**。
+  theoremE は R を parameter で取る (`hR : RData M x (R M x)`) ので canonical 不要、structure の R で OK。
+- 精密 step (全 piece 在庫): (1) x,y に `signalizer_structure_of_mem_sigmaSharp` 適用 (N_x,N_y, choose) →
+  R_x=Msigma N_x⊓C[x], R_y=Msigma N_y⊓C[y]。 (2) g=x·r=y·s (r∈R_x,s∈R_y)。`sigma_cover_decomposition_signalizer`
+  (x の M_x,N_x,τ2) で σ-decomp(g)={x}∪{r}^#; 同 y で ={y}∪{s}^#。`mem_sigma_cover_decomposition_signalizer`
+  で y∈σ-decomp(g)。y≠x ⟹ **y=r∈R_x⊆Msigma N_x** ⟹ N_x∈𝓜_σ(y)。 (3) x=s'... 正確には x=y' from
+  x·r=y·s,r=y ⟹ s=x (commute) ⟹ **x∈R_y**。 (4) structure(y) の ∀M' clause を M'=N_x∈𝓜_σ(y) に適用 →
+  `IsComplement'((Msigma N_y).subgroupOf N_y)((N_x⊓N_y).subgroupOf N_y)` → `signalizer_centralizer_isComplement`
+  (a=y, M=N_x, N=N_y; y∈N_x ∵ y∈Msigma N_x) → `IsComplement'((N_x⊓C[y])..)((Msigma N_y⊓C[y])..)`。
+  x∈両factor (x∈N_x⊓C[y] [x∈N_x via C[x]≤N_x; x∈C[y] via commute] かつ x∈R_y=Msigma N_y⊓C[y]) →
+  `.disjoint` で x=1 矛盾。 (5) ⚠ branch: |𝓜_σ(x)|=1 (R_x=⊥) では x·R_x={x}; この場合の disjoint も要処理。
+- ⚠ **長い grind 継続中** (14.5a→14.5c→theoremE→bgTheoremE→spine)。高速代替 = cross-lane refactor
+  (card_LF を partition-only 化、lane c 協調) を hub/user 判断で検討推奨。
+
+## ✅ 進捗 (lane d, 2026-06-29 cont.¹⁴ — /loop): **BG Lemma 14.5(a) core 完成** (sigma_cover_disjoint_of_inputs)
+
+**`sigma_cover_disjoint_of_inputs`** (S16、axiom-clean、cluster 最難ピース): 異なる ℓ_σ=1 元 x,y の
+cover coset `x·R(x)`, `y·R(y)` (R=Msigma N⊓C) は disjoint。証明 = 共通元 g=x·r=y·s ⟹
+σ-decomp で `{x}∪{r}^#={y}∪{s}^#` ⟹ y=r, s=x ⟹ x が y-centralizer complement (M'=N_x) の自明交差に
+落ちる (`signalizer_centralizer_isComplement`) ⟹ x=1 矛盾。`_of_inputs` 形 (structure data を hyp、choose 回避)。
+plan 通り完遂 (1 build fix: `Set.mem_diff.mp`→`.1`)。
+
+**残 14.5c**: (1) wrapper (structure 抽出で cover の canonical R に接続) (2) **14.5c cardinality**: cover
+identity (M̃^G=⋃x·R(x)) + trivIset (14.5a ✅) + double-count (|R|=|𝓜_σ| ✅ `card_signalizer`) +
+orbit-stabilizer ([G:M] `ncard_conjugates_eq_index_of_normalizer_eq_self` S14:4749) (3) theoremE assemble。
+**14.5c cluster の数学核 (consttM/cover-decomp/14.5a) 完了; 残は assembly 寄り**。次 = 14.5c cardinality 組立。
