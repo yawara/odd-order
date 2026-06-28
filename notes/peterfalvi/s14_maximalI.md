@@ -344,3 +344,31 @@ char/§8-gated で手詰まり」評価は**誤り**(= 新方針が根絶する�
 **実装順(上流順)**: (12.2) faithful 化 → (12.3)-(12.5) → (12.13)-(12.15)+(1.10) → (12.16) →
 `pi_empty`/`typeI_frobenius`/headline unblock。正本 issue = 0081。
 [[scaffold-sorry-free-not-done]] [[feedback-cite-sorried-lemmas-if-signature-correct]]
+
+## 2026-06-28 (lane-b=β loop): (12.2) genuine 完成 + (12.3)-(12.5) 埋め方確定
+
+**(12.2) 完成** (commits 8574ef2a + edf58329, full build 3886 green):
+- (12.2.b) `exists_signedFamily_of_constituents` (R(χ) 構成 core): degree-equal constituent family の差分
+  を Dade isometry で signed family に ((1.4) `isometry_difference_pair_structure`)。3条件は Dade package
+  (`dadeIntegralCharacterMap_{mem_ZIrr_of_supported,apply_one_eq_zero,inner_eq_on_supported_span}`) で
+  discharge。**instance 統一の知見** (§12 全体で再利用): helper を `[Fintype G]` binder でなく
+  `haveI := hyp.finiteG` + `S12.FiniteInduce` scope (= `Hypothesis.tau` と同 context) にして hyp.tau の
+  instance と一致させる。binder の `[Fintype G]` は hyp.finiteG synthesize と非一致で whnf timeout +
+  instance desync。
+- (12.2) carrier `CharacterDecompositionData` genuine 化 (constituents/decomp/equal_degree/not_real/
+  supported)。(12.2.a) `character_decomposition_and_dade_domain` genuine assembly (sorry-free): §8 型 F
+  char fact を obligation **`typeI_induced_char_constituents`** (genuine statement, body=§8 型 F Clifford:
+  (8.2.c) inertia + (1.7.c)/(1.5.a)/(1.2)) に isolate。
+
+**(12.3)-(12.5) 埋め方確定 (次イテレーション実装)**:
+- ⚠ **現 (12.4)/(12.5) statement は `R` free で unsound** (R=∅ で horth trivial、結論 ψ constant は ψ
+  任意で偽; (12.3) も R1=R2=∅ で vacuous)。**R を genuine R(χ) に bind 必須**。
+- **R(χ) = ∪_{φ∈constituents} R₁(φ)**。R₁(φ) = `exists_signedFamily_of_constituents` を family=![φ, φ̄]
+  (Fin 2) に適用した signed family (imageSet = {sign·μ₁, −sign·μ₀})。φ̄=conj (`Sset_closedUnderConjugate`
+  の `(θ:CF).conj` + `θ.isIrreducible.conj` パターン)。hyp discharge: hinj←not_real (φ≠φ̄)、hdeg←conj
+  次数保存、hsupp←supported。
+- **実装**: CharacterDecompositionData に `Rfamily : (φ∈constituents)→OrthonormalCharacterImageFamily
+  hyp.tau φ` field 追加 (obligation で供給) → R(χ) derive。(12.3)-(12.5) を R(χ) consume に faithful 化。
+- **(12.4)/(12.5) 証明 core = `CharacterPsiDecomposition`** (S07_Coherence:1110, ψ⊥R ⟹ Res_L ψ 分解)。
+  S08 certain-type で多用、型 I 適用要確認。+ §8 ((8.12.c) A(L)−H# TI)、§1 ((1.4))、[Is] 6.2/7.7。
+- **(12.3)** = (8.18.c) Ã disjoint + (5.9) + Supp((φ−φ̄)^τ)⊆Ã(L) disjoint で R(χ₁)⊥R(χ₂)。
