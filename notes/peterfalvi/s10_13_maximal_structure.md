@@ -430,3 +430,40 @@ and (11.8)"。
    で排除、∴ w₂<w₁。**(11.9.b) の reduction 論理は完成**、残 = `h118` (= genuine (11.8)) の discharge (step 2)。
 4. **carrier 構成 + 翻訳**: type III/IV maximal S → `exists_hypothesis_of_typeIIIorIVorV` で S12.Hypothesis、
    q=w₁=|K|, p=w₂=|K*| に翻訳 → `card_kappaHall_lt_of_isTypeIIIorIV` (FeitThompson:426)。
+
+---
+
+## 12. Lane A (α) 立ち上げ 2026-06-28 — §9 keystone `caseB_degree_qu` (9.9.a) 進行中
+
+新体制 (lane a/b/c/d, 正本 `notes/meta/ft_lane_reallocation_2026_06_28.md`) で Lane A = クラスタ α
+(Pf §10–13 中央指標核) を立ち上げ。最上流 §9 (repo `S11`) の keystone から着手。
+
+**⚠ stale 訂正**: §1 の「§9 carrier `Section11CharacterData` は opaque/never-constructed」は **stale**。
+実コードでは carrier は materialize 済 (`S11:1477`「formerly free fields are pinned to genuine
+constructions」、`C := cSub`, `X := xiSet`, `S/SOf` も genuine def)。`clifford_dichotomy` (9.7) も
+sorry-free。⟹ §9 counts (9.8/9.9/9.10) は genuine に証明可能 (carrier gate は消滅済)。
+
+**`caseB_degree_qu` (9.9.a, `S11:3454`)** = 「𝒮(H₀C') の各元は degree qu」。Clifford degree
+`χ(1)=[HU:HC]` を `apply_one_eq_index_of_liesOver_linear_inertia` で出す skeleton は既存。3 obligation:
+
+- ✅ **obligation 1 (θ₀ 抽出)** DONE (commit `46e474d9`): χ∈𝒳(H₀C') から nontrivial chief-factor
+  constituent θ を `exists_constituent_not_subset_characterKernel` で抽出 → kernel 継承 (新 helper
+  `liesOver_mem_characterKernel`、S08 `characterKernel_subset_of_isCharacter_of_inner_ne_zero` cite)
+  で θ が N-trivial → `exists_compHom_eq_of_subset_characterKernel` で θ=compHom(hInHuEquivH)(inflate θbar)
+  に同定 → inertia=HC は既証明 `inertia_eq_hcInHu`、θ₀(1)=1 は H̄ 可換 ⟹ θbar linear。
+- ✅ **obligation 4 の数学核** DONE (commit `62fce025`): `hInHu_inf_uInHu_le_cInHu` (`H⊓U≤C_U(H̄)`、
+  H̄ 可換ゆえ H 元の共役は H̄ 上自明) + `uInHu_inf_hcInHu_eq_cInHu` (`U⊓HC=C`)。これが `[HU:HC]=[U:C]`。
+- ⬜ **obligation 4 残 (index 代数, `S11:3557` `hidx`)** = `(hInHu⊔cInHu).index = chars.u`。機械的:
+  (A) `HC.index = cInHu.relindex uInHu` (第2同型 `quotientInfEquivProdNormalQuotient` + `uInHu⊔HC=⊤`
+  (`hInHu_sup_uInHu_eq_top`+sup_comm) + `relindex_top_right`、`uInHu⊓HC=cInHu` で LHS 商を書換);
+  (C) `cInHu.relindex uInHu = chars.u` (card-cancel: `card_mul_index`+`subgroupOfEquivOfLe` で
+  `|cSub|·relindex=|U|`、first-iso `quotientKerEquivRange`+`equivMapOfInjective`×2 で `|U|=u·|cSub|`、
+  `Nat.card cSub>0` で消去)。`chars.u_eq_card_quotient` が `u=|range uActionHom|`。
+- ⬜ **obligation 3 (ψ linearity, `S11:3551` `hψdeg`)** = `ψ(1)=1` (ψ=`exists_liesOver` の HC-constituent)。
+  `apply_one_eq_one_of_subset_characterKernel_of_isMulCommutative_quotient` (N=`commutator ↥HC`) で、
+  `[HC,HC]⊆ker ψ` を kernel 継承 (`liesOver_mem_characterKernel`) + `[HC,HC]⊆ker χ` から。後者は
+  `⁅HC,HC⁆≤H₀C'` (構造: `⁅H,H⁆≤H₀` [H̄ 可換], `⁅H,C⁆≤H₀` [C cent H̄], `⁅C,C⁆=C']) — `Subgroup.commutator_le`
+  で生成元ごとに ([[lean-normal-closure-good-elements]]: sup 上の commutator 分配は直接不可、generator 経由)。
+
+**次手 (上流順)**: obligation 4 残 (機械的、すぐ) → obligation 3 (構造 commutator) → caseB_degree_qu
+sorry-free。その後 (9.9) `caseB_character_counts` / (9.8) `caseA_character_counts` → (11.8)/(10.7) へ。
