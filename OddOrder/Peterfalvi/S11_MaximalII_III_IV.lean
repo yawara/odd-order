@@ -1649,6 +1649,119 @@ theorem cprimeSub_le_C (data : TypesIIIIIIVSetup M) (chief : ChiefFactorData dat
     cprimeSub data chief ≤ cSub data chief :=
   Subgroup.map_subtype_le _
 
+open Subgroup in
+/-- **`C = C_U(H̄) ◁ U`** (Peterfalvi (9.5)): the kernel of the `U`-action on the chief factor is
+normal in `U`.  `cSub` is the `G`-image of `(uActionHom).ker`, which corresponds (via the
+realization iso `subgroupOfEquivOfLe : ↥(U.subgroupOf (U ⊔ W₁)) ≃* ↥U`) to a kernel of a
+homomorphism out of `↥U`; kernels are normal.  This is the `C ◁ U` input of the (9.9.a) carrier
+normality `HC ◁ HU` (`sup_normal_of_normal_left_of_normal_subgroupOf`). -/
+theorem cSub_subgroupOf_U_normal (data : TypesIIIIIIVSetup M) (chief : ChiefFactorData data) :
+    ((cSub data chief).subgroupOf data.U).Normal := by
+  set e := subgroupOfEquivOfLe (le_sup_left : data.typeP.U ≤ data.typeP.U ⊔ data.typeP.W1) with he
+  have heq : (cSub data chief).subgroupOf data.U
+      = (uActionHom data chief).ker.map e.toMonoidHom := by
+    ext x
+    simp only [Subgroup.mem_subgroupOf]
+    constructor
+    · intro hx
+      simp only [cSub, Subgroup.mem_map] at hx
+      obtain ⟨z, ⟨y, hy, hyz⟩, hzx⟩ := hx
+      refine ⟨y, hy, ?_⟩
+      apply Subtype.ext
+      rw [MulEquiv.coe_toMonoidHom, he, subgroupOfEquivOfLe_apply_coe, ← hzx, ← hyz]
+      rfl
+    · rintro ⟨y, hy, rfl⟩
+      simp only [cSub, Subgroup.mem_map]
+      refine ⟨_, ⟨y, hy, rfl⟩, ?_⟩
+      rw [MulEquiv.coe_toMonoidHom, he, subgroupOfEquivOfLe_apply_coe]
+      rfl
+  rw [heq]
+  exact (MonoidHom.normal_ker _).map e.toMonoidHom e.surjective
+
+/-! ### (9.9.a) realization: `HC ◁ HU` (the inertia subgroup is normal)
+
+For the (9.9.a) Clifford degree `χ(1) = u` we induce from the inertia subgroup `HC` of a chief-factor
+character; `isIrreducibleCharacter_induce_of_inertia_eq` requires `HC ◁ HU`.  We realize `U` and
+`C = C_U(H̄)` inside `HU = huSub` and apply the abstract
+`sup_normal_of_normal_left_of_normal_subgroupOf` (`H ◁ HU` from `hInHu_normal`, `C ◁ U` from
+`cSub_subgroupOf_U_normal`, `H ⊔ U = ⊤`). -/
+
+/-- `H ⊴ HU`: the realization `hInHu data = (H.subgroupOf M).subgroupOf HU` of `H = M_F` inside
+`HU` is normal (`M_F ◁ M`, descended along the inclusions). -/
+instance hInHu_normal {M : Subgroup G} (data : TypesIIIIIIVSetup M) :
+    (hInHu data).Normal := by
+  have h1 : (data.H.subgroupOf M).Normal := by
+    rw [show data.H = maxNilpotentNormalHall M from data.typeP.H_eq]
+    exact OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_subgroupOf_normal M
+  exact h1.subgroupOf (huSub data)
+
+theorem U_le_M (data : TypesIIIIIIVSetup M) : data.U ≤ M :=
+  data.typeP.U_le.trans (Subgroup.map_subtype_le _)
+
+theorem H_le_M (data : TypesIIIIIIVSetup M) : data.H ≤ M :=
+  data.typeP.H_le.trans (Subgroup.map_subtype_le _)
+
+/-- `U`, realized as a subgroup of `HU = H ⊔ U` inside `↥M`. -/
+noncomputable def uInHu (data : TypesIIIIIIVSetup M) : Subgroup ↥(huSub data) :=
+  (data.U.subgroupOf M).subgroupOf (huSub data)
+
+/-- `C = C_U(H̄)`, realized as a subgroup of `HU` inside `↥M`. -/
+noncomputable def cInHu (data : TypesIIIIIIVSetup M) (chief : ChiefFactorData data) :
+    Subgroup ↥(huSub data) :=
+  ((cSub data chief).subgroupOf M).subgroupOf (huSub data)
+
+theorem cInHu_le_uInHu (data : TypesIIIIIIVSetup M) (chief : ChiefFactorData data) :
+    cInHu data chief ≤ uInHu data :=
+  Subgroup.subgroupOf_mono _ (Subgroup.subgroupOf_mono _ (cSub_le_U data chief))
+
+open Subgroup in
+/-- **`C ◁ U` inside `HU`** (realized form): `cInHu ◁ uInHu`, transported from `cSub ◁ U`
+(`cSub_subgroupOf_U_normal`) along the realization iso `↥uInHu ≃* ↥U`.  Comap of a normal subgroup
+is normal. -/
+theorem cInHu_normal (data : TypesIIIIIIVSetup M) (chief : ChiefFactorData data) :
+    ((cInHu data chief).subgroupOf (uInHu data)).Normal := by
+  have hUsubM : data.U.subgroupOf M ≤ huSub data :=
+    Subgroup.subgroupOf_mono M (le_sup_right : data.U ≤ data.H ⊔ data.U)
+  set f : ↥(uInHu data) ≃* ↥data.U :=
+    (subgroupOfEquivOfLe hUsubM).trans (subgroupOfEquivOfLe (U_le_M data)) with hf
+  have hgval : ∀ x : ↥(uInHu data), ((f x : ↥data.U) : G) = (((x : ↥(huSub data)) : ↥M) : G) := by
+    intro x
+    have h1 : (f x : ↥data.U)
+        = subgroupOfEquivOfLe (U_le_M data) (subgroupOfEquivOfLe hUsubM x) := by rw [hf]; rfl
+    rw [h1, subgroupOfEquivOfLe_apply_coe, subgroupOfEquivOfLe_apply_coe]
+  have hcomap : (cInHu data chief).subgroupOf (uInHu data)
+      = ((cSub data chief).subgroupOf data.U).comap f.toMonoidHom := by
+    ext x
+    simp only [cInHu, Subgroup.mem_subgroupOf]
+    rw [Subgroup.mem_comap, Subgroup.mem_subgroupOf, MulEquiv.coe_toMonoidHom, hgval x]
+  rw [hcomap]
+  exact (cSub_subgroupOf_U_normal data chief).comap f.toMonoidHom
+
+open Subgroup in
+/-- **`H ⊔ U = ⊤` inside `HU`** (realized form): `hInHu ⊔ uInHu = ⊤`, since `HU = H ⊔ U`.  Both
+`H.subgroupOf M` and `U.subgroupOf M` lie below `huSub = (H ⊔ U).subgroupOf M`, and `subgroupOf`
+distributes over `⊔` for subgroups below the ambient (`subgroupOf_sup`), so the realized join is
+`((H ⊔ U).subgroupOf M).subgroupOf (huSub) = huSub.subgroupOf huSub = ⊤`. -/
+theorem hInHu_sup_uInHu_eq_top (data : TypesIIIIIIVSetup M) :
+    hInHu data ⊔ uInHu data = ⊤ := by
+  have hHsub : data.H.subgroupOf M ≤ huSub data := Subgroup.subgroupOf_mono M le_sup_left
+  have hUsub : data.U.subgroupOf M ≤ huSub data := Subgroup.subgroupOf_mono M le_sup_right
+  unfold hInHu uInHu
+  rw [← subgroupOf_sup hHsub hUsub, ← subgroupOf_sup (H_le_M data) (U_le_M data)]
+  exact Subgroup.subgroupOf_self _
+
+/-- **Peterfalvi (9.9.a), the inertia subgroup is normal: `HC ◁ HU`.**  Realized as
+`hInHu ⊔ cInHu ◁ huSub`, by the abstract `sup_normal_of_normal_left_of_normal_subgroupOf`:
+`H ◁ HU` (`hInHu_normal`), `C ◁ U` (`cInHu_normal`), `H ⊔ U = ⊤` (`hInHu_sup_uInHu_eq_top`).  This is
+the normality `isIrreducibleCharacter_induce_of_inertia_eq` needs to make `Ind_{HC}^{HU} ψ`
+irreducible in the (9.9.a) Clifford-degree argument. -/
+theorem hcInHu_normal (data : TypesIIIIIIVSetup M) (chief : ChiefFactorData data) :
+    (hInHu data ⊔ cInHu data chief).Normal :=
+  haveI := hInHu_normal data
+  haveI := cInHu_normal data chief
+  sup_normal_of_normal_left_of_normal_subgroupOf (cInHu_le_uInHu data chief)
+    (hInHu_sup_uInHu_eq_top data)
+
 /-- The character-theoretic setup of Peterfalvi (9.5).
 
 `C`, `U'`, and `C'` denote the centralizer, commutator subgroup, and its
@@ -2929,15 +3042,6 @@ preserves the underlying `G`-element, so it intertwines `conjBy g` (for `g ∈ H
 abstract `typeP_conjAction a` (for `a ∈ U W₁` with the same `G`-image).  This is the last
 realization step of (9.9.a)'s `I_U(θ) ⊆ C`: it turns a concrete `HU`-inertia hypothesis into the
 `typeP_conjAction`-invariance consumed by `caseB_char_inertia_inflation`. -/
-
-/-- `H ⊴ HU`: the realization `hInHu data = (H.subgroupOf M).subgroupOf HU` of `H = M_F` inside
-`HU` is normal (`M_F ◁ M`, descended along the inclusions). -/
-instance hInHu_normal {M : Subgroup G} (data : TypesIIIIIIVSetup M) :
-    (hInHu data).Normal := by
-  have h1 : (data.H.subgroupOf M).Normal := by
-    rw [show data.H = maxNilpotentNormalHall M from data.typeP.H_eq]
-    exact OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_subgroupOf_normal M
-  exact h1.subgroupOf (huSub data)
 
 /-- The realization iso `↥(H-in-HU) ≃* ↥H`: `H` realized inside `HU = H ⊔ U` is `H`, via the
 composite of `subgroupOfEquivOfLe (H.subgroupOf M ≤ HU)` and `subgroupOfEquivOfLe (H ≤ M)`. -/
