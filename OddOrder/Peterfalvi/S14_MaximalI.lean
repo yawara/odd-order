@@ -357,6 +357,43 @@ theorem ne_conjConstituent {L : Subgroup G} [Finite ↥L] {φ : IrreducibleChara
     rw [← coe_conjConstituent, ← heq]
   exact hc
 
+open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
+/-- **Peterfalvi (12.2.b), per-constituent `R₁(φ)`**: for a constituent `φ ∈ S(χ)`, applying the
+(1.4) machinery (`exists_signedFamily_of_constituents`) to the family `![φ, φ̄]` (Fin 2) yields a
+signed irreducible-difference family `sd` of `G` with `(φ_i − φ_0)^τ = sd.signedDifference i`.  The
+three (1.4) hypotheses are discharged from the `conjConstituent` lemmas: `φ ≠ φ̄`
+(`ne_conjConstituent` ← `not_real`), equal degree (`conjConstituent_apply_one`), and support
+(`support_conjConstituent` + `supported`).  The orthonormal block `R₁(φ) = {sd.μ 0, sd.μ 1}` of
+(12.2.b) lives in this `sd`. -/
+theorem signedFamily_exists {L : Subgroup G} [Fintype G] [Invertible (Nat.card G : ℂ)]
+    [Invertible (Nat.card ↥L : ℂ)] {hyp : Hypothesis L} {chi : ClassFunction ↥L ℂ}
+    (data : CharacterDecompositionData hyp chi)
+    {φ : IrreducibleCharacter ↥L} (hφ : φ ∈ data.constituents) :
+    ∃ sd : OddOrder.RepresentationTheory.SignedIrreducibleDifferenceFamily G 2,
+      ∀ i, hyp.tau ((![φ, conjConstituent φ] i : ClassFunction ↥L ℂ)
+        - (![φ, conjConstituent φ] 0 : ClassFunction ↥L ℂ)) = sd.signedDifference i := by
+  haveI := hyp.finiteG
+  refine exists_signedFamily_of_constituents hyp (le_refl 2) ![φ, conjConstituent φ] ?_ ?_ ?_
+  · -- injective: `![φ, φ̄]` is injective since `φ ≠ φ̄`
+    intro i j hij
+    fin_cases i <;> fin_cases j <;>
+      simp_all [Matrix.cons_val_zero, Matrix.cons_val_one, Matrix.head_cons,
+        ne_conjConstituent (data.not_real φ hφ),
+        (ne_conjConstituent (data.not_real φ hφ)).symm]
+  · -- equal degree: `φ̄(1) = φ(1)`
+    intro i
+    fin_cases i
+    · rfl
+    · simpa only [Matrix.cons_val_one, Matrix.head_cons, Matrix.cons_val_zero]
+        using conjConstituent_apply_one φ
+  · -- support: `φ` and `φ̄` are supported in `A(L) ∪ {1}`
+    intro i
+    fin_cases i
+    · simpa only [Matrix.cons_val_zero] using data.supported φ hφ
+    · show (conjConstituent φ : ClassFunction ↥L ℂ).support ⊆ _
+      rw [support_conjConstituent]
+      exact data.supported φ hφ
+
 /-- Carrier for Peterfalvi (12.3), comparing two non-conjugate type-I maximal
 subgroups. -/
 structure CrossOrthogonalityData {L1 L2 : Subgroup G}
