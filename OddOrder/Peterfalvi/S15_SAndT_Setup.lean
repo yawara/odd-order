@@ -441,6 +441,36 @@ theorem lambda_forces_T_caseB [Finite G]
 
 /-! ## (13.5)--(13.10): norm estimates -/
 
+/-- **Inflation norm lower bound — the carrier-free core of Peterfalvi (13.5.c)**.
+
+If a function `α : H → ℂ` is constant on a finite subgroup `P ≤ H` (equal to `α 1` on all of `P`)
+— the situation when `P` lies in the kernel of every irreducible constituent of `α`, so `α` is
+inflated from `H/P` — then its squared-norm sum over the nonidentity elements `H#` is at least
+`(|P| − 1)·|α(1)|²`.  This is exactly Peterfalvi (13.5.c)
+`∑_{x∈H#} |α(x)|² ≥ (|P|−1)·α(1)²` in self-contained, carrier-free form: it uses only that `α`
+equals `α 1` on `P` and that the remaining squared norms are nonnegative (one sums over the
+nonidentity elements of `P` alone, `P# ⊆ H#`).  Specialises to `H = ↥hyp.H`, `P = S_F` in the full
+(13.5) TI-subset calculation. -/
+theorem sum_normSq_erase_one_ge_of_const_on_subgroup {H : Type*} [Group H] [Fintype H]
+    (P : Subgroup H) (α : H → ℂ) (hP : ∀ x ∈ P, α x = α 1) :
+    ((Nat.card ↥P : ℝ) - 1) * ‖α 1‖ ^ 2 ≤ (∑ x : H, ‖α x‖ ^ 2) - ‖α 1‖ ^ 2 := by
+  classical
+  -- card of the subgroup as a filtered finset.
+  have hcard : (Finset.univ.filter (· ∈ P)).card = Nat.card ↥P := by
+    rw [Nat.card_eq_fintype_card]; simp [Fintype.card_subtype]
+  -- the `P`-sum equals `|P|·‖α 1‖²` (every term is `‖α 1‖²`).
+  have hPsum : ∑ x ∈ Finset.univ.filter (· ∈ P), ‖α x‖ ^ 2 = (Nat.card ↥P : ℝ) * ‖α 1‖ ^ 2 := by
+    rw [Finset.sum_congr rfl (g := fun _ => ‖α 1‖ ^ 2)
+        (fun x hx => by rw [hP x (Finset.mem_filter.mp hx).2]),
+      Finset.sum_const, nsmul_eq_mul, hcard]
+  -- the `P`-sum is at most the full sum (squared norms nonnegative).
+  have hmono : ∑ x ∈ Finset.univ.filter (· ∈ P), ‖α x‖ ^ 2 ≤ ∑ x : H, ‖α x‖ ^ 2 :=
+    Finset.sum_le_sum_of_subset_of_nonneg (Finset.subset_univ _) (fun x _ _ => by positivity)
+  have hkey : (Nat.card ↥P : ℝ) * ‖α 1‖ ^ 2 ≤ ∑ x : H, ‖α x‖ ^ 2 := hPsum ▸ hmono
+  have hexp : ((Nat.card ↥P : ℝ) - 1) * ‖α 1‖ ^ 2
+      = (Nat.card ↥P : ℝ) * ‖α 1‖ ^ 2 - ‖α 1‖ ^ 2 := by ring
+  rw [hexp]; linarith [hkey]
+
 /-- Carrier for Peterfalvi (13.5), the TI-subset orthogonality calculation. -/
 structure TISubsetOrthogonalityData (hyp : Hypothesis (G := G)) where
   S1 : Set (ClassFunction ↥hyp.S ℂ)
