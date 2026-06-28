@@ -137,6 +137,67 @@ def piStar (G : Type*) [Group G] : Set ℕ :=
           A ≤ (P : Subgroup G) ∧ B ≤ (P : Subgroup G) ∧ Nat.card ↥A = p ∧
           IsCyclic ↥B ∧ Subgroup.centralizer (A : Set G) ⊓ (P : Subgroup G) = A ⊔ B}
 
+/-! ### BG `FT_signalizer` (`R(x)`, Theorem D(3)/(4)) — concrete construction
+
+The concrete FT signalizer `R(x) = FT_signalizer x` (Coq `FT_signalizer`, BGsection14:90), built from
+`FT_signalizer_base x = N[x]`: when `x` has more than one `σ`-maximal, `N[x]` is a maximal subgroup
+over `C_G(x)` (the unique one — Theorem D, via Corollary 12.14); `R(x) = (N[x])_σ ⊓ C_G(x)`.  This is
+the genuine object the Theorem D(3)/(4) data `RData M x R` is built on; the deep
+`FT_signalizer_context` (transitive action / Hall / uniqueness) is the remaining content. -/
+
+open Classical in
+/-- BG `FT_signalizer_base x` (`N[x]`, Coq BGsection14:87): a maximal subgroup over `C_G(x)` when `x`
+has more than one `σ`-maximal (Coq picks one; Theorem D proves it unique), else `⊥`. -/
+noncomputable def FT_signalizerBase (x : G) : Subgroup G :=
+  if h : 1 < (maximalSigmaSubgroupsOfElement x).ncard ∧
+      (maximalSubgroupsContaining (Subgroup.centralizer ({x} : Set G))).Nonempty then
+    h.2.choose
+  else ⊥
+
+/-- BG `FT_signalizer x` (`R(x)`, Coq BGsection14:90): `(N[x])_σ ⊓ C_G(x)`. -/
+noncomputable def FT_signalizer (x : G) : Subgroup G :=
+  OddOrder.BG.Ch3.S10.Msigma (FT_signalizerBase x) ⊓ Subgroup.centralizer ({x} : Set G)
+
+/-- `R(x) ≤ C_G(x)` (Coq `cent_FT_signalizer`). -/
+theorem FT_signalizer_le_centralizer (x : G) :
+    FT_signalizer x ≤ Subgroup.centralizer ({x} : Set G) :=
+  inf_le_right
+
+/-- **Trivial branch** (Coq: `#|M_σ[x]| ≤ 1 ⟹ R(x) = 1`): when `x` has at most one `σ`-maximal (or
+no maximal lies over `C_G(x)`), `N[x] = ⊥` so `R(x) = (N[x])_σ ⊓ C_G(x) = ⊥`. -/
+theorem FT_signalizer_eq_bot_of_not_branch {x : G}
+    (h : ¬ (1 < (maximalSigmaSubgroupsOfElement x).ncard ∧
+      (maximalSubgroupsContaining (Subgroup.centralizer ({x} : Set G))).Nonempty)) :
+    FT_signalizer x = ⊥ := by
+  have hb : FT_signalizerBase x = ⊥ := dif_neg h
+  simp only [FT_signalizer, hb, le_bot_iff.mp (OddOrder.BG.Ch3.S10.Msigma_le ⊥), bot_inf_eq]
+
+/-- In the nontrivial branch, `N[x]` is a maximal subgroup containing `C_G(x)`. -/
+theorem centralizer_le_FT_signalizerBase {x : G}
+    (h : 1 < (maximalSigmaSubgroupsOfElement x).ncard ∧
+      (maximalSubgroupsContaining (Subgroup.centralizer ({x} : Set G))).Nonempty) :
+    Subgroup.centralizer ({x} : Set G) ≤ FT_signalizerBase x := by
+  have hb : FT_signalizerBase x = h.2.choose := dif_pos h
+  rw [hb]
+  exact (mem_maximalSubgroupsContaining.mp h.2.choose_spec).2
+
+/-- **BG Theorem D(3), `R(x) ◁ C_G(x)`** (Coq `nsRCx`): the first-conjunct normality.  Since `R(x) =
+(N[x])_σ ⊓ C_G(x)` with `C_G(x) ≤ N[x]` (nontrivial branch) and `(N[x])_σ ◁ N[x]`, the centralizer
+`C_G(x)` normalizes both factors, hence their intersection `R(x)`. -/
+theorem FT_signalizer_normal_in_centralizer {x : G}
+    (h : 1 < (maximalSigmaSubgroupsOfElement x).ncard ∧
+      (maximalSubgroupsContaining (Subgroup.centralizer ({x} : Set G))).Nonempty) :
+    Subgroup.centralizer ({x} : Set G) ≤ Subgroup.normalizer (FT_signalizer x : Set G) := by
+  have hCN : Subgroup.centralizer ({x} : Set G) ≤ FT_signalizerBase x :=
+    centralizer_le_FT_signalizerBase h
+  haveI hMσN : ((OddOrder.BG.Ch3.S10.Msigma (FT_signalizerBase x)).subgroupOf
+      (FT_signalizerBase x)).Normal := by
+    rw [OddOrder.BG.Ch3.S10.Msigma_subgroupOf]; infer_instance
+  have hbaseN : FT_signalizerBase x ≤
+      Subgroup.normalizer (OddOrder.BG.Ch3.S10.Msigma (FT_signalizerBase x) : Set G) :=
+    (Subgroup.normal_subgroupOf_iff_le_normalizer (OddOrder.BG.Ch3.S10.Msigma_le _)).mp hMσN
+  exact OddOrder.BG.Ch3.S12.le_normalizer_inf (hCN.trans hbaseN) Subgroup.le_normalizer
+
 /-! ## Theorems A--E -/
 
 /-- **BG Theorem A** (mmd L4274): the basic structure of a maximal subgroup:
