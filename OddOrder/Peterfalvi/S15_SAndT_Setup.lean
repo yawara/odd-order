@@ -549,6 +549,50 @@ theorem induce_one_eq_one_of_mem_complement {G : Type*} [Group G] [Fintype G]
     rw [Nat.card_eq_fintype_card]; simp [Fintype.card_subtype]
   rw [hcard, invOf_mul_self]
 
+open scoped Classical in
+/-- **Frobenius induced-trivial-character norm — Peterfalvi (13.18.b)**:
+`‖Ind_A^G 1‖² = (|N| − 1)/|A| + 1` for a Frobenius group `G = N ⋊ A`.
+
+Here `‖Ind_A^G 1‖² = ⅟|A|·(|G:A| + |A| − 1)`; with `|G:A| = |N|` (the complement index) this is
+`(|N|−1)/|A| + 1`.  Proof: Frobenius reciprocity turns the norm into `⅟|A|·Σ_{a∈A} γ(a)` where
+`γ = Ind_A^G 1` is the permutation character (its values are real, so the conjugate-star drops);
+the sum splits as `γ(1) = |G:A|` plus `|A|−1` terms `γ(a) = 1` (`a ∈ A#`, by the three value lemmas
+`induce_apply_one` / `induce_one_eq_one_of_mem_complement`).  This is the `‖Ind_{PW₁}^S 1‖²
+= (u−1)/q + 1` used in `‖β_j‖² = (u−1)/q + 2` of (13.18.b). -/
+theorem norm_induce_one_frobenius {G : Type*} [Group G] [Fintype G]
+    {N A : Subgroup G} (hFrob : OddOrder.Isaacs.Ch06.IsFrobeniusGroup G N A)
+    [Invertible (Nat.card ↥A : ℂ)] [Invertible (Nat.card G : ℂ)] :
+    ClassFunction.inner (ClassFunction.induce A (trivialClassFunction ↥A))
+        (ClassFunction.induce A (trivialClassFunction ↥A))
+      = ⅟(Nat.card ↥A : ℂ) * ((A.index : ℂ) + (Nat.card ↥A : ℂ) - 1) := by
+  have hreal : ∀ a : ↥A, star ((ClassFunction.induce A (trivialClassFunction ↥A)) (↑a : G))
+      = (ClassFunction.induce A (trivialClassFunction ↥A)) (↑a : G) := by
+    intro a
+    rw [induce_one_apply, invOf_eq_inv, star_mul', star_natCast, star_inv₀, star_natCast]
+  rw [ClassFunction.inner_induce_eq_inner_restrict, ClassFunction.inner_eq_inv_card_mul_innerSum,
+    ClassFunction.innerSum]
+  have hterm : ∀ a : ↥A,
+      (trivialClassFunction ↥A) a *
+          star ((ClassFunction.restrict A (ClassFunction.induce A (trivialClassFunction ↥A))) a)
+        = (ClassFunction.induce A (trivialClassFunction ↥A)) (↑a : G) := by
+    intro a
+    rw [ClassFunction.restrict_apply, hreal a, show (trivialClassFunction ↥A) a = 1 from rfl, one_mul]
+  rw [Finset.sum_congr rfl (fun a _ => hterm a)]
+  congr 1
+  rw [← Finset.add_sum_erase Finset.univ _ (Finset.mem_univ (1 : ↥A))]
+  have h1 : (ClassFunction.induce A (trivialClassFunction ↥A)) ((1 : ↥A) : G) = (A.index : ℂ) := by
+    rw [Subgroup.coe_one, ClassFunction.induce_apply_one,
+      show (trivialClassFunction ↥A) (1 : ↥A) = 1 from rfl, mul_one]
+  have herase : ∑ a ∈ Finset.univ.erase (1 : ↥A),
+      (ClassFunction.induce A (trivialClassFunction ↥A)) (↑a : G) = (Nat.card ↥A : ℂ) - 1 := by
+    rw [Finset.sum_congr rfl (g := fun _ => (1 : ℂ)) (fun a ha => ?_)]
+    · rw [Finset.sum_const, Finset.card_erase_of_mem (Finset.mem_univ _), Finset.card_univ,
+        nsmul_eq_mul, mul_one, ← Nat.card_eq_fintype_card, Nat.cast_sub Nat.card_pos, Nat.cast_one]
+    · have ha1 : (↑a : G) ≠ 1 := fun h =>
+        (Finset.mem_erase.mp ha).1 (Subtype.ext (h.trans (Subgroup.coe_one (H := A)).symm))
+      exact induce_one_eq_one_of_mem_complement hFrob a.2 ha1
+  rw [h1, herase]; ring
+
 /-- **Inflation norm lower bound — the carrier-free core of Peterfalvi (13.5.c)**.
 
 If a function `α : H → ℂ` is constant on a finite subgroup `P ≤ H` (equal to `α 1` on all of `P`)
