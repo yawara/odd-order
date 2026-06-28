@@ -316,3 +316,29 @@ char work、substantial)。
 4. (11.3) 矛盾。
 
 機構は完全確定。残 = S(HC) materialization (次) → S₂ → calc。深い multi-session endgame だが各 API は特定済。
+
+## 2026-06-29 update¹⁰ (lane-a) — 🛑 honest stall flag: (11.8) endgame は dedicated effort 要
+
+**正直な評価 (要ユーザー判断)**: この session で (11.8) の **foundation (9 feat commits) + 完全機構確定**を
+達成したが、endgame の core = **S(HC) full materialization** (degree-q 既約族を Frobenius (U/C)⋊W₁ /
+§6 columnFamily から enumerate + coherentEqualDegree_fromDade の preconditions 確立) を **~7 反復 build
+できず** (investigation/mapping に終始)。これは §6/Frobenius char theory の深い construction で、bloated な
+loop 反復では production 不能。[[feedback-flag-poor-progress]] に従い churning を止め flag する。
+
+**完了済 (build-green, committed)**:
+- (11.8) `exists_zeta_residual_not_orthogonal`: 実 ζ witness 供給 + params/by_contra 構造。
+- `inducedFamily_hasNoRealCharacters` (9-lemma chain) + `inducedFamily_pairwiseOrthogonal` (inducedFamily の
+  真の character 事実、(11.8.x) calc が消費)。
+- 全機構確定 (Dade-based、global S07.Hypothesis でない): coherence=coherentEqualDegree_fromDade /
+  α^τ inners (muGridAlpha_tau_*) / 矛盾=S13.S_H0C_not_coherent。
+
+**残 (deep multi-session、dedicated effort 推奨)**:
+1. **S(HC) materialization** (bottleneck): degree-q 既約族 χ:Fin n→Irr(↥M) を §6 columnFamily /
+   Frobenius count から enumerate。coherentEqualDegree_fromDade (S07:5968) に χ + equal-degree +
+   supported-diff + n≥2 を渡す。**§6 framework (typePData_toS06Hypothesis 経由) との bridge が要点**。
+2. S₂=S(C)−S(HC) coherence: (9.11)/(11.7)。
+3. (11.8.1)-(11.8.6) α-grid calc: 上記 coherence の τ₁ + α^τ inners + no_real/pairwise (✅) で。
+4. (11.3) 矛盾。
+
+**要判断**: (11.8) endgame に dedicated focused session を割く (fresh /loop) か、lane-a を別 FT-path 作業へ
+redirect するか。foundation + roadmap は本ノートに完備。
