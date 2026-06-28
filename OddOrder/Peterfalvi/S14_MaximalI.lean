@@ -481,6 +481,45 @@ theorem exists_offKernel_constituent_partition {L : Subgroup G} [Finite G] (hyp 
   sorry
 
 open scoped Classical OddOrder.Peterfalvi.S12.FiniteInduce in
+/-- **Toward (12.4) pin (c'), the off-kernel direction** (genuine): every constituent `φ ∈ S(χ)` of a
+member `χ = Ind_H^L θ ∈ S` (`θ ≠ 1_H`) is off-kernel, `H ⊄ ker φ`.  If `H ⊆ ker φ` then `Res_H φ` is
+constant `= φ(1)` on `H` (`= φ(1)·1_H`), so by Frobenius `⟨χ, φ⟩ = ⟨θ, Res_H φ⟩ = star(φ(1))·⟨θ, 1_H⟩
+= 0` (`θ ≠ 1_H`); but `φ` a constituent of `χ` gives `⟨χ, φ⟩ = 1`.  This is the `⊇` inclusion
+`S(χ) ⊆ {φ : H ⊄ ker φ}` of the partition `exists_offKernel_constituent_partition`. -/
+theorem constituents_not_inHKernel {L : Subgroup G} [Finite G] (hyp : Hypothesis L)
+    {chi : ClassFunction ↥L ℂ} (hχ : chi ∈ hyp.Sset) (dχ : CharacterDecompositionData hyp chi)
+    {φ : IrreducibleCharacter ↥L} (hφ : φ ∈ dχ.constituents) : ¬ InHKernel hyp φ := by
+  haveI := hyp.finiteG
+  classical
+  obtain ⟨θ, hθ_ne, hchi_eq⟩ := hχ
+  intro hker
+  set K := (hyp.typeI.typeF.H).subgroupOf L with hKdef
+  -- `Res_K φ = φ(1) · 1_K` (since `H ⊆ ker φ`, `φ` is constant `= φ(1)` on `K`).
+  have hrestrict : ClassFunction.restrict K (φ : ClassFunction ↥L ℂ)
+      = OddOrder.Peterfalvi.S03.characterDegree (φ : ClassFunction ↥L ℂ) •
+        (trivialIrreducibleCharacter ↥K : ClassFunction ↥K ℂ) := by
+    ext k
+    rw [ClassFunction.restrict_apply, ClassFunction.smul_apply]
+    have hmem : (↑k : ↥L) ∈ OddOrder.Peterfalvi.S03.characterKernel (φ : ClassFunction ↥L ℂ) :=
+      hker k.2
+    rw [OddOrder.Peterfalvi.S03.mem_characterKernel] at hmem
+    simp only [hmem, IrreducibleCharacter.coe_trivialIrreducibleCharacter,
+      trivialClassFunction_apply, mul_one]
+  -- `⟨χ, φ⟩ = ⟨θ, Res_K φ⟩ = star(φ(1)) · ⟨θ, 1_K⟩ = 0` (`θ ≠ 1_K`).
+  have hzero : ClassFunction.inner chi (φ : ClassFunction ↥L ℂ) = 0 := by
+    rw [hchi_eq, ClassFunction.inner_induce_eq_inner_restrict, hrestrict,
+      OddOrder.RepresentationTheory.inner_smul_right, irreducibleCharacter_inner, if_neg hθ_ne,
+      mul_zero]
+  -- `⟨χ, φ⟩ = 1` (multiplicity-one constituent), contradiction.
+  have hone : ClassFunction.inner chi (φ : ClassFunction ↥L ℂ) = 1 := by
+    rw [dχ.decomp, inner_sum_left,
+      Finset.sum_eq_single_of_mem φ hφ (fun φ' _ hne => by
+        rw [irreducibleCharacter_inner, if_neg hne]),
+      irreducibleCharacter_inner, if_pos rfl]
+  rw [hone] at hzero
+  exact one_ne_zero hzero
+
+open scoped Classical OddOrder.Peterfalvi.S12.FiniteInduce in
 /-- **Peterfalvi (12.4), the off-kernel regroup** (genuine, from the [Is] 6.2 partition pin): the
 off-kernel Fourier part `β = ∑_{φ : H ⊄ ker φ} ⟨Res_L ψ, φ⟩·φ` of `Res_L ψ` vanishes on `L − H`.
 Regroup the off-kernel irreducibles by the partition into `S(χ)`
