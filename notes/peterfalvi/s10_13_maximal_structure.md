@@ -614,3 +614,25 @@ reducible count を deep 分析 (tractable か §3-§7 char API gate か、原�
 **要判断 (ユーザー/hub)**: (a) §4 Theorem (4.5)/(4.7) を formalize (上流優先だが S04 で大物・scope 外気味)、
 (b) §4 signature を pin して (9.9.b) で cite (policy 可、但し (4.5) statement は複雑)、(c) lane-a を
 §4-gated でない別 FT-path 作業へ redirect。lane-a の非-§4-gated な §9 char 内容 ((9.9.a)) は完了済。
+
+### §12 追補⁸ (lane-a /loop iter10): §9 counts の gate を §6 Theorem (4.5)/(4.7) + (8.4.d) に精密特定
+
+Theorem (4.5)/(4.7) の所在確定 (mmd 04.6 = 書籍 §6 "Dade Isometry for Certain Type of Subgroup"):
+- **(4.5)** (04.6:39): Hypothesis (4.2) 下、μ_j = ∑_{0≤i<w₁} μ_{ij} (0≤j<w₂) の reducible 構造。
+- **(4.7)** (04.6:67): Hypothesis (4.6) 下、Supp χ ⊂ A∪{1} 等。
+- ⟹ (9.9.b) の「p-1 reducible」count = w₂-1 (w₂=p)。**repo S06** に `Hypothesis46`/`CertainTypeHypothesis`/
+  omegaProdChar 機構は存在するが、**μ_j reducible-count 定理 (4.5)/(4.7) は citeable な形で未完**。
+- **(8.4.d)** (Hypothesis (4.6) for M/H₀, M/H₀C) は **§8 = S10 = lane-a scope** (S10:451,588 に
+  「Hypothesis (4.6)/(5.2) specializations ... kept as ...」言及 = 部分的)。
+
+**⟹ (9.9.b)/(9.8.b)/(9.10) の path**: (8.4.d) [S10/lane-a] Hypothesis(4.6)-for-M/H₀ 構成 →
+S06 Theorem (4.5)/(4.7) reducible-count (要 formalize/拡充) → (9.9.b) instantiate。**substantial な
+§6/§8 char-framework 作業** (multi-step、複数ファイル)。
+
+**lane-a frontier 総括 (honest)**: 純 Clifford な §9 主結果 (9.9.a)=caseB_degree_qu は DONE。残る
+§9 counts + endgame ((10.7)/(10.8)/(11.8)) は **§6/§8 char-framework endgame** (Dade reducible-count
++ §7 norm-counting + coherence) gated = 本プロジェクトで「最難・最高コスト」と記された指標終盤。
+lane-a がこれを担うのは FT 経路・上流優先で妥当だが quick win でなく multi-session 級。
+
+**次手 (concrete)**: (8.4.d) Hypothesis(4.6)-for-M/H₀ 構成 (S10、lane-a scope、上流優先の entry point)。
+S10:445-595 の既存 specialization を土台に。
