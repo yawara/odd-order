@@ -1469,6 +1469,42 @@ theorem sigma_cover_decomposition [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOd
       rw [hpart N, sigmaPart_eq_one_of_not_conj hG hM hxσ hN hMN,
         sigmaPart_eq_self_of_conj hx'σ ⟨1, by rw [map_one, one_smul]⟩, one_mul]
 
+/-- **The signalizer maximal is not `M`-conjugate** (the `M, N` non-conjugacy behind the cover
+decomposition): a nonidentity `σ(M)`-element `x` that is also a `τ₂(N)`-element forces `M`, `N`
+non-conjugate.  If `M ∼ N` then `σ(M) = σ(N)`, so a prime `q ∣ |x|` lies in `σ(N)`; but `q ∈ τ₂(N) ⊆
+σ(N)ᶜ` (`tau2_subset_sigma_compl`) — contradiction.  In the FT signalizer context `x ∈ M_σ^#` is a
+`τ₂(N)`-element for the signalizer maximal `N` (`signalizer_structure_of_mem_sigmaSharp`). -/
+theorem not_conj_of_mem_Msigma_of_tau2 [Finite G] {M N : Subgroup G}
+    {x : G} (hxM : x ∈ OddOrder.BG.Ch3.S10.Msigma M) (hx1 : x ≠ 1)
+    (hxτ2 : ∀ p ∈ piSet (Subgroup.closure ({x} : Set G)), p ∈ tau2 N) :
+    ¬ ∃ g : G, MulAut.conj g • M = N := by
+  rintro ⟨g, hg⟩
+  obtain ⟨q, hqp, hqdvd⟩ :=
+    (orderOf x).exists_prime_and_dvd (fun h => hx1 (orderOf_eq_one_iff.mp h))
+  haveI : Fact q.Prime := ⟨hqp⟩
+  have hqσM : q ∈ OddOrder.BG.Ch3.S10.sigma M :=
+    isPiElement_sigma_of_mem_Msigma hxM q (Nat.mem_primeFactors.mpr ⟨hqp, hqdvd, (orderOf_pos x).ne'⟩)
+  have hqσN : q ∈ OddOrder.BG.Ch3.S10.sigma N := hg ▸ OddOrder.BG.Ch3.S10.sigma_conj g hqσM
+  have hcardx : Nat.card ↥(Subgroup.closure ({x} : Set G)) = orderOf x := by
+    rw [← Subgroup.zpowers_eq_closure, Nat.card_zpowers]
+  have hqπ : q ∈ piSet (Subgroup.closure ({x} : Set G)) := by
+    rw [piSet, Set.mem_setOf_eq, hcardx]
+    exact Nat.mem_primeFactors.mpr ⟨hqp, hqdvd, (orderOf_pos x).ne'⟩
+  exact tau2_subset_sigma_compl N (hxτ2 q hqπ) hqσN
+
+/-- **σ-decomposition of a cover element in the signalizer context** (`sigma_cover_decomposition`
+specialized to `N` = the signalizer maximal): for `x ∈ M_σ^#` a `τ₂(N)`-element and `x' ∈ N_σ`
+commuting with `x`, `sigma_decomposition (x * x') = {x} ∪ {x'}^#`.  The `M, N` non-conjugacy needed by
+`sigma_cover_decomposition` is supplied by `not_conj_of_mem_Msigma_of_tau2`.  Discharges the cover
+decomposition that BG Lemma 14.5(a) (`sigma_cover_disjoint`) reads off. -/
+theorem sigma_cover_decomposition_signalizer [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    {M N : Subgroup G} (hM : M ∈ maximalSubgroups G) (hN : N ∈ maximalSubgroups G)
+    {x x' : G} (hxM : x ∈ OddOrder.BG.Ch3.S10.Msigma M) (hx1 : x ≠ 1)
+    (hxτ2 : ∀ p ∈ piSet (Subgroup.closure ({x} : Set G)), p ∈ tau2 N)
+    (hx'N : x' ∈ OddOrder.BG.Ch3.S10.Msigma N) (hcomm : Commute x x') :
+    sigmaDecomposition (x * x') = insert x ({x'} \ {1}) :=
+  sigma_cover_decomposition hG hM hN (not_conj_of_mem_Msigma_of_tau2 hxM hx1 hxτ2) hxM hx1 hx'N hcomm
+
 /-- **BG `Msigma_ell1`** (Coq BGsection14): a nonidentity element of `M_σ` has σ-length `1`.  As a
 `σ(M)`-element, its σ-decomposition collapses to the single block `{x}`: every `σ(L)`-part is `x`
 or `1` (`sigmaPart_eq_self_or_one_of_isPiElement_sigma`), and `sigmaPart M x = x ≠ 1`.  This is the

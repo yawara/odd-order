@@ -388,3 +388,13 @@ card_LF_coprime_pq (spine, lane c)  ←  bgTheoremE_cover_data (Pf 8.17, Peterfa
 [structure] + sdprod 自明交差 [`signalizer_centralizer_isComplement`])。 2. 14.5c (cover identity + double-count
 [`card_signalizer_eq_card_maximalSigma` ✅] + orbit [S14:4749])。3. theoremE assemble → bgTheoremE_cover_data。
 **次 = 14.5a sigma_cover_disjoint**。但し cover 文脈では M,N non-conj を structure t2Nx (x τ2(N)-elt vs σ(M)-elt) で要供給。
+
+## ✅ 進捗 (lane d, 2026-06-29 cont.¹¹ — /loop): cover-decomp の structure 配線 (14.5a 直前)
+
+- **`not_conj_of_mem_Msigma_of_tau2`** (S14、axiom-clean、reusable): x∈M_σ^# が τ2(N)-elt ⟹ M,N non-conj
+  (M∼N なら σM=σN ∋ q|x, だが q∈τ2(N)⊆σ(N)ᶜ 矛盾)。**14.5a も使う M,N 非共役の核**。
+- **`sigma_cover_decomposition_signalizer`** (S14): 上記 + `sigma_cover_decomposition` の合成 = structure
+  context での cover decomp (x∈M_σ^#・τ2(N)・x'∈N_σ・commute ⟹ σ-decomp(x*x')={x}∪{x'}^#)。
+**14.5c cluster 進捗**: consttM ✅ → sigma_cover_decomposition ✅ → cover-decomp 配線 ✅ → **[残] 14.5a
+sigma_cover_disjoint** (signalizer for 2 elements x,y + sdprod 自明交差) → 14.5c (cover+count+orbit) → theoremE。
+次 = 14.5a。
