@@ -8,7 +8,38 @@
 
 ---
 
-## ✅ LIVE STATUS (2026-06-23 再開², 正本) — step-3 wiring 着地後の carrier consumer
+## ✅ LIVE STATUS (2026-06-29, 正本 — ゲートなし方針で再開, lane c /loop)
+
+> **下の 2026-06-23 ブロックの「§15 lane-c ungated closable work 枯渇 / 全 cross-lane gated」は
+> stale な待ち文化フレーミング** ([[ft-four-fronts-w1-w4]] の 2026-06-28 再配分が明示的に却下した症状)。
+> 実際には「上流 sorried を cite する」「genuine な arithmetic core を抽出する」だけで closable work は在る。
+> 技術的な carrier 診断 (U/W₂ reconciliation の所在) は今も有効な参照。
+
+### 本セッション成果 (2026-06-29, 2 commits)
+1. **(13.2.b) 位数 `|P|=p^q` = 実証明** (`Hypothesis.card_P_eq`, commit `a1e59e84`):
+   §11 の Wielandt 順序関係 `typeII_III_IV_order_relations` (type-II 側) を `typeP := Sdata` の
+   `TypesIIIIIIVSetup` に適用。nontrivial-core (U≠⊥ via 不変 index / |W₁| prime / A₀(S) TI) は type-II
+   witness から read off。唯一の non-derivable 入力 = `Sdata.W2 = W2` reconciliation を**明示仮説に隔離**
+   (= `Sdata_U_eq`/`Sdata_W1_eq` の W₂ 版; **issue 3001** で carrier threading)。`P_elementaryAbelian`
+   と `u_bound` は genuine §10/§11/§9 (lane a) content ゆえ未着手。
+2. **(13.12)/(13.15) 数値核 = 抽出** (`caseB_numeric_forces_q_three`, commit `389650dd`):
+   `m < qp/((2q+1)(p-1))` + (13.11) 下界 ⟹ `q=3` の純 ℚ-arithmetic (3 ケース)。`m_value_*` 族と同様の
+   self-contained 補題、(13.12) c=1 と (13.15) u 値の両者が consume する再利用核。
+
+### frontier の正しい見立て (ゲートなし方針)
+§15 の残 sorry は 2 種:
+- **(A) Dade norm cascade ((13.5)-(13.10) + (13.3)/(13.4))** = §15 の **genuine hard core**。`Hypothesis` の
+  opaque grid (`omega`/`eta`/`mu`/`nu`) が **τ-isometry / 直交性 / 指標次数** を property として carry して
+  いないのが障害。`IsDadeIsometry`/`FullDadeIsometryData` (S04, 既存) + §5 grid producer (`S05_*Grid`,
+  `S05_IntegralSigma`, 既存) の性質を `Hypothesis` に enrich して norm 評価を実証明するのが**次の本丸**
+  (lane-c 所有の `Hypothesis` + §13 定理。ただし enrich は FeitThompson の 2 constructor + §5 性質補題に波及)。
+  → **次 /loop iteration の最優先候補** (難所回避せず本丸へ)。
+- **(B) 後半 arithmetic ((13.12)/(13.13)/(13.15))** = (A) の (13.10) に gated だが、数値核は抽出済 (上記 2)。
+  (13.10) を cite + c/x-構造 (FPF) + (9.7.b) endgame を足せば closable に近づく (構造入力が残課題)。
+
+---
+
+## ✅ LIVE STATUS (2026-06-23 再開², ⚠ framing stale — 上ブロック参照) — step-3 wiring 着地後の carrier consumer
 
 > 以下が現状の正本。下の「🔑 carrier 診断」「🔧 POLE-1 carrier 構築」節は **step-3 wiring 着地前の
 > 歴史的経緯** (carrier wall の診断・解消過程)。carrier は既に sorry-free 完成 (`exists_typePData_W1_eq_of_isTypeP2`)

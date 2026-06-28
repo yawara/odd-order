@@ -330,6 +330,51 @@ theorem basic_structure [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
             tauS_eq_induction_holds := core.tauS_eq_induction_holds }, ?_⟩
   exact ⟨Or.inl hSII, core.P_elementaryAbelian, core.P_order, core.u_bound, core.A0S_TI_holds⟩
 
+/-- **Peterfalvi (13.2.b), order part**: the Fitting kernel `P = S_F` has order `p^q`.
+
+This is the order half of (13.2.b) ("`P` is elementary abelian of order `p^q`").  `S` is of Type II
+from the κ-Hall carrier `S_typeP2` (`isTypeII_of_isTypeP2`), so §11's Wielandt fixed-point order
+relation `typeII_III_IV_order_relations` (Peterfalvi (9.3)) applies to the type-II setup on `S` with
+`typeP := Sdata`, giving `|S_F| = |W₂|^q`.
+
+The one input not derivable from the bare `Hypothesis` fields is the reconciliation `Sdata.W2 = W2`
+between the *intrinsic* type-`P` `W₂` of `S` (`Sdata.W2 = C_{S'}(W₁#)`) and the abstract `W₂`
+(complement of `W₁` in the cyclic `W = S ∩ T`) — the `W₂`-analogue of the carried
+`Sdata_U_eq` / `Sdata_W1_eq`.  It is honest §16-carrier content (`Section16TypePStructure`, which
+builds `Sdata`); taken here as an explicit hypothesis so the order computation is unconditional on
+its proof.  See issue 3001 for threading it through the carrier (then `basic_structure_gated`'s
+`P_order` field discharges). -/
+theorem Hypothesis.card_P_eq [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hyp : Hypothesis (G := G)) (hSdataW2 : hyp.Sdata.W2 = hyp.W2) :
+    Nat.card ↥hyp.P = hyp.p ^ hyp.q := by
+  have hSII : IsTypeII hyp.S :=
+    OddOrder.BG.Ch4.S16.isTypeII_of_isTypeP2 hG hyp.S_maximal hyp.S_typeP2
+  have tdata : TypeIIData hyp.S := hSII.some
+  -- `Sdata.U ≠ ⊥`: its order is the witness-independent index `[S' : S_F]`, which is `≠ 1`
+  -- because the type-II witness has `U ≠ 1` at the same index.
+  have hUne : hyp.Sdata.U ≠ ⊥ := by
+    intro hbot
+    have h1 : Nat.card ↥hyp.Sdata.U = Nat.card ↥tdata.typeP.U := by
+      rw [hyp.Sdata.card_U_eq_index, tdata.typeP.card_U_eq_index]
+    rw [hbot, Subgroup.card_bot] at h1
+    exact tdata.common.1 (Subgroup.card_eq_one.mp h1.symm)
+  have hW1prime : (Nat.card ↥hyp.Sdata.W1).Prime := by
+    rw [hyp.Sdata_W1_eq, ← hyp.q_eq_card_W1]; exact hyp.q_prime
+  -- the `A_0(S)` TI-subset clause of the nontrivial core depends only on `S` (witness-independent).
+  have hTI := tdata.common.2.2
+  -- (9.3) Wielandt order relation for the type-II setup on `S`.
+  have hord := (OddOrder.Peterfalvi.S11.typeII_III_IV_order_relations hG
+    { maximal := hyp.S_maximal
+      typeP := hyp.Sdata
+      nontrivial := ⟨hUne, hW1prime, hTI⟩
+      type_alt := Or.inl hSII }).1 hSII
+  have hord2 : Nat.card ↥hyp.Sdata.H
+      = Nat.card ↥hyp.Sdata.W2 ^ Nat.card ↥hyp.Sdata.W1 := hord.2
+  have hW2card : Nat.card ↥hyp.Sdata.W2 = hyp.p := by
+    rw [hSdataW2, ← hyp.p_eq_card_W2]
+  rw [hyp.Sdata.H_eq, ← hyp.P_eq_SF, hW2card, hyp.Sdata_W1_eq, ← hyp.q_eq_card_W1] at hord2
+  exact hord2
+
 /-- **Structural input for Peterfalvi (13.2.d) — §14-gated.**
 
 The type II/III maximal subgroup `S` carries the Sibley Dade setup of (6.8) realizing its
@@ -545,6 +590,44 @@ theorem m_value_q_three_gt_49_hundredths {p : ℕ} (hp : 5 ≤ p) :
     ring
   rw [hexpr]
   linarith [hsmall]
+
+/-- **Numerical core shared by Peterfalvi (13.12) and (13.15)**: the upper estimate
+`m < q·p / ((2q+1)(p-1))` — obtained from `c ≥ 2q+1` (13.12) resp. the divisor `x ≥ 2q+1`
+(13.15) together with the analytic inequality (13.10) and `u ≤ (p^q-1)/(p-1)` (13.2.c) — combined
+with the (13.11) lower bounds on `m` forces `q = 3`.
+
+Self-contained `ℚ`-arithmetic over an abstract `m` satisfying the (13.11.a,b) lower bounds; `p`, `q`
+are odd primes so `p = 3 ∨ p ≥ 5` and `q = 3 ∨ q ≥ 5`, as supplied by the callers.
+
+* `p ≥ 5`: `m < q·p/((2q+1)(p-1)) < (1/2)(5/4) = 5/8 < 7/10`, against `m > 7/10` (13.11.b).
+* `p = 3`, `q ≥ 7`: `m < 3q/(2(2q+1)) < 3/4 < 8/10`, against `m > 8/10` (13.11.a).
+* `p = 3`, `5 ≤ q < 7`: `m < 3q/(2(2q+1)) < 7/10`, against `m > 7/10` (13.11.b). -/
+theorem caseB_numeric_forces_q_three {p q : ℕ} {m : ℚ}
+    (hp : p = 3 ∨ 5 ≤ p) (hq : q = 3 ∨ 5 ≤ q)
+    (hm5 : 5 ≤ q → (7 : ℚ) / 10 < m) (hm7 : 7 ≤ q → (8 : ℚ) / 10 < m)
+    (hbound : m < (q : ℚ) * (p : ℚ) / ((2 * (q : ℚ) + 1) * ((p : ℚ) - 1))) :
+    q = 3 := by
+  rcases hq with hq3 | hq5
+  · exact hq3
+  exfalso
+  have hqR : (5 : ℚ) ≤ (q : ℚ) := by exact_mod_cast hq5
+  have hm7over : (7 : ℚ) / 10 < m := hm5 hq5
+  rcases hp with rfl | hp5
+  · -- `p = 3`
+    have hden : (0 : ℚ) < (2 * (q : ℚ) + 1) * (((3 : ℕ) : ℚ) - 1) := by
+      rw [show (((3 : ℕ) : ℚ)) = 3 by norm_num]; nlinarith [hqR]
+    have hb := (lt_div_iff₀ hden).mp hbound
+    rw [show (((3 : ℕ) : ℚ)) = 3 by norm_num] at hb
+    by_cases hq7 : 7 ≤ q
+    · have h87 : (8 : ℚ) / 10 < m := hm7 hq7
+      nlinarith [hb, h87, hqR]
+    · have hqlt7 : (q : ℚ) < 7 := by exact_mod_cast (show q < 7 by omega)
+      nlinarith [hb, hm7over, hqR, hqlt7]
+  · -- `p ≥ 5`
+    have hpR5 : (5 : ℚ) ≤ (p : ℚ) := by exact_mod_cast hp5
+    have hden : (0 : ℚ) < (2 * (q : ℚ) + 1) * ((p : ℚ) - 1) := by nlinarith [hqR, hpR5]
+    have hb := (lt_div_iff₀ hden).mp hbound
+    nlinarith [hb, hm7over, hqR, hpR5]
 
 namespace Hypothesis
 
