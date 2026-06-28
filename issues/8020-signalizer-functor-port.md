@@ -249,3 +249,20 @@ careful な Coq-port。assembly skeleton は ready、cite 待ち。
 - **要決定**: RData conjunct 1 を σ(N)'-Hall (N=signalizer の極大) に修正するか。修正には N の存在 (|M_σ[x]|>1
   枝) を def に織り込む必要があり、trivial 枝 (R=⊥, C[x]≤M) では C_M(x)=C[x] が σ(M)... これも要再検討
   (trivial 枝でも κ が C[x] に入りうる)。**RData def の再設計が必要**。
+
+## ✅ HUB 裁定 (2026-06-29)
+
+lane-d の発見 (conjunct 1 = `IsHallSubgroup (σ M) (C_M(x) in C[x])` が type-P M で偽) を hub が実コードで検証:
+- **数学的に妥当**: x∈Kstar^#⊆M_σ^# で K(κ-Hall, κ⊆σ(M)ᶜ)≤C_M(x) ⟹ C_M(x) は σ(M)' 素数を含む ⟹ σ(M)-Hall でない。Coq Thm 14.4(b)/(e) の `σ(N)'-Hall(N)(M∩N)` とも整合。**conjunct 1 は σ(N)'-Hall (N=signalizer の極大) であるべき = mis-encoding 確定。**
+- **⚠ ただし「RData は FT spine が cite する shared contract」は事実誤認**: 実コード検証で
+  **`RData`/`theoremD_*`/`theoremE_*` は FeitThompson.lean からも Peterfalvi/* からも一切 cite されていない**
+  (grep 0 件)。consumer は S16_MainResults 内の theoremE のみ、theoremE も spine 非 cite。
+  ⟹ **RData/theoremD/E は完全に δ-internal (lane-d 所有の S16_MainResults 内) かつ honest FT spine の外**。
+
+**裁定**: RData は cross-lane 契約ではなく **δ-internal** ゆえ、STOP 条件 (d)「契約の無断改変」は**適用されない**。
+**lane-d は RData conjunct 1 を Coq 正解 (σ(N)'-Hall(N=signalizer 極大)、N 存在を def に織り込む) へ自身で再設計してよい** (hub/他レーン承認不要、自クラスタ内編集)。trivial 枝 (C[x]≤M, R=⊥) の C_M(x) 性質も併せて再検討。
+既存機構 (conjunct 2,4 + bridge + set-relation + assembly skeleton `RData_of_inputs` + case-split) は全て valid・再利用可。
+
+**教訓**: 「shared contract だから無断改変不可」と escalate する前に、その def が**実際に cross-lane / on-spine で cite されているか**を grep 検証する。δ-internal な def は owner が再設計してよい (no-gating 原則; cf. `feedback-cite-sorried-lemmas-if-signature-correct`)。
+
+**次手 (lane-d)**: (1) RData conjunct 1 を σ(N)'-Hall へ再設計 (N 存在込み) → (2) conjunct 1 (a) `M⊓C[x]=M_σ⊓C[x]` for x∈M_σ^# (Thm 12.5) / (b) σ(N)'-Hall 本体 → (3) conjunct 3 (Coq part b) → (4) hD3/hD4 完成。issue 継続。
