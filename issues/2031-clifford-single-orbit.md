@@ -140,6 +140,13 @@ linear extend する構造 (HC/H = C, coprime) から。`CliffordMultiplicityOne
 
 ⟹ **(9.9.a) χ(1)=u の概念的内容は完了** (e=1=ψ linear を含め)。残 = **全て carrier realization plumbing**。
 
+### cont.²: 抽象正規性 keystone landed (commit `e186e0a4`)
+
+step 2 (HC⊴HU) の抽象核を landed: **`OddOrder.GroupTheory.sup_normal_of_normal_left_of_normal_subgroupOf`**
+(SubgroupInAmbient.lean、axiom-clean): H◁G, C≤U, `(C.subgroupOf U).Normal`, H⊔U=⊤ ⟹ (H⊔C)◁G。
+証明 = `normalizer_eq_top_iff` + `mem_normalizer_iff` + `mem_sup_of_normal_left`、H が [h,c]·c で
+正規化・U が uHu⁻¹=H/uCu⁻¹=C で正規化。**carrier の HC⊴HU はこれを instantiate するだけ** (下記 step 2)。
+
 ### 残 (9.9.a) = carrier realization (S11、multi-session、概念的に easy だが plumbing-heavy)
 
 carrier goal: **χ∈xiOf data (chief.H0⊔chars.Cprime) ⟹ (χ:IrreducibleCharacter ↥(huSub data)) 1 = chars.u**
