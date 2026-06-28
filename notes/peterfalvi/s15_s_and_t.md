@@ -15,7 +15,7 @@
 > 実際には「上流 sorried を cite する」「genuine な arithmetic core を抽出する」だけで closable work は在る。
 > 技術的な carrier 診断 (U/W₂ reconciliation の所在) は今も有効な参照。
 
-### 本セッション成果 (2026-06-29, 3 commits + **生産的手法を確立**)
+### 本セッション成果 (2026-06-29, **5 commits** — carrier-free norm toolkit を構築中)
 1. **(13.2.b) 位数 `|P|=p^q` = 実証明** (`Hypothesis.card_P_eq`, commit `a1e59e84`):
    §11 の Wielandt 順序関係 `typeII_III_IV_order_relations` (type-II 側) を `typeP := Sdata` の
    `TypesIIIIIIVSetup` に適用。nontrivial-core (U≠⊥ via 不変 index / |W₁| prime / A₀(S) TI) は type-II
@@ -29,16 +29,23 @@
    `∑_{x∈H#}|α(x)|² ≥ (|P|−1)α(1)²` (α が P 上 α(1) に定値 = P が α の全 constituent の kernel に入る inflation
    状況)。**任意有限群 H + 部分群 P の carrier-free 一般補題** — Dade 機構も Hypothesis carrier も不要
    (α=α(1) on P + 二乗ノルム非負 only)。`H=↥hyp.H`, `P=S_F` で (13.5) に特化。
+4. **innerSum self-identity = 実証明** (`innerSum_self_eq_sum_normSq`, commit `56886c1c`):
+   `ClassFunction.innerSum α α = ↑(∑_g ‖α g‖²)` — 抽象 inner-product API と具体 `∑|α|²` の**橋**
+   (API に欠けていた)。`RCLike.mul_conj` 経由、任意有限群 H。norm cascade 全 step が依存。
+5. **(13.6) quadratic 非負 = 実証明** (`caseB_quadratic_nonneg`, commit `54a1784f`):
+   `0 ≤ (|P|−1)b² − 2ub` (u ≤ (|P|−1)/2)。`α(1)=qb` 代入で (13.6) の補正項
+   `q²((|P|−1)b²−2ub) ≥ 0` を与える、純 ℤ-arithmetic 核。`(|P|−1−2u)b² + 2u·b(b−1)` 分解。
 
-### ★ 生産的手法の確立 (2026-06-29) — **carrier-free core 抽出**
+### ★ 生産的手法 (2026-06-29) — **carrier-free core 抽出** (5 commit で実証)
 norm cascade ((13.5)-(13.10)) は「Hypothesis の opaque grid が τ-isometry/直交性/次数を carry しない」ため
 **wrapper 定理 (∃ data, opaqueProp 形) は carrier-gated**。だが **各 cascade step の genuine な数学的核は
-carrier-free な一般補題として抽出・実証明できる** (13.5.c が実例)。これが**待たずに本丸を進める正攻法**
+carrier-free な一般補題として抽出・実証明できる**。これが**待たずに本丸を進める正攻法**
 (reallocation §2 の consumer-side prescribed path; STOP(c) の sorry-shuffle でない — 実定理・実証明・再利用可)。
-**次 /loop の方針**: cascade の各 step の carrier-free core を順に抽出 (候補: 13.5.b の norm 展開恒等式、
-13.7/13.8 の `∑_{H#}|α|²=|H|‖α‖²−d²` + 不等式核、13.18.b の Frobenius induced-trivial norm `(u-1)/q+1`)。
-grid 依存が残る部分 (直交性そのもの) は §5 producer の性質 cite が要るが、純粋不等式/inflation/Frobenius-count
-部分は今すぐ可。
+**着地済 toolkit**: 13.5.c (inflation 下界) / innerSum self-identity (橋) / 13.6 quadratic 非負。
+**残候補**: 13.7/13.8 の `∑_{H#}|α|²=|H|‖α‖²−d²` 不等式核 (= innerSum self + `∑_{H#}=∑_H−|α1|²`; 但し
+最終不等式は virtual-char 整数性 `‖α‖²≥1`・H abelian を要し carrier/structural)、13.18.b の Frobenius
+induced-trivial norm `(u-1)/q+1` (Frobenius 群 + 誘導指標値、より重い)、13.6 の Parseval 等式
+(`∑_H|α|²=|H|‖α‖²`、innerSum self + `card_mul_inner` 即時)。grid 依存 (直交性そのもの) は §5 producer cite 要。
 
 ### frontier (ゲートなし方針)
 - **(A) Dade norm cascade ((13.5)-(13.10) + (13.3)/(13.4))** = §15 hard core。wrapper は carrier-gated だが
