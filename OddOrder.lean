@@ -45,6 +45,7 @@ import OddOrder.GroupTheory.RepresentationTheory.Clifford
 import OddOrder.GroupTheory.RepresentationTheory.CliffordAlgClosed
 import OddOrder.GroupTheory.RepresentationTheory.CliffordConjugateChar
 import OddOrder.GroupTheory.RepresentationTheory.CliffordMultiplicityOne
+import OddOrder.GroupTheory.RepresentationTheory.CliffordSingleOrbit
 import OddOrder.GroupTheory.RepresentationTheory.ConjugationBrauer
 import OddOrder.GroupTheory.RepresentationTheory.ExtraspecialFaithful
 import OddOrder.GroupTheory.RepresentationTheory.ExtraspecialThm25Final

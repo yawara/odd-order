@@ -32,6 +32,7 @@ import OddOrder.GroupTheory.RepresentationTheory.ClassSumAlgebra
 import OddOrder.GroupTheory.RepresentationTheory.ClassSumCoefficientFormula
 import OddOrder.GroupTheory.RepresentationTheory.RealClassTISubset
 import OddOrder.GroupTheory.RepresentationTheory.Clifford
+import OddOrder.GroupTheory.RepresentationTheory.CliffordSingleOrbit
 import OddOrder.GroupTheory.RepresentationTheory.InflationCharacter
 import OddOrder.GroupTheory.RepresentationTheory.ExtraspecialThm25Final
 import OddOrder.Isaacs.Ch02_Subnormality.Main
@@ -2576,6 +2577,11 @@ set_option linter.style.longLine false in
 -- The degree component of the (9.9.a) Clifford-degree assembly (issue 2031).
 #assert_only_allowed_axioms
   OddOrder.RepresentationTheory.apply_one_eq_sum_restrictionMultiplicity_mul
+-- Clifford single-orbit (module level): two simple `k[H]`-submodules of a `G`-irreducible
+-- restriction have conjugate characters `χ_{N'}(h) = χ_N(g⁻¹ h g)` — the core of
+-- `RestrictionConstituentsSingleOrbit` (issue 2031), from `iSup_map_conjSemilinearEnd_eq_top`.
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.character_conj_of_simpleSubmodule
 
 -- Peterfalvi (6.8) T6/Y-family consumer side: degree-one induced families have common degree,
 -- supported differences on `H#`, irreducibility from c1/c2 inertia, and equal-degree coherence.
