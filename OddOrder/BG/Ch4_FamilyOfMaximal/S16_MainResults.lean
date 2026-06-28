@@ -282,6 +282,39 @@ theorem signalizer_structure_of_mem_sigmaSharp [Finite G]
   exact (S14.sigmaLength_one_centralizer_structure hG (S14.genuineSigmaDecomposition hG) hx1
     (S14.Msigma_ell1 hG hM hxM.1 hx1)).2 hgt
 
+/-- **The conjugates of `M` containing `x` are exactly the `σ`-maximals of `x`** (for `x ∈ M_σ^#`):
+`maximalConjugatesContaining M x = 𝓜_σ(x)`.  This identifies the set on which Theorem D(3)/(4)'s
+`RData` asks for sharp transitivity (`maximalConjugatesContaining`) with the set the proven structure
+controls (`maximalSigmaSubgroupsOfElement`).
+* `⊆`: a conjugate `N = M^g ∋ x` has `x` a `σ(N)`-element (`σ(N) = σ(M)`, `sigma_conj`), and the
+  normal `σ(N)`-Hall `N_σ` absorbs the `σ(N)`-subgroup `⟨x⟩` (`sigma_subgroup_le_Msigma_of_isHall`),
+  so `x ∈ N_σ`.
+* `⊇`: `Theorem 14.4`'s `C_G(x)`-conjugacy (`exists_conj_centralizer_of_mem_maximalSigma`) makes any
+  `N ∈ 𝓜_σ(x)` a conjugate `M^c` (`c ∈ C_G(x)`), and `x ∈ N_σ ≤ N`. -/
+theorem maximalConjugatesContaining_eq_maximalSigma [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} (hM : M ∈ maximalSubgroups G)
+    {x : G} (hxMσ : x ∈ OddOrder.BG.Ch3.S10.Msigma M) (hx1 : x ≠ 1) :
+    maximalConjugatesContaining M x = S14.maximalSigmaSubgroupsOfElement x := by
+  ext N
+  constructor
+  · rintro ⟨g, rfl, hxN⟩
+    have hNmax : MulAut.conj g • M ∈ maximalSubgroups G :=
+      S14.mem_maximalSubgroups_of_isConjugateSubgroup hM ⟨g, rfl⟩
+    refine ⟨hNmax, ?_⟩
+    have hxpi : Ch03.Subgroup.IsPiGroup (OddOrder.BG.Ch3.S10.sigma (MulAut.conj g • M))
+        (Subgroup.zpowers x) := by
+      intro p hp
+      rw [Nat.card_zpowers] at hp
+      haveI : Fact p.Prime := ⟨Nat.prime_of_mem_primeFactors hp⟩
+      exact OddOrder.BG.Ch3.S10.sigma_conj g (S14.isPiElement_sigma_of_mem_Msigma hxMσ p hp)
+    exact OddOrder.BG.Ch3.S10.sigma_subgroup_le_Msigma_of_isHall
+      (OddOrder.BG.Ch3.S10.Msigma_isHall hG hNmax) (Subgroup.zpowers_le.mpr hxN) hxpi
+      (Subgroup.mem_zpowers x)
+  · rintro ⟨hNmax, hxNσ⟩
+    obtain ⟨c, _, hcconj⟩ := S14.exists_conj_centralizer_of_mem_maximalSigma hG
+      (S14.genuineSigmaDecomposition hG) (S14.Msigma_ell1 hG hM hxMσ hx1) ⟨hM, hxMσ⟩ ⟨hNmax, hxNσ⟩
+    exact ⟨c, hcconj.symm, OddOrder.BG.Ch3.S10.Msigma_le N hxNσ⟩
+
 /-! ## Theorems A--E -/
 
 /-- **BG Theorem A** (mmd L4274): the basic structure of a maximal subgroup:
