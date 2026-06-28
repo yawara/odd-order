@@ -181,6 +181,35 @@ theorem centralizer_le_FT_signalizerBase {x : G}
   rw [hb]
   exact (mem_maximalSubgroupsContaining.mp h.2.choose_spec).2
 
+/-- **Normal Hall meets a subgroup, giving a Hall subgroup** (Coq `setI_normal_Hall`): if `A` is a
+normal `π`-Hall subgroup of `N` and `H ≤ N`, then `A ⊓ H` is a `π`-Hall subgroup of `H`.  The
+`π`-part is clear (`A ⊓ H ≤ A`); the `π′`-index is `[H : A ⊓ H] = (A_N).relIndex (H_N) ∣ [N : A]` by
+the second isomorphism (`relIndex_sup_right`, using `A ◁ N`). -/
+theorem isHallSubgroup_subgroupOf_inf_of_normal_isHall [Finite G] {π : Set ℕ} {A N H : Subgroup G}
+    (hAN : A ≤ N) (hHN : H ≤ N)
+    (hAhall : Ch03.IsHallSubgroup π (A.subgroupOf N))
+    (hAnorm : (A.subgroupOf N).Normal) :
+    Ch03.IsHallSubgroup π ((A ⊓ H).subgroupOf H) := by
+  haveI : (A.subgroupOf N).Normal := hAnorm
+  refine ⟨fun p hp => ?_, fun p hp => ?_⟩
+  · -- `π`-part: `|A ⊓ H| ∣ |A|`.
+    have hcard1 : Nat.card ↥((A ⊓ H).subgroupOf H) = Nat.card ↥(A ⊓ H) :=
+      Nat.card_congr (Subgroup.subgroupOfEquivOfLe (inf_le_right : A ⊓ H ≤ H)).toEquiv
+    have hcard2 : Nat.card ↥(A ⊓ H) ∣ Nat.card ↥(A.subgroupOf N) := by
+      rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hAN).toEquiv]
+      exact Subgroup.card_dvd_of_le inf_le_left
+    exact hAhall.1 p (Nat.primeFactors_mono (hcard1 ▸ hcard2) Nat.card_pos.ne' hp)
+  · -- `π′`-index: `[H : A ⊓ H] = (A_N).relIndex (H_N) ∣ (A_N).index`.
+    have he1 : ((A ⊓ H).subgroupOf H).index = (A.subgroupOf N).relIndex (H.subgroupOf N) := by
+      show (A ⊓ H).relIndex H = _
+      rw [inf_comm, Subgroup.inf_relIndex_left, ← Subgroup.relIndex_subgroupOf hHN]
+    have htower := Subgroup.relIndex_mul_relIndex (A.subgroupOf N)
+      ((H.subgroupOf N) ⊔ (A.subgroupOf N)) ⊤ le_sup_right le_top
+    simp only [Subgroup.relIndex_top_right, Subgroup.relIndex_sup_right] at htower
+    have hidvd : ((A ⊓ H).subgroupOf H).index ∣ (A.subgroupOf N).index := by
+      rw [he1]; exact ⟨_, htower.symm⟩
+    exact hAhall.2 p (Nat.primeFactors_mono hidvd Subgroup.index_ne_zero_of_finite hp)
+
 /-- **BG Theorem D(3), `R(x) ◁ C_G(x)`** (Coq `nsRCx`): the first-conjunct normality.  Since `R(x) =
 (N[x])_σ ⊓ C_G(x)` with `C_G(x) ≤ N[x]` (nontrivial branch) and `(N[x])_σ ◁ N[x]`, the centralizer
 `C_G(x)` normalizes both factors, hence their intersection `R(x)`. -/
@@ -197,6 +226,25 @@ theorem FT_signalizer_normal_in_centralizer {x : G}
       Subgroup.normalizer (OddOrder.BG.Ch3.S10.Msigma (FT_signalizerBase x) : Set G) :=
     (Subgroup.normal_subgroupOf_iff_le_normalizer (OddOrder.BG.Ch3.S10.Msigma_le _)).mp hMσN
   exact OddOrder.BG.Ch3.S12.le_normalizer_inf (hCN.trans hbaseN) Subgroup.le_normalizer
+
+/-- **BG Theorem D(3), `R(x)` is a `σ(N[x])`-Hall subgroup of `C_G(x)`** (Coq `hallR`): the
+first-conjunct Hall property.  `R(x) = (N[x])_σ ⊓ C_G(x)` with `(N[x])_σ` a normal `σ(N[x])`-Hall
+subgroup of `N[x]` (`Msigma_subgroupOf_isHall`) and `C_G(x) ≤ N[x]`, so
+`isHallSubgroup_subgroupOf_inf_of_normal_isHall` applies. -/
+theorem FT_signalizer_isHall [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G) {x : G}
+    (h : 1 < (maximalSigmaSubgroupsOfElement x).ncard ∧
+      (maximalSubgroupsContaining (Subgroup.centralizer ({x} : Set G))).Nonempty) :
+    Ch03.IsHallSubgroup (OddOrder.BG.Ch3.S10.sigma (FT_signalizerBase x))
+      ((FT_signalizer x).subgroupOf (Subgroup.centralizer ({x} : Set G))) := by
+  have hbasemax : FT_signalizerBase x ∈ maximalSubgroups G := by
+    have hb : FT_signalizerBase x = h.2.choose := dif_pos h
+    rw [hb]; exact mem_maximalSubgroups.mpr (mem_maximalSubgroupsContaining.mp h.2.choose_spec).1
+  have hnorm : ((OddOrder.BG.Ch3.S10.Msigma (FT_signalizerBase x)).subgroupOf
+      (FT_signalizerBase x)).Normal := by
+    rw [OddOrder.BG.Ch3.S10.Msigma_subgroupOf]; infer_instance
+  exact isHallSubgroup_subgroupOf_inf_of_normal_isHall
+    (OddOrder.BG.Ch3.S10.Msigma_le _) (centralizer_le_FT_signalizerBase h)
+    (OddOrder.BG.Ch3.S10.Msigma_subgroupOf_isHall hG hbasemax) hnorm
 
 /-! ## Theorems A--E -/
 
