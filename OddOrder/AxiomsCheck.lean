@@ -2582,6 +2582,11 @@ set_option linter.style.longLine false in
 -- `RestrictionConstituentsSingleOrbit` (issue 2031), from `iSup_map_conjSemilinearEnd_eq_top`.
 #assert_only_allowed_axioms
   OddOrder.RepresentationTheory.character_conj_of_simpleSubmodule
+-- Constituent ⟺ submodule bridge (module side): a nonzero `H`-intertwiner `σ → Res^G_H ρ`
+-- (`σ` irreducible) yields a simple `k[H]`-submodule of `Res^G_H ρ` with character `χ_σ` (Schur +
+-- `equivLinearMapAsModule` + `LinearEquiv.ofInjective` + `char_iso`); issue 2031 補題4 core.
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.exists_simpleSubmodule_character_eq_of_ne_zero_intertwiner
 
 -- Peterfalvi (6.8) T6/Y-family consumer side: degree-one induced families have common degree,
 -- supported differences on `H#`, irreducibility from c1/c2 inertia, and equal-degree coherence.
