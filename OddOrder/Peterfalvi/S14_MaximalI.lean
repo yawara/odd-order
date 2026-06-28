@@ -465,22 +465,6 @@ def InHKernel {L : Subgroup G} (hyp : Hypothesis L) (φ : IrreducibleCharacter �
     OddOrder.Peterfalvi.S03.characterKernel (φ : ClassFunction ↥L ℂ)
 
 open scoped Classical OddOrder.Peterfalvi.S12.FiniteInduce in
-/-- **Peterfalvi (12.4), pin (c)** ([Is] 6.2 capturing + (1.5.a)/(1.2)): the off-kernel irreducible
-characters `{φ : H ⊄ ker φ}` partition into the constituent-sets `S(χ)`, `χ ∈ S`.  By [Is] 6.2,
-`H ⊄ ker φ ⟹ Res_H φ` has a non-trivial constituent `θ`, so `φ ∈ S(Ind_H^L θ)`; the orbit `θ`
-determines `χ = Ind θ` uniquely ((1.5.a)/(1.2)), so the `S(χ)` are pairwise disjoint and cover the
-off-kernel irreducibles.  This is the genuine cross-section content (the [Is] 6.2 partition); the
-`β`-vanishing regroup `Sset_offKernel_vanishes_off_H` is proved from it. -/
-theorem exists_offKernel_constituent_partition {L : Subgroup G} [Finite G] (hyp : Hypothesis L)
-    (data : ∀ χ ∈ hyp.Sset, CharacterDecompositionData hyp χ) :
-    ∃ parts : Finset {χ : ClassFunction ↥L ℂ // χ ∈ hyp.Sset},
-      Finset.univ.filter (fun φ => ¬ InHKernel hyp φ) =
-        parts.biUnion (fun χ => (data χ.1 χ.2).constituents) ∧
-      (↑parts : Set {χ : ClassFunction ↥L ℂ // χ ∈ hyp.Sset}).PairwiseDisjoint
-        (fun χ => (data χ.1 χ.2).constituents) := by
-  sorry
-
-open scoped Classical OddOrder.Peterfalvi.S12.FiniteInduce in
 /-- **Toward (12.4) pin (c'), the off-kernel direction** (genuine): every constituent `φ ∈ S(χ)` of a
 member `χ = Ind_H^L θ ∈ S` (`θ ≠ 1_H`) is off-kernel, `H ⊄ ker φ`.  If `H ⊆ ker φ` then `Res_H φ` is
 constant `= φ(1)` on `H` (`= φ(1)·1_H`), so by Frobenius `⟨χ, φ⟩ = ⟨θ, Res_H φ⟩ = star(φ(1))·⟨θ, 1_H⟩
@@ -628,6 +612,57 @@ theorem constituents_eq_of_mem {L : Subgroup G} [Finite G] (hyp : Hypothesis L)
   rw [← hg]
   exact (ClassFunction.induce_conjBy_eq (H := (hyp.typeI.typeF.H).subgroupOf L) g
     (θ : ClassFunction ↥((hyp.typeI.typeF.H).subgroupOf L) ℂ)).symm
+
+open scoped Classical OddOrder.Peterfalvi.S12.FiniteInduce in
+/-- **Peterfalvi (12.4), pin (c)** ([Is] 6.2 capturing + (1.5.a)/(1.2)): the off-kernel irreducible
+characters `{φ : H ⊄ ker φ}` partition into the constituent-sets `S(χ)`, `χ ∈ S`.  By [Is] 6.2,
+`H ⊄ ker φ ⟹ Res_H φ` has a non-trivial constituent `θ`, so `φ ∈ S(Ind_H^L θ)`; the orbit `θ`
+determines `χ = Ind θ` uniquely ((1.5.a)/(1.2)), so the `S(χ)` are pairwise disjoint and cover the
+off-kernel irreducibles.  This is the genuine cross-section content (the [Is] 6.2 partition); the
+`β`-vanishing regroup `Sset_offKernel_vanishes_off_H` is proved from it. -/
+theorem exists_offKernel_constituent_partition {L : Subgroup G} [Finite G] (hyp : Hypothesis L)
+    (data : ∀ χ ∈ hyp.Sset, CharacterDecompositionData hyp χ) :
+    ∃ parts : Finset {χ : ClassFunction ↥L ℂ // χ ∈ hyp.Sset},
+      Finset.univ.filter (fun φ => ¬ InHKernel hyp φ) =
+        parts.biUnion (fun χ => (data χ.1 χ.2).constituents) ∧
+      (↑parts : Set {χ : ClassFunction ↥L ℂ // χ ∈ hyp.Sset}).PairwiseDisjoint
+        (fun χ => (data χ.1 χ.2).constituents) := by
+  haveI := hyp.finiteG
+  classical
+  by_cases hne : (Finset.univ.filter (fun φ => ¬ InHKernel hyp φ)).Nonempty
+  · -- The off-kernel filter is nonempty, so `S` is nonempty; build the capturing map.
+    obtain ⟨φ0, hφ0⟩ := hne
+    rw [Finset.mem_filter] at hφ0
+    obtain ⟨χ0, hχ0, -⟩ := not_inHKernel_imp_mem_constituents hyp data hφ0.2
+    haveI : Nonempty {χ : ClassFunction ↥L ℂ // χ ∈ hyp.Sset} := ⟨⟨χ0, hχ0⟩⟩
+    let cap : IrreducibleCharacter ↥L → {χ : ClassFunction ↥L ℂ // χ ∈ hyp.Sset} :=
+      fun φ => if h : ¬ InHKernel hyp φ then
+        ⟨(not_inHKernel_imp_mem_constituents hyp data h).choose,
+         (not_inHKernel_imp_mem_constituents hyp data h).choose_spec.choose⟩
+      else Classical.arbitrary _
+    refine ⟨(Finset.univ.filter (fun φ => ¬ InHKernel hyp φ)).image cap, ?_, ?_⟩
+    · ext φ
+      simp only [Finset.mem_filter, Finset.mem_univ, true_and, Finset.mem_biUnion,
+        Finset.mem_image]
+      constructor
+      · intro hφ
+        refine ⟨cap φ, ⟨φ, hφ, rfl⟩, ?_⟩
+        have hcapφ : cap φ = ⟨(not_inHKernel_imp_mem_constituents hyp data hφ).choose,
+            (not_inHKernel_imp_mem_constituents hyp data hφ).choose_spec.choose⟩ := dif_pos hφ
+        rw [hcapφ]
+        exact (not_inHKernel_imp_mem_constituents hyp data hφ).choose_spec.choose_spec
+      · rintro ⟨χs, ⟨φ', _, rfl⟩, hmem⟩
+        exact constituents_not_inHKernel hyp (cap φ').2 (data (cap φ').1 (cap φ').2) hmem
+    · intro χs _ χs' _ hne_s
+      simp only [Function.onFun, Finset.disjoint_left]
+      intro φ hmem hmem'
+      exact hne_s (Subtype.ext (constituents_eq_of_mem hyp χs.2 χs'.2
+        (data χs.1 χs.2) (data χs'.1 χs'.2) hmem hmem'))
+  · -- The off-kernel filter is empty; the empty partition works.
+    rw [Finset.not_nonempty_iff_eq_empty] at hne
+    exact ⟨∅, by rw [hne, Finset.biUnion_empty], by
+      rw [Finset.coe_empty]; exact Set.pairwiseDisjoint_empty⟩
+
 
 open scoped Classical OddOrder.Peterfalvi.S12.FiniteInduce in
 /-- **Peterfalvi (12.4), the off-kernel regroup** (genuine, from the [Is] 6.2 partition pin): the
