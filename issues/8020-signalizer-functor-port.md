@@ -150,3 +150,30 @@ full build green、新 sorry なし)。S16_MainResults に実装。
 **次 = 第1連言の transitivity/cardinality**: R (or C(X)) の {maximals} への conjugation action 設定 →
 sigma_group_trans (Lean 存在未確認、要構築の可能性) → orbit-stabilizer。その後 第2連言 (|M_σ[x]|>1 枝:
 一意 N / x∈τ2(N) / N type-F or P2 / complement 構造) → RData 供給 → hD3/hD4。
+
+## 進捗ログ (lane d, 4 回目 — /loop Chunk 2: 重大発見)
+
+**2026-06-28 cont.³ (/loop): `sigmaLength_one_centralizer_structure` が FT_signalizer_context の核を既に持つ。**
+transitivity/cardinality を orbit-stabilizer でゼロ構築する必要なし — **既存 proven theorem に接続する**のが正道。
+
+**発見**: `sigmaLength_one_centralizer_structure` (S14_TypePCounting、**sorry-free・AxiomsCheck 登録済**) は
+`(D : SigmaDecompositionData G)` + `D.length x = 1` で、|M_σ[x]|>1 のとき次を供給:
+**∃! N** (N maximal ∧ C[x]≤N ∧ N_σ∩C[x]≠⊥ ∧ **R=N_σ∩C[x] が σ(N)-Hall in C[x]** ∧ x primes∈τ2(N) ∧
+(TypeF∨TypeP2 N) ∧ ∀M'∈M_σ[x]: [τ2∩π⊆σM'] [σ∩π⊆β] [IsComplement'((Msigma N)|N)((M'⊓N)|N)]
+**[sharp transitivity: ∃!r∈R, M'^r=L]**)。docstring 自身が「R◁C[x] と sharp transitivity の headline は §16
+(RData/ConjSharplyTransitiveOn=Theorem D) に preserve」と明記 → **§16 が cite すべき相手はこの S14 structure**。
+`genuineSigmaDecomposition` (Chunk 1 capstone) を D に与え、`Msigma_ell1` で ℓ_σ(x)=1 を出せば、
+x∈sigmaSharp M で structure が直接適用可能。
+
+**精密 gap 分析 (structure に対する hD3/hD4 の残)**:
+- **hD3 = RData M x R** (R:=Msigma N⊓C[x] を witness に): (1) **C_M(x)=M⊓C[x] が σ(M)-Hall in C[x]** [structure 外、別途] /
+  (2) R◁C[x] ✅ [既証 `FT_signalizer_normal_in_centralizer` の議論を N で直接: C[x]≤N + Msigma N◁N] /
+  (3) **R が C_M(x) を C[x] で complement** [Coq part(b)、structure 外] / (4) sharp transitivity on
+  **`maximalConjugatesContaining M x`** [structure は **M_σ[x]** 上。両 set の関係 (x∈conj∧conj は M_σ[x] か) を要橋渡し]。
+- **hD4 = RData + ∃!N**: ∃!N の core (maximal/C[x]≤N/Hall/complement[IsComplement' は `isComplement'_comm` で対称]/type/sharp trans) は structure 直供給。残 gap = **MF N=Msigma N** / **x∈ASet N ⊤ \ Msigma N** / **TypeP2 N→M の Frobenius 帰結** (structure 外の N 構造)。
+- **共通の linchpin**: `FT_signalizerBase x = (structure の ∃!N)` には **`maximalSubgroupsContaining(C[x])={N}`** (全 maximal over C[x] が N=singleton、Coq 第2連言 part a) が要る。但し hD3/hD4 は N を structure から直接取れば **FT_signalizerBase 経由不要**。
+
+**次 = bridge 構築 (上流順)**: (A) `signalizer_structure_of_mem_sigmaSharp` (structure を sigmaSharp 元へ再露出、
+genuineSigmaDecomposition+Msigma_ell1 経由) → (B) hD3 の RData: R◁C[x] (既証移植) + C_M(x) Hall + complement(b) +
+set 関係 (maximalConjugatesContaining↔M_σ[x]) → (C) hD4 の MF/ASet/P2 gap。my `FT_signalizer_isHall`/`_normal`
+は structure と整合 (重複でなく N 接続待ち)。
