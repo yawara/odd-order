@@ -35,8 +35,11 @@
   (**issue 3002**)。toolkit + 13.18.b は完成済ゆえ、grid 性質が入れば wrapper を組める。**最高 value の unblock**
   だが lanes B/D + FT spine 波及 (要 hub coordination)。
 
-**次の判断 (hub/ユーザー)**: (A) 13.9.b の number-field 橋を腰を据えて build (solo 可、multi-iter、uncertain)、
-(B) issue 3002 の cross-lane carrier を優先 (全 cascade 解禁)、(C) lane c を別 FT-path segment へ。
+**次の判断 (ユーザー裁定 2026-06-29)**: **(B) issue 3002 の cross-lane grid carrier を優先** = 次の正本方針。
+toolkit + 13.18.b は完成済ゆえ、Hypothesis に grid τ-isometry/orthogonality field が入れば §15/§16 cascade
+wrapper を組める。実施は cross-lane (lanes B grids / D carrier + FeitThompson constructor) ゆえ hub
+coordination 要 — **再開時はまず issue 3002 を起点に、grid 性質 field の追加 + constructor thread を進める**
+(consumer-side で sorried contract を pin しつつ並行可)。(A) 13.9.b number-field 橋 / (C) 再配置は保留。
 
 ### 本セッション成果 (2026-06-29 詳細, 16+ commits — carrier-free norm toolkit + 13.18.b + 13.9.b core)
 1. **(13.2.b) 位数 `|P|=p^q` = 実証明** (`Hypothesis.card_P_eq`, commit `a1e59e84`):
