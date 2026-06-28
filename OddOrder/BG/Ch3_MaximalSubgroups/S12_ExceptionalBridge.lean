@@ -1180,6 +1180,45 @@ theorem centralizer_le_of_elemAb_rank_two [Finite G] (hG : IsMinimalSimpleOdd G)
     exact (Subgroup.centralizer_le (SetLike.coe_subset_coe.mpr hA₀A)).trans
       ((Subgroup.centralizer_le_normalizer _).trans hNM)
 
+/-- **BG Corollary 12.4 (`norm_noncyclic_sigma`)** (BGsection12, mmd L3138): a *noncyclic*
+`σ(M)`-`p`-subgroup `P ≤ M` has `N_G(P) ≤ M`.  A noncyclic odd `p`-group contains a rank-two
+elementary abelian subgroup `A` (`exists_isElementaryAbelian_card_prime_sq_of_not_isCyclic`), whose
+`G`-centralizer lies in `M` (`centralizer_le_of_elemAb_rank_two`, BG Proposition 12.4(a)); the
+`σ`-fusion control (`fusion_control_of_mem_sigma`, third clause `N_G(P) = (N_G(P) ⊓ M)·C_G(P)`)
+factors every `n ∈ N_G(P)` as `n = a·c` with `a ∈ N_G(P) ⊓ M ≤ M` and `c ∈ C_G(P) ≤ C_G(A) ≤ M`, so
+`N_G(P) ≤ M`.  This is the `σ`-uniqueness input to BG Lemma `sigma_compl_embedding` (the cyclicity of
+`M_σ ∩ M^g`, BG Theorem D(2)). -/
+theorem norm_noncyclic_sigma [Finite G] (hG : IsMinimalSimpleOdd G)
+    {M : Subgroup G} (hM : M ∈ maximalSubgroups G) {p : ℕ} [Fact p.Prime]
+    (hpσ : p ∈ S10.sigma M) {P : Subgroup G} (hPp : IsPGroup p ↥P) (hPM : P ≤ M)
+    (hPnc : ¬ IsCyclic ↥P) :
+    Subgroup.normalizer (P : Set G) ≤ M := by
+  -- `p` is odd (`p ∣ |M| ∣ |G|`, `|G|` odd).
+  have hodd : Odd p := hG.odd.of_dvd_nat
+    ((Nat.dvd_of_mem_primeFactors ((S10.mem_sigma_iff M p).mp hpσ).1).trans
+      (Subgroup.card_subgroup_dvd_card M))
+  -- A rank-two elementary abelian `A ≤ P` inside the noncyclic odd `p`-group `P`.
+  obtain ⟨E, hEelem, hEcard⟩ :=
+    OddOrder.BG.Ch1.S04.exists_isElementaryAbelian_card_prime_sq_of_not_isCyclic hPp hodd hPnc
+  set A : Subgroup G := E.map P.subtype with hAdef
+  have hAP : A ≤ P := hAdef ▸ Subgroup.map_subtype_le E
+  have hArank : A ∈ elemAbelianOfRank G p 2 := by
+    rw [mem_elemAbelianOfRank]
+    refine ⟨hEelem.map P.subtype_injective, ?_⟩
+    rw [hAdef, Subgroup.card_map_of_injective P.subtype_injective, hEcard]
+  -- `C_G(A) ≤ M` (Prop 12.4(a)), and `C_G(P) ≤ C_G(A)` since `A ≤ P`.
+  have hCAM : Subgroup.centralizer (A : Set G) ≤ M :=
+    centralizer_le_of_elemAb_rank_two hG hM hArank (hAP.trans hPM)
+  have hCPA : Subgroup.centralizer (P : Set G) ≤ Subgroup.centralizer (A : Set G) :=
+    Subgroup.centralizer_le (SetLike.coe_subset_coe.mpr hAP)
+  have hPne : P ≠ ⊥ := by rintro rfl; exact hPnc inferInstance
+  -- `σ`-fusion: `n = a·c` with `a ∈ N_G(P) ⊓ M` and `c ∈ C_G(P) ≤ M`.
+  intro n hn
+  obtain ⟨a, haNM, c, hcC, hnac⟩ :=
+    (S10.fusion_control_of_mem_sigma hG hM hpσ hPne hPp).2.2.1 hPM n hn
+  rw [hnac]
+  exact M.mul_mem (Subgroup.mem_inf.mp haNM).2 (hCAM (hCPA hcC))
+
 end S12
 
 end OddOrder.BG.Ch3
