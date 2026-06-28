@@ -394,6 +394,25 @@ theorem signedFamily_exists {L : Subgroup G} [Fintype G] [Invertible (Nat.card G
       rw [support_conjConstituent]
       exact data.supported φ hφ
 
+open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
+/-- The chosen signed Dade-image family `R₁(φ)` of a constituent `φ ∈ S(χ)`
+(`signedFamily_exists`); `(φ − φ̄)^τ = R₁(φ).signedDifference`. -/
+noncomputable def signedFamily {L : Subgroup G} [Fintype G] [Invertible (Nat.card G : ℂ)]
+    [Invertible (Nat.card ↥L : ℂ)] {hyp : Hypothesis L} {chi : ClassFunction ↥L ℂ}
+    (data : CharacterDecompositionData hyp chi) {φ : IrreducibleCharacter ↥L}
+    (hφ : φ ∈ data.constituents) :
+    OddOrder.RepresentationTheory.SignedIrreducibleDifferenceFamily G 2 :=
+  (signedFamily_exists data hφ).choose
+
+/-- **Peterfalvi (12.2.b)**: `R(χ) = ⋃_{φ ∈ S(χ)} R₁(φ)`, the union of the two-element orthonormal
+Dade-image blocks of the constituents.  A class function `ψ` is "orthogonal to `R(χ)`" iff
+`⟨ψ, μ⟩ = 0` for every `μ = R₁(φ).μ i` ((12.4)/(12.5)). -/
+noncomputable def Rset {L : Subgroup G} [Fintype G] [Invertible (Nat.card G : ℂ)]
+    [Invertible (Nat.card ↥L : ℂ)] {hyp : Hypothesis L} {chi : ClassFunction ↥L ℂ}
+    (data : CharacterDecompositionData hyp chi) : Set (ClassFunction G ℂ) :=
+  {α | ∃ (φ : IrreducibleCharacter ↥L) (hφ : φ ∈ data.constituents) (i : Fin 2),
+    α = ((signedFamily data hφ).mu i : ClassFunction G ℂ)}
+
 /-- Carrier for Peterfalvi (12.3), comparing two non-conjugate type-I maximal
 subgroups. -/
 structure CrossOrthogonalityData {L1 L2 : Subgroup G}
