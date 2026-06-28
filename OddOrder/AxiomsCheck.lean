@@ -6729,3 +6729,5 @@ remaining content.  All axiom-clean. -/
 #assert_only_allowed_axioms OddOrder.BG.Ch4.S16.signalizer_structure_of_mem_sigmaSharp
 #assert_only_allowed_axioms OddOrder.BG.Ch4.S16.centralizer_le_normalizer_Msigma_inf_centralizer
 #assert_only_allowed_axioms OddOrder.BG.Ch4.S16.maximalConjugatesContaining_eq_maximalSigma
+#assert_only_allowed_axioms OddOrder.BG.Ch4.S16.conjSharplyTransitiveOn_of_pointed
+#assert_only_allowed_axioms OddOrder.BG.Ch4.S16.RData_of_inputs

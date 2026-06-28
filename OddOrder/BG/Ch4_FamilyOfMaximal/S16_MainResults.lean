@@ -315,6 +315,52 @@ theorem maximalConjugatesContaining_eq_maximalSigma [Finite G]
       (S14.genuineSigmaDecomposition hG) (S14.Msigma_ell1 hG hM hxMσ hx1) ⟨hM, hxMσ⟩ ⟨hNmax, hxNσ⟩
     exact ⟨c, hcconj.symm, OddOrder.BG.Ch3.S10.Msigma_le N hxNσ⟩
 
+/-- **Pointed sharp transitivity upgrades to full sharp transitivity** (regular action): if `R`
+acts on `S` so that every `L ∈ S` is `M₀^r` for a *unique* `r ∈ R`, then `R` is sharply transitive
+on `S` — for `A, B ∈ S` the unique `r ∈ R` with `B = A^r` is `r = b a⁻¹` (where `A = M₀^a`,
+`B = M₀^b`).  Supplies the `ConjSharplyTransitiveOn` conjunct of `RData` from the proven structure's
+"from `M`" transitivity (`signalizer_structure_of_mem_sigmaSharp`). -/
+theorem conjSharplyTransitiveOn_of_pointed {R : Subgroup G} {S : Set (Subgroup G)} {M₀ : Subgroup G}
+    (hbase : ∀ L ∈ S, ∃! r : G, r ∈ R ∧ MulAut.conj r • M₀ = L) :
+    ConjSharplyTransitiveOn R S := by
+  intro A hA B hB
+  obtain ⟨a, ⟨haR, haM⟩, _⟩ := hbase A hA
+  obtain ⟨b, ⟨hbR, hbM⟩, hbuniq⟩ := hbase B hB
+  refine ⟨b * a⁻¹, ⟨R.mul_mem hbR (R.inv_mem haR), ?_⟩, ?_⟩
+  · show B = MulAut.conj (b * a⁻¹) • A
+    rw [← haM, ← mul_smul, ← map_mul, show (b * a⁻¹) * a = b by group, hbM]
+  · rintro r ⟨hrR, hrA⟩
+    have hrab : MulAut.conj (r * a) • M₀ = B := by
+      rw [map_mul, mul_smul, haM, ← hrA]
+    have hra : r * a = b := hbuniq (r * a) ⟨R.mul_mem hrR haR, hrab⟩
+    rw [← hra]; group
+
+/-- **Theorem D(3) `RData` assembly** (gated-endpoint skeleton): from the proven structure's data
+(the maximal `N ≥ C_G(x)` and its sharp transitivity on `𝓜_σ(x)`) plus the two deep `M`-side inputs
+(the `σ(M)`-Hall `C_M(x)` and the complement `R ⋊ C_M(x) = C_G(x)`, Coq parts (e)/(b)), the four
+`RData M x R` conjuncts assemble for `R = N_σ ⊓ C_G(x)`: conjunct 2 (`R ◁ C_G(x)`) is
+`centralizer_le_normalizer_Msigma_inf_centralizer`, conjunct 4 (sharp transitivity on
+`maximalConjugatesContaining M x = 𝓜_σ(x)`) is `conjSharplyTransitiveOn_of_pointed`.  Reduces hD3 to
+the two genuinely-remaining inputs. -/
+theorem RData_of_inputs [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G}
+    (hM : M ∈ maximalSubgroups G) {x : G} (hxMσ : x ∈ OddOrder.BG.Ch3.S10.Msigma M) (hx1 : x ≠ 1)
+    {N : Subgroup G} (hCN : Subgroup.centralizer ({x} : Set G) ≤ N)
+    (hsharp : ∀ L ∈ S14.maximalSigmaSubgroupsOfElement x,
+      ∃! r : G, (r ∈ OddOrder.BG.Ch3.S10.Msigma N ⊓ Subgroup.centralizer ({x} : Set G)) ∧
+        MulAut.conj r • M = L)
+    (hconj1 : Ch03.IsHallSubgroup (OddOrder.BG.Ch3.S10.sigma M)
+      ((M ⊓ Subgroup.centralizer ({x} : Set G)).subgroupOf (Subgroup.centralizer ({x} : Set G))))
+    (hconj3 : Subgroup.IsComplement'
+      ((M ⊓ Subgroup.centralizer ({x} : Set G)).subgroupOf (Subgroup.centralizer ({x} : Set G)))
+      ((OddOrder.BG.Ch3.S10.Msigma N ⊓ Subgroup.centralizer ({x} : Set G)).subgroupOf
+        (Subgroup.centralizer ({x} : Set G)))) :
+    RData M x (OddOrder.BG.Ch3.S10.Msigma N ⊓ Subgroup.centralizer ({x} : Set G)) := by
+  refine ⟨hconj1, ?_, hconj3, ?_⟩
+  · exact (Subgroup.normal_subgroupOf_iff_le_normalizer inf_le_right).mpr
+      (centralizer_le_normalizer_Msigma_inf_centralizer hCN)
+  · rw [maximalConjugatesContaining_eq_maximalSigma hG hM hxMσ hx1]
+    exact conjSharplyTransitiveOn_of_pointed hsharp
+
 /-! ## Theorems A--E -/
 
 /-- **BG Theorem A** (mmd L4274): the basic structure of a maximal subgroup:
