@@ -6726,3 +6726,4 @@ remaining content.  All axiom-clean. -/
 #assert_only_allowed_axioms OddOrder.BG.Ch4.S16.FT_signalizer_normal_in_centralizer
 #assert_only_allowed_axioms OddOrder.BG.Ch4.S16.isHallSubgroup_subgroupOf_inf_of_normal_isHall
 #assert_only_allowed_axioms OddOrder.BG.Ch4.S16.FT_signalizer_isHall
+#assert_only_allowed_axioms OddOrder.BG.Ch4.S16.signalizer_structure_of_mem_sigmaSharp

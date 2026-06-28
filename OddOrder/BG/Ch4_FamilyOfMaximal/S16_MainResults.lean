@@ -246,6 +246,36 @@ theorem FT_signalizer_isHall [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G) 
     (OddOrder.BG.Ch3.S10.Msigma_le _) (centralizer_le_FT_signalizerBase h)
     (OddOrder.BG.Ch3.S10.Msigma_subgroupOf_isHall hG hbasemax) hnorm
 
+/-- **Signalizer structure for a `σ`-sharp element** (the genuine bridge to Theorem D): for
+`x ∈ M_σ^#` with more than one `σ`-maximal, the proven `sigmaLength_one_centralizer_structure`
+(fed the genuine `genuineSigmaDecomposition`, with `ℓ_σ(x) = 1` from `Msigma_ell1`) yields the unique
+maximal `N = N[x]` over `C_G(x)` together with the Hall property of `R = N_σ ⊓ C_G(x)`, the sharp
+transitivity on `𝓜_σ(x)`, the type-F/P2 dichotomy and the complement structure.  This is what the
+Theorem D(3)/(4) data is assembled from. -/
+theorem signalizer_structure_of_mem_sigmaSharp [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} (hM : M ∈ maximalSubgroups G)
+    {x : G} (hxM : x ∈ S14.sigmaSharp M)
+    (hgt : 1 < (S14.maximalSigmaSubgroupsOfElement x).ncard) :
+    ∃! N : Subgroup G, N ∈ maximalSubgroups G ∧
+      Subgroup.centralizer ({x} : Set G) ≤ N ∧
+      OddOrder.BG.Ch3.S10.Msigma N ⊓ Subgroup.centralizer ({x} : Set G) ≠ ⊥ ∧
+      Ch03.IsHallSubgroup (OddOrder.BG.Ch3.S10.sigma N)
+        ((OddOrder.BG.Ch3.S10.Msigma N ⊓ Subgroup.centralizer ({x} : Set G)).subgroupOf
+          (Subgroup.centralizer ({x} : Set G))) ∧
+      (∀ p ∈ S14.piSet (Subgroup.closure {x}), p ∈ tau2 N) ∧
+      (S14.IsTypeF N ∨ S14.IsTypeP2 N) ∧
+      ∀ M' ∈ S14.maximalSigmaSubgroupsOfElement x,
+        tau2 N ∩ S14.piSet N ⊆ OddOrder.BG.Ch3.S10.sigma M' ∧
+        OddOrder.BG.Ch3.S10.sigma N ∩ S14.piSet M' ⊆ OddOrder.BG.Ch3.S10.beta N ∧
+        Subgroup.IsComplement' ((OddOrder.BG.Ch3.S10.Msigma N).subgroupOf N)
+          ((M' ⊓ N).subgroupOf N) ∧
+        (∀ L ∈ S14.maximalSigmaSubgroupsOfElement x,
+          ∃! r : G, (r ∈ OddOrder.BG.Ch3.S10.Msigma N ⊓ Subgroup.centralizer ({x} : Set G)) ∧
+            MulAut.conj r • M' = L) := by
+  have hx1 : x ≠ 1 := hxM.2
+  exact (S14.sigmaLength_one_centralizer_structure hG (S14.genuineSigmaDecomposition hG) hx1
+    (S14.Msigma_ell1 hG hM hxM.1 hx1)).2 hgt
+
 /-! ## Theorems A--E -/
 
 /-- **BG Theorem A** (mmd L4274): the basic structure of a maximal subgroup:
