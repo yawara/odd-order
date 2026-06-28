@@ -487,3 +487,24 @@ sorry-free。その後 (9.9) `caseB_character_counts` / (9.8) `caseA_character_c
     可換 (fact1/2/3 が mod K で commute) ⟹ HC/K abelian ⟹ `⁅HC,HC⁆≤K`。
     sup 上の commutator 直接分配は不可 ([[lean-normal-closure-good-elements]]) ゆえ商可換経由。
 - caseB_degree_qu 完了で → (9.9) caseB_character_counts (9.9.b/c) → (9.8) → (11.8)/(10.7)。
+
+### §12 追補² (lane-a /loop iter2): obligation 3 facts 1,2 完了 + assembly full path
+
+- ✅ fact 1 `derivedInG_H_le_H0` (commit bf689bc7)、✅ fact 2 `commutator_cSub_H_le_H0` (`⁅C,H⁆≤H₀`,
+  commit abbfb1d7、`quotientMulAutHom_apply_mk'` で W=conj·h·h⁻¹∈N transport)。
+- fact 3 `⁅C,C⁆≤C'` = `derivedInG cSub` で定義的 (= `cprimeSub`)。
+- **assembly full path (次反復で実装、~120行)**: 目標 = `⁅HC,HC⁆ ⊆ ker χ` (HC=hInHu⊔cInHu, huSub level)。
+  ⚠ **正規性レベル**: K=H₀⊔C' は **G で非正規** (H₀ は M でのみ正規) ⟹ 商論法は **↥(H⊔C) level** で。
+  1. **K◁(H⊔C)** (G-level group `data.H⊔cSub`): `H⊔C ≤ normalizer K`、`sup_le` で H,C 各々が K 正規化。
+     h∈H: `(conj h)•K = (conj h)•H₀ ⊔ (conj h)•C'` (map_sup)、`(conj h)•H₀=H₀` (H₀◁M)、
+     `(conj h)•C'≤K` (`h c' h⁻¹=⁅h,c'⁆·c'`、⁅h,c'⁆∈⁅cSub,H⁆⊆H₀ [fact2,comm,C'≤cSub]、c'∈C')。
+     c∈cSub: `(conj c)•H₀≤K` (同様 fact2)、`(conj c)•C'=C'` (C'=⁅cSub,cSub⁆◁cSub)。
+  2. **⁅H⊔C,H⊔C⁆≤K**: mk:=mk' (K.subgroupOf(H⊔C))、`map_commutator`+`map_sup` で
+     `⁅H̄⊔C̄,H̄⊔C̄⁆=⊥`、`commutator_eq_bot_iff_le_centralizer`+`centralizer_sup` (repo `OddOrder.Mathlib.Subgroup`)
+     +`sup_le`/`le_inf` で 4 facts (mapped) に帰着 (⁅H̄,H̄⁆=⁅C̄,C̄⁆=⁅H̄,C̄⁆=⊥ ⟸ facts 1/3/2 ≤K)。
+     `Subgroup.map_eq_bot_iff`/`ker_mk'` で `⁅H⊔C,H⊔C⁆≤K`。
+  3. **realized 転送**: huSub-level `⁅hInHu⊔cInHu,·⁆⊆realized-K`: `commutator_le`+各 commutator の
+     G-coord が ⁅H⊔C,H⊔C⁆ に入る (`map_commutatorElement` 2 coe) → step2 適用。
+  4. **obligation 3**: `apply_one_eq_one_of_subset_characterKernel_of_isMulCommutative_quotient`
+     (N=`commutator ↥HC`、商可換 instance) + `liesOver_mem_characterKernel` で
+     commutator ↥HC ⊆ ker ψ (← (g:huSub)∈⁅HC,HC⁆⊆realized-K⊆ker χ [hχker])。
