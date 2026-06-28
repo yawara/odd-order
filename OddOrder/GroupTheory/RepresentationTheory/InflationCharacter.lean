@@ -10,6 +10,7 @@ import OddOrder.GroupTheory.RepresentationTheory.ClassSumAlgebra
 import OddOrder.GroupTheory.RepresentationTheory.ColumnOrthogonality
 import OddOrder.Peterfalvi.S03_PreliminaryCharacter
 import OddOrder.GroupTheory.RepresentationTheory.SchurCenterBound
+import OddOrder.GroupTheory.RepresentationTheory.LinearCharacter
 
 /-!
 # Inflation of irreducible characters
@@ -327,6 +328,26 @@ theorem exists_inflate_eq_of_subset_characterKernel (χ : IrreducibleCharacter G
   rw [show σ.character (QuotientGroup.mk' N g)
       = Representation.character (σ.comp (QuotientGroup.mk' N)) g from rfl,
     hcomp, ← congrFun hχ g]
+
+/-- **An irreducible character with abelian image is linear** (degree one).  If `ψ ∈ Irr G` is
+trivial on a normal subgroup `N ⊴ G` (`N ⊆ ker ψ` as character kernel) whose quotient `G ⧸ N` is
+commutative, then `ψ(1) = 1`.
+
+`ψ` descends through the quotient (`exists_inflate_eq_of_subset_characterKernel`) to an irreducible
+character `ψbar` of the *commutative* group `G ⧸ N`, which has degree one
+(`IsIrreducibleCharacter.apply_one_eq_one_of_isMulCommutative`); inflation preserves degree
+(`inflate_apply_one`), so `ψ(1) = ψbar(1) = 1`.
+
+This is Peterfalvi (9.9.a)'s "`(θλ)(1) = 1`": the `HC`-character `ψ` lying under `χ ∈ 𝒳(H₀C')` is
+linear because `[HC,HC]` lies in its kernel (`[H,H] ⊆ H₀`, `[H,C] ⊆ H₀` as `C = C_U(H̄)`, and
+`[C,C] = C' ⊆ ker χ`), so the quotient by that commutator is abelian. -/
+theorem apply_one_eq_one_of_subset_characterKernel_of_isMulCommutative_quotient
+    [IsMulCommutative (G ⧸ N)] (ψ : IrreducibleCharacter G)
+    (hker : (N : Set G) ⊆ OddOrder.Peterfalvi.S03.characterKernel (ψ : ClassFunction G ℂ)) :
+    (ψ : ClassFunction G ℂ) 1 = 1 := by
+  obtain ⟨ψbar, hψbar⟩ := exists_inflate_eq_of_subset_characterKernel (N := N) ψ hker
+  rw [← hψbar, inflate_apply_one]
+  exact ψbar.isIrreducible.apply_one_eq_one_of_isMulCommutative
 
 /-- **Section form of [Is] Corollary 2.30.**  If an irreducible character `φ` of
 `G` is trivial on the normal subgroup `N`, `N ≤ D`, and the image `D ⧸ N` is
