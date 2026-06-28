@@ -15,7 +15,30 @@
 > 実際には「上流 sorried を cite する」「genuine な arithmetic core を抽出する」だけで closable work は在る。
 > 技術的な carrier 診断 (U/W₂ reconciliation の所在) は今も有効な参照。
 
-### 本セッション成果 (2026-06-29, **5 commits** — carrier-free norm toolkit を構築中)
+### ★★ SESSION TOTAL + FRONTIER 評価 (2026-06-29 long /loop, ~16 lemma 完走)
+**完了した carrier-free chunk (全 sorry-free, build-green, axiom-clean)**:
+1. **§15/§16 norm-cascade arithmetic toolkit** (8 lemma): 13.2.b (`card_P_eq`)・13.2.c bridge
+   (`caseB_u_bound_arith`)・13.5.c (`sum_normSq_erase_one_ge_of_const_on_subgroup`)・innerSum-self
+   + Parseval・13.6 quadratic (`caseB_quadratic_nonneg`、13.8 も被覆)・13.7 (`caseB_eta_norm_core`)・
+   13.12/15 数値核 (`caseB_numeric_forces_q_three`)。
+2. **13.18.b Frobenius induced-trivial norm = 完成** (5 lemma): `norm_induce_one_frobenius`
+   `‖Ind_A^G 1‖²=(|N|−1)/|A|+1` + value pieces (`induce_one_apply`/kernel-vanishing/complement-count) +
+   reciprocity assembly。repo の `IsFrobeniusGroup.trivialIntersection` cite。
+3. **13.9.b ([Is] 3.14) arithmetic core** (1 lemma): `card_le_sum_of_one_le_prod` (∏xᵢ≥1⟹∑≥|s|、log-convexity)。
+
+**⟹ carrier-free frontier の残りは 2 つ、いずれも「loop の 1-iteration grind に不向き」**:
+- **(深い number-field infra) 13.9.b の残**: `∏|χ(aᵏ)|²≥1` = `N(χ(a))∈ℤ\{0}` が要。repo は character
+  値 algebraic-integer (`character_isIntegral`) + ℂ-auto Galois action (`CyclotomicGaloisAction`) を持つが、
+  **「Galois-invariant cyclotomic 元 → rational integer」(ℂ-auto ↔ number-field Galois の橋 + fixedField=ℚ
+  + Algebra.norm∈ℤ) が未整備** → 大きな multi-iteration build。feeds 13.9→13.10 (cascade、carrier-gated)。
+- **(cross-lane) 全 §15/§16 cascade wrapper**: Hypothesis の grid τ-isometry/orthogonality field 化
+  (**issue 3002**)。toolkit + 13.18.b は完成済ゆえ、grid 性質が入れば wrapper を組める。**最高 value の unblock**
+  だが lanes B/D + FT spine 波及 (要 hub coordination)。
+
+**次の判断 (hub/ユーザー)**: (A) 13.9.b の number-field 橋を腰を据えて build (solo 可、multi-iter、uncertain)、
+(B) issue 3002 の cross-lane carrier を優先 (全 cascade 解禁)、(C) lane c を別 FT-path segment へ。
+
+### 本セッション成果 (2026-06-29 詳細, 16+ commits — carrier-free norm toolkit + 13.18.b + 13.9.b core)
 1. **(13.2.b) 位数 `|P|=p^q` = 実証明** (`Hypothesis.card_P_eq`, commit `a1e59e84`):
    §11 の Wielandt 順序関係 `typeII_III_IV_order_relations` (type-II 側) を `typeP := Sdata` の
    `TypesIIIIIIVSetup` に適用。nontrivial-core (U≠⊥ via 不変 index / |W₁| prime / A₀(S) TI) は type-II
