@@ -100,12 +100,23 @@ linear extend する構造 (HC/H = C, coprime) から。`CliffordMultiplicityOne
       (長年の scaffold 仮説を除去)。wrapper (χ.isIrreducible → ρ、`restrictionMultiplicity_eq_finrank` →
       nonzero intertwiner → 補題4 core) を inline、`character_conj_of_simpleSubmodule` + IrreducibleCharacter.conjBy
       接続で組立。sorry-free + axiom-clean。
-- [ ] **degree assembly**: 基底展開 (`apply_one_eq_sum_restrictionMultiplicity_mul`) + single-orbit
-      (`restrictionConstituentsSingleOrbit_of_isIrreducible`) + common-mult
-      (`hasCommonRestrictionMultiplicity_of_singleOrbit`) + orbit-size (`card_conjByOrbit_eq_index_inertia`) +
-      次数保存 → `χ(1)=e·[G:I]·θ₀(1)`。**全 ingredient 揃った**、mechanical 集約。
-- [ ] **e=1** (別 track、Gallagher/extension or Skolem-Noether in inertia)。
-- [ ] (9.9.a) consumer: G=HU, H=H, [HU:HC]=u, θ₀(1)=1, e=1 → χ(1)=u → S11 caseB_character_counts。
+- [x] **degree formula** = `apply_one_eq_restrictionMultiplicity_mul_index_inertia` (commit `9b3363d2`):
+      `χ(1) = ⟨Res χ,θ₀⟩·[G:I_G(θ₀)]·θ₀(1)`。degree-side + single-orbit + common-mult + orbit-size を
+      Finset.sum_filter + sum_const + cardinality bridge で集約。**= 一般 Clifford 次数機構 完成**。
+- [ ] **e=1** (multiplicity-one、別 track、(9.9.a) 固有): θ₀ が inertia HC へ linear extend ⟹ Res χ
+      multiplicity-free。Gallagher/extension or Skolem-Noether in inertia。**残る deep 数学**。
+- [ ] (9.9.a) consumer wiring: G=HU, H=H, θ₀ = chief factor の nontrivial constituent。
+      `caseB_inertia_realized` (issue 2030) で I_HU(θ)=HC ⟹ [HU:I]=[HU:HC]=u (typeP_H_inf_U)、
+      θ₀(1)=1 (H̄ abelian ⟹ linear)、e=1 → degree formula で χ(1)=u → S11 caseB_character_counts 第1連言。
+
+## 2026-06-28: ★ 一般 Clifford 次数機構 完成 (single-orbit 定理化 + degree formula)
+
+ユーザー裁可「Clifford 対応を構築」を完遂: `RestrictionConstituentsSingleOrbit` を irreducibility から
+定理化 (commit `65dd09e4`、長年 scaffold 仮説を除去) + 次数公式
+`χ(1)=⟨Res χ,θ₀⟩·[G:I]·θ₀(1)` (commit `9b3363d2`)。dictionary は CliffordConjugateChar 既存活用、
+新規 build = degree-side / module single-orbit / 補題4 核 / single-orbit 組立 / degree formula。
+全 sorry-free + axiom-clean。**(9.9.a) χ(1)=u は degree formula へ e=1 + 固有値代入で導出可** =
+残 deep 数学は e=1 (multiplicity-one) のみ。
 - [ ] (9.9.a) consumer wiring (S11 `caseB_character_counts` 第1連言)。
 
 ## 完了条件
