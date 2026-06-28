@@ -604,4 +604,58 @@ theorem exists_compHom_eq_of_subset_characterKernel {H G : Type*} [Group H] [Gro
       (χ : ClassFunction H ℂ)
   rw [ClassFunction.compHom_comp, he_comp, ← inflate_coe f.ker θ0, hθ0]
 
+/-- **A constituent not killing `A`** (constituent transitivity).  For subgroups `A ≤ B ≤ G` and an
+irreducible `χ` of `G` with `A ⊄ ker χ`, some irreducible constituent `ψ` of `Res^G_B χ` (i.e. `χ`
+lies over `ψ`) also has `A ⊄ ker ψ` (where `A` is realized inside `B` as `A.subgroupOf B`).
+
+If every constituent `ψ` of `Res_B χ` killed `A`, then for `x ∈ A`, expanding `Res_B χ` in the
+irreducible basis (`sum_inner_irreducibleCharacter_smul`) and evaluating at `x` would give
+`χ(x) = ∑_ψ ⟨Res_B χ,ψ⟩ψ(x) = ∑_ψ ⟨Res_B χ,ψ⟩ψ(1) = χ(1)`, i.e. `A ⊆ ker χ` — contradiction.  This
+is the Clifford-correspondent existence input: a constituent of `Res_{HC} χ` not killing `H`, hence
+lying over a nontrivial chief-factor character, in Peterfalvi (9.9.a). -/
+theorem exists_constituent_not_subset_characterKernel
+    {A B : Subgroup G} [Fintype ↥B] [Invertible (Nat.card ↥B : ℂ)]
+    [Fintype (IrreducibleCharacter ↥B)]
+    (hAB : A ≤ B) (χ : IrreducibleCharacter G)
+    (hAχ : ¬ ((A : Set G) ⊆ OddOrder.Peterfalvi.S03.characterKernel (χ : ClassFunction G ℂ))) :
+    ∃ ψ : IrreducibleCharacter ↥B, IrreducibleCharacter.LiesOver B χ ψ ∧
+      ¬ ((A.subgroupOf B : Set ↥B) ⊆
+        OddOrder.Peterfalvi.S03.characterKernel (ψ : ClassFunction ↥B ℂ)) := by
+  classical
+  by_contra hcon
+  push_neg at hcon
+  apply hAχ
+  intro x hx
+  rw [OddOrder.Peterfalvi.S03.mem_characterKernel, OddOrder.Peterfalvi.S03.characterDegree_def]
+  set xB : ↥B := ⟨x, hAB hx⟩ with hxB
+  have hsum_apply : ∀ (s : Finset (IrreducibleCharacter ↥B))
+      (F : IrreducibleCharacter ↥B → ClassFunction ↥B ℂ) (g : ↥B),
+      (∑ ψ ∈ s, F ψ) g = ∑ ψ ∈ s, (F ψ) g := by
+    intro s F g
+    induction s using Finset.induction_on with
+    | empty => simp
+    | insert a s ha ih =>
+        rw [Finset.sum_insert ha, Finset.sum_insert ha, ClassFunction.add_apply, ih]
+  have hfourier :=
+    sum_inner_irreducibleCharacter_smul (ClassFunction.restrict B (χ : ClassFunction G ℂ))
+  have key : (χ : ClassFunction G ℂ) x = (χ : ClassFunction G ℂ) 1 := by
+    have e1 : (χ : ClassFunction G ℂ) x = (ClassFunction.restrict B (χ : ClassFunction G ℂ)) xB := by
+      rw [ClassFunction.restrict_apply]
+    have e2 : (χ : ClassFunction G ℂ) 1 = (ClassFunction.restrict B (χ : ClassFunction G ℂ)) 1 := by
+      rw [ClassFunction.restrict_apply]; rfl
+    rw [e1, e2, ← hfourier, hsum_apply, hsum_apply]
+    refine Finset.sum_congr rfl (fun ψ _ => ?_)
+    rw [ClassFunction.smul_apply, ClassFunction.smul_apply]
+    by_cases hm : ClassFunction.inner (ClassFunction.restrict B (χ : ClassFunction G ℂ))
+        (ψ : ClassFunction ↥B ℂ) = 0
+    · rw [hm]; ring
+    · have hlo : IrreducibleCharacter.LiesOver B χ ψ := by
+        rw [IrreducibleCharacter.LiesOver, ClassFunction.restrictionMultiplicity_def]; exact hm
+      have hxmem : xB ∈ A.subgroupOf B := by rw [Subgroup.mem_subgroupOf]; exact hx
+      have hψ := hcon ψ hlo hxmem
+      rw [OddOrder.Peterfalvi.S03.mem_characterKernel,
+        OddOrder.Peterfalvi.S03.characterDegree_def] at hψ
+      rw [hψ]
+  rw [key]
+
 end OddOrder.RepresentationTheory

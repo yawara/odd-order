@@ -2099,6 +2099,11 @@ set_option linter.style.longLine false in
 set_option linter.style.longLine false in
 #assert_only_allowed_axioms
   OddOrder.RepresentationTheory.apply_one_eq_one_of_subset_characterKernel_of_isMulCommutative_quotient
+-- Constituent transitivity: A ≤ B ≤ G, A ⊄ ker χ ⟹ some constituent ψ of Res_B χ has A ⊄ ker ψ.
+-- Clifford-correspondent existence for Peterfalvi (9.9.a) (issue 2031/2030).
+set_option linter.style.longLine false in
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.exists_constituent_not_subset_characterKernel
 
 -- Coefficientwise Galois transport for class functions, irreducible-character indices,
 -- virtual-character lattices, and S07 coherence data.  Galois conjugates of irreducible
