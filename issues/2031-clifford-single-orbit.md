@@ -95,15 +95,17 @@ linear extend する構造 (HC/H = C, coprime) から。`CliffordMultiplicityOne
       nonzero intertwiner σ→Res ρ (σ 既約) ⟹ simple 部分加群 N で char(ofSubmodule' N)=χ_σ
       (Schur `injective_of_ne_zero` + `equivLinearMapAsModule` + `LinearEquiv.ofInjective` + `char_iso`)。
       **= IntertwiningMap→単純部分加群抽出 (deep content) 完了**。
-- [ ] **補題4 wrapper** (LiesOver χ θ ⟹ ∃ simple submodule with char θ): χ から ρ 抽出
-      (`χ.isIrreducible`) + θ から σ_θ + `restrictionMultiplicity_eq_finrank_intertwiningMap` で
-      finrank≠0 ⟹ nonzero f (`Module.nontrivial_of_finrank_pos`+`exists_ne`) ⟹ 補題4 core。mechanical。
-- [ ] **character-level single-orbit 組立** → `restrictionConstituentsSingleOrbit_of_isIrreducible`:
-      ρ を χ から1回抽出 → N_θ,N_η (wrapper) → `character_conj_of_simpleSubmodule ρ N_η N_θ` で
-      ∃g χ_{N_θ}=χ_{N_η}(g⁻¹·g) → θ=conjBy g⁻¹ η → conjBy g θ=η (IrreducibleCharacter.conjBy 接続 =
-      char-as-function ↔ conjByEquiv + ext)。mechanical だが coercion friction あり。
-- [ ] **degree assembly**: 基底展開 + common-mult + orbit-size + 次数保存 → `χ(1)=e·u·θ₀(1)`。
+- [x] **補題4 wrapper + character-level single-orbit 組立** = `restrictionConstituentsSingleOrbit_of_isIrreducible`
+      (commit `65dd09e4`、★): **`RestrictionConstituentsSingleOrbit` を irreducibility から完全に定理化**
+      (長年の scaffold 仮説を除去)。wrapper (χ.isIrreducible → ρ、`restrictionMultiplicity_eq_finrank` →
+      nonzero intertwiner → 補題4 core) を inline、`character_conj_of_simpleSubmodule` + IrreducibleCharacter.conjBy
+      接続で組立。sorry-free + axiom-clean。
+- [ ] **degree assembly**: 基底展開 (`apply_one_eq_sum_restrictionMultiplicity_mul`) + single-orbit
+      (`restrictionConstituentsSingleOrbit_of_isIrreducible`) + common-mult
+      (`hasCommonRestrictionMultiplicity_of_singleOrbit`) + orbit-size (`card_conjByOrbit_eq_index_inertia`) +
+      次数保存 → `χ(1)=e·[G:I]·θ₀(1)`。**全 ingredient 揃った**、mechanical 集約。
 - [ ] **e=1** (別 track、Gallagher/extension or Skolem-Noether in inertia)。
+- [ ] (9.9.a) consumer: G=HU, H=H, [HU:HC]=u, θ₀(1)=1, e=1 → χ(1)=u → S11 caseB_character_counts。
 - [ ] (9.9.a) consumer wiring (S11 `caseB_character_counts` 第1連言)。
 
 ## 完了条件
