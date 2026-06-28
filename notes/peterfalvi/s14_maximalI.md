@@ -372,3 +372,25 @@ char/§8-gated で手詰まり」評価は**誤り**(= 新方針が根絶する�
 - **(12.4)/(12.5) 証明 core = `CharacterPsiDecomposition`** (S07_Coherence:1110, ψ⊥R ⟹ Res_L ψ 分解)。
   S08 certain-type で多用、型 I 適用要確認。+ §8 ((8.12.c) A(L)−H# TI)、§1 ((1.4))、[Is] 6.2/7.7。
 - **(12.3)** = (8.18.c) Ã disjoint + (5.9) + Supp((φ−φ̄)^τ)⊆Ã(L) disjoint で R(χ₁)⊥R(χ₂)。
+
+## 2026-06-29 (lane-b=β loop cont.): (12.2)-(12.5) carrier 層 genuine 完成
+
+**(12.2.b) R(χ) carrier 完成** (commits c80bfb92/a8298a69/7b13b1f3/364589f7):
+- `conjConstituent` (φ̄=⟨(φ:CF).conj, isIrreducible.conj⟩) + 4性質 (coe / support_conjConstituent
+  [star_eq_zero] / conjConstituent_apply_one [degree=irreducibleCharacter_apply_one_eq_pos_natCast +
+  star_natCast] / ne_conjConstituent [¬IsReal⟹φ≠φ̄])。**`[Finite ↥L]` instance 必須** (isIrreducible.conj 用)。
+- `signedFamily_exists` (R₁(φ) derive 本体): exists_signedFamily_of_constituents を family=![φ,φ̄]
+  (Fin 2) に適用、3 hyp を conjConstituent lemma で discharge (fin_cases + show で coe 正規化)。
+- `signedFamily` (choose) + `Rset` = {α|∃φ∈constituents,∃i, α=(signedFamily data hφ).μ i} = R(χ)。
+
+**(12.3)-(12.5) faithful 化完成** (commits a0c011d3/5d4ae345):
+- (12.4)/(12.5): R free (unsound) → `data : ∀χ∈Sset, CharacterDecompositionData hyp χ` 引数 +
+  horth=ψ⊥`(Rset (data χ hχ))`。(12.3): CrossOrthogonalityData 削除 → `∀α∈Rset data1,∀β∈Rset data2,⟨α,β⟩=0`。
+- instance: `[Fintype G][Invertible (Nat.card G/↥L:ℂ)]`、L を binder 先頭 (↥L 順序)、`Rset` は explicit
+  (top-level、dot notation 不可)。
+
+**残 = (12.3)-(12.5) 証明本体** (次イテレーション、§12 char obligation):
+- (12.4)/(12.5) = `CharacterPsiDecomposition` (S07:1110) 型 I 適用 + §8 ((8.12.c) TI) + §1 ((1.4)) +
+  [Is] 6.2/7.7。engine statement 確認から。
+- (12.3) = (8.18.c) Ã disjoint + (5.9) + Supp disjoint + 共役論法。§8 cross fact は β 範囲外 (pin)。
+- その後 (12.6) sibleyTarget / (12.10)-(12.15) / (12.16) 最終矛盾 (+(1.10) congruence)。
