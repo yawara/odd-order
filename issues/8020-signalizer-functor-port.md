@@ -405,3 +405,19 @@ sigma_cover_disjoint** (signalizer for 2 elements x,y + sdprod 自明交差) →
 g∈x·R(x)∩y·R(y) ⟹ y=x' (cover-decomp) ⟹ x∈R(y)∩(N[x]⊓C[y]) = ⊥ (signalizer_centralizer_isComplement
 を M'=N[x]/y に適用) ⟹ x=1 矛盾。structure を x,y 両方に適用 (signalizer_structure_of_mem_sigmaSharp、
 general ℓ_σ=1 は 𝓜_σ(x)≠∅ から M 抽出)。
+
+**🔑 cont.¹³ scoping (14.5a 実装 key insight, 次セッションの土台)**:
+- **structure の R (`Msigma N_x ⊓ C[x]`, N_x = ∃!N を `choose`) を使う; canonical `FT_signalizer` を使わない**
+  ⟹ `FT_signalizerBase x = N_x` の uniqueness bridge (`𝓜('C[x])={N}`, hD4 linchpin, deep) を**回避**。
+  theoremE は R を parameter で取る (`hR : RData M x (R M x)`) ので canonical 不要、structure の R で OK。
+- 精密 step (全 piece 在庫): (1) x,y に `signalizer_structure_of_mem_sigmaSharp` 適用 (N_x,N_y, choose) →
+  R_x=Msigma N_x⊓C[x], R_y=Msigma N_y⊓C[y]。 (2) g=x·r=y·s (r∈R_x,s∈R_y)。`sigma_cover_decomposition_signalizer`
+  (x の M_x,N_x,τ2) で σ-decomp(g)={x}∪{r}^#; 同 y で ={y}∪{s}^#。`mem_sigma_cover_decomposition_signalizer`
+  で y∈σ-decomp(g)。y≠x ⟹ **y=r∈R_x⊆Msigma N_x** ⟹ N_x∈𝓜_σ(y)。 (3) x=s'... 正確には x=y' from
+  x·r=y·s,r=y ⟹ s=x (commute) ⟹ **x∈R_y**。 (4) structure(y) の ∀M' clause を M'=N_x∈𝓜_σ(y) に適用 →
+  `IsComplement'((Msigma N_y).subgroupOf N_y)((N_x⊓N_y).subgroupOf N_y)` → `signalizer_centralizer_isComplement`
+  (a=y, M=N_x, N=N_y; y∈N_x ∵ y∈Msigma N_x) → `IsComplement'((N_x⊓C[y])..)((Msigma N_y⊓C[y])..)`。
+  x∈両factor (x∈N_x⊓C[y] [x∈N_x via C[x]≤N_x; x∈C[y] via commute] かつ x∈R_y=Msigma N_y⊓C[y]) →
+  `.disjoint` で x=1 矛盾。 (5) ⚠ branch: |𝓜_σ(x)|=1 (R_x=⊥) では x·R_x={x}; この場合の disjoint も要処理。
+- ⚠ **長い grind 継続中** (14.5a→14.5c→theoremE→bgTheoremE→spine)。高速代替 = cross-lane refactor
+  (card_LF を partition-only 化、lane c 協調) を hub/user 判断で検討推奨。
