@@ -498,6 +498,23 @@ theorem sum_normSq_erase_one_ge_of_const_on_subgroup {H : Type*} [Group H] [Fint
       = (Nat.card ↥P : ℝ) * ‖α 1‖ ^ 2 - ‖α 1‖ ^ 2 := by ring
   rw [hexp]; linarith [hkey]
 
+/-- **Arithmetic bridge of Peterfalvi (13.2.c)**: `(p−1)^{q−1} ≤ (p^q − 1)/(p − 1)`.
+
+Peterfalvi (13.2.c) gets `u ≤ (p^q − 1)/(p − 1)` from the fixed-point-free bound `u ≤ (p−1)^{q−1}`
+(of (9.7)) via this inequality.  Pure ℕ-arithmetic: `(p−1)^{q−1}·(p−1) = (p−1)^q < p^q`, so
+`(p−1)^q ≤ p^q − 1`, and dividing by `p−1` gives the claim.  Together with `|P| = p^q` and `p ≥ 3`
+this yields `u ≤ (|P|−1)/2` — the hypothesis of `caseB_quadratic_nonneg` (and hence of the (13.6)
+norm bound). -/
+theorem caseB_u_bound_arith {p q : ℕ} (hp : 2 ≤ p) (hq : 1 ≤ q) :
+    (p - 1) ^ (q - 1) ≤ (p ^ q - 1) / (p - 1) := by
+  have hp1 : 0 < p - 1 := by omega
+  rw [Nat.le_div_iff_mul_le hp1]
+  have hpow : (p - 1) ^ (q - 1) * (p - 1) = (p - 1) ^ q := by
+    rw [← pow_succ]; congr 1; omega
+  rw [hpow]
+  have hlt : (p - 1) ^ q < p ^ q := Nat.pow_lt_pow_left (by omega) (by omega)
+  omega
+
 /-- **Key nonnegativity of Peterfalvi (13.6)**: the quadratic correction term is `≥ 0`.
 
 In (13.6) the inflation degree satisfies `α(1) = q·b` for an integer `b`, and the bound reduces to
