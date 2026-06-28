@@ -6768,6 +6768,17 @@ theorem exists_zeta_residual_not_orthogonal [Finite G]
           ((hyp.tau ((∑ i' : Fin hyp.w1, hyp.muGrid hG hG.odd i' 0) - ζ))
             - ∑ i' : Fin hyp.w1, hyp.alignedOmegaSigmaGrid hG hG.odd i' 0)
           (hyp.alignedOmegaSigmaGrid hG hG.odd i j) = 0 := by
+  -- Peterfalvi's (10.2)/(10.3) character parameters of (10.4): `params.zeta` is the degree-`w₁`
+  -- irreducible of (10.2) (`ζ ∈ S(HC)`), with the `μ`/`ω^σ`-grids, `δ = ±1` and column-sign data —
+  -- the (10.6.b) conditions the (11.8.1)–(11.8.6) `σ`-grid identities consume.
+  obtain ⟨params, -, -, hzS, hz1, -, -, -⟩ := hyp.exists_charParameters_full hG
+  refine ⟨params.zeta, hzS, params.zeta_irreducible, hz1, ?_⟩
+  -- The deep non-orthogonality calculation Peterfalvi (11.8.1)–(11.8.6): by contradiction, the
+  -- residual `(μ₀−ζ)^τ − ∑ᵢ ω_{i0}^σ` being orthogonal to `(Irr W)^σ` forces, via the available
+  -- `σ`-grid identities (`muGridAlpha_tau_*`) and the `(5.7)` `S(HC)`-coherence, the `(5.6)`
+  -- coherence-union of the whole family `S = S(HC) ∪ (S(C)−S(HC))`, contradicting (11.3)
+  -- `S13.S_H0C_not_coherent`.
+  intro _h_orth
   sorry
 
 open scoped FiniteInduce in
