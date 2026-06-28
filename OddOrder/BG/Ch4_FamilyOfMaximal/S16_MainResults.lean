@@ -3182,6 +3182,32 @@ theorem mf_eq_msigma_of_typePData_U_eq_bot [Finite G] (hG : OddOrder.BG.IsMinima
   refine le_antisymm (S15.maxNilpotentNormalHall_le_Msigma hG hM) ?_
   exact hderiv ▸ OddOrder.BG.Ch3.S10.Msigma_le_derived hG hM
 
+/-- **Type V and Type II are mutually exclusive** (the `U = ⊥` vs `U ≠ ⊥` dichotomy): a type-V
+maximal has `M' = M_F` (trivial complement `U = ⊥`), while a type-II maximal has `M' ⊋ M_F`
+(nontrivial complement `U ≠ ⊥`, `TypePNontrivialCore`).  Since `M' = M_F ⊔ U` and `U` is a
+complement of `M_F = H` in `M'`, both data structures fix the *same* `H = maxNilpotentNormalHall M`,
+so a type-V witness forces the type-II complement `U ≤ H`, hence (disjointness) `U = ⊥` — a
+contradiction.  Supplies the `¬ M_P2` half of the reverse bridge `hVP1`. -/
+theorem not_isTypeII_of_isTypeV {M : Subgroup G} :
+    OddOrder.GroupTheory.IsTypeV M → ¬ OddOrder.GroupTheory.IsTypeII M := by
+  rintro ⟨dV⟩ ⟨dII⟩
+  have hMV : derivedInG M = maxNilpotentNormalHall M := by
+    rw [dV.typeP.derivedInG_eq_fitting_sup_U, dV.U_eq_bot, sup_bot_eq]
+  have hUH : dII.typeP.U ≤ dII.typeP.H := by
+    rw [dII.typeP.H_eq]
+    have hsup : maxNilpotentNormalHall M ⊔ dII.typeP.U = maxNilpotentNormalHall M := by
+      rw [← dII.typeP.derivedInG_eq_fitting_sup_U, hMV]
+    exact le_sup_right.trans (le_of_eq hsup)
+  have hdisj : Disjoint (dII.typeP.H.subgroupOf (derivedInG M))
+      (dII.typeP.U.subgroupOf (derivedInG M)) := dII.typeP.derived_complement.disjoint
+  have hUsub : dII.typeP.U.subgroupOf (derivedInG M) = ⊥ := by
+    rw [← inf_of_le_left (Subgroup.subgroupOf_mono (derivedInG M) hUH), inf_comm,
+      disjoint_iff.mp hdisj]
+  have hUbot : dII.typeP.U = ⊥ :=
+    (inf_of_le_left dII.typeP.U_le).symm.trans
+      (disjoint_iff.mp (Subgroup.subgroupOf_eq_bot.mp hUsub))
+  exact dII.common.1 hUbot
+
 /-- **Prop 16.1 reverse, centralizer half of `π(W₁) ⊆ κ(M)`** (mmd L4478, `1 ⊂ C_H(W₁) ⊆
 C_{M_σ}(W₁)`): for a type-`P` datum and a nonidentity `x ∈ W₁`, the `M_σ`-centralizer of `x` is
 nontrivial.  Witness: `W₂ = M' ⊓ C(x)` (`centralizer_W1`) lies in both `M_σ` (`W₂ ≤ H = M_F ≤ M_σ`)
@@ -4360,9 +4386,16 @@ theorem proposition_type_classification [Finite G]
   case hIIP2 => sorry
   -- `hIIIIVP1` (Type III/IV ⟹ Type P₁ ∧ `M_F ≠ M_σ`): `π(W₁) ⊆ κ(M)` + `M_F ≠ M_σ` (carrier).
   case hIIIIVP1 => sorry
-  -- `hVP1` (Type V ⟹ Type P₁ ∧ `M_F = M_σ`): `M_F = M_σ` proved (`mf_eq_msigma_of_typePData_U_eq_bot`),
-  -- but `IsTypeP1` still needs `π(W₁) ⊆ κ(M)` (carrier `W₁ = κ`-Hall, issue 8015).
-  case hVP1 => sorry
+  -- `hVP1` (Type V ⟹ Type P₁ ∧ `M_F = M_σ`): `M_F = M_σ` from `U = ⊥`
+  -- (`mf_eq_msigma_of_typePData_U_eq_bot`); `IsTypeP1` (not `P₂`) because `P₂ ⟹ Type II`
+  -- (`isTypeII_of_isTypeP2`) contradicts `Type V` (`not_isTypeII_of_isTypeV`).
+  case hVP1 =>
+    intro hV
+    obtain ⟨dV⟩ := hV
+    refine ⟨?_, mf_eq_msigma_of_typePData_U_eq_bot hG hM dV.typeP dV.U_eq_bot⟩
+    rcases isTypeP_iff_isTypeP1_or_isTypeP2.mp (isTypeP_of_isTypeV hG hM ⟨dV⟩) with h1 | h2
+    · exact h1
+    · exact absurd (isTypeII_of_isTypeP2 hG hM h2) (not_isTypeII_of_isTypeV ⟨dV⟩)
 
 /-- **Type I and non-Type-I are mutually exclusive** (corollary of Proposition
 16.1(a)–(d)).  A maximal subgroup of a minimal simple group of odd order that is
