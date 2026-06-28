@@ -156,7 +156,13 @@ carrier goal: **χ∈xiOf data (chief.H0⊔chars.Cprime) ⟹ (χ:IrreducibleChar
    `cSub_subgroupOf_U_normal` (C=cSub=ker(uActionHom)⊴U、`MonoidHom.normal_ker`+iso) →
    `cInHu_normal` (comap transport `↥uInHu≃*↥U` で C◁U realized) + `hInHu_sup_uInHu_eq_top`
    (H⊔U=⊤ via `subgroupOf_sup`×2 + `subgroupOf_self`) → 抽象補題 `sup_normal_...` 適用。
-3. **ψ∈Irr(HC) を Res_{HC} χ の成分に** (`exists_liesOver`) + **χ lies over ψ**。
+3. **✅ constituent 存在 landed** (commit pending、InflationCharacter、axiom-clean):
+   `exists_constituent_not_subset_characterKernel` (A≤B≤G, A⊄Ker χ ⟹ ∃ψ∈Res_B χ, A⊄Ker ψ、Fourier+
+   restriction transitivity)。**A=B=H で適用 ⟹ χ の非自明 H-constituent θ₀** (degree formula route の鍵)。
+   ψ∈Irr(HC) は `exists_liesOver` で取得 (χ lies over ψ)。**重要簡略化: 全 HC-constituent ψ が linear**
+   ([HC,HC]⊆Ker χ ([H,H]/[H,C]⊆H₀, C'⊆Ker χ) ⟹ ∀constituent ⊆Ker ψ) ゆえ ψ 選択は任意。
+   **degree formula route で inertia ψ=HC / Ind 既約を回避可**: χ(1)=e·[HU:HC]·θ₀(1)=e·[HU:HC] (degree formula
+   + inertia_eq_hcInHu)、e≥1、χ(1)≤(Ind ψ)(1)=[HU:HC] (ψ linear constituent) ⟹ e=1, χ(1)=[HU:HC]=u。
 4. **ψ(1)=1**: [HC,HC]⊆characterKernel ψ (上記 commutator 3 facts、H₀=chief.N realized⊆Ker χ も要) → keystone 2。
 5. **✅✅✅ inertia lift core COMPLETE** (S11、axiom-clean): `inertia_eq_hcInHu` = **I_HU(θ₀)=HC**
    (θ₀=realized inflation の H-char)。重要発見: `typeP_quotientCoprimeAction.φ.comp U.subtype = uActionHom`
