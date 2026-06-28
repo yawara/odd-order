@@ -3546,6 +3546,131 @@ theorem derivedInG_eq_commutator (H : Subgroup G) : derivedInG H = ⁅H, H⁆ :=
   rw [derivedInG, commutator_def, Subgroup.map_commutator]
   simp only [← H.subtype.range_eq_map, Subgroup.range_subtype]
 
+section
+open scoped commutatorElement
+
+/-- **Peterfalvi (9.9.a): `H ⊔ C ≤ normalizer(H₀ ⊔ C')`.**  For a generator `x ∈ H ∪ C` and any
+`k ∈ K = H₀C'`, `⁅x,k⁆ ∈ K`: by `closure_induction` on `k`, the base cases (`k ∈ H₀` or `k ∈ C'`) use
+`⁅H,H₀⁆,⁅C,H₀⁆ ≤ H₀` and `⁅H,C'⁆ ≤ H₀`, `⁅C,C'⁆ ≤ C'`, and the inductive conjugations stay in `K`
+since `K` is closed under conjugation by its own elements.  Then `x k x⁻¹ = ⁅x,k⁆·k ∈ K`. -/
+theorem HsupC_le_normalizer_K [Finite G] {M : Subgroup G} (data : TypesIIIIIIVSetup M)
+    (chief : ChiefFactorData data) :
+    data.H ⊔ cSub data chief
+      ≤ Subgroup.normalizer ((chief.H0 ⊔ cprimeSub data chief : Subgroup G) : Set G) := by
+  haveI := chief.N_normal
+  set K := chief.H0 ⊔ cprimeSub data chief with hKdef
+  have hHH : ⁅data.H, data.H⁆ ≤ K :=
+    le_trans ((derivedInG_eq_commutator data.H).symm.trans_le (derivedInG_H_le_H0 data chief))
+      le_sup_left
+  have hCH : ⁅cSub data chief, data.H⁆ ≤ K :=
+    le_trans (commutator_cSub_H_le_H0 data chief) le_sup_left
+  have hHC' : ⁅data.H, cSub data chief⁆ ≤ K := by rw [Subgroup.commutator_comm]; exact hCH
+  have hCC : ⁅cSub data chief, cSub data chief⁆ ≤ K :=
+    le_trans (derivedInG_eq_commutator (cSub data chief)).symm.le le_sup_right
+  have hKclosure : K = Subgroup.closure (↑chief.H0 ∪ ↑(cprimeSub data chief) : Set G) := by
+    rw [hKdef, Subgroup.closure_union, Subgroup.closure_eq, Subgroup.closure_eq]
+  -- For a generator `x ∈ H ∪ C` and any `k ∈ K`, `⁅x, k⁆ ∈ K`.
+  have hcomm : ∀ x : G, (x ∈ data.H ∨ x ∈ cSub data chief) → ∀ k ∈ K, ⁅x, k⁆ ∈ K := by
+    intro x hx k hk
+    rw [hKclosure] at hk
+    induction hk using Subgroup.closure_induction with
+    | mem y hy =>
+      rcases hy with hy0 | hyc'
+      · rcases hx with hxH | hxC
+        · exact hHH (Subgroup.commutator_mem_commutator hxH (chief.H0_lt_H.le hy0))
+        · exact hCH (Subgroup.commutator_mem_commutator hxC (chief.H0_lt_H.le hy0))
+      · rcases hx with hxH | hxC
+        · exact hHC' (Subgroup.commutator_mem_commutator hxH (cprimeSub_le_C data chief hyc'))
+        · exact hCC (Subgroup.commutator_mem_commutator hxC (cprimeSub_le_C data chief hyc'))
+    | one => simpa using K.one_mem
+    | mul a b ha hb iha ihb =>
+      have haK : a ∈ K := by rw [hKclosure]; exact ha
+      rw [show ⁅x, a * b⁆ = ⁅x, a⁆ * (a * ⁅x, b⁆ * a⁻¹) by
+        rw [commutatorElement_def, commutatorElement_def]; group]
+      exact mul_mem iha (mul_mem (mul_mem haK ihb) (K.inv_mem haK))
+    | inv a ha iha =>
+      have haK : a ∈ K := by rw [hKclosure]; exact ha
+      rw [show ⁅x, a⁻¹⁆ = a⁻¹ * ⁅x, a⁆⁻¹ * a by
+        rw [commutatorElement_def, commutatorElement_def]; group]
+      exact mul_mem (mul_mem (K.inv_mem haK) (K.inv_mem iha)) haK
+  -- conclude normalizer membership for generators, then `sup_le`.
+  have hnorm : ∀ x : G, (x ∈ data.H ∨ x ∈ cSub data chief) → x ∈ Subgroup.normalizer K := by
+    intro x hx
+    rw [Subgroup.mem_normalizer_iff]
+    intro n
+    refine ⟨fun hn => ?_, fun hn => ?_⟩
+    · rw [show x * n * x⁻¹ = ⁅x, n⁆ * n by rw [commutatorElement_def]; group]
+      exact mul_mem (hcomm x hx n hn) hn
+    · have hxinv : x⁻¹ ∈ data.H ∨ x⁻¹ ∈ cSub data chief := by
+        rcases hx with h | h
+        · exact Or.inl (data.H.inv_mem h)
+        · exact Or.inr ((cSub data chief).inv_mem h)
+      have hkey := mul_mem (hcomm x⁻¹ hxinv _ hn) hn
+      rw [show ⁅x⁻¹, x * n * x⁻¹⁆ * (x * n * x⁻¹) = n by
+        rw [commutatorElement_def]; group] at hkey
+      exact hkey
+  exact sup_le (fun x hx => hnorm x (Or.inl hx)) (fun x hx => hnorm x (Or.inr hx))
+
+/-- **Peterfalvi (9.9.a) commutator step**: `⁅HC, HC⁆ ≤ H₀C'`.  `K = H₀C'` is normal in `HC`
+(`HsupC_le_normalizer_K`), and in the quotient `HC/K` the images of `H` and `C` commute and are
+abelian (the four sub-commutators `⁅H,H⁆,⁅H,C⁆,⁅C,H⁆,⁅C,C⁆ ≤ K`), so `HC/K` is abelian, i.e.
+`⁅HC,HC⁆ ≤ K`.  This is the kernel containment making the (9.9.a) `S(H₀C')`-constituents linear. -/
+theorem commutator_HsupC_le_H0Cprime [Finite G] {M : Subgroup G} (data : TypesIIIIIIVSetup M)
+    (chief : ChiefFactorData data) :
+    ⁅data.H ⊔ cSub data chief, data.H ⊔ cSub data chief⁆
+      ≤ chief.H0 ⊔ cprimeSub data chief := by
+  haveI := chief.N_normal
+  set HC := data.H ⊔ cSub data chief with hHCdef
+  set K := chief.H0 ⊔ cprimeSub data chief with hKdef
+  have hHH : ⁅data.H, data.H⁆ ≤ K :=
+    le_trans ((derivedInG_eq_commutator data.H).symm.trans_le (derivedInG_H_le_H0 data chief))
+      le_sup_left
+  have hCH : ⁅cSub data chief, data.H⁆ ≤ K :=
+    le_trans (commutator_cSub_H_le_H0 data chief) le_sup_left
+  have hHC' : ⁅data.H, cSub data chief⁆ ≤ K := by rw [Subgroup.commutator_comm]; exact hCH
+  have hCC : ⁅cSub data chief, cSub data chief⁆ ≤ K :=
+    le_trans (derivedInG_eq_commutator (cSub data chief)).symm.le le_sup_right
+  have hKle : K ≤ HC :=
+    sup_le (le_trans chief.H0_lt_H.le le_sup_left)
+      (le_trans (cprimeSub_le_C data chief) le_sup_right)
+  haveI hK'normal : (K.subgroupOf HC).Normal :=
+    (Subgroup.normal_subgroupOf_iff_le_normalizer hKle).mpr (HsupC_le_normalizer_K data chief)
+  -- `commutator ↥HC ≤ K.subgroupOf HC` via the quotient `HC/K` being abelian.
+  have hcomm : commutator ↥HC ≤ K.subgroupOf HC := by
+    have hmk_surj := QuotientGroup.mk'_surjective (K.subgroupOf HC)
+    set mk := QuotientGroup.mk' (K.subgroupOf HC) with hmk
+    have hsub : ∀ P Q : Subgroup G, ⁅P, Q⁆ ≤ K →
+        ⁅(P.subgroupOf HC).map mk, (Q.subgroupOf HC).map mk⁆ = ⊥ := by
+      intro P Q hPQ
+      rw [← Subgroup.map_commutator, Subgroup.map_eq_bot_iff, hmk, QuotientGroup.ker_mk',
+        Subgroup.commutator_le]
+      intro x hx y hy
+      rw [Subgroup.mem_subgroupOf] at hx hy ⊢
+      have hxy : ((⁅x, y⁆ : ↥HC) : G) = ⁅((x : ↥HC) : G), ((y : ↥HC) : G)⁆ := by
+        simp [commutatorElement_def]
+      rw [hxy]
+      exact hPQ (Subgroup.commutator_mem_commutator hx hy)
+    rw [← QuotientGroup.ker_mk' (K.subgroupOf HC), ← Subgroup.map_eq_bot_iff, commutator_def,
+      Subgroup.map_commutator, Subgroup.map_top_of_surjective mk hmk_surj]
+    have hAB : (data.H.subgroupOf HC).map mk ⊔ ((cSub data chief).subgroupOf HC).map mk = ⊤ := by
+      rw [← Subgroup.map_sup, ← Subgroup.subgroupOf_sup le_sup_left le_sup_right,
+        show (data.H ⊔ cSub data chief).subgroupOf HC = ⊤ from Subgroup.subgroupOf_self HC,
+        Subgroup.map_top_of_surjective mk hmk_surj]
+    rw [← hAB, Subgroup.commutator_eq_bot_iff_le_centralizer, Subgroup.centralizer_sup]
+    refine sup_le (le_inf ?_ ?_) (le_inf ?_ ?_)
+    · exact Subgroup.commutator_eq_bot_iff_le_centralizer.mp (hsub data.H data.H hHH)
+    · exact Subgroup.commutator_eq_bot_iff_le_centralizer.mp (hsub data.H (cSub data chief) hHC')
+    · exact Subgroup.commutator_eq_bot_iff_le_centralizer.mp (hsub (cSub data chief) data.H hCH)
+    · exact Subgroup.commutator_eq_bot_iff_le_centralizer.mp
+        (hsub (cSub data chief) (cSub data chief) hCC)
+  -- `⁅HC,HC⁆ = (commutator ↥HC).map subtype ≤ K ⊓ HC ≤ K`.
+  calc ⁅data.H ⊔ cSub data chief, data.H ⊔ cSub data chief⁆
+      = (commutator ↥HC).map HC.subtype := by rw [← derivedInG_eq_commutator]; rfl
+    _ ≤ (K.subgroupOf HC).map HC.subtype := Subgroup.map_mono hcomm
+    _ ≤ K := by rw [Subgroup.subgroupOf_map_subtype]; exact inf_le_left
+
+end
+
 /-- **(9.9.a) index step (C): `[U:C] = u`** realized form `(cInHu.subgroupOf uInHu).index = u`.
 First isomorphism `U/C ≃ Ū` (the `U`-action image on the chief factor), with `u = |Ū|`. -/
 theorem index_cInHu_subgroupOf_uInHu_eq_u [Finite G] {M : Subgroup G}
