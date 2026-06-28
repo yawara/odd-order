@@ -36,16 +36,19 @@
    `0 ≤ (|P|−1)b² − 2ub` (u ≤ (|P|−1)/2)。`α(1)=qb` 代入で (13.6) の補正項
    `q²((|P|−1)b²−2ub) ≥ 0` を与える、純 ℤ-arithmetic 核。`(|P|−1−2u)b² + 2u·b(b−1)` 分解。
 
-### ★ 生産的手法 (2026-06-29) — **carrier-free core 抽出** (5 commit で実証)
+### ★ 生産的手法 (2026-06-29) — **carrier-free core 抽出** (8 commit で実証)
 norm cascade ((13.5)-(13.10)) は「Hypothesis の opaque grid が τ-isometry/直交性/次数を carry しない」ため
 **wrapper 定理 (∃ data, opaqueProp 形) は carrier-gated**。だが **各 cascade step の genuine な数学的核は
 carrier-free な一般補題として抽出・実証明できる**。これが**待たずに本丸を進める正攻法**
 (reallocation §2 の consumer-side prescribed path; STOP(c) の sorry-shuffle でない — 実定理・実証明・再利用可)。
-**着地済 toolkit**: 13.5.c (inflation 下界) / innerSum self-identity (橋) / 13.6 quadratic 非負。
-**残候補**: 13.7/13.8 の `∑_{H#}|α|²=|H|‖α‖²−d²` 不等式核 (= innerSum self + `∑_{H#}=∑_H−|α1|²`; 但し
-最終不等式は virtual-char 整数性 `‖α‖²≥1`・H abelian を要し carrier/structural)、13.18.b の Frobenius
-induced-trivial norm `(u-1)/q+1` (Frobenius 群 + 誘導指標値、より重い)、13.6 の Parseval 等式
-(`∑_H|α|²=|H|‖α‖²`、innerSum self + `card_mul_inner` 即時)。grid 依存 (直交性そのもの) は §5 producer cite 要。
+**着地済 toolkit** (norm-cascade arithmetic はほぼ網羅):
+- `sum_normSq_erase_one_ge_of_const_on_subgroup` = 13.5.c (inflation 下界 `∑_{H#}|α|²≥(|P|−1)d²`)
+- `innerSum_self_eq_sum_normSq` = innerSum↔∑‖·‖² の橋 + `sum_normSq_eq_card_mul_inner` = Parseval `∑_H=|H|⟨α,α⟩`
+- `caseB_quadratic_nonneg` = 13.6 quadratic 非負 `0≤(|P|−1)b²−2ub` (**13.8 も `b↦±b` で被覆**)
+- `caseB_eta_norm_core` = 13.7 不等式核 `∑_{H#}|η₁₀|²≥|H#|` (Parseval + 13.5.c + n≥1/abelian)
+**残**: 13.18.b の Frobenius induced-trivial norm `(u-1)/q+1` (= `‖Ind_E^F 1‖²=|E\F/E|` Mackey + Frobenius
+malnormal double-coset count; substantive だが誘導指標 API + Frobenius TI が要、より重い)。13.5.b 分解・
+13.9 G₀ covering・13.10 assembly は **grid 直交性 (§5 producer cite) または carrier 依存**で wrapper 化待ち。
 
 ### frontier (ゲートなし方針)
 - **(A) Dade norm cascade ((13.5)-(13.10) + (13.3)/(13.4))** = §15 hard core。wrapper は carrier-gated だが
