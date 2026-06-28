@@ -51,13 +51,15 @@ carrier-free な一般補題として抽出・実証明できる**。これが**
 
 **⟹ cheap carrier-free arithmetic cores はほぼ枯渇** (starved でなく「土台が建った」)。**残る genuine work は 2 系統**、
 いずれもより重い/cross-lane:
-1. **重い character-theoretic core** (carrier-free だが API 構築要): 13.18.b Frobenius induced-trivial norm
-   `(u-1)/q+1` = `‖Ind_E^F 1‖²=|E\F/E|` (Mackey 二重剰余類 + Frobenius malnormal count — 誘導指標 norm/Mackey
-   API が repo 未整備)、13.9.b の [Is] Lemma 3.14 (∑_{⟨x⟩-class}|χ|²≥count、代数的整数論)。
-2. **carrier/grid enrichment** (cross-lane): 13.5.b 分解・13.9 covering・13.10 assembly と全 wrapper は
-   Hypothesis に τ₃-isometry/ω-orthonormality (§5 producer の性質) を field 追加して faithful 化する要あり
-   → FeitThompson の 2 constructor + §16 carrier (lane-d) に波及。**次 /loop はこの 2 系統のどちらか** (1 を
-   優先=単独可、但し API 構築から; 2 は hub coordination 要)。
+1. **重い character-theoretic core** (carrier-free だが API 構築要、lane-c solo grind 中): 13.18.b Frobenius
+   induced-trivial norm `(u-1)/q+1`。**✅ 着手** — `induce_one_apply` (置換指標値 `(Ind_H^G 1)(g)=⅟|H|·|{x:x⁻¹gx∈H}|`)
+   を landing (commit `6c471a7c`、`induce_apply_eq_sum_filter` + `trivialClassFunction` 上)。残: Frobenius
+   reciprocity (`inner_induce_eq_inner_restrict` 既存) で `‖Ind_E^F 1‖²=⅟|E|·∑_{e∈E}(Ind 1)(e)` 化 → Frobenius
+   centralizer count (e=1↦|F|, e∈E#↦|E|: C_F(e)⊆E 要) → 算術。13.9.b の [Is] 3.14 は代数的整数論 (より重い)。
+2. **carrier/grid enrichment** (cross-lane、**issue 3002 で hub escalate 済**): 全 cascade wrapper を
+   Hypothesis の grid τ₃-isometry/ω-orthonormality field から faithful 化 (toolkit 完成済ゆえ field が入れば
+   組める)。FeitThompson constructor + §16 carrier (lanes B/D) に波及。consumer-side で contract pin も可。
+   **次 /loop**: 1 の Frobenius reciprocity step を継続 (solo)。
 
 ### frontier (ゲートなし方針)
 - **(A) Dade norm cascade ((13.5)-(13.10) + (13.3)/(13.4))** = §15 hard core。wrapper は carrier-gated だが
