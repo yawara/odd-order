@@ -6546,6 +6546,31 @@ formula together with the prime computation `coprimeFrobeniusAction_card_eq_prim
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.S14.thickenedSupport_subset_conjClassSet_maxNilpotentNormalHall
 
+-- **W2 §12 (12.17) → (8.8) dichotomy (lane-h)** — `theorem88_dichotomy`: for a minimal simple group
+-- of odd order, either every maximal subgroup is type I, or the case-(b) pairing data
+-- `Theorem88CaseBData` exists.  The case-(b) branch is constructed from a non-type-I (hence type-`P`,
+-- Prop 16.1(a)) maximal `S`: BG Theorem 14.7 duality (`typeP_duality`) supplies the complement
+-- `S = S' ⋊ K` (its `IsComplement'` first conjunct, `K` a `κ(S)`-Hall subgroup), the dual maximal
+-- `M*`, and the cyclic `W = K ⊔ K*`; a second application at `M*` gives `M* = (M*)' ⋊ K*`.  Now
+-- axiom-clean: both `proposition_type_classification` (BG Prop 16.1, issue 8015 reverse bridges closed)
+-- and `typeP_duality` (BG Theorem 14.7) are axiom-clean, so the (8.8) dichotomy is honestly proven.
+-- (`theorem88_caseB_holds` itself is not yet axiom-clean: it also consumes `not_all_maximal_typeI`,
+-- gated on the `exists_typeICovering`/`typeI_frobenius` §8/char residuals.)
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S14.theorem88_dichotomy
+
+-- **W2 §12 (12.9) rank-two witness machinery (lane-h/lane-c)** — the minimal-counterexample structure
+-- theory of Peterfalvi (12.9), now axiom-clean since its sole `§16` gate (Proposition 16.1's type-`I`
+-- clauses (a) `κ(M) = ∅` and (f) `M_F = M_σ`) is closed (issue 8015).
+-- * `exists_sigmaKappaCompl_hall_ge_P0`: the noncyclic Sylow `P₀` of a type-`I` counterexample maximal
+--   `M` lies in a `(κ(M) ∪ σ(M))ᶜ`-Hall subgroup `U ≤ M` (so BG Theorem B(1) gives `P₀` abelian of
+--   rank `≤ 2`); via `p ∉ σ(M)` from `p ∤ |M_σ|` and `κ(M) = ∅`.
+-- * `counterexample_P0_K_structure`: `P₀` is abelian of rank exactly 2, the structural core of (12.9).
+-- Both cite only the now-clean Proposition 16.1, BG Hall theory, and the proved BG Theorem B(1).
+-- (`exists_rankTwoWitness`, the full rank-two witness packaging, still transits a `sorryAx` through a
+-- further §12/§16 cite, so it is not yet registered.)
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S14.exists_sigmaKappaCompl_hall_ge_P0
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S14.counterexample_P0_K_structure
+
 -- **W1 §16 Prop 16.1 `hP1eqV` disjunct 3 (Singer/`SL₂(p)`) prerequisite (lane-f, issue 8015)** —
 -- `IsExtraspecial.of_card_eq_prime_cube`: a nonabelian group of order `p³` is extraspecial
 -- (`Z(G) = [G,G] = Φ(G)`, `|Z(G)| = p`); Coq mathcomp `p3group_extraspecial`.  This is the structural
