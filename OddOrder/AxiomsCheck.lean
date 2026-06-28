@@ -5516,14 +5516,23 @@ the pair intersects in the cyclic `Z`: `M ⊓ M* = K ⊔ K*`.  This is the rever
 
 #assert_only_allowed_axioms OddOrder.BG.Ch4.S16.typeP_pair_inf_eq
 
-/-! **BG Theorem E, `σ(Mᵢ)`-disjointness conjunct** (`S16_MainResults`,
-`sigma_reps_pairwise_disjoint`): distinct conjugacy-class representatives of maximal subgroups
-have disjoint `σ`-sets.  This is the one currently-unconditional conjunct of BG Theorem E — the
-`σ(Mᵢ)` "disjoint union" piece — derived from BG Theorem 13.9 (`sigma_disjoint_of_nonconjugate`,
-Lane F, landed sorry-free) via the `∃!` non-conjugacy of distinct representatives.  Fully
-unconditional, axiom-clean. -/
+/-! **BG Theorem E, the `π(G)` partition core** (`S16_MainResults`): the two unconditional conjuncts
+of BG Theorem E (issue 8019) — the partition of `π(G)` by the `σ(Mᵢ)` of a system of conjugacy-class
+representatives of the maximal subgroups.
+
+* `sigma_reps_pairwise_disjoint` (clause (a2)): distinct representatives have disjoint `σ`-sets,
+  from BG Theorem 13.9 (`sigma_disjoint_of_nonconjugate`, landed sorry-free) via the `∃!`
+  non-conjugacy of distinct representatives.
+* `sigma_reps_prime_cover` (clause (a1)): a prime `p` divides `|G|` iff it is a `σ`-prime of some
+  representative — forward from `exists_mem_sigma_of_prime_dvd_card` (every prime of `G` is a
+  `σ`-prime of some maximal) + `sigma_conj`, reverse from `σ ⊆ π` + Lagrange.
+
+Together they give `π(G) = ⨆ᵢ σ(Mᵢ)`.  The remaining BG Theorem E content (the thickened-support
+cardinality, tilde-disjointness, and `G#` covering) stays gated on §13–14 (`theoremE_…`, issue 8019).
+Both fully unconditional, axiom-clean. -/
 
 #assert_only_allowed_axioms OddOrder.BG.Ch4.S16.sigma_reps_pairwise_disjoint
+#assert_only_allowed_axioms OddOrder.BG.Ch4.S16.sigma_reps_prime_cover
 
 /-! **BG Theorem B(1)** (`S16_MainResults`, `theoremB_U_sylow_abelian_rank_le_two`): every Sylow
 subgroup of `U` is abelian of rank ≤ 2.  Standalone, faithful (explicit `U ≤ M`; restricted to
