@@ -210,22 +210,28 @@ theorem isHallSubgroup_subgroupOf_inf_of_normal_isHall [Finite G] {π : Set ℕ}
       rw [he1]; exact ⟨_, htower.symm⟩
     exact hAhall.2 p (Nat.primeFactors_mono hidvd Subgroup.index_ne_zero_of_finite hp)
 
-/-- **BG Theorem D(3), `R(x) ◁ C_G(x)`** (Coq `nsRCx`): the first-conjunct normality.  Since `R(x) =
-(N[x])_σ ⊓ C_G(x)` with `C_G(x) ≤ N[x]` (nontrivial branch) and `(N[x])_σ ◁ N[x]`, the centralizer
-`C_G(x)` normalizes both factors, hence their intersection `R(x)`. -/
+/-- **General `(N)_σ ⊓ C_G(x) ◁ C_G(x)` normality** (the core of Theorem D(3) `nsRCx`): for any `N`
+with `C_G(x) ≤ N`, the centralizer normalizes `(N)_σ ⊓ C_G(x)` — it normalizes `(N)_σ ◁ N` (since
+`C_G(x) ≤ N`) and itself, so it normalizes the intersection (`le_normalizer_inf`).  Applies both to
+`N[x]` (`FT_signalizer_normal_in_centralizer`) and to the unique maximal from
+`signalizer_structure_of_mem_sigmaSharp`. -/
+theorem centralizer_le_normalizer_Msigma_inf_centralizer {x : G} {N : Subgroup G}
+    (hCN : Subgroup.centralizer ({x} : Set G) ≤ N) :
+    Subgroup.centralizer ({x} : Set G) ≤ Subgroup.normalizer
+      ((OddOrder.BG.Ch3.S10.Msigma N ⊓ Subgroup.centralizer ({x} : Set G) : Subgroup G) : Set G) := by
+  haveI hMσN : ((OddOrder.BG.Ch3.S10.Msigma N).subgroupOf N).Normal := by
+    rw [OddOrder.BG.Ch3.S10.Msigma_subgroupOf]; infer_instance
+  have hbaseN : N ≤ Subgroup.normalizer (OddOrder.BG.Ch3.S10.Msigma N : Set G) :=
+    (Subgroup.normal_subgroupOf_iff_le_normalizer (OddOrder.BG.Ch3.S10.Msigma_le _)).mp hMσN
+  exact OddOrder.BG.Ch3.S12.le_normalizer_inf (hCN.trans hbaseN) Subgroup.le_normalizer
+
+/-- **BG Theorem D(3), `R(x) ◁ C_G(x)`** (Coq `nsRCx`): the first-conjunct normality, the
+`N = N[x]` instance of `centralizer_le_normalizer_Msigma_inf_centralizer`. -/
 theorem FT_signalizer_normal_in_centralizer {x : G}
     (h : 1 < (maximalSigmaSubgroupsOfElement x).ncard ∧
       (maximalSubgroupsContaining (Subgroup.centralizer ({x} : Set G))).Nonempty) :
-    Subgroup.centralizer ({x} : Set G) ≤ Subgroup.normalizer (FT_signalizer x : Set G) := by
-  have hCN : Subgroup.centralizer ({x} : Set G) ≤ FT_signalizerBase x :=
-    centralizer_le_FT_signalizerBase h
-  haveI hMσN : ((OddOrder.BG.Ch3.S10.Msigma (FT_signalizerBase x)).subgroupOf
-      (FT_signalizerBase x)).Normal := by
-    rw [OddOrder.BG.Ch3.S10.Msigma_subgroupOf]; infer_instance
-  have hbaseN : FT_signalizerBase x ≤
-      Subgroup.normalizer (OddOrder.BG.Ch3.S10.Msigma (FT_signalizerBase x) : Set G) :=
-    (Subgroup.normal_subgroupOf_iff_le_normalizer (OddOrder.BG.Ch3.S10.Msigma_le _)).mp hMσN
-  exact OddOrder.BG.Ch3.S12.le_normalizer_inf (hCN.trans hbaseN) Subgroup.le_normalizer
+    Subgroup.centralizer ({x} : Set G) ≤ Subgroup.normalizer (FT_signalizer x : Set G) :=
+  centralizer_le_normalizer_Msigma_inf_centralizer (centralizer_le_FT_signalizerBase h)
 
 /-- **BG Theorem D(3), `R(x)` is a `σ(N[x])`-Hall subgroup of `C_G(x)`** (Coq `hallR`): the
 first-conjunct Hall property.  `R(x) = (N[x])_σ ⊓ C_G(x)` with `(N[x])_σ` a normal `σ(N[x])`-Hall
@@ -245,6 +251,69 @@ theorem FT_signalizer_isHall [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G) 
   exact isHallSubgroup_subgroupOf_inf_of_normal_isHall
     (OddOrder.BG.Ch3.S10.Msigma_le _) (centralizer_le_FT_signalizerBase h)
     (OddOrder.BG.Ch3.S10.Msigma_subgroupOf_isHall hG hbasemax) hnorm
+
+/-- **Signalizer structure for a `σ`-sharp element** (the genuine bridge to Theorem D): for
+`x ∈ M_σ^#` with more than one `σ`-maximal, the proven `sigmaLength_one_centralizer_structure`
+(fed the genuine `genuineSigmaDecomposition`, with `ℓ_σ(x) = 1` from `Msigma_ell1`) yields the unique
+maximal `N = N[x]` over `C_G(x)` together with the Hall property of `R = N_σ ⊓ C_G(x)`, the sharp
+transitivity on `𝓜_σ(x)`, the type-F/P2 dichotomy and the complement structure.  This is what the
+Theorem D(3)/(4) data is assembled from. -/
+theorem signalizer_structure_of_mem_sigmaSharp [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} (hM : M ∈ maximalSubgroups G)
+    {x : G} (hxM : x ∈ S14.sigmaSharp M)
+    (hgt : 1 < (S14.maximalSigmaSubgroupsOfElement x).ncard) :
+    ∃! N : Subgroup G, N ∈ maximalSubgroups G ∧
+      Subgroup.centralizer ({x} : Set G) ≤ N ∧
+      OddOrder.BG.Ch3.S10.Msigma N ⊓ Subgroup.centralizer ({x} : Set G) ≠ ⊥ ∧
+      Ch03.IsHallSubgroup (OddOrder.BG.Ch3.S10.sigma N)
+        ((OddOrder.BG.Ch3.S10.Msigma N ⊓ Subgroup.centralizer ({x} : Set G)).subgroupOf
+          (Subgroup.centralizer ({x} : Set G))) ∧
+      (∀ p ∈ S14.piSet (Subgroup.closure {x}), p ∈ tau2 N) ∧
+      (S14.IsTypeF N ∨ S14.IsTypeP2 N) ∧
+      ∀ M' ∈ S14.maximalSigmaSubgroupsOfElement x,
+        tau2 N ∩ S14.piSet N ⊆ OddOrder.BG.Ch3.S10.sigma M' ∧
+        OddOrder.BG.Ch3.S10.sigma N ∩ S14.piSet M' ⊆ OddOrder.BG.Ch3.S10.beta N ∧
+        Subgroup.IsComplement' ((OddOrder.BG.Ch3.S10.Msigma N).subgroupOf N)
+          ((M' ⊓ N).subgroupOf N) ∧
+        (∀ L ∈ S14.maximalSigmaSubgroupsOfElement x,
+          ∃! r : G, (r ∈ OddOrder.BG.Ch3.S10.Msigma N ⊓ Subgroup.centralizer ({x} : Set G)) ∧
+            MulAut.conj r • M' = L) := by
+  have hx1 : x ≠ 1 := hxM.2
+  exact (S14.sigmaLength_one_centralizer_structure hG (S14.genuineSigmaDecomposition hG) hx1
+    (S14.Msigma_ell1 hG hM hxM.1 hx1)).2 hgt
+
+/-- **The conjugates of `M` containing `x` are exactly the `σ`-maximals of `x`** (for `x ∈ M_σ^#`):
+`maximalConjugatesContaining M x = 𝓜_σ(x)`.  This identifies the set on which Theorem D(3)/(4)'s
+`RData` asks for sharp transitivity (`maximalConjugatesContaining`) with the set the proven structure
+controls (`maximalSigmaSubgroupsOfElement`).
+* `⊆`: a conjugate `N = M^g ∋ x` has `x` a `σ(N)`-element (`σ(N) = σ(M)`, `sigma_conj`), and the
+  normal `σ(N)`-Hall `N_σ` absorbs the `σ(N)`-subgroup `⟨x⟩` (`sigma_subgroup_le_Msigma_of_isHall`),
+  so `x ∈ N_σ`.
+* `⊇`: `Theorem 14.4`'s `C_G(x)`-conjugacy (`exists_conj_centralizer_of_mem_maximalSigma`) makes any
+  `N ∈ 𝓜_σ(x)` a conjugate `M^c` (`c ∈ C_G(x)`), and `x ∈ N_σ ≤ N`. -/
+theorem maximalConjugatesContaining_eq_maximalSigma [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} (hM : M ∈ maximalSubgroups G)
+    {x : G} (hxMσ : x ∈ OddOrder.BG.Ch3.S10.Msigma M) (hx1 : x ≠ 1) :
+    maximalConjugatesContaining M x = S14.maximalSigmaSubgroupsOfElement x := by
+  ext N
+  constructor
+  · rintro ⟨g, rfl, hxN⟩
+    have hNmax : MulAut.conj g • M ∈ maximalSubgroups G :=
+      S14.mem_maximalSubgroups_of_isConjugateSubgroup hM ⟨g, rfl⟩
+    refine ⟨hNmax, ?_⟩
+    have hxpi : Ch03.Subgroup.IsPiGroup (OddOrder.BG.Ch3.S10.sigma (MulAut.conj g • M))
+        (Subgroup.zpowers x) := by
+      intro p hp
+      rw [Nat.card_zpowers] at hp
+      haveI : Fact p.Prime := ⟨Nat.prime_of_mem_primeFactors hp⟩
+      exact OddOrder.BG.Ch3.S10.sigma_conj g (S14.isPiElement_sigma_of_mem_Msigma hxMσ p hp)
+    exact OddOrder.BG.Ch3.S10.sigma_subgroup_le_Msigma_of_isHall
+      (OddOrder.BG.Ch3.S10.Msigma_isHall hG hNmax) (Subgroup.zpowers_le.mpr hxN) hxpi
+      (Subgroup.mem_zpowers x)
+  · rintro ⟨hNmax, hxNσ⟩
+    obtain ⟨c, _, hcconj⟩ := S14.exists_conj_centralizer_of_mem_maximalSigma hG
+      (S14.genuineSigmaDecomposition hG) (S14.Msigma_ell1 hG hM hxMσ hx1) ⟨hM, hxMσ⟩ ⟨hNmax, hxNσ⟩
+    exact ⟨c, hcconj.symm, OddOrder.BG.Ch3.S10.Msigma_le N hxNσ⟩
 
 /-! ## Theorems A--E -/
 
