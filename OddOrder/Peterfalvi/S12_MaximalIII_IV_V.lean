@@ -264,6 +264,23 @@ theorem inducedFamily_hasNoRealCharacters {M : Subgroup G} [Finite G]
   exact (show (Nat.card ↥(ClassFunction.inertia θ.toClassFunction) : ℂ) ≠ 0 by
     exact_mod_cast Nat.card_pos.ne') hc.symm
 
+open scoped FiniteInduce in
+/-- **The induced family `S = inducedFamily M` is pairwise orthogonal** (the `pairwise_orthogonal`
+clause of the §7 coherence hypothesis for `S`).  Distinct members `Ind_{M'}^M θ ≠ Ind_{M'}^M θ'`
+have non-`M`-conjugate sources (`induce_eq_induce_iff_conj`), so `inner_induce_eq_zero_of_not_conj`
+gives `⟨Ind θ, Ind θ'⟩ = 0`. -/
+theorem inducedFamily_pairwiseOrthogonal {M : Subgroup G} [Finite G] :
+    OddOrder.Peterfalvi.S03.PairwiseOrthogonal (inducedFamily M) := by
+  intro χ ψ hχ hψ hne
+  obtain ⟨θ, hθne, rfl⟩ := hχ
+  obtain ⟨θ', hθ'ne, rfl⟩ := hψ
+  haveI : ((derivedInG M).subgroupOf M).Normal := by
+    rw [derivedInG, Subgroup.subgroupOf,
+      Subgroup.comap_map_eq_self_of_injective M.subtype_injective]
+    infer_instance
+  exact inner_induce_eq_zero_of_not_conj θ θ'
+    (fun g hg => hne ((induce_eq_induce_iff_conj θ θ').mpr ⟨g, hg⟩))
+
 /-! ## (10.1): the type III/IV/V hypothesis -/
 
 open scoped FiniteInduce in
