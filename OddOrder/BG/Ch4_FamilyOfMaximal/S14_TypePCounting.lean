@@ -1270,6 +1270,11 @@ theorem piPart_eq_one_of_isPiElement_compl [Finite G] {π : Set ℕ} {g : G}
   exact (isPiElement_mul_unique hmul hcomm hpiA hpiB (one_mul g) (Commute.one_left g)
     (isPiElement_one π) hg).1
 
+/-- The `π`-part of `g` is a power of `g`. -/
+theorem piPart_mem_zpowers [Finite G] (π : Set ℕ) (g : G) :
+    piPart π g ∈ Subgroup.zpowers g := by
+  obtain ⟨_, _, _, _, _, hz, _⟩ := piPart_spec π g; exact hz
+
 /-- The `σ(M)`-part of an element `x` (Coq `x.`_{σ(M)}`): its `σ(M)`-component in the two-block
 π-part decomposition. -/
 noncomputable def sigmaPart [Finite G] (M : Subgroup G) (x : G) : G :=
@@ -1310,6 +1315,13 @@ theorem sigmaLength_conj [Finite G] (h x : G) :
         exact ⟨M, hMmax, (sigmaPart_conj M h x).symm⟩
     · rw [Set.image_singleton]; simp
   rw [sigmaLength, sigmaLength, hconjset, Set.ncard_image_of_injective _ hinj]
+
+/-- **Coq `sigma_decomposition_subG`**: if `x ∈ H` then every σ-part of `x` lies in `H` (the σ-parts
+are powers of `x`), so `sigma_decomposition x ⊆ H`. -/
+theorem sigmaDecomposition_subset [Finite G] {x : G} {H : Subgroup G} (hx : x ∈ H) :
+    sigmaDecomposition x ⊆ (H : Set G) := by
+  rintro y ⟨⟨M, hM, rfl⟩, -⟩
+  exact Subgroup.zpowers_le.mpr hx (piPart_mem_zpowers (OddOrder.BG.Ch3.S10.sigma M) x)
 
 /-- Every element of `M_σ` is a `σ(M)`-element (its order divides `|M_σ|`, a `σ(M)`-number). -/
 theorem isPiElement_sigma_of_mem_Msigma [Finite G] {M : Subgroup G} {x : G}
