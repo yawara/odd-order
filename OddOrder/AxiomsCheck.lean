@@ -4386,6 +4386,16 @@ of Corollary 12.14 gives `p ∉ β(M)`.  Consumed by Proposition 14.2(g). -/
 
 #assert_only_allowed_axioms OddOrder.BG.Ch3.S12.Msigma_inf_conj_isBetaCompl
 
+/-! ### BG §12: Corollary 12.4 (`norm_noncyclic_sigma`) — unconditional
+
+A noncyclic `σ(M)`-`p`-subgroup `P ≤ M` has `N_G(P) ≤ M`.  A rank-two elementary abelian
+`A ≤ P` (`exists_isElementaryAbelian_card_prime_sq_of_not_isCyclic`) has `C_G(A) ≤ M`
+(`centralizer_le_of_elemAb_rank_two`, Prop 12.4(a)), and `σ`-fusion control
+(`fusion_control_of_mem_sigma`, `N_G(P) = (N_G(P) ⊓ M)·C_G(P)`) plus `C_G(P) ≤ C_G(A) ≤ M` gives
+`N_G(P) ≤ M`.  The `σ`-uniqueness input to BG Lemma `sigma_compl_embedding` / Theorem D(2). -/
+
+#assert_only_allowed_axioms OddOrder.BG.Ch3.S12.norm_noncyclic_sigma
+
 /-! ### BG §12: Lemma 12.19 (`derivedE_centralizes_betaComplement`) — unconditional
 
 `E'` centralizes a Hall `β(M)'`-subgroup of `M_σ`. The proof consumes Corollary 10.9(a)
