@@ -468,6 +468,54 @@ theorem sum_normSq_eq_card_mul_inner {H : Type*} [Group H] [Fintype H]
     ((∑ g : H, ‖α g‖ ^ 2 : ℝ) : ℂ) = (Nat.card H : ℂ) * ClassFunction.inner α α := by
   rw [← innerSum_self_eq_sum_normSq, ClassFunction.card_mul_inner]
 
+open scoped Classical in
+/-- **Permutation-character value**: `(Ind_H^G 1_H)(g) = |H|⁻¹ · |{x ∈ G : x⁻¹gx ∈ H}|`.
+
+The induced trivial character is the permutation character of `G` acting on the cosets `G/H`; at
+`g` its value is `|H|⁻¹` times the number of conjugators carrying `g` into `H`.  Every summand of
+the induction sum over that conjugator set is `1` (the trivial character is constant `1`), so the
+sum is the cardinality.  Foundation for the Frobenius induced-trivial-character norm of Peterfalvi
+(13.18.b) `‖Ind_E^F 1‖² = (|K|−1)/|E| + 1` (via Frobenius reciprocity + the Frobenius
+double-coset count). -/
+theorem induce_one_apply {G : Type*} [Group G] [Fintype G] (H : Subgroup G)
+    [Invertible (Nat.card ↥H : ℂ)] (g : G) :
+    ClassFunction.induce H (trivialClassFunction ↥H) g
+      = ⅟(Nat.card ↥H : ℂ) *
+        ((Finset.univ.filter (fun x : G => x⁻¹ * g * x ∈ H)).card : ℂ) := by
+  rw [ClassFunction.induce_apply_eq_sum_filter]
+  congr 1
+  rw [Finset.sum_congr rfl (g := fun _ => (1 : ℂ))
+      (fun x hx => by
+        rw [Finset.mem_filter] at hx
+        rw [ClassFunction.induceTerm_of_mem (trivialClassFunction ↥H) hx.2]
+        rfl),
+    Finset.sum_const, nsmul_eq_mul, mul_one]
+
+open scoped Classical in
+/-- **Kernel-vanishing of the Frobenius permutation character** (second piece of (13.18.b)).
+
+For a normal subgroup `N` with `N ⊓ A = ⊥`, the induced trivial character `Ind_A^G 1_A` vanishes on
+`N#`: a conjugate `x⁻¹gx` of `g ∈ N` again lies in `N` (normality), so if it also lay in `A` it
+would lie in `N ⊓ A = ⊥`, forcing `g = 1`.  Hence the conjugator set `{x : x⁻¹gx ∈ A}` is empty.
+In the Frobenius case `F = N ⋊ A` this is `γ(g) = 0` for `g ∈ N#`, one of the three value cases
+behind `‖Ind_A^F 1‖² = (|N|−1)/|A| + 1` (13.18.b). -/
+theorem induce_one_eq_zero_of_mem_normal_inf_bot {G : Type*} [Group G] [Fintype G]
+    {N A : Subgroup G} (hN : N.Normal) (hNA : N ⊓ A = ⊥)
+    [Invertible (Nat.card ↥A : ℂ)] {g : G} (hg : g ∈ N) (hg1 : g ≠ 1) :
+    ClassFunction.induce A (trivialClassFunction ↥A) g = 0 := by
+  rw [induce_one_apply]
+  have hempty : (Finset.univ.filter (fun x : G => x⁻¹ * g * x ∈ A)) = ∅ := by
+    rw [Finset.filter_eq_empty_iff]
+    intro x _ hmem
+    have hxN : x⁻¹ * g * x ∈ N := by simpa using hN.conj_mem g hg x⁻¹
+    have hbot : x⁻¹ * g * x ∈ N ⊓ A := ⟨hxN, hmem⟩
+    rw [hNA, Subgroup.mem_bot] at hbot
+    apply hg1
+    calc g = x * (x⁻¹ * g * x) * x⁻¹ := by group
+      _ = x * 1 * x⁻¹ := by rw [hbot]
+      _ = 1 := by group
+  rw [hempty, Finset.card_empty, Nat.cast_zero, mul_zero]
+
 /-- **Inflation norm lower bound — the carrier-free core of Peterfalvi (13.5.c)**.
 
 If a function `α : H → ℂ` is constant on a finite subgroup `P ≤ H` (equal to `α 1` on all of `P`)
