@@ -3669,6 +3669,28 @@ theorem commutator_HsupC_le_H0Cprime [Finite G] {M : Subgroup G} (data : TypesII
     _ ≤ (K.subgroupOf HC).map HC.subtype := Subgroup.map_mono hcomm
     _ ≤ K := by rw [Subgroup.subgroupOf_map_subtype]; exact inf_le_left
 
+/-- **(9.9.a) realized commutator bound**: `⁅HC, HC⁆ ⊆ 𝒮(H₀C')`-kernel, i.e. the realized commutator
+`⁅hInHu ⊔ cInHu, hInHu ⊔ cInHu⁆` lands in the realized `H₀C'` inside `↥HU`.  Transport of
+`commutator_HsupC_le_H0Cprime` along the inclusion `↥HU ↪ ↥M ↪ G` (`map_le_iff_le_comap`). -/
+theorem commutator_hcInHu_le_realized [Finite G] {M : Subgroup G} (data : TypesIIIIIIVSetup M)
+    (chief : ChiefFactorData data) :
+    ⁅hInHu data ⊔ cInHu data chief, hInHu data ⊔ cInHu data chief⁆
+      ≤ ((chief.H0 ⊔ cprimeSub data chief).subgroupOf M).subgroupOf (huSub data) := by
+  have hreal : ((chief.H0 ⊔ cprimeSub data chief).subgroupOf M).subgroupOf (huSub data)
+      = (chief.H0 ⊔ cprimeSub data chief).comap (M.subtype.comp (huSub data).subtype) := rfl
+  have hmaple : (hInHu data ⊔ cInHu data chief).map (M.subtype.comp (huSub data).subtype)
+      ≤ data.H ⊔ cSub data chief := by
+    rw [Subgroup.map_sup]
+    refine sup_le (le_trans ?_ le_sup_left) (le_trans ?_ le_sup_right)
+    · have hh : hInHu data = data.H.comap (M.subtype.comp (huSub data).subtype) := by
+        rw [hInHu, Subgroup.subgroupOf, Subgroup.subgroupOf, Subgroup.comap_comap]
+      rw [hh]; exact Subgroup.map_comap_le _ _
+    · have hc : cInHu data chief = (cSub data chief).comap (M.subtype.comp (huSub data).subtype) := by
+        rw [cInHu, Subgroup.subgroupOf, Subgroup.subgroupOf, Subgroup.comap_comap]
+      rw [hc]; exact Subgroup.map_comap_le _ _
+  rw [hreal, ← Subgroup.map_le_iff_le_comap, Subgroup.map_commutator]
+  exact le_trans (Subgroup.commutator_mono hmaple hmaple) (commutator_HsupC_le_H0Cprime data chief)
+
 end
 
 /-- **(9.9.a) index step (C): `[U:C] = u`** realized form `(cInHu.subgroupOf uInHu).index = u`.
@@ -3831,7 +3853,21 @@ theorem caseB_degree_qu [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
       (H := hInHu data ⊔ cInHu data chief) χ
   have hψdeg : (ψ : ClassFunction ↥(hInHu data ⊔ cInHu data chief) ℂ)
       (1 : ↥(hInHu data ⊔ cInHu data chief)) = 1 := by
-    sorry
+    -- `ψ` is linear: `⁅HC,HC⁆ ⊆ ker χ`, so the constituent `ψ` factors through the abelian
+    -- `HC/⁅HC,HC⁆`.
+    haveI : IsMulCommutative (↥(hInHu data ⊔ cInHu data chief) ⧸
+        commutator ↥(hInHu data ⊔ cInHu data chief)) :=
+      inferInstanceAs (IsMulCommutative (Abelianization ↥(hInHu data ⊔ cInHu data chief)))
+    refine OddOrder.RepresentationTheory.apply_one_eq_one_of_subset_characterKernel_of_isMulCommutative_quotient
+      (N := commutator ↥(hInHu data ⊔ cInHu data chief)) ψ ?_
+    intro g hg
+    refine liesOver_mem_characterKernel hψover ?_
+    refine hχ.2 ?_
+    have hgmem : (g : ↥(huSub data))
+        ∈ ⁅hInHu data ⊔ cInHu data chief, hInHu data ⊔ cInHu data chief⁆ := by
+      rw [← derivedInG_eq_commutator]
+      exact Subgroup.mem_map_of_mem _ hg
+    exact commutator_hcInHu_le_realized data chief hgmem
   -- Clifford degree: `χ(1) = [HU:HC]`.
   have key := OddOrder.RepresentationTheory.apply_one_eq_index_of_liesOver_linear_inertia
     (H := hInHu data) (I := hInHu data ⊔ cInHu data chief)
@@ -3865,7 +3901,11 @@ theorem caseB_character_counts [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G
         φ 1 = ((data.q * chars.u : ℕ) : ℂ) ∧ φ ∈ chars.SOf (chief.H0 ⊔ chars.C)) ∧
       ((¬ ∃ χ ∈ chars.SOf (chief.H0 ⊔ chars.Cprime), IsIrreducibleCharacter χ) →
         chars.C = ⊥ ∧ chars.u = (chief.p ^ data.q - 1) / (chief.p - 1)) := by
-  sorry
+  -- (9.9.a) is the proven `caseB_degree_qu`; (9.9.b)/(9.9.c) remain (reducible count / exceptional).
+  refine ⟨caseB_degree_qu hG chars caseB, ?_, ?_, ?_⟩
+  · sorry
+  · sorry
+  · sorry
 
 /-- **Peterfalvi (9.10)**: in the exceptional case where `𝒮(H₀C')` contains no irreducible
 character of degree `qu`, the quotient semidirect product is Frobenius; in type II the full `H U`

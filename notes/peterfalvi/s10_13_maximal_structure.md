@@ -555,3 +555,42 @@ real error を live で特定して修正。確定 lemma 名は §12追補³ 参
 ([HU:HC]=u)・obligation 3 facts 1,2 + bridge を committed (6 commits)。残 = obligation 3 assembly のみ
 (機械的だが mathlib gap で高コスト)。難所の数学は全完了、残りは群論 plumbing。caseB_degree_qu は
 signature 正しく cite 可。
+
+### §12 追補⁵ (lane-a /loop iter7): caseB_degree_qu (9.9.a) SORRY-FREE 達成 🎉
+
+obligation 3 (ψ linearity) を完成し **caseB_degree_qu (𝒮(H₀C') の各元 degree qu) が完全 sorry-free**。
+obligation 1 (θ₀ inflation 抽出)・3 (linearity)・4 ([HU:HC]=u) 全完了。full build 3886 green。
+
+**6 反復の obligation 3 struggle の真因 (重要教訓)**:
+1. **`commutatorElement` (element commutator `⁅x,y⁆` の `Bracket G G`) は scoped instance** —
+   `open scoped commutatorElement` が必要 (subgroup commutator `⁅H,K⁆` は別 instance で常用可)。
+   fresh な element bracket を書くと `failed to synthesize Bracket G G`。
+2. **`Subgroup.normalizer` は Set 引数** (`normalizer (S : Set G)`) — `normalizer (A ⊔ B)` は
+   Subgroup の A,B を Set-sup (union) に解釈。Subgroup-sup の normalizer は `normalizer (↑(A⊔B):Set)` と書く。
+
+**完成した補題群** (全 axiom-clean candidate、AxiomsCheck 未登録):
+- `derivedInG_eq_commutator` (⁅H,H⁆=derivedInG H)、`HsupC_le_normalizer_K` (K=H₀C' は HC で正規、
+  closure_induction on k で ⁅x,k⁆∈K、帰納共役は K の部分群閉性)、`commutator_HsupC_le_H0Cprime`
+  (G-level ⁅HC,HC⁆≤K、商/中心化子)、`commutator_hcInHu_le_realized` (huSub 転送、comap 経由)。
+- 構造的 commutator facts: `derivedInG_H_le_H0` (⁅H,H⁆≤H₀)、`commutator_cSub_H_le_H0` (⁅C,H⁆≤H₀)。
+
+**次手**: (9.9) `caseB_character_counts` の (9.9.a) conjunct を proven caseB_degree_qu で wire
+(残 (9.9.b)/(9.9.c))、(9.8) `caseA_character_counts`、→ (11.8)/(10.7) → card_kappaHall。
+
+### §12 追補⁶ (lane-a /loop iter8): (9.9) に (9.9.a) wire + 残 §9 counts frontier 評価
+
+(9.9.a)=caseB_degree_qu を `caseB_character_counts` の第1 conjunct に wire (honest)。残 §9 counts の評価:
+
+**残 §9 counts (全て深い Peterfalvi character-counting、次反復の deep 着手対象)**:
+- **(9.9.b)** `caseB_character_counts` 第2/3 conjunct: `{φ∈𝒮(H₀)|¬irr}.ncard = p-1` (reducible count) +
+  reducible は degree qu かつ 𝒮(H₀C) に入る。Clifford counting (どの θ̄∈Irr(H̄) が reducible Ind を生むか)
+  + inflation 機構 (obligation 1 で構築済) で着手可か要分析。
+- **(9.9.c)** 第4 conjunct: `(𝒮(H₀C') に irr 無) → C=⊥ ∧ u=(p^q-1)/(p-1)` (exceptional case)。
+- **(9.8)** `caseA_character_counts` (S11:3479): case (a) の counts ((9.8.b/c/d))、parallel to (9.9)。
+- **(9.10)** `exceptional_case_frobenius_realization` (S11:3913): ⚠ 第1 conjunct
+  `chars.quotientSemidirectFrobenius` は **opaque Prop field** ([[scaffold-sorry-free-not-done]]、
+  de-opacify 要)。第2/3 は exceptional u + HU Frobenius (深い)。
+- **(9.11)** `sibleyTarget_H0C` (S11:3936): §14-gated ((6.8) + Sibley Dade witness)、lane-b/d 寄り。
+
+これらは (10.7) typeII_derived_frobenius / (11.8) を unblock する (両者 §9 counts 依存)。次反復は (9.9.b)
+reducible count を deep 分析 (tractable か §3-§7 char API gate か、原文 04.13 (9.8.b)/(9.9.b) 読んで判定)。
