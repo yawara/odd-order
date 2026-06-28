@@ -350,3 +350,26 @@ card_LF_coprime_pq (spine, lane c)  ←  bgTheoremE_cover_data (Pf 8.17, Peterfa
   bgTheoremE_cover_data の deep cardinality を bypass、最短 spine unblock だが lane 境界越え)。 (C) hD4
   (theoremD 完成だが δ-internal、spine 非直結)。**推奨 = (A)** (genuine 上流・lane-d 単独・hD3 の自然な続き)。
 **教訓: spine consumer が full struct を cite していても、実使用 field を grep 確認** (card_LF は disjoint のみ)。
+
+## ✅ 進捗 (lane d, 2026-06-29 cont.⁹ — /loop): `piPart_mul_of_commute` (Coq consttM) — 14.5c cluster の基礎工具
+
+14.5c (cardinality) cluster の依存を Coq で精査:
+```
+14.5c card_class_support_sigma (|M̃^G|=(|M_σ|−1)·[G:M])
+  ← 14.5a sigma_cover_disjoint (x·R[x] ∩ y·R[y]=∅)  ← FT_signalizer uniqueness (∃!N) + sdprod tiRyNx + σ-cover-decomp
+  + cover identity (M̃^G = ⋃ x·R[x]) + exchange_big double-count + orbit-stabilizer ([G:M])
+  ← sigma_cover_decomposition (σ-decomp(x·x')={x,x'}, Coq Remark @BGsection14:1055)  ← **consttM (π-part of commuting product)**
+```
+**`piPart_mul_of_commute`** (S14、axiom-clean、AxiomsCheck 登録): `Commute x y ⟹ piPart π (x*y)=piPart π x · piPart π y`。
+証明 = 両 π-part/π′-part は x,y の冪ゆえ pairwise commute (`hcomm.zpow_zpow`) → `x*y=(xπ yπ)(xπ′ yπ′)` を rearrange →
+`isPiElement_mul_unique` で π-part 同定。汎用・再利用可 (Coq consttM)。
+
+**残 14.5c cluster (上流順、全 deep multi-session)**:
+1. **`sigma_cover_decomposition`** (σ-decomp(x·x')={x}∪{x'}^# for ℓ_σ(x)=1, x'∈R[x]): `piPart_mul_of_commute`
+   (本セッション) で `sigmaPart L (x·x') = sigmaPart L x · sigmaPart L x'` 化 + structure の σ(M)/σ(N)/τ2 関係
+   (x は τ2(N)-elt, x' は σ(N)-elt) で {x,x'} に collapse。**structure type info 要**。
+2. **14.5a `sigma_cover_disjoint`**: 上記 + FT_signalizer uniqueness (∃!N, structure 供給) + sdprod 自明交差
+   (`signalizer_centralizer_isComplement` の IsComplement' = disjoint)。
+3. **14.5c**: cover identity (set 操作) + double-count (`|R|=|𝓜_σ(x)|` ✅ 本セッション + 14.5a disjoint で trivIset) +
+   orbit-stabilizer for [G:M] (`ncard_conjugates_eq_index_of_normalizer_eq_self` S14:4749 在庫)。
+**次 = sigma_cover_decomposition** (piPart_mul_of_commute の自然な consumer)。

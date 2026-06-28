@@ -6684,6 +6684,7 @@ foundational facts: `sigmaLength_eq_zero_iff` (Coq `ell_sigma0P`: `ℓ_σ(x) = 0
 #assert_only_allowed_axioms OddOrder.BG.Ch4.S14.isPiElement_compl_of_piPart_eq_one
 #assert_only_allowed_axioms OddOrder.BG.Ch4.S14.isPiElement_conj
 #assert_only_allowed_axioms OddOrder.BG.Ch4.S14.piPart_conj
+#assert_only_allowed_axioms OddOrder.BG.Ch4.S14.piPart_mul_of_commute
 #assert_only_allowed_axioms OddOrder.BG.Ch4.S14.sigmaPart_conj
 #assert_only_allowed_axioms OddOrder.BG.Ch4.S14.sigmaLength_eq_zero_iff
 #assert_only_allowed_axioms OddOrder.BG.Ch4.S14.sigmaLength_conj

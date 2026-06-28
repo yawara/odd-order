@@ -1286,6 +1286,37 @@ theorem prime_dvd_orderOf_piPart [Finite G] {π : Set ℕ} {p : ℕ} (hp : p.Pri
   · exact h
   · exact absurd hpπ (hpiB p (Nat.mem_primeFactors.mpr ⟨hp, h, (orderOf_pos b).ne'⟩))
 
+/-- **The `π`-part is multiplicative on commuting elements** (Coq `consttM`): for commuting `x, y`,
+`piPart π (x * y) = piPart π x * piPart π y`.  Both `π`-parts are powers of `x`, `y`, so they commute
+(as do the two `π′`-parts and the cross pairs), letting `x * y = (xπ yπ)(xπ′ yπ′)` be rearranged into
+a commuting `π`-element times `π′`-element; uniqueness of the `π`-decomposition
+(`isPiElement_mul_unique`) identifies its `π`-part with `xπ yπ`.  The computational tool behind the
+`σ`-decomposition of a `σ`-cover element `x · R(x)` (BG Lemma 14.5). -/
+theorem piPart_mul_of_commute [Finite G] {π : Set ℕ} {x y : G} (hcomm : Commute x y) :
+    piPart π (x * y) = piPart π x * piPart π y := by
+  obtain ⟨cx, hxmul, hxc, hxπ, hxπ', hxz, hcxz⟩ := piPart_spec π x
+  obtain ⟨cy, hymul, hyc, hyπ, hyπ', hyz, hcyz⟩ := piPart_spec π y
+  obtain ⟨c, hmul, hc, hπ, hπ', -, -⟩ := piPart_spec π (x * y)
+  -- powers of `x` commute with powers of `y` (as `x, y` commute).
+  have hcross : ∀ {a b : G}, a ∈ Subgroup.zpowers x → b ∈ Subgroup.zpowers y → Commute a b := by
+    intro a b ha hb
+    obtain ⟨m, rfl⟩ := Subgroup.mem_zpowers_iff.mp ha
+    obtain ⟨n, rfl⟩ := Subgroup.mem_zpowers_iff.mp hb
+    exact hcomm.zpow_zpow m n
+  have hcyx : Commute (piPart π y) cx := (hcross hcxz hyz).symm
+  have hprod : (piPart π x * piPart π y) * (cx * cy) = x * y := by
+    calc (piPart π x * piPart π y) * (cx * cy)
+        = piPart π x * (piPart π y * cx) * cy := by group
+      _ = piPart π x * (cx * piPart π y) * cy := by rw [hcyx]
+      _ = (piPart π x * cx) * (piPart π y * cy) := by group
+      _ = x * y := by rw [hxmul, hymul]
+  have hABcomm : Commute (piPart π x * piPart π y) (cx * cy) :=
+    Commute.mul_left (Commute.mul_right hxc (hcross hxz hcyz))
+      (Commute.mul_right (hcross hcxz hyz).symm hyc)
+  exact (isPiElement_mul_unique hmul hc hπ hπ' hprod hABcomm
+    (isPiElement_mul_of_commute (hcross hxz hyz) hxπ hyπ)
+    (isPiElement_mul_of_commute (hcross hcxz hcyz) hxπ' hyπ')).1
+
 /-- The `σ(M)`-part of an element `x` (Coq `x.`_{σ(M)}`): its `σ(M)`-component in the two-block
 π-part decomposition. -/
 noncomputable def sigmaPart [Finite G] (M : Subgroup G) (x : G) : G :=
