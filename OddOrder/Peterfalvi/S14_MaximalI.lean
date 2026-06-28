@@ -413,28 +413,19 @@ noncomputable def Rset {L : Subgroup G} [Fintype G] [Invertible (Nat.card G : �
   {α | ∃ (φ : IrreducibleCharacter ↥L) (hφ : φ ∈ data.constituents) (i : Fin 2),
     α = ((signedFamily data hφ).mu i : ClassFunction G ℂ)}
 
-/-- Carrier for Peterfalvi (12.3), comparing two non-conjugate type-I maximal
-subgroups. -/
-structure CrossOrthogonalityData {L1 L2 : Subgroup G}
-    (hyp1 : Hypothesis L1) (hyp2 : Hypothesis L2) where
-  chi1 : ClassFunction ↥L1 ℂ
-  chi1_mem : chi1 ∈ hyp1.Sset
-  chi2 : ClassFunction ↥L2 ℂ
-  chi2_mem : chi2 ∈ hyp2.Sset
-  /-- The family `R(χ₁)` from (12.2) (the union of the two-element Dade-image blocks). -/
-  R1 : Set (ClassFunction G ℂ)
-  /-- The family `R(χ₂)` from (12.2). -/
-  R2 : Set (ClassFunction G ℂ)
-  orthogonal : Prop
-  orthogonal_holds : orthogonal
-
-/-- **Peterfalvi (12.3)**: for non-conjugate type-I maximal subgroups, the
-families `R(chi)` are mutually orthogonal. -/
-theorem nonconjugate_typeI_R_orthogonal [Finite G]
-    (_hG : OddOrder.BG.IsMinimalSimpleOdd G) {L1 L2 : Subgroup G}
+/-- **Peterfalvi (12.3)**: for non-conjugate type-I maximal subgroups `L₁, L₂`, the families
+`R(χ₁) = Rset data1` and `R(χ₂) = Rset data2` are mutually orthogonal.  Proof (a §12 char
+obligation): by (8.18.c) assume `Ã(L₁) ∩ Ã₁(L₂) = ∅`; each `α ∈ R(χ₁)` satisfies `α − ᾱ ∈
+(φ−φ̄)^{τ₁}` supported in `Ã(L₁)` by (12.2)/(5.9), orthogonal to `R(χ₂) ⊆ Ã₁(L₂)`; a conjugation
+argument forces `⟨α, β⟩ = 0`. -/
+theorem nonconjugate_typeI_R_orthogonal {L1 L2 : Subgroup G} [Finite G] [Fintype G]
+    [Invertible (Nat.card G : ℂ)] [Invertible (Nat.card ↥L1 : ℂ)] [Invertible (Nat.card ↥L2 : ℂ)]
+    (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
     (hyp1 : Hypothesis L1) (hyp2 : Hypothesis L2)
-    (hnot_conj : ¬ ∃ g : G, MulAut.conj g • L1 = L2) :
-    ∃ data : CrossOrthogonalityData hyp1 hyp2, data.orthogonal := by
+    (hnot_conj : ¬ ∃ g : G, MulAut.conj g • L1 = L2)
+    {chi1 : ClassFunction ↥L1 ℂ} (data1 : CharacterDecompositionData hyp1 chi1)
+    {chi2 : ClassFunction ↥L2 ℂ} (data2 : CharacterDecompositionData hyp2 chi2) :
+    ∀ α ∈ Rset data1, ∀ β ∈ Rset data2, ClassFunction.inner α β = 0 := by
   sorry
 
 open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
