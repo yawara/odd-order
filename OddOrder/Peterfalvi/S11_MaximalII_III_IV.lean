@@ -14,6 +14,7 @@ import OddOrder.BG.Ch1_Preliminary.OperatorMaschke
 import OddOrder.BG.Ch4_FamilyOfMaximal.S15_MF
 import OddOrder.GroupTheory.RepresentationTheory.SingerField
 import OddOrder.GroupTheory.RepresentationTheory.WielandtElabBridge
+import OddOrder.GroupTheory.RepresentationTheory.CliffordSingleOrbit
 
 /-!
 # Peterfalvi Section 11: Maximal Subgroups of Types II, III, and IV
@@ -3343,6 +3344,61 @@ theorem caseA_character_counts [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G
         {χ ∈ chars.SOf (chief.H0 ⊔ chars.Uprime) |
           IsIrreducibleCharacter χ ∧ χ 1 = ((data.q * caseA.a : ℕ) : ℂ)}.ncard := by
   sorry
+
+/-- **Peterfalvi (9.9.a)**: every member of `𝒮(H₀C')` has degree `qu`.
+
+For `φ = Ind_{HU}^M χ ∈ 𝒮(H₀C')` (so `χ ∈ 𝒳(H₀C')`, i.e. `χ ∈ Irr(HU)` with `H ⊄ Ker χ` and
+`H₀C' ⊆ Ker χ`), `φ(1) = [M:HU]·χ(1) = q·χ(1)` (`induceHU_apply_one_eq_q_mul`), so it suffices to
+show `χ(1) = u`.  That is the Clifford degree `χ(1) = [HU:HC]` via
+`apply_one_eq_index_of_liesOver_linear_inertia`: `χ` lies over a nontrivial chief-factor character
+`θ₀` (inflation of `θbar ∈ Irr(H̄)`, linear since `H̄` is abelian) whose inertia in `HU` is `HC`
+(`inertia_eq_hcInHu`, case (b)), and over a linear `ψ ∈ Irr(HC)` (`[HC,HC] ⊆ Ker χ ⟹ ψ(1)=1`); the
+degree sandwich forces `χ(1) = [HU:HC] = u`. -/
+theorem caseB_degree_qu [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    {M : Subgroup G} {data : TypesIIIIIIVSetup M} {chief : ChiefFactorData data}
+    (chars : Section11CharacterData data chief) (caseB : CliffordCaseBData chars) :
+    ∀ φ ∈ chars.SOf (chief.H0 ⊔ chars.Cprime), φ 1 = ((data.q * chars.u : ℕ) : ℂ) := by
+  classical
+  haveI : Fintype ↥(huSub data) := Fintype.ofFinite _
+  haveI : Fintype ↥(hInHu data) := Fintype.ofFinite _
+  haveI : Fintype ↥(hInHu data ⊔ cInHu data chief) := Fintype.ofFinite _
+  haveI : Invertible (Nat.card ↥(huSub data) : ℂ) :=
+    invertibleOfNonzero (Nat.cast_ne_zero.mpr Nat.card_pos.ne')
+  haveI : Invertible (Nat.card ↥(hInHu data) : ℂ) :=
+    invertibleOfNonzero (Nat.cast_ne_zero.mpr Nat.card_pos.ne')
+  haveI : Invertible (Nat.card ↥(hInHu data ⊔ cInHu data chief) : ℂ) :=
+    invertibleOfNonzero (Nat.cast_ne_zero.mpr Nat.card_pos.ne')
+  intro φ hφ
+  rw [Section11CharacterData.SOf_eq, mem_sOf] at hφ
+  obtain ⟨χ, hχ, rfl⟩ := hφ
+  rw [induceHU_apply_one_eq_q_mul]
+  -- Reduce `q·χ(1) = qu` to `χ(1) = u`.
+  suffices hχu : (χ : ClassFunction ↥(huSub data) ℂ) (1 : ↥(huSub data)) = (chars.u : ℂ) by
+    rw [hχu]; push_cast; ring
+  -- Obligation 1: extract a nontrivial chief-factor constituent `θ₀` (inflation form), with
+  -- inertia `HC` and degree `1`.
+  obtain ⟨θ₀, hθ₀over, hθ₀inertia, hθ₀deg⟩ :
+      ∃ θ₀ : IrreducibleCharacter ↥(hInHu data),
+        IrreducibleCharacter.LiesOver (hInHu data) χ θ₀ ∧
+        IrreducibleCharacter.inertia (G := ↥(huSub data)) (H := hInHu data) θ₀
+          = hInHu data ⊔ cInHu data chief ∧
+        (θ₀ : ClassFunction ↥(hInHu data) ℂ) (1 : ↥(hInHu data)) = 1 := by
+    sorry
+  -- Obligation 3: a constituent `ψ ∈ Irr(HC)` that `χ` lies over, linear.
+  obtain ⟨ψ, hψover⟩ :=
+    OddOrder.RepresentationTheory.IrreducibleCharacter.exists_liesOver
+      (H := hInHu data ⊔ cInHu data chief) χ
+  have hψdeg : (ψ : ClassFunction ↥(hInHu data ⊔ cInHu data chief) ℂ)
+      (1 : ↥(hInHu data ⊔ cInHu data chief)) = 1 := by
+    sorry
+  -- Clifford degree: `χ(1) = [HU:HC]`.
+  have key := OddOrder.RepresentationTheory.apply_one_eq_index_of_liesOver_linear_inertia
+    (H := hInHu data) (I := hInHu data ⊔ cInHu data chief)
+    χ θ₀ ψ hθ₀over hθ₀inertia hθ₀deg hψover hψdeg
+  -- Obligation 4: `[HU:HC] = u`.
+  have hidx : (hInHu data ⊔ cInHu data chief).index = chars.u := by
+    sorry
+  rw [key, hidx]
 
 /-- **Peterfalvi (9.9)**: character-count consequences in Clifford case (b).
 
