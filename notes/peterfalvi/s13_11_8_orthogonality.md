@@ -181,3 +181,47 @@ available infra で assembly 可能な multi-step。次反復 = CharacterParamet
 **状態 (honest)**: (11.8) は完全に scope 済・全 infra 確認済で feasible。執行は **§11 char 終盤の最大の山** =
 α-identities-with-S₁-τ₁ の新 lemma 群 (forward 版の S₁-coherence 版) を起点とする large multi-iteration。
 ζ witness + params/by_contra 足場は landed (commits 47158295/25ad0aec)。次 = α-identity-with-S₁-τ₁ 起点。
+
+## 2026-06-29 update⁴ (lane-a) — 執行 stack の build 順確定 (foundational bridge は未構築)
+
+(11.8) 執行 = §10-11 coherence-construction infra stack の build。各層を確認した結果の build 順:
+
+1. **§10 hyp → S07.Hypothesis bridge** (未構築・foundational): `S07.Hypothesis S A` は tau_isometry/
+   conjugate_closed/no_real_characters/pairwise_orthogonal/difference_image/difference_images_orthogonal
+   を要求。現状 `inducedFamily_closedUnderConjugate` (S12:83) のみ。残 (no_real/pairwise_orthogonal/
+   difference_image 等) を inducedFamily/Dade tau から build。
+2. **S(HC) materialization**: S_HC = {φ∈inducedFamily M | degree w₁} subfamily + constant-degree 条件。
+3. **(5.7) 適用** → S₁=S(HC)-coherence τ₁ (`coherent_of_constant_degree`、Nonempty IsCoherent)。
+4. **(11.8.x) identities を τ₁ で**: 一部 coh-free 済 (`muGridAlpha_tau_inner_self` =2+n², coh 不要)、
+   τ₁ 絡み (`muGridAlpha_tau1_zeta_eq_neg_n`/`zeta_tau1_inner_self`) は full-coh 版あり→S₁-τ₁ 版が要る。
+5. **union** (`coherentUnion_of_glued`/`coherentPairChain`) で S(C)=S₁∪S₂ coherence。
+6. **τ₂** (S₂): (9.11) `coherent_H0C_commutator` (S11、sibleyTarget_H0C sorry、cite 可) + (11.7)。
+7. **contradiction**: by_contra (residual ⊥) → 1-6 で full S coherent → (11.3) `S_H0C_not_coherent` 矛盾。
+
+**honest 評価**: (11.8) は §11 char 終盤の最大の山で、執行は **layer 1 (S07.Hypothesis bridge) から始まる
+深い未構築 infra stack** = major multi-iteration。setup (ζ witness/params/by_contra) + 完全 scope は landed。
+**次 = layer 1: inducedFamily の S07.Hypothesis 性質 (no_real/pairwise_orthogonal/difference_image) を build**。
+
+## 2026-06-29 update⁵ (lane-a) — assessment 修正: (11.8) infra は完備、no_real は組立で feasible
+
+deep dive で update³/⁴ の「深い再帰未構築 stack」評価が**悲観的すぎた**と判明。layer 1 の核心
+`no_real_characters (inducedFamily M)` の build に要る infra は**ほぼ全て available**:
+- **Mackey ✅**: `card_mul_inner_induce` (two-fn, InducedIrreducible:135) `|H|⟨Ind θ,Ind ψ⟩=∑⟨θ,ψ^{x⁻¹}⟩`、
+  `card_smul_restrict_induce` (99)、`card_mul_inner_self_induce` (120)。
+- `ClassFunction.induce_conj` ✅ (S12:107 で使用)。
+- conjByOrbit 機構 ✅: `card_conjByOrbit_eq_index_inertia` (227)、`mem_conjByOrbit`/`conjBy_mem_conjByOrbit`
+  (Clifford:745/750)、Brauer perm (`ConjugationBrauer.lean`: conjByPerm 30、card_fixedPoints 186)。
+- `not_isReal_of_ne_trivial_irreducible_of_odd_card` (S03:155) ✅。
+
+**no_real の証明** (組立、feasible): χ=Ind θ∈inducedFamily, θ≠1。χ.IsReal ⟹ χ.conj=χ ⟹ Ind θ̄=Ind θ ⟹
+⟨Ind θ,Ind θ⟩=⟨Ind θ,Ind θ̄⟩。Mackey: |H|⟨Ind θ,Ind θ̄⟩=∑⟨θ,θ̄^{x⁻¹}⟩。θ̄∉conjByOrbit(θ) なら全項 0 ⟹
+⟨Ind θ,Ind θ̄⟩=0 だが ⟨Ind θ,Ind θ⟩≥1、矛盾。**θ̄∉conjByOrbit(θ)** = odd-orbit involution 論法:
+conjByOrbit(θ) 奇数 card (=[M':I_θ]∣|M'| odd)、σ:η↦η̄ involution が θ̄∈orbit なら orbit を保ち、
+**involution on odd-card set ⟹ fixed pt η** (η̄=η ⟹ η real ⟹ η=1 ⟹ 1∈orbit(θ) ⟹ θ=1 矛盾)。
+
+**残る唯一の fiddly piece** = `involution on odd-card finite set has a fixed point` (mathlib に
+`Function.Involutive`+odd card であるか要確認、無ければ「非不動点は 2 元 orbit ⟹ 偶数、total 奇数 ⟹ fixed 奇数≥1」で小 helper)。+ `conjBy_conj` (conj が conjBy と可換、ext+simp)。
+
+**評価**: no_real は **available pieces + 2 小 helper (involution-fixed-pt, conjBy_conj) の組立**で feasible。
+(11.8) は「最難だが blocked でない」。layer 1 → 7 を incremental commit で積める (commit は persist)。
+次 = involution-fixed-pt helper + no_real 組立。
