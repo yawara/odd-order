@@ -126,6 +126,21 @@ theorem conjPerm_conjBy_comm {K : Type*} [Group K] {H : Subgroup K} [H.Normal] [
   simp only [IrreducibleCharacter.conjPerm_apply_coe, IrreducibleCharacter.coe_conjBy]
   exact conjBy_conj g (θ : ClassFunction ↥H ℂ)
 
+/-- **The conjugation orbit `conjByOrbit θ` is `conjPerm`-invariant** once it contains `θ̄`.  If the
+complex conjugate `θ̄ = conjPerm θ` lies in the `M`-conjugation orbit of `θ`, then so does the
+conjugate of every orbit member.  Combines `conjPerm_conjBy_comm` (`σ` commutes with the action)
+with the group-action laws (`conjBy_mul`). -/
+theorem conjPerm_mem_conjByOrbit {K : Type*} [Group K] {H : Subgroup K} [H.Normal] [Finite ↥H]
+    {θ : IrreducibleCharacter ↥H}
+    (hmem : IrreducibleCharacter.conjPerm ↥H θ ∈ IrreducibleCharacter.conjByOrbit (G := K) θ)
+    {η : IrreducibleCharacter ↥H} (hη : η ∈ IrreducibleCharacter.conjByOrbit (G := K) θ) :
+    IrreducibleCharacter.conjPerm ↥H η ∈ IrreducibleCharacter.conjByOrbit (G := K) θ := by
+  obtain ⟨g, rfl⟩ := hη
+  rw [conjPerm_conjBy_comm]
+  obtain ⟨g₀, hg₀⟩ := hmem
+  rw [← hg₀, ← IrreducibleCharacter.conjBy_mul]
+  exact IrreducibleCharacter.conjBy_mem_conjByOrbit θ (g₀ * g)
+
 /-! ## (10.1): the type III/IV/V hypothesis -/
 
 open scoped FiniteInduce in
