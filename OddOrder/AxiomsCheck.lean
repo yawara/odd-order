@@ -6713,3 +6713,13 @@ scaffold only posited (consumers can drop `dummySigmaDecomposition` for it).  Al
 #assert_only_allowed_axioms OddOrder.BG.Ch4.S14.exists_mem_Msigma_of_isPiElement_sigma
 #assert_only_allowed_axioms OddOrder.BG.Ch4.S14.sigmaLength_eq_one_iff
 #assert_only_allowed_axioms OddOrder.BG.Ch4.S14.genuineSigmaDecomposition
+
+/-! **`FT_signalizer` construction** (`S16_MainResults`, Coq `FT_signalizer`/`nsRCx`; lane δ
+signalizer-functor port Chunk 2, issue 8020).  The concrete `R(x) = (N[x])_σ ⊓ C_G(x)` object and its
+first structural facts: `R(x) ≤ C_G(x)`, `C_G(x) ≤ N[x]` (nontrivial branch), and `R(x) ◁ C_G(x)`
+(Theorem D(3) normality).  The deep `FT_signalizer_context` (transitivity / Hall / uniqueness) is the
+remaining content.  All axiom-clean. -/
+
+#assert_only_allowed_axioms OddOrder.BG.Ch4.S16.FT_signalizer_le_centralizer
+#assert_only_allowed_axioms OddOrder.BG.Ch4.S16.centralizer_le_FT_signalizerBase
+#assert_only_allowed_axioms OddOrder.BG.Ch4.S16.FT_signalizer_normal_in_centralizer
