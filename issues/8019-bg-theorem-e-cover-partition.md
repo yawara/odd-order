@@ -146,3 +146,25 @@ M-fusion に upgrade。Theorem D の唯一 unconditional な conjunct。
 analysis の最深部で multi-session。⟹ BG Theorem E の Phase 3 (cardinality 14.5c は Theorem D の R(x)
 counting に依存) は D(3)/D(4) 完成待ち。次セッション = D(2) (Lem 12.17 cyclic 化が可能か精査) or
 D(3) signalizer 着手。
+
+## 🔬 2026-06-28 — Theorem D 残 conjunct (D2/D3/D4) の精密 deep-scoping (次セッション地図)
+
+Theorem D(1) (msigma_fusion_control) 完了後、残 conjunct を Coq `BGsummaryD` (BGsection16:790) +
+`sigma_compl_embedding` (BGsection12:2461) で精査。**全て deep BG §12/signalizer machinery (Lean 未ポート)
+に gated と確定** — tractable な断片は binding gate を進めない:
+
+- **D(2) cyclic `M_σ∩M^g`** (hD2): Coq 証明で cyclic は **`sigma_compl_embedding`** (§12) 由来。これは
+  σ-uniqueness 機構 `sigma_group_trans` (σ-transitivity) / `norm_noncyclic_sigma` (noncyclic σ-subgroup
+  ⟹ N(X)≤M) / `cent_der_sigma_uniq` に依存し、**いずれも Lean 未ポート**。前半 `M_σ∩M^g = M_σ∩M_σ^g`
+  (Hall-pcore 論法) は tractable だが cyclic でなく hD2 を満たさない。`Msigma_conj_smul` は S14:2923 に
+  private 在庫 (要 de-privatize、但し equality 半分用)。
+- **D(3) RData 存在** (hD3): `∀x∈M_σ#, ∃R, RData M x R` = R(x) signalizer normal complement の存在 +
+  sharply transitive action。Coq `FT_signalizer_context` (signalizer functor theory) 由来 = **BG local
+  analysis の最深部**、multi-session の大型ポート。
+- **D(4) tail** (hD4): D(3) + 一意 N + 型構造、最深。
+
+**∴ BG Theorem E Phase 3 (cardinality 14.5c) は Theorem D の R(x) counting = D(3)/D(4) signalizer
+待ちが真のボトルネック**。Theorem E partition core (Phase 1) は完了済・FT-path 上の genuine 前進。
+次セッションの選択肢 = (i) `sigma_compl_embedding` §12 port (σ-uniqueness 3 補題から、D(2) cyclic 用)、
+(ii) signalizer functor theory 着手 (D(3)、最深)、(iii) Pf-side Phase 4 の family/partition field 供給
+(cardinality/covering は gate 据置の gated-endpoint)。いずれも fresh 集中セッション推奨。
