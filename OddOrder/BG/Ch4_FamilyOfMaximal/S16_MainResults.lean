@@ -315,6 +315,21 @@ theorem maximalConjugatesContaining_eq_maximalSigma [Finite G]
       (S14.genuineSigmaDecomposition hG) (S14.Msigma_ell1 hG hM hxMσ hx1) ⟨hM, hxMσ⟩ ⟨hNmax, hxNσ⟩
     exact ⟨c, hcconj.symm, OddOrder.BG.Ch3.S10.Msigma_le N hxNσ⟩
 
+/-- **If `C_G(x) ≤ M` then `M` is the unique `σ`-maximal of `x`** (`𝓜_σ(x) = {M}`, for `x ∈ M_σ^#`):
+any `L ∈ 𝓜_σ(x)` is `M^c` with `c ∈ C_G(x)` (`exists_conj_centralizer_of_mem_maximalSigma`), and
+`c ∈ C_G(x) ≤ M ≤ N_G(M)` gives `M^c = M`.  The easy direction of the `|𝓜_σ(x)|`-vs-`C_G(x) ⊆ M`
+dichotomy — the trivial (`R(x) = 1`) branch of Theorem D(3). -/
+theorem maximalSigmaSubgroupsOfElement_eq_singleton_of_centralizer_le [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} (hM : M ∈ maximalSubgroups G)
+    {x : G} (hxMσ : x ∈ OddOrder.BG.Ch3.S10.Msigma M) (hx1 : x ≠ 1)
+    (hCM : Subgroup.centralizer ({x} : Set G) ≤ M) :
+    S14.maximalSigmaSubgroupsOfElement x = {M} := by
+  refine Set.eq_singleton_iff_unique_mem.mpr ⟨⟨hM, hxMσ⟩, fun L hL => ?_⟩
+  obtain ⟨c, hcC, hcconj⟩ := S14.exists_conj_centralizer_of_mem_maximalSigma hG
+    (S14.genuineSigmaDecomposition hG) (S14.Msigma_ell1 hG hM hxMσ hx1) ⟨hM, hxMσ⟩ hL
+  rw [← hcconj]
+  exact conj_smul_eq_self_of_mem_normalizer (Subgroup.le_normalizer (hCM hcC))
+
 /-- **Pointed sharp transitivity upgrades to full sharp transitivity** (regular action): if `R`
 acts on `S` so that every `L ∈ S` is `M₀^r` for a *unique* `r ∈ R`, then `R` is sharply transitive
 on `S` — for `A, B ∈ S` the unique `r ∈ R` with `B = A^r` is `r = b a⁻¹` (where `A = M₀^a`,
