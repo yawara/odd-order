@@ -375,6 +375,24 @@ theorem nonconjugate_typeI_R_orthogonal {L1 L2 : Subgroup G} [Finite G]
   exact nonconjugate_diffImage_inner_zero hyp1 hyp2 hnot_conj data1 hφ1 data2 hφ2
 
 open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
+/-- **Peterfalvi (12.4)/(12.5) input**: each member `χ = Ind_H^L θ` of `S` vanishes on `L − H`.
+`H = L_F` is normal in `L` (`maxNilpotentNormalHall_subgroupOf_normal`, the Fitting subgroup `L_F`),
+so the induced character is supported on `H` (`ClassFunction.induce_eq_zero_of_not_mem_normal`).  This
+is the "the elements of `S` vanish on `L − H`" step of the constant-on-coset conclusions of
+(12.4)/(12.5) (`ψ(xh) = β(xh) + γ(xh) = γ(x)`, the `β ∈ ℂ[S]` part vanishing off `H`). -/
+theorem Sset_vanishes_off_H {L : Subgroup G} (hyp : Hypothesis L) {χ : ClassFunction ↥L ℂ}
+    (hχ : χ ∈ hyp.Sset) {x : ↥L} (hxH : (x : G) ∉ hyp.H) : χ x = 0 := by
+  haveI := hyp.finiteG
+  obtain ⟨θ, _, hχ_eq⟩ := hχ
+  haveI hnormal : ((hyp.typeI.typeF.H).subgroupOf L).Normal := by
+    rw [hyp.typeI.typeF.H_eq]
+    exact OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_subgroupOf_normal L
+  have hxmem : x ∉ (hyp.typeI.typeF.H).subgroupOf L :=
+    fun hcon => hxH (Subgroup.mem_subgroupOf.mp hcon)
+  rw [hχ_eq]
+  exact ClassFunction.induce_eq_zero_of_not_mem_normal _ hxmem
+
+open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
 /-- **Peterfalvi (12.4)**: a class function `ψ` orthogonal to every type-I family
 `R(χ)` (`χ ∈ S`) is constant on each coset `xH` with `x ∈ L − H`.  The orthogonality
 hypothesis is now the genuine `⟨ψ, α⟩ = 0` for `α ∈ R(χ)`, no longer an opaque
