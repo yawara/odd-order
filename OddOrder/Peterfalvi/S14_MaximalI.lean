@@ -564,6 +564,22 @@ theorem not_inHKernel_imp_mem_constituents {L : Subgroup G} [Finite G] (hyp : Hy
   have hne : φ ≠ φ' := by rintro rfl; exact hnotin hφ'
   rw [irreducibleCharacter_inner, if_neg hne]
 
+open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
+/-- **Pin (c') partition characterization** (genuine, both directions): the off-kernel irreducibles
+`{φ : H ⊄ ker φ}` are *exactly* the constituents of the `S`-members, `⋃_{χ ∈ S} S(χ)`.  `⊆` is the
+capturing direction `not_inHKernel_imp_mem_constituents`; `⊇` is `constituents_not_inHKernel`.  This
+is the set-equality underlying the `biUnion` of `exists_offKernel_constituent_partition`; the residual
+of that pin is now only the **disjointness** (φ in `S(χ) ∩ S(χ')` ⟹ χ = χ', via Clifford single-orbit
+`RestrictionConstituentsSingleOrbit.exists_conj` + `induce_conjBy_eq`) and the `parts`-`Finset`
+construction. -/
+theorem not_inHKernel_iff {L : Subgroup G} [Finite G] (hyp : Hypothesis L)
+    (data : ∀ χ ∈ hyp.Sset, CharacterDecompositionData hyp χ)
+    {φ : IrreducibleCharacter ↥L} :
+    ¬ InHKernel hyp φ ↔
+      ∃ (χ : ClassFunction ↥L ℂ) (hχ : χ ∈ hyp.Sset), φ ∈ (data χ hχ).constituents :=
+  ⟨not_inHKernel_imp_mem_constituents hyp data,
+    fun ⟨χ, hχ, hmem⟩ => constituents_not_inHKernel hyp hχ (data χ hχ) hmem⟩
+
 open scoped Classical OddOrder.Peterfalvi.S12.FiniteInduce in
 /-- **Peterfalvi (12.4), the off-kernel regroup** (genuine, from the [Is] 6.2 partition pin): the
 off-kernel Fourier part `β = ∑_{φ : H ⊄ ker φ} ⟨Res_L ψ, φ⟩·φ` of `Res_L ψ` vanishes on `L − H`.
