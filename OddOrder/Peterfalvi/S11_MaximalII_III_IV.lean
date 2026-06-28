@@ -1833,6 +1833,80 @@ theorem uInHu_inf_hcInHu_eq_cInHu [Finite G] {M : Subgroup G} (data : TypesIIIII
     exact (cInHu data chief).mul_mem hh_c ccmem
   · exact le_inf (cInHu_le_uInHu data chief) le_sup_right
 
+/-- **(9.9.a) index step (A): `[HU:HC] = [U:C]` realized form `HC.index = (cInHu.subgroupOf uInHu).index`.**
+The second isomorphism theorem for `HC ◁ HU` with `uInHu ⊔ HC = ⊤`: `HU ⧸ HC ≃ uInHu ⧸ (uInHu ⊓ HC)`,
+and `uInHu ⊓ HC = cInHu` (`uInHu_inf_hcInHu_eq_cInHu`). -/
+theorem index_hcInHu_eq_relindex_cInHu [Finite G] {M : Subgroup G} (data : TypesIIIIIIVSetup M)
+    (chief : ChiefFactorData data) :
+    (hInHu data ⊔ cInHu data chief).index
+      = ((cInHu data chief).subgroupOf (uInHu data)).index := by
+  haveI : (hInHu data ⊔ cInHu data chief).Normal := hcInHu_normal data chief
+  have htop : uInHu data ⊔ (hInHu data ⊔ cInHu data chief) = ⊤ := by
+    rw [← sup_assoc, sup_comm (uInHu data) (hInHu data), hInHu_sup_uInHu_eq_top, top_sup_eq]
+  have he := Nat.card_congr (QuotientGroup.quotientInfEquivProdNormalQuotient
+    (uInHu data) (hInHu data ⊔ cInHu data chief)).toEquiv
+  -- The iso's source denominator `HC.subgroupOf uInHu = cInHu.subgroupOf uInHu` (by `U ⊓ HC = C`).
+  have hsub : (hInHu data ⊔ cInHu data chief).subgroupOf (uInHu data)
+      = (cInHu data chief).subgroupOf (uInHu data) := by
+    ext x
+    simp only [Subgroup.mem_subgroupOf]
+    constructor
+    · intro hx
+      have hxin : (x : ↥(huSub data)) ∈ uInHu data ⊓ (hInHu data ⊔ cInHu data chief) :=
+        Subgroup.mem_inf.mpr ⟨x.2, hx⟩
+      rw [uInHu_inf_hcInHu_eq_cInHu data chief] at hxin
+      exact hxin
+    · intro hx; exact Subgroup.mem_sup_right hx
+  rw [hsub] at he
+  -- `he : Nat.card (↥uInHu ⧸ cInHu.subgroupOf uInHu)
+  --       = Nat.card (↥(uInHu ⊔ HC) ⧸ HC.subgroupOf (uInHu ⊔ HC))`
+  have hsplit := Subgroup.card_eq_card_quotient_mul_card_subgroup
+    ((hInHu data ⊔ cInHu data chief).subgroupOf (uInHu data ⊔ (hInHu data ⊔ cInHu data chief)))
+  rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe (le_sup_right :
+        (hInHu data ⊔ cInHu data chief) ≤ uInHu data ⊔ (hInHu data ⊔ cInHu data chief))).toEquiv,
+    ← he, ← Subgroup.index_eq_card] at hsplit
+  -- `hsplit : Nat.card ↥(uInHu ⊔ HC) = (cInHu.subgroupOf uInHu).index * Nat.card ↥HC`
+  have htopcard : Nat.card ↥(uInHu data ⊔ (hInHu data ⊔ cInHu data chief))
+      = Nat.card ↥(huSub data) := by
+    rw [htop]; exact Nat.card_congr Subgroup.topEquiv.toEquiv
+  rw [htopcard] at hsplit
+  -- `hsplit : Nat.card ↥(huSub) = (cInHu.subgroupOf uInHu).index * Nat.card ↥HC`
+  have hmul := Subgroup.card_mul_index (hInHu data ⊔ cInHu data chief)
+  rw [hsplit, mul_comm (((cInHu data chief).subgroupOf (uInHu data)).index)] at hmul
+  exact Nat.eq_of_mul_eq_mul_left Nat.card_pos hmul
+
+/-- `|uInHu| = |U|` (the realization `uInHu = (U.subgroupOf M).subgroupOf HU`). -/
+theorem card_uInHu_eq (data : TypesIIIIIIVSetup M) :
+    Nat.card ↥(uInHu data) = Nat.card ↥data.U := by
+  have hUsubM : data.U.subgroupOf M ≤ huSub data :=
+    Subgroup.subgroupOf_mono M (le_sup_right : data.U ≤ data.H ⊔ data.U)
+  calc Nat.card ↥(uInHu data)
+      = Nat.card ↥(data.U.subgroupOf M) :=
+        Nat.card_congr (Subgroup.subgroupOfEquivOfLe hUsubM).toEquiv
+    _ = Nat.card ↥data.U := Nat.card_congr (Subgroup.subgroupOfEquivOfLe (U_le_M data)).toEquiv
+
+/-- `|cInHu| = |C|` (the realization `cInHu = (cSub.subgroupOf M).subgroupOf HU`). -/
+theorem card_cInHu_eq (data : TypesIIIIIIVSetup M) (chief : ChiefFactorData data) :
+    Nat.card ↥(cInHu data chief) = Nat.card ↥(cSub data chief) := by
+  have hCsubM : (cSub data chief).subgroupOf M ≤ huSub data :=
+    Subgroup.subgroupOf_mono M
+      ((cSub_le_U data chief).trans (le_sup_right : data.U ≤ data.H ⊔ data.U))
+  have hCleM : cSub data chief ≤ M := (cSub_le_U data chief).trans (U_le_M data)
+  calc Nat.card ↥(cInHu data chief)
+      = Nat.card ↥((cSub data chief).subgroupOf M) :=
+        Nat.card_congr (Subgroup.subgroupOfEquivOfLe hCsubM).toEquiv
+    _ = Nat.card ↥(cSub data chief) :=
+        Nat.card_congr (Subgroup.subgroupOfEquivOfLe hCleM).toEquiv
+
+/-- `|C| = |ker(uActionHom)|`: `cSub` is the injective double-image of the kernel. -/
+theorem card_cSub_eq_card_ker (data : TypesIIIIIIVSetup M) (chief : ChiefFactorData data) :
+    Nat.card ↥(cSub data chief) = Nat.card ↥(uActionHom data chief).ker := by
+  show Nat.card ↥(((uActionHom data chief).ker.map
+      (data.typeP.U.subgroupOf (data.typeP.U ⊔ data.typeP.W1)).subtype).map
+        (data.typeP.U ⊔ data.typeP.W1).subtype) = Nat.card ↥(uActionHom data chief).ker
+  rw [← Nat.card_congr (Subgroup.equivMapOfInjective _ _ (Subgroup.subtype_injective _)).toEquiv,
+    ← Nat.card_congr (Subgroup.equivMapOfInjective _ _ (Subgroup.subtype_injective _)).toEquiv]
+
 /-- The character-theoretic setup of Peterfalvi (9.5).
 
 `C`, `U'`, and `C'` denote the centralizer, commutator subgroup, and its
@@ -3415,6 +3489,33 @@ theorem caseA_character_counts [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G
           IsIrreducibleCharacter χ ∧ χ 1 = ((data.q * caseA.a : ℕ) : ℂ)}.ncard := by
   sorry
 
+/-- **(9.9.a) index step (C): `[U:C] = u`** realized form `(cInHu.subgroupOf uInHu).index = u`.
+First isomorphism `U/C ≃ Ū` (the `U`-action image on the chief factor), with `u = |Ū|`. -/
+theorem index_cInHu_subgroupOf_uInHu_eq_u [Finite G] {M : Subgroup G}
+    (data : TypesIIIIIIVSetup M) (chief : ChiefFactorData data)
+    (chars : Section11CharacterData data chief) :
+    ((cInHu data chief).subgroupOf (uInHu data)).index = chars.u := by
+  -- (I): `|C| · [U:C] = |U|`.
+  have hI : Nat.card ↥(cSub data chief) * ((cInHu data chief).subgroupOf (uInHu data)).index
+      = Nat.card ↥data.U := by
+    have h := Subgroup.card_mul_index ((cInHu data chief).subgroupOf (uInHu data))
+    rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe (cInHu_le_uInHu data chief)).toEquiv,
+      card_cInHu_eq data chief, card_uInHu_eq data] at h
+    exact h
+  -- (II): `|U| = u · |C|` (first iso for the `U`-action hom).
+  have hu : chars.u = Nat.card ↥(uActionHom data chief).range := chars.u_eq_card_quotient
+  have hII : Nat.card ↥data.U = chars.u * Nat.card ↥(cSub data chief) := by
+    have h := Subgroup.card_eq_card_quotient_mul_card_subgroup (uActionHom data chief).ker
+    rw [Nat.card_congr (QuotientGroup.quotientKerEquivRange (uActionHom data chief)).toEquiv,
+      ← card_cSub_eq_card_ker data chief, ← hu,
+      Nat.card_congr (Subgroup.subgroupOfEquivOfLe
+        (le_sup_left : data.typeP.U ≤ data.typeP.U ⊔ data.typeP.W1)).toEquiv] at h
+    exact h
+  have hcancel : Nat.card ↥(cSub data chief)
+      * ((cInHu data chief).subgroupOf (uInHu data)).index
+      = Nat.card ↥(cSub data chief) * chars.u := by rw [hI, hII, mul_comm]
+  exact Nat.eq_of_mul_eq_mul_left Nat.card_pos hcancel
+
 /-- **Constituent kernel inheritance (lies-over form).**  If `χ ∈ Irr Γ` lies over `θ ∈ Irr K`
 for a subgroup `K ≤ Γ`, then every element of `K` lying in the character kernel of `χ` also lies in
 the character kernel of `θ`: each constituent of `Res^Γ_K χ` inherits `χ`'s kernel containments.
@@ -3553,9 +3654,10 @@ theorem caseB_degree_qu [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
   have key := OddOrder.RepresentationTheory.apply_one_eq_index_of_liesOver_linear_inertia
     (H := hInHu data) (I := hInHu data ⊔ cInHu data chief)
     χ θ₀ ψ hθ₀over hθ₀inertia hθ₀deg hψover hψdeg
-  -- Obligation 4: `[HU:HC] = u`.
-  have hidx : (hInHu data ⊔ cInHu data chief).index = chars.u := by
-    sorry
+  -- Obligation 4: `[HU:HC] = u` = `[U:C]` (second iso (A) + first iso (C)).
+  have hidx : (hInHu data ⊔ cInHu data chief).index = chars.u :=
+    (index_hcInHu_eq_relindex_cInHu data chief).trans
+      (index_cInHu_subgroupOf_uInHu_eq_u data chief chars)
   rw [key, hidx]
 
 /-- **Peterfalvi (9.9)**: character-count consequences in Clifford case (b).
