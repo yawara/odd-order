@@ -6671,3 +6671,19 @@ formula together with the prime computation `coprimeFrobeniusAction_card_eq_prim
 -- (`K* = Z`), `K` centralizing `Z(P)` from `Z ≤ K* ≤ C_G(K)`).
 #assert_only_allowed_axioms
   OddOrder.BG.Ch4.S16.isTypeV_of_isTypeP1_mf_eq_msigma
+
+/-! **Genuine `σ`-decomposition of an element** (`S14_TypePCounting`, BG §14 opening / Coq
+`sigma_decomposition` / `sigma_length`; lane δ signalizer-functor port Chunk 1, issue 8020).  The
+element σ-part `sigmaPart M x` (a genuine function via the two-block π-part decomposition
+`exists_isPiElement_mul`), the `sigma_decomposition`/`sigma_length` of an element, and the two
+foundational facts: `sigmaLength_eq_zero_iff` (Coq `ell_sigma0P`: `ℓ_σ(x) = 0 ↔ x = 1`) and
+`sigmaLength_conj` (Coq `ell_sigmaJ`: conjugation-invariance).  These construct the carrier that
+`SigmaDecompositionData` only posits.  All axiom-clean. -/
+
+#assert_only_allowed_axioms OddOrder.BG.Ch4.S14.piPart_one
+#assert_only_allowed_axioms OddOrder.BG.Ch4.S14.isPiElement_compl_of_piPart_eq_one
+#assert_only_allowed_axioms OddOrder.BG.Ch4.S14.isPiElement_conj
+#assert_only_allowed_axioms OddOrder.BG.Ch4.S14.piPart_conj
+#assert_only_allowed_axioms OddOrder.BG.Ch4.S14.sigmaPart_conj
+#assert_only_allowed_axioms OddOrder.BG.Ch4.S14.sigmaLength_eq_zero_iff
+#assert_only_allowed_axioms OddOrder.BG.Ch4.S14.sigmaLength_conj

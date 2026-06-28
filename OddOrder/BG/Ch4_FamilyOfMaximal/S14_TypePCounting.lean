@@ -1189,6 +1189,114 @@ theorem mem_maximalSubgroups_of_isConjugateSubgroup {M N : Subgroup G}
 def zTilde (K Kstar : Subgroup G) : Set G :=
   ((K ⊔ Kstar : Subgroup G) : Set G) \ ((K : Set G) ∪ (Kstar : Set G))
 
+/-! ### Genuine `σ`-decomposition of an element (BG §14 opening, Coq `sigma_decomposition`)
+
+Built on the two-block π-part decomposition `OddOrder.GroupTheory.exists_isPiElement_mul`.  These
+genuine definitions (`sigmaPart`, `sigmaDecomposition`, `sigmaLength`) construct the carrier that
+`SigmaDecompositionData` below only *posits*: `sigmaLength` is an honest `ℕ`-valued function with
+`sigmaLength_eq_zero_iff` (Coq `ell_sigma0P`) and `sigmaLength_conj` (conjugation invariance,
+Coq `ell_sigmaJ`) proven from the construction, not a free structure field.  This is the upstream
+foundation of the `FT_signalizer` (Theorem D(3)/(4)) port (issue 8020, Chunk 1). -/
+
+/-- The `π`-part of a finite-order element `g`, as a *function*: the `π`-element factor of the
+unique two-block decomposition `g = (π-part) * (π′-part)` (`exists_isPiElement_mul`, made into a
+function via `Classical.choose`).  This is Coq's `g.`_π`. -/
+noncomputable def piPart [Finite G] (π : Set ℕ) (g : G) : G :=
+  (exists_isPiElement_mul π g).choose
+
+/-- The decomposition behind `piPart`: there is a commuting `π′`-element `b`, a power of `g`, with
+`piPart π g * b = g`. -/
+theorem piPart_spec [Finite G] (π : Set ℕ) (g : G) :
+    ∃ b : G, piPart π g * b = g ∧ Commute (piPart π g) b ∧
+      IsPiElement π (piPart π g) ∧ IsPiElement πᶜ b ∧
+      piPart π g ∈ Subgroup.zpowers g ∧ b ∈ Subgroup.zpowers g :=
+  (exists_isPiElement_mul π g).choose_spec
+
+/-- `piPart π g` is a `π`-element. -/
+theorem isPiElement_piPart [Finite G] (π : Set ℕ) (g : G) : IsPiElement π (piPart π g) := by
+  obtain ⟨_, _, _, h, _, _, _⟩ := piPart_spec π g; exact h
+
+/-- The identity has trivial `π`-part. -/
+theorem piPart_one [Finite G] (π : Set ℕ) : piPart π (1 : G) = 1 := by
+  obtain ⟨b, hmul, hcomm, hpiA, hpiB, -, -⟩ := piPart_spec π (1 : G)
+  exact (isPiElement_mul_unique hmul hcomm hpiA hpiB (one_mul (1 : G)) (Commute.refl 1)
+    (isPiElement_one π) (isPiElement_one πᶜ)).1
+
+/-- If the `π`-part of `g` is trivial, then `g` itself is a `π′`-element. -/
+theorem isPiElement_compl_of_piPart_eq_one [Finite G] {π : Set ℕ} {g : G}
+    (h : piPart π g = 1) : IsPiElement πᶜ g := by
+  obtain ⟨b, hmul, -, -, hpiB, -, -⟩ := piPart_spec π g
+  rw [h, one_mul] at hmul
+  rwa [hmul] at hpiB
+
+/-- Conjugation preserves the `π`-element property (the conjugate has the same order). -/
+theorem isPiElement_conj {π : Set ℕ} (h : G) {a : G} (ha : IsPiElement π a) :
+    IsPiElement π (h * a * h⁻¹) := by
+  have key : orderOf (h * a * h⁻¹) = orderOf a := by
+    have hh := orderOf_injective (MulAut.conj h).toMonoidHom (MulAut.conj h).injective a
+    simpa only [MulEquiv.coe_toMonoidHom, MulAut.conj_apply] using hh
+  intro p hp
+  rw [key] at hp
+  exact ha p hp
+
+/-- **The `π`-part is conjugation-equivariant** (`piPart π (h x h⁻¹) = h (piPart π x) h⁻¹`).
+Conjugating the unique decomposition `x = (π-part)(π′-part)` gives a decomposition of `h x h⁻¹`;
+uniqueness identifies its `π`-part with `h (piPart π x) h⁻¹`. -/
+theorem piPart_conj [Finite G] (π : Set ℕ) (h x : G) :
+    piPart π (h * x * h⁻¹) = h * piPart π x * h⁻¹ := by
+  obtain ⟨bx, hxmul, hxcomm, hxpiA, hxpiB, -, -⟩ := piPart_spec π x
+  obtain ⟨b', hmul', hcomm', hpiA', hpiB', -, -⟩ := piPart_spec π (h * x * h⁻¹)
+  have hprod : (h * piPart π x * h⁻¹) * (h * bx * h⁻¹) = h * x * h⁻¹ := by
+    calc (h * piPart π x * h⁻¹) * (h * bx * h⁻¹)
+        = h * (piPart π x * bx) * h⁻¹ := by group
+      _ = h * x * h⁻¹ := by rw [hxmul]
+  have hBcomm : Commute (h * piPart π x * h⁻¹) (h * bx * h⁻¹) := by
+    have hm := hxcomm.map (MulAut.conj h)
+    simpa only [MulAut.conj_apply] using hm
+  exact (isPiElement_mul_unique hmul' hcomm' hpiA' hpiB' hprod hBcomm
+    (isPiElement_conj h hxpiA) (isPiElement_conj h hxpiB)).1
+
+/-- The `σ(M)`-part of an element `x` (Coq `x.`_{σ(M)}`): its `σ(M)`-component in the two-block
+π-part decomposition. -/
+noncomputable def sigmaPart [Finite G] (M : Subgroup G) (x : G) : G :=
+  piPart (OddOrder.BG.Ch3.S10.sigma M) x
+
+/-- The `σ(M)`-part is conjugation-equivariant. -/
+theorem sigmaPart_conj [Finite G] (M : Subgroup G) (h x : G) :
+    sigmaPart M (h * x * h⁻¹) = h * sigmaPart M x * h⁻¹ := by
+  simp only [sigmaPart]; exact piPart_conj _ h x
+
+/-- **BG `sigma_decomposition x`** (Coq `sigma_decomposition`): the set of nonidentity `σ(M)`-parts
+of `x` ranging over the maximal subgroups `M`. -/
+noncomputable def sigmaDecomposition [Finite G] (x : G) : Set G :=
+  {y | ∃ M : Subgroup G, M ∈ maximalSubgroups G ∧ y = sigmaPart M x} \ {1}
+
+/-- **BG `sigma_length x = #|sigma_decomposition x|`** (Coq `sigma_length`).  `sigmaLength_eq_zero_iff`
+(Coq `ell_sigma0P`) is proved further down, after `exists_mem_sigma_of_prime_dvd_card`. -/
+noncomputable def sigmaLength [Finite G] (x : G) : ℕ :=
+  (sigmaDecomposition x).ncard
+
+/-- **BG `ell_sigmaJ`**: the σ-length is conjugation-invariant.  Conjugation by `h` is a bijection
+of `G` carrying `sigma_decomposition x` onto `sigma_decomposition (h x h⁻¹)` (via `sigmaPart_conj`),
+so the two sets have the same cardinality. -/
+theorem sigmaLength_conj [Finite G] (h x : G) :
+    sigmaLength (h * x * h⁻¹) = sigmaLength x := by
+  have hinj : Function.Injective (fun z => h * z * h⁻¹) := fun a b hab => by simpa using hab
+  have hconjset : sigmaDecomposition (h * x * h⁻¹)
+      = (fun z => h * z * h⁻¹) '' sigmaDecomposition x := by
+    unfold sigmaDecomposition
+    rw [Set.image_diff hinj]
+    congr 1
+    · ext y
+      simp only [Set.mem_setOf_eq, Set.mem_image]
+      constructor
+      · rintro ⟨M, hMmax, rfl⟩
+        exact ⟨sigmaPart M x, ⟨M, hMmax, rfl⟩, (sigmaPart_conj M h x).symm⟩
+      · rintro ⟨z, ⟨M, hMmax, rfl⟩, rfl⟩
+        exact ⟨M, hMmax, (sigmaPart_conj M h x).symm⟩
+    · rw [Set.image_singleton]; simp
+  rw [sigmaLength, sigmaLength, hconjset, Set.ncard_image_of_injective _ hinj]
+
 /-- A named carrier for the sigma-decomposition / sigma-length data of BG §14.
 
 The actual construction comes from Theorem 13.9 and the Hall decomposition of
@@ -4051,6 +4159,37 @@ theorem exists_mem_sigma_of_prime_dvd_card [Finite G] (hG : OddOrder.BG.IsMinima
   refine ⟨Sylow.ofCard ((P : Subgroup G).subgroupOf M) hQcard, ?_⟩
   rw [Sylow.coe_ofCard, hmap]
   exact hNM
+
+/-- **BG `ell_sigma0P`** (Coq BGsection14:222): the genuine σ-length of `x` is `0` iff `x = 1`.
+If `x ≠ 1`, any prime `p ∣ orderOf x` divides `|G|`, hence is a `σ`-prime of some maximal `M`
+(`exists_mem_sigma_of_prime_dvd_card`); then `sigmaPart M x ≠ 1` (else `x` would be a `σ(M)′`-element
+avoiding `p`), so `sigma_decomposition x` is nonempty.  (Placed after
+`exists_mem_sigma_of_prime_dvd_card`, which it cites; the genuine `sigmaLength` is defined earlier.) -/
+theorem sigmaLength_eq_zero_iff [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G) (x : G) :
+    sigmaLength x = 0 ↔ x = 1 := by
+  rw [sigmaLength, Set.ncard_eq_zero (Set.toFinite _)]
+  constructor
+  · intro hempty
+    by_contra hx1
+    have hox : orderOf x ≠ 1 := fun h => hx1 (orderOf_eq_one_iff.mp h)
+    obtain ⟨p, hp, hpdvd⟩ := Nat.exists_prime_and_dvd hox
+    haveI : Fact p.Prime := ⟨hp⟩
+    obtain ⟨M, hMmax, hpσ⟩ :=
+      exists_mem_sigma_of_prime_dvd_card hG (hpdvd.trans (orderOf_dvd_natCard x))
+    have hne : sigmaPart M x ≠ 1 := by
+      intro hcontra
+      have hcompl : IsPiElement (OddOrder.BG.Ch3.S10.sigma M)ᶜ x :=
+        isPiElement_compl_of_piPart_eq_one hcontra
+      exact (hcompl p (Nat.mem_primeFactors.mpr ⟨hp, hpdvd, (orderOf_pos x).ne'⟩)) hpσ
+    have hmem : sigmaPart M x ∈ sigmaDecomposition x := by
+      refine ⟨⟨M, hMmax, rfl⟩, ?_⟩
+      simp only [Set.mem_singleton_iff]; exact hne
+    rw [hempty] at hmem
+    exact Set.notMem_empty _ hmem
+  · rintro rfl
+    rw [Set.eq_empty_iff_forall_notMem]
+    rintro y ⟨⟨M, hMmax, rfl⟩, hy⟩
+    exact hy (by simp [sigmaPart, piPart_one])
 
 /-- **σ-decomposition keystone** (BG §1, mmd L3793): a nonidentity `σ(M)`-element `x` has
 `ℓ_σ(x) = 1`.  The cyclic group `⟨x⟩` is a nonidentity proper `σ(M)`-subgroup (proper since `G` is
