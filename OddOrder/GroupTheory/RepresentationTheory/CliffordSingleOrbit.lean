@@ -356,4 +356,53 @@ theorem apply_one_le_induce_apply_one_of_liesOver
         Finset.single_le_sum hnn (Finset.mem_univ χ)
     _ = ClassFunction.induce I (ψ : ClassFunction ↥I ℂ) (1 : G) := key
 
+open scoped ComplexOrder in
+/-- **Clifford correspondence degree** ([Is] Thm 6.11, packaged for Peterfalvi (9.8.c)/(9.9.a)).
+Let `H ⊴ G`, `I ≤ G`, and `χ ∈ Irr G`.  Suppose `χ` lies over a *linear* (`θ₀(1) = 1`) constituent
+`θ₀ ∈ Irr H` whose inertia group in `G` is exactly `I`, and over a *linear* (`ψ(1) = 1`) character
+`ψ ∈ Irr I`.  Then `χ(1) = [G : I]`.
+
+The Clifford lower bound `χ(1) = ⟨Res χ, θ₀⟩ · [G : I_G(θ₀)] · θ₀(1) = e · [G : I]` (with
+`apply_one_eq_restrictionMultiplicity_mul_index_inertia`, where `e = ⟨Res χ, θ₀⟩ ≥ 1`) and the
+constituent upper bound `χ(1) ≤ (Ind_I^G ψ)(1) = [G : I] · ψ(1) = [G : I]`
+(`apply_one_le_induce_apply_one_of_liesOver`) sandwich `χ(1)` between `[G : I]` and itself, forcing
+`e = 1` and `χ(1) = [G : I]`.  This is the abstract core of Peterfalvi's "every `χ ∈ 𝒮(H₀C')` has
+degree `u = [HU : HC]`" (9.9.a): with `H = H`, `I = HC` and `θ₀` a nontrivial chief-factor character
+(inertia `HC` by `inertia_eq_hcInHu`). -/
+theorem apply_one_eq_index_of_liesOver_linear_inertia
+    [Fintype G] [Invertible (Nat.card G : ℂ)] [Fintype (IrreducibleCharacter G)]
+    {H : Subgroup G} [H.Normal] [Fintype ↥H] [Invertible (Nat.card ↥H : ℂ)]
+    [Fintype (IrreducibleCharacter ↥H)]
+    {I : Subgroup G} [Fintype ↥I] [Invertible (Nat.card ↥I : ℂ)]
+    (χ : IrreducibleCharacter G) (θ₀ : IrreducibleCharacter ↥H) (ψ : IrreducibleCharacter ↥I)
+    (hθ₀over : IrreducibleCharacter.LiesOver H χ θ₀)
+    (hθ₀inertia : IrreducibleCharacter.inertia (G := G) (H := H) θ₀ = I)
+    (hθ₀deg : (θ₀ : ClassFunction ↥H ℂ) (1 : ↥H) = 1)
+    (hψover : IrreducibleCharacter.LiesOver I χ ψ)
+    (hψdeg : (ψ : ClassFunction ↥I ℂ) (1 : ↥I) = 1) :
+    (χ : ClassFunction G ℂ) (1 : G) = (I.index : ℂ) := by
+  classical
+  -- The constituent multiplicity `e = ⟨Res χ, θ₀⟩` is a non-negative integer `m`, and `m ≥ 1`
+  -- because `χ` lies over `θ₀`.
+  obtain ⟨m, hm⟩ := IrreducibleCharacter.restrictionMultiplicity_natCast (H := H) χ θ₀
+  have hm_pos : 1 ≤ m := by
+    rcases Nat.eq_zero_or_pos m with h | h
+    · exact absurd (hm.trans (by rw [h, Nat.cast_zero])) hθ₀over
+    · exact h
+  -- Lower bound: `χ(1) = m · [G:I]` (Clifford degree formula, inertia `= I`, `θ₀(1) = 1`).
+  have hlow : (χ : ClassFunction G ℂ) (1 : G) = (m : ℂ) * (I.index : ℂ) := by
+    rw [apply_one_eq_restrictionMultiplicity_mul_index_inertia (H := H) χ θ₀ hθ₀over,
+      hm, hθ₀inertia, hθ₀deg, mul_one]
+  -- Upper bound: `χ(1) ≤ (Ind_I ψ)(1) = [G:I] · ψ(1) = [G:I]`.
+  have hup : (χ : ClassFunction G ℂ) (1 : G) ≤ (I.index : ℂ) := by
+    have h := apply_one_le_induce_apply_one_of_liesOver χ ψ hψover
+    rwa [ClassFunction.induce_apply_one, hψdeg, mul_one] at h
+  -- `[G:I] = 1·[G:I] ≤ m·[G:I] = χ(1)`, sandwiched against `χ(1) ≤ [G:I]`.
+  have hge : (I.index : ℂ) ≤ (χ : ClassFunction G ℂ) (1 : G) := by
+    rw [hlow]
+    calc (I.index : ℂ) = 1 * (I.index : ℂ) := (one_mul _).symm
+      _ ≤ (m : ℂ) * (I.index : ℂ) :=
+          mul_le_mul_of_nonneg_right (by exact_mod_cast hm_pos) (Nat.cast_nonneg _)
+  exact le_antisymm hup hge
+
 end OddOrder.RepresentationTheory
