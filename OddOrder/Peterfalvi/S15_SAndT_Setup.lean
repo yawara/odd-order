@@ -593,6 +593,27 @@ theorem norm_induce_one_frobenius {G : Type*} [Group G] [Fintype G]
       exact induce_one_eq_one_of_mem_complement hFrob a.2 ha1
   rw [h1, herase]; ring
 
+/-- **Arithmetic core of [Isaacs] Lemma 3.14 / Peterfalvi (13.9.b)**: if a finite family of positive
+reals has product `≥ 1`, then their sum is at least the count.
+
+`∏ xᵢ ≥ 1 ∧ xᵢ > 0  ⟹  Σ xᵢ ≥ |s|`.  In (13.9.b) the `xᵢ = |χ(aᵏ)|²` are the squared norms of the
+Galois conjugates of a nonzero character value `χ(a)`; their product `|∏ χ(aᵏ)|² = |N(χ(a))|²` is a
+nonzero rational integer, hence `≥ 1`, and this bound gives `Σ_{⟨x⟩=⟨a⟩} |χ(x)|² ≥ |{x : ⟨x⟩=⟨a⟩}|`.
+Proof (AM-GM-free, via `log x ≤ x − 1`): `Σ xᵢ ≥ Σ (1 + log xᵢ) = |s| + log (∏ xᵢ) ≥ |s|`. -/
+theorem card_le_sum_of_one_le_prod {ι : Type*} (s : Finset ι) (x : ι → ℝ)
+    (hpos : ∀ i ∈ s, 0 < x i) (hprod : 1 ≤ ∏ i ∈ s, x i) :
+    (s.card : ℝ) ≤ ∑ i ∈ s, x i := by
+  have hlog : ∀ i ∈ s, 1 + Real.log (x i) ≤ x i := fun i hi => by
+    have := Real.log_le_sub_one_of_pos (hpos i hi); linarith
+  have hsum_log : (0 : ℝ) ≤ ∑ i ∈ s, Real.log (x i) := by
+    rw [← Real.log_prod fun i hi => (hpos i hi).ne']
+    exact Real.log_nonneg hprod
+  calc (s.card : ℝ)
+      = (∑ _i ∈ s, (1 : ℝ)) + 0 := by rw [Finset.sum_const, nsmul_eq_mul, mul_one, add_zero]
+    _ ≤ (∑ _i ∈ s, (1 : ℝ)) + ∑ i ∈ s, Real.log (x i) := by linarith [hsum_log]
+    _ = ∑ i ∈ s, (1 + Real.log (x i)) := by rw [Finset.sum_add_distrib]
+    _ ≤ ∑ i ∈ s, x i := Finset.sum_le_sum hlog
+
 /-- **Inflation norm lower bound — the carrier-free core of Peterfalvi (13.5.c)**.
 
 If a function `α : H → ℂ` is constant on a finite subgroup `P ≤ H` (equal to `α 1` on all of `P`)
