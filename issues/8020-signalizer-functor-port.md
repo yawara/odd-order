@@ -266,3 +266,14 @@ lane-d の発見 (conjunct 1 = `IsHallSubgroup (σ M) (C_M(x) in C[x])` が type
 **教訓**: 「shared contract だから無断改変不可」と escalate する前に、その def が**実際に cross-lane / on-spine で cite されているか**を grep 検証する。δ-internal な def は owner が再設計してよい (no-gating 原則; cf. `feedback-cite-sorried-lemmas-if-signature-correct`)。
 
 **次手 (lane-d)**: (1) RData conjunct 1 を σ(N)'-Hall へ再設計 (N 存在込み) → (2) conjunct 1 (a) `M⊓C[x]=M_σ⊓C[x]` for x∈M_σ^# (Thm 12.5) / (b) σ(N)'-Hall 本体 → (3) conjunct 3 (Coq part b) → (4) hD3/hD4 完成。issue 継続。
+
+## ✅ RESOLVED (lane d, 2026-06-29): RData mis-encoding 修正 + hD3 を conjunct 3 のみに結晶化
+
+HUB 裁定 (δ-internal、再設計可) を受け修正完了 (commits `dcd1ace9` + `a33444c0`、axiom-clean、full build green):
+- **RData conjunct 1 修正**: `IsHallSubgroup (σ M)` (type-P で偽) → **intrinsic Hall = `Nat.Coprime (card C_M(x)) (C_M(x).index)`** (σ-agnostic、docstring「C_M(x) is a Hall subgroup of C_G(x)」通り、Coq の σ(N)'-Hall と同値)。波及は RData_of_inputs のみ (theoremD/E は RData を抽象参照)。
+- **RData_of_inputs 改良**: conjunct 1 (coprime) は深い入力でなく、structure 供給の **R σ(N)-Hall (hRhall) + conjunct 3 (complement)** から導出 (`IsComplement'.index_eq_card` + `IsHallSubgroup.coprime_index`)。
+- ∴ **hD3 の |M_σ[x]|>1 枝 = `RData_of_inputs` の入力のうち hRhall/hsharp/hCN は全て structure (`signalizer_structure_of_mem_sigmaSharp`) 供給、唯一の真の deep 入力は conjunct 3 (Coq part b complement)**。
+
+**教訓 (hub 記録済)**: 「shared contract で無断改変不可」と escalate する前に、def が実際に cross-lane / on-spine で cite されているか grep 検証する。δ-internal な def は owner が再設計してよい。
+
+**残 work (上流順)**: (1) **conjunct 3 (Coq part b: R ⋊ C_M(x) = C[x])** = 唯一の deep input、Frobenius/regular-action complement / (2) structure 適用 wiring (signalizer_structure で N/hRhall/hsharp/hCN 取得) + |M_σ[x]|=1 枝 (case-split lemma 済) → hD3 完成 / (3) hD4 の MF/ASet/P2 gaps。
