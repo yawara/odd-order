@@ -456,6 +456,18 @@ theorem innerSum_self_eq_sum_normSq {H : Type*} [Group H] [Fintype H]
   rw [← starRingEnd_apply, RCLike.mul_conj]
   norm_cast
 
+/-- **Parseval identity for class functions** (general): `Σ_g ‖α(g)‖² = |H| · ⟨α, α⟩`.
+
+The full squared-norm sum equals `|H|` times the normalized self inner product `⟨α,α⟩ = ‖α‖²`.
+Combined with `Σ_{H#} = Σ_H − ‖α(1)‖²` this is precisely the Parseval relation `s + d² = |H|·n`
+consumed by `caseB_eta_norm_core` (the (13.7) core): it lets the cascade read off `s = ∑_{H#}|α|²`
+from the abstract inner product `n = ⟨α,α⟩`.  Immediate from `innerSum_self_eq_sum_normSq` and
+`ClassFunction.card_mul_inner`. -/
+theorem sum_normSq_eq_card_mul_inner {H : Type*} [Group H] [Fintype H]
+    [Invertible (Nat.card H : ℂ)] (α : ClassFunction H ℂ) :
+    ((∑ g : H, ‖α g‖ ^ 2 : ℝ) : ℂ) = (Nat.card H : ℂ) * ClassFunction.inner α α := by
+  rw [← innerSum_self_eq_sum_normSq, ClassFunction.card_mul_inner]
+
 /-- **Inflation norm lower bound — the carrier-free core of Peterfalvi (13.5.c)**.
 
 If a function `α : H → ℂ` is constant on a finite subgroup `P ≤ H` (equal to `α 1` on all of `P`)
