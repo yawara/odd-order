@@ -448,19 +448,98 @@ theorem Sset_coeff_equal {L : Subgroup G} [Finite G] (hyp : Hypothesis L)
   rw [hf, ClassFunction.inner_sub_right] at hresf
   exact sub_eq_zero.mp hresf
 
-open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
-/-- **Peterfalvi (12.4)**: a class function `ψ` orthogonal to every type-I family
-`R(χ)` (`χ ∈ S`) is constant on each coset `xH` with `x ∈ L − H`.  The orthogonality
-hypothesis is now the genuine `⟨ψ, α⟩ = 0` for `α ∈ R(χ)`, no longer an opaque
-field (`R` is the (12.2) family). -/
-theorem orthogonal_character_constant_on_coset {L : Subgroup G} [Finite G] [Fintype G]
-    [Invertible (Nat.card G : ℂ)] [Invertible (Nat.card ↥L : ℂ)]
+/-- Evaluation of a finite sum of class functions at a point (the eval map is additive). -/
+private theorem classFunction_sum_apply {H : Type*} [Group H] {ι : Type*} (s : Finset ι)
+    (F : ι → ClassFunction H ℂ) (g : H) : (∑ i ∈ s, F i) g = ∑ i ∈ s, (F i) g := by
+  classical
+  induction s using Finset.induction with
+  | empty => simp
+  | insert i s hi ih =>
+      rw [Finset.sum_insert hi, Finset.sum_insert hi, ClassFunction.add_apply, ih]
+
+/-- The "`H ⊆ ker φ`" predicate: the Fitting subgroup `H = L_F` lies in the character kernel of the
+irreducible character `φ` of `L`.  The `γ`-components of `Res_L ψ` in (12.4) are exactly those `φ`
+with `InHKernel`; they are constant on `H`-cosets (`apply_mul_eq_of_mem_characterKernel`). -/
+def InHKernel {L : Subgroup G} (hyp : Hypothesis L) (φ : IrreducibleCharacter ↥L) : Prop :=
+  ((hyp.typeI.typeF.H).subgroupOf L : Set ↥L) ⊆
+    OddOrder.Peterfalvi.S03.characterKernel (φ : ClassFunction ↥L ℂ)
+
+open scoped Classical OddOrder.Peterfalvi.S12.FiniteInduce in
+/-- **Peterfalvi (12.4), pin (c)** ([Is] 6.2 capturing + (1.5.a)/(1.2) + the coefficient regroup):
+the off-kernel Fourier part `β = ∑_{φ : H ⊄ ker φ} ⟨Res_L ψ, φ⟩·φ` of `Res_L ψ` vanishes on `L − H`.
+By [Is] 6.2 the off-kernel irreducibles are exactly `⋃_χ S(χ)` (`H ⊄ ker φ ⟹ Res_H φ` has a
+non-trivial constituent `θ ⟹ φ ∈ S(Ind θ)`), and by the coefficient-equality bridge
+`Sset_coeff_equal` (`ψ ⊥ R(χ)`) the coefficient is constant on each `S(χ)`, so
+`β = ∑_χ c_χ·χ ∈ ℂ[S]`, which vanishes on `L − H` (each `χ = Ind_H^L θ` does, `Sset_vanishes_off_H`).
+A faithful §8/[Is] obligation packaging the [Is] 6.2 partition + the (proven) regroup pieces; to be
+discharged via the explicit χ-partition of the off-kernel irreducibles. -/
+theorem Sset_offKernel_vanishes_off_H {L : Subgroup G} [Finite G] (hyp : Hypothesis L)
+    (data : ∀ χ ∈ hyp.Sset, CharacterDecompositionData hyp χ) {psi : ClassFunction G ℂ}
+    (horth : ∀ χ (hχ : χ ∈ hyp.Sset), ∀ α ∈ Rset (data χ hχ), ClassFunction.inner psi α = 0)
+    {g : ↥L} (hg : (g : G) ∉ hyp.H) :
+    (∑ φ ∈ Finset.univ.filter (fun φ => ¬ InHKernel hyp φ),
+      ClassFunction.inner (ClassFunction.restrict L psi) (φ : ClassFunction ↥L ℂ) •
+        (φ : ClassFunction ↥L ℂ)) g = 0 := by
+  sorry
+
+open scoped Classical OddOrder.Peterfalvi.S12.FiniteInduce in
+/-- **Peterfalvi (12.4)**: a class function `ψ` orthogonal to every type-I family `R(χ)` (`χ ∈ S`) is
+constant on each coset `xH` with `x ∈ L − H`.
+
+Proof: write `Res_L ψ = γ + β` by the Fourier expansion (`sum_inner_irreducibleCharacter_smul`),
+splitting `Irr L` into `{H ⊆ ker φ}` (= `γ`) and `{H ⊄ ker φ}` (= `β`).  The kernel part `γ` is
+constant on `H`-cosets (`apply_mul_eq_of_mem_characterKernel`, each `φ` with `H ⊆ ker φ`); the
+off-kernel part `β` vanishes on `L − H` (`Sset_offKernel_vanishes_off_H`: by [Is] 6.2 + the
+coefficient bridge `Sset_coeff_equal`, `β ∈ ℂ[S]` vanishes off `H`).  Hence
+`ψ(xh) = γ(xh) + β(xh) = γ(x) + 0 = γ(x) + β(x) = ψ(x)`. -/
+theorem orthogonal_character_constant_on_coset {L : Subgroup G} [Finite G]
     (_hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis L)
     (data : ∀ χ ∈ hyp.Sset, CharacterDecompositionData hyp χ) {psi : ClassFunction G ℂ}
     (horth : ∀ χ (hχ : χ ∈ hyp.Sset), ∀ α ∈ Rset (data χ hχ), ClassFunction.inner psi α = 0)
     {x : G} (hxL : x ∈ L) (hxH : x ∉ hyp.H) :
     ∀ h : G, h ∈ hyp.H → psi (x * h) = psi x := by
-  sorry
+  haveI := hyp.finiteG
+  classical
+  intro h hh
+  have hhL : h ∈ L := hyp.typeI.typeF.H_le hh
+  set xL : ↥L := ⟨x, hxL⟩ with hxLdef
+  set hL : ↥L := ⟨h, hhL⟩ with hhLdef
+  set gf : ClassFunction ↥L ℂ := ClassFunction.restrict L psi with hgf
+  -- Fourier split of `Res_L ψ = γ + β`.
+  set γ : ClassFunction ↥L ℂ := ∑ φ ∈ Finset.univ.filter (fun φ => InHKernel hyp φ),
+    ClassFunction.inner gf (φ : ClassFunction ↥L ℂ) • (φ : ClassFunction ↥L ℂ) with hγ
+  set β : ClassFunction ↥L ℂ := ∑ φ ∈ Finset.univ.filter (fun φ => ¬ InHKernel hyp φ),
+    ClassFunction.inner gf (φ : ClassFunction ↥L ℂ) • (φ : ClassFunction ↥L ℂ) with hβ
+  have hsplit : gf = γ + β := by
+    rw [hγ, hβ, Finset.sum_filter_add_sum_filter_not]
+    exact (sum_inner_irreducibleCharacter_smul gf).symm
+  -- `hL` lies in `H` (as a subgroup of `L`).
+  have hLmem : hL ∈ ((hyp.typeI.typeF.H).subgroupOf L : Set ↥L) :=
+    Subgroup.mem_subgroupOf.mpr hh
+  -- `γ` is constant on the `H`-coset `xL · hL`.
+  have hγconst : γ (xL * hL) = γ xL := by
+    rw [hγ, classFunction_sum_apply, classFunction_sum_apply]
+    refine Finset.sum_congr rfl fun φ hφ => ?_
+    rw [ClassFunction.smul_apply, ClassFunction.smul_apply,
+      apply_mul_eq_of_mem_characterKernel φ.isIrreducible
+        ((Finset.mem_filter.mp hφ).2 hLmem) xL]
+  -- `β` vanishes on `L − H` (off-kernel part is in `ℂ[S]`).
+  have hxhH : x * h ∉ hyp.H := fun hcon => hxH (by
+    have hmem : x * h * h⁻¹ ∈ hyp.H := mul_mem hcon (inv_mem hh)
+    rwa [mul_inv_cancel_right] at hmem)
+  have hβxh : β (xL * hL) = 0 := by
+    rw [hβ]
+    exact Sset_offKernel_vanishes_off_H hyp data horth (g := xL * hL)
+      (by rw [Subgroup.coe_mul]; exact hxhH)
+  have hβx : β xL = 0 := by
+    rw [hβ]; exact Sset_offKernel_vanishes_off_H hyp data horth (g := xL) hxH
+  -- Assemble: `ψ(xh) = γ(xh) + β(xh) = γ(x) + 0 = γ(x) + β(x) = ψ(x)`.
+  have key : gf (xL * hL) = gf xL := by
+    simp only [hsplit, ClassFunction.add_apply, hγconst, hβxh, hβx, add_zero]
+  have hgxh : gf (xL * hL) = psi (x * h) := by
+    rw [hgf, ClassFunction.restrict_apply, Subgroup.coe_mul]
+  have hgx : gf xL = psi x := by rw [hgf, ClassFunction.restrict_apply]
+  rw [← hgxh, ← hgx]; exact key
 
 open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
 /-- **Peterfalvi (12.5)**: after the rho-reduction, a class function `ψ` orthogonal
