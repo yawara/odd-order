@@ -158,9 +158,14 @@ carrier goal: **χ∈xiOf data (chief.H0⊔chars.Cprime) ⟹ (χ:IrreducibleChar
    (H⊔U=⊤ via `subgroupOf_sup`×2 + `subgroupOf_self`) → 抽象補題 `sup_normal_...` 適用。
 3. **ψ∈Irr(HC) を Res_{HC} χ の成分に** (`exists_liesOver`) + **χ lies over ψ**。
 4. **ψ(1)=1**: [HC,HC]⊆characterKernel ψ (上記 commutator 3 facts、H₀=chief.N realized⊆Ker χ も要) → keystone 2。
-5. **Ind_{HC}^{HU} ψ 既約**: `isIrreducibleCharacter_induce_of_inertia_eq` (HU,HC,ψ) 要 inertia_HU(ψ)=HC。
-   ⟵ **caseB_inertia_realized** (I_U(θ̄)⊆C、abstract φ 形) を ψ (HC-char) の inertia に lift + Dedekind
-   I=H·(I∩U)=HC。**= realization の真の crux** (abstract φ-inertia ↔ IrreducibleCharacter.inertia of ψ)。
+5. **✅✅✅ inertia lift core COMPLETE** (S11、axiom-clean): `inertia_eq_hcInHu` = **I_HU(θ₀)=HC**
+   (θ₀=realized inflation の H-char)。重要発見: `typeP_quotientCoprimeAction.φ.comp U.subtype = uActionHom`
+   (rfl)、ゆえ caseB_inertia_realized の結論は a∈ker そのもの。3 piece: `cInHu_le_inertia` (C fixes θ₀ = easy、
+   `compHom_typeP_conjAction_inflation`+quotientMulAutHom=1) + `inertia_inf_uInHu_le_cInHu` (hard =
+   caseB_inertia_realized に action 元 a 構成して適用) + `inertia_eq_hcInHu` (assembly: g=h·u 分解 [H⊔U=⊤,
+   H◁HU mem_sup_of_normal_left] + u∈I⊓U≤C)。**残 step 5b**: `Ind_{HC}^{HU} ψ 既約` =
+   `isIrreducibleCharacter_induce_of_inertia_eq` (HU,HC,ψ) 要 inertia_HU(ψ)=HC ⟵ inertia ψ=inertia θ₀=HC
+   (ψ over θ₀) の bridge (HC◁HU=`hcInHu_normal` 済)。
 6. **[HU:HC]=u** = chars.u (cSub の `u_eq_card_quotient` range + [HU:HC]=[U:C]=u first-iso)。
 7. 2 keystone 合成: χ=Ind ψ ⟹ χ(1)=[HU:HC]·ψ(1)=u·1=u。
 
