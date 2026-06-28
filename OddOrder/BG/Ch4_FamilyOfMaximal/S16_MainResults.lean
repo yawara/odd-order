@@ -315,6 +315,26 @@ theorem maximalConjugatesContaining_eq_maximalSigma [Finite G]
       (S14.genuineSigmaDecomposition hG) (S14.Msigma_ell1 hG hM hxMσ hx1) ⟨hM, hxMσ⟩ ⟨hNmax, hxNσ⟩
     exact ⟨c, hcconj.symm, OddOrder.BG.Ch3.S10.Msigma_le N hxNσ⟩
 
+/-- **Pointed sharp transitivity upgrades to full sharp transitivity** (regular action): if `R`
+acts on `S` so that every `L ∈ S` is `M₀^r` for a *unique* `r ∈ R`, then `R` is sharply transitive
+on `S` — for `A, B ∈ S` the unique `r ∈ R` with `B = A^r` is `r = b a⁻¹` (where `A = M₀^a`,
+`B = M₀^b`).  Supplies the `ConjSharplyTransitiveOn` conjunct of `RData` from the proven structure's
+"from `M`" transitivity (`signalizer_structure_of_mem_sigmaSharp`). -/
+theorem conjSharplyTransitiveOn_of_pointed {R : Subgroup G} {S : Set (Subgroup G)} {M₀ : Subgroup G}
+    (hbase : ∀ L ∈ S, ∃! r : G, r ∈ R ∧ MulAut.conj r • M₀ = L) :
+    ConjSharplyTransitiveOn R S := by
+  intro A hA B hB
+  obtain ⟨a, ⟨haR, haM⟩, _⟩ := hbase A hA
+  obtain ⟨b, ⟨hbR, hbM⟩, hbuniq⟩ := hbase B hB
+  refine ⟨b * a⁻¹, ⟨R.mul_mem hbR (R.inv_mem haR), ?_⟩, ?_⟩
+  · show B = MulAut.conj (b * a⁻¹) • A
+    rw [← haM, ← mul_smul, ← map_mul, show (b * a⁻¹) * a = b by group, hbM]
+  · rintro r ⟨hrR, hrA⟩
+    have hrab : MulAut.conj (r * a) • M₀ = B := by
+      rw [map_mul, mul_smul, haM, ← hrA]
+    have hra : r * a = b := hbuniq (r * a) ⟨R.mul_mem hrR haR, hrab⟩
+    rw [← hra]; group
+
 /-! ## Theorems A--E -/
 
 /-- **BG Theorem A** (mmd L4274): the basic structure of a maximal subgroup:
