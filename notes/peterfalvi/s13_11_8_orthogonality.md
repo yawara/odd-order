@@ -295,3 +295,24 @@ update⁵/⁶ で「S07.Hypothesis for inducedFamily を layer 1 として組む
 
 **残作業 = §11-specific な SibleyDadeHypothesis 構築 + §8 coherence 適用 + (11.8.x) calc**。深い multi-session
 endgame だが機構は確定 (global S07.Hypothesis の誤読を是正済)。foundation (ζ witness/no_real/pairwise) は landed。
+
+## 2026-06-29 update⁹ (lane-a) — S(HC) coherence の concrete path = coherentEqualDegree_fromDade
+
+S₁=S(HC) coherence (FT-correct, Dade-based) の concrete API 確定:
+- **`coherentEqualDegree_fromDade`** (S07_Coherence:5968): `(hyp:S04.Hypothesis G A L) (hconj) (χ:Fin n→Irr(↥L))
+  (n≥2) (hχinj) (hdeg: 全 equal-degree) (hsuppdiff: χⱼ−χ₀ supported on A) (1∉A) →
+  IsCoherent (dadeIntegralCharacterMap hyp ...) (Set.range χ) (supportInSubgroup A L)`。
+- これが FT版 (5.7) (global S07.Hypothesis 不要、Dade base map で直接 coherent)。
+
+**S(HC) coherence の構築 path**: S(HC) = inducedFamily の degree-q 既約族を **χ:Fin n→Irr(↥M) として
+enumerate** (n=(u−1)/q≥2、Frobenius (U/C)⋊W₁ から) + equal-degree(全 q)/injective/supported-diff を示し
+coherentEqualDegree_fromDade 適用 → IsCoherent hyp.tau (range χ=S(HC)) A0。**= S(HC) materialization** (§11
+char work、substantial)。
+
+**(11.8) 全 path 確定 (機構レベル)**: 
+1. S(HC) coherence = coherentEqualDegree_fromDade + S(HC) materialization (上記)。
+2. S(C) coherence = (9.11)/(11.7) + S₂ glue。
+3. (11.8.1)-(11.8.5) α-grid calc (no_real/pairwise_orthogonal + α^τ inners + τ₁ 消費)。
+4. (11.3) 矛盾。
+
+機構は完全確定。残 = S(HC) materialization (次) → S₂ → calc。深い multi-session endgame だが各 API は特定済。
