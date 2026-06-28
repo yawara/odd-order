@@ -106,3 +106,24 @@ card_LF_coprime_pq の `primeFactors_disjoint` cite が解消。中間は各 pha
 - Coq `FT_Dade_support_partition` (PFsection8.v:923) + `BGsummaryE` (BGsection16.v) — 構造正本。
 - mmd `references/peterfalvi/04.11*.mmd` (8.14)-(8.18)、BG Theorem E は BG §16。
 - consumer chain: card_LF_coprime_pq (S15_SAndT:463) → (13.17) → S16_NonExistenceG → POLE-2。
+
+## ✅ 2026-06-28 進捗 — Phase 1 完了: 無条件 π(G) partition (Theorem E part a) 達成
+
+partition core (clause a) を **無条件 (reps 仮説なし)** で完成。3 lemma 全て sorry-free + axiom-clean
+(AxiomsCheck 登録)、full build green:
+
+- `sigma_reps_prime_cover` (S16, clause a1): p∈π(G) ⟺ ∃Mᵢ∈reps, p∈σ(Mᵢ)。forward =
+  `exists_mem_sigma_of_prime_dvd_card` (G の各素数は或る極大の σ-prime) + `sigma_conj`; reverse =
+  σ⊆π + Lagrange。
+- `sigma_reps_pairwise_disjoint` (S16:999, 既済): clause a2 (非共役代表の σ disjoint)。
+- **`exists_maximal_conjugacy_reps` (S16, 新)**: 極大共役類の代表系 reps の存在。`IsConjugateSubgroup`
+  setoid (`isConjugateSubgroup_equivalence`) の Quotient + `Quotient.out` で transversal 構成、∃! 一意性
+  証明。⟹ `hreps` 仮説を無条件に discharge。
+- **`exists_reps_sigma_partition` (S16, 新, capstone)**: 上記 3 を結合 → **∃ reps, (maximal) ∧
+  (p∈π(G)⟺∃Mᵢ∈reps p∈σ(Mᵢ)) ∧ (非共役で σ disjoint)** = BG Theorem E part (a) の完全無条件形。
+
+⟹ **Phase 1 (partition core) 完了**。残 = Phase 3 (thickened cardinality 14.5c [Theorem D 依存] /
+tilde-disjoint [Theorem D R-data 依存] / G# covering 14.9) + Phase 4 (Pf-side `bgTheoremE_cover_data`
+の `BGTheoremECoverData` 全 field 供給 + covering、reps 族は `exists_maximal_conjugacy_reps` の indexed
+版で供給可)。Phase 3 は §13-14 (Theorem D `theoremD_msigma_conjugacy_and_centralizers` S16:961 自体
+sorry) に gated ゆえ上流。次セッション = Phase 4 の reps→ι 変換 + 浅い field 供給、or Theorem D 着手。

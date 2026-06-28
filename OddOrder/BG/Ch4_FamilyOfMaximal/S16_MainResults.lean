@@ -1043,6 +1043,60 @@ theorem sigma_reps_prime_cover [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G
       (Nat.dvd_of_mem_primeFactors hpMiPF).trans (Subgroup.card_subgroup_dvd_card Mi),
       (Nat.card_pos).ne'⟩
 
+/-- **A system of conjugacy-class representatives of the maximal subgroups exists** (the `reps`
+hypothesis of BG Theorem E, issue 8019).  Subgroup conjugacy `IsConjugateSubgroup` is an equivalence
+relation (`isConjugateSubgroup_equivalence`) on the finite type of maximal subgroups; taking the
+quotient and its canonical representatives `Quotient.out` yields a set `reps` of maximal subgroups
+such that every maximal subgroup is conjugate to a *unique* representative.  Discharges the `hreps`
+input of `sigma_reps_prime_cover` / `sigma_reps_pairwise_disjoint` (and of
+`theoremE_sigma_partition_and_counting` / `bgTheoremE_cover_data`), making the `π(G)` partition
+unconditional (`exists_reps_sigma_partition`). -/
+theorem exists_maximal_conjugacy_reps [Finite G] :
+    ∃ reps : Set (Subgroup G),
+      (∀ Mi ∈ reps, Mi ∈ maximalSubgroups G) ∧
+      ∀ H : Subgroup G, H ∈ maximalSubgroups G →
+        ∃! Mi : Subgroup G, Mi ∈ reps ∧ S14.IsConjugateSubgroup H Mi := by
+  classical
+  -- Conjugacy as a setoid on the (finite) subtype of maximal subgroups.
+  let S := {M : Subgroup G // M ∈ maximalSubgroups G}
+  let σ : Setoid S :=
+    ⟨fun a b => S14.IsConjugateSubgroup a.1 b.1,
+      ⟨fun a => S14.IsConjugateSubgroup.refl a.1, fun h => S14.IsConjugateSubgroup.symm h,
+        fun h₁ h₂ => S14.IsConjugateSubgroup.trans h₁ h₂⟩⟩
+  -- `reps` = the canonical representatives `Quotient.out` of each conjugacy class.
+  refine ⟨Set.range (fun c : Quotient σ => (c.out : Subgroup G)), ?_, ?_⟩
+  · rintro Mi ⟨c, rfl⟩; exact c.out.2
+  · intro H hH
+    refine ⟨((Quotient.mk σ ⟨H, hH⟩).out : Subgroup G), ⟨⟨Quotient.mk σ ⟨H, hH⟩, rfl⟩, ?_⟩, ?_⟩
+    · -- `H` is conjugate to its representative.
+      have h : S14.IsConjugateSubgroup ((Quotient.mk σ ⟨H, hH⟩).out : Subgroup G) H :=
+        Quotient.exact (Quotient.out_eq (Quotient.mk σ ⟨H, hH⟩))
+      exact h.symm
+    · -- Any representative conjugate to `H` is *the* representative of `H`'s class.
+      rintro Mi' ⟨⟨c, rfl⟩, hconj'⟩
+      have hrel : @Setoid.r S σ ⟨H, hH⟩ c.out := hconj'
+      have heq : Quotient.mk σ ⟨H, hH⟩ = c := by
+        rw [Quotient.sound hrel]; exact Quotient.out_eq c
+      rw [heq]
+
+/-- **BG Theorem E, the unconditional `π(G)` partition** (mmd L4370, clause (a)): there is a system
+`reps` of conjugacy-class representatives of the maximal subgroups whose `σ`-sets partition `π(G)` —
+`p ∣ |G|` iff `p ∈ σ(Mᵢ)` for a unique class, and distinct representatives have disjoint `σ`-sets.
+Combines `exists_maximal_conjugacy_reps` (the transversal) with `sigma_reps_prime_cover` (cover,
+clause (a1)) and `sigma_reps_pairwise_disjoint` (disjointness, clause (a2)).  This is the full
+**partition core** of BG Theorem E, with no `reps` hypothesis; the remaining BG Theorem E content
+(the thickened-support cardinality / `G#` covering) stays gated on §13–14 (issue 8019). -/
+theorem exists_reps_sigma_partition [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G) :
+    ∃ reps : Set (Subgroup G),
+      (∀ Mi ∈ reps, Mi ∈ maximalSubgroups G) ∧
+      (∀ p : ℕ, p ∈ (Nat.card G).primeFactors ↔
+        ∃ Mi : Subgroup G, Mi ∈ reps ∧ p ∈ OddOrder.BG.Ch3.S10.sigma Mi) ∧
+      (∀ Mi ∈ reps, ∀ Mj ∈ reps, Mi ≠ Mj →
+        OddOrder.BG.Ch3.S10.sigma Mi ∩ OddOrder.BG.Ch3.S10.sigma Mj = ∅) := by
+  obtain ⟨reps, hrepsMax, hreps⟩ := exists_maximal_conjugacy_reps (G := G)
+  exact ⟨reps, hrepsMax, sigma_reps_prime_cover hG hrepsMax hreps,
+    fun _ hMi _ hMj hne => sigma_reps_pairwise_disjoint hG hrepsMax hreps hMi hMj hne⟩
+
 /-- **BG Theorem E** (mmd L4370): with `R(x)` as in Theorem D and
 `\widetilde M = ⋃_{x ∈ M_sigma#} xR(x)`, the conjugacy saturation of
 `\widetilde M` has the stated size, the representative maximal subgroups give a

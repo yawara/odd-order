@@ -5539,12 +5539,17 @@ representatives of the maximal subgroups.
   representative — forward from `exists_mem_sigma_of_prime_dvd_card` (every prime of `G` is a
   `σ`-prime of some maximal) + `sigma_conj`, reverse from `σ ⊆ π` + Lagrange.
 
-Together they give `π(G) = ⨆ᵢ σ(Mᵢ)`.  The remaining BG Theorem E content (the thickened-support
-cardinality, tilde-disjointness, and `G#` covering) stays gated on §13–14 (`theoremE_…`, issue 8019).
-Both fully unconditional, axiom-clean. -/
+Together they give `π(G) = ⨆ᵢ σ(Mᵢ)`.  `exists_maximal_conjugacy_reps` constructs the system `reps`
+itself (a conjugacy transversal of the maximal subgroups, via the `IsConjugateSubgroup` setoid and
+`Quotient.out`), so `exists_reps_sigma_partition` is the **unconditional** `π(G)` partition (no `reps`
+hypothesis).  The remaining BG Theorem E content (the thickened-support cardinality,
+tilde-disjointness, and `G#` covering) stays gated on §13–14 (`theoremE_…`, issue 8019).  All fully
+unconditional, axiom-clean. -/
 
 #assert_only_allowed_axioms OddOrder.BG.Ch4.S16.sigma_reps_pairwise_disjoint
 #assert_only_allowed_axioms OddOrder.BG.Ch4.S16.sigma_reps_prime_cover
+#assert_only_allowed_axioms OddOrder.BG.Ch4.S16.exists_maximal_conjugacy_reps
+#assert_only_allowed_axioms OddOrder.BG.Ch4.S16.exists_reps_sigma_partition
 
 /-! **BG Theorem B(1)** (`S16_MainResults`, `theoremB_U_sylow_abelian_rank_le_two`): every Sylow
 subgroup of `U` is abelian of rank ≤ 2.  Standalone, faithful (explicit `U ≤ M`; restricted to
