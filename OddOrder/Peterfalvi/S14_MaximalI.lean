@@ -465,14 +465,28 @@ def InHKernel {L : Subgroup G} (hyp : Hypothesis L) (φ : IrreducibleCharacter �
     OddOrder.Peterfalvi.S03.characterKernel (φ : ClassFunction ↥L ℂ)
 
 open scoped Classical OddOrder.Peterfalvi.S12.FiniteInduce in
-/-- **Peterfalvi (12.4), pin (c)** ([Is] 6.2 capturing + (1.5.a)/(1.2) + the coefficient regroup):
-the off-kernel Fourier part `β = ∑_{φ : H ⊄ ker φ} ⟨Res_L ψ, φ⟩·φ` of `Res_L ψ` vanishes on `L − H`.
-By [Is] 6.2 the off-kernel irreducibles are exactly `⋃_χ S(χ)` (`H ⊄ ker φ ⟹ Res_H φ` has a
-non-trivial constituent `θ ⟹ φ ∈ S(Ind θ)`), and by the coefficient-equality bridge
-`Sset_coeff_equal` (`ψ ⊥ R(χ)`) the coefficient is constant on each `S(χ)`, so
-`β = ∑_χ c_χ·χ ∈ ℂ[S]`, which vanishes on `L − H` (each `χ = Ind_H^L θ` does, `Sset_vanishes_off_H`).
-A faithful §8/[Is] obligation packaging the [Is] 6.2 partition + the (proven) regroup pieces; to be
-discharged via the explicit χ-partition of the off-kernel irreducibles. -/
+/-- **Peterfalvi (12.4), pin (c)** ([Is] 6.2 capturing + (1.5.a)/(1.2)): the off-kernel irreducible
+characters `{φ : H ⊄ ker φ}` partition into the constituent-sets `S(χ)`, `χ ∈ S`.  By [Is] 6.2,
+`H ⊄ ker φ ⟹ Res_H φ` has a non-trivial constituent `θ`, so `φ ∈ S(Ind_H^L θ)`; the orbit `θ`
+determines `χ = Ind θ` uniquely ((1.5.a)/(1.2)), so the `S(χ)` are pairwise disjoint and cover the
+off-kernel irreducibles.  This is the genuine cross-section content (the [Is] 6.2 partition); the
+`β`-vanishing regroup `Sset_offKernel_vanishes_off_H` is proved from it. -/
+theorem exists_offKernel_constituent_partition {L : Subgroup G} [Finite G] (hyp : Hypothesis L)
+    (data : ∀ χ ∈ hyp.Sset, CharacterDecompositionData hyp χ) :
+    ∃ parts : Finset {χ : ClassFunction ↥L ℂ // χ ∈ hyp.Sset},
+      Finset.univ.filter (fun φ => ¬ InHKernel hyp φ) =
+        parts.biUnion (fun χ => (data χ.1 χ.2).constituents) ∧
+      (↑parts : Set {χ : ClassFunction ↥L ℂ // χ ∈ hyp.Sset}).PairwiseDisjoint
+        (fun χ => (data χ.1 χ.2).constituents) := by
+  sorry
+
+open scoped Classical OddOrder.Peterfalvi.S12.FiniteInduce in
+/-- **Peterfalvi (12.4), the off-kernel regroup** (genuine, from the [Is] 6.2 partition pin): the
+off-kernel Fourier part `β = ∑_{φ : H ⊄ ker φ} ⟨Res_L ψ, φ⟩·φ` of `Res_L ψ` vanishes on `L − H`.
+Regroup the off-kernel irreducibles by the partition into `S(χ)`
+(`exists_offKernel_constituent_partition`); on each `S(χ)` the coefficient `⟨Res_L ψ, φ⟩` is constant
+(`Sset_coeff_equal`, from `ψ ⊥ R(χ)`), so the `S(χ)`-block is `c_χ·∑_{φ ∈ S(χ)} φ = c_χ·χ`
+(`decomp`), which vanishes at `g ∈ L − H` (`Sset_vanishes_off_H`). -/
 theorem Sset_offKernel_vanishes_off_H {L : Subgroup G} [Finite G] (hyp : Hypothesis L)
     (data : ∀ χ ∈ hyp.Sset, CharacterDecompositionData hyp χ) {psi : ClassFunction G ℂ}
     (horth : ∀ χ (hχ : χ ∈ hyp.Sset), ∀ α ∈ Rset (data χ hχ), ClassFunction.inner psi α = 0)
@@ -480,7 +494,23 @@ theorem Sset_offKernel_vanishes_off_H {L : Subgroup G} [Finite G] (hyp : Hypothe
     (∑ φ ∈ Finset.univ.filter (fun φ => ¬ InHKernel hyp φ),
       ClassFunction.inner (ClassFunction.restrict L psi) (φ : ClassFunction ↥L ℂ) •
         (φ : ClassFunction ↥L ℂ)) g = 0 := by
-  sorry
+  obtain ⟨parts, hpart, hdisj⟩ := exists_offKernel_constituent_partition hyp data
+  rw [classFunction_sum_apply, hpart, Finset.sum_biUnion hdisj]
+  refine Finset.sum_eq_zero fun χ _ => ?_
+  -- The `S(χ)`-block: `∑_{φ ∈ S(χ)} ⟨Res_L ψ, φ⟩ · φ(g) = c_χ · χ(g) = 0`.
+  obtain ⟨φ₀, hφ₀⟩ := (data χ.1 χ.2).constituents_nonempty
+  have hblock : ∑ φ ∈ (data χ.1 χ.2).constituents,
+      (ClassFunction.inner (ClassFunction.restrict L psi) (φ : ClassFunction ↥L ℂ) •
+        (φ : ClassFunction ↥L ℂ)) g
+      = ClassFunction.inner (ClassFunction.restrict L psi) (φ₀ : ClassFunction ↥L ℂ) *
+        ∑ φ ∈ (data χ.1 χ.2).constituents, (φ : ClassFunction ↥L ℂ) g := by
+    rw [Finset.mul_sum]
+    refine Finset.sum_congr rfl fun φ hφ => ?_
+    rw [ClassFunction.smul_apply,
+      Sset_coeff_equal hyp (data χ.1 χ.2) (horth χ.1 χ.2) hφ hφ₀]
+  have hdecomp : ∑ φ ∈ (data χ.1 χ.2).constituents, (φ : ClassFunction ↥L ℂ) g = χ.1 g := by
+    rw [← classFunction_sum_apply, ← (data χ.1 χ.2).decomp]
+  rw [hblock, hdecomp, Sset_vanishes_off_H hyp χ.2 hg, mul_zero]
 
 open scoped Classical OddOrder.Peterfalvi.S12.FiniteInduce in
 /-- **Peterfalvi (12.4)**: a class function `ψ` orthogonal to every type-I family `R(χ)` (`χ ∈ S`) is
