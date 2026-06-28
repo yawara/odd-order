@@ -393,6 +393,62 @@ theorem Sset_vanishes_off_H {L : Subgroup G} (hyp : Hypothesis L) {χ : ClassFun
   exact ClassFunction.induce_eq_zero_of_not_mem_normal _ hxmem
 
 open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
+/-- **Peterfalvi (12.4), pin (a)** (coherence): for constituents `φ₁, φ₂ ∈ S(χ)`, the Dade image
+`(φ₁ − φ₂)^τ` lies in `ℤ[R(χ)]`.  By (1.4) the four-element set `{φ₁, φ₂, φ̄₁, φ̄₂}` is coherent, so
+`τ` maps its difference lattice into the integral span of `R(χ) = ⋃ R₁(φ)`.  A faithful §5/§1
+obligation (the coherence-extension content of (1.4)/(5.x), char-theory). -/
+theorem constituent_diff_tau_mem_span {L : Subgroup G} [Finite G] (hyp : Hypothesis L)
+    {chi : ClassFunction ↥L ℂ} (dχ : CharacterDecompositionData hyp chi)
+    {φ₁ φ₂ : IrreducibleCharacter ↥L} (_h₁ : φ₁ ∈ dχ.constituents) (_h₂ : φ₂ ∈ dχ.constituents) :
+    hyp.tau ((φ₁ : ClassFunction ↥L ℂ) - (φ₂ : ClassFunction ↥L ℂ)) ∈
+      Submodule.span ℤ (Rset dχ) := by
+  sorry
+
+open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
+/-- **Peterfalvi (12.4), pin (b)** ([Is] 7.7 + (8.12.c) + [Is] 6.2): for constituents `φ₁, φ₂ ∈ S(χ)`,
+the Dade isometry acts as induction on the difference, `(φ₁ − φ₂)^τ = Ind_L^G(φ₁ − φ₂)`.  By [Is] 6.2
+`Res_H φᵢ` is the conjugate-sum of `θ`, so `Supp(φ₁ − φ₂) ⊆ A(L) − H^#`, a TI-subset of `G` with
+normalizer `L` by (8.12.c); on a TI-supported function the Dade isometry coincides with `Ind_L^G`
+([Is] 7.7).  A faithful §8/[Is] obligation. -/
+theorem constituent_diff_tau_eq_induce {L : Subgroup G} [Finite G] (hyp : Hypothesis L)
+    {chi : ClassFunction ↥L ℂ} (dχ : CharacterDecompositionData hyp chi)
+    {φ₁ φ₂ : IrreducibleCharacter ↥L} (_h₁ : φ₁ ∈ dχ.constituents) (_h₂ : φ₂ ∈ dχ.constituents) :
+    hyp.tau ((φ₁ : ClassFunction ↥L ℂ) - (φ₂ : ClassFunction ↥L ℂ)) =
+      ClassFunction.induce L ((φ₁ : ClassFunction ↥L ℂ) - (φ₂ : ClassFunction ↥L ℂ)) := by
+  sorry
+
+open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
+/-- **Peterfalvi (12.4), coherence → coefficient-equality bridge** (genuine).  If `ψ ⊥ R(χ)`, then
+`Res_L ψ` has the *same* coefficient on every constituent of `χ`: `⟨Res_L ψ, φ₁⟩ = ⟨Res_L ψ, φ₂⟩`
+for `φ₁, φ₂ ∈ S(χ)`.  Proof: `⟨Res_L ψ, φ₁ − φ₂⟩ = ⟨ψ, Ind_L^G(φ₁ − φ₂)⟩ = ⟨ψ, (φ₁ − φ₂)^τ⟩`
+(Frobenius `inner_induce_eq_inner_restrict` + conjugate symmetry + pin (b)), and this is `0` because
+`(φ₁ − φ₂)^τ ∈ ℤ[R(χ)]` (pin (a)) and `ψ ⊥ R(χ)` (`inner_eq_zero_of_mem_zSpan`).  This is the genuine
+content by which `ψ ⊥ R(χ)` forces the `∪S(χ)`-part of `Res_L ψ` to be `β = ∑_χ c_χ·χ ∈ ℂ[S]`. -/
+theorem Sset_coeff_equal {L : Subgroup G} [Finite G] (hyp : Hypothesis L)
+    {chi : ClassFunction ↥L ℂ} (dχ : CharacterDecompositionData hyp chi)
+    {psi : ClassFunction G ℂ} (horth : ∀ α ∈ Rset dχ, ClassFunction.inner psi α = 0)
+    {φ₁ φ₂ : IrreducibleCharacter ↥L} (h₁ : φ₁ ∈ dχ.constituents) (h₂ : φ₂ ∈ dχ.constituents) :
+    ClassFunction.inner (ClassFunction.restrict L psi) (φ₁ : ClassFunction ↥L ℂ)
+      = ClassFunction.inner (ClassFunction.restrict L psi) (φ₂ : ClassFunction ↥L ℂ) := by
+  haveI := hyp.finiteG
+  set f : ClassFunction ↥L ℂ :=
+    (φ₁ : ClassFunction ↥L ℂ) - (φ₂ : ClassFunction ↥L ℂ) with hf
+  -- `⟨ψ, τ f⟩ = 0`: `τ f ∈ ℤ[R(χ)]` (pin a) and `ψ ⊥ R(χ)`.
+  have hψτ : ClassFunction.inner psi (hyp.tau f) = 0 :=
+    OddOrder.Peterfalvi.S07.IntegralCharacterMap.inner_eq_zero_of_mem_zSpan horth
+      (constituent_diff_tau_mem_span hyp dχ h₁ h₂)
+  -- `⟨f, Res_L ψ⟩ = ⟨Ind_L^G f, ψ⟩ = ⟨τ f, ψ⟩ = star⟨ψ, τ f⟩ = 0`.
+  have hfres : ClassFunction.inner f (ClassFunction.restrict L psi) = 0 := by
+    rw [← ClassFunction.inner_induce_eq_inner_restrict L f psi,
+      ← constituent_diff_tau_eq_induce hyp dχ h₁ h₂,
+      inner_conj_symm psi (hyp.tau f), hψτ, star_zero]
+  -- `⟨Res_L ψ, f⟩ = star⟨f, Res_L ψ⟩ = 0`, then split the difference.
+  have hresf : ClassFunction.inner (ClassFunction.restrict L psi) f = 0 := by
+    rw [inner_conj_symm f (ClassFunction.restrict L psi), hfres, star_zero]
+  rw [hf, ClassFunction.inner_sub_right] at hresf
+  exact sub_eq_zero.mp hresf
+
+open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
 /-- **Peterfalvi (12.4)**: a class function `ψ` orthogonal to every type-I family
 `R(χ)` (`χ ∈ S`) is constant on each coset `xH` with `x ∈ L − H`.  The orthogonality
 hypothesis is now the genuine `⟨ψ, α⟩ = 0` for `α ∈ R(χ)`, no longer an opaque
