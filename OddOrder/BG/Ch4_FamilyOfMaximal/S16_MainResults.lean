@@ -1336,6 +1336,105 @@ theorem Msigma_inf_conj_isCyclic [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd
       hG hM hg hApσ hAp hAne hAmeet hCA
   exact S15.isCyclic_of_isMulCommutative_of_rank_le_one habelian hodd hrank
 
+/-- **Dichotomy `|𝓜_σ(x)| ≤ 1 ⟹ C_G(x) ≤ M`** (the converse of
+`maximalSigmaSubgroupsOfElement_eq_singleton_of_centralizer_le`, Coq Theorem 14.4's `not_sCX_M`
+direction): for `x ∈ M_σ^#` with at most one `σ`-maximal, `C_G(x) ≤ M`.  If some `c ∈ C_G(x)` escaped
+`M`, then `Mᶜ` would be a second `σ`-maximal of `x` — `x ∈ Mᶜ` (as `c⁻¹xc = x ∈ M`), so `Mᶜ` is a
+maximal conjugate containing `x`, hence in `𝓜_σ(x)` (`maximalConjugatesContaining_eq_maximalSigma`),
+and `Mᶜ ≠ M` (else `c ∈ N_G(M) = M`) — contradicting `|𝓜_σ(x)| ≤ 1`.  Much shallower than the Coq
+proof's `C(X)`-orbit count: this direction needs only `N_G(M) = M` (maximal self-normalizing,
+inlined). -/
+theorem centralizer_le_of_maximalSigma_le_one [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    {M : Subgroup G} (hM : M ∈ maximalSubgroups G) {x : G}
+    (hxMσ : x ∈ OddOrder.BG.Ch3.S10.Msigma M) (hx1 : x ≠ 1)
+    (hle : (S14.maximalSigmaSubgroupsOfElement x).ncard ≤ 1) :
+    Subgroup.centralizer ({x} : Set G) ≤ M := by
+  have hMne : M ≠ ⊥ := fun h =>
+    OddOrder.BG.Ch3.S10.Msigma_ne_bot hG hM (le_bot_iff.mp (h ▸ OddOrder.BG.Ch3.S10.Msigma_le M))
+  -- `N_G(M) = M`: `M ≤ N_G(M)`, and a proper inclusion forces `M ◁ G` (maximality), excluded by
+  -- simplicity (`M ≠ ⊥, ⊤`).
+  have hNM : Subgroup.normalizer (M : Set G) = M := by
+    refine le_antisymm ?_ Subgroup.le_normalizer
+    rcases eq_or_lt_of_le (Subgroup.le_normalizer (H := M)) with heq | hlt
+    · exact le_of_eq heq.symm
+    · have hnorm : M.Normal :=
+        Subgroup.normalizer_eq_top_iff.mp ((mem_maximalSubgroups.mp hM).2 _ hlt)
+      rcases hG.simple.eq_bot_or_eq_top_of_normal _ hnorm with hbot | htop
+      · exact absurd hbot hMne
+      · exact absurd htop (mem_maximalSubgroups.mp hM).1
+  -- `conj c • M = M → c ∈ N_G(M)`.
+  have hconj_mem : ∀ c : G, MulAut.conj c • M = M → c ∈ Subgroup.normalizer (M : Set G) := by
+    intro c hcfix
+    rw [Subgroup.mem_normalizer_iff]
+    intro n
+    have key : MulAut.conj c • n ∈ MulAut.conj c • M ↔ n ∈ M :=
+      Subgroup.smul_mem_pointwise_smul_iff
+    rw [hcfix, show (MulAut.conj c • n) = (MulAut.conj c) n from rfl, MulAut.conj_apply] at key
+    exact key.symm
+  intro c hc
+  by_contra hcM
+  have hMmem : M ∈ S14.maximalSigmaSubgroupsOfElement x := ⟨hM, hxMσ⟩
+  -- `Mᶜ ∈ 𝓜_σ(x)`: `x ∈ Mᶜ` since `c⁻¹xc = x ∈ M`.
+  have hxcM : x ∈ MulAut.conj c • M := by
+    rw [Subgroup.mem_pointwise_smul_iff_inv_smul_mem]
+    have hcalc : (MulAut.conj c)⁻¹ • x = c⁻¹ * x * c := by
+      change (MulAut.conj c).symm x = _
+      rw [MulAut.conj_symm_apply]
+    rw [hcalc]
+    have hcx : c * x = x * c := Subgroup.mem_centralizer_singleton_iff.mp hc
+    have hxconj : c⁻¹ * x * c = x := by rw [mul_assoc, ← hcx]; group
+    rw [hxconj]
+    exact OddOrder.BG.Ch3.S10.Msigma_le M hxMσ
+  have hconjmem : MulAut.conj c • M ∈ S14.maximalSigmaSubgroupsOfElement x := by
+    rw [← maximalConjugatesContaining_eq_maximalSigma hG hM hxMσ hx1]
+    exact ⟨c, rfl, hxcM⟩
+  -- two members of a `≤ 1`-element set coincide, so `c ∈ N_G(M) = M`.
+  have heq : MulAut.conj c • M = M :=
+    (Set.ncard_le_one (Set.toFinite _)).mp hle _ hconjmem _ hMmem
+  exact hcM (hNM ▸ hconj_mem c heq)
+
+/-- **BG Theorem D(3), full `hD3`** (`∀ x ∈ M_σ^#, ∃ R, RData M x R`): combine the two branches of
+the `|𝓜_σ(x)|` dichotomy.  When `|𝓜_σ(x)| > 1`, `RData_of_gt_one` supplies the signalizer `R(x)`;
+when `|𝓜_σ(x)| ≤ 1`, the dichotomy gives `C_G(x) ≤ M`, whereupon `R = ⊥` works: `C_M(x) = C_G(x)`
+is all of `C_G(x)` (conjunct 1 trivial, conjunct 3 is `⊤ ⋊ ⊥`), `⊥ ◁ C_G(x)`, and `𝓜_σ(x) = {M}`
+makes sharp transitivity vacuous. -/
+theorem exists_RData_of_mem_sigmaSharp [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    {M : Subgroup G} (hM : M ∈ maximalSubgroups G) :
+    ∀ x : G, x ∈ S14.sigmaSharp M → ∃ R : Subgroup G, RData M x R := by
+  intro x hx
+  have hxMσ : x ∈ OddOrder.BG.Ch3.S10.Msigma M := hx.1
+  have hx1 : x ≠ 1 := hx.2
+  by_cases hgt : 1 < (S14.maximalSigmaSubgroupsOfElement x).ncard
+  · exact RData_of_gt_one hG hM hx hgt
+  · have hCxM : Subgroup.centralizer ({x} : Set G) ≤ M :=
+      centralizer_le_of_maximalSigma_le_one hG hM hxMσ hx1 (not_lt.mp hgt)
+    have hMCx : M ⊓ Subgroup.centralizer ({x} : Set G) = Subgroup.centralizer ({x} : Set G) :=
+      inf_eq_right.mpr hCxM
+    have hc1 : Nat.Coprime
+        (Nat.card ↥((M ⊓ Subgroup.centralizer ({x} : Set G)).subgroupOf
+          (Subgroup.centralizer ({x} : Set G))))
+        ((M ⊓ Subgroup.centralizer ({x} : Set G)).subgroupOf
+          (Subgroup.centralizer ({x} : Set G))).index := by
+      rw [hMCx, Subgroup.subgroupOf_self, Subgroup.index_top]; exact Nat.coprime_one_right _
+    have hc2 : ((⊥ : Subgroup G).subgroupOf (Subgroup.centralizer ({x} : Set G))).Normal := by
+      rw [Subgroup.bot_subgroupOf]; infer_instance
+    have hc3 : Subgroup.IsComplement'
+        ((M ⊓ Subgroup.centralizer ({x} : Set G)).subgroupOf (Subgroup.centralizer ({x} : Set G)))
+        ((⊥ : Subgroup G).subgroupOf (Subgroup.centralizer ({x} : Set G))) := by
+      rw [hMCx, Subgroup.subgroupOf_self, Subgroup.bot_subgroupOf]
+      exact Subgroup.isComplement'_top_bot
+    have hc4 : ConjSharplyTransitiveOn (⊥ : Subgroup G) (maximalConjugatesContaining M x) := by
+      have hsingle : maximalConjugatesContaining M x = {M} := by
+        rw [maximalConjugatesContaining_eq_maximalSigma hG hM hxMσ hx1]
+        exact maximalSigmaSubgroupsOfElement_eq_singleton_of_centralizer_le hG hM hxMσ hx1 hCxM
+      rw [hsingle]
+      intro A hA B hB
+      rw [Set.mem_singleton_iff] at hA hB
+      subst hA; subst hB
+      exact ⟨1, ⟨Subgroup.mem_bot.mpr rfl, by rw [map_one, one_smul]⟩,
+        fun r hr => Subgroup.mem_bot.mp hr.1⟩
+    exact ⟨⊥, hc1, hc2, hc3, hc4⟩
+
 /-- **BG Theorem D** (mmd L4317, recovered tail L4368): conjugacy and centralizer
 control for `M_sigma`, including the `R(x)` normal complement, its sharply transitive
 action, and the unique maximal subgroup attached to escaping centralizers.
@@ -1373,7 +1472,7 @@ theorem theoremD_msigma_conjugacy_and_centralizers [Finite G]
   -- (`Msigma_inf_conj_isCyclic`, Lemma 12.17) are proven; D(3)/D(4) are the deep `R(x)`
   -- signalizer normal complement (issue 8019, multi-session).
   refine ⟨msigma_fusion_control hG hM, fun g hg => Msigma_inf_conj_isCyclic hG hM hg, ?_, ?_⟩
-  · sorry
+  · exact exists_RData_of_mem_sigmaSharp hG hM
   · sorry
 
 /-- **BG Theorem E, `σ(Mᵢ)`-disjointness conjunct** (mmd L4370): distinct

@@ -301,3 +301,24 @@ HUB 裁定 (δ-internal、再設計可) を受け修正完了 (commits `dcd1ace9
 の逆、Coq の transitive `C(X)`-action + orbit-count、deep)。これが closed すれば hD3 完全。
 **教訓**: 「deep」評価は証明戦略依存 — 正しい engine (`subcent_sdprod`) を Coq で確認すれば tractable だった
 ([[scaffold-sorry-free-not-done]] と同系、原文の証明本体を読め)。次 = (1) ≤1 枝 (hard direction) or (2) hD4 gaps。
+
+## ✅ 進捗 (lane d, 2026-06-29 cont.⁷ — /loop): full hD3 完成 — theoremD の hD3 conjunct を discharge
+
+**前ノートが「deep (Coq `not_sCX_M` 逆向き、C(X)-transitive-action port 要)」とした dichotomy
+`|𝓜_σ(x)| ≤ 1 ⟹ C_G(x) ≤ M` も実は浅かった** (conjunct 3 に続く 2 度目の過大評価)。直接論法:
+`c ∈ C[x]\M` なら `Mᶜ ∈ 𝓜_σ(x)` (`x∈Mᶜ` ∵ `c⁻¹xc=x∈M`、`maximalConjugatesContaining_eq_maximalSigma`)
+かつ `Mᶜ≠M` (∵ `c∉N(M)=M`) ⟹ `|𝓜_σ(x)|≥2`。**C(X)-orbit count 不要、`N(M)=M` (maximal
+self-normalizing) のみ**。
+
+**landed (axiom-clean、full build green)**:
+- `centralizer_le_of_maximalSigma_le_one` (S16): dichotomy (`≤1 ⟹ C[x]≤M`、`N(M)=M` inline)。
+- `exists_RData_of_mem_sigmaSharp` (S16): **full hD3** = `>1` 枝 (`RData_of_gt_one`) + `≤1` 枝
+  (`C[x]≤M ⟹ R=⊥`: `C_M(x)=C[x]` で conjunct 1 trivial / conjunct 3 = `⊤⋊⊥` / `𝓜_σ(x)={M}` で
+  sharp trans vacuous)。
+- **`theoremD_msigma_conjugacy_and_centralizers` の hD3 conjunct を discharge** (S16, `· sorry` →
+  `· exact exists_RData_of_mem_sigmaSharp hG hM`)。
+
+**∴ Theorem D(3) (hD3) 完全 proven。残 theoremD = hD4 のみ** (`∃!N` with `MF=Msigma`/`ASet`/`P2→Frobenius`
+gaps; ただし dichotomy が `¬(C[x]≤M)⟹>1` も供給ゆえ structure 適用は可能、残は `∃!N` の N-構造 gaps)。
+**教訓 (再): 「deep」は証明戦略依存** — 2 度連続で BG §16 の「deep」評価が誤りだった (conjunct 3 / dichotomy)。
+原文の証明本体を読み、正しい補題 (`subcent_sdprod` / 直接 2-element argument) を確認すれば浅い。

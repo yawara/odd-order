@@ -6742,3 +6742,11 @@ proven structure's `N`-complement, discharging the one genuinely-deep `RData` in
 #assert_only_allowed_axioms Subgroup.IsComplement'.inf_centralizer_of_normalizer
 #assert_only_allowed_axioms OddOrder.BG.Ch4.S16.signalizer_centralizer_isComplement
 #assert_only_allowed_axioms OddOrder.BG.Ch4.S16.RData_of_gt_one
+
+/-! **Theorem D(3) full `hD3`** (`S16_MainResults`; lane δ, issue 8020).  The `|𝓜_σ(x)| ≤ 1 ⟹
+C_G(x) ≤ M` dichotomy (`centralizer_le_of_maximalSigma_le_one`, the shallow converse of the
+singleton lemma, Coq `not_sCX_M` direction) plus the `> 1` branch (`RData_of_gt_one`) assemble the
+full `∀ x ∈ M_σ^#, ∃ R, RData M x R` (`exists_RData_of_mem_sigmaSharp`), discharging the `hD3`
+conjunct of Theorem D.  All axiom-clean. -/
+#assert_only_allowed_axioms OddOrder.BG.Ch4.S16.centralizer_le_of_maximalSigma_le_one
+#assert_only_allowed_axioms OddOrder.BG.Ch4.S16.exists_RData_of_mem_sigmaSharp
