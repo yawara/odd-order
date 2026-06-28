@@ -208,3 +208,26 @@ conjunct 1 の (a) / (2) `M_σ⊓C[x] σ(M)-Hall in C[x]` = conjunct 1 (b) / (3)
 (4) structure 適用 wiring (signalizer_structure_of_mem_sigmaSharp で N/hsharp 取得) + |M_σ[x]|=1 枝
 (C[x]≤M, R=⊥) → hD3 完成 / (5) hD4 の MF=Msigma / x∈ASet / TypeP2→Frobenius gaps。
 assembly skeleton `RData_of_inputs` は ready、残は M-side 構造の本体証明。
+
+## 進捗ログ (lane d, 10-12 回目 — /loop: 深い endgame 到達 + blocker 明示)
+
+**2026-06-29 cont.⁵ (/loop iter 9-11): case-split easy 方向 landed + 残 conjunct の本質 blocker 確認。**
+commit `ba739946`: `maximalSigmaSubgroupsOfElement_eq_singleton_of_centralizer_le`
+(C[x]≤M ⟹ 𝓜_σ(x)={M}、`exists_conj_centralizer` + N(M)=M、Theorem D(3) trivial-branch)。axiom-clean。
+
+**⚠ 残 hD3/hD4 conjunct は一様に深く ready leverage なし (本質的 blocker、context でなく未ポート infra)**:
+- **conjunct 1 (C_M(x) σ(M)-Hall in C[x] ⟺ C_M(x)≤M_σ)**: `mf_centralizer_hall_decomp` は ⟨x⟩ が
+  M_σ-Hall を要し x に不適用。「σ-element の M-centralizer は σ-group」= 未ポートの §12-14 centralizer
+  theory が必要。**path 未確定** (真偽含め要検証)。
+- **conjunct 3 (R⋊C_M(x)=C[x], Coq part b)**: Frobenius/regular-action complement。modular-law descent
+  は A≤H 不成立で不可。深い。
+- **hard case-split 方向 (¬(C[x]≤M)⟹|M_σ[x]|>1)**: easy 方向の逆、深い (Coq not_sCX_M の逆向き)。
+- **hD4 `MF N=Msigma N`**: **type-P2 では FittingIsTI 成立** (Thm 15.7a `fittingIsTI_of_isTypeP2`) ゆえ
+  `mf_eq_msigma_of_not_fittingIsTI` 不適用 → type-依存、clean でない。x∈ASet / TypeP2→Frobenius も深い。
+
+**結論**: signalizer functor Theorem D(3)/(4) の **assembly skeleton (RData_of_inputs) + 機構 (conjuncts
+2,4 + bridge + case-split easy) は完成**。残は BG 最深 M-side 構造 (conjunct 1,3 + hard case-split + hD4
+type gaps) で、各々 §12-14 の未ポート centralizer/Frobenius/type-classification infra を要する multi-session
+porting。これは「上流 infra 不足」が真の blocker (難所回避でなく、上流が未整備)。**次の正しい上流 work** =
+「σ-element の M-centralizer 構造」(conjunct 1 の前提) の §12-14 からのポート、または fresh-context での
+careful な Coq-port。assembly skeleton は ready、cite 待ち。
