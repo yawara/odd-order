@@ -951,6 +951,31 @@ theorem theoremD_msigma_conjugacy_and_centralizers_of_inputs [Finite G]
   rw [normalizer_Msigma_eq_self hG hM] at hnN
   exact ⟨n, hnN, hnconj⟩
 
+/-- **BG Theorem D(1), `M_σ`-fusion control** (mmd L4317, the first conjunct of
+`theoremD_msigma_conjugacy_and_centralizers`): two elements of `M_σ` conjugate in `G` are already
+conjugate by an element of `M`.  This is the one Theorem-D conjunct that is unconditional given
+Corollary 15.3: applying `mf_hall_centralizer_control` (Cor 15.3(b), sorry-free) to the trivial
+Hall subgroup `H := M_σ` of `M_σ` gives `N_G(M_σ)`-fusion, and `N_G(M_σ) = M`
+(`normalizer_Msigma_eq_self`) upgrades it to `M`-fusion.  Standalone and reusable; the remaining
+Theorem-D conjuncts D(2) (Lemma 12.17) / D(3)(4) (the `R(x)` signalizer normal complement, deep) are
+isolated in `theoremD_msigma_conjugacy_and_centralizers_of_inputs` (issue 8019). -/
+theorem msigma_fusion_control [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    {M : Subgroup G} (hM : M ∈ maximalSubgroups G) :
+    ∀ x ∈ OddOrder.BG.Ch3.S10.Msigma M, ∀ y ∈ OddOrder.BG.Ch3.S10.Msigma M,
+      (∃ g : G, y = g * x * g⁻¹) → ∃ m ∈ M, y = m * x * m⁻¹ := by
+  -- `M_σ` is (trivially) a `piSet`-Hall subgroup of itself.
+  have hHall : Ch03.IsHallSubgroup (S14.piSet (OddOrder.BG.Ch3.S10.Msigma M))
+      ((OddOrder.BG.Ch3.S10.Msigma M).subgroupOf (OddOrder.BG.Ch3.S10.Msigma M)) := by
+    rw [Subgroup.subgroupOf_self, Ch03.IsHallSubgroup.top_iff]
+    exact fun p hp => hp
+  intro x hx y hy hconj
+  -- Corollary 15.3(b) at `H := M_σ`: `N_G(M_σ)`-fusion; then `N_G(M_σ) = M`.
+  obtain ⟨n, hnN, hnconj⟩ :=
+    (mf_hall_centralizer_control hG hM le_rfl hHall (OddOrder.BG.Ch3.S10.Msigma_ne_bot hG hM)).2
+      x hx y hy hconj
+  rw [normalizer_Msigma_eq_self hG hM] at hnN
+  exact ⟨n, hnN, hnconj⟩
+
 /-- **BG Theorem D** (mmd L4317, recovered tail L4368): conjugacy and centralizer
 control for `M_sigma`, including the `R(x)` normal complement, its sharply transitive
 action, and the unique maximal subgroup attached to escaping centralizers.
