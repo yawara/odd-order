@@ -988,3 +988,41 @@ commutator symplectic form)、class-2 commutator multiplicativity helper (`commu
   で ∃ n∈M_F, U_III = n·U_II·n⁻¹ ⟹ N(U_III)=n·N(U_II)·n⁻¹、n∈M_F≤M ⟹ N(U_III)≤M ⟺ N(U_II)≤M で矛盾。
   実装は ↥M' での共役を G へ翻訳 (subgroupOf↔G map/conj) が intricate (~80-120 行)。次セッション。
 
+
+## ✅✅✅ 2026-06-28 (lane-f 再開¹⁴): Prop 16.1 完全 sorry-free + axiom-clean — reverse hIIP2/hIIIIVP1 を閉鎖 (commit 777d017b)
+
+前セクションが「確定・要実装」とした reverse bridge `hIIP2`/`hIIIIVP1` を実装完遂。
+`proposition_type_classification` (S16_MainResults、BG Prop 16.1) が **完全 sorry-free かつ
+axiom-clean** (`#print axioms` = propext/Classical.choice/Quot.sound のみ)。§16 型分類辞書が完成。
+
+**証明路 = 型 II/III/IV/V 相互排他性** (forward 5 本 + reverse hVP1 は既済):
+- hIIP2 (II⟹P₂): II は非 type-I ⟹ `isTypeP_of_isTypeNonI` で IsTypeP (=P₁∨P₂)。P₁ 枝を排除 —
+  M_F=M_σ なら hP1eqV で型V (II と `not_isTypeII_of_isTypeV` で矛盾)、M_F≠M_σ なら hP1neIIIIV で
+  型III/IV (II と `not_isTypeII_of_isTypeIII_or_IV` で矛盾) ⟹ P₂。
+- hIIIIVP1 (III/IV⟹P₁∧M_F≠M_σ): III/IV は非 type-I ⟹ IsTypeP。P₂⟹II (`isTypeII_of_isTypeP2`) は
+  III/IV と `not_isTypeII_of_isTypeIII_or_IV` で矛盾 ⟹ P₁。M_F=M_σ なら hP1eqV で型V、III/IV と
+  `not_isTypeV_of_isTypeIII_or_IV` で矛盾 ⟹ M_F≠M_σ。
+
+**新 reusable 補題 (全 axiom-clean、AxiomsCheck 登録)**:
+1. `not_isTypeV_of_typePData_U_ne_bot` — **U=⊥ 排他性核**: 型V witness (U=⊥⟹M'=M_F) と任意
+   TypePData の U≠⊥ が矛盾 (両 data が同じ H=maxNilpotentNormalHall、derived_complement で U≤H⟹U=⊥)。
+   `not_isTypeII_of_isTypeV` を一般化。
+2. `not_isTypeV_of_isTypeIII_or_IV` — III/IV≠V (核を `common.1` に適用)。
+3. **`typePData_exists_conj_U`** — 任意 2 TypePData の complement U は M-共役。両 U は冪零正規 Hall
+   M_F を M'=[M,M] 内で complement (`derived_complement`)。M_F は M で Hall
+   (`maxNilpotentNormalHall_isHall`)、ゆえ M' でも Hall ([M':M_F]∣[M:M_F]、`relIndex_mul_relIndex`)
+   で |M_F| と [M':M_F]=|U| が coprime ⟹ **Schur–Zassenhaus 共役** (`exists_conj_of_coprime` を
+   ↥M' 内で適用) で n∈M_F≤M, conj n • U_1 = U_2。↥M'→G 翻訳は subtype intertwine
+   (S15_SAndT `exists_conj_typeP_U_of_coprime` テンプレ流用、但し両 U が genuine complement ゆえ
+   containment→equality upgrade 不要で簡潔)。
+4. `typePData_normalizer_U_le_iff` — N(U_1)≤M ⟺ N(U_2)≤M (3 の共役 + `normalizer_conj_smul` +
+   `conj_smul_eq_self_of_mem_normalizer` で conj が M を固定)。
+5. `not_isTypeII_of_isTypeIII_or_IV` — **II≠III/IV**: type-II の `normalizer_not_le` (¬N(U)≤M) と
+   type-III/IV の `normalizer_le` (N(U)≤M) を 4 の共役不変性で矛盾。
+
+`not_isTypeII_of_isTypeV` は核 1 を使う 1 行に refactor。full build 3886 green、main 合流済。
+
+**∴ issue 8015 完了条件達成** (`proposition_type_classification` sorry-free)。本 issue は CLOSE 可。
+W1-a (BG §16 Prop 16.1 + 全 bridge) は forward 5 + reverse 3 すべて honest + axiom-clean で完結。
+**次の lane-f frontier = W1 の他 §16 endpoint** (theoremA_maximal_structure S16:146 / theoremII /
+theoremD 等、まだ sorry) を書籍順・上流優先で。または hub 再判断。
