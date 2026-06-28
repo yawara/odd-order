@@ -516,6 +516,39 @@ theorem induce_one_eq_zero_of_mem_normal_inf_bot {G : Type*} [Group G] [Fintype 
       _ = 1 := by group
   rw [hempty, Finset.card_empty, Nat.cast_zero, mul_zero]
 
+open scoped Classical in
+/-- **Frobenius permutation char is `1` on the complement #** (third value case of (13.18.b)).
+
+For a Frobenius group `G = N ⋊ A`, the induced trivial character `Ind_A^G 1` takes value `1` on
+`A#`: the conjugator set `{x : x⁻¹ax ∈ A}` is exactly `A`.  `x ∈ A` clearly works; conversely
+`x⁻¹ax ∈ A` puts `a ∈ A ⊓ A^x`, which is `⊥` for `x ∉ A` by the Frobenius trivial-intersection
+property (`IsFrobeniusGroup.trivialIntersection`), forcing `a = 1`.  So the count is `|A|` and the
+value is `⅟|A| · |A| = 1`. -/
+theorem induce_one_eq_one_of_mem_complement {G : Type*} [Group G] [Fintype G]
+    {N A : Subgroup G} (hFrob : OddOrder.Isaacs.Ch06.IsFrobeniusGroup G N A)
+    [Invertible (Nat.card ↥A : ℂ)] {a : G} (ha : a ∈ A) (ha1 : a ≠ 1) :
+    ClassFunction.induce A (trivialClassFunction ↥A) a = 1 := by
+  rw [induce_one_apply]
+  have hfilter : (Finset.univ.filter (fun x : G => x⁻¹ * a * x ∈ A))
+      = Finset.univ.filter (fun x : G => x ∈ A) := by
+    apply Finset.filter_congr
+    intro x _
+    constructor
+    · intro hmem
+      by_contra hxA
+      have hmemmap : a ∈ A ⊓ Subgroup.map (MulAut.conj x).toMonoidHom A := by
+        rw [Subgroup.mem_inf]
+        refine ⟨ha, Subgroup.mem_map.mpr ⟨x⁻¹ * a * x, hmem, ?_⟩⟩
+        simp only [MulEquiv.coe_toMonoidHom, MulAut.conj_apply]; group
+      rw [hFrob.trivialIntersection x hxA, Subgroup.mem_bot] at hmemmap
+      exact ha1 hmemmap
+    · intro hxA
+      exact A.mul_mem (A.mul_mem (A.inv_mem hxA) ha) hxA
+  rw [hfilter]
+  have hcard : (Finset.univ.filter (fun x : G => x ∈ A)).card = Nat.card ↥A := by
+    rw [Nat.card_eq_fintype_card]; simp [Fintype.card_subtype]
+  rw [hcard, invOf_mul_self]
+
 /-- **Inflation norm lower bound — the carrier-free core of Peterfalvi (13.5.c)**.
 
 If a function `α : H → ℂ` is constant on a finite subgroup `P ≤ H` (equal to `α 1` on all of `P`)
