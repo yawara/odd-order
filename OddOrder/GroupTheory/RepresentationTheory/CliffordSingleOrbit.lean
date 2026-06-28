@@ -74,4 +74,33 @@ theorem character_conj_of_simpleSubmodule [ρ.IsIrreducible] [FiniteDimensional 
   funext h
   exact character_subRep_conj ρ N g h
 
+set_option backward.isDefEq.respectTransparency false in
+/-- **A nonzero intertwiner yields a simple constituent submodule** (the module side of the
+constituent ⟺ submodule bridge).  If `σ` is an irreducible `k[H]`-representation and there is a
+nonzero `H`-equivariant map `f : σ → Res^G_H ρ`, then `Res^G_H ρ` has a simple `k[H]`-submodule `N`
+whose subrepresentation character equals `χ_σ`.  Proof: pass `f` to its `k[H]`-linear `asModule`
+form (`equivLinearMapAsModule`); it is nonzero, so injective by Schur
+(`LinearMap.injective_of_ne_zero`, `σ.asModule` simple); its range is a simple submodule
+`k[H]`-isomorphic to `σ.asModule` (`LinearEquiv.ofInjective`), and transporting that isomorphism
+through `equivOfAsModuleEquiv` + `char_iso` equates the characters. -/
+theorem exists_simpleSubmodule_character_eq_of_ne_zero_intertwiner [FiniteDimensional k V]
+    {H : Subgroup G} [hH : H.Normal]
+    {W : Type*} [AddCommGroup W] [Module k W]
+    (σ : Representation k ↥H W) [σ.IsIrreducible]
+    {f : Representation.IntertwiningMap σ (resRep ρ H)} (hf : f ≠ 0) :
+    ∃ N : Submodule k[↥H] (resRep ρ H).asModule, IsSimpleModule k[↥H] ↥N ∧
+      ((Subrepresentation.ofSubmodule' N).toRepresentation).character = σ.character := by
+  haveI : IsSimpleModule k[↥H] σ.asModule :=
+    (Representation.irreducible_iff_isSimpleModule_asModule σ).mp inferInstance
+  set fam := Representation.IntertwiningMap.equivLinearMapAsModule σ (resRep ρ H) f with hfam
+  have hfam_ne : fam ≠ 0 := by
+    rw [hfam, ne_eq, LinearEquiv.map_eq_zero_iff]; exact hf
+  have hinj : Function.Injective fam := LinearMap.injective_of_ne_zero hfam_ne
+  refine ⟨LinearMap.range fam, ?_, ?_⟩
+  · exact (LinearEquiv.ofInjective fam hinj).isSimpleModule_iff.mp inferInstance
+  · refine Representation.char_iso
+      (equivOfAsModuleEquiv
+        ((subRepAsModuleEquiv (resRep ρ H) (LinearMap.range fam)).symm.trans
+          (LinearEquiv.ofInjective fam hinj).symm))
+
 end OddOrder.RepresentationTheory
