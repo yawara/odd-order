@@ -168,3 +168,24 @@ Theorem D(1) (msigma_fusion_control) 完了後、残 conjunct を Coq `BGsummary
 次セッションの選択肢 = (i) `sigma_compl_embedding` §12 port (σ-uniqueness 3 補題から、D(2) cyclic 用)、
 (ii) signalizer functor theory 着手 (D(3)、最深)、(iii) Pf-side Phase 4 の family/partition field 供給
 (cardinality/covering は gate 据置の gated-endpoint)。いずれも fresh 集中セッション推奨。
+
+## ✅ 2026-06-28 進捗 (cont.²) — D(2) σ-uniqueness 第1 gate `norm_noncyclic_sigma` を実証明
+
+Theorem D(2) (cyclic M_σ∩M^g) への σ-uniqueness 機構ポートを開始。Coq `sigma_compl_embedding`
+(BGsection12:2461) の cyclic 論法を分解 → 2 つの σ-uniqueness gate に帰着:
+
+**✅ gate 1 `norm_noncyclic_sigma`** (commit 54f1b995、S12_ExceptionalBridge、sorry-free+axiom-clean、
+AxiomsCheck 登録): noncyclic σ(M)-p-subgroup P≤M ⟹ N_G(P)≤M。Coq BGsection12:1420 を忠実ポート。
+全 dep が repo 在庫だった: `exists_isElementaryAbelian_card_prime_sq_of_not_isCyclic` (rank-2 A⊆P) +
+`centralizer_le_of_elemAb_rank_two` (Prop 12.4(a)、C(A)≤M) + `fusion_control_of_mem_sigma` 第3 conjunct
+(N_G(P)=(N_G(P)⊓M)·C_G(P))。
+
+**❌ gate 2 `cent_der_sigma_uniq`** (Coq BGsection12:2139、**未ポート・深い**): X∈E_p^1(M),
+(p∈β ∨ X⊆M_σ') ⟹ 𝓜(C(X))={M}。D(2) の abelian 部分 (K∩M_σ'=1 ⟹ K' =1) に必須。Coq 証明 ~50 行で
+**narrow-group 機構** (`narrow_centP`/`beta_max_pdiv`/`rank3_Uniqueness`/`quotient_isom`) 依存 = §12 の
+deep multi-lemma undertaking。
+
+**cyclic M_σ∩M^g (D(2)) の残**: (i) gate 2 `cent_der_sigma_uniq` ポート (narrow/β/rank-3 機構)、
+(ii) EpMsMg rank-1 論法 (gate1 + fusion 第1 conjunct `not_sCX_M` で X cyclic; **gate1 で unblock 済**)、
+(iii) abelian (gate2 経由 K∩M_σ'=1)、(iv) `abelian_rank1_cyclic` 組立、(v) D(2) を theoremD に wire。
+gate 1 完了で (ii) は可能、残は gate 2 (narrow-group、次セッション) が真のボトルネック。
