@@ -231,3 +231,21 @@ type gaps) で、各々 §12-14 の未ポート centralizer/Frobenius/type-class
 porting。これは「上流 infra 不足」が真の blocker (難所回避でなく、上流が未整備)。**次の正しい上流 work** =
 「σ-element の M-centralizer 構造」(conjunct 1 の前提) の §12-14 からのポート、または fresh-context での
 careful な Coq-port。assembly skeleton は ready、cite 待ち。
+
+## 🛑 重大発見 (lane d, iter 12): RData conjunct 1 は mis-encoded — hD3/hD4 が偽の target
+
+**2026-06-29: RData (S16:114) conjunct 1 `Ch03.IsHallSubgroup (σ M) ((M⊓C[x]).subgroupOf C[x])`
+(= C_M(x) が σ(M)-Hall in C[x]) は type-P M で偽。**
+- **論拠**: `kappa_subset_sigmaCompl` (κ(M)⊆σ(M)ᶜ) + Kstar=M_σ∩C(K)。x∈Kstar^#⊆M_σ^#=sigmaSharp M で
+  x は K を中心化 ⟹ K≤C(x), K≤M ⟹ **K≤C_M(x)**。K は κ-Hall (σ 外の素数)。∴ |C_M(x)| は σ(M)' 素数を
+  含み **C_M(x) は σ(M)-group でない** ⟹ `IsHallSubgroup (σ M)` の第1連言 (|H| 素数⊆σM) が偽。
+  type-P M (K≠⊥) かつ Kstar≠⊥ で x∈Kstar^# が実在 ⟹ hD3 `∀x∈sigmaSharp M` は偽。
+- **Coq 正解 (Theorem 14.4(b)/(e))**: `R ><| 'C_(M:&:N)[x] = 'C[x]` (part b) + `\sigma(N)^'.-Hall(N)
+  (M:&:N)` (part e)。∴ C_M(x)=C_{M∩N}(x) は R(σ(N)-Hall)の complement = **σ(N)'-Hall in C[x]** (N 参照)。
+  Lean の `σ M` は **`σ N` (signalizer の極大) の '-Hall であるべき**で、σ(M)-Hall は誤エンコード。
+- **影響**: conjunct 1 が偽 ⟹ hD3/hD4 は現エンコードのまま honest に閉じられない。私の機構 (conjunct 2,4 +
+  bridge + set-relation + assembly skeleton + case-split) は**全て valid・再利用可** (conjunct 1 のエンコード
+  だけが問題)。**RData は shared contract (theoremD は FT spine が cite) ゆえ無断改変不可** → hub/ユーザー判断要。
+- **要決定**: RData conjunct 1 を σ(N)'-Hall (N=signalizer の極大) に修正するか。修正には N の存在 (|M_σ[x]|>1
+  枝) を def に織り込む必要があり、trivial 枝 (R=⊥, C[x]≤M) では C_M(x)=C[x] が σ(M)... これも要再検討
+  (trivial 枝でも κ が C[x] に入りうる)。**RData def の再設計が必要**。
