@@ -151,8 +151,11 @@ step 2 (HC⊴HU) の抽象核を landed: **`OddOrder.GroupTheory.sup_normal_of_n
 
 carrier goal: **χ∈xiOf data (chief.H0⊔chars.Cprime) ⟹ (χ:IrreducibleCharacter ↥(huSub data)) 1 = chars.u**
 (これで φ=induceHU χ の φ(1)=q·χ(1)=qu、第1連言成立)。Γ=↥(huSub data)=HU、I=HC realized で 2 keystone 適用:
-1. **HC を HU 内に realize** = `(HC.subgroupOf M).subgroupOf (huSub data)`、HC=data.H⊔cSub (Subgroup G)。
-2. **HC ⊴ HU**: [HU,HC]⊆HC via H⊴HU (`hInHu_normal`) + [U,C]⊆C (**C=cSub=ker(uActionHom)⊴U 自動**=hom の核) + [H,C]⊆H₀。
+1. **✅ HC を HU 内に realize** = `uInHu`/`cInHu` (S11、`(·.subgroupOf M).subgroupOf (huSub data)`)。
+2. **✅✅ HC ⊴ HU COMPLETE** (S11、axiom-clean): `hcInHu_normal` = `hInHu ⊔ cInHu ◁ huSub`。
+   `cSub_subgroupOf_U_normal` (C=cSub=ker(uActionHom)⊴U、`MonoidHom.normal_ker`+iso) →
+   `cInHu_normal` (comap transport `↥uInHu≃*↥U` で C◁U realized) + `hInHu_sup_uInHu_eq_top`
+   (H⊔U=⊤ via `subgroupOf_sup`×2 + `subgroupOf_self`) → 抽象補題 `sup_normal_...` 適用。
 3. **ψ∈Irr(HC) を Res_{HC} χ の成分に** (`exists_liesOver`) + **χ lies over ψ**。
 4. **ψ(1)=1**: [HC,HC]⊆characterKernel ψ (上記 commutator 3 facts、H₀=chief.N realized⊆Ker χ も要) → keystone 2。
 5. **Ind_{HC}^{HU} ψ 既約**: `isIrreducibleCharacter_induce_of_inertia_eq` (HU,HC,ψ) 要 inertia_HU(ψ)=HC。
@@ -161,7 +164,7 @@ carrier goal: **χ∈xiOf data (chief.H0⊔chars.Cprime) ⟹ (χ:IrreducibleChar
 6. **[HU:HC]=u** = chars.u (cSub の `u_eq_card_quotient` range + [HU:HC]=[U:C]=u first-iso)。
 7. 2 keystone 合成: χ=Ind ψ ⟹ χ(1)=[HU:HC]·ψ(1)=u·1=u。
 
-**次セッション = 上記 realization** (HC realize+normality が最初の brick、inertia lift (step 5) が crux)。
+**次セッション = step 3-7** (step 1-2 = realize+normality 完了)。残 crux = step 5 inertia lift。
 
 ## 完了条件
 
