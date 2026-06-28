@@ -373,3 +373,18 @@ card_LF_coprime_pq (spine, lane c)  ←  bgTheoremE_cover_data (Pf 8.17, Peterfa
 3. **14.5c**: cover identity (set 操作) + double-count (`|R|=|𝓜_σ(x)|` ✅ 本セッション + 14.5a disjoint で trivIset) +
    orbit-stabilizer for [G:M] (`ncard_conjugates_eq_index_of_normalizer_eq_self` S14:4749 在庫)。
 **次 = sigma_cover_decomposition** (piPart_mul_of_commute の自然な consumer)。
+
+## ✅ 進捗 (lane d, 2026-06-29 cont.¹⁰ — /loop): `sigma_cover_decomposition` (Coq BGsection14:1055)
+
+**`sigma_cover_decomposition`** (S14、axiom-clean): `M,N` non-conj・`x∈M_σ^#`・`x'∈N_σ`・`Commute x x'`
+⟹ `sigma_decomposition (x*x') = {x} ∪ {x'}^#`。**Coq の `constt'` route を回避し直接証明**:
+`sigmaPart L (x*x') = sigmaPart L x · sigmaPart L x'` (piPart_mul_of_commute) で各 σ(L)-part を分解、
+`L∼M`/`L∼N`/どちらでもない の by_cases (M,N non-conj で「両方」を排除) → part は `x`/`x'`/`1`。
+- 補助 (directed `sigmaPart`): `sigmaPart_eq_self_of_conj` (L∼M ⟹ sigmaPart L x=x) /
+  `sigmaPart_eq_one_of_not_conj` (L≁M ⟹ sigmaPart L x=1、σ-disjoint 経由)。再利用可。
+
+**残 14.5c cluster (上流順)**: 1. **14.5a `sigma_cover_disjoint`** (`x·R[x] ∩ y·R[y]=∅`): sigma_cover_decomposition
+(本) で共通元の σ-decomp を {x}∪{x'} と {y}∪{y'} に同定 → x=y or 矛盾 (FT_signalizer uniqueness ∃!N
+[structure] + sdprod 自明交差 [`signalizer_centralizer_isComplement`])。 2. 14.5c (cover identity + double-count
+[`card_signalizer_eq_card_maximalSigma` ✅] + orbit [S14:4749])。3. theoremE assemble → bgTheoremE_cover_data。
+**次 = 14.5a sigma_cover_disjoint**。但し cover 文脈では M,N non-conj を structure t2Nx (x τ2(N)-elt vs σ(M)-elt) で要供給。

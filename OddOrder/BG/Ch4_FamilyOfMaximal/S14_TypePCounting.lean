@@ -1395,6 +1395,80 @@ theorem sigmaPart_eq_self_or_one_of_isPiElement_sigma [Finite G]
   · refine Or.inr (piPart_eq_one_of_isPiElement_compl (fun p hp hpL => ?_))
     exact Set.disjoint_left.mp (sigma_disjoint_of_nonconjugate hG hM hL hconj) (hx p hp) hpL
 
+/-- **Directed `sigmaPart`, conjugate case**: a `σ(M)`-element is fixed by the `σ(L)`-part when `L`
+is `M`-conjugate (`σ(L) = σ(M)`). -/
+theorem sigmaPart_eq_self_of_conj [Finite G] {M : Subgroup G} {x : G}
+    (hx : IsPiElement (OddOrder.BG.Ch3.S10.sigma M) x) {L : Subgroup G}
+    (hconj : ∃ g : G, MulAut.conj g • M = L) : sigmaPart L x = x := by
+  simp only [sigmaPart]
+  obtain ⟨g, rfl⟩ := hconj
+  exact piPart_self_of_isPiElement (fun p hp => by
+    haveI : Fact p.Prime := ⟨Nat.prime_of_mem_primeFactors hp⟩
+    exact OddOrder.BG.Ch3.S10.sigma_conj g (hx p hp))
+
+/-- **Directed `sigmaPart`, non-conjugate case**: a `σ(M)`-element has trivial `σ(L)`-part when `L`
+is *not* `M`-conjugate (`σ(M) ∩ σ(L) = ∅`). -/
+theorem sigmaPart_eq_one_of_not_conj [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    {M : Subgroup G} (hM : M ∈ maximalSubgroups G) {x : G}
+    (hx : IsPiElement (OddOrder.BG.Ch3.S10.sigma M) x) {L : Subgroup G}
+    (hL : L ∈ maximalSubgroups G) (hnconj : ¬ ∃ g : G, MulAut.conj g • M = L) :
+    sigmaPart L x = 1 := by
+  simp only [sigmaPart]
+  exact piPart_eq_one_of_isPiElement_compl (fun p hp hpL =>
+    Set.disjoint_left.mp (sigma_disjoint_of_nonconjugate hG hM hL hnconj) (hx p hp) hpL)
+
+/-- **σ-decomposition of a `σ`-cover element** (Coq `sigma_cover_decomposition`, BG remark above
+Lemma 14.5): for a nonidentity `σ(M)`-element `x`, a `σ(N)`-element `x'` with `M`, `N`
+non-conjugate, and `x`, `x'` commuting, `sigma_decomposition (x * x') = {x} ∪ {x'}^#`.  Each `σ(L)`-part
+of `x * x'` is `sigmaPart L x · sigmaPart L x'` (`piPart_mul_of_commute`); as `M`, `N` are
+non-conjugate, no `L` is conjugate to both, so that part is `x` (`L ∼ M`), `x'` (`L ∼ N`) or `1`. -/
+theorem sigma_cover_decomposition [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    {M N : Subgroup G} (hM : M ∈ maximalSubgroups G) (hN : N ∈ maximalSubgroups G)
+    (hMN : ¬ ∃ g : G, MulAut.conj g • M = N)
+    {x x' : G} (hxM : x ∈ OddOrder.BG.Ch3.S10.Msigma M) (hx1 : x ≠ 1)
+    (hx'N : x' ∈ OddOrder.BG.Ch3.S10.Msigma N) (hcomm : Commute x x') :
+    sigmaDecomposition (x * x') = insert x ({x'} \ {1}) := by
+  classical
+  have hxσ : IsPiElement (OddOrder.BG.Ch3.S10.sigma M) x := isPiElement_sigma_of_mem_Msigma hxM
+  have hx'σ : IsPiElement (OddOrder.BG.Ch3.S10.sigma N) x' := isPiElement_sigma_of_mem_Msigma hx'N
+  -- conjugacy is symmetric, so `N` is not `M`-conjugate either.
+  have hNM : ¬ ∃ g : G, MulAut.conj g • N = M := by
+    rintro ⟨g, hg⟩
+    exact hMN ⟨g⁻¹, by rw [← hg, ← mul_smul, ← map_mul, inv_mul_cancel, map_one, one_smul]⟩
+  have hpart : ∀ L : Subgroup G, sigmaPart L (x * x') = sigmaPart L x * sigmaPart L x' := fun L => by
+    simp only [sigmaPart]; exact piPart_mul_of_commute hcomm
+  ext y
+  simp only [sigmaDecomposition, Set.mem_diff, Set.mem_setOf_eq, Set.mem_singleton_iff,
+    Set.mem_insert_iff]
+  constructor
+  · rintro ⟨⟨L, hL, rfl⟩, hne⟩
+    rw [hpart L] at hne ⊢
+    by_cases hLM : ∃ g : G, MulAut.conj g • M = L
+    · by_cases hLN : ∃ g : G, MulAut.conj g • N = L
+      · exfalso
+        obtain ⟨g, hg⟩ := hLM; obtain ⟨h, hh⟩ := hLN
+        refine hMN ⟨h⁻¹ * g, ?_⟩
+        have hgh : MulAut.conj g • M = MulAut.conj h • N := hg.trans hh.symm
+        rw [map_mul, mul_smul, hgh, ← mul_smul, ← map_mul, inv_mul_cancel, map_one, one_smul]
+      · left
+        rw [sigmaPart_eq_self_of_conj hxσ hLM,
+          sigmaPart_eq_one_of_not_conj hG hN hx'σ hL hLN, mul_one]
+    · by_cases hLN : ∃ g : G, MulAut.conj g • N = L
+      · right
+        have hval : sigmaPart L x * sigmaPart L x' = x' := by
+          rw [sigmaPart_eq_one_of_not_conj hG hM hxσ hL hLM,
+            sigmaPart_eq_self_of_conj hx'σ hLN, one_mul]
+        exact ⟨hval, hval ▸ hne⟩
+      · exact absurd (by rw [sigmaPart_eq_one_of_not_conj hG hM hxσ hL hLM,
+          sigmaPart_eq_one_of_not_conj hG hN hx'σ hL hLN, mul_one]) hne
+  · rintro (rfl | ⟨rfl, hne⟩)
+    · refine ⟨⟨M, hM, ?_⟩, hx1⟩
+      rw [hpart M, sigmaPart_eq_self_of_conj hxσ ⟨1, by rw [map_one, one_smul]⟩,
+        sigmaPart_eq_one_of_not_conj hG hN hx'σ hM hNM, mul_one]
+    · refine ⟨⟨N, hN, ?_⟩, hne⟩
+      rw [hpart N, sigmaPart_eq_one_of_not_conj hG hM hxσ hN hMN,
+        sigmaPart_eq_self_of_conj hx'σ ⟨1, by rw [map_one, one_smul]⟩, one_mul]
+
 /-- **BG `Msigma_ell1`** (Coq BGsection14): a nonidentity element of `M_σ` has σ-length `1`.  As a
 `σ(M)`-element, its σ-decomposition collapses to the single block `{x}`: every `σ(L)`-part is `x`
 or `1` (`sigmaPart_eq_self_or_one_of_isPiElement_sigma`), and `sigmaPart M x = x ≠ 1`.  This is the
