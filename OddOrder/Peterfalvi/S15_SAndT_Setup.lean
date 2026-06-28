@@ -505,6 +505,49 @@ theorem caseB_quadratic_nonneg {Pm1 u : ℕ} (hu : 2 * u ≤ Pm1) (b : ℤ) :
   nlinarith [mul_nonneg (by linarith : (0 : ℤ) ≤ (Pm1 : ℤ) - 2 * u) (sq_nonneg b),
     mul_nonneg (by positivity : (0 : ℤ) ≤ 2 * (u : ℤ)) hb]
 
+/-- **Arithmetic core of Peterfalvi (13.7)**: the norm lower bound `∑_{x∈H#}|η₁₀(x)|² ≥ |H#|`.
+
+In (13.7), for `α = η₁₀` on `H#` with `α(1) = d` and squared norm `‖α‖² = n`, one has:
+* the Parseval relation `s + d² = |H|·n` where `s = ∑_{H#}|α|²` (from `∑_{x∈H}|α|² = |H|‖α‖²`);
+* the inflation bound `(|P|−1)·d² ≤ s` (Peterfalvi (13.5.c));
+* `n ≥ 1` (`α` a nonzero virtual character), `|P| ≥ 2`, and — `H` being abelian — `n = 1 ⟹ d² = 1`.
+
+Then `s ≥ |H| − 1 = |H#|`.  Carrier-free arithmetic core (`H, P, d, n, s` abstract naturals; the
+character-theoretic inputs are supplied by the cascade).  Proof: `n = 1` gives `s = |H| − 1`
+directly; for `n ≥ 2`, multiplying through by `|P|` reduces to `|P|(|H|−1) ≤ |H|n(|P|−1)`
+(true since `n, |P| ≥ 2`) together with `|P|·d² ≤ |H|n` (from the inflation bound). -/
+theorem caseB_eta_norm_core {H P d n s : ℕ}
+    (hP : 2 ≤ P) (hn : 1 ≤ n) (hParseval : s + d ^ 2 = H * n)
+    (hInflation : (P - 1) * d ^ 2 ≤ s) (habelian : n = 1 → d ^ 2 = 1) :
+    H - 1 ≤ s := by
+  by_cases hn2 : 2 ≤ n
+  · -- `n ≥ 2`
+    have hPos : 1 ≤ P := by omega
+    have hcast_infl : ((P : ℤ) - 1) * (d : ℤ) ^ 2 ≤ (s : ℤ) := by
+      have h : ((P - 1 : ℕ) : ℤ) * (d : ℤ) ^ 2 ≤ (s : ℤ) := by exact_mod_cast hInflation
+      rwa [Nat.cast_sub hPos, Nat.cast_one] at h
+    have hPar : (s : ℤ) + (d : ℤ) ^ 2 = (H : ℤ) * n := by exact_mod_cast hParseval
+    have hH : (0 : ℤ) ≤ (H : ℤ) := by positivity
+    have hn2' : (2 : ℤ) ≤ (n : ℤ) := by exact_mod_cast hn2
+    have hP2' : (2 : ℤ) ≤ (P : ℤ) := by exact_mod_cast hP
+    have hPd2 : (P : ℤ) * (d : ℤ) ^ 2 ≤ (H : ℤ) * n := by nlinarith [hcast_infl, hPar]
+    have hkey : (P : ℤ) * ((H : ℤ) - 1) ≤ (H : ℤ) * n * ((P : ℤ) - 1) := by
+      nlinarith [mul_nonneg (mul_nonneg hH (by linarith : (0:ℤ) ≤ (n:ℤ) - 2))
+          (by linarith : (0:ℤ) ≤ (P:ℤ) - 1),
+        mul_nonneg hH (by linarith : (0:ℤ) ≤ (P:ℤ) - 2), hP2']
+    have hs_eq : (s : ℤ) = (H : ℤ) * n - (d : ℤ) ^ 2 := by linarith [hPar]
+    have hPpos : (0 : ℤ) < (P : ℤ) := by linarith
+    have hmul : (P : ℤ) * ((H : ℤ) - 1) ≤ (P : ℤ) * (s : ℤ) := by
+      rw [hs_eq]; nlinarith [hkey, hPd2]
+    have hfin : (H : ℤ) - 1 ≤ (s : ℤ) := le_of_mul_le_mul_left hmul hPpos
+    omega
+  · -- `n = 1`
+    have hn_eq : n = 1 := by omega
+    subst hn_eq
+    rw [mul_one] at hParseval
+    have hd : d ^ 2 = 1 := habelian rfl
+    omega
+
 /-- Carrier for Peterfalvi (13.5), the TI-subset orthogonality calculation. -/
 structure TISubsetOrthogonalityData (hyp : Hypothesis (G := G)) where
   S1 : Set (ClassFunction ↥hyp.S ℂ)
