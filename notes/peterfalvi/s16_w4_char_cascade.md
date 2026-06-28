@@ -198,3 +198,21 @@ bottom-out する §7 接続点を確立 (`S16_NonExistenceG.lean`, sorry-free, 
 
 de-opacify 後は `eta_generic_data`/`betaM_expansion_data` も同 `typeIHyp` carrier から S09 cite で連鎖。
 [[scaffold-sorry-free-not-done]] [[feedback-cite-sorried-lemmas-if-signature-correct]] [[feedback-no-avoiding-hard-parts]]
+
+### cont. (lane c=γ /loop): Hypothesis78 carrier 導入 + betaM_expansion_data honest 化 (commit 7c8af266)
+
+MHypothesis に M の §7 coherence (`h78 : S09.Hypothesis78`) + 整合 carrier
+(`betaM_eq`/`psi_tau1_eq`/`betaSigns`/`betaSigns_pm`/`betaGrid` = 13.1.d η-grid) を追加。
+**betaM_expansion_data (14.11.2) を honest 化**: `h78.beta_eq_constOne_sub_zetaImage_add_delta`
+(S09 (7.8.a), sorry-free) cite + carrier から genuine 構成。残 obligation =
+exists_MHypothesis の h78 supply (M coherence) + η-grid (13.1.d) に isolate。full build 3886 green、
+S16 実 sorry 11→10。instance plumbing は `open scoped S12.FiniteInduce in` (docstring の**前**) で
+`finiteG : Finite G` から Fintype/Invertible 供給 (FiniteInduce に finiteGFintype/natCardInvCG 在)。
+
+**⚠ normCascadeData (14.11.4) の追加課題発見 (原文 `04.16` 精読)**: 既知 3 課題 (ℚ/ℝ・norm-one・
+upper/lower) に加え、**family_inequality の support が toFamilyHypothesis71 と異なる**。原文は `ρ` を
+(M, A(M)) で取るが norm 評価の `G₀ = G − [Ã(M) ∪ (W#)^G ∪ (P#)^G ∪ (Q#)^G]` (thickened + W#/P#/Q# 除外);
+一方 `toFamilyHypothesis71.G0 = G − A(M)^τ`。(14.11.3) の `|ψ^τ₁|≥1` はこの狭い G₀ 上ゆえ、
+family_inequality 出力の `Σ_{G0}` から W#/P#/Q# 寄与を分離する counting が要る (S12 (10.8) の
+`sum_zeta_tau1_normSq_ge_card`+`dadeSupport_restrict_subset` に対応)。**normCascadeData は betaM より深い**。
+次は `S12.chiRhoNormSq_zeta_le_line83` (`S12:6047`) を type-I M 版に移植する形で着手するのが定石。

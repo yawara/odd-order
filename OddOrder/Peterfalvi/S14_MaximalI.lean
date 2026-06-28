@@ -268,32 +268,58 @@ theorem exists_signedFamily_of_constituents {L : Subgroup G}
     _hn φ hinj hdeg hyp.tau h_virtual h_vanish h_isom
   exact ⟨data, hdata⟩
 
-/-- Carrier for the decomposition of `chi in S` used in Peterfalvi (12.2). -/
+/-- **Peterfalvi (12.2)**, genuine carrier: the constituent decomposition of `χ ∈ S`.
+`S(χ) = constituents` is the (finite, nonempty) set of irreducible constituents of `χ`, all of
+equal degree ((12.2.a)), each non-real (so `φ ≠ φ̄`) and supported in `A(L) ∪ {1}` (so the
+differences `φ − φ̄` lie in the Dade domain `A(L)`, feeding (12.2.b)
+`exists_signedFamily_of_constituents`). -/
 structure CharacterDecompositionData {L : Subgroup G} (hyp : Hypothesis L)
     (chi : ClassFunction ↥L ℂ) where
   chi_mem : chi ∈ hyp.Sset
-  components : Set (ClassFunction ↥L ℂ)
-  components_nonempty : components.Nonempty
-  R1 : ClassFunction ↥L ℂ → Set (ClassFunction G ℂ)
-  equal_degree : Prop
-  equal_degree_holds : equal_degree
-  tau_restriction_domain : Prop
-  tau_restriction_domain_holds : tau_restriction_domain
-  difference_image_formula : Prop
-  difference_image_formula_holds : difference_image_formula
-  R_eq_union : Prop
-  R_eq_union_holds : R_eq_union
+  /-- `S(χ)`: the irreducible constituents of `χ`. -/
+  constituents : Finset (IrreducibleCharacter ↥L)
+  constituents_nonempty : constituents.Nonempty
+  /-- (12.2.a): `χ` is the multiplicity-one sum of its constituents. -/
+  decomp : chi = ∑ φ ∈ constituents, (φ : ClassFunction ↥L ℂ)
+  /-- (12.2.a): the constituents share a common degree. -/
+  equal_degree : ∀ φ ∈ constituents, ∀ φ' ∈ constituents,
+    ((φ : ClassFunction ↥L ℂ) : ↥L → ℂ) 1 = ((φ' : ClassFunction ↥L ℂ) : ↥L → ℂ) 1
+  /-- Each constituent is non-real, so `φ ≠ φ̄` and `φ − φ̄ ≠ 0` ((12.2.b)). -/
+  not_real : ∀ φ ∈ constituents, ¬ ClassFunction.IsReal (φ : ClassFunction ↥L ℂ)
+  /-- (12.2.a): each constituent is supported in `A(L) ∪ {1}` (`H ⊄ Ker φ` (1.5.a), then (1.2)),
+  so each difference `φ − φ̄` is supported in the Dade domain `A(L)`. -/
+  supported : ∀ φ ∈ constituents, (φ : ClassFunction ↥L ℂ).support ⊆
+    OddOrder.Peterfalvi.S04.supportInSubgroup hyp.ambientA L ∪ {1}
 
-/-- **Peterfalvi (12.2)**: each `chi in S` decomposes into irreducible components
-of equal degree, and the restricted Dade map has the stated two-element image
-blocks. -/
+/-- **Type-`F` induced-character constituent structure** (Peterfalvi (8.2.c) + (1.2)/(1.5.a) +
+(1.7.c) + Clifford; a faithful §8 obligation — the deep content is type-`F` character theory living
+in §8, not §12).  For a type-I maximal `L` and `χ = Ind_H^L θ ∈ S` (`θ ∈ Irr H ∖ {1}`), `χ` is the
+multiplicity-one sum of a nonempty finite set of equal-degree, non-real irreducible constituents,
+each supported in `A(L) ∪ {1}`.  Body = §8 type-`F` Clifford theory: (8.2.c) `I(θ) ∩ U ⊆ U₁` +
+induced-degree (1.7.c) for the equal degree, `(Res_H φ, 1_H) = 0` (1.5.a) + (1.2) for the support. -/
+theorem typeI_induced_char_constituents [Finite G] {L : Subgroup G} (hyp : Hypothesis L)
+    {chi : ClassFunction ↥L ℂ} (hchi : chi ∈ hyp.Sset) :
+    ∃ S : Finset (IrreducibleCharacter ↥L), S.Nonempty ∧
+      chi = ∑ φ ∈ S, (φ : ClassFunction ↥L ℂ) ∧
+      (∀ φ ∈ S, ∀ φ' ∈ S, ((φ : ClassFunction ↥L ℂ) : ↥L → ℂ) 1
+        = ((φ' : ClassFunction ↥L ℂ) : ↥L → ℂ) 1) ∧
+      (∀ φ ∈ S, ¬ ClassFunction.IsReal (φ : ClassFunction ↥L ℂ)) ∧
+      (∀ φ ∈ S, (φ : ClassFunction ↥L ℂ).support ⊆
+        OddOrder.Peterfalvi.S04.supportInSubgroup hyp.ambientA L ∪ {1}) := by
+  sorry
+
+/-- **Peterfalvi (12.2.a)**: each `χ ∈ S` decomposes (multiplicity one) into irreducible
+constituents of equal degree, each non-real and supported in `A(L) ∪ {1}`.  The §12 assembly:
+unpack the type-`F` constituent structure (`typeI_induced_char_constituents`) into the genuine
+`CharacterDecompositionData` carrier — whose R(χ) blocks of (12.2.b) then come from
+`exists_signedFamily_of_constituents`.  The deep type-`F` Clifford content ((8.2.c) inertia +
+(1.7.c)/(1.5.a)/(1.2)) is isolated in the obligation, keeping this assembly `sorry`-free. -/
 theorem character_decomposition_and_dade_domain [Finite G]
     (_hG : OddOrder.BG.IsMinimalSimpleOdd G) {L : Subgroup G} (hyp : Hypothesis L)
     {chi : ClassFunction ↥L ℂ} (hchi : chi ∈ hyp.Sset) :
-    ∃ data : CharacterDecompositionData hyp chi,
-      data.chi_mem = hchi ∧ data.tau_restriction_domain ∧
-        data.difference_image_formula ∧ data.R_eq_union := by
-  sorry
+    ∃ data : CharacterDecompositionData hyp chi, data.chi_mem = hchi := by
+  obtain ⟨S, hne, hdecomp, hdeg, hreal, hsupp⟩ := typeI_induced_char_constituents hyp hchi
+  exact ⟨⟨hchi, S, hne, hdecomp, hdeg, hreal, hsupp⟩, rfl⟩
 
 /-! ## (12.3)--(12.5): orthogonality and rho-constancy -/
 
