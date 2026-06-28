@@ -401,3 +401,36 @@ char/§8-gated で手詰まり」評価は**誤り**(= 新方針が根絶する�
   要 (signed→orthonormal 変換 helper を S14 に要実装)。
 - (12.3) = (8.18.c) Ã disjoint + (5.9) + Supp disjoint + 共役論法。§8 cross fact は β 範囲外 (pin)。
 - その後 (12.6) sibleyTarget / (12.10)-(12.15) / (12.16) 最終矛盾 (+(1.10) congruence)。
+
+## 2026-06-29 (lane-b=β loop²): R₁(φ) orthonormal 化 + (12.3) genuine 証明完了
+
+**(12.2.b) 壁解消 — R₁(φ) を genuine OrthonormalCharacterImageFamily 化** (commit 278384dc):
+- 「signed→orthonormal 変換が次の壁」評価は**回避不要**だった。`S07.dadeOrthonormalCharacterImageFamilyOfDiff`
+  (S07:5497、差 φ̄−φ のみ supported を要求、constituent は φ(1)≠0 で個別 unsupported ゆえ正にこれ)が
+  τ=hyp.tau に直接 orthonormal family を構成。教科書定義「R₁(φ)=ℤ[Irr G] の濃度 2 orthonormal 部分集合」に
+  忠実。signed-family scaffold (exists_signedFamily_of_constituents / conjConstituent+補題 / signedFamily*)
+  は subsume されたため除去。`R1` (orthonormal) + `R1_diffsupp` (φ̄−φ⊆A(L)) + `Rset`=⋃R₁(φ).imageSet。
+- instance: return type に `haveI := hyp.finiteG; OrthonormalCharacterImageFamily hyp.tau φ` + body も
+  同 haveI + S12.FiniteInduce scope ⟹ hyp.tau の instance と完全一致 (binder [Fintype G] は使わない)。
+
+**(12.3) genuine 証明完了** (commit eb5eda20、S07+S14):
+- **S07 cross-domain (4.1) インフラ** (再利用可能、sorry-free):
+  - `inner_eq_zero_of_signedDifference_inner_zero_of_mem`: 既存 `orthogonal_of_signedDifference_inner_eq_zero`
+    を**異なる定義域 L,L' (τ,τ')** に一般化 (証明は元々 τ 非依存)。同域版は委譲 wrapper。
+  - `dadeCharacterDifferenceImageOfDiff`: `dadeOrthonormalCharacterImageFamilyOfDiff` から CDI producer を
+    factor out (orthonormal 版は `.toOrthonormalImage` wrapper)。R₁(φ) の underlying {μ,ν,ε} 露出。
+  - `toOrthonormalImage_inner_eq_zero_across`: 上記を符号付き member {ε·μ,−ε·ν} に持ち上げ (Rset の形)。
+- **S14**: `R1cdi` (R₁(φ) の CDI 露出)、`R1 := (R1cdi …).toOrthonormalImage`。`nonconjugate_typeI_R_orthogonal`
+  (12.3) を genuine 証明: member→R₁(φ)→cross-L (4.1)→⟨α,β⟩=0 を signed diff 直交に帰着
+  (`image_eq_signedDifference`)。幾何学入力 = `nonconjugate_diffImage_inner_zero` (S14:338) に faithful pin
+  = (8.18.c) thickened support 不交差 (S10.support_mutual_exclusion、§10=lane-d/f territory)。
+
+**残 frontier = (12.4)/(12.5) 証明本体** (次の上流項目、engine は ready):
+- `R1` が今や engine `CharacterPsiDecomposition.ofProjection` (S07:1185) の `imageFamily` 引数に直接適合
+  (= OrthonormalCharacterImageFamily)。signed→orthonormal の壁は無い。
+- (12.4) `orthogonal_character_constant_on_coset` (S14:382): χ=Ind_H^L θ, φ₁,φ₂∈S(χ) で Supp(φ₁−φ₂)⊆
+  A(L)−H#、(8.12.c) で TI⟹(φ₁−φ₂)^τ=Ind (Is 7.7)、(1.4) coherence⟹(φ₁−φ₂)^τ∈ℤ[R(χ)]⟹(Res_H ψ,φ₁−φ₂)=0
+  (ψ⊥R(χ))。Res_L ψ=β+γ (β∈ℂ[S], γ は H⊆Ker)、S は L−H で消える⟹ψ(xh)=γ(x)。
+  pin 候補: [Is] 6.2 (Res_H Ind=共役和)、[Is] 7.7 (TI 上で τ=Ind)、(8.12.c) (A(L)−H# TI)。
+- (12.5) `rho_constant_on_H_minus_Hprime` (S14:395): θ₁,θ₂∈Irr H 同次数、χᵢ=Ind θᵢ、(5.7) coherence、
+  (5.5) で (χ₁−χ₂)^τ∈ℤ[R(χ₁)∪R(χ₂)]⟹(Res_H ψ^ρ,θ₁−θ₂)=0。(1.7.b)+Ind_{H'}^H λ が H−H' で消える。
