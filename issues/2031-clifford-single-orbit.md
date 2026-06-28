@@ -217,6 +217,21 @@ S11-specific plumbing (4 obligation、いずれも realization 機械作業):
 **∴ 数学的 hard part は完了** (e=1 Clifford 論法)。残は abstract 補題への carrier wiring (realization、
 issue が当初 "~150-200行 multi-session" と見積もった部分)。次セッションは obligation 1-4 を順に。
 
+### ✅ 2026-06-28 cont.: assembly skeleton COMMITTED + machine-validated (commit `c3061966`)
+
+`caseB_degree_qu` (S11、`caseB_character_counts` 直前) = (9.9.a) 第1連言 `∀ φ∈𝒮(H₀C'), φ(1)=qu`
+の完全な assembly を **build-green で committed**。skeleton が compile する = **wiring が構造的に健全**
+であることの機械検証 (instance 解決 [Fintype/Invertible/Fintype-Irr for HU/H/HC]、crux
+`inertia_eq_hcInHu` への `caseB.actsIrreducibly` 供給 [defeq]、`IrreducibleCharacter.inertia` ↔
+`ClassFunction.inertia` bridge、`induceHU_apply_one_eq_q_mul` で φ(1)=q·χ(1) 還元、`apply_one_eq_index_of_liesOver_linear_inertia`
+適用、最終 `χ(1)=hcInHu.index → =u` — 全て typecheck)。**残 = body 内の 3 `sorry`** (上の obligation
+1/3/4、obligation 2=θ₀(1)=1 は 1 に同梱):
+- S11 import に `CliffordSingleOrbit` 追加済。
+- `exists_liesOver` で ψ 取得は wired (sorry は ψ(1)=1 のみ)。
+- 次セッション = この 3 `sorry` を埋める (kernel-inheritance 汎用補題が obligation 1+3 で共有、
+  未実装ゆえ要新規; obligation 4 = realized 指数 [HU:HC]=[U:C]=u)。埋まれば `caseB_character_counts`
+  第1連言を `caseB_degree_qu` に wire (`refine ⟨caseB_degree_qu …, ?_, ?_, ?_⟩`)。
+
 ## 完了条件
 
 `RestrictionConstituentsSingleOrbit` が irreducible χ に対し定理化 (hypothesis 除去) され、(9.9.a)
