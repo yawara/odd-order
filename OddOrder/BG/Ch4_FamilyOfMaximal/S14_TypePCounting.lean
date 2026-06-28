@@ -1275,6 +1275,17 @@ theorem piPart_mem_zpowers [Finite G] (π : Set ℕ) (g : G) :
     piPart π g ∈ Subgroup.zpowers g := by
   obtain ⟨_, _, _, _, _, hz, _⟩ := piPart_spec π g; exact hz
 
+/-- A prime of `π` dividing `orderOf g` also divides `orderOf (piPart π g)` (it cannot land in the
+`π′`-part `b`, whose order is coprime to `π`). -/
+theorem prime_dvd_orderOf_piPart [Finite G] {π : Set ℕ} {p : ℕ} (hp : p.Prime) (hpπ : p ∈ π)
+    {g : G} (hpg : p ∣ orderOf g) : p ∣ orderOf (piPart π g) := by
+  obtain ⟨b, hmul, hcomm, _, hpiB, _, _⟩ := piPart_spec π g
+  have hdvd : orderOf g ∣ orderOf (piPart π g) * orderOf b := by
+    have h := hcomm.orderOf_mul_dvd_mul_orderOf; rwa [hmul] at h
+  rcases hp.dvd_mul.mp (hpg.trans hdvd) with h | h
+  · exact h
+  · exact absurd hpπ (hpiB p (Nat.mem_primeFactors.mpr ⟨hp, h, (orderOf_pos b).ne'⟩))
+
 /-- The `σ(M)`-part of an element `x` (Coq `x.`_{σ(M)}`): its `σ(M)`-component in the two-block
 π-part decomposition. -/
 noncomputable def sigmaPart [Finite G] (M : Subgroup G) (x : G) : G :=
@@ -4272,12 +4283,10 @@ non-solvable, hence non-cyclic), so by Corollary 12.16(a)
 (`sigma_subgroup_conj_into_Msigma_general`) it is `G`-conjugate into `M_σ`; thus a conjugate of `M`
 is a `σ`-maximal of `x`, giving `𝓜_σ(x) ≠ ∅`.  This is the existence half of the σ-decomposition
 that drives Lemma 14.6 (extracting a `σ`-length-one factor of an element). -/
-theorem length_one_of_isPiElement_sigma [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
-    (D : SigmaDecompositionData G) {M : Subgroup G} (hM : M ∈ maximalSubgroups G) {x : G}
+theorem exists_mem_Msigma_of_isPiElement_sigma [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} (hM : M ∈ maximalSubgroups G) {x : G}
     (hx : x ≠ 1) (hxpi : OddOrder.GroupTheory.IsPiElement (OddOrder.BG.Ch3.S10.sigma M) x) :
-    D.length x = 1 := by
-  rw [D.length_one_iff]
-  refine ⟨hx, ?_⟩
+    (maximalSigmaSubgroupsOfElement x).Nonempty := by
   have hclosne : Subgroup.closure ({x} : Set G) ≠ ⊥ := fun h =>
     hx (Subgroup.mem_bot.mp (h ▸ Subgroup.subset_closure (Set.mem_singleton x)))
   have hlt : Subgroup.closure ({x} : Set G) < ⊤ := by
@@ -4299,6 +4308,61 @@ theorem length_one_of_isPiElement_sigma [Finite G] (hG : OddOrder.BG.IsMinimalSi
   rw [he]
   exact hg (Subgroup.smul_mem_pointwise_smul x (MulAut.conj g) _
     (Subgroup.subset_closure (Set.mem_singleton x)))
+
+/-- The scaffold form: a nonidentity `σ(M)`-element `x` has `D.length x = 1` (it cites the genuine
+existence half `exists_mem_Msigma_of_isPiElement_sigma` through `D.length_one_iff`). -/
+theorem length_one_of_isPiElement_sigma [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (D : SigmaDecompositionData G) {M : Subgroup G} (hM : M ∈ maximalSubgroups G) {x : G}
+    (hx : x ≠ 1) (hxpi : OddOrder.GroupTheory.IsPiElement (OddOrder.BG.Ch3.S10.sigma M) x) :
+    D.length x = 1 :=
+  (D.length_one_iff x).mpr ⟨hx, exists_mem_Msigma_of_isPiElement_sigma hG hM hx hxpi⟩
+
+/-- **BG `ell_sigma1P`** (Coq BGsection14:272): `sigmaLength x = 1 ↔ x ≠ 1 ∧ 𝓜_σ(x) ≠ ∅`.  This is
+*exactly* the characterization the `SigmaDecompositionData` scaffold posits as `length_one_iff`,
+here **proved** for the genuine `sigmaLength`.  ⟸ is `Msigma_ell1`.  ⟹: a σ-length-`1` element has
+all its primes in one `σ(M₀)` (each prime `p ∣ |x|` lands in some `σ(L)`, forcing the nonidentity
+`sigmaPart L x` to equal the unique block `y = sigmaPart M₀ x`, so `p ∈ π(y) ⊆ σ(M₀)`), hence is a
+`σ(M₀)`-element, and the existence half `exists_mem_Msigma_of_isPiElement_sigma` finishes. -/
+theorem sigmaLength_eq_one_iff [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G) (x : G) :
+    sigmaLength x = 1 ↔ x ≠ 1 ∧ (maximalSigmaSubgroupsOfElement x).Nonempty := by
+  constructor
+  · intro hlen
+    have hx1 : x ≠ 1 := by
+      intro h
+      rw [h, (sigmaLength_eq_zero_iff hG 1).mpr rfl] at hlen
+      exact zero_ne_one hlen
+    refine ⟨hx1, ?_⟩
+    obtain ⟨y, hy⟩ := Set.ncard_eq_one.mp hlen
+    have hyMem : y ∈ sigmaDecomposition x := by rw [hy]; rfl
+    obtain ⟨⟨M₀, hM₀, hy_eq⟩, hyne⟩ := hyMem
+    have hxσ : OddOrder.GroupTheory.IsPiElement (OddOrder.BG.Ch3.S10.sigma M₀) x := by
+      intro p hp
+      haveI : Fact p.Prime := ⟨Nat.prime_of_mem_primeFactors hp⟩
+      obtain ⟨L, hL, hpL⟩ := exists_mem_sigma_of_prime_dvd_card hG
+        ((Nat.dvd_of_mem_primeFactors hp).trans (orderOf_dvd_natCard x))
+      have hLne : sigmaPart L x ≠ 1 := fun hc =>
+        isPiElement_compl_of_piPart_eq_one hc p hp hpL
+      have hLmem : sigmaPart L x ∈ sigmaDecomposition x :=
+        ⟨⟨L, hL, rfl⟩, by simp only [Set.mem_singleton_iff]; exact hLne⟩
+      rw [hy, Set.mem_singleton_iff] at hLmem
+      have hpy : p ∣ orderOf (sigmaPart M₀ x) := by
+        rw [← hy_eq, ← hLmem]
+        exact prime_dvd_orderOf_piPart (Nat.prime_of_mem_primeFactors hp) hpL
+          (Nat.dvd_of_mem_primeFactors hp)
+      exact isPiElement_piPart (OddOrder.BG.Ch3.S10.sigma M₀) x p
+        (Nat.mem_primeFactors.mpr ⟨Nat.prime_of_mem_primeFactors hp, hpy, (orderOf_pos _).ne'⟩)
+    exact exists_mem_Msigma_of_isPiElement_sigma hG hM₀ hx1 hxσ
+  · rintro ⟨hx1, M, hM, hxM⟩
+    exact Msigma_ell1 hG hM hxM hx1
+
+/-- The **genuine** `SigmaDecompositionData`: `length := sigmaLength` (the honestly constructed
+σ-length) with `length_one_iff` discharged by `sigmaLength_eq_one_iff` (Coq `ell_sigma1P`).  This
+*realizes* the carrier the scaffold only posited — downstream consumers can be fed this in place of
+`dummySigmaDecomposition` ([[scaffold-sorry-free-not-done]]: the posited interface is constructible). -/
+noncomputable def genuineSigmaDecomposition [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) : SigmaDecompositionData G where
+  length := sigmaLength
+  length_one_iff := sigmaLength_eq_one_iff hG
 
 /-- **σ-decomposition: extracting a `σ`-length-one factor** (BG §1, mmd L3793): every `g ≠ 1`
 factors as `g = x · x'` with `x` a `σ`-length-one element (the `σ(M)`-part for a maximal `M` whose

@@ -6702,3 +6702,14 @@ and the σ-decomposition collapses to `{x}`, giving `sigmaLength x = 1`.  All ax
 #assert_only_allowed_axioms OddOrder.BG.Ch4.S14.sigmaPart_eq_self_or_one_of_isPiElement_sigma
 #assert_only_allowed_axioms OddOrder.BG.Ch4.S14.sigmaDecomposition_subset
 #assert_only_allowed_axioms OddOrder.BG.Ch4.S14.Msigma_ell1
+
+/-! **`ell_sigma1P` and the genuine `SigmaDecompositionData`** (`S14_TypePCounting`, Coq
+`ell_sigma1P`; lane δ signalizer-functor port Chunk 1 capstone, issue 8020).  `sigmaLength_eq_one_iff`
+proves the scaffold's *posited* `length_one_iff` (`ℓ_σ(x) = 1 ↔ x ≠ 1 ∧ 𝓜_σ(x) ≠ ∅`) for the genuine
+`sigmaLength`, so `genuineSigmaDecomposition` **realizes** the `SigmaDecompositionData` carrier the
+scaffold only posited (consumers can drop `dummySigmaDecomposition` for it).  All axiom-clean. -/
+
+#assert_only_allowed_axioms OddOrder.BG.Ch4.S14.prime_dvd_orderOf_piPart
+#assert_only_allowed_axioms OddOrder.BG.Ch4.S14.exists_mem_Msigma_of_isPiElement_sigma
+#assert_only_allowed_axioms OddOrder.BG.Ch4.S14.sigmaLength_eq_one_iff
+#assert_only_allowed_axioms OddOrder.BG.Ch4.S14.genuineSigmaDecomposition
