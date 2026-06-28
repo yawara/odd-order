@@ -317,3 +317,30 @@ The book proof of (12.12): let `P = O_p(H)`, `T = Ω₁(Z(P))` (elem-ab of order
 - §9 Wielandt chain (9.1/9.3/9.4/9.6) — **DONE** (group theory, ungated).
 - §12 (S14) type-I-Frobenius — upstream frontier, **§8-gated** as above.
 - §13 (S15) `|P|=p^q` (`basic_structure.P_order`) — gated on (10.11)/(11.7) (lane-b).
+
+## 2026-06-28 (lane-b = β 立ち上げ, 新方針 signature contract): §12 char tower の埋め方確定
+
+Owner = **lane-b (β)** (2026-06-28 relane、worktree `odd-order-b`)。過去の「§12 残 sorry は全部
+char/§8-gated で手詰まり」評価は**誤り**(= 新方針が根絶する待ち文化)。R(χ) machinery は §6/§8
+(certain-type coherence, Round B)に在庫し、§12 (型 I)はその**型 I 再利用**。正面から埋める。
+
+**確定した埋め方**(原文 04.14 精読 + machinery 調査):
+- **R(χ) = `S07.OrthonormalCharacterImageFamily hyp.tau φ`**(各 constituent φ)。構成は
+  **`S07.dadeOrthonormalCharacterImageFamily`**(S07:5412)を直接 cite。3条件(virtual/
+  vanish-at-1/isometry)は `dadeIntegralCharacterMap_mem_ZIrr_of_supported`(S07:5360)/
+  `_apply_one_eq_zero`(5381)/`_inner_eq_on_supported_span`(5303)で揃う(全 sorry-free)。
+  正準型: `imageSet : Finset (CF G)` + `orthonormal` + `image_eq: τ(φ−φ̄)=Σα`。
+  (12.3) = `OrthonormalCharacterImageFamily.Orthogonal`(= 5.2.e、S07:807)。
+- **(12.2.a) S(χ) decomp**(χ=Ind_H^L θ の constituents, degree 一定): Clifford
+  (`inner_induce_ne_zero_iff_liesOver` Clifford:583 + `restrictionMultiplicity_natCast`)+
+  **(8.2.c)**(`I(θ)∩U⊆U₁` inertia, 04.10 (8.2.c))。(8.2.c) は repo 不在 → S14 内 faithful pin。
+- **(12.4)/(12.5) ψ⊥R(χ)⟹constant** = `CharacterPsiDecomposition`(InducedCharacter:751)engine
+  の型 I 適用。現 (12.4)/(12.5) の free 変数 `R` を (12.2) の genuine R(χ) に bind し直す(現状
+  R 抽象ゆえ honest 証明不能)。
+- **(12.16) 最終矛盾**: (1.10.a)/(1.10.b) p-進 congruence が **repo 不在** = §12 で新規に要る唯一の
+  純 char piece。(7.3)/(7.8) norm bounds は S09 在庫(`chiRho_norm_sq_le` 等)。
+
+**現状 (12.2)-(12.5) scaffold は下流 consumer 0**(S14 内のみ)⟹ faithful 化は安全。
+**実装順(上流順)**: (12.2) faithful 化 → (12.3)-(12.5) → (12.13)-(12.15)+(1.10) → (12.16) →
+`pi_empty`/`typeI_frobenius`/headline unblock。正本 issue = 0081。
+[[scaffold-sorry-free-not-done]] [[feedback-cite-sorried-lemmas-if-signature-correct]]

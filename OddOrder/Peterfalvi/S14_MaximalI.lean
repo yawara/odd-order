@@ -204,6 +204,70 @@ theorem Sset_closedUnderConjugate [Finite G] {L : Subgroup G} (hyp : Hypothesis 
 
 /-! ## (12.2): character decomposition and Dade domain -/
 
+open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
+/-- **Peterfalvi (12.2.b)**: the (1.4) orthonormal difference-pair structure applied to the Dade
+isometry `τ = hyp.tau`.  For a degree-equal injective family of constituents `φ : Fin n → Irr L`
+(`n ≥ 2`, e.g. an enumeration of `S(χ) ∪ S(χ̄)`), each supported in `A(L) ∪ {1}`, the differences
+`φ_i − φ_0` are supported in the Dade domain `A(L)` (the common degree cancels at `1`).  Hence the
+Dade isometry sends them to a signed irreducible-difference family of `G` (Peterfalvi (1.4) via
+`isometry_difference_pair_structure`): there are irreducibles `μ_i` of `G` and a sign `ε` with
+`(φ_i − φ_0)^τ = ε(μ_i − μ_0)`.  The three (1.4) hypotheses are discharged by the Dade package on
+the supported differences (`dadeIntegralCharacterMap_mem_ZIrr_of_supported`, `_apply_one_eq_zero`,
+`_inner_eq_on_supported_span`). -/
+theorem exists_signedFamily_of_constituents {L : Subgroup G}
+    (hyp : Hypothesis L) {n : ℕ} [NeZero n] (_hn : 2 ≤ n)
+    (φ : Fin n → IrreducibleCharacter ↥L) (hinj : Function.Injective φ)
+    (hdeg : ∀ i, ((φ i : ClassFunction ↥L ℂ) : ↥L → ℂ) 1
+      = ((φ 0 : ClassFunction ↥L ℂ) : ↥L → ℂ) 1)
+    (hsupp : ∀ i, (φ i : ClassFunction ↥L ℂ).support ⊆
+      OddOrder.Peterfalvi.S04.supportInSubgroup hyp.ambientA L ∪ {1}) :
+    ∃ data : OddOrder.RepresentationTheory.SignedIrreducibleDifferenceFamily G n,
+      ∀ i, hyp.tau ((φ i : ClassFunction ↥L ℂ) - (φ 0 : ClassFunction ↥L ℂ))
+        = data.signedDifference i := by
+  haveI := hyp.finiteG
+  classical
+  -- The differences `φ_i − φ_0` are supported in `A(L)` (degree cancels at `1`).
+  have hdiff_supp : ∀ i,
+      (OddOrder.RepresentationTheory.irreducibleCharacterDifference φ i).support
+      ⊆ OddOrder.Peterfalvi.S04.supportInSubgroup hyp.ambientA L := by
+    intro i x hx
+    have hx0 : ((φ i : ClassFunction ↥L ℂ) - (φ 0 : ClassFunction ↥L ℂ)) x ≠ 0 := hx
+    have hxU : x ∈ (φ i : ClassFunction ↥L ℂ).support ∪ (φ 0 : ClassFunction ↥L ℂ).support :=
+      ClassFunction.support_sub_subset _ _ hx
+    have hxA : x ∈ OddOrder.Peterfalvi.S04.supportInSubgroup hyp.ambientA L ∪ {1} := by
+      rcases hxU with h | h
+      · exact hsupp i h
+      · exact hsupp 0 h
+    rcases hxA with h | h
+    · exact h
+    · exfalso
+      rw [Set.mem_singleton_iff] at h
+      subst h
+      exact hx0 (by simp only [ClassFunction.sub_apply]; rw [hdeg i]; ring)
+  -- The three (1.4) hypotheses, from the Dade package on the supported differences.
+  have h_virtual :
+      OddOrder.RepresentationTheory.IsometryDifferenceImagesAreVirtual hyp.tau φ := fun i =>
+    OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap_mem_ZIrr_of_supported
+      hyp.dadeData.dade hyp.hconj (hdiff_supp i)
+      (Submodule.sub_mem _ (φ i).mem_ZIrr (φ 0).mem_ZIrr)
+  have h_vanish :
+      OddOrder.RepresentationTheory.IsometryDifferenceImagesVanishAtOne hyp.tau φ := fun i =>
+    OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap_apply_one_eq_zero
+      hyp.dadeData.dade hyp.hconj (hdiff_supp i)
+  have h_isom : ∀ i j,
+      ClassFunction.inner (OddOrder.RepresentationTheory.isometryDifferenceImage hyp.tau φ i)
+        (OddOrder.RepresentationTheory.isometryDifferenceImage hyp.tau φ j) =
+      ClassFunction.inner (OddOrder.RepresentationTheory.irreducibleCharacterDifference φ i)
+        (OddOrder.RepresentationTheory.irreducibleCharacterDifference φ j) := fun i j =>
+    OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap_inner_eq_on_supported_span
+      hyp.dadeData.dade hyp.hconj
+      (S := Set.range (OddOrder.RepresentationTheory.irreducibleCharacterDifference φ))
+      (by rintro s ⟨k, rfl⟩; exact hdiff_supp k)
+      (Submodule.subset_span ⟨i, rfl⟩) (Submodule.subset_span ⟨j, rfl⟩)
+  obtain ⟨data, hdata⟩ := OddOrder.RepresentationTheory.isometry_difference_pair_structure
+    _hn φ hinj hdeg hyp.tau h_virtual h_vanish h_isom
+  exact ⟨data, hdata⟩
+
 /-- Carrier for the decomposition of `chi in S` used in Peterfalvi (12.2). -/
 structure CharacterDecompositionData {L : Subgroup G} (hyp : Hypothesis L)
     (chi : ClassFunction ↥L ℂ) where
