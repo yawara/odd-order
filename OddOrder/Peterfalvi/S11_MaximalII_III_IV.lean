@@ -3540,6 +3540,12 @@ theorem commutator_cSub_H_le_H0 [Finite G] {M : Subgroup G} (data : TypesIIIIIIV
 
 end
 
+/-- `derivedInG H = ⁅H, H⁆` (general): the image of `commutator ↥H` under the inclusion is the
+commutator subgroup `⁅H,H⁆`. -/
+theorem derivedInG_eq_commutator (H : Subgroup G) : derivedInG H = ⁅H, H⁆ := by
+  rw [derivedInG, commutator_def, Subgroup.map_commutator]
+  simp only [← H.subtype.range_eq_map, Subgroup.range_subtype]
+
 /-- **(9.9.a) index step (C): `[U:C] = u`** realized form `(cInHu.subgroupOf uInHu).index = u`.
 First isomorphism `U/C ≃ Ū` (the `U`-action image on the chief factor), with `u = |Ū|`. -/
 theorem index_cInHu_subgroupOf_uInHu_eq_u [Finite G] {M : Subgroup G}
