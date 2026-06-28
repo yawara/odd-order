@@ -456,8 +456,31 @@ char/§8-gated で手詰まり」評価は**誤り**(= 新方針が根絶する�
 **(12.5) は ρ-blocked (要判断)**: repo statement `psi h=psi 1` は **unfaithful** (ρ 無 + =psi 1 が
 constant-on-H−H' でない)。book は「ψ^ρ が H−H' で constant」。ρ (Hypothesis 7.1, A=A(L)) は repo 未
 形式化 (S09 chiRho/FamilyHypothesis71 は family 特化、型 I A(L) 一般 ρ 不在)。faithful 化には §7 ρ
-machinery 構築 (大、§7 prerequisite) 要。**次イテレーション判断: pin(c')/(b)/(a) discharge を優先 vs
-ρ 構築 vs hub 相談**。
+machinery 構築 (大、§7 prerequisite) 要。
+
+## 2026-06-29 (lane-b=β loop⁵-¹⁰): pin (c') 完全 discharge — [Is]6.2 partition genuine
+
+**pin (c') `exists_offKernel_constituent_partition` 完全 discharge** (commits 99db2c93 → d7fe3fc7 →
+8bd87b1c → e817e3ee → 6bf6f93b)。{φ:H⊄ker}=⊔S(χ) を bottom-up で全 genuine 化:
+- `constituents_not_inHKernel` (⊇): constituent は off-kernel (Frobenius + decomp + characterKernel)。
+- `not_inHKernel_imp_mem_constituents` (⊆): off-kernel φ は capturing
+  (`exists_constituent_not_subset_characterKernel` [Is]6.5 + Frobenius)。
+- `not_inHKernel_iff` (両方向 ↔)。
+- `constituents_eq_of_mem` (disjointness): Clifford single-orbit
+  `restrictionConstituentsSingleOrbit_of_isIrreducible.exists_conj` + `induce_conjBy_eq` (Pf 1.5.a)。
+- pin 本体: parts=image(cap)、biUnion 等式 + PairwiseDisjoint の Finset 組立 (content lemma を pin
+  前に reorder)。
+
+**(12.4) は残 pin (a)(b) modulo で genuine closed**。pin (c) regroup + (c') partition 両方 genuine。
+
+**残 §12 char frontier (全て deeper cross-section/§7/§8 machinery)**:
+- pin (a) `constituent_diff_tau_mem_span` (S14:400): (φ₁−φ₂)^τ∈ℤ[R(χ)] ((1.4) global coherence +
+  per-φ R₁(φ) reconciliation)。
+- pin (b) `constituent_diff_tau_eq_induce` (S14:413): (φ₁−φ₂)^τ=Ind_L^G ([Is]7.7 τ=Ind on TI、Dade
+  machinery; S05 tau_eq_induce は TI-cyclic 用で型 I 不適用)。
+- (12.2.a) `typeI_induced_char_constituents` (S14:235): §8 型 F Clifford ((8.2.c) inertia + (1.7.c))。
+- (12.3) (8.18.c) `nonconjugate_diffImage_inner_zero` (S14:338): §10 support 不交差 (lane-d/f)。
+- (12.5) ρ-blocked (上記)。
 
 ## 2026-06-29 (lane-b=β loop³): Sset_vanishes_off_H + (12.4) 精密 reduction 設計
 
