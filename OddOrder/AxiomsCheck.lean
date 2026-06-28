@@ -5551,6 +5551,13 @@ unconditional, axiom-clean. -/
 #assert_only_allowed_axioms OddOrder.BG.Ch4.S16.exists_maximal_conjugacy_reps
 #assert_only_allowed_axioms OddOrder.BG.Ch4.S16.exists_reps_sigma_partition
 
+/-! **BG Theorem D(1), `M_σ`-fusion control** (`S16_MainResults`, `msigma_fusion_control`): two
+elements of `M_σ` conjugate in `G` are conjugate in `M`.  The one unconditional Theorem-D conjunct,
+from Corollary 15.3(b) (`mf_hall_centralizer_control`, axiom-clean) at the trivial Hall subgroup
+`H := M_σ` plus `N_G(M_σ) = M` (`normalizer_Msigma_eq_self`).  Axiom-clean. -/
+
+#assert_only_allowed_axioms OddOrder.BG.Ch4.S16.msigma_fusion_control
+
 /-! **BG Theorem B(1)** (`S16_MainResults`, `theoremB_U_sylow_abelian_rank_le_two`): every Sylow
 subgroup of `U` is abelian of rank ≤ 2.  Standalone, faithful (explicit `U ≤ M`; restricted to
 prime `p`) form of the first conjunct of `theoremB_U_and_A_tame`, derived cite-only over §12

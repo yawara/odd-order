@@ -127,3 +127,22 @@ tilde-disjoint [Theorem D R-data 依存] / G# covering 14.9) + Phase 4 (Pf-side 
 の `BGTheoremECoverData` 全 field 供給 + covering、reps 族は `exists_maximal_conjugacy_reps` の indexed
 版で供給可)。Phase 3 は §13-14 (Theorem D `theoremD_msigma_conjugacy_and_centralizers` S16:961 自体
 sorry) に gated ゆえ上流。次セッション = Phase 4 の reps→ι 変換 + 浅い field 供給、or Theorem D 着手。
+
+## ✅ 2026-06-28 進捗 (cont.) — Theorem D(1) M_σ-fusion control 実証明
+
+BG Theorem E の残 cardinality/covering は **Theorem D** (`theoremD_msigma_conjugacy_and_centralizers`
+S16:961、sorry) に gated。Theorem D には `_of_inputs` skeleton (S16:897) があり D(1) (fusion upgrade)
+は既に実証明、残 input = hfusionMσ (Cor 15.3b) / hD2 (Lem 12.17) / hD3 (RData 存在=signalizer 深い) /
+hD4 (deep tail)。
+
+**`msigma_fusion_control` (Theorem D(1)、S16、sorry-free + axiom-clean、AxiomsCheck 登録)**: 「M_σ の
+2 元が G で共役 ⟹ M で共役」を実証明。`mf_hall_centralizer_control` (Cor 15.3(b)、lane-c 完遂で
+sorry-free+axiom-clean) を **trivial Hall H:=M_σ** (M_σ は自身の piSet-Hall、`subgroupOf_self`+
+`IsHallSubgroup.top_iff`) に適用 → N_G(M_σ)-fusion、`normalizer_Msigma_eq_self` (N_G(M_σ)=M) で
+M-fusion に upgrade。Theorem D の唯一 unconditional な conjunct。
+
+**残 Theorem D = D(2) (Lem 12.17 cyclic M_σ∩M^g) + D(3)/D(4) (R(x) signalizer normal complement の
+存在 + sharply transitive action + 一意 N、deep signalizer functor theory)**。D(3)/D(4) が BG local
+analysis の最深部で multi-session。⟹ BG Theorem E の Phase 3 (cardinality 14.5c は Theorem D の R(x)
+counting に依存) は D(3)/D(4) 完成待ち。次セッション = D(2) (Lem 12.17 cyclic 化が可能か精査) or
+D(3) signalizer 着手。
