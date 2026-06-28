@@ -434,3 +434,22 @@ char/§8-gated で手詰まり」評価は**誤り**(= 新方針が根絶する�
   pin 候補: [Is] 6.2 (Res_H Ind=共役和)、[Is] 7.7 (TI 上で τ=Ind)、(8.12.c) (A(L)−H# TI)。
 - (12.5) `rho_constant_on_H_minus_Hprime` (S14:395): θ₁,θ₂∈Irr H 同次数、χᵢ=Ind θᵢ、(5.7) coherence、
   (5.5) で (χ₁−χ₂)^τ∈ℤ[R(χ₁)∪R(χ₂)]⟹(Res_H ψ^ρ,θ₁−θ₂)=0。(1.7.b)+Ind_{H'}^H λ が H−H' で消える。
+
+## 2026-06-29 (lane-b=β loop³): Sset_vanishes_off_H + (12.4) 精密 reduction 設計
+
+**`Sset_vanishes_off_H` 完成** (commit 66aac2b5): χ=Ind_H^L θ∈S は H=L_F normal (Fitting,
+`OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_subgroupOf_normal`) ゆえ `induce_eq_zero_of_not_mem_normal`
+で L−H で 0。(12.4)/(12.5) endgame の β∈ℂ[S] 消失 step。両者 consume。
+
+**(12.4) 精密 reduction (次イテレーション実装) — 3 faithful pin + genuine 組立**:
+- **adjunction `⟨ψ,τf⟩_G = ⟨Res_L ψ,f⟩_L`** (f=φ₁−φ₂, A(L)−H# supported) は **[Is]7.7 (τ=Ind_L^G on
+  TI-subset) + Frobenius reciprocity** に分解。後者は repo 在庫 `inner_induce_eq_inner_restrict`
+  (InducedCharacter:531)。⟹ pin は τ=Ind 部分のみ。
+- **pin (a)** `τ(φ₁−φ₂)∈zSpan R(χ)` (coherence, (1.4)/{φ₁,φ₂,φ̄₁,φ̄₂} coherent) ⟹ ψ⊥R(χ) で ⟨ψ,τ(φ₁−φ₂)⟩=0。
+- **pin (b)** `τ(φ₁−φ₂)=Ind_L^G(φ₁−φ₂)` ([Is]7.7 + (8.12.c) A(L)−H# TI、φ₁−φ₂ は (8.12.a) [Is]6.2 で
+  A(L)−H# supported) ⟹ Frobenius で ⟨ψ,τ(φ₁−φ₂)⟩=⟨Res_L ψ,φ₁−φ₂⟩。(a)(b) 合わせ ⟨Res_L ψ,φ₁−φ₂⟩=0
+  = S(χ) 内 constituent で Res_L ψ 係数一定 ⟹ ∪S(χ)-part = β∈ℂ[S]。
+- **pin (c)** capturing: H⊄ker φ ⟹ φ∈S(χ) ([Is]6.2/Clifford) ⟹ γ=残り は H⊆ker。
+- **genuine 組立**: 上記で Res_L ψ=β+γ、β は L−H で 0 (`Sset_vanishes_off_H` ✓)、γ は coset-const
+  (H⊆ker character ⟹ φ(xh)=φ(x)、要 character-kernel coset-const lemma) ⟹ ψ(xh)=γ(x)=ψ(x)。
+  regrouping は character completeness (`CharacterCompleteness`) + 係数抽出。
