@@ -286,13 +286,26 @@ theorem R1_diffsupp {L : Subgroup G} {hyp : Hypothesis L} {chi : ClassFunction �
     exact hx0 (by rw [ClassFunction.sub_apply, ClassFunction.conj_apply, hd, star_natCast, sub_self])
 
 open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
+/-- **Peterfalvi (12.2.b), the underlying difference image `{μ_φ, ν_φ, ε}` of `R₁(φ)`.**  The Dade
+`CharacterDifferenceImage` of the constituent `φ ∈ S(χ)`: `(φ − φ̄)^τ = ε·(μ_φ − ν_φ)`.  `R1` is its
+`toOrthonormalImage`; the raw `{μ_φ, ν_φ}` data is what the cross-`L` (4.1) orthogonality of (12.3)
+consumes (`S07.CharacterDifferenceImage.toOrthonormalImage_inner_eq_zero_across`). -/
+noncomputable def R1cdi {L : Subgroup G} {hyp : Hypothesis L} {chi : ClassFunction ↥L ℂ}
+    (data : CharacterDecompositionData hyp chi) {φ : IrreducibleCharacter ↥L}
+    (hφ : φ ∈ data.constituents) :
+    haveI := hyp.finiteG
+    OddOrder.Peterfalvi.S07.CharacterDifferenceImage (L := ↥L) (G := G)
+      hyp.tau (φ : ClassFunction ↥L ℂ) :=
+  haveI := hyp.finiteG
+  OddOrder.Peterfalvi.S07.dadeCharacterDifferenceImageOfDiff
+    hyp.dadeData.dade hyp.hconj φ (data.not_real φ hφ) (R1_diffsupp data hφ)
+
+open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
 /-- **Peterfalvi (12.2.b), the orthonormal block `R₁(φ)`**: for a constituent `φ ∈ S(χ)`, the
 orthonormal Dade-image family of `φ − φ̄`, "an orthonormal subset of `ℤ[Irr G]` of cardinality 2"
-with `(φ − φ̄)^τ = ∑_{α ∈ R₁(φ)} α` (the `image_eq` field).  Built directly from the Dade isometry
-`τ = hyp.tau` via the difference-support constructor `S07.dadeOrthonormalCharacterImageFamilyOfDiff`
-(`φ` is non-real by `data.not_real`, and `φ̄ − φ` is supported in `A(L)` by `R1_diffsupp`); the
-`(1.4)` keystone is internal to that constructor.  This is the `imageFamily` the
-`CharacterPsiDecomposition` engine of (12.4)/(12.5) consumes. -/
+with `(φ − φ̄)^τ = ∑_{α ∈ R₁(φ)} α` (the `image_eq` field).  The `toOrthonormalImage` of the
+difference image `R1cdi`.  This is the `imageFamily` the `CharacterPsiDecomposition` engine of
+(12.4)/(12.5) consumes; its underlying `{μ, ν}` feeds the (12.3) cross-`L` orthogonality. -/
 noncomputable def R1 {L : Subgroup G} {hyp : Hypothesis L} {chi : ClassFunction ↥L ℂ}
     (data : CharacterDecompositionData hyp chi) {φ : IrreducibleCharacter ↥L}
     (hφ : φ ∈ data.constituents) :
@@ -300,8 +313,7 @@ noncomputable def R1 {L : Subgroup G} {hyp : Hypothesis L} {chi : ClassFunction 
     OddOrder.Peterfalvi.S07.OrthonormalCharacterImageFamily (L := ↥L) (G := G)
       hyp.tau (φ : ClassFunction ↥L ℂ) :=
   haveI := hyp.finiteG
-  OddOrder.Peterfalvi.S07.dadeOrthonormalCharacterImageFamilyOfDiff
-    hyp.dadeData.dade hyp.hconj φ (data.not_real φ hφ) (R1_diffsupp data hφ)
+  (R1cdi data hφ).toOrthonormalImage
 
 open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
 /-- **Peterfalvi (12.2.b)**: `R(χ) = ⋃_{φ ∈ S(χ)} R₁(φ)`, the union of the two-element orthonormal
@@ -315,20 +327,52 @@ noncomputable def Rset {L : Subgroup G} {hyp : Hypothesis L} {chi : ClassFunctio
 
 /-! ## (12.3)--(12.5): orthogonality and rho-constancy -/
 
+open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
+/-- **Peterfalvi (12.3), the geometric obligation** ((8.18.c) + (5.9) + Dade support).  For
+non-conjugate type-I maximal subgroups `L₁, L₂` and constituents `φ₁ ∈ S(χ₁)`, `φ₂ ∈ S(χ₂)`, the
+Dade difference-images `(φ₁−φ̄₁)^{τ₁}` and `(φ₂−φ̄₂)^{τ₂}` are orthogonal: their supports lie in the
+disjoint thickened Dade domains `Ã(L₁)`, `Ã₁(L₂)` (Peterfalvi (8.18.c),
+`S10.support_mutual_exclusion`).  A faithful §8/§10 obligation — the thickened-support theory and
+its mutual-exclusion are §10 (lane-d/f) territory; (12.3) cites this as the geometric input to the
+(4.1) assembly. -/
+theorem nonconjugate_diffImage_inner_zero {L1 L2 : Subgroup G} [Finite G]
+    (hyp1 : Hypothesis L1) (hyp2 : Hypothesis L2)
+    (hnot_conj : ¬ ∃ g : G, MulAut.conj g • L1 = L2)
+    {chi1 : ClassFunction ↥L1 ℂ} (data1 : CharacterDecompositionData hyp1 chi1)
+    {φ1 : IrreducibleCharacter ↥L1} (_hφ1 : φ1 ∈ data1.constituents)
+    {chi2 : ClassFunction ↥L2 ℂ} (data2 : CharacterDecompositionData hyp2 chi2)
+    {φ2 : IrreducibleCharacter ↥L2} (_hφ2 : φ2 ∈ data2.constituents) :
+    ClassFunction.inner
+        (hyp1.tau ((φ1 : ClassFunction ↥L1 ℂ) - (φ1 : ClassFunction ↥L1 ℂ).conj))
+        (hyp2.tau ((φ2 : ClassFunction ↥L2 ℂ) - (φ2 : ClassFunction ↥L2 ℂ).conj)) = 0 := by
+  sorry
+
+open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
 /-- **Peterfalvi (12.3)**: for non-conjugate type-I maximal subgroups `L₁, L₂`, the families
-`R(χ₁) = Rset data1` and `R(χ₂) = Rset data2` are mutually orthogonal.  Proof (a §12 char
-obligation): by (8.18.c) assume `Ã(L₁) ∩ Ã₁(L₂) = ∅`; each `α ∈ R(χ₁)` satisfies `α − ᾱ ∈
-(φ−φ̄)^{τ₁}` supported in `Ã(L₁)` by (12.2)/(5.9), orthogonal to `R(χ₂) ⊆ Ã₁(L₂)`; a conjugation
-argument forces `⟨α, β⟩ = 0`. -/
-theorem nonconjugate_typeI_R_orthogonal {L1 L2 : Subgroup G} [Finite G] [Fintype G]
-    [Invertible (Nat.card G : ℂ)] [Invertible (Nat.card ↥L1 : ℂ)] [Invertible (Nat.card ↥L2 : ℂ)]
+`R(χ₁) = Rset data1` and `R(χ₂) = Rset data2` are mutually orthogonal.
+
+Proof: a member `α ∈ R(χ₁)` lies in `R₁(φ₁) = (R1cdi data1 hφ₁).toOrthonormalImage` for some
+constituent `φ₁`, and likewise `β ∈ R₁(φ₂)`.  The cross-`L` (4.1) orthogonality
+`toOrthonormalImage_inner_eq_zero_across` reduces `⟨α, β⟩ = 0` to the orthogonality of the signed
+differences `⟨(φ₁−φ̄₁)^{τ₁}, (φ₂−φ̄₂)^{τ₂}⟩ = 0` (`image_eq_signedDifference`), which is the geometric
+obligation `nonconjugate_diffImage_inner_zero` ((8.18.c): the supports lie in disjoint `Ã(L₁)`,
+`Ã₁(L₂)`). -/
+theorem nonconjugate_typeI_R_orthogonal {L1 L2 : Subgroup G} [Finite G]
     (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
     (hyp1 : Hypothesis L1) (hyp2 : Hypothesis L2)
     (hnot_conj : ¬ ∃ g : G, MulAut.conj g • L1 = L2)
     {chi1 : ClassFunction ↥L1 ℂ} (data1 : CharacterDecompositionData hyp1 chi1)
     {chi2 : ClassFunction ↥L2 ℂ} (data2 : CharacterDecompositionData hyp2 chi2) :
     ∀ α ∈ Rset data1, ∀ β ∈ Rset data2, ClassFunction.inner α β = 0 := by
-  sorry
+  intro α hαm β hβm
+  obtain ⟨φ1, hφ1, hα⟩ := hαm
+  obtain ⟨φ2, hφ2, hβ⟩ := hβm
+  refine OddOrder.Peterfalvi.S07.CharacterDifferenceImage.toOrthonormalImage_inner_eq_zero_across
+    (R1cdi data1 hφ1) (R1cdi data2 hφ2) ?_ hα hβ
+  rw [← OddOrder.Peterfalvi.S07.CharacterDifferenceImage.image_eq_signedDifference
+        (R1cdi data1 hφ1),
+    ← OddOrder.Peterfalvi.S07.CharacterDifferenceImage.image_eq_signedDifference (R1cdi data2 hφ2)]
+  exact nonconjugate_diffImage_inner_zero hyp1 hyp2 hnot_conj data1 hφ1 data2 hφ2
 
 open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
 /-- **Peterfalvi (12.4)**: a class function `ψ` orthogonal to every type-I family
