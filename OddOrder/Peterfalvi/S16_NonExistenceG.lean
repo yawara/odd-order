@@ -1573,6 +1573,13 @@ structure MHypothesis (hyp : Hypothesis (G := G)) where
   M_maximal : M ∈ maximalSubgroups G
   normalizer_V_le_M : Subgroup.normalizer (hyp.base.V : Set G) ≤ M
   K_eq_MF : K = maxNilpotentNormalHall M
+  /-- **Peterfalvi (12.1) for `M`**: the genuine type-I Dade setup of the maximal subgroup `M`
+  over `N_G(V)` — its `TypeIData`, the (8.15) Dade support data for `A(M)`, and the support-kernel
+  conjugation invariance.  This is the honest carrier (sorry-free constructible from `IsTypeI M`
+  via `S14.exists_typeI_hypothesis`) supplying the concrete `S04.Hypothesis`/`S04.DadeMap` that
+  bridge `M` to the §7 ρ-machinery (`S09.Hypothesis71`/`FamilyHypothesis71`/`family_inequality`),
+  the common §3/§4 Dade foundation of the (14.11) norm-cascade producers. -/
+  typeIHyp : OddOrder.Peterfalvi.S14.Hypothesis M
   Mset : Set (ClassFunction ↥M ℂ)
   tau : OddOrder.Peterfalvi.S07.IntegralCharacterMap ↥M G
   tau1 : OddOrder.Peterfalvi.S07.IntegralCharacterMap ↥M G
@@ -1598,6 +1605,40 @@ structure MHypothesis (hyp : Hypothesis (G := G)) where
   betaM_formula : Prop
   betaM_formula_holds : betaM_formula
   G0 : Set G
+
+namespace MHypothesis
+
+open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
+/-- **The Peterfalvi (7.4) one-member family `{(M, A(M))}` for the V-side type-I subgroup `M`** —
+the §7 input bridging `M` to the family inequality (7.5) `S09.family_inequality`, the common
+foundation of the (14.11) norm-cascade producers (`normCascadeData`, …).
+
+Built genuinely from the type-I Dade setup carried by `typeIHyp` (its (8.15) Dade support
+`dadeData` for `A(M) = typeIA M` and the conjugation invariance `hconj`), mirroring
+`S12.Hypothesis.toFamilyHypothesis71` for type-`P` subgroups — but on the type-I support `typeIA`,
+so no `A_0(M) → A(M)` restriction is needed.  The single member's (7.1) data is the restricted Dade
+map of `dadeData`, the `IsDadeIsometry` certificate is `FullDadeIsometryData`'s, and
+`pairwise_disjoint` is vacuous over `Fin 1`.  **Sorry-free + self-contained** from the genuine
+`typeIHyp`. -/
+noncomputable def toFamilyHypothesis71 [Finite G] {hyp : Hypothesis (G := G)}
+    (Mdata : MHypothesis hyp) : OddOrder.Peterfalvi.S09.FamilyHypothesis71 G 1 where
+  L := fun _ => Mdata.M
+  A := fun _ => OddOrder.GroupTheory.typeIA Mdata.M Mdata.typeIHyp.typeI
+  fintypeL := fun _ => inferInstance
+  invertibleL := fun _ => inferInstance
+  hyp71 := fun _ =>
+    { hyp := Mdata.typeIHyp.dadeData.dade
+      τ := (Mdata.typeIHyp.dadeData.dade.fullDadeIsometryData Mdata.typeIHyp.hconj).toDadeMap
+      isDadeMap :=
+        (Mdata.typeIHyp.dadeData.dade.fullDadeIsometryData
+          Mdata.typeIHyp.hconj).toDadeIsometryData.isDadeMap
+      hConjInvariant := Mdata.typeIHyp.hconj }
+  isDadeIsometry := fun _ =>
+    (Mdata.typeIHyp.dadeData.dade.fullDadeIsometryData
+      Mdata.typeIHyp.hconj).toDadeIsometryData.isDadeIsometry
+  pairwise_disjoint := fun i j hij => absurd (Subsingleton.elim i j) hij
+
+end MHypothesis
 
 /-- The displayed rational inequality produced by the norm calculation in
 **Peterfalvi (14.11.4)**, after substituting `e = p q`.  It is kept concrete so
