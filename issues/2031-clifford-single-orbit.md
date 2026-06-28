@@ -47,20 +47,36 @@ inertia → inflation 還元 → realization → capstone `caseB_inertia_realize
   (CliffordMultiplicityOne.lean:318) — (9.9.a) は inertia=HC⊊HU ゆえ**別ケース**だが Skolem-Noether/
   cliffordConj/End 代数解析の機構は e=1 で流用可能性。
 
-## 残 gap = module→character dictionary (補題群) → single-orbit
+## 2026-06-28 重要更新: dictionary は `CliffordConjugateChar.lean` に既存 + module-level single-orbit landed
 
-1. **iso-invariance of character**: ℂ[H]-LinearEquiv な部分加群は等 character (trace の iso 不変)。
-   mathlib 近傍を要確認。最も foundational、まず着手。
-2. **`submoduleChar`**: simple ℂ[H]-部分加群 N ⊆ (Res ρ).asModule の character。N simple ⟹ 既約 H-指標。
-   **MISSING** (Subrepresentation→character、新規)。
-3. **conjugate-character**: `char(N.map(conjSemilinearEnd ρ g)) = conjBy g (char N)` (semilinear twist
-   `h↦ghg⁻¹` 由来)。**MISSING**。
-4. **constituent ⟺ simple submodule**: θ constituent of Res χ ⟺ ∃ simple 部分加群 N, char N=θ
-   (`restrictionMultiplicity_eq_finrank_intertwiningMap` + nonzero intertwiner の image は simple ≅ σ_θ)。
+調査で、想定した dictionary 補題 1-3 は **`CliffordConjugateChar.lean` に既に実装済**と判明:
+- **補題1 (iso-invariance)** = mathlib `Representation.char_iso` (Character.lean:171)。
+- **補題2 (submoduleChar)** = `Subrepresentation.ofSubmodule'.toRepresentation.character` +
+  `subRep_isIrreducible` (N simple ⟹ subrep 既約) + `subRepAsModuleEquiv`/`equivOfAsModuleEquiv`
+  (asModule↔Representation 変換)。
+- **補題3 (conjugate-character)** = `character_subRep_conj` (CliffordConjugateChar:218,
+  `χ_{(ρg)W}(h)=χ_W(g⁻¹hg)`, `char_iso` 経由) + `submodule_iso_of_character_eq` (Schur 逆向き)。
 
-組立 (single-orbit): θ,η constituents ⟹ N_θ,N_η simple (4) ⟹ transitivity
-(`iSup_map_conjSemilinearEnd_eq_top` + `linearEquiv_of_sSup_eq_top`) で N_θ ≅ (N_η)^g ⟹ (2,3,1)
-θ = conjBy g η。
+**✅ module-level single-orbit landed** (commit `0d7d573f`, `CliffordSingleOrbit.lean`):
+`character_conj_of_simpleSubmodule` (sorry-free + axiom-clean) — G-既約 ρ で Res^G_H ρ の任意 2 つの
+simple k[H]-部分加群 N,N' は共役指標 ∃g, χ_{N'}(h)=χ_N(g⁻¹hg)。`iSup_map_conjSemilinearEnd_eq_top` +
+`linearEquiv_of_sSup_eq_top` + `equivOfAsModuleEquiv`+`char_iso` + `character_subRep_conj` で組立。
+**= single-orbit の module-level 核**。⚠ `set_option backward.isDefEq.respectTransparency false` が
+asModule instance 合成に必須 (CliffordConjugateChar と同様)。
+
+## 残 gap = 補題4 (constituent ⟺ simple submodule) — character-level single-orbit の唯一の橋
+
+`RestrictionConstituentsSingleOrbit` (character-level) に残るのは **補題4 のみ**:
+- **θ constituent of Res χ ⟺ ∃ simple k[H]-部分加群 N ⊆ (Res ρ).asModule, char(ofSubmodule' N)=θ**。
+- 経路: `restrictionMultiplicity_eq_finrank_intertwiningMap` で multiplicity = finrank(IntertwiningMap σ_θ (Res ρ))
+  ≠ 0 ⟹ ∃ nonzero intertwiner f:σ_θ→Res ρ ⟹ (Schur, σ_θ 既約) f injective ⟹ range f を
+  `Submodule k[↥H] (resRep ρ H).asModule` 化 (Representation↔asModule-submodule 変換) ⟹ range f ≅ σ_θ
+  ⟹ simple + char=θ。
+- **deep gate**: IntertwiningMap → 単純部分加群の抽出 (mathlib IntertwiningMap plumbing + Schur +
+  range-as-asModule-submodule)。次セッションの焦点。
+
+組立 (character-level single-orbit、補題4 入れば即): θ,η constituents ⟹ N_θ,N_η simple (補題4) ⟹
+`character_conj_of_simpleSubmodule` で χ_{N_θ}=conjBy g χ_{N_η} ⟹ θ=conjBy g η。
 
 ## e=1 (single-orbit と別の残)
 
@@ -70,11 +86,15 @@ linear extend する構造 (HC/H = C, coprime) から。`CliffordMultiplicityOne
 
 ## やること (research-grade, multi-session)
 
-- [ ] **補題1 (iso-invariance of character)** — foundational・mathlib 近傍確認、まず着手。
-- [ ] **補題2 (submoduleChar + N simple ⟹ 既約)** — Subrepresentation→character 基盤。
-- [ ] **補題3 (conjugate-character = conjBy)** — semilinear twist。
-- [ ] **補題4 (constituent ⟺ simple submodule)** — intertwining map 経由。
-- [ ] **single-orbit 組立** → `restrictionConstituentsSingleOrbit_of_isIrreducible`。
+- [x] **補題1 (iso-invariance)** = mathlib `Representation.char_iso` (既存)。
+- [x] **補題2 (submoduleChar + N simple ⟹ 既約)** = `ofSubmodule'.toRepresentation.character` +
+      `subRep_isIrreducible` (CliffordConjugateChar 既存)。
+- [x] **補題3 (conjugate-character)** = `character_subRep_conj` (CliffordConjugateChar 既存)。
+- [x] **module-level single-orbit** = `character_conj_of_simpleSubmodule` (commit `0d7d573f`、本 leaf)。
+- [ ] **補題4 (constituent ⟺ simple submodule)** — IntertwiningMap → simple submodule 抽出 (Schur +
+      range-as-asModule-submodule)。**残る唯一の deep gate**、次の焦点。
+- [ ] **character-level single-orbit 組立** → `restrictionConstituentsSingleOrbit_of_isIrreducible`
+      (補題4 + `character_conj_of_simpleSubmodule`、補題4 入れば即)。
 - [ ] **degree assembly**: 基底展開 + common-mult + orbit-size + 次数保存 → `χ(1)=e·u·θ₀(1)`。
 - [ ] **e=1** (別 track、Gallagher/extension or Skolem-Noether in inertia)。
 - [ ] (9.9.a) consumer wiring (S11 `caseB_character_counts` 第1連言)。
