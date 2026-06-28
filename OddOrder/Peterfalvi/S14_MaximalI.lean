@@ -286,13 +286,26 @@ theorem R1_diffsupp {L : Subgroup G} {hyp : Hypothesis L} {chi : ClassFunction �
     exact hx0 (by rw [ClassFunction.sub_apply, ClassFunction.conj_apply, hd, star_natCast, sub_self])
 
 open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
+/-- **Peterfalvi (12.2.b), the underlying difference image `{μ_φ, ν_φ, ε}` of `R₁(φ)`.**  The Dade
+`CharacterDifferenceImage` of the constituent `φ ∈ S(χ)`: `(φ − φ̄)^τ = ε·(μ_φ − ν_φ)`.  `R1` is its
+`toOrthonormalImage`; the raw `{μ_φ, ν_φ}` data is what the cross-`L` (4.1) orthogonality of (12.3)
+consumes (`S07.CharacterDifferenceImage.toOrthonormalImage_inner_eq_zero_across`). -/
+noncomputable def R1cdi {L : Subgroup G} {hyp : Hypothesis L} {chi : ClassFunction ↥L ℂ}
+    (data : CharacterDecompositionData hyp chi) {φ : IrreducibleCharacter ↥L}
+    (hφ : φ ∈ data.constituents) :
+    haveI := hyp.finiteG
+    OddOrder.Peterfalvi.S07.CharacterDifferenceImage (L := ↥L) (G := G)
+      hyp.tau (φ : ClassFunction ↥L ℂ) :=
+  haveI := hyp.finiteG
+  OddOrder.Peterfalvi.S07.dadeCharacterDifferenceImageOfDiff
+    hyp.dadeData.dade hyp.hconj φ (data.not_real φ hφ) (R1_diffsupp data hφ)
+
+open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
 /-- **Peterfalvi (12.2.b), the orthonormal block `R₁(φ)`**: for a constituent `φ ∈ S(χ)`, the
 orthonormal Dade-image family of `φ − φ̄`, "an orthonormal subset of `ℤ[Irr G]` of cardinality 2"
-with `(φ − φ̄)^τ = ∑_{α ∈ R₁(φ)} α` (the `image_eq` field).  Built directly from the Dade isometry
-`τ = hyp.tau` via the difference-support constructor `S07.dadeOrthonormalCharacterImageFamilyOfDiff`
-(`φ` is non-real by `data.not_real`, and `φ̄ − φ` is supported in `A(L)` by `R1_diffsupp`); the
-`(1.4)` keystone is internal to that constructor.  This is the `imageFamily` the
-`CharacterPsiDecomposition` engine of (12.4)/(12.5) consumes. -/
+with `(φ − φ̄)^τ = ∑_{α ∈ R₁(φ)} α` (the `image_eq` field).  The `toOrthonormalImage` of the
+difference image `R1cdi`.  This is the `imageFamily` the `CharacterPsiDecomposition` engine of
+(12.4)/(12.5) consumes; its underlying `{μ, ν}` feeds the (12.3) cross-`L` orthogonality. -/
 noncomputable def R1 {L : Subgroup G} {hyp : Hypothesis L} {chi : ClassFunction ↥L ℂ}
     (data : CharacterDecompositionData hyp chi) {φ : IrreducibleCharacter ↥L}
     (hφ : φ ∈ data.constituents) :
@@ -300,8 +313,7 @@ noncomputable def R1 {L : Subgroup G} {hyp : Hypothesis L} {chi : ClassFunction 
     OddOrder.Peterfalvi.S07.OrthonormalCharacterImageFamily (L := ↥L) (G := G)
       hyp.tau (φ : ClassFunction ↥L ℂ) :=
   haveI := hyp.finiteG
-  OddOrder.Peterfalvi.S07.dadeOrthonormalCharacterImageFamilyOfDiff
-    hyp.dadeData.dade hyp.hconj φ (data.not_real φ hφ) (R1_diffsupp data hφ)
+  (R1cdi data hφ).toOrthonormalImage
 
 open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
 /-- **Peterfalvi (12.2.b)**: `R(χ) = ⋃_{φ ∈ S(χ)} R₁(φ)`, the union of the two-element orthonormal
@@ -315,34 +327,433 @@ noncomputable def Rset {L : Subgroup G} {hyp : Hypothesis L} {chi : ClassFunctio
 
 /-! ## (12.3)--(12.5): orthogonality and rho-constancy -/
 
+open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
+/-- **Peterfalvi (12.3), the geometric obligation** ((8.18.c) + (5.9) + Dade support).  For
+non-conjugate type-I maximal subgroups `L₁, L₂` and constituents `φ₁ ∈ S(χ₁)`, `φ₂ ∈ S(χ₂)`, the
+Dade difference-images `(φ₁−φ̄₁)^{τ₁}` and `(φ₂−φ̄₂)^{τ₂}` are orthogonal: their supports lie in the
+disjoint thickened Dade domains `Ã(L₁)`, `Ã₁(L₂)` (Peterfalvi (8.18.c),
+`S10.support_mutual_exclusion`).  A faithful §8/§10 obligation — the thickened-support theory and
+its mutual-exclusion are §10 (lane-d/f) territory; (12.3) cites this as the geometric input to the
+(4.1) assembly. -/
+theorem nonconjugate_diffImage_inner_zero {L1 L2 : Subgroup G} [Finite G]
+    (hyp1 : Hypothesis L1) (hyp2 : Hypothesis L2)
+    (hnot_conj : ¬ ∃ g : G, MulAut.conj g • L1 = L2)
+    {chi1 : ClassFunction ↥L1 ℂ} (data1 : CharacterDecompositionData hyp1 chi1)
+    {φ1 : IrreducibleCharacter ↥L1} (_hφ1 : φ1 ∈ data1.constituents)
+    {chi2 : ClassFunction ↥L2 ℂ} (data2 : CharacterDecompositionData hyp2 chi2)
+    {φ2 : IrreducibleCharacter ↥L2} (_hφ2 : φ2 ∈ data2.constituents) :
+    ClassFunction.inner
+        (hyp1.tau ((φ1 : ClassFunction ↥L1 ℂ) - (φ1 : ClassFunction ↥L1 ℂ).conj))
+        (hyp2.tau ((φ2 : ClassFunction ↥L2 ℂ) - (φ2 : ClassFunction ↥L2 ℂ).conj)) = 0 := by
+  sorry
+
+open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
 /-- **Peterfalvi (12.3)**: for non-conjugate type-I maximal subgroups `L₁, L₂`, the families
-`R(χ₁) = Rset data1` and `R(χ₂) = Rset data2` are mutually orthogonal.  Proof (a §12 char
-obligation): by (8.18.c) assume `Ã(L₁) ∩ Ã₁(L₂) = ∅`; each `α ∈ R(χ₁)` satisfies `α − ᾱ ∈
-(φ−φ̄)^{τ₁}` supported in `Ã(L₁)` by (12.2)/(5.9), orthogonal to `R(χ₂) ⊆ Ã₁(L₂)`; a conjugation
-argument forces `⟨α, β⟩ = 0`. -/
-theorem nonconjugate_typeI_R_orthogonal {L1 L2 : Subgroup G} [Finite G] [Fintype G]
-    [Invertible (Nat.card G : ℂ)] [Invertible (Nat.card ↥L1 : ℂ)] [Invertible (Nat.card ↥L2 : ℂ)]
+`R(χ₁) = Rset data1` and `R(χ₂) = Rset data2` are mutually orthogonal.
+
+Proof: a member `α ∈ R(χ₁)` lies in `R₁(φ₁) = (R1cdi data1 hφ₁).toOrthonormalImage` for some
+constituent `φ₁`, and likewise `β ∈ R₁(φ₂)`.  The cross-`L` (4.1) orthogonality
+`toOrthonormalImage_inner_eq_zero_across` reduces `⟨α, β⟩ = 0` to the orthogonality of the signed
+differences `⟨(φ₁−φ̄₁)^{τ₁}, (φ₂−φ̄₂)^{τ₂}⟩ = 0` (`image_eq_signedDifference`), which is the geometric
+obligation `nonconjugate_diffImage_inner_zero` ((8.18.c): the supports lie in disjoint `Ã(L₁)`,
+`Ã₁(L₂)`). -/
+theorem nonconjugate_typeI_R_orthogonal {L1 L2 : Subgroup G} [Finite G]
     (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
     (hyp1 : Hypothesis L1) (hyp2 : Hypothesis L2)
     (hnot_conj : ¬ ∃ g : G, MulAut.conj g • L1 = L2)
     {chi1 : ClassFunction ↥L1 ℂ} (data1 : CharacterDecompositionData hyp1 chi1)
     {chi2 : ClassFunction ↥L2 ℂ} (data2 : CharacterDecompositionData hyp2 chi2) :
     ∀ α ∈ Rset data1, ∀ β ∈ Rset data2, ClassFunction.inner α β = 0 := by
+  intro α hαm β hβm
+  obtain ⟨φ1, hφ1, hα⟩ := hαm
+  obtain ⟨φ2, hφ2, hβ⟩ := hβm
+  refine OddOrder.Peterfalvi.S07.CharacterDifferenceImage.toOrthonormalImage_inner_eq_zero_across
+    (R1cdi data1 hφ1) (R1cdi data2 hφ2) ?_ hα hβ
+  rw [← OddOrder.Peterfalvi.S07.CharacterDifferenceImage.image_eq_signedDifference
+        (R1cdi data1 hφ1),
+    ← OddOrder.Peterfalvi.S07.CharacterDifferenceImage.image_eq_signedDifference (R1cdi data2 hφ2)]
+  exact nonconjugate_diffImage_inner_zero hyp1 hyp2 hnot_conj data1 hφ1 data2 hφ2
+
+open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
+/-- **Peterfalvi (12.4)/(12.5) input**: each member `χ = Ind_H^L θ` of `S` vanishes on `L − H`.
+`H = L_F` is normal in `L` (`maxNilpotentNormalHall_subgroupOf_normal`, the Fitting subgroup `L_F`),
+so the induced character is supported on `H` (`ClassFunction.induce_eq_zero_of_not_mem_normal`).  This
+is the "the elements of `S` vanish on `L − H`" step of the constant-on-coset conclusions of
+(12.4)/(12.5) (`ψ(xh) = β(xh) + γ(xh) = γ(x)`, the `β ∈ ℂ[S]` part vanishing off `H`). -/
+theorem Sset_vanishes_off_H {L : Subgroup G} (hyp : Hypothesis L) {χ : ClassFunction ↥L ℂ}
+    (hχ : χ ∈ hyp.Sset) {x : ↥L} (hxH : (x : G) ∉ hyp.H) : χ x = 0 := by
+  haveI := hyp.finiteG
+  obtain ⟨θ, _, hχ_eq⟩ := hχ
+  haveI hnormal : ((hyp.typeI.typeF.H).subgroupOf L).Normal := by
+    rw [hyp.typeI.typeF.H_eq]
+    exact OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_subgroupOf_normal L
+  have hxmem : x ∉ (hyp.typeI.typeF.H).subgroupOf L :=
+    fun hcon => hxH (Subgroup.mem_subgroupOf.mp hcon)
+  rw [hχ_eq]
+  exact ClassFunction.induce_eq_zero_of_not_mem_normal _ hxmem
+
+open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
+/-- **Peterfalvi (12.4), pin (a)** (coherence): for constituents `φ₁, φ₂ ∈ S(χ)`, the Dade image
+`(φ₁ − φ₂)^τ` lies in `ℤ[R(χ)]`.  By (1.4) the four-element set `{φ₁, φ₂, φ̄₁, φ̄₂}` is coherent, so
+`τ` maps its difference lattice into the integral span of `R(χ) = ⋃ R₁(φ)`.  A faithful §5/§1
+obligation (the coherence-extension content of (1.4)/(5.x), char-theory). -/
+theorem constituent_diff_tau_mem_span {L : Subgroup G} [Finite G] (hyp : Hypothesis L)
+    {chi : ClassFunction ↥L ℂ} (dχ : CharacterDecompositionData hyp chi)
+    {φ₁ φ₂ : IrreducibleCharacter ↥L} (_h₁ : φ₁ ∈ dχ.constituents) (_h₂ : φ₂ ∈ dχ.constituents) :
+    hyp.tau ((φ₁ : ClassFunction ↥L ℂ) - (φ₂ : ClassFunction ↥L ℂ)) ∈
+      Submodule.span ℤ (Rset dχ) := by
   sorry
 
 open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
-/-- **Peterfalvi (12.4)**: a class function `ψ` orthogonal to every type-I family
-`R(χ)` (`χ ∈ S`) is constant on each coset `xH` with `x ∈ L − H`.  The orthogonality
-hypothesis is now the genuine `⟨ψ, α⟩ = 0` for `α ∈ R(χ)`, no longer an opaque
-field (`R` is the (12.2) family). -/
-theorem orthogonal_character_constant_on_coset {L : Subgroup G} [Finite G] [Fintype G]
-    [Invertible (Nat.card G : ℂ)] [Invertible (Nat.card ↥L : ℂ)]
+/-- **Peterfalvi (12.4), pin (b)** ([Is] 7.7 + (8.12.c) + [Is] 6.2): for constituents `φ₁, φ₂ ∈ S(χ)`,
+the Dade isometry acts as induction on the difference, `(φ₁ − φ₂)^τ = Ind_L^G(φ₁ − φ₂)`.  By [Is] 6.2
+`Res_H φᵢ` is the conjugate-sum of `θ`, so `Supp(φ₁ − φ₂) ⊆ A(L) − H^#`, a TI-subset of `G` with
+normalizer `L` by (8.12.c); on a TI-supported function the Dade isometry coincides with `Ind_L^G`
+([Is] 7.7).  A faithful §8/[Is] obligation. -/
+theorem constituent_diff_tau_eq_induce {L : Subgroup G} [Finite G] (hyp : Hypothesis L)
+    {chi : ClassFunction ↥L ℂ} (dχ : CharacterDecompositionData hyp chi)
+    {φ₁ φ₂ : IrreducibleCharacter ↥L} (_h₁ : φ₁ ∈ dχ.constituents) (_h₂ : φ₂ ∈ dχ.constituents) :
+    hyp.tau ((φ₁ : ClassFunction ↥L ℂ) - (φ₂ : ClassFunction ↥L ℂ)) =
+      ClassFunction.induce L ((φ₁ : ClassFunction ↥L ℂ) - (φ₂ : ClassFunction ↥L ℂ)) := by
+  sorry
+
+open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
+/-- **Peterfalvi (12.4), coherence → coefficient-equality bridge** (genuine).  If `ψ ⊥ R(χ)`, then
+`Res_L ψ` has the *same* coefficient on every constituent of `χ`: `⟨Res_L ψ, φ₁⟩ = ⟨Res_L ψ, φ₂⟩`
+for `φ₁, φ₂ ∈ S(χ)`.  Proof: `⟨Res_L ψ, φ₁ − φ₂⟩ = ⟨ψ, Ind_L^G(φ₁ − φ₂)⟩ = ⟨ψ, (φ₁ − φ₂)^τ⟩`
+(Frobenius `inner_induce_eq_inner_restrict` + conjugate symmetry + pin (b)), and this is `0` because
+`(φ₁ − φ₂)^τ ∈ ℤ[R(χ)]` (pin (a)) and `ψ ⊥ R(χ)` (`inner_eq_zero_of_mem_zSpan`).  This is the genuine
+content by which `ψ ⊥ R(χ)` forces the `∪S(χ)`-part of `Res_L ψ` to be `β = ∑_χ c_χ·χ ∈ ℂ[S]`. -/
+theorem Sset_coeff_equal {L : Subgroup G} [Finite G] (hyp : Hypothesis L)
+    {chi : ClassFunction ↥L ℂ} (dχ : CharacterDecompositionData hyp chi)
+    {psi : ClassFunction G ℂ} (horth : ∀ α ∈ Rset dχ, ClassFunction.inner psi α = 0)
+    {φ₁ φ₂ : IrreducibleCharacter ↥L} (h₁ : φ₁ ∈ dχ.constituents) (h₂ : φ₂ ∈ dχ.constituents) :
+    ClassFunction.inner (ClassFunction.restrict L psi) (φ₁ : ClassFunction ↥L ℂ)
+      = ClassFunction.inner (ClassFunction.restrict L psi) (φ₂ : ClassFunction ↥L ℂ) := by
+  haveI := hyp.finiteG
+  set f : ClassFunction ↥L ℂ :=
+    (φ₁ : ClassFunction ↥L ℂ) - (φ₂ : ClassFunction ↥L ℂ) with hf
+  -- `⟨ψ, τ f⟩ = 0`: `τ f ∈ ℤ[R(χ)]` (pin a) and `ψ ⊥ R(χ)`.
+  have hψτ : ClassFunction.inner psi (hyp.tau f) = 0 :=
+    OddOrder.Peterfalvi.S07.IntegralCharacterMap.inner_eq_zero_of_mem_zSpan horth
+      (constituent_diff_tau_mem_span hyp dχ h₁ h₂)
+  -- `⟨f, Res_L ψ⟩ = ⟨Ind_L^G f, ψ⟩ = ⟨τ f, ψ⟩ = star⟨ψ, τ f⟩ = 0`.
+  have hfres : ClassFunction.inner f (ClassFunction.restrict L psi) = 0 := by
+    rw [← ClassFunction.inner_induce_eq_inner_restrict L f psi,
+      ← constituent_diff_tau_eq_induce hyp dχ h₁ h₂,
+      inner_conj_symm psi (hyp.tau f), hψτ, star_zero]
+  -- `⟨Res_L ψ, f⟩ = star⟨f, Res_L ψ⟩ = 0`, then split the difference.
+  have hresf : ClassFunction.inner (ClassFunction.restrict L psi) f = 0 := by
+    rw [inner_conj_symm f (ClassFunction.restrict L psi), hfres, star_zero]
+  rw [hf, ClassFunction.inner_sub_right] at hresf
+  exact sub_eq_zero.mp hresf
+
+/-- Evaluation of a finite sum of class functions at a point (the eval map is additive). -/
+private theorem classFunction_sum_apply {H : Type*} [Group H] {ι : Type*} (s : Finset ι)
+    (F : ι → ClassFunction H ℂ) (g : H) : (∑ i ∈ s, F i) g = ∑ i ∈ s, (F i) g := by
+  classical
+  induction s using Finset.induction with
+  | empty => simp
+  | insert i s hi ih =>
+      rw [Finset.sum_insert hi, Finset.sum_insert hi, ClassFunction.add_apply, ih]
+
+/-- The "`H ⊆ ker φ`" predicate: the Fitting subgroup `H = L_F` lies in the character kernel of the
+irreducible character `φ` of `L`.  The `γ`-components of `Res_L ψ` in (12.4) are exactly those `φ`
+with `InHKernel`; they are constant on `H`-cosets (`apply_mul_eq_of_mem_characterKernel`). -/
+def InHKernel {L : Subgroup G} (hyp : Hypothesis L) (φ : IrreducibleCharacter ↥L) : Prop :=
+  ((hyp.typeI.typeF.H).subgroupOf L : Set ↥L) ⊆
+    OddOrder.Peterfalvi.S03.characterKernel (φ : ClassFunction ↥L ℂ)
+
+open scoped Classical OddOrder.Peterfalvi.S12.FiniteInduce in
+/-- **Toward (12.4) pin (c'), the off-kernel direction** (genuine): every constituent `φ ∈ S(χ)` of a
+member `χ = Ind_H^L θ ∈ S` (`θ ≠ 1_H`) is off-kernel, `H ⊄ ker φ`.  If `H ⊆ ker φ` then `Res_H φ` is
+constant `= φ(1)` on `H` (`= φ(1)·1_H`), so by Frobenius `⟨χ, φ⟩ = ⟨θ, Res_H φ⟩ = star(φ(1))·⟨θ, 1_H⟩
+= 0` (`θ ≠ 1_H`); but `φ` a constituent of `χ` gives `⟨χ, φ⟩ = 1`.  This is the `⊇` inclusion
+`S(χ) ⊆ {φ : H ⊄ ker φ}` of the partition `exists_offKernel_constituent_partition`. -/
+theorem constituents_not_inHKernel {L : Subgroup G} [Finite G] (hyp : Hypothesis L)
+    {chi : ClassFunction ↥L ℂ} (hχ : chi ∈ hyp.Sset) (dχ : CharacterDecompositionData hyp chi)
+    {φ : IrreducibleCharacter ↥L} (hφ : φ ∈ dχ.constituents) : ¬ InHKernel hyp φ := by
+  haveI := hyp.finiteG
+  classical
+  obtain ⟨θ, hθ_ne, hchi_eq⟩ := hχ
+  intro hker
+  set K := (hyp.typeI.typeF.H).subgroupOf L with hKdef
+  -- `Res_K φ = φ(1) · 1_K` (since `H ⊆ ker φ`, `φ` is constant `= φ(1)` on `K`).
+  have hrestrict : ClassFunction.restrict K (φ : ClassFunction ↥L ℂ)
+      = OddOrder.Peterfalvi.S03.characterDegree (φ : ClassFunction ↥L ℂ) •
+        (trivialIrreducibleCharacter ↥K : ClassFunction ↥K ℂ) := by
+    ext k
+    rw [ClassFunction.restrict_apply, ClassFunction.smul_apply]
+    have hmem : (↑k : ↥L) ∈ OddOrder.Peterfalvi.S03.characterKernel (φ : ClassFunction ↥L ℂ) :=
+      hker k.2
+    rw [OddOrder.Peterfalvi.S03.mem_characterKernel] at hmem
+    simp only [hmem, IrreducibleCharacter.coe_trivialIrreducibleCharacter,
+      trivialClassFunction_apply, mul_one]
+  -- `⟨χ, φ⟩ = ⟨θ, Res_K φ⟩ = star(φ(1)) · ⟨θ, 1_K⟩ = 0` (`θ ≠ 1_K`).
+  have hzero : ClassFunction.inner chi (φ : ClassFunction ↥L ℂ) = 0 := by
+    rw [hchi_eq, ClassFunction.inner_induce_eq_inner_restrict, hrestrict,
+      OddOrder.RepresentationTheory.inner_smul_right, irreducibleCharacter_inner, if_neg hθ_ne,
+      mul_zero]
+  -- `⟨χ, φ⟩ = 1` (multiplicity-one constituent), contradiction.
+  have hone : ClassFunction.inner chi (φ : ClassFunction ↥L ℂ) = 1 := by
+    rw [dχ.decomp, inner_sum_left,
+      Finset.sum_eq_single_of_mem φ hφ (fun φ' _ hne => by
+        rw [irreducibleCharacter_inner, if_neg hne]),
+      irreducibleCharacter_inner, if_pos rfl]
+  rw [hone] at hzero
+  exact one_ne_zero hzero
+
+open scoped Classical OddOrder.Peterfalvi.S12.FiniteInduce in
+/-- **Toward (12.4) pin (c'), the capturing direction** (genuine): every off-kernel irreducible `φ`
+(`H ⊄ ker φ`) is a constituent of some `χ ∈ S`.  By `exists_constituent_not_subset_characterKernel`
+([Is] 6.5 / constituent transitivity), `Res_H φ` has a constituent `θ ≠ 1_H`; then `χ := Ind_H^L θ ∈ S`
+and `⟨φ, χ⟩ = ⟨Res_H φ, θ⟩ ≠ 0` (Frobenius `inner_induce_eq_inner_restrict` + conjugate symmetry), so
+`φ ∈ S(χ)`.  This is the `⊆` inclusion `{φ : H ⊄ ker φ} ⊆ ⋃ S(χ)` of the partition
+`exists_offKernel_constituent_partition`. -/
+theorem not_inHKernel_imp_mem_constituents {L : Subgroup G} [Finite G] (hyp : Hypothesis L)
+    (data : ∀ χ ∈ hyp.Sset, CharacterDecompositionData hyp χ)
+    {φ : IrreducibleCharacter ↥L} (hφ : ¬ InHKernel hyp φ) :
+    ∃ (χ : ClassFunction ↥L ℂ) (hχ : χ ∈ hyp.Sset), φ ∈ (data χ hχ).constituents := by
+  haveI := hyp.finiteG
+  classical
+  obtain ⟨θ, hlo, hθker⟩ :=
+    exists_constituent_not_subset_characterKernel
+      (le_refl ((hyp.typeI.typeF.H).subgroupOf L)) φ hφ
+  -- `θ ≠ 1`: else `K = K.subgroupOf K ⊆ ker θ = univ`, contradicting `hθker`.
+  have hθ_ne : θ ≠ trivialIrreducibleCharacter ↥((hyp.typeI.typeF.H).subgroupOf L) := by
+    rintro rfl
+    exact hθker (by
+      simp only [IrreducibleCharacter.coe_trivialIrreducibleCharacter,
+        OddOrder.Peterfalvi.S03.characterKernel_trivialClassFunction, Set.subset_univ])
+  -- `θ` is a genuine constituent of `Res_K φ`.
+  have hlo' : ClassFunction.inner
+      (ClassFunction.restrict ((hyp.typeI.typeF.H).subgroupOf L) (φ : ClassFunction ↥L ℂ))
+      (θ : ClassFunction ↥((hyp.typeI.typeF.H).subgroupOf L) ℂ) ≠ 0 := by
+    rw [IrreducibleCharacter.LiesOver, ClassFunction.restrictionMultiplicity_def] at hlo
+    exact hlo
+  refine ⟨ClassFunction.induce ((hyp.typeI.typeF.H).subgroupOf L)
+    (θ : ClassFunction ↥((hyp.typeI.typeF.H).subgroupOf L) ℂ), ⟨θ, hθ_ne, rfl⟩, ?_⟩
+  -- `⟨φ, Ind_K θ⟩ = ⟨Res_K φ, θ⟩ ≠ 0` (Frobenius + conjugate symmetry).
+  have hinner_ne : ClassFunction.inner (φ : ClassFunction ↥L ℂ)
+      (ClassFunction.induce ((hyp.typeI.typeF.H).subgroupOf L)
+        (θ : ClassFunction ↥((hyp.typeI.typeF.H).subgroupOf L) ℂ)) ≠ 0 := by
+    rw [OddOrder.RepresentationTheory.inner_conj_symm,
+      ClassFunction.inner_induce_eq_inner_restrict,
+      OddOrder.RepresentationTheory.inner_conj_symm, star_star]
+    exact hlo'
+  by_contra hnotin
+  apply hinner_ne
+  rw [(data _ ⟨θ, hθ_ne, rfl⟩).decomp, inner_sum_right]
+  refine Finset.sum_eq_zero fun φ' hφ' => ?_
+  have hne : φ ≠ φ' := by rintro rfl; exact hnotin hφ'
+  rw [irreducibleCharacter_inner, if_neg hne]
+
+open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
+/-- **Pin (c') partition characterization** (genuine, both directions): the off-kernel irreducibles
+`{φ : H ⊄ ker φ}` are *exactly* the constituents of the `S`-members, `⋃_{χ ∈ S} S(χ)`.  `⊆` is the
+capturing direction `not_inHKernel_imp_mem_constituents`; `⊇` is `constituents_not_inHKernel`.  This
+is the set-equality underlying the `biUnion` of `exists_offKernel_constituent_partition`; the residual
+of that pin is now only the **disjointness** (φ in `S(χ) ∩ S(χ')` ⟹ χ = χ', via Clifford single-orbit
+`RestrictionConstituentsSingleOrbit.exists_conj` + `induce_conjBy_eq`) and the `parts`-`Finset`
+construction. -/
+theorem not_inHKernel_iff {L : Subgroup G} [Finite G] (hyp : Hypothesis L)
+    (data : ∀ χ ∈ hyp.Sset, CharacterDecompositionData hyp χ)
+    {φ : IrreducibleCharacter ↥L} :
+    ¬ InHKernel hyp φ ↔
+      ∃ (χ : ClassFunction ↥L ℂ) (hχ : χ ∈ hyp.Sset), φ ∈ (data χ hχ).constituents :=
+  ⟨not_inHKernel_imp_mem_constituents hyp data,
+    fun ⟨χ, hχ, hmem⟩ => constituents_not_inHKernel hyp hχ (data χ hχ) hmem⟩
+
+open scoped Classical OddOrder.Peterfalvi.S12.FiniteInduce in
+/-- **Toward (12.4) pin (c'), disjointness** (genuine, Clifford single-orbit): a `φ` that is a
+constituent of both `χ, χ' ∈ S` forces `χ = χ'`.  Writing `χ = Ind_H^L θ`, `χ' = Ind_H^L θ'`, both
+witnesses `θ, θ'` lie under `φ` (`⟨Res_H φ, θ⟩ = ⟨φ, χ⟩ ≠ 0`, Frobenius); by Clifford single-orbit
+(`restrictionConstituentsSingleOrbit_of_isIrreducible` + `.exists_conj`) they are `L`-conjugate,
+`conjBy g θ = θ'`, so `Ind θ = Ind θ'` (`induce_conjBy_eq`, Peterfalvi (1.5.a)).  This is the
+`PairwiseDisjoint` content of `exists_offKernel_constituent_partition`. -/
+theorem constituents_eq_of_mem {L : Subgroup G} [Finite G] (hyp : Hypothesis L)
+    {χ χ' : ClassFunction ↥L ℂ} (hχ : χ ∈ hyp.Sset) (hχ' : χ' ∈ hyp.Sset)
+    (dχ : CharacterDecompositionData hyp χ) (dχ' : CharacterDecompositionData hyp χ')
+    {φ : IrreducibleCharacter ↥L} (hmem : φ ∈ dχ.constituents) (hmem' : φ ∈ dχ'.constituents) :
+    χ = χ' := by
+  haveI := hyp.finiteG
+  classical
+  haveI hKnormal : ((hyp.typeI.typeF.H).subgroupOf L).Normal := by
+    rw [hyp.typeI.typeF.H_eq]
+    exact OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_subgroupOf_normal L
+  obtain ⟨θ, hθ_ne, rfl⟩ := hχ
+  obtain ⟨θ', hθ'_ne, rfl⟩ := hχ'
+  -- `θ`, `θ'` lie under `φ`: `⟨Res_K φ, η⟩ = ⟨φ, Ind_K η⟩ = 1 ≠ 0` for a constituent.
+  have key : ∀ (η : IrreducibleCharacter ↥((hyp.typeI.typeF.H).subgroupOf L))
+      (dη : CharacterDecompositionData hyp
+        (ClassFunction.induce ((hyp.typeI.typeF.H).subgroupOf L) (η : ClassFunction _ ℂ)))
+      (_ : φ ∈ dη.constituents),
+      IrreducibleCharacter.LiesOver ((hyp.typeI.typeF.H).subgroupOf L) φ η := by
+    intro η dη hη
+    rw [IrreducibleCharacter.LiesOver, ClassFunction.restrictionMultiplicity_def]
+    have hval : ClassFunction.inner (φ : ClassFunction ↥L ℂ)
+        (ClassFunction.induce ((hyp.typeI.typeF.H).subgroupOf L) (η : ClassFunction _ ℂ)) = 1 := by
+      rw [dη.decomp, inner_sum_right,
+        Finset.sum_eq_single_of_mem φ hη (fun φ' _ hne => by
+          rw [irreducibleCharacter_inner, if_neg (Ne.symm hne)]),
+        irreducibleCharacter_inner, if_pos rfl]
+    have hrel : ClassFunction.inner (φ : ClassFunction ↥L ℂ)
+        (ClassFunction.induce ((hyp.typeI.typeF.H).subgroupOf L) (η : ClassFunction _ ℂ))
+        = ClassFunction.inner
+          (ClassFunction.restrict ((hyp.typeI.typeF.H).subgroupOf L) (φ : ClassFunction ↥L ℂ))
+          (η : ClassFunction _ ℂ) := by
+      rw [OddOrder.RepresentationTheory.inner_conj_symm,
+        ClassFunction.inner_induce_eq_inner_restrict,
+        OddOrder.RepresentationTheory.inner_conj_symm, star_star]
+    rw [← hrel, hval]; exact one_ne_zero
+  obtain ⟨g, hg⟩ :=
+    (restrictionConstituentsSingleOrbit_of_isIrreducible φ).exists_conj
+      (key θ dχ hmem) (key θ' dχ' hmem')
+  rw [← hg]
+  exact (ClassFunction.induce_conjBy_eq (H := (hyp.typeI.typeF.H).subgroupOf L) g
+    (θ : ClassFunction ↥((hyp.typeI.typeF.H).subgroupOf L) ℂ)).symm
+
+open scoped Classical OddOrder.Peterfalvi.S12.FiniteInduce in
+/-- **Peterfalvi (12.4), pin (c)** ([Is] 6.2 capturing + (1.5.a)/(1.2)): the off-kernel irreducible
+characters `{φ : H ⊄ ker φ}` partition into the constituent-sets `S(χ)`, `χ ∈ S`.  By [Is] 6.2,
+`H ⊄ ker φ ⟹ Res_H φ` has a non-trivial constituent `θ`, so `φ ∈ S(Ind_H^L θ)`; the orbit `θ`
+determines `χ = Ind θ` uniquely ((1.5.a)/(1.2)), so the `S(χ)` are pairwise disjoint and cover the
+off-kernel irreducibles.  This is the genuine cross-section content (the [Is] 6.2 partition); the
+`β`-vanishing regroup `Sset_offKernel_vanishes_off_H` is proved from it. -/
+theorem exists_offKernel_constituent_partition {L : Subgroup G} [Finite G] (hyp : Hypothesis L)
+    (data : ∀ χ ∈ hyp.Sset, CharacterDecompositionData hyp χ) :
+    ∃ parts : Finset {χ : ClassFunction ↥L ℂ // χ ∈ hyp.Sset},
+      Finset.univ.filter (fun φ => ¬ InHKernel hyp φ) =
+        parts.biUnion (fun χ => (data χ.1 χ.2).constituents) ∧
+      (↑parts : Set {χ : ClassFunction ↥L ℂ // χ ∈ hyp.Sset}).PairwiseDisjoint
+        (fun χ => (data χ.1 χ.2).constituents) := by
+  haveI := hyp.finiteG
+  classical
+  by_cases hne : (Finset.univ.filter (fun φ => ¬ InHKernel hyp φ)).Nonempty
+  · -- The off-kernel filter is nonempty, so `S` is nonempty; build the capturing map.
+    obtain ⟨φ0, hφ0⟩ := hne
+    rw [Finset.mem_filter] at hφ0
+    obtain ⟨χ0, hχ0, -⟩ := not_inHKernel_imp_mem_constituents hyp data hφ0.2
+    haveI : Nonempty {χ : ClassFunction ↥L ℂ // χ ∈ hyp.Sset} := ⟨⟨χ0, hχ0⟩⟩
+    let cap : IrreducibleCharacter ↥L → {χ : ClassFunction ↥L ℂ // χ ∈ hyp.Sset} :=
+      fun φ => if h : ¬ InHKernel hyp φ then
+        ⟨(not_inHKernel_imp_mem_constituents hyp data h).choose,
+         (not_inHKernel_imp_mem_constituents hyp data h).choose_spec.choose⟩
+      else Classical.arbitrary _
+    refine ⟨(Finset.univ.filter (fun φ => ¬ InHKernel hyp φ)).image cap, ?_, ?_⟩
+    · ext φ
+      simp only [Finset.mem_filter, Finset.mem_univ, true_and, Finset.mem_biUnion,
+        Finset.mem_image]
+      constructor
+      · intro hφ
+        refine ⟨cap φ, ⟨φ, hφ, rfl⟩, ?_⟩
+        have hcapφ : cap φ = ⟨(not_inHKernel_imp_mem_constituents hyp data hφ).choose,
+            (not_inHKernel_imp_mem_constituents hyp data hφ).choose_spec.choose⟩ := dif_pos hφ
+        rw [hcapφ]
+        exact (not_inHKernel_imp_mem_constituents hyp data hφ).choose_spec.choose_spec
+      · rintro ⟨χs, ⟨φ', _, rfl⟩, hmem⟩
+        exact constituents_not_inHKernel hyp (cap φ').2 (data (cap φ').1 (cap φ').2) hmem
+    · intro χs _ χs' _ hne_s
+      simp only [Function.onFun, Finset.disjoint_left]
+      intro φ hmem hmem'
+      exact hne_s (Subtype.ext (constituents_eq_of_mem hyp χs.2 χs'.2
+        (data χs.1 χs.2) (data χs'.1 χs'.2) hmem hmem'))
+  · -- The off-kernel filter is empty; the empty partition works.
+    rw [Finset.not_nonempty_iff_eq_empty] at hne
+    exact ⟨∅, by rw [hne, Finset.biUnion_empty], by
+      rw [Finset.coe_empty]; exact Set.pairwiseDisjoint_empty⟩
+
+
+open scoped Classical OddOrder.Peterfalvi.S12.FiniteInduce in
+/-- **Peterfalvi (12.4), the off-kernel regroup** (genuine, from the [Is] 6.2 partition pin): the
+off-kernel Fourier part `β = ∑_{φ : H ⊄ ker φ} ⟨Res_L ψ, φ⟩·φ` of `Res_L ψ` vanishes on `L − H`.
+Regroup the off-kernel irreducibles by the partition into `S(χ)`
+(`exists_offKernel_constituent_partition`); on each `S(χ)` the coefficient `⟨Res_L ψ, φ⟩` is constant
+(`Sset_coeff_equal`, from `ψ ⊥ R(χ)`), so the `S(χ)`-block is `c_χ·∑_{φ ∈ S(χ)} φ = c_χ·χ`
+(`decomp`), which vanishes at `g ∈ L − H` (`Sset_vanishes_off_H`). -/
+theorem Sset_offKernel_vanishes_off_H {L : Subgroup G} [Finite G] (hyp : Hypothesis L)
+    (data : ∀ χ ∈ hyp.Sset, CharacterDecompositionData hyp χ) {psi : ClassFunction G ℂ}
+    (horth : ∀ χ (hχ : χ ∈ hyp.Sset), ∀ α ∈ Rset (data χ hχ), ClassFunction.inner psi α = 0)
+    {g : ↥L} (hg : (g : G) ∉ hyp.H) :
+    (∑ φ ∈ Finset.univ.filter (fun φ => ¬ InHKernel hyp φ),
+      ClassFunction.inner (ClassFunction.restrict L psi) (φ : ClassFunction ↥L ℂ) •
+        (φ : ClassFunction ↥L ℂ)) g = 0 := by
+  obtain ⟨parts, hpart, hdisj⟩ := exists_offKernel_constituent_partition hyp data
+  rw [classFunction_sum_apply, hpart, Finset.sum_biUnion hdisj]
+  refine Finset.sum_eq_zero fun χ _ => ?_
+  -- The `S(χ)`-block: `∑_{φ ∈ S(χ)} ⟨Res_L ψ, φ⟩ · φ(g) = c_χ · χ(g) = 0`.
+  obtain ⟨φ₀, hφ₀⟩ := (data χ.1 χ.2).constituents_nonempty
+  have hblock : ∑ φ ∈ (data χ.1 χ.2).constituents,
+      (ClassFunction.inner (ClassFunction.restrict L psi) (φ : ClassFunction ↥L ℂ) •
+        (φ : ClassFunction ↥L ℂ)) g
+      = ClassFunction.inner (ClassFunction.restrict L psi) (φ₀ : ClassFunction ↥L ℂ) *
+        ∑ φ ∈ (data χ.1 χ.2).constituents, (φ : ClassFunction ↥L ℂ) g := by
+    rw [Finset.mul_sum]
+    refine Finset.sum_congr rfl fun φ hφ => ?_
+    rw [ClassFunction.smul_apply,
+      Sset_coeff_equal hyp (data χ.1 χ.2) (horth χ.1 χ.2) hφ hφ₀]
+  have hdecomp : ∑ φ ∈ (data χ.1 χ.2).constituents, (φ : ClassFunction ↥L ℂ) g = χ.1 g := by
+    rw [← classFunction_sum_apply, ← (data χ.1 χ.2).decomp]
+  rw [hblock, hdecomp, Sset_vanishes_off_H hyp χ.2 hg, mul_zero]
+
+open scoped Classical OddOrder.Peterfalvi.S12.FiniteInduce in
+/-- **Peterfalvi (12.4)**: a class function `ψ` orthogonal to every type-I family `R(χ)` (`χ ∈ S`) is
+constant on each coset `xH` with `x ∈ L − H`.
+
+Proof: write `Res_L ψ = γ + β` by the Fourier expansion (`sum_inner_irreducibleCharacter_smul`),
+splitting `Irr L` into `{H ⊆ ker φ}` (= `γ`) and `{H ⊄ ker φ}` (= `β`).  The kernel part `γ` is
+constant on `H`-cosets (`apply_mul_eq_of_mem_characterKernel`, each `φ` with `H ⊆ ker φ`); the
+off-kernel part `β` vanishes on `L − H` (`Sset_offKernel_vanishes_off_H`: by [Is] 6.2 + the
+coefficient bridge `Sset_coeff_equal`, `β ∈ ℂ[S]` vanishes off `H`).  Hence
+`ψ(xh) = γ(xh) + β(xh) = γ(x) + 0 = γ(x) + β(x) = ψ(x)`. -/
+theorem orthogonal_character_constant_on_coset {L : Subgroup G} [Finite G]
     (_hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis L)
     (data : ∀ χ ∈ hyp.Sset, CharacterDecompositionData hyp χ) {psi : ClassFunction G ℂ}
     (horth : ∀ χ (hχ : χ ∈ hyp.Sset), ∀ α ∈ Rset (data χ hχ), ClassFunction.inner psi α = 0)
     {x : G} (hxL : x ∈ L) (hxH : x ∉ hyp.H) :
     ∀ h : G, h ∈ hyp.H → psi (x * h) = psi x := by
-  sorry
+  haveI := hyp.finiteG
+  classical
+  intro h hh
+  have hhL : h ∈ L := hyp.typeI.typeF.H_le hh
+  set xL : ↥L := ⟨x, hxL⟩ with hxLdef
+  set hL : ↥L := ⟨h, hhL⟩ with hhLdef
+  set gf : ClassFunction ↥L ℂ := ClassFunction.restrict L psi with hgf
+  -- Fourier split of `Res_L ψ = γ + β`.
+  set γ : ClassFunction ↥L ℂ := ∑ φ ∈ Finset.univ.filter (fun φ => InHKernel hyp φ),
+    ClassFunction.inner gf (φ : ClassFunction ↥L ℂ) • (φ : ClassFunction ↥L ℂ) with hγ
+  set β : ClassFunction ↥L ℂ := ∑ φ ∈ Finset.univ.filter (fun φ => ¬ InHKernel hyp φ),
+    ClassFunction.inner gf (φ : ClassFunction ↥L ℂ) • (φ : ClassFunction ↥L ℂ) with hβ
+  have hsplit : gf = γ + β := by
+    rw [hγ, hβ, Finset.sum_filter_add_sum_filter_not]
+    exact (sum_inner_irreducibleCharacter_smul gf).symm
+  -- `hL` lies in `H` (as a subgroup of `L`).
+  have hLmem : hL ∈ ((hyp.typeI.typeF.H).subgroupOf L : Set ↥L) :=
+    Subgroup.mem_subgroupOf.mpr hh
+  -- `γ` is constant on the `H`-coset `xL · hL`.
+  have hγconst : γ (xL * hL) = γ xL := by
+    rw [hγ, classFunction_sum_apply, classFunction_sum_apply]
+    refine Finset.sum_congr rfl fun φ hφ => ?_
+    rw [ClassFunction.smul_apply, ClassFunction.smul_apply,
+      apply_mul_eq_of_mem_characterKernel φ.isIrreducible
+        ((Finset.mem_filter.mp hφ).2 hLmem) xL]
+  -- `β` vanishes on `L − H` (off-kernel part is in `ℂ[S]`).
+  have hxhH : x * h ∉ hyp.H := fun hcon => hxH (by
+    have hmem : x * h * h⁻¹ ∈ hyp.H := mul_mem hcon (inv_mem hh)
+    rwa [mul_inv_cancel_right] at hmem)
+  have hβxh : β (xL * hL) = 0 := by
+    rw [hβ]
+    exact Sset_offKernel_vanishes_off_H hyp data horth (g := xL * hL)
+      (by rw [Subgroup.coe_mul]; exact hxhH)
+  have hβx : β xL = 0 := by
+    rw [hβ]; exact Sset_offKernel_vanishes_off_H hyp data horth (g := xL) hxH
+  -- Assemble: `ψ(xh) = γ(xh) + β(xh) = γ(x) + 0 = γ(x) + β(x) = ψ(x)`.
+  have key : gf (xL * hL) = gf xL := by
+    simp only [hsplit, ClassFunction.add_apply, hγconst, hβxh, hβx, add_zero]
+  have hgxh : gf (xL * hL) = psi (x * h) := by
+    rw [hgf, ClassFunction.restrict_apply, Subgroup.coe_mul]
+  have hgx : gf xL = psi x := by rw [hgf, ClassFunction.restrict_apply]
+  rw [← hgxh, ← hgx]; exact key
 
 open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
 /-- **Peterfalvi (12.5)**: after the rho-reduction, a class function `ψ` orthogonal

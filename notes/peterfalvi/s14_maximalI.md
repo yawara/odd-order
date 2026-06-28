@@ -401,3 +401,113 @@ char/§8-gated で手詰まり」評価は**誤り**(= 新方針が根絶する�
   要 (signed→orthonormal 変換 helper を S14 に要実装)。
 - (12.3) = (8.18.c) Ã disjoint + (5.9) + Supp disjoint + 共役論法。§8 cross fact は β 範囲外 (pin)。
 - その後 (12.6) sibleyTarget / (12.10)-(12.15) / (12.16) 最終矛盾 (+(1.10) congruence)。
+
+## 2026-06-29 (lane-b=β loop²): R₁(φ) orthonormal 化 + (12.3) genuine 証明完了
+
+**(12.2.b) 壁解消 — R₁(φ) を genuine OrthonormalCharacterImageFamily 化** (commit 278384dc):
+- 「signed→orthonormal 変換が次の壁」評価は**回避不要**だった。`S07.dadeOrthonormalCharacterImageFamilyOfDiff`
+  (S07:5497、差 φ̄−φ のみ supported を要求、constituent は φ(1)≠0 で個別 unsupported ゆえ正にこれ)が
+  τ=hyp.tau に直接 orthonormal family を構成。教科書定義「R₁(φ)=ℤ[Irr G] の濃度 2 orthonormal 部分集合」に
+  忠実。signed-family scaffold (exists_signedFamily_of_constituents / conjConstituent+補題 / signedFamily*)
+  は subsume されたため除去。`R1` (orthonormal) + `R1_diffsupp` (φ̄−φ⊆A(L)) + `Rset`=⋃R₁(φ).imageSet。
+- instance: return type に `haveI := hyp.finiteG; OrthonormalCharacterImageFamily hyp.tau φ` + body も
+  同 haveI + S12.FiniteInduce scope ⟹ hyp.tau の instance と完全一致 (binder [Fintype G] は使わない)。
+
+**(12.3) genuine 証明完了** (commit eb5eda20、S07+S14):
+- **S07 cross-domain (4.1) インフラ** (再利用可能、sorry-free):
+  - `inner_eq_zero_of_signedDifference_inner_zero_of_mem`: 既存 `orthogonal_of_signedDifference_inner_eq_zero`
+    を**異なる定義域 L,L' (τ,τ')** に一般化 (証明は元々 τ 非依存)。同域版は委譲 wrapper。
+  - `dadeCharacterDifferenceImageOfDiff`: `dadeOrthonormalCharacterImageFamilyOfDiff` から CDI producer を
+    factor out (orthonormal 版は `.toOrthonormalImage` wrapper)。R₁(φ) の underlying {μ,ν,ε} 露出。
+  - `toOrthonormalImage_inner_eq_zero_across`: 上記を符号付き member {ε·μ,−ε·ν} に持ち上げ (Rset の形)。
+- **S14**: `R1cdi` (R₁(φ) の CDI 露出)、`R1 := (R1cdi …).toOrthonormalImage`。`nonconjugate_typeI_R_orthogonal`
+  (12.3) を genuine 証明: member→R₁(φ)→cross-L (4.1)→⟨α,β⟩=0 を signed diff 直交に帰着
+  (`image_eq_signedDifference`)。幾何学入力 = `nonconjugate_diffImage_inner_zero` (S14:338) に faithful pin
+  = (8.18.c) thickened support 不交差 (S10.support_mutual_exclusion、§10=lane-d/f territory)。
+
+**残 frontier = (12.4)/(12.5) 証明本体** (次の上流項目、engine は ready):
+- `R1` が今や engine `CharacterPsiDecomposition.ofProjection` (S07:1185) の `imageFamily` 引数に直接適合
+  (= OrthonormalCharacterImageFamily)。signed→orthonormal の壁は無い。
+- (12.4) `orthogonal_character_constant_on_coset` (S14:382): χ=Ind_H^L θ, φ₁,φ₂∈S(χ) で Supp(φ₁−φ₂)⊆
+  A(L)−H#、(8.12.c) で TI⟹(φ₁−φ₂)^τ=Ind (Is 7.7)、(1.4) coherence⟹(φ₁−φ₂)^τ∈ℤ[R(χ)]⟹(Res_H ψ,φ₁−φ₂)=0
+  (ψ⊥R(χ))。Res_L ψ=β+γ (β∈ℂ[S], γ は H⊆Ker)、S は L−H で消える⟹ψ(xh)=γ(x)。
+  pin 候補: [Is] 6.2 (Res_H Ind=共役和)、[Is] 7.7 (TI 上で τ=Ind)、(8.12.c) (A(L)−H# TI)。
+- (12.5) `rho_constant_on_H_minus_Hprime` (S14:395): θ₁,θ₂∈Irr H 同次数、χᵢ=Ind θᵢ、(5.7) coherence、
+  (5.5) で (χ₁−χ₂)^τ∈ℤ[R(χ₁)∪R(χ₂)]⟹(Res_H ψ^ρ,θ₁−θ₂)=0。(1.7.b)+Ind_{H'}^H λ が H−H' で消える。
+
+## 2026-06-29 (lane-b=β loop⁴): (12.4) 完成 (genuine、3 pin modulo) + 残 frontier 整理
+
+**(12.4) `orthogonal_character_constant_on_coset` genuine 証明完了** (commits c83e47f2 + 56e6bba6):
+- Fourier 展開 (sum_inner_irreducibleCharacter_smul) で Res_L ψ=γ+β に分割 (InHKernel 述語)。
+  γ (H⊆ker) coset-const = apply_mul_eq_of_mem_characterKernel (既存)。β (H⊄ker) L−H 消失。
+- **pin (c) discharge 済**: β-vanishing を genuine 化。off-kernel sum を S(χ) partition で regroup
+  (Finset.sum_biUnion + Sset_coeff_equal 係数一定 + decomp + Sset_vanishes_off_H)。
+- 補助 genuine: `Sset_vanishes_off_H` (S 元が L−H で 0)、`Sset_coeff_equal` (ψ⊥R(χ)⟹S(χ) 係数一定、
+  Frobenius inner_induce_eq_inner_restrict + pin a,b)、`classFunction_sum_apply`。
+
+**残 (12.4) pin = 3 純 cross-section faithful obligation**:
+- (a) `constituent_diff_tau_mem_span`: (φ₁−φ₂)^τ∈ℤ[R(χ)] ((1.4) global coherence)。discharge には
+  n-ary (1.4) 再導入 + per-φ R₁(φ) との reconciliation 要 (ℤ-span は一致するが μ 対応付けが involved)。
+- (b) `constituent_diff_tau_eq_induce`: (φ₁−φ₂)^τ=Ind_L^G(φ₁−φ₂) ([Is]7.7 τ=Ind on TI)。repo の
+  S05 `tau_eq_induce` は TI-cyclic 用で型 I 不適用。Dade-on-TI 一般化要。
+- (c') `exists_offKernel_constituent_partition`: {φ:H⊄ker}=⊔S(χ) ([Is]6.2 capturing + uniqueness)。
+  Clifford theory (CliffordSingleOrbit 等) 部分在庫 → 比較的 tractable か。
+
+**(12.5) は ρ-blocked (要判断)**: repo statement `psi h=psi 1` は **unfaithful** (ρ 無 + =psi 1 が
+constant-on-H−H' でない)。book は「ψ^ρ が H−H' で constant」。ρ (Hypothesis 7.1, A=A(L)) は repo 未
+形式化 (S09 chiRho/FamilyHypothesis71 は family 特化、型 I A(L) 一般 ρ 不在)。faithful 化には §7 ρ
+machinery 構築 (大、§7 prerequisite) 要。
+
+## 2026-06-29 (lane-b=β loop⁵-¹⁰): pin (c') 完全 discharge — [Is]6.2 partition genuine
+
+**pin (c') `exists_offKernel_constituent_partition` 完全 discharge** (commits 99db2c93 → d7fe3fc7 →
+8bd87b1c → e817e3ee → 6bf6f93b)。{φ:H⊄ker}=⊔S(χ) を bottom-up で全 genuine 化:
+- `constituents_not_inHKernel` (⊇): constituent は off-kernel (Frobenius + decomp + characterKernel)。
+- `not_inHKernel_imp_mem_constituents` (⊆): off-kernel φ は capturing
+  (`exists_constituent_not_subset_characterKernel` [Is]6.5 + Frobenius)。
+- `not_inHKernel_iff` (両方向 ↔)。
+- `constituents_eq_of_mem` (disjointness): Clifford single-orbit
+  `restrictionConstituentsSingleOrbit_of_isIrreducible.exists_conj` + `induce_conjBy_eq` (Pf 1.5.a)。
+- pin 本体: parts=image(cap)、biUnion 等式 + PairwiseDisjoint の Finset 組立 (content lemma を pin
+  前に reorder)。
+
+**(12.4) は残 pin (a)(b) modulo で genuine closed**。pin (c) regroup + (c') partition 両方 genuine。
+
+**残 §12 char frontier (全て deeper cross-section/§7/§8 machinery)**:
+- pin (a) `constituent_diff_tau_mem_span` (S14:400): (φ₁−φ₂)^τ∈ℤ[R(χ)] ((1.4) global coherence +
+  per-φ R₁(φ) reconciliation)。**concrete 3-piece plan (2026-06-29 確認)**:
+  1. **n-ary (1.4)**: `isometry_difference_pair_structure` (IsometryDifferencePair:730) を constituent
+     family に適用 ⟹ global SignedIrreducibleDifferenceFamily で τ(φᵢ−φ₀)=ε(μᵢ−μ₀) ⟹
+     τ(φ₁−φ₂)=ε(μ_{φ₁}−μ_{φ₂})。(削除した exists_signedFamily_of_constituents の再導入)。
+  2. **difference-uniqueness reconciliation**: global μ_{φ₁} は τ(φ₁−φ̄₁) の既約成分。R1cdi の
+     image_eq: τ(φ₁−φ̄₁)=ε_cdi(μ_cdi−ν_cdi)。両者 = 同じ τ(φ₁−φ̄₁) ⟹ ε(μ_{φ₁}−μ_{φ̄₁})=
+     ε_cdi(μ_cdi−ν_cdi) ⟹ `linearIndependent_irreducibleCharacter` (CharacterCount:86) で
+     {μ_{φ₁},μ_{φ̄₁}}={μ_cdi,ν_cdi} ⟹ μ_{φ₁}∈{μ_cdi,ν_cdi} ⟹ ±(R1cdi.toOrthonormalImage.imageSet member)
+     ∈ ℤ[Rset]。要 difference-uniqueness lemma (s(α−β)=s'(γ−δ), 既約 distinct ⟹ pair 一致、
+     線形独立から、~30 行、新規)。
+  3. **span assembly**: τ(φ₁−φ₂)=ε(μ_{φ₁}−μ_{φ₂})、μ_{φᵢ}∈ℤ[Rset] ⟹ ∈ℤ[Rset]。
+  深い multi-iteration proof (~100+ 行)。次イテレーションで piece 1 から bottom-up。
+- pin (b) `constituent_diff_tau_eq_induce` (S14:413): (φ₁−φ₂)^τ=Ind_L^G ([Is]7.7 τ=Ind on TI、Dade
+  machinery; S05 tau_eq_induce は TI-cyclic 用で型 I 不適用)。
+- (12.2.a) `typeI_induced_char_constituents` (S14:235): §8 型 F Clifford ((8.2.c) inertia + (1.7.c))。
+- (12.3) (8.18.c) `nonconjugate_diffImage_inner_zero` (S14:338): §10 support 不交差 (lane-d/f)。
+- (12.5) ρ-blocked (上記)。
+
+## 2026-06-29 (lane-b=β loop³): Sset_vanishes_off_H + (12.4) 精密 reduction 設計
+
+**`Sset_vanishes_off_H` 完成** (commit 66aac2b5): χ=Ind_H^L θ∈S は H=L_F normal (Fitting,
+`OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_subgroupOf_normal`) ゆえ `induce_eq_zero_of_not_mem_normal`
+で L−H で 0。(12.4)/(12.5) endgame の β∈ℂ[S] 消失 step。両者 consume。
+
+**(12.4) 精密 reduction (次イテレーション実装) — 3 faithful pin + genuine 組立**:
+- **adjunction `⟨ψ,τf⟩_G = ⟨Res_L ψ,f⟩_L`** (f=φ₁−φ₂, A(L)−H# supported) は **[Is]7.7 (τ=Ind_L^G on
+  TI-subset) + Frobenius reciprocity** に分解。後者は repo 在庫 `inner_induce_eq_inner_restrict`
+  (InducedCharacter:531)。⟹ pin は τ=Ind 部分のみ。
+- **pin (a)** `τ(φ₁−φ₂)∈zSpan R(χ)` (coherence, (1.4)/{φ₁,φ₂,φ̄₁,φ̄₂} coherent) ⟹ ψ⊥R(χ) で ⟨ψ,τ(φ₁−φ₂)⟩=0。
+- **pin (b)** `τ(φ₁−φ₂)=Ind_L^G(φ₁−φ₂)` ([Is]7.7 + (8.12.c) A(L)−H# TI、φ₁−φ₂ は (8.12.a) [Is]6.2 で
+  A(L)−H# supported) ⟹ Frobenius で ⟨ψ,τ(φ₁−φ₂)⟩=⟨Res_L ψ,φ₁−φ₂⟩。(a)(b) 合わせ ⟨Res_L ψ,φ₁−φ₂⟩=0
+  = S(χ) 内 constituent で Res_L ψ 係数一定 ⟹ ∪S(χ)-part = β∈ℂ[S]。
+- **pin (c)** capturing: H⊄ker φ ⟹ φ∈S(χ) ([Is]6.2/Clifford) ⟹ γ=残り は H⊆ker。
+- **genuine 組立**: 上記で Res_L ψ=β+γ、β は L−H で 0 (`Sset_vanishes_off_H` ✓)、γ は coset-const
+  (H⊆ker character ⟹ φ(xh)=φ(x)、要 character-kernel coset-const lemma) ⟹ ψ(xh)=γ(x)=ψ(x)。
+  regrouping は character completeness (`CharacterCompleteness`) + 係数抽出。

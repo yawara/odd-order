@@ -559,29 +559,29 @@ def Orthogonal (hχ : CharacterDifferenceImage (L := L) (G := G) τ χ)
     ClassFunction.inner φ η = 0
 
 open scoped Classical in
-/-- **Peterfalvi (4.1) for two-element families (the `u = v = 1` case): cross-orthogonality from
-orthogonal signed differences.**
+/-- **Peterfalvi (4.1), cross-domain member form (the `u = v = 1` case).**
 
-If the signed differences `(χ − χ̄)^τ = ε·(μ − ν)` and `(ψ − ψ̄)^τ = ε'·(μ' − ν')` of two
-two-element image families are orthogonal, then `R(χ) = {μ, ν}` is orthogonal to `R(ψ) = {μ', ν'}`:
-the four irreducibles are pairwise orthogonal across the families.
+The two `CharacterDifferenceImage`s may live over **different domains** `L, L'` (maps `τ, τ'`) but the
+same `G`.  If the signed differences `(χ − χ̄)^τ = ε·(μ − ν)` and `(ψ − ψ̄)^{τ'} = ε'·(μ' − ν')` are
+orthogonal in `CF(G)`, then every cross pairing of members vanishes — `μ, ν, μ', ν'` share no
+irreducible, so any `a ∈ R(χ)`, `b ∈ R(ψ)` satisfy `(a, b) = 0`.
 
 This is the special `u = v = 1` instance of Peterfalvi (4.1) (mmd 04.6 L5), where the degree /
-value-at-`1` hypotheses are not needed: for `α, β, γ, δ ∈ ±Irr` with `(α, β) = (γ, δ) = 0` and the
-*single* difference pairing `(α − β, γ − δ) = 0`, suppose two of `μ, ν, μ', ν'` coincide as
-irreducibles.  Expanding `0 = (ε(μ−ν), ε'(μ'−ν')) = εε'·((μ,μ') − (μ,ν') − (ν,μ') + (ν,ν'))` against
-the orthonormality of `Irr G` (`irreducibleCharacter_inner`) and the within-family distinctness
+value-at-`1` hypotheses are not needed: suppose two of `μ, ν, μ', ν'` coincide as irreducibles.
+Expanding `0 = (ε(μ−ν), ε'(μ'−ν')) = εε'·((μ,μ') − (μ,ν') − (ν,μ') + (ν,ν'))` against the
+orthonormality of `Irr G` (`irreducibleCharacter_inner`) and the within-family distinctness
 (`μ ≠ ν`, `μ' ≠ ν'`) collapses the bracket to `±(1 + δ) = 0` with `δ ∈ {0, 1}` a Kronecker delta —
-impossible.  So no irreducible is shared, and every cross pairing is `0`.
-
-This is the genuine (5.2.e)/(4.1) content for the Dade families, discharged from the isometry's
-inner-preservation `((χ − χ̄)^τ, (ψ − ψ̄)^τ) = 0` (itself a consequence of `χ ⊥ {ψ, ψ̄}`). -/
-theorem orthogonal_of_signedDifference_inner_eq_zero
+impossible.  So no irreducible is shared, and every cross pairing is `0`.  The proof is
+τ-independent; the cross-`L` generality is exactly what Peterfalvi (12.3) needs (`R(χ₁)`, `R(χ₂)`
+from non-conjugate maximal subgroups `L₁, L₂`). -/
+theorem inner_eq_zero_of_signedDifference_inner_zero_of_mem
     [Fintype G] [Invertible (Nat.card G : ℂ)]
+    {L' : Type*} [Group L'] {τ' : IntegralCharacterMap L' G} {ψ' : ClassFunction L' ℂ}
     (hχ : CharacterDifferenceImage (L := L) (G := G) τ χ)
-    (hψ : CharacterDifferenceImage (L := L) (G := G) τ ψ)
-    (hinner : ClassFunction.inner hχ.signedDifference hψ.signedDifference = 0) :
-    hχ.Orthogonal hψ := by
+    (hψ : CharacterDifferenceImage (L := L') (G := G) τ' ψ')
+    (hinner : ClassFunction.inner hχ.signedDifference hψ.signedDifference = 0)
+    {a b : ClassFunction G ℂ} (ha : a ∈ hχ.imageSet) (hb : b ∈ hψ.imageSet) :
+    ClassFunction.inner a b = 0 := by
   classical
   -- Abbreviations for the four irreducible characters of the two families.
   set μ := hχ.mu with hμ
@@ -657,17 +657,27 @@ theorem orthogonal_of_signedDifference_inner_eq_zero
       have hμν' : μ ≠ ν' := fun he => hμν (he.trans h.symm)
       rw [if_pos h, if_neg hνμ', if_neg hμν'] at hbracket
       revert hbracket; split_ifs <;> intro hb <;> norm_num at hb
-  -- Conclude orthogonality of the image sets.
-  intro φ η hφ hη
-  rw [hχ.mem_imageSet_iff] at hφ
-  rw [hψ.mem_imageSet_iff] at hη
+  -- Conclude: the chosen members `a ∈ R(χ)`, `b ∈ R(ψ)` are orthogonal.
+  rw [hχ.mem_imageSet_iff] at ha
+  rw [hψ.mem_imageSet_iff] at hb
   obtain ⟨h1, h2, h3, h4⟩ := key
-  rcases hφ with rfl | rfl <;> rcases hη with rfl | rfl <;>
+  rcases ha with rfl | rfl <;> rcases hb with rfl | rfl <;>
     simp only [muClassFunction, nuClassFunction]
   · rw [hcross μ μ', if_neg h1]
   · rw [hcross μ ν', if_neg h2]
   · rw [hcross ν μ', if_neg h3]
   · rw [hcross ν ν', if_neg h4]
+
+/-- **Peterfalvi (5.2.e)/(4.1) same-domain form** (`R(χ).Orthogonal R(ψ)` for `χ, ψ` over the same
+`L`): the `CharacterDifferenceImage.Orthogonal`-facing wrapper of the cross-domain member lemma
+`inner_eq_zero_of_signedDifference_inner_zero_of_mem`. -/
+theorem orthogonal_of_signedDifference_inner_eq_zero
+    [Fintype G] [Invertible (Nat.card G : ℂ)]
+    (hχ : CharacterDifferenceImage (L := L) (G := G) τ χ)
+    (hψ : CharacterDifferenceImage (L := L) (G := G) τ ψ)
+    (hinner : ClassFunction.inner hχ.signedDifference hψ.signedDifference = 0) :
+    hχ.Orthogonal hψ :=
+  fun _a _b ha hb => inner_eq_zero_of_signedDifference_inner_zero_of_mem hχ hψ hinner ha hb
 
 /-- Restatement using the named §3/§7 helper for the expression `χ - χ̄`. -/
 theorem image_conjugateDifference (hχ : CharacterDifferenceImage (L := L) (G := G) τ χ) :
@@ -955,6 +965,35 @@ theorem toOrthonormalImage_orthogonal
   · rw [h hχ.muClassFunction_mem_imageSet hψ.nuClassFunction_mem_imageSet, mul_zero, mul_zero]
   · rw [h hχ.nuClassFunction_mem_imageSet hψ.muClassFunction_mem_imageSet, mul_zero, mul_zero]
   · rw [h hχ.nuClassFunction_mem_imageSet hψ.nuClassFunction_mem_imageSet, mul_zero, mul_zero]
+
+open scoped Classical in
+/-- **Cross-domain member orthogonality through `toOrthonormalImage`.**  The orthonormal families
+`{ε·μ, −ε·ν}` and `{ε'·μ', −ε'·ν'}` produced by `toOrthonormalImage` from two
+`CharacterDifferenceImage`s over *possibly different* domains `L, L'` (maps `τ, τ'`, same `G`) have
+all member cross pairings `0`, given only that the signed differences are orthogonal
+(`⟨(χ−χ̄)^τ, (ψ−ψ̄)^{τ'}⟩ = 0`).  Sign-scales the cross-domain (4.1) member lemma
+`inner_eq_zero_of_signedDifference_inner_zero_of_mem` (`⟨s•a, t•b⟩ = s̄·t·⟨a,b⟩`).  This is the form
+Peterfalvi (12.3) consumes (`R(χ₁) ⊥ R(χ₂)` for non-conjugate maximal subgroups `L₁, L₂`). -/
+theorem toOrthonormalImage_inner_eq_zero_across
+    {L' : Type*} [Group L'] {τ' : IntegralCharacterMap L' G} {ψ' : ClassFunction L' ℂ}
+    (hχ : CharacterDifferenceImage (L := L) (G := G) τ χ)
+    (hψ : CharacterDifferenceImage (L := L') (G := G) τ' ψ')
+    (hinner : ClassFunction.inner hχ.signedDifference hψ.signedDifference = 0)
+    {a b : ClassFunction G ℂ}
+    (ha : a ∈ hχ.toOrthonormalImage.imageSet) (hb : b ∈ hψ.toOrthonormalImage.imageSet) :
+    ClassFunction.inner a b = 0 := by
+  simp only [toOrthonormalImage, Finset.mem_insert, Finset.mem_singleton] at ha hb
+  rcases ha with rfl | rfl <;> rcases hb with rfl | rfl <;>
+    rw [← Int.cast_smul_eq_zsmul ℂ, ← Int.cast_smul_eq_zsmul ℂ,
+      ClassFunction.inner_smul_left, OddOrder.RepresentationTheory.inner_smul_right]
+  · rw [inner_eq_zero_of_signedDifference_inner_zero_of_mem hχ hψ hinner
+      hχ.muClassFunction_mem_imageSet hψ.muClassFunction_mem_imageSet, mul_zero, mul_zero]
+  · rw [inner_eq_zero_of_signedDifference_inner_zero_of_mem hχ hψ hinner
+      hχ.muClassFunction_mem_imageSet hψ.nuClassFunction_mem_imageSet, mul_zero, mul_zero]
+  · rw [inner_eq_zero_of_signedDifference_inner_zero_of_mem hχ hψ hinner
+      hχ.nuClassFunction_mem_imageSet hψ.muClassFunction_mem_imageSet, mul_zero, mul_zero]
+  · rw [inner_eq_zero_of_signedDifference_inner_zero_of_mem hχ hψ hinner
+      hχ.nuClassFunction_mem_imageSet hψ.nuClassFunction_mem_imageSet, mul_zero, mul_zero]
 
 end CharacterDifferenceImage
 
@@ -5479,7 +5518,9 @@ noncomputable def dadeOrthonormalCharacterImageFamily
   -- Assemble: the §3 keystone difference image, lifted to the orthonormal family.
   exact (characterDifferenceImageOfIsometry τ χ hreal hvirtual hzero hisom).toOrthonormalImage
 
-/-- **R(χ) from the Dade isometry, with only the DIFFERENCE `χ̄ − χ` supported (X-family).**
+/-- **The Dade `CharacterDifferenceImage` `{μ, ν, ε}` of `χ`, with only the DIFFERENCE `χ̄ − χ`
+supported (X-family).**  (`.toOrthonormalImage` lifts it to the orthonormal `R(χ)`; see
+`dadeOrthonormalCharacterImageFamilyOfDiff` below.)
 
 The orthonormal image family `R(χ)` with `(χ − χ̄)^τ = ∑_{α ∈ R(χ)} α`, built from the Dade base
 map — but requiring only that the *difference* `χ̄ − χ` is supported in `CF(L,A)`, **not** the
@@ -5494,13 +5535,13 @@ The Dade `CF(L,A)`-isometry is applied on the **difference set** `D = {0, χ̄ �
 generators the (1.4)/(2.6.a) keystone uses.  No `χ`/`χ̄` individual support is touched.
 `dadeOrthonormalCharacterImageFamily` (individual supports) is recovered as the special case where
 `hdiffsupp` is derived from `hχsupp`, `hχbarsupp`. -/
-noncomputable def dadeOrthonormalCharacterImageFamilyOfDiff
+noncomputable def dadeCharacterDifferenceImageOfDiff
     (hyp : S04.Hypothesis G A L) (hconj : hyp.HConjInvariant)
     (χ : IrreducibleCharacter (↥L))
     (hreal : ¬ ClassFunction.IsReal (χ : ClassFunction (↥L) ℂ))
     (hdiffsupp : ((χ : ClassFunction (↥L) ℂ).conj - (χ : ClassFunction (↥L) ℂ)).support ⊆
       supportInSubgroup A L) :
-    OrthonormalCharacterImageFamily (L := ↥L) (G := G)
+    CharacterDifferenceImage (L := ↥L) (G := G)
       (dadeIntegralCharacterMap hyp (hyp.fullDadeIsometryData hconj))
       (χ : ClassFunction (↥L) ℂ) := by
   classical
@@ -5552,7 +5593,23 @@ noncomputable def dadeOrthonormalCharacterImageFamilyOfDiff
     intro i j
     exact dadeIntegralCharacterMap_inner_eq_on_supported_span hyp hconj hDsupp
       (hdiff_in_D i) (hdiff_in_D j)
-  exact (characterDifferenceImageOfIsometry τ χ hreal hvirtual hzero hisom).toOrthonormalImage
+  exact characterDifferenceImageOfIsometry τ χ hreal hvirtual hzero hisom
+
+/-- **R(χ) from the Dade isometry, difference-support form**: `dadeCharacterDifferenceImageOfDiff`
+lifted to the orthonormal family `R(χ) = {ε·μ, −ε·ν}` via `toOrthonormalImage`.  Requires only the
+*difference* `χ̄ − χ` supported in `CF(L,A)` (the `(6.8)`/`(12.2)` X-family situation, where `χ`
+itself is unsupported since `χ(1) ≠ 0`).  The underlying `{μ, ν, ε}` data is
+`dadeCharacterDifferenceImageOfDiff` (consumed by the cross-`L` (4.1) orthogonality of (12.3)). -/
+noncomputable def dadeOrthonormalCharacterImageFamilyOfDiff
+    (hyp : S04.Hypothesis G A L) (hconj : hyp.HConjInvariant)
+    (χ : IrreducibleCharacter (↥L))
+    (hreal : ¬ ClassFunction.IsReal (χ : ClassFunction (↥L) ℂ))
+    (hdiffsupp : ((χ : ClassFunction (↥L) ℂ).conj - (χ : ClassFunction (↥L) ℂ)).support ⊆
+      supportInSubgroup A L) :
+    OrthonormalCharacterImageFamily (L := ↥L) (G := G)
+      (dadeIntegralCharacterMap hyp (hyp.fullDadeIsometryData hconj))
+      (χ : ClassFunction (↥L) ℂ) :=
+  (dadeCharacterDifferenceImageOfDiff hyp hconj χ hreal hdiffsupp).toOrthonormalImage
 
 /-- **The supported per-step decomposition `Da` of `χ − a·χ₁`, for an UNSUPPORTED `χ` (X-family).**
 
