@@ -104,6 +104,16 @@ theorem inducedFamily_closedUnderConjugate [Finite G] (M : Subgroup G) :
     simpa using ClassFunction.induce_conj ((derivedInG M).subgroupOf M)
       (θ : ClassFunction ↥((derivedInG M).subgroupOf M) ℂ)
 
+/-- **Complex conjugation commutes with `G`-conjugation** of class functions: for a normal
+subgroup `H ⊴ G`, `(θ^g)‾ = (θ‾)^g`.  Both sides evaluate to `star (θ ⟨g·h·g⁻¹⟩)`.  This is the
+`σ`-commutes-with-the-`M`-action input to the odd-order orbit argument showing that an induced
+character `Ind_{M'}^M θ` (`θ ≠ 1`) is non-real. -/
+theorem conjBy_conj {K : Type*} [Group K] {H : Subgroup K} [H.Normal]
+    (g : K) (θ : ClassFunction ↥H ℂ) :
+    (ClassFunction.conjBy g θ).conj = ClassFunction.conjBy g θ.conj := by
+  ext h
+  simp only [ClassFunction.conj_apply, ClassFunction.conjBy_apply]
+
 /-! ## (10.1): the type III/IV/V hypothesis -/
 
 open scoped FiniteInduce in
