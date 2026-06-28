@@ -177,6 +177,13 @@ theorem conjPerm_ne_self_of_mem_conjByOrbit {K : Type*} [Group K] {H : Subgroup 
     exact OddOrder.RepresentationTheory.not_isReal_of_ne_trivial_of_odd_card' hodd hne hreal
   exact trivial_not_mem_conjByOrbit hθ (htriv ▸ hη)
 
+/-- **`conjPerm` is an involution**: `(χ̄)‾ = χ`. -/
+theorem conjPerm_conjPerm {L : Type*} [Group L] [Finite L] (χ : IrreducibleCharacter L) :
+    IrreducibleCharacter.conjPerm L (IrreducibleCharacter.conjPerm L χ) = χ := by
+  apply IrreducibleCharacter.ext
+  rw [IrreducibleCharacter.conjPerm_apply_coe, IrreducibleCharacter.conjPerm_apply_coe,
+    ClassFunction.conj_conj]
+
 /-! ## (10.1): the type III/IV/V hypothesis -/
 
 open scoped FiniteInduce in
