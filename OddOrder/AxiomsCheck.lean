@@ -2099,6 +2099,11 @@ set_option linter.style.longLine false in
 set_option linter.style.longLine false in
 #assert_only_allowed_axioms
   OddOrder.RepresentationTheory.apply_one_eq_one_of_subset_characterKernel_of_isMulCommutative_quotient
+-- Constituent transitivity: A ≤ B ≤ G, A ⊄ ker χ ⟹ some constituent ψ of Res_B χ has A ⊄ ker ψ.
+-- Clifford-correspondent existence for Peterfalvi (9.9.a) (issue 2031/2030).
+set_option linter.style.longLine false in
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.exists_constituent_not_subset_characterKernel
 
 -- Coefficientwise Galois transport for class functions, irreducible-character indices,
 -- virtual-character lattices, and S07 coherence data.  Galois conjugates of irreducible
@@ -2608,6 +2613,16 @@ set_option linter.style.longLine false in
   OddOrder.RepresentationTheory.coe_eq_induce_of_liesOver_of_isIrreducibleCharacter_induce
 #assert_only_allowed_axioms
   OddOrder.RepresentationTheory.apply_one_eq_index_mul_of_liesOver_of_isIrreducibleCharacter_induce
+-- **Constituent degree bound**: an irreducible `χ` lying over `ψ ∈ Irr I` has degree `χ(1) ≤
+-- (Ind_I^G ψ)(1)` (genuine-character Fourier expansion + nonneg multiplicities).  Unlike the Clifford
+-- correspondence it needs no irreducibility of `Ind ψ`; it forces `e = 1` in (9.9.a) (issue 2031).
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.apply_one_le_induce_apply_one_of_liesOver
+-- **Clifford correspondence degree (e=1 sandwich)**: `χ` over a linear `θ₀ ∈ Irr H` with inertia `I`
+-- and over a linear `ψ ∈ Irr I` ⟹ `χ(1) = [G:I]`.  Sandwiches the Clifford lower bound `e·[G:I]`
+-- against the constituent upper bound `[G:I]`, forcing `e = 1`.  Abstract core of (9.9.a) (issue 2031).
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.apply_one_eq_index_of_liesOver_linear_inertia
 
 -- Peterfalvi (6.8) T6/Y-family consumer side: degree-one induced families have common degree,
 -- supported differences on `H#`, irreducibility from c1/c2 inertia, and equal-degree coherence.
