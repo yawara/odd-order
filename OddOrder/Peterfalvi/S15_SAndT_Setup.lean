@@ -330,6 +330,51 @@ theorem basic_structure [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
             tauS_eq_induction_holds := core.tauS_eq_induction_holds }, ?_⟩
   exact ⟨Or.inl hSII, core.P_elementaryAbelian, core.P_order, core.u_bound, core.A0S_TI_holds⟩
 
+/-- **Peterfalvi (13.2.b), order part**: the Fitting kernel `P = S_F` has order `p^q`.
+
+This is the order half of (13.2.b) ("`P` is elementary abelian of order `p^q`").  `S` is of Type II
+from the κ-Hall carrier `S_typeP2` (`isTypeII_of_isTypeP2`), so §11's Wielandt fixed-point order
+relation `typeII_III_IV_order_relations` (Peterfalvi (9.3)) applies to the type-II setup on `S` with
+`typeP := Sdata`, giving `|S_F| = |W₂|^q`.
+
+The one input not derivable from the bare `Hypothesis` fields is the reconciliation `Sdata.W2 = W2`
+between the *intrinsic* type-`P` `W₂` of `S` (`Sdata.W2 = C_{S'}(W₁#)`) and the abstract `W₂`
+(complement of `W₁` in the cyclic `W = S ∩ T`) — the `W₂`-analogue of the carried
+`Sdata_U_eq` / `Sdata_W1_eq`.  It is honest §16-carrier content (`Section16TypePStructure`, which
+builds `Sdata`); taken here as an explicit hypothesis so the order computation is unconditional on
+its proof.  See issue 3001 for threading it through the carrier (then `basic_structure_gated`'s
+`P_order` field discharges). -/
+theorem Hypothesis.card_P_eq [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hyp : Hypothesis (G := G)) (hSdataW2 : hyp.Sdata.W2 = hyp.W2) :
+    Nat.card ↥hyp.P = hyp.p ^ hyp.q := by
+  have hSII : IsTypeII hyp.S :=
+    OddOrder.BG.Ch4.S16.isTypeII_of_isTypeP2 hG hyp.S_maximal hyp.S_typeP2
+  have tdata : TypeIIData hyp.S := hSII.some
+  -- `Sdata.U ≠ ⊥`: its order is the witness-independent index `[S' : S_F]`, which is `≠ 1`
+  -- because the type-II witness has `U ≠ 1` at the same index.
+  have hUne : hyp.Sdata.U ≠ ⊥ := by
+    intro hbot
+    have h1 : Nat.card ↥hyp.Sdata.U = Nat.card ↥tdata.typeP.U := by
+      rw [hyp.Sdata.card_U_eq_index, tdata.typeP.card_U_eq_index]
+    rw [hbot, Subgroup.card_bot] at h1
+    exact tdata.common.1 (Subgroup.card_eq_one.mp h1.symm)
+  have hW1prime : (Nat.card ↥hyp.Sdata.W1).Prime := by
+    rw [hyp.Sdata_W1_eq, ← hyp.q_eq_card_W1]; exact hyp.q_prime
+  -- the `A_0(S)` TI-subset clause of the nontrivial core depends only on `S` (witness-independent).
+  have hTI := tdata.common.2.2
+  -- (9.3) Wielandt order relation for the type-II setup on `S`.
+  have hord := (OddOrder.Peterfalvi.S11.typeII_III_IV_order_relations hG
+    { maximal := hyp.S_maximal
+      typeP := hyp.Sdata
+      nontrivial := ⟨hUne, hW1prime, hTI⟩
+      type_alt := Or.inl hSII }).1 hSII
+  have hord2 : Nat.card ↥hyp.Sdata.H
+      = Nat.card ↥hyp.Sdata.W2 ^ Nat.card ↥hyp.Sdata.W1 := hord.2
+  have hW2card : Nat.card ↥hyp.Sdata.W2 = hyp.p := by
+    rw [hSdataW2, ← hyp.p_eq_card_W2]
+  rw [hyp.Sdata.H_eq, ← hyp.P_eq_SF, hW2card, hyp.Sdata_W1_eq, ← hyp.q_eq_card_W1] at hord2
+  exact hord2
+
 /-- **Structural input for Peterfalvi (13.2.d) — §14-gated.**
 
 The type II/III maximal subgroup `S` carries the Sibley Dade setup of (6.8) realizing its
