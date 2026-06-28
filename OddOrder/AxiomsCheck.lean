@@ -32,6 +32,7 @@ import OddOrder.GroupTheory.RepresentationTheory.ClassSumAlgebra
 import OddOrder.GroupTheory.RepresentationTheory.ClassSumCoefficientFormula
 import OddOrder.GroupTheory.RepresentationTheory.RealClassTISubset
 import OddOrder.GroupTheory.RepresentationTheory.Clifford
+import OddOrder.GroupTheory.RepresentationTheory.CliffordSingleOrbit
 import OddOrder.GroupTheory.RepresentationTheory.InflationCharacter
 import OddOrder.GroupTheory.RepresentationTheory.ExtraspecialThm25Final
 import OddOrder.Isaacs.Ch02_Subnormality.Main
@@ -2572,6 +2573,25 @@ set_option linter.style.longLine false in
 -- Frobenius-group consumer form of [Is] Thm 6.34, used by Peterfalvi (6.8) case c1.
 #assert_only_allowed_axioms
   OddOrder.RepresentationTheory.isIrreducibleCharacter_induce_of_frobeniusGroup
+-- Degree side of Clifford's theorem: `χ(1) = ∑_θ ⟨Res χ,θ⟩·θ(1)` (Fourier expansion of `Res χ`).
+-- The degree component of the (9.9.a) Clifford-degree assembly (issue 2031).
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.apply_one_eq_sum_restrictionMultiplicity_mul
+-- Clifford single-orbit (module level): two simple `k[H]`-submodules of a `G`-irreducible
+-- restriction have conjugate characters `χ_{N'}(h) = χ_N(g⁻¹ h g)` — the core of
+-- `RestrictionConstituentsSingleOrbit` (issue 2031), from `iSup_map_conjSemilinearEnd_eq_top`.
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.character_conj_of_simpleSubmodule
+-- Constituent ⟺ submodule bridge (module side): a nonzero `H`-intertwiner `σ → Res^G_H ρ`
+-- (`σ` irreducible) yields a simple `k[H]`-submodule of `Res^G_H ρ` with character `χ_σ` (Schur +
+-- `equivLinearMapAsModule` + `LinearEquiv.ofInjective` + `char_iso`); issue 2031 補題4 core.
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.exists_simpleSubmodule_character_eq_of_ne_zero_intertwiner
+-- **Clifford's theorem, single-orbit (character level)** ([Is] Thm 6.5, first clause): for a
+-- `G`-irreducible χ and `H ⊴ G`, the constituents of `Res^G_H χ` form a single `G`-conjugation
+-- orbit.  Discharges the `RestrictionConstituentsSingleOrbit` scaffold hypothesis (issue 2031).
+#assert_only_allowed_axioms
+  OddOrder.RepresentationTheory.restrictionConstituentsSingleOrbit_of_isIrreducible
 
 -- Peterfalvi (6.8) T6/Y-family consumer side: degree-one induced families have common degree,
 -- supported differences on `H#`, irreducibility from c1/c2 inertia, and equal-degree coherence.

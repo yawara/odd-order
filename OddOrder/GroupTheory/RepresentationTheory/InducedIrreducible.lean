@@ -457,6 +457,37 @@ theorem isIrreducibleCharacter_induce_of_frobeniusGroup {W : Subgroup G}
   isIrreducibleCharacter_induce_of_inertia_eq θ
     (inertia_eq_of_frobeniusGroup hF hθ_ne)
 
+omit hH [Fintype G] [Invertible (Nat.card G : ℂ)] in
+/-- **Degree from restriction multiplicities** (the degree side of Clifford's theorem).  For
+`H ⊴ G` and any class function `χ` of `G`, the degree `χ(1)` equals `∑_θ ⟨Res χ, θ⟩ · θ(1)` over
+the irreducible characters `θ` of `H` — the Fourier expansion (`sum_inner_irreducibleCharacter_smul`)
+of `Res^G_H χ` evaluated at `1`.
+
+Combined with single-orbit + common multiplicity
+(`hasCommonRestrictionMultiplicity_of_singleOrbit`) and the orbit size
+(`card_conjByOrbit_eq_index_inertia`), this is the degree statement of Clifford's theorem
+`χ(1) = e · [G : I_G(θ)] · θ(1)`. -/
+theorem apply_one_eq_sum_restrictionMultiplicity_mul [Fintype (IrreducibleCharacter ↥H)]
+    (χ : ClassFunction G ℂ) :
+    χ (1 : G) = ∑ θ : IrreducibleCharacter ↥H,
+      ClassFunction.restrictionMultiplicity H χ (θ : ClassFunction ↥H ℂ)
+        * (θ : ClassFunction ↥H ℂ) (1 : ↥H) := by
+  classical
+  have hsum : ∀ (s : Finset (IrreducibleCharacter ↥H))
+      (F : IrreducibleCharacter ↥H → ClassFunction ↥H ℂ),
+      (∑ θ ∈ s, F θ) (1 : ↥H) = ∑ θ ∈ s, (F θ) (1 : ↥H) := by
+    intro s F
+    induction s using Finset.induction_on with
+    | empty => simp
+    | insert a s ha ih =>
+        rw [Finset.sum_insert ha, Finset.sum_insert ha, ClassFunction.add_apply, ih]
+  have hexp := sum_inner_irreducibleCharacter_smul (G := ↥H) (ClassFunction.restrict H χ)
+  have key := congrArg (fun f : ClassFunction ↥H ℂ => f (1 : ↥H)) hexp
+  simp only [hsum, ClassFunction.smul_apply, ClassFunction.restrict_apply,
+    OneMemClass.coe_one] at key
+  simp only [ClassFunction.restrictionMultiplicity_def]
+  exact key.symm
+
 end Complex
 
 section SignedIrreducible
