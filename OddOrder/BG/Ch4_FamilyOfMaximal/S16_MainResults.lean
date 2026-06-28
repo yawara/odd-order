@@ -210,22 +210,28 @@ theorem isHallSubgroup_subgroupOf_inf_of_normal_isHall [Finite G] {π : Set ℕ}
       rw [he1]; exact ⟨_, htower.symm⟩
     exact hAhall.2 p (Nat.primeFactors_mono hidvd Subgroup.index_ne_zero_of_finite hp)
 
-/-- **BG Theorem D(3), `R(x) ◁ C_G(x)`** (Coq `nsRCx`): the first-conjunct normality.  Since `R(x) =
-(N[x])_σ ⊓ C_G(x)` with `C_G(x) ≤ N[x]` (nontrivial branch) and `(N[x])_σ ◁ N[x]`, the centralizer
-`C_G(x)` normalizes both factors, hence their intersection `R(x)`. -/
+/-- **General `(N)_σ ⊓ C_G(x) ◁ C_G(x)` normality** (the core of Theorem D(3) `nsRCx`): for any `N`
+with `C_G(x) ≤ N`, the centralizer normalizes `(N)_σ ⊓ C_G(x)` — it normalizes `(N)_σ ◁ N` (since
+`C_G(x) ≤ N`) and itself, so it normalizes the intersection (`le_normalizer_inf`).  Applies both to
+`N[x]` (`FT_signalizer_normal_in_centralizer`) and to the unique maximal from
+`signalizer_structure_of_mem_sigmaSharp`. -/
+theorem centralizer_le_normalizer_Msigma_inf_centralizer {x : G} {N : Subgroup G}
+    (hCN : Subgroup.centralizer ({x} : Set G) ≤ N) :
+    Subgroup.centralizer ({x} : Set G) ≤ Subgroup.normalizer
+      ((OddOrder.BG.Ch3.S10.Msigma N ⊓ Subgroup.centralizer ({x} : Set G) : Subgroup G) : Set G) := by
+  haveI hMσN : ((OddOrder.BG.Ch3.S10.Msigma N).subgroupOf N).Normal := by
+    rw [OddOrder.BG.Ch3.S10.Msigma_subgroupOf]; infer_instance
+  have hbaseN : N ≤ Subgroup.normalizer (OddOrder.BG.Ch3.S10.Msigma N : Set G) :=
+    (Subgroup.normal_subgroupOf_iff_le_normalizer (OddOrder.BG.Ch3.S10.Msigma_le _)).mp hMσN
+  exact OddOrder.BG.Ch3.S12.le_normalizer_inf (hCN.trans hbaseN) Subgroup.le_normalizer
+
+/-- **BG Theorem D(3), `R(x) ◁ C_G(x)`** (Coq `nsRCx`): the first-conjunct normality, the
+`N = N[x]` instance of `centralizer_le_normalizer_Msigma_inf_centralizer`. -/
 theorem FT_signalizer_normal_in_centralizer {x : G}
     (h : 1 < (maximalSigmaSubgroupsOfElement x).ncard ∧
       (maximalSubgroupsContaining (Subgroup.centralizer ({x} : Set G))).Nonempty) :
-    Subgroup.centralizer ({x} : Set G) ≤ Subgroup.normalizer (FT_signalizer x : Set G) := by
-  have hCN : Subgroup.centralizer ({x} : Set G) ≤ FT_signalizerBase x :=
-    centralizer_le_FT_signalizerBase h
-  haveI hMσN : ((OddOrder.BG.Ch3.S10.Msigma (FT_signalizerBase x)).subgroupOf
-      (FT_signalizerBase x)).Normal := by
-    rw [OddOrder.BG.Ch3.S10.Msigma_subgroupOf]; infer_instance
-  have hbaseN : FT_signalizerBase x ≤
-      Subgroup.normalizer (OddOrder.BG.Ch3.S10.Msigma (FT_signalizerBase x) : Set G) :=
-    (Subgroup.normal_subgroupOf_iff_le_normalizer (OddOrder.BG.Ch3.S10.Msigma_le _)).mp hMσN
-  exact OddOrder.BG.Ch3.S12.le_normalizer_inf (hCN.trans hbaseN) Subgroup.le_normalizer
+    Subgroup.centralizer ({x} : Set G) ≤ Subgroup.normalizer (FT_signalizer x : Set G) :=
+  centralizer_le_normalizer_Msigma_inf_centralizer (centralizer_le_FT_signalizerBase h)
 
 /-- **BG Theorem D(3), `R(x)` is a `σ(N[x])`-Hall subgroup of `C_G(x)`** (Coq `hallR`): the
 first-conjunct Hall property.  `R(x) = (N[x])_σ ⊓ C_G(x)` with `(N[x])_σ` a normal `σ(N[x])`-Hall
