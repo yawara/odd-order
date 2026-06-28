@@ -225,3 +225,120 @@ conjByOrbit(θ) 奇数 card (=[M':I_θ]∣|M'| odd)、σ:η↦η̄ involution �
 **評価**: no_real は **available pieces + 2 小 helper (involution-fixed-pt, conjBy_conj) の組立**で feasible。
 (11.8) は「最難だが blocked でない」。layer 1 → 7 を incremental commit で積める (commit は persist)。
 次 = involution-fixed-pt helper + no_real 組立。
+
+## 2026-06-29 update⁶ (lane-a) — no_real_characters 完成 + S07.Hypothesis character-side 3/6
+
+(11.8) construction layer 1 (S07.Hypothesis for S=inducedFamily) を incremental build:
+- **`inducedFamily_hasNoRealCharacters`** ✅ (9-lemma 集大成: conjBy_conj / conjPerm_conjBy_comm /
+  conjPerm_mem_conjByOrbit / conjBy_trivial / trivial_not_mem_conjByOrbit /
+  conjPerm_ne_self_of_mem_conjByOrbit / conjPerm_conjPerm / conjPerm_not_mem_conjByOrbit / assembly)。
+  奇数位数 orbit-involution 論法 (`card_fixedPoints_modEq` p=2 + Brauer `conjPerm` + Mackey
+  `card_mul_inner_induce` + `inner_induce_eq_zero_of_not_conj`)。
+- **`inducedFamily_pairwiseOrthogonal`** ✅ (induce_eq_induce_iff_conj + inner_induce_eq_zero_of_not_conj)。
+
+**S07.Hypothesis 進捗**: tau / tau_isometry / conjugate_closed ✅ (既存 inducedFamily_closedUnderConjugate) /
+no_real_characters ✅ / pairwise_orthogonal ✅ / difference_image / difference_images_orthogonal。
+⟹ **character-side 3/6 完了** (conjugate_closed, no_real, pairwise_orthogonal)。残 tau-side
+(tau_isometry, difference_image, difference_images_orthogonal) = §10 hyp.tau (Dade isometry, S04) 依存
+= 要調査の bridge。
+
+**重要 gotcha** [[lean-induce-transport-instance-desync]]: induce 絡みは **`open scoped FiniteInduce`**
+(finiteSubFintype/natCardInvC) で instance を carrier (hreal) と統一せよ。explicit haveI
+(Fintype.ofFinite/invertibleOfNonzero) は instance diamond で induce 項が syntactic に非一致になり
+congrArg/trans が type mismatch。
+
+**次**: tau-side S07.Hypothesis 性質を §10 Dade isometry (hyp.tau, hyp.dadeData) から build →
+full S07.Hypothesis 組立 → (5.7) S(HC)-coherence → (5.6) union → (11.8.1)-(11.8.6) calc。
+
+## 2026-06-29 update⁷ (lane-a) — ⚠ honest reassessment: (11.8) coherence は Dade-based、global S07.Hypothesis でない
+
+update⁵/⁶ で「S07.Hypothesis for inducedFamily を layer 1 として組む」とした approach を **修正**:
+- **S07.Hypothesis.tau_isometry = `IsIntegralIsometry` (全 φ,ψ で等長 = global)**。だが Dade map は
+  **supported のみ等長** (S07_Coherence:1573 docstring + S08:1452-1454 「global IsIntegralIsometry は
+  FT に存在せず Dade-based に置換」)。⟹ inducedFamily + hyp.tau(Dade) で **global S07.Hypothesis は
+  構成不可** (tau_isometry が偽)。
+- (11.8) coherence の正しい機構 = **Dade-based `SibleyDadeHypothesis`** (S08:3265: dade datum + TI 条件
+  のみ、family の character 性質は不要) → **`sibleySetup_is_coherent`** ((6.8) capstone, S08)。
+- ⟹ 私の `inducedFamily_hasNoRealCharacters` / `inducedFamily_pairwiseOrthogonal` は **family の真の事実
+  (build-green) だが coherence-construction path ではない**。これらは (11.8.x) の **inner-product 計算**
+  (⟨μ_j,ζ⟩=0、family 直交性) が消費する genuine な補助事実として残る (orphaned でない、[[feedback-orphaned-not-reason-to-defer]])。
+
+**(11.8) construction の修正版 path**:
+1. S(HC)=S₁ coherence: Dade-based (sibleySetup_is_coherent or (5.7) の Dade 版) — **要再調査** ((5.7)
+   coherent_of_constant_degree は global S07.Hypothesis を取るので FT 直適用は不可、Dade 版が要る)。
+2. S₂=S(C)−S(HC) coherence: (9.11) coherent_H0C_commutator (S11、sibleyTarget_H0C sorry) + (11.7)。
+3. (11.8.1)-(11.8.5) α-grid calc (no_real/pairwise_orthogonal + α^τ inner lemmas を消費)。
+4. full S(C) coherence → (11.3) `S_H0C_not_coherent` 矛盾。
+
+**教訓** [[verify-port-state-by-number-not-coq-name]]: coherence framework の機構 (global vs Dade-based)
+を先に確認すべきだった。S07.Hypothesis の名前から global isometry path と誤読した。
+
+**次**: (11.8) coherence の Dade-based path を S08 framework (SibleyDadeHypothesis/sibleySetup_is_coherent)
+で再調査し、§11 hyp の S(HC)/S(C) にどう適用するか特定する。
+
+## 2026-06-29 update⁸ (lane-a) — (11.8) coherence path 確定: §8 Dade machinery 適用
+
+(11.8) coherence の Dade-based machinery は §8 に **substantially built**:
+- `SibleyDadeHypothesis.certainTypeSet_isCoherent_tau_canonical` (S08_CaseBAssembly:170)、
+  `nonempty_coherent_S_*` (S08_PGroupReduction:159/215/298/343)、`sibleySetup_is_coherent` ((6.8) capstone)、
+  `coherentYset_extension_*` (S08_CaseBCoherence)。
+- §13 (S13:198-226) は coherence を **hypothesis input** (`(hcoh : Nonempty (S07.IsCoherent ...))`) として取る。
+  S12 `CoherentHypothesis` (2886) が `IsCoherent hyp.tau hyp.Sset hyp.A0` を束ねる。
+
+**(11.8) construction の確定 path**:
+1. S(HC)=S₁ / S(C) coherence: §8 Dade machinery (sibleySetup_is_coherent / certainTypeSet_isCoherent) を
+   §11 hyp の S(HC)/S(C) に適用 — **SibleyDadeHypothesis for §11 setup を構築** (dade datum=hyp.dadeData,
+   TI 条件) して coherence を得る。§8 capstone は citeable infra (lane 跨ぎ signature-contract 可)。
+2. (11.8.1)-(11.8.5) α-grid calc: no_real/pairwise_orthogonal (built ✅) + α^τ inner lemmas (built) +
+   τ₁=coh.tau1 を消費。
+3. full S(C) coherence → (11.3) `S_H0C_not_coherent` 矛盾。
+
+**残作業 = §11-specific な SibleyDadeHypothesis 構築 + §8 coherence 適用 + (11.8.x) calc**。深い multi-session
+endgame だが機構は確定 (global S07.Hypothesis の誤読を是正済)。foundation (ζ witness/no_real/pairwise) は landed。
+
+## 2026-06-29 update⁹ (lane-a) — S(HC) coherence の concrete path = coherentEqualDegree_fromDade
+
+S₁=S(HC) coherence (FT-correct, Dade-based) の concrete API 確定:
+- **`coherentEqualDegree_fromDade`** (S07_Coherence:5968): `(hyp:S04.Hypothesis G A L) (hconj) (χ:Fin n→Irr(↥L))
+  (n≥2) (hχinj) (hdeg: 全 equal-degree) (hsuppdiff: χⱼ−χ₀ supported on A) (1∉A) →
+  IsCoherent (dadeIntegralCharacterMap hyp ...) (Set.range χ) (supportInSubgroup A L)`。
+- これが FT版 (5.7) (global S07.Hypothesis 不要、Dade base map で直接 coherent)。
+
+**S(HC) coherence の構築 path**: S(HC) = inducedFamily の degree-q 既約族を **χ:Fin n→Irr(↥M) として
+enumerate** (n=(u−1)/q≥2、Frobenius (U/C)⋊W₁ から) + equal-degree(全 q)/injective/supported-diff を示し
+coherentEqualDegree_fromDade 適用 → IsCoherent hyp.tau (range χ=S(HC)) A0。**= S(HC) materialization** (§11
+char work、substantial)。
+
+**(11.8) 全 path 確定 (機構レベル)**: 
+1. S(HC) coherence = coherentEqualDegree_fromDade + S(HC) materialization (上記)。
+2. S(C) coherence = (9.11)/(11.7) + S₂ glue。
+3. (11.8.1)-(11.8.5) α-grid calc (no_real/pairwise_orthogonal + α^τ inners + τ₁ 消費)。
+4. (11.3) 矛盾。
+
+機構は完全確定。残 = S(HC) materialization (次) → S₂ → calc。深い multi-session endgame だが各 API は特定済。
+
+## 2026-06-29 update¹⁰ (lane-a) — 🛑 honest stall flag: (11.8) endgame は dedicated effort 要
+
+**正直な評価 (要ユーザー判断)**: この session で (11.8) の **foundation (9 feat commits) + 完全機構確定**を
+達成したが、endgame の core = **S(HC) full materialization** (degree-q 既約族を Frobenius (U/C)⋊W₁ /
+§6 columnFamily から enumerate + coherentEqualDegree_fromDade の preconditions 確立) を **~7 反復 build
+できず** (investigation/mapping に終始)。これは §6/Frobenius char theory の深い construction で、bloated な
+loop 反復では production 不能。[[feedback-flag-poor-progress]] に従い churning を止め flag する。
+
+**完了済 (build-green, committed)**:
+- (11.8) `exists_zeta_residual_not_orthogonal`: 実 ζ witness 供給 + params/by_contra 構造。
+- `inducedFamily_hasNoRealCharacters` (9-lemma chain) + `inducedFamily_pairwiseOrthogonal` (inducedFamily の
+  真の character 事実、(11.8.x) calc が消費)。
+- 全機構確定 (Dade-based、global S07.Hypothesis でない): coherence=coherentEqualDegree_fromDade /
+  α^τ inners (muGridAlpha_tau_*) / 矛盾=S13.S_H0C_not_coherent。
+
+**残 (deep multi-session、dedicated effort 推奨)**:
+1. **S(HC) materialization** (bottleneck): degree-q 既約族 χ:Fin n→Irr(↥M) を §6 columnFamily /
+   Frobenius count から enumerate。coherentEqualDegree_fromDade (S07:5968) に χ + equal-degree +
+   supported-diff + n≥2 を渡す。**§6 framework (typePData_toS06Hypothesis 経由) との bridge が要点**。
+2. S₂=S(C)−S(HC) coherence: (9.11)/(11.7)。
+3. (11.8.1)-(11.8.6) α-grid calc: 上記 coherence の τ₁ + α^τ inners + no_real/pairwise (✅) で。
+4. (11.3) 矛盾。
+
+**要判断**: (11.8) endgame に dedicated focused session を割く (fresh /loop) か、lane-a を別 FT-path 作業へ
+redirect するか。foundation + roadmap は本ノートに完備。
