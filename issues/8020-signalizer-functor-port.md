@@ -208,3 +208,61 @@ conjunct 1 の (a) / (2) `M_σ⊓C[x] σ(M)-Hall in C[x]` = conjunct 1 (b) / (3)
 (4) structure 適用 wiring (signalizer_structure_of_mem_sigmaSharp で N/hsharp 取得) + |M_σ[x]|=1 枝
 (C[x]≤M, R=⊥) → hD3 完成 / (5) hD4 の MF=Msigma / x∈ASet / TypeP2→Frobenius gaps。
 assembly skeleton `RData_of_inputs` は ready、残は M-side 構造の本体証明。
+
+## 進捗ログ (lane d, 10-12 回目 — /loop: 深い endgame 到達 + blocker 明示)
+
+**2026-06-29 cont.⁵ (/loop iter 9-11): case-split easy 方向 landed + 残 conjunct の本質 blocker 確認。**
+commit `ba739946`: `maximalSigmaSubgroupsOfElement_eq_singleton_of_centralizer_le`
+(C[x]≤M ⟹ 𝓜_σ(x)={M}、`exists_conj_centralizer` + N(M)=M、Theorem D(3) trivial-branch)。axiom-clean。
+
+**⚠ 残 hD3/hD4 conjunct は一様に深く ready leverage なし (本質的 blocker、context でなく未ポート infra)**:
+- **conjunct 1 (C_M(x) σ(M)-Hall in C[x] ⟺ C_M(x)≤M_σ)**: `mf_centralizer_hall_decomp` は ⟨x⟩ が
+  M_σ-Hall を要し x に不適用。「σ-element の M-centralizer は σ-group」= 未ポートの §12-14 centralizer
+  theory が必要。**path 未確定** (真偽含め要検証)。
+- **conjunct 3 (R⋊C_M(x)=C[x], Coq part b)**: Frobenius/regular-action complement。modular-law descent
+  は A≤H 不成立で不可。深い。
+- **hard case-split 方向 (¬(C[x]≤M)⟹|M_σ[x]|>1)**: easy 方向の逆、深い (Coq not_sCX_M の逆向き)。
+- **hD4 `MF N=Msigma N`**: **type-P2 では FittingIsTI 成立** (Thm 15.7a `fittingIsTI_of_isTypeP2`) ゆえ
+  `mf_eq_msigma_of_not_fittingIsTI` 不適用 → type-依存、clean でない。x∈ASet / TypeP2→Frobenius も深い。
+
+**結論**: signalizer functor Theorem D(3)/(4) の **assembly skeleton (RData_of_inputs) + 機構 (conjuncts
+2,4 + bridge + case-split easy) は完成**。残は BG 最深 M-side 構造 (conjunct 1,3 + hard case-split + hD4
+type gaps) で、各々 §12-14 の未ポート centralizer/Frobenius/type-classification infra を要する multi-session
+porting。これは「上流 infra 不足」が真の blocker (難所回避でなく、上流が未整備)。**次の正しい上流 work** =
+「σ-element の M-centralizer 構造」(conjunct 1 の前提) の §12-14 からのポート、または fresh-context での
+careful な Coq-port。assembly skeleton は ready、cite 待ち。
+
+## 🛑 重大発見 (lane d, iter 12): RData conjunct 1 は mis-encoded — hD3/hD4 が偽の target
+
+**2026-06-29: RData (S16:114) conjunct 1 `Ch03.IsHallSubgroup (σ M) ((M⊓C[x]).subgroupOf C[x])`
+(= C_M(x) が σ(M)-Hall in C[x]) は type-P M で偽。**
+- **論拠**: `kappa_subset_sigmaCompl` (κ(M)⊆σ(M)ᶜ) + Kstar=M_σ∩C(K)。x∈Kstar^#⊆M_σ^#=sigmaSharp M で
+  x は K を中心化 ⟹ K≤C(x), K≤M ⟹ **K≤C_M(x)**。K は κ-Hall (σ 外の素数)。∴ |C_M(x)| は σ(M)' 素数を
+  含み **C_M(x) は σ(M)-group でない** ⟹ `IsHallSubgroup (σ M)` の第1連言 (|H| 素数⊆σM) が偽。
+  type-P M (K≠⊥) かつ Kstar≠⊥ で x∈Kstar^# が実在 ⟹ hD3 `∀x∈sigmaSharp M` は偽。
+- **Coq 正解 (Theorem 14.4(b)/(e))**: `R ><| 'C_(M:&:N)[x] = 'C[x]` (part b) + `\sigma(N)^'.-Hall(N)
+  (M:&:N)` (part e)。∴ C_M(x)=C_{M∩N}(x) は R(σ(N)-Hall)の complement = **σ(N)'-Hall in C[x]** (N 参照)。
+  Lean の `σ M` は **`σ N` (signalizer の極大) の '-Hall であるべき**で、σ(M)-Hall は誤エンコード。
+- **影響**: conjunct 1 が偽 ⟹ hD3/hD4 は現エンコードのまま honest に閉じられない。私の機構 (conjunct 2,4 +
+  bridge + set-relation + assembly skeleton + case-split) は**全て valid・再利用可** (conjunct 1 のエンコード
+  だけが問題)。**RData は shared contract (theoremD は FT spine が cite) ゆえ無断改変不可** → hub/ユーザー判断要。
+- **要決定**: RData conjunct 1 を σ(N)'-Hall (N=signalizer の極大) に修正するか。修正には N の存在 (|M_σ[x]|>1
+  枝) を def に織り込む必要があり、trivial 枝 (R=⊥, C[x]≤M) では C_M(x)=C[x] が σ(M)... これも要再検討
+  (trivial 枝でも κ が C[x] に入りうる)。**RData def の再設計が必要**。
+
+## ✅ HUB 裁定 (2026-06-29)
+
+lane-d の発見 (conjunct 1 = `IsHallSubgroup (σ M) (C_M(x) in C[x])` が type-P M で偽) を hub が実コードで検証:
+- **数学的に妥当**: x∈Kstar^#⊆M_σ^# で K(κ-Hall, κ⊆σ(M)ᶜ)≤C_M(x) ⟹ C_M(x) は σ(M)' 素数を含む ⟹ σ(M)-Hall でない。Coq Thm 14.4(b)/(e) の `σ(N)'-Hall(N)(M∩N)` とも整合。**conjunct 1 は σ(N)'-Hall (N=signalizer の極大) であるべき = mis-encoding 確定。**
+- **⚠ ただし「RData は FT spine が cite する shared contract」は事実誤認**: 実コード検証で
+  **`RData`/`theoremD_*`/`theoremE_*` は FeitThompson.lean からも Peterfalvi/* からも一切 cite されていない**
+  (grep 0 件)。consumer は S16_MainResults 内の theoremE のみ、theoremE も spine 非 cite。
+  ⟹ **RData/theoremD/E は完全に δ-internal (lane-d 所有の S16_MainResults 内) かつ honest FT spine の外**。
+
+**裁定**: RData は cross-lane 契約ではなく **δ-internal** ゆえ、STOP 条件 (d)「契約の無断改変」は**適用されない**。
+**lane-d は RData conjunct 1 を Coq 正解 (σ(N)'-Hall(N=signalizer 極大)、N 存在を def に織り込む) へ自身で再設計してよい** (hub/他レーン承認不要、自クラスタ内編集)。trivial 枝 (C[x]≤M, R=⊥) の C_M(x) 性質も併せて再検討。
+既存機構 (conjunct 2,4 + bridge + set-relation + assembly skeleton `RData_of_inputs` + case-split) は全て valid・再利用可。
+
+**教訓**: 「shared contract だから無断改変不可」と escalate する前に、その def が**実際に cross-lane / on-spine で cite されているか**を grep 検証する。δ-internal な def は owner が再設計してよい (no-gating 原則; cf. `feedback-cite-sorried-lemmas-if-signature-correct`)。
+
+**次手 (lane-d)**: (1) RData conjunct 1 を σ(N)'-Hall へ再設計 (N 存在込み) → (2) conjunct 1 (a) `M⊓C[x]=M_σ⊓C[x]` for x∈M_σ^# (Thm 12.5) / (b) σ(N)'-Hall 本体 → (3) conjunct 3 (Coq part b) → (4) hD3/hD4 完成。issue 継続。
