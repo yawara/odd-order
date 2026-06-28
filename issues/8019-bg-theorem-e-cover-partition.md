@@ -189,3 +189,34 @@ deep multi-lemma undertaking。
 (ii) EpMsMg rank-1 論法 (gate1 + fusion 第1 conjunct `not_sCX_M` で X cyclic; **gate1 で unblock 済**)、
 (iii) abelian (gate2 経由 K∩M_σ'=1)、(iv) `abelian_rank1_cyclic` 組立、(v) D(2) を theoremD に wire。
 gate 1 完了で (ii) は可能、残は gate 2 (narrow-group、次セッション) が真のボトルネック。
+
+## ✅✅✅ 2026-06-28 進捗 (cont.³) — D(2) cyclic 完成。**gate 2「未ポート」は STALE だった**
+
+**⚠ 訂正 (重要)**: cont.² の「gate 2 `cent_der_sigma_uniq` 未ポート・深い・narrow-group 機構」は **誤り**。
+`cent_der_sigma_uniq` = **BG Corollary 12.14** (Coq L2133 のコメントが明記) で、Lean に
+**`maximalContaining_centralizer_and_someSylow_eq_singleton`** (`S12_Corollary1214.lean`) として
+**既に sorry-free + axiom-clean でポート済み**。前 entry は Coq 名 `cent_der_sigma_uniq` で grep して
+descriptive 名のポート (CLAUDE.md 命名規約) を見落とした **stale-pointer**。教訓: 「未ポート」と即断せず
+descriptive 名・docstring・BG 番号で grep して実コード状態を確認する ([[lanes-are-equivalent-no-specialty]]
+の relane #5/#11 stale-pointer と同根)。同様に narrow 機構 (`narrow_centP`=`narrow_iff_exists_card_prime_centralizer_pRank_le_two`,
+`narrow_cent_dprod`=`narrow_centralizer_decomp`, `rank3_Uniqueness`=`isUniquelyMaximal_of_three_le_rank_of_lt_top`,
+`mFT_rank2_Sylow_cprod`=`sylow_structure` (public), `beta_max_pdiv`=`derived_msigma_hasNormalPComplement_of_not_mem_beta`)
+も全て既存だった。
+
+**∴ D(2) cyclic は短経路で完成** (commit 次、full build 3886 green、3 新補題 axiom-clean+AxiomsCheck 登録):
+- **core `centralizer_not_le_of_isPGroup_le_Msigma_inf_conj`** (S12_Lemma1217、Coq `not_sCX_M` 一般 X 版):
+  nontrivial p-subgroup X≤M_σ∩M^g (p∈σ(M)) ⟹ C_G(X)⊄M。`fusion_control_of_mem_sigma` σ-fusion 推移性 +
+  N_G(M)=M。既存 `Msigma_inf_conj_isBetaCompl` の hCnotM を補題化。
+- **TI `Msigma_inf_conj_inf_derived_eq_bot`** (S12_Lemma1217、Coq `tiMsMg_Ms'`): M_σ∩M^g ⊓ M_σ' = ⊥。
+  nontrivial 元 ⟹ rank-1 X⊆M_σ' ⟹ Cor 12.14 (Or.inr) で C_G(X)≤M ⟹ core と矛盾。
+- **cyclic `Msigma_inf_conj_isCyclic`** (S16_MainResults、Coq `abelian_rank1_cyclic` 経路): g∉M ⟹
+  IsCyclic(M_σ∩M^g)。abelian (K'≤K⊓M_σ'=⊥, TI) + odd + rank≤1 (noncyclic elementary abelian A≤K なら
+  `norm_noncyclic_sigma` で C_G(A)≤N_G(A)≤M、core と矛盾; `exists_isElementaryAbelian_not_isCyclic_le_of_two_le_rank`
+  で抽出) ⟹ `isCyclic_of_isMulCommutative_of_rank_le_one` (§15)。
+- **theoremD wiring**: `theoremD_msigma_conjugacy_and_centralizers` の hD2 を `Msigma_inf_conj_isCyclic` で供給。
+  D(1) `msigma_fusion_control` + D(2) cyclic が honest 化、**残 sorry = D(3)/D(4) のみ** (R(x) signalizer
+  normal complement、deep、multi-session)。`refine ⟨msigma_fusion_control, fun g hg => Msigma_inf_conj_isCyclic, ?_, ?_⟩`。
+
+**∴ Theorem D 残 = D(3)/D(4) signalizer functor theory のみ** (BG local analysis 最深部)。これが Theorem E
+cardinality (14.5c) の真のボトルネック。次セッション = (i) D(3) signalizer 着手 (最深、大型ポート)、or
+(ii) Pf-side Phase 4 (family/partition field 供給、gated-endpoint)。**D(2) は完全 close**。

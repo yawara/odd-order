@@ -4401,6 +4401,16 @@ of Corollary 12.14 gives `p ∉ β(M)`.  Consumed by Proposition 14.2(g). -/
 
 #assert_only_allowed_axioms OddOrder.BG.Ch3.S12.Msigma_inf_conj_isBetaCompl
 
+/-! ### BG §12: Lemma 12.17 third clause — σ-uniqueness core + TI part — unconditional
+
+`centralizer_not_le_of_isPGroup_le_Msigma_inf_conj`: for a nontrivial `p`-subgroup
+`X ≤ M_σ ∩ M^g` (`g ∉ M`, `p ∈ σ(M)`), `C_G(X) ⊄ M` (Theorem 10.1(b) σ-fusion transitivity).
+`Msigma_inf_conj_inf_derived_eq_bot`: `M_σ ∩ M^g ⊓ M_σ' = 1` (the TI part; a nontrivial element
+yields a rank-one `X ≤ M_σ'`, and Corollary 12.14's `Or.inr` disjunct forces `C_G(X) ≤ M`). -/
+
+#assert_only_allowed_axioms OddOrder.BG.Ch3.S12.centralizer_not_le_of_isPGroup_le_Msigma_inf_conj
+#assert_only_allowed_axioms OddOrder.BG.Ch3.S12.Msigma_inf_conj_inf_derived_eq_bot
+
 /-! ### BG §12: Corollary 12.4 (`norm_noncyclic_sigma`) — unconditional
 
 A noncyclic `σ(M)`-`p`-subgroup `P ≤ M` has `N_G(P) ≤ M`.  A rank-two elementary abelian
@@ -5582,6 +5592,14 @@ from Corollary 15.3(b) (`mf_hall_centralizer_control`, axiom-clean) at the trivi
 `H := M_σ` plus `N_G(M_σ) = M` (`normalizer_Msigma_eq_self`).  Axiom-clean. -/
 
 #assert_only_allowed_axioms OddOrder.BG.Ch4.S16.msigma_fusion_control
+
+/-! **BG Theorem D(2), `M_σ ∩ M^g` cyclic** (`S16_MainResults`, `Msigma_inf_conj_isCyclic`): for
+`g ∉ M`, `M_σ ∩ M^g` is cyclic (BG Lemma 12.17 third clause).  Abelian (TI part
+`Msigma_inf_conj_inf_derived_eq_bot`), odd, and rank ≤ 1 (a noncyclic elementary abelian subgroup
+would give `C_G(A) ≤ N_G(A) ≤ M` via `norm_noncyclic_sigma`, contradicting the σ-uniqueness core),
+hence cyclic (`isCyclic_of_isMulCommutative_of_rank_le_one`).  Supplies Theorem D's `hD2`.  Axiom-clean. -/
+
+#assert_only_allowed_axioms OddOrder.BG.Ch4.S16.Msigma_inf_conj_isCyclic
 
 /-! **BG Theorem B(1)** (`S16_MainResults`, `theoremB_U_sylow_abelian_rank_le_two`): every Sylow
 subgroup of `U` is abelian of rank ≤ 2.  Standalone, faithful (explicit `U ≤ M`; restricted to
