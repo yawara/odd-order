@@ -413,28 +413,19 @@ noncomputable def Rset {L : Subgroup G} [Fintype G] [Invertible (Nat.card G : �
   {α | ∃ (φ : IrreducibleCharacter ↥L) (hφ : φ ∈ data.constituents) (i : Fin 2),
     α = ((signedFamily data hφ).mu i : ClassFunction G ℂ)}
 
-/-- Carrier for Peterfalvi (12.3), comparing two non-conjugate type-I maximal
-subgroups. -/
-structure CrossOrthogonalityData {L1 L2 : Subgroup G}
-    (hyp1 : Hypothesis L1) (hyp2 : Hypothesis L2) where
-  chi1 : ClassFunction ↥L1 ℂ
-  chi1_mem : chi1 ∈ hyp1.Sset
-  chi2 : ClassFunction ↥L2 ℂ
-  chi2_mem : chi2 ∈ hyp2.Sset
-  /-- The family `R(χ₁)` from (12.2) (the union of the two-element Dade-image blocks). -/
-  R1 : Set (ClassFunction G ℂ)
-  /-- The family `R(χ₂)` from (12.2). -/
-  R2 : Set (ClassFunction G ℂ)
-  orthogonal : Prop
-  orthogonal_holds : orthogonal
-
-/-- **Peterfalvi (12.3)**: for non-conjugate type-I maximal subgroups, the
-families `R(chi)` are mutually orthogonal. -/
-theorem nonconjugate_typeI_R_orthogonal [Finite G]
-    (_hG : OddOrder.BG.IsMinimalSimpleOdd G) {L1 L2 : Subgroup G}
+/-- **Peterfalvi (12.3)**: for non-conjugate type-I maximal subgroups `L₁, L₂`, the families
+`R(χ₁) = Rset data1` and `R(χ₂) = Rset data2` are mutually orthogonal.  Proof (a §12 char
+obligation): by (8.18.c) assume `Ã(L₁) ∩ Ã₁(L₂) = ∅`; each `α ∈ R(χ₁)` satisfies `α − ᾱ ∈
+(φ−φ̄)^{τ₁}` supported in `Ã(L₁)` by (12.2)/(5.9), orthogonal to `R(χ₂) ⊆ Ã₁(L₂)`; a conjugation
+argument forces `⟨α, β⟩ = 0`. -/
+theorem nonconjugate_typeI_R_orthogonal {L1 L2 : Subgroup G} [Finite G] [Fintype G]
+    [Invertible (Nat.card G : ℂ)] [Invertible (Nat.card ↥L1 : ℂ)] [Invertible (Nat.card ↥L2 : ℂ)]
+    (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
     (hyp1 : Hypothesis L1) (hyp2 : Hypothesis L2)
-    (hnot_conj : ¬ ∃ g : G, MulAut.conj g • L1 = L2) :
-    ∃ data : CrossOrthogonalityData hyp1 hyp2, data.orthogonal := by
+    (hnot_conj : ¬ ∃ g : G, MulAut.conj g • L1 = L2)
+    {chi1 : ClassFunction ↥L1 ℂ} (data1 : CharacterDecompositionData hyp1 chi1)
+    {chi2 : ClassFunction ↥L2 ℂ} (data2 : CharacterDecompositionData hyp2 chi2) :
+    ∀ α ∈ Rset data1, ∀ β ∈ Rset data2, ClassFunction.inner α β = 0 := by
   sorry
 
 open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
@@ -442,10 +433,11 @@ open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
 `R(χ)` (`χ ∈ S`) is constant on each coset `xH` with `x ∈ L − H`.  The orthogonality
 hypothesis is now the genuine `⟨ψ, α⟩ = 0` for `α ∈ R(χ)`, no longer an opaque
 field (`R` is the (12.2) family). -/
-theorem orthogonal_character_constant_on_coset [Finite G]
-    (_hG : OddOrder.BG.IsMinimalSimpleOdd G) {L : Subgroup G} (hyp : Hypothesis L)
-    {R : ClassFunction ↥L ℂ → Set (ClassFunction G ℂ)} {psi : ClassFunction G ℂ}
-    (horth : ∀ χ ∈ hyp.Sset, ∀ α ∈ R χ, ClassFunction.inner psi α = 0)
+theorem orthogonal_character_constant_on_coset {L : Subgroup G} [Finite G] [Fintype G]
+    [Invertible (Nat.card G : ℂ)] [Invertible (Nat.card ↥L : ℂ)]
+    (_hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis L)
+    (data : ∀ χ ∈ hyp.Sset, CharacterDecompositionData hyp χ) {psi : ClassFunction G ℂ}
+    (horth : ∀ χ (hχ : χ ∈ hyp.Sset), ∀ α ∈ Rset (data χ hχ), ClassFunction.inner psi α = 0)
     {x : G} (hxL : x ∈ L) (hxH : x ∉ hyp.H) :
     ∀ h : G, h ∈ hyp.H → psi (x * h) = psi x := by
   sorry
@@ -454,10 +446,11 @@ open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
 /-- **Peterfalvi (12.5)**: after the rho-reduction, a class function `ψ` orthogonal
 to every type-I family `R(χ)` is constant on `H − H'`.  The orthogonality hypothesis
 is the genuine `⟨ψ, α⟩ = 0` for `α ∈ R(χ)`, no longer an opaque field. -/
-theorem rho_constant_on_H_minus_Hprime [Finite G]
-    (_hG : OddOrder.BG.IsMinimalSimpleOdd G) {L : Subgroup G} (hyp : Hypothesis L)
-    {R : ClassFunction ↥L ℂ → Set (ClassFunction G ℂ)} {psi : ClassFunction G ℂ}
-    (horth : ∀ χ ∈ hyp.Sset, ∀ α ∈ R χ, ClassFunction.inner psi α = 0) :
+theorem rho_constant_on_H_minus_Hprime {L : Subgroup G} [Finite G] [Fintype G]
+    [Invertible (Nat.card G : ℂ)] [Invertible (Nat.card ↥L : ℂ)]
+    (_hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis L)
+    (data : ∀ χ ∈ hyp.Sset, CharacterDecompositionData hyp χ) {psi : ClassFunction G ℂ}
+    (horth : ∀ χ (hχ : χ ∈ hyp.Sset), ∀ α ∈ Rset (data χ hχ), ClassFunction.inner psi α = 0) :
     ∀ h : G, h ∈ hyp.H → h ∉ hyp.Hprime → psi h = psi 1 := by
   sorry
 
