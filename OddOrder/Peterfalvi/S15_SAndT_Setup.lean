@@ -486,6 +486,25 @@ theorem sum_normSq_erase_one_ge_of_const_on_subgroup {H : Type*} [Group H] [Fint
       = (Nat.card ↥P : ℝ) * ‖α 1‖ ^ 2 - ‖α 1‖ ^ 2 := by ring
   rw [hexp]; linarith [hkey]
 
+/-- **Key nonnegativity of Peterfalvi (13.6)**: the quadratic correction term is `≥ 0`.
+
+In (13.6) the inflation degree satisfies `α(1) = q·b` for an integer `b`, and the bound reduces to
+`(|P|−1)·α(1)² − 2·λ(1)·α(1) = q²·((|P|−1)·b² − 2u·b) ≥ 0`, using `u ≤ (|P|−1)/2` from (13.2.c).
+This is exactly that nonnegativity `0 ≤ (|P|−1)·b² − 2u·b` (here `Pm1 = |P| − 1`), pure ℤ-arithmetic:
+`(|P|−1)b² − 2ub = (|P|−1−2u)·b² + 2u·b(b−1)`, both summands `≥ 0` (the first by `2u ≤ |P|−1`, the
+second since consecutive integers `b(b−1) ≥ 0`).  Carrier-free core of the (13.6) estimate. -/
+theorem caseB_quadratic_nonneg {Pm1 u : ℕ} (hu : 2 * u ≤ Pm1) (b : ℤ) :
+    0 ≤ (Pm1 : ℤ) * b ^ 2 - 2 * (u : ℤ) * b := by
+  have h2u : (2 * u : ℤ) ≤ (Pm1 : ℤ) := by exact_mod_cast hu
+  have hb : 0 ≤ b * (b - 1) := by
+    by_cases h : 1 ≤ b
+    · exact mul_nonneg (by linarith) (by linarith)
+    · push_neg at h
+      calc 0 ≤ (-b) * (-(b - 1)) := mul_nonneg (by omega) (by omega)
+        _ = b * (b - 1) := by ring
+  nlinarith [mul_nonneg (by linarith : (0 : ℤ) ≤ (Pm1 : ℤ) - 2 * u) (sq_nonneg b),
+    mul_nonneg (by positivity : (0 : ℤ) ≤ 2 * (u : ℤ)) hb]
+
 /-- Carrier for Peterfalvi (13.5), the TI-subset orthogonality calculation. -/
 structure TISubsetOrthogonalityData (hyp : Hypothesis (G := G)) where
   S1 : Set (ClassFunction ↥hyp.S ℂ)
