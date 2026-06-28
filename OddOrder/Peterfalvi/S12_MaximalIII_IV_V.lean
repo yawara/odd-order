@@ -6768,6 +6768,15 @@ theorem exists_zeta_residual_not_orthogonal [Finite G]
           ((hyp.tau ((∑ i' : Fin hyp.w1, hyp.muGrid hG hG.odd i' 0) - ζ))
             - ∑ i' : Fin hyp.w1, hyp.alignedOmegaSigmaGrid hG hG.odd i' 0)
           (hyp.alignedOmegaSigmaGrid hG hG.odd i j) = 0 := by
+  -- Exhibit Peterfalvi's `ζ ∈ S(HC)`: the degree-`w₁` irreducible of (10.2), a degree-`q`
+  -- constituent of the constant-degree `(U/C)⋊W₁`-Frobenius family `S₁ = S(HC)`.
+  obtain ⟨ζ, hζS, hζirr, hζdeg⟩ := exists_zeta_in_inducedFamily_degree_w1 hyp.typeP hG.odd
+    (typePData_W1_hall_coprime hG hyp.maximal (hyp.bgTypeP hG) hyp.typeP)
+  refine ⟨ζ, hζS, hζirr, hζdeg, ?_⟩
+  -- The deep non-orthogonality calculation Peterfalvi (11.8.1)–(11.8.6): by contradiction,
+  -- assuming the residual `(μ₀−ζ)^τ − ∑ᵢ ω_{i0}^σ` orthogonal to `(Irr W)^σ` makes `S(C)`
+  -- coherent (via the `τ₁/τ₂` extensions of (5.7)/(11.7) and the `σ`-grid identities (11.8.2)–
+  -- (11.8.5)), contradicting (11.3) `S13.S_H0C_not_coherent`.
   sorry
 
 open scoped FiniteInduce in
