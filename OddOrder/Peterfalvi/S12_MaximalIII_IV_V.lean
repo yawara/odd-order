@@ -141,6 +141,25 @@ theorem conjPerm_mem_conjByOrbit {K : Type*} [Group K] {H : Subgroup K} [H.Norma
   rw [← hg₀, ← IrreducibleCharacter.conjBy_mul]
   exact IrreducibleCharacter.conjBy_mem_conjByOrbit θ (g₀ * g)
 
+/-- **`G`-conjugation fixes the trivial character.** -/
+theorem conjBy_trivial {K : Type*} [Group K] {H : Subgroup K} [H.Normal] (g : K) :
+    IrreducibleCharacter.conjBy g (trivialIrreducibleCharacter ↥H)
+      = trivialIrreducibleCharacter ↥H := by
+  apply IrreducibleCharacter.ext
+  ext h
+  simp [IrreducibleCharacter.coe_conjBy, ClassFunction.conjBy_apply]
+
+/-- **The trivial character is not in the conjugation orbit of a nontrivial character.**  If
+`conjBy g θ = 1` then `θ = conjBy g⁻¹ 1 = 1` (`conjBy_trivial`). -/
+theorem trivial_not_mem_conjByOrbit {K : Type*} [Group K] {H : Subgroup K} [H.Normal]
+    {θ : IrreducibleCharacter ↥H} (hθ : θ ≠ trivialIrreducibleCharacter ↥H) :
+    trivialIrreducibleCharacter ↥H ∉ IrreducibleCharacter.conjByOrbit (G := K) θ := by
+  rintro ⟨g, hg⟩
+  apply hθ
+  have : θ = IrreducibleCharacter.conjBy g⁻¹ (trivialIrreducibleCharacter ↥H) := by
+    rw [← hg]; exact (IrreducibleCharacter.conjBy_inv_conjBy g θ).symm
+  rw [this, conjBy_trivial]
+
 /-! ## (10.1): the type III/IV/V hypothesis -/
 
 open scoped FiniteInduce in
