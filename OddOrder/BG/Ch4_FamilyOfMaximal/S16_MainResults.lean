@@ -110,10 +110,18 @@ def maximalConjugatesContaining (M : Subgroup G) (x : G) : Set (Subgroup G) :=
 
 /-- BG Theorem D(3) local data for `R(x)`: `C_M(x)` is a Hall subgroup of
 `C_G(x)`, and `R` is a normal complement acting sharply transitively on the
-maximal conjugates that contain `x`. -/
+maximal conjugates that contain `x`.
+
+**Encoding fix (2026-06-29, lane δ; HUB-cleared `RData` is δ-internal, not a cross-lane contract):**
+conjunct 1 was `IsHallSubgroup (σ M) (C_M(x))`, which is **false** for type-`P` `M`: at `x ∈ Kstar^#`
+the `κ`-Hall `K` (with `κ(M) ⊆ σ(M)ᶜ`) centralizes `x`, so `K ≤ C_M(x)`, making `C_M(x)` carry
+`σ(M)′`-primes — not a `σ(M)`-group.  Coq Theorem 14.4(b)/(e) has `C_M(x)` a `σ(N)′`-Hall of `C_G(x)`
+(`N` = the signalizer maximal), i.e. *intrinsically* a Hall subgroup of `C_G(x)` (its order coprime to
+its index).  We encode "`C_M(x)` is a Hall subgroup of `C_G(x)`" `σ`-agnostically as this coprimality,
+matching the docstring and avoiding the spurious `σ(M)` reference. -/
 def RData (M : Subgroup G) (x : G) (R : Subgroup G) : Prop :=
   let Cx : Subgroup G := Subgroup.centralizer ({x} : Set G)
-  Ch03.IsHallSubgroup (OddOrder.BG.Ch3.S10.sigma M) ((M ⊓ Cx).subgroupOf Cx) ∧
+  Nat.Coprime (Nat.card ↥((M ⊓ Cx).subgroupOf Cx)) ((M ⊓ Cx).subgroupOf Cx).index ∧
     (R.subgroupOf Cx).Normal ∧
     Subgroup.IsComplement' ((M ⊓ Cx).subgroupOf Cx) (R.subgroupOf Cx) ∧
     ConjSharplyTransitiveOn R (maximalConjugatesContaining M x)
@@ -352,8 +360,8 @@ theorem conjSharplyTransitiveOn_of_pointed {R : Subgroup G} {S : Set (Subgroup G
 
 /-- **Theorem D(3) `RData` assembly** (gated-endpoint skeleton): from the proven structure's data
 (the maximal `N ≥ C_G(x)` and its sharp transitivity on `𝓜_σ(x)`) plus the two deep `M`-side inputs
-(the `σ(M)`-Hall `C_M(x)` and the complement `R ⋊ C_M(x) = C_G(x)`, Coq parts (e)/(b)), the four
-`RData M x R` conjuncts assemble for `R = N_σ ⊓ C_G(x)`: conjunct 2 (`R ◁ C_G(x)`) is
+(`C_M(x)` a Hall subgroup of `C_G(x)`, and the complement `R ⋊ C_M(x) = C_G(x)`, Coq parts (e)/(b)),
+the four `RData M x R` conjuncts assemble for `R = N_σ ⊓ C_G(x)`: conjunct 2 (`R ◁ C_G(x)`) is
 `centralizer_le_normalizer_Msigma_inf_centralizer`, conjunct 4 (sharp transitivity on
 `maximalConjugatesContaining M x = 𝓜_σ(x)`) is `conjSharplyTransitiveOn_of_pointed`.  Reduces hD3 to
 the two genuinely-remaining inputs. -/
@@ -363,8 +371,10 @@ theorem RData_of_inputs [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : 
     (hsharp : ∀ L ∈ S14.maximalSigmaSubgroupsOfElement x,
       ∃! r : G, (r ∈ OddOrder.BG.Ch3.S10.Msigma N ⊓ Subgroup.centralizer ({x} : Set G)) ∧
         MulAut.conj r • M = L)
-    (hconj1 : Ch03.IsHallSubgroup (OddOrder.BG.Ch3.S10.sigma M)
-      ((M ⊓ Subgroup.centralizer ({x} : Set G)).subgroupOf (Subgroup.centralizer ({x} : Set G))))
+    (hconj1 : Nat.Coprime
+      (Nat.card ↥((M ⊓ Subgroup.centralizer ({x} : Set G)).subgroupOf
+        (Subgroup.centralizer ({x} : Set G))))
+      ((M ⊓ Subgroup.centralizer ({x} : Set G)).subgroupOf (Subgroup.centralizer ({x} : Set G))).index)
     (hconj3 : Subgroup.IsComplement'
       ((M ⊓ Subgroup.centralizer ({x} : Set G)).subgroupOf (Subgroup.centralizer ({x} : Set G)))
       ((OddOrder.BG.Ch3.S10.Msigma N ⊓ Subgroup.centralizer ({x} : Set G)).subgroupOf
