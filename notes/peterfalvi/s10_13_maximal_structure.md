@@ -508,3 +508,30 @@ sorry-free。その後 (9.9) `caseB_character_counts` / (9.8) `caseA_character_c
   4. **obligation 3**: `apply_one_eq_one_of_subset_characterKernel_of_isMulCommutative_quotient`
      (N=`commutator ↥HC`、商可換 instance) + `liesOver_mem_characterKernel` で
      commutator ↥HC ⊆ ker ψ (← (g:huSub)∈⁅HC,HC⁆⊆realized-K⊆ker χ [hχker])。
+
+### §12 追補³ (lane-a /loop iter5): obligation 3 assembly — lemma 名確定 + closure_induction 注意
+
+facts 1,2 + bridge `derivedInG_eq_commutator` (⁅H,H⁆=derivedInG H) committed。assembly
+`commutator_HsupC_le_H0Cprime : ⁅data.H ⊔ cSub, data.H ⊔ cSub⁆ ≤ chief.H0 ⊔ cprimeSub` を試作したが
+下記 friction で revert (clean 状態は green、obligation 3 のみ sorry)。**次反復で完遂**:
+
+確定 lemma 名 (build で検証済): `Subgroup.normal_subgroupOf_iff_le_normalizer (hKle : K≤HC)`、
+`Subgroup.subgroupOf_sup le_sup_left le_sup_right` (A,A',B 全 implicit)、`Subgroup.subgroupOf_self`、
+`Subgroup.map_top_of_surjective mk hmk_surj`、`Subgroup.commutator_eq_bot_iff_le_centralizer.mp`
+(`..` 不可、引数なし)、`OddOrder.Mathlib.Subgroup.centralizer_sup` (Set 形)、
+`Subgroup.subgroupOf_map_subtype : (K.subgroupOf H).map H.subtype = K⊓H`、`Subgroup.map_eq_bot_iff`、
+`QuotientGroup.ker_mk'`、`Subgroup.map_commutator`、`Subgroup.commutator_comm` (=)、
+`Subgroup.commutator_mem_commutator`。facts in ⁅⁆形: hHH=⁅H,H⁆≤K (bridge+fact1), hCH (fact2),
+hHC' (commutator_comm), hCC=⁅C,C⁆≤K (bridge, =cprimeSub)。
+
+**残 friction (次反復の要対処)**:
+1. **conj fact `∀x∈HC,∀k∈K, xkx⁻¹∈K`**: `closure_induction` (k∈K=closure(↑H₀∪↑C') を
+   `← closure_eq ×2, ← closure_union` で) は **dependent-motive** で binder 不一致 +
+   `chief.H0_lt_H.le hy0` が Set→Subgroup mem 強制要 (`SetLike.mem_coe`)。**代替**: pointwise
+   `MulAut.conj x • K = •H₀ ⊔ •C'` (`smul_sup`) で各 ≤K を示す方が clean かも。
+2. quotient hcomm: `commutator ↥HC ≤ K.subgroupOf HC` を `← ker_mk', ← map_eq_bot_iff, commutator_def,
+   map_commutator, map_top_of_surjective` → `⁅⊤,⊤⁆=⊥` → `← hAB (⊤=A⊔B)` → `commutator_eq_bot_iff_le_centralizer,
+   centralizer_sup` → `sup_le (le_inf ..) (le_inf ..)` で 4 facts (hsub helper: ⁅P,Q⁆≤K → 商で⊥)。
+3. obligation 3 wiring: `apply_one_eq_one_of_subset_characterKernel_of_isMulCommutative_quotient`
+   (N=commutator ↥HC) + `liesOver_mem_characterKernel` で commutator ↥HC ⊆ ker ψ
+   (← (g:huSub) G-coord ∈ ⁅H⊔C,H⊔C⁆≤K [assembly] ⊆ ker χ [hχker]; map_commutatorElement で transport)。
