@@ -107,7 +107,6 @@ import OddOrder.Peterfalvi.S06_MuColumnBridge
 import OddOrder.Peterfalvi.S07_Coherence
 import OddOrder.Peterfalvi.S07_CoherenceConstantDegree
 import OddOrder.Peterfalvi.S07_CoherenceGalois
-import OddOrder.Peterfalvi.S07_RhoProjection
 import OddOrder.Peterfalvi.S08_CoherenceTheorems
 import OddOrder.Peterfalvi.S08_Theorem62_63_Standalone
 import OddOrder.Peterfalvi.S09_NonexistenceCertain
@@ -6719,11 +6718,6 @@ formula together with the prime computation `coprimeFrobeniusAction_card_eq_prim
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S14.two_mul_le_succ_of_odd_dvd
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S14.four_le_of_dvd_sub_one
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S14.exists_witness_g
--- Pf §7 (7.1) ρ projection foundation: `rhoValue χ a = (1/|H(a)|)∑_{x∈H(a)} χ(ax)` is `ℂ`-linear in
--- `χ`.  Start of the §7 ρ machinery (the unbuilt upstream of (12.14)/(12.15) and the (12.16) norm
--- bounds hA/hB/hC) on the existing Dade `H(a)` infrastructure (`S04.Hypothesis`).
-#assert_only_allowed_axioms OddOrder.Peterfalvi.S07.rhoValue_add
-#assert_only_allowed_axioms OddOrder.Peterfalvi.S07.rhoValue_smul
 
 -- **W1 §16 Prop 16.1 `hP1eqV` disjunct 3 (Singer/`SL₂(p)`) prerequisite (lane-f, issue 8015)** —
 -- `IsExtraspecial.of_card_eq_prime_cube`: a nonabelian group of order `p³` is extraspecial
@@ -6872,28 +6866,6 @@ first block, foundation of BG Theorem E's Lemma 14.5(c) count.  Axiom-clean. -/
 trivIset.  Axiom-clean. -/
 #assert_only_allowed_axioms OddOrder.BG.Ch4.S16.sigma_cover_disjoint_of_inputs
 
-/-! **Peterfalvi (7.1) `ρ`-projection `L`-conjugation invariance** (`S07_RhoProjection`; lane β, §12
-Dade-tower upstream, issue 0081/0087).  The averaged value `χ^ρ(a) = (1/|H(a)|)∑_{x∈H(a)} χ(a·x)` is
-invariant under conjugating the support point `a` by `ℓ ∈ L`: `χ^ρ(ℓ·a·ℓ⁻¹) = χ^ρ(a)` — the
-class-function (equivariance) property of `ρ`, the input for packaging `χ^ρ ∈ CF(L,A)`.  Rests on
-`(2.4.a)` (`HConjInvariant`, `H(ℓ·a·ℓ⁻¹) = ℓ·H(a)·ℓ⁻¹`) reindexing the average through the bijection
-`y ↦ ℓ⁻¹·y·ℓ` plus `χ`'s class-function property.  Axiom-clean. -/
-#assert_only_allowed_axioms OddOrder.Peterfalvi.S07.rhoValue_conjA
-
-/-! **Peterfalvi (7.1) `ρ`-projection as a class-function map `CF(G) → CF(L,A)`** (`S07_RhoProjection`;
-lane β).  `rho` packages `χ^ρ` (value `rhoValue`, equivariant by `rhoValue_conjA`) into `CF(L,A)`:
-the class function on `L` taking `χ^ρ(a)` on `A` and `0` off `A`, with support `⊆ A`.
-`rhoClassFun_add`/`rhoClassFun_smul` are its `ℂ`-linearity.  All axiom-clean. -/
-#assert_only_allowed_axioms OddOrder.Peterfalvi.S07.rho
-#assert_only_allowed_axioms OddOrder.Peterfalvi.S07.rhoClassFun_add
-#assert_only_allowed_axioms OddOrder.Peterfalvi.S07.rhoClassFun_smul
-
-/-! **Peterfalvi (7.2.a) `α^{τρ} = α`** (`S07_RhoProjection`; lane β).  The `ρ` projection is a left
-inverse of the Dade isometry `τ` on `CF(L,A)`: since `α^τ` is constant `= α(a)` on the coset `a·H(a)`
-(`Hypothesis.dadeValue_eq`), its `ρ`-average over `H(a)` recovers `α(a)`.  Axiom-clean. -/
-#assert_only_allowed_axioms OddOrder.Peterfalvi.S07.rhoValue_dadeMap
-#assert_only_allowed_axioms OddOrder.Peterfalvi.S07.rho_dadeMap
-
 /-! **Peterfalvi (14.11.4) `ρ`-norm bridge** (`S16_NonExistenceG`, lane γ/POLE-2).  The
 family-inequality `ρ`-norm `(toFamilyHypothesis71).chiRhoNormSq (ψ^{τ₁}) 0` equals the (7.8.b)
 coherence-norm `h78.zetaNuRhoNormSq`, since `S09.Hypothesis71.chiRho` depends only on the support
@@ -6912,19 +6884,6 @@ field of the `normCascadeData` producer; the remaining gate is the upper §8 TI-
 Axiom-clean. -/
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S16.MHypothesis.rhoNormSq_ge_lower
 
-/-! **Peterfalvi (2.7) adjunction for `ρ`** (`S07_RhoProjection`; lane β).  `rho_adjoint`:
-`⟨α^τ, χ⟩_G = ⟨α, χ^ρ⟩_L` — the Dade isometry `τ` (`hyp.dadeMap`) and the `ρ` projection are adjoint,
-by citing S04's `adjoint_formula` with `ψ = χ^ρ`; the averaging hypothesis is
-`rhoValue_eq_adjointAverageFun`, bridging the `ρ`-value to S04's `adjointAverageFun`.  Axiom-clean. -/
-#assert_only_allowed_axioms OddOrder.Peterfalvi.S07.rhoValue_eq_adjointAverageFun
-#assert_only_allowed_axioms OddOrder.Peterfalvi.S07.rho_adjoint
-
-/-! **Peterfalvi (7.2.b) `‖χ^ρ‖² ≤ ‖χ‖²`** (`S07_RhoProjection`; lane β).  `rho_normSq_le`: the `ρ`
-projection is norm-decreasing.  `π = τ(χ^ρ)` is the orthogonal projection of `χ` onto `im τ` (via the
-`rho_adjoint` adjunction + `isDadeIsometry_of_isDadeMap`), so the residual `χ − π` is orthogonal to
-`π`, and Pythagoras gives `‖χ‖² = ‖χ − π‖² + ‖χ^ρ‖² ≥ ‖χ^ρ‖²` (`inner_self_re_nonneg`).  Axiom-clean. -/
-#assert_only_allowed_axioms OddOrder.Peterfalvi.S07.rho_normSq_le
-
 /-! **Peterfalvi (14.11.4) §8 support identity `A(M) = K#`** (`S16_NonExistenceG`, lane γ/POLE-2).
 For a Frobenius group `M` with kernel `N`, the centralizer-support `centralizerSupport N# M` is
 exactly `N#`: forward by the Frobenius FPF property `centralizer_kernel_le` (`C_M(x) ≤ N` for
@@ -6932,11 +6891,3 @@ exactly `N#`: forward by the Frobenius FPF property `centralizer_kernel_le` (`C_
 cardinality input `|A(M)| = k − 1` of (14.11.4) (Coq `PFsection14` `Dade_cover_inequality`
 `#|A| = k.-1`).  Axiom-clean. -/
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S16.centralizerSupport_sharpSubgroup_eq_of_frobenius
-
-/-! **Peterfalvi (7.3) `‖χ^ρ‖² ≤ (1/|G|) ∑_{g∈Aᵗ} |χ(g)|²`** (`S07_RhoProjection`; lane β).
-`rho_normSq_le_restrict`: `‖χ^ρ‖² ≤ ‖χ₁‖²` where `χ₁ = restrictDadeSupport χ` is the restriction of
-`χ` to `Aᵗ`, since `χ₁^ρ = χ^ρ` (`rhoClassFun_restrictDadeSupport`, as `χ₁ = χ` on each coset
-`a·H(a) ⊆ Aᵗ`) and (7.2.b) applies to `χ₁`.  `inner_restrictDadeSupport_re` evaluates
-`‖χ₁‖² = (1/|G|) ∑_{g∈Aᵗ} |χ(g)|²`.  Both axiom-clean. -/
-#assert_only_allowed_axioms OddOrder.Peterfalvi.S07.rho_normSq_le_restrict
-#assert_only_allowed_axioms OddOrder.Peterfalvi.S07.inner_restrictDadeSupport_re
