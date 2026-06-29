@@ -240,6 +240,19 @@ count lemma は作らない。
 ⟹ χ M-invariant (∀g, conjBy g χ=χ) ⟹ `induce_injective_of_inertia_stable` 適用可。infra =
 `card_mul_inner_self_induce_eq_card_inertia` + prime-quotient dichotomy。次 = この「reducible ⟹ I=M」。
 
+**✅ 2026-06-30 (commit a19cc41b): W₁-stability の核心 landed — prime-quotient 不要だった**:
+`chiRestrict_conjBy_eq` (`S06_CertainTypeClifford`、axiom-clean): reducible-inducing column
+`chiRestrict χ₂` は **`L`-invariant** (∀g∈L, conjBy g (chiRestrict χ₂)=chiRestrict χ₂)。reducible⟺column
+(`induce_not_isIrreducible_iff`)、column=`Res_K μ` (`coe_chiRestrict`) ゆえ `L`-class function μ の制限で
+共役不変 (`conj_eq`)。⟹ q が prime でなくても column は **全 L で固定** (inflate された W̄₁-stable 列ゆえ;
+当初の「prime cyclic quotient」評価は不要、column の Res-構造が直接 full inertia を与える)。
+⟹ `induce_injective_of_inertia_stable` を column に適用可。
+
+**残 assembly (次着手)**: (1) **transport**: §6 column の `L=M/H₀`-invariance → §9 `inflate(chiRestrict χ₂)`
+の `M`-invariance (conjBy を inflate/compHom 通す)。(2) reducible φ∈𝒮(H₀) ↔ column χ̄ の inflate iso +
+reducibility correspondence (`isIrreducibleCharacter_compHom_mk'_iff` + commute、landed)。(3) ncard
+bijection → p-1 (B3b count inline)。core piece は出揃った — 残は §9↔§6 transport glue。
+
 > **状況 (2026-06-29)**: §6 side + (8.4.d) bridge B1 (structural Hypothesis(M/H₀)) 完成 (全 axiom-clean)。
 > 残 = B2 (inflation character bridge、最難所 = induction-inflation commute lemma) + B3 (|W̄₂|=p +
 > instantiate)。本プロジェクトで「最難・最高コスト」と記された指標終盤の最後の山。
