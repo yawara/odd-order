@@ -633,10 +633,18 @@ theorem bgTheoremE_cover_data [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
         (e.symm j.down).2 (e.symm k.down).2 hne] at hpσ
       exact Set.notMem_empty p hpσ
     thickenedA1_card := fun j => by
-      -- DEEP GATE (issue 8020): the Peterfalvi-side `thickenedA1 M M τ` (built from the (8.14)
-      -- `supportKernel` `R(x) = C_{M_F}(x)`) equals BG's `conjClassSet (Mtilde D M)` (built from the
-      -- §14 `Rsub` `R(x) = (N[x])_σ ⊓ C_G(x)`); given that identification,
-      -- `sigmaConjugacySaturation_Mtilde_ncard` (BG 14.5(c), DONE) + `mainSubgroup_eq_Msigma` close it.
+      -- DEEP GATE (issue 8020) — **encoding faithfulness issue, /loop²⁰ finding**: this field uses
+      -- `thickenedA1 (reps j) (reps j) τ`, whose `supportKernel L M X x` (= `L_F ⊓ C_G(x)` for escaping
+      -- `x`) is here applied with `L = M = reps j`, i.e. `(reps j)_F ⊓ C_G(x)`.  But Peterfalvi (8.14)
+      -- / Coq `FTsignalizer M x = C_{(N[x])_F}(x)` uses the **per-`x` signalizer maximal `N[x]`**'s
+      -- Fitting, not `M`'s.  For `x ∈ M_σ#` escaping `M` (`C_G(x) ⊄ M`), `M_F ⊓ C_G(x) ⊆ M` differs
+      -- from `(N[x])_σ ⊓ C_G(x) ⊆ N[x]` (different maximals) — so `thickenedA1 (reps j)(reps j)` is
+      -- **not** BG's faithful `𝒞_G(M̃)`, and this cardinality is not `(|M_σ|−1)·[G:M]` as stated.
+      -- Resolution needs a def/field redesign to the per-`x` signalizer (`FTsignalizer`/`Rsub`); then
+      -- `(N[x])_F = (N[x])_σ` (`maxNilpotentNormalHall_eq_Msigma_of_isTypeF_or_isTypeP2`, signalizer
+      -- `N[x]` is type `F`/`P₂`) makes Pf `R(x) = Rsub(x)`, and `sigmaConjugacySaturation_Mtilde_ncard`
+      -- (14.5(c), DONE) + `mainSubgroup_eq_Msigma` close it.  Touches shared `GroupTheory` defs +
+      -- the `S14_MaximalI` consumer (S14_MaximalI:2365) → needs design coordination (hub).
       sorry
   }, ?_⟩
   -- DEEP GATE (issue 8020): the (8.8) covering dichotomy (BG Cor 14.9) decides Type-I vs non-Type-I.

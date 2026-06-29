@@ -5314,6 +5314,22 @@ theorem exists_peterfalviType [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
         · exact ⟨.IV, hIV⟩
     · exact ⟨.II, hcls.2.1.mpr hP2⟩
 
+/-- **The signalizer maximal's Fitting equals its `σ`-core** (`M_F = M_σ` for type-`F`/`P₂`
+maximals): a maximal subgroup that is BG type `F` or `P₂` has `maxNilpotentNormalHall N = M_σ(N)`.
+Type `F` is Peterfalvi I and type `P₂` is Peterfalvi II (`proposition_type_classification` clauses
+(a)/(b)), both of which satisfy `M_F = M_σ` (clause (f)).  This is exactly the identity making
+Peterfalvi's (8.14) signalizer `R(x) = C_{(N[x])_F}(x)` (Coq `FTsignalizer`, Fitting of the signalizer
+maximal `N[x]`, which is type `F`/`P₂` by `signalizer_structure_of_mem_sigmaSharp`) coincide with BG's
+`R(x) = (N[x])_σ ⊓ C_G(x)` (`Rsub`): `(N[x])_F = (N[x])_σ` (issue 8020). -/
+theorem maxNilpotentNormalHall_eq_Msigma_of_isTypeF_or_isTypeP2 [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {N : Subgroup G} (hN : N ∈ maximalSubgroups G)
+    (h : S14.IsTypeF N ∨ S14.IsTypeP2 N) :
+    maxNilpotentNormalHall N = OddOrder.BG.Ch3.S10.Msigma N := by
+  have hcls := proposition_type_classification hG hN
+  rcases h with hF | hP2
+  · exact hcls.2.2.2.2.2.mpr (Or.inl (hcls.1.mpr hF))
+  · exact hcls.2.2.2.2.2.mpr (Or.inr (Or.inl (hcls.2.1.mpr hP2)))
+
 /-- **Type I and non-Type-I are mutually exclusive** (corollary of Proposition
 16.1(a)–(d)).  A maximal subgroup of a minimal simple group of odd order that is
 Type I cannot also be one of Types II–V.

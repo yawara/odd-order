@@ -6087,6 +6087,9 @@ through `typeP_maximal_eq_kappaHall_sup_U_sup_Msigma` + `isTypeP1_kappaSigma_com
 -- Every maximal subgroup has a Peterfalvi type (exhaustiveness of I–V): from Prop 16.1 over the
 -- exhaustive BG trichotomy F/P₁/P₂.  Supplies `BGTheoremECoverData.tau`/`typed` (issue 8020).
 #assert_only_allowed_axioms OddOrder.BG.Ch4.S16.exists_peterfalviType
+-- Signalizer maximal's Fitting = its σ-core (`(N[x])_F = (N[x])_σ`, type F/P₂): the identity making
+-- Peterfalvi's (8.14) `R(x) = C_{(N[x])_F}(x)` coincide with BG `Rsub = (N[x])_σ ⊓ C_G(x)` (issue 8020).
+#assert_only_allowed_axioms OddOrder.BG.Ch4.S16.maxNilpotentNormalHall_eq_Msigma_of_isTypeF_or_isTypeP2
 -- 15.7(e) conjunct A divisibility engine (Coq `regZq_dv_q1`): a `U0`-invariant order-`q` subgroup
 -- of the Frobenius kernel `M_F` forces `exp U ∣ q - 1` (Frobenius semiregular action).
 #assert_only_allowed_axioms OddOrder.BG.Ch4.S16.typeF_exponent_dvd_sub_one_of_invariant_card

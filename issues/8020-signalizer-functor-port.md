@@ -548,3 +548,21 @@ index) で ι を任意 universe に。`↥reps` (G の universe) 直接は型�
 
 ⟹ **prime partition (FT consumer card_LF が依存) は genuine 実証済**。残は signalizer R(x) の Pf↔BG
 identification + covering。次 = `supportKernel ↔ Rsub` (gate 1) に着手。
+
+## ⚠ 進捗 (lane d, 2026-06-29 /loop²⁰): gate 1 (thickenedA1_card) は **encoding faithfulness 問題** — issue 8021 起票
+
+deep gate 1 (`thickenedA1_card`) を closing しようと Coq Pf (8.14) を精読 → **Lean の thickenedA1/supportKernel
+が不忠実**と判明 (詳細 = 新 issue 8021):
+- Coq `FTsignalizer M x = C_{(N[x])_F}[x]` (per-x signalizer 極大 N[x] の Fitting) vs Lean
+  `supportKernel L M X x = L_F ⊓ C_G(x)` を struct field が **L=M** で使用 (= M_F)。escape する x で
+  M_F⊓C[x]⊆M ≠ (N[x])_σ⊓C[x]⊆N[x] (別極大) ⟹ thickenedA1 (reps i)(reps i) は BG faithful cover でなく、
+  `thickenedA1_card = (|M_σ|−1)·[G:M]` は現定義で likely false。
+- ⟹ gate 1 は「supportKernel↔Rsub の identification」でなく **def/field の faithfulness 修正** (shared
+  GroupTheory + S14_MaximalI consumer に跨る design 決定 = issue 8021)。sorry comment (S10:635) を更新済。
+
+**landed ingredient**: `maxNilpotentNormalHall_eq_Msigma_of_isTypeF_or_isTypeP2` (S16、axiom-clean、
+AxiomsCheck 登録): signalizer N[x] は type F/P₂ ゆえ `(N[x])_F = (N[x])_σ`。∴ faithful な Pf R(x) =
+(N[x])_F⊓C[x] = (N[x])_σ⊓C[x] = BG Rsub(x)。修正後の gate 1 closing の鍵 (Pf R(x)=Rsub を与える)。
+
+**残**: gate 1 = issue 8021 (encoding 修正、design 要)、gate 2 = covering 析取 (Cor 14.9)。prime partition
+(9/11 field) は実証済。次 = issue 8021 の design 検討 or gate 2 (Cor 14.9) 調査。
