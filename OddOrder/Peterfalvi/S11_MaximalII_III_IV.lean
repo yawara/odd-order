@@ -2627,6 +2627,16 @@ noncomputable def chiefFactorQuotientHypothesis [Finite G] {M : Subgroup G}
       omega
     · exact ho
 
+/-- **`|W̄₂| = p` for the `M/H₀` quotient hypothesis** (issue 1012, B3b bridge): the `W₂` field of
+`chiefFactorQuotientHypothesis` is `W̄₂ = (W₂.subgroupOf M).map(mk' H₀')`, whose order is `p` by
+`chiefFactor_card_W2bar`. -/
+theorem chiefFactorQuotient_card_W2_eq_p [Finite G] {M : Subgroup G}
+    {data : TypesIIIIIIVSetup M} (chief : ChiefFactorData data)
+    [(chief.H0.subgroupOf M).Normal] (hodd : Odd (Nat.card G))
+    (hHall : Nat.Coprime (Nat.card ↥(derivedInG M)) (Nat.card ↥data.W1)) :
+    Nat.card ↥(chiefFactorQuotientHypothesis chief hodd hHall).W2 = chief.p :=
+  chiefFactor_card_W2bar chief
+
 /-- The `K` of the `M/H₀`-`Hypothesis` is the `mk'`-image of the §9 induction carrier `HU = huSub`
 (`huSub_eq_derivedInG_subgroupOf`).  This bridges the §6 reducible count (over `Irr(K̄)`,
 `card_reducible_Hnontrivial_induce_eq_W2_sub_one`) to the §9 family `𝒮(H₀)` whose members are
