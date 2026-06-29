@@ -1488,6 +1488,17 @@ for a subgroup `Y` (the cases `Y = H₀, H₀C, H₀C', H₀U'` of (9.8)/(9.9)).
 def huSub (data : TypesIIIIIIVSetup M) : Subgroup ↥M :=
   (data.H ⊔ data.U).subgroupOf M
 
+/-- `HU = H ⊔ U` is exactly the derived subgroup `M' = derivedInG M` realised inside `↥M`
+(Peterfalvi (9.2): `M' = HU`).  This identifies the §9 induction carrier `huSub data` with the
+`(derivedInG M).subgroupOf M` whose `mk'`-image is the `K` of the `M/H₀`-`Hypothesis`
+(`chiefFactorQuotientHypothesis`), the bridge from the §9 family to the §6 reducible count
+(issue 1012, B2 bijection). -/
+theorem huSub_eq_derivedInG_subgroupOf (data : TypesIIIIIIVSetup M) :
+    huSub data = (derivedInG M).subgroupOf M := by
+  have h : data.H ⊔ data.U = derivedInG M := by
+    rw [data.typeP.derivedInG_eq_fitting_sup_U, ← data.typeP.H_eq]; rfl
+  rw [huSub, h]
+
 /-- `H`, realised as a subgroup of `HU = H ⊔ U` inside `↥M`.  Used to state the kernel condition
 `H ⊄ Ker χ` defining `𝒳`. -/
 def hInHu (data : TypesIIIIIIVSetup M) : Subgroup ↥(huSub data) :=
@@ -2502,6 +2513,20 @@ noncomputable def chiefFactorQuotientHypothesis [Finite G] {M : Subgroup G}
       rw [Nat.odd_iff] at hodd
       omega
     · exact ho
+
+/-- The `K` of the `M/H₀`-`Hypothesis` is the `mk'`-image of the §9 induction carrier `HU = huSub`
+(`huSub_eq_derivedInG_subgroupOf`).  This bridges the §6 reducible count (over `Irr(K̄)`,
+`card_reducible_Hnontrivial_induce_eq_W2_sub_one`) to the §9 family `𝒮(H₀)` whose members are
+`induceHU`-inductions of inflations from `K̄ = HU/H₀` (issue 1012, B2 bijection). -/
+theorem chiefFactorQuotientHypothesis_K_eq [Finite G] {M : Subgroup G}
+    {data : TypesIIIIIIVSetup M} (chief : ChiefFactorData data)
+    [(chief.H0.subgroupOf M).Normal] (hodd : Odd (Nat.card G))
+    (hHall : Nat.Coprime (Nat.card ↥(derivedInG M)) (Nat.card ↥data.W1)) :
+    (chiefFactorQuotientHypothesis chief hodd hHall).K
+      = (huSub data).map (QuotientGroup.mk' (chief.H0.subgroupOf M)) := by
+  show ((derivedInG M).subgroupOf M).map (QuotientGroup.mk' (chief.H0.subgroupOf M))
+      = (huSub data).map (QuotientGroup.mk' (chief.H0.subgroupOf M))
+  rw [huSub_eq_derivedInG_subgroupOf]
 
 /-- **(9.7) span step** (general form): in an irreducible `A`-action on a group `H` (every
 `A`-invariant subgroup is `⊥` or `⊤`), any nonzero subgroup `S₀` generates `H` under its
