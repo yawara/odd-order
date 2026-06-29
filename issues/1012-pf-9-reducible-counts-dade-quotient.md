@@ -189,7 +189,16 @@ X/H₀ の文字と同一視」((1.6)) で商で作業。⟹ §9 reducible-count
    - §6 stability machinery (`conjByPerm`/`conjByMulEquiv` @ S06_CertainTypeClifford) 既存。
    ⟹ **assembly は cont.¹⁷ の悲観評価より tractable**。残 content = reducible⟹inertia-stable (§6 certain-type
    から、reducible μ_j は W̄₁-stable=I_L(χ̄)=L) + induce_eq_induce_iff_conj 適用 + inflate iso + |W̄₂|=p。
-   次着手 = reducible⟹stable lemma or inflate iso (どちらも既存 tool 上)。
+
+   **✅ cont.¹⁹ (commit `<this>`): 単射 lemma landed + stability source 特定**:
+   - **`induce_injective_of_inertia_stable`** (`InducedIrreducible.lean`、general、axiom-clean):
+     `(∀g, conjBy g θ=θ) → induce θ=induce ψ → ψ=θ`。`induce_eq_induce_iff_conj` の near-cite
+     (予言通り)。⟹ 単射 piece 完成 (general/reusable)。
+   - **stability source 特定** (Coq `PFsection9.v`): reducible⟹inertia-stable は **`def_IXmu` @ L1048**
+     (`{in Xmu, forall s, 'I_M['chi_s]=M}` = 完全 inertia)、その source = **`sW1_Imu` @ L996**
+     (`W1 ⊆ 'I[theta(mu_f i) %% H0]`)。即ち **reducible family の χ は inflate された HC-linear char
+     ゆえ W₁ がその inertia に入る** (HU⊆I 常、HU·W₁=M ⟹ I_M=M)。⟹ §9 で要 = 「reducible-inducing χ∈xiOf
+     は W₁⊆I_M(χ)」(certain-type linear-char 構造から)。次着手 = この W₁-stability (or inflate iso)。
    - **reducibility 対応**: φ=Ind χ reducible (M-char) ⟺ Ind^L_K̄ χ̄ reducible (M/H₀-char) (inflation
      既約保存の両向き)。`{φ∈𝒮(H₀)|¬irr}` ↔ `{χ̄∈Irr(K̄)|¬irr(Ind χ̄)∧H̄⊄Ker}` の ncard bijection。
 4. **B3**: (a) **|W̄₂|=p** (`Nat.card ((W₂.subgroupOf M).map mk') = chief.p`、`|fixedByE|=p` の

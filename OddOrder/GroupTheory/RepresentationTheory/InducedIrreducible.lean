@@ -220,6 +220,18 @@ theorem induce_eq_induce_iff_conj (θ ψ : IrreducibleCharacter H) :
     haveI : Fintype G := Fintype.ofFinite G
     rw [IrreducibleCharacter.coe_conjBy, induce_conjBy_eq]
 
+/-- **Induction is injective at an inertia-stable irreducible.**  If `θ ∈ Irr H` (`H ⊴ G`) is fixed
+by every `G`-conjugation (`I_G(θ) = G`, i.e. its conjugation orbit is the singleton `{θ}`), then
+`Ind_H^G θ = Ind_H^G ψ` forces `ψ = θ`: the fibre of `ψ ↦ Ind ψ` over `Ind θ` is that singleton
+orbit (`induce_eq_induce_iff_conj`).  This is the injectivity behind the `𝒳 ↔ 𝒮` count when the
+relevant sources are `G`-invariant — Peterfalvi (9.5)/(9.9)'s `Smu` uniqueness (the Coq `ResIndXmu`
+route: `Res_H (Ind θ) = [G:H] · θ` for `G`-stable `θ`). -/
+theorem induce_injective_of_inertia_stable {θ ψ : IrreducibleCharacter H}
+    (hθ : ∀ g : G, IrreducibleCharacter.conjBy g θ = θ)
+    (h : induce H (θ : ClassFunction ↥H ℂ) = induce H (ψ : ClassFunction ↥H ℂ)) : ψ = θ := by
+  obtain ⟨g, hg⟩ := (induce_eq_induce_iff_conj θ ψ).mp h
+  rw [← hg]; exact hθ g
+
 /-- **Orbit size = inertia index.**  The `G`-conjugation orbit of `θ ∈ Irr H` (`H ⊴ G`) has
 cardinality `[G : I_G(θ)]`, via the coset parametrization `conjByOrbitEquivLeftCosets`.  Together
 with `induce_eq_induce_iff_conj` (orbit = fibre of `θ ↦ Ind θ`) this gives the multiplicity with
