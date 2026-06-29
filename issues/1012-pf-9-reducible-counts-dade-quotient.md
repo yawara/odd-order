@@ -121,8 +121,27 @@ X/H₀ の文字と同一視」((1.6)) で商で作業。⟹ §9 reducible-count
      ✅✅ **commute 全体 DONE = `induce_compHom_subgroupMap_mk'`** (S11、axiom-clean): `f=mk' N` 版
      `induce H (compHom ((mk' N).subgroupMap H) χ̄) = compHom (mk' N) (induce (H.map (mk' N)) χ̄)`。
      term eq + sum_comp + normalize で |N| 相殺 (ℂ: `invOf_eq_inv`+`mul_inv`+`inv_mul_cancel₀`)。
-     **⟹ B2 最難所 (induction-inflation commute) 完成**。残 B2 = inflation bijection 𝒳(H₀)↔{χ̄|H̄⊄Ker} +
-     reducibility 対応 (commute で φ=inflate(Ind χ̄) ⟹ inflation 既約保存で両向き)。次反復。
+     **⟹ B2 最難所 (induction-inflation commute) 完成**。
+   - **残 B2 = inflation bijection (realization plumbing、intricate but conceptually clear given commute)**:
+     `{φ∈chars.SOf chief.H0 | ¬irr φ} ≅ {χ̄∈Irr(K̄) | ¬irr(induce K̄ χ̄) ∧ H̄⊄Ker χ̄}` (ncard 両 = p-1)。
+     **key identifications**:
+     - `huSub data = (derivedInG M).subgroupOf M` (∵ `derivedInG M = data.H⊔data.U` = hM'eq S11:383)
+       ⟹ K̄ = `(chiefFactorQuotientHypothesis chief).K` = `(huSub data).map (mk' H₀')`、
+       induceHU = `induce (huSub data)`。
+     - **commute 適用**: `induce_compHom_subgroupMap_mk' (chief.H0.subgroupOf M) (hNH: H₀'≤huSub) χ̄`
+       ⟹ `induceHU (inflate χ̄) = inflate (induce K̄ χ̄)`。Invertible 2 つ + DecidablePred は classical/Finite。
+     - **inflation iso** (InflationCharacter.lean infra): `inflate_injective` + `exists_inflate_eq_of_subset_characterKernel`
+       ⟹ Irr(K̄) ≅ {χ∈Irr(huSub)|H₀⊆Ker} (= xiSet の H₀⊆Ker 部); restriction で
+       {χ̄|H̄⊄Ker}↔xiOf data chief.H0。
+     - **reducibility 対応**: φ=induceHU(inflate χ̄)=inflate(induce K̄ χ̄)、inflation 既約保存
+       (`compHom_of_surjective` + 逆) ⟹ ¬irr φ ⟺ ¬irr(induce K̄ χ̄)。
+     - **ncard bijection**: 上記 chain で `{φ∈sOf|¬irr} ≅ {χ̄|¬irr(induce χ̄)∧H̄⊄Ker}`。
+4. **B3**: (a) **|W̄₂|=p** (`chiefFactor_W2_not_le_H0` 系の card 版、`|fixedByE|=p` の W̄₂↔fixedByE iso); (b)
+   H=H̄ = (data.H.subgroupOf M).map mk' で `card_reducible_Hnontrivial_induce_eq_W2_sub_one
+   (chiefFactorQuotientHypothesis chief)` instantiate (= w̄₂-1 = p-1); (c) B2 bijection で
+   `{φ∈𝒮(H₀)|¬irr}.ncard = p-1` → caseB_character_counts conjunct 2,3,4 discharge。
+   > **状況**: §6 + B1 + B2 crux (commute) = 3 大ピース完成 (全 axiom-clean)。残 = B2 bijection
+   > (realization plumbing) + B3。conceptually clear, mechanically intricate (§9 carrier 同定)。
      ⟹ `induce H (inflate χ̄) g = compHom f (induce (H.map f) χ̄) g`。inflation 既約保存
      (`compHom_of_surjective` + 逆) で reducibility 両向き。
    - **reducibility 対応**: φ=Ind χ reducible (M-char) ⟺ Ind^L_K̄ χ̄ reducible (M/H₀-char) (inflation
