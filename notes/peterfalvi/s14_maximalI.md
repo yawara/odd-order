@@ -487,6 +487,24 @@ machinery 構築 (大、§7 prerequisite) 要。
      線形独立から、~30 行、新規)。
   3. **span assembly**: τ(φ₁−φ₂)=ε(μ_{φ₁}−μ_{φ₂})、μ_{φᵢ}∈ℤ[Rset] ⟹ ∈ℤ[Rset]。
   深い multi-iteration proof (~100+ 行)。次イテレーションで piece 1 から bottom-up。
+  **alt path (conj-difference、より clean だが要 Dade-conj-commute)**: (φ₁−φ₂)−(φ̄₁−φ̄₂)=
+  (φ₁−φ̄₁)−(φ₂−φ̄₂) ⟹ τ(φ₁−φ₂)−τ(φ₁−φ₂).conj = τ(φ₁−φ̄₁)−τ(φ₂−φ̄₂)=∑R₁(φ₁)−∑R₁(φ₂)∈ℤ[Rset]
+  (per-φ image_eq のみ、global (1.4)/uniqueness 不要)。**但し** τ(g.conj)=(τ g).conj が要
+  (Dade map の複素共役 commute) — supported g では dadeMap = genuine だが、repo に
+  complex-conj-commute lemma 不在 (group-conj `induce_map_conj` のみ)。要新規証明 (Dade
+  内部、alphaB conj 挙動から、深い)。⟹ どちらの path も deep prerequisite 要
+  (uniqueness via linearIndep / Dade-conj-commute)。**difference-uniqueness lemma**
+  (s(a−b)=t(c−d), 既約 distinct ⟹ {a,b}={c,d}) は inner-product 経由で証明可 (各 x で
+  s([a=x]−[b=x])=t([c=x]−[d=x])、x=a,b,c,d で case 分け、~50 行) = global path piece 2。
+
+## 2026-06-29 (lane-b=β loop¹¹, 再開): pin (a) 両 path の deep prerequisite 確認
+
+pin (a) は (1) global-(1.4)+difference-uniqueness か (2) conj-difference+Dade-conj-commute。
+両者とも deep prerequisite (uniqueness lemma ~50 行 / Dade complex-conj commute 新規)。
+§12 char frontier は genuine に deep cross-section/Dade machinery 段階。(12.2.b)/(12.3)/(12.4)
+は pin (a)(b) + §8/§10/§7 obligation modulo で honest closed、pin (c)(c') 完全 discharge 済。
+次: difference-uniqueness lemma (inner-product 経由、tractable) を piece 2 として bottom-up、
+or pin (b)/(12.2.a)/§7 ρ の machinery 評価。
 - pin (b) `constituent_diff_tau_eq_induce` (S14:413): (φ₁−φ₂)^τ=Ind_L^G ([Is]7.7 τ=Ind on TI、Dade
   machinery; S05 tau_eq_induce は TI-cyclic 用で型 I 不適用)。
 - (12.2.a) `typeI_induced_char_constituents` (S14:235): §8 型 F Clifford ((8.2.c) inertia + (1.7.c))。
