@@ -6911,3 +6911,11 @@ discharged) with the index identities `h78.kernelOrder = |K| = k`, `h78.compleme
 field of the `normCascadeData` producer; the remaining gate is the upper §8 TI-counting.
 Axiom-clean. -/
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S16.MHypothesis.rhoNormSq_ge_lower
+
+/-! **Peterfalvi (14.11.4) §8 support identity `A(M) = K#`** (`S16_NonExistenceG`, lane γ/POLE-2).
+For a Frobenius group `M` with kernel `N`, the centralizer-support `centralizerSupport N# M` is
+exactly `N#`: forward by the Frobenius FPF property `centralizer_kernel_le` (`C_M(x) ≤ N` for
+`x ∈ N#`), reverse by `x = y`.  Applied with `N = K = M_F` this is `typeIA M = K#`, the §8
+cardinality input `|A(M)| = k − 1` of (14.11.4) (Coq `PFsection14` `Dade_cover_inequality`
+`#|A| = k.-1`).  Axiom-clean. -/
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S16.centralizerSupport_sharpSubgroup_eq_of_frobenius
