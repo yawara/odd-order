@@ -613,3 +613,22 @@ genuine bridge **`mem_Mtilde_of_mem_coset`** (x∈M_σ#・x⁻¹g∈R(x) ⟹ g�
 
 **教訓**: cover を述べる前に Coq dichotomy の XOR 構造を読め (signalizer branch ≠ κ branch)。
 **次 = `pi_of_cent_sigma` の Lean port** (dichotomy の未ポート dep)。Coq BGsection12/14 で statement 精査要。
+
+## ✅ 進捗 (lane d, 2026-06-30 /loop²⁴): gate 2 は **feasible** と確定 — pi_of_cent_sigma の deps は全てポート済 (stale-pointer 罠回避)
+
+`pi_of_cent_sigma` (Coq Corollary BGsection14:797-856、~70 行) を精読。当初「deps 未ポート」と評価しかけたが、
+**memory `verify-port-state-by-number-not-coq-name` に従い概念/番号で grep し直すと deps は全て descriptive 名でポート済**:
+- **τ2-case uniqueness `'M('C[y])={M}`** = `maximalContaining_centralizer_eq_singleton_of_tau2_element` (S14:3032、Coq Cor 14.3 br.2、sorry-free)。
+- τ2 元の elementary abelian = `exists_elemAb_rank_two_le_E_mem_of_tau2` (S14:664)。
+- τ/σ partition = `mem_tau1_iff`/`mem_tau2_iff`/`mem_tau3_iff`/`mem_sigma_iff` (S12_ECore/S10_HallStructureCore)。
+- Ptype 構造 = `typeP_structure` (S14:2198) / `Ptype_structure` 相当。
+- σ-decomposition membership = ほぼ定義的 (`sigmaDecomposition x = {sigmaPart M x}\{1}`、4439/4514 で inline 使用)。
+
+⟹ **gate 2 (cover) は blocked でなく feasible な substantial port**: `pi_of_cent_sigma` (~70 行、deps 揃い) →
+`sigma_decomposition_dichotomy` (~80 行) → cover 組立。pi_of_cent_sigma の構造 = case split on τ2(M)-elt x':
+[τ2: 𝓜(C[x'])={M} (上記 ported) + ℓ_σ(x')=1 (σ_H-decomp 論法 Coq:818-821) + τ2-elt] / [非τ2: κ-elt x' + C[x]⊆M (Ptype_structure 経由 Coq:822-856)]。
+
+**訂正の教訓**: Coq 名 grep で「deps 未ポート→gate 2 too deep/blocked」と即断しかけた = まさに stale-pointer 罠
+([[verify-port-state-by-number-not-coq-name]])。概念 grep で feasible と判明。gate 2 を「深すぎ」と deprioritize
+しなくてよい (genuine 上流、deps 揃い)。**次 = pi_of_cent_sigma の port 実行** (τ2-case から: uniqueness は
+ported lemma 直結、ℓ_σ(x')=1 と κ-case を埋める)。
