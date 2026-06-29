@@ -283,4 +283,74 @@ theorem rho_normSq_le (hconj : hyp.HConjInvariant) (χ : ClassFunction G ℂ) :
   rw [hpyth, Complex.add_re]
   linarith [inner_self_re_nonneg (χ - π)]
 
+open Classical in
+/-- The restriction `χ₁` of `χ` to the Dade support `A^τ` (`dadeSupport`): equals `χ` on `A^τ` and
+`0` off it.  A class function since `A^τ` is conjugation-stable (`mem_dadeSupport_conj_iff`). -/
+noncomputable def restrictDadeSupport (χ : ClassFunction G ℂ) : ClassFunction G ℂ :=
+  ⟨fun g => if g ∈ hyp.dadeSupport then χ g else 0, by
+    intro g h
+    by_cases hg : g ∈ hyp.dadeSupport
+    · simp only [if_pos hg, if_pos (hyp.mem_dadeSupport_conj_iff.mpr hg)]
+      exact χ.conj_eq g h
+    · simp only [if_neg hg, if_neg (fun hc => hg (hyp.mem_dadeSupport_conj_iff.mp hc))]⟩
+
+omit [Fintype ↥L] in
+/-- `χ₁ = χ` on each coset `a·H(a) ⊆ A^τ`, so `χ₁` and `χ` have the same `ρ`-average at `a ∈ A`. -/
+theorem rhoValue_restrictDadeSupport (χ : ClassFunction G ℂ) {a : G} (ha : a ∈ A) :
+    rhoValue hyp (restrictDadeSupport hyp χ) ⟨a, ha⟩ = rhoValue hyp χ ⟨a, ha⟩ := by
+  letI : Fintype (hyp.H ⟨a, ha⟩) := Fintype.ofFinite _
+  have hval : ∀ x : (hyp.H ⟨a, ha⟩),
+      (restrictDadeSupport hyp χ) (a * (x : G)) = χ (a * (x : G)) := by
+    intro x
+    have hmem : a * (x : G) ∈ hyp.dadeSupport := hyp.mem_dadeSupport_of_mem_hCoset x.2
+    simp only [restrictDadeSupport, ClassFunction.coe_mk, if_pos hmem]
+  have h1 : rhoValue hyp (restrictDadeSupport hyp χ) ⟨a, ha⟩
+      = (Nat.card (hyp.H ⟨a, ha⟩) : ℂ)⁻¹
+          * ∑ x : (hyp.H ⟨a, ha⟩), (restrictDadeSupport hyp χ) (a * (x : G)) := rfl
+  have h2 : rhoValue hyp χ ⟨a, ha⟩
+      = (Nat.card (hyp.H ⟨a, ha⟩) : ℂ)⁻¹ * ∑ x : (hyp.H ⟨a, ha⟩), χ (a * (x : G)) := rfl
+  rw [h1, h2]
+  simp_rw [hval]
+
+omit [Fintype ↥L] in
+/-- **Peterfalvi (7.3), the `ρ`-invariance of restriction**: `χ₁^ρ = χ^ρ`. -/
+theorem rhoClassFun_restrictDadeSupport (hconj : hyp.HConjInvariant) (χ : ClassFunction G ℂ) :
+    rhoClassFun hyp hconj (restrictDadeSupport hyp χ) = rhoClassFun hyp hconj χ := by
+  apply ClassFunction.ext
+  intro g
+  by_cases hg : (g : G) ∈ A
+  · rw [rhoClassFun_apply_mem hyp hconj (restrictDadeSupport hyp χ) hg,
+      rhoClassFun_apply_mem hyp hconj χ hg, rhoValue_restrictDadeSupport hyp χ hg]
+  · rw [rhoClassFun_apply_not_mem hyp hconj (restrictDadeSupport hyp χ) hg,
+      rhoClassFun_apply_not_mem hyp hconj χ hg]
+
+/-- **Peterfalvi (7.3)**: `‖χ^ρ‖² ≤ ‖χ₁‖²`, where `χ₁` is the restriction of `χ` to `A^τ`.  Since
+`χ₁^ρ = χ^ρ` (`rhoClassFun_restrictDadeSupport`), this is just (7.2.b) applied to `χ₁`; and
+`‖χ₁‖² = (1/|G|) ∑_{g ∈ A^τ} |χ(g)|²` feeds the final inequality of (12.16). -/
+theorem rho_normSq_le_restrict (hconj : hyp.HConjInvariant) (χ : ClassFunction G ℂ) :
+    (ClassFunction.inner (rhoClassFun hyp hconj χ) (rhoClassFun hyp hconj χ)).re
+      ≤ (ClassFunction.inner (restrictDadeSupport hyp χ) (restrictDadeSupport hyp χ)).re := by
+  rw [← rhoClassFun_restrictDadeSupport hyp hconj χ]
+  exact rho_normSq_le hyp hconj (restrictDadeSupport hyp χ)
+
+omit [Fintype ↥L] in
+open Classical in
+/-- `‖χ₁‖² = (1/|G|) ∑_{g ∈ A^τ} |χ(g)|²`: the squared norm of the restriction is the partial sum of
+`|χ|²` over the Dade support.  Combined with `rho_normSq_le_restrict` this is the explicit (7.3)
+bound `‖χ^ρ‖² ≤ (1/|G|) ∑_{g ∈ A^τ} |χ(g)|²` used by the final inequality of (12.16). -/
+theorem inner_restrictDadeSupport_re (χ : ClassFunction G ℂ) :
+    (ClassFunction.inner (restrictDadeSupport hyp χ) (restrictDadeSupport hyp χ)).re
+      = (Nat.card G : ℝ)⁻¹
+          * ∑ g ∈ Finset.univ.filter (· ∈ hyp.dadeSupport), Complex.normSq (χ g) := by
+  rw [inner_self_eq_realCast, Complex.ofReal_re, Finset.sum_filter]
+  congr 1
+  refine Finset.sum_congr rfl (fun g _ => ?_)
+  by_cases hg : g ∈ hyp.dadeSupport
+  · have hχ₁ : (restrictDadeSupport hyp χ) g = χ g := by
+      simp only [restrictDadeSupport, ClassFunction.coe_mk, if_pos hg]
+    rw [hχ₁, if_pos hg]
+  · have hχ₁ : (restrictDadeSupport hyp χ) g = 0 := by
+      simp only [restrictDadeSupport, ClassFunction.coe_mk, if_neg hg]
+    rw [hχ₁, if_neg hg, Complex.normSq_zero]
+
 end OddOrder.Peterfalvi.S07

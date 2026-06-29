@@ -985,3 +985,24 @@ inner-self 正値性 (`∑|φ|²≥0`) + 展開。→ (7.3) → (12.16) hC。
 **残 §7 = (7.3)** (次イテレーション): `(1/|G|)Σ_{g∈Aᵗ}|χ(g)|²≥‖χ^ρ‖²` は χ₁=Aᵗ-restriction
 (Aᵗ=`hyp.dadeSupport`) で χ₁^ρ=χ^ρ + (7.2.b) 適用、`(1/|G|)Σ_{Aᵗ}|χ|²=‖χ₁‖²`。
 → (7.5) family / (7.8.b) → (12.16) hB/hC。
+
+### loop³⁷ — (7.3) `‖χ^ρ‖²≤(1/|G|)Σ_{Aᵗ}|χ|²` 完成 ✅ (§7 (7.1)-(7.3) コア完結)
+
+**(7.3) 完成** (全 axiom-clean、leaf green、初回通過)。χ₁=Aᵗ-restriction で (7.2.b) を適用:
+- `restrictDadeSupport χ` = χ on dadeSupport / 0 off (conj-stable `mem_dadeSupport_conj_iff`)。
+- `rhoValue_restrictDadeSupport`/`rhoClassFun_restrictDadeSupport`: χ₁^ρ=χ^ρ (χ₁=χ on coset
+  a·H(a)⊆Aᵗ via `mem_dadeSupport_of_mem_hCoset`)。
+- `rho_normSq_le_restrict` = (7.3): `‖χ^ρ‖²≤‖χ₁‖²` (χ₁^ρ=χ^ρ rw + (7.2.b))。
+- `inner_restrictDadeSupport_re`: `‖χ₁‖²=(1/|G|)Σ_{g∈Aᵗ}|χ(g)|²` (`inner_self_eq_realCast` +
+  `Finset.sum_filter` + normSq split)。⟹ 明示形 `‖χ^ρ‖²≤(1/|G|)Σ_{Aᵗ}|χ|²`。AxiomsCheck 登録。
+- ⚠ unusedSectionVars: G-only の 3 lemma に `omit [Fintype ↥L] in`。
+
+**∴ §7 (7.1)-(7.3) コア完結**: value/equivariance/packaging/linearity (7.1) + α^{τρ}=α (7.2.a) +
+(2.7) adjunction + ‖χ^ρ‖²≤‖χ‖² (7.2.b) + (7.3) partial-sum bound。これが (12.16) hC の
+`normRho=‖ψ^ρ‖²` + disjoint-Aᵗ 加算 → <‖χ‖²=1 の土台。
+
+**残 §7 (12.16 用)**: (7.5) family 多重版 (Aᵢᵗ disjoint で Σ‖χ^{ρᵢ}‖²≤‖χ‖²) + (7.6)-(7.8)
+family+normal-subgroup ((7.8.b) `1-e/h≤‖ζ^{νρ}‖²`=hB)。**lane γ は S09 family 機構 (`chiRho`/
+`chiRhoNormSq`/`zetaNuRhoNormSq`) で (14.11.4) を処理済** ⟹ 次イテレーションは (12.16) の hA/hB/hC
+を S09 family 機構 + 本 §7 (7.1)-(7.3) でどう構成するか (S09 再利用 vs (7.5)/(7.8) 新規) を評価。
+正本=issue 0081。

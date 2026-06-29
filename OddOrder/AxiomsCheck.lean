@@ -6924,3 +6924,11 @@ projection is norm-decreasing.  `π = τ(χ^ρ)` is the orthogonal projection of
 `rho_adjoint` adjunction + `isDadeIsometry_of_isDadeMap`), so the residual `χ − π` is orthogonal to
 `π`, and Pythagoras gives `‖χ‖² = ‖χ − π‖² + ‖χ^ρ‖² ≥ ‖χ^ρ‖²` (`inner_self_re_nonneg`).  Axiom-clean. -/
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S07.rho_normSq_le
+
+/-! **Peterfalvi (7.3) `‖χ^ρ‖² ≤ (1/|G|) ∑_{g∈Aᵗ} |χ(g)|²`** (`S07_RhoProjection`; lane β).
+`rho_normSq_le_restrict`: `‖χ^ρ‖² ≤ ‖χ₁‖²` where `χ₁ = restrictDadeSupport χ` is the restriction of
+`χ` to `Aᵗ`, since `χ₁^ρ = χ^ρ` (`rhoClassFun_restrictDadeSupport`, as `χ₁ = χ` on each coset
+`a·H(a) ⊆ Aᵗ`) and (7.2.b) applies to `χ₁`.  `inner_restrictDadeSupport_re` evaluates
+`‖χ₁‖² = (1/|G|) ∑_{g∈Aᵗ} |χ(g)|²`.  Both axiom-clean. -/
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S07.rho_normSq_le_restrict
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S07.inner_restrictDadeSupport_re
