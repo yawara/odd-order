@@ -4561,6 +4561,53 @@ noncomputable def genuineSigmaDecomposition [Finite G]
   length := sigmaLength
   length_one_iff := sigmaLength_eq_one_iff hG
 
+/-- **`pi_of_cent_sigma` τ₂-case `ℓ_σ = 1`** (Coq `BGsection14`:809-821): a nonidentity
+`τ₂(M)`-element `x'` has `ℓ_σ(x') = 1`.  Following BG: a `τ₂(M)`-prime `p ∣ |x'|` gives a rank-two
+elementary abelian `A ≤ E` (`exists_elemAb_rank_two_le_E_of_tau2`); a maximal `N ⊇ N_G(A)` then
+absorbs every `τ₂(M)`-prime into `σ(N)` (`tau2_prime_mem_sigma_diff_beta`), so `x'` is a
+`σ(N)`-element and `length_one_of_isPiElement_sigma`/`exists_mem_Msigma_of_isPiElement_sigma` gives
+`ℓ_σ(x') = 1`.  This is the second discharged part of `pi_of_cent_sigma`'s τ₂ branch (with
+`pi_of_cent_sigma_tau2_uniqueness`). -/
+theorem tau2_element_sigmaLength_one [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    {M : Subgroup G} (hM : M ∈ maximalSubgroups G) {x' : G} (hx'1 : x' ≠ 1)
+    (hx'τ2 : ∀ p ∈ piSet (Subgroup.closure ({x'} : Set G)), p ∈ tau2 M) :
+    sigmaLength x' = 1 := by
+  classical
+  obtain ⟨E, E₁, E₂, E₃, hsetup⟩ := exists_subgroupESetup hG hM
+  have hcard : Nat.card ↥(Subgroup.closure ({x'} : Set G)) = orderOf x' := by
+    rw [← Subgroup.zpowers_eq_closure, Nat.card_zpowers]
+  -- `piSet (closure {x'})` membership reduces to `(orderOf x').primeFactors`.
+  have hpiSet : ∀ q : ℕ, q ∈ (orderOf x').primeFactors → q ∈ tau2 M := fun q hq =>
+    hx'τ2 q (by
+      show q ∈ (Nat.card ↥(Subgroup.closure ({x'} : Set G))).primeFactors
+      rw [hcard]; exact hq)
+  -- a `τ₂(M)`-prime `p ∣ |x'|`, and a rank-two `τ₂(M)` elementary abelian `A ≤ E`.
+  have hord_ne : orderOf x' ≠ 1 := by rwa [Ne, orderOf_eq_one_iff]
+  obtain ⟨p, hp_prime, hp_dvd⟩ := (orderOf x').exists_prime_and_dvd hord_ne
+  haveI : Fact p.Prime := ⟨hp_prime⟩
+  have hpτ2 : p ∈ tau2 M :=
+    hpiSet p (Nat.mem_primeFactors.mpr ⟨hp_prime, hp_dvd, (orderOf_pos x').ne'⟩)
+  obtain ⟨A, hAea, hAE⟩ := exists_elemAb_rank_two_le_E_of_tau2 hG hsetup hpτ2
+  have hAcard : Nat.card ↥A = p ^ 2 := hAea.2
+  have hAne : A ≠ ⊥ := by
+    rintro rfl
+    rw [show Nat.card ↥(⊥ : Subgroup G) = 1 from by simp] at hAcard
+    nlinarith [hp_prime.two_le, hAcard]
+  -- a maximal `N ⊇ N_G(A)`.
+  obtain ⟨N, hNmem, hN_le⟩ :=
+    OddOrder.BG.Ch2.S08.exists_maximalSubgroup_containing_normalizer_of_ne_bot_le_maximal
+      hG hM hAne (hAE.trans hsetup.E_le)
+  have hNcontain : N ∈ maximalSubgroupsContaining (Subgroup.normalizer (A : Set G)) :=
+    ⟨mem_maximalSubgroups.mp hNmem, hN_le⟩
+  -- every prime of `x'` lands in `σ(N)`, so `x'` is a `σ(N)`-element.
+  have hx'σ : OddOrder.GroupTheory.IsPiElement (OddOrder.BG.Ch3.S10.sigma N) x' := by
+    intro q hq
+    haveI : Fact q.Prime := ⟨Nat.prime_of_mem_primeFactors hq⟩
+    exact (tau2_prime_mem_sigma_diff_beta hG hsetup hpτ2 hAea hAE hNcontain
+      (Nat.prime_of_mem_primeFactors hq) (hpiSet q hq)).1
+  exact (sigmaLength_eq_one_iff hG x').mpr
+    ⟨hx'1, exists_mem_Msigma_of_isPiElement_sigma hG hNmem hx'1 hx'σ⟩
+
 /-- **σ-decomposition: extracting a `σ`-length-one factor** (BG §1, mmd L3793): every `g ≠ 1`
 factors as `g = x · x'` with `x` a `σ`-length-one element (the `σ(M)`-part for a maximal `M` whose
 `σ(M)` contains a prime of `g`), `x'` a `σ(M)′`-element, both in `⟨g⟩` and commuting.  Combines
