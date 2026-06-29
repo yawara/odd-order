@@ -1626,6 +1626,18 @@ structure MHypothesis (hyp : Hypothesis (G := G)) where
   betaGrid : OddOrder.Peterfalvi.S09.Hypothesis71.constOne G + h78.delta =
     ∑ i : Fin hyp.base.q, ∑ j : Fin hyp.base.p, (betaSigns i j : ℂ) • hyp.base.eta i j
   G0 : Set G
+  /-- **Peterfalvi (14.10)/(7.5)**: the test character `ψ^{τ₁}` has norm one — it is the
+  Dade-isometry `τ₁`-image of the unit-norm coherent `ζ`, hence admissible in the family
+  inequality (7.5) `S09.family_inequality`.  V-side dual of
+  `S12.Hypothesis.inner_tau1_zeta_self_eq_one`; a genuine consequence of `tau1` being an isometry
+  on `ℤ[ℳ]` and `ψ ∈ ℳ` irreducible. -/
+  psi_tau1_norm_one : ClassFunction.inner (tau1 psi) (tau1 psi) = 1
+  /-- **Peterfalvi (14.11.3)/(14.11.4)**: `G₀ ⊆ G − Ã(M)`.  The (14.11.3) set
+  `G₀ = G − [Ã(M) ∪ (W#)^G ∪ (P#)^G ∪ (Q#)^G]` lies inside the family `(7.4)` support complement
+  `famG₀ = (toFamilyHypothesis71).G0 = G − Ã(M)`, since every `g ∈ G₀` is off the Dade support
+  `Ã(M)` of `A(M)` (`typeIHyp.dadeData.dade.dadeSupport`).  This is the inclusion `G₀ ⊆ famG₀`
+  used to drop the `G₀`-part of the (7.5) sum in (14.11.4). -/
+  G0_off_dadeSupport : ∀ g ∈ G0, g ∉ typeIHyp.dadeData.dade.dadeSupport
 
 namespace MHypothesis
 
@@ -2288,6 +2300,62 @@ theorem generic_character_bound [Finite G]
           hyp.base.q_odd hyp.base.p_odd n ε hε hpair h00
     _ = ‖χ g‖ := by rw [hχ2]
     _ = ‖(Mdata.tau1 Mdata.psi) g‖ := hχnorm g
+
+open scoped Classical OddOrder.Peterfalvi.S12.FiniteInduce in
+/-- **Peterfalvi (14.11.4), line-83 upper-bound step** — the V-side `M`-analogue of
+`S12.Hypothesis.chiRhoNormSq_zeta_le_line83`.  Applying the family inequality (7.5)
+`S09.family_inequality` to the norm-one character `ψ^{τ₁}` (`psi_tau1_norm_one`) and dropping the
+`G₀`-part of the sum via (14.11.3) `generic_character_bound` (`|ψ^{τ₁}(g)| ≥ 1` on `G₀`) together
+with the inclusion `G₀ ⊆ famG₀` (`G0_off_dadeSupport`) gives
+`‖ψ^{τ₁ρ}‖² ≤ |A(M)|/|M| + (1/|G|)(|famG₀| − |G₀|)`.
+
+This is the first step of (14.11.4)'s upper bound; the remaining passage to the displayed
+`1 − 1/p − 1/q + …` is the `|K#|/|M|` evaluation and the §8 TI-counting of the `(W#)^G`/`(P#)^G`/
+`(Q#)^G` contributions, isolated for the cascade producer `normCascadeData`.  `famG₀ =
+(toFamilyHypothesis71).G0 = G − Ã(M)` and `G₀ = Mdata.G0`. -/
+theorem MHypothesis.chiRhoNormSq_psi_le_line83 [Finite G]
+    (_hG : OddOrder.BG.IsMinimalSimpleOdd G) {hyp : Hypothesis (G := G)}
+    (Mdata : MHypothesis hyp) (hne : Mdata.K ≠ hyp.base.V) :
+    (Mdata.toFamilyHypothesis71).chiRhoNormSq (Mdata.tau1 Mdata.psi) 0
+      ≤ (Nat.card ↥(OddOrder.GroupTheory.typeIA Mdata.M Mdata.typeIHyp.typeI) : ℝ)
+          / (Nat.card ↥Mdata.M : ℝ)
+        + (Nat.card G : ℝ)⁻¹ * ((Nat.card (Mdata.toFamilyHypothesis71).G0 : ℝ)
+          - ((Finset.univ.filter (fun g : G => g ∈ Mdata.G0)).card : ℝ)) := by
+  haveI := Mdata.finiteG
+  have hA0 : (Mdata.toFamilyHypothesis71).A 0
+      = OddOrder.GroupTheory.typeIA Mdata.M Mdata.typeIHyp.typeI := rfl
+  have hL0 : (Mdata.toFamilyHypothesis71).L 0 = Mdata.M := rfl
+  -- (7.5) line 81 (single member, `k = 1`).
+  have h81 := OddOrder.Peterfalvi.S09.family_inequality (Mdata.toFamilyHypothesis71)
+    (Mdata.tau1 Mdata.psi) Mdata.psi_tau1_norm_one
+  rw [Fin.sum_univ_one, hA0, hL0] at h81
+  -- `G₀ ⊆ famG₀`: every `g ∈ G₀` is off the Dade support `Ã(M)`.
+  have hsub : Finset.univ.filter (fun g : G => g ∈ Mdata.G0)
+      ⊆ Finset.univ.filter (fun g : G => g ∈ (Mdata.toFamilyHypothesis71).G0) := by
+    intro g hg
+    rw [Finset.mem_filter] at hg ⊢
+    exact ⟨Finset.mem_univ g, fun _ => Mdata.G0_off_dadeSupport g hg.2⟩
+  -- Drop the `G₀`-part: `|G₀| ≤ Σ_{G₀} ‖ψ^{τ₁}‖² ≤ Σ_{famG₀} ‖ψ^{τ₁}‖²`.
+  have hge : ((Finset.univ.filter (fun g : G => g ∈ Mdata.G0)).card : ℝ)
+      ≤ ∑ g ∈ Finset.univ.filter (fun g : G => g ∈ Mdata.G0),
+          ‖(Mdata.tau1 Mdata.psi : G → ℂ) g‖ ^ 2 := by
+    calc ((Finset.univ.filter (fun g : G => g ∈ Mdata.G0)).card : ℝ)
+        = ∑ _g ∈ Finset.univ.filter (fun g : G => g ∈ Mdata.G0), (1 : ℝ) := by
+          rw [Finset.sum_const, nsmul_eq_mul, mul_one]
+      _ ≤ ∑ g ∈ Finset.univ.filter (fun g : G => g ∈ Mdata.G0),
+            ‖(Mdata.tau1 Mdata.psi : G → ℂ) g‖ ^ 2 := by
+          refine Finset.sum_le_sum (fun g hg => ?_)
+          have hg2 : g ∈ Mdata.G0 := (Finset.mem_filter.mp hg).2
+          have h1 := generic_character_bound _hG hyp Mdata hne g hg2
+          nlinarith [h1, norm_nonneg ((Mdata.tau1 Mdata.psi : G → ℂ) g)]
+  have hdrop : ((Finset.univ.filter (fun g : G => g ∈ Mdata.G0)).card : ℝ)
+      ≤ ∑ g ∈ Finset.univ.filter (fun g : G => g ∈ (Mdata.toFamilyHypothesis71).G0),
+          ‖(Mdata.tau1 Mdata.psi : G → ℂ) g‖ ^ 2 :=
+    le_trans hge (Finset.sum_le_sum_of_subset_of_nonneg hsub (fun g _ _ => by positivity))
+  have hGinv : (0 : ℝ) ≤ (Nat.card G : ℝ)⁻¹ := by positivity
+  have hcS := mul_le_mul_of_nonneg_left hdrop hGinv
+  rw [mul_sub] at h81 ⊢
+  linarith [h81, hcS]
 
 /-- **Faithful §7 carrier for the `ρ`-norm two-sided bound of Peterfalvi (14.11.4).**
 
