@@ -55,16 +55,34 @@ X/H₀ の文字と同一視」((1.6)) で商で作業。⟹ §9 reducible-count
    - **重要簡約**: count は STRUCTURAL `Hypothesis L` のみ要 (Dade τ 不要) ⟹ (8.4.d) bridge も
      「`Hypothesis (M/H₀)` 構造のみ + 文字対応」で足り、商上 Dade 等長写像構成は不要。
    「(4.5)/(4.7) 未完」は stale だった。
-2. **← 次手 (残る唯一のゲート)**: (8.4.d) Hypothesis(4.6)-for-M/H₀ bridge。entry = S10:587-588 の
-   TODO (`-- TODO (Peterfalvi (8.15), higher Dade specializations): ... Hypothesis (4.6)/(5.2)
-   statements with K=M_prime and H=M_F`)。`DadeSupportHypothesisData` (S10:453) は L=M 直接版のみ。
-   必要 = (i) L=M/H₀ 商の §6 structural `Hypothesis (M⧸H₀)` 構成 (W̄₁/W̄₂/K̄/V̄/sdiffTICyclic/isComplement)、
-   (ii) §9 `chars.SOf chief.H0` (HU→M induced family) ↔ §6 induction-family on M/H₀ の同一視 ((1.6)
-   「H₀⊆Ker の M-文字 = M/H₀-文字」)、その下で reducibility 対応。`typePData_toS06Hypothesis`
-   (S12:1011、L=M 版) が template。
-3. (9.9.b)/(9.8.b) instantiate: bridge + `card_reducible_induce_eq_W2` を cite、w₂=p・j=0 除去で
-   `{φ∈𝒮(H₀)|¬irr}.ncard = p-1` を caseB/caseA_character_counts conjunct 2,3,4 で discharge。
-4. (9.10) de-opacify + exceptional 構造。
+2. **← 次手 (残る唯一のゲート) = B1: `S06.Hypothesis (↥M ⧸ H₀')` の構成** (構造のみ、Dade τ 不要)。
+   **2026-06-29 de-risk 完了 — 以下が field-by-field の construction recipe (要 ~150-200 行 def)**:
+   - **L = `↥M ⧸ (chief.H0.subgroupOf M)`**。H₀⊴M = `normal_subgroupOf_iff_le_normalizer` +
+     `chief.H0_normalized_by_M` (9.4)。`q := QuotientGroup.mk' (H0.subgroupOf M)`。
+   - **K̄ = `((derivedInG M).subgroupOf M).map q`** (= M'/H₀ = HU/H₀)。`K_normal` ← image of normal。
+   - **W̄₁ = `(data.W1.subgroupOf M).map q`**, **W̄₂ = `(data.W2.subgroupOf M).map q`**。
+   - フィールド証明:
+     - `isComplement K̄ W̄₁`: L=M で `data.M_complement` (= K⋊W₁), Q=H₀'≤K で商 ⟹ K̄⋊W̄₁。
+       (complement の quotient-by-normal-in-K)。
+     - `W1_cyclic/W2_cyclic`: image of cyclic。`W1_nontrivial`: W₁∩H₀'≤W₁∩K=⊥ (complement) ⟹
+       W̄₁≅W₁≠⊥。`card_coprime`: |K̄| ∣ |K|, |W̄₁|=|W₁| (W₁∩H₀=⊥ injective), `hHall`。`W2_le_K`: image。
+     - **`W2_nontrivial` + |W̄₂|=p**: `typeP_chiefFactor_card` (S11:888) が `|C_{H̄}(W₁)|=p` 供給。
+       **⚠ type-II 注意 (S11:2032 faithfulness note)**: type II では `|W₂| > p` (W₂∩H₀≠⊥)、
+       使うのは **image-order |W̄₂|=p** (typeP_chiefFactor_card)、**`|W₂|` ではない** (後者は
+       type III/IV のみ p)。W̄₂ = image of W₂ = C_{H̄}(W₁), order p。
+     - **`centralizer_W2` (= (8.4.d) crux)**: `C_{M'/H₀}(x̄) = W̄₂` for x̄∈W̄₁^#。⊇ easy。⊆ =
+       coprime fixed-point lift: `coprime_fixedPoints_quotient` (Isaacs Cor 3.28、ForwardFromCh03:808)。
+       coprimality `Coprime |⟨x⟩| |H₀|` ← x∈W₁, `typeP_coprime_H_W1` (H₀⊆H, gcd(|H||W₁|)=1)。
+       ⟹ C_{M'/H₀}(x̄) = image of C_{M'}(x) = image of W₂ (= `data.centralizer_W1`) = W̄₂。
+     - `W_odd`: image of W₁⊔W₂ odd ← |G| odd。
+   - **B1 def の home**: S12 (typePData_toS06Hypothesis 近傍) or 新 bridge leaf。`typePData_toS06Hypothesis`
+     (S12:1062, L=M版) が subgroupOf-transport の template; B1 は mk'-image-transport 版。
+3. **B2**: §9 `chars.SOf chief.H0` (HU→M induced family) ↔ §6 induction-family {Ind^L_K̄ χ̄} on M/H₀。
+   χ̄∈Irr(K̄)↔χ∈Irr(HU) with H₀⊆Ker (inflation (1.6)); `Ind^{M/H₀}_{K̄} χ̄` ↔ inflation of `Ind^M_{HU} χ`
+   (induction-inflation commute)。H̄⊄Ker χ̄ ↔ H⊄Ker χ。reducibility 対応。
+4. **B3**: `card_reducible_Hnontrivial_induce_eq_W2_sub_one` を B1 の Hypothesis(M/H₀), H=H̄, w₂=p で
+   instantiate → (9.9.b)/(9.8.b) count を discharge。
+5. (9.10) de-opacify + exceptional 構造。
 
 ## 完了条件
 

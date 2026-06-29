@@ -2064,6 +2064,16 @@ theorem chiefFactor_basic [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     have h2 : 2 ≤ p ^ data.q := le_trans hp.two_le (Nat.le_self_pow hq_ne p)
     omega
 
+/-- **`H₀ ◁ M`** (the chief-factor kernel is `M`-normal): `H₀.subgroupOf M` is normal in `↥M`, so
+the quotient `↥M ⧸ H₀` — the ambient of Peterfalvi (8.4.d)'s certain-type group `L = M/H₀` — is a
+group.  Immediate from the `M`-normalization `H0_normalized_by_M` of (9.4) via
+`normal_subgroupOf_iff_le_normalizer` (using `H₀ < H ≤ M`).  This is the foundation of the §9
+reducible-count `quotient`-Dade framework (issue 1012). -/
+theorem chiefFactor_H0_subgroupOf_normal {M : Subgroup G} {data : TypesIIIIIIVSetup M}
+    (chief : ChiefFactorData data) : (chief.H0.subgroupOf M).Normal :=
+  (Subgroup.normal_subgroupOf_iff_le_normalizer
+    (chief.H0_lt_H.le.trans (H_le_M data))).mpr chief.H0_normalized_by_M
+
 /-! ### (9.7) The chief factor `H̄ = H/H₀` as an `𝔽ₚ[U W₁]`-module
 
 The Clifford dichotomy of (9.7) is read off the `𝔽ₚ`-dimension of `H̄`: it equals `q`, and `q` is
