@@ -61,19 +61,32 @@ X/H₀ の文字と同一視」((1.6)) で商で作業。⟹ §9 reducible-count
      `chief.H0_normalized_by_M` (9.4)。`q := QuotientGroup.mk' (H0.subgroupOf M)`。
    - **K̄ = `((derivedInG M).subgroupOf M).map q`** (= M'/H₀ = HU/H₀)。`K_normal` ← image of normal。
    - **W̄₁ = `(data.W1.subgroupOf M).map q`**, **W̄₂ = `(data.W2.subgroupOf M).map q`**。
+   - **foundations landed** (2026-06-29, S11, axiom-clean): `chiefFactor_H0_subgroupOf_normal`
+     (H₀◁M) + `chiefFactor_W1_inf_H0_subgroupOf_eq_bot` (W₁⊓H₀=⊥) + `chiefFactor_coprime_H0_W1`
+     (Coprime|H₀||W₁|)。
    - フィールド証明:
-     - `isComplement K̄ W̄₁`: L=M で `data.M_complement` (= K⋊W₁), Q=H₀'≤K で商 ⟹ K̄⋊W̄₁。
-       (complement の quotient-by-normal-in-K)。
-     - `W1_cyclic/W2_cyclic`: image of cyclic。`W1_nontrivial`: W₁∩H₀'≤W₁∩K=⊥ (complement) ⟹
-       W̄₁≅W₁≠⊥。`card_coprime`: |K̄| ∣ |K|, |W̄₁|=|W₁| (W₁∩H₀=⊥ injective), `hHall`。`W2_le_K`: image。
+     - **`isComplement K̄ W̄₁` = 1-liner**: `data.M_complement.map_mk' hcop (H₀.subgroupOf M)`
+       (`IsComplement'.map_mk'` @ `OddOrder/Mathlib/SchurZassenhausConj.lean:49`、N=M'.subgroupOf M,
+       K=W₁.subgroupOf M, L=H₀.subgroupOf M; hcop=Coprime|M'||W₁|=hHall)。K̄/W̄₁ も自動で image 形。
+     - `W1_cyclic/W2_cyclic`: image of cyclic。`W1_nontrivial`: `chiefFactor_W1_inf_H0_..._eq_bot` で
+       W̄₁≅W₁≠⊥。`card_coprime`: |K̄| ∣ |K|, |W̄₁|=|W₁|, `hHall`。`W2_le_K`: image monotone。
      - **`W2_nontrivial` + |W̄₂|=p**: `typeP_chiefFactor_card` (S11:888) が `|C_{H̄}(W₁)|=p` 供給。
        **⚠ type-II 注意 (S11:2032 faithfulness note)**: type II では `|W₂| > p` (W₂∩H₀≠⊥)、
        使うのは **image-order |W̄₂|=p** (typeP_chiefFactor_card)、**`|W₂|` ではない** (後者は
        type III/IV のみ p)。W̄₂ = image of W₂ = C_{H̄}(W₁), order p。
-     - **`centralizer_W2` (= (8.4.d) crux)**: `C_{M'/H₀}(x̄) = W̄₂` for x̄∈W̄₁^#。⊇ easy。⊆ =
-       coprime fixed-point lift: `coprime_fixedPoints_quotient` (Isaacs Cor 3.28、ForwardFromCh03:808)。
-       coprimality `Coprime |⟨x⟩| |H₀|` ← x∈W₁, `typeP_coprime_H_W1` (H₀⊆H, gcd(|H||W₁|)=1)。
-       ⟹ C_{M'/H₀}(x̄) = image of C_{M'}(x) = image of W₂ (= `data.centralizer_W1`) = W̄₂。
+     - **`centralizer_W2` (= (8.4.d) crux、残る唯一の hard field、~60-100行)**: `C_{↥M⧸H₀'}(x̄) ⊓ K̄ = W̄₂`
+       for x̄∈W̄₁^#。**3-step 分解**:
+       1. **`C_{↥M⧸H₀'}(x̄) = (C_{↥M}(x)).map mk'`** (coprime lift)。⊇ general。⊆ =
+          `coprime_fixedPoints_quotient` (Isaacs Cor 3.28、ForwardFromCh03:808): φ=⟨x⟩ conjugation on
+          ↥M (`MulAut.conj` restrict to `Subgroup.zpowers x`、`isCyclic_zpowers`)、N=H₀'、IsAInvariant
+          (x∈M normalizes H₀'∵H0_normalized_by_M)、coprime |⟨x⟩|∣|W₁| と |H₀'| (`chiefFactor_coprime_H0_W1`)。
+          ḡ∈C(x̄)⟹conj_x g≡g mod H₀'⟹lift c∈C_{↥M}(x)。setup pattern = FrobeniusActionTI:247-285。
+          **⚠ BG Lemma 1.14 `centralizer_comap_mk'_eq_centralizer_sup_of_pGroup_coprime` (S01:2413) は
+          T=p-group 限定で ⟨x⟩ (非素数冪可) に不適用** — coprime_fixedPoints_quotient 直接組立要。
+       2. **`(C_{↥M}(x)).map mk' ⊓ K̄ = (C_{↥M}(x) ⊓ K).map mk'`** (`ker mk'=H₀'≤K=M'.subgroupOf M` ゆえ
+          image∩image=image∩、mathlib `Subgroup.map_inf_eq` 系 or 手動 ker≤K 論法)。
+       3. **`C_{↥M}(x) ⊓ (M'.subgroupOf M) = W₂.subgroupOf M`** (= `data.centralizer_W1` の subgroupOf 版:
+          `derivedInG M ⊓ centralizer{x} = W₂` を ↥M に subgroupOf transport)。⟹ = W̄₂。
      - `W_odd`: image of W₁⊔W₂ odd ← |G| odd。
    - **B1 def の home**: S12 (typePData_toS06Hypothesis 近傍) or 新 bridge leaf。`typePData_toS06Hypothesis`
      (S12:1062, L=M版) が subgroupOf-transport の template; B1 は mk'-image-transport 版。

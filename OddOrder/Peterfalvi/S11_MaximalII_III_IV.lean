@@ -2074,6 +2074,28 @@ theorem chiefFactor_H0_subgroupOf_normal {M : Subgroup G} {data : TypesIIIIIIVSe
   (Subgroup.normal_subgroupOf_iff_le_normalizer
     (chief.H0_lt_H.le.trans (H_le_M data))).mpr chief.H0_normalized_by_M
 
+/-- **`W₁ ⊓ H₀ = ⊥` inside `↥M`**: `W₁` complements `M' = [M,M]` (`data.M_complement`) and
+`H₀ < H ≤ M'`, so `W₁ ⊓ H₀ ≤ W₁ ⊓ M' = ⊥`.  In `↥M ⧸ H₀` this makes `W̄₁ = W₁ H₀ / H₀ ≅ W₁`
+(needed for `W̄₁ ≠ ⊥` and the Hall coprimality of the (8.4.d) certain-type group). -/
+theorem chiefFactor_W1_inf_H0_subgroupOf_eq_bot {M : Subgroup G}
+    {data : TypesIIIIIIVSetup M} (chief : ChiefFactorData data) :
+    (data.W1.subgroupOf M) ⊓ (chief.H0.subgroupOf M) = ⊥ := by
+  have hH0M' : (chief.H0.subgroupOf M) ≤ (derivedInG M).subgroupOf M :=
+    Subgroup.comap_mono (chief.H0_lt_H.le.trans data.typeP.H_le)
+  rw [eq_bot_iff]
+  exact le_trans (inf_le_inf_left _ hH0M')
+    (disjoint_iff.mp data.typeP.M_complement.disjoint.symm).le
+
+/-- **`gcd(|H₀|, |W₁|) = 1`**: `H₀ < H` and `gcd(|H|, |W₁|) = 1` (`typeP_coprime_H_W1`, the coprime
+action of the Hall complement `W₁` on the nilpotent `H = M_F`).  This is the coprimality the
+(8.4.d) centralizer computation `C_{M'/H₀}(x̄) = W̄₂` needs (the `x`-fixed points of `M'` lift
+across `H₀` by Isaacs Cor 3.28). -/
+theorem chiefFactor_coprime_H0_W1 [Finite G] {M : Subgroup G}
+    {data : TypesIIIIIIVSetup M} (chief : ChiefFactorData data) :
+    Nat.Coprime (Nat.card ↥chief.H0) (Nat.card ↥data.W1) :=
+  (typeP_coprime_H_W1 data.typeP).coprime_dvd_left
+    (Subgroup.card_dvd_of_le chief.H0_lt_H.le)
+
 /-! ### (9.7) The chief factor `H̄ = H/H₀` as an `𝔽ₚ[U W₁]`-module
 
 The Clifford dichotomy of (9.7) is read off the `𝔽ₚ`-dimension of `H̄`: it equals `q`, and `q` is
