@@ -529,3 +529,44 @@ or pin (b)/(12.2.a)/§7 ρ の machinery 評価。
 - **genuine 組立**: 上記で Res_L ψ=β+γ、β は L−H で 0 (`Sset_vanishes_off_H` ✓)、γ は coset-const
   (H⊆ker character ⟹ φ(xh)=φ(x)、要 character-kernel coset-const lemma) ⟹ ψ(xh)=γ(x)=ψ(x)。
   regrouping は character completeness (`CharacterCompleteness`) + 係数抽出。
+
+## 2026-06-29 (lane-b=β loop¹²): pin (a) piece 2 = difference-uniqueness lemma 完成 + 残 piece の具体 recipe
+
+**difference-uniqueness lemma 完成** (commit ef060c7d、sorry-free + axiom-clean、AxiomsCheck 登録):
+`irreducibleCharacter_signed_difference_uniqueness` (S14:407 付近、`[Finite G]`):
+`s•(a−b)=t•(c−d)` (a≠b, c≠d, s≠0 ∈ ℂ) ⟹ `(a=c∧b=d∧s=t) ∨ (a=d∧b=c∧s=−t)`。
+証明 = 既約 a/b と左 inner で pairing (`ClassFunction.inner` 左線形) + 直交正規
+`irreducibleCharacter_inner_eq_ite` で Kronecker delta 化 ⟹ `s=t·([c=a]−[d=a])` /
+`−s=t·([c=b]−[d=b])`、s≠0 で 2 orientation 場合分け。**loop⁵-¹⁰/¹¹ が「tractable piece 2」と
+判定したもの、回避せず実装**。
+
+**pin (a) `constituent_diff_tau_mem_span` 残 piece の具体 recipe (調査確定、次イテレーション実装)**:
+route = **global n-ary (1.4) signed family + reconciliation** (conj-difference path は Dade-conj-commute
+新規ゆえ不採用)。**injectivity 懸念は解消** — family を Finset で取れば distinct 自動。
+
+- **piece 1 (global family)**: `isometry_difference_pair_structure` (IsometryDifferencePair:730) を
+  family T = `constituents ∪ constituents.image conj` (Finset、φ̄ も含む全 distinct 既約) に適用。
+  **template = `S07_CoherenceConstantDegree.coherent_of_constant_degree:527-540`** (`hSfin.toFinset.equivFin`
+  で Finset→`Fin n` 列挙 + injective + range=T)。要件:
+  - n≥2: φ≠φ̄ (non-real) ゆえ |T|≥2。
+  - equal degree: constituents 等次数 (`data.equal_degree`) + φ̄(1)=φ(1) (degree real)。
+  - 3 Dade hyp (`IsometryDifferenceImagesAreVirtual`/`...VanishAtOne`/isometry `h_isom`): 全て差
+    χᵢ−χ₀ が A(L)-supported から従う。constituents⊆A(L)∪{1} (`data.supported`)、φ̄ 同、等次数で {1}
+    相殺 ⟹ A(L)-supported。供給 = `S07.dadeIntegralCharacterMap_{mem_ZIrr_of_supported(:5360),`
+    `apply_one_eq_zero(:5381),inner_eq_on_supported_span(:5303)}` (R1cdi が単一 pair で使うのと同じ)。
+  - 出力: `data : SignedIrreducibleDifferenceFamily G n` + ∀i, `τ(χᵢ−χ₀)=ε•(μᵢ−μ₀)` (global sign ε,
+    global μ:Fin n→Irr G)。⟹ `τ(φ₁−φ₂)=ε(μ_{φ₁}−μ_{φ₂})`、`τ(φ−φ̄)=ε(μ_φ−μ_{φ̄})`。
+- **piece 2 (reconciliation, lemma 済)**: 各 constituent φ で R1cdi (`CharacterDifferenceImage`,
+  S07_Coherence:395) の `image_eq`: `τ(φ−φ̄)=sign_φ•(mu_φ−nu_φ)` (S07_Coherence:402、χ.conj=φ̄)。
+  global と等置 `ε(μ_φ−μ_{φ̄})=sign_φ(mu_φ−nu_φ)` → **`irreducibleCharacter_signed_difference_uniqueness`**
+  (μ_φ≠μ_{φ̄}: μ inj + φ≠φ̄; mu_φ≠nu_φ: `.distinct`; ε≠0) ⟹ {μ_φ,μ_{φ̄}}={mu_φ,nu_φ}
+  ⟹ μ_φ∈{mu_φ,nu_φ}=`(R1cdi).imageSet`。
+- **piece 3 (span assembly)**: mu_φ,nu_φ は `(R1 data hφ).imageSet`=Rset member の ± (orthonormal 化
+  `toOrthonormalImage`)。⟹ μ_φ∈span ℤ Rset。∴ `τ(φ₁−φ₂)=ε(μ_{φ₁}−μ_{φ₂})∈span ℤ Rset`。
+  ⚠ `toOrthonormalImage.imageSet` vs `R1cdi.imageSet`={mu,nu} の符号関係を 1 つ確認要
+  (mu_φ が Rset member の ±1 倍であること)。
+
+**実装順**: piece 1 を sub-lemma 群に分解 (1a=Finset family+equal degree+supportedness、1b=3 Dade hyp、
+1c=(1.4) 適用) → piece 2 reconciliation lemma (uniqueness 適用) → piece 3 span。各 committable。
+pin (b) (τ=Ind on TI) と (12.5) ρ は別 (deeper Dade/§7)。
+[[scaffold-sorry-free-not-done]] [[feedback-no-avoiding-hard-parts]] [[feedback-cite-sorried-lemmas-if-signature-correct]]
