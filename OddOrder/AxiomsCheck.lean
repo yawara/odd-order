@@ -6919,6 +6919,14 @@ exactly `N#`: forward by the Frobenius FPF property `centralizer_kernel_le` (`C_
 cardinality input `|A(M)| = k − 1` of (14.11.4) (Coq `PFsection14` `Dade_cover_inequality`
 `#|A| = k.-1`).  Axiom-clean. -/
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S16.centralizerSupport_sharpSubgroup_eq_of_frobenius
+
+/-! **Peterfalvi (14.11) `|M| = p q k`** (`S16_NonExistenceG`, lane γ/POLE-2).  The order of the
+type-I maximal `M`, from `[M : K] = pq` and `|K| = k` by Lagrange (`card_mul_index` +
+`subgroupOfEquivOfLe`).  The denominator of the §8 cardinality input `|A(M)|/|M| = (k−1)/(kpq)`.
+(`card_typeIA_eq`, the numerator `|A(M)| = k − 1`, cites `typeI_frobenius` (12.7) so is body-honest
+but transitively gated on (12.16)/lane β, hence not registered here.)  Axiom-clean. -/
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S16.MHypothesis.card_M_eq
+
 /-! **Peterfalvi (2.7) adjunction for `ρ`** (`S07_RhoProjection`; lane β).  `rho_adjoint`:
 `⟨α^τ, χ⟩_G = ⟨α, χ^ρ⟩_L` — the Dade isometry `τ` (`hyp.dadeMap`) and the `ρ` projection are adjoint,
 by citing S04's `adjoint_formula` with `ψ = χ^ρ`; the averaging hypothesis is
