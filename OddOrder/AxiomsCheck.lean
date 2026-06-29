@@ -771,7 +771,10 @@ set_option linter.style.longLine false in
 -- Pf (12.4) pin (b) step 3: on functions supported in a trivial-`H` sub-support `A₁ ⊆ A`, the
 -- abstract Dade map of `hyp` equals `Ind_L^G` (restrict to `A₁` + step 2 + `IsDadeMap.unique`).
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S14.dadeMap_eq_induce_of_supported_on_trivial_H
--- Pf (8.2.b) Frobenius realization for the type-I/F tower step (consumed by (12.10) step 2 /
+-- Pf (12.4) pin (b) type-I bridge: for a type-I maximal `L`, on a function supported in a trivial-`H`
+-- sub-support `A₁ ⊆ A(L)`, the type-I Dade isometry `τ` acts as `Ind_L^G` (instantiates step 3 at
+-- `hyp.tau` via `dadeIntegralCharacterMap_apply_of_support`).  Axiom-clean (parameterized by A₁).
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S14.typeI_tau_eq_induce_of_supported_trivial_H
 -- (12.16) `π = ∅` case): a type-F/I maximal whose complement `U` is a Z-group (all Sylow cyclic)
 -- is Frobenius with kernel `M_F`, via `IsZGroup.exponent_eq_card` + `typeF_frobenius_of_card_eq_exponent`.
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S14.typeF_frobenius_of_isZGroup_complement

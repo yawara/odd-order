@@ -800,17 +800,95 @@ theorem dadeMap_eq_induce_of_supported_on_trivial_H {A : Set G} {L : Subgroup G}
   exact congrFun h1 α
 
 open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
+/-- **Peterfalvi (12.4) pin (b), type-I bridge**: for a type-I maximal `L`, on a class function `f`
+supported in a trivial-`H` sub-support `A₁ ⊆ A(L)` (an `L`-invariant subset on which the type-I Dade
+stabilizers vanish), the Dade isometry `τ` acts as induction `Ind_L^G`.  This instantiates the
+general step-3 bridge `dadeMap_eq_induce_of_supported_on_trivial_H` at the type-I Dade map `hyp.tau`
+(via `dadeIntegralCharacterMap_apply_of_support`, and `inclusion` to widen the support from `A₁`). -/
+theorem typeI_tau_eq_induce_of_supported_trivial_H {L : Subgroup G} [Finite G] (hyp : Hypothesis L)
+    {A₁ : Set G} (hA₁A : A₁ ⊆ hyp.ambientA)
+    (hA₁norm : ∀ (l : L) ⦃a : G⦄, a ∈ A₁ → (l : G) * a * (l : G)⁻¹ ∈ A₁)
+    (hH₁ : ∀ a, (hyp.dadeData.dade.restrict hA₁A hA₁norm).H a = ⊥)
+    {f : ClassFunction ↥L ℂ}
+    (hf : f.support ⊆ OddOrder.Peterfalvi.S04.supportInSubgroup A₁ L) :
+    hyp.tau f = ClassFunction.induce L f := by
+  haveI := hyp.finiteG
+  have hfA : f.support ⊆ OddOrder.Peterfalvi.S04.supportInSubgroup hyp.ambientA L :=
+    hf.trans (OddOrder.Peterfalvi.S04.supportInSubgroup_mono hA₁A)
+  have h1 : hyp.tau f = hyp.dadeData.dade.dadeMap (k := ℂ)
+      ⟨f, (ClassFunction.mem_supportedSubmodule).mpr hfA⟩ :=
+    OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap_apply_of_support hyp.dadeData.dade
+      (hyp.dadeData.dade.fullDadeIsometryData hyp.hconj) hfA
+  rw [h1]
+  -- `⟨f, hfA⟩` is defeq to `inclusion hA₁A ⟨f, hf⟩` (same carrier `f`), so step 3 applies directly.
+  exact dadeMap_eq_induce_of_supported_on_trivial_H hyp.dadeData.dade hA₁A hA₁norm hH₁
+    ⟨f, (ClassFunction.mem_supportedSubmodule).mpr hf⟩
+
+/-- The escaping-centralizer set `{a ∈ X : ¬ C_G(a) ≤ M}` is `M`-conjugation invariant when `X` is
+(`C_G(gag⁻¹) = g·C_G(a)·g⁻¹` and `g ∈ M` normalizes `M`).  Extracted from the
+`supportKernel_conj_invariant` calculation; the `L`-invariance of the trivial-`H` sub-support
+`A(L) ∖ escaping` rests on this. -/
+private theorem escaping_conj_mem_iff {M : Subgroup G} {X : Set G} {g x : G}
+    (hg : g ∈ M) (hmem : g * x * g⁻¹ ∈ X ↔ x ∈ X) :
+    g * x * g⁻¹ ∈ escapingCentralizerSet M X ↔ x ∈ escapingCentralizerSet M X := by
+  have hcent : (Subgroup.centralizer ({g * x * g⁻¹} : Set G) ≤ M)
+      ↔ (Subgroup.centralizer ({x} : Set G) ≤ M) := by
+    rw [← conj_smul_centralizer_singleton]
+    conv_lhs => rw [← (conj_smul_eq_self_of_mem_normalizer (Subgroup.le_normalizer hg) :
+      MulAut.conj g • M = M)]
+    exact Subgroup.pointwise_smul_le_pointwise_smul_iff
+  simp only [escapingCentralizerSet, Set.mem_setOf_eq, hmem, hcent]
+
+open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
+/-- **Peterfalvi (12.4), the §8 support obligation** ([Is] 6.2 + (8.12.a)): for constituents
+`φ₁, φ₂ ∈ S(χ)`, the difference `φ₁ − φ₂` is supported on the **non-escaping** part of `A(L)`,
+`A₁ = {a ∈ A(L) : C_G(a) ≤ L}` (= `A(L) − H^#`, exactly where the type-I Dade stabilizers vanish).
+By [Is] 6.2 `Res_H φᵢ` is a conjugate-sum of `θ`, so `φᵢ` is supported on `A(L) ∪ {1}` with the
+(8.12.a) restriction to the non-escaping part; the difference cancels the value at `1`.  A faithful
+§8/[Is] obligation — the genuine cross-section content remaining in pin (b). -/
+theorem constituent_diff_support_subset_nonescaping [Finite G] {L : Subgroup G} (hyp : Hypothesis L)
+    {chi : ClassFunction ↥L ℂ} (dχ : CharacterDecompositionData hyp chi)
+    {φ₁ φ₂ : IrreducibleCharacter ↥L} (h₁ : φ₁ ∈ dχ.constituents) (h₂ : φ₂ ∈ dχ.constituents) :
+    ((φ₁ : ClassFunction ↥L ℂ) - (φ₂ : ClassFunction ↥L ℂ)).support ⊆
+      OddOrder.Peterfalvi.S04.supportInSubgroup
+        (hyp.ambientA \ escapingCentralizerSet L hyp.ambientA) L := by
+  sorry
+
+open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
 /-- **Peterfalvi (12.4), pin (b)** ([Is] 7.7 + (8.12.c) + [Is] 6.2): for constituents `φ₁, φ₂ ∈ S(χ)`,
-the Dade isometry acts as induction on the difference, `(φ₁ − φ₂)^τ = Ind_L^G(φ₁ − φ₂)`.  By [Is] 6.2
-`Res_H φᵢ` is the conjugate-sum of `θ`, so `Supp(φ₁ − φ₂) ⊆ A(L) − H^#`, a TI-subset of `G` with
-normalizer `L` by (8.12.c); on a TI-supported function the Dade isometry coincides with `Ind_L^G`
-([Is] 7.7).  A faithful §8/[Is] obligation. -/
+the Dade isometry acts as induction on the difference, `(φ₁ − φ₂)^τ = Ind_L^G(φ₁ − φ₂)`.
+
+Proof (now genuine, modulo the §8 support obligation): `φ₁ − φ₂` is supported on the non-escaping
+part `A₁ = {a ∈ A(L) : C_G(a) ≤ L}` (`constituent_diff_support_subset_nonescaping`), which is
+`L`-invariant (`escaping_conj_mem_iff` + `A(L)` `L`-invariant) and carries only trivial Dade
+stabilizers (`supportKernel = ⊥` off the escaping set, via `H_eq_supportKernel`).  On such a
+trivial-`H` support the type-I Dade isometry coincides with `Ind_L^G`
+(`typeI_tau_eq_induce_of_supported_trivial_H`, i.e. pin (b) steps 1–3 + the restriction assembly). -/
 theorem constituent_diff_tau_eq_induce {L : Subgroup G} [Finite G] (hyp : Hypothesis L)
     {chi : ClassFunction ↥L ℂ} (dχ : CharacterDecompositionData hyp chi)
-    {φ₁ φ₂ : IrreducibleCharacter ↥L} (_h₁ : φ₁ ∈ dχ.constituents) (_h₂ : φ₂ ∈ dχ.constituents) :
+    {φ₁ φ₂ : IrreducibleCharacter ↥L} (h₁ : φ₁ ∈ dχ.constituents) (h₂ : φ₂ ∈ dχ.constituents) :
     hyp.tau ((φ₁ : ClassFunction ↥L ℂ) - (φ₂ : ClassFunction ↥L ℂ)) =
       ClassFunction.induce L ((φ₁ : ClassFunction ↥L ℂ) - (φ₂ : ClassFunction ↥L ℂ)) := by
-  sorry
+  have hmem : ∀ (l : L) (a : G), ((l : G) * a * (l : G)⁻¹ ∈ hyp.ambientA ↔ a ∈ hyp.ambientA) := by
+    intro l a
+    refine ⟨fun h => ?_, fun h => hyp.dadeData.dade.L_normalizes_A l h⟩
+    have h2 := hyp.dadeData.dade.L_normalizes_A l⁻¹ h
+    simpa [Subgroup.coe_inv, mul_assoc] using h2
+  have hA₁A : hyp.ambientA \ escapingCentralizerSet L hyp.ambientA ⊆ hyp.ambientA := Set.diff_subset
+  have hA₁norm : ∀ (l : L) ⦃a : G⦄,
+      a ∈ hyp.ambientA \ escapingCentralizerSet L hyp.ambientA →
+      (l : G) * a * (l : G)⁻¹ ∈ hyp.ambientA \ escapingCentralizerSet L hyp.ambientA := by
+    intro l a ha
+    exact ⟨hyp.dadeData.dade.L_normalizes_A l ha.1,
+      fun hesc => ha.2 ((escaping_conj_mem_iff l.2 (hmem l a)).mp hesc)⟩
+  have hH₁ : ∀ a, (hyp.dadeData.dade.restrict hA₁A hA₁norm).H a = ⊥ := by
+    intro a
+    rw [OddOrder.Peterfalvi.S04.Hypothesis.restrict_H, hyp.dadeData.H_eq_supportKernel]
+    show supportKernel L L hyp.ambientA a.1 = ⊥
+    unfold supportKernel
+    rw [if_neg a.2.2]
+  exact typeI_tau_eq_induce_of_supported_trivial_H hyp hA₁A hA₁norm hH₁
+    (constituent_diff_support_subset_nonescaping hyp dχ h₁ h₂)
 
 open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
 /-- **Peterfalvi (12.4), coherence → coefficient-equality bridge** (genuine).  If `ψ ⊥ R(χ)`, then
