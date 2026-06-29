@@ -105,8 +105,19 @@ X/H₀ の文字と同一視」((1.6)) で商で作業。⟹ §9 reducible-count
      {χ̄∈Irr(K̄)|H̄⊄Ker χ̄} via `inflate` (`compHom mk'`、InflationCharacter.lean)。infra 既存:
      `IsIrreducibleCharacter.compHom_of_surjective` (inflation 既約保存)、`inflate_apply_one` (degree)、
      `exists_inflate_eq_of_subset_characterKernel` (H₀⊆Ker char の surjectivity)、`inflate` injective。
-   - **induction-inflation commute**: `Ind_{huSub}^M (inflate χ̄) = inflate_M (Ind^{M/H₀}_{K̄} χ̄)` —
-     **要 general lemma** (repo に無、新規; 商 huSub→K̄ と M→M/H₀ の compatibility)。これが B2 の難所。
+   - **induction-inflation commute** (B2 crux、新規 general lemma、~100行): `Ind_H^G (compHom (f.subgroupMap H) χ̄)
+     = compHom f (Ind_{H.map f} χ̄)` for `f:G→*Q surj`, `ker f≤H`, χ̄∈ClassFunction ↥(H.map f)。
+     **proof 完全 mapped (2026-06-29、build は fresh-context 反復で)**:
+     1. **term equality**: `induceTerm H (compHom (f.subgroupMap H) χ̄) x g = induceTerm (H.map f) χ̄ (f x) (f g)`。
+        induceTerm = `if x⁻¹gx∈H then θ⟨x⁻¹gx⟩ else 0`。条件同値 `x⁻¹gx∈H ⟺ f(x⁻¹gx)∈H.map f` =
+        **`Subgroup.comap_map_eq_self (ker f≤H)`** + mem_comap (mathlib 既存、ker≤H が key); 値 =
+        `χ̄⟨f(x⁻¹gx)⟩` 一致 ((fx)⁻¹(fg)(fx)=f(x⁻¹gx))。
+     2. **fiberwise sum**: `Σ_{x∈G} induceTerm H (...) x g = Σ_{x∈G} induceTerm (H.map f) χ̄ (f x) (fg)`
+        (term eq) `= |N|·Σ_{x̄∈Q} induceTerm (H.map f) χ̄ x̄ (fg)` (term は f x のみ依存 ⟹ fiberwise、
+        各 fiber size=|N| = `QuotientGroup.card_preimage_mk`)。Finset.sum_fiberwise 系。
+     3. **normalize**: `induce H θ = |H|⁻¹·Σ`、|H|=|N|·|H.map f| (ker≤H、first-iso) ⟹ |H|⁻¹·|N|=|H.map f|⁻¹。
+     ⟹ `induce H (inflate χ̄) g = compHom f (induce (H.map f) χ̄) g`。inflation 既約保存
+     (`compHom_of_surjective` + 逆) で reducibility 両向き。
    - **reducibility 対応**: φ=Ind χ reducible (M-char) ⟺ Ind^L_K̄ χ̄ reducible (M/H₀-char) (inflation
      既約保存の両向き)。`{φ∈𝒮(H₀)|¬irr}` ↔ `{χ̄∈Irr(K̄)|¬irr(Ind χ̄)∧H̄⊄Ker}` の ncard bijection。
 4. **B3**: (a) **|W̄₂|=p** (`Nat.card ((W₂.subgroupOf M).map mk') = chief.p`、`|fixedByE|=p` の
