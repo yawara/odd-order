@@ -2528,6 +2528,17 @@ theorem chiefFactorQuotientHypothesis_K_eq [Finite G] {M : Subgroup G}
       = (huSub data).map (QuotientGroup.mk' (chief.H0.subgroupOf M))
   rw [huSub_eq_derivedInG_subgroupOf]
 
+/-- **`H₀ ≤ HU` inside `↥M`** (`H₀ < H ≤ M' = HU`): the inclusion needed to specialize the
+induction-inflation commute `induce_compHom_subgroupMap_mk'` to `N = H₀`, `H = huSub` for the §9↔§6
+reducibility bridge (issue 1012, B2 bijection).  The commute itself is applied inline in the
+bijection assembly (under a single `letI : Fintype ↥M`) — stating it standalone fights the
+statement-level `Fintype (↥M ⧸ H₀)` that `ClassFunction.induce`'s sum needs. -/
+theorem chiefFactor_H0_le_huSub {M : Subgroup G} (data : TypesIIIIIIVSetup M)
+    (chief : ChiefFactorData data) :
+    (chief.H0.subgroupOf M) ≤ huSub data := by
+  rw [huSub_eq_derivedInG_subgroupOf]
+  exact Subgroup.comap_mono (chief.H0_lt_H.le.trans data.typeP.H_le)
+
 /-- **(9.7) span step** (general form): in an irreducible `A`-action on a group `H` (every
 `A`-invariant subgroup is `⊥` or `⊤`), any nonzero subgroup `S₀` generates `H` under its
 `A`-orbit — `⨆_{a} φ(a) • S₀ = ⊤`.  The orbit join is `A`-invariant (reindex `a ↦ h·a`) and

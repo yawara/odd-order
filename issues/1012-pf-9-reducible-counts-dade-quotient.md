@@ -140,8 +140,21 @@ X/H₀ の文字と同一視」((1.6)) で商で作業。⟹ §9 reducible-count
    H=H̄ = (data.H.subgroupOf M).map mk' で `card_reducible_Hnontrivial_induce_eq_W2_sub_one
    (chiefFactorQuotientHypothesis chief)` instantiate (= w̄₂-1 = p-1); (c) B2 bijection で
    `{φ∈𝒮(H₀)|¬irr}.ncard = p-1` → caseB_character_counts conjunct 2,3,4 discharge。
-   > **状況**: §6 + B1 + B2 crux (commute) = 3 大ピース完成 (全 axiom-clean)。残 = B2 bijection
-   > (realization plumbing) + B3。conceptually clear, mechanically intricate (§9 carrier 同定)。
+   > **状況**: §6 + B1 + B2 crux (commute) + bijection 基盤 = 完成 (全 axiom-clean)。残 = B2 bijection
+   > assembly + B3。conceptually clear, mechanically intricate (§9 carrier 同定 + instance 管理)。
+
+   **⚠ 2026-06-29 知見 (cont.¹⁶)**:
+   - **§9-commute は standalone lemma で書けない** — `ClassFunction.induce` の RHS は ambient
+     `↥M⧸H₀` の `Fintype` を `induceSum` の `∑ x` で要し、これは statement-level で `[Finite G]`
+     からは synth されない (general commute は `[Fintype Γ]` 引数から `Fintype (Γ⧸N)` を得る)。
+     かつ induceHU の内部 `letI Fintype ↥M` と statement の `[Fintype ↥M]` 引数で **Fintype diamond**
+     リスク。⟹ **bijection assembly 内で `letI : Fintype ↥M` 1 つの下で `induce_compHom_subgroupMap_mk'`
+     を inline 適用** (両辺同一 Fintype で diamond 回避)。inclusion `chiefFactor_H0_le_huSub`
+     (H₀≤HU、commit `<this>`) は landed。
+   - **|W̄₂|=p は cross-quotient** — W̄₂=(W₂.subgroupOf M).map (mk' H₀') は `↥M⧸H₀` 設定、
+     `coprimeFrobeniusChiefFactor_card.2`=|fixedByE|=p は `↥data.H⧸chief.N` 設定。`chiefFactor_W2_not_le_H0`
+     proof が両者の infra を持つ (hcard.2, hmap: fixedSubgroup.map mk'=fixedByE, hCHW1: .map H.subtype=W2)
+     が、2 quotient (↥M⧸H₀ vs ↥H⧸N、H₀ vs N) の橋渡しが要 ⟹ assembly と同様 intricate。
      ⟹ `induce H (inflate χ̄) g = compHom f (induce (H.map f) χ̄) g`。inflation 既約保存
      (`compHom_of_surjective` + 逆) で reducibility 両向き。
    - **reducibility 対応**: φ=Ind χ reducible (M-char) ⟺ Ind^L_K̄ χ̄ reducible (M/H₀-char) (inflation
