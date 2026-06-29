@@ -376,3 +376,29 @@ materialize。coq `PFsection11.v` 併読で機構を確定 → 旧評価の「§
 
 **次**: S(HC) enumeration (degree-w₁ 既約 subfamily の Fin n 化)。bridge は landed ゆえ、enumerate さえ
 すれば S(HC) coherence が出る。その後 S₂ + glue + α-grid calc + (10.8) 矛盾。
+
+## 2026-06-29 update¹² (lane-a) — 🎉 S(HC)=S₁ coherence **完全 materialized** (bottleneck 突破)
+
+update¹⁰ で「deep multi-session, dedicated effort 要」と flag した **S(HC) materialization を sorry-free で
+landed** (commit 5fdc6f12)。enumeration の「Clifford 数え上げ」評価は**過大**だった — **束ね型 IrreducibleCharacter
+は単なる subtype** `{φ // IsIrreducibleCharacter φ}` ゆえ bundling は自由、**Finset.equivFin で injective Fin n 化が
+自動** (M-orbit 明示不要)。
+
+**`Hypothesis.SHC_isCoherent`** (S12, sorry-free):
+`IsCoherent hyp.tau {φ | φ∈inducedFamily M ∧ IsIrreducibleCharacter φ ∧ φ(1)=w₁} hyp.A0`。
+- degree-w₁ 既約 ∩ inducedFamily の Finset を `Finset.univ.filter` で取り `equivFin` で Fin n 化。
+- bridge `inducedFamily_isCoherent_of_equalDegreeFamily` (前 commit) に渡す。
+- n≥2 = {ζ,ζ̄} (`exists_zeta_in_inducedFamily_degree_w1` + `inducedFamily_hasNoRealCharacters` で distinct)。
+- range = S₁ identity を Set.ext で示し transport。Prop ∃-elim は hcard (Prop) 内に閉込め (goal=Type)。
+= coq `cohS1 := uniform_degree_coherence scohS1` (PFsection11 L607)。
+
+**残 (11.8) endgame (S₁ coherence は供給済)**:
+1. **S₂=S(C)−S(HC) coherence** (unconditional、coq L660 `cohS2 := subset_coherent (Ptype_core_coherence)`):
+   Lean (9.11) `coherent_H0C_commutator` (S11) + (11.7)。S₁ と同様の materialization を S₂ にも。
+2. **union glue** S(C)=S₁∪S₂: `coherentUnion_of_glued`/`coherentPairChain` (S07)。glue 条件は α-grid calc が供給。
+3. **α-grid calc** (11.8.1)-(11.8.6): by_contra (residual⊥) → glue 条件確立 (α^τ inner lemmas `muGridAlpha_tau_*`
+   消費)。これが残る genuine multi-step character calc。
+4. **矛盾**: S(C) coherent → S(H₀C) coherent → (11.3)/(10.8) 矛盾。
+
+本 session = 4 commit (3 Lean: inducedFamily_sub_support / _isCoherent_of_equalDegreeFamily / SHC_isCoherent
++ note)。update¹⁰ の churn (0 commit/7 反復) を脱し flagged bottleneck を突破。
