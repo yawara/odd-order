@@ -107,6 +107,7 @@ import OddOrder.Peterfalvi.S06_MuColumnBridge
 import OddOrder.Peterfalvi.S07_Coherence
 import OddOrder.Peterfalvi.S07_CoherenceConstantDegree
 import OddOrder.Peterfalvi.S07_CoherenceGalois
+import OddOrder.Peterfalvi.S07_RhoProjection
 import OddOrder.Peterfalvi.S08_CoherenceTheorems
 import OddOrder.Peterfalvi.S08_Theorem62_63_Standalone
 import OddOrder.Peterfalvi.S09_NonexistenceCertain
@@ -6715,6 +6716,11 @@ formula together with the prime computation `coprimeFrobeniusAction_card_eq_prim
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S14.two_mul_le_succ_of_odd_dvd
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S14.four_le_of_dvd_sub_one
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S14.exists_witness_g
+-- Pf §7 (7.1) ρ projection foundation: `rhoValue χ a = (1/|H(a)|)∑_{x∈H(a)} χ(ax)` is `ℂ`-linear in
+-- `χ`.  Start of the §7 ρ machinery (the unbuilt upstream of (12.14)/(12.15) and the (12.16) norm
+-- bounds hA/hB/hC) on the existing Dade `H(a)` infrastructure (`S04.Hypothesis`).
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S07.rhoValue_add
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S07.rhoValue_smul
 
 -- **W1 §16 Prop 16.1 `hP1eqV` disjunct 3 (Singer/`SL₂(p)`) prerequisite (lane-f, issue 8015)** —
 -- `IsExtraspecial.of_card_eq_prime_cube`: a nonabelian group of order `p³` is extraspecial
