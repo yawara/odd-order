@@ -56,4 +56,43 @@ theorem rhoValue_sub (χ ψ : ClassFunction G ℂ) (a : {a : G // a ∈ A}) :
     rhoValue hyp (χ - ψ) a = rhoValue hyp χ a - rhoValue hyp ψ a := by
   simp only [rhoValue, ClassFunction.sub_apply, Finset.sum_sub_distrib, mul_sub]
 
+/-- **Peterfalvi (7.1), `L`-conjugation invariance of the average.**  The value `χ^ρ(a)` is
+invariant under conjugating the support point `a` by `ℓ ∈ L`: `χ^ρ(ℓ·a·ℓ⁻¹) = χ^ρ(a)`.  This is the
+class-function (equivariance) property of `ρ` — the input needed to package `χ^ρ` as an element of
+`CF(L, A)` — and rests on `(2.4.a)` (`HConjInvariant`, i.e. `H(ℓ·a·ℓ⁻¹) = ℓ·H(a)·ℓ⁻¹`) together with
+`χ` being a class function on `G`.  Concretely, conjugation by `ℓ` is a bijection
+`H(ℓ·a·ℓ⁻¹) ≃ H(a)`, `y ↦ ℓ⁻¹·y·ℓ`, under which the coset element `(ℓ·a·ℓ⁻¹)·y` is `G`-conjugate to
+`a·(ℓ⁻¹·y·ℓ)`, so the two averages agree term by term. -/
+theorem rhoValue_conjA (hconj : hyp.HConjInvariant) (χ : ClassFunction G ℂ)
+    (l : L) (a : {a : G // a ∈ A}) :
+    rhoValue hyp χ (hyp.conjA l a) = rhoValue hyp χ a := by
+  letI iA : Fintype (hyp.H a) := Fintype.ofFinite _
+  letI iB : Fintype (hyp.H (hyp.conjA l a)) := Fintype.ofFinite _
+  -- conjugation by `ℓ⁻¹` is the bijection `H(ℓ·a·ℓ⁻¹) ≃ H(a)`
+  let e : (hyp.H (hyp.conjA l a)) ≃ (hyp.H a) :=
+    { toFun := fun y => ⟨(l : G)⁻¹ * (y : G) * (l : G),
+        (hyp.mem_H_conjA_iff hconj a l).mp y.2⟩
+      invFun := fun x => ⟨(l : G) * (x : G) * (l : G)⁻¹,
+        (hyp.mem_H_conjA_iff hconj a l).mpr (by
+          have hx : (l : G)⁻¹ * ((l : G) * (x : G) * (l : G)⁻¹) * (l : G) = (x : G) := by group
+          rw [hx]; exact x.2)⟩
+      left_inv := fun y => by
+        apply Subtype.ext
+        change (l : G) * ((l : G)⁻¹ * (y : G) * (l : G)) * (l : G)⁻¹ = (y : G); group
+      right_inv := fun x => by
+        apply Subtype.ext
+        change (l : G)⁻¹ * ((l : G) * (x : G) * (l : G)⁻¹) * (l : G) = (x : G); group }
+  -- rewrite both `rhoValue`s into their averaging form under the chosen `Fintype` instances
+  have hB : rhoValue hyp χ (hyp.conjA l a)
+      = (Nat.card (hyp.H (hyp.conjA l a)) : ℂ)⁻¹
+          * ∑ y : (hyp.H (hyp.conjA l a)), χ ((hyp.conjA l a).1 * (y : G)) := rfl
+  have hA : rhoValue hyp χ a
+      = (Nat.card (hyp.H a) : ℂ)⁻¹ * ∑ x : (hyp.H a), χ (a.1 * (x : G)) := rfl
+  rw [hA, hB, Nat.card_congr e]
+  congr 1
+  refine Fintype.sum_equiv e _ _ (fun y => ?_)
+  change χ ((hyp.conjA l a).1 * (y : G)) = χ (a.1 * ((l : G)⁻¹ * (y : G) * (l : G)))
+  rw [hyp.conjA_coe]
+  exact χ.of_isConj (isConj_iff.mpr ⟨(l : G)⁻¹, by group⟩)
+
 end OddOrder.Peterfalvi.S07

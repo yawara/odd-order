@@ -6871,3 +6871,11 @@ first block, foundation of BG Theorem E's Lemma 14.5(c) count.  Axiom-clean. -/
 (`signalizer_centralizer_isComplement`) — contradiction.  The deep core of the 14.5(c) `R(x)`-cover
 trivIset.  Axiom-clean. -/
 #assert_only_allowed_axioms OddOrder.BG.Ch4.S16.sigma_cover_disjoint_of_inputs
+
+/-! **Peterfalvi (7.1) `ρ`-projection `L`-conjugation invariance** (`S07_RhoProjection`; lane β, §12
+Dade-tower upstream, issue 0081/0087).  The averaged value `χ^ρ(a) = (1/|H(a)|)∑_{x∈H(a)} χ(a·x)` is
+invariant under conjugating the support point `a` by `ℓ ∈ L`: `χ^ρ(ℓ·a·ℓ⁻¹) = χ^ρ(a)` — the
+class-function (equivariance) property of `ρ`, the input for packaging `χ^ρ ∈ CF(L,A)`.  Rests on
+`(2.4.a)` (`HConjInvariant`, `H(ℓ·a·ℓ⁻¹) = ℓ·H(a)·ℓ⁻¹`) reindexing the average through the bijection
+`y ↦ ℓ⁻¹·y·ℓ` plus `χ`'s class-function property.  Axiom-clean. -/
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S07.rhoValue_conjA
