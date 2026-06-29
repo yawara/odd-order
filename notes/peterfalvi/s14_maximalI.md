@@ -800,3 +800,26 @@ S14 closure に S11 + ZIrr_eq_span あれば S14 が自然 (lane b file)。
 (infra 全特定、次イテレーション build) + ℂ-instantiation ((1.10.b) を ℂ 値に、roots-set-adjoin route)。
 これらで (1.10) 完成 → (12.16) の一前提 (他 = §7 ρ/(12.13)-(12.15)/assembly)。
 **次イテレーション = (1.10.a) full を build** (infra ready、no more planning)。
+
+### loop²³⁻²⁴ — (1.10.a) full + G-form 完成、ℂ-instantiation の field-generality 判明
+
+**(1.10.a) 完全版 landing 済** (loop²³⁻²⁴、`CyclotomicCharacterCongruence.lean`、全 axiom-clean):
+- `exists_integral_zirr_apply_sub` — (1.10.a) full: 有限群 `[Group A][Finite A][IsMulCommutative A]`
+  の virtual char χ∈ℤ[Irr A]、x^p=1 で `χ(xy)-χ(y)=(1-ε)z`。**submodule framing**
+  (性質を持つ CF が ℤ-submodule で irreducibles を含む ⟹ ZIrr を含む) + linear-char core。
+  当初 [CommGroup] → 部分群 ↥A に適用するため **[Group]+[IsMulCommutative]** に refactor。
+- `exists_integral_apply_sub_of_commute` — (1.10.a) **G-form**: 任意有限群 G、commute する x,y で
+  `ψ(xy)-ψ(y)=(1-ε)z`。A=⟨x,y⟩ (abelian) に還元 (`Subgroup.isMulCommutative_closure` +
+  `ClassFunction.restrict_mem_ZIrr`)。**(12.16)/(13.5) が直接 cite 可な形**。
+
+⟹ **(1.10.a) 全形完成** (abelian + G-form)、**(1.10.b) abstract 完成**。
+
+**🔑 残 (1.10) wiring = (1.10.b) の ℂ-instantiation。重要な設計点 (次イテレーションで対処)**:
+現 `int_dvd_of_zeta_sub_one_dvd` は `[IsCyclotomicExtension {p} ℚ L]` (L = **ちょうど** p-th
+cyclotomic field、[L:ℚ]=p-1、N(ζ-1)=p) を要求。だが (12.16) の char 値 z は
+**ℚ(ζ_m)** (m=exp G ⊇ ζ_p) という**より大きい**体に住む (α(y) が m-th root of unity)。
+norm 論法は大きい体でも成立: `N_{L/ℚ}(ζ_p-1) = N_{ℚ(ζ_p)/ℚ}(ζ_p-1)^[L:ℚ(ζ_p)] = p^[L:ℚ(ζ_p)]`
+(p|N)、`N_{L/ℚ}(n)=n^[L:ℚ]` ⟹ p|n^[L:ℚ] ⟹ p|n。よって (1.10.b) を「**ζ_p を含む任意の
+number field L**」へ一般化が必要 (norm tower transitivity、`Norm.Transitivity` import 済)。
+**次イテレーション = この一般化版 (1.10.b) を build** (現 IsCyclotomicExtension 版は p-th 特化として残すか置換)。
+Coq PFsection1 の (1.10) 対応も併読して generality 確認。
