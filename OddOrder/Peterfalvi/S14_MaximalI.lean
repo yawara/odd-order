@@ -697,6 +697,108 @@ theorem constituent_diff_tau_mem_span {L : Subgroup G} [Finite G] (hyp : Hypothe
   rw [hμrel φ₁ hφ₁T φ₂ hφ₂T]
   exact Submodule.smul_mem _ _ (Submodule.sub_mem _ (hmu_mem φ₁ h₁) (hmu_mem φ₂ h₂))
 
+open scoped Classical in
+/-- **General TI-induction self-value** (Isaacs 7.x / Peterfalvi (3.2.c) value half), generalized
+from `TICyclicHypothesis.induce_apply_eq_self_of_mem_V` to an arbitrary TI subset.  For a TI subset
+`A` relative to `L` (`L ⊆ N_G(A)`, `A ⊆ L`, `IsTISubset A L`) and a class function `α` of `L`
+supported in `A`, the induced class function `Ind_L^G α` agrees with `α` on `A`: only the `|L|`
+conjugators `x ∈ L` contribute to the induction sum (the others land outside `A`, where `α` vanishes,
+by the TI property), each with value `α(a)`.  This is **pin (b), step 1** — the value-half of the
+"Dade map = Ind on the trivial-`H` part" bridge. -/
+theorem induce_apply_eq_self_of_mem_tiSubset {A : Set G} {L : Subgroup G}
+    [Fintype G] [Invertible (Nat.card L : ℂ)]
+    (hAL : A ⊆ (L : Set G))
+    (hnorm : ∀ x ∈ L, ∀ a ∈ A, x⁻¹ * a * x ∈ A)
+    (hTI : OddOrder.GroupTheory.IsTISubset A L)
+    (α : ClassFunction ↥L ℂ)
+    (hαsupp : α.support ⊆ OddOrder.Peterfalvi.S04.supportInSubgroup A L)
+    {a : G} (ha : a ∈ A) :
+    ClassFunction.induce L α a = α ⟨a, hAL ha⟩ := by
+  classical
+  haveI : Fintype ↥L := Fintype.ofFinite _
+  have haL : a ∈ L := hAL ha
+  have hterm : ∀ x : G, ClassFunction.induceTerm L α x a
+      = if x ∈ L then α ⟨a, haL⟩ else 0 := by
+    intro x
+    by_cases hx : x ∈ L
+    · rw [if_pos hx]
+      have haxL : x⁻¹ * a * x ∈ L := hAL (hnorm x hx a ha)
+      rw [ClassFunction.induceTerm_of_mem _ haxL]
+      have harg : (⟨x⁻¹ * a * x, haxL⟩ : ↥L)
+          = ⟨x⁻¹, L.inv_mem hx⟩ * ⟨a, haL⟩ * ⟨x⁻¹, L.inv_mem hx⟩⁻¹ := by
+        apply Subtype.ext; simp [inv_inv]
+      rw [harg]
+      exact α.conj_eq ⟨a, haL⟩ ⟨x⁻¹, L.inv_mem hx⟩
+    · rw [if_neg hx]
+      by_cases hax : x⁻¹ * a * x ∈ L
+      · rw [ClassFunction.induceTerm_of_mem _ hax]
+        have hnotA : x⁻¹ * a * x ∉ A := fun hV =>
+          hx (by simpa using L.inv_mem (hTI x⁻¹ ⟨a, ha, by simpa using hV⟩))
+        by_contra hne
+        exact hnotA ((OddOrder.Peterfalvi.S04.mem_supportInSubgroup).mp
+          (hαsupp (ClassFunction.mem_support.mpr hne)))
+      · rw [ClassFunction.induceTerm_of_not_mem _ hax]
+  rw [ClassFunction.induce_apply, Finset.sum_congr rfl (fun x _ => hterm x),
+    ← Finset.sum_filter, Finset.sum_const]
+  have hcard : (Finset.univ.filter (· ∈ L)).card = Nat.card ↥L := by
+    rw [Nat.card_eq_fintype_card]; exact (Fintype.card_subtype _).symm
+  rw [hcard, nsmul_eq_mul, ← mul_assoc, invOf_mul_self, one_mul]
+
+open scoped Classical in
+/-- **Peterfalvi (12.4) pin (b), step 2**: for a Dade hypothesis with all trivial stabilizers
+`∀ a, H(a) = ⊥`, induction `Ind_L^G` (restricted to `CF(L, A)`) **is** the Dade map.  Generalizes
+`TICyclicHypothesis.isDadeMap_inducedDadeMap`: the value half is the step-1 self-value
+`induce_apply_eq_self_of_mem_tiSubset` (the coset condition collapses to `IsConj a g` since `h ∈ ⊥`),
+the support half is `induce_eq_zero_of_not_conjugatesIntoSet` (induced functions vanish off the
+`A`-conjugates, which are the Dade support when `H = ⊥`).  Via `IsDadeMap.unique` this pins the
+abstract Dade map to `Ind_L^G` on `CF(L, A)`. -/
+theorem isDadeMap_induce_of_forall_H_eq_bot {A : Set G} {L : Subgroup G}
+    [Fintype G] [Invertible (Nat.card L : ℂ)]
+    (hyp : OddOrder.Peterfalvi.S04.Hypothesis G A L)
+    (hH : ∀ a, hyp.H a = ⊥) :
+    OddOrder.Peterfalvi.S04.IsDadeMap hyp
+      (fun α => ClassFunction.induce L (α : ClassFunction ↥L ℂ)) where
+  map_eq_of_isConj_hCoset := by
+    intro α g a h hh hconj
+    have hh1 : h = 1 := Subgroup.mem_bot.mp (by rw [← hH a]; exact hh)
+    subst hh1
+    have hga : IsConj a.1 g := by simpa using hconj
+    show ClassFunction.induce L (α : ClassFunction ↥L ℂ) g = _
+    rw [← (ClassFunction.induce L (α : ClassFunction ↥L ℂ)).of_isConj hga]
+    exact induce_apply_eq_self_of_mem_tiSubset hyp.subset_L
+      (fun x hx a' ha' => by simpa using hyp.L_normalizes_A ⟨x⁻¹, L.inv_mem hx⟩ ha')
+      (hyp.isTISubset_of_forall_H_eq_bot hH) _
+      (ClassFunction.mem_supportedSubmodule.mp α.2) a.2
+  map_eq_zero_of_not_mem_dadeSupport := by
+    intro α g hg
+    show ClassFunction.induce L (α : ClassFunction ↥L ℂ) g = 0
+    refine ClassFunction.induce_eq_zero_of_not_conjugatesIntoSet
+      (ClassFunction.mem_supportedSubmodule.mp α.2) (fun hgin => hg ?_)
+    rw [hyp.dadeSupport_eq_conjugatesOfSet_of_forall_H_eq_bot hH]
+    obtain ⟨x, hx, hxV⟩ := hgin
+    rw [OddOrder.Peterfalvi.S04.mem_supportInSubgroup] at hxV
+    exact Group.mem_conjugatesOfSet_iff.mpr ⟨x⁻¹ * g * x, hxV, isConj_iff.mpr ⟨x, by group⟩⟩
+
+/-- **Peterfalvi (12.4) pin (b), step 3** (restriction assembly): if a sub-support `A₁ ⊆ A` carries
+only trivial Dade stabilizers (`(hyp.restrict …).H a = ⊥`), then on `A₁`-supported functions the
+abstract Dade map of `hyp` **is** induction `Ind_L^G`.  The restricted hypothesis has `H = ⊥`, so its
+Dade map is `Ind_L^G` (step 2 + `IsDadeMap.unique`); `Hypothesis.dadeMap_restrict_apply` identifies
+it with `hyp.dadeMap` of the included function. -/
+theorem dadeMap_eq_induce_of_supported_on_trivial_H {A : Set G} {L : Subgroup G}
+    [Fintype G] [Invertible (Nat.card L : ℂ)]
+    (hyp : OddOrder.Peterfalvi.S04.Hypothesis G A L) {A₁ : Set G} (hA₁A : A₁ ⊆ A)
+    (hA₁norm : ∀ (l : L) ⦃a : G⦄, a ∈ A₁ → (l : G) * a * (l : G)⁻¹ ∈ A₁)
+    (hH₁ : ∀ a, (hyp.restrict hA₁A hA₁norm).H a = ⊥)
+    (α : OddOrder.Peterfalvi.S04.SupportedClassFunctions (G := G) ℂ A₁ L) :
+    hyp.dadeMap (OddOrder.Peterfalvi.S04.SupportedClassFunctions.inclusion
+        (G := G) (k := ℂ) (L := L) hA₁A α)
+      = ClassFunction.induce L (α : ClassFunction ↥L ℂ) := by
+  have h1 := OddOrder.Peterfalvi.S04.IsDadeMap.unique
+    ((hyp.restrict hA₁A hA₁norm).isDadeMap_dadeMap (k := ℂ))
+    (isDadeMap_induce_of_forall_H_eq_bot (hyp.restrict hA₁A hA₁norm) hH₁)
+  rw [← hyp.dadeMap_restrict_apply hA₁A hA₁norm α]
+  exact congrFun h1 α
+
 open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
 /-- **Peterfalvi (12.4), pin (b)** ([Is] 7.7 + (8.12.c) + [Is] 6.2): for constituents `φ₁, φ₂ ∈ S(χ)`,
 the Dade isometry acts as induction on the difference, `(φ₁ − φ₂)^τ = Ind_L^G(φ₁ − φ₂)`.  By [Is] 6.2

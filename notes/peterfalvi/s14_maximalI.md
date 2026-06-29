@@ -619,3 +619,56 @@ pin (b) (τ=Ind on TI) と (12.5) ρ は別 (deeper Dade/§7)。
 2. **Supp(φ₁−φ₂)⊆A(L)−H#**: [Is]6.2 (Res_H φ=共役和) + 型 F constituent (cross-lane §8、(8.12.a))。
    φᵢ は A(L)∪{1} supported (data.supported)、差で {1} 相殺だが H# 除外は別途。
 深い Dade machinery + §8 cross-lane。pin (a) と違い「単一 coherent proof」では済まない可能性大。
+
+## 2026-06-29 (lane-b=β loop¹⁴): pin (b) feasible path 完全マップ (Explore + Dade machinery 調査)
+
+**重要確定: 型 I Dade map は globally induction でない**。H(a)=supportKernel=L_F⊓C_G(a)
+(a∈escapingCentralizerSet=`C_G(a)⊄M` のとき)、else ⊥。⟹ **τ=Ind は trivial-H 部分
+A₁={a∈A(L):C_G(a)≤M}=A(L)−H# 上のみ**。一般「τ=Ind on trivial-H support」lemma は repo 不在
+(TICyclic 専用)。`of_isTISubset` (S04:267) は TI subset→trivial-H Hypothesis 構成するが
+「その dadeMap=induce」lemma も一般 TI-induction-self-value も無し。
+
+**pin (b) の feasible 4-step plan (全 in-lane Dade、§8 は support fact のみ)**:
+1. **一般 TI-induction self-value** `induce_apply_eq_self_of_mem_tiSubset`: TI subset A
+   (L⊆N(A)、A⊆L、TI) + α が A-supported、a∈A ⟹ `Ind_L^G α (a) = α(a)`。
+   **template = TICyclic `induce_apply_eq_self_of_mem_V`/`induceTerm_eq_of_mem_V`
+   (S05_SignedTripleGrid:199-243)** を一般 TI subset に generalize (V/W/W_normalizes_V/V_subset_W/
+   V_ti を explicit hyp 化、of_isTISubset:267 の hyp 形をミラー)。~40-60 行。
+2. **一般 induce-is-Dade-map** (trivial-H hyp): `isDadeMap_inducedDadeMap` (S05:254-275) を
+   of_isTISubset 仮説に generalize (map_eq_of_isConj_hCoset は H=⊥⟹h=1⟹induce self-value、
+   map_eq_zero は `induce_eq_zero_of_not_conjugatesIntoSet`)。step 1 consume。
+3. **restriction assembly**: 型 I hyp を A₁=trivial-H 部分に `Hypothesis.restrict` (S04:329)。
+   restrict_H (S04:345) で A₁ 上 H=⊥。`Hypothesis.dadeMap_restrict` (S04:3641) で
+   global dadeMap|A₁-supported = restricted dadeMap = induce (step2 + IsDadeMap.unique S04:3442)。
+   ⟹ A₁-supported f で `hyp.tau f = induce L f`。
+4. **§8 support fact** (cross-lane、cite obligation): `Supp(φ₁−φ₂)⊆A₁` ([Is]6.2 + (8.12.a)、
+   constituent が escaping 部分で消える)。data.supported は A(L)∪{1} までしか言わない。
+
+**次イテレーション = step 1 (一般 TI-induction self-value) を build** (foundational + reusable、
+TICyclic proof mirror)。pin (b) は pin (a) と違い deep multi-iteration Dade 開発 (4 lemma)。
+正本ノート = 本節 + issue 0081。[[feedback-no-avoiding-hard-parts]]
+
+**loop¹⁴ 続き: step 1 DONE** (commit 6dbdf835、`induce_apply_eq_self_of_mem_tiSubset`、axiom-clean、
+full build 3874 green)。次 = **step 2** (一般 induce-is-Dade-map for TI/trivial-H hyp、
+`isDadeMap_inducedDadeMap` S05:254-275 を of_isTISubset 仮説に generalize、step 1 を value-half に consume)。
+
+## 2026-06-29 (lane-b=β loop¹⁵): pin (b) steps 1+2+3 完成 — 一般 Dade machinery DONE
+
+**steps 1+2+3 全 axiom-clean、committed** (6dbdf835 step1 / 0125ce2a steps2+3):
+- step 1 `induce_apply_eq_self_of_mem_tiSubset` (TI-induce self-value)。
+- step 2 `isDadeMap_induce_of_forall_H_eq_bot` (trivial-H hyp で Ind=Dade map)。
+- step 3 `dadeMap_eq_induce_of_supported_on_trivial_H` (A₁⊆A trivial-H 上で global dadeMap=Ind、
+  restrict + IsDadeMap.unique + dadeMap_restrict_apply)。
+⟹ 「τ=Ind on trivial-H support」の一般 machinery 完成 (reusable)。
+
+**残 pin (b) = 型 I final assembly のみ** (次イテレーション):
+1. A₁ := 型 I A(L) の trivial-H 部分 = `{a∈A(L) : C_G(a)≤M}` = A(L)∖escapingCentralizerSet
+   (supportKernel def: H(a)=L_F⊓C_G(a) if escaping else ⊥)。
+2. hA₁A (A₁⊆A(L)) / hA₁norm (L normalizes A₁) / **hH₁** ((hyp.dadeData.dade.restrict).H=⊥ on A₁、
+   `H_eq_supportKernel` field [S10:460] + supportKernel if-else で a∉escaping⟹⊥)。
+3. **§8 support fact (cite obligation)**: φ₁−φ₂ supported on A₁ ([Is]6.2 + (8.12.a)、constituent が
+   escaping 部分で消える)。data.supported は A(L)∪{1} まで。**genuine cross-lane §8、faithful sorry pin**。
+4. bridge: `hyp.tau f = dadeIntegralCharacterMap .. f = hyp.dadeMap ⟨f,A-supp⟩`
+   (`dadeIntegralCharacterMap_apply_of_support`) = `hyp.dadeMap (inclusion ⟨f,A₁-supp⟩)`
+   (Subtype.ext、同 carrier) = `induce L f` (step 3)。
+⚠ A₁ (trivial-H) と教科書の A(L)−H# が厳密一致するか要確認 (H# の定義)。
