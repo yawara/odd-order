@@ -6872,6 +6872,28 @@ first block, foundation of BG Theorem E's Lemma 14.5(c) count.  Axiom-clean. -/
 trivIset.  Axiom-clean. -/
 #assert_only_allowed_axioms OddOrder.BG.Ch4.S16.sigma_cover_disjoint_of_inputs
 
+/-! **Peterfalvi (7.1) `ρ`-projection `L`-conjugation invariance** (`S07_RhoProjection`; lane β, §12
+Dade-tower upstream, issue 0081/0087).  The averaged value `χ^ρ(a) = (1/|H(a)|)∑_{x∈H(a)} χ(a·x)` is
+invariant under conjugating the support point `a` by `ℓ ∈ L`: `χ^ρ(ℓ·a·ℓ⁻¹) = χ^ρ(a)` — the
+class-function (equivariance) property of `ρ`, the input for packaging `χ^ρ ∈ CF(L,A)`.  Rests on
+`(2.4.a)` (`HConjInvariant`, `H(ℓ·a·ℓ⁻¹) = ℓ·H(a)·ℓ⁻¹`) reindexing the average through the bijection
+`y ↦ ℓ⁻¹·y·ℓ` plus `χ`'s class-function property.  Axiom-clean. -/
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S07.rhoValue_conjA
+
+/-! **Peterfalvi (7.1) `ρ`-projection as a class-function map `CF(G) → CF(L,A)`** (`S07_RhoProjection`;
+lane β).  `rho` packages `χ^ρ` (value `rhoValue`, equivariant by `rhoValue_conjA`) into `CF(L,A)`:
+the class function on `L` taking `χ^ρ(a)` on `A` and `0` off `A`, with support `⊆ A`.
+`rhoClassFun_add`/`rhoClassFun_smul` are its `ℂ`-linearity.  All axiom-clean. -/
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S07.rho
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S07.rhoClassFun_add
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S07.rhoClassFun_smul
+
+/-! **Peterfalvi (7.2.a) `α^{τρ} = α`** (`S07_RhoProjection`; lane β).  The `ρ` projection is a left
+inverse of the Dade isometry `τ` on `CF(L,A)`: since `α^τ` is constant `= α(a)` on the coset `a·H(a)`
+(`Hypothesis.dadeValue_eq`), its `ρ`-average over `H(a)` recovers `α(a)`.  Axiom-clean. -/
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S07.rhoValue_dadeMap
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S07.rho_dadeMap
+
 /-! **Peterfalvi (14.11.4) `ρ`-norm bridge** (`S16_NonExistenceG`, lane γ/POLE-2).  The
 family-inequality `ρ`-norm `(toFamilyHypothesis71).chiRhoNormSq (ψ^{τ₁}) 0` equals the (7.8.b)
 coherence-norm `h78.zetaNuRhoNormSq`, since `S09.Hypothesis71.chiRho` depends only on the support

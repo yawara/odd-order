@@ -566,3 +566,50 @@ AxiomsCheck 登録): signalizer N[x] は type F/P₂ ゆえ `(N[x])_F = (N[x])_�
 
 **残**: gate 1 = issue 8021 (encoding 修正、design 要)、gate 2 = covering 析取 (Cor 14.9)。prime partition
 (9/11 field) は実証済。次 = issue 8021 の design 検討 or gate 2 (Cor 14.9) 調査。
+
+## ✅✅ 進捗 (lane d, 2026-06-29 /loop²¹): **gate 1 (thickenedA1_card cardinality) 解消** — faithful cover wiring (hub/user 承認 Option B)
+
+issue 8021 の design を hub/ユーザーへ上げ **Option 1 (lane d が δ struct + lane-b consumer を 1 commit で実施)** 承認 →
+faithful cover への wiring 完遂 (S10 + S14_MaximalI、full build **3889 green / 63s**、所有例外 = hub 承認)。詳細 = issue 8021 RESOLVED。
+
+- **Option A (共有 `supportKernel`→`Rsub` 再定義) は import 不可で却下**: `Rsub` (BG/Ch4/S14) ← 共有 `GroupTheory/MaximalSubgroupType` (`supportKernel`) を import ⟹ 逆向き循環。
+- **採用 Option B**: `BGTheoremECoverData` に抽象 `cover : ι → Set G` field 追加、`thickenedA1_card`→**`cover_card`** に置換。witness で `cover i := conjClassSet (Mtilde hG (genuineSigmaDecomposition hG) (reps i))` (BG faithful cover)、`cover_card` を **`sigmaConjugacySaturation_Mtilde_ncard` (14.5c DONE) + `mainSubgroup_eq_Msigma` + `Nat.card_coe_set_eq`** で**実証 sorry-free**。
+- covering struct は `data.cover` に追従 + 新 field **`cover_subset_kernels`** (type-I の Frobenius kernel 包含、gate 2 sorry に bundle)。consumer `exists_typeICovering` (FT spine) の `two_le`/`covers` を追従。
+
+**∴ 14.5c の数学 (DONE) を `bgTheoremE_cover_data` まで配線完了 — cardinality field は honest 実証**。
+**残 frontier = gate 2 (covering disjunction `BGTheoremETypeICovering ∨ NonTypeICovering`, S10:664, sorry)** =
+BG Cor 14.9 / (8.8.a) dichotomy。`cover_nonidentity` (G# = ⋃ 𝒞_G(M̃_i)) + `cover_subset_kernels` (type-I で
+R(x)=1 ⟹ M̃=(M_i)_F#) + 各 disjointness。次の lane-d 上流 work。
+
+## ✅ 進捗 (lane d, 2026-06-29 /loop²²): gate 2 着手 — faithful cover identity の easy half + gated skeleton
+
+gate 2 (`cover_nonidentity` = BG Cor 14.9 cover identity) を上流から engage (S14、full build 3889 green):
+- **`sigmaSharp_subset_Mtilde`** (sorry-free): `M_σ# ⊆ M̃`。ℓ_σ=1 元 x は `x = x·1` (1∈R(x)) で M̃ に入る
+  cover の easy half。
+- **`exists_mem_conjClassSet_Mtilde_of_ne_one`** (gated skeleton): `∀ g≠1, ∃ M maximal, g ∈ 𝒞_G(M̃ M)`。
+  ℓ_σ(g)=1 を easy half で**実証**、ℓ_σ(g)≥2 を **BG Lemma 14.6 (signalizer capture: g=x·x', x'∈R(x))**
+  として named sorry に isolate。canonical `genuineSigmaDecomposition` 使用ゆえ `bgTheoremE_cover_data` の
+  `cover` field (= `conjClassSet (Mtilde hG (genuineSigmaDecomposition hG) (reps i))`) に直結。
+  既存の偽 surface `nonidentity_covered_by_sigma_pieces` (S14:9230、`𝒞_G(M_σ#)` で cover = BG に対し偽、
+  「prove as-is するな」) の faithful 代替。
+
+**残 = (i) Lemma 14.6 (ℓ_σ=2 capture、deep): `exists_length_one_factor` の σ(M)'-cofactor が signalizer
+R(x)=(N[x])_σ∩C[x] に入ることを示す (σ-decomp が signalizer decomp と整合)。(ii) cover_nonidentity 組立
+(reps への conj 還元 + sharpSubgroup ⊤ = ⋃ 𝒞_G(M̃_i))。(iii) cover_subset_kernels (type-I R(x)=1)。次 = (i)。**
+
+## ⚠→✅ 進捗 (lane d, 2026-06-29 /loop²³): cover の deep core = `sigma_decomposition_dichotomy` 特定 + faithfulness 修正
+
+Coq `sigma_decomposition_dichotomy` (BGsection14:1189) を精査 — cover identity の真の core:
+**XOR**[ signalizer branch `∃x ℓ_σ(x)=1, x⁻¹g∈R(x)` ] ⊕ [ κ branch `∃y ℓ_σ(y)=1, ∃M∈M_σ[y], y⁻¹g∈C_M[y]# ∧ κ(M)-elt` ]。
+~80 行 intricate、deps = `FT_signalizer_context`(✅=`sigmaLength_one_centralizer_structure`)・`consttM`(✅=
+`piPart_mul_of_commute`)・`sigma_cover_decomposition`(✅)・**`pi_of_cent_sigma`(❌未ポート、centralizer の
+π 分類)**・κ/τ₂ 機構。⟹ cover の deep core = この dichotomy port (multi-session、`pi_of_cent_sigma` が次の上流)。
+
+**⚠ faithfulness 修正 (commit 次)**: /loop²² の `exists_mem_conjClassSet_Mtilde_of_ne_one` は **一般には偽**
+だった (issue 8021 と同種): dichotomy は XOR ゆえ κ-branch 元 (type-P) は signalizer branch に入らず、どの
+`𝒞_G(M̃)` にも属さない (zTilde piece へ)。⟹ `hall : ∀M, IsTypeF M` (全 type-F = κ-branch 空) を追加して**真に
+修正**。ℓ_σ=1 は無条件で実証、ℓ_σ≥2 を dichotomy signalizer branch (κ 空 ⟹ 成立) として isolate。
+genuine bridge **`mem_Mtilde_of_mem_coset`** (x∈M_σ#・x⁻¹g∈R(x) ⟹ g∈M̃) も追加 (dichotomy→cover の coset step)。
+
+**教訓**: cover を述べる前に Coq dichotomy の XOR 構造を読め (signalizer branch ≠ κ branch)。
+**次 = `pi_of_cent_sigma` の Lean port** (dichotomy の未ポート dep)。Coq BGsection12/14 で statement 精査要。

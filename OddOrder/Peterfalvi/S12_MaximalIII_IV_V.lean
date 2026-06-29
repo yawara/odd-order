@@ -6974,6 +6974,85 @@ noncomputable def Hypothesis.inducedFamily_isCoherent_of_equalDegreeFamily [Fini
     hχinj hdeg hsuppdiff h1notA
 
 open scoped FiniteInduce in
+/-- **Peterfalvi (11.8)/(5.7): coherence of `S₁ = S(HC)`**, the uniform degree-`w₁` irreducible
+subfamily of `S = inducedFamily M`.
+
+This materializes the coq `cohS1 : coherent S1 M^# tau := uniform_degree_coherence scohS1`
+(`PFsection11.v`): the degree-`w₁` irreducible members of `S` all share the degree `w₁`, so the
+equal-degree coherence producer applies.  The family is enumerated as a `Finset` of *bundled*
+irreducible characters (`IrreducibleCharacter ↥M = {φ // IsIrreducibleCharacter φ}`); `Finset.equivFin`
+gives an injective `Fin n` indexing for free, and `inducedFamily_isCoherent_of_equalDegreeFamily`
+discharges the rest.  Nonemptiness with `n ≥ 2` is the conjugate pair `{ζ, ζ̄}` of the degree-`w₁`
+witness `exists_zeta_in_inducedFamily_degree_w1` (distinct since `S` has no real characters,
+`inducedFamily_hasNoRealCharacters`).
+
+This is the `S₁`-coherence the (11.8) contradiction consumes (with `S₂ = S(C) − S(HC)` and a glue to
+build full `S(C)` coherence, contradicting (11.3)/(10.8)). -/
+noncomputable def Hypothesis.SHC_isCoherent [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} (hyp : Hypothesis M) :
+    OddOrder.Peterfalvi.S07.IsCoherent hyp.tau
+      {φ : ClassFunction ↥M ℂ | φ ∈ inducedFamily M ∧ IsIrreducibleCharacter φ ∧
+        ((φ : ↥M → ℂ) 1 = (hyp.w1 : ℂ))} hyp.A0 := by
+  haveI := hyp.finiteG
+  classical
+  have hModd : Odd (Nat.card ↥M) := hG.odd.of_dvd_nat (Subgroup.card_subgroup_dvd_card M)
+  -- `s` = the bundled degree-`w₁` irreducible members of `S`.
+  set p : IrreducibleCharacter ↥M → Prop := fun χ =>
+    (χ : ClassFunction ↥M ℂ) ∈ inducedFamily M ∧
+      ((χ : ClassFunction ↥M ℂ) : ↥M → ℂ) 1 = (hyp.w1 : ℂ) with hp
+  set s : Finset (IrreducibleCharacter ↥M) := Finset.univ.filter p with hs_def
+  have hmem_s : ∀ χ, χ ∈ s ↔ p χ := fun χ => by
+    rw [hs_def, Finset.mem_filter]; exact and_iff_right (Finset.mem_univ _)
+  -- the enumerating family, injective for free via `Finset.equivFin`.
+  set χfam : Fin s.card → IrreducibleCharacter ↥M :=
+    fun j => (s.equivFin.symm j : IrreducibleCharacter ↥M) with hχfam
+  have hχfam_mem : ∀ j, χfam j ∈ s := fun j => (s.equivFin.symm j).2
+  have hinj : Function.Injective χfam := fun a b h =>
+    s.equivFin.symm.injective (Subtype.ext h)
+  have hmem : ∀ j, (χfam j : ClassFunction ↥M ℂ) ∈ inducedFamily M := fun j =>
+    ((hmem_s _).mp (hχfam_mem j)).1
+  have hdegfam : ∀ j, ((χfam j : ClassFunction ↥M ℂ) : ↥M → ℂ) 1 = (hyp.w1 : ℂ) := fun j =>
+    ((hmem_s _).mp (hχfam_mem j)).2
+  -- `n ≥ 2`: the conjugate pair `{ζ, ζ̄}` of the degree-`w₁` witness (a `Prop`, so the `∃`-witness
+  -- elimination is confined to this proof — the enclosing goal `IsCoherent …` is `Type`-valued).
+  have hcard : 2 ≤ s.card := by
+    obtain ⟨ζ, hζS, hζirr, hζ1⟩ := exists_zeta_in_inducedFamily_degree_w1 hyp.typeP hG.odd
+      (typePData_W1_hall_coprime hG hyp.maximal (hyp.bgTypeP hG) hyp.typeP)
+    have hζ1' : ((ζ : ClassFunction ↥M ℂ) : ↥M → ℂ) 1 = (hyp.w1 : ℂ) := hζ1
+    have hζcS : ζ.conj ∈ inducedFamily M := inducedFamily_closedUnderConjugate M hζS
+    have hζc1 : ((ζ.conj : ClassFunction ↥M ℂ) : ↥M → ℂ) 1 = (hyp.w1 : ℂ) := by
+      rw [ClassFunction.conj_apply, hζ1', star_natCast]
+    have hζi_s : (⟨ζ, hζirr⟩ : IrreducibleCharacter ↥M) ∈ s := (hmem_s _).mpr ⟨hζS, hζ1'⟩
+    have hζci_s : (⟨ζ.conj, hζirr.conj⟩ : IrreducibleCharacter ↥M) ∈ s :=
+      (hmem_s _).mpr ⟨hζcS, hζc1⟩
+    have hne : (⟨ζ.conj, hζirr.conj⟩ : IrreducibleCharacter ↥M) ≠ ⟨ζ, hζirr⟩ := by
+      intro h
+      exact inducedFamily_hasNoRealCharacters hModd hζS (congrArg Subtype.val h)
+    have hsub : ({⟨ζ.conj, hζirr.conj⟩, ⟨ζ, hζirr⟩} : Finset (IrreducibleCharacter ↥M)) ⊆ s := by
+      intro x hx
+      rcases Finset.mem_insert.mp hx with rfl | hx'
+      · exact hζci_s
+      · rw [Finset.mem_singleton] at hx'; exact hx' ▸ hζi_s
+    exact (Finset.card_pair hne).symm.trans_le (Finset.card_le_card hsub)
+  haveI : NeZero s.card := ⟨by omega⟩
+  have hdeg : ∀ j, ((χfam j : ClassFunction ↥M ℂ) : ↥M → ℂ) 1
+      = ((χfam 0 : ClassFunction ↥M ℂ) : ↥M → ℂ) 1 := fun j => by rw [hdegfam j, hdegfam 0]
+  -- coherence on the range, then identify the range with `S₁ = S(HC)`.
+  have hcoh := hyp.inducedFamily_isCoherent_of_equalDegreeFamily hcard χfam hinj hmem hdeg
+  have hrange : (Set.range fun j => (χfam j : ClassFunction ↥M ℂ)) =
+      {φ : ClassFunction ↥M ℂ | φ ∈ inducedFamily M ∧ IsIrreducibleCharacter φ ∧
+        ((φ : ↥M → ℂ) 1 = (hyp.w1 : ℂ))} := by
+    ext φ
+    constructor
+    · rintro ⟨j, rfl⟩
+      exact ⟨hmem j, (χfam j).2, hdegfam j⟩
+    · rintro ⟨hφS, hφirr, hφ1⟩
+      have hsφ : (⟨φ, hφirr⟩ : IrreducibleCharacter ↥M) ∈ s := (hmem_s _).mpr ⟨hφS, hφ1⟩
+      exact ⟨s.equivFin ⟨⟨φ, hφirr⟩, hsφ⟩, by simp [hχfam]⟩
+  rw [hrange] at hcoh
+  exact hcoh
+
+open scoped FiniteInduce in
 /-- **Peterfalvi (11.8), the genuine non-orthogonality** (lane-b W3 obligation, issue 2020).
 
 Under Hypothesis (10.1), there is an irreducible `ζ ∈ S = inducedFamily M` of degree `w₁` —
