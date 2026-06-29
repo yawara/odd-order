@@ -985,3 +985,82 @@ inner-self 正値性 (`∑|φ|²≥0`) + 展開。→ (7.3) → (12.16) hC。
 **残 §7 = (7.3)** (次イテレーション): `(1/|G|)Σ_{g∈Aᵗ}|χ(g)|²≥‖χ^ρ‖²` は χ₁=Aᵗ-restriction
 (Aᵗ=`hyp.dadeSupport`) で χ₁^ρ=χ^ρ + (7.2.b) 適用、`(1/|G|)Σ_{Aᵗ}|χ|²=‖χ₁‖²`。
 → (7.5) family / (7.8.b) → (12.16) hB/hC。
+
+### loop³⁷ — (7.3) `‖χ^ρ‖²≤(1/|G|)Σ_{Aᵗ}|χ|²` 完成 ✅ (§7 (7.1)-(7.3) コア完結)
+
+**(7.3) 完成** (全 axiom-clean、leaf green、初回通過)。χ₁=Aᵗ-restriction で (7.2.b) を適用:
+- `restrictDadeSupport χ` = χ on dadeSupport / 0 off (conj-stable `mem_dadeSupport_conj_iff`)。
+- `rhoValue_restrictDadeSupport`/`rhoClassFun_restrictDadeSupport`: χ₁^ρ=χ^ρ (χ₁=χ on coset
+  a·H(a)⊆Aᵗ via `mem_dadeSupport_of_mem_hCoset`)。
+- `rho_normSq_le_restrict` = (7.3): `‖χ^ρ‖²≤‖χ₁‖²` (χ₁^ρ=χ^ρ rw + (7.2.b))。
+- `inner_restrictDadeSupport_re`: `‖χ₁‖²=(1/|G|)Σ_{g∈Aᵗ}|χ(g)|²` (`inner_self_eq_realCast` +
+  `Finset.sum_filter` + normSq split)。⟹ 明示形 `‖χ^ρ‖²≤(1/|G|)Σ_{Aᵗ}|χ|²`。AxiomsCheck 登録。
+- ⚠ unusedSectionVars: G-only の 3 lemma に `omit [Fintype ↥L] in`。
+
+**∴ §7 (7.1)-(7.3) コア完結**: value/equivariance/packaging/linearity (7.1) + α^{τρ}=α (7.2.a) +
+(2.7) adjunction + ‖χ^ρ‖²≤‖χ‖² (7.2.b) + (7.3) partial-sum bound。これが (12.16) hC の
+`normRho=‖ψ^ρ‖²` + disjoint-Aᵗ 加算 → <‖χ‖²=1 の土台。
+
+**残 §7 (12.16 用)**: (7.5) family 多重版 (Aᵢᵗ disjoint で Σ‖χ^{ρᵢ}‖²≤‖χ‖²) + (7.6)-(7.8)
+family+normal-subgroup ((7.8.b) `1-e/h≤‖ζ^{νρ}‖²`=hB)。**lane γ は S09 family 機構 (`chiRho`/
+`chiRhoNormSq`/`zetaNuRhoNormSq`) で (14.11.4) を処理済** ⟹ 次イテレーションは (12.16) の hA/hB/hC
+を S09 family 機構 + 本 §7 (7.1)-(7.3) でどう構成するか (S09 再利用 vs (7.5)/(7.8) 新規) を評価。
+正本=issue 0081。
+
+### 🛑🛑 loop³⁸ — 重大発見: S07_RhoProjection (7.1)-(7.3) は S09 chiRho の完全重複 (STOP+報告)
+
+**`S09_NonexistenceCertain.lean` = 教科書 §7** (S番号=§番号+2: S09↔§7)。§7 ρ machinery は `chiRho` 名で
+**(7.1)-(7.8) 完備**。本セッションで S07 に構築した (7.1)-(7.3) は**完全な重複**だった (consumer は
+AxiomsCheck のみ、何にも使われない):
+
+| S07 (本セッション、冗長) | S09 既存 |
+|---|---|
+| `rhoValue`/`rhoClassFun`/`rho` | `chiRho`/`chiRhoCF` |
+| `rho_dadeMap` (7.2.a) | `chiRhoCF_dadeImage_eq` (7.2.a) |
+| `rhoValue_eq_adjointAverageFun` | `chiRhoCF_eq_adjointAverageFun` |
+| `rho_adjoint` (2.7) | `chiRho_adjoint` (同じ S04.adjoint_formula cite) |
+| `rho_normSq_le` (7.2.b) | `chiRho_norm_sq_le` (同じ Pythagoras) |
+| `rho_normSq_le_restrict`+`inner_restrictDadeSupport_re` (7.3) | `chiRho_integral_inequality` |
+
+さらに S09 は (7.4)-(7.8) も完備 (`FamilyHypothesis71`/`family_inequality`/`Hypothesis76`/
+`Hypothesis78`/`NormEstimates` = (12.16) hA/hB/hC に必要な全部、lane γ が (14.11.4) で常用)。
+
+**原因**: 本ノートの旧前提「S09 chiRho は family 特化、型 I A(L) 一般 ρ 不在」(loop¹⁸/²⁰) が**誤り**。
+`Hypothesis71 G A L` は general single-L の (7.1) そのもの。note を信じ S09 を実コード確認しなかった
+([[verify-port-state-by-number-not-coq-name]] [[scaffold-sorry-free-not-done]]、正本 memory
+`s09-is-section7-chirho-complete`)。
+
+**正しい (12.16) path**: §12 `CounterexampleHypothesis` から S09 `Hypothesis71`/`Hypothesis78` を構築 →
+S09 `chiRho_norm_sq_le`/`chiRho_integral_inequality`/`NormEstimates`/`family_inequality` を cite して
+hA/hB/hC を構成 (新規 ρ を作らない)。**S07_RhoProjection は削除推奨** (carve-out=issue 0087 は hub 承認
+ゆえユーザー/hub 裁可待ち)。🛑 STOP し報告 (ユーザー判断待ち)。
+
+### loop⁴⁰ — S07 削除完了 + (12.16) 配線の具体 construction plan (S09 cite、lane γ pattern mirror)
+
+**S07_RhoProjection 削除済** (commit `4e34c478`、hub も独立に issue 0089 で削除実施 = `83c2c3c9`、merge
+clean、full build 3888 green)。§7 ρ は S09 `chiRho` に (7.1)-(7.8) 完備。本来の (12.16) 配線へ。
+
+**(12.16) 原文 (04.14 L99-101) の構造** (精読確定):
+- (12.13): S={Ind_H^L θ}, τ=Dade isometry for (A(L),L,G), τ₁ 拡張 (by (12.6)), χ∈S with χ(1)=e, ψ=χ^{τ₁},
+  ρ=(7.1) map with A=A(L)。
+- (12.14): ψ(xg)=ψ^ρ(x)=χ(x) for g∈K。 (12.15): ρ_M=(7.1) map for (M, A₁(M)); ψ^{ρ_M}(g)=ψ(g) on K#,
+  ψ const on K-K', ψ(g)∈ℤ。
+- (12.16): (1.10) + norm bounds で |ψ(g)|≥e-1 → (7.3)/(7.8.b) で矛盾。**ρ (for L) と ρ_M (for M) の
+  2 つの (7.1) map を使う**。
+
+**construction plan (lane γ MHypothesis pattern を mirror、全て S09 cite)**:
+- **producers 既存**: `S12.Hypothesis.toHypothesis71` (S12:440)/`toFamilyHypothesis71` (S12:458) =
+  §10-13 char hyp → S09 `Hypothesis71`/`FamilyHypothesis71`。lane γ `MHypothesis` (S16:1585) は
+  `h78:S09.Hypothesis78` をバンドルし `NormEstimates.zetaNuRho_norm_sq_ge` で (7.8.b) を得る = **(12.16)
+  hB の template**。
+- **hB ((7.8.b) for L)**: witness L (Frobenius, (12.10)) + S coherent ((12.6)) から `Hypothesis78 G (A(L)) L`
+  を構築 → `NormEstimates.zetaNuRho_norm_sq_ge` cite。**bottoms out on (12.6)/(12.10) sorries** (signature
+  contract で cite 可、[[feedback-cite-sorried-lemmas-if-signature-correct]])。
+- **hA ((12.15) for M, ρ_M)**: `Hypothesis71 G (A₁(M)) M` (M type-I、S12.toHypothesis71 系) → ψ^{ρ_M}。
+- **hC ((7.3)/(7.5))**: 両 pole の Aᵗ disjoint → `family_inequality` (S09) / `chiRho_integral_inequality`。
+- **始端/終端は materialize 済** (`counterexample_contradiction_of_facts` sorry-free、(1.10) 完成)。
+
+**残骨格**: `counterexample_contradiction` (S14:2491) を `exists_rankTwoWitness` (S14:1948) で witness 取得 →
+ψ=χ^{τ₁} 構築 → hA/hB/hC を上記 S09 cite で構成 → `counterexample_contradiction_of_facts` 適用。
+**多 iteration の deep endgame** (Hypothesis78 構築 + ν coherent extension + ζ distinguished が核)。
+次イテレーション = witness 取得 + skeleton (facts を faithful obligation に isolate) から着手。正本=issue 0081。
