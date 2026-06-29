@@ -782,3 +782,21 @@ mathlib API: `cyclotomic.irreducible_rat`/`Nat.totient_prime`/`Nat.prime_iff_pri
 **状況**: lane b §12 endgame は deep prerequisites の piece-by-piece grind (12.4✅/1.10.b✅ landed、
 残 = 1.10.a/ℂ-bridge/§7 ρ/12.16 assembly、各 substantial)。次イテレーション = (1.10.a) linear-char
 route の char restriction-decomposition から build (or ℂ-bridge)。
+
+## 2026-06-29 (lane-b=β loop²²): (1.10.a) full の infra 全特定 — build plan 完成
+
+**(1.10.a) full `exists_integral_zirr_apply_sub` の infra 全て特定** (de-risk 完了):
+- **Fourier**: `ZIrr_eq_span` (ZIrr.lean:156、ZIrr A=span ℤ {irreducibles}) + `Submodule.mem_span` ⟹
+  χ=∑ c_α α (c_α∈ℤ、Finsupp)。
+- **abelian bridge**: `exists_units_monoidHom_of_isIrreducibleCharacter_of_isMulCommutative`
+  (**S11_MaximalII_III_IV:2431**、既存): abelian Γ の irreducible char φ ⟹ ∃ θ:Γ→*ℂˣ, θ(g)=φ(g)。
+- **per-α core**: `exists_integral_linearChar_apply_sub` (本 leaf、loop²¹)。
+**plan**: χ=∑c_α α → 各 α で bridge θ_α + linear-char core で α(xy)-α(y)=(1-ε)z_α →
+χ(xy)-χ(y)=∑c_α(α(xy)-α(y))=(1-ε)·∑c_α z_α、z=∑c_α z_α integral。~100-150 行 Finsupp/span assembly。
+**placement**: bridge が S11 ゆえ leaf に S11 import (heavy) か S14 内 (S14→S13→S12→S11? 要確認) に置く。
+S14 closure に S11 + ZIrr_eq_span あれば S14 が自然 (lane b file)。
+
+**(1.10) 進捗総括**: (1.10.b)✅ abstract + (1.10.a) helper✅ + linear-char core✅。残 = (1.10.a) full
+(infra 全特定、次イテレーション build) + ℂ-instantiation ((1.10.b) を ℂ 値に、roots-set-adjoin route)。
+これらで (1.10) 完成 → (12.16) の一前提 (他 = §7 ρ/(12.13)-(12.15)/assembly)。
+**次イテレーション = (1.10.a) full を build** (infra ready、no more planning)。
