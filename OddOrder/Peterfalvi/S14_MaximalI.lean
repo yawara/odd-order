@@ -2409,6 +2409,55 @@ theorem counterexample_closing {e kK kKp kM kH : ℝ} (he : 3 ≤ e) (hkKp : 0 <
     (hnorm : ((kK - kKp) / kM) * (e - 1) ^ 2 + 1 - e / kH < 1) : False :=
   index_ratio_contradiction he hkKp hidx (norm_ineq_reduce hkM hkH (by linarith) hM hnorm)
 
+/-- **Peterfalvi (12.16), the middle (norm-bound) glue**: from `|ψ(g)| ≥ e-1` and the three §7/§8
+norm bounds — `A`: `‖ψ^{ρM}‖² ≥ (|K-K'|/|M|)|ψ(g)|²` (from (12.15)), `B`: `‖ψ^ρ‖² ≥ 1 - e/|H|`
+((7.8.b)), `C`: `‖ψ^{ρM}‖² + ‖ψ^ρ‖² < 1` ((7.3) with (8.17)) — the norm conclusion
+`(|K-K'|/|M|)(e-1)² + 1 - e/|H| < 1` follows (`|ψ(g)|² = mval² ≥ (e-1)²`, then linear). -/
+theorem norm_conclusion_glue {e mval : ℤ} {kK kKp kM kH normRhoM normRho : ℝ}
+    (he : 3 ≤ e) (hkKp : 0 < kKp) (hkM : 0 < kM) (hidx : 4 * kKp ≤ kK)
+    (hmag : (e : ℝ) - 1 ≤ |(mval : ℝ)|)
+    (hA : (kK - kKp) / kM * (mval : ℝ) ^ 2 ≤ normRhoM)
+    (hB : (1 : ℝ) - (e : ℝ) / kH ≤ normRho)
+    (hC : normRhoM + normRho < 1) :
+    (kK - kKp) / kM * ((e : ℝ) - 1) ^ 2 + 1 - (e : ℝ) / kH < 1 := by
+  have hsq : ((e : ℝ) - 1) ^ 2 ≤ (mval : ℝ) ^ 2 := by
+    have heR : (3 : ℝ) ≤ (e : ℝ) := by exact_mod_cast he
+    nlinarith [hmag, sq_abs (mval : ℝ), abs_nonneg (mval : ℝ)]
+  have hpos : 0 ≤ (kK - kKp) / kM := div_nonneg (by linarith) hkM.le
+  have hA' : (kK - kKp) / kM * ((e : ℝ) - 1) ^ 2 ≤ normRhoM :=
+    le_trans (mul_le_mul_of_nonneg_left hsq hpos) hA
+  linarith [hA', hB, hC]
+
+/-- **Peterfalvi (12.16), the full assembly** (the entire argument, parameterized on its gated
+upstream): the minimal counterexample is impossible.  Combines the `(1.10)` congruence/magnitude
+start (`abs_psi_g_ge_e_sub_one`: `|ψ(g)| ≥ e-1`), the §7/§8 norm-bound middle (`norm_conclusion_glue`
+from the three bounds `hA`/`hB`/`hC`), and the index/degree endgame (`counterexample_closing`).
+
+Every hypothesis is a fact supplied by §7/§8/§12: `h_const` = (12.14), `h_psix` = Dade value relation
+with (1.10.a) on `χ`, `h_psig_int` = (12.15), `h2e` = (12.12); `hA` = (12.15)+`|ψ(g)|`, `hB` = (7.8.b),
+`hC` = (7.3)+(8.17); `hM` = (12.11), `hidx` = fpf `[K:K'] ≥ 4` of (8.1.c).  The remaining work to close
+`counterexample_contradiction` is exactly the construction of these — the §7 `ρ`/`ρM` machinery. -/
+theorem counterexample_contradiction_of_facts [Finite G]
+    {p : ℕ} (hp : p.Prime) {ε : ℂ} (hε : IsPrimitiveRoot ε p)
+    {ψ : ClassFunction G ℂ} (hψ : ψ ∈ ZIrr G) {x g : G} (hx : x ^ p = 1) (hxg : Commute x g)
+    {e mval : ℤ} (he : 3 ≤ e) (h2e : 2 * e ≤ (p : ℤ) + 1)
+    (h_const : ψ (x * g) = ψ x)
+    (h_psix : ∃ w : ℂ, IsIntegral ℤ w ∧ ψ x - (e : ℂ) = (1 - ε) * w)
+    (h_psig_int : ψ g = (mval : ℂ))
+    {kK kKp kM kH normRhoM normRho : ℝ}
+    (hkKp : 0 < kKp) (hkM : 0 < kM) (hkH : 0 < kH)
+    (hidx : 4 * kKp ≤ kK) (hM : kM ≤ kK * kH)
+    (hA : (kK - kKp) / kM * (mval : ℝ) ^ 2 ≤ normRhoM)
+    (hB : (1 : ℝ) - (e : ℝ) / kH ≤ normRho)
+    (hC : normRhoM + normRho < 1) :
+    False := by
+  have hmagZ : (e - 1 : ℤ) ≤ |mval| :=
+    abs_psi_g_ge_e_sub_one hp hε hψ hx hxg (by linarith) h2e h_const h_psix h_psig_int
+  have hmag : (e : ℝ) - 1 ≤ |(mval : ℝ)| := by rw [← Int.cast_abs]; exact_mod_cast hmagZ
+  have heR : (3 : ℝ) ≤ (e : ℝ) := by exact_mod_cast he
+  exact counterexample_closing heR hkKp hkM hkH hidx hM
+    (norm_conclusion_glue he hkKp hkM hidx hmag hA hB hC)
+
 /-- **Peterfalvi (12.16)**: the minimal counterexample of (12.8) is impossible. -/
 theorem counterexample_contradiction [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G)

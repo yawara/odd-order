@@ -6703,6 +6703,12 @@ formula together with the prime computation `coprimeFrobeniusAction_card_eq_prim
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S14.index_ratio_contradiction
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S14.norm_ineq_reduce
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S14.counterexample_closing
+-- Pf (12.16) middle glue: `|ψ(g)|≥e-1` + the three §7/§8 norm bounds (A/B/C) ⟹ the norm conclusion.
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S14.norm_conclusion_glue
+-- Pf (12.16) FULL assembly: the entire argument as one sorry-free theorem, parameterized on every
+-- gated §7/§8/§12 fact ((12.14)/(12.15)/Dade/(12.12)/(12.11)/(8.1.c) + norm bounds A/B/C).  The
+-- remaining work to close `counterexample_contradiction` is exactly constructing these (§7 ρ machinery).
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S14.counterexample_contradiction_of_facts
 
 -- **W1 §16 Prop 16.1 `hP1eqV` disjunct 3 (Singer/`SL₂(p)`) prerequisite (lane-f, issue 8015)** —
 -- `IsExtraspecial.of_card_eq_prime_cube`: a nonabelian group of order `p³` is extraspecial
