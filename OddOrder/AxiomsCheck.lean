@@ -6898,3 +6898,17 @@ type-I maximal `M`, from `[M : K] = pq` and `|K| = k` by Lagrange (`card_mul_ind
 (`card_typeIA_eq`, the numerator `|A(M)| = k − 1`, cites `typeI_frobenius` (12.7) so is body-honest
 but transitively gated on (12.16)/lane β, hence not registered here.)  Axiom-clean. -/
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S16.MHypothesis.card_M_eq
+
+/-! **Peterfalvi (14.11.4) orbit measure of a TI-subset** (`S16_NonExistenceG`, lane γ/POLE-2).
+`orbit_normSq_term`: `|𝒞_G(A)|/|G| = |A|/|N|` for a TI-subset `A` with stabilizing normalizer-bound
+`N` — the real-valued form of `S14.ncard_conjClassSet_of_isTISubset` (`|𝒞_G(A)| = |A|·[G:N]`), via
+Lagrange.  The reusable bridge turning each (14.11.4) orbit `(W#)^G`/`(P#)^G`/`(Q#)^G` into a
+`1/|N_G(·)|`-term.  Axiom-clean. -/
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S16.orbit_normSq_term
+
+/-! **Peterfalvi (14.11.4) `W`-orbit TI core** (`S16_NonExistenceG`, lane γ/POLE-2).
+`isTISubset_sdiff_sup_of_normalizer_eq`: the exceptional set `W − (W₁ ∪ W₂)` of a cyclic
+`W = W₁ × W₂` is a TI-subset with normalizer-bound `W`, given the singleton/subset normalizer fact
+`N_G(X) = W` — generalising `S12.typePData_V_ti` to the abstract `W`/`W₁`/`W₂` + `hnorm` inputs.
+The `W`-orbit TI input to the (14.11.4) §8 TI-count.  Axiom-clean. -/
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S16.isTISubset_sdiff_sup_of_normalizer_eq
