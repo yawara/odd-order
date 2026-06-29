@@ -8,6 +8,14 @@
 > **レーン配分の正本 = [`ft_lane_reallocation_2026_06_28.md`](ft_lane_reallocation_2026_06_28.md)**
 > (ゲートなし・signature contract 方式)。本ファイルは hub 側の合流手順 + gotcha 集。
 
+> **⏸ 一時 HOLD (2026-06-30, issue 0089)**: **lane b の `S07_RhoProjection.lean` 関連 commit は
+> issue 0089 解決まで合流しない**。理由: lane b 自身が「S07_RhoProjection (7.1)-(7.3) は S09 `chiRho`
+> 機構の完全重複 (consumer=AxiomsCheck のみ)」と判明し 🛑 STOP、削除可否のユーザー判断待ち。
+> ⟹ 各 tick で lane b の未マージが `S07_RhoProjection.lean` + その AxiomsCheck rho* ガードのみなら
+> **b はスキップ** (「b: HOLD (issue 0089)」と 1 行報告)。b が S07 と無関係な別ファイル (例: S14_MaximalI)
+> の実作業を出していればその部分は通常合流してよい (S07 commit と混在なら hub が判断; 不明なら skip+報告)。
+> 判断確定 (D=削除 / K=保持) 後に本 HOLD を解除しサマリに記録。
+
 ## レーン (2026-06-28 再配分: 4 レーン a/b/c/d)
 
 | lane | branch | worktree | クラスタ | 主所有 .lean | issue base |
