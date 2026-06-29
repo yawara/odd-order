@@ -253,6 +253,21 @@ count lemma は作らない。
 reducibility correspondence (`isIrreducibleCharacter_compHom_mk'_iff` + commute、landed)。(3) ncard
 bijection → p-1 (B3b count inline)。core piece は出揃った — 残は §9↔§6 transport glue。
 
+**✅✅ 2026-06-30 (commit e1926427): source↔image injectivity landed (§6 level)**:
+`induce_chiRestrict_injective` (`S06_CertainTypeClifford`、axiom-clean): `induce K̄` は reducible column 上で
+injective (distinct χ₂ → distinct `Ind_K̄ (chiRestrict χ₂)`)。`chiRestrict_conjBy_eq` (L-inertia-stable) +
+`induce_injective_of_inertia_stable` + `chiRestrict_injective`。⟹ reducible induced **image** 数 = column 数。
+
+**🛑 残 = 単一 non-decomposable inline block (focused session 推奨)**: (9.9.b) conjunct 2 =
+`{φ∈chars.SOf chief.H0|¬irr}.ncard = p-1` (S11:4549) は **§9↔§6 ncard 全単射の 1 つの inline 証明**:
+合成写像 `χ̄ ↦ induceHU(inflate χ̄) = inflate_M(induce K̄ χ̄)` (commute) が §9 sOf-reducibles と §6 columns を
+全単射。**commute は standalone 不可** (cont.¹⁶ の Fintype-diamond: induceHU 内部 letI vs general commute の
+[Fintype ↥M]) ⟹ assembly 全体を `letI Fintype ↥M` 1 つの下で inline 構築。**全 core piece は landed**
+(|W̄₂|=p / column L-不変 / induce-injective / inflate iso infra / commute / reducibility correspondence /
+§6 source count) — 残は chars(Section11CharacterData)↔chiefFactorQuotientHypothesis の構造 bridge を張り、
+inflate iso (xiOf↔Irr(K̄)) + commute + Set.ncard 全単射 を chain する **~100-150 行の inline glue**。
+loop-fragment 不適 (分割不能・Fintype 管理重) ⟹ **focused session 推奨**。
+
 > **状況 (2026-06-29)**: §6 side + (8.4.d) bridge B1 (structural Hypothesis(M/H₀)) 完成 (全 axiom-clean)。
 > 残 = B2 (inflation character bridge、最難所 = induction-inflation commute lemma) + B3 (|W̄₂|=p +
 > instantiate)。本プロジェクトで「最難・最高コスト」と記された指標終盤の最後の山。
