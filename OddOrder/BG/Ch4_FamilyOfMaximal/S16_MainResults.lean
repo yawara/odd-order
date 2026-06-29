@@ -5259,6 +5259,61 @@ theorem proposition_type_classification [Finite G]
     · exact h1
     · exact absurd (isTypeII_of_isTypeP2 hG hM h2) (not_isTypeII_of_isTypeV ⟨dV⟩)
 
+/-- **Peterfalvi (8.10)/(8.11), the full `M_s = M_σ` identity** (mmd 04.10:123: "M_s is the group
+denoted by M_σ in [BG]"): for a maximal subgroup `M` of its classified Peterfalvi type `τ`, the
+"main subgroup" `M_s` (`mainSubgroup`, `= M_F` for I/II/V, `= M'` for III/IV) coincides with BG's
+σ-Hall subgroup `M_σ`.  Assembled from `proposition_type_classification` (BG Prop 16.1): for I/II/V it
+is clause (f) (`M_F = M_σ ⟺ τ ∈ {I,II,V}`); for III/IV it is clause (c) (`τ ∈ {III,IV} ⟹ M` is type
+`P₁`) followed by `isTypeP1_derivedInG_eq_Msigma` (`M' = M_σ`).  The linchpin bridge turning BG's
+`M_σ`-stated Theorem E (`sigmaConjugacySaturation_Mtilde_ncard`, `sigma_reps_prime_cover`) into the
+`mainSubgroup`-stated `BGTheoremECoverData` (issue 8020). -/
+theorem mainSubgroup_eq_Msigma [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G}
+    (hM : M ∈ maximalSubgroups G) {tau : PeterfalviType} (htau : HasPeterfalviType tau M) :
+    mainSubgroup M tau = OddOrder.BG.Ch3.S10.Msigma M := by
+  have hcls := proposition_type_classification hG hM
+  cases tau with
+  | I => exact hcls.2.2.2.2.2.mpr (Or.inl htau)
+  | II => exact hcls.2.2.2.2.2.mpr (Or.inr (Or.inl htau))
+  | V => exact hcls.2.2.2.2.2.mpr (Or.inr (Or.inr htau))
+  | III => exact isTypeP1_derivedInG_eq_Msigma hG hM (hcls.2.2.1.mp (Or.inl htau)).1
+  | IV => exact isTypeP1_derivedInG_eq_Msigma hG hM (hcls.2.2.1.mp (Or.inr htau)).1
+
+/-- **Support-set bridge (all types)**: Peterfalvi's `A_1(M) = M_s#` coincides with BG's
+`\widetilde M = M_σ#` (`sigmaSharp`) for a maximal subgroup of its classified type.  Immediate from
+`A_1(M) = M_s#`, `M_s = M_σ` (`mainSubgroup_eq_Msigma`, Peterfalvi (8.10)), and `M̃ = M_σ#`.
+Generalises the type-I/II support bridge to all five types; supplies the BG↔Pf support identification
+behind `BGTheoremECoverData`'s `thickenedA1`/covering fields (issue 8020). -/
+theorem A1_eq_sigmaSharp [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G}
+    (hM : M ∈ maximalSubgroups G) {tau : PeterfalviType} (htau : HasPeterfalviType tau M) :
+    A1 M tau = sigmaSharp M := by
+  change sharpSubgroup (mainSubgroup M tau) = sharpSubgroup (OddOrder.BG.Ch3.S10.Msigma M)
+  rw [mainSubgroup_eq_Msigma hG hM htau]
+
+/-- **Every maximal subgroup has a Peterfalvi type** (exhaustiveness of the I–V classification): a
+maximal subgroup `M` of a minimal simple group of odd order has `HasPeterfalviType τ M` for some
+`τ ∈ {I,II,III,IV,V}`.  Reads off `proposition_type_classification` (BG Prop 16.1) over the exhaustive
+BG trichotomy `F`/`P₁`/`P₂` (`isTypeF_iff_not_isTypeP`, `isTypeP_iff_isTypeP1_or_isTypeP2`): type `F`
+is I (clause a), `P₂` is II (clause b), `P₁` splits as V if `M_F = M_σ` (clause d) else III/IV
+(clause c).  Supplies the `tau`/`typed` fields of `BGTheoremECoverData` (issue 8020). -/
+theorem exists_peterfalviType [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    {M : Subgroup G} (hM : M ∈ maximalSubgroups G) :
+    ∃ tau : PeterfalviType, HasPeterfalviType tau M := by
+  have hcls := proposition_type_classification hG hM
+  by_cases hF : S14.IsTypeF M
+  · exact ⟨.I, hcls.1.mpr hF⟩
+  · have hP : S14.IsTypeP M := by
+      by_contra hnP
+      exact hF (S14.isTypeF_iff_not_isTypeP.mpr hnP)
+    rcases S14.isTypeP_iff_isTypeP1_or_isTypeP2.mp hP with hP1 | hP2
+    · by_cases hmf : S15.MF M = OddOrder.BG.Ch3.S10.Msigma M
+      · exact ⟨.V, hcls.2.2.2.1.mpr ⟨hP1, hmf⟩⟩
+      · rcases hcls.2.2.1.mpr ⟨hP1, hmf⟩ with hIII | hIV
+        · exact ⟨.III, hIII⟩
+        · exact ⟨.IV, hIV⟩
+    · exact ⟨.II, hcls.2.1.mpr hP2⟩
+
 /-- **Type I and non-Type-I are mutually exclusive** (corollary of Proposition
 16.1(a)–(d)).  A maximal subgroup of a minimal simple group of odd order that is
 Type I cannot also be one of Types II–V.
