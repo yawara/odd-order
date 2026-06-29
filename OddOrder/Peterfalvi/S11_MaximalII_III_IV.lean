@@ -1488,6 +1488,27 @@ for a subgroup `Y` (the cases `Y = H₀, H₀C, H₀C', H₀U'` of (9.8)/(9.9)).
 def huSub (data : TypesIIIIIIVSetup M) : Subgroup ↥M :=
   (data.H ⊔ data.U).subgroupOf M
 
+/-- `HU = H ⊔ U` is exactly the derived subgroup `M' = derivedInG M` realised inside `↥M`
+(Peterfalvi (9.2): `M' = HU`).  This identifies the §9 induction carrier `huSub data` with the
+`(derivedInG M).subgroupOf M` whose `mk'`-image is the `K` of the `M/H₀`-`Hypothesis`
+(`chiefFactorQuotientHypothesis`), the bridge from the §9 family to the §6 reducible count
+(issue 1012, B2 bijection). -/
+theorem huSub_eq_derivedInG_subgroupOf (data : TypesIIIIIIVSetup M) :
+    huSub data = (derivedInG M).subgroupOf M := by
+  have h : data.H ⊔ data.U = derivedInG M := by
+    rw [data.typeP.derivedInG_eq_fitting_sup_U, ← data.typeP.H_eq]; rfl
+  rw [huSub, h]
+
+/-- **`HU ◁ M`**: `HU = H ⊔ U = M' = [M,M]` is the derived subgroup realised inside `↥M`, hence
+normal.  This is the `H ⊴ G` hypothesis letting the §9 induction `induceHU = Ind_{HU}^M` use the
+Clifford fibre/orbit machinery (`induce_eq_induce_iff_conj`: distinct `M`-conjugacy orbits ↔ distinct
+inductions) for the `𝒳 ↔ 𝒮` count of Peterfalvi (9.5)/(9.9). -/
+instance huSub_normal (data : TypesIIIIIIVSetup M) : (huSub data).Normal := by
+  rw [huSub_eq_derivedInG_subgroupOf, show (derivedInG M).subgroupOf M = commutator ↥M by
+    rw [derivedInG, Subgroup.subgroupOf,
+      Subgroup.comap_map_eq_self_of_injective M.subtype_injective]]
+  infer_instance
+
 /-- `H`, realised as a subgroup of `HU = H ⊔ U` inside `↥M`.  Used to state the kernel condition
 `H ⊄ Ker χ` defining `𝒳`. -/
 def hInHu (data : TypesIIIIIIVSetup M) : Subgroup ↥(huSub data) :=
@@ -2064,6 +2085,73 @@ theorem chiefFactor_basic [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     have h2 : 2 ≤ p ^ data.q := le_trans hp.two_le (Nat.le_self_pow hq_ne p)
     omega
 
+/-- **Centralizer commutes with a coprime cyclic quotient** (general group theory): for `x : Γ` and
+`N ◁ Γ` with `gcd(|⟨x⟩|, |N|) = 1`, the centralizer of `x̄ = x N` in `Γ/N` is the image of the
+centralizer of `x` in `Γ`: `C_{Γ/N}(x̄) = (C_Γ(x)).map (mk' N)`.
+
+`⊇` is functoriality of `mk'`.  `⊆` lifts an `x̄`-centralizing element `g N` through the coprime
+action of `⟨x⟩` on `Γ` (conjugation): `g N ∈ C(x̄)` means every power of `x` fixes `g` modulo `N`,
+so Isaacs Cor 3.28 (`coprime_fixedPoints_quotient_of_coprime_normal`) produces a genuine
+`x`-centralizing representative `c ≡ g (mod N)`.  This is the engine of the Peterfalvi (8.4.d)
+`centralizer_W̄₂` computation (`Γ = ↥M`, `N = H₀`). -/
+theorem centralizer_map_mk'_eq_of_coprime_zpowers {Γ : Type*} [Group Γ] [Finite Γ]
+    {N : Subgroup Γ} [N.Normal] (x : Γ)
+    (hcop : Nat.Coprime (Nat.card ↥(Subgroup.zpowers x)) (Nat.card ↥N)) :
+    Subgroup.centralizer ({(QuotientGroup.mk' N x : Γ ⧸ N)} : Set (Γ ⧸ N))
+      = (Subgroup.centralizer ({x} : Set Γ)).map (QuotientGroup.mk' N) := by
+  classical
+  apply le_antisymm
+  · -- `⊆`: coprime lift of an `x̄`-centralizing element to an `x`-centralizing one
+    intro gbar hgbar
+    obtain ⟨g, rfl⟩ := QuotientGroup.mk'_surjective N gbar
+    set φ : ↥(Subgroup.zpowers x) →* MulAut Γ :=
+      (MulAut.conj (G := Γ)).comp (Subgroup.zpowers x).subtype with hφ
+    have hN_inv : OddOrder.Isaacs.Ch03.IsAInvariant φ N := by
+      rw [OddOrder.Isaacs.Ch03.isAInvariant_iff_smul_mem]
+      intro c n hn
+      show (MulAut.conj (c : Γ)) n ∈ N
+      rw [MulAut.conj_apply]
+      exact (inferInstance : N.Normal).conj_mem n hn (c : Γ)
+    haveI : IsCyclic ↥(Subgroup.zpowers x) := Subgroup.isCyclic_zpowers x
+    have hcomm : Commute (QuotientGroup.mk' N x) (QuotientGroup.mk' N g) :=
+      Subgroup.mem_centralizer_iff.mp hgbar _ (Set.mem_singleton _)
+    have hg_fix : ∀ c : ↥(Subgroup.zpowers x), ∃ n ∈ N, φ c g = g * n := by
+      intro c
+      refine ⟨g⁻¹ * φ c g, ?_, by group⟩
+      rw [← QuotientGroup.ker_mk' N, MonoidHom.mem_ker, map_mul, map_inv]
+      have hφc : φ c g = (c : Γ) * g * (c : Γ)⁻¹ := by simp [hφ, MulAut.conj_apply]
+      have hcc : Commute (QuotientGroup.mk' N (c : Γ)) (QuotientGroup.mk' N g) := by
+        obtain ⟨k, hk⟩ := (Subgroup.mem_zpowers_iff).mp c.2
+        rw [← hk, map_zpow]
+        exact hcomm.zpow_left k
+      rw [hφc, map_mul, map_mul, map_inv, hcc.eq]
+      group
+    obtain ⟨c, hc_fixed, n, hn, hc_eq⟩ :=
+      OddOrder.Isaacs.Ch04.coprime_fixedPoints_quotient_of_coprime_normal
+        hcop (Or.inl inferInstance) hN_inv hg_fix
+    rw [Subgroup.mem_map]
+    refine ⟨c, ?_, ?_⟩
+    · refine Subgroup.mem_centralizer_iff.mpr ?_
+      intro y hy
+      rw [Set.mem_singleton_iff] at hy
+      have hfix := hc_fixed ⟨x, Subgroup.mem_zpowers x⟩
+      rw [hφ] at hfix
+      simp only [MonoidHom.comp_apply, Subgroup.coe_subtype, MulAut.conj_apply] at hfix
+      -- `hfix : x * c * x⁻¹ = c`  ⟹  `x * c = c * x`
+      rw [hy]
+      exact mul_inv_eq_iff_eq_mul.mp hfix
+    · have hn1 : (QuotientGroup.mk' N) n = 1 := by
+        rw [QuotientGroup.mk'_apply]; exact (QuotientGroup.eq_one_iff n).mpr hn
+      rw [hc_eq, map_mul, hn1, mul_one]
+  · -- `⊇`: image of the centralizer centralizes `x̄`
+    rw [Subgroup.map_le_iff_le_comap]
+    intro c hc
+    rw [Subgroup.mem_comap, Subgroup.mem_centralizer_iff]
+    intro ybar hybar
+    rw [Set.mem_singleton_iff] at hybar; subst hybar
+    show QuotientGroup.mk' N x * QuotientGroup.mk' N c = QuotientGroup.mk' N c * QuotientGroup.mk' N x
+    rw [← map_mul, ← map_mul, Subgroup.mem_centralizer_iff.mp hc x (Set.mem_singleton _)]
+
 /-- **`H₀ ◁ M`** (the chief-factor kernel is `M`-normal): `H₀.subgroupOf M` is normal in `↥M`, so
 the quotient `↥M ⧸ H₀` — the ambient of Peterfalvi (8.4.d)'s certain-type group `L = M/H₀` — is a
 group.  Immediate from the `M`-normalization `H0_normalized_by_M` of (9.4) via
@@ -2073,6 +2161,93 @@ theorem chiefFactor_H0_subgroupOf_normal {M : Subgroup G} {data : TypesIIIIIIVSe
     (chief : ChiefFactorData data) : (chief.H0.subgroupOf M).Normal :=
   (Subgroup.normal_subgroupOf_iff_le_normalizer
     (chief.H0_lt_H.le.trans (H_le_M data))).mpr chief.H0_normalized_by_M
+
+/-- **`W₁ ⊓ H₀ = ⊥` inside `↥M`**: `W₁` complements `M' = [M,M]` (`data.M_complement`) and
+`H₀ < H ≤ M'`, so `W₁ ⊓ H₀ ≤ W₁ ⊓ M' = ⊥`.  In `↥M ⧸ H₀` this makes `W̄₁ = W₁ H₀ / H₀ ≅ W₁`
+(needed for `W̄₁ ≠ ⊥` and the Hall coprimality of the (8.4.d) certain-type group). -/
+theorem chiefFactor_W1_inf_H0_subgroupOf_eq_bot {M : Subgroup G}
+    {data : TypesIIIIIIVSetup M} (chief : ChiefFactorData data) :
+    (data.W1.subgroupOf M) ⊓ (chief.H0.subgroupOf M) = ⊥ := by
+  have hH0M' : (chief.H0.subgroupOf M) ≤ (derivedInG M).subgroupOf M :=
+    Subgroup.comap_mono (chief.H0_lt_H.le.trans data.typeP.H_le)
+  rw [eq_bot_iff]
+  exact le_trans (inf_le_inf_left _ hH0M')
+    (disjoint_iff.mp data.typeP.M_complement.disjoint.symm).le
+
+/-- **`gcd(|H₀|, |W₁|) = 1`**: `H₀ < H` and `gcd(|H|, |W₁|) = 1` (`typeP_coprime_H_W1`, the coprime
+action of the Hall complement `W₁` on the nilpotent `H = M_F`).  This is the coprimality the
+(8.4.d) centralizer computation `C_{M'/H₀}(x̄) = W̄₂` needs (the `x`-fixed points of `M'` lift
+across `H₀` by Isaacs Cor 3.28). -/
+theorem chiefFactor_coprime_H0_W1 [Finite G] {M : Subgroup G}
+    {data : TypesIIIIIIVSetup M} (chief : ChiefFactorData data) :
+    Nat.Coprime (Nat.card ↥chief.H0) (Nat.card ↥data.W1) :=
+  (typeP_coprime_H_W1 data.typeP).coprime_dvd_left
+    (Subgroup.card_dvd_of_le chief.H0_lt_H.le)
+
+/-- **`A.map f ⊓ B.map f = (A ⊓ B).map f` when `ker f ≤ B`** (general group theory).  `⊇` is
+monotonicity; for `⊆`, `f a = f b` with `b ∈ B` and `ker f ≤ B` forces `a ∈ B`, so `a ∈ A ⊓ B`.
+The step (8.4.d) needs to pull `C(x̄) ⊓ K̄` out of the image (`f = mk' H₀`, `ker = H₀ ≤ K = M'`). -/
+theorem map_inf_map_of_ker_le {H : Type*} [Group H] {f : G →* H} {A B : Subgroup G}
+    (hB : f.ker ≤ B) : A.map f ⊓ B.map f = (A ⊓ B).map f := by
+  refine le_antisymm ?_ (le_inf (Subgroup.map_mono inf_le_left) (Subgroup.map_mono inf_le_right))
+  intro y hy
+  rw [Subgroup.mem_inf] at hy
+  obtain ⟨a, ha, rfl⟩ := hy.1
+  obtain ⟨b, hb, hab⟩ := hy.2
+  have hker : a * b⁻¹ ∈ f.ker := by
+    rw [MonoidHom.mem_ker, map_mul, map_inv, hab, mul_inv_cancel]
+  have haB : a ∈ B := by
+    have hmem : a * b⁻¹ * b ∈ B := mul_mem (hB hker) hb
+    simpa using hmem
+  exact ⟨a, ⟨ha, haB⟩, rfl⟩
+
+/-- **Peterfalvi (8.4.d), step 3 — `centralizer_W₁` transported to `↥M`**: for a lift `x` of a
+nontrivial `W̄₁`-element, `C_{↥M}(x) ⊓ M' = W₂` (inside `↥M`).  The (8.4) datum
+`derivedInG M ⊓ C_G(x) = W₂` (`data.centralizer_W1`) transported across `↥M ↪ G`
+(`S03h.centralizer_subgroupOf`). -/
+theorem chiefFactor_centralizer_inf_derived {M : Subgroup G}
+    {data : TypesIIIIIIVSetup M} (x : ↥M) (hx : (x : G) ∈ data.W1) (hx1 : (x : G) ≠ 1) :
+    Subgroup.centralizer ({x} : Set ↥M) ⊓ ((derivedInG M).subgroupOf M)
+      = data.W2.subgroupOf M := by
+  have hamb : Subgroup.centralizer ({(x : G)} : Set G) ⊓ derivedInG M = data.W2 := by
+    rw [inf_comm]; exact data.typeP.centralizer_W1 (x : G) hx hx1
+  rw [OddOrder.BG.Ch1.S03h.centralizer_subgroupOf, Set.image_singleton]
+  simp only [Subgroup.subgroupOf, ← Subgroup.comap_inf, Subgroup.coe_subtype, hamb]
+
+/-- **Peterfalvi (8.4.d), `centralizer_W̄₂`**: in `L = ↥M ⧸ H₀`, for a nontrivial `x̄ ∈ W̄₁`,
+`C_L(x̄) ⊓ K̄ = W̄₂` where `K̄ = M'/H₀` and `W̄₂ = W₂ H₀/H₀`.  Lift `x̄ = x H₀`, apply the coprime
+centralizer-quotient `centralizer_map_mk'_eq_of_coprime_zpowers` (step 1, `gcd(|⟨x⟩|,|H₀|)=1`),
+pull the image out of `⊓ K̄` (`map_inf_map_of_ker_le`, `ker = H₀ ≤ M'`, step 2), and finish with
+`C_{↥M}(x) ⊓ M' = W₂` (`chiefFactor_centralizer_inf_derived`, step 3).  This is the (8.4.d)
+certain-type `centralizer_W₂` field of `S06.Hypothesis (M/H₀)`. -/
+theorem chiefFactor_centralizer_W2bar [Finite G] {M : Subgroup G}
+    {data : TypesIIIIIIVSetup M} (chief : ChiefFactorData data)
+    [(chief.H0.subgroupOf M).Normal]
+    (xbar : ↥M ⧸ (chief.H0.subgroupOf M))
+    (hxbar : xbar ∈ (data.W1.subgroupOf M).map (QuotientGroup.mk' (chief.H0.subgroupOf M)))
+    (hxbar1 : xbar ≠ 1) :
+    Subgroup.centralizer ({xbar} : Set (↥M ⧸ (chief.H0.subgroupOf M)))
+        ⊓ ((derivedInG M).subgroupOf M).map (QuotientGroup.mk' (chief.H0.subgroupOf M))
+      = (data.W2.subgroupOf M).map (QuotientGroup.mk' (chief.H0.subgroupOf M)) := by
+  obtain ⟨x, hx_mem, rfl⟩ := Subgroup.mem_map.mp hxbar
+  have hx1 : x ≠ 1 := fun h => hxbar1 (by rw [h]; exact map_one _)
+  have hxW1 : ((x : ↥M) : G) ∈ data.W1 := Subgroup.mem_subgroupOf.mp hx_mem
+  have hxG1 : ((x : ↥M) : G) ≠ 1 := fun h => hx1 (Subtype.ext h)
+  have hcardW1 : Nat.card ↥(data.W1.subgroupOf M) = Nat.card ↥data.W1 :=
+    Nat.card_congr (Subgroup.subgroupOfEquivOfLe data.typeP.W1_le).toEquiv
+  have hcardH0 : Nat.card ↥(chief.H0.subgroupOf M) = Nat.card ↥chief.H0 :=
+    Nat.card_congr (Subgroup.subgroupOfEquivOfLe (chief.H0_lt_H.le.trans (H_le_M data))).toEquiv
+  have hcop : Nat.Coprime (Nat.card ↥(Subgroup.zpowers x))
+      (Nat.card ↥(chief.H0.subgroupOf M)) := by
+    rw [hcardH0]
+    refine (chiefFactor_coprime_H0_W1 chief).symm.coprime_dvd_left ?_
+    rw [← hcardW1]
+    exact Subgroup.card_dvd_of_le (Subgroup.zpowers_le.mpr hx_mem)
+  rw [centralizer_map_mk'_eq_of_coprime_zpowers x hcop,
+    map_inf_map_of_ker_le (B := (derivedInG M).subgroupOf M) (by
+      rw [QuotientGroup.ker_mk']
+      exact Subgroup.comap_mono (chief.H0_lt_H.le.trans data.typeP.H_le)),
+    chiefFactor_centralizer_inf_derived x hxW1 hxG1]
 
 /-! ### (9.7) The chief factor `H̄ = H/H₀` as an `𝔽ₚ[U W₁]`-module
 
@@ -2095,6 +2270,284 @@ theorem chiefFactor_quotient_card [Finite G] {M : Subgroup G} {data : TypesIIIII
     rw [Subgroup.index_mul_card, chief.quotient_order, hH0card]
   rw [(Subgroup.index_eq_card chief.N).symm]
   exact Nat.eq_of_mul_eq_mul_right Nat.card_pos key
+
+/-- **Peterfalvi (8.4.d) `W2_nontrivial` input: `W₂ ⊄ H₀`.**  The `W₁`-fixed points of the chief
+factor `H̄ = ↥H ⧸ N` have order `p ≠ 1` (`coprimeFrobeniusChiefFactor_card`, Wielandt), and they are
+the image of `C_H(W₁) = W₂` (`map_fixedSubgroup_eq_fixedSubgroup_quotient`).  So `C_H(W₁) ⊄ N`, i.e.
+some element of `W₂` lies outside `H₀ = N.map H.subtype`; hence `W₂ ⊄ H₀`, equivalently the
+certain-type `W̄₂ = W₂ H₀ / H₀` of `S06.Hypothesis (M/H₀)` is nontrivial. -/
+theorem chiefFactor_W2_not_le_H0 [Finite G] {M : Subgroup G}
+    {data : TypesIIIIIIVSetup M} (chief : ChiefFactorData data) :
+    ¬ data.W2 ≤ chief.H0 := by
+  show ¬ data.typeP.W2 ≤ chief.H0
+  haveI := chief.N_normal
+  have hU : data.typeP.U ≠ ⊥ := data.nontrivial.1
+  have hHbar : Nat.card (↥data.H ⧸ chief.N) ≠ 1 := by
+    rw [chiefFactor_quotient_card chief]
+    exact (Nat.one_lt_pow (Nat.card_pos (α := ↥data.W1)).ne' chief.p_prime.one_lt).ne'
+  have hUnorm : ((typeP_quotientCoprimeAction data.typeP hU chief.N_aInvariant).U).Normal :=
+    (typeP_uW1_frobenius data.typeP hU).isNormal
+  have hEcyc := typeP_quotient_fixedByE_cyclic data.typeP hU chief.N_aInvariant
+  have hcard := coprimeFrobeniusChiefFactor_card
+    (typeP_quotientCoprimeAction data.typeP hU chief.N_aInvariant) hUnorm chief.p_prime
+    chief.quotient_elementaryAbelian chief.quotient_chiefFactor chief.U_noncentral_on_quotient
+    hEcyc hHbar
+  have hfixne : (typeP_quotientCoprimeAction data.typeP hU chief.N_aInvariant).fixedByE ≠ ⊥ := by
+    intro h
+    have h1 : Nat.card ↥(typeP_quotientCoprimeAction data.typeP hU chief.N_aInvariant).fixedByE = 1 :=
+      by rw [h]; simp
+    exact chief.p_prime.ne_one (hcard.2.symm.trans h1)
+  have hcopHW1 : Nat.Coprime
+      (Nat.card ↥(data.typeP.W1.subgroupOf (data.typeP.U ⊔ data.typeP.W1))) (Nat.card ↥data.H) :=
+    (typeP_coprime_H_uW1 data.typeP hU).symm.coprime_dvd_left (Subgroup.card_subgroup_dvd_card _)
+  haveI : IsSolvable ↥data.H := (typeP_coprimeAction data.typeP hU).H_solvable
+  have hmap : (fixedSubgroup (typeP_conjAction data.typeP)
+      (data.typeP.W1.subgroupOf (data.typeP.U ⊔ data.typeP.W1))).map (QuotientGroup.mk' chief.N)
+      = (typeP_quotientCoprimeAction data.typeP hU chief.N_aInvariant).fixedByE :=
+    map_fixedSubgroup_eq_fixedSubgroup_quotient chief.N_aInvariant hcopHW1 (Or.inr inferInstance)
+  have hCHW1 : (fixedSubgroup (typeP_conjAction data.typeP)
+        (data.typeP.W1.subgroupOf (data.typeP.U ⊔ data.typeP.W1))).map data.typeP.H.subtype
+      = data.typeP.W2 := by
+    rw [typeP_fixedSubgroup_map data.typeP le_sup_right, typeP_H_inf_centralizer_W1]
+  have hCfixN : ¬ (fixedSubgroup (typeP_conjAction data.typeP)
+      (data.typeP.W1.subgroupOf (data.typeP.U ⊔ data.typeP.W1))) ≤ chief.N := by
+    intro hle
+    apply hfixne
+    rw [← hmap, Subgroup.map_eq_bot_iff, QuotientGroup.ker_mk']
+    exact hle
+  obtain ⟨c, hcCfix, hcN⟩ := SetLike.not_le_iff_exists.mp hCfixN
+  intro hW2H0
+  have hcG_W2 : (data.typeP.H.subtype c) ∈ data.typeP.W2 := by
+    rw [← hCHW1]; exact Subgroup.mem_map_of_mem _ hcCfix
+  have hcG_H0 : (data.typeP.H.subtype c) ∈ chief.H0 := hW2H0 hcG_W2
+  rw [chief.H0_eq, Subgroup.mem_map] at hcG_H0
+  obtain ⟨n, hn, hnc⟩ := hcG_H0
+  exact hcN (data.typeP.H.subtype_injective hnc ▸ hn)
+
+/-- **Induction-inflation commute, term level** (general): for `f : Γ →* Q` with `ker f ≤ H`, the
+induced-character term of the inflated `compHom (f.subgroupMap H) χ̄` at `(x, g)` equals the
+induced-character term of `χ̄` on `H.map f` at `(f x, f g)`.  The conjugate `x⁻¹gx ∈ H` iff
+`f(x⁻¹gx) = (fx)⁻¹(fg)(fx) ∈ H.map f` (`comap_map_eq_self`, `ker f ≤ H`), and the values agree
+(`χ̄⟨f(x⁻¹gx)⟩`).  Term level of the (8.4.d) induction-inflation commute (issue 1012, B2). -/
+theorem induceTerm_compHom_subgroupMap {Γ Q : Type*} [Group Γ] [Group Q]
+    (f : Γ →* Q) {H : Subgroup Γ} (hker : f.ker ≤ H)
+    (χbar : ClassFunction ↥(H.map f) ℂ) (x g : Γ) :
+    ClassFunction.induceTerm H (ClassFunction.compHom (f.subgroupMap H) χbar) x g
+      = ClassFunction.induceTerm (H.map f) χbar (f x) (f g) := by
+  have hmem : (f x)⁻¹ * (f g) * (f x) ∈ H.map f ↔ x⁻¹ * g * x ∈ H := by
+    rw [← map_inv, ← map_mul, ← map_mul, ← Subgroup.mem_comap, Subgroup.comap_map_eq_self hker]
+  by_cases hx : x⁻¹ * g * x ∈ H
+  · rw [ClassFunction.induceTerm_of_mem _ hx, ClassFunction.induceTerm_of_mem _ (hmem.mpr hx),
+      ClassFunction.compHom_apply]
+    have heq : (f.subgroupMap H) ⟨x⁻¹ * g * x, hx⟩
+        = (⟨(f x)⁻¹ * (f g) * (f x), hmem.mpr hx⟩ : ↥(H.map f)) := by
+      apply Subtype.ext
+      change f (x⁻¹ * g * x) = (f x)⁻¹ * (f g) * (f x)
+      rw [map_mul, map_mul, map_inv]
+    rw [heq]
+  · rw [ClassFunction.induceTerm_of_not_mem _ hx,
+      ClassFunction.induceTerm_of_not_mem _ (fun h => hx (hmem.mp h))]
+
+/-- **The fiber of `mk' N` over `q` is equinumerous to `N`** (`x ↦ x₀⁻¹ x` for a representative
+`x₀`).  Used for the `|N|`-fold fiberwise sum in the (8.4.d) induction-inflation commute. -/
+theorem card_fiber_mk'_eq {Γ : Type*} [Group Γ] {N : Subgroup Γ} [N.Normal] (q : Γ ⧸ N) :
+    Nat.card {x : Γ // QuotientGroup.mk' N x = q} = Nat.card ↥N := by
+  obtain ⟨x₀, rfl⟩ := QuotientGroup.mk'_surjective N q
+  refine Nat.card_congr ⟨fun p => ⟨x₀⁻¹ * (p : Γ), QuotientGroup.eq.mp p.2.symm⟩,
+    fun n => ⟨x₀ * (n : Γ), ?_⟩, ?_, ?_⟩
+  · refine QuotientGroup.eq.mpr ?_
+    have he : (x₀ * (n : Γ))⁻¹ * x₀ = ((n : Γ))⁻¹ := by group
+    rw [he]; exact inv_mem n.2
+  · intro p; ext; show x₀ * (x₀⁻¹ * (p : Γ)) = (p : Γ); group
+  · intro n; ext; show x₀⁻¹ * (x₀ * (n : Γ)) = (n : Γ); group
+
+/-- **`|N|`-fold fiberwise sum over a quotient** (general): `∑_{x:Γ} g(x N) = |N| • ∑_{q:Γ/N} g q`.
+Each fiber of `mk' N` has `|N|` elements (`card_fiber_mk'_eq`), and the summand is constant on
+fibers.  This is step 2 of the (8.4.d) induction-inflation commute (issue 1012, B2). -/
+theorem sum_comp_mk'_eq {Γ : Type*} [Group Γ] [Fintype Γ] (N : Subgroup Γ) [N.Normal]
+    [DecidablePred (· ∈ N)] {M : Type*} [AddCommMonoid M] (g : Γ ⧸ N → M) :
+    (∑ x : Γ, g (QuotientGroup.mk' N x)) = Nat.card ↥N • ∑ q : Γ ⧸ N, g q := by
+  classical
+  rw [Finset.smul_sum,
+    ← Finset.sum_fiberwise_of_maps_to (t := (Finset.univ : Finset (Γ ⧸ N)))
+      (fun (x : Γ) (_ : x ∈ Finset.univ) => Finset.mem_univ (QuotientGroup.mk' N x))]
+  refine Finset.sum_congr rfl (fun q _ => ?_)
+  rw [Finset.sum_congr rfl (g := fun _ => g q)
+      (fun x hx => by rw [(Finset.mem_filter.mp hx).2]), Finset.sum_const]
+  congr 1
+  rw [← card_fiber_mk'_eq q, Nat.card_eq_fintype_card, Fintype.card_subtype]
+
+/-- **`|H| = |N| · |H/N|`** (`N ◁ Γ`, `N ≤ H`): the image `H.map (mk' N)` of `H` in `Γ/N` has order
+`|H|/|N|`, since the restriction `mk' N |_H : ↥H → ↥(H.map (mk' N))` has kernel `N` and is onto
+(Noether's first isomorphism, `quotientKerEquivRange`).  The `|H|⁻¹·|N| = |H/N|⁻¹` normalization
+(step 3) of the (8.4.d) induction-inflation commute (issue 1012, B2). -/
+theorem card_eq_card_subgroup_mul_card_map_mk' {Γ : Type*} [Group Γ] [Fintype Γ]
+    {N H : Subgroup Γ} [N.Normal] (hNH : N ≤ H) :
+    Nat.card ↥H = Nat.card ↥N * Nat.card ↥(H.map (QuotientGroup.mk' N)) := by
+  set φ := (QuotientGroup.mk' N).comp H.subtype with hφ
+  have hrange : φ.range = H.map (QuotientGroup.mk' N) := by
+    rw [hφ, MonoidHom.range_comp, Subgroup.range_subtype]
+  have hker : φ.ker = N.subgroupOf H := by
+    ext h
+    rw [MonoidHom.mem_ker, Subgroup.mem_subgroupOf]
+    exact QuotientGroup.eq_one_iff (h : Γ)
+  rw [Subgroup.card_eq_card_quotient_mul_card_subgroup φ.ker,
+    Nat.card_congr (QuotientGroup.quotientKerEquivRange φ).toEquiv, hrange, hker,
+    Nat.card_congr (Subgroup.subgroupOfEquivOfLe hNH).toEquiv, mul_comm]
+
+/-- **Induction-inflation commute** (B2 crux, for `f = mk' N`): for `N ◁ Γ`, `N ≤ H`, the induced
+character of the inflated `compHom ((mk' N).subgroupMap H) χ̄` on `Γ` equals the inflation
+`compHom (mk' N)` of the induced character of `χ̄` on the image `H.map (mk' N) ⊆ Γ/N`.
+
+Term-by-term equality (`induceTerm_compHom_subgroupMap`), the `|N|`-fold fiberwise sum
+(`sum_comp_mk'_eq`), and the `|H| = |N|·|H/N|` normalization
+(`card_eq_card_subgroup_mul_card_map_mk'`) combine to cancel the `|N|` factor.  This is the
+character-level engine of Peterfalvi's (8.4.d) identification of `𝒮(H₀)` with the `M/H₀`-induction
+family (issue 1012, B2). -/
+theorem induce_compHom_subgroupMap_mk' {Γ : Type*} [Group Γ] [Fintype Γ] (N : Subgroup Γ) [N.Normal]
+    [DecidablePred (· ∈ N)] {H : Subgroup Γ} (hNH : N ≤ H)
+    [Invertible (Nat.card ↥H : ℂ)] [Invertible (Nat.card ↥(H.map (QuotientGroup.mk' N)) : ℂ)]
+    (χbar : ClassFunction ↥(H.map (QuotientGroup.mk' N)) ℂ) :
+    ClassFunction.induce H (ClassFunction.compHom ((QuotientGroup.mk' N).subgroupMap H) χbar)
+      = ClassFunction.compHom (QuotientGroup.mk' N)
+          (ClassFunction.induce (H.map (QuotientGroup.mk' N)) χbar) := by
+  have hker : (QuotientGroup.mk' N).ker ≤ H := by rw [QuotientGroup.ker_mk']; exact hNH
+  haveI : Invertible (Nat.card ↥N : ℂ) :=
+    invertibleOfNonzero (Nat.cast_ne_zero.mpr Nat.card_pos.ne')
+  have hnorm : (Nat.card ↥H : ℂ)
+      = (Nat.card ↥N : ℂ) * (Nat.card ↥(H.map (QuotientGroup.mk' N)) : ℂ) := by
+    rw [← Nat.cast_mul, card_eq_card_subgroup_mul_card_map_mk' hNH]
+  have hkey : ⅟(Nat.card ↥H : ℂ) * (Nat.card ↥N : ℂ)
+      = ⅟(Nat.card ↥(H.map (QuotientGroup.mk' N)) : ℂ) := by
+    rw [invOf_eq_inv, invOf_eq_inv, hnorm, mul_inv, mul_comm ((Nat.card ↥N : ℂ)⁻¹), mul_assoc,
+      inv_mul_cancel₀ (Nat.cast_ne_zero.mpr Nat.card_pos.ne'), mul_one]
+  apply ClassFunction.ext
+  intro g
+  rw [ClassFunction.compHom_apply, ClassFunction.induce_apply, ClassFunction.induce_apply,
+    Finset.sum_congr rfl (fun x _ =>
+      induceTerm_compHom_subgroupMap (QuotientGroup.mk' N) hker χbar x g),
+    sum_comp_mk'_eq N (fun x' => ClassFunction.induceTerm (H.map (QuotientGroup.mk' N)) χbar x'
+      (QuotientGroup.mk' N g)), nsmul_eq_mul, ← mul_assoc, hkey]
+
+open OddOrder.Peterfalvi.S06 in
+/-- **Peterfalvi (8.4.d): Hypothesis (4.2) holds for `L = M/H₀`.**  The certain-type structural
+hypothesis `S06.Hypothesis (↥M ⧸ H₀)` with `K = M'/H₀`, `W̄₁ = W₁ H₀/H₀`, `W̄₂ = W₂ H₀/H₀`.  Built
+from the type-`P` data of `M` by pushing the (8.4) datum through the quotient `mk' H₀`:
+`isComplement` from `M = M' ⋊ W₁` (`IsComplement'.map_mk'`), `centralizer_W2` from the coprime
+centralizer-quotient (`chiefFactor_centralizer_W2bar`), `W2_nontrivial` from `W₂ ⊄ H₀`
+(`chiefFactor_W2_not_le_H0`).  The Hall coprimality `gcd(|M'|, |W₁|) = 1` is the input `hHall`
+(as in `typePData_toS06Hypothesis`).  This is the quotient `L = M/H₀` of issue 1012's reducible
+counts; the §9 family `𝒮(H₀)` is its induction family. -/
+noncomputable def chiefFactorQuotientHypothesis [Finite G] {M : Subgroup G}
+    {data : TypesIIIIIIVSetup M} (chief : ChiefFactorData data)
+    [(chief.H0.subgroupOf M).Normal] (hodd : Odd (Nat.card G))
+    (hHall : Nat.Coprime (Nat.card ↥(derivedInG M)) (Nat.card ↥data.W1)) :
+    Hypothesis (↥M ⧸ (chief.H0.subgroupOf M)) := by
+  haveI := data.typeP.W1_cyclic
+  haveI := data.typeP.W2_cyclic
+  have hM'le : derivedInG M ≤ M := Subgroup.map_subtype_le _
+  have hW2leM' : data.W2 ≤ derivedInG M :=
+    data.typeP.W2_le.trans (le_trans inf_le_right (Subgroup.map_subtype_le _))
+  have hW2leM : data.W2 ≤ M := hW2leM'.trans hM'le
+  have hKnorm : ((derivedInG M).subgroupOf M).Normal := by
+    rw [show (derivedInG M).subgroupOf M = commutator ↥M by
+      rw [derivedInG, Subgroup.subgroupOf,
+        Subgroup.comap_map_eq_self_of_injective M.subtype_injective]]
+    infer_instance
+  have hcardK : Nat.card ↥((derivedInG M).subgroupOf M) = Nat.card ↥(derivedInG M) :=
+    Nat.card_congr (Subgroup.subgroupOfEquivOfLe hM'le).toEquiv
+  have hcardW1 : Nat.card ↥(data.W1.subgroupOf M) = Nat.card ↥data.W1 :=
+    Nat.card_congr (Subgroup.subgroupOfEquivOfLe data.typeP.W1_le).toEquiv
+  refine
+    { K := ((derivedInG M).subgroupOf M).map (QuotientGroup.mk' (chief.H0.subgroupOf M))
+      W1 := (data.W1.subgroupOf M).map (QuotientGroup.mk' (chief.H0.subgroupOf M))
+      W2 := (data.W2.subgroupOf M).map (QuotientGroup.mk' (chief.H0.subgroupOf M))
+      K_normal := hKnorm.map _ (QuotientGroup.mk'_surjective _)
+      isComplement := by
+        have hcop : Nat.Coprime (Nat.card ↥((derivedInG M).subgroupOf M))
+            (Nat.card ↥(data.W1.subgroupOf M)) := by rw [hcardK, hcardW1]; exact hHall
+        exact data.typeP.M_complement.map_mk' hcop (chief.H0.subgroupOf M)
+      W1_nontrivial := ?_
+      W1_cyclic := ?_
+      card_coprime :=
+        (hHall.coprime_dvd_left (hcardK ▸ Subgroup.card_map_dvd _ _)).coprime_dvd_right
+          (hcardW1 ▸ Subgroup.card_map_dvd _ _)
+      W2_nontrivial := ?_
+      W2_cyclic := ?_
+      W2_le_K := Subgroup.map_mono (Subgroup.comap_mono hW2leM')
+      centralizer_W2 := fun x hx hx1 => chiefFactor_centralizer_W2bar chief x hx hx1
+      W_odd := ?_ }
+  · -- W1_nontrivial: `W̄₁ ≠ ⊥` since `W₁ ⊄ H₀`
+    rw [ne_eq, Subgroup.map_eq_bot_iff, QuotientGroup.ker_mk']
+    intro hle
+    have hbot : data.W1.subgroupOf M = ⊥ :=
+      le_bot_iff.mp (le_trans (le_inf le_rfl hle)
+        (chiefFactor_W1_inf_H0_subgroupOf_eq_bot chief).le)
+    rw [Subgroup.subgroupOf_eq_bot] at hbot
+    exact data.typeP.W1_nontrivial (disjoint_self.mp (hbot.mono_right data.typeP.W1_le))
+  · -- W1_cyclic: image of cyclic
+    haveI : IsCyclic ↥(data.W1.subgroupOf M) :=
+      isCyclic_of_injective (Subgroup.subgroupOfEquivOfLe data.typeP.W1_le).toMonoidHom
+        (Subgroup.subgroupOfEquivOfLe data.typeP.W1_le).injective
+    rw [show (data.W1.subgroupOf M).map (QuotientGroup.mk' (chief.H0.subgroupOf M))
+        = ((QuotientGroup.mk' (chief.H0.subgroupOf M)).comp
+          (data.W1.subgroupOf M).subtype).range by
+      rw [MonoidHom.range_comp, Subgroup.range_subtype]]
+    exact isCyclic_of_surjective _ (MonoidHom.rangeRestrict_surjective _)
+  · -- W2_nontrivial: `W̄₂ ≠ ⊥` since `W₂ ⊄ H₀`
+    rw [ne_eq, Subgroup.map_eq_bot_iff, QuotientGroup.ker_mk']
+    intro hle
+    refine chiefFactor_W2_not_le_H0 chief (fun y hy => ?_)
+    have hmem : (⟨y, hW2leM hy⟩ : ↥M) ∈ data.W2.subgroupOf M := Subgroup.mem_subgroupOf.mpr hy
+    exact Subgroup.mem_subgroupOf.mp (hle hmem)
+  · -- W2_cyclic: image of cyclic
+    haveI : IsCyclic ↥data.W2 := data.typeP.W2_cyclic
+    haveI : IsCyclic ↥(data.W2.subgroupOf M) :=
+      isCyclic_of_injective (Subgroup.subgroupOfEquivOfLe hW2leM).toMonoidHom
+        (Subgroup.subgroupOfEquivOfLe hW2leM).injective
+    rw [show (data.W2.subgroupOf M).map (QuotientGroup.mk' (chief.H0.subgroupOf M))
+        = ((QuotientGroup.mk' (chief.H0.subgroupOf M)).comp
+          (data.W2.subgroupOf M).subtype).range by
+      rw [MonoidHom.range_comp, Subgroup.range_subtype]]
+    exact isCyclic_of_surjective _ (MonoidHom.rangeRestrict_surjective _)
+  · -- W_odd: `|W̄₁ ⊔ W̄₂|` divides `|↥M/H₀| ∣ |↥M| ∣ |G|`, which is odd
+    have hdvd : Nat.card ↥(((data.W1.subgroupOf M).map (QuotientGroup.mk' (chief.H0.subgroupOf M)))
+        ⊔ ((data.W2.subgroupOf M).map (QuotientGroup.mk' (chief.H0.subgroupOf M))))
+        ∣ Nat.card G :=
+      dvd_trans (Subgroup.card_subgroup_dvd_card _)
+        (dvd_trans (Subgroup.index_dvd_card _) (Subgroup.card_subgroup_dvd_card M))
+    rcases Nat.even_or_odd (Nat.card ↥(((data.W1.subgroupOf M).map
+        (QuotientGroup.mk' (chief.H0.subgroupOf M)))
+        ⊔ ((data.W2.subgroupOf M).map (QuotientGroup.mk' (chief.H0.subgroupOf M))))) with he | ho
+    · have h2G : 2 ∣ Nat.card G := dvd_trans he.two_dvd hdvd
+      rw [Nat.odd_iff] at hodd
+      omega
+    · exact ho
+
+/-- The `K` of the `M/H₀`-`Hypothesis` is the `mk'`-image of the §9 induction carrier `HU = huSub`
+(`huSub_eq_derivedInG_subgroupOf`).  This bridges the §6 reducible count (over `Irr(K̄)`,
+`card_reducible_Hnontrivial_induce_eq_W2_sub_one`) to the §9 family `𝒮(H₀)` whose members are
+`induceHU`-inductions of inflations from `K̄ = HU/H₀` (issue 1012, B2 bijection). -/
+theorem chiefFactorQuotientHypothesis_K_eq [Finite G] {M : Subgroup G}
+    {data : TypesIIIIIIVSetup M} (chief : ChiefFactorData data)
+    [(chief.H0.subgroupOf M).Normal] (hodd : Odd (Nat.card G))
+    (hHall : Nat.Coprime (Nat.card ↥(derivedInG M)) (Nat.card ↥data.W1)) :
+    (chiefFactorQuotientHypothesis chief hodd hHall).K
+      = (huSub data).map (QuotientGroup.mk' (chief.H0.subgroupOf M)) := by
+  show ((derivedInG M).subgroupOf M).map (QuotientGroup.mk' (chief.H0.subgroupOf M))
+      = (huSub data).map (QuotientGroup.mk' (chief.H0.subgroupOf M))
+  rw [huSub_eq_derivedInG_subgroupOf]
+
+/-- **`H₀ ≤ HU` inside `↥M`** (`H₀ < H ≤ M' = HU`): the inclusion needed to specialize the
+induction-inflation commute `induce_compHom_subgroupMap_mk'` to `N = H₀`, `H = huSub` for the §9↔§6
+reducibility bridge (issue 1012, B2 bijection).  The commute itself is applied inline in the
+bijection assembly (under a single `letI : Fintype ↥M`) — stating it standalone fights the
+statement-level `Fintype (↥M ⧸ H₀)` that `ClassFunction.induce`'s sum needs. -/
+theorem chiefFactor_H0_le_huSub {M : Subgroup G} (data : TypesIIIIIIVSetup M)
+    (chief : ChiefFactorData data) :
+    (chief.H0.subgroupOf M) ≤ huSub data := by
+  rw [huSub_eq_derivedInG_subgroupOf]
+  exact Subgroup.comap_mono (chief.H0_lt_H.le.trans data.typeP.H_le)
 
 /-- **(9.7) span step** (general form): in an irreducible `A`-action on a group `H` (every
 `A`-invariant subgroup is `⊥` or `⊤`), any nonzero subgroup `S₀` generates `H` under its
