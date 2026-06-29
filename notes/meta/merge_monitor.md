@@ -10,8 +10,13 @@
 
 > **✅ issue 0089 解決 (2026-06-30, ユーザー裁定 D=削除)**: `S07_RhoProjection.lean` は S09 `chiRho`
 > 機構の完全重複ゆえ**削除済** (carve-out 0087 撤回)。(12.16) path は S09 `chiRho`/`Hypothesis78`/
-> `NormEstimates` を cite。lane b の S07-only commit は無効 (b は S09 cite に redirect; b が S07 を
-> 再追加したら逸脱扱い)。旧 HOLD は解除。
+> `NormEstimates` を cite。旧 HOLD は解除。
+> ⚠ **re-sync lag**: lane b の branch には**削除前の** S07_RhoProjection がまだ残存しうる (b が
+> `git merge main` で削除を取り込むまで)。⟹ 3-dot `main...b` に `S07_RhoProjection.lean` が出ても、
+> それが「b が削除前から持っている残存」(= b の commit は S07 の**新規宣言追加でない**) なら**逸脱でなく
+> 『b: S07 削除の re-sync 待ち』として skip**。b の non-S07 .lean 実作業のみ通常合流。b が**削除後に
+> S07 を新規再作成**した場合のみ逸脱。判定: `git log main..b --no-merges` の commit が S07 への新規宣言
+> 追加か (= 再作成) / 既存 S07 への追記止まり (= 残存) か。混在・不明なら skip+報告。
 
 ## レーン (2026-06-28 再配分: 4 レーン a/b/c/d)
 
