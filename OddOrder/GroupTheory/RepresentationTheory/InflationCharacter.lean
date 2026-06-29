@@ -571,6 +571,36 @@ theorem sumNonInflatedDegreeMulChar_of_mem {z : G} (hz : z ∈ N) (hz1 : z ≠ 1
   rw [hker] at hsplit
   linear_combination hsplit + htot
 
+/-- **Inflation preserves (ir)reducibility, both directions.**  For `N ⊴ G` and any class function
+`ψ` of `G ⧸ N`, the pullback `compHom (mk' N) ψ` is an irreducible character of `G` iff `ψ` is an
+irreducible character of `G ⧸ N`.
+
+Forward is `IsIrreducibleCharacter.compHom_of_surjective` (`mk' N` is surjective).  Backward: an
+irreducible `compHom (mk' N) ψ` has `N ⊆ ker` (it is constant `= ψ 1` on `N`), so by
+`exists_inflate_eq_of_subset_characterKernel` it equals `inflate χ̄` for some irreducible `χ̄`; since
+`compHom (mk' N)` is injective (`compHom_injective_of_surjective`), `ψ = χ̄` is irreducible.
+
+This is the reducibility correspondence of the §9↔§6 bridge: via the induction-inflation commute
+`induceHU (inflate χ̄) = compHom (mk' N) (induce K̄ χ̄)`, the §9 member `φ = induceHU (inflate χ̄)` is
+reducible iff the §6 induction `induce K̄ χ̄` is (issue 1012, B2 bijection). -/
+theorem isIrreducibleCharacter_compHom_mk'_iff (ψ : ClassFunction (G ⧸ N) ℂ) :
+    IsIrreducibleCharacter (ClassFunction.compHom (QuotientGroup.mk' N) ψ) ↔
+      IsIrreducibleCharacter ψ := by
+  refine ⟨fun h => ?_, fun h => h.compHom_of_surjective (QuotientGroup.mk'_surjective N)⟩
+  have hker : (N : Set G) ⊆ OddOrder.Peterfalvi.S03.characterKernel
+      (ClassFunction.compHom (QuotientGroup.mk' N) ψ) := by
+    intro n hn
+    rw [OddOrder.Peterfalvi.S03.mem_characterKernel, OddOrder.Peterfalvi.S03.characterDegree_def,
+      ClassFunction.compHom_apply, ClassFunction.compHom_apply, map_one,
+      show QuotientGroup.mk' N n = 1 from (QuotientGroup.eq_one_iff n).mpr hn]
+  obtain ⟨χbar, hχbar⟩ := exists_inflate_eq_of_subset_characterKernel N
+    (⟨ClassFunction.compHom (QuotientGroup.mk' N) ψ, h⟩ : IrreducibleCharacter G) hker
+  have heq : ClassFunction.compHom (QuotientGroup.mk' N) (χbar : ClassFunction (G ⧸ N) ℂ)
+      = ClassFunction.compHom (QuotientGroup.mk' N) ψ := by
+    rw [← inflate_coe, hχbar]
+  rw [← ClassFunction.compHom_injective_of_surjective (QuotientGroup.mk'_surjective N) heq]
+  exact χbar.2
+
 end Inflation
 
 /-- **Inflation along an arbitrary surjective homomorphism.**  If `f : H →* G` is surjective and

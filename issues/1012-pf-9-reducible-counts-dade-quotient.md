@@ -201,6 +201,14 @@ X/H₀ の文字と同一視」((1.6)) で商で作業。⟹ §9 reducible-count
      は W₁⊆I_M(χ)」(certain-type linear-char 構造から)。次着手 = この W₁-stability (or inflate iso)。
    - **reducibility 対応**: φ=Ind χ reducible (M-char) ⟺ Ind^L_K̄ χ̄ reducible (M/H₀-char) (inflation
      既約保存の両向き)。`{φ∈𝒮(H₀)|¬irr}` ↔ `{χ̄∈Irr(K̄)|¬irr(Ind χ̄)∧H̄⊄Ker}` の ncard bijection。
+
+   **✅ cont.²⁰ (commit `<this>`): reducibility correspondence core landed**:
+   **`isIrreducibleCharacter_compHom_mk'_iff`** (`InflationCharacter.lean`、general、axiom-clean):
+   `IsIrreducibleCharacter (compHom (mk' N) ψ) ↔ IsIrreducibleCharacter ψ` (任意 ψ:ClassFunction(G⧸N))。
+   forward=`compHom_of_surjective`、backward=N⊆characterKernel (compHom n=ψ 1=degree) ⟹ `exists_inflate_eq`
+   で =inflate χ̄ ⟹ `compHom_injective` で ψ=χ̄。⟹ commute (induceHU(inflate χ̄)=compHom(mk')(induce K̄ χ̄))
+   と合わせ **φ=induceHU(inflate χ̄) reducible ⟺ induce K̄ χ̄ reducible** (reducibility 対応完成)。
+   残 assembly = §9 W₁-stability (単射適用) + inflate iso (xiOf↔Irr(K̄)) + inline commute + |W̄₂|=p + ncard。
 4. **B3**: (a) **|W̄₂|=p** (`Nat.card ((W₂.subgroupOf M).map mk') = chief.p`、`|fixedByE|=p` の
    W̄₂↔fixedByE iso、M/H₀↔H̄ identification 経由、~30-50行); (b) H=H̄ = (data.H.subgroupOf M).map mk'
    (≤K̄) で `card_reducible_Hnontrivial_induce_eq_W2_sub_one (chiefFactorQuotientHypothesis chief)`
