@@ -876,7 +876,7 @@ theorem exists_eq_chiRestrict_of_isFixedPt [NeZero (Nat.card h.W1)]
 under `L`-conjugation).  This `L`-inertia-stability is the source↔image bijection input of the (9.9.b)
 reducible count: `induce` is injective on the reducible-inducing columns
 (`induce_injective_of_inertia_stable`), since each is fixed by all of `L`. -/
-theorem Hypothesis.chiRestrict_conjBy_eq [NeZero (Nat.card h.W1)]
+theorem chiRestrict_conjBy_eq [NeZero (Nat.card h.W1)]
     (χ₂ : (h.W2.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ) (g : L) :
     IrreducibleCharacter.conjBy g (h.chiRestrict χ₂) = h.chiRestrict χ₂ := by
   haveI := h.K_normal
@@ -885,6 +885,19 @@ theorem Hypothesis.chiRestrict_conjBy_eq [NeZero (Nat.card h.W1)]
   rw [IrreducibleCharacter.coe_conjBy, ClassFunction.conjBy_apply, coe_chiRestrict,
     ClassFunction.restrict_apply, ClassFunction.restrict_apply]
   exact ((h.columnFamily χ₂).mu 0 : ClassFunction L ℂ).conj_eq (x : L) g
+
+/-- **`induce` is injective on the reducible-inducing columns** (issue 1012, (9.9.b) source↔image):
+distinct `W₂`-duals `χ₂` give distinct induced characters `Ind_K^L(chiRestrict χ₂)`.  Each column is
+`L`-inertia-stable (`chiRestrict_conjBy_eq`), so `induce_injective_of_inertia_stable` forces
+`chiRestrict χ₂ = chiRestrict χ₂'`, hence `χ₂ = χ₂'` (`chiRestrict_injective`).  This makes the count
+of *reducible induced images* equal the count of columns (`= w₂ − 1`), the bridge from the §6 source
+count to the §9 family `{φ ∈ 𝒮(H₀) | ¬ irr φ}`. -/
+theorem induce_chiRestrict_injective [NeZero (Nat.card h.W1)] [Fintype ↥h.K] :
+    Function.Injective (fun χ₂ : (h.W2.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ =>
+      ClassFunction.induce h.K (h.chiRestrict χ₂ : ClassFunction ↥h.K ℂ)) := by
+  intro χ₂ χ₂' heq
+  exact (h.chiRestrict_injective
+    (induce_injective_of_inertia_stable (h.chiRestrict_conjBy_eq χ₂) heq)).symm
 
 /-- **Peterfalvi (4.5.b), inertia computation**: a `χ ∈ Irr(K)` that is none of the `χ_j` has full
 inertia group `I_L(χ) = K`.  Write `ℓ ∈ I_L(χ)` as `ℓ = k·w` (`k ∈ K`, `w ∈ W₁`) via the complement
