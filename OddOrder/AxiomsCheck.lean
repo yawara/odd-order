@@ -6911,3 +6911,10 @@ discharged) with the index identities `h78.kernelOrder = |K| = k`, `h78.compleme
 field of the `normCascadeData` producer; the remaining gate is the upper §8 TI-counting.
 Axiom-clean. -/
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S16.MHypothesis.rhoNormSq_ge_lower
+
+/-! **Peterfalvi (2.7) adjunction for `ρ`** (`S07_RhoProjection`; lane β).  `rho_adjoint`:
+`⟨α^τ, χ⟩_G = ⟨α, χ^ρ⟩_L` — the Dade isometry `τ` (`hyp.dadeMap`) and the `ρ` projection are adjoint,
+by citing S04's `adjoint_formula` with `ψ = χ^ρ`; the averaging hypothesis is
+`rhoValue_eq_adjointAverageFun`, bridging the `ρ`-value to S04's `adjointAverageFun`.  Axiom-clean. -/
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S07.rhoValue_eq_adjointAverageFun
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S07.rho_adjoint

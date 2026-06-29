@@ -2495,6 +2495,35 @@ theorem MHypothesis.rhoNormSq_ge_lower [Finite G] {hyp : Hypothesis (G := G)}
   rw [hci, hko] at key
   exact key
 
+open scoped Classical OddOrder.Peterfalvi.S12.FiniteInduce in
+/-- **Peterfalvi (14.11.4), the upper-bound §8 TI-counting step** (04.16 lines 109–115).  Brings the
+line-83 bound `|A(M)|/|M| + (1/|G|)(|famG₀| − |G₀|)` (the RHS of `chiRhoNormSq_psi_le_line83`,
+proven) up to the displayed `NormCascadeData.upper` bound `1 − 1/p − 1/q + 2/(pq) + 1/(uq) + 1/(vp)`.
+
+The genuine §8 content, by the textbook's two stages:
+* **`|A(M)|/|M| = |K#|/|M| = (k−1)/(kpq)`**: the type-I Dade support `A(M) = K#` with `|M| = pqk`;
+* **orbit counting** `(1/|G|)(|famG₀| − |G₀|) ≤ (1/|G|)(|(W−(W₁∪W₂))^G| + |(P#)^G| + |(Q#)^G|)`
+  (the (14.11.3) exclusions, union bound on `famG₀ ∖ G₀`), with the TI orbit cardinalities
+  `|(P#)^G| = (|P|−1)·[G:N_G(P)]`, `|(Q#)^G| = (|Q|−1)·[G:N_G(Q)]` from
+  `S14.ncard_conjClassSet_of_isTISubset` (`|𝒞_G(A)| = |A|·[G:L]` for a TI-subset `A`), and the
+  normalizer sizes `[G:N_G(P)] = |G|/(|P|uq)` etc. from the Type-II partner `S = (H ⋊ U) ⋊ W₂`
+  ((8.6.a)/(8.11)/(13.12)).  The raw estimate is then loosened by `normCascade_upper_loosen` (proven).
+
+The single remaining genuine §8 obligation of (14.11.4) — the type-I analogue of the S12 (10.8)
+TI-counting `G₁ ⊆ (H#)^G ∪ V^G`.  The orbit-cardinality tool (`ncard_conjClassSet_of_isTISubset`)
+and the loosening (`normCascade_upper_loosen`) are in hand; the remaining work is the §8 structural
+input — the TI property and normalizer sizes of the Frobenius pieces `W`, `P`, `Q` for this `M`. -/
+theorem MHypothesis.line83_le_displayed_upper [Finite G] {hyp : Hypothesis (G := G)}
+    (Mdata : MHypothesis hyp) :
+    (Nat.card ↥(OddOrder.GroupTheory.typeIA Mdata.M Mdata.typeIHyp.typeI) : ℝ)
+        / (Nat.card ↥Mdata.M : ℝ)
+      + (Nat.card G : ℝ)⁻¹ * ((Nat.card (Mdata.toFamilyHypothesis71).G0 : ℝ)
+        - ((Finset.univ.filter (fun g : G => g ∈ Mdata.G0)).card : ℝ))
+      ≤ 1 - (1 : ℝ) / (hyp.base.p : ℝ) - 1 / (hyp.base.q : ℝ)
+        + 2 / ((hyp.base.p * hyp.base.q : ℕ) : ℝ)
+        + 1 / ((hyp.base.u * hyp.base.q : ℕ) : ℝ)
+        + 1 / ((hyp.base.v * hyp.base.p : ℕ) : ℝ) := sorry
+
 /-- **Faithful §7 carrier for the `ρ`-norm two-sided bound of Peterfalvi (14.11.4).**
 
 The character theory of (14.11.4) reduces to a two-sided bound on `‖ψ^{τ₁ρ}‖²`, where `ρ` is the
@@ -2548,9 +2577,9 @@ noncomputable def normCascadeData [Finite G]
     NormCascadeData hyp Mdata where
   rhoNormSq := (Mdata.toFamilyHypothesis71).chiRhoNormSq (Mdata.tau1 Mdata.psi) 0
   lower := Mdata.rhoNormSq_ge_lower
-  -- §8 TI-counting gate (Pf 04.16 lines 109-115): bridges `chiRhoNormSq_psi_le_line83` (proven) to
-  -- the raw bound that `normCascade_upper_loosen` (proven) loosens to `NormCascadeData.upper`.
-  upper := sorry
+  -- line-83 (`chiRhoNormSq_psi_le_line83`, proven) chained with the §8 TI-counting step
+  -- (`line83_le_displayed_upper`, the single remaining gate).
+  upper := le_trans (Mdata.chiRhoNormSq_psi_le_line83 _hG hne) Mdata.line83_le_displayed_upper
 
 /-- **Peterfalvi (14.11.4)**: the character-theoretic norm calculation produces the displayed
 rational inequality `normCascadeBound hyp k`.

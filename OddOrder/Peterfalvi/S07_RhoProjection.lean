@@ -31,6 +31,16 @@ open OddOrder.RepresentationTheory
 
 variable {G : Type*} [Group G] [Fintype G] {A : Set G} {L : Subgroup G}
 
+/-- `|G|` is invertible in `ℂ` (for the class-function inner product), since `G` is a finite group.
+Scoped so it does not leak outside §7. -/
+noncomputable scoped instance natCardInvCG [Finite G] : Invertible (Nat.card G : ℂ) :=
+  invertibleOfNonzero (Nat.cast_ne_zero.mpr Nat.card_pos.ne')
+
+/-- `|H|` is invertible in `ℂ` for any subgroup `H` of a finite group. -/
+noncomputable scoped instance natCardInvC [Finite G] (H : Subgroup G) :
+    Invertible (Nat.card H : ℂ) :=
+  invertibleOfNonzero (Nat.cast_ne_zero.mpr Nat.card_pos.ne')
+
 /-- **Peterfalvi (7.1)**, the value of the `ρ` projection at a support point `a ∈ A`:
 `χ^ρ(a) = (1/|H(a)|) ∑_{x ∈ H(a)} χ(a·x)`, the average of `χ` over the coset `aH(a)`. -/
 noncomputable def rhoValue (hyp : S04.Hypothesis G A L) (χ : ClassFunction G ℂ)
@@ -212,5 +222,36 @@ of the Dade isometry `τ` on `CF(L, A)`. -/
 theorem rho_dadeMap (hconj : hyp.HConjInvariant) (α : S04.SupportedClassFunctions ℂ A L) :
     rho hyp hconj (hyp.dadeMap α) = α :=
   Subtype.ext (rhoClassFun_dadeMap hyp hconj α)
+
+/-- The `ρ`-value (`rhoValue`) agrees with S04's Peterfalvi (2.7) `adjointAverageFun`, bridging the
+two `Fintype` conventions for the average over `H(a)`. -/
+theorem rhoValue_eq_adjointAverageFun (χ : ClassFunction G ℂ) {a : G} (ha : a ∈ A) :
+    rhoValue hyp χ ⟨a, ha⟩ = S04.adjointAverageFun hyp χ ⟨a, hyp.mem_L ha⟩ := by
+  classical
+  letI : Fintype (hyp.H ⟨a, ha⟩) := Fintype.ofFinite _
+  have h1 : rhoValue hyp χ ⟨a, ha⟩
+      = (Nat.card (hyp.H ⟨a, ha⟩) : ℂ)⁻¹ * ∑ x : (hyp.H ⟨a, ha⟩), χ (a * (x : G)) := rfl
+  have h2 : S04.adjointAverageFun hyp χ ⟨a, hyp.mem_L ha⟩
+      = (Nat.card (hyp.H ⟨a, ha⟩) : ℂ)⁻¹ * ∑ x : (hyp.H ⟨a, ha⟩), χ (a * (x : G)) := by
+    simp only [S04.adjointAverageFun]
+    rw [dif_pos ha]
+    congr 1
+    refine Finset.sum_congr (Finset.ext fun x => ?_) (fun _ _ => rfl)
+    simp only [Finset.mem_univ]
+  rw [h1, h2]
+
+variable [Fintype ↥L]
+
+/-- **Peterfalvi (2.7), adjunction for `ρ`**: `⟨α^τ, χ⟩_G = ⟨α, χ^ρ⟩_L` — the Dade isometry `τ` and
+the `ρ` projection are adjoint.  Cites S04's `adjoint_formula` with `ψ = χ^ρ` (`rhoClassFun`), whose
+averaging hypothesis is `rhoValue_eq_adjointAverageFun`. -/
+theorem rho_adjoint (hconj : hyp.HConjInvariant)
+    (α : S04.SupportedClassFunctions ℂ A L) (χ : ClassFunction G ℂ) :
+    ClassFunction.inner (hyp.dadeMap α) χ
+      = ClassFunction.inner (α : ClassFunction L ℂ) (rhoClassFun hyp hconj χ) :=
+  S04.adjoint_formula hyp hyp.dadeMap hyp.isDadeMap_dadeMap hconj α χ (rhoClassFun hyp hconj χ)
+    (fun a => by
+      rw [rhoClassFun_apply_mem hyp hconj χ a.2]
+      exact rhoValue_eq_adjointAverageFun hyp χ a.2)
 
 end OddOrder.Peterfalvi.S07
