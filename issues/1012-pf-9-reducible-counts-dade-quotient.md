@@ -157,6 +157,24 @@ X/H₀ の文字と同一視」((1.6)) で商で作業。⟹ §9 reducible-count
      が、2 quotient (↥M⧸H₀ vs ↥H⧸N、H₀ vs N) の橋渡しが要 ⟹ assembly と同様 intricate。
      ⟹ `induce H (inflate χ̄) g = compHom f (induce (H.map f) χ̄) g`。inflation 既約保存
      (`compHom_of_surjective` + 逆) で reducibility 両向き。
+
+   **⚠⚠ 2026-06-29 知見 (cont.¹⁷): bijection assembly は当初 recipe より大きい sub-phase**:
+   - **target = `caseA_character_counts` (S11:3935) conjunct 1** = `{φ∈chars.SOf chief.H0|¬irr}.ncard = chief.p-1`
+     (caseB 版も同様)。**ただし caseA_character_counts は 4-conjunct の大定理** (他: degree formula
+     `φ 1 = q·u`、𝒮(H₀⊔C) irreducible 存在、𝒮(H₀⊔U') irreducible count) ⟹ (9.9.b) reducible count は
+     1 conjunct のみ。残 conjunct は別途 (degree=induceHU_apply_one+commute、irreducible count=certain-type)。
+   - **🛑 crux = induceHU の orbit 構造 (Pf (9.5)/(9.9) 行間、要careful read)**: induceHU は 𝒳 全体では
+     **単射でない** — HU=M'◁M ゆえ Mackey/Clifford で M/HU≅W₁ が Irr(HU) に作用、induction は W₁-orbit を潰す
+     (⟨Ind χ,Ind χ'⟩=Σ_{g∈M/HU}⟨χ,χ'^g⟩)。**但し reducible-inducing χ̄ は W̄₁-stable** (induce_K̄^L χ̄
+     reducible ⟺ χ̄ が W̄₁ で安定 ⟹ orbit size 1) ⟹ **reducible subset 上では induceHU 単射**、counts 一致
+     (|𝒮(H₀) reducible|=|{reducible χ̄}|=p-1)。⟹ 形式化要 = 「reducible⟹W̄₁-stable⟹induceHU InjOn」の
+     Clifford/Mackey argument (§6 stability 構造依存) + Pf (9.5)/(9.9) の正確な statement 確認
+     (Coq PFsection9.v 併読 or ChatGPT 相談が有効、[[feedback-ask-chatgpt-for-elided-gaps]])。
+     **upstream-first ゆえ次の着手 = この orbit/injectivity の正確な定式化**。現状 `induceHU_mem_ZIrr` のみ。
+   - **assembly 全 chain** (injectivity 後): `{φ∈sOf chief.H0|¬irr}` --(induceHU InjOn)--> `{χ∈xiOf|¬irr(induceHU χ)}`
+     --(inflate iso + huSub⧸N_huSub≅K̄ transport)--> `{χ̄∈Irr(K̄)|¬irr(induce K̄ χ̄)∧H̄⊄Ker χ̄}` --(§6 count)--> |W̄₂|-1
+     --(|W̄₂|=p)--> p-1。各 step に transport/instance friction。**実質 multi-iteration sub-phase**
+     (§6+B1+B2 crux の hard math は完了、残は intricate Lean glue + injectivity prereq)。
    - **reducibility 対応**: φ=Ind χ reducible (M-char) ⟺ Ind^L_K̄ χ̄ reducible (M/H₀-char) (inflation
      既約保存の両向き)。`{φ∈𝒮(H₀)|¬irr}` ↔ `{χ̄∈Irr(K̄)|¬irr(Ind χ̄)∧H̄⊄Ker}` の ncard bijection。
 4. **B3**: (a) **|W̄₂|=p** (`Nat.card ((W₂.subgroupOf M).map mk') = chief.p`、`|fixedByE|=p` の
