@@ -488,8 +488,8 @@ representatives of maximal subgroups.
 
 The field `ι` indexes the representatives `M_i`.  The prime-factor fields record
 the statement that `π(G)` is the disjoint union of the `π((M_i)_s)`, while
-`thickenedA1_card` records
-`|⋃_{x ∈ A_1(M_i)} (x R(x))^G| = (|(M_i)_s| - 1) |G : M_i|`. -/
+`cover_card` records the faithful BG cover cardinality
+`|𝒞_G(M̃_i)| = (|(M_i)_s| - 1) |G : M_i|`. -/
 structure BGTheoremECoverData (G : Type*) [Group G] where
   /-- Indexing type for the representative maximal subgroups. -/
   ι : Type*
@@ -497,6 +497,12 @@ structure BGTheoremECoverData (G : Type*) [Group G] where
   reps : ι → Subgroup G
   /-- The Peterfalvi type attached to `M_i`. -/
   tau : ι → PeterfalviType
+  /-- The faithful BG cover set `𝒞_G(M̃_i)` attached to `M_i`: the conjugacy-saturation of the
+  `σ`-decomposition support `M̃_i = ⋃_{x ∈ (M_i)_σ#} x R(x)` of BG Lemma 14.5.  Abstracted as a
+  bare `Set G` so the structure need not carry the `SigmaDecompositionData`/`Finite` data of `M̃`.
+  (This replaces the unfaithful `thickenedA1 (M_i) (M_i)`, whose `(M_i)_F`-based kernel disagrees
+  with the per-`x` signalizer `(N[x])_F` of Peterfalvi (8.14); see issue 8021.) -/
+  cover : ι → Set G
   /-- The representatives form a finite family. -/
   finite_index : Fintype ι
   /-- Every representative is maximal. -/
@@ -521,23 +527,30 @@ structure BGTheoremECoverData (G : Type*) [Group G] where
       Disjoint
         ((Nat.card ↥(mainSubgroup (reps i) (tau i))).primeFactors : Finset ℕ)
         ((Nat.card ↥(mainSubgroup (reps j) (tau j))).primeFactors : Finset ℕ)
-  /-- The cardinality formula for the thickened `A_1(M_i)` sets. -/
-  thickenedA1_card :
+  /-- **BG Lemma 14.5(c)**: the cardinality formula for the faithful cover `𝒞_G(M̃_i)`:
+  `|𝒞_G(M̃_i)| = (|(M_i)_s| - 1) |G : M_i|`. -/
+  cover_card :
     ∀ i : ι,
-      Nat.card ↥(thickenedA1 (reps i) (reps i) (tau i)) =
+      Nat.card ↥(cover i) =
         (Nat.card ↥(mainSubgroup (reps i) (tau i)) - 1) * (reps i).index
 
 /-- **Peterfalvi (8.17), case (8.8.a)**: when all maximal subgroups are type I,
 `G#` is the disjoint union of the thickened `A_1(M_i)` sets. -/
 structure BGTheoremETypeICovering (data : BGTheoremECoverData G) : Prop where
-  /-- The thickened `A_1(M_i)` sets cover all nonidentity elements of `G`. -/
+  /-- The cover sets `𝒞_G(M̃_i)` cover all nonidentity elements of `G`. -/
   cover_nonidentity :
     sharpSubgroup (⊤ : Subgroup G) =
-      ⋃ i : data.ι, thickenedA1 (data.reps i) (data.reps i) (data.tau i)
-  /-- The cover by thickened `A_1(M_i)` sets is disjoint. -/
+      ⋃ i : data.ι, data.cover i
+  /-- The cover by the `𝒞_G(M̃_i)` is disjoint. -/
   pairwise_disjoint_thickened :
-    (Set.univ : Set data.ι).PairwiseDisjoint fun i =>
-      thickenedA1 (data.reps i) (data.reps i) (data.tau i)
+    (Set.univ : Set data.ι).PairwiseDisjoint fun i => data.cover i
+  /-- **All-type-I refinement**: each cover set lands in the conjugates of the kernel sharp-set
+  `((M_i)_F)#`.  In the all-type-I case the signalizer `R(x)` is trivial, so
+  `M̃_i = (M_i)_σ# = (M_i)_F#` and the cover collapses onto the Frobenius kernels (BG Cor 14.9 /
+  the (8.8.a) dichotomy). -/
+  cover_subset_kernels :
+    ∀ i : data.ι,
+      data.cover i ⊆ conjClassSet ((maxNilpotentNormalHall (data.reps i) : Set G) \ {1})
 
 /-- **Peterfalvi (8.17), case (8.8.b)**: in the two-exceptional-subgroup case,
 `G#` is covered by the thickened `A_1(M_i)` sets together with the conjugates of
@@ -545,20 +558,18 @@ the exceptional `W#`. -/
 structure BGTheoremENonTypeICovering (data : BGTheoremECoverData G) where
   /-- The exceptional subgroup whose nonidentity conjugates supplement the cover. -/
   W : Subgroup G
-  /-- The thickened `A_1(M_i)` sets and the conjugates of `W#` cover `G#`. -/
+  /-- The cover sets `𝒞_G(M̃_i)` and the conjugates of `W#` cover `G#`. -/
   cover_nonidentity :
     sharpSubgroup (⊤ : Subgroup G) =
-      (⋃ i : data.ι, thickenedA1 (data.reps i) (data.reps i) (data.tau i)) ∪
+      (⋃ i : data.ι, data.cover i) ∪
         conjClassSet (sharpSubgroup W)
-  /-- The thickened `A_1(M_i)` part of the cover is disjoint. -/
+  /-- The `𝒞_G(M̃_i)` part of the cover is disjoint. -/
   pairwise_disjoint_thickened :
-    (Set.univ : Set data.ι).PairwiseDisjoint fun i =>
-      thickenedA1 (data.reps i) (data.reps i) (data.tau i)
-  /-- The exceptional part is disjoint from every thickened `A_1(M_i)`. -/
+    (Set.univ : Set data.ι).PairwiseDisjoint fun i => data.cover i
+  /-- The exceptional part is disjoint from every `𝒞_G(M̃_i)`. -/
   exceptional_disjoint_thickened :
     ∀ i : data.ι,
-      Disjoint (conjClassSet (sharpSubgroup W))
-        (thickenedA1 (data.reps i) (data.reps i) (data.tau i))
+      Disjoint (conjClassSet (sharpSubgroup W)) (data.cover i)
 
 /-- **Peterfalvi (8.17)**: BG Theorem E, repackaged as the Section 10 covering
 interface.
@@ -591,10 +602,13 @@ theorem bgTheoremE_cover_data [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
       OddOrder.BG.Ch4.S16.mainSubgroup_eq_Msigma hG (hrepsMax i.1 i.2) ht
     rw [h]
     exact OddOrder.BG.Ch4.S16.primeFactors_Msigma_eq_sigma hG (hrepsMax i.1 i.2) p
+  -- Canonical `σ`-decomposition data (the faithful cover `𝒞_G(M̃)` is independent of the choice).
+  let D := OddOrder.BG.Ch4.S14.genuineSigmaDecomposition hG
   refine ⟨{
     ι := ULift (Fin (Fintype.card (↥reps)))
     reps := fun j => (e.symm j.down).1
     tau := fun j => tau (e.symm j.down)
+    cover := fun j => conjClassSet (OddOrder.BG.Ch4.S14.Mtilde hG D (e.symm j.down).1)
     finite_index := inferInstance
     maximal := fun j => hrepsMax _ (e.symm j.down).2
     typed := fun j => htyped (e.symm j.down)
@@ -632,20 +646,19 @@ theorem bgTheoremE_cover_data [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
       rw [OddOrder.BG.Ch4.S16.sigma_reps_pairwise_disjoint hG hrepsMax hreps
         (e.symm j.down).2 (e.symm k.down).2 hne] at hpσ
       exact Set.notMem_empty p hpσ
-    thickenedA1_card := fun j => by
-      -- DEEP GATE (issue 8020) — **encoding faithfulness issue, /loop²⁰ finding**: this field uses
-      -- `thickenedA1 (reps j) (reps j) τ`, whose `supportKernel L M X x` (= `L_F ⊓ C_G(x)` for escaping
-      -- `x`) is here applied with `L = M = reps j`, i.e. `(reps j)_F ⊓ C_G(x)`.  But Peterfalvi (8.14)
-      -- / Coq `FTsignalizer M x = C_{(N[x])_F}(x)` uses the **per-`x` signalizer maximal `N[x]`**'s
-      -- Fitting, not `M`'s.  For `x ∈ M_σ#` escaping `M` (`C_G(x) ⊄ M`), `M_F ⊓ C_G(x) ⊆ M` differs
-      -- from `(N[x])_σ ⊓ C_G(x) ⊆ N[x]` (different maximals) — so `thickenedA1 (reps j)(reps j)` is
-      -- **not** BG's faithful `𝒞_G(M̃)`, and this cardinality is not `(|M_σ|−1)·[G:M]` as stated.
-      -- Resolution needs a def/field redesign to the per-`x` signalizer (`FTsignalizer`/`Rsub`); then
-      -- `(N[x])_F = (N[x])_σ` (`maxNilpotentNormalHall_eq_Msigma_of_isTypeF_or_isTypeP2`, signalizer
-      -- `N[x]` is type `F`/`P₂`) makes Pf `R(x) = Rsub(x)`, and `sigmaConjugacySaturation_Mtilde_ncard`
-      -- (14.5(c), DONE) + `mainSubgroup_eq_Msigma` close it.  Touches shared `GroupTheory` defs +
-      -- the `S14_MaximalI` consumer (S14_MaximalI:2365) → needs design coordination (hub).
-      sorry
+    cover_card := fun j => by
+      -- **BG Lemma 14.5(c)** for the faithful cover (issue 8021 resolution): the cover is
+      -- `𝒞_G(M̃)` with `M̃ = ⋃_{x ∈ M_σ#} x R(x)` the per-`x` signalizer support, whose cardinality
+      -- `sigmaConjugacySaturation_Mtilde_ncard` proves to be `(|M_σ| − 1)·[G:M]`.  The
+      -- `mainSubgroup`-stated RHS is rewritten to `M_σ` by `mainSubgroup_eq_Msigma` (Pf 8.10).
+      have hms : mainSubgroup (e.symm j.down).1 (tau (e.symm j.down))
+          = OddOrder.BG.Ch3.S10.Msigma (e.symm j.down).1 :=
+        OddOrder.BG.Ch4.S16.mainSubgroup_eq_Msigma hG (hrepsMax _ (e.symm j.down).2)
+          (htyped (e.symm j.down))
+      show Nat.card ↥(conjClassSet (OddOrder.BG.Ch4.S14.Mtilde hG D (e.symm j.down).1)) = _
+      rw [Nat.card_coe_set_eq,
+        OddOrder.BG.Ch4.S14.sigmaConjugacySaturation_Mtilde_ncard hG D
+          (hrepsMax _ (e.symm j.down).2), hms]
   }, ?_⟩
   -- DEEP GATE (issue 8020): the (8.8) covering dichotomy (BG Cor 14.9) decides Type-I vs non-Type-I.
   sorry

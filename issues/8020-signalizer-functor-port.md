@@ -566,3 +566,17 @@ AxiomsCheck 登録): signalizer N[x] は type F/P₂ ゆえ `(N[x])_F = (N[x])_�
 
 **残**: gate 1 = issue 8021 (encoding 修正、design 要)、gate 2 = covering 析取 (Cor 14.9)。prime partition
 (9/11 field) は実証済。次 = issue 8021 の design 検討 or gate 2 (Cor 14.9) 調査。
+
+## ✅✅ 進捗 (lane d, 2026-06-29 /loop²¹): **gate 1 (thickenedA1_card cardinality) 解消** — faithful cover wiring (hub/user 承認 Option B)
+
+issue 8021 の design を hub/ユーザーへ上げ **Option 1 (lane d が δ struct + lane-b consumer を 1 commit で実施)** 承認 →
+faithful cover への wiring 完遂 (S10 + S14_MaximalI、full build **3889 green / 63s**、所有例外 = hub 承認)。詳細 = issue 8021 RESOLVED。
+
+- **Option A (共有 `supportKernel`→`Rsub` 再定義) は import 不可で却下**: `Rsub` (BG/Ch4/S14) ← 共有 `GroupTheory/MaximalSubgroupType` (`supportKernel`) を import ⟹ 逆向き循環。
+- **採用 Option B**: `BGTheoremECoverData` に抽象 `cover : ι → Set G` field 追加、`thickenedA1_card`→**`cover_card`** に置換。witness で `cover i := conjClassSet (Mtilde hG (genuineSigmaDecomposition hG) (reps i))` (BG faithful cover)、`cover_card` を **`sigmaConjugacySaturation_Mtilde_ncard` (14.5c DONE) + `mainSubgroup_eq_Msigma` + `Nat.card_coe_set_eq`** で**実証 sorry-free**。
+- covering struct は `data.cover` に追従 + 新 field **`cover_subset_kernels`** (type-I の Frobenius kernel 包含、gate 2 sorry に bundle)。consumer `exists_typeICovering` (FT spine) の `two_le`/`covers` を追従。
+
+**∴ 14.5c の数学 (DONE) を `bgTheoremE_cover_data` まで配線完了 — cardinality field は honest 実証**。
+**残 frontier = gate 2 (covering disjunction `BGTheoremETypeICovering ∨ NonTypeICovering`, S10:664, sorry)** =
+BG Cor 14.9 / (8.8.a) dichotomy。`cover_nonidentity` (G# = ⋃ 𝒞_G(M̃_i)) + `cover_subset_kernels` (type-I で
+R(x)=1 ⟹ M̃=(M_i)_F#) + 各 disjointness。次の lane-d 上流 work。
