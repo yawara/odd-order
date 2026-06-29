@@ -28,6 +28,13 @@ namespace OddOrder.RepresentationTheory
 
 open Polynomial Module
 
+/-- `(1 - ε) ∣ (ε^k - 1)` in any commutative ring (the elementary divisibility behind (1.10.a)):
+`ε^k - 1 = (ε - 1)·∑_{i<k} ε^i = (1 - ε)·(-∑_{i<k} ε^i)`.  Applied with `ε` a `p`-th root of unity
+and `ε^k = α(x)` for a linear character `α` and an order-`p` element `x`. -/
+theorem one_sub_dvd_pow_sub_one {R : Type*} [CommRing R] (ε : R) (k : ℕ) :
+    (1 - ε) ∣ (ε ^ k - 1) :=
+  ⟨-(∑ i ∈ Finset.range k, ε ^ i), by rw [← geom_sum_mul ε k]; ring⟩
+
 /-- **Peterfalvi (1.10.b)** (abstract cyclotomic form): in a `p`-th cyclotomic field `L` over `ℚ`
 (`p` an odd prime), if an integer `n` is divisible by `ζ - 1` (`ζ` a primitive `p`-th root of
 unity) with an algebraic-integer quotient `a`, then `p ∣ n`.
