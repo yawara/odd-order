@@ -2064,6 +2064,73 @@ theorem chiefFactor_basic [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     have h2 : 2 ≤ p ^ data.q := le_trans hp.two_le (Nat.le_self_pow hq_ne p)
     omega
 
+/-- **Centralizer commutes with a coprime cyclic quotient** (general group theory): for `x : Γ` and
+`N ◁ Γ` with `gcd(|⟨x⟩|, |N|) = 1`, the centralizer of `x̄ = x N` in `Γ/N` is the image of the
+centralizer of `x` in `Γ`: `C_{Γ/N}(x̄) = (C_Γ(x)).map (mk' N)`.
+
+`⊇` is functoriality of `mk'`.  `⊆` lifts an `x̄`-centralizing element `g N` through the coprime
+action of `⟨x⟩` on `Γ` (conjugation): `g N ∈ C(x̄)` means every power of `x` fixes `g` modulo `N`,
+so Isaacs Cor 3.28 (`coprime_fixedPoints_quotient_of_coprime_normal`) produces a genuine
+`x`-centralizing representative `c ≡ g (mod N)`.  This is the engine of the Peterfalvi (8.4.d)
+`centralizer_W̄₂` computation (`Γ = ↥M`, `N = H₀`). -/
+theorem centralizer_map_mk'_eq_of_coprime_zpowers {Γ : Type*} [Group Γ] [Finite Γ]
+    {N : Subgroup Γ} [N.Normal] (x : Γ)
+    (hcop : Nat.Coprime (Nat.card ↥(Subgroup.zpowers x)) (Nat.card ↥N)) :
+    Subgroup.centralizer ({(QuotientGroup.mk' N x : Γ ⧸ N)} : Set (Γ ⧸ N))
+      = (Subgroup.centralizer ({x} : Set Γ)).map (QuotientGroup.mk' N) := by
+  classical
+  apply le_antisymm
+  · -- `⊆`: coprime lift of an `x̄`-centralizing element to an `x`-centralizing one
+    intro gbar hgbar
+    obtain ⟨g, rfl⟩ := QuotientGroup.mk'_surjective N gbar
+    set φ : ↥(Subgroup.zpowers x) →* MulAut Γ :=
+      (MulAut.conj (G := Γ)).comp (Subgroup.zpowers x).subtype with hφ
+    have hN_inv : OddOrder.Isaacs.Ch03.IsAInvariant φ N := by
+      rw [OddOrder.Isaacs.Ch03.isAInvariant_iff_smul_mem]
+      intro c n hn
+      show (MulAut.conj (c : Γ)) n ∈ N
+      rw [MulAut.conj_apply]
+      exact (inferInstance : N.Normal).conj_mem n hn (c : Γ)
+    haveI : IsCyclic ↥(Subgroup.zpowers x) := Subgroup.isCyclic_zpowers x
+    have hcomm : Commute (QuotientGroup.mk' N x) (QuotientGroup.mk' N g) :=
+      Subgroup.mem_centralizer_iff.mp hgbar _ (Set.mem_singleton _)
+    have hg_fix : ∀ c : ↥(Subgroup.zpowers x), ∃ n ∈ N, φ c g = g * n := by
+      intro c
+      refine ⟨g⁻¹ * φ c g, ?_, by group⟩
+      rw [← QuotientGroup.ker_mk' N, MonoidHom.mem_ker, map_mul, map_inv]
+      have hφc : φ c g = (c : Γ) * g * (c : Γ)⁻¹ := by simp [hφ, MulAut.conj_apply]
+      have hcc : Commute (QuotientGroup.mk' N (c : Γ)) (QuotientGroup.mk' N g) := by
+        obtain ⟨k, hk⟩ := (Subgroup.mem_zpowers_iff).mp c.2
+        rw [← hk, map_zpow]
+        exact hcomm.zpow_left k
+      rw [hφc, map_mul, map_mul, map_inv, hcc.eq]
+      group
+    obtain ⟨c, hc_fixed, n, hn, hc_eq⟩ :=
+      OddOrder.Isaacs.Ch04.coprime_fixedPoints_quotient_of_coprime_normal
+        hcop (Or.inl inferInstance) hN_inv hg_fix
+    rw [Subgroup.mem_map]
+    refine ⟨c, ?_, ?_⟩
+    · refine Subgroup.mem_centralizer_iff.mpr ?_
+      intro y hy
+      rw [Set.mem_singleton_iff] at hy
+      have hfix := hc_fixed ⟨x, Subgroup.mem_zpowers x⟩
+      rw [hφ] at hfix
+      simp only [MonoidHom.comp_apply, Subgroup.coe_subtype, MulAut.conj_apply] at hfix
+      -- `hfix : x * c * x⁻¹ = c`  ⟹  `x * c = c * x`
+      rw [hy]
+      exact mul_inv_eq_iff_eq_mul.mp hfix
+    · have hn1 : (QuotientGroup.mk' N) n = 1 := by
+        rw [QuotientGroup.mk'_apply]; exact (QuotientGroup.eq_one_iff n).mpr hn
+      rw [hc_eq, map_mul, hn1, mul_one]
+  · -- `⊇`: image of the centralizer centralizes `x̄`
+    rw [Subgroup.map_le_iff_le_comap]
+    intro c hc
+    rw [Subgroup.mem_comap, Subgroup.mem_centralizer_iff]
+    intro ybar hybar
+    rw [Set.mem_singleton_iff] at hybar; subst hybar
+    show QuotientGroup.mk' N x * QuotientGroup.mk' N c = QuotientGroup.mk' N c * QuotientGroup.mk' N x
+    rw [← map_mul, ← map_mul, Subgroup.mem_centralizer_iff.mp hc x (Set.mem_singleton _)]
+
 /-- **`H₀ ◁ M`** (the chief-factor kernel is `M`-normal): `H₀.subgroupOf M` is normal in `↥M`, so
 the quotient `↥M ⧸ H₀` — the ambient of Peterfalvi (8.4.d)'s certain-type group `L = M/H₀` — is a
 group.  Immediate from the `M`-normalization `H0_normalized_by_M` of (9.4) via

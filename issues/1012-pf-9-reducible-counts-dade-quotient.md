@@ -74,19 +74,17 @@ X/H₀ の文字と同一視」((1.6)) で商で作業。⟹ §9 reducible-count
        **⚠ type-II 注意 (S11:2032 faithfulness note)**: type II では `|W₂| > p` (W₂∩H₀≠⊥)、
        使うのは **image-order |W̄₂|=p** (typeP_chiefFactor_card)、**`|W₂|` ではない** (後者は
        type III/IV のみ p)。W̄₂ = image of W₂ = C_{H̄}(W₁), order p。
-     - **`centralizer_W2` (= (8.4.d) crux、残る唯一の hard field、~60-100行)**: `C_{↥M⧸H₀'}(x̄) ⊓ K̄ = W̄₂`
-       for x̄∈W̄₁^#。**3-step 分解**:
-       1. **`C_{↥M⧸H₀'}(x̄) = (C_{↥M}(x)).map mk'`** (coprime lift)。⊇ general。⊆ =
-          `coprime_fixedPoints_quotient` (Isaacs Cor 3.28、ForwardFromCh03:808): φ=⟨x⟩ conjugation on
-          ↥M (`MulAut.conj` restrict to `Subgroup.zpowers x`、`isCyclic_zpowers`)、N=H₀'、IsAInvariant
-          (x∈M normalizes H₀'∵H0_normalized_by_M)、coprime |⟨x⟩|∣|W₁| と |H₀'| (`chiefFactor_coprime_H0_W1`)。
-          ḡ∈C(x̄)⟹conj_x g≡g mod H₀'⟹lift c∈C_{↥M}(x)。setup pattern = FrobeniusActionTI:247-285。
-          **⚠ BG Lemma 1.14 `centralizer_comap_mk'_eq_centralizer_sup_of_pGroup_coprime` (S01:2413) は
-          T=p-group 限定で ⟨x⟩ (非素数冪可) に不適用** — coprime_fixedPoints_quotient 直接組立要。
+     - **`centralizer_W2` (= (8.4.d) crux)**: `C_{↥M⧸H₀'}(x̄) ⊓ K̄ = W̄₂` for x̄∈W̄₁^#。**3-step 分解**:
+       1. ✅ **DONE (2026-06-29)**: `C_{↥M⧸H₀'}(x̄) = (C_{↥M}(x)).map mk'` = **一般補題
+          `centralizer_map_mk'_eq_of_coprime_zpowers`** (S11、axiom-clean、reusable):
+          `C_{Γ/N}(x̄) = (C_Γ(x)).map mk'` for Coprime|⟨x⟩||N|。⊆ = `coprime_fixedPoints_quotient_of_coprime_normal`
+          (φ=MulAut.conj∘zpowers subtype, IsAInvariant ∵N normal, hg_fix ∵x̄,ḡ commute⟹power commute)。
+          **これが (8.4.d) の本質的 content** (BG Lem 1.14 は p-group 限定で ⟨x⟩ 不適用、直接組立した)。
        2. **`(C_{↥M}(x)).map mk' ⊓ K̄ = (C_{↥M}(x) ⊓ K).map mk'`** (`ker mk'=H₀'≤K=M'.subgroupOf M` ゆえ
-          image∩image=image∩、mathlib `Subgroup.map_inf_eq` 系 or 手動 ker≤K 論法)。
-       3. **`C_{↥M}(x) ⊓ (M'.subgroupOf M) = W₂.subgroupOf M`** (= `data.centralizer_W1` の subgroupOf 版:
-          `derivedInG M ⊓ centralizer{x} = W₂` を ↥M に subgroupOf transport)。⟹ = W̄₂。
+          image∩image=image∩; mathlib `Subgroup.map_inf_eq_map_inf_comap`/`map_inf` ker条件 系)。残。
+       3. **`C_{↥M}(x) ⊓ (M'.subgroupOf M) = W₂.subgroupOf M`** (= `data.centralizer_W1`
+          `derivedInG M ⊓ centralizer{x} = W₂` の ↥M subgroupOf transport)。残。
+       ⟹ 残 = step 2+3 (algebraic plumbing) + x̄→x lift 接続。crux 本質 (step 1) 完了。
      - `W_odd`: image of W₁⊔W₂ odd ← |G| odd。
    - **B1 def の home**: S12 (typePData_toS06Hypothesis 近傍) or 新 bridge leaf。`typePData_toS06Hypothesis`
      (S12:1062, L=M版) が subgroupOf-transport の template; B1 は mk'-image-transport 版。
