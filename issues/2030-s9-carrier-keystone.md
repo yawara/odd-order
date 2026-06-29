@@ -278,6 +278,34 @@ realized-inflation 形の nontrivial constituent θ (H₀⊆ker θ) を取り出
 correspondence** (inertia=HC からの誘導 + ψ linear extension) を要し、repo は `isIrreducibleCharacter_induce_of_inertia_eq`
 (inertia=H 特殊形) のみ所持 = 一般形 (誘導 from 一般 inertia + degree formula + extension) は新規構築要。次の大ピース。
 
+## 2026-06-29 lane a (α): (9.9.a) 第1文 COMPLETE — `u ∣ χ(1)` on `𝒳(H₀)` + 共有 helper 抽出
+
+`caseB_degree_qu` ((9.9.a) 第2文 `χ(1)=u` on `𝒳(H₀C')`) の chief-factor constituent 抽出 (旧
+obligation 1) を共有 helper に切り出し、(9.9.a) **第1文** `χ ∈ 𝒳(H₀) ⟹ u ∣ χ(1)` を実証明
+(両 sorry-free + axiom-clean [3 標準公理のみ]、full build 3886 green)。
+
+- **`caseB_exists_chiefFactorConstituent`** (S11、新 helper): case (b) で `χ∈𝒳`・`H₀⊆Ker χ` から
+  chief-factor constituent `θ₀` (inflation 形、`inertia_HU(θ₀)=HC`=`inertia_eq_hcInHu`、linear
+  `θ₀(1)=1`) を抽出。`caseB_degree_qu` を rewire (旧 obligation 1 をこの helper 呼び出しに置換、
+  ~70 行 → 5 行) + 新 divisibility が共有。型に `IrreducibleCharacter.LiesOver`/`inertia` を出すため
+  `hInHu` の `[Fintype]`/`[Invertible]` を binder 化 (`huSub` 側は body haveI、`unusedFintypeInType`
+  linter 準拠)。
+- **`caseB_xi_H0_degree_dvd_u`** (S11、(9.9.a) 第1文): `∀ χ∈𝒳(H₀), ∀ d:ℕ, χ(1)=d → u ∣ d`。Clifford
+  degree formula `χ(1)=⟨Res χ,θ₀⟩·[HU:HC]·θ₀(1)`
+  (`apply_one_eq_restrictionMultiplicity_mul_index_inertia`) + `[HU:HC]=u` (`index_hcInHu_…`) で
+  `χ(1)=e·u·θ₀(1)` (e=restriction mult を `restrictionMultiplicity_natCast` で ℕ 化、θ₀(1) も ℕ
+  degree)。**θ₀(1)=1 すら不要** — `e·θ₀(1)` が ℕ ゆえ `u ∣ χ(1)` 直接 (degree_qu の e=1 sandwich より弱く広い)。
+- ⟹ **(9.9.a) は両文とも形式化済** (第2文=`caseB_degree_qu`、第1文=新 `caseB_xi_H0_degree_dvd_u`)。
+
+**残 §9 (headline sorry) = (4.5)/(4.7) Dade reducible-count に gated** (真の上流 blocker、精密化):
+(9.8) `caseA_character_counts` / (9.9.b) `{φ∈𝒮(H₀)|¬irred}.ncard=p−1` + degree/membership /
+(9.9.c) exceptional / (9.10) は全て「𝒮(H₀) contains exactly p−1 reducible μ_j」を要し、これは
+§4 Dade (Pf (4.5)/(4.7)、S06 `CertainTypeHypothesis A L` でパラメタ化) を **L=M/H₀ の商**に適用する
+必要がある (Pf (8.4.d): Hypothesis (4.2) holds for L=M/H₀ and L=M/H₀C with `W₂` → `W̄₂`)。
+**この M/H₀ への (4.2)/(4.6) bridge は未構築** = §9 reducible-count の唯一の genuine multi-session
+blocker。S12 は §4 Dade を群 M に直接適用 (`dadeData` on A_0(M)) するのみで商版は無い。次の lane-a
+genuine target = この quotient-Dade bridge の構築。
+
 ## 完了条件
 
 (9.8)/(9.9)/(9.10) が genuine な carrier に対し sorry-free。これで (10.7)→(10.8)`hB` と (11.8) の
