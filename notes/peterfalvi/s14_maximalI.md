@@ -869,3 +869,31 @@ C: `1>‖ψ^{ρM}‖²+‖ψ^ρ‖²` ((7.3)+(8.17)) から `linarith` でノル
 始端 + 中間 (A/B/C→norm 結論の linarith) + 終端 を合成し、全 gated 事実を仮説に取って False を導く
 sorry-free skeleton (gated-endpoint-skeleton パターン全体)。⟹ (12.16) の論理構造を完全 materialize、
 残 sorry = §7/§8 ρ 機構の構成のみに局所化。
+
+### loop²⁹⁻³¹ — (12.16) 全 materialize 完了 + ungated 入力 discharge、真の gate = §7 ρ 機構 (未形式化)
+
+**(12.16) 完全 materialize** (loop²⁹): `counterexample_contradiction_of_facts` —
+始端 (`abs_psi_g_ge_e_sub_one`: (1.10)→|ψ(g)|≥e-1) + 中間 (`norm_conclusion_glue`: 3 ノルム下界
+A/B/C→ノルム結論) + 終端 (`counterexample_closing`) を合成、全 gated 事実を仮説化し False。sorry-free。
+
+**ungated 入力 discharge** (loop³⁰): `two_mul_le_succ_of_odd_dvd` ((12.12) e∣p+1+odd→2e≤p+1)、
+`four_le_of_dvd_sub_one` ((8.1.c) p∣[K:K']-1→[K:K']≥4)、`exists_witness_g` ((12.9) C_K(x)∖K' 抽出)。
+
+**🔑 真の gate = §7 ρ 機構 (04.9, 完全未形式化)** (loop³¹ 調査):
+`counterexample_contradiction` を閉じる残作業 = (12.16) engine の仮説のうち ρ 依存分の構成:
+- hA/hB/hC (ノルム下界) = (7.3)/(7.8.b)/(8.17) + ρ/ρM 構成。
+- h_const (12.14) ψ(xg)=ψ(x)、h_psix ψ(x)≡e、h_psig_int (12.15) ψ(g)∈ℤ = ρ + Dade 値理論。
+- group core: (12.12) e∣p+1 導出 (F_{p²}⋊E Schur + (12.11))、(8.1.c) fpf。
+
+**§7 ρ 機構の scope** (04.9 mmd (7.1)-(7.8)):
+- (7.1) Hyp: `χ^ρ(a) = (1/|H(a)|)Σ_{x∈H(a)} χ(ax)` (a∈A)、`A^τ = ⋃_a (aH(a))^G`。
+- (7.2): (a) `α^{τρ}=α` (α∈CF(L,A))。(b) `‖χ^ρ‖²≤‖χ‖²`、等号 ⟺ χ∈im τ。
+- (7.3): `(1/|G|)Σ_{g∈A^τ}|χ(g)|² ≥ ‖χ^ρ‖²`、等号 ⟺ χ が aH(a) 上定数 ⟹ **bound C/(7.8.b)** の源。
+- (7.5): 多 family 版 `‖χ‖²=1` 分解。
+- **基盤あり**: Dade infra (`dadeSupport`/`mem_dadeSupport_iff` (base-point+H(a) 構造)/`dadeIntegralCharacterMap`)。
+  ρ map 定義は H(a) を Dade hypothesis から抽出して averaging。**DadeNotation.rhoFormula/rhoMFormula は現状
+  opaque Prop placeholder** ⟹ ρ/ρM を実体化する必要。
+- **次イテレーション = §7 ρ map (7.1) の定義に着手** (Dade infra の H(a) 抽出 + averaging で `rho : CF(G)→CF(L)`)、
+  続いて (7.2.a) adjunction → (7.2.b)/(7.3) norm bound。これが (12.14)/(12.15)/hA-hC 全ての upstream。
+
+**(1.10) は完成済** (前 loop²³⁻²⁵、両半 FT-ready)。(12.16) は ρ 機構を残し論理構造完全。
