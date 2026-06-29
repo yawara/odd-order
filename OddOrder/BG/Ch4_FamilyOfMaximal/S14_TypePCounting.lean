@@ -4867,13 +4867,29 @@ theorem sigmaSharp_subset_Mtilde [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd
     sigmaSharp M ⊆ Mtilde hG D M :=
   fun g hg => ⟨g, hg, 1, Subgroup.one_mem _, (mul_one g).symm⟩
 
-/-- **BG Corollary 14.9, the cover (faithful form), `ℓ_σ = 1` half discharged**: every nonidentity
-`g` lies in some `𝒞_G(M̃)`.  When `ℓ_σ(g) = 1`, `g ∈ M_σ^# ⊆ M̃` for the maximal `M` with
-`g ∈ M_σ` (`sigmaSharp_subset_Mtilde`); the `ℓ_σ ≥ 2` case is the signalizer capture of BG
-Lemma 14.6 (`g = x x'` with `x' ∈ R(x)`), isolated as the remaining residual.  The cover uses the
-canonical `genuineSigmaDecomposition`, matching `bgTheoremE_cover_data`'s `cover` field. -/
+/-- **Signalizer branch ⟹ `M̃` membership** (the bridge from BG's `sigma_decomposition_dichotomy`
+first branch to the cover): if `x ∈ M_σ^#` and `x⁻¹ g ∈ R(x)`, then `g = x · (x⁻¹ g) ∈ x R(x) ⊆ M̃`.
+This is the coset-to-`M̃` step used to turn the dichotomy's signalizer branch into a cover. -/
+theorem mem_Mtilde_of_mem_coset [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (D : SigmaDecompositionData G) {M : Subgroup G} {x g : G}
+    (hx : x ∈ sigmaSharp M) (hg : x⁻¹ * g ∈ Rsub hG D x) :
+    g ∈ Mtilde hG D M :=
+  ⟨x, hx, x⁻¹ * g, hg, by group⟩
+
+/-- **BG Corollary 14.9, the type-I cover (faithful form), `ℓ_σ = 1` half discharged**: when every
+maximal subgroup is of type `F` (= Peterfalvi type I; equivalently `κ(M) = ∅`, so there is no
+exceptional/`κ` branch in `sigma_decomposition_dichotomy`), every nonidentity `g` lies in some
+`𝒞_G(M̃)`.  When `ℓ_σ(g) = 1`, `g ∈ M_σ^# ⊆ M̃` for the maximal `M` with `g ∈ M_σ`
+(`sigmaSharp_subset_Mtilde`); the `ℓ_σ ≥ 2` case is the signalizer branch of BG
+`sigma_decomposition_dichotomy` (Coq `BGsection14`:1189): under all-type-`F` the `κ` branch is empty,
+so `∃ x, ℓ_σ(x) = 1 ∧ x⁻¹ g ∈ R(x)`, giving `g ∈ M̃(M)` via `mem_Mtilde_of_mem_coset`.
+
+**Faithfulness note:** without the all-type-`F` hypothesis the statement is *false* — `κ`-branch
+elements lie in the exceptional `𝒞_G(Ẑ)` piece and in no `𝒞_G(M̃)` (the dichotomy is an XOR).  The
+cover uses the canonical `genuineSigmaDecomposition`, matching `bgTheoremE_cover_data`'s `cover`. -/
 theorem exists_mem_conjClassSet_Mtilde_of_ne_one [Finite G]
-    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {g : G} (hg : g ≠ 1) :
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hall : ∀ M ∈ maximalSubgroups G, IsTypeF M) {g : G} (hg : g ≠ 1) :
     ∃ M ∈ maximalSubgroups G,
       g ∈ conjClassSet (Mtilde hG (genuineSigmaDecomposition hG) M) := by
   set D := genuineSigmaDecomposition hG with hD
@@ -4884,10 +4900,11 @@ theorem exists_mem_conjClassSet_Mtilde_of_ne_one [Finite G]
     obtain ⟨-, M, hMmax, hgMsigma⟩ := (D.length_one_iff g).mp h1
     have hgsharp : g ∈ sigmaSharp M := ⟨hgMsigma, hg⟩
     exact ⟨M, hMmax, subset_conjClassSet (sigmaSharp_subset_Mtilde hG D hgsharp)⟩
-  · -- `ℓ_σ(g) ≥ 2`: BG Lemma 14.6 (signalizer capture) — `g = x x'` with `x ∈ M_σ^#`,
-    -- `x' ∈ R(x)^#`, so `g ∈ M̃(M)`.  This is the deep `ℓ_σ = 2` half of Cor 14.9 (issue 8020/8021
-    -- gate 2): it needs that the `σ(M)′`-cofactor of the length-one decomposition lands in the
-    -- signalizer `R(x) = (N[x])_σ ∩ C_G(x)`.
+  · -- `ℓ_σ(g) ≥ 2`: the signalizer branch of `sigma_decomposition_dichotomy` (Coq `BGsection14`:1189).
+    -- Under `hall` (all type-`F`, `κ(M) = ∅`) the dichotomy's `κ` branch is empty, so the signalizer
+    -- branch holds: `∃ x, ℓ_σ(x) = 1 ∧ x⁻¹ g ∈ R(x)`.  Then `mem_Mtilde_of_mem_coset` (with `x ∈ M_σ^#`
+    -- from `ℓ_σ(x) = 1`) gives `g ∈ M̃(M)`.  Deep residual: port `sigma_decomposition_dichotomy`
+    -- (needs `pi_of_cent_sigma`, not yet ported) + `κ(M) = ∅` for type-`F` (issue 8020 gate 2).
     sorry
 
 /-- **BG Lemma 14.5(b)** (mmd L3920), faithful `M̃` form: for nonconjugate maximal `M₁`, `M₂`,

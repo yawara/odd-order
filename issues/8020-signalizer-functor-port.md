@@ -596,3 +596,20 @@ gate 2 (`cover_nonidentity` = BG Cor 14.9 cover identity) を上流から engage
 **残 = (i) Lemma 14.6 (ℓ_σ=2 capture、deep): `exists_length_one_factor` の σ(M)'-cofactor が signalizer
 R(x)=(N[x])_σ∩C[x] に入ることを示す (σ-decomp が signalizer decomp と整合)。(ii) cover_nonidentity 組立
 (reps への conj 還元 + sharpSubgroup ⊤ = ⋃ 𝒞_G(M̃_i))。(iii) cover_subset_kernels (type-I R(x)=1)。次 = (i)。**
+
+## ⚠→✅ 進捗 (lane d, 2026-06-29 /loop²³): cover の deep core = `sigma_decomposition_dichotomy` 特定 + faithfulness 修正
+
+Coq `sigma_decomposition_dichotomy` (BGsection14:1189) を精査 — cover identity の真の core:
+**XOR**[ signalizer branch `∃x ℓ_σ(x)=1, x⁻¹g∈R(x)` ] ⊕ [ κ branch `∃y ℓ_σ(y)=1, ∃M∈M_σ[y], y⁻¹g∈C_M[y]# ∧ κ(M)-elt` ]。
+~80 行 intricate、deps = `FT_signalizer_context`(✅=`sigmaLength_one_centralizer_structure`)・`consttM`(✅=
+`piPart_mul_of_commute`)・`sigma_cover_decomposition`(✅)・**`pi_of_cent_sigma`(❌未ポート、centralizer の
+π 分類)**・κ/τ₂ 機構。⟹ cover の deep core = この dichotomy port (multi-session、`pi_of_cent_sigma` が次の上流)。
+
+**⚠ faithfulness 修正 (commit 次)**: /loop²² の `exists_mem_conjClassSet_Mtilde_of_ne_one` は **一般には偽**
+だった (issue 8021 と同種): dichotomy は XOR ゆえ κ-branch 元 (type-P) は signalizer branch に入らず、どの
+`𝒞_G(M̃)` にも属さない (zTilde piece へ)。⟹ `hall : ∀M, IsTypeF M` (全 type-F = κ-branch 空) を追加して**真に
+修正**。ℓ_σ=1 は無条件で実証、ℓ_σ≥2 を dichotomy signalizer branch (κ 空 ⟹ 成立) として isolate。
+genuine bridge **`mem_Mtilde_of_mem_coset`** (x∈M_σ#・x⁻¹g∈R(x) ⟹ g∈M̃) も追加 (dichotomy→cover の coset step)。
+
+**教訓**: cover を述べる前に Coq dichotomy の XOR 構造を読め (signalizer branch ≠ κ branch)。
+**次 = `pi_of_cent_sigma` の Lean port** (dichotomy の未ポート dep)。Coq BGsection12/14 で statement 精査要。
