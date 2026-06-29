@@ -448,3 +448,13 @@ orbit-stabilizer ([G:M] `ncard_conjugates_eq_index_of_normalizer_eq_self` S14:47
 refactor (card_LF を partition-only 化、lane c 協調; card_LF は primeFactors_disjoint のみ使用、partition core
 は既 proven)**。hub/user 判断推奨: (A) 長い genuine 上流 vs (B) 最短 spine unblock。CLAUDE.md は genuine 上流
 非 deprioritize を説くので (A) が default だが、(B) は lane c 協調で大幅短縮可。
+
+## ✅ HUB 裁定 (2026-06-29, ユーザー判断): (A) genuine 上流を完遂
+
+(A)/(B) の判断を hub からユーザーへ上げ、**(A) = BG Theorem E cardinality assembly を lane d 単独で完遂**に決定。
+理由: CLAUDE.md の「genuine 上流を deprioritize しない / 最短 spine unblock を進捗指標にしない」方針通り。
+本物の BG Theorem E content (cover identity M̃^G=⋃x·R(x) + trivIset[14.5a] + double-count[exchange_big] +
+orbit[|M^G|=[G:M]]) を `bgTheoremE_cover_data` まで積み上げる。formulation は選択肢 (a)/(b)/(c) のうち lane d
+裁量 (R を structure-derived にする: theoremE hyp 強化 or 内部 obtain or 14.5c 切り出し)。**(B) の cross-lane
+refactor (card_LF partition-only 化) は採らない** — spine unblock の最短化は目的でない。lane d は (A) を淡々と
+上流から埋める。
