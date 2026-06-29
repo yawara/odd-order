@@ -2303,6 +2303,30 @@ theorem chiefFactor_W2_not_le_H0 [Finite G] {M : Subgroup G}
   obtain ⟨n, hn, hnc⟩ := hcG_H0
   exact hcN (data.typeP.H.subtype_injective hnc ▸ hn)
 
+/-- **Induction-inflation commute, term level** (general): for `f : Γ →* Q` with `ker f ≤ H`, the
+induced-character term of the inflated `compHom (f.subgroupMap H) χ̄` at `(x, g)` equals the
+induced-character term of `χ̄` on `H.map f` at `(f x, f g)`.  The conjugate `x⁻¹gx ∈ H` iff
+`f(x⁻¹gx) = (fx)⁻¹(fg)(fx) ∈ H.map f` (`comap_map_eq_self`, `ker f ≤ H`), and the values agree
+(`χ̄⟨f(x⁻¹gx)⟩`).  Term level of the (8.4.d) induction-inflation commute (issue 1012, B2). -/
+theorem induceTerm_compHom_subgroupMap {Γ Q : Type*} [Group Γ] [Group Q]
+    (f : Γ →* Q) {H : Subgroup Γ} (hker : f.ker ≤ H)
+    (χbar : ClassFunction ↥(H.map f) ℂ) (x g : Γ) :
+    ClassFunction.induceTerm H (ClassFunction.compHom (f.subgroupMap H) χbar) x g
+      = ClassFunction.induceTerm (H.map f) χbar (f x) (f g) := by
+  have hmem : (f x)⁻¹ * (f g) * (f x) ∈ H.map f ↔ x⁻¹ * g * x ∈ H := by
+    rw [← map_inv, ← map_mul, ← map_mul, ← Subgroup.mem_comap, Subgroup.comap_map_eq_self hker]
+  by_cases hx : x⁻¹ * g * x ∈ H
+  · rw [ClassFunction.induceTerm_of_mem _ hx, ClassFunction.induceTerm_of_mem _ (hmem.mpr hx),
+      ClassFunction.compHom_apply]
+    have heq : (f.subgroupMap H) ⟨x⁻¹ * g * x, hx⟩
+        = (⟨(f x)⁻¹ * (f g) * (f x), hmem.mpr hx⟩ : ↥(H.map f)) := by
+      apply Subtype.ext
+      change f (x⁻¹ * g * x) = (f x)⁻¹ * (f g) * (f x)
+      rw [map_mul, map_mul, map_inv]
+    rw [heq]
+  · rw [ClassFunction.induceTerm_of_not_mem _ hx,
+      ClassFunction.induceTerm_of_not_mem _ (fun h => hx (hmem.mp h))]
+
 open OddOrder.Peterfalvi.S06 in
 /-- **Peterfalvi (8.4.d): Hypothesis (4.2) holds for `L = M/H₀`.**  The certain-type structural
 hypothesis `S06.Hypothesis (↥M ⧸ H₀)` with `K = M'/H₀`, `W̄₁ = W₁ H₀/H₀`, `W̄₂ = W₂ H₀/H₀`.  Built

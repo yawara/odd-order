@@ -108,10 +108,10 @@ X/H₀ の文字と同一視」((1.6)) で商で作業。⟹ §9 reducible-count
    - **induction-inflation commute** (B2 crux、新規 general lemma、~100行): `Ind_H^G (compHom (f.subgroupMap H) χ̄)
      = compHom f (Ind_{H.map f} χ̄)` for `f:G→*Q surj`, `ker f≤H`, χ̄∈ClassFunction ↥(H.map f)。
      **proof 完全 mapped (2026-06-29、build は fresh-context 反復で)**:
-     1. **term equality**: `induceTerm H (compHom (f.subgroupMap H) χ̄) x g = induceTerm (H.map f) χ̄ (f x) (f g)`。
-        induceTerm = `if x⁻¹gx∈H then θ⟨x⁻¹gx⟩ else 0`。条件同値 `x⁻¹gx∈H ⟺ f(x⁻¹gx)∈H.map f` =
-        **`Subgroup.comap_map_eq_self (ker f≤H)`** + mem_comap (mathlib 既存、ker≤H が key); 値 =
-        `χ̄⟨f(x⁻¹gx)⟩` 一致 ((fx)⁻¹(fg)(fx)=f(x⁻¹gx))。
+     1. ✅ **DONE (2026-06-29)**: term equality = **`induceTerm_compHom_subgroupMap`** (S11、axiom-clean、
+        general): `induceTerm H (compHom (f.subgroupMap H) χ̄) x g = induceTerm (H.map f) χ̄ (f x) (f g)`
+        for `ker f≤H`。条件同値 = `Subgroup.comap_map_eq_self hker` + mem_comap; 値一致 = subgroupMap
+        coe defeq `f(x⁻¹gx)` + map_mul/map_inv。
      2. **fiberwise sum**: `Σ_{x∈G} induceTerm H (...) x g = Σ_{x∈G} induceTerm (H.map f) χ̄ (f x) (fg)`
         (term eq) `= |N|·Σ_{x̄∈Q} induceTerm (H.map f) χ̄ x̄ (fg)` (term は f x のみ依存 ⟹ fiberwise、
         各 fiber size=|N| = `QuotientGroup.card_preimage_mk`)。Finset.sum_fiberwise 系。
