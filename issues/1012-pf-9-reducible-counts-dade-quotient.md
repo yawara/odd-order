@@ -209,11 +209,23 @@ X/H₀ の文字と同一視」((1.6)) で商で作業。⟹ §9 reducible-count
    で =inflate χ̄ ⟹ `compHom_injective` で ψ=χ̄。⟹ commute (induceHU(inflate χ̄)=compHom(mk')(induce K̄ χ̄))
    と合わせ **φ=induceHU(inflate χ̄) reducible ⟺ induce K̄ χ̄ reducible** (reducibility 対応完成)。
    残 assembly = §9 W₁-stability (単射適用) + inflate iso (xiOf↔Irr(K̄)) + inline commute + |W̄₂|=p + ncard。
-4. **B3**: (a) **|W̄₂|=p** (`Nat.card ((W₂.subgroupOf M).map mk') = chief.p`、`|fixedByE|=p` の
-   W̄₂↔fixedByE iso、M/H₀↔H̄ identification 経由、~30-50行); (b) H=H̄ = (data.H.subgroupOf M).map mk'
-   (≤K̄) で `card_reducible_Hnontrivial_induce_eq_W2_sub_one (chiefFactorQuotientHypothesis chief)`
-   instantiate; (c) B2 bijection で `{φ∈𝒮(H₀)|¬irr}.ncard = §6 count = |W̄₂|-1 = p-1` → (9.9.b) discharge。
+4. **B3**: (a) ✅✅ **|W̄₂|=p DONE (2026-06-30, commit 218e9226)**: **`chiefFactor_card_W2bar`** (S11、
+   axiom-clean): `Nat.card ((W₂.subgroupOf M).map(mk' H₀')) = chief.p`。**明示 cross-quotient iso 不要** —
+   W̄₂ と商 fixedByE=F.map(mk' N) を共に `|F|/|F⊓ker|` 形に分解 (`nat_card_quotient_subgroupOf_eq_card_map`
+   + `card_eq_card_quotient_mul_card_subgroup`)、injective H.subtype で kernel 位数一致
+   (|J₁|=|N⊓F|=|W₂⊓H₀|) + |F|=|W₂| ⟹ |W̄₂|=|fixedByE|=p。**type II 注意は解決** (|W₂|>p でも image は p)。
+   (b) H=H̄ = (data.H.subgroupOf M).map mk' (≤K̄) で `card_reducible_Hnontrivial_induce_eq_W2_sub_one
+   (chiefFactorQuotientHypothesis chief)` instantiate (= |W̄₂|-1 = p-1); (c) B2 bijection で
+   `{φ∈𝒮(H₀)|¬irr}.ncard = §6 count = p-1` → (9.9.b) discharge。
 5. (9.10) de-opacify + exceptional 構造。
+
+> **状況 (2026-06-30 更新)**: §6 count + B1 (商 Hypothesis) + B2 crux (commute) + injectivity
+> (`induce_injective_of_inertia_stable`) + reducibility correspondence (`isIrreducibleCharacter_compHom_mk'_iff`)
+> + **B3a (|W̄₂|=p, `chiefFactor_card_W2bar`)** = 完成 (全 axiom-clean)。残 = **B2 inflation-bijection
+> assembly** (W₁-stability で induceHU InjOn + inflate iso xiOf↔Irr(K̄) + commute inline + |W̄₂|=p で
+> ncard chain → p-1) + B3b/c instantiate。bijection assembly は依然 intricate multi-iteration (§9 carrier
+> 同定 + instance 管理) だが、構成要素は全て landed — 残は glue。次着手 = **W₁-stability**
+> (reducible-inducing χ∈xiOf ⟹ W₁⊆I_M(χ)、`induce_injective_of_inertia_stable` を適用するため)。
 
 > **状況 (2026-06-29)**: §6 side + (8.4.d) bridge B1 (structural Hypothesis(M/H₀)) 完成 (全 axiom-clean)。
 > 残 = B2 (inflation character bridge、最難所 = induction-inflation commute lemma) + B3 (|W̄₂|=p +

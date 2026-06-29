@@ -2324,6 +2324,109 @@ theorem chiefFactor_W2_not_le_H0 [Finite G] {M : Subgroup G}
   obtain ⟨n, hn, hnc⟩ := hcG_H0
   exact hcN (data.typeP.H.subtype_injective hnc ▸ hn)
 
+/-- **Peterfalvi (9.9.b), `|W̄₂| = p`**: the image `W̄₂ = (W₂.subgroupOf M).map(mk' H₀')` of the
+cyclic factor `W₂` in the chief-factor quotient `↥M ⧸ H₀` has order `p` — the quotient chief-factor
+centralizer order `|C_{H̄}(W₁)| = p` (`coprimeFrobeniusChiefFactor_card`), *not* `|W₂|` (which can
+exceed `p` in type II).
+
+The bridge is a card identity avoiding the explicit cross-quotient iso: both `W̄₂` and the quotient
+`fixedByE = F.map(mk' N)` (`F = C_H(W₁)` the `W₁`-fixed points in `↥H`) are quotients
+`|F|/|F ⊓ kernel|`.  Via the injective `H.subtype` (`F ↦ W₂`, `N ↦ H₀`), the kernels match
+(`|F ⊓ N| = |W₂ ⊓ H₀| = |J₁|`), and `|F| = |W₂|`, so `|W̄₂| = |F|/|F⊓N| = |fixedByE| = p`.  This
+gives the `p-1` reducible count once `card_reducible_Hnontrivial_induce_eq_W2_sub_one` is
+instantiated on `chiefFactorQuotientHypothesis` (issue 1012, B3). -/
+theorem chiefFactor_card_W2bar [Finite G] {M : Subgroup G}
+    {data : TypesIIIIIIVSetup M} (chief : ChiefFactorData data)
+    [(chief.H0.subgroupOf M).Normal] :
+    Nat.card ↥((data.W2.subgroupOf M).map (QuotientGroup.mk' (chief.H0.subgroupOf M)))
+      = chief.p := by
+  haveI := chief.N_normal
+  have hU : data.typeP.U ≠ ⊥ := data.nontrivial.1
+  -- The quotient chief-factor action and `|fixedByE| = p`.
+  have hHbar : Nat.card (↥data.typeP.H ⧸ chief.N) ≠ 1 := by
+    rw [chiefFactor_quotient_card chief]
+    exact (Nat.one_lt_pow (Nat.card_pos (α := ↥data.typeP.W1)).ne' chief.p_prime.one_lt).ne'
+  have hUnorm : ((typeP_quotientCoprimeAction data.typeP hU chief.N_aInvariant).U).Normal :=
+    (typeP_uW1_frobenius data.typeP hU).isNormal
+  have hEcyc := typeP_quotient_fixedByE_cyclic data.typeP hU chief.N_aInvariant
+  have hcard := coprimeFrobeniusChiefFactor_card
+    (typeP_quotientCoprimeAction data.typeP hU chief.N_aInvariant) hUnorm chief.p_prime
+    chief.quotient_elementaryAbelian chief.quotient_chiefFactor chief.U_noncentral_on_quotient
+    hEcyc hHbar
+  have hcopHW1 : Nat.Coprime
+      (Nat.card ↥(data.typeP.W1.subgroupOf (data.typeP.U ⊔ data.typeP.W1))) (Nat.card ↥data.typeP.H) :=
+    (typeP_coprime_H_uW1 data.typeP hU).symm.coprime_dvd_left (Subgroup.card_subgroup_dvd_card _)
+  haveI : IsSolvable ↥data.typeP.H := (typeP_coprimeAction data.typeP hU).H_solvable
+  -- `F = C_H(W₁)`, with `F.map(mk' N) = fixedByE` and `F.map H.subtype = W₂`.
+  set F := fixedSubgroup (typeP_conjAction data.typeP)
+    (data.typeP.W1.subgroupOf (data.typeP.U ⊔ data.typeP.W1)) with hF
+  have hmap : F.map (QuotientGroup.mk' chief.N)
+      = (typeP_quotientCoprimeAction data.typeP hU chief.N_aInvariant).fixedByE :=
+    map_fixedSubgroup_eq_fixedSubgroup_quotient chief.N_aInvariant hcopHW1 (Or.inr inferInstance)
+  have hCHW1 : F.map data.typeP.H.subtype = data.typeP.W2 := by
+    rw [hF, typeP_fixedSubgroup_map data.typeP le_sup_right, typeP_H_inf_centralizer_W1]
+  -- `W₂ ≤ M` (via `W₂ ≤ H ≤ M' ≤ M`).
+  have hW2M : data.typeP.W2 ≤ M := ((data.typeP.W2_le.trans inf_le_left).trans
+    data.typeP.H_le).trans (Subgroup.map_subtype_le _)
+  -- `|A.subgroupOf B| = |A ⊓ B|` (image under the injective `B.subtype`).
+  have hcardSubOf : ∀ {K : Type u_1} [inst : Group K] (A B : Subgroup K),
+      Nat.card ↥(A.subgroupOf B) = Nat.card ↥(A ⊓ B) := by
+    intro K _ A B
+    rw [← Subgroup.subgroupOf_map_subtype A B]
+    exact Nat.card_congr (Subgroup.equivMapOfInjective (A.subgroupOf B) B.subtype
+      (Subgroup.subtype_injective B)).toEquiv
+  -- `|F| = |W₂|` (`H.subtype` injective) and `|fixedByE| = p`.
+  have hcardF_W2 : Nat.card ↥F = Nat.card ↥data.typeP.W2 := by
+    rw [← hCHW1]
+    exact Nat.card_congr (Subgroup.equivMapOfInjective F data.typeP.H.subtype
+      data.typeP.H.subtype_injective).toEquiv
+  have hfixp : Nat.card ↥(typeP_quotientCoprimeAction data.typeP hU chief.N_aInvariant).fixedByE
+      = chief.p := hcard.2
+  -- `|F| = |fixedByE| · |N ⊓ F|` (first iso for `mk' N` restricted to `F`).
+  have hFsplit : Nat.card ↥F
+      = Nat.card ↥(typeP_quotientCoprimeAction data.typeP hU chief.N_aInvariant).fixedByE
+        * Nat.card ↥(chief.N.subgroupOf F) := by
+    rw [← hmap, ← Subgroup.nat_card_quotient_subgroupOf_eq_card_map]
+    exact Subgroup.card_eq_card_quotient_mul_card_subgroup _
+  -- `|W₂.subgroupOf M| = |W̄₂| · |J₁|` (first iso for `mk' H₀'` restricted to `W₂.subgroupOf M`).
+  set J₁ := (chief.H0.subgroupOf M).subgroupOf (data.typeP.W2.subgroupOf M) with hJ₁
+  have hW2split : Nat.card ↥(data.typeP.W2.subgroupOf M)
+      = Nat.card ↥((data.typeP.W2.subgroupOf M).map (QuotientGroup.mk' (chief.H0.subgroupOf M)))
+        * Nat.card ↥J₁ := by
+    rw [← Subgroup.nat_card_quotient_subgroupOf_eq_card_map]
+    exact Subgroup.card_eq_card_quotient_mul_card_subgroup _
+  have hcardW2M : Nat.card ↥(data.typeP.W2.subgroupOf M) = Nat.card ↥data.typeP.W2 :=
+    Nat.card_congr (Subgroup.subgroupOfEquivOfLe hW2M).toEquiv
+  -- The two kernels have equal order: `|J₁| = |N ⊓ F| = |W₂ ⊓ H₀|`.
+  have hker : Nat.card ↥J₁ = Nat.card ↥(chief.N.subgroupOf F) := by
+    -- `|J₁| = |(H₀.subgroupOf M) ⊓ (W₂.subgroupOf M)| = |(H₀ ⊓ W₂).subgroupOf M| = |H₀ ⊓ W₂|`.
+    have hinf : (chief.H0.subgroupOf M) ⊓ (data.typeP.W2.subgroupOf M)
+        = (chief.H0 ⊓ data.typeP.W2).subgroupOf M :=
+      (Subgroup.comap_inf chief.H0 data.typeP.W2 M.subtype).symm
+    have h1 : Nat.card ↥J₁ = Nat.card ↥(chief.H0 ⊓ data.typeP.W2 : Subgroup G) := by
+      rw [hJ₁, hcardSubOf, hinf, hcardSubOf, inf_of_le_left (inf_le_right.trans hW2M)]
+    -- `|N.subgroupOf F| = |N ⊓ F| = |(N ⊓ F).map H.subtype| = |H₀ ⊓ W₂|`.
+    have h2 : Nat.card ↥(chief.N.subgroupOf F)
+        = Nat.card ↥(chief.H0 ⊓ data.typeP.W2 : Subgroup G) := by
+      rw [hcardSubOf]
+      have hmapinf : (chief.N ⊓ F).map data.typeP.H.subtype
+          = (chief.H0 ⊓ data.typeP.W2 : Subgroup G) := by
+        rw [Subgroup.map_inf_eq chief.N F data.typeP.H.subtype data.typeP.H.subtype_injective,
+          hCHW1, ← chief.H0_eq]
+      rw [← hmapinf]
+      exact Nat.card_congr (Subgroup.equivMapOfInjective _ data.typeP.H.subtype
+        data.typeP.H.subtype_injective).toEquiv
+    rw [h1, h2]
+  -- Combine: `|W̄₂| · |J₁| = |W₂| = |F| = |fixedByE| · |J₁|`, cancel.
+  have hposJ : 0 < Nat.card ↥J₁ := Nat.card_pos
+  have hchain : Nat.card ↥((data.typeP.W2.subgroupOf M).map
+        (QuotientGroup.mk' (chief.H0.subgroupOf M))) * Nat.card ↥J₁
+      = chief.p * Nat.card ↥J₁ := by
+    rw [← hW2split, hcardW2M, ← hcardF_W2, hFsplit, hfixp, hker]
+  show Nat.card ↥((data.typeP.W2.subgroupOf M).map (QuotientGroup.mk' (chief.H0.subgroupOf M)))
+    = chief.p
+  exact Nat.eq_of_mul_eq_mul_right hposJ hchain
+
 /-- **Induction-inflation commute, term level** (general): for `f : Γ →* Q` with `ker f ≤ H`, the
 induced-character term of the inflated `compHom (f.subgroupMap H) χ̄` at `(x, g)` equals the
 induced-character term of `χ̄` on `H.map f` at `(f x, f g)`.  The conjugate `x⁻¹gx ∈ H` iff
