@@ -636,3 +636,28 @@ lane-a がこれを担うのは FT 経路・上流優先で妥当だが quick wi
 
 **次手 (concrete)**: (8.4.d) Hypothesis(4.6)-for-M/H₀ 構成 (S10、lane-a scope、上流優先の entry point)。
 S10:445-595 の既存 specialization を土台に。
+
+### §12 追補⁹ (lane-a /loop): 「(4.5)/(4.7) 未完」評価は STALE — §6 reducible-count を完結
+
+追補⁷⁸ の「§6 Theorem (4.5)/(4.7) の reducible-count 定理は citeable な形で未完」は **STALE だった**
+([[verify-port-state-by-number-not-coq-name]] / [[grep-sorry-docstring-contamination]] 系)。実コード
+を grep/Read で検証した結果:
+
+- **(4.5)(a),(b) の Clifford 分類は 2026-06-11 に完成済** (`S06_CertainTypeClifford.lean`、commit
+  `1091b8f7`〜`a1679621`): `exists_eq_certainType_or_induce` = 「Irr(L) = {μ_{ij}} ∪ {Ind^L_K χ}」
+  (χ∉{χ_j})、支持補題 `card_fixed_irr_le_W2` (Brauer count ≤ w₂) / `inertia_eq_K_of_forall_chiRestrict_ne`
+  (I_L(χ)=K) / `chiRestrict_injective` / `card_charGroup_W2` (|Ŵ₂|=w₂) すべて axiom-clean。
+  追補⁷⁸ は (4.5.b) 完成後に書かれたのに「未完」と誤評価していた。
+- **不在だったのは reducible-COUNT corollary のみ** (分類の上の数え上げ)。これを本セッションで実証明・追加
+  (`S06_CertainTypeClifford.lean`、全 axiom-clean [3 標準公理]、leaf build green):
+  - `induce_chiRestrict_not_isIrreducible`: `Ind^L_K χ_j = μ_j = ∑_i μ_{ij}` は reducible (w₁≥2 個の相異
+    既約の和; 既約と仮定すると μ_{0j}/μ_{1j} 両方に等しくなり矛盾)。
+  - `induce_not_isIrreducible_iff`: χ∈Irr(K) で `Ind^L_K χ` reducible ⟺ χ=χ_j (∃χ₂, chiRestrict χ₂=χ)。
+  - **`card_reducible_induce_eq_W2`**: `|{χ∈Irr(K) | Ind^L_K χ reducible}| = w₂` (= 相異 χ_j の数
+    = |Ŵ₂|)。`chiRestrict` の bijection で。
+
+**⟹ §9 reducible counts の残ゲートは純粋に (8.4.d) bridge のみ**: 「(4.5)/(4.7) 未完だから gated」は
+誤りで、§6 count は **citeable** (`card_reducible_induce_eq_W2`)。残るのは「§9 の `chars.SOf chief.H0`
+(HU から M への induced family) を L=M/H₀ の §6 induction-family と同一視する (8.4.d) 商 bridge」。
+w₂=p で count は p、H̄-nontriviality で j=0 column を除いて **p-1** = (9.9.b) の主張。**次手は変わらず
+(8.4.d) bridge** だが、ゲートが 2 つ (§6 count + bridge) から 1 つ (bridge) に縮小し、§6 count は完了。

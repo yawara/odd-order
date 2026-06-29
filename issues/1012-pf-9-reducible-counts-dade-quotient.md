@@ -19,15 +19,18 @@ created: 2026-06-29
 - [ ] `exceptional_case_frobenius_realization` (9.10): conjunct 1 = opaque field
       `quotientSemidirectFrobenius` de-opacify + exceptional u + HU Frobenius。
 
-## ゲート分析 (原文 04.11 精読、確定)
+## ゲート分析 (原文 04.11 精読、確定) — 2026-06-29 更新: §6 count は完了
 
 (9.9.b) 証明 = 「By (4.7) and Theorem (4.5), 𝒮(H₀)/𝒮(H₀C) contain exactly p-1 reducible μ_j」。
 - **Theorem (4.5)/(4.7)** = 書籍 §6 (mmd 04.6 "Dade Isometry for Certain Type of Subgroup")。
   (4.5): Hypothesis (4.2) 下 μ_j=∑_{0≤i<w₁}μ_{ij} (0≤j<w₂); reducible count = w₂-1 = p-1 (w₂=p)。
-  repo S06 に `Hypothesis46`/`CertainTypeHypothesis`/omegaProdChar 機構あり、**count 定理 (4.5)/(4.7) は
-  citeable な形で未完**。
+  ✅ **2026-06-29 完了**: (4.5)(a),(b) 分類は 2026-06-11 既完成 (`exists_eq_certainType_or_induce`)。
+  上の reducible-COUNT corollary を本 lane-a セッションで追加 (全 axiom-clean):
+  `S06_CertainTypeClifford.lean` の `induce_chiRestrict_not_isIrreducible` /
+  `induce_not_isIrreducible_iff` / **`card_reducible_induce_eq_W2`** (`|{χ∈Irr(K)|Ind^L_K χ reducible}|
+  = w₂`)。⟹ **§6 count は citeable**。旧「未完」評価は stale だった ([[verify-port-state-by-number-not-coq-name]])。
 - **(8.4.d)** = Hypothesis (4.6)/(4.2) for L = **M/H₀** (商群)。S10 `DadeSupportHypothesisData` は §4 部分のみ、
-  「Hypothesis (4.6)/(5.2) char-family は TODO」明記 (S10:451)。
+  「Hypothesis (4.6)/(5.2) char-family は TODO」明記 (S10:451)。**← 残る唯一のゲート**。
 
 ## 真の難所 = quotient Dade framework
 
