@@ -15,6 +15,35 @@
 > 実際には「上流 sorried を cite する」「genuine な arithmetic core を抽出する」だけで closable work は在る。
 > 技術的な carrier 診断 (U/W₂ reconciliation の所在) は今も有効な参照。
 
+### ✅ cont. (2026-06-29 lane c=γ): (13.10) 算術核 `analytic_inequality_arith` 着地 + issue 3002 cross-lane 性確定
+
+**(13.10) arithmetic core を sorry-free reusable lemma として抽出** (`S15_SAndT_Setup.lean`,
+full build 3886 green/58.6s, AxiomsCheck OK):
+
+- **`analytic_inequality_arith`** (sorry-free): 原文 (13.10, 04.15 pp.85-86) の導出を忠実に Lean 化。
+  **grid 依存の character content を concrete な norm-sum 仮説に完全隔離**し、純算術で結論
+  `u/c > m·p^(q-1)/q` を出す。abstract atoms = `gi=1/|G|`, `slam=(1/|G|)Σ_{G₀}|λ^{τ₁}|²`,
+  `seta=(1/|G|)Σ_{G₀}|η₁₀|²`, `g0=|G₀|/|G|`, `LS=λ(1)²/|S|`, `HS=|H#|/|S|`, `TT=(|T'|−v²)/|T|`,
+  `QT=|Q#|/|T|`。仮説 = (13.10.1)/(13.10.2)/(13.10.3) + (13.9.b) `g0≤slam+seta` + counting 恒等式
+  (`hLS`/`hTT`/`hQT`/`hm`)。**Stage A** (`linarith`): h1+h2−h3+h139b+gi>0 ⟹ `LS > TT−QT`。
+  **Stage B**: counting で `TT−QT = m/p`、`q/p^q>0` を factor out して `uq/(cp^q) > m/p` を
+  `u/c > m·p^(q-1)/q` に。これは **§15 cascade の最終出力**で FT に直結 (→ (13.11-15) numeric q=3
+  → §16 型決定 → AppC 矛盾)。**grid carrier 着地時 (issue 3002) に wrapper `analytic_inequality`
+  がこれを cite** (h1-h139b を carried grid 直交性から、counting を §15 structure から供給)。
+
+**⚠ issue 3002 の cross-lane 性を確定 (重要、s15 ユーザー裁定 (B) の単独実施可能性を精緻化)**:
+`S16_NonExistenceGCore.lean:43` で **`S16.Hypothesis.base : S15.Hypothesis`**、`FeitThompson.lean:1828`
+の `sectionSixteenHypothesis_of_inputs` が `base := {...}` で **S15.Hypothesis を構成** (sorry-free)。
+⟹ **S15.Hypothesis に grid property field を追加すると FeitThompson (lane c 非所有、lane a/d 所有) の
+constructor が build-red**。reallocation 方針「自クラスタ主所有のみ編集 + 各 commit build-green」より
+**issue 3002 の field 追加は lane c 単独では build-green 不可 = genuine cross-lane** (lanes a/d or hub
+が constructor を thread する必要)。⟹ lane c 単独でやれるのは **grid property を Hypothesis field でなく
+定理の仮説引数に取る** consumer-side core 抽出 (本 lemma がその第一例)。FeitThompson 不変・build-green・
+toolkit 活用・grid property は genuine 構成可能ゆえ honest ([[scaffold-sorry-free-not-done]] の vacuous
+仮説 hoist でない)。**次手**: 同様に (13.6)/(13.7)/(13.8) の各 norm bound を grid property 仮説引数の
+concrete core として抽出 (caseB_eta_norm_core 等 toolkit を接続)。grid carrier の本丸供給は hub 経由
+(issue 3002, cross-lane)。
+
 ### ★★ SESSION TOTAL + FRONTIER 評価 (2026-06-29 long /loop, ~16 lemma 完走)
 **完了した carrier-free chunk (全 sorry-free, build-green, axiom-clean)**:
 1. **§15/§16 norm-cascade arithmetic toolkit** (8 lemma): 13.2.b (`card_P_eq`)・13.2.c bridge
