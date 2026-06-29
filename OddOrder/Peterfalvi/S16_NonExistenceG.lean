@@ -2525,6 +2525,49 @@ theorem centralizerSupport_sharpSubgroup_eq_of_frobenius [Finite G] {M N : Subgr
     refine ⟨hNM hyN, hy1, y, ⟨hyN, hy1⟩, ?_⟩
     rw [Subgroup.mem_centralizer_singleton_iff]
 
+/-- **Peterfalvi (14.11.4): `|A(M)| = k − 1`** — the §8 cardinality input of the upper bound.  The
+type-I Dade support `A(M) = typeIA M` equals `K#` (`centralizerSupport_sharpSubgroup_eq_of_frobenius`
+applied to the Frobenius structure of `M` from `typeI_frobenius` (12.7), kernel `K = M_F`), so its
+cardinality is `|K| − 1 = k − 1`. -/
+theorem MHypothesis.card_typeIA_eq [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    {hyp : Hypothesis (G := G)} (Mdata : MHypothesis hyp) :
+    Nat.card ↥(OddOrder.GroupTheory.typeIA Mdata.M Mdata.typeIHyp.typeI) = Mdata.k - 1 := by
+  -- Frobenius witness for `M` (kernel `M_F`), from (12.7).
+  obtain ⟨fdata, _⟩ :=
+    OddOrder.Peterfalvi.S14.typeI_frobenius hG Mdata.M_maximal ⟨Mdata.typeIHyp.typeI⟩
+  -- The two kernels both equal `maxNilpotentNormalHall M`.
+  have hKf : fdata.typeI.typeF.H = Mdata.typeIHyp.typeI.typeF.H := by
+    rw [fdata.typeI.typeF.H_eq, Mdata.typeIHyp.typeI.typeF.H_eq]
+  have hfrob : OddOrder.Isaacs.Ch06.IsFrobeniusGroup ↥Mdata.M
+      (Mdata.typeIHyp.typeI.typeF.H.subgroupOf Mdata.M) fdata.complement := hKf ▸ fdata.frobenius
+  -- `typeIA M = K#` (FPF support identity).
+  have hTI : OddOrder.GroupTheory.typeIA Mdata.M Mdata.typeIHyp.typeI
+      = OddOrder.GroupTheory.sharpSubgroup Mdata.typeIHyp.typeI.typeF.H :=
+    centralizerSupport_sharpSubgroup_eq_of_frobenius hfrob Mdata.typeIHyp.typeI.typeF.H_le
+  -- `typeF.H = K`, so `|K#| = |K| − 1 = k − 1`.
+  have hHK : Mdata.typeIHyp.typeI.typeF.H = Mdata.K := by
+    rw [Mdata.typeIHyp.typeI.typeF.H_eq, Mdata.K_eq_MF]
+  have hc : Nat.card ↥Mdata.K = ((Mdata.K : Set G)).ncard := by
+    rw [← Nat.card_coe_set_eq]; exact Nat.card_congr (Equiv.refl _)
+  rw [hTI, hHK, Mdata.k_eq_card_K, Nat.card_coe_set_eq, OddOrder.GroupTheory.sharpSubgroup,
+    Set.ncard_diff (Set.singleton_subset_iff.mpr Mdata.K.one_mem), Set.ncard_singleton, hc]
+
+/-- **Peterfalvi (14.11): `|M| = p q k`** — the order of the type-I maximal `M`, from
+`[M : K] = e = pq` (`e_eq_index`, `complement_card_eq_pq`) and `|K| = k` (`k_eq_card_K`) by Lagrange.
+The denominator of the §8 cardinality input `|A(M)|/|M| = (k − 1)/(kpq)` of (14.11.4). -/
+theorem MHypothesis.card_M_eq {hyp : Hypothesis (G := G)} (Mdata : MHypothesis hyp) :
+    Nat.card ↥Mdata.M = hyp.base.p * hyp.base.q * Mdata.k := by
+  have hKleM : Mdata.K ≤ Mdata.M :=
+    Mdata.K_eq_MF ▸ OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_le Mdata.M
+  have hcardK : Nat.card ↥(Mdata.K.subgroupOf Mdata.M) = Nat.card ↥Mdata.K :=
+    Nat.card_congr (Subgroup.subgroupOfEquivOfLe hKleM).toEquiv
+  have hidx : Nat.card ↥Mdata.K * (Mdata.K.subgroupOf Mdata.M).index = Nat.card ↥Mdata.M := by
+    rw [← hcardK]; exact Subgroup.card_mul_index _
+  have hidxpq : (Mdata.K.subgroupOf Mdata.M).index = hyp.base.p * hyp.base.q := by
+    rw [← Mdata.e_eq_index]; exact Mdata.complement_card_eq_pq
+  rw [hidxpq] at hidx
+  rw [← hidx, Mdata.k_eq_card_K]; ring
+
 open scoped Classical OddOrder.Peterfalvi.S12.FiniteInduce in
 /-- **Peterfalvi (14.11.4), the upper-bound §8 TI-counting step** (04.16 lines 109–115).  Brings the
 line-83 bound `|A(M)|/|M| + (1/|G|)(|famG₀| − |G₀|)` (the RHS of `chiRhoNormSq_psi_le_line83`,

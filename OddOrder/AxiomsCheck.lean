@@ -6912,6 +6912,21 @@ field of the `normCascadeData` producer; the remaining gate is the upper §8 TI-
 Axiom-clean. -/
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S16.MHypothesis.rhoNormSq_ge_lower
 
+/-! **Peterfalvi (14.11.4) §8 support identity `A(M) = K#`** (`S16_NonExistenceG`, lane γ/POLE-2).
+For a Frobenius group `M` with kernel `N`, the centralizer-support `centralizerSupport N# M` is
+exactly `N#`: forward by the Frobenius FPF property `centralizer_kernel_le` (`C_M(x) ≤ N` for
+`x ∈ N#`), reverse by `x = y`.  Applied with `N = K = M_F` this is `typeIA M = K#`, the §8
+cardinality input `|A(M)| = k − 1` of (14.11.4) (Coq `PFsection14` `Dade_cover_inequality`
+`#|A| = k.-1`).  Axiom-clean. -/
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S16.centralizerSupport_sharpSubgroup_eq_of_frobenius
+
+/-! **Peterfalvi (14.11) `|M| = p q k`** (`S16_NonExistenceG`, lane γ/POLE-2).  The order of the
+type-I maximal `M`, from `[M : K] = pq` and `|K| = k` by Lagrange (`card_mul_index` +
+`subgroupOfEquivOfLe`).  The denominator of the §8 cardinality input `|A(M)|/|M| = (k−1)/(kpq)`.
+(`card_typeIA_eq`, the numerator `|A(M)| = k − 1`, cites `typeI_frobenius` (12.7) so is body-honest
+but transitively gated on (12.16)/lane β, hence not registered here.)  Axiom-clean. -/
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S16.MHypothesis.card_M_eq
+
 /-! **Peterfalvi (2.7) adjunction for `ρ`** (`S07_RhoProjection`; lane β).  `rho_adjoint`:
 `⟨α^τ, χ⟩_G = ⟨α, χ^ρ⟩_L` — the Dade isometry `τ` (`hyp.dadeMap`) and the `ρ` projection are adjoint,
 by citing S04's `adjoint_formula` with `ψ = χ^ρ`; the averaging hypothesis is
@@ -6924,11 +6939,3 @@ projection is norm-decreasing.  `π = τ(χ^ρ)` is the orthogonal projection of
 `rho_adjoint` adjunction + `isDadeIsometry_of_isDadeMap`), so the residual `χ − π` is orthogonal to
 `π`, and Pythagoras gives `‖χ‖² = ‖χ − π‖² + ‖χ^ρ‖² ≥ ‖χ^ρ‖²` (`inner_self_re_nonneg`).  Axiom-clean. -/
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S07.rho_normSq_le
-
-/-! **Peterfalvi (14.11.4) §8 support identity `A(M) = K#`** (`S16_NonExistenceG`, lane γ/POLE-2).
-For a Frobenius group `M` with kernel `N`, the centralizer-support `centralizerSupport N# M` is
-exactly `N#`: forward by the Frobenius FPF property `centralizer_kernel_le` (`C_M(x) ≤ N` for
-`x ∈ N#`), reverse by `x = y`.  Applied with `N = K = M_F` this is `typeIA M = K#`, the §8
-cardinality input `|A(M)| = k − 1` of (14.11.4) (Coq `PFsection14` `Dade_cover_inequality`
-`#|A| = k.-1`).  Axiom-clean. -/
-#assert_only_allowed_axioms OddOrder.Peterfalvi.S16.centralizerSupport_sharpSubgroup_eq_of_frobenius
