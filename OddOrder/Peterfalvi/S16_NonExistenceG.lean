@@ -1638,6 +1638,29 @@ structure MHypothesis (hyp : Hypothesis (G := G)) where
   `Ã(M)` of `A(M)` (`typeIHyp.dadeData.dade.dadeSupport`).  This is the inclusion `G₀ ⊆ famG₀`
   used to drop the `G₀`-part of the (7.5) sum in (14.11.4). -/
   G0_off_dadeSupport : ∀ g ∈ G0, g ∉ typeIHyp.dadeData.dade.dadeSupport
+  /-- **Peterfalvi (7.1)/(14.11.4) bridge compatibility.**  The underlying `(7.1)` Dade hypothesis
+  of the §7 coherence datum `h78` is the type-I Dade support hypothesis of `M` carried by
+  `typeIHyp` (i.e. `h78` is built over the same `(M, A(M))` Dade map that powers the family
+  inequality (7.5) via `toFamilyHypothesis71`).  Since `S09.Hypothesis71.chiRho` depends only on
+  the support hypothesis `H71.hyp` (the `H(a)`-family), not on the chosen Dade map `τ`, this
+  identifies the `ρ`-image of `h78` (used in `zetaNuRho`, (7.8.b)) with the family member's
+  `ρ`-image, so the `ρ`-norm `‖ψ^{τ₁ρ}‖²` of (14.11.4) equals `h78.zetaNuRhoNormSq`.  Holds by
+  `rfl` for any `h78` built from `typeIHyp.dadeData`; carried so `exists_MHypothesis` supplies a
+  compatible `h78`. -/
+  h78_hyp_eq : h78.hyp76.hyp71.hyp = typeIHyp.dadeData.dade
+  /-- **Peterfalvi (7.6)/(14.10).**  The normal kernel `H` of the §7 coherence datum `h78` is the
+  Fitting kernel `K = M_F`.  (For type-I `M`, `A(M) = K^#` is the Dade support; the coherent family
+  `T = {Ind_K^M θ}` has kernel `K`.)  Gives `h78.kernelOrder = |K| = k` and
+  `h78.complementIndex = |M : K| = e = p q` for the (7.8.b) lower bound. -/
+  h78_H_eq : h78.hyp76.H = K
+  /-- **Peterfalvi (7.8.b) for `M`** — the coherence-norm lower bound
+  `‖ζ^{νρ}‖² ≥ 1 − e/h = 1 − |M:K|/|K|`.  This is
+  `S09.Hypothesis78.NormEstimates.zetaNuRho_norm_sq_ge` for the coherent type-I `M`, with the
+  small-index hypothesis `smallIndex` (`2·|M:K| + 1 ≤ |K|`, i.e. `2 p q + 1 ≤ k`, a consequence of
+  (14.11.1) `k > 2 p v` and `v ≥ q`) discharged.  The genuine §7 Dade content of the (14.11.4)
+  lower bound, isolated here as part of the `exists_MHypothesis` obligation. -/
+  h78_zetaNuRho_normSq_ge :
+    1 - (h78.complementIndex : ℝ) / (h78.kernelOrder : ℝ) ≤ h78.zetaNuRhoNormSq
 
 namespace MHypothesis
 
@@ -2401,46 +2424,133 @@ theorem MHypothesis.chiRhoNormSq_psi_le_line83 [Finite G]
   rw [mul_sub] at h81 ⊢
   linarith [h81, hcS]
 
+/-- **`S09.Hypothesis71.chiRho` depends only on the support hypothesis `H71.hyp`.**  Two `(7.1)`
+data with the same underlying `S04.Hypothesis` (the same `H(a)`-family) induce the same `ρ`-image
+of any `χ`, even if their chosen Dade maps `τ` differ — `chiRho` never mentions `τ`.  Used to
+identify the family-inequality `ρ`-norm of (14.11.4) with the (7.8.b) `ρ`-norm of `h78`. -/
+theorem chiRhoCF_congr_hyp [Fintype G] {A : Set G} {L : Subgroup G}
+    {H71a H71b : OddOrder.Peterfalvi.S09.Hypothesis71 G A L}
+    (h : H71a.hyp = H71b.hyp) (χ : ClassFunction G ℂ) :
+    H71a.chiRhoCF χ = H71b.chiRhoCF χ := by
+  apply ClassFunction.ext
+  intro a
+  simp only [OddOrder.Peterfalvi.S09.Hypothesis71.chiRhoCF_apply]
+  unfold OddOrder.Peterfalvi.S09.Hypothesis71.chiRho
+  rw [h]
+
+open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
+/-- **Peterfalvi (14.11.4) norm bridge.**  The family-inequality `ρ`-norm of `ψ^{τ₁}` (the LHS of
+the line-83 bound) equals the (7.8.b) `ρ`-norm `h78.zetaNuRhoNormSq`.  Both are `‖(ψ^{τ₁})^ρ‖²` for
+the `(M, A(M))` map `ρ`: `psi_tau1_eq` (`ψ^{τ₁} = ζ^ν`) matches the characters, and `h78_hyp_eq`
+(same Dade support hypothesis) plus `chiRhoCF_congr_hyp` (independence of `chiRho` from `τ`) matches
+the `ρ`-images.  This is the linchpin tying the (7.5) family-inequality layer to the (7.8.b)
+coherence-norm layer of (14.11.4). -/
+theorem MHypothesis.chiRhoNormSq_eq_zetaNuRhoNormSq [Finite G] {hyp : Hypothesis (G := G)}
+    (Mdata : MHypothesis hyp) :
+    (Mdata.toFamilyHypothesis71).chiRhoNormSq (Mdata.tau1 Mdata.psi) 0
+      = Mdata.h78.zetaNuRhoNormSq := by
+  have hcf : ((Mdata.toFamilyHypothesis71).hyp71 0).chiRhoCF (Mdata.tau1 Mdata.psi)
+      = Mdata.h78.zetaNuRho := by
+    rw [OddOrder.Peterfalvi.S09.Hypothesis78.zetaNuRho, Mdata.psi_tau1_eq]
+    exact chiRhoCF_congr_hyp Mdata.h78_hyp_eq.symm _
+  simp only [OddOrder.Peterfalvi.S09.FamilyHypothesis71.chiRhoNormSq,
+    OddOrder.Peterfalvi.S09.Hypothesis78.zetaNuRhoNormSq, hcf]
+  congr 1
+
+open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
+/-- **Peterfalvi (14.11.4), the lower bound** `1 − pq/k ≤ ‖ψ^{τ₁ρ}‖²` — the genuine (7.8.b)
+coherence-norm content of (14.11.4).  Combines the (7.8.b) lower bound for the coherent type-I `M`
+(`h78_zetaNuRho_normSq_ge`) with the index identities `h78.kernelOrder = |K| = k` and
+`h78.complementIndex = |M:K| = p q` (`h78_H_eq`, `e_eq_index`, `complement_card_eq_pq`) via the norm
+bridge `chiRhoNormSq_eq_zetaNuRhoNormSq`.  This is the `lower` field of the `NormCascadeData`
+producer `normCascadeData`; the remaining gate is the upper-bound §8 TI-counting. -/
+theorem MHypothesis.rhoNormSq_ge_lower [Finite G] {hyp : Hypothesis (G := G)}
+    (Mdata : MHypothesis hyp) :
+    1 - ((hyp.base.p * hyp.base.q : ℕ) : ℝ) / (Mdata.k : ℝ)
+      ≤ (Mdata.toFamilyHypothesis71).chiRhoNormSq (Mdata.tau1 Mdata.psi) 0 := by
+  rw [Mdata.chiRhoNormSq_eq_zetaNuRhoNormSq]
+  -- `K ≤ M` for the index/card bookkeeping.
+  have hKleM : Mdata.K ≤ Mdata.M :=
+    Mdata.K_eq_MF ▸ OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_le Mdata.M
+  -- `h78.kernelOrder = |K| = k`.
+  have hko : Mdata.h78.kernelOrder = Mdata.k := by
+    rw [Mdata.k_eq_card_K]
+    show Nat.card ↥(Mdata.h78.hyp76.H) = Nat.card ↥Mdata.K
+    rw [Mdata.h78_H_eq]
+  -- `h78.complementIndex = |M:K| = p q`.
+  have hci : Mdata.h78.complementIndex = hyp.base.p * hyp.base.q := by
+    have hmul := Mdata.h78.kernelOrder_mul_complementIndex_eq_card_L
+    rw [hko, Mdata.k_eq_card_K] at hmul
+    have hcardK : Nat.card ↥(Mdata.K.subgroupOf Mdata.M) = Nat.card ↥Mdata.K :=
+      Nat.card_congr (Subgroup.subgroupOfEquivOfLe hKleM).toEquiv
+    have hidx : Nat.card ↥Mdata.K * (Mdata.K.subgroupOf Mdata.M).index = Nat.card ↥Mdata.M := by
+      rw [← hcardK]; exact Subgroup.card_mul_index _
+    have hidxpq : (Mdata.K.subgroupOf Mdata.M).index = hyp.base.p * hyp.base.q := by
+      rw [← Mdata.e_eq_index]; exact Mdata.complement_card_eq_pq
+    rw [hidxpq] at hidx
+    have hKpos : 0 < Nat.card ↥Mdata.K := Nat.card_pos
+    exact Nat.eq_of_mul_eq_mul_left hKpos (hmul.trans hidx.symm)
+  -- Rewrite the (7.8.b) carrier into `p q`/`k` and conclude.
+  have key := Mdata.h78_zetaNuRho_normSq_ge
+  rw [hci, hko] at key
+  exact key
+
 /-- **Faithful §7 carrier for the `ρ`-norm two-sided bound of Peterfalvi (14.11.4).**
 
 The character theory of (14.11.4) reduces to a two-sided bound on `‖ψ^{τ₁ρ}‖²`, where `ρ` is the
 Hypothesis (7.1) map for `(M, A(M))` (Pf (14.11.4), p.90):
 
-* `lower` — **(7.5) + (14.11.3)**: applying the (7.5) family inequality to the norm-one character
-  `ψ^{τ₁}` and using `|ψ^{τ₁}(g)| ≥ 1` on `G_0` (`generic_character_bound`) gives
-  `1 − pq/k ≤ ‖ψ^{τ₁ρ}‖²`.
-* `upper` — **(7.5) + (7.8.b)**: the same (7.5) inequality together with the (7.8.b) norm bound
-  `Σ a_ij² ≤ e − 1` gives the displayed estimate, loosened by `(|P|−1)/|P| ≤ 1`,
-  `(|Q|−1)/|Q| ≤ 1`, `(k−1)/k ≤ 1` (Pf line 14.11.4) to the `normCascadeBound` error terms
-  `2/(pq) + 1/(uq) + 1/(vp)`.
+* `lower` — **(7.8.b)** (Pf 04.16 line 113): the §7 coherence-norm formula `‖ζ^{νρ}‖² ≥ 1 − e/h`
+  for the coherent type-I `M` (with `e = |M:K| = pq`, `h = |K| = k`) gives `1 − pq/k ≤ ‖ψ^{τ₁ρ}‖²`.
+  **Proven** (`MHypothesis.rhoNormSq_ge_lower`), via the `h78` coherence carrier and the norm bridge
+  `chiRhoNormSq_eq_zetaNuRhoNormSq`.
+* `upper` — **(7.5) + (14.11.3) + §8 TI-counting**: the (7.5) family inequality applied to the
+  norm-one `ψ^{τ₁}`, dropping the `G_0`-part via `|ψ^{τ₁}(g)| ≥ 1` (`generic_character_bound`,
+  14.11.3) to line 83 (`chiRhoNormSq_psi_le_line83`), then the §8 TI-counting of the
+  `(W#)^G`/`(P#)^G`/`(Q#)^G` orbit contributions giving the raw estimate, loosened by
+  `(|P|−1)/|P| ≤ 1`, `(|Q|−1)/|Q| ≤ 1`, `(k−1)/k ≤ 1` (`normCascade_upper_loosen`) to the
+  `normCascadeBound` error terms `2/(pq) + 1/(uq) + 1/(vp)`.
 
-The two-sided structure mirrors the textbook's two-step derivation; the genuine §7 Dade content
-(the (7.5) family inequality for `M` and the (7.8.b) norm bound) is the remaining obligation,
-isolated in `normCascadeData`. -/
+The two-sided structure mirrors the textbook's two-step derivation; the `lower` (7.8.b) bound is
+proven, and the remaining genuine obligation is the upper §8 TI-counting, isolated in
+`normCascadeData`. -/
 structure NormCascadeData (hyp : Hypothesis (G := G)) (Mdata : MHypothesis hyp) where
   /-- `‖ψ^{τ₁ρ}‖²`, the squared `L`-norm of the Hypothesis (7.1) `ρ`-image of `ψ^{τ₁}`.
   Real-valued (matching `S09.FamilyHypothesis71.chiRhoNormSq : ℝ`), so the (7.5)/(7.8.b)
   derivation lives in `ℝ`; the passage to the rational `normCascadeBound` is a final cast. -/
   rhoNormSq : ℝ
-  /-- **(7.5) + (14.11.3)** lower bound: `1 − pq/k ≤ ‖ψ^{τ₁ρ}‖²`. -/
+  /-- **(7.8.b)** lower bound: `1 − pq/k ≤ ‖ψ^{τ₁ρ}‖²`
+  (proven, `MHypothesis.rhoNormSq_ge_lower`). -/
   lower :
     (1 : ℝ) - ((hyp.base.p * hyp.base.q : ℕ) : ℝ) / (Mdata.k : ℝ) ≤ rhoNormSq
-  /-- **(7.5) + (7.8.b)** upper bound (loosened to the `normCascadeBound` error terms). -/
+  /-- **(7.5) + (14.11.3) + §8 TI-counting** upper bound (loosened to the `normCascadeBound`
+  error terms). -/
   upper :
     rhoNormSq ≤ 1 - (1 : ℝ) / (hyp.base.p : ℝ) - 1 / (hyp.base.q : ℝ)
       + 2 / ((hyp.base.p * hyp.base.q : ℕ) : ℝ)
       + 1 / ((hyp.base.u * hyp.base.q : ℕ) : ℝ)
       + 1 / ((hyp.base.v * hyp.base.p : ℕ) : ℝ)
 
-/-- **Faithful §7 Dade producer for (14.11.4).**  Under `K ≠ V`, the (7.1) `ρ`-map for `(M, A(M))`,
-the (7.5) family inequality, and the (7.8.b)/(14.11.3) norm bounds supply the two-sided
-`NormCascadeData` bound on `‖ψ^{τ₁ρ}‖²`.  The construction is the §7 Dade-coherence layer (the (7.5)
-family hypothesis `S09.FamilyHypothesis71` for `M` plus `generic_character_bound`, the latter already
-honest modulo `betaM_expansion_data`). -/
+open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
+/-- **Faithful §7 Dade producer for (14.11.4).**  The `ρ`-norm is the concrete family-inequality
+norm `(toFamilyHypothesis71).chiRhoNormSq (ψ^{τ₁}) 0` for the `(M, A(M))` map `ρ`.
+
+* `lower` is **proven** (`MHypothesis.rhoNormSq_ge_lower`): the (7.8.b) coherence-norm lower bound
+  `1 − pq/k ≤ ‖ψ^{τ₁ρ}‖²` (via the `h78` carrier and the bridge `chiRhoNormSq_eq_zetaNuRhoNormSq`).
+* `upper` is the remaining genuine obligation: the **§8 TI-counting** of the `(W#)^G`/`(P#)^G`/
+  `(Q#)^G` orbit contributions that turns the line-83 bound (`chiRhoNormSq_psi_le_line83`, proven)
+  into the raw estimate, which `normCascade_upper_loosen` (proven) then loosens to the displayed
+  `normCascadeBound` error terms.  Both arithmetic ends of `upper` are honest; the gap is the §8
+  orbit cardinality `|K#|/|M|`, `|(W#)^G|`/`|(P#)^G|`/`|(Q#)^G|` count. -/
 noncomputable def normCascadeData [Finite G]
     (_hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
     (Mdata : MHypothesis hyp) (hne : Mdata.K ≠ hyp.base.V) :
-    NormCascadeData hyp Mdata := sorry
+    NormCascadeData hyp Mdata where
+  rhoNormSq := (Mdata.toFamilyHypothesis71).chiRhoNormSq (Mdata.tau1 Mdata.psi) 0
+  lower := Mdata.rhoNormSq_ge_lower
+  -- §8 TI-counting gate (Pf 04.16 lines 109-115): bridges `chiRhoNormSq_psi_le_line83` (proven) to
+  -- the raw bound that `normCascade_upper_loosen` (proven) loosens to `NormCascadeData.upper`.
+  upper := sorry
 
 /-- **Peterfalvi (14.11.4)**: the character-theoretic norm calculation produces the displayed
 rational inequality `normCascadeBound hyp k`.
