@@ -672,3 +672,26 @@ full build 3874 green)。次 = **step 2** (一般 induce-is-Dade-map for TI/triv
    (`dadeIntegralCharacterMap_apply_of_support`) = `hyp.dadeMap (inclusion ⟨f,A₁-supp⟩)`
    (Subtype.ext、同 carrier) = `induce L f` (step 3)。
 ⚠ A₁ (trivial-H) と教科書の A(L)−H# が厳密一致するか要確認 (H# の定義)。
+
+## 2026-06-29 (lane-b=β loop¹⁶): pin (b) 完全証明 ✅✅✅ — (12.4) coherence+induction machinery 完成
+
+**pin (b) `constituent_diff_tau_eq_induce` を honest 証明** (commit 32271b67、§8 support obligation
+modulo)。深い Dade machinery 全完成、残は単一 faithful §8 obligation のみ:
+- 型 I bridge `typeI_tau_eq_induce_of_supported_trivial_H` (axiom-clean): step 3 を hyp.tau に
+  `dadeIntegralCharacterMap_apply_of_support` で instantiate。
+- escaping_conj_mem_iff (helper): escaping set L-共役不変 (既存 conj_smul_centralizer_singleton 活用)。
+- pin (b) assembly: A₁=A(L)∖escaping、hA₁norm/hH₁ (restrict_H+H_eq_supportKernel+if_neg) 証明 → bridge。
+- §8 obligation `constituent_diff_support_subset_nonescaping` (faithful sorried): φ₁−φ₂ が
+  non-escaping 部分 supported = [Is]6.2 + (8.12.a) の genuine cross-lane 残。
+
+**⟹ pin (a)✅ + pin (b)✅ で (12.4) 完成**。`Sset_coeff_equal` (pin a+b consume) →
+`orthogonal_character_constant_on_coset` (12.4) が構造的に sorry-free (§8 modulo)。
+
+**実装知見**: instance desync は FiniteInduce scope の `finiteGFintype` に統一 (`Fintype.ofFinite G`
+を haveI で入れると hyp.tau の Fintype と非一致); `((l⁻¹:L):G)` coercion は `simpa [Subgroup.coe_inv,
+mul_assoc]` で正規化 (rw [he] は coercion form 不一致); supportKernel は `show ... a.1` で arg 正規化後
+`unfold; if_neg`; SupportedClassFunctions ⟨f,_⟩ は carrier 同一なら inclusion と defeq。
+
+**残 §12 frontier (次イテレーション以降)**: (12.4) §8 obligation discharge (cross-lane §8/§10) /
+(12.5) ρ-blocked (§7 ρ machinery) / (12.3) §10 support / (12.6) sibleyTarget / (12.10)-(12.16) /
+(12.2.a) §8 Clifford。(12.4) は完了ゆえ次は document 順で (12.5) or §8 obligation 評価。
