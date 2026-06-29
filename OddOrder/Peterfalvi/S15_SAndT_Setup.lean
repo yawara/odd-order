@@ -791,6 +791,72 @@ theorem analytic_inequality [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
           hyp.m * ((hyp.p ^ (hyp.q - 1) : ℕ) : ℚ) / (hyp.q : ℚ) := by
   sorry
 
+/-- **Peterfalvi (13.10), arithmetic core** (04.15 pp.85–86): the (13.6)–(13.9) norm estimates
+together with the disjoint-union counting `G = {1} ⊔ G₀ ⊔ (H#)^G ⊔ (Q#)^G` and the (13.4) counting
+identities force `u / c > m p^(q-1) / q`.
+
+This is the faithful Lean encoding of Peterfalvi (13.10)'s derivation, with the **grid-dependent
+character content fully isolated** into the concrete norm-sum hypotheses (the (13.6)/(13.7)/(13.8)
+outputs and the (13.9.b) cover, to be supplied by the cascade producers once the grid τ-isometry /
+orthogonality is carried) and the **group-counting identities** `hLS`/`hTT`/`hQT`.  No grid carrier
+is needed here: this is a `sorry`-free reusable arithmetic lemma.  The abstract real atoms are
+`gi = 1/|G|`, `slam = (1/|G|)·Σ_{G₀}|λ^{τ₁}(x)|²`, `seta = (1/|G|)·Σ_{G₀}|η₁₀(x)|²`,
+`g0 = |G₀|/|G|`, `LS = λ(1)²/|S|`, `HS = |H#|/|S|`, `TT = (|T'|−v²)/|T|`, `QT = |Q#|/|T|`.
+
+* `h1` — (13.10.1): `1 ≥ 1/|G| + (1/|G|)Σ_{G₀}|λ^{τ₁}|² + 1 − λ(1)²/|S|` (Parseval + (13.6));
+* `h2` — (13.10.2): `1 ≥ 1/|G| + (1/|G|)Σ_{G₀}|η₁₀|² + |H#|/|S| + (|T'|−v²)/|T|`
+  (Parseval + (13.7) + (13.8) for `T`, `D = 1`);
+* `h3` — (13.10.3): the disjoint-union counting `1 = 1/|G| + |G₀|/|G| + |H#|/|S| + |Q#|/|T|`;
+* `h139b` — (13.9.b): `|G₀|/|G| ≤ (1/|G|)(Σ_{G₀}|λ^{τ₁}|² + Σ_{G₀}|η₁₀|²)`.
+
+**Stage A** (`linarith`): combining `h1 + h2 − h3` with `h139b` and `gi > 0` gives `LS > TT − QT`.
+**Stage B**: the counting identities collapse `TT − QT` to `m/p`, and factoring out `q/p^q > 0`
+turns `uq/(cp^q) > m/p` into `u/c > m p^(q-1)/q`. -/
+theorem analytic_inequality_arith {p q u c : ℕ} {m gi slam seta g0 LS HS TT QT : ℚ}
+    (hp2 : 2 ≤ p) (hq2 : 2 ≤ q) (hc0 : 0 < c)
+    (h1 : 1 ≥ gi + slam + 1 - LS)
+    (h2 : 1 ≥ gi + seta + HS + TT)
+    (h3 : 1 = gi + g0 + HS + QT)
+    (h139b : g0 ≤ slam + seta)
+    (hgi : 0 < gi)
+    (hLS : LS = ((u : ℚ) * (q : ℚ)) / ((c : ℚ) * (p : ℚ) ^ q))
+    (hTT : TT = 1 / (p : ℚ) - 1 / ((p : ℚ) * ((q : ℚ) - 1))
+      + 1 / ((p : ℚ) * ((q : ℚ) - 1) * (q : ℚ) ^ p))
+    (hQT : QT = ((q : ℚ) - 1) / ((p : ℚ) * (q : ℚ) ^ p))
+    (hm : m = 1 - 1 / ((q : ℚ) - 1) - ((q : ℚ) - 1) / (q : ℚ) ^ p
+      + 1 / (((q : ℚ) - 1) * (q : ℚ) ^ p)) :
+    (u : ℚ) / (c : ℚ) > m * ((p : ℚ) ^ (q - 1)) / (q : ℚ) := by
+  have hpQ : (0 : ℚ) < (p : ℚ) := by exact_mod_cast (show 0 < p by omega)
+  have hqQ : (0 : ℚ) < (q : ℚ) := by exact_mod_cast (show 0 < q by omega)
+  have hcQ : (0 : ℚ) < (c : ℚ) := by exact_mod_cast hc0
+  have hq1 : (0 : ℚ) < (q : ℚ) - 1 := by
+    have h2q : (2 : ℚ) ≤ (q : ℚ) := by exact_mod_cast hq2
+    linarith
+  have hqpowp : (0 : ℚ) < (q : ℚ) ^ p := by positivity
+  have hppow1 : (0 : ℚ) < (p : ℚ) ^ (q - 1) := by positivity
+  have hppowq : (0 : ℚ) < (p : ℚ) ^ q := by positivity
+  -- Stage A: the (13.10.1)+(13.10.2)−(13.10.3)+(13.9.b) combination gives `LS > TT − QT`.
+  have hStageA : LS > TT - QT := by linarith
+  -- Stage B: the counting identities collapse `TT − QT` to `m / p`.
+  have hTTQT : TT - QT = m / (p : ℚ) := by
+    rw [hTT, hQT, hm]
+    field_simp
+    ring
+  rw [hTTQT, hLS] at hStageA
+  -- `hStageA : u q / (c p^q) > m / p`.  Factor out the positive `q / p^q`.
+  have hpexp : (p : ℚ) ^ q = (p : ℚ) ^ (q - 1) * (p : ℚ) := by
+    rw [← pow_succ]; congr 1; omega
+  have hfac : (0 : ℚ) < (q : ℚ) / (p : ℚ) ^ q := by positivity
+  have e1 : ((u : ℚ) * (q : ℚ)) / ((c : ℚ) * (p : ℚ) ^ q)
+      = ((u : ℚ) / (c : ℚ)) * ((q : ℚ) / (p : ℚ) ^ q) := by
+    field_simp
+  have e2 : m / (p : ℚ)
+      = (m * ((p : ℚ) ^ (q - 1)) / (q : ℚ)) * ((q : ℚ) / (p : ℚ) ^ q) := by
+    rw [hpexp]
+    field_simp
+  rw [e1, e2] at hStageA
+  exact lt_of_mul_lt_mul_right hStageA (le_of_lt hfac)
+
 /-! ## (13.11)--(13.15): order and divisor determination -/
 
 /-- Lower estimate for the analytic parameter `m` of **Peterfalvi (13.10)**.
