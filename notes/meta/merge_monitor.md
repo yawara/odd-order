@@ -8,20 +8,17 @@
 > **レーン配分の正本 = [`ft_lane_reallocation_2026_06_28.md`](ft_lane_reallocation_2026_06_28.md)**
 > (ゲートなし・signature contract 方式)。本ファイルは hub 側の合流手順 + gotcha 集。
 
-> **⏸ 一時 HOLD (2026-06-30, issue 0089)**: **lane b の `S07_RhoProjection.lean` 関連 commit は
-> issue 0089 解決まで合流しない**。理由: lane b 自身が「S07_RhoProjection (7.1)-(7.3) は S09 `chiRho`
-> 機構の完全重複 (consumer=AxiomsCheck のみ)」と判明し 🛑 STOP、削除可否のユーザー判断待ち。
-> ⟹ 各 tick で lane b の未マージが `S07_RhoProjection.lean` + その AxiomsCheck rho* ガードのみなら
-> **b はスキップ** (「b: HOLD (issue 0089)」と 1 行報告)。b が S07 と無関係な別ファイル (例: S14_MaximalI)
-> の実作業を出していればその部分は通常合流してよい (S07 commit と混在なら hub が判断; 不明なら skip+報告)。
-> 判断確定 (D=削除 / K=保持) 後に本 HOLD を解除しサマリに記録。
+> **✅ issue 0089 解決 (2026-06-30, ユーザー裁定 D=削除)**: `S07_RhoProjection.lean` は S09 `chiRho`
+> 機構の完全重複ゆえ**削除済** (carve-out 0087 撤回)。(12.16) path は S09 `chiRho`/`Hypothesis78`/
+> `NormEstimates` を cite。lane b の S07-only commit は無効 (b は S09 cite に redirect; b が S07 を
+> 再追加したら逸脱扱い)。旧 HOLD は解除。
 
 ## レーン (2026-06-28 再配分: 4 レーン a/b/c/d)
 
 | lane | branch | worktree | クラスタ | 主所有 .lean | issue base |
 |---|---|---|---|---|---|
 | **a** | `a` | `odd-order-a` | α Pf §10–13 中央指標核 (bare spine sorry 11.8) | `Peterfalvi/S(0[3-9]|1[0-3])*` + `FeitThompson.lean:426` | 1000 |
-| **b** | `b` | `odd-order-b` | β Pf §12 Dade tower (12.16) | `Peterfalvi/S14_MaximalI.lean` | 2000 |
+| **b** | `b` | `odd-order-b` | β Pf §12 Dade tower (12.16) | `Peterfalvi/S14_MaximalI.lean` (carve-out 0087=S07_RhoProjection は issue 0089 で削除済) | 2000 |
 | **c** | `c` | `odd-order-c` | γ POLE-2 §14–16 + §15 (最長 pole) | `Peterfalvi/{S15_SAndT,S15_SAndT_Setup,S16_NonExistenceG}.lean` | 3000 |
 | **d** | `d` | `odd-order-d` | δ BG §14–16 局所解析 + carrier | `BG/**`（特に Ch4_FamilyOfMaximal/{S14_TypePCounting,S15_MF,S16_MainResults,S16_PairIntersection}）+ `FeitThompson.lean` carrier 宣言 | 4000 |
 
@@ -62,7 +59,7 @@
 > | lane | クラスタ | 所有 .lean（これ以外の Pf/BG S-ファイル編集 = 逸脱→停止） |
 > |---|---|---|
 > | **a** | α Pf §10–13 中央指標核 | `OddOrder/Peterfalvi/S(0[3-9]|1[0-3])*` + `OddOrder/FeitThompson.lean:426` |
-> | **b** | β Pf §12 Dade tower | `OddOrder/Peterfalvi/S14_MaximalI.lean`（**ただし `exists_typeICovering` carrier-consumer は lane d、carve-out 0088**）+ **`OddOrder/Peterfalvi/S07_RhoProjection.lean`**（§7 ρ 機構、issue 0087 carve-out） |
+> | **b** | β Pf §12 Dade tower | `OddOrder/Peterfalvi/S14_MaximalI.lean`（**ただし `exists_typeICovering` carrier-consumer は lane d、carve-out 0088**）〔旧 carve-out 0087=S07_RhoProjection は issue 0089 で削除済〕 |
 > | **c** | γ POLE-2 §14–16 + §15 | `OddOrder/Peterfalvi/S1[56]*`（S15_SAndT/S15_SAndT_Setup/S16_NonExistenceG）|
 > | **d** | δ BG §14–16 + carrier | `OddOrder/BG/**` + `OddOrder/FeitThompson.lean` carrier 宣言 + **S10 の bgTheoremE_cover_data carrier ブロック**（carve-out 0086）+ **S14_MaximalI の `exists_typeICovering` carrier-consumer**（carve-out 0088、下記） |
 > | **共有（全 lane 可）** | — | `OddOrder/AxiomsCheck.lean` / `OddOrder.lean` / `OddOrder/GroupTheory/**` / `OddOrder/Mathlib/**`（汎用 mathlib-shim、全 lane 加算可）/ **`OddOrder/FeitThompson.lean`**（宣言単位: a=:426、d=carrier、prefix-split で衝突回避）/ `notes/**` / `issues/**` |
@@ -75,10 +72,10 @@
 > `git diff main...d -- …S10…` の hunk が line 493–570 周辺の carrier 宣言に限るか確認。恒久解（現状維持 or lane d
 > ファイルへ移設）は issue 0086 で追跡。
 >
-> **carve-out (issue 0087, ユーザー裁可 2026-06-29)**: `OddOrder/Peterfalvi/S07_RhoProjection.lean` は
-> S07 namespace（原則 lane a）内だが、lane b が (12.16) の §7 ρ 機構として**新規作成した独立ファイル**
-> （lane a 不接触）ゆえ **lane b 所有**として扱う。⟹ step 1.5 で lane b がこのファイルを編集していても逸脱としない
-> （lane a が S07_RhoProjection を編集したら逸脱）。§7 ρ が複数ファイル化したら所有を再整理（issue 0087）。
+> **carve-out (issue 0087, ユーザー裁可 2026-06-29) — ❌ 撤回済 (issue 0089, 2026-06-30)**:
+> `OddOrder/Peterfalvi/S07_RhoProjection.lean` は lane b 所有として導入されたが、S09 `chiRho` 機構の
+> 完全重複と判明し**削除済** (issue 0089, ユーザー裁定 D)。以後この carve-out は無効。lane b が
+> S07_RhoProjection を再作成したら逸脱。
 >
 > **carve-out (issue 0088, ユーザー裁可 2026-06-29)**: `OddOrder/Peterfalvi/S14_MaximalI.lean`（原則 lane b）の
 > うち **`exists_typeICovering` 定理（line 2639–2798、(8.17.a) type-I covering）の carrier-consumer 部分**は

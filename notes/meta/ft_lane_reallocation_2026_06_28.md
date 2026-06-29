@@ -58,8 +58,9 @@ carrier 宣言とその consumer が複数レーンの所有ファイルに跨�
 - **issue 0086**: `Peterfalvi/S10_MinimalSimpleStructure.lean` の `BGTheoremECoverData` 構造 +
   `BGTheoremETypeICovering`/`BGTheoremENonTypeICovering` + `bgTheoremE_cover_data` 定理 (BG Thm E carrier,
   Pf 8.17) は原則 lane a の S10 内だが **lane d 所有** (b/c/d 共有 consumer)。
-- **issue 0087**: `Peterfalvi/S07_RhoProjection.lean` は S07 namespace (原則 lane a) だが lane b が (12.16) §7 ρ
-  機構として新規作成した独立ファイルゆえ **lane b 所有**。
+- **issue 0087 → ❌ 撤回 (issue 0089, 2026-06-30)**: `Peterfalvi/S07_RhoProjection.lean` は lane b 所有として
+  導入されたが、S09 `chiRho` 機構 (=教科書 §7、S番号=§+2) の完全重複と判明し**削除済** (ユーザー裁定 D)。
+  (12.16) path は S09 `chiRho`/`Hypothesis78`/`NormEstimates` を cite。memory `s09-is-section7-chirho-complete`。
 - **issue 0088**: `Peterfalvi/S14_MaximalI.lean` の `exists_typeICovering` 定理 (8.17.a type-I covering) は原則
   lane b だが、上記 0086 の S10 carrier API を直接 consume するため、**carrier-consumer 部分は lane d 所有**
   (role split: b = covering math 8.13.c1/8.8.a の本体、d = carrier API 追従)。恒久解 = carrier-consumer を

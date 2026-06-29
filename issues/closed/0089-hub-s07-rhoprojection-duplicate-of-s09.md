@@ -37,7 +37,19 @@ lane b が「**`S07_RhoProjection.lean` の (7.1)-(7.3) は `S09_NonexistenceCer
 single-L の (7.1) そのもの)。正本 memory `s09-is-section7-chirho-complete`、
 [[verify-port-state-by-number-not-coq-name]]。
 
-## 判断待ち
+## ✅ 裁定 + 実施 (2026-06-30, ユーザー = 判断 D 削除)
+
+ユーザー裁定 = **判断 D (削除)**。hub が main で実施済:
+- `OddOrder/Peterfalvi/S07_RhoProjection.lean` 削除 (`git rm`)
+- AxiomsCheck.lean の rho* ガード 11 本 + import 1 行削除
+- carve-out 0087 撤回 (merge_monitor.md / ft_lane_reallocation_2026_06_28.md 更新、HOLD 解除)
+- build green (3888 jobs、S07 削除で −1) / AxiomsCheck OK / sorry 124 不変 / 残存参照ゼロ
+
+lane b は今後 (12.16) path を S09 `chiRho`/`Hypothesis78`/`NormEstimates` cite で構成 (新規 ρ を作らない)。
+lane b の branch に残る S07 commit は次 sync の modify/delete conflict で削除側を採用 (b 自身が削除推奨ゆえ整合)。
+本 issue は closed。
+
+## 判断待ち (裁定済 = D)
 
 - **判断 D (削除, b 推奨 + hub 推奨)**: `S07_RhoProjection.lean` 削除 + AxiomsCheck の rho* ガード
   11 本 + import 削除 + carve-out 0087 撤回。(12.16) path は S09 `chiRho`/`Hypothesis78`/`NormEstimates`

@@ -41,3 +41,8 @@ S07 編集が衝突しない運用が確立していること。
 - `OddOrder/Peterfalvi/S07_RhoProjection.lean` (lane b 新規作成)
 - issue 0086 (lane d/S10 bgTheoremE_cover_data 同型の carve-out 先例)
 - issue 0081 (lane b §12 本体), commit `2da3ac95` (作成), `c9e6a7bc` (hub 承認合流)
+
+## ❌ 撤回 (issue 0089, 2026-06-30)
+
+S07_RhoProjection は S09 `chiRho` 機構の完全重複と判明し**削除済** (ユーザー裁定 D、issue 0089)。
+本 carve-out は無効。本 issue も closed。
