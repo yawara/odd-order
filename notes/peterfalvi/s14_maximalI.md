@@ -727,3 +727,25 @@ lane c S15/§13 両用 = 高 reuse):
 
 substantial multi-iteration §1 build。次イテレーションで (1.10.b) [純代数、char 不要] から着手。
 [[feedback-no-avoiding-hard-parts]]
+
+## 2026-06-29 (lane-b=β loop¹⁸): (1.10) は from-scratch cyclotomic NT build と確認 + 設計確定
+
+**確認**: (1.10) は repo に基盤なし、mathlib の cyclotomic norm も prime-power 特化 (`norm_sub_one_of_prime_ne_two` 等は p^(k+1))。char 値↔ℤ[η] bridge + p-ramification を一から構築要 = major multi-iteration。**FT-critical 確認**: (12.16)→pi_empty→typeI_frobenius(12.7)→S15_SAndT (lane c, FT-critical) consume。
+
+**(1.10) build 設計 (次イテレーション実行)**:
+- **設計課題 = ring bridge**: repo char は `ClassFunction G ℂ` (ℂ 値)。(1.10) は ℂ の部分環
+  (algebraic integers `integralClosure ℤ ℂ` or `Algebra.adjoin ℤ {η}`) での divisibility。
+  char 値が algebraic integer であること + (1−ε)∣(...) in 𝓞 の形式化が bridge。
+- **(1.10.a)** `χ(xy)≡χ(y) (mod 1−ε)`: Res_⟨x,y⟩ χ を linear α に分解 (⟨x,y⟩ abelian)、
+  α(xy)−α(y)=(α(x)−1)α(y)、α(x)=ε^k (x order p)、`(1−ε)∣(ε^k−1)` [elementary: 1−ε^k=(1−ε)∑ε^i]。
+  要: char restriction + abelian-degree-1 + 値 ∈ 𝓞 (repo 薄い、要構築)。
+- **(1.10.b)** `n∈ℤ, (1−ε)∣n in ℤ[η] ⟹ p∣n`: **norm approach** = `N_{ℚ(η)/ℚ}(1−ε)=p^k` (k≥1、
+  N_{ℚ(ε)/ℚ}(1−ε)=Φ_p(1)=p の tower)、`N(n)=n^{[ℚ(η):ℚ]}` (`Algebra.norm_algebraMap`)、
+  `N` multiplicative on `∣` ⟹ p^k∣n^d ⟹ p∣n。要: ℚ(η) IntermediateField + Algebra.norm setup。
+  代替 = ring hom ℤ[η]→𝔽_p-bar (η↦ reduction, ε↦1) — prime-above-p の reduction 要、より複雑。
+- **leaf**: 新 `RepresentationTheory/CyclotomicCharacterCongruence.lean` (cross-lane 衝突回避、lane b/c 両用)。
+
+**⚠ 状況認識**: (12.4) 完了後、lane b §12 frontier は deep foundational builds のみ ((1.10) NT /
+§7 ρ machinery / §8 obligations、各 multi-iteration、quick win なし)。これは §12 endgame の本来の
+最難部 (lane reallocation で lane b に割当)。難所回避せず (1.10) から grind。**hub 検討事項**: lane b
+§12 が deep-foundation-only になったため、reallocation 価値の再評価余地あり (但し (12.16) は assigned)。
