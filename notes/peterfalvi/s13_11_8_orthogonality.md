@@ -342,3 +342,37 @@ loop 反復では production 不能。[[feedback-flag-poor-progress]] に従い 
 
 **要判断**: (11.8) endgame に dedicated focused session を割く (fresh /loop) か、lane-a を別 FT-path 作業へ
 redirect するか。foundation + roadmap は本ノートに完備。
+
+## 2026-06-29 update¹¹ (lane-a) — S(HC) coherence bridge **landed** (churn 脱却); 残 = enumeration のみ
+
+update¹⁰ の「investigation churn」を脱し、**build-green な 2 commit** で S(HC) coherence の assembly を
+materialize。coq `PFsection11.v` 併読で機構を確定 → 旧評価の「§6/Frobenius の深い再帰 stack」は**過大**と判明。
+
+**landed (build-green, committed; leaf S12 3847 jobs)**:
+1. **`Hypothesis.inducedFamily_sub_support`** (commit 3dede22f): `inducedFamily M` の任意の**等次数 2 元**
+   `ζ₁,ζ₂` (ζ₁(1)=ζ₂(1)) の差 `ζ₁−ζ₂` が `A₀`-supported。`zeta_sub_conj_support` を一般化 (後者は
+   conjugate-pair 特例として本補題に還元)。`coherentEqualDegree_fromDade` の `hsuppdiff` 前提そのもの。
+2. **`Hypothesis.inducedFamily_isCoherent_of_equalDegreeFamily`** (commit 27481ebd): 等次数単射族
+   `χ:Fin n→Irr(M)` (n≥2, 各 χⱼ∈inducedFamily, 同次数) → `IsCoherent hyp.tau (range χ) hyp.A0` を構成する
+   `noncomputable def`。`coherentEqualDegree_fromDade` の**全前提を §10 Hypothesis から opaque field なしで
+   discharge** (基底 map=hyp.tau 定義的一致 / support=hyp.A0 定義的一致 / hsuppdiff=上記① / 1∉A₀=
+   `S04.Hypothesis.ne_one`)。
+
+**coq 併読で確定した機構** (`PFsection11.v`):
+- L607 `cohS1 : coherent S1 M^# tau := uniform_degree_coherence scohS1` — **S1=S(HC) coherence は uniform
+  (equal) degree から直接**。= 本 Lean bridge `inducedFamily_isCoherent_of_equalDegreeFamily` (機構一致確認)。
+- L206-208 `FTtype34_noncoherence` ((11.3)): S(H₀C) coherent ⟹ full S(1) coherent ⟹ `FTtype345_noncoherence`
+  ((10.8)) と矛盾。⟹ (11.8) の contradiction target は **(10.8) full-S non-coherence** に bottom-out。
+- L660 `cohS2 := subset_coherent (Ptype_core_coherence …)` — S2=S(C)−S(HC) coherence。
+
+**残 = S(HC) enumeration のみ** (genuine だが scope 明確、bridge に渡すだけ):
+- S(HC) = inducedFamily M の **degree-w₁ かつ既約**な元 = `{Ind θ | θ∈Irr(M') linear, θ≠1, θ が全 chiRestrict
+  column を avoid}` を M-conjugacy で割った代表系を `Fin n→Irr(↥M)` に並べる。⚠ **inducedFamily は reducible な
+  Ind θ も含む** (Ind θ 既約 ⟺ θ が column avoid、`exists_zeta_in_inducedFamily_degree_w1` の `havoid` 論法)、
+  S(HC) は既約 degree-w₁ 元のみ。injective には M-orbit 代表系が要 (Clifford: Ind θ_i=Ind θ_j ⟺ θ_j∈orbit(θ_i))。
+- n≥2 は conjugation-closure (ζ̄∈S(HC), 奇数位数で ζ̄≠ζ) で自動。
+- S07 coherence producer は全て **Fin n-indexed** (set-level uniform-degree 版は repo に無し、確認済) ゆえ
+  enumeration は回避不能。これが genuine な残工。
+
+**次**: S(HC) enumeration (degree-w₁ 既約 subfamily の Fin n 化)。bridge は landed ゆえ、enumerate さえ
+すれば S(HC) coherence が出る。その後 S₂ + glue + α-grid calc + (10.8) 矛盾。
