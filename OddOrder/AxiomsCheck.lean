@@ -772,6 +772,10 @@ set_option linter.style.longLine false in
 -- `x^p=1` element `x`, `χ(xy)-χ(y) = (1-ε)·z` with `z` an algebraic integer (submodule framing over
 -- the linear-char core + `exists_linearIrreducibleCharacter_eq_of_isMulCommutative`).
 #assert_only_allowed_axioms OddOrder.RepresentationTheory.exists_integral_zirr_apply_sub
+-- Pf (1.10.a) G-form: for a virtual character `ψ ∈ ℤ[Irr G]` of ANY finite group, `x^p=1` and `y`
+-- COMMUTING with `x`, `ψ(xy)-ψ(y) = (1-ε)·z`.  Reduce to the abelian subgroup `A=⟨x,y⟩` via
+-- `restrict_mem_ZIrr` + `exists_integral_zirr_apply_sub`.  Directly usable by (12.16)/(13.5).
+#assert_only_allowed_axioms OddOrder.RepresentationTheory.exists_integral_apply_sub_of_commute
 -- Pf (12.4) pin (b) step 1: general TI-induction self-value — for a TI subset `A` rel. `L` and an
 -- `A`-supported class function `α`, `Ind_L^G α` agrees with `α` on `A`.  Generalizes the TI-cyclic
 -- `induce_apply_eq_self_of_mem_V` to arbitrary TI subsets (the value-half of "Dade map = Ind").

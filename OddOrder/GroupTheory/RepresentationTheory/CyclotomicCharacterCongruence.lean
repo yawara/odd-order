@@ -8,6 +8,7 @@ import Mathlib.RingTheory.Norm.Transitivity
 import OddOrder.GroupTheory.RepresentationTheory.ClassSumAlgebra
 import OddOrder.GroupTheory.RepresentationTheory.ZIrr
 import OddOrder.GroupTheory.RepresentationTheory.LinearCharacter
+import OddOrder.GroupTheory.RepresentationTheory.InducedCharacter
 
 /-!
 # Peterfalvi (1.10): cyclotomic congruences of character values
@@ -111,10 +112,9 @@ contains `0`); it contains every irreducible character of `A` — each is a line
 (`exists_linearIrreducibleCharacter_eq_of_isMulCommutative`) so the per-linear-character core
 `exists_integral_linearChar_apply_sub` applies — hence it contains `ℤ[Irr A] = span ℤ (Irr A)`. -/
 theorem exists_integral_zirr_apply_sub {p : ℕ} (hp : 0 < p) {ε : ℂ} (hε : IsPrimitiveRoot ε p)
-    {A : Type*} [CommGroup A] [Finite A] {χ : ClassFunction A ℂ} (hχ : χ ∈ ZIrr A)
-    {x y : A} (hx : x ^ p = 1) :
+    {A : Type*} [Group A] [Finite A] [IsMulCommutative A] {χ : ClassFunction A ℂ}
+    (hχ : χ ∈ ZIrr A) {x y : A} (hx : x ^ p = 1) :
     ∃ z : ℂ, IsIntegral ℤ z ∧ χ (x * y) - χ y = (1 - ε) * z := by
-  haveI : IsMulCommutative A := ⟨⟨mul_comm⟩⟩
   -- the property, as a `ℤ`-submodule of `CF(A)`.
   let M : Submodule ℤ (ClassFunction A ℂ) :=
     { carrier := {ψ | ∃ z : ℂ, IsIntegral ℤ z ∧ ψ (x * y) - ψ y = (1 - ε) * z}
@@ -143,5 +143,36 @@ theorem exists_integral_zirr_apply_sub {p : ℕ} (hp : 0 < p) {ε : ℂ} (hε : 
   -- conclude: `χ ∈ ZIrr A = span ℤ (Irr A) ≤ M`.
   rw [ZIrr_eq_span] at hχ
   exact Submodule.span_le.mpr hsub hχ
+
+/-- **Peterfalvi (1.10.a)** (`G`-form, commuting elements): for a virtual character `ψ ∈ ℤ[Irr G]` of
+any finite group `G`, an order-dividing-`p` element `x` (`x^p = 1`) and any `y` **commuting** with
+`x`, `ψ(xy) - ψ(y)` is `(1 - ε)` times an algebraic integer.
+
+Reduce to the abelian subgroup `A = ⟨x, y⟩` (commutative since `x, y` commute): `Res_A ψ ∈ ℤ[Irr A]`
+(`restrict_mem_ZIrr`), and `exists_integral_zirr_apply_sub` applies, with `(Res_A ψ)(a) = ψ(a)`. -/
+theorem exists_integral_apply_sub_of_commute {p : ℕ} (hp : 0 < p) {ε : ℂ}
+    (hε : IsPrimitiveRoot ε p) {G : Type*} [Group G] [Finite G]
+    {ψ : ClassFunction G ℂ} (hψ : ψ ∈ ZIrr G) {x y : G} (hx : x ^ p = 1) (hxy : Commute x y) :
+    ∃ z : ℂ, IsIntegral ℤ z ∧ ψ (x * y) - ψ y = (1 - ε) * z := by
+  set A := Subgroup.closure ({x, y} : Set G) with hA
+  haveI : IsMulCommutative ↥A := by
+    refine Subgroup.isMulCommutative_closure (fun a ha b hb => ?_)
+    simp only [Set.mem_insert_iff, Set.mem_singleton_iff] at ha hb
+    rcases ha with rfl | rfl <;> rcases hb with rfl | rfl
+    · exact Commute.refl _
+    · exact hxy
+    · exact hxy.symm
+    · exact Commute.refl _
+  have hxA : x ∈ A := Subgroup.subset_closure (by simp)
+  have hyA : y ∈ A := Subgroup.subset_closure (by simp)
+  have hres : ClassFunction.restrict A ψ ∈ ZIrr ↥A := ClassFunction.restrict_mem_ZIrr A hψ
+  have hx' : (⟨x, hxA⟩ : ↥A) ^ p = 1 := by
+    apply Subtype.ext; push_cast; exact hx
+  obtain ⟨z, hz, he⟩ := exists_integral_zirr_apply_sub hp hε hres
+    (x := ⟨x, hxA⟩) (y := ⟨y, hyA⟩) hx'
+  refine ⟨z, hz, ?_⟩
+  rwa [ClassFunction.restrict_apply, ClassFunction.restrict_apply,
+    show ((⟨x, hxA⟩ * ⟨y, hyA⟩ : ↥A) : G) = x * y from rfl,
+    show ((⟨y, hyA⟩ : ↥A) : G) = y from rfl] at he
 
 end OddOrder.RepresentationTheory
