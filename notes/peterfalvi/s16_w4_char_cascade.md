@@ -230,3 +230,34 @@ family_inequality 出力の `Σ_{G0}` から W#/P#/Q# 寄与を分離する coun
    (‖ψ^τ₁‖≥1 on G0) で `S12.chiRhoNormSq_zeta_le_line83` を type-I M 移植 (support set counting)。
 4. **upper** (rhoNormSq ≤ …): `family_inequality` + (7.8.b) `h78.NormEstimates`。
 全 piece は h78 carrier (commit 7c8af266) + toFamilyHypothesis71 (commit 95bcc13e) から接続済。
+
+### cont.³ (2026-06-29 lane c=γ, ユーザー裁定 §16 本丸): line-83 upper-bound step + 2 carrier field 着地
+
+normCascadeData (14.11.4) の **upper bound 第一段を sorry-free 着地** (`S16_NonExistenceG.lean`,
+full build 3886 green)。原文 (14.11.4 04.16 lines 107-115) の family inequality 骨格を honest 化:
+
+- **MHypothesis に 2 carrier field 追加** (build-safe: 構成は exists_MHypothesis=sorry のみ、
+  field access は不変ゆえ downstream 無影響):
+  - **`psi_tau1_norm_one : ClassFunction.inner (tau1 psi) (tau1 psi) = 1`** ((14.10)/(7.5):
+    ψ^τ₁ norm-one = family_inequality の `hχ` 入力。S12 `inner_tau1_zeta_self_eq_one` の V-side dual)。
+    MHypothesis は `open scoped S12.FiniteInduce in` 下で宣言ゆえ inner の Fintype/Invertible が
+    `finiteG : Finite G` から synth (Finite は Prop ゆえ proof-irrelevance で family_inequality 側の
+    instance と defeq、desync なし)。
+  - **`G0_off_dadeSupport : ∀ g ∈ G0, g ∉ typeIHyp.dadeData.dade.dadeSupport`** ((14.11.3)/(14.11.4):
+    G₀ ⊆ famG₀ = `(toFamilyHypothesis71).G0` = G − Ã(M))。toFamilyHypothesis71 は構造体の後方定義ゆえ
+    Dade support を `typeIHyp.dadeData.dade.dadeSupport` で直接参照 (toFamilyHypothesis71 の `hyp71 i).hyp`
+    と rfl 一致)。
+- **`MHypothesis.chiRhoNormSq_psi_le_line83` (sorry-free)** = S12 `chiRhoNormSq_zeta_le_line83` の
+  type-I M 移植。family_inequality (7.5) を `toFamilyHypothesis71` に適用 (norm-one =
+  `psi_tau1_norm_one`) + generic_character_bound (‖ψ^τ₁‖≥1 on G₀) で `|G₀|≤Σ_{G₀}‖·‖²` (1≤‖·‖⟹1≤‖·‖²
+  の `nlinarith`) + `G0_off_dadeSupport` で G₀⊆famG₀ → `Finset.sum_le_sum_of_subset_of_nonneg` で drop →
+  `mul_sub`+`linarith`。結論 `‖ψ^τ₁ρ‖² ≤ |A(M)|/|M| + (1/|G|)(|famG₀|−|G₀|)`。
+
+**残 (normCascadeData 完了まで、次セッション)**:
+1. **upper**: line-83 の `|A(M)|/|M|` + `(1/|G|)(|famG₀|−|G₀|)` を **§8 TI-counting** で displayed
+   `1−1/p−1/q+2/(pq)+1/(uq)+1/(vp)` に評価 (原文 line 109-115: `|K#|/|M|`, `|(W#)^G|`/`|(P#)^G|`/
+   `|(Q#)^G|` の |G| 比を引いて raw upper、(|P|−1)/|P|≤1 等で loosen)。**deep §8 counting**。
+2. **lower**: `1−pq/k ≤ ‖ψ^τ₁ρ‖²` = **(7.8.b) coherence norm formula** (S09 BetaDecomp の `‖Γ‖²≤e−1`
+   producer 要、重い)。
+upper の family-inequality + G₀-drop 骨格は本セッションで honest 化済 ⟹ 次は 1 (§8 counting) または
+2 ((7.8.b))。[[scaffold-sorry-free-not-done]] [[feedback-no-avoiding-hard-parts]]

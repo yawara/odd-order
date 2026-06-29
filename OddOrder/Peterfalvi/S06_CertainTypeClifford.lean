@@ -968,6 +968,89 @@ theorem exists_eq_certainType_or_induce [NeZero (Nat.card h.W1)] (μ : Irreducib
     · exact Subtype.ext_iff.mp hEq
     · rw [if_neg hEq] at hite; exact absurd hite hcon
 
+/-! ### Peterfalvi (4.5)(b), reducible-induction count (mmd 04.6)
+
+The classification `exists_eq_certainType_or_induce` splits `Irr(L)` into the certain-type grid
+`μ_{ij}` and the irreducible inductions `Ind^L_K χ` (`χ` not a `χ_j`).  The *reducible* members of
+the induction family `{Ind^L_K χ : χ ∈ Irr(K)}` are exactly the `w₂` characters `μ_j = Ind^L_K χ_j`,
+giving the count behind Peterfalvi (9.9.b)/(9.8.b) ("`𝒮(H₀)` contains exactly `p − 1` reducible
+characters", with `w₂ = p` and the trivial column `j = 0` removed by the `H̄`-nontriviality). -/
+
+/-- **Peterfalvi (4.5.b), the `μ_j` are reducible**: `Ind^L_K χ_j = μ_j = ∑_i μ_{ij}` is *not*
+irreducible.  It equals the sum of the `w₁ ≥ 2` distinct irreducibles `μ_{ij}`
+(`induce_restrict_certainType_eq`, `columnFamily.injective`, `one_lt_card_W1`); an irreducible
+character meeting two distinct constituents `μ_{0j}, μ_{1j}` with multiplicity `1` would have to
+equal both, contradicting their distinctness. -/
+theorem induce_chiRestrict_not_isIrreducible [NeZero (Nat.card h.W1)]
+    (χ₂ : (h.W2.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ) :
+    ¬ IsIrreducibleCharacter
+      (ClassFunction.induce h.K (h.chiRestrict χ₂ : ClassFunction ↥h.K ℂ)) := by
+  classical
+  haveI := h.K_normal
+  haveI : Fintype ↥h.K := Fintype.ofFinite _
+  intro hirr
+  -- `Ind^L_K χ_j = ∑_i μ_{ij}`
+  have hsum : ClassFunction.induce h.K (h.chiRestrict χ₂ : ClassFunction ↥h.K ℂ)
+      = ∑ i, ((h.columnFamily χ₂).mu i : ClassFunction L ℂ) := by
+    rw [coe_chiRestrict, h.induce_restrict_certainType_eq χ₂]
+  -- `⟨Ind, μ_{kj}⟩ = 1` for every column index `k`
+  have hinner : ∀ k : Fin (Nat.card h.W1),
+      ClassFunction.inner ((⟨_, hirr⟩ : IrreducibleCharacter L) : ClassFunction L ℂ)
+        ((h.columnFamily χ₂).mu k : ClassFunction L ℂ) = 1 := by
+    intro k
+    rw [IrreducibleCharacter.coe_mk, hsum, inner_sum_left,
+      Finset.sum_congr rfl (fun i _ => irreducibleCharacter_inner_eq_ite _ _),
+      Finset.sum_congr rfl (fun i _ => if_congr (h.columnFamily χ₂).injective.eq_iff rfl rfl),
+      Finset.sum_ite_eq' Finset.univ k (fun _ => (1 : ℂ)), if_pos (Finset.mem_univ _)]
+  -- the irreducible would then equal both `μ_{0j}` and `μ_{1j}`
+  have h1 : (1 : ℕ) < Nat.card h.W1 := h.one_lt_card_W1
+  have heq : ∀ k : Fin (Nat.card h.W1),
+      (⟨_, hirr⟩ : IrreducibleCharacter L) = (h.columnFamily χ₂).mu k := by
+    intro k
+    by_contra hne
+    have hk := hinner k
+    rw [irreducibleCharacter_inner_eq_ite, if_neg hne] at hk
+    exact one_ne_zero hk.symm
+  have hcontra := (h.columnFamily χ₂).injective
+    ((heq ⟨0, by omega⟩).symm.trans (heq ⟨1, h1⟩))
+  simp [Fin.ext_iff] at hcontra
+
+/-- **Peterfalvi (4.5.b), reducibility criterion**: for `χ ∈ Irr(K)`, the induced character
+`Ind^L_K χ` is reducible iff `χ` is one of the `χ_j`.  Forward is the contrapositive of
+`induce_isIrreducible_of_forall_chiRestrict_ne`; the reverse is
+`induce_chiRestrict_not_isIrreducible`. -/
+theorem induce_not_isIrreducible_iff [NeZero (Nat.card h.W1)]
+    (χ : IrreducibleCharacter ↥h.K) :
+    ¬ IsIrreducibleCharacter (ClassFunction.induce h.K (χ : ClassFunction ↥h.K ℂ))
+      ↔ ∃ χ₂, h.chiRestrict χ₂ = χ := by
+  constructor
+  · intro hred
+    by_contra hcon
+    push_neg at hcon
+    exact hred (h.induce_isIrreducible_of_forall_chiRestrict_ne hcon)
+  · rintro ⟨χ₂, rfl⟩
+    exact h.induce_chiRestrict_not_isIrreducible χ₂
+
+set_option linter.unusedFintypeInType false in
+/-- **Peterfalvi (4.5.b), reducible-induction count**: exactly `w₂ = |W₂|` of the irreducible
+characters `χ ∈ Irr(K)` induce a *reducible* character of `L` — namely the `w₂` distinct `χ_j`.
+This is the count behind Peterfalvi (9.9.b)/(9.8.b): under the (8.4.d) realization of `𝒮(H₀)` as
+the `M/H₀`-induction family, the reducible members are the `μ_j`, of which there are
+`w₂ − 1 = p − 1` after removing the `H̄`-trivial column `j = 0`. -/
+theorem card_reducible_induce_eq_W2 [NeZero (Nat.card h.W1)] :
+    Nat.card {χ : IrreducibleCharacter ↥h.K //
+        ¬ IsIrreducibleCharacter (ClassFunction.induce h.K (χ : ClassFunction ↥h.K ℂ))}
+      = Nat.card h.W2 := by
+  rw [← h.card_charGroup_W2]
+  symm
+  apply Nat.card_congr
+  apply Equiv.ofBijective
+    (fun χ₂ => ⟨h.chiRestrict χ₂, h.induce_chiRestrict_not_isIrreducible χ₂⟩)
+  refine ⟨fun a b hab => h.chiRestrict_injective (Subtype.ext_iff.mp hab), ?_⟩
+  rintro ⟨χ, hχ⟩
+  obtain ⟨χ₂, hχ₂⟩ := (h.induce_not_isIrreducible_iff χ).mp hχ
+  exact ⟨χ₂, Subtype.ext hχ₂⟩
+
 end Recipe
 
 end Hypothesis
