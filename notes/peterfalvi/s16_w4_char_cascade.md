@@ -279,3 +279,44 @@ full build 3886 green/33s):
 ((7.8.b) coherence norm formula、§7) を正面から、または §8 counting。
 
 注: `div_le_div_iff` は本 mathlib で **`div_le_div_iff₀`** (末尾 ₀) に改名 ([[verify-port-state-by-number-not-coq-name]] 系の API drift)。
+
+### cont.⁵ (2026-06-29 lane c=γ): normCascadeData (14.11.4) **lower bound = (7.8.b)** sorry-free 着地
+
+normCascadeData (14.11.4) の **lower gate を完全 honest 化** (`S16_NonExistenceG.lean`, full build
+3889 green、AxiomsCheck OK 新 3 定理 allowlist 3 axioms、commit `f4d731ec`、main 同期済)。
+
+**原文精読で lower/upper の出所を確定** (04.16 lines 107-115): (7.5) family inequality は単一の
+不等式を与え、そこから (14.11.3) で G₀-part を drop ⟹ **upper** `‖ψ^{τ₁ρ}‖² ≤ |K#|/|M| +
+(1/|G|)(|(W#)^G|+|(P#)^G|+|(Q#)^G|)` (→§8 counting → raw → loosen)。**lower** `1−pq/k ≤ ‖ψ^{τ₁ρ}‖²`
+は **(7.8.b) coherence-norm formula 直接** (`‖ζ^{νρ}‖² ≥ 1−e/h`、e=pq, h=k)。⚠ NormCascadeData
+の旧 docstring は lower=(7.5)+(14.11.3) / upper=(7.5)+(7.8.b) と **swap して誤記**していた → 訂正。
+
+**genuine 成果 (全 axiom-clean)**:
+- **`chiRhoCF_congr_hyp`** (一般): `S09.Hypothesis71.chiRho` は support hypothesis `H71.hyp`
+  (= H(a)-族) のみ依存で **Dade map τ 非依存** (chiRho 定義 S09:133-138 が τ を参照しない)。
+  ⟹ 異なる τ でも同じ `.hyp` なら chiRhoCF 一致。
+- **`MHypothesis.chiRhoNormSq_eq_zetaNuRhoNormSq`** (bridge、linchpin): family-inequality ρ-norm
+  `(toFamilyHypothesis71).chiRhoNormSq (ψ^{τ₁}) 0` = (7.8.b) coherence-norm `h78.zetaNuRhoNormSq`。
+  `psi_tau1_eq` (ψ^{τ₁}=ζ^ν) + `h78_hyp_eq` (同 Dade support) + chiRhoCF_congr_hyp。**(7.5) family
+  inequality 層と (7.8.b) coherence-norm 層を繋ぐ**。⚠ instance desync (両 inner が同 M の別
+  FiniteInduce instance) は `congr 1` で Subsingleton 自動解決 ([[lean-induce-transport-instance-desync]])。
+- **`MHypothesis.rhoNormSq_ge_lower`**: lower 組立 = bridge + (7.8.b carrier) + index 算術。
+  index: `h78.kernelOrder=Nat.card H=|K|=k` (h78_H_eq+k_eq_card_K)、`h78.complementIndex=|M:K|=pq`
+  (h78_H_eq + `kernelOrder_mul_complementIndex_eq_card_L` + Lagrange `Subgroup.card_mul_index` +
+  `subgroupOfEquivOfLe` + e_eq_index + complement_card_eq_pq、`Nat.eq_of_mul_eq_mul_left` で cancel)。
+
+**MHypothesis に faithful carrier 3 本追加** (構成は exists_MHypothesis=sorry のみゆえ build-safe):
+`h78_hyp_eq` (h78.hyp76.hyp71.hyp = typeIHyp.dadeData.dade、bridge 互換) / `h78_H_eq`
+(h78.hyp76.H = K、kernel) / `h78_zetaNuRho_normSq_ge` (`1−ci/ko ≤ zetaNuRhoNormSq` = (7.8.b)
+`NormEstimates.zetaNuRho_norm_sq_ge` for M、smallIndex=2pq+1≤k from (14.11.1) k>2pv & v≥q 充足)。
+**doneness は carrier 構成可能性** ([[scaffold-sorry-free-not-done]]): 3 carrier は型-I M で全て真
+(compatibly-built h78 で rfl/structural)、exists_MHypothesis に isolate。
+
+**producer `normCascadeData` を full-sorry → field-split**: `rhoNormSq`=family norm + `lower`=
+rhoNormSq_ge_lower を honest 配線、**残 sorry は `upper` §8 TI-counting のみに isolate** (line-83
+`chiRhoNormSq_psi_le_line83`✅ と loosen `normCascade_upper_loosen`✅ の両端は既 honest、gap は
+`|K#|/|M|`・`|(W#)^G|`/`|(P#)^G|`/`|(Q#)^G|` の orbit cardinality count)。
+
+**次 /loop**: upper §8 TI-counting (line-83 → raw bound)。= conjugacy-class orbit size
+`|(P#)^G|=[G:C_G(P)]·|P#|` 型 + (8.6.a)/(8.11)/(10.7) の C_S(x)/C_T(x) 包含。S12 (10.8) の
+TI-counting (`G₁⊆(H#)^G∪V^G`) の type-I M 対応物。[[scaffold-sorry-free-not-done]] [[feedback-no-avoiding-hard-parts]]
