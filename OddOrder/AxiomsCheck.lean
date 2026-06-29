@@ -762,9 +762,18 @@ set_option linter.style.longLine false in
 -- Pf (12.4) pin (a): `(φ₁−φ₂)^τ ∈ ℤ[R(χ)]` for constituents `φ₁,φ₂ ∈ S(χ)`.  Reconciles the global
 -- (1.4) family with the per-φ blocks `R₁(φ)` via difference-uniqueness.  Genuine; no longer sorried.
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S14.constituent_diff_tau_mem_span
--- Pf (1.10.b) cyclotomic congruence: in a `p`-th cyclotomic field, an integer `n` with
--- `n = (ζ-1)·a` (`a` integral) has `p ∣ n` (norm argument `N(ζ-1)=p`).  Used by (12.16)/(13.5).
+-- Pf (1.10.b) cyclotomic congruence (field form): in a `p`-th cyclotomic field, an integer `n` with
+-- `n = (ζ-1)·a` (`a` integral) has `p ∣ n` (norm argument `N(ζ-1)=p`).
 #assert_only_allowed_axioms OddOrder.RepresentationTheory.int_dvd_of_zeta_sub_one_dvd
+-- Pf (1.10.b) **ℂ-form** (global algebraic integers, the FT-usable form): for `p` prime, `ε` a
+-- primitive `p`-th root, an integer `n` with `(n:ℂ) = (1-ε)·z` (`z` any algebraic integer) has
+-- `p ∣ n`.  Via `∏(1-ε^k)=p` + each `(1-ε^k)∣(1-ε)∣n` ⟹ `p∣n^{p-1}`, descend to ℤ.  Used by
+-- (12.16)/(13.5) directly (no specific field needed; matches Coq `Z[η]` formulation).
+#assert_only_allowed_axioms OddOrder.RepresentationTheory.int_dvd_of_one_sub_primRoot_dvd
+-- (1.10.b) supporting: `1-ε^k` and `1-ε` are associates (`1-ε = (1-ε^k)·w`, `w` integral).
+#assert_only_allowed_axioms OddOrder.RepresentationTheory.one_sub_pow_dvd_one_sub
+-- (1.10.b) supporting: a rational integer `a` with `(a:ℂ)=(b:ℂ)·W` (`W` integral, `b≠0`) has `b∣a`.
+#assert_only_allowed_axioms OddOrder.RepresentationTheory.int_dvd_of_intCast_eq_mul_isIntegral
 -- Pf (1.10.a) linear-char core: for a linear character `α` of a finite group, `x^p=1` element `x`,
 -- `α(xy)-α(y) = (1-ε)·z` with `z` an algebraic integer (`α(x)=ε^k`, `α(y)` a root of unity).
 #assert_only_allowed_axioms OddOrder.RepresentationTheory.exists_integral_linearChar_apply_sub

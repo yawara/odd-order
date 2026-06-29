@@ -9,6 +9,7 @@ import OddOrder.GroupTheory.RepresentationTheory.ClassSumAlgebra
 import OddOrder.GroupTheory.RepresentationTheory.ZIrr
 import OddOrder.GroupTheory.RepresentationTheory.LinearCharacter
 import OddOrder.GroupTheory.RepresentationTheory.InducedCharacter
+import Mathlib.RingTheory.RootsOfUnity.Lemmas
 
 /-!
 # Peterfalvi (1.10): cyclotomic congruences of character values
@@ -38,6 +39,85 @@ and `ε^k = α(x)` for a linear character `α` and an order-`p` element `x`. -/
 theorem one_sub_dvd_pow_sub_one {R : Type*} [CommRing R] (ε : R) (k : ℕ) :
     (1 - ε) ∣ (ε ^ k - 1) :=
   ⟨-(∑ i ∈ Finset.range k, ε ^ i), by rw [← geom_sum_mul ε k]; ring⟩
+
+/-- For `ε` a primitive `p`-th root of unity (`p` prime) and `0 < k < p`, the cyclotomic factors
+`1 - ε^k` and `1 - ε` are **associates**: explicitly `1 - ε = (1 - ε^k)·w` with `w` an algebraic
+integer.  Since `gcd(k,p)=1`, `ε^k` is again a primitive `p`-th root, so `ε = (ε^k)^r` for some `r`,
+whence `1 - ε = 1 - (ε^k)^r = (1 - ε^k)·∑_{i<r}(ε^k)^i`.  This is the "hard" divisibility direction
+(the easy one, `(1-ε) ∣ (1-ε^k)`, is `one_sub_dvd_pow_sub_one`) underlying Peterfalvi (1.10.b). -/
+theorem one_sub_pow_dvd_one_sub {p : ℕ} (hp : p.Prime) {ε : ℂ} (hε : IsPrimitiveRoot ε p)
+    {k : ℕ} (hk0 : 0 < k) (hkp : k < p) :
+    ∃ w : ℂ, IsIntegral ℤ w ∧ (1 - ε) = (1 - ε ^ k) * w := by
+  haveI : NeZero p := ⟨hp.pos.ne'⟩
+  have hcop : Nat.Coprime k p :=
+    (hp.coprime_iff_not_dvd.mpr (Nat.not_dvd_of_pos_of_lt hk0 hkp)).symm
+  have hεk : IsPrimitiveRoot (ε ^ k) p := hε.pow_of_coprime k hcop
+  obtain ⟨r, _, hr⟩ := hεk.eq_pow_of_pow_eq_one hε.pow_eq_one
+  have hεk_int : IsIntegral ℤ (ε ^ k) :=
+    isIntegral_of_pow_eq_one (n := p) hp.pos.ne'
+      (by rw [← pow_mul, mul_comm, pow_mul, hε.pow_eq_one, one_pow])
+  have hmem : ε ^ k ∈ integralClosure ℤ ℂ := hεk_int
+  refine ⟨∑ i ∈ Finset.range r, (ε ^ k) ^ i, ?_, ?_⟩
+  · exact Subalgebra.sum_mem _ (fun i _ => Subalgebra.pow_mem _ hmem i)
+  · have hgeom : (1 - ε ^ k) * ∑ i ∈ Finset.range r, (ε ^ k) ^ i = 1 - (ε ^ k) ^ r := by
+      linear_combination -geom_sum_mul (ε ^ k) r
+    rw [hr] at hgeom; exact hgeom.symm
+
+/-- A rational integer `a` with `(a:ℂ) = (b:ℂ)·W` for `b ≠ 0` an integer and `W` an algebraic
+integer is divisible by `b` (the rational algebraic integer `W = a/b` is a rational integer). -/
+theorem int_dvd_of_intCast_eq_mul_isIntegral {a b : ℤ} (hb : b ≠ 0) {W : ℂ}
+    (hW : IsIntegral ℤ W) (h : (a : ℂ) = (b : ℂ) * W) : b ∣ a := by
+  have hb' : (b : ℂ) ≠ 0 := Int.cast_ne_zero.mpr hb
+  have hbq : (b : ℚ) ≠ 0 := Int.cast_ne_zero.mpr hb
+  have hWeq : W = algebraMap ℚ ℂ ((a : ℚ) / (b : ℚ)) := by
+    rw [map_div₀, map_intCast, map_intCast, eq_div_iff hb', mul_comm]; exact h.symm
+  have hqInt : IsIntegral ℤ ((a : ℚ) / (b : ℚ)) :=
+    (isIntegral_algebraMap_iff (algebraMap ℚ ℂ).injective).mp (hWeq ▸ hW)
+  obtain ⟨m, hm⟩ := IsIntegrallyClosed.isIntegral_iff.mp hqInt
+  refine ⟨m, ?_⟩
+  have key : (a : ℚ) = (b : ℚ) * (m : ℚ) := by
+    rw [← eq_intCast (algebraMap ℤ ℚ) m, hm]; field_simp
+  exact_mod_cast key
+
+/-- **Peterfalvi (1.10.b)** (ℂ-form, global algebraic integers): for `p` prime, `ε` a primitive
+`p`-th root of unity, if a rational integer `n` is `(1 - ε)` times an algebraic integer `z`, then
+`p ∣ n`.  This is the form actually used in (12.16)/(13.5) — `z` is any algebraic integer of `ℂ`
+(matching the Coq/`Z[η]` formulation), no specific cyclotomic field needed.
+
+Proof: `∏_{1≤k<p}(1 - ε^k) = p` (`prod_one_sub_pow_eq_order`), and each `(1 - ε^k) ∣ (1 - ε) ∣ n`
+(`one_sub_pow_dvd_one_sub`) with integral cofactor, so the product `p` divides `n^{p-1}` with
+integral quotient; descending the rational algebraic integer to `ℤ` gives `p ∣ n^{p-1}`, hence
+`p ∣ n`. -/
+theorem int_dvd_of_one_sub_primRoot_dvd {p : ℕ} (hp : p.Prime) {ε : ℂ}
+    (hε : IsPrimitiveRoot ε p) {n : ℤ} {z : ℂ} (hz : IsIntegral ℤ z)
+    (h : (n : ℂ) = (1 - ε) * z) : (p : ℤ) ∣ n := by
+  obtain ⟨m, rfl⟩ : ∃ m, p = m + 1 := ⟨p - 1, (Nat.succ_pred_eq_of_pos hp.pos).symm⟩
+  -- per-factor cofactors: `(n:ℂ) = (1 - ε^(k+1))·c k`, `c k` an algebraic integer.
+  have key : ∀ k : ℕ, ∃ c : ℂ, IsIntegral ℤ c ∧ (k < m → (n : ℂ) = (1 - ε ^ (k + 1)) * c) := by
+    intro k
+    by_cases hk : k < m
+    · obtain ⟨w, hw_int, hw_eq⟩ :=
+        one_sub_pow_dvd_one_sub (k := k + 1) hp hε (by omega) (by omega)
+      exact ⟨w * z, hw_int.mul hz, fun _ => by rw [h, hw_eq]; ring⟩
+    · exact ⟨0, isIntegral_zero, fun hc => absurd hc hk⟩
+  choose c hc_int hc_eq using key
+  -- `n^m = (∏(1-ε^(k+1)))·(∏ c) = (m+1)·(∏ c)`.
+  have hprod_fac : (n : ℂ) ^ m = ((m : ℂ) + 1) * ∏ k ∈ Finset.range m, c k := by
+    have e1 : (n : ℂ) ^ m = ∏ _k ∈ Finset.range m, (n : ℂ) := by
+      rw [Finset.prod_const, Finset.card_range]
+    rw [e1, Finset.prod_congr rfl (fun k hk => hc_eq k (Finset.mem_range.mp hk)),
+      Finset.prod_mul_distrib, hε.prod_one_sub_pow_eq_order]
+  -- descend `(m+1) ∣ n^m` in `ℤ`.
+  have hWint : IsIntegral ℤ (∏ k ∈ Finset.range m, c k) := by
+    have : (∏ k ∈ Finset.range m, c k) ∈ integralClosure ℤ ℂ :=
+      Subalgebra.prod_mem _ (fun k _ => hc_int k)
+    exact this
+  have hdvd_pow : ((m : ℤ) + 1) ∣ n ^ m :=
+    int_dvd_of_intCast_eq_mul_isIntegral (a := n ^ m) (b := (m : ℤ) + 1)
+      (by positivity) hWint (by push_cast; exact hprod_fac)
+  have hpZ : Prime ((m : ℤ) + 1) := by
+    have := Nat.prime_iff_prime_int.mp hp; push_cast at this; exact this
+  exact hpZ.dvd_of_dvd_pow hdvd_pow
 
 /-- **Peterfalvi (1.10.a), per-linear-character core**: for a linear character `α : A → ℂˣ` of a
 finite group `A`, a `p`-th-power-trivial element `x` (`x^p = 1`) and any `y`, the difference
@@ -144,8 +224,9 @@ theorem exists_integral_zirr_apply_sub {p : ℕ} (hp : 0 < p) {ε : ℂ} (hε : 
   rw [ZIrr_eq_span] at hχ
   exact Submodule.span_le.mpr hsub hχ
 
-/-- **Peterfalvi (1.10.a)** (`G`-form, commuting elements): for a virtual character `ψ ∈ ℤ[Irr G]` of
-any finite group `G`, an order-dividing-`p` element `x` (`x^p = 1`) and any `y` **commuting** with
+/-- **Peterfalvi (1.10.a)** (`G`-form, commuting elements): for a virtual character
+`ψ ∈ ℤ[Irr G]` of any finite group `G`, an order-dividing-`p` element `x` (`x^p = 1`) and any `y`
+**commuting** with
 `x`, `ψ(xy) - ψ(y)` is `(1 - ε)` times an algebraic integer.
 
 Reduce to the abelian subgroup `A = ⟨x, y⟩` (commutative since `x, y` commute): `Res_A ψ ∈ ℤ[Irr A]`
