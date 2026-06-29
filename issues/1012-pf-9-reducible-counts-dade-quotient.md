@@ -227,6 +227,19 @@ X/H₀ の文字と同一視」((1.6)) で商で作業。⟹ §9 reducible-count
 > 同定 + instance 管理) だが、構成要素は全て landed — 残は glue。次着手 = **W₁-stability**
 > (reducible-inducing χ∈xiOf ⟹ W₁⊆I_M(χ)、`induce_injective_of_inertia_stable` を適用するため)。
 
+**2026-06-30 知見 (B3b は inline)**: `chiefFactorQuotient_card_W2_eq_p` (S11、bridge: 商 hypothesis の
+`card W̄₂ = p` = `chiefFactor_card_W2bar`) landed。但し §6 count `card_reducible_Hnontrivial_induce_eq_W2_sub_one`
+の **standalone 再述は instance elaboration と衝突** — conclusion 型が `ClassFunction.induce h.K` を含み、
+statement-level で `Fintype (↥M⧸H₀')` + `Invertible (card h.K)` を要求 (proof-body の haveI では遅い、§6 の
+`variable` context が失われる)。⟹ **B3b count は §9 assembly 内で inline 適用** (local instances 下で
+`h.card_reducible_Hnontrivial_induce_eq_W2_sub_one hW2H` → rw `chiefFactor_card_W2bar` → p-1)。standalone
+count lemma は作らない。
+
+**W₁-stability の Clifford 機構 (2026-06-30 scoped)**: reducible Ind_{HU}^M χ ⟺ I_M(χ)=M
+(∵ M/HU≅Z/q prime ゆえ inertia は HU か M のみ; ⟨Ind χ,Ind χ⟩=[I:HU]、reducible⟺[I:HU]>1⟺I=M)
+⟹ χ M-invariant (∀g, conjBy g χ=χ) ⟹ `induce_injective_of_inertia_stable` 適用可。infra =
+`card_mul_inner_self_induce_eq_card_inertia` + prime-quotient dichotomy。次 = この「reducible ⟹ I=M」。
+
 > **状況 (2026-06-29)**: §6 side + (8.4.d) bridge B1 (structural Hypothesis(M/H₀)) 完成 (全 axiom-clean)。
 > 残 = B2 (inflation character bridge、最難所 = induction-inflation commute lemma) + B3 (|W̄₂|=p +
 > instantiate)。本プロジェクトで「最難・最高コスト」と記された指標終盤の最後の山。

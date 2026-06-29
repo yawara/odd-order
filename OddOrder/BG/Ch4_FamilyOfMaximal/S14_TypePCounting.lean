@@ -3044,6 +3044,34 @@ theorem maximalContaining_centralizer_eq_singleton_of_tau2_element [Finite G]
       show r ∈ (Nat.card ↥(Subgroup.closure {x'})).primeFactors
       rw [hcard]; exact hr)) hC
 
+/-- **`pi_of_cent_sigma` τ₂-case uniqueness** (Coq `BGsection14`:806, the `'M('C[y]) = [set M]`
+half of the τ₂ branch of Corollary 14.3): for `x ∈ M_σ^#` and a `τ₂(M)`-element `x' ∈ (C_M[x])^#`,
+the unique maximal subgroup containing `C_G(x')` is `M`.  The nonregularity side condition of
+`maximalContaining_centralizer_eq_singleton_of_tau2_element` (`M_σ ⊓ C_G(x') ≠ 1`) is witnessed by
+`x`: since `x'` centralizes `x`, `x` centralizes `x'`, and `x ∈ M_σ^#`.  This is the directly
+discharged part of `pi_of_cent_sigma`'s τ₂ branch (the `ℓ_σ(x') = 1` part needs
+`primes_norm_tau2Elem`, the κ branch needs `Ptype_structure`). -/
+theorem pi_of_cent_sigma_tau2_uniqueness [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    {M : Subgroup G} (hM : M ∈ maximalSubgroups G) {x x' : G}
+    (hxMσ : x ∈ OddOrder.BG.Ch3.S10.Msigma M) (hx1 : x ≠ 1) (hx'M : x' ∈ M) (hx'1 : x' ≠ 1)
+    (hx'cx : x' ∈ Subgroup.centralizer ({x} : Set G))
+    (hx'τ2 : ∀ p ∈ piSet (Subgroup.closure ({x'} : Set G)), p ∈ tau2 M) :
+    maximalSubgroupsContaining (Subgroup.centralizer ({x'} : Set G)) = {M} := by
+  have hcomm : x * x' = x' * x :=
+    Subgroup.mem_centralizer_iff.mp hx'cx x rfl
+  have hxcx' : x ∈ Subgroup.centralizer ({x'} : Set G) := by
+    rw [Subgroup.mem_centralizer_iff]
+    intro h hh
+    rw [Set.mem_singleton_iff] at hh
+    subst hh
+    exact hcomm.symm
+  refine maximalContaining_centralizer_eq_singleton_of_tau2_element hG hM hx'M hx'1 hx'τ2 ?_
+  intro hbot
+  have hxmem : x ∈ OddOrder.BG.Ch3.S10.Msigma M ⊓ Subgroup.centralizer ({x'} : Set G) :=
+    Subgroup.mem_inf.mpr ⟨hxMσ, hxcx'⟩
+  rw [hbot, Subgroup.mem_bot] at hxmem
+  exact hx1 hxmem
+
 /-- **BG Lemma 15.1(c)** (mmd L4170): if `U` is a `(κ(M) ∪ σ(M))'`-Hall subgroup of `M` and
 `X` is a nonidentity subgroup of `U` with `C_{M_σ}(X) ≠ 1`, then `ℳ(C_G(X)) = {M}` and `X` is a
 cyclic `τ₂(M)`-subgroup.
