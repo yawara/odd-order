@@ -320,3 +320,33 @@ rhoNormSq_ge_lower を honest 配線、**残 sorry は `upper` §8 TI-counting �
 **次 /loop**: upper §8 TI-counting (line-83 → raw bound)。= conjugacy-class orbit size
 `|(P#)^G|=[G:C_G(P)]·|P#|` 型 + (8.6.a)/(8.11)/(10.7) の C_S(x)/C_T(x) 包含。S12 (10.8) の
 TI-counting (`G₁⊆(H#)^G∪V^G`) の type-I M 対応物。[[scaffold-sorry-free-not-done]] [[feedback-no-avoiding-hard-parts]]
+
+### cont.⁶ (2026-06-30 lane c=γ /loop): normCascadeData upper を line-83+§8-gap に wire + §8 plan 確定
+
+`normCascadeData` (14.11.4) の **`upper` field を honest skeleton 化** (commit `a7ff9cb2`、full build
+3889 green/15s): `upper := le_trans (chiRhoNormSq_psi_le_line83 [proven]) line83_le_displayed_upper`
+⟹ **producer body は sorry-free**、残 §8 obligation を単一 named lemma `line83_le_displayed_upper`
+(sorried, precise statement) に isolate。∴ normCascadeData の 3 field = rhoNormSq (具体) + lower
+(proven) + upper (line-83 ✅ + §8-gap)。
+
+**§8 TI-counting plan 確定** (`line83_le_displayed_upper` を埋める道筋、原文 04.16 L109-115):
+1. **`|A(M)|/|M| = (k−1)/(kpq)`**: type-I Dade support `A(M) = typeIA M = K#` (= `|K|−1`) + `|M| = pqk`。
+   ⚠ `typeIA M = centralizerSupport (sharpSubgroup H) M` で**単純な K# でない** → `|typeIA M| = |K#|`
+   自体が §8 事実 (要確認/証明)。S12 type-P 側は `typePA_eq_sharpSubgroup_derivedInG` + `Set.ncard_diff`
+   で `|typePA|=|M'|−1` を出す (S12:6126、pattern 流用可)。
+2. **orbit counting** `(1/|G|)(|famG₀|−|G₀|) ≤ (1/|G|)(|(W−(W₁∪W₂))^G|+|(P#)^G|+|(Q#)^G|)`:
+   - set 部 = `famG₀∖G₀ ⊆ (W..)^G∪(P#)^G∪(Q#)^G` (union bound)。⚠ `Mdata.G0` が **abstract carrier**
+     (= G−[Ã(M)∪orbits] の orbit 構造を持たない) ゆえ、G0 を concrete 化 or carrier 追加が要。
+   - **✅ tool 在庫**: **`S14.ncard_conjClassSet_of_isTISubset`** (S14_TypePCounting:5594、axiom-clean、
+     登録済) = `(conjClassSet A).ncard = A.ncard · L.index` (TI-subset A、L=normalizer-bound で A 安定)。
+     ⟹ `|(P#)^G| = (|P|−1)·[G:N_G(P)]`。
+   - normalizer サイズ `[G:N_G(P)]=|G|/(|P|uq)` 等は **Type-II partner S=(H⋊U)⋊W₂** の構造
+     ((8.6.a)/(8.11)/(13.12))。
+3. **raw → displayed**: `normCascade_upper_loosen` (proven)。
+
+**∴ 在庫 = orbit-cardinality tool (`ncard_conjClassSet_of_isTISubset`) + loosening。残 deep =
+§8 structural input** = Frobenius pieces W/P/Q の (a) TI 性 (`IsTISubset`) + (b) normalizer サイズ +
+(c) `Mdata.G0` の orbit-complement concrete 化 (carrier enrich)。= S12 (10.8) `G₁⊆(H#)^G∪V^G` の
+type-I 対応 (S12 側も `typeII_coherence_contradiction_estimate` で sorry、共有 deep gate)。
+**次 /loop** = (1) で `|typeIA M|=|K#|` を確認/証明 (tractable 候補) or §8 structure carrier 設計。
+[[scaffold-sorry-free-not-done]] [[feedback-no-avoiding-hard-parts]]
