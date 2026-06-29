@@ -19,15 +19,18 @@ created: 2026-06-29
 - [ ] `exceptional_case_frobenius_realization` (9.10): conjunct 1 = opaque field
       `quotientSemidirectFrobenius` de-opacify + exceptional u + HU Frobenius。
 
-## ゲート分析 (原文 04.11 精読、確定)
+## ゲート分析 (原文 04.11 精読、確定) — 2026-06-29 更新: §6 count は完了
 
 (9.9.b) 証明 = 「By (4.7) and Theorem (4.5), 𝒮(H₀)/𝒮(H₀C) contain exactly p-1 reducible μ_j」。
 - **Theorem (4.5)/(4.7)** = 書籍 §6 (mmd 04.6 "Dade Isometry for Certain Type of Subgroup")。
   (4.5): Hypothesis (4.2) 下 μ_j=∑_{0≤i<w₁}μ_{ij} (0≤j<w₂); reducible count = w₂-1 = p-1 (w₂=p)。
-  repo S06 に `Hypothesis46`/`CertainTypeHypothesis`/omegaProdChar 機構あり、**count 定理 (4.5)/(4.7) は
-  citeable な形で未完**。
+  ✅ **2026-06-29 完了**: (4.5)(a),(b) 分類は 2026-06-11 既完成 (`exists_eq_certainType_or_induce`)。
+  上の reducible-COUNT corollary を本 lane-a セッションで追加 (全 axiom-clean):
+  `S06_CertainTypeClifford.lean` の `induce_chiRestrict_not_isIrreducible` /
+  `induce_not_isIrreducible_iff` / **`card_reducible_induce_eq_W2`** (`|{χ∈Irr(K)|Ind^L_K χ reducible}|
+  = w₂`)。⟹ **§6 count は citeable**。旧「未完」評価は stale だった ([[verify-port-state-by-number-not-coq-name]])。
 - **(8.4.d)** = Hypothesis (4.6)/(4.2) for L = **M/H₀** (商群)。S10 `DadeSupportHypothesisData` は §4 部分のみ、
-  「Hypothesis (4.6)/(5.2) char-family は TODO」明記 (S10:451)。
+  「Hypothesis (4.6)/(5.2) char-family は TODO」明記 (S10:451)。**← 残る唯一のゲート**。
 
 ## 真の難所 = quotient Dade framework
 
@@ -43,9 +46,18 @@ X/H₀ の文字と同一視」((1.6)) で商で作業。⟹ §9 reducible-count
 > (9.9.b)/(9.8.b) を cite で実証明して前に進む。`typePData_toS06Hypothesis` 既存 = §6 `S06.Hypothesis` は
 > type-P data から構成可能 (S12:1011) ⟹ §6 machinery は available。M/H₀ 商版の bridge が要点。
 
-1. §6 reducible-count obligation (Theorem (4.5)/(4.7): μ_j count = w₂-1) を pin (consumer side、sorried 可)。
-2. (8.4.d) Hypothesis(4.6)-for-M/H₀: `typePData_toS06Hypothesis` の商版 bridge。
-3. (9.9.b)/(9.8.b) instantiate → caseB/caseA_character_counts conjunct 2,3,4 を cite で証明。
+1. ✅ **DONE (2026-06-29)**: §6 reducible-count = `card_reducible_induce_eq_W2`
+   (`S06_CertainTypeClifford.lean`、axiom-clean、pin 不要で実証明完了)。`induce_not_isIrreducible_iff`
+   / `induce_chiRestrict_not_isIrreducible` 込み。「(4.5)/(4.7) 未完」は stale だった。
+2. **← 次手 (残る唯一のゲート)**: (8.4.d) Hypothesis(4.6)-for-M/H₀ bridge。entry = S10:587-588 の
+   TODO (`-- TODO (Peterfalvi (8.15), higher Dade specializations): ... Hypothesis (4.6)/(5.2)
+   statements with K=M_prime and H=M_F`)。`DadeSupportHypothesisData` (S10:453) は L=M 直接版のみ。
+   必要 = (i) L=M/H₀ 商の §6 structural `Hypothesis (M⧸H₀)` 構成 (W̄₁/W̄₂/K̄/V̄/sdiffTICyclic/isComplement)、
+   (ii) §9 `chars.SOf chief.H0` (HU→M induced family) ↔ §6 induction-family on M/H₀ の同一視 ((1.6)
+   「H₀⊆Ker の M-文字 = M/H₀-文字」)、その下で reducibility 対応。`typePData_toS06Hypothesis`
+   (S12:1011、L=M 版) が template。
+3. (9.9.b)/(9.8.b) instantiate: bridge + `card_reducible_induce_eq_W2` を cite、w₂=p・j=0 除去で
+   `{φ∈𝒮(H₀)|¬irr}.ncard = p-1` を caseB/caseA_character_counts conjunct 2,3,4 で discharge。
 4. (9.10) de-opacify + exceptional 構造。
 
 ## 完了条件
