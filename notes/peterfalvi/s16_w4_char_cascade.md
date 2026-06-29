@@ -350,3 +350,35 @@ TI-counting (`G₁⊆(H#)^G∪V^G`) の type-I M 対応物。[[scaffold-sorry-fr
 type-I 対応 (S12 側も `typeII_coherence_contradiction_estimate` で sorry、共有 deep gate)。
 **次 /loop** = (1) で `|typeIA M|=|K#|` を確認/証明 (tractable 候補) or §8 structure carrier 設計。
 [[scaffold-sorry-free-not-done]] [[feedback-no-avoiding-hard-parts]]
+
+### cont.⁷ (2026-06-30 lane c=γ /loop): Coq PFsection14 co-read — §8 counting 構造完全判明 + `|A(M)|=k−1` 確認
+
+`line83_le_displayed_upper` (§8 TI-counting) の正確な port path を **Coq `PFsection14.v` の (14.11.4)
+証明** (lines 929-991) 併読で確定。**typeIA=K# の不確実性を解消**:
+
+- **Dade support**: `ddMK := FT_DadeF_hyp maxM`、`AM := Dade_support ddMK`、`defAM: AM = 'A~(M)`
+  (`FTsupp_Frobenius`)。
+- **upper `ub_rho`** (line 980): `'[rho(ψ^τ₁)] ≤ k.-1/#|M| − nG⁻¹·sumG0_diff` を **`Dade_cover_inequality`**
+  (MathComp Dade 理論) 1 発で。`sumG0_diff = sumG0 − (#|G0|+#|What^G|+#|P#^G|+#|Q#^G|)`。
+  **= 私の `chiRhoNormSq_psi_le_line83` と同型** (family_inequality (7.5) = single-member Dade-cover)。
+- **🔑 `k.-1/#|M| = |A(M)|/|M|` ⟹ `#|A(M)| = k−1 = #|K#|` を Coq が確認** (Dade_cover_inequality の
+  `#|A|` 項が `k−1`)。∴ **`typeIA M = K#` は TRUE** (型-I M の Frobenius FPF `C_M(x)≤K for x∈K#`
+  由来。⚠ Lean TypeFData の `centralizer_le_U1` は弱条件のみ → 完全 FPF は別の §8 定理が要、
+  但し結論 typeIA=K# は正しい)。`cardG_D1: #|R^#|=#|R|.-1` で `#|K#|=k−1`。
+- **G0** (line 932): `~:(Ã(M) ∪ ccG What ∪ ccG P^# ∪ ccG Q^#)` (`ccG A = class_support A G = A^G`)。
+- **P/Q/W の出所** (lines 926,933-934): **S/T type-P partner** (`FTtype2_support_coherence TtypeP
+  StypeP` = (14.11.2)、`W2⊆P` [StypeP]、`W1⊆Q` [TtypeP])。P=S の Sylow 的ピース、Q=T 側。
+- **(14.11.3) lbG0** (line 936): `1≤|ψ^τ₁(g)|²` on G0 = 私の `generic_character_bound` と同型
+  (`coprime_typeP_Galois_core` で order prime-to-pq、`Cint_cycTIiso_coprime` で η-grid 整数、
+  signed sum ≡1 mod 2 で |·|≥1)。
+
+**∴ §8 counting port path 確定** (`line83_le_displayed_upper` を埋める):
+1. **`|A(M)|/|M| = (k−1)/(kpq)`**: `typeIA M = K#` (Frobenius FPF、§8) + `|M|=kpq`。Coq で TRUE 確認。
+2. **orbit counts** `|P#^G|=(|P|−1)·[G:N_G(P)]` 等: `ncard_conjClassSet_of_isTISubset` (在庫) + P/Q/W
+   の TI 性 (S/T partner 構造) + normalizer サイズ ([G:N_G(P)]=|G|/(|P|uq))。
+3. **drop + loosen**: sumG0≥|G0| (lbG0) で drop、`normCascade_upper_loosen` (proven)。
+
+**残 deep = (a) `typeIA M = K#` の Frobenius-FPF lemma (§8)、(b) P/Q/W 定義 + TI 性 + normalizer
+サイズ (S/T type-P partner 構造、§13-14)**。= multi-session port。Coq `Dade_cover_inequality` の Lean
+analog は私の line-83 (= family_inequality) で既達ゆえ、残は orbit-size 評価 (TI tool 在庫) + partner
+構造。次 = (a) typeIA=K# の FPF lemma (最 tractable、§8 Frobenius) から着手。[[scaffold-sorry-free-not-done]]
