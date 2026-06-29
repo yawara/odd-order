@@ -2303,6 +2303,101 @@ theorem chiefFactor_W2_not_le_H0 [Finite G] {M : Subgroup G}
   obtain ⟨n, hn, hnc⟩ := hcG_H0
   exact hcN (data.typeP.H.subtype_injective hnc ▸ hn)
 
+open OddOrder.Peterfalvi.S06 in
+/-- **Peterfalvi (8.4.d): Hypothesis (4.2) holds for `L = M/H₀`.**  The certain-type structural
+hypothesis `S06.Hypothesis (↥M ⧸ H₀)` with `K = M'/H₀`, `W̄₁ = W₁ H₀/H₀`, `W̄₂ = W₂ H₀/H₀`.  Built
+from the type-`P` data of `M` by pushing the (8.4) datum through the quotient `mk' H₀`:
+`isComplement` from `M = M' ⋊ W₁` (`IsComplement'.map_mk'`), `centralizer_W2` from the coprime
+centralizer-quotient (`chiefFactor_centralizer_W2bar`), `W2_nontrivial` from `W₂ ⊄ H₀`
+(`chiefFactor_W2_not_le_H0`).  The Hall coprimality `gcd(|M'|, |W₁|) = 1` is the input `hHall`
+(as in `typePData_toS06Hypothesis`).  This is the quotient `L = M/H₀` of issue 1012's reducible
+counts; the §9 family `𝒮(H₀)` is its induction family. -/
+noncomputable def chiefFactorQuotientHypothesis [Finite G] {M : Subgroup G}
+    {data : TypesIIIIIIVSetup M} (chief : ChiefFactorData data)
+    [(chief.H0.subgroupOf M).Normal] (hodd : Odd (Nat.card G))
+    (hHall : Nat.Coprime (Nat.card ↥(derivedInG M)) (Nat.card ↥data.W1)) :
+    Hypothesis (↥M ⧸ (chief.H0.subgroupOf M)) := by
+  haveI := data.typeP.W1_cyclic
+  haveI := data.typeP.W2_cyclic
+  have hM'le : derivedInG M ≤ M := Subgroup.map_subtype_le _
+  have hW2leM' : data.W2 ≤ derivedInG M :=
+    data.typeP.W2_le.trans (le_trans inf_le_right (Subgroup.map_subtype_le _))
+  have hW2leM : data.W2 ≤ M := hW2leM'.trans hM'le
+  have hKnorm : ((derivedInG M).subgroupOf M).Normal := by
+    rw [show (derivedInG M).subgroupOf M = commutator ↥M by
+      rw [derivedInG, Subgroup.subgroupOf,
+        Subgroup.comap_map_eq_self_of_injective M.subtype_injective]]
+    infer_instance
+  have hcardK : Nat.card ↥((derivedInG M).subgroupOf M) = Nat.card ↥(derivedInG M) :=
+    Nat.card_congr (Subgroup.subgroupOfEquivOfLe hM'le).toEquiv
+  have hcardW1 : Nat.card ↥(data.W1.subgroupOf M) = Nat.card ↥data.W1 :=
+    Nat.card_congr (Subgroup.subgroupOfEquivOfLe data.typeP.W1_le).toEquiv
+  refine
+    { K := ((derivedInG M).subgroupOf M).map (QuotientGroup.mk' (chief.H0.subgroupOf M))
+      W1 := (data.W1.subgroupOf M).map (QuotientGroup.mk' (chief.H0.subgroupOf M))
+      W2 := (data.W2.subgroupOf M).map (QuotientGroup.mk' (chief.H0.subgroupOf M))
+      K_normal := hKnorm.map _ (QuotientGroup.mk'_surjective _)
+      isComplement := by
+        have hcop : Nat.Coprime (Nat.card ↥((derivedInG M).subgroupOf M))
+            (Nat.card ↥(data.W1.subgroupOf M)) := by rw [hcardK, hcardW1]; exact hHall
+        exact data.typeP.M_complement.map_mk' hcop (chief.H0.subgroupOf M)
+      W1_nontrivial := ?_
+      W1_cyclic := ?_
+      card_coprime :=
+        (hHall.coprime_dvd_left (hcardK ▸ Subgroup.card_map_dvd _ _)).coprime_dvd_right
+          (hcardW1 ▸ Subgroup.card_map_dvd _ _)
+      W2_nontrivial := ?_
+      W2_cyclic := ?_
+      W2_le_K := Subgroup.map_mono (Subgroup.comap_mono hW2leM')
+      centralizer_W2 := fun x hx hx1 => chiefFactor_centralizer_W2bar chief x hx hx1
+      W_odd := ?_ }
+  · -- W1_nontrivial: `W̄₁ ≠ ⊥` since `W₁ ⊄ H₀`
+    rw [ne_eq, Subgroup.map_eq_bot_iff, QuotientGroup.ker_mk']
+    intro hle
+    have hbot : data.W1.subgroupOf M = ⊥ :=
+      le_bot_iff.mp (le_trans (le_inf le_rfl hle)
+        (chiefFactor_W1_inf_H0_subgroupOf_eq_bot chief).le)
+    rw [Subgroup.subgroupOf_eq_bot] at hbot
+    exact data.typeP.W1_nontrivial (disjoint_self.mp (hbot.mono_right data.typeP.W1_le))
+  · -- W1_cyclic: image of cyclic
+    haveI : IsCyclic ↥(data.W1.subgroupOf M) :=
+      isCyclic_of_injective (Subgroup.subgroupOfEquivOfLe data.typeP.W1_le).toMonoidHom
+        (Subgroup.subgroupOfEquivOfLe data.typeP.W1_le).injective
+    rw [show (data.W1.subgroupOf M).map (QuotientGroup.mk' (chief.H0.subgroupOf M))
+        = ((QuotientGroup.mk' (chief.H0.subgroupOf M)).comp
+          (data.W1.subgroupOf M).subtype).range by
+      rw [MonoidHom.range_comp, Subgroup.range_subtype]]
+    exact isCyclic_of_surjective _ (MonoidHom.rangeRestrict_surjective _)
+  · -- W2_nontrivial: `W̄₂ ≠ ⊥` since `W₂ ⊄ H₀`
+    rw [ne_eq, Subgroup.map_eq_bot_iff, QuotientGroup.ker_mk']
+    intro hle
+    refine chiefFactor_W2_not_le_H0 chief (fun y hy => ?_)
+    have hmem : (⟨y, hW2leM hy⟩ : ↥M) ∈ data.W2.subgroupOf M := Subgroup.mem_subgroupOf.mpr hy
+    exact Subgroup.mem_subgroupOf.mp (hle hmem)
+  · -- W2_cyclic: image of cyclic
+    haveI : IsCyclic ↥data.W2 := data.typeP.W2_cyclic
+    haveI : IsCyclic ↥(data.W2.subgroupOf M) :=
+      isCyclic_of_injective (Subgroup.subgroupOfEquivOfLe hW2leM).toMonoidHom
+        (Subgroup.subgroupOfEquivOfLe hW2leM).injective
+    rw [show (data.W2.subgroupOf M).map (QuotientGroup.mk' (chief.H0.subgroupOf M))
+        = ((QuotientGroup.mk' (chief.H0.subgroupOf M)).comp
+          (data.W2.subgroupOf M).subtype).range by
+      rw [MonoidHom.range_comp, Subgroup.range_subtype]]
+    exact isCyclic_of_surjective _ (MonoidHom.rangeRestrict_surjective _)
+  · -- W_odd: `|W̄₁ ⊔ W̄₂|` divides `|↥M/H₀| ∣ |↥M| ∣ |G|`, which is odd
+    have hdvd : Nat.card ↥(((data.W1.subgroupOf M).map (QuotientGroup.mk' (chief.H0.subgroupOf M)))
+        ⊔ ((data.W2.subgroupOf M).map (QuotientGroup.mk' (chief.H0.subgroupOf M))))
+        ∣ Nat.card G :=
+      dvd_trans (Subgroup.card_subgroup_dvd_card _)
+        (dvd_trans (Subgroup.index_dvd_card _) (Subgroup.card_subgroup_dvd_card M))
+    rcases Nat.even_or_odd (Nat.card ↥(((data.W1.subgroupOf M).map
+        (QuotientGroup.mk' (chief.H0.subgroupOf M)))
+        ⊔ ((data.W2.subgroupOf M).map (QuotientGroup.mk' (chief.H0.subgroupOf M))))) with he | ho
+    · have h2G : 2 ∣ Nat.card G := dvd_trans he.two_dvd hdvd
+      rw [Nat.odd_iff] at hodd
+      omega
+    · exact ho
+
 /-- **(9.7) span step** (general form): in an irreducible `A`-action on a group `H` (every
 `A`-invariant subgroup is `⊥` or `⊤`), any nonzero subgroup `S₀` generates `H` under its
 `A`-orbit — `⨆_{a} φ(a) • S₀ = ⊤`.  The orbit join is `A`-invariant (reindex `a ↦ h·a`) and

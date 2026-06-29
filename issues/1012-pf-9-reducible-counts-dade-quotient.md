@@ -76,8 +76,11 @@ X/H₀ の文字と同一視」((1.6)) で商で作業。⟹ §9 reducible-count
        `typeP_fixedSubgroup_map`+`typeP_H_inf_centralizer_W1` で C_H(W₁).map H.subtype=W₂、
        N.map H.subtype=H₀ ⟹ W₂⊄H₀。**⚠ type-II 注意 (S11:2032)**: |W₂|>p 可だが image-order
        |W̄₂|=|fixedByE|=p を使った (|W₂| でなく)。
-     - **⟹ B1 の全 field の証明手段が揃った** (centralizer_W̄₂ + W2_nontrivial 完了、他は 1-liner)。
-       残 = def 組立のみ (mechanical、~80-120行、`[(chief.H0.subgroupOf M).Normal]` binder)。
+     - ✅✅✅ **B1 完成 (2026-06-29)**: **`chiefFactorQuotientHypothesis`** (S11、axiom-clean、全 13
+       field): `S06.Hypothesis (↥M ⧸ H₀)` = Peterfalvi (8.4.d) の certain-type structural hypothesis。
+       isComplement=`M_complement.map_mk'`, centralizer_W2=`chiefFactor_centralizer_W2bar`,
+       W2_nontrivial=`chiefFactor_W2_not_le_H0`, W_odd=|W̄₁⊔W̄₂|∣|↥M⧸H₀|∣|↥M|∣|G| odd、他=image of
+       cyclic/normal。引数 `[(chief.H0.subgroupOf M).Normal]` + hodd + hHall。
      - **`centralizer_W2` (= (8.4.d) crux)**: `C_{↥M⧸H₀'}(x̄) ⊓ K̄ = W̄₂` for x̄∈W̄₁^#。**3-step 分解**:
        1. ✅ **DONE (2026-06-29)**: `C_{↥M⧸H₀'}(x̄) = (C_{↥M}(x)).map mk'` = **一般補題
           `centralizer_map_mk'_eq_of_coprime_zpowers`** (S11、axiom-clean、reusable):
