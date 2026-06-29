@@ -524,3 +524,27 @@ V (d) else III/IV (c)。`BGTheoremECoverData.tau`/`typed` field 用。
 ⟹ struct の prime-side bridge + tau 網羅性が全て揃った。残 deep gate = (4) thickenedA1↔Mtilde
 (`supportKernel`[Pf 8.14 R(x)=C_{M_F}(x)] ↔ `Rsub`[BG §14 (N[x])_σ⊓C(x)] の identification、深い)、
 (5) Cor 14.9 covering。次 = struct 組立 (bridgeable field 実証 + (4)(5) を named sorry で isolate)。
+
+## ✅✅ 進捗 (lane d, 2026-06-29 /loop¹⁹): **bgTheoremE_cover_data 本体組立** — 9/11 field 実証
+
+`bgTheoremE_cover_data` (Pf 8.17、S10_MinimalSimpleStructure) を **sorry 1 個 → 実構成 (9 field 実証 +
+deep gate 2 個)** に。full build 3886 green、consumer (S14_MaximalI `.{_,0}`) 不変。
+
+**実証した 9 field** (前 /loop の bridge を配線):
+- `ι`/`reps`/`tau`/`finite_index`/`maximal`/`typed`/`representatives`/`nonconjugate`: plumbing
+  (`exists_maximal_conjugacy_reps` + `exists_peterfalviType`)。
+- **`primeFactors_cover`/`primeFactors_disjoint`** (genuine 核心、card_LF が使う): `sigma_reps_prime_cover`
+  /`sigma_reps_pairwise_disjoint` (σ-記述) を `mainSubgroup_eq_Msigma` (M_s=M_σ) + `primeFactors_Msigma_eq_sigma`
+  (π(M_σ)=σ) で `π(mainSubgroup)` 形へ橋渡し。
+
+**universe 解決**: 消費側が `.{_,0}` で ι 普遍量化 ⟹ `ι := ULift (Fin (card reps))` (Fintype.equivFin で
+index) で ι を任意 universe に。`↥reps` (G の universe) 直接は型不一致。
+
+**残 deep gate 2 個** (precise sorry):
+1. `thickenedA1_card` (S10:640): `thickenedA1 M M τ` (Pf 8.14 `supportKernel` R(x)=C_{M_F}(x)) =
+   `conjClassSet (Mtilde D M)` (BG §14 `Rsub` R(x)=(N[x])_σ⊓C_G(x)) の identification 待ち。これさえ出れば
+   `sigmaConjugacySaturation_Mtilde_ncard` (14.5c DONE) + `mainSubgroup_eq_Msigma` で閉じる。
+2. covering 析取 (S10:643): (8.8) dichotomy (BG Cor 14.9) で Type-I vs non-Type-I。
+
+⟹ **prime partition (FT consumer card_LF が依存) は genuine 実証済**。残は signalizer R(x) の Pf↔BG
+identification + covering。次 = `supportKernel ↔ Rsub` (gate 1) に着手。
