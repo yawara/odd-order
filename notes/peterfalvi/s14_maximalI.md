@@ -954,3 +954,20 @@ S04 API 確認) → (7.2.b) `‖χ^ρ‖²≤‖χ‖²` (adjoint χ^{ρτ}=orth
 **χ^{ρτ}=χ の orthogonal projection** を経由 — (a) で `χ^{ρτρ}=χ^ρ`、(2.7) adjunction `⟨α^τ,χ⟩=⟨α,χ^ρ⟩`
 で `(α^τ, χ^{ρτ}−χ)=0` ⟹ χ^{ρτ}=proj、Pythagoras。要 = (2.7) adjunction (S04 inner_eq 系) +
 (2.6) isometry。(7.3) `(1/|G|)Σ_{g∈Aᵗ}|χ(g)|²≥‖χ^ρ‖²` は χ₁=Aᵗ-restriction で (7.2.b) 適用。
+
+### loop³⁵ — (2.7) adjunction for ρ 完成 ✅ (S04 adjoint_formula 再利用、(7.2.b) の土台)
+
+**重要発見: S04 に (2.7) adjoint 機構が既存** — `S04.adjointAverageFun` (= ρ の underlying 関数、同式) +
+`S04.adjoint_formula` ((2.7) adjunction `⟨τα,χ⟩=⟨α,ψ⟩`、docstring に「§9 (7.2.b) が直接適用」と明記)。
+⟹ (7.2.b) の adjunction は再証明せず既存を cite。
+- `rhoValue_eq_adjointAverageFun` (bridge、axiom-clean): rhoValue = adjointAverageFun。両者の Fintype 規約
+  (Fintype.ofFinite vs instFintypeSubtypeMemOfDecidablePred) 差は `Finset.sum_congr (Finset.ext …)` で吸収。
+- `rho_adjoint` = (2.7): `⟨hyp.dadeMap α, χ⟩ = ⟨α, χ^ρ⟩` (S04.adjoint_formula を ψ=rhoClassFun で cite、
+  averaging hyp = bridge)。AxiomsCheck 登録。
+- instance: ClassFunction.inner は `[Fintype ↥L]` (variable 追加) + `Invertible (Nat.card G/↥L : ℂ)`
+  (scoped natCardInvCG/natCardInvC、S12/S15 と同パターン、S07 上流ゆえローカル宣言) 要。
+
+**残 §7 = (7.2.b) `‖χ^ρ‖²≤‖χ‖²` の Pythagoras 本体** (次イテレーション): α=χ^ρ で adjunction
+`⟨τ(χ^ρ),χ⟩=‖χ^ρ‖²` + isometry `‖τ(χ^ρ)‖²=‖χ^ρ‖²` (S04 `isDadeIsometry_of_isDadeMap`/`inner_eq`) ⟹
+残差 χ−τ(χ^ρ) が τ(χ^ρ) と直交 ⟹ Pythagoras `‖χ‖²=‖χ−τ(χ^ρ)‖²+‖χ^ρ‖²≥‖χ^ρ‖²`。要 = ClassFunction
+inner-self 正値性 (`∑|φ|²≥0`) + 展開。→ (7.3) → (12.16) hC。
