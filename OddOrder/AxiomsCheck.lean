@@ -6898,3 +6898,10 @@ type-I maximal `M`, from `[M : K] = pq` and `|K| = k` by Lagrange (`card_mul_ind
 (`card_typeIA_eq`, the numerator `|A(M)| = k − 1`, cites `typeI_frobenius` (12.7) so is body-honest
 but transitively gated on (12.16)/lane β, hence not registered here.)  Axiom-clean. -/
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S16.MHypothesis.card_M_eq
+
+/-! **Peterfalvi (14.11.4) orbit measure of a TI-subset** (`S16_NonExistenceG`, lane γ/POLE-2).
+`orbit_normSq_term`: `|𝒞_G(A)|/|G| = |A|/|N|` for a TI-subset `A` with stabilizing normalizer-bound
+`N` — the real-valued form of `S14.ncard_conjClassSet_of_isTISubset` (`|𝒞_G(A)| = |A|·[G:N]`), via
+Lagrange.  The reusable bridge turning each (14.11.4) orbit `(W#)^G`/`(P#)^G`/`(Q#)^G` into a
+`1/|N_G(·)|`-term.  Axiom-clean. -/
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S16.orbit_normSq_term

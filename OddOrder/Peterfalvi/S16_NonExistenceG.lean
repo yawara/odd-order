@@ -2568,6 +2568,21 @@ theorem MHypothesis.card_M_eq {hyp : Hypothesis (G := G)} (Mdata : MHypothesis h
   rw [hidxpq] at hidx
   rw [← hidx, Mdata.k_eq_card_K]; ring
 
+/-- **Orbit measure of a TI-subset** `|𝒞_G(A)|/|G| = |A|/|N|` — the real-valued form of the §8
+TI-counting `ncard_conjClassSet_of_isTISubset` (`|𝒞_G(A)| = |A|·[G:N]`).  For a TI-subset `A` with
+normalizer-bound `N` stabilizing `A`, the conjugacy-saturation `𝒞_G(A) = A^G` has relative measure
+`|A|/|N|` in `G`.  The reusable bridge turning each (14.11.4) orbit `(W#)^G`/`(P#)^G`/`(Q#)^G` into a
+`1/|N_G(·)|`-term (Pf 04.16 lines 109–115). -/
+theorem orbit_normSq_term [Finite G] {A : Set G} {L : Subgroup G}
+    (hTI : OddOrder.GroupTheory.IsTISubset A L)
+    (hstab : ∀ l ∈ L, MulAut.conj l • A = A) :
+    ((OddOrder.GroupTheory.conjClassSet A).ncard : ℝ) / (Nat.card G : ℝ)
+      = (A.ncard : ℝ) / (Nat.card ↥L : ℝ) := by
+  rw [OddOrder.BG.Ch4.S14.ncard_conjClassSet_of_isTISubset hTI hstab, ← L.card_mul_index]
+  have hidx : (L.index : ℝ) ≠ 0 := by exact_mod_cast Subgroup.index_ne_zero_of_finite
+  push_cast
+  rw [mul_div_mul_right _ _ hidx]
+
 open scoped Classical OddOrder.Peterfalvi.S12.FiniteInduce in
 /-- **Peterfalvi (14.11.4), the upper-bound §8 TI-counting step** (04.16 lines 109–115).  Brings the
 line-83 bound `|A(M)|/|M| + (1/|G|)(|famG₀| − |G₀|)` (the RHS of `chiRhoNormSq_psi_le_line83`,
