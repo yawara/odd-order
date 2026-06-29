@@ -823,3 +823,24 @@ norm 論法は大きい体でも成立: `N_{L/ℚ}(ζ_p-1) = N_{ℚ(ζ_p)/ℚ}(�
 number field L**」へ一般化が必要 (norm tower transitivity、`Norm.Transitivity` import 済)。
 **次イテレーション = この一般化版 (1.10.b) を build** (現 IsCyclotomicExtension 版は p-th 特化として残すか置換)。
 Coq PFsection1 の (1.10) 対応も併読して generality 確認。
+
+### loop²⁵ — (1.10.b) ℂ-form 完成 ⟹ (1.10) 全完成・FT-ready
+
+**重要な statement 確定 (Coq PFsection1 併読)**: Coq は (1.10) を **ℂ の大域代数的整数**で定式化
+(コメント: Z[η]→全整数環の simplification、原文 ℤ[η] と同値)。⟹ 正しい FT-usable 版は**特定体不要**:
+- `int_dvd_of_one_sub_primRoot_dvd` (axiom-clean) — (1.10.b) ℂ-form: p 素数、ε 原始 p 乗根、n∈ℤ で
+  `(n:ℂ)=(1-ε)·z` (z 任意代数的整数) ⟹ p∣n。前 commit の field 版 `int_dvd_of_zeta_sub_one_dvd`
+  (L=ちょうど ℚ(ζ_p) 限定) は FT に使えず ⟹ **本 ℂ 版が supersede** (field 版は dead、後で除去可)。
+  証明=associate-unit (Coq と同じ): `∏_{1≤k<p}(1-ε^k)=p` (mathlib `prod_one_sub_pow_eq_order`) +
+  各 `(1-ε^k)∣(1-ε)∣n` (`one_sub_pow_dvd_one_sub`、整数 cofactor) ⟹ p∣n^{p-1} ⟹ ℤ descend
+  (`int_dvd_of_intCast_eq_mul_isIntegral`) ⟹ p∣n。
+- helper: `one_sub_pow_dvd_one_sub` (ε^k と ε の associate、gcd(k,p)=1 で ε=(ε^k)^r) +
+  `int_dvd_of_intCast_eq_mul_isIntegral` (rational 代数的整数 ⟹ ℤ、IsIntegrallyClosed)。
+
+⟹ **Peterfalvi (1.10) 全完成・FT-ready**: (1.10.a) G-form `exists_integral_apply_sub_of_commute`
++ (1.10.b) ℂ-form `int_dvd_of_one_sub_primRoot_dvd`、両者 ℂ 値指標で直接動く ((12.16)/(13.5) 用)。
+
+**次イテレーション = (12.16) `counterexample_contradiction` 本体での (1.10) wiring に着手**: 原文
+(04.14 mmd:101) の論法 — g∈C_K(x)∖K' で (1.10.a) から ψ(xg)≡ψ(g), χ(x)≡e (mod 1-ε)、(12.14) で
+ψ(g)≡e、(1.10.b)+(12.15) で ψ(g)≡e (mod p)、… ⟹ 矛盾。(12.12)/(12.14)/(12.15) の現状を grep して
+assembly の gate を特定。dead な field 版 (1.10.b) 除去も検討。
