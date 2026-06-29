@@ -117,6 +117,7 @@ import OddOrder.BG.AppC_FrobeniusClassSum
 import OddOrder.BG.AppC_LemmaC2
 import OddOrder.Peterfalvi.Appendices.SemilinearField
 import OddOrder.Peterfalvi.Appendices.NearFields
+import OddOrder.GroupTheory.RepresentationTheory.CyclotomicCharacterCongruence
 
 /-!
 # Axioms check for chapter flagship theorems
@@ -761,6 +762,9 @@ set_option linter.style.longLine false in
 -- Pf (12.4) pin (a): `(φ₁−φ₂)^τ ∈ ℤ[R(χ)]` for constituents `φ₁,φ₂ ∈ S(χ)`.  Reconciles the global
 -- (1.4) family with the per-φ blocks `R₁(φ)` via difference-uniqueness.  Genuine; no longer sorried.
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S14.constituent_diff_tau_mem_span
+-- Pf (1.10.b) cyclotomic congruence: in a `p`-th cyclotomic field, an integer `n` with
+-- `n = (ζ-1)·a` (`a` integral) has `p ∣ n` (norm argument `N(ζ-1)=p`).  Used by (12.16)/(13.5).
+#assert_only_allowed_axioms OddOrder.RepresentationTheory.int_dvd_of_zeta_sub_one_dvd
 -- Pf (12.4) pin (b) step 1: general TI-induction self-value — for a TI subset `A` rel. `L` and an
 -- `A`-supported class function `α`, `Ind_L^G α` agrees with `α` on `A`.  Generalizes the TI-cyclic
 -- `induce_apply_eq_self_of_mem_V` to arbitrary TI subsets (the value-half of "Dade map = Ind").

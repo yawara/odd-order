@@ -749,3 +749,19 @@ substantial multi-iteration §1 build。次イテレーションで (1.10.b) [�
 §7 ρ machinery / §8 obligations、各 multi-iteration、quick win なし)。これは §12 endgame の本来の
 最難部 (lane reallocation で lane b に割当)。難所回避せず (1.10) から grind。**hub 検討事項**: lane b
 §12 が deep-foundation-only になったため、reallocation 価値の再評価余地あり (但し (12.16) は assigned)。
+
+## 2026-06-29 (lane-b=β loop¹⁹): (1.10.b) cyclotomic congruence 実装完了 ✅ — code landed
+
+**(1.10.b) `int_dvd_of_zeta_sub_one_dvd` 完成** (新 leaf `RepresentationTheory/CyclotomicCharacterCongruence.lean`、
+sorry-free)。abstract cyclotomic field 版: p odd prime, L = p-th cyclotomic field /ℚ, ζ primitive
+p-th root、n∈ℤ, a integral で `n=(ζ-1)·a` ⟹ `p∣n`。
+**証明 = norm argument** (設計通り): `N_{L/ℚ}(ζ-1)=p` (`IsPrimitiveRoot.norm_sub_one_of_prime_ne_two'`)、
+`N(algebraMap n)=n^(p-1)` (`Algebra.norm_algebraMap` + `IsCyclotomicExtension.finrank`=totient p)、
+`N(a)∈ℤ` (`Algebra.isIntegral_norm` + `IsIntegrallyClosed.isIntegral_iff`) ⟹ n^(p-1)=p·N(a) ⟹ p∣n。
+mathlib API: `cyclotomic.irreducible_rat`/`Nat.totient_prime`/`Nat.prime_iff_prime_int`。
+
+**残 (1.10)**:
+- **(1.10.a)** `χ(xy)≡χ(y) (mod 1−ε)`: char restriction + (1−ε)∣(ε^k−1)。要 char 値↔algebraic-integer。
+- **ℂ-instantiation bridge**: (12.16) 用に L=ℚ(ε)⊆ℂ で int_dvd_of_zeta_sub_one_dvd を適用
+  (a=n/(1−ε)∈ℚ(ε)∩𝓞=ℤ[ε] の integrality 供給)。
+次イテレーション = (1.10.a) char-side or ℂ-instantiation。AxiomsCheck 登録。
