@@ -570,3 +570,20 @@ route = **global n-ary (1.4) signed family + reconciliation** (conj-difference p
 1c=(1.4) 適用) → piece 2 reconciliation lemma (uniqueness 適用) → piece 3 span。各 committable。
 pin (b) (τ=Ind on TI) と (12.5) ρ は別 (deeper Dade/§7)。
 [[scaffold-sorry-free-not-done]] [[feedback-no-avoiding-hard-parts]] [[feedback-cite-sorried-lemmas-if-signature-correct]]
+
+**piece 1 の正確な実装 template (loop¹² 末、調査確定)**:
+- 列挙: `coherent_of_constant_degree:527-540` (`hSfin.toFinset.equivFin.symm` で Finset→`Fin n`、
+  injective/range=T/n≥2)。
+- 3 Dade hyp 放出: `dadeOrthonormalCharacterImageFamily:5499-5517` が **Fin 2 で完全な template**
+  (hvirtual=`dadeIntegralCharacterMap_mem_ZIrr_of_supported hyp.dadeData.dade hyp.hconj (hdiff_supp i)
+  (Submodule.sub_mem .. mem_ZIrr)` / hzero=`..apply_one_eq_zero` / hisom=`..inner_eq_on_supported_span
+  .. hSsupp (hdiff_zspan i)(hdiff_zspan j)`)。これを **Fin 2 → Fin n に一般化**(fam=T 列挙、
+  hSsupp/hdiff_supp/hdiff_zspan を T 全体に)。
+- (1.4) 適用: `isometry_difference_pair_structure:730` (characterDifferenceImageOfIsometry でなく直接)
+  → `SignedIrreducibleDifferenceFamily G n` + `∀i, isometryDifferenceImage hyp.tau fam i = sdf.signedDifference i`。
+- 補助: φ̄ as Irr = `IrreducibleCharacter.conjPerm ↥L φ` (BrauerPermutationUnconditional:152、coe=`.conj`)。
+  `hyp.tau` は `IntegralCharacterMap` (S14:95、=`dadeIntegralCharacterMap hyp.dadeData.dade ..`)、
+  (1.4) の `τ:CF→ₗ[ℤ]CF` 引数には IntegralCharacterMap の linear-map coe を渡す
+  (`dadeOrthonormalCharacterImageFamily` が `set τ := dadeIntegralCharacterMap ..` で直接渡している)。
+- pin (a) は**単一 coherent proof** (~150-200 行、piece 1+2+3 一体) が自然単位。global family は
+  existential 中間ゆえ sorry-free 分割が難しい。次イテレーションで一気に書く。
