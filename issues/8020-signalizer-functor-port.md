@@ -434,3 +434,17 @@ plan 通り完遂 (1 build fix: `Set.mem_diff.mp`→`.1`)。
 identity (M̃^G=⋃x·R(x)) + trivIset (14.5a ✅) + double-count (|R|=|𝓜_σ| ✅ `card_signalizer`) +
 orbit-stabilizer ([G:M] `ncard_conjugates_eq_index_of_normalizer_eq_self` S14:4749) (3) theoremE assemble。
 **14.5c cluster の数学核 (consttM/cover-decomp/14.5a) 完了; 残は assembly 寄り**。次 = 14.5c cardinality 組立。
+
+## ⚠ 設計 finding (lane d, 2026-06-29 cont.¹⁵): theoremE cardinality は RData でなく structure を要する
+
+14.5c cardinality 組立を scoping して判明: **`theoremE_sigma_partition_and_counting` は `hR : ∀x, RData M x (R M x)` を hyp に取るが、cardinality conjunct (14.5c) の trivIset (= 14.5a `sigma_cover_disjoint_of_inputs`) は signalizer structure (N_x, τ2(N_x), y-complement) を要し、RData だけでは出ない**。RData は conjunct1-4 (coprime/normal/complement/sharp-trans) のみで N/τ2 を carry しない。
+- ⟹ **theoremE の cardinality を証明するには R が structure-derived (signalizer_structure_of_mem_sigmaSharp の N から) である必要**があり、hR:RData だけの現 hyp では 14.5a を呼べない。
+- **選択肢**: (a) theoremE の hyp を強化 (structure data を渡す/内部で obtain) (b) theoremE 内で各 x の structure を再 obtain して 14.5a_of_inputs 適用 (c) 14.5c を別 lemma に切り出し structure を直接使う。
+- これは formulation 設計判断 + 大型 assembly (~150-200行: cover identity M̃^G=⋃x·R(x) + trivIset[14.5a] + double-count[exchange_big] + orbit[|M^G|=[G:M]])。
+
+**📍 lane d 現在地 (checkpoint, 2026-06-29 /loop ~13 turns, 9 commits)**: hD3 完全 + 14.5c cluster 数学核完成
+(consttM/sigma_cover_decomposition/14.5a/Cor 14.10/|R|=|𝓜_σ|)。**残 = (A) 14.5c/theoremE assembly (上記設計
++大型、genuine BG Theorem E content) → bgTheoremE_cover_data → spine[card_LF] / (B) 高速代替 = cross-lane
+refactor (card_LF を partition-only 化、lane c 協調; card_LF は primeFactors_disjoint のみ使用、partition core
+は既 proven)**。hub/user 判断推奨: (A) 長い genuine 上流 vs (B) 最短 spine unblock。CLAUDE.md は genuine 上流
+非 deprioritize を説くので (A) が default だが、(B) は lane c 協調で大幅短縮可。
