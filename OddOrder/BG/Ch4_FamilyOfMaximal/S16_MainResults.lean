@@ -1641,6 +1641,28 @@ theorem sigma_reps_prime_cover [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G
       (Nat.dvd_of_mem_primeFactors hpMiPF).trans (Subgroup.card_subgroup_dvd_card Mi),
       (Nat.card_pos).ne'⟩
 
+/-- **`π(M_σ) = σ(M)`** (the prime-factor content of `M_σ` being the `σ(M)`-Hall subgroup, BG (8.11) /
+`Msigma_isHall`): a prime divides `|M_σ|` iff it is a `σ`-prime of `M`.  Forward is the `π`-part of
+the Hall property (`Msigma_isHall.1`); backward, a `σ`-prime `p` divides `|M|` (`mem_sigma_iff`) hence
+`|G|`, but not the `σ′`-index `[G : M_σ]` (`Msigma_isHall.2`), so by `|G| = |M_σ|·[G : M_σ]` it
+divides `|M_σ|`.  Bridges the `σ`-stated partition (`sigma_reps_prime_cover`) to the
+`π(mainSubgroup ·)` form of `BGTheoremECoverData` via Peterfalvi (8.10) (`M_s = M_σ`, issue 8020). -/
+theorem primeFactors_Msigma_eq_sigma [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    {M : Subgroup G} (hM : M ∈ maximalSubgroups G) (p : ℕ) :
+    p ∈ (Nat.card ↥(OddOrder.BG.Ch3.S10.Msigma M)).primeFactors ↔
+      p ∈ OddOrder.BG.Ch3.S10.sigma M := by
+  have hHall := OddOrder.BG.Ch3.S10.Msigma_isHall hG hM
+  refine ⟨fun hp => hHall.1 p hp, fun hp => ?_⟩
+  have hpM : p ∈ (Nat.card ↥M).primeFactors := ((OddOrder.BG.Ch3.S10.mem_sigma_iff M p).mp hp).1
+  have hpprime : p.Prime := Nat.prime_of_mem_primeFactors hpM
+  have hpG : p ∣ Nat.card G :=
+    (Nat.dvd_of_mem_primeFactors hpM).trans (Subgroup.card_subgroup_dvd_card M)
+  have hpnidx : ¬ p ∣ (OddOrder.BG.Ch3.S10.Msigma M).index := fun hdvd =>
+    hHall.2 p (Nat.mem_primeFactors.mpr ⟨hpprime, hdvd, Subgroup.index_ne_zero_of_finite⟩) hp
+  rw [← Subgroup.card_mul_index (OddOrder.BG.Ch3.S10.Msigma M)] at hpG
+  exact Nat.mem_primeFactors.mpr
+    ⟨hpprime, (hpprime.dvd_mul.mp hpG).resolve_right hpnidx, Nat.card_pos.ne'⟩
+
 /-- **A system of conjugacy-class representatives of the maximal subgroups exists** (the `reps`
 hypothesis of BG Theorem E, issue 8019).  Subgroup conjugacy `IsConjugateSubgroup` is an equivalence
 relation (`isConjugateSubgroup_equivalence`) on the finite type of maximal subgroups; taking the
