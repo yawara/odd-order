@@ -54,9 +54,9 @@
 > | lane | クラスタ | 所有 .lean（これ以外の Pf/BG S-ファイル編集 = 逸脱→停止） |
 > |---|---|---|
 > | **a** | α Pf §10–13 中央指標核 | `OddOrder/Peterfalvi/S(0[3-9]|1[0-3])*` + `OddOrder/FeitThompson.lean:426` |
-> | **b** | β Pf §12 Dade tower | `OddOrder/Peterfalvi/S14_MaximalI.lean` + **`OddOrder/Peterfalvi/S07_RhoProjection.lean`**（§7 ρ 機構、issue 0087 carve-out） |
+> | **b** | β Pf §12 Dade tower | `OddOrder/Peterfalvi/S14_MaximalI.lean`（**ただし `exists_typeICovering` carrier-consumer は lane d、carve-out 0088**）+ **`OddOrder/Peterfalvi/S07_RhoProjection.lean`**（§7 ρ 機構、issue 0087 carve-out） |
 > | **c** | γ POLE-2 §14–16 + §15 | `OddOrder/Peterfalvi/S1[56]*`（S15_SAndT/S15_SAndT_Setup/S16_NonExistenceG）|
-> | **d** | δ BG §14–16 + carrier | `OddOrder/BG/**` + `OddOrder/FeitThompson.lean` carrier 宣言 + **S10 の bgTheoremE_cover_data carrier ブロック**（下記 carve-out） |
+> | **d** | δ BG §14–16 + carrier | `OddOrder/BG/**` + `OddOrder/FeitThompson.lean` carrier 宣言 + **S10 の bgTheoremE_cover_data carrier ブロック**（carve-out 0086）+ **S14_MaximalI の `exists_typeICovering` carrier-consumer**（carve-out 0088、下記） |
 > | **共有（全 lane 可）** | — | `OddOrder/AxiomsCheck.lean` / `OddOrder.lean` / `OddOrder/GroupTheory/**` / `OddOrder/Mathlib/**`（汎用 mathlib-shim、全 lane 加算可）/ **`OddOrder/FeitThompson.lean`**（宣言単位: a=:426、d=carrier、prefix-split で衝突回避）/ `notes/**` / `issues/**` |
 >
 > **carve-out (issue 0086, ユーザー裁可 2026-06-29)**: `OddOrder/Peterfalvi/S10_MinimalSimpleStructure.lean` は
@@ -71,6 +71,17 @@
 > S07 namespace（原則 lane a）内だが、lane b が (12.16) の §7 ρ 機構として**新規作成した独立ファイル**
 > （lane a 不接触）ゆえ **lane b 所有**として扱う。⟹ step 1.5 で lane b がこのファイルを編集していても逸脱としない
 > （lane a が S07_RhoProjection を編集したら逸脱）。§7 ρ が複数ファイル化したら所有を再整理（issue 0087）。
+>
+> **carve-out (issue 0088, ユーザー裁可 2026-06-29)**: `OddOrder/Peterfalvi/S14_MaximalI.lean`（原則 lane b）の
+> うち **`exists_typeICovering` 定理（line 2639–2798、(8.17.a) type-I covering）の carrier-consumer 部分**は
+> **lane d 所有**として扱う。理由: この定理は lane d 所有の S10 carrier `BGTheoremECoverData` /
+> `BGTheoremETypeICovering`（carve-out 0086）を直接 consume するので、carrier API の変更
+> （例: `thickenedA1`→`cover`, `thickenedA1_card`→`cover_card`, `cover_subset_kernels` 追加）が
+> 必然的にこの定理に波及する。⟹ step 1.5 で **lane d が S14_MaximalI のうち `exists_typeICovering`
+> のみ**を編集している場合は逸脱としない（S14_MaximalI のそれ以外を lane d が編集したら逸脱; lane b が
+> `exists_typeICovering` の carrier-consumer 部分を編集したら逸脱）。判定が曖昧なら
+> `git diff main...d -- …S14_MaximalI…` の `@@` hunk が全て `theorem exists_typeICovering` 文脈
+> （line 2639–2798）に収まるか確認。恒久解（現状維持 or carrier-consumer を d ファイルへ移設）は issue 0088 で追跡。
 1. 各レーンの未マージ確認: `git log --oneline main..<branch>`。
    **全レーン 0 なら「変化なし」1行報告で即終了**（build を走らせない）。
 1.5. **レーン範囲逸脱チェック（ユーザー方針 2026-06-22, 永続）**: 未マージがあるレーンについて、

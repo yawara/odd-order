@@ -41,7 +41,22 @@ d は自所有の S10 carrier `BGTheoremECoverData` を **API リファクタ**�
 **現時点で b の pending 3 commits は S14_MaximalI を触っていない** (b は S07 + AxiomsCheck のみ) ので、
 d の S14_MaximalI 編集を採れば b の現作業とは衝突しない。
 
-## やること (= 判断待ち)
+## 裁定 (2026-06-29, ユーザー)
+
+**判断 C — 恒久 carve-out 化** を採択。`exists_typeICovering` (S14_MaximalI line 2639–2798) の
+**carrier-consumer 部分を lane d 所有**とする role split (b = covering math 8.13.c1/8.8.a 本体、
+d = S10 carrier `BGTheoremECoverData` API 追従)。所有マップ更新済:
+- `notes/meta/merge_monitor.md` 🔒 マップ + carve-out 0088 ブロック
+- `notes/meta/ft_lane_reallocation_2026_06_28.md` carve-out 節
+
+step 1.5: lane d が S14_MaximalI のうち `exists_typeICovering` のみ編集 → 逸脱としない。
+これにより d の合流が解禁 → 監視ループ再開。
+
+**恒久解 (本 issue は open 維持)**: carrier-consumer wiring を d 所有 helper 補題に抽出し
+`exists_typeICovering` から cite する形にすれば、b/d が同一定理本体を共有編集する状態を解消できる
+(将来 lane d の作業項目)。
+
+## やること (= 判断待ち、裁定済)
 
 - [ ] **判断 A — hub 承認の所有例外 (推奨候補)**: 過去の `[所有例外: hub 承認]` マージ
   (git log `c9e6a7bc`/`e28908aa` 等) と同様、d の S14_MaximalI consumer 更新を承認して d を
