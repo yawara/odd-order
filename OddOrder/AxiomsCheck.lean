@@ -6912,3 +6912,12 @@ Lagrange.  The reusable bridge turning each (14.11.4) orbit `(W#)^G`/`(P#)^G`/`(
 `N_G(X) = W` — generalising `S12.typePData_V_ti` to the abstract `W`/`W₁`/`W₂` + `hnorm` inputs.
 The `W`-orbit TI input to the (14.11.4) §8 TI-count.  Axiom-clean. -/
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S16.isTISubset_sdiff_sup_of_normalizer_eq
+
+/-! **Peterfalvi (14.11.4) `W`-orbit measure** (`S16_NonExistenceG`, lane γ/POLE-2).  The `W`-stab
+`conj_smul_sdiff_sup_eq_of_normalizer_eq` (`W ≤ N_G(set)` normalizes the set) and the assembled
+relative measure `orbit_sdiff_sup_normSq_term`: `|(W − (W₁∪W₂))^G|/|G| = |W − (W₁∪W₂)|/|W|`,
+combining the TI core, the `W`-stability, and `orbit_normSq_term`.  The `W`-orbit term of (14.11.4),
+reduced to `hnorm` (= the §13 `normalizer_V` fact, from the partner type-`P` structure).
+Axiom-clean. -/
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S16.conj_smul_sdiff_sup_eq_of_normalizer_eq
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S16.orbit_sdiff_sup_normSq_term

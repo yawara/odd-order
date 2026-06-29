@@ -2650,6 +2650,27 @@ theorem isTISubset_sdiff_sup_of_normalizer_eq [Finite G] {W W1 W2 : Subgroup G}
   simp only [hvset, Set.mem_diff, Set.mem_union, SetLike.mem_coe]
   rw [hgW h, hstab W1 hW1le h, hstab W2 hW2le h]
 
+/-- **`W` stabilises its exceptional set `W − (W₁ ∪ W₂)` under conjugation** — the `hstab` input to
+the `W`-orbit count `ncard_conjClassSet_of_isTISubset`/`orbit_normSq_term`, generalising
+`S12.typePData_W_normalizes_typePV`.  Every `l ∈ W = N_G(set)` (via `hnorm`) normalizes the set. -/
+theorem conj_smul_sdiff_sup_eq_of_normalizer_eq [Finite G] {W W1 W2 : Subgroup G}
+    (hnorm : ∀ X : Set G, X.Nonempty →
+      X ⊆ (W : Set G) \ ((W1 : Set G) ∪ (W2 : Set G)) → Subgroup.normalizer X = W)
+    (hne : ((W : Set G) \ ((W1 : Set G) ∪ (W2 : Set G))).Nonempty) :
+    ∀ l ∈ W, MulAut.conj l • ((W : Set G) \ ((W1 : Set G) ∪ (W2 : Set G)))
+      = (W : Set G) \ ((W1 : Set G) ∪ (W2 : Set G)) := by
+  intro l hl
+  have hlN : l ∈ Subgroup.normalizer ((W : Set G) \ ((W1 : Set G) ∪ (W2 : Set G))) := by
+    rw [hnorm _ hne Set.Subset.rfl]; exact hl
+  rw [Subgroup.mem_set_normalizer_iff] at hlN
+  ext x
+  simp only [Set.mem_smul_set, MulAut.smul_def, MulAut.conj_apply]
+  constructor
+  · rintro ⟨v, hv, rfl⟩; exact (hlN v).mp hv
+  · intro hx
+    refine ⟨l⁻¹ * x * l, (hlN _).mpr ?_, by group⟩
+    rw [show l * (l⁻¹ * x * l) * l⁻¹ = x by group]; exact hx
+
 /-- **Orbit measure of a TI-subset** `|𝒞_G(A)|/|G| = |A|/|N|` — the real-valued form of the §8
 TI-counting `ncard_conjClassSet_of_isTISubset` (`|𝒞_G(A)| = |A|·[G:N]`).  For a TI-subset `A` with
 normalizer-bound `N` stabilizing `A`, the conjugacy-saturation `𝒞_G(A) = A^G` has relative measure
@@ -2664,6 +2685,22 @@ theorem orbit_normSq_term [Finite G] {A : Set G} {L : Subgroup G}
   have hidx : (L.index : ℝ) ≠ 0 := by exact_mod_cast Subgroup.index_ne_zero_of_finite
   push_cast
   rw [mul_div_mul_right _ _ hidx]
+
+/-- **`W`-orbit relative measure** `|(W − (W₁ ∪ W₂))^G|/|G| = |W − (W₁ ∪ W₂)|/|W|` — the assembled
+`W`-orbit term of Peterfalvi (14.11.4), combining the TI core
+(`isTISubset_sdiff_sup_of_normalizer_eq`), the `W`-stability
+(`conj_smul_sdiff_sup_eq_of_normalizer_eq`), and the orbit bridge (`orbit_normSq_term`).  Given the
+cyclic structure `W = W₁ × W₂` and the singleton/subset normalizer fact `N_G(X) = W` (`hnorm`). -/
+theorem orbit_sdiff_sup_normSq_term [Finite G] {W W1 W2 : Subgroup G}
+    (hWcyc : IsCyclic ↥W) (hWeq : W = W1 ⊔ W2)
+    (hnorm : ∀ X : Set G, X.Nonempty →
+      X ⊆ (W : Set G) \ ((W1 : Set G) ∪ (W2 : Set G)) → Subgroup.normalizer X = W)
+    (hne : ((W : Set G) \ ((W1 : Set G) ∪ (W2 : Set G))).Nonempty) :
+    ((OddOrder.GroupTheory.conjClassSet
+        ((W : Set G) \ ((W1 : Set G) ∪ (W2 : Set G)))).ncard : ℝ) / (Nat.card G : ℝ)
+      = (((W : Set G) \ ((W1 : Set G) ∪ (W2 : Set G))).ncard : ℝ) / (Nat.card ↥W : ℝ) :=
+  orbit_normSq_term (isTISubset_sdiff_sup_of_normalizer_eq hWcyc hWeq hnorm)
+    (conj_smul_sdiff_sup_eq_of_normalizer_eq hnorm hne)
 
 open scoped Classical OddOrder.Peterfalvi.S12.FiniteInduce in
 /-- **Peterfalvi (14.11.4), the upper-bound §8 TI-counting step** (04.16 lines 109–115).  Brings the
