@@ -587,3 +587,35 @@ pin (b) (τ=Ind on TI) と (12.5) ρ は別 (deeper Dade/§7)。
   (`dadeOrthonormalCharacterImageFamily` が `set τ := dadeIntegralCharacterMap ..` で直接渡している)。
 - pin (a) は**単一 coherent proof** (~150-200 行、piece 1+2+3 一体) が自然単位。global family は
   existential 中間ゆえ sorry-free 分割が難しい。次イテレーションで一気に書く。
+
+## 2026-06-29 (lane-b=β loop¹³): pin (a) `constituent_diff_tau_mem_span` 完全証明 ✅✅
+
+**pin (a) sorry-free 化完了** (commit 4eecce9c、3 lemma 全 axiom-clean、full build 3849 / AxiomsCheck
+3874 green)。loop¹²の recipe を実装:
+- `R1cdi_muNu_mem_span_Rset` (piece 3): R₁(φ).imageSet={ε·μ,−ε·ν}⊆R(χ)、ε=±1 ⟹ μ_φ,ν_φ∈span ℤ R(χ)。
+- `exists_uniform_image_of_constituents` (piece 1): 共役閉 T=S(χ)∪S(χ)‾ の global (1.4) coherence
+  (`isometry_difference_pair_structure` を定次数 family に適用、3 Dade hyp は A(L)-supported 差から
+  `dadeIntegralCharacterMap_{mem_ZIrr_of_supported,apply_one_eq_zero,inner_eq_on_supported_span}`)。
+  一様符号 ε + 単射 μ:T↪Irr G、τ(α−β)=ε(μα−μβ)。**Finset 列挙で injectivity 自動** (懸念解消)。
+- pin (a): global ε(μφ−μφ̄) と per-φ R₁(φ) の ε_φ(μ_φ−ν_φ) を difference-uniqueness で照合。
+- **実装知見**: 文の Finset image/union は `open scoped Classical` 要 (DecidableEq)。
+  μ の dite は `simp only [dif_pos h]` で beta+解決 (`rw [dif_pos]` は lambda 未適用で pattern 不一致)。
+  ℤ-smul→ℂ-smul は `Int.cast_smul_eq_zsmul`。`IntegralCharacterMap=CF→ₗ[ℤ]CF` ゆえ hyp.tau 直接渡せる。
+
+**残 (12.4) gate = pin (b) `constituent_diff_tau_eq_induce`** (τ(φ₁−φ₂)=Ind_L^G(φ₁−φ₂))。
+これが埋まれば `Sset_coeff_equal` → (12.4) `orthogonal_character_constant_on_coset` が unblock。
+次イテレーション = pin (b) scope ([Is]7.7 τ=Ind on TI; Dade map は supported 上で induce か要確認、
+`dadeIntegralCharacterMap_apply_of_support` + Dade map=induce-on-TI)。
+
+**pin (b) `constituent_diff_tau_eq_induce` scoping (loop¹³ 末、次イテレーション)**:
+τ(φ₁−φ₂)=Ind_L^G(φ₁−φ₂)。template = `TICyclicHypothesis.tau_eq_induce` (S05_SignedTripleGrid:288)
+= `IsDadeMap.unique τ.isDadeMap (isDadeMap_inducedDadeMap)`。2 piece 要:
+1. **induce が Dade map (型 I)**: `isDadeMap_inducedDadeMap` (S05:254) は TICyclicHypothesis 専用、
+   依存 = `induce_apply_eq_self_of_mem_V` (value-half) + `dadeSupport_eq_conjugatesOfSet_of_forall_H_eq_bot`
+   (要 **∀a, H(a)=⊥** = trivial Dade stabilizer)。型 I Dade (`S10.dadeSupportHypotheses_typeI`) が
+   ∀a H(a)=⊥ を満たすか要確認 (満たせば inducedDadeMap 構成を DadeHypothesis 一般に generalize して
+   IsDadeMap.unique で τ=induce)。⚠ 型 I 全 A(L) で H(a)=⊥ は怪しい (H# 除外がある = (8.12.c))。
+   ⟹ TI 部分 (A(L)−H#) でのみ τ=induce の可能性 → supported-restriction 版が要る。
+2. **Supp(φ₁−φ₂)⊆A(L)−H#**: [Is]6.2 (Res_H φ=共役和) + 型 F constituent (cross-lane §8、(8.12.a))。
+   φᵢ は A(L)∪{1} supported (data.supported)、差で {1} 相殺だが H# 除外は別途。
+深い Dade machinery + §8 cross-lane。pin (a) と違い「単一 coherent proof」では済まない可能性大。
