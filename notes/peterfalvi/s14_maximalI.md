@@ -938,3 +938,19 @@ equivariance (`rhoValue_conjA`) を使い (7.1) を genuine な class-function m
 S04 API 確認) → (7.2.b) `‖χ^ρ‖²≤‖χ‖²` (adjoint χ^{ρτ}=orthogonal projection、(2.7) Dade adjunction +
 (2.6) isometry) → (7.3) `(1/|G|)Σ_{g∈Aᵗ}|χ(g)|²≥‖χ^ρ‖²` (χ₁=A^τ-restriction、χ₁^ρ=χ^ρ + (7.2.b))。
 これらが (12.16) の hA/hB/hC + h_const/h_psix/h_psig_int を供給。Aᵗ=`hyp.dadeSupport` 既存。正本=issue 0081。
+
+### loop³⁴ — (7.2.a) `α^{τρ}=α` 完成 ✅ (ρ は τ の left inverse)
+
+**(7.2.a) `rho_dadeMap` 完成** (全 axiom-clean、leaf green)。crux = Dade τ の coset-value
+`Hypothesis.dadeValue_eq` (S04:3547、`α^τ(g)=(α:CF L)⟨a,_⟩` for `IsConj (a·h) g`, h∈H(a)) が既存:
+- `rhoValue_dadeMap` (value): `α^τ` は coset `a·H(a)` 上で定数 `=α(a)` (dadeValue_eq + IsConj.refl)
+  ⟹ ρ-average = `(card H)⁻¹·(card H • α(a)) = α(a)` (`Finset.sum_const`+`inv_mul_cancel_left₀`、
+  instance は letI+rfl pin)。
+- `rhoClassFun_dadeMap` (CF(L) 形): A 上 rhoValue_dadeMap、A 外は両者 0 (rhoClassFun=0 + α supported
+  ⟹ α=0 off A、`mem_supportedSubmodule`+`mem_support` で)。`⟨↑g,_⟩=g` は rw の defeq で閉。
+- `rho_dadeMap` = (7.2.a): `rho hyp hconj (hyp.dadeMap α) = α` (Subtype.ext)。AxiomsCheck 登録。
+
+**残 §7 = (7.2.b)/(7.3) norm bound** (次イテレーション): (7.2.b) `‖χ^ρ‖²≤‖χ‖²` (等号⟺χ∈im τ) は
+**χ^{ρτ}=χ の orthogonal projection** を経由 — (a) で `χ^{ρτρ}=χ^ρ`、(2.7) adjunction `⟨α^τ,χ⟩=⟨α,χ^ρ⟩`
+で `(α^τ, χ^{ρτ}−χ)=0` ⟹ χ^{ρτ}=proj、Pythagoras。要 = (2.7) adjunction (S04 inner_eq 系) +
+(2.6) isometry。(7.3) `(1/|G|)Σ_{g∈Aᵗ}|χ(g)|²≥‖χ^ρ‖²` は χ₁=Aᵗ-restriction で (7.2.b) 適用。

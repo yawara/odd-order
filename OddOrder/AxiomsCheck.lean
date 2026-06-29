@@ -6887,3 +6887,9 @@ the class function on `L` taking `χ^ρ(a)` on `A` and `0` off `A`, with support
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S07.rho
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S07.rhoClassFun_add
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S07.rhoClassFun_smul
+
+/-! **Peterfalvi (7.2.a) `α^{τρ} = α`** (`S07_RhoProjection`; lane β).  The `ρ` projection is a left
+inverse of the Dade isometry `τ` on `CF(L,A)`: since `α^τ` is constant `= α(a)` on the coset `a·H(a)`
+(`Hypothesis.dadeValue_eq`), its `ρ`-average over `H(a)` recovers `α(a)`.  Axiom-clean. -/
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S07.rhoValue_dadeMap
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S07.rho_dadeMap

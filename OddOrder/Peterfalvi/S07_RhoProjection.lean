@@ -174,4 +174,43 @@ theorem rhoClassFun_smul (hconj : hyp.HConjInvariant) (c : ℂ) (χ : ClassFunct
   · rw [ClassFunction.smul_apply, rhoClassFun_apply_not_mem hyp hconj _ hg,
       rhoClassFun_apply_not_mem hyp hconj _ hg, mul_zero]
 
+/-- **Peterfalvi (7.2.a), pointwise**: for `α ∈ CF(L, A)` and `a ∈ A`, the `τρ`-roundtrip recovers
+`α(a)`.  The Dade image `α^τ` is constant equal to `α(a)` on the coset `a·H(a)`
+(`Hypothesis.dadeValue_eq`), so its `ρ`-average over `H(a)` is just `α(a)`. -/
+theorem rhoValue_dadeMap (α : S04.SupportedClassFunctions ℂ A L) {a : G} (ha : a ∈ A) :
+    rhoValue hyp (hyp.dadeMap α) ⟨a, ha⟩ = (α : ClassFunction L ℂ) ⟨a, hyp.mem_L ha⟩ := by
+  letI : Fintype (hyp.H ⟨a, ha⟩) := Fintype.ofFinite _
+  have hval : ∀ x : (hyp.H ⟨a, ha⟩),
+      (hyp.dadeMap α) (a * (x : G)) = (α : ClassFunction L ℂ) ⟨a, hyp.mem_L ha⟩ := fun x => by
+    rw [hyp.dadeMap_apply]
+    exact hyp.dadeValue_eq α x.2 (IsConj.refl (a * (x : G)))
+  have hcard : (Nat.card (hyp.H ⟨a, ha⟩) : ℂ) ≠ 0 :=
+    Nat.cast_ne_zero.mpr Nat.card_pos.ne'
+  have hexp : rhoValue hyp (hyp.dadeMap α) ⟨a, ha⟩
+      = (Nat.card (hyp.H ⟨a, ha⟩) : ℂ)⁻¹
+          * ∑ x : (hyp.H ⟨a, ha⟩), (hyp.dadeMap α) (a * (x : G)) := rfl
+  rw [hexp]
+  simp_rw [hval]
+  rw [Finset.sum_const, Finset.card_univ, ← Nat.card_eq_fintype_card, nsmul_eq_mul,
+    inv_mul_cancel_left₀ hcard]
+
+/-- **Peterfalvi (7.2.a), class-function form**: `α^{τρ} = α` (as a class function on `L`). -/
+theorem rhoClassFun_dadeMap (hconj : hyp.HConjInvariant) (α : S04.SupportedClassFunctions ℂ A L) :
+    rhoClassFun hyp hconj (hyp.dadeMap α) = (α : ClassFunction L ℂ) := by
+  apply ClassFunction.ext
+  intro g
+  by_cases hg : (g : G) ∈ A
+  · rw [rhoClassFun_apply_mem hyp hconj _ hg, rhoValue_dadeMap hyp α hg]
+  · rw [rhoClassFun_apply_not_mem hyp hconj _ hg]
+    symm
+    by_contra hne
+    exact hg (S04.mem_supportInSubgroup.mp
+      ((ClassFunction.mem_supportedSubmodule.mp α.property) (ClassFunction.mem_support.mpr hne)))
+
+/-- **Peterfalvi (7.2.a)**: `α^{τρ} = α` for `α ∈ CF(L, A)` — the `ρ` projection is a left inverse
+of the Dade isometry `τ` on `CF(L, A)`. -/
+theorem rho_dadeMap (hconj : hyp.HConjInvariant) (α : S04.SupportedClassFunctions ℂ A L) :
+    rho hyp hconj (hyp.dadeMap α) = α :=
+  Subtype.ext (rhoClassFun_dadeMap hyp hconj α)
+
 end OddOrder.Peterfalvi.S07
