@@ -280,6 +280,70 @@ theorem Hypothesis.not_subset_characterKernel_chiRestrict_of_ne_one
   rw [map_one] at hval'
   exact hval'
 
+/-- **The trivial column `χ₂ = 1` gives `χ_0 = 1_K`** (Peterfalvi (4.4) anchor): `chiRestrict 1 =
+Res^L_K μ_{00} = Res^L_K 1_L = 1_K` (`certainType_zero_column_anchor`).  This is the unique
+reducible induction whose kernel contains every `H ≤ K`; it is the `j = 0` column removed by the
+`H`-nontriviality of (9.9.b). -/
+theorem Hypothesis.chiRestrict_one_eq_trivial
+    (h : Hypothesis L₀) [NeZero (Nat.card h.W1)] [Invertible (Nat.card ↥h.K : ℂ)]
+    [Fintype ↥(h.W1 ⊔ h.W2)] [Invertible (Nat.card ↥(h.W1 ⊔ h.W2) : ℂ)] :
+    h.chiRestrict 1 = trivialIrreducibleCharacter ↥h.K := by
+  apply IrreducibleCharacter.ext
+  rw [coe_chiRestrict, h.certainType_zero_column_anchor.2]
+  simp
+
+/-- **Peterfalvi (4.5.b) + (4.7), `H`-nontrivial reducible-induction count**: for a subgroup `H ≤ K`
+containing `W₂` (the (4.6.c) covering condition), exactly `w₂ − 1` of the irreducible characters
+`χ ∈ Irr(K)` induce a *reducible* character of `L` with `H ⊄ Ker χ` — the `μ_j`, `1 ≤ j < w₂`.
+
+The `w₂` reducible inductions biject with the columns `Ŵ₂` (`card_reducible_induce_eq_W2`,
+`induce_not_isIrreducible_iff`).  The trivial column `χ₂ = 1` gives `χ_0 = 1_K`
+(`chiRestrict_one_eq_trivial`), whose kernel is all of `K ⊇ H`; every nontrivial column `χ₂ ≠ 1`
+gives `W₂ ⊄ Ker χ_j` ((4.7), `not_subset_characterKernel_chiRestrict_of_ne_one`), hence
+`H ⊄ Ker χ_j`.  Removing the one trivial column leaves `w₂ − 1`.  This is the count behind
+Peterfalvi (9.9.b)/(9.8.b) (with `w₂ = p` and `H = H̄` after the (8.4.d) realization of `𝒮(H₀)`
+as the `M/H₀`-induction family). -/
+theorem Hypothesis.card_reducible_Hnontrivial_induce_eq_W2_sub_one
+    (h : Hypothesis L₀) [NeZero (Nat.card h.W1)] [Invertible (Nat.card ↥h.K : ℂ)]
+    [Fintype ↥(h.W1 ⊔ h.W2)] [Invertible (Nat.card ↥(h.W1 ⊔ h.W2) : ℂ)]
+    {H : Subgroup ↥h.K} (hW2H : h.W2.subgroupOf h.K ≤ H) :
+    Nat.card {χ : IrreducibleCharacter ↥h.K //
+        ¬ IsIrreducibleCharacter (ClassFunction.induce h.K (χ : ClassFunction ↥h.K ℂ))
+        ∧ ¬ ((H : Set ↥h.K) ⊆ S03.characterKernel (χ : ClassFunction ↥h.K ℂ))}
+      = Nat.card h.W2 - 1 := by
+  classical
+  haveI : Fintype ((h.W2.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ) := Fintype.ofFinite _
+  -- the forward map sends a nontrivial column `χ₂` to its reducible, `H`-nontrivial `χ_j`
+  have hfwd : ∀ p : {χ₂ : (h.W2.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ // χ₂ ≠ 1},
+      ¬ IsIrreducibleCharacter (ClassFunction.induce h.K (h.chiRestrict p.1 : ClassFunction ↥h.K ℂ))
+        ∧ ¬ ((H : Set ↥h.K) ⊆
+            S03.characterKernel (h.chiRestrict p.1 : ClassFunction ↥h.K ℂ)) := by
+    rintro ⟨χ₂, hχ₂⟩
+    refine ⟨h.induce_chiRestrict_not_isIrreducible χ₂, fun hHker => ?_⟩
+    exact h.not_subset_characterKernel_chiRestrict_of_ne_one hχ₂
+      (Set.Subset.trans (SetLike.coe_subset_coe.mpr hW2H) hHker)
+  -- bijection of the `H`-nontrivial reducibles with the nontrivial columns `Ŵ₂ ∖ {1}`
+  have hcard : Nat.card {χ : IrreducibleCharacter ↥h.K //
+        ¬ IsIrreducibleCharacter (ClassFunction.induce h.K (χ : ClassFunction ↥h.K ℂ))
+        ∧ ¬ ((H : Set ↥h.K) ⊆ S03.characterKernel (χ : ClassFunction ↥h.K ℂ))}
+      = Nat.card {χ₂ : (h.W2.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ // χ₂ ≠ 1} := by
+    refine (Nat.card_congr (Equiv.ofBijective (fun p => ⟨h.chiRestrict p.1, hfwd p⟩) ⟨?_, ?_⟩)).symm
+    · rintro ⟨a, ha⟩ ⟨b, hb⟩ hab
+      exact Subtype.ext (h.chiRestrict_injective (Subtype.ext_iff.mp hab))
+    · rintro ⟨χ, hred, hHnt⟩
+      obtain ⟨χ₂, hχ₂⟩ := (h.induce_not_isIrreducible_iff χ).mp hred
+      refine ⟨⟨χ₂, ?_⟩, Subtype.ext hχ₂⟩
+      rintro rfl
+      refine hHnt ?_
+      rw [← hχ₂, h.chiRestrict_one_eq_trivial, IrreducibleCharacter.coe_trivialIrreducibleCharacter,
+        S03.characterKernel_trivialClassFunction]
+      exact Set.subset_univ _
+  -- `|Ŵ₂ ∖ {1}| = |Ŵ₂| − 1 = w₂ − 1`
+  rw [hcard, Nat.card_eq_fintype_card]
+  simp only [ne_eq]
+  rw [Fintype.card_subtype_compl, Fintype.card_subtype_eq, ← Nat.card_eq_fintype_card,
+    h.card_charGroup_W2]
+
 end ChiJ
 
 /-- **Peterfalvi (4.7), `j ≥ 1` kernel statement** in the Hypothesis (4.6) form: for a nontrivial

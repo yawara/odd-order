@@ -661,3 +661,30 @@ S10:445-595 の既存 specialization を土台に。
 (HU から M への induced family) を L=M/H₀ の §6 induction-family と同一視する (8.4.d) 商 bridge」。
 w₂=p で count は p、H̄-nontriviality で j=0 column を除いて **p-1** = (9.9.b) の主張。**次手は変わらず
 (8.4.d) bridge** だが、ゲートが 2 つ (§6 count + bridge) から 1 つ (bridge) に縮小し、§6 count は完了。
+
+### §12 追補¹⁰ (lane-a /loop cont.): §6 side を完全クローズ — H-nontrivial count = w₂-1、bridge も「構造のみ」と判明
+
+**重要な簡約 2 件**:
+1. **count は STRUCTURAL Hypothesis のみ要 (Dade isometry 不要)**: `card_reducible_induce_eq_W2` /
+   (4.7) structural は全て `S06.Hypothesis L` (= K/W₁/W₂ + complement) 上で動き、`Hypothesis46` の
+   Dade τ/dade0 は不要。⟹ (8.4.d) bridge は **`S06.Hypothesis (M⧸H₀)` (構造のみ) の構成 + 文字対応**で
+   足り、商上の Dade 等長写像構成 (最重量級) は **不要**。
+2. **(4.7) structural も既存だった** ([[verify-port-state-by-number-not-coq-name]] 再び):
+   `not_subset_characterKernel_chiRestrict_of_ne_one` (S06_CertainTypeSupport、χ₂≠1 ⟹ W₂⊄Ker χ_j、
+   `Hypothesis L` 構造のみ) が (4.7) j≥1 核を既に供給。
+
+**本セッションで §6 side を完全クローズ** (commit 次、2 lemma axiom-clean [3 標準公理]、leaf build green):
+- `Hypothesis.chiRestrict_one_eq_trivial` (S06_CertainTypeSupport): trivial column χ₂=1 ⟹
+  chiRestrict 1 = 1_K (anchor `certainType_zero_column_anchor.2`)。j=0 列が唯一の H-trivial reducible。
+- **`Hypothesis.card_reducible_Hnontrivial_induce_eq_W2_sub_one`**: 任意の `W₂ ≤ H ≤ K` に対し
+  `|{χ∈Irr(K) | Ind^L_K χ reducible ∧ H⊄Ker χ}| = w₂ - 1`。reducible↔Ŵ₂ bijection から χ₂=1 列
+  (=1_K, H⊆Ker) を除外、χ₂≠1 列は (4.7) で H⊄Ker。**これが (9.9.b) "p-1 reducible" の §6 side 完全形**
+  (H=H̄、w₂=p で p-1)。
+
+**⟹ §6 side は 100% 完了。残る唯一のピース = §9↔§6 character bridge** (構造のみ):
+- (B1) `S06.Hypothesis (↥M ⧸ H₀')` 構成 (K=HU/H₀, W̄₁, W̄₂; `typePData_toS06Hypothesis` (S12:1062, L=M版)
+  が template、商 transport が要点)。**H₀ ◁ M 要確認** (chief factor data から)。
+- (B2) `chars.SOf chief.H0` (§9 induced family, HU→M) ↔ §6 induction-family {Ind^L_K χ} on M/H₀ の
+  同一視 ((1.6): H₀⊆Ker の M-文字 = M/H₀-文字)。その下で reducibility + H̄-nontriviality 対応。
+- (B3) `card_reducible_Hnontrivial_induce_eq_W2_sub_one` を H=H̄, w₂=p で instantiate → (9.9.b) count。
+次手 = B1 (S10、`typePData_toS06Hypothesis` 商版)。

@@ -46,9 +46,15 @@ X/H₀ の文字と同一視」((1.6)) で商で作業。⟹ §9 reducible-count
 > (9.9.b)/(9.8.b) を cite で実証明して前に進む。`typePData_toS06Hypothesis` 既存 = §6 `S06.Hypothesis` は
 > type-P data から構成可能 (S12:1011) ⟹ §6 machinery は available。M/H₀ 商版の bridge が要点。
 
-1. ✅ **DONE (2026-06-29)**: §6 reducible-count = `card_reducible_induce_eq_W2`
-   (`S06_CertainTypeClifford.lean`、axiom-clean、pin 不要で実証明完了)。`induce_not_isIrreducible_iff`
-   / `induce_chiRestrict_not_isIrreducible` 込み。「(4.5)/(4.7) 未完」は stale だった。
+1. ✅✅ **DONE (2026-06-29)**: §6 side 完全クローズ (全 axiom-clean、pin 不要で実証明)。
+   - `card_reducible_induce_eq_W2` (`S06_CertainTypeClifford`、`|reducible Ind|=w₂`)。
+   - **`card_reducible_Hnontrivial_induce_eq_W2_sub_one`** (`S06_CertainTypeSupport`、任意 W₂≤H≤K で
+     `|reducible Ind ∧ H⊄Ker| = w₂-1`) + helper `chiRestrict_one_eq_trivial`。これが (9.9.b) "p-1
+     reducible" の §6 完全形 (H=H̄, w₂=p)。`induce_not_isIrreducible_iff` / (4.7) structural
+     `not_subset_characterKernel_chiRestrict_of_ne_one` (既存) を統合。
+   - **重要簡約**: count は STRUCTURAL `Hypothesis L` のみ要 (Dade τ 不要) ⟹ (8.4.d) bridge も
+     「`Hypothesis (M/H₀)` 構造のみ + 文字対応」で足り、商上 Dade 等長写像構成は不要。
+   「(4.5)/(4.7) 未完」は stale だった。
 2. **← 次手 (残る唯一のゲート)**: (8.4.d) Hypothesis(4.6)-for-M/H₀ bridge。entry = S10:587-588 の
    TODO (`-- TODO (Peterfalvi (8.15), higher Dade specializations): ... Hypothesis (4.6)/(5.2)
    statements with K=M_prime and H=M_F`)。`DadeSupportHypothesisData` (S10:453) は L=M 直接版のみ。
