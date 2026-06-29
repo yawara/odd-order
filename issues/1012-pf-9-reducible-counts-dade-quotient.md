@@ -70,21 +70,23 @@ X/H₀ の文字と同一視」((1.6)) で商で作業。⟹ §9 reducible-count
        K=W₁.subgroupOf M, L=H₀.subgroupOf M; hcop=Coprime|M'||W₁|=hHall)。K̄/W̄₁ も自動で image 形。
      - `W1_cyclic/W2_cyclic`: image of cyclic。`W1_nontrivial`: `chiefFactor_W1_inf_H0_..._eq_bot` で
        W̄₁≅W₁≠⊥。`card_coprime`: |K̄| ∣ |K|, |W̄₁|=|W₁|, `hHall`。`W2_le_K`: image monotone。
-     - **`W2_nontrivial` + |W̄₂|=p**: `typeP_chiefFactor_card` (S11:888) が `|C_{H̄}(W₁)|=p` 供給。
-       **⚠ type-II 注意 (S11:2032 faithfulness note)**: type II では `|W₂| > p` (W₂∩H₀≠⊥)、
-       使うのは **image-order |W̄₂|=p** (typeP_chiefFactor_card)、**`|W₂|` ではない** (後者は
-       type III/IV のみ p)。W̄₂ = image of W₂ = C_{H̄}(W₁), order p。
+     - **`W2_nontrivial` (= W̄₂≠⊥ ⟺ W₂⊄H₀) — 残る非自明 field**: `coprimeFrobeniusChiefFactor_card`
+       (S11:761) が `|fixedByE|=|C_{H̄}(W₁)|=p` 供給。但し fixedByE は H̄=↥H⧸N chief-action 側、
+       W̄₂=(W₂.subgroupOf M).map mk' は M/H₀ 側 ⟹ **両者同一視 (W₂↪H̄ image = fixedByE, |·|=p≠1) の
+       connection が要** (次反復、~30-50行)。**⚠ type-II 注意 (S11:2032)**: type II では `|W₂|>p`、
+       使うのは **image-order |W̄₂|=p**、`|W₂|` ではない。
      - **`centralizer_W2` (= (8.4.d) crux)**: `C_{↥M⧸H₀'}(x̄) ⊓ K̄ = W̄₂` for x̄∈W̄₁^#。**3-step 分解**:
        1. ✅ **DONE (2026-06-29)**: `C_{↥M⧸H₀'}(x̄) = (C_{↥M}(x)).map mk'` = **一般補題
           `centralizer_map_mk'_eq_of_coprime_zpowers`** (S11、axiom-clean、reusable):
           `C_{Γ/N}(x̄) = (C_Γ(x)).map mk'` for Coprime|⟨x⟩||N|。⊆ = `coprime_fixedPoints_quotient_of_coprime_normal`
           (φ=MulAut.conj∘zpowers subtype, IsAInvariant ∵N normal, hg_fix ∵x̄,ḡ commute⟹power commute)。
           **これが (8.4.d) の本質的 content** (BG Lem 1.14 は p-group 限定で ⟨x⟩ 不適用、直接組立した)。
-       2. **`(C_{↥M}(x)).map mk' ⊓ K̄ = (C_{↥M}(x) ⊓ K).map mk'`** (`ker mk'=H₀'≤K=M'.subgroupOf M` ゆえ
-          image∩image=image∩; mathlib `Subgroup.map_inf_eq_map_inf_comap`/`map_inf` ker条件 系)。残。
-       3. **`C_{↥M}(x) ⊓ (M'.subgroupOf M) = W₂.subgroupOf M`** (= `data.centralizer_W1`
-          `derivedInG M ⊓ centralizer{x} = W₂` の ↥M subgroupOf transport)。残。
-       ⟹ 残 = step 2+3 (algebraic plumbing) + x̄→x lift 接続。crux 本質 (step 1) 完了。
+       2. ✅ **DONE**: `map_inf_map_of_ker_le` (一般、`ker f≤B ⟹ A.map f ⊓ B.map f=(A⊓B).map f`)。
+       3. ✅ **DONE**: `chiefFactor_centralizer_inf_derived` (`C_{↥M}(x)⊓M'=W₂`、`centralizer_W1` +
+          `S03h.centralizer_subgroupOf` transport)。
+       ✅✅ **crux 全完了 (2026-06-29、3 lemma axiom-clean)**: **`chiefFactor_centralizer_W2bar`**
+       (step1+2+3+lift 統合): `C_{↥M⧸H₀'}(x̄)⊓K̄=W̄₂` for x̄∈W̄₁^#。これで **B1 の最難 field
+       (centralizer_W̄₂) 完成**。lift coprimality は `chiefFactor_coprime_H0_W1`+card chain。
      - `W_odd`: image of W₁⊔W₂ odd ← |G| odd。
    - **B1 def の home**: S12 (typePData_toS06Hypothesis 近傍) or 新 bridge leaf。`typePData_toS06Hypothesis`
      (S12:1062, L=M版) が subgroupOf-transport の template; B1 は mk'-image-transport 版。

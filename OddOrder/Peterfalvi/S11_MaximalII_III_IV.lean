@@ -2163,6 +2163,71 @@ theorem chiefFactor_coprime_H0_W1 [Finite G] {M : Subgroup G}
   (typeP_coprime_H_W1 data.typeP).coprime_dvd_left
     (Subgroup.card_dvd_of_le chief.H0_lt_H.le)
 
+/-- **`A.map f ⊓ B.map f = (A ⊓ B).map f` when `ker f ≤ B`** (general group theory).  `⊇` is
+monotonicity; for `⊆`, `f a = f b` with `b ∈ B` and `ker f ≤ B` forces `a ∈ B`, so `a ∈ A ⊓ B`.
+The step (8.4.d) needs to pull `C(x̄) ⊓ K̄` out of the image (`f = mk' H₀`, `ker = H₀ ≤ K = M'`). -/
+theorem map_inf_map_of_ker_le {H : Type*} [Group H] {f : G →* H} {A B : Subgroup G}
+    (hB : f.ker ≤ B) : A.map f ⊓ B.map f = (A ⊓ B).map f := by
+  refine le_antisymm ?_ (le_inf (Subgroup.map_mono inf_le_left) (Subgroup.map_mono inf_le_right))
+  intro y hy
+  rw [Subgroup.mem_inf] at hy
+  obtain ⟨a, ha, rfl⟩ := hy.1
+  obtain ⟨b, hb, hab⟩ := hy.2
+  have hker : a * b⁻¹ ∈ f.ker := by
+    rw [MonoidHom.mem_ker, map_mul, map_inv, hab, mul_inv_cancel]
+  have haB : a ∈ B := by
+    have hmem : a * b⁻¹ * b ∈ B := mul_mem (hB hker) hb
+    simpa using hmem
+  exact ⟨a, ⟨ha, haB⟩, rfl⟩
+
+/-- **Peterfalvi (8.4.d), step 3 — `centralizer_W₁` transported to `↥M`**: for a lift `x` of a
+nontrivial `W̄₁`-element, `C_{↥M}(x) ⊓ M' = W₂` (inside `↥M`).  The (8.4) datum
+`derivedInG M ⊓ C_G(x) = W₂` (`data.centralizer_W1`) transported across `↥M ↪ G`
+(`S03h.centralizer_subgroupOf`). -/
+theorem chiefFactor_centralizer_inf_derived {M : Subgroup G}
+    {data : TypesIIIIIIVSetup M} (x : ↥M) (hx : (x : G) ∈ data.W1) (hx1 : (x : G) ≠ 1) :
+    Subgroup.centralizer ({x} : Set ↥M) ⊓ ((derivedInG M).subgroupOf M)
+      = data.W2.subgroupOf M := by
+  have hamb : Subgroup.centralizer ({(x : G)} : Set G) ⊓ derivedInG M = data.W2 := by
+    rw [inf_comm]; exact data.typeP.centralizer_W1 (x : G) hx hx1
+  rw [OddOrder.BG.Ch1.S03h.centralizer_subgroupOf, Set.image_singleton]
+  simp only [Subgroup.subgroupOf, ← Subgroup.comap_inf, Subgroup.coe_subtype, hamb]
+
+/-- **Peterfalvi (8.4.d), `centralizer_W̄₂`**: in `L = ↥M ⧸ H₀`, for a nontrivial `x̄ ∈ W̄₁`,
+`C_L(x̄) ⊓ K̄ = W̄₂` where `K̄ = M'/H₀` and `W̄₂ = W₂ H₀/H₀`.  Lift `x̄ = x H₀`, apply the coprime
+centralizer-quotient `centralizer_map_mk'_eq_of_coprime_zpowers` (step 1, `gcd(|⟨x⟩|,|H₀|)=1`),
+pull the image out of `⊓ K̄` (`map_inf_map_of_ker_le`, `ker = H₀ ≤ M'`, step 2), and finish with
+`C_{↥M}(x) ⊓ M' = W₂` (`chiefFactor_centralizer_inf_derived`, step 3).  This is the (8.4.d)
+certain-type `centralizer_W₂` field of `S06.Hypothesis (M/H₀)`. -/
+theorem chiefFactor_centralizer_W2bar [Finite G] {M : Subgroup G}
+    {data : TypesIIIIIIVSetup M} (chief : ChiefFactorData data)
+    [(chief.H0.subgroupOf M).Normal]
+    (xbar : ↥M ⧸ (chief.H0.subgroupOf M))
+    (hxbar : xbar ∈ (data.W1.subgroupOf M).map (QuotientGroup.mk' (chief.H0.subgroupOf M)))
+    (hxbar1 : xbar ≠ 1) :
+    Subgroup.centralizer ({xbar} : Set (↥M ⧸ (chief.H0.subgroupOf M)))
+        ⊓ ((derivedInG M).subgroupOf M).map (QuotientGroup.mk' (chief.H0.subgroupOf M))
+      = (data.W2.subgroupOf M).map (QuotientGroup.mk' (chief.H0.subgroupOf M)) := by
+  obtain ⟨x, hx_mem, rfl⟩ := Subgroup.mem_map.mp hxbar
+  have hx1 : x ≠ 1 := fun h => hxbar1 (by rw [h]; exact map_one _)
+  have hxW1 : ((x : ↥M) : G) ∈ data.W1 := Subgroup.mem_subgroupOf.mp hx_mem
+  have hxG1 : ((x : ↥M) : G) ≠ 1 := fun h => hx1 (Subtype.ext h)
+  have hcardW1 : Nat.card ↥(data.W1.subgroupOf M) = Nat.card ↥data.W1 :=
+    Nat.card_congr (Subgroup.subgroupOfEquivOfLe data.typeP.W1_le).toEquiv
+  have hcardH0 : Nat.card ↥(chief.H0.subgroupOf M) = Nat.card ↥chief.H0 :=
+    Nat.card_congr (Subgroup.subgroupOfEquivOfLe (chief.H0_lt_H.le.trans (H_le_M data))).toEquiv
+  have hcop : Nat.Coprime (Nat.card ↥(Subgroup.zpowers x))
+      (Nat.card ↥(chief.H0.subgroupOf M)) := by
+    rw [hcardH0]
+    refine (chiefFactor_coprime_H0_W1 chief).symm.coprime_dvd_left ?_
+    rw [← hcardW1]
+    exact Subgroup.card_dvd_of_le (Subgroup.zpowers_le.mpr hx_mem)
+  rw [centralizer_map_mk'_eq_of_coprime_zpowers x hcop,
+    map_inf_map_of_ker_le (B := (derivedInG M).subgroupOf M) (by
+      rw [QuotientGroup.ker_mk']
+      exact Subgroup.comap_mono (chief.H0_lt_H.le.trans data.typeP.H_le)),
+    chiefFactor_centralizer_inf_derived x hxW1 hxG1]
+
 /-! ### (9.7) The chief factor `H̄ = H/H₀` as an `𝔽ₚ[U W₁]`-module
 
 The Clifford dichotomy of (9.7) is read off the `𝔽ₚ`-dimension of `H̄`: it equals `q`, and `q` is
