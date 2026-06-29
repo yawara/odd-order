@@ -4858,6 +4858,38 @@ def Mtilde [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G) (D : SigmaDecompos
     (M : Subgroup G) : Set G :=
   {g | ∃ x ∈ sigmaSharp M, ∃ x' ∈ Rsub hG D x, g = x * x'}
 
+/-- **Easy half of the `M̃` cover** (`M_σ^# ⊆ M̃`): every `σ`-length-one element `x ∈ M_σ^#` lies in
+`M̃` via the trivial decomposition `x = x · 1` (`1 ∈ R(x)`).  This is the `ℓ_σ = 1` part of the
+faithful covering (BG Cor 14.9); the `ℓ_σ = 2` twisted elements need the signalizer capture
+(Lemma 14.6). -/
+theorem sigmaSharp_subset_Mtilde [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (D : SigmaDecompositionData G) {M : Subgroup G} :
+    sigmaSharp M ⊆ Mtilde hG D M :=
+  fun g hg => ⟨g, hg, 1, Subgroup.one_mem _, (mul_one g).symm⟩
+
+/-- **BG Corollary 14.9, the cover (faithful form), `ℓ_σ = 1` half discharged**: every nonidentity
+`g` lies in some `𝒞_G(M̃)`.  When `ℓ_σ(g) = 1`, `g ∈ M_σ^# ⊆ M̃` for the maximal `M` with
+`g ∈ M_σ` (`sigmaSharp_subset_Mtilde`); the `ℓ_σ ≥ 2` case is the signalizer capture of BG
+Lemma 14.6 (`g = x x'` with `x' ∈ R(x)`), isolated as the remaining residual.  The cover uses the
+canonical `genuineSigmaDecomposition`, matching `bgTheoremE_cover_data`'s `cover` field. -/
+theorem exists_mem_conjClassSet_Mtilde_of_ne_one [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {g : G} (hg : g ≠ 1) :
+    ∃ M ∈ maximalSubgroups G,
+      g ∈ conjClassSet (Mtilde hG (genuineSigmaDecomposition hG) M) := by
+  set D := genuineSigmaDecomposition hG with hD
+  rcases Nat.lt_or_ge (D.length g) 2 with hlt | hge
+  · -- `ℓ_σ(g) ≤ 1`, and `g ≠ 1` rules out `ℓ_σ(g) = 0`, so `ℓ_σ(g) = 1`.
+    have hz : D.length g ≠ 0 := fun h => hg ((sigmaLength_eq_zero_iff hG g).mp h)
+    have h1 : D.length g = 1 := by omega
+    obtain ⟨-, M, hMmax, hgMsigma⟩ := (D.length_one_iff g).mp h1
+    have hgsharp : g ∈ sigmaSharp M := ⟨hgMsigma, hg⟩
+    exact ⟨M, hMmax, subset_conjClassSet (sigmaSharp_subset_Mtilde hG D hgsharp)⟩
+  · -- `ℓ_σ(g) ≥ 2`: BG Lemma 14.6 (signalizer capture) — `g = x x'` with `x ∈ M_σ^#`,
+    -- `x' ∈ R(x)^#`, so `g ∈ M̃(M)`.  This is the deep `ℓ_σ = 2` half of Cor 14.9 (issue 8020/8021
+    -- gate 2): it needs that the `σ(M)′`-cofactor of the length-one decomposition lands in the
+    -- signalizer `R(x) = (N[x])_σ ∩ C_G(x)`.
+    sorry
+
 /-- **BG Lemma 14.5(b)** (mmd L3920), faithful `M̃` form: for nonconjugate maximal `M₁`, `M₂`,
 the sets `M̃₁`, `M̃₂` are disjoint.  Immediate from 14.5(a): if `g = x·x' = w·w'` with
 `x ∈ (M₁)_σ^#`, `w ∈ (M₂)_σ^#`, then `x ≠ w` (else `x` is a nonidentity element of

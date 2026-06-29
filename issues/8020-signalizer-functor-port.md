@@ -580,3 +580,19 @@ faithful cover への wiring 完遂 (S10 + S14_MaximalI、full build **3889 gree
 **残 frontier = gate 2 (covering disjunction `BGTheoremETypeICovering ∨ NonTypeICovering`, S10:664, sorry)** =
 BG Cor 14.9 / (8.8.a) dichotomy。`cover_nonidentity` (G# = ⋃ 𝒞_G(M̃_i)) + `cover_subset_kernels` (type-I で
 R(x)=1 ⟹ M̃=(M_i)_F#) + 各 disjointness。次の lane-d 上流 work。
+
+## ✅ 進捗 (lane d, 2026-06-29 /loop²²): gate 2 着手 — faithful cover identity の easy half + gated skeleton
+
+gate 2 (`cover_nonidentity` = BG Cor 14.9 cover identity) を上流から engage (S14、full build 3889 green):
+- **`sigmaSharp_subset_Mtilde`** (sorry-free): `M_σ# ⊆ M̃`。ℓ_σ=1 元 x は `x = x·1` (1∈R(x)) で M̃ に入る
+  cover の easy half。
+- **`exists_mem_conjClassSet_Mtilde_of_ne_one`** (gated skeleton): `∀ g≠1, ∃ M maximal, g ∈ 𝒞_G(M̃ M)`。
+  ℓ_σ(g)=1 を easy half で**実証**、ℓ_σ(g)≥2 を **BG Lemma 14.6 (signalizer capture: g=x·x', x'∈R(x))**
+  として named sorry に isolate。canonical `genuineSigmaDecomposition` 使用ゆえ `bgTheoremE_cover_data` の
+  `cover` field (= `conjClassSet (Mtilde hG (genuineSigmaDecomposition hG) (reps i))`) に直結。
+  既存の偽 surface `nonidentity_covered_by_sigma_pieces` (S14:9230、`𝒞_G(M_σ#)` で cover = BG に対し偽、
+  「prove as-is するな」) の faithful 代替。
+
+**残 = (i) Lemma 14.6 (ℓ_σ=2 capture、deep): `exists_length_one_factor` の σ(M)'-cofactor が signalizer
+R(x)=(N[x])_σ∩C[x] に入ることを示す (σ-decomp が signalizer decomp と整合)。(ii) cover_nonidentity 組立
+(reps への conj 還元 + sharpSubgroup ⊤ = ⋃ 𝒞_G(M̃_i))。(iii) cover_subset_kernels (type-I R(x)=1)。次 = (i)。**
