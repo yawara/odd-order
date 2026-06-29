@@ -3747,6 +3747,88 @@ theorem liesOver_mem_characterKernel {Γ : Type*} [Group Γ] [Fintype Γ]
       rw [ClassFunction.restrict_apply]; rfl
     rw [h1]; exact hg
 
+/-- **Peterfalvi (9.9.a), the chief-factor constituent of `χ ∈ 𝒳(H₀)`.**
+
+In Clifford case (b) (`U` acts irreducibly on `H̄ = H/H_0`), any `χ ∈ Irr(HU)` with `H ⊄ Ker χ`
+(`χ ∈ 𝒳`) and `H_0 ⊆ Ker χ` lies over a chief-factor constituent `θ₀ ∈ Irr(H)`, realised in
+inflation form `θ₀ = compHom (H̄ ≃ ·) (compHom (mk' N) θ̄)` for a nontrivial `θ̄ ∈ Irr(H̄)`.  Its
+inertia group in `HU` is `HC` (`inertia_eq_hcInHu`, the case-(b) crux) and it is linear
+(`θ₀(1) = 1`, `H̄` elementary abelian).  This is the shared extraction behind the (9.9.a) degree
+statements `caseB_degree_qu` (`χ(1) = u` on `𝒳(H₀C')`) and `caseB_xi_H0_degree_dvd_u`
+(`u ∣ χ(1)` on the larger `𝒳(H₀)`). -/
+theorem caseB_exists_chiefFactorConstituent [Finite G]
+    {M : Subgroup G} {data : TypesIIIIIIVSetup M} {chief : ChiefFactorData data}
+    (chars : Section11CharacterData data chief) (caseB : CliffordCaseBData chars)
+    [Fintype ↥(hInHu data)] [Invertible (Nat.card ↥(hInHu data) : ℂ)]
+    {χ : IrreducibleCharacter ↥(huSub data)}
+    (hχX : χ ∈ xiSet data)
+    (hχH0 : ((chief.H0.subgroupOf M).subgroupOf (huSub data) : Set ↥(huSub data)) ⊆
+        OddOrder.Peterfalvi.S03.characterKernel (χ : ClassFunction ↥(huSub data) ℂ)) :
+    ∃ θ₀ : IrreducibleCharacter ↥(hInHu data),
+      IrreducibleCharacter.LiesOver (hInHu data) χ θ₀ ∧
+      IrreducibleCharacter.inertia (G := ↥(huSub data)) (H := hInHu data) θ₀
+        = hInHu data ⊔ cInHu data chief ∧
+      (θ₀ : ClassFunction ↥(hInHu data) ℂ) (1 : ↥(hInHu data)) = 1 := by
+  classical
+  haveI : Fintype ↥(huSub data) := Fintype.ofFinite _
+  haveI : Invertible (Nat.card ↥(huSub data) : ℂ) :=
+    invertibleOfNonzero (Nat.cast_ne_zero.mpr Nat.card_pos.ne')
+  haveI : Fintype (IrreducibleCharacter ↥(hInHu data)) := Fintype.ofFinite _
+  -- A nontrivial constituent `θ` of `Res^{HU}_H χ` (`H ⊄ Ker χ`).
+  obtain ⟨θ, hθlo, hθnt⟩ :=
+    OddOrder.RepresentationTheory.exists_constituent_not_subset_characterKernel
+      (A := hInHu data) (B := hInHu data) le_rfl χ hχX
+  -- The descent hom `f = (mk' N) ∘ hInHuEquivH : ↥(hInHu) → H̄ = ↥H ⧸ N`.
+  set f : ↥(hInHu data) →* (↥data.H ⧸ chief.N) :=
+    (QuotientGroup.mk' chief.N).comp (hInHuEquivH data).toMonoidHom with hf
+  have hfsurj : Function.Surjective f :=
+    (QuotientGroup.mk'_surjective chief.N).comp (hInHuEquivH data).surjective
+  -- `f.ker ⊆ ker θ`: `f x = 1` puts the `G`-coordinate of `x` in `H₀ ⊆ ker χ`.
+  have hfker : (f.ker : Set ↥(hInHu data)) ⊆
+      OddOrder.Peterfalvi.S03.characterKernel (θ : ClassFunction ↥(hInHu data) ℂ) := by
+    intro x hx
+    have hxN : (hInHuEquivH data) x ∈ chief.N := by
+      have hx1 : f x = 1 := hx
+      rw [hf, MonoidHom.comp_apply, MulEquiv.coe_toMonoidHom, QuotientGroup.mk'_apply,
+        QuotientGroup.eq_one_iff] at hx1
+      exact hx1
+    have hxH0 : (((x : ↥(huSub data)) : ↥M) : G) ∈ chief.H0 := by
+      rw [chief.H0_eq, ← hInHuEquivH_coe data x]
+      exact Subgroup.mem_map_of_mem data.H.subtype hxN
+    have hxχ : (x : ↥(huSub data)) ∈
+        OddOrder.Peterfalvi.S03.characterKernel (χ : ClassFunction ↥(huSub data) ℂ) := by
+      apply hχH0
+      rw [SetLike.mem_coe, Subgroup.mem_subgroupOf, Subgroup.mem_subgroupOf]
+      exact hxH0
+    exact liesOver_mem_characterKernel hθlo hxχ
+  -- `θ` is an inflation: `θ = compHom f θbar` for some `θbar ∈ Irr(H̄)`.
+  obtain ⟨θbar, hθbar⟩ :=
+    OddOrder.RepresentationTheory.exists_compHom_eq_of_subset_characterKernel hfsurj θ hfker
+  have hθeq : (θ : ClassFunction ↥(hInHu data) ℂ)
+      = ClassFunction.compHom (hInHuEquivH data).toMonoidHom
+          (ClassFunction.compHom (QuotientGroup.mk' chief.N)
+            (θbar : ClassFunction (↥data.H ⧸ chief.N) ℂ)) := by
+    rw [← hθbar, hf, ClassFunction.compHom_comp]
+  have hθbarnt : (θbar : ClassFunction (↥data.H ⧸ chief.N) ℂ)
+      ≠ trivialClassFunction _ := by
+    intro h0
+    apply hθnt
+    rw [Subgroup.subgroupOf_self]
+    intro y _
+    rw [OddOrder.Peterfalvi.S03.mem_characterKernel, OddOrder.Peterfalvi.S03.characterDegree_def,
+      hθeq, h0]
+    simp [ClassFunction.compHom_apply, trivialClassFunction]
+  haveI : IsMulCommutative (↥data.H ⧸ chief.N) :=
+    ⟨⟨chief.quotient_elementaryAbelian.1⟩⟩
+  refine ⟨θ, hθlo, ?_, ?_⟩
+  · show ClassFunction.inertia (G := ↥(huSub data)) (H := hInHu data)
+      (θ : ClassFunction ↥(hInHu data) ℂ) = hInHu data ⊔ cInHu data chief
+    rw [hθeq]
+    exact inertia_eq_hcInHu data chief caseB.actsIrreducibly hθbarnt
+  · rw [hθeq]
+    simp only [ClassFunction.compHom_apply, map_one]
+    exact θbar.isIrreducible.apply_one_eq_one_of_isMulCommutative
+
 /-- **Peterfalvi (9.9.a)**: every member of `𝒮(H₀C')` has degree `qu`.
 
 For `φ = Ind_{HU}^M χ ∈ 𝒮(H₀C')` (so `χ ∈ 𝒳(H₀C')`, i.e. `χ ∈ Irr(HU)` with `H ⊄ Ker χ` and
@@ -3777,76 +3859,12 @@ theorem caseB_degree_qu [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
   -- Reduce `q·χ(1) = qu` to `χ(1) = u`.
   suffices hχu : (χ : ClassFunction ↥(huSub data) ℂ) (1 : ↥(huSub data)) = (chars.u : ℂ) by
     rw [hχu]; push_cast; ring
-  -- Obligation 1: extract a nontrivial chief-factor constituent `θ₀` (inflation form), with
-  -- inertia `HC` and degree `1`.
-  obtain ⟨θ₀, hθ₀over, hθ₀inertia, hθ₀deg⟩ :
-      ∃ θ₀ : IrreducibleCharacter ↥(hInHu data),
-        IrreducibleCharacter.LiesOver (hInHu data) χ θ₀ ∧
-        IrreducibleCharacter.inertia (G := ↥(huSub data)) (H := hInHu data) θ₀
-          = hInHu data ⊔ cInHu data chief ∧
-        (θ₀ : ClassFunction ↥(hInHu data) ℂ) (1 : ↥(hInHu data)) = 1 := by
-    classical
-    haveI : Fintype (IrreducibleCharacter ↥(hInHu data)) := Fintype.ofFinite _
-    -- `χ ∈ 𝒳` (so `H ⊄ ker χ`) and `χ ∈ 𝒳(H₀C')` (so `H₀C' ⊆ ker χ`).
-    obtain ⟨hχX, hχker⟩ := hχ
-    -- 1. A nontrivial constituent `θ` of `Res^{HU}_H χ` (`exists_constituent_not_subset…`).
-    obtain ⟨θ, hθlo, hθnt⟩ :=
-      OddOrder.RepresentationTheory.exists_constituent_not_subset_characterKernel
-        (A := hInHu data) (B := hInHu data) le_rfl χ hχX
-    -- 2. The descent hom `f = (mk' N) ∘ hInHuEquivH : ↥(hInHu) → H̄ = ↥H ⧸ N`.
-    set f : ↥(hInHu data) →* (↥data.H ⧸ chief.N) :=
-      (QuotientGroup.mk' chief.N).comp (hInHuEquivH data).toMonoidHom with hf
-    have hfsurj : Function.Surjective f :=
-      (QuotientGroup.mk'_surjective chief.N).comp (hInHuEquivH data).surjective
-    -- `f.ker ⊆ ker θ`: `f x = 1` means `hInHuEquivH x ∈ N`, so the `G`-coordinate of `x` lies in
-    -- `H₀ ⊆ ker χ`, and the constituent `θ` inherits the kernel containment.
-    have hfker : (f.ker : Set ↥(hInHu data)) ⊆
-        OddOrder.Peterfalvi.S03.characterKernel (θ : ClassFunction ↥(hInHu data) ℂ) := by
-      intro x hx
-      have hxN : (hInHuEquivH data) x ∈ chief.N := by
-        have hx1 : f x = 1 := hx
-        rw [hf, MonoidHom.comp_apply, MulEquiv.coe_toMonoidHom, QuotientGroup.mk'_apply,
-          QuotientGroup.eq_one_iff] at hx1
-        exact hx1
-      have hxH0 : (((x : ↥(huSub data)) : ↥M) : G) ∈ chief.H0 := by
-        rw [chief.H0_eq, ← hInHuEquivH_coe data x]
-        exact Subgroup.mem_map_of_mem data.H.subtype hxN
-      have hxχ : (x : ↥(huSub data)) ∈
-          OddOrder.Peterfalvi.S03.characterKernel (χ : ClassFunction ↥(huSub data) ℂ) := by
-        apply hχker
-        rw [SetLike.mem_coe, Subgroup.mem_subgroupOf, Subgroup.mem_subgroupOf]
-        exact Subgroup.mem_sup_left hxH0
-      exact liesOver_mem_characterKernel hθlo hxχ
-    -- 3. `θ` is an inflation: `θ = compHom f θbar` for some `θbar ∈ Irr(H̄)`.
-    obtain ⟨θbar, hθbar⟩ :=
-      OddOrder.RepresentationTheory.exists_compHom_eq_of_subset_characterKernel hfsurj θ hfker
-    -- The realized inflation form expected by `inertia_eq_hcInHu`.
-    have hθeq : (θ : ClassFunction ↥(hInHu data) ℂ)
-        = ClassFunction.compHom (hInHuEquivH data).toMonoidHom
-            (ClassFunction.compHom (QuotientGroup.mk' chief.N)
-              (θbar : ClassFunction (↥data.H ⧸ chief.N) ℂ)) := by
-      rw [← hθbar, hf, ClassFunction.compHom_comp]
-    -- 4. `θbar` is nontrivial (else `θ` would be trivial, contradicting `hθnt`).
-    have hθbarnt : (θbar : ClassFunction (↥data.H ⧸ chief.N) ℂ)
-        ≠ trivialClassFunction _ := by
-      intro h0
-      apply hθnt
-      rw [Subgroup.subgroupOf_self]
-      intro y _
-      rw [OddOrder.Peterfalvi.S03.mem_characterKernel, OddOrder.Peterfalvi.S03.characterDegree_def,
-        hθeq, h0]
-      simp [ClassFunction.compHom_apply, trivialClassFunction]
-    -- `H̄` is abelian (elementary abelian chief factor), so `θbar` is linear.
-    haveI : IsMulCommutative (↥data.H ⧸ chief.N) :=
-      ⟨⟨chief.quotient_elementaryAbelian.1⟩⟩
-    refine ⟨θ, hθlo, ?_, ?_⟩
-    · show ClassFunction.inertia (G := ↥(huSub data)) (H := hInHu data)
-        (θ : ClassFunction ↥(hInHu data) ℂ) = hInHu data ⊔ cInHu data chief
-      rw [hθeq]
-      exact inertia_eq_hcInHu data chief caseB.actsIrreducibly hθbarnt
-    · rw [hθeq]
-      simp only [ClassFunction.compHom_apply, map_one]
-      exact θbar.isIrreducible.apply_one_eq_one_of_isMulCommutative
+  -- Obligation 1: the chief-factor constituent `θ₀` (case-(b) crux, shared helper).  `χ ∈ 𝒳(H₀C')`
+  -- supplies `χ ∈ 𝒳` (`hχ.1`) and, via `H₀ ≤ H₀C'`, the `H₀ ⊆ Ker χ` the helper needs.
+  obtain ⟨θ₀, hθ₀over, hθ₀inertia, hθ₀deg⟩ :=
+    caseB_exists_chiefFactorConstituent chars caseB hχ.1
+      (subset_trans (SetLike.coe_subset_coe.mpr
+        (Subgroup.subgroupOf_mono (huSub data) (Subgroup.subgroupOf_mono M le_sup_left))) hχ.2)
   -- Obligation 3: a constituent `ψ ∈ Irr(HC)` that `χ` lies over, linear.
   obtain ⟨ψ, hψover⟩ :=
     OddOrder.RepresentationTheory.IrreducibleCharacter.exists_liesOver
@@ -3877,6 +3895,55 @@ theorem caseB_degree_qu [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     (index_hcInHu_eq_relindex_cInHu data chief).trans
       (index_cInHu_subgroupOf_uInHu_eq_u data chief chars)
   rw [key, hidx]
+
+/-- **Peterfalvi (9.9.a), first sentence**: in Clifford case (b), every `χ ∈ 𝒳(H₀)` has degree
+divisible by `u = |U:C|`.
+
+`χ` lies over a chief-factor constituent `θ₀` whose inertia in `HU` is `HC`
+(`caseB_exists_chiefFactorConstituent`), so the Clifford degree formula
+`χ(1) = ⟨Res χ, θ₀⟩ · [HU:HC] · θ₀(1)`
+(`apply_one_eq_restrictionMultiplicity_mul_index_inertia`) with `[HU:HC] = u` (`index_hcInHu_…`)
+and the restriction multiplicity / `θ₀(1)` being natural numbers gives `u ∣ χ(1)`.  (On the smaller
+`𝒳(H₀C')` this sharpens to `χ(1) = u`, `caseB_degree_qu`.)  Phrased on the natural-degree witness
+`d` of `χ(1)`; this is the degree datum behind (9.9.b)'s `μ_j(1) = qu`. -/
+theorem caseB_xi_H0_degree_dvd_u [Finite G]
+    {M : Subgroup G} {data : TypesIIIIIIVSetup M} {chief : ChiefFactorData data}
+    (chars : Section11CharacterData data chief) (caseB : CliffordCaseBData chars) :
+    ∀ χ ∈ chars.XOf chief.H0, ∀ d : ℕ,
+      (χ : ClassFunction ↥(huSub data) ℂ) (1 : ↥(huSub data)) = (d : ℂ) → chars.u ∣ d := by
+  classical
+  haveI : Fintype ↥(huSub data) := Fintype.ofFinite _
+  haveI : Fintype ↥(hInHu data) := Fintype.ofFinite _
+  haveI : Invertible (Nat.card ↥(huSub data) : ℂ) :=
+    invertibleOfNonzero (Nat.cast_ne_zero.mpr Nat.card_pos.ne')
+  haveI : Invertible (Nat.card ↥(hInHu data) : ℂ) :=
+    invertibleOfNonzero (Nat.cast_ne_zero.mpr Nat.card_pos.ne')
+  haveI : Fintype (IrreducibleCharacter ↥(hInHu data)) := Fintype.ofFinite _
+  intro χ hχ d hd
+  rw [Section11CharacterData.XOf_eq] at hχ
+  obtain ⟨hχX, hχH0⟩ := hχ
+  -- The chief-factor constituent `θ₀` (inertia `HC`).
+  obtain ⟨θ₀, hθ₀over, hθ₀inertia, -⟩ :=
+    caseB_exists_chiefFactorConstituent chars caseB hχX hχH0
+  -- Clifford degree formula `χ(1) = e · [HU:HC] · θ₀(1)`, with `[HU:HC] = u`.
+  have key := OddOrder.RepresentationTheory.apply_one_eq_restrictionMultiplicity_mul_index_inertia
+    (H := hInHu data) χ θ₀ hθ₀over
+  rw [hθ₀inertia] at key
+  have hidx : (hInHu data ⊔ cInHu data chief).index = chars.u :=
+    (index_hcInHu_eq_relindex_cInHu data chief).trans
+      (index_cInHu_subgroupOf_uInHu_eq_u data chief chars)
+  rw [hidx] at key
+  -- The restriction multiplicity and `θ₀(1)` are natural numbers.
+  obtain ⟨e, he⟩ :=
+    OddOrder.RepresentationTheory.IrreducibleCharacter.restrictionMultiplicity_natCast
+      (H := hInHu data) χ θ₀
+  obtain ⟨d₀, -, hd₀, -⟩ := θ₀.isIrreducible.exists_natDegree_charValue_one_dvd_card
+  rw [he, hd₀, hd] at key
+  -- `(d : ℂ) = (e · u · d₀ : ℕ)`, so `d = e·u·d₀` and `u ∣ d`.
+  have hdeq : d = e * chars.u * d₀ := by
+    have hcast : (d : ℂ) = ((e * chars.u * d₀ : ℕ) : ℂ) := by push_cast; linear_combination key
+    exact_mod_cast hcast
+  exact ⟨e * d₀, by rw [hdeq]; ring⟩
 
 /-- **Peterfalvi (9.9)**: character-count consequences in Clifford case (b).
 
