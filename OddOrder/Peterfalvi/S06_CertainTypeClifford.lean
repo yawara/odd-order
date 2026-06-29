@@ -870,6 +870,22 @@ theorem exists_eq_chiRestrict_of_isFixedPt [NeZero (Nat.card h.W1)]
   obtain ⟨χ₂, hχ₂⟩ := hbij.surjective ⟨χ, hfix⟩
   exact ⟨χ₂, Subtype.ext_iff.mp hχ₂⟩
 
+/-- **The reducible-inducing column `chiRestrict χ₂` is `L`-invariant** (issue 1012, W₁-stability for
+(9.9.b)): `chiRestrict χ₂ = Res_K μ` is the restriction of the `L`-character `μ = (columnFamily χ₂).mu 0`
+(`coe_chiRestrict`), so conjugation by any `g ∈ L` fixes it (`μ` is a class function of `L`, invariant
+under `L`-conjugation).  This `L`-inertia-stability is the source↔image bijection input of the (9.9.b)
+reducible count: `induce` is injective on the reducible-inducing columns
+(`induce_injective_of_inertia_stable`), since each is fixed by all of `L`. -/
+theorem Hypothesis.chiRestrict_conjBy_eq [NeZero (Nat.card h.W1)]
+    (χ₂ : (h.W2.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ) (g : L) :
+    IrreducibleCharacter.conjBy g (h.chiRestrict χ₂) = h.chiRestrict χ₂ := by
+  haveI := h.K_normal
+  apply IrreducibleCharacter.ext
+  ext x
+  rw [IrreducibleCharacter.coe_conjBy, ClassFunction.conjBy_apply, coe_chiRestrict,
+    ClassFunction.restrict_apply, ClassFunction.restrict_apply]
+  exact ((h.columnFamily χ₂).mu 0 : ClassFunction L ℂ).conj_eq (x : L) g
+
 /-- **Peterfalvi (4.5.b), inertia computation**: a `χ ∈ Irr(K)` that is none of the `χ_j` has full
 inertia group `I_L(χ) = K`.  Write `ℓ ∈ I_L(χ)` as `ℓ = k·w` (`k ∈ K`, `w ∈ W₁`) via the complement
 `L = K ⋊ W₁`; then `w = k⁻¹ℓ ∈ I_L(χ)`.  If `w ≠ 1` then `w ∈ W₁^#` fixes `χ`
