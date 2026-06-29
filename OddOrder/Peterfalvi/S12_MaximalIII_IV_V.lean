@@ -3518,42 +3518,43 @@ theorem Hypothesis.muGridAlpha_inner_muColumn_self_sub_conj [Finite G]
   simp
 
 open scoped FiniteInduce in
-/-- **§10 support of `ζ − ζ̄`** (Peterfalvi (10.5), `a = 0` argument): the difference `ζ − ζ̄` of a
-degree-`w₁` irreducible `ζ ∈ S` and its conjugate is supported in `A_0(M)`.  Both `ζ` and `ζ̄` are
-induced from the normal `M' = [M,M]`, hence vanish off `M'`; and `(ζ − ζ̄)(1) = ζ(1) − ζ̄(1) = 0`
-(equal degrees), so the support lies in `M'^# = M' − {1}`.  Every element of `M'^#` centralizes
+/-- **§10 support of an equal-degree difference in `S`** (Peterfalvi (10.5)/(11.8)): for two members
+`ζ₁, ζ₂ ∈ S = inducedFamily M` of *equal degree* (`ζ₁(1) = ζ₂(1)`), the difference `ζ₁ − ζ₂` is
+supported in `A_0(M)`.  Both are induced from the normal `M' = [M,M]`, hence vanish off `M'`; and
+`(ζ₁ − ζ₂)(1) = 0`, so the support lies in `M'^# = M' − {1}`.  Every element of `M'^#` centralizes
 itself, hence lies in `A(M) ⊆ A_0(M)` (the left disjunct of `typePA0`, as in `muGrid_alpha_support`).
 
-This makes `ζ − ζ̄` `A_0`-supported, so the Dade isometry `τ` transfers it
-(`tau_inner_eq_of_supported`) in the `(α_{ij}^τ, (ζ−ζ̄)^τ) = (α_{ij}, ζ−ζ̄)` step. -/
-theorem Hypothesis.zeta_sub_conj_support [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
-    {M : Subgroup G} (hyp : Hypothesis M) (hodd : Odd (Nat.card G))
-    {ζ : ClassFunction ↥M ℂ} (hζS : ζ ∈ inducedFamily M) (hζirr : IsIrreducibleCharacter ζ) :
-    (ζ - ζ.conj).support ⊆ hyp.A0 := by
+This is the `hsuppdiff` precondition feeding the (5.7)/(1.4) equal-degree coherence producer
+`coherentEqualDegree_fromDade` on the degree-`w₁` subfamily `S(HC)` (Peterfalvi (11.8)); the
+conjugate-pair special case `ζ₂ = ζ̄` is `zeta_sub_conj_support`, used in the `(α_{ij}^τ, (ζ−ζ̄)^τ)`
+step of the (10.5) `a = 0` argument. -/
+theorem Hypothesis.inducedFamily_sub_support [Finite G] {M : Subgroup G} (hyp : Hypothesis M)
+    {ζ₁ ζ₂ : ClassFunction ↥M ℂ} (hζ₁ : ζ₁ ∈ inducedFamily M) (hζ₂ : ζ₂ ∈ inducedFamily M)
+    (hdeg : ζ₁ 1 = ζ₂ 1) :
+    (ζ₁ - ζ₂).support ⊆ hyp.A0 := by
   haveI := hyp.finiteG
   classical
-  obtain ⟨θ, _hθne, hζeq⟩ := hζS
+  obtain ⟨θ₁, _hθ₁ne, hζ₁eq⟩ := hζ₁
+  obtain ⟨θ₂, _hθ₂ne, hζ₂eq⟩ := hζ₂
   have hKcomm : (derivedInG M).subgroupOf M = commutator ↥M := by
     rw [derivedInG, Subgroup.subgroupOf, Subgroup.comap_map_eq_self_of_injective M.subtype_injective]
   haveI hKnormal : ((derivedInG M).subgroupOf M).Normal := by rw [hKcomm]; infer_instance
-  have hζvanish : ∀ {w : ↥M}, w ∉ (derivedInG M).subgroupOf M → ζ w = 0 := fun {w} hw => by
-    rw [hζeq]; exact ClassFunction.induce_eq_zero_of_not_mem_normal _ hw
-  -- `ζ̄(1) = ζ(1)`: the degree is a real natural number.
-  have hconj1 : ζ.conj 1 = ζ 1 := by
-    obtain ⟨nn, _, hn, _⟩ := hζirr.exists_natDegree_charValue_one_dvd_card
-    simp only [ClassFunction.conj_apply, hn, star_natCast]
+  have hζ₁vanish : ∀ {w : ↥M}, w ∉ (derivedInG M).subgroupOf M → ζ₁ w = 0 := fun {w} hw => by
+    rw [hζ₁eq]; exact ClassFunction.induce_eq_zero_of_not_mem_normal _ hw
+  have hζ₂vanish : ∀ {w : ↥M}, w ∉ (derivedInG M).subgroupOf M → ζ₂ w = 0 := fun {w} hw => by
+    rw [hζ₂eq]; exact ClassFunction.induce_eq_zero_of_not_mem_normal _ hw
   intro z hz
   rw [ClassFunction.mem_support] at hz
-  -- `z ∈ M'`: else `ζ z = ζ̄ z = 0`.
+  -- `z ∈ M'`: else `ζ₁ z = ζ₂ z = 0`.
   have hzK : z ∈ (derivedInG M).subgroupOf M := by
     by_contra hzK
     apply hz
-    rw [ClassFunction.sub_apply, ClassFunction.conj_apply, hζvanish hzK, star_zero, sub_zero]
-  -- `z ≠ 1`: `(ζ − ζ̄)(1) = 0`.
+    rw [ClassFunction.sub_apply, hζ₁vanish hzK, hζ₂vanish hzK, sub_zero]
+  -- `z ≠ 1`: `(ζ₁ − ζ₂)(1) = 0` by equal degree.
   have hz1 : z ≠ 1 := by
     rintro rfl
     apply hz
-    rw [ClassFunction.sub_apply, hconj1, sub_self]
+    rw [ClassFunction.sub_apply, hdeg, sub_self]
   have hzM' : (z : G) ∈ derivedInG M := Subgroup.mem_subgroupOf.mp hzK
   show (z : G) ∈ typePA0 M hyp.typeP
   unfold typePA0
@@ -3562,6 +3563,25 @@ theorem Hypothesis.zeta_sub_conj_support [Finite G] (hG : OddOrder.BG.IsMinimalS
   exact ⟨hzM', fun h0 => hz1 (Subtype.ext h0), (z : G),
     ⟨z.2, fun h0 => hz1 (Subtype.ext (Set.mem_singleton_iff.mp h0))⟩,
     Subgroup.mem_centralizer_singleton_iff.mpr rfl⟩
+
+open scoped FiniteInduce in
+/-- **§10 support of `ζ − ζ̄`** (Peterfalvi (10.5), `a = 0` argument): the difference `ζ − ζ̄` of a
+degree-`w₁` irreducible `ζ ∈ S` and its conjugate is supported in `A_0(M)`.  The conjugate-pair
+special case of `inducedFamily_sub_support`: `ζ̄ = ζ.conj ∈ S` (`inducedFamily_closedUnderConjugate`)
+has the same degree `ζ̄(1) = ζ(1)` (the degree is a real natural number).
+
+This makes `ζ − ζ̄` `A_0`-supported, so the Dade isometry `τ` transfers it
+(`tau_inner_eq_of_supported`) in the `(α_{ij}^τ, (ζ−ζ̄)^τ) = (α_{ij}, ζ−ζ̄)` step. -/
+theorem Hypothesis.zeta_sub_conj_support [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    {M : Subgroup G} (hyp : Hypothesis M) (hodd : Odd (Nat.card G))
+    {ζ : ClassFunction ↥M ℂ} (hζS : ζ ∈ inducedFamily M) (hζirr : IsIrreducibleCharacter ζ) :
+    (ζ - ζ.conj).support ⊆ hyp.A0 := by
+  haveI := hyp.finiteG
+  -- `ζ̄(1) = ζ(1)`: the degree is a real natural number.
+  have hconj1 : ζ.conj 1 = ζ 1 := by
+    obtain ⟨nn, _, hn, _⟩ := hζirr.exists_natDegree_charValue_one_dvd_card
+    simp only [ClassFunction.conj_apply, hn, star_natCast]
+  exact hyp.inducedFamily_sub_support hζS (inducedFamily_closedUnderConjugate M hζS) hconj1.symm
 
 open scoped FiniteInduce in
 /-- **Peterfalvi (10.5), `(α_{ij}^τ, (ζ−ζ̄)^τ) = −n`**: the Dade-image inner product, transferred to
