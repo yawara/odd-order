@@ -96,12 +96,28 @@ X/H₀ の文字と同一視」((1.6)) で商で作業。⟹ §9 reducible-count
      - `W_odd`: image of W₁⊔W₂ odd ← |G| odd。
    - **B1 def の home**: S12 (typePData_toS06Hypothesis 近傍) or 新 bridge leaf。`typePData_toS06Hypothesis`
      (S12:1062, L=M版) が subgroupOf-transport の template; B1 は mk'-image-transport 版。
-3. **B2**: §9 `chars.SOf chief.H0` (HU→M induced family) ↔ §6 induction-family {Ind^L_K̄ χ̄} on M/H₀。
-   χ̄∈Irr(K̄)↔χ∈Irr(HU) with H₀⊆Ker (inflation (1.6)); `Ind^{M/H₀}_{K̄} χ̄` ↔ inflation of `Ind^M_{HU} χ`
-   (induction-inflation commute)。H̄⊄Ker χ̄ ↔ H⊄Ker χ。reducibility 対応。
-4. **B3**: `card_reducible_Hnontrivial_induce_eq_W2_sub_one` を B1 の Hypothesis(M/H₀), H=H̄, w₂=p で
-   instantiate → (9.9.b)/(9.8.b) count を discharge。
+3. **B2 (deep character bridge、次の phase、~3-5 反復見込み)**: §9 `chars.SOf chief.H0` (HU→M induced
+   family) ↔ §6 induction-family {Ind^L_K̄ χ̄} on M/H₀。**精密 recipe (2026-06-29 scoped)**:
+   - **K̄ ↔ HU 同定**: §6 K̄ = `((derivedInG M).subgroupOf M).map mk'` (B1 で構成)、`derivedInG M =
+     data.H ⊔ data.U = HU` (`derivedInG_eq_fitting_sup_U`+`H_eq`)、§9 `huSub data` = HU realized in
+     ↥M。⟹ K̄ = (huSub data).map mk' = HU/H₀。
+   - **inflation bijection**: 𝒳(H₀) = `xiOf data chief.H0` = {χ∈Irr(huSub)|H⊄Ker, H₀⊆Ker} ↔
+     {χ̄∈Irr(K̄)|H̄⊄Ker χ̄} via `inflate` (`compHom mk'`、InflationCharacter.lean)。infra 既存:
+     `IsIrreducibleCharacter.compHom_of_surjective` (inflation 既約保存)、`inflate_apply_one` (degree)、
+     `exists_inflate_eq_of_subset_characterKernel` (H₀⊆Ker char の surjectivity)、`inflate` injective。
+   - **induction-inflation commute**: `Ind_{huSub}^M (inflate χ̄) = inflate_M (Ind^{M/H₀}_{K̄} χ̄)` —
+     **要 general lemma** (repo に無、新規; 商 huSub→K̄ と M→M/H₀ の compatibility)。これが B2 の難所。
+   - **reducibility 対応**: φ=Ind χ reducible (M-char) ⟺ Ind^L_K̄ χ̄ reducible (M/H₀-char) (inflation
+     既約保存の両向き)。`{φ∈𝒮(H₀)|¬irr}` ↔ `{χ̄∈Irr(K̄)|¬irr(Ind χ̄)∧H̄⊄Ker}` の ncard bijection。
+4. **B3**: (a) **|W̄₂|=p** (`Nat.card ((W₂.subgroupOf M).map mk') = chief.p`、`|fixedByE|=p` の
+   W̄₂↔fixedByE iso、M/H₀↔H̄ identification 経由、~30-50行); (b) H=H̄ = (data.H.subgroupOf M).map mk'
+   (≤K̄) で `card_reducible_Hnontrivial_induce_eq_W2_sub_one (chiefFactorQuotientHypothesis chief)`
+   instantiate; (c) B2 bijection で `{φ∈𝒮(H₀)|¬irr}.ncard = §6 count = |W̄₂|-1 = p-1` → (9.9.b) discharge。
 5. (9.10) de-opacify + exceptional 構造。
+
+> **状況 (2026-06-29)**: §6 side + (8.4.d) bridge B1 (structural Hypothesis(M/H₀)) 完成 (全 axiom-clean)。
+> 残 = B2 (inflation character bridge、最難所 = induction-inflation commute lemma) + B3 (|W̄₂|=p +
+> instantiate)。本プロジェクトで「最難・最高コスト」と記された指標終盤の最後の山。
 
 ## 完了条件
 
