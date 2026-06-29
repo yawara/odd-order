@@ -6,6 +6,7 @@ Authors: Yawara Ishida
 import OddOrder.Peterfalvi.S13_MaximalIII_IV
 import OddOrder.Peterfalvi.S10_CoherenceWiring
 import OddOrder.GroupTheory.RepresentationTheory.SingerField
+import OddOrder.GroupTheory.RepresentationTheory.CyclotomicCharacterCongruence
 import Mathlib.RepresentationTheory.Irreducible
 
 /-!
@@ -800,17 +801,95 @@ theorem dadeMap_eq_induce_of_supported_on_trivial_H {A : Set G} {L : Subgroup G}
   exact congrFun h1 α
 
 open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
+/-- **Peterfalvi (12.4) pin (b), type-I bridge**: for a type-I maximal `L`, on a class function `f`
+supported in a trivial-`H` sub-support `A₁ ⊆ A(L)` (an `L`-invariant subset on which the type-I Dade
+stabilizers vanish), the Dade isometry `τ` acts as induction `Ind_L^G`.  This instantiates the
+general step-3 bridge `dadeMap_eq_induce_of_supported_on_trivial_H` at the type-I Dade map `hyp.tau`
+(via `dadeIntegralCharacterMap_apply_of_support`, and `inclusion` to widen the support from `A₁`). -/
+theorem typeI_tau_eq_induce_of_supported_trivial_H {L : Subgroup G} [Finite G] (hyp : Hypothesis L)
+    {A₁ : Set G} (hA₁A : A₁ ⊆ hyp.ambientA)
+    (hA₁norm : ∀ (l : L) ⦃a : G⦄, a ∈ A₁ → (l : G) * a * (l : G)⁻¹ ∈ A₁)
+    (hH₁ : ∀ a, (hyp.dadeData.dade.restrict hA₁A hA₁norm).H a = ⊥)
+    {f : ClassFunction ↥L ℂ}
+    (hf : f.support ⊆ OddOrder.Peterfalvi.S04.supportInSubgroup A₁ L) :
+    hyp.tau f = ClassFunction.induce L f := by
+  haveI := hyp.finiteG
+  have hfA : f.support ⊆ OddOrder.Peterfalvi.S04.supportInSubgroup hyp.ambientA L :=
+    hf.trans (OddOrder.Peterfalvi.S04.supportInSubgroup_mono hA₁A)
+  have h1 : hyp.tau f = hyp.dadeData.dade.dadeMap (k := ℂ)
+      ⟨f, (ClassFunction.mem_supportedSubmodule).mpr hfA⟩ :=
+    OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap_apply_of_support hyp.dadeData.dade
+      (hyp.dadeData.dade.fullDadeIsometryData hyp.hconj) hfA
+  rw [h1]
+  -- `⟨f, hfA⟩` is defeq to `inclusion hA₁A ⟨f, hf⟩` (same carrier `f`), so step 3 applies directly.
+  exact dadeMap_eq_induce_of_supported_on_trivial_H hyp.dadeData.dade hA₁A hA₁norm hH₁
+    ⟨f, (ClassFunction.mem_supportedSubmodule).mpr hf⟩
+
+/-- The escaping-centralizer set `{a ∈ X : ¬ C_G(a) ≤ M}` is `M`-conjugation invariant when `X` is
+(`C_G(gag⁻¹) = g·C_G(a)·g⁻¹` and `g ∈ M` normalizes `M`).  Extracted from the
+`supportKernel_conj_invariant` calculation; the `L`-invariance of the trivial-`H` sub-support
+`A(L) ∖ escaping` rests on this. -/
+private theorem escaping_conj_mem_iff {M : Subgroup G} {X : Set G} {g x : G}
+    (hg : g ∈ M) (hmem : g * x * g⁻¹ ∈ X ↔ x ∈ X) :
+    g * x * g⁻¹ ∈ escapingCentralizerSet M X ↔ x ∈ escapingCentralizerSet M X := by
+  have hcent : (Subgroup.centralizer ({g * x * g⁻¹} : Set G) ≤ M)
+      ↔ (Subgroup.centralizer ({x} : Set G) ≤ M) := by
+    rw [← conj_smul_centralizer_singleton]
+    conv_lhs => rw [← (conj_smul_eq_self_of_mem_normalizer (Subgroup.le_normalizer hg) :
+      MulAut.conj g • M = M)]
+    exact Subgroup.pointwise_smul_le_pointwise_smul_iff
+  simp only [escapingCentralizerSet, Set.mem_setOf_eq, hmem, hcent]
+
+open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
+/-- **Peterfalvi (12.4), the §8 support obligation** ([Is] 6.2 + (8.12.a)): for constituents
+`φ₁, φ₂ ∈ S(χ)`, the difference `φ₁ − φ₂` is supported on the **non-escaping** part of `A(L)`,
+`A₁ = {a ∈ A(L) : C_G(a) ≤ L}` (= `A(L) − H^#`, exactly where the type-I Dade stabilizers vanish).
+By [Is] 6.2 `Res_H φᵢ` is a conjugate-sum of `θ`, so `φᵢ` is supported on `A(L) ∪ {1}` with the
+(8.12.a) restriction to the non-escaping part; the difference cancels the value at `1`.  A faithful
+§8/[Is] obligation — the genuine cross-section content remaining in pin (b). -/
+theorem constituent_diff_support_subset_nonescaping [Finite G] {L : Subgroup G} (hyp : Hypothesis L)
+    {chi : ClassFunction ↥L ℂ} (dχ : CharacterDecompositionData hyp chi)
+    {φ₁ φ₂ : IrreducibleCharacter ↥L} (h₁ : φ₁ ∈ dχ.constituents) (h₂ : φ₂ ∈ dχ.constituents) :
+    ((φ₁ : ClassFunction ↥L ℂ) - (φ₂ : ClassFunction ↥L ℂ)).support ⊆
+      OddOrder.Peterfalvi.S04.supportInSubgroup
+        (hyp.ambientA \ escapingCentralizerSet L hyp.ambientA) L := by
+  sorry
+
+open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
 /-- **Peterfalvi (12.4), pin (b)** ([Is] 7.7 + (8.12.c) + [Is] 6.2): for constituents `φ₁, φ₂ ∈ S(χ)`,
-the Dade isometry acts as induction on the difference, `(φ₁ − φ₂)^τ = Ind_L^G(φ₁ − φ₂)`.  By [Is] 6.2
-`Res_H φᵢ` is the conjugate-sum of `θ`, so `Supp(φ₁ − φ₂) ⊆ A(L) − H^#`, a TI-subset of `G` with
-normalizer `L` by (8.12.c); on a TI-supported function the Dade isometry coincides with `Ind_L^G`
-([Is] 7.7).  A faithful §8/[Is] obligation. -/
+the Dade isometry acts as induction on the difference, `(φ₁ − φ₂)^τ = Ind_L^G(φ₁ − φ₂)`.
+
+Proof (now genuine, modulo the §8 support obligation): `φ₁ − φ₂` is supported on the non-escaping
+part `A₁ = {a ∈ A(L) : C_G(a) ≤ L}` (`constituent_diff_support_subset_nonescaping`), which is
+`L`-invariant (`escaping_conj_mem_iff` + `A(L)` `L`-invariant) and carries only trivial Dade
+stabilizers (`supportKernel = ⊥` off the escaping set, via `H_eq_supportKernel`).  On such a
+trivial-`H` support the type-I Dade isometry coincides with `Ind_L^G`
+(`typeI_tau_eq_induce_of_supported_trivial_H`, i.e. pin (b) steps 1–3 + the restriction assembly). -/
 theorem constituent_diff_tau_eq_induce {L : Subgroup G} [Finite G] (hyp : Hypothesis L)
     {chi : ClassFunction ↥L ℂ} (dχ : CharacterDecompositionData hyp chi)
-    {φ₁ φ₂ : IrreducibleCharacter ↥L} (_h₁ : φ₁ ∈ dχ.constituents) (_h₂ : φ₂ ∈ dχ.constituents) :
+    {φ₁ φ₂ : IrreducibleCharacter ↥L} (h₁ : φ₁ ∈ dχ.constituents) (h₂ : φ₂ ∈ dχ.constituents) :
     hyp.tau ((φ₁ : ClassFunction ↥L ℂ) - (φ₂ : ClassFunction ↥L ℂ)) =
       ClassFunction.induce L ((φ₁ : ClassFunction ↥L ℂ) - (φ₂ : ClassFunction ↥L ℂ)) := by
-  sorry
+  have hmem : ∀ (l : L) (a : G), ((l : G) * a * (l : G)⁻¹ ∈ hyp.ambientA ↔ a ∈ hyp.ambientA) := by
+    intro l a
+    refine ⟨fun h => ?_, fun h => hyp.dadeData.dade.L_normalizes_A l h⟩
+    have h2 := hyp.dadeData.dade.L_normalizes_A l⁻¹ h
+    simpa [Subgroup.coe_inv, mul_assoc] using h2
+  have hA₁A : hyp.ambientA \ escapingCentralizerSet L hyp.ambientA ⊆ hyp.ambientA := Set.diff_subset
+  have hA₁norm : ∀ (l : L) ⦃a : G⦄,
+      a ∈ hyp.ambientA \ escapingCentralizerSet L hyp.ambientA →
+      (l : G) * a * (l : G)⁻¹ ∈ hyp.ambientA \ escapingCentralizerSet L hyp.ambientA := by
+    intro l a ha
+    exact ⟨hyp.dadeData.dade.L_normalizes_A l ha.1,
+      fun hesc => ha.2 ((escaping_conj_mem_iff l.2 (hmem l a)).mp hesc)⟩
+  have hH₁ : ∀ a, (hyp.dadeData.dade.restrict hA₁A hA₁norm).H a = ⊥ := by
+    intro a
+    rw [OddOrder.Peterfalvi.S04.Hypothesis.restrict_H, hyp.dadeData.H_eq_supportKernel]
+    show supportKernel L L hyp.ambientA a.1 = ⊥
+    unfold supportKernel
+    rw [if_neg a.2.2]
+  exact typeI_tau_eq_induce_of_supported_trivial_H hyp hA₁A hA₁norm hH₁
+    (constituent_diff_support_subset_nonescaping hyp dχ h₁ h₂)
 
 open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
 /-- **Peterfalvi (12.4), coherence → coefficient-equality bridge** (genuine).  If `ψ ⊥ R(χ)`, then
@@ -2236,6 +2315,173 @@ theorem rhoM_integer_values [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
     dade.rhoMFormula ∧
       (∀ g : G, g ∈ ctr.K → g ∉ ctr.Kprime → ∃ z : ℤ, dade.psi g = (z : ℂ)) := by
   sorry
+
+/-- **Peterfalvi (12.16), the (1.10) congruence core**: the cyclotomic-congruence chain of the
+(12.16) contradiction.  Given the minimal-counterexample data — a virtual character `ψ ∈ ℤ[Irr G]`,
+an order-`p` element `x` and a commuting `g` — together with the facts supplied by the surrounding
+§12 machinery (`ψ` constant on the coset, `ψ(xg) = ψ(x)`, by (12.14); `ψ(x) ≡ e (mod 1-ε)`, from the
+Dade value relation and (1.10.a) applied to `χ`; and `ψ(g) = mval ∈ ℤ`, by (12.15)), Peterfalvi
+(1.10.a) (`exists_integral_apply_sub_of_commute`) and (1.10.b) (`int_dvd_of_one_sub_primRoot_dvd`)
+yield `ψ(g) ≡ e (mod p)`, i.e. `p ∣ (mval - e)`.
+
+This isolates the `(1.10)`-using arithmetic of (12.16) (now fully discharged); the remaining
+contradiction is the norm/degree inequality (`2e ≤ p+1` of (12.12) together with (12.15)). -/
+theorem psi_int_congr_e_mod_p [Finite G] {p : ℕ} (hp : p.Prime) {ε : ℂ}
+    (hε : IsPrimitiveRoot ε p) {ψ : ClassFunction G ℂ} (hψ : ψ ∈ ZIrr G) {x g : G}
+    (hx : x ^ p = 1) (hxg : Commute x g) {e mval : ℤ}
+    (h_const : ψ (x * g) = ψ x)
+    (h_psix : ∃ w : ℂ, IsIntegral ℤ w ∧ ψ x - (e : ℂ) = (1 - ε) * w)
+    (h_psig_int : ψ g = (mval : ℂ)) :
+    (p : ℤ) ∣ (mval - e) := by
+  obtain ⟨z, hz, hzeq⟩ :=
+    OddOrder.RepresentationTheory.exists_integral_apply_sub_of_commute hp.pos hε hψ hx hxg
+  obtain ⟨w, hw, hweq⟩ := h_psix
+  apply OddOrder.RepresentationTheory.int_dvd_of_one_sub_primRoot_dvd hp hε (hw.sub hz)
+  have h1 : ψ x - ψ g = (1 - ε) * z := by rw [← h_const]; exact hzeq
+  rw [h_psig_int] at h1
+  push_cast
+  linear_combination hweq - h1
+
+/-- **Peterfalvi (12.16), the magnitude step**: an integer `mval ≡ e (mod p)` with `1 ≤ e` and
+`2e ≤ p+1` (the degree bound (12.12)) satisfies `|mval| ≥ e - 1`.  Indeed the integers `≡ e (mod p)`
+nearest `0` are `e` (distance `e`) and `e - p` (distance `p - e ≥ e - 1`, by `2e ≤ p+1`), so every
+such value has `|·| ≥ min(e, p-e) ≥ e - 1`. -/
+theorem abs_ge_e_sub_one {p : ℕ} (hppos : 0 < p) {e mval : ℤ} (he : 1 ≤ e)
+    (h2e : 2 * e ≤ (p : ℤ) + 1) (hdvd : (p : ℤ) ∣ (mval - e)) :
+    e - 1 ≤ |mval| := by
+  obtain ⟨k, hk⟩ := hdvd
+  have hpZ : (0 : ℤ) < (p : ℤ) := by exact_mod_cast hppos
+  by_cases hk' : 0 ≤ k
+  · have hpk : 0 ≤ (p : ℤ) * k := mul_nonneg hpZ.le hk'
+    rw [abs_of_nonneg (by omega)]; omega
+  · have hk1 : k ≤ -1 := by omega
+    have hpk : (p : ℤ) * k ≤ -(p : ℤ) := by nlinarith [mul_le_mul_of_nonneg_left hk1 hpZ.le]
+    rw [abs_of_nonpos (by omega)]; omega
+
+/-- **Peterfalvi (12.16), the value-magnitude conclusion**: chaining the `(1.10)` congruence core
+(`psi_int_congr_e_mod_p`) with the degree bound `2e ≤ p+1` of (12.12) gives `|ψ(g)| ≥ e - 1` — the
+lower bound on `|ψ(g)|` feeding the final norm inequality of (12.16). -/
+theorem abs_psi_g_ge_e_sub_one [Finite G] {p : ℕ} (hp : p.Prime) {ε : ℂ}
+    (hε : IsPrimitiveRoot ε p) {ψ : ClassFunction G ℂ} (hψ : ψ ∈ ZIrr G) {x g : G}
+    (hx : x ^ p = 1) (hxg : Commute x g) {e mval : ℤ} (he : 1 ≤ e)
+    (h2e : 2 * e ≤ (p : ℤ) + 1)
+    (h_const : ψ (x * g) = ψ x)
+    (h_psix : ∃ w : ℂ, IsIntegral ℤ w ∧ ψ x - (e : ℂ) = (1 - ε) * w)
+    (h_psig_int : ψ g = (mval : ℂ)) :
+    e - 1 ≤ |mval| :=
+  abs_ge_e_sub_one hp.pos he h2e
+    (psi_int_congr_e_mod_p hp hε hψ hx hxg h_const h_psix h_psig_int)
+
+/-- **Peterfalvi (12.16), the index/degree contradiction** (the heart of the final inequality): the
+reduced inequality `(|K| - |K'|)(e-1)² < e·|K|` together with `4·|K'| ≤ |K|` (i.e. `[K:K'] ≥ 4`,
+forced by the fixed-point-free order-`p` action of (8.1.c)) and `e ≥ 3` is contradictory.  Indeed
+`|K| - |K'| ≥ (3/4)|K|`, so `(3/4)(e-1)² < e`, i.e. `3(e-1)² < 4e`, i.e. `(3e-1)(e-3) < 0` — false
+for `e ≥ 3`.  This is the `e/(e-1)² ≤ 3/4 < 1 - |K'|/|K|` step of (12.16). -/
+theorem index_ratio_contradiction {e kK kKp : ℝ} (he : 3 ≤ e) (hkKp : 0 < kKp)
+    (hidx : 4 * kKp ≤ kK) (hineq : (kK - kKp) * (e - 1) ^ 2 < e * kK) : False := by
+  have hkK : 0 < kK := by linarith
+  nlinarith [hineq, mul_nonneg (show (0:ℝ) ≤ kK / 4 - kKp by linarith) (sq_nonneg (e - 1)),
+    mul_nonneg hkK.le (mul_nonneg (show (0:ℝ) ≤ e - 3 by linarith)
+      (show (0:ℝ) ≤ 3 * e - 1 by linarith))]
+
+/-- **Peterfalvi (12.16), the (12.11) reduction**: the final norm inequality
+`((|K|-|K'|)/|M|)(e-1)² + 1 - e/|H| < 1` together with `|M| ≤ |K|·|H|` of (12.11) reduces to
+`(|K|-|K'|)(e-1)² < e·|K|` (clear `|M|`, `|H|`, then bound `|M|` above). -/
+theorem norm_ineq_reduce {e kK kKp kM kH : ℝ} (hkM : 0 < kM) (hkH : 0 < kH)
+    (he1 : 0 ≤ e) (hM : kM ≤ kK * kH)
+    (hnorm : ((kK - kKp) / kM) * (e - 1) ^ 2 + 1 - e / kH < 1) :
+    (kK - kKp) * (e - 1) ^ 2 < e * kK := by
+  have h1 : (kK - kKp) * (e - 1) ^ 2 / kM < e / kH := by
+    have e1 : (kK - kKp) * (e - 1) ^ 2 / kM = ((kK - kKp) / kM) * (e - 1) ^ 2 := by ring
+    rw [e1]; linarith [hnorm]
+  rw [div_lt_div_iff₀ hkM hkH] at h1
+  have h2 : e * kM ≤ e * (kK * kH) := mul_le_mul_of_nonneg_left hM he1
+  have h3 : (kK - kKp) * (e - 1) ^ 2 * kH < e * kK * kH := by nlinarith [h1, h2]
+  exact lt_of_mul_lt_mul_right h3 hkH.le
+
+/-- **Peterfalvi (12.16), the closing contradiction** (norm-inequality endgame): given the final
+norm bound `((|K|-|K'|)/|M|)(e-1)² + 1 - e/|H| < 1` (from (7.3)/(7.8.b)/(8.17) with `|ψ(g)| ≥ e-1`),
+the index bound `|M| ≤ |K|·|H|` of (12.11), the degree bound `e ≥ 3`, and the fixed-point-free
+`[K:K'] ≥ 4` of (8.1.c), the minimal counterexample is impossible.  Combines `norm_ineq_reduce`
+with `index_ratio_contradiction`. -/
+theorem counterexample_closing {e kK kKp kM kH : ℝ} (he : 3 ≤ e) (hkKp : 0 < kKp)
+    (hkM : 0 < kM) (hkH : 0 < kH) (hidx : 4 * kKp ≤ kK) (hM : kM ≤ kK * kH)
+    (hnorm : ((kK - kKp) / kM) * (e - 1) ^ 2 + 1 - e / kH < 1) : False :=
+  index_ratio_contradiction he hkKp hidx (norm_ineq_reduce hkM hkH (by linarith) hM hnorm)
+
+/-- **Peterfalvi (12.16), the middle (norm-bound) glue**: from `|ψ(g)| ≥ e-1` and the three §7/§8
+norm bounds — `A`: `‖ψ^{ρM}‖² ≥ (|K-K'|/|M|)|ψ(g)|²` (from (12.15)), `B`: `‖ψ^ρ‖² ≥ 1 - e/|H|`
+((7.8.b)), `C`: `‖ψ^{ρM}‖² + ‖ψ^ρ‖² < 1` ((7.3) with (8.17)) — the norm conclusion
+`(|K-K'|/|M|)(e-1)² + 1 - e/|H| < 1` follows (`|ψ(g)|² = mval² ≥ (e-1)²`, then linear). -/
+theorem norm_conclusion_glue {e mval : ℤ} {kK kKp kM kH normRhoM normRho : ℝ}
+    (he : 3 ≤ e) (hkKp : 0 < kKp) (hkM : 0 < kM) (hidx : 4 * kKp ≤ kK)
+    (hmag : (e : ℝ) - 1 ≤ |(mval : ℝ)|)
+    (hA : (kK - kKp) / kM * (mval : ℝ) ^ 2 ≤ normRhoM)
+    (hB : (1 : ℝ) - (e : ℝ) / kH ≤ normRho)
+    (hC : normRhoM + normRho < 1) :
+    (kK - kKp) / kM * ((e : ℝ) - 1) ^ 2 + 1 - (e : ℝ) / kH < 1 := by
+  have hsq : ((e : ℝ) - 1) ^ 2 ≤ (mval : ℝ) ^ 2 := by
+    have heR : (3 : ℝ) ≤ (e : ℝ) := by exact_mod_cast he
+    nlinarith [hmag, sq_abs (mval : ℝ), abs_nonneg (mval : ℝ)]
+  have hpos : 0 ≤ (kK - kKp) / kM := div_nonneg (by linarith) hkM.le
+  have hA' : (kK - kKp) / kM * ((e : ℝ) - 1) ^ 2 ≤ normRhoM :=
+    le_trans (mul_le_mul_of_nonneg_left hsq hpos) hA
+  linarith [hA', hB, hC]
+
+/-- **Peterfalvi (12.16), the full assembly** (the entire argument, parameterized on its gated
+upstream): the minimal counterexample is impossible.  Combines the `(1.10)` congruence/magnitude
+start (`abs_psi_g_ge_e_sub_one`: `|ψ(g)| ≥ e-1`), the §7/§8 norm-bound middle (`norm_conclusion_glue`
+from the three bounds `hA`/`hB`/`hC`), and the index/degree endgame (`counterexample_closing`).
+
+Every hypothesis is a fact supplied by §7/§8/§12: `h_const` = (12.14), `h_psix` = Dade value relation
+with (1.10.a) on `χ`, `h_psig_int` = (12.15), `h2e` = (12.12); `hA` = (12.15)+`|ψ(g)|`, `hB` = (7.8.b),
+`hC` = (7.3)+(8.17); `hM` = (12.11), `hidx` = fpf `[K:K'] ≥ 4` of (8.1.c).  The remaining work to close
+`counterexample_contradiction` is exactly the construction of these — the §7 `ρ`/`ρM` machinery. -/
+theorem counterexample_contradiction_of_facts [Finite G]
+    {p : ℕ} (hp : p.Prime) {ε : ℂ} (hε : IsPrimitiveRoot ε p)
+    {ψ : ClassFunction G ℂ} (hψ : ψ ∈ ZIrr G) {x g : G} (hx : x ^ p = 1) (hxg : Commute x g)
+    {e mval : ℤ} (he : 3 ≤ e) (h2e : 2 * e ≤ (p : ℤ) + 1)
+    (h_const : ψ (x * g) = ψ x)
+    (h_psix : ∃ w : ℂ, IsIntegral ℤ w ∧ ψ x - (e : ℂ) = (1 - ε) * w)
+    (h_psig_int : ψ g = (mval : ℂ))
+    {kK kKp kM kH normRhoM normRho : ℝ}
+    (hkKp : 0 < kKp) (hkM : 0 < kM) (hkH : 0 < kH)
+    (hidx : 4 * kKp ≤ kK) (hM : kM ≤ kK * kH)
+    (hA : (kK - kKp) / kM * (mval : ℝ) ^ 2 ≤ normRhoM)
+    (hB : (1 : ℝ) - (e : ℝ) / kH ≤ normRho)
+    (hC : normRhoM + normRho < 1) :
+    False := by
+  have hmagZ : (e - 1 : ℤ) ≤ |mval| :=
+    abs_psi_g_ge_e_sub_one hp hε hψ hx hxg (by linarith) h2e h_const h_psix h_psig_int
+  have hmag : (e : ℝ) - 1 ≤ |(mval : ℝ)| := by rw [← Int.cast_abs]; exact_mod_cast hmagZ
+  have heR : (3 : ℝ) ≤ (e : ℝ) := by exact_mod_cast he
+  exact counterexample_closing heR hkKp hkM hkH hidx hM
+    (norm_conclusion_glue he hkKp hkM hidx hmag hA hB hC)
+
+/-- **Peterfalvi (12.12) → (12.16) numerical bridge**: the (12.12) conclusion `e ∣ p+1` together
+with `e` odd (odd order) gives the bound `2e ≤ p+1` cited by (12.16).  Since `p` is odd, `2 ∣ p+1`;
+as `gcd(2,e)=1`, `2e ∣ p+1`, hence `2e ≤ p+1`.  (`e ≤ (p+1)/2` in the textbook.) -/
+theorem two_mul_le_succ_of_odd_dvd {e p : ℕ} (hp : Odd p) (he : Odd e)
+    (hdvd : e ∣ (p + 1)) : 2 * e ≤ p + 1 :=
+  Nat.le_of_dvd (by omega) (he.coprime_two_left.mul_dvd_of_dvd_of_dvd (hp.add_one).two_dvd hdvd)
+
+/-- **Peterfalvi (8.1.c) → (12.16) numerical bridge**: a fixed-point-free order-`p` action on
+`K/K'` forces `p ∣ ([K:K'] - 1)`; with `[K:K'] > 1` and `p ≥ 3` this gives `[K:K'] ≥ 4`, the index
+bound contradicting `[K:K'] < 4` in the (12.16) endgame. -/
+theorem four_le_of_dvd_sub_one {p n : ℕ} (hp : 3 ≤ p) (hn : 1 < n) (hdvd : p ∣ (n - 1)) :
+    4 ≤ n := by
+  have : p ≤ n - 1 := Nat.le_of_dvd (by omega) hdvd
+  omega
+
+/-- **Peterfalvi (12.9), the centralizer witness extraction**: the rank-two witness datum records
+`¬(C_G(x) ⊓ K ≤ K')`, which directly yields an element `g ∈ C_K(x)` with `g ∉ K'` — the `g`
+commuting with `x` used throughout the (12.16) argument.  (Pure `SetLike` extraction, ungated.) -/
+theorem exists_witness_g {ctr : CounterexampleHypothesis (G := G)}
+    (witness : RankTwoWitnessData ctr) :
+    ∃ g : G, Commute witness.x g ∧ g ∈ ctr.K ∧ g ∉ ctr.Kprime := by
+  obtain ⟨g, hgA, hgB⟩ := SetLike.not_le_iff_exists.mp witness.CKx_not_le_Kprime
+  rw [Subgroup.mem_inf] at hgA
+  exact ⟨g, Subgroup.mem_centralizer_iff.mp hgA.1 witness.x (Set.mem_singleton _), hgA.2, hgB⟩
 
 /-- **Peterfalvi (12.16)**: the minimal counterexample of (12.8) is impossible. -/
 theorem counterexample_contradiction [Finite G]

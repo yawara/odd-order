@@ -107,6 +107,7 @@ import OddOrder.Peterfalvi.S06_MuColumnBridge
 import OddOrder.Peterfalvi.S07_Coherence
 import OddOrder.Peterfalvi.S07_CoherenceConstantDegree
 import OddOrder.Peterfalvi.S07_CoherenceGalois
+import OddOrder.Peterfalvi.S07_RhoProjection
 import OddOrder.Peterfalvi.S08_CoherenceTheorems
 import OddOrder.Peterfalvi.S08_Theorem62_63_Standalone
 import OddOrder.Peterfalvi.S09_NonexistenceCertain
@@ -117,6 +118,7 @@ import OddOrder.BG.AppC_FrobeniusClassSum
 import OddOrder.BG.AppC_LemmaC2
 import OddOrder.Peterfalvi.Appendices.SemilinearField
 import OddOrder.Peterfalvi.Appendices.NearFields
+import OddOrder.GroupTheory.RepresentationTheory.CyclotomicCharacterCongruence
 
 /-!
 # Axioms check for chapter flagship theorems
@@ -761,6 +763,29 @@ set_option linter.style.longLine false in
 -- Pf (12.4) pin (a): `(φ₁−φ₂)^τ ∈ ℤ[R(χ)]` for constituents `φ₁,φ₂ ∈ S(χ)`.  Reconciles the global
 -- (1.4) family with the per-φ blocks `R₁(φ)` via difference-uniqueness.  Genuine; no longer sorried.
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S14.constituent_diff_tau_mem_span
+-- Pf (1.10.b) cyclotomic congruence (field form): in a `p`-th cyclotomic field, an integer `n` with
+-- `n = (ζ-1)·a` (`a` integral) has `p ∣ n` (norm argument `N(ζ-1)=p`).
+#assert_only_allowed_axioms OddOrder.RepresentationTheory.int_dvd_of_zeta_sub_one_dvd
+-- Pf (1.10.b) **ℂ-form** (global algebraic integers, the FT-usable form): for `p` prime, `ε` a
+-- primitive `p`-th root, an integer `n` with `(n:ℂ) = (1-ε)·z` (`z` any algebraic integer) has
+-- `p ∣ n`.  Via `∏(1-ε^k)=p` + each `(1-ε^k)∣(1-ε)∣n` ⟹ `p∣n^{p-1}`, descend to ℤ.  Used by
+-- (12.16)/(13.5) directly (no specific field needed; matches Coq `Z[η]` formulation).
+#assert_only_allowed_axioms OddOrder.RepresentationTheory.int_dvd_of_one_sub_primRoot_dvd
+-- (1.10.b) supporting: `1-ε^k` and `1-ε` are associates (`1-ε = (1-ε^k)·w`, `w` integral).
+#assert_only_allowed_axioms OddOrder.RepresentationTheory.one_sub_pow_dvd_one_sub
+-- (1.10.b) supporting: a rational integer `a` with `(a:ℂ)=(b:ℂ)·W` (`W` integral, `b≠0`) has `b∣a`.
+#assert_only_allowed_axioms OddOrder.RepresentationTheory.int_dvd_of_intCast_eq_mul_isIntegral
+-- Pf (1.10.a) linear-char core: for a linear character `α` of a finite group, `x^p=1` element `x`,
+-- `α(xy)-α(y) = (1-ε)·z` with `z` an algebraic integer (`α(x)=ε^k`, `α(y)` a root of unity).
+#assert_only_allowed_axioms OddOrder.RepresentationTheory.exists_integral_linearChar_apply_sub
+-- Pf (1.10.a) full: for a virtual character `χ ∈ ℤ[Irr A]` of a finite ABELIAN group `A`, an
+-- `x^p=1` element `x`, `χ(xy)-χ(y) = (1-ε)·z` with `z` an algebraic integer (submodule framing over
+-- the linear-char core + `exists_linearIrreducibleCharacter_eq_of_isMulCommutative`).
+#assert_only_allowed_axioms OddOrder.RepresentationTheory.exists_integral_zirr_apply_sub
+-- Pf (1.10.a) G-form: for a virtual character `ψ ∈ ℤ[Irr G]` of ANY finite group, `x^p=1` and `y`
+-- COMMUTING with `x`, `ψ(xy)-ψ(y) = (1-ε)·z`.  Reduce to the abelian subgroup `A=⟨x,y⟩` via
+-- `restrict_mem_ZIrr` + `exists_integral_zirr_apply_sub`.  Directly usable by (12.16)/(13.5).
+#assert_only_allowed_axioms OddOrder.RepresentationTheory.exists_integral_apply_sub_of_commute
 -- Pf (12.4) pin (b) step 1: general TI-induction self-value — for a TI subset `A` rel. `L` and an
 -- `A`-supported class function `α`, `Ind_L^G α` agrees with `α` on `A`.  Generalizes the TI-cyclic
 -- `induce_apply_eq_self_of_mem_V` to arbitrary TI subsets (the value-half of "Dade map = Ind").
@@ -771,7 +796,10 @@ set_option linter.style.longLine false in
 -- Pf (12.4) pin (b) step 3: on functions supported in a trivial-`H` sub-support `A₁ ⊆ A`, the
 -- abstract Dade map of `hyp` equals `Ind_L^G` (restrict to `A₁` + step 2 + `IsDadeMap.unique`).
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S14.dadeMap_eq_induce_of_supported_on_trivial_H
--- Pf (8.2.b) Frobenius realization for the type-I/F tower step (consumed by (12.10) step 2 /
+-- Pf (12.4) pin (b) type-I bridge: for a type-I maximal `L`, on a function supported in a trivial-`H`
+-- sub-support `A₁ ⊆ A(L)`, the type-I Dade isometry `τ` acts as `Ind_L^G` (instantiates step 3 at
+-- `hyp.tau` via `dadeIntegralCharacterMap_apply_of_support`).  Axiom-clean (parameterized by A₁).
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S14.typeI_tau_eq_induce_of_supported_trivial_H
 -- (12.16) `π = ∅` case): a type-F/I maximal whose complement `U` is a Z-group (all Sylow cyclic)
 -- is Frobenius with kernel `M_F`, via `IsZGroup.exponent_eq_card` + `typeF_frobenius_of_card_eq_exponent`.
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S14.typeF_frobenius_of_isZGroup_complement
@@ -6664,6 +6692,38 @@ formula together with the prime computation `coprimeFrobeniusAction_card_eq_prim
 -- further §12/§16 cite, so it is not yet registered.)
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S14.exists_sigmaKappaCompl_hall_ge_P0
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S14.counterexample_P0_K_structure
+-- Pf (12.16) (1.10) congruence core: from `ψ ∈ ℤ[Irr G]`, `x^p=1`, `g` commuting with `x`, the
+-- (12.14)/(12.15)/Dade facts (`ψ(xg)=ψ(x)`, `ψ(x)≡e mod 1-ε`, `ψ(g)=mval∈ℤ`), (1.10.a)+(1.10.b)
+-- give `p ∣ (mval-e)` (i.e. `ψ(g)≡e mod p`).  Materializes the (1.10)-wiring of (12.16).
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S14.psi_int_congr_e_mod_p
+-- Pf (12.16) magnitude step: an integer `≡ e mod p` with `1≤e`, `2e≤p+1` (12.12) has `|·| ≥ e-1`.
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S14.abs_ge_e_sub_one
+-- Pf (12.16) value-magnitude conclusion: chaining the congruence core with `2e≤p+1` gives
+-- `|ψ(g)| ≥ e-1` — the lower bound feeding the final norm inequality of (12.16).
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S14.abs_psi_g_ge_e_sub_one
+-- Pf (12.16) closing endgame: `index_ratio_contradiction` (reduced ineq + `[K:K']≥4` + `e≥3` ⟹ False
+-- via `(3e-1)(e-3)≥0`), `norm_ineq_reduce` ((12.11) `|M|≤|K||H|` reduction), and `counterexample_closing`
+-- (combined: norm conclusion + (12.11) + `e≥3` + fpf `[K:K']≥4` of (8.1.c) ⟹ False).
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S14.index_ratio_contradiction
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S14.norm_ineq_reduce
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S14.counterexample_closing
+-- Pf (12.16) middle glue: `|ψ(g)|≥e-1` + the three §7/§8 norm bounds (A/B/C) ⟹ the norm conclusion.
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S14.norm_conclusion_glue
+-- Pf (12.16) FULL assembly: the entire argument as one sorry-free theorem, parameterized on every
+-- gated §7/§8/§12 fact ((12.14)/(12.15)/Dade/(12.12)/(12.11)/(8.1.c) + norm bounds A/B/C).  The
+-- remaining work to close `counterexample_contradiction` is exactly constructing these (§7 ρ machinery).
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S14.counterexample_contradiction_of_facts
+-- Pf (12.16) ungated input bridges: `two_mul_le_succ_of_odd_dvd` ((12.12) `e∣p+1` + odd ⟹ `2e≤p+1`),
+-- `four_le_of_dvd_sub_one` ((8.1.c) `p∣[K:K']-1` ⟹ `[K:K']≥4`), `exists_witness_g` ((12.9) centralizer
+-- witness `g ∈ C_K(x) ∖ K'`).  Discharge the non-ρ-machinery content of (12.16)'s cited steps.
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S14.two_mul_le_succ_of_odd_dvd
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S14.four_le_of_dvd_sub_one
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S14.exists_witness_g
+-- Pf §7 (7.1) ρ projection foundation: `rhoValue χ a = (1/|H(a)|)∑_{x∈H(a)} χ(ax)` is `ℂ`-linear in
+-- `χ`.  Start of the §7 ρ machinery (the unbuilt upstream of (12.14)/(12.15) and the (12.16) norm
+-- bounds hA/hB/hC) on the existing Dade `H(a)` infrastructure (`S04.Hypothesis`).
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S07.rhoValue_add
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S07.rhoValue_smul
 
 -- **W1 §16 Prop 16.1 `hP1eqV` disjunct 3 (Singer/`SL₂(p)`) prerequisite (lane-f, issue 8015)** —
 -- `IsExtraspecial.of_card_eq_prime_cube`: a nonabelian group of order `p³` is extraspecial

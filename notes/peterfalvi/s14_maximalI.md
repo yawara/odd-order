@@ -672,3 +672,228 @@ full build 3874 green)。次 = **step 2** (一般 induce-is-Dade-map for TI/triv
    (`dadeIntegralCharacterMap_apply_of_support`) = `hyp.dadeMap (inclusion ⟨f,A₁-supp⟩)`
    (Subtype.ext、同 carrier) = `induce L f` (step 3)。
 ⚠ A₁ (trivial-H) と教科書の A(L)−H# が厳密一致するか要確認 (H# の定義)。
+
+## 2026-06-29 (lane-b=β loop¹⁶): pin (b) 完全証明 ✅✅✅ — (12.4) coherence+induction machinery 完成
+
+**pin (b) `constituent_diff_tau_eq_induce` を honest 証明** (commit 32271b67、§8 support obligation
+modulo)。深い Dade machinery 全完成、残は単一 faithful §8 obligation のみ:
+- 型 I bridge `typeI_tau_eq_induce_of_supported_trivial_H` (axiom-clean): step 3 を hyp.tau に
+  `dadeIntegralCharacterMap_apply_of_support` で instantiate。
+- escaping_conj_mem_iff (helper): escaping set L-共役不変 (既存 conj_smul_centralizer_singleton 活用)。
+- pin (b) assembly: A₁=A(L)∖escaping、hA₁norm/hH₁ (restrict_H+H_eq_supportKernel+if_neg) 証明 → bridge。
+- §8 obligation `constituent_diff_support_subset_nonescaping` (faithful sorried): φ₁−φ₂ が
+  non-escaping 部分 supported = [Is]6.2 + (8.12.a) の genuine cross-lane 残。
+
+**⟹ pin (a)✅ + pin (b)✅ で (12.4) 完成**。`Sset_coeff_equal` (pin a+b consume) →
+`orthogonal_character_constant_on_coset` (12.4) が構造的に sorry-free (§8 modulo)。
+
+**実装知見**: instance desync は FiniteInduce scope の `finiteGFintype` に統一 (`Fintype.ofFinite G`
+を haveI で入れると hyp.tau の Fintype と非一致); `((l⁻¹:L):G)` coercion は `simpa [Subgroup.coe_inv,
+mul_assoc]` で正規化 (rw [he] は coercion form 不一致); supportKernel は `show ... a.1` で arg 正規化後
+`unfold; if_neg`; SupportedClassFunctions ⟨f,_⟩ は carrier 同一なら inclusion と defeq。
+
+**残 §12 frontier (次イテレーション以降)**: (12.4) §8 obligation discharge (cross-lane §8/§10) /
+(12.5) ρ-blocked (§7 ρ machinery) / (12.3) §10 support / (12.6) sibleyTarget / (12.10)-(12.16) /
+(12.2.a) §8 Clifford。(12.4) は完了ゆえ次は document 順で (12.5) or §8 obligation 評価。
+
+## 2026-06-29 (lane-b=β loop¹⁷): (12.4) 完成後の §12 frontier 再評価 — 残は deep §1/§7 prerequisites
+
+**(12.4) 完成** (pin a✅ + pin b✅, loop¹²-¹⁶)。残 §12 sorry を survey、frontier は deep
+foundational prerequisites に移行 (tractable な §12 char-coherence 核は完了):
+
+| sorry | 内容 | 種別 |
+|---|---|---|
+| L855 `constituent_diff_support_subset_nonescaping` | pin b の §8 support obligation | cross-lane §8/§10 |
+| L244 `typeI_induced_char_constituents` | (12.2.a) §8 type-F Clifford | cross-lane §8 |
+| L348 `nonconjugate_diffImage_inner_zero` | (12.3) §10 support 不交差 | cross-lane §10 |
+| L1241 `rho_constant_on_H_minus_Hprime` | (12.5) **§7 ρ machinery 要** (statement unfaithful) | deep §7 build |
+| L1265 `sibleyTarget_frobI` | (12.6) Sibley target 構成 | gated on (6.8) [done?] |
+| L1999-2283 (12.10)-(12.12) | structural | §8-gated (旧 lane-h) |
+| L2307-2323 (12.13)-(12.16) | Dade calc + 最終矛盾 | **(12.16)=lane-b keystone**, 要 (12.5)/(1.10) |
+
+**(12.16) `counterexample_contradiction` (lane-b keystone) の binding prerequisites** (04.14:101 精読):
+(12.9)g + (1.10.a/b) p-進 congruence + (12.12) 2e≤p+1 + (12.14)/(12.15) + (7.3)/(7.8) norm bounds。
+
+**次の最有力 target = (1.10) cyclotomic-integer congruence** (04.3:129、repo 不在、lane b 12.16 +
+lane c S15/§13 両用 = 高 reuse):
+- **(1.10.a)**: x order p, xy=yx, χ virtual char ⟹ `χ(xy)≡χ(y) (mod 1−ε)` in ℤ[η]。
+  証明 = Res_⟨x,y⟩ χ の irreducible α は abelian ゆえ degree 1、α(x)=ε^k、α(xy)−α(y)=(ε^k−1)α(y)、
+  (1−ε)∣(ε^k−1)。要: char 値 ↔ ℤ[η] bridge (ClassFunction 値は ℂ、ℤ[η]⊆ℂ への connection)。
+- **(1.10.b)**: n∈ℤ, (1−ε)∣n in ℤ[η] ⟹ p∣n。証明 = N(1−ε)=p^k (mathlib `norm_sub_one_of_prime_ne_two`
+  系)、(1−ε)∣n ⟹ N(1−ε)∣N(n)=n^d ⟹ p∣n。要: ℚ(η)/ℚ norm machinery (mathlib Cyclotomic.PrimitiveRoots)。
+- **設計課題**: 抽象 ring R + IsPrimitiveRoot ε p で phrase か、ℤ[η]⊆ℂ 具体か。char 値の ℤ[η] 所属が
+  bridge。**新 leaf** (e.g. `RepresentationTheory/CyclotomicCharacterCongruence.lean`) で cross-lane 衝突回避。
+- mathlib 在庫: `Mathlib/NumberTheory/Cyclotomic/PrimitiveRoots.lean` (norm_sub_one 系)、IsPrimitiveRoot。
+
+substantial multi-iteration §1 build。次イテレーションで (1.10.b) [純代数、char 不要] から着手。
+[[feedback-no-avoiding-hard-parts]]
+
+## 2026-06-29 (lane-b=β loop¹⁸): (1.10) は from-scratch cyclotomic NT build と確認 + 設計確定
+
+**確認**: (1.10) は repo に基盤なし、mathlib の cyclotomic norm も prime-power 特化 (`norm_sub_one_of_prime_ne_two` 等は p^(k+1))。char 値↔ℤ[η] bridge + p-ramification を一から構築要 = major multi-iteration。**FT-critical 確認**: (12.16)→pi_empty→typeI_frobenius(12.7)→S15_SAndT (lane c, FT-critical) consume。
+
+**(1.10) build 設計 (次イテレーション実行)**:
+- **設計課題 = ring bridge**: repo char は `ClassFunction G ℂ` (ℂ 値)。(1.10) は ℂ の部分環
+  (algebraic integers `integralClosure ℤ ℂ` or `Algebra.adjoin ℤ {η}`) での divisibility。
+  char 値が algebraic integer であること + (1−ε)∣(...) in 𝓞 の形式化が bridge。
+- **(1.10.a)** `χ(xy)≡χ(y) (mod 1−ε)`: Res_⟨x,y⟩ χ を linear α に分解 (⟨x,y⟩ abelian)、
+  α(xy)−α(y)=(α(x)−1)α(y)、α(x)=ε^k (x order p)、`(1−ε)∣(ε^k−1)` [elementary: 1−ε^k=(1−ε)∑ε^i]。
+  要: char restriction + abelian-degree-1 + 値 ∈ 𝓞 (repo 薄い、要構築)。
+- **(1.10.b)** `n∈ℤ, (1−ε)∣n in ℤ[η] ⟹ p∣n`: **norm approach** = `N_{ℚ(η)/ℚ}(1−ε)=p^k` (k≥1、
+  N_{ℚ(ε)/ℚ}(1−ε)=Φ_p(1)=p の tower)、`N(n)=n^{[ℚ(η):ℚ]}` (`Algebra.norm_algebraMap`)、
+  `N` multiplicative on `∣` ⟹ p^k∣n^d ⟹ p∣n。要: ℚ(η) IntermediateField + Algebra.norm setup。
+  代替 = ring hom ℤ[η]→𝔽_p-bar (η↦ reduction, ε↦1) — prime-above-p の reduction 要、より複雑。
+- **leaf**: 新 `RepresentationTheory/CyclotomicCharacterCongruence.lean` (cross-lane 衝突回避、lane b/c 両用)。
+
+**⚠ 状況認識**: (12.4) 完了後、lane b §12 frontier は deep foundational builds のみ ((1.10) NT /
+§7 ρ machinery / §8 obligations、各 multi-iteration、quick win なし)。これは §12 endgame の本来の
+最難部 (lane reallocation で lane b に割当)。難所回避せず (1.10) から grind。**hub 検討事項**: lane b
+§12 が deep-foundation-only になったため、reallocation 価値の再評価余地あり (但し (12.16) は assigned)。
+
+## 2026-06-29 (lane-b=β loop¹⁹): (1.10.b) cyclotomic congruence 実装完了 ✅ — code landed
+
+**(1.10.b) `int_dvd_of_zeta_sub_one_dvd` 完成** (新 leaf `RepresentationTheory/CyclotomicCharacterCongruence.lean`、
+sorry-free)。abstract cyclotomic field 版: p odd prime, L = p-th cyclotomic field /ℚ, ζ primitive
+p-th root、n∈ℤ, a integral で `n=(ζ-1)·a` ⟹ `p∣n`。
+**証明 = norm argument** (設計通り): `N_{L/ℚ}(ζ-1)=p` (`IsPrimitiveRoot.norm_sub_one_of_prime_ne_two'`)、
+`N(algebraMap n)=n^(p-1)` (`Algebra.norm_algebraMap` + `IsCyclotomicExtension.finrank`=totient p)、
+`N(a)∈ℤ` (`Algebra.isIntegral_norm` + `IsIntegrallyClosed.isIntegral_iff`) ⟹ n^(p-1)=p·N(a) ⟹ p∣n。
+mathlib API: `cyclotomic.irreducible_rat`/`Nat.totient_prime`/`Nat.prime_iff_prime_int`。
+
+**残 (1.10)**:
+- **(1.10.a)** `χ(xy)≡χ(y) (mod 1−ε)`: char restriction + (1−ε)∣(ε^k−1)。要 char 値↔algebraic-integer。
+- **ℂ-instantiation bridge**: (12.16) 用に L=ℚ(ε)⊆ℂ で int_dvd_of_zeta_sub_one_dvd を適用
+  (a=n/(1−ε)∈ℚ(ε)∩𝓞=ℤ[ε] の integrality 供給)。
+次イテレーション = (1.10.a) char-side or ℂ-instantiation。AxiomsCheck 登録。
+
+## 2026-06-29 (lane-b=β loop²⁰): (1.10) 残 piece scoping — (1.10.a) linear-char route + ℂ-bridge friction
+
+**(1.10.b) 済** (loop¹⁹)。残 (1.10) piece の friction を確認:
+- **ℂ-instantiation friction**: abstract (1.10.b) は cyclotomic field L 上。ℂ 適用には L=ℚ(ε)⊆ℂ の
+  cyclotomic instance 要だが `intermediateField_adjoin_isCyclotomicExtension` は `[Algebra.IsIntegral ℚ ℂ]`
+  要 (ℂ に transcendental ゆえ偽)。代替 = `IntermediateField.isCyclotomicExtension_adjoin_of_exists_isPrimitiveRoot`
+  (roots-set adjoin) or `CyclotomicField p ℚ`+embedding — どちらも plumbing 重。
+- **(1.10.a) refined plan (char-integrality bridge 回避)**: χ(xy)−χ(y)=∑_α(α(x)−1)α(y)。
+  **linear-char route**: Res_⟨x,y⟩ χ を irreducible α に分解 (⟨x,y⟩ abelian ⟹ α linear)、
+  **linear char α(g) は root of unity ⟹ 直接 integral** (一般 char-integrality bridge 不要)、
+  α(x)=ε^k (x order p)、(1−ε)∣(ε^k−1) [`1−ε^k=(1−ε)∑ε^i`]。要 = char restriction +
+  abelian-irreducible-decomposition (repo は mathlib `Representation` ベース、要調査)。
+
+**状況**: lane b §12 endgame は deep prerequisites の piece-by-piece grind (12.4✅/1.10.b✅ landed、
+残 = 1.10.a/ℂ-bridge/§7 ρ/12.16 assembly、各 substantial)。次イテレーション = (1.10.a) linear-char
+route の char restriction-decomposition から build (or ℂ-bridge)。
+
+## 2026-06-29 (lane-b=β loop²²): (1.10.a) full の infra 全特定 — build plan 完成
+
+**(1.10.a) full `exists_integral_zirr_apply_sub` の infra 全て特定** (de-risk 完了):
+- **Fourier**: `ZIrr_eq_span` (ZIrr.lean:156、ZIrr A=span ℤ {irreducibles}) + `Submodule.mem_span` ⟹
+  χ=∑ c_α α (c_α∈ℤ、Finsupp)。
+- **abelian bridge**: `exists_units_monoidHom_of_isIrreducibleCharacter_of_isMulCommutative`
+  (**S11_MaximalII_III_IV:2431**、既存): abelian Γ の irreducible char φ ⟹ ∃ θ:Γ→*ℂˣ, θ(g)=φ(g)。
+- **per-α core**: `exists_integral_linearChar_apply_sub` (本 leaf、loop²¹)。
+**plan**: χ=∑c_α α → 各 α で bridge θ_α + linear-char core で α(xy)-α(y)=(1-ε)z_α →
+χ(xy)-χ(y)=∑c_α(α(xy)-α(y))=(1-ε)·∑c_α z_α、z=∑c_α z_α integral。~100-150 行 Finsupp/span assembly。
+**placement**: bridge が S11 ゆえ leaf に S11 import (heavy) か S14 内 (S14→S13→S12→S11? 要確認) に置く。
+S14 closure に S11 + ZIrr_eq_span あれば S14 が自然 (lane b file)。
+
+**(1.10) 進捗総括**: (1.10.b)✅ abstract + (1.10.a) helper✅ + linear-char core✅。残 = (1.10.a) full
+(infra 全特定、次イテレーション build) + ℂ-instantiation ((1.10.b) を ℂ 値に、roots-set-adjoin route)。
+これらで (1.10) 完成 → (12.16) の一前提 (他 = §7 ρ/(12.13)-(12.15)/assembly)。
+**次イテレーション = (1.10.a) full を build** (infra ready、no more planning)。
+
+### loop²³⁻²⁴ — (1.10.a) full + G-form 完成、ℂ-instantiation の field-generality 判明
+
+**(1.10.a) 完全版 landing 済** (loop²³⁻²⁴、`CyclotomicCharacterCongruence.lean`、全 axiom-clean):
+- `exists_integral_zirr_apply_sub` — (1.10.a) full: 有限群 `[Group A][Finite A][IsMulCommutative A]`
+  の virtual char χ∈ℤ[Irr A]、x^p=1 で `χ(xy)-χ(y)=(1-ε)z`。**submodule framing**
+  (性質を持つ CF が ℤ-submodule で irreducibles を含む ⟹ ZIrr を含む) + linear-char core。
+  当初 [CommGroup] → 部分群 ↥A に適用するため **[Group]+[IsMulCommutative]** に refactor。
+- `exists_integral_apply_sub_of_commute` — (1.10.a) **G-form**: 任意有限群 G、commute する x,y で
+  `ψ(xy)-ψ(y)=(1-ε)z`。A=⟨x,y⟩ (abelian) に還元 (`Subgroup.isMulCommutative_closure` +
+  `ClassFunction.restrict_mem_ZIrr`)。**(12.16)/(13.5) が直接 cite 可な形**。
+
+⟹ **(1.10.a) 全形完成** (abelian + G-form)、**(1.10.b) abstract 完成**。
+
+**🔑 残 (1.10) wiring = (1.10.b) の ℂ-instantiation。重要な設計点 (次イテレーションで対処)**:
+現 `int_dvd_of_zeta_sub_one_dvd` は `[IsCyclotomicExtension {p} ℚ L]` (L = **ちょうど** p-th
+cyclotomic field、[L:ℚ]=p-1、N(ζ-1)=p) を要求。だが (12.16) の char 値 z は
+**ℚ(ζ_m)** (m=exp G ⊇ ζ_p) という**より大きい**体に住む (α(y) が m-th root of unity)。
+norm 論法は大きい体でも成立: `N_{L/ℚ}(ζ_p-1) = N_{ℚ(ζ_p)/ℚ}(ζ_p-1)^[L:ℚ(ζ_p)] = p^[L:ℚ(ζ_p)]`
+(p|N)、`N_{L/ℚ}(n)=n^[L:ℚ]` ⟹ p|n^[L:ℚ] ⟹ p|n。よって (1.10.b) を「**ζ_p を含む任意の
+number field L**」へ一般化が必要 (norm tower transitivity、`Norm.Transitivity` import 済)。
+**次イテレーション = この一般化版 (1.10.b) を build** (現 IsCyclotomicExtension 版は p-th 特化として残すか置換)。
+Coq PFsection1 の (1.10) 対応も併読して generality 確認。
+
+### loop²⁵ — (1.10.b) ℂ-form 完成 ⟹ (1.10) 全完成・FT-ready
+
+**重要な statement 確定 (Coq PFsection1 併読)**: Coq は (1.10) を **ℂ の大域代数的整数**で定式化
+(コメント: Z[η]→全整数環の simplification、原文 ℤ[η] と同値)。⟹ 正しい FT-usable 版は**特定体不要**:
+- `int_dvd_of_one_sub_primRoot_dvd` (axiom-clean) — (1.10.b) ℂ-form: p 素数、ε 原始 p 乗根、n∈ℤ で
+  `(n:ℂ)=(1-ε)·z` (z 任意代数的整数) ⟹ p∣n。前 commit の field 版 `int_dvd_of_zeta_sub_one_dvd`
+  (L=ちょうど ℚ(ζ_p) 限定) は FT に使えず ⟹ **本 ℂ 版が supersede** (field 版は dead、後で除去可)。
+  証明=associate-unit (Coq と同じ): `∏_{1≤k<p}(1-ε^k)=p` (mathlib `prod_one_sub_pow_eq_order`) +
+  各 `(1-ε^k)∣(1-ε)∣n` (`one_sub_pow_dvd_one_sub`、整数 cofactor) ⟹ p∣n^{p-1} ⟹ ℤ descend
+  (`int_dvd_of_intCast_eq_mul_isIntegral`) ⟹ p∣n。
+- helper: `one_sub_pow_dvd_one_sub` (ε^k と ε の associate、gcd(k,p)=1 で ε=(ε^k)^r) +
+  `int_dvd_of_intCast_eq_mul_isIntegral` (rational 代数的整数 ⟹ ℤ、IsIntegrallyClosed)。
+
+⟹ **Peterfalvi (1.10) 全完成・FT-ready**: (1.10.a) G-form `exists_integral_apply_sub_of_commute`
++ (1.10.b) ℂ-form `int_dvd_of_one_sub_primRoot_dvd`、両者 ℂ 値指標で直接動く ((12.16)/(13.5) 用)。
+
+**次イテレーション = (12.16) `counterexample_contradiction` 本体での (1.10) wiring に着手**: 原文
+(04.14 mmd:101) の論法 — g∈C_K(x)∖K' で (1.10.a) から ψ(xg)≡ψ(g), χ(x)≡e (mod 1-ε)、(12.14) で
+ψ(g)≡e、(1.10.b)+(12.15) で ψ(g)≡e (mod p)、… ⟹ 矛盾。(12.12)/(12.14)/(12.15) の現状を grep して
+assembly の gate を特定。dead な field 版 (1.10.b) 除去も検討。
+
+### loop²⁶⁻²⁸ — (12.16) を (1.10) で wiring、両端 materialize (start + end)
+
+(1.10) 完成後、(12.16) `counterexample_contradiction` (bare sorry) の論法を engine 群で materialize
+(gated 上流を仮説パラメータ化、全 axiom-clean)。**S14 が (1.10) leaf を import**。
+
+**始端** (loop²⁶⁻²⁷): (1.10) → |ψ(g)|≥e-1。
+- `psi_int_congr_e_mod_p` — (1.10.a) G-form + (1.10.b) ℂ-form + (12.14)/(12.15)/Dade 事実
+  (`ψ(xg)=ψ(x)`, `ψ(x)≡e mod 1-ε`, `ψ(g)=mval∈ℤ`) ⟹ `p∣(mval-e)` (ψ(g)≡e mod p)。
+- `abs_ge_e_sub_one` (純算術) + `abs_psi_g_ge_e_sub_one` (合成) ⟹ `|ψ(g)|≥e-1` ((12.12) `2e≤p+1`)。
+
+**終端** (loop²⁸): ノルム結論 → False。
+- `index_ratio_contradiction` — reduced `(|K|-|K'|)(e-1)²<e·|K|` + `4|K'|≤|K|` (fpf `[K:K']≥4`、(8.1.c))
+  + e≥3 ⟹ False ((3e-1)(e-3)≥0)。
+- `norm_ineq_reduce` — (12.11) `|M|≤|K||H|` 還元。`counterexample_closing` — 合成。
+
+**gated 中間** = ノルム不等式連鎖。実は **algebra は trivial linarith**: 3 つの ρ-ノルム下界
+A: `‖ψ^{ρM}‖²≥(|K-K'|/|M|)(e-1)²` (←(12.15)+|ψ(g)|≥e-1)、B: `‖ψ^ρ‖²≥1-e/|H|` ((7.8.b))、
+C: `1>‖ψ^{ρM}‖²+‖ψ^ρ‖²` ((7.3)+(8.17)) から `linarith` でノルム結論。
+⟹ **真の gate = A/B/C 自体 = §7/§8 ρ 機構** ((7.3)/(7.8.b)/(8.17) + §7 ρ/ρM の構成)。
+
+**次イテレーション** = 全 (12.16) assembly engine `counterexample_contradiction_of_facts`:
+始端 + 中間 (A/B/C→norm 結論の linarith) + 終端 を合成し、全 gated 事実を仮説に取って False を導く
+sorry-free skeleton (gated-endpoint-skeleton パターン全体)。⟹ (12.16) の論理構造を完全 materialize、
+残 sorry = §7/§8 ρ 機構の構成のみに局所化。
+
+### loop²⁹⁻³¹ — (12.16) 全 materialize 完了 + ungated 入力 discharge、真の gate = §7 ρ 機構 (未形式化)
+
+**(12.16) 完全 materialize** (loop²⁹): `counterexample_contradiction_of_facts` —
+始端 (`abs_psi_g_ge_e_sub_one`: (1.10)→|ψ(g)|≥e-1) + 中間 (`norm_conclusion_glue`: 3 ノルム下界
+A/B/C→ノルム結論) + 終端 (`counterexample_closing`) を合成、全 gated 事実を仮説化し False。sorry-free。
+
+**ungated 入力 discharge** (loop³⁰): `two_mul_le_succ_of_odd_dvd` ((12.12) e∣p+1+odd→2e≤p+1)、
+`four_le_of_dvd_sub_one` ((8.1.c) p∣[K:K']-1→[K:K']≥4)、`exists_witness_g` ((12.9) C_K(x)∖K' 抽出)。
+
+**🔑 真の gate = §7 ρ 機構 (04.9, 完全未形式化)** (loop³¹ 調査):
+`counterexample_contradiction` を閉じる残作業 = (12.16) engine の仮説のうち ρ 依存分の構成:
+- hA/hB/hC (ノルム下界) = (7.3)/(7.8.b)/(8.17) + ρ/ρM 構成。
+- h_const (12.14) ψ(xg)=ψ(x)、h_psix ψ(x)≡e、h_psig_int (12.15) ψ(g)∈ℤ = ρ + Dade 値理論。
+- group core: (12.12) e∣p+1 導出 (F_{p²}⋊E Schur + (12.11))、(8.1.c) fpf。
+
+**§7 ρ 機構の scope** (04.9 mmd (7.1)-(7.8)):
+- (7.1) Hyp: `χ^ρ(a) = (1/|H(a)|)Σ_{x∈H(a)} χ(ax)` (a∈A)、`A^τ = ⋃_a (aH(a))^G`。
+- (7.2): (a) `α^{τρ}=α` (α∈CF(L,A))。(b) `‖χ^ρ‖²≤‖χ‖²`、等号 ⟺ χ∈im τ。
+- (7.3): `(1/|G|)Σ_{g∈A^τ}|χ(g)|² ≥ ‖χ^ρ‖²`、等号 ⟺ χ が aH(a) 上定数 ⟹ **bound C/(7.8.b)** の源。
+- (7.5): 多 family 版 `‖χ‖²=1` 分解。
+- **基盤あり**: Dade infra (`dadeSupport`/`mem_dadeSupport_iff` (base-point+H(a) 構造)/`dadeIntegralCharacterMap`)。
+  ρ map 定義は H(a) を Dade hypothesis から抽出して averaging。**DadeNotation.rhoFormula/rhoMFormula は現状
+  opaque Prop placeholder** ⟹ ρ/ρM を実体化する必要。
+- **次イテレーション = §7 ρ map (7.1) の定義に着手** (Dade infra の H(a) 抽出 + averaging で `rho : CF(G)→CF(L)`)、
+  続いて (7.2.a) adjunction → (7.2.b)/(7.3) norm bound。これが (12.14)/(12.15)/hA-hC 全ての upstream。
+
+**(1.10) は完成済** (前 loop²³⁻²⁵、両半 FT-ready)。(12.16) は ρ 機構を残し論理構造完全。
