@@ -744,6 +744,13 @@ set_option linter.style.longLine false in
 -- Pf (12.1)/(12.2.b): the genuine type-I family `S = {Ind_H^L θ}` (`H = L_F`) is closed under
 -- complex conjugation (`Ind_H^L θ̄ ∈ S`), the `χ̄ ∈ S` input to (12.2.b).  Axiom-clean.
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S14.Sset_closedUnderConjugate
+-- Pf §3 (1.4) reconciliation core: difference-uniqueness for signed irreducible-character
+-- differences.  `s • (a − b) = t • (c − d)` (a ≠ b, c ≠ d, s ≠ 0) forces the unordered pairs to
+-- agree with the sign tracking orientation (a=c,b=d,s=t  or  a=d,b=c,s=−t).  Orthonormality +
+-- left-linearity of `ClassFunction.inner`.  Reconciles per-φ `R₁(φ)` with the global (1.4) family
+-- in (12.4) pin (a) `constituent_diff_tau_mem_span`.
+#assert_only_allowed_axioms
+  OddOrder.Peterfalvi.S14.irreducibleCharacter_signed_difference_uniqueness
 -- Pf (8.2.b) Frobenius realization for the type-I/F tower step (consumed by (12.10) step 2 /
 -- (12.16) `π = ∅` case): a type-F/I maximal whose complement `U` is a Z-group (all Sylow cyclic)
 -- is Frobenius with kernel `M_F`, via `IsZGroup.exponent_eq_card` + `typeF_frobenius_of_card_eq_exponent`.
