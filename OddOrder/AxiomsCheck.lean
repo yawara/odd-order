@@ -6871,3 +6871,21 @@ first block, foundation of BG Theorem E's Lemma 14.5(c) count.  Axiom-clean. -/
 (`signalizer_centralizer_isComplement`) — contradiction.  The deep core of the 14.5(c) `R(x)`-cover
 trivIset.  Axiom-clean. -/
 #assert_only_allowed_axioms OddOrder.BG.Ch4.S16.sigma_cover_disjoint_of_inputs
+
+/-! **Peterfalvi (14.11.4) `ρ`-norm bridge** (`S16_NonExistenceG`, lane γ/POLE-2).  The
+family-inequality `ρ`-norm `(toFamilyHypothesis71).chiRhoNormSq (ψ^{τ₁}) 0` equals the (7.8.b)
+coherence-norm `h78.zetaNuRhoNormSq`, since `S09.Hypothesis71.chiRho` depends only on the support
+hypothesis `H71.hyp` (not the Dade map `τ`): `chiRhoCF_congr_hyp` + `psi_tau1_eq` + `h78_hyp_eq`.
+The linchpin tying the (7.5) family-inequality layer to the (7.8.b) coherence-norm layer of
+(14.11.4).  Axiom-clean. -/
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S16.chiRhoCF_congr_hyp
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S16.MHypothesis.chiRhoNormSq_eq_zetaNuRhoNormSq
+
+/-! **Peterfalvi (14.11.4) lower bound** (`S16_NonExistenceG`, lane γ/POLE-2).  The genuine (7.8.b)
+content of (14.11.4): `1 − pq/k ≤ ‖ψ^{τ₁ρ}‖²`.  Combines the coherence-norm lower bound for `M`
+(`h78_zetaNuRho_normSq_ge`, the (7.8.b) `NormEstimates.zetaNuRho_norm_sq_ge` with `smallIndex`
+discharged) with the index identities `h78.kernelOrder = |K| = k`, `h78.complementIndex = |M:K| = pq`
+(`h78_H_eq`/`e_eq_index`/`complement_card_eq_pq` + Lagrange) and the norm bridge above.  The `lower`
+field of the `normCascadeData` producer; the remaining gate is the upper §8 TI-counting.
+Axiom-clean. -/
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S16.MHypothesis.rhoNormSq_ge_lower
