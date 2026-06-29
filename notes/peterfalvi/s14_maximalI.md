@@ -765,3 +765,20 @@ mathlib API: `cyclotomic.irreducible_rat`/`Nat.totient_prime`/`Nat.prime_iff_pri
 - **ℂ-instantiation bridge**: (12.16) 用に L=ℚ(ε)⊆ℂ で int_dvd_of_zeta_sub_one_dvd を適用
   (a=n/(1−ε)∈ℚ(ε)∩𝓞=ℤ[ε] の integrality 供給)。
 次イテレーション = (1.10.a) char-side or ℂ-instantiation。AxiomsCheck 登録。
+
+## 2026-06-29 (lane-b=β loop²⁰): (1.10) 残 piece scoping — (1.10.a) linear-char route + ℂ-bridge friction
+
+**(1.10.b) 済** (loop¹⁹)。残 (1.10) piece の friction を確認:
+- **ℂ-instantiation friction**: abstract (1.10.b) は cyclotomic field L 上。ℂ 適用には L=ℚ(ε)⊆ℂ の
+  cyclotomic instance 要だが `intermediateField_adjoin_isCyclotomicExtension` は `[Algebra.IsIntegral ℚ ℂ]`
+  要 (ℂ に transcendental ゆえ偽)。代替 = `IntermediateField.isCyclotomicExtension_adjoin_of_exists_isPrimitiveRoot`
+  (roots-set adjoin) or `CyclotomicField p ℚ`+embedding — どちらも plumbing 重。
+- **(1.10.a) refined plan (char-integrality bridge 回避)**: χ(xy)−χ(y)=∑_α(α(x)−1)α(y)。
+  **linear-char route**: Res_⟨x,y⟩ χ を irreducible α に分解 (⟨x,y⟩ abelian ⟹ α linear)、
+  **linear char α(g) は root of unity ⟹ 直接 integral** (一般 char-integrality bridge 不要)、
+  α(x)=ε^k (x order p)、(1−ε)∣(ε^k−1) [`1−ε^k=(1−ε)∑ε^i`]。要 = char restriction +
+  abelian-irreducible-decomposition (repo は mathlib `Representation` ベース、要調査)。
+
+**状況**: lane b §12 endgame は deep prerequisites の piece-by-piece grind (12.4✅/1.10.b✅ landed、
+残 = 1.10.a/ℂ-bridge/§7 ρ/12.16 assembly、各 substantial)。次イテレーション = (1.10.a) linear-char
+route の char restriction-decomposition から build (or ℂ-bridge)。
