@@ -261,3 +261,21 @@ full build 3886 green)。原文 (14.11.4 04.16 lines 107-115) の family inequal
    producer 要、重い)。
 upper の family-inequality + G₀-drop 骨格は本セッションで honest 化済 ⟹ 次は 1 (§8 counting) または
 2 ((7.8.b))。[[scaffold-sorry-free-not-done]] [[feedback-no-avoiding-hard-parts]]
+
+### cont.⁴ (2026-06-29 lane c=γ /loop): upper-bound loosening step `normCascade_upper_loosen` 着地
+
+normCascadeData (14.11.4) upper の **最終段 (loosening) を sorry-free 着地** (`S16_NonExistenceG.lean`,
+full build 3886 green/33s):
+
+- **`normCascade_upper_loosen` (sorry-free, 純 ℝ 算術)** = 原文 (14.11.4 04.16 line 115) の raw (7.8.b)
+  upper estimate `1−1/p−1/q+1/(pq)+(|P|−1)/(|P|uq)+(|Q|−1)/(|Q|vp)+(k−1)/(kpq)` を
+  NormCascadeData.upper の displayed bound `1−1/p−1/q+2/(pq)+1/(uq)+1/(vp)` に `(|P|−1)/|P|≤1`・
+  `(|Q|−1)/|Q|≤1`・`(k−1)/k≤1` で loosen (各 `div_le_div_iff₀`+`nlinarith`、合流は `linarith`+
+  `2/(pq)=1/(pq)+1/(pq)`)。**RHS は NormCascadeData.upper と一致ゆえ producer が直接 cite 可**。
+
+**⟹ normCascadeData upper の算術両端が honest 化完了**: line-83 (第一段, cont.³) + loosen (最終段,
+本)。**残る upper gate は §8 TI-counting** (raw bound 生成: `|K#|/|M|`, `|(W#)^G|`/`|(P#)^G|`/`|(Q#)^G|`
+の |G| 比) **のみに crisp に絞られた**。lower gate は依然 (7.8.b)。次 /loop は上流優先で (7.8.b) lower
+((7.8.b) coherence norm formula、§7) を正面から、または §8 counting。
+
+注: `div_le_div_iff` は本 mathlib で **`div_le_div_iff₀`** (末尾 ₀) に改名 ([[verify-port-state-by-number-not-coq-name]] 系の API drift)。
