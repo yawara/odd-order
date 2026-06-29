@@ -647,3 +647,7 @@ A₁={a∈A(L):C_G(a)≤M}=A(L)−H# 上のみ**。一般「τ=Ind on trivial-H 
 **次イテレーション = step 1 (一般 TI-induction self-value) を build** (foundational + reusable、
 TICyclic proof mirror)。pin (b) は pin (a) と違い deep multi-iteration Dade 開発 (4 lemma)。
 正本ノート = 本節 + issue 0081。[[feedback-no-avoiding-hard-parts]]
+
+**loop¹⁴ 続き: step 1 DONE** (commit 6dbdf835、`induce_apply_eq_self_of_mem_tiSubset`、axiom-clean、
+full build 3874 green)。次 = **step 2** (一般 induce-is-Dade-map for TI/trivial-H hyp、
+`isDadeMap_inducedDadeMap` S05:254-275 を of_isTISubset 仮説に generalize、step 1 を value-half に consume)。
