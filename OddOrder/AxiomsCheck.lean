@@ -6074,6 +6074,9 @@ through `typeP_maximal_eq_kappaHall_sup_U_sup_Msigma` + `isTypeP1_kappaSigma_com
 -- `BGTheoremECoverData` needs.  Axiom-clean exactly because Prop 16.1 is.
 #assert_only_allowed_axioms OddOrder.BG.Ch4.S16.mainSubgroup_eq_Msigma
 #assert_only_allowed_axioms OddOrder.BG.Ch4.S16.A1_eq_sigmaSharp
+-- Every maximal subgroup has a Peterfalvi type (exhaustiveness of I–V): from Prop 16.1 over the
+-- exhaustive BG trichotomy F/P₁/P₂.  Supplies `BGTheoremECoverData.tau`/`typed` (issue 8020).
+#assert_only_allowed_axioms OddOrder.BG.Ch4.S16.exists_peterfalviType
 -- 15.7(e) conjunct A divisibility engine (Coq `regZq_dv_q1`): a `U0`-invariant order-`q` subgroup
 -- of the Frobenius kernel `M_F` forces `exp U ∣ q - 1` (Frobenius semiregular action).
 #assert_only_allowed_axioms OddOrder.BG.Ch4.S16.typeF_exponent_dvd_sub_one_of_invariant_card
