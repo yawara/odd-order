@@ -2342,6 +2342,36 @@ theorem psi_int_congr_e_mod_p [Finite G] {p : ℕ} (hp : p.Prime) {ε : ℂ}
   push_cast
   linear_combination hweq - h1
 
+/-- **Peterfalvi (12.16), the magnitude step**: an integer `mval ≡ e (mod p)` with `1 ≤ e` and
+`2e ≤ p+1` (the degree bound (12.12)) satisfies `|mval| ≥ e - 1`.  Indeed the integers `≡ e (mod p)`
+nearest `0` are `e` (distance `e`) and `e - p` (distance `p - e ≥ e - 1`, by `2e ≤ p+1`), so every
+such value has `|·| ≥ min(e, p-e) ≥ e - 1`. -/
+theorem abs_ge_e_sub_one {p : ℕ} (hppos : 0 < p) {e mval : ℤ} (he : 1 ≤ e)
+    (h2e : 2 * e ≤ (p : ℤ) + 1) (hdvd : (p : ℤ) ∣ (mval - e)) :
+    e - 1 ≤ |mval| := by
+  obtain ⟨k, hk⟩ := hdvd
+  have hpZ : (0 : ℤ) < (p : ℤ) := by exact_mod_cast hppos
+  by_cases hk' : 0 ≤ k
+  · have hpk : 0 ≤ (p : ℤ) * k := mul_nonneg hpZ.le hk'
+    rw [abs_of_nonneg (by omega)]; omega
+  · have hk1 : k ≤ -1 := by omega
+    have hpk : (p : ℤ) * k ≤ -(p : ℤ) := by nlinarith [mul_le_mul_of_nonneg_left hk1 hpZ.le]
+    rw [abs_of_nonpos (by omega)]; omega
+
+/-- **Peterfalvi (12.16), the value-magnitude conclusion**: chaining the `(1.10)` congruence core
+(`psi_int_congr_e_mod_p`) with the degree bound `2e ≤ p+1` of (12.12) gives `|ψ(g)| ≥ e - 1` — the
+lower bound on `|ψ(g)|` feeding the final norm inequality of (12.16). -/
+theorem abs_psi_g_ge_e_sub_one [Finite G] {p : ℕ} (hp : p.Prime) {ε : ℂ}
+    (hε : IsPrimitiveRoot ε p) {ψ : ClassFunction G ℂ} (hψ : ψ ∈ ZIrr G) {x g : G}
+    (hx : x ^ p = 1) (hxg : Commute x g) {e mval : ℤ} (he : 1 ≤ e)
+    (h2e : 2 * e ≤ (p : ℤ) + 1)
+    (h_const : ψ (x * g) = ψ x)
+    (h_psix : ∃ w : ℂ, IsIntegral ℤ w ∧ ψ x - (e : ℂ) = (1 - ε) * w)
+    (h_psig_int : ψ g = (mval : ℂ)) :
+    e - 1 ≤ |mval| :=
+  abs_ge_e_sub_one hp.pos he h2e
+    (psi_int_congr_e_mod_p hp hε hψ hx hxg h_const h_psix h_psig_int)
+
 /-- **Peterfalvi (12.16)**: the minimal counterexample of (12.8) is impossible. -/
 theorem counterexample_contradiction [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G)
