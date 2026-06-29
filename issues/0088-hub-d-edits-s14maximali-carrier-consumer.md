@@ -72,6 +72,32 @@ step 1.5: lane d が S14_MaximalI のうち `exists_typeICovering` のみ編集 
 ft_lane_reallocation_2026_06_28.md) を更新し該当レーンへ作業移譲。いずれも完了後に
 **監視 cron を `13,43 * * * *` で再作成** (CronCreate) してループ再開。
 
+## ⚖ 整合 (2026-06-29, hub): A と C の二重裁定 → **C を採択 (A を包含)**
+
+lane d セッションと hub セッションが**独立にユーザーへ確認**し、別ラベルの裁定を得ていた:
+- **lane d セッション → 判断 A** (hub 承認の所有例外、issue 8021 Option 1。下記 §「判断 A」)
+- **hub セッション (本 tick, 後) → 判断 C** (恒久 carve-out。上記 §「裁定 (判断 C)」)
+
+両者とも結論は「**d を今合流**」で一致。恒久 carve-out (C) は一回承認 (A) を**包含**する
+(C ⊇ A) ため、最終採択は **C** とし所有マップを恒久更新済。lane d の A 裁定は「初回の越境を
+承認」した記録として保持 (矛盾でなく、C がそれを恒久化した形)。lane d 側の「頻発するなら C へ
+移行検討」という所見は、まさに本 tick で C に移行したことで解決済。
+
+## (参考) lane d セッションの裁定 = 判断 A
+
+**判断 A (hub 承認の所有例外) で確定** — lane d セッションの AskUserQuestion でユーザーが
+「lane d が δ struct + lane-b consumer を 1 commit で実施 / 所有境界越えは過去の merge と同じ
+hub 承認 (=ユーザー) 扱い」を明示選択 (issue 8021 の Option 1)。逸脱内容は機械的 carrier API
+rename 追従 (新規 sorry・新規 axiom なし) ゆえ低リスク、判断 A の推奨条件を満たす。
+
+**hub (main worktree) への依頼**: d を `--no-ff` 合流 (build/sorry/axiom 検証通過済 — lane d 側で
+full build 3889 green 確認済) + 監視 cron `13,43 * * * *` 再作成。lane d worktree からは main の
+checkout 不可ゆえ実マージは hub 側で実施。lane d はこの裁定後も S14_MaximalI の carrier-consumer
+追従を継続する可能性があるため、頻発するなら判断 C (恒久 carve-out) への移行も検討余地あり
+(現状は A で十分)。
+
+その後の lane d commits (`5f962b5a` 以降) も同性質 (S14_TypePCounting = d 所有 + carrier API faithfulness 修正)。
+
 ## 参照
 - 範囲逸脱検出 tick: main `8982a4d4` (a/b/c 合流済) の直後
 - carve-out 先例: issue `0086` (S10 bgTheoremE carrier), `0087` (S07_RhoProjection)
