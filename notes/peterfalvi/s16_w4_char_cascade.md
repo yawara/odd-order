@@ -382,3 +382,29 @@ type-I 対応 (S12 側も `typeII_coherence_contradiction_estimate` で sorry、
 サイズ (S/T type-P partner 構造、§13-14)**。= multi-session port。Coq `Dade_cover_inequality` の Lean
 analog は私の line-83 (= family_inequality) で既達ゆえ、残は orbit-size 評価 (TI tool 在庫) + partner
 構造。次 = (a) typeIA=K# の FPF lemma (最 tractable、§8 Frobenius) から着手。[[scaffold-sorry-free-not-done]]
+
+### cont.⁸ (2026-06-30 lane c=γ /loop): §8 第1成分 cardinalities 着地 + orbit-count plan 確定
+
+**§8 counting 第1成分の cardinalities 実証** (commit `2f5c17c6`): `card_typeIA_eq` (`|A(M)|=k−1`、
+FPF 恒等式を `typeI_frobenius` (12.7) の Frobenius witness に適用) + `card_M_eq` (`|M|=pqk`、
+axiom-clean)。⟹ **第1成分 `|A(M)|/|M|=(k−1)/(kpq)` の cardinality 完成**。⚠ card_typeIA_eq は
+typeI_frobenius 経由で (12.16)/lane-β に transitively gated (body sorry-free・citable)、AxiomsCheck 非登録。
+
+**§8 残 3 成分 (W/P/Q orbit counts) の deep core 確認** (`line83_le_displayed_upper` を埋める残り):
+- **在庫**: `hyp.base` が partner subgroups **P/Q/W2/U/S** を保持 (`hyp.base.P`/`.Q`/`.W2`/`.S`)、
+  + 関係補題 (`hyp.base.S ≤ normalizer P`、`IsMulCommutative P`、`P ≤ centralizer P`、
+  `Nat.card (P.subgroupOf S) = Nat.card P` @S16:3031)。orbit tool `ncard_conjClassSet_of_isTISubset`。
+- **未在庫 (= deep, 要構築)**:
+  (a) **P/Q/W の TI 性** (`IsTISubset (sharpSubgroup P) (normalizer P)`) — Frobenius kernel TI
+      (`IsFrobeniusGroup.trivialIntersection` 在庫だが P の Frobenius 構造特定が要)。
+  (b) **N_G(P)/N_G(Q) サイズ** (`[G:N_G(P)]=|G|/(|P|uq)`) — Type-II partner S=(H⋊U)⋊W₂ 構造から。
+  (c) **`Mdata.G0` の orbit-complement concrete 化** — 現状 abstract carrier (`G0_off_dadeSupport`
+      で `G0⊆famG₀` のみ)、`famG₀∖G0 ⊆ (W..)^G∪(P#)^G∪(Q#)^G` を出すには G0 を (14.11.3) 集合
+      `G−[Ã(M)∪orbits]` に concrete 化 (carrier 追加、build-safe) が要。
+- **S12 (10.8) と共有 deep gate**: 同じ TI-counting (`G₁⊆(H#)^G∪V^G`) が S12 でも sorried
+  (`typeII_coherence_contradiction_estimate`)。partner orbit 構造は両者の共通核。
+
+**次 /loop**: orbit-count 構築の最 foundational ピース = (c) G0 concrete 化 carrier 追加 →
+set-reduction `famG₀∖G0 ⊆ orbits` (union bound) を実証 → 各 orbit を (a)+(b)+tool で評価。
+あるいは (a) P TI 性 (Frobenius kernel) から。**deep multi-session structural build**。
+[[scaffold-sorry-free-not-done]] [[feedback-no-avoiding-hard-parts]]
