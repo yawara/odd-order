@@ -2372,6 +2372,43 @@ theorem abs_psi_g_ge_e_sub_one [Finite G] {p : ℕ} (hp : p.Prime) {ε : ℂ}
   abs_ge_e_sub_one hp.pos he h2e
     (psi_int_congr_e_mod_p hp hε hψ hx hxg h_const h_psix h_psig_int)
 
+/-- **Peterfalvi (12.16), the index/degree contradiction** (the heart of the final inequality): the
+reduced inequality `(|K| - |K'|)(e-1)² < e·|K|` together with `4·|K'| ≤ |K|` (i.e. `[K:K'] ≥ 4`,
+forced by the fixed-point-free order-`p` action of (8.1.c)) and `e ≥ 3` is contradictory.  Indeed
+`|K| - |K'| ≥ (3/4)|K|`, so `(3/4)(e-1)² < e`, i.e. `3(e-1)² < 4e`, i.e. `(3e-1)(e-3) < 0` — false
+for `e ≥ 3`.  This is the `e/(e-1)² ≤ 3/4 < 1 - |K'|/|K|` step of (12.16). -/
+theorem index_ratio_contradiction {e kK kKp : ℝ} (he : 3 ≤ e) (hkKp : 0 < kKp)
+    (hidx : 4 * kKp ≤ kK) (hineq : (kK - kKp) * (e - 1) ^ 2 < e * kK) : False := by
+  have hkK : 0 < kK := by linarith
+  nlinarith [hineq, mul_nonneg (show (0:ℝ) ≤ kK / 4 - kKp by linarith) (sq_nonneg (e - 1)),
+    mul_nonneg hkK.le (mul_nonneg (show (0:ℝ) ≤ e - 3 by linarith)
+      (show (0:ℝ) ≤ 3 * e - 1 by linarith))]
+
+/-- **Peterfalvi (12.16), the (12.11) reduction**: the final norm inequality
+`((|K|-|K'|)/|M|)(e-1)² + 1 - e/|H| < 1` together with `|M| ≤ |K|·|H|` of (12.11) reduces to
+`(|K|-|K'|)(e-1)² < e·|K|` (clear `|M|`, `|H|`, then bound `|M|` above). -/
+theorem norm_ineq_reduce {e kK kKp kM kH : ℝ} (hkM : 0 < kM) (hkH : 0 < kH)
+    (he1 : 0 ≤ e) (hM : kM ≤ kK * kH)
+    (hnorm : ((kK - kKp) / kM) * (e - 1) ^ 2 + 1 - e / kH < 1) :
+    (kK - kKp) * (e - 1) ^ 2 < e * kK := by
+  have h1 : (kK - kKp) * (e - 1) ^ 2 / kM < e / kH := by
+    have e1 : (kK - kKp) * (e - 1) ^ 2 / kM = ((kK - kKp) / kM) * (e - 1) ^ 2 := by ring
+    rw [e1]; linarith [hnorm]
+  rw [div_lt_div_iff₀ hkM hkH] at h1
+  have h2 : e * kM ≤ e * (kK * kH) := mul_le_mul_of_nonneg_left hM he1
+  have h3 : (kK - kKp) * (e - 1) ^ 2 * kH < e * kK * kH := by nlinarith [h1, h2]
+  exact lt_of_mul_lt_mul_right h3 hkH.le
+
+/-- **Peterfalvi (12.16), the closing contradiction** (norm-inequality endgame): given the final
+norm bound `((|K|-|K'|)/|M|)(e-1)² + 1 - e/|H| < 1` (from (7.3)/(7.8.b)/(8.17) with `|ψ(g)| ≥ e-1`),
+the index bound `|M| ≤ |K|·|H|` of (12.11), the degree bound `e ≥ 3`, and the fixed-point-free
+`[K:K'] ≥ 4` of (8.1.c), the minimal counterexample is impossible.  Combines `norm_ineq_reduce`
+with `index_ratio_contradiction`. -/
+theorem counterexample_closing {e kK kKp kM kH : ℝ} (he : 3 ≤ e) (hkKp : 0 < kKp)
+    (hkM : 0 < kM) (hkH : 0 < kH) (hidx : 4 * kKp ≤ kK) (hM : kM ≤ kK * kH)
+    (hnorm : ((kK - kKp) / kM) * (e - 1) ^ 2 + 1 - e / kH < 1) : False :=
+  index_ratio_contradiction he hkKp hidx (norm_ineq_reduce hkM hkH (by linarith) hM hnorm)
+
 /-- **Peterfalvi (12.16)**: the minimal counterexample of (12.8) is impossible. -/
 theorem counterexample_contradiction [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G)

@@ -6697,6 +6697,12 @@ formula together with the prime computation `coprimeFrobeniusAction_card_eq_prim
 -- Pf (12.16) value-magnitude conclusion: chaining the congruence core with `2e≤p+1` gives
 -- `|ψ(g)| ≥ e-1` — the lower bound feeding the final norm inequality of (12.16).
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S14.abs_psi_g_ge_e_sub_one
+-- Pf (12.16) closing endgame: `index_ratio_contradiction` (reduced ineq + `[K:K']≥4` + `e≥3` ⟹ False
+-- via `(3e-1)(e-3)≥0`), `norm_ineq_reduce` ((12.11) `|M|≤|K||H|` reduction), and `counterexample_closing`
+-- (combined: norm conclusion + (12.11) + `e≥3` + fpf `[K:K']≥4` of (8.1.c) ⟹ False).
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S14.index_ratio_contradiction
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S14.norm_ineq_reduce
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S14.counterexample_closing
 
 -- **W1 §16 Prop 16.1 `hP1eqV` disjunct 3 (Singer/`SL₂(p)`) prerequisite (lane-f, issue 8015)** —
 -- `IsExtraspecial.of_card_eq_prime_cube`: a nonabelian group of order `p³` is extraspecial
