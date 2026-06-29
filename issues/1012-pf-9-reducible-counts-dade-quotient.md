@@ -46,9 +46,18 @@ X/H₀ の文字と同一視」((1.6)) で商で作業。⟹ §9 reducible-count
 > (9.9.b)/(9.8.b) を cite で実証明して前に進む。`typePData_toS06Hypothesis` 既存 = §6 `S06.Hypothesis` は
 > type-P data から構成可能 (S12:1011) ⟹ §6 machinery は available。M/H₀ 商版の bridge が要点。
 
-1. §6 reducible-count obligation (Theorem (4.5)/(4.7): μ_j count = w₂-1) を pin (consumer side、sorried 可)。
-2. (8.4.d) Hypothesis(4.6)-for-M/H₀: `typePData_toS06Hypothesis` の商版 bridge。
-3. (9.9.b)/(9.8.b) instantiate → caseB/caseA_character_counts conjunct 2,3,4 を cite で証明。
+1. ✅ **DONE (2026-06-29)**: §6 reducible-count = `card_reducible_induce_eq_W2`
+   (`S06_CertainTypeClifford.lean`、axiom-clean、pin 不要で実証明完了)。`induce_not_isIrreducible_iff`
+   / `induce_chiRestrict_not_isIrreducible` 込み。「(4.5)/(4.7) 未完」は stale だった。
+2. **← 次手 (残る唯一のゲート)**: (8.4.d) Hypothesis(4.6)-for-M/H₀ bridge。entry = S10:587-588 の
+   TODO (`-- TODO (Peterfalvi (8.15), higher Dade specializations): ... Hypothesis (4.6)/(5.2)
+   statements with K=M_prime and H=M_F`)。`DadeSupportHypothesisData` (S10:453) は L=M 直接版のみ。
+   必要 = (i) L=M/H₀ 商の §6 structural `Hypothesis (M⧸H₀)` 構成 (W̄₁/W̄₂/K̄/V̄/sdiffTICyclic/isComplement)、
+   (ii) §9 `chars.SOf chief.H0` (HU→M induced family) ↔ §6 induction-family on M/H₀ の同一視 ((1.6)
+   「H₀⊆Ker の M-文字 = M/H₀-文字」)、その下で reducibility 対応。`typePData_toS06Hypothesis`
+   (S12:1011、L=M 版) が template。
+3. (9.9.b)/(9.8.b) instantiate: bridge + `card_reducible_induce_eq_W2` を cite、w₂=p・j=0 除去で
+   `{φ∈𝒮(H₀)|¬irr}.ncard = p-1` を caseB/caseA_character_counts conjunct 2,3,4 で discharge。
 4. (9.10) de-opacify + exceptional 構造。
 
 ## 完了条件
