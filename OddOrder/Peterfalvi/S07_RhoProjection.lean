@@ -56,4 +56,161 @@ theorem rhoValue_sub (χ ψ : ClassFunction G ℂ) (a : {a : G // a ∈ A}) :
     rhoValue hyp (χ - ψ) a = rhoValue hyp χ a - rhoValue hyp ψ a := by
   simp only [rhoValue, ClassFunction.sub_apply, Finset.sum_sub_distrib, mul_sub]
 
+/-- **Peterfalvi (7.1), `L`-conjugation invariance of the average.**  The value `χ^ρ(a)` is
+invariant under conjugating the support point `a` by `ℓ ∈ L`: `χ^ρ(ℓ·a·ℓ⁻¹) = χ^ρ(a)`.  This is the
+class-function (equivariance) property of `ρ` — the input needed to package `χ^ρ` as an element of
+`CF(L, A)` — and rests on `(2.4.a)` (`HConjInvariant`, i.e. `H(ℓ·a·ℓ⁻¹) = ℓ·H(a)·ℓ⁻¹`) together with
+`χ` being a class function on `G`.  Concretely, conjugation by `ℓ` is a bijection
+`H(ℓ·a·ℓ⁻¹) ≃ H(a)`, `y ↦ ℓ⁻¹·y·ℓ`, under which the coset element `(ℓ·a·ℓ⁻¹)·y` is `G`-conjugate to
+`a·(ℓ⁻¹·y·ℓ)`, so the two averages agree term by term. -/
+theorem rhoValue_conjA (hconj : hyp.HConjInvariant) (χ : ClassFunction G ℂ)
+    (l : L) (a : {a : G // a ∈ A}) :
+    rhoValue hyp χ (hyp.conjA l a) = rhoValue hyp χ a := by
+  letI iA : Fintype (hyp.H a) := Fintype.ofFinite _
+  letI iB : Fintype (hyp.H (hyp.conjA l a)) := Fintype.ofFinite _
+  -- conjugation by `ℓ⁻¹` is the bijection `H(ℓ·a·ℓ⁻¹) ≃ H(a)`
+  let e : (hyp.H (hyp.conjA l a)) ≃ (hyp.H a) :=
+    { toFun := fun y => ⟨(l : G)⁻¹ * (y : G) * (l : G),
+        (hyp.mem_H_conjA_iff hconj a l).mp y.2⟩
+      invFun := fun x => ⟨(l : G) * (x : G) * (l : G)⁻¹,
+        (hyp.mem_H_conjA_iff hconj a l).mpr (by
+          have hx : (l : G)⁻¹ * ((l : G) * (x : G) * (l : G)⁻¹) * (l : G) = (x : G) := by group
+          rw [hx]; exact x.2)⟩
+      left_inv := fun y => by
+        apply Subtype.ext
+        change (l : G) * ((l : G)⁻¹ * (y : G) * (l : G)) * (l : G)⁻¹ = (y : G); group
+      right_inv := fun x => by
+        apply Subtype.ext
+        change (l : G)⁻¹ * ((l : G) * (x : G) * (l : G)⁻¹) * (l : G) = (x : G); group }
+  -- rewrite both `rhoValue`s into their averaging form under the chosen `Fintype` instances
+  have hB : rhoValue hyp χ (hyp.conjA l a)
+      = (Nat.card (hyp.H (hyp.conjA l a)) : ℂ)⁻¹
+          * ∑ y : (hyp.H (hyp.conjA l a)), χ ((hyp.conjA l a).1 * (y : G)) := rfl
+  have hA : rhoValue hyp χ a
+      = (Nat.card (hyp.H a) : ℂ)⁻¹ * ∑ x : (hyp.H a), χ (a.1 * (x : G)) := rfl
+  rw [hA, hB, Nat.card_congr e]
+  congr 1
+  refine Fintype.sum_equiv e _ _ (fun y => ?_)
+  change χ ((hyp.conjA l a).1 * (y : G)) = χ (a.1 * ((l : G)⁻¹ * (y : G) * (l : G)))
+  rw [hyp.conjA_coe]
+  exact χ.of_isConj (isConj_iff.mpr ⟨(l : G)⁻¹, by group⟩)
+
+open Classical in
+/-- **Peterfalvi (7.1), the `ρ` projection as a class function on `L`.**  Packages the averaged
+value `χ^ρ` (`rhoValue`) into `CF(L)`: it takes the value `χ^ρ(a)` at support points `a ∈ A` and `0`
+elsewhere.  Class-function (conjugation) invariance is `rhoValue_conjA` on `A`, and the
+`L`-invariance of `A` (`L_normalizes_A`, applied to `ℓ` and to `ℓ⁻¹`) off `A`. -/
+noncomputable def rhoClassFun (hconj : hyp.HConjInvariant) (χ : ClassFunction G ℂ) :
+    ClassFunction L ℂ :=
+  ⟨fun g => if hg : (g : G) ∈ A then rhoValue hyp χ ⟨(g : G), hg⟩ else 0, by
+    intro g h
+    dsimp only
+    by_cases hg : (g : G) ∈ A
+    · have hcm : ((h * g * h⁻¹ : L) : G) ∈ A := by
+        have hmem := hyp.L_normalizes_A h hg
+        simpa only [Subgroup.coe_mul, Subgroup.coe_inv] using hmem
+      rw [dif_pos hcm, dif_pos hg]
+      have hconjeq : (⟨((h * g * h⁻¹ : L) : G), hcm⟩ : {a : G // a ∈ A})
+          = hyp.conjA h ⟨(g : G), hg⟩ := by
+        apply Subtype.ext
+        simp only [hyp.conjA_coe, Subgroup.coe_mul, Subgroup.coe_inv]
+      rw [hconjeq]
+      exact rhoValue_conjA hyp hconj χ h ⟨(g : G), hg⟩
+    · have hcnm : ((h * g * h⁻¹ : L) : G) ∉ A := by
+        intro hmem
+        have hback := hyp.L_normalizes_A h⁻¹ hmem
+        have heq : ((h⁻¹ : L) : G) * ((h * g * h⁻¹ : L) : G) * ((h⁻¹ : L) : G)⁻¹ = (g : G) := by
+          simp only [Subgroup.coe_mul, Subgroup.coe_inv]; group
+        rw [heq] at hback
+        exact hg hback
+      rw [dif_neg hcnm, dif_neg hg]⟩
+
+open Classical in
+@[simp] theorem rhoClassFun_apply_mem (hconj : hyp.HConjInvariant) (χ : ClassFunction G ℂ)
+    {g : L} (hg : (g : G) ∈ A) :
+    rhoClassFun hyp hconj χ g = rhoValue hyp χ ⟨(g : G), hg⟩ :=
+  dif_pos hg
+
+open Classical in
+@[simp] theorem rhoClassFun_apply_not_mem (hconj : hyp.HConjInvariant) (χ : ClassFunction G ℂ)
+    {g : L} (hg : (g : G) ∉ A) :
+    rhoClassFun hyp hconj χ g = 0 :=
+  dif_neg hg
+
+/-- The `ρ` projection `χ^ρ` (as a class function on `L`) is supported on `A`. -/
+theorem rhoClassFun_support_subset (hconj : hyp.HConjInvariant) (χ : ClassFunction G ℂ) :
+    (rhoClassFun hyp hconj χ).support ⊆ S04.supportInSubgroup A L := by
+  intro g hg
+  rw [ClassFunction.mem_support] at hg
+  rw [S04.mem_supportInSubgroup]
+  by_contra hgA
+  exact hg (rhoClassFun_apply_not_mem hyp hconj χ hgA)
+
+/-- **Peterfalvi (7.1), the `ρ` projection `χ ↦ χ^ρ` as an element of `CF(L, A)`.** -/
+noncomputable def rho (hconj : hyp.HConjInvariant) (χ : ClassFunction G ℂ) :
+    S04.SupportedClassFunctions ℂ A L :=
+  ⟨rhoClassFun hyp hconj χ,
+    ClassFunction.mem_supportedSubmodule.mpr (rhoClassFun_support_subset hyp hconj χ)⟩
+
+/-- Additivity of the `ρ` projection (class-function form). -/
+theorem rhoClassFun_add (hconj : hyp.HConjInvariant) (χ ψ : ClassFunction G ℂ) :
+    rhoClassFun hyp hconj (χ + ψ) = rhoClassFun hyp hconj χ + rhoClassFun hyp hconj ψ := by
+  apply ClassFunction.ext
+  intro g
+  by_cases hg : (g : G) ∈ A
+  · rw [ClassFunction.add_apply, rhoClassFun_apply_mem hyp hconj _ hg,
+      rhoClassFun_apply_mem hyp hconj _ hg, rhoClassFun_apply_mem hyp hconj _ hg, rhoValue_add]
+  · rw [ClassFunction.add_apply, rhoClassFun_apply_not_mem hyp hconj _ hg,
+      rhoClassFun_apply_not_mem hyp hconj _ hg, rhoClassFun_apply_not_mem hyp hconj _ hg, add_zero]
+
+/-- Homogeneity of the `ρ` projection (class-function form). -/
+theorem rhoClassFun_smul (hconj : hyp.HConjInvariant) (c : ℂ) (χ : ClassFunction G ℂ) :
+    rhoClassFun hyp hconj (c • χ) = c • rhoClassFun hyp hconj χ := by
+  apply ClassFunction.ext
+  intro g
+  by_cases hg : (g : G) ∈ A
+  · rw [ClassFunction.smul_apply, rhoClassFun_apply_mem hyp hconj _ hg,
+      rhoClassFun_apply_mem hyp hconj _ hg, rhoValue_smul]
+  · rw [ClassFunction.smul_apply, rhoClassFun_apply_not_mem hyp hconj _ hg,
+      rhoClassFun_apply_not_mem hyp hconj _ hg, mul_zero]
+
+/-- **Peterfalvi (7.2.a), pointwise**: for `α ∈ CF(L, A)` and `a ∈ A`, the `τρ`-roundtrip recovers
+`α(a)`.  The Dade image `α^τ` is constant equal to `α(a)` on the coset `a·H(a)`
+(`Hypothesis.dadeValue_eq`), so its `ρ`-average over `H(a)` is just `α(a)`. -/
+theorem rhoValue_dadeMap (α : S04.SupportedClassFunctions ℂ A L) {a : G} (ha : a ∈ A) :
+    rhoValue hyp (hyp.dadeMap α) ⟨a, ha⟩ = (α : ClassFunction L ℂ) ⟨a, hyp.mem_L ha⟩ := by
+  letI : Fintype (hyp.H ⟨a, ha⟩) := Fintype.ofFinite _
+  have hval : ∀ x : (hyp.H ⟨a, ha⟩),
+      (hyp.dadeMap α) (a * (x : G)) = (α : ClassFunction L ℂ) ⟨a, hyp.mem_L ha⟩ := fun x => by
+    rw [hyp.dadeMap_apply]
+    exact hyp.dadeValue_eq α x.2 (IsConj.refl (a * (x : G)))
+  have hcard : (Nat.card (hyp.H ⟨a, ha⟩) : ℂ) ≠ 0 :=
+    Nat.cast_ne_zero.mpr Nat.card_pos.ne'
+  have hexp : rhoValue hyp (hyp.dadeMap α) ⟨a, ha⟩
+      = (Nat.card (hyp.H ⟨a, ha⟩) : ℂ)⁻¹
+          * ∑ x : (hyp.H ⟨a, ha⟩), (hyp.dadeMap α) (a * (x : G)) := rfl
+  rw [hexp]
+  simp_rw [hval]
+  rw [Finset.sum_const, Finset.card_univ, ← Nat.card_eq_fintype_card, nsmul_eq_mul,
+    inv_mul_cancel_left₀ hcard]
+
+/-- **Peterfalvi (7.2.a), class-function form**: `α^{τρ} = α` (as a class function on `L`). -/
+theorem rhoClassFun_dadeMap (hconj : hyp.HConjInvariant) (α : S04.SupportedClassFunctions ℂ A L) :
+    rhoClassFun hyp hconj (hyp.dadeMap α) = (α : ClassFunction L ℂ) := by
+  apply ClassFunction.ext
+  intro g
+  by_cases hg : (g : G) ∈ A
+  · rw [rhoClassFun_apply_mem hyp hconj _ hg, rhoValue_dadeMap hyp α hg]
+  · rw [rhoClassFun_apply_not_mem hyp hconj _ hg]
+    symm
+    by_contra hne
+    exact hg (S04.mem_supportInSubgroup.mp
+      ((ClassFunction.mem_supportedSubmodule.mp α.property) (ClassFunction.mem_support.mpr hne)))
+
+/-- **Peterfalvi (7.2.a)**: `α^{τρ} = α` for `α ∈ CF(L, A)` — the `ρ` projection is a left inverse
+of the Dade isometry `τ` on `CF(L, A)`. -/
+theorem rho_dadeMap (hconj : hyp.HConjInvariant) (α : S04.SupportedClassFunctions ℂ A L) :
+    rho hyp hconj (hyp.dadeMap α) = α :=
+  Subtype.ext (rhoClassFun_dadeMap hyp hconj α)
+
 end OddOrder.Peterfalvi.S07
