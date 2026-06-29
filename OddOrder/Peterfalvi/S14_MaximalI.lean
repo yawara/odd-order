@@ -697,6 +697,53 @@ theorem constituent_diff_tau_mem_span {L : Subgroup G} [Finite G] (hyp : Hypothe
   rw [hμrel φ₁ hφ₁T φ₂ hφ₂T]
   exact Submodule.smul_mem _ _ (Submodule.sub_mem _ (hmu_mem φ₁ h₁) (hmu_mem φ₂ h₂))
 
+open scoped Classical in
+/-- **General TI-induction self-value** (Isaacs 7.x / Peterfalvi (3.2.c) value half), generalized
+from `TICyclicHypothesis.induce_apply_eq_self_of_mem_V` to an arbitrary TI subset.  For a TI subset
+`A` relative to `L` (`L ⊆ N_G(A)`, `A ⊆ L`, `IsTISubset A L`) and a class function `α` of `L`
+supported in `A`, the induced class function `Ind_L^G α` agrees with `α` on `A`: only the `|L|`
+conjugators `x ∈ L` contribute to the induction sum (the others land outside `A`, where `α` vanishes,
+by the TI property), each with value `α(a)`.  This is **pin (b), step 1** — the value-half of the
+"Dade map = Ind on the trivial-`H` part" bridge. -/
+theorem induce_apply_eq_self_of_mem_tiSubset {A : Set G} {L : Subgroup G}
+    [Fintype G] [Invertible (Nat.card L : ℂ)]
+    (hAL : A ⊆ (L : Set G))
+    (hnorm : ∀ x ∈ L, ∀ a ∈ A, x⁻¹ * a * x ∈ A)
+    (hTI : OddOrder.GroupTheory.IsTISubset A L)
+    (α : ClassFunction ↥L ℂ)
+    (hαsupp : α.support ⊆ OddOrder.Peterfalvi.S04.supportInSubgroup A L)
+    {a : G} (ha : a ∈ A) :
+    ClassFunction.induce L α a = α ⟨a, hAL ha⟩ := by
+  classical
+  haveI : Fintype ↥L := Fintype.ofFinite _
+  have haL : a ∈ L := hAL ha
+  have hterm : ∀ x : G, ClassFunction.induceTerm L α x a
+      = if x ∈ L then α ⟨a, haL⟩ else 0 := by
+    intro x
+    by_cases hx : x ∈ L
+    · rw [if_pos hx]
+      have haxL : x⁻¹ * a * x ∈ L := hAL (hnorm x hx a ha)
+      rw [ClassFunction.induceTerm_of_mem _ haxL]
+      have harg : (⟨x⁻¹ * a * x, haxL⟩ : ↥L)
+          = ⟨x⁻¹, L.inv_mem hx⟩ * ⟨a, haL⟩ * ⟨x⁻¹, L.inv_mem hx⟩⁻¹ := by
+        apply Subtype.ext; simp [inv_inv]
+      rw [harg]
+      exact α.conj_eq ⟨a, haL⟩ ⟨x⁻¹, L.inv_mem hx⟩
+    · rw [if_neg hx]
+      by_cases hax : x⁻¹ * a * x ∈ L
+      · rw [ClassFunction.induceTerm_of_mem _ hax]
+        have hnotA : x⁻¹ * a * x ∉ A := fun hV =>
+          hx (by simpa using L.inv_mem (hTI x⁻¹ ⟨a, ha, by simpa using hV⟩))
+        by_contra hne
+        exact hnotA ((OddOrder.Peterfalvi.S04.mem_supportInSubgroup).mp
+          (hαsupp (ClassFunction.mem_support.mpr hne)))
+      · rw [ClassFunction.induceTerm_of_not_mem _ hax]
+  rw [ClassFunction.induce_apply, Finset.sum_congr rfl (fun x _ => hterm x),
+    ← Finset.sum_filter, Finset.sum_const]
+  have hcard : (Finset.univ.filter (· ∈ L)).card = Nat.card ↥L := by
+    rw [Nat.card_eq_fintype_card]; exact (Fintype.card_subtype _).symm
+  rw [hcard, nsmul_eq_mul, ← mul_assoc, invOf_mul_self, one_mul]
+
 open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
 /-- **Peterfalvi (12.4), pin (b)** ([Is] 7.7 + (8.12.c) + [Is] 6.2): for constituents `φ₁, φ₂ ∈ S(χ)`,
 the Dade isometry acts as induction on the difference, `(φ₁ − φ₂)^τ = Ind_L^G(φ₁ − φ₂)`.  By [Is] 6.2
