@@ -460,16 +460,242 @@ theorem irreducibleCharacter_signed_difference_uniqueness [Finite G]
       exact absurd ka hs
 
 open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
+/-- **Peterfalvi (12.4) pin (a), piece 3** (span membership): the two underlying irreducibles
+`μ_φ, ν_φ` of the difference image `R1cdi data hφ` lie in `ℤ[R(χ)]`.  The orthonormal block
+`R₁(φ).imageSet = {ε·μ_φ, −ε·ν_φ} ⊆ R(χ)` with `ε = ±1`, so `μ_φ = ε·(ε·μ_φ)` and
+`ν_φ = (−ε)·(−ε·ν_φ)` are integer multiples of `R(χ)` members. -/
+theorem R1cdi_muNu_mem_span_Rset {L : Subgroup G} [Finite G] {hyp : Hypothesis L}
+    {chi : ClassFunction ↥L ℂ} (data : CharacterDecompositionData hyp chi)
+    {φ : IrreducibleCharacter ↥L} (hφ : φ ∈ data.constituents) :
+    (R1cdi data hφ).muClassFunction ∈ Submodule.span ℤ (Rset data) ∧
+      (R1cdi data hφ).nuClassFunction ∈ Submodule.span ℤ (Rset data) := by
+  haveI := hyp.finiteG
+  classical
+  have himg : (R1 data hφ).imageSet
+      = ({(R1cdi data hφ).sign • (R1cdi data hφ).muClassFunction,
+          (-(R1cdi data hφ).sign) • (R1cdi data hφ).nuClassFunction} :
+            Finset (ClassFunction G ℂ)) := rfl
+  have hsq : (R1cdi data hφ).sign * (R1cdi data hφ).sign = 1 := (R1cdi data hφ).sign_mul_self
+  have hμRset : (R1cdi data hφ).sign • (R1cdi data hφ).muClassFunction ∈ Rset data :=
+    ⟨φ, hφ, by rw [himg]; exact Finset.mem_insert_self _ _⟩
+  have hνRset : (-(R1cdi data hφ).sign) • (R1cdi data hφ).nuClassFunction ∈ Rset data :=
+    ⟨φ, hφ, by rw [himg]; exact Finset.mem_insert_of_mem (Finset.mem_singleton_self _)⟩
+  refine ⟨?_, ?_⟩
+  · have hμ : (R1cdi data hφ).muClassFunction
+        = (R1cdi data hφ).sign • ((R1cdi data hφ).sign • (R1cdi data hφ).muClassFunction) := by
+      rw [smul_smul, hsq, one_smul]
+    rw [hμ]
+    exact Submodule.smul_mem _ _ (Submodule.subset_span hμRset)
+  · have hν : (R1cdi data hφ).nuClassFunction
+        = (-(R1cdi data hφ).sign) • ((-(R1cdi data hφ).sign) • (R1cdi data hφ).nuClassFunction) := by
+      rw [smul_smul, neg_mul_neg, hsq, one_smul]
+    rw [hν]
+    exact Submodule.smul_mem _ _ (Submodule.subset_span hνRset)
+
+open scoped Classical OddOrder.Peterfalvi.S12.FiniteInduce in
+/-- **Peterfalvi (12.4) pin (a), piece 1** (global (1.4) coherence): the constituent set `S(χ)`
+together with its complex conjugates forms a single coherent family under the Dade isometry `τ`.
+There is a uniform sign `ε = ±1` and an injection `μ` of the conjugate-closed set
+`T = S(χ) ∪ S(χ)‾` into `Irr G` with `τ(α − β) = ε·(μ α − μ β)` for all `α, β ∈ T`.
+
+This is the §3 (1.4) keystone `isometry_difference_pair_structure` applied to the constant-degree
+family `T` (every member supported in `A(L) ∪ {1}`, so member differences are `A(L)`-supported and
+the three Dade-isometry hypotheses hold by `dadeIntegralCharacterMap_{mem_ZIrr_of_supported,
+apply_one_eq_zero,inner_eq_on_supported_span}`). -/
+theorem exists_uniform_image_of_constituents {L : Subgroup G} [Finite G] (hyp : Hypothesis L)
+    {chi : ClassFunction ↥L ℂ} (data : CharacterDecompositionData hyp chi) :
+    ∃ (ε : ℤ) (μ : IrreducibleCharacter ↥L → IrreducibleCharacter G),
+      (ε = 1 ∨ ε = -1) ∧
+      Set.InjOn μ ↑(data.constituents ∪
+          data.constituents.image (IrreducibleCharacter.conjPerm ↥L)) ∧
+      ∀ α ∈ data.constituents ∪ data.constituents.image (IrreducibleCharacter.conjPerm ↥L),
+        ∀ β ∈ data.constituents ∪ data.constituents.image (IrreducibleCharacter.conjPerm ↥L),
+          hyp.tau ((α : ClassFunction ↥L ℂ) - (β : ClassFunction ↥L ℂ))
+            = ε • ((μ α : ClassFunction G ℂ) - (μ β : ClassFunction G ℂ)) := by
+  haveI := hyp.finiteG
+  classical
+  set T := data.constituents ∪ data.constituents.image (IrreducibleCharacter.conjPerm ↥L) with hTdef
+  obtain ⟨φref, hφref⟩ := data.constituents_nonempty
+  -- (1) every member of `T` is supported in `A(L) ∪ {1}`.
+  have hTsupp : ∀ x ∈ T, (x : ClassFunction ↥L ℂ).support ⊆
+      OddOrder.Peterfalvi.S04.supportInSubgroup hyp.ambientA L ∪ {1} := by
+    intro x hx
+    rw [hTdef, Finset.mem_union] at hx
+    rcases hx with hx | hx
+    · exact data.supported x hx
+    · rw [Finset.mem_image] at hx
+      obtain ⟨φ, hφ, rfl⟩ := hx
+      rw [IrreducibleCharacter.conjPerm_apply_coe]
+      have hconjsupp : (φ : ClassFunction ↥L ℂ).conj.support = (φ : ClassFunction ↥L ℂ).support := by
+        ext y; simp only [ClassFunction.mem_support, ne_eq, ClassFunction.conj_apply, star_eq_zero]
+      rw [hconjsupp]; exact data.supported φ hφ
+  -- (2) every member of `T` has the reference degree `φref(1)`.
+  have hTdeg : ∀ x ∈ T, ((x : ClassFunction ↥L ℂ) : ↥L → ℂ) 1
+      = ((φref : ClassFunction ↥L ℂ) : ↥L → ℂ) 1 := by
+    intro x hx
+    rw [hTdef, Finset.mem_union] at hx
+    rcases hx with hx | hx
+    · exact data.equal_degree x hx φref hφref
+    · rw [Finset.mem_image] at hx
+      obtain ⟨φ, hφ, rfl⟩ := hx
+      rw [IrreducibleCharacter.conjPerm_apply_coe]
+      obtain ⟨d, _, hd⟩ := irreducibleCharacter_apply_one_eq_pos_natCast φ
+      rw [ClassFunction.conj_apply, hd, star_natCast, ← hd]
+      exact data.equal_degree φ hφ φref hφref
+  -- (3) enumerate `T` as a `Fin n` family.
+  set n := T.card with hndef
+  have hφrefT : φref ∈ T := Finset.mem_union_left _ hφref
+  have hconjrefT : IrreducibleCharacter.conjPerm ↥L φref ∈ T :=
+    Finset.mem_union_right _ (Finset.mem_image_of_mem _ hφref)
+  have hrefne : φref ≠ IrreducibleCharacter.conjPerm ↥L φref := fun hcon =>
+    data.not_real φref hφref ((IrreducibleCharacter.conjPerm_eq_self_iff φref).mp hcon.symm)
+  have hn2 : 2 ≤ n := Finset.one_lt_card.mpr ⟨φref, hφrefT, _, hconjrefT, hrefne⟩
+  haveI : NeZero n := ⟨by omega⟩
+  set fam : Fin n → IrreducibleCharacter ↥L := fun i => (T.equivFin.symm i : IrreducibleCharacter ↥L)
+    with hfamdef
+  have hfam_mem : ∀ i, fam i ∈ T := fun i => (T.equivFin.symm i).2
+  have hfam_inj : Function.Injective fam :=
+    fun i j h => T.equivFin.symm.injective (Subtype.ext h)
+  -- (4) each member difference `fam i − fam 0` is `A(L)`-supported.
+  have hdiff_supp : ∀ i, (irreducibleCharacterDifference fam i).support ⊆
+      OddOrder.Peterfalvi.S04.supportInSubgroup hyp.ambientA L := by
+    intro i y hy
+    have hne1 : y ≠ 1 := by
+      rintro rfl
+      refine (ClassFunction.mem_support.mp hy) ?_
+      show (fam i : ClassFunction ↥L ℂ) 1 - (fam 0 : ClassFunction ↥L ℂ) 1 = 0
+      rw [hTdeg (fam i) (hfam_mem i), hTdeg (fam 0) (hfam_mem 0), sub_self]
+    rcases ClassFunction.support_sub_subset _ _ hy with h | h
+    · rcases hTsupp _ (hfam_mem i) h with h2 | h2
+      · exact h2
+      · exact absurd (Set.mem_singleton_iff.mp h2) hne1
+    · rcases hTsupp _ (hfam_mem 0) h with h2 | h2
+      · exact h2
+      · exact absurd (Set.mem_singleton_iff.mp h2) hne1
+  have hSsupp : ∀ s ∈ Set.range (irreducibleCharacterDifference fam),
+      s.support ⊆ OddOrder.Peterfalvi.S04.supportInSubgroup hyp.ambientA L := by
+    rintro s ⟨i, rfl⟩; exact hdiff_supp i
+  -- (5) the three (1.4) hypotheses for the Dade isometry, via the supported-span lemmas.
+  have hsame_deg : ∀ i, ((fam i : ClassFunction ↥L ℂ) : ↥L → ℂ) 1
+      = ((fam 0 : ClassFunction ↥L ℂ) : ↥L → ℂ) 1 := fun i =>
+    (hTdeg (fam i) (hfam_mem i)).trans (hTdeg (fam 0) (hfam_mem 0)).symm
+  have hvirtual : IsometryDifferenceImagesAreVirtual hyp.tau fam := by
+    intro i
+    show hyp.tau (irreducibleCharacterDifference fam i) ∈ ZIrr G
+    exact OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap_mem_ZIrr_of_supported
+      hyp.dadeData.dade hyp.hconj (hdiff_supp i)
+      (Submodule.sub_mem _ (fam i).mem_ZIrr (fam 0).mem_ZIrr)
+  have hzero : IsometryDifferenceImagesVanishAtOne hyp.tau fam := by
+    intro i
+    show hyp.tau (irreducibleCharacterDifference fam i) (1 : G) = 0
+    exact OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap_apply_one_eq_zero
+      hyp.dadeData.dade hyp.hconj (hdiff_supp i)
+  have hisom : ∀ i j, ClassFunction.inner (isometryDifferenceImage hyp.tau fam i)
+      (isometryDifferenceImage hyp.tau fam j)
+      = ClassFunction.inner (irreducibleCharacterDifference fam i)
+          (irreducibleCharacterDifference fam j) := by
+    intro i j
+    show ClassFunction.inner (hyp.tau (irreducibleCharacterDifference fam i))
+      (hyp.tau (irreducibleCharacterDifference fam j)) = _
+    exact OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap_inner_eq_on_supported_span
+      hyp.dadeData.dade hyp.hconj hSsupp (Submodule.subset_span ⟨i, rfl⟩)
+      (Submodule.subset_span ⟨j, rfl⟩)
+  -- (6) apply the (1.4) keystone.
+  obtain ⟨sdf, himage⟩ :=
+    isometry_difference_pair_structure hn2 fam hfam_inj hsame_deg hyp.tau hvirtual hzero hisom
+  -- (7) read off `ε` and `μ`.
+  refine ⟨sdf.sign, fun x => if hx : x ∈ T then sdf.mu (T.equivFin ⟨x, hx⟩) else sdf.mu 0,
+    sdf.sign_eq, ?_, ?_⟩
+  · -- InjOn
+    intro x hx y hy hxy
+    have hxT : x ∈ T := Finset.mem_coe.mp hx
+    have hyT : y ∈ T := Finset.mem_coe.mp hy
+    simp only [dif_pos hxT, dif_pos hyT] at hxy
+    exact Subtype.ext_iff.mp (T.equivFin.injective (sdf.injective hxy))
+  · -- the pair relation
+    intro α hα β hβ
+    have hαT : α ∈ T := hα
+    have hβT : β ∈ T := hβ
+    -- key: for `x ∈ T`, `τ(x − fam 0) = ε·(μ x − μ₀)`.
+    have key : ∀ x (hx : x ∈ T), hyp.tau ((x : ClassFunction ↥L ℂ) - (fam 0 : ClassFunction ↥L ℂ))
+        = sdf.sign • ((sdf.mu (T.equivFin ⟨x, hx⟩) : ClassFunction G ℂ)
+            - (sdf.mu 0 : ClassFunction G ℂ)) := by
+      intro x hx
+      have hfx : fam (T.equivFin ⟨x, hx⟩) = x := by
+        simp only [hfamdef, Equiv.symm_apply_apply]
+      have hLHS : (x : ClassFunction ↥L ℂ) - (fam 0 : ClassFunction ↥L ℂ)
+          = irreducibleCharacterDifference fam (T.equivFin ⟨x, hx⟩) := by
+        show (x : ClassFunction ↥L ℂ) - (fam 0 : ClassFunction ↥L ℂ)
+          = (fam (T.equivFin ⟨x, hx⟩) : ClassFunction ↥L ℂ) - (fam 0 : ClassFunction ↥L ℂ)
+        rw [hfx]
+      rw [hLHS]
+      change isometryDifferenceImage hyp.tau fam (T.equivFin ⟨x, hx⟩) = _
+      rw [himage (T.equivFin ⟨x, hx⟩),
+        SignedIrreducibleDifferenceFamily.signedDifference_apply,
+        SignedIrreducibleDifferenceFamily.difference_apply,
+        SignedIrreducibleDifferenceFamily.classFunction_apply,
+        SignedIrreducibleDifferenceFamily.classFunction_apply]
+    have hsub : (α : ClassFunction ↥L ℂ) - (β : ClassFunction ↥L ℂ)
+        = ((α : ClassFunction ↥L ℂ) - (fam 0 : ClassFunction ↥L ℂ))
+          - ((β : ClassFunction ↥L ℂ) - (fam 0 : ClassFunction ↥L ℂ)) := by abel
+    rw [hsub, map_sub, key α hαT, key β hβT, ← smul_sub]
+    congr 1
+    simp only [dif_pos hαT, dif_pos hβT]
+    abel
+
+open scoped Classical OddOrder.Peterfalvi.S12.FiniteInduce in
 /-- **Peterfalvi (12.4), pin (a)** (coherence): for constituents `φ₁, φ₂ ∈ S(χ)`, the Dade image
-`(φ₁ − φ₂)^τ` lies in `ℤ[R(χ)]`.  By (1.4) the four-element set `{φ₁, φ₂, φ̄₁, φ̄₂}` is coherent, so
-`τ` maps its difference lattice into the integral span of `R(χ) = ⋃ R₁(φ)`.  A faithful §5/§1
-obligation (the coherence-extension content of (1.4)/(5.x), char-theory). -/
+`(φ₁ − φ₂)^τ` lies in `ℤ[R(χ)]`.
+
+Proof (the (1.4) coherence content, now genuine): the conjugate-closed constituent set `T` is a
+single coherent family under `τ` (`exists_uniform_image_of_constituents`), giving a uniform sign
+`ε` and injection `μ : T → Irr G` with `τ(φ₁ − φ₂) = ε·(μ φ₁ − μ φ₂)`.  For each constituent `φ`,
+the two presentations of `τ(φ − φ̄)` — the global `ε·(μ φ − μ φ̄)` and the per-`φ` block
+`R₁(φ)`'s `ε_φ·(μ_φ − ν_φ)` (`R1cdi.image_eq`) — must share their irreducible pair
+(`irreducibleCharacter_signed_difference_uniqueness`), so `μ φ ∈ {μ_φ, ν_φ} ⊆ ℤ[R(χ)]`
+(`R1cdi_muNu_mem_span_Rset`).  Hence `μ φ₁, μ φ₂ ∈ ℤ[R(χ)]` and `τ(φ₁ − φ₂) ∈ ℤ[R(χ)]`. -/
 theorem constituent_diff_tau_mem_span {L : Subgroup G} [Finite G] (hyp : Hypothesis L)
     {chi : ClassFunction ↥L ℂ} (dχ : CharacterDecompositionData hyp chi)
-    {φ₁ φ₂ : IrreducibleCharacter ↥L} (_h₁ : φ₁ ∈ dχ.constituents) (_h₂ : φ₂ ∈ dχ.constituents) :
+    {φ₁ φ₂ : IrreducibleCharacter ↥L} (h₁ : φ₁ ∈ dχ.constituents) (h₂ : φ₂ ∈ dχ.constituents) :
     hyp.tau ((φ₁ : ClassFunction ↥L ℂ) - (φ₂ : ClassFunction ↥L ℂ)) ∈
       Submodule.span ℤ (Rset dχ) := by
-  sorry
+  haveI := hyp.finiteG
+  classical
+  obtain ⟨ε, μ, hε, hμinj, hμrel⟩ := exists_uniform_image_of_constituents hyp dχ
+  set T := dχ.constituents ∪ dχ.constituents.image (IrreducibleCharacter.conjPerm ↥L) with hTdef
+  -- reconciliation: every `μ φ` (for a constituent `φ`) lies in `ℤ[R(χ)]`.
+  have hmu_mem : ∀ φ ∈ dχ.constituents, (μ φ : ClassFunction G ℂ) ∈ Submodule.span ℤ (Rset dχ) := by
+    intro φ hφ
+    have hφT : φ ∈ T := Finset.mem_union_left _ hφ
+    have hconjT : IrreducibleCharacter.conjPerm ↥L φ ∈ T :=
+      Finset.mem_union_right _ (Finset.mem_image_of_mem _ hφ)
+    set cdi := R1cdi dχ hφ with hcdi
+    -- global vs per-`φ` presentation of `τ(φ − φ̄)`.
+    have hglob := hμrel φ hφT (IrreducibleCharacter.conjPerm ↥L φ) hconjT
+    rw [IrreducibleCharacter.conjPerm_apply_coe] at hglob
+    have hcomb : ε • ((μ φ : ClassFunction G ℂ)
+          - (μ (IrreducibleCharacter.conjPerm ↥L φ) : ClassFunction G ℂ))
+        = cdi.sign • ((cdi.muClassFunction) - (cdi.nuClassFunction)) :=
+      hglob.symm.trans cdi.image_eq
+    have hcombℂ : (ε : ℂ) • ((μ φ : ClassFunction G ℂ)
+          - (μ (IrreducibleCharacter.conjPerm ↥L φ) : ClassFunction G ℂ))
+        = (cdi.sign : ℂ) • (((cdi.mu : ClassFunction G ℂ)) - ((cdi.nu : ClassFunction G ℂ))) := by
+      rw [Int.cast_smul_eq_zsmul, Int.cast_smul_eq_zsmul]; exact hcomb
+    -- the two distinct-pair hypotheses.
+    have hφne : φ ≠ IrreducibleCharacter.conjPerm ↥L φ := fun h =>
+      dχ.not_real φ hφ ((IrreducibleCharacter.conjPerm_eq_self_iff φ).mp h.symm)
+    have hab : μ φ ≠ μ (IrreducibleCharacter.conjPerm ↥L φ) := fun h =>
+      hφne (hμinj (Finset.mem_coe.mpr hφT) (Finset.mem_coe.mpr hconjT) h)
+    have hs : (ε : ℂ) ≠ 0 := by rcases hε with h | h <;> simp [h]
+    rcases irreducibleCharacter_signed_difference_uniqueness hab cdi.distinct hs hcombℂ with
+      ⟨h1, _, _⟩ | ⟨h1, _, _⟩
+    · rw [h1]; exact (R1cdi_muNu_mem_span_Rset dχ hφ).1
+    · rw [h1]; exact (R1cdi_muNu_mem_span_Rset dχ hφ).2
+  -- assemble.
+  have hφ₁T : φ₁ ∈ T := Finset.mem_union_left _ h₁
+  have hφ₂T : φ₂ ∈ T := Finset.mem_union_left _ h₂
+  rw [hμrel φ₁ hφ₁T φ₂ hφ₂T]
+  exact Submodule.smul_mem _ _ (Submodule.sub_mem _ (hmu_mem φ₁ h₁) (hmu_mem φ₂ h₂))
 
 open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
 /-- **Peterfalvi (12.4), pin (b)** ([Is] 7.7 + (8.12.c) + [Is] 6.2): for constituents `φ₁, φ₂ ∈ S(χ)`,
