@@ -844,3 +844,28 @@ Coq PFsection1 の (1.10) 対応も併読して generality 確認。
 (04.14 mmd:101) の論法 — g∈C_K(x)∖K' で (1.10.a) から ψ(xg)≡ψ(g), χ(x)≡e (mod 1-ε)、(12.14) で
 ψ(g)≡e、(1.10.b)+(12.15) で ψ(g)≡e (mod p)、… ⟹ 矛盾。(12.12)/(12.14)/(12.15) の現状を grep して
 assembly の gate を特定。dead な field 版 (1.10.b) 除去も検討。
+
+### loop²⁶⁻²⁸ — (12.16) を (1.10) で wiring、両端 materialize (start + end)
+
+(1.10) 完成後、(12.16) `counterexample_contradiction` (bare sorry) の論法を engine 群で materialize
+(gated 上流を仮説パラメータ化、全 axiom-clean)。**S14 が (1.10) leaf を import**。
+
+**始端** (loop²⁶⁻²⁷): (1.10) → |ψ(g)|≥e-1。
+- `psi_int_congr_e_mod_p` — (1.10.a) G-form + (1.10.b) ℂ-form + (12.14)/(12.15)/Dade 事実
+  (`ψ(xg)=ψ(x)`, `ψ(x)≡e mod 1-ε`, `ψ(g)=mval∈ℤ`) ⟹ `p∣(mval-e)` (ψ(g)≡e mod p)。
+- `abs_ge_e_sub_one` (純算術) + `abs_psi_g_ge_e_sub_one` (合成) ⟹ `|ψ(g)|≥e-1` ((12.12) `2e≤p+1`)。
+
+**終端** (loop²⁸): ノルム結論 → False。
+- `index_ratio_contradiction` — reduced `(|K|-|K'|)(e-1)²<e·|K|` + `4|K'|≤|K|` (fpf `[K:K']≥4`、(8.1.c))
+  + e≥3 ⟹ False ((3e-1)(e-3)≥0)。
+- `norm_ineq_reduce` — (12.11) `|M|≤|K||H|` 還元。`counterexample_closing` — 合成。
+
+**gated 中間** = ノルム不等式連鎖。実は **algebra は trivial linarith**: 3 つの ρ-ノルム下界
+A: `‖ψ^{ρM}‖²≥(|K-K'|/|M|)(e-1)²` (←(12.15)+|ψ(g)|≥e-1)、B: `‖ψ^ρ‖²≥1-e/|H|` ((7.8.b))、
+C: `1>‖ψ^{ρM}‖²+‖ψ^ρ‖²` ((7.3)+(8.17)) から `linarith` でノルム結論。
+⟹ **真の gate = A/B/C 自体 = §7/§8 ρ 機構** ((7.3)/(7.8.b)/(8.17) + §7 ρ/ρM の構成)。
+
+**次イテレーション** = 全 (12.16) assembly engine `counterexample_contradiction_of_facts`:
+始端 + 中間 (A/B/C→norm 結論の linarith) + 終端 を合成し、全 gated 事実を仮説に取って False を導く
+sorry-free skeleton (gated-endpoint-skeleton パターン全体)。⟹ (12.16) の論理構造を完全 materialize、
+残 sorry = §7/§8 ρ 機構の構成のみに局所化。
