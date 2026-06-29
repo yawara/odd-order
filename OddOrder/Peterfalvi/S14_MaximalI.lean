@@ -2458,6 +2458,31 @@ theorem counterexample_contradiction_of_facts [Finite G]
   exact counterexample_closing heR hkKp hkM hkH hidx hM
     (norm_conclusion_glue he hkKp hkM hidx hmag hA hB hC)
 
+/-- **Peterfalvi (12.12) → (12.16) numerical bridge**: the (12.12) conclusion `e ∣ p+1` together
+with `e` odd (odd order) gives the bound `2e ≤ p+1` cited by (12.16).  Since `p` is odd, `2 ∣ p+1`;
+as `gcd(2,e)=1`, `2e ∣ p+1`, hence `2e ≤ p+1`.  (`e ≤ (p+1)/2` in the textbook.) -/
+theorem two_mul_le_succ_of_odd_dvd {e p : ℕ} (hp : Odd p) (he : Odd e)
+    (hdvd : e ∣ (p + 1)) : 2 * e ≤ p + 1 :=
+  Nat.le_of_dvd (by omega) (he.coprime_two_left.mul_dvd_of_dvd_of_dvd (hp.add_one).two_dvd hdvd)
+
+/-- **Peterfalvi (8.1.c) → (12.16) numerical bridge**: a fixed-point-free order-`p` action on
+`K/K'` forces `p ∣ ([K:K'] - 1)`; with `[K:K'] > 1` and `p ≥ 3` this gives `[K:K'] ≥ 4`, the index
+bound contradicting `[K:K'] < 4` in the (12.16) endgame. -/
+theorem four_le_of_dvd_sub_one {p n : ℕ} (hp : 3 ≤ p) (hn : 1 < n) (hdvd : p ∣ (n - 1)) :
+    4 ≤ n := by
+  have : p ≤ n - 1 := Nat.le_of_dvd (by omega) hdvd
+  omega
+
+/-- **Peterfalvi (12.9), the centralizer witness extraction**: the rank-two witness datum records
+`¬(C_G(x) ⊓ K ≤ K')`, which directly yields an element `g ∈ C_K(x)` with `g ∉ K'` — the `g`
+commuting with `x` used throughout the (12.16) argument.  (Pure `SetLike` extraction, ungated.) -/
+theorem exists_witness_g {ctr : CounterexampleHypothesis (G := G)}
+    (witness : RankTwoWitnessData ctr) :
+    ∃ g : G, Commute witness.x g ∧ g ∈ ctr.K ∧ g ∉ ctr.Kprime := by
+  obtain ⟨g, hgA, hgB⟩ := SetLike.not_le_iff_exists.mp witness.CKx_not_le_Kprime
+  rw [Subgroup.mem_inf] at hgA
+  exact ⟨g, Subgroup.mem_centralizer_iff.mp hgA.1 witness.x (Set.mem_singleton _), hgA.2, hgB⟩
+
 /-- **Peterfalvi (12.16)**: the minimal counterexample of (12.8) is impossible. -/
 theorem counterexample_contradiction [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G)
