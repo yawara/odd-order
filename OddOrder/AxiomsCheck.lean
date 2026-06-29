@@ -6893,3 +6893,10 @@ inverse of the Dade isometry `τ` on `CF(L,A)`: since `α^τ` is constant `= α(
 (`Hypothesis.dadeValue_eq`), its `ρ`-average over `H(a)` recovers `α(a)`.  Axiom-clean. -/
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S07.rhoValue_dadeMap
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S07.rho_dadeMap
+
+/-! **Peterfalvi (2.7) adjunction for `ρ`** (`S07_RhoProjection`; lane β).  `rho_adjoint`:
+`⟨α^τ, χ⟩_G = ⟨α, χ^ρ⟩_L` — the Dade isometry `τ` (`hyp.dadeMap`) and the `ρ` projection are adjoint,
+by citing S04's `adjoint_formula` with `ψ = χ^ρ`; the averaging hypothesis is
+`rhoValue_eq_adjointAverageFun`, bridging the `ρ`-value to S04's `adjointAverageFun`.  Axiom-clean. -/
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S07.rhoValue_eq_adjointAverageFun
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S07.rho_adjoint
