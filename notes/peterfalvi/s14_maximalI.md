@@ -1034,3 +1034,33 @@ AxiomsCheck のみ、何にも使われない):
 S09 `chiRho_norm_sq_le`/`chiRho_integral_inequality`/`NormEstimates`/`family_inequality` を cite して
 hA/hB/hC を構成 (新規 ρ を作らない)。**S07_RhoProjection は削除推奨** (carve-out=issue 0087 は hub 承認
 ゆえユーザー/hub 裁可待ち)。🛑 STOP し報告 (ユーザー判断待ち)。
+
+### loop⁴⁰ — S07 削除完了 + (12.16) 配線の具体 construction plan (S09 cite、lane γ pattern mirror)
+
+**S07_RhoProjection 削除済** (commit `4e34c478`、hub も独立に issue 0089 で削除実施 = `83c2c3c9`、merge
+clean、full build 3888 green)。§7 ρ は S09 `chiRho` に (7.1)-(7.8) 完備。本来の (12.16) 配線へ。
+
+**(12.16) 原文 (04.14 L99-101) の構造** (精読確定):
+- (12.13): S={Ind_H^L θ}, τ=Dade isometry for (A(L),L,G), τ₁ 拡張 (by (12.6)), χ∈S with χ(1)=e, ψ=χ^{τ₁},
+  ρ=(7.1) map with A=A(L)。
+- (12.14): ψ(xg)=ψ^ρ(x)=χ(x) for g∈K。 (12.15): ρ_M=(7.1) map for (M, A₁(M)); ψ^{ρ_M}(g)=ψ(g) on K#,
+  ψ const on K-K', ψ(g)∈ℤ。
+- (12.16): (1.10) + norm bounds で |ψ(g)|≥e-1 → (7.3)/(7.8.b) で矛盾。**ρ (for L) と ρ_M (for M) の
+  2 つの (7.1) map を使う**。
+
+**construction plan (lane γ MHypothesis pattern を mirror、全て S09 cite)**:
+- **producers 既存**: `S12.Hypothesis.toHypothesis71` (S12:440)/`toFamilyHypothesis71` (S12:458) =
+  §10-13 char hyp → S09 `Hypothesis71`/`FamilyHypothesis71`。lane γ `MHypothesis` (S16:1585) は
+  `h78:S09.Hypothesis78` をバンドルし `NormEstimates.zetaNuRho_norm_sq_ge` で (7.8.b) を得る = **(12.16)
+  hB の template**。
+- **hB ((7.8.b) for L)**: witness L (Frobenius, (12.10)) + S coherent ((12.6)) から `Hypothesis78 G (A(L)) L`
+  を構築 → `NormEstimates.zetaNuRho_norm_sq_ge` cite。**bottoms out on (12.6)/(12.10) sorries** (signature
+  contract で cite 可、[[feedback-cite-sorried-lemmas-if-signature-correct]])。
+- **hA ((12.15) for M, ρ_M)**: `Hypothesis71 G (A₁(M)) M` (M type-I、S12.toHypothesis71 系) → ψ^{ρ_M}。
+- **hC ((7.3)/(7.5))**: 両 pole の Aᵗ disjoint → `family_inequality` (S09) / `chiRho_integral_inequality`。
+- **始端/終端は materialize 済** (`counterexample_contradiction_of_facts` sorry-free、(1.10) 完成)。
+
+**残骨格**: `counterexample_contradiction` (S14:2491) を `exists_rankTwoWitness` (S14:1948) で witness 取得 →
+ψ=χ^{τ₁} 構築 → hA/hB/hC を上記 S09 cite で構成 → `counterexample_contradiction_of_facts` 適用。
+**多 iteration の deep endgame** (Hypothesis78 構築 + ν coherent extension + ζ distinguished が核)。
+次イテレーション = witness 取得 + skeleton (facts を faithful obligation に isolate) から着手。正本=issue 0081。
