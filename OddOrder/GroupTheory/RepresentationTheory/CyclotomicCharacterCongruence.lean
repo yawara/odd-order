@@ -6,6 +6,8 @@ Authors: Yawara Ishida
 import Mathlib.NumberTheory.Cyclotomic.PrimitiveRoots
 import Mathlib.RingTheory.Norm.Transitivity
 import OddOrder.GroupTheory.RepresentationTheory.ClassSumAlgebra
+import OddOrder.GroupTheory.RepresentationTheory.ZIrr
+import OddOrder.GroupTheory.RepresentationTheory.LinearCharacter
 
 /-!
 # Peterfalvi (1.10): cyclotomic congruences of character values
@@ -99,5 +101,47 @@ theorem int_dvd_of_zeta_sub_one_dvd {p : ℕ} [hp : Fact p.Prime] (hp2 : p ≠ 2
   have hZ : (n : ℤ) ^ (p - 1) = (p : ℤ) * m := by exact_mod_cast hN
   have hpZ : Prime (p : ℤ) := Nat.prime_iff_prime_int.mp hp.out
   exact hpZ.dvd_of_dvd_pow ⟨m, hZ⟩
+
+/-- **Peterfalvi (1.10.a)** (full, virtual-character form): for a finite **abelian** group `A`, a
+virtual character `χ ∈ ℤ[Irr A]`, a `p`-th-power-trivial element `x` (`x^p = 1`) and any `y`, the
+difference `χ(xy) - χ(y)` is `(1 - ε)` times an algebraic integer (`ε` a primitive `p`-th root).
+
+Proof: the set of class functions with this property is a `ℤ`-submodule (closed under `+`, `ℤ`-smul,
+contains `0`); it contains every irreducible character of `A` — each is a linear character
+(`exists_linearIrreducibleCharacter_eq_of_isMulCommutative`) so the per-linear-character core
+`exists_integral_linearChar_apply_sub` applies — hence it contains `ℤ[Irr A] = span ℤ (Irr A)`. -/
+theorem exists_integral_zirr_apply_sub {p : ℕ} (hp : 0 < p) {ε : ℂ} (hε : IsPrimitiveRoot ε p)
+    {A : Type*} [CommGroup A] [Finite A] {χ : ClassFunction A ℂ} (hχ : χ ∈ ZIrr A)
+    {x y : A} (hx : x ^ p = 1) :
+    ∃ z : ℂ, IsIntegral ℤ z ∧ χ (x * y) - χ y = (1 - ε) * z := by
+  haveI : IsMulCommutative A := ⟨⟨mul_comm⟩⟩
+  -- the property, as a `ℤ`-submodule of `CF(A)`.
+  let M : Submodule ℤ (ClassFunction A ℂ) :=
+    { carrier := {ψ | ∃ z : ℂ, IsIntegral ℤ z ∧ ψ (x * y) - ψ y = (1 - ε) * z}
+      zero_mem' := ⟨0, isIntegral_zero, by simp⟩
+      add_mem' := by
+        rintro ψ₁ ψ₂ ⟨z₁, hz₁, e₁⟩ ⟨z₂, hz₂, e₂⟩
+        exact ⟨z₁ + z₂, hz₁.add hz₂, by
+          simp only [ClassFunction.add_apply]; linear_combination e₁ + e₂⟩
+      smul_mem' := by
+        rintro c ψ ⟨z, hz, e⟩
+        have hcz : IsIntegral ℤ ((c : ℂ) * z) :=
+          (isIntegral_algebraMap (R := ℤ) (x := c)).mul hz
+        refine ⟨(c : ℂ) * z, hcz, ?_⟩
+        have happ : ∀ g, (c • ψ) g = (c : ℂ) * ψ g := fun g => by
+          show c • ψ g = (c : ℂ) * ψ g
+          rw [zsmul_eq_mul]
+        rw [happ, happ]; linear_combination (c : ℂ) * e }
+  -- every irreducible character of `A` lies in `M`.
+  have hsub : irreducibleCharacters A ⊆ (M : Set (ClassFunction A ℂ)) := by
+    intro α hα
+    obtain ⟨θ, hθ⟩ :=
+      (mem_irreducibleCharacters.mp hα).exists_linearIrreducibleCharacter_eq_of_isMulCommutative
+    obtain ⟨z, hz, he⟩ := exists_integral_linearChar_apply_sub hp hε θ hx
+    refine ⟨z, hz, ?_⟩
+    rw [← hθ]; simpa using he
+  -- conclude: `χ ∈ ZIrr A = span ℤ (Irr A) ≤ M`.
+  rw [ZIrr_eq_span] at hχ
+  exact Submodule.span_le.mpr hsub hχ
 
 end OddOrder.RepresentationTheory
