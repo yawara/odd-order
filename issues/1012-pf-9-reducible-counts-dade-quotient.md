@@ -70,11 +70,14 @@ X/H₀ の文字と同一視」((1.6)) で商で作業。⟹ §9 reducible-count
        K=W₁.subgroupOf M, L=H₀.subgroupOf M; hcop=Coprime|M'||W₁|=hHall)。K̄/W̄₁ も自動で image 形。
      - `W1_cyclic/W2_cyclic`: image of cyclic。`W1_nontrivial`: `chiefFactor_W1_inf_H0_..._eq_bot` で
        W̄₁≅W₁≠⊥。`card_coprime`: |K̄| ∣ |K|, |W̄₁|=|W₁|, `hHall`。`W2_le_K`: image monotone。
-     - **`W2_nontrivial` (= W̄₂≠⊥ ⟺ W₂⊄H₀) — 残る非自明 field**: `coprimeFrobeniusChiefFactor_card`
-       (S11:761) が `|fixedByE|=|C_{H̄}(W₁)|=p` 供給。但し fixedByE は H̄=↥H⧸N chief-action 側、
-       W̄₂=(W₂.subgroupOf M).map mk' は M/H₀ 側 ⟹ **両者同一視 (W₂↪H̄ image = fixedByE, |·|=p≠1) の
-       connection が要** (次反復、~30-50行)。**⚠ type-II 注意 (S11:2032)**: type II では `|W₂|>p`、
-       使うのは **image-order |W̄₂|=p**、`|W₂|` ではない。
+     - ✅ **`W2_nontrivial` (= W̄₂≠⊥ ⟺ W₂⊄H₀) DONE (2026-06-29)**: `chiefFactor_W2_not_le_H0`
+       (axiom-clean): `coprimeFrobeniusChiefFactor_card.2` で `|fixedByE|=p≠1` ⟹ fixedByE≠⊥;
+       `map_fixedSubgroup_eq_fixedSubgroup_quotient` で fixedByE=(C_H(W₁)).map mk' ⟹ C_H(W₁)⊄N;
+       `typeP_fixedSubgroup_map`+`typeP_H_inf_centralizer_W1` で C_H(W₁).map H.subtype=W₂、
+       N.map H.subtype=H₀ ⟹ W₂⊄H₀。**⚠ type-II 注意 (S11:2032)**: |W₂|>p 可だが image-order
+       |W̄₂|=|fixedByE|=p を使った (|W₂| でなく)。
+     - **⟹ B1 の全 field の証明手段が揃った** (centralizer_W̄₂ + W2_nontrivial 完了、他は 1-liner)。
+       残 = def 組立のみ (mechanical、~80-120行、`[(chief.H0.subgroupOf M).Normal]` binder)。
      - **`centralizer_W2` (= (8.4.d) crux)**: `C_{↥M⧸H₀'}(x̄) ⊓ K̄ = W̄₂` for x̄∈W̄₁^#。**3-step 分解**:
        1. ✅ **DONE (2026-06-29)**: `C_{↥M⧸H₀'}(x̄) = (C_{↥M}(x)).map mk'` = **一般補題
           `centralizer_map_mk'_eq_of_coprime_zpowers`** (S11、axiom-clean、reusable):

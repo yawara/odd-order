@@ -2250,6 +2250,59 @@ theorem chiefFactor_quotient_card [Finite G] {M : Subgroup G} {data : TypesIIIII
   rw [(Subgroup.index_eq_card chief.N).symm]
   exact Nat.eq_of_mul_eq_mul_right Nat.card_pos key
 
+/-- **Peterfalvi (8.4.d) `W2_nontrivial` input: `W₂ ⊄ H₀`.**  The `W₁`-fixed points of the chief
+factor `H̄ = ↥H ⧸ N` have order `p ≠ 1` (`coprimeFrobeniusChiefFactor_card`, Wielandt), and they are
+the image of `C_H(W₁) = W₂` (`map_fixedSubgroup_eq_fixedSubgroup_quotient`).  So `C_H(W₁) ⊄ N`, i.e.
+some element of `W₂` lies outside `H₀ = N.map H.subtype`; hence `W₂ ⊄ H₀`, equivalently the
+certain-type `W̄₂ = W₂ H₀ / H₀` of `S06.Hypothesis (M/H₀)` is nontrivial. -/
+theorem chiefFactor_W2_not_le_H0 [Finite G] {M : Subgroup G}
+    {data : TypesIIIIIIVSetup M} (chief : ChiefFactorData data) :
+    ¬ data.W2 ≤ chief.H0 := by
+  show ¬ data.typeP.W2 ≤ chief.H0
+  haveI := chief.N_normal
+  have hU : data.typeP.U ≠ ⊥ := data.nontrivial.1
+  have hHbar : Nat.card (↥data.H ⧸ chief.N) ≠ 1 := by
+    rw [chiefFactor_quotient_card chief]
+    exact (Nat.one_lt_pow (Nat.card_pos (α := ↥data.W1)).ne' chief.p_prime.one_lt).ne'
+  have hUnorm : ((typeP_quotientCoprimeAction data.typeP hU chief.N_aInvariant).U).Normal :=
+    (typeP_uW1_frobenius data.typeP hU).isNormal
+  have hEcyc := typeP_quotient_fixedByE_cyclic data.typeP hU chief.N_aInvariant
+  have hcard := coprimeFrobeniusChiefFactor_card
+    (typeP_quotientCoprimeAction data.typeP hU chief.N_aInvariant) hUnorm chief.p_prime
+    chief.quotient_elementaryAbelian chief.quotient_chiefFactor chief.U_noncentral_on_quotient
+    hEcyc hHbar
+  have hfixne : (typeP_quotientCoprimeAction data.typeP hU chief.N_aInvariant).fixedByE ≠ ⊥ := by
+    intro h
+    have h1 : Nat.card ↥(typeP_quotientCoprimeAction data.typeP hU chief.N_aInvariant).fixedByE = 1 :=
+      by rw [h]; simp
+    exact chief.p_prime.ne_one (hcard.2.symm.trans h1)
+  have hcopHW1 : Nat.Coprime
+      (Nat.card ↥(data.typeP.W1.subgroupOf (data.typeP.U ⊔ data.typeP.W1))) (Nat.card ↥data.H) :=
+    (typeP_coprime_H_uW1 data.typeP hU).symm.coprime_dvd_left (Subgroup.card_subgroup_dvd_card _)
+  haveI : IsSolvable ↥data.H := (typeP_coprimeAction data.typeP hU).H_solvable
+  have hmap : (fixedSubgroup (typeP_conjAction data.typeP)
+      (data.typeP.W1.subgroupOf (data.typeP.U ⊔ data.typeP.W1))).map (QuotientGroup.mk' chief.N)
+      = (typeP_quotientCoprimeAction data.typeP hU chief.N_aInvariant).fixedByE :=
+    map_fixedSubgroup_eq_fixedSubgroup_quotient chief.N_aInvariant hcopHW1 (Or.inr inferInstance)
+  have hCHW1 : (fixedSubgroup (typeP_conjAction data.typeP)
+        (data.typeP.W1.subgroupOf (data.typeP.U ⊔ data.typeP.W1))).map data.typeP.H.subtype
+      = data.typeP.W2 := by
+    rw [typeP_fixedSubgroup_map data.typeP le_sup_right, typeP_H_inf_centralizer_W1]
+  have hCfixN : ¬ (fixedSubgroup (typeP_conjAction data.typeP)
+      (data.typeP.W1.subgroupOf (data.typeP.U ⊔ data.typeP.W1))) ≤ chief.N := by
+    intro hle
+    apply hfixne
+    rw [← hmap, Subgroup.map_eq_bot_iff, QuotientGroup.ker_mk']
+    exact hle
+  obtain ⟨c, hcCfix, hcN⟩ := SetLike.not_le_iff_exists.mp hCfixN
+  intro hW2H0
+  have hcG_W2 : (data.typeP.H.subtype c) ∈ data.typeP.W2 := by
+    rw [← hCHW1]; exact Subgroup.mem_map_of_mem _ hcCfix
+  have hcG_H0 : (data.typeP.H.subtype c) ∈ chief.H0 := hW2H0 hcG_W2
+  rw [chief.H0_eq, Subgroup.mem_map] at hcG_H0
+  obtain ⟨n, hn, hnc⟩ := hcG_H0
+  exact hcN (data.typeP.H.subtype_injective hnc ▸ hn)
+
 /-- **(9.7) span step** (general form): in an irreducible `A`-action on a group `H` (every
 `A`-invariant subgroup is `⊥` or `⊤`), any nonzero subgroup `S₀` generates `H` under its
 `A`-orbit — `⨆_{a} φ(a) • S₀ = ⊤`.  The orbit join is `A`-invariant (reindex `a ↦ h·a`) and
