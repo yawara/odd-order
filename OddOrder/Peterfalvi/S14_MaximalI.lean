@@ -6,6 +6,7 @@ Authors: Yawara Ishida
 import OddOrder.Peterfalvi.S13_MaximalIII_IV
 import OddOrder.Peterfalvi.S10_CoherenceWiring
 import OddOrder.GroupTheory.RepresentationTheory.SingerField
+import OddOrder.GroupTheory.RepresentationTheory.CyclotomicCharacterCongruence
 import Mathlib.RepresentationTheory.Irreducible
 
 /-!
@@ -2314,6 +2315,32 @@ theorem rhoM_integer_values [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
     dade.rhoMFormula ∧
       (∀ g : G, g ∈ ctr.K → g ∉ ctr.Kprime → ∃ z : ℤ, dade.psi g = (z : ℂ)) := by
   sorry
+
+/-- **Peterfalvi (12.16), the (1.10) congruence core**: the cyclotomic-congruence chain of the
+(12.16) contradiction.  Given the minimal-counterexample data — a virtual character `ψ ∈ ℤ[Irr G]`,
+an order-`p` element `x` and a commuting `g` — together with the facts supplied by the surrounding
+§12 machinery (`ψ` constant on the coset, `ψ(xg) = ψ(x)`, by (12.14); `ψ(x) ≡ e (mod 1-ε)`, from the
+Dade value relation and (1.10.a) applied to `χ`; and `ψ(g) = mval ∈ ℤ`, by (12.15)), Peterfalvi
+(1.10.a) (`exists_integral_apply_sub_of_commute`) and (1.10.b) (`int_dvd_of_one_sub_primRoot_dvd`)
+yield `ψ(g) ≡ e (mod p)`, i.e. `p ∣ (mval - e)`.
+
+This isolates the `(1.10)`-using arithmetic of (12.16) (now fully discharged); the remaining
+contradiction is the norm/degree inequality (`2e ≤ p+1` of (12.12) together with (12.15)). -/
+theorem psi_int_congr_e_mod_p [Finite G] {p : ℕ} (hp : p.Prime) {ε : ℂ}
+    (hε : IsPrimitiveRoot ε p) {ψ : ClassFunction G ℂ} (hψ : ψ ∈ ZIrr G) {x g : G}
+    (hx : x ^ p = 1) (hxg : Commute x g) {e mval : ℤ}
+    (h_const : ψ (x * g) = ψ x)
+    (h_psix : ∃ w : ℂ, IsIntegral ℤ w ∧ ψ x - (e : ℂ) = (1 - ε) * w)
+    (h_psig_int : ψ g = (mval : ℂ)) :
+    (p : ℤ) ∣ (mval - e) := by
+  obtain ⟨z, hz, hzeq⟩ :=
+    OddOrder.RepresentationTheory.exists_integral_apply_sub_of_commute hp.pos hε hψ hx hxg
+  obtain ⟨w, hw, hweq⟩ := h_psix
+  apply OddOrder.RepresentationTheory.int_dvd_of_one_sub_primRoot_dvd hp hε (hw.sub hz)
+  have h1 : ψ x - ψ g = (1 - ε) * z := by rw [← h_const]; exact hzeq
+  rw [h_psig_int] at h1
+  push_cast
+  linear_combination hweq - h1
 
 /-- **Peterfalvi (12.16)**: the minimal counterexample of (12.8) is impossible. -/
 theorem counterexample_contradiction [Finite G]

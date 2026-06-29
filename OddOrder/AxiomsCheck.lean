@@ -6688,6 +6688,10 @@ formula together with the prime computation `coprimeFrobeniusAction_card_eq_prim
 -- further §12/§16 cite, so it is not yet registered.)
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S14.exists_sigmaKappaCompl_hall_ge_P0
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S14.counterexample_P0_K_structure
+-- Pf (12.16) (1.10) congruence core: from `ψ ∈ ℤ[Irr G]`, `x^p=1`, `g` commuting with `x`, the
+-- (12.14)/(12.15)/Dade facts (`ψ(xg)=ψ(x)`, `ψ(x)≡e mod 1-ε`, `ψ(g)=mval∈ℤ`), (1.10.a)+(1.10.b)
+-- give `p ∣ (mval-e)` (i.e. `ψ(g)≡e mod p`).  Materializes the (1.10)-wiring of (12.16).
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S14.psi_int_congr_e_mod_p
 
 -- **W1 §16 Prop 16.1 `hP1eqV` disjunct 3 (Singer/`SL₂(p)`) prerequisite (lane-f, issue 8015)** —
 -- `IsExtraspecial.of_card_eq_prime_cube`: a nonabelian group of order `p³` is extraspecial
