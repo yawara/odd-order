@@ -1006,3 +1006,31 @@ family+normal-subgroup ((7.8.b) `1-e/h≤‖ζ^{νρ}‖²`=hB)。**lane γ は 
 `chiRhoNormSq`/`zetaNuRhoNormSq`) で (14.11.4) を処理済** ⟹ 次イテレーションは (12.16) の hA/hB/hC
 を S09 family 機構 + 本 §7 (7.1)-(7.3) でどう構成するか (S09 再利用 vs (7.5)/(7.8) 新規) を評価。
 正本=issue 0081。
+
+### 🛑🛑 loop³⁸ — 重大発見: S07_RhoProjection (7.1)-(7.3) は S09 chiRho の完全重複 (STOP+報告)
+
+**`S09_NonexistenceCertain.lean` = 教科書 §7** (S番号=§番号+2: S09↔§7)。§7 ρ machinery は `chiRho` 名で
+**(7.1)-(7.8) 完備**。本セッションで S07 に構築した (7.1)-(7.3) は**完全な重複**だった (consumer は
+AxiomsCheck のみ、何にも使われない):
+
+| S07 (本セッション、冗長) | S09 既存 |
+|---|---|
+| `rhoValue`/`rhoClassFun`/`rho` | `chiRho`/`chiRhoCF` |
+| `rho_dadeMap` (7.2.a) | `chiRhoCF_dadeImage_eq` (7.2.a) |
+| `rhoValue_eq_adjointAverageFun` | `chiRhoCF_eq_adjointAverageFun` |
+| `rho_adjoint` (2.7) | `chiRho_adjoint` (同じ S04.adjoint_formula cite) |
+| `rho_normSq_le` (7.2.b) | `chiRho_norm_sq_le` (同じ Pythagoras) |
+| `rho_normSq_le_restrict`+`inner_restrictDadeSupport_re` (7.3) | `chiRho_integral_inequality` |
+
+さらに S09 は (7.4)-(7.8) も完備 (`FamilyHypothesis71`/`family_inequality`/`Hypothesis76`/
+`Hypothesis78`/`NormEstimates` = (12.16) hA/hB/hC に必要な全部、lane γ が (14.11.4) で常用)。
+
+**原因**: 本ノートの旧前提「S09 chiRho は family 特化、型 I A(L) 一般 ρ 不在」(loop¹⁸/²⁰) が**誤り**。
+`Hypothesis71 G A L` は general single-L の (7.1) そのもの。note を信じ S09 を実コード確認しなかった
+([[verify-port-state-by-number-not-coq-name]] [[scaffold-sorry-free-not-done]]、正本 memory
+`s09-is-section7-chirho-complete`)。
+
+**正しい (12.16) path**: §12 `CounterexampleHypothesis` から S09 `Hypothesis71`/`Hypothesis78` を構築 →
+S09 `chiRho_norm_sq_le`/`chiRho_integral_inequality`/`NormEstimates`/`family_inequality` を cite して
+hA/hB/hC を構成 (新規 ρ を作らない)。**S07_RhoProjection は削除推奨** (carve-out=issue 0087 は hub 承認
+ゆえユーザー/hub 裁可待ち)。🛑 STOP し報告 (ユーザー判断待ち)。
