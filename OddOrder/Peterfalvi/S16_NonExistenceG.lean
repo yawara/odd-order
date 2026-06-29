@@ -1739,6 +1739,50 @@ theorem norm_error_terms_lt_inv_q {p q u v : ℕ}
     nlinarith [hmul_nonneg]
   nlinarith [hsum, hsum_eq, hthree_le]
 
+/-- **Peterfalvi (14.11.4), the upper-bound loosening step** (04.16 line 115).  The raw `(7.8.b)`
+upper estimate
+`1 − 1/p − 1/q + 1/(pq) + (|P|−1)/(|P|uq) + (|Q|−1)/(|Q|vp) + (k−1)/(kpq)`
+is loosened to the displayed `NormCascadeData.upper`
+`1 − 1/p − 1/q + 2/(pq) + 1/(uq) + 1/(vp)`
+via `(|P|−1)/|P| ≤ 1`, `(|Q|−1)/|Q| ≤ 1`, and `(k−1)/k ≤ 1` (so `(k−1)/(kpq) ≤ 1/(pq)`).  Pure `ℝ`
+arithmetic; reusable by the `normCascadeData` producer to discharge `NormCascadeData.upper` once the
+§8 TI-counting has produced the raw bound. -/
+theorem normCascade_upper_loosen {p q u v k cardP cardQ : ℕ}
+    (hp : 0 < p) (hq : 0 < q) (hu : 0 < u) (hv : 0 < v)
+    (hk : 0 < k) (hP : 0 < cardP) (hQ : 0 < cardQ) :
+    (1 : ℝ) - 1 / (p : ℝ) - 1 / (q : ℝ) + 1 / ((p * q : ℕ) : ℝ)
+        + ((cardP : ℝ) - 1) / ((cardP * u * q : ℕ) : ℝ)
+        + ((cardQ : ℝ) - 1) / ((cardQ * v * p : ℕ) : ℝ)
+        + ((k : ℝ) - 1) / ((k * p * q : ℕ) : ℝ)
+      ≤ 1 - 1 / (p : ℝ) - 1 / (q : ℝ) + 2 / ((p * q : ℕ) : ℝ)
+        + 1 / ((u * q : ℕ) : ℝ) + 1 / ((v * p : ℕ) : ℝ) := by
+  have hpR : (0 : ℝ) < p := by exact_mod_cast hp
+  have hqR : (0 : ℝ) < q := by exact_mod_cast hq
+  have huR : (0 : ℝ) < u := by exact_mod_cast hu
+  have hvR : (0 : ℝ) < v := by exact_mod_cast hv
+  have hkR : (0 : ℝ) < k := by exact_mod_cast hk
+  have hPR : (0 : ℝ) < cardP := by exact_mod_cast hP
+  have hQR : (0 : ℝ) < cardQ := by exact_mod_cast hQ
+  -- `(|P|−1)/(|P|uq) ≤ 1/(uq)`.
+  have h1 : ((cardP : ℝ) - 1) / ((cardP * u * q : ℕ) : ℝ) ≤ 1 / ((u * q : ℕ) : ℝ) := by
+    rw [div_le_div_iff₀ (by positivity) (by positivity)]
+    push_cast
+    nlinarith [hPR, huR, hqR, mul_pos huR hqR]
+  -- `(|Q|−1)/(|Q|vp) ≤ 1/(vp)`.
+  have h2 : ((cardQ : ℝ) - 1) / ((cardQ * v * p : ℕ) : ℝ) ≤ 1 / ((v * p : ℕ) : ℝ) := by
+    rw [div_le_div_iff₀ (by positivity) (by positivity)]
+    push_cast
+    nlinarith [hQR, hvR, hpR, mul_pos hvR hpR]
+  -- `(k−1)/(kpq) ≤ 1/(pq)`.
+  have h3 : ((k : ℝ) - 1) / ((k * p * q : ℕ) : ℝ) ≤ 1 / ((p * q : ℕ) : ℝ) := by
+    rw [div_le_div_iff₀ (by positivity) (by positivity)]
+    push_cast
+    nlinarith [hkR, hpR, hqR, mul_pos hpR hqR]
+  -- `1/(pq) + (k−1)/(kpq) ≤ 2/(pq)`, plus the two complement bounds.
+  have hpq2 : (2 : ℝ) / ((p * q : ℕ) : ℝ)
+      = 1 / ((p * q : ℕ) : ℝ) + 1 / ((p * q : ℕ) : ℝ) := by ring
+  linarith [h1, h2, h3, hpq2]
+
 /-- Arithmetic endpoint for **Peterfalvi (14.11.4)**.  If the norm calculation
 has already yielded the displayed bound from the text, then the lower bound
 `k > 2 p v` and the cyclotomic lower consequence `p q < v` are contradictory. -/
