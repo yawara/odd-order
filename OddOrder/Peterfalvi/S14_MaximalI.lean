@@ -392,6 +392,73 @@ theorem Sset_vanishes_off_H {L : Subgroup G} (hyp : Hypothesis L) {χ : ClassFun
   rw [hχ_eq]
   exact ClassFunction.induce_eq_zero_of_not_mem_normal _ hxmem
 
+/-- **Difference-uniqueness for signed irreducible-character differences** (Peterfalvi §3, the
+reconciliation core of (1.4)).  If two *signed* differences of distinct irreducible characters
+coincide, `s • (a − b) = t • (c − d)` with `a ≠ b`, `c ≠ d` and a nonzero left scalar `s`, then the
+unordered pairs agree, with the sign tracking the orientation: either `a = c, b = d, s = t`
+(same orientation) or `a = d, b = c, s = −t` (reversed).
+
+This is the lemma by which the per-constituent families `R₁(φ)` (built from `τ(φ̄ − φ)`) are
+reconciled with the global signed family of (1.4) in pin (a) `constituent_diff_tau_mem_span`:
+the two presentations of `τ(φ − φ̄)` as a signed difference must share their underlying irreducible
+pair, so each `μ_φ` lands in `ℤ[R(χ)]`.
+
+Proof: pairing the hypothesis on the *left* with the irreducible `a` (resp. `b`) and using
+orthonormality `⟨χ, ψ⟩ = δ_{χ,ψ}` (`irreducibleCharacter_inner_eq_ite`; `ClassFunction.inner` is
+ℂ-linear in the left slot) gives `s = t·([c=a] − [d=a])` and `−s = t·([c=b] − [d=b])`.  Since
+`s ≠ 0`, exactly one of `c = a`, `d = a` holds (the two cases are the two orientations), and the
+`b`-pairing pins the remaining equality. -/
+theorem irreducibleCharacter_signed_difference_uniqueness [Finite G]
+    {a b c d : IrreducibleCharacter G} (hab : a ≠ b) (hcd : c ≠ d)
+    {s t : ℂ} (hs : s ≠ 0)
+    (h : s • ((a : ClassFunction G ℂ) - (b : ClassFunction G ℂ))
+        = t • ((c : ClassFunction G ℂ) - (d : ClassFunction G ℂ))) :
+    (a = c ∧ b = d ∧ s = t) ∨ (a = d ∧ b = c ∧ s = -t) := by
+  classical
+  haveI : Fintype G := Fintype.ofFinite G
+  haveI : Invertible (Nat.card G : ℂ) :=
+    invertibleOfNonzero (Nat.cast_ne_zero.mpr Nat.card_pos.ne')
+  have hba : b ≠ a := fun he => hab he.symm
+  -- Pair the equation on the left with an arbitrary irreducible `e`; orthonormality turns each
+  -- coercion-inner into a Kronecker delta.
+  have key : ∀ e : IrreducibleCharacter G,
+      s * ((if a = e then (1 : ℂ) else 0) - (if b = e then 1 else 0))
+        = t * ((if c = e then (1 : ℂ) else 0) - (if d = e then 1 else 0)) := by
+    intro e
+    have h2 := congrArg (fun f => ClassFunction.inner f (e : ClassFunction G ℂ)) h
+    simpa only [ClassFunction.inner_smul_left, ClassFunction.inner_sub_left,
+      irreducibleCharacter_inner_eq_ite] using h2
+  -- Evaluate at `a`: `s = t·([c=a] − [d=a])`.
+  have ka : s = t * ((if c = a then (1 : ℂ) else 0) - (if d = a then 1 else 0)) := by
+    have hka := key a
+    rwa [if_pos rfl, if_neg hba, sub_zero, mul_one] at hka
+  -- Evaluate at `b`: `−s = t·([c=b] − [d=b])`.
+  have kb : -s = t * ((if c = b then (1 : ℂ) else 0) - (if d = b then 1 else 0)) := by
+    have hkb := key b
+    rwa [if_neg hab, if_pos rfl, zero_sub, mul_neg_one] at hkb
+  by_cases hca : c = a
+  · -- Orientation A: `c = a`, hence `d ≠ a`, and `ka` collapses to `s = t`.
+    have hda : d ≠ a := fun he => hcd (hca.trans he.symm)
+    rw [if_pos hca, if_neg hda, sub_zero, mul_one] at ka
+    have hcb : c ≠ b := fun he => hab (hca.symm.trans he)
+    rw [if_neg hcb, zero_sub, mul_neg] at kb
+    by_cases hdb : d = b
+    · exact Or.inl ⟨hca.symm, hdb.symm, ka⟩
+    · rw [if_neg hdb, mul_zero, neg_zero] at kb
+      exact absurd (neg_eq_zero.mp kb) hs
+  · by_cases hda : d = a
+    · -- Orientation B: `c ≠ a`, `d = a`, and `ka` collapses to `s = −t`.
+      rw [if_neg hca, if_pos hda, zero_sub, mul_neg_one] at ka
+      have hdb : d ≠ b := fun he => hab (hda.symm.trans he)
+      rw [if_neg hdb, sub_zero] at kb
+      by_cases hcb : c = b
+      · exact Or.inr ⟨hda.symm, hcb.symm, ka⟩
+      · rw [if_neg hcb, mul_zero] at kb
+        exact absurd (neg_eq_zero.mp kb) hs
+    · -- Neither: `ka` forces `s = 0`, contradiction.
+      rw [if_neg hca, if_neg hda, sub_zero, mul_zero] at ka
+      exact absurd ka hs
+
 open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
 /-- **Peterfalvi (12.4), pin (a)** (coherence): for constituents `φ₁, φ₂ ∈ S(χ)`, the Dade image
 `(φ₁ − φ₂)^τ` lies in `ℤ[R(χ)]`.  By (1.4) the four-element set `{φ₁, φ₂, φ̄₁, φ̄₂}` is coherent, so

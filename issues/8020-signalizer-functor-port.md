@@ -458,3 +458,38 @@ orbit[|M^G|=[G:M]]) を `bgTheoremE_cover_data` まで積み上げる。formulat
 裁量 (R を structure-derived にする: theoremE hyp 強化 or 内部 obtain or 14.5c 切り出し)。**(B) の cross-lane
 refactor (card_LF partition-only 化) は採らない** — spine unblock の最短化は目的でない。lane d は (A) を淡々と
 上流から埋める。
+
+## ✅✅ 重大発見 (lane d, 2026-06-29 /loop¹⁶): **14.5(c) cardinality は既に DONE** — frontier は bgTheoremE_cover_data
+
+前 checkpoint (cont.¹⁵ + HUB 裁定) は「残 = (A) 14.5c/theoremE assembly」と書いたが **stale**。frontier 全 survey で判明:
+
+**14.5(c) cardinality は完成済み** = `sigmaConjugacySaturation_Mtilde_ncard` (S14:5342、commit `b9a7031b`
+"14.5(c) COMPLETE"、**sorry-free + axiom-clean + AxiomsCheck 登録**):
+`(conjClassSet (Mtilde hG D M)).ncard = (Nat.card ↥(Msigma M) - 1) * M.index`。
+HUB 要請の「cover identity + trivIset[14.5a] + double-count[exchange_big] + orbit[|M^G|=[G:M]]」は **全部 S14 に landed**:
+- `conjClassSet_Mtilde_eq_biUnion` (5308): cover identity 𝒞_G(M̃)=⋃ₓ x·R(x)、`Rsub_conj` 同変性経由。
+- `sigmaSaturation_Rsub_count` (5153): double-count ∑|R(x)|=|M_σ#|·[G:M] (exchange_big + |R(x)|=|𝓜_σ(x)|)。
+- `Mtilde_disjoint`/`xRsub_disjoint` (14.5a) + `Rsub_ncard_eq` + `normalizer_eq_self_of_mem_maximalSubgroups` (orbit)。
+
+⟹ **HUB が (A) で要請した genuine 上流 (14.5c content) は既に完遂**。`theoremE_sigma_partition_and_counting`
+(S16:1707, sorry) は **consumer 0** (grep 確認) — abstract R/RData 形で design finding の通り cardinality が
+出ない intermediate。CLAUDE.md ラッパー方針より **深追い不要**。
+
+### 真の FT-path frontier = `bgTheoremE_cover_data` (Pf 8.17, S10_MinimalSimpleStructure:570, sorry)
+
+consumer = card_LF_coprime_pq (S15:453, primeFactors_disjoint) + S14_MaximalI:1368/2003 (primeFactors_cover
+/reps/tau/typed + covering)。`BGTheoremECoverData` struct 全 field + covering 析取を構成する必要。残作業:
+
+1. **(8.10)/(8.11) bridge `mainSubgroup M τ = Msigma M`** (linchpin): Pf 04.10:123 が明記 —
+   「M_s は [BG] の M_σ」(BG Prop 16.1)。`mainSubgroup` (= M_F[I/II/V] / M'[III/IV]、(8.10)) = M_σ。
+   per-type 証明: type-P2 は既存 (`maxNilpotentNormalHall_derivedInG_eq_Msigma_of_isTypeP2` S15:9301,
+   `msigma_isNilpotent_of_isTypeP2`)、type I (M_F=M_σ ⟺ M_σ nilpotent, `maxNilpotentNormalHall_eq_Msigma_iff_isNilpotent`
+   S15:231 — 残 `isTypeI → IsNilpotent M_σ`)、III/IV (M'=M_σ)。**5-type assembly、S15/S16 横断**。
+2. **`primeFactors_Msigma_eq_sigma`**: π(M_σ)=σ(M) (M_σ は σ-Hall = `Msigma_isHall`)。prime fields の土台
+   (`sigma_reps_prime_cover` の σ を mainSubgroup の primeFactors へ橋渡し)。← 本 /loop で着手。
+3. **thickenedA1 ↔ conjClassSet Mtilde**: `supportKernel L M X` (Pf 8.14 R(x)) ↔ `Rsub` (§14 FT_signalizer)
+   の identification。thickenedA1_card field 用。
+4. **Cor 14.9 covering** (G# = ⋃ thickenedA1 ∪ [type-P で zTilde]): (8.8) dichotomy。covering 析取。
+5. struct 組立 (reps→indexed via `exists_maximal_conjugacy_reps`、tau via `proposition_type_classification`)。
+
+⟹ multi-session。14.5c (最深 math) DONE ゆえ残は genuine bridge 群 + 組立。次 = (8.10) bridge を上流から。
