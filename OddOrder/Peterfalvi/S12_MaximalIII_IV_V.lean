@@ -6941,6 +6941,39 @@ theorem w2_lt_w1_of_residual_not_orthogonal [Finite G]
   · exact hgt
 
 open scoped FiniteInduce in
+/-- **Coherence of an equal-degree subfamily of `S`** (Peterfalvi (5.7)/(1.4) for §11): an injective
+family `χ : Fin n → Irr(M)` (`n ≥ 2`) of irreducible characters, each a member of
+`S = inducedFamily M` and all of the *same degree*, is coherent for the §10 Dade isometry `τ`.
+
+This is the (11.8) materialization bridge.  Every input of the equal-degree coherence producer
+`coherentEqualDegree_fromDade` is discharged from the §10 `Hypothesis` data with no opaque field:
+* the `(5.1)` base map is `τ = dadeIntegralCharacterMap hyp.dadeData.dade …` (definitionally `hyp.tau`);
+* the support is `A₀(M) = supportInSubgroup (typePA0 M) M` (definitionally `hyp.A0`);
+* the signed-difference supports `(χⱼ − χ₀).support ⊆ A₀(M)` are `inducedFamily_sub_support` (the
+  members share a degree, so each difference vanishes off `M'^#`);
+* `1 ∉ A₀(M)` is `S04.Hypothesis.ne_one` (`A₀ ⊆ G^#`).
+
+Applied to the degree-`w₁` subfamily `S(HC)` (the `(u−1)/q ≥ 2` degree-`q = w₁` constituents of the
+`(U/C) ⋊ W₁` Frobenius), it gives the `S₁ = S(HC)` coherence `τ₁` the (11.8) contradiction consumes;
+the remaining content is enumerating `S(HC)` as such a family. -/
+noncomputable def Hypothesis.inducedFamily_isCoherent_of_equalDegreeFamily [Finite G]
+    {M : Subgroup G}
+    (hyp : Hypothesis M) {n : ℕ} [NeZero n] (hn : 2 ≤ n) (χ : Fin n → IrreducibleCharacter (↥M))
+    (hχinj : Function.Injective χ)
+    (hmem : ∀ j, (χ j : ClassFunction ↥M ℂ) ∈ inducedFamily M)
+    (hdeg : ∀ j, ((χ j : ClassFunction ↥M ℂ) : ↥M → ℂ) 1
+      = ((χ 0 : ClassFunction ↥M ℂ) : ↥M → ℂ) 1) :
+    OddOrder.Peterfalvi.S07.IsCoherent hyp.tau
+      (Set.range (fun j => (χ j : ClassFunction ↥M ℂ))) hyp.A0 := by
+  haveI := hyp.finiteG
+  have h1notA : (1 : G) ∉ typePA0 M hyp.typeP := fun h => hyp.dadeData.dade.ne_one h rfl
+  have hsuppdiff : ∀ j, (irreducibleCharacterDifference χ j).support ⊆
+      OddOrder.Peterfalvi.S04.supportInSubgroup (typePA0 M hyp.typeP) M := fun j =>
+    hyp.inducedFamily_sub_support (hmem j) (hmem 0) (hdeg j)
+  exact OddOrder.Peterfalvi.S07.coherentEqualDegree_fromDade hyp.dadeData.dade hyp.hconj hn χ
+    hχinj hdeg hsuppdiff h1notA
+
+open scoped FiniteInduce in
 /-- **Peterfalvi (11.8), the genuine non-orthogonality** (lane-b W3 obligation, issue 2020).
 
 Under Hypothesis (10.1), there is an irreducible `ζ ∈ S = inducedFamily M` of degree `w₁` —
