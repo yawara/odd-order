@@ -6905,3 +6905,10 @@ but transitively gated on (12.16)/lane β, hence not registered here.)  Axiom-cl
 Lagrange.  The reusable bridge turning each (14.11.4) orbit `(W#)^G`/`(P#)^G`/`(Q#)^G` into a
 `1/|N_G(·)|`-term.  Axiom-clean. -/
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S16.orbit_normSq_term
+
+/-! **Peterfalvi (14.11.4) `W`-orbit TI core** (`S16_NonExistenceG`, lane γ/POLE-2).
+`isTISubset_sdiff_sup_of_normalizer_eq`: the exceptional set `W − (W₁ ∪ W₂)` of a cyclic
+`W = W₁ × W₂` is a TI-subset with normalizer-bound `W`, given the singleton/subset normalizer fact
+`N_G(X) = W` — generalising `S12.typePData_V_ti` to the abstract `W`/`W₁`/`W₂` + `hnorm` inputs.
+The `W`-orbit TI input to the (14.11.4) §8 TI-count.  Axiom-clean. -/
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S16.isTISubset_sdiff_sup_of_normalizer_eq
