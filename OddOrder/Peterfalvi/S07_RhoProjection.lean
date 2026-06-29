@@ -5,6 +5,7 @@ Authors: Yawara Ishida
 -/
 import OddOrder.Peterfalvi.S04_DadeIsometry
 import OddOrder.GroupTheory.RepresentationTheory.ClassFunction
+import OddOrder.GroupTheory.RepresentationTheory.ZIrrFourier
 
 /-!
 # Peterfalvi §7: the `ρ` projection (Hypothesis (7.1))
@@ -253,5 +254,33 @@ theorem rho_adjoint (hconj : hyp.HConjInvariant)
     (fun a => by
       rw [rhoClassFun_apply_mem hyp hconj χ a.2]
       exact rhoValue_eq_adjointAverageFun hyp χ a.2)
+
+/-- **Peterfalvi (7.2.b)**: `‖χ^ρ‖² ≤ ‖χ‖²` — the `ρ` projection is norm-decreasing.
+
+`π := τ(χ^ρ)` is the orthogonal projection of `χ` onto the image of the Dade isometry: by the
+adjunction (`rho_adjoint`) and isometry (`isDadeIsometry_of_isDadeMap`), `⟨π, χ⟩ = ⟨π, π⟩ = ‖χ^ρ‖²`,
+so the residual `χ - π` is orthogonal to `π`.  Pythagoras then gives
+`‖χ‖² = ‖χ - π‖² + ‖χ^ρ‖² ≥ ‖χ^ρ‖²`. -/
+theorem rho_normSq_le (hconj : hyp.HConjInvariant) (χ : ClassFunction G ℂ) :
+    (ClassFunction.inner (rhoClassFun hyp hconj χ) (rhoClassFun hyp hconj χ)).re
+      ≤ (ClassFunction.inner χ χ).re := by
+  set r : ClassFunction L ℂ := rhoClassFun hyp hconj χ with hr
+  set π : ClassFunction G ℂ := hyp.dadeMap (rho hyp hconj χ) with hπ
+  have hadj : ClassFunction.inner π χ = ClassFunction.inner r r := by
+    rw [hπ]; exact rho_adjoint hyp hconj (rho hyp hconj χ) χ
+  have hiso : ClassFunction.inner π π = ClassFunction.inner r r := by
+    rw [hπ]
+    exact (S04.isDadeIsometry_of_isDadeMap hyp hyp.dadeMap hyp.isDadeMap_dadeMap hconj).inner_eq
+      (rho hyp hconj χ) (rho hyp hconj χ)
+  have hχπ : ClassFunction.inner χ π = ClassFunction.inner r r := by
+    rw [inner_conj_symm π χ, hadj, inner_self_eq_realCast r]
+    simp [Complex.conj_ofReal]
+  have hpyth : ClassFunction.inner χ χ
+      = ClassFunction.inner (χ - π) (χ - π) + ClassFunction.inner r r := by
+    rw [ClassFunction.inner_sub_left, ClassFunction.inner_sub_right, ClassFunction.inner_sub_right,
+      hχπ, hadj, hiso]
+    ring
+  rw [hpyth, Complex.add_re]
+  linarith [inner_self_re_nonneg (χ - π)]
 
 end OddOrder.Peterfalvi.S07
