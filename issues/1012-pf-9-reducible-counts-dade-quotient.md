@@ -112,10 +112,12 @@ X/H₀ の文字と同一視」((1.6)) で商で作業。⟹ §9 reducible-count
         general): `induceTerm H (compHom (f.subgroupMap H) χ̄) x g = induceTerm (H.map f) χ̄ (f x) (f g)`
         for `ker f≤H`。条件同値 = `Subgroup.comap_map_eq_self hker` + mem_comap; 値一致 = subgroupMap
         coe defeq `f(x⁻¹gx)` + map_mul/map_inv。
-     2. **fiberwise sum**: `Σ_{x∈G} induceTerm H (...) x g = Σ_{x∈G} induceTerm (H.map f) χ̄ (f x) (fg)`
-        (term eq) `= |N|·Σ_{x̄∈Q} induceTerm (H.map f) χ̄ x̄ (fg)` (term は f x のみ依存 ⟹ fiberwise、
-        各 fiber size=|N| = `QuotientGroup.card_preimage_mk`)。Finset.sum_fiberwise 系。
-     3. **normalize**: `induce H θ = |H|⁻¹·Σ`、|H|=|N|·|H.map f| (ker≤H、first-iso) ⟹ |H|⁻¹·|N|=|H.map f|⁻¹。
+     2. ✅ **DONE (2026-06-29)**: fiberwise sum = **`sum_comp_mk'_eq`** (S11、axiom-clean、general):
+        `Σ_{x:Γ} g(mk' N x) = |N| • Σ_q g q` (`sum_fiberwise_of_maps_to` + 各 fiber const + fiber card
+        = **`card_fiber_mk'_eq`** : fiber ≃ N via x↦x₀⁻¹x)。⚠ `(g:=)` named arg は Fintype M 誤 synth →
+        minimal invocation で解決。
+     3. **normalize (残)**: `induce H θ = |H|⁻¹·Σ`、|H|=|N|·|H.map f| (ker≤H、first-iso) ⟹
+        |H|⁻¹·|N|=|H.map f|⁻¹。+ term eq + sum_comp で commute 全体 assemble。次反復。
      ⟹ `induce H (inflate χ̄) g = compHom f (induce (H.map f) χ̄) g`。inflation 既約保存
      (`compHom_of_surjective` + 逆) で reducibility 両向き。
    - **reducibility 対応**: φ=Ind χ reducible (M-char) ⟺ Ind^L_K̄ χ̄ reducible (M/H₀-char) (inflation

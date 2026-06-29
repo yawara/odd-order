@@ -2327,6 +2327,35 @@ theorem induceTerm_compHom_subgroupMap {Γ Q : Type*} [Group Γ] [Group Q]
   · rw [ClassFunction.induceTerm_of_not_mem _ hx,
       ClassFunction.induceTerm_of_not_mem _ (fun h => hx (hmem.mp h))]
 
+/-- **The fiber of `mk' N` over `q` is equinumerous to `N`** (`x ↦ x₀⁻¹ x` for a representative
+`x₀`).  Used for the `|N|`-fold fiberwise sum in the (8.4.d) induction-inflation commute. -/
+theorem card_fiber_mk'_eq {Γ : Type*} [Group Γ] {N : Subgroup Γ} [N.Normal] (q : Γ ⧸ N) :
+    Nat.card {x : Γ // QuotientGroup.mk' N x = q} = Nat.card ↥N := by
+  obtain ⟨x₀, rfl⟩ := QuotientGroup.mk'_surjective N q
+  refine Nat.card_congr ⟨fun p => ⟨x₀⁻¹ * (p : Γ), QuotientGroup.eq.mp p.2.symm⟩,
+    fun n => ⟨x₀ * (n : Γ), ?_⟩, ?_, ?_⟩
+  · refine QuotientGroup.eq.mpr ?_
+    have he : (x₀ * (n : Γ))⁻¹ * x₀ = ((n : Γ))⁻¹ := by group
+    rw [he]; exact inv_mem n.2
+  · intro p; ext; show x₀ * (x₀⁻¹ * (p : Γ)) = (p : Γ); group
+  · intro n; ext; show x₀⁻¹ * (x₀ * (n : Γ)) = (n : Γ); group
+
+/-- **`|N|`-fold fiberwise sum over a quotient** (general): `∑_{x:Γ} g(x N) = |N| • ∑_{q:Γ/N} g q`.
+Each fiber of `mk' N` has `|N|` elements (`card_fiber_mk'_eq`), and the summand is constant on
+fibers.  This is step 2 of the (8.4.d) induction-inflation commute (issue 1012, B2). -/
+theorem sum_comp_mk'_eq {Γ : Type*} [Group Γ] [Fintype Γ] (N : Subgroup Γ) [N.Normal]
+    [DecidablePred (· ∈ N)] {M : Type*} [AddCommMonoid M] (g : Γ ⧸ N → M) :
+    (∑ x : Γ, g (QuotientGroup.mk' N x)) = Nat.card ↥N • ∑ q : Γ ⧸ N, g q := by
+  classical
+  rw [Finset.smul_sum,
+    ← Finset.sum_fiberwise_of_maps_to (t := (Finset.univ : Finset (Γ ⧸ N)))
+      (fun (x : Γ) (_ : x ∈ Finset.univ) => Finset.mem_univ (QuotientGroup.mk' N x))]
+  refine Finset.sum_congr rfl (fun q _ => ?_)
+  rw [Finset.sum_congr rfl (g := fun _ => g q)
+      (fun x hx => by rw [(Finset.mem_filter.mp hx).2]), Finset.sum_const]
+  congr 1
+  rw [← card_fiber_mk'_eq q, Nat.card_eq_fintype_card, Fintype.card_subtype]
+
 open OddOrder.Peterfalvi.S06 in
 /-- **Peterfalvi (8.4.d): Hypothesis (4.2) holds for `L = M/H₀`.**  The certain-type structural
 hypothesis `S06.Hypothesis (↥M ⧸ H₀)` with `K = M'/H₀`, `W̄₁ = W₁ H₀/H₀`, `W̄₂ = W₂ H₀/H₀`.  Built
