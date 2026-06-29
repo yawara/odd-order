@@ -918,3 +918,23 @@ class-function (equivariance) 性質。
 両向き [g∉A⟹ℓgℓ⁻¹∉A は h⁻¹ で戻す]) → `support⊆supportInSubgroup A L` で `SupportedClassFunctions ℂ A L`
 wrap → map 線形性。**その後**: (7.2.a) `α^{τρ}=α` (Dade value `α^τ(a·x)=α(a)` = (2.10.3) `α_B`-collapse
 経由) → (7.2.b)/(7.3) norm bound (adjoint/projection) → (7.8.b) → (12.16) hB/hC + (7.8) で hA。正本=issue 0081。
+
+### loop³³ — (7.1) ρ の CF(L,A) packaging 完成 ✅ (χ↦χ^ρ が genuine な class-function map)
+
+**`rho : CF(G) → CF(L,A)` 完成** (`S07_RhoProjection.lean`、全 axiom-clean、leaf+full green)。loop³² の
+equivariance (`rhoValue_conjA`) を使い (7.1) を genuine な class-function map として実現:
+- `rhoClassFun hyp hconj χ : ClassFunction L ℂ` = `⟨fun g => if (g:G)∈A then rhoValue ⟨↑g,_⟩ else 0, conj-inv⟩`。
+  conj-inv 証明: A 内は `rhoValue_conjA` (`⟨↑(h·g·h⁻¹),_⟩ = conjA h ⟨↑g,_⟩` を Subtype.ext+conjA_coe で同定)、
+  A 外は `L_normalizes_A` 両向き (g∉A⟹h·g·h⁻¹∉A は h⁻¹ で戻して矛盾)。**dite は `open Classical in` +
+  `dsimp only` で beta 展開してから `dif_pos/neg`** (lambda 適用の未 beta で rw 失敗→dsimp で解消)。
+- `rhoClassFun_apply_mem`/`_apply_not_mem` (@[simp])、`rhoClassFun_support_subset` (support⊆`supportInSubgroup A L`)、
+  `rho` (= `SupportedClassFunctions ℂ A L` wrap、`mem_supportedSubmodule.mpr`)。
+- 線形性 `rhoClassFun_add`/`rhoClassFun_smul` (各 by_cases (g:G)∈A + `rhoValue_add`/`_smul`、ℂ-smul=mul
+  ゆえ neg 枝は `mul_zero`)。**∴ (7.1) ρ projection = value+equivariance+packaging+線形 完成**。
+- AxiomsCheck 登録: `rho`/`rhoClassFun_add`/`rhoClassFun_smul`。
+
+**残 §7 = (7.2)/(7.3) norm theory** (次イテレーション): (7.2.a) `α^{τρ}=α` (α∈CF(L,A) で
+χ^ρ(a)=(1/|H(a)|)Σ α^τ(a·x)=α(a)、要 Dade value `α^τ(a·x)=α(a)` = (2.5)/(2.10.3) `α_B`-collapse の
+S04 API 確認) → (7.2.b) `‖χ^ρ‖²≤‖χ‖²` (adjoint χ^{ρτ}=orthogonal projection、(2.7) Dade adjunction +
+(2.6) isometry) → (7.3) `(1/|G|)Σ_{g∈Aᵗ}|χ(g)|²≥‖χ^ρ‖²` (χ₁=A^τ-restriction、χ₁^ρ=χ^ρ + (7.2.b))。
+これらが (12.16) の hA/hB/hC + h_const/h_psix/h_psig_int を供給。Aᵗ=`hyp.dadeSupport` 既存。正本=issue 0081。

@@ -95,4 +95,83 @@ theorem rhoValue_conjA (hconj : hyp.HConjInvariant) (χ : ClassFunction G ℂ)
   rw [hyp.conjA_coe]
   exact χ.of_isConj (isConj_iff.mpr ⟨(l : G)⁻¹, by group⟩)
 
+open Classical in
+/-- **Peterfalvi (7.1), the `ρ` projection as a class function on `L`.**  Packages the averaged
+value `χ^ρ` (`rhoValue`) into `CF(L)`: it takes the value `χ^ρ(a)` at support points `a ∈ A` and `0`
+elsewhere.  Class-function (conjugation) invariance is `rhoValue_conjA` on `A`, and the
+`L`-invariance of `A` (`L_normalizes_A`, applied to `ℓ` and to `ℓ⁻¹`) off `A`. -/
+noncomputable def rhoClassFun (hconj : hyp.HConjInvariant) (χ : ClassFunction G ℂ) :
+    ClassFunction L ℂ :=
+  ⟨fun g => if hg : (g : G) ∈ A then rhoValue hyp χ ⟨(g : G), hg⟩ else 0, by
+    intro g h
+    dsimp only
+    by_cases hg : (g : G) ∈ A
+    · have hcm : ((h * g * h⁻¹ : L) : G) ∈ A := by
+        have hmem := hyp.L_normalizes_A h hg
+        simpa only [Subgroup.coe_mul, Subgroup.coe_inv] using hmem
+      rw [dif_pos hcm, dif_pos hg]
+      have hconjeq : (⟨((h * g * h⁻¹ : L) : G), hcm⟩ : {a : G // a ∈ A})
+          = hyp.conjA h ⟨(g : G), hg⟩ := by
+        apply Subtype.ext
+        simp only [hyp.conjA_coe, Subgroup.coe_mul, Subgroup.coe_inv]
+      rw [hconjeq]
+      exact rhoValue_conjA hyp hconj χ h ⟨(g : G), hg⟩
+    · have hcnm : ((h * g * h⁻¹ : L) : G) ∉ A := by
+        intro hmem
+        have hback := hyp.L_normalizes_A h⁻¹ hmem
+        have heq : ((h⁻¹ : L) : G) * ((h * g * h⁻¹ : L) : G) * ((h⁻¹ : L) : G)⁻¹ = (g : G) := by
+          simp only [Subgroup.coe_mul, Subgroup.coe_inv]; group
+        rw [heq] at hback
+        exact hg hback
+      rw [dif_neg hcnm, dif_neg hg]⟩
+
+open Classical in
+@[simp] theorem rhoClassFun_apply_mem (hconj : hyp.HConjInvariant) (χ : ClassFunction G ℂ)
+    {g : L} (hg : (g : G) ∈ A) :
+    rhoClassFun hyp hconj χ g = rhoValue hyp χ ⟨(g : G), hg⟩ :=
+  dif_pos hg
+
+open Classical in
+@[simp] theorem rhoClassFun_apply_not_mem (hconj : hyp.HConjInvariant) (χ : ClassFunction G ℂ)
+    {g : L} (hg : (g : G) ∉ A) :
+    rhoClassFun hyp hconj χ g = 0 :=
+  dif_neg hg
+
+/-- The `ρ` projection `χ^ρ` (as a class function on `L`) is supported on `A`. -/
+theorem rhoClassFun_support_subset (hconj : hyp.HConjInvariant) (χ : ClassFunction G ℂ) :
+    (rhoClassFun hyp hconj χ).support ⊆ S04.supportInSubgroup A L := by
+  intro g hg
+  rw [ClassFunction.mem_support] at hg
+  rw [S04.mem_supportInSubgroup]
+  by_contra hgA
+  exact hg (rhoClassFun_apply_not_mem hyp hconj χ hgA)
+
+/-- **Peterfalvi (7.1), the `ρ` projection `χ ↦ χ^ρ` as an element of `CF(L, A)`.** -/
+noncomputable def rho (hconj : hyp.HConjInvariant) (χ : ClassFunction G ℂ) :
+    S04.SupportedClassFunctions ℂ A L :=
+  ⟨rhoClassFun hyp hconj χ,
+    ClassFunction.mem_supportedSubmodule.mpr (rhoClassFun_support_subset hyp hconj χ)⟩
+
+/-- Additivity of the `ρ` projection (class-function form). -/
+theorem rhoClassFun_add (hconj : hyp.HConjInvariant) (χ ψ : ClassFunction G ℂ) :
+    rhoClassFun hyp hconj (χ + ψ) = rhoClassFun hyp hconj χ + rhoClassFun hyp hconj ψ := by
+  apply ClassFunction.ext
+  intro g
+  by_cases hg : (g : G) ∈ A
+  · rw [ClassFunction.add_apply, rhoClassFun_apply_mem hyp hconj _ hg,
+      rhoClassFun_apply_mem hyp hconj _ hg, rhoClassFun_apply_mem hyp hconj _ hg, rhoValue_add]
+  · rw [ClassFunction.add_apply, rhoClassFun_apply_not_mem hyp hconj _ hg,
+      rhoClassFun_apply_not_mem hyp hconj _ hg, rhoClassFun_apply_not_mem hyp hconj _ hg, add_zero]
+
+/-- Homogeneity of the `ρ` projection (class-function form). -/
+theorem rhoClassFun_smul (hconj : hyp.HConjInvariant) (c : ℂ) (χ : ClassFunction G ℂ) :
+    rhoClassFun hyp hconj (c • χ) = c • rhoClassFun hyp hconj χ := by
+  apply ClassFunction.ext
+  intro g
+  by_cases hg : (g : G) ∈ A
+  · rw [ClassFunction.smul_apply, rhoClassFun_apply_mem hyp hconj _ hg,
+      rhoClassFun_apply_mem hyp hconj _ hg, rhoValue_smul]
+  · rw [ClassFunction.smul_apply, rhoClassFun_apply_not_mem hyp hconj _ hg,
+      rhoClassFun_apply_not_mem hyp hconj _ hg, mul_zero]
+
 end OddOrder.Peterfalvi.S07

@@ -6879,3 +6879,11 @@ class-function (equivariance) property of `ρ`, the input for packaging `χ^ρ �
 `(2.4.a)` (`HConjInvariant`, `H(ℓ·a·ℓ⁻¹) = ℓ·H(a)·ℓ⁻¹`) reindexing the average through the bijection
 `y ↦ ℓ⁻¹·y·ℓ` plus `χ`'s class-function property.  Axiom-clean. -/
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S07.rhoValue_conjA
+
+/-! **Peterfalvi (7.1) `ρ`-projection as a class-function map `CF(G) → CF(L,A)`** (`S07_RhoProjection`;
+lane β).  `rho` packages `χ^ρ` (value `rhoValue`, equivariant by `rhoValue_conjA`) into `CF(L,A)`:
+the class function on `L` taking `χ^ρ(a)` on `A` and `0` off `A`, with support `⊆ A`.
+`rhoClassFun_add`/`rhoClassFun_smul` are its `ℂ`-linearity.  All axiom-clean. -/
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S07.rho
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S07.rhoClassFun_add
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S07.rhoClassFun_smul
