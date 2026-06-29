@@ -1499,6 +1499,16 @@ theorem huSub_eq_derivedInG_subgroupOf (data : TypesIIIIIIVSetup M) :
     rw [data.typeP.derivedInG_eq_fitting_sup_U, ← data.typeP.H_eq]; rfl
   rw [huSub, h]
 
+/-- **`HU ◁ M`**: `HU = H ⊔ U = M' = [M,M]` is the derived subgroup realised inside `↥M`, hence
+normal.  This is the `H ⊴ G` hypothesis letting the §9 induction `induceHU = Ind_{HU}^M` use the
+Clifford fibre/orbit machinery (`induce_eq_induce_iff_conj`: distinct `M`-conjugacy orbits ↔ distinct
+inductions) for the `𝒳 ↔ 𝒮` count of Peterfalvi (9.5)/(9.9). -/
+instance huSub_normal (data : TypesIIIIIIVSetup M) : (huSub data).Normal := by
+  rw [huSub_eq_derivedInG_subgroupOf, show (derivedInG M).subgroupOf M = commutator ↥M by
+    rw [derivedInG, Subgroup.subgroupOf,
+      Subgroup.comap_map_eq_self_of_injective M.subtype_injective]]
+  infer_instance
+
 /-- `H`, realised as a subgroup of `HU = H ⊔ U` inside `↥M`.  Used to state the kernel condition
 `H ⊄ Ker χ` defining `𝒳`. -/
 def hInHu (data : TypesIIIIIIVSetup M) : Subgroup ↥(huSub data) :=

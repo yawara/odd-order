@@ -175,6 +175,21 @@ X/H₀ の文字と同一視」((1.6)) で商で作業。⟹ §9 reducible-count
      --(inflate iso + huSub⧸N_huSub≅K̄ transport)--> `{χ̄∈Irr(K̄)|¬irr(induce K̄ χ̄)∧H̄⊄Ker χ̄}` --(§6 count)--> |W̄₂|-1
      --(|W̄₂|=p)--> p-1。各 step に transport/instance friction。**実質 multi-iteration sub-phase**
      (§6+B1+B2 crux の hard math は完了、残は intricate Lean glue + injectivity prereq)。
+
+   **✅✅ 2026-06-29 知見 (cont.¹⁸): assembly 大幅 de-risk — 鍵 tool 既存 (Pf (6.2) 流用)**:
+   Coq `PFsection9.v` 併読 (ResIndXmu @ L1064: `Res_{HU}('Ind χ_s)=q·χ_s` via `cfclass_inertia big_seq1`
+   = inertia singleton、injectivity @ L1068 = `congr1 'Res` + scalerK) で proof strategy 確定。**さらに
+   repo に鍵 tool が既存**:
+   - **`induce_eq_induce_iff_conj`** (`InducedIrreducible.lean:200`): `induce H θ = induce H ψ ↔ ∃g, conjBy g θ = ψ`
+     (H◁G、Pf (6.2) step-4a の fibre 記述)。⟹ **inertia-stable θ (conjBy g θ=θ ∀g) では fibre singleton
+     ⟹ induceHU 単射** = near-cite (orbit/injectivity prereq は新規大物でなく既存 machinery の適用)。
+   - `card_smul_restrict_induce` (Mackey `|H|•Res(Ind θ)=∑_x conjBy x⁻¹ θ`)、`card_conjByOrbit_eq_index_inertia`
+     (orbit size=inertia index)、`card_mul_inner_self_induce_eq_card_inertia` も既存。
+   - **`huSub_normal` instance landed** (commit `<this>`): HU=M'◁M ⟹ induce_eq_induce_iff_conj 適用可。
+   - §6 stability machinery (`conjByPerm`/`conjByMulEquiv` @ S06_CertainTypeClifford) 既存。
+   ⟹ **assembly は cont.¹⁷ の悲観評価より tractable**。残 content = reducible⟹inertia-stable (§6 certain-type
+   から、reducible μ_j は W̄₁-stable=I_L(χ̄)=L) + induce_eq_induce_iff_conj 適用 + inflate iso + |W̄₂|=p。
+   次着手 = reducible⟹stable lemma or inflate iso (どちらも既存 tool 上)。
    - **reducibility 対応**: φ=Ind χ reducible (M-char) ⟺ Ind^L_K̄ χ̄ reducible (M/H₀-char) (inflation
      既約保存の両向き)。`{φ∈𝒮(H₀)|¬irr}` ↔ `{χ̄∈Irr(K̄)|¬irr(Ind χ̄)∧H̄⊄Ker}` の ncard bijection。
 4. **B3**: (a) **|W̄₂|=p** (`Nat.card ((W₂.subgroupOf M).map mk') = chief.p`、`|fixedByE|=p` の
