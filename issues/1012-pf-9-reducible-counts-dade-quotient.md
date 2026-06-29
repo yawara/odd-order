@@ -116,8 +116,13 @@ X/H₀ の文字と同一視」((1.6)) で商で作業。⟹ §9 reducible-count
         `Σ_{x:Γ} g(mk' N x) = |N| • Σ_q g q` (`sum_fiberwise_of_maps_to` + 各 fiber const + fiber card
         = **`card_fiber_mk'_eq`** : fiber ≃ N via x↦x₀⁻¹x)。⚠ `(g:=)` named arg は Fintype M 誤 synth →
         minimal invocation で解決。
-     3. **normalize (残)**: `induce H θ = |H|⁻¹·Σ`、|H|=|N|·|H.map f| (ker≤H、first-iso) ⟹
-        |H|⁻¹·|N|=|H.map f|⁻¹。+ term eq + sum_comp で commute 全体 assemble。次反復。
+     3. ✅ **DONE (2026-06-29)**: normalize = **`card_eq_card_subgroup_mul_card_map_mk'`**
+        (|H|=|N|·|H.map(mk' N)|、first-iso `quotientKerEquivRange`)。
+     ✅✅ **commute 全体 DONE = `induce_compHom_subgroupMap_mk'`** (S11、axiom-clean): `f=mk' N` 版
+     `induce H (compHom ((mk' N).subgroupMap H) χ̄) = compHom (mk' N) (induce (H.map (mk' N)) χ̄)`。
+     term eq + sum_comp + normalize で |N| 相殺 (ℂ: `invOf_eq_inv`+`mul_inv`+`inv_mul_cancel₀`)。
+     **⟹ B2 最難所 (induction-inflation commute) 完成**。残 B2 = inflation bijection 𝒳(H₀)↔{χ̄|H̄⊄Ker} +
+     reducibility 対応 (commute で φ=inflate(Ind χ̄) ⟹ inflation 既約保存で両向き)。次反復。
      ⟹ `induce H (inflate χ̄) g = compHom f (induce (H.map f) χ̄) g`。inflation 既約保存
      (`compHom_of_surjective` + 逆) で reducibility 両向き。
    - **reducibility 対応**: φ=Ind χ reducible (M-char) ⟺ Ind^L_K̄ χ̄ reducible (M/H₀-char) (inflation

@@ -2356,6 +2356,58 @@ theorem sum_comp_mk'_eq {Γ : Type*} [Group Γ] [Fintype Γ] (N : Subgroup Γ) [
   congr 1
   rw [← card_fiber_mk'_eq q, Nat.card_eq_fintype_card, Fintype.card_subtype]
 
+/-- **`|H| = |N| · |H/N|`** (`N ◁ Γ`, `N ≤ H`): the image `H.map (mk' N)` of `H` in `Γ/N` has order
+`|H|/|N|`, since the restriction `mk' N |_H : ↥H → ↥(H.map (mk' N))` has kernel `N` and is onto
+(Noether's first isomorphism, `quotientKerEquivRange`).  The `|H|⁻¹·|N| = |H/N|⁻¹` normalization
+(step 3) of the (8.4.d) induction-inflation commute (issue 1012, B2). -/
+theorem card_eq_card_subgroup_mul_card_map_mk' {Γ : Type*} [Group Γ] [Fintype Γ]
+    {N H : Subgroup Γ} [N.Normal] (hNH : N ≤ H) :
+    Nat.card ↥H = Nat.card ↥N * Nat.card ↥(H.map (QuotientGroup.mk' N)) := by
+  set φ := (QuotientGroup.mk' N).comp H.subtype with hφ
+  have hrange : φ.range = H.map (QuotientGroup.mk' N) := by
+    rw [hφ, MonoidHom.range_comp, Subgroup.range_subtype]
+  have hker : φ.ker = N.subgroupOf H := by
+    ext h
+    rw [MonoidHom.mem_ker, Subgroup.mem_subgroupOf]
+    exact QuotientGroup.eq_one_iff (h : Γ)
+  rw [Subgroup.card_eq_card_quotient_mul_card_subgroup φ.ker,
+    Nat.card_congr (QuotientGroup.quotientKerEquivRange φ).toEquiv, hrange, hker,
+    Nat.card_congr (Subgroup.subgroupOfEquivOfLe hNH).toEquiv, mul_comm]
+
+/-- **Induction-inflation commute** (B2 crux, for `f = mk' N`): for `N ◁ Γ`, `N ≤ H`, the induced
+character of the inflated `compHom ((mk' N).subgroupMap H) χ̄` on `Γ` equals the inflation
+`compHom (mk' N)` of the induced character of `χ̄` on the image `H.map (mk' N) ⊆ Γ/N`.
+
+Term-by-term equality (`induceTerm_compHom_subgroupMap`), the `|N|`-fold fiberwise sum
+(`sum_comp_mk'_eq`), and the `|H| = |N|·|H/N|` normalization
+(`card_eq_card_subgroup_mul_card_map_mk'`) combine to cancel the `|N|` factor.  This is the
+character-level engine of Peterfalvi's (8.4.d) identification of `𝒮(H₀)` with the `M/H₀`-induction
+family (issue 1012, B2). -/
+theorem induce_compHom_subgroupMap_mk' {Γ : Type*} [Group Γ] [Fintype Γ] (N : Subgroup Γ) [N.Normal]
+    [DecidablePred (· ∈ N)] {H : Subgroup Γ} (hNH : N ≤ H)
+    [Invertible (Nat.card ↥H : ℂ)] [Invertible (Nat.card ↥(H.map (QuotientGroup.mk' N)) : ℂ)]
+    (χbar : ClassFunction ↥(H.map (QuotientGroup.mk' N)) ℂ) :
+    ClassFunction.induce H (ClassFunction.compHom ((QuotientGroup.mk' N).subgroupMap H) χbar)
+      = ClassFunction.compHom (QuotientGroup.mk' N)
+          (ClassFunction.induce (H.map (QuotientGroup.mk' N)) χbar) := by
+  have hker : (QuotientGroup.mk' N).ker ≤ H := by rw [QuotientGroup.ker_mk']; exact hNH
+  haveI : Invertible (Nat.card ↥N : ℂ) :=
+    invertibleOfNonzero (Nat.cast_ne_zero.mpr Nat.card_pos.ne')
+  have hnorm : (Nat.card ↥H : ℂ)
+      = (Nat.card ↥N : ℂ) * (Nat.card ↥(H.map (QuotientGroup.mk' N)) : ℂ) := by
+    rw [← Nat.cast_mul, card_eq_card_subgroup_mul_card_map_mk' hNH]
+  have hkey : ⅟(Nat.card ↥H : ℂ) * (Nat.card ↥N : ℂ)
+      = ⅟(Nat.card ↥(H.map (QuotientGroup.mk' N)) : ℂ) := by
+    rw [invOf_eq_inv, invOf_eq_inv, hnorm, mul_inv, mul_comm ((Nat.card ↥N : ℂ)⁻¹), mul_assoc,
+      inv_mul_cancel₀ (Nat.cast_ne_zero.mpr Nat.card_pos.ne'), mul_one]
+  apply ClassFunction.ext
+  intro g
+  rw [ClassFunction.compHom_apply, ClassFunction.induce_apply, ClassFunction.induce_apply,
+    Finset.sum_congr rfl (fun x _ =>
+      induceTerm_compHom_subgroupMap (QuotientGroup.mk' N) hker χbar x g),
+    sum_comp_mk'_eq N (fun x' => ClassFunction.induceTerm (H.map (QuotientGroup.mk' N)) χbar x'
+      (QuotientGroup.mk' N g)), nsmul_eq_mul, ← mul_assoc, hkey]
+
 open OddOrder.Peterfalvi.S06 in
 /-- **Peterfalvi (8.4.d): Hypothesis (4.2) holds for `L = M/H₀`.**  The certain-type structural
 hypothesis `S06.Hypothesis (↥M ⧸ H₀)` with `K = M'/H₀`, `W̄₁ = W₁ H₀/H₀`, `W̄₂ = W₂ H₀/H₀`.  Built
