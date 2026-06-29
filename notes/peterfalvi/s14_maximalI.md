@@ -695,3 +695,35 @@ mul_assoc]` で正規化 (rw [he] は coercion form 不一致); supportKernel �
 **残 §12 frontier (次イテレーション以降)**: (12.4) §8 obligation discharge (cross-lane §8/§10) /
 (12.5) ρ-blocked (§7 ρ machinery) / (12.3) §10 support / (12.6) sibleyTarget / (12.10)-(12.16) /
 (12.2.a) §8 Clifford。(12.4) は完了ゆえ次は document 順で (12.5) or §8 obligation 評価。
+
+## 2026-06-29 (lane-b=β loop¹⁷): (12.4) 完成後の §12 frontier 再評価 — 残は deep §1/§7 prerequisites
+
+**(12.4) 完成** (pin a✅ + pin b✅, loop¹²-¹⁶)。残 §12 sorry を survey、frontier は deep
+foundational prerequisites に移行 (tractable な §12 char-coherence 核は完了):
+
+| sorry | 内容 | 種別 |
+|---|---|---|
+| L855 `constituent_diff_support_subset_nonescaping` | pin b の §8 support obligation | cross-lane §8/§10 |
+| L244 `typeI_induced_char_constituents` | (12.2.a) §8 type-F Clifford | cross-lane §8 |
+| L348 `nonconjugate_diffImage_inner_zero` | (12.3) §10 support 不交差 | cross-lane §10 |
+| L1241 `rho_constant_on_H_minus_Hprime` | (12.5) **§7 ρ machinery 要** (statement unfaithful) | deep §7 build |
+| L1265 `sibleyTarget_frobI` | (12.6) Sibley target 構成 | gated on (6.8) [done?] |
+| L1999-2283 (12.10)-(12.12) | structural | §8-gated (旧 lane-h) |
+| L2307-2323 (12.13)-(12.16) | Dade calc + 最終矛盾 | **(12.16)=lane-b keystone**, 要 (12.5)/(1.10) |
+
+**(12.16) `counterexample_contradiction` (lane-b keystone) の binding prerequisites** (04.14:101 精読):
+(12.9)g + (1.10.a/b) p-進 congruence + (12.12) 2e≤p+1 + (12.14)/(12.15) + (7.3)/(7.8) norm bounds。
+
+**次の最有力 target = (1.10) cyclotomic-integer congruence** (04.3:129、repo 不在、lane b 12.16 +
+lane c S15/§13 両用 = 高 reuse):
+- **(1.10.a)**: x order p, xy=yx, χ virtual char ⟹ `χ(xy)≡χ(y) (mod 1−ε)` in ℤ[η]。
+  証明 = Res_⟨x,y⟩ χ の irreducible α は abelian ゆえ degree 1、α(x)=ε^k、α(xy)−α(y)=(ε^k−1)α(y)、
+  (1−ε)∣(ε^k−1)。要: char 値 ↔ ℤ[η] bridge (ClassFunction 値は ℂ、ℤ[η]⊆ℂ への connection)。
+- **(1.10.b)**: n∈ℤ, (1−ε)∣n in ℤ[η] ⟹ p∣n。証明 = N(1−ε)=p^k (mathlib `norm_sub_one_of_prime_ne_two`
+  系)、(1−ε)∣n ⟹ N(1−ε)∣N(n)=n^d ⟹ p∣n。要: ℚ(η)/ℚ norm machinery (mathlib Cyclotomic.PrimitiveRoots)。
+- **設計課題**: 抽象 ring R + IsPrimitiveRoot ε p で phrase か、ℤ[η]⊆ℂ 具体か。char 値の ℤ[η] 所属が
+  bridge。**新 leaf** (e.g. `RepresentationTheory/CyclotomicCharacterCongruence.lean`) で cross-lane 衝突回避。
+- mathlib 在庫: `Mathlib/NumberTheory/Cyclotomic/PrimitiveRoots.lean` (norm_sub_one 系)、IsPrimitiveRoot。
+
+substantial multi-iteration §1 build。次イテレーションで (1.10.b) [純代数、char 不要] から着手。
+[[feedback-no-avoiding-hard-parts]]
