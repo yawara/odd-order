@@ -6925,6 +6925,14 @@ projection is norm-decreasing.  `π = τ(χ^ρ)` is the orthogonal projection of
 `π`, and Pythagoras gives `‖χ‖² = ‖χ − π‖² + ‖χ^ρ‖² ≥ ‖χ^ρ‖²` (`inner_self_re_nonneg`).  Axiom-clean. -/
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S07.rho_normSq_le
 
+/-! **Peterfalvi (14.11.4) §8 support identity `A(M) = K#`** (`S16_NonExistenceG`, lane γ/POLE-2).
+For a Frobenius group `M` with kernel `N`, the centralizer-support `centralizerSupport N# M` is
+exactly `N#`: forward by the Frobenius FPF property `centralizer_kernel_le` (`C_M(x) ≤ N` for
+`x ∈ N#`), reverse by `x = y`.  Applied with `N = K = M_F` this is `typeIA M = K#`, the §8
+cardinality input `|A(M)| = k − 1` of (14.11.4) (Coq `PFsection14` `Dade_cover_inequality`
+`#|A| = k.-1`).  Axiom-clean. -/
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S16.centralizerSupport_sharpSubgroup_eq_of_frobenius
+
 /-! **Peterfalvi (7.3) `‖χ^ρ‖² ≤ (1/|G|) ∑_{g∈Aᵗ} |χ(g)|²`** (`S07_RhoProjection`; lane β).
 `rho_normSq_le_restrict`: `‖χ^ρ‖² ≤ ‖χ₁‖²` where `χ₁ = restrictDadeSupport χ` is the restriction of
 `χ` to `Aᵗ`, since `χ₁^ρ = χ^ρ` (`rhoClassFun_restrictDadeSupport`, as `χ₁ = χ` on each coset
