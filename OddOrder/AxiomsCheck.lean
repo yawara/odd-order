@@ -5602,6 +5602,7 @@ unconditional, axiom-clean. -/
 #assert_only_allowed_axioms OddOrder.BG.Ch4.S16.sigma_reps_prime_cover
 #assert_only_allowed_axioms OddOrder.BG.Ch4.S16.exists_maximal_conjugacy_reps
 #assert_only_allowed_axioms OddOrder.BG.Ch4.S16.exists_reps_sigma_partition
+#assert_only_allowed_axioms OddOrder.BG.Ch4.S16.primeFactors_Msigma_eq_sigma
 
 /-! **BG Theorem D(1), `M_σ`-fusion control** (`S16_MainResults`, `msigma_fusion_control`): two
 elements of `M_σ` conjugate in `G` are conjugate in `M`.  The one unconditional Theorem-D conjunct,
