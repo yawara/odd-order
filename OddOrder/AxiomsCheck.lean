@@ -751,6 +751,16 @@ set_option linter.style.longLine false in
 -- in (12.4) pin (a) `constituent_diff_tau_mem_span`.
 #assert_only_allowed_axioms
   OddOrder.Peterfalvi.S14.irreducibleCharacter_signed_difference_uniqueness
+-- Pf (12.4) pin (a) piece 3: the underlying irreducibles `μ_φ, ν_φ` of `R₁(φ)` lie in `ℤ[R(χ)]`
+-- (`R₁(φ).imageSet = {ε·μ, −ε·ν} ⊆ R(χ)`, `ε = ±1`).
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S14.R1cdi_muNu_mem_span_Rset
+-- Pf (12.4) pin (a) piece 1 (global (1.4) coherence): the conjugate-closed constituent set is a
+-- single coherent family under the Dade isometry `τ` — uniform sign `ε` + injection `μ` into `Irr G`
+-- with `τ(α−β)=ε·(μ α−μ β)`.  `isometry_difference_pair_structure` on the constant-degree family.
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S14.exists_uniform_image_of_constituents
+-- Pf (12.4) pin (a): `(φ₁−φ₂)^τ ∈ ℤ[R(χ)]` for constituents `φ₁,φ₂ ∈ S(χ)`.  Reconciles the global
+-- (1.4) family with the per-φ blocks `R₁(φ)` via difference-uniqueness.  Genuine; no longer sorried.
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S14.constituent_diff_tau_mem_span
 -- Pf (8.2.b) Frobenius realization for the type-I/F tower step (consumed by (12.10) step 2 /
 -- (12.16) `π = ∅` case): a type-F/I maximal whose complement `U` is a Z-group (all Sylow cyclic)
 -- is Frobenius with kernel `M_F`, via `IsZGroup.exponent_eq_card` + `typeF_frobenius_of_card_eq_exponent`.
