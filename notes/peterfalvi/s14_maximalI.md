@@ -971,3 +971,17 @@ S04 API 確認) → (7.2.b) `‖χ^ρ‖²≤‖χ‖²` (adjoint χ^{ρτ}=orth
 `⟨τ(χ^ρ),χ⟩=‖χ^ρ‖²` + isometry `‖τ(χ^ρ)‖²=‖χ^ρ‖²` (S04 `isDadeIsometry_of_isDadeMap`/`inner_eq`) ⟹
 残差 χ−τ(χ^ρ) が τ(χ^ρ) と直交 ⟹ Pythagoras `‖χ‖²=‖χ−τ(χ^ρ)‖²+‖χ^ρ‖²≥‖χ^ρ‖²`。要 = ClassFunction
 inner-self 正値性 (`∑|φ|²≥0`) + 展開。→ (7.3) → (12.16) hC。
+
+### loop³⁶ — (7.2.b) `‖χ^ρ‖²≤‖χ‖²` 完成 ✅ (ρ は norm-decreasing、Pythagoras 一発)
+
+**(7.2.b) `rho_normSq_le` 完成** (axiom-clean、leaf green、初回ビルド通過)。π=τ(χ^ρ) が χ の im τ 上正射影:
+- adjunction `rho_adjoint` (α=rho χ) ⟹ `⟨π,χ⟩=⟨χ^ρ,χ^ρ⟩` + isometry `S04.isDadeIsometry_of_isDadeMap`
+  ⟹ `⟨π,π⟩=⟨χ^ρ,χ^ρ⟩` ⟹ 残差 χ−π ⟂ π (`⟨χ,π⟩=⟨χ^ρ,χ^ρ⟩` real は `inner_conj_symm`+`inner_self_eq_realCast`)。
+- Pythagoras `⟨χ,χ⟩=⟨χ−π,χ−π⟩+⟨χ^ρ,χ^ρ⟩` (`inner_sub_left/right` bilinearity + ring) → `.re` +
+  `inner_self_re_nonneg (χ−π)` で linarith。
+- **既存 infra 全活用**: `ZIrrFourier` の `inner_conj_symm`/`inner_self_eq_realCast`/`inner_self_re_nonneg`
+  (import 追加) + S04 `isDadeIsometry_of_isDadeMap`。当初懸念した inner-self 正値性は既存。AxiomsCheck 登録。
+
+**残 §7 = (7.3)** (次イテレーション): `(1/|G|)Σ_{g∈Aᵗ}|χ(g)|²≥‖χ^ρ‖²` は χ₁=Aᵗ-restriction
+(Aᵗ=`hyp.dadeSupport`) で χ₁^ρ=χ^ρ + (7.2.b) 適用、`(1/|G|)Σ_{Aᵗ}|χ|²=‖χ₁‖²`。
+→ (7.5) family / (7.8.b) → (12.16) hB/hC。

@@ -6918,3 +6918,17 @@ by citing S04's `adjoint_formula` with `ψ = χ^ρ`; the averaging hypothesis is
 `rhoValue_eq_adjointAverageFun`, bridging the `ρ`-value to S04's `adjointAverageFun`.  Axiom-clean. -/
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S07.rhoValue_eq_adjointAverageFun
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S07.rho_adjoint
+
+/-! **Peterfalvi (7.2.b) `‖χ^ρ‖² ≤ ‖χ‖²`** (`S07_RhoProjection`; lane β).  `rho_normSq_le`: the `ρ`
+projection is norm-decreasing.  `π = τ(χ^ρ)` is the orthogonal projection of `χ` onto `im τ` (via the
+`rho_adjoint` adjunction + `isDadeIsometry_of_isDadeMap`), so the residual `χ − π` is orthogonal to
+`π`, and Pythagoras gives `‖χ‖² = ‖χ − π‖² + ‖χ^ρ‖² ≥ ‖χ^ρ‖²` (`inner_self_re_nonneg`).  Axiom-clean. -/
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S07.rho_normSq_le
+
+/-! **Peterfalvi (14.11.4) §8 support identity `A(M) = K#`** (`S16_NonExistenceG`, lane γ/POLE-2).
+For a Frobenius group `M` with kernel `N`, the centralizer-support `centralizerSupport N# M` is
+exactly `N#`: forward by the Frobenius FPF property `centralizer_kernel_le` (`C_M(x) ≤ N` for
+`x ∈ N#`), reverse by `x = y`.  Applied with `N = K = M_F` this is `typeIA M = K#`, the §8
+cardinality input `|A(M)| = k − 1` of (14.11.4) (Coq `PFsection14` `Dade_cover_inequality`
+`#|A| = k.-1`).  Axiom-clean. -/
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S16.centralizerSupport_sharpSubgroup_eq_of_frobenius

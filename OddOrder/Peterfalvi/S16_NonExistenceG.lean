@@ -2495,19 +2495,51 @@ theorem MHypothesis.rhoNormSq_ge_lower [Finite G] {hyp : Hypothesis (G := G)}
   rw [hci, hko] at key
   exact key
 
+/-- **The type-I Dade support is the kernel sharp** `A(M) = K#`, the §8 cardinality input
+`|A(M)| = |K#| = k − 1` of Peterfalvi (14.11.4) (Coq `PFsection14`: the `Dade_cover_inequality`
+support term `#|A| = k.-1`).  For a Frobenius group `M` with kernel `N` (the complement acts
+fixed-point-freely on `N#`), the centralizer-support
+`centralizerSupport N# M = {y ∈ M : y ≠ 1, ∃ x ∈ N#, [y,x]=1}` is exactly `N#`: the forward
+inclusion is the Frobenius FPF property `centralizer_kernel_le` (`C_M(x) ≤ N` for `x ∈ N#`), the
+reverse takes `x = y`.  Applied with `N = K = M_F`, this is `typeIA M = K#`. -/
+theorem centralizerSupport_sharpSubgroup_eq_of_frobenius [Finite G] {M N : Subgroup G}
+    {C : Subgroup ↥M}
+    (hfrob : OddOrder.Isaacs.Ch06.IsFrobeniusGroup ↥M (N.subgroupOf M) C) (hNM : N ≤ M) :
+    OddOrder.GroupTheory.centralizerSupport (OddOrder.GroupTheory.sharpSubgroup N) M
+      = OddOrder.GroupTheory.sharpSubgroup N := by
+  ext y
+  simp only [OddOrder.GroupTheory.centralizerSupport, OddOrder.GroupTheory.sharpSubgroup,
+    Set.mem_setOf_eq, Set.mem_diff, SetLike.mem_coe, Set.mem_singleton_iff]
+  constructor
+  · rintro ⟨hyM, hy1, x, ⟨hxN, hx1⟩, hyx⟩
+    have hxM : x ∈ M := hNM hxN
+    have hxMsub : (⟨x, hxM⟩ : ↥M) ∈ N.subgroupOf M := (Subgroup.mem_subgroupOf).mpr hxN
+    have hx1' : (⟨x, hxM⟩ : ↥M) ≠ 1 := fun h => hx1 (congrArg Subtype.val h)
+    have hycomm : (⟨y, hyM⟩ : ↥M) ∈ Subgroup.centralizer ({(⟨x, hxM⟩ : ↥M)} : Set ↥M) := by
+      rw [Subgroup.mem_centralizer_singleton_iff] at hyx ⊢
+      exact Subtype.ext hyx
+    have hyN : (⟨y, hyM⟩ : ↥M) ∈ N.subgroupOf M :=
+      hfrob.centralizer_kernel_le _ hxMsub hx1' hycomm
+    exact ⟨(Subgroup.mem_subgroupOf).mp hyN, hy1⟩
+  · rintro ⟨hyN, hy1⟩
+    refine ⟨hNM hyN, hy1, y, ⟨hyN, hy1⟩, ?_⟩
+    rw [Subgroup.mem_centralizer_singleton_iff]
+
 open scoped Classical OddOrder.Peterfalvi.S12.FiniteInduce in
 /-- **Peterfalvi (14.11.4), the upper-bound §8 TI-counting step** (04.16 lines 109–115).  Brings the
 line-83 bound `|A(M)|/|M| + (1/|G|)(|famG₀| − |G₀|)` (the RHS of `chiRhoNormSq_psi_le_line83`,
-proven) up to the displayed `NormCascadeData.upper` bound `1 − 1/p − 1/q + 2/(pq) + 1/(uq) + 1/(vp)`.
+proven) up to the displayed `NormCascadeData.upper` `1 − 1/p − 1/q + 2/(pq) + 1/(uq) + 1/(vp)`.
 
 The genuine §8 content, by the textbook's two stages:
-* **`|A(M)|/|M| = |K#|/|M| = (k−1)/(kpq)`**: the type-I Dade support `A(M) = K#` with `|M| = pqk`;
+* **`|A(M)|/|M| = |K#|/|M| = (k−1)/(kpq)`**: the type-I Dade support `A(M) = K#`
+  (`centralizerSupport_sharpSubgroup_eq_of_frobenius`, **proven** from the Frobenius FPF of `M`)
+  with `|M| = pqk`;
 * **orbit counting** `(1/|G|)(|famG₀| − |G₀|) ≤ (1/|G|)(|(W−(W₁∪W₂))^G| + |(P#)^G| + |(Q#)^G|)`
   (the (14.11.3) exclusions, union bound on `famG₀ ∖ G₀`), with the TI orbit cardinalities
   `|(P#)^G| = (|P|−1)·[G:N_G(P)]`, `|(Q#)^G| = (|Q|−1)·[G:N_G(Q)]` from
   `S14.ncard_conjClassSet_of_isTISubset` (`|𝒞_G(A)| = |A|·[G:L]` for a TI-subset `A`), and the
-  normalizer sizes `[G:N_G(P)] = |G|/(|P|uq)` etc. from the Type-II partner `S = (H ⋊ U) ⋊ W₂`
-  ((8.6.a)/(8.11)/(13.12)).  The raw estimate is then loosened by `normCascade_upper_loosen` (proven).
+  normalizer sizes `[G:N_G(P)] = |G|/(|P|uq)` etc. from the Type-II partner `S` ((8.6.a)/(8.11)/
+  (13.12)).  The raw estimate is then loosened by `normCascade_upper_loosen` (proven).
 
 The single remaining genuine §8 obligation of (14.11.4) — the type-I analogue of the S12 (10.8)
 TI-counting `G₁ ⊆ (H#)^G ∪ V^G`.  The orbit-cardinality tool (`ncard_conjClassSet_of_isTISubset`)
