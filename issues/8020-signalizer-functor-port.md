@@ -493,3 +493,34 @@ consumer = card_LF_coprime_pq (S15:453, primeFactors_disjoint) + S14_MaximalI:13
 5. struct 組立 (reps→indexed via `exists_maximal_conjugacy_reps`、tau via `proposition_type_classification`)。
 
 ⟹ multi-session。14.5c (最深 math) DONE ゆえ残は genuine bridge 群 + 組立。次 = (8.10) bridge を上流から。
+
+## ✅ 進捗 (lane d, 2026-06-29 /loop¹⁷): **(8.10) bridge `mainSubgroup M τ = Msigma M` 完成** (全 5 type)
+
+bgTheoremE_cover_data の linchpin bridge を landed (S16_MainResults、axiom-clean、AxiomsCheck 登録;
+S10_BGInterface は orphaned ゆえ consumer S10_MinimalSimpleStructure が import 済の S16 に配置):
+
+- **`mainSubgroup_eq_Msigma`** (全 type): M の分類 type τ で `mainSubgroup M τ` (= M_F[I/II/V] / M'[III/IV])
+  = `Msigma M`。Prop 16.1 (`proposition_type_classification`) から組立: I/II/V = clause (f)
+  (M_F=M_σ ⟺ τ∈{I,II,V})、III/IV = clause (c) (τ∈{III,IV} ⟹ P1) + `isTypeP1_derivedInG_eq_Msigma`
+  (P1 ⟹ M'=M_σ)。既存 `maxNilpotentNormalHall_eq_Msigma_of_typeI_or_II` (I/II のみ) を全 type に一般化。
+- **`A1_eq_sigmaSharp`** (全 type): `A1 M τ` (= M_s#) = `sigmaSharp M` (= M_σ#)。mainSubgroup_eq_Msigma の系。
+  既存 `A1_eq_sigmaSharp_of_typeI_or_II` を全 type に一般化。covering/thickenedA1 field 用。
+
+⟹ Prop 16.1 が sorry-free + axiom-clean (issue 8015) ゆえ両 bridge も axiom-clean。
+**bgTheoremE_cover_data の prime/cardinality field の主要 bridge が揃った**:
+`primeFactors_Msigma_eq_sigma` (π(M_σ)=σ、/loop¹⁶) + `mainSubgroup_eq_Msigma` (M_s=M_σ) で
+`sigma_reps_prime_cover` (σ-記述) → `BGTheoremECoverData.primeFactors_cover/disjoint` (π(mainSubgroup)) が組める。
+
+**残**: (3) thickenedA1 ↔ conjClassSet Mtilde (`supportKernel` ↔ `Rsub`、cardinality field 用)、
+(4) Cor 14.9 covering ((8.8) dichotomy)、(5) struct 組立 (reps indexed + tau 分類 + 全 field)。次 = struct 組立に
+着手 (prime fields は bridge 揃い済、cardinality/covering は (3)/(4) 待ち)。
+
+## ✅ 進捗 (lane d, 2026-06-29 /loop¹⁸): `exists_peterfalviType` (type 網羅性) landed
+
+`exists_peterfalviType` (S16、axiom-clean、AxiomsCheck 登録): 任意の極大 M は HasPeterfalviType τ M を
+持つ τ∈{I,…,V} が存在。Prop 16.1 を BG 三分 F/P₁/P₂ (網羅) 上で読む: F=I (a)、P₂=II (b)、P₁ は MF=Mσ で
+V (d) else III/IV (c)。`BGTheoremECoverData.tau`/`typed` field 用。
+
+⟹ struct の prime-side bridge + tau 網羅性が全て揃った。残 deep gate = (4) thickenedA1↔Mtilde
+(`supportKernel`[Pf 8.14 R(x)=C_{M_F}(x)] ↔ `Rsub`[BG §14 (N[x])_σ⊓C(x)] の identification、深い)、
+(5) Cor 14.9 covering。次 = struct 組立 (bridgeable field 実証 + (4)(5) を named sorry で isolate)。
