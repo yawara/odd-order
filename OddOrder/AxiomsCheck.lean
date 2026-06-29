@@ -761,6 +761,16 @@ set_option linter.style.longLine false in
 -- Pf (12.4) pin (a): `(φ₁−φ₂)^τ ∈ ℤ[R(χ)]` for constituents `φ₁,φ₂ ∈ S(χ)`.  Reconciles the global
 -- (1.4) family with the per-φ blocks `R₁(φ)` via difference-uniqueness.  Genuine; no longer sorried.
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S14.constituent_diff_tau_mem_span
+-- Pf (12.4) pin (b) step 1: general TI-induction self-value — for a TI subset `A` rel. `L` and an
+-- `A`-supported class function `α`, `Ind_L^G α` agrees with `α` on `A`.  Generalizes the TI-cyclic
+-- `induce_apply_eq_self_of_mem_V` to arbitrary TI subsets (the value-half of "Dade map = Ind").
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S14.induce_apply_eq_self_of_mem_tiSubset
+-- Pf (12.4) pin (b) step 2: for a trivial-stabilizer Dade hypothesis (`∀ a, H(a)=⊥`), induction
+-- `Ind_L^G` IS the Dade map (generalizes `TICyclicHypothesis.isDadeMap_inducedDadeMap`).
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S14.isDadeMap_induce_of_forall_H_eq_bot
+-- Pf (12.4) pin (b) step 3: on functions supported in a trivial-`H` sub-support `A₁ ⊆ A`, the
+-- abstract Dade map of `hyp` equals `Ind_L^G` (restrict to `A₁` + step 2 + `IsDadeMap.unique`).
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S14.dadeMap_eq_induce_of_supported_on_trivial_H
 -- Pf (8.2.b) Frobenius realization for the type-I/F tower step (consumed by (12.10) step 2 /
 -- (12.16) `π = ∅` case): a type-F/I maximal whose complement `U` is a Z-group (all Sylow cyclic)
 -- is Frobenius with kernel `M_F`, via `IsZGroup.exponent_eq_card` + `typeF_frobenius_of_card_eq_exponent`.
