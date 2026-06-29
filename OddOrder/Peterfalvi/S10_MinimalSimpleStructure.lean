@@ -570,6 +570,84 @@ two cases from (8.8). -/
 theorem bgTheoremE_cover_data [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G) :
     ∃ data : BGTheoremECoverData G,
       BGTheoremETypeICovering data ∨ Nonempty (BGTheoremENonTypeICovering data) := by
+  classical
+  haveI : Finite (Subgroup G) :=
+    Finite.of_injective (fun H : Subgroup G => (H : Set G)) SetLike.coe_injective
+  obtain ⟨reps, hrepsMax, hreps⟩ := OddOrder.BG.Ch4.S16.exists_maximal_conjugacy_reps (G := G)
+  haveI : Fintype ↥reps := Fintype.ofFinite _
+  -- Index the representatives by `Fin n`, then `ULift` to the (universe-polymorphic) struct index.
+  let e := Fintype.equivFin (↥reps)
+  -- Peterfalvi type label + classification proof for each representative (exhaustiveness).
+  let tau : ↥reps → PeterfalviType := fun i =>
+    (OddOrder.BG.Ch4.S16.exists_peterfalviType hG (hrepsMax i.1 i.2)).choose
+  have htyped : ∀ i : ↥reps, HasPeterfalviType (tau i) i.1 := fun i =>
+    (OddOrder.BG.Ch4.S16.exists_peterfalviType hG (hrepsMax i.1 i.2)).choose_spec
+  -- Prime-factor bridge: `π(M_s) = σ(M)`, via `M_s = M_σ` (Pf 8.10, `mainSubgroup_eq_Msigma`)
+  -- and `π(M_σ) = σ(M)` (`primeFactors_Msigma_eq_sigma`).
+  have hbridge : ∀ (i : ↥reps) (t : PeterfalviType), HasPeterfalviType t i.1 → ∀ p : ℕ,
+      p ∈ (Nat.card ↥(mainSubgroup i.1 t)).primeFactors ↔
+        p ∈ OddOrder.BG.Ch3.S10.sigma i.1 := fun i t ht p => by
+    have h : mainSubgroup i.1 t = OddOrder.BG.Ch3.S10.Msigma i.1 :=
+      OddOrder.BG.Ch4.S16.mainSubgroup_eq_Msigma hG (hrepsMax i.1 i.2) ht
+    rw [h]
+    exact OddOrder.BG.Ch4.S16.primeFactors_Msigma_eq_sigma hG (hrepsMax i.1 i.2) p
+  refine ⟨{
+    ι := ULift (Fin (Fintype.card (↥reps)))
+    reps := fun j => (e.symm j.down).1
+    tau := fun j => tau (e.symm j.down)
+    finite_index := inferInstance
+    maximal := fun j => hrepsMax _ (e.symm j.down).2
+    typed := fun j => htyped (e.symm j.down)
+    representatives := fun M hM => by
+      obtain ⟨Mi, ⟨hMirep, hconj⟩, _⟩ := hreps M hM
+      refine ⟨⟨e ⟨Mi, hMirep⟩⟩, ?_⟩
+      simp only [ULift.down_up, Equiv.symm_apply_apply]
+      exact hconj
+    nonconjugate := fun j k hconj => by
+      have hsub : e.symm j.down = e.symm k.down := by
+        obtain ⟨_, _, huniq⟩ := hreps (e.symm j.down).1 (hrepsMax _ (e.symm j.down).2)
+        exact Subtype.ext
+          ((huniq _ ⟨(e.symm j.down).2, OddOrder.BG.Ch4.S14.IsConjugateSubgroup.refl _⟩).trans
+            (huniq _ ⟨(e.symm k.down).2, hconj⟩).symm)
+      exact ULift.ext _ _ (e.symm.injective hsub)
+    primeFactors_cover := fun p _ => by
+      rw [OddOrder.BG.Ch4.S16.sigma_reps_prime_cover hG hrepsMax hreps p]
+      constructor
+      · rintro ⟨Mi, hMirep, hpMi⟩
+        refine ⟨⟨e ⟨Mi, hMirep⟩⟩, ?_⟩
+        simp only [ULift.down_up, Equiv.symm_apply_apply]
+        exact (hbridge ⟨Mi, hMirep⟩ _ (htyped ⟨Mi, hMirep⟩) p).mpr hpMi
+      · rintro ⟨j, hpj⟩
+        exact ⟨(e.symm j.down).1, (e.symm j.down).2,
+          (hbridge (e.symm j.down) _ (htyped (e.symm j.down)) p).mp hpj⟩
+    primeFactors_disjoint := fun j k hjk => by
+      rw [Finset.disjoint_left]
+      intro p hpj hpk
+      have hne : (e.symm j.down).1 ≠ (e.symm k.down).1 := fun h =>
+        hjk (ULift.ext _ _ (e.symm.injective (Subtype.ext h)))
+      have hpσ : p ∈ OddOrder.BG.Ch3.S10.sigma (e.symm j.down).1 ∩
+          OddOrder.BG.Ch3.S10.sigma (e.symm k.down).1 :=
+        ⟨(hbridge (e.symm j.down) _ (htyped (e.symm j.down)) p).mp hpj,
+          (hbridge (e.symm k.down) _ (htyped (e.symm k.down)) p).mp hpk⟩
+      rw [OddOrder.BG.Ch4.S16.sigma_reps_pairwise_disjoint hG hrepsMax hreps
+        (e.symm j.down).2 (e.symm k.down).2 hne] at hpσ
+      exact Set.notMem_empty p hpσ
+    thickenedA1_card := fun j => by
+      -- DEEP GATE (issue 8020) — **encoding faithfulness issue, /loop²⁰ finding**: this field uses
+      -- `thickenedA1 (reps j) (reps j) τ`, whose `supportKernel L M X x` (= `L_F ⊓ C_G(x)` for escaping
+      -- `x`) is here applied with `L = M = reps j`, i.e. `(reps j)_F ⊓ C_G(x)`.  But Peterfalvi (8.14)
+      -- / Coq `FTsignalizer M x = C_{(N[x])_F}(x)` uses the **per-`x` signalizer maximal `N[x]`**'s
+      -- Fitting, not `M`'s.  For `x ∈ M_σ#` escaping `M` (`C_G(x) ⊄ M`), `M_F ⊓ C_G(x) ⊆ M` differs
+      -- from `(N[x])_σ ⊓ C_G(x) ⊆ N[x]` (different maximals) — so `thickenedA1 (reps j)(reps j)` is
+      -- **not** BG's faithful `𝒞_G(M̃)`, and this cardinality is not `(|M_σ|−1)·[G:M]` as stated.
+      -- Resolution needs a def/field redesign to the per-`x` signalizer (`FTsignalizer`/`Rsub`); then
+      -- `(N[x])_F = (N[x])_σ` (`maxNilpotentNormalHall_eq_Msigma_of_isTypeF_or_isTypeP2`, signalizer
+      -- `N[x]` is type `F`/`P₂`) makes Pf `R(x) = Rsub(x)`, and `sigmaConjugacySaturation_Mtilde_ncard`
+      -- (14.5(c), DONE) + `mainSubgroup_eq_Msigma` close it.  Touches shared `GroupTheory` defs +
+      -- the `S14_MaximalI` consumer (S14_MaximalI:2365) → needs design coordination (hub).
+      sorry
+  }, ?_⟩
+  -- DEEP GATE (issue 8020): the (8.8) covering dichotomy (BG Cor 14.9) decides Type-I vs non-Type-I.
   sorry
 
 /-- **Peterfalvi (8.18)**: the final support-exclusion relation in Section 10.
