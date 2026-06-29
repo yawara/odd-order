@@ -5,6 +5,7 @@ Authors: Yawara Ishida
 -/
 import Mathlib.NumberTheory.Cyclotomic.PrimitiveRoots
 import Mathlib.RingTheory.Norm.Transitivity
+import OddOrder.GroupTheory.RepresentationTheory.ClassSumAlgebra
 
 /-!
 # Peterfalvi (1.10): cyclotomic congruences of character values
@@ -34,6 +35,36 @@ and `ε^k = α(x)` for a linear character `α` and an order-`p` element `x`. -/
 theorem one_sub_dvd_pow_sub_one {R : Type*} [CommRing R] (ε : R) (k : ℕ) :
     (1 - ε) ∣ (ε ^ k - 1) :=
   ⟨-(∑ i ∈ Finset.range k, ε ^ i), by rw [← geom_sum_mul ε k]; ring⟩
+
+/-- **Peterfalvi (1.10.a), per-linear-character core**: for a linear character `α : A → ℂˣ` of a
+finite group `A`, a `p`-th-power-trivial element `x` (`x^p = 1`) and any `y`, the difference
+`α(xy) - α(y)` is `(1 - ε)` times an algebraic integer (`ε` a primitive `p`-th root of unity).
+
+Proof: `α(xy) - α(y) = (α(x) - 1)·α(y)`; `α(x)^p = 1` so `α(x) = ε^k`; `ε^k - 1 = (1-ε)·(-∑ εⁱ)`;
+and `α(y)` is a root of unity, hence integral.  This is the linear-character building block of the
+restriction-decomposition proof of (1.10.a) (`⟨x,y⟩` abelian ⟹ constituents are linear). -/
+theorem exists_integral_linearChar_apply_sub {p : ℕ} (hp : 0 < p) {ε : ℂ}
+    (hε : IsPrimitiveRoot ε p) {A : Type*} [Group A] [Finite A] (α : A →* ℂˣ)
+    {x y : A} (hx : x ^ p = 1) :
+    ∃ z : ℂ, IsIntegral ℤ z ∧ (α (x * y) : ℂ) - (α y : ℂ) = (1 - ε) * z := by
+  haveI : NeZero p := ⟨hp.ne'⟩
+  -- `α(x)` is a `p`-th root of unity, hence `= ε^k`
+  have hαxp : (α x : ℂ) ^ p = 1 := by
+    rw [← Units.val_pow_eq_pow_val, ← map_pow, hx, map_one, Units.val_one]
+  obtain ⟨k, _, hk⟩ := hε.eq_pow_of_pow_eq_one hαxp
+  -- `α(y)` is a root of unity (order divides `|A|`), hence integral
+  have hαy : IsIntegral ℤ (α y : ℂ) := by
+    refine isIntegral_of_pow_eq_one (n := Nat.card A) Nat.card_pos.ne' ?_
+    rw [← Units.val_pow_eq_pow_val, ← map_pow, pow_card_eq_one', map_one, Units.val_one]
+  refine ⟨-(∑ i ∈ Finset.range k, ε ^ i) * (α y : ℂ), ?_, ?_⟩
+  · have hε_mem : ε ∈ integralClosure ℤ ℂ := hε.isIntegral hp
+    have hsum : IsIntegral ℤ (∑ i ∈ Finset.range k, ε ^ i) :=
+      Subalgebra.sum_mem _ (fun i _ => Subalgebra.pow_mem _ hε_mem i)
+    exact hsum.neg.mul hαy
+  · have hgeom : ε ^ k - 1 = (1 - ε) * (-(∑ i ∈ Finset.range k, ε ^ i)) := by
+      rw [← geom_sum_mul ε k]; ring
+    rw [map_mul, Units.val_mul, ← hk]
+    linear_combination (α y : ℂ) * hgeom
 
 /-- **Peterfalvi (1.10.b)** (abstract cyclotomic form): in a `p`-th cyclotomic field `L` over `ℚ`
 (`p` an odd prime), if an integer `n` is divisible by `ζ - 1` (`ζ` a primitive `p`-th root of

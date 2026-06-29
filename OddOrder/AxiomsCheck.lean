@@ -765,6 +765,9 @@ set_option linter.style.longLine false in
 -- Pf (1.10.b) cyclotomic congruence: in a `p`-th cyclotomic field, an integer `n` with
 -- `n = (ζ-1)·a` (`a` integral) has `p ∣ n` (norm argument `N(ζ-1)=p`).  Used by (12.16)/(13.5).
 #assert_only_allowed_axioms OddOrder.RepresentationTheory.int_dvd_of_zeta_sub_one_dvd
+-- Pf (1.10.a) linear-char core: for a linear character `α` of a finite group, `x^p=1` element `x`,
+-- `α(xy)-α(y) = (1-ε)·z` with `z` an algebraic integer (`α(x)=ε^k`, `α(y)` a root of unity).
+#assert_only_allowed_axioms OddOrder.RepresentationTheory.exists_integral_linearChar_apply_sub
 -- Pf (12.4) pin (b) step 1: general TI-induction self-value — for a TI subset `A` rel. `L` and an
 -- `A`-supported class function `α`, `Ind_L^G α` agrees with `α` on `A`.  Generalizes the TI-cyclic
 -- `induce_apply_eq_self_of_mem_V` to arbitrary TI subsets (the value-half of "Dade map = Ind").
