@@ -6067,5 +6067,14 @@ theorem hcHom_eq_one_of_mem_realizedH0supC [Finite G] {M : Subgroup G}
   simp only [hcHom, MonoidHom.comp_apply, QuotientGroup.mk'_apply]
   rw [(QuotientGroup.eq_one_iff x).mpr hx, map_one]
 
+/-- **`HC ◁ HU` in the realized `hInHu ⊔ H₀C` form**: `hInHu ⊔ (realized H₀C) ◁ huSub`, from
+`hcInHu_normal` (`hInHu ⊔ cInHu ◁ HU`) and the identification `hInHu_sup_realizedH0supC`.  The
+`H ◁ G` hypothesis of `isIrreducibleCharacter_induce_of_inertia_eq` for `Ind_{HC}^{HU} ψ`. -/
+theorem hcInHu_realized_normal [Finite G] {M : Subgroup G}
+    {data : TypesIIIIIIVSetup M} (chief : ChiefFactorData data) :
+    (hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf (huSub data)).Normal := by
+  rw [hInHu_sup_realizedH0supC]
+  exact hcInHu_normal data chief
+
 end OddOrder.Peterfalvi.S11
 
