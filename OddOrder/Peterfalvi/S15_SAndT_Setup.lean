@@ -468,6 +468,28 @@ theorem sum_normSq_eq_card_mul_inner {H : Type*} [Group H] [Fintype H]
     ((∑ g : H, ‖α g‖ ^ 2 : ℝ) : ℂ) = (Nat.card H : ℂ) * ClassFunction.inner α α := by
   rw [← innerSum_self_eq_sum_normSq, ClassFunction.card_mul_inner]
 
+/-- **Parseval expansion of a real-scalar linear combination** (the algebraic core of Peterfalvi
+(13.5.b)).  For complex functions `f, g` on a finite index set and a real scalar `κ`,
+`∑‖κ·f + g‖² = κ²∑‖f‖² + 2κ·Re(∑ f·ḡ) + ∑‖g‖²`.  In (13.5.b) this is applied with `κ = a/‖ζ₁‖²`,
+`f = ζ₁`, `g = α` on `H#`; together with the (13.5) sum facts `∑_{H#}|ζ₁|² = |S|‖ζ₁‖² − ζ₁(1)²` and
+`∑_{H#} ζ₁ᾱ = −ζ₁(1)α(1)` it yields the (13.5.b) norm decomposition consumed by `caseB_lambda_norm_core`
+(13.6) and `caseB_eta01_norm_core` (13.8). -/
+theorem sum_normSq_real_smul_add {ι : Type*} (s : Finset ι) (κ : ℝ) (f g : ι → ℂ) :
+    (∑ x ∈ s, ‖(κ : ℂ) * f x + g x‖ ^ 2)
+      = κ ^ 2 * (∑ x ∈ s, ‖f x‖ ^ 2)
+        + 2 * κ * (∑ x ∈ s, f x * (starRingEnd ℂ) (g x)).re
+        + (∑ x ∈ s, ‖g x‖ ^ 2) := by
+  have hpt : ∀ x ∈ s, ‖(κ : ℂ) * f x + g x‖ ^ 2
+      = κ ^ 2 * ‖f x‖ ^ 2 + 2 * κ * (f x * (starRingEnd ℂ) (g x)).re + ‖g x‖ ^ 2 := by
+    intro x _
+    rw [← Complex.normSq_eq_norm_sq, ← Complex.normSq_eq_norm_sq, ← Complex.normSq_eq_norm_sq,
+      Complex.normSq_add, Complex.normSq_mul, Complex.normSq_ofReal]
+    rw [show ((κ : ℂ) * f x) * (starRingEnd ℂ) (g x) = (κ : ℂ) * (f x * (starRingEnd ℂ) (g x)) by ring,
+      Complex.re_ofReal_mul]
+    ring
+  rw [Finset.sum_congr rfl hpt, Finset.sum_add_distrib, Finset.sum_add_distrib,
+    ← Finset.mul_sum, ← Finset.mul_sum, ← Complex.re_sum]
+
 open scoped Classical in
 /-- **Permutation-character value**: `(Ind_H^G 1_H)(g) = |H|⁻¹ · |{x ∈ G : x⁻¹gx ∈ H}|`.
 
@@ -680,6 +702,30 @@ theorem caseB_quadratic_nonneg {Pm1 u : ℕ} (hu : 2 * u ≤ Pm1) (b : ℤ) :
   nlinarith [mul_nonneg (by linarith : (0 : ℤ) ≤ (Pm1 : ℤ) - 2 * u) (sq_nonneg b),
     mul_nonneg (by positivity : (0 : ℤ) ≤ 2 * (u : ℤ)) hb]
 
+/-- **Arithmetic assembly of Peterfalvi (13.6)**: the norm lower bound `∑_{x∈H#}|λ^{τ₁}(x)|² ≥ |S| − λ(1)²`.
+
+For the irreducible `λ ∈ S` of degree `λ(1) = u q` induced from a linear character of `H = PC`
+(`‖λ‖² = 1`, `a = 1`), the (13.5) decomposition gives `s = (|S| − λ(1)²) − 2λ(1)α(1) + sₐ` where
+`s = ∑_{H#}|λ^{τ₁}|²`, `sₐ = ∑_{H#}|α|²`.  By (13.5.a)+(1.10) the correction `α(1) = q b` is divisible
+by `q`, by (13.5.c) `(|P|−1)α(1)² ≤ sₐ`, and by (13.2.c) `2u ≤ |P|−1`.  The cross terms are then
+nonnegative — `−2λ(1)α(1) + (|P|−1)α(1)² = q²((|P|−1)b² − 2ub) ≥ 0` (`caseB_quadratic_nonneg`) — whence
+`|S| − λ(1)² ≤ s`.  Carrier-free arithmetic core (`Scard, Pm1, u, q` abstract naturals; the
+character-theoretic decomposition is supplied by the cascade once the (13.5) engine lands). -/
+theorem caseB_lambda_norm_core {Scard Pm1 u q : ℕ} {s sₐ lam1 : ℝ} {b : ℤ}
+    (hlam1 : lam1 = (u : ℝ) * q)
+    (hdecomp : s = ((Scard : ℝ) - lam1 ^ 2) - 2 * lam1 * ((q : ℝ) * b) + sₐ)
+    (hinfl : (Pm1 : ℝ) * ((q : ℝ) * b) ^ 2 ≤ sₐ)
+    (hu : 2 * u ≤ Pm1) :
+    (Scard : ℝ) - lam1 ^ 2 ≤ s := by
+  have hquad : (0 : ℤ) ≤ (Pm1 : ℤ) * b ^ 2 - 2 * (u : ℤ) * b := caseB_quadratic_nonneg hu b
+  have hquadR : (0 : ℝ) ≤ (Pm1 : ℝ) * (b : ℝ) ^ 2 - 2 * (u : ℝ) * (b : ℝ) := by exact_mod_cast hquad
+  have hcross : 0 ≤ -2 * lam1 * ((q : ℝ) * b) + sₐ := by
+    have hfac : -2 * lam1 * ((q : ℝ) * b) + (Pm1 : ℝ) * ((q : ℝ) * b) ^ 2
+        = (q : ℝ) ^ 2 * ((Pm1 : ℝ) * (b : ℝ) ^ 2 - 2 * (u : ℝ) * (b : ℝ)) := by
+      rw [hlam1]; ring
+    nlinarith [hinfl, hfac, mul_nonneg (sq_nonneg (q : ℝ)) hquadR]
+  linarith [hdecomp, hcross]
+
 /-- **Arithmetic core of Peterfalvi (13.7)**: the norm lower bound `∑_{x∈H#}|η₁₀(x)|² ≥ |H#|`.
 
 In (13.7), for `α = η₁₀` on `H#` with `α(1) = d` and squared norm `‖α‖² = n`, one has:
@@ -722,6 +768,33 @@ theorem caseB_eta_norm_core {H P d n s : ℕ}
     rw [mul_one] at hParseval
     have hd : d ^ 2 = 1 := habelian rfl
     omega
+
+/-- **Arithmetic assembly of Peterfalvi (13.8)**: the norm lower bound `∑_{x∈H#}|η₀₁(x)|² ≥ |S'| − u²`.
+
+By (13.3.c) there are `j` and `δ = ±1` with `μ_j^{τ₁} = δ ∑_{0≤i<q} η_{i1}`, so the (13.5) hypothesis
+holds with `ζ₁ = μ_j` (degree `qu`, `‖μ_j‖² = q`), `χ = η₀₁`, `a = δ`.  The (13.5.b) decomposition then
+gives `s = firstTerm − 2δu·α(1) + sₐ` where `firstTerm = (1/q)(|S| − (qu)²/q) = |S|/q − u² = |S'| − u²`
+(as `[S:S'] = q`) and `sₐ = ∑_{H#}|α|²`.  With `(|P|−1)α(1)² ≤ sₐ` (13.5.c), `α(1) ∈ ℤ`, `δ² = 1`, and
+`2u ≤ |P|−1` (13.2.c), the cross terms are nonnegative — setting `b = δ·α(1)`,
+`−2δu·α(1) + (|P|−1)α(1)² = (|P|−1)b² − 2ub ≥ 0` (`caseB_quadratic_nonneg`) — whence `firstTerm ≤ s`.
+Carrier-free arithmetic core; the character-theoretic decomposition is supplied by the (13.5) engine. -/
+theorem caseB_eta01_norm_core {Pm1 u : ℕ} {firstTerm s sₐ : ℝ} {α1 δ : ℤ}
+    (hδ : δ ^ 2 = 1)
+    (hdecomp : s = firstTerm - 2 * (δ : ℝ) * u * α1 + sₐ)
+    (hinfl : (Pm1 : ℝ) * (α1 : ℝ) ^ 2 ≤ sₐ)
+    (hu : 2 * u ≤ Pm1) :
+    firstTerm ≤ s := by
+  have hquad : (0 : ℤ) ≤ (Pm1 : ℤ) * (δ * α1) ^ 2 - 2 * (u : ℤ) * (δ * α1) :=
+    caseB_quadratic_nonneg hu (δ * α1)
+  have hquadR : (0 : ℝ) ≤ (Pm1 : ℝ) * ((δ : ℝ) * α1) ^ 2 - 2 * (u : ℝ) * ((δ : ℝ) * α1) := by
+    exact_mod_cast hquad
+  have hδR : (δ : ℝ) ^ 2 = 1 := by exact_mod_cast hδ
+  have hcross : 0 ≤ -2 * (δ : ℝ) * u * α1 + sₐ := by
+    have hsq : ((δ : ℝ) * α1) ^ 2 = (α1 : ℝ) ^ 2 := by rw [mul_pow, hδR, one_mul]
+    have hfac : (Pm1 : ℝ) * ((δ : ℝ) * α1) ^ 2 - 2 * (u : ℝ) * ((δ : ℝ) * α1)
+        = (Pm1 : ℝ) * (α1 : ℝ) ^ 2 - 2 * (δ : ℝ) * u * α1 := by rw [hsq]; ring
+    nlinarith [hinfl, hfac, hquadR]
+  linarith [hdecomp, hcross]
 
 /-- Carrier for Peterfalvi (13.5), the TI-subset orthogonality calculation. -/
 structure TISubsetOrthogonalityData (hyp : Hypothesis (G := G)) where
