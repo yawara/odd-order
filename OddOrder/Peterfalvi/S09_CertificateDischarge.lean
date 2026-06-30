@@ -1445,4 +1445,43 @@ theorem exists_betaDecomp_a {G : Type*} [Group G] [Fintype G] {A : Set G} {L : S
     ClassFunction.inner_mem_ZIrr_int (H78.beta_mem_ZIrr_of_sourceDiff_mem_ZIrr hdiffZ) hζ0nuZ
   exact ⟨m + 1, by push_cast; rw [hm]⟩
 
+/-- **Peterfalvi (7.8.b) coefficient identification, generic index** (`case A`, `ζ_0 = ζ`).  For the
+`(7.7.a)` coefficient `c_i = (ψ_i^τ, ζ_0^ν)` with `χ = ζ_0^ν` (the distinguished `ζ = ζ_0` at index
+`0`), the coherence agreement `ψ_i^τ = ζ_i^ν − d_i ζ_0^ν` (for `i ≠ 0, ind1H`), the isometry of `ν`,
+the family orthogonality `(ζ_i, ζ_0) = 0`, the normalization `‖ζ_0‖² = 1`, and `d_i` real, give
+`c_i = −d_i`.  This is the off-distinguished coefficient feeding the (7.8.b) double sum. -/
+theorem cCoeff_nu_zeta_zero_eq_neg_d {G : Type*} [Group G] [Fintype G] {A : Set G} {L : Subgroup G}
+    [Fintype L] [Invertible (Nat.card L : ℂ)] [Invertible (Nat.card G : ℂ)]
+    (H76 : Hypothesis76 G A L) (ν : ClassFunction ↥L ℂ →ₗ[ℤ] ClassFunction G ℂ)
+    {ind1H : Fin (H76.n + 1)}
+    (hagree : ∀ i : Fin (H76.n + 1), i ≠ 0 → i ≠ ind1H →
+      H76.hyp71.τ (H76.psiSupp i) = ν (H76.zeta i) - H76.d i • ν (H76.zeta 0))
+    (hiso : ∀ φ ψ : ClassFunction ↥L ℂ,
+      ClassFunction.inner (ν φ) (ν ψ) = ClassFunction.inner φ ψ)
+    (horth : ∀ i : Fin (H76.n + 1), i ≠ 0 →
+      ClassFunction.inner (H76.zeta i) (H76.zeta 0) = 0)
+    (hnorm : ClassFunction.inner (H76.zeta 0) (H76.zeta 0) = 1)
+    (i : Fin (H76.n + 1)) (hi0 : i ≠ 0) (hind : i ≠ ind1H) :
+    H76.cCoeff (ν (H76.zeta 0)) i = - H76.d i := by
+  unfold Hypothesis76.cCoeff
+  rw [hagree i hi0 hind, ClassFunction.inner_sub_left, ClassFunction.inner_smul_left,
+    hiso, hiso, horth i hi0, hnorm, mul_one, zero_sub]
+
+/-- **Peterfalvi (7.8.b) coefficient identification, the `Ind 1_H` index.**  At `i = ind1H`, the
+`(7.7.a)` coefficient `c_{ind1H} = (ψ_{ind1H}^τ, ζ_0^ν)` equals `(β, ζ_0^ν)`: with `d_{ind1H} = 1`
+and `zetaDistinct = 0`, the supported difference `ψ_{ind1H} = ζ_{ind1H} − ζ_0` coincides (as a member
+of `CF(L,A)`) with `Ind 1_H − ζ`, whose Dade image is `β`.  This is the distinguished coefficient
+feeding the (7.8.b) double sum; combined with `exists_betaDecomp_a` it gives `c_{ind1H} = a − 1`. -/
+theorem cCoeff_nu_zeta_zero_ind1H_eq {G : Type*} [Group G] [Fintype G] {A : Set G} {L : Subgroup G}
+    [Fintype L] [Invertible (Nat.card L : ℂ)] [Invertible (Nat.card G : ℂ)]
+    (H78 : Hypothesis78 G A L) (ν : ClassFunction ↥L ℂ →ₗ[ℤ] ClassFunction G ℂ)
+    (hzd : H78.zetaDistinct = 0) (hd1 : H78.hyp76.d H78.ind1H = 1) :
+    H78.hyp76.cCoeff (ν (H78.hyp76.zeta 0)) H78.ind1H =
+      ClassFunction.inner H78.beta (ν (H78.hyp76.zeta 0)) := by
+  have hsupp : H78.hyp76.psiSupp H78.ind1H = H78.indMinusZetaSupp := by
+    apply Subtype.ext
+    simp only [Hypothesis76.psiSupp_coe, Hypothesis78.indMinusZetaSupp, hd1, one_smul, hzd]
+  unfold Hypothesis76.cCoeff Hypothesis78.beta
+  rw [hsupp]
+
 end OddOrder.Peterfalvi.S09.Cert
