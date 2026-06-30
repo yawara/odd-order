@@ -2434,11 +2434,13 @@ contradiction is the value/norm content — (12.14)/(12.15) for `h_const`/`h_psi
 degree bounds, and the `ρ`/`ρM` norm bounds `hA`/`hB`/`hC`. -/
 theorem exists_witness_dadeNotation [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     {ctr : CounterexampleHypothesis (G := G)} (data : RankTwoWitnessData ctr) :
-    ∃ hyp : Hypothesis data.L, Nonempty (DadeNotation hyp) := by
+    ∃ hyp : Hypothesis data.L, ∃ dade : DadeNotation hyp, dade.psi ∈ ZIrr G := by
   obtain ⟨hyp, ⟨coh⟩⟩ := witness_L_coherent hG data
   obtain ⟨χ, hχ, hdeg⟩ := exists_distinguished_char hyp
-  exact ⟨hyp, ⟨dadeNotation_of_coherence hyp coh χ hχ
-    ((hyp.typeI.typeF.H).subgroupOf data.L).index hdeg⟩⟩
+  refine ⟨hyp, dadeNotation_of_coherence hyp coh χ hχ
+    ((hyp.typeI.typeF.H).subgroupOf data.L).index hdeg, ?_⟩
+  -- `dade.psi = coh.extension χ` and `χ ∈ S ⊆ ℤ[S]`, so the coherent extension lands in `ℤ[Irr G]`.
+  exact coh.extension_mem_ZIrr χ (Submodule.subset_span hχ)
 
 /-- **Peterfalvi (12.14)**: the character `psi` is constant on the coset `xK`. -/
 theorem psi_constant_on_xK [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
