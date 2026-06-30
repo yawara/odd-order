@@ -4368,6 +4368,36 @@ theorem inertia_eq_hcInHu [Finite G] {M : Subgroup G} (data : TypesIIIIIIVSetup 
       = hInHu data ⊔ cInHu data chief :=
   inertia_eq_hcInHu_of_inf_le data chief (inertia_inf_uInHu_le_cInHu data chief hcaseB hθbar)
 
+/-- **Inertia lift `I_{HU}(θ₀) = HC` in Clifford case (a)** — the non-Galois analog of
+`inertia_eq_hcInHu`.  For a **regular** chief-factor character `θ̄` (nontrivial on each order-`p`
+Clifford summand `Hpart i`), the inertia of its inflation `θ₀` in `HU` is `HC`.  Feeds the proven
+case-(a) core `chiefFactor_caseA_char_inertia` through the same case-agnostic plumbing
+(`caseB_char_inertia_inflation_of_core` → `caseB_inertia_realized_of_charInertia` →
+`inertia_inf_uInHu_le_cInHu_of_realized` → `inertia_eq_hcInHu_of_inf_le`) that case (b) uses with
+`chiefFactor_caseB_char_inertia`.  This is the (9.8.b)/(9.8.c) degree input for the reducible
+(= regular) characters. -/
+theorem inertia_eq_hcInHu_caseA [Finite G] {M : Subgroup G} (data : TypesIIIIIIVSetup M)
+    (chief : ChiefFactorData data) {chars : Section11CharacterData data chief}
+    (caseA : CliffordCaseAData chars)
+    {θbar : IrreducibleCharacter (↥data.H ⧸ chief.N)}
+    (hreg : ∀ i, ∃ x ∈ caseA.Hpart i,
+      (θbar : ClassFunction (↥data.H ⧸ chief.N) ℂ) x
+        ≠ (θbar : ClassFunction (↥data.H ⧸ chief.N) ℂ) 1) :
+    ClassFunction.inertia (G := ↥(huSub data)) (H := hInHu data)
+        (ClassFunction.compHom (hInHuEquivH data).toMonoidHom
+          (ClassFunction.compHom (QuotientGroup.mk' chief.N)
+            (θbar : ClassFunction (↥data.H ⧸ chief.N) ℂ)))
+      = hInHu data ⊔ cInHu data chief :=
+  inertia_eq_hcInHu_of_inf_le data chief
+    (inertia_inf_uInHu_le_cInHu_of_realized data chief
+      (fun a g hag hfix =>
+        caseB_inertia_realized_of_charInertia
+          (fun g' hfix' =>
+            caseB_char_inertia_inflation_of_core
+              (fun g'' hinv => chiefFactor_caseA_char_inertia caseA hreg g'' hinv)
+              g' hfix')
+          a g hag hfix))
+
 /-- **Peterfalvi (9.7) case (b) carrier.**  When `U` acts irreducibly on the chief factor
 `H̄ = H/H₀` (Clifford case (b), the left branch of `chiefFactor_clifford_U_dichotomy`), the
 field-model divisibilities of `CliffordCaseBData` hold: with `chars.u = |Ū|` (pinned in
