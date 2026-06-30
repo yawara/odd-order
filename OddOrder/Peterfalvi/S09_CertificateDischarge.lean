@@ -478,22 +478,30 @@ theorem supported_mem_span_psi (K : Subgroup L) [K.Normal] [Fintype ↥K]
   rintro v ⟨θ, rfl⟩
   exact hcover θ
 
-/-- **Enumeration of the distinct induced characters** (Peterfalvi (7.6) family).  For a normal
-subgroup `K ◁ L`, the family `T = {Ind_K^L θ : θ ∈ Irr K}` of induced characters is finite; listing
-its *distinct* members as `ζ_i = Ind_K^L θ_i` over `Fin (n+1)` (nonempty: the trivial character
-contributes) yields a representative family `θ : Fin (n+1) → Irr K` for which `i ↦ Ind_K^L θ_i` is
-**injective** (distinct members) and **covers** every induced irreducible.
+/-- **The distinct induced characters as data** (Peterfalvi (7.6) family).  Bundles the
+representative family `θ : Fin (n+1) → Irr K` enumerating the *distinct* induced characters
+`ζ_i = Ind_K^L θ_i`, together with the two facts `inj` (the members are distinct) and `cover`
+(every induced irreducible occurs).  Packaged as data (not an `∃`) so it can be projected inside a
+`Type`-valued construction such as `hypothesis76OfDade`. -/
+structure DistinctInducedFamily (K : Subgroup L) [K.Normal] [Fintype ↥K]
+    [Invertible (Nat.card L : ℂ)] [Invertible (Nat.card ↥K : ℂ)] where
+  /-- One less than the number of distinct induced characters. -/
+  n : ℕ
+  /-- A representative irreducible for each distinct induced character. -/
+  θ : Fin (n + 1) → IrreducibleCharacter ↥K
+  /-- The induced characters `ζ_i = Ind_K^L θ_i` are pairwise distinct. -/
+  inj : Function.Injective (fun i => ClassFunction.induce K (θ i : ClassFunction ↥K ℂ))
+  /-- Every induced irreducible occurs among the `ζ_i`. -/
+  cover : ∀ φ : IrreducibleCharacter ↥K,
+    ClassFunction.induce K (φ : ClassFunction ↥K ℂ) ∈
+      Set.range (fun i => ClassFunction.induce K (θ i : ClassFunction ↥K ℂ))
 
-These are precisely the `hinj`/`hcover` inputs of `induce_family_orthogonal_of_injective` and
-`supported_mem_span_psi`, i.e. the orthogonality and spanning hypotheses of `chiRho_decomp_proof`.
-The enumeration is the standard `Finset.equivFin` listing of `Finset.univ.image (Ind_K^L ·)`. -/
-theorem exists_distinct_induced_family (K : Subgroup L) [K.Normal] [Fintype ↥K]
+/-- **Construction of the distinct induced family.**  The members are the `Finset.equivFin` listing
+of `Finset.univ.image (Ind_K^L ·)`, nonempty since the trivial character contributes; injectivity
+is `equivFin.symm.injective` and covering is `Finset.mem_image`. -/
+noncomputable def distinctInducedFamily (K : Subgroup L) [K.Normal] [Fintype ↥K]
     [Invertible (Nat.card L : ℂ)] [Invertible (Nat.card ↥K : ℂ)] :
-    ∃ (n : ℕ) (θ : Fin (n + 1) → IrreducibleCharacter ↥K),
-      Function.Injective (fun i => ClassFunction.induce K (θ i : ClassFunction ↥K ℂ)) ∧
-      ∀ φ : IrreducibleCharacter ↥K,
-        ClassFunction.induce K (φ : ClassFunction ↥K ℂ) ∈
-          Set.range (fun i => ClassFunction.induce K (θ i : ClassFunction ↥K ℂ)) := by
+    DistinctInducedFamily K := by
   classical
   haveI : Finite ↥K := Finite.of_fintype _
   let V : Finset (ClassFunction L ℂ) :=
@@ -501,27 +509,41 @@ theorem exists_distinct_induced_family (K : Subgroup L) [K.Normal] [Fintype ↥K
       ClassFunction.induce K (φ : ClassFunction ↥K ℂ))
   have hVne : V.Nonempty :=
     ⟨_, Finset.mem_image_of_mem _ (Finset.mem_univ (trivialIrreducibleCharacter ↥K))⟩
-  obtain ⟨n, hn⟩ : ∃ n, V.card = n + 1 :=
-    ⟨V.card - 1, (Nat.succ_pred_eq_of_pos hVne.card_pos).symm⟩
-  let e : ↥V ≃ Fin (n + 1) := V.equivFin.trans (finCongr hn)
-  have hrep : ∀ i : Fin (n + 1), ∃ φ : IrreducibleCharacter ↥K,
+  have hn : V.card = (V.card - 1) + 1 := (Nat.succ_pred_eq_of_pos hVne.card_pos).symm
+  let e : ↥V ≃ Fin ((V.card - 1) + 1) := V.equivFin.trans (finCongr hn)
+  have hrep : ∀ i : Fin ((V.card - 1) + 1), ∃ φ : IrreducibleCharacter ↥K,
       ClassFunction.induce K (φ : ClassFunction ↥K ℂ) = (e.symm i : ClassFunction L ℂ) := by
     intro i
     obtain ⟨φ, _, hφ⟩ := Finset.mem_image.mp (e.symm i).2
     exact ⟨φ, hφ⟩
   choose θ hθ using hrep
-  refine ⟨n, θ, ?_, ?_⟩
-  · intro i j hij
-    have hval : (e.symm i : ClassFunction L ℂ) = (e.symm j : ClassFunction L ℂ) := by
-      rw [← hθ i, ← hθ j]; exact hij
-    exact e.symm.injective (Subtype.ext hval)
-  · intro φ
-    have hmem : ClassFunction.induce K (φ : ClassFunction ↥K ℂ) ∈ V :=
-      Finset.mem_image_of_mem _ (Finset.mem_univ φ)
-    refine ⟨e ⟨_, hmem⟩, ?_⟩
-    show ClassFunction.induce K (θ (e ⟨_, hmem⟩) : ClassFunction ↥K ℂ) = _
-    rw [hθ (e ⟨_, hmem⟩)]
-    exact congrArg Subtype.val (Equiv.symm_apply_apply e ⟨_, hmem⟩)
+  exact
+    { n := V.card - 1
+      θ := θ
+      inj := by
+        intro i j hij
+        have hval : (e.symm i : ClassFunction L ℂ) = (e.symm j : ClassFunction L ℂ) := by
+          rw [← hθ i, ← hθ j]; exact hij
+        exact e.symm.injective (Subtype.ext hval)
+      cover := by
+        intro φ
+        have hmem : ClassFunction.induce K (φ : ClassFunction ↥K ℂ) ∈ V :=
+          Finset.mem_image_of_mem _ (Finset.mem_univ φ)
+        refine ⟨e ⟨_, hmem⟩, ?_⟩
+        show ClassFunction.induce K (θ (e ⟨_, hmem⟩) : ClassFunction ↥K ℂ) = _
+        rw [hθ (e ⟨_, hmem⟩)]
+        exact congrArg Subtype.val (Equiv.symm_apply_apply e ⟨_, hmem⟩) }
+
+/-- **Existence form** of `distinctInducedFamily`, for `Prop`-level consumers. -/
+theorem exists_distinct_induced_family (K : Subgroup L) [K.Normal] [Fintype ↥K]
+    [Invertible (Nat.card L : ℂ)] [Invertible (Nat.card ↥K : ℂ)] :
+    ∃ (n : ℕ) (θ : Fin (n + 1) → IrreducibleCharacter ↥K),
+      Function.Injective (fun i => ClassFunction.induce K (θ i : ClassFunction ↥K ℂ)) ∧
+      ∀ φ : IrreducibleCharacter ↥K,
+        ClassFunction.induce K (φ : ClassFunction ↥K ℂ) ∈
+          Set.range (fun i => ClassFunction.induce K (θ i : ClassFunction ↥K ℂ)) :=
+  let F := distinctInducedFamily K
+  ⟨F.n, F.θ, F.inj, F.cover⟩
 
 /-- **Discharge of the (7.7.a) certificate for an induced family** (Peterfalvi (7.7.a)).  This is
 the consolidation of `chiRho_decomp_proof` for the concrete family `ζ_i = Ind_K^L θ_i`: the
@@ -574,5 +596,115 @@ theorem chiRho_decomp_induced {G : Type*} [Group G] [Fintype G] {A : Set G} {L :
     exact hyK (hAK_off y (hψ (ClassFunction.mem_support.mpr hne)))
   · by_contra hne
     exact hA_one (hψ (ClassFunction.mem_support.mpr hne))
+
+/-- **`H.subgroupOf L` is normal when `L` conjugation-normalizes `H`.**  If every `l ∈ L`
+conjugates `H ≤ G` into itself (the `H_normal_in_L` field of `Hypothesis76`), then `H.subgroupOf L`
+is a normal subgroup of `↥L`.  Direct check of the `conj_mem` field via `Subgroup.mem_subgroupOf`
+and the coercion `↑(g·n·g⁻¹) = ↑g·↑n·↑g⁻¹`. -/
+theorem subgroupOf_normal_of_conj {G : Type*} [Group G] {H L : Subgroup G}
+    (hconj : ∀ (g : ↥L) {h : G}, h ∈ H → (g : G) * h * (g : G)⁻¹ ∈ H) :
+    (H.subgroupOf L).Normal where
+  conj_mem n hn g := by
+    rw [Subgroup.mem_subgroupOf] at hn ⊢
+    simp only [Subgroup.coe_mul, Subgroup.coe_inv]
+    exact hconj g hn
+
+/-- **Construction of `Hypothesis76` from `(7.1)` data** (Peterfalvi (7.6)/(7.7.a)).  Given the
+Dade-isometry data of `(7.1)` (`H71` together with `hτ : IsDadeIsometry H71.τ`) and a normal
+subgroup `H ⊴ L` with `A = H \ {1}`, the entire `Hypothesis76` structure — *including* the
+`(7.7.a)` certificate `chiRho_decomp` — is constructed with **no certificate assumed**.
+
+The induced family `ζ_i = Ind_{H}^L θ_i` is the `exists_distinct_induced_family` enumeration of the
+distinct induced characters, the degree ratios are `d_i = ζ_i(1)/ζ_0(1)`, and `chiRho_decomp` is
+discharged by `chiRho_decomp_induced` (its `hinj`/`hcover` from the enumeration, the geometric
+`A = H^#` inputs from `Subgroup.mem_subgroupOf` + normality of `H`).  This realizes the issue-1013
+goal: `Hypothesis76` (hence the `(7.7.a)` content) is constructible from coherence/`(7.1)` data alone. -/
+noncomputable def hypothesis76OfDade
+    {G : Type*} [Group G] [Fintype G] {A : Set G} {L : Subgroup G}
+    [Fintype L] [Invertible (Nat.card L : ℂ)] [Invertible (Nat.card G : ℂ)]
+    (H71 : Hypothesis71 G A L)
+    (hτ : OddOrder.Peterfalvi.S04.IsDadeIsometry (G := G) (k := ℂ) (L := L) H71.τ)
+    (H : Subgroup G) (hHL : H ≤ L)
+    (hHnorm : ∀ (l : ↥L) {h : G}, h ∈ H → (l : G) * h * (l : G)⁻¹ ∈ H)
+    (hAH : A = (H : Set G) \ {1}) :
+    Hypothesis76 G A L := by
+  classical
+  haveI hKnorm : (H.subgroupOf L).Normal := subgroupOf_normal_of_conj hHnorm
+  haveI : Invertible (Nat.card ↥(H.subgroupOf L) : ℂ) :=
+    invertibleOfNonzero (by exact_mod_cast Nat.card_pos.ne')
+  let F := distinctInducedFamily (H.subgroupOf L)
+  set n := F.n with hn
+  set θ := F.θ with hθdef
+  have hinj := F.inj
+  have hcover := F.cover
+  -- The induced family `ζ` and degree ratios `d`.
+  set ζ : Fin (n + 1) → ClassFunction ↥L ℂ :=
+    fun i => ClassFunction.induce (H.subgroupOf L) (θ i : ClassFunction _ ℂ) with hζ
+  set d : Fin (n + 1) → ℂ := fun i => ζ i (1 : ↥L) / ζ 0 (1 : ↥L) with hd
+  have hz0 : ζ 0 (1 : ↥L) ≠ 0 := induce_apply_one_ne_zero _ (θ 0)
+  have hdeg : ∀ i, ζ i (1 : ↥L) = d i * ζ 0 (1 : ↥L) := fun i => by
+    rw [hd]; field_simp
+  -- Support characterization: `x ∈ supportInSubgroup A L ↔ (x:G) ∈ H ∧ (x:G) ≠ 1`.
+  have hAchar : ∀ x : ↥L, x ∈ OddOrder.Peterfalvi.S04.supportInSubgroup A L ↔
+      ((x : G) ∈ H ∧ (x : G) ≠ 1) := fun x => by
+    rw [OddOrder.Peterfalvi.S04.mem_supportInSubgroup, hAH]
+    simp only [Set.mem_diff, SetLike.mem_coe, Set.mem_singleton_iff]
+  -- `x ≠ 1` in `↥L` is equivalent to `(x:G) ≠ 1`.
+  have hne_one : ∀ x : ↥L, (x : G) ≠ 1 ↔ x ≠ 1 := fun x => by
+    rw [not_iff_not]
+    constructor
+    · intro h; exact Subtype.ext (by rw [h, Subgroup.coe_one])
+    · intro h; rw [h, Subgroup.coe_one]
+  -- `ζ_i` vanishes off `H`.
+  have hvanish : ∀ (i : Fin (n + 1)) (x : ↥L), (x : G) ∉ H → ζ i x = 0 := fun i x hxH => by
+    rw [hζ]
+    exact ClassFunction.induce_eq_zero_of_not_mem_normal _ (by rwa [Subgroup.mem_subgroupOf])
+  -- `ψ_i = ζ_i − d_i ζ_0` is supported on `A = H^#`.
+  have hpsupp : ∀ i, (ζ i - d i • ζ 0).support ⊆
+      OddOrder.Peterfalvi.S04.supportInSubgroup A L := fun i => by
+    rw [hζ]
+    refine (induce_diff_support (θ i) (θ 0) (d i) (hdeg i)).trans ?_
+    intro x hx
+    rw [Set.mem_diff, SetLike.mem_coe, Subgroup.mem_subgroupOf, Set.mem_singleton_iff] at hx
+    rw [hAchar]
+    exact ⟨hx.1, (hne_one x).mpr hx.2⟩
+  -- Geometric inputs for `chiRho_decomp_induced`, phrased through `K = H.subgroupOf L`.
+  have hAcharK : ∀ x : ↥L, x ∈ OddOrder.Peterfalvi.S04.supportInSubgroup A L ↔
+      (x ∈ H.subgroupOf L ∧ x ≠ 1) := fun x => by
+    rw [hAchar x, Subgroup.mem_subgroupOf, hne_one x]
+  have hAK_off : ∀ x : ↥L, x ∈ OddOrder.Peterfalvi.S04.supportInSubgroup A L →
+      x ∈ H.subgroupOf L := fun x hx => ((hAcharK x).mp hx).1
+  have hA_one : (1 : ↥L) ∉ OddOrder.Peterfalvi.S04.supportInSubgroup A L := fun hx =>
+    ((hAcharK 1).mp hx).2 rfl
+  have hAconj : ∀ g h : ↥L,
+      h * g * h⁻¹ ∈ OddOrder.Peterfalvi.S04.supportInSubgroup A L ↔
+      g ∈ OddOrder.Peterfalvi.S04.supportInSubgroup A L := fun g h => by
+    rw [hAcharK, hAcharK]
+    refine and_congr ?_ ?_
+    · constructor
+      · intro hm
+        have hc := hKnorm.conj_mem _ hm h⁻¹
+        have heq : h⁻¹ * (h * g * h⁻¹) * (h⁻¹)⁻¹ = g := by group
+        rwa [heq] at hc
+      · intro hm; exact hKnorm.conj_mem _ hm h
+    · rw [ne_eq, ne_eq, mul_inv_eq_one, mul_eq_left]
+  -- Assemble the structure; `chiRho_decomp` is discharged by `chiRho_decomp_induced`.
+  exact
+    { hyp71 := H71
+      isDadeIsometry := hτ
+      H := H
+      H_le_L := hHL
+      H_normal_in_L := hHnorm
+      A_eq_H_sharp := hAH
+      n := n
+      zeta := ζ
+      d := d
+      zeta_eq_zero_of_not_mem_H := hvanish
+      zeta_one_eq_d_mul := hdeg
+      psi_support := hpsupp
+      chiRho_decomp := by
+        intro χ x hx
+        exact chiRho_decomp_induced H71 (H.subgroupOf L) θ d hpsupp hinj hcover hdeg hAconj
+          hAK_off hA_one χ hx }
 
 end OddOrder.Peterfalvi.S09.Cert
