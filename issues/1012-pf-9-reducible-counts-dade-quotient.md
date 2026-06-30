@@ -1112,3 +1112,25 @@ trans_apply/symm_apply_apply/congr_mk が **unused** = hcQuotientEquivHbar (letI
 を separate instance 化) で unfold 可能に、(b) explicit rw + MulEquiv.trans_apply、(c)
 hcQuotientEquivHbar_apply lemma を別途証明。次 iteration で main assembly を fresh に解決。
 build slow (~2min post-merge) → background build 使用。
+
+
+## conjunct c — home stretch: ζ irr + degree DONE; H₀C⊆ker が giant-term whnf で詰まり (2026-07-01)
+
+**Landed (20 construction lemmas、axiom-clean)**: subgroup foundation + 2nd iso hcQuotientEquivHbar +
+hom hcHom + ψ hcPsi + **hcHom_inclusion (deep crux)** + ψ|hInHu=θ₀ (hcPsi_apply_inclusion) +
+restriction-inertia (hcPsi_inertia_le) + **inertia(ψ)=HC (hcPsi_inertia_eq_hc)** +
+**ζ=Ind irr (hcZeta_irreducible)** + [HU:HC]=u (hc_index_eq_u) + **ζ(1)=u (hcZeta_apply_one)**。
+
+**残 (home stretch)**:
+- **H₀C⊆ker ζ**: `subsetCharacterKernel_induce_of_subgroupOf` (S03、induce-kernel for normal A⊆ker θ)
+  + ψ trivial on H₀C (hcHom_eq_one_of_mem_realizedH0supC) で証明可。**但し giant HC/hcHom (iso-composite)
+  term で whnf 爆発** (refine + proof body 共に、2000000 heartbeats でも timeout)。giant-declaration
+  技法要 ([[lean-giant-declaration-debugging]]: HC abbreviation/type-synonym、term-pinning、
+  hcHom を opaque に扱う rw)。fresh context で。
+- **H⊄ker ζ**: ζ over θ₀ (nontrivial on H)。
+- **bundle ζ as IrreducibleCharacter** ⟨induce HC ψ, hcZeta_irreducible⟩。
+- **M-level**: ζ not-W1-fixed → I_M(ζ)=HU (prime-index eq_of_le_of_prime_index) → χ=induceHU(ζ) irr
+  (isIrreducibleCharacter_induce_of_inertia_eq + huSub_normal) deg q·u=qu (induceHU_apply_one_eq_q_mul)。
+- χ∈𝒮(H₀C) → conjunct c (caseA_character_counts:5166)。
+
+inertia heart + degree-u irreducible 完成 (最難部分)。残は giant-term 注意の final assembly。
