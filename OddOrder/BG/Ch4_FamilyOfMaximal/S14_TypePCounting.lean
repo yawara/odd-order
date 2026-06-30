@@ -10102,10 +10102,25 @@ theorem nonidentity_covered_by_sigma_pieces [Finite G]
           H ∈ maximalSubgroups G ∧ IsTypeF H ∧ x ∈ sigmaConjugacySaturation H) := by
   sorry
 
-/-- **BG Corollary 14.10** (mmd L4008): global sigma-length bound. -/
-theorem exists_sigmaDecomposition_length_le_two [Finite G]
-    (hG : OddOrder.BG.IsMinimalSimpleOdd G) :
-    ∃ D : SigmaDecompositionData G, ∀ g : G, D.length g ≤ 2 := by
+/-- **`Ẑ` elements have `σ`-length at most two** (the type-P exceptional half of BG Cor 14.10).  A
+`z ∈ Ẑ = zTilde Kref Kstarref = (Kref ⊔ Kstarref) ∖ (Kref ∪ Kstarref)` factors as `z = k·k*` with
+`k* ∈ Kstarref ⊆ M_σ(Mref)#` (a `σ(Mref)`-element, so `ℓ_σ(k*) = 1`) and `k ∈ Kref` a nonidentity
+`κ(Mref)`-element; since `Kref` consists of `σ(Mref*)`-elements for the non-conjugate partner `Mref*`
+(type-P duality), `sigma_cover_decomposition` gives the two-element `σ`-decomposition `{k, k*}`.
+
+**Residual (`sorry`):** the partner-`σ` membership `Kref ≤ M_σ(Mref*)` (the full-`K` strengthening of
+the rank-1 `typeP_neighbor_embed`), plus the `k·k*` split of `z`.  This is the single deep input the
+Cor 14.10 assembly below is gated on; the `M̃`-piece (`sigmaLength_le_two_of_mem_Mtilde`) and the
+cover/conjugation plumbing are sorry-free. -/
+theorem sigmaLength_le_two_of_mem_zTilde_of_isTypeP [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {Mref Kref Kstarref Uref : Subgroup G}
+    (hMref : Mref ∈ maximalSubgroups G) (hMPref : IsTypeP Mref) (hKMref : Kref ≤ Mref)
+    (hKref : Ch03.IsHallSubgroup (kappa Mref) (Kref.subgroupOf Mref))
+    (hKstarref : Kstarref = OddOrder.BG.Ch3.S10.Msigma Mref ⊓ Subgroup.centralizer (Kref : Set G))
+    (hUref : Ch03.IsHallSubgroup ((kappa Mref ∪ OddOrder.BG.Ch3.S10.sigma Mref)ᶜ)
+      (Uref.subgroupOf Mref))
+    {z : G} (hz : z ∈ zTilde Kref Kstarref) :
+    sigmaLength z ≤ 2 := by
   sorry
 
 /-! ### BG Lemma 14.11 — phase 1: `Q ⊄ F(E) ⟹ q ∈ τ₁(M)` and `C_{M_σ}(Q) = 1`
@@ -11843,6 +11858,51 @@ theorem sigmaLength_one_frobenius_type [Finite G]
         OddOrder.Isaacs.Ch06.IsFrobeniusGroup ↥M
           ((OddOrder.BG.Ch3.S10.Msigma M).subgroupOf M) (U.subgroupOf M) := by
   sorry
+
+/-- **BG Corollary 14.10** (mmd L4008): global `σ`-length bound `ℓ_σ(g) ≤ 2`.
+
+Assembled from the faithful `G#` cover.  The genuine `SigmaDecompositionData` is
+`genuineSigmaDecomposition hG` (`length = sigmaLength`); `ℓ_σ(1) = 0` (`sigmaLength_eq_zero_iff`), and
+for `g ≠ 1` the cover (`exists_mem_conjClassSet_Mtilde_or_fixed_zTilde` when a type-P maximal exists,
+else `sharpSubgroup_top_eq_iUnion_conjClassSet_Mtilde_of_typeF`) places `g` in `𝒞_G(M̃)` or
+`𝒞_G(Ẑ)`; conjugation-invariance (`sigmaLength_conj`) reduces to the per-piece bounds
+`sigmaLength_le_two_of_mem_Mtilde` (sorry-free) and `sigmaLength_le_two_of_mem_zTilde_of_isTypeP`
+(gated on the type-P partner-duality residual). -/
+theorem exists_sigmaDecomposition_length_le_two [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) :
+    ∃ D : SigmaDecompositionData G, ∀ g : G, D.length g ≤ 2 := by
+  refine ⟨genuineSigmaDecomposition hG, fun g => ?_⟩
+  show sigmaLength g ≤ 2
+  by_cases hg1 : g = 1
+  · have h0 : sigmaLength g = 0 := (sigmaLength_eq_zero_iff hG g).mpr hg1
+    omega
+  · -- The `M̃`-piece closes by `sigmaLength_le_two_of_mem_Mtilde` after `sigmaLength_conj`.
+    have hMtilde : ∀ M : Subgroup G, M ∈ maximalSubgroups G →
+        g ∈ conjClassSet (Mtilde hG (genuineSigmaDecomposition hG) M) → sigmaLength g ≤ 2 := by
+      intro M hMmax hgM
+      obtain ⟨m, hm, c, hcm⟩ := mem_conjClassSet.mp hgM
+      rw [← hcm, sigmaLength_conj]
+      exact sigmaLength_le_two_of_mem_Mtilde hG hMmax hm
+    by_cases hP : (maximalTypePFamily G).Nonempty
+    · obtain ⟨Mref, hMref, hMPref⟩ := hP
+      obtain ⟨Kref, Kstarref, Uref, hKMref, hKref, hKstarref, hUref⟩ := exists_typeP_data hG hMref
+      rcases exists_mem_conjClassSet_Mtilde_or_fixed_zTilde hG hMref hMPref hKMref hKref hKstarref
+          hUref hg1 with ⟨M, hMmax, hgM⟩ | hgZ
+      · exact hMtilde M hMmax hgM
+      · obtain ⟨z, hz, c, hcz⟩ := mem_conjClassSet.mp hgZ
+        rw [← hcz, sigmaLength_conj]
+        exact sigmaLength_le_two_of_mem_zTilde_of_isTypeP hG hMref hMPref hKMref hKref hKstarref
+          hUref hz
+    · have htypeF : ∀ M : Subgroup G, M ∈ maximalSubgroups G → IsTypeF M := by
+        intro M hM
+        rw [isTypeF_iff_not_isTypeP]
+        exact fun hMP => hP ⟨M, hM, hMP⟩
+      have hgsharp : g ∈ sharpSubgroup (⊤ : Subgroup G) :=
+        Set.mem_diff_singleton.mpr ⟨Subgroup.mem_top g, hg1⟩
+      rw [sharpSubgroup_top_eq_iUnion_conjClassSet_Mtilde_of_typeF hG htypeF,
+        Set.mem_iUnion₂] at hgsharp
+      obtain ⟨M, hMmax, hgM⟩ := hgsharp
+      exact hMtilde M hMmax hgM
 
 end OddOrder.BG.Ch4.S14
 
