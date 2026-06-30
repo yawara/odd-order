@@ -325,7 +325,8 @@ conjunct 3) / (9.9.c) exceptional (caseB conjunct 4) / (9.8.b,c,d) (caseA conjun
        と realize (`map_comap_eq`+`comap_ker`)、両者 L-normal (U'=Frobenius `typeP_uW1_frobenius.isNormal`、
        kernel=`MonoidHom.normal_ker`)⟹inf も L-normal。L の normal は L.subtype 押し出しで ↑(U⊔W₁) 全体に
        正規化 (`le_normalizer_map`+`normalizer_eq_top`+`range_subtype`、`← MonoidHom.range_eq_map`)。
-     - **残 = 組立 `chiefFactor_H0supC_subgroupOf_normal` (次 iteration、全 API 解決済、~60 行)**:
+     - **✅✅✅ 組立 DONE (commit 57f9239e): `chiefFactor_H0supC_subgroupOf_normal`** (S11、axiom-clean)。
+       ⟹ **3 構造入力 (∩H=H₀ / ≤HU / ◁M) 全完成**。下記レシピ通り landed:
        `(normal_subgroupOf_iff_le_normalizer hH0CleM).mpr (M ≤ N(H₀⊔C))`。M≤N(H₀⊔C) を:
        - **helper `key`** (`∀g∈Hs, toConjAct g•K≤K → Hs≤N(K)`): `conjAct_pointwise_smul_iff` +
          le_antisymm、逆向きは `pointwise_smul_le_pointwise_smul_iff.mpr (hle g⁻¹)` + `←mul_smul,←map_mul,
