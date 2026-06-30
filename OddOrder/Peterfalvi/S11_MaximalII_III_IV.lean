@@ -2043,6 +2043,69 @@ noncomputable def SOf [Finite G] (_chars : Section11CharacterData data chief) (Y
 
 end Section11CharacterData
 
+/-- **A nontrivial character of a prime-order group is faithful.**  `ker χ ≤ K` has order
+dividing the prime `|K|`, and `χ ≠ 1` rules out `ker χ = K`, so `ker χ = ⊥`.  The per-factor input
+of Peterfalvi (9.8)'s `def_Itheta`: on each order-`p` chief-factor summand a nontrivial linear
+character is faithful, so any automorphism fixing it is the identity. -/
+theorem injective_of_prime_card_of_ne_one {K : Type*} [Group K] [Finite K]
+    (hp : (Nat.card K).Prime) (χ : K →* ℂˣ) (hχ : χ ≠ 1) : Function.Injective χ := by
+  rw [← MonoidHom.ker_eq_bot_iff]
+  have hdvd : Nat.card ↥(MonoidHom.ker χ) ∣ Nat.card K := Subgroup.card_subgroup_dvd_card _
+  rcases hp.eq_one_or_self_of_dvd _ hdvd with h1 | hpeq
+  · exact Subgroup.card_eq_one.mp h1
+  · exact absurd (MonoidHom.ker_eq_top_iff.mp ((MonoidHom.ker χ).eq_top_of_card_eq hpeq)) hχ
+
+/-- **An automorphism fixing a nontrivial character of a prime-order group is the identity.**
+`χ (α x) = χ x` with `χ` faithful (`injective_of_prime_card_of_ne_one`) forces `α x = x`. -/
+theorem mulAut_eq_one_of_fixes_ne_one_hom {K : Type*} [Group K] [Finite K]
+    (hp : (Nat.card K).Prime) (α : MulAut K) (χ : K →* ℂˣ) (hχ : χ ≠ 1)
+    (hfix : ∀ x, χ (α x) = χ x) : α = 1 := by
+  ext x
+  exact injective_of_prime_card_of_ne_one hp χ hχ (hfix x)
+
+open OddOrder.RepresentationTheory in
+/-- **Per-factor stabilizer = centralizer** (Peterfalvi (9.8) `def_Itheta`, character form): for an
+abelian prime-order group `K`, an automorphism `α` fixing a nontrivial irreducible character `θ` is
+the identity.  `θ` is linear (`exists_linearIrreducibleCharacter_eq_of_isMulCommutative`), so it is a
+faithful homomorphism `χ : K →* ℂˣ` (`injective_of_prime_card_of_ne_one`), and `α` fixing `χ` forces
+`α = 1`.  Applied per order-`p` chief-factor summand of the non-Galois (9.7) decomposition. -/
+theorem mulAut_eq_one_of_fixes_irr_ne_trivial_of_prime_card {K : Type*} [Group K] [Finite K]
+    [IsMulCommutative K] (hp : (Nat.card K).Prime) (α : MulAut K)
+    (θ : IrreducibleCharacter K)
+    (hθnt : (θ : ClassFunction K ℂ) ≠ trivialClassFunction K)
+    (hfix : ∀ x, (θ : ClassFunction K ℂ) (α x) = (θ : ClassFunction K ℂ) x) : α = 1 := by
+  obtain ⟨χ, hχ⟩ := θ.isIrreducible.exists_linearIrreducibleCharacter_eq_of_isMulCommutative
+  have hχne : χ ≠ 1 := by
+    intro h0
+    apply hθnt
+    rw [← hχ, h0, show (linearIrreducibleCharacter (1 : K →* ℂˣ)) = trivialIrreducibleCharacter K from
+      linearIrreducibleCharacter_eq_trivial_iff.mpr rfl]
+    rfl
+  refine mulAut_eq_one_of_fixes_ne_one_hom hp α χ hχne (fun x => ?_)
+  apply Units.val_injective
+  have h1 := hfix x
+  rw [← hχ] at h1
+  simpa only [linearIrreducibleCharacter_apply] using h1
+
+/-- **An automorphism trivial on a spanning family of subgroups is the identity.**  The fixed
+points `{x | α x = x}` form a subgroup containing each `K i`, hence `⨆ i, K i = ⊤`; so `α` fixes
+everything.  Piece (D) of the non-Galois (9.8) inertia: `φ(g)` trivial on each order-`p` chief-factor
+summand `Hpart i` (which span `H̄`) is trivial on `H̄`. -/
+theorem mulAut_eq_one_of_eq_id_on_iSup {H : Type*} [Group H] (α : MulAut H)
+    {ι : Type*} (K : ι → Subgroup H) (hspan : ⨆ i, K i = ⊤)
+    (htriv : ∀ i, ∀ x ∈ K i, α x = x) : α = 1 := by
+  set S : Subgroup H :=
+    { carrier := {x | α x = x}
+      one_mem' := map_one α
+      mul_mem' := fun {a b} ha hb => by
+        simp only [Set.mem_setOf_eq] at ha hb ⊢; rw [map_mul, ha, hb]
+      inv_mem' := fun {a} ha => by
+        simp only [Set.mem_setOf_eq] at ha ⊢; rw [map_inv, ha] } with hS
+  have htop : S = ⊤ := top_le_iff.mp (hspan ▸ iSup_le (fun i x hx => htriv i x hx))
+  ext x
+  show α x = x
+  exact htop.ge (Subgroup.mem_top x)
+
 /-- Case (a) of Peterfalvi (9.7): `H/H_0` splits as a direct product of `q`
 order-`p` factors permuted by `W_1`.
 
