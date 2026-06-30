@@ -717,3 +717,25 @@ theorem exists_regular_char {Hbar} [CommGroup Hbar] [Finite Hbar] {ι} [Fintype 
    coprod の single slot) ⟹ θ ↑x = ψ i x ≠1。`noncommPiCoprod_mulSingle` が single-slot 計算。
 注: 一般補題ゆえ instance friction 無し。use site (Hbar=↥H⧸N) で IsMulCommutative→CommGroup の
 letI が要る (別途)。~50 行、fresh context 推奨。
+
+
+## conjunct c の状態 (2026-06-30、regular θ̄ 機構完成後)
+
+**揃った入力** (全て本セッションで実証明):
+- `exists_regular_irr_caseA`: regular θ̄ (各 Hpart 上 nontrivial) ∃。✅
+- `inertia_eq_hcInHu_caseA`: regular θ̄ ⟹ I_HU(θ₀)=HC。✅
+- `induceHU` (Ind_HU^M) + `induceHU_apply_one_eq_q_mul` (deg = q·χ(1)) + `xiSet`/`sOf`/`mem_sOf`。✅
+
+**欠けている核心 = Clifford correspondence**: 「I_HU(θ₀)=HC ⟹ Ind_{HC}^{HU}(θ₀ 上の linear) は
+irreducible、degree [HU:HC]=u」。これは S11:4402 で**docstring コメントとして言及されるのみ、
+未だ lemma 化されていない**。conjunct c (∃ irreducible deg qu ∈ 𝒮(H₀C)) はこの correspondence を
+要する最大の残ピース。
+
+**次イテレーション手順**:
+1. mathlib の Clifford correspondence (induced-from-inertia-group is irreducible) を探す
+   (`leansearch` / `Mathlib.RepresentationTheory` の Clifford/inertia)。無ければ repo 内
+   `IrreducibleCharacter.LiesOver`/inertia infra で構築。
+2. θ₀ 上の linear HC-char を構成 (inertia=HC ⟹ θ₀ が HC へ linear 拡張)、Ind_{HC}^{HU} で
+   irreducible (deg u) → χ ∈ xiSet ∩ 𝒳(H₀C)。
+3. `induceHU` で 𝒮(H₀C)、deg = q·u (`induceHU_apply_one_eq_q_mul`)。
+conjunct b は更に reducible↔regular (prTIred) を要し別ピース。conjunct d は count。
