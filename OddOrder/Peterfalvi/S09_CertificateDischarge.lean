@@ -187,4 +187,21 @@ theorem eq_zero_on_A_of_inner_zero [Invertible (Nat.card L : ℂ)] (A : Set L)
   have h0 : supportedProj A hA η x = 0 := by rw [hproj_zero]; rfl
   rwa [supportedProj_apply, if_pos hx] at h0
 
+/-- **Peterfalvi (7.7.a), the Gram entry.**  For a pairwise-orthogonal family `ζ : Fin (n+1) → CF(L)`
+and the difference vectors `ψ_j = ζ_j − d_j ζ_0` (`j ≥ 1`), the inner product `⟨ψ_j, ζ_i⟩` (`i ≥ 1`)
+is the diagonal entry `‖ζ_j‖²` when `i = j` and `0` otherwise: the `ζ_0` term drops out (`0 ≠ i`) and
+the `ζ_j`-term is the orthonormality indicator.  This is the Gram matrix that pins the coefficients
+of the (7.7.a) decomposition. -/
+theorem inner_psi_zeta [Invertible (Nat.card L : ℂ)] {n : ℕ}
+    (ζ : Fin (n + 1) → ClassFunction L ℂ) (d : Fin (n + 1) → ℂ)
+    (horth : ∀ a b : Fin (n + 1), a ≠ b → ClassFunction.inner (ζ a) (ζ b) = 0)
+    {i j : Fin (n + 1)} (hi : i ≠ 0) :
+    ClassFunction.inner (ζ j - d j • ζ 0) (ζ i) =
+      if i = j then ClassFunction.inner (ζ j) (ζ j) else 0 := by
+  rw [ClassFunction.inner_sub_left, ClassFunction.inner_smul_left,
+    horth 0 i (Ne.symm hi), mul_zero, sub_zero]
+  by_cases hij : i = j
+  · rw [if_pos hij, hij]
+  · rw [if_neg hij, horth j i (fun h => hij h.symm)]
+
 end OddOrder.Peterfalvi.S09.Cert
