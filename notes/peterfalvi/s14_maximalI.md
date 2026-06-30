@@ -1152,3 +1152,83 @@ de-opacify。
   (7.2.b)/(7.3) は upper bound (proven) ゆえ hB には不足、hC(sum<1)には寄与し得る。
 - **(12.12) degree bound** `complement_cyclic_order_dvd` (S14 sorried) が he:3≤e/h2e:2e≤p+1 を供給。
   rep-theory cores (isCyclic_and_card_dvd_of_faithful_one_dim 等 S14:2015+) から組める可能性。
+
+### loop⁴⁵ — ψ=χ^{τ₁} を witness L で完全構築 (distinguished χ 解決)
+
+**commit `0225855a`**: ψ-construction が realize された:
+- `exists_distinguished_char` (S14:~2392, sorry-free, 実 character theory): S が最小 degree [L:H] の member
+  を含む。H=L_F 非自明 nilpotent → commutator≠⊤ → `S08.exists_irreducibleCharacter_ne_trivial_degree_one_of_commutator_ne_top`
+  (推移 import 済; 内部は CommGroup.exists_apply_ne_one_of_hasEnoughRootsOfUnity = Pontryagin) で非自明線形
+  θ → χ=Ind θ、`induce_apply_one` で degree=[L:H]。**instance desync 教訓**: Sset の induce と同じ
+  FiniteInduce scope `natCardInvC` を使え (explicit invertibleOfNonzero は別 instance → rfl 破綻)。
+- `exists_witness_dadeNotation` (S14:~2425, sorry-free assembly): witness_L_coherent + exists_distinguished_char
+  + dadeNotation_of_coherence → witness L が完全 DadeNotation (ψ=χ^{τ₁})。
+
+**(12.16) char 核の残 (CounterexampleDadeData の値/norm 内容)**:
+- **h_const** = (12.14) `psi_constant_on_xK` (S14 sorried) — ψ concrete 化したので証明可能性 up。
+- **h_psig_int** = (12.15) `rhoM_integer_values` (S14 sorried)。
+- **e/he/h2e** = (12.12) `complement_cyclic_order_dvd` (S14 sorried) — rep-theory cores
+  (isCyclic_and_card_dvd_of_faithful_one_dim 等 S14:2015+) から組める見込み = **次の自己完結な実標的**。
+- **hA/hC** = ρ_M norm (12.15) / chiRho_integral_inequality (7.3, proven, Hypothesis71 から)。
+- **hB** = (7.8.b) lower bound = Hypothesis78 必須 → (7.7.a)/(7.8.c) certificate は **project 全体で未形式化**
+  (真の hard floor; lane γ も defer)。ここが (12.16) を closeする最終 blocker。
+
+**次 iteration の標的**: (12.12) `complement_cyclic_order_dvd` を rep-theory cores から組む (he/h2e 供給)。
+
+### loop⁴⁶ — hψ:ψ∈ZIrr G 追加 (ψ-data package 完成) + 戦略評価
+
+**commit `30be6dc9`**: `exists_witness_dadeNotation` を (hyp, dade, dade.psi∈ZIrr G) に拡張。
+IsCoherent.extension_mem_ZIrr (ℤ[S]→ℤ[Irr G]) を distinguished χ∈zSpan S に適用。
+witness L の ψ-data (ψ=dade.psi / e=dade.e / hψ) が CounterexampleDadeData 構築に揃った。
+
+### ⚠ (12.16) char 核の戦略評価 (loop⁴⁰–⁴⁶ 累積後)
+
+**到達済 (sorry-free real)**: capstone assembly + contract / witness L の Dade+coherence /
+toHypothesis71 ((7.1)) / dadeNotation_of_coherence / distinguished χ / **ψ=χ^{τ₁} 構築** / hψ∈ZIrr。
+
+**CounterexampleDadeData の残 field を到達可能性で分類**:
+| field | 内容 | 状態 |
+|---|---|---|
+| ε/hε | primitive root | **easy real** (Complex.isPrimitiveRoot_exp) |
+| ψ/hψ | χ^{τ₁}, virtual | **DONE** (exists_witness_dadeNotation) |
+| e | [L:H] | **DONE** (dade.e) |
+| h_const | (12.14) ψ(xg)=ψ(x) | char-deep (psi_constant_on_xK sorried、ψ concrete 化で証明可能性 up) |
+| h_psig_int | (12.15) ψ(g)∈ℤ | char-deep (rhoM_integer_values sorried) |
+| he/h2e | (12.12) 3≤e, 2e≤p+1 | **deep**: complement_cyclic_order_dvd は T=Ω₁(Z(O_p(H))) 構築+FPF+p²−1→p+1 refinement (12.9/12.11消費) |
+| h_psix | (1.10.a) Dade value 合同 | char-deep |
+| 基数/hidx/hM | \|K\|等, (8.1.c), (12.11) | 群論 (cite 可、一部 real) |
+| hA | (12.15) ρ_M norm | char-deep |
+| **hB** | **(7.8.b) lower bound** | **🛑 HARD FLOOR**: Hypothesis78 の chiRho_eq_inner_beta (7.8.c.i)/chiRho_decomp (7.7.a) は **project 全体で未形式化** (lane γ exists_MHypothesis も全体 sorry)。(12.16) を closeする最終 blocker |
+| hC | (7.3) sum<1 | chiRho_integral_inequality (proven) から組める可能性 |
+
+**🛑 戦略判断ポイント**: (12.16) の完全 close は **hB = (7.8.c) (7.7.a) の形式化を要し、これは §7 (S09) の
+project 全体の hard floor** (lane γ と共有)。lane b 単独では (12.16) を閉じられない。選択肢:
+(a) 12.16 の到達可能 field (12.14/12.15/12.12) を引き続き埋める (honest だが hB は残る)、
+(b) 上流 (7.8.c)/(7.7.a) の形式化に pivot (§7、深い、lane γ も unblock するが S09 領域)。
+上流優先原則は (b) を示唆するが S09 は別領域。**ユーザー判断が望ましい** (現状は (a) を継続中)。
+
+### loop⁴⁷ — three_le_index (he:3≤e) 完成
+
+**commit `53605390`**: `three_le_index` (sorry-free) = CounterexampleDadeData の `he : 3 ≤ e`。
+e=[L:H]=|U| (Frobenius complement、typeF.complement.symm.index_eq_card)、非自明 (U_nontrivial) ∧
+奇数 (∣|G| odd) → ≥3。**field 表更新: he = DONE**。残 reachable: ε/hε (easy), 基数/positivity (easy),
+h_const(12.14 cite)/h_psig_int(12.15 cite)/h2e(12.12)/hidx(8.1.c)/hM(12.11) = cite-able。
+**trajectory**: 残り cite-able を埋めて exists_counterexample_dade_data を hA/hB/hC のみ残す real partial
+assembly にする (hB=hard floor を明示 isolate)。次: ε/hε + 基数 (easy reals)。
+
+### loop⁴⁸ — lane b 方向転換: §7 hard floor 解消へ (ユーザー裁可)
+
+**ユーザー判断 (AskUserQuestion)**: lane b の (12.16) ψ-construction (he/hM 含む) 完了後、残る hard floor
+**hB=(7.8.b) は `Hypothesis78` の (7.8.c.i) certificate を要し project 全体で未形式化**。ユーザーが
+「§7 hard floor を解消」を選択 → lane b を **§7 (7.7.a)/(7.8.c) certificate discharge に pivot**。
+
+**正本 = issue 1013** (S09 §7 certificate discharge)。要点:
+- hard floor = `Hypothesis76.chiRho_decomp` (7.7.a) + `Hypothesis78.chiRho_eq_inner_beta` (7.8.c.i) が
+  構造の carried field。coherence から Hypothesis76/78 を構成するにはこれらを証明要。
+- 原文 mmd `04.9` L54-109 (p.39-40) に proof。coq `PFsection7.v` 併読。
+- ⚠ S09 は別セッションが活発編集中 ((7.11) assembly) → **S09 直接編集せず新ファイルで certificate を
+  standalone theorem 証明**して衝突回避。
+- discharge 後、lane b (12.16) hB と lane γ (14.11) h78 obligation の両方が unblock。
+
+**(12.16) の lane b 成果は temporal に一段落** (ψ/he/hM real、残 field は §7 unblock 待ち or deep)。
+次イテレーション = (7.7.a) chiRho_decomp の standalone 証明に着手 (新ファイル)。
