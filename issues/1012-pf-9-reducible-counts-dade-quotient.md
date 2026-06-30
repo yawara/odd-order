@@ -1330,3 +1330,27 @@ hIM が要する **M-conjugation (m∈M) と framework-bridge が要る**。
 **hIM 自体は clean** (inertia_M(ζ)=conjBy (G:=↥M)(H:=huSub) m ζ、huSub data : Subgroup ↥M ゆえ多段不要)。
 fiddly なのは argument 内の Res↔compHom 橋 (φ_m + identity + inner-compHom)。次 iteration build。
 construction 完成・green。
+
+
+## propagation Clifford reduction 完全完成 (L1+L2+L3+assembly) — 残 L4/L5 (2026-07-01)
+
+**LANDED (commits 94a76573/7412a9e1/afc5c7a1/8d4162ac/239bbd27/1d8e5293、全 clean-rebuild green)**:
+- L1: `hInHuConj` (φ_m, m-conjugation aut) + `hInHuConj_restrict_conjBy` (Res(conjBy m ζ)=compHom φ_m(Res ζ))。
+- L2: `innerSum/inner_compHom_of_bijective` + `hInHuConj_bijective` + `hcZeta_liesOver_compHom_of_fixed`
+  (conjBy m ζ=ζ ∧ ζ LiesOver θ₀ → ζ LiesOver φ_m·θ₀)。
+- L3: `hcZeta_exists_conj_of_fixed` (→ ∃g∈HU, conjBy g θ₀=compHom φ_m θ₀)。
+- assembly: `hcZeta_inertia_ne_top_of_free` (**hIM ⟸ free-orbit hfree + ζ LiesOver θ₀**)。
+
+**残 L4 (free-orbit hfree、deep) — 大量 reuse 判明**:
+- `conjBy_compHom_hInHuEquivH` (S11:4500) = **inflation-conjugation commute 既存**:
+  conjBy g (compHom hInHuEquivH θ) = compHom hInHuEquivH (compHom (typeP_conjAction a) θ) (↑g=↑a)。
+- θ₀ = compHom hInHuEquivH (compHom (mk' N) (linearIrr θ̄))。conjBy g θ₀ / compHom φ_m θ₀ を
+  これ + compHom_comp で quotient action on θ̄ に落とす (caseB_char_inertia 系が手本)。φ_m (m∈M) 側は
+  conjBy_compHom_hInHuEquivH の m∈M 類似が要 (または hInHuConj を huSub-conjBy 経由で接続)。
+- inflation injective (exists_compHom_eq 系) → hfree ⟺ θ̄^{w₀}∉U-orbit。
+- **free-orbit θ̄^{w₀}∉U-orbit**: `exists_regular_char_not_fixed` (S11:2314、θ̄^{τ}≠θ̄) を ∉U-orbit に強化
+  (regular θ̄ non-constant factor、W1 q-cycle 置換、U factor 内): per-factor support 比較。
+**残 L5**: w₀∈act.E の m∈M realization + 構築 ζ の ζ LiesOver θ₀ → assemble hIM →
+`hcZeta_inertia_ne_top_of_free` → `hcZeta_induceHU_irreducible` → `hcZeta_exists_irreducible_sOf` → conjunct c。
+
+Clifford reduction (genuinely new infra) 完成。残=L4 (free-orbit 深) + L5 (realization wiring)。
