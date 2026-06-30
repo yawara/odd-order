@@ -256,3 +256,24 @@ hypothesis76OfDade + (7.8.c.i) chiRho_eq_inner_beta_induced + 全 toolkit/buildi
 bare field でなく §8 coherence primitive)。最終 consumer = exists_counterexample_dade_data
 (giant §12 sorry)。carrier-conditional discharge は hyp76OfDade と同様 legitimate
 (§7 reasoning は実証明、§8 primitive のみ入力)。
+
+### 2026-07-01 (loop 継続⁷): (7.8.a) orth_one discharge + lane-b-tractable 境界の確定
+
+**(7.8.a) orth_one field を carrier-conditional に discharge** (commits 5d98039d, 411d4df4):
+- `inner_eq_of_eqOn_support` (support-inner)、`inner_tau_supported_constOne` ((2.7)-for-1_G:
+  ⟨α^τ,1_G⟩=⟨α,1_L⟩)、`inner_induce_constOne_eq_zero` (非主誘導⊥1_L)。
+- `betaDecomp_orth_one`: agreement (hagree) + (ζ_0^ν,1_G)=0 (hzeta0nu) から ∀i≠ind1H で
+  (ζ_i^ν,1_G)=0。**入力は simple coherence primitive のみ** (hoisting でない)。
+
+**⚠ lane-b-tractable 境界の確定 (重要)**: 残 BetaDecomp field (整数 a / Gamma / **Gamma_orth_nu**
+/ beta_eq) と (7.8.b) norm bounds は **§5/§8 coherence STRUCTURE を要し carrier-conditional 化
+できない**。Gamma_orth_nu = ⟨Γ,ζ_i^ν⟩=0 は ⟨β,ζ_i^ν⟩ (= (ζ_ind1H−ζ_0)^τ と ζ_i^ν の内積、
+ζ_i^ν の ρ-projection 経由) + 整数 a の特定値を要し、**これは hard content そのもの** (入力に
+取れば hoisting = 禁止 [[scaffold-sorry-free-not-done]])。根本原因 = **Hypothesis78.nu が
+abstract free field** (nu_isometry のみ; 実 §8 coherent extension と非接続) ゆえ ν の
+integer-coefficient structure / (β,ζ^ν) 関係が無い。
+
+**完了に要する cross-lane integration**: (a) Hypothesis78.nu を実 §8 coherent extension に接続
+(S09 structure 変更、並行編集注意) **or** (b) §8 coherence machinery が (β,ζ^ν) 関係を直接供給。
+→ **lane-b 単独で §7 floor を閉じる tractable 部分は orth_one まで**。残は §8 coherence
+(Pf §1-9 spine、実質 sorry-free のはずだが Hypothesis78.nu との接続が未) との integration。
