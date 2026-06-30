@@ -891,3 +891,21 @@ M_F=M_σ ケースの別 deep port。
 - NonTypeICovering: κ→Ẑ cover identification (上記 ~50-70 行 monolith) + exceptional_disjoint (trivIset)。
 §14 cover rapid-win phase 完了 (Lemma 14.6/Cor 14.9/covering eq/Cor 14.8)。残は sustained deep porting。
 **次 = NonTypeICovering κ→Ẑ monolith を head-on で着手** (上記 2-WLOG 構造に従い multi-iteration grind)。
+
+## ✅✅ 進捗 (lane d, 2026-06-30 /loop³⁷-⁴⁰): **κ→Ẑ identification 完成 + 一般 G# cover ⊆ 完成**
+
+deep monolith だった **NonTypeICovering の κ→Ẑ identification (Coq mFT_partition part 2) を clean sorry-free
+lemma 群に分解して完遂** (S14、全 axiom-clean、AxiomsCheck 登録、full build 3888 green)。~5 iteration で head-on grind:
+- `one_not_mem_zTilde` (1∉Ẑ) / `mem_zTilde_of_mul` (y∈K*#·y'∈K#·K⊓K*=⊥ ⟹ y·y'∈Ẑ、algebraic core)
+- `mem_centralizer_of_mem_sup_isCyclic` (y∈Z cyclic ⟹ y∈C(K)) / `typeP_sigmaElement_mem_Kstar`
+  (y∈M_σ·centralizes y'∈K# ⟹ y∈K*、conjunct(d) `typeP_centralizer_kappaElement_eq` + Z cyclic 経由)
+- `kappa_branch_mem_zTilde` (core, y'∈K) / `kappa_branch_mem_conjClassSet_zTilde` (general、⟨y'⟩を K に共役)
+- `kappa_branch_dichotomy_mem_conjClassSet_zTilde` (dichotomy κ-branch → ∃K K*, g∈𝒞_G(Ẑ)、N の typeP data 構成)
+- **`exists_mem_conjClassSet_Mtilde_or_zTilde_of_ne_one`**: **一般 G# cover ⊆ (両 branch、all-type-F 不要)** =
+  ∀g≠1, g∈𝒞_G(M̃) ∨ g∈𝒞_G(Ẑ)。signalizer→M̃ (`mem_Mtilde_of_mem_coset`) + κ→Ẑ。**BG Cor 14.9 partition の ⊆**。
+
+**▶▶ 残り NonTypeICovering struct**: (1) Ẑ を fixed W に固定 (全 type-P Ẑ 共役 = Cor 14.8 two classes + Ẑ 対称性) /
+(2) cover_nonidentity 完成 (⊇ = pieces⊆G# は `one_not_mem_Mtilde`/`one_not_mem_zTilde`+sharpSubgroup で軽い) /
+(3) pairwise (`conjClassSet_Mtilde_disjoint` 在) / (4) exceptional_disjoint (Ẑ∩M̃=∅、Coq trivIset) / struct 組立。
+**κ→Ẑ の deep heart は完了**; 残は struct plumbing + Ẑ-fixing。TypeICovering branch は別途 cover_subset_kernels
+(FittingIsTI-for-typeF gap) 待ち。

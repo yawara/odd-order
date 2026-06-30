@@ -5187,6 +5187,20 @@ WLOG `x ∈ M_σ`, the neighbour `N = N(x)` of Theorem 14.4, and Hall conjugacy 
 is the `cover_nonidentity` field of `BGTheoremETypeICovering` (modulo reps-vs-all-maximals).
 Axiom-clean. -/
 #assert_only_allowed_axioms OddOrder.BG.Ch4.S14.sharpSubgroup_top_eq_iUnion_conjClassSet_Mtilde_of_typeF
+/-! **κ→Ẑ identification** (`S14_TypePCounting`, the Coq `mFT_partition` part 2 core): for a
+type-`P` `M`, a `σ(M)`-element `y` centralizing a nonidentity `κ(M)`-element `y'∈M` has product
+`y·y' ∈ 𝒞_G(Ẑ)`.  `typeP_sigmaElement_mem_Kstar` (`y∈K*` via `Z=K⊔K*` cyclic) →
+`kappa_branch_mem_zTilde` (`y·y'∈Ẑ` for `y'∈K`) → `kappa_branch_mem_conjClassSet_zTilde` (general,
+via conjugation).  All axiom-clean. -/
+#assert_only_allowed_axioms OddOrder.BG.Ch4.S14.typeP_sigmaElement_mem_Kstar
+#assert_only_allowed_axioms OddOrder.BG.Ch4.S14.kappa_branch_mem_conjClassSet_zTilde
+/-! **`G^#` cover dichotomy** (`S14_TypePCounting`,
+`exists_mem_conjClassSet_Mtilde_or_zTilde_of_ne_one`): every `g ≠ 1` lies in `𝒞_G(M̃)` for some
+maximal `M`, or in `𝒞_G(Ẑ)` for some exceptional `(K,K*)` — the `⊆` of BG Cor 14.9's `G^#`
+partition (both cases), from `sigma_decomposition_dichotomy` (signalizer→M̃, κ→Ẑ via
+`kappa_branch_dichotomy_mem_conjClassSet_zTilde`).  Axiom-clean. -/
+#assert_only_allowed_axioms OddOrder.BG.Ch4.S14.kappa_branch_dichotomy_mem_conjClassSet_zTilde
+#assert_only_allowed_axioms OddOrder.BG.Ch4.S14.exists_mem_conjClassSet_Mtilde_or_zTilde_of_ne_one
 /-! **BG Lemma 14.6, exclusivity** (`S14_TypePCounting`, `not_type1_of_type2`): a type-2 element
 (`g = y·y'`, `y'` a nonidentity `κ(M)`-element of `C_M(y)`, `y ∈ M_σ^#`) is not of type-1
 (`g = x·x'`, `ℓ_σ(x)=1`, `x' ∈ R(x)`).  The `T ∩ H̃ = ∅` input to Theorem 14.7. -/
