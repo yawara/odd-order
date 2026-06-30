@@ -6499,5 +6499,34 @@ theorem hcZeta_exists_irreducible_sOf [Finite G] {M : Subgroup G}
     hcZeta_induceHU_irreducible chars θ hθ₀ hIM,
     hcZeta_induceHU_apply_one chars θ⟩
 
+/-- **`H ◁ M`** realized: `(data.H.subgroupOf M).Normal`.  Extracted as in `hInHu_normal`. -/
+theorem hSubgroupOfM_normal {M : Subgroup G} (data : TypesIIIIIIVSetup M) :
+    (data.H.subgroupOf M).Normal := by
+  rw [show data.H = maxNilpotentNormalHall M from data.typeP.H_eq]
+  exact OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_subgroupOf_normal M
+
+/-- **The `m`-conjugation automorphism of `hInHu`** (`m ∈ M`).  Well-defined since `H ◁ M`
+(`hSubgroupOfM_normal`), so `m` normalizes `hInHu`.  Realizing the `M`-conjugation of an
+`hInHu`-character as `compHom` by this hom keeps the (9.8.c) free-`W₁`-orbit argument at the `hInHu`
+level (no subgroup-realization transport). -/
+noncomputable def hInHuConj {M : Subgroup G} (data : TypesIIIIIIVSetup M) (m : ↥M) :
+    ↥(hInHu data) →* ↥(hInHu data) where
+  toFun h := ⟨ClassFunction.conjByMulEquiv (G := ↥M) (H := huSub data) m (h : ↥(huSub data)), by
+    refine Subgroup.mem_subgroupOf.mpr ?_
+    rw [ClassFunction.conjByMulEquiv_apply]
+    exact (hSubgroupOfM_normal data).conj_mem _ (Subgroup.mem_subgroupOf.mp h.2) m⟩
+  map_one' := by
+    apply Subtype.ext
+    simp
+  map_mul' h₁ h₂ := by
+    apply Subtype.ext
+    simp [map_mul]
+
+@[simp] theorem hInHuConj_coe {M : Subgroup G} (data : TypesIIIIIIVSetup M) (m : ↥M)
+    (h : ↥(hInHu data)) :
+    (((hInHuConj data m h : ↥(hInHu data)) : ↥(huSub data)) : ↥M)
+      = m * ((h : ↥(huSub data)) : ↥M) * m⁻¹ :=
+  rfl
+
 end OddOrder.Peterfalvi.S11
 
