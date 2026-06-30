@@ -545,6 +545,31 @@ theorem exists_distinct_induced_family (K : Subgroup L) [K.Normal] [Fintype ↥K
   let F := distinctInducedFamily K
   ⟨F.n, F.θ, F.inj, F.cover⟩
 
+/-- **Reindexing the induced family preserves injectivity.**  For any permutation `σ`, the family
+`i ↦ Ind_K^L θ_{σ i}` is injective when `i ↦ Ind_K^L θ_i` is.  Used to move the distinguished member
+to index `0` (`σ = Equiv.swap 0 j`) before applying `chiRho_eq_inner_beta_induced` (which expects
+the distinguished `ζ` at index `0`). -/
+theorem induce_family_comp_perm_injective {K : Subgroup L} [Fintype ↥K]
+    [Invertible (Nat.card ↥K : ℂ)] {n : ℕ} {θ : Fin (n + 1) → IrreducibleCharacter ↥K}
+    (hinj : Function.Injective (fun i => ClassFunction.induce K (θ i : ClassFunction ↥K ℂ)))
+    (σ : Equiv.Perm (Fin (n + 1))) :
+    Function.Injective (fun i => ClassFunction.induce K (θ (σ i) : ClassFunction ↥K ℂ)) :=
+  hinj.comp σ.injective
+
+/-- **Reindexing the induced family preserves covering.** -/
+theorem induce_family_comp_perm_covering {K : Subgroup L} [Fintype ↥K]
+    [Invertible (Nat.card ↥K : ℂ)] {n : ℕ} {θ : Fin (n + 1) → IrreducibleCharacter ↥K}
+    (hcover : ∀ φ : IrreducibleCharacter ↥K,
+      ClassFunction.induce K (φ : ClassFunction ↥K ℂ) ∈
+        Set.range (fun i => ClassFunction.induce K (θ i : ClassFunction ↥K ℂ)))
+    (σ : Equiv.Perm (Fin (n + 1))) :
+    ∀ φ : IrreducibleCharacter ↥K,
+      ClassFunction.induce K (φ : ClassFunction ↥K ℂ) ∈
+        Set.range (fun i => ClassFunction.induce K (θ (σ i) : ClassFunction ↥K ℂ)) := by
+  intro φ
+  obtain ⟨i, hi⟩ := hcover φ
+  exact ⟨σ.symm i, by simpa using hi⟩
+
 /-- **Discharge of the (7.7.a) certificate for an induced family** (Peterfalvi (7.7.a)).  This is
 the consolidation of `chiRho_decomp_proof` for the concrete family `ζ_i = Ind_K^L θ_i`: the
 orthogonality (`horth`) and spanning (`hspan`) hypotheses of the basis argument are *derived* from
