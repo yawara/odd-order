@@ -102,6 +102,14 @@
 > `exists_typeICovering` の carrier-consumer 部分を編集したら逸脱）。判定が曖昧なら
 > `git diff main...d -- …S14_MaximalI…` の `@@` hunk が全て `theorem exists_typeICovering` 文脈
 > （line 2639–2798）に収まるか確認。恒久解（現状維持 or carrier-consumer を d ファイルへ移設）は issue 0088 で追跡。
+>
+> **carve-out (issue 0090, ユーザー裁可 2026-06-30)**: `OddOrder/Peterfalvi/S09_CertificateDischarge.lean`
+> （lane b が新規作成、§7 (7.7.a) の CF(L,A) spanning 基盤 = S09 の opaque `chiRho_decomp` certificate を
+> discharge する欠落インフラ、genuine・非重複と hub 検証済）はファイル名が lane a の S09 namespace
+> パターンに掛かるが **lane b 所有**として扱う。⟹ step 1.5 で **lane b がこのファイルを編集していても
+> 逸脱としない**（lane a がこのファイルを編集したら逸脱; lane b が他の S09 ファイル＝
+> `S09_NonexistenceCertain.lean` 等を編集したら逸脱）。lane b は別ファイル隔離ゆえ lane a の S09 本体と
+> 衝突しない。恒久解（現状維持 / `S07_*` rename / S09 統合）は issue 0090 で追跡。
 1. 各レーンの未マージ確認: `git log --oneline main..<branch>`。
    **全レーン 0 なら「変化なし」1行報告で即終了**（build を走らせない）。
 1.5. **レーン範囲逸脱チェック（ユーザー方針 2026-06-22, 永続）**: 未マージがあるレーンについて、
