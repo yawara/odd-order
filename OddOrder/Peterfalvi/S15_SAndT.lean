@@ -433,6 +433,125 @@ theorem isMulCommutative_U [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
   exact OddOrder.GroupTheory.isMulCommutative_of_mulEquiv
     (Subgroup.subgroupOfEquivOfLe hU_le) h4
 
+/-- **`T`-side dual of `coprime_card_U_card_P_of_disjoint`** (Pf (13.2.a), V-side): for the type-II
+member `T` with a `TypeIIData` witness `tdata` and `Q ⊓ V = ⊥`, the complement order `|V|` is
+coprime to `|Q| = |T_F|`.  The `V`-side analogue used by the V-side of (13.17)/(14.10). -/
+theorem coprime_card_V_card_Q_of_disjoint [Finite G]
+    (hyp : Hypothesis (G := G)) (tdata : TypeIIData hyp.T) (hdisj : hyp.Q ⊓ hyp.V = ⊥) :
+    Nat.Coprime (Nat.card ↥hyp.V) (Nat.card ↥hyp.Q) := by
+  have hQH : hyp.Q = tdata.typeP.H := by rw [hyp.Q_eq_TF, tdata.typeP.H_eq]
+  have hQ_le : hyp.Q ≤ derivedInG hyp.T := by rw [hyp.T_deriv_eq_QV]; exact le_sup_left
+  have hV_le : hyp.V ≤ derivedInG hyp.T := by rw [hyp.T_deriv_eq_QV]; exact le_sup_right
+  have hM'_le_T : derivedInG hyp.T ≤ hyp.T := Subgroup.map_subtype_le _
+  have hT_le_NQ : hyp.T ≤ Subgroup.normalizer (hyp.Q : Set G) := by
+    rw [hyp.Q_eq_TF]; exact OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_le_normalizer hyp.T
+  haveI hQn_normal : (hyp.Q.subgroupOf (derivedInG hyp.T)).Normal :=
+    (Subgroup.normal_subgroupOf_iff_le_normalizer hQ_le).mpr (hM'_le_T.trans hT_le_NQ)
+  have hQnVn_inf : (hyp.Q.subgroupOf (derivedInG hyp.T)) ⊓
+      (hyp.V.subgroupOf (derivedInG hyp.T)) = ⊥ := by
+    ext ⟨x, hx⟩
+    simp only [Subgroup.mem_inf, Subgroup.mem_subgroupOf, Subgroup.mem_bot, Subtype.ext_iff,
+      OneMemClass.coe_one]
+    refine ⟨fun ⟨hxQ, hxV⟩ => ?_, fun h => by simp [h]⟩
+    have hxQV : x ∈ (hyp.Q ⊓ hyp.V : Subgroup G) := ⟨hxQ, hxV⟩
+    rwa [hdisj, Subgroup.mem_bot] at hxQV
+  have hQnVn_sup : (hyp.Q.subgroupOf (derivedInG hyp.T)) ⊔
+      (hyp.V.subgroupOf (derivedInG hyp.T)) = ⊤ := by
+    rw [← Subgroup.subgroupOf_sup hQ_le hV_le, hyp.T_deriv_eq_QV.symm, Subgroup.subgroupOf_self]
+  have hVcompl : (hyp.Q.subgroupOf (derivedInG hyp.T)).IsComplement'
+      (hyp.V.subgroupOf (derivedInG hyp.T)) := by
+    apply Subgroup.isComplement'_of_disjoint_and_mul_eq_univ (disjoint_iff.mpr hQnVn_inf)
+    have hmul := Subgroup.normal_mul (hyp.Q.subgroupOf (derivedInG hyp.T))
+      (hyp.V.subgroupOf (derivedInG hyp.T))
+    rw [hQnVn_sup, Subgroup.coe_top] at hmul
+    exact hmul.symm
+  have hidx : (hyp.Q.subgroupOf (derivedInG hyp.T)).index = Nat.card ↥hyp.V := by
+    rw [hVcompl.symm.index_eq_card, Nat.card_congr (Subgroup.subgroupOfEquivOfLe hV_le).toEquiv]
+  have hQ_mnh : hyp.Q = maxNilpotentNormalHall (derivedInG hyp.T) :=
+    hQH.trans tdata.derived_fitting_eq.symm
+  have hHall := OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_isHall (derivedInG hyp.T)
+  rw [← hQ_mnh] at hHall
+  have hcop_idx := hHall.coprime_index
+  rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hQ_le).toEquiv, hidx] at hcop_idx
+  exact hcop_idx.symm
+
+/-- **`T`-side dual of `isMulCommutative_U`** (Pf (13.2.a), V-side): the complement `V` of the
+type-II member `T` is commutative.  Mirror of `isMulCommutative_U`; here `IsTypeII T` is a
+hypothesis (the (14.9) `T_typeII` conclusion, supplied by the caller) since — unlike `S` — `T`'s
+type-II-ness is not sorry-free from the carrier.  Consumes the `Tdata` carrier (`Tdata_V_eq`). -/
+theorem isMulCommutative_V [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hyp : Hypothesis (G := G)) (hTTypeII : IsTypeII hyp.T) : IsMulCommutative ↥hyp.V := by
+  obtain ⟨tdata⟩ := hTTypeII
+  have hdisj : hyp.Q ⊓ hyp.V = ⊥ := by
+    have key : hyp.Tdata.H ⊓ hyp.Tdata.U = ⊥ := by
+      have hd := disjoint_iff.mp hyp.Tdata.derived_complement.disjoint
+      rw [eq_bot_iff]
+      rintro x ⟨hxH, hxU⟩
+      have hxD : x ∈ derivedInG hyp.T := hyp.Tdata.H_le hxH
+      have hmem : (⟨x, hxD⟩ : ↥(derivedInG hyp.T)) ∈
+          (hyp.Tdata.H.subgroupOf (derivedInG hyp.T)) ⊓
+            (hyp.Tdata.U.subgroupOf (derivedInG hyp.T)) :=
+        ⟨Subgroup.mem_subgroupOf.mpr hxH, Subgroup.mem_subgroupOf.mpr hxU⟩
+      rw [hd, Subgroup.mem_bot] at hmem
+      rw [Subgroup.mem_bot]
+      simpa using Subtype.ext_iff.mp hmem
+    rw [hyp.Q_eq_TF, ← hyp.Tdata.H_eq, ← hyp.Tdata_V_eq]
+    exact key
+  have hQH : hyp.Q = tdata.typeP.H := by rw [hyp.Q_eq_TF, tdata.typeP.H_eq]
+  have hQ_le : hyp.Q ≤ derivedInG hyp.T := by rw [hyp.T_deriv_eq_QV]; exact le_sup_left
+  have hV_le : hyp.V ≤ derivedInG hyp.T := by rw [hyp.T_deriv_eq_QV]; exact le_sup_right
+  have hM'_le_T : derivedInG hyp.T ≤ hyp.T := Subgroup.map_subtype_le _
+  have hQ_le_T : hyp.Q ≤ hyp.T := by
+    rw [hyp.Q_eq_TF]; exact OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_le hyp.T
+  have hT_le_NQ : hyp.T ≤ Subgroup.normalizer (hyp.Q : Set G) := by
+    rw [hyp.Q_eq_TF]; exact OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_le_normalizer hyp.T
+  haveI hQn_normal : (hyp.Q.subgroupOf (derivedInG hyp.T)).Normal :=
+    (Subgroup.normal_subgroupOf_iff_le_normalizer hQ_le).mpr (hM'_le_T.trans hT_le_NQ)
+  have hVcompl : (hyp.Q.subgroupOf (derivedInG hyp.T)).IsComplement'
+      (hyp.V.subgroupOf (derivedInG hyp.T)) := by
+    refine Subgroup.isComplement'_of_disjoint_and_mul_eq_univ ?_ ?_
+    · rw [disjoint_iff]
+      ext ⟨x, hx⟩
+      simp only [Subgroup.mem_inf, Subgroup.mem_subgroupOf, Subgroup.mem_bot, Subtype.ext_iff,
+        OneMemClass.coe_one]
+      refine ⟨fun ⟨hxQ, hxV⟩ => ?_, fun h => by simp [h]⟩
+      have hxQV : x ∈ (hyp.Q ⊓ hyp.V : Subgroup G) := ⟨hxQ, hxV⟩
+      rwa [hdisj, Subgroup.mem_bot] at hxQV
+    · have hsup : (hyp.Q.subgroupOf (derivedInG hyp.T)) ⊔
+          (hyp.V.subgroupOf (derivedInG hyp.T)) = ⊤ := by
+        rw [← Subgroup.subgroupOf_sup hQ_le hV_le, hyp.T_deriv_eq_QV.symm, Subgroup.subgroupOf_self]
+      have hmul := Subgroup.normal_mul (hyp.Q.subgroupOf (derivedInG hyp.T))
+        (hyp.V.subgroupOf (derivedInG hyp.T))
+      rw [hsup, Subgroup.coe_top] at hmul
+      exact hmul.symm
+  have hV'compl : (hyp.Q.subgroupOf (derivedInG hyp.T)).IsComplement'
+      (tdata.typeP.U.subgroupOf (derivedInG hyp.T)) := by
+    rw [hQH]; exact tdata.typeP.derived_complement
+  have hcop : Nat.Coprime (Nat.card ↥(hyp.Q.subgroupOf (derivedInG hyp.T)))
+      ((hyp.Q.subgroupOf (derivedInG hyp.T)).index) := by
+    rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hQ_le).toEquiv, hVcompl.symm.index_eq_card,
+      Nat.card_congr (Subgroup.subgroupOfEquivOfLe hV_le).toEquiv]
+    exact (coprime_card_V_card_Q_of_disjoint hyp tdata hdisj).symm
+  have hQ_lt_top : hyp.Q < ⊤ :=
+    lt_of_le_of_lt hQ_le_T (lt_top_iff_ne_top.mpr (mem_maximalSubgroups.mp hyp.T_maximal).1)
+  haveI hQsolv : IsSolvable ↥hyp.Q := _hG.solvable_of_lt_top hyp.Q hQ_lt_top
+  have hsolv : IsSolvable ↥(hyp.Q.subgroupOf (derivedInG hyp.T)) ∨
+      IsSolvable (↥(derivedInG hyp.T) ⧸ hyp.Q.subgroupOf (derivedInG hyp.T)) :=
+    Or.inl (solvable_of_solvable_injective
+      (f := (Subgroup.subgroupOfEquivOfLe hQ_le).toMonoidHom)
+      (Subgroup.subgroupOfEquivOfLe hQ_le).injective)
+  obtain ⟨n, _hnQ, hn⟩ :=
+    Subgroup.IsComplement'.exists_conj_of_coprime hcop hsolv hVcompl hV'compl
+  have h2 : IsMulCommutative ↥(tdata.typeP.U.subgroupOf (derivedInG hyp.T)) :=
+    OddOrder.GroupTheory.isMulCommutative_of_mulEquiv
+      (Subgroup.subgroupOfEquivOfLe tdata.typeP.U_le).symm tdata.U_commutative
+  rw [← hn] at h2
+  have h4 : IsMulCommutative ↥(hyp.V.subgroupOf (derivedInG hyp.T)) :=
+    OddOrder.GroupTheory.isMulCommutative_of_mulEquiv
+      (Subgroup.equivMapOfInjective _ _ (MulAut.conj n).injective).symm h2
+  exact OddOrder.GroupTheory.isMulCommutative_of_mulEquiv
+    (Subgroup.subgroupOfEquivOfLe hV_le) h4
+
 /-- **Structural core of Peterfalvi (13.17.a)** — the `L`-conjugate-to-`S` exclusion.  If `U` is a
 `π`-Hall subgroup of the solvable subgroup `V`, `L` is conjugate to `V` (`L^g = V`, i.e.
 `conj g • L = V`), and `N_G(U) ⊆ L`, then `N_G(U) ⊆ V`.
