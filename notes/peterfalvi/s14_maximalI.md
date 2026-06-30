@@ -1111,3 +1111,22 @@ support hyp.A) + coherence。残るは:
 2. **DadeNotation 構築**: distinguished χ∈Sset (degree e) + 拡張 τ₁ → ψ=τ₁(χ)。(12.13) data。
    e の degree bound (12.12) `complement_cyclic_order_dvd` (sorried) が he/h2e を供給。
 3. **hA/hC**: ρ_M norm (12.15) / `chiRho_integral_inequality` (7.3)。
+
+### loop⁴³ — S14.Hypothesis.toHypothesis71 完成 ((7.1) foundation)
+
+**commit `00c37192`**: `S14.Hypothesis.toHypothesis71` (S14:~102, sorry-free) = type-I L の (7.1)
+`S09.Hypothesis71 G (typeIA L hyp.typeI) L`。type-P (S12) と違い restriction 不要 (typeIA が dadeData の
+載る set そのもの)。`dadeData.dade : S04.Hypothesis G (typeIA L typeI) L` 直接 + FullDadeIsometryData の
+`.toDadeIsometryData.{toDadeMap,isDadeMap}` で構築。
+
+**hB への残 chain (構築コスト順)**:
+1. **Hypothesis76** (族 T): `hyp71`(済) + `H`/`A_eq_H_sharp`/`n`/`zeta`/`d`/`zeta_one_eq_d_mul`/
+   `psi_support`/**`chiRho_decomp`** ((7.7.a) decomposition 証明書)。H=L_F、T=Ind 構成要素列挙。
+   **族列挙 + (7.7.a) が実質 character theory ゆえ multi-step** (一 iteration 不可)。
+2. **Hypothesis78** (ν+certificate): Hypothesis76 + `nu`(coherent isometric extension, witness_L_coherent
+   の IsCoherent から)+ distinguished ζ + **`chiRho_eq_inner_beta`** ((7.8.c.i) certificate)。
+3. **hB**: `NormEstimates.zetaNuRho_norm_sq_ge` (S09:2616) cite。
+
+**次 iteration の標的**: Hypothesis76 構築の足場。H=L_F の特定、族 T (n/zeta/d) の (7.6) 列挙、
+chiRho_decomp (7.7.a) の構築経路調査。lane γ MHypothesis.h78 は obligation field ゆえ exists_MHypothesis
+での discharge 法 (S16:4499) も参照。
