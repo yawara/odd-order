@@ -343,6 +343,16 @@ conjunct 3) / (9.9.c) exceptional (caseB conjunct 4) / (9.8.b,c,d) (caseA conjun
          + `sup_assoc` ⟹ `M ≤ H⊔(U⊔W₁)` で `sup_le hH hUW1` に流す。
      その後 generic count refactor (chiefFactorQuotientHypothesis を N' (3条件: ◁M / ≤HU / ∩H=H₀) 一般化 +
      H₀/H₀C instance)。
+
+   **✅✅ 2026-06-30 (commit 248e268e): generic count refactor step 1 — hypothesis 層 一般化**:
+   - `chiefFactorQuotientHypothesisGen` (S06.Hypothesis(↥M⧸N') を generic N' (◁M, ≤M', W₁⊓N'=⊥, ¬W₂≤N')
+     で構成)。`chiefFactorQuotientHypothesis` (H₀) は delegate (bridge lemmas + reducible_count_sOf_H0 不変)。
+   - H₀C instance 入力: `chiefFactor_W1_inf_H0supC_subgroupOf_eq_bot` + `chiefFactor_W2_not_le_H0supC`。
+   - 残 (次 iteration、reducible_count_sOf_H0C へ): **A. generic |W̄₂'|=p** (H₀C 版): `Nat.card((W₂.subgroupOf M).map(mk' N'))`
+     = |W₂.subgroupOf M|/|W₂.subgroupOf M ⊓ N'`、kernel 一致 `W₂⊓H₀C=W₂⊓H₀` (W₂≤H, chiefFactor_H0supC_inf_H_eq_H0)
+     ⟹ H₀ 版 (`chiefFactor_card_W2bar`) と同値 = p。**B. `reducible_count_sOf_H0` を carrier K で一般化**
+     (~150 行、chief.H0→K、H₀-specific lemma → Gen + 一般 K_eq `chiefFactorQuotientHypothesisGen_K_eq` +
+     K≤huSub=hN'le + |W̄₂|=p 入力)。**C. H₀/H₀C instantiate** → `reducible_count_sOf_H0C` 実証明。
 - **⚠ caseA は独自 degree lemma 要**: caseA_character_counts は caseB を scope に持たない ⟹
   `caseB_degree_qu` cite 不可。(9.8.b) degree も caseA 版 chief-factor-constituent で別途。
 - **⚠ caseA は独自 degree lemma 要**: caseA_character_counts は caseB を scope に持たない ⟹
