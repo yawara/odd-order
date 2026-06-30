@@ -9937,6 +9937,33 @@ theorem conjClassSet_zTilde_eq_of_isConjugate [Finite G]
         (conjClassSet_zTilde_conj_eq (w * g) KN KstarN).symm
     _ = conjClassSet (zTilde K Kstar) := by rw [hKeq, hKstareq]
 
+/-- **fix-`W`** (BG Cor 14.8 packaging): for a reference type-`P` maximal `M` (with Theorem 14.7
+data `K, K*, U`) and *any* type-`P` maximal `N` (with data `KN, KstarN`), the `Ẑ` of `N` has the
+same `G`-conjugacy-class closure as the fixed `Ẑ(M) = zTilde K K*`.  Every type-`P` `N` is
+`G`-conjugate to `M` or to its partner `M*` (`typeP_covering`); the `M`-class lands on `W` by
+`conjClassSet_zTilde_eq_of_isConjugate`, and the `M*`-class lands on `zTilde K* K = zTilde K K*`
+(`typeP_partner_structure` supplies `M*`'s data `(K*, K)`, then `zTilde_comm`). -/
+theorem conjClassSet_zTilde_eq_fixed_of_isTypeP [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    {M K Kstar U N KN KstarN : Subgroup G}
+    (hM : M ∈ maximalSubgroups G) (hP : IsTypeP M) (hKM : K ≤ M)
+    (hK : Ch03.IsHallSubgroup (kappa M) (K.subgroupOf M))
+    (hKstar : Kstar = OddOrder.BG.Ch3.S10.Msigma M ⊓ Subgroup.centralizer (K : Set G))
+    (hU : Ch03.IsHallSubgroup ((kappa M ∪ OddOrder.BG.Ch3.S10.sigma M)ᶜ) (U.subgroupOf M))
+    (hNmax : N ∈ maximalSubgroups G) (hNP : IsTypeP N) (hKNN : KN ≤ N)
+    (hKN : Ch03.IsHallSubgroup (kappa N) (KN.subgroupOf N))
+    (hKstarN : KstarN = OddOrder.BG.Ch3.S10.Msigma N ⊓ Subgroup.centralizer (KN : Set G)) :
+    conjClassSet (zTilde KN KstarN) = conjClassSet (zTilde K Kstar) := by
+  obtain ⟨Mstar, hMstarne, hMstarmem, hpart⟩ :=
+    exists_partner hG (genuineSigmaDecomposition hG) hM hP hKM hK hKstar hU
+  obtain ⟨hMstarmax, hMstarP, hKstarMstar, hKstar_hall, hKeq⟩ :=
+    typeP_partner_structure hG hM hP hKM hK hKstar hU hMstarmem hMstarne hpart
+  rcases typeP_covering hG hM hP hKM hK hKstar hU hMstarmem hMstarne hpart hNmax hNP with
+    hNM | hNMstar
+  · exact conjClassSet_zTilde_eq_of_isConjugate hG hM hKM hK hKstar hNmax hKNN hKN hKstarN hNM
+  · rw [conjClassSet_zTilde_eq_of_isConjugate hG hMstarmax hKstarMstar hKstar_hall hKeq
+      hNmax hKNN hKN hKstarN hNMstar, zTilde_comm]
+
 /-- **Type-`P` data constructor**: every maximal subgroup `M` carries the Theorem 14.7 data — a
 Hall `κ(M)`-subgroup `K ≤ M`, the swap `K* = M_σ ∩ C_G(K)`, and a Hall `(κ ∪ σ)ᶜ`-subgroup `U` —
 obtained from Hall's theorem in the solvable `↥M`.  This is the missing constructor that lets the
