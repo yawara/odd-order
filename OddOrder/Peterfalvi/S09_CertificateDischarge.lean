@@ -1101,8 +1101,10 @@ theorem inner_weightedNuSum_nu_gen {G : Type*} [Group G] [Fintype G] {L : Subgro
     (hN : ∀ j : Fin (n + 1), ClassFunction.inner (ζ j) (ζ j) ≠ 0)
     (hz0 : ζ 0 (1 : ↥L) ≠ 0)
     (ν : ClassFunction ↥L ℂ →ₗ[ℤ] ClassFunction G ℂ)
-    (hnu : ∀ φ ψ : ClassFunction ↥L ℂ, ClassFunction.inner (ν φ) (ν ψ) = ClassFunction.inner φ ψ)
-    {ind1H j : Fin (n + 1)} (hj : j ≠ ind1H) :
+    {ind1H : Fin (n + 1)}
+    (hnu : ∀ i j : Fin (n + 1), i ≠ ind1H → j ≠ ind1H →
+      ClassFunction.inner (ν (ζ i)) (ν (ζ j)) = ClassFunction.inner (ζ i) (ζ j))
+    {j : Fin (n + 1)} (hj : j ≠ ind1H) :
     ClassFunction.inner
       (∑ i ∈ Finset.univ.erase ind1H,
         (ζ i (1 : ↥L) / (ζ 0 (1 : ↥L) * ClassFunction.inner (ζ i) (ζ i)) : ℂ) • ν (ζ i))
@@ -1110,9 +1112,10 @@ theorem inner_weightedNuSum_nu_gen {G : Type*} [Group G] [Fintype G] {L : Subgro
     = ζ j (1 : ↥L) / ζ 0 (1 : ↥L) := by
   rw [inner_sum_left, Finset.sum_eq_single_of_mem j
       (Finset.mem_erase.mpr ⟨hj, Finset.mem_univ j⟩)
-      (fun i _ hij => by
-        rw [ClassFunction.inner_smul_left, hnu, horth i j hij, mul_zero]),
-    ClassFunction.inner_smul_left, hnu]
+      (fun i hi_mem hij => by
+        rw [ClassFunction.inner_smul_left, hnu i j (Finset.ne_of_mem_erase hi_mem) hj,
+          horth i j hij, mul_zero]),
+    ClassFunction.inner_smul_left, hnu j j hj hj]
   have hNj := hN j
   field_simp
 
@@ -1127,8 +1130,13 @@ theorem inner_weightedNuSum_nu {G : Type*} [Group G] [Fintype G] {L : Subgroup G
     (θ : Fin (n + 1) → IrreducibleCharacter ↥K)
     (hinj : Function.Injective (fun i => ClassFunction.induce K (θ i : ClassFunction ↥K ℂ)))
     (ν : ClassFunction ↥L ℂ →ₗ[ℤ] ClassFunction G ℂ)
-    (hnu : ∀ φ ψ : ClassFunction ↥L ℂ, ClassFunction.inner (ν φ) (ν ψ) = ClassFunction.inner φ ψ)
-    {ind1H j : Fin (n + 1)} (hj : j ≠ ind1H) :
+    {ind1H : Fin (n + 1)}
+    (hnu : ∀ i j : Fin (n + 1), i ≠ ind1H → j ≠ ind1H →
+      ClassFunction.inner (ν (ClassFunction.induce K (θ i : ClassFunction ↥K ℂ)))
+          (ν (ClassFunction.induce K (θ j : ClassFunction ↥K ℂ)))
+        = ClassFunction.inner (ClassFunction.induce K (θ i : ClassFunction ↥K ℂ))
+          (ClassFunction.induce K (θ j : ClassFunction ↥K ℂ)))
+    {j : Fin (n + 1)} (hj : j ≠ ind1H) :
     ClassFunction.inner
       (∑ i ∈ Finset.univ.erase ind1H,
         (ClassFunction.induce K (θ i : ClassFunction ↥K ℂ) (1 : ↥L) /
@@ -1226,7 +1234,8 @@ theorem betaDecomp_gamma_orth_nu_gen {G : Type*} [Group G] [Fintype G] {A : Set 
     {ind1H : Fin (n + 1)} (hind0 : ind1H ≠ 0)
     (diffβ : (ζ ind1H - ζ 0).support ⊆ OddOrder.Peterfalvi.S04.supportInSubgroup A L)
     (ν : ClassFunction ↥L ℂ →ₗ[ℤ] ClassFunction G ℂ)
-    (hnu : ∀ φ ψ : ClassFunction ↥L ℂ, ClassFunction.inner (ν φ) (ν ψ) = ClassFunction.inner φ ψ)
+    (hnu : ∀ i j : Fin (n + 1), i ≠ ind1H → j ≠ ind1H →
+      ClassFunction.inner (ν (ζ i)) (ν (ζ j)) = ClassFunction.inner (ζ i) (ζ j))
     (hagree : ∀ i : Fin (n + 1), i ≠ 0 → i ≠ ind1H →
       ν (ζ i) - d i • ν (ζ 0) = H71.τ ⟨ζ i - d i • ζ 0, psi_support i⟩)
     (horth1 : ∀ i : Fin (n + 1), i ≠ ind1H →
@@ -1244,7 +1253,7 @@ theorem betaDecomp_gamma_orth_nu_gen {G : Type*} [Group G] [Fintype G] {A : Set 
   have hWj : ClassFunction.inner W (ν (ζ j)) = ζ j (1 : ↥L) / ζ 0 (1 : ↥L) := by
     rw [hW]; exact inner_weightedNuSum_nu_gen ζ horth hN hz0 ν hnu hj
   rw [ClassFunction.inner_sub_left, ClassFunction.inner_add_left, ClassFunction.inner_sub_left,
-    ClassFunction.inner_smul_left, hnu, hc1, hWj]
+    ClassFunction.inner_smul_left, hnu 0 j (Ne.symm hind0) hj, hc1, hWj]
   by_cases hj0 : j = 0
   · subst hj0
     rw [hζ0norm, div_self hz0, ha]; ring
@@ -1282,7 +1291,11 @@ theorem betaDecomp_gamma_orth_nu {G : Type*} [Group G] [Fintype G] {A : Set G} {
         - ClassFunction.induce K (θ 0 : ClassFunction ↥K ℂ)).support ⊆
       OddOrder.Peterfalvi.S04.supportInSubgroup A L)
     (ν : ClassFunction ↥L ℂ →ₗ[ℤ] ClassFunction G ℂ)
-    (hnu : ∀ φ ψ : ClassFunction ↥L ℂ, ClassFunction.inner (ν φ) (ν ψ) = ClassFunction.inner φ ψ)
+    (hnu : ∀ i j : Fin (n + 1), i ≠ ind1H → j ≠ ind1H →
+      ClassFunction.inner (ν (ClassFunction.induce K (θ i : ClassFunction ↥K ℂ)))
+          (ν (ClassFunction.induce K (θ j : ClassFunction ↥K ℂ)))
+        = ClassFunction.inner (ClassFunction.induce K (θ i : ClassFunction ↥K ℂ))
+          (ClassFunction.induce K (θ j : ClassFunction ↥K ℂ)))
     (hagree : ∀ i : Fin (n + 1), i ≠ 0 → i ≠ ind1H →
       ν (ClassFunction.induce K (θ i : ClassFunction ↥K ℂ))
           - d i • ν (ClassFunction.induce K (θ 0 : ClassFunction ↥K ℂ))
@@ -1524,8 +1537,11 @@ noncomputable def hypothesis78OfDade
     (hdeg_match : ClassFunction.induce (H.subgroupOf L) (θ 0 : ClassFunction _ ℂ) (1 : ↥L)
         = ClassFunction.induce (H.subgroupOf L) (θ ind1H : ClassFunction _ ℂ) (1 : ↥L))
     (ν : ClassFunction ↥L ℂ →ₗ[ℤ] ClassFunction G ℂ)
-    (hnu_isometry : ∀ φ ψ : ClassFunction ↥L ℂ,
-      ClassFunction.inner (ν φ) (ν ψ) = ClassFunction.inner φ ψ)
+    (hnu_isometry : ∀ i j : Fin (n + 1), i ≠ ind1H → j ≠ ind1H →
+      ClassFunction.inner (ν (ClassFunction.induce (H.subgroupOf L) (θ i : ClassFunction _ ℂ)))
+          (ν (ClassFunction.induce (H.subgroupOf L) (θ j : ClassFunction _ ℂ)))
+        = ClassFunction.inner (ClassFunction.induce (H.subgroupOf L) (θ i : ClassFunction _ ℂ))
+          (ClassFunction.induce (H.subgroupOf L) (θ j : ClassFunction _ ℂ)))
     (hagree : ∀ i : Fin (n + 1), i ≠ 0 → i ≠ ind1H →
       H71.τ ⟨ClassFunction.induce (H.subgroupOf L) (θ i : ClassFunction _ ℂ)
           - d i • ClassFunction.induce (H.subgroupOf L) (θ 0 : ClassFunction _ ℂ), psi_support i⟩
@@ -1607,8 +1623,10 @@ theorem cCoeff_nu_zeta_zero_eq_neg_d {G : Type*} [Group G] [Fintype G] {A : Set 
     {ind1H : Fin (H76.n + 1)}
     (hagree : ∀ i : Fin (H76.n + 1), i ≠ 0 → i ≠ ind1H →
       H76.hyp71.τ (H76.psiSupp i) = ν (H76.zeta i) - H76.d i • ν (H76.zeta 0))
-    (hiso : ∀ φ ψ : ClassFunction ↥L ℂ,
-      ClassFunction.inner (ν φ) (ν ψ) = ClassFunction.inner φ ψ)
+    (hiso : ∀ a b : Fin (H76.n + 1), a ≠ ind1H → b ≠ ind1H →
+      ClassFunction.inner (ν (H76.zeta a)) (ν (H76.zeta b))
+        = ClassFunction.inner (H76.zeta a) (H76.zeta b))
+    (h0ind : (0 : Fin (H76.n + 1)) ≠ ind1H)
     (horth : ∀ i : Fin (H76.n + 1), i ≠ 0 →
       ClassFunction.inner (H76.zeta i) (H76.zeta 0) = 0)
     (hnorm : ClassFunction.inner (H76.zeta 0) (H76.zeta 0) = 1)
@@ -1616,7 +1634,7 @@ theorem cCoeff_nu_zeta_zero_eq_neg_d {G : Type*} [Group G] [Fintype G] {A : Set 
     H76.cCoeff (ν (H76.zeta 0)) i = - H76.d i := by
   unfold Hypothesis76.cCoeff
   rw [hagree i hi0 hind, ClassFunction.inner_sub_left, ClassFunction.inner_smul_left,
-    hiso, hiso, horth i hi0, hnorm, mul_one, zero_sub]
+    hiso i 0 hind h0ind, hiso 0 0 h0ind h0ind, horth i hi0, hnorm, mul_one, zero_sub]
 
 /-- **Peterfalvi (7.8.b) coefficient identification, the `Ind 1_H` index.**  At `i = ind1H`, the
 `(7.7.a)` coefficient `c_{ind1H} = (ψ_{ind1H}^τ, ζ_0^ν)` equals `(β, ζ_0^ν)`: with `d_{ind1H} = 1`
@@ -2157,8 +2175,11 @@ noncomputable def betaDecompOfDade
     (hdeg_match : ClassFunction.induce (H.subgroupOf L) (θ 0 : ClassFunction _ ℂ) (1 : ↥L)
         = ClassFunction.induce (H.subgroupOf L) (θ ind1H : ClassFunction _ ℂ) (1 : ↥L))
     (ν : ClassFunction ↥L ℂ →ₗ[ℤ] ClassFunction G ℂ)
-    (hnu_isometry : ∀ φ ψ : ClassFunction ↥L ℂ,
-      ClassFunction.inner (ν φ) (ν ψ) = ClassFunction.inner φ ψ)
+    (hnu_isometry : ∀ i j : Fin (n + 1), i ≠ ind1H → j ≠ ind1H →
+      ClassFunction.inner (ν (ClassFunction.induce (H.subgroupOf L) (θ i : ClassFunction _ ℂ)))
+          (ν (ClassFunction.induce (H.subgroupOf L) (θ j : ClassFunction _ ℂ)))
+        = ClassFunction.inner (ClassFunction.induce (H.subgroupOf L) (θ i : ClassFunction _ ℂ))
+          (ClassFunction.induce (H.subgroupOf L) (θ j : ClassFunction _ ℂ)))
     (hagree : ∀ i : Fin (n + 1), i ≠ 0 → i ≠ ind1H →
       H71.τ ⟨ClassFunction.induce (H.subgroupOf L) (θ i : ClassFunction _ ℂ)
           - d i • ClassFunction.induce (H.subgroupOf L) (θ 0 : ClassFunction _ ℂ), psi_support i⟩
@@ -2285,8 +2306,11 @@ theorem zetaNuRhoNormSqGeOfDade
     (hdeg_match : ClassFunction.induce (H.subgroupOf L) (θ 0 : ClassFunction _ ℂ) (1 : ↥L)
         = ClassFunction.induce (H.subgroupOf L) (θ ind1H : ClassFunction _ ℂ) (1 : ↥L))
     (ν : ClassFunction ↥L ℂ →ₗ[ℤ] ClassFunction G ℂ)
-    (hnu_isometry : ∀ φ ψ : ClassFunction ↥L ℂ,
-      ClassFunction.inner (ν φ) (ν ψ) = ClassFunction.inner φ ψ)
+    (hnu_isometry : ∀ i j : Fin (n + 1), i ≠ ind1H → j ≠ ind1H →
+      ClassFunction.inner (ν (ClassFunction.induce (H.subgroupOf L) (θ i : ClassFunction _ ℂ)))
+          (ν (ClassFunction.induce (H.subgroupOf L) (θ j : ClassFunction _ ℂ)))
+        = ClassFunction.inner (ClassFunction.induce (H.subgroupOf L) (θ i : ClassFunction _ ℂ))
+          (ClassFunction.induce (H.subgroupOf L) (θ j : ClassFunction _ ℂ)))
     (hagree : ∀ i : Fin (n + 1), i ≠ 0 → i ≠ ind1H →
       H71.τ ⟨ClassFunction.induce (H.subgroupOf L) (θ i : ClassFunction _ ℂ)
           - d i • ClassFunction.induce (H.subgroupOf L) (θ 0 : ClassFunction _ ℂ), psi_support i⟩
@@ -2381,6 +2405,7 @@ theorem zetaNuRhoNormSqGeOfDade
         (ν (ClassFunction.induce (H.subgroupOf L) (θ 0 : ClassFunction _ ℂ))) = (a : ℂ) - 1
       rw [ha]; ring)
     (fun i hi0 hii => cCoeff_nu_zeta_zero_eq_neg_d H78.hyp76 H78.nu hagree' H78.nu_isometry
+      (Ne.symm hind1H)
       (fun i hi => induce_family_orthogonal_of_injective (H.subgroupOf L) θ hinj i 0 hi)
       hζ0norm i hi0 hii)
     (fun i => by
