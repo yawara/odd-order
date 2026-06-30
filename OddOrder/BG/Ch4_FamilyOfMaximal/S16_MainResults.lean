@@ -1682,6 +1682,22 @@ theorem exists_reps_sigma_partition [Finite G] (hG : OddOrder.BG.IsMinimalSimple
   exact ⟨reps, hrepsMax, sigma_reps_prime_cover hG hrepsMax hreps,
     fun _ hMi _ hMj hne => sigma_reps_pairwise_disjoint hG hrepsMax hreps hMi hMj hne⟩
 
+/-- The `𝒞_G(M̃)` cover taken over *all* maximal subgroups equals the cover taken over a set of
+conjugacy representatives `reps` (`M̃` is conjugation-equivariant, `𝒞_G` is conjugation-invariant).
+The `←` direction needs `reps ⊆ maximalSubgroups`. -/
+theorem mem_conjClassSet_Mtilde_maximals_iff_reps [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {reps : Set (Subgroup G)}
+    (hreps_max : ∀ Mi ∈ reps, Mi ∈ maximalSubgroups G)
+    (hreps : ∀ H ∈ maximalSubgroups G, ∃ Mi ∈ reps, S14.IsConjugateSubgroup H Mi) (g : G) :
+    (∃ M' ∈ maximalSubgroups G,
+      g ∈ conjClassSet (S14.Mtilde hG (S14.genuineSigmaDecomposition hG) M')) ↔
+      (∃ Mi ∈ reps,
+        g ∈ conjClassSet (S14.Mtilde hG (S14.genuineSigmaDecomposition hG) Mi)) := by
+  refine ⟨fun ⟨M', hM'max, hg⟩ => ?_, fun ⟨Mi, hMirep, hg⟩ => ⟨Mi, hreps_max Mi hMirep, hg⟩⟩
+  obtain ⟨Mi, hMirep, c, hc⟩ := hreps M' hM'max
+  exact ⟨Mi, hMirep, by
+    rw [← hc, ← S14.Mtilde_conj_smul, S14.conjClassSet_conj_smul]; exact hg⟩
+
 /-- **BG Theorem E** (mmd L4370): with `R(x)` as in Theorem D and
 `\widetilde M = ⋃_{x ∈ M_sigma#} xR(x)`, the conjugacy saturation of
 `\widetilde M` has the stated size, the representative maximal subgroups give a
