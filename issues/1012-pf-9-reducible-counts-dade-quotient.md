@@ -1408,3 +1408,23 @@ direct-product inertia vs (b) Frobenius-subgroup argument vs (c) cleaner; θ̄^{
 **次 iteration**: `mcp__Claude_in_Chrome__get_page_text{tabId:1470253202}` で回答を回収 (Pro は
 思考 ~10min)。回答を厳密検証してから free-orbit を formalize。未了なら再 poll + 並行で wiring
 (ζ LiesOver θ₀, realization) を build。tools: ToolSearch{query:"chrome browser tab navigate page"}。
+
+
+## ChatGPT consult ANSWER (verified) — 構築 strengthen 要・lemma chain 確定 (2026-07-01)
+
+回答回収・**厳密検証済** (counterexample 具体的に正しい、Lemma A/F の証明正しい)。正本=
+`notes/peterfalvi/s11_freeorbit_chatgpt_answer.md`。**重大**: 現構築 (fact 2 = θ̄^{w₀}≠θ̄) は
+**θ̄^{w₀}∉U-orbit に不十分** (反例 C₇⋊C₃/p=29、uw₀ が θ̄ を固定しうる)。
+
+**lemma chain (formalize 対象)**:
+- **Lemma A** (semidirect stabilizer、q prime): I_G(x)≤U ⟺ x^{w₀}∉x^U。pure group theory。
+- **Lemma C** (direct-product char extensionality), **D/E** (component formula + factor-orbit
+  separation): θ̄^w∈θ̄^U ⟺ ∃u,∀i transport_w(θ_{w⁻¹i})=θ_i^u; ∃i で ∉U-orbit(θ_i) なら θ̄^w∉θ̄^U。
+- **Lemma F** (marked-factor): U-orbit-label i↦[θ_i]_U 非定数 → q-cycle (q prime) で固定不可 →
+  θ̄^{w₀}∉U-orbit。**要 ≥2 U-orbit on Irr(factor)^# = im(U→F_pˣ) proper (u<p-1)**。
+- im(U) transitive なら **exponent criterion (Lemma G)**: Δ_{w₀}(a)∉ρ(U)。u=1 なら fact 2 で十分。
+
+**redirected plan**: 現 reduction (hcZeta_inertia_ne_top_of_free, hfree 取る) は正しく構築済。
+残 = hfree (θ̄^{w₀}∉U-orbit) を **marked-factor 構築 (strengthen clifford_caseA_exists_char_not_fixed)
++ Lemma C/D/E/F chain** で discharge。**要 caseA で u<p-1 (im(U) proper) を確認** (否なら Lemma G)。
++ realization wiring (g→a) で connection core を全 g に lift。
