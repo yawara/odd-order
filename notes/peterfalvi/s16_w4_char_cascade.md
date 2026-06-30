@@ -646,3 +646,12 @@ V-side landing (全 build-green、~13 lemma/struct + Tdata carrier):
 次 = (1) の structural wiring で exists_MHypothesis を de-opacify (bare sorry → 構造 field 充足 + char
 field isolate)、or TypeIOverNormalizerDataV packaging。[[feedback-no-avoiding-hard-parts]]
 [[scaffold-sorry-free-not-done]] [[hub-check-issue-before-asking-on-scope-violation]]
+
+**✅ UPDATE (同 /loop): hub V-side directive 完遂** (commit `06509fc6`)。`TypeIOverNormalizerDataV`
+struct + `typeI_overNormalizer_complement_V` (generic `exists_mem_conj_W2_le_of_dvd_card` を (P,W1,E)
+再利用) + `typeII_overNormalizer_frobenius_V` assembly を landing。⟹ hub 指示
+「typeII_overNormalizer_frobenius / exists_typeI_maximal_overNormalizer_U の V-side dual」**両方完成**。
+V-side 構造 producer 完備。残 = exists_MHypothesis (S16:4547、bare sorry) の wiring: typeII_overNormalizer_frobenius_V
+で M/complement_card_eq_pq 供給 + typeIHyp (M type-I → hypothesis_of_typeIData) + 残 deep char field
+(h78/§8、lane a/b char keystone gated、carrier isolate or sorried cite)。これは 35-field assembly
+ゆえ char sorry を多数導入する点に注意 (de-opacify は genuine だが optically sorry 増)。
