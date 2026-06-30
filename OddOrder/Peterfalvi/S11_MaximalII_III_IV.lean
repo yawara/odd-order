@@ -2174,6 +2174,22 @@ theorem noncommPiCoprod_bijective_of_card {K : Type*} [Group K] [Finite K] {ι :
   refine ⟨MonoidHom.range_eq_top.mp (by rw [Subgroup.noncommPiCoprod_range]; exact hspan), ?_⟩
   rw [Nat.card_pi]; exact hcard
 
+/-- **An intermediate subgroup of prime index is the bottom.**  For `H ≤ I` with `[G:H]` prime,
+`[G:I] ∣ [G:H]` is `1` (so `I = ⊤`) or `[G:H]` (so `|I| = |H|`, giving `I = H`).  Used for the
+M-level inertia: `HU ≤ I_M(χ) ≤ M` with `[M:HU] = q` prime, so a character not `W1`-fixed
+(`I_M(χ) ≠ M`) has `I_M(χ) = HU` — the free-`W1`-orbit ⟹ `induceHU` irreducible step. -/
+theorem eq_of_le_of_prime_index {G : Type*} [Group G] [Finite G] {H I : Subgroup G}
+    (hHI : H ≤ I) (hprime : (H.index).Prime) (hne : I ≠ ⊤) : I = H := by
+  have hdvd : I.index ∣ H.index := Subgroup.index_dvd_of_le hHI
+  rcases hprime.eq_one_or_self_of_dvd I.index hdvd with h1 | hp
+  · exact absurd (Subgroup.index_eq_one.mp h1) hne
+  · have hcard : Nat.card ↥I = Nat.card ↥H := by
+      have e1 : I.index * Nat.card ↥I = Nat.card G := Subgroup.index_mul_card I
+      have e2 : H.index * Nat.card ↥H = Nat.card G := Subgroup.index_mul_card H
+      rw [hp] at e1
+      exact Nat.eq_of_mul_eq_mul_left hprime.pos (e1.trans e2.symm)
+    exact (Subgroup.eq_of_le_of_card_ge hHI hcard.le).symm
+
 /-- **A permutation-invariant function on a transitive orbit is constant.**  If `σ` acts
 transitively (`∀ i j, ∃ k, σ^k i = j`) and `f` is `σ`-invariant (`f (σ i) = f i`), then `f` is
 constant.  Contrapositive: a non-constant `f` is not `σ`-invariant — the combinatorial core of the
@@ -4621,6 +4637,48 @@ noncomputable def clifford_caseA_data [Finite G] {M : Subgroup G}
   -- `a = |U-image on S₀| ∣ |S₀| - 1 = p - 1` (the order-`p` factor is cyclic, `Aut ≅ (ZMod p)ˣ`).
   have hdvd := aInvariantRestrictAut_range_card_dvd hS₀inv (hS₀card ▸ chief.p_prime)
   rwa [hS₀card] at hdvd
+
+/-- **A regular character nontrivial on each `W1`-conjugate of `S₀`** (Clifford case (a)).
+Instantiates the elementary `(9.7)` decomposition `H̄ = ⊕_{w∈W1} S₀^w` (`wConjugate_coprod_bijective`,
+with the chief-factor `U`-action, `act.U ⊔ act.E = ⊤`, `|H̄| = p^{|W1|}`) and feeds the resulting
+internal-direct-product bijection to `exists_regular_char_of_bijective`. -/
+theorem clifford_caseA_exists_regular_char_on_conjugates [Finite G] {M : Subgroup G}
+    {data : TypesIIIIIIVSetup M} (chief : ChiefFactorData data)
+    {S₀ : Subgroup (↥data.H ⧸ chief.N)} (hS₀ne : S₀ ≠ ⊥)
+    (hS₀inv : IsAInvariant ((typeP_quotientCoprimeAction data.typeP data.nontrivial.1
+        chief.N_aInvariant).φ.comp (typeP_quotientCoprimeAction data.typeP data.nontrivial.1
+        chief.N_aInvariant).U.subtype) S₀)
+    (hS₀card : Nat.card ↥S₀ = chief.p) :
+    ∃ θ : (↥data.H ⧸ chief.N) →* ℂˣ,
+      ∀ w : ↥(typeP_quotientCoprimeAction data.typeP data.nontrivial.1 chief.N_aInvariant).E,
+        ∃ x ∈ (typeP_quotientCoprimeAction data.typeP data.nontrivial.1
+            chief.N_aInvariant).φ ↑w • S₀, θ x ≠ 1 := by
+  classical
+  letI : CommGroup (↥data.H ⧸ chief.N) :=
+    { (inferInstance : Group (↥data.H ⧸ chief.N)) with
+      mul_comm := chief.quotient_elementaryAbelian.comm }
+  set act := typeP_quotientCoprimeAction data.typeP data.nontrivial.1 chief.N_aInvariant with hact
+  haveI : Fintype ↥act.E := Fintype.ofFinite _
+  have hUnorm : act.U.Normal := (typeP_uW1_frobenius data.typeP data.nontrivial.1).isNormal
+  have hspan0 : ⨆ a, act.φ a • S₀ = ⊤ :=
+    iSup_smul_eq_top_of_irreducible (φ := act.φ) chief.quotient_chiefFactor hS₀ne
+  have htop : act.U ⊔ act.E = ⊤ := by
+    show data.typeP.U.subgroupOf (data.typeP.U ⊔ data.typeP.W1)
+        ⊔ data.typeP.W1.subgroupOf (data.typeP.U ⊔ data.typeP.W1) = ⊤
+    rw [← Subgroup.subgroupOf_sup le_sup_left le_sup_right, Subgroup.subgroupOf_self]
+  have hspan : ⨆ a : ↥(act.U ⊔ act.E), act.φ ↑a • S₀ = ⊤ := by
+    refine le_antisymm le_top ?_
+    rw [← hspan0]
+    exact iSup_le fun b => le_iSup (fun a : ↥(act.U ⊔ act.E) => act.φ ↑a • S₀)
+      ⟨b, htop.ge (Subgroup.mem_top b)⟩
+  have hEcard : Fintype.card ↥act.E = data.q := by
+    rw [Fintype.card_eq_nat_card]
+    exact Nat.card_congr (Subgroup.subgroupOfEquivOfLe le_sup_right).toEquiv
+  have hKcard : Nat.card (↥data.H ⧸ chief.N) = (Nat.card ↥S₀) ^ (Fintype.card ↥act.E) := by
+    rw [hS₀card, hEcard, chiefFactor_quotient_card chief]
+  exact exists_regular_char_of_bijective _
+    (wConjugate_coprod_bijective hUnorm hS₀inv hspan hKcard)
+    (fun w => by rw [card_pointwise_smul, hS₀card]; exact chief.p_prime)
 
 /-- **Peterfalvi (9.7)**: the Clifford-theory dichotomy for the action on the chief factor `H/H_0`.
 

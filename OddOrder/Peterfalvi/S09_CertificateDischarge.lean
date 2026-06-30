@@ -139,6 +139,19 @@ theorem inner_self_eq_zero [Invertible (Nat.card L : ℂ)] {η : ClassFunction L
   ext g
   simpa using Complex.normSq_eq_zero.mp (hzero g)
 
+/-- **The inner product only sees the second factor on the support of the first.**  If `ψ` and `ψ'`
+agree wherever `α` is nonzero, then `⟨α, ψ⟩ = ⟨α, ψ'⟩`.  Used in (7.8.a)/(7.8.c) where a class
+function supported on `A` is paired against `(1_G)^ρ`, which equals `1_L` on `A`. -/
+theorem inner_eq_of_eqOn_support [Invertible (Nat.card L : ℂ)] {α ψ ψ' : ClassFunction L ℂ}
+    (h : ∀ g : L, α g ≠ 0 → ψ g = ψ' g) :
+    ClassFunction.inner α ψ = ClassFunction.inner α ψ' := by
+  rw [ClassFunction.inner_eq_inv_card_mul_innerSum, ClassFunction.inner_eq_inv_card_mul_innerSum,
+    ClassFunction.innerSum, ClassFunction.innerSum]
+  refine congrArg _ (Finset.sum_congr rfl fun g _ => ?_)
+  by_cases hg : α g = 0
+  · rw [hg, zero_mul, zero_mul]
+  · rw [h g hg]
+
 /-- **Peterfalvi (7.7.a), the uniqueness principle.**  If `η` lies in the `ℂ`-span of a set `S` of
 class functions and is orthogonal to every member of `S`, then `η = 0`.  This is the
 non-degeneracy of the inner product on a spanned subspace: the linear functional `⟨·, η⟩` vanishes
@@ -779,6 +792,97 @@ theorem induce_trivialChar_normSq_eq_index (K : Subgroup L) [K.Normal] [Fintype 
   have h2 : (Nat.card ↥K : ℂ) * (K.index : ℂ) = (Nat.card L : ℂ) := by
     rw [← Nat.cast_mul, mul_comm, K.index_mul_card]
   exact mul_left_cancel₀ hcardK (hkey.trans h2.symm)
+
+/-- **A nonprincipal induced character is orthogonal to `1_L`** (Peterfalvi (7.8.a), the `(φ,1_L)=0`
+step).  For `θ ∈ Irr K` with `θ ≠ 1_K`, `(Ind_K^L θ, 1_L)_L = 0`: by Frobenius reciprocity it is
+`(θ, Res_K 1_L)_K = (θ, 1_K)_K`, which vanishes by orthonormality of distinct irreducibles.
+
+This is the honest `(7.8.a)` ingredient that `(φ − d ζ, 1_L) = 0` (for the members `φ, ζ ∈ S`,
+induced from nonprincipal characters) rests on; the rest of `(7.8.a)`'s `orth_one` additionally
+needs the coherence facts `(φ−dζ)^τ = φ^ν − d ζ^ν` and `(ζ^ν, 1_G) = 0` about the extension `ν`. -/
+theorem inner_induce_constOne_eq_zero (K : Subgroup L) [Fintype ↥K]
+    [Invertible (Nat.card L : ℂ)] [Invertible (Nat.card ↥K : ℂ)]
+    (θ : IrreducibleCharacter ↥K) (hθ : θ ≠ trivialIrreducibleCharacter ↥K) :
+    ClassFunction.inner (ClassFunction.induce K (θ : ClassFunction ↥K ℂ))
+      (Hypothesis71.constOne L) = 0 := by
+  rw [ClassFunction.inner_induce_eq_inner_restrict,
+    show ClassFunction.restrict K (Hypothesis71.constOne L)
+        = (trivialIrreducibleCharacter ↥K : ClassFunction ↥K ℂ) from by
+      ext h; rw [ClassFunction.restrict_apply]; rfl,
+    irreducibleCharacter_inner_eq_ite, if_neg hθ]
+
+/-- **The Dade image of a supported class function is orthogonal to `1_G` iff the source is to
+`1_L`** (Peterfalvi (7.8.a), the `(2.7)`-for-`1_G` instance).  For `α ∈ CF(L,A)`,
+`⟨α^τ, 1_G⟩_G = ⟨α, 1_L⟩_L`: by the adjoint formula `chiRho_adjoint` `⟨α^τ, 1_G⟩ = ⟨α, (1_G)^ρ⟩`,
+and `(1_G)^ρ = 1` on `A` (`chiRho_constOne`) where `α` is supported (`inner_eq_of_eqOn_support`). -/
+theorem inner_tau_supported_constOne {G : Type*} [Group G] [Fintype G] {A : Set G} {L : Subgroup G}
+    [Fintype L] [Invertible (Nat.card L : ℂ)] [Invertible (Nat.card G : ℂ)]
+    (H71 : Hypothesis71 G A L)
+    (α : OddOrder.Peterfalvi.S04.SupportedClassFunctions (G := G) ℂ A L) :
+    ClassFunction.inner (H71.τ α) (Hypothesis71.constOne G)
+      = ClassFunction.inner (α : ClassFunction L ℂ) (Hypothesis71.constOne L) := by
+  rw [H71.chiRho_adjoint]
+  refine inner_eq_of_eqOn_support fun g hg => ?_
+  have hgA : (g : G) ∈ A := by
+    have h := (ClassFunction.mem_supportedSubmodule.mp α.2) (ClassFunction.mem_support.mpr hg)
+    rwa [OddOrder.Peterfalvi.S04.mem_supportInSubgroup] at h
+  rw [H71.chiRhoCF_apply, H71.chiRho_constOne, if_pos hgA, Hypothesis71.constOne_apply]
+
+/-- **Peterfalvi (7.8.a), `S^ν ⊥ 1_G`** (the `orth_one` field of `BetaDecomp`), carrier-conditional
+on the coherence of `ν`.  With the distinguished `ζ = Ind_K^L θ_0` at index `0`, the principal
+`Ind_K^L 1_K` at `ind1H ≠ 0`, the coherence agreement `(ζ_i − d_i ζ_0)^τ = ζ_i^ν − d_i ζ_0^ν`
+(`hagree`), and the single base fact `⟨ζ_0^ν, 1_G⟩ = 0` (`hzeta0nu`, the distinguished image is
+nonprincipal), every `ζ_i^ν` (`i ≠ ind1H`) is orthogonal to `1_G`:
+
+* `i = 0` is `hzeta0nu`;
+* for `i ≠ 0, ind1H`, `⟨ζ_i^ν, 1_G⟩ = ⟨(ζ_i − d_i ζ_0)^τ, 1_G⟩ + d_i ⟨ζ_0^ν, 1_G⟩` (`hagree`), the
+  first summand is `⟨ζ_i − d_i ζ_0, 1_L⟩ = 0` (`inner_tau_supported_constOne` +
+  `inner_induce_constOne_eq_zero`, as `θ_i, θ_0 ≠ 1_K`), the second is `0` (`hzeta0nu`). -/
+theorem betaDecomp_orth_one {G : Type*} [Group G] [Fintype G] {A : Set G} {L : Subgroup G}
+    [Fintype L] [Invertible (Nat.card L : ℂ)] [Invertible (Nat.card G : ℂ)]
+    (H71 : Hypothesis71 G A L) (K : Subgroup ↥L) [K.Normal] [Fintype ↥K]
+    [Invertible (Nat.card ↥K : ℂ)] {n : ℕ}
+    (θ : Fin (n + 1) → IrreducibleCharacter ↥K) (d : Fin (n + 1) → ℂ)
+    (psi_support : ∀ i, (ClassFunction.induce K (θ i : ClassFunction ↥K ℂ)
+        - d i • ClassFunction.induce K (θ 0 : ClassFunction ↥K ℂ)).support ⊆
+      OddOrder.Peterfalvi.S04.supportInSubgroup A L)
+    (hinj : Function.Injective (fun i => ClassFunction.induce K (θ i : ClassFunction ↥K ℂ)))
+    (ind1H : Fin (n + 1)) (hind1H : ind1H ≠ 0)
+    (hzeta_ind1H : θ ind1H = trivialIrreducibleCharacter ↥K)
+    (ν : ClassFunction ↥L ℂ →ₗ[ℤ] ClassFunction G ℂ)
+    (hagree : ∀ i : Fin (n + 1), i ≠ 0 → i ≠ ind1H →
+      H71.τ ⟨ClassFunction.induce K (θ i : ClassFunction ↥K ℂ)
+          - d i • ClassFunction.induce K (θ 0 : ClassFunction ↥K ℂ), psi_support i⟩
+        = ν (ClassFunction.induce K (θ i : ClassFunction ↥K ℂ))
+          - d i • ν (ClassFunction.induce K (θ 0 : ClassFunction ↥K ℂ)))
+    (hzeta0nu : ClassFunction.inner (ν (ClassFunction.induce K (θ 0 : ClassFunction ↥K ℂ)))
+      (Hypothesis71.constOne G) = 0) :
+    ∀ i : Fin (n + 1), i ≠ ind1H →
+      ClassFunction.inner (ν (ClassFunction.induce K (θ i : ClassFunction ↥K ℂ)))
+        (Hypothesis71.constOne G) = 0 := by
+  have hne_triv : ∀ j : Fin (n + 1), j ≠ ind1H → θ j ≠ trivialIrreducibleCharacter ↥K := by
+    intro j hj hcontra
+    apply hj
+    apply hinj
+    show ClassFunction.induce K (θ j : ClassFunction ↥K ℂ)
+      = ClassFunction.induce K (θ ind1H : ClassFunction ↥K ℂ)
+    rw [hcontra, hzeta_ind1H]
+  intro i hi
+  by_cases hi0 : i = 0
+  · rw [hi0]; exact hzeta0nu
+  · have hrearrange : ν (ClassFunction.induce K (θ i : ClassFunction ↥K ℂ))
+        = H71.τ ⟨ClassFunction.induce K (θ i : ClassFunction ↥K ℂ)
+            - d i • ClassFunction.induce K (θ 0 : ClassFunction ↥K ℂ), psi_support i⟩
+          + d i • ν (ClassFunction.induce K (θ 0 : ClassFunction ↥K ℂ)) := by
+      rw [hagree i hi0 hi]; abel
+    rw [hrearrange, ClassFunction.inner_add_left, ClassFunction.inner_smul_left, hzeta0nu,
+      mul_zero, add_zero, inner_tau_supported_constOne]
+    show ClassFunction.inner (ClassFunction.induce K (θ i : ClassFunction ↥K ℂ)
+        - d i • ClassFunction.induce K (θ 0 : ClassFunction ↥K ℂ)) (Hypothesis71.constOne L) = 0
+    rw [ClassFunction.inner_sub_left, ClassFunction.inner_smul_left,
+      inner_induce_constOne_eq_zero K (θ i) (hne_triv i hi),
+      inner_induce_constOne_eq_zero K (θ 0) (hne_triv 0 (Ne.symm hind1H)),
+      mul_zero, sub_zero]
 
 /-- **The (7.8.c) collapse of the (7.7.a) sum to a single term.**  If, in the `(7.7.a)`
 decomposition `χ^ρ(x) = ∑_{i ≥ 1} (c̄_i/‖ζ_i‖²) ζ_i(x)`, all coefficients `c_i` (`i ≥ 1`) vanish
