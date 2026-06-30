@@ -802,3 +802,18 @@ proof は無傷で通る。さらに option F (global isometry) は **存在し�
 受け取る形になった**。残りの bridge assembly: (b) family 構成 (θ_0=distinguished, ind1H≠0 で trivial)、
 (c) hzeta0nu, (d) degrees、(e) S14 で witness-L 組み立て。教訓: "fragile" 判定は真因 (helper の書き方) を
 特定してから; 弱化必須性は dimension argument で確認。[[feedback-no-avoiding-hard-parts]]
+
+### 2026-07-01 (loop 継続³⁴): bridge 部品 (b) family 構成 ✅ exists_placed_induced_family
+
+§12 bridge の family 構成 (part b) を landing (commit 6ceea07b): `exists_placed_induced_family`
+は distinctInducedFamily を reindex し θ 0 を distinguished (Ind(θ0)=χ_dist)、ind1H≠0 を trivial
+(θ ind1H=1_K) に配置 (inj/cover 保存)。trivial の fibre は inertia-stable ゆえ rep が 1_K 自身、
+swap 0 j_dist で distinguished を 0 へ、j_dist≠j_triv は χ_dist≠Ind 1_K から。
+
+§12 で確認した assembly target: `Hypothesis L → toHypothesis71 → hypothesis78OfDade →
+Hypothesis78.NormEstimates (7.8.b)` で CounterexampleDadeData.hB (=`1−e/kH≤normRho`) を産む。
+endpoint `exists_counterexample_dade_data` (S14:2740 sorry) は 25-field 構造で hB は 1 field。
+lane-b の clean な貢献 = standalone hB-producer (Hypothesis L から (7.8.b) bound)。残り bridge 部品:
+(c) degree facts (d/psi_support/hdeg/hdeg_match for placed family)、(d) hagree (coh から、
+coherence_hagree_dadeMap)、(e) ν=coh.extension + hnu_isometry=coherence_extension_inner_eq_on_family、
+(f) hypothesis78OfDade 組み立て→zetaNuRhoNormSqGeOfDade→normRho/kH/e 同定。
