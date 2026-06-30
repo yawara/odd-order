@@ -320,3 +320,30 @@ inner_beta_nuDiff / inner_beta_nu_eq / inner_weightedNuSum_nu / induce_apply_one
 chiRho_eq_inner_beta_induced を **consumable にする** (H78 構成 → lane γ unblock) が最高価値。
 path = hypothesis76OfFamily (hyp76OfDade を θ パラメタ化 refactor) → 区別 ζ を index 0 配置
 (induce_family_comp_perm) → hypothesis78OfDade (全 H78 field + certificate)。次 loop で着手。
+
+### 2026-07-01 (loop 継続¹¹⁻): hypothesis78OfDade 完成 — H78 構成可能 (issue 核 達成)
+
+**`hypothesis78OfDade` 完成** (S09_CertificateDischarge.lean, 55 宣言, 全 sorry-free, axiom-clean):
+`Hypothesis78` 全体を (7.1)/(7.6) データ + coherence 入力から構成、**(7.8.c.i) certificate を
+assume せず** `chiRho_eq_inner_beta_induced` で discharge。
+
+途中で抽出した再利用部品:
+- **`hypothesis76OfFamily`**: hypothesis76OfDade を任意 inj+cover 族 θ でパラメタ化 (区別 ζ を
+  index 0 に配置した族で H76 構成可能に)。hypothesis76OfDade は薄い wrapper。
+- **sharp-support 幾何 5 lemma** (`mem_supportInSubgroup_sharp_iff` 他、section SharpSupport):
+  A=H\{1} ↔ K=H.subgroupOf L の K\{1} 翻訳。hypothesis76OfFamily の inline を de-dup + H78 でも再利用。
+
+**hypothesis78OfDade の入力** (全て legitimate carrier-conditional、hoisting でない):
+H71, hτ (IsDadeIsometry), H◁L, A=H^#, 族 θ+hinj+hcover, 度数比 d+psi_support+hdeg, ind1H+区別 0,
+hzeta_ind1H (θ_ind1H=trivial), hdeg_match (ζ_0(1)=ζ_ind1H(1) ⟹ d_ind1H=1), ν+nu_isometry,
+hagree (§8 coherent extension の family-diff agreement)。certificate は (7.8.c.i) 機械で自動。
+
+**証明 bridge の要点** (将来 §12/§16 consumer が H78 を inline 構成する際の参考):
+(1) `hyp76.hyp71 = H71` を rfl で還元してから rw → chiRho_eq_inner_beta_induced 発火。
+(2) `congrArg star (congrArg (inner · χ) (congrArg H71.τ ?_))` で SupportedClassFunction 同値に帰着。
+(3) `Subtype.ext` + `rw[hd1, one_smul]` + `rfl` で d_ind1H•ζ_0 → ζ_0 を橋渡し。
+⚠ `.zeta` projection の rw は diff_support 依存で motive 不正 → `.hyp71` のみ rw し congrArg で処理。
+
+**issue 1013 の核 達成**: H78 (=§7 floor、(12.16) hB / lane γ (14.11) h78 が cite) が
+(7.1)+coherence のみから **certificate 仮定なし**で構成可能。残 = (7.8.b) NormEstimates
+(深く gated: a∈ℤ + degree-sum) + 実 consumer (exists_MHypothesis / §12 calc) が hypothesis78OfDade を呼ぶ統合。
