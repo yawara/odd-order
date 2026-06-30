@@ -634,6 +634,29 @@ theorem exists_compHom_eq_of_subset_characterKernel {H G : Type*} [Group H] [Gro
       (χ : ClassFunction H ℂ)
   rw [ClassFunction.compHom_comp, he_comp, ← inflate_coe f.ker θ0, hθ0]
 
+/-- **Inflation–kernel correspondence.**  For a group homomorphism `f : H →* G`, a class function
+`χbar` of `G`, and a subgroup `A ≤ H`, the inflation `compHom f χbar` contains `A` in its character
+kernel iff `χbar` contains the image `A.map f` in its character kernel:
+`A ⊆ ker (compHom f χbar) ↔ A.map f ⊆ ker χbar`.
+
+Pointwise, `(compHom f χbar)(x) = χbar(f x)` and `(compHom f χbar)(1) = χbar(1)`, so `x` lies in the
+kernel of the inflation iff `f x` lies in the kernel of `χbar`; ranging `x` over `A` matches the
+image `A.map f`.  This is the `H ⊄ ker χ ↔ H̄ ⊄ ker χ̄` bridge of the §9↔§6 reducible-count bijection
+(issue 1012): the §9 family `𝒳(H₀) ⊆ Irr(HU)` condition `H ⊄ ker` transports to the §6 condition
+`H̄ ⊄ ker` on `Irr(K̄)` under the inflation `K̄ = HU/H₀ → HU`. -/
+theorem subset_characterKernel_compHom_iff {H G : Type*} [Group H] [Group G]
+    (f : H →* G) (χbar : ClassFunction G ℂ) (A : Subgroup H) :
+    (A : Set H) ⊆ OddOrder.Peterfalvi.S03.characterKernel (ClassFunction.compHom f χbar) ↔
+      (A.map f : Set G) ⊆ OddOrder.Peterfalvi.S03.characterKernel χbar := by
+  simp only [Set.subset_def, SetLike.mem_coe, Subgroup.mem_map,
+    OddOrder.Peterfalvi.S03.mem_characterKernel, OddOrder.Peterfalvi.S03.characterDegree_def,
+    ClassFunction.compHom_apply, map_one]
+  constructor
+  · rintro h y ⟨x, hx, rfl⟩
+    exact h x hx
+  · intro h x hx
+    exact h (f x) ⟨x, hx, rfl⟩
+
 /-- **A constituent not killing `A`** (constituent transitivity).  For subgroups `A ≤ B ≤ G` and an
 irreducible `χ` of `G` with `A ⊄ ker χ`, some irreducible constituent `ψ` of `Res^G_B χ` (i.e. `χ`
 lies over `ψ`) also has `A ⊄ ker ψ` (where `A` is realized inside `B` as `A.subgroupOf B`).
