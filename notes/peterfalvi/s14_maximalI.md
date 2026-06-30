@@ -1152,3 +1152,25 @@ de-opacify。
   (7.2.b)/(7.3) は upper bound (proven) ゆえ hB には不足、hC(sum<1)には寄与し得る。
 - **(12.12) degree bound** `complement_cyclic_order_dvd` (S14 sorried) が he:3≤e/h2e:2e≤p+1 を供給。
   rep-theory cores (isCyclic_and_card_dvd_of_faithful_one_dim 等 S14:2015+) から組める可能性。
+
+### loop⁴⁵ — ψ=χ^{τ₁} を witness L で完全構築 (distinguished χ 解決)
+
+**commit `0225855a`**: ψ-construction が realize された:
+- `exists_distinguished_char` (S14:~2392, sorry-free, 実 character theory): S が最小 degree [L:H] の member
+  を含む。H=L_F 非自明 nilpotent → commutator≠⊤ → `S08.exists_irreducibleCharacter_ne_trivial_degree_one_of_commutator_ne_top`
+  (推移 import 済; 内部は CommGroup.exists_apply_ne_one_of_hasEnoughRootsOfUnity = Pontryagin) で非自明線形
+  θ → χ=Ind θ、`induce_apply_one` で degree=[L:H]。**instance desync 教訓**: Sset の induce と同じ
+  FiniteInduce scope `natCardInvC` を使え (explicit invertibleOfNonzero は別 instance → rfl 破綻)。
+- `exists_witness_dadeNotation` (S14:~2425, sorry-free assembly): witness_L_coherent + exists_distinguished_char
+  + dadeNotation_of_coherence → witness L が完全 DadeNotation (ψ=χ^{τ₁})。
+
+**(12.16) char 核の残 (CounterexampleDadeData の値/norm 内容)**:
+- **h_const** = (12.14) `psi_constant_on_xK` (S14 sorried) — ψ concrete 化したので証明可能性 up。
+- **h_psig_int** = (12.15) `rhoM_integer_values` (S14 sorried)。
+- **e/he/h2e** = (12.12) `complement_cyclic_order_dvd` (S14 sorried) — rep-theory cores
+  (isCyclic_and_card_dvd_of_faithful_one_dim 等 S14:2015+) から組める見込み = **次の自己完結な実標的**。
+- **hA/hC** = ρ_M norm (12.15) / chiRho_integral_inequality (7.3, proven, Hypothesis71 から)。
+- **hB** = (7.8.b) lower bound = Hypothesis78 必須 → (7.7.a)/(7.8.c) certificate は **project 全体で未形式化**
+  (真の hard floor; lane γ も defer)。ここが (12.16) を closeする最終 blocker。
+
+**次 iteration の標的**: (12.12) `complement_cyclic_order_dvd` を rep-theory cores から組む (he/h2e 供給)。
