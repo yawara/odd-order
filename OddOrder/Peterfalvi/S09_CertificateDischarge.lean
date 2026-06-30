@@ -780,6 +780,24 @@ theorem induce_trivialChar_normSq_eq_index (K : Subgroup L) [K.Normal] [Fintype 
     rw [← Nat.cast_mul, mul_comm, K.index_mul_card]
   exact mul_left_cancel₀ hcardK (hkey.trans h2.symm)
 
+/-- **A nonprincipal induced character is orthogonal to `1_L`** (Peterfalvi (7.8.a), the `(φ,1_L)=0`
+step).  For `θ ∈ Irr K` with `θ ≠ 1_K`, `(Ind_K^L θ, 1_L)_L = 0`: by Frobenius reciprocity it is
+`(θ, Res_K 1_L)_K = (θ, 1_K)_K`, which vanishes by orthonormality of distinct irreducibles.
+
+This is the honest `(7.8.a)` ingredient that `(φ − d ζ, 1_L) = 0` (for the members `φ, ζ ∈ S`,
+induced from nonprincipal characters) rests on; the rest of `(7.8.a)`'s `orth_one` additionally
+needs the coherence facts `(φ−dζ)^τ = φ^ν − d ζ^ν` and `(ζ^ν, 1_G) = 0` about the extension `ν`. -/
+theorem inner_induce_constOne_eq_zero (K : Subgroup L) [Fintype ↥K]
+    [Invertible (Nat.card L : ℂ)] [Invertible (Nat.card ↥K : ℂ)]
+    (θ : IrreducibleCharacter ↥K) (hθ : θ ≠ trivialIrreducibleCharacter ↥K) :
+    ClassFunction.inner (ClassFunction.induce K (θ : ClassFunction ↥K ℂ))
+      (Hypothesis71.constOne L) = 0 := by
+  rw [ClassFunction.inner_induce_eq_inner_restrict,
+    show ClassFunction.restrict K (Hypothesis71.constOne L)
+        = (trivialIrreducibleCharacter ↥K : ClassFunction ↥K ℂ) from by
+      ext h; rw [ClassFunction.restrict_apply]; rfl,
+    irreducibleCharacter_inner_eq_ite, if_neg hθ]
+
 /-- **The (7.8.c) collapse of the (7.7.a) sum to a single term.**  If, in the `(7.7.a)`
 decomposition `χ^ρ(x) = ∑_{i ≥ 1} (c̄_i/‖ζ_i‖²) ζ_i(x)`, all coefficients `c_i` (`i ≥ 1`) vanish
 except at one index `i₁`, and the distinguished member satisfies `ζ_{i₁}(x) = ‖ζ_{i₁}‖²`
