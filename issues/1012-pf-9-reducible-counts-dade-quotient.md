@@ -1235,3 +1235,29 @@ HU-共役 → θ̄^{w₀}∈U-orbit(θ̄) → free-orbit 矛盾。Coq PFsection9
 factor-permutation (980-994: conjg_Iirr) を熟読してから組む。
 
 ζ∈𝒳(H₀C) + degree + SOf + M-level irreducible(gated) + assembly 完成。残=propagation 1 本。
+
+
+## propagation (hIM) 完全 mapping — 残ゲートの precise gap 特定 (2026-07-01)
+
+**explicit route (全 producer 在庫確認)**:
+1. ζ LiesOver θ₀ (hInHu-level): `exists_constituent_not_subset_characterKernel` (ζ∈xiSet=H⊄ker ζ →
+   ∃θ₀ constituent nontrivial on hInHu)。θ₀ = inflation of 何らかの nontrivial θ̄'。
+2. SingleOrbit ζ: `restrictionConstituentsSingleOrbit_of_isIrreducible ζ` (CliffordSingleOrbit:120,
+   Clifford Thm 6.5、[hInHu.Normal][Fintype][Invertible] で直接適用)。
+3. 仮定 conjBy w₀_M ζ=ζ → `liesOver_conjBy` で ζ LiesOver conjBy w₀_M θ₀。
+4. `RestrictionConstituentsSingleOrbit.exists_conj` (Clifford:828): θ₀, conjBy w₀_M θ₀ HU-共役
+   → ∃h∈HU, conjBy h θ₀ = conjBy w₀_M θ₀ → **θ̄^{w₀} ∈ U-orbit(θ̄)** (h の U-成分)。
+
+**precise gap (残る本質)**: 矛盾には **θ̄^{w₀} ∉ U-orbit(θ̄)** が要る。現 seed
+`clifford_caseA_exists_char_inertia_hc_not_fixed` は **θ̄^{w₀}≠θ̄ しか与えない** (U-orbit が
+θ̄^{w₀} を含めば ≠ でも矛盾せず; U-stab(θ̄)=C≠U ゆえ U-orbit は u 元で非自明)。
+**strengthen 要**: regular θ̄ の factor 構造 (W1 が q factor を q-cycle で置換、U は
+factor-arrangement 保存) から θ̄^{w₀} ∉ U-orbit(θ̄) を導く (= free-W1-orbit の真の content)。
++ **w₀ の M-realization** (act.E elt → M elt) + conjBy。deep、複数 iteration。
+
+**alternative route (counting、要検討)**: Coq `oXtheta` (PFsection9:952) `u·|Xtheta|=(p-1)^q>0` →
+∃ irreducible 𝒮(H₀C)-member (個別構成+I_M=HU 不要、cardinality から存在)。conjunct c は
+∃ で足りるので、total |𝒮(H₀C)| count - reducible(p-1) > 0 で済む可能性。次 iteration で
+Coq oXtheta 構造を精査し、explicit(free-orbit) vs counting のどちらが tractable か判断。
+
+construction 完成 (assembly まで)。残 = hIM 1 本 (free-orbit content、deep)。
