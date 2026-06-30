@@ -2422,6 +2422,62 @@ theorem exists_distinguished_char {L : Subgroup G} [Finite G] (hyp : Hypothesis 
   refine ⟨_, hmem, ?_⟩
   rw [ClassFunction.induce_apply_one, hθ_deg, mul_one]
 
+/-- **Peterfalvi (12.13)/(12.16), the degree lower bound `e ≥ 3`**: the distinguished degree
+`e = [L:H]` (`H = L_F`) of a type-I `Hypothesis` is at least `3`.  It equals the order of the
+Frobenius complement `U` (`H` complements `U` in `L`, `typeF.complement`), which is **nontrivial**
+(`typeF.U_nontrivial`) and of **odd** order (a subgroup of the odd-order `G`); an odd integer `> 1`
+is `≥ 3`.  This discharges the `he : 3 ≤ e` field of `CounterexampleDadeData`. -/
+theorem three_le_index {L : Subgroup G} [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hyp : Hypothesis L) :
+    3 ≤ ((hyp.typeI.typeF.H).subgroupOf L).index := by
+  -- `[L : H] = |U|` via the complement `H ⋊ U = L`.
+  have hUle : hyp.typeI.typeF.U ≤ L := hyp.typeI.typeF.U_le
+  have hidx_eq : ((hyp.typeI.typeF.H).subgroupOf L).index = Nat.card ↥(hyp.typeI.typeF.U) := by
+    rw [hyp.typeI.typeF.complement.symm.index_eq_card,
+      Nat.card_congr (Subgroup.subgroupOfEquivOfLe hUle).toEquiv]
+  -- `|U| > 1` (nontrivial) and `|U|` odd (divides `|G|` odd), so `|U| ≥ 3`.
+  haveI : Nontrivial ↥(hyp.typeI.typeF.U) :=
+    (Subgroup.nontrivial_iff_ne_bot _).mpr hyp.typeI.typeF.U_nontrivial
+  have hgt1 : 1 < ((hyp.typeI.typeF.H).subgroupOf L).index := by
+    rw [hidx_eq]; exact Finite.one_lt_card
+  have hodd : Odd ((hyp.typeI.typeF.H).subgroupOf L).index := by
+    have hdvd : ((hyp.typeI.typeF.H).subgroupOf L).index ∣ Nat.card G :=
+      (Subgroup.index_dvd_card _).trans (Subgroup.card_subgroup_dvd_card L)
+    rcases Nat.even_or_odd ((hyp.typeI.typeF.H).subgroupOf L).index with hev | ho
+    · exfalso
+      obtain ⟨d, hd⟩ := hG.odd
+      obtain ⟨m, hm⟩ := hev.two_dvd.trans hdvd
+      omega
+    · exact ho
+  obtain ⟨k, hk⟩ := hodd
+  omega
+
+/-- **Peterfalvi (12.11)/(12.16), the index bound `|M| ≤ |K|·|H|`** (`H = L_F`): from the (12.11)
+complement structure (`M ∩ L` complements `K` in `M`, and `M ∩ L ≤ L_F`), the order of `M`
+factors as `|M| = |K|·|M ∩ L| ≤ |K|·|L_F|`.  This discharges the `hM` field of
+`CounterexampleDadeData` (cites the (12.11) `intersection_complement_structure`). -/
+theorem card_M_le [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    {ctr : CounterexampleHypothesis (G := G)} (data : RankTwoWitnessData ctr) :
+    Nat.card ↥ctr.M ≤ Nat.card ↥ctr.K * Nat.card ↥(maxNilpotentNormalHall data.L) := by
+  obtain ⟨hcompl, hsub⟩ := intersection_complement_structure hG data
+  have hKM : ctr.K ≤ ctr.M := ctr.K_eq_MF ▸ OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_le ctr.M
+  -- `|M| = |K| · |M ∩ L|` from the complement `K ⋊ (M ∩ L) = M`.
+  have h1 : Nat.card ↥(ctr.K.subgroupOf ctr.M) * (ctr.K.subgroupOf ctr.M).index = Nat.card ↥ctr.M :=
+    Subgroup.card_mul_index _
+  have h2 : (ctr.K.subgroupOf ctr.M).index = Nat.card ↥((ctr.M ⊓ data.L).subgroupOf ctr.M) :=
+    hcompl.symm.index_eq_card
+  have h3 : Nat.card ↥(ctr.K.subgroupOf ctr.M) = Nat.card ↥ctr.K :=
+    Nat.card_congr (Subgroup.subgroupOfEquivOfLe hKM).toEquiv
+  have h4 : Nat.card ↥((ctr.M ⊓ data.L).subgroupOf ctr.M) = Nat.card ↥(ctr.M ⊓ data.L) :=
+    Nat.card_congr (Subgroup.subgroupOfEquivOfLe inf_le_left).toEquiv
+  have hMeq : Nat.card ↥ctr.M = Nat.card ↥ctr.K * Nat.card ↥(ctr.M ⊓ data.L) := by
+    rw [← h3, ← h4, ← h2, h1]
+  -- `|M ∩ L| ≤ |L_F|` since `M ∩ L ≤ L_F`.
+  have hle : Nat.card ↥(ctr.M ⊓ data.L) ≤ Nat.card ↥(maxNilpotentNormalHall data.L) :=
+    Nat.le_of_dvd Nat.card_pos (Subgroup.card_dvd_of_le hsub)
+  rw [hMeq]
+  exact Nat.mul_le_mul_left _ hle
+
 open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
 /-- **Peterfalvi (12.13) for the witness subgroup `L`**: the second maximal `L` of (12.9) carries a
 full (12.13) `DadeNotation` — the realized `ψ = χ^{τ₁}` of the (12.16) Dade calculation.
@@ -2434,11 +2490,13 @@ contradiction is the value/norm content — (12.14)/(12.15) for `h_const`/`h_psi
 degree bounds, and the `ρ`/`ρM` norm bounds `hA`/`hB`/`hC`. -/
 theorem exists_witness_dadeNotation [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     {ctr : CounterexampleHypothesis (G := G)} (data : RankTwoWitnessData ctr) :
-    ∃ hyp : Hypothesis data.L, Nonempty (DadeNotation hyp) := by
+    ∃ hyp : Hypothesis data.L, ∃ dade : DadeNotation hyp, dade.psi ∈ ZIrr G := by
   obtain ⟨hyp, ⟨coh⟩⟩ := witness_L_coherent hG data
   obtain ⟨χ, hχ, hdeg⟩ := exists_distinguished_char hyp
-  exact ⟨hyp, ⟨dadeNotation_of_coherence hyp coh χ hχ
-    ((hyp.typeI.typeF.H).subgroupOf data.L).index hdeg⟩⟩
+  refine ⟨hyp, dadeNotation_of_coherence hyp coh χ hχ
+    ((hyp.typeI.typeF.H).subgroupOf data.L).index hdeg, ?_⟩
+  -- `dade.psi = coh.extension χ` and `χ ∈ S ⊆ ℤ[S]`, so the coherent extension lands in `ℤ[Irr G]`.
+  exact coh.extension_mem_ZIrr χ (Submodule.subset_span hχ)
 
 /-- **Peterfalvi (12.14)**: the character `psi` is constant on the coset `xK`. -/
 theorem psi_constant_on_xK [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
