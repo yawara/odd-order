@@ -453,3 +453,29 @@ G := Σ_{φ∈S∖{ζ}} φ(1)²/‖φ‖² と置くと:
 
 次 = (7.8.b) 代数 assembly (degree facts + G を hypothesis に取り collapse+c_i から ua²−2va+w)
 を構築 (G は (1.5.d) carrier 入力、別途 bridge)。または (1.5.d) bridge を先に。multi-turn。
+
+### 2026-07-01 (loop 継続¹⁶⁻): 🎯 (7.8.b) 代数+identification チェーン完全 — 残 (1.5.d) のみ (S08-accessible)
+
+**(7.8.b) の代数+identification チェーンが完全に揃った** (全 sorry-free、S09_CertificateDischarge):
+```
+cCoeff_nu_zeta_zero_eq_neg_d / _ind1H_eq  (c_i 同定: c_i=−d_i, c_ind1H=(β,ζ_0^ν)=a−1)
+  → chiRho_norm_sq_collapse  (double-sum → 対角 + rank-1、族直交)
+  → sum_diag_split_ind1H / term1_eval_generic / rank1_eval_generic / rank1_eval_Y_generic  (sum 評価)
+  → normEstimate_matching  (ring-verified: t₁−X²/eh = ua²−2va+w、G=e(h−1)−e² 代入)
+  → zetaNuRho_inner_eq_cexpr  (ℂ-level: inner = (a−1)²/e + G/e² − ((a−1)−G/e)²/|L|)
+  → cexpr_re_eq_normQuad  (.re + matching bridge)
+  → zetaNuRhoNormSq_eq_normQuad  (identification: zetaNuRhoNormSq = normQuadraticCorrection + (1−e/h))
+```
+既存 `zetaNuRhoNormSq_ge_of_normQuadraticCorrection_eq` に渡せば **(7.8.b) lower bound**。
+
+**残るは (1.5.d) G 値一点** (= zetaNuRho_inner_eq_cexpr の G を establish):
+`G = Σ_{i≠0,ind1H} ζ_i(1)²/‖ζ_i‖² = e(h−1) − e²`。**path 確定 (S08 機構で buildable)**:
+- **S08 `sum_div_normSq_induce_kernelFilter_eq` (CorePart1、S09 の closure に在=import 不要) を A=⊥ で適用**:
+  filter `(⊥⊆Ker θ) ∧ θ≠1` は ⊥⊆Ker 自明ゆえ θ≠1 に簡約、|K/⊥|=|K|、K.index=[↥L:K]=e。
+  → `Σ over (distinct-induced θ≠1) χ(1)²/‖χ‖² = e·(|K|−1) = e(h−1)`。
+- **family↔image reindexing** (substantial): my family-index sum `Σ_{i≠ind1H}` (DistinctInducedFamily
+  enumeration、hinj/hcover) = S08 image sum (θ≠1)。{ζ_i : i≠ind1H} = {induce θ : θ≠1} を hcover+hinj+
+  ind1H↔trivial で示し Finset.sum_image で reindex。
+- → `Σ_{i≠ind1H} = e(h−1)`、ζ_0 項 (e²) を引いて `G = e(h−1)−e²`。
+
+次 = (1.5.d) 構築 (A=⊥ specialization → reindexing)。これが (7.8.b) 唯一残る実質数学。

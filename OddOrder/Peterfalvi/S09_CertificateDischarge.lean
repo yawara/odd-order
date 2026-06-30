@@ -1648,4 +1648,73 @@ theorem zetaNuRho_inner_eq_cexpr {G : Type*} [Group G] [Fintype G] {A : Set G} {
       a e hind hc_ind1H hc_rest hP_real hd hN_ind1H hP_ind1H he]
   ring
 
+/-- **(7.8.b) real-part + matching.**  Taking the real part of the ℂ-level norm identity (all of
+`a, e, G, |L| = e·h` being real casts) and applying `normEstimate_matching`, the `ζ_0^ν`-norm
+equals Peterfalvi's quadratic `(1/e)(1−1/h)a² − (2/h)a + (1−e/h) = normQuadraticCorrection + (1−e/h)`.
+This bridges the ℂ-level `zetaNuRho_inner_eq_cexpr` to the ℝ-valued `NormEstimates` field. -/
+theorem cexpr_re_eq_normQuad (a e h G : ℝ) (he : e ≠ 0) (hh : h ≠ 0)
+    (hG : G = e * (h - 1) - e ^ 2) :
+    (((a : ℂ) - 1) ^ 2 / (e : ℂ) + (G : ℂ) / (e : ℂ) ^ 2
+        - (((a : ℂ) - 1) - (G : ℂ) / (e : ℂ)) ^ 2 / ((e : ℂ) * (h : ℂ))).re =
+      (1 / e) * (1 - 1 / h) * a ^ 2 - 2 * (1 / h) * a + (1 - e / h) := by
+  rw [show (((a : ℂ) - 1) ^ 2 / (e : ℂ) + (G : ℂ) / (e : ℂ) ^ 2
+        - (((a : ℂ) - 1) - (G : ℂ) / (e : ℂ)) ^ 2 / ((e : ℂ) * (h : ℂ)))
+      = (((a - 1) ^ 2 / e + G / e ^ 2 - ((a - 1) - G / e) ^ 2 / (e * h) : ℝ) : ℂ) from by
+      push_cast; ring,
+    Complex.ofReal_re, normEstimate_matching a e h G he hh hG]
+
+/-- **(7.8.b) identification** (last mile).  Given the ℂ-level norm identity (`h_inner`, supplied by
+`zetaNuRho_inner_eq_cexpr` with `a, e, G` as the real casts `hBD.a`, `complementIndex`, and the
+`(1.5.d)` degree-sum value), the real norm `‖ζ_0^{νρ}‖²` equals
+`normQuadraticCorrection + (1 − e/h)`.  Fed to `zetaNuRhoNormSq_ge_of_normQuadraticCorrection_eq`,
+this yields the Peterfalvi (7.8.b) lower bound. -/
+theorem zetaNuRhoNormSq_eq_normQuad {G : Type*} [Group G] [Fintype G] {A : Set G} {L : Subgroup G}
+    [Fintype L] [Invertible (Nat.card L : ℂ)] [Invertible (Nat.card G : ℂ)]
+    (H78 : OddOrder.Peterfalvi.S09.Hypothesis78 G A L) (hBD : H78.BetaDecomp)
+    (a_ℝ e_ℝ h_ℝ G_ℝ : ℝ) (he : e_ℝ ≠ 0) (hh : h_ℝ ≠ 0)
+    (hG : G_ℝ = e_ℝ * (h_ℝ - 1) - e_ℝ ^ 2)
+    (ha : a_ℝ = (hBD.a : ℝ)) (he' : e_ℝ = (H78.complementIndex : ℝ))
+    (hh' : h_ℝ = (H78.kernelOrder : ℝ))
+    (h_inner : ClassFunction.inner H78.zetaNuRho H78.zetaNuRho =
+      ((a_ℝ : ℂ) - 1) ^ 2 / (e_ℝ : ℂ) + (G_ℝ : ℂ) / (e_ℝ : ℂ) ^ 2
+        - (((a_ℝ : ℂ) - 1) - (G_ℝ : ℂ) / (e_ℝ : ℂ)) ^ 2 / ((e_ℝ : ℂ) * (h_ℝ : ℂ))) :
+    H78.zetaNuRhoNormSq =
+      H78.normQuadraticCorrection hBD
+        + (1 - (H78.complementIndex : ℝ) / (H78.kernelOrder : ℝ)) := by
+  unfold OddOrder.Peterfalvi.S09.Hypothesis78.zetaNuRhoNormSq
+  rw [h_inner, cexpr_re_eq_normQuad a_ℝ e_ℝ h_ℝ G_ℝ he hh hG,
+    OddOrder.Peterfalvi.S09.Hypothesis78.normQuadraticCorrection, ha, he', hh']
+
+/-- **(1.5.d) degree-sum over distinct induced characters** (`A = ⊥` specialization of the S08
+orbit-count `sum_div_normSq_induce_kernelFilter_eq`).  Summing `χ(1)²/‖χ‖²` over the distinct
+nontrivially-induced characters `Ind_K^L θ` (`θ ≠ 1`) gives `[L:K]·(|K| − 1)`.  With `K = H ◁ L`
+this is `e·(h − 1)` of Peterfalvi (1.5.d). -/
+theorem induce_degree_sum_bot {L : Type*} [Group L] [Fintype L] [Invertible (Nat.card L : ℂ)]
+    (K : Subgroup L) [K.Normal] [Fintype ↥K] [Invertible (Nat.card ↥K : ℂ)] :
+    ∑ χ ∈ (Finset.univ.filter (fun θ : IrreducibleCharacter ↥K =>
+        θ ≠ trivialIrreducibleCharacter ↥K)).image
+        (fun θ => ClassFunction.induce K θ.toClassFunction),
+      χ 1 ^ 2 / ClassFunction.inner χ χ = (K.index : ℂ) * ((Nat.card ↥K : ℂ) - 1) := by
+  have hbot : (⊥ : Subgroup L).subgroupOf K = ⊥ := by
+    ext x; simp [Subgroup.mem_subgroupOf]
+  have h := OddOrder.Peterfalvi.S08.sum_div_normSq_induce_kernelFilter_eq (G := L) (H := K) (A := ⊥)
+  have hfilter : (Finset.univ.filter (fun θ : IrreducibleCharacter ↥K =>
+      (↑((⊥ : Subgroup L).subgroupOf K) : Set ↥K) ⊆
+          OddOrder.Peterfalvi.S03.characterKernel (θ : ClassFunction ↥K ℂ) ∧
+        θ ≠ trivialIrreducibleCharacter ↥K))
+      = Finset.univ.filter (fun θ : IrreducibleCharacter ↥K =>
+        θ ≠ trivialIrreducibleCharacter ↥K) := by
+    refine Finset.filter_congr fun θ _ => ?_
+    rw [and_iff_right_iff_imp]
+    intro _
+    rw [hbot, Subgroup.coe_bot]
+    intro x hx
+    rw [Set.mem_singleton_iff] at hx
+    rw [hx]
+    exact OddOrder.Peterfalvi.S03.one_mem_characterKernel _
+  rw [hfilter] at h
+  rw [h, hbot]
+  congr 2
+  exact_mod_cast Nat.card_congr QuotientGroup.quotientBot.toEquiv
+
 end OddOrder.Peterfalvi.S09.Cert
