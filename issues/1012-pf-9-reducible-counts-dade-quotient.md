@@ -608,3 +608,29 @@ sorry-free (上流 §6 obligation cite は可)。**還元 count 部分は完了*
 - **plumbing 配線**: caseA core を既存の parametrized inertia plumbing (`inertia_eq_hcInHu_of_inf_le` /
   `caseB_inertia_realized_of_charInertia` / `caseB_char_inertia_inflation_of_core` — core を引数に取る)
   に通して caseA inertia=HC → degree u → `caseA_character_counts` conjunct b。
+
+
+## caseA degree (conjunct b) wiring plan — Coq PFsection9 併読 (2026-06-30)
+
+Coq `typeP_nonGalois_characters` (L845, = Pf (9.8)) の核心構造 `isIndHC` (L840):
+```
+isIndHC zeta := [/\ zeta 1 = (q*u), zeta ∈ S_ H0C & ∃ xi : CF(HC), xi linear & zeta = Ind xi]
+```
+- **(b)** reducibles `mu_j` は全て `isIndHC` を満たす (`{in mu_, isIndHC}`)。
+- **(c)** ∃ irreducible `chi_t`, `isIndHC chi_t`。
+
+⟹ **degree qu の出所** = `mu_j = Ind_{HC}^M(xi)` (xi LINEAR ∈ CF(HC))。linear ⟹ xi(1)=1 ⟹
+`(Ind xi)(1) = [M:HC]·1 = [M:HU]·[HU:HC] = q·u` (q=|W1|=[M:HU], u=[U:C]=[HU:HC])。
+
+**chiefFactor_caseA_char_inertia (proven) の役割**: reducible mu_j に対応する chief-factor char θ̄ が
+**regular** (各 Hpart summand 上 nontrivial) ⟹ inertia I_{HU}(θ̄)=HC (= my core) ⟹ HC-constituent が
+HC 上 linear で induce ⟹ mu_j = Ind_{HC}(linear)。∴ my core は on-path (degree の Ind 構造を license)。
+
+**残ステップ (caseA degree 配線)**:
+1. **reducible ⟹ regular θ̄**: mu_j reducible (prTIred) ⟹ 対応 θ̄ が各 Hpart 上 nontrivial。Coq
+   `Part_a` (L883) / `typeP_reducible_core_Ind` (L1423) / `typeP_reducible_core_cases` (L1439) 参照。
+2. **mu_j = Ind_{HC}(linear)**: 1 + my core (inertia=HC) + Clifford induction。
+3. **degree [M:HC]=qu**: index 算術 ([M:HU]=q=|W1|, [HU:HC]=u)。caseB_degree_qu の
+   `induceHU_apply_one_eq_q_mul` 系が部分再利用可。
+caseB_degree_qu (irreducible, S_ H0C') の構造 (caseB_exists_chiefFactorConstituent → inertia → degree)
+が template。caseA は reducible 版で parallel。
