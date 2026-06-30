@@ -4005,6 +4005,33 @@ theorem chiefFactor_caseB_char_inertia [Finite G] {M : Subgroup G}
   rw [h1] at hx
   simpa using hx.symm
 
+/-- **Peterfalvi (9.8), case (a) non-Galois core**: the case-(a) analog of
+`chiefFactor_caseB_char_inertia`.  When `U` acts on `H̄ = H/N` with a `U`-invariant order-`p` factor
+(case (a) of (9.7), packaged as `CliffordCaseAData`), a character `θ` that is **regular** (nontrivial
+on each of the `q` order-`p` Clifford summands `Hpart i`) and fixed by `φ_U(g)` forces `φ_U(g) = 1`.
+
+This is the `def_Itheta` computation `I_{HU}(θ̄) = HC` for the *reducible* (= regular) characters in
+case (a): `θ̄` linear and faithful on each order-`p` summand
+(`mulAut_eq_one_of_fixes_regular_on_prime_span`), with the summand data supplied non-opaquely by
+`CliffordCaseAData.Hpart_order`/`Hpart_iSup`/`Hpart_aInvariant`. -/
+theorem chiefFactor_caseA_char_inertia [Finite G] {M : Subgroup G}
+    {data : TypesIIIIIIVSetup M} {chief : ChiefFactorData data}
+    {chars : Section11CharacterData data chief} (caseA : CliffordCaseAData chars)
+    {θ : IrreducibleCharacter (↥data.H ⧸ chief.N)}
+    (hreg : ∀ i, ∃ x ∈ caseA.Hpart i,
+      (θ : ClassFunction (↥data.H ⧸ chief.N) ℂ) x
+        ≠ (θ : ClassFunction (↥data.H ⧸ chief.N) ℂ) 1)
+    (g : ↥(typeP_quotientCoprimeAction data.typeP data.nontrivial.1 chief.N_aInvariant).U)
+    (hinv : ∀ x, (θ : ClassFunction (↥data.H ⧸ chief.N) ℂ) ((uActionHom data chief) g x)
+        = (θ : ClassFunction (↥data.H ⧸ chief.N) ℂ) x) :
+    (uActionHom data chief) g = 1 := by
+  haveI : IsMulCommutative (↥data.H ⧸ chief.N) :=
+    IsMulCommutative.of_comm chief.quotient_elementaryAbelian.comm
+  refine mulAut_eq_one_of_fixes_regular_on_prime_span ((uActionHom data chief) g) caseA.Hpart
+    (fun i => ?_) (fun i x hx => ?_) caseA.Hpart_iSup θ hreg hinv
+  · rw [caseA.Hpart_order i]; exact chief.p_prime
+  · exact (caseA.Hpart_aInvariant i).smul_mem g hx
+
 /-- **Inflation equivariance for the chief-factor action.**  The inflation map
 `compHom (mk' N) : ClassFunction (↥H/N) → ClassFunction ↥H` intertwines the conjugation action
 `typeP_conjAction a` on `↥H` (upstairs) with the descended action `quotientMulAutHom a` on the
