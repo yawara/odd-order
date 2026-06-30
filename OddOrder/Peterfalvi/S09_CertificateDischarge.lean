@@ -79,6 +79,42 @@ theorem eq_induce_restrict_of_supported (K : Subgroup L) [K.Normal]
   rw [ClassFunction.induce_smul, induce_restrict_eq_index_smul K ψ hψ, smul_smul,
     inv_mul_cancel₀ (Nat.cast_ne_zero.mpr K.index_ne_zero_of_finite), one_smul]
 
+/-- **The induced characters span the image of induction** (Peterfalvi (7.7.a) spanning, image
+half).  Every induced class function `Ind_K^L φ` lies in the `ℂ`-span of the induced *irreducible*
+characters `{Ind_K^L θ : θ ∈ Irr K}`.  Expand `φ` in the irreducible basis of `CF(K)`
+(`span_irreducibleCharacter_eq_top`) and push through the linearity of induction
+(`induce_add`/`induce_smul`/`induce_zero`) by `Submodule.span_induction`. -/
+theorem induce_mem_span_induce_irr (K : Subgroup L) [Fintype ↥K] [Invertible (Nat.card ↥K : ℂ)]
+    (φ : ClassFunction ↥K ℂ) :
+    ClassFunction.induce K φ ∈ Submodule.span ℂ
+      (Set.range (fun θ : IrreducibleCharacter ↥K =>
+        ClassFunction.induce K (θ : ClassFunction ↥K ℂ))) := by
+  classical
+  haveI : Finite ↥K := Finite.of_fintype _
+  have hφ : φ ∈ Submodule.span ℂ
+      (Set.range (fun θ : IrreducibleCharacter ↥K => (θ : ClassFunction ↥K ℂ))) := by
+    rw [span_irreducibleCharacter_eq_top]; exact Submodule.mem_top
+  induction hφ using Submodule.span_induction with
+  | mem v hv => obtain ⟨θ, rfl⟩ := hv; exact Submodule.subset_span ⟨θ, rfl⟩
+  | zero => rw [ClassFunction.induce_zero]; exact Submodule.zero_mem _
+  | add x y _ _ ihx ihy => rw [ClassFunction.induce_add]; exact Submodule.add_mem _ ihx ihy
+  | smul c x _ ih => rw [ClassFunction.induce_smul]; exact Submodule.smul_mem _ c ih
+
+/-- **`CF(L,A)` lies in the span of the induced irreducibles** (Peterfalvi (7.7.a) spanning).  A
+class function `ψ` supported inside the normal subgroup `K` lies in the `ℂ`-span of the family
+`{Ind_K^L θ : θ ∈ Irr K}`: combine `eq_induce_restrict_of_supported` (`ψ = Ind_K^L(e⁻¹ Res ψ)`,
+so `ψ ∈ Ind_K^L(CF K)`) with `induce_mem_span_induce_irr`.  This is the spanning input that, after
+the degree-`0` reduction (`mem_span_psi_of_apply_one_zero`), supplies the `hspan` hypothesis of
+`chiRho_decomp_proof`. -/
+theorem supported_mem_span_induce_irr (K : Subgroup L) [K.Normal] [Fintype ↥K]
+    [Invertible (Nat.card ↥K : ℂ)] (ψ : ClassFunction L ℂ)
+    (hψ : ∀ y : L, y ∉ K → ψ y = 0) :
+    ψ ∈ Submodule.span ℂ
+      (Set.range (fun θ : IrreducibleCharacter ↥K =>
+        ClassFunction.induce K (θ : ClassFunction ↥K ℂ))) := by
+  rw [eq_induce_restrict_of_supported K ψ hψ]
+  exact induce_mem_span_induce_irr K _
+
 /-- **Positive-definiteness of Peterfalvi's class-function inner product.**  Over `ℂ`,
 `⟨η, η⟩ = 0` forces `η = 0`.  Indeed `⟨η, η⟩ = |G|⁻¹ Σ_g |η(g)|²`, a sum of non-negative reals, so
 it vanishes only when every `η(g) = 0`.  This is the non-degeneracy used in Peterfalvi's (7.7.a)
