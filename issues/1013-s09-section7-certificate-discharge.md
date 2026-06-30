@@ -691,3 +691,23 @@ BetaDecomp/hB。次イテレーション = 部品1 (coherence-agreement lemma) �
 **次 = coherence_hagree lemma** (上記 path を Lean 化): IsCoherent + 整数次数 + supported から hagree。
 その後 part 2-5 (τ↔H71.τ 同一視 / Sset→Fin family / typeIA=H^# / degree) → witness-L Hypothesis78
 構築 → betaDecompOfDade/zetaNuRhoNormSqGeOfDade で BetaDecomp/hB → CounterexampleDadeData。
+
+### 2026-07-01 (loop 継続²⁸⁻²⁹): §12 bridge parts 1+2+4 完成
+
+§12→§7 Dade bridge を部品単位で構築 (各 1-2 build cycle, full build 緑):
+- keystone `dadeIntegralCharacterMap_smul_complex` (commit 87dcbd03): hyp.tau の ℂ-linearity。
+- part 1 `coherence_hagree` (f2ce7b25): IsCoherent から (7.8.a) agreement (IntegralCharacterMap レベル)。
+- parts 1+2 `coherence_hagree_dadeMap` (200fe2a5): agreement を DadeMap 形へ (= hypothesis78OfDade の hagree)。
+  [上記 3 つは S09_CertificateDischarge]
+- part 4 `Hypothesis.typeIA_eq_sharp` (399c33c5, **S14**): typeIA L = H^# (= hAH)。typeI_frobenius
+  (proven) + Frobenius centralizer_kernel_le。
+
+⚠ **hub dedup task**: `centralizerSupport_sharpSubgroup_eq_of_frobenius` (S16:2584, pure GT) を
+S14 が cite できない (S16 は S14 下流) ため typeIA_eq_sharp 内で再導出。共有ファイル
+(MaximalSubgroupType, IsFrobeniusGroup 既 import) へ hoist すれば S14/S16 両用で dedup 可能。
+
+**残 bridge parts** (witness-L Hypothesis78 assembly へ): part 3 (Sset→Fin (n+1) family:
+distinctInducedFamily で hinj/hcover/ind1H、Sset={induce θ|θ≠1} は trivial 抜き) / part 5
+(degrees d/hdeg/hdeg_match) / hnu_isometry (IsCoherent.extension_inner_eq) / H71+hτ
+(toHypothesis71 + IsDadeIsometry)。**assembly は S14 に S09_CertificateDischarge を import して**
+hypothesis78OfDade を呼ぶ (S14 が consumer exists_counterexample_dade_data の home)。
