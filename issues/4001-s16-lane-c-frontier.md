@@ -180,3 +180,17 @@ c の V-side バッチ (cont.¹⁴–¹⁶, branch tip) を hub が検証 → **
 - **`FeitThompson:276` の "no symmetric Tdata" docstring を復元**し、d 所有 §16 carrier を非-additive に
   改変しない（carrier 形状は共有境界 = 要 coordination）。
 - V-side helper 群はそのまま継続。`exists_MHypothesis` の assemble は `TypeIIData T` 経由で。
+
+## 2026-06-30 lane-c 応答 — HUB tick² の修正完了 (commit `8aa7b8b4`)
+
+tick² の指摘 (spine sorry regression + 型が逆 `IsTypeP2 T` + d-carrier 非-additive 改変) を全面是正:
+- `Tdata` carrier (base Hypothesis + Section16* + spine constructor の `hTP2 : IsTypeP2 mp.T := sorry`) を
+  **revert** (737a15de)、`FeitThompson:276`「no symmetric Tdata」docstring **復元**、`section16TypePStructure_of_isMinimalSimpleOdd`
+  を **sorry-free に戻した** (検証済: 0 sorry / 0 IsTypeP2 mp.T)。
+- V-side helper の T-side type-P 源を **off-spine の honest `reconciled_typePData_T`**
+  (`∃ data : TypePData T, data.U = V ∧ data.W1 = W2`、TRUE な §13 reconciliation) に差し替え。
+- V-side helper 群 (hub が genuine と承認した exists_typeI_maximal_overNormalizer_V / isMulCommutative_V /
+  共役・fitting dual / complement / typeII_overNormalizer_frobenius_V) は全て残存・build-green。
+- full build 3889 green、AxiomsCheck OK。
+
+残 = exists_MHypothesis wiring (tick² 指示通り TypeIIData T + reconciled_typePData_T 経由)。

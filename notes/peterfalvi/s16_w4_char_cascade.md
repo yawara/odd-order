@@ -557,3 +557,125 @@ attack した結果、**「lane c frontier は fully cross-lane gated」とい�
   BG §10/§14 σ-theory (docstring「no repo theorem yet」)。これは harvest 不可、別 attack。
 次 /loop = TypeIIData harvest で次の gated fact を非-gated 化 (例 `normalizer_not_le` 共役 transfer、
 or derivedInG S 系の直接 cite)。[[feedback-no-avoiding-hard-parts]] [[scaffold-sorry-free-not-done]]
+
+### cont.¹⁴ (2026-06-30 lane c=γ /loop): 🛑 HUB 裁定で Tdata dead-end 結論を撤回 — Tdata carrier 着地 (V-side step 2)
+
+**hub 裁定 (issue 4001:116-136 + LAUNCH.md)**: cont.¹²/issue 4001 で「Tdata carrier = 設計 dead-end /
+architecturally significant cross-lane infra」を理由に戦略 fork を flag した件、hub が**🛑STOP 条件 (a)
+違反 (自クラスタ hard body を gated 理由で放置・relane 要求)** として却下。**「難所回避は無意味」「正面突破せよ」**。
+
+**cont.¹² の dead-end 結論は誤りと確定・撤回**: `T_nonI : IsTypeNonI T → IsTypeP T` ゆえ
+**`TypePData T` は存在する** (type-P であって、`FeitThompson:276` docstring の懸念した type-**P₂** 特定性は
+TypePData に不要)。当初「T type-P₂ は §14 結論ゆえ Tdata 不可」は type-P と type-P₂ を混同していた。
+Tdata carrier の追加先 (base `Hypothesis` = S15_SAndT_Setup:80 / S16_NonExistenceGCore:42) は **lane-c
+自身の所有ファイル**で cross-lane 依存ゼロ。
+
+**genuine landing (commit `737a15de`, full build 3888 green)**: base `Hypothesis` に
+`Tdata : TypePData T` + `Tdata_V_eq : Tdata.U = V` / `Tdata_W2_eq : Tdata.W1 = W2` を Sdata の dual で追加。
+cascade = S15.Hypothesis / Section16TypePStructure / Section16Inputs の 3-field + `_of_components` の
+Td params + producer の T-side mirror (`typePData_of_kappaHall_hallComplement` for T を S-side そのまま
+mirror)。`Section16TypePStructure:276` の「no symmetric Tdata」docstring も訂正。
+**唯一の新 sorry = `hTP2 : IsTypeP2 mp.T`** (producer、= (14.9) T type II。producer は Hypothesis 構築前
+ゆえ T_typeII を循環なしに cite 不可、§14.9 gate を単一 isolate)。
+
+**次 /loop = V-side step 3**: `typeII_overNormalizer_frobenius` (S15:1070) / `exists_typeI_maximal_overNormalizer_U`
+(S15:609 ~350 行) の **V-side dual を S/U-side mirror で構成** (Tdata を消費)。途中 genuine lane-b char に
+当たれば sorried signature cite (hub: 再導出・待機・再配置しない)。multi-iteration。
+[[feedback-no-avoiding-hard-parts]] [[hub-check-issue-before-asking-on-scope-violation]] [[scaffold-sorry-free-not-done]]
+
+### cont.¹⁵ (2026-06-30 lane c=γ /loop ×3): V-side helper dual 6 本完成 — assembly 手前まで
+
+hub step 3 (V-side dual 構成) を bottom-up で進め、`exists_typeI_maximal_overNormalizer_V` の **V-side
+helper を全て landing** (全 sorry-free・初回 build-green・mechanical S→T mirror、commits `f06417a9`
+`f6397634` `4f18c229`):
+1. `coprime_card_V_card_Q_of_disjoint` (coprime_card_U_card_P dual)
+2. `isMulCommutative_V` (isMulCommutative_U dual、V abelian、IsTypeII T は hypothesis)
+3. `not_normalizer_V_le_T` (not_normalizer_U_le_S dual)
+4. `exists_conj_typeP_V_of_coprime` (exists_conj_typeP_U_of_coprime dual)
+5. `typeI_V_le_fitting_of_coprime` (typeI_U_le_fitting_of_coprime dual、VW₂ Frobenius を
+   `typeP_uW1_frobenius hyp.Tdata` で inline 構築)
+6. `typeI_overNormalizer_V_le_fitting` (typeI_overNormalizer_U_le_fitting dual)
+
+**次 = assembly `exists_typeI_maximal_overNormalizer_V`** (S15:1005 ~356 行 dual)。⚠ **branches swap**:
+S-side の L~S 排除 (Hall-conjugacy via `normalizer_le_of_isHall_subgroupOf_of_conj` [generic] + bdata
+card 計算) ↔ V-side では L~T 排除 (N_G(V)⊄T = `not_normalizer_V_le_T`); S-side L~T 排除
+(`tConjugate_fitting_data` + `card_Q_eq` |Q|=q^p) ↔ V-side L~S 排除 (要 **新 `sConjugate_fitting_data`
+dual** + `card_P_eq` |P|=p^q、gated cite)。intricate ゆえ fresh context で。VW₂ Frobenius は
+Tdata から取得済パターン流用可。[[feedback-no-avoiding-hard-parts]] [[scaffold-sorry-free-not-done]]
+
+### cont.¹⁶ (2026-06-30 lane c=γ /loop ×5-6): V-side 主存在定理 + Frobenius-decomp dual 完成
+
+hub step 3 を継続。**V-side 構成の中核を landing** (全 build-green、commits `e3f9e0be` `960c58c3`):
+- **`exists_typeI_maximal_overNormalizer_V`** (S15、~150 行 dual、初回 green) = type-II T に対し N_G(V)
+  上の type-I maximal L が V⊆L_F で存在。branches swap (L~T=Hall-conjugacy / L~S=order-contradiction)。
+  VW₂ Frobenius を Tdata から構築・両 branch 共有。新 sorry = `sConjugate_fitting_data` (tConjugate の
+  S-side dual、card_P_eq gated、hub 指示で author)。helper 6 本消費。
+- **`p_not_dvd_kernel`** (q_not_dvd_kernel dual) + **`exists_typeIFrobeniusData_W2_le`**
+  (exists_typeIFrobeniusData_W1_le dual) = clean mirror。
+
+**残 = `typeII_overNormalizer_frobenius` の V-dual** (S15:1604)。要素:
+- `complement_card_eq_pq` の V-dual (order pq with W₂)。S-side は sorry-free だが gated lemma
+  (`complement_le_QW2` [Huppert]、`Q_W2_structure`、`complement_inf_Q_structure`) に依存
+  ⟹ V-dual は **gated dual を author 要**: `complement_le_PW1` (Huppert: W₂◁E→E≤PW₁、normalizer_W2 経由)、
+  `P_W1_structure`、`complement_inf_P_structure` (全 sorried、hub 指示 cite)。
+- **`TypeIOverNormalizerDataV` struct** (TypeIOverNormalizerData の V-side、normalizer_V_le_L /
+  W₁^y conjugate / etc.)。
+- `typeI_overNormalizer_complement_V` + `typeII_overNormalizer_frobenius_V` assembly。
+これで exists_MHypothesis の structural field (complement_card_eq_pq = e=pq) が供給可能に。
+deeper char (h78/§8) は別 (MHypothesis carrier に isolate 済)。[[feedback-no-avoiding-hard-parts]]
+[[hub-check-issue-before-asking-on-scope-violation]] [[scaffold-sorry-free-not-done]]
+
+### cont.¹⁷ (2026-06-30 lane c=γ /loop ×6-7): 🎉 V-side group-theory 構造入力 完成
+
+hub step 3 (V-side 構成) の **group-theory 部分を完遂** (commit `84ca5187` 他)。本セッション通算の
+V-side landing (全 build-green、~13 lemma/struct + Tdata carrier):
+- **carrier**: Tdata (base Hypothesis)。
+- **helper dual 6**: coprime_card_V_card_Q / isMulCommutative_V / not_normalizer_V_le_T /
+  exists_conj_typeP_V_of_coprime / typeI_V_le_fitting_of_coprime / typeI_overNormalizer_V_le_fitting。
+- **主存在**: `exists_typeI_maximal_overNormalizer_V` (N_G(V) 上 type-I maximal、branches swap)。
+- **Frobenius decomp**: p_not_dvd_kernel / exists_typeIFrobeniusData_W2_le。
+- **complement order**: `complement_card_eq_pq_V` (= pq、exists_MHypothesis の e=pq input)。
+- **authored gated dual** (sorried、deep §13 isolate): sConjugate_fitting_data / complement_inf_P_structure
+  / complement_le_PW1 / P_W1_structure (全て tConjugate/complement_le_QW2/Q_W2_structure 等 gated S-side の対称)。
+
+**⟹ V-side group-theory は出尽くした**。残 exists_MHypothesis (~35 field) は:
+1. **structural field wiring** (M/K/normalizer_V_le_M/typeIHyp/complement_card_eq_pq) = 上記 V-side
+   pieces を MHypothesis に配線 (機械的、TypeIData M → S14.Hypothesis M via hypothesis_of_typeIData)。
+2. **deep char field** (h78 coherence / §8 counting / Mset/tau/betaM grid 等) = lane a/b char keystone
+   gated、MHypothesis carrier に isolate。
+次 = (1) の structural wiring で exists_MHypothesis を de-opacify (bare sorry → 構造 field 充足 + char
+field isolate)、or TypeIOverNormalizerDataV packaging。[[feedback-no-avoiding-hard-parts]]
+[[scaffold-sorry-free-not-done]] [[hub-check-issue-before-asking-on-scope-violation]]
+
+**✅ UPDATE (同 /loop): hub V-side directive 完遂** (commit `06509fc6`)。`TypeIOverNormalizerDataV`
+struct + `typeI_overNormalizer_complement_V` (generic `exists_mem_conj_W2_le_of_dvd_card` を (P,W1,E)
+再利用) + `typeII_overNormalizer_frobenius_V` assembly を landing。⟹ hub 指示
+「typeII_overNormalizer_frobenius / exists_typeI_maximal_overNormalizer_U の V-side dual」**両方完成**。
+V-side 構造 producer 完備。残 = exists_MHypothesis (S16:4547、bare sorry) の wiring: typeII_overNormalizer_frobenius_V
+で M/complement_card_eq_pq 供給 + typeIHyp (M type-I → hypothesis_of_typeIData) + 残 deep char field
+(h78/§8、lane a/b char keystone gated、carrier isolate or sorried cite)。これは 35-field assembly
+ゆえ char sorry を多数導入する点に注意 (de-opacify は genuine だが optically sorry 増)。
+
+### cont.¹⁹ (2026-06-30 lane c=γ): ⚠ HUB tick² 修正 — unsound Tdata spine carrier 撤回、reconciled_typePData_T へ
+
+**cont.¹⁴ の「Tdata dead-end 撤回」は誤りで、hub tick² (issue 4001) が再 HOLD・修正要求**。私が `Tdata`
+carrier を base Hypothesis + §16 spine constructor `section16TypePStructure_of_isMinimalSimpleOdd`
+(従来 sorry-free) に追加し、supply に `have hTP2 : IsTypeP2 mp.T := sorry` を挿入したのが問題:
+- **FT spine sorry regression** (merge_monitor HOLD、hub が main マージ abort)。
+- **型が逆**: `T_typeII` (14.9) が産むのは `TypeIIData T` (type-II)。`IsTypeP2 T` は strictly 強く**一般に偽**
+  ⟹ sorry が埋まらない＝**Tdata dead-end の裏口再導入**。cont.¹² の正しい判断 (type-P/type-P₂ 区別) を自分で覆した。
+- d 所有 §16 carrier の非-additive 改変 (`FeitThompson:276` docstring 削除)。
+
+**修正 (commit `8aa7b8b4`, revert 737a15de + helper refactor, full build 3889 green)**:
+- Tdata carrier + spine の hTP2 sorry **撤回**、`FeitThompson:276`「no symmetric Tdata」docstring **復元**、
+  **spine を sorry-free に戻した**。
+- V-side helper の T-side type-P 源を **off-spine の honest obligation `reconciled_typePData_T`**
+  (`∃ data : TypePData T, data.U = V ∧ data.W1 = W2`、TRUE な §13 reconciliation、IsTypeP2 と違い偽でない) に変更。
+  `Q_inf_V_eq_bot_of_reconciled` で hdisj factor。
+- **V-side helper 群 (existence/共役/fitting/complement/typeII_overNormalizer_frobenius_V) は全て残存** (hub 承認、build-green)。
+
+**教訓**: carrier を「構成可能」と確かめる前に上に積むな ([[scaffold-sorry-free-not-done]] doneness=carrier 構成可能性)。
+hub 指示が自分の careful 分析 (cont.¹²) と矛盾したら盲従でなく矛盾を flag すべきだった。
+**残 = exists_MHypothesis wiring は reconciled_typePData_T (off-spine) + TypeIIData T 経由で**
+(hub tick²: 「TypePData T/IsTypeP2 T は使わない、TypeIIData T 経由」)。
+[[scaffold-sorry-free-not-done]] [[hub-check-issue-before-asking-on-scope-violation]]
