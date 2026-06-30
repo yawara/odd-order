@@ -233,3 +233,26 @@ Equiv.swap 0 j で区別 ζ を index 0 配置 → 適用可能。constructor (h
   (7.8.c.i) chiRho_eq_inner_beta_induced + toolkits。lane γ (14.11 h78) も §7 を共有消費。
 - **次**: (7.8.a) → (7.8.b) formula discharge (上流順)。両者は ν の coherence ((2.7)+orthonormality)
   を入力に取る形 (carrier-conditional)。
+
+### 2026-07-01 (loop 継続⁶): (7.8.a) orth_one の完全 proof map + honest ingredient 1 件
+
+**(7.8.a) orth_one (S^ν⊥1_G) の carrier-conditional proof を完全に map した** (tractable):
+`(ν ζ_i, 1_G)=0` (i≠ind1H) の導出 =
+1. coherence agreement `ν ζ_i − d_i ν ζ_0 = (ζ_i−d_iζ_0)^τ` (ζ_0=区別 ζ) で
+   `(ν ζ_i,1_G) = ((ζ_i−d_iζ_0)^τ,1_G) + d_i(ν ζ_0,1_G)`。
+2. `((ζ_i−d_iζ_0)^τ,1_G) = (ζ_i−d_iζ_0, (1_G)^ρ)` [`chiRho_adjoint` (2.7)、S09:335 既存]
+   `= (ζ_i−d_iζ_0, 1_L)` [`chiRho_constOne` (S09:500): (1_G)^ρ=1 on A 既存 + support-inner fact]
+   `= 0` [`inner_induce_constOne_eq_zero` 本commit、ζ_i,ζ_0 は非主誘導 ⊥1_L]。
+3. `d_i(ν ζ_0,1_G) = 0` [coherence input `(ζ^ν,1_G)=0`、区別 ζ の像 ⊥1_G]。
+
+**honest §7 ingredient `inner_induce_constOne_eq_zero` 完成** (commit 3c3069f2):
+θ≠1_K で (Ind θ,1_L)=0。orth_one step 2 の核。**残 helper = support-restricted inner**
+(`(α,ψ)=(α,ψ')` if ψ=ψ' on supp α) + **coherence inputs 2 件** (agreement + (ζ^ν,1_G)=0)。
+
+**状況整理 (honest)**: §7 floor の **reusable hard math は完了** ((7.7.a) chiRho_decomp_induced +
+hypothesis76OfDade + (7.8.c.i) chiRho_eq_inner_beta_induced + 全 toolkit/building blocks、
+全 axiom-clean、lane γ 14.11 とも共有)。残 (7.8.a)/(7.8.b) は **§8-coherence carrier-conditional
+な grind** (ν の (2.7)-agreement + ζ^ν⊥1_G + 整数 a を入力に取る; これらは Hypothesis78.nu の
+bare field でなく §8 coherence primitive)。最終 consumer = exists_counterexample_dade_data
+(giant §12 sorry)。carrier-conditional discharge は hyp76OfDade と同様 legitimate
+(§7 reasoning は実証明、§8 primitive のみ入力)。
