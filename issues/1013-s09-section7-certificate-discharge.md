@@ -292,3 +292,31 @@ nu_isometry (Hyp78 field) + family 直交性 (induce_family_orthogonal) は既�
 legitimate (hoisting でない、§7 reasoning 実証明)。整数 a = (β,ζ^ν)+1 ∈ ℤ は β,ζ^ν virtual char
 から (integrality 別途)。残構築 = family-diff 内積 + (β,ζ_i^ν) 計算 + a + Γ + 全 orthogonality。
 区別 ζ∈Irr L (‖ζ‖²=1) の irreducibility が family setup property。
+
+### 2026-07-01 (loop 継続⁹⁻): (7.8.a) orthogonality 全 field 完成 + (7.8.b) scoping + 戦略 checkpoint
+
+**(7.8.a) BetaDecomp の orthogonality 3 field を全て carrier-conditional に discharge** (axiom-clean):
+`betaDecomp_orth_one` (S^ν⊥1_G) + `betaDecomp_gamma_orth_nu` (Γ⊥S^ν) + `betaDecomp_gamma_orth_one`
+(Γ⊥1_G)。computation ingredient: inner_eq_of_eqOn_support / inner_tau_supported_constOne /
+inner_induce_constOne_eq_zero / inner_induce_trivialChar_constOne_eq_one / inner_family_diff /
+inner_beta_nuDiff / inner_beta_nu_eq / inner_weightedNuSum_nu / induce_apply_one_star。
+`beta_eq` は Γ 定義から trivial。**S09_CertificateDischarge.lean = 47 宣言, 1272 行, 全 sorry-free。**
+
+**§7 floor の現況 (honest, ~20 loop 後)**:
+- ✅ **完了 (reusable, axiom-clean)**: (7.7.a) chiRho_decomp_induced + hypothesis76OfDade、
+  (7.8.c.i) chiRho_eq_inner_beta_induced + reindexing toolkit、(7.8.a) orthogonality 全 field +
+  全 computation ingredient。lane γ 14.11 も共有消費。
+- 🔒 **残 (7.8.b) NormEstimates は深く gated**: zetaNuRho_norm_sq_ge (‖ζ^{νρ}‖²≥1−e/h) は
+  **H78-level** (chiRho_norm_sq_double_sum (7.7.b、S09:1336) を χ=ζ^ν に適用、ν 経由) +
+  **整数 a∈ℤ** (ν→ℤ[Irr] integrality に gated、(7.8.a) の agreement より深い) +
+  **degree-sum (1.5.d) Σθ(1)²=|H|** (repo/mathlib に未在、foundational gap) + quadratic
+  (S09 normQuadraticCorrection_nonneg 既存) を要す。(7.8.a) より substantially 深い。
+- 🔗 **実 consumption は H78 construction (hypothesis78OfDade) に gated**: chiRho_eq_inner_beta_induced
+  を cite して H78 を構成 → lane γ 14.11 h78 unblock + (12.16) hB 経路。要 family arrangement
+  (区別 ζ を index 0; reindexing primitive 既存 + hypothesis76OfFamily refactor) + coherence
+  agreement carrier 入力。
+
+**次の戦略 fork** (lane b 自律判断 = hypothesis78OfDade integration を優先):
+chiRho_eq_inner_beta_induced を **consumable にする** (H78 構成 → lane γ unblock) が最高価値。
+path = hypothesis76OfFamily (hyp76OfDade を θ パラメタ化 refactor) → 区別 ζ を index 0 配置
+(induce_family_comp_perm) → hypothesis78OfDade (全 H78 field + certificate)。次 loop で着手。
