@@ -5166,6 +5166,21 @@ in a maximal `M`, every `π`-subgroup `X ≤ M` conjugates by an element of `M` 
 `π`-subgroup `K` of `M`.  The general-`π` form of `exists_conj_smul_le_isHall_kappa`; the tool for
 the `g ∉ M` case of the full Lemma 14.6 dichotomy.  Axiom-clean. -/
 #assert_only_allowed_axioms OddOrder.BG.Ch4.S14.exists_conj_smul_le_of_isHall
+/-! **`σ` conjugation-invariant** (`S14_TypePCounting`, `sigma_conjSmul_eq`, Coq `sigmaJ`):
+`σ(Mᶜ) = σ(M)` as sets.  Axiom-clean. -/
+#assert_only_allowed_axioms OddOrder.BG.Ch4.S14.sigma_conjSmul_eq
+/-! **BG Lemma 14.6** (`S14_TypePCounting`, `sigma_decomposition_dichotomy`, Coq `BGsection14`:1189):
+every `g ≠ 1` lands in the signalizer branch (`∃ y, ℓ_σ(y)=1 ∧ y⁻¹g ∈ R(y)`) or the κ branch
+(`∃ y, ℓ_σ(y)=1 ∧ ∃ N ∈ 𝓜_σ(y), y⁻¹g ∈ (C_N[y])^#` with `y⁻¹g` a `κ(N)`-element).  Proof = Coq's
+second half: `branchA_or_branchB_of_mem_maximal` gives `s'g`, then the σ-decomposition factor,
+WLOG `x ∈ M_σ`, the neighbour `N = N(x)` of Theorem 14.4, and Hall conjugacy of `⟨g⟩` into the
+`σ(N)′`-Hall `M ∩ N` force the σ-part `x = 1`, a contradiction.  Axiom-clean. -/
+#assert_only_allowed_axioms OddOrder.BG.Ch4.S14.sigma_decomposition_dichotomy
+/-! **BG Corollary 14.9, type-I cover** (`S14_TypePCounting`,
+`exists_mem_conjClassSet_Mtilde_of_ne_one`): under all-type-`F`, every `g ≠ 1` lies in some
+`𝒞_G(M̃)`.  Immediate from `sigma_decomposition_dichotomy` (the κ branch is empty since
+`κ(N) = ∅`).  **Gate 2 of the BG Theorem E cover is now sorry-free.**  Axiom-clean. -/
+#assert_only_allowed_axioms OddOrder.BG.Ch4.S14.exists_mem_conjClassSet_Mtilde_of_ne_one
 /-! **BG Lemma 14.6, exclusivity** (`S14_TypePCounting`, `not_type1_of_type2`): a type-2 element
 (`g = y·y'`, `y'` a nonidentity `κ(M)`-element of `C_M(y)`, `y ∈ M_σ^#`) is not of type-1
 (`g = x·x'`, `ℓ_σ(x)=1`, `x' ∈ R(x)`).  The `T ∩ H̃ = ∅` input to Theorem 14.7. -/
