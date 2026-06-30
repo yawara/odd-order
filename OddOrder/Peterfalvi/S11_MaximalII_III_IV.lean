@@ -6594,5 +6594,33 @@ theorem hcZeta_liesOver_compHom_of_fixed {M : Subgroup G}
   rwa [OddOrder.RepresentationTheory.IrreducibleCharacter.liesOver_iff,
     ClassFunction.restrictionMultiplicity_def] at h
 
+/-- **L3: SingleOrbit reduction.**  If `ζ` is fixed by `conjBy m` and lies over `θ₀`, then `θ₀` and
+its `φ_m`-conjugate are `HU`-conjugate: there is `g ∈ HU` with `conjBy g θ₀ = compHom φ_m θ₀`.  By
+the L2 equivariance `ζ` lies over both `θ₀` and `φ_m·θ₀`, and Clifford's single-orbit theorem
+(`restrictionConstituentsSingleOrbit_of_isIrreducible`) puts both constituents in one `HU`-orbit
+(`exists_conj`).  The free-`W₁`-orbit hypothesis (L4) will deny exactly this. -/
+theorem hcZeta_exists_conj_of_fixed {M : Subgroup G} {data : TypesIIIIIIVSetup M} (m : ↥M)
+    [Fintype ↥(hInHu data)] [Invertible (Nat.card ↥(hInHu data) : ℂ)]
+    (ζ : IrreducibleCharacter ↥(huSub data)) (θ₀ : IrreducibleCharacter ↥(hInHu data))
+    (hlo : OddOrder.RepresentationTheory.IrreducibleCharacter.LiesOver (hInHu data) ζ θ₀)
+    (hfix : ClassFunction.conjBy m (ζ : ClassFunction ↥(huSub data) ℂ)
+      = (ζ : ClassFunction ↥(huSub data) ℂ)) :
+    ∃ g : ↥(huSub data), ClassFunction.conjBy g (θ₀ : ClassFunction ↥(hInHu data) ℂ)
+      = ClassFunction.compHom (hInHuConj data m) (θ₀ : ClassFunction ↥(hInHu data) ℂ) := by
+  have hirr : IsIrreducibleCharacter
+      (ClassFunction.compHom (hInHuConj data m) (θ₀ : ClassFunction ↥(hInHu data) ℂ)) :=
+    θ₀.isIrreducible.compHom_of_surjective (hInHuConj_bijective data m).surjective
+  set φθ₀ : IrreducibleCharacter ↥(hInHu data) :=
+    ⟨ClassFunction.compHom (hInHuConj data m) (θ₀ : ClassFunction ↥(hInHu data) ℂ), hirr⟩
+    with hφdef
+  have hη := hcZeta_liesOver_compHom_of_fixed m ζ θ₀ φθ₀ hlo hfix rfl
+  obtain ⟨g, hg⟩ :=
+    OddOrder.RepresentationTheory.IrreducibleCharacter.RestrictionConstituentsSingleOrbit.exists_conj
+      (OddOrder.RepresentationTheory.restrictionConstituentsSingleOrbit_of_isIrreducible ζ) hlo hη
+  refine ⟨g, ?_⟩
+  have hc := congrArg (fun x : IrreducibleCharacter ↥(hInHu data) =>
+    (x : ClassFunction ↥(hInHu data) ℂ)) hg
+  simpa [OddOrder.RepresentationTheory.IrreducibleCharacter.coe_conjBy, hφdef] using hc
+
 end OddOrder.Peterfalvi.S11
 
