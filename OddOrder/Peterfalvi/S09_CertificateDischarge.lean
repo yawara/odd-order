@@ -707,4 +707,52 @@ noncomputable def hypothesis76OfDade
         exact chiRho_decomp_induced H71 (H.subgroupOf L) θ d hpsupp hinj hcover hdeg hAconj
           hAK_off hA_one χ hx }
 
+/-! ### (7.8.c) building blocks: the induced principal character on `A`
+
+Peterfalvi's (7.8.c) collapse hinges on the fact that `ζ_1 = Ind_K^L 1_K` satisfies
+`ζ_1(x) = ‖ζ_1‖² = [L:K]` for `x ∈ K`, so the single surviving `(7.7.a)` term
+`(c̄_1/‖ζ_1‖²) ζ_1(x)` simplifies to `c̄_1 = star(β,χ)`. -/
+
+/-- **Conjugation fixes the trivial class function.**  `(1_K)^g = 1_K` for any `g`, since the
+trivial class function is constant `1`. -/
+theorem conjBy_trivialClassFunction {K : Subgroup L} [K.Normal] (g : L) :
+    ClassFunction.conjBy g (trivialClassFunction ↥K) = trivialClassFunction ↥K := by
+  ext h
+  simp only [ClassFunction.conjBy_apply, trivialClassFunction_apply]
+
+/-- **The induced principal character is `[L:K]` on `K`** (Peterfalvi (7.8.c)).  For a normal
+subgroup `K ◁ L` and `x ∈ K`, `(Ind_K^L 1_K)(x) = [L:K]`: every conjugate of `x` lies in `K`
+(normality), so all `|L|` induction summands equal `1`, giving `|L|/|K| = [L:K]`. -/
+theorem induce_trivialChar_apply_eq_index (K : Subgroup L) [K.Normal] [Fintype ↥K]
+    [Invertible (Nat.card ↥K : ℂ)] {x : L} (hx : x ∈ K) :
+    ClassFunction.induce K (trivialClassFunction ↥K) x = (K.index : ℂ) := by
+  rw [ClassFunction.induce_apply_of_mem_normal_of_const (le_refl K) (trivialClassFunction ↥K)
+      (fun a' _ => trivialClassFunction_apply _) hx, mul_one,
+    show (Nat.card L : ℂ) = (K.index : ℂ) * (Nat.card ↥K : ℂ) from by
+      rw [← Nat.cast_mul, K.index_mul_card],
+    show ⅟(Nat.card ↥K : ℂ) * ((K.index : ℂ) * (Nat.card ↥K : ℂ))
+        = (K.index : ℂ) * (⅟(Nat.card ↥K : ℂ) * (Nat.card ↥K : ℂ)) from by ring,
+    invOf_mul_self, mul_one]
+
+/-- **The norm of the induced principal character is `[L:K]`** (Peterfalvi (7.8.c)).  For a normal
+subgroup `K ◁ L`, `‖Ind_K^L 1_K‖² = [L:K]`: by `card_mul_inner_self_induce_eq_card_inertia`,
+`|K| · ‖Ind 1_K‖² = |I_L(1_K)| = |L|` since the trivial character is `L`-invariant
+(`inertia 1_K = ⊤`); dividing by `|K|` gives `[L:K]`. -/
+theorem induce_trivialChar_normSq_eq_index (K : Subgroup L) [K.Normal] [Fintype ↥K]
+    [Invertible (Nat.card L : ℂ)] [Invertible (Nat.card ↥K : ℂ)] :
+    ClassFunction.inner (ClassFunction.induce K (trivialClassFunction ↥K))
+      (ClassFunction.induce K (trivialClassFunction ↥K)) = (K.index : ℂ) := by
+  have hcoe : (trivialIrreducibleCharacter ↥K : ClassFunction ↥K ℂ) = trivialClassFunction ↥K := rfl
+  have htop : ClassFunction.inertia (trivialClassFunction ↥K) = ⊤ := by
+    rw [eq_top_iff]
+    intro g _
+    rw [ClassFunction.mem_inertia]
+    exact conjBy_trivialClassFunction g
+  have hkey := card_mul_inner_self_induce_eq_card_inertia (G := L) (trivialIrreducibleCharacter ↥K)
+  rw [hcoe, htop, Subgroup.card_top] at hkey
+  have hcardK : (Nat.card ↥K : ℂ) ≠ 0 := by exact_mod_cast Nat.card_pos.ne'
+  have h2 : (Nat.card ↥K : ℂ) * (K.index : ℂ) = (Nat.card L : ℂ) := by
+    rw [← Nat.cast_mul, mul_comm, K.index_mul_card]
+  exact mul_left_cancel₀ hcardK (hkey.trans h2.symm)
+
 end OddOrder.Peterfalvi.S09.Cert
