@@ -2158,6 +2158,38 @@ theorem exists_ne_one_hom_of_prime_card {K : Type*} [CommGroup K] [Finite K]
     CommGroup.exists_apply_ne_one_of_hasEnoughRootsOfUnity (G := K) (M := ℂ) ha
   exact ⟨ψ, fun h => hψa (by rw [h]; rfl)⟩
 
+/-- **A regular character exists on an internal direct product of prime-order subgroups.**
+If `Hbar` is the internal direct product (`iSupIndep` + spanning) of order-`p` subgroups `Hpart i`,
+there is a character `θ : Hbar →* ℂˣ` nontrivial on every summand.  Combine per-factor nontrivial
+characters (`exists_ne_one_hom_of_prime_card`) through the direct-product isomorphism
+`(∀ i, Hpart i) ≃* Hbar` (`Subgroup.noncommPiCoprod`, bijective by independence + spanning).
+Supplies the regular `θ̄` for the Clifford case-(a) degree (`inertia_eq_hcInHu_caseA`'s `hreg`). -/
+theorem exists_regular_char {Hbar : Type*} [CommGroup Hbar] [Finite Hbar]
+    {ι : Type*} [Fintype ι] (Hpart : ι → Subgroup Hbar)
+    (hindep : iSupIndep Hpart) (hspan : ⨆ i, Hpart i = ⊤)
+    (hp : ∀ i, (Nat.card ↥(Hpart i)).Prime) :
+    ∃ θ : Hbar →* ℂˣ, ∀ i, ∃ x ∈ Hpart i, θ x ≠ 1 := by
+  classical
+  choose ψ hψ using fun i => exists_ne_one_hom_of_prime_card (hp i)
+  have hcomm : Pairwise fun i j : ι => ∀ x y : Hbar, x ∈ Hpart i → y ∈ Hpart j → Commute x y :=
+    fun i j _ x y _ _ => mul_comm x y
+  have hinj : Function.Injective (Subgroup.noncommPiCoprod hcomm) :=
+    Subgroup.injective_noncommPiCoprod_of_iSupIndep hindep
+  have hsurj : Function.Surjective (Subgroup.noncommPiCoprod hcomm) := by
+    rw [← MonoidHom.range_eq_top, Subgroup.noncommPiCoprod_range]; exact hspan
+  let eEquiv : (∀ i : ι, ↥(Hpart i)) ≃* Hbar :=
+    MulEquiv.ofBijective (Subgroup.noncommPiCoprod hcomm) ⟨hinj, hsurj⟩
+  refine ⟨(MonoidHom.noncommPiCoprod ψ
+      (fun i j _ x y => mul_comm (ψ i x) (ψ j y))).comp eEquiv.symm.toMonoidHom, fun i => ?_⟩
+  obtain ⟨z, hz⟩ := DFunLike.ne_iff.mp (hψ i)
+  rw [MonoidHom.one_apply] at hz
+  refine ⟨↑z, z.2, ?_⟩
+  have hsymm : eEquiv.symm ↑z = Pi.mulSingle i z :=
+    eEquiv.symm_apply_eq.mpr (Subgroup.noncommPiCoprod_mulSingle (hcomm := hcomm) i z).symm
+  rw [MonoidHom.comp_apply, MulEquiv.coe_toMonoidHom, hsymm,
+    MonoidHom.noncommPiCoprod_mulSingle]
+  exact hz
+
 /-- Case (a) of Peterfalvi (9.7): `H/H_0` splits as a direct product of `q`
 order-`p` factors permuted by `W_1`.
 
@@ -4690,6 +4722,28 @@ theorem reducible_count_sOf_H0 [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G
   have hyM : (⟨y, hW2leM hy⟩ : ↥M) ∈ data.W2.subgroupOf M := Subgroup.mem_subgroupOf.mpr hy
   exact Subgroup.mem_subgroupOf.mp (hle hyM)
 
+
+/-- **A regular chief-factor character exists in Clifford case (a)**: an irreducible character of
+`H̄ = H/N` nontrivial on each order-`p` Clifford summand `Hpart i`.  Instantiates
+`exists_regular_char` with the internal-direct-product structure of `CliffordCaseAData`
+(`Hpart_iSupIndep` + `Hpart_iSup` + `Hpart_order`), packaged as a linear `IrreducibleCharacter`.
+Supplies the `hreg` of `inertia_eq_hcInHu_caseA` / `chiefFactor_caseA_char_inertia`. -/
+theorem exists_regular_irr_caseA [Finite G] {M : Subgroup G}
+    {data : TypesIIIIIIVSetup M} {chief : ChiefFactorData data}
+    {chars : Section11CharacterData data chief} (caseA : CliffordCaseAData chars) :
+    ∃ θbar : IrreducibleCharacter (↥data.H ⧸ chief.N), ∀ i, ∃ x ∈ caseA.Hpart i,
+      (θbar : ClassFunction (↥data.H ⧸ chief.N) ℂ) x
+        ≠ (θbar : ClassFunction (↥data.H ⧸ chief.N) ℂ) 1 := by
+  letI : CommGroup (↥data.H ⧸ chief.N) :=
+    { (inferInstance : Group (↥data.H ⧸ chief.N)) with
+      mul_comm := chief.quotient_elementaryAbelian.comm }
+  obtain ⟨θ, hθ⟩ := exists_regular_char caseA.Hpart caseA.Hpart_iSupIndep caseA.Hpart_iSup
+    (fun i => by rw [caseA.Hpart_order i]; exact chief.p_prime)
+  refine ⟨linearIrreducibleCharacter θ, fun i => ?_⟩
+  obtain ⟨x, hx, hne⟩ := hθ i
+  refine ⟨x, hx, ?_⟩
+  rw [linearIrreducibleCharacter_apply, linearIrreducibleCharacter_apply, map_one, Units.val_one]
+  simpa using hne
 
 /-- **Peterfalvi (9.8)**: character-count consequences in Clifford case (a).
 
