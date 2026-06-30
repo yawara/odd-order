@@ -2786,6 +2786,47 @@ theorem typeI_frobenius [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
            kernel_eq_MF_holds := trivial
            frobenius := typeI_frobenius_of_pi_empty hG (pi_empty hG) hM data }, trivial⟩
 
+/-- **The type-I Dade support is `H#`** (Peterfalvi (8.3)/(12.1) for the witness subgroup `L`).
+`typeIA L = centralizerSupport (H#) L` collapses to `H# = (H : Set G) \ {1}` (`H = L_F`): the
+Frobenius structure of `L` (from (12.7) `typeI_frobenius`) makes the centralizer condition vacuous
+on `H#` (`IsFrobeniusGroup.centralizer_kernel_le`).  This supplies the `A = H#` shape that
+`S09.Cert.hypothesis78OfDade` needs (the `hAH` argument of the §12→§7 Dade bridge).
+
+Re-derives the `centralizerSupport = sharp` argument of
+`S16.centralizerSupport_sharpSubgroup_eq_of_frobenius` — which lives downstream of `S14` and so
+cannot be cited here; a hub dedup hoisting that pure-group-theory fact to a shared file (e.g.
+`MaximalSubgroupType`) is tracked in issue 1013. -/
+theorem Hypothesis.typeIA_eq_sharp [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    {L : Subgroup G} (hyp : Hypothesis L) :
+    OddOrder.GroupTheory.typeIA L hyp.typeI
+      = OddOrder.GroupTheory.sharpSubgroup hyp.typeI.typeF.H := by
+  obtain ⟨fdata, _⟩ := typeI_frobenius hG hyp.maximal ⟨hyp.typeI⟩
+  have hKf : fdata.typeI.typeF.H = hyp.typeI.typeF.H := by
+    rw [fdata.typeI.typeF.H_eq, hyp.typeI.typeF.H_eq]
+  have hfrob : OddOrder.Isaacs.Ch06.IsFrobeniusGroup ↥L
+      (hyp.typeI.typeF.H.subgroupOf L) fdata.complement := hKf ▸ fdata.frobenius
+  show OddOrder.GroupTheory.centralizerSupport
+      (OddOrder.GroupTheory.sharpSubgroup hyp.typeI.typeF.H) L
+    = OddOrder.GroupTheory.sharpSubgroup hyp.typeI.typeF.H
+  ext y
+  simp only [OddOrder.GroupTheory.centralizerSupport, OddOrder.GroupTheory.sharpSubgroup,
+    Set.mem_setOf_eq, Set.mem_diff, SetLike.mem_coe, Set.mem_singleton_iff]
+  constructor
+  · rintro ⟨hyL, hy1, x, ⟨hxN, hx1⟩, hyx⟩
+    have hxL : x ∈ L := hyp.typeI.typeF.H_le hxN
+    have hxsub : (⟨x, hxL⟩ : ↥L) ∈ hyp.typeI.typeF.H.subgroupOf L :=
+      (Subgroup.mem_subgroupOf).mpr hxN
+    have hx1' : (⟨x, hxL⟩ : ↥L) ≠ 1 := fun h => hx1 (congrArg Subtype.val h)
+    have hycomm : (⟨y, hyL⟩ : ↥L) ∈ Subgroup.centralizer ({(⟨x, hxL⟩ : ↥L)} : Set ↥L) := by
+      rw [Subgroup.mem_centralizer_singleton_iff] at hyx ⊢
+      exact Subtype.ext hyx
+    have hyN : (⟨y, hyL⟩ : ↥L) ∈ hyp.typeI.typeF.H.subgroupOf L :=
+      hfrob.centralizer_kernel_le _ hxsub hx1' hycomm
+    exact ⟨(Subgroup.mem_subgroupOf).mp hyN, hy1⟩
+  · rintro ⟨hyN, hy1⟩
+    refine ⟨hyp.typeI.typeF.H_le hyN, hy1, y, ⟨hyN, hy1⟩, ?_⟩
+    rw [Subgroup.mem_centralizer_singleton_iff]
+
 /-! ## (12.17): forcing case (b) of Theorem (8.8) — the all-type-I non-existence argument
 
 Peterfalvi (12.17) shows that case (a) of Theorem (8.8) — *every* maximal subgroup of `G` being of
