@@ -6528,5 +6528,16 @@ noncomputable def hInHuConj {M : Subgroup G} (data : TypesIIIIIIVSetup M) (m : �
       = m * ((h : ↥(huSub data)) : ↥M) * m⁻¹ :=
   rfl
 
+/-- **Core identity for L1**: restricting the `M`-conjugate `conjBy m ζ` of an `HU`-character `ζ`
+to `H = hInHu` equals `compHom`-by-`φ_m` of `Res ζ`.  Both evaluate at `h ∈ hInHu` to
+`ζ(m·h·m⁻¹)`.  This converts the `M`-conjugation (needed for `I_M(ζ)`) into a `compHom`-by-aut
+at the `hInHu` level, the hinge of the (9.8.c) free-`W₁`-orbit argument. -/
+theorem hInHuConj_restrict_conjBy {M : Subgroup G} (data : TypesIIIIIIVSetup M) (m : ↥M)
+    (ζ : ClassFunction ↥(huSub data) ℂ) :
+    ClassFunction.restrict (hInHu data) (ClassFunction.conjBy m ζ)
+      = ClassFunction.compHom (hInHuConj data m) (ClassFunction.restrict (hInHu data) ζ) := by
+  ext h
+  rfl
+
 end OddOrder.Peterfalvi.S11
 
