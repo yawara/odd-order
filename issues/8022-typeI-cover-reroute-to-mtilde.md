@@ -128,3 +128,31 @@ lane-a/c 協調が要る。lane-d は assembly skeleton を先行実装可 (次 
 ⟹ headline sorry は (8.8) 全体から **TypeICovering/§8 case (𝓜_P=∅) のみ**に縮小。残りは
 `cover_subset_kernels` (= route B / §8 Dade、lane-a/c)。lane-d の §14-16 群論 + fix-W はこれで
 NonTypeICovering を閉じきった。
+
+## ✅ lane-d milestone 再検証 + route-B contradiction engine 同定 (2026-07-01 /loop)
+
+**(1) full build green 再検証** (3889 jobs, exit 0): Theorem D (D(3) `exists_RData_of_mem_sigmaSharp`
+両枝 sorry-free / conjunct 3 `signalizer_centralizer_isComplement` / hD4 `exists_RData_escape_structure`
+/ wrapper `theoremD_msigma_conjugacy_and_centralizers`) + Theorem E + NonTypeICovering 分岐すべて
+build-green を確認。lane-d の BG §14-16 群論 FT-path milestone は完全に landed・solid。
+
+**(2) route-B contradiction engine = `S09.not_trivial_G0_of_family71_coherent_zeta_source_data`
+(S09:6580)**: route-B の (12.17) 矛盾は単純な FamilyHypothesis71-only path **ではない**。この engine は
+**FrobeniusFamily F + FamilyHypothesis71 P を `hP_G0 : P.G0 = F.G0` で結合**し、`hG0 : F.G0 = {1}` +
+**~30 の §7/§8 character 入力** (coherence `IsCoherent τ`、`Hypothesis78.BetaDecomp`、zeta 既約/norm/
+degree-sum bounds、`chiRhoNormSq` lower bounds 等) を取って False を出す。これらの char 入力は全て
+**lane-a/c の §7-9 coherence/Dade 領域**で、type-I family 向けには未構成。⟹ route-B の真の residual は
+これら char 入力の構成 (lane-a/c)。**lane-d は難所回避でなく、上流 char infra が未整備**。
+
+**(3) lane-d prep landed (S10, commit 本 /loop)**: route-B が必要とする `FamilyHypothesis71` の
+`G₀ = {1}` step を certain-correct な純集合論 helper として供給:
+- `S10.familyHyp71_one_mem_G0` (`1 ∈ G₀`、`S04.one_notMem_dadeSupport` 経由)。
+- `S10.familyHyp71_G0_eq_singleton_one_of_cover` (Dade-support cover ⟹ `G₀ = {1}`、`FrobeniusFamily`
+  kernel-cover の M̃-cover 類似)。M̃-cover (`S14.sharpSubgroup_top_eq_iUnion_conjClassSet_Mtilde_of_typeF`)
+  を hcov に与えれば `P.G0 = {1}` が出る。axiom-clean、full build green。
+  (route-B assembly 時に `S09.FamilyHypothesis71` namespace へ hoist 可。)
+
+⟹ **route-B の lane-d-doable prep (M̃-cover + G₀={1} helpers) は揃った**。残 = (a) §8 `dadeSupportHypotheses_typeI`
+(8.15) を cite した per-rep `FamilyHypothesis71` 構成 + (b) ~30 char 入力 (coherence/Dade、lane-a/c)。
+両者とも lane-a/c §7-9 char theory に gated。lane-d 単独 build-green での route-B closure は不可
+(上流 char infra 待ち)。
