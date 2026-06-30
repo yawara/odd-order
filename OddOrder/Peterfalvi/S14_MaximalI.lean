@@ -2422,6 +2422,36 @@ theorem exists_distinguished_char {L : Subgroup G} [Finite G] (hyp : Hypothesis 
   refine ⟨_, hmem, ?_⟩
   rw [ClassFunction.induce_apply_one, hθ_deg, mul_one]
 
+/-- **Peterfalvi (12.13)/(12.16), the degree lower bound `e ≥ 3`**: the distinguished degree
+`e = [L:H]` (`H = L_F`) of a type-I `Hypothesis` is at least `3`.  It equals the order of the
+Frobenius complement `U` (`H` complements `U` in `L`, `typeF.complement`), which is **nontrivial**
+(`typeF.U_nontrivial`) and of **odd** order (a subgroup of the odd-order `G`); an odd integer `> 1`
+is `≥ 3`.  This discharges the `he : 3 ≤ e` field of `CounterexampleDadeData`. -/
+theorem three_le_index {L : Subgroup G} [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hyp : Hypothesis L) :
+    3 ≤ ((hyp.typeI.typeF.H).subgroupOf L).index := by
+  -- `[L : H] = |U|` via the complement `H ⋊ U = L`.
+  have hUle : hyp.typeI.typeF.U ≤ L := hyp.typeI.typeF.U_le
+  have hidx_eq : ((hyp.typeI.typeF.H).subgroupOf L).index = Nat.card ↥(hyp.typeI.typeF.U) := by
+    rw [hyp.typeI.typeF.complement.symm.index_eq_card,
+      Nat.card_congr (Subgroup.subgroupOfEquivOfLe hUle).toEquiv]
+  -- `|U| > 1` (nontrivial) and `|U|` odd (divides `|G|` odd), so `|U| ≥ 3`.
+  haveI : Nontrivial ↥(hyp.typeI.typeF.U) :=
+    (Subgroup.nontrivial_iff_ne_bot _).mpr hyp.typeI.typeF.U_nontrivial
+  have hgt1 : 1 < ((hyp.typeI.typeF.H).subgroupOf L).index := by
+    rw [hidx_eq]; exact Finite.one_lt_card
+  have hodd : Odd ((hyp.typeI.typeF.H).subgroupOf L).index := by
+    have hdvd : ((hyp.typeI.typeF.H).subgroupOf L).index ∣ Nat.card G :=
+      (Subgroup.index_dvd_card _).trans (Subgroup.card_subgroup_dvd_card L)
+    rcases Nat.even_or_odd ((hyp.typeI.typeF.H).subgroupOf L).index with hev | ho
+    · exfalso
+      obtain ⟨d, hd⟩ := hG.odd
+      obtain ⟨m, hm⟩ := hev.two_dvd.trans hdvd
+      omega
+    · exact ho
+  obtain ⟨k, hk⟩ := hodd
+  omega
+
 open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
 /-- **Peterfalvi (12.13) for the witness subgroup `L`**: the second maximal `L` of (12.9) carries a
 full (12.13) `DadeNotation` — the realized `ψ = χ^{τ₁}` of the (12.16) Dade calculation.
