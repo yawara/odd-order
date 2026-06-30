@@ -1324,7 +1324,7 @@ theorem theoremD_msigma_conjugacy_and_centralizers_of_inputs [Finite G]
             Subgroup.IsComplement' ((M ⊓ N).subgroupOf N)
               ((OddOrder.BG.Ch3.S10.Msigma N).subgroupOf N) ∧
             (S14.IsTypeP2 N →
-              S14.IsTypeP M ∧ ¬ S15.FittingIsTI M ∧
+              S14.IsTypeF M ∧ ¬ S15.FittingIsTI M ∧
                 ∃ E : Subgroup G,
                   E ≤ M ∧ IsCyclic ↥E ∧
                   Subgroup.IsComplement' ((OddOrder.BG.Ch3.S10.Msigma M).subgroupOf M)
@@ -1347,7 +1347,7 @@ theorem theoremD_msigma_conjugacy_and_centralizers_of_inputs [Finite G]
             Subgroup.IsComplement' ((M ⊓ N).subgroupOf N)
               ((OddOrder.BG.Ch3.S10.Msigma N).subgroupOf N) ∧
             (S14.IsTypeP2 N →
-              S14.IsTypeP M ∧ ¬ S15.FittingIsTI M ∧
+              S14.IsTypeF M ∧ ¬ S15.FittingIsTI M ∧
                 ∃ E : Subgroup G,
                   E ≤ M ∧ IsCyclic ↥E ∧
                   Subgroup.IsComplement' ((OddOrder.BG.Ch3.S10.Msigma M).subgroupOf M)
@@ -1570,7 +1570,7 @@ theorem theoremD_msigma_conjugacy_and_centralizers [Finite G]
             Subgroup.IsComplement' ((M ⊓ N).subgroupOf N)
               ((OddOrder.BG.Ch3.S10.Msigma N).subgroupOf N) ∧
             (S14.IsTypeP2 N →
-              S14.IsTypeP M ∧ ¬ S15.FittingIsTI M ∧
+              S14.IsTypeF M ∧ ¬ S15.FittingIsTI M ∧
                 ∃ E : Subgroup G,
                   E ≤ M ∧ IsCyclic ↥E ∧
                   Subgroup.IsComplement' ((OddOrder.BG.Ch3.S10.Msigma M).subgroupOf M)
