@@ -897,3 +897,30 @@ isAInvariant_comp_subtype_pointwise_smul、iSupIndep は bijection 経由不要)
 5. induceHU(χ) irreducible deg qu (M-level、`isIrreducibleCharacter_induce_of_inertia_eq` + huSub_normal ✅)。
 6. χ∈𝒳(H₀C) (kernel 条件) → conjunct c。
 inertia/§6 framework 横断の multi-step。char-side は完備、残は inertia-side 配線。
+
+
+## conjunct c — 構造的 worry は FALSE ALARM、step 2 は健全 (2026-07-01, Coq 確認)
+
+**前回の「W1-conjugates は U-invariant でない」は誤り。** producer 確認: `caseA.Hpart j =
+act.φ↑(e.symm j)•S₀`、`Hpart_aInvariant = isAInvariant_comp_subtype_pointwise_smul hUnorm hS₀inv`。
+**任意の a で `act.φ(a)•S₀` は U-invariant**: S₀ U-inv + U◁UW1 ⟹ u∈U で
+`act.φ(u)•act.φ(a)•S₀ = act.φ(ua)•S₀ = act.φ(a)•act.φ(a⁻¹ua)•S₀ = act.φ(a)•S₀`
+(`a⁻¹ua∈U` が S₀ を固定)。**U は各 W1-conjugate を (部分群として) 固定**し、permute するのは W1 のみ。
+⟹ W1-conjugates は `haInv` を満たし、`inertia_eq_hcInHu_gen` が**直接適用可** (step 2 健全)。
+
+**Coq PFsection9.v (9.8) 構成 (正本、L916-963)**:
+- `cfJ w i := 'chi_(isom_Iirr (conj_isom H1 w) i)` — H1^w の char (i:Iirr H1)。
+- `thetaH f := cfBigdprod defHbar (fun w => cfJ w (f w))` — Hbar=⊕_w H1^w の char (f:W1bar→Iirr H1)。
+- `theta f := cfDprodl defHCbar (thetaH f)` — HC への拡張。
+- `Ftheta := pffun_on 0 W1bar (predC1 0)` — **各 W1-conjugate で f w ≠ 0 (nontrivial)** = regular 族。
+  (= 私の clifford_caseA_exists_regular_char_not_fixed の hreg 条件と一致 ✅)。
+- `def_Itheta: f∈Ftheta → 'I_HU[theta f %% H0] = HC` (L938) — **私の inertia_eq_hcInHu_gen に相当**。
+  Coq は inertia_bigdprod_irr + inertia_irr_prime 経由 (別 route だが同結論; 私は U-inv family assembly)。
+- `irrXtheta: f∈Ftheta → 'Ind[HU](theta f %% H0) ∈ irr HU` (L950) — inertia_Ind_irr で degree-u irreducible。
+- `Xtheta := {cfIirr('Ind[HU] 'chi_t) | t∈Mtheta}` (L954) — **double induction Ind_{HU}^M(Ind_{HC}^{HU}(θ_f))**。
+- `oXtheta: u·|Xtheta| = (p-1)^q` (L955) — count。
+- conjunct c は ∃ なので Xtheta の 1 元を構成すれば足る (free orbit = not W1-fixed の f)。
+
+**残 step (path 明確化)**: step1 θ̄ (hom) → IrreducibleCharacter (linearIrreducibleCharacter) +
+hreg ClassFunction 化 → inertia_eq_hcInHu_gen 適用 (Hpart=W1-conj、hp_order/hspan/haInv) → I_HU=HC →
+Ind_{HC}^{HU} deg-u irr (inertia_Ind) → not-W1-fixed (step1 の hnf) ⟹ I_M=HU → Ind_{HU}^M deg-qu irr → 𝒳。
