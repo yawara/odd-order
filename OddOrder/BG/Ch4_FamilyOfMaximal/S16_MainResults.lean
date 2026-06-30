@@ -1804,7 +1804,16 @@ theorem theoremE_sigma_partition_and_counting [Finite G] (hG : OddOrder.BG.IsMin
 /-- **BG §16 `A(M)`/`A_0(M)` support slice**: the auxiliary sets from this section
 have the TI and support properties used by the downstream character-theory interface.
 This is a separate Peterfalvi-facing slice, not a replacement for BG Theorem E; the
-full local counting/partition statement is `theoremE_sigma_partition_and_counting`. -/
+full local counting/partition statement is `theoremE_sigma_partition_and_counting`.
+
+⚠ **UNDERSPECIFIED — do not prove as-is.**  Like `theoremA_maximal_structure`, this omits `U ≤ M`
+and the `(κ∪σ)′`-Hall hypothesis on `U`, so conjuncts 2–3 (involving `A(M) = ASet M U`) are not
+forced (for a free `U`, `A(M)` can contain `κ`-elements).  A faithful version adds `hUM : U ≤ M` and
+`hU : IsHallSubgroup ((κ∪σ)′) (U.subgroupOf M)`; then all three are provable: conjunct 1 (zTilde TI)
+from `typeP_duality` (type-`F`: `K = ⊥`, `zTilde = ∅`); conjunct 2 (`A_0(M)−A(M)` TI) from
+`theoremC_paired_structure`; conjunct 3 (`Supports = A(M) ⊆ 𝒞_G(zTilde ∪ A_0(M))`) reduces to
+`A(M) ⊆ A_0(M)` — `A(M)`-elements are `κ(M)′`-elements (`mem_U_sup_Msigma_iff_isPiElement_kappa_compl`),
+hence not conjugate to the `κ(M)`-elements of `K#`, so they avoid `𝒞_G(K#)`. -/
 theorem aSets_support_slice [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     {M K Kstar U : Subgroup G} (hM : M ∈ maximalSubgroups G)
     (hK : Ch03.IsHallSubgroup (S14.kappa M) (K.subgroupOf M))
