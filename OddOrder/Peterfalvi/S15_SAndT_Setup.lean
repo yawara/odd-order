@@ -869,6 +869,31 @@ theorem caseB_eta_norm_core {H P d n s : ℕ}
     have hd : d ^ 2 = 1 := habelian rfl
     omega
 
+/-- **Peterfalvi (13.7), character-theoretic bound**: the norm lower bound
+`∑_{x∈H#}|η₁₀(x)|² ≥ |H#|`, assembled from the (13.5) machinery.
+
+For `χ = η₁₀` the (13.5) hypothesis holds with `a = 0`, so the (13.5.a) point formula collapses to
+`η₁₀ = α` on `H#` (no `ζ₁` term — `hχ`); hence `∑_{H#}|η₁₀|² = ∑_{H#}|α|²`.  The character-theoretic
+sum is an integer `s` (`hs`: `∑_{H#}|α|² = s`, since `∑_{x∈H}|α|² = |H|‖α‖²` is an integer and
+`α(1) ∈ ℤ`), and the arithmetic core `caseB_eta_norm_core` gives `s ≥ |H| − 1 = |H#|`.  Bridges the
+nat-valued core to the real-valued cascade input consumed by the (13.10) analytic inequality.
+Honest hypotheses: `hχ` the (13.5.a) `a = 0` point formula; `hs` integrality; `hParseval`
+`s + α(1)² = |H|‖α‖²`; `hInflation` (13.5.c); `habelian` (13.2.b, `H` abelian + `α` faithful). -/
+theorem caseB_eta_norm_bound {S : Type*} [Group S] [Fintype S]
+    (α χ : S → ℂ) (A : Finset S) {Hcard P d n s : ℕ}
+    (hH : 1 ≤ Hcard)
+    (hχ : ∀ x ∈ A, χ x = α x)
+    (hs : ∑ x ∈ A, ‖α x‖ ^ 2 = (s : ℝ))
+    (hP : 2 ≤ P) (hn : 1 ≤ n) (hParseval : s + d ^ 2 = Hcard * n)
+    (hInflation : (P - 1) * d ^ 2 ≤ s) (habelian : n = 1 → d ^ 2 = 1) :
+    ((Hcard : ℝ) - 1) ≤ ∑ x ∈ A, ‖χ x‖ ^ 2 := by
+  have hsum : ∑ x ∈ A, ‖χ x‖ ^ 2 = ∑ x ∈ A, ‖α x‖ ^ 2 :=
+    Finset.sum_congr rfl (fun x hx => by rw [hχ x hx])
+  rw [hsum, hs]
+  have hnat : Hcard - 1 ≤ s := caseB_eta_norm_core hP hn hParseval hInflation habelian
+  have h := (Nat.cast_le (α := ℝ)).mpr hnat
+  rwa [Nat.cast_sub hH, Nat.cast_one] at h
+
 /-- **Arithmetic assembly of Peterfalvi (13.8)**: the norm lower bound `∑_{x∈H#}|η₀₁(x)|² ≥ |S'| − u²`.
 
 By (13.3.c) there are `j` and `δ = ±1` with `μ_j^{τ₁} = δ ∑_{0≤i<q} η_{i1}`, so the (13.5) hypothesis
