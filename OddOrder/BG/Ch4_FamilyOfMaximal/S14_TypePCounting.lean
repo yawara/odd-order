@@ -1395,6 +1395,22 @@ theorem mem_Msigma_iff_isPiElement_sigma [Finite G] (hG : OddOrder.BG.IsMinimalS
     (OddOrder.BG.Ch3.S10.Msigma_isHall hG hM) (Subgroup.zpowers_le.mpr hxM) hzpi
     (Subgroup.mem_zpowers x)
 
+/-- **An element of `M` whose order is coprime to `[M : N]` lies in the normal `N ≤ M`.**  Pure
+group theory: `x^[M:N] ∈ N` (`Subgroup.pow_index_mem`), and `x ∈ ⟨x^[M:N]⟩` because `[M:N]` is
+coprime to `orderOf x` (`exists_pow_eq_self_of_coprime`).  The engine for "a normal `π′`-Hall of `M`
+absorbs every `π′`-element of `M`" (apply with `[M:N]` a `π`-number and `x` a `π′`-element) — used
+for the `A(M)` / `κ(M)′`-Hall piece of BG Theorem E's "distinct orders". -/
+theorem mem_of_coprime_index [Finite G] {M N : Subgroup G} (hNM : N ≤ M)
+    [(N.subgroupOf M).Normal] {x : G} (hxM : x ∈ M)
+    (hcop : Nat.Coprime ((N.subgroupOf M).index) (orderOf x)) : x ∈ N := by
+  have hpow : x ^ (N.subgroupOf M).index ∈ N := by
+    have h := Subgroup.pow_index_mem (N.subgroupOf M) ⟨x, hxM⟩
+    rw [Subgroup.mem_subgroupOf] at h
+    simpa using h
+  obtain ⟨m, hm⟩ := exists_pow_eq_self_of_coprime hcop
+  rw [← hm]
+  exact pow_mem hpow m
+
 /-- For a `σ(M)`-element `x`, every `σ(L)`-part (`L` maximal) is either `x` or `1`: if `L` is
 conjugate to `M` then `σ(L) = σ(M)` contains all primes of `x` (`sigmaPart L x = x`); otherwise
 `σ(M) ∩ σ(L) = ∅` (`sigma_disjoint_of_nonconjugate`) so `x` avoids `σ(L)` (`sigmaPart L x = 1`). -/
