@@ -925,3 +925,25 @@ NonTypeICovering の hard と思っていた disjointness 群が **`density_piec
 私の cover ⊆ に橋渡し → cover_nonidentity (G#=A∪U) → struct 組立。
 **注意: gate-2 disjunction は依然 TypeICovering の `cover_subset_kernels` (FittingIsTI-for-typeF, A(8) M_F=M_σ deep gap) で block**。
 NonTypeICovering 完成は ¬all-type-F branch を埋めるが gate-2 全閉には cover_subset_kernels が必須。
+
+## 🎯 調査完了 (lane d, 2026-06-30 /loop⁴²-⁴³): **gate-2 frontier 精密マッピング** — cover_subset_kernels は単一 deep lemma に帰着
+
+gate-2 disjunction (`bgTheoremE_cover_data`, S10:581) の **TypeICovering branch (`cover_subset_kernels`)** を精密に分解。
+**周辺機械は全部済**で、残る deep gap は **ただ 1 つの clean statement** に帰着することを確認:
+
+**cover_subset_kernels** = `𝒞_G(M̃_i) ⊆ 𝒞_G((M_i)_F#)` (docstring: type-I で R(x)=1 ⟹ M̃=M_σ#=M_F#)。要件分解:
+- ✅ **R(x) card = |𝓜_σ(x)|** (`Rsub_ncard_eq`, S16:452) → R(x)=1 ⟺ |𝓜_σ(x)|≤1。
+- ✅ **|𝓜_σ(x)|≤1 ⟹ C_G(x)≤M** (`centralizer_le_of_maximalSigma_le_one`, S16:1456)。
+- ✅ **M_F=M_σ for type-F** (`maxNilpotentNormalHall_eq_Msigma_of_isTypeF_or_isTypeP2`, S16:5324;
+  `maxNilpotentNormalHall_eq_Msigma_iff_isNilpotent`, S16:3053)。
+- ✅ **Frobenius kernel TI** (`IsFrobeniusGroup.trivialIntersection`, Isaacs Ch06 FrobeniusGroup:357)。
+- ❌ **残 gap = `|𝓜_σ(x)| ≤ 1` for type-F M** (= M_σ が G-level TI)。route: type-F ⟹ M Frobenius
+  (`typeI_frobenius`/12.7) ⟹ kernel M_σ=M_F ⟹ **G-level kernel TI** (M_σ∩M_σ^g=1 for g∉M=N_G(M_σ))。
+  G-level TI を Isaacs の Frobenius-internal `trivialIntersection` から導けるか (or 別 BG 構造要) が次の核心。
+
+**∴ gate-2 全閉の残り = 2 件のみ**:
+- **(A) deep**: `|𝓜_σ(x)|≤1` for type-F (上記、単一 lemma だが genuine BG structure)。← 真の blocker、次の優先。
+- **(B) plumbing**: NonTypeICovering struct 組立 (struct を sharpSubgroup W→Ẑ-set に redesign + `Tset=zTilde`
+  connector + cover_nonidentity)。disjointness は density_pieces で既済。gate-2 を直接は閉じない (TypeICovering が
+  block) が ¬all-type-F branch を埋める。
+- 注: §14 cover MATH (κ→Ẑ + 一般 cover ⊆) は完了済。残りは (A) 1 lemma + (B) plumbing で、sprawling gap ではない。
