@@ -790,3 +790,23 @@ crux を最も具体的な形に: **W1 (order q, prime) は q 個の Hpart facto
 (2) 一般補題 `exists_aperiodic_regular_char` (exists_regular_char + not-all-equal で σ-stabilizer 自明)、
 (3) caseA instantiate → I_M=HU → induceHU irreducible deg qu → conjunct c。
 conjunct b も同じ W1-orbit (reducibles = 特定 W1-orbit 類) ゆえ此処共有。
+
+
+## 真の gating prerequisite 確定: (9.7) non-Galois decomposition の port (2026-06-30)
+
+調査確定: **(9.7) non-Galois 分解 (Coq `typeP_Galois_Pn`) は Lean 未 port**。S11 には opaque
+`W1_transitive_on_parts := True` のみ。producer (`clifford_caseA_data`) の S₀ は**任意の
+U-invariant order-p factor** で、non-Galois 分解の H1 (W1-conjugates が q factors を transitive
+置換) とは未接続。⟹ **W1-transitivity / W1-action は producer の現データから導けない**。
+
+**∴ 残 caseA degree (conjunct b/c/d) の gating = (9.7) typeP_Galois_Pn の port** (実質的新規形式化):
+Coq `typeP_Galois_Pn : ~~typeP_Galois → {H1 | oH1 ∧ nH1U ∧ defHbar : Hbar = \prod_{w∈W1bar} H1^w ∧ ...}`。
+H̄ = ⊕_{w∈W1bar} H1^w (W1-conjugate 分解)、H1 order-p、W1 が conjugates を巡回置換。これを Lean 化し
+producer の Hpart を H1^w に同定すれば W1-action (q-cycle) + transitivity が出る。
+
+**完成済 (gate まで)**: HU-inertia 機構 (core+lift), regular θ̄ 構成, combinatorial core
+(`constant_of_perm_invariant_of_transitive`)。**gate 後** (port 後): W1-action de-opacify →
+aperiodic regular θ̄ → I_M=HU (prime-index, relindex 不在ゆえ Nat.card 版要) → induceHU irreducible
+→ conjunct c。conjunct b は reducible=特定 W1-orbit。
+**次の真の作業 = (9.7) typeP_Galois_Pn の Lean port** (Coq PFsection9 の typeP_Galois_Pn 周辺精読 +
+W1-conjugate 分解構築)。これは数十行〜の coherent な新規形式化、fresh context 推奨。
