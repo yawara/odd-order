@@ -1638,6 +1638,17 @@ structure MHypothesis (hyp : Hypothesis (G := G)) where
   `Ã(M)` of `A(M)` (`typeIHyp.dadeData.dade.dadeSupport`).  This is the inclusion `G₀ ⊆ famG₀`
   used to drop the `G₀`-part of the (7.5) sum in (14.11.4). -/
   G0_off_dadeSupport : ∀ g ∈ G0, g ∉ typeIHyp.dadeData.dade.dadeSupport
+  /-- **Peterfalvi (14.11.3)/(14.11.4)**: the complement of `G₀` is covered by the Dade support
+  `Ã(M)` and the three orbits `(W − (W₁∪W₂))^G`, `(P#)^G`, `(Q#)^G`.  Concretely, `G₀` is the
+  (14.11.3) set `G − [Ã(M) ∪ (W−(W₁∪W₂))^G ∪ (P#)^G ∪ (Q#)^G]`, so any `g` off `Ã(M)` and off `G₀`
+  lies in the orbit union.  This is the §8 TI-counting input: `famG₀ ∖ G₀ ⊆ orbits` lets the
+  `(7.5)` `G₀`-drop in line 83 (`chiRhoNormSq_psi_le_line83`) be bounded by the orbit cardinalities
+  (the genuine §8 structural fact, supplied from the partner type-`P` structure). -/
+  G0_orbit_cover : ∀ g : G, g ∉ typeIHyp.dadeData.dade.dadeSupport → g ∉ G0 →
+    g ∈ OddOrder.GroupTheory.conjClassSet
+          ((hyp.base.W : Set G) \ ((hyp.base.W1 : Set G) ∪ (hyp.base.W2 : Set G)))
+        ∪ OddOrder.GroupTheory.conjClassSet (OddOrder.GroupTheory.sharpSubgroup hyp.base.P)
+        ∪ OddOrder.GroupTheory.conjClassSet (OddOrder.GroupTheory.sharpSubgroup hyp.base.Q)
   /-- **Peterfalvi (7.1)/(14.11.4) bridge compatibility.**  The underlying `(7.1)` Dade hypothesis
   of the §7 coherence datum `h78` is the type-I Dade support hypothesis of `M` carried by
   `typeIHyp` (i.e. `h78` is built over the same `(M, A(M))` Dade map that powers the family
@@ -2767,25 +2778,65 @@ theorem ncard_sdiff_sup_add_eq [Finite G] {W W1 W2 : Subgroup G}
   omega
 
 open scoped Classical OddOrder.Peterfalvi.S12.FiniteInduce in
+/-- **Peterfalvi (14.11.4), the `G₀`-drop set reduction** — `|famG₀| − |G₀| ≤ |(W−(W₁∪W₂))^G| +
+|(P#)^G| + |(Q#)^G|` (as `ncard`s).  Since `G₀ ⊆ famG₀` (`G0_off_dadeSupport`) and `famG₀ ∖ G₀` is
+covered by the three orbits (`G0_orbit_cover`, the (14.11.3) `G₀ = G − [Ã(M) ∪ orbits]`), the
+difference is bounded by the orbit cardinalities (`Set.ncard_diff` + `Set.ncard_union_le`).  The
+set-theoretic core of the (14.11.4) §8 TI-counting, feeding `orbit_normSq_term` per orbit. -/
+theorem MHypothesis.famG0_sub_filter_card_le_orbit_ncard [Finite G] {hyp : Hypothesis (G := G)}
+    (Mdata : MHypothesis hyp) :
+    (Nat.card (Mdata.toFamilyHypothesis71).G0 : ℝ)
+        - ((Finset.univ.filter (fun g : G => g ∈ Mdata.G0)).card : ℝ)
+      ≤ ((OddOrder.GroupTheory.conjClassSet
+            ((hyp.base.W : Set G) \ ((hyp.base.W1 : Set G) ∪ (hyp.base.W2 : Set G)))).ncard : ℝ)
+        + ((OddOrder.GroupTheory.conjClassSet
+            (OddOrder.GroupTheory.sharpSubgroup hyp.base.P)).ncard : ℝ)
+        + ((OddOrder.GroupTheory.conjClassSet
+            (OddOrder.GroupTheory.sharpSubgroup hyp.base.Q)).ncard : ℝ) := by
+  classical
+  haveI := Mdata.finiteG
+  set famG0 := (Mdata.toFamilyHypothesis71).G0 with hfamdef
+  set Worb := OddOrder.GroupTheory.conjClassSet
+    ((hyp.base.W : Set G) \ ((hyp.base.W1 : Set G) ∪ (hyp.base.W2 : Set G)))
+  set Porb := OddOrder.GroupTheory.conjClassSet (OddOrder.GroupTheory.sharpSubgroup hyp.base.P)
+  set Qorb := OddOrder.GroupTheory.conjClassSet (OddOrder.GroupTheory.sharpSubgroup hyp.base.Q)
+  -- `g ∈ famG₀ ↔ g ∉ Ã(M)` (single-member family).
+  have hmemfam : ∀ g : G, g ∈ famG0 ↔ g ∉ Mdata.typeIHyp.dadeData.dade.dadeSupport := by
+    intro g
+    refine ⟨fun hg => hg 0, fun hg i => ?_⟩
+    fin_cases i; exact hg
+  -- `G₀ ⊆ famG₀` and `famG₀ ∖ G₀ ⊆ orbits`.
+  have hsub : Mdata.G0 ⊆ famG0 := fun g hg => (hmemfam g).mpr (Mdata.G0_off_dadeSupport g hg)
+  have hcover : famG0 \ Mdata.G0 ⊆ Worb ∪ Porb ∪ Qorb := by
+    rintro g ⟨hgfam, hgG0⟩
+    exact Mdata.G0_orbit_cover g ((hmemfam g).mp hgfam) hgG0
+  -- ncard reduction.
+  have hdiff : (famG0 \ Mdata.G0).ncard ≤ Worb.ncard + Porb.ncard + Qorb.ncard :=
+    le_trans (Set.ncard_le_ncard hcover)
+      (le_trans (Set.ncard_union_le _ _) (by gcongr; exact Set.ncard_union_le _ _))
+  have hdeq : (famG0 \ Mdata.G0).ncard = famG0.ncard - Mdata.G0.ncard := Set.ncard_diff hsub
+  have hG0le : Mdata.G0.ncard ≤ famG0.ncard := Set.ncard_le_ncard hsub
+  -- `Nat.card famG₀ = famG₀.ncard`, `|filter| = G₀.ncard`.
+  have hfamcard : Nat.card famG0 = famG0.ncard := Nat.card_coe_set_eq famG0
+  have hfiltcard : (Finset.univ.filter (fun g : G => g ∈ Mdata.G0)).card = Mdata.G0.ncard := by
+    rw [Set.ncard_eq_toFinset_card']; congr 1; ext g; simp
+  rw [hfamcard, hfiltcard]
+  have hcast : (famG0.ncard : ℝ) - (Mdata.G0.ncard : ℝ)
+      = ((famG0.ncard - Mdata.G0.ncard : ℕ) : ℝ) := (Nat.cast_sub hG0le).symm
+  rw [hcast, ← hdeq]
+  calc ((famG0 \ Mdata.G0).ncard : ℝ) ≤ ((Worb.ncard + Porb.ncard + Qorb.ncard : ℕ) : ℝ) := by
+        exact_mod_cast hdiff
+    _ = (Worb.ncard : ℝ) + (Porb.ncard : ℝ) + (Qorb.ncard : ℝ) := by push_cast; ring
+
+open scoped Classical OddOrder.Peterfalvi.S12.FiniteInduce in
 /-- **Peterfalvi (14.11.4), the upper-bound §8 TI-counting step** (04.16 lines 109–115).  Brings the
-line-83 bound `|A(M)|/|M| + (1/|G|)(|famG₀| − |G₀|)` (the RHS of `chiRhoNormSq_psi_le_line83`,
-proven) up to the displayed `NormCascadeData.upper` `1 − 1/p − 1/q + 2/(pq) + 1/(uq) + 1/(vp)`.
-
-The genuine §8 content, by the textbook's two stages:
-* **`|A(M)|/|M| = |K#|/|M| = (k−1)/(kpq)`**: the type-I Dade support `A(M) = K#`
-  (`centralizerSupport_sharpSubgroup_eq_of_frobenius`, **proven** from the Frobenius FPF of `M`)
-  with `|M| = pqk`;
-* **orbit counting** `(1/|G|)(|famG₀| − |G₀|) ≤ (1/|G|)(|(W−(W₁∪W₂))^G| + |(P#)^G| + |(Q#)^G|)`
-  (the (14.11.3) exclusions, union bound on `famG₀ ∖ G₀`), with the TI orbit cardinalities
-  `|(P#)^G| = (|P|−1)·[G:N_G(P)]`, `|(Q#)^G| = (|Q|−1)·[G:N_G(Q)]` from
-  `S14.ncard_conjClassSet_of_isTISubset` (`|𝒞_G(A)| = |A|·[G:L]` for a TI-subset `A`), and the
-  normalizer sizes `[G:N_G(P)] = |G|/(|P|uq)` etc. from the Type-II partner `S` ((8.6.a)/(8.11)/
-  (13.12)).  The raw estimate is then loosened by `normCascade_upper_loosen` (proven).
-
-The single remaining genuine §8 obligation of (14.11.4) — the type-I analogue of the S12 (10.8)
-TI-counting `G₁ ⊆ (H#)^G ∪ V^G`.  The orbit-cardinality tool (`ncard_conjClassSet_of_isTISubset`)
-and the loosening (`normCascade_upper_loosen`) are in hand; the remaining work is the §8 structural
-input — the TI property and normalizer sizes of the Frobenius pieces `W`, `P`, `Q` for this `M`. -/
+line-83 bound `|A(M)|/|M| + (1/|G|)(|famG₀| − |G₀|)` (`chiRhoNormSq_psi_le_line83`, proven) up to
+the displayed `NormCascadeData.upper`.  The genuine §8 content: `|A(M)|/|M| = (k−1)/(kpq)`
+(`card_typeIA_eq`/`card_M_eq`); the `G₀`-drop `famG0_sub_filter_card_le_orbit_ncard` (set-reduction,
+proven) plus the orbit measures (`orbit_sdiff_sup_normSq_term`/`orbit_sharpSubgroup_normSq_term`)
+and the structural values (`|W|`/`|N_G(P)|`, `IsTI P`/`IsTI Q`, `normalizer_V`) bound the orbits, then
+`normCascade_upper_loosen`.  The remaining §8 structural input is the TI/normalizer data of the
+Frobenius pieces `W`, `P`, `Q` (the type-I analogue of S12 (10.8)'s `G₁ ⊆ (H#)^G ∪ V^G`). -/
 theorem MHypothesis.line83_le_displayed_upper [Finite G] {hyp : Hypothesis (G := G)}
     (Mdata : MHypothesis hyp) :
     (Nat.card ↥(OddOrder.GroupTheory.typeIA Mdata.M Mdata.typeIHyp.typeI) : ℝ)
