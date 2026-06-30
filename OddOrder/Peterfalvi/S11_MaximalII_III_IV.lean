@@ -4077,9 +4077,45 @@ theorem cInHu_le_inertia [Finite G] {M : Subgroup G} (data : TypesIIIIIIVSetup M
   rw [conjBy_compHom_hInHuEquivH data w c hag, compHom_typeP_conjAction_inflation, hq1]
   rfl
 
-/-- **`I_{HU}(θ₀) ⊓ U ≤ C`**: any `U`-element of `HU` fixing the realized chief-factor character
-`θ₀` acts trivially on `H̄`, i.e. lies in `C` — exactly `caseB_inertia_realized`, with the action
-element constructed from the `U`-realized `g`.  The hard half of the (9.9.a) inertia lift. -/
+/-- **`I(θ₀) ⊓ U ≤ C`, parametrized over the realized stabilizer-triviality `hrealized`.**  The
+case-agnostic part of the hard inertia direction: any `g ∈ I(θ₀) ⊓ U` realizes as a `U`-element `a`
+whose `θ₀`-fixing (`mem_inertia`) feeds `hrealized` to conclude `a ∈ ker(uActionHom) = C`.  Case (b)
+supplies `hrealized` as `caseB_inertia_realized`; case (a) via the non-Galois analog. -/
+theorem inertia_inf_uInHu_le_cInHu_of_realized [Finite G] {M : Subgroup G}
+    (data : TypesIIIIIIVSetup M) (chief : ChiefFactorData data)
+    {θbar : IrreducibleCharacter (↥data.H ⧸ chief.N)}
+    (hrealized : ∀ (a : ↥((typeP_quotientCoprimeAction data.typeP data.nontrivial.1
+          chief.N_aInvariant).U)) (g : ↥(huSub data)),
+        (((g : ↥M) : G) = (((typeP_quotientCoprimeAction data.typeP data.nontrivial.1
+            chief.N_aInvariant).U.subtype a : ↥(data.typeP.U ⊔ data.typeP.W1)) : G)) →
+        ClassFunction.conjBy g (ClassFunction.compHom (hInHuEquivH data).toMonoidHom
+            (ClassFunction.compHom (QuotientGroup.mk' chief.N)
+              (θbar : ClassFunction (↥data.H ⧸ chief.N) ℂ)))
+          = ClassFunction.compHom (hInHuEquivH data).toMonoidHom
+              (ClassFunction.compHom (QuotientGroup.mk' chief.N)
+                (θbar : ClassFunction (↥data.H ⧸ chief.N) ℂ)) →
+        ((typeP_quotientCoprimeAction data.typeP data.nontrivial.1 chief.N_aInvariant).φ.comp
+          (typeP_quotientCoprimeAction data.typeP data.nontrivial.1
+            chief.N_aInvariant).U.subtype) a = 1) :
+    ClassFunction.inertia (G := ↥(huSub data)) (H := hInHu data)
+        (ClassFunction.compHom (hInHuEquivH data).toMonoidHom
+          (ClassFunction.compHom (QuotientGroup.mk' chief.N)
+            (θbar : ClassFunction (↥data.H ⧸ chief.N) ℂ))) ⊓ uInHu data
+      ≤ cInHu data chief := by
+  rintro g ⟨hgin, hgu⟩
+  have hgU : ((g : ↥M) : G) ∈ data.typeP.U := by
+    simp only [uInHu] at hgu; exact hgu
+  have hgUW1 : ((g : ↥M) : G) ∈ data.typeP.U ⊔ data.typeP.W1 := Subgroup.mem_sup_left hgU
+  set a : ↥((typeP_quotientCoprimeAction data.typeP data.nontrivial.1 chief.N_aInvariant).U) :=
+    ⟨⟨((g : ↥M) : G), hgUW1⟩, Subgroup.mem_subgroupOf.mpr hgU⟩ with ha_def
+  have hag : ((g : ↥M) : G)
+      = (((typeP_quotientCoprimeAction data.typeP data.nontrivial.1
+          chief.N_aInvariant).U.subtype a : ↥(data.typeP.U ⊔ data.typeP.W1)) : G) := rfl
+  have hker : a ∈ (uActionHom data chief).ker :=
+    hrealized a g hag (ClassFunction.mem_inertia.mp hgin)
+  simp only [cInHu, Subgroup.mem_subgroupOf, cSub, Subgroup.mem_map]
+  exact ⟨_, ⟨a, hker, rfl⟩, rfl⟩
+
 theorem inertia_inf_uInHu_le_cInHu [Finite G] {M : Subgroup G} (data : TypesIIIIIIVSetup M)
     (chief : ChiefFactorData data)
     (hcaseB : ∀ J : Subgroup (↥data.H ⧸ chief.N),
@@ -4092,20 +4128,8 @@ theorem inertia_inf_uInHu_le_cInHu [Finite G] {M : Subgroup G} (data : TypesIIII
         (ClassFunction.compHom (hInHuEquivH data).toMonoidHom
           (ClassFunction.compHom (QuotientGroup.mk' chief.N)
             (θbar : ClassFunction (↥data.H ⧸ chief.N) ℂ))) ⊓ uInHu data
-      ≤ cInHu data chief := by
-  rintro g ⟨hgin, hgu⟩
-  have hgU : ((g : ↥M) : G) ∈ data.typeP.U := by
-    simp only [uInHu, Subgroup.mem_subgroupOf] at hgu; exact hgu
-  have hgUW1 : ((g : ↥M) : G) ∈ data.typeP.U ⊔ data.typeP.W1 := Subgroup.mem_sup_left hgU
-  set a : ↥((typeP_quotientCoprimeAction data.typeP data.nontrivial.1 chief.N_aInvariant).U) :=
-    ⟨⟨((g : ↥M) : G), hgUW1⟩, Subgroup.mem_subgroupOf.mpr hgU⟩ with ha_def
-  have hag : ((g : ↥M) : G)
-      = (((typeP_quotientCoprimeAction data.typeP data.nontrivial.1
-          chief.N_aInvariant).U.subtype a : ↥(data.typeP.U ⊔ data.typeP.W1)) : G) := rfl
-  have hker : a ∈ (uActionHom data chief).ker :=
-    caseB_inertia_realized hcaseB hθbar a g hag (ClassFunction.mem_inertia.mp hgin)
-  simp only [cInHu, Subgroup.mem_subgroupOf, cSub, Subgroup.mem_map]
-  exact ⟨_, ⟨a, hker, rfl⟩, rfl⟩
+      ≤ cInHu data chief :=
+  inertia_inf_uInHu_le_cInHu_of_realized data chief (caseB_inertia_realized hcaseB hθbar)
 
 /-- **Inertia lift `I_{HU}(θ₀) = HC`, parametrized over the hard direction** `I(θ₀) ⊓ U ≤ C`.  The
 case-agnostic assembly: `⊇` from `H ≤ I(θ₀)` (`subgroup_le_inertia`) and `cInHu_le_inertia` (both
