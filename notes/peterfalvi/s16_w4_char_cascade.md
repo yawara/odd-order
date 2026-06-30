@@ -529,3 +529,31 @@ mirror 中** (s14 note 明記)。但し全て **L (witness 第二極大) 対象*
 ⟹ **multi-iteration の V-side helper chain build**。Tdata dead-end を除外できたのが本 iteration の成果。
 次 = `exists_typeI_maximal_overNormalizer_V` の helper chain から着手 (T_typeII gated、fresh context 推奨)。
 [[feedback-no-avoiding-hard-parts]] [[scaffold-sorry-free-not-done]] [[feedback-flag-poor-progress]]
+
+### cont.¹³ (2026-06-30 lane c=γ /loop): 🎯 「fully-gated」結論は過早だった — TypeIIData harvest で §13.2.a 非-gated 化 (`isMulCommutative_U`)
+
+ユーザーが「待つな・lane c を進めろ」と push (×3)。それを受けて §15/§13.2 の gated 構造事実を**正面から**
+attack した結果、**「lane c frontier は fully cross-lane gated」という本 session 前半の結論は過早**と判明
+([[feedback-no-avoiding-hard-parts]] の warning 通り、試行不足だった)。
+
+**genuine landing** (commit `100e4d73`, full build 3888 green): **`S15.isMulCommutative_U`** (sorry-free) =
+型-P₂ member S の complement U が可換 (Pf 13.2.a)。これまで §16-gated な `basic_structure_gated.U_commutative`
+経由でしか得られなかった事実を**非-gated に実証明**:
+- **鍵 = sorry-free type determination の harvest**: S は type II (`isTypeII_of_isTypeP2`, sorry-free
+  from `S_typeP2`) ゆえ `TypeIIData S` witness `tdata` が**只で手に入る**。`tdata.U_commutative` は
+  witness の U の可換性。
+- carrier U (=Sdata.U) と tdata.typeP.U は M'=[S,S] 内で M_F=P の complement ⟹ Schur–Zassenhaus
+  (`IsComplement'.exists_conj_of_coprime`, |P|⊥|U| from `coprime_card_U_card_P_of_disjoint`) で M'-共役
+  ⟹ `isMulCommutative_of_mulEquiv` chain で可換性 transfer。
+- 消費者 `typeI_overNormalizer_U_le_fitting:646` の gated 参照を本 lemma に置換。
+
+**⟹ 反復可能な lane-c 技法 (次 iteration の方針)**: **sorry-free type determination が与える
+`TypeIIData S` (= `hSII.some`) の field を harvest して gated §13.2 構造事実を非-gated 化**する。
+- witness 非依存 field (derivedInG S 関連: `derived_typeF` = `IsTypeF (derivedInG S)`,
+  `derived_fitting_eq`) は**直接** citable (transfer 不要、derivedInG S は canonical)。
+- U-witness 依存 field (`U_commutative` ✅, `normalizer_not_le` = ¬N_G(U)≤S) は**complement 共役
+  transfer** (本 `isMulCommutative_U` pattern)。
+- 真に deep な残り = σ-structure (`P_order` |P|=p^q, `P_elementaryAbelian`, `u_bound`, `A0S_TI`) =
+  BG §10/§14 σ-theory (docstring「no repo theorem yet」)。これは harvest 不可、別 attack。
+次 /loop = TypeIIData harvest で次の gated fact を非-gated 化 (例 `normalizer_not_le` 共役 transfer、
+or derivedInG S 系の直接 cite)。[[feedback-no-avoiding-hard-parts]] [[scaffold-sorry-free-not-done]]
