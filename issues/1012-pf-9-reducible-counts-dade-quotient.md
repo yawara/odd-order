@@ -426,10 +426,21 @@ S11:4549 sorry。全 transport 補題が repo 実在ゆえ機械的に組める:
   `exists_zeta_residual_not_orthogonal` (11.8 = 唯一の bare FT spine sorry)、`typeV_forces_coherence` (10.10)。
 
 **進め方**: deep だが incremental に grind 可 — caseA inertia は 1 iteration = 1 supporting lemma の
-ペースで caseB inertia infra を analog 構築 (`chiefFactor_caseA_char_inertia` ← Hpart 直積 +
-W₁-transitive permutation の Clifford 解析)。難所の数学が真に impasse なら **ChatGPT 相談**
-([[feedback-ask-chatgpt-for-elided-gaps]]、strongest model) を併用。**次着手 = caseA inertia の最初の
-supporting lemma を WRITE** (scoping は完了済、deliberation 不要)。
+ペースで caseB inertia infra を analog 構築。難所の数学が真に impasse なら **ChatGPT 相談**
+([[feedback-ask-chatgpt-for-elided-gaps]]、strongest model) を併用。
+
+**✅✅ 2026-06-30: inertia plumbing 4 層 全 generalize 完了 (build-green、commits dd3576fe→1203f462)**:
+`inertia_eq_hcInHu_of_inf_le` / `inertia_inf_uInHu_le_cInHu_of_realized` /
+`caseB_inertia_realized_of_charInertia` / `caseB_char_inertia_inflation_of_core` — 各層を θbar-generic
+な hypothesis で parametrize、caseB は delegate。⟹ caseA inertia chain は parametrized 連鎖の trivial
+適用 + 単一 core `chiefFactor_caseA_char_inertia` に還元。
+
+**残 (deep)**: (1) **core `chiefFactor_caseA_char_inertia`** — ⚠ 注意: caseB core は θ nontrivial で
+g 固定⟹g trivial だが、caseA では一般 θ で偽 (U が H̄ に可約作用)。**reducible-relevant θbar (W₁ が
+Hpart factors を transitive permute ゆえ全 factor 対称) に限り成立** — この θbar の characterization +
+stabilizer 論が core の本体 (Hpart Clifford)。(2) **caseA_exists_chiefFactorConstituent** (reducible χ
+から上記 θbar 構成 + inertia=HC を parametrized chain で計算) + (3) **caseA_degree_qu** + wiring
+(caseB と同形 mechanical)。次着手 = core の Hpart W₁-symmetric θbar 解析 (ChatGPT 相談候補)。
 
 ## 進捗サマリ (2026-06-30 更新)
 
