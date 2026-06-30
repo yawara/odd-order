@@ -733,3 +733,29 @@ bridge 残部品を精査し、必要な入力と障害を確定:
 bridge progress: keystone (ℂ-linearity) + parts 1/2 (coherence agreement DadeMap 形) + part 4
 (typeIA=H^#) + family-isometry。**hard math content 完了**、残は構造 refactor + family 構成 +
 char-theory 入力 (Frobenius-induction irreducible)。
+
+### 2026-07-01 (loop 継続³¹⁻): §12 bridge ingredient 一覧 完備 — hζ0norm supplier landed
+
+`inner_self_induce_eq_one_of_frobeniusGroup` (commit 73a241ea, InducedIrreducible): Frobenius 群で
+非自明既約の誘導 ‖Ind θ‖²=1 → hypothesis78OfDade の hζ0norm。これで bridge の全 ingredient が
+所在確定:
+- hagree: `coherence_hagree_dadeMap` ✓
+- nu_isometry (family-level): `coherence_extension_inner_eq_on_family` ✓ (⚠ field 弱化 refactor 必要)
+- hAH (typeIA=H^#): `Hypothesis.typeIA_eq_sharp` ✓
+- hζ0norm (‖ζ_0‖²=1): `inner_self_induce_eq_one_of_frobeniusGroup` ✓
+- 区別 char χ(1)=[L:K]: `exists_distinguished_char` ✓
+- Frobenius-induce-irreducible: `isIrreducibleCharacter_induce_of_frobeniusGroup` ✓
+- H71+hτ: `Hypothesis.toHypothesis71` ✓ (IsDadeIsometry from fullDadeIsometryData)
+- Frobenius 構造: `typeI_frobenius` ✓
+
+**残 (assembly フェーズ)**:
+1. **nu_isometry field 弱化** (Hypothesis78 の global → `∀ i j, i≠ind1H → j≠ind1H → ...`、
+   ~6-8 sites、pre-existing gamma-side consumer の rw に ≠ind1H proof を thread; shared
+   S09_Nonexistence ゆえ atomic + 注意)。これが唯一の真の refactor。
+2. **family 構成** (distinctInducedFamily ベース、区別 char rep を index 0、trivial を ind1H≠0 に配置、
+   cover/inj 保存; 2-member 配置の intricate 構成)。
+3. hzeta0nu (⟨ν χ, 1_G⟩=0、非自明 coherent image ⊥ 1_G)。
+4. degrees (d/hdeg/hdeg_match)。
+5. assembly: S14 に S09_CertificateDischarge import → hypothesis78OfDade で witness-L H78 →
+   betaDecompOfDade/zetaNuRhoNormSqGeOfDade。
+注: full (12.16) は別途 §12 char sorry (12.11/12.14/12.15) が gating。
