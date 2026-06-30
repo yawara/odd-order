@@ -204,4 +204,23 @@ theorem inner_psi_zeta [Invertible (Nat.card L : ℂ)] {n : ℕ}
   · rw [if_pos hij, hij]
   · rw [if_neg hij, horth j i (fun h => hij h.symm)]
 
+/-- **Peterfalvi (7.7.a), the Gram sum.**  For a pairwise-orthogonal family `ζ` and `j ≥ 1`, pairing
+`ψ_j = ζ_j − d_j ζ_0` against any linear combination `Σ_{i ≥ 1} b_i ζ_i` picks out the diagonal:
+`⟨ψ_j, Σ_{i≥1} b_i ζ_i⟩ = star(b_j) ‖ζ_j‖²`.  Immediate from the Gram entry `inner_psi_zeta` and
+`Finset.sum_eq_single`.  In (7.7.a) the candidate is `Σ_{i≥1} (c̄_i/‖ζ_i‖²) ζ_i`, so this equals `c_j`
+(after `star (c̄_j/‖ζ_j‖²)·‖ζ_j‖² = c_j`, using `‖ζ_j‖²` real). -/
+theorem inner_psi_candidate [Invertible (Nat.card L : ℂ)] {n : ℕ}
+    (ζ : Fin (n + 1) → ClassFunction L ℂ) (d : Fin (n + 1) → ℂ)
+    (horth : ∀ a b : Fin (n + 1), a ≠ b → ClassFunction.inner (ζ a) (ζ b) = 0)
+    (b : Fin (n + 1) → ℂ) {j : Fin (n + 1)} (hj : j ≠ 0) :
+    ClassFunction.inner (ζ j - d j • ζ 0)
+        (∑ i ∈ Finset.Ioi (0 : Fin (n + 1)), b i • ζ i) =
+      star (b j) * ClassFunction.inner (ζ j) (ζ j) := by
+  rw [inner_sum_right, Finset.sum_eq_single j
+    (fun i hi hij => by
+      rw [ClassFunction.inner_smul_right, inner_psi_zeta ζ d horth (Finset.mem_Ioi.mp hi).ne',
+        if_neg hij, mul_zero])
+    (fun hj_notin => absurd (Finset.mem_Ioi.mpr (Fin.pos_of_ne_zero hj)) hj_notin)]
+  rw [ClassFunction.inner_smul_right, inner_psi_zeta ζ d horth hj, if_pos rfl]
+
 end OddOrder.Peterfalvi.S09.Cert
