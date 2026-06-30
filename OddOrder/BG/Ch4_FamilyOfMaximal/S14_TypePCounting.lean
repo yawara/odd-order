@@ -10131,7 +10131,55 @@ theorem sigmaLength_le_two_of_mem_zTilde_of_isTypeP [Finite G]
       (Uref.subgroupOf Mref))
     {z : G} (hz : z ∈ zTilde Kref Kstarref) :
     sigmaLength z ≤ 2 := by
-  sorry
+  classical
+  -- The dual partner `Mstar` (Theorem 14.7 duality): `K = M*_σ ⊓ C(K*)` (so `K ≤ M*_σ`) and
+  -- `M` not conjugate to `M*`.
+  obtain ⟨_, _, hExU⟩ := typeP_duality hG hMref hMPref hKMref hKref hKstarref
+  obtain ⟨Mstar, ⟨hMstarmax, _, hnc, ⟨_, _, hK_eq⟩, _, _, _, _⟩, _⟩ := hExU
+  have hKMsig : Kref ≤ OddOrder.BG.Ch3.S10.Msigma Mstar := hK_eq.trans_le inf_le_left
+  have hKstarMsig : Kstarref ≤ OddOrder.BG.Ch3.S10.Msigma Mref := hKstarref.trans_le inf_le_left
+  -- Unpack `z ∈ Ẑ = (K ⊔ K*) ∖ (K ∪ K*)`.
+  rw [zTilde, Set.mem_diff, Set.mem_union] at hz
+  obtain ⟨hzW, hznot⟩ := hz
+  have hzW' : z ∈ Kref ⊔ Kstarref := SetLike.mem_coe.mp hzW
+  -- `K ◁ (K ⊔ K*)` (`K*` centralises `K`), so the split `z = k·k*` exists (no `CommGroup` needed).
+  haveI hKrefnorm : (Kref.subgroupOf (Kref ⊔ Kstarref)).Normal := by
+    rw [Subgroup.normal_subgroupOf_iff_le_normalizer le_sup_left]
+    exact sup_le Subgroup.le_normalizer
+      (le_trans (hKstarref.trans_le inf_le_right)
+        (Subgroup.centralizer_le_normalizer (↑Kref : Set G)))
+  have hsplit : (⟨z, hzW'⟩ : ↥(Kref ⊔ Kstarref)) ∈
+      (Kref.subgroupOf (Kref ⊔ Kstarref)) ⊔ (Kstarref.subgroupOf (Kref ⊔ Kstarref)) := by
+    rw [codisjoint_iff.mp (Subgroup.codisjoint_subgroupOf_sup Kref Kstarref)]
+    exact Subgroup.mem_top _
+  rw [Subgroup.mem_sup_of_normal_left] at hsplit
+  obtain ⟨a, ha, b, hb, hab⟩ := hsplit
+  have hkK : (a : G) ∈ Kref := Subgroup.mem_subgroupOf.mp ha
+  have hksK : (b : G) ∈ Kstarref := Subgroup.mem_subgroupOf.mp hb
+  have hzkk : z = (a : G) * (b : G) := by
+    have h := congrArg (Subgroup.subtype (Kref ⊔ Kstarref)) hab
+    simpa using h.symm
+  have hk1 : (a : G) ≠ 1 := by
+    rintro h0
+    exact hznot (Or.inr (by rw [hzkk, h0, one_mul]; exact SetLike.mem_coe.mpr hksK))
+  have hks1 : (b : G) ≠ 1 := by
+    rintro h0
+    exact hznot (Or.inl (by rw [hzkk, h0, mul_one]; exact SetLike.mem_coe.mpr hkK))
+  have hksC : (b : G) ∈ Subgroup.centralizer (↑Kref : Set G) :=
+    (hKstarref.trans_le inf_le_right) hksK
+  have hcomm : Commute (a : G) (b : G) :=
+    Subgroup.mem_centralizer_iff.mp hksC (a : G) (SetLike.mem_coe.mpr hkK)
+  have hMN : ¬ ∃ g : G, MulAut.conj g • Mstar = Mref := fun h => hnc (IsConjugateSubgroup.symm h)
+  -- `z = k·k*` with `k ∈ M*_σ#`, `k* ∈ M_σ`, `M*`/`M` non-conjugate: `sigma_cover_decomposition`.
+  have hdecomp := sigma_cover_decomposition hG hMstarmax hMref hMN (hKMsig hkK) hk1
+    (hKstarMsig hksK) hcomm
+  rw [sigmaLength, hzkk, hdecomp]
+  have h1 : (({(b : G)} : Set G) \ {1}).ncard ≤ 1 :=
+    (Set.ncard_le_ncard Set.diff_subset (Set.finite_singleton _)).trans
+      (le_of_eq (Set.ncard_singleton _))
+  calc (insert (a : G) (({(b : G)} : Set G) \ {1})).ncard
+      ≤ (({(b : G)} : Set G) \ {1}).ncard + 1 := Set.ncard_insert_le _ _
+    _ ≤ 2 := by omega
 
 /-! ### BG Lemma 14.11 — phase 1: `Q ⊄ F(E) ⟹ q ∈ τ₁(M)` and `C_{M_σ}(Q) = 1`
 
