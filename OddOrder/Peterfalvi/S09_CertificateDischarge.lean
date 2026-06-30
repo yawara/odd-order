@@ -370,6 +370,18 @@ theorem induce_apply_one_ne_zero (K : Subgroup L) [Fintype ↥K] [Invertible (Na
   rw [hval]
   exact Nat.cast_ne_zero.mpr hd.ne'
 
+/-- **The induced character is real at `1`.**  `Ind_K^L θ (1) = [L:K] · θ(1)` is the natural-number
+cast `[L:K] · dim θ`, so it is fixed by complex conjugation.  Supplies `star d_i = d_i` for the
+degree ratios `d_i = ζ_i(1)/ζ_0(1)` in the `(7.8.a)` `Gamma_orth_nu` computation. -/
+theorem induce_apply_one_star (K : Subgroup L) [Fintype ↥K] [Invertible (Nat.card ↥K : ℂ)]
+    (θ : IrreducibleCharacter ↥K) :
+    star (ClassFunction.induce K (θ : ClassFunction ↥K ℂ) (1 : L))
+      = ClassFunction.induce K (θ : ClassFunction ↥K ℂ) (1 : L) := by
+  rw [ClassFunction.induce_apply_one]
+  obtain ⟨d, _, hval⟩ := irreducibleCharacter_apply_one_eq_pos_natCast θ
+  rw [hval, ← Nat.cast_mul]
+  exact star_natCast _
+
 /-- **The induced family is pairwise orthogonal** (Peterfalvi (7.6)/(7.7.a) hypothesis).  For a
 family `θ : Fin (n+1) → Irr K` of pairwise non-conjugate irreducibles, the induced characters
 `ζ_i = Ind_K^L θ_i` are pairwise orthogonal — the `horth` hypothesis of `chiRho_decomp_proof`.
@@ -883,6 +895,140 @@ theorem betaDecomp_orth_one {G : Type*} [Group G] [Fintype G] {A : Set G} {L : S
       inner_induce_constOne_eq_zero K (θ i) (hne_triv i hi),
       inner_induce_constOne_eq_zero K (θ 0) (hne_triv 0 (Ne.symm hind1H)),
       mul_zero, sub_zero]
+
+/-- **The family-difference inner product** (Peterfalvi (7.8.a), `a_φ` computation).  For pairwise
+distinct family members, `⟨ζ_{ind1H} − ζ_0, ζ_i − d_i ζ_0⟩ = star(d_i) ‖ζ_0‖²` (`i ≠ 0, ind1H`,
+`ind1H ≠ 0`): all cross terms vanish by orthogonality (`induce_family_orthogonal_of_injective`),
+leaving the `d_i ζ_0`-against-`ζ_0` term.  Via `IsDadeIsometry.inner_eq` and the coherence agreement
+this equals `⟨β, ζ_i^ν − d_i ζ_0^ν⟩`, the key step in the `(7.8.a)` decomposition. -/
+theorem inner_family_diff (K : Subgroup L) [K.Normal] [Fintype ↥K]
+    [Invertible (Nat.card L : ℂ)] [Invertible (Nat.card ↥K : ℂ)] {n : ℕ}
+    (θ : Fin (n + 1) → IrreducibleCharacter ↥K)
+    (hinj : Function.Injective (fun i => ClassFunction.induce K (θ i : ClassFunction ↥K ℂ)))
+    (d : Fin (n + 1) → ℂ) {i ind1H : Fin (n + 1)}
+    (hi0 : i ≠ 0) (hi_ind : i ≠ ind1H) (hind0 : ind1H ≠ 0) :
+    ClassFunction.inner
+        (ClassFunction.induce K (θ ind1H : ClassFunction ↥K ℂ)
+          - ClassFunction.induce K (θ 0 : ClassFunction ↥K ℂ))
+        (ClassFunction.induce K (θ i : ClassFunction ↥K ℂ)
+          - d i • ClassFunction.induce K (θ 0 : ClassFunction ↥K ℂ))
+      = star (d i) * ClassFunction.inner (ClassFunction.induce K (θ 0 : ClassFunction ↥K ℂ))
+          (ClassFunction.induce K (θ 0 : ClassFunction ↥K ℂ)) := by
+  have horth := induce_family_orthogonal_of_injective K θ hinj
+  rw [ClassFunction.inner_sub_left, ClassFunction.inner_sub_right, ClassFunction.inner_sub_right,
+    ClassFunction.inner_smul_right, ClassFunction.inner_smul_right,
+    horth ind1H i (Ne.symm hi_ind), horth ind1H 0 hind0, horth 0 i (Ne.symm hi0)]
+  ring
+
+/-- **The inner product `⟨β, ζ_i^ν − d_i ζ_0^ν⟩`** (Peterfalvi (7.8.a), `a_φ` step).  With
+`β = (ζ_{ind1H} − ζ_0)^τ` and the coherence agreement `ζ_i^ν − d_i ζ_0^ν = (ζ_i − d_i ζ_0)^τ`
+(`hagree_i`), the Dade isometry (`hτ : IsDadeIsometry`) turns the `G`-side inner product into the
+`L`-side family inner product `⟨ζ_{ind1H} − ζ_0, ζ_i − d_i ζ_0⟩ = star(d_i) ‖ζ_0‖²`
+(`inner_family_diff`).  No `ρ`-projection is needed — only the two isometries. -/
+theorem inner_beta_nuDiff {G : Type*} [Group G] [Fintype G] {A : Set G} {L : Subgroup G}
+    [Fintype L] [Invertible (Nat.card L : ℂ)] [Invertible (Nat.card G : ℂ)]
+    (H71 : Hypothesis71 G A L)
+    (hτ : OddOrder.Peterfalvi.S04.IsDadeIsometry (G := G) (k := ℂ) (L := L) H71.τ)
+    (K : Subgroup ↥L) [K.Normal] [Fintype ↥K] [Invertible (Nat.card ↥K : ℂ)] {n : ℕ}
+    (θ : Fin (n + 1) → IrreducibleCharacter ↥K)
+    (hinj : Function.Injective (fun i => ClassFunction.induce K (θ i : ClassFunction ↥K ℂ)))
+    (d : Fin (n + 1) → ℂ)
+    (psi_support : ∀ i, (ClassFunction.induce K (θ i : ClassFunction ↥K ℂ)
+        - d i • ClassFunction.induce K (θ 0 : ClassFunction ↥K ℂ)).support ⊆
+      OddOrder.Peterfalvi.S04.supportInSubgroup A L)
+    {ind1H : Fin (n + 1)} (hind0 : ind1H ≠ 0)
+    (diffβ : (ClassFunction.induce K (θ ind1H : ClassFunction ↥K ℂ)
+        - ClassFunction.induce K (θ 0 : ClassFunction ↥K ℂ)).support ⊆
+      OddOrder.Peterfalvi.S04.supportInSubgroup A L)
+    {i : Fin (n + 1)} (hi0 : i ≠ 0) (hi_ind : i ≠ ind1H)
+    (ν : ClassFunction ↥L ℂ →ₗ[ℤ] ClassFunction G ℂ)
+    (hagree_i : ν (ClassFunction.induce K (θ i : ClassFunction ↥K ℂ))
+        - d i • ν (ClassFunction.induce K (θ 0 : ClassFunction ↥K ℂ))
+      = H71.τ ⟨ClassFunction.induce K (θ i : ClassFunction ↥K ℂ)
+          - d i • ClassFunction.induce K (θ 0 : ClassFunction ↥K ℂ), psi_support i⟩) :
+    ClassFunction.inner
+        (H71.τ ⟨ClassFunction.induce K (θ ind1H : ClassFunction ↥K ℂ)
+            - ClassFunction.induce K (θ 0 : ClassFunction ↥K ℂ), diffβ⟩)
+        (ν (ClassFunction.induce K (θ i : ClassFunction ↥K ℂ))
+          - d i • ν (ClassFunction.induce K (θ 0 : ClassFunction ↥K ℂ)))
+      = star (d i) * ClassFunction.inner (ClassFunction.induce K (θ 0 : ClassFunction ↥K ℂ))
+          (ClassFunction.induce K (θ 0 : ClassFunction ↥K ℂ)) := by
+  rw [hagree_i, hτ.inner_eq]
+  exact inner_family_diff K θ hinj d hi0 hi_ind hind0
+
+/-- **The inner product `⟨weightedNuSum, ζ_j^ν⟩ = ζ_j(1)/ζ_0(1)`** (Peterfalvi (7.8.a)).  The
+weighted sum `Σ_{i ≠ ind1H} (ζ_i(1)/(ζ_0(1)‖ζ_i‖²)) ζ_i^ν` paired against `ζ_j^ν` (`j ≠ ind1H`)
+collapses by the `ν`-isometry (`hnu`) + family orthogonality to the single `i = j` term, which is
+`(ζ_j(1)/(ζ_0(1)‖ζ_j‖²)) ‖ζ_j‖² = ζ_j(1)/ζ_0(1)`.  This supplies the `a · ⟨weightedNuSum, ζ_j^ν⟩`
+term that cancels `⟨β, ζ_j^ν⟩` in the `Gamma_orth_nu` computation. -/
+theorem inner_weightedNuSum_nu {G : Type*} [Group G] [Fintype G] {A : Set G} {L : Subgroup G}
+    [Fintype L] [Invertible (Nat.card L : ℂ)] [Invertible (Nat.card G : ℂ)]
+    (K : Subgroup ↥L) [K.Normal] [Fintype ↥K] [Invertible (Nat.card ↥K : ℂ)] {n : ℕ}
+    (θ : Fin (n + 1) → IrreducibleCharacter ↥K)
+    (hinj : Function.Injective (fun i => ClassFunction.induce K (θ i : ClassFunction ↥K ℂ)))
+    (ν : ClassFunction ↥L ℂ →ₗ[ℤ] ClassFunction G ℂ)
+    (hnu : ∀ φ ψ : ClassFunction ↥L ℂ, ClassFunction.inner (ν φ) (ν ψ) = ClassFunction.inner φ ψ)
+    {ind1H j : Fin (n + 1)} (hj : j ≠ ind1H) :
+    ClassFunction.inner
+      (∑ i ∈ Finset.univ.erase ind1H,
+        (ClassFunction.induce K (θ i : ClassFunction ↥K ℂ) (1 : ↥L) /
+          (ClassFunction.induce K (θ 0 : ClassFunction ↥K ℂ) (1 : ↥L) *
+            ClassFunction.inner (ClassFunction.induce K (θ i : ClassFunction ↥K ℂ))
+              (ClassFunction.induce K (θ i : ClassFunction ↥K ℂ))) : ℂ) •
+          ν (ClassFunction.induce K (θ i : ClassFunction ↥K ℂ)))
+      (ν (ClassFunction.induce K (θ j : ClassFunction ↥K ℂ)))
+    = ClassFunction.induce K (θ j : ClassFunction ↥K ℂ) (1 : ↥L) /
+        ClassFunction.induce K (θ 0 : ClassFunction ↥K ℂ) (1 : ↥L) := by
+  rw [inner_sum_left, Finset.sum_eq_single_of_mem j
+      (Finset.mem_erase.mpr ⟨hj, Finset.mem_univ j⟩)
+      (fun i _ hij => by
+        rw [ClassFunction.inner_smul_left, hnu,
+          induce_family_orthogonal_of_injective K θ hinj i j hij, mul_zero]),
+    ClassFunction.inner_smul_left, hnu]
+  have hN : ClassFunction.inner (ClassFunction.induce K (θ j : ClassFunction ↥K ℂ))
+      (ClassFunction.induce K (θ j : ClassFunction ↥K ℂ)) ≠ 0 := induce_norm_ne_zero K (θ j)
+  have hz0 : ClassFunction.induce K (θ 0 : ClassFunction ↥K ℂ) (1 : ↥L) ≠ 0 :=
+    induce_apply_one_ne_zero K (θ 0)
+  field_simp
+
+/-- **The inner product `⟨β, ζ_j^ν⟩ = star(d_j) · a`** (Peterfalvi (7.8.a)).  With `a = ⟨β, ζ_0^ν⟩ + 1`
+and `‖ζ_0‖² = 1` (the distinguished `ζ_0 ∈ Irr L`), `inner_beta_nuDiff` (`⟨β, ζ_j^ν − d_j ζ_0^ν⟩ =
+star(d_j) ‖ζ_0‖²`) rearranges to `⟨β, ζ_j^ν⟩ = star(d_j)(⟨β, ζ_0^ν⟩ + 1)` for `j ≠ 0, ind1H`.  This is
+the `⟨β, ζ_j^ν⟩` value that cancels `a ⟨weightedNuSum, ζ_j^ν⟩` in `Gamma_orth_nu`. -/
+theorem inner_beta_nu_eq {G : Type*} [Group G] [Fintype G] {A : Set G} {L : Subgroup G}
+    [Fintype L] [Invertible (Nat.card L : ℂ)] [Invertible (Nat.card G : ℂ)]
+    (H71 : Hypothesis71 G A L)
+    (hτ : OddOrder.Peterfalvi.S04.IsDadeIsometry (G := G) (k := ℂ) (L := L) H71.τ)
+    (K : Subgroup ↥L) [K.Normal] [Fintype ↥K] [Invertible (Nat.card ↥K : ℂ)] {n : ℕ}
+    (θ : Fin (n + 1) → IrreducibleCharacter ↥K)
+    (hinj : Function.Injective (fun i => ClassFunction.induce K (θ i : ClassFunction ↥K ℂ)))
+    (d : Fin (n + 1) → ℂ)
+    (psi_support : ∀ i, (ClassFunction.induce K (θ i : ClassFunction ↥K ℂ)
+        - d i • ClassFunction.induce K (θ 0 : ClassFunction ↥K ℂ)).support ⊆
+      OddOrder.Peterfalvi.S04.supportInSubgroup A L)
+    {ind1H : Fin (n + 1)} (hind0 : ind1H ≠ 0)
+    (diffβ : (ClassFunction.induce K (θ ind1H : ClassFunction ↥K ℂ)
+        - ClassFunction.induce K (θ 0 : ClassFunction ↥K ℂ)).support ⊆
+      OddOrder.Peterfalvi.S04.supportInSubgroup A L)
+    {j : Fin (n + 1)} (hj0 : j ≠ 0) (hj_ind : j ≠ ind1H)
+    (ν : ClassFunction ↥L ℂ →ₗ[ℤ] ClassFunction G ℂ)
+    (hagree_j : ν (ClassFunction.induce K (θ j : ClassFunction ↥K ℂ))
+        - d j • ν (ClassFunction.induce K (θ 0 : ClassFunction ↥K ℂ))
+      = H71.τ ⟨ClassFunction.induce K (θ j : ClassFunction ↥K ℂ)
+          - d j • ClassFunction.induce K (θ 0 : ClassFunction ↥K ℂ), psi_support j⟩)
+    (hζ0norm : ClassFunction.inner (ClassFunction.induce K (θ 0 : ClassFunction ↥K ℂ))
+      (ClassFunction.induce K (θ 0 : ClassFunction ↥K ℂ)) = 1) :
+    ClassFunction.inner
+        (H71.τ ⟨ClassFunction.induce K (θ ind1H : ClassFunction ↥K ℂ)
+            - ClassFunction.induce K (θ 0 : ClassFunction ↥K ℂ), diffβ⟩)
+        (ν (ClassFunction.induce K (θ j : ClassFunction ↥K ℂ)))
+      = star (d j) * (ClassFunction.inner
+          (H71.τ ⟨ClassFunction.induce K (θ ind1H : ClassFunction ↥K ℂ)
+              - ClassFunction.induce K (θ 0 : ClassFunction ↥K ℂ), diffβ⟩)
+          (ν (ClassFunction.induce K (θ 0 : ClassFunction ↥K ℂ))) + 1) := by
+  have key := inner_beta_nuDiff H71 hτ K θ hinj d psi_support hind0 diffβ hj0 hj_ind ν hagree_j
+  rw [ClassFunction.inner_sub_right, ClassFunction.inner_smul_right, hζ0norm, mul_one] at key
+  linear_combination key
 
 /-- **The (7.8.c) collapse of the (7.7.a) sum to a single term.**  If, in the `(7.7.a)`
 decomposition `χ^ρ(x) = ∑_{i ≥ 1} (c̄_i/‖ζ_i‖²) ζ_i(x)`, all coefficients `c_i` (`i ≥ 1`) vanish
