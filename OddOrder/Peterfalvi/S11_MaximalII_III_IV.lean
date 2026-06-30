@@ -2632,6 +2632,19 @@ theorem realizedH0supC_eq_realizedH0_sup_cInHu {M : Subgroup G}
   rw [Subgroup.subgroupOf_sup hH0sub hCsub]
   rfl
 
+/-- **`hInHu ⊔ H₀C = HC`** (realized): `hInHu ⊔ (realized H₀C) = hInHu ⊔ cInHu` (the inertia
+subgroup `HC`).  Via the bridge `realized H₀C = realizedH₀ ⊔ cInHu` and `realizedH₀ ≤ hInHu`.  This
+identifies the `H ⊔ N` of the second isomorphism `H/(H∩N) ≅ (H⊔N)/N` (`H = hInHu`, `N = realized
+H₀C`) with the inertia subgroup `HC = hInHu ⊔ cInHu` of `clifford_caseA_regular_inertia_hc`. -/
+theorem hInHu_sup_realizedH0supC {M : Subgroup G}
+    {data : TypesIIIIIIVSetup M} (chief : ChiefFactorData data) :
+    hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf (huSub data)
+      = hInHu data ⊔ cInHu data chief := by
+  rw [realizedH0supC_eq_realizedH0_sup_cInHu, ← sup_assoc]
+  congr 1
+  exact sup_eq_left.mpr
+    (Subgroup.subgroupOf_mono _ (Subgroup.subgroupOf_mono _ chief.H0_lt_H.le))
+
 /-- **`H₀C ≤ M' = HU`**: `H₀ ≤ H ≤ M'` (`typeP.H_le`) and `C ≤ U ≤ M'` (`typeP.U_le`).  The second
 input (`K ≤ HU`) of the generic reducible-count hypothesis (Coq `PFsection9` `nb_redM`) for the
 quotient `M/H₀C`; combined with `chiefFactor_H0supC_inf_H_eq_H0` and `H₀C ◁ M` it makes the §9↔§6
@@ -5935,6 +5948,61 @@ noncomputable def coherent_H0C_commutator [Fintype G]
     (chars : Section11CharacterData data chief) :
     OddOrder.Peterfalvi.S07.IsCoherent chars.tau chars.S chars.H0CprimeSupport :=
   CoherenceWiring.cohereOfSibleyTarget (sibleyTarget_H0C chars)
+
+/-! ### (9.8.c) irreducible-character construction
+
+The construction of the degree-`qu` irreducible character of `𝒮(H₀C)` for Clifford case (a)
+(conjunct c of `caseA_character_counts`).  Built here at the end of the file so the `H₀C` machinery
+(`chiefFactor_H0supC_subgroupOf_normal` etc.) is in scope; `caseA_character_counts` is relocated
+after it. -/
+
+/-- **realized `H₀C ◁ HU`** (in `huSub`): restricts `chiefFactor_H0supC_subgroupOf_normal`
+(`(H₀C).subgroupOf M ◁ ↥M`) along `huSub ≤ ↥M`.  The `N ◁ G` hypothesis of the second isomorphism
+`HC/H₀C ≅ H̄` in the (9.8.c) character construction. -/
+theorem realizedH0supC_normal_huSub [Finite G] {M : Subgroup G}
+    {data : TypesIIIIIIVSetup M} (chief : ChiefFactorData data) :
+    (((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf (huSub data)).Normal :=
+  (chiefFactor_H0supC_subgroupOf_normal chief).subgroupOf (huSub data)
+
+/-- **`H₀C ∩ H = H₀` inside `hInHu`** (the `H ∩ N` of the second iso, realized in `hInHu`):
+`(realized H₀C).subgroupOf hInHu = (realized H₀).subgroupOf hInHu`.  From
+`hInHu_inf_realizedH0supC_eq_realizedH0` via `inf_subgroupOf_left`.  This rewrites the `N.subgroupOf H`
+of `quotientInfEquivProdNormalQuotient` to `realized H₀`, the kernel of `hInHu ↠ H̄`. -/
+theorem realizedH0supC_subgroupOf_hInHu_eq {M : Subgroup G}
+    {data : TypesIIIIIIVSetup M} (chief : ChiefFactorData data) :
+    (((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf (huSub data)).subgroupOf (hInHu data)
+      = ((chief.H0.subgroupOf M).subgroupOf (huSub data)).subgroupOf (hInHu data) := by
+  rw [← Subgroup.inf_subgroupOf_left, hInHu_inf_realizedH0supC_eq_realizedH0]
+
+/-- **realized `H₀` in `hInHu` = `N` pulled back along `hInHuEquivH`**: the realized `H₀`,
+as a subgroup of `hInHu`, is `chief.N.comap hInHuEquivH`.  Via `hInHuEquivH_coe` + `chief.H0_eq`
+(`H₀ = N.map H.subtype`): `x ∈ realized H₀ ⟺ ((x:M):G) ∈ H₀ ⟺ (hInHuEquivH x : G) ∈ H₀ ⟺
+hInHuEquivH x ∈ N`.  Feeds `QuotientGroup.congr hInHuEquivH` for `hInHu/realizedH₀ ≅ ↥H ⧸ N = H̄`. -/
+theorem realizedH0_subgroupOf_hInHu_eq_comap {M : Subgroup G}
+    {data : TypesIIIIIIVSetup M} (chief : ChiefFactorData data) :
+    ((chief.H0.subgroupOf M).subgroupOf (huSub data)).subgroupOf (hInHu data)
+      = chief.N.comap (hInHuEquivH data).toMonoidHom := by
+  ext x
+  rw [Subgroup.mem_comap, MulEquiv.coe_toMonoidHom, Subgroup.mem_subgroupOf,
+    Subgroup.mem_subgroupOf, Subgroup.mem_subgroupOf, chief.H0_eq, ← hInHuEquivH_coe,
+    Subgroup.mem_map]
+  constructor
+  · rintro ⟨z, hz, hzeq⟩
+    have hz_eq : z = hInHuEquivH data x := Subgroup.subtype_injective data.H hzeq
+    rwa [hz_eq] at hz
+  · intro h
+    exact ⟨_, h, rfl⟩
+
+/-- **realized `H₀` in `hInHu` maps to `N` under `hInHuEquivH`**: the map form of
+`realizedH0_subgroupOf_hInHu_eq_comap`, via `map_comap_eq_self_of_surjective` (`hInHuEquivH`
+surjective).  This is the `G'.map e = H'` hypothesis of `QuotientGroup.congr hInHuEquivH` for
+`hInHu/realizedH₀ ≅ ↥H ⧸ N = H̄`. -/
+theorem realizedH0_map_hInHuEquivH_eq_N {M : Subgroup G}
+    {data : TypesIIIIIIVSetup M} (chief : ChiefFactorData data) :
+    (((chief.H0.subgroupOf M).subgroupOf (huSub data)).subgroupOf (hInHu data)).map
+        (hInHuEquivH data).toMonoidHom = chief.N := by
+  rw [realizedH0_subgroupOf_hInHu_eq_comap]
+  exact Subgroup.map_comap_eq_self_of_surjective (hInHuEquivH data).surjective chief.N
 
 end OddOrder.Peterfalvi.S11
 
