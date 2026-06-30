@@ -7940,6 +7940,37 @@ theorem mem_Mtilde_imp_form [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
   rw [sigmaSharp, sharpSubgroup, Set.mem_diff, Set.mem_singleton_iff, SetLike.mem_coe] at hx
   exact ⟨x, x', rfl, (D.length_one_iff x).mpr ⟨hx.2, ⟨M, hM, hx.1⟩⟩, hx'⟩
 
+/-- **Elements of `M̃` have `σ`-length at most two** (the per-element core of BG Cor 14.10): every
+`g ∈ M̃(M) = ⋃_{x ∈ M_σ#} x·R(x)` is a `σ`-cover element `x·x'` (`mem_Mtilde_imp_form`) with
+`x ∈ M_σ#` and `x' ∈ R(x)`, so `ℓ_σ(g) ≤ 2`.  In the multi-maximal case `R(x) = N_σ ∩ C_G(x)` for
+the neighbour `N` (`exists_neighbor_eq_Rsub`), where `sigmaLength_cover_le_two_signalizer` applies;
+in the trivial case `R(x) = 1`, so `g = x` with `ℓ_σ(x) = 1`. -/
+theorem sigmaLength_le_two_of_mem_Mtilde [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    {M : Subgroup G} (hM : M ∈ maximalSubgroups G) {g : G}
+    (hg : g ∈ Mtilde hG (genuineSigmaDecomposition hG) M) :
+    sigmaLength g ≤ 2 := by
+  obtain ⟨x, x', rfl, hlen, hx'⟩ :=
+    mem_Mtilde_imp_form hG (genuineSigmaDecomposition hG) hM hg
+  have hx1 : x ≠ 1 := (((genuineSigmaDecomposition hG).length_one_iff x).mp hlen).1
+  by_cases hgt : 1 < (maximalSigmaSubgroupsOfElement x).ncard
+  · obtain ⟨M0, hM0⟩ := (((genuineSigmaDecomposition hG).length_one_iff x).mp hlen).2
+    obtain ⟨N, hNmax, _, hReq, hxτ2, _⟩ :=
+      exists_neighbor_eq_Rsub hG (genuineSigmaDecomposition hG) hlen hgt
+    rw [hReq] at hx'
+    have hx'N : x' ∈ OddOrder.BG.Ch3.S10.Msigma N := (Subgroup.mem_inf.mp hx').1
+    have hcomm : Commute x x' := by
+      have h := (Subgroup.mem_inf.mp hx').2
+      rw [Subgroup.mem_centralizer_iff] at h
+      exact h x (Set.mem_singleton_iff.mpr rfl)
+    exact sigmaLength_cover_le_two_signalizer hG hM0.1 hNmax hM0.2 hx1 hxτ2 hx'N hcomm
+  · have hRbot : Rsub hG (genuineSigmaDecomposition hG) x = ⊥ := by
+      unfold Rsub
+      exact dif_neg (fun h => hgt h.2.2)
+    rw [hRbot, Subgroup.mem_bot] at hx'
+    rw [hx', mul_one]
+    have hsl1 : sigmaLength x = 1 := hlen
+    omega
+
 /-- **BG 14.7, elements of `T` have the `not_type1_of_type2` "type-1 form"** (mmd L4021): for
 `t ∈ T = Z − ⋃ Kᵢ*`, there is a family member `N` and `t = y·y'` with `y ∈ M_σ(N)^#`, `y'` a
 nonidentity `κ(N)`-element of `N` centralising `y`.  Extracted exactly as in the TI-of-`T` proof:
