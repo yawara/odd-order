@@ -1,3 +1,11 @@
+> ⚠️ **SUPERSEDED (2026-07-01)**: This free-orbit/exponent route is NOT the path to conjunct c.
+> Reading the Coq proof (`PFsection9.v` `typeP_nonGalois_characters` part (c)) showed (9.8.c) is a
+> **counting + parity** argument, not a per-`f` free-orbit construction. The clean existence: either
+> `Xmu ⊊ Xtheta` (→ witness) or `Xmu = Xtheta` (→ `u = (p-1)^{q-1}` even, contradicting `u` odd).
+> This **sidesteps the `ρ(U)=K` number-theory gap entirely**. New plan = issue 1012
+> "★ 重大 redirect". The free-orbit machinery below stays green/committed but is off the main path.
+> (The verified consult content below remains correct as an *alternative* route, kept for reference.)
+
 # Free-orbit (9.8.c) — ChatGPT Pro consult answer (verified) 2026-07-01
 
 Consult sent (model 最高/Pro) for `θ̄^{w₀}∉U-orbit` strategy. Answer **verified rigorous** (the

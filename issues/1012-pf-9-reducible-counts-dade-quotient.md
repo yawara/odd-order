@@ -1446,3 +1446,38 @@ a=p-1 なら U transitive で marked-factor 不可)。
 θ̄^{w₀}∉U-orbit = hfree、(3) g→a realization で connection core を全 g lift →
 hcZeta_inertia_ne_top_of_free → conjunct c。reduction+connection 完成済; 残=construction-side discharge。
 session 巨大 (compaction 近); 次 fire は fresh context で深 construction を engage。
+
+## ★ 重大 redirect: (9.8.c) は counting+parity であって free-orbit/exponent でない (2026-07-01)
+
+**Coq PFsection9.v `typeP_nonGalois_characters` (= Peterfalvi (9.8)) part (c) を精読** (CLAUDE.md の
+Coq-first で行間補完)。part (c) = `exists t, isIndHC 'chi_t` で `isIndHC zeta := [/\ zeta 1 = (q*u),
+zeta ∈ S_ H0C & ∃ xi linear, zeta = 'Ind xi]` — **これが我々の conjunct c そのもの** (degree qu の
+M-irreducible 𝒮(H₀C)-member)。
+
+**Coq の証明は free-orbit/exponent 構築でなく counting + parity** (PFsection9.v:1083-1107):
+- `Xtheta` = HU-level の degree-u irr chars (𝒳(H₀C) に相当)、`oXtheta: u·|Xtheta| = (p-1)^q`。
+- `Xmu` ⊆ `Xtheta` = **constant factor-data** から来る reducible-producing ζ、`|Xmu| = p-1`
+  (`mu_f i := [ffun w => if w∈W1bar then i else 0]`、`sW1_Imu`: constant data は W1-invariant)。
+- **parity dichotomy**: `Xmu ⊆ Xtheta` を `eqVproper` で2分:
+  - **proper (Xmu ⊊ Xtheta)**: ∃ s ∈ Xtheta\Xmu → `'Ind[M] 'chi_s ∈ irr M` (reducible なら mu_ に
+    入り s∈Xmu に矛盾、`cfclass_Ind_irrP`/`ResIndXmu` 経由) → degree qu witness。
+  - **equality (Xmu = Xtheta)**: `|Xtheta|=|Xmu|=p-1` → oXtheta から `u = (p-1)^{q-1}`。p odd で
+    (p-1) even ⟹ u even。だが **u は ODD** (odd-order: u=|Ū| ∣ |G| odd) ⟹ 矛盾。∴ この場合は不可能。
+- ∴ parity が強制的に proper case を選び、witness t を生む。**number-theory (ρ(U)=K) gap を完全回避**。
+
+**→ 新 plan (free-orbit/exponent route を放棄)**: conjunct c を以下で閉じる:
+1. **(A) total count `u·|𝒳(H₀C)| = (p-1)^q`** (oXtheta) — **未形式化、最大の残ピース**。bijection
+   𝒳(H₀C) ↔ regular factor-data Ftheta (|Ftheta|=(p-1)^q)、u-fold induction fiber。
+2. **(B) reducibles ⊆ 𝒳(H₀C)、count p-1**: `reducible_count_sOf_K` 既存 ✓ (Xmu 相当)。
+3. **(C) u odd**: odd-order から導出 (要 wiring)。
+4. **(D) parity**: |𝒳(H₀C)| ≥ p-1 (B) かつ等号なら u=(p-1)^{q-1} even が u-odd と矛盾 ⟹ **|𝒳(H₀C)| > p-1 厳密** ⟹ ∃ ζ ∉ reducible-set。
+5. **(E) ζ ∈ 𝒳\reducible ⟹ Ind_M(ζ) irreducible** (degree qu): cfclass 論 (reducible⟹mu_⟹矛盾)。
+
+**既存 free-orbit machinery** (hcZeta_inertia_ne_top_of_free, conjBy_eq_compHom_iff_quotient,
+Clifford conjugation reduction、~13 commits) は **green・保存** だが conjunct-c の主経路からは外れる
+(別 route として valid、機械は再利用可)。**Lemma C (char_eq_of_eq_on_factors) は commit 382b02df で
+landed** (counting route でも factor-data bijection で有用)。
+
+**次 iteration**: (A) total count の形式化に着手 (𝒳(H₀C) ↔ Ftheta bijection、|Ftheta|=(p-1)^q)。
+これが counting route の心臓。Coq PFsection9.v:956 `oXtheta` + 920-960 の `theta f`/`inj_theta`/
+`card_imset_Ind_irr` を port。session 巨大 (compaction 近)。
