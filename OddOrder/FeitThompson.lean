@@ -1112,17 +1112,6 @@ theorem Section16TypePStructure.W_eq_kappa_join {G : Type*} [Group G] [Finite G]
     (tp : Section16TypePStructure mp) : tp.W = mp.K ⊔ mp.Kstar :=
   tp.W_eq_inter.trans (mp.W_structure hG).1
 
-/-- **`Ind` is invariant under transporting the source subgroup along an equality** (the cd-grid
-transport primitive).  For `A = B` (subgroups of a finite group `K`), inducing the
-`MulEquiv.subgroupCongr`-pullback of `ψ : ClassFunction ↥B` from `A` equals inducing `ψ` from `B`.
-`subst` collapses `subgroupCongr rfl` to the identity (`compHom id ψ = ψ`). -/
-theorem induce_compHom_subgroupCongr {K : Type*} [Group K] [Fintype K]
-    {A B : Subgroup K} (hAB : A = B) (ψ : ClassFunction ↥B ℂ) :
-    ClassFunction.induce A (ClassFunction.compHom (MulEquiv.subgroupCongr hAB).toMonoidHom ψ)
-      = ClassFunction.induce B ψ := by
-  subst hAB
-  rfl
-
 namespace Section16CharacterData
 
 variable {G : Type*} [Group G] [Finite G] (hG : IsMinimalSimpleOdd G) (mp : Section16MaximalPair G)
