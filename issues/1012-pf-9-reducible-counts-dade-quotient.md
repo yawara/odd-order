@@ -1031,3 +1031,24 @@ realized HC↠H̄ hom (hInHu→H̄ の f=(mk'N)∘hInHuEquivH を HC へ延長)�
 - M-level: not-fixed → I_M=HU → induceHU(χ) irr deg qu → conjunct c (5166)。
 
 seed (inertia heart) 完成。残 = explicit inflation hom + induction chain (機構・facts 全確定、fresh context で build)。
+
+
+## conjunct c — 🔑 戦略転換: counting で explicit construction を回避できる可能性 (2026-07-01)
+
+**重大発見**: repo は explicit char construction を**系統的に counting/antitone で回避**している:
+- `reducible_mem_sOf_H0C` (5766): `Set.eq_of_subset_of_ncard_le` (両者 p-1 ⟹ subset=whole)。
+- `forall_mem_sOf_H0C_apply_one_eq_qu` (5728): `sOf_antitone` + caseB_degree_qu。
+- `HC/H₀=H̄×(C/H₀)` dprod は docstring のみ (実証明は使わない)。
+
+⟹ **conjunct c (∃ irreducible deg-qu ∈ 𝒮(H₀C)) も counting で出せる可能性大** —
+explicit inflation hom 不要。方針: |𝒮(H₀C)| - |reducibles(=p-1)| = |irreducibles| > 0 ⟹ ∃ irreducible。
+`reducible_count_sOf_H0C` (p-1、§9↔§6 bijection、no explicit construction) は既存。
+Coq oXtheta: u·|Xtheta|=(p-1)^q ⟹ |Xtheta|=(p-1)^q/u ≥ 1 (irreducible 存在)。
+
+**次の探索 (counting 路線、explicit hom より優先)**:
+- 全 𝒮(H₀C) member は deg qu か (case-A 版 forall_degree_qu)? caseA_character_counts conjunct 2
+  (reducibles deg qu) + irreducible も同 → ∃ irreducible で conjunct c。
+- |𝒮(H₀C)| total count or |irreducibles|>0 を §9↔§6 bijection / 既存 count から出せるか。
+- 出せれば explicit inflation hom (intricate) を完全回避。出せなければ explicit construction に戻る。
+
+seed (inertia heart) は両路線で不要になる可能性 (counting なら) だが、explicit fallback では中核入力。
