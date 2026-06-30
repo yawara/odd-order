@@ -577,6 +577,83 @@ structure BGTheoremENonTypeICovering (data : BGTheoremECoverData G) where
     ∀ i : data.ι,
       Disjoint (conjClassSet exceptionalSet) (data.cover i)
 
+/-- **NonTypeICovering producer** (the `𝓜_P ≠ ∅` side of the (8.8) dichotomy): when `data`'s cover
+is the faithful `𝒞_G(M̃_i)` family and a reference type-`P` maximal `Mref` exists (Theorem 14.7 data
+`Kref, K*ref, Uref`), `data` admits a `BGTheoremENonTypeICovering` with exceptional set
+`Ẑ = zTilde Kref K*ref`.
+
+- `cover_nonidentity`: the fixed-`W` cover (`exists_mem_conjClassSet_Mtilde_or_fixed_zTilde`) puts
+  every `x ≠ 1` in some `𝒞_G(M̃_M)` — moved to a representative via `data.representatives` +
+  `Mtilde_conj_smul` + `conjClassSet_conj_smul` — or in the fixed `𝒞_G(Ẑ)`; the reverse uses that
+  conjugacy-saturations of `1`-free sets avoid `1`.
+- `pairwise_disjoint_thickened`: `conjClassSet_Mtilde_disjoint` on nonconjugate reps.
+- `exceptional_disjoint_thickened`: `conjClassSet_T_Mtilde_disjoint`, with `Ẑ` rewritten to the
+  family `T`-set form via `family_inf_msigma_union_eq`. -/
+noncomputable def nonTypeICovering_of_isTypeP [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (data : BGTheoremECoverData G)
+    (hcover : ∀ j : data.ι, data.cover j = conjClassSet
+      (OddOrder.BG.Ch4.S14.Mtilde hG (OddOrder.BG.Ch4.S14.genuineSigmaDecomposition hG)
+        (data.reps j)))
+    {Mref Kref Kstarref Uref : Subgroup G} (hMref : Mref ∈ maximalSubgroups G)
+    (hMPref : OddOrder.BG.Ch4.S14.IsTypeP Mref) (hKMref : Kref ≤ Mref)
+    (hKref : Ch03.IsHallSubgroup (OddOrder.BG.Ch4.S14.kappa Mref)
+      (Kref.subgroupOf Mref))
+    (hKstarref : Kstarref =
+      OddOrder.BG.Ch3.S10.Msigma Mref ⊓ Subgroup.centralizer (Kref : Set G))
+    (hUref : Ch03.IsHallSubgroup
+      ((OddOrder.BG.Ch4.S14.kappa Mref ∪ OddOrder.BG.Ch3.S10.sigma Mref)ᶜ)
+      (Uref.subgroupOf Mref)) :
+    BGTheoremENonTypeICovering data := by
+  classical
+  set D := OddOrder.BG.Ch4.S14.genuineSigmaDecomposition hG with hD
+  -- conjugacy-saturation of a `1`-free set avoids `1`, hence lands in `(⊤)#`.
+  have hsub : ∀ S : Set G, (1 : G) ∉ S → conjClassSet S ⊆ sharpSubgroup (⊤ : Subgroup G) := by
+    rintro S hS y ⟨t, ht, g, rfl⟩
+    rw [sharpSubgroup, Set.mem_diff, Set.mem_singleton_iff]
+    refine ⟨Subgroup.mem_top _, fun h1 => hS ?_⟩
+    have ht1 : t = 1 := mul_left_cancel ((mul_inv_eq_one.mp h1).trans (mul_one g).symm)
+    exact ht1 ▸ ht
+  refine ⟨OddOrder.BG.Ch4.S14.zTilde Kref Kstarref, ?_, ?_, ?_⟩
+  · -- cover_nonidentity
+    apply Set.Subset.antisymm
+    · intro x hx
+      have hx1 : x ≠ 1 := by
+        rw [sharpSubgroup, Set.mem_diff, Set.mem_singleton_iff] at hx; exact hx.2
+      rcases OddOrder.BG.Ch4.S14.exists_mem_conjClassSet_Mtilde_or_fixed_zTilde hG hMref hMPref
+        hKMref hKref hKstarref hUref hx1 with ⟨M, hMmax, hxM⟩ | hxZ
+      · obtain ⟨j, g, hgconj⟩ := data.representatives M hMmax
+        refine Or.inl (Set.mem_iUnion.mpr ⟨j, ?_⟩)
+        rw [hcover j, ← hgconj, ← OddOrder.BG.Ch4.S14.Mtilde_conj_smul hG D g M,
+          OddOrder.BG.Ch4.S14.conjClassSet_conj_smul]
+        exact hxM
+      · exact Or.inr hxZ
+    · rintro y (hy | hy)
+      · obtain ⟨j, hyj⟩ := Set.mem_iUnion.mp hy
+        rw [hcover j] at hyj
+        exact hsub _ (OddOrder.BG.Ch4.S14.one_not_mem_Mtilde hG D (data.maximal j)) hyj
+      · exact hsub _ (OddOrder.BG.Ch4.S14.one_not_mem_zTilde Kref Kstarref) hy
+  · -- pairwise_disjoint_thickened
+    intro j _ k _ hjk
+    show Disjoint (data.cover j) (data.cover k)
+    rw [hcover j, hcover k]
+    exact OddOrder.BG.Ch4.S14.conjClassSet_Mtilde_disjoint hG D (data.maximal j) (data.maximal k)
+      (fun hconj => hjk (data.nonconjugate j k hconj))
+  · -- exceptional_disjoint_thickened
+    intro j
+    rw [hcover j]
+    obtain ⟨Mstar, hMstarne, hMstarmem, hpart⟩ :=
+      OddOrder.BG.Ch4.S14.exists_partner hG D hMref hMPref hKMref hKref hKstarref hUref
+    have hunion := OddOrder.BG.Ch4.S14.family_inf_msigma_union_eq hG hMref hMPref hKMref hKref
+      hKstarref hUref hMstarmem hMstarne hpart
+    have hzeq : OddOrder.BG.Ch4.S14.zTilde Kref Kstarref =
+        ((Kref ⊔ Kstarref : Subgroup G) : Set G) \
+        ⋃ N ∈ OddOrder.BG.Ch4.S14.ZFamilyFinset Mref Kref,
+          (((Kref ⊔ Kstarref) ⊓ OddOrder.BG.Ch3.S10.Msigma N : Subgroup G) : Set G) := by
+      simp only [OddOrder.BG.Ch4.S14.zTilde]; rw [hunion]
+    rw [hzeq]
+    exact OddOrder.BG.Ch4.S14.conjClassSet_T_Mtilde_disjoint hG D hMref hMPref hKMref hKref
+      hKstarref hUref (data.maximal j)
+
 /-- **Peterfalvi (8.17)**: BG Theorem E, repackaged as the Section 10 covering
 interface.
 
@@ -666,8 +743,18 @@ theorem bgTheoremE_cover_data [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
         OddOrder.BG.Ch4.S14.sigmaConjugacySaturation_Mtilde_ncard hG D
           (hrepsMax _ (e.symm j.down).2), hms]
   }, ?_⟩
-  -- DEEP GATE (issue 8020): the (8.8) covering dichotomy (BG Cor 14.9) decides Type-I vs non-Type-I.
-  sorry
+  -- The (8.8) covering dichotomy (BG Cor 14.9) splits on whether a type-`P` maximal exists.
+  by_cases hP : (OddOrder.BG.Ch4.S14.maximalTypePFamily G).Nonempty
+  · -- `𝓜_P ≠ ∅`: the non-Type-I covering, exceptional `Ẑ` of a reference type-`P` maximal (fix-`W`).
+    obtain ⟨Mref, hMrefmax, hMrefP⟩ := hP
+    obtain ⟨Kref, Kstarref, Uref, hKMref, hKref, hKstarref, hUref⟩ :=
+      OddOrder.BG.Ch4.S14.exists_typeP_data hG hMrefmax
+    exact Or.inr ⟨nonTypeICovering_of_isTypeP hG _ (fun _ => rfl) hMrefmax hMrefP hKMref hKref
+      hKstarref hUref⟩
+  · -- `𝓜_P = ∅` (every maximal is type-F/I): the Type-I covering.  Its `cover_subset_kernels`
+    -- (`M̃_i ⊆ ((M_i)_F)#` conjugates) is the §8 / route-B endpoint (`bgTheoremE_cover_data`'s
+    -- TypeICovering side, owned by the §8 Dade work in lane-a/c), so this branch remains gated.
+    sorry
 
 /-- **Peterfalvi (8.18)**: the final support-exclusion relation in Section 10.
 
