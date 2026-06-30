@@ -2106,6 +2106,46 @@ theorem mulAut_eq_one_of_eq_id_on_iSup {H : Type*} [Group H] (α : MulAut H)
   show α x = x
   exact htop.ge (Subgroup.mem_top x)
 
+open OddOrder.RepresentationTheory in
+/-- **Non-Galois (9.8) core, structural form** (Peterfalvi `def_Itheta`): given the chief factor
+`H̄` written as the span of order-`p` `φg`-invariant summands `Hpart i`, and a character `θ` that is
+nontrivial on each summand (regular), any `φg` fixing `θ` is the identity.  `θ` is linear
+(`= χ`), faithful on each order-`p` summand (`injective_of_prime_card_of_ne_one`), so `φg` is the
+identity there (per-factor), hence on the spanning `H̄` (`mulAut_eq_one_of_eq_id_on_iSup`). -/
+theorem mulAut_eq_one_of_fixes_regular_on_prime_span {Hbar : Type*} [Group Hbar] [Finite Hbar]
+    [IsMulCommutative Hbar] (φg : MulAut Hbar) {ι : Type*} (Hpart : ι → Subgroup Hbar)
+    (hp : ∀ i, (Nat.card ↥(Hpart i)).Prime)
+    (hpreserve : ∀ i, ∀ x ∈ Hpart i, φg x ∈ Hpart i)
+    (hspan : ⨆ i, Hpart i = ⊤)
+    (θ : IrreducibleCharacter Hbar)
+    (hreg : ∀ i, ∃ x ∈ Hpart i,
+      (θ : ClassFunction Hbar ℂ) x ≠ (θ : ClassFunction Hbar ℂ) 1)
+    (hfix : ∀ x, (θ : ClassFunction Hbar ℂ) (φg x) = (θ : ClassFunction Hbar ℂ) x) :
+    φg = 1 := by
+  obtain ⟨χ, hχ⟩ := θ.isIrreducible.exists_linearIrreducibleCharacter_eq_of_isMulCommutative
+  have hcoe : ∀ x, (θ : ClassFunction Hbar ℂ) x = (χ x : ℂ) := by
+    intro x; rw [← hχ]; exact linearIrreducibleCharacter_apply χ x
+  refine mulAut_eq_one_of_eq_id_on_iSup φg Hpart hspan (fun i x hx => ?_)
+  set χi : ↥(Hpart i) →* ℂˣ := χ.comp (Hpart i).subtype with hχi
+  have hχine : χi ≠ 1 := by
+    obtain ⟨y, hy, hyne⟩ := hreg i
+    intro h0
+    apply hyne
+    have hχy : χ y = 1 := by
+      have : χi ⟨y, hy⟩ = 1 := by rw [h0]; rfl
+      simpa [hχi, MonoidHom.comp_apply] using this
+    rw [hcoe, hcoe, hχy]
+    simp
+  have hinj : Function.Injective χi := injective_of_prime_card_of_ne_one (hp i) χi hχine
+  have hval : χi ⟨φg x, hpreserve i x hx⟩ = χi ⟨x, hx⟩ := by
+    apply Units.val_injective
+    have hcx : (χi ⟨φg x, hpreserve i x hx⟩ : ℂ) = (θ : ClassFunction Hbar ℂ) (φg x) := by
+      rw [hcoe]; rfl
+    have hcy : (χi ⟨x, hx⟩ : ℂ) = (θ : ClassFunction Hbar ℂ) x := by
+      rw [hcoe]; rfl
+    rw [hcx, hcy, hfix x]
+  exact Subtype.ext_iff.mp (hinj hval)
+
 /-- Case (a) of Peterfalvi (9.7): `H/H_0` splits as a direct product of `q`
 order-`p` factors permuted by `W_1`.
 
