@@ -1080,6 +1080,26 @@ theorem card_reducible_induce_eq_W2 [NeZero (Nat.card h.W1)] :
   obtain ⟨χ₂, hχ₂⟩ := (h.induce_not_isIrreducible_iff χ).mp hχ
   exact ⟨χ₂, Subtype.ext hχ₂⟩
 
+set_option linter.unusedFintypeInType false in
+/-- **`induce` is injective on the reducible-inducing irreducibles** (issue 1012, (9.9.b)
+source↔image, general form): if `χ, χ' ∈ Irr(K)` both induce *reducible* characters of `L` and
+`Ind_K^L χ = Ind_K^L χ'`, then `χ = χ'`.  Every reducible-inducing `χ` is a column `chiRestrict χ₂`
+(`induce_not_isIrreducible_iff`), and `induce ∘ chiRestrict` is injective
+(`induce_chiRestrict_injective`).  This is the form the §9↔§6 bijection's injectivity uses: the §9
+family member `induceHU (inflate χ̄)` determines `χ̄` among the reducible columns, so distinct
+reducible `χ̄ ∈ Irr(K̄)` give distinct `𝒮(H₀)`-members. -/
+theorem induce_injective_on_reducible [NeZero (Nat.card h.W1)] [Fintype ↥h.K]
+    {χ χ' : IrreducibleCharacter ↥h.K}
+    (hred : ¬ IsIrreducibleCharacter (ClassFunction.induce h.K (χ : ClassFunction ↥h.K ℂ)))
+    (heq : ClassFunction.induce h.K (χ : ClassFunction ↥h.K ℂ)
+      = ClassFunction.induce h.K (χ' : ClassFunction ↥h.K ℂ)) :
+    χ = χ' := by
+  obtain ⟨χ₂, rfl⟩ := (h.induce_not_isIrreducible_iff χ).mp hred
+  have hred' : ¬ IsIrreducibleCharacter
+      (ClassFunction.induce h.K (χ' : ClassFunction ↥h.K ℂ)) := heq ▸ hred
+  obtain ⟨χ₂', rfl⟩ := (h.induce_not_isIrreducible_iff χ').mp hred'
+  exact congrArg h.chiRestrict (h.induce_chiRestrict_injective heq)
+
 end Recipe
 
 end Hypothesis
