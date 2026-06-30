@@ -2174,6 +2174,22 @@ theorem noncommPiCoprod_bijective_of_card {K : Type*} [Group K] [Finite K] {ι :
   refine ⟨MonoidHom.range_eq_top.mp (by rw [Subgroup.noncommPiCoprod_range]; exact hspan), ?_⟩
   rw [Nat.card_pi]; exact hcard
 
+/-- **An intermediate subgroup of prime index is the bottom.**  For `H ≤ I` with `[G:H]` prime,
+`[G:I] ∣ [G:H]` is `1` (so `I = ⊤`) or `[G:H]` (so `|I| = |H|`, giving `I = H`).  Used for the
+M-level inertia: `HU ≤ I_M(χ) ≤ M` with `[M:HU] = q` prime, so a character not `W1`-fixed
+(`I_M(χ) ≠ M`) has `I_M(χ) = HU` — the free-`W1`-orbit ⟹ `induceHU` irreducible step. -/
+theorem eq_of_le_of_prime_index {G : Type*} [Group G] [Finite G] {H I : Subgroup G}
+    (hHI : H ≤ I) (hprime : (H.index).Prime) (hne : I ≠ ⊤) : I = H := by
+  have hdvd : I.index ∣ H.index := Subgroup.index_dvd_of_le hHI
+  rcases hprime.eq_one_or_self_of_dvd I.index hdvd with h1 | hp
+  · exact absurd (Subgroup.index_eq_one.mp h1) hne
+  · have hcard : Nat.card ↥I = Nat.card ↥H := by
+      have e1 : I.index * Nat.card ↥I = Nat.card G := Subgroup.index_mul_card I
+      have e2 : H.index * Nat.card ↥H = Nat.card G := Subgroup.index_mul_card H
+      rw [hp] at e1
+      exact Nat.eq_of_mul_eq_mul_left hprime.pos (e1.trans e2.symm)
+    exact (Subgroup.eq_of_le_of_card_ge hHI hcard.le).symm
+
 /-- **A permutation-invariant function on a transitive orbit is constant.**  If `σ` acts
 transitively (`∀ i j, ∃ k, σ^k i = j`) and `f` is `σ`-invariant (`f (σ i) = f i`), then `f` is
 constant.  Contrapositive: a non-constant `f` is not `σ`-invariant — the combinatorial core of the
