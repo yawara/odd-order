@@ -896,3 +896,35 @@ alpha bound `sum_normSq_erase_one_ge_of_const_on_subgroup` の入力) が得ら�
 (tail の forward だけで足りる)。**⚠ 注意**: H76 family は θ_i : ClassFunction ↥(H.subgroupOf S) で
 induction は ↥S 内 (Ind_K^L, K=H.subgroupOf S, L=S) ⟹ partition/orthogonality/α 構成は
 subgroup-of-S setup での careful work。次 iteration = producer 組立 (step 1-4) を engage。
+
+### cont.²⁸ (2026-07-01 lane c=γ /loop): (13.5.a) point-formula 算術核 LANDED (sorry-free)
+
+`H_sharp_point_formula` (S15_SAndT_Setup, commit 7cea5ee8) = (13.5.a) の**代数核を証明**。
+H^# 上で `χ(a:G) = (c̄_{i₁}/‖ζ_{i₁}‖²)ζ_{i₁}(a) + ∑_{i∈filter(P⊆ker ζ_i)(Ioi 0)}(c̄_i/‖ζ_i‖²)ζ_i(a)`。
+証明 = base decomp `H_sharp_chiRho_eq_explicit` → `Finset.add_sum_erase` で i₁ 抽出 →
+`Finset.sum_filter_add_sum_filter_not` で P⊆ker / P⊄ker 分割 → middle (P⊄ker, ≠i₁) を
+直交仮説 `hmiddle` (cCoeff χ i=0) で `Finset.sum_eq_zero` drop → `filter_erase`+`erase_eq_self`。
+**パラメータ**: distinguished index `i₁` (`hi1`: 0<i₁, `hi1_ker`: P⊄ker ζ_{i₁}), 直交 `hmiddle`
+(∀ i, 0<i → i≠i₁ → P⊄ker ζ_i → cCoeff χ i=0)。α = RHS の tail Σ (P⊆ker, pointwise 値)。
+
+**残 (13.5)**: (b) norm formula = ‖χ‖²_{H#} を point formula + facts1/2 (`sum_normSq_sharp...` /
+`sum_mul_conj_sharp...`) + Parseval 核 (`sum_normSq_real_smul_add`) で展開 (κ²‖ζ₁‖²+2κRe(...)+‖α‖²)。
+(c) alpha_norm_bound = α P-const (各 tail ζ_i が P⊆ker ⟹ pointwise const) + `sum_normSq_erase_one_ge...`。
+全 prerequisite landing 済 = 次 increment は (13.5.b) 組立。[[scaffold-sorry-free-not-done]]
+
+### cont.²⁹ (2026-07-01 lane c=γ /loop): generic (13.5) 完成 — (13.5.b) LANDED
+
+`sum_normSq_sharp_chi_decomp` (commit c05ba8f1) = (13.5.b) 代数組立を証明。generic (ζ₁,α,χ,κ);
+hχ (point formula χ=κζ₁+α on H#) + Parseval 核 + facts1/2 (hvanish/hinner) を連鎖し
+`∑_{H#}|χ|² = κ²(∑_S|ζ₁|² − ζ₁(1)²) − 2κ·Re(ζ₁(1)conj α(1)) + ∑_{H#}|α|²`。証明 = sum_congr →
+Parseval → facts → `Complex.neg_re` → ring (一発 green)。
+
+**⟹ generic (13.5) machinery 完成** (全 sorry-free): (a) `H_sharp_point_formula` + (b) 本 lemma
++ (c) `sum_normSq_erase_one_ge_of_const_on_subgroup` (P:Subgroup H, α const on P ⟹
+(|P|−1)|α(1)|² ≤ ∑_{x:H}|α|²−|α(1)|²)。
+
+**次 frontier = (13.6)-(13.8) 具体適用** (各 χ=λ^{τ1}/η10/η01 に対し hvanish/hinner/hχ 充足 →
+`sum_normSq_sharp_chi_decomp` → arith core `caseB_*_norm_core`)。具体 fact の依存:
+hχ の直交 hmiddle ← **S-coherence** (§11-12, 上流: 必要なら sorried-cite, [[feedback-cite-sorried-lemmas-if-signature-correct]]);
+hvanish (ζ₁ が S∖H で消える) ← H 構造 (13.2: H◁S か); hinner ((Res_H ζ₁,α)=0) ← P-kernel 直交。
++ norm 恒等式 ∑_S|ζ₁|²=|S|‖ζ₁‖² (`sum_normSq_eq_card_mul_inner`)。[[scaffold-sorry-free-not-done]]
