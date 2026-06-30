@@ -6659,5 +6659,32 @@ theorem compHom_hInHuConj_hInHuEquivH {M : Subgroup G} (data : TypesIIIIIIVSetup
     Subgroup.coe_mul, Subgroup.coe_inv]
   rw [hmb]
 
+/-- **L4 connection core**: the free-orbit equality `conjBy g θ₀ = compHom φ_m θ₀` (for `θ₀` the
+inflation of `θ̄`, `↑g = ↑a`, `↑m = ↑b`) is equivalent to the quotient-level equality
+`quotientMulAutHom a θ̄ = quotientMulAutHom b θ̄`.  Chains the two inflation-conjugation commutes
+(`conjBy_compHom_hInHuEquivH`, `compHom_hInHuConj_hInHuEquivH`), the descent
+(`compHom_typeP_conjAction_inflation`, `rfl`), and double inflation injectivity
+(`compHom_injective_of_surjective` for `hInHuEquivH` and `mk' N`).  This turns `hfree` into the pure
+free-`W₁`-orbit statement `θ̄^{w₀} ∉ U-orbit`. -/
+theorem conjBy_eq_compHom_iff_quotient [Finite G] {M : Subgroup G} {data : TypesIIIIIIVSetup M}
+    {chief : ChiefFactorData data} (a b : ↥(data.typeP.U ⊔ data.typeP.W1))
+    (g : ↥(huSub data)) (m : ↥M) (hag : ((g : ↥M) : G) = (a : G)) (hbm : ((m : G)) = (b : G))
+    (θbar : ClassFunction (↥data.H ⧸ chief.N) ℂ) :
+    ClassFunction.conjBy g (ClassFunction.compHom (hInHuEquivH data).toMonoidHom
+        (ClassFunction.compHom (QuotientGroup.mk' chief.N) θbar))
+      = ClassFunction.compHom (hInHuConj data m)
+          (ClassFunction.compHom (hInHuEquivH data).toMonoidHom
+            (ClassFunction.compHom (QuotientGroup.mk' chief.N) θbar))
+    ↔ ClassFunction.compHom (quotientMulAutHom chief.N_aInvariant a).toMonoidHom θbar
+      = ClassFunction.compHom (quotientMulAutHom chief.N_aInvariant b).toMonoidHom θbar := by
+  rw [conjBy_compHom_hInHuEquivH data a g hag, compHom_hInHuConj_hInHuEquivH data b m hbm,
+    compHom_typeP_conjAction_inflation, compHom_typeP_conjAction_inflation]
+  constructor
+  · intro h
+    exact ClassFunction.compHom_injective_of_surjective (QuotientGroup.mk'_surjective chief.N)
+      (ClassFunction.compHom_injective_of_surjective (hInHuEquivH data).surjective h)
+  · intro h
+    rw [h]
+
 end OddOrder.Peterfalvi.S11
 
