@@ -5964,5 +5964,15 @@ theorem realizedH0supC_normal_huSub [Finite G] {M : Subgroup G}
     (((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf (huSub data)).Normal :=
   (chiefFactor_H0supC_subgroupOf_normal chief).subgroupOf (huSub data)
 
+/-- **`H₀C ∩ H = H₀` inside `hInHu`** (the `H ∩ N` of the second iso, realized in `hInHu`):
+`(realized H₀C).subgroupOf hInHu = (realized H₀).subgroupOf hInHu`.  From
+`hInHu_inf_realizedH0supC_eq_realizedH0` via `inf_subgroupOf_left`.  This rewrites the `N.subgroupOf H`
+of `quotientInfEquivProdNormalQuotient` to `realized H₀`, the kernel of `hInHu ↠ H̄`. -/
+theorem realizedH0supC_subgroupOf_hInHu_eq {M : Subgroup G}
+    {data : TypesIIIIIIVSetup M} (chief : ChiefFactorData data) :
+    (((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf (huSub data)).subgroupOf (hInHu data)
+      = ((chief.H0.subgroupOf M).subgroupOf (huSub data)).subgroupOf (hInHu data) := by
+  rw [← Subgroup.inf_subgroupOf_left, hInHu_inf_realizedH0supC_eq_realizedH0]
+
 end OddOrder.Peterfalvi.S11
 
