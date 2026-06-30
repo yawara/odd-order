@@ -556,20 +556,26 @@ structure BGTheoremETypeICovering (data : BGTheoremECoverData G) : Prop where
 `G#` is covered by the thickened `A_1(M_i)` sets together with the conjugates of
 the exceptional `W#`. -/
 structure BGTheoremENonTypeICovering (data : BGTheoremECoverData G) where
-  /-- The exceptional subgroup whose nonidentity conjugates supplement the cover. -/
-  W : Subgroup G
-  /-- The cover sets `𝒞_G(M̃_i)` and the conjugates of `W#` cover `G#`. -/
+  /-- The exceptional TI-set `Ẑ` (BG `zTilde K K* = (K ⊔ K*) \ (K ∪ K*)`) whose nonidentity
+  conjugates supplement the cover.  Modelled as a bare `Set G`, **not** `W#` for a subgroup `W`:
+  `Ẑ` removes all of `K ∪ K*` (not just `1`), so no `sharpSubgroup W = W \ {1}` equals it.  The
+  earlier `W : Subgroup` form is unsatisfiable — the minimal subgroup containing `Ẑ` is `K ⊔ K*`,
+  whose `K*# ⊆ M_σ# ⊆ M̃` would overlap the cover, breaking `exceptional_disjoint_thickened`
+  (issue 8020).  Satisfied by `exceptionalSet = zTilde K K*` via the fixed-`W` cover
+  (`BG.Ch4.S14.exists_mem_conjClassSet_Mtilde_or_fixed_zTilde`). -/
+  exceptionalSet : Set G
+  /-- The cover sets `𝒞_G(M̃_i)` and the conjugates of `Ẑ` cover `G#`. -/
   cover_nonidentity :
     sharpSubgroup (⊤ : Subgroup G) =
       (⋃ i : data.ι, data.cover i) ∪
-        conjClassSet (sharpSubgroup W)
+        conjClassSet exceptionalSet
   /-- The `𝒞_G(M̃_i)` part of the cover is disjoint. -/
   pairwise_disjoint_thickened :
     (Set.univ : Set data.ι).PairwiseDisjoint fun i => data.cover i
   /-- The exceptional part is disjoint from every `𝒞_G(M̃_i)`. -/
   exceptional_disjoint_thickened :
     ∀ i : data.ι,
-      Disjoint (conjClassSet (sharpSubgroup W)) (data.cover i)
+      Disjoint (conjClassSet exceptionalSet) (data.cover i)
 
 /-- **Peterfalvi (8.17)**: BG Theorem E, repackaged as the Section 10 covering
 interface.
