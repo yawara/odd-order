@@ -1376,3 +1376,22 @@ free-orbit θ̄^{w₀}∉act.φ-U-orbit** (`clifford_caseA_exists_char_inertia_h
 → assemble hIM → hcZeta_induceHU_irreducible → conjunct c。
 
 Clifford reduction + connection commutes 完成。残=connection reduction wiring + free-orbit (深) + L5。
+
+
+## free-orbit = factor-structure inertia (Coq def_Itheta) — 深部 crux 確定 (2026-07-01)
+
+connection core (eebacf96) で hfree ⟺ θ̄^{w₀}∉U-orbit (≡ I_M(θ₀)≤HU、≡ Stab_{UW1}(θ̄)≤U) に帰着。
+これは **θ̄^{w₀}≠θ̄ より真に強い** (U が factor char に transitive だと ≠ でも ∈U-orbit になりうる)。
+
+**Coq PFsection9 def_Itheta (938-948)**: `f∈Ftheta → I_HU[theta f]=HC` を **`inertia_bigdprod_irr`
++ `inertia_irr_prime`** で証明 = **factor-structure (bigdprod) inertia 機構**。free-orbit は
+この factor inertia 論 (W1-conjugate factors {act.φ w•S₀} の bigdprod、U は各 factor 保存、
+W1 は q-cycle 置換、regular θ̄ の per-factor char が factor 跨ぎで非自明) を要する。Lean に
+inertia_bigdprod_irr 相当が無ければ新規 (substantial §9 機構)。Coq oXtheta (u·|Xtheta|=(p-1)^q) は
+counting だが conjunct c の M-level IsIrreducibleCharacter は I_M=HU を要し、現 explicit approach
+(L1-L3+connection core 完成) が直接提供 — 残 free-orbit 1 本。
+
+**propagation 完成度**: L1+L2+L3+assembly+connection commutes+connection core = 9 commits、
+hIM ⟸ θ̄^{w₀}∉U-orbit。残 = (1) **free-orbit factor inertia** (深、Coq inertia_bigdprod_irr guide) +
+(2) g→a∈U realization (wiring) + (3) L5 (w₀→m, ζ LiesOver θ₀) + assembly。free-orbit が
+research-level に深ければ Coq 熟読 → ChatGPT escalation も選択肢 ([[feedback-ask-chatgpt-for-elided-gaps]])。
