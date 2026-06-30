@@ -99,6 +99,21 @@ noncomputable def tau {L : Subgroup G} (hyp : Hypothesis L) :
   OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap hyp.dadeData.dade
     (hyp.dadeData.dade.fullDadeIsometryData hyp.hconj)
 
+open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
+/-- **The Peterfalvi (7.1) `ρ`-machinery data for `(L, A(L))`** — the §7 foundation for the (12.16)
+Dade calculation.  Built genuinely from the §10 Dade isometry carried by `hyp.dadeData`/`hyp.hconj`:
+unlike the type-`P` `S12.Hypothesis.toHypothesis71`, the type-I support `A(L) = typeIA` is already the
+set on which `dadeData` lives, so no restriction is needed — the Dade map, its `IsDadeMap`
+certificate, and the `L`-equivariance transfer directly.  This `S09.Hypothesis71` is what lets the
+§9 norm machinery — `chiRho_norm_sq_le` (7.2.b), `chiRho_integral_inequality` (7.3),
+`family_inequality` (7.5), and `Hypothesis78.NormEstimates` (7.8.b) — apply to `L`. -/
+noncomputable def toHypothesis71 {L : Subgroup G} [Finite G] (hyp : Hypothesis L) :
+    OddOrder.Peterfalvi.S09.Hypothesis71 G (typeIA L hyp.typeI) L where
+  hyp := hyp.dadeData.dade
+  τ := (hyp.dadeData.dade.fullDadeIsometryData hyp.hconj).toDadeIsometryData.toDadeMap
+  isDadeMap := (hyp.dadeData.dade.fullDadeIsometryData hyp.hconj).toDadeIsometryData.isDadeMap
+  hConjInvariant := hyp.hconj
+
 end Hypothesis
 
 /-- Conjugation transports the centralizer of a singleton:
@@ -150,17 +165,18 @@ private theorem supportKernel_conj_invariant {M : Subgroup G} {X : Set G} {g x :
   · rw [if_neg (fun h => hx (hescape.mp h)), if_neg hx, Subgroup.smul_bot]
 
 open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
-/-- **Peterfalvi (12.1), existence**: every type-I maximal subgroup `L` carries the
-(12.1) Hypothesis.  The Dade isometry, induced family, and support are the genuine
-`S07.dadeIntegralCharacterMap`, `Sset`, and `A(L)`; the only inputs are the (8.15)
-Dade support data (`S10.dadeSupportHypotheses_typeI`) and the conjugation
-invariance `hconj` of the support kernels (a (8.14)/(8.15) fact).  Mirrors
-`S12.exists_hypothesis_of_typeIIIorIVorV`. -/
-theorem exists_typeI_hypothesis [Finite G]
+/-- **Peterfalvi (12.1), construction from explicit type-I data**: a type-I maximal subgroup `L`
+with a *given* `TypeIData` carries the (12.1) Hypothesis whose `typeI` field is exactly that data.
+This refines `exists_typeI_hypothesis` by preserving the identity of the type-I witness, so callers
+holding a `TypeIData` (e.g. the Frobenius structure of (12.10)) can recover it — and the associated
+Frobenius decomposition of `H = L_F` — from the resulting `Hypothesis`.  The Dade isometry, induced
+family, and support are the genuine `S07.dadeIntegralCharacterMap`, `Sset`, and `A(L)`; the only
+inputs are the (8.15) Dade support data (`S10.dadeSupportHypotheses_typeI`) and the conjugation
+invariance `hconj` of the support kernels (a (8.14)/(8.15) fact). -/
+theorem hypothesis_of_typeIData [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) {L : Subgroup G}
-    (hL : L ∈ maximalSubgroups G) (hType : IsTypeI L) :
-    Nonempty (Hypothesis L) := by
-  obtain ⟨data⟩ := hType
+    (hL : L ∈ maximalSubgroups G) (data : TypeIData L) :
+    ∃ hyp : Hypothesis L, hyp.typeI = data := by
   obtain ⟨dadeData⟩ :=
     (OddOrder.Peterfalvi.S10.dadeSupportHypotheses_typeI hG hL data).1
   -- (8.14)/(8.15): the support kernels `R(a)` are `L`-conjugation invariant.
@@ -170,7 +186,18 @@ theorem exists_typeI_hypothesis [Finite G]
     refine supportKernel_conj_invariant l.2 ?_
     exact ⟨fun h => by simpa using dadeData.dade.L_normalizes_A l⁻¹ h,
       fun h => dadeData.dade.L_normalizes_A l h⟩
-  exact ⟨{ maximal := hL, typeI := data, dadeData := dadeData, hconj := hconj }⟩
+  exact ⟨{ maximal := hL, typeI := data, dadeData := dadeData, hconj := hconj }, rfl⟩
+
+/-- **Peterfalvi (12.1), existence**: every type-I maximal subgroup `L` carries the (12.1)
+Hypothesis.  Forgetful form of `hypothesis_of_typeIData`.  Mirrors
+`S12.exists_hypothesis_of_typeIIIorIVorV`. -/
+theorem exists_typeI_hypothesis [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {L : Subgroup G}
+    (hL : L ∈ maximalSubgroups G) (hType : IsTypeI L) :
+    Nonempty (Hypothesis L) := by
+  obtain ⟨data⟩ := hType
+  obtain ⟨hyp, _⟩ := hypothesis_of_typeIData hG hL data
+  exact ⟨hyp⟩
 
 open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
 /-- **The type-I family `S = {Ind_H^L θ}` is closed under complex conjugation**
@@ -1998,6 +2025,45 @@ theorem witness_L_frobenius [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     {ctr : CounterexampleHypothesis (G := G)} (data : RankTwoWitnessData ctr) :
     ∃ frob : TypeIFrobeniusData data.L, frob.kernel_eq_MF := by
   sorry
+
+/-- **Peterfalvi (12.1) for the witness subgroup `L`, with its Frobenius witness**: the second
+maximal subgroup `L` of (12.9) carries the (12.1) Hypothesis together with an explicit Frobenius
+decomposition of its kernel `H = L_F`.  Since `L` is type I (Frobenius, by (12.10)
+`witness_L_frobenius`), `hypothesis_of_typeIData` applied to the recovered `TypeIData` yields the
+Hypothesis whose `typeI` is that very data, so the Frobenius group structure `frob.frobenius`
+transfers to `hyp.H`.  This Frobenius witness is the structural input to coherence (12.6). -/
+theorem witness_L_hypothesis_frobenius [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    {ctr : CounterexampleHypothesis (G := G)} (data : RankTwoWitnessData ctr) :
+    ∃ hyp : Hypothesis data.L, ∃ C : Subgroup ↥data.L,
+      OddOrder.Isaacs.Ch06.IsFrobeniusGroup ↥data.L (hyp.H.subgroupOf data.L) C := by
+  obtain ⟨frob, _⟩ := witness_L_frobenius hG data
+  obtain ⟨hyp, hhyp⟩ := hypothesis_of_typeIData hG data.L_maximal frob.typeI
+  refine ⟨hyp, frob.complement, ?_⟩
+  have hH : hyp.H = frob.typeI.typeF.H := by
+    rw [show hyp.H = hyp.typeI.typeF.H from rfl, hhyp]
+  rw [hH]
+  exact frob.frobenius
+
+/-- **Peterfalvi (12.1) Hypothesis for the witness subgroup `L`** (forgetful form of
+`witness_L_hypothesis_frobenius`). -/
+theorem witness_L_hypothesis [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    {ctr : CounterexampleHypothesis (G := G)} (data : RankTwoWitnessData ctr) :
+    Nonempty (Hypothesis data.L) := by
+  obtain ⟨hyp, _⟩ := witness_L_hypothesis_frobenius hG data
+  exact ⟨hyp⟩
+
+open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
+/-- **Peterfalvi (12.6) for the witness subgroup `L`**: the type-I family `S` of `L` is coherent.
+Combines the Hypothesis + Frobenius witness of `witness_L_hypothesis_frobenius` with the (12.6)
+Frobenius-case coherence `frobenius_typeI_coherent`.  This is the coherence input "`S` coherent" of
+the (12.16) Dade calculation — it feeds the `(7.8.b)` norm bound `hB` of `CounterexampleDadeData`
+via the §7 `Hypothesis78`/`NormEstimates`. -/
+theorem witness_L_coherent [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    {ctr : CounterexampleHypothesis (G := G)} (data : RankTwoWitnessData ctr) :
+    ∃ hyp : Hypothesis data.L,
+      Nonempty (OddOrder.Peterfalvi.S07.IsCoherent hyp.tau hyp.Sset hyp.A) := by
+  obtain ⟨hyp, C, hC⟩ := witness_L_hypothesis_frobenius hG data
+  exact ⟨hyp, frobenius_typeI_coherent hG hyp ⟨C, hC⟩⟩
 
 /-- **Peterfalvi (12.11)**: `M inter L` complements `K` in `M` and lies in the
 Fitting kernel `H` of the witness subgroup `L`. -/
