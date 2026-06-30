@@ -10596,6 +10596,61 @@ theorem kappa_branch_mem_conjClassSet_zTilde [Finite G]
   exact ⟨MulAut.conj a • (y * y'), hzin, a⁻¹, by
     rw [MulAut.smul_def, MulAut.conj_apply]; group⟩
 
+/-- **κ-branch of the dichotomy → `𝒞_G(Ẑ)`**: the κ branch of `sigma_decomposition_dichotomy`
+(`y` with `ℓ_σ(y)=1`, a maximal `N ∈ 𝓜_σ(y)`, `y⁻¹g ∈ (C_N[y])^#` a `κ(N)`-element) places `g`
+in `𝒞_G(Ẑ)` for the type-`P` neighbour `N`'s exceptional subgroup `Ẑ`.  `N` is type-`P` (it has a
+`κ`-element), so `exists_typeP_data`/`exists_partner` supply its Theorem 14.7 data, and
+`kappa_branch_mem_conjClassSet_zTilde` finishes (`y · (y⁻¹g) = g`).  This is the κ branch of the
+NonType-I `G^#` cover (Coq `mFT_partition` part 2). -/
+theorem kappa_branch_dichotomy_mem_conjClassSet_zTilde [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (D : SigmaDecompositionData G) {y g : G}
+    (hyl : D.length y = 1) {N : Subgroup G}
+    (hNmem : N ∈ maximalSigmaSubgroupsOfElement y)
+    (hsharp : y⁻¹ * g ∈ sharpSubgroup (N ⊓ Subgroup.centralizer ({y} : Set G)))
+    (hkappa : OddOrder.GroupTheory.IsPiElement (kappa N) (y⁻¹ * g)) :
+    ∃ K Kstar : Subgroup G, g ∈ conjClassSet (zTilde K Kstar) := by
+  obtain ⟨hNmax, hyNsigma⟩ := hNmem
+  have hy1 : y ≠ 1 := ((D.length_one_iff y).mp hyl).1
+  rw [sharpSubgroup, Set.mem_diff, Set.mem_singleton_iff, SetLike.mem_coe,
+    Subgroup.mem_inf] at hsharp
+  obtain ⟨⟨hy'N, hy'cent⟩, hy'1⟩ := hsharp
+  have hycent : y ∈ Subgroup.centralizer ({y⁻¹ * g} : Set G) := by
+    rw [Subgroup.mem_centralizer_iff]; intro z hz
+    rw [Set.mem_singleton_iff.mp hz]
+    exact (Subgroup.mem_centralizer_iff.mp hy'cent y (Set.mem_singleton y)).symm
+  have hNP : IsTypeP N := by
+    obtain ⟨p, hp⟩ : (orderOf (y⁻¹ * g)).primeFactors.Nonempty :=
+      Nat.nonempty_primeFactors.mpr (by
+        have h1 : orderOf (y⁻¹ * g) ≠ 1 := by rwa [Ne, orderOf_eq_one_iff]
+        have h0 : 0 < orderOf (y⁻¹ * g) := orderOf_pos _
+        omega)
+    exact ⟨p, hkappa p hp⟩
+  obtain ⟨K, Kstar, U, hKM, hK, hKstar, hU⟩ := exists_typeP_data hG hNmax
+  obtain ⟨Mstar, hMstarne, hMstarmem, hpart⟩ := exists_partner hG D hNmax hNP hKM hK hKstar hU
+  refine ⟨K, Kstar, ?_⟩
+  have hmem := kappa_branch_mem_conjClassSet_zTilde hG D hNmax hNP hKM hK hKstar hU hMstarmem
+    hMstarne hpart hyNsigma hy1 hy'N hy'1 hycent hkappa
+  rwa [mul_inv_cancel_left] at hmem
+
+/-- **`G^#` cover dichotomy** (the `⊆` of BG Corollary 14.9's `G^#` partition, both cases): every
+`g ≠ 1` lies in `𝒞_G(M̃)` for some maximal `M`, *or* in `𝒞_G(Ẑ)` for some exceptional pair `(K, K*)`.
+Immediate from `sigma_decomposition_dichotomy`: the signalizer branch gives `g ∈ M̃`
+(`mem_Mtilde_of_mem_coset`), the κ branch gives `g ∈ 𝒞_G(Ẑ)`
+(`kappa_branch_dichotomy_mem_conjClassSet_zTilde`).  Unlike `exists_mem_conjClassSet_Mtilde_of_ne_one`
+this needs no all-type-`F` hypothesis — it covers the κ branch with the `Ẑ` piece. -/
+theorem exists_mem_conjClassSet_Mtilde_or_zTilde_of_ne_one [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {g : G} (hg : g ≠ 1) :
+    (∃ M ∈ maximalSubgroups G,
+      g ∈ conjClassSet (Mtilde hG (genuineSigmaDecomposition hG) M))
+    ∨ (∃ K Kstar : Subgroup G, g ∈ conjClassSet (zTilde K Kstar)) := by
+  set D := genuineSigmaDecomposition hG with hD
+  rcases sigma_decomposition_dichotomy hG D hg with
+    ⟨y, hyl, hyr⟩ | ⟨y, hyl, N, hNmem, hsharp, hκ⟩
+  · obtain ⟨hy1, M, hMmax, hyMσ⟩ := (D.length_one_iff y).mp hyl
+    exact Or.inl ⟨M, hMmax, subset_conjClassSet
+      (mem_Mtilde_of_mem_coset hG D (Set.mem_diff_singleton.mpr ⟨hyMσ, hy1⟩) hyr)⟩
+  · exact Or.inr (kappa_branch_dichotomy_mem_conjClassSet_zTilde hG D hyl hNmem hsharp hκ)
+
 /-- **BG Theorem A(4)** (mmd L4279): `C_U(k) = 1` for `k ∈ K#` — the `(κ(M) ∪ σ(M))'`-Hall
 complement `U` meets each `M`-centralizer `C_M(k) = K ⊔ K*` trivially.
 

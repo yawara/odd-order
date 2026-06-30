@@ -891,3 +891,59 @@ M_F=M_σ ケースの別 deep port。
 - NonTypeICovering: κ→Ẑ cover identification (上記 ~50-70 行 monolith) + exceptional_disjoint (trivIset)。
 §14 cover rapid-win phase 完了 (Lemma 14.6/Cor 14.9/covering eq/Cor 14.8)。残は sustained deep porting。
 **次 = NonTypeICovering κ→Ẑ monolith を head-on で着手** (上記 2-WLOG 構造に従い multi-iteration grind)。
+
+## ✅✅ 進捗 (lane d, 2026-06-30 /loop³⁷-⁴⁰): **κ→Ẑ identification 完成 + 一般 G# cover ⊆ 完成**
+
+deep monolith だった **NonTypeICovering の κ→Ẑ identification (Coq mFT_partition part 2) を clean sorry-free
+lemma 群に分解して完遂** (S14、全 axiom-clean、AxiomsCheck 登録、full build 3888 green)。~5 iteration で head-on grind:
+- `one_not_mem_zTilde` (1∉Ẑ) / `mem_zTilde_of_mul` (y∈K*#·y'∈K#·K⊓K*=⊥ ⟹ y·y'∈Ẑ、algebraic core)
+- `mem_centralizer_of_mem_sup_isCyclic` (y∈Z cyclic ⟹ y∈C(K)) / `typeP_sigmaElement_mem_Kstar`
+  (y∈M_σ·centralizes y'∈K# ⟹ y∈K*、conjunct(d) `typeP_centralizer_kappaElement_eq` + Z cyclic 経由)
+- `kappa_branch_mem_zTilde` (core, y'∈K) / `kappa_branch_mem_conjClassSet_zTilde` (general、⟨y'⟩を K に共役)
+- `kappa_branch_dichotomy_mem_conjClassSet_zTilde` (dichotomy κ-branch → ∃K K*, g∈𝒞_G(Ẑ)、N の typeP data 構成)
+- **`exists_mem_conjClassSet_Mtilde_or_zTilde_of_ne_one`**: **一般 G# cover ⊆ (両 branch、all-type-F 不要)** =
+  ∀g≠1, g∈𝒞_G(M̃) ∨ g∈𝒞_G(Ẑ)。signalizer→M̃ (`mem_Mtilde_of_mem_coset`) + κ→Ẑ。**BG Cor 14.9 partition の ⊆**。
+
+**▶▶ 残り NonTypeICovering struct**: (1) Ẑ を fixed W に固定 (全 type-P Ẑ 共役 = Cor 14.8 two classes + Ẑ 対称性) /
+(2) cover_nonidentity 完成 (⊇ = pieces⊆G# は `one_not_mem_Mtilde`/`one_not_mem_zTilde`+sharpSubgroup で軽い) /
+(3) pairwise (`conjClassSet_Mtilde_disjoint` 在) / (4) exceptional_disjoint (Ẑ∩M̃=∅、Coq trivIset) / struct 組立。
+**κ→Ẑ の deep heart は完了**; 残は struct plumbing + Ẑ-fixing。TypeICovering branch は別途 cover_subset_kernels
+(FittingIsTI-for-typeF gap) 待ち。
+
+## 🔍 調査 (lane d, 2026-06-30 /loop⁴¹): **NonTypeICovering disjointness は density_pieces で既済** — path 明確化
+
+NonTypeICovering の hard と思っていた disjointness 群が **`density_pieces_ncard_le` (S14:8252) で既に組まれている**ことを発見 (重複構築を回避):
+- `conjClassSet_T_Mtilde_disjoint` (S14:7995, **BG Lemma 14.6 = exceptional_disjoint**): `Disjoint (𝒞_G(Tset)) (𝒞_G(M̃ᵢ))` ✅
+  - `Tset = (K⊔Kstar)\(⋃ N∈ZFamilyFinset, (K⊔Kstar)⊓N_σ)` = **exceptional Ẑ** (refined)。
+- `conjClassSet_Mtilde_disjoint` 経由 `hpair` (pairwise M̃) ✅ / `one_not_mem_conjClassSet`+`one_not_mem_Mtilde` で
+  `h1A,h1U` (1∉pieces) ✅ / `hsub`: **A∪U ⊆ G# (partition の ⊇)** ✅。
+- つまり NonTypeICovering の **disjointness + ⊇ + avoid-1 は全部済**。残るは **cover ⊆ (= 私の `exists_mem_conjClassSet_Mtilde_or_zTilde_of_ne_one`) を fixed-family の A=𝒞_G(Tset) に接続**。
+
+**▶ 次の clean build = `Tset = zTilde` connector**: 2-member family `{M,Mstar}` (`exists_partner` の `hpart`) で
+`⋃ = (Z⊓M_σ)∪(Z⊓Mstar_σ) = Kstar∪K` ⟹ `Tset = Z\(K∪Kstar) = zTilde K Kstar`。要 intersection facts
+`(K⊔Kstar)⊓M_σ=Kstar`・`(K⊔Kstar)⊓Mstar_σ=K` (σ/κ Hall 分解、未 port、fiddly だが tractable)。これで density_pieces の A を
+私の cover ⊆ に橋渡し → cover_nonidentity (G#=A∪U) → struct 組立。
+**注意: gate-2 disjunction は依然 TypeICovering の `cover_subset_kernels` (FittingIsTI-for-typeF, A(8) M_F=M_σ deep gap) で block**。
+NonTypeICovering 完成は ¬all-type-F branch を埋めるが gate-2 全閉には cover_subset_kernels が必須。
+
+## 🎯 調査完了 (lane d, 2026-06-30 /loop⁴²-⁴³): **gate-2 frontier 精密マッピング** — cover_subset_kernels は単一 deep lemma に帰着
+
+gate-2 disjunction (`bgTheoremE_cover_data`, S10:581) の **TypeICovering branch (`cover_subset_kernels`)** を精密に分解。
+**周辺機械は全部済**で、残る deep gap は **ただ 1 つの clean statement** に帰着することを確認:
+
+**cover_subset_kernels** = `𝒞_G(M̃_i) ⊆ 𝒞_G((M_i)_F#)` (docstring: type-I で R(x)=1 ⟹ M̃=M_σ#=M_F#)。要件分解:
+- ✅ **R(x) card = |𝓜_σ(x)|** (`Rsub_ncard_eq`, S16:452) → R(x)=1 ⟺ |𝓜_σ(x)|≤1。
+- ✅ **|𝓜_σ(x)|≤1 ⟹ C_G(x)≤M** (`centralizer_le_of_maximalSigma_le_one`, S16:1456)。
+- ✅ **M_F=M_σ for type-F** (`maxNilpotentNormalHall_eq_Msigma_of_isTypeF_or_isTypeP2`, S16:5324;
+  `maxNilpotentNormalHall_eq_Msigma_iff_isNilpotent`, S16:3053)。
+- ✅ **Frobenius kernel TI** (`IsFrobeniusGroup.trivialIntersection`, Isaacs Ch06 FrobeniusGroup:357)。
+- ❌ **残 gap = `|𝓜_σ(x)| ≤ 1` for type-F M** (= M_σ が G-level TI)。route: type-F ⟹ M Frobenius
+  (`typeI_frobenius`/12.7) ⟹ kernel M_σ=M_F ⟹ **G-level kernel TI** (M_σ∩M_σ^g=1 for g∉M=N_G(M_σ))。
+  G-level TI を Isaacs の Frobenius-internal `trivialIntersection` から導けるか (or 別 BG 構造要) が次の核心。
+
+**∴ gate-2 全閉の残り = 2 件のみ**:
+- **(A) deep**: `|𝓜_σ(x)|≤1` for type-F (上記、単一 lemma だが genuine BG structure)。← 真の blocker、次の優先。
+- **(B) plumbing**: NonTypeICovering struct 組立 (struct を sharpSubgroup W→Ẑ-set に redesign + `Tset=zTilde`
+  connector + cover_nonidentity)。disjointness は density_pieces で既済。gate-2 を直接は閉じない (TypeICovering が
+  block) が ¬all-type-F branch を埋める。
+- 注: §14 cover MATH (κ→Ẑ + 一般 cover ⊆) は完了済。残りは (A) 1 lemma + (B) plumbing で、sprawling gap ではない。
