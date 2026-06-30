@@ -839,3 +839,60 @@ numeric_bounds (13.11) → c_eq_one (13.12)。
 次 = (13.5) engine の foundation (S04.Hypothesis for (S,H#)) を構築開始。算術層が完備ゆえ engine が
 landing すれば (13.6-13.8) → (13.10) → c_eq_one が連鎖。[[feedback-no-avoiding-hard-parts]]
 [[feedback-cite-sorried-lemmas-if-signature-correct]] [[scaffold-sorry-free-not-done]]
+
+### cont.²⁶ (2026-07-01 lane c=γ /loop ×多数): 🎉 (13.5) chiRho engine を**完全結線** (foundation→H71→H76→χ=χ^ρ→base decomp)
+
+ユーザー裁定 (quick win 不問・hard work 正面) を受け §13 (13.5) chiRho engine を一から構築完遂。
+**全 sorry-free** (§8 TI obligation modulo)、各 commit で landing、S15_SAndT_Setup:
+
+1. **算術層** (13.6/13.8 core): `caseB_lambda_norm_core`/`caseB_eta01_norm_core` (caseB_quadratic_nonneg)。
+2. **(13.5.b) 分解部品**: `sum_normSq_real_smul_add` (Parseval 代数核) + `sum_normSq_sharp_eq_total_sub_one`
+   (fact1 ζ₁-norm) + `sum_mul_conj_sharp_eq_neg_of_inner_zero` (fact2 cross-term)。
+3. **Dade foundation**: `H_sharp_dadeHypothesis` = S04.Hypothesis for (S,H#) via `S04.Hypothesis.of_isTISubset`
+   (§8 TI 入力 = `H_sharp_isTISubset`(8.5.a)/`S_normalizes_H_sharp` を named obligation 化、構造入力
+   H#⊆G#・H=PC≤S は proven)。
+4. **Hypothesis71**: `H_sharp_hypothesis71` (Dade map = `fullDadeIsometryData`、hconj = of_forall_H_eq_bot)。
+5. **Hypothesis76**: `H_sharp_hypothesis76` via `S09.Cert.hypothesis76OfDade` (issue-1013 = (7.7.a) 証明書込で
+   (7.1) data のみから構築)。import S09_CertificateDischarge。instance は FiniteInduce scope+[Inv|G|] param。
+6. **χ=χ^ρ bridge**: `chiRho_eq_self_of_H_eq_bot` (TI 局所 H(a)=⊥ で ρ-map 恒等)。
+7. **(13.5.a) base decomp**: `H_sharp_chiRho_eq_explicit` = χ(x) = ∑_{i≥1}(c̄_i/‖ζ_i‖²)ζ_i(x) on H#
+   (bridge .symm.trans chiRho_explicit_formula、H76.hyp71=H71 defeq)。
+
+**残 (13.5.a)**: base decomp から **ζ₁ 抽出 + P-kernel tail を α に grouping** (textbook の orthogonality
+仮説 χ⊥(ζ_i-ζ_0)^τ で S₁ 中間項 c_i=0、P⊆ker tail = α、α(1) ≡0 mod q)。これが intricate な reorganization。
+完成すれば `tiSubset_character_orthogonality` (13.5 producer) → (13.6-13.8) [arith 済] → (13.9)/(13.10) →
+numeric_bounds [済] → c_eq_one。[[feedback-no-avoiding-hard-parts]] [[scaffold-sorry-free-not-done]]
+
+### cont.²⁷ (2026-07-01 lane c=γ /loop): (13.5.a) reorganization の sub-plan 確定 (base decomp は landing 済)
+
+base decomp (`H_sharp_chiRho_eq_explicit`: χ(x) = ∑_{i∈Ioi 0}(c̄_i/‖ζ_i‖²)ζ_i(x) on H#) から
+(13.5.a) full form `χ = (a/‖ζ₁‖²)ζ₁ + α` (P off ker α) への reorganization の precise sub-plan:
+
+**🔑 kernel insight**: H76 family ζ_i = Ind_H^S θ_i (θ_i∈Irr H, distinct, exists_distinct_induced_family)。
+P◁H (H=PC≤S≤N(P)、P=S_F)。**P⊆ker(Ind_H^S θ) ⟺ P⊆ker θ** ゆえ family は 2 群に分割:
+S₁ middle = {Ind θ : P⊄ker θ} (P⊄ker)、tail = {Ind θ : P⊆ker θ}。
+
+**sub-steps**:
+1. (13.5) hypothesis χ⊥(ζ_i-ζ_0)^τ for S₁ middle (2≤i≤n) ⟹ c_i = cCoeff χ i = 0 ⟹ middle 項 drop
+   (Finset.sum_subset / filter で zero 項除去)。
+2. i=1 (distinguished ζ₁) を Finset.add_sum_erase 等で抽出 → (c̄_1/‖ζ_1‖²)ζ_1。
+3. **α := ∑_{tail}(c̄_i/‖ζ_i‖²)·Res_H ζ_i** (ClassFunction ↥H、tail を H に制限)。各 Res_H(Ind_H^S θ) (tail) は
+   P⊆ker (θ が P⊆ker ゆえ) ⟹ α の P⊆ker (= `alpha_kernel_contains_P`)。textbook: 「(1/‖ζ_i‖²)Res_H ζ_i is a
+   character of H having P in its kernel」(13.5.a 証明)。
+4. point_formula: χ(x) = (a/‖ζ_1‖²)ζ_1(x) + α(x) on H# (steps 1-3 合成、a = c̄_1)。
+5. norm_formula (13.5.b): `sum_normSq_real_smul_add` (Parseval核) + fact1/fact2。
+   alpha_norm_bound (13.5.c): `sum_normSq_erase_one_ge_of_const_on_subgroup` (α const on P から、step 3 で取得)。
+
+**⟹ 全部品は landing 済**: base decomp + facts1/2 + Parseval核 + alpha bound 補題。残=上記 1-4 の組立
+(kernel partition の Lean 化が核心: P⊆ker(Ind θ)⟺P⊆ker θ + tail の Res_H が P⊆ker)。multi-step だが
+全 prerequisite 在庫。fresh context で producer 組立を engage。[[feedback-no-avoiding-hard-parts]]
+[[scaffold-sorry-free-not-done]]
+
+**🔑 kernel lemma 確認 (cont.²⁷ 追記)**: `subsetCharacterKernel_induce_of_subgroupOf`
+(S03_PreliminaryCharacter:618、Pf (1.6.a) **forward**: A⊴G, A≤H, A⊆ker θ ⟹ A⊆ker(Ind_H^G θ)) が
+**在庫** = step 3-4 の核心。これで α=∑_tail Res_H(Ind θ_i) (P⊆ker θ_i) の **P-const** (α(p)=α(1) on P,
+alpha bound `sum_normSq_erase_one_ge_of_const_on_subgroup` の入力) が得られる: P⊆ker(Ind θ)
+[forward lemma] ⟹ Ind θ が P 上 const ⟹ Res_H も。converse (1.6.a 逆) は未形式化だが**不要**
+(tail の forward だけで足りる)。**⚠ 注意**: H76 family は θ_i : ClassFunction ↥(H.subgroupOf S) で
+induction は ↥S 内 (Ind_K^L, K=H.subgroupOf S, L=S) ⟹ partition/orthogonality/α 構成は
+subgroup-of-S setup での careful work。次 iteration = producer 組立 (step 1-4) を engage。
