@@ -351,4 +351,44 @@ theorem induce_diff_support {K : Subgroup L} [hK : K.Normal] [Fintype ↥K]
     rw [Set.mem_singleton_iff] at hx1
     exact hx (by rw [hx1, hd, sub_self])
 
+/-- **Peterfalvi (7.7.a), the degree-zero reduction.**  A class function in the span of the full
+family `{ζ_i}` that vanishes at `1` lies in the span of the difference vectors `{ψ_i = ζ_i − d_i ζ_0}`
+(`i ≠ 0`).  Writing `ψ = Σ a_i ζ_i`, the condition `ψ(1) = 0` gives `Σ a_i d_i = 0` (`ζ_i(1) = d_i ζ_0(1)`,
+`ζ_0(1) ≠ 0`), and then `ψ = Σ_{i≠0} a_i ψ_i` since the `ζ_0`-coefficient `a_0 + Σ_{i≠0} a_i d_i =
+Σ_i a_i d_i = 0`.  Combined with `CF(L,A) ⊆ span {ζ_i}` (`eq_induce_restrict_of_supported` + the family
+covering all induced characters), this gives the `hspan` hypothesis of `chiRho_decomp_proof`. -/
+theorem mem_span_psi_of_apply_one_zero {n : ℕ} (ζ : Fin (n + 1) → ClassFunction L ℂ)
+    (d : Fin (n + 1) → ℂ) (hd : ∀ i : Fin (n + 1), ζ i (1 : L) = d i * ζ 0 (1 : L))
+    (hz0 : ζ 0 (1 : L) ≠ 0) {ψ : ClassFunction L ℂ}
+    (hψ : ψ ∈ Submodule.span ℂ (Set.range ζ)) (hψ1 : ψ (1 : L) = 0) :
+    ψ ∈ Submodule.span ℂ ((fun i => ζ i - d i • ζ 0) '' {i : Fin (n + 1) | i ≠ 0}) := by
+  classical
+  obtain ⟨a, ha⟩ := (Submodule.mem_span_range_iff_exists_fun ℂ).mp hψ
+  have hd0 : d 0 = 1 := (mul_right_cancel₀ hz0 (by rw [one_mul]; exact hd 0)).symm
+  -- `Σ a_i d_i = 0` from `ψ(1) = 0`.
+  have hsum0 : ∑ i, a i * d i = 0 := by
+    have hv : ∑ i, a i * ζ i (1 : L) = 0 := by
+      have h0 : (∑ i, a i • ζ i) (1 : L) = 0 := by rw [ha]; exact hψ1
+      rw [ClassFunction.finset_sum_apply] at h0
+      simpa only [ClassFunction.smul_apply] using h0
+    have h1 : (∑ i, a i * d i) * ζ 0 (1 : L) = 0 := by
+      rw [Finset.sum_mul, ← hv]
+      exact Finset.sum_congr rfl fun i _ => by rw [hd i]; ring
+    exact (mul_eq_zero.mp h1).resolve_right hz0
+  -- `Σ_{i≠0} a_i • (ζ_i − d_i ζ_0) = ψ`.
+  have hcombo : (∑ i ∈ Finset.univ.erase (0 : Fin (n + 1)), a i • (ζ i - d i • ζ 0)) = ψ := by
+    have hexp : (∑ i ∈ Finset.univ.erase (0 : Fin (n + 1)), a i • (ζ i - d i • ζ 0))
+        = (∑ i ∈ Finset.univ.erase (0 : Fin (n + 1)), a i • ζ i)
+          - (∑ i ∈ Finset.univ.erase (0 : Fin (n + 1)), (a i * d i) • ζ 0) := by
+      rw [← Finset.sum_sub_distrib]
+      exact Finset.sum_congr rfl fun i _ => by rw [smul_sub, smul_smul]
+    rw [hexp, ← Finset.sum_smul,
+      Finset.sum_erase_eq_sub (Finset.mem_univ (0 : Fin (n + 1))),
+      Finset.sum_erase_eq_sub (Finset.mem_univ (0 : Fin (n + 1))),
+      ha, hd0, mul_one, hsum0, zero_sub, neg_smul]
+    abel
+  rw [← hcombo]
+  refine Submodule.sum_mem _ fun i hi => Submodule.smul_mem _ _ (Submodule.subset_span ?_)
+  exact ⟨i, Finset.ne_of_mem_erase hi, rfl⟩
+
 end OddOrder.Peterfalvi.S09.Cert
