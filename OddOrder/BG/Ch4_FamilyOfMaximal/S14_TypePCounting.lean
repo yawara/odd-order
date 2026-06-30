@@ -8746,6 +8746,21 @@ theorem mem_zTilde_of_mul {K Kstar : Subgroup G} (htri : K ⊓ Kstar = ⊥)
     have h := Subgroup.mem_inf.mpr ⟨hy', hy'Ks⟩
     rwa [htri, Subgroup.mem_bot] at h
 
+/-- **`y ∈ C_G(K)` from `y ∈ Z = K ⊔ K*` with `Z` cyclic** (the `cKZ` step of κ→Ẑ): since the
+join `K ⊔ K*` is cyclic — hence abelian — every element of it centralizes `K`.  Combined with
+`y ∈ M_σ`, this places the σ-part `y` in `K* = M_σ ⊓ C_G(K)`. -/
+theorem mem_centralizer_of_mem_sup_isCyclic {K Kstar : Subgroup G}
+    (hcyc : IsCyclic ↥(K ⊔ Kstar)) {y : G} (hyZ : y ∈ K ⊔ Kstar) :
+    y ∈ Subgroup.centralizer (K : Set G) := by
+  haveI := hcyc
+  letI : CommGroup ↥(K ⊔ Kstar) := IsCyclic.commGroup
+  rw [Subgroup.mem_centralizer_iff]
+  intro k hk
+  have hkZ : k ∈ K ⊔ Kstar := Subgroup.mem_sup_left (SetLike.mem_coe.mp hk)
+  have hcomm : (⟨k, hkZ⟩ : ↥(K ⊔ Kstar)) * ⟨y, hyZ⟩ = ⟨y, hyZ⟩ * ⟨k, hkZ⟩ := mul_comm _ _
+  have h := congrArg (Subgroup.subtype (K ⊔ Kstar)) hcomm
+  simpa using h
+
 /-- **BG Theorem 14.7, `|Ẑ| = (k − 1)(k* − 1)`** (mmd L4051): the TI-set `Ẑ = Z − (K ∪ K*)` has
 `(|K| − 1)(|K*| − 1)` elements.  `|Z| = |K|·|K*|` (`card_kappaHall_sup_Kstar`), `K ∩ K* = 1`
 (`kappaHall_inf_Kstar_eq_bot`) so `|K ∪ K*| = |K| + |K*| − 1`, and `|Ẑ| = |Z| − |K ∪ K*|`.
