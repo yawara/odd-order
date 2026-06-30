@@ -1778,6 +1778,26 @@ theorem cInHu_le_uInHu (data : TypesIIIIIIVSetup M) (chief : ChiefFactorData dat
     cInHu data chief ≤ uInHu data :=
   Subgroup.subgroupOf_mono _ (Subgroup.subgroupOf_mono _ (cSub_le_U data chief))
 
+/-- **`H ⊓ C = ⊥` inside `HU`** (realized `hInHu ⊓ cInHu = ⊥`): `C ≤ U` and `H ⊓ U = ⊥`
+(`typeP_H_inf_U`), so `H ⊓ C ≤ H ⊓ U = ⊥`.  A foundational input for the second-isomorphism
+`HC/H₀C ≅ H̄` behind the (9.8.c) irreducible-character construction. -/
+theorem hInHu_inf_cInHu_eq_bot {M : Subgroup G} (data : TypesIIIIIIVSetup M)
+    (chief : ChiefFactorData data) : hInHu data ⊓ cInHu data chief = ⊥ := by
+  rw [eq_bot_iff]
+  intro x hx
+  obtain ⟨hxH, hxC⟩ := Subgroup.mem_inf.mp hx
+  have hxU := cInHu_le_uInHu data chief hxC
+  rw [Subgroup.mem_bot]
+  have hxH' : x ∈ (data.H.subgroupOf M).subgroupOf (huSub data) := hxH
+  have hxU' : x ∈ (data.U.subgroupOf M).subgroupOf (huSub data) := hxU
+  have keyH : ((x : ↥M) : G) ∈ data.H :=
+    Subgroup.mem_subgroupOf.mp (Subgroup.mem_subgroupOf.mp hxH')
+  have keyU : ((x : ↥M) : G) ∈ data.U :=
+    Subgroup.mem_subgroupOf.mp (Subgroup.mem_subgroupOf.mp hxU')
+  have key : ((x : ↥M) : G) ∈ data.typeP.H ⊓ data.typeP.U := ⟨keyH, keyU⟩
+  rw [typeP_H_inf_U data.typeP, Subgroup.mem_bot] at key
+  exact Subtype.ext (Subtype.ext key)
+
 open Subgroup in
 /-- **`C ◁ U` inside `HU`** (realized form): `cInHu ◁ uInHu`, transported from `cSub ◁ U`
 (`cSub_subgroupOf_U_normal`) along the realization iso `↥uInHu ≃* ↥U`.  Comap of a normal subgroup
