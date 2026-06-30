@@ -347,3 +347,32 @@ hagree (§8 coherent extension の family-diff agreement)。certificate は (7.8
 **issue 1013 の核 達成**: H78 (=§7 floor、(12.16) hB / lane γ (14.11) h78 が cite) が
 (7.1)+coherence のみから **certificate 仮定なし**で構成可能。残 = (7.8.b) NormEstimates
 (深く gated: a∈ℤ + degree-sum) + 実 consumer (exists_MHypothesis / §12 calc) が hypothesis78OfDade を呼ぶ統合。
+
+### 2026-07-01 (loop 継続¹²⁻): (7.8.b) 全 infrastructure 在庫確認 — 「深く gated」評価を訂正
+
+⭐ **前回までの「(7.8.b) は a∈ℤ + degree-sum が repo 未在で深く gated」は誤りだった**。徹底調査の結果、
+(7.8.b) NormEstimates を組むのに必要な部品は **すべて repo に既存**:
+
+- **degree-sum (1.5.d)** `Σθ(1)²=|G|`: `sumIrreducibleDegreeSq` + `sumNontrivialIrreducibleDegreeSq`
+  (`ColumnOrthogonality.lean`, Burnside identity)。
+- **整数性** `inner_mem_ZIrr_int` (`InducedCharacter.lean:716`): virtual char (∈ZIrr) の内積 ∈ ℤ。
+- **β∈ZIrr** cascade (`S09_NonexistenceCertain.lean:1499-1540`):
+  `beta_mem_ZIrr_of_ind_mem_ZIrr_of_zeta_irreducible` / `sourceDiff_mem_ZIrr_of_irreducible` 他。
+- **ν preserves ZIrr** `nu_mem_ZIrr_of_isCoherent` (`S09_NonexistenceCertain.lean:2073`):
+  coherent extension は ℤ[S]→ZIrr G。
+- **virtual 保存** `PreservesVirtualCharacters`/`FullDadeIsometryData` (S04 (2.6.b)/(2.9))。
+- **(7.7.b) double-sum** `chiRho_norm_sq_double_sum` (`S09_NonexistenceCertain.lean:1336`)。
+- **quadratic** `normQuadraticCorrection_nonneg_of_smallIndex` (S09)。
+- **(7.8.a) orthogonality** `betaDecomp_orth_one`/`_gamma_orth_nu`/`_gamma_orth_one` (本ファイル、済)。
+
+**既存の BetaDecomp/NormEstimates producer は無い** (grep 確認、重複なし)。
+
+**(7.8.b) 残 build path (全部 buildable)**:
+1. **BetaDecomp 構成** (H78 から): `a:ℤ` = `inner_mem_ZIrr_int (beta_mem_ZIrr…) (nu_mem_ZIrr…)` の m+1、
+   `Gamma` = β−(1_G−ζ_0^ν+a•W) residual、orth フィールドは betaDecomp_* (本ファイル) を H78 へ
+   bridge (hypothesis78OfDade と同じ rfl-還元 + congrArg 技法)、`beta_eq` は abel。
+2. **NormEstimates**: `zetaNuRho_norm_sq_ge` = chiRho_norm_sq_double_sum を ζ^ν に適用し
+   ‖ζ^{νρ}‖²=ua²−2va+w (u=(1/e)(1−1/h),v=1/h,w=1−e/h)、degree-sum で係数確定、a∈ℤ+u≥2v(⟺h≥2e+1)
+   で quadratic ua²−2va≥0 ⟹ ≥w=1−e/h。`gamma_norm_sq_le` も同様。
+
+次 loop = BetaDecomp 構成に着手 (上流; NormEstimates の前提)。
