@@ -6451,8 +6451,12 @@ theorem hcZeta_induceHU_irreducible [Finite G] {M : Subgroup G}
     IsIrreducibleCharacter (induceHU data (ClassFunction.induce
       (hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf (huSub data))
       (hcPsi chief θ) : ClassFunction ↥(huSub data) ℂ)) := by
-  haveI : Fintype ↥M := Fintype.ofFinite _
-  haveI : Invertible (Nat.card ↥(huSub data) : ℂ) :=
+  -- `letI` (not `haveI`) keeps the instances transparent so `induceHU = ClassFunction.induce`
+  -- holds by `rfl` (matching `induceHU`'s own `letI`s); cf. the `hunfold` idiom at `reducible_count`.
+  letI : Fintype ↥M := Fintype.ofFinite _
+  letI : Invertible (Nat.card ↥(huSub data) : ℂ) :=
+    invertibleOfNonzero (Nat.cast_ne_zero.mpr Nat.card_pos.ne')
+  letI : Invertible (Nat.card ↥M : ℂ) :=
     invertibleOfNonzero (Nat.cast_ne_zero.mpr Nat.card_pos.ne')
   have hIeq : ClassFunction.inertia (ClassFunction.induce
       (hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf (huSub data))
@@ -6463,6 +6467,37 @@ theorem hcZeta_induceHU_irreducible [Finite G] {M : Subgroup G}
     (⟨ClassFunction.induce
       (hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf (huSub data))
       (hcPsi chief θ), hcZeta_irreducible chief θ hθ₀⟩ : IrreducibleCharacter ↥(huSub data)) hIeq
+
+/-- **Conjunct (c) of (9.8.c), `hIM`-gated assembly**: given the not-`W₁`-fixed datum (`hIM`), the
+(9.8.c) construction `Ind_{HU}^M ζ` witnesses an irreducible `𝒮(H₀C)`-member of degree `qu`.  Bundles
+the membership (`hcZeta_induceHU_mem_sOf`), irreducibility (`hcZeta_induceHU_irreducible`), and degree
+(`hcZeta_induceHU_apply_one`).  Discharging `hIM` (the free-`W₁`-orbit propagation `θ̄^{w₀}≠θ̄ ⟹
+ζ^{w₀}≠ζ`) closes conjunct (c) of `caseA_character_counts`. -/
+theorem hcZeta_exists_irreducible_sOf [Finite G] {M : Subgroup G}
+    {data : TypesIIIIIIVSetup M} {chief : ChiefFactorData data}
+    (chars : Section11CharacterData data chief)
+    (θ : (↥data.H ⧸ chief.N) →* ℂˣ) (hθnt : θ ≠ 1)
+    [Fintype ↥(huSub data)]
+    [Fintype ↥(hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf (huSub data))]
+    [Invertible (Nat.card ↥(huSub data) : ℂ)]
+    [Invertible (Nat.card ↥(hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf
+      (huSub data)) : ℂ)]
+    [(hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf (huSub data)).Normal]
+    (hθ₀ : ClassFunction.inertia (ClassFunction.compHom (hInHuEquivH data).toMonoidHom
+        (ClassFunction.compHom (QuotientGroup.mk' chief.N)
+          (linearIrreducibleCharacter θ : ClassFunction (↥data.H ⧸ chief.N) ℂ)))
+        = hInHu data ⊔ cInHu data chief)
+    (hIM : ClassFunction.inertia (ClassFunction.induce
+        (hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf (huSub data))
+        (hcPsi chief θ) : ClassFunction ↥(huSub data) ℂ) ≠ ⊤) :
+    ∃ χ ∈ sOf data (chief.H0 ⊔ cSub data chief),
+      IsIrreducibleCharacter χ ∧ χ (1 : ↥M) = ((data.q * chars.u : ℕ) : ℂ) :=
+  ⟨induceHU data (ClassFunction.induce
+      (hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf (huSub data))
+      (hcPsi chief θ) : ClassFunction ↥(huSub data) ℂ),
+    hcZeta_induceHU_mem_sOf chars θ hθnt hθ₀,
+    hcZeta_induceHU_irreducible chars θ hθ₀ hIM,
+    hcZeta_induceHU_apply_one chars θ⟩
 
 end OddOrder.Peterfalvi.S11
 
