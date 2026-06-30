@@ -1557,11 +1557,33 @@ theorem key_inequality [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
   obtain ⟨Ldata⟩ := exists_LHypothesis _hG hyp
   exact key_inequality_of_caseB_outputs (caseB_for_T _hG hyp) (caseB_for_S _hG hyp Ldata)
 
-/-- **Peterfalvi (14.9)**: the subgroup `T` is of Type II. -/
+/-- **§13/§14 structural inputs for `T` type-II** (the `T`-side analogue of `basic_structure` +
+(8.6) for `S`).  For the type-`P` data of the partner `T` (from `T_nonI`), the BG type-II
+characterisation `isTypeII_of_typePData` needs: the nontrivial-core data, `U` commutative,
+`N_G(U) ⊄ T`, and the derived subgroup `T'` of type `F` with `F(T') = T_F`.  These are the genuine
+§13/§14 `T`-side residual of Peterfalvi (14.9) (dual to the `S`-side `basic_structure`/(8.6); the
+textbook routes through the type-III orthogonality contradiction, but the BG structural
+characterisation is the `M_F`-side equivalent).  Consumer-pinned signature; the body is the
+`T`-side partner character/structure theory. -/
+theorem T_typeII_structural_inputs [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hyp : Hypothesis (G := G)) (data : OddOrder.GroupTheory.TypePData hyp.base.T) :
+    OddOrder.GroupTheory.TypePNontrivialCore hyp.base.T data ∧
+      IsMulCommutative ↥data.U ∧
+      ¬ Subgroup.normalizer (data.U : Set G) ≤ hyp.base.T ∧
+      OddOrder.GroupTheory.IsTypeF (derivedInG hyp.base.T) ∧
+      maxNilpotentNormalHall (derivedInG hyp.base.T) = data.H := sorry
+
+/-- **Peterfalvi (14.9)**: the subgroup `T` is of Type II.  Built from the BG type-II
+characterisation `isTypeII_of_typePData`: `T` is non-type-I (`T_nonI`), hence carries a `TypePData`
+(`typePData_of_isTypeNonI`); applying `isTypeII_of_typePData` with the §13/§14 `T`-side structural
+inputs (`T_typeII_structural_inputs`) gives type II.  The §14-level reduction is honest; the
+remaining content is the pinned `T`-side structure. -/
 theorem T_typeII [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
     (hyp : Hypothesis (G := G)) :
     IsTypeII hyp.base.T := by
-  sorry
+  obtain ⟨data⟩ := OddOrder.GroupTheory.typePData_of_isTypeNonI hyp.base.T_nonI
+  obtain ⟨hcommon, hUcomm, hnorm, hderF, hderfit⟩ := T_typeII_structural_inputs _hG hyp data
+  exact OddOrder.BG.Ch4.S16.isTypeII_of_typePData data hcommon hUcomm hnorm hderF hderfit
 
 /-! ## (14.10)--(14.11): the subgroup `M` over `N_G(V)` -/
 
