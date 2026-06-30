@@ -991,3 +991,21 @@ machinery + bound 三対 + [Is]3.14 解析核)。残 §13 downstream は (i) dee
 + posited carrier に gated。次候補 = [Is]3.14 Galois 半 or §8 TI (H_sharp_isTISubset) を engage。
 ユーザー裁定あれば lane 配分見直し可 (cross-lane は notes 経由 [[cross-lane-sync-via-notes]])。
 [[scaffold-sorry-free-not-done]] [[feedback-cite-sorried-lemmas-if-signature-correct]]
+
+### cont.³³ (2026-07-01 lane c=γ /loop): TI conjugate-union counting infra 着手 ((13.10.3) 用)
+
+ungated path として (13.10.3) disjoint-union counting (`|G|=1+|G0|+|(H#)^G|+|(Q#)^G|`,
+`|(H#)^G|=|H#|·[G:S]`) の TI 基盤を `OddOrder/GroupTheory/TISubset.lean` に構築開始:
+- `mem_of_conj_mem_conj` (commit e4a0c7c1): overlap ⟹ 共役比 h⁻¹g∈L (orbit-stabilizer 核)。
+- `conj_disjoint_of_ratio_not_mem` (本 commit): h⁻¹g∉L ⟹ distinct 共役 disjoint。
+
+**残 = orbit cardinality `|(H#)^G|=|H#|·[G:S]` (focused build、multi-piece)**。API plan:
+- ConjAct G の `Set G` への pointwise `MulAction` (mathlib `Set.mulAction` 由来) で orbit of H#。
+- orbit-stabilizer `MulAction.card_orbit_mul_card_stabilizer_eq_card_group`
+  (`GroupAction/Quotient.lean:180`) ⟹ `|orbit|=[G:stabilizer]`、stabilizer=N_G(H#)=L (IsTISubset+L-norm)。
+- disjoint translates ⟹ `|⋃orbit|=|orbit|·|H#|` (disjoint-union ncard、`Set.ncard_iUnion` 系は
+  未確認ゆえ Finset 経由か要調査)。⚠ block API `IsBlock.ncard_block_mul_ncard_orbit_eq` は
+  `IsPretransitive` 要 ⟹ conjugation (非推移) に**不適用**。
+**注意**: (13.10.3) は (13.10) の 4 入力 (h1/h2/h3/h139b) の 1 つ、かつ §8 TI (sorried
+H_sharp_isTISubset) を cite。h1/h2/h139b は別途 gated ゆえ (13.10) endpoint は unblock せず。
+[[scaffold-sorry-free-not-done]]
