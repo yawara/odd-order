@@ -1134,3 +1134,32 @@ restriction-inertia (hcPsi_inertia_le) + **inertia(ψ)=HC (hcPsi_inertia_eq_hc)*
 - χ∈𝒮(H₀C) → conjunct c (caseA_character_counts:5166)。
 
 inertia heart + degree-u irreducible 完成 (最難部分)。残は giant-term 注意の final assembly。
+
+
+## H₀C⊆Ker ζ LANDED + H⊄Ker ζ の route 確定 (2026-07-01, commit 1bf9e469)
+
+**giant-term whnf/isDefEq 突破 (前 iteration の blocker 解消)**: H₀C⊆Ker ζ を 2 段技法で landing:
+- **instance-free 本体抽出**: `hcPsi_mem_characterKernel_of_mem_realizedH0supC` +
+  `hcPsi_realizedH0supC_subgroupOf_subset_characterKernel` を induce/Invertible instance scope
+  の外で証明 (巨大 HC/ψ 項が whnf-exploding manipulation に入らない)。
+- **A/H pin (named args)**: `subsetCharacterKernel_induce_of_subgroupOf (A:=)(H:=)` で {A H} の
+  繰り返し巨大 unification (isDefEq 爆発源) 回避。`hcZeta_H0supC_subset_ker` axiom-clean green。
+  → **giant-declaration の汎用パターン**: 巨大項の lemma 適用は (1) 本体を instance-free helper に
+  逃がす + (2) implicit subgroup を named-arg で pin。[[lean-giant-declaration-debugging]]
+
+**残 home stretch の route 確定 (全 machinery 在庫確認済)**:
+1. **H⊄Ker ζ (ζ∈xiSet)** = `¬(hInHu ⊆ characterKernel ζ)`。route:
+   - `IrreducibleCharacter.inner_induce_ne_zero_iff_liesOver HC ζ ψ` (Clifford.lean:583): ⟨Ind ψ,ζ⟩≠0
+     ⟺ ζ LiesOver ψ。ζ=Ind ψ ゆえ ⟨Ind ψ,ζ⟩=⟨ζ,ζ⟩=1≠0 (ζ irreducible self-inner)。→ ζ LiesOver ψ。
+   - `liesOver_mem_characterKernel` (S11:5579): ζ LiesOver ψ + (g:HU)∈ker ζ → g∈ker ψ (g:HC)。
+     仮に hInHu⊆ker ζ → ∀h∈hInHu, ψ(incl h)=ψ(1)。
+   - 矛盾: `hcPsi_apply_inclusion` で ψ(incl h)=θ₀-value、θ nontrivial (hθnt 仮説、assembly では
+     CliffordCaseAData の regular θ̄) → ∃h ψ(incl h)≠ψ(1)。∴ H⊄Ker ζ。
+   - **実装**: bundled `def hcZeta := ⟨induce HC ψ, hcZeta_irreducible⟩` を先に作り `hcZeta_mem_xiSet` 証明。
+2. **ζ∈xiOf(H₀C)**: `mem_xiOf.mpr ⟨hcZeta_mem_xiSet, hcZeta_H0supC_subset_ker⟩` (cSub=chars.C 一致確認)。
+3. **M-level**: ζ not-W1-fixed → I_M(ζ)=HU (prime-index [M:HU]=q, eq_of_le_of_prime_index) →
+   χ=induceHU(ζ) irr (isIrreducibleCharacter_induce_of_inertia_eq + huSub_normal) deg
+   q·u=qu (`induceHU_apply_one_eq_q_mul` + `hcZeta_apply_one` ζ(1)=u)。
+4. χ∈SOf(H₀C) = `mem_sOf.mpr ⟨ζ, ζ∈xiOf, rfl⟩` → conjunct c (caseA_character_counts:5270)。
+
+inertia heart + ζ-irreducible + degree + H₀C⊆Ker 完成。残=xiSet membership (LiesOver descent) + M-level。
