@@ -6023,5 +6023,21 @@ noncomputable def hcQuotientEquivHbar [Finite G] {M : Subgroup G}
         (hInHu data)) chief.N (hInHuEquivH data)
       (by rw [realizedH0supC_subgroupOf_hInHu_eq]; exact realizedH0_map_hInHuEquivH_eq_N chief))
 
+/-- **Inflation hom `HC → H̄`**: `↥(hInHu ⊔ H₀C) →* (↥H ⧸ N)`, the quotient map `mk'` by `H₀C`
+followed by the second iso `hcQuotientEquivHbar`.  Composing a chief-factor character `θ̄` with this
+gives the `HC`-linear character `ψ` (trivial on `H₀C`, inflation of `θ̄`) of the (9.8.c)
+construction. -/
+noncomputable def hcHom [Finite G] {M : Subgroup G}
+    {data : TypesIIIIIIVSetup M} (chief : ChiefFactorData data) :
+    ↥(hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf (huSub data)) →*
+      (↥data.H ⧸ chief.N) :=
+  letI hN := realizedH0supC_normal_huSub chief
+  letI : ((((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf (huSub data)).subgroupOf
+      (hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf (huSub data))).Normal :=
+    hN.subgroupOf _
+  (hcQuotientEquivHbar chief).toMonoidHom.comp
+    (QuotientGroup.mk' ((((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf (huSub data)).subgroupOf
+      (hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf (huSub data))))
+
 end OddOrder.Peterfalvi.S11
 
