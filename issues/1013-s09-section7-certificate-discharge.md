@@ -671,3 +671,23 @@ agreement 取得。
 5. degree data (d/hdeg/hdeg_match)。
 → 揃えば `hypothesis78OfDade` で witness-L H78 構築 → betaDecompOfDade/zetaNuRhoNormSqGeOfDade で
 BetaDecomp/hB。次イテレーション = 部品1 (coherence-agreement lemma) から着手。
+
+### 2026-07-01 (loop 継続²⁷⁻ cont): §12 bridge crux RESOLVED — hyp.tau は ℂ-線形 (keystone landed)
+
+前記 ℤ/ℚ-linearity difficulty を解決。`dadeIntegralCharacterMap` (=hyp.tau) の定義 (S07:5272) は
+`(LinearMap.exists_extend hyp.dadeLinearMap (k:=ℂ)).choose.restrictScalars ℤ` = **ℂ-線形** Dade map
+拡張を ℤ-線形として読んだもの。∴ underlying map は ℂ-線形、`τ(c•x)=c•τ x` (c:ℂ) 成立。
+`dadeIntegralCharacterMap_smul_complex` (commit 87dcbd03) がこれを供給。
+
+**hagree 導出 path (確定)**: ζ_i,ζ_0∈S、整数次数 m_i=ζ_i(1),m_0=ζ_0(1)、d_i=m_i/m_0。
+ℤ結合 c:=m_0•ζ_i − m_i•ζ_0 = m_0•(ζ_i−d_iζ_0) は supported (=m_0•ψ_i) かつ ℤ-span ∈ →
+`extends_on_supported`: ν c = τ c。ℤ-線形 decompose + m_0 で除算 → `ν ζ_i − d_i ν ζ_0 = τ ζ_i − d_i τ ζ_0`。
+ℂ-linearity (`dadeIntegralCharacterMap_smul_complex`): `τ(ζ_i−d_iζ_0)=τ ζ_i − d_i τ ζ_0`。
+両者で `τ(ζ_i−d_iζ_0) = ν ζ_i − d_i ν ζ_0` = hagree。
+
+⚠ **S14/S16 とも type-I family の hagree (coherence agreement) は未構築** (S16.toFamilyHypothesis71
+は Hypothesis71 止まり、(7.8) は NormEstimates を carrier 扱い)。本 bridge が初。
+
+**次 = coherence_hagree lemma** (上記 path を Lean 化): IsCoherent + 整数次数 + supported から hagree。
+その後 part 2-5 (τ↔H71.τ 同一視 / Sset→Fin family / typeIA=H^# / degree) → witness-L Hypothesis78
+構築 → betaDecompOfDade/zetaNuRhoNormSqGeOfDade で BetaDecomp/hB → CounterexampleDadeData。
