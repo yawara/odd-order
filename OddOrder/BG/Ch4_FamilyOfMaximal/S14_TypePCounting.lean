@@ -5092,6 +5092,38 @@ theorem ncard_conjugates_eq_index_of_normalizer_eq_self [Finite G] {M : Subgroup
     (Nat.card_congr (Equiv.ofBijective f' hbij)).symm
   rw [← Nat.card_coe_set_eq, h_card_eq, ← Subgroup.index]
 
+/-- **Hall conjugacy** (Coq `Hall_subJ` for the solvable maximal `M`): in a maximal subgroup `M`,
+every `π`-subgroup `X ≤ M` is conjugate by an element of `M` into any Hall `π`-subgroup `K` of `M`.
+This is the general-`π` form of `exists_conj_smul_le_isHall_kappa` (which specialises `π = κ(M)`);
+the proof embeds `X` in a Hall `π`-subgroup of the solvable `↥M` and conjugates the two Hall
+subgroups together (`exists_conj_eq_of_isHall_subgroupOf`). -/
+theorem exists_conj_smul_le_of_isHall [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M K : Subgroup G} (hM : M ∈ maximalSubgroups G)
+    {π : Set ℕ} (hKM : K ≤ M) (hK : Ch03.IsHallSubgroup π (K.subgroupOf M))
+    {X : Subgroup G} (hXM : X ≤ M)
+    (hXpi : Ch03.Subgroup.IsPiGroup π (X.subgroupOf M)) :
+    ∃ w ∈ M, MulAut.conj w • X ≤ K := by
+  classical
+  haveI : IsSolvable ↥M := hG.solvable_of_mem_maximalSubgroups hM
+  obtain ⟨H, hH_hall, -, hX_le_H⟩ :=
+    OddOrder.BG.Ch1.S01.aInvariant_piSubgroup_le_aInvariant_hall
+      (A := Unit) (φ := (1 : Unit →* MulAut ↥M))
+      (by rw [Nat.card_unique]; exact Nat.coprime_one_left _)
+      hXpi (fun _ => one_smul _ _)
+  set HG : Subgroup G := H.map M.subtype with hHGdef
+  have hHG_le_M : HG ≤ M := Subgroup.map_subtype_le _
+  have hHG_hall : Ch03.IsHallSubgroup π (HG.subgroupOf M) := by
+    rwa [hHGdef, Subgroup.subgroupOf,
+      Subgroup.comap_map_eq_self_of_injective M.subtype_injective]
+  obtain ⟨w, hwM, hw⟩ :=
+    OddOrder.BG.Ch1.S06.exists_conj_eq_of_isHall_subgroupOf inferInstance hHG_le_M hKM
+      hHG_hall hK
+  have hXHG : X ≤ HG := by
+    intro x hx
+    rw [hHGdef]
+    exact Subgroup.mem_map.mpr ⟨⟨x, hXM hx⟩, hX_le_H (Subgroup.mem_subgroupOf.mpr hx), rfl⟩
+  exact ⟨w, hwM, (conj_smul_mono (MulAut.conj w) hXHG).trans hw.le⟩
+
 /-- **Converse of `isPiElement_sigma_of_mem_Msigma`** (Coq `mem_Hall_pcore (Msigma_Hall maxM)`):
 a `σ(M)`-element `x ∈ M` lies in `M_σ`.  The image of `x` in the quotient `M / M_σ` is a
 `σ(M)`-element (a power of `x`), but `M_σ` is a Hall `σ(M)`-subgroup of `M` so `M / M_σ` is a

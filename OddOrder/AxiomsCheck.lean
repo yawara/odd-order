@@ -5161,6 +5161,11 @@ lands in the signalizer branch or the κ branch.  Combines `mem_Msigma_of_isPiEl
 with `signalizer_coset_or_kappa_of_sigmaSharp`.  The form consumed by the full Lemma 14.6
 assembly.  Axiom-clean. -/
 #assert_only_allowed_axioms OddOrder.BG.Ch4.S14.branchA_or_branchB_of_mem_maximal
+/-! **Hall conjugacy** (`S14_TypePCounting`, `exists_conj_smul_le_of_isHall`, Coq `Hall_subJ`):
+in a maximal `M`, every `π`-subgroup `X ≤ M` conjugates by an element of `M` into any Hall
+`π`-subgroup `K` of `M`.  The general-`π` form of `exists_conj_smul_le_isHall_kappa`; the tool for
+the `g ∉ M` case of the full Lemma 14.6 dichotomy.  Axiom-clean. -/
+#assert_only_allowed_axioms OddOrder.BG.Ch4.S14.exists_conj_smul_le_of_isHall
 /-! **BG Lemma 14.6, exclusivity** (`S14_TypePCounting`, `not_type1_of_type2`): a type-2 element
 (`g = y·y'`, `y'` a nonidentity `κ(M)`-element of `C_M(y)`, `y ∈ M_σ^#`) is not of type-1
 (`g = x·x'`, `ℓ_σ(x)=1`, `x' ∈ R(x)`).  The `T ∩ H̃ = ∅` input to Theorem 14.7. -/
