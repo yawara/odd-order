@@ -2568,6 +2568,103 @@ theorem MHypothesis.card_M_eq {hyp : Hypothesis (G := G)} (Mdata : MHypothesis h
   rw [hidxpq] at hidx
   rw [← hidx, Mdata.k_eq_card_K]; ring
 
+/-- **The exceptional set `W − (W₁ ∪ W₂)` of a cyclic `W = W₁ × W₂` is a TI-subset with
+normalizer-bound `W`** — the abstract core of Peterfalvi's `V`-set TI property, generalising
+`S12.typePData_V_ti` to take the singleton/subset normalizer fact `N_G(X) = W` (`hnorm`) directly.
+Given `g` conjugating some `a` of the set into it, `N_G({a}) = W = N_G({g a g⁻¹})` forces `g` to
+normalize `W`, and cyclic-uniqueness (`cyclic_subgroup_eq_of_card_eq`) makes `W₁`, `W₂`
+`g`-stable, so `g` normalizes the set, whence `g ∈ N_G(set) = W`.  The `W`-orbit TI input to the
+(14.11.4) §8 count (`hnorm` is the genuine §13 structural fact, supplied from the partner type-`P`
+structure). -/
+theorem isTISubset_sdiff_sup_of_normalizer_eq [Finite G] {W W1 W2 : Subgroup G}
+    (hWcyc : IsCyclic ↥W) (hWeq : W = W1 ⊔ W2)
+    (hnorm : ∀ X : Set G, X.Nonempty →
+      X ⊆ (W : Set G) \ ((W1 : Set G) ∪ (W2 : Set G)) → Subgroup.normalizer X = W) :
+    OddOrder.GroupTheory.IsTISubset ((W : Set G) \ ((W1 : Set G) ∪ (W2 : Set G))) W := by
+  classical
+  set vset : Set G := (W : Set G) \ ((W1 : Set G) ∪ (W2 : Set G)) with hvset
+  haveI : IsCyclic ↥W := hWcyc
+  have hW1le : W1 ≤ W := hWeq ▸ le_sup_left
+  have hW2le : W2 ≤ W := hWeq ▸ le_sup_right
+  have mem_norm_sing : ∀ c z : G,
+      z ∈ Subgroup.normalizer ({c} : Set G) ↔ z * c * z⁻¹ = c := by
+    intro c z
+    rw [Subgroup.mem_set_normalizer_iff]
+    constructor
+    · intro hz; have := (hz c).mp rfl; simpa using this
+    · intro hz h
+      simp only [Set.mem_singleton_iff]
+      refine ⟨fun hrfl => hrfl ▸ hz, fun hh => ?_⟩
+      have hcc : z * h * z⁻¹ = z * c * z⁻¹ := by rw [hh, hz]
+      exact mul_left_cancel (mul_right_cancel hcc)
+  intro g hg
+  obtain ⟨a, haV, hbV⟩ := hg
+  have hNa : Subgroup.normalizer ({a} : Set G) = W :=
+    hnorm {a} (Set.singleton_nonempty a) (Set.singleton_subset_iff.mpr haV)
+  have hNb : Subgroup.normalizer ({g * a * g⁻¹} : Set G) = W :=
+    hnorm {g * a * g⁻¹} (Set.singleton_nonempty _) (Set.singleton_subset_iff.mpr hbV)
+  have hgW : ∀ h, h ∈ W ↔ g * h * g⁻¹ ∈ W := by
+    intro h
+    have e1 : (h ∈ W) ↔ h * a * h⁻¹ = a := by rw [← hNa, mem_norm_sing]
+    have e2 : (g * h * g⁻¹ ∈ W) ↔ h * a * h⁻¹ = a := by
+      rw [← hNb, mem_norm_sing]
+      have hexp : g * h * g⁻¹ * (g * a * g⁻¹) * (g * h * g⁻¹)⁻¹ = g * (h * a * h⁻¹) * g⁻¹ := by
+        group
+      rw [hexp]
+      exact ⟨fun hh => mul_left_cancel (mul_right_cancel hh), fun hh => by rw [hh]⟩
+    rw [e1, e2]
+  have hstab : ∀ (A : Subgroup G), A ≤ W → ∀ x : G, g * x * g⁻¹ ∈ A ↔ x ∈ A := by
+    intro A hAW
+    have hmap_le : A.map (MulAut.conj g).toMonoidHom ≤ W := by
+      rintro y hy
+      rw [Subgroup.mem_map] at hy
+      obtain ⟨z, hzA, rfl⟩ := hy
+      simp only [MulEquiv.coe_toMonoidHom, MulAut.conj_apply]
+      exact (hgW z).mp (hAW hzA)
+    have hcard : Nat.card ↥(A.map (MulAut.conj g).toMonoidHom) = Nat.card ↥A :=
+      (Nat.card_congr (Subgroup.equivMapOfInjective A (MulAut.conj g).toMonoidHom
+        (MulAut.conj g).injective).toEquiv).symm
+    have hsubeq : (A.map (MulAut.conj g).toMonoidHom).subgroupOf W = A.subgroupOf W := by
+      apply OddOrder.BG.Ch3.S10.cyclic_subgroup_eq_of_card_eq (C := ↥W)
+      rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hmap_le).toEquiv,
+        Nat.card_congr (Subgroup.subgroupOfEquivOfLe hAW).toEquiv, hcard]
+    have hmapeq : A.map (MulAut.conj g).toMonoidHom = A := by
+      rw [← Subgroup.map_subgroupOf_eq_of_le hmap_le, hsubeq,
+        Subgroup.map_subgroupOf_eq_of_le hAW]
+    intro x
+    constructor
+    · intro hx
+      have hmem : g * x * g⁻¹ ∈ A.map (MulAut.conj g).toMonoidHom := by rw [hmapeq]; exact hx
+      rw [Subgroup.mem_map] at hmem
+      obtain ⟨z, hzA, hz⟩ := hmem
+      simp only [MulEquiv.coe_toMonoidHom, MulAut.conj_apply] at hz
+      have hzx : z = x := mul_left_cancel (mul_right_cancel hz)
+      rwa [hzx] at hzA
+    · intro hx
+      have hmem : (MulAut.conj g).toMonoidHom x ∈ A.map (MulAut.conj g).toMonoidHom :=
+        Subgroup.mem_map_of_mem _ hx
+      rw [hmapeq] at hmem
+      simpa only [MulEquiv.coe_toMonoidHom, MulAut.conj_apply] using hmem
+  rw [← hnorm vset ⟨a, haV⟩ Set.Subset.rfl, Subgroup.mem_set_normalizer_iff]
+  intro h
+  simp only [hvset, Set.mem_diff, Set.mem_union, SetLike.mem_coe]
+  rw [hgW h, hstab W1 hW1le h, hstab W2 hW2le h]
+
+/-- **Orbit measure of a TI-subset** `|𝒞_G(A)|/|G| = |A|/|N|` — the real-valued form of the §8
+TI-counting `ncard_conjClassSet_of_isTISubset` (`|𝒞_G(A)| = |A|·[G:N]`).  For a TI-subset `A` with
+normalizer-bound `N` stabilizing `A`, the conjugacy-saturation `𝒞_G(A) = A^G` has relative measure
+`|A|/|N|` in `G`.  The reusable bridge turning each (14.11.4) orbit `(W#)^G`/`(P#)^G`/`(Q#)^G` into a
+`1/|N_G(·)|`-term (Pf 04.16 lines 109–115). -/
+theorem orbit_normSq_term [Finite G] {A : Set G} {L : Subgroup G}
+    (hTI : OddOrder.GroupTheory.IsTISubset A L)
+    (hstab : ∀ l ∈ L, MulAut.conj l • A = A) :
+    ((OddOrder.GroupTheory.conjClassSet A).ncard : ℝ) / (Nat.card G : ℝ)
+      = (A.ncard : ℝ) / (Nat.card ↥L : ℝ) := by
+  rw [OddOrder.BG.Ch4.S14.ncard_conjClassSet_of_isTISubset hTI hstab, ← L.card_mul_index]
+  have hidx : (L.index : ℝ) ≠ 0 := by exact_mod_cast Subgroup.index_ne_zero_of_finite
+  push_cast
+  rw [mul_div_mul_right _ _ hidx]
+
 open scoped Classical OddOrder.Peterfalvi.S12.FiniteInduce in
 /-- **Peterfalvi (14.11.4), the upper-bound §8 TI-counting step** (04.16 lines 109–115).  Brings the
 line-83 bound `|A(M)|/|M| + (1/|G|)(|famG₀| − |G₀|)` (the RHS of `chiRhoNormSq_psi_le_line83`,
