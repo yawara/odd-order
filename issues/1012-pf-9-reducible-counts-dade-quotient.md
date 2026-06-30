@@ -1354,3 +1354,25 @@ construction 完成・green。
 `hcZeta_inertia_ne_top_of_free` → `hcZeta_induceHU_irreducible` → `hcZeta_exists_irreducible_sOf` → conjunct c。
 
 Clifford reduction (genuinely new infra) 完成。残=L4 (free-orbit 深) + L5 (realization wiring)。
+
+
+## L4 connection chain — caseB inertia machinery で大量 pre-built (2026-07-01)
+
+L4 の connection chain (hfree ⟺ θ̄^{w₀}∈U-orbit) は **caseB inertia machinery でほぼ既存**:
+- `conjBy_compHom_hInHuEquivH` (conjBy g) + `compHom_hInHuConj_hInHuEquivH` (compHom φ_m、新規 build 済):
+  両 conjugation を typeP_conjAction a/b (↑g=↑a, ↑m=↑b) へ。
+- `compHom_typeP_conjAction_inflation` (S11:4400、**rfl**): typeP_conjAction a (compHom (mk' N) θ̄)
+  = compHom (mk' N) (quotientMulAutHom a θ̄)。← descent to quotient action。
+- `compHom_injective_of_surjective` (hInHuEquivH surj + mk' N surj): 二重 inflation strip。
+- → conjBy g θ₀=compHom φ_m θ₀ ⟺ quotientMulAutHom (g-image) θ̄ = quotientMulAutHom (w₀) θ̄
+  ⟺ θ̄^{act.φ(U-image of g)} = θ̄^{w₀}。g∈huSub の quotient image は huSub/hInHu≅U で U-element
+  (H-part は inner=trivial) → ∃g ⟺ **θ̄^{w₀}∈act.φ-U-orbit**。
+- `caseB_inertia_realized` (S11:4570) が realization+descent の手本 (a∈U, g∈huSub, ↑g=↑a)。
+
+**残 L4 = (1) connection reduction lemma** (上を組む、realization g→U-image 込) **+ (2) 深部
+free-orbit θ̄^{w₀}∉act.φ-U-orbit** (`clifford_caseA_exists_char_inertia_hc_not_fixed` は θ̄^{w₀}≠θ̄
+のみ → ∉U-orbit に強化: regular θ̄ non-constant factor、W1 q-cycle 置換、U factor 内)。
+**残 L5 = w₀ realization (m∈M) + 構築 ζ の ζ LiesOver θ₀** (ζ LiesOver ψ→θ₀、restriction 推移)。
+→ assemble hIM → hcZeta_induceHU_irreducible → conjunct c。
+
+Clifford reduction + connection commutes 完成。残=connection reduction wiring + free-orbit (深) + L5。
