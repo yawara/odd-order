@@ -1613,6 +1613,58 @@ theorem typeII_overNormalizer_frobenius [Finite G]
     typeI_overNormalizer_complement _hG hyp hSTypeII hLmax hNUL hUH frob hW1E
   exact ⟨⟨L, maxNilpotentNormalHall L, hLmax, rfl, hNUL, frob, hUH, hcard, hy⟩, hker, hUH⟩
 
+/-- **`T`-side dual of `q_not_dvd_kernel`** (V-side): `p = |W₂|` is coprime to the type-I Frobenius
+kernel `L_F` (`p ∤ |L_F|`).  Mirror; same gated input `card_LF_coprime_pq` (`|L_F| ⟂ pq`). -/
+theorem p_not_dvd_kernel [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hyp : Hypothesis (G := G)) {L : Subgroup G} (hLmax : L ∈ maximalSubgroups G)
+    (hLI : IsTypeI L) (frob : OddOrder.Peterfalvi.S14.TypeIFrobeniusData L) :
+    ¬ hyp.p ∣ Nat.card ↥(frob.typeI.typeF.H.subgroupOf L) := by
+  have hnconjS : ¬ ∃ g : G, MulAut.conj g • L = hyp.S :=
+    not_conj_of_isTypeI_of_isTypeNonI _hG hLI hyp.S_maximal hyp.S_nonI
+  have hnconjT : ¬ ∃ g : G, MulAut.conj g • L = hyp.T :=
+    not_conj_of_isTypeI_of_isTypeNonI _hG hLI hyp.T_maximal hyp.T_nonI
+  have hcop := card_LF_coprime_pq _hG hyp hLmax hLI hnconjS hnconjT
+  have hcopp : Nat.Coprime (Nat.card ↥(maxNilpotentNormalHall L)) hyp.p :=
+    Nat.Coprime.coprime_dvd_right (dvd_mul_right hyp.p hyp.q) hcop
+  have hnotdvd : ¬ hyp.p ∣ Nat.card ↥(maxNilpotentNormalHall L) :=
+    hyp.p_prime.coprime_iff_not_dvd.mp hcopp.symm
+  have hHeq : frob.typeI.typeF.H = maxNilpotentNormalHall L := frob.typeI.typeF.H_eq
+  have hHleL : frob.typeI.typeF.H ≤ L := by
+    rw [hHeq]; exact OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_le L
+  rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hHleL).toEquiv, hHeq]
+  exact hnotdvd
+
+/-- **`T`-side dual of `exists_typeIFrobeniusData_W1_le`** (V-side): the type-I Frobenius
+decomposition of `L` can be taken with the complement containing `W₂` (`|W₂| = p` coprime to the
+kernel by `p_not_dvd_kernel`, Schur–Zassenhaus complement conjugacy). -/
+theorem exists_typeIFrobeniusData_W2_le [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hyp : Hypothesis (G := G)) {L : Subgroup G} (hLmax : L ∈ maximalSubgroups G)
+    (hLtypeI : IsTypeI L) (hNVL : Subgroup.normalizer (hyp.V : Set G) ≤ L) :
+    ∃ frob : OddOrder.Peterfalvi.S14.TypeIFrobeniusData L, frob.kernel_eq_MF ∧
+      hyp.W2 ≤ frob.complement.map L.subtype := by
+  obtain ⟨frob₀, hker₀⟩ := OddOrder.Peterfalvi.S14.typeI_frobenius _hG hLmax hLtypeI
+  have hW2L : hyp.W2 ≤ L := hyp.W2_normalizes_V.trans hNVL
+  haveI : (frob₀.typeI.typeF.H.subgroupOf L).Normal := frob₀.frobenius.isNormal
+  haveI hLsolv : IsSolvable ↥L :=
+    _hG.solvable_of_lt_top L (lt_top_iff_ne_top.mpr (mem_maximalSubgroups.mp hLmax).1)
+  haveI : IsSolvable ↥(frob₀.typeI.typeF.H.subgroupOf L) := inferInstance
+  have hcop : Nat.Coprime (Nat.card ↥(hyp.W2.subgroupOf L))
+      (Nat.card ↥(frob₀.typeI.typeF.H.subgroupOf L)) := by
+    have hW2card : Nat.card ↥(hyp.W2.subgroupOf L) = hyp.p := by
+      rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hW2L).toEquiv]
+      exact hyp.p_eq_card_W2.symm
+    rw [hW2card]
+    exact (hyp.p_prime.coprime_iff_not_dvd).mpr (p_not_dvd_kernel _hG hyp hLmax hLtypeI frob₀)
+  obtain ⟨x, hx⟩ := Ch03.exists_conj_le_of_isComplement'_of_coprime
+    inferInstance frob₀.frobenius.isComplement hcop
+  refine ⟨{ frob₀ with
+      complement := frob₀.complement.map (MulAut.conj x).toMonoidHom
+      frobenius := frob₀.frobenius.conjComplement x }, frob₀.kernel_eq_MF_holds, ?_⟩
+  have : hyp.W2 = (hyp.W2.subgroupOf L).map L.subtype := by
+    rw [Subgroup.map_subgroupOf_eq_of_le hW2L]
+  rw [this]
+  exact Subgroup.map_mono hx
+
 /-- Carrier for the virtual character `beta_j` and `Gamma_j` in (13.18). -/
 structure BetaData (hyp : Hypothesis (G := G)) where
   j : Fin hyp.p
