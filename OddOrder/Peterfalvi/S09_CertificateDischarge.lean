@@ -659,6 +659,64 @@ theorem subgroupOf_normal_of_conj {G : Type*} [Group G] {H L : Subgroup G}
     simp only [Subgroup.coe_mul, Subgroup.coe_inv]
     exact hconj g hn
 
+/-! ### Geometric facts on the sharp support `supportInSubgroup (H \ {1}) L`
+
+The support set `A = H \ {1}` (where `H ⊴ L`) translates, on the subgroup side
+`K = H.subgroupOf L`, into the punctured subgroup `K \ {1}`.  These lemmas package the
+`A ↔ K` dictionary used by `chiRho_decomp_induced` / `chiRho_eq_inner_beta_induced`
+(membership, the excluded identity, and conjugation-invariance from normality of `H`). -/
+
+section SharpSupport
+variable {G : Type*} [Group G] {L : Subgroup G}
+
+/-- Membership in the sharp support, phrased on `G`: `x ∈ supportInSubgroup (H \ {1}) L`
+iff `(x : G) ∈ H` and `(x : G) ≠ 1`. -/
+theorem mem_supportInSubgroup_sharp_iff (H : Subgroup G) {A : Set G}
+    (hAH : A = (H : Set G) \ {1}) (x : ↥L) :
+    x ∈ OddOrder.Peterfalvi.S04.supportInSubgroup A L ↔ ((x : G) ∈ H ∧ (x : G) ≠ 1) := by
+  rw [OddOrder.Peterfalvi.S04.mem_supportInSubgroup, hAH]
+  simp only [Set.mem_diff, SetLike.mem_coe, Set.mem_singleton_iff]
+
+/-- Membership in the sharp support, phrased on the subgroup side `K = H.subgroupOf L`:
+`x ∈ supportInSubgroup (H \ {1}) L` iff `x ∈ H.subgroupOf L` and `x ≠ 1`. -/
+theorem mem_supportInSubgroup_sharp_subgroupOf_iff (H : Subgroup G) {A : Set G}
+    (hAH : A = (H : Set G) \ {1}) (x : ↥L) :
+    x ∈ OddOrder.Peterfalvi.S04.supportInSubgroup A L ↔ (x ∈ H.subgroupOf L ∧ x ≠ 1) := by
+  rw [mem_supportInSubgroup_sharp_iff H hAH x, Subgroup.mem_subgroupOf]
+  exact and_congr_right fun _ => not_congr OneMemClass.coe_eq_one
+
+/-- The sharp support is contained in `K = H.subgroupOf L`. -/
+theorem supportInSubgroup_sharp_subset_subgroupOf (H : Subgroup G) {A : Set G}
+    (hAH : A = (H : Set G) \ {1}) {x : ↥L}
+    (hx : x ∈ OddOrder.Peterfalvi.S04.supportInSubgroup A L) : x ∈ H.subgroupOf L :=
+  ((mem_supportInSubgroup_sharp_subgroupOf_iff H hAH x).mp hx).1
+
+/-- The identity is not in the sharp support. -/
+theorem one_not_mem_supportInSubgroup_sharp (H : Subgroup G) {A : Set G}
+    (hAH : A = (H : Set G) \ {1}) :
+    (1 : ↥L) ∉ OddOrder.Peterfalvi.S04.supportInSubgroup A L := fun hx =>
+  ((mem_supportInSubgroup_sharp_subgroupOf_iff H hAH 1).mp hx).2 rfl
+
+/-- The sharp support is invariant under `L`-conjugation (from normality of `H` in `L`). -/
+theorem supportInSubgroup_sharp_conj_mem_iff (H : Subgroup G) {A : Set G}
+    (hAH : A = (H : Set G) \ {1})
+    (hHnorm : ∀ (l : ↥L) {h : G}, h ∈ H → (l : G) * h * (l : G)⁻¹ ∈ H) (g h : ↥L) :
+    h * g * h⁻¹ ∈ OddOrder.Peterfalvi.S04.supportInSubgroup A L ↔
+      g ∈ OddOrder.Peterfalvi.S04.supportInSubgroup A L := by
+  haveI hKnorm : (H.subgroupOf L).Normal := subgroupOf_normal_of_conj hHnorm
+  rw [mem_supportInSubgroup_sharp_subgroupOf_iff H hAH,
+    mem_supportInSubgroup_sharp_subgroupOf_iff H hAH]
+  refine and_congr ?_ ?_
+  · constructor
+    · intro hm
+      have hc := hKnorm.conj_mem _ hm h⁻¹
+      have heq : h⁻¹ * (h * g * h⁻¹) * (h⁻¹)⁻¹ = g := by group
+      rwa [heq] at hc
+    · intro hm; exact hKnorm.conj_mem _ hm h
+  · rw [ne_eq, ne_eq, mul_inv_eq_one, mul_eq_left]
+
+end SharpSupport
+
 /-- **Construction of `Hypothesis76` from `(7.1)` data** (Peterfalvi (7.6)/(7.7.a)).  Given the
 Dade-isometry data of `(7.1)` (`H71` together with `hτ : IsDadeIsometry H71.τ`) and a normal
 subgroup `H ⊴ L` with `A = H \ {1}`, the entire `Hypothesis76` structure — *including* the
@@ -719,25 +777,14 @@ noncomputable def hypothesis76OfFamily
     rw [hAchar]
     exact ⟨hx.1, (hne_one x).mpr hx.2⟩
   -- Geometric inputs for `chiRho_decomp_induced`, phrased through `K = H.subgroupOf L`.
-  have hAcharK : ∀ x : ↥L, x ∈ OddOrder.Peterfalvi.S04.supportInSubgroup A L ↔
-      (x ∈ H.subgroupOf L ∧ x ≠ 1) := fun x => by
-    rw [hAchar x, Subgroup.mem_subgroupOf, hne_one x]
   have hAK_off : ∀ x : ↥L, x ∈ OddOrder.Peterfalvi.S04.supportInSubgroup A L →
-      x ∈ H.subgroupOf L := fun x hx => ((hAcharK x).mp hx).1
-  have hA_one : (1 : ↥L) ∉ OddOrder.Peterfalvi.S04.supportInSubgroup A L := fun hx =>
-    ((hAcharK 1).mp hx).2 rfl
+      x ∈ H.subgroupOf L := fun _ => supportInSubgroup_sharp_subset_subgroupOf H hAH
+  have hA_one : (1 : ↥L) ∉ OddOrder.Peterfalvi.S04.supportInSubgroup A L :=
+    one_not_mem_supportInSubgroup_sharp H hAH
   have hAconj : ∀ g h : ↥L,
       h * g * h⁻¹ ∈ OddOrder.Peterfalvi.S04.supportInSubgroup A L ↔
-      g ∈ OddOrder.Peterfalvi.S04.supportInSubgroup A L := fun g h => by
-    rw [hAcharK, hAcharK]
-    refine and_congr ?_ ?_
-    · constructor
-      · intro hm
-        have hc := hKnorm.conj_mem _ hm h⁻¹
-        have heq : h⁻¹ * (h * g * h⁻¹) * (h⁻¹)⁻¹ = g := by group
-        rwa [heq] at hc
-      · intro hm; exact hKnorm.conj_mem _ hm h
-    · rw [ne_eq, ne_eq, mul_inv_eq_one, mul_eq_left]
+      g ∈ OddOrder.Peterfalvi.S04.supportInSubgroup A L :=
+    fun g h => supportInSubgroup_sharp_conj_mem_iff H hAH hHnorm g h
   -- Assemble the structure; `chiRho_decomp` is discharged by `chiRho_decomp_induced`.
   exact
     { hyp71 := H71
