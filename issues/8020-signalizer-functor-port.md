@@ -746,3 +746,30 @@ Lemma 14.6 の自然な帰結 = BG Cor 14.9 covering の核。
 構成** の 2 deep piece が要る。cover_nonidentity/pairwise は揃った。次 = (a) R(x)=1-under-typeF (signalizer
 trivial) の調査/構成、または gate 2 を by_cases all-type-F で restructure し TypeICovering を組んで NonTypeICovering
 を named sorry に isolate。
+
+## 🔎 進捗 (lane d, 2026-06-30 /loop³⁰): gate-2 frontier 確定調査 — cover_subset_kernels の真の依存を特定
+
+新規 Lean なし。**gate-2 (bgTheoremE_cover_data の covering disjunction) の残依存を BG 原文 + Coq + ported 14.7
+全 survey で確定** (cover_nonidentity ✅/pairwise ready の次に何が要るか):
+
+**BG 原文 (mmd L4069 Cor 14.9, L3910 M̃ 定義)**: Cor 14.9(1) [𝓜_𝒫=∅] は **G# = ⊔ 𝒞_G(M̃_i)** (M̃ = thickened
+`{xx':x∈M_σ#,x'∈R(x)}`、ℓ_σ≤2)。**M̃=M_σ# とは言っていない**。Coq `mFT_partition` Part 1 も partition のみ証明。
+⟹ Lean struct の **`cover_subset_kernels` (cover_i ⊆ 𝒞_G((M_i)_F#)=𝒞_G(M_σ#)) は Cor 14.9 に無い追加 field**。
+
+**cover_subset_kernels の真の内容 = R(x)=1 under all-type-F (M̃=M_σ#)**: これは **TRUE** (𝓜_𝒫=∅ ⟹ |M_σ[x]|=1
+⟹ Rsub=⊥) **だが Theorem 14.7 の「|M_σ[x]|>1 ⟹ type-P」方向が要る**。FT_signalizer_context (Thm 14.4) は
+neighbour N = type-F **or** P2 までしか言わず (S14:3797)、all-type-F でも N=type-F の |M_σ[x]|>1 を排除しない。
+排除には **signalizer→type-P 構築 (Coq `Ptype_structure` の逆向き、未ポート)** が必要。
+
+**ported 14.7 は全て `IsTypeP M` を仮説に取る** (`exists_partner`/`typeP_partner_structure`/`typeP_partner_existsUnique`、
+S14:8555/9025/9363) — **逆向き (signalizer→type-P) は無い** (grep 0)。⟹ **cover_subset_kernels = 未ポートの deep
+piece「|M_σ[x]|>1 ⟹ ∃ type-P maximal」** (Coq Ptype_structure 構築の逆、multi-session)。
+
+**gate-2 両 branch とも Theorem 14.7 深部依存**:
+- **TypeICovering**: cover_nonidentity ✅ (/loop²⁹) + pairwise (`conjClassSet_Mtilde_disjoint` ready) + **cover_subset_kernels**
+  (= signalizer→type-P 逆、未ポート deep)。
+- **NonTypeICovering**: Theorem 14.7(e) の Ẑ (zTilde) exceptional cover (deep)。
+
+⟹ **§14 cover の数学核 (Lemma 14.6 + Cor 14.9 cover identity + covering equality) は完成**。gate-2 完全 close
+は signalizer→type-P 逆向き (新 deep port) が gating。**overstatement 懸念は解消** (cover_subset_kernels は真、
+ただし deep)。次 = (a)「|M_σ[x]|>1 ⟹ type-P」port (Coq Ptype_structure 逆、~multi-session) or (b) lane 再配分検討。
