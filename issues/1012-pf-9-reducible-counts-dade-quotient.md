@@ -456,6 +456,17 @@ fresh context で 1 つずつ。次着手 = caseA degree machinery。
 - **状況**: 残 §9 は全て deep (caseA constituent/exceptional/Singer/§14-gated sibleyTarget)。
   還元 count 中核は完了。各 deep piece は fresh context で。
 
+**❌ §6 column-degree shortcut は無効 (2026-06-30 確認)**: column χ̄=`chiRestrict χ₂`=`Res_K(μ_{0j})`、
+χ̄(1)=μ_{0j}(1) (§6 columnFamily grid char)。§6 は generic certain-type framework ゆえ μ_{0j}(1) を
+u に pin する lemma **無し** (u=[U:C] は §9-specific)。⟹ degree qu (φ(1)=q·χ̄(1)=qu ⟺ χ̄(1)=u) は
+**(9.8.a)/(9.9.a) 本体** = §9-specific constituent 解析が必須、shortcut 不可。
+
+**⟹ caseA degree build plan (次 iteration、deep)**: `caseA_exists_chiefFactorConstituent` (caseB の
+analog、但し inertia は非 HC=non-Galois split) → `caseA_degree_qu` (χ(1)=u on 𝒳(H₀C'))。crux =
+caseA inertia 解析 (CliffordCaseAData の Hpart 直積構造経由)。Coq `Part_a` (L883-940) +
+`isIndHC` (reducible mu_j=Ind linear HC char ⟹ degree qu) 参照。**caseB-constituent 並みの multi-iteration。**
+membership half は ✅ (`reducible_mem_sOf_H0C hG chars`、case-agnostic 済)。
+
 ## 完了条件
 
 S11 の caseB_character_counts / caseA_character_counts / exceptional_case_frobenius_realization が
