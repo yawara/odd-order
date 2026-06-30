@@ -211,3 +211,25 @@ chiRho_eq_inner_beta_induced + hypothesis76OfDade、全 axiom-clean。
 - これで Hypothesis78 構成可能 → (12.16) hB + lane γ (14.11) h78 unblock。
 - **代替検討**: (7.8.b) `zetaNuRho_norm_sq_ge` も formula discharge 可能か (full Hyp78 構成回避)。
   hB が要するのは (7.8.b) ゆえ、(7.8.b) を直接 formula 化できれば constructor 不要かも。次回精査。
+
+### 2026-07-01 (loop 継続⁵): landscape 確定 + (7.8.c.i) toolkit 完備 + 残務 map
+
+**(7.8.c.i) toolkit 完備** (commit 132c7d8f): `induce_family_comp_perm_injective/covering` 追加。
+これで chiRho_eq_inner_beta_induced (index-0 formula) + 再添字付け primitive が揃い、§12 calc は
+Equiv.swap 0 j で区別 ζ を index 0 配置 → 適用可能。constructor (hypothesis78OfDade) は不要に
+(§12 calc が inline 構成、formula を cite)。
+
+**重要な landscape 発見**:
+- **最終 consumer = `exists_counterexample_dade_data` (S14:2740) は単一 giant sorry** —
+  CounterexampleDadeData の全 ~24 field (witness L 構成 + Dade τ₁ + coherent S + ψ=χ^{τ₁} +
+  norm bounds hA/hB/hC + 整数/次数 facts) を産出する (12.16) 本体の山。hB=(7.8.b) は単なる
+  1 field (`1-e/kH ≤ normRho` の実不等式)。§7 norm estimates はその ingredient。
+- **§7 floor 残 = (7.8.a)+(7.8.b)** (coherence-dependent、meaty だが tractable):
+  既存機構 (7.7.b) `chiRho_norm_sq_double_sum` (S09:90) + (2.7) `chiRho_adjoint` (S09:335) +
+  Hyp78 helpers (beta/weightedNuSum/zetaNuRho/zetaNuRhoNormSq/kernelOrder/complementIndex/
+  smallIndex) 全在。(7.8.a) BetaDecomp (orth_one: S^ν⊥1_G + 整数 a/残余 Γ 分解) →
+  (7.8.b) NormEstimates (‖ζ^{νρ}‖²≥1-e/h via (7.7.b)+(7.8.a)+coefficient 計算 c_1=a,c_2=1)。
+- **完成済 (全 axiom-clean、reusable)**: (7.7.a) chiRho_decomp_induced + hypothesis76OfDade +
+  (7.8.c.i) chiRho_eq_inner_beta_induced + toolkits。lane γ (14.11 h78) も §7 を共有消費。
+- **次**: (7.8.a) → (7.8.b) formula discharge (上流順)。両者は ν の coherence ((2.7)+orthonormality)
+  を入力に取る形 (carrier-conditional)。
