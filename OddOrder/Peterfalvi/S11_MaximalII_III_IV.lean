@@ -4367,6 +4367,67 @@ theorem commutator_cSub_H_le_H0 [Finite G] {M : Subgroup G} (data : TypesIIIIIIV
     typeP_conjAction_apply, hzc]
   simp [hhH]
 
+open scoped commutatorElement in
+/-- **`H₀C ◁ M`** (Peterfalvi `Ptype_Fcore_extensions_normal`, the third structural input for the
+`H₀C` reducible count, issue 1012): the normal subgroup `H₀ ⊔ C` of `M` realised as
+`(H₀ ⊔ C).subgroupOf M ◁ ↥M`.  `M = H ⊔ (U ⊔ W₁)` (`M_complement`, `derivedInG = H ⊔ U`) normalizes
+`H₀ ⊔ C` generator-class by generator-class: `M ≤ N(H₀)` (9.4) handles the `H₀` part throughout,
+while the `C` part splits — `U W₁ ≤ N(C)` *exactly* (`cSub_normalized_by_uW1`), and `H` normalizes
+`H₀C` because `⁅H, C⁆ ≤ H₀` (`commutator_cSub_H_le_H0`) lets `H₀` absorb the `H`-conjugates of `C`. -/
+theorem chiefFactor_H0supC_subgroupOf_normal [Finite G] {M : Subgroup G}
+    {data : TypesIIIIIIVSetup M} (chief : ChiefFactorData data) :
+    ((chief.H0 ⊔ cSub data chief).subgroupOf M).Normal := by
+  have hH0CleM : chief.H0 ⊔ cSub data chief ≤ M :=
+    (chiefFactor_H0supC_le_derived chief).trans (derivedInG_le_self M)
+  rw [Subgroup.normal_subgroupOf_iff_le_normalizer hH0CleM]
+  -- A subgroup that conjugates `K` into itself normalizes `K` (the reverse inclusion is `g⁻¹`).
+  have key : ∀ (K Hs : Subgroup G), (∀ g ∈ Hs, ConjAct.toConjAct g • K ≤ K) →
+      Hs ≤ Subgroup.normalizer (K : Set G) := by
+    intro K Hs hle g hg
+    rw [← Subgroup.conjAct_pointwise_smul_iff]
+    refine le_antisymm (hle g hg) ?_
+    have h1 : ConjAct.toConjAct g • (ConjAct.toConjAct g⁻¹ • K) ≤ ConjAct.toConjAct g • K :=
+      Subgroup.pointwise_smul_le_pointwise_smul_iff.mpr (hle g⁻¹ (inv_mem hg))
+    rwa [← mul_smul, ← map_mul, mul_inv_cancel, map_one, one_smul] at h1
+  -- `U W₁ ≤ N(H₀ ⊔ C)`: `U W₁ ≤ M ≤ N(H₀)` and `U W₁ ≤ N(C)` (`cSub_normalized_by_uW1`).
+  have hUW1 : data.typeP.U ⊔ data.typeP.W1
+      ≤ Subgroup.normalizer ((chief.H0 ⊔ cSub data chief : Subgroup G) : Set G) :=
+    le_trans (le_inf (le_trans (sup_le (U_le_M data) data.typeP.W1_le) chief.H0_normalized_by_M)
+      (cSub_normalized_by_uW1 data chief))
+      (Subgroup.normalizer_inf_normalizer_le_normalizer_sup chief.H0 (cSub data chief))
+  -- `H ≤ N(H₀ ⊔ C)`: `H ≤ N(H₀)` and `h C h⁻¹ ⊆ H₀ C` via `⁅H, C⁆ ≤ H₀`.
+  have hH : data.typeP.H ≤ Subgroup.normalizer ((chief.H0 ⊔ cSub data chief : Subgroup G) : Set G) := by
+    refine key _ _ (fun h hh => ?_)
+    rw [Subgroup.smul_sup]
+    refine sup_le ?_ ?_
+    · rw [Subgroup.conjAct_pointwise_smul_eq_self (chief.H0_normalized_by_M (H_le_M data hh))]
+      exact le_sup_left
+    · intro x hx
+      rw [Subgroup.mem_pointwise_smul_iff_inv_smul_mem] at hx
+      have hc₀ : (ConjAct.toConjAct h)⁻¹ • x ∈ cSub data chief := hx
+      have hH0mem : ⁅h, (ConjAct.toConjAct h)⁻¹ • x⁆ ∈ chief.H0 := by
+        have hcomm : ⁅h, (ConjAct.toConjAct h)⁻¹ • x⁆ ∈ ⁅data.typeP.H, cSub data chief⁆ :=
+          Subgroup.commutator_mem_commutator hh hc₀
+        rw [Subgroup.commutator_comm] at hcomm
+        exact commutator_cSub_H_le_H0 data chief hcomm
+      have hxeq : x = ⁅h, (ConjAct.toConjAct h)⁻¹ • x⁆ * ((ConjAct.toConjAct h)⁻¹ • x) := by
+        rw [commutatorElement_def]
+        simp only [ConjAct.smul_def, ConjAct.ofConjAct_inv, ConjAct.ofConjAct_toConjAct]
+        group
+      rw [hxeq]
+      exact mul_mem (Subgroup.mem_sup_left hH0mem) (Subgroup.mem_sup_right hc₀)
+  -- `M = H ⊔ (U ⊔ W₁)`.
+  have hM'eq : derivedInG M = data.typeP.H ⊔ data.typeP.U := by
+    rw [data.typeP.derivedInG_eq_fitting_sup_U, data.typeP.H_eq]
+  have hMW1 : derivedInG M ⊔ data.typeP.W1 = M := by
+    have hmap := congrArg (Subgroup.map M.subtype) data.typeP.M_complement.sup_eq_top
+    rwa [Subgroup.map_sup, Subgroup.subgroupOf_map_subtype, Subgroup.subgroupOf_map_subtype,
+      inf_of_le_left (derivedInG_le_self M), inf_of_le_left data.typeP.W1_le,
+      ← MonoidHom.range_eq_map, Subgroup.range_subtype] at hmap
+  have hMeq : M = data.typeP.H ⊔ (data.typeP.U ⊔ data.typeP.W1) := by
+    rw [← sup_assoc, ← hM'eq, hMW1]
+  exact hMeq.le.trans (sup_le hH hUW1)
+
 end
 
 /-- `derivedInG H = ⁅H, H⁆` (general): the image of `commutator ↥H` under the inclusion is the
