@@ -258,6 +258,30 @@ bijection → p-1 (B3b count inline)。core piece は出揃った — 残は §9
 injective (distinct χ₂ → distinct `Ind_K̄ (chiRestrict χ₂)`)。`chiRestrict_conjBy_eq` (L-inertia-stable) +
 `induce_injective_of_inertia_stable` + `chiRestrict_injective`。⟹ reducible induced **image** 数 = column 数。
 
+**✅✅✅ 2026-06-30 COMPLETE (commit 652fec2f): §9↔§6 bijection 完成 — (9.9.b)/(9.8.b) reducible
+count 実証明・axiom-clean**: `reducible_count_sOf_H0` (S11、`[propext,Classical.choice,Quot.sound]`)
+が `{φ∈𝒮(H₀)|¬irr}.ncard = p-1` を §9↔§6 全単射で証明、**caseA conjunct 1 + caseB conjunct 2 両方に
+wire 済**。下記「完全実行レシピ」を全て landed:
+- **Φ-identity** = commute `induce_compHom_subgroupMap_mk'` + transport `induce_compHom_subgroupCongr`
+  (`g = subgroupCongr(K_eq.symm)∘subgroupMap`)。**全 instance を 1 つの `letI`-transparent scope に
+  hoist** して Fintype/Invertible diamond 解消 (`induceHU` unfold は `letI` 透過性が鍵; `haveI` は
+  opaque で rfl 不能)。
+- **image 等式** = `exists_compHom_eq_of_subset_characterKernel` (inflation 全射) +
+  `subset_characterKernel_compHom_iff` (kernel 対応) + `isIrreducibleCharacter_compHom_mk'_iff` (reducibility)。
+- **InjOn** = `induce_injective_on_reducible` + `compHom_injective_of_surjective`。
+- **W̄₂⊆H̄** (`H̄=hInHu.map g`) = `data.W2≤data.H` の element chase。
+- **ncard chain** = `Set.InjOn.ncard_image` + `Nat.card_coe_set_eq` + §6 count + `chiefFactorQuotient_card_W2_eq_p`。
+- **refactor**: `induce_compHom_subgroupCongr` を FeitThompson→InducedCharacter に上流移動 (S11 から
+  cite 可に)、explicit `Invertible` binder + `subst;congr 1;Subsingleton.elim`。
+
+**残 §9 (別 conjunct、reducible count とは独立)**: (9.9.b) degree=qu + membership 𝒮(H₀C) (caseB
+conjunct 3) / (9.9.c) exceptional (caseB conjunct 4) / (9.8.b,c,d) (caseA conjunct 2,3,4) /
+(9.10) `exceptional_case_frobenius_realization`。これらは degree formula `induceHU_apply_one_eq_q_mul`
++ column linearity + certain-type 構造 (reducible count とは別経路)。
+
+---
+（以下、完成前の分析メモ — 履歴として保存）
+
 **🛑 残 = 単一 non-decomposable inline block (focused session 推奨)**: (9.9.b) conjunct 2 =
 `{φ∈chars.SOf chief.H0|¬irr}.ncard = p-1` (S11:4549) は **§9↔§6 ncard 全単射の 1 つの inline 証明**:
 合成写像 `χ̄ ↦ induceHU(inflate χ̄) = inflate_M(induce K̄ χ̄)` (commute) が §9 sOf-reducibles と §6 columns を

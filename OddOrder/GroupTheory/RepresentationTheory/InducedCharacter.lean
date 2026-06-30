@@ -846,4 +846,18 @@ end InduceVirtualCharacters
 
 end ClassFunction
 
+/-- **`Ind` is invariant under transporting the source subgroup along an equality** (the cd-grid /
+§9↔§6 transport primitive).  For `A = B` (subgroups of a finite group `K`), inducing the
+`MulEquiv.subgroupCongr`-pullback of `ψ : ClassFunction ↥B` from `A` equals inducing `ψ` from `B`.
+`subst` collapses `subgroupCongr rfl` to the identity (`compHom id ψ = ψ`). -/
+theorem induce_compHom_subgroupCongr {K : Type*} [Group K] [Fintype K]
+    {A B : Subgroup K} (hAB : A = B)
+    [Invertible (Nat.card ↥A : ℂ)] [Invertible (Nat.card ↥B : ℂ)]
+    (ψ : ClassFunction ↥B ℂ) :
+    ClassFunction.induce A (ClassFunction.compHom (MulEquiv.subgroupCongr hAB).toMonoidHom ψ)
+      = ClassFunction.induce B ψ := by
+  subst hAB
+  congr 1
+  exact Subsingleton.elim _ _
+
 end OddOrder.RepresentationTheory

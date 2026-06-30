@@ -6505,7 +6505,7 @@ formula together with the prime computation `coprimeFrobeniusAction_card_eq_prim
 -- (13.1.e) `mu_definition` identity `Ind_W^S(ω_{ij} − ω_{0j}) = δ_j(μ_{ij} − μ_{0j})`, read off the
 -- `certainTypeS` certain-type machinery (`chiColumn`/`columnFamily`) via the `tpW_subgroupOf_eq`
 -- W-identification + the (4.3.b)/(1.4) bridge `S06.induce_chiColumn_diff_mu_diff`.  Both axiom-clean.
-#assert_only_allowed_axioms OddOrder.induce_compHom_subgroupCongr
+#assert_only_allowed_axioms OddOrder.RepresentationTheory.induce_compHom_subgroupCongr
 #assert_only_allowed_axioms OddOrder.Section16CharacterData.tpW_subgroupOf_eq
 #assert_only_allowed_axioms OddOrder.Section16CharacterData.muS_definition
 -- S/T-shared-`ω` symmetry transport infrastructure (toward the `nu_definition` field, T-side).
