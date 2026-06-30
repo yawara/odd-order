@@ -321,4 +321,34 @@ theorem induce_family_orthogonal (K : Subgroup L) [K.Normal] [Fintype ↥K] [Inv
         (ClassFunction.induce K (θ b : ClassFunction ↥K ℂ)) = 0 :=
   fun a b hab => inner_induce_eq_zero_of_not_conj (θ a) (θ b) (hnc a b hab)
 
+/-- **The difference `ψ_i = ζ_i − d_i ζ_0` is supported on `K^#`** (Peterfalvi (7.6)/(7.7.a)
+hypothesis).  With `ζ = Ind_K^L θ` and the degree relation `ζ_i(1) = d_i ζ_0(1)`, the difference
+`Ind θ − d • Ind θ₀` vanishes off `K` (induction from the normal `K` is `K`-supported) and at `1`
+(degree relation), so its support lies in `K^# = K \ {1}` — the `psi_support` hypothesis of
+`chiRho_decomp_proof`. -/
+theorem induce_diff_support {K : Subgroup L} [hK : K.Normal] [Fintype ↥K]
+    [Invertible (Nat.card ↥K : ℂ)] (θ θ₀ : IrreducibleCharacter ↥K) (d : ℂ)
+    (hd : ClassFunction.induce K (θ : ClassFunction ↥K ℂ) (1 : L)
+        = d * ClassFunction.induce K (θ₀ : ClassFunction ↥K ℂ) (1 : L)) :
+    (ClassFunction.induce K (θ : ClassFunction ↥K ℂ)
+        - d • ClassFunction.induce K (θ₀ : ClassFunction ↥K ℂ)).support ⊆ (K : Set L) \ {1} := by
+  have hvanish : ∀ φ : ClassFunction ↥K ℂ, ∀ x : L, x ∉ K → ClassFunction.induce K φ x = 0 := by
+    intro φ x hxK
+    have hconj : x ∉ ClassFunction.conjugatesInto K := by
+      rw [ClassFunction.mem_conjugatesInto]
+      rintro ⟨y, hy⟩
+      have h := hK.conj_mem (y⁻¹ * x * y) hy y
+      have he : y * (y⁻¹ * x * y) * y⁻¹ = x := by group
+      exact hxK (he ▸ h)
+    rw [ClassFunction.induce_apply, ← ClassFunction.induceSum_apply,
+      ClassFunction.induceSum_eq_zero_of_not_conjugatesInto φ hconj, mul_zero]
+  intro x hx
+  rw [ClassFunction.mem_support, ClassFunction.sub_apply, ClassFunction.smul_apply] at hx
+  refine ⟨?_, ?_⟩
+  · by_contra hxK
+    exact hx (by rw [hvanish _ x hxK, hvanish _ x hxK, mul_zero, sub_zero])
+  · intro hx1
+    rw [Set.mem_singleton_iff] at hx1
+    exact hx (by rw [hx1, hd, sub_self])
+
 end OddOrder.Peterfalvi.S09.Cert
