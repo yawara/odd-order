@@ -15,6 +15,7 @@ import OddOrder.GroupTheory.RepresentationTheory.InducedCharacter
 namespace OddOrder.Peterfalvi.S09.Cert
 
 open OddOrder.RepresentationTheory
+open scoped Classical
 
 variable {L : Type*} [Group L] [Fintype L]
 
@@ -120,5 +121,32 @@ theorem eq_zero_of_mem_span_orthogonal [Invertible (Nat.card L : ℂ)]
     | add x y _ _ ihx ihy => rw [ClassFunction.inner_add_left, ihx, ihy, add_zero]
     | smul c x _ ih => rw [ClassFunction.inner_smul_left, ih, mul_zero]
   exact inner_self_eq_zero (key η hη)
+
+/-- **The supported projection** `η ↦ η · 𝟙_A` of a class function onto `CF(L, A)`.  When `A` is a
+conjugation-invariant set, the pointwise product with the indicator of `A` is again a class
+function (the indicator and `η` are both conjugation-invariant).  This is the projection used in
+Peterfalvi's (7.7.a) basis argument to compare `χ^ρ` (already supported on `A`) with the candidate
+linear combination `Σ c̄_i/‖ζ_i‖² ζ_i` (whose `A`-part is what (7.7.a) computes). -/
+noncomputable def supportedProj (A : Set L) (hA : ∀ g h : L, h * g * h⁻¹ ∈ A ↔ g ∈ A)
+    (η : ClassFunction L ℂ) : ClassFunction L ℂ :=
+  ⟨fun x => if x ∈ A then η x else 0, fun g h => by
+    by_cases hg : g ∈ A
+    · simp only [if_pos hg, if_pos ((hA g h).mpr hg), η.conj_eq g h]
+    · simp only [if_neg hg, if_neg (fun hc => hg ((hA g h).mp hc))]⟩
+
+@[simp] theorem supportedProj_apply (A : Set L) (hA : ∀ g h : L, h * g * h⁻¹ ∈ A ↔ g ∈ A)
+    (η : ClassFunction L ℂ) (x : L) :
+    supportedProj A hA η x = if x ∈ A then η x else 0 := rfl
+
+/-- The supported projection is supported on `A` (lies in `CF(L,A)`). -/
+theorem supportedProj_mem_supported (A : Set L) (hA : ∀ g h : L, h * g * h⁻¹ ∈ A ↔ g ∈ A)
+    (η : ClassFunction L ℂ) :
+    supportedProj A hA η ∈ ClassFunction.supportedSubmodule A := by
+  rw [ClassFunction.mem_supportedSubmodule]
+  intro x hx
+  by_contra hxA
+  apply hx
+  show supportedProj A hA η x = 0
+  simp only [supportedProj_apply, if_neg hxA]
 
 end OddOrder.Peterfalvi.S09.Cert
