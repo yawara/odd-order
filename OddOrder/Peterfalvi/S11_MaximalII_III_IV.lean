@@ -1701,6 +1701,47 @@ theorem cSub_subgroupOf_U_normal (data : TypesIIIIIIVSetup M) (chief : ChiefFact
   rw [heq]
   exact (MonoidHom.normal_ker _).map e.toMonoidHom e.surjective
 
+/-- **`U W₁ ≤ N_G(C)`** (the `W₁`-half of the `H₀C ◁ M` normality, issue 1012): the `U W₁`-action on
+the chief factor `H̄ = ↥H ⧸ N` is defined on *all* of `U ⊔ W₁` (`quotientMulAutHom`, built from
+`typeP_conjAction : U ⊔ W₁ → MulAut ↥H`), so `C = C_U(H̄)` realises inside `L = ↥(U ⊔ W₁)` as the
+intersection `U' ⊓ ker(quotientMulAutHom)` of two `L`-normal subgroups (`U' = U.subgroupOf L` normal
+by the Frobenius structure `typeP_uW1_frobenius`, the action kernel normal as a kernel).  A normal
+subgroup of `L` is normalized by all of `L = ↑(U ⊔ W₁)` once pushed forward along `L.subtype`
+(`le_normalizer_map`, `normalizer_eq_top`).  Unlike the `H`-conjugation (which only gives
+`[C, H] ≤ H₀`, i.e. `H ≤ N(H₀C)` not `H ≤ N(C)`), `W₁` normalizes `C` *exactly*. -/
+theorem cSub_normalized_by_uW1 [Finite G] (data : TypesIIIIIIVSetup M)
+    (chief : ChiefFactorData data) :
+    data.typeP.U ⊔ data.typeP.W1 ≤ Subgroup.normalizer (cSub data chief : Set G) := by
+  have hU : data.typeP.U ≠ ⊥ := data.nontrivial.1
+  haveI hUnorm : (data.typeP.U.subgroupOf (data.typeP.U ⊔ data.typeP.W1)).Normal :=
+    (typeP_uW1_frobenius data.typeP hU).isNormal
+  haveI hKnorm : (quotientMulAutHom chief.N_aInvariant).ker.Normal := MonoidHom.normal_ker _
+  haveI hInfNorm : ((data.typeP.U.subgroupOf (data.typeP.U ⊔ data.typeP.W1))
+      ⊓ (quotientMulAutHom chief.N_aInvariant).ker).Normal :=
+    Subgroup.normal_inf_normal _ _
+  -- `C` realised in `L = ↥(U ⊔ W₁)` is `U' ⊓ ker(quotientMulAutHom)`.
+  have hinner : (uActionHom data chief).ker.map
+        (data.typeP.U.subgroupOf (data.typeP.U ⊔ data.typeP.W1)).subtype
+      = (data.typeP.U.subgroupOf (data.typeP.U ⊔ data.typeP.W1))
+          ⊓ (quotientMulAutHom chief.N_aInvariant).ker := by
+    rw [show (uActionHom data chief).ker
+          = (quotientMulAutHom chief.N_aInvariant).ker.comap
+              (data.typeP.U.subgroupOf (data.typeP.U ⊔ data.typeP.W1)).subtype from
+        (MonoidHom.comap_ker _ _).symm,
+      Subgroup.map_comap_eq, Subgroup.range_subtype]
+  have hcSub : cSub data chief
+      = ((data.typeP.U.subgroupOf (data.typeP.U ⊔ data.typeP.W1))
+            ⊓ (quotientMulAutHom chief.N_aInvariant).ker).map
+          (data.typeP.U ⊔ data.typeP.W1).subtype := by
+    unfold cSub
+    rw [hinner]
+  rw [hcSub]
+  have h1 := Subgroup.le_normalizer_map
+    (H := (data.typeP.U.subgroupOf (data.typeP.U ⊔ data.typeP.W1))
+      ⊓ (quotientMulAutHom chief.N_aInvariant).ker)
+    (data.typeP.U ⊔ data.typeP.W1).subtype
+  rwa [Subgroup.normalizer_eq_top, ← MonoidHom.range_eq_map, Subgroup.range_subtype] at h1
+
 /-! ### (9.9.a) realization: `HC ◁ HU` (the inertia subgroup is normal)
 
 For the (9.9.a) Clifford degree `χ(1) = u` we induce from the inertia subgroup `HC` of a chief-factor
