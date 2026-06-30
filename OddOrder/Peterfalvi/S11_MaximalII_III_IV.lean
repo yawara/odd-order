@@ -6113,5 +6113,90 @@ theorem hcHom_inclusion [Finite G] {M : Subgroup G}
   rw [MulEquiv.trans_apply, MulEquiv.symm_apply_apply]
   exact QuotientGroup.congr_mk _ chief.N (hInHuEquivH data) _ h
 
+/-- **`ψ|_hInHu = θ₀`** (pointwise): on the inclusion of `h ∈ hInHu`, the `HC`-linear character
+`ψ = hcPsi θ` equals the seed's inflation `θ₀ = compHom hInHuEquivH (compHom mk'_N (linearIrr θ))`.
+Both equal `(θ ((mk'_N) (hInHuEquivH h)) : ℂ)` via `hcHom_inclusion`.  This is the restriction
+identity feeding the restriction-inertia `inertia(ψ) ⊆ inertia(θ₀) = HC`. -/
+theorem hcPsi_apply_inclusion [Finite G] {M : Subgroup G}
+    {data : TypesIIIIIIVSetup M} (chief : ChiefFactorData data)
+    (θ : (↥data.H ⧸ chief.N) →* ℂˣ) (h : ↥(hInHu data)) :
+    (hcPsi chief θ : ClassFunction
+        ↥(hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf (huSub data)) ℂ)
+      (Subgroup.inclusion le_sup_left h)
+      = (ClassFunction.compHom (hInHuEquivH data).toMonoidHom
+          (ClassFunction.compHom (QuotientGroup.mk' chief.N)
+            (linearIrreducibleCharacter θ : ClassFunction (↥data.H ⧸ chief.N) ℂ)))
+        h := by
+  simp only [hcPsi, linearIrreducibleCharacter_apply, MonoidHom.comp_apply,
+    ClassFunction.compHom_apply, MulEquiv.coe_toMonoidHom, hcHom_inclusion]
+
+/-- **Restriction-inertia `inertia(ψ) ≤ inertia(θ₀)`**: an element `g` fixing the `HC`-character `ψ`
+also fixes its restriction `θ₀ = ψ|_hInHu` (via `hcPsi_apply_inclusion`).  Pointwise `conjBy`
+argument: `conjBy g θ₀ (h) = θ₀⟨g h g⁻¹⟩ = ψ(incl⟨g h g⁻¹⟩) = ψ⟨g (incl h) g⁻¹⟩ = (conjBy g ψ)(incl h)
+= ψ(incl h) = θ₀(h)`.  Combined with `subgroup_le_inertia` and the seed `inertia(θ₀) = HC`, gives
+`inertia(ψ) = HC`. -/
+theorem hcPsi_inertia_le [Finite G] {M : Subgroup G}
+    {data : TypesIIIIIIVSetup M} (chief : ChiefFactorData data)
+    (θ : (↥data.H ⧸ chief.N) →* ℂˣ)
+    [(hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf (huSub data)).Normal] :
+    ClassFunction.inertia (hcPsi chief θ : ClassFunction
+        ↥(hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf (huSub data)) ℂ)
+      ≤ ClassFunction.inertia (ClassFunction.compHom (hInHuEquivH data).toMonoidHom
+          (ClassFunction.compHom (QuotientGroup.mk' chief.N)
+            (linearIrreducibleCharacter θ : ClassFunction (↥data.H ⧸ chief.N) ℂ))) := by
+  haveI := hInHu_normal data
+  intro g hg
+  rw [ClassFunction.mem_inertia] at hg ⊢
+  ext h
+  have key : (ClassFunction.conjBy g (hcPsi chief θ : ClassFunction ↥(hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf (huSub data)) ℂ))
+      (Subgroup.inclusion le_sup_left h)
+      = (hcPsi chief θ : ClassFunction ↥(hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf (huSub data)) ℂ) (Subgroup.inclusion le_sup_left h) := by rw [hg]
+  rw [ClassFunction.conjBy_apply] at key ⊢
+  rw [← hcPsi_apply_inclusion, ← hcPsi_apply_inclusion, ← key]
+  congr 1
+
+/-- **`inertia(ψ) = HC`**: the inertia of the `HC`-linear character `ψ` in `HU` is exactly `HC`.
+`le_antisymm` of `hcPsi_inertia_le` (`inertia(ψ) ≤ inertia(θ₀) = HC`, via the seed `hθ₀`) and
+`subgroup_le_inertia` (`HC ≤ inertia(ψ)`).  This is the `inertia = H` hypothesis of
+`isIrreducibleCharacter_induce_of_inertia_eq`, making `Ind_{HC}^{HU} ψ` irreducible of degree `u`. -/
+theorem hcPsi_inertia_eq_hc [Finite G] {M : Subgroup G}
+    {data : TypesIIIIIIVSetup M} (chief : ChiefFactorData data)
+    (θ : (↥data.H ⧸ chief.N) →* ℂˣ)
+    [(hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf (huSub data)).Normal]
+    (hθ₀ : ClassFunction.inertia (ClassFunction.compHom (hInHuEquivH data).toMonoidHom
+        (ClassFunction.compHom (QuotientGroup.mk' chief.N)
+          (linearIrreducibleCharacter θ : ClassFunction (↥data.H ⧸ chief.N) ℂ)))
+        = hInHu data ⊔ cInHu data chief) :
+    ClassFunction.inertia (hcPsi chief θ : ClassFunction
+        ↥(hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf (huSub data)) ℂ)
+      = hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf (huSub data) := by
+  apply le_antisymm ?_ (ClassFunction.subgroup_le_inertia _)
+  refine le_trans (hcPsi_inertia_le chief θ) ?_
+  rw [hθ₀]
+  exact (hInHu_sup_realizedH0supC chief).ge
+
+/-- **`ζ = Ind_{HC}^{HU}(ψ)` is irreducible** (degree `u`): direct from
+`isIrreducibleCharacter_induce_of_inertia_eq` and `inertia(ψ) = HC` (`hcPsi_inertia_eq_hc`).  This is
+the degree-`u` irreducible character of `𝒳(H₀C)` over `θ₀` in the (9.8.c) construction. -/
+theorem hcZeta_irreducible [Finite G] {M : Subgroup G}
+    {data : TypesIIIIIIVSetup M} (chief : ChiefFactorData data)
+    (θ : (↥data.H ⧸ chief.N) →* ℂˣ)
+    [Fintype ↥(huSub data)]
+    [Fintype ↥(hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf (huSub data))]
+    [Invertible (Nat.card ↥(huSub data) : ℂ)]
+    [Invertible (Nat.card ↥(hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf
+      (huSub data)) : ℂ)]
+    [(hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf (huSub data)).Normal]
+    (hθ₀ : ClassFunction.inertia (ClassFunction.compHom (hInHuEquivH data).toMonoidHom
+        (ClassFunction.compHom (QuotientGroup.mk' chief.N)
+          (linearIrreducibleCharacter θ : ClassFunction (↥data.H ⧸ chief.N) ℂ)))
+        = hInHu data ⊔ cInHu data chief) :
+    IsIrreducibleCharacter (ClassFunction.induce
+      (hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf (huSub data))
+      (hcPsi chief θ : ClassFunction
+        ↥(hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf (huSub data)) ℂ)) :=
+  OddOrder.RepresentationTheory.isIrreducibleCharacter_induce_of_inertia_eq (hcPsi chief θ)
+    (hcPsi_inertia_eq_hc chief θ hθ₀)
+
 end OddOrder.Peterfalvi.S11
 
