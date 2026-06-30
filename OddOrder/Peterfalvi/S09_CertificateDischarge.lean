@@ -920,16 +920,44 @@ theorem inner_tau_supported_constOne {G : Type*} [Group G] [Fintype G] {A : Set 
     rwa [OddOrder.Peterfalvi.S04.mem_supportInSubgroup] at h
   rw [H71.chiRhoCF_apply, H71.chiRho_constOne, if_pos hgA, Hypothesis71.constOne_apply]
 
+/-- **Peterfalvi (7.8.a), `S^ν ⊥ 1_G`, generic family form.**  Abstracted over an arbitrary family
+`ζ : Fin (n+1) → CF(L)` (not necessarily induced), with the coherence agreement
+`(ζ_i − d_i ζ_0)^τ = ζ_i^ν − d_i ζ_0^ν` (`hagree`), the distinguished image orthogonality
+`⟨ζ_0^ν, 1_G⟩ = 0` (`hzeta0nu`), and the source-side fact `⟨ζ_i, 1_L⟩ = 0` for `i ≠ ind1H`
+(`hzeta_orth_one`, true for nonprincipal induced characters), every `ζ_i^ν` (`i ≠ ind1H`) is
+orthogonal to `1_G`.  This is the family-agnostic core; the `induce`-specific
+`betaDecomp_orth_one` and the abstract-`Hypothesis78`-level constructor both instantiate it. -/
+theorem betaDecomp_orth_one_gen {G : Type*} [Group G] [Fintype G] {A : Set G} {L : Subgroup G}
+    [Fintype L] [Invertible (Nat.card L : ℂ)] [Invertible (Nat.card G : ℂ)]
+    (H71 : Hypothesis71 G A L) {n : ℕ} (ζ : Fin (n + 1) → ClassFunction ↥L ℂ) (d : Fin (n + 1) → ℂ)
+    (psi_support : ∀ i, (ζ i - d i • ζ 0).support ⊆ OddOrder.Peterfalvi.S04.supportInSubgroup A L)
+    (ind1H : Fin (n + 1)) (hind1H : ind1H ≠ 0)
+    (ν : ClassFunction ↥L ℂ →ₗ[ℤ] ClassFunction G ℂ)
+    (hagree : ∀ i : Fin (n + 1), i ≠ 0 → i ≠ ind1H →
+      H71.τ ⟨ζ i - d i • ζ 0, psi_support i⟩ = ν (ζ i) - d i • ν (ζ 0))
+    (hzeta0nu : ClassFunction.inner (ν (ζ 0)) (Hypothesis71.constOne G) = 0)
+    (hzeta_orth_one : ∀ i : Fin (n + 1), i ≠ ind1H →
+      ClassFunction.inner (ζ i) (Hypothesis71.constOne L) = 0) :
+    ∀ i : Fin (n + 1), i ≠ ind1H →
+      ClassFunction.inner (ν (ζ i)) (Hypothesis71.constOne G) = 0 := by
+  intro i hi
+  by_cases hi0 : i = 0
+  · rw [hi0]; exact hzeta0nu
+  · have hrearrange : ν (ζ i)
+        = H71.τ ⟨ζ i - d i • ζ 0, psi_support i⟩ + d i • ν (ζ 0) := by
+      rw [hagree i hi0 hi]; abel
+    rw [hrearrange, ClassFunction.inner_add_left, ClassFunction.inner_smul_left, hzeta0nu,
+      mul_zero, add_zero, inner_tau_supported_constOne]
+    show ClassFunction.inner (ζ i - d i • ζ 0) (Hypothesis71.constOne L) = 0
+    rw [ClassFunction.inner_sub_left, ClassFunction.inner_smul_left,
+      hzeta_orth_one i hi, hzeta_orth_one 0 (Ne.symm hind1H), mul_zero, sub_zero]
+
 /-- **Peterfalvi (7.8.a), `S^ν ⊥ 1_G`** (the `orth_one` field of `BetaDecomp`), carrier-conditional
 on the coherence of `ν`.  With the distinguished `ζ = Ind_K^L θ_0` at index `0`, the principal
 `Ind_K^L 1_K` at `ind1H ≠ 0`, the coherence agreement `(ζ_i − d_i ζ_0)^τ = ζ_i^ν − d_i ζ_0^ν`
 (`hagree`), and the single base fact `⟨ζ_0^ν, 1_G⟩ = 0` (`hzeta0nu`, the distinguished image is
-nonprincipal), every `ζ_i^ν` (`i ≠ ind1H`) is orthogonal to `1_G`:
-
-* `i = 0` is `hzeta0nu`;
-* for `i ≠ 0, ind1H`, `⟨ζ_i^ν, 1_G⟩ = ⟨(ζ_i − d_i ζ_0)^τ, 1_G⟩ + d_i ⟨ζ_0^ν, 1_G⟩` (`hagree`), the
-  first summand is `⟨ζ_i − d_i ζ_0, 1_L⟩ = 0` (`inner_tau_supported_constOne` +
-  `inner_induce_constOne_eq_zero`, as `θ_i, θ_0 ≠ 1_K`), the second is `0` (`hzeta0nu`). -/
+nonprincipal), every `ζ_i^ν` (`i ≠ ind1H`) is orthogonal to `1_G`.  The `induce`-specific
+`⟨Ind θ_i, 1_L⟩ = 0` (`θ_i ≠ 1_K`) source-orthogonality is supplied to `betaDecomp_orth_one_gen`. -/
 theorem betaDecomp_orth_one {G : Type*} [Group G] [Fintype G] {A : Set G} {L : Subgroup G}
     [Fintype L] [Invertible (Nat.card L : ℂ)] [Invertible (Nat.card G : ℂ)]
     (H71 : Hypothesis71 G A L) (K : Subgroup ↥L) [K.Normal] [Fintype ↥K]
@@ -959,22 +987,9 @@ theorem betaDecomp_orth_one {G : Type*} [Group G] [Fintype G] {A : Set G} {L : S
     show ClassFunction.induce K (θ j : ClassFunction ↥K ℂ)
       = ClassFunction.induce K (θ ind1H : ClassFunction ↥K ℂ)
     rw [hcontra, hzeta_ind1H]
-  intro i hi
-  by_cases hi0 : i = 0
-  · rw [hi0]; exact hzeta0nu
-  · have hrearrange : ν (ClassFunction.induce K (θ i : ClassFunction ↥K ℂ))
-        = H71.τ ⟨ClassFunction.induce K (θ i : ClassFunction ↥K ℂ)
-            - d i • ClassFunction.induce K (θ 0 : ClassFunction ↥K ℂ), psi_support i⟩
-          + d i • ν (ClassFunction.induce K (θ 0 : ClassFunction ↥K ℂ)) := by
-      rw [hagree i hi0 hi]; abel
-    rw [hrearrange, ClassFunction.inner_add_left, ClassFunction.inner_smul_left, hzeta0nu,
-      mul_zero, add_zero, inner_tau_supported_constOne]
-    show ClassFunction.inner (ClassFunction.induce K (θ i : ClassFunction ↥K ℂ)
-        - d i • ClassFunction.induce K (θ 0 : ClassFunction ↥K ℂ)) (Hypothesis71.constOne L) = 0
-    rw [ClassFunction.inner_sub_left, ClassFunction.inner_smul_left,
-      inner_induce_constOne_eq_zero K (θ i) (hne_triv i hi),
-      inner_induce_constOne_eq_zero K (θ 0) (hne_triv 0 (Ne.symm hind1H)),
-      mul_zero, sub_zero]
+  exact betaDecomp_orth_one_gen H71 (fun i => ClassFunction.induce K (θ i : ClassFunction ↥K ℂ))
+    d psi_support ind1H hind1H ν hagree hzeta0nu
+    (fun i hi => inner_induce_constOne_eq_zero K (θ i) (hne_triv i hi))
 
 /-- **The family-difference inner product** (Peterfalvi (7.8.a), `a_φ` computation).  For pairwise
 distinct family members, `⟨ζ_{ind1H} − ζ_0, ζ_i − d_i ζ_0⟩ = star(d_i) ‖ζ_0‖²` (`i ≠ 0, ind1H`,
@@ -1185,12 +1200,40 @@ theorem betaDecomp_gamma_orth_nu {G : Type*} [Group G] [Fintype G] {A : Set G} {
       rw [hd j, star_div₀, induce_apply_one_star, induce_apply_one_star]
     rw [hstar]; ring
 
+/-- **Peterfalvi (7.8.a), `Γ ⊥ 1_G`, generic family form.**  Abstracted over an arbitrary family
+`ζ` and taking the family-agnostic `⟨β, 1_G⟩ = 1` (`hβ1`).  For the residual
+`Γ = β − (1_G − ζ_0^ν + a · W)`, `⟨Γ, 1_G⟩ = ⟨β,1_G⟩ − ⟨1_G,1_G⟩ + ⟨ζ_0^ν,1_G⟩ − ā⟨W,1_G⟩
+= 1 − 1 + 0 − 0 = 0` (`⟨ζ_0^ν,1_G⟩ = 0` and `⟨W,1_G⟩ = 0` from `horth1`).  Instantiated by the
+`induce`-specific `betaDecomp_gamma_orth_one` (which computes `⟨β,1_G⟩ = 1`) and the
+`Hypothesis78`-level constructor. -/
+theorem betaDecomp_gamma_orth_one_gen {G : Type*} [Group G] [Fintype G]
+    {L : Subgroup G} [Fintype L] [Invertible (Nat.card L : ℂ)] [Invertible (Nat.card G : ℂ)]
+    {n : ℕ} (ζ : Fin (n + 1) → ClassFunction ↥L ℂ)
+    {ind1H : Fin (n + 1)} (hind0 : ind1H ≠ 0)
+    (ν : ClassFunction ↥L ℂ →ₗ[ℤ] ClassFunction G ℂ)
+    (horth1 : ∀ i : Fin (n + 1), i ≠ ind1H →
+      ClassFunction.inner (ν (ζ i)) (Hypothesis71.constOne G) = 0)
+    (β : ClassFunction G ℂ) (hβ1 : ClassFunction.inner β (Hypothesis71.constOne G) = 1)
+    (a : ℂ) (W : ClassFunction G ℂ)
+    (hW : W = ∑ i ∈ Finset.univ.erase ind1H,
+      (ζ i (1 : ↥L) / (ζ 0 (1 : ↥L) * ClassFunction.inner (ζ i) (ζ i)) : ℂ) • ν (ζ i)) :
+    ClassFunction.inner (β - (Hypothesis71.constOne G - ν (ζ 0) + a • W))
+      (Hypothesis71.constOne G) = 0 := by
+  have hW0 : ClassFunction.inner W (Hypothesis71.constOne G) = 0 := by
+    rw [hW, inner_sum_left]
+    refine Finset.sum_eq_zero fun i hi => ?_
+    rw [ClassFunction.inner_smul_left, horth1 i (Finset.mem_erase.mp hi).1, mul_zero]
+  rw [ClassFunction.inner_sub_left, ClassFunction.inner_add_left, ClassFunction.inner_sub_left,
+    ClassFunction.inner_smul_left, hβ1, hW0, horth1 0 (Ne.symm hind0),
+    Hypothesis71.constOne_inner_self_eq_one]
+  ring
+
 /-- **Peterfalvi (7.8.a), `Γ ⊥ 1_G`** (the `Gamma_orth_one` field of `BetaDecomp`).  For the residual
 `Γ = β − (1_G − ζ_0^ν + a · W)`, `⟨Γ, 1_G⟩ = ⟨β,1_G⟩ − ⟨1_G,1_G⟩ + ⟨ζ_0^ν,1_G⟩ − a⟨W,1_G⟩`, where
 `⟨β,1_G⟩ = ⟨Ind 1_K − ζ_0, 1_L⟩ = 1 − 0 = 1` (`inner_tau_supported_constOne` +
 `inner_induce_trivialChar_constOne_eq_one`/`inner_induce_constOne_eq_zero`), `⟨1_G,1_G⟩ = 1`,
 `⟨ζ_0^ν,1_G⟩ = 0` (`orth_one`), and `⟨W,1_G⟩ = 0` (`orth_one` for each summand) — giving
-`1 − 1 + 0 − 0 = 0`. -/
+`1 − 1 + 0 − 0 = 0`.  The `⟨β,1_G⟩ = 1` computation is fed to `betaDecomp_gamma_orth_one_gen`. -/
 theorem betaDecomp_gamma_orth_one {G : Type*} [Group G] [Fintype G] {A : Set G} {L : Subgroup G}
     [Fintype L] [Invertible (Nat.card L : ℂ)] [Invertible (Nat.card G : ℂ)]
     (H71 : Hypothesis71 G A L)
@@ -1231,14 +1274,8 @@ theorem betaDecomp_gamma_orth_one {G : Type*} [Group G] [Fintype G] {A : Set G} 
         = ClassFunction.induce K (trivialIrreducibleCharacter ↥K : ClassFunction ↥K ℂ) from by
         rw [hzeta_ind1H],
       inner_induce_trivialChar_constOne_eq_one, inner_induce_constOne_eq_zero K (θ 0) hθ0, sub_zero]
-  have hW0 : ClassFunction.inner W (Hypothesis71.constOne G) = 0 := by
-    rw [hW, inner_sum_left]
-    refine Finset.sum_eq_zero fun i hi => ?_
-    rw [ClassFunction.inner_smul_left, horth1 i (Finset.mem_erase.mp hi).1, mul_zero]
-  rw [ClassFunction.inner_sub_left, ClassFunction.inner_add_left, ClassFunction.inner_sub_left,
-    ClassFunction.inner_smul_left, hβ1, hW0, horth1 0 (Ne.symm hind0),
-    Hypothesis71.constOne_inner_self_eq_one]
-  ring
+  exact betaDecomp_gamma_orth_one_gen (fun i => ClassFunction.induce K (θ i : ClassFunction ↥K ℂ))
+    hind0 ν horth1 β hβ1 a W hW
 
 /-- **The (7.8.c) collapse of the (7.7.a) sum to a single term.**  If, in the `(7.7.a)`
 decomposition `χ^ρ(x) = ∑_{i ≥ 1} (c̄_i/‖ζ_i‖²) ζ_i(x)`, all coefficients `c_i` (`i ≥ 1`) vanish
