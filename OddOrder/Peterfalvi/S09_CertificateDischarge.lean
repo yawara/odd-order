@@ -2056,4 +2056,69 @@ theorem zetaNuRhoNormSq_ge_of_facts {G : Type*} [Group G] [Fintype G] {A : Set G
     (zetaNuRhoNormSq_eq_normQuad_of_facts H78 hBD hzd horth hc_ind1H hc_rest hd_real hP_real hd
       hN_ind1H hP_ind1H hGsum) hsmall
 
+/-- **Peterfalvi (7.8.a), the `BetaDecomp` constructor** (`Hypothesis78` level).  Assembles the full
+`(7.8.a)` decomposition `β = 1_G − ζ_0^ν + a · W + Γ` (with `Γ` the explicit residual) for an
+abstract `H78` from the `(7.8.a)` coherence / family facts, discharging all four `BetaDecomp` proof
+fields via the family-agnostic gen lemmas (`betaDecomp_orth_one_gen`, `betaDecomp_gamma_orth_nu_gen`,
+`betaDecomp_gamma_orth_one_gen`).  Because `H78` is abstract here (not a `hypothesis78OfDade`
+application), the field projections `H78.hyp76.zeta` / `H78.beta` / `H78.weightedNuSum` do not trip
+the whnf-wall.  The hypotheses (family orthogonality, coherence agreement `hagree`, source
+orthogonalities, `⟨β,1_G⟩ = 1`, `‖ζ_0‖² = 1`, the integer `a`) are all constructible from the Dade
+family; `a` is `exists_betaDecomp_a`. -/
+noncomputable def betaDecompOfFacts {G : Type*} [Group G] [Fintype G] {A : Set G} {L : Subgroup G}
+    [Fintype L] [Invertible (Nat.card L : ℂ)] [Invertible (Nat.card G : ℂ)]
+    (H78 : OddOrder.Peterfalvi.S09.Hypothesis78 G A L) (hzd : H78.zetaDistinct = 0)
+    (horth : ∀ i j : Fin (H78.hyp76.n + 1), i ≠ j →
+      ClassFunction.inner (H78.hyp76.zeta i) (H78.hyp76.zeta j) = 0)
+    (hN : ∀ j : Fin (H78.hyp76.n + 1),
+      ClassFunction.inner (H78.hyp76.zeta j) (H78.hyp76.zeta j) ≠ 0)
+    (hz0 : H78.hyp76.zeta 0 (1 : ↥L) ≠ 0)
+    (hP_real : ∀ i, star (H78.hyp76.zeta i (1 : ↥L)) = H78.hyp76.zeta i (1 : ↥L))
+    (hagree : ∀ i : Fin (H78.hyp76.n + 1), i ≠ 0 → i ≠ H78.ind1H →
+      H78.hyp76.hyp71.τ ⟨H78.hyp76.zeta i - H78.hyp76.d i • H78.hyp76.zeta 0,
+          H78.hyp76.psi_support i⟩
+        = H78.nu (H78.hyp76.zeta i) - H78.hyp76.d i • H78.nu (H78.hyp76.zeta 0))
+    (hzeta0nu : ClassFunction.inner (H78.nu (H78.hyp76.zeta 0)) (Hypothesis71.constOne G) = 0)
+    (hzeta_orth_one : ∀ i : Fin (H78.hyp76.n + 1), i ≠ H78.ind1H →
+      ClassFunction.inner (H78.hyp76.zeta i) (Hypothesis71.constOne L) = 0)
+    (hβ1 : ClassFunction.inner H78.beta (Hypothesis71.constOne G) = 1)
+    (hζ0norm : ClassFunction.inner (H78.hyp76.zeta 0) (H78.hyp76.zeta 0) = 1)
+    (a : ℤ) (ha : (a : ℂ) = ClassFunction.inner H78.beta (H78.nu (H78.hyp76.zeta 0)) + 1) :
+    H78.BetaDecomp := by
+  have hind0 : H78.ind1H ≠ 0 := fun h => H78.zetaDistinct_ne_ind1H (hzd.trans h.symm)
+  have hd : ∀ i, H78.hyp76.d i = H78.hyp76.zeta i (1 : ↥L) / H78.hyp76.zeta 0 (1 : ↥L) :=
+    fun i => by rw [eq_div_iff hz0]; exact (H78.hyp76.zeta_one_eq_d_mul i).symm
+  have diffβ : (H78.hyp76.zeta H78.ind1H - H78.hyp76.zeta 0).support ⊆
+      OddOrder.Peterfalvi.S04.supportInSubgroup A L := by
+    have h := H78.diff_support; rw [hzd] at h; exact h
+  have hβ : H78.beta
+      = H78.hyp76.hyp71.τ ⟨H78.hyp76.zeta H78.ind1H - H78.hyp76.zeta 0, diffβ⟩ := by
+    rw [H78.beta_def]; congr 1; apply Subtype.ext
+    show H78.hyp76.zeta H78.ind1H - H78.hyp76.zeta H78.zetaDistinct
+      = H78.hyp76.zeta H78.ind1H - H78.hyp76.zeta 0
+    rw [hzd]
+  have hW : H78.weightedNuSum = ∑ i ∈ Finset.univ.erase H78.ind1H,
+      (H78.hyp76.zeta i (1 : ↥L) /
+        (H78.hyp76.zeta 0 (1 : ↥L) * ClassFunction.inner (H78.hyp76.zeta i) (H78.hyp76.zeta i))
+        : ℂ) • H78.nu (H78.hyp76.zeta i) := by
+    unfold OddOrder.Peterfalvi.S09.Hypothesis78.weightedNuSum; rw [hzd]
+  have horth1 : ∀ i : Fin (H78.hyp76.n + 1), i ≠ H78.ind1H →
+      ClassFunction.inner (H78.nu (H78.hyp76.zeta i)) (Hypothesis71.constOne G) = 0 :=
+    betaDecomp_orth_one_gen H78.hyp76.hyp71 H78.hyp76.zeta H78.hyp76.d H78.hyp76.psi_support
+      H78.ind1H hind0 H78.nu hagree hzeta0nu hzeta_orth_one
+  exact
+    { orth_one := horth1
+      a := a
+      Gamma := H78.beta - (Hypothesis71.constOne G - H78.nu (H78.hyp76.zeta 0)
+        + (a : ℂ) • H78.weightedNuSum)
+      Gamma_orth_nu := fun i hi =>
+        betaDecomp_gamma_orth_nu_gen H78.hyp76.hyp71 H78.hyp76.isDadeIsometry H78.hyp76.zeta
+          horth hN hz0 hP_real H78.hyp76.d hd H78.hyp76.psi_support hind0 diffβ H78.nu
+          H78.nu_isometry (fun i hi0 hii => (hagree i hi0 hii).symm) horth1 hζ0norm H78.beta hβ
+          (a : ℂ) ha H78.weightedNuSum hW hi
+      Gamma_orth_one :=
+        betaDecomp_gamma_orth_one_gen H78.hyp76.zeta hind0 H78.nu horth1 H78.beta hβ1
+          (a : ℂ) H78.weightedNuSum hW
+      beta_eq := by rw [hzd]; abel }
+
 end OddOrder.Peterfalvi.S09.Cert
