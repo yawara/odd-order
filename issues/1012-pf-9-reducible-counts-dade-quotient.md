@@ -1052,3 +1052,23 @@ Coq oXtheta: u·|Xtheta|=(p-1)^q ⟹ |Xtheta|=(p-1)^q/u ≥ 1 (irreducible 存�
 - 出せれば explicit inflation hom (intricate) を完全回避。出せなければ explicit construction に戻る。
 
 seed (inertia heart) は両路線で不要になる可能性 (counting なら) だが、explicit fallback では中核入力。
+
+
+## conjunct c — counting 路線却下、explicit construction 確定 (2026-07-01)
+
+**counting 却下**: repo に 𝒮(H₀C)/𝒳(H₀C) の **total count 無し** (reducible count p-1 のみ)。
+total が無いと irreducible = total - reducible が出せない。Coq oXtheta (u·|Xtheta|=(p-1)^q) も
+Xtheta 構成依存。⟹ **explicit construction が必要** (確定、fallback でなく唯一路線)。
+
+**構成路線確定 (second isomorphism theorem)**: HC/H₀C ≅ H̄ を 2nd iso で構成:
+HC = hInHu·(realized H₀C) (H₀⊆hInHu, C⊆H₀C) ∧ hInHu∩(realized H₀C)=realized H₀ ⟹
+HC/H₀C ≅ hInHu/H₀ ≅ H̄ (hInHuEquivH 経由)。manual semidirect bookkeeping 不要。
+
+**multi-layer build (各 iteration で 1 layer)**:
+- L1: iso HC/H₀C≅H̄ (mathlib 2nd iso: QuotientGroup.quotient*Equiv系) + hom HC→H̄。
+- L2: ψ=linearIrr(θ̄∘hom) on HC、cInHu⊆ker、ψ|hInHu=θ₀。
+- L3: inertia(ψ)=HC (clifford_caseA_regular_inertia_hc + restriction-inertia)。
+- L4: χ=Ind_{HC}^{HU}(ψ) irr deg u (isIrreducibleCharacter_induce_of_inertia_eq + hcInHu_normal)。
+- L5: M-level I_M=HU (not-fixed) → induceHU(χ) irr deg qu (huSub_normal)。
+- L6: χ∈𝒳(H₀C) + induceHU∈𝒮(H₀C) → conjunct c (5166)。
+seed (inertia heart) は L3 の中核入力。
