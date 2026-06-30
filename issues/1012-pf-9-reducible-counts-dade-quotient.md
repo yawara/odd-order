@@ -291,8 +291,21 @@ conjunct 3) / (9.9.c) exceptional (caseB conjunct 4) / (9.8.b,c,d) (caseA conjun
   評価は **over-pessimistic だった** — cardinality が full construction を回避。
   - **残 = `reducible_count_sOf_H0C` (sorried)**: 𝒮(H₀C) の reducible count=p-1。`reducible_count_sOf_H0`
     の **PARALLEL** — `M/(H₀C)` certain-type hypothesis ((8.4.d) は M/H₀C でも成立、W̄₂'=W₂-image は
-    依然 order p ∵ W₂∩H₀C=W₂∩H₀, W₂≤H・C≤U が H で trivial 交差)。`chiefFactorQuotientHypothesis` +
-    bijection を N=H₀⊔C で再構築 (bounded parallel work、§6 shortcut 不要は確定したが H₀ 版と同形)。**次 target**。
+    依然 order p ∵ W₂∩H₀C=W₂∩H₀, W₂≤H・C≤U が H で trivial 交差)。
+    **2026-06-30 build plan (foundation 着手済)**:
+    - ✅ **`centralizer_W2bar_quotient` landed (commit dfc66c89)**: (8.4.d) centralizer crux を quotient
+      kernel N' で generic 化 (N'≤M' + Coprime|W₁||N'| が input、core は N'-independent
+      `chiefFactor_centralizer_inf_derived`)。`chiefFactor_centralizer_W2bar`=N'=H₀ instance。**最難 helper
+      を H₀C 用に reusable 化**。
+    - **残 foundation (各 generic 化 or H₀C instance)**: (a) Coprime|W₁||H₀C| (=Coprime|W₁||H₀|·|C|、
+      `chiefFactor_coprime_H0_W1`+`typeP_coprime_U_W1` で C⊆U)、(b) H₀C≤M'.subgroupOf (H₀⊆H⊆M'・C⊆U⊆M')、
+      (c) W₁⊓H₀C=⊥ (W₁⊓M'=⊥)、(d) W₂⊄H₀C (`chiefFactor_W2_not_le_H0`+W₂∩H₀C=W₂∩H₀)、
+      (e) |W̄₂'|=p (`chiefFactor_card_W2bar` generic、|W₂|/|W₂∩H₀C|=|W₂|/|W₂∩H₀|=p)。
+    - **次 step**: 上記 foundation で `chiefFactorQuotientHypothesis` を N'=H₀C へ instantiate
+      (generic 化 or 並行 def) → bijection (`reducible_count_sOf_H0` を generic 化 or 並行) → count=p-1。
+      bounded だが ~200 行 multi-iteration。§6 shortcut 不要は確定 (C̄ は §6 W-structure 外)。
+- **⚠ caseA は独自 degree lemma 要**: caseA_character_counts は caseB を scope に持たない ⟹
+  `caseB_degree_qu` cite 不可。(9.8.b) degree も caseA 版 chief-factor-constituent で別途。
 - **⚠ caseA は独自 degree lemma 要**: caseA_character_counts は caseB を scope に持たない ⟹
   `caseB_degree_qu` cite 不可。(9.8.b) degree も caseA 版 chief-factor-constituent で別途。
 - **(9.9.c)/(9.10)** = exceptional (C=⊥ ∧ u=(p^q-1)/(p-1) + Frobenius)。`quotientSemidirectFrobenius`
