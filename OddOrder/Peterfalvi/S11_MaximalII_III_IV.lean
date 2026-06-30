@@ -6539,5 +6539,34 @@ theorem hInHuConj_restrict_conjBy {M : Subgroup G} (data : TypesIIIIIIVSetup M) 
   ext h
   rfl
 
+/-- **Inner sum is invariant under `compHom` by a bijective endomorphism** (reindexing the sum by
+the induced permutation).  Mirrors `innerSum_conjBy_conjBy`. -/
+theorem innerSum_compHom_of_bijective {H : Type*} [Group H] [Fintype H]
+    (e : H →* H) (he : Function.Bijective e) (a b : ClassFunction H ℂ) :
+    ClassFunction.innerSum (ClassFunction.compHom e a) (ClassFunction.compHom e b)
+      = ClassFunction.innerSum a b := by
+  simpa [ClassFunction.innerSum, ClassFunction.compHom_apply] using
+    Fintype.sum_equiv (Equiv.ofBijective e he)
+      (fun h => a (e h) * star (b (e h))) (fun h => a h * star (b h)) (fun _ => rfl)
+
+/-- **Inner product is invariant under `compHom` by a bijective endomorphism.** -/
+theorem inner_compHom_of_bijective {H : Type*} [Group H] [Fintype H]
+    [Invertible (Nat.card H : ℂ)] (e : H →* H) (he : Function.Bijective e)
+    (a b : ClassFunction H ℂ) :
+    ClassFunction.inner (ClassFunction.compHom e a) (ClassFunction.compHom e b)
+      = ClassFunction.inner a b := by
+  simp [ClassFunction.inner, innerSum_compHom_of_bijective e he]
+
+/-- **`φ_m` is bijective** (inverse `φ_{m⁻¹}`), so `compHom φ_m` preserves inner products and
+irreducibility. -/
+theorem hInHuConj_bijective {M : Subgroup G} (data : TypesIIIIIIVSetup M) (m : ↥M) :
+    Function.Bijective (hInHuConj data m) := by
+  refine Function.bijective_iff_has_inverse.mpr ⟨hInHuConj data m⁻¹, ?_, ?_⟩ <;>
+  · intro h
+    apply Subtype.ext
+    apply Subtype.ext
+    simp only [hInHuConj_coe]
+    group
+
 end OddOrder.Peterfalvi.S11
 
