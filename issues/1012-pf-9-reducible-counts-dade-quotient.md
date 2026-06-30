@@ -772,3 +772,21 @@ necessary だが **sufficient でない**。degree conjunct (b/c) は **M-level*
 prime-TI (primeTIred) / §13 cyclic-TI と entangle。私の HU-inertia 機構 + regular θ̄ 構成は
 この上流の prerequisite として完備、残りは M-level W1-orbit ピース。caseB は U-irreducible ゆえ
 W1-orbit 自明 (全 θ̄ regular) で此処を回避; caseA 固有の追加。
+
+
+## conjunct c の最終的に sharp な構築 target — aperiodic tuple (2026-06-30)
+
+crux を最も具体的な形に: **W1 (order q, prime) は q 個の Hpart factors を q-cycle で transitive 置換**
+(W1_transitive_on_parts の実体)。dual で W1 は per-factor chars (ψ_i) を巡回 shift。
+- free W1-orbit char θ̄ = **aperiodic tuple** (ψ_1,…,ψ_q): 非自明 σ^k で固定 ⟺ 全 ψ_i 相等
+  (q-cycle ゆえ)。∴ **「全相等でない」⟹ trivial W1-stabilizer ⟹ I_M(χ)=HU**。
+- 存在: q≥3 (odd prime) かつ各 factor に p-1≥2 個の nontrivial char ⟹ not-all-equal tuple 存在。
+- downstream 完備: `huSub_normal` (HU◁M) ✅ + `isIrreducibleCharacter_induce_of_inertia_eq` ✅
+  ⟹ induceHU(χ) irreducible deg q·u。
+
+**唯一の残 prerequisite = W1-action de-opacify**: W1 が factors に q-cycle で作用する構造を (9.7)
+`typeP_Galois_Pn` (non-Galois 分解) から producer に threading + `W1_transitive_on_parts` 実体化。
+**次イテレーションの構築**: (1) producer に W1-permutation σ:Fin q≃Fin q (q-cycle) を露出、
+(2) 一般補題 `exists_aperiodic_regular_char` (exists_regular_char + not-all-equal で σ-stabilizer 自明)、
+(3) caseA instantiate → I_M=HU → induceHU irreducible deg qu → conjunct c。
+conjunct b も同じ W1-orbit (reducibles = 特定 W1-orbit 類) ゆえ此処共有。
