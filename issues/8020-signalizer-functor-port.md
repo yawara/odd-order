@@ -993,3 +993,46 @@ gate-2 TypeICovering blocker (`cover_subset_kernels` = type-F ⟹ R(x)=1 = **typ
 or σ-uniqueness 経由で。Coq `cent_cent_Msigma`/`def_uniq` 系を併読。あるいは (B) D(4) escaping 構造に着手。
 いずれも fresh 集中セッション級。§14 cover math (κ→Ẑ + 一般 cover ⊆ + Cor14.8/14.9 + Lem14.6) は完了済で
 honest FT 前進。
+
+## 🔴🔴 重大訂正 (lane d, 2026-06-30 /loop⁴⁷): gate-2 の reduction は **誤り** — 「type-F⟹τ2=∅ / type-F M_σ TI」は **偽の target**
+
+Coq BGsection14/16 + ported Lean を authoritative に精読し、**gate-2 (cover_subset_kernels) の従来 reduction が
+数学的に成立しないことを確定**。lane の従来 target (「type-F M_σ G-level TI」/loop⁴⁴-⁴⁶) も、本 /loop で一旦
+refine した「type-F⟹τ2=∅」も、**両方 dead end**。以下、確定事項 (高 confidence):
+
+1. **cover_subset_kernels ≠ BG Cor 14.9**: Cor 14.9 (mmd L4069-4078) が証明するのは **partition のみ**
+   (`G#=⊔𝒞_G(M̃_i)`)。Lean field `cover_subset_kernels` (`𝒞_G(M̃_i)⊆𝒞_G((M_i)_F#)`) は **strictly 強い**
+   別 statement で、`R(x)=1` (= C[x]≤M, no-escape for x∈M_σ#) を要する。
+
+2. **cover_subset_kernels は genuinely 必要・真 (overstatement では *ない*)**: consumer
+   `not_all_maximal_typeI` (S14_MaximalI:2787) は `cov.covers` (= 全 g∈G# が ある kernel (M_i)_F# に共役) を
+   line 2811 で使い `F.G0={1}` を出し `S09.not_trivial_G0` で矛盾 = (7.10)/(7.11) Frobenius-family argument。
+   ∴ FT spine が「all-type-I で全元が kernel に共役」を**実際に要求**。`covers` を partition+cardinality で
+   bypass する余地は **ない** (15.7(c) 型の overstatement では *なかった* — 確認済)。
+
+3. **🛑 `type-F ⟹ τ2=∅` は FALSE**: `exists_typeF_complement_cyclic_commutator` (BG **Lemma 14.11**,
+   S14:10108, **ported & proven**) は「type-F M (κ=∅) + complement E に Q⊄F(E) (= E 非 nilpotent) ⟹
+   K'=⁅⁅E,Q⁆,Q⁆ の全素数 ∈ τ2(M)、∴ **τ2(M)≠∅**」。⟹ type-F でも非 nilpotent complement なら τ2≠∅。
+   よって escape-impossibility (R(x)=1) を「type-F neighbor N ⟹ τ2(N)=∅ ⟹ x∉τ2(N)# 矛盾」で閉じる路線は
+   **無効**。FT_signalizer_context は escape で x∈τ2(N) を出すが、type-F N でも τ2(N)≠∅ はあり得る。
+
+4. **`centralizer_escape_final_local` (Cor 15.9, S15:9417, sorry) は ¬type-F neighbor のみ**: all-type-I
+   (𝓜_𝒫=∅) では neighbor N は常に type-F (P2 無し) ゆえ Cor 15.9 の `hNnotF` 前提が**決して満たされず**、
+   all-type-I escape の shortcut にならない。
+
+5. **genuine engine = full signalizer escape machinery (Lemma 14.13 + Cor 15.9 + all-type-I assembly)**:
+   Coq `non_disjoint_signalizer_Frobenius` (**Lemma 14.13**, BGsection14:2412) = 「escape (M∈𝓜_σ[x],
+   |𝓜_σ[x]|>1, M not σ(N[x])'-group) ⟹ M∈𝓜_F ∧ **τ2(M)=∅**」。これは escape⟹τ2(M)=∅ の **向き**で、
+   τ2=∅ を *仮定* するのでなく escape の *帰結*。証明は `Ptype_structure`/`Ptype_embedding`/
+   `cent_der_sigma_uniq`/β(N)/`tau2_not_beta` 等の深い §13-14 機構。Lean の `sigmaLength_one_frobenius_type`
+   (S14:11580) は **Lemma 14.13 の mis-encoding** (vacuous premise、docstring に警告済) ゆえ faithful 再述要。
+
+**∴ gate-2 (cover_subset_kernels) の honest な閉じ方** = (a) **faithful Lemma 14.13** を port (`non_disjoint_signalizer_Frobenius`、
+escape⟹M type-F∧τ2(M)=∅、現 Lean は vacuous) → (b) **Cor 15.9** (`centralizer_escape_final_local`) と
+合わせ all-type-I で escape の type-F neighbor case を M↔N structure interaction で排除 → R(x)=1 → cover_subset_kernels。
+**τ2-for-type-F / M_σ-TI 路線は二度と追わない** (本 /loop で偽と確定)。これは deep multi-session だが、
+target が「漠然 deep gate」から「faithful Lem14.13 + all-type-I escape assembly」へ精密化された。
+
+**教訓**: 「deep」評価の前に reduction の **数学的妥当性**を ported lemma で検証せよ — 本件は lane が ~16 iteration
+(loop³⁰-⁴⁶) 偽の target (type-F M_σ TI) を追い続けた。Lemma 14.11 (ported) を読めば τ2≠∅ for type-F は即わかった。
+[[scaffold-sorry-free-not-done]] [[verify-port-state-by-number-not-coq-name]]
