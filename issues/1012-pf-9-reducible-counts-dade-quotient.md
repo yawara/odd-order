@@ -855,3 +855,22 @@ caseA degree は **deep rep-theory gate (issue 0026) に transitively gated**。
 major rep-theory 形式化 (InducedCharacter + 2nd orthogonality)。**upstream-first ⟹ 次の真の作業は
 issue 0026 の Clifford core** (or それを回避する別 lane-a FT-path 作業の再評価)。caseA degree の HU-level
 milestone は honest かつ完備で、deep gate ゆえ此処が自然な区切り。
+
+
+## 重要訂正: (9.7) dprod は elementary、issue 0026 に gated していない (2026-07-01)
+
+前項「caseA degree は issue 0026 (character Clifford core) に gated」は**誤り**。難所を掘ったところ
+(9.7) dprod `H̄=⊕H1^w` は **elementary な count 論**で構築可、character Clifford 不要:
+- **H は abelian H̄ に trivial 作用** ([H,H]≤H0 ゆえ): M acts on H̄ factors through M/H≈UW1。
+  ⟹ **M-irreducible = UW1-irreducible** (chief factor ゆえ M-irr 既知)。
+- S₀ (U-minimal order-p, dichotomy) は **W1-fixed でない** (else S₀ UW1-inv ⟹ ⊥/⊤、|S₀|=p 矛盾)。
+- W1-conjugates {φ(w)•S₀} は **U-invariant** (U◁UW1: φ(u)φ(w)•S₀=φ(w)φ(w⁻¹uw)•S₀=φ(w)•S₀)、
+  UW1-orbit=W1-orbit (U が各 conjugate に trivial) ⟹ **span ⊤**。
+- W1 prime order q + S₀ not W1-fixed ⟹ **W1 free 作用 ⟹ q distinct conjugates**。
+- q distinct order-p subgroups span order-p^q ⟹ **count で internal direct product**
+  (`noncommPiCoprod_bijective_of_card` ✅ landed: ∏|S_i|=|K| + span ⟹ bijective)。
+
+**∴ caseA degree は issue 0026 に gated していない。(9.7) dprod は elementary group theory で完結。**
+landed: `noncommPiCoprod_bijective_of_card` (count⟹bijective core)。残: W1-conjugate setup
+(U-inv/not-W1-fixed/span/card の §11 plumbing) → iso H̄≅∏ → aperiodic regular θ̄ (iso 直接、iSupIndep 回避可)
+→ I_M=HC → induceHU irreducible → conjunct c。grinding 継続。

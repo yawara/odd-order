@@ -810,3 +810,32 @@ h78 構成可能性を正面調査し、戦略を reframe (複数 iteration の�
 既存 infra + §5-9 Dade-norm 上に構築し (13.10) analytic inequality (u/c > (p²-1)/6) に到達 →
 c_eq_one。heavy・multi-iteration だが lane-c の genuine 本丸。「ask/wait/re-org」でなく hard part を
 正面突破。[[feedback-no-avoiding-hard-parts]] [[scaffold-sorry-free-not-done]] [[feedback-flag-poor-progress]]
+
+### cont.²⁵ (2026-07-01 lane c=γ): §13 norm cascade を engage — **算術層 (13.6/13.7/13.8/13.10/13.11) 完備**、残 = (13.5) chiRho engine
+
+ユーザー裁定「quick win は基準でない、目的にかなう deep work を難しくても正面から」(規約 = CLAUDE.md
+「進捗の測り方」+ [[feedback-quick-win-not-a-criterion]]) を受け §13 norm cascade を engage。
+**cascade 構造を完全 map**: (13.5) engine → (13.6-13.9) norm bounds → (13.10) analytic ineq →
+numeric_bounds (13.11) → c_eq_one (13.12)。
+
+**算術層は完備** (全 sorry-free、S15_SAndT_Setup):
+- (13.5.c) `sum_normSq_erase_one_ge_of_const_on_subgroup` ✅ (既存)
+- (13.6) `caseB_lambda_norm_core` ✅ **landed** (commit `0abe3a3b`、caseB_quadratic_nonneg で交差項 q²(...)≥0)
+- (13.7) `caseB_eta_norm_core` ✅ (既存、Parseval 形)
+- (13.8) `caseB_eta01_norm_core` ✅ **landed** (本セッション、δ=±1、b=δα(1) で caseB_quadratic_nonneg)
+- (13.10) `analytic_inequality_arith` ✅ (既存)、(13.11) `m_value_*`/`numeric_bounds` ✅ (q=3 branch のみ (13.10) gated)
+
+**⟹ 残る §13 数学 = (13.5) chiRho engine のみ** (character theory、deep・multi-iteration):
+- **(13.5.a)** point formula `χ(x) = (a/‖ζ₁‖²)ζ₁(x) + α(x)` on H# — (7.7.a) `chiRho_explicit_formula`
+  (S09:1109、lane b 済) を (S, H#) に適用。
+- **(13.5.b)** norm expansion — ζ₁ が S−H で消える + Res ζ₁ ⊥ α (P-kernel) の 2 char 事実 + 代数展開。
+- **engine の foundation build plan** (次の deep work): `S04.Hypothesis G (H#) S` ((2.2) Dade hyp、
+  S04:192) を構築 → `Hypothesis71 (S, H#)` → coherence は `S_coherent` (S15:397、citable、
+  sibleyTarget_S/(6.8) gated) → `Hypothesis76` bridge → chiRho。⚠ S04.Hypothesis (S,H#) は H# TI +
+  centralizer 半直積構造 (centralizer_eq_sup/disjoint/coprime) を要し major build。§8 TI 入力
+  `H_sharp_ti : IsTISubset (sharpImage H) L` は `S08_CoherenceCorePart1:3279` に在 (bridge 要)。
+- **(13.9)/(13.10.3)** = 構造 counting (H# TI で disjoint union G = {1}⊔G₀⊔(H#)^G⊔(Q#)^G、§8)。
+
+次 = (13.5) engine の foundation (S04.Hypothesis for (S,H#)) を構築開始。算術層が完備ゆえ engine が
+landing すれば (13.6-13.8) → (13.10) → c_eq_one が連鎖。[[feedback-no-avoiding-hard-parts]]
+[[feedback-cite-sorried-lemmas-if-signature-correct]] [[scaffold-sorry-free-not-done]]

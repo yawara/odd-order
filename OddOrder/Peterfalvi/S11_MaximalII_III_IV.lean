@@ -2158,6 +2158,22 @@ theorem exists_ne_one_hom_of_prime_card {K : Type*} [CommGroup K] [Finite K]
     CommGroup.exists_apply_ne_one_of_hasEnoughRootsOfUnity (G := K) (M := ℂ) ha
   exact ⟨ψ, fun h => hψa (by rw [h]; rfl)⟩
 
+/-- **`noncommPiCoprod` is bijective from a cardinality count.**  A spanning commuting family of
+subgroups whose cardinalities multiply to `|K|` realises `K` as their internal direct product: the
+product map `(∀ i, S i) →* K` is surjective (spanning) and its domain has the same cardinality
+(`Nat.card_pi`), hence bijective.  The elementary count behind the `(9.7)` decomposition
+`H̄ = ⊕_{w} H1^w` (`q` order-`p` `W1`-conjugates spanning order-`p^q`), bypassing character Clifford
+theory. -/
+theorem noncommPiCoprod_bijective_of_card {K : Type*} [Group K] [Finite K] {ι : Type*} [Fintype ι]
+    {S : ι → Subgroup K}
+    (hcomm : Pairwise fun i j : ι => ∀ x y : K, x ∈ S i → y ∈ S j → Commute x y)
+    (hspan : ⨆ i, S i = ⊤)
+    (hcard : ∏ i, Nat.card ↥(S i) = Nat.card K) :
+    Function.Bijective (Subgroup.noncommPiCoprod hcomm) := by
+  rw [Nat.bijective_iff_surjective_and_card]
+  refine ⟨MonoidHom.range_eq_top.mp (by rw [Subgroup.noncommPiCoprod_range]; exact hspan), ?_⟩
+  rw [Nat.card_pi]; exact hcard
+
 /-- **A permutation-invariant function on a transitive orbit is constant.**  If `σ` acts
 transitively (`∀ i j, ∃ k, σ^k i = j`) and `f` is `σ`-invariant (`f (σ i) = f i`), then `f` is
 constant.  Contrapositive: a non-constant `f` is not `σ`-invariant — the combinatorial core of the
@@ -2176,6 +2192,32 @@ theorem constant_of_perm_invariant_of_transitive {ι α : Type*}
   obtain ⟨k, hk⟩ := htrans i j
   rw [← hk, key]
 
+/-- **Regular character from a bijective product map.**  The char-construction core of
+`exists_regular_char`, taking the internal-direct-product witness as `noncommPiCoprod` *bijective*
+(rather than `iSupIndep` + spanning).  This lets the elementary `(9.7)` count
+(`noncommPiCoprod_bijective_of_card`) feed the construction directly, sidestepping the
+`iSupIndep`-from-injectivity gap. -/
+theorem exists_regular_char_of_bijective {Hbar : Type*} [CommGroup Hbar] [Finite Hbar]
+    {ι : Type*} [Fintype ι] {S : ι → Subgroup Hbar}
+    (hcomm : Pairwise fun i j : ι => ∀ x y : Hbar, x ∈ S i → y ∈ S j → Commute x y)
+    (hbij : Function.Bijective (Subgroup.noncommPiCoprod hcomm))
+    (hp : ∀ i, (Nat.card ↥(S i)).Prime) :
+    ∃ θ : Hbar →* ℂˣ, ∀ i, ∃ x ∈ S i, θ x ≠ 1 := by
+  classical
+  choose ψ hψ using fun i => exists_ne_one_hom_of_prime_card (hp i)
+  let eEquiv : (∀ i : ι, ↥(S i)) ≃* Hbar :=
+    MulEquiv.ofBijective (Subgroup.noncommPiCoprod hcomm) hbij
+  refine ⟨(MonoidHom.noncommPiCoprod ψ
+      (fun i j _ x y => mul_comm (ψ i x) (ψ j y))).comp eEquiv.symm.toMonoidHom, fun i => ?_⟩
+  obtain ⟨z, hz⟩ := DFunLike.ne_iff.mp (hψ i)
+  rw [MonoidHom.one_apply] at hz
+  refine ⟨↑z, z.2, ?_⟩
+  have hsymm : eEquiv.symm ↑z = Pi.mulSingle i z :=
+    eEquiv.symm_apply_eq.mpr (Subgroup.noncommPiCoprod_mulSingle (hcomm := hcomm) i z).symm
+  rw [MonoidHom.comp_apply, MulEquiv.coe_toMonoidHom, hsymm,
+    MonoidHom.noncommPiCoprod_mulSingle]
+  exact hz
+
 /-- **A regular character exists on an internal direct product of prime-order subgroups.**
 If `Hbar` is the internal direct product (`iSupIndep` + spanning) of order-`p` subgroups `Hpart i`,
 there is a character `θ : Hbar →* ℂˣ` nontrivial on every summand.  Combine per-factor nontrivial
@@ -2187,26 +2229,11 @@ theorem exists_regular_char {Hbar : Type*} [CommGroup Hbar] [Finite Hbar]
     (hindep : iSupIndep Hpart) (hspan : ⨆ i, Hpart i = ⊤)
     (hp : ∀ i, (Nat.card ↥(Hpart i)).Prime) :
     ∃ θ : Hbar →* ℂˣ, ∀ i, ∃ x ∈ Hpart i, θ x ≠ 1 := by
-  classical
-  choose ψ hψ using fun i => exists_ne_one_hom_of_prime_card (hp i)
   have hcomm : Pairwise fun i j : ι => ∀ x y : Hbar, x ∈ Hpart i → y ∈ Hpart j → Commute x y :=
     fun i j _ x y _ _ => mul_comm x y
-  have hinj : Function.Injective (Subgroup.noncommPiCoprod hcomm) :=
-    Subgroup.injective_noncommPiCoprod_of_iSupIndep hindep
-  have hsurj : Function.Surjective (Subgroup.noncommPiCoprod hcomm) := by
-    rw [← MonoidHom.range_eq_top, Subgroup.noncommPiCoprod_range]; exact hspan
-  let eEquiv : (∀ i : ι, ↥(Hpart i)) ≃* Hbar :=
-    MulEquiv.ofBijective (Subgroup.noncommPiCoprod hcomm) ⟨hinj, hsurj⟩
-  refine ⟨(MonoidHom.noncommPiCoprod ψ
-      (fun i j _ x y => mul_comm (ψ i x) (ψ j y))).comp eEquiv.symm.toMonoidHom, fun i => ?_⟩
-  obtain ⟨z, hz⟩ := DFunLike.ne_iff.mp (hψ i)
-  rw [MonoidHom.one_apply] at hz
-  refine ⟨↑z, z.2, ?_⟩
-  have hsymm : eEquiv.symm ↑z = Pi.mulSingle i z :=
-    eEquiv.symm_apply_eq.mpr (Subgroup.noncommPiCoprod_mulSingle (hcomm := hcomm) i z).symm
-  rw [MonoidHom.comp_apply, MulEquiv.coe_toMonoidHom, hsymm,
-    MonoidHom.noncommPiCoprod_mulSingle]
-  exact hz
+  refine exists_regular_char_of_bijective hcomm ⟨?_, ?_⟩ hp
+  · exact Subgroup.injective_noncommPiCoprod_of_iSupIndep hindep
+  · rw [← MonoidHom.range_eq_top, Subgroup.noncommPiCoprod_range]; exact hspan
 
 /-- Case (a) of Peterfalvi (9.7): `H/H_0` splits as a direct product of `q`
 order-`p` factors permuted by `W_1`.
@@ -3215,6 +3242,49 @@ theorem card_pointwise_smul {A K : Type*} [Group A] [Group K] [Finite K]
     (φ : A →* MulAut K) (a : A) (S : Subgroup K) :
     Nat.card ↥(φ a • S) = Nat.card ↥S :=
   (Nat.card_congr (Subgroup.equivMapOfInjective S (φ a).toMonoidHom (φ a).injective).toEquiv).symm
+
+/-- **`U W`-orbit collapses to the `W`-orbit** for a `U`-invariant `S₀` (`U ◁ A`).  Since each
+`W`-conjugate `φ w • S₀` is again `U`-invariant (`isAInvariant_comp_subtype_pointwise_smul`), a
+`U W`-element `a = u·w` gives `φ a • S₀ = φ u • (φ w • S₀) = φ w • S₀`.  Hence the spanning
+`U W`-orbit of `S₀` already equals its `W`-orbit — the elementary span step of the `(9.7)`
+decomposition `H̄ = ⊕_{w∈W1} S₀^w`. -/
+theorem iSup_phi_smul_eq_iSup_W_of_normal {A K : Type*} [Group A] [Group K]
+    {φ : A →* MulAut K} {U W : Subgroup A} (hU : U.Normal) {S₀ : Subgroup K}
+    (hS₀ : IsAInvariant (φ.comp U.subtype) S₀) :
+    ⨆ a : ↥(U ⊔ W), φ ↑a • S₀ = ⨆ w : ↥W, φ ↑w • S₀ := by
+  haveI := hU
+  apply le_antisymm
+  · rw [iSup_le_iff]
+    rintro ⟨a, ha⟩
+    have ha' : a ∈ (↑U * ↑W : Set A) := by rw [← Subgroup.normal_mul]; exact ha
+    obtain ⟨u, hu, w, hw, huw⟩ := Set.mem_mul.mp ha'
+    show φ a • S₀ ≤ ⨆ w' : ↥W, φ ↑w' • S₀
+    rw [← huw, map_mul, mul_smul]
+    have key : φ u • (φ w • S₀) = φ w • S₀ :=
+      isAInvariant_comp_subtype_pointwise_smul hU hS₀ w ⟨u, hu⟩
+    rw [key]
+    exact le_iSup (fun w' : ↥W => φ ↑w' • S₀) ⟨w, hw⟩
+  · rw [iSup_le_iff]
+    rintro ⟨w, hw⟩
+    exact le_iSup (fun a : ↥(U ⊔ W) => φ ↑a • S₀) ⟨w, Subgroup.mem_sup_right hw⟩
+
+/-- **The `W`-conjugates of a `U`-invariant order-`p` `S₀` realise `K` as their internal direct
+product** when `|K| = |S₀|^|W|` and the `UW`-orbit spans.  Assembles the span step
+(`iSup_phi_smul_eq_iSup_W_of_normal`), the order count (`card_pointwise_smul`,
+`|φ w • S₀| = |S₀|`), and the bijectivity-from-count (`noncommPiCoprod_bijective_of_card`).  This is
+the elementary `(9.7)` decomposition `H̄ = ⊕_{w∈W1} S₀^w`, needing no character Clifford theory. -/
+theorem wConjugate_coprod_bijective {A K : Type*} [Group A] [CommGroup K] [Finite K]
+    {φ : A →* MulAut K} {U W : Subgroup A} [Fintype ↥W] (hU : U.Normal) {S₀ : Subgroup K}
+    (hS₀inv : IsAInvariant (φ.comp U.subtype) S₀)
+    (hspan : ⨆ a : ↥(U ⊔ W), φ ↑a • S₀ = ⊤)
+    (hKcard : Nat.card K = (Nat.card ↥S₀) ^ (Fintype.card ↥W)) :
+    Function.Bijective (Subgroup.noncommPiCoprod
+      (fun (i j : ↥W) (_ : i ≠ j) (x y : K) (_ : x ∈ φ ↑i • S₀) (_ : y ∈ φ ↑j • S₀) =>
+        mul_comm x y)) := by
+  apply noncommPiCoprod_bijective_of_card
+  · rw [← iSup_phi_smul_eq_iSup_W_of_normal hU hS₀inv]; exact hspan
+  · simp only [card_pointwise_smul]
+    rw [Finset.prod_const, Finset.card_univ, ← hKcard]
 
 /-! ### (9.7) The Singer mechanism for the chief factor (Clifford case (b))
 
