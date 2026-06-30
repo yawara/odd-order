@@ -839,3 +839,26 @@ numeric_bounds (13.11) → c_eq_one (13.12)。
 次 = (13.5) engine の foundation (S04.Hypothesis for (S,H#)) を構築開始。算術層が完備ゆえ engine が
 landing すれば (13.6-13.8) → (13.10) → c_eq_one が連鎖。[[feedback-no-avoiding-hard-parts]]
 [[feedback-cite-sorried-lemmas-if-signature-correct]] [[scaffold-sorry-free-not-done]]
+
+### cont.²⁶ (2026-07-01 lane c=γ /loop ×多数): 🎉 (13.5) chiRho engine を**完全結線** (foundation→H71→H76→χ=χ^ρ→base decomp)
+
+ユーザー裁定 (quick win 不問・hard work 正面) を受け §13 (13.5) chiRho engine を一から構築完遂。
+**全 sorry-free** (§8 TI obligation modulo)、各 commit で landing、S15_SAndT_Setup:
+
+1. **算術層** (13.6/13.8 core): `caseB_lambda_norm_core`/`caseB_eta01_norm_core` (caseB_quadratic_nonneg)。
+2. **(13.5.b) 分解部品**: `sum_normSq_real_smul_add` (Parseval 代数核) + `sum_normSq_sharp_eq_total_sub_one`
+   (fact1 ζ₁-norm) + `sum_mul_conj_sharp_eq_neg_of_inner_zero` (fact2 cross-term)。
+3. **Dade foundation**: `H_sharp_dadeHypothesis` = S04.Hypothesis for (S,H#) via `S04.Hypothesis.of_isTISubset`
+   (§8 TI 入力 = `H_sharp_isTISubset`(8.5.a)/`S_normalizes_H_sharp` を named obligation 化、構造入力
+   H#⊆G#・H=PC≤S は proven)。
+4. **Hypothesis71**: `H_sharp_hypothesis71` (Dade map = `fullDadeIsometryData`、hconj = of_forall_H_eq_bot)。
+5. **Hypothesis76**: `H_sharp_hypothesis76` via `S09.Cert.hypothesis76OfDade` (issue-1013 = (7.7.a) 証明書込で
+   (7.1) data のみから構築)。import S09_CertificateDischarge。instance は FiniteInduce scope+[Inv|G|] param。
+6. **χ=χ^ρ bridge**: `chiRho_eq_self_of_H_eq_bot` (TI 局所 H(a)=⊥ で ρ-map 恒等)。
+7. **(13.5.a) base decomp**: `H_sharp_chiRho_eq_explicit` = χ(x) = ∑_{i≥1}(c̄_i/‖ζ_i‖²)ζ_i(x) on H#
+   (bridge .symm.trans chiRho_explicit_formula、H76.hyp71=H71 defeq)。
+
+**残 (13.5.a)**: base decomp から **ζ₁ 抽出 + P-kernel tail を α に grouping** (textbook の orthogonality
+仮説 χ⊥(ζ_i-ζ_0)^τ で S₁ 中間項 c_i=0、P⊆ker tail = α、α(1) ≡0 mod q)。これが intricate な reorganization。
+完成すれば `tiSubset_character_orthogonality` (13.5 producer) → (13.6-13.8) [arith 済] → (13.9)/(13.10) →
+numeric_bounds [済] → c_eq_one。[[feedback-no-avoiding-hard-parts]] [[scaffold-sorry-free-not-done]]
