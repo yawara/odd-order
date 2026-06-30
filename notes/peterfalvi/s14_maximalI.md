@@ -1130,3 +1130,25 @@ support hyp.A) + coherence。残るは:
 **次 iteration の標的**: Hypothesis76 構築の足場。H=L_F の特定、族 T (n/zeta/d) の (7.6) 列挙、
 chiRho_decomp (7.7.a) の構築経路調査。lane γ MHypothesis.h78 は obligation field ゆえ exists_MHypothesis
 での discharge 法 (S16:4499) も参照。
+
+### loop⁴⁴ — dadeNotation_of_coherence (ψ=χ^{τ₁} backbone を coherence から実現)
+
+**commit `23c49c3a`**: 重要発見 = `S07.IsCoherent.extension : IntegralCharacterMap ↥L G` が (12.13) の
+τ₁ そのもの (S07_Coherence:1596、`extension`/`extension_inner_eq`/`extends_on_supported` フィールド)。
+`dadeNotation_of_coherence` (S14:~2368): coherence + distinguished χ∈Sset(deg e) → DadeNotation を
+tau1:=coh.extension / psi:=coh.extension χ で構築 (**psi_eq_tau1_chi := rfl**)。e_eq_index を e=[L:H] に
+de-opacify。
+
+**調査確定事項 (次 iteration の地図)**:
+- **ψ-construction の残 gap = distinguished χ 選択のみ**: Sset={Ind_H^L θ | θ irred ≠1} (S14:84)。
+  distinguished χ は最小 degree=[L:H] ゆえ **θ 線形 (deg 1)** が必要。H=L_F は非自明 nilpotent ゆえ
+  H/[H,H] 非自明 → 非自明線形指標 θ 存在。`χ(1)=[L:H]·θ(1)=[L:H]` は `induce_apply_one`
+  (RepresentationTheory、Ind θ(1)=[G:H]θ(1)) で。**次 iteration の標的 = exists_distinguished_char**
+  (非自明 nilpotent 群の非自明線形指標存在 + induce degree)。mathlib の linear char / abelianization
+  character API 要調査 (未確認)。
+- **hA/hB/hC は全て ψ 前提** (確定): hB=(7.8.b) lower bound は Hypothesis78 必須で、その
+  chiRho_eq_inner_beta (7.8.c.i)/chiRho_decomp (7.7.a) は **project 全体で未形式化**
+  (lane γ exists_MHypothesis (S16:4502) も h78 含む全体を単一 sorry で defer)。
+  (7.2.b)/(7.3) は upper bound (proven) ゆえ hB には不足、hC(sum<1)には寄与し得る。
+- **(12.12) degree bound** `complement_cyclic_order_dvd` (S14 sorried) が he:3≤e/h2e:2e≤p+1 を供給。
+  rep-theory cores (isCyclic_and_card_dvd_of_faithful_one_dim 等 S14:2015+) から組める可能性。
