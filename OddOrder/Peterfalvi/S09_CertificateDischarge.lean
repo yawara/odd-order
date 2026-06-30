@@ -1542,4 +1542,110 @@ theorem sum_diag_split_ind1H {n : ℕ} (c N d : Fin (n + 1) → ℂ) (cval : ℂ
   obtain ⟨hi_ne, hi_ioi⟩ := Finset.mem_erase.mp hi
   rw [hc_rest i (Finset.mem_Ioi.mp hi_ioi).ne' hi_ne, star_neg, neg_mul, mul_neg, neg_neg]
 
+/-- **Arithmetic core of (7.8.b).**  With the collapsed norm `‖ζ^{νρ}‖² = t₁ − X²/(e·h)` where the
+diagonal `t₁ = (a−1)²/e + G/e²` and the rank-one `X = (a−1) − G/e`, and the `(1.5.d)` degree-sum
+value `G = e(h−1) − e²`, the norm equals the quadratic `u a² − 2 v a + w` of Peterfalvi (7.8.b),
+with `u = (1/e)(1−1/h)`, `v = 1/h`, `w = 1 − e/h`.  Pure field identity (verified by `ring`). -/
+theorem normEstimate_matching (a e h G : ℝ) (he : e ≠ 0) (hh : h ≠ 0)
+    (hG : G = e * (h - 1) - e ^ 2) :
+    ((a - 1) ^ 2 / e + G / e ^ 2) - ((a - 1) - G / e) ^ 2 / (e * h) =
+      (1 / e) * (1 - 1 / h) * a ^ 2 - 2 * (1 / h) * a + (1 - e / h) := by
+  subst hG
+  field_simp
+  ring
+
+/-- **Diagonal sum evaluation for (7.8.b)** (`term₁`).  With `c_{ind1H} = a−1`, `c_i = −d_i`
+(`i ≠ 0, ind1H`), `N_{ind1H} = e`, `d_i = P_i/e`, and `a` / the `d_i` real, the diagonal sum
+`Σ_i c̄_i c_i / N_i` evaluates to `(a−1)²/e + (Σ_{i ≠ ind1H} P_i²/N_i)/e²`. -/
+theorem term1_eval_generic {n : ℕ} (c N P d : Fin (n + 1) → ℂ) (a e : ℂ)
+    {ind1H : Fin (n + 1)} (hind : ind1H ≠ 0)
+    (hc_ind1H : c ind1H = a - 1) (hc_rest : ∀ i, i ≠ 0 → i ≠ ind1H → c i = -(d i))
+    (ha1_real : star (a - 1) = a - 1) (hd_real : ∀ i, star (d i) = d i)
+    (hd : ∀ i, d i = P i / e) (hN_ind1H : N ind1H = e) :
+    ∑ i ∈ Finset.Ioi (0 : Fin (n + 1)), star (c i) * c i / N i =
+      (a - 1) ^ 2 / e
+        + (∑ i ∈ (Finset.Ioi (0 : Fin (n + 1))).erase ind1H, P i ^ 2 / N i) / e ^ 2 := by
+  rw [sum_diag_split_ind1H c N d (a - 1) hind hc_ind1H hc_rest, hN_ind1H, ha1_real, ← pow_two]
+  congr 1
+  rw [Finset.sum_div]
+  refine Finset.sum_congr rfl fun i _ => ?_
+  rw [hd_real i, ← pow_two, hd i, div_pow]
+  ring
+
+/-- **Rank-one sum evaluation for (7.8.b)** (`X`).  With the same data, the rank-one factor
+`Σ_i c̄_i P_i / N_i` evaluates to `(a−1) − (Σ_{i ≠ ind1H} P_i²/N_i)/e` (the `Ind 1_H` term gives
+`(a−1)·e/e = a−1`; the off-distinguished terms give `−d_i P_i/N_i = −P_i²/(e N_i)`). -/
+theorem rank1_eval_generic {n : ℕ} (c N P d : Fin (n + 1) → ℂ) (a e : ℂ)
+    {ind1H : Fin (n + 1)} (hind : ind1H ≠ 0)
+    (hc_ind1H : c ind1H = a - 1) (hc_rest : ∀ i, i ≠ 0 → i ≠ ind1H → c i = -(d i))
+    (ha1_real : star (a - 1) = a - 1) (hd_real : ∀ i, star (d i) = d i)
+    (hd : ∀ i, d i = P i / e) (hN_ind1H : N ind1H = e) (hP_ind1H : P ind1H = e) (he : e ≠ 0) :
+    ∑ i ∈ Finset.Ioi (0 : Fin (n + 1)), star (c i) * P i / N i =
+      (a - 1) - (∑ i ∈ (Finset.Ioi (0 : Fin (n + 1))).erase ind1H, P i ^ 2 / N i) / e := by
+  rw [← Finset.add_sum_erase _ _ (Finset.mem_Ioi.mpr (Fin.pos_iff_ne_zero.mpr hind)),
+    hc_ind1H, ha1_real, hP_ind1H, hN_ind1H, mul_div_assoc, div_self he, mul_one, sub_eq_add_neg]
+  congr 1
+  rw [show (∑ i ∈ (Finset.Ioi (0 : Fin (n + 1))).erase ind1H, star (c i) * P i / N i)
+        = ∑ i ∈ (Finset.Ioi (0 : Fin (n + 1))).erase ind1H, P i ^ 2 / N i * (-(1 / e)) from
+      Finset.sum_congr rfl fun i hi => by
+        obtain ⟨hi_ne, hi_ioi⟩ := Finset.mem_erase.mp hi
+        rw [hc_rest i (Finset.mem_Ioi.mp hi_ioi).ne' hi_ne, star_neg, hd_real i, hd i]; ring,
+    ← Finset.sum_mul]
+  ring
+
+/-- **Rank-one sum evaluation, conjugate-weight form** (`Y`).  The collapse's second rank-one
+factor `Σ_j c_j \overline{P_j} / N_j` (note: bare `c_j`, conjugated `P_j`) evaluates to the same
+`(a−1) − (Σ_{i ≠ ind1H} P_i²/N_i)/e` as `rank1_eval_generic`, using that the degrees `P_i` are real
+(`\overline{P_i} = P_i`).  Together with `rank1_eval_generic` this gives `X·Y = ((a−1) − G/e)²`. -/
+theorem rank1_eval_Y_generic {n : ℕ} (c N P d : Fin (n + 1) → ℂ) (a e : ℂ)
+    {ind1H : Fin (n + 1)} (hind : ind1H ≠ 0)
+    (hc_ind1H : c ind1H = a - 1) (hc_rest : ∀ i, i ≠ 0 → i ≠ ind1H → c i = -(d i))
+    (hP_real : ∀ i, star (P i) = P i) (hd : ∀ i, d i = P i / e)
+    (hN_ind1H : N ind1H = e) (hP_ind1H : P ind1H = e) (he : e ≠ 0) :
+    ∑ i ∈ Finset.Ioi (0 : Fin (n + 1)), c i * star (P i) / N i =
+      (a - 1) - (∑ i ∈ (Finset.Ioi (0 : Fin (n + 1))).erase ind1H, P i ^ 2 / N i) / e := by
+  rw [← Finset.add_sum_erase _ _ (Finset.mem_Ioi.mpr (Fin.pos_iff_ne_zero.mpr hind)),
+    hc_ind1H, hP_real ind1H, hP_ind1H, hN_ind1H, mul_div_assoc, div_self he, mul_one,
+    sub_eq_add_neg]
+  congr 1
+  rw [show (∑ i ∈ (Finset.Ioi (0 : Fin (n + 1))).erase ind1H, c i * star (P i) / N i)
+        = ∑ i ∈ (Finset.Ioi (0 : Fin (n + 1))).erase ind1H, P i ^ 2 / N i * (-(1 / e)) from
+      Finset.sum_congr rfl fun i hi => by
+        obtain ⟨hi_ne, hi_ioi⟩ := Finset.mem_erase.mp hi
+        rw [hc_rest i (Finset.mem_Ioi.mp hi_ioi).ne' hi_ne, hP_real i, hd i]; ring,
+    ← Finset.sum_mul]
+  ring
+
+/-- **(7.8.b) ℂ-level norm identity.**  Assembling the collapse with the three sum evaluations,
+the `ζ_0^ν` self-inner-product equals `(a−1)²/e + G/e² − ((a−1) − G/e)²/|L|` where
+`G = Σ_{i ≠ ind1H} ζ_i(1)²/‖ζ_i‖²` is the off-distinguished degree-sum.  (The `.re` and the
+`(1.5.d)` value `G = e(h−1)−e²` then yield the (7.8.b) lower bound via `normEstimate_matching`.) -/
+theorem zetaNuRho_inner_eq_cexpr {G : Type*} [Group G] [Fintype G] {A : Set G} {L : Subgroup G}
+    [Fintype L] [Invertible (Nat.card L : ℂ)] [Invertible (Nat.card G : ℂ)]
+    (H76 : Hypothesis76 G A L) (ν : ClassFunction ↥L ℂ →ₗ[ℤ] ClassFunction G ℂ)
+    {ind1H : Fin (H76.n + 1)} (a e : ℂ) (hind : ind1H ≠ 0)
+    (horth : ∀ i j : Fin (H76.n + 1), i ≠ j →
+      ClassFunction.inner (H76.zeta i) (H76.zeta j) = 0)
+    (hc_ind1H : H76.cCoeff (ν (H76.zeta 0)) ind1H = a - 1)
+    (hc_rest : ∀ i, i ≠ 0 → i ≠ ind1H → H76.cCoeff (ν (H76.zeta 0)) i = -(H76.d i))
+    (ha1_real : star (a - 1) = a - 1) (hd_real : ∀ i, star (H76.d i) = H76.d i)
+    (hP_real : ∀ i, star (H76.zeta i 1) = H76.zeta i 1)
+    (hd : ∀ i, H76.d i = H76.zeta i 1 / e)
+    (hN_ind1H : H76.zetaNormSq ind1H = e) (hP_ind1H : H76.zeta ind1H 1 = e) (he : e ≠ 0) :
+    ClassFunction.inner (H76.hyp71.chiRhoCF (ν (H76.zeta 0)))
+        (H76.hyp71.chiRhoCF (ν (H76.zeta 0))) =
+      (a - 1) ^ 2 / e
+        + (∑ i ∈ (Finset.Ioi (0 : Fin (H76.n + 1))).erase ind1H,
+            H76.zeta i 1 ^ 2 / H76.zetaNormSq i) / e ^ 2
+        - ((a - 1) - (∑ i ∈ (Finset.Ioi (0 : Fin (H76.n + 1))).erase ind1H,
+            H76.zeta i 1 ^ 2 / H76.zetaNormSq i) / e) ^ 2 / (Nat.card L : ℂ) := by
+  rw [chiRho_norm_sq_collapse H76 (ν (H76.zeta 0)) horth,
+    term1_eval_generic (H76.cCoeff (ν (H76.zeta 0))) H76.zetaNormSq (fun i => H76.zeta i 1) H76.d
+      a e hind hc_ind1H hc_rest ha1_real hd_real hd hN_ind1H,
+    rank1_eval_generic (H76.cCoeff (ν (H76.zeta 0))) H76.zetaNormSq (fun i => H76.zeta i 1) H76.d
+      a e hind hc_ind1H hc_rest ha1_real hd_real hd hN_ind1H hP_ind1H he,
+    rank1_eval_Y_generic (H76.cCoeff (ν (H76.zeta 0))) H76.zetaNormSq (fun i => H76.zeta i 1) H76.d
+      a e hind hc_ind1H hc_rest hP_real hd hN_ind1H hP_ind1H he]
+  ring
+
 end OddOrder.Peterfalvi.S09.Cert
