@@ -6039,5 +6039,17 @@ noncomputable def hcHom [Finite G] {M : Subgroup G}
     (QuotientGroup.mk' ((((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf (huSub data)).subgroupOf
       (hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf (huSub data))))
 
+/-- **The `HC`-linear character `ψ`** of the (9.8.c) construction: for a chief-factor character
+`θ : H̄ →* ℂˣ` (the seed's regular character), `ψ = θ ∘ hcHom` is the inflation of `θ` to `HC`,
+a linear (degree-one) irreducible character of `HC = hInHu ⊔ H₀C`, trivial on `H₀C`.  Its inertia in
+`HU` is `HC` (`hInHu ◁ HC ◁ HU`, restriction to `θ₀`); `Ind_{HC}^{HU} ψ` is the degree-`u`
+irreducible of `𝒳(H₀C)`. -/
+noncomputable def hcPsi [Finite G] {M : Subgroup G}
+    {data : TypesIIIIIIVSetup M} (chief : ChiefFactorData data)
+    (θ : (↥data.H ⧸ chief.N) →* ℂˣ) :
+    IrreducibleCharacter
+      ↥(hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf (huSub data)) :=
+  linearIrreducibleCharacter (θ.comp (hcHom chief))
+
 end OddOrder.Peterfalvi.S11
 
