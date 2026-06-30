@@ -944,6 +944,41 @@ theorem inner_beta_nuDiff {G : Type*} [Group G] [Fintype G] {A : Set G} {L : Sub
   rw [hagree_i, hτ.inner_eq]
   exact inner_family_diff K θ hinj d hi0 hi_ind hind0
 
+/-- **The inner product `⟨weightedNuSum, ζ_j^ν⟩ = ζ_j(1)/ζ_0(1)`** (Peterfalvi (7.8.a)).  The
+weighted sum `Σ_{i ≠ ind1H} (ζ_i(1)/(ζ_0(1)‖ζ_i‖²)) ζ_i^ν` paired against `ζ_j^ν` (`j ≠ ind1H`)
+collapses by the `ν`-isometry (`hnu`) + family orthogonality to the single `i = j` term, which is
+`(ζ_j(1)/(ζ_0(1)‖ζ_j‖²)) ‖ζ_j‖² = ζ_j(1)/ζ_0(1)`.  This supplies the `a · ⟨weightedNuSum, ζ_j^ν⟩`
+term that cancels `⟨β, ζ_j^ν⟩` in the `Gamma_orth_nu` computation. -/
+theorem inner_weightedNuSum_nu {G : Type*} [Group G] [Fintype G] {A : Set G} {L : Subgroup G}
+    [Fintype L] [Invertible (Nat.card L : ℂ)] [Invertible (Nat.card G : ℂ)]
+    (K : Subgroup ↥L) [K.Normal] [Fintype ↥K] [Invertible (Nat.card ↥K : ℂ)] {n : ℕ}
+    (θ : Fin (n + 1) → IrreducibleCharacter ↥K)
+    (hinj : Function.Injective (fun i => ClassFunction.induce K (θ i : ClassFunction ↥K ℂ)))
+    (ν : ClassFunction ↥L ℂ →ₗ[ℤ] ClassFunction G ℂ)
+    (hnu : ∀ φ ψ : ClassFunction ↥L ℂ, ClassFunction.inner (ν φ) (ν ψ) = ClassFunction.inner φ ψ)
+    {ind1H j : Fin (n + 1)} (hj : j ≠ ind1H) :
+    ClassFunction.inner
+      (∑ i ∈ Finset.univ.erase ind1H,
+        (ClassFunction.induce K (θ i : ClassFunction ↥K ℂ) (1 : ↥L) /
+          (ClassFunction.induce K (θ 0 : ClassFunction ↥K ℂ) (1 : ↥L) *
+            ClassFunction.inner (ClassFunction.induce K (θ i : ClassFunction ↥K ℂ))
+              (ClassFunction.induce K (θ i : ClassFunction ↥K ℂ))) : ℂ) •
+          ν (ClassFunction.induce K (θ i : ClassFunction ↥K ℂ)))
+      (ν (ClassFunction.induce K (θ j : ClassFunction ↥K ℂ)))
+    = ClassFunction.induce K (θ j : ClassFunction ↥K ℂ) (1 : ↥L) /
+        ClassFunction.induce K (θ 0 : ClassFunction ↥K ℂ) (1 : ↥L) := by
+  rw [inner_sum_left, Finset.sum_eq_single_of_mem j
+      (Finset.mem_erase.mpr ⟨hj, Finset.mem_univ j⟩)
+      (fun i _ hij => by
+        rw [ClassFunction.inner_smul_left, hnu,
+          induce_family_orthogonal_of_injective K θ hinj i j hij, mul_zero]),
+    ClassFunction.inner_smul_left, hnu]
+  have hN : ClassFunction.inner (ClassFunction.induce K (θ j : ClassFunction ↥K ℂ))
+      (ClassFunction.induce K (θ j : ClassFunction ↥K ℂ)) ≠ 0 := induce_norm_ne_zero K (θ j)
+  have hz0 : ClassFunction.induce K (θ 0 : ClassFunction ↥K ℂ) (1 : ↥L) ≠ 0 :=
+    induce_apply_one_ne_zero K (θ 0)
+  field_simp
+
 /-- **The (7.8.c) collapse of the (7.7.a) sum to a single term.**  If, in the `(7.7.a)`
 decomposition `χ^ρ(x) = ∑_{i ≥ 1} (c̄_i/‖ζ_i‖²) ζ_i(x)`, all coefficients `c_i` (`i ≥ 1`) vanish
 except at one index `i₁`, and the distinguished member satisfies `ζ_{i₁}(x) = ‖ζ_{i₁}‖²`
