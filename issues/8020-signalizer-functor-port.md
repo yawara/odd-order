@@ -632,3 +632,35 @@ genuine bridge **`mem_Mtilde_of_mem_coset`** (x∈M_σ#・x⁻¹g∈R(x) ⟹ g�
 ([[verify-port-state-by-number-not-coq-name]])。概念 grep で feasible と判明。gate 2 を「深すぎ」と deprioritize
 しなくてよい (genuine 上流、deps 揃い)。**次 = pi_of_cent_sigma の port 実行** (τ2-case から: uniqueness は
 ported lemma 直結、ℓ_σ(x')=1 と κ-case を埋める)。
+
+## ✅ 進捗 (lane d, 2026-06-30 /loop²⁵): **pi_of_cent_sigma 完成確認 + BG Lemma 14.6 核心 (Coq `s'g`) 着地**
+
+**(1) `pi_of_cent_sigma` (= `sigma_diagnostic`, S14:3335) は COMPLETE** — /loop²⁴ の「次=pi_of_cent_sigma の
+port 実行」は直近 2 commit (`fa20fcc7` τ2-case uniqueness `𝓜(C[x'])={M}` + `810d1fad` τ2-case `ℓ_σ(x')=1`
+`tau2_element_sigmaLength_one`) で完遂済。本 /loop で sorry-free 確認 (両 branch κ/τ2 とも proven、L3335-3660 に sorry 無し)。
+⟹ gate 2 (cover) の真の上流 dep が解禁。
+
+**(2) BG Lemma 14.6 (`sigma_decomposition_dichotomy`, Coq BGsection14:1189) の核心を port** (S14、axiom-clean、
+AxiomsCheck 登録、full build 3888 green):
+- **`centralizer_le_of_maximalSigma_ncard_eq_one`** (Coq `cent1_sub_uniq_sigma_mmax`, BGsection14:1008):
+  `|𝓜_σ(x)|=1 ⟹ C_G(x)≤M` (unique element)。証明 = y∈C[x] が 𝓜_σ(x) を conj で permute → singleton 固定 →
+  `Mʸ=M` → y∈N(M)=M (`normalizer_eq_self_of_mem_maximalSubgroups` + `mem_normalizer_of_map_conj_eq`)。**MSx'_gt1
+  step の linchpin**。
+- **`signalizer_coset_or_kappa_of_sigmaSharp`** (Coq `s'g`, Lemma 14.6 の心臓部): x∈M_σ^#・x' は M の σ(M)'-elt
+  (≠1, x を中心化) ⟹ g=x·x' は **signalizer branch (∃y, ℓ_σ(y)=1 ∧ y⁻¹g∈R(y)、witness y=x') XOR κ branch
+  (ℓ_σ(x)=1 ∧ M∈𝓜_σ(x) ∧ x'∈(C_M[x])^# ∧ x' は κ(M)-elt)** の disjunction に落ちる。**`sigma_diagnostic` の直接
+  consumer**: τ2 branch → signalizer disjunct (cent1_sub_uniq で |𝓜_σ(x')|>1 を強制 + `exists_neighbor_eq_Rsub`
+  で neighbour N=M 同定 → x∈Rsub D x')、κ branch → κ disjunct verbatim。
+
+**▶▶ 残り Lemma 14.6 / cover (gate 2)**:
+1. **full dichotomy assembly** `g≠1 ⟹ signalizerBranch ∨ κBranch` (Coq 第2半 BGsection14:1231-1287)。
+   `s'g`-content (本 commit) を二度使う + `exists_length_one_factor` (σ-decomp 入力, S14:4617 在) + FT_signalizer_context
+   (`sigmaLength_one_centralizer_structure`) + Hall conjugacy (Coq `Hall_subJ`) で `g∉M`-case を assemble。~60 行。
+   ⚠ 配置注意: cover identity (S14:4965) は s'g-content (S14:5140) の**上流**ゆえ、cover の sorry を閉じるには
+   cover identity を dichotomy より**下流に移動**する要 (consumer 0 = 移動安全)。
+2. **cover identity** `exists_mem_conjClassSet_Mtilde_of_ne_one` (S14:4965) の `hall:∀M,IsTypeF M` 下の sorry を、
+   dichotomy + 「type-F ⟹ κ(M)=∅ ⟹ κBranch 空 (x'≠1 の κ-elt が存在せず矛盾)」で閉じる。
+
+**🔧 メモ**: `tau2_element_sigmaLength_one` / `maximalContaining_centralizer_eq_singleton_of_tau2_element`
+(直近 2 commit) は AxiomsCheck 未登録のまま (lane が登録省略)。本 commit で sigma_diagnostic 系の登録 gap として
+follow-up 候補 (issue or 次 /loop で登録)。次 = full dichotomy assembly。

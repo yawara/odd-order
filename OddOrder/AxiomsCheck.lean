@@ -5138,6 +5138,18 @@ for `p ∣ |G|` there is a maximal `M` with `p ∈ σ(M)` (BG §1, via a non-nor
 /-! **σ-decomposition factor extraction** (`S14_TypePCounting`, `exists_length_one_factor`): every
 `g ≠ 1` factors `g = x·x'` with `ℓ_σ(x) = 1`, `x'` a `σ(M)′`-element (commuting, both in `⟨g⟩`). -/
 #assert_only_allowed_axioms OddOrder.BG.Ch4.S14.exists_length_one_factor
+/-! **Coq `cent1_sub_uniq_sigma_mmax`** (`S14_TypePCounting`,
+`centralizer_le_of_maximalSigma_ncard_eq_one`): if `𝓜_σ(x)` is a singleton, its unique element `M`
+contains `C_G(x)` (`y ∈ C_G(x)` permutes `𝓜_σ(x)`, fixing `M`, so `y ∈ N_G(M) = M`).  The linchpin
+of the `|𝓜_σ(x')| > 1` step of BG Lemma 14.6.  Axiom-clean. -/
+#assert_only_allowed_axioms OddOrder.BG.Ch4.S14.centralizer_le_of_maximalSigma_ncard_eq_one
+/-! **BG Lemma 14.6 core** (`S14_TypePCounting`, `signalizer_coset_or_kappa_of_sigmaSharp`, Coq
+`s'g`): for `x ∈ M_σ^#` and a nonidentity `σ(M)′`-element `x'` of `M` centralizing `x`, the product
+`g = x·x'` lands in either the signalizer branch (`∃ y, ℓ_σ(y)=1 ∧ y⁻¹g ∈ R(y)`, witnessed by
+`y = x'`) or the κ branch (`ℓ_σ(x)=1`, `M ∈ 𝓜_σ(x)`, `x' ∈ (C_M[x])^#`, `x'` a `κ(M)`-element).
+Direct consumer of `sigma_diagnostic` (Cor 14.3); the τ₂ branch uses
+`centralizer_le_of_maximalSigma_ncard_eq_one` + `exists_neighbor_eq_Rsub`.  Axiom-clean. -/
+#assert_only_allowed_axioms OddOrder.BG.Ch4.S14.signalizer_coset_or_kappa_of_sigmaSharp
 /-! **BG Lemma 14.6, exclusivity** (`S14_TypePCounting`, `not_type1_of_type2`): a type-2 element
 (`g = y·y'`, `y'` a nonidentity `κ(M)`-element of `C_M(y)`, `y ∈ M_σ^#`) is not of type-1
 (`g = x·x'`, `ℓ_σ(x)=1`, `x' ∈ R(x)`).  The `T ∩ H̃ = ∅` input to Theorem 14.7. -/
