@@ -962,3 +962,27 @@ conjunct c の sorry = caseA_character_counts:5166 (refine の 2 番目 ?_、∃
   [M:HU]=q) → χ=induceHU(ζ) irr (huSub_normal + isIrreducibleCharacter_induce_of_inertia_eq) deg q·u=qu
   (induceHU_apply_one_eq_q_mul)。
 - **𝒳**: ζ∈𝒳(H₀C) (kernel 条件 + xiOf membership) → χ=induceHU(ζ)∈𝒮(H₀C) (sOf_iff)。
+
+
+## conjunct c — 𝒳 framework解明 + 完全構成マップ (2026-07-01)
+
+**𝒳 def** (S11): `xiSet` = HU の irreducible char で **H ⊄ ker** (H 上 nontrivial)。
+`xiOf(Y)` = xiSet ∩ {Y ⊆ ker}。⟹ **𝒳(H₀C) = HU irr char、H 上 nontrivial かつ H₀C ⊆ ker**。
+conjunct c (5166): ∃ζ∈xiOf(H₀C), ζ(1)=u ∧ induceHU(ζ) irr (deg q·u=qu、induceHU_apply_one_eq_q_mul)。
+
+**重要簡略化**: H∩C=1 ∧ [H,C]≤H₀ ⟹ **HC/H₀C ≅ H̄** ⟹ ψ on HC = **θ̄ の inflation** (H₀C 自動的に
+ker、Clifford 拡張不要)。⟹ 私の I_HU=HC seed (clifford_caseA_exists_char_inertia_hc_not_fixed) が
+正しい入力。Coq cfDprodl も同じ (Cbar 上 trivial = inflation)。
+
+**残 layers (多層 plumbing、機構は全て同定済)**:
+1. ψ on HC = inflate θ̄ (HC↠HC/H₀C≅H̄)。← iso HC/H₀C≅H̄ の構成 (H∩C=1 + [H,C]≤H₀、both repo に有:
+   commutator_cSub_H_le_H0)。
+2. inertia_{HU}(ψ)=HC: clifford_caseA_regular_inertia_hc (H-part の inertia=HC) +
+   restriction-inertia relation (inertia(ψ)⊆inertia(ψ|_H) + ψ HC-invariant)。Coq sub_inertia_Res。
+3. ζ=Ind_{HC}^{HU}(ψ) irr deg u: `isIrreducibleCharacter_induce_of_inertia_eq` + `hcInHu_normal`。
+4. M-level I_M(ζ)=HU: ζ not-W1-fixed (⟸ θ̄ not-fixed の伝播) → I_M≠M → prime-index
+   `eq_of_le_of_prime_index` ([M:HU]=q)。
+5. χ=induceHU(ζ) irr deg qu: `huSub_normal` + `isIrreducibleCharacter_induce_of_inertia_eq`。
+6. 𝒳: ζ∈xiOf(H₀C) (H⊄ker: θ̄ nontrivial on H̄; H₀C⊆ker: inflation で自動) → χ∈𝒮(H₀C) (sOf_iff)。
+
+inertia heart (seed) は完成、残は char-construction plumbing (多層だが機構既知)。layer 1-2 が次。
