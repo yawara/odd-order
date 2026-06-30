@@ -874,3 +874,20 @@ equality + Cor 14.8 全)。**残 on-path = deep multi-session のみ**: (1) cove
 (by_cases all-type-F で TypeICovering の cover_nonidentity[在]+pairwise[在] を wire、cover_subset_kernels を
 named sorry に isolate)。(a) が genuine math、(b) が配線。cover_subset_kernels (type-F TI) は Theorem A(8)
 M_F=M_σ ケースの別 deep port。
+
+## 進捗 (lane d, 2026-06-30 /loop³⁶): one_not_mem_zTilde prerequisite + κ→Ẑ port 精査 (deep monolith 確定)
+
+- **`one_not_mem_zTilde`** (S14、新): `1∉Ẑ` (1∈K⊆K⊔K*、K∪K* に入る)。⟹ `sharpSubgroup Ẑ = Ẑ`、`𝒞_G(Ẑ#)⊆G#`。
+  NonTypeICovering ⊇ direction の prerequisite。full build 3888 green。
+- **κ→Ẑ cover identification (Coq mFT_partition part 2、L2028-2070+) を精査**: NonTypeICovering の
+  cover_nonidentity ⊆ の κ branch は **deep monolith** = 2 重 WLOG (`wlog defH: H:=M` で H を M に正規化 +
+  `wlog Ky': y'∈K` で κ-element を κ-Hall K に Hall_subJ 共役) + `Ptype_embedding` (cycZ/defZ で Z=K⊔K* dprod) +
+  x=z·z' (z∈K*, z'∈K) 分解 → x∈Ẑ。**~50-70 行 Lean、deep Ptype/dprod machinery**。signalizer branch→M̃ は
+  `mem_Mtilde_of_mem_coset` (在) で軽い。
+
+**🛑 honest frontier (再確認)**: gate-2 両 branch とも deep multi-session port:
+- TypeICovering: cover_subset_kernels = **FittingIsTI-for-typeF** (Theorem A(8) M_F=M_σ ケース未証明 gap、または
+  Pf (8.13.c1) escaping-centralizer 経由、いずれも deep)。
+- NonTypeICovering: κ→Ẑ cover identification (上記 ~50-70 行 monolith) + exceptional_disjoint (trivIset)。
+§14 cover rapid-win phase 完了 (Lemma 14.6/Cor 14.9/covering eq/Cor 14.8)。残は sustained deep porting。
+**次 = NonTypeICovering κ→Ẑ monolith を head-on で着手** (上記 2-WLOG 構造に従い multi-iteration grind)。
