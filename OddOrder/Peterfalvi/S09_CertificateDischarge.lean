@@ -755,4 +755,36 @@ theorem induce_trivialChar_normSq_eq_index (K : Subgroup L) [K.Normal] [Fintype 
     rw [← Nat.cast_mul, mul_comm, K.index_mul_card]
   exact mul_left_cancel₀ hcardK (hkey.trans h2.symm)
 
+/-- **The (7.8.c) collapse of the (7.7.a) sum to a single term.**  If, in the `(7.7.a)`
+decomposition `χ^ρ(x) = ∑_{i ≥ 1} (c̄_i/‖ζ_i‖²) ζ_i(x)`, all coefficients `c_i` (`i ≥ 1`) vanish
+except at one index `i₁`, and the distinguished member satisfies `ζ_{i₁}(x) = ‖ζ_{i₁}‖²`
+(the induced-principal-character identity, both `= e`), then the sum collapses to `star(c_{i₁})`.
+
+This is the algebraic core of Peterfalvi (7.8.c): with `ζ_{i₁} = Ind_H^L 1_H` and
+`c_{i₁} = (β,χ)`, `induce_trivialChar_apply_eq_index`/`_normSq_eq_index` give the hypothesis
+`ζ_{i₁}(x) = ‖ζ_{i₁}‖²`, and `χ^ρ(x) = star(β,χ)`. -/
+theorem sum_collapse_to_single [Invertible (Nat.card L : ℂ)] {n : ℕ}
+    (ζ : Fin (n + 1) → ClassFunction L ℂ) (c : Fin (n + 1) → ℂ)
+    {x : L} {i₁ : Fin (n + 1)} (hi₁ : (0 : Fin (n + 1)) < i₁)
+    (hvanish : ∀ i ∈ Finset.Ioi (0 : Fin (n + 1)), i ≠ i₁ → c i = 0)
+    (hcrux : ζ i₁ x = ClassFunction.inner (ζ i₁) (ζ i₁))
+    (hnorm : ClassFunction.inner (ζ i₁) (ζ i₁) ≠ 0) :
+    (∑ i ∈ Finset.Ioi (0 : Fin (n + 1)),
+        (star (c i) / ClassFunction.inner (ζ i) (ζ i)) * ζ i x) = star (c i₁) := by
+  rw [Finset.sum_eq_single_of_mem i₁ (Finset.mem_Ioi.mpr hi₁)
+      (fun i hi hne => by rw [hvanish i hi hne]; simp), hcrux]
+  exact div_mul_cancel₀ _ hnorm
+
+/-- **The coherence vanishing of a (7.7.a) coefficient** (Peterfalvi (7.8.c)).  If `χ` is orthogonal
+to both `a` and `b` in `CF(G)`, then `(a − d·b, χ) = 0`.  In (7.8.c), with `a = ζ_i^ν`, `b = ζ_0^ν`
+(`ζ_i, ζ_0 ∈ S`) and the coherence agreement `(ζ_i − d_i ζ_0)^τ = ζ_i^ν − d_i ζ_0^ν`, the hypothesis
+`χ ⊥ S^ν` makes the coefficient `c_i = ((ζ_i − d_i ζ_0)^τ, χ)` vanish for the non-distinguished
+indices. -/
+theorem inner_sub_smul_left_eq_zero {G : Type*} [Group G] [Fintype G]
+    [Invertible (Nat.card G : ℂ)] {a b χ : ClassFunction G ℂ} {d : ℂ}
+    (ha : ClassFunction.inner χ a = 0) (hb : ClassFunction.inner χ b = 0) :
+    ClassFunction.inner (a - d • b) χ = 0 := by
+  rw [ClassFunction.inner_sub_left, ClassFunction.inner_smul_left,
+    inner_conj_symm χ a, ha, star_zero, inner_conj_symm χ b, hb, star_zero, mul_zero, sub_zero]
+
 end OddOrder.Peterfalvi.S09.Cert
