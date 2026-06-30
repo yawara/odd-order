@@ -738,3 +738,29 @@ card_normalizer_P_eq が (13.10)-conditional に。**(13.10) 自体の formaliza
 (13.5)-(13.10)) はさらに deep = lane a §13 char と重複** ⟹ (13.10) は cite に留め body は埋めない
 ([[feedback-cite-sorried-lemmas-if-signature-correct]])。[[scaffold-sorry-free-not-done]]
 [[feedback-no-avoiding-hard-parts]] [[feedback-flag-poor-progress]]
+
+### cont.²² (2026-06-30 lane c=γ /loop): c_eq_one は cont.²¹ 想定より深い (要 13.3.b char case split) — 方針を hub directive (exists_MHypothesis skeleton) に切替、index bridge を landing
+
+cont.²¹ の c_eq_one de-opacify plan を着手したが、**c_eq_one は cont.²¹ 想定より深いと判明** (Coq
+PFsection13 再読): textbook 04.15:208「By (13.3.b), we may assume the hypothesis of (13.10) holds」
+= c_eq_one は **char-theoretic case split** を要す:
+- **reducible core case** (`~~ has irrIndH calS`): C=1 via Frobenius PU `cent_semiregular` (Coq
+  `FTtypeP_no_Ind_Fitting_facts` = 13.3.b)。
+- **irreducible case**: (13.10) analytic + (13.11) numerical。
+case split 自体 (`has irrIndH calS` = 型-P char family の irreducible induction 有無) が deep §13
+char ⟹ c_eq_one は lane-c-solo wireable でない (lane a §10-13 char と重複)。FPF→c bound piece も
+IsFrobeniusGroup を ↥(C⊔W₁) ambient + subgroupOf で組む friction 大。
+
+**⟹ 方針切替: hub cont.¹⁹ directive (exists_MHypothesis structural skeleton) に従う**
+([[feedback-gated-endpoint-skeleton-pattern]] = gated endpoint を structural skeleton で前倒し)。
+**landed (commit 次): `typeIFrobenius_kernel_index_eq_complement`** (S15_SAndT、sorry-free) =
+任意 `TypeIFrobeniusData M` で `|M : M_F| = |complement|` (`IsComplement'.symm.index_eq_card` +
+`typeF.H_eq`)。V-side `complement_card_eq_pq` (=pq) と合わせ exists_MHypothesis の `e=|M:K|=pq`
+(`e_eq_index`+`complement_card_eq_pq` field) を供給する skeleton 第1 piece。
+
+**残 σ-frontier 確定** (cont.²⁰-²² 総括): clean independent structural win = W-cardinality のみ。
+残は全て (a) deep char (c_eq_one=13.3.b+13.10、h78=§7 coherence、lane a/b 共有) / (b) gated-endpoint
+scaffold (exists_MHypothesis skeleton、index bridge が初手) / (c) BG FittingIsTI (P/Q_isTI、lane d)。
+**次 = exists_MHypothesis skeleton の structural field を順次供給** (M/K/typeIHyp via
+exists_typeI_hypothesis + V-side producer、e=pq via 本 index bridge、T_typeII sorried cite)、char
+field は named obligation に isolate。[[scaffold-sorry-free-not-done]] [[feedback-no-avoiding-hard-parts]]

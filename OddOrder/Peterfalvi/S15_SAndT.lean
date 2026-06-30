@@ -1867,6 +1867,18 @@ theorem typeII_overNormalizer_frobenius_V [Finite G]
     typeI_overNormalizer_complement_V _hG hyp hTTypeII hLmax hNVL hVH frob hW2E
   exact ⟨⟨L, maxNilpotentNormalHall L, hLmax, rfl, hNVL, frob, hVH, hcard, hy⟩, hker, hVH⟩
 
+/-- **Frobenius index bridge** (Pf (14.11), structural): for a type-I maximal `M` with
+`TypeIFrobeniusData`, the index `|M : M_F|` of the Fitting kernel equals the order of the Frobenius
+complement.  Immediate from the complement structure `M = M_F ⋊ complement` (`IsComplement'`) and the
+kernel identity `typeF.H = M_F`.  Supplies the `e = |M : K| = p q` half of `MHypothesis`
+(`e_eq_index` + `complement_card_eq_pq`): combined with the V-side `complement_card_eq_pq` (`= p q`),
+the Fitting-kernel index of the type-I maximal over `N_G(V)` is `p q`. -/
+theorem typeIFrobenius_kernel_index_eq_complement {M : Subgroup G}
+    (data : OddOrder.Peterfalvi.S14.TypeIFrobeniusData M) :
+    ((maxNilpotentNormalHall M).subgroupOf M).index = Nat.card data.complement := by
+  rw [← data.typeI.typeF.H_eq]
+  exact data.frobenius.isComplement.symm.index_eq_card
+
 /-- Carrier for the virtual character `beta_j` and `Gamma_j` in (13.18). -/
 structure BetaData (hyp : Hypothesis (G := G)) where
   j : Fin hyp.p
