@@ -1793,4 +1793,116 @@ theorem family_degree_sum_Ioi {L : Type*} [Group L] [Fintype L] [Invertible (Nat
     family_degree_sum K θ hinj hcover ind1H hzeta_ind1H, hz0_deg, hz0_norm]
   ring
 
+/-- **(7.8.b) ℂ-level norm identity at the `Hypothesis78` level** (the `h_inner` producer).  Lifts
+`zetaNuRho_inner_eq_cexpr` (stated for `chiRhoCF (ν ζ_0)`) to
+`H78.zetaNuRho = chiRhoCF (ν ζ_{zetaDistinct})` under the constructor convention `zetaDistinct = 0`,
+then identifies the off-distinguished degree sum
+`G = Σ_{i ∈ Ioi 0, i ≠ ind1H} ζ_i(1)²/‖ζ_i‖²` with `e·(h−1) − e²` (via `hGsum`, the `(1.5.d)`
+`family_degree_sum_Ioi` value) and `|L| = e·h` (Lagrange
+`kernelOrder_mul_complementIndex_eq_card_L`).
+The conclusion is in the `(e_ℝ:ℂ)` real-cast shape consumed by `zetaNuRhoNormSq_eq_normQuad`. -/
+theorem zetaNuRho_inner_eq_cexpr_H78 {G : Type*} [Group G] [Fintype G] {A : Set G} {L : Subgroup G}
+    [Fintype L] [Invertible (Nat.card L : ℂ)] [Invertible (Nat.card G : ℂ)]
+    (H78 : OddOrder.Peterfalvi.S09.Hypothesis78 G A L) (hBD : H78.BetaDecomp)
+    (hzd : H78.zetaDistinct = 0)
+    (horth : ∀ i j : Fin (H78.hyp76.n + 1), i ≠ j →
+      ClassFunction.inner (H78.hyp76.zeta i) (H78.hyp76.zeta j) = 0)
+    (hc_ind1H : H78.hyp76.cCoeff (H78.nu (H78.hyp76.zeta 0)) H78.ind1H = (hBD.a : ℂ) - 1)
+    (hc_rest : ∀ i, i ≠ 0 → i ≠ H78.ind1H →
+      H78.hyp76.cCoeff (H78.nu (H78.hyp76.zeta 0)) i = -(H78.hyp76.d i))
+    (hd_real : ∀ i, star (H78.hyp76.d i) = H78.hyp76.d i)
+    (hP_real : ∀ i, star (H78.hyp76.zeta i 1) = H78.hyp76.zeta i 1)
+    (hd : ∀ i, H78.hyp76.d i = H78.hyp76.zeta i 1 / (H78.complementIndex : ℂ))
+    (hN_ind1H : H78.hyp76.zetaNormSq H78.ind1H = (H78.complementIndex : ℂ))
+    (hP_ind1H : H78.hyp76.zeta H78.ind1H 1 = (H78.complementIndex : ℂ))
+    (hGsum : ∑ i ∈ (Finset.Ioi (0 : Fin (H78.hyp76.n + 1))).erase H78.ind1H,
+        H78.hyp76.zeta i 1 ^ 2 / H78.hyp76.zetaNormSq i
+      = (H78.complementIndex : ℂ) * ((H78.kernelOrder : ℂ) - 1) - (H78.complementIndex : ℂ) ^ 2) :
+    ClassFunction.inner H78.zetaNuRho H78.zetaNuRho =
+      (((hBD.a : ℝ) : ℂ) - 1) ^ 2 / ((H78.complementIndex : ℝ) : ℂ)
+        + (((H78.complementIndex : ℝ) * ((H78.kernelOrder : ℝ) - 1)
+              - (H78.complementIndex : ℝ) ^ 2 : ℝ) : ℂ) / ((H78.complementIndex : ℝ) : ℂ) ^ 2
+        - ((((hBD.a : ℝ) : ℂ) - 1)
+            - (((H78.complementIndex : ℝ) * ((H78.kernelOrder : ℝ) - 1)
+                  - (H78.complementIndex : ℝ) ^ 2 : ℝ) : ℂ) / ((H78.complementIndex : ℝ) : ℂ)) ^ 2
+          / (((H78.complementIndex : ℝ) : ℂ) * ((H78.kernelOrder : ℝ) : ℂ)) := by
+  have he_ne : (H78.complementIndex : ℂ) ≠ 0 :=
+    Nat.cast_ne_zero.mpr H78.complementIndex_pos.ne'
+  have hind : H78.ind1H ≠ 0 := fun h => H78.zetaDistinct_ne_ind1H (hzd.trans h.symm)
+  have ha1_real : star ((hBD.a : ℂ) - 1) = (hBD.a : ℂ) - 1 := by simp
+  have hLcard : (Nat.card L : ℂ) = (H78.complementIndex : ℂ) * (H78.kernelOrder : ℂ) := by
+    rw [mul_comm]; exact_mod_cast H78.kernelOrder_mul_complementIndex_eq_card_L.symm
+  simp only [OddOrder.Peterfalvi.S09.Hypothesis78.zetaNuRho, hzd]
+  rw [zetaNuRho_inner_eq_cexpr H78.hyp76 H78.nu (hBD.a : ℂ) (H78.complementIndex : ℂ) hind horth
+      hc_ind1H hc_rest ha1_real hd_real hP_real hd hN_ind1H hP_ind1H he_ne,
+    hGsum, hLcard]
+  push_cast
+  ring
+
+/-- **Peterfalvi (7.8.b), the `ζ`-norm lower bound** (`Hypothesis78` level).  Assembles the full
+chain: the `h_inner` identity `zetaNuRho_inner_eq_cexpr_H78`, the real-part identification
+`zetaNuRhoNormSq_eq_normQuad` (`‖ζ_0^{νρ}‖² = normQuadraticCorrection + (1 − e/h)`), and the
+nonnegativity reduction `zetaNuRhoNormSq_ge_of_normQuadraticCorrection_eq` (valid under
+`2e + 1 ≤ h`).  The result `1 − e/h ≤ ‖ζ_0^{νρ}‖²` is exactly the (7.8.b)
+`NormEstimates.zetaNuRho_norm_sq_ge` target, discharged from the abstract
+`(7.8.a)`-decomposition / coherence / degree facts. -/
+theorem zetaNuRhoNormSq_eq_normQuad_of_facts {G : Type*} [Group G] [Fintype G] {A : Set G}
+    {L : Subgroup G} [Fintype L] [Invertible (Nat.card L : ℂ)] [Invertible (Nat.card G : ℂ)]
+    (H78 : OddOrder.Peterfalvi.S09.Hypothesis78 G A L) (hBD : H78.BetaDecomp)
+    (hzd : H78.zetaDistinct = 0)
+    (horth : ∀ i j : Fin (H78.hyp76.n + 1), i ≠ j →
+      ClassFunction.inner (H78.hyp76.zeta i) (H78.hyp76.zeta j) = 0)
+    (hc_ind1H : H78.hyp76.cCoeff (H78.nu (H78.hyp76.zeta 0)) H78.ind1H = (hBD.a : ℂ) - 1)
+    (hc_rest : ∀ i, i ≠ 0 → i ≠ H78.ind1H →
+      H78.hyp76.cCoeff (H78.nu (H78.hyp76.zeta 0)) i = -(H78.hyp76.d i))
+    (hd_real : ∀ i, star (H78.hyp76.d i) = H78.hyp76.d i)
+    (hP_real : ∀ i, star (H78.hyp76.zeta i 1) = H78.hyp76.zeta i 1)
+    (hd : ∀ i, H78.hyp76.d i = H78.hyp76.zeta i 1 / (H78.complementIndex : ℂ))
+    (hN_ind1H : H78.hyp76.zetaNormSq H78.ind1H = (H78.complementIndex : ℂ))
+    (hP_ind1H : H78.hyp76.zeta H78.ind1H 1 = (H78.complementIndex : ℂ))
+    (hGsum : ∑ i ∈ (Finset.Ioi (0 : Fin (H78.hyp76.n + 1))).erase H78.ind1H,
+        H78.hyp76.zeta i 1 ^ 2 / H78.hyp76.zetaNormSq i
+      = (H78.complementIndex : ℂ) * ((H78.kernelOrder : ℂ) - 1) - (H78.complementIndex : ℂ) ^ 2) :
+    H78.zetaNuRhoNormSq =
+      H78.normQuadraticCorrection hBD
+        + (1 - (H78.complementIndex : ℝ) / (H78.kernelOrder : ℝ)) :=
+  zetaNuRhoNormSq_eq_normQuad H78 hBD (hBD.a : ℝ) (H78.complementIndex : ℝ) (H78.kernelOrder : ℝ)
+    ((H78.complementIndex : ℝ) * ((H78.kernelOrder : ℝ) - 1) - (H78.complementIndex : ℝ) ^ 2)
+    (Nat.cast_ne_zero.mpr H78.complementIndex_pos.ne')
+    (Nat.cast_ne_zero.mpr H78.kernelOrder_pos.ne') rfl rfl rfl rfl
+    (zetaNuRho_inner_eq_cexpr_H78 H78 hBD hzd horth hc_ind1H hc_rest hd_real hP_real hd
+      hN_ind1H hP_ind1H hGsum)
+
+/-- **Peterfalvi (7.8.b), the `ζ`-norm lower bound** (`Hypothesis78` level).  The direct `≤` form of
+the (7.8.b) target `NormEstimates.zetaNuRho_norm_sq_ge`: from the `zetaNuRhoNormSq_eq_normQuad_of_facts`
+identity and the `smallIndex` (`2e + 1 ≤ h`) nonnegativity reduction
+`zetaNuRhoNormSq_ge_of_normQuadraticCorrection_eq`, the coherent `ζ`-image satisfies
+`1 − e/h ≤ ‖ζ_0^{νρ}‖²`.
+
+To obtain the *full* (7.8.b) `NormEstimates` (both the `ζ` bound and the `Γ` bound `‖Γ‖² ≤ e − 1`),
+feed `zetaNuRhoNormSq_eq_normQuad_of_facts` as the `hzeta` argument of the already-assembled source-side
+`OddOrder.Peterfalvi.S09.Hypothesis78.normEstimates_of_source_orthogonal`. -/
+theorem zetaNuRhoNormSq_ge_of_facts {G : Type*} [Group G] [Fintype G] {A : Set G} {L : Subgroup G}
+    [Fintype L] [Invertible (Nat.card L : ℂ)] [Invertible (Nat.card G : ℂ)]
+    (H78 : OddOrder.Peterfalvi.S09.Hypothesis78 G A L) (hBD : H78.BetaDecomp)
+    (hzd : H78.zetaDistinct = 0)
+    (horth : ∀ i j : Fin (H78.hyp76.n + 1), i ≠ j →
+      ClassFunction.inner (H78.hyp76.zeta i) (H78.hyp76.zeta j) = 0)
+    (hc_ind1H : H78.hyp76.cCoeff (H78.nu (H78.hyp76.zeta 0)) H78.ind1H = (hBD.a : ℂ) - 1)
+    (hc_rest : ∀ i, i ≠ 0 → i ≠ H78.ind1H →
+      H78.hyp76.cCoeff (H78.nu (H78.hyp76.zeta 0)) i = -(H78.hyp76.d i))
+    (hd_real : ∀ i, star (H78.hyp76.d i) = H78.hyp76.d i)
+    (hP_real : ∀ i, star (H78.hyp76.zeta i 1) = H78.hyp76.zeta i 1)
+    (hd : ∀ i, H78.hyp76.d i = H78.hyp76.zeta i 1 / (H78.complementIndex : ℂ))
+    (hN_ind1H : H78.hyp76.zetaNormSq H78.ind1H = (H78.complementIndex : ℂ))
+    (hP_ind1H : H78.hyp76.zeta H78.ind1H 1 = (H78.complementIndex : ℂ))
+    (hGsum : ∑ i ∈ (Finset.Ioi (0 : Fin (H78.hyp76.n + 1))).erase H78.ind1H,
+        H78.hyp76.zeta i 1 ^ 2 / H78.hyp76.zetaNormSq i
+      = (H78.complementIndex : ℂ) * ((H78.kernelOrder : ℂ) - 1) - (H78.complementIndex : ℂ) ^ 2)
+    (hsmall : H78.smallIndex) :
+    1 - (H78.complementIndex : ℝ) / (H78.kernelOrder : ℝ) ≤ H78.zetaNuRhoNormSq :=
+  H78.zetaNuRhoNormSq_ge_of_normQuadraticCorrection_eq hBD
+    (zetaNuRhoNormSq_eq_normQuad_of_facts H78 hBD hzd horth hc_ind1H hc_rest hd_real hP_real hd
+      hN_ind1H hP_ind1H hGsum) hsmall
+
 end OddOrder.Peterfalvi.S09.Cert
