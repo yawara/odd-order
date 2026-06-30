@@ -1215,3 +1215,20 @@ e=[L:H]=|U| (Frobenius complement、typeF.complement.symm.index_eq_card)、非�
 h_const(12.14 cite)/h_psig_int(12.15 cite)/h2e(12.12)/hidx(8.1.c)/hM(12.11) = cite-able。
 **trajectory**: 残り cite-able を埋めて exists_counterexample_dade_data を hA/hB/hC のみ残す real partial
 assembly にする (hB=hard floor を明示 isolate)。次: ε/hε + 基数 (easy reals)。
+
+### loop⁴⁸ — lane b 方向転換: §7 hard floor 解消へ (ユーザー裁可)
+
+**ユーザー判断 (AskUserQuestion)**: lane b の (12.16) ψ-construction (he/hM 含む) 完了後、残る hard floor
+**hB=(7.8.b) は `Hypothesis78` の (7.8.c.i) certificate を要し project 全体で未形式化**。ユーザーが
+「§7 hard floor を解消」を選択 → lane b を **§7 (7.7.a)/(7.8.c) certificate discharge に pivot**。
+
+**正本 = issue 1013** (S09 §7 certificate discharge)。要点:
+- hard floor = `Hypothesis76.chiRho_decomp` (7.7.a) + `Hypothesis78.chiRho_eq_inner_beta` (7.8.c.i) が
+  構造の carried field。coherence から Hypothesis76/78 を構成するにはこれらを証明要。
+- 原文 mmd `04.9` L54-109 (p.39-40) に proof。coq `PFsection7.v` 併読。
+- ⚠ S09 は別セッションが活発編集中 ((7.11) assembly) → **S09 直接編集せず新ファイルで certificate を
+  standalone theorem 証明**して衝突回避。
+- discharge 後、lane b (12.16) hB と lane γ (14.11) h78 obligation の両方が unblock。
+
+**(12.16) の lane b 成果は temporal に一段落** (ψ/he/hM real、残 field は §7 unblock 待ち or deep)。
+次イテレーション = (7.7.a) chiRho_decomp の standalone 証明に着手 (新ファイル)。
