@@ -91,6 +91,20 @@ lane c の独立 runway = (a) base Hypothesis の Tdata carrier 拡張 + V-side 
 下流 char-gated) or (b) lane b char keystone (重複 risk)。**戦略 fork をユーザーに flag** (issue 4002
 proposal: 続行 / lane b bottleneck 支援 / 別 frontier 再配置)。[[feedback-flag-poor-progress]]
 
+### ⚠ 訂正 (同 /loop、ユーザー裁定「V-side 続行」後の正面調査): Tdata carrier は dead-end
+
+ユーザーが「§16 V-side 構成続行」を選択 → 上記 (a) の「Tdata carrier 拡張」を着手調査した結果
+**誤りと判明**。`FeitThompson.lean:276` docstring が明記: **「T (larger-κ member) need not be
+type-P₂, so no symmetric Tdata」** — T の type-P₂ 性は §14 結論 (`T_typeII` 14.9) で**入力でない**
+(S は smaller-κ で type-P₂ 固定ゆえ Sdata 入力、T は非対称が設計意図)。Tdata を入力 carrier に
+すると §14 結論を入力に格上げする設計違反。
+
+**真の V-side gate = `T_typeII` (14.9、本 iteration で BG-structural reduction 済)**。V-side 構成は
+`exists_typeI_maximal_overNormalizer_V` (S-side S15:609 ~350 行 dual、T_typeII gated + V-side helper
+chain) → `exists_MHypothesis` ~35 field assemble。`T_typeII_structural_inputs` の 5 連言 = `TypeIIData
+T` field そのもの (深 §14.9 char、tractable sub-conjunct 無し)。詳細 =
+`notes/peterfalvi/s16_w4_char_cascade.md` cont.¹²。次 = V-side helper chain (multi-iteration)。
+
 ## 参照
 
 - `notes/peterfalvi/s16_nonexistence_gate_map.md` (正本・13 sorry の gate 詳細)
