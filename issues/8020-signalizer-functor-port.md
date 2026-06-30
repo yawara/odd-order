@@ -1090,3 +1090,21 @@ M̃-cover に切替 (M_σ-TI 回避、但し S09 再構成要・cross-lane)。τ
 
 **次 = hD4 grind**: existence assembly を書き、uniqueness を §13/§12 uniqueness 補題で埋める (or |ℳ(C(x))|=1
 を escaping x へ適用)。theoremII hMaxUnique も同時 unblock。
+
+## ✅ 進捗 (lane d, 2026-06-30 /loop⁴⁹ cont.): D(4) uniqueness SOLVED — hD4 proof 完成 (placement 待ち)
+
+D(4) の「deep」と恐れた uniqueness が **tractable** と判明 (grind が証明):
+- **uniqueness 解決**: `maximalContaining_centralizer_eq_singleton_of_tau2_element` (S14:3032, sorry-free,
+  = Coq `cent1_nreg_sigma_uniq`) を neighbor N に適用 → **`ℳ(C(x)) = {N}`**。signalizer structure が
+  x∈τ2(N) + Msigma N⊓C(x)≠⊥ を供給するゆえ前提充足。これで hD4 の ∃! uniqueness が即出る。
+- **🔑 2-for-1 再確認**: 同 `ℳ(C(x))={N}` が `theoremII_tame_embedding` の `hMaxUnique` (S16:5580) も discharge。
+- **hD4 proof 完成** (scratchpad `hD4_proof.lean`, 73 行): existence (signalizer_structure + RData_of_inputs +
+  maxNilpotentNormalHall_eq + ASet=hatMsigma + x∉Msigma N via τ2) + uniqueness (上記) + conjunct7
+  (centralizer_escape_final_local)。
+- **残 2 点 (次 iteration で land)**:
+  1. **placement**: helper は `maxNilpotentNormalHall_eq_Msigma_of_isTypeF_or_isTypeP2` (S16:5324) を要し
+     forward-ref ゆえ **5324 以降に配置**。theoremD は 5670/5683 でのみ consume (両 >5324) ゆえ helper+theoremD を
+     5324 直後へ relocate し hD4 sorry を `exists_RData_escape_structure` で discharge。
+  2. **¬FittingIsTI M** (conjunct 7 の唯一 sub-sorry): escape から導出 — c∈C(x)∖M で x∈M_σ∩(M_σ)^c≠1
+     (c が x を中心化)、c∉N(M_σ)=M ⟹ (M_σ)# は TI でない ⟹ ¬FittingIsTI M (要 fittingInAmbient M=Msigma M for type-F)。
+  3. build-debug (forward-ref で早期停止ゆえ他 conjunct の names/sigs 未検証)。
