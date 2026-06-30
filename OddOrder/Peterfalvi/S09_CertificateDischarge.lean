@@ -63,4 +63,18 @@ theorem induce_restrict_eq_index_smul (K : Subgroup L) [hK : K.Normal]
     rw [Finset.sum_congr rfl (fun x _ => hterm x), Finset.sum_const_zero, mul_zero,
       hψ y hy, mul_zero]
 
+/-- **Peterfalvi (7.7.a), `CF(L,A)` is induced from `K`.**  A class function `ψ` on `L` supported
+inside a normal subgroup `K` (i.e. `ψ ∈ CF(L, K^#)`) is the induction of a class function on `K`,
+namely `ψ = Ind_K^L ((1/[L:K]) · Res_K^L ψ)`.  Immediate from the spanning identity
+`induce_restrict_eq_index_smul` and linearity of induction (`induce_smul`).
+
+This realizes the membership `CF(L,A) ⊆ Ind_K^L(CF(K)) = ⟨Ind_K^L θ⟩_ℂ` that underlies Peterfalvi's
+basis argument: every `ψ ∈ CF(L,A)` lies in the `ℂ`-span of the family `T = {Ind_K^L θ}`. -/
+theorem eq_induce_restrict_of_supported (K : Subgroup L) [K.Normal]
+    [Invertible (Nat.card ↥K : ℂ)] (ψ : ClassFunction L ℂ)
+    (hψ : ∀ y : L, y ∉ K → ψ y = 0) :
+    ψ = ClassFunction.induce K ((K.index : ℂ)⁻¹ • ClassFunction.restrict K ψ) := by
+  rw [ClassFunction.induce_smul, induce_restrict_eq_index_smul K ψ hψ, smul_smul,
+    inv_mul_cancel₀ (Nat.cast_ne_zero.mpr K.index_ne_zero_of_finite), one_smul]
+
 end OddOrder.Peterfalvi.S09.Cert
