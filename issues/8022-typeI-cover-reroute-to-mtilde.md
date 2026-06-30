@@ -105,3 +105,26 @@ named inputs に結晶化し、kernel-cover/M_σ-TI (possibly false) 依存を�
 
 **hub 要請**: 8.15 (`dadeSupportHypotheses_typeI`) + type-I Dade isometry/HConjInvariant は §8 ゆえ
 lane-a/c 協調が要る。lane-d は assembly skeleton を先行実装可 (次 /loop)。
+
+## ✅ NonTypeICovering 分岐 COMPLETE (lane d, 2026-06-30, fix-W + producer)
+
+`bgTheoremE_cover_data` の (8.8) dichotomy を **𝓜_P で case 分け**し、**𝓜_P≠∅ 側を完全証明**した
+(全 sorry-free, full build 3889 green / AxiomsCheck OK):
+
+- **fix-W 完成** (S14, 7 補題): `zTilde_comm` / `zTilde_conj_smul` / `conjClassSet_conj_smul` /
+  `conjClassSet_zTilde_conj_eq` / `isHall_kappa_subgroupOf_conj` (κ-Hall 共役不変) /
+  `conjClassSet_zTilde_eq_of_isConjugate` (threading) / `conjClassSet_zTilde_eq_fixed_of_isTypeP`
+  (任意 type-P N の Ẑ → 固定 W=Ẑ(M))。
+- **fixed-W cover** (S14): `kappa_branch_dichotomy_mem_fixed_conjClassSet_zTilde` +
+  `exists_mem_conjClassSet_Mtilde_or_fixed_zTilde` (κ-branch を固定 Ẑ に着地)。
+- **struct redesign** (S10): `BGTheoremENonTypeICovering.W : Subgroup` → `exceptionalSet : Set`
+  (W:Subgroup は **unsatisfiable** = 本 issue で独立確認; K*#⊆M_σ#⊆M̃ が exceptional_disjoint を破る)。
+  downstream consumer 0 ゆえ safe。
+- **producer** (S10): `nonTypeICovering_of_isTypeP` — M̃-cover data + ref type-P ⟹
+  `BGTheoremENonTypeICovering` (exceptionalSet=zTilde、cover_nonidentity=fixed-W cover+reps変換、
+  pairwise=conjClassSet_Mtilde_disjoint、exceptional=conjClassSet_T_Mtilde_disjoint)。
+- **wiring** (S10): 𝓜_P≠∅ → `Or.inr ⟨producer⟩` 完全証明; 𝓜_P=∅ → TypeICovering sorry のみ残。
+
+⟹ headline sorry は (8.8) 全体から **TypeICovering/§8 case (𝓜_P=∅) のみ**に縮小。残りは
+`cover_subset_kernels` (= route B / §8 Dade、lane-a/c)。lane-d の §14-16 群論 + fix-W はこれで
+NonTypeICovering を閉じきった。
