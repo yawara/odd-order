@@ -679,3 +679,19 @@ deg [M:HC]=qu) で構成。
   spread 性) で prime-TI 同定に依存 = より重い。
 ∴ 次は **conjunct c 経由 + SupIndep de-opacify + regular θ̄ 構成** を優先検討。my inertia 機構
 (core+lift) は両 conjunct の共通 enabling ingredient で完備。
+
+
+## regular θ̄ 構成の mathlib 機構 (2026-06-30)
+
+conjunct c の regular θ̄ (各 Hpart 上 nontrivial な linear char) 構成に使える mathlib:
+- `CommGroup.exists_apply_ne_one_of_hasEnoughRootsOfUnity {a≠1} : ∃ χ:G→*Mˣ, χ a ≠ 1`
+  (FiniteAbelian/Duality.lean:64) — char が点を分離 (ℂ は hasEnoughRootsOfUnity)。
+- `MonoidHom.restrict_surjective (H:Subgroup G) : Surjective (G→*Mˣ の H 制限)` (同:108) —
+  部分群の char は G へ拡張可。
+- 構成: H̄ = ⊕ Hpart (Hpart_iSupIndep + Hpart_iSup) ⟹ H̄ ≅ ∏ Hpart (internal direct product iso;
+  `Subgroup.noncommPiCoprod` / `DirectSum.IsInternal` 系) ⟹ θ̄ = (∏ ψ_i) ∘ iso⁻¹ (各 ψ_i nontrivial)。
+  regular char 数 = (p-1)^q > 0 ゆえ存在は確実。union-bound は弱すぎ (q<p 不要)、tuple 対応 (iso) が正道。
+
+**次の構成ステップ**: (1) H̄ ≅ ∏ Hpart の iso (iSupIndep+iSup=⊤ から; elementary abelian ゆえ
+additive `DirectSum.IsInternal` も可)、(2) 各 Hpart i の nontrivial char (exists_apply_ne_one)、
+(3) 合成で regular θ̄、(4) `inertia_eq_hcInHu_caseA` → induce → conjunct c。multi-piece、fresh context 推奨。
