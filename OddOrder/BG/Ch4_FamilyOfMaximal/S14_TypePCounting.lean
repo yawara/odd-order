@@ -8735,6 +8735,46 @@ theorem one_not_mem_zTilde (K Kstar : Subgroup G) : (1 : G) ∉ zTilde K Kstar :
   rw [zTilde, Set.mem_diff, not_and_or, not_not]
   exact Or.inr (Set.mem_union_left _ (SetLike.mem_coe.mpr K.one_mem))
 
+/-- **`Ẑ` is symmetric in its two factors**: `zTilde K K* = zTilde K* K` (both `K ⊔ K*` and
+`K ∪ K*` are symmetric).  Used for the partner side, where the swap exchanges `K ↔ K*`. -/
+theorem zTilde_comm (K Kstar : Subgroup G) : zTilde K Kstar = zTilde Kstar K := by
+  rw [zTilde, zTilde, sup_comm, Set.union_comm]
+
+/-- **`Ẑ` is `G`-conjugation equivariant**: `(zTilde K K*)^g = zTilde (K^g) (K*^g)`.  Conjugation is
+a set bijection commuting with `\`, `∪`, and `⊔` (`Subgroup.smul_sup`), so it distributes through
+the `zTilde = (K ⊔ K*) ∖ (K ∪ K*)` definition.  Lets a `zTilde` of a conjugate type-`P` maximal be
+identified (up to `conjClassSet`) with a fixed `Ẑ`. -/
+theorem zTilde_conj_smul (g : G) (K Kstar : Subgroup G) :
+    MulAut.conj g • zTilde K Kstar
+      = zTilde (MulAut.conj g • K) (MulAut.conj g • Kstar) := by
+  rw [zTilde, zTilde, Set.smul_set_sdiff, Set.smul_set_union,
+    ← Subgroup.coe_pointwise_smul, ← Subgroup.coe_pointwise_smul,
+    ← Subgroup.coe_pointwise_smul, Subgroup.smul_sup]
+
+/-- **`𝒞_G` is invariant under conjugating the underlying set**: `𝒞_G(S^g) = 𝒞_G(S)` (conjugation
+permutes `G`-conjugacy classes, fixing their union). -/
+theorem conjClassSet_conj_smul (g : G) (S : Set G) :
+    conjClassSet (MulAut.conj g • S) = conjClassSet S := by
+  ext y
+  simp only [OddOrder.GroupTheory.mem_conjClassSet]
+  constructor
+  · rintro ⟨t, ht, b, rfl⟩
+    rw [Set.mem_smul_set] at ht
+    obtain ⟨s, hs, hst⟩ := ht
+    refine ⟨s, hs, b * g, ?_⟩
+    rw [← hst, MulAut.smul_def, MulAut.conj_apply]; group
+  · rintro ⟨s, hs, b, rfl⟩
+    refine ⟨MulAut.conj g • s, Set.smul_mem_smul_set hs, b * g⁻¹, ?_⟩
+    rw [MulAut.smul_def, MulAut.conj_apply]; group
+
+/-- **`𝒞_G(Ẑ)` only depends on the `G`-conjugacy class of `(K, K*)`**: conjugating both factors by
+`g` leaves `𝒞_G(zTilde K K*)` unchanged.  This is the fix-`W` step — a `zTilde` of a conjugate
+type-`P` maximal has the same `conjClassSet` as the reference `Ẑ`. -/
+theorem conjClassSet_zTilde_conj_eq (g : G) (K Kstar : Subgroup G) :
+    conjClassSet (zTilde (MulAut.conj g • K) (MulAut.conj g • Kstar))
+      = conjClassSet (zTilde K Kstar) := by
+  rw [← zTilde_conj_smul, conjClassSet_conj_smul]
+
 /-- **Algebraic core of the κ→Ẑ identification** (the final step of BG `mFT_partition` part 2):
 a product `y · y'` of a nonidentity `K*`-element `y` and a nonidentity `K`-element `y'` lies in
 `Ẑ = (K ⊔ K*) ∖ (K ∪ K*)`, provided `K ⊓ K* = ⊥`.  Membership in `K ⊔ K*` is immediate; `y·y' ∉ K`
