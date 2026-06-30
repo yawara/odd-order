@@ -2184,6 +2184,43 @@ theorem chiefFactor_coprime_H0_W1 [Finite G] {M : Subgroup G}
   (typeP_coprime_H_W1 data.typeP).coprime_dvd_left
     (Subgroup.card_dvd_of_le chief.H0_lt_H.le)
 
+/-- **`(H₀ ⊔ C) ⊓ H = H₀`** (Peterfalvi (9.8.b)/(9.9.b) shared, the Dedekind step) — the unifying
+condition `K ∩ H = H₀` that lets the §9↔§6 reducible count `reducible_count_sOf_H0` apply to
+`K = H₀C` exactly as to `K = H₀` (Coq `PFsection9` `nb_redM`, instantiated at both `K = H0` and
+`K = H0C`).  `C ≤ U` and `H ⊓ U = ⊥` (`typeP_H_inf_U`) kill the `C`-part: writing
+`x ∈ H₀ ⊔ C = H₀·C` (`coe_mul_of_right_le_normalizer_left`, since `C ≤ U ≤ M ≤ N(H₀)`) as
+`x = h₀·c`, membership `x ∈ H` together with `h₀ ∈ H₀ ≤ H` forces `c ∈ H ⊓ C ≤ H ⊓ U = ⊥`.
+Consequently `W₂ ∩ H₀C = W₂ ∩ H ∩ H₀C = W₂ ∩ H₀` (as `W₂ ≤ H`), so the chief-factor image `W̄₂`
+keeps order `p` in `M/H₀C` just as in `M/H₀` — this is what makes the `H₀C` reducible count
+`reducible_count_sOf_H0C` a parallel of the `H₀` one (issue 1012). -/
+theorem chiefFactor_H0supC_inf_H_eq_H0 {M : Subgroup G}
+    {data : TypesIIIIIIVSetup M} (chief : ChiefFactorData data) :
+    (chief.H0 ⊔ cSub data chief) ⊓ data.H = chief.H0 := by
+  refine le_antisymm ?_ (le_inf le_sup_left chief.H0_lt_H.le)
+  intro x hx
+  obtain ⟨hxHC, hxH⟩ := Subgroup.mem_inf.mp hx
+  rw [← SetLike.mem_coe, Subgroup.coe_mul_of_right_le_normalizer_left chief.H0 (cSub data chief)
+      (((cSub_le_U data chief).trans (U_le_M data)).trans chief.H0_normalized_by_M)] at hxHC
+  obtain ⟨h₀, hh₀, c, hc, rfl⟩ := hxHC
+  have hcH : c ∈ data.typeP.H := by
+    have hcalc : h₀⁻¹ * (h₀ * c) ∈ data.H := mul_mem (inv_mem (chief.H0_lt_H.le hh₀)) hxH
+    simpa [inv_mul_cancel_left] using hcalc
+  have hc1 : c = 1 := by
+    have hmem : c ∈ data.typeP.H ⊓ data.typeP.U :=
+      Subgroup.mem_inf.mpr ⟨hcH, cSub_le_U data chief hc⟩
+    rwa [typeP_H_inf_U data.typeP, Subgroup.mem_bot] at hmem
+  simpa [hc1] using hh₀
+
+/-- **`H₀C ≤ M' = HU`**: `H₀ ≤ H ≤ M'` (`typeP.H_le`) and `C ≤ U ≤ M'` (`typeP.U_le`).  The second
+input (`K ≤ HU`) of the generic reducible-count hypothesis (Coq `PFsection9` `nb_redM`) for the
+quotient `M/H₀C`; combined with `chiefFactor_H0supC_inf_H_eq_H0` and `H₀C ◁ M` it makes the §9↔§6
+count apply to `K = H₀C` (issue 1012). -/
+theorem chiefFactor_H0supC_le_derived {M : Subgroup G}
+    {data : TypesIIIIIIVSetup M} (chief : ChiefFactorData data) :
+    chief.H0 ⊔ cSub data chief ≤ derivedInG M :=
+  sup_le (chief.H0_lt_H.le.trans data.typeP.H_le)
+    ((cSub_le_U data chief).trans data.typeP.U_le)
+
 /-- **`A.map f ⊓ B.map f = (A ⊓ B).map f` when `ker f ≤ B`** (general group theory).  `⊇` is
 monotonicity; for `⊆`, `f a = f b` with `b ∈ B` and `ker f ≤ B` forces `a ∈ B`, so `a ∈ A ⊓ B`.
 The step (8.4.d) needs to pull `C(x̄) ⊓ K̄` out of the image (`f = mk' H₀`, `ker = H₀ ≤ K = M'`). -/
