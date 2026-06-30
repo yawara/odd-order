@@ -9410,7 +9410,7 @@ theorem centralizer_escape_final_local [Finite G]
     (hx : x ∈ sigmaSharp M) (hesc : ¬ Subgroup.centralizer ({x} : Set G) ≤ M)
     (hNmem : N ∈ maximalSubgroupsContaining (Subgroup.centralizer ({x} : Set G)))
     (hNnotF : ¬ S14.IsTypeF N) :
-    S14.IsTypeF M ∧ S14.IsTypeP2 N ∧
+    S14.IsTypeF M ∧ ¬ FittingIsTI M ∧ S14.IsTypeP2 N ∧
       ∃ E : Subgroup G,
         E ≤ M ∧ Subgroup.IsComplement' ((OddOrder.BG.Ch3.S10.Msigma M).subgroupOf M)
           (E.subgroupOf M) ∧ IsCyclic ↥E ∧
