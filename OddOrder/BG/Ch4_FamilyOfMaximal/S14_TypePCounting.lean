@@ -10786,6 +10786,48 @@ theorem kappa_branch_dichotomy_mem_conjClassSet_zTilde [Finite G]
     hMstarne hpart hyNsigma hy1 hy'N hy'1 hycent hkappa
   rwa [mul_inv_cancel_left] at hmem
 
+/-- **Fixed-`W` κ-branch**: the same conclusion as `kappa_branch_dichotomy_mem_conjClassSet_zTilde`,
+but landing in the `Ẑ` of a *fixed* reference type-`P` maximal `Mref` (data `Kref, K*ref, Uref`)
+rather than in the (existentially produced) type-`P` `N`'s own `Ẑ`.  The dichotomy's `N` is type-`P`,
+so `conjClassSet_zTilde_eq_fixed_of_isTypeP` (fix-`W`) absorbs `N`'s `Ẑ` into `Ẑ(Mref)`. -/
+theorem kappa_branch_dichotomy_mem_fixed_conjClassSet_zTilde [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (D : SigmaDecompositionData G)
+    {Mref Kref Kstarref Uref : Subgroup G}
+    (hMref : Mref ∈ maximalSubgroups G) (hMPref : IsTypeP Mref) (hKMref : Kref ≤ Mref)
+    (hKref : Ch03.IsHallSubgroup (kappa Mref) (Kref.subgroupOf Mref))
+    (hKstarref : Kstarref = OddOrder.BG.Ch3.S10.Msigma Mref ⊓ Subgroup.centralizer (Kref : Set G))
+    (hUref : Ch03.IsHallSubgroup ((kappa Mref ∪ OddOrder.BG.Ch3.S10.sigma Mref)ᶜ)
+      (Uref.subgroupOf Mref))
+    {y g : G} (hyl : D.length y = 1) {N : Subgroup G}
+    (hNmem : N ∈ maximalSigmaSubgroupsOfElement y)
+    (hsharp : y⁻¹ * g ∈ sharpSubgroup (N ⊓ Subgroup.centralizer ({y} : Set G)))
+    (hkappa : OddOrder.GroupTheory.IsPiElement (kappa N) (y⁻¹ * g)) :
+    g ∈ conjClassSet (zTilde Kref Kstarref) := by
+  obtain ⟨hNmax, hyNsigma⟩ := hNmem
+  have hy1 : y ≠ 1 := ((D.length_one_iff y).mp hyl).1
+  rw [sharpSubgroup, Set.mem_diff, Set.mem_singleton_iff, SetLike.mem_coe,
+    Subgroup.mem_inf] at hsharp
+  obtain ⟨⟨hy'N, hy'cent⟩, hy'1⟩ := hsharp
+  have hycent : y ∈ Subgroup.centralizer ({y⁻¹ * g} : Set G) := by
+    rw [Subgroup.mem_centralizer_iff]; intro z hz
+    rw [Set.mem_singleton_iff.mp hz]
+    exact (Subgroup.mem_centralizer_iff.mp hy'cent y (Set.mem_singleton y)).symm
+  have hNP : IsTypeP N := by
+    obtain ⟨p, hp⟩ : (orderOf (y⁻¹ * g)).primeFactors.Nonempty :=
+      Nat.nonempty_primeFactors.mpr (by
+        have h1 : orderOf (y⁻¹ * g) ≠ 1 := by rwa [Ne, orderOf_eq_one_iff]
+        have h0 : 0 < orderOf (y⁻¹ * g) := orderOf_pos _
+        omega)
+    exact ⟨p, hkappa p hp⟩
+  obtain ⟨K, Kstar, U, hKM, hK, hKstar, hU⟩ := exists_typeP_data hG hNmax
+  obtain ⟨Mstar, hMstarne, hMstarmem, hpart⟩ := exists_partner hG D hNmax hNP hKM hK hKstar hU
+  have hmem : g ∈ conjClassSet (zTilde K Kstar) := by
+    have h := kappa_branch_mem_conjClassSet_zTilde hG D hNmax hNP hKM hK hKstar hU hMstarmem
+      hMstarne hpart hyNsigma hy1 hy'N hy'1 hycent hkappa
+    rwa [mul_inv_cancel_left] at h
+  rwa [conjClassSet_zTilde_eq_fixed_of_isTypeP hG hMref hMPref hKMref hKref hKstarref hUref
+    hNmax hNP hKM hK hKstar] at hmem
+
 /-- **`G^#` cover dichotomy** (the `⊆` of BG Corollary 14.9's `G^#` partition, both cases): every
 `g ≠ 1` lies in `𝒞_G(M̃)` for some maximal `M`, *or* in `𝒞_G(Ẑ)` for some exceptional pair `(K, K*)`.
 Immediate from `sigma_decomposition_dichotomy`: the signalizer branch gives `g ∈ M̃`
@@ -10804,6 +10846,32 @@ theorem exists_mem_conjClassSet_Mtilde_or_zTilde_of_ne_one [Finite G]
     exact Or.inl ⟨M, hMmax, subset_conjClassSet
       (mem_Mtilde_of_mem_coset hG D (Set.mem_diff_singleton.mpr ⟨hyMσ, hy1⟩) hyr)⟩
   · exact Or.inr (kappa_branch_dichotomy_mem_conjClassSet_zTilde hG D hyl hNmem hsharp hκ)
+
+/-- **Fixed-`W` `G^#` cover** (the form BG Corollary 14.9 / the NonTypeICovering struct needs):
+every `g ≠ 1` lies in `𝒞_G(M̃)` for some maximal `M`, or in `𝒞_G(Ẑ)` for the *fixed* exceptional
+`Ẑ = zTilde Kref K*ref` of a reference type-`P` maximal `Mref`.  Same as
+`exists_mem_conjClassSet_Mtilde_or_zTilde_of_ne_one`, but the κ branch is collapsed onto the single
+fixed `Ẑ` via `kappa_branch_dichotomy_mem_fixed_conjClassSet_zTilde`. -/
+theorem exists_mem_conjClassSet_Mtilde_or_fixed_zTilde [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    {Mref Kref Kstarref Uref : Subgroup G}
+    (hMref : Mref ∈ maximalSubgroups G) (hMPref : IsTypeP Mref) (hKMref : Kref ≤ Mref)
+    (hKref : Ch03.IsHallSubgroup (kappa Mref) (Kref.subgroupOf Mref))
+    (hKstarref : Kstarref = OddOrder.BG.Ch3.S10.Msigma Mref ⊓ Subgroup.centralizer (Kref : Set G))
+    (hUref : Ch03.IsHallSubgroup ((kappa Mref ∪ OddOrder.BG.Ch3.S10.sigma Mref)ᶜ)
+      (Uref.subgroupOf Mref))
+    {g : G} (hg : g ≠ 1) :
+    (∃ M ∈ maximalSubgroups G,
+      g ∈ conjClassSet (Mtilde hG (genuineSigmaDecomposition hG) M))
+    ∨ g ∈ conjClassSet (zTilde Kref Kstarref) := by
+  set D := genuineSigmaDecomposition hG with hD
+  rcases sigma_decomposition_dichotomy hG D hg with
+    ⟨y, hyl, hyr⟩ | ⟨y, hyl, N, hNmem, hsharp, hκ⟩
+  · obtain ⟨hy1, M, hMmax, hyMσ⟩ := (D.length_one_iff y).mp hyl
+    exact Or.inl ⟨M, hMmax, subset_conjClassSet
+      (mem_Mtilde_of_mem_coset hG D (Set.mem_diff_singleton.mpr ⟨hyMσ, hy1⟩) hyr)⟩
+  · exact Or.inr (kappa_branch_dichotomy_mem_fixed_conjClassSet_zTilde hG D hMref hMPref hKMref
+      hKref hKstarref hUref hyl hNmem hsharp hκ)
 
 /-- **BG Theorem A(4)** (mmd L4279): `C_U(k) = 1` for `k ∈ K#` — the `(κ(M) ∪ σ(M))'`-Hall
 complement `U` meets each `M`-centralizer `C_M(k) = K ⊔ K*` trivially.
