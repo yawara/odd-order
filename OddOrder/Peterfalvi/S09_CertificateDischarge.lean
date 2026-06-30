@@ -1428,4 +1428,21 @@ noncomputable def hypothesis78OfDade
         rw [hd1, one_smul]
         rfl }
 
+/-- **Integrality of the `(7.8.a)` coefficient `a`** (Peterfalvi (7.8.a)).  The weighted-sum
+coefficient `a = (β, ζ_0^ν) + 1` is an integer: `β = τ(Ind 1_H − ζ)` is a virtual character (from
+`(2.6.b)` Dade preservation, packaged in `beta_mem_ZIrr_of_sourceDiff_mem_ZIrr`, given the source
+difference `Ind 1_H − ζ ∈ ℤ[Irr L]`), `ζ_0^ν = ν ζ ∈ ℤ[Irr G]` is the coherent image
+(`nu_mem_ZIrr_of_isCoherent`), and `inner_mem_ZIrr_int` makes their inner product an integer.
+Supplies the `a : ℤ` field of `BetaDecomp` together with the displayed value `(β, ζ_0^ν) + 1`. -/
+theorem exists_betaDecomp_a {G : Type*} [Group G] [Fintype G] {A : Set G} {L : Subgroup G}
+    [Fintype L] [Invertible (Nat.card L : ℂ)] [Invertible (Nat.card G : ℂ)]
+    (H78 : Hypothesis78 G A L)
+    (hdiffZ : H78.hyp76.zeta H78.ind1H - H78.hyp76.zeta H78.zetaDistinct ∈ ZIrr L)
+    (hζ0nuZ : H78.nu (H78.hyp76.zeta H78.zetaDistinct) ∈ ZIrr G) :
+    ∃ a : ℤ, (a : ℂ) = ClassFunction.inner H78.beta
+      (H78.nu (H78.hyp76.zeta H78.zetaDistinct)) + 1 := by
+  obtain ⟨m, hm⟩ :=
+    ClassFunction.inner_mem_ZIrr_int (H78.beta_mem_ZIrr_of_sourceDiff_mem_ZIrr hdiffZ) hζ0nuZ
+  exact ⟨m + 1, by push_cast; rw [hm]⟩
+
 end OddOrder.Peterfalvi.S09.Cert
