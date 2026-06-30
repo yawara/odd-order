@@ -655,3 +655,27 @@ V-side 構造 producer 完備。残 = exists_MHypothesis (S16:4547、bare sorry)
 で M/complement_card_eq_pq 供給 + typeIHyp (M type-I → hypothesis_of_typeIData) + 残 deep char field
 (h78/§8、lane a/b char keystone gated、carrier isolate or sorried cite)。これは 35-field assembly
 ゆえ char sorry を多数導入する点に注意 (de-opacify は genuine だが optically sorry 増)。
+
+### cont.¹⁹ (2026-06-30 lane c=γ): ⚠ HUB tick² 修正 — unsound Tdata spine carrier 撤回、reconciled_typePData_T へ
+
+**cont.¹⁴ の「Tdata dead-end 撤回」は誤りで、hub tick² (issue 4001) が再 HOLD・修正要求**。私が `Tdata`
+carrier を base Hypothesis + §16 spine constructor `section16TypePStructure_of_isMinimalSimpleOdd`
+(従来 sorry-free) に追加し、supply に `have hTP2 : IsTypeP2 mp.T := sorry` を挿入したのが問題:
+- **FT spine sorry regression** (merge_monitor HOLD、hub が main マージ abort)。
+- **型が逆**: `T_typeII` (14.9) が産むのは `TypeIIData T` (type-II)。`IsTypeP2 T` は strictly 強く**一般に偽**
+  ⟹ sorry が埋まらない＝**Tdata dead-end の裏口再導入**。cont.¹² の正しい判断 (type-P/type-P₂ 区別) を自分で覆した。
+- d 所有 §16 carrier の非-additive 改変 (`FeitThompson:276` docstring 削除)。
+
+**修正 (commit `8aa7b8b4`, revert 737a15de + helper refactor, full build 3889 green)**:
+- Tdata carrier + spine の hTP2 sorry **撤回**、`FeitThompson:276`「no symmetric Tdata」docstring **復元**、
+  **spine を sorry-free に戻した**。
+- V-side helper の T-side type-P 源を **off-spine の honest obligation `reconciled_typePData_T`**
+  (`∃ data : TypePData T, data.U = V ∧ data.W1 = W2`、TRUE な §13 reconciliation、IsTypeP2 と違い偽でない) に変更。
+  `Q_inf_V_eq_bot_of_reconciled` で hdisj factor。
+- **V-side helper 群 (existence/共役/fitting/complement/typeII_overNormalizer_frobenius_V) は全て残存** (hub 承認、build-green)。
+
+**教訓**: carrier を「構成可能」と確かめる前に上に積むな ([[scaffold-sorry-free-not-done]] doneness=carrier 構成可能性)。
+hub 指示が自分の careful 分析 (cont.¹²) と矛盾したら盲従でなく矛盾を flag すべきだった。
+**残 = exists_MHypothesis wiring は reconciled_typePData_T (off-spine) + TypeIIData T 経由で**
+(hub tick²: 「TypePData T/IsTypeP2 T は使わない、TypeIIData T 経由」)。
+[[scaffold-sorry-free-not-done]] [[hub-check-issue-before-asking-on-scope-violation]]
