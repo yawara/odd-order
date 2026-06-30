@@ -755,3 +755,20 @@ mathlib に Clifford correspondence は**無い**が、**repo 内に Clifford �
 (Clifford.lean) で「I_HU(θ₀)=HC 上の Irr(HC) char ↔ Irr(HU) over θ₀」⟹ Ind_{HC}^{HU}(θ₀ 拡張 linear)
 irreducible deg [HU:HC]=u ⟹ χ∈xiSet∩𝒳(H₀C) ⟹ induceHU deg q·u。次イテレーションは Clifford.lean の
 Thm 6.11 lemma を特定 (induce-from-inertia-bijective/irreducible の usable form) して適用。
+
+
+## 重要な再framing: conjunct b/c は M-level (W1-orbit) で bottom out (2026-06-30)
+
+深い解析で判明: 私の caseA inertia 機構 (`inertia_eq_hcInHu_caseA`, I_HU(θ₀)=HC) は **HU-level** で
+necessary だが **sufficient でない**。degree conjunct (b/c) は **M-level** inertia I_M(ξ)=HC を要する:
+- HU-level Clifford (`isIrreducibleCharacter_induce_of_inertia_eq` + `hcInHu_normal`、既存) ⟹
+  Ind_{HC}^{HU}(ξ) irreducible deg u。✅ 支持あり。
+- だが 𝒮(H₀C) は `induceHU` = Ind_{HU}^**M**。conjunct c の最終 χ の irreducibility は M-level、
+  = I_M(ξ)=HC、= I_HU=HC (済) **+ W1 が regular θ̄ 上 free に作用** (regular = trivial W1-stabilizer)。
+- この **W1-orbit 構造 (regular ⟺ free W1-orbit)** が prime-TI content で、**conjunct b の
+  reducible↔regular とも共有**。両 degree conjunct はここに bottom out。
+
+**∴ 次の真の上流 = W1-orbit 解析** (regular θ̄ の W1-stabilizer 自明 / M-level inertia=HC)。これは
+prime-TI (primeTIred) / §13 cyclic-TI と entangle。私の HU-inertia 機構 + regular θ̄ 構成は
+この上流の prerequisite として完備、残りは M-level W1-orbit ピース。caseB は U-irreducible ゆえ
+W1-orbit 自明 (全 θ̄ regular) で此処を回避; caseA 固有の追加。
