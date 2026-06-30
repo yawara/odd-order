@@ -4643,6 +4643,36 @@ theorem inertia_eq_hcInHu [Finite G] {M : Subgroup G} (data : TypesIIIIIIVSetup 
       = hInHu data ⊔ cInHu data chief :=
   inertia_eq_hcInHu_of_inf_le data chief (inertia_inf_uInHu_le_cInHu data chief hcaseB hθbar)
 
+/-- **Inertia lift `I_{HU}(θ₀) = HC`, generic over the factor family.**  As `inertia_eq_hcInHu_caseA`
+but taking the order-`p`, `U`-invariant, spanning family `Hpart` directly (via
+`chiefFactor_caseA_char_inertia_gen`), so the `W1`-conjugates `{S₀^w}` — not the producer's
+`caseA.Hpart` — drive the inertia lift for the free-`W1`-orbit character of (9.8.c). -/
+theorem inertia_eq_hcInHu_gen [Finite G] {M : Subgroup G} (data : TypesIIIIIIVSetup M)
+    (chief : ChiefFactorData data)
+    {ι : Type*} (Hpart : ι → Subgroup (↥data.H ⧸ chief.N))
+    (hp_order : ∀ i, Nat.card ↥(Hpart i) = chief.p)
+    (hspan : ⨆ i, Hpart i = ⊤)
+    (haInv : ∀ i, IsAInvariant (uActionHom data chief) (Hpart i))
+    {θbar : IrreducibleCharacter (↥data.H ⧸ chief.N)}
+    (hreg : ∀ i, ∃ x ∈ Hpart i,
+      (θbar : ClassFunction (↥data.H ⧸ chief.N) ℂ) x
+        ≠ (θbar : ClassFunction (↥data.H ⧸ chief.N) ℂ) 1) :
+    ClassFunction.inertia (G := ↥(huSub data)) (H := hInHu data)
+        (ClassFunction.compHom (hInHuEquivH data).toMonoidHom
+          (ClassFunction.compHom (QuotientGroup.mk' chief.N)
+            (θbar : ClassFunction (↥data.H ⧸ chief.N) ℂ)))
+      = hInHu data ⊔ cInHu data chief :=
+  inertia_eq_hcInHu_of_inf_le data chief
+    (inertia_inf_uInHu_le_cInHu_of_realized data chief
+      (fun a g hag hfix =>
+        caseB_inertia_realized_of_charInertia
+          (fun g' hfix' =>
+            caseB_char_inertia_inflation_of_core
+              (fun g'' hinv =>
+                chiefFactor_caseA_char_inertia_gen Hpart hp_order hspan haInv hreg g'' hinv)
+              g' hfix')
+          a g hag hfix))
+
 /-- **Inertia lift `I_{HU}(θ₀) = HC` in Clifford case (a)** — the non-Galois analog of
 `inertia_eq_hcInHu`.  For a **regular** chief-factor character `θ̄` (nontrivial on each order-`p`
 Clifford summand `Hpart i`), the inertia of its inflation `θ₀` in `HU` is `HC`.  Feeds the proven
@@ -4663,15 +4693,8 @@ theorem inertia_eq_hcInHu_caseA [Finite G] {M : Subgroup G} (data : TypesIIIIIIV
           (ClassFunction.compHom (QuotientGroup.mk' chief.N)
             (θbar : ClassFunction (↥data.H ⧸ chief.N) ℂ)))
       = hInHu data ⊔ cInHu data chief :=
-  inertia_eq_hcInHu_of_inf_le data chief
-    (inertia_inf_uInHu_le_cInHu_of_realized data chief
-      (fun a g hag hfix =>
-        caseB_inertia_realized_of_charInertia
-          (fun g' hfix' =>
-            caseB_char_inertia_inflation_of_core
-              (fun g'' hinv => chiefFactor_caseA_char_inertia caseA hreg g'' hinv)
-              g' hfix')
-          a g hag hfix))
+  inertia_eq_hcInHu_gen data chief caseA.Hpart caseA.Hpart_order caseA.Hpart_iSup
+    caseA.Hpart_aInvariant hreg
 
 /-- **Peterfalvi (9.7) case (b) carrier.**  When `U` acts irreducibly on the chief factor
 `H̄ = H/H₀` (Clifford case (b), the left branch of `chiefFactor_clifford_U_dichotomy`), the
