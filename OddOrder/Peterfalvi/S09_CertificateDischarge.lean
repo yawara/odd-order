@@ -101,4 +101,24 @@ theorem inner_self_eq_zero [Invertible (Nat.card L : ℂ)] {η : ClassFunction L
   ext g
   simpa using Complex.normSq_eq_zero.mp (hzero g)
 
+/-- **Peterfalvi (7.7.a), the uniqueness principle.**  If `η` lies in the `ℂ`-span of a set `S` of
+class functions and is orthogonal to every member of `S`, then `η = 0`.  This is the
+non-degeneracy of the inner product on a spanned subspace: the linear functional `⟨·, η⟩` vanishes
+on `S`, hence on `span S ∋ η`, giving `⟨η, η⟩ = 0` and `η = 0` by `inner_self_eq_zero`.
+
+In (7.7.a), `S = {ψ_i}` spans `CF(L,A)`, so a class function in `CF(L,A)` is determined by its inner
+products against the `ψ_i` — the determination of `χ^ρ` on `A`. -/
+theorem eq_zero_of_mem_span_orthogonal [Invertible (Nat.card L : ℂ)]
+    {S : Set (ClassFunction L ℂ)} {η : ClassFunction L ℂ}
+    (hη : η ∈ Submodule.span ℂ S) (horth : ∀ v ∈ S, ClassFunction.inner v η = 0) :
+    η = 0 := by
+  have key : ∀ φ ∈ Submodule.span ℂ S, ClassFunction.inner φ η = 0 := by
+    intro φ hφ
+    induction hφ using Submodule.span_induction with
+    | mem v hv => exact horth v hv
+    | zero => exact ClassFunction.inner_zero_left η
+    | add x y _ _ ihx ihy => rw [ClassFunction.inner_add_left, ihx, ihy, add_zero]
+    | smul c x _ ih => rw [ClassFunction.inner_smul_left, ih, mul_zero]
+  exact inner_self_eq_zero (key η hη)
+
 end OddOrder.Peterfalvi.S09.Cert
