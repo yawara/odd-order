@@ -3276,7 +3276,7 @@ theorem typeP_hall_small_subgroup_cyclic_tau2 [Finite G] (hG : OddOrder.BG.IsMin
 
 /-- The `σ`-set is conjugation-invariant: `σ(Mᵍ) = σ(M)` (both inclusions from `sigma_conj`;
 non-primes lie in neither set). -/
-private theorem sigma_conj_smul_eq [Finite G] (g : G) (M : Subgroup G) :
+theorem sigma_conj_smul_eq [Finite G] (g : G) (M : Subgroup G) :
     OddOrder.BG.Ch3.S10.sigma (MulAut.conj g • M) = OddOrder.BG.Ch3.S10.sigma M := by
   ext p
   by_cases hp : p.Prime
@@ -5061,22 +5061,6 @@ theorem ncard_conjugates_eq_index_of_normalizer_eq_self [Finite G] {M : Subgroup
     (Nat.card_congr (Equiv.ofBijective f' hbij)).symm
   rw [← Nat.card_coe_set_eq, h_card_eq, ← Subgroup.index]
 
-/-- **`σ` is conjugation-invariant as a set** (Coq `sigmaJ`): `σ(Mᶜ) = σ(M)`.  The per-prime
-`sigma_conj` (both directions) together with `σ(M) ⊆ π(M) ⊆ primes` give the set equality. -/
-theorem sigma_conjSmul_eq [Finite G] (c : G) (M : Subgroup G) :
-    OddOrder.BG.Ch3.S10.sigma (MulAut.conj c • M) = OddOrder.BG.Ch3.S10.sigma M := by
-  ext p
-  by_cases hp : p.Prime
-  · haveI : Fact p.Prime := ⟨hp⟩
-    constructor
-    · intro hpc
-      have h := OddOrder.BG.Ch3.S10.sigma_conj c⁻¹ hpc
-      rwa [← mul_smul, ← map_mul, inv_mul_cancel, map_one, one_smul] at h
-    · exact OddOrder.BG.Ch3.S10.sigma_conj c
-  · constructor <;> intro h <;>
-      exact absurd (Nat.prime_of_mem_primeFactors
-        ((OddOrder.BG.Ch3.S10.mem_sigma_iff _ _).mp h).1) hp
-
 /-- **Hall conjugacy** (Coq `Hall_subJ` for the solvable maximal `M`): in a maximal subgroup `M`,
 every `π`-subgroup `X ≤ M` is conjugate by an element of `M` into any Hall `π`-subgroup `K` of `M`.
 This is the general-`π` form of `exists_conj_smul_le_isHall_kappa` (which specialises `π = κ(M)`);
@@ -5367,7 +5351,7 @@ theorem sigma_decomposition_dichotomy [Finite G] (hG : OddOrder.BG.IsMinimalSimp
         (Subgroup.subset_closure (Set.mem_singleton x)))
     rwa [show (MulAut.conj c⁻¹)⁻¹ • x = MulAut.conj c • x from by rw [← map_inv, inv_inv]]
   have hσM : OddOrder.BG.Ch3.S10.sigma M = OddOrder.BG.Ch3.S10.sigma M₀ := by
-    rw [hMdef, sigma_conjSmul_eq]
+    rw [hMdef, sigma_conj_smul_eq]
   have hxsig : sigmaPart M g = x := by rw [sigmaPart, hσM, ← sigmaPart, ← hxeq]
   -- `g ∉ M`, `g ∈ C_G(x)`, `M ∈ 𝓜_σ(x)`.
   have hnotMg : g ∉ M := fun hgM => hx1 (hxsig ▸ hsg M hMmax hgM)
@@ -5421,7 +5405,7 @@ theorem sigma_decomposition_dichotomy [Finite G] (hG : OddOrder.BG.IsMinimalSimp
       show (MulAut.conj w⁻¹)⁻¹ • g = MulAut.conj w • g from by rw [← map_inv, inv_inv]]
     exact hwg
   have hfinal : sigmaPart (MulAut.conj w⁻¹ • M) g = 1 := hsg _ hM' hgM'
-  rw [sigmaPart, sigma_conjSmul_eq, ← sigmaPart, hxsig] at hfinal
+  rw [sigmaPart, sigma_conj_smul_eq, ← sigmaPart, hxsig] at hfinal
   exact hx1 hfinal
 
 /-- **BG Corollary 14.9, the type-I cover (faithful form)**: when every maximal subgroup is of
@@ -8732,6 +8716,12 @@ private theorem nat_mul_sub_kl_identity {k l : ℕ} (hk : 1 ≤ k) (hl : 1 ≤ l
   have h2 : (1 + a - 1) * (1 + b - 1) = a * b := by simp
   omega
 
+/-- `1 ∉ Ẑ`: the identity lies in `K ≤ K ⊔ K*`, hence in the removed set `K ∪ K*`.  So
+`sharpSubgroup Ẑ = Ẑ` and `𝒞_G(Ẑ^#) ⊆ G^#` — a prerequisite for the NonType-I `G^#` cover. -/
+theorem one_not_mem_zTilde (K Kstar : Subgroup G) : (1 : G) ∉ zTilde K Kstar := by
+  rw [zTilde, Set.mem_diff, not_and_or, not_not]
+  exact Or.inr (Set.mem_union_left _ (SetLike.mem_coe.mpr K.one_mem))
+
 /-- **BG Theorem 14.7, `|Ẑ| = (k − 1)(k* − 1)`** (mmd L4051): the TI-set `Ẑ = Z − (K ∪ K*)` has
 `(|K| − 1)(|K*| − 1)` elements.  `|Z| = |K|·|K*|` (`card_kappaHall_sup_Kstar`), `K ∩ K* = 1`
 (`kappaHall_inf_Kstar_eq_bot`) so `|K ∪ K*| = |K| + |K*| − 1`, and `|Ẑ| = |Z| − |K ∪ K*|`.
@@ -11371,7 +11361,16 @@ theorem typeP2_neighbor_is_typeF [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd
 
 /-- **BG Lemma 14.13** (mmd L4059): extension of Theorem 14.4.  In the specified
 multi-maximal sigma-length-one situation, `M` is Frobenius type, `tau_2(M)` is
-empty, and `M` is a Frobenius group with kernel `M_sigma`. -/
+empty, and `M` is a Frobenius group with kernel `M_sigma`.
+
+⚠ **STATEMENT MIS-ENCODED (do not prove vacuously, 2026-06-30)**: the Coq original
+(`non_disjoint_signalizer_Frobenius`, BGsection14:2412) hypothesises `1 < |𝓜_σ(x)|` and `M` *not*
+a `σ(N[x])′`-group (`N[x]` = the signalizer neighbour).  The Lean hypotheses `M, N ∈ 𝓜_σ(x)` with
+`¬ IsConjugateSubgroup M N` are **inconsistent**: by Theorem 13.9 non-conjugate maximals have
+`σ(M) ∩ σ(N) = ∅`, but `x ∈ M_σ ∩ N_σ` with `x ≠ 1` forces a common prime — so the premise is
+vacuous (the two elements of `𝓜_σ(x)` are conjugate, not non-conjugate).  A faithful restatement
+replaces `{N, hN, hMN, hinter}` by `1 < (𝓜_σ(x)).ncard` and the `σ(N[x])′`-group condition.
+Orphaned (no consumers); not on the FT path.  See issue 8020. -/
 theorem sigmaLength_one_frobenius_type [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) (D : SigmaDecompositionData G)
     {x : G} (hx : x ≠ 1) (hlen : D.length x = 1)

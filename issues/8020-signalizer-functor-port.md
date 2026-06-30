@@ -836,3 +836,58 @@ cover frontier (cover_subset_kernels = FittingIsTI-for-typeF、deep) を一旦�
 
 **§14 δ-lane 残 sorry** (substantial): cover_subset_kernels (FittingIsTI-for-typeF) / Cor 14.10 (cover-gated) /
 NonTypeICovering Ẑ / sigmaLength_one_frobenius_type。Cor 14.8 完了で family corollary 群は片付いた。
+
+## 🧹 進捗 (lane d, 2026-06-30 /loop³⁴): duplicate consolidation + faithfulness findings (orphaned §14 pieces)
+
+cover frontier (deep) を保留し、hygiene + faithfulness を整理 (S14、full build 3888 green):
+- **duplicate 解消**: `sigma_conjSmul_eq` (/loop²⁸ で私が追加、public) を削除し既存 `sigma_conj_smul_eq`
+  (3279、当時 private を grep 見落とし) を public 化 + 2 usages 更新 + AxiomsCheck rename。CLAUDE.md no-duplicate 準拠。
+- **⚠ Lemma 14.13 (`sigmaLength_one_frobenius_type`) MIS-ENCODED 発見**: Lean 仮説 `M,N∈𝓜_σ(x)` で
+  `¬IsConjugateSubgroup M N` は **inconsistent** (Thm 13.9 で σ(M)∩σ(N)=∅、だが x∈M_σ∩N_σ・x≠1 で共通素数 →
+  矛盾 ⟹ 前提 vacuous)。Coq `non_disjoint_signalizer_Frobenius` (BGsection14:2412) は `1<|𝓜_σ(x)|` +
+  「M は σ(N[x])'-group でない」(N[x]=signalizer neighbour) が正。docstring に ⚠ 警告追加 (vacuous 証明禁止)。
+  orphaned (consumer 0)、FT 経路外。faithful 再述は `{N,hN,hMN,hinter}` → `1<ncard` + σ(N[x])'-group 条件。
+- **Cor 14.10 (`exists_sigmaDecomposition_length_le_two`) は dummy-satisfiable**: `∃ D, ∀g, D.length g≤2` は
+  `dummySigmaDecomposition` (length=0) で trivially 真 ⟹ genuine 証明には `genuineSigmaDecomposition` 固定 +
+  cover-gated ℓ_σ≤2 が要 (scaffold statement)。orphaned。
+
+**🛑 §14 δ-lane frontier 確定 (honest)**: rapid-win phase 完了 (Lemma 14.6 + Cor 14.9 type-F cover + covering
+equality + Cor 14.8 全)。**残 on-path = deep multi-session のみ**: (1) cover_subset_kernels = FittingIsTI-for-typeF
+(Frobenius-kernel-TI、消費される on-path) / (2) NonTypeICovering = Theorem 14.7(e) Ẑ (deep)。orphaned/scaffold な
+14.10/14.13 は低価値。次の genuine on-path work は (1) の deep TI port。
+
+## 🔎 進捗 (lane d, 2026-06-30 /loop³⁵): gate-2 残依存 survey — FittingIsTI-for-typeF は genuine gap, NonTypeICovering が次の tractable 候補
+
+新規 Lean なし (frontier 精緻化)。gate-2 両 branch の deep 依存を確定:
+- **cover_subset_kernels (= M_σ TI for type-F = FittingIsTI-for-typeF)**: `theoremA8_structure` (S16:4482、
+  Theorem A(8)) は **M_F≠M_σ ケースのみ** (U=1, F(M) TI, |K| prime)。type-F は M_F=M_σ ゆえ **未カバー = genuine gap**。
+  `fittingIsTI_of_isTypeP2` (type-P2) はあるが `_of_isTypeF` 無し。さらに Theorem D(2)
+  (`Msigma_inf_conj_isCyclic`) は M_σ∩M^g **cyclic** までで TI (=1) でない ⟹ FittingIsTI-for-typeF は genuine に
+  強く、Theorem A(8) の M_F=M_σ ケース (未証明) を要する deep piece。
+- **NonTypeICovering (Ẑ branch)**: `cover_subset_kernels` field を**持たない** (W=Ẑ, cover_nonidentity, pairwise,
+  exceptional_disjoint のみ)。cover_nonidentity (G#=⋃𝒞_G(M̃)∪𝒞_G(Ẑ#)) は **proven dichotomy
+  (`sigma_decomposition_dichotomy`) から導出可** (signalizer branch→M̃ [`mem_Mtilde_of_mem_coset` 在]、κ branch→Ẑ
+  [要 zTilde identification、Coq mFT_partition part 2])。⟹ **cover_subset_kernels (type-F TI gap) より tractable**。
+
+**▶▶ 次の concrete target**: (a) **NonTypeICovering Ẑ assembly** (κ branch→𝒞_G(Ẑ#) identification + disjointness、
+~50-80 行、dichotomy 利用、deep だが gap 無し) — gate-2 の 𝓜_𝒫≠∅ 枝。あるいは (b) gate-2 restructure
+(by_cases all-type-F で TypeICovering の cover_nonidentity[在]+pairwise[在] を wire、cover_subset_kernels を
+named sorry に isolate)。(a) が genuine math、(b) が配線。cover_subset_kernels (type-F TI) は Theorem A(8)
+M_F=M_σ ケースの別 deep port。
+
+## 進捗 (lane d, 2026-06-30 /loop³⁶): one_not_mem_zTilde prerequisite + κ→Ẑ port 精査 (deep monolith 確定)
+
+- **`one_not_mem_zTilde`** (S14、新): `1∉Ẑ` (1∈K⊆K⊔K*、K∪K* に入る)。⟹ `sharpSubgroup Ẑ = Ẑ`、`𝒞_G(Ẑ#)⊆G#`。
+  NonTypeICovering ⊇ direction の prerequisite。full build 3888 green。
+- **κ→Ẑ cover identification (Coq mFT_partition part 2、L2028-2070+) を精査**: NonTypeICovering の
+  cover_nonidentity ⊆ の κ branch は **deep monolith** = 2 重 WLOG (`wlog defH: H:=M` で H を M に正規化 +
+  `wlog Ky': y'∈K` で κ-element を κ-Hall K に Hall_subJ 共役) + `Ptype_embedding` (cycZ/defZ で Z=K⊔K* dprod) +
+  x=z·z' (z∈K*, z'∈K) 分解 → x∈Ẑ。**~50-70 行 Lean、deep Ptype/dprod machinery**。signalizer branch→M̃ は
+  `mem_Mtilde_of_mem_coset` (在) で軽い。
+
+**🛑 honest frontier (再確認)**: gate-2 両 branch とも deep multi-session port:
+- TypeICovering: cover_subset_kernels = **FittingIsTI-for-typeF** (Theorem A(8) M_F=M_σ ケース未証明 gap、または
+  Pf (8.13.c1) escaping-centralizer 経由、いずれも deep)。
+- NonTypeICovering: κ→Ẑ cover identification (上記 ~50-70 行 monolith) + exceptional_disjoint (trivIset)。
+§14 cover rapid-win phase 完了 (Lemma 14.6/Cor 14.9/covering eq/Cor 14.8)。残は sustained deep porting。
+**次 = NonTypeICovering κ→Ẑ monolith を head-on で着手** (上記 2-WLOG 構造に従い multi-iteration grind)。
