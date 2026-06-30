@@ -924,3 +924,23 @@ act.φ↑(e.symm j)•S₀`、`Hpart_aInvariant = isAInvariant_comp_subtype_poin
 **残 step (path 明確化)**: step1 θ̄ (hom) → IrreducibleCharacter (linearIrreducibleCharacter) +
 hreg ClassFunction 化 → inertia_eq_hcInHu_gen 適用 (Hpart=W1-conj、hp_order/hspan/haInv) → I_HU=HC →
 Ind_{HC}^{HU} deg-u irr (inertia_Ind) → not-W1-fixed (step1 の hnf) ⟹ I_M=HU → Ind_{HU}^M deg-qu irr → 𝒳。
+
+
+## conjunct c — steps 1/2/2-apply landed; bridge pieces identified (2026-07-01)
+
+**Landed** (axiom-clean, build-green): step1 `clifford_caseA_exists_regular_char_not_fixed` (hom θ̄ +
+regular + not-W1-fixed) / step2 `chiefFactor_caseA_char_inertia_gen`+`inertia_eq_hcInHu_gen` (generic
+inertia) / step2-apply `clifford_caseA_regular_inertia_hc` (I_HU(θ₀)=HC for W1-conjugate regular θbar)。
+
+**残 path (全 piece 同定済、欠落機構なし)**:
+- **bridge** (hom θ̄ → IrreducibleCharacter): `linearIrreducibleCharacter` (K→*ℂˣ → IrreducibleCharacter)
+  + `ClassFunction.compHom_linearIrreducibleCharacter` (値) + `linearIrreducibleCharacter_injective`。
+  ⟹ θbar=linearIrr θ̄、hom regularity (θ̄ x≠1) → ClassFunction regularity ((θbar)x≠(θbar)1) →
+  clifford_caseA_regular_inertia_hc で I_HU=HC。
+- **degree-u** (step4): `isIrreducibleCharacter_induce_of_inertia_eq` (InducedIrreducible.lean:436) +
+  hcInHu_normal ⟹ Ind_{HC}^{HU}(θ₀) irreducible deg u。
+- **M-level** (step3): ζ=Ind_{HC}^{HU}(θ₀) not-W1-fixed (⟸ θ̄ not-fixed、step1 hnf) ⟹ I_M(ζ)≠M ⟹
+  prime-index `eq_of_le_of_prime_index` ([M:HU]=q) ⟹ I_M(ζ)=HU。
+- **degree-qu** (step5): `isIrreducibleCharacter_induce_of_inertia_eq` + huSub_normal ⟹
+  Ind_{HU}^M(ζ) irreducible deg qu。
+- **𝒳** (step6): kernel 条件 → χ∈𝒳(H₀C) → caseA_character_counts conjunct c。
