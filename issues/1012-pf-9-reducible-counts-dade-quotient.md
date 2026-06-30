@@ -442,6 +442,20 @@ S11:4549 sorry。全 transport 補題が repo 実在ゆえ機械的に組める:
 **注**: 還元 count (中核) 完了後、残は各々 caseB constituent 並みの新 machinery を要する phase。
 fresh context で 1 つずつ。次着手 = caseA degree machinery。
 
+**caseA degree machinery — Coq (9.8) 精読 (2026-06-30、`PFsection9.v` L840-940 `typeP_nonGalois_characters`)**:
+- (9.8.a) `Part_a` = `{in X_ H0, forall s, a ∣ χ(1)}` (**divisibility**, 等式でない)。inertia
+  `T='I_HU['chi_t]` + H̄ の `bigdprod` 分解 (`cfBigdprod_Res_lin`) 経由 — 長い (L883-940)。
+- (9.8.b) reducibles `mu_` = `{in mu_, isIndHC mu_j}`、`isIndHC zeta := zeta 1=qu ∧ zeta∈S_H0C ∧
+  ∃ linear xi:'CF(HC), zeta='Ind xi`。⟹ **caseA conjunct b の degree qu = mu_j が HC の linear char
+  から induced (degree [M:HC]=qu)**。mu_j は `primeTIred` (Dade W₁/W₂ prime-TI 構造)。
+- **Lean 写像**: 還元 φ∈𝒮(H₀) = induceHU(inflate χ̄)、χ̄=column (chiRestrict)、degree=q·χ̄(1)。
+  degree qu ⟺ **χ̄(1)=u** (§6 column の degree=u)。これが (9.8.a)/(9.9.a) の本体 = caseA/caseB
+  共通の column-degree=u。**要調査**: 既存 §6 `Hypothesis` から column degree=u が出るか (W̄₁-inflation
+  の degree、`card_reducible_…` 近傍)。出れば caseA/caseB 両 degree が §6 経由で case-agnostic に取れる
+  可能性 (caseB_degree_qu の constituent 経路と別ルート)。
+- **状況**: 残 §9 は全て deep (caseA constituent/exceptional/Singer/§14-gated sibleyTarget)。
+  還元 count 中核は完了。各 deep piece は fresh context で。
+
 ## 完了条件
 
 S11 の caseB_character_counts / caseA_character_counts / exceptional_case_frobenius_realization が
