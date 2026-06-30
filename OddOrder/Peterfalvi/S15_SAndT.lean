@@ -1665,6 +1665,77 @@ theorem exists_typeIFrobeniusData_W2_le [Finite G] (_hG : OddOrder.BG.IsMinimalS
   rw [this]
   exact Subgroup.map_mono hx
 
+/-- **`S`-side dual of `complement_inf_Q_structure`** (V-side, gated): for the `W₂`-containing
+Frobenius complement `E`, `E ⊓ P = W₂` and `E ⊄ P`.  Mirror of the gated `complement_inf_Q_structure`
+(the §13 residual `E ∩ P = W₂`); declared sorried per the hub cite-gated directive. -/
+theorem complement_inf_P_structure [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hyp : Hypothesis (G := G)) {L : Subgroup G}
+    (frob : OddOrder.Peterfalvi.S14.TypeIFrobeniusData L)
+    (hW2E : hyp.W2 ≤ frob.complement.map L.subtype) :
+    frob.complement.map L.subtype ⊓ hyp.P = hyp.W2 ∧
+      ¬ frob.complement.map L.subtype ≤ hyp.P := sorry
+
+/-- **`S`-side dual of `complement_le_QW2`** (V-side Huppert step, gated): the `W₂`-containing
+Frobenius complement `E` satisfies `E ≤ P W₁`.  Mirror; the Huppert step needs a `normalizer_W2`
+analogue of (13.16) (not yet ported), so declared sorried per the hub cite-gated directive. -/
+theorem complement_le_PW1 [Finite G]
+    (_hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
+    {L : Subgroup G} (frob : OddOrder.Peterfalvi.S14.TypeIFrobeniusData L)
+    (hW2E : hyp.W2 ≤ frob.complement.map L.subtype) :
+    frob.complement.map L.subtype ≤ hyp.P ⊔ hyp.W1 := sorry
+
+/-- **`S`-side dual of `Q_W2_structure`** (V-side, gated): `W₁ ≤ N_G(P)`, `P ⊓ W₁ = ⊥`, and
+`q ∤ |P|`.  Mirror of the gated `Q_W2_structure`; declared sorried per the hub cite-gated directive
+(the `q ∤ |P|` and `P ⊓ W₁ = ⊥` parts bottom out on `|P| = p^q`, the §13 σ-structure). -/
+theorem P_W1_structure [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hyp : Hypothesis (G := G)) :
+    hyp.W1 ≤ Subgroup.normalizer (hyp.P : Set G) ∧ hyp.P ⊓ hyp.W1 = ⊥ ∧
+      ¬ hyp.q ∣ Nat.card ↥hyp.P := sorry
+
+/-- **`T`-side dual of `complement_card_eq_pq`** (Pf (13.17.c)/(14.5), V-side): the `W₂`-containing
+Frobenius complement of the type-I subgroup `L` over `N_G(V)` has order `p q`.  Mirror with the
+`P`/`W₁` ↔ `Q`/`W₂` roles swapped; consumes the V-side complement-structure obligations. -/
+theorem complement_card_eq_pq_V [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hyp : Hypothesis (G := G)) {L : Subgroup G}
+    (frob : OddOrder.Peterfalvi.S14.TypeIFrobeniusData L)
+    (hW2E : hyp.W2 ≤ frob.complement.map L.subtype) :
+    Nat.card ↥frob.complement = hyp.p * hyp.q := by
+  set Em := frob.complement.map L.subtype with hEm
+  set Hg := hyp.P ⊔ hyp.W1 with hHg
+  obtain ⟨hInf, hnle⟩ := complement_inf_P_structure _hG hyp frob hW2E
+  have hEH : Em ≤ Hg := complement_le_PW1 _hG hyp frob hW2E
+  obtain ⟨hWnorm, hdisj, _⟩ := P_W1_structure _hG hyp
+  have hPleH : hyp.P ≤ Hg := le_sup_left
+  have hInfCard : Nat.card ↥(Em ⊓ hyp.P) = hyp.p := by rw [hInf]; exact hyp.p_eq_card_W2.symm
+  haveI hPnorm : (hyp.P.subgroupOf Hg).Normal :=
+    (Subgroup.normal_subgroupOf_iff_le_normalizer hPleH).mpr (sup_le Subgroup.le_normalizer hWnorm)
+  have hHcard : Nat.card ↥Hg = Nat.card ↥hyp.P * hyp.q := by
+    have h := OddOrder.BG.Ch3.S12.card_sup_eq_mul_of_le_normalizer_of_disjoint hWnorm
+      (show hyp.W1 ⊓ hyp.P = ⊥ by rw [inf_comm]; exact hdisj)
+    rw [hHg, sup_comm, h, ← hyp.q_eq_card_W1]
+    exact mul_comm _ _
+  have hPpos : 0 < Nat.card ↥hyp.P := Nat.card_pos
+  have hindexH : (hyp.P.subgroupOf Hg).index = hyp.q := by
+    have hmul := Subgroup.card_mul_index (hyp.P.subgroupOf Hg)
+    rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hPleH).toEquiv, hHcard] at hmul
+    exact Nat.eq_of_mul_eq_mul_left hPpos hmul
+  have hdvd : hyp.P.relIndex Em ∣ hyp.q := by
+    have h1 := Subgroup.relIndex_dvd_index_of_normal (H := hyp.P.subgroupOf Hg)
+      (K := Em.subgroupOf Hg)
+    rwa [Subgroup.relIndex_subgroupOf hEH, hindexH] at h1
+  have hne1 : hyp.P.relIndex Em ≠ 1 := fun h => hnle (Subgroup.relIndex_eq_one.mp h)
+  have hrel : hyp.P.relIndex Em = hyp.q :=
+    (hyp.q_prime.eq_one_or_self_of_dvd _ hdvd).resolve_left hne1
+  have hEmcard : Nat.card ↥Em = hyp.p * hyp.q := by
+    have hmul := Subgroup.card_mul_index (hyp.P.subgroupOf Em)
+    rw [show (hyp.P.subgroupOf Em).index = hyp.q from hrel, ← Subgroup.inf_subgroupOf_left,
+      Nat.card_congr (Subgroup.subgroupOfEquivOfLe (inf_le_left : Em ⊓ hyp.P ≤ Em)).toEquiv,
+      hInfCard] at hmul
+    exact hmul.symm
+  rw [show Nat.card ↥frob.complement = Nat.card ↥Em from
+    Nat.card_congr (Subgroup.equivMapOfInjective frob.complement L.subtype
+      L.subtype_injective).toEquiv, hEmcard]
+
 /-- Carrier for the virtual character `beta_j` and `Gamma_j` in (13.18). -/
 structure BetaData (hyp : Hypothesis (G := G)) where
   j : Fin hyp.p
