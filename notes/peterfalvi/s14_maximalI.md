@@ -1091,3 +1091,64 @@ counterexample_contradiction (2554, sorry-FREE)
    `psi_constant_on_xK` (12.14, 2308 sorried); `h_psig_int` = `rhoM_integer_values` (12.15, 2317);
    `hA` = (12.15) ρ_M norm; `hB` = (7.8.b) `S09.NormEstimates.zetaNuRho_norm_sq_ge` (Hypothesis78 構築);
    `hC` = (7.3) `S09.chiRho_integral_inequality`。lane γ `MHypothesis` (S16:1585) pattern を mirror。
+
+### loop⁴² — witness L の Dade+coherence foundation 確立 (hB への配線完了)
+
+**commit `fac8de5d`**: (12.16) char 核に向け、witness 第二極大 L の Dade machinery を named lemma 化:
+- `hypothesis_of_typeIData` (S14:159, sorry-free): explicit `TypeIData` → `Hypothesis L` + `hyp.typeI=data`
+  保存。`exists_typeI_hypothesis` を本 lemma 経由に refactor。**型 I witness の identity 保存が鍵** —
+  Nonempty 版は erase するため Frobenius 構造を hyp.H に transfer 不能だった。
+- `witness_L_hypothesis_frobenius` (S14:~2015): L は (12.10) で type-I ゆえ `Hypothesis data.L` +
+  `∃C, IsFrobeniusGroup ↥L (hyp.H.subgroupOf L) C`。
+- `witness_L_hypothesis` (forgetful)、`witness_L_coherent`: (12.6) `frobenius_typeI_coherent` 合成で
+  `Nonempty (S07.IsCoherent hyp.tau hyp.Sset hyp.A)`。S12.FiniteInduce scope で instance 自動。
+
+**これで `CounterexampleDadeData` の char 核への入力が揃った**: hyp (Dade isometry hyp.tau / 族 hyp.Sset /
+support hyp.A) + coherence。残るは:
+1. **hB = (7.8.b)**: coherence → `S09.Hypothesis78 G (A(L)) L` 構築 → `NormEstimates.zetaNuRho_norm_sq_ge`。
+   次 iteration の標的。lane γ `MHypothesis` (S16:1585) の h78 bundle pattern を mirror。**S09.Hypothesis78
+   の field 要件 + coherence からの構築経路を調査**するのが次の一歩。
+2. **DadeNotation 構築**: distinguished χ∈Sset (degree e) + 拡張 τ₁ → ψ=τ₁(χ)。(12.13) data。
+   e の degree bound (12.12) `complement_cyclic_order_dvd` (sorried) が he/h2e を供給。
+3. **hA/hC**: ρ_M norm (12.15) / `chiRho_integral_inequality` (7.3)。
+
+### loop⁴³ — S14.Hypothesis.toHypothesis71 完成 ((7.1) foundation)
+
+**commit `00c37192`**: `S14.Hypothesis.toHypothesis71` (S14:~102, sorry-free) = type-I L の (7.1)
+`S09.Hypothesis71 G (typeIA L hyp.typeI) L`。type-P (S12) と違い restriction 不要 (typeIA が dadeData の
+載る set そのもの)。`dadeData.dade : S04.Hypothesis G (typeIA L typeI) L` 直接 + FullDadeIsometryData の
+`.toDadeIsometryData.{toDadeMap,isDadeMap}` で構築。
+
+**hB への残 chain (構築コスト順)**:
+1. **Hypothesis76** (族 T): `hyp71`(済) + `H`/`A_eq_H_sharp`/`n`/`zeta`/`d`/`zeta_one_eq_d_mul`/
+   `psi_support`/**`chiRho_decomp`** ((7.7.a) decomposition 証明書)。H=L_F、T=Ind 構成要素列挙。
+   **族列挙 + (7.7.a) が実質 character theory ゆえ multi-step** (一 iteration 不可)。
+2. **Hypothesis78** (ν+certificate): Hypothesis76 + `nu`(coherent isometric extension, witness_L_coherent
+   の IsCoherent から)+ distinguished ζ + **`chiRho_eq_inner_beta`** ((7.8.c.i) certificate)。
+3. **hB**: `NormEstimates.zetaNuRho_norm_sq_ge` (S09:2616) cite。
+
+**次 iteration の標的**: Hypothesis76 構築の足場。H=L_F の特定、族 T (n/zeta/d) の (7.6) 列挙、
+chiRho_decomp (7.7.a) の構築経路調査。lane γ MHypothesis.h78 は obligation field ゆえ exists_MHypothesis
+での discharge 法 (S16:4499) も参照。
+
+### loop⁴⁴ — dadeNotation_of_coherence (ψ=χ^{τ₁} backbone を coherence から実現)
+
+**commit `23c49c3a`**: 重要発見 = `S07.IsCoherent.extension : IntegralCharacterMap ↥L G` が (12.13) の
+τ₁ そのもの (S07_Coherence:1596、`extension`/`extension_inner_eq`/`extends_on_supported` フィールド)。
+`dadeNotation_of_coherence` (S14:~2368): coherence + distinguished χ∈Sset(deg e) → DadeNotation を
+tau1:=coh.extension / psi:=coh.extension χ で構築 (**psi_eq_tau1_chi := rfl**)。e_eq_index を e=[L:H] に
+de-opacify。
+
+**調査確定事項 (次 iteration の地図)**:
+- **ψ-construction の残 gap = distinguished χ 選択のみ**: Sset={Ind_H^L θ | θ irred ≠1} (S14:84)。
+  distinguished χ は最小 degree=[L:H] ゆえ **θ 線形 (deg 1)** が必要。H=L_F は非自明 nilpotent ゆえ
+  H/[H,H] 非自明 → 非自明線形指標 θ 存在。`χ(1)=[L:H]·θ(1)=[L:H]` は `induce_apply_one`
+  (RepresentationTheory、Ind θ(1)=[G:H]θ(1)) で。**次 iteration の標的 = exists_distinguished_char**
+  (非自明 nilpotent 群の非自明線形指標存在 + induce degree)。mathlib の linear char / abelianization
+  character API 要調査 (未確認)。
+- **hA/hB/hC は全て ψ 前提** (確定): hB=(7.8.b) lower bound は Hypothesis78 必須で、その
+  chiRho_eq_inner_beta (7.8.c.i)/chiRho_decomp (7.7.a) は **project 全体で未形式化**
+  (lane γ exists_MHypothesis (S16:4502) も h78 含む全体を単一 sorry で defer)。
+  (7.2.b)/(7.3) は upper bound (proven) ゆえ hB には不足、hC(sum<1)には寄与し得る。
+- **(12.12) degree bound** `complement_cyclic_order_dvd` (S14 sorried) が he:3≤e/h2e:2e≤p+1 を供給。
+  rep-theory cores (isCyclic_and_card_dvd_of_faithful_one_dim 等 S14:2015+) から組める可能性。

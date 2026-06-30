@@ -440,3 +440,61 @@ Q-term = raw bound (`normCascade_upper_loosen` で displayed へ、u,v>0 は nor
 **残 §16 sorry** (normCascadeData は閉じた): `exists_MHypothesis` (全 carrier 供給、最大)、`eta_generic_data`
 (§3 Dade)、`betaM_expansion`、`orthogonality_switch` (14.14、最深)、v formulas、CaseBContradictionData。
 次 = exists_MHypothesis の carrier 供給 (deep §13-14) or orthogonality_switch。[[feedback-no-avoiding-hard-parts]]
+
+### cont.¹⁰ (2026-06-30 lane c=γ /loop): main_size_bounds reduction + solo frontier 枯渇の確定
+
+§16 char 義務 solo 続行 (ユーザー裁可) で 1 reduction 着地: `main_size_bounds_structural` (14.11.1)
+の quotient bound `(k−1)/e ≥ (v−1)/p` を第1連言 `k>2pv` から純算術で genuine 化 (commit `fd9a55b8`)。
+obligation = `k>2pv` のみ (構造 residual)。
+
+**solo tractable frontier 枯渇の確定** (残 §16 sorry を網羅調査):
+- `main_size_bounds_structural`: `k>2pv` のみ残 (deep、cyclotomic v-value + M order gated)。
+- `T_side_caseB_facts` (136、v-formula `v=(q^p−1)/(q−1)`): S-side dual `caseB_order_u` も sorry、§13
+  cyclotomic 構築要。
+- `T_typeII` (1564、14.9): char argument (type-III ⟹ `(v−1)/p≤(u−1)/q`、§5/§11/§13 inner-product)
+  は **cite 可能 lemma なし** ((14.8) `key_ratio_inequality_of_caseB_data` は在庫だが片側のみ)。
+- `eta_generic_data` (2345): §3 Dade η-grid 整数性。
+- `U_cyclic_and_Q_elemAbelian` (3438)/`V_cyclic` (3518): §9/§11 char (docstring 明記)。
+- `CaseBContradictionData` (4360): §14.16 L-side β decomp + orthogonality。
+- `exists_MHypothesis` (4426/4502): 全 carrier 供給 = type-I M 完全構成 (最深)。
+
+⟹ **残 §16 は全て non-citable な deep §13/§14/§9/§11 partner char theory を一から構築要**で、lane a
+(§9-13 char core)・lane b (§12 Dade) と深く重複。lane c の group-theory/arithmetic shaped 生産 frontier
+(§8 counting + main_size_bounds 等) は枯渇。これ以上の solo は (a) 同 sorry 再調査 (空転) or (b) §13 char
+を lane a と重複構築。**hub/ユーザー判断要** (lane a/b char 成熟を待って cite [[feedback-cite-sorried-lemmas-if-signature-correct]]、
+lane c 再配分、or §13 char solo 構築の是非)。[[feedback-flag-poor-progress]] [[cross-lane-sync-via-notes]]
+
+### cont.¹¹ (2026-06-30 lane c=γ /loop): T_typeII (14.9) BG-structural reduction landed + bedrock 独立再確認
+
+**1 genuine reduction landed** (commit `89f71cfc`): `T_typeII` (14.9, S16:1581) の bare sorry を
+**BG structural 経路**で de-opacify。教科書の type-III orthogonality contradiction (cite 可能 lemma
+無し、cont.¹⁰ で確認) を回避し、`typePData_of_isTypeNonI (T_nonI)` (sorry-free) → `TypePData` →
+`isTypeII_of_typePData` (**axiom-clean**, `OddOrder.BG.Ch4.S16`, AxiomsCheck 登録) に T-side
+structural inputs を供給。残 obligation = 新 `T_typeII_structural_inputs` (S16:1565、5 連言:
+nontrivial core / U commutative / N_G(U)⊄T / T' type-F / F(T')=T_F) に isolate。これは cont.¹⁰ が
+「cite 可能 lemma なし」とした T_typeII への、唯一見つかった alternative-route reduction。leaf green。
+
+**main sync** (10 commits, conflict 無): lane-b (β) の L-witness Dade infra 着地 —
+`hypothesis_of_typeIData` (S14:159, **sorry-free**: explicit TypeIData → S14.Hypothesis)、
+`witness_L_hypothesis_frobenius`/`witness_L_coherent`。**lane b が lane-c の MHypothesis pattern を
+mirror 中** (s14 note 明記)。但し全て **L (witness 第二極大) 対象**で、私の deepest sorry
+`exists_MHypothesis` は **M (type-I over N_G(V)) の完全構成**を要し直接 discharge せず。
+
+**残 9 sorry を独立 fresh 調査で bedrock 再確認** (cont.¹⁰ 結論を refine):
+- **U/V cyclic** (3486/3566): citation 候補 `complement_cyclic_order_dvd` (S14:2343, sorried 但し
+  citable) は **frob.complement** 対象 → だが U/V は Frobenius **kernel** (`S_deriv_eq_PU: derivedInG S
+  = P⊔U`, `T_deriv_eq_QV: Q⊔V`; `BasicStructureData.UW1_frobenius` で U=kernel/W₁=complement)。
+  ∴ complement 経路は**適用不可**、kernel cyclicity は deep §9/§11 char。sorry-free
+  `isCyclic_and_card_dvd_of_fpf_conj_elemAbelian` (S14:2298) も rank-≤2 elem-abelian FPF 要 / P は
+  rank q (>2) ゆえ不適用。
+- **v-formula** (136, `v=(q^p−1)/(q−1)`): §13 cyclotomic 同定 (`hyp.tSide_cyclotomic_quotient_*`
+  field 経由)、純算術 shortcut 無し。
+- main_size_bounds (k>2pv) / EtaGenericData (§3 Dade) / CaseBContradictionData (§14.16) /
+  exists_MHypothesis (~30 field full M 構成) も全て deep、既に minimal isolated obligation
+  (de-opacify 余地ほぼ無)。
+- **∴ T_typeII は one-off opportunity** (既存 BG structural lemma が alternative route を供給した稀有例)。
+  他 8 sorry には対応する shallower-bottoming alternative-route lemma が無く、同種 reduction 不可。
+
+**bedrock 確定**: tractable solo lane-c frontier (group-theory/arithmetic) は枯渇。次は**戦略判断**
+(wait-and-cite / 再配分 / §13 char solo 構築の是非) = ユーザーに flag。[[feedback-flag-poor-progress]]
+[[scaffold-sorry-free-not-done]] [[s09-is-section7-chirho-complete]] (duplication 回避)

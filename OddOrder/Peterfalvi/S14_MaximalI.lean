@@ -99,6 +99,21 @@ noncomputable def tau {L : Subgroup G} (hyp : Hypothesis L) :
   OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap hyp.dadeData.dade
     (hyp.dadeData.dade.fullDadeIsometryData hyp.hconj)
 
+open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
+/-- **The Peterfalvi (7.1) `ρ`-machinery data for `(L, A(L))`** — the §7 foundation for the (12.16)
+Dade calculation.  Built genuinely from the §10 Dade isometry carried by `hyp.dadeData`/`hyp.hconj`:
+unlike the type-`P` `S12.Hypothesis.toHypothesis71`, the type-I support `A(L) = typeIA` is already the
+set on which `dadeData` lives, so no restriction is needed — the Dade map, its `IsDadeMap`
+certificate, and the `L`-equivariance transfer directly.  This `S09.Hypothesis71` is what lets the
+§9 norm machinery — `chiRho_norm_sq_le` (7.2.b), `chiRho_integral_inequality` (7.3),
+`family_inequality` (7.5), and `Hypothesis78.NormEstimates` (7.8.b) — apply to `L`. -/
+noncomputable def toHypothesis71 {L : Subgroup G} [Finite G] (hyp : Hypothesis L) :
+    OddOrder.Peterfalvi.S09.Hypothesis71 G (typeIA L hyp.typeI) L where
+  hyp := hyp.dadeData.dade
+  τ := (hyp.dadeData.dade.fullDadeIsometryData hyp.hconj).toDadeIsometryData.toDadeMap
+  isDadeMap := (hyp.dadeData.dade.fullDadeIsometryData hyp.hconj).toDadeIsometryData.isDadeMap
+  hConjInvariant := hyp.hconj
+
 end Hypothesis
 
 /-- Conjugation transports the centralizer of a singleton:
@@ -150,17 +165,18 @@ private theorem supportKernel_conj_invariant {M : Subgroup G} {X : Set G} {g x :
   · rw [if_neg (fun h => hx (hescape.mp h)), if_neg hx, Subgroup.smul_bot]
 
 open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
-/-- **Peterfalvi (12.1), existence**: every type-I maximal subgroup `L` carries the
-(12.1) Hypothesis.  The Dade isometry, induced family, and support are the genuine
-`S07.dadeIntegralCharacterMap`, `Sset`, and `A(L)`; the only inputs are the (8.15)
-Dade support data (`S10.dadeSupportHypotheses_typeI`) and the conjugation
-invariance `hconj` of the support kernels (a (8.14)/(8.15) fact).  Mirrors
-`S12.exists_hypothesis_of_typeIIIorIVorV`. -/
-theorem exists_typeI_hypothesis [Finite G]
+/-- **Peterfalvi (12.1), construction from explicit type-I data**: a type-I maximal subgroup `L`
+with a *given* `TypeIData` carries the (12.1) Hypothesis whose `typeI` field is exactly that data.
+This refines `exists_typeI_hypothesis` by preserving the identity of the type-I witness, so callers
+holding a `TypeIData` (e.g. the Frobenius structure of (12.10)) can recover it — and the associated
+Frobenius decomposition of `H = L_F` — from the resulting `Hypothesis`.  The Dade isometry, induced
+family, and support are the genuine `S07.dadeIntegralCharacterMap`, `Sset`, and `A(L)`; the only
+inputs are the (8.15) Dade support data (`S10.dadeSupportHypotheses_typeI`) and the conjugation
+invariance `hconj` of the support kernels (a (8.14)/(8.15) fact). -/
+theorem hypothesis_of_typeIData [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) {L : Subgroup G}
-    (hL : L ∈ maximalSubgroups G) (hType : IsTypeI L) :
-    Nonempty (Hypothesis L) := by
-  obtain ⟨data⟩ := hType
+    (hL : L ∈ maximalSubgroups G) (data : TypeIData L) :
+    ∃ hyp : Hypothesis L, hyp.typeI = data := by
   obtain ⟨dadeData⟩ :=
     (OddOrder.Peterfalvi.S10.dadeSupportHypotheses_typeI hG hL data).1
   -- (8.14)/(8.15): the support kernels `R(a)` are `L`-conjugation invariant.
@@ -170,7 +186,18 @@ theorem exists_typeI_hypothesis [Finite G]
     refine supportKernel_conj_invariant l.2 ?_
     exact ⟨fun h => by simpa using dadeData.dade.L_normalizes_A l⁻¹ h,
       fun h => dadeData.dade.L_normalizes_A l h⟩
-  exact ⟨{ maximal := hL, typeI := data, dadeData := dadeData, hconj := hconj }⟩
+  exact ⟨{ maximal := hL, typeI := data, dadeData := dadeData, hconj := hconj }, rfl⟩
+
+/-- **Peterfalvi (12.1), existence**: every type-I maximal subgroup `L` carries the (12.1)
+Hypothesis.  Forgetful form of `hypothesis_of_typeIData`.  Mirrors
+`S12.exists_hypothesis_of_typeIIIorIVorV`. -/
+theorem exists_typeI_hypothesis [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {L : Subgroup G}
+    (hL : L ∈ maximalSubgroups G) (hType : IsTypeI L) :
+    Nonempty (Hypothesis L) := by
+  obtain ⟨data⟩ := hType
+  obtain ⟨hyp, _⟩ := hypothesis_of_typeIData hG hL data
+  exact ⟨hyp⟩
 
 open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
 /-- **The type-I family `S = {Ind_H^L θ}` is closed under complex conjugation**
@@ -1999,6 +2026,45 @@ theorem witness_L_frobenius [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     ∃ frob : TypeIFrobeniusData data.L, frob.kernel_eq_MF := by
   sorry
 
+/-- **Peterfalvi (12.1) for the witness subgroup `L`, with its Frobenius witness**: the second
+maximal subgroup `L` of (12.9) carries the (12.1) Hypothesis together with an explicit Frobenius
+decomposition of its kernel `H = L_F`.  Since `L` is type I (Frobenius, by (12.10)
+`witness_L_frobenius`), `hypothesis_of_typeIData` applied to the recovered `TypeIData` yields the
+Hypothesis whose `typeI` is that very data, so the Frobenius group structure `frob.frobenius`
+transfers to `hyp.H`.  This Frobenius witness is the structural input to coherence (12.6). -/
+theorem witness_L_hypothesis_frobenius [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    {ctr : CounterexampleHypothesis (G := G)} (data : RankTwoWitnessData ctr) :
+    ∃ hyp : Hypothesis data.L, ∃ C : Subgroup ↥data.L,
+      OddOrder.Isaacs.Ch06.IsFrobeniusGroup ↥data.L (hyp.H.subgroupOf data.L) C := by
+  obtain ⟨frob, _⟩ := witness_L_frobenius hG data
+  obtain ⟨hyp, hhyp⟩ := hypothesis_of_typeIData hG data.L_maximal frob.typeI
+  refine ⟨hyp, frob.complement, ?_⟩
+  have hH : hyp.H = frob.typeI.typeF.H := by
+    rw [show hyp.H = hyp.typeI.typeF.H from rfl, hhyp]
+  rw [hH]
+  exact frob.frobenius
+
+/-- **Peterfalvi (12.1) Hypothesis for the witness subgroup `L`** (forgetful form of
+`witness_L_hypothesis_frobenius`). -/
+theorem witness_L_hypothesis [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    {ctr : CounterexampleHypothesis (G := G)} (data : RankTwoWitnessData ctr) :
+    Nonempty (Hypothesis data.L) := by
+  obtain ⟨hyp, _⟩ := witness_L_hypothesis_frobenius hG data
+  exact ⟨hyp⟩
+
+open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
+/-- **Peterfalvi (12.6) for the witness subgroup `L`**: the type-I family `S` of `L` is coherent.
+Combines the Hypothesis + Frobenius witness of `witness_L_hypothesis_frobenius` with the (12.6)
+Frobenius-case coherence `frobenius_typeI_coherent`.  This is the coherence input "`S` coherent" of
+the (12.16) Dade calculation — it feeds the `(7.8.b)` norm bound `hB` of `CounterexampleDadeData`
+via the §7 `Hypothesis78`/`NormEstimates`. -/
+theorem witness_L_coherent [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    {ctr : CounterexampleHypothesis (G := G)} (data : RankTwoWitnessData ctr) :
+    ∃ hyp : Hypothesis data.L,
+      Nonempty (OddOrder.Peterfalvi.S07.IsCoherent hyp.tau hyp.Sset hyp.A) := by
+  obtain ⟨hyp, C, hC⟩ := witness_L_hypothesis_frobenius hG data
+  exact ⟨hyp, frobenius_typeI_coherent hG hyp ⟨C, hC⟩⟩
+
 /-- **Peterfalvi (12.11)**: `M inter L` complements `K` in `M` and lies in the
 Fitting kernel `H` of the witness subgroup `L`. -/
 theorem intersection_complement_structure [Finite G]
@@ -2298,6 +2364,81 @@ structure DadeNotation {L : Subgroup G} (hyp : Hypothesis L) where
   psi_eq_tau1_chi : psi = tau1 chi
   rhoFormula : Prop
   rhoMFormula : Prop
+
+open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
+/-- **Peterfalvi (12.13), the Dade calculation realized from coherence**: given the (12.6) coherent
+extension of `L`'s family `S` (`S07.IsCoherent`, supplied by `witness_L_coherent`) and a distinguished
+character `χ ∈ S` of degree `e`, the (12.13) `DadeNotation` is realized with `τ₁ =` the coherent
+extension and `ψ = χ^{τ₁} = extension χ`.
+
+This wires the coherent isometric extension into the `ψ`-construction backbone of (12.16): the
+former opaque `tau1`/`psi` are now the genuine `coh.extension` and its value on `χ`.  The remaining
+input is the *selection* of the distinguished `χ` — a minimal-degree `Ind_H^L θ` with `θ` a
+nontrivial linear character of `H = L_F`, so `χ(1) = [L:H] = e` — together with the (12.12) degree
+bounds on `e`.  (`e_eq_index`/`rhoFormula`/`rhoMFormula` remain the structure's carried `Prop`s.) -/
+noncomputable def dadeNotation_of_coherence {L : Subgroup G} [Finite G] (hyp : Hypothesis L)
+    (coh : OddOrder.Peterfalvi.S07.IsCoherent hyp.tau hyp.Sset hyp.A)
+    (χ : ClassFunction ↥L ℂ) (hχ : χ ∈ hyp.Sset) (e : ℕ) (hdeg : χ 1 = (e : ℂ)) :
+    DadeNotation hyp where
+  e := e
+  e_eq_index := e = (hyp.H.subgroupOf L).index
+  tau1 := coh.extension
+  chi := χ
+  chi_mem := hχ
+  chi_degree_eq_e := hdeg
+  psi := coh.extension χ
+  psi_eq_tau1_chi := rfl
+  rhoFormula := True
+  rhoMFormula := True
+
+open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
+/-- **Peterfalvi (12.13), the distinguished character**: the family `S` of `L` contains a member of
+minimal degree `[L : H]` (`H = L_F`), namely `Ind_H^L θ` for `θ` a nontrivial **linear** character
+of `H`.  Such `θ` exists because `H = L_F` is a nontrivial nilpotent group, so its commutator is
+proper (`H` is not perfect); `exists_irreducibleCharacter_ne_trivial_degree_one_of_commutator_ne_top`
+then supplies a nontrivial degree-one `θ`, and `induce_apply_one` gives the induced degree
+`[L:H]·θ(1) = [L:H]`.  This is the distinguished `χ ∈ S` with `χ(1) = e = [L:H]` of the (12.13)/(12.16)
+Dade calculation — the input to `dadeNotation_of_coherence`. -/
+theorem exists_distinguished_char {L : Subgroup G} [Finite G] (hyp : Hypothesis L) :
+    ∃ χ ∈ hyp.Sset, χ (1 : ↥L) = (((hyp.typeI.typeF.H).subgroupOf L).index : ℂ) := by
+  have hHL : hyp.typeI.typeF.H ≤ L := hyp.typeI.typeF.H_le
+  have e : ↥((hyp.typeI.typeF.H).subgroupOf L) ≃* ↥(hyp.typeI.typeF.H) :=
+    Subgroup.subgroupOfEquivOfLe hHL
+  haveI : Nontrivial ↥(hyp.typeI.typeF.H) :=
+    (Subgroup.nontrivial_iff_ne_bot _).mpr hyp.typeI.typeF.H_nontrivial
+  haveI : Group.IsNilpotent ↥(hyp.typeI.typeF.H) :=
+    hyp.typeI.typeF.H_eq ▸ OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_isNilpotent L
+  haveI : Nontrivial ↥((hyp.typeI.typeF.H).subgroupOf L) := e.toEquiv.nontrivial
+  haveI : IsSolvable ↥((hyp.typeI.typeF.H).subgroupOf L) :=
+    solvable_of_solvable_injective (f := e.toMonoidHom) e.injective
+  have hcomm : commutator ↥((hyp.typeI.typeF.H).subgroupOf L) ≠ ⊤ :=
+    (IsSolvable.commutator_lt_top_of_nontrivial _).ne
+  obtain ⟨θ, hθ_ne, hθ_deg⟩ :=
+    OddOrder.Peterfalvi.S08.exists_irreducibleCharacter_ne_trivial_degree_one_of_commutator_ne_top
+      hcomm
+  have hmem : ClassFunction.induce ((hyp.typeI.typeF.H).subgroupOf L)
+      (θ : ClassFunction ↥((hyp.typeI.typeF.H).subgroupOf L) ℂ) ∈ hyp.Sset :=
+    ⟨θ, hθ_ne, rfl⟩
+  refine ⟨_, hmem, ?_⟩
+  rw [ClassFunction.induce_apply_one, hθ_deg, mul_one]
+
+open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
+/-- **Peterfalvi (12.13) for the witness subgroup `L`**: the second maximal `L` of (12.9) carries a
+full (12.13) `DadeNotation` — the realized `ψ = χ^{τ₁}` of the (12.16) Dade calculation.
+
+Assembles the foundation chain: `witness_L_coherent` supplies the (12.6) coherent extension of `L`'s
+family `S`, `exists_distinguished_char` selects the distinguished `χ ∈ S` of degree `[L:H]`, and
+`dadeNotation_of_coherence` realizes the (12.13) notation with `τ₁ = ` the coherent extension and
+`ψ = χ^{τ₁}`.  This is the `ψ`-data of `CounterexampleDadeData`; what remains for the (12.16)
+contradiction is the value/norm content — (12.14)/(12.15) for `h_const`/`h_psig_int`, the (12.12)
+degree bounds, and the `ρ`/`ρM` norm bounds `hA`/`hB`/`hC`. -/
+theorem exists_witness_dadeNotation [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    {ctr : CounterexampleHypothesis (G := G)} (data : RankTwoWitnessData ctr) :
+    ∃ hyp : Hypothesis data.L, Nonempty (DadeNotation hyp) := by
+  obtain ⟨hyp, ⟨coh⟩⟩ := witness_L_coherent hG data
+  obtain ⟨χ, hχ, hdeg⟩ := exists_distinguished_char hyp
+  exact ⟨hyp, ⟨dadeNotation_of_coherence hyp coh χ hχ
+    ((hyp.typeI.typeF.H).subgroupOf data.L).index hdeg⟩⟩
 
 /-- **Peterfalvi (12.14)**: the character `psi` is constant on the coset `xK`. -/
 theorem psi_constant_on_xK [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd G)

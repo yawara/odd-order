@@ -27,6 +27,18 @@ M̃-cover route が必要とする群論はすべて lane-d が既に proven (S1
 
 ∴ **gate-2 の TypeICovering branch の `cover_nonidentity` + `pairwise_disjoint_thickened` は供給可能**。
 
+## ✅ 実行体制 (ユーザー裁定 2026-06-30 hub session): lane d に cross-lane carve-out
+
+S10+S09+S14_MaximalI を build-green に一括必要な coupled 改修ゆえ、独立並行不可。**lane d が全体を
+1 つの atomic 変更 (専用 branch) として実装** → hub が一括合流。
+- **lane d に一時 cross-lane carve-out 付与** (merge_monitor.md 🔀 ブロック): d が S09
+  (FrobeniusFamily/FamilyHypothesis71/G0) + S14_MaximalI (`not_all_maximal_typeI`/`covers`) を
+  8022 の一環として編集してよい (逸脱としない)。
+- **a/b/c への要請**: 8022 land まで S09 FrobeniusFamily/FamilyHypothesis71・S14_MaximalI
+  `not_all_maximal_typeI` 周辺の編集を避ける (d の atomic 変更との衝突回避)。各 lane の他フロンティアは継続可。
+- hub: d の atomic diff (S09/S14/S10 含む大型) を build-green + sorry/axiom 検証して一括合流。land 後に
+  carve-out 解除 + a/b/c へ解除通知。
+
 ## やること (cross-lane re-route、coupled = build-green に一括必要)
 
 1. **S10 (`BGTheoremETypeICovering`, lane-d carve-out 8086)**: `cover_subset_kernels` field を

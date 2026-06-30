@@ -65,8 +65,36 @@ foundational arithmetic backbone を構築 (η free-field に非依存、signatu
 `field_normalizer_structure` / `nonexistence_of_G` が unconditional。`lake build OddOrder
 OddOrder.AxiomsCheck` 緑。
 
+## 2026-06-30 lane-c (/loop): T_typeII reduction landed + V-side 構成 blocker を精密特定
+
+本 /loop iteration の成果と、残 frontier の精密診断:
+
+**genuine landing**: `T_typeII` (14.9) を BG-structural 経路で de-opacify (commit `89f71cfc`、leaf
+green)。`typePData_of_isTypeNonI`→`isTypeII_of_typePData` (axiom-clean) cite、残は新
+`T_typeII_structural_inputs` (5 連言) に isolate。教科書 type-III orthogonality 経路 (cite 不能) を回避。
+
+**残 9 sorry の精密診断** (cont.¹⁰ の「枯渇」を refine): 全て deep §3/§9/§11/§13/§14。issue 4002 の
+ユーザー裁定「lane c は自前 V-side Dade/§14 char を進める」に従い最大 item `exists_MHypothesis`
+(V-side Dade 構成) の forward path を調査 → **構造 blocker を精密特定**:
+
+- **base `Hypothesis` は非対称**: `Sdata : TypePData S` (+`Sdata_U_eq`/`Sdata_W1_eq` reconciliation) は
+  在るが **`Tdata : TypePData T` が無い**。⟹ `typeII_overNormalizer_frobenius` (S15:1070、S/U-side) の
+  V-side dual は機械 mirror 不可。**base Hypothesis への `Tdata` carrier 追加が前提** (= §16 carrier infra
+  拡張、`Section16TypePStructure` 供給含む、architecturally significant)。
+- **追加後も下流は deep**: V-side `exists_typeI_maximal_overNormalizer_U` dual は
+  `card_LF_coprime_pq`/`theorem88_caseB` T-side/`typeI_overNormalizer_U_le_fitting` dual に bottom-out、
+  h78 coherence/§8 partner structure は **lane b の active char keystone (Section11CharacterData /
+  (11.8)/(10.8)、issue 2020)** と overlap。
+
+⟹ **issue 4002 診断 (lane c = thin downstream consumer、real fan-out は lane b char) の再確認**。
+lane c の独立 runway = (a) base Hypothesis の Tdata carrier 拡張 + V-side 構造構成 (大規模・非重複・
+下流 char-gated) or (b) lane b char keystone (重複 risk)。**戦略 fork をユーザーに flag** (issue 4002
+proposal: 続行 / lane b bottleneck 支援 / 別 frontier 再配置)。[[feedback-flag-poor-progress]]
+
 ## 参照
 
 - `notes/peterfalvi/s16_nonexistence_gate_map.md` (正本・13 sorry の gate 詳細)
+- `notes/peterfalvi/s16_w4_char_cascade.md` cont.¹¹ (本 iteration の詳細)
 - issue 2009 (POLE-2 `field_normalizer_structure`)、issue 1004 (section16CharacterData, Lane B)
-- commit ff2338a5 (kickoff: (14.8)/(14.11.1)/(14.11) wiring)
+- issue 4002 (lane allocation 診断: thin downstream consumer)、issue 2020 (§13.2.a char core, lane b)
+- commit ff2338a5 (kickoff)、`89f71cfc` (T_typeII reduction, 本 iteration)

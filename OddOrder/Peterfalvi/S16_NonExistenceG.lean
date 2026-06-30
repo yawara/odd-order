@@ -1557,11 +1557,33 @@ theorem key_inequality [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
   obtain ⟨Ldata⟩ := exists_LHypothesis _hG hyp
   exact key_inequality_of_caseB_outputs (caseB_for_T _hG hyp) (caseB_for_S _hG hyp Ldata)
 
-/-- **Peterfalvi (14.9)**: the subgroup `T` is of Type II. -/
+/-- **§13/§14 structural inputs for `T` type-II** (the `T`-side analogue of `basic_structure` +
+(8.6) for `S`).  For the type-`P` data of the partner `T` (from `T_nonI`), the BG type-II
+characterisation `isTypeII_of_typePData` needs: the nontrivial-core data, `U` commutative,
+`N_G(U) ⊄ T`, and the derived subgroup `T'` of type `F` with `F(T') = T_F`.  These are the genuine
+§13/§14 `T`-side residual of Peterfalvi (14.9) (dual to the `S`-side `basic_structure`/(8.6); the
+textbook routes through the type-III orthogonality contradiction, but the BG structural
+characterisation is the `M_F`-side equivalent).  Consumer-pinned signature; the body is the
+`T`-side partner character/structure theory. -/
+theorem T_typeII_structural_inputs [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hyp : Hypothesis (G := G)) (data : OddOrder.GroupTheory.TypePData hyp.base.T) :
+    OddOrder.GroupTheory.TypePNontrivialCore hyp.base.T data ∧
+      IsMulCommutative ↥data.U ∧
+      ¬ Subgroup.normalizer (data.U : Set G) ≤ hyp.base.T ∧
+      OddOrder.GroupTheory.IsTypeF (derivedInG hyp.base.T) ∧
+      maxNilpotentNormalHall (derivedInG hyp.base.T) = data.H := sorry
+
+/-- **Peterfalvi (14.9)**: the subgroup `T` is of Type II.  Built from the BG type-II
+characterisation `isTypeII_of_typePData`: `T` is non-type-I (`T_nonI`), hence carries a `TypePData`
+(`typePData_of_isTypeNonI`); applying `isTypeII_of_typePData` with the §13/§14 `T`-side structural
+inputs (`T_typeII_structural_inputs`) gives type II.  The §14-level reduction is honest; the
+remaining content is the pinned `T`-side structure. -/
 theorem T_typeII [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
     (hyp : Hypothesis (G := G)) :
     IsTypeII hyp.base.T := by
-  sorry
+  obtain ⟨data⟩ := OddOrder.GroupTheory.typePData_of_isTypeNonI hyp.base.T_nonI
+  obtain ⟨hcommon, hUcomm, hnorm, hderF, hderfit⟩ := T_typeII_structural_inputs _hG hyp data
+  exact OddOrder.BG.Ch4.S16.isTypeII_of_typePData data hcommon hUcomm hnorm hderF hderfit
 
 /-! ## (14.10)--(14.11): the subgroup `M` over `N_G(V)` -/
 
@@ -1965,17 +1987,43 @@ theorem norm_cascade_contradiction_of_caseB_outputs_main_size_bounds
     hsize hbound
 
 /-- **Peterfalvi (14.11.1)** structural half: under `K ≠ V`, the Fitting kernel `K = M_F` is large
-(`k > 2 p v`) and the Frobenius quotient `(k − 1) / e` dominates `(v − 1) / p`.  Both bounds come
-from the type-I structure of `M` and the degree/index data of (14.10)--(14.11) — they are the
-genuine §13/§14 character-theoretic residual of (14.11.1) (Lane B).  The third inequality of
-(14.11.1), `(v − 1) / p > (u − 1) / q`, is *pure arithmetic* (it is `key_ratio_inequality_of_caseB_data`)
-and is discharged directly in `main_size_bounds`. -/
+(`k > 2 p v`) and the Frobenius quotient `(k − 1) / e` dominates `(v − 1) / p`.  The **quotient
+bound is now a genuine consequence** of `k > 2 p v` (with `e = pq`, `q < p`): `q(v−1) ≤ qv ≤ 2pv ≤
+k−1`, so `(v−1)/p ≤ (k−1)/(pq)` (`div_le_div_iff₀` + `nlinarith`).  The single remaining obligation
+is the order bound `k > 2 p v` — the genuine §13/§14 character-theoretic residual of (14.11.1)
+(type-I order datum of `M`, gated on the cyclotomic `v`-value).  The third inequality of (14.11.1),
+`(v − 1) / p > (u − 1) / q`, is `key_ratio_inequality_of_caseB_data` (14.8), discharged in
+`main_size_bounds`. -/
 theorem main_size_bounds_structural [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
     (hyp : Hypothesis (G := G)) (Mdata : MHypothesis hyp)
     (hne : Mdata.K ≠ hyp.base.V) :
     Mdata.k > 2 * hyp.base.p * hyp.base.v ∧
       (((Mdata.k - 1 : ℕ) : ℚ) / (Mdata.e : ℚ) ≥
-        ((hyp.base.v - 1 : ℕ) : ℚ) / (hyp.base.p : ℚ)) := sorry
+        ((hyp.base.v - 1 : ℕ) : ℚ) / (hyp.base.p : ℚ)) := by
+  have hqp : hyp.base.q < hyp.base.p := hyp.q_lt_p
+  -- The structural bound `k > 2 p v` is the genuine §13/§14 residual of (14.11.1) (the type-I
+  -- order datum of `M`; gated on the cyclotomic `v`-value and the Frobenius quotient).
+  have hk : Mdata.k > 2 * hyp.base.p * hyp.base.v := sorry
+  refine ⟨hk, ?_⟩
+  -- The quotient bound `(k−1)/e ≥ (v−1)/p` is pure arithmetic from `k > 2pv`, `q < p`, `e = pq`:
+  -- `q(v−1) ≤ qv ≤ 2pv ≤ k−1`, so `(v−1)/p ≤ (k−1)/(pq)`.
+  have he : Mdata.e = hyp.base.p * hyp.base.q := Mdata.complement_card_eq_pq
+  have hNat : hyp.base.q * (hyp.base.v - 1) ≤ Mdata.k - 1 := by
+    have hb : 2 * hyp.base.p * hyp.base.v ≤ Mdata.k - 1 := Nat.le_sub_one_of_lt hk
+    have ha : hyp.base.q * (hyp.base.v - 1) ≤ 2 * hyp.base.p * hyp.base.v := by
+      calc hyp.base.q * (hyp.base.v - 1) ≤ hyp.base.q * hyp.base.v := by gcongr; omega
+        _ ≤ 2 * hyp.base.p * hyp.base.v := by gcongr; omega
+    exact le_trans ha hb
+  rw [he, ge_iff_le]
+  have hppos : (0 : ℚ) < hyp.base.p := by exact_mod_cast hyp.base.p_prime.pos
+  have hqpos : (0 : ℚ) < hyp.base.q := by exact_mod_cast hyp.base.q_prime.pos
+  have hpqpos : (0 : ℚ) < ((hyp.base.p * hyp.base.q : ℕ) : ℚ) := by
+    exact_mod_cast Nat.mul_pos hyp.base.p_prime.pos hyp.base.q_prime.pos
+  rw [div_le_div_iff₀ hppos hpqpos]
+  have hNatQ : (hyp.base.q : ℚ) * ((hyp.base.v - 1 : ℕ) : ℚ) ≤ ((Mdata.k - 1 : ℕ) : ℚ) := by
+    exact_mod_cast hNat
+  push_cast
+  nlinarith [hNatQ, hppos, hqpos]
 
 /-- **Peterfalvi (14.11.1)**: if `K != V`, then `k` is large and the quotient
 bound dominates `(v - 1) / p`.
