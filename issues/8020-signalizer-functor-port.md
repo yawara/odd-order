@@ -1124,3 +1124,20 @@ D(4) の「deep」と恐れた uniqueness が **tractable** と判明 (grind が
 別途「x∈X escaping → signalizer 構造」接続が要る (follow-up、direct でない)。
 
 **残 §16 lane-d sorry**: theoremA (superseded old form) / theoremB / theoremE / aSets / theoremII (×2)。
+
+## 🧭 戦略的発見 (lane d, 2026-06-30 /loop⁵²): §16 main-result theorems は **unconsumed** — spine value 低
+
+D(4) 完了後の残 §16 lane-d sorry を consumer grep で精査:
+- **theoremE / aSets_support_slice / theoremII_tame_embedding: 実 consumer ゼロ** (docstring 言及のみ)。
+- **theoremD (今回証明) も unconsumed** (consumer は theoremII のみ、それも unconsumed)。
+⟹ これら BG §16 "summary/main-result" theorems は **FT spine が cite していない presentation endpoint**。
+完遂は assigned BG §16 の体裁を整えるが (legitimate)、**spine を前進させない** (doneness=spine 基準で低価値)。
+
+**spine-critical な lane-d work = gate-2 route B** (`bgTheoremE_cover_data` → `card_LF_coprime_pq`(lane-c spine) →
+POLE-2 → feitThompson)。但し route B は §8 Dade (`dadeSupportHypotheses_typeI`=8.15, sorry) + per-rep
+HConjInvariant/IsDadeIsometry に gated = §8 character theory (deep)。route B assembly (FamilyHypothesis71 over
+reps + family_inequality + M̃-cover) は lane-d-doable だが 8.15/isometry が §8 residual。
+
+**∴ lane-d の岐路**: (a) §16 unconsumed endpoints 完遂 (group theory, 低 spine value) / (b) route B
+(spine-critical, §8-gated)。**project 方針 (spine>endpoint) は (b)**。次 = route B の assembly に着手
+(8.15 を cite した FamilyHypothesis71 構成、§8 residual は別途/lane-a-c 協調)。
