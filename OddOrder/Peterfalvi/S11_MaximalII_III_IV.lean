@@ -2087,6 +2087,25 @@ theorem mulAut_eq_one_of_fixes_irr_ne_trivial_of_prime_card {K : Type*} [Group K
   rw [← hχ] at h1
   simpa only [linearIrreducibleCharacter_apply] using h1
 
+/-- **An automorphism trivial on a spanning family of subgroups is the identity.**  The fixed
+points `{x | α x = x}` form a subgroup containing each `K i`, hence `⨆ i, K i = ⊤`; so `α` fixes
+everything.  Piece (D) of the non-Galois (9.8) inertia: `φ(g)` trivial on each order-`p` chief-factor
+summand `Hpart i` (which span `H̄`) is trivial on `H̄`. -/
+theorem mulAut_eq_one_of_eq_id_on_iSup {H : Type*} [Group H] (α : MulAut H)
+    {ι : Type*} (K : ι → Subgroup H) (hspan : ⨆ i, K i = ⊤)
+    (htriv : ∀ i, ∀ x ∈ K i, α x = x) : α = 1 := by
+  set S : Subgroup H :=
+    { carrier := {x | α x = x}
+      one_mem' := map_one α
+      mul_mem' := fun {a b} ha hb => by
+        simp only [Set.mem_setOf_eq] at ha hb ⊢; rw [map_mul, ha, hb]
+      inv_mem' := fun {a} ha => by
+        simp only [Set.mem_setOf_eq] at ha ⊢; rw [map_inv, ha] } with hS
+  have htop : S = ⊤ := top_le_iff.mp (hspan ▸ iSup_le (fun i x hx => htriv i x hx))
+  ext x
+  show α x = x
+  exact htop.ge (Subgroup.mem_top x)
+
 /-- Case (a) of Peterfalvi (9.7): `H/H_0` splits as a direct product of `q`
 order-`p` factors permuted by `W_1`.
 
