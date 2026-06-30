@@ -5858,6 +5858,65 @@ theorem theoremII_tame_embedding_of_inputs [Finite G] (hG : OddOrder.BG.IsMinima
     rintro N' ⟨hN'mem, _hN'type⟩
     exact hMaxUnique x hxX hx1 hxc N' N₀ hN'mem hN₀mem
 
+/-- **The escaping piece of `A(M)`/`A_0(M)` lands in `M_σ#`** (the `D ⊆ M_σ#` reduction of Theorem
+II's conjunct 2, extracted for reuse).  An `x ∈ X` (`X = A(M)` or `A_0(M)`) with `x ≠ 1` and
+`C_G(x) ⊄ M` must lie in `M_σ`: the dual TI pieces `A(M) - M_σ` (Theorem B(5)) and `A_0(M) - A(M)`
+(Theorem C(9), or empty in the type-`F` case via Theorem A(3)) have `G`-centralizer inside `M`. -/
+theorem mem_sigmaSharp_of_mem_aSet_of_escape [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M K U : Subgroup G} (hM : M ∈ maximalSubgroups G)
+    (hKM : K ≤ M) (hUM : U ≤ M)
+    (hK : Ch03.IsHallSubgroup (S14.kappa M) (K.subgroupOf M))
+    (hU : Ch03.IsHallSubgroup ((S14.kappa M ∪ OddOrder.BG.Ch3.S10.sigma M)ᶜ) (U.subgroupOf M))
+    {X : Set G} (hX : X = ASet M U ∨ X = A0Set M K)
+    {x : G} (hxX : x ∈ X) (hx1 : x ≠ 1)
+    (hesc : ¬ Subgroup.centralizer ({x} : Set G) ≤ M) :
+    x ∈ S14.sigmaSharp M := by
+  simp only [S14.sigmaSharp, sharpSubgroup, Set.mem_diff, SetLike.mem_coe, Set.mem_singleton_iff]
+  refine ⟨?_, hx1⟩
+  by_contra hxnMσ
+  have hxnMσ' : x ∉ (OddOrder.BG.Ch3.S10.Msigma M : Set G) := by rwa [SetLike.mem_coe]
+  have hTIB : IsTISubset (ASet M U \ (OddOrder.BG.Ch3.S10.Msigma M : Set G)) M :=
+    (theoremB_U_and_A_tame hG hM hU).2.2.2.2
+  rcases hX with hXA | hXA0
+  · exact hesc (hTIB.centralizer_le ⟨hXA ▸ hxX, hxnMσ'⟩)
+  · have hxA0 : x ∈ A0Set M K := hXA0 ▸ hxX
+    by_cases hxA : x ∈ ASet M U
+    · exact hesc (hTIB.centralizer_le ⟨hxA, hxnMσ'⟩)
+    · by_cases hKbot : K = ⊥
+      · refine hxA ⟨hxA0.1, ?_⟩
+        have hxM : x ∈ M := hxA0.1.1
+        have hA3 : M = K ⊔ U ⊔ OddOrder.BG.Ch3.S10.Msigma M :=
+          (theoremA_maximal_structure hG hM hK rfl hU).2.2.1
+        have hx' : x ∈ (K ⊔ U ⊔ OddOrder.BG.Ch3.S10.Msigma M : Subgroup G) := hA3 ▸ hxM
+        rw [hKbot, bot_sup_eq] at hx'
+        exact hx'
+      · obtain ⟨_, _, _, _, _, _, _, _, _, hTIC, _, _⟩ :=
+          theoremC_paired_structure hG hM hKbot hKM hUM hK rfl hU
+        exact hesc (hTIC.centralizer_le ⟨hxA0, hxA⟩)
+
+/-- **`ℳ(C_G(x))` is a singleton for an escaping `σ`-sharp element** (`|ℳ(C_G(x))| = 1`, the BG
+§9--§10 uniqueness input of Theorem II's conjunct 3).  For `x ∈ M_σ#` with `C_G(x) ⊄ M`, the escape
+forces `|𝓜_σ(x)| > 1` (`centralizer_le_of_maximalSigma_le_one`), so the signalizer structure
+(`signalizer_structure_of_mem_sigmaSharp`) supplies the type-`F`/`P₂` neighbour `N` over `C_G(x)`
+whose `τ₂`-element data feeds the Corollary-14.3 uniqueness
+`maximalContaining_centralizer_eq_singleton_of_tau2_element`, pinning `ℳ(C_G(x)) = {N}`. -/
+theorem maximalSubgroupsContaining_centralizer_eq_singleton_of_sigmaSharp_escape [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} (hM : M ∈ maximalSubgroups G)
+    {x : G} (hx : x ∈ S14.sigmaSharp M) (hesc : ¬ Subgroup.centralizer ({x} : Set G) ≤ M) :
+    ∃ N : Subgroup G,
+      maximalSubgroupsContaining (Subgroup.centralizer ({x} : Set G)) = {N} := by
+  have hx1 : x ≠ 1 := hx.2
+  have hxMσ : x ∈ OddOrder.BG.Ch3.S10.Msigma M := hx.1
+  have hgt : 1 < (S14.maximalSigmaSubgroupsOfElement x).ncard := by
+    by_contra h
+    push_neg at h
+    exact hesc (centralizer_le_of_maximalSigma_le_one hG hM hxMσ hx1 h)
+  obtain ⟨N, hNstruct, -⟩ := signalizer_structure_of_mem_sigmaSharp hG hM hx hgt
+  obtain ⟨hNmax, hCN, hRne, _hRhall, hxtau2, _hNtype, _hforall⟩ := hNstruct
+  have hxN : x ∈ N := hCN (Subgroup.mem_centralizer_iff.mpr
+    (fun y hy => by rw [Set.mem_singleton_iff.mp hy]))
+  exact ⟨N, maximalContaining_centralizer_eq_singleton_of_tau2_element hG hNmax hxN hx1 hxtau2 hRne⟩
+
 /-- **BG Theorem II** (mmd L4548): `A(M)` and `A_0(M)` are tamely embedded.  The BG form of the
 centralizer-control input used by Peterfalvi (8.12)--(8.13).  Cites the gated-endpoint skeleton
 `theoremII_tame_embedding_of_inputs`; the two residual obligations — the BG Theorem E cross-piece
@@ -5880,7 +5939,13 @@ theorem theoremII_tame_embedding [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd
   theoremII_tame_embedding_of_inputs hG hM hKM hUM hK hU hX
     -- `hPieceInv`: BG Theorem E cross-piece exclusion.
     (by sorry)
-    -- `hMaxUnique`: BG §9--§10 maximal-overgroup uniqueness `|ℳ(C_G(x))| = 1`.
-    (by sorry)
+    -- `hMaxUnique`: BG §9--§10 maximal-overgroup uniqueness `|ℳ(C_G(x))| = 1`, discharged from the
+    -- signalizer uniqueness (`maximalSubgroupsContaining_centralizer_eq_singleton_of_sigmaSharp_escape`)
+    -- via the `D ⊆ M_σ#` reduction (`mem_sigmaSharp_of_mem_aSet_of_escape`).
+    (fun x hxX hx1 hesc N₁ N₂ hN₁ hN₂ => by
+      obtain ⟨N, hMC⟩ := maximalSubgroupsContaining_centralizer_eq_singleton_of_sigmaSharp_escape
+        hG hM (mem_sigmaSharp_of_mem_aSet_of_escape hG hM hKM hUM hK hU hX hxX hx1 hesc) hesc
+      rw [hMC, Set.mem_singleton_iff] at hN₁ hN₂
+      exact hN₁.trans hN₂.symm)
 
 end OddOrder.BG.Ch4.S16
