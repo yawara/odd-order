@@ -479,3 +479,32 @@ cCoeff_nu_zeta_zero_eq_neg_d / _ind1H_eq  (c_i 同定: c_i=−d_i, c_ind1H=(β,�
 - → `Σ_{i≠ind1H} = e(h−1)`、ζ_0 項 (e²) を引いて `G = e(h−1)−e²`。
 
 次 = (1.5.d) 構築 (A=⊥ specialization → reindexing)。これが (7.8.b) 唯一残る実質数学。
+
+### 2026-07-01 (loop 継続²¹⁻): ✅ (7.8.b) ζ-bound 完全 discharge — `normEstimates_of_source_orthogonal` の hzeta gap 閉鎖
+
+**(7.8.b) の最終 assembly が完成** (commit 3969b134, full build green 3889 jobs)。(1.5.d) trio
+(`induce_degree_sum_bot`→`family_degree_sum`→`family_degree_sum_Ioi`、先行 commit) に続き、
+h_inner producer + keystone + 直接 bound の 3 定理を追加:
+
+```
+zetaNuRho_inner_eq_cexpr_H78  (ℂ h_inner: zeta 0 版 lemma を H78.zetaNuRho へ lift、
+                               zetaDistinct=0、G=family_degree_sum_Ioi 値、|L|=Lagrange)
+  → zetaNuRhoNormSq_eq_normQuad_of_facts  (keystone: zetaNuRhoNormSq = normQuadCorr + (1−e/h))
+  → zetaNuRhoNormSq_ge_of_facts  (smallIndex 非負性 → 1−e/h ≤ ‖ζ_0^{νρ}‖²)
+```
+
+**核心の発見**: γ-side は既に完全実装済 (`gammaNormSq_eq_of_source_orthogonal` /
+`normEstimates_of_source_orthogonal`、S09:3241/3270)。後者は `hzeta : zetaNuRhoNormSq =
+normQuadCorr + (1−e/h)` を**未証明仮説**として待っていた。my `zetaNuRhoNormSq_eq_normQuad_of_facts`
+がこの `hzeta` そのものを産出 → **完全な (7.8.b) NormEstimates (ζ 下界 + Γ 上界) が構成可能
+仮説のみから閉じる**。downstream は `normEstimates_of_source_orthogonal ...
+(zetaNuRhoNormSq_eq_normQuad_of_facts ...)` で full NormEstimates を得る。
+
+**producer の仮説 (全て family constructor から構成可能、whnf-wall 回避で抽象 H78 設計)**:
+hzd(=0,rfl)・horth(族直交)・hc_ind1H/hc_rest(coherence agreement→c_i 同定、`cCoeff_nu_zeta_zero_*`)・
+hd(degree ratio,`zeta_one_eq_d_mul`)・hN_ind1H/hP_ind1H(‖Ind 1_H‖²=Ind 1_H(1)=e,
+`induce_trivialChar_normSq/apply_eq_index`)・hGsum((1.5.d),`family_degree_sum_Ioi`)・hsmall(2e+1≤h)。
+
+(7.8.b) は実質数学 (norm identity) として **完了**。残 = (7.8.a) 側の `BetaDecomp` constructor
+producer (a の整数性は `exists_betaDecomp_a` 済、decomp 自体の field 充足) と、これら facts を
+concrete Dade family で discharge する glue (上流、family constructor は zeta=induce が rfl)。
