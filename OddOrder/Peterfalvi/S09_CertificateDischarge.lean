@@ -241,4 +241,58 @@ theorem inner_psi_candidate_eq [Invertible (Nat.card L : ℂ)] {n : ℕ}
     OddOrder.Peterfalvi.S09.Hypothesis71.ClassFunction.star_inner_self,
     mul_right_comm, inv_mul_cancel₀ (hnorm j), one_mul]
 
+open OddOrder.Peterfalvi.S09 in
+/-- **Peterfalvi (7.7.a), the decomposition.**  Given the §7 `ρ`-machinery (`Hypothesis71`), a
+pairwise-orthogonal family `ζ` of class functions with nonzero norms whose difference vectors
+`ψ_i = ζ_i − d_i ζ_0` are `A`-supported and span `CF(L, A)`, the `ρ`-image of any `χ` decomposes on
+`A` as `χ^ρ(x) = Σ_{i≥1} c̄_i/‖ζ_i‖² · ζ_i(x)`, where `c_i = ⟨ψ_i^τ, χ⟩`.
+
+This **discharges the `Hypothesis76.chiRho_decomp` certificate** of Peterfalvi (7.7.a) (issue 1013):
+the candidate `Σ c̄_i/‖ζ_i‖² ζ_i` and `χ^ρ` have the same inner products `c_j` against the spanning
+`{ψ_j}` (`chiRho_adjoint` on one side, `inner_psi_candidate_eq` on the other), so their difference is
+orthogonal to a spanning set of `CF(L,A)` and hence vanishes on `A` (`eq_zero_on_A_of_inner_zero`). -/
+theorem chiRho_decomp_proof {G : Type*} [Group G] [Fintype G] {A : Set G} {L : Subgroup G}
+    [Fintype L] [Invertible (Nat.card L : ℂ)] [Invertible (Nat.card G : ℂ)]
+    (H71 : Hypothesis71 G A L) {n : ℕ}
+    (ζ : Fin (n + 1) → ClassFunction L ℂ) (d : Fin (n + 1) → ℂ)
+    (psi_support : ∀ i, (ζ i - d i • ζ 0).support ⊆
+      OddOrder.Peterfalvi.S04.supportInSubgroup A L)
+    (horth : ∀ a b : Fin (n + 1), a ≠ b → ClassFunction.inner (ζ a) (ζ b) = 0)
+    (hnorm : ∀ i : Fin (n + 1), ClassFunction.inner (ζ i) (ζ i) ≠ 0)
+    (hAconj : ∀ g h : L, h * g * h⁻¹ ∈ OddOrder.Peterfalvi.S04.supportInSubgroup A L ↔
+      g ∈ OddOrder.Peterfalvi.S04.supportInSubgroup A L)
+    (hspan : ClassFunction.supportedSubmodule (OddOrder.Peterfalvi.S04.supportInSubgroup A L) ≤
+      Submodule.span ℂ ((fun j => ζ j - d j • ζ 0) '' {j : Fin (n + 1) | j ≠ 0}))
+    (χ : ClassFunction G ℂ) {x : L} (hx : (x : G) ∈ A) :
+    H71.chiRho χ x =
+      ∑ i ∈ Finset.Ioi (0 : Fin (n + 1)),
+        (star (ClassFunction.inner (H71.τ ⟨ζ i - d i • ζ 0, psi_support i⟩) χ) /
+          ClassFunction.inner (ζ i) (ζ i)) * ζ i x := by
+  set A' := OddOrder.Peterfalvi.S04.supportInSubgroup A L with hA'
+  set c : Fin (n + 1) → ℂ :=
+    fun i => ClassFunction.inner (H71.τ ⟨ζ i - d i • ζ 0, psi_support i⟩) χ with hc
+  set cand : ClassFunction L ℂ :=
+    ∑ i ∈ Finset.Ioi (0 : Fin (n + 1)),
+      (star (c i) / ClassFunction.inner (ζ i) (ζ i)) • ζ i with hcand
+  -- `η = χ^ρ − cand` is orthogonal to every `ψ_j` and lies in `CF(L,A) = span {ψ_j}`, so it
+  -- vanishes on `A`.
+  have hηA : (H71.chiRhoCF χ - cand) x = 0 := by
+    apply eq_zero_on_A_of_inner_zero A' hAconj hspan
+    · rintro v ⟨j, _, rfl⟩
+      rw [ClassFunction.mem_supportedSubmodule]
+      exact psi_support j
+    · rintro v ⟨j, hj, rfl⟩
+      rw [ClassFunction.inner_sub_right,
+        show ClassFunction.inner (ζ j - d j • ζ 0) (H71.chiRhoCF χ) = c j from
+          (H71.chiRho_adjoint ⟨ζ j - d j • ζ 0, psi_support j⟩ χ).symm,
+        inner_psi_candidate_eq ζ d horth c hnorm hj, sub_self]
+    · rw [hA', OddOrder.Peterfalvi.S04.mem_supportInSubgroup]; exact hx
+  -- conclude `χ^ρ x = cand x`, then evaluate the sum.
+  have hval : H71.chiRho χ x = cand x := by
+    have := hηA
+    rw [ClassFunction.sub_apply, H71.chiRhoCF_apply] at this
+    exact sub_eq_zero.mp this
+  rw [hval, hcand, ClassFunction.finset_sum_apply]
+  exact Finset.sum_congr rfl fun i _ => by rw [ClassFunction.smul_apply]
+
 end OddOrder.Peterfalvi.S09.Cert
