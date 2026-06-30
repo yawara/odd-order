@@ -2483,12 +2483,83 @@ theorem exists_witness_g {ctr : CounterexampleHypothesis (G := G)}
   rw [Subgroup.mem_inf] at hgA
   exact ⟨g, Subgroup.mem_centralizer_iff.mp hgA.1 witness.x (Set.mem_singleton _), hgA.2, hgB⟩
 
-/-- **Peterfalvi (12.16)**: the minimal counterexample of (12.8) is impossible. -/
+/-- **Peterfalvi (12.13)–(12.16), the character/norm contract** packaging every fact that the
+numerical endgame `counterexample_contradiction_of_facts` consumes.  Bundling them here isolates the
+deep §7/§12 content — the Dade calculation `ψ = χ^{τ₁}` of (12.13), the coset/value facts
+(12.14)/(12.15), and the `ρ`/`ρM` integral inequalities (7.3)/(7.8.b) — into a single
+faithfully-typed obligation, leaving the (12.16) capstone `counterexample_contradiction` a
+`sorry`-free assembly.
+
+Field map to the textbook (`H = L_F`, the Fitting kernel of the witness subgroup `L`):
+* `ε`/`hε` — a primitive `p`-th root of unity (the cyclotomic base of (1.10));
+* `ψ`/`hψ` — the virtual character `ψ = χ^{τ₁}` of (12.13) (`ZIrr` membership = it is a
+  ℤ-combination of irreducibles, from the Dade isometry image);
+* `e` — the common degree `χ(1) = e` of the coherent family `S` ((12.6)); `he`/`h2e` = (12.12);
+* `h_const` = (12.14) (`ψ` constant on the coset `xK`); `h_psix` = (1.10.a) applied to `χ`;
+  `h_psig_int` = (12.15) (`ψ(g) ∈ ℤ`);
+* `kK`/`kKp`/`kM`/`kH` = `|K|`/`|K'|`/`|M|`/`|H|`; `hidx` = (8.1.c), `hM` = (12.11);
+* `hA` = (12.15) norm relation for `ρM`, `hB` = (7.8.b) for `ρ`, `hC` = (7.3)+(8.17). -/
+structure CounterexampleDadeData {ctr : CounterexampleHypothesis (G := G)}
+    (witness : RankTwoWitnessData ctr) (g : G) where
+  ε : ℂ
+  hε : IsPrimitiveRoot ε ctr.p
+  ψ : ClassFunction G ℂ
+  hψ : ψ ∈ ZIrr G
+  e : ℤ
+  mval : ℤ
+  he : 3 ≤ e
+  h2e : 2 * e ≤ (ctr.p : ℤ) + 1
+  h_const : ψ (witness.x * g) = ψ witness.x
+  h_psix : ∃ w : ℂ, IsIntegral ℤ w ∧ ψ witness.x - (e : ℂ) = (1 - ε) * w
+  h_psig_int : ψ g = (mval : ℂ)
+  kK : ℝ
+  kKp : ℝ
+  kM : ℝ
+  kH : ℝ
+  normRhoM : ℝ
+  normRho : ℝ
+  hkKp : 0 < kKp
+  hkM : 0 < kM
+  hkH : 0 < kH
+  hidx : 4 * kKp ≤ kK
+  hM : kM ≤ kK * kH
+  hA : (kK - kKp) / kM * (mval : ℝ) ^ 2 ≤ normRhoM
+  hB : (1 : ℝ) - (e : ℝ) / kH ≤ normRho
+  hC : normRhoM + normRho < 1
+
+/-- **Peterfalvi (12.13)–(12.15) + (7.3)/(7.8.b)**, the construction of the character/norm contract
+of (12.16).  Given the rank-two witness of (12.9) and a commuting element `g ∈ C_K(x) ∖ K'`
+(`exists_witness_g`), the §7/§12 machinery produces the Dade calculation `ψ = χ^{τ₁}` and its
+associated `ρ`/`ρM` norm bounds.
+
+This is the remaining deep obligation of (12.16): build a `Hypothesis L` for the witness subgroup
+`L` (type I by (12.10) `witness_L_frobenius`), the Dade isometry `τ₁` and coherent family `S`
+((12.6)), the `DadeNotation` of (12.13), then discharge each field via the existing §12 theorems —
+`psi_constant_on_xK` (12.14), `rhoM_integer_values` (12.15), `intersection_complement_structure`
+(12.11) — and the §7 `chiRho` norm estimates (`S09.NormEstimates`, `chiRho_integral_inequality`).
+Bottoms out on (12.6)/(12.10)/(12.11) (cited via signature contract). -/
+theorem exists_counterexample_dade_data [Finite G]
+    (_hG : OddOrder.BG.IsMinimalSimpleOdd G) (ctr : CounterexampleHypothesis (G := G))
+    (witness : RankTwoWitnessData ctr) {g : G}
+    (_hg_comm : Commute witness.x g) (_hgK : g ∈ ctr.K) (_hgK' : g ∉ ctr.Kprime) :
+    Nonempty (CounterexampleDadeData witness g) :=
+  sorry
+
+/-- **Peterfalvi (12.16)**: the minimal counterexample of (12.8) is impossible.
+
+The rank-two witness of (12.9) (`exists_rankTwoWitness`) and the commuting element `g ∈ C_K(x) ∖ K'`
+(`exists_witness_g`) are extracted unconditionally; the deep §7/§12 character calculation is bundled
+into `exists_counterexample_dade_data`; the contradiction then follows from the numerical endgame
+`counterexample_contradiction_of_facts`. -/
 theorem counterexample_contradiction [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     (ctr : CounterexampleHypothesis (G := G)) :
     False := by
-  sorry
+  obtain ⟨_, _, ⟨witness⟩⟩ := exists_rankTwoWitness hG ctr
+  obtain ⟨g, hg_comm, hgK, hgK'⟩ := exists_witness_g witness
+  obtain ⟨d⟩ := exists_counterexample_dade_data hG ctr witness hg_comm hgK hgK'
+  exact counterexample_contradiction_of_facts ctr.p_prime d.hε d.hψ witness.x_mem_omega1 hg_comm
+    d.he d.h2e d.h_const d.h_psix d.h_psig_int d.hkKp d.hkM d.hkH d.hidx d.hM d.hA d.hB d.hC
 
 /-- **Peterfalvi (12.7), `π = ∅`** (the headline consequence of (12.16)): no prime lies in the
 set `π` of (12.8).  Were `π` nonempty, (12.8) (`exists_counterexampleHypothesis`) would build a
