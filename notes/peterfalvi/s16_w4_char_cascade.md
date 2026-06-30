@@ -602,3 +602,25 @@ card 計算) ↔ V-side では L~T 排除 (N_G(V)⊄T = `not_normalizer_V_le_T`)
 (`tConjugate_fitting_data` + `card_Q_eq` |Q|=q^p) ↔ V-side L~S 排除 (要 **新 `sConjugate_fitting_data`
 dual** + `card_P_eq` |P|=p^q、gated cite)。intricate ゆえ fresh context で。VW₂ Frobenius は
 Tdata から取得済パターン流用可。[[feedback-no-avoiding-hard-parts]] [[scaffold-sorry-free-not-done]]
+
+### cont.¹⁶ (2026-06-30 lane c=γ /loop ×5-6): V-side 主存在定理 + Frobenius-decomp dual 完成
+
+hub step 3 を継続。**V-side 構成の中核を landing** (全 build-green、commits `e3f9e0be` `960c58c3`):
+- **`exists_typeI_maximal_overNormalizer_V`** (S15、~150 行 dual、初回 green) = type-II T に対し N_G(V)
+  上の type-I maximal L が V⊆L_F で存在。branches swap (L~T=Hall-conjugacy / L~S=order-contradiction)。
+  VW₂ Frobenius を Tdata から構築・両 branch 共有。新 sorry = `sConjugate_fitting_data` (tConjugate の
+  S-side dual、card_P_eq gated、hub 指示で author)。helper 6 本消費。
+- **`p_not_dvd_kernel`** (q_not_dvd_kernel dual) + **`exists_typeIFrobeniusData_W2_le`**
+  (exists_typeIFrobeniusData_W1_le dual) = clean mirror。
+
+**残 = `typeII_overNormalizer_frobenius` の V-dual** (S15:1604)。要素:
+- `complement_card_eq_pq` の V-dual (order pq with W₂)。S-side は sorry-free だが gated lemma
+  (`complement_le_QW2` [Huppert]、`Q_W2_structure`、`complement_inf_Q_structure`) に依存
+  ⟹ V-dual は **gated dual を author 要**: `complement_le_PW1` (Huppert: W₂◁E→E≤PW₁、normalizer_W2 経由)、
+  `P_W1_structure`、`complement_inf_P_structure` (全 sorried、hub 指示 cite)。
+- **`TypeIOverNormalizerDataV` struct** (TypeIOverNormalizerData の V-side、normalizer_V_le_L /
+  W₁^y conjugate / etc.)。
+- `typeI_overNormalizer_complement_V` + `typeII_overNormalizer_frobenius_V` assembly。
+これで exists_MHypothesis の structural field (complement_card_eq_pq = e=pq) が供給可能に。
+deeper char (h78/§8) は別 (MHypothesis carrier に isolate 済)。[[feedback-no-avoiding-hard-parts]]
+[[hub-check-issue-before-asking-on-scope-violation]] [[scaffold-sorry-free-not-done]]
