@@ -2304,6 +2304,29 @@ theorem char_eq_on_factors_of_bijective {Hbar : Type*} [CommGroup Hbar] [Finite 
       eEquiv.symm_apply_eq.mpr (Subgroup.noncommPiCoprod_mulSingle (hcomm := hcomm) i x).symm,
     MonoidHom.noncommPiCoprod_mulSingle]
 
+/-- **Character extensionality on an internal direct product** (Lemma C — uniqueness companion to
+`char_eq_on_factors_of_bijective`).  Two characters of `Hbar` that agree on every factor `S i` are
+equal: the factors span `Hbar` (`noncommPiCoprod` surjective), so a character is determined by its
+per-factor data.  The `⟸` half of the free-`W1`-orbit separation of `(9.8.c)` — per-factor agreement
+forces global equality (the `⟹` half, global equality restricting to the factors, is `congr_fun`). -/
+theorem char_eq_of_eq_on_factors {Hbar : Type*} [CommGroup Hbar] [Finite Hbar]
+    {ι : Type*} [Fintype ι] {S : ι → Subgroup Hbar}
+    (hcomm : Pairwise fun i j : ι => ∀ x y : Hbar, x ∈ S i → y ∈ S j → Commute x y)
+    (hbij : Function.Bijective (Subgroup.noncommPiCoprod hcomm))
+    {χ ψ : Hbar →* ℂˣ} (h : ∀ (i : ι) (x : ↥(S i)), χ ↑x = ψ ↑x) : χ = ψ := by
+  classical
+  let eEquiv : (∀ i : ι, ↥(S i)) ≃* Hbar :=
+    MulEquiv.ofBijective (Subgroup.noncommPiCoprod hcomm) hbij
+  have hcomp : χ.comp eEquiv.toMonoidHom = ψ.comp eEquiv.toMonoidHom := by
+    refine MonoidHom.functions_ext ℂˣ _ _ (fun i x => ?_)
+    rw [MonoidHom.comp_apply, MonoidHom.comp_apply, MulEquiv.coe_toMonoidHom,
+      show eEquiv (Pi.mulSingle i x) = (↑x : Hbar) from
+        Subgroup.noncommPiCoprod_mulSingle (hcomm := hcomm) i x]
+    exact h i x
+  refine MonoidHom.ext fun y => ?_
+  have hy := DFunLike.congr_fun hcomp (eEquiv.symm y)
+  simpa using hy
+
 /-- **A regular character not fixed by a factor-permuting automorphism.**  Given the internal
 direct product `(noncommPiCoprod hbij)` of prime-order (`≥ 3`) factors `S i`, and an automorphism
 `τ` mapping factor `S i₀` onto a *different* factor `S j₀`, there is a character nontrivial on every
