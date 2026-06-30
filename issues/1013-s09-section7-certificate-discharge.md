@@ -376,3 +376,29 @@ hagree (§8 coherent extension の family-diff agreement)。certificate は (7.8
    で quadratic ua²−2va≥0 ⟹ ≥w=1−e/h。`gamma_norm_sq_le` も同様。
 
 次 loop = BetaDecomp 構成に着手 (上流; NormEstimates の前提)。
+
+### 2026-07-01 (loop 継続¹³⁻): exists_betaDecomp_a 完成 + ⚠ whnf-wall アーキ知見
+
+✅ **`exists_betaDecomp_a`** (S09_CertificateDischarge.lean、sorry-free、commit df88bb94):
+(7.8.a) 係数 `a = (β, ζ_0^ν) + 1 ∈ ℤ`。β は `beta_mem_ZIrr_of_sourceDiff_mem_ZIrr` ((2.6.b))、
+ζ_0^ν は coherence carrier、`inner_mem_ZIrr_int` で内積∈ℤ。orthogonality (betaDecomp_*) と併せ
+**(7.8.a) の math content 完備** (family-level lemma 群)。
+
+⚠ **whnf-wall 知見 (重要、downstream アーキを再方向づけ)**: `betaDecompOfDade` を
+`(hypothesis78OfDade …).BetaDecomp` を返す coupled constructor として組もうとして **whnf timeout
+(>1,000,000 heartbeats)** に到達。原因 = `BetaDecomp` の field 型が `(hyp78).hyp76.n`
+(Fin (n+1) の index) を要し、これが **hypothesis78OfDade → hypothesis76OfFamily の 2 段の巨大
+tactic def (set/classical/have wrapper) を unfold** するため事実上 non-terminating。
+
+**アーキ含意**:
+- hypothesis78OfDade/hypothesis76OfFamily は **H78 を「構成可能」にする**(issue 核、達成)が、
+  その出力を **deep-project する downstream 構成は coupled には組めない**。
+- downstream (BetaDecomp/NormEstimates) は **(a) consumer が H78 を inline 構築(族データを
+  scope に持ち、私の family-level lemma を cite)** するか、**(b) H78 を抽象的に carry し
+  deep-project しない**(lane γ MHypothesis.h78 field の carry はこちら、問題なし)で扱う。
+- 私の **family-level lemma 群 (chiRho_eq_inner_beta_induced, betaDecomp_*, exists_betaDecomp_a,
+  sharp-support 5 lemma)** が deliverable。coupled constructor は作らない。
+
+**次 (7.8.b)**: family-level の bound `‖ζ^{νρ}‖² ≥ 1−e/h` を `chiRho_norm_sq_double_sum` (7.7.b) +
+`sumNontrivialIrreducibleDegreeSq` (degree-sum) + a∈ℤ + quadratic で組む(H78-coupling を避け、
+族データ θ/ν/a で直接)。consumer が inline で使う。
