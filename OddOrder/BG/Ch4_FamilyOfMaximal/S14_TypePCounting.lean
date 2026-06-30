@@ -8722,6 +8722,30 @@ theorem one_not_mem_zTilde (K Kstar : Subgroup G) : (1 : G) ∉ zTilde K Kstar :
   rw [zTilde, Set.mem_diff, not_and_or, not_not]
   exact Or.inr (Set.mem_union_left _ (SetLike.mem_coe.mpr K.one_mem))
 
+/-- **Algebraic core of the κ→Ẑ identification** (the final step of BG `mFT_partition` part 2):
+a product `y · y'` of a nonidentity `K*`-element `y` and a nonidentity `K`-element `y'` lies in
+`Ẑ = (K ⊔ K*) ∖ (K ∪ K*)`, provided `K ⊓ K* = ⊥`.  Membership in `K ⊔ K*` is immediate; `y·y' ∉ K`
+because then `y = (y·y')·y'⁻¹ ∈ K ⊓ K* = ⊥` contradicts `y ≠ 1`, and dually `y·y' ∉ K*`.  The deep
+part of κ→Ẑ (placing the σ-part `y` in `K* = C_{M_σ}(K)` via `Z = K ⊔ K*` cyclic, and the
+`κ`-element `y'` in the Hall `K`) wraps this core. -/
+theorem mem_zTilde_of_mul {K Kstar : Subgroup G} (htri : K ⊓ Kstar = ⊥)
+    {y y' : G} (hy : y ∈ Kstar) (hy1 : y ≠ 1) (hy' : y' ∈ K) (hy'1 : y' ≠ 1) :
+    y * y' ∈ zTilde K Kstar := by
+  rw [zTilde, Set.mem_diff]
+  refine ⟨(K ⊔ Kstar).mul_mem (Subgroup.mem_sup_right hy) (Subgroup.mem_sup_left hy'), ?_⟩
+  rw [Set.mem_union, not_or]
+  refine ⟨fun hmem => hy1 ?_, fun hmem => hy'1 ?_⟩
+  · have hyK : y ∈ K := by
+      have h := K.mul_mem (SetLike.mem_coe.mp hmem) (K.inv_mem hy')
+      rwa [mul_assoc, mul_inv_cancel, mul_one] at h
+    have h := Subgroup.mem_inf.mpr ⟨hyK, hy⟩
+    rwa [htri, Subgroup.mem_bot] at h
+  · have hy'Ks : y' ∈ Kstar := by
+      have h := Kstar.mul_mem (Kstar.inv_mem hy) (SetLike.mem_coe.mp hmem)
+      rwa [← mul_assoc, inv_mul_cancel, one_mul] at h
+    have h := Subgroup.mem_inf.mpr ⟨hy', hy'Ks⟩
+    rwa [htri, Subgroup.mem_bot] at h
+
 /-- **BG Theorem 14.7, `|Ẑ| = (k − 1)(k* − 1)`** (mmd L4051): the TI-set `Ẑ = Z − (K ∪ K*)` has
 `(|K| − 1)(|K*| − 1)` elements.  `|Z| = |K|·|K*|` (`card_kappaHall_sup_Kstar`), `K ∩ K* = 1`
 (`kappaHall_inf_Kstar_eq_bot`) so `|K ∪ K*| = |K| + |K*| − 1`, and `|Ẑ| = |Z| − |K ∪ K*|`.
