@@ -153,3 +153,30 @@ reduction 済) → `exists_typeI_maximal_overNormalizer_V` (S-side `exists_typeI
 S15:609 ~350 行の dual、`T_typeII`-gated + V-side helper chain) → `exists_MHypothesis` (~35 field assemble)。
 multi-iteration の hard work、lane-c の own。`T_typeII_structural_inputs` の 5 連言 = `TypeIIData T` field
 そのもの (深 §14.9 char)。詳細 = `notes/peterfalvi/s16_w4_char_cascade.md` cont.¹²。
+
+## ⛔ 2026-06-30 HUB tick² — c の `TypePData T` spine 再導入を HOLD (マージ却下)
+
+c の V-side バッチ (cont.¹⁴–¹⁶, branch tip) を hub が検証 → **spine sorry regression** ゆえ `git merge --abort`。
+**ただし V-side helper 構築 (exists_typeI_maximal_overNormalizer_V / isMulCommutative_V / 共役・fitting dual 群
++ 4 本の新規 scaffold sorry) は genuine で歓迎 — それは残す。** 却下対象は次の 1 点のみ:
+
+**問題**: `FeitThompson.lean` の §16 spine carrier に `Tdata : TypePData (mp.)T` + `Tdata_V_eq` を追加し、
+**既存の spine constructor `section16TypePStructure_of_isMinimalSimpleOdd`**（→ `sectionSixteenHypothesis`
+→ `feitThompson`、合流前は sorry-free）の中に **`have hTP2 : IsTypeP2 mp.T := sorry`** を挿入した。
+これは:
+1. **FT spine への sorry regression**（既存 sorry-free def に sorry 混入、merge_monitor HOLD 条件）。
+2. **型が逆で設計矛盾**: `T_typeII` (14.9) が産むのは **`TypeIIData mp.T`（T = type-II）**。`TypePData mp.T` /
+   `IsTypeP2 mp.T` は **type-P2**（より強い、type-P2 ⟹ type-II の逆は不成立）。c 自身の cont.¹²「真の gate =
+   T_typeII = T は type-II」とも、`FeitThompson:276`「T need not be type-P₂, no symmetric Tdata」（c が今回
+   **削除**した docstring）とも矛盾。`IsTypeP2 mp.T` は一般に偽ゆえ sorry は埋まらない（= Tdata dead-end の
+   裏口再導入）。
+3. **d 所有 carrier の非-additive 編集**（FeitThompson §16 carrier 構造の docstring 削除 + 既存 constructor 改変）。
+
+**正しい path (差し替え)**:
+- T-side data が要るなら **`TypeIIData mp.T`**（`T_typeII` から導出、constructed か新規 lemma の scaffold-sorry）
+  を使う。**`TypePData mp.T` / `IsTypeP2 mp.T` は使わない**（T は type-II であって type-P2 でない）。
+- **既存 spine constructor (`section16TypePStructure_of_isMinimalSimpleOdd` 等) に sorry を挿入しない**。
+  carrier 拡張が本当に要るなら新規 def/lemma 側に隔離し、spine は sorry-free を保つ。
+- **`FeitThompson:276` の "no symmetric Tdata" docstring を復元**し、d 所有 §16 carrier を非-additive に
+  改変しない（carrier 形状は共有境界 = 要 coordination）。
+- V-side helper 群はそのまま継続。`exists_MHypothesis` の assemble は `TypeIIData T` 経由で。
