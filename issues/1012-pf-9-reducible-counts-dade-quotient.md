@@ -1428,3 +1428,21 @@ direct-product inertia vs (b) Frobenius-subgroup argument vs (c) cleaner; θ̄^{
 残 = hfree (θ̄^{w₀}∉U-orbit) を **marked-factor 構築 (strengthen clifford_caseA_exists_char_not_fixed)
 + Lemma C/D/E/F chain** で discharge。**要 caseA で u<p-1 (im(U) proper) を確認** (否なら Lemma G)。
 + realization wiring (g→a) で connection core を全 g に lift。
+
+
+## free-orbit 構築: a∣p-1、marked-factor は a<p-1 要、exponent criterion が robust (2026-07-01)
+
+`CliffordCaseAData.a` (a∣p-1) = U の factor 上 action order (|im(U→F_pˣ)|=a)。U-orbit-class 数 =
+(p-1)/a。**marked-factor (Lemma F) は ≥2 class 要 = (p-1)/a≥2 = a<p-1** (a∣p-1 では保証されない;
+a=p-1 なら U transitive で marked-factor 不可)。
+
+**→ exponent-vector criterion (Lemma G) が robust path** (a 不問): θ̄ を exponents e=(e_i)∈(F_pˣ)^q
+で encode、U-action ρ(u)∈(F_pˣ)^q (factor 毎 scalar)、Δ_{w₀}(e)_i:=e_i⁻¹ e_{w₀⁻¹i}。
+θ̄^{w₀}∈U-orbit ⟺ Δ_{w₀}(e)∈ρ(U)。|ρ(U)|=a ≤ p-1 << (p-1)^q (q≥2) ゆえ大半の e で Δ_{w₀}(e)∉ρ(U)
+→ 構築時に e を選べば θ̄^{w₀}∉U-orbit。**exists_regular_char を Δ_{w₀}(e)∉ρ(U) 込で強化**。
+
+**残 build (次 iteration、深 construction)**: (1) Lemma C (direct-product char ext: χ=ψ⟺∀i factor 上等)
++ D/E (factor-orbit separation)、(2) θ̄ 構築 (Δ_{w₀}(e)∉ρ(U) or marked-factor if a<p-1 確認) →
+θ̄^{w₀}∉U-orbit = hfree、(3) g→a realization で connection core を全 g lift →
+hcZeta_inertia_ne_top_of_free → conjunct c。reduction+connection 完成済; 残=construction-side discharge。
+session 巨大 (compaction 近); 次 fire は fresh context で深 construction を engage。
