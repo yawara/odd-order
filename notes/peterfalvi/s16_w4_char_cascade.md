@@ -408,3 +408,35 @@ typeI_frobenius 経由で (12.16)/lane-β に transitively gated (body sorry-fre
 set-reduction `famG₀∖G0 ⊆ orbits` (union bound) を実証 → 各 orbit を (a)+(b)+tool で評価。
 あるいは (a) P TI 性 (Frobenius kernel) から。**deep multi-session structural build**。
 [[scaffold-sorry-free-not-done]] [[feedback-no-avoiding-hard-parts]]
+
+### cont.⁹ (2026-06-30 lane c=γ /loop): 🎉 §8 TI-counting 完全組立 — normCascadeData (14.11.4) body-sorry-free
+
+ユーザー裁可「§8 orbit counts 正面構築」を**完遂**。`line83_le_displayed_upper` を body-sorry-free
+証明 ⟹ **`normCascadeData` (14.11.4) は body-sorry-free** (upper = `le_trans (line-83) (line83_le_displayed_upper)`、
+全 char content [lower (7.8.b) + upper §8] が MHypothesis carrier に isolate)。commits = §8 machinery
+群 (`orbit_normSq_term`〜`famG0_sub_filter_card_le_orbit_ncard`) + 構造 carrier 8 + capstone `638f1dcb`。
+
+**§8 機械 (全 axiom-clean reusable、~13 lemma)**:
+- **bridge** `orbit_normSq_term` (`|A^G|/|G|=|A|/|N|`、TI-subset)。
+- **W-orbit** `isTISubset_sdiff_sup_of_normalizer_eq` (TI、S12 typePData_V_ti 一般化) +
+  `conj_smul_sdiff_sup_eq_of_normalizer_eq` (stab) + `orbit_sdiff_sup_normSq_term` (measure) +
+  `ncard_sdiff_sup_add_eq` (|W-set|=|W|−|W1|−|W2|+1)。
+- **P#/Q#-orbit** `conj_smul_sharpSubgroup_eq_of_mem_normalizer` (stab) +
+  `orbit_sharpSubgroup_normSq_term` (measure、`Subgroup.IsTI`=orbit TI 定義的) +
+  `ncard_sharpSubgroup_add_one` (|P#|=|P|−1)。
+- **set-reduction** `famG0_sub_filter_card_le_orbit_ncard` (`|famG₀|−|G₀|≤Σ|orbit|`、`G0_orbit_cover` carrier)。
+- **§8 第1成分** `card_typeIA_eq` (|A(M)|=k−1 via FPF 恒等式 `centralizerSupport_sharpSubgroup_eq_of_frobenius`)
+  + `card_M_eq` (|M|=pqk)。
+
+**MHypothesis 構造 carrier (§13-14 structural prerequisite、exists_MHypothesis に isolate)**:
+G0_orbit_cover / W_normalizer_V / W_set_nonempty / P_isTI / Q_isTI / card_W_eq (|W|=pq) /
+card_W1_add_W2_eq (=p+q) / card_normalizer_P_eq (|N_G(P)|=|P|uq) / card_normalizer_Q_eq (|N_G(Q)|=|Q|vp)
++ (lower 用) h78_zetaNuRho_normSq_ge 等。**counting は機械が genuine 実行、carrier は構造前提のみ** (ユーザー
+「結果 carrier 化」拒否を遵守、[[scaffold-sorry-free-not-done]] doneness=carrier 構成可能性)。
+
+最終 assembly: line83-RHS = |A(M)|/|M| + (1/|G|)(|famG₀|−|G₀|) ≤ (k−1)/(kpq) + W-term + P-term +
+Q-term = raw bound (`normCascade_upper_loosen` で displayed へ、u,v>0 は normalizer carrier から)。
+
+**残 §16 sorry** (normCascadeData は閉じた): `exists_MHypothesis` (全 carrier 供給、最大)、`eta_generic_data`
+(§3 Dade)、`betaM_expansion`、`orthogonality_switch` (14.14、最深)、v formulas、CaseBContradictionData。
+次 = exists_MHypothesis の carrier 供給 (deep §13-14) or orthogonality_switch。[[feedback-no-avoiding-hard-parts]]
