@@ -484,8 +484,16 @@ S₀^w も U-invariant: u S₀^w u⁻¹ = w (w⁻¹uw) S₀ (…)⁻¹ w⁻¹ = 
 - g が全 factor を中心化 ⟹ H̄=⟨Hpart_i⟩ を中心化 ⟹ g∈C。
 ⟹ **bigdprod inertia の permutation 機構不要**。必要 piece: (A) Hpart U-invariance、(B) θ̄ regular ⟹
 θ̄|_{Hpart_i} nontrivial、(C) per-factor free-Aut stabilizer、(D) 全 factor 中心化⟹H̄ 中心化。
-既存 infra: `inertia_eq_of_freeAction`, inertia transfer (`mem_inertia_compHom_iff`)。次着手 = piece C
-(per-factor free-Aut、最も self-contained)。
+既存 infra: `inertia_eq_of_freeAction`, inertia transfer (`mem_inertia_compHom_iff`)。
+
+**2026-06-30 API survey (piece C の framework-fitting)**: 数学は自明 (faithful char fixed by auto ⟹ id)
+だが Lean は API-building 要: `characterKernel` は **Set** (`{g|χ g=χ 1}`、S03:378)、Subgroup 版なし。
+piece C 鎖 = (i) irreducible char of abelian K は linear (degree 1) [mathlib/repo 要確認]、(ii) nontrivial
+linear of prime-order K は faithful (characterKernel={1}、kernel-subgroup の order∣p 論)、(iii) faithful θ
++ θ(αx)=θx ⟹ α=1 (injective)。**caseA degree = clear math + substantial Lean API-building** (mechanical
+plumbing と違い careful work)。grind 順: piece C (faithful-char API) → de-opacify (9.7) (CliffordCaseAData に
+Hpart の SupIndep/iSup/U-invariance を field 追加、producer の `exists_supIndep_aInvariant_family_of_iSup`
+出力 `hexist.choose_spec` から、Fin q reindex 経由) → 還元χ⟹θbar regular → 組立 → core → plumbing → degree u。
 
 ## 進捗サマリ (2026-06-30 更新)
 
