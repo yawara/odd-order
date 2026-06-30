@@ -632,3 +632,76 @@ genuine bridge **`mem_Mtilde_of_mem_coset`** (x∈M_σ#・x⁻¹g∈R(x) ⟹ g�
 ([[verify-port-state-by-number-not-coq-name]])。概念 grep で feasible と判明。gate 2 を「深すぎ」と deprioritize
 しなくてよい (genuine 上流、deps 揃い)。**次 = pi_of_cent_sigma の port 実行** (τ2-case から: uniqueness は
 ported lemma 直結、ℓ_σ(x')=1 と κ-case を埋める)。
+
+## ✅ 進捗 (lane d, 2026-06-30 /loop²⁵): **pi_of_cent_sigma 完成確認 + BG Lemma 14.6 核心 (Coq `s'g`) 着地**
+
+**(1) `pi_of_cent_sigma` (= `sigma_diagnostic`, S14:3335) は COMPLETE** — /loop²⁴ の「次=pi_of_cent_sigma の
+port 実行」は直近 2 commit (`fa20fcc7` τ2-case uniqueness `𝓜(C[x'])={M}` + `810d1fad` τ2-case `ℓ_σ(x')=1`
+`tau2_element_sigmaLength_one`) で完遂済。本 /loop で sorry-free 確認 (両 branch κ/τ2 とも proven、L3335-3660 に sorry 無し)。
+⟹ gate 2 (cover) の真の上流 dep が解禁。
+
+**(2) BG Lemma 14.6 (`sigma_decomposition_dichotomy`, Coq BGsection14:1189) の核心を port** (S14、axiom-clean、
+AxiomsCheck 登録、full build 3888 green):
+- **`centralizer_le_of_maximalSigma_ncard_eq_one`** (Coq `cent1_sub_uniq_sigma_mmax`, BGsection14:1008):
+  `|𝓜_σ(x)|=1 ⟹ C_G(x)≤M` (unique element)。証明 = y∈C[x] が 𝓜_σ(x) を conj で permute → singleton 固定 →
+  `Mʸ=M` → y∈N(M)=M (`normalizer_eq_self_of_mem_maximalSubgroups` + `mem_normalizer_of_map_conj_eq`)。**MSx'_gt1
+  step の linchpin**。
+- **`signalizer_coset_or_kappa_of_sigmaSharp`** (Coq `s'g`, Lemma 14.6 の心臓部): x∈M_σ^#・x' は M の σ(M)'-elt
+  (≠1, x を中心化) ⟹ g=x·x' は **signalizer branch (∃y, ℓ_σ(y)=1 ∧ y⁻¹g∈R(y)、witness y=x') XOR κ branch
+  (ℓ_σ(x)=1 ∧ M∈𝓜_σ(x) ∧ x'∈(C_M[x])^# ∧ x' は κ(M)-elt)** の disjunction に落ちる。**`sigma_diagnostic` の直接
+  consumer**: τ2 branch → signalizer disjunct (cent1_sub_uniq で |𝓜_σ(x')|>1 を強制 + `exists_neighbor_eq_Rsub`
+  で neighbour N=M 同定 → x∈Rsub D x')、κ branch → κ disjunct verbatim。
+
+**▶▶ 残り Lemma 14.6 / cover (gate 2)**:
+1. **full dichotomy assembly** `g≠1 ⟹ signalizerBranch ∨ κBranch` (Coq 第2半 BGsection14:1231-1287)。
+   `s'g`-content (本 commit) を二度使う + `exists_length_one_factor` (σ-decomp 入力, S14:4617 在) + FT_signalizer_context
+   (`sigmaLength_one_centralizer_structure`) + Hall conjugacy (Coq `Hall_subJ`) で `g∉M`-case を assemble。~60 行。
+   ⚠ 配置注意: cover identity (S14:4965) は s'g-content (S14:5140) の**上流**ゆえ、cover の sorry を閉じるには
+   cover identity を dichotomy より**下流に移動**する要 (consumer 0 = 移動安全)。
+2. **cover identity** `exists_mem_conjClassSet_Mtilde_of_ne_one` (S14:4965) の `hall:∀M,IsTypeF M` 下の sorry を、
+   dichotomy + 「type-F ⟹ κ(M)=∅ ⟹ κBranch 空 (x'≠1 の κ-elt が存在せず矛盾)」で閉じる。
+
+**🔧 メモ**: `tau2_element_sigmaLength_one` / `maximalContaining_centralizer_eq_singleton_of_tau2_element`
+(直近 2 commit) は AxiomsCheck 未登録のまま (lane が登録省略)。本 commit で sigma_diagnostic 系の登録 gap として
+follow-up 候補 (issue or 次 /loop で登録)。次 = full dichotomy assembly。
+
+## ✅ 進捗 (lane d, 2026-06-30 /loop²⁶): BG Lemma 14.6 — `g∈M` dichotomy corollary + σ-elt M_σ membership
+
+dichotomy assembly に向けた 2 building block を landed (S14、axiom-clean、AxiomsCheck 登録、full build 3888 green):
+- **`mem_Msigma_of_isPiElement_sigma_of_mem`** (Coq `mem_Hall_pcore (Msigma_Hall maxM)`): σ(M)-element x∈M
+  ⟹ x∈M_σ (`isPiElement_sigma_of_mem_Msigma` の逆)。証明 = x の像 (M/M_σ 内) は σ(M)-elt かつ M_σ が σ(M)-Hall
+  ゆえ M/M_σ は σ(M)'-group → 像 trivial → x∈M_σ。quotient orderOf 論法 (`orderOf_map_dvd` + `index_no_pi`)。
+  **既存は conjugate 版 `exists_mem_Msigma_of_isPiElement_sigma` のみ; same-M 版は s'g に必須だった**。
+- **`branchA_or_branchB_of_mem_maximal`** (Coq `s'g` の g∈M corollary = dichotomy disjunction for g∈M):
+  g∈M maximal・σ(M)-part(g)≠1 ⟹ **signalizerBranch(g) ∨ κBranch(g)**。x=piPart(σM)g, x'=x⁻¹g で
+  `mem_Msigma_…` (x∈M_σ^#) + `signalizer_coset_or_kappa_of_sigmaSharp` (s'g core) を合成。b=1 (g=x) は
+  signalizer branch (x⁻¹g=1∈R(x)) で直接処理。**dichotomy の disjunction を g∈M ケースで実現**。
+
+**▶▶ 残り Lemma 14.6 (full dichotomy `g≠1 ⟹ branchA ∨ branchB`)**: 残る gap = **g∉M ケース** (Coq 第2半
+BGsection14:1264-1287)。σ_decomp(g)≠∅ で x=σ-part≠1 の M₀ を取るが g∉M₀ 一般 ⟹ branchA_or_branchB は不適用。
+Coq は ¬A∧¬B 下で FT_signalizer N[x] + Hall conjugacy (`Hall_subJ`) で ⟨g⟩ を M₀∩N に conjugate → σ-part=1 矛盾。
+deps: `exists_length_one_factor` (S14:4617 ✓ σ-decomp 入力)・`sigmaLength_one_centralizer_structure` (FT_signalizer ✓)・
+`centralizer_le_of_maximalSigma_ncard_eq_one` (本 commit ✓)・Hall conjugacy (Lean 名 未確認、要調査)。
+⟹ 次 /loop = full dichotomy の g∉M assembly。その後 cover identity (type-F で κBranch 排除) で gate 2 close。
+
+## ✅ 進捗 (lane d, 2026-06-30 /loop²⁷): 一般 π Hall conjugacy (Coq `Hall_subJ`) — dichotomy g∉M ケースの鍵
+
+**`exists_conj_smul_le_of_isHall`** (S14、axiom-clean、AxiomsCheck 登録、full build 3888 green): 極大 M 内で
+π-subgroup X≤M は M の元で共役して任意の π-Hall K≤M に入る。**`exists_conj_smul_le_isHall_kappa` (S15、κ 特化) の
+一般 π 版** (証明は同一: `aInvariant_piSubgroup_le_aInvariant_hall` で π-Hall に埋込 + `exists_conj_eq_of_isHall_subgroupOf`
+で 2 つの Hall を共役)。S15 κ 版は upstream の本一般版を cite するよう将来 refactor 可 (現状 minor 重複)。
+
+**▶▶ full dichotomy `g≠1 ⟹ branchA ∨ branchB` assembly (次 /loop、Coq 第2半 BGsection14:1264-1287)** — 全 piece
+の所在確定:
+1. **`by_contra` → ¬A∧¬B**。**s'g**: `∀M maximal, g∈M ⟹ sigmaPart M g=1` = `branchA_or_branchB_of_mem_maximal`
+   (本セッション ✓) の対偶 (sigmaPart≠1⟹A∨B、¬A∧¬B で矛盾)。
+2. **σ-decomp 抽出**: `exists_length_one_factor` (✓) で x=σ(M₀)-part≠1, ℓ_σ(x)=1, IsPiElement(σ M₀) x。
+3. **WLOG x∈M_σ**: `sigma_subgroup_conj_into_Msigma_general` (S12_Cor1216:745) で M:=conj•M₀ を構成 (σ(M)=σ(M₀)
+   via `sigma_conj` S10Core:619 ⟹ x=sigmaPart M g 保存)。
+4. **notMg** (g∈M⟹s'g⟹sigmaPart=1=x≠1 矛盾)、**cxg** (x∈zpowers g)、**MSx_gt1** (≤1⟹`centralizer_le_of_maximalSigma_ncard_eq_one`✓⟹C[x]≤M⟹g∈M 矛盾)。
+5. **FT_signalizer**: `sigmaLength_one_centralizer_structure` (✓) で N=N[x], C[x]≤N, `IsComplement'((Msigma N)|N)((M⊓N)|N)`。
+6. **M∩N は σ(N)'-Hall in N**: co-Hall 補題 = `isHallSubgroup_subgroupOf_of_complement_pi_pi'` (S01:1131、**private**、
+   ⟹ public 化 or S14 複製要、~8 行)。
+7. **Hall conj**: `exists_conj_smul_le_of_isHall` (本セッション ✓) で ⟨g⟩ (σ(N)'-elt = `sN'g`=s'g N) を M∩N に共役 → g^z∈M。
+8. **最終矛盾**: `sigmaPart M (g^z) = (sigmaPart M g)^z = x^z` (piPart_conj) = 1 (s'g M, g^z∈M) ⟹ x=1 矛盾。
+⟹ 次 /loop = この assembly (~70 行 + co-Hall public 化)。その後 cover identity (type-F で κBranch 排除) で gate 2 close。

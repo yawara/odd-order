@@ -5138,6 +5138,34 @@ for `p ∣ |G|` there is a maximal `M` with `p ∈ σ(M)` (BG §1, via a non-nor
 /-! **σ-decomposition factor extraction** (`S14_TypePCounting`, `exists_length_one_factor`): every
 `g ≠ 1` factors `g = x·x'` with `ℓ_σ(x) = 1`, `x'` a `σ(M)′`-element (commuting, both in `⟨g⟩`). -/
 #assert_only_allowed_axioms OddOrder.BG.Ch4.S14.exists_length_one_factor
+/-! **Coq `cent1_sub_uniq_sigma_mmax`** (`S14_TypePCounting`,
+`centralizer_le_of_maximalSigma_ncard_eq_one`): if `𝓜_σ(x)` is a singleton, its unique element `M`
+contains `C_G(x)` (`y ∈ C_G(x)` permutes `𝓜_σ(x)`, fixing `M`, so `y ∈ N_G(M) = M`).  The linchpin
+of the `|𝓜_σ(x')| > 1` step of BG Lemma 14.6.  Axiom-clean. -/
+#assert_only_allowed_axioms OddOrder.BG.Ch4.S14.centralizer_le_of_maximalSigma_ncard_eq_one
+/-! **BG Lemma 14.6 core** (`S14_TypePCounting`, `signalizer_coset_or_kappa_of_sigmaSharp`, Coq
+`s'g`): for `x ∈ M_σ^#` and a nonidentity `σ(M)′`-element `x'` of `M` centralizing `x`, the product
+`g = x·x'` lands in either the signalizer branch (`∃ y, ℓ_σ(y)=1 ∧ y⁻¹g ∈ R(y)`, witnessed by
+`y = x'`) or the κ branch (`ℓ_σ(x)=1`, `M ∈ 𝓜_σ(x)`, `x' ∈ (C_M[x])^#`, `x'` a `κ(M)`-element).
+Direct consumer of `sigma_diagnostic` (Cor 14.3); the τ₂ branch uses
+`centralizer_le_of_maximalSigma_ncard_eq_one` + `exists_neighbor_eq_Rsub`.  Axiom-clean. -/
+#assert_only_allowed_axioms OddOrder.BG.Ch4.S14.signalizer_coset_or_kappa_of_sigmaSharp
+/-! **σ-element of `M` lies in `M_σ`** (`S14_TypePCounting`,
+`mem_Msigma_of_isPiElement_sigma_of_mem`, Coq `mem_Hall_pcore (Msigma_Hall maxM)`): the converse of
+`isPiElement_sigma_of_mem_Msigma` — the image of a `σ(M)`-element `x ∈ M` in the `σ(M)′`-quotient
+`M / M_σ` is trivial.  Axiom-clean. -/
+#assert_only_allowed_axioms OddOrder.BG.Ch4.S14.mem_Msigma_of_isPiElement_sigma_of_mem
+/-! **BG Lemma 14.6 core, `g ∈ M` corollary** (`S14_TypePCounting`,
+`branchA_or_branchB_of_mem_maximal`): for `g` in a maximal `M` with nontrivial `σ(M)`-part, `g`
+lands in the signalizer branch or the κ branch.  Combines `mem_Msigma_of_isPiElement_sigma_of_mem`
+with `signalizer_coset_or_kappa_of_sigmaSharp`.  The form consumed by the full Lemma 14.6
+assembly.  Axiom-clean. -/
+#assert_only_allowed_axioms OddOrder.BG.Ch4.S14.branchA_or_branchB_of_mem_maximal
+/-! **Hall conjugacy** (`S14_TypePCounting`, `exists_conj_smul_le_of_isHall`, Coq `Hall_subJ`):
+in a maximal `M`, every `π`-subgroup `X ≤ M` conjugates by an element of `M` into any Hall
+`π`-subgroup `K` of `M`.  The general-`π` form of `exists_conj_smul_le_isHall_kappa`; the tool for
+the `g ∉ M` case of the full Lemma 14.6 dichotomy.  Axiom-clean. -/
+#assert_only_allowed_axioms OddOrder.BG.Ch4.S14.exists_conj_smul_le_of_isHall
 /-! **BG Lemma 14.6, exclusivity** (`S14_TypePCounting`, `not_type1_of_type2`): a type-2 element
 (`g = y·y'`, `y'` a nonidentity `κ(M)`-element of `C_M(y)`, `y ∈ M_σ^#`) is not of type-1
 (`g = x·x'`, `ℓ_σ(x)=1`, `x' ∈ R(x)`).  The `T ∩ H̃ = ∅` input to Theorem 14.7. -/
@@ -6912,3 +6940,35 @@ Lagrange.  The reusable bridge turning each (14.11.4) orbit `(W#)^G`/`(P#)^G`/`(
 `N_G(X) = W` — generalising `S12.typePData_V_ti` to the abstract `W`/`W₁`/`W₂` + `hnorm` inputs.
 The `W`-orbit TI input to the (14.11.4) §8 TI-count.  Axiom-clean. -/
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S16.isTISubset_sdiff_sup_of_normalizer_eq
+
+/-! **Peterfalvi (14.11.4) `W`-orbit measure** (`S16_NonExistenceG`, lane γ/POLE-2).  The `W`-stab
+`conj_smul_sdiff_sup_eq_of_normalizer_eq` (`W ≤ N_G(set)` normalizes the set) and the assembled
+relative measure `orbit_sdiff_sup_normSq_term`: `|(W − (W₁∪W₂))^G|/|G| = |W − (W₁∪W₂)|/|W|`,
+combining the TI core, the `W`-stability, and `orbit_normSq_term`.  The `W`-orbit term of (14.11.4),
+reduced to `hnorm` (= the §13 `normalizer_V` fact, from the partner type-`P` structure).
+Axiom-clean. -/
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S16.conj_smul_sdiff_sup_eq_of_normalizer_eq
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S16.orbit_sdiff_sup_normSq_term
+
+/-! **Peterfalvi (14.11.4) `|W − (W₁∪W₂)|` cardinality** (`S16_NonExistenceG`, lane γ/POLE-2).
+`ncard_sdiff_sup_add_eq`: `|W − (W₁∪W₂)| + |W₁| + |W₂| = |W| + 1` by inclusion–exclusion with
+`W₁ ∩ W₂ = {1}`.  The numerator of the `W`-orbit term `|W − (W₁∪W₂)|/|W|` of (14.11.4).
+Axiom-clean. -/
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S16.ncard_sdiff_sup_add_eq
+
+/-! **Peterfalvi (14.11.4) `P#`/`Q#`-orbit machinery** (`S16_NonExistenceG`, lane γ/POLE-2).  The
+`P#`-stab `conj_smul_sharpSubgroup_eq_of_mem_normalizer` (`N_G(P)` permutes `P ∖ {1}`), the assembled
+measure `orbit_sharpSubgroup_normSq_term`: `|(P#)^G|/|G| = |P#|/|N_G(P)|` for a TI-subgroup
+`Subgroup.IsTI P` (= `IsTISubset (P ∖ {1}) (N_G(P))`), and the numerator `ncard_sharpSubgroup_add_one`
+(`|P#| + 1 = |P|`).  The `P`/`Q` orbit terms of (14.11.4), reduced to `IsTI P`/`IsTI Q` and the
+`|N_G(P)|`/`|N_G(Q)|` sizes.  Axiom-clean. -/
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S16.conj_smul_sharpSubgroup_eq_of_mem_normalizer
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S16.orbit_sharpSubgroup_normSq_term
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S16.ncard_sharpSubgroup_add_one
+
+/-! **Peterfalvi (14.11.4) `G₀`-drop set reduction** (`S16_NonExistenceG`, lane γ/POLE-2).
+`MHypothesis.famG0_sub_filter_card_le_orbit_ncard`: `|famG₀| − |G₀| ≤ |(W−(W₁∪W₂))^G| + |(P#)^G| +
+|(Q#)^G|` (as `ncard`s), from `G₀ ⊆ famG₀` (`G0_off_dadeSupport`) and `famG₀ ∖ G₀ ⊆ orbits`
+(`G0_orbit_cover` carrier) via `Set.ncard_diff` + `Set.ncard_union_le`.  The set-theoretic core of
+the §8 TI-counting of (14.11.4).  Axiom-clean. -/
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S16.MHypothesis.famG0_sub_filter_card_le_orbit_ncard
