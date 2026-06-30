@@ -315,9 +315,33 @@ conjunct 3) / (9.9.c) exceptional (caseB conjunct 4) / (9.8.b,c,d) (caseA conjun
    Coq L834-835 は K=H₀C の `K∩H=H₀` を `group_modl` (Dedekind) + `tiHU` (H⊓U=1) で証明 — Lean でも同型。
    - **landed (S11, axiom-clean)**: `chiefFactor_H0supC_inf_H_eq_H0` ((H₀⊔C)⊓H=H₀, Dedekind crux =
      統一条件) + `chiefFactor_H0supC_le_derived` (H₀C≤M'=HU)。= 構造入力 2/3。
-   - **残 1/3 = H₀C ◁ M** (Coq `Ptype_Fcore_extensions_normal` L240, semidirect 構造経由)。
-     M normalizes H₀ (既) + H₀ が C の非正規性を吸収 (gCg⁻¹⊆H₀C ⟸ [C,H]≤H₀ (S11:4263) + C◁U +
-     W₁ action)。非自明 — 次 iteration。その後 generic count refactor。
+   - **残 1/3 = H₀C ◁ M** (Coq `Ptype_Fcore_extensions_normal` L240)。`M ≤ N(H₀⊔C)` を
+     `M=⟨H,U,W₁⟩` の生成元別に (各 g で `conj g • (H₀⊔C) = (conj g•H₀)⊔(conj g•C)`、H₀ は M-normal
+     ⟹ gH₀g⁻¹=H₀、残 = gCg⁻¹⊆H₀⊔C):
+     - **H ≤ N(H₀C)**: H≤M≤N(H₀) + hCh⁻¹⊆H₀C (∵ `commutator_cSub_H_le_H0` [C,H]≤H₀ ⟹ hch⁻¹=[h,c]·c∈H₀·C)。
+     - **U ≤ N(H₀C)**: U≤M≤N(H₀) + C◁U (`cSub_subgroupOf_U_normal`)。
+     - **✅✅ crux = W₁ ≤ N(C) DONE (commit 4f2bf341): `cSub_normalized_by_uW1`** (S11、axiom-clean):
+       `data.U⊔data.W1 ≤ N_G(cSub)`。C=`ker(uActionHom)` を L=↥(U⊔W₁) 内で `U'⊓ker(quotientMulAutHom)`
+       と realize (`map_comap_eq`+`comap_ker`)、両者 L-normal (U'=Frobenius `typeP_uW1_frobenius.isNormal`、
+       kernel=`MonoidHom.normal_ker`)⟹inf も L-normal。L の normal は L.subtype 押し出しで ↑(U⊔W₁) 全体に
+       正規化 (`le_normalizer_map`+`normalizer_eq_top`+`range_subtype`、`← MonoidHom.range_eq_map`)。
+     - **残 = 組立 `chiefFactor_H0supC_subgroupOf_normal` (次 iteration、全 API 解決済、~60 行)**:
+       `(normal_subgroupOf_iff_le_normalizer hH0CleM).mpr (M ≤ N(H₀⊔C))`。M≤N(H₀⊔C) を:
+       - **helper `key`** (`∀g∈Hs, toConjAct g•K≤K → Hs≤N(K)`): `conjAct_pointwise_smul_iff` +
+         le_antisymm、逆向きは `pointwise_smul_le_pointwise_smul_iff.mpr (hle g⁻¹)` + `←mul_smul,←map_mul,
+         mul_inv_cancel,map_one,one_smul`。
+       - **U⊔W₁ ≤ N(H₀C)**: `le_inf (U⊔W₁≤M≤N(H₀)) (cSub_normalized_by_uW1)` ▸
+         `Subgroup.normalizer_inf_normalizer_le_normalizer_sup chief.H0 (cSub data chief)`。
+       - **H ≤ N(H₀C)**: `key` で、`toConjAct h•(H₀⊔C)≤H₀⊔C` を `smul_sup`+sup_le。H₀-part=
+         `conjAct_pointwise_smul_eq_self (chief.H0_normalized_by_M (H_le_M data hh))`。cSub-part: x∈toConjAct h•cSub
+         ⟹ `mem_pointwise_smul_iff_inv_smul_mem` で c₀:=(toConjAct h)⁻¹•x=h⁻¹xh∈cSub (`ConjAct.smul_def`+
+         `ofConjAct_inv`+`ofConjAct_toConjAct`)、x=⁅h,c₀⁆·c₀ (`group`)、⁅h,c₀⁆∈H₀ (`commutator_mem_commutator hh hc₀`
+         +`commutator_comm`+`commutator_cSub_H_le_H0`) ⟹ x∈H₀⊔cSub (`mul_mem le_sup_left le_sup_right`)。
+       - **M≤H⊔U⊔W₁**: `M=derivedInG M⊔W₁` (`M_complement.sup_eq_top` を `map_sup`+`subgroupOf_map_subtype`+
+         `inf_of_le_left`+`⊤.map subtype=M` で G 化) + `derivedInG M=H⊔U` (`derivedInG_eq_fitting_sup_U`+`H_eq`)
+         + `sup_assoc` ⟹ `M ≤ H⊔(U⊔W₁)` で `sup_le hH hUW1` に流す。
+     その後 generic count refactor (chiefFactorQuotientHypothesis を N' (3条件: ◁M / ≤HU / ∩H=H₀) 一般化 +
+     H₀/H₀C instance)。
 - **⚠ caseA は独自 degree lemma 要**: caseA_character_counts は caseB を scope に持たない ⟹
   `caseB_degree_qu` cite 不可。(9.8.b) degree も caseA 版 chief-factor-constituent で別途。
 - **⚠ caseA は独自 degree lemma 要**: caseA_character_counts は caseB を scope に持たない ⟹
