@@ -508,3 +508,22 @@ hd(degree ratio,`zeta_one_eq_d_mul`)・hN_ind1H/hP_ind1H(‖Ind 1_H‖²=Ind 1_H
 (7.8.b) は実質数学 (norm identity) として **完了**。残 = (7.8.a) 側の `BetaDecomp` constructor
 producer (a の整数性は `exists_betaDecomp_a` 済、decomp 自体の field 充足) と、これら facts を
 concrete Dade family で discharge する glue (上流、family constructor は zeta=induce が rfl)。
+
+### 2026-07-01 (loop 継続²²⁻): (7.8.a) BetaDecomp constructor 着手 — orth lemma を抽象族へ一般化
+
+(7.8.b) discharge 完了後、§7 残 = **(7.8.a) BetaDecomp constructor** (abstract H78 から、
+whnf-wall 回避設計)。BetaDecomp 3 orth field を induce 固有から抽象族 `ζ` へ一般化中
+(commit 04eb7910、2/3 完了): `betaDecomp_orth_one_gen` (S^ν⊥1_G)・`betaDecomp_gamma_orth_one_gen`
+(Γ⊥1_G、`⟨β,1_G⟩=1` を hβ1 として家族非依存化)。既存 induce 版は gen を instantiate に refactor。
+
+**次 = `betaDecomp_gamma_orth_nu` (Γ⊥S^ν) の一般化** = 5-lemma cascade を抽象 ζ へ:
+`inner_family_diff` (⟨ζ_ind1H−ζ_0, ζ_i−d_iζ_0⟩=star(d_i)‖ζ_0‖²、horth で induce_family_orthogonal
+置換) → `inner_beta_nuDiff` (⟨β,ζ_i^ν−d_iζ_0^ν⟩、hτ.inner_eq+hagree、ζ 抽象化) → `inner_beta_nu_eq`
+(⟨β,ζ_j^ν⟩=star(d_j)·a、hζ0norm) + `inner_weightedNuSum_nu` (⟨W,ζ_j^ν⟩=ζ_j(1)/ζ_0(1)、horth/hN/hz0
+で induce 固有事実置換) → `betaDecomp_gamma_orth_nu_gen`。induce 固有事実 (induce_family_orthogonal_of_injective
+/induce_norm_ne_zero/induce_apply_one_ne_zero/induce_apply_one_star) を仮説化。
+
+**その後 = `betaDecompOfFacts (H78) (hzd:zetaDistinct=0) (facts) : H78.BetaDecomp`**:
+ζ:=H78.hyp76.zeta で 3 gen lemma を instantiate (whnf-wall なし: H78 は変数)。Gamma:=H78.beta−(1_G−ν(ζ_0)
++a•H78.weightedNuSum)、a=exists_betaDecomp_a、beta_eq=by abel、hW は weightedNuSum 定義+hzd で。
+→ full (7.8.a). 最終 = concrete Dade family で全 facts discharge する bundling (whnf-wall 根治、別途)。
