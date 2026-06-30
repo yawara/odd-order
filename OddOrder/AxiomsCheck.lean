@@ -6965,3 +6965,10 @@ measure `orbit_sharpSubgroup_normSq_term`: `|(P#)^G|/|G| = |P#|/|N_G(P)|` for a 
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S16.conj_smul_sharpSubgroup_eq_of_mem_normalizer
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S16.orbit_sharpSubgroup_normSq_term
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S16.ncard_sharpSubgroup_add_one
+
+/-! **Peterfalvi (14.11.4) `G₀`-drop set reduction** (`S16_NonExistenceG`, lane γ/POLE-2).
+`MHypothesis.famG0_sub_filter_card_le_orbit_ncard`: `|famG₀| − |G₀| ≤ |(W−(W₁∪W₂))^G| + |(P#)^G| +
+|(Q#)^G|` (as `ncard`s), from `G₀ ⊆ famG₀` (`G0_off_dadeSupport`) and `famG₀ ∖ G₀ ⊆ orbits`
+(`G0_orbit_cover` carrier) via `Set.ncard_diff` + `Set.ncard_union_le`.  The set-theoretic core of
+the §8 TI-counting of (14.11.4).  Axiom-clean. -/
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S16.MHypothesis.famG0_sub_filter_card_le_orbit_ncard
