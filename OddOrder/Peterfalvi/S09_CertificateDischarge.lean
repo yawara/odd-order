@@ -523,4 +523,56 @@ theorem exists_distinct_induced_family (K : Subgroup L) [K.Normal] [Fintype ↥K
     rw [hθ (e ⟨_, hmem⟩)]
     exact congrArg Subtype.val (Equiv.symm_apply_apply e ⟨_, hmem⟩)
 
+/-- **Discharge of the (7.7.a) certificate for an induced family** (Peterfalvi (7.7.a)).  This is
+the consolidation of `chiRho_decomp_proof` for the concrete family `ζ_i = Ind_K^L θ_i`: the
+orthogonality (`horth`) and spanning (`hspan`) hypotheses of the basis argument are *derived* from
+the induced-family data — injectivity `hinj` (distinct members) and covering `hcover` (every induced
+irreducible is in the family) — via `induce_family_orthogonal_of_injective`, `induce_norm_ne_zero`,
+and `supported_mem_span_psi`.  The only remaining inputs are the geometric facts that `A` (where
+`χ^ρ` is read off) sits inside `K^#`: `hAK_off` (`A`-support lies in `K`), `hA_one` (`1 ∉ A`), and
+the conjugation-invariance `hAconj`.
+
+When `K = H.subgroupOf L` for the normal subgroup `H ⊴ L` of Peterfalvi's `Hypothesis76` and
+`A = H \ {1}`, all of `hinj`/`hcover` come from `exists_distinct_induced_family`, `hdeg`/`psi_support`
+from `induce_apply_one_ne_zero`/`induce_diff_support`, and `hAK_off`/`hA_one`/`hAconj` from
+`Subgroup.mem_subgroupOf` + the normality of `H`.  Thus the `Hypothesis76.chiRho_decomp` certificate
+is constructible from `(7.1)` data alone, with no certificate assumed. -/
+theorem chiRho_decomp_induced {G : Type*} [Group G] [Fintype G] {A : Set G} {L : Subgroup G}
+    [Fintype L] [Invertible (Nat.card L : ℂ)] [Invertible (Nat.card G : ℂ)]
+    (H71 : Hypothesis71 G A L) (K : Subgroup ↥L) [K.Normal] [Fintype ↥K]
+    [Invertible (Nat.card ↥K : ℂ)] {n : ℕ}
+    (θ : Fin (n + 1) → IrreducibleCharacter ↥K) (d : Fin (n + 1) → ℂ)
+    (psi_support : ∀ i, (ClassFunction.induce K (θ i : ClassFunction ↥K ℂ)
+        - d i • ClassFunction.induce K (θ 0 : ClassFunction ↥K ℂ)).support ⊆
+      OddOrder.Peterfalvi.S04.supportInSubgroup A L)
+    (hinj : Function.Injective (fun i => ClassFunction.induce K (θ i : ClassFunction ↥K ℂ)))
+    (hcover : ∀ φ : IrreducibleCharacter ↥K,
+      ClassFunction.induce K (φ : ClassFunction ↥K ℂ) ∈
+        Set.range (fun i => ClassFunction.induce K (θ i : ClassFunction ↥K ℂ)))
+    (hdeg : ∀ i, ClassFunction.induce K (θ i : ClassFunction ↥K ℂ) (1 : ↥L)
+        = d i * ClassFunction.induce K (θ 0 : ClassFunction ↥K ℂ) (1 : ↥L))
+    (hAconj : ∀ g h : ↥L, h * g * h⁻¹ ∈ OddOrder.Peterfalvi.S04.supportInSubgroup A L ↔
+      g ∈ OddOrder.Peterfalvi.S04.supportInSubgroup A L)
+    (hAK_off : ∀ y : ↥L, y ∈ OddOrder.Peterfalvi.S04.supportInSubgroup A L → y ∈ K)
+    (hA_one : (1 : ↥L) ∉ OddOrder.Peterfalvi.S04.supportInSubgroup A L)
+    (χ : ClassFunction G ℂ) {x : ↥L} (hx : (x : G) ∈ A) :
+    H71.chiRho χ x =
+      ∑ i ∈ Finset.Ioi (0 : Fin (n + 1)),
+        (star (ClassFunction.inner (H71.τ ⟨ClassFunction.induce K (θ i : ClassFunction ↥K ℂ)
+            - d i • ClassFunction.induce K (θ 0 : ClassFunction ↥K ℂ), psi_support i⟩) χ) /
+          ClassFunction.inner (ClassFunction.induce K (θ i : ClassFunction ↥K ℂ))
+            (ClassFunction.induce K (θ i : ClassFunction ↥K ℂ))) *
+        ClassFunction.induce K (θ i : ClassFunction ↥K ℂ) x := by
+  refine chiRho_decomp_proof H71 (fun i => ClassFunction.induce K (θ i : ClassFunction ↥K ℂ)) d
+    psi_support (induce_family_orthogonal_of_injective K θ hinj)
+    (fun i => induce_norm_ne_zero K (θ i)) hAconj ?_ χ hx
+  intro ψ hψ
+  refine supported_mem_span_psi K (fun i => ClassFunction.induce K (θ i : ClassFunction ↥K ℂ)) d
+    hcover hdeg (induce_apply_one_ne_zero K (θ 0)) ?_ ?_
+  · intro y hyK
+    by_contra hne
+    exact hyK (hAK_off y (hψ (ClassFunction.mem_support.mpr hne)))
+  · by_contra hne
+    exact hA_one (hψ (ClassFunction.mem_support.mpr hne))
+
 end OddOrder.Peterfalvi.S09.Cert
