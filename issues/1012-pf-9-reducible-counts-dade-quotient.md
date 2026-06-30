@@ -416,10 +416,97 @@ S11:4549 sorry。全 transport 補題が repo 実在ゆえ機械的に組める:
 > 残 = B2 (inflation character bridge、最難所 = induction-inflation commute lemma) + B3 (|W̄₂|=p +
 > instantiate)。本プロジェクトで「最難・最高コスト」と記された指標終盤の最後の山。
 
+## ⚑ lane-a endgame 状況 (2026-06-30, 要判断)
+
+**還元 count 中核 = 完了** (H₀C reducible count、本 issue の "最難" piece、sorry-free)。**残 lane-a は
+全て一様に deep FT endgame** — tractable な pivot 先は無い:
+- §9: caseA conjunct b degree (`chiefFactor_caseA_char_inertia` = non-Galois Hpart Clifford 解析、
+  caseB inertia infra 全体 ~150 行規模の analog)、caseB (9.9.c)、(9.10) Singer。
+- §10-13 (S12): `typeII_derived_frobenius` (10.7)、`typeII_coherence_contradiction_estimate` (10.8)、
+  `exists_zeta_residual_not_orthogonal` (11.8 = 唯一の bare FT spine sorry)、`typeV_forces_coherence` (10.10)。
+
+**進め方**: deep だが incremental に grind 可 — caseA inertia は 1 iteration = 1 supporting lemma の
+ペースで caseB inertia infra を analog 構築 (`chiefFactor_caseA_char_inertia` ← Hpart 直積 +
+W₁-transitive permutation の Clifford 解析)。難所の数学が真に impasse なら **ChatGPT 相談**
+([[feedback-ask-chatgpt-for-elided-gaps]]、strongest model) を併用。**次着手 = caseA inertia の最初の
+supporting lemma を WRITE** (scoping は完了済、deliberation 不要)。
+
+## 進捗サマリ (2026-06-30 更新)
+
+**✅✅✅ 還元 count (9.8.b)/(9.9.b) 全完成 (sorry-free, axiom-clean)** — issue 1012 の中核:
+- `reducible_count_sOf_K` (generic carrier、Coq `nb_redM`) + `chiefFactorQuotientHypothesisGen`
+  (commit 6c19150d, 248e268e)。
+- H₀C 構造入力 4 本 (∩H=H₀ / ≤M' / W₁⊓=⊥ / ¬W₂≤ / ◁M) + |W̄₂'|=p
+  (`chiefFactor_card_W2bar_H0supC`、helper `nat_card_map_mk'_eq_of_inf_eq`、commit 0cee8e67)。
+- ⟹ `reducible_count_sOf_H0` / `reducible_count_sOf_H0C` 両方 実証明、`reducible_mem_sOf_H0C` honest、
+  caseB conjunct 3 (degree+membership) 完全 honest。
+
+**残 §9 (還元 count とは別経路、各 substantial な新 machinery 要)**:
+- **caseA conjunct b (degree+membership)**: membership ✅ citeable (`reducible_mem_sOf_H0C hG chars`、
+  commit f92cf378 で case-agnostic 化済)。degree = **要 `caseA_degree_qu` (9.8.a-analog)** =
+  caseA chief-factor-constituent machinery (`caseB_exists_chiefFactorConstituent` (S11:4880) の
+  caseA 版)。χ∈𝒳 の χ(1)=u は定義から自明でない (xiSet=`{χ|H⊄ker χ}` のみ、degree 条件なし) — 真の定理。
+  **次 iteration の最有力** (caseB 機構の直接 analog、doc 順最上流)。
+- **caseA conjunct c (9.8.c)**: ∃ irreducible degree qu in 𝒮(H₀C)。
+- **caseA conjunct d (9.8.d)**: irreducible count 下界 in 𝒮(H₀U')。
+- **caseB conjunct 4 (9.9.c)**: 𝒮(H₀C') に irr 無 ⟹ C=⊥ ∧ u=(p^q-1)/(p-1) (exceptional)。
+- **(9.10) `exceptional_case_frobenius_realization`**: `quotientSemidirectFrobenius` free field +
+  Singer field model 依存 (別 deep)。
+- **`sibleyTarget_H0C`**: coherence wiring。
+
+**注**: 還元 count (中核) 完了後、残は各々 caseB constituent 並みの新 machinery を要する phase。
+fresh context で 1 つずつ。次着手 = caseA degree machinery。
+
+**caseA degree machinery — Coq (9.8) 精読 (2026-06-30、`PFsection9.v` L840-940 `typeP_nonGalois_characters`)**:
+- (9.8.a) `Part_a` = `{in X_ H0, forall s, a ∣ χ(1)}` (**divisibility**, 等式でない)。inertia
+  `T='I_HU['chi_t]` + H̄ の `bigdprod` 分解 (`cfBigdprod_Res_lin`) 経由 — 長い (L883-940)。
+- (9.8.b) reducibles `mu_` = `{in mu_, isIndHC mu_j}`、`isIndHC zeta := zeta 1=qu ∧ zeta∈S_H0C ∧
+  ∃ linear xi:'CF(HC), zeta='Ind xi`。⟹ **caseA conjunct b の degree qu = mu_j が HC の linear char
+  から induced (degree [M:HC]=qu)**。mu_j は `primeTIred` (Dade W₁/W₂ prime-TI 構造)。
+- **Lean 写像**: 還元 φ∈𝒮(H₀) = induceHU(inflate χ̄)、χ̄=column (chiRestrict)、degree=q·χ̄(1)。
+  degree qu ⟺ **χ̄(1)=u** (§6 column の degree=u)。これが (9.8.a)/(9.9.a) の本体 = caseA/caseB
+  共通の column-degree=u。**要調査**: 既存 §6 `Hypothesis` から column degree=u が出るか (W̄₁-inflation
+  の degree、`card_reducible_…` 近傍)。出れば caseA/caseB 両 degree が §6 経由で case-agnostic に取れる
+  可能性 (caseB_degree_qu の constituent 経路と別ルート)。
+- **状況**: 残 §9 は全て deep (caseA constituent/exceptional/Singer/§14-gated sibleyTarget)。
+  還元 count 中核は完了。各 deep piece は fresh context で。
+
+**❌ §6 column-degree shortcut は無効 (2026-06-30 確認)**: column χ̄=`chiRestrict χ₂`=`Res_K(μ_{0j})`、
+χ̄(1)=μ_{0j}(1) (§6 columnFamily grid char)。§6 は generic certain-type framework ゆえ μ_{0j}(1) を
+u に pin する lemma **無し** (u=[U:C] は §9-specific)。⟹ degree qu (φ(1)=q·χ̄(1)=qu ⟺ χ̄(1)=u) は
+**(9.8.a)/(9.9.a) 本体** = §9-specific constituent 解析が必須、shortcut 不可。
+
+**⟹ caseA degree build plan (次 iteration、deep)**: `caseA_exists_chiefFactorConstituent` (caseB の
+analog、但し inertia は非 HC=non-Galois split) → `caseA_degree_qu` (χ(1)=u on 𝒳(H₀C'))。crux =
+caseA inertia 解析 (CliffordCaseAData の Hpart 直積構造経由)。Coq `Part_a` (L883-940) +
+`isIndHC` (reducible mu_j=Ind linear HC char ⟹ degree qu) 参照。**caseB-constituent 並みの multi-iteration。**
+membership half は ✅ (`reducible_mem_sOf_H0C hG chars`、case-agnostic 済)。
+
+**❌ inertia=HC shortcut も無効 (2026-06-30 確認)**: `inertia_eq_hcInHu` (S11:4115) は
+`caseB.actsIrreducibly` (U が H̄ 上既約) を要求 — caseB-specific。caseA (non-Galois) では θ₀ の inertia≠HC
+ゆえ caseB_degree_qu の「χ=Ind_HC(linear)⟹degree u」機構は **reducibles にも直接転用不可**。
+⟹ caseA reducible degree は **CliffordCaseAData.Hpart 直積構造経由の inertia 解析が必須**
+(Coq Part_a の non-Galois 版)。= 真の deep piece、case-agnostic 経路は全て排除済。
+
+**✅ crux 精密 localize 完了 (2026-06-30)**: caseA conjunct b degree の唯一の欠落 piece =
+**`inertia θ₀ = HC for reducible-inducing χ`**。`caseB_degree_qu` の構成要素を分解すると、
+**case-agnostic で既存**: constituent 存在+linearity (`caseB_exists_chiefFactorConstituent` の
+step 1/2/4)、degree extraction `apply_one_eq_index_of_liesOver_linear_inertia` (χ over θ₀ (inertia I,
+linear) + ψ (linear) ⟹ χ(1)=[HU:I])、index `[HU:HC]=u` (`index_hcInHu_eq_relindex_cInHu` +
+`index_cInHu_subgroupOf_uInHu_eq_u`)。**caseB-specific は `inertia_eq_hcInHu` のみ** (S11:4115、
+`≤` 方向の `inertia_inf_uInHu_le_cInHu` が U-既約 `hcaseB` を使用 = U-elt が θ₀ 固定⟹H̄ 中心化)。
+caseA (non-Galois) では一般 χ で inertia≠HC だが、**reducible χ (M-invariant) は W₁ が Hpart factors を
+transitive permute ゆえ全 factor 対称 ⟹ inertia=HC** が成り立つはず (要 Hpart-inertia 証明、Coq
+PFsection9 `Part_a` L883-940 の reducible 部分)。⟹ build = `caseA_inertia_eq_hc_for_reducible`
+(Hpart 解析) → 残は case-agnostic machinery を caseB と同形に組むだけ。**well-delimited な deep piece**。
+**注 (FT spine)**: (10.7) typeII_derived_frobenius が要するのは (9.8.b)+(9.9.b)+(9.10)。(9.9.b) は
+caseB conjunct 3 込み完了、(9.8.b) は count 完了 + **degree (caseA conjunct b) が残**。⟹ FT-spine-critical
+残 §9 = **caseA conjunct b degree** + **(9.10)** のみ (caseA c/d・caseB 9.9.c は (10.7) 非依存の可能性大)。
+
 ## 完了条件
 
 S11 の caseB_character_counts / caseA_character_counts / exceptional_case_frobenius_realization が
-sorry-free (上流 §6 obligation cite は可)。
+sorry-free (上流 §6 obligation cite は可)。**還元 count 部分は完了**、残は上記 (9.9.c)/(9.10)/caseA c/d。
 
 ## 下流 (unblock するもの)
 
