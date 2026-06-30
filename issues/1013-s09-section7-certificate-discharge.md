@@ -548,3 +548,22 @@ hβ1/hζ0norm/a + (7.8.b) facts) を充足する glue。facts 自体は family (
 refactor (field を別 lemma に抽出) し projection を cheap 化、(2) H78+BetaDecomp+NormEstimates を
 n free のまま 1 構成で束ねる bundle def。次イテレーションで consumer (exists_MHypothesis /
 exists_counterexample_dade_data) の必要シェイプを確認してから着手。
+
+### 2026-07-01 (loop 継続²³⁻ cont): 🎯 FT-path 接続確認 — consumer = exists_counterexample_dade_data (S14:2740, sorry)
+
+§7 producer の実 consumer を特定。`counterexample_contradiction` (12.16, S14:2753) は
+`exists_counterexample_dade_data` (S14:2740, **現状 sorry**) から `CounterexampleDadeData` を得て
+`counterexample_contradiction_of_facts` に渡す。`CounterexampleDadeData` (S14:2701) のフィールド:
+- **`hB : (1:ℝ) − (e:ℝ)/kH ≤ normRho`** = まさに my (7.8.b) ζ-bound `zetaNuRhoNormSq_ge_of_facts`
+  (e=complementIndex, kH=kernelOrder=h, normRho=‖ζ_0^{νρ}‖²)。
+- `hA : (kK−kKp)/kM * mval² ≤ normRhoM` = Γ/ρM bound (γ-side)。
+- 他: hε/hψ (§12 char)、he (3≤e)、h2e (2e≤p+1)、h_const/h_psix/h_psig_int (12.14/12.15)、
+  hkKp/hkM/hkH/hidx/hM (index 不等式)、hC (capstone < 1)。
+
+→ **次フェーズ = exists_counterexample_dade_data sorry の discharge** (FT-path payoff)。
+docstring (S14:2729) 指示: witness L (type I by 12.10) の Hypothesis(78) 構築 + Dade τ₁ + coherent
+family S (12.6) + DadeNotation (12.13) → 各 field を §12 定理 (psi_constant_on_xK 12.14 /
+rhoM_integer_values 12.15 / intersection_complement_structure 12.11) + §7 norm estimates
+(`NormEstimates` / `zetaNuRhoNormSq_ge_of_facts` for hB) で discharge。whnf-wall は hB の
+concrete fact 充足で再来 → ここで根治 (clean literal / bundle) が必要。(12.6)/(12.10)/(12.11) は
+signature contract 経由 cite。これが §7→§12→(12.16)→FT の実接続。
