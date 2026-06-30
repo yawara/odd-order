@@ -552,7 +552,13 @@ theorem sigma_cover_disjoint_of_inputs [Finite G] (hG : OddOrder.BG.IsMinimalSim
 /-- **BG Theorem A** (mmd L4274): the basic structure of a maximal subgroup:
 unique `M_sigma`, cyclic `K`, a `K`-invariant complement `U`, centralizer product
 with `Kstar`, derived/Fitting layering, and the extreme case
-`M_F != M_sigma`. -/
+`M_F != M_sigma`.
+
+⚠ **OVERSTATEMENT — do not prove as-is.**  The conclusion (conjuncts A(3) `M = K U M_σ`, A(4)
+`C_U(k) = 1`, A(8) `U = ⊥`) needs `K ≤ M` and `U ≤ M`, which the bare Hall conditions on
+`K.subgroupOf M` / `U.subgroupOf M` do **not** force.  The faithfulness-corrected, fully `sorry`-free
+counterpart is `theoremA_maximal_structure_faithful` (adds `hKM : K ≤ M`, `hUM : U ≤ M`).  This bare
+form is kept only for its existing (cross-lane) callers; new consumers cite the faithful version. -/
 theorem theoremA_maximal_structure [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     {M K Kstar U : Subgroup G} (hM : M ∈ maximalSubgroups G)
     (hK : Ch03.IsHallSubgroup (S14.kappa M) (K.subgroupOf M))
