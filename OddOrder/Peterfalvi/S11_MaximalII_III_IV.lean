@@ -4682,6 +4682,25 @@ theorem caseB_xi_H0_degree_dvd_u [Finite G]
     exact_mod_cast hcast
   exact ⟨e * d₀, by rw [hdeq]; ring⟩
 
+/-- **Peterfalvi (9.9.b), degree part**: every member of `𝒮(H₀C)` has degree `qu`.
+
+Immediate from `caseB_degree_qu` (degree `qu` on `𝒮(H₀C')`): since `C' = ⁅C,C⁆ ≤ C`
+(`Cprime_le_C`), we have `H₀C' ≤ H₀C`, so `𝒮(H₀C) ⊆ 𝒮(H₀C')` (`sOf_antitone` — a larger kernel
+demand selects fewer characters).  Thus the (9.9.b) degree claim (each reducible member of `𝒮(H₀)`
+has degree `qu`) reduces to its membership claim (the reducibles lie in `𝒮(H₀C)`): once a reducible
+`φ ∈ 𝒮(H₀)` is shown to lie in `𝒮(H₀C)`, this lemma gives its degree.  The membership itself is the
+deep Clifford crux — reducible `Ind_{HU}^M χ` ⟺ `χ` is `W₁`/`M`-invariant, and via the direct
+product `HC/H₀ = H̄ × (C/H₀)` the underlying `HC`-linear character is `C`-trivial (Peterfalvi
+(9.9.b)/(9.8.b) shared subproof, Coq `PFsection9` `Part_a`). -/
+theorem forall_mem_sOf_H0C_apply_one_eq_qu [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    {M : Subgroup G} {data : TypesIIIIIIVSetup M} {chief : ChiefFactorData data}
+    (chars : Section11CharacterData data chief) (caseB : CliffordCaseBData chars) :
+    ∀ φ ∈ chars.SOf (chief.H0 ⊔ chars.C), φ 1 = ((data.q * chars.u : ℕ) : ℂ) := by
+  intro φ hφ
+  refine caseB_degree_qu hG chars caseB φ ?_
+  rw [Section11CharacterData.SOf_eq] at hφ ⊢
+  exact sOf_antitone data (sup_le_sup_left chars.Cprime_le_C chief.H0) hφ
+
 
 /-- **Peterfalvi (9.9)**: character-count consequences in Clifford case (b).
 
