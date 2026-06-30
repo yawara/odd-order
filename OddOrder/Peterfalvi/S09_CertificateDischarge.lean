@@ -775,4 +775,16 @@ theorem sum_collapse_to_single [Invertible (Nat.card L : ℂ)] {n : ℕ}
       (fun i hi hne => by rw [hvanish i hi hne]; simp), hcrux]
   exact div_mul_cancel₀ _ hnorm
 
+/-- **The coherence vanishing of a (7.7.a) coefficient** (Peterfalvi (7.8.c)).  If `χ` is orthogonal
+to both `a` and `b` in `CF(G)`, then `(a − d·b, χ) = 0`.  In (7.8.c), with `a = ζ_i^ν`, `b = ζ_0^ν`
+(`ζ_i, ζ_0 ∈ S`) and the coherence agreement `(ζ_i − d_i ζ_0)^τ = ζ_i^ν − d_i ζ_0^ν`, the hypothesis
+`χ ⊥ S^ν` makes the coefficient `c_i = ((ζ_i − d_i ζ_0)^τ, χ)` vanish for the non-distinguished
+indices. -/
+theorem inner_sub_smul_left_eq_zero {G : Type*} [Group G] [Fintype G]
+    [Invertible (Nat.card G : ℂ)] {a b χ : ClassFunction G ℂ} {d : ℂ}
+    (ha : ClassFunction.inner χ a = 0) (hb : ClassFunction.inner χ b = 0) :
+    ClassFunction.inner (a - d • b) χ = 0 := by
+  rw [ClassFunction.inner_sub_left, ClassFunction.inner_smul_left,
+    inner_conj_symm χ a, ha, star_zero, inner_conj_symm χ b, hb, star_zero, mul_zero, sub_zero]
+
 end OddOrder.Peterfalvi.S09.Cert
