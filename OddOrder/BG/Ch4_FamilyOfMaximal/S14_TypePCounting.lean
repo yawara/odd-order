@@ -9896,6 +9896,47 @@ theorem isHall_kappa_subgroupOf_conj [Finite G] (g : G) {M N KN : Subgroup G}
   unfold Ch03.IsHallSubgroup at hKN ⊢
   rw [hkap, hcard, hidx]; exact hKN
 
+/-- **fix-`W` threading**: two conjugate type-`P` maximals `N ~ M` carry `Ẑ`'s with the same
+`G`-conjugacy-class closure.  Concretely, if `N` and `M` carry Theorem 14.7 data
+`(KN, KstarN)` resp. `(K, Kstar)` and `N` is `G`-conjugate to `M`, then
+`𝒞_G(zTilde KN KstarN) = 𝒞_G(zTilde K Kstar)`.  The conjugator `g` (`conj g • N = M`) is corrected
+by a Hall conjugacy `w ∈ M` so that `conj (w*g)` carries `N`'s data exactly onto `M`'s; the
+`conjClassSet` is then conjugation-invariant via `conjClassSet_zTilde_conj_eq`. -/
+theorem conjClassSet_zTilde_eq_of_isConjugate [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    {M N K Kstar KN KstarN : Subgroup G}
+    (hMmax : M ∈ maximalSubgroups G) (hKM : K ≤ M)
+    (hK : Ch03.IsHallSubgroup (kappa M) (K.subgroupOf M))
+    (hKstar : Kstar = OddOrder.BG.Ch3.S10.Msigma M ⊓ Subgroup.centralizer (K : Set G))
+    (hNmax : N ∈ maximalSubgroups G) (hKNN : KN ≤ N)
+    (hKN : Ch03.IsHallSubgroup (kappa N) (KN.subgroupOf N))
+    (hKstarN : KstarN = OddOrder.BG.Ch3.S10.Msigma N ⊓ Subgroup.centralizer (KN : Set G))
+    (hconj : IsConjugateSubgroup N M) :
+    conjClassSet (zTilde KN KstarN) = conjClassSet (zTilde K Kstar) := by
+  obtain ⟨g, hg⟩ := hconj
+  have hle : MulAut.conj g • KN ≤ M := by
+    rw [← hg]; exact Subgroup.pointwise_smul_le_pointwise_smul_iff.mpr hKNN
+  have hHallM : Ch03.IsHallSubgroup (kappa M) ((MulAut.conj g • KN).subgroupOf M) :=
+    isHall_kappa_subgroupOf_conj g hg hKNN hKN
+  haveI : IsSolvable ↥M := hG.solvable_of_mem_maximalSubgroups hMmax
+  obtain ⟨w, hwM, hw⟩ :=
+    OddOrder.BG.Ch1.S06.exists_conj_eq_of_isHall_subgroupOf inferInstance hle hKM hHallM hK
+  -- `conj (w*g)` carries `N`'s `κ`-Hall and ambient maximal exactly onto `M`'s.
+  have hKeq : MulAut.conj (w * g) • KN = K := by rw [map_mul, mul_smul]; exact hw
+  have hMN : MulAut.conj (w * g) • N = M := by
+    rw [map_mul, mul_smul, hg]
+    exact conj_smul_eq_self_of_mem_normalizer (Subgroup.le_normalizer hwM)
+  -- hence it carries `KstarN = N_σ ∩ C(KN)` onto `Kstar = M_σ ∩ C(K)`.
+  have hKstareq : MulAut.conj (w * g) • KstarN = Kstar := by
+    rw [hKstarN, Subgroup.smul_inf, centralizer_pointwise_smul, ← coe_pointwise_smul, hKeq, hKstar]
+    congr 1
+    rw [← Msigma_conj_smul, hMN]
+  -- `conjClassSet` is conjugation-invariant on `Ẑ`.
+  calc conjClassSet (zTilde KN KstarN)
+      = conjClassSet (zTilde (MulAut.conj (w * g) • KN) (MulAut.conj (w * g) • KstarN)) :=
+        (conjClassSet_zTilde_conj_eq (w * g) KN KstarN).symm
+    _ = conjClassSet (zTilde K Kstar) := by rw [hKeq, hKstareq]
+
 /-- **Type-`P` data constructor**: every maximal subgroup `M` carries the Theorem 14.7 data — a
 Hall `κ(M)`-subgroup `K ≤ M`, the swap `K* = M_σ ∩ C_G(K)`, and a Hall `(κ ∪ σ)ᶜ`-subgroup `U` —
 obtained from Hall's theorem in the solvable `↥M`.  This is the missing constructor that lets the
