@@ -510,6 +510,23 @@ theorem sum_normSq_sharp_eq_total_sub_one {S : Type*} [Group S] [Fintype S]
   ring
 
 open scoped Classical in
+/-- **Peterfalvi (13.5), cross-term sum** (the (13.5.b) `−2a ζ₁(1)α(1)/‖ζ₁‖²` term): when the inner
+sum `∑_{x∈H} ζ₁(x)·conj(α(x))` over the subgroup `H` vanishes — which holds in (13.5) because
+`Res_H ζ₁` is a sum of characters with `P` *off* their kernels while every component of `α` has `P`
+*in* its kernel (orthogonal constituents) — the sum over `H# = H ∖ {1}` collapses to the single
+identity term: `∑_{H#} ζ₁·ᾱ = −ζ₁(1)·conj(α(1))`.  Supplies the cross term of the (13.5.b)
+decomposition `sum_normSq_real_smul_add` (with `f = ζ₁`, `g = α`). -/
+theorem sum_mul_conj_sharp_eq_neg_of_inner_zero {S : Type*} [Group S] [Fintype S]
+    (H : Subgroup S) (ζ α : S → ℂ)
+    (hinner : ∑ x ∈ Finset.univ.filter (· ∈ H), ζ x * (starRingEnd ℂ) (α x) = 0) :
+    ∑ x ∈ (Finset.univ.filter (· ∈ H)).erase 1, ζ x * (starRingEnd ℂ) (α x)
+      = -(ζ 1 * (starRingEnd ℂ) (α 1)) := by
+  rw [← Finset.sum_erase_add (Finset.univ.filter (· ∈ H))
+    (fun x => ζ x * (starRingEnd ℂ) (α x))
+    (Finset.mem_filter.mpr ⟨Finset.mem_univ 1, H.one_mem⟩)] at hinner
+  exact eq_neg_of_add_eq_zero_left hinner
+
+open scoped Classical in
 /-- **Permutation-character value**: `(Ind_H^G 1_H)(g) = |H|⁻¹ · |{x ∈ G : x⁻¹gx ∈ H}|`.
 
 The induced trivial character is the permutation character of `G` acting on the cosets `G/H`; at
