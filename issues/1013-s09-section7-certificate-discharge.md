@@ -615,3 +615,27 @@ hd_real/hP_real=induce_apply_one_star、hd=ζ_i(1)/e (ζ_0(1)=ζ_ind1H(1)=e via 
 hN_ind1H/hP_ind1H=induce_trivialChar_normSq/apply_eq_index + complementIndex_eq_subgroupOf_index、
 hGsum=family_degree_sum_Ioi (hz0_deg=ζ_0(1)=e from zeta_one_eq_ind1H_one、hz0_norm=hζ0norm)、hsmall。
 betaDecompOfDade で landing 実証済 = 既知 feasible。
+
+### 2026-07-01 (loop 継続²⁶⁻): ✅ concrete §7 (7.8) producer 完備 — betaDecompOfDade + zetaNuRhoNormSqGeOfDade
+
+`zetaNuRhoNormSqGeOfDade` (commit 400aa905): Dade family → concrete H78 に対し (7.8.b) ζ-bound
+`1−e/h ≤ ‖ζ_0^{νρ}‖²` を産出 (= `CounterexampleDadeData.hB`)。`betaDecompOfDade` +
+`zetaNuRhoNormSq_ge_of_facts` を bundle、(7.8.b) facts を全 discharge (係数同定 cCoeff_nu_zeta_zero_*
++ Subtype.ext で hagree を computed-d 形へ / reality induce_apply_one_star / degree ratio
+zeta_one_eq_ind1H_one / index facts induce_trivialChar_* + complementIndex_eq_subgroupOf_index /
+(1.5.d) family_degree_sum_Ioi)。2 build cycle で landing。
+
+**§7 (7.8) は abstract + concrete 共に完備**:
+- abstract: betaDecompOfFacts (7.8.a) / zetaNuRhoNormSq_eq_normQuad_of_facts (7.8.b keystone) +
+  既存 normEstimates_of_source_orthogonal (γ-side)。
+- concrete (Dade family): betaDecompOfDade (7.8.a BetaDecomp) / zetaNuRhoNormSqGeOfDade (7.8.b hB)。
+
+**残る FT-path = §12 integration (別フェーズ、deep)**: `exists_counterexample_dade_data` (S14:2740 sorry)
+で `CounterexampleDadeData` を組む。必要:
+1. **§12 `Hypothesis L`/`Coherence`/`DadeNotation` → §7 `hypothesis78OfDade` 入力の bridge** (構造変換、
+   witness-L H78 を構築するため。現状 bridge 未在 = 鍵)。
+2. CounterexampleDadeData の各 field: hB=zetaNuRhoNormSqGeOfDade、hA=γ-side、hε/hψ/he/h2e/h_const/
+   h_psix/h_psig_int/hk*/hidx/hM/hC=§12 (12.12/12.14/12.15 等、多くが sorry)。
+§12 sorry (witness_L_frobenius 12.10 / intersection_complement_structure 12.11 / psi_constant_on_xK
+12.14 / rhoM_integer_values 12.15) が gating。次イテレーション = §12 Coherence→Hypothesis78 bridge の
+feasibility 調査 + 着手。
