@@ -1879,6 +1879,29 @@ theorem typeIFrobenius_kernel_index_eq_complement {M : Subgroup G}
   rw [← data.typeI.typeF.H_eq]
   exact data.frobenius.isComplement.symm.index_eq_card
 
+/-- **Peterfalvi (14.10), structural foundation**: for `T` of type II, there is a type-I maximal
+subgroup `M` over `N_G(V)` carrying a §14 `S14.Hypothesis`, with Fitting-kernel index
+`|M : M_F| = p q`.  Assembled from the V-side producer `typeII_overNormalizer_frobenius_V` (`M`,
+maximality, `N_G(V) ≤ M`, the Frobenius complement of order `p q`), `S14.exists_typeI_hypothesis`
+(the (12.1) `Hypothesis` from `IsTypeI M`), and the index bridge
+`typeIFrobenius_kernel_index_eq_complement` (`|M : M_F| = |complement| = p q`).  This is the
+sorry-free structural half of `exists_MHypothesis` — it supplies `MHypothesis`'s
+`M`/`K = M_F`/`typeIHyp`/`e_eq_index`/`complement_card_eq_pq` fields; the §7/§8/§13 character carrier
+(`h78`, `betaM`, the σ counts) is isolated separately.  Gated on `T_typeII` (14.9) for `IsTypeII T`,
+cited at the §16 consumer. -/
+theorem exists_M_structural [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hyp : Hypothesis (G := G)) (hTII : IsTypeII hyp.T) :
+    ∃ (M : Subgroup G) (_typeIHyp : OddOrder.Peterfalvi.S14.Hypothesis M),
+      M ∈ maximalSubgroups G ∧
+        Subgroup.normalizer (hyp.V : Set G) ≤ M ∧
+          ((maxNilpotentNormalHall M).subgroupOf M).index = hyp.p * hyp.q := by
+  obtain ⟨vdata, _hker, _hVH⟩ := typeII_overNormalizer_frobenius_V hG hyp hTII
+  have hMtypeI : IsTypeI vdata.L := ⟨vdata.frobenius.typeI⟩
+  obtain ⟨typeIHyp⟩ := OddOrder.Peterfalvi.S14.exists_typeI_hypothesis hG vdata.L_maximal hMtypeI
+  refine ⟨vdata.L, typeIHyp, vdata.L_maximal, vdata.normalizer_V_le_L, ?_⟩
+  rw [typeIFrobenius_kernel_index_eq_complement vdata.frobenius]
+  exact vdata.complement_card_eq_pq
+
 /-- Carrier for the virtual character `beta_j` and `Gamma_j` in (13.18). -/
 structure BetaData (hyp : Hypothesis (G := G)) where
   j : Fin hyp.p
