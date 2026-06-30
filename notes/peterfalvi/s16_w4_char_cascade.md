@@ -679,3 +679,29 @@ hub 指示が自分の careful 分析 (cont.¹²) と矛盾したら盲従でな
 **残 = exists_MHypothesis wiring は reconciled_typePData_T (off-spine) + TypeIIData T 経由で**
 (hub tick²: 「TypePData T/IsTypeP2 T は使わない、TypeIIData T 経由」)。
 [[scaffold-sorry-free-not-done]] [[hub-check-issue-before-asking-on-scope-violation]]
+
+### cont.²⁰ (2026-06-30 lane c=γ /loop): MHypothesis carrier −3 — W=W₁×W₂ cardinalities を base から honest 化
+
+cont.¹⁹ の方向 (spine 改変でなく carrier 構成可能性を上げる) に沿い、**spine を一切触らず** carrier の
+deep-looking field を 3 本 honest に de-gate (commit `b82d7c9e`, full build 3889 green):
+
+- `MHypothesis` (S16:1593) の `card_W_eq` (|W|=pq) / `card_W1_add_W2_eq` (|W₁|+|W₂|=p+q) /
+  `W_set_nonempty` (W∖(W₁∪W₂)≠∅) の 3 field を**撤去**。これらは「§13-14 σ-prerequisite」として
+  exists_MHypothesis に isolate されていたが、実は base `Hypothesis` の elementary consequence と判明。
+- 新規 sorry-free 補題 (S15_SAndT.lean、base `Hypothesis` 上):
+  - `S15.card_W_eq_pq`: W=W₁⊔W₂ の内部直積 (`W1_commutes_W2`+`W1_inf_W2_eq_bot` →
+    `card_sup_eq_mul_of_le_normalizer_of_disjoint`、commute から W₁≤N(W₂) を `mem_normalizer_iff` で構築)。
+  - `S15.card_W1_add_W2`: prime data から自明。
+  - `S15.W_sdiff_nonempty`: `Set.ncard_le_ncard`+`ncard_union_le`、(p−1)(q−1)>0 を omega。
+- §16 第8 TI-counting の 3 消費点 (orbit measure 2949 / W-set ncard 2961 / hWcardR 2974) を
+  `Mdata.*` field から `S15.*` lemma (`hyp.base` 適用) に rewire。**lemma 文 = 旧 field 文と同一**ゆえ
+  drop-in (omega/ring 文脈不変)。
+
+**意義**: exists_MHypothesis の obligation −3 (bare sorry 数は不変、3 field が proven 化 = carrier 構成
+可能性 ↑、CLAUDE.md doneness 判定の本筋)。sorry regression 0 (sound REMOVAL、cont.¹⁹ の unsound
+ADDITION と逆)。**残 σ-carrier (8→5)**: P_isTI/Q_isTI (§8 TI)、card_normalizer_P/Q (|N(P)|=|P|uq 等
+§13-14)、W_normalizer_V (exceptional-set normalizer=W §13) — これらは base から自明でなく要 char/σ。
+次候補 = (a) 同様に base/Sdata から derivable な残 carrier field の探索 (P_isTI が Frobenius kernel TI
+として Sdata/typeP から出るか調査) or (b) exists_MHypothesis の structural field skeleton
+(M/K/typeIHyp/e=pq、T_typeII sorried cite + V-side producer)。[[scaffold-sorry-free-not-done]]
+[[feedback-no-avoiding-hard-parts]]
