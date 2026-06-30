@@ -711,3 +711,25 @@ distinctInducedFamily で hinj/hcover/ind1H、Sset={induce θ|θ≠1} は trivia
 (degrees d/hdeg/hdeg_match) / hnu_isometry (IsCoherent.extension_inner_eq) / H71+hτ
 (toHypothesis71 + IsDadeIsometry)。**assembly は S14 に S09_CertificateDischarge を import して**
 hypothesis78OfDade を呼ぶ (S14 が consumer exists_counterexample_dade_data の home)。
+
+### 2026-07-01 (loop 継続³⁰⁻): §12 bridge 残部品の精査 + family-isometry supplier
+
+bridge 残部品を精査し、必要な入力と障害を確定:
+- ✅ `coherence_extension_inner_eq_on_family` (commit 12b657ea): IsCoherent から family-level isometry
+  ⟨ν ζ_i, ν ζ_j⟩=⟨ζ_i,ζ_j⟩。
+- ✅ 区別 char (zetaDistinct=0, 次数 [L:K]) は `exists_distinguished_char hyp` (S14:2402, proven) で取得可
+  (χ∈Sset, χ(1)=(typeF.H.subgroupOf L).index)。χ=induce(linear θ_0)。
+- ⚠ **nu_isometry interface 問題**: hypothesis78OfDade の nu_isometry field は global (∀ φ ψ) だが
+  §12 coherent ν は family span 上のみ isometry。全使用箇所が family-level ゆえ field を
+  `∀ i j, ⟨ν(zeta i),ν(zeta j)⟩=⟨zeta i,zeta j⟩` へ弱める refactor が必要 (~6-8 sites, contained:
+  constructor=hypothesis78OfDade のみ、consumer 全て my §7 files)。**次フェーズ最初の step**。
+- 残: family construction (θ_0=区別 char rep at 0、trivial at ind1H≠0、cover/inj は
+  distinctInducedFamily ベース + 2-member 配置) / hζ0norm (‖χ‖²=1、L Frobenius ゆえ Ind θ
+  (θ≠1) irreducible) / hzeta0nu (⟨ν χ,1_G⟩=0) / degrees (hdeg/hdeg_match) / H71+hτ
+  (toHypothesis71) / assembly (S14 に S09_CertificateDischarge import)。
+- 注: full (12.16) は別途 §12 char sorry (psi_constant_on_xK 12.14 / rhoM_integer_values 12.15 /
+  intersection_complement_structure 12.11) が gating。
+
+bridge progress: keystone (ℂ-linearity) + parts 1/2 (coherence agreement DadeMap 形) + part 4
+(typeIA=H^#) + family-isometry。**hard math content 完了**、残は構造 refactor + family 構成 +
+char-theory 入力 (Frobenius-induction irreducible)。
