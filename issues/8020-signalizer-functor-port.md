@@ -971,3 +971,25 @@ cover/partition) と接続:
 
 **⚠ frontier flag**: 真の gate-2 blocker (Theorem D(4)) は BG signalizer functor 最深部・multi-session 大型。
 §14 cover math 完了後、tractable な単一 win は connector/plumbing (gate-2 を単独 unblock せず) のみ。
+
+## 🔴 deep-frontier 確定 (lane d, 2026-06-30 /loop⁴⁶): 「easy Frobenius route」棄却 + 深い port 計画
+
+gate-2 TypeICovering blocker (`cover_subset_kernels` = type-F ⟹ R(x)=1 = **type-F M_σ G-level TI**) の
+「Frobenius kernel TI で即解決」route を **明示的に棄却**:
+- **Isaacs `IsFrobeniusGroup.trivialIntersection`** (FrobeniusGroup:357) = **complement TI** (`A⊓A^g=⊥` for
+  g∉A、A=complement)。**kernel TI ではない**。type-F M_σ は kernel ゆえ Isaacs 直接適用不可。
+- **D(2) `Msigma_inf_conj_isCyclic`** = `M_σ∩M^g` **cyclic** (≠⊥)。TI には足りない (cyclic≠bot)。
+- ∴ type-F M_σ G-level TI は genuine deep (BG §14 σ-core uniqueness / Theorem 14.4 / Theorem D(4) signalizer)。
+
+**∴ §14 cover の tractable single-session win は枯渇。残り gate-2 = 全て deep multi-session**:
+- **(A) type-F M_σ G-level TI** = `C_G(x)≤M for x∈M_σ#, type-F`。machinery済 (`≤1⟺C(x)≤M`:
+  S16:1456/330)。残 = C_G(x)≤M 本体 = BG Theorem 14.4 σ-uniqueness の type-F 版。**deep**。
+- **(B) Theorem D(4)** (S16:1585) escaping-centralizer signalizer tail。**deep**。(A)≠D(4) 直接従属
+  (escaping は type-F neighbor もあり得るので D(4) から (A) は出ない)。
+- **(C) NonTypeICovering plumbing**: connector partner-side (`Z⊓Mstar_σ=K`) は κ(M)↔σ(Mstar) swap 要 =
+  これも deep。base side `typeP_Z_inf_Msigma_eq_Kstar` のみ済。gate-2 を単独 unblock せず。
+
+**次の port 計画 (deep, 集中要)**: (A) C_G(x)≤M for type-F を BG Theorem 14.4 (`not_sCX_M` の type-F 特殊化)
+or σ-uniqueness 経由で。Coq `cent_cent_Msigma`/`def_uniq` 系を併読。あるいは (B) D(4) escaping 構造に着手。
+いずれも fresh 集中セッション級。§14 cover math (κ→Ẑ + 一般 cover ⊆ + Cor14.8/14.9 + Lem14.6) は完了済で
+honest FT 前進。
