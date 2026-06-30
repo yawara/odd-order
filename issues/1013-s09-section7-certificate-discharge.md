@@ -165,3 +165,25 @@ Quot.sound] のみ、sorryAx なし)。`hypothesis76OfDade` が Hypothesis76 を
   は bare field でない → discharge theorem の hypothesis に取る (S08 の tau1_agrees 系を供給元に)。
   原文 mmd 04.9 L103-107 (7.8.c の (7.7) 適用 ζ_0=ζ,ζ_1=Ind 1_H)。S09 docstring (1419-1421) が
   「coherence-based derivation from (7.7.a) ... not yet formalized」と明記 = 既知 gap。
+
+### 2026-06-30 (loop 継続³): (7.8.c) core 5 lemma 完成 + 詳細 proof 確定
+
+原文 (7.8.c) proof 完全解読 (mmd 04.9 L103-107): (7.7) を **ζ_0=ζ (zetaDistinct),
+ζ_1=Ind 1_H** で適用 → c_1=(β,χ), c_i=0 (i≥2)。生存項 (c̄_1/‖ζ_1‖²)ζ_1(x) は
+**ζ_1(x)=‖ζ_1‖²=e** (x∈A、Ind 1_H の特殊性) ゆえ c̄_1=star(β,χ) に collapse。
+
+**(7.8.c) の reusable core を全 sorry-free 構築** (commits c5eec18c→95f79715):
+- `conjBy_trivialClassFunction` / `induce_trivialChar_apply_eq_index` ((Ind 1_K)(x)=[L:K] for
+  x∈K) / `induce_trivialChar_normSq_eq_index` (‖Ind 1_K‖²=[L:K]、inertia(1_K)=⊤+card_top)。
+- `sum_collapse_to_single`: (7.7.a) 和で c_i が i₁ 以外消滅 + ζ_{i₁}(x)=‖ζ_{i₁}‖² なら star(c_{i₁})。
+- `inner_sub_smul_left_eq_zero`: χ⊥{a,b} ⟹ (a−d•b,χ)=0 (coherence 係数消滅核)。
+
+**残 = 大 assembly `chiRho_eq_inner_beta_induced`** (chiRho_decomp_induced と parallel な standalone):
+入力 = H71, K, θ (rep family, inj+cover), ind1H/zetaDistinct, **hzeta_ind1H: θ ind1H=trivial**,
+degree 関係, **ν + coherence agreement** `(ζ_i−d_iζ_zd)^τ=νζ_i−d_i•νζ_zd` (i≠ind1H),
+**χ⊥S^ν** `inner χ (νζ_i)=0` (i≠ind1H), geometric facts。証明 =
+(1) family を **Equiv.swap 0 zetaDistinct** で permute → chiRho_decomp_induced 適用 (ζ'_0=ζ_zd)、
+(2) i₁=swap(ind1H) (≠0 ∵ ind1H≠zd)、(3) c'_i=0 (i≠i₁) via inner_sub_smul_left_eq_zero、
+(4) c'_{i₁}=(β,χ) (d'_{i₁}=1 ∵ degree)、(5) building blocks で ζ'_{i₁}(x)=‖ζ'_{i₁}‖²=K.index、
+(6) sum_collapse_to_single → star(β,χ)。次に `hypothesis78OfDade` constructor で配線
+(hyp76 を hypothesis76OfDade で構築 ⟹ zeta=Ind∘θ、ind1H/zetaDistinct 設定、ν+agreement 入力)。
