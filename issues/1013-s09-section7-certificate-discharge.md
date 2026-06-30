@@ -591,3 +591,27 @@ heartbeats で `rfl` projection 可能と実証。従来「`.hyp76.n` が巨大 
 + γ-side を concrete H78 へ; facts は同様に induce で discharge) → **`exists_counterexample_dade_data`
 (S14:2740 sorry) 接続** (witness L の H78 構築 + CounterexampleDadeData.hB=my (7.8.b) bound)。
 full build 3889 jobs 緑、AxiomsCheck OK。
+
+### 2026-07-01 (loop 継続²⁵⁻): §12 consumer survey + complementIndex bridge (concrete (7.8.b) 着手)
+
+**§12 consumer の状態**: `exists_counterexample_dade_data` (S14:2740, **sorry**) は (12.16)
+`counterexample_contradiction` の deep obligation で、`CounterexampleDadeData` (S14:2701) を構築。
+依存する §12 lemma の多くが sorry: `witness_L_frobenius` (12.10, 2024)・
+`intersection_complement_structure` (12.11, 2070)・`psi_constant_on_xK` (12.14, 2502)・
+`rhoM_integer_values` (12.15, 2511)。§12 は `Hypothesis L`/`DadeNotation`/`Coherence` 構造を使い、
+my §7 `Hypothesis78` と直結しない (bridge 未在)。full integration は deep な別フェーズ。
+
+**`CounterexampleDadeData` フィールド→source**: hB (1−e/kH≤normRho) = **my (7.8.b) ζ-bound**、
+hA = Γ/ρM (γ-side)、hε/hψ=§12 char、he/h2e=12.12 degree、h_const=12.14、h_psig_int=12.15、
+hk*/hidx/hM=index 不等式、hC=capstone。
+
+**着手: concrete (7.8.b)**。`complementIndex_eq_subgroupOf_index` (commit de0ac155) =
+`e = (H.subgroupOf L).index` bridge (induce-index → complement-index)。**次 = `zetaNuRhoNormSqGeOfDade`**
+(betaDecompOfDade と同パターン、concrete (7.8.b) ζ-bound): hBD:=betaDecompOfDade、
+`zetaNuRhoNormSq_ge_of_facts` へ facts 供給 — hzd=rfl、horth=induce 直交、
+hc_ind1H=cCoeff_nu_zeta_zero_ind1H_eq+ha (hBD.a=a)、hc_rest=cCoeff_nu_zeta_zero_eq_neg_d
+(hagree を psiSupp/computed-d 形へ Subtype.ext 変換、betaDecompOfDade の hagree' と同)、
+hd_real/hP_real=induce_apply_one_star、hd=ζ_i(1)/e (ζ_0(1)=ζ_ind1H(1)=e via zeta_one_eq_ind1H_one)、
+hN_ind1H/hP_ind1H=induce_trivialChar_normSq/apply_eq_index + complementIndex_eq_subgroupOf_index、
+hGsum=family_degree_sum_Ioi (hz0_deg=ζ_0(1)=e from zeta_one_eq_ind1H_one、hz0_norm=hζ0norm)、hsmall。
+betaDecompOfDade で landing 実証済 = 既知 feasible。
