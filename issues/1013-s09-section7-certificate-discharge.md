@@ -639,3 +639,35 @@ zeta_one_eq_ind1H_one / index facts induce_trivialChar_* + complementIndex_eq_su
 §12 sorry (witness_L_frobenius 12.10 / intersection_complement_structure 12.11 / psi_constant_on_xK
 12.14 / rhoM_integer_values 12.15) が gating。次イテレーション = §12 Coherence→Hypothesis78 bridge の
 feasibility 調査 + 着手。
+
+### 2026-07-01 (loop 継続²⁷⁻): §12 Coherence→Hypothesis78 bridge 解析 — ℤ/ℚ-linearity の核心 difficulty + 解法
+
+§7 producer を (12.16) consumer に繋ぐ bridge `Hypothesis L` (+`IsCoherent`) → `hypothesis78OfDade`
+を精査。判明した構造と difficulty:
+
+**既存の足場**:
+- `Hypothesis.toHypothesis71` (S14:110) = §12 `Hypothesis L` → §7 `S09.Hypothesis71` (済、docstring も
+  「7.8.b を L に適用可能にする」と明記)。
+- `witness_L_coherent` (S14:2061) = `IsCoherent hyp.tau hyp.Sset hyp.A` (Nonempty)。
+- `IsCoherent` (S07:1596): `extension : IntegralCharacterMap L G` (=ν)、`extends_on_supported`
+  (ν φ = τ φ for φ∈zSupportedSpan)、`extension_inner_eq` (zSpan 上 isometry)、`extension_mem_ZIrr`。
+
+**核心 difficulty (ℤ vs ℚ linearity)**: `IntegralCharacterMap = CF→ₗ[ℤ]CF` は **ℤ-線形**。だが
+`hypothesis78OfDade.hagree` = `τ(ζ_i − d_i ζ_0) = ν(ζ_i) − d_i•ν(ζ_0)` は `d_i=ζ_i(1)/ζ_0(1)∈ℚ` の
+非ℤ結合。`extends_on_supported` は zSupportedSpan (=ℤ-span∩supported) 上のみ → ψ_i=ζ_i−d_iζ_0 は
+ℚ結合ゆえ直接適用不可。
+
+**解法 path**: **ℤ結合** `ζ_0(1)•ζ_i − ζ_i(1)•ζ_0 ∈ ℤ[S]` (degree は整数) は supported (=ζ_0(1)•ψ_i)
+かつ ℤ-span ゆえ zSupportedSpan ∈ → `ν = τ` 適用可。degree の natCast-smul は nsmul に等しく ℤ-線形
+が効く (ν((n:ℂ)•x)=(n:ℂ)•ν x, n:ℕ; mathlib `map_natCast_smul` 等)。両辺を ζ_0(1)(≠0) で割れば ψ_i
+agreement 取得。
+
+**bridge の残り部品** (全て multi-lemma、次フェーズ):
+1. 上記 coherence-agreement lemma (ℤ結合→割算→ψ_i hagree)。
+2. `toHypothesis71.τ` (DadeMap) ↔ `hyp.tau` (IntegralCharacterMap) の同一視 (IsCoherent は hyp.tau、
+   hagree は H71.τ)。
+3. Sset 列挙 → Fin (n+1) family (hinj/hcover/ind1H; distinctInducedFamily 利用)。
+4. `typeIA L hyp.typeI = (hyp.H : Set G) \ {1}` (A 一致、(12.1)/(8.3) fact)。
+5. degree data (d/hdeg/hdeg_match)。
+→ 揃えば `hypothesis78OfDade` で witness-L H78 構築 → betaDecompOfDade/zetaNuRhoNormSqGeOfDade で
+BetaDecomp/hB。次イテレーション = 部品1 (coherence-agreement lemma) から着手。
