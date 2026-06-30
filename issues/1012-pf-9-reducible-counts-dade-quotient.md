@@ -755,3 +755,82 @@ mathlib に Clifford correspondence は**無い**が、**repo 内に Clifford �
 (Clifford.lean) で「I_HU(θ₀)=HC 上の Irr(HC) char ↔ Irr(HU) over θ₀」⟹ Ind_{HC}^{HU}(θ₀ 拡張 linear)
 irreducible deg [HU:HC]=u ⟹ χ∈xiSet∩𝒳(H₀C) ⟹ induceHU deg q·u。次イテレーションは Clifford.lean の
 Thm 6.11 lemma を特定 (induce-from-inertia-bijective/irreducible の usable form) して適用。
+
+
+## 重要な再framing: conjunct b/c は M-level (W1-orbit) で bottom out (2026-06-30)
+
+深い解析で判明: 私の caseA inertia 機構 (`inertia_eq_hcInHu_caseA`, I_HU(θ₀)=HC) は **HU-level** で
+necessary だが **sufficient でない**。degree conjunct (b/c) は **M-level** inertia I_M(ξ)=HC を要する:
+- HU-level Clifford (`isIrreducibleCharacter_induce_of_inertia_eq` + `hcInHu_normal`、既存) ⟹
+  Ind_{HC}^{HU}(ξ) irreducible deg u。✅ 支持あり。
+- だが 𝒮(H₀C) は `induceHU` = Ind_{HU}^**M**。conjunct c の最終 χ の irreducibility は M-level、
+  = I_M(ξ)=HC、= I_HU=HC (済) **+ W1 が regular θ̄ 上 free に作用** (regular = trivial W1-stabilizer)。
+- この **W1-orbit 構造 (regular ⟺ free W1-orbit)** が prime-TI content で、**conjunct b の
+  reducible↔regular とも共有**。両 degree conjunct はここに bottom out。
+
+**∴ 次の真の上流 = W1-orbit 解析** (regular θ̄ の W1-stabilizer 自明 / M-level inertia=HC)。これは
+prime-TI (primeTIred) / §13 cyclic-TI と entangle。私の HU-inertia 機構 + regular θ̄ 構成は
+この上流の prerequisite として完備、残りは M-level W1-orbit ピース。caseB は U-irreducible ゆえ
+W1-orbit 自明 (全 θ̄ regular) で此処を回避; caseA 固有の追加。
+
+
+## conjunct c の最終的に sharp な構築 target — aperiodic tuple (2026-06-30)
+
+crux を最も具体的な形に: **W1 (order q, prime) は q 個の Hpart factors を q-cycle で transitive 置換**
+(W1_transitive_on_parts の実体)。dual で W1 は per-factor chars (ψ_i) を巡回 shift。
+- free W1-orbit char θ̄ = **aperiodic tuple** (ψ_1,…,ψ_q): 非自明 σ^k で固定 ⟺ 全 ψ_i 相等
+  (q-cycle ゆえ)。∴ **「全相等でない」⟹ trivial W1-stabilizer ⟹ I_M(χ)=HU**。
+- 存在: q≥3 (odd prime) かつ各 factor に p-1≥2 個の nontrivial char ⟹ not-all-equal tuple 存在。
+- downstream 完備: `huSub_normal` (HU◁M) ✅ + `isIrreducibleCharacter_induce_of_inertia_eq` ✅
+  ⟹ induceHU(χ) irreducible deg q·u。
+
+**唯一の残 prerequisite = W1-action de-opacify**: W1 が factors に q-cycle で作用する構造を (9.7)
+`typeP_Galois_Pn` (non-Galois 分解) から producer に threading + `W1_transitive_on_parts` 実体化。
+**次イテレーションの構築**: (1) producer に W1-permutation σ:Fin q≃Fin q (q-cycle) を露出、
+(2) 一般補題 `exists_aperiodic_regular_char` (exists_regular_char + not-all-equal で σ-stabilizer 自明)、
+(3) caseA instantiate → I_M=HU → induceHU irreducible deg qu → conjunct c。
+conjunct b も同じ W1-orbit (reducibles = 特定 W1-orbit 類) ゆえ此処共有。
+
+
+## 真の gating prerequisite 確定: (9.7) non-Galois decomposition の port (2026-06-30)
+
+調査確定: **(9.7) non-Galois 分解 (Coq `typeP_Galois_Pn`) は Lean 未 port**。S11 には opaque
+`W1_transitive_on_parts := True` のみ。producer (`clifford_caseA_data`) の S₀ は**任意の
+U-invariant order-p factor** で、non-Galois 分解の H1 (W1-conjugates が q factors を transitive
+置換) とは未接続。⟹ **W1-transitivity / W1-action は producer の現データから導けない**。
+
+**∴ 残 caseA degree (conjunct b/c/d) の gating = (9.7) typeP_Galois_Pn の port** (実質的新規形式化):
+Coq `typeP_Galois_Pn : ~~typeP_Galois → {H1 | oH1 ∧ nH1U ∧ defHbar : Hbar = \prod_{w∈W1bar} H1^w ∧ ...}`。
+H̄ = ⊕_{w∈W1bar} H1^w (W1-conjugate 分解)、H1 order-p、W1 が conjugates を巡回置換。これを Lean 化し
+producer の Hpart を H1^w に同定すれば W1-action (q-cycle) + transitivity が出る。
+
+**完成済 (gate まで)**: HU-inertia 機構 (core+lift), regular θ̄ 構成, combinatorial core
+(`constant_of_perm_invariant_of_transitive`)。**gate 後** (port 後): W1-action de-opacify →
+aperiodic regular θ̄ → I_M=HU (prime-index, relindex 不在ゆえ Nat.card 版要) → induceHU irreducible
+→ conjunct c。conjunct b は reducible=特定 W1-orbit。
+**次の真の作業 = (9.7) typeP_Galois_Pn の Lean port** (Coq PFsection9 の typeP_Galois_Pn 周辺精読 +
+W1-conjugate 分解構築)。これは数十行〜の coherent な新規形式化、fresh context 推奨。
+
+
+## (9.7) port の precise design — Coq typeP_Galois_Pn 精読 (2026-06-30、Coq-first)
+
+Coq `PFsection9.v` L323-365 精読完了:
+- `typeP_Galois := acts_irreducibly U Hbar` (= caseB、CliffordCaseBData.actsIrreducibly に対応)。
+- `typeP_Galois_Pn (~~Galois)` (= caseA) → `{H1 | #|H1|=p, U/H0 ⊂ N(H1), [acts U on H1],`
+  `⊕_(w∈W1bar) H1:^w = Hbar, a-property}`。
+- **構築**: H1 = U-minimal-normal subgroup of H̄ (mingroup_exists; ~~irreducible ゆえ proper、order p)。
+  = **my producer の S₀ に相当** (U-invariant order-p factor)。
+- **核心 = Clifford dprod 分解** `⊕_(w∈W1bar) H1:^w = Hbar`: UW1-表現 rUW1 (abelem_repr) に Clifford
+  理論 (`Clifford_basis irrUW1 simV1`) を適用、H1 = U-simple submodule の W1-conjugates が H̄ を
+  direct-sum 分解。W1 が conjugates を置換 = W1-transitivity (by construction)。
+
+**port 設計 (Lean)**:
+1. `typeP_Galois` predicate = U-action irreducible (既 CliffordCaseBData.actsIrreducibly)。
+2. caseA: U-minimal H1 ≤ H̄ (order p, U-inv) を取る (= 現 producer の S₀ 役)。
+3. **H̄ = ⊕_(w∈W1bar) H1^w** を Clifford 理論 (repo `Clifford.lean`) で構築 — **rep-theory-heavy 核心**。
+4. producer rework: Hpart j := H1^{w_j} (W1-conjugates、現 maximal-SupIndep 族を置換) ⟹ W1-action
+   (W1 permutes conjugates) + transitivity が by-construction で出る。
+
+**∴ (9.7) port の hard core = Clifford dprod 分解 (H̄=⊕H1^w)** = rep-theory 重量級、`Clifford.lean`
+(clifford_decomposition 等) 活用、fresh focused context 推奨。これが caseA degree (conjunct b/c/d) の
+唯一の真の gate。完成済は全て gate まで (HU-inertia + regular θ̄ + combinatorial core)。
