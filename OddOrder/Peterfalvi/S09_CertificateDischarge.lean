@@ -2398,4 +2398,22 @@ theorem zetaNuRhoNormSqGeOfDade
       rw [hz0_compl])
     hN_ind1H hP_ind1H hGsum hsmall
 
+/-- **The Dade integral character map is ℂ-linear** (the §12→§7 coherence-bridge keystone).
+`dadeIntegralCharacterMap` is `(LinearMap.exists_extend hyp.dadeLinearMap).choose.restrictScalars ℤ`
+— the ℂ-linear extension of the §4 Dade map, read as `ℤ`-linear (`IntegralCharacterMap`).  Its
+underlying function is therefore ℂ-linear: `τ (c • x) = c • τ x` for `c : ℂ`.  This is the missing
+ingredient for the (7.8.a) coherence agreement `τ(ζ_i − d_i ζ_0) = ν ζ_i − d_i ν ζ_0` (`d_i ∈ ℚ`):
+the integer-degree ℤ-combination `ζ_0(1)·ζ_i − ζ_i(1)·ζ_0 ∈ ℤ[S]` gives, via `extends_on_supported`
+and division, `ν ζ_i − d_i ν ζ_0 = τ ζ_i − d_i τ ζ_0`, and this ℂ-linearity closes the gap
+`τ(ζ_i − d_i ζ_0) = τ ζ_i − d_i τ ζ_0`. -/
+theorem dadeIntegralCharacterMap_smul_complex {G : Type*} [Group G] {A : Set G} {L : Subgroup G}
+    [Fintype G] [Fintype ↥L] [Invertible (Nat.card G : ℂ)] [Invertible (Nat.card L : ℂ)]
+    (hyp : OddOrder.Peterfalvi.S04.Hypothesis G A L)
+    (dade : OddOrder.Peterfalvi.S04.FullDadeIsometryData (G := G) hyp)
+    (c : ℂ) (x : ClassFunction ↥L ℂ) :
+    OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap hyp dade (c • x)
+      = c • OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap hyp dade x := by
+  simp only [OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap, LinearMap.restrictScalars_apply,
+    map_smul]
+
 end OddOrder.Peterfalvi.S09.Cert
