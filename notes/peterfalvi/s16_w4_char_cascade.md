@@ -624,3 +624,25 @@ hub step 3 を継続。**V-side 構成の中核を landing** (全 build-green、
 これで exists_MHypothesis の structural field (complement_card_eq_pq = e=pq) が供給可能に。
 deeper char (h78/§8) は別 (MHypothesis carrier に isolate 済)。[[feedback-no-avoiding-hard-parts]]
 [[hub-check-issue-before-asking-on-scope-violation]] [[scaffold-sorry-free-not-done]]
+
+### cont.¹⁷ (2026-06-30 lane c=γ /loop ×6-7): 🎉 V-side group-theory 構造入力 完成
+
+hub step 3 (V-side 構成) の **group-theory 部分を完遂** (commit `84ca5187` 他)。本セッション通算の
+V-side landing (全 build-green、~13 lemma/struct + Tdata carrier):
+- **carrier**: Tdata (base Hypothesis)。
+- **helper dual 6**: coprime_card_V_card_Q / isMulCommutative_V / not_normalizer_V_le_T /
+  exists_conj_typeP_V_of_coprime / typeI_V_le_fitting_of_coprime / typeI_overNormalizer_V_le_fitting。
+- **主存在**: `exists_typeI_maximal_overNormalizer_V` (N_G(V) 上 type-I maximal、branches swap)。
+- **Frobenius decomp**: p_not_dvd_kernel / exists_typeIFrobeniusData_W2_le。
+- **complement order**: `complement_card_eq_pq_V` (= pq、exists_MHypothesis の e=pq input)。
+- **authored gated dual** (sorried、deep §13 isolate): sConjugate_fitting_data / complement_inf_P_structure
+  / complement_le_PW1 / P_W1_structure (全て tConjugate/complement_le_QW2/Q_W2_structure 等 gated S-side の対称)。
+
+**⟹ V-side group-theory は出尽くした**。残 exists_MHypothesis (~35 field) は:
+1. **structural field wiring** (M/K/normalizer_V_le_M/typeIHyp/complement_card_eq_pq) = 上記 V-side
+   pieces を MHypothesis に配線 (機械的、TypeIData M → S14.Hypothesis M via hypothesis_of_typeIData)。
+2. **deep char field** (h78 coherence / §8 counting / Mset/tau/betaM grid 等) = lane a/b char keystone
+   gated、MHypothesis carrier に isolate。
+次 = (1) の structural wiring で exists_MHypothesis を de-opacify (bare sorry → 構造 field 充足 + char
+field isolate)、or TypeIOverNormalizerDataV packaging。[[feedback-no-avoiding-hard-parts]]
+[[scaffold-sorry-free-not-done]] [[hub-check-issue-before-asking-on-scope-violation]]
