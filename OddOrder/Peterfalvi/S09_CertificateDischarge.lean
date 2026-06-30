@@ -1648,4 +1648,19 @@ theorem zetaNuRho_inner_eq_cexpr {G : Type*} [Group G] [Fintype G] {A : Set G} {
       a e hind hc_ind1H hc_rest hP_real hd hN_ind1H hP_ind1H he]
   ring
 
+/-- **(7.8.b) real-part + matching.**  Taking the real part of the ℂ-level norm identity (all of
+`a, e, G, |L| = e·h` being real casts) and applying `normEstimate_matching`, the `ζ_0^ν`-norm
+equals Peterfalvi's quadratic `(1/e)(1−1/h)a² − (2/h)a + (1−e/h) = normQuadraticCorrection + (1−e/h)`.
+This bridges the ℂ-level `zetaNuRho_inner_eq_cexpr` to the ℝ-valued `NormEstimates` field. -/
+theorem cexpr_re_eq_normQuad (a e h G : ℝ) (he : e ≠ 0) (hh : h ≠ 0)
+    (hG : G = e * (h - 1) - e ^ 2) :
+    (((a : ℂ) - 1) ^ 2 / (e : ℂ) + (G : ℂ) / (e : ℂ) ^ 2
+        - (((a : ℂ) - 1) - (G : ℂ) / (e : ℂ)) ^ 2 / ((e : ℂ) * (h : ℂ))).re =
+      (1 / e) * (1 - 1 / h) * a ^ 2 - 2 * (1 / h) * a + (1 - e / h) := by
+  rw [show (((a : ℂ) - 1) ^ 2 / (e : ℂ) + (G : ℂ) / (e : ℂ) ^ 2
+        - (((a : ℂ) - 1) - (G : ℂ) / (e : ℂ)) ^ 2 / ((e : ℂ) * (h : ℂ)))
+      = (((a - 1) ^ 2 / e + G / e ^ 2 - ((a - 1) - G / e) ^ 2 / (e * h) : ℝ) : ℂ) from by
+      push_cast; ring,
+    Complex.ofReal_re, normEstimate_matching a e h G he hh hG]
+
 end OddOrder.Peterfalvi.S09.Cert
