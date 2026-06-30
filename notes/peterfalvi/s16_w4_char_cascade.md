@@ -862,3 +862,28 @@ landing すれば (13.6-13.8) → (13.10) → c_eq_one が連鎖。[[feedback-no
 仮説 χ⊥(ζ_i-ζ_0)^τ で S₁ 中間項 c_i=0、P⊆ker tail = α、α(1) ≡0 mod q)。これが intricate な reorganization。
 完成すれば `tiSubset_character_orthogonality` (13.5 producer) → (13.6-13.8) [arith 済] → (13.9)/(13.10) →
 numeric_bounds [済] → c_eq_one。[[feedback-no-avoiding-hard-parts]] [[scaffold-sorry-free-not-done]]
+
+### cont.²⁷ (2026-07-01 lane c=γ /loop): (13.5.a) reorganization の sub-plan 確定 (base decomp は landing 済)
+
+base decomp (`H_sharp_chiRho_eq_explicit`: χ(x) = ∑_{i∈Ioi 0}(c̄_i/‖ζ_i‖²)ζ_i(x) on H#) から
+(13.5.a) full form `χ = (a/‖ζ₁‖²)ζ₁ + α` (P off ker α) への reorganization の precise sub-plan:
+
+**🔑 kernel insight**: H76 family ζ_i = Ind_H^S θ_i (θ_i∈Irr H, distinct, exists_distinct_induced_family)。
+P◁H (H=PC≤S≤N(P)、P=S_F)。**P⊆ker(Ind_H^S θ) ⟺ P⊆ker θ** ゆえ family は 2 群に分割:
+S₁ middle = {Ind θ : P⊄ker θ} (P⊄ker)、tail = {Ind θ : P⊆ker θ}。
+
+**sub-steps**:
+1. (13.5) hypothesis χ⊥(ζ_i-ζ_0)^τ for S₁ middle (2≤i≤n) ⟹ c_i = cCoeff χ i = 0 ⟹ middle 項 drop
+   (Finset.sum_subset / filter で zero 項除去)。
+2. i=1 (distinguished ζ₁) を Finset.add_sum_erase 等で抽出 → (c̄_1/‖ζ_1‖²)ζ_1。
+3. **α := ∑_{tail}(c̄_i/‖ζ_i‖²)·Res_H ζ_i** (ClassFunction ↥H、tail を H に制限)。各 Res_H(Ind_H^S θ) (tail) は
+   P⊆ker (θ が P⊆ker ゆえ) ⟹ α の P⊆ker (= `alpha_kernel_contains_P`)。textbook: 「(1/‖ζ_i‖²)Res_H ζ_i is a
+   character of H having P in its kernel」(13.5.a 証明)。
+4. point_formula: χ(x) = (a/‖ζ_1‖²)ζ_1(x) + α(x) on H# (steps 1-3 合成、a = c̄_1)。
+5. norm_formula (13.5.b): `sum_normSq_real_smul_add` (Parseval核) + fact1/fact2。
+   alpha_norm_bound (13.5.c): `sum_normSq_erase_one_ge_of_const_on_subgroup` (α const on P から、step 3 で取得)。
+
+**⟹ 全部品は landing 済**: base decomp + facts1/2 + Parseval核 + alpha bound 補題。残=上記 1-4 の組立
+(kernel partition の Lean 化が核心: P⊆ker(Ind θ)⟺P⊆ker θ + tail の Res_H が P⊆ker)。multi-step だが
+全 prerequisite 在庫。fresh context で producer 組立を engage。[[feedback-no-avoiding-hard-parts]]
+[[scaffold-sorry-free-not-done]]
