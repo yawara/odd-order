@@ -1091,3 +1091,23 @@ counterexample_contradiction (2554, sorry-FREE)
    `psi_constant_on_xK` (12.14, 2308 sorried); `h_psig_int` = `rhoM_integer_values` (12.15, 2317);
    `hA` = (12.15) ρ_M norm; `hB` = (7.8.b) `S09.NormEstimates.zetaNuRho_norm_sq_ge` (Hypothesis78 構築);
    `hC` = (7.3) `S09.chiRho_integral_inequality`。lane γ `MHypothesis` (S16:1585) pattern を mirror。
+
+### loop⁴² — witness L の Dade+coherence foundation 確立 (hB への配線完了)
+
+**commit `fac8de5d`**: (12.16) char 核に向け、witness 第二極大 L の Dade machinery を named lemma 化:
+- `hypothesis_of_typeIData` (S14:159, sorry-free): explicit `TypeIData` → `Hypothesis L` + `hyp.typeI=data`
+  保存。`exists_typeI_hypothesis` を本 lemma 経由に refactor。**型 I witness の identity 保存が鍵** —
+  Nonempty 版は erase するため Frobenius 構造を hyp.H に transfer 不能だった。
+- `witness_L_hypothesis_frobenius` (S14:~2015): L は (12.10) で type-I ゆえ `Hypothesis data.L` +
+  `∃C, IsFrobeniusGroup ↥L (hyp.H.subgroupOf L) C`。
+- `witness_L_hypothesis` (forgetful)、`witness_L_coherent`: (12.6) `frobenius_typeI_coherent` 合成で
+  `Nonempty (S07.IsCoherent hyp.tau hyp.Sset hyp.A)`。S12.FiniteInduce scope で instance 自動。
+
+**これで `CounterexampleDadeData` の char 核への入力が揃った**: hyp (Dade isometry hyp.tau / 族 hyp.Sset /
+support hyp.A) + coherence。残るは:
+1. **hB = (7.8.b)**: coherence → `S09.Hypothesis78 G (A(L)) L` 構築 → `NormEstimates.zetaNuRho_norm_sq_ge`。
+   次 iteration の標的。lane γ `MHypothesis` (S16:1585) の h78 bundle pattern を mirror。**S09.Hypothesis78
+   の field 要件 + coherence からの構築経路を調査**するのが次の一歩。
+2. **DadeNotation 構築**: distinguished χ∈Sset (degree e) + 拡張 τ₁ → ψ=τ₁(χ)。(12.13) data。
+   e の degree bound (12.12) `complement_cyclic_order_dvd` (sorried) が he/h2e を供給。
+3. **hA/hC**: ρ_M norm (12.15) / `chiRho_integral_inequality` (7.3)。
