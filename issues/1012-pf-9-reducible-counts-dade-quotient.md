@@ -986,3 +986,16 @@ ker、Clifford 拡張不要)。⟹ 私の I_HU=HC seed (clifford_caseA_exists_ch
 6. 𝒳: ζ∈xiOf(H₀C) (H⊄ker: θ̄ nontrivial on H̄; H₀C⊆ker: inflation で自動) → χ∈𝒮(H₀C) (sOf_iff)。
 
 inertia heart (seed) は完成、残は char-construction plumbing (多層だが機構既知)。layer 1-2 が次。
+
+
+## conjunct c — extraction lemma 同定、forward construction が残 (2026-07-01)
+
+`caseB_exists_chiefFactorConstituent` (S11:5529) = **extraction** (χ∈𝒳 → θ₀ over、inertia=HC、linear)。
+(9.9.a) degree 決定用。conjunct c は **forward** (θ₀ regular → χ∈𝒳(H₀C) over θ₀ 構成) が必要。
+利用機構: `IrreducibleCharacter.LiesOver` / `exists_constituent_not_subset_characterKernel` /
+`exists_compHom_eq_of_subset_characterKernel` / `isIrreducibleCharacter_induce_of_inertia_eq` /
+`hcInHu_normal` / `huSub_normal`。
+
+**layer 1 (次)**: ψ on HC = inflate θ̄ — realized HC↠H̄ hom (HC=hInHu⊔cInHu⊆huSub、quotient
+HC/H₀C≅H̄)。これが realized-subgroup setting で intricate (subgroupOf chain + quotient iso)。
+seed (I_HU=HC + not-fixed、inertia heart) は完成、残は forward Clifford correspondence + M-level + 𝒳。
