@@ -4926,6 +4926,38 @@ theorem clifford_caseA_regular_inertia_hc [Finite G] {M : Subgroup G}
     (fun w => isAInvariant_comp_subtype_pointwise_smul hUnorm hS₀inv ↑w)
     hreg
 
+/-- **Regular character with `I_HU = HC`, not `W1`-fixed** (Clifford case (a), the (9.8.c) object).
+Packages `clifford_caseA_exists_regular_char_not_fixed` (a regular hom `θ` on `H̄` in a free
+`W1`-orbit) into the inertia statement: the inflation of `linearIrreducibleCharacter θ` has inertia
+`HC` in `HU` (via `clifford_caseA_regular_inertia_hc`), and `θ` carries the non-`W1`-fixedness datum
+`w₀` for the downstream `I_M = HU` step.  This is the existence of the (9.8.c) seed character. -/
+theorem clifford_caseA_exists_char_inertia_hc_not_fixed [Finite G] {M : Subgroup G}
+    {data : TypesIIIIIIVSetup M} (chief : ChiefFactorData data)
+    {S₀ : Subgroup (↥data.H ⧸ chief.N)} (hS₀ne : S₀ ≠ ⊥)
+    (hS₀inv : IsAInvariant ((typeP_quotientCoprimeAction data.typeP data.nontrivial.1
+        chief.N_aInvariant).φ.comp (typeP_quotientCoprimeAction data.typeP data.nontrivial.1
+        chief.N_aInvariant).U.subtype) S₀)
+    (hS₀card : Nat.card ↥S₀ = chief.p) (hp3 : 3 ≤ chief.p) :
+    ∃ θ : (↥data.H ⧸ chief.N) →* ℂˣ,
+      ClassFunction.inertia (G := ↥(huSub data)) (H := hInHu data)
+          (ClassFunction.compHom (hInHuEquivH data).toMonoidHom
+            (ClassFunction.compHom (QuotientGroup.mk' chief.N)
+              (linearIrreducibleCharacter θ : ClassFunction (↥data.H ⧸ chief.N) ℂ)))
+        = hInHu data ⊔ cInHu data chief ∧
+      ∃ w₀ : ↥(typeP_quotientCoprimeAction data.typeP data.nontrivial.1 chief.N_aInvariant).E,
+        θ.comp ((typeP_quotientCoprimeAction data.typeP data.nontrivial.1
+          chief.N_aInvariant).φ ↑w₀).toMonoidHom ≠ θ := by
+  obtain ⟨θ, hreg, w₀, hnf⟩ :=
+    clifford_caseA_exists_regular_char_not_fixed chief hS₀ne hS₀inv hS₀card hp3
+  refine ⟨θ, ?_, w₀, hnf⟩
+  refine clifford_caseA_regular_inertia_hc chief hS₀ne hS₀inv hS₀card
+    (θbar := linearIrreducibleCharacter θ) ?_
+  intro w
+  obtain ⟨x, hx, hxne⟩ := hreg w
+  refine ⟨x, hx, ?_⟩
+  simp only [linearIrreducibleCharacter_apply]
+  exact fun h => hxne ((Units.val_injective h).trans (map_one θ))
+
 /-- **Peterfalvi (9.7)**: the Clifford-theory dichotomy for the action on the chief factor `H/H_0`.
 
 The case split is `chiefFactor_clifford_U_dichotomy`: `U` acts on `H̄ = H/H₀` either irreducibly
