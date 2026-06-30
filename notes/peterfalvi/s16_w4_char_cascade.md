@@ -787,3 +787,26 @@ psi_tau1_*/h78_*/P_isTI/Q_isTI/card_normalizer_P,Q/W_normalizer_V/G0*)。これ�
    32-field assembly`。⟹ spine bare-sorry 1→1 (exists_MHypothesis sorry → exists_MCharData sorry)、
    structural 半は proven 化 = de-opacify。[[feedback-gated-endpoint-skeleton-pattern]]
    [[scaffold-sorry-free-not-done]] [[feedback-no-avoiding-hard-parts]]
+
+### cont.²⁴ (2026-06-30 lane c=γ /loop): 🎯 戦略 REFRAME — lane-c の真の remaining work は §13 char (lane-c OWNED, §5-9 上、blocked でない)
+
+h78 構成可能性を正面調査し、戦略を reframe (複数 iteration の「char は lane-a 共有/gated」思考を修正):
+
+- **h78 (Hypothesis78 for M) は lane-B coherence gated と確定**: `Hypothesis78` (S09:1433) は coherent
+  ν-isometry + `Hypothesis76` ((7.6) coherent family) + (7.8.c.i) certificate を要す。`S14.toHypothesis71`
+  は Hypothesis71 を構成するが Hypothesis78 producer は無 ⟹ §5-8 coherence (`frobenius_typeI_coherent`
+  → `sibleyTarget_frobI` S14:1289 sorry + (6.8) lane-B) gated。**lane-c solo 構成不可**。
+- **MCharData bundle は数学価値低 (sorry 再編成)**: structural 進捗は `exists_M_structural` が既に捕捉
+  (carrier 構成可能性=doneness 判定済)。bundle は spine sorry を relocate するだけ ⟹ 優先しない
+  ([[feedback-no-spine-sorry-verify-carrier]] hub cont.¹⁹ directive と私の技術分析が齟齬、本 entry で flag)。
+- **🎯 REFRAME: lane-c の真の deep work = §13 char (13.5-13.15)**。これは **lane-c OWNED**
+  (`S15_SAndT_Setup.lean` = 教科書§13「The Subgroups S and T」、lane-a の S10-S13 は §8-§11 で別)、
+  **§1-9 machinery 完了済の上に積める** (lane-a blocked でない)。§13 norm cascade infra は既に大量実装
+  (`innerSum_self_eq_sum_normSq`/`sum_normSq_eq_card_mul_inner`/`induce_one_apply`/Frobenius perm-char
+  vanishing 等、S15_SAndT_Setup:442+)。(13.11) numeric_bounds も済。**残 gate = (13.10) analytic
+  inequality (norm cascade 終端) → c_eq_one (13.12) → card_normalizer_P/Q + §16 数値矛盾**。
+
+**⟹ 次 iteration = §13 char を正面から engage** (fresh context): (13.5)-(13.10) norm cascade を
+既存 infra + §5-9 Dade-norm 上に構築し (13.10) analytic inequality (u/c > (p²-1)/6) に到達 →
+c_eq_one。heavy・multi-iteration だが lane-c の genuine 本丸。「ask/wait/re-org」でなく hard part を
+正面突破。[[feedback-no-avoiding-hard-parts]] [[scaffold-sorry-free-not-done]] [[feedback-flag-poor-progress]]
