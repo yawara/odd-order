@@ -2043,6 +2043,26 @@ noncomputable def SOf [Finite G] (_chars : Section11CharacterData data chief) (Y
 
 end Section11CharacterData
 
+/-- **A nontrivial character of a prime-order group is faithful.**  `ker χ ≤ K` has order
+dividing the prime `|K|`, and `χ ≠ 1` rules out `ker χ = K`, so `ker χ = ⊥`.  The per-factor input
+of Peterfalvi (9.8)'s `def_Itheta`: on each order-`p` chief-factor summand a nontrivial linear
+character is faithful, so any automorphism fixing it is the identity. -/
+theorem injective_of_prime_card_of_ne_one {K : Type*} [Group K] [Finite K]
+    (hp : (Nat.card K).Prime) (χ : K →* ℂˣ) (hχ : χ ≠ 1) : Function.Injective χ := by
+  rw [← MonoidHom.ker_eq_bot_iff]
+  have hdvd : Nat.card ↥(MonoidHom.ker χ) ∣ Nat.card K := Subgroup.card_subgroup_dvd_card _
+  rcases hp.eq_one_or_self_of_dvd _ hdvd with h1 | hpeq
+  · exact Subgroup.card_eq_one.mp h1
+  · exact absurd (MonoidHom.ker_eq_top_iff.mp ((MonoidHom.ker χ).eq_top_of_card_eq hpeq)) hχ
+
+/-- **An automorphism fixing a nontrivial character of a prime-order group is the identity.**
+`χ (α x) = χ x` with `χ` faithful (`injective_of_prime_card_of_ne_one`) forces `α x = x`. -/
+theorem mulAut_eq_one_of_fixes_ne_one_hom {K : Type*} [Group K] [Finite K]
+    (hp : (Nat.card K).Prime) (α : MulAut K) (χ : K →* ℂˣ) (hχ : χ ≠ 1)
+    (hfix : ∀ x, χ (α x) = χ x) : α = 1 := by
+  ext x
+  exact injective_of_prime_card_of_ne_one hp χ hχ (hfix x)
+
 /-- Case (a) of Peterfalvi (9.7): `H/H_0` splits as a direct product of `q`
 order-`p` factors permuted by `W_1`.
 
