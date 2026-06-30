@@ -468,6 +468,28 @@ theorem sum_normSq_eq_card_mul_inner {H : Type*} [Group H] [Fintype H]
     ((∑ g : H, ‖α g‖ ^ 2 : ℝ) : ℂ) = (Nat.card H : ℂ) * ClassFunction.inner α α := by
   rw [← innerSum_self_eq_sum_normSq, ClassFunction.card_mul_inner]
 
+/-- **Parseval expansion of a real-scalar linear combination** (the algebraic core of Peterfalvi
+(13.5.b)).  For complex functions `f, g` on a finite index set and a real scalar `κ`,
+`∑‖κ·f + g‖² = κ²∑‖f‖² + 2κ·Re(∑ f·ḡ) + ∑‖g‖²`.  In (13.5.b) this is applied with `κ = a/‖ζ₁‖²`,
+`f = ζ₁`, `g = α` on `H#`; together with the (13.5) sum facts `∑_{H#}|ζ₁|² = |S|‖ζ₁‖² − ζ₁(1)²` and
+`∑_{H#} ζ₁ᾱ = −ζ₁(1)α(1)` it yields the (13.5.b) norm decomposition consumed by `caseB_lambda_norm_core`
+(13.6) and `caseB_eta01_norm_core` (13.8). -/
+theorem sum_normSq_real_smul_add {ι : Type*} (s : Finset ι) (κ : ℝ) (f g : ι → ℂ) :
+    (∑ x ∈ s, ‖(κ : ℂ) * f x + g x‖ ^ 2)
+      = κ ^ 2 * (∑ x ∈ s, ‖f x‖ ^ 2)
+        + 2 * κ * (∑ x ∈ s, f x * (starRingEnd ℂ) (g x)).re
+        + (∑ x ∈ s, ‖g x‖ ^ 2) := by
+  have hpt : ∀ x ∈ s, ‖(κ : ℂ) * f x + g x‖ ^ 2
+      = κ ^ 2 * ‖f x‖ ^ 2 + 2 * κ * (f x * (starRingEnd ℂ) (g x)).re + ‖g x‖ ^ 2 := by
+    intro x _
+    rw [← Complex.normSq_eq_norm_sq, ← Complex.normSq_eq_norm_sq, ← Complex.normSq_eq_norm_sq,
+      Complex.normSq_add, Complex.normSq_mul, Complex.normSq_ofReal]
+    rw [show ((κ : ℂ) * f x) * (starRingEnd ℂ) (g x) = (κ : ℂ) * (f x * (starRingEnd ℂ) (g x)) by ring,
+      Complex.re_ofReal_mul]
+    ring
+  rw [Finset.sum_congr rfl hpt, Finset.sum_add_distrib, Finset.sum_add_distrib,
+    ← Finset.mul_sum, ← Finset.mul_sum, ← Complex.re_sum]
+
 open scoped Classical in
 /-- **Permutation-character value**: `(Ind_H^G 1_H)(g) = |H|⁻¹ · |{x ∈ G : x⁻¹gx ∈ H}|`.
 
