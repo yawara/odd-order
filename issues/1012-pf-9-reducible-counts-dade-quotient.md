@@ -1212,3 +1212,26 @@ inertia heart + ζ-irreducible(HU) + degree + H₀C⊆Ker + xiSet + xiOf 完成�
   for HC) 確立; hIM discharge → conjunct c の sorry 埋め (relocate 後)。
 
 ζ∈𝒳(H₀C) + degree + SOf + M-level irreducible(gated) 完成。残=propagation 1 ゲート + assembly。
+
+
+## conjunct-c FULLY ASSEMBLED — 残ゲートは propagation 1 本のみ (2026-07-01, commit 96e9c0a8)
+
+**hcZeta_exists_irreducible_sOf** (hIM-gated): ∃ χ∈𝒮(H₀C), IsIrreducibleCharacter χ ∧ χ(1)=qu を
+3 ピース (mem_sOf + irreducible + deg) で組立完了。conjunct c は **hIM さえ discharge すれば閉じる**。
+
+**build-red 修正 (重要)**: 40eaba00 の hcZeta_induceHU_irreducible は **leaf stale-green** で commit された
+build-red だった。原因 = (1) Invertible (card M) 未供給、(2) induceHU vs ClassFunction.induce の
+**letI/haveI desync** (induceHU は letI で instance を焼込むので、ambient も **letI (透明) で供給せねば
+defeq せず** exact/show/convert 全滅; haveI=opaque で破綻)。修正 = 全 instance を letI 供給 → exact 一発。
+正本 memory = [[lean-induce-transport-instance-desync]]。**clean rebuild (rm olean) で検証必須**
+([[leaf-build-stale-green]])。
+
+**残 = hIM discharge のみ (唯一の本質ゲート)**: θ̄^{w₀}≠θ̄ → conjBy w₀ ζ≠ζ → I_M(ζ)≠⊤ (deep Clifford)。
+machinery 在庫: `liesOver_conjBy`/`liesOver_conjBy_iff` (Clifford:836/846, conjBy equivariance),
+`RestrictionConstituentsSingleOrbit` (Clifford:870, 単一軌道), `induce_conjBy_eq` (Clifford:531),
+`clifford_caseA_exists_char_inertia_hc_not_fixed` (S11:5014, θ+hθ₀+w₀ 産出)。
+route: ζ LiesOver θ₀ → conjBy w₀ ζ=ζ なら ζ LiesOver conjBy w₀ θ₀ → 単一軌道で θ₀,conjBy w₀ θ₀ が
+HU-共役 → θ̄^{w₀}∈U-orbit(θ̄) → free-orbit 矛盾。Coq PFsection9 Part_a (880-915) +
+factor-permutation (980-994: conjg_Iirr) を熟読してから組む。
+
+ζ∈𝒳(H₀C) + degree + SOf + M-level irreducible(gated) + assembly 完成。残=propagation 1 本。
