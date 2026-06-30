@@ -8722,6 +8722,45 @@ theorem one_not_mem_zTilde (K Kstar : Subgroup G) : (1 : G) ∉ zTilde K Kstar :
   rw [zTilde, Set.mem_diff, not_and_or, not_not]
   exact Or.inr (Set.mem_union_left _ (SetLike.mem_coe.mpr K.one_mem))
 
+/-- **Algebraic core of the κ→Ẑ identification** (the final step of BG `mFT_partition` part 2):
+a product `y · y'` of a nonidentity `K*`-element `y` and a nonidentity `K`-element `y'` lies in
+`Ẑ = (K ⊔ K*) ∖ (K ∪ K*)`, provided `K ⊓ K* = ⊥`.  Membership in `K ⊔ K*` is immediate; `y·y' ∉ K`
+because then `y = (y·y')·y'⁻¹ ∈ K ⊓ K* = ⊥` contradicts `y ≠ 1`, and dually `y·y' ∉ K*`.  The deep
+part of κ→Ẑ (placing the σ-part `y` in `K* = C_{M_σ}(K)` via `Z = K ⊔ K*` cyclic, and the
+`κ`-element `y'` in the Hall `K`) wraps this core. -/
+theorem mem_zTilde_of_mul {K Kstar : Subgroup G} (htri : K ⊓ Kstar = ⊥)
+    {y y' : G} (hy : y ∈ Kstar) (hy1 : y ≠ 1) (hy' : y' ∈ K) (hy'1 : y' ≠ 1) :
+    y * y' ∈ zTilde K Kstar := by
+  rw [zTilde, Set.mem_diff]
+  refine ⟨(K ⊔ Kstar).mul_mem (Subgroup.mem_sup_right hy) (Subgroup.mem_sup_left hy'), ?_⟩
+  rw [Set.mem_union, not_or]
+  refine ⟨fun hmem => hy1 ?_, fun hmem => hy'1 ?_⟩
+  · have hyK : y ∈ K := by
+      have h := K.mul_mem (SetLike.mem_coe.mp hmem) (K.inv_mem hy')
+      rwa [mul_assoc, mul_inv_cancel, mul_one] at h
+    have h := Subgroup.mem_inf.mpr ⟨hyK, hy⟩
+    rwa [htri, Subgroup.mem_bot] at h
+  · have hy'Ks : y' ∈ Kstar := by
+      have h := Kstar.mul_mem (Kstar.inv_mem hy) (SetLike.mem_coe.mp hmem)
+      rwa [← mul_assoc, inv_mul_cancel, one_mul] at h
+    have h := Subgroup.mem_inf.mpr ⟨hy', hy'Ks⟩
+    rwa [htri, Subgroup.mem_bot] at h
+
+/-- **`y ∈ C_G(K)` from `y ∈ Z = K ⊔ K*` with `Z` cyclic** (the `cKZ` step of κ→Ẑ): since the
+join `K ⊔ K*` is cyclic — hence abelian — every element of it centralizes `K`.  Combined with
+`y ∈ M_σ`, this places the σ-part `y` in `K* = M_σ ⊓ C_G(K)`. -/
+theorem mem_centralizer_of_mem_sup_isCyclic {K Kstar : Subgroup G}
+    (hcyc : IsCyclic ↥(K ⊔ Kstar)) {y : G} (hyZ : y ∈ K ⊔ Kstar) :
+    y ∈ Subgroup.centralizer (K : Set G) := by
+  haveI := hcyc
+  letI : CommGroup ↥(K ⊔ Kstar) := IsCyclic.commGroup
+  rw [Subgroup.mem_centralizer_iff]
+  intro k hk
+  have hkZ : k ∈ K ⊔ Kstar := Subgroup.mem_sup_left (SetLike.mem_coe.mp hk)
+  have hcomm : (⟨k, hkZ⟩ : ↥(K ⊔ Kstar)) * ⟨y, hyZ⟩ = ⟨y, hyZ⟩ * ⟨k, hkZ⟩ := mul_comm _ _
+  have h := congrArg (Subgroup.subtype (K ⊔ Kstar)) hcomm
+  simpa using h
+
 /-- **BG Theorem 14.7, `|Ẑ| = (k − 1)(k* − 1)`** (mmd L4051): the TI-set `Ẑ = Z − (K ∪ K*)` has
 `(|K| − 1)(|K*| − 1)` elements.  `|Z| = |K|·|K*|` (`card_kappaHall_sup_Kstar`), `K ∩ K* = 1`
 (`kappaHall_inf_Kstar_eq_bot`) so `|K ∪ K*| = |K| + |K*| − 1`, and `|Ẑ| = |Z| − |K ∪ K*|`.
@@ -10457,6 +10496,105 @@ theorem typeP_centralizer_kappaElement_eq [Finite G] (hG : OddOrder.BG.IsMinimal
       exact le_inf (inf_le_left.trans (OddOrder.BG.Ch3.S10.Msigma_le M))
         (inf_le_right.trans (Subgroup.centralizer_le (Set.singleton_subset_iff.mpr hk)))
   exact le_antisymm hfwd hrev
+
+/-- **σ-part of a κ-branch element lies in `K*`** (the `Ks_y` step of κ→Ẑ): for a type-`P`
+maximal `M`, a `σ(M)`-element `y` that centralizes a nonidentity `κ`-Hall element `y' ∈ K^#` lies
+in `K* = M_σ ⊓ C_G(K)`.  Chain: `y ∈ M ⊓ C_G(y') = K ⊔ K*` (`typeP_centralizer_kappaElement_eq`,
+conjunct (d)); since `K ⊔ K*` is cyclic (`typeP_Z_isCyclic`), `y` centralizes `K`
+(`mem_centralizer_of_mem_sup_isCyclic`); with `y ∈ M_σ` this gives `y ∈ K*`. -/
+theorem typeP_sigmaElement_mem_Kstar [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (D : SigmaDecompositionData G) {M K Kstar U Mstar : Subgroup G} (hM : M ∈ maximalSubgroups G)
+    (hP : IsTypeP M) (hKM : K ≤ M) (hK : Ch03.IsHallSubgroup (kappa M) (K.subgroupOf M))
+    (hKstar : Kstar = OddOrder.BG.Ch3.S10.Msigma M ⊓ Subgroup.centralizer (K : Set G))
+    (hU : Ch03.IsHallSubgroup ((kappa M ∪ OddOrder.BG.Ch3.S10.sigma M)ᶜ) (U.subgroupOf M))
+    (hMstarmem : IsZFamilyMember M K Mstar) (hMstarne : Mstar ≠ M)
+    (hpart : ∀ N : Subgroup G, IsZFamilyMember M K N → N = M ∨ N = Mstar)
+    {y y' : G} (hyMsigma : y ∈ OddOrder.BG.Ch3.S10.Msigma M) (hy'K : y' ∈ K) (hy'1 : y' ≠ 1)
+    (hcent : y ∈ Subgroup.centralizer ({y'} : Set G)) :
+    y ∈ Kstar := by
+  haveI hcycZ : IsCyclic ↥(K ⊔ Kstar) :=
+    typeP_Z_isCyclic hG D hM hP hKM hK hKstar hU hMstarmem hMstarne hpart
+  haveI hcycK : IsCyclic ↥K :=
+    (Subgroup.subgroupOfEquivOfLe (le_sup_left : K ≤ K ⊔ Kstar)).isCyclic.mp inferInstance
+  have hyM : y ∈ M := OddOrder.BG.Ch3.S10.Msigma_le M hyMsigma
+  have hyMC : y ∈ M ⊓ Subgroup.centralizer ({y'} : Set G) := Subgroup.mem_inf.mpr ⟨hyM, hcent⟩
+  rw [typeP_centralizer_kappaElement_eq hG hM hP hKM hK hKstar hU y' hy'K hy'1] at hyMC
+  rw [hKstar]
+  exact Subgroup.mem_inf.mpr ⟨hyMsigma, mem_centralizer_of_mem_sup_isCyclic hcycZ hyMC⟩
+
+/-- **κ→Ẑ membership, core** (the `y'∈K` form): for a type-`P` maximal `M`, a nonidentity
+`σ(M)`-element `y` and a nonidentity `κ`-Hall element `y' ∈ K^#` that commute have product
+`y · y' ∈ Ẑ = (K ⊔ K*) ∖ (K ∪ K*)`.  Combines `typeP_sigmaElement_mem_Kstar` (`y ∈ K*`) with
+`mem_zTilde_of_mul` (using `K ⊓ K* = ⊥`, `kappaHall_inf_Kstar_eq_bot`).  The general κ-branch
+element (Coq `mFT_partition` part 2) reduces to this by conjugating its `κ`-element into `K`. -/
+theorem kappa_branch_mem_zTilde [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (D : SigmaDecompositionData G) {M K Kstar U Mstar : Subgroup G} (hM : M ∈ maximalSubgroups G)
+    (hP : IsTypeP M) (hKM : K ≤ M) (hK : Ch03.IsHallSubgroup (kappa M) (K.subgroupOf M))
+    (hKstar : Kstar = OddOrder.BG.Ch3.S10.Msigma M ⊓ Subgroup.centralizer (K : Set G))
+    (hU : Ch03.IsHallSubgroup ((kappa M ∪ OddOrder.BG.Ch3.S10.sigma M)ᶜ) (U.subgroupOf M))
+    (hMstarmem : IsZFamilyMember M K Mstar) (hMstarne : Mstar ≠ M)
+    (hpart : ∀ N : Subgroup G, IsZFamilyMember M K N → N = M ∨ N = Mstar)
+    {y y' : G} (hyMsigma : y ∈ OddOrder.BG.Ch3.S10.Msigma M) (hy1 : y ≠ 1) (hy'K : y' ∈ K)
+    (hy'1 : y' ≠ 1) (hcent : y ∈ Subgroup.centralizer ({y'} : Set G)) :
+    y * y' ∈ zTilde K Kstar :=
+  mem_zTilde_of_mul (kappaHall_inf_Kstar_eq_bot hKM hK hKstar)
+    (typeP_sigmaElement_mem_Kstar hG D hM hP hKM hK hKstar hU hMstarmem hMstarne hpart
+      hyMsigma hy'K hy'1 hcent)
+    hy1 hy'K hy'1
+
+/-- **κ→Ẑ membership, general form**: lifts `kappa_branch_mem_zTilde` to a `κ(M)`-element `y'` not
+necessarily in the chosen Hall `K`, via conjugation.  Since `⟨y'⟩` is a `κ(M)`-subgroup of `M`, an
+`a ∈ M` conjugates it into `K` (`exists_conj_smul_le_of_isHall`); then `aᵃ • (y · y')` lies in `Ẑ`
+(applying the core to `aᵃ • y ∈ M_σ` and `aᵃ • y' ∈ K`), so `y · y' ∈ 𝒞_G(Ẑ)`.  This is the
+κ-branch → `𝒞_G(Ẑ)` step of the NonType-I `G^#` cover (Coq `mFT_partition` part 2). -/
+theorem kappa_branch_mem_conjClassSet_zTilde [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (D : SigmaDecompositionData G)
+    {M K Kstar U Mstar : Subgroup G} (hM : M ∈ maximalSubgroups G) (hP : IsTypeP M) (hKM : K ≤ M)
+    (hK : Ch03.IsHallSubgroup (kappa M) (K.subgroupOf M))
+    (hKstar : Kstar = OddOrder.BG.Ch3.S10.Msigma M ⊓ Subgroup.centralizer (K : Set G))
+    (hU : Ch03.IsHallSubgroup ((kappa M ∪ OddOrder.BG.Ch3.S10.sigma M)ᶜ) (U.subgroupOf M))
+    (hMstarmem : IsZFamilyMember M K Mstar) (hMstarne : Mstar ≠ M)
+    (hpart : ∀ N : Subgroup G, IsZFamilyMember M K N → N = M ∨ N = Mstar)
+    {y y' : G} (hyMsigma : y ∈ OddOrder.BG.Ch3.S10.Msigma M) (hy1 : y ≠ 1) (hy'M : y' ∈ M)
+    (hy'1 : y' ≠ 1) (hcent : y ∈ Subgroup.centralizer ({y'} : Set G))
+    (hy'kappa : OddOrder.GroupTheory.IsPiElement (kappa M) y') :
+    y * y' ∈ conjClassSet (zTilde K Kstar) := by
+  classical
+  -- `⟨y'⟩` is a `κ(M)`-subgroup of `M`; conjugate it into `K`.
+  have hcloseM : Subgroup.closure ({y'} : Set G) ≤ M := by
+    rw [Subgroup.closure_le]; exact Set.singleton_subset_iff.mpr hy'M
+  have hcard : Nat.card ↥((Subgroup.closure ({y'} : Set G)).subgroupOf M) = orderOf y' := by
+    rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hcloseM).toEquiv,
+      ← Subgroup.zpowers_eq_closure, Nat.card_zpowers]
+  have hclosepi : Ch03.Subgroup.IsPiGroup (kappa M)
+      ((Subgroup.closure ({y'} : Set G)).subgroupOf M) := fun p hp =>
+    hy'kappa p (by rwa [hcard] at hp)
+  obtain ⟨a, haM, hale⟩ := exists_conj_smul_le_of_isHall hG hM hKM hK hcloseM hclosepi
+  have hay'K : MulAut.conj a • y' ∈ K :=
+    hale (Subgroup.smul_mem_pointwise_smul y' (MulAut.conj a) _
+      (Subgroup.subset_closure (Set.mem_singleton y')))
+  -- `aᵃ • y ∈ M_σ`.
+  have hMsigmaFix : MulAut.conj a • OddOrder.BG.Ch3.S10.Msigma M = OddOrder.BG.Ch3.S10.Msigma M := by
+    rw [← Msigma_conj_smul, Subgroup.conj_smul_eq_self_of_mem haM]
+  have hayMsigma : MulAut.conj a • y ∈ OddOrder.BG.Ch3.S10.Msigma M :=
+    hMsigmaFix ▸ Subgroup.smul_mem_pointwise_smul y (MulAut.conj a) _ hyMsigma
+  have hay1 : MulAut.conj a • y ≠ 1 := fun h => hy1 (by
+    rw [MulAut.smul_def] at h; exact (MulAut.conj a).injective (h.trans (map_one _).symm))
+  have hay'1 : MulAut.conj a • y' ≠ 1 := fun h => hy'1 (by
+    rw [MulAut.smul_def] at h; exact (MulAut.conj a).injective (h.trans (map_one _).symm))
+  -- `aᵃ • y` centralizes `aᵃ • y'`.
+  have haycent : MulAut.conj a • y ∈ Subgroup.centralizer ({MulAut.conj a • y'} : Set G) := by
+    rw [Subgroup.mem_centralizer_iff]
+    intro z hz
+    rw [Set.mem_singleton_iff.mp hz, MulAut.smul_def, MulAut.smul_def, ← map_mul, ← map_mul]
+    exact congrArg (MulAut.conj a) (Subgroup.mem_centralizer_iff.mp hcent y' (Set.mem_singleton y'))
+  -- `aᵃ • (y·y') = (aᵃ • y)·(aᵃ • y') ∈ Ẑ`, so `y·y' ∈ 𝒞_G(Ẑ)`.
+  have hzin : MulAut.conj a • (y * y') ∈ zTilde K Kstar := by
+    rw [MulAut.smul_def, map_mul, ← MulAut.smul_def, ← MulAut.smul_def]
+    exact kappa_branch_mem_zTilde hG D hM hP hKM hK hKstar hU hMstarmem hMstarne hpart
+      hayMsigma hay1 hay'K hay'1 haycent
+  exact ⟨MulAut.conj a • (y * y'), hzin, a⁻¹, by
+    rw [MulAut.smul_def, MulAut.conj_apply]; group⟩
 
 /-- **BG Theorem A(4)** (mmd L4279): `C_U(k) = 1` for `k ∈ K#` — the `(κ(M) ∪ σ(M))'`-Hall
 complement `U` meets each `M`-centralizer `C_M(k) = K ⊔ K*` trivially.
