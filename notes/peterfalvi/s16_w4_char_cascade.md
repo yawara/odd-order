@@ -928,3 +928,22 @@ Parseval → facts → `Complex.neg_re` → ring (一発 green)。
 hχ の直交 hmiddle ← **S-coherence** (§11-12, 上流: 必要なら sorried-cite, [[feedback-cite-sorried-lemmas-if-signature-correct]]);
 hvanish (ζ₁ が S∖H で消える) ← H 構造 (13.2: H◁S か); hinner ((Res_H ζ₁,α)=0) ← P-kernel 直交。
 + norm 恒等式 ∑_S|ζ₁|²=|S|‖ζ₁‖² (`sum_normSq_eq_card_mul_inner`)。[[scaffold-sorry-free-not-done]]
+
+### cont.³⁰ (2026-07-01 lane c=γ /loop): (13.6)+(13.8) bound engine LANDED (lambda-style 対完成)
+
+**4 連続 landing** (point formula → (13.5.b) decomp → (13.6) → (13.8))。bound engine 2 件:
+- `caseB_lambda_norm_bound` (commit 1a87e56f, (13.6)): λ irreducible ⟹ κ=1 で
+  `sum_normSq_sharp_chi_decomp` → `caseB_lambda_norm_core` ⟹ `∑_{H#}|λ^{τ1}|² ≥ |S|−λ(1)²`。
+- `caseB_eta01_norm_bound` (commit 1e1df33b, (13.8)): a=δ=±1 ⟹ κ=δ, δ²=1 で同型 →
+  `caseB_eta01_norm_core` ⟹ `firstTerm ≤ ∑_{H#}|η₀₁|²`。
+
+両者とも opaque bare-sorry endpoint (lambda_norm_lower/eta01_norm_lower) と違い **bound を実際に証明**
+(char-theoretic 仮説 hvanish/hinner/hχ/hT or hfirstTerm/hcross/hinfl/hu に条件付き、honest)。
+(13.7) は a=0 (η₁₀=α 直接) ゆえ薄い nat→real cast bridge のみ ⟹ wrapper 不要 (full proof inline)。
+
+**次 frontier = char facts の discharge** (deep, 各 χ の setup を要す): (1) hvanish = H◁S +
+induce-vanishing (13.2 構造調査); (2) hinner = P-kernel 直交 (Res_H ζ₁ が P⊄ker 成分, α が P⊆ker);
+(3) hχ = H_sharp_point_formula の instantiation + hmiddle (← S-coherence 上流 cite);
+(4) congruence α(1)=qb ((1.10.a)); (5) λ/η10/η01/τ1 の object setup (coherent family ← §11-12)。
+これらが揃えば bound → (13.9)/(13.10) cover+analytic → (13.11) numeric → c_eq_one (13.12)。
+[[scaffold-sorry-free-not-done]] [[feedback-cite-sorried-lemmas-if-signature-correct]]
