@@ -325,7 +325,8 @@ conjunct 3) / (9.9.c) exceptional (caseB conjunct 4) / (9.8.b,c,d) (caseA conjun
        と realize (`map_comap_eq`+`comap_ker`)、両者 L-normal (U'=Frobenius `typeP_uW1_frobenius.isNormal`、
        kernel=`MonoidHom.normal_ker`)⟹inf も L-normal。L の normal は L.subtype 押し出しで ↑(U⊔W₁) 全体に
        正規化 (`le_normalizer_map`+`normalizer_eq_top`+`range_subtype`、`← MonoidHom.range_eq_map`)。
-     - **残 = 組立 `chiefFactor_H0supC_subgroupOf_normal` (次 iteration、全 API 解決済、~60 行)**:
+     - **✅✅✅ 組立 DONE (commit 57f9239e): `chiefFactor_H0supC_subgroupOf_normal`** (S11、axiom-clean)。
+       ⟹ **3 構造入力 (∩H=H₀ / ≤HU / ◁M) 全完成**。下記レシピ通り landed:
        `(normal_subgroupOf_iff_le_normalizer hH0CleM).mpr (M ≤ N(H₀⊔C))`。M≤N(H₀⊔C) を:
        - **helper `key`** (`∀g∈Hs, toConjAct g•K≤K → Hs≤N(K)`): `conjAct_pointwise_smul_iff` +
          le_antisymm、逆向きは `pointwise_smul_le_pointwise_smul_iff.mpr (hle g⁻¹)` + `←mul_smul,←map_mul,
@@ -342,6 +343,16 @@ conjunct 3) / (9.9.c) exceptional (caseB conjunct 4) / (9.8.b,c,d) (caseA conjun
          + `sup_assoc` ⟹ `M ≤ H⊔(U⊔W₁)` で `sup_le hH hUW1` に流す。
      その後 generic count refactor (chiefFactorQuotientHypothesis を N' (3条件: ◁M / ≤HU / ∩H=H₀) 一般化 +
      H₀/H₀C instance)。
+
+   **✅✅ 2026-06-30 (commit 248e268e): generic count refactor step 1 — hypothesis 層 一般化**:
+   - `chiefFactorQuotientHypothesisGen` (S06.Hypothesis(↥M⧸N') を generic N' (◁M, ≤M', W₁⊓N'=⊥, ¬W₂≤N')
+     で構成)。`chiefFactorQuotientHypothesis` (H₀) は delegate (bridge lemmas + reducible_count_sOf_H0 不変)。
+   - H₀C instance 入力: `chiefFactor_W1_inf_H0supC_subgroupOf_eq_bot` + `chiefFactor_W2_not_le_H0supC`。
+   - 残 (次 iteration、reducible_count_sOf_H0C へ): **A. generic |W̄₂'|=p** (H₀C 版): `Nat.card((W₂.subgroupOf M).map(mk' N'))`
+     = |W₂.subgroupOf M|/|W₂.subgroupOf M ⊓ N'`、kernel 一致 `W₂⊓H₀C=W₂⊓H₀` (W₂≤H, chiefFactor_H0supC_inf_H_eq_H0)
+     ⟹ H₀ 版 (`chiefFactor_card_W2bar`) と同値 = p。**B. `reducible_count_sOf_H0` を carrier K で一般化**
+     (~150 行、chief.H0→K、H₀-specific lemma → Gen + 一般 K_eq `chiefFactorQuotientHypothesisGen_K_eq` +
+     K≤huSub=hN'le + |W̄₂|=p 入力)。**C. H₀/H₀C instantiate** → `reducible_count_sOf_H0C` 実証明。
 - **⚠ caseA は独自 degree lemma 要**: caseA_character_counts は caseB を scope に持たない ⟹
   `caseB_degree_qu` cite 不可。(9.8.b) degree も caseA 版 chief-factor-constituent で別途。
 - **⚠ caseA は独自 degree lemma 要**: caseA_character_counts は caseB を scope に持たない ⟹
