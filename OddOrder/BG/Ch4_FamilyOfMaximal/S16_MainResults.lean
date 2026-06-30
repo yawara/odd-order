@@ -1682,6 +1682,71 @@ theorem exists_reps_sigma_partition [Finite G] (hG : OddOrder.BG.IsMinimalSimple
   exact ⟨reps, hrepsMax, sigma_reps_prime_cover hG hrepsMax hreps,
     fun _ hMi _ hMj hne => sigma_reps_pairwise_disjoint hG hrepsMax hreps hMi hMj hne⟩
 
+/-- The `𝒞_G(M̃)` cover taken over *all* maximal subgroups equals the cover taken over a set of
+conjugacy representatives `reps` (`M̃` is conjugation-equivariant, `𝒞_G` is conjugation-invariant).
+The `←` direction needs `reps ⊆ maximalSubgroups`. -/
+theorem mem_conjClassSet_Mtilde_maximals_iff_reps [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {reps : Set (Subgroup G)}
+    (hreps_max : ∀ Mi ∈ reps, Mi ∈ maximalSubgroups G)
+    (hreps : ∀ H ∈ maximalSubgroups G, ∃ Mi ∈ reps, S14.IsConjugateSubgroup H Mi) (g : G) :
+    (∃ M' ∈ maximalSubgroups G,
+      g ∈ conjClassSet (S14.Mtilde hG (S14.genuineSigmaDecomposition hG) M')) ↔
+      (∃ Mi ∈ reps,
+        g ∈ conjClassSet (S14.Mtilde hG (S14.genuineSigmaDecomposition hG) Mi)) := by
+  refine ⟨fun ⟨M', hM'max, hg⟩ => ?_, fun ⟨Mi, hMirep, hg⟩ => ⟨Mi, hreps_max Mi hMirep, hg⟩⟩
+  obtain ⟨Mi, hMirep, c, hc⟩ := hreps M' hM'max
+  exact ⟨Mi, hMirep, by
+    rw [← hc, ← S14.Mtilde_conj_smul, S14.conjClassSet_conj_smul]; exact hg⟩
+
+/-- **theoremE conjunct 5** (BG Cor 14.9, over a representative set): `G#` is covered by the
+`𝒞_G(M̃_{Mi})` (`Mi ∈ reps`), plus — exactly when a type-`P` maximal exists — the conjugates of the
+exceptional `Ẑ = zTilde K K*`.  The all-type-`F` case is the lane-d M̃-cover; the type-`P` case is
+the NonTypeICovering fixed-`W` cover.  Both go through the reps-conversion helper. -/
+theorem sharpSubgroup_top_cover_reps_dichotomy [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {reps : Set (Subgroup G)}
+    (hreps_max : ∀ Mi ∈ reps, Mi ∈ maximalSubgroups G)
+    (hreps : ∀ H ∈ maximalSubgroups G, ∃ Mi ∈ reps, S14.IsConjugateSubgroup H Mi)
+    {M K Kstar U : Subgroup G} (hM : M ∈ maximalSubgroups G) (hKM : K ≤ M)
+    (hK : Ch03.IsHallSubgroup (S14.kappa M) (K.subgroupOf M))
+    (hKstar : Kstar = OddOrder.BG.Ch3.S10.Msigma M ⊓ Subgroup.centralizer (K : Set G))
+    (hU : Ch03.IsHallSubgroup ((S14.kappa M ∪ OddOrder.BG.Ch3.S10.sigma M)ᶜ) (U.subgroupOf M)) :
+    (S14.maximalTypePFamily G = ∅ →
+      sharpSubgroup (⊤ : Subgroup G) =
+        {g | ∃ Mi ∈ reps, g ∈ conjClassSet (S14.Mtilde hG (S14.genuineSigmaDecomposition hG) Mi)}) ∧
+    (S14.maximalTypePFamily G ≠ ∅ → S14.IsTypeP M →
+      sharpSubgroup (⊤ : Subgroup G) =
+        {g | ∃ Mi ∈ reps, g ∈ conjClassSet (S14.Mtilde hG (S14.genuineSigmaDecomposition hG) Mi)} ∪
+          conjClassSet (S14.zTilde K Kstar)) := by
+  -- conjugacy-saturation of a `1`-free set lands in `(⊤)#`.
+  have hsub : ∀ S : Set G, (1 : G) ∉ S → conjClassSet S ⊆ sharpSubgroup (⊤ : Subgroup G) := by
+    rintro S hS y ⟨t, ht, g, rfl⟩
+    rw [sharpSubgroup, Set.mem_diff, Set.mem_singleton_iff]
+    exact ⟨Subgroup.mem_top _, fun h1 =>
+      hS ((mul_left_cancel ((mul_inv_eq_one.mp h1).trans (mul_one g).symm) : t = 1) ▸ ht)⟩
+  refine ⟨fun hempty => ?_, fun _ hMP => ?_⟩
+  · -- `𝓜_P = ∅`: every maximal is type-`F`, so the M̃-cover holds; convert to `reps`.
+    have htypeF : ∀ M' ∈ maximalSubgroups G, S14.IsTypeF M' := fun M' hM'max =>
+      S14.isTypeF_iff_not_isTypeP.mpr fun hP =>
+        Set.notMem_empty M' (hempty ▸ (⟨hM'max, hP⟩ : M' ∈ S14.maximalTypePFamily G))
+    rw [S14.sharpSubgroup_top_eq_iUnion_conjClassSet_Mtilde_of_typeF hG htypeF]
+    ext g
+    simp only [Set.mem_iUnion₂, Set.mem_setOf_eq, exists_prop]
+    exact mem_conjClassSet_Mtilde_maximals_iff_reps hG hreps_max hreps g
+  · -- `𝓜_P ≠ ∅`, `M` type-`P`: fixed-`W` cover, convert the M̃ branch to `reps`.
+    apply Set.Subset.antisymm
+    · intro x hx
+      have hx1 : x ≠ 1 := by
+        rw [sharpSubgroup, Set.mem_diff, Set.mem_singleton_iff] at hx; exact hx.2
+      rcases S14.exists_mem_conjClassSet_Mtilde_or_fixed_zTilde hG hM hMP hKM hK hKstar hU hx1 with
+        ⟨M', hM'max, hg⟩ | hxZ
+      · exact Set.mem_union_left _
+          ((mem_conjClassSet_Mtilde_maximals_iff_reps hG hreps_max hreps x).mp ⟨M', hM'max, hg⟩)
+      · exact Set.mem_union_right _ hxZ
+    · rintro y (⟨Mi, hMirep, hg⟩ | hy)
+      · exact hsub _ (S14.one_not_mem_Mtilde hG (S14.genuineSigmaDecomposition hG)
+          (hreps_max Mi hMirep)) hg
+      · exact hsub _ (S14.one_not_mem_zTilde K Kstar) hy
+
 /-- **BG Theorem E** (mmd L4370): with `R(x)` as in Theorem D and
 `\widetilde M = ⋃_{x ∈ M_sigma#} xR(x)`, the conjugacy saturation of
 `\widetilde M` has the stated size, the representative maximal subgroups give a
@@ -1692,31 +1757,43 @@ are covered by the corresponding `\widetilde M_i` pieces, with the additional
 Proof gates: Lemma 14.5(c) for the cardinal formula, Theorem 13.9 for the
 `σ(M_i)` disjoint union, and Corollary 14.9 for the final covering. -/
 theorem theoremE_sigma_partition_and_counting [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
-    {M K Kstar : Subgroup G} (hM : M ∈ maximalSubgroups G)
+    {M K Kstar U : Subgroup G} (hM : M ∈ maximalSubgroups G) (hKM : K ≤ M)
     (hK : Ch03.IsHallSubgroup (S14.kappa M) (K.subgroupOf M))
     (hKstar : Kstar = OddOrder.BG.Ch3.S10.Msigma M ⊓ Subgroup.centralizer (K : Set G))
-    (R : Subgroup G → G → Subgroup G) (reps : Set (Subgroup G))
+    (hU : Ch03.IsHallSubgroup ((S14.kappa M ∪ OddOrder.BG.Ch3.S10.sigma M)ᶜ) (U.subgroupOf M))
+    {reps : Set (Subgroup G)} (hrepsMax : ∀ Mi ∈ reps, Mi ∈ maximalSubgroups G)
     (hreps : ∀ H : Subgroup G, H ∈ maximalSubgroups G →
-      ∃! Mi : Subgroup G, Mi ∈ reps ∧ S14.IsConjugateSubgroup H Mi)
-    -- `R` must be the Theorem D normal-complement data `R(x)` (the docstring's
-    -- "`R(x)` as in Theorem D"); without this the conclusion would be claimed for an
-    -- arbitrary `R`, which is false. Pins `R M ·` and each `R Mi ·` to `RData`.
-    (hR : ∀ x ∈ sigmaSharp M, RData M x (R M x))
-    (hRreps : ∀ Mi ∈ reps, ∀ x ∈ sigmaSharp Mi, RData Mi x (R Mi x)) :
-    Nat.card (conjClassSet (tildeM M (R M))) =
+      ∃! Mi : Subgroup G, Mi ∈ reps ∧ S14.IsConjugateSubgroup H Mi) :
+    Nat.card (conjClassSet (S14.Mtilde hG (S14.genuineSigmaDecomposition hG) M)) =
         (Nat.card ↥(OddOrder.BG.Ch3.S10.Msigma M) - 1) * M.index ∧
       (∀ p : ℕ, p ∈ (Nat.card G).primeFactors ↔
         ∃ Mi : Subgroup G, Mi ∈ reps ∧ p ∈ OddOrder.BG.Ch3.S10.sigma Mi) ∧
       (∀ Mi ∈ reps, ∀ Mj ∈ reps, Mi ≠ Mj →
         OddOrder.BG.Ch3.S10.sigma Mi ∩ OddOrder.BG.Ch3.S10.sigma Mj = ∅) ∧
       (∀ Mi ∈ reps, ∀ Mj ∈ reps, Mi ≠ Mj →
-        conjClassSet (tildeM Mi (R Mi)) ∩ conjClassSet (tildeM Mj (R Mj)) = ∅) ∧
+        conjClassSet (S14.Mtilde hG (S14.genuineSigmaDecomposition hG) Mi) ∩
+          conjClassSet (S14.Mtilde hG (S14.genuineSigmaDecomposition hG) Mj) = ∅) ∧
       (let tildeG : Set G :=
-        {g | ∃ Mi : Subgroup G, Mi ∈ reps ∧ g ∈ conjClassSet (tildeM Mi (R Mi))}
+        {g | ∃ Mi : Subgroup G,
+          Mi ∈ reps ∧ g ∈ conjClassSet (S14.Mtilde hG (S14.genuineSigmaDecomposition hG) Mi)}
        (S14.maximalTypePFamily G = ∅ → sharpSubgroup (⊤ : Subgroup G) = tildeG) ∧
         (S14.maximalTypePFamily G ≠ ∅ → S14.IsTypeP M →
           sharpSubgroup (⊤ : Subgroup G) = tildeG ∪ conjClassSet (S14.zTilde K Kstar))) := by
-  sorry
+  refine ⟨?_, fun p => sigma_reps_prime_cover hG hrepsMax hreps p, ?_, ?_, ?_⟩
+  · rw [Nat.card_coe_set_eq]
+    exact S14.sigmaConjugacySaturation_Mtilde_ncard hG (S14.genuineSigmaDecomposition hG) hM
+  · intro Mi hMi Mj hMj hne
+    exact sigma_reps_pairwise_disjoint hG hrepsMax hreps hMi hMj hne
+  · intro Mi hMi Mj hMj hne
+    rw [← Set.disjoint_iff_inter_eq_empty]
+    refine S14.conjClassSet_Mtilde_disjoint hG (S14.genuineSigmaDecomposition hG)
+      (hrepsMax Mi hMi) (hrepsMax Mj hMj) ?_
+    intro hconj
+    obtain ⟨_, _, huniq⟩ := hreps Mi (hrepsMax Mi hMi)
+    exact hne ((huniq Mi ⟨hMi, S14.IsConjugateSubgroup.refl Mi⟩).trans
+      (huniq Mj ⟨hMj, hconj⟩).symm)
+  · exact sharpSubgroup_top_cover_reps_dichotomy hG hrepsMax (fun H hH => (hreps H hH).exists)
+      hM hKM hK hKstar hU
 
 /-- **BG §16 `A(M)`/`A_0(M)` support slice**: the auxiliary sets from this section
 have the TI and support properties used by the downstream character-theory interface.

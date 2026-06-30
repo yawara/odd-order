@@ -9863,6 +9863,18 @@ theorem isTypeP1_conj_smul [Finite G] (g : G) (M : Subgroup G) :
   unfold IsTypeP1
   rw [kappa_conj_smul, sigmaComplementPrimes_conj_smul, isTypeP_conj_smul]
 
+/-- **A normal Hall subgroup is the unique Hall subgroup of its primes** (finite solvable group):
+two Hall `π`-subgroups are conjugate (`hall_C`), and a normal one is fixed by conjugation, so they
+coincide.  Used to pin the Theorem D normal complement `R(x)` (a normal Hall complement in `C_G(x)`)
+to the canonical signalizer `Rsub`. -/
+theorem eq_of_isHall_of_normal {K : Type*} [Group K] [Finite K] [IsSolvable K] {π : Set ℕ}
+    {H₁ H₂ : Subgroup K} (hH₁ : Ch03.IsHallSubgroup π H₁) (hH₂ : Ch03.IsHallSubgroup π H₂)
+    (hN : H₁.Normal) : H₁ = H₂ := by
+  haveI := hN
+  obtain ⟨g, hg⟩ := Ch03.hall_C hH₁ hH₂
+  rw [← hg]
+  exact (Subgroup.Normal.conj_smul_eq_self g H₁).symm
+
 /-- **κ-Hall data transfers under conjugation of the ambient maximal**: if `conj g • N = M` and
 `KN.subgroupOf N` is a Hall `κ(N)`-subgroup, then `(conj g • KN).subgroupOf M` is a Hall
 `κ(M)`-subgroup.  Conjugation by `g` restricts to a `↥N ≃ ↥M` preserving both `Nat.card` and the
