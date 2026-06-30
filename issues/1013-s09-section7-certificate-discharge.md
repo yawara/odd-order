@@ -567,3 +567,27 @@ rhoM_integer_values 12.15 / intersection_complement_structure 12.11) + §7 norm 
 (`NormEstimates` / `zetaNuRhoNormSq_ge_of_facts` for hB) で discharge。whnf-wall は hB の
 concrete fact 充足で再来 → ここで根治 (clean literal / bundle) が必要。(12.6)/(12.10)/(12.11) は
 signature contract 経由 cite。これが §7→§12→(12.16)→FT の実接続。
+
+### 2026-07-01 (loop 継続²⁴⁻): ⭐ whnf-wall は幻だった + betaDecompOfDade (concrete (7.8.a))
+
+**whnf-wall の再検証で否定**: probe (variable inputs で `hypothesis78OfDade` 適用→projection) により
+`.hyp76.n` / `.hyp76.zeta` / `.nu` / `.hyp76.hyp71` / `.ind1H` / `.zetaDistinct` がすべて default
+heartbeats で `rfl` projection 可能と実証。従来「`.hyp76.n` が巨大 tactic def を unfold して
+>1M heartbeats」は誤りで、旧 `betaDecompOfDade` failure は coupled tactic 固有の問題だった。
+**concrete instantiation は wall-free**。
+
+✅ **`betaDecompOfDade` (commit 5c80fedb)**: `hypothesis78OfDade` 出力 concrete H78 に
+`betaDecompOfFacts` を適用し (7.8.a) BetaDecomp を構成。facts discharge:
+- family 直交/ノルム/degree-real = induce 補題 (`induce_family_orthogonal_of_injective` /
+  `induce_norm_ne_zero` / `induce_apply_one_ne_zero` / `induce_apply_one_star`) を defeq で。
+- coherence agreement: 供給 hagree (passed-d) を computed-d (`H78.hyp76.d i = ζ_i(1)/ζ_0(1)`, hdeq)
+  へ `Subtype.ext` で輸送 (dependent subtype の motive 破綻を回避: show を induce 形で書き
+  post-`rw [hdeq i]` が syntactic rfl になるよう)。
+- ⟨β,1_G⟩=1 内部計算 (beta_def + inner_tau_supported_constOne + induce 補題)。
+- 残 genuine §7 入力 = hzeta0nu (ζ_0^ν⊥1_G)・hζ0norm (‖ζ_0‖²=1)・整数 a/ha。
+
+**concrete path 開通**: `hypothesis78OfDade` → concrete H78 → `betaDecompOfDade` → BetaDecomp。
+**次 = NormEstimates concrete** (同パターンで (7.8.b) producer `zetaNuRhoNormSq_eq_normQuad_of_facts`
++ γ-side を concrete H78 へ; facts は同様に induce で discharge) → **`exists_counterexample_dade_data`
+(S14:2740 sorry) 接続** (witness L の H78 構築 + CounterexampleDadeData.hB=my (7.8.b) bound)。
+full build 3889 jobs 緑、AxiomsCheck OK。
