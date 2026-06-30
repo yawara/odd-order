@@ -428,3 +428,28 @@ hypothesis78OfDade は **zetaDistinct=0 (ζ_0=区別 ζ)** に設定。→ 2 案
 
 次 loop = (A) で identification 構築に着手 (再 indexing 不要、既存 H78 で直接; 族直交
 + degree-sum + c_i 同定 + 代数)。multi-turn の見込み。
+
+### 2026-07-01 (loop 継続¹⁵⁻): (7.8.b) collapse 完成 + case-A 代数 fully mapped + (1.5.d) 前提特定
+
+✅ **building blocks 完成**: `cCoeff_nu_zeta_zero_eq_neg_d` (c_i=−d_i)、
+`cCoeff_nu_zeta_zero_ind1H_eq` (c_ind1H=(β,ζ_0^ν)=a−1)、`chiRho_norm_sq_collapse`
+(double-sum → Σ|c_i|²/N_i − (1/|L|)|Σc_iζ_i(1)/N_i|²、族直交)。全 sorry-free。
+
+**case-A 代数を完全に導出** (ζ_0=ζ=区別、zetaDistinct=0 は certificate が要求するので固定):
+c_ind1H=a−1, c_i=−d_i (i≠0,ind1H), d_i=P_i/e, N_ind1H=‖Ind 1_H‖²=e, P_ind1H=P_0=e。
+G := Σ_{φ∈S∖{ζ}} φ(1)²/‖φ‖² と置くと:
+- Term1 = (a−1)²/e + G/e²、Q = (a−1) − G/e、|L|=eh。
+- ‖ζ^{νρ}‖² = Term1 − |Q|²/(eh) は **G = e(h−1) − e²** を代入して ua²−2va+w に一致 (要検算)。
+
+🔑 **残の鍵 = (1.5.d) S-degree-sum bridge**: `Σ_{φ∈S} φ(1)²/‖φ‖² = e(h−1)`
+(= e·Σ_{θ∈Irr H,θ≠1}θ(1)²、誘導指標の orbit/Clifford 構造で `sumNontrivialIrreducibleDegreeSq`
+に橋渡し)。**repo に未在** (誘導指標 degree/norm の orbit 関係、substantial prerequisite)。
+教科書は (7.8.c.i) で ζ_0=ζ、(7.8.b) で ζ_0∈S−{ζ} と **参照を部分ごとに変える** (case B clean)
+が、formalization は H76 の ζ_0 固定ゆえ certificate と整合する case A 一択、よって G が要る。
+
+⚠ **lane γ の indChainDecomposition 機構** (S09:1574+、IsCoherent extension の chain 分解、
+`re_eq_one_sub_sum_sq` で Σd² 計算) が並行存在。(7.8.b) NormEstimates producer は未在
+(重複なし) だが、indChain は (7.8.a/b) norm の別アプローチ。統合の余地あり。
+
+次 = (7.8.b) 代数 assembly (degree facts + G を hypothesis に取り collapse+c_i から ua²−2va+w)
+を構築 (G は (1.5.d) carrier 入力、別途 bridge)。または (1.5.d) bridge を先に。multi-turn。
