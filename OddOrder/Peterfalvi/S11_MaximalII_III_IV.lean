@@ -4882,6 +4882,50 @@ theorem clifford_caseA_exists_regular_char_not_fixed [Finite G] {M : Subgroup G}
     (by simp only [Subgroup.coe_one, map_one, one_smul])
   exact ⟨θ, hreg, w₀, hnf⟩
 
+/-- **`I_HU(θ₀) = HC` for a `W1`-conjugate regular character** (Clifford case (a), free orbit).
+Applies the generic inertia lift `inertia_eq_hcInHu_gen` to the `W1`-conjugate family
+`{act.φ↑w • S₀}_{w∈W1}`: each is `U`-invariant (since `S₀` is and `U ◁ UW1`, so `U` fixes each
+conjugate as a subgroup), they span `H̄` by (9.7), and have order `p`.  For a character nontrivial on
+each (a regular character), its inflation `θ₀` has inertia `HC` in `HU` — the `I_HU = HC` step toward
+the degree-`qu` irreducible of (9.8.c). -/
+theorem clifford_caseA_regular_inertia_hc [Finite G] {M : Subgroup G}
+    {data : TypesIIIIIIVSetup M} (chief : ChiefFactorData data)
+    {S₀ : Subgroup (↥data.H ⧸ chief.N)} (hS₀ne : S₀ ≠ ⊥)
+    (hS₀inv : IsAInvariant ((typeP_quotientCoprimeAction data.typeP data.nontrivial.1
+        chief.N_aInvariant).φ.comp (typeP_quotientCoprimeAction data.typeP data.nontrivial.1
+        chief.N_aInvariant).U.subtype) S₀)
+    (hS₀card : Nat.card ↥S₀ = chief.p)
+    {θbar : IrreducibleCharacter (↥data.H ⧸ chief.N)}
+    (hreg : ∀ w : ↥(typeP_quotientCoprimeAction data.typeP data.nontrivial.1 chief.N_aInvariant).E,
+      ∃ x ∈ (typeP_quotientCoprimeAction data.typeP data.nontrivial.1 chief.N_aInvariant).φ ↑w • S₀,
+        (θbar : ClassFunction (↥data.H ⧸ chief.N) ℂ) x
+          ≠ (θbar : ClassFunction (↥data.H ⧸ chief.N) ℂ) 1) :
+    ClassFunction.inertia (G := ↥(huSub data)) (H := hInHu data)
+        (ClassFunction.compHom (hInHuEquivH data).toMonoidHom
+          (ClassFunction.compHom (QuotientGroup.mk' chief.N)
+            (θbar : ClassFunction (↥data.H ⧸ chief.N) ℂ)))
+      = hInHu data ⊔ cInHu data chief := by
+  set act := typeP_quotientCoprimeAction data.typeP data.nontrivial.1 chief.N_aInvariant with hact
+  have hUnorm : act.U.Normal := (typeP_uW1_frobenius data.typeP data.nontrivial.1).isNormal
+  have hspan0 : ⨆ a, act.φ a • S₀ = ⊤ :=
+    iSup_smul_eq_top_of_irreducible (φ := act.φ) chief.quotient_chiefFactor hS₀ne
+  have htop : act.U ⊔ act.E = ⊤ := by
+    show data.typeP.U.subgroupOf (data.typeP.U ⊔ data.typeP.W1)
+        ⊔ data.typeP.W1.subgroupOf (data.typeP.U ⊔ data.typeP.W1) = ⊤
+    rw [← Subgroup.subgroupOf_sup le_sup_left le_sup_right, Subgroup.subgroupOf_self]
+  have hspan : ⨆ a : ↥(act.U ⊔ act.E), act.φ ↑a • S₀ = ⊤ := by
+    refine le_antisymm le_top ?_
+    rw [← hspan0]
+    exact iSup_le fun b => le_iSup (fun a : ↥(act.U ⊔ act.E) => act.φ ↑a • S₀)
+      ⟨b, htop.ge (Subgroup.mem_top b)⟩
+  have hspan_W : ⨆ w : ↥act.E, act.φ ↑w • S₀ = ⊤ :=
+    (iSup_phi_smul_eq_iSup_W_of_normal (W := act.E) hUnorm hS₀inv).symm.trans hspan
+  exact inertia_eq_hcInHu_gen data chief (fun w : ↥act.E => act.φ ↑w • S₀)
+    (fun w => (card_pointwise_smul act.φ ↑w S₀).trans hS₀card)
+    hspan_W
+    (fun w => isAInvariant_comp_subtype_pointwise_smul hUnorm hS₀inv ↑w)
+    hreg
+
 /-- **Peterfalvi (9.7)**: the Clifford-theory dichotomy for the action on the chief factor `H/H_0`.
 
 The case split is `chiefFactor_clifford_U_dichotomy`: `U` acts on `H̄ = H/H₀` either irreducibly
