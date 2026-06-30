@@ -1036,3 +1036,30 @@ target が「漠然 deep gate」から「faithful Lem14.13 + all-type-I escape a
 **教訓**: 「deep」評価の前に reduction の **数学的妥当性**を ported lemma で検証せよ — 本件は lane が ~16 iteration
 (loop³⁰-⁴⁶) 偽の target (type-F M_σ TI) を追い続けた。Lemma 14.11 (ported) を読めば τ2≠∅ for type-F は即わかった。
 [[scaffold-sorry-free-not-done]] [[verify-port-state-by-number-not-coq-name]]
+
+## ⚖️ 自己訂正 + consumer 解剖 (lane d, 2026-06-30 /loop⁴⁸): 「M_σ-TI は dead end」は **言い過ぎ** — M_σ-TI が真の target、τ2-route のみが無効
+
+/loop⁴⁷ の「type-F M_σ TI も dead end」は **不正確**だった。consumer chain を最後まで解剖し精密化:
+
+- **consumer = `not_all_maximal_typeI` (S14_MaximalI:2787)** は `cov.covers` (= ∀x≠1, x が ある (M_i)_F# (kernel)
+  に共役) で `F.G0={1}` を出す。**`F.G0` (S09:660) = `∀i, g∉dadeSupport_i` の補集合**。consumer term
+  `(F.mem_G0_iff.mp hx) i ⟨g, hg⟩` (hg: g*x*g⁻¹∈kernel#) が typecheck する ⟹ **現 family の
+  `dadeSupport_i = 𝒞_G((M_i)_F#)` (kernel sharp-set、isolated-Frobenius Dade hyp、H(a)=1)**。
+  ∴ kernel-cover (`covers`) が **genuinely exactly 必要** (M̃-cover では dadeSupport=kernel# に届かない)。
+- **`covers` (kernel-cover) ⟺ M_σ-TI for type-I** (M_σ∩(M_σ)^g=1 for g∉M; 非共役は σ-disjoint、共役は
+  M_σ-TI)。∴ **M_σ-TI は正しい target** (dead end ではない)。誤りは τ2=∅ という **route** のみ (/loop⁴⁷ で確定)。
+- **M_σ-TI > D(2)**: BG Thm D(2) (`Msigma_inf_conj_isCyclic`) は M_σ∩M^g **cyclic** までで TI(=1) でない。
+  ∴ M_σ-TI は D(2) より strictly 強く、genuine deep (type-I Frobenius kernel の G-level TI)。
+- **同じ deep content が `isTI` field にも**: `TypeICovering.isTI` (S14_MaximalI:2587) = `IsTISubset ((M_i)_F#) M_i`
+  = BG (8.13.c1)+(2.3) escaping-centralizer 制御 = M_σ-TI 同等。`exists_typeICovering` の residual sorry の 1 つ
+  (docstring 明記)。∴ **kernel-cover (`covers`/`cover_subset_kernels`) と `isTI` は同じ M_σ-TI(type-I) deep core を共有**。
+
+- **possible re-route (cross-lane, 要判断)**: Peterfalvi 実際の Dade support `A~(M)=⋃_{a∈A1}class_support(R(a)·a)`
+  は **thickened M̃** (R(a) signalizer 込み)。もし FrobeniusFamily を G-context Dade support (M̃) で再構成すれば
+  `dadeSupport_i=𝒞_G(M̃_i)` となり、**M̃-cover (`cover_nonidentity`、Coq mFT_partition 既証、lane に
+  `exists_mem_conjClassSet_Mtilde_or_zTilde_of_ne_one` 在)** で G0={1} が出て **M_σ-TI 不要**になる可能性。
+  但し S09 FamilyHypothesis71 の再構成 = cross-lane (lane-a/c 所有 S09) ⟹ hub/user 判断要。
+
+**∴ gate-2 の honest path は 2 択 (どちらも substantial)**: (A) **M_σ-TI for type-I を port** (= `covers`+`isTI` を同時 unblock、
+deep BG §14 σ-uniqueness、D(2) cyclic→TI 強化) / (B) **cross-lane re-route**: family を M̃-Dade support で再構成し
+M̃-cover に切替 (M_σ-TI 回避、但し S09 再構成要・cross-lane)。τ2-route は無効 (loop⁴⁷)。
