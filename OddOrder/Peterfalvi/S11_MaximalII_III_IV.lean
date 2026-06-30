@@ -4254,6 +4254,32 @@ theorem chiefFactor_caseB_char_inertia [Finite G] {M : Subgroup G}
   rw [h1] at hx
   simpa using hx.symm
 
+/-- **Non-Galois (9.8) core, generic over the factor family.**  As `chiefFactor_caseA_char_inertia`
+but taking the order-`p`, `U`-invariant, spanning factor family `Hpart` directly (rather than from
+`CliffordCaseAData`), so the `W1`-conjugates `{S₀^w}` — which have the same properties but are not
+the producer's `caseA.Hpart` family — can drive the inertia argument for the free-`W1`-orbit
+character of (9.8.c). -/
+theorem chiefFactor_caseA_char_inertia_gen [Finite G] {M : Subgroup G}
+    {data : TypesIIIIIIVSetup M} {chief : ChiefFactorData data}
+    {ι : Type*} (Hpart : ι → Subgroup (↥data.H ⧸ chief.N))
+    (hp_order : ∀ i, Nat.card ↥(Hpart i) = chief.p)
+    (hspan : ⨆ i, Hpart i = ⊤)
+    (haInv : ∀ i, IsAInvariant (uActionHom data chief) (Hpart i))
+    {θ : IrreducibleCharacter (↥data.H ⧸ chief.N)}
+    (hreg : ∀ i, ∃ x ∈ Hpart i,
+      (θ : ClassFunction (↥data.H ⧸ chief.N) ℂ) x
+        ≠ (θ : ClassFunction (↥data.H ⧸ chief.N) ℂ) 1)
+    (g : ↥(typeP_quotientCoprimeAction data.typeP data.nontrivial.1 chief.N_aInvariant).U)
+    (hinv : ∀ x, (θ : ClassFunction (↥data.H ⧸ chief.N) ℂ) ((uActionHom data chief) g x)
+        = (θ : ClassFunction (↥data.H ⧸ chief.N) ℂ) x) :
+    (uActionHom data chief) g = 1 := by
+  haveI : IsMulCommutative (↥data.H ⧸ chief.N) :=
+    IsMulCommutative.of_comm chief.quotient_elementaryAbelian.comm
+  refine mulAut_eq_one_of_fixes_regular_on_prime_span ((uActionHom data chief) g) Hpart
+    (fun i => ?_) (fun i x hx => ?_) hspan θ hreg hinv
+  · rw [hp_order i]; exact chief.p_prime
+  · exact (haInv i).smul_mem g hx
+
 /-- **Peterfalvi (9.8), case (a) non-Galois core**: the case-(a) analog of
 `chiefFactor_caseB_char_inertia`.  When `U` acts on `H̄ = H/N` with a `U`-invariant order-`p` factor
 (case (a) of (9.7), packaged as `CliffordCaseAData`), a character `θ` that is **regular** (nontrivial
