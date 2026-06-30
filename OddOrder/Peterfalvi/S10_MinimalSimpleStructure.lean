@@ -743,8 +743,18 @@ theorem bgTheoremE_cover_data [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
         OddOrder.BG.Ch4.S14.sigmaConjugacySaturation_Mtilde_ncard hG D
           (hrepsMax _ (e.symm j.down).2), hms]
   }, ?_⟩
-  -- DEEP GATE (issue 8020): the (8.8) covering dichotomy (BG Cor 14.9) decides Type-I vs non-Type-I.
-  sorry
+  -- The (8.8) covering dichotomy (BG Cor 14.9) splits on whether a type-`P` maximal exists.
+  by_cases hP : (OddOrder.BG.Ch4.S14.maximalTypePFamily G).Nonempty
+  · -- `𝓜_P ≠ ∅`: the non-Type-I covering, exceptional `Ẑ` of a reference type-`P` maximal (fix-`W`).
+    obtain ⟨Mref, hMrefmax, hMrefP⟩ := hP
+    obtain ⟨Kref, Kstarref, Uref, hKMref, hKref, hKstarref, hUref⟩ :=
+      OddOrder.BG.Ch4.S14.exists_typeP_data hG hMrefmax
+    exact Or.inr ⟨nonTypeICovering_of_isTypeP hG _ (fun _ => rfl) hMrefmax hMrefP hKMref hKref
+      hKstarref hUref⟩
+  · -- `𝓜_P = ∅` (every maximal is type-F/I): the Type-I covering.  Its `cover_subset_kernels`
+    -- (`M̃_i ⊆ ((M_i)_F)#` conjugates) is the §8 / route-B endpoint (`bgTheoremE_cover_data`'s
+    -- TypeICovering side, owned by the §8 Dade work in lane-a/c), so this branch remains gated.
+    sorry
 
 /-- **Peterfalvi (8.18)**: the final support-exclusion relation in Section 10.
 
