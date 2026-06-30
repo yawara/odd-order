@@ -6622,5 +6622,23 @@ theorem hcZeta_exists_conj_of_fixed {M : Subgroup G} {data : TypesIIIIIIVSetup M
     (x : ClassFunction ↥(hInHu data) ℂ)) hg
   simpa [OddOrder.RepresentationTheory.IrreducibleCharacter.coe_conjBy, hφdef] using hc
 
+/-- **`I_M(ζ) ≠ M` from the free-`W₁`-orbit** (the reduction side of `hIM`, complete).  If there is
+*no* `g ∈ HU` with `conjBy g θ₀ = compHom φ_m θ₀` (the free-orbit hypothesis L4), then `m ∉ I_M(ζ)`,
+so `I_M(ζ) ≠ ⊤ = M`.  Indeed `m ∈ I_M(ζ)` would give `conjBy m ζ = ζ`, and L3
+(`hcZeta_exists_conj_of_fixed`) would then produce exactly the forbidden `g`.  Combined with
+`HU ≤ I_M(ζ) ≤ M` and `[M:HU]=q` prime, this is `hIM` for `hcZeta_induceHU_irreducible`. -/
+theorem hcZeta_inertia_ne_top_of_free {M : Subgroup G} {data : TypesIIIIIIVSetup M} (m : ↥M)
+    [Fintype ↥(hInHu data)] [Invertible (Nat.card ↥(hInHu data) : ℂ)]
+    (ζ : IrreducibleCharacter ↥(huSub data)) (θ₀ : IrreducibleCharacter ↥(hInHu data))
+    (hlo : OddOrder.RepresentationTheory.IrreducibleCharacter.LiesOver (hInHu data) ζ θ₀)
+    (hfree : ¬ ∃ g : ↥(huSub data), ClassFunction.conjBy g (θ₀ : ClassFunction ↥(hInHu data) ℂ)
+      = ClassFunction.compHom (hInHuConj data m) (θ₀ : ClassFunction ↥(hInHu data) ℂ)) :
+    ClassFunction.inertia (ζ : ClassFunction ↥(huSub data) ℂ) ≠ ⊤ := by
+  intro htop
+  have hmem : m ∈ ClassFunction.inertia (ζ : ClassFunction ↥(huSub data) ℂ) :=
+    htop ▸ Subgroup.mem_top m
+  rw [ClassFunction.mem_inertia] at hmem
+  exact hfree (hcZeta_exists_conj_of_fixed m ζ θ₀ hlo hmem)
+
 end OddOrder.Peterfalvi.S11
 
