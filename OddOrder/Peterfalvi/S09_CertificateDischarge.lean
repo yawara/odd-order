@@ -1717,4 +1717,49 @@ theorem induce_degree_sum_bot {L : Type*} [Group L] [Fintype L] [Invertible (Nat
   congr 2
   exact_mod_cast Nat.card_congr QuotientGroup.quotientBot.toEquiv
 
+/-- **(1.5.d) family degree-sum** (reindexed to the distinct-induced enumeration).  For a
+`DistinctInducedFamily` enumeration `θ` with `Ind 1_H` at `ind1H`, the family degree-sum over
+`i ≠ ind1H` equals the `induce_degree_sum_bot` image sum `= [L:K]·(|K|−1)`.  The reindexing is
+`Finset.sum_image` (injectivity `hinj`); the image equality uses `hcover` and the orbit fact
+`Ind θ' = Ind 1_H ↔ θ' = 1` (via `⟨Ind θ', 1_L⟩ = 0` for `θ' ≠ 1` vs `⟨Ind 1_H, 1_L⟩ = 1`). -/
+theorem family_degree_sum {L : Type*} [Group L] [Fintype L] [Invertible (Nat.card L : ℂ)]
+    (K : Subgroup L) [K.Normal] [Fintype ↥K] [Invertible (Nat.card ↥K : ℂ)] {n : ℕ}
+    (θ : Fin (n + 1) → IrreducibleCharacter ↥K)
+    (hinj : Function.Injective (fun i => ClassFunction.induce K (θ i : ClassFunction ↥K ℂ)))
+    (hcover : ∀ φ : IrreducibleCharacter ↥K,
+      ClassFunction.induce K (φ : ClassFunction ↥K ℂ) ∈
+        Set.range (fun i => ClassFunction.induce K (θ i : ClassFunction ↥K ℂ)))
+    (ind1H : Fin (n + 1)) (hzeta_ind1H : θ ind1H = trivialIrreducibleCharacter ↥K) :
+    ∑ i ∈ Finset.univ.erase ind1H,
+        ClassFunction.induce K (θ i : ClassFunction ↥K ℂ) 1 ^ 2 /
+          ClassFunction.inner (ClassFunction.induce K (θ i : ClassFunction ↥K ℂ))
+            (ClassFunction.induce K (θ i : ClassFunction ↥K ℂ)) =
+      (K.index : ℂ) * ((Nat.card ↥K : ℂ) - 1) := by
+  rw [← induce_degree_sum_bot K,
+    ← Finset.sum_image (f := fun φ : ClassFunction L ℂ => φ 1 ^ 2 / ClassFunction.inner φ φ)
+      (g := fun i => ClassFunction.induce K (θ i : ClassFunction ↥K ℂ))
+      (fun i _ j _ h => hinj h)]
+  congr 1
+  ext φ
+  simp only [Finset.mem_image, Finset.mem_erase, Finset.mem_univ, and_true, Finset.mem_filter,
+    true_and]
+  constructor
+  · rintro ⟨i, hi, rfl⟩
+    refine ⟨θ i, ?_, rfl⟩
+    intro hc
+    exact hi (hinj (show ClassFunction.induce K (θ i : ClassFunction ↥K ℂ)
+      = ClassFunction.induce K (θ ind1H : ClassFunction ↥K ℂ) by rw [hc, hzeta_ind1H]))
+  · rintro ⟨φ', hφ', rfl⟩
+    obtain ⟨j, hj⟩ := hcover φ'
+    refine ⟨j, ?_, hj⟩
+    intro hjeq
+    have hone : ClassFunction.inner (ClassFunction.induce K (φ' : ClassFunction ↥K ℂ))
+        (Hypothesis71.constOne L) = 1 := by
+      rw [← hj, hjeq]
+      show ClassFunction.inner (ClassFunction.induce K (θ ind1H : ClassFunction ↥K ℂ))
+        (Hypothesis71.constOne L) = 1
+      rw [hzeta_ind1H]; exact inner_induce_trivialChar_constOne_eq_one K
+    rw [inner_induce_constOne_eq_zero K φ' hφ'] at hone
+    exact one_ne_zero hone.symm
+
 end OddOrder.Peterfalvi.S09.Cert
