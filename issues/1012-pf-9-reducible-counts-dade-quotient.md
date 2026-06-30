@@ -426,10 +426,66 @@ S11:4549 sorry。全 transport 補題が repo 実在ゆえ機械的に組める:
   `exists_zeta_residual_not_orthogonal` (11.8 = 唯一の bare FT spine sorry)、`typeV_forces_coherence` (10.10)。
 
 **進め方**: deep だが incremental に grind 可 — caseA inertia は 1 iteration = 1 supporting lemma の
-ペースで caseB inertia infra を analog 構築 (`chiefFactor_caseA_char_inertia` ← Hpart 直積 +
-W₁-transitive permutation の Clifford 解析)。難所の数学が真に impasse なら **ChatGPT 相談**
-([[feedback-ask-chatgpt-for-elided-gaps]]、strongest model) を併用。**次着手 = caseA inertia の最初の
-supporting lemma を WRITE** (scoping は完了済、deliberation 不要)。
+ペースで caseB inertia infra を analog 構築。難所の数学が真に impasse なら **ChatGPT 相談**
+([[feedback-ask-chatgpt-for-elided-gaps]]、strongest model) を併用。
+
+**✅✅ 2026-06-30: inertia plumbing 4 層 全 generalize 完了 (build-green、commits dd3576fe→1203f462)**:
+`inertia_eq_hcInHu_of_inf_le` / `inertia_inf_uInHu_le_cInHu_of_realized` /
+`caseB_inertia_realized_of_charInertia` / `caseB_char_inertia_inflation_of_core` — 各層を θbar-generic
+な hypothesis で parametrize、caseB は delegate。⟹ caseA inertia chain は parametrized 連鎖の trivial
+適用 + 単一 core `chiefFactor_caseA_char_inertia` に還元。
+
+**残 (deep)**: (1) **core `chiefFactor_caseA_char_inertia`** — caseB core は θ nontrivial で g 固定⟹
+g trivial だが caseA では一般 θ で偽; reducible-relevant θbar (W₁-transitive Hpart 対称) 限定で成立。
+(2) caseA_exists_for_reducible + (3) caseA_degree_qu + wiring。
+
+**🛑 2026-06-30 重大発見: caseA core は (9.7) case-a 構造の de-opacify に gated**:
+`CliffordCaseAData` の `W1_transitive_on_parts` / `quotient_factors_cyclic_order_a` /
+`Ubar_embeds_product` は **opaque な bare `Prop` field** (trivial `_holds`)。⟹ core が要する W₁-transitivity
+は **usably 形式化されていない scaffold**。caseB は対応する genuine content を standalone lemma
+(`chiefFactor_caseB_action_fpf` 等) + `hcaseB` (既約性 hypothesis) で供給 — caseA も同様に **(9.7)
+case-a 構造 (H̄=⊕Hpart_i 直積, W₁ transitive permute, Ū embeds in product) の concrete lemma/hypothesis**
+が必要。これは genuine な §9 Clifford 形式化 = substantial upstream piece。
+⟹ **caseA degree = inertia plumbing (✅完了) + (9.7) case-a 形式化 (deep) + core + assembly**。
+
+**✅ 2026-06-30 精緻化: (9.7) case-a は concrete 構築済・opaque 露出 (de-opacify は「露出」、scratch でない)**:
+producer (chiefFactor_clifford_U_dichotomy の case-a 枝、S11:4288-4316) は **Hpart を concrete に構築**:
+`Hpart j = act.φ ↑(e.symm j) • S₀` = 単一 U-invariant order-p factor S₀ の **W₁-orbit translate**
+(`exists_supIndep_aInvariant_family_of_iSup` で S₀ から q 個の supIndep aInvariant family を生成)。
+⟹ W₁-transitivity は **construction に implicit** だが usable field 化されてない (`:= True`)。
+**de-opacify = CliffordCaseAData に orbit 構造 (S₀ generator, act, orbit indexing) を usable field
+として carry + W₁-transitivity を lemma 化** (structure + producer refactor、plumbing より重いが grindable)。
+その後 core (W₁-symmetric θbar stabilizer) → caseA_exists → degree_qu。inertia plumbing は reusable 基盤。
+
+**✅✅ impasse 解消 (2026-06-30、Coq-first で発見)**: 「W₁-symmetric stabilizer」framing は誤り
+だった。Coq `PFsection9.v` `def_Itheta` (L938-949) が **inertia θ̄ = HC を直接証明**:
+- 還元 χ の chief-factor 構成 θ̄ = `cfBigdprod defHbar f` = **q 個の order-p Hpart factor H̄_i 上の
+  *nontrivial* linear char の積** (f ∈ `Ftheta` = pffun_on で全成分 nonzero)。
+- **per-factor (`inertia_irr_prime`, L948)**: order-**p** (prime) 群の nontrivial char の U-stabilizer
+  = centralizer。理由 = **Aut(ℤ/p)=(ℤ/p)* は nontrivial char に *自由*作用** ⟹ char 固定の U-elt は
+  その factor を中心化。
+- **`inertia_bigdprod_irr` (L947)**: 積 char の inertia = 各 factor inertia の ∩。
+- ⟹ ∩(per-factor centralizers) = C_U(H̄) = **C** ⟹ inertia θ̄ = HC。
+私は「新しい W₁-対称論」を探して詰まったが、実際は **per-factor order-p free-action という routine な
+論証**を見落としていた (= reconstruction gap, not research gap、[[feedback-ask-chatgpt-for-elided-gaps]]
+の典型)。**Coq-first check で発見** (ユーザー 2026-06-30 指針)。
+
+**Lean 形式化 path (clear)**: (1) de-opacify (9.7): Hpart 構造を露出 (producer の supIndep family)。
+(2) **per-factor stabilizer**: order-p 群の nontrivial char → stabilizer=centralizer (Aut(ℤ/p) free)。
+(3) bigdprod inertia (∩) → (4) inertia θ̄=HC → (5) inertia plumbing (✅) → caseA inertia=HC → degree u。
+
+**✅ 2026-06-30 cleaner path 発見 (bigdprod permutation 機構を回避)**: type-P では **U が各 Hpart factor を
+正規化** (producer の S₀ は U-invariant `hS₀inv`、かつ W₁≤N(U) ∵ U◁U⋊W₁ Frobenius ⟹ 各 W₁-translate
+S₀^w も U-invariant: u S₀^w u⁻¹ = w (w⁻¹uw) S₀ (…)⁻¹ w⁻¹ = w S₀ w⁻¹、w⁻¹uw∈U)。⟹ U は **diagonal 作用**
+(factor を permute しない)。⟹ 議論:
+- g∈U が regular θ̄ (各 factor で nontrivial) を固定 ⟹ 各 factor で θ̄|_{Hpart_i} を固定 (factor U-invariant)。
+- Hpart_i order p ⟹ nontrivial char の stabilizer = centralizer (Aut(ℤ/p)=(ℤ/p)* free、既存
+  `inertia_eq_of_freeAction` 系 @ ConjugationBrauer.lean:277 が近い infra)。
+- g が全 factor を中心化 ⟹ H̄=⟨Hpart_i⟩ を中心化 ⟹ g∈C。
+⟹ **bigdprod inertia の permutation 機構不要**。必要 piece: (A) Hpart U-invariance、(B) θ̄ regular ⟹
+θ̄|_{Hpart_i} nontrivial、(C) per-factor free-Aut stabilizer、(D) 全 factor 中心化⟹H̄ 中心化。
+既存 infra: `inertia_eq_of_freeAction`, inertia transfer (`mem_inertia_compHom_iff`)。次着手 = piece C
+(per-factor free-Aut、最も self-contained)。
 
 ## 進捗サマリ (2026-06-30 更新)
 
