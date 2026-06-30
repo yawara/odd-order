@@ -728,3 +728,21 @@ deps: `exists_length_one_factor` (S14:4617 ✓ σ-decomp 入力)・`sigmaLength_
 限定 (BG Cor 14.9 の type-I half)。**full covering disjunction `BGTheoremETypeICovering ∨ NonTypeICovering`
 (S10:664)** には (a) type-P (非 type-I) branch (zTilde piece、`typeP_zTilde_*` 在) + (b) cover identity を
 `bgTheoremE_cover_data.cover_nonidentity` field へ wiring が要る。次 = この wiring + type-P branch。
+
+## ✅ 進捗 (lane d, 2026-06-30 /loop²⁹): BG Cor 14.9 covering equality (cover_nonidentity) under all-type-F
+
+**`sharpSubgroup_top_eq_iUnion_conjClassSet_Mtilde_of_typeF`** (S14、axiom-clean、AxiomsCheck 登録、full build
+3888 green): all-type-F で **G# = ⋃_M 𝒞_G(M̃)**。⊆ = Lemma 14.6 discharge した cover identity
+(`exists_mem_conjClassSet_Mtilde_of_ne_one`)、⊇ = `one_not_mem_Mtilde` (1∉M̃ ⟹ 1∉𝒞_G(M̃))。
+**= `BGTheoremETypeICovering.cover_nonidentity` field** (reps↔all-maximals は `Mtilde_conj_smul` で吸収)。
+Lemma 14.6 の自然な帰結 = BG Cor 14.9 covering の核。
+
+**gate 2 (bgTheoremE_cover_data S10:664 disjunction) の残 deep parts を確定**:
+- **TypeICovering branch** (all-type-F): `cover_nonidentity` ✅ (本セッション)、`pairwise_disjoint_thickened` =
+  `conjClassSet_Mtilde_disjoint` (S14:7913 在) + nonconjugate reps で**即可**、**`cover_subset_kernels` = deep**
+  (cover i ⊆ 𝒞_G((M_i)_F#) には all-type-F で **R(x)=1** [(8.8.a) signalizer-trivial 構造、repo 未証明] が要る)。
+- **NonTypeICovering branch** (else): deep (zTilde exceptional cover、`BGTheoremENonTypeICovering` の W 構成)。
+⟹ gate 2 を閉じるには (a) **R(x)=1 under all-type-F** (cover_subset_kernels) と (b) **NonTypeICovering の zTilde
+構成** の 2 deep piece が要る。cover_nonidentity/pairwise は揃った。次 = (a) R(x)=1-under-typeF (signalizer
+trivial) の調査/構成、または gate 2 を by_cases all-type-F で restructure し TypeICovering を組んで NonTypeICovering
+を named sorry に isolate。

@@ -5181,6 +5181,12 @@ WLOG `x ∈ M_σ`, the neighbour `N = N(x)` of Theorem 14.4, and Hall conjugacy 
 `𝒞_G(M̃)`.  Immediate from `sigma_decomposition_dichotomy` (the κ branch is empty since
 `κ(N) = ∅`).  **Gate 2 of the BG Theorem E cover is now sorry-free.**  Axiom-clean. -/
 #assert_only_allowed_axioms OddOrder.BG.Ch4.S14.exists_mem_conjClassSet_Mtilde_of_ne_one
+/-! **BG Corollary 14.9, the `G#` cover under all-type-`F`** (`S14_TypePCounting`,
+`sharpSubgroup_top_eq_iUnion_conjClassSet_Mtilde_of_typeF`): under all-type-`F`,
+`G# = ⋃_M 𝒞_G(M̃)`.  `⊆` is the discharged cover identity (BG Lemma 14.6), `⊇` is `1 ∉ M̃`.  This
+is the `cover_nonidentity` field of `BGTheoremETypeICovering` (modulo reps-vs-all-maximals).
+Axiom-clean. -/
+#assert_only_allowed_axioms OddOrder.BG.Ch4.S14.sharpSubgroup_top_eq_iUnion_conjClassSet_Mtilde_of_typeF
 /-! **BG Lemma 14.6, exclusivity** (`S14_TypePCounting`, `not_type1_of_type2`): a type-2 element
 (`g = y·y'`, `y'` a nonidentity `κ(M)`-element of `C_M(y)`, `y ∈ M_σ^#`) is not of type-1
 (`g = x·x'`, `ℓ_σ(x)=1`, `x' ∈ R(x)`).  The `T ∩ H̃ = ∅` input to Theorem 14.7. -/
