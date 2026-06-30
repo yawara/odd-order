@@ -457,13 +457,25 @@ producer (chiefFactor_clifford_U_dichotomy の case-a 枝、S11:4288-4316) は *
 として carry + W₁-transitivity を lemma 化** (structure + producer refactor、plumbing より重いが grindable)。
 その後 core (W₁-symmetric θbar stabilizer) → caseA_exists → degree_qu。inertia plumbing は reusable 基盤。
 
-**🛑 math impasse (2026-06-30): non-Galois (9.8.b) inertia 論の精密化が要**: orbit family は
-**U⊔W₁ で生成** (`act.φ` の `t ⊆ U⊔W₁`)、W₁ 単独でない。⟹「reducible χ → θbar が W₁ で対称 →
-U-stabilizer=C」の framing が orbit-under-(U⊔W₁) と噛み合わず、core の精密な論証 (なぜ stabilizer=C か)
-が未確定。これは formalization labor でなく **genuine な数学の gap** = Peterfalvi (9.8) `Part_a` の
-精読 or **ChatGPT 相談** ([[feedback-ask-chatgpt-for-elided-gaps]], strongest model) で argument を
-再構成すべき (Coq PFsection9 L883-940 `Part_a` の inertia/bigdprod 論)。focused mode 向き。
-**この impasse 解消が caseA degree の rate-limiting step** (de-opacify も core もこの論証に依存)。
+**✅✅ impasse 解消 (2026-06-30、Coq-first で発見)**: 「W₁-symmetric stabilizer」framing は誤り
+だった。Coq `PFsection9.v` `def_Itheta` (L938-949) が **inertia θ̄ = HC を直接証明**:
+- 還元 χ の chief-factor 構成 θ̄ = `cfBigdprod defHbar f` = **q 個の order-p Hpart factor H̄_i 上の
+  *nontrivial* linear char の積** (f ∈ `Ftheta` = pffun_on で全成分 nonzero)。
+- **per-factor (`inertia_irr_prime`, L948)**: order-**p** (prime) 群の nontrivial char の U-stabilizer
+  = centralizer。理由 = **Aut(ℤ/p)=(ℤ/p)* は nontrivial char に *自由*作用** ⟹ char 固定の U-elt は
+  その factor を中心化。
+- **`inertia_bigdprod_irr` (L947)**: 積 char の inertia = 各 factor inertia の ∩。
+- ⟹ ∩(per-factor centralizers) = C_U(H̄) = **C** ⟹ inertia θ̄ = HC。
+私は「新しい W₁-対称論」を探して詰まったが、実際は **per-factor order-p free-action という routine な
+論証**を見落としていた (= reconstruction gap, not research gap、[[feedback-ask-chatgpt-for-elided-gaps]]
+の典型)。**Coq-first check で発見** (ユーザー 2026-06-30 指針)。
+
+**Lean 形式化 path (clear、tractable)**: (1) de-opacify (9.7): Hpart の bigdprod 構造を露出
+(H̄=⊕H̄_i, 各 order p, θ̄=積 char)。(2) **per-factor stabilizer lemma**: order-p 群の nontrivial
+char → U-stabilizer = centralizer (`inertia_irr_prime` analog, Aut(ℤ/p) free)。(3) **bigdprod inertia**:
+積 char の inertia = ∩ factor inertias (`inertia_bigdprod_irr` analog)。(4) 合成 → inertia θ̄=HC。
+(5) inertia plumbing (✅完了) → caseA inertia=HC → degree u。**impasse でなく substantial だが clear な
+formalization labor**。次着手 = (9.7) bigdprod de-opacify + per-factor stabilizer lemma。
 
 ## 進捗サマリ (2026-06-30 更新)
 
