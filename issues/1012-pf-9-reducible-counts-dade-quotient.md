@@ -416,10 +416,23 @@ S11:4549 sorry。全 transport 補題が repo 実在ゆえ機械的に組める:
 > 残 = B2 (inflation character bridge、最難所 = induction-inflation commute lemma) + B3 (|W̄₂|=p +
 > instantiate)。本プロジェクトで「最難・最高コスト」と記された指標終盤の最後の山。
 
+## 進捗サマリ (2026-06-30 更新)
+
+**✅✅✅ 還元 count (9.8.b)/(9.9.b) 全完成 (sorry-free, axiom-clean)** — issue 1012 の中核:
+- `reducible_count_sOf_K` (generic carrier、Coq `nb_redM`) + `chiefFactorQuotientHypothesisGen`
+  (commit 6c19150d, 248e268e)。
+- H₀C 構造入力 4 本 (∩H=H₀ / ≤M' / W₁⊓=⊥ / ¬W₂≤ / ◁M) + |W̄₂'|=p
+  (`chiefFactor_card_W2bar_H0supC`、helper `nat_card_map_mk'_eq_of_inf_eq`、commit 0cee8e67)。
+- ⟹ `reducible_count_sOf_H0` / `reducible_count_sOf_H0C` 両方 実証明、`reducible_mem_sOf_H0C` honest、
+  caseB conjunct 3 (degree+membership) 完全 honest。
+
+**残 §9 (還元 count とは別経路)**: caseA_character_counts (9.8.c/d), caseB_character_counts
+conjunct 4 (9.9.c exceptional), `exceptional_case_frobenius_realization` (9.10), `sibleyTarget_H0C`。
+
 ## 完了条件
 
 S11 の caseB_character_counts / caseA_character_counts / exceptional_case_frobenius_realization が
-sorry-free (上流 §6 obligation cite は可)。
+sorry-free (上流 §6 obligation cite は可)。**還元 count 部分は完了**、残は上記 (9.9.c)/(9.10)/caseA c/d。
 
 ## 下流 (unblock するもの)
 
