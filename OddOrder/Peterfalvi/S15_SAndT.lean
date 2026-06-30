@@ -1736,6 +1736,72 @@ theorem complement_card_eq_pq_V [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd
     Nat.card_congr (Subgroup.equivMapOfInjective frob.complement L.subtype
       L.subtype_injective).toEquiv, hEmcard]
 
+/-- **`T`-side dual of `TypeIOverNormalizerData`** (V-side): the type-I-over-`N_G(V)` structure of a
+maximal `L` for `T` type II — its Frobenius decomposition with `V` in the kernel `L_F` and a
+`W₁`-conjugate in the complement (order `p q`). -/
+structure TypeIOverNormalizerDataV (hyp : Hypothesis (G := G)) where
+  L : Subgroup G
+  H : Subgroup G
+  L_maximal : L ∈ maximalSubgroups G
+  H_eq_LF : H = maxNilpotentNormalHall L
+  normalizer_V_le_L : Subgroup.normalizer (hyp.V : Set G) ≤ L
+  frobenius : OddOrder.Peterfalvi.S14.TypeIFrobeniusData L
+  V_le_H : hyp.V ≤ H
+  /-- **Peterfalvi (13.17.c)/(14.5)**: the Frobenius complement has order `p q` (the `W₂W₁^y`
+  alternative). -/
+  complement_card_eq_pq : Nat.card ↥frobenius.complement = hyp.p * hyp.q
+  /-- **Peterfalvi (13.17.c)/(14.5)**: a conjugate `W₁^y` (`y ∈ P`) lies in the Frobenius
+  complement of `L`. -/
+  exists_y_W1_conj_le_complement :
+    ∃ y ∈ hyp.P, (MulAut.conj y • hyp.W1 : Subgroup G) ≤
+      frobenius.complement.map L.subtype
+
+/-- **`T`-side dual of `typeI_overNormalizer_complement`** (Pf (13.17.c), V-side): the
+`W₂`-containing Frobenius complement of `L` over `N_G(V)` has order `p q` and contains a conjugate
+`W₁^y` (`y ∈ P`).  Mirror; the `∃ y` extraction reuses the generic `exists_mem_conj_W2_le_of_dvd_card`
+with `(Q, W2, E) := (P, W1, E)`. -/
+theorem typeI_overNormalizer_complement_V [Finite G]
+    (_hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
+    (_hTTypeII : IsTypeII hyp.T) {L : Subgroup G} (hLmax : L ∈ maximalSubgroups G)
+    (_hNVL : Subgroup.normalizer (hyp.V : Set G) ≤ L)
+    (_hVH : hyp.V ≤ maxNilpotentNormalHall L)
+    (frob : OddOrder.Peterfalvi.S14.TypeIFrobeniusData L)
+    (hW2E : hyp.W2 ≤ frob.complement.map L.subtype) :
+    Nat.card ↥frob.complement = hyp.p * hyp.q ∧
+      ∃ y ∈ hyp.P, (MulAut.conj y • hyp.W1 : Subgroup G) ≤
+        frob.complement.map L.subtype := by
+  have hcard := complement_card_eq_pq_V _hG hyp frob hW2E
+  refine ⟨hcard, ?_⟩
+  obtain ⟨hWnorm, hdisj, hpP⟩ := P_W1_structure _hG hyp
+  have hEPW1 := complement_le_PW1 _hG hyp frob hW2E
+  haveI hPsolv : IsSolvable ↥hyp.P := by
+    have hPS : hyp.P ≤ hyp.S := by
+      rw [hyp.P_eq_SF]; exact OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_le hyp.S
+    have hSlt : hyp.S < ⊤ := lt_top_iff_ne_top.mpr (mem_maximalSubgroups.mp hyp.S_maximal).1
+    exact _hG.solvable_of_lt_top hyp.P (lt_of_le_of_lt hPS hSlt)
+  have hqE : hyp.q ∣ Nat.card ↥(frob.complement.map L.subtype) := by
+    rw [Nat.card_congr (Subgroup.equivMapOfInjective frob.complement L.subtype
+      L.subtype_injective).toEquiv.symm, hcard]
+    exact dvd_mul_left hyp.q hyp.p
+  exact exists_mem_conj_W2_le_of_dvd_card hWnorm hPsolv hdisj hyp.q_prime
+    hyp.q_eq_card_W1.symm hpP hEPW1 hqE
+
+/-- **`T`-side dual of `typeII_overNormalizer_frobenius`** (Pf (13.17), V-side): for `T` type II, a
+maximal subgroup over `N_G(V)` is type-I Frobenius, contains `V` in its kernel, and has a complement
+of order `p q` with a conjugate `W₁^y`.  Assembled from `exists_typeI_maximal_overNormalizer_V`,
+`exists_typeIFrobeniusData_W2_le`, and `typeI_overNormalizer_complement_V`. -/
+theorem typeII_overNormalizer_frobenius_V [Finite G]
+    (_hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
+    (hTTypeII : IsTypeII hyp.T) :
+    ∃ data : TypeIOverNormalizerDataV hyp,
+      data.frobenius.kernel_eq_MF ∧ (hyp.V ≤ data.H) := by
+  obtain ⟨L, hLmax, hLtypeI, hNVL, hVH⟩ :=
+    exists_typeI_maximal_overNormalizer_V _hG hyp hTTypeII
+  obtain ⟨frob, hker, hW2E⟩ := exists_typeIFrobeniusData_W2_le _hG hyp hLmax hLtypeI hNVL
+  obtain ⟨hcard, hy⟩ :=
+    typeI_overNormalizer_complement_V _hG hyp hTTypeII hLmax hNVL hVH frob hW2E
+  exact ⟨⟨L, maxNilpotentNormalHall L, hLmax, rfl, hNVL, frob, hVH, hcard, hy⟩, hker, hVH⟩
+
 /-- Carrier for the virtual character `beta_j` and `Gamma_j` in (13.18). -/
 structure BetaData (hyp : Hypothesis (G := G)) where
   j : Fin hyp.p
