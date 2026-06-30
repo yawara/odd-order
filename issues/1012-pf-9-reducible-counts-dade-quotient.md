@@ -446,9 +446,16 @@ g trivial だが caseA では一般 θ で偽; reducible-relevant θbar (W₁-tr
 (`chiefFactor_caseB_action_fpf` 等) + `hcaseB` (既約性 hypothesis) で供給 — caseA も同様に **(9.7)
 case-a 構造 (H̄=⊕Hpart_i 直積, W₁ transitive permute, Ū embeds in product) の concrete lemma/hypothesis**
 が必要。これは genuine な §9 Clifford 形式化 = substantial upstream piece。
-⟹ **caseA degree = inertia plumbing (✅完了) + (9.7) case-a 形式化 (deep, 未着手) + core + assembly**。
-(9.7) case-a 形式化が真の bottleneck。focused session / ChatGPT 相談候補。inertia plumbing は
-(9.7) 形式化後に core を供給すれば即座に caseA inertia=HC を与える reusable 基盤として残る。
+⟹ **caseA degree = inertia plumbing (✅完了) + (9.7) case-a 形式化 (deep) + core + assembly**。
+
+**✅ 2026-06-30 精緻化: (9.7) case-a は concrete 構築済・opaque 露出 (de-opacify は「露出」、scratch でない)**:
+producer (chiefFactor_clifford_U_dichotomy の case-a 枝、S11:4288-4316) は **Hpart を concrete に構築**:
+`Hpart j = act.φ ↑(e.symm j) • S₀` = 単一 U-invariant order-p factor S₀ の **W₁-orbit translate**
+(`exists_supIndep_aInvariant_family_of_iSup` で S₀ から q 個の supIndep aInvariant family を生成)。
+⟹ W₁-transitivity は **construction に implicit** だが usable field 化されてない (`:= True`)。
+**de-opacify = CliffordCaseAData に orbit 構造 (S₀ generator, act, orbit indexing) を usable field
+として carry + W₁-transitivity を lemma 化** (structure + producer refactor、plumbing より重いが grindable)。
+その後 core (W₁-symmetric θbar stabilizer) → caseA_exists → degree_qu。inertia plumbing は reusable 基盤。
 
 ## 進捗サマリ (2026-06-30 更新)
 
