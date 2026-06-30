@@ -88,3 +88,20 @@ deep、escape が起きれば false) / (B) **M̃ route** = §8 Dade hypothesis f
 - consumer = `not_all_maximal_typeI` (S14_MaximalI:2787)、`FrobeniusFamily.G0` (S09:4273, **kernel-based**)。
 - 別構造 = `FamilyHypothesis71.G0` (S09:660, dadeSupport-based) + `family_inequality`。
 - [[scaffold-sorry-free-not-done]] [[gate2-typeF-tau2-reduction-is-false]]
+
+## 🚧 route B は lane-a/c の §8 Dade work に block (lane d /loop⁵³ 確定)
+
+route B の FamilyHypothesis71 assembly は **per-rep の §8 Dade 入力**を要し、全て lane-a/c の §8 領域:
+- `dadeSupportHypotheses_typeI` (8.15, S10:467, **sorry**) — type-I の Dade hypothesis 構成 (§8 Dade isometry)。
+- `fullDadeIsometryData` (Dade map τ + IsDadeMap/IsDadeIsometry) — §8。
+- `HConjInvariant` (S04:492) — `HConjInvariant.of_forall_H_eq_bot` は type-I (H=R(x)≠⊥) に不適用ゆえ別途要 §8 証明。
+
+⟹ **lane-d は route B を build-green に単独で進められない** (foundation が §8 character theory = lane-a/c)。
+lane-d の lane-d-doable 貢献 = **assembly skeleton (gated-endpoint pattern)**: `not_all_maximal_typeI` の
+M̃-cover 版を、per-rep の §8 Dade hypothesis を**名前付き仮説 (input)** に取って組む engine を作り、
+M̃-cover (`sharpSubgroup_top_eq_iUnion_conjClassSet_Mtilde_of_typeF`, lane-d 既証) + `family_inequality`
+(既存) で contradiction を出す。§8 入力は cite (lane-a/c が後で充足)。これで route B の §8 residual を
+named inputs に結晶化し、kernel-cover/M_σ-TI (possibly false) 依存を除去。
+
+**hub 要請**: 8.15 (`dadeSupportHypotheses_typeI`) + type-I Dade isometry/HConjInvariant は §8 ゆえ
+lane-a/c 協調が要る。lane-d は assembly skeleton を先行実装可 (次 /loop)。
