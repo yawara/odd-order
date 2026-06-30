@@ -2487,4 +2487,21 @@ theorem coherence_hagree_dadeMap {G : Type*} [Group G] {A : Set G} {L : Subgroup
     (hyp.fullDadeIsometryData hconj) hsupp] at h1
   exact h1
 
+/-- **The coherent extension is isometric on the family** (§12→§7 bridge, the `nu_isometry`
+ingredient).  `IsCoherent.extension_inner_eq` preserves inner products on the integral span
+`ℤ[S] = zSpan S`; specialised to family members `ζ_i, ζ_j ∈ S ⊆ zSpan S`, it gives
+`⟨ν ζ_i, ν ζ_j⟩ = ⟨ζ_i, ζ_j⟩` — the family-level isometry the `Hypothesis78` `ν` machinery actually
+consumes (every `nu_isometry` use site rewrites it on family members `zeta i`/`zeta j`).  The §12
+coherent `ν = hcoh.extension` is *not* a global isometry (the `exists_extend` lift off `CF(L,A)` is
+merely linear), so this family-restricted form is the load-bearing one. -/
+theorem coherence_extension_inner_eq_on_family {L G : Type*} [Group L] [Group G]
+    [Fintype L] [Fintype G] [Invertible (Nat.card L : ℂ)] [Invertible (Nat.card G : ℂ)]
+    {τ : OddOrder.Peterfalvi.S07.IntegralCharacterMap L G}
+    {S : Set (ClassFunction L ℂ)} {A : Set L}
+    (hcoh : OddOrder.Peterfalvi.S07.IsCoherent τ S A)
+    {ζi ζj : ClassFunction L ℂ} (hζi : ζi ∈ S) (hζj : ζj ∈ S) :
+    ClassFunction.inner (hcoh.extension ζi) (hcoh.extension ζj)
+      = ClassFunction.inner ζi ζj :=
+  hcoh.extension_inner_eq ζi ζj (Submodule.subset_span hζi) (Submodule.subset_span hζj)
+
 end OddOrder.Peterfalvi.S09.Cert
