@@ -695,3 +695,25 @@ conjunct c の regular θ̄ (各 Hpart 上 nontrivial な linear char) 構成に
 **次の構成ステップ**: (1) H̄ ≅ ∏ Hpart の iso (iSupIndep+iSup=⊤ から; elementary abelian ゆえ
 additive `DirectSum.IsInternal` も可)、(2) 各 Hpart i の nontrivial char (exists_apply_ne_one)、
 (3) 合成で regular θ̄、(4) `inertia_eq_hcInHu_caseA` → induce → conjunct c。multi-piece、fresh context 推奨。
+
+
+## regular θ̄ 構成の正確な mathlib 配線 (2026-06-30、次イテレーション用)
+
+`exists_regular_char` (一般補題、`[CommGroup Hbar]` で述べれば subgroup の CommGroup instance は自動):
+```
+theorem exists_regular_char {Hbar} [CommGroup Hbar] [Finite Hbar] {ι} [Fintype ι]
+  (Hpart : ι → Subgroup Hbar) (hindep : iSupIndep Hpart) (hspan : ⨆ i, Hpart i = ⊤)
+  (hp : ∀ i, (Nat.card ↥(Hpart i)).Prime) : ∃ θ : Hbar →* ℂˣ, ∀ i, ∃ x ∈ Hpart i, θ x ≠ 1
+```
+配線 (GroupTheory/NoncommPiCoprod.lean):
+1. `choose ψ hψ using fun i => exists_ne_one_hom_of_prime_card (hp i)` — ψ i : ↥(Hpart i)→*ℂˣ, ≠1。
+2. commuting: Hbar abelian ⟹ `fun _ _ _ _ _ _ => mul_comm _ _` 系で Pairwise Commute。
+3. `e := Subgroup.noncommPiCoprod Hpart hcomm : (∀ i, ↥(Hpart i)) →* Hbar`。
+4. inj: `injective_noncommPiCoprod_of_iSupIndep` (hindep + 各 subtype inj)。
+   surj: range = `noncommPiCoprod_range`/`noncommPiCoprod_mrange` = ⨆ Hpart = ⊤ (hspan)。
+5. `eEquiv := MulEquiv.ofBijective e ⟨inj, surj⟩`。
+6. `θ := (MonoidHom.noncommPiCoprod ψ (commuting in ℂˣ auto)).comp eEquiv.symm.toMonoidHom`。
+7. nontriv: ψ i ≠1 ⟹ ∃ x:↥(Hpart i), ψ i x ≠1。`eEquiv.symm ↑x = Pi.mulSingle i x` (x∈Hpart i ゆえ
+   coprod の single slot) ⟹ θ ↑x = ψ i x ≠1。`noncommPiCoprod_mulSingle` が single-slot 計算。
+注: 一般補題ゆえ instance friction 無し。use site (Hbar=↥H⧸N) で IsMulCommutative→CommGroup の
+letI が要る (別途)。~50 行、fresh context 推奨。

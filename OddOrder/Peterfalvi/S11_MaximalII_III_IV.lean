@@ -2146,6 +2146,18 @@ theorem mulAut_eq_one_of_fixes_regular_on_prime_span {Hbar : Type*} [Group Hbar]
     rw [hcx, hcy, hfix x]
   exact Subtype.ext_iff.mp (hinj hval)
 
+/-- **A prime-order abelian group has a nontrivial linear character.**  `K` is nontrivial
+(`|K| = p > 1`), so some `a ≠ 1`, and `ℂ` has enough roots of unity to separate it
+(`exists_apply_ne_one_of_hasEnoughRootsOfUnity`).  Per-factor input for the regular-`θ̄`
+construction of Peterfalvi (9.8.c): a character nontrivial on each order-`p` Clifford summand. -/
+theorem exists_ne_one_hom_of_prime_card {K : Type*} [CommGroup K] [Finite K]
+    (hp : (Nat.card K).Prime) : ∃ ψ : K →* ℂˣ, ψ ≠ 1 := by
+  haveI : Nontrivial K := Finite.one_lt_card_iff_nontrivial.mp hp.one_lt
+  obtain ⟨a, ha⟩ := exists_ne (1 : K)
+  obtain ⟨ψ, hψa⟩ :=
+    CommGroup.exists_apply_ne_one_of_hasEnoughRootsOfUnity (G := K) (M := ℂ) ha
+  exact ⟨ψ, fun h => hψa (by rw [h]; rfl)⟩
+
 /-- Case (a) of Peterfalvi (9.7): `H/H_0` splits as a direct product of `q`
 order-`p` factors permuted by `W_1`.
 
