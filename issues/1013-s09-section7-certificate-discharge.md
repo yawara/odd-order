@@ -158,4 +158,10 @@ Quot.sound] のみ、sorryAx なし)。`hypothesis76OfDade` が Hypothesis76 を
   (7.7.a) が induced-family 構造を要したのと同様、(7.8.c.i) は coherence agreement を要する。
 - **設計**: `chiRho_eq_inner_beta_of_coherence` standalone (chiRho_decomp_induced + coherence
   agreement → collapse)。collapse algebra + index bookkeeping (ind1H/zetaDistinct/ζ_0) が山。
-  次イテレーションで §8 coherence (Dade isometry ↔ coherent extension の τ=ν) を調査 → 構築。
+- **coherence agreement の所在 (調査済)**: `IsCoherent.tau1_agrees : tau1 (χ−χ.conj) = τ (χ−χ.conj)`
+  (S07_Coherence.lean:1171) が Dade τ ↔ coherent extension τ₁ の agreement。S08_CoherenceCore.lean に
+  `coherentYset.extension` / `inner_tau_eq_inner_restrict` (差 χ−aη の τ-内積を restrict 内積に) 多数。
+  Hypothesis78 の `nu` field は coherent extension に対応するが、τ との agreement (= (τψ_i,χ)=(νψ_i,χ))
+  は bare field でない → discharge theorem の hypothesis に取る (S08 の tau1_agrees 系を供給元に)。
+  原文 mmd 04.9 L103-107 (7.8.c の (7.7) 適用 ζ_0=ζ,ζ_1=Ind 1_H)。S09 docstring (1419-1421) が
+  「coherence-based derivation from (7.7.a) ... not yet formalized」と明記 = 既知 gap。
