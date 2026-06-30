@@ -416,6 +416,21 @@ S11:4549 sorry。全 transport 補題が repo 実在ゆえ機械的に組める:
 > 残 = B2 (inflation character bridge、最難所 = induction-inflation commute lemma) + B3 (|W̄₂|=p +
 > instantiate)。本プロジェクトで「最難・最高コスト」と記された指標終盤の最後の山。
 
+## ⚑ lane-a endgame 状況 (2026-06-30, 要判断)
+
+**還元 count 中核 = 完了** (H₀C reducible count、本 issue の "最難" piece、sorry-free)。**残 lane-a は
+全て一様に deep FT endgame** — tractable な pivot 先は無い:
+- §9: caseA conjunct b degree (`chiefFactor_caseA_char_inertia` = non-Galois Hpart Clifford 解析、
+  caseB inertia infra 全体 ~150 行規模の analog)、caseB (9.9.c)、(9.10) Singer。
+- §10-13 (S12): `typeII_derived_frobenius` (10.7)、`typeII_coherence_contradiction_estimate` (10.8)、
+  `exists_zeta_residual_not_orthogonal` (11.8 = 唯一の bare FT spine sorry)、`typeV_forces_coherence` (10.10)。
+
+**進め方**: deep だが incremental に grind 可 — caseA inertia は 1 iteration = 1 supporting lemma の
+ペースで caseB inertia infra を analog 構築 (`chiefFactor_caseA_char_inertia` ← Hpart 直積 +
+W₁-transitive permutation の Clifford 解析)。難所の数学が真に impasse なら **ChatGPT 相談**
+([[feedback-ask-chatgpt-for-elided-gaps]]、strongest model) を併用。**次着手 = caseA inertia の最初の
+supporting lemma を WRITE** (scoping は完了済、deliberation 不要)。
+
 ## 進捗サマリ (2026-06-30 更新)
 
 **✅✅✅ 還元 count (9.8.b)/(9.9.b) 全完成 (sorry-free, axiom-clean)** — issue 1012 の中核:
