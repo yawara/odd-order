@@ -1013,3 +1013,21 @@ realized HC↠H̄ hom (hInHu→H̄ の f=(mk'N)∘hInHuEquivH を HC へ延長)�
 **layer 2+**: χ=Ind_{HC}^{HU}(ψ) irr (isIrreducibleCharacter_induce_of_inertia_eq + inertia(ψ)=HC,
 ψ HC-inv + restriction-inertia) → χ∈𝒳(H₀C) over θ₀ deg u → not-fixed → I_M=HU → induceHU deg qu。
 利用可能: exists_liesOver / coe_eq_induce_of_liesOver_of_isIrreducibleCharacter_induce (CliffordSingleOrbit)。
+
+
+## conjunct c — build 方針確定: explicit realized inflation hom (2026-07-01)
+
+**確認**: (1) `typeP_H_inf_U` (S11:134) = H∩U=⊥ ⟹ HC=hInHu⋊cInHu (internal semidirect、hInHu∩cInHu=⊥)。
+(2) repo に abstract char-extension lemma 無し (linearIrreducibleCharacter 系のみ) ⟹ ψ は
+**explicit realized inflation hom HC↠H̄ を構成**するしかない (semidirect 経由、~50-100 行)。
+
+**layer 1 build approach (post-summarization で実行)**:
+- hom ↥(hInHu⊔cInHu)→↥H⧸N: hInHu◁HC + HC=hInHu·cInHu (semidirect) を使い、g=h·c↦f(h)
+  (f=(mk'N)∘hInHuEquivH on hInHu、cInHu 上 trivial)。well-defined: f は cInHu-invariant
+  (θ̄ on H̄、C 中心化) + hInHu∩cInHu=⊥。
+- ψ=linearIrreducibleCharacter(θ̄∘(この hom))、ψ on HC、cInHu⊆ker、ψ|_hInHu=θ₀。
+- χ=Ind_{HC}^{HU}(ψ) irr (isIrreducibleCharacter_induce_of_inertia_eq + inertia(ψ)=HC via
+  clifford_caseA_regular_inertia_hc + restriction-inertia)。→ χ∈𝒳(H₀C) over θ₀ deg u。
+- M-level: not-fixed → I_M=HU → induceHU(χ) irr deg qu → conjunct c (5166)。
+
+seed (inertia heart) 完成。残 = explicit inflation hom + induction chain (機構・facts 全確定、fresh context で build)。
