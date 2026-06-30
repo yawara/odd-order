@@ -944,3 +944,21 @@ inertia) / step2-apply `clifford_caseA_regular_inertia_hc` (I_HU(θ₀)=HC for W
 - **degree-qu** (step5): `isIrreducibleCharacter_induce_of_inertia_eq` + huSub_normal ⟹
   Ind_{HU}^M(ζ) irreducible deg qu。
 - **𝒳** (step6): kernel 条件 → χ∈𝒳(H₀C) → caseA_character_counts conjunct c。
+
+
+## conjunct c — bridge/seed DONE; 残=degree-u/qu induction (2026-07-01)
+
+**Landed**: `clifford_caseA_exists_char_inertia_hc_not_fixed` (= (9.8.c) seed: ∃ θ hom, I_HU(θ₀)=HC
+∧ ∃w₀ not-W1-fixed)。inertia heart 完成 (steps 1/2/2-apply/bridge、25 feature commits)。
+conjunct c の sorry = caseA_character_counts:5166 (refine の 2 番目 ?_、∃χ∈𝒮(H₀C) irr deg qu)。
+
+**残 path + 利用機構**:
+- **degree-u** (Clifford 拡張 + 誘導): I_HU(θ on H)=HC → ψ on HC → Ind_{HC}^{HU}(ψ) irr deg u。
+  Coq の θ_f は HC 上直接 (cfDprodl→HCbar)。**OPEN: Clifford 拡張 (θ on H→ψ on HC) の所在**。
+  機構: `isIrreducibleCharacter_induce_of_inertia_eq` (θ:IrreducibleCharacter H, inertia=H → Ind irr)
+  + `hcInHu_normal` (HC◁HU)。**次の調査: 既存 (9.9.a) caseB_degree_qu (S11:5579) が I_HU=HC→deg-u を
+  どう作るか** (拡張パターン流用; 既存に有れば conjunct c はそれを呼ぶだけ)。
+- **degree-qu** (M-level): ζ not-W1-fixed (⟸ θ not-fixed) → I_M(ζ)=HU (prime-index, eq_of_le_of_prime_index,
+  [M:HU]=q) → χ=induceHU(ζ) irr (huSub_normal + isIrreducibleCharacter_induce_of_inertia_eq) deg q·u=qu
+  (induceHU_apply_one_eq_q_mul)。
+- **𝒳**: ζ∈𝒳(H₀C) (kernel 条件 + xiOf membership) → χ=induceHU(ζ)∈𝒮(H₀C) (sOf_iff)。
