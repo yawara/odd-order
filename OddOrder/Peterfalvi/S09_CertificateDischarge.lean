@@ -1616,4 +1616,36 @@ theorem rank1_eval_Y_generic {n : ℕ} (c N P d : Fin (n + 1) → ℂ) (a e : �
     ← Finset.sum_mul]
   ring
 
+/-- **(7.8.b) ℂ-level norm identity.**  Assembling the collapse with the three sum evaluations,
+the `ζ_0^ν` self-inner-product equals `(a−1)²/e + G/e² − ((a−1) − G/e)²/|L|` where
+`G = Σ_{i ≠ ind1H} ζ_i(1)²/‖ζ_i‖²` is the off-distinguished degree-sum.  (The `.re` and the
+`(1.5.d)` value `G = e(h−1)−e²` then yield the (7.8.b) lower bound via `normEstimate_matching`.) -/
+theorem zetaNuRho_inner_eq_cexpr {G : Type*} [Group G] [Fintype G] {A : Set G} {L : Subgroup G}
+    [Fintype L] [Invertible (Nat.card L : ℂ)] [Invertible (Nat.card G : ℂ)]
+    (H76 : Hypothesis76 G A L) (ν : ClassFunction ↥L ℂ →ₗ[ℤ] ClassFunction G ℂ)
+    {ind1H : Fin (H76.n + 1)} (a e : ℂ) (hind : ind1H ≠ 0)
+    (horth : ∀ i j : Fin (H76.n + 1), i ≠ j →
+      ClassFunction.inner (H76.zeta i) (H76.zeta j) = 0)
+    (hc_ind1H : H76.cCoeff (ν (H76.zeta 0)) ind1H = a - 1)
+    (hc_rest : ∀ i, i ≠ 0 → i ≠ ind1H → H76.cCoeff (ν (H76.zeta 0)) i = -(H76.d i))
+    (ha1_real : star (a - 1) = a - 1) (hd_real : ∀ i, star (H76.d i) = H76.d i)
+    (hP_real : ∀ i, star (H76.zeta i 1) = H76.zeta i 1)
+    (hd : ∀ i, H76.d i = H76.zeta i 1 / e)
+    (hN_ind1H : H76.zetaNormSq ind1H = e) (hP_ind1H : H76.zeta ind1H 1 = e) (he : e ≠ 0) :
+    ClassFunction.inner (H76.hyp71.chiRhoCF (ν (H76.zeta 0)))
+        (H76.hyp71.chiRhoCF (ν (H76.zeta 0))) =
+      (a - 1) ^ 2 / e
+        + (∑ i ∈ (Finset.Ioi (0 : Fin (H76.n + 1))).erase ind1H,
+            H76.zeta i 1 ^ 2 / H76.zetaNormSq i) / e ^ 2
+        - ((a - 1) - (∑ i ∈ (Finset.Ioi (0 : Fin (H76.n + 1))).erase ind1H,
+            H76.zeta i 1 ^ 2 / H76.zetaNormSq i) / e) ^ 2 / (Nat.card L : ℂ) := by
+  rw [chiRho_norm_sq_collapse H76 (ν (H76.zeta 0)) horth,
+    term1_eval_generic (H76.cCoeff (ν (H76.zeta 0))) H76.zetaNormSq (fun i => H76.zeta i 1) H76.d
+      a e hind hc_ind1H hc_rest ha1_real hd_real hd hN_ind1H,
+    rank1_eval_generic (H76.cCoeff (ν (H76.zeta 0))) H76.zetaNormSq (fun i => H76.zeta i 1) H76.d
+      a e hind hc_ind1H hc_rest ha1_real hd_real hd hN_ind1H hP_ind1H he,
+    rank1_eval_Y_generic (H76.cCoeff (ν (H76.zeta 0))) H76.zetaNormSq (fun i => H76.zeta i 1) H76.d
+      a e hind hc_ind1H hc_rest hP_real hd hN_ind1H hP_ind1H he]
+  ring
+
 end OddOrder.Peterfalvi.S09.Cert
