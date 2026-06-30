@@ -1757,31 +1757,43 @@ are covered by the corresponding `\widetilde M_i` pieces, with the additional
 Proof gates: Lemma 14.5(c) for the cardinal formula, Theorem 13.9 for the
 `σ(M_i)` disjoint union, and Corollary 14.9 for the final covering. -/
 theorem theoremE_sigma_partition_and_counting [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
-    {M K Kstar : Subgroup G} (hM : M ∈ maximalSubgroups G)
+    {M K Kstar U : Subgroup G} (hM : M ∈ maximalSubgroups G) (hKM : K ≤ M)
     (hK : Ch03.IsHallSubgroup (S14.kappa M) (K.subgroupOf M))
     (hKstar : Kstar = OddOrder.BG.Ch3.S10.Msigma M ⊓ Subgroup.centralizer (K : Set G))
-    (R : Subgroup G → G → Subgroup G) (reps : Set (Subgroup G))
+    (hU : Ch03.IsHallSubgroup ((S14.kappa M ∪ OddOrder.BG.Ch3.S10.sigma M)ᶜ) (U.subgroupOf M))
+    {reps : Set (Subgroup G)} (hrepsMax : ∀ Mi ∈ reps, Mi ∈ maximalSubgroups G)
     (hreps : ∀ H : Subgroup G, H ∈ maximalSubgroups G →
-      ∃! Mi : Subgroup G, Mi ∈ reps ∧ S14.IsConjugateSubgroup H Mi)
-    -- `R` must be the Theorem D normal-complement data `R(x)` (the docstring's
-    -- "`R(x)` as in Theorem D"); without this the conclusion would be claimed for an
-    -- arbitrary `R`, which is false. Pins `R M ·` and each `R Mi ·` to `RData`.
-    (hR : ∀ x ∈ sigmaSharp M, RData M x (R M x))
-    (hRreps : ∀ Mi ∈ reps, ∀ x ∈ sigmaSharp Mi, RData Mi x (R Mi x)) :
-    Nat.card (conjClassSet (tildeM M (R M))) =
+      ∃! Mi : Subgroup G, Mi ∈ reps ∧ S14.IsConjugateSubgroup H Mi) :
+    Nat.card (conjClassSet (S14.Mtilde hG (S14.genuineSigmaDecomposition hG) M)) =
         (Nat.card ↥(OddOrder.BG.Ch3.S10.Msigma M) - 1) * M.index ∧
       (∀ p : ℕ, p ∈ (Nat.card G).primeFactors ↔
         ∃ Mi : Subgroup G, Mi ∈ reps ∧ p ∈ OddOrder.BG.Ch3.S10.sigma Mi) ∧
       (∀ Mi ∈ reps, ∀ Mj ∈ reps, Mi ≠ Mj →
         OddOrder.BG.Ch3.S10.sigma Mi ∩ OddOrder.BG.Ch3.S10.sigma Mj = ∅) ∧
       (∀ Mi ∈ reps, ∀ Mj ∈ reps, Mi ≠ Mj →
-        conjClassSet (tildeM Mi (R Mi)) ∩ conjClassSet (tildeM Mj (R Mj)) = ∅) ∧
+        conjClassSet (S14.Mtilde hG (S14.genuineSigmaDecomposition hG) Mi) ∩
+          conjClassSet (S14.Mtilde hG (S14.genuineSigmaDecomposition hG) Mj) = ∅) ∧
       (let tildeG : Set G :=
-        {g | ∃ Mi : Subgroup G, Mi ∈ reps ∧ g ∈ conjClassSet (tildeM Mi (R Mi))}
+        {g | ∃ Mi : Subgroup G,
+          Mi ∈ reps ∧ g ∈ conjClassSet (S14.Mtilde hG (S14.genuineSigmaDecomposition hG) Mi)}
        (S14.maximalTypePFamily G = ∅ → sharpSubgroup (⊤ : Subgroup G) = tildeG) ∧
         (S14.maximalTypePFamily G ≠ ∅ → S14.IsTypeP M →
           sharpSubgroup (⊤ : Subgroup G) = tildeG ∪ conjClassSet (S14.zTilde K Kstar))) := by
-  sorry
+  refine ⟨?_, fun p => sigma_reps_prime_cover hG hrepsMax hreps p, ?_, ?_, ?_⟩
+  · rw [Nat.card_coe_set_eq]
+    exact S14.sigmaConjugacySaturation_Mtilde_ncard hG (S14.genuineSigmaDecomposition hG) hM
+  · intro Mi hMi Mj hMj hne
+    exact sigma_reps_pairwise_disjoint hG hrepsMax hreps hMi hMj hne
+  · intro Mi hMi Mj hMj hne
+    rw [← Set.disjoint_iff_inter_eq_empty]
+    refine S14.conjClassSet_Mtilde_disjoint hG (S14.genuineSigmaDecomposition hG)
+      (hrepsMax Mi hMi) (hrepsMax Mj hMj) ?_
+    intro hconj
+    obtain ⟨_, _, huniq⟩ := hreps Mi (hrepsMax Mi hMi)
+    exact hne ((huniq Mi ⟨hMi, S14.IsConjugateSubgroup.refl Mi⟩).trans
+      (huniq Mj ⟨hMj, hconj⟩).symm)
+  · exact sharpSubgroup_top_cover_reps_dichotomy hG hrepsMax (fun H hH => (hreps H hH).exists)
+      hM hKM hK hKstar hU
 
 /-- **BG §16 `A(M)`/`A_0(M)` support slice**: the auxiliary sets from this section
 have the TI and support properties used by the downstream character-theory interface.
