@@ -134,3 +134,22 @@ cross-lane infra」「下流 char-gated / lane-b overlap」を理由に戦略 fo
 **lane-c への指示 (LAUNCH.md と同一)**: (1) `git merge main` (16 behind 解消) → (2) base `Hypothesis`
 に `Tdata` carrier 追加 → (3) `typeII_overNormalizer_frobenius`/`exists_typeI_maximal_overNormalizer_U`
 の V-side dual を S/U-side mirror で構成 → (4) genuine lane-b char は cite/isolate。fork を立てず淡々と。
+
+## ⚠ HUB 自己訂正 (2026-06-30, lane-c の cont.¹² 訂正 + `FeitThompson.lean:276` を merge で確認)
+
+上記裁定の **step (2)「`Tdata` carrier 追加」は撤回する**。私が stale な punt commits に基づき誤った
+具体策を出していた。`FeitThompson.lean:276` docstring が明記する通り **「`T` (larger-κ member) need not be
+type-`P₂`, so no symmetric `Tdata`」** — `S` のみ determinate (type-P₂ 固定で `Sdata` 入力)、`T` の非対称は
+**設計意図**であり、`Tdata` を入力 carrier にすると §14 結論 (`T_typeII` 14.9) を入力へ格上げする設計違反。
+**lane-c の自己訂正 (本 issue cont.¹² 訂正) が正しい**。私の Tdata 指示は無効。
+
+**ただし裁定の spirit は不変かつ lane-c の実 trajectory と一致**: punt/再配置せず自クラスタ V-side を
+正面から、は正しい。ユーザーも lane-c session で **「§16 V-side 構成続行」を裁定済**、lane-c は既に
+`isMulCommutative_U` (13.2.a 非-gated 実証明) を landing し punt から脱却している。⟹ 戦略 fork 却下は維持、
+具体策のみ差し替え。
+
+**正しい path (lane-c が特定済、これを進めよ)**: 真の V-side gate = `T_typeII` (14.9、BG-structural
+reduction 済) → `exists_typeI_maximal_overNormalizer_V` (S-side `exists_typeI_maximal_overNormalizer_U`
+S15:609 ~350 行の dual、`T_typeII`-gated + V-side helper chain) → `exists_MHypothesis` (~35 field assemble)。
+multi-iteration の hard work、lane-c の own。`T_typeII_structural_inputs` の 5 連言 = `TypeIIData T` field
+そのもの (深 §14.9 char)。詳細 = `notes/peterfalvi/s16_w4_char_cascade.md` cont.¹²。
