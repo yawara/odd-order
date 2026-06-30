@@ -961,7 +961,7 @@ weighted sum `Σ_{i ≠ ind1H} (ζ_i(1)/(ζ_0(1)‖ζ_i‖²)) ζ_i^ν` paired a
 collapses by the `ν`-isometry (`hnu`) + family orthogonality to the single `i = j` term, which is
 `(ζ_j(1)/(ζ_0(1)‖ζ_j‖²)) ‖ζ_j‖² = ζ_j(1)/ζ_0(1)`.  This supplies the `a · ⟨weightedNuSum, ζ_j^ν⟩`
 term that cancels `⟨β, ζ_j^ν⟩` in the `Gamma_orth_nu` computation. -/
-theorem inner_weightedNuSum_nu {G : Type*} [Group G] [Fintype G] {A : Set G} {L : Subgroup G}
+theorem inner_weightedNuSum_nu {G : Type*} [Group G] [Fintype G] {L : Subgroup G}
     [Fintype L] [Invertible (Nat.card L : ℂ)] [Invertible (Nat.card G : ℂ)]
     (K : Subgroup ↥L) [K.Normal] [Fintype ↥K] [Invertible (Nat.card ↥K : ℂ)] {n : ℕ}
     (θ : Fin (n + 1) → IrreducibleCharacter ↥K)
@@ -1029,6 +1029,81 @@ theorem inner_beta_nu_eq {G : Type*} [Group G] [Fintype G] {A : Set G} {L : Subg
   have key := inner_beta_nuDiff H71 hτ K θ hinj d psi_support hind0 diffβ hj0 hj_ind ν hagree_j
   rw [ClassFunction.inner_sub_right, ClassFunction.inner_smul_right, hζ0norm, mul_one] at key
   linear_combination key
+
+/-- **Peterfalvi (7.8.a), `Γ ⊥ S^ν`** (the `Gamma_orth_nu` field of `BetaDecomp`).  For the residual
+`Γ = β − (1_G − ζ_0^ν + a · W)` with `a = ⟨β, ζ_0^ν⟩ + 1` and `W = Σ_{i≠ind1H} (ζ_i(1)/(ζ_0(1)‖ζ_i‖²))
+ζ_i^ν`, every `ζ_j^ν` (`j ≠ ind1H`) is orthogonal to `Γ`:
+
+* `⟨1_G, ζ_j^ν⟩ = 0` (`orth_one`), `⟨ζ_0^ν, ζ_j^ν⟩ = ⟨ζ_0, ζ_j⟩` (`ν`-isometry), `⟨W, ζ_j^ν⟩ =
+  ζ_j(1)/ζ_0(1)` (`inner_weightedNuSum_nu`);
+* `j = 0`: `⟨β, ζ_0^ν⟩ = a − 1`, `⟨ζ_0, ζ_0⟩ = 1`, so `(a−1) + 1 − a·1 = 0`;
+* `j ≠ 0`: `⟨β, ζ_j^ν⟩ = star(d_j)·a` (`inner_beta_nu_eq`), `⟨ζ_0, ζ_j⟩ = 0`, and `star(d_j) = d_j =
+  ζ_j(1)/ζ_0(1)` (`induce_apply_one_star`), so `d_j·a − a·d_j = 0`. -/
+theorem betaDecomp_gamma_orth_nu {G : Type*} [Group G] [Fintype G] {A : Set G} {L : Subgroup G}
+    [Fintype L] [Invertible (Nat.card L : ℂ)] [Invertible (Nat.card G : ℂ)]
+    (H71 : Hypothesis71 G A L)
+    (hτ : OddOrder.Peterfalvi.S04.IsDadeIsometry (G := G) (k := ℂ) (L := L) H71.τ)
+    (K : Subgroup ↥L) [K.Normal] [Fintype ↥K] [Invertible (Nat.card ↥K : ℂ)] {n : ℕ}
+    (θ : Fin (n + 1) → IrreducibleCharacter ↥K)
+    (hinj : Function.Injective (fun i => ClassFunction.induce K (θ i : ClassFunction ↥K ℂ)))
+    (d : Fin (n + 1) → ℂ)
+    (hd : ∀ i, d i = ClassFunction.induce K (θ i : ClassFunction ↥K ℂ) (1 : ↥L) /
+      ClassFunction.induce K (θ 0 : ClassFunction ↥K ℂ) (1 : ↥L))
+    (psi_support : ∀ i, (ClassFunction.induce K (θ i : ClassFunction ↥K ℂ)
+        - d i • ClassFunction.induce K (θ 0 : ClassFunction ↥K ℂ)).support ⊆
+      OddOrder.Peterfalvi.S04.supportInSubgroup A L)
+    {ind1H : Fin (n + 1)} (hind0 : ind1H ≠ 0)
+    (diffβ : (ClassFunction.induce K (θ ind1H : ClassFunction ↥K ℂ)
+        - ClassFunction.induce K (θ 0 : ClassFunction ↥K ℂ)).support ⊆
+      OddOrder.Peterfalvi.S04.supportInSubgroup A L)
+    (ν : ClassFunction ↥L ℂ →ₗ[ℤ] ClassFunction G ℂ)
+    (hnu : ∀ φ ψ : ClassFunction ↥L ℂ, ClassFunction.inner (ν φ) (ν ψ) = ClassFunction.inner φ ψ)
+    (hagree : ∀ i : Fin (n + 1), i ≠ 0 → i ≠ ind1H →
+      ν (ClassFunction.induce K (θ i : ClassFunction ↥K ℂ))
+          - d i • ν (ClassFunction.induce K (θ 0 : ClassFunction ↥K ℂ))
+        = H71.τ ⟨ClassFunction.induce K (θ i : ClassFunction ↥K ℂ)
+            - d i • ClassFunction.induce K (θ 0 : ClassFunction ↥K ℂ), psi_support i⟩)
+    (horth1 : ∀ i : Fin (n + 1), i ≠ ind1H →
+      ClassFunction.inner (ν (ClassFunction.induce K (θ i : ClassFunction ↥K ℂ)))
+        (Hypothesis71.constOne G) = 0)
+    (hζ0norm : ClassFunction.inner (ClassFunction.induce K (θ 0 : ClassFunction ↥K ℂ))
+      (ClassFunction.induce K (θ 0 : ClassFunction ↥K ℂ)) = 1)
+    (β : ClassFunction G ℂ)
+    (hβ : β = H71.τ ⟨ClassFunction.induce K (θ ind1H : ClassFunction ↥K ℂ)
+      - ClassFunction.induce K (θ 0 : ClassFunction ↥K ℂ), diffβ⟩)
+    (a : ℂ) (ha : a = ClassFunction.inner β (ν (ClassFunction.induce K (θ 0 : ClassFunction ↥K ℂ))) + 1)
+    (W : ClassFunction G ℂ)
+    (hW : W = ∑ i ∈ Finset.univ.erase ind1H,
+      (ClassFunction.induce K (θ i : ClassFunction ↥K ℂ) (1 : ↥L) /
+        (ClassFunction.induce K (θ 0 : ClassFunction ↥K ℂ) (1 : ↥L) *
+          ClassFunction.inner (ClassFunction.induce K (θ i : ClassFunction ↥K ℂ))
+            (ClassFunction.induce K (θ i : ClassFunction ↥K ℂ))) : ℂ) •
+        ν (ClassFunction.induce K (θ i : ClassFunction ↥K ℂ)))
+    {j : Fin (n + 1)} (hj : j ≠ ind1H) :
+    ClassFunction.inner (β - (Hypothesis71.constOne G
+        - ν (ClassFunction.induce K (θ 0 : ClassFunction ↥K ℂ)) + a • W))
+      (ν (ClassFunction.induce K (θ j : ClassFunction ↥K ℂ))) = 0 := by
+  have hz0 : ClassFunction.induce K (θ 0 : ClassFunction ↥K ℂ) (1 : ↥L) ≠ 0 :=
+    induce_apply_one_ne_zero K (θ 0)
+  have hc1 : ClassFunction.inner (Hypothesis71.constOne G)
+      (ν (ClassFunction.induce K (θ j : ClassFunction ↥K ℂ))) = 0 := by
+    rw [OddOrder.RepresentationTheory.inner_conj_symm, horth1 j hj, star_zero]
+  have hWj : ClassFunction.inner W (ν (ClassFunction.induce K (θ j : ClassFunction ↥K ℂ)))
+      = ClassFunction.induce K (θ j : ClassFunction ↥K ℂ) (1 : ↥L) /
+        ClassFunction.induce K (θ 0 : ClassFunction ↥K ℂ) (1 : ↥L) := by
+    rw [hW]; exact inner_weightedNuSum_nu K θ hinj ν hnu hj
+  rw [ClassFunction.inner_sub_left, ClassFunction.inner_add_left, ClassFunction.inner_sub_left,
+    ClassFunction.inner_smul_left, hnu, hc1, hWj]
+  by_cases hj0 : j = 0
+  · subst hj0
+    rw [hζ0norm, div_self hz0, ha]; ring
+  · rw [induce_family_orthogonal_of_injective K θ hinj 0 j (Ne.symm hj0), hβ,
+      inner_beta_nu_eq H71 hτ K θ hinj d psi_support hind0 diffβ hj0 hj ν (hagree j hj0 hj) hζ0norm,
+      ← hβ, ← ha]
+    have hstar : star (d j) = ClassFunction.induce K (θ j : ClassFunction ↥K ℂ) (1 : ↥L) /
+        ClassFunction.induce K (θ 0 : ClassFunction ↥K ℂ) (1 : ↥L) := by
+      rw [hd j, star_div₀, induce_apply_one_star, induce_apply_one_star]
+    rw [hstar]; ring
 
 /-- **The (7.8.c) collapse of the (7.7.a) sum to a single term.**  If, in the `(7.7.a)`
 decomposition `χ^ρ(x) = ∑_{i ≥ 1} (c̄_i/‖ζ_i‖²) ζ_i(x)`, all coefficients `c_i` (`i ≥ 1`) vanish
