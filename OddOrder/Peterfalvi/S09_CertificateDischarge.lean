@@ -991,6 +991,23 @@ theorem betaDecomp_orth_one {G : Type*} [Group G] [Fintype G] {A : Set G} {L : S
     d psi_support ind1H hind1H ν hagree hzeta0nu
     (fun i hi => inner_induce_constOne_eq_zero K (θ i) (hne_triv i hi))
 
+/-- **The family-difference inner product, generic family form** (Peterfalvi (7.8.a)).  For an
+arbitrary pairwise-orthogonal family `ζ` (`horth`), `⟨ζ_{ind1H} − ζ_0, ζ_i − d_i ζ_0⟩
+= star(d_i) ‖ζ_0‖²` (`i ≠ 0, ind1H`, `ind1H ≠ 0`): all cross terms vanish, leaving the
+`d_i ζ_0`-against-`ζ_0` term.  The `induce`-specific `inner_family_diff` instantiates `ζ = Ind θ`
+with `horth := induce_family_orthogonal_of_injective`. -/
+theorem inner_family_diff_gen [Invertible (Nat.card L : ℂ)] {n : ℕ}
+    (ζ : Fin (n + 1) → ClassFunction L ℂ)
+    (horth : ∀ i j : Fin (n + 1), i ≠ j → ClassFunction.inner (ζ i) (ζ j) = 0)
+    (d : Fin (n + 1) → ℂ) {i ind1H : Fin (n + 1)}
+    (hi0 : i ≠ 0) (hi_ind : i ≠ ind1H) (hind0 : ind1H ≠ 0) :
+    ClassFunction.inner (ζ ind1H - ζ 0) (ζ i - d i • ζ 0)
+      = star (d i) * ClassFunction.inner (ζ 0) (ζ 0) := by
+  rw [ClassFunction.inner_sub_left, ClassFunction.inner_sub_right, ClassFunction.inner_sub_right,
+    ClassFunction.inner_smul_right, ClassFunction.inner_smul_right,
+    horth ind1H i (Ne.symm hi_ind), horth ind1H 0 hind0, horth 0 i (Ne.symm hi0)]
+  ring
+
 /-- **The family-difference inner product** (Peterfalvi (7.8.a), `a_φ` computation).  For pairwise
 distinct family members, `⟨ζ_{ind1H} − ζ_0, ζ_i − d_i ζ_0⟩ = star(d_i) ‖ζ_0‖²` (`i ≠ 0, ind1H`,
 `ind1H ≠ 0`): all cross terms vanish by orthogonality (`induce_family_orthogonal_of_injective`),
@@ -1008,12 +1025,32 @@ theorem inner_family_diff (K : Subgroup L) [K.Normal] [Fintype ↥K]
         (ClassFunction.induce K (θ i : ClassFunction ↥K ℂ)
           - d i • ClassFunction.induce K (θ 0 : ClassFunction ↥K ℂ))
       = star (d i) * ClassFunction.inner (ClassFunction.induce K (θ 0 : ClassFunction ↥K ℂ))
-          (ClassFunction.induce K (θ 0 : ClassFunction ↥K ℂ)) := by
-  have horth := induce_family_orthogonal_of_injective K θ hinj
-  rw [ClassFunction.inner_sub_left, ClassFunction.inner_sub_right, ClassFunction.inner_sub_right,
-    ClassFunction.inner_smul_right, ClassFunction.inner_smul_right,
-    horth ind1H i (Ne.symm hi_ind), horth ind1H 0 hind0, horth 0 i (Ne.symm hi0)]
-  ring
+          (ClassFunction.induce K (θ 0 : ClassFunction ↥K ℂ)) :=
+  inner_family_diff_gen (fun i => ClassFunction.induce K (θ i : ClassFunction ↥K ℂ))
+    (induce_family_orthogonal_of_injective K θ hinj) d hi0 hi_ind hind0
+
+/-- **The inner product `⟨β, ζ_i^ν − d_i ζ_0^ν⟩`, generic family form** (Peterfalvi (7.8.a)).  For an
+arbitrary pairwise-orthogonal family `ζ` (`horth`), with `β = (ζ_{ind1H} − ζ_0)^τ` and the coherence
+agreement `ζ_i^ν − d_i ζ_0^ν = (ζ_i − d_i ζ_0)^τ` (`hagree_i`), the Dade isometry turns the `G`-side
+inner product into `⟨ζ_{ind1H} − ζ_0, ζ_i − d_i ζ_0⟩ = star(d_i) ‖ζ_0‖²` (`inner_family_diff_gen`).
+Instantiated by the `induce`-specific `inner_beta_nuDiff` and the `Hypothesis78`-level constructor. -/
+theorem inner_beta_nuDiff_gen {G : Type*} [Group G] [Fintype G] {A : Set G} {L : Subgroup G}
+    [Fintype L] [Invertible (Nat.card L : ℂ)] [Invertible (Nat.card G : ℂ)]
+    (H71 : Hypothesis71 G A L)
+    (hτ : OddOrder.Peterfalvi.S04.IsDadeIsometry (G := G) (k := ℂ) (L := L) H71.τ)
+    {n : ℕ} (ζ : Fin (n + 1) → ClassFunction ↥L ℂ)
+    (horth : ∀ i j : Fin (n + 1), i ≠ j → ClassFunction.inner (ζ i) (ζ j) = 0)
+    (d : Fin (n + 1) → ℂ)
+    (psi_support : ∀ i, (ζ i - d i • ζ 0).support ⊆ OddOrder.Peterfalvi.S04.supportInSubgroup A L)
+    {ind1H : Fin (n + 1)} (hind0 : ind1H ≠ 0)
+    (diffβ : (ζ ind1H - ζ 0).support ⊆ OddOrder.Peterfalvi.S04.supportInSubgroup A L)
+    {i : Fin (n + 1)} (hi0 : i ≠ 0) (hi_ind : i ≠ ind1H)
+    (ν : ClassFunction ↥L ℂ →ₗ[ℤ] ClassFunction G ℂ)
+    (hagree_i : ν (ζ i) - d i • ν (ζ 0) = H71.τ ⟨ζ i - d i • ζ 0, psi_support i⟩) :
+    ClassFunction.inner (H71.τ ⟨ζ ind1H - ζ 0, diffβ⟩) (ν (ζ i) - d i • ν (ζ 0))
+      = star (d i) * ClassFunction.inner (ζ 0) (ζ 0) := by
+  rw [hagree_i, hτ.inner_eq]
+  exact inner_family_diff_gen ζ horth d hi0 hi_ind hind0
 
 /-- **The inner product `⟨β, ζ_i^ν − d_i ζ_0^ν⟩`** (Peterfalvi (7.8.a), `a_φ` step).  With
 `β = (ζ_{ind1H} − ζ_0)^τ` and the coherence agreement `ζ_i^ν − d_i ζ_0^ν = (ζ_i − d_i ζ_0)^τ`
@@ -1047,9 +1084,37 @@ theorem inner_beta_nuDiff {G : Type*} [Group G] [Fintype G] {A : Set G} {L : Sub
         (ν (ClassFunction.induce K (θ i : ClassFunction ↥K ℂ))
           - d i • ν (ClassFunction.induce K (θ 0 : ClassFunction ↥K ℂ)))
       = star (d i) * ClassFunction.inner (ClassFunction.induce K (θ 0 : ClassFunction ↥K ℂ))
-          (ClassFunction.induce K (θ 0 : ClassFunction ↥K ℂ)) := by
-  rw [hagree_i, hτ.inner_eq]
-  exact inner_family_diff K θ hinj d hi0 hi_ind hind0
+          (ClassFunction.induce K (θ 0 : ClassFunction ↥K ℂ)) :=
+  inner_beta_nuDiff_gen H71 hτ (fun i => ClassFunction.induce K (θ i : ClassFunction ↥K ℂ))
+    (induce_family_orthogonal_of_injective K θ hinj) d psi_support hind0 diffβ hi0 hi_ind ν hagree_i
+
+/-- **The inner product `⟨weightedNuSum, ζ_j^ν⟩ = ζ_j(1)/ζ_0(1)`, generic family form**
+(Peterfalvi (7.8.a)).  For an arbitrary pairwise-orthogonal family `ζ` (`horth`) with nonzero norms
+(`hN`) and `ζ_0(1) ≠ 0` (`hz0`), the weighted sum `Σ_{i ≠ ind1H} (ζ_i(1)/(ζ_0(1)‖ζ_i‖²)) ζ_i^ν`
+against `ζ_j^ν` (`j ≠ ind1H`) collapses by the `ν`-isometry to the single `i = j` term
+`(ζ_j(1)/(ζ_0(1)‖ζ_j‖²)) ‖ζ_j‖² = ζ_j(1)/ζ_0(1)`.  Instantiated by the `induce`-specific
+`inner_weightedNuSum_nu` and the `Hypothesis78`-level constructor. -/
+theorem inner_weightedNuSum_nu_gen {G : Type*} [Group G] [Fintype G] {L : Subgroup G}
+    [Fintype L] [Invertible (Nat.card L : ℂ)] [Invertible (Nat.card G : ℂ)]
+    {n : ℕ} (ζ : Fin (n + 1) → ClassFunction ↥L ℂ)
+    (horth : ∀ i j : Fin (n + 1), i ≠ j → ClassFunction.inner (ζ i) (ζ j) = 0)
+    (hN : ∀ j : Fin (n + 1), ClassFunction.inner (ζ j) (ζ j) ≠ 0)
+    (hz0 : ζ 0 (1 : ↥L) ≠ 0)
+    (ν : ClassFunction ↥L ℂ →ₗ[ℤ] ClassFunction G ℂ)
+    (hnu : ∀ φ ψ : ClassFunction ↥L ℂ, ClassFunction.inner (ν φ) (ν ψ) = ClassFunction.inner φ ψ)
+    {ind1H j : Fin (n + 1)} (hj : j ≠ ind1H) :
+    ClassFunction.inner
+      (∑ i ∈ Finset.univ.erase ind1H,
+        (ζ i (1 : ↥L) / (ζ 0 (1 : ↥L) * ClassFunction.inner (ζ i) (ζ i)) : ℂ) • ν (ζ i))
+      (ν (ζ j))
+    = ζ j (1 : ↥L) / ζ 0 (1 : ↥L) := by
+  rw [inner_sum_left, Finset.sum_eq_single_of_mem j
+      (Finset.mem_erase.mpr ⟨hj, Finset.mem_univ j⟩)
+      (fun i _ hij => by
+        rw [ClassFunction.inner_smul_left, hnu, horth i j hij, mul_zero]),
+    ClassFunction.inner_smul_left, hnu]
+  have hNj := hN j
+  field_simp
 
 /-- **The inner product `⟨weightedNuSum, ζ_j^ν⟩ = ζ_j(1)/ζ_0(1)`** (Peterfalvi (7.8.a)).  The
 weighted sum `Σ_{i ≠ ind1H} (ζ_i(1)/(ζ_0(1)‖ζ_i‖²)) ζ_i^ν` paired against `ζ_j^ν` (`j ≠ ind1H`)
@@ -1074,17 +1139,33 @@ theorem inner_weightedNuSum_nu {G : Type*} [Group G] [Fintype G] {L : Subgroup G
       (ν (ClassFunction.induce K (θ j : ClassFunction ↥K ℂ)))
     = ClassFunction.induce K (θ j : ClassFunction ↥K ℂ) (1 : ↥L) /
         ClassFunction.induce K (θ 0 : ClassFunction ↥K ℂ) (1 : ↥L) := by
-  rw [inner_sum_left, Finset.sum_eq_single_of_mem j
-      (Finset.mem_erase.mpr ⟨hj, Finset.mem_univ j⟩)
-      (fun i _ hij => by
-        rw [ClassFunction.inner_smul_left, hnu,
-          induce_family_orthogonal_of_injective K θ hinj i j hij, mul_zero]),
-    ClassFunction.inner_smul_left, hnu]
-  have hN : ClassFunction.inner (ClassFunction.induce K (θ j : ClassFunction ↥K ℂ))
-      (ClassFunction.induce K (θ j : ClassFunction ↥K ℂ)) ≠ 0 := induce_norm_ne_zero K (θ j)
-  have hz0 : ClassFunction.induce K (θ 0 : ClassFunction ↥K ℂ) (1 : ↥L) ≠ 0 :=
-    induce_apply_one_ne_zero K (θ 0)
-  field_simp
+  exact inner_weightedNuSum_nu_gen (fun i => ClassFunction.induce K (θ i : ClassFunction ↥K ℂ))
+    (induce_family_orthogonal_of_injective K θ hinj) (fun j => induce_norm_ne_zero K (θ j))
+    (induce_apply_one_ne_zero K (θ 0)) ν hnu hj
+
+/-- **The inner product `⟨β, ζ_j^ν⟩ = star(d_j) · a`, generic family form** (Peterfalvi (7.8.a)).
+For an arbitrary pairwise-orthogonal family `ζ` (`horth`), with `a = ⟨β, ζ_0^ν⟩ + 1` and `‖ζ_0‖² = 1`
+(`hζ0norm`), `inner_beta_nuDiff_gen` rearranges to `⟨β, ζ_j^ν⟩ = star(d_j)(⟨β, ζ_0^ν⟩ + 1)`
+(`j ≠ 0, ind1H`).  Instantiated by `inner_beta_nu_eq` and the `Hypothesis78`-level constructor. -/
+theorem inner_beta_nu_eq_gen {G : Type*} [Group G] [Fintype G] {A : Set G} {L : Subgroup G}
+    [Fintype L] [Invertible (Nat.card L : ℂ)] [Invertible (Nat.card G : ℂ)]
+    (H71 : Hypothesis71 G A L)
+    (hτ : OddOrder.Peterfalvi.S04.IsDadeIsometry (G := G) (k := ℂ) (L := L) H71.τ)
+    {n : ℕ} (ζ : Fin (n + 1) → ClassFunction ↥L ℂ)
+    (horth : ∀ i j : Fin (n + 1), i ≠ j → ClassFunction.inner (ζ i) (ζ j) = 0)
+    (d : Fin (n + 1) → ℂ)
+    (psi_support : ∀ i, (ζ i - d i • ζ 0).support ⊆ OddOrder.Peterfalvi.S04.supportInSubgroup A L)
+    {ind1H : Fin (n + 1)} (hind0 : ind1H ≠ 0)
+    (diffβ : (ζ ind1H - ζ 0).support ⊆ OddOrder.Peterfalvi.S04.supportInSubgroup A L)
+    {j : Fin (n + 1)} (hj0 : j ≠ 0) (hj_ind : j ≠ ind1H)
+    (ν : ClassFunction ↥L ℂ →ₗ[ℤ] ClassFunction G ℂ)
+    (hagree_j : ν (ζ j) - d j • ν (ζ 0) = H71.τ ⟨ζ j - d j • ζ 0, psi_support j⟩)
+    (hζ0norm : ClassFunction.inner (ζ 0) (ζ 0) = 1) :
+    ClassFunction.inner (H71.τ ⟨ζ ind1H - ζ 0, diffβ⟩) (ν (ζ j))
+      = star (d j) * (ClassFunction.inner (H71.τ ⟨ζ ind1H - ζ 0, diffβ⟩) (ν (ζ 0)) + 1) := by
+  have key := inner_beta_nuDiff_gen H71 hτ ζ horth d psi_support hind0 diffβ hj0 hj_ind ν hagree_j
+  rw [ClassFunction.inner_sub_right, ClassFunction.inner_smul_right, hζ0norm, mul_one] at key
+  linear_combination key
 
 /-- **The inner product `⟨β, ζ_j^ν⟩ = star(d_j) · a`** (Peterfalvi (7.8.a)).  With `a = ⟨β, ζ_0^ν⟩ + 1`
 and `‖ζ_0‖² = 1` (the distinguished `ζ_0 ∈ Irr L`), `inner_beta_nuDiff` (`⟨β, ζ_j^ν − d_j ζ_0^ν⟩ =
@@ -1121,9 +1202,58 @@ theorem inner_beta_nu_eq {G : Type*} [Group G] [Fintype G] {A : Set G} {L : Subg
           (H71.τ ⟨ClassFunction.induce K (θ ind1H : ClassFunction ↥K ℂ)
               - ClassFunction.induce K (θ 0 : ClassFunction ↥K ℂ), diffβ⟩)
           (ν (ClassFunction.induce K (θ 0 : ClassFunction ↥K ℂ))) + 1) := by
-  have key := inner_beta_nuDiff H71 hτ K θ hinj d psi_support hind0 diffβ hj0 hj_ind ν hagree_j
-  rw [ClassFunction.inner_sub_right, ClassFunction.inner_smul_right, hζ0norm, mul_one] at key
-  linear_combination key
+  exact inner_beta_nu_eq_gen H71 hτ (fun i => ClassFunction.induce K (θ i : ClassFunction ↥K ℂ))
+    (induce_family_orthogonal_of_injective K θ hinj) d psi_support hind0 diffβ hj0 hj_ind ν
+    hagree_j hζ0norm
+
+/-- **Peterfalvi (7.8.a), `Γ ⊥ S^ν`, generic family form** (the `Gamma_orth_nu` field of
+`BetaDecomp`).  For an arbitrary pairwise-orthogonal family `ζ` with nonzero norms (`hN`),
+`ζ_0(1) ≠ 0` (`hz0`), and real degrees (`hP_real`), the residual `Γ = β − (1_G − ζ_0^ν + a · W)`
+(`a = ⟨β, ζ_0^ν⟩ + 1`, `W = Σ_{i≠ind1H} (ζ_i(1)/(ζ_0(1)‖ζ_i‖²)) ζ_i^ν`) is orthogonal to every
+`ζ_j^ν` (`j ≠ ind1H`): the building blocks are `inner_weightedNuSum_nu_gen`, `inner_beta_nu_eq_gen`,
+`horth`, and `hP_real`.  Instantiated by the `induce`-specific `betaDecomp_gamma_orth_nu` and the
+`Hypothesis78`-level constructor. -/
+theorem betaDecomp_gamma_orth_nu_gen {G : Type*} [Group G] [Fintype G] {A : Set G} {L : Subgroup G}
+    [Fintype L] [Invertible (Nat.card L : ℂ)] [Invertible (Nat.card G : ℂ)]
+    (H71 : Hypothesis71 G A L)
+    (hτ : OddOrder.Peterfalvi.S04.IsDadeIsometry (G := G) (k := ℂ) (L := L) H71.τ)
+    {n : ℕ} (ζ : Fin (n + 1) → ClassFunction ↥L ℂ)
+    (horth : ∀ i j : Fin (n + 1), i ≠ j → ClassFunction.inner (ζ i) (ζ j) = 0)
+    (hN : ∀ j : Fin (n + 1), ClassFunction.inner (ζ j) (ζ j) ≠ 0)
+    (hz0 : ζ 0 (1 : ↥L) ≠ 0) (hP_real : ∀ i, star (ζ i (1 : ↥L)) = ζ i (1 : ↥L))
+    (d : Fin (n + 1) → ℂ) (hd : ∀ i, d i = ζ i (1 : ↥L) / ζ 0 (1 : ↥L))
+    (psi_support : ∀ i, (ζ i - d i • ζ 0).support ⊆ OddOrder.Peterfalvi.S04.supportInSubgroup A L)
+    {ind1H : Fin (n + 1)} (hind0 : ind1H ≠ 0)
+    (diffβ : (ζ ind1H - ζ 0).support ⊆ OddOrder.Peterfalvi.S04.supportInSubgroup A L)
+    (ν : ClassFunction ↥L ℂ →ₗ[ℤ] ClassFunction G ℂ)
+    (hnu : ∀ φ ψ : ClassFunction ↥L ℂ, ClassFunction.inner (ν φ) (ν ψ) = ClassFunction.inner φ ψ)
+    (hagree : ∀ i : Fin (n + 1), i ≠ 0 → i ≠ ind1H →
+      ν (ζ i) - d i • ν (ζ 0) = H71.τ ⟨ζ i - d i • ζ 0, psi_support i⟩)
+    (horth1 : ∀ i : Fin (n + 1), i ≠ ind1H →
+      ClassFunction.inner (ν (ζ i)) (Hypothesis71.constOne G) = 0)
+    (hζ0norm : ClassFunction.inner (ζ 0) (ζ 0) = 1)
+    (β : ClassFunction G ℂ) (hβ : β = H71.τ ⟨ζ ind1H - ζ 0, diffβ⟩)
+    (a : ℂ) (ha : a = ClassFunction.inner β (ν (ζ 0)) + 1)
+    (W : ClassFunction G ℂ)
+    (hW : W = ∑ i ∈ Finset.univ.erase ind1H,
+      (ζ i (1 : ↥L) / (ζ 0 (1 : ↥L) * ClassFunction.inner (ζ i) (ζ i)) : ℂ) • ν (ζ i))
+    {j : Fin (n + 1)} (hj : j ≠ ind1H) :
+    ClassFunction.inner (β - (Hypothesis71.constOne G - ν (ζ 0) + a • W)) (ν (ζ j)) = 0 := by
+  have hc1 : ClassFunction.inner (Hypothesis71.constOne G) (ν (ζ j)) = 0 := by
+    rw [OddOrder.RepresentationTheory.inner_conj_symm, horth1 j hj, star_zero]
+  have hWj : ClassFunction.inner W (ν (ζ j)) = ζ j (1 : ↥L) / ζ 0 (1 : ↥L) := by
+    rw [hW]; exact inner_weightedNuSum_nu_gen ζ horth hN hz0 ν hnu hj
+  rw [ClassFunction.inner_sub_left, ClassFunction.inner_add_left, ClassFunction.inner_sub_left,
+    ClassFunction.inner_smul_left, hnu, hc1, hWj]
+  by_cases hj0 : j = 0
+  · subst hj0
+    rw [hζ0norm, div_self hz0, ha]; ring
+  · rw [horth 0 j (Ne.symm hj0), hβ,
+      inner_beta_nu_eq_gen H71 hτ ζ horth d psi_support hind0 diffβ hj0 hj ν (hagree j hj0 hj)
+        hζ0norm, ← hβ, ← ha]
+    have hstar : star (d j) = ζ j (1 : ↥L) / ζ 0 (1 : ↥L) := by
+      rw [hd j, star_div₀, hP_real j, hP_real 0]
+    rw [hstar]; ring
 
 /-- **Peterfalvi (7.8.a), `Γ ⊥ S^ν`** (the `Gamma_orth_nu` field of `BetaDecomp`).  For the residual
 `Γ = β − (1_G − ζ_0^ν + a · W)` with `a = ⟨β, ζ_0^ν⟩ + 1` and `W = Σ_{i≠ind1H} (ζ_i(1)/(ζ_0(1)‖ζ_i‖²))
@@ -1178,27 +1308,11 @@ theorem betaDecomp_gamma_orth_nu {G : Type*} [Group G] [Fintype G] {A : Set G} {
     ClassFunction.inner (β - (Hypothesis71.constOne G
         - ν (ClassFunction.induce K (θ 0 : ClassFunction ↥K ℂ)) + a • W))
       (ν (ClassFunction.induce K (θ j : ClassFunction ↥K ℂ))) = 0 := by
-  have hz0 : ClassFunction.induce K (θ 0 : ClassFunction ↥K ℂ) (1 : ↥L) ≠ 0 :=
-    induce_apply_one_ne_zero K (θ 0)
-  have hc1 : ClassFunction.inner (Hypothesis71.constOne G)
-      (ν (ClassFunction.induce K (θ j : ClassFunction ↥K ℂ))) = 0 := by
-    rw [OddOrder.RepresentationTheory.inner_conj_symm, horth1 j hj, star_zero]
-  have hWj : ClassFunction.inner W (ν (ClassFunction.induce K (θ j : ClassFunction ↥K ℂ)))
-      = ClassFunction.induce K (θ j : ClassFunction ↥K ℂ) (1 : ↥L) /
-        ClassFunction.induce K (θ 0 : ClassFunction ↥K ℂ) (1 : ↥L) := by
-    rw [hW]; exact inner_weightedNuSum_nu K θ hinj ν hnu hj
-  rw [ClassFunction.inner_sub_left, ClassFunction.inner_add_left, ClassFunction.inner_sub_left,
-    ClassFunction.inner_smul_left, hnu, hc1, hWj]
-  by_cases hj0 : j = 0
-  · subst hj0
-    rw [hζ0norm, div_self hz0, ha]; ring
-  · rw [induce_family_orthogonal_of_injective K θ hinj 0 j (Ne.symm hj0), hβ,
-      inner_beta_nu_eq H71 hτ K θ hinj d psi_support hind0 diffβ hj0 hj ν (hagree j hj0 hj) hζ0norm,
-      ← hβ, ← ha]
-    have hstar : star (d j) = ClassFunction.induce K (θ j : ClassFunction ↥K ℂ) (1 : ↥L) /
-        ClassFunction.induce K (θ 0 : ClassFunction ↥K ℂ) (1 : ↥L) := by
-      rw [hd j, star_div₀, induce_apply_one_star, induce_apply_one_star]
-    rw [hstar]; ring
+  exact betaDecomp_gamma_orth_nu_gen H71 hτ
+    (fun i => ClassFunction.induce K (θ i : ClassFunction ↥K ℂ))
+    (induce_family_orthogonal_of_injective K θ hinj) (fun j => induce_norm_ne_zero K (θ j))
+    (induce_apply_one_ne_zero K (θ 0)) (fun i => induce_apply_one_star K (θ i))
+    d hd psi_support hind0 diffβ ν hnu hagree horth1 hζ0norm β hβ a ha W hW hj
 
 /-- **Peterfalvi (7.8.a), `Γ ⊥ 1_G`, generic family form.**  Abstracted over an arbitrary family
 `ζ` and taking the family-agnostic `⟨β, 1_G⟩ = 1` (`hβ1`).  For the residual
