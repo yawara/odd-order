@@ -2229,4 +2229,23 @@ noncomputable def betaDecompOfDade
     (fun i hi => inner_induce_constOne_eq_zero (H.subgroupOf L) (θ i) (hne_triv i hi))
     hβ1 hζ0norm a ha
 
+/-- **`e = [L : H◁L]`**, the complement index as the `subgroupOf` index.  By Lagrange both equal
+`|L| / |H|`: `(H.subgroupOf L).index · |H.subgroupOf L| = |L|` and `|H.subgroupOf L| = |H|`, while
+`e · |H| = |L|` (`kernelOrder_mul_complementIndex_eq_card_L`); cancelling `|H| > 0` identifies them.
+This bridges the induced-principal degree/norm `‖Ind 1_K‖² = Ind 1_K(1) = [L:K]` (`K = H.subgroupOf L`)
+to the `(7.8.b)` complement index `e`, the `hN_ind1H`/`hP_ind1H` source facts. -/
+theorem complementIndex_eq_subgroupOf_index {G : Type*} [Group G] [Fintype G] {A : Set G}
+    {L : Subgroup G} [Fintype L] [Invertible (Nat.card L : ℂ)] [Invertible (Nat.card G : ℂ)]
+    (H78 : OddOrder.Peterfalvi.S09.Hypothesis78 G A L) :
+    H78.complementIndex = (H78.hyp76.H.subgroupOf L).index := by
+  have hKcard : Nat.card ↥(H78.hyp76.H.subgroupOf L) = Nat.card H78.hyp76.H :=
+    Nat.card_congr (Subgroup.subgroupOfEquivOfLe H78.hyp76.H_le_L).toEquiv
+  have hpos : 0 < Nat.card H78.hyp76.H := Nat.card_pos
+  have h1 : (H78.hyp76.H.subgroupOf L).index * Nat.card H78.hyp76.H = Nat.card L := by
+    rw [← hKcard, Subgroup.index_mul_card]
+  have h2 : Nat.card H78.hyp76.H * H78.complementIndex = Nat.card L :=
+    H78.kernelOrder_mul_complementIndex_eq_card_L
+  apply Nat.eq_of_mul_eq_mul_left hpos
+  rw [h2, mul_comm, h1]
+
 end OddOrder.Peterfalvi.S09.Cert
