@@ -6198,5 +6198,17 @@ theorem hcZeta_irreducible [Finite G] {M : Subgroup G}
   OddOrder.RepresentationTheory.isIrreducibleCharacter_induce_of_inertia_eq (hcPsi chief θ)
     (hcPsi_inertia_eq_hc chief θ hθ₀)
 
+/-- **`[HU:HC] = u`**: the index of `HC = hInHu ⊔ H₀C` in `HU` is `u = |Ū|`.  Via the identification
+`HC = hInHu ⊔ cInHu` and the existing `index_hcInHu_eq_relindex_cInHu` + `index_cInHu_subgroupOf_uInHu_eq_u`
+(`[HU:HC] = [U:C] = u`).  The degree `ζ(1) = [HU:HC]·ψ(1) = u·1` of the (9.8.c) construction. -/
+theorem hc_index_eq_u [Finite G] {M : Subgroup G}
+    {data : TypesIIIIIIVSetup M} {chief : ChiefFactorData data}
+    (chars : Section11CharacterData data chief) :
+    (hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf (huSub data)).index
+      = chars.u := by
+  rw [hInHu_sup_realizedH0supC]
+  exact (index_hcInHu_eq_relindex_cInHu data chief).trans
+    (index_cInHu_subgroupOf_uInHu_eq_u data chief chars)
+
 end OddOrder.Peterfalvi.S11
 
