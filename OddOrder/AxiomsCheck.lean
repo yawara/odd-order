@@ -6927,3 +6927,13 @@ Axiom-clean. -/
 `W₁ ∩ W₂ = {1}`.  The numerator of the `W`-orbit term `|W − (W₁∪W₂)|/|W|` of (14.11.4).
 Axiom-clean. -/
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S16.ncard_sdiff_sup_add_eq
+
+/-! **Peterfalvi (14.11.4) `P#`/`Q#`-orbit machinery** (`S16_NonExistenceG`, lane γ/POLE-2).  The
+`P#`-stab `conj_smul_sharpSubgroup_eq_of_mem_normalizer` (`N_G(P)` permutes `P ∖ {1}`), the assembled
+measure `orbit_sharpSubgroup_normSq_term`: `|(P#)^G|/|G| = |P#|/|N_G(P)|` for a TI-subgroup
+`Subgroup.IsTI P` (= `IsTISubset (P ∖ {1}) (N_G(P))`), and the numerator `ncard_sharpSubgroup_add_one`
+(`|P#| + 1 = |P|`).  The `P`/`Q` orbit terms of (14.11.4), reduced to `IsTI P`/`IsTI Q` and the
+`|N_G(P)|`/`|N_G(Q)|` sizes.  Axiom-clean. -/
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S16.conj_smul_sharpSubgroup_eq_of_mem_normalizer
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S16.orbit_sharpSubgroup_normSq_term
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S16.ncard_sharpSubgroup_add_one
