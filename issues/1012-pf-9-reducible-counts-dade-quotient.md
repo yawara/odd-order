@@ -304,6 +304,20 @@ conjunct 3) / (9.9.c) exceptional (caseB conjunct 4) / (9.8.b,c,d) (caseA conjun
     - **次 step**: 上記 foundation で `chiefFactorQuotientHypothesis` を N'=H₀C へ instantiate
       (generic 化 or 並行 def) → bijection (`reducible_count_sOf_H0` を generic 化 or 並行) → count=p-1。
       bounded だが ~200 行 multi-iteration。§6 shortcut 不要は確定 (C̄ は §6 W-structure 外)。
+
+   **✅✅ 2026-06-30 (commit f8d302fa): Coq `nb_redM` 併読で設計確定 + 構造入力 2/3 landed**:
+   Coq `PFsection9.v` の `nb_redM K` (L787) を精読 — 還元 count `count redM (S_ K) = p-1` は
+   **generic K で証明**され、H₀ と H₀C は共に instance。統一条件は **`K ◁ M` ∧ `K ⊆ HU` ∧
+   `K ∩ H = H₀`** の 3 つだけ ((a)-(e) の個別 foundation はこの 3 つから従う:
+   K≤HU ⟹ Coprime|W₁||K| (hHall) ・W₁⊓K=⊥ ・K≤M'; K∩H=H₀ ∧ W₂≤H ⟹ W₂∩K=W₂∩H₀ ⟹ W₂⊄K ∧
+   |W̄₂'|=p)。⟹ 「parallel quotient を一から作る」でなく **`chiefFactorQuotientHypothesis` /
+   `reducible_count_sOf_H0` を generic N' (3 条件) で一般化し、H₀/H₀C を instance 化**するのが正。
+   Coq L834-835 は K=H₀C の `K∩H=H₀` を `group_modl` (Dedekind) + `tiHU` (H⊓U=1) で証明 — Lean でも同型。
+   - **landed (S11, axiom-clean)**: `chiefFactor_H0supC_inf_H_eq_H0` ((H₀⊔C)⊓H=H₀, Dedekind crux =
+     統一条件) + `chiefFactor_H0supC_le_derived` (H₀C≤M'=HU)。= 構造入力 2/3。
+   - **残 1/3 = H₀C ◁ M** (Coq `Ptype_Fcore_extensions_normal` L240, semidirect 構造経由)。
+     M normalizes H₀ (既) + H₀ が C の非正規性を吸収 (gCg⁻¹⊆H₀C ⟸ [C,H]≤H₀ (S11:4263) + C◁U +
+     W₁ action)。非自明 — 次 iteration。その後 generic count refactor。
 - **⚠ caseA は独自 degree lemma 要**: caseA_character_counts は caseB を scope に持たない ⟹
   `caseB_degree_qu` cite 不可。(9.8.b) degree も caseA 版 chief-factor-constituent で別途。
 - **⚠ caseA は独自 degree lemma 要**: caseA_character_counts は caseB を scope に持たない ⟹

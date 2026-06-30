@@ -1064,3 +1064,30 @@ clean、full build 3888 green)。§7 ρ は S09 `chiRho` に (7.1)-(7.8) 完備�
 ψ=χ^{τ₁} 構築 → hA/hB/hC を上記 S09 cite で構成 → `counterexample_contradiction_of_facts` 適用。
 **多 iteration の deep endgame** (Hypothesis78 構築 + ν coherent extension + ζ distinguished が核)。
 次イテレーション = witness 取得 + skeleton (facts を faithful obligation に isolate) から着手。正本=issue 0081。
+
+### loop⁴¹ — (12.16) capstone を sorry-free assembly 化 (witness 実配線 + facts contract isolate)
+
+**commit `61e38330`**: `counterexample_contradiction` (S14:2554) は**もう sorry-free**。残骨格 = 単一 producer
+`exists_counterexample_dade_data` (S14:2541) に集約された。
+
+**現 (12.16) frontier の構造** (full build 3888 green, AxiomsCheck OK):
+```
+counterexample_contradiction (2554, sorry-FREE)
+ ├ exists_rankTwoWitness (1948, sorry-free)        ← witness (rank-2, x, L)
+ ├ exists_witness_g (2479, sorry-free)             ← g∈C_K(x)∖K', Commute x g
+ ├ exists_counterexample_dade_data (2541, ★SORRY)  ← 唯一の残 deep obligation
+ └ counterexample_contradiction_of_facts (2440, sorry-free)  ← 数値 endgame 完成済
+```
+
+**残 obligation = `CounterexampleDadeData` (2502) の全 field 構成** (structure = 12.13–12.16 の精密契約)。
+次 iteration の充足順 (易→難、全て field 単位で per-field 充足可能):
+1. **易 (real proof 即可、ψ 不要)**: `ε`/`hε` = `Complex.isPrimitiveRoot_exp ctr.p` 系;
+   `kK/kKp/kM/kH` = `Nat.card` 実値 + 正値性 (`Nat.card_pos`)。→ producer を `refine {ε:=…, …, ψ:=?_, …}`
+   で部分実体化し deep field のみ per-field sorry に分離するのが honest。
+2. **群論 (char 不要)**: `hidx` = (8.1.c) fpf `4|K'|≤|K|` (`four_le_of_dvd_sub_one` 既存); `hM` = (12.11)
+   `intersection_complement_structure` (2009 sorried, signature cite 可) から `|M|≤|K||H|`。
+3. **char 核 (deep, 多 iteration)**: `ψ`/`hψ` = DadeNotation (12.13) の ψ=χ^{τ₁} 構築 (`Hypothesis data.L`
+   要、data.L type-I は `witness_L_frobenius` (12.10)); `e`/`he`/`h2e` = (12.12) degree; `h_const` =
+   `psi_constant_on_xK` (12.14, 2308 sorried); `h_psig_int` = `rhoM_integer_values` (12.15, 2317);
+   `hA` = (12.15) ρ_M norm; `hB` = (7.8.b) `S09.NormEstimates.zetaNuRho_norm_sq_ge` (Hypothesis78 構築);
+   `hC` = (7.3) `S09.chiRho_integral_inequality`。lane γ `MHypothesis` (S16:1585) pattern を mirror。
