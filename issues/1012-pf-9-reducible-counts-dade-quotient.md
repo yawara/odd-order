@@ -457,6 +457,14 @@ producer (chiefFactor_clifford_U_dichotomy の case-a 枝、S11:4288-4316) は *
 として carry + W₁-transitivity を lemma 化** (structure + producer refactor、plumbing より重いが grindable)。
 その後 core (W₁-symmetric θbar stabilizer) → caseA_exists → degree_qu。inertia plumbing は reusable 基盤。
 
+**🛑 math impasse (2026-06-30): non-Galois (9.8.b) inertia 論の精密化が要**: orbit family は
+**U⊔W₁ で生成** (`act.φ` の `t ⊆ U⊔W₁`)、W₁ 単独でない。⟹「reducible χ → θbar が W₁ で対称 →
+U-stabilizer=C」の framing が orbit-under-(U⊔W₁) と噛み合わず、core の精密な論証 (なぜ stabilizer=C か)
+が未確定。これは formalization labor でなく **genuine な数学の gap** = Peterfalvi (9.8) `Part_a` の
+精読 or **ChatGPT 相談** ([[feedback-ask-chatgpt-for-elided-gaps]], strongest model) で argument を
+再構成すべき (Coq PFsection9 L883-940 `Part_a` の inertia/bigdprod 論)。focused mode 向き。
+**この impasse 解消が caseA degree の rate-limiting step** (de-opacify も core もこの論証に依存)。
+
 ## 進捗サマリ (2026-06-30 更新)
 
 **✅✅✅ 還元 count (9.8.b)/(9.9.b) 全完成 (sorry-free, axiom-clean)** — issue 1012 の中核:
