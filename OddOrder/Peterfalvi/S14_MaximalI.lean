@@ -99,6 +99,21 @@ noncomputable def tau {L : Subgroup G} (hyp : Hypothesis L) :
   OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap hyp.dadeData.dade
     (hyp.dadeData.dade.fullDadeIsometryData hyp.hconj)
 
+open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
+/-- **The Peterfalvi (7.1) `ρ`-machinery data for `(L, A(L))`** — the §7 foundation for the (12.16)
+Dade calculation.  Built genuinely from the §10 Dade isometry carried by `hyp.dadeData`/`hyp.hconj`:
+unlike the type-`P` `S12.Hypothesis.toHypothesis71`, the type-I support `A(L) = typeIA` is already the
+set on which `dadeData` lives, so no restriction is needed — the Dade map, its `IsDadeMap`
+certificate, and the `L`-equivariance transfer directly.  This `S09.Hypothesis71` is what lets the
+§9 norm machinery — `chiRho_norm_sq_le` (7.2.b), `chiRho_integral_inequality` (7.3),
+`family_inequality` (7.5), and `Hypothesis78.NormEstimates` (7.8.b) — apply to `L`. -/
+noncomputable def toHypothesis71 {L : Subgroup G} [Finite G] (hyp : Hypothesis L) :
+    OddOrder.Peterfalvi.S09.Hypothesis71 G (typeIA L hyp.typeI) L where
+  hyp := hyp.dadeData.dade
+  τ := (hyp.dadeData.dade.fullDadeIsometryData hyp.hconj).toDadeIsometryData.toDadeMap
+  isDadeMap := (hyp.dadeData.dade.fullDadeIsometryData hyp.hconj).toDadeIsometryData.isDadeMap
+  hConjInvariant := hyp.hconj
+
 end Hypothesis
 
 /-- Conjugation transports the centralizer of a singleton:
