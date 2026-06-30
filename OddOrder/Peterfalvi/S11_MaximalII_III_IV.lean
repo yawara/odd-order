@@ -2156,6 +2156,10 @@ structure CliffordCaseAData {M : Subgroup G} {data : TypesIIIIIIVSetup M}
     {chief : ChiefFactorData data} (chars : Section11CharacterData data chief) where
   Hpart : Fin data.q → Subgroup (↥data.H ⧸ chief.N)
   Hpart_order : ∀ i, Nat.card ↥(Hpart i) = chief.p
+  /-- The `q` order-`p` Clifford summands span the chief factor `H̄` (non-opaque (9.7) structure). -/
+  Hpart_iSup : ⨆ i, Hpart i = ⊤
+  /-- Each Clifford summand is `U`-invariant (non-opaque (9.7) structure). -/
+  Hpart_aInvariant : ∀ i, IsAInvariant (uActionHom data chief) (Hpart i)
   W1_transitive_on_parts : Prop
   W1_transitive_on_parts_holds : W1_transitive_on_parts
   a : ℕ
@@ -4405,6 +4409,13 @@ noncomputable def clifford_caseA_data [Finite G] {M : Subgroup G}
   refine
     { Hpart := fun j => act.φ ↑(e.symm j) • S₀
       Hpart_order := fun j => (card_pointwise_smul act.φ _ S₀).trans hS₀card
+      Hpart_iSup := by
+        rw [← hexist.choose_spec.2.2.1]
+        refine le_antisymm (iSup_le fun j => le_iSup₂_of_le _ (e.symm j).2 le_rfl) ?_
+        exact iSup₂_le fun i hi =>
+          le_iSup_of_le (e ⟨i, hi⟩) (le_of_eq (by rw [Equiv.symm_apply_apply]))
+      Hpart_aInvariant := fun j =>
+        isAInvariant_comp_subtype_pointwise_smul hUnorm hS₀inv ↑(e.symm j)
       W1_transitive_on_parts := True
       W1_transitive_on_parts_holds := trivial
       a := Nat.card ↥(aInvariantRestrictAut hS₀inv).range
