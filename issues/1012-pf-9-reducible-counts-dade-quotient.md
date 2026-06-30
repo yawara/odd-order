@@ -739,3 +739,19 @@ irreducible、degree [HU:HC]=u」。これは S11:4402 で**docstring コメン�
    irreducible (deg u) → χ ∈ xiSet ∩ 𝒳(H₀C)。
 3. `induceHU` で 𝒮(H₀C)、deg = q·u (`induceHU_apply_one_eq_q_mul`)。
 conjunct b は更に reducible↔regular (prTIred) を要し別ピース。conjunct d は count。
+
+
+## conjunct c の Clifford correspondence — repo infra 確認 (2026-06-30)
+
+mathlib に Clifford correspondence は**無い**が、**repo 内に Clifford 完備 infra あり**:
+- `OddOrder/GroupTheory/RepresentationTheory/Clifford.lean` — Isaacs Thm 6.5/6.11、**inertia
+  bijection** (induction from inertia T)、`restrictionMultiplicity`、`IrreducibleCharacter.LiesOver`/
+  `inertia`/`inertiaQuotient`、conjBySimpleSemilinear (Clifford module setup)。
+- `InducedIrreducible.lean` — Frobenius irreducibility (Isaacs Thm 6.34、inertia=H 特殊化)、
+  Mackey norm (`card_mul_inner_self_induce` で ‖Ind θ‖²=1 ⟹ irreducible)。
+- `CliffordSingleOrbit.lean` — single-orbit Clifford。
+
+**conjunct c 構築 path**: regular θ̄ (inertia=HC) ⟹ Clifford **Thm 6.11 inertia bijection**
+(Clifford.lean) で「I_HU(θ₀)=HC 上の Irr(HC) char ↔ Irr(HU) over θ₀」⟹ Ind_{HC}^{HU}(θ₀ 拡張 linear)
+irreducible deg [HU:HC]=u ⟹ χ∈xiSet∩𝒳(H₀C) ⟹ induceHU deg q·u。次イテレーションは Clifford.lean の
+Thm 6.11 lemma を特定 (induce-from-inertia-bijective/irreducible の usable form) して適用。
