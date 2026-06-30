@@ -5166,9 +5166,9 @@ in a maximal `M`, every `π`-subgroup `X ≤ M` conjugates by an element of `M` 
 `π`-subgroup `K` of `M`.  The general-`π` form of `exists_conj_smul_le_isHall_kappa`; the tool for
 the `g ∉ M` case of the full Lemma 14.6 dichotomy.  Axiom-clean. -/
 #assert_only_allowed_axioms OddOrder.BG.Ch4.S14.exists_conj_smul_le_of_isHall
-/-! **`σ` conjugation-invariant** (`S14_TypePCounting`, `sigma_conjSmul_eq`, Coq `sigmaJ`):
-`σ(Mᶜ) = σ(M)` as sets.  Axiom-clean. -/
-#assert_only_allowed_axioms OddOrder.BG.Ch4.S14.sigma_conjSmul_eq
+/-! **`σ` conjugation-invariant** (`S14_TypePCounting`, `sigma_conj_smul_eq`, Coq `sigmaJ`):
+`σ(Mᵍ) = σ(M)` as sets.  Axiom-clean. -/
+#assert_only_allowed_axioms OddOrder.BG.Ch4.S14.sigma_conj_smul_eq
 /-! **BG Lemma 14.6** (`S14_TypePCounting`, `sigma_decomposition_dichotomy`, Coq `BGsection14`:1189):
 every `g ≠ 1` lands in the signalizer branch (`∃ y, ℓ_σ(y)=1 ∧ y⁻¹g ∈ R(y)`) or the κ branch
 (`∃ y, ℓ_σ(y)=1 ∧ ∃ N ∈ 𝓜_σ(y), y⁻¹g ∈ (C_N[y])^#` with `y⁻¹g` a `κ(N)`-element).  Proof = Coq's

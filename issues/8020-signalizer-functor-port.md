@@ -836,3 +836,22 @@ cover frontier (cover_subset_kernels = FittingIsTI-for-typeF、deep) を一旦�
 
 **§14 δ-lane 残 sorry** (substantial): cover_subset_kernels (FittingIsTI-for-typeF) / Cor 14.10 (cover-gated) /
 NonTypeICovering Ẑ / sigmaLength_one_frobenius_type。Cor 14.8 完了で family corollary 群は片付いた。
+
+## 🧹 進捗 (lane d, 2026-06-30 /loop³⁴): duplicate consolidation + faithfulness findings (orphaned §14 pieces)
+
+cover frontier (deep) を保留し、hygiene + faithfulness を整理 (S14、full build 3888 green):
+- **duplicate 解消**: `sigma_conjSmul_eq` (/loop²⁸ で私が追加、public) を削除し既存 `sigma_conj_smul_eq`
+  (3279、当時 private を grep 見落とし) を public 化 + 2 usages 更新 + AxiomsCheck rename。CLAUDE.md no-duplicate 準拠。
+- **⚠ Lemma 14.13 (`sigmaLength_one_frobenius_type`) MIS-ENCODED 発見**: Lean 仮説 `M,N∈𝓜_σ(x)` で
+  `¬IsConjugateSubgroup M N` は **inconsistent** (Thm 13.9 で σ(M)∩σ(N)=∅、だが x∈M_σ∩N_σ・x≠1 で共通素数 →
+  矛盾 ⟹ 前提 vacuous)。Coq `non_disjoint_signalizer_Frobenius` (BGsection14:2412) は `1<|𝓜_σ(x)|` +
+  「M は σ(N[x])'-group でない」(N[x]=signalizer neighbour) が正。docstring に ⚠ 警告追加 (vacuous 証明禁止)。
+  orphaned (consumer 0)、FT 経路外。faithful 再述は `{N,hN,hMN,hinter}` → `1<ncard` + σ(N[x])'-group 条件。
+- **Cor 14.10 (`exists_sigmaDecomposition_length_le_two`) は dummy-satisfiable**: `∃ D, ∀g, D.length g≤2` は
+  `dummySigmaDecomposition` (length=0) で trivially 真 ⟹ genuine 証明には `genuineSigmaDecomposition` 固定 +
+  cover-gated ℓ_σ≤2 が要 (scaffold statement)。orphaned。
+
+**🛑 §14 δ-lane frontier 確定 (honest)**: rapid-win phase 完了 (Lemma 14.6 + Cor 14.9 type-F cover + covering
+equality + Cor 14.8 全)。**残 on-path = deep multi-session のみ**: (1) cover_subset_kernels = FittingIsTI-for-typeF
+(Frobenius-kernel-TI、消費される on-path) / (2) NonTypeICovering = Theorem 14.7(e) Ẑ (deep)。orphaned/scaffold な
+14.10/14.13 は低価値。次の genuine on-path work は (1) の deep TI port。
