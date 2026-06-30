@@ -1649,6 +1649,30 @@ structure MHypothesis (hyp : Hypothesis (G := G)) where
           ((hyp.base.W : Set G) \ ((hyp.base.W1 : Set G) ∪ (hyp.base.W2 : Set G)))
         ∪ OddOrder.GroupTheory.conjClassSet (OddOrder.GroupTheory.sharpSubgroup hyp.base.P)
         ∪ OddOrder.GroupTheory.conjClassSet (OddOrder.GroupTheory.sharpSubgroup hyp.base.Q)
+  /-- **Peterfalvi §13 `normalizer_V` for the `W`-set**: `N_G(X) = W` for every nonempty
+  `X ⊆ W − (W₁∪W₂)` (the type-`P` exceptional-set normalizer, from the partner structure).  The
+  `hnorm` input to the `W`-orbit TI count (`orbit_sdiff_sup_normSq_term`). -/
+  W_normalizer_V : ∀ X : Set G, X.Nonempty →
+    X ⊆ (hyp.base.W : Set G) \ ((hyp.base.W1 : Set G) ∪ (hyp.base.W2 : Set G)) →
+    Subgroup.normalizer X = hyp.base.W
+  /-- The exceptional set `W − (W₁∪W₂)` is nonempty (`(p−1)(q−1) ≥ 1`). -/
+  W_set_nonempty :
+    ((hyp.base.W : Set G) \ ((hyp.base.W1 : Set G) ∪ (hyp.base.W2 : Set G))).Nonempty
+  /-- **Peterfalvi §8**: `P` is a TI-subgroup (distinct conjugates meet trivially). -/
+  P_isTI : Subgroup.IsTI hyp.base.P
+  /-- **Peterfalvi §8**: `Q` is a TI-subgroup. -/
+  Q_isTI : Subgroup.IsTI hyp.base.Q
+  /-- **Peterfalvi (14.11)**: `|W| = p q` (the cyclic group `W = W₁ × W₂`). -/
+  card_W_eq : Nat.card ↥hyp.base.W = hyp.base.p * hyp.base.q
+  /-- **Peterfalvi (14.11)**: `|W₁| + |W₂| = p + q` (so `{|W₁|, |W₂|} = {p, q}`). -/
+  card_W1_add_W2_eq :
+    Nat.card ↥hyp.base.W1 + Nat.card ↥hyp.base.W2 = hyp.base.p + hyp.base.q
+  /-- **Peterfalvi (14.11.4)**: `|N_G(P)| = |P| u q` (the Type-II partner `S = (H ⋊ U) ⋊ W₂`). -/
+  card_normalizer_P_eq : Nat.card ↥(Subgroup.normalizer (hyp.base.P : Set G))
+    = Nat.card ↥hyp.base.P * hyp.base.u * hyp.base.q
+  /-- **Peterfalvi (14.11.4)**: `|N_G(Q)| = |Q| v p` (the `T`-side partner). -/
+  card_normalizer_Q_eq : Nat.card ↥(Subgroup.normalizer (hyp.base.Q : Set G))
+    = Nat.card ↥hyp.base.Q * hyp.base.v * hyp.base.p
   /-- **Peterfalvi (7.1)/(14.11.4) bridge compatibility.**  The underlying `(7.1)` Dade hypothesis
   of the §7 coherence datum `h78` is the type-I Dade support hypothesis of `M` carried by
   `typeIHyp` (i.e. `h78` is built over the same `(M, A(M))` Dade map that powers the family
