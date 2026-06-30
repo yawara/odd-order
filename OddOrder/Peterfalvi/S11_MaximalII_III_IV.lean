@@ -2613,6 +2613,25 @@ theorem hInHu_inf_realizedH0supC_eq_realizedH0 {M : Subgroup G}
     · exact Subgroup.mem_subgroupOf.mpr (Subgroup.mem_subgroupOf.mpr
         ((le_sup_left : chief.H0 ≤ chief.H0 ⊔ cSub data chief) memH0))
 
+/-- **realized `H₀C = H₀ ⊔ C` distributes** (realized form): the realized `H₀C` inside `HU` equals
+`(realized H₀) ⊔ cInHu`.  Via `Subgroup.subgroupOf_sup` (twice, with `H₀,C ≤ M` and
+`H₀.subgroupOf M, C.subgroupOf M ≤ huSub`).  Lets the second isomorphism use `N = realized H₀C`
+with `hInHu ⊔ N = HC` (`realized H₀ ≤ hInHu`) and `hInHu ⊓ N = realized H₀` (modular law +
+`hInHu_inf_cInHu_eq_bot`), avoiding `⊔`-realization friction in the (9.8.c) construction. -/
+theorem realizedH0supC_eq_realizedH0_sup_cInHu {M : Subgroup G}
+    {data : TypesIIIIIIVSetup M} (chief : ChiefFactorData data) :
+    ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf (huSub data)
+      = (chief.H0.subgroupOf M).subgroupOf (huSub data) ⊔ cInHu data chief := by
+  have hH0M : chief.H0 ≤ M := chief.H0_lt_H.le.trans (H_le_M data)
+  have hCM : cSub data chief ≤ M := (cSub_le_U data chief).trans (U_le_M data)
+  rw [Subgroup.subgroupOf_sup hH0M hCM]
+  have hH0sub : (chief.H0.subgroupOf M) ≤ huSub data :=
+    Subgroup.subgroupOf_mono M (le_trans chief.H0_lt_H.le le_sup_left)
+  have hCsub : (cSub data chief).subgroupOf M ≤ huSub data :=
+    Subgroup.subgroupOf_mono M (le_trans (cSub_le_U data chief) le_sup_right)
+  rw [Subgroup.subgroupOf_sup hH0sub hCsub]
+  rfl
+
 /-- **`H₀C ≤ M' = HU`**: `H₀ ≤ H ≤ M'` (`typeP.H_le`) and `C ≤ U ≤ M'` (`typeP.U_le`).  The second
 input (`K ≤ HU`) of the generic reducible-count hypothesis (Coq `PFsection9` `nb_redM`) for the
 quotient `M/H₀C`; combined with `chiefFactor_H0supC_inf_H_eq_H0` and `H₀C ◁ M` it makes the §9↔§6
