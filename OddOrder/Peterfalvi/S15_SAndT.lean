@@ -1155,6 +1155,144 @@ theorem exists_typeI_maximal_overNormalizer_U [Finite G]
       Subtype.ext (by simpa using hcomm)
     exact bdata.UW1_frobenius.conj_frobenius _ hwmem hwne' _ hnmem hnne' hconj_eq
 
+/-- **`S`-side dual of `tConjugate_fitting_data`** (Pf (13.17.a), V-side L~S exclusion input): for a
+maximal `L` conjugate to `S`, the Fitting kernel `L_F` is a `p`-group of order `p^q` containing `W₂`
+and meeting `V` trivially.  The `card`-equality part is the isolated §13 residual (`card_P_eq`, dual
+of the sorried `card_Q_eq`); declared sorried, the V-side analogue of `tConjugate_fitting_data`. -/
+theorem sConjugate_fitting_data [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hyp : Hypothesis (G := G)) (_hSTypeII : IsTypeNonI hyp.S)
+    {L : Subgroup G} {g : G} (_hconj : MulAut.conj g • L = hyp.S) :
+    Nat.card ↥(maxNilpotentNormalHall L) = hyp.p ^ hyp.q ∧
+      hyp.W2 ≤ maxNilpotentNormalHall L ∧
+      maxNilpotentNormalHall L ⊓ hyp.V = ⊥ := sorry
+
+/-- **`T`-side dual of `exists_typeI_maximal_overNormalizer_U`** (Pf (13.17.a/b), V-side): for `T`
+type II, a maximal subgroup `L` over `N_G(V)` is type I with `V ⊆ L_F`.  Mirror of the `U`-side with
+the two exclusion branches swapped: `L ~ T` is ruled out by the Hall conjugacy `N_G(V) ⊄ T`
+(`not_normalizer_V_le_T`), and `L ~ S` by the `|L_F| = p^q` order contradiction
+(`sConjugate_fitting_data`) against the `V W₂` Frobenius (from the `Tdata` carrier). -/
+theorem exists_typeI_maximal_overNormalizer_V [Finite G]
+    (_hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
+    (hTTypeII : IsTypeII hyp.T) :
+    ∃ L : Subgroup G, L ∈ maximalSubgroups G ∧ IsTypeI L ∧
+      Subgroup.normalizer (hyp.V : Set G) ≤ L ∧ hyp.V ≤ maxNilpotentNormalHall L := by
+  obtain ⟨tdata⟩ := hTTypeII
+  have hdisj : hyp.Q ⊓ hyp.V = ⊥ := by
+    have key : hyp.Tdata.H ⊓ hyp.Tdata.U = ⊥ := by
+      have hd := disjoint_iff.mp hyp.Tdata.derived_complement.disjoint
+      rw [eq_bot_iff]
+      rintro x ⟨hxH, hxU⟩
+      have hxD : x ∈ derivedInG hyp.T := hyp.Tdata.H_le hxH
+      have hmem : (⟨x, hxD⟩ : ↥(derivedInG hyp.T)) ∈
+          (hyp.Tdata.H.subgroupOf (derivedInG hyp.T)) ⊓
+            (hyp.Tdata.U.subgroupOf (derivedInG hyp.T)) :=
+        ⟨Subgroup.mem_subgroupOf.mpr hxH, Subgroup.mem_subgroupOf.mpr hxU⟩
+      rw [hd, Subgroup.mem_bot] at hmem
+      rw [Subgroup.mem_bot]
+      simpa using Subtype.ext_iff.mp hmem
+    rw [hyp.Q_eq_TF, ← hyp.Tdata.H_eq, ← hyp.Tdata_V_eq]
+    exact key
+  have hcop : Nat.Coprime (Nat.card ↥hyp.V) (Nat.card ↥hyp.Q) :=
+    coprime_card_V_card_Q_of_disjoint hyp tdata hdisj
+  have hNVT : ¬ Subgroup.normalizer (hyp.V : Set G) ≤ hyp.T :=
+    not_normalizer_V_le_T _hG hyp tdata (exists_conj_typeP_V_of_coprime _hG hyp tdata hcop)
+  have hVne : hyp.V ≠ ⊥ := by
+    obtain ⟨x, _, hVconj⟩ := exists_conj_typeP_V_of_coprime _hG hyp tdata hcop
+    rw [hVconj]
+    exact mt (pointwise_smul_eq_bot_iff (MulAut.conj x)).mp tdata.common.1
+  have hM'_le_T : derivedInG hyp.T ≤ hyp.T := Subgroup.map_subtype_le _
+  have hVleT : hyp.V ≤ hyp.T := (le_sup_right.trans hyp.T_deriv_eq_QV.ge).trans hM'_le_T
+  have hVneTop : hyp.V ≠ ⊤ := fun hVtop =>
+    (mem_maximalSubgroups.mp hyp.T_maximal).1 (top_le_iff.mp (hVtop ▸ hVleT))
+  have hNVtop : Subgroup.normalizer (hyp.V : Set G) ≠ ⊤ := by
+    intro hNtop
+    haveI hVnormal : (hyp.V).Normal := Subgroup.normalizer_eq_top_iff.mp hNtop
+    rcases _hG.simple.eq_bot_or_eq_top_of_normal hyp.V hVnormal with h | h
+    · exact hVne h
+    · exact hVneTop h
+  obtain ⟨L, hNVL, hLmaximal⟩ :=
+    Finite.exists_le_maximal (p := fun K : Subgroup G => K ≠ ⊤) hNVtop
+  have hLmem : L ∈ maximalSubgroups G :=
+    mem_maximalSubgroups.mpr ⟨hLmaximal.1, fun b hLb => by
+      by_contra hbne
+      exact lt_irrefl L (lt_of_lt_of_le hLb (hLmaximal.2 hbne hLb.le))⟩
+  -- `V W₂` Frobenius from the `Tdata` carrier (used by both exclusion branches).
+  have hTdataVne : hyp.Tdata.U ≠ ⊥ := by rw [hyp.Tdata_V_eq]; exact hVne
+  have hVW2frob : OddOrder.Isaacs.Ch06.IsFrobeniusGroup
+      ↥(hyp.V ⊔ hyp.W2) (hyp.V.subgroupOf (hyp.V ⊔ hyp.W2))
+        (hyp.W2.subgroupOf (hyp.V ⊔ hyp.W2)) := by
+    have h := OddOrder.Peterfalvi.S11.typeP_uW1_frobenius hyp.Tdata hTdataVne
+    rwa [hyp.Tdata_V_eq, hyp.Tdata_W2_eq] at h
+  rcases hyp.theorem88_caseB L hLmem with hLI | hLconjS | hLconjT
+  · exact ⟨L, hLmem, hLI, hNVL,
+      typeI_overNormalizer_V_le_fitting _hG hyp ⟨tdata⟩ hLmem hLI hNVL⟩
+  · -- `L ~ S` excluded (order contradiction, mirror of the S-side `L ~ T`).
+    exfalso
+    obtain ⟨g, hg⟩ := hLconjS
+    obtain ⟨_hLFcard, hW2le, hLFV⟩ := sConjugate_fitting_data _hG hyp hyp.S_nonI hg
+    have hVleL : hyp.V ≤ L := Subgroup.le_normalizer.trans hNVL
+    have hV_norm_LF : hyp.V ≤ Subgroup.normalizer (maxNilpotentNormalHall L) :=
+      hVleL.trans (OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_le_normalizer L)
+    have hVW2_le_V : ⁅hyp.V, hyp.W2⁆ ≤ hyp.V :=
+      OddOrder.Isaacs.Ch04.commutator_le_of_le_normalizer hyp.W2_normalizes_V
+    have hVW2_le_LF : ⁅hyp.V, hyp.W2⁆ ≤ maxNilpotentNormalHall L := by
+      refine (Subgroup.commutator_mono (le_refl hyp.V) hW2le).trans ?_
+      rw [Subgroup.commutator_comm]
+      exact OddOrder.Isaacs.Ch04.commutator_le_of_le_normalizer hV_norm_LF
+    have hVW2_bot : ⁅hyp.V, hyp.W2⁆ = ⊥ :=
+      le_bot_iff.mp ((le_inf hVW2_le_LF hVW2_le_V).trans hLFV.le)
+    have hVcent : hyp.V ≤ Subgroup.centralizer (hyp.W2 : Set G) :=
+      Subgroup.commutator_eq_bot_iff_le_centralizer.mp hVW2_bot
+    have hW2ne : hyp.W2 ≠ ⊥ := by
+      intro hbot
+      have : hyp.p = 1 := by rw [hyp.p_eq_card_W2, hbot, Subgroup.card_bot]
+      exact hyp.p_prime.one_lt.ne' this
+    obtain ⟨w, hwW2, hwne⟩ := (hyp.W2.bot_or_exists_ne_one).resolve_left hW2ne
+    obtain ⟨n, hnV, hnne⟩ := (hyp.V.bot_or_exists_ne_one).resolve_left hVne
+    have hcomm : w * n * w⁻¹ = n := by
+      have := hVcent hnV w hwW2
+      rw [mul_inv_eq_iff_eq_mul, this]
+    have hwVW2 : w ∈ hyp.V ⊔ hyp.W2 := Subgroup.mem_sup_right hwW2
+    have hnVW2 : n ∈ hyp.V ⊔ hyp.W2 := Subgroup.mem_sup_left hnV
+    have hwmem : (⟨w, hwVW2⟩ : ↥(hyp.V ⊔ hyp.W2)) ∈ hyp.W2.subgroupOf (hyp.V ⊔ hyp.W2) := hwW2
+    have hnmem : (⟨n, hnVW2⟩ : ↥(hyp.V ⊔ hyp.W2)) ∈ hyp.V.subgroupOf (hyp.V ⊔ hyp.W2) := hnV
+    have hwne' : (⟨w, hwVW2⟩ : ↥(hyp.V ⊔ hyp.W2)) ≠ 1 := fun h => hwne (congrArg Subtype.val h)
+    have hnne' : (⟨n, hnVW2⟩ : ↥(hyp.V ⊔ hyp.W2)) ≠ 1 := fun h => hnne (congrArg Subtype.val h)
+    have hconj_eq : (⟨w, hwVW2⟩ : ↥(hyp.V ⊔ hyp.W2)) * ⟨n, hnVW2⟩ * ⟨w, hwVW2⟩⁻¹ = ⟨n, hnVW2⟩ :=
+      Subtype.ext (by simpa using hcomm)
+    exact hVW2frob.conj_frobenius _ hwmem hwne' _ hnmem hnne' hconj_eq
+  · -- `L ~ T` excluded (Hall conjugacy, mirror of the S-side `L ~ S`): `N_G(V) ⊆ T` vs `hNVT`.
+    obtain ⟨g, hg⟩ := hLconjT
+    have hVhall_cop : Nat.Coprime (Nat.card ↥hyp.V) ((hyp.V.subgroupOf hyp.T).index) := by
+      have frobcop : Nat.Coprime (Nat.card ↥hyp.V) (Nat.card ↥hyp.W2) := by
+        have h := hVW2frob.coprime_card_kernel_complement
+        rwa [Nat.card_congr
+            (Subgroup.subgroupOfEquivOfLe (le_sup_left : hyp.V ≤ hyp.V ⊔ hyp.W2)).toEquiv,
+          Nat.card_congr
+            (Subgroup.subgroupOfEquivOfLe (le_sup_right : hyp.W2 ≤ hyp.V ⊔ hyp.W2)).toEquiv] at h
+      have hQleM' : hyp.Q ≤ derivedInG hyp.T := le_sup_left.trans hyp.T_deriv_eq_QV.ge
+      have hidxM' : ((derivedInG hyp.T).subgroupOf hyp.T).index = Nat.card ↥hyp.W2 := by
+        rw [← hyp.Tdata_W2_eq, ← hyp.Tdata.card_W1_eq_derived_index]
+      have hidxQ : (hyp.Q.subgroupOf (derivedInG hyp.T)).index = Nat.card ↥hyp.V := by
+        rw [hyp.Q_eq_TF, ← hyp.Tdata.card_U_eq_index, hyp.Tdata_V_eq]
+      have hTcard : Nat.card ↥hyp.T
+          = Nat.card ↥hyp.W2 * (Nat.card ↥hyp.V * Nat.card ↥hyp.Q) := by
+        have e1 := ((derivedInG hyp.T).subgroupOf hyp.T).index_mul_card
+        have e2 := (hyp.Q.subgroupOf (derivedInG hyp.T)).index_mul_card
+        rw [hidxM', Nat.card_congr (Subgroup.subgroupOfEquivOfLe hM'_le_T).toEquiv] at e1
+        rw [hidxQ, Nat.card_congr (Subgroup.subgroupOfEquivOfLe hQleM').toEquiv] at e2
+        rw [← e1, ← e2]
+      have hidxV := (hyp.V.subgroupOf hyp.T).index_mul_card
+      rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hVleT).toEquiv] at hidxV
+      have hidxVeq : (hyp.V.subgroupOf hyp.T).index = Nat.card ↥hyp.Q * Nat.card ↥hyp.W2 := by
+        apply Nat.eq_of_mul_eq_mul_right (Nat.card_pos (α := ↥hyp.V))
+        rw [hidxV, hTcard]; ring
+      rw [hidxVeq]
+      exact hcop.mul_right frobcop
+    exact absurd (normalizer_le_of_isHall_subgroupOf_of_conj
+        (_hG.solvable_of_mem_maximalSubgroups hyp.T_maximal) hVleT
+        (isHall_subgroupOf_primeFactors_of_coprime_index hVleT hVhall_cop) hg hNVL) hNVT
+
 /-- **Peterfalvi (13.17.c), Huppert step.**  If `W₁` lies in a Frobenius complement `E` of the
 type-I subgroup `L`, then `E ⊆ Q W₂`.
 
