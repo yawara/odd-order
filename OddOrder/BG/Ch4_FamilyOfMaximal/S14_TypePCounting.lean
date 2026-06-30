@@ -1411,6 +1411,33 @@ theorem mem_of_coprime_index [Finite G] {M N : Subgroup G} (hNM : N ≤ M)
   rw [← hm]
   exact pow_mem hpow m
 
+/-- **The index `[M : U ⊔ M_σ]` is a `κ(M)`-number** (`M` maximal, `M_σ` the `σ(M)`-Hall, `U` a
+`(κ∪σ)′`-Hall).  Since `M_σ ≤ U ⊔ M_σ` and `U ≤ U ⊔ M_σ`, `[M : U⊔M_σ]` divides both `[M : M_σ]` (a
+`σ′`-number, `Msigma_subgroupOf_isHall`) and `[M : U]` (a `κ∪σ`-number, `hU`), so each of its primes
+avoids `σ` yet lies in `κ ∪ σ`, i.e. in `κ(M)`.  Combined with `mem_of_coprime_index`, this gives the
+`A(M)`-piece absorption "a `κ(M)′`-element of `M` lies in `U ⊔ M_σ`" of BG Theorem E. -/
+theorem index_U_sup_Msigma_primeFactors_subset_kappa [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M U : Subgroup G} (hM : M ∈ maximalSubgroups G)
+    (hU : Ch03.IsHallSubgroup ((kappa M ∪ OddOrder.BG.Ch3.S10.sigma M)ᶜ) (U.subgroupOf M))
+    {p : ℕ} (hp : p ∈ ((U ⊔ OddOrder.BG.Ch3.S10.Msigma M).subgroupOf M).index.primeFactors) :
+    p ∈ kappa M := by
+  have hpp : p.Prime := Nat.prime_of_mem_primeFactors hp
+  have hpdvd : p ∣ ((U ⊔ OddOrder.BG.Ch3.S10.Msigma M).subgroupOf M).index :=
+    Nat.dvd_of_mem_primeFactors hp
+  have hdvdMσ : ((U ⊔ OddOrder.BG.Ch3.S10.Msigma M).subgroupOf M).index ∣
+      ((OddOrder.BG.Ch3.S10.Msigma M).subgroupOf M).index :=
+    Subgroup.index_dvd_of_le (Subgroup.subgroupOf_mono M le_sup_right)
+  have hdvdU : ((U ⊔ OddOrder.BG.Ch3.S10.Msigma M).subgroupOf M).index ∣ (U.subgroupOf M).index :=
+    Subgroup.index_dvd_of_le (Subgroup.subgroupOf_mono M le_sup_left)
+  have hpnσ : p ∉ OddOrder.BG.Ch3.S10.sigma M :=
+    (OddOrder.BG.Ch3.S10.Msigma_subgroupOf_isHall hG hM).index_no_pi p
+      (Nat.mem_primeFactors.mpr ⟨hpp, hpdvd.trans hdvdMσ, Subgroup.index_ne_zero_of_finite⟩)
+  have hpnκσ : p ∉ (kappa M ∪ OddOrder.BG.Ch3.S10.sigma M)ᶜ :=
+    hU.index_no_pi p
+      (Nat.mem_primeFactors.mpr ⟨hpp, hpdvd.trans hdvdU, Subgroup.index_ne_zero_of_finite⟩)
+  simp only [Set.mem_compl_iff, not_not, Set.mem_union] at hpnκσ
+  exact hpnκσ.resolve_right hpnσ
+
 /-- For a `σ(M)`-element `x`, every `σ(L)`-part (`L` maximal) is either `x` or `1`: if `L` is
 conjugate to `M` then `σ(L) = σ(M)` contains all primes of `x` (`sigmaPart L x = x`); otherwise
 `σ(M) ∩ σ(L) = ∅` (`sigma_disjoint_of_nonconjugate`) so `x` avoids `σ(L)` (`sigmaPart L x = 1`). -/
