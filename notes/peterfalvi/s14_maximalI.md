@@ -1174,3 +1174,35 @@ de-opacify。
   (真の hard floor; lane γ も defer)。ここが (12.16) を closeする最終 blocker。
 
 **次 iteration の標的**: (12.12) `complement_cyclic_order_dvd` を rep-theory cores から組む (he/h2e 供給)。
+
+### loop⁴⁶ — hψ:ψ∈ZIrr G 追加 (ψ-data package 完成) + 戦略評価
+
+**commit `30be6dc9`**: `exists_witness_dadeNotation` を (hyp, dade, dade.psi∈ZIrr G) に拡張。
+IsCoherent.extension_mem_ZIrr (ℤ[S]→ℤ[Irr G]) を distinguished χ∈zSpan S に適用。
+witness L の ψ-data (ψ=dade.psi / e=dade.e / hψ) が CounterexampleDadeData 構築に揃った。
+
+### ⚠ (12.16) char 核の戦略評価 (loop⁴⁰–⁴⁶ 累積後)
+
+**到達済 (sorry-free real)**: capstone assembly + contract / witness L の Dade+coherence /
+toHypothesis71 ((7.1)) / dadeNotation_of_coherence / distinguished χ / **ψ=χ^{τ₁} 構築** / hψ∈ZIrr。
+
+**CounterexampleDadeData の残 field を到達可能性で分類**:
+| field | 内容 | 状態 |
+|---|---|---|
+| ε/hε | primitive root | **easy real** (Complex.isPrimitiveRoot_exp) |
+| ψ/hψ | χ^{τ₁}, virtual | **DONE** (exists_witness_dadeNotation) |
+| e | [L:H] | **DONE** (dade.e) |
+| h_const | (12.14) ψ(xg)=ψ(x) | char-deep (psi_constant_on_xK sorried、ψ concrete 化で証明可能性 up) |
+| h_psig_int | (12.15) ψ(g)∈ℤ | char-deep (rhoM_integer_values sorried) |
+| he/h2e | (12.12) 3≤e, 2e≤p+1 | **deep**: complement_cyclic_order_dvd は T=Ω₁(Z(O_p(H))) 構築+FPF+p²−1→p+1 refinement (12.9/12.11消費) |
+| h_psix | (1.10.a) Dade value 合同 | char-deep |
+| 基数/hidx/hM | \|K\|等, (8.1.c), (12.11) | 群論 (cite 可、一部 real) |
+| hA | (12.15) ρ_M norm | char-deep |
+| **hB** | **(7.8.b) lower bound** | **🛑 HARD FLOOR**: Hypothesis78 の chiRho_eq_inner_beta (7.8.c.i)/chiRho_decomp (7.7.a) は **project 全体で未形式化** (lane γ exists_MHypothesis も全体 sorry)。(12.16) を closeする最終 blocker |
+| hC | (7.3) sum<1 | chiRho_integral_inequality (proven) から組める可能性 |
+
+**🛑 戦略判断ポイント**: (12.16) の完全 close は **hB = (7.8.c) (7.7.a) の形式化を要し、これは §7 (S09) の
+project 全体の hard floor** (lane γ と共有)。lane b 単独では (12.16) を閉じられない。選択肢:
+(a) 12.16 の到達可能 field (12.14/12.15/12.12) を引き続き埋める (honest だが hB は残る)、
+(b) 上流 (7.8.c)/(7.7.a) の形式化に pivot (§7、深い、lane γ も unblock するが S09 領域)。
+上流優先原則は (b) を示唆するが S09 は別領域。**ユーザー判断が望ましい** (現状は (a) を継続中)。
