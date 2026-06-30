@@ -5993,5 +5993,16 @@ theorem realizedH0_subgroupOf_hInHu_eq_comap {M : Subgroup G}
   · intro h
     exact ⟨_, h, rfl⟩
 
+/-- **realized `H₀` in `hInHu` maps to `N` under `hInHuEquivH`**: the map form of
+`realizedH0_subgroupOf_hInHu_eq_comap`, via `map_comap_eq_self_of_surjective` (`hInHuEquivH`
+surjective).  This is the `G'.map e = H'` hypothesis of `QuotientGroup.congr hInHuEquivH` for
+`hInHu/realizedH₀ ≅ ↥H ⧸ N = H̄`. -/
+theorem realizedH0_map_hInHuEquivH_eq_N {M : Subgroup G}
+    {data : TypesIIIIIIVSetup M} (chief : ChiefFactorData data) :
+    (((chief.H0.subgroupOf M).subgroupOf (huSub data)).subgroupOf (hInHu data)).map
+        (hInHuEquivH data).toMonoidHom = chief.N := by
+  rw [realizedH0_subgroupOf_hInHu_eq_comap]
+  exact Subgroup.map_comap_eq_self_of_surjective (hInHuEquivH data).surjective chief.N
+
 end OddOrder.Peterfalvi.S11
 
