@@ -2452,6 +2452,32 @@ theorem three_le_index {L : Subgroup G} [Finite G] (hG : OddOrder.BG.IsMinimalSi
   obtain ⟨k, hk⟩ := hodd
   omega
 
+/-- **Peterfalvi (12.11)/(12.16), the index bound `|M| ≤ |K|·|H|`** (`H = L_F`): from the (12.11)
+complement structure (`M ∩ L` complements `K` in `M`, and `M ∩ L ≤ L_F`), the order of `M`
+factors as `|M| = |K|·|M ∩ L| ≤ |K|·|L_F|`.  This discharges the `hM` field of
+`CounterexampleDadeData` (cites the (12.11) `intersection_complement_structure`). -/
+theorem card_M_le [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    {ctr : CounterexampleHypothesis (G := G)} (data : RankTwoWitnessData ctr) :
+    Nat.card ↥ctr.M ≤ Nat.card ↥ctr.K * Nat.card ↥(maxNilpotentNormalHall data.L) := by
+  obtain ⟨hcompl, hsub⟩ := intersection_complement_structure hG data
+  have hKM : ctr.K ≤ ctr.M := ctr.K_eq_MF ▸ OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_le ctr.M
+  -- `|M| = |K| · |M ∩ L|` from the complement `K ⋊ (M ∩ L) = M`.
+  have h1 : Nat.card ↥(ctr.K.subgroupOf ctr.M) * (ctr.K.subgroupOf ctr.M).index = Nat.card ↥ctr.M :=
+    Subgroup.card_mul_index _
+  have h2 : (ctr.K.subgroupOf ctr.M).index = Nat.card ↥((ctr.M ⊓ data.L).subgroupOf ctr.M) :=
+    hcompl.symm.index_eq_card
+  have h3 : Nat.card ↥(ctr.K.subgroupOf ctr.M) = Nat.card ↥ctr.K :=
+    Nat.card_congr (Subgroup.subgroupOfEquivOfLe hKM).toEquiv
+  have h4 : Nat.card ↥((ctr.M ⊓ data.L).subgroupOf ctr.M) = Nat.card ↥(ctr.M ⊓ data.L) :=
+    Nat.card_congr (Subgroup.subgroupOfEquivOfLe inf_le_left).toEquiv
+  have hMeq : Nat.card ↥ctr.M = Nat.card ↥ctr.K * Nat.card ↥(ctr.M ⊓ data.L) := by
+    rw [← h3, ← h4, ← h2, h1]
+  -- `|M ∩ L| ≤ |L_F|` since `M ∩ L ≤ L_F`.
+  have hle : Nat.card ↥(ctr.M ⊓ data.L) ≤ Nat.card ↥(maxNilpotentNormalHall data.L) :=
+    Nat.le_of_dvd Nat.card_pos (Subgroup.card_dvd_of_le hsub)
+  rw [hMeq]
+  exact Nat.mul_le_mul_left _ hle
+
 open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
 /-- **Peterfalvi (12.13) for the witness subgroup `L`**: the second maximal `L` of (12.9) carries a
 full (12.13) `DadeNotation` — the realized `ψ = χ^{τ₁}` of the (12.16) Dade calculation.
