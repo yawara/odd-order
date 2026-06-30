@@ -9717,6 +9717,29 @@ theorem typeP_duality [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
   exact ⟨hparth, coprime_card_derived_kappaHall_of_isComplement' hK hparth,
     typeP_partner_existsUnique hG (dummySigmaDecomposition G) hM hP hKM hK hKstar hU⟩
 
+/-- **Type-`P` data constructor**: every maximal subgroup `M` carries the Theorem 14.7 data — a
+Hall `κ(M)`-subgroup `K ≤ M`, the swap `K* = M_σ ∩ C_G(K)`, and a Hall `(κ ∪ σ)ᶜ`-subgroup `U` —
+obtained from Hall's theorem in the solvable `↥M`.  This is the missing constructor that lets the
+family-level corollaries (14.8) feed `exists_partner` / `typeP_covering` from a bare
+`M ∈ maximalTypePFamily`. -/
+theorem exists_typeP_data [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    {M : Subgroup G} (hM : M ∈ maximalSubgroups G) :
+    ∃ K Kstar U : Subgroup G, K ≤ M ∧
+      Ch03.IsHallSubgroup (kappa M) (K.subgroupOf M) ∧
+      Kstar = OddOrder.BG.Ch3.S10.Msigma M ⊓ Subgroup.centralizer (K : Set G) ∧
+      Ch03.IsHallSubgroup ((kappa M ∪ OddOrder.BG.Ch3.S10.sigma M)ᶜ) (U.subgroupOf M) := by
+  haveI : IsSolvable ↥M := hG.solvable_of_mem_maximalSubgroups hM
+  obtain ⟨HK, hHK⟩ := Ch03.hall_E_exists (G := ↥M) (kappa M)
+  obtain ⟨HU, hHU⟩ :=
+    Ch03.hall_E_exists (G := ↥M) ((kappa M ∪ OddOrder.BG.Ch3.S10.sigma M)ᶜ)
+  refine ⟨HK.map M.subtype,
+    OddOrder.BG.Ch3.S10.Msigma M ⊓ Subgroup.centralizer ((HK.map M.subtype : Subgroup G) : Set G),
+    HU.map M.subtype, Subgroup.map_subtype_le _, ?_, rfl, ?_⟩
+  · rw [Subgroup.subgroupOf, Subgroup.comap_map_eq_self_of_injective M.subtype_injective]
+    exact hHK
+  · rw [Subgroup.subgroupOf, Subgroup.comap_map_eq_self_of_injective M.subtype_injective]
+    exact hHU
+
 /-- **BG Corollary 14.8** (mmd L4065): the type-`P₁` maximal subgroups, if any, are all
 conjugate in `G`; and if the type-`P` family is nonempty it consists of exactly two conjugacy
 classes of maximal subgroups (`M` and its nonconjugate partner `M*` from Theorem 14.7).
@@ -9730,7 +9753,24 @@ theorem typeP1_conjugate_and_typeP_twoClasses [Finite G]
         ¬ IsConjugateSubgroup M Mstar ∧
         ∀ H ∈ maximalTypePFamily G,
           IsConjugateSubgroup H M ∨ IsConjugateSubgroup H Mstar) := by
-  sorry
+  refine ⟨?_, fun hne => ?_⟩
+  · -- **Part 1** (`𝓜_{P₁}` is a single class): two type-`P₁` maximals are conjugate.  This needs
+    -- that the Theorem 14.7 partner pair is not both type-`P₁` (one is type-`P₂`), the κ/κ* type
+    -- analysis of the pair — not yet isolated as a standalone lemma.
+    sorry
+  · -- **Part 2** (`𝓜_P` = two conjugacy classes): the partner pair `(M, M*)` of Theorem 14.7,
+    -- with `typeP_covering` placing every type-`P` `H` in one of the two classes.
+    obtain ⟨M, hMmax, hMP⟩ := hne
+    obtain ⟨K, Kstar, U, hKM, hK, hKstar, hU⟩ := exists_typeP_data hG hMmax
+    obtain ⟨Mstar, hMstarne, hMstarmem, hpart⟩ :=
+      exists_partner hG (genuineSigmaDecomposition hG) hMmax hMP hKM hK hKstar hU
+    obtain ⟨hMstarmax, hMstarP, _⟩ :=
+      typeP_family_member_data hG hMmax hMP hKM hK hKstar hU hMstarmem
+    refine ⟨M, ⟨hMmax, hMP⟩, Mstar, ⟨hMstarmax, hMstarP⟩, ?_, ?_⟩
+    · exact typeP_family_pairwise_nonconjugate hG hMmax hMP hKM hK hKstar hU (Or.inl rfl)
+        hMstarmem (Ne.symm hMstarne)
+    · rintro H ⟨hHmax, hHP⟩
+      exact typeP_covering hG hMmax hMP hKM hK hKstar hU hMstarmem hMstarne hpart hHmax hHP
 
 /-- **BG Corollary 14.9** (mmd L3997): `G^#` is the disjoint union of the conjugacy pieces
 `𝒞_G(M̃ᵢ)` over class representatives `Mᵢ ∈ 𝓜` — together with one extra `𝒞_G(Ẑ)` piece when
