@@ -705,3 +705,26 @@ deps: `exists_length_one_factor` (S14:4617 ✓ σ-decomp 入力)・`sigmaLength_
 7. **Hall conj**: `exists_conj_smul_le_of_isHall` (本セッション ✓) で ⟨g⟩ (σ(N)'-elt = `sN'g`=s'g N) を M∩N に共役 → g^z∈M。
 8. **最終矛盾**: `sigmaPart M (g^z) = (sigmaPart M g)^z = x^z` (piPart_conj) = 1 (s'g M, g^z∈M) ⟹ x=1 矛盾。
 ⟹ 次 /loop = この assembly (~70 行 + co-Hall public 化)。その後 cover identity (type-F で κBranch 排除) で gate 2 close。
+
+## ✅✅✅ 進捗 (lane d, 2026-06-30 /loop²⁸): **BG Lemma 14.6 (sigma_decomposition_dichotomy) 完成 + Cor 14.9 type-F cover sorry CLOSED**
+
+§14 cover の deep core を完遂 (S14、全 axiom-clean、AxiomsCheck 登録、full build 3888 green / 1:56):
+- **`sigma_conjSmul_eq`** (Coq `sigmaJ`): σ(c•M)=σ(M) as sets (per-prime `sigma_conj` 双方向 + σ⊆primes)。WLOG/最終段の鍵。
+- **`sigma_decomposition_dichotomy`** (BG Lemma 14.6、Coq BGsection14:1189): **g≠1 ⟹ signalizerBranch ∨ κBranch**。
+  Coq 第2半を full assembly: `by_contra` → `branchA_or_branchB_of_mem_maximal` で s'g (g∈M⟹σ-part=1) →
+  σ-decomp 抽出 (`exists_length_one_factor` 不使用、`sigmaDecomposition` 直接) → WLOG x∈M_σ
+  (`sigma_subgroup_conj_into_Msigma_general` で M=conj•M₀、σ(M)=σ(M₀) で x=sigmaPart M g 保存) → notMg/MSx_gt1
+  (`centralizer_le_of_maximalSigma_ncard_eq_one`) → FT_signalizer N (`exists_neighbor_eq_Rsub`) → M∩N が σ(N)'-Hall
+  (complement の index/card を inline 計算、private co-Hall 補題回避) → ⟨g⟩ を M∩N に Hall 共役
+  (`exists_conj_smul_le_of_isHall`) → g∈Mʷ⁻¹ で s'g ⟹ x=1 矛盾。**~90 行、3 build-fix で着地** (主 fix=s'g は固定 g
+  ゆえ共役は M 側を動かす [conj w⁻¹•M] のが正)。
+- **`exists_mem_conjClassSet_Mtilde_of_ne_one`** (BG Cor 14.9 type-F cover): **sorry CLOSED** (旧 ℓ_σ≥2 の named
+  sorry を dichotomy で discharge)。signalizer branch → `mem_Mtilde_of_mem_coset`、κ branch → IsTypeF N=κ(N)=∅ で
+  即矛盾。定義位置を dichotomy 下流へ移動 (consumer 0 ゆえ安全)。
+
+**∴ §14 cover の数学核 (BG Lemma 14.6) 完成。type-F cover identity sorry-free。**
+
+**▶▶ 残り (gate 2 完全 close → bgTheoremE_cover_data)**: `exists_mem_conjClassSet_Mtilde_of_ne_one` は all-type-F
+限定 (BG Cor 14.9 の type-I half)。**full covering disjunction `BGTheoremETypeICovering ∨ NonTypeICovering`
+(S10:664)** には (a) type-P (非 type-I) branch (zTilde piece、`typeP_zTilde_*` 在) + (b) cover identity を
+`bgTheoremE_cover_data.cover_nonidentity` field へ wiring が要る。次 = この wiring + type-P branch。

@@ -4951,37 +4951,6 @@ theorem mem_Mtilde_of_mem_coset [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd 
     g ∈ Mtilde hG D M :=
   ⟨x, hx, x⁻¹ * g, hg, by group⟩
 
-/-- **BG Corollary 14.9, the type-I cover (faithful form), `ℓ_σ = 1` half discharged**: when every
-maximal subgroup is of type `F` (= Peterfalvi type I; equivalently `κ(M) = ∅`, so there is no
-exceptional/`κ` branch in `sigma_decomposition_dichotomy`), every nonidentity `g` lies in some
-`𝒞_G(M̃)`.  When `ℓ_σ(g) = 1`, `g ∈ M_σ^# ⊆ M̃` for the maximal `M` with `g ∈ M_σ`
-(`sigmaSharp_subset_Mtilde`); the `ℓ_σ ≥ 2` case is the signalizer branch of BG
-`sigma_decomposition_dichotomy` (Coq `BGsection14`:1189): under all-type-`F` the `κ` branch is empty,
-so `∃ x, ℓ_σ(x) = 1 ∧ x⁻¹ g ∈ R(x)`, giving `g ∈ M̃(M)` via `mem_Mtilde_of_mem_coset`.
-
-**Faithfulness note:** without the all-type-`F` hypothesis the statement is *false* — `κ`-branch
-elements lie in the exceptional `𝒞_G(Ẑ)` piece and in no `𝒞_G(M̃)` (the dichotomy is an XOR).  The
-cover uses the canonical `genuineSigmaDecomposition`, matching `bgTheoremE_cover_data`'s `cover`. -/
-theorem exists_mem_conjClassSet_Mtilde_of_ne_one [Finite G]
-    (hG : OddOrder.BG.IsMinimalSimpleOdd G)
-    (hall : ∀ M ∈ maximalSubgroups G, IsTypeF M) {g : G} (hg : g ≠ 1) :
-    ∃ M ∈ maximalSubgroups G,
-      g ∈ conjClassSet (Mtilde hG (genuineSigmaDecomposition hG) M) := by
-  set D := genuineSigmaDecomposition hG with hD
-  rcases Nat.lt_or_ge (D.length g) 2 with hlt | hge
-  · -- `ℓ_σ(g) ≤ 1`, and `g ≠ 1` rules out `ℓ_σ(g) = 0`, so `ℓ_σ(g) = 1`.
-    have hz : D.length g ≠ 0 := fun h => hg ((sigmaLength_eq_zero_iff hG g).mp h)
-    have h1 : D.length g = 1 := by omega
-    obtain ⟨-, M, hMmax, hgMsigma⟩ := (D.length_one_iff g).mp h1
-    have hgsharp : g ∈ sigmaSharp M := ⟨hgMsigma, hg⟩
-    exact ⟨M, hMmax, subset_conjClassSet (sigmaSharp_subset_Mtilde hG D hgsharp)⟩
-  · -- `ℓ_σ(g) ≥ 2`: the signalizer branch of `sigma_decomposition_dichotomy` (Coq `BGsection14`:1189).
-    -- Under `hall` (all type-`F`, `κ(M) = ∅`) the dichotomy's `κ` branch is empty, so the signalizer
-    -- branch holds: `∃ x, ℓ_σ(x) = 1 ∧ x⁻¹ g ∈ R(x)`.  Then `mem_Mtilde_of_mem_coset` (with `x ∈ M_σ^#`
-    -- from `ℓ_σ(x) = 1`) gives `g ∈ M̃(M)`.  Deep residual: port `sigma_decomposition_dichotomy`
-    -- (needs `pi_of_cent_sigma`, not yet ported) + `κ(M) = ∅` for type-`F` (issue 8020 gate 2).
-    sorry
-
 /-- **BG Lemma 14.5(b)** (mmd L3920), faithful `M̃` form: for nonconjugate maximal `M₁`, `M₂`,
 the sets `M̃₁`, `M̃₂` are disjoint.  Immediate from 14.5(a): if `g = x·x' = w·w'` with
 `x ∈ (M₁)_σ^#`, `w ∈ (M₂)_σ^#`, then `x ≠ w` (else `x` is a nonidentity element of
@@ -5091,6 +5060,22 @@ theorem ncard_conjugates_eq_index_of_normalizer_eq_self [Finite G] {M : Subgroup
   have h_card_eq : Nat.card conjs = Nat.card (G ⧸ M) :=
     (Nat.card_congr (Equiv.ofBijective f' hbij)).symm
   rw [← Nat.card_coe_set_eq, h_card_eq, ← Subgroup.index]
+
+/-- **`σ` is conjugation-invariant as a set** (Coq `sigmaJ`): `σ(Mᶜ) = σ(M)`.  The per-prime
+`sigma_conj` (both directions) together with `σ(M) ⊆ π(M) ⊆ primes` give the set equality. -/
+theorem sigma_conjSmul_eq [Finite G] (c : G) (M : Subgroup G) :
+    OddOrder.BG.Ch3.S10.sigma (MulAut.conj c • M) = OddOrder.BG.Ch3.S10.sigma M := by
+  ext p
+  by_cases hp : p.Prime
+  · haveI : Fact p.Prime := ⟨hp⟩
+    constructor
+    · intro hpc
+      have h := OddOrder.BG.Ch3.S10.sigma_conj c⁻¹ hpc
+      rwa [← mul_smul, ← map_mul, inv_mul_cancel, map_one, one_smul] at h
+    · exact OddOrder.BG.Ch3.S10.sigma_conj c
+  · constructor <;> intro h <;>
+      exact absurd (Nat.prime_of_mem_primeFactors
+        ((OddOrder.BG.Ch3.S10.mem_sigma_iff _ _).mp h).1) hp
 
 /-- **Hall conjugacy** (Coq `Hall_subJ` for the solvable maximal `M`): in a maximal subgroup `M`,
 every `π`-subgroup `X ≤ M` is conjugate by an element of `M` into any Hall `π`-subgroup `K` of `M`.
@@ -5315,6 +5300,163 @@ theorem branchA_or_branchB_of_mem_maximal [Finite G]
       exact Or.inl ⟨y, hyl, by rwa [hbmul] at hyr⟩
     · obtain ⟨hxl, hMmem, hbsharp, hbκ⟩ := hB
       exact Or.inr ⟨x, hxl, M, hMmem, by rw [hxg]; exact hbsharp, by rw [hxg]; exact hbκ⟩
+
+/-- **BG Lemma 14.6** (`sigma_decomposition_dichotomy`, Coq `BGsection14`:1189): every `g ≠ 1`
+satisfies (at least) one of the two branches of the σ-decomposition dichotomy: the **signalizer
+branch** (`∃ y, ℓ_σ(y) = 1 ∧ y⁻¹g ∈ R(y)`) or the **κ branch** (`∃ y, ℓ_σ(y) = 1 ∧ ∃ N ∈ 𝓜_σ(y),
+y⁻¹g ∈ (C_N[y])^#` with `y⁻¹g` a `κ(N)`-element).
+
+Proof (Coq's second half): assume both branches fail.  Then `branchA_or_branchB_of_mem_maximal`
+gives **`s'g`**: every `g ∈ M` (maximal) has trivial `σ(M)`-part.  Pick `x = (g)_{σ(M₀)} ≠ 1` from
+the nonempty σ-decomposition; conjugate `M₀` so that `x ∈ M_σ` (preserving `σ(M) = σ(M₀)`, hence
+`x = (g)_{σ(M)}`).  Then `g ∉ M` (else `s'g` kills `x`), so `|𝓜_σ(x)| > 1`
+(`centralizer_le_of_maximalSigma_ncard_eq_one`).  The neighbour `N = N(x)` of Theorem 14.4 has
+`C_G(x) ≤ N` and `M ∩ N` a Hall `σ(N)′`-subgroup of `N` (complement of `N_σ`); since `g` is a
+`σ(N)′`-element (`s'g` for `N`), `⟨g⟩` conjugates into `M ∩ N ⊆ M` (`exists_conj_smul_le_of_isHall`),
+so `(g^w)_{σ(M)} = (x)^w = 1` by `s'g`, forcing `x = 1` — a contradiction. -/
+theorem sigma_decomposition_dichotomy [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (D : SigmaDecompositionData G) {g : G} (hg : g ≠ 1) :
+    (∃ y, D.length y = 1 ∧ y⁻¹ * g ∈ Rsub hG D y)
+    ∨ (∃ y, D.length y = 1 ∧ ∃ N, N ∈ maximalSigmaSubgroupsOfElement y ∧
+        y⁻¹ * g ∈ sharpSubgroup (N ⊓ Subgroup.centralizer ({y} : Set G)) ∧
+        OddOrder.GroupTheory.IsPiElement (kappa N) (y⁻¹ * g)) := by
+  classical
+  by_contra hcon
+  have hnA : ¬ (∃ y, D.length y = 1 ∧ y⁻¹ * g ∈ Rsub hG D y) := fun h => hcon (Or.inl h)
+  have hnB : ¬ (∃ y, D.length y = 1 ∧ ∃ N, N ∈ maximalSigmaSubgroupsOfElement y ∧
+      y⁻¹ * g ∈ sharpSubgroup (N ⊓ Subgroup.centralizer ({y} : Set G)) ∧
+      OddOrder.GroupTheory.IsPiElement (kappa N) (y⁻¹ * g)) := fun h => hcon (Or.inr h)
+  -- **`s'g`**: `g ∈ M` (maximal) ⟹ `σ(M)`-part of `g` is trivial.
+  have hsg : ∀ M, M ∈ maximalSubgroups G → g ∈ M → sigmaPart M g = 1 := by
+    intro M hM hgM
+    by_contra hne
+    rcases branchA_or_branchB_of_mem_maximal hG D hM hgM hne with hA | hB
+    · exact hnA hA
+    · exact hnB hB
+  -- σ-decomposition is nonempty; pick `x = (g)_{σ(M₀)} ≠ 1`.
+  have hlen0 : sigmaLength g ≠ 0 := fun h => hg ((sigmaLength_eq_zero_iff hG g).mp h)
+  obtain ⟨x, hxmem⟩ : (sigmaDecomposition g).Nonempty := by
+    rw [sigmaLength] at hlen0; exact Set.nonempty_of_ncard_ne_zero hlen0
+  rw [sigmaDecomposition, Set.mem_diff, Set.mem_singleton_iff] at hxmem
+  obtain ⟨⟨M₀, hM₀, hxeq⟩, hx1⟩ := hxmem
+  have hxπ₀ : OddOrder.GroupTheory.IsPiElement (OddOrder.BG.Ch3.S10.sigma M₀) x :=
+    hxeq ▸ isPiElement_piPart (OddOrder.BG.Ch3.S10.sigma M₀) g
+  have hxz : x ∈ Subgroup.zpowers g := hxeq ▸ piPart_mem_zpowers (OddOrder.BG.Ch3.S10.sigma M₀) g
+  have hxlen : D.length x = 1 := length_one_of_isPiElement_sigma hG D hM₀ hx1 hxπ₀
+  -- **WLOG `x ∈ M_σ`**: conjugate `M₀` into a maximal `M` containing `x` in its `σ`-core.
+  have hclosne : Subgroup.closure ({x} : Set G) ≠ ⊥ := fun h =>
+    hx1 (Subgroup.mem_bot.mp (h ▸ Subgroup.subset_closure (Set.mem_singleton x)))
+  have hclt : Subgroup.closure ({x} : Set G) < ⊤ := by
+    refine lt_top_iff_ne_top.mpr (fun htop => hG.notSolvable (isSolvable_of_comm fun a b => ?_))
+    have hmem : ∀ y : G, y ∈ Subgroup.zpowers x := fun y => by
+      rw [Subgroup.zpowers_eq_closure, htop]; exact Subgroup.mem_top y
+    obtain ⟨m, rfl⟩ := hmem a; obtain ⟨n, rfl⟩ := hmem b
+    rw [← zpow_add, ← zpow_add, Int.add_comm]
+  have hxpisub : Subgroup.IsPiSubgroup (OddOrder.BG.Ch3.S10.sigma M₀)
+      (Subgroup.closure ({x} : Set G)) := fun p hp =>
+    hxπ₀ p (by rwa [← Subgroup.zpowers_eq_closure, Nat.card_zpowers] at hp)
+  obtain ⟨c, hc⟩ := sigma_subgroup_conj_into_Msigma_general hG hM₀ hclosne hclt hxpisub
+    (fun hN hnc => sigma_disjoint_of_nonconjugate hG hM₀ hN hnc)
+  set M := MulAut.conj c⁻¹ • M₀ with hMdef
+  have hMmax : M ∈ maximalSubgroups G :=
+    mem_maximalSubgroups_of_isConjugateSubgroup hM₀ ⟨c⁻¹, rfl⟩
+  have hxMσ : x ∈ OddOrder.BG.Ch3.S10.Msigma M := by
+    rw [hMdef, Msigma_conj_smul, Subgroup.mem_pointwise_smul_iff_inv_smul_mem]
+    have hcx : MulAut.conj c • x ∈ OddOrder.BG.Ch3.S10.Msigma M₀ :=
+      hc (Subgroup.smul_mem_pointwise_smul x (MulAut.conj c) _
+        (Subgroup.subset_closure (Set.mem_singleton x)))
+    rwa [show (MulAut.conj c⁻¹)⁻¹ • x = MulAut.conj c • x from by rw [← map_inv, inv_inv]]
+  have hσM : OddOrder.BG.Ch3.S10.sigma M = OddOrder.BG.Ch3.S10.sigma M₀ := by
+    rw [hMdef, sigma_conjSmul_eq]
+  have hxsig : sigmaPart M g = x := by rw [sigmaPart, hσM, ← sigmaPart, ← hxeq]
+  -- `g ∉ M`, `g ∈ C_G(x)`, `M ∈ 𝓜_σ(x)`.
+  have hnotMg : g ∉ M := fun hgM => hx1 (hxsig ▸ hsg M hMmax hgM)
+  have hcxg : g ∈ Subgroup.centralizer ({x} : Set G) := by
+    rw [Subgroup.mem_centralizer_iff]; intro z hz
+    rw [Set.mem_singleton_iff.mp hz]
+    obtain ⟨k, hk⟩ := hxz; rw [← hk]; exact Commute.zpow_left (Commute.refl g) k
+  have hMmemx : M ∈ maximalSigmaSubgroupsOfElement x := ⟨hMmax, hxMσ⟩
+  -- `|𝓜_σ(x)| > 1` (else `C_G(x) ≤ M`, so `g ∈ M`).
+  have hgt : 1 < (maximalSigmaSubgroupsOfElement x).ncard := by
+    by_contra hle
+    push_neg at hle
+    have hcard1 : (maximalSigmaSubgroupsOfElement x).ncard = 1 :=
+      le_antisymm hle ((Set.ncard_pos (Set.toFinite _)).mpr ⟨M, hMmemx⟩)
+    exact hnotMg ((centralizer_le_of_maximalSigma_ncard_eq_one hG hcard1 hMmemx) hcxg)
+  -- Neighbour `N = N(x)`: `C_G(x) ≤ N`, and `M ∩ N` complements `N_σ` in `N`.
+  obtain ⟨N, hNmax, hCxN, -, -, hcompl⟩ := exists_neighbor_eq_Rsub hG D hxlen hgt
+  have hcomplM := hcompl M hMmemx
+  have hgN : g ∈ N := hCxN hcxg
+  have hsigNg : sigmaPart N g = 1 := hsg N hNmax hgN
+  have hsN'g : OddOrder.GroupTheory.IsPiElement (OddOrder.BG.Ch3.S10.sigma N)ᶜ g :=
+    isPiElement_compl_of_piPart_eq_one hsigNg
+  -- `M ∩ N` is a Hall `σ(N)′`-subgroup of `N`.
+  have hMsHall := OddOrder.BG.Ch3.S10.Msigma_subgroupOf_isHall hG hNmax
+  have hMNhall : Ch03.IsHallSubgroup (OddOrder.BG.Ch3.S10.sigma N)ᶜ ((M ⊓ N).subgroupOf N) := by
+    refine ⟨fun p hp => ?_, fun p hp => ?_⟩
+    · rw [(hcomplM.symm.index_eq_card).symm] at hp
+      exact hMsHall.index_no_pi p hp
+    · rw [hcomplM.index_eq_card] at hp
+      rw [Set.mem_compl_iff, not_not]
+      exact hMsHall.primeFactors_card_subset p hp
+  -- `⟨g⟩` is a `σ(N)′`-subgroup of `N`.
+  have hgN_le : Subgroup.zpowers g ≤ N := Subgroup.zpowers_le.mpr hgN
+  have hgpi : Ch03.Subgroup.IsPiGroup (OddOrder.BG.Ch3.S10.sigma N)ᶜ
+      ((Subgroup.zpowers g).subgroupOf N) := by
+    intro p hp
+    refine hsN'g p ?_
+    rwa [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hgN_le).toEquiv, Nat.card_zpowers] at hp
+  -- Conjugate `⟨g⟩` into `M ∩ N`, so a conjugate of `g` lies in `M`.
+  obtain ⟨w, _, hwle⟩ :=
+    exists_conj_smul_le_of_isHall hG hNmax (inf_le_right) hMNhall hgN_le hgpi
+  have hwg : MulAut.conj w • g ∈ M := by
+    have hmem : MulAut.conj w • g ∈ M ⊓ N :=
+      hwle (Subgroup.smul_mem_pointwise_smul g (MulAut.conj w) _ (Subgroup.mem_zpowers g))
+    exact (Subgroup.mem_inf.mp hmem).1
+  -- `g ∈ Mʷ⁻¹` (a maximal conjugate of `M`); `s'g` there gives `(g)_{σ(M)} = x = 1`.
+  have hM' : MulAut.conj w⁻¹ • M ∈ maximalSubgroups G :=
+    mem_maximalSubgroups_of_isConjugateSubgroup hMmax ⟨w⁻¹, rfl⟩
+  have hgM' : g ∈ MulAut.conj w⁻¹ • M := by
+    rw [Subgroup.mem_pointwise_smul_iff_inv_smul_mem,
+      show (MulAut.conj w⁻¹)⁻¹ • g = MulAut.conj w • g from by rw [← map_inv, inv_inv]]
+    exact hwg
+  have hfinal : sigmaPart (MulAut.conj w⁻¹ • M) g = 1 := hsg _ hM' hgM'
+  rw [sigmaPart, sigma_conjSmul_eq, ← sigmaPart, hxsig] at hfinal
+  exact hx1 hfinal
+
+/-- **BG Corollary 14.9, the type-I cover (faithful form)**: when every maximal subgroup is of
+type `F` (`κ(M) = ∅`, so there is no exceptional `κ` branch), every nonidentity `g` lies in some
+`𝒞_G(M̃)`.  Immediate from `sigma_decomposition_dichotomy`: the signalizer branch gives
+`y` with `ℓ_σ(y) = 1` and `y⁻¹g ∈ R(y)`, so `g ∈ M̃(M)` (`mem_Mtilde_of_mem_coset`, with `M` the
+maximal carrying `y ∈ M_σ^#`); the `κ` branch is impossible because a nonidentity `κ(N)`-element
+would force `κ(N) ≠ ∅`, contradicting `IsTypeF N`.
+
+**Faithfulness note:** without the all-type-`F` hypothesis the statement is *false* — `κ`-branch
+elements lie in the exceptional `𝒞_G(Ẑ)` piece and in no `𝒞_G(M̃)` (the dichotomy is an XOR).  The
+cover uses the canonical `genuineSigmaDecomposition`, matching `bgTheoremE_cover_data`'s `cover`. -/
+theorem exists_mem_conjClassSet_Mtilde_of_ne_one [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hall : ∀ M ∈ maximalSubgroups G, IsTypeF M) {g : G} (hg : g ≠ 1) :
+    ∃ M ∈ maximalSubgroups G,
+      g ∈ conjClassSet (Mtilde hG (genuineSigmaDecomposition hG) M) := by
+  set D := genuineSigmaDecomposition hG with hD
+  rcases sigma_decomposition_dichotomy hG D hg with
+    ⟨y, hyl, hyr⟩ | ⟨y, hyl, N, hNmem, hsharp, hκ⟩
+  · -- **Signalizer branch**: `y⁻¹g ∈ R(y)` puts `g` in `M̃(M)` for the maximal `M ∋ y` in `M_σ`.
+    obtain ⟨hy1, M, hMmax, hyMσ⟩ := (D.length_one_iff y).mp hyl
+    exact ⟨M, hMmax, subset_conjClassSet
+      (mem_Mtilde_of_mem_coset hG D (Set.mem_diff_singleton.mpr ⟨hyMσ, hy1⟩) hyr)⟩
+  · -- **κ branch**: impossible under all-type-`F` (`κ(N) = ∅`).
+    exfalso
+    have hN1 : y⁻¹ * g ≠ 1 := (Set.mem_diff_singleton.mp hsharp).2
+    obtain ⟨p, hp⟩ : (orderOf (y⁻¹ * g)).primeFactors.Nonempty :=
+      Nat.nonempty_primeFactors.mpr (by
+        have h1 : orderOf (y⁻¹ * g) ≠ 1 := by rwa [Ne, orderOf_eq_one_iff]
+        have h0 : 0 < orderOf (y⁻¹ * g) := orderOf_pos _
+        omega)
+    have hpκ : p ∈ kappa N := hκ p hp
+    rw [hall N hNmem.1] at hpκ
+    exact (Set.mem_empty_iff_false p).mp hpκ
 
 /-- `|L_σ^#| = |M_σ^#|` whenever `L` is a conjugate of `M`: conjugation is an order-preserving
 bijection, so `|L_σ| = |M_σ|` and removing the (fixed) identity preserves the count. -/
