@@ -2063,6 +2063,30 @@ theorem mulAut_eq_one_of_fixes_ne_one_hom {K : Type*} [Group K] [Finite K]
   ext x
   exact injective_of_prime_card_of_ne_one hp χ hχ (hfix x)
 
+open OddOrder.RepresentationTheory in
+/-- **Per-factor stabilizer = centralizer** (Peterfalvi (9.8) `def_Itheta`, character form): for an
+abelian prime-order group `K`, an automorphism `α` fixing a nontrivial irreducible character `θ` is
+the identity.  `θ` is linear (`exists_linearIrreducibleCharacter_eq_of_isMulCommutative`), so it is a
+faithful homomorphism `χ : K →* ℂˣ` (`injective_of_prime_card_of_ne_one`), and `α` fixing `χ` forces
+`α = 1`.  Applied per order-`p` chief-factor summand of the non-Galois (9.7) decomposition. -/
+theorem mulAut_eq_one_of_fixes_irr_ne_trivial_of_prime_card {K : Type*} [Group K] [Finite K]
+    [IsMulCommutative K] (hp : (Nat.card K).Prime) (α : MulAut K)
+    (θ : IrreducibleCharacter K)
+    (hθnt : (θ : ClassFunction K ℂ) ≠ trivialClassFunction K)
+    (hfix : ∀ x, (θ : ClassFunction K ℂ) (α x) = (θ : ClassFunction K ℂ) x) : α = 1 := by
+  obtain ⟨χ, hχ⟩ := θ.isIrreducible.exists_linearIrreducibleCharacter_eq_of_isMulCommutative
+  have hχne : χ ≠ 1 := by
+    intro h0
+    apply hθnt
+    rw [← hχ, h0, show (linearIrreducibleCharacter (1 : K →* ℂˣ)) = trivialIrreducibleCharacter K from
+      linearIrreducibleCharacter_eq_trivial_iff.mpr rfl]
+    rfl
+  refine mulAut_eq_one_of_fixes_ne_one_hom hp α χ hχne (fun x => ?_)
+  apply Units.val_injective
+  have h1 := hfix x
+  rw [← hχ] at h1
+  simpa only [linearIrreducibleCharacter_apply] using h1
+
 /-- Case (a) of Peterfalvi (9.7): `H/H_0` splits as a direct product of `q`
 order-`p` factors permuted by `W_1`.
 
