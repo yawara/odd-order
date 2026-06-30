@@ -11,6 +11,7 @@ conflicts; it imports the `S09` machinery and supplies standalone lemmas toward 
 discharge (issue 1013).
 -/
 import OddOrder.GroupTheory.RepresentationTheory.InducedCharacter
+import OddOrder.Peterfalvi.S09_NonexistenceCertain
 
 namespace OddOrder.Peterfalvi.S09.Cert
 
@@ -222,5 +223,22 @@ theorem inner_psi_candidate [Invertible (Nat.card L : ℂ)] {n : ℕ}
         if_neg hij, mul_zero])
     (fun hj_notin => absurd (Finset.mem_Ioi.mpr (Fin.pos_of_ne_zero hj)) hj_notin)]
   rw [ClassFunction.inner_smul_right, inner_psi_zeta ζ d horth hj, if_pos rfl]
+
+/-- **Peterfalvi (7.7.a), the candidate-coefficient identity.**  With the (7.7.a) coefficients
+`b_i = star(c_i)/‖ζ_i‖²`, the pairing of `ψ_j` against the candidate `Σ_{i≥1} b_i ζ_i` recovers
+`c_j` exactly: `star(b_j)·‖ζ_j‖² = (c_j/‖ζ_j‖²)·‖ζ_j‖² = c_j` (using `‖ζ_j‖²` real and nonzero).
+This is the consistency that makes `Σ c̄_i/‖ζ_i‖² ζ_i` the decomposition of `χ^ρ`. -/
+theorem inner_psi_candidate_eq [Invertible (Nat.card L : ℂ)] {n : ℕ}
+    (ζ : Fin (n + 1) → ClassFunction L ℂ) (d : Fin (n + 1) → ℂ)
+    (horth : ∀ a b : Fin (n + 1), a ≠ b → ClassFunction.inner (ζ a) (ζ b) = 0)
+    (c : Fin (n + 1) → ℂ) (hnorm : ∀ i : Fin (n + 1), ClassFunction.inner (ζ i) (ζ i) ≠ 0)
+    {j : Fin (n + 1)} (hj : j ≠ 0) :
+    ClassFunction.inner (ζ j - d j • ζ 0)
+        (∑ i ∈ Finset.Ioi (0 : Fin (n + 1)),
+          (star (c i) / ClassFunction.inner (ζ i) (ζ i)) • ζ i) = c j := by
+  rw [inner_psi_candidate ζ d horth (fun i => star (c i) / ClassFunction.inner (ζ i) (ζ i)) hj,
+    div_eq_mul_inv, star_mul, star_star, star_inv₀,
+    OddOrder.Peterfalvi.S09.Hypothesis71.ClassFunction.star_inner_self,
+    mul_right_comm, inv_mul_cancel₀ (hnorm j), one_mul]
 
 end OddOrder.Peterfalvi.S09.Cert
