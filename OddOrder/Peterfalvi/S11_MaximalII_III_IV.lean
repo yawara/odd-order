@@ -3243,6 +3243,31 @@ theorem card_pointwise_smul {A K : Type*} [Group A] [Group K] [Finite K]
     Nat.card ↥(φ a • S) = Nat.card ↥S :=
   (Nat.card_congr (Subgroup.equivMapOfInjective S (φ a).toMonoidHom (φ a).injective).toEquiv).symm
 
+/-- **`U W`-orbit collapses to the `W`-orbit** for a `U`-invariant `S₀` (`U ◁ A`).  Since each
+`W`-conjugate `φ w • S₀` is again `U`-invariant (`isAInvariant_comp_subtype_pointwise_smul`), a
+`U W`-element `a = u·w` gives `φ a • S₀ = φ u • (φ w • S₀) = φ w • S₀`.  Hence the spanning
+`U W`-orbit of `S₀` already equals its `W`-orbit — the elementary span step of the `(9.7)`
+decomposition `H̄ = ⊕_{w∈W1} S₀^w`. -/
+theorem iSup_phi_smul_eq_iSup_W_of_normal {A K : Type*} [Group A] [Group K]
+    {φ : A →* MulAut K} {U W : Subgroup A} (hU : U.Normal) {S₀ : Subgroup K}
+    (hS₀ : IsAInvariant (φ.comp U.subtype) S₀) :
+    ⨆ a : ↥(U ⊔ W), φ ↑a • S₀ = ⨆ w : ↥W, φ ↑w • S₀ := by
+  haveI := hU
+  apply le_antisymm
+  · rw [iSup_le_iff]
+    rintro ⟨a, ha⟩
+    have ha' : a ∈ (↑U * ↑W : Set A) := by rw [← Subgroup.normal_mul]; exact ha
+    obtain ⟨u, hu, w, hw, huw⟩ := Set.mem_mul.mp ha'
+    show φ a • S₀ ≤ ⨆ w' : ↥W, φ ↑w' • S₀
+    rw [← huw, map_mul, mul_smul]
+    have key : φ u • (φ w • S₀) = φ w • S₀ :=
+      isAInvariant_comp_subtype_pointwise_smul hU hS₀ w ⟨u, hu⟩
+    rw [key]
+    exact le_iSup (fun w' : ↥W => φ ↑w' • S₀) ⟨w, hw⟩
+  · rw [iSup_le_iff]
+    rintro ⟨w, hw⟩
+    exact le_iSup (fun a : ↥(U ⊔ W) => φ ↑a • S₀) ⟨w, Subgroup.mem_sup_right hw⟩
+
 /-! ### (9.7) The Singer mechanism for the chief factor (Clifford case (b))
 
 When `U` acts irreducibly on the chief factor `H̄` (case (b)), the commutant `End_{𝔽ₚ[U]}(H̄)` is a
