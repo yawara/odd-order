@@ -3268,6 +3268,24 @@ theorem iSup_phi_smul_eq_iSup_W_of_normal {A K : Type*} [Group A] [Group K]
     rintro ⟨w, hw⟩
     exact le_iSup (fun a : ↥(U ⊔ W) => φ ↑a • S₀) ⟨w, Subgroup.mem_sup_right hw⟩
 
+/-- **The `W`-conjugates of a `U`-invariant order-`p` `S₀` realise `K` as their internal direct
+product** when `|K| = |S₀|^|W|` and the `UW`-orbit spans.  Assembles the span step
+(`iSup_phi_smul_eq_iSup_W_of_normal`), the order count (`card_pointwise_smul`,
+`|φ w • S₀| = |S₀|`), and the bijectivity-from-count (`noncommPiCoprod_bijective_of_card`).  This is
+the elementary `(9.7)` decomposition `H̄ = ⊕_{w∈W1} S₀^w`, needing no character Clifford theory. -/
+theorem wConjugate_coprod_bijective {A K : Type*} [Group A] [CommGroup K] [Finite K]
+    {φ : A →* MulAut K} {U W : Subgroup A} [Fintype ↥W] (hU : U.Normal) {S₀ : Subgroup K}
+    (hS₀inv : IsAInvariant (φ.comp U.subtype) S₀)
+    (hspan : ⨆ a : ↥(U ⊔ W), φ ↑a • S₀ = ⊤)
+    (hKcard : Nat.card K = (Nat.card ↥S₀) ^ (Fintype.card ↥W)) :
+    Function.Bijective (Subgroup.noncommPiCoprod
+      (fun (i j : ↥W) (_ : i ≠ j) (x y : K) (_ : x ∈ φ ↑i • S₀) (_ : y ∈ φ ↑j • S₀) =>
+        mul_comm x y)) := by
+  apply noncommPiCoprod_bijective_of_card
+  · rw [← iSup_phi_smul_eq_iSup_W_of_normal hU hS₀inv]; exact hspan
+  · simp only [card_pointwise_smul]
+    rw [Finset.prod_const, Finset.card_univ, ← hKcard]
+
 /-! ### (9.7) The Singer mechanism for the chief factor (Clifford case (b))
 
 When `U` acts irreducibly on the chief factor `H̄` (case (b)), the commutant `End_{𝔽ₚ[U]}(H̄)` is a
