@@ -191,6 +191,17 @@ structure Hypothesis where
   Sdata : TypePData S
   Sdata_U_eq : Sdata.U = U
   Sdata_W1_eq : Sdata.W1 = W1
+  /-- **Peterfalvi (13.1.b) carrier (T-side, dual of `Sdata`)**: the type-`P` data of `T`
+  (`T = (Q ⋊ V) ⋊ W₂`), with its complement `V` and cyclic factor `W₂` reconciled to the
+  hypothesis's `V`/`W2` (`Tdata_V_eq`/`Tdata_W2_eq`).  The `V`-side analogue of `Sdata`, supplying
+  the structural facts (`V` complements `Q = T_F`, `W₂ ≤ N_G(V)`, `V` nilpotent) that the `V`-side
+  of §14 (`exists_typeI_maximal_overNormalizer_V`, the dual of the `U`-side) reads off `T`.  Since
+  `T = M_σ`-member is type `P` (`T_nonI : IsTypeNonI T ⟹ IsTypeP T`), `TypePData T` exists; the
+  `V`/`W₂` reconciliation is the §16-construction carrier content (gated on `T` type-`P₂`, the (14.9)
+  conclusion, supplied at the §16 producer). -/
+  Tdata : TypePData T
+  Tdata_V_eq : Tdata.U = V
+  Tdata_W2_eq : Tdata.W1 = W2
 
 namespace Hypothesis
 
