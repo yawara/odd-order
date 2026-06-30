@@ -6210,5 +6210,28 @@ theorem hc_index_eq_u [Finite G] {M : Subgroup G}
   exact (index_hcInHu_eq_relindex_cInHu data chief).trans
     (index_cInHu_subgroupOf_uInHu_eq_u data chief chars)
 
+/-- **`ζ(1) = u`**: the degree of `ζ = Ind_{HC}^{HU}(ψ)` is `u`.  `induce_apply_one` gives
+`ζ(1) = [HU:HC]·ψ(1) = u·1` (`hc_index_eq_u`, and `ψ` linear so `ψ(1)=1`).  This is the degree-`u`
+of the (9.8.c) irreducible; `induceHU ζ` then has degree `q·u = qu`. -/
+theorem hcZeta_apply_one [Finite G] {M : Subgroup G}
+    {data : TypesIIIIIIVSetup M} {chief : ChiefFactorData data}
+    (chars : Section11CharacterData data chief)
+    (θ : (↥data.H ⧸ chief.N) →* ℂˣ)
+    [Fintype ↥(huSub data)]
+    [Fintype ↥(hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf (huSub data))]
+    [Invertible (Nat.card ↥(hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf
+      (huSub data)) : ℂ)] :
+    ClassFunction.induce
+        (hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf (huSub data))
+        (hcPsi chief θ : ClassFunction
+          ↥(hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf (huSub data)) ℂ)
+        (1 : ↥(huSub data))
+      = (chars.u : ℂ) := by
+  rw [ClassFunction.induce_apply_one, hc_index_eq_u chars,
+    show (hcPsi chief θ : ClassFunction
+        ↥(hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf (huSub data)) ℂ)
+        (1 : ↥(hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf (huSub data)))
+        = 1 from by simp [hcPsi, linearIrreducibleCharacter_apply_one], mul_one]
+
 end OddOrder.Peterfalvi.S11
 
