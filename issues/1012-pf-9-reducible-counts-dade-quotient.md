@@ -470,12 +470,22 @@ producer (chiefFactor_clifford_U_dichotomy の case-a 枝、S11:4288-4316) は *
 論証**を見落としていた (= reconstruction gap, not research gap、[[feedback-ask-chatgpt-for-elided-gaps]]
 の典型)。**Coq-first check で発見** (ユーザー 2026-06-30 指針)。
 
-**Lean 形式化 path (clear、tractable)**: (1) de-opacify (9.7): Hpart の bigdprod 構造を露出
-(H̄=⊕H̄_i, 各 order p, θ̄=積 char)。(2) **per-factor stabilizer lemma**: order-p 群の nontrivial
-char → U-stabilizer = centralizer (`inertia_irr_prime` analog, Aut(ℤ/p) free)。(3) **bigdprod inertia**:
-積 char の inertia = ∩ factor inertias (`inertia_bigdprod_irr` analog)。(4) 合成 → inertia θ̄=HC。
-(5) inertia plumbing (✅完了) → caseA inertia=HC → degree u。**impasse でなく substantial だが clear な
-formalization labor**。次着手 = (9.7) bigdprod de-opacify + per-factor stabilizer lemma。
+**Lean 形式化 path (clear)**: (1) de-opacify (9.7): Hpart 構造を露出 (producer の supIndep family)。
+(2) **per-factor stabilizer**: order-p 群の nontrivial char → stabilizer=centralizer (Aut(ℤ/p) free)。
+(3) bigdprod inertia (∩) → (4) inertia θ̄=HC → (5) inertia plumbing (✅) → caseA inertia=HC → degree u。
+
+**✅ 2026-06-30 cleaner path 発見 (bigdprod permutation 機構を回避)**: type-P では **U が各 Hpart factor を
+正規化** (producer の S₀ は U-invariant `hS₀inv`、かつ W₁≤N(U) ∵ U◁U⋊W₁ Frobenius ⟹ 各 W₁-translate
+S₀^w も U-invariant: u S₀^w u⁻¹ = w (w⁻¹uw) S₀ (…)⁻¹ w⁻¹ = w S₀ w⁻¹、w⁻¹uw∈U)。⟹ U は **diagonal 作用**
+(factor を permute しない)。⟹ 議論:
+- g∈U が regular θ̄ (各 factor で nontrivial) を固定 ⟹ 各 factor で θ̄|_{Hpart_i} を固定 (factor U-invariant)。
+- Hpart_i order p ⟹ nontrivial char の stabilizer = centralizer (Aut(ℤ/p)=(ℤ/p)* free、既存
+  `inertia_eq_of_freeAction` 系 @ ConjugationBrauer.lean:277 が近い infra)。
+- g が全 factor を中心化 ⟹ H̄=⟨Hpart_i⟩ を中心化 ⟹ g∈C。
+⟹ **bigdprod inertia の permutation 機構不要**。必要 piece: (A) Hpart U-invariance、(B) θ̄ regular ⟹
+θ̄|_{Hpart_i} nontrivial、(C) per-factor free-Aut stabilizer、(D) 全 factor 中心化⟹H̄ 中心化。
+既存 infra: `inertia_eq_of_freeAction`, inertia transfer (`mem_inertia_compHom_iff`)。次着手 = piece C
+(per-factor free-Aut、最も self-contained)。
 
 ## 進捗サマリ (2026-06-30 更新)
 
