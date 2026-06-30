@@ -282,16 +282,17 @@ conjunct 3) / (9.9.c) exceptional (caseB conjunct 4) / (9.8.b,c,d) (caseA conjun
 - **degree は free**: `caseB_degree_qu` が 𝒮(H₀C') 全体で degree=qu を既証明、`𝒮(H₀C)⊆𝒮(H₀C')`
   (C'≤C, `sOf_antitone`) ゆえ。**✅ landed `forall_mem_sOf_H0C_apply_one_eq_qu`** (commit a4676bc6)。
   ⟹ conjunct 3 は **membership に帰着**: reducible φ∈𝒮(H₀) → φ∈𝒮(H₀C) が分かれば degree は cite で済む。
-- **🛑 membership crux = 唯一の deep 残**: reducible χ∈𝒳(H₀) ⟹ C⊆ker χ。**deep Clifford** (Coq
-  `PFsection9` `Part_a` @ L884+、(9.9.b)/(9.8.b) 共有 subproof):
-  - reducible `Ind_{HU}^M χ` ⟺ I_M(χ)=M ⟺ **χ は M(=W₁)-invariant** (M/HU≅W₁ cyclic prime q ゆえ
-    inertia は HU か M のみ; reducible⟺inertia=M)。← repo に prime-quotient dichotomy + 私の column
-    work (`chiRestrict_conjBy_eq` L-invariance) が部品。
-  - **HC/H₀ = H̄ × (C/H₀) 直積** (Coq `defHCbar`)。χ=Ind_{HC}^{HU}ψ (ψ∈Irr(HC), I_HU(θ₀)=HC)、
-    χ M-invariant ⟹ ψ の W₁-orbit 構造 ⟹ **underlying HC-linear char ψ は C-trivial** (C⊆ker ψ)。
-  - `C⊴HU` + χ|_C=u·(ψ|_C) ⟹ C⊆ker χ ⟸ C⊆ker ψ。
-  これは multi-lemma 再構築 (reducible⟹M-inv / HC 直積 / ψ C-trivial / Ind-kernel)、bijection 並みの
-  focused 仕事。次 lane-a target。
+- **✅✅✅ 2026-06-30 BREAKTHROUGH (commit 45e634a5): membership は cardinality で proven — full theta
+  construction 不要だった**。`reducible_mem_sOf_H0C` (PROVEN): `𝒮(H₀C)⊆𝒮(H₀)` (`sOf_antitone`,
+  H₀≤H₀C) ゆえ reducibles も subset; 両 count=p-1; **subset + 等 finite card ⟹ 全体一致**
+  (`Set.eq_of_subset_of_ncard_le`, finite は p-1≠0 ∵ p prime)。⟹ 全 reducible 𝒮(H₀)-member は
+  𝒮(H₀C) に既在。**caseB conjunct 3 (degree+membership) 完全 wire 済** (degree=`forall_mem_sOf_H0C_apply_one_eq_qu`,
+  membership=`reducible_mem_sOf_H0C`)。当初の「deep Clifford crux (HC/H₀ 直積, theta family, Coq Part_a)」
+  評価は **over-pessimistic だった** — cardinality が full construction を回避。
+  - **残 = `reducible_count_sOf_H0C` (sorried)**: 𝒮(H₀C) の reducible count=p-1。`reducible_count_sOf_H0`
+    の **PARALLEL** — `M/(H₀C)` certain-type hypothesis ((8.4.d) は M/H₀C でも成立、W̄₂'=W₂-image は
+    依然 order p ∵ W₂∩H₀C=W₂∩H₀, W₂≤H・C≤U が H で trivial 交差)。`chiefFactorQuotientHypothesis` +
+    bijection を N=H₀⊔C で再構築 (bounded parallel work、§6 shortcut 不要は確定したが H₀ 版と同形)。**次 target**。
 - **⚠ caseA は独自 degree lemma 要**: caseA_character_counts は caseB を scope に持たない ⟹
   `caseB_degree_qu` cite 不可。(9.8.b) degree も caseA 版 chief-factor-constituent で別途。
 - **(9.9.c)/(9.10)** = exceptional (C=⊥ ∧ u=(p^q-1)/(p-1) + Frobenius)。`quotientSemidirectFrobenius`
