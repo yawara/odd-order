@@ -4040,6 +4040,163 @@ theorem clifford_dichotomy [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
 
 /-! ## (9.8)--(9.10): character counts in the two Clifford cases -/
 
+/-- **Peterfalvi (9.9.b)/(9.8.b) reducible count**: `𝒮(H₀)` contains exactly `p − 1` reducible
+characters.  This is the §9↔§6 bijection: the §9 family `𝒮(H₀) = {Ind_{HU}^M χ | χ ∈ 𝒳(H₀)}`
+bijects with the §6 reducible inductions on `K̄ = HU/H₀` (the `M/H₀`-`Hypothesis`
+`chiefFactorQuotientHypothesis`), whose reducible-with-`H̄⊄ker` count is `w̄₂ − 1 = p − 1`
+(`card_reducible_Hnontrivial_induce_eq_W2_sub_one`, `chiefFactorQuotient_card_W2_eq_p`).
+
+The bijection `χ̄ ↦ Ind_{HU}^M (inflate χ̄)` factors through the induction-inflation commute
+(`induce_compHom_subgroupMap_mk'`: `Ind_{HU}^M (inflate χ̄) = inflate_M (Ind_{K̄} χ̄)`), inflation
+surjectivity (`exists_compHom_eq_of_subset_characterKernel`), the kernel correspondence
+(`subset_characterKernel_compHom_iff`: `H ⊄ ker ↔ H̄ ⊄ ker`), the reducibility correspondence
+(`isIrreducibleCharacter_compHom_mk'_iff`), and injectivity on reducibles
+(`induce_injective_on_reducible`).  Case-agnostic: serves both (9.8.b) and (9.9.b). -/
+theorem reducible_count_sOf_H0 [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    {M : Subgroup G} {data : TypesIIIIIIVSetup M} (chief : ChiefFactorData data) :
+    {φ ∈ sOf data chief.H0 | ¬ IsIrreducibleCharacter φ}.ncard = chief.p - 1 := by
+  classical
+  haveI hN : (chief.H0.subgroupOf M).Normal := chiefFactor_H0_subgroupOf_normal chief
+  letI : Fintype ↥M := Fintype.ofFinite _
+  have hodd : Odd (Nat.card G) := hG.odd
+  have hU : data.typeP.U ≠ ⊥ := data.nontrivial.1
+  have hHall : Nat.Coprime (Nat.card ↥(derivedInG M)) (Nat.card ↥data.W1) := by
+    rw [show Nat.card ↥(derivedInG M) = Nat.card ↥data.typeP.H * Nat.card ↥data.typeP.U by
+      rw [← data.typeP.derived_complement.card_mul,
+        Nat.card_congr (Subgroup.subgroupOfEquivOfLe data.typeP.H_le).toEquiv,
+        Nat.card_congr (Subgroup.subgroupOfEquivOfLe data.typeP.U_le).toEquiv]]
+    exact (Nat.Coprime.mul_right (typeP_coprime_H_W1 data.typeP).symm
+      (typeP_coprime_U_W1 data.typeP hU).symm).symm
+  set h := chiefFactorQuotientHypothesis chief hodd hHall with hh_def
+  have hKeq : h.K = (huSub data).map (QuotientGroup.mk' (chief.H0.subgroupOf M)) :=
+    chiefFactorQuotientHypothesis_K_eq chief hodd hHall
+  -- the inflation hom `g : ↥(huSub) →* ↥(h.K)`, surjective with kernel `H₀`
+  set sm := (QuotientGroup.mk' (chief.H0.subgroupOf M)).subgroupMap (huSub data) with hsm_def
+  set g : ↥(huSub data) →* ↥h.K :=
+    (MulEquiv.subgroupCongr hKeq.symm).toMonoidHom.comp sm with hg_def
+  have hg_surj : Function.Surjective g :=
+    (MulEquiv.subgroupCongr hKeq.symm).surjective.comp
+      ((QuotientGroup.mk' (chief.H0.subgroupOf M)).subgroupMap_surjective (huSub data))
+  have hg_ker : g.ker = (chief.H0.subgroupOf M).subgroupOf (huSub data) := by
+    have hsmker : sm.ker = (chief.H0.subgroupOf M).subgroupOf (huSub data) := by
+      rw [hsm_def, Subgroup.ker_subgroupMap, QuotientGroup.ker_mk']
+    rw [hg_def]
+    ext x
+    simp only [MonoidHom.mem_ker, MonoidHom.comp_apply, MulEquiv.coe_toMonoidHom,
+      map_eq_one_iff _ (MulEquiv.subgroupCongr hKeq.symm).injective]
+    rw [← MonoidHom.mem_ker, hsmker]
+  -- instances for the §6 count, the commute, and `induceHU` (one shared scope, no diamonds)
+  haveI : Invertible (Nat.card (↥M ⧸ (chief.H0.subgroupOf M)) : ℂ) :=
+    invertibleOfNonzero (Nat.cast_ne_zero.mpr Nat.card_pos.ne')
+  haveI : NeZero (Nat.card ↥h.W1) := ⟨Nat.card_pos.ne'⟩
+  haveI : Fintype ↥h.K := Fintype.ofFinite _
+  haveI : Invertible (Nat.card ↥h.K : ℂ) :=
+    invertibleOfNonzero (Nat.cast_ne_zero.mpr Nat.card_pos.ne')
+  haveI : Fintype ↥(h.W1 ⊔ h.W2) := Fintype.ofFinite _
+  haveI : Invertible (Nat.card ↥(h.W1 ⊔ h.W2) : ℂ) :=
+    invertibleOfNonzero (Nat.cast_ne_zero.mpr Nat.card_pos.ne')
+  letI : Invertible (Nat.card ↥(huSub data) : ℂ) :=
+    invertibleOfNonzero (Nat.cast_ne_zero.mpr Nat.card_pos.ne')
+  letI : Invertible
+      (Nat.card ↥((huSub data).map (QuotientGroup.mk' (chief.H0.subgroupOf M))) : ℂ) :=
+    invertibleOfNonzero (Nat.cast_ne_zero.mpr Nat.card_pos.ne')
+  -- the commute / Φ-identity: `induceHU (compHom g χ̄) = compHom (mk' N) (induce h.K χ̄)`
+  have hPhi : ∀ χbar : IrreducibleCharacter ↥h.K,
+      induceHU data (ClassFunction.compHom g (χbar : ClassFunction ↥h.K ℂ))
+        = ClassFunction.compHom (QuotientGroup.mk' (chief.H0.subgroupOf M))
+            (ClassFunction.induce h.K (χbar : ClassFunction ↥h.K ℂ)) := by
+    intro χbar
+    have hunfold : ∀ Y : ClassFunction ↥(huSub data) ℂ,
+        induceHU data Y = ClassFunction.induce (huSub data) Y := fun _ => rfl
+    rw [hg_def, ← ClassFunction.compHom_comp, hunfold, hsm_def,
+      induce_compHom_subgroupMap_mk' (chief.H0.subgroupOf M)
+        (chiefFactor_H0_le_huSub data chief)
+        (ClassFunction.compHom (MulEquiv.subgroupCongr hKeq.symm).toMonoidHom
+          (χbar : ClassFunction ↥h.K ℂ))]
+    congr 1
+    exact induce_compHom_subgroupCongr hKeq.symm (χbar : ClassFunction ↥h.K ℂ)
+  -- the §6 reducible-with-`H̄⊄ker` subset `B'` of `Irr(K̄)` (counted as `p − 1`)
+  set B' : Set (IrreducibleCharacter ↥h.K) :=
+    {χbar | ¬ IsIrreducibleCharacter (ClassFunction.induce h.K (χbar : ClassFunction ↥h.K ℂ))
+      ∧ ¬ (((hInHu data).map g : Set ↥h.K) ⊆
+        OddOrder.Peterfalvi.S03.characterKernel (χbar : ClassFunction ↥h.K ℂ))} with hB'_def
+  have hW2H : h.W2.subgroupOf h.K ≤ (hInHu data).map g := by
+    intro y hy
+    rw [Subgroup.mem_subgroupOf] at hy
+    have hW2eq : h.W2
+        = (data.W2.subgroupOf M).map (QuotientGroup.mk' (chief.H0.subgroupOf M)) := rfl
+    rw [hW2eq, Subgroup.mem_map] at hy
+    obtain ⟨w, hw, hwy⟩ := hy
+    rw [Subgroup.mem_subgroupOf] at hw
+    have hwH : (w : G) ∈ data.H := (data.typeP.W2_le hw).1
+    have hwHU : w ∈ huSub data := by
+      rw [huSub, Subgroup.mem_subgroupOf]
+      exact Subgroup.mem_sup_left hwH
+    refine ⟨⟨w, hwHU⟩, ?_, ?_⟩
+    · show (⟨w, hwHU⟩ : ↥(huSub data)) ∈ (data.H.subgroupOf M).subgroupOf (huSub data)
+      rw [Subgroup.mem_subgroupOf, Subgroup.mem_subgroupOf]
+      exact hwH
+    · apply Subtype.ext
+      have hco : ((g ⟨w, hwHU⟩ : ↥h.K) : ↥M ⧸ (chief.H0.subgroupOf M))
+          = QuotientGroup.mk' (chief.H0.subgroupOf M) w := rfl
+      rw [hco]; exact hwy
+  -- image equality: `{φ ∈ 𝒮(H₀) | ¬ irr φ} = Φ '' B'`, `Φ χ̄ = induceHU (compHom g χ̄)`
+  have himage : {φ ∈ sOf data chief.H0 | ¬ IsIrreducibleCharacter φ}
+      = (fun χbar : IrreducibleCharacter ↥h.K => induceHU data (ClassFunction.compHom g (χbar : ClassFunction ↥h.K ℂ))) '' B' := by
+    ext φ
+    simp only [Set.mem_sep_iff, Set.mem_image, hB'_def, Set.mem_setOf_eq]
+    constructor
+    · rintro ⟨hφS, hred⟩
+      rw [mem_sOf] at hφS
+      obtain ⟨χ, hχxi, rfl⟩ := hφS
+      rw [mem_xiOf] at hχxi
+      obtain ⟨hχX, hχH0⟩ := hχxi
+      have hgker_sub : (g.ker : Set ↥(huSub data)) ⊆
+          OddOrder.Peterfalvi.S03.characterKernel (χ : ClassFunction ↥(huSub data) ℂ) := by
+        rw [hg_ker]; exact hχH0
+      obtain ⟨χbar, hχbar⟩ :=
+        OddOrder.RepresentationTheory.exists_compHom_eq_of_subset_characterKernel hg_surj χ hgker_sub
+      refine ⟨χbar, ⟨?_, ?_⟩, ?_⟩
+      · rw [← isIrreducibleCharacter_compHom_mk'_iff (chief.H0.subgroupOf M), ← hPhi χbar, hχbar]
+        exact hred
+      · rw [← subset_characterKernel_compHom_iff g (χbar : ClassFunction ↥h.K ℂ) (hInHu data), hχbar]
+        exact hχX
+      · rw [hχbar]
+    · rintro ⟨χbar, ⟨hred, hker⟩, rfl⟩
+      refine ⟨?_, ?_⟩
+      · rw [mem_sOf]
+        refine ⟨⟨ClassFunction.compHom g (χbar : ClassFunction ↥h.K ℂ),
+          IsIrreducibleCharacter.compHom_of_surjective hg_surj χbar.isIrreducible⟩, ?_, rfl⟩
+        rw [mem_xiOf]
+        refine ⟨?_, ?_⟩
+        · show ¬ ((hInHu data : Set ↥(huSub data)) ⊆ _)
+          rw [subset_characterKernel_compHom_iff g (χbar : ClassFunction ↥h.K ℂ) (hInHu data)]
+          exact hker
+        · rw [← hg_ker]
+          intro x hx
+          rw [SetLike.mem_coe, MonoidHom.mem_ker] at hx
+          rw [OddOrder.Peterfalvi.S03.mem_characterKernel,
+            OddOrder.Peterfalvi.S03.characterDegree_def, ClassFunction.compHom_apply,
+            ClassFunction.compHom_apply, hx, map_one]
+      · rw [hPhi χbar, isIrreducibleCharacter_compHom_mk'_iff]
+        exact hred
+  -- injectivity of `Φ` on `B'`
+  have hInj : Set.InjOn
+      (fun χbar : IrreducibleCharacter ↥h.K => induceHU data (ClassFunction.compHom g (χbar : ClassFunction ↥h.K ℂ))) B' := by
+    intro χbar hχbar χbar' _ heq
+    simp only at heq
+    rw [hPhi χbar, hPhi χbar'] at heq
+    rw [hB'_def, Set.mem_setOf_eq] at hχbar
+    exact h.induce_injective_on_reducible hχbar.1
+      (ClassFunction.compHom_injective_of_surjective
+        (QuotientGroup.mk'_surjective (chief.H0.subgroupOf M)) heq)
+  -- conclude: `|{φ ∈ 𝒮(H₀) | ¬ irr}| = |B'| = w̄₂ − 1 = p − 1`
+  rw [himage, hInj.ncard_image]
+  have hcardW2 : Nat.card ↥h.W2 = chief.p := chiefFactorQuotient_card_W2_eq_p chief hodd hHall
+  rw [hB'_def, ← Nat.card_coe_set_eq, ← hcardW2]
+  exact h.card_reducible_Hnontrivial_induce_eq_W2_sub_one hW2H
+
+
 /-- **Peterfalvi (9.8)**: character-count consequences in Clifford case (a).
 
 Faithful to Peterfalvi (9.8.b,c,d) (count-statement audit, issue 2030):
@@ -4063,7 +4220,11 @@ theorem caseA_character_counts [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G
       ((chief.p - 1) / caseA.a) * (Nat.card ↥data.U / (caseA.a * Nat.card ↥chars.Uprime)) ≤
         {χ ∈ chars.SOf (chief.H0 ⊔ chars.Uprime) |
           IsIrreducibleCharacter χ ∧ χ 1 = ((data.q * caseA.a : ℕ) : ℂ)}.ncard := by
-  sorry
+  -- (9.8.b) reducible count is the §9↔§6 bijection `reducible_count_sOf_H0` (case-agnostic).
+  refine ⟨reducible_count_sOf_H0 hG chief, ?_, ?_, ?_⟩
+  · sorry
+  · sorry
+  · sorry
 
 section
 open scoped IsMulCommutative
@@ -4521,6 +4682,7 @@ theorem caseB_xi_H0_degree_dvd_u [Finite G]
     exact_mod_cast hcast
   exact ⟨e * d₀, by rw [hdeq]; ring⟩
 
+
 /-- **Peterfalvi (9.9)**: character-count consequences in Clifford case (b).
 
 Faithful to Peterfalvi (9.9.a,b,c) (count-statement audit, issue 2030):
@@ -4544,9 +4706,10 @@ theorem caseB_character_counts [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G
         φ 1 = ((data.q * chars.u : ℕ) : ℂ) ∧ φ ∈ chars.SOf (chief.H0 ⊔ chars.C)) ∧
       ((¬ ∃ χ ∈ chars.SOf (chief.H0 ⊔ chars.Cprime), IsIrreducibleCharacter χ) →
         chars.C = ⊥ ∧ chars.u = (chief.p ^ data.q - 1) / (chief.p - 1)) := by
-  -- (9.9.a) is the proven `caseB_degree_qu`; (9.9.b)/(9.9.c) remain (reducible count / exceptional).
+  -- (9.9.a) is the proven `caseB_degree_qu`; (9.9.b) is the §9↔§6 bijection `reducible_count_sOf_H0`;
+  -- (9.9.b) degree/membership and (9.9.c) exceptional remain.
   refine ⟨caseB_degree_qu hG chars caseB, ?_, ?_, ?_⟩
-  · sorry
+  · exact reducible_count_sOf_H0 hG chief
   · sorry
   · sorry
 
@@ -4602,3 +4765,4 @@ noncomputable def coherent_H0C_commutator [Fintype G]
   CoherenceWiring.cohereOfSibleyTarget (sibleyTarget_H0C chars)
 
 end OddOrder.Peterfalvi.S11
+
