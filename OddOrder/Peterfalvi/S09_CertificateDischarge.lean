@@ -79,6 +79,42 @@ theorem eq_induce_restrict_of_supported (K : Subgroup L) [K.Normal]
   rw [ClassFunction.induce_smul, induce_restrict_eq_index_smul K ψ hψ, smul_smul,
     inv_mul_cancel₀ (Nat.cast_ne_zero.mpr K.index_ne_zero_of_finite), one_smul]
 
+/-- **The induced characters span the image of induction** (Peterfalvi (7.7.a) spanning, image
+half).  Every induced class function `Ind_K^L φ` lies in the `ℂ`-span of the induced *irreducible*
+characters `{Ind_K^L θ : θ ∈ Irr K}`.  Expand `φ` in the irreducible basis of `CF(K)`
+(`span_irreducibleCharacter_eq_top`) and push through the linearity of induction
+(`induce_add`/`induce_smul`/`induce_zero`) by `Submodule.span_induction`. -/
+theorem induce_mem_span_induce_irr (K : Subgroup L) [Fintype ↥K] [Invertible (Nat.card ↥K : ℂ)]
+    (φ : ClassFunction ↥K ℂ) :
+    ClassFunction.induce K φ ∈ Submodule.span ℂ
+      (Set.range (fun θ : IrreducibleCharacter ↥K =>
+        ClassFunction.induce K (θ : ClassFunction ↥K ℂ))) := by
+  classical
+  haveI : Finite ↥K := Finite.of_fintype _
+  have hφ : φ ∈ Submodule.span ℂ
+      (Set.range (fun θ : IrreducibleCharacter ↥K => (θ : ClassFunction ↥K ℂ))) := by
+    rw [span_irreducibleCharacter_eq_top]; exact Submodule.mem_top
+  induction hφ using Submodule.span_induction with
+  | mem v hv => obtain ⟨θ, rfl⟩ := hv; exact Submodule.subset_span ⟨θ, rfl⟩
+  | zero => rw [ClassFunction.induce_zero]; exact Submodule.zero_mem _
+  | add x y _ _ ihx ihy => rw [ClassFunction.induce_add]; exact Submodule.add_mem _ ihx ihy
+  | smul c x _ ih => rw [ClassFunction.induce_smul]; exact Submodule.smul_mem _ c ih
+
+/-- **`CF(L,A)` lies in the span of the induced irreducibles** (Peterfalvi (7.7.a) spanning).  A
+class function `ψ` supported inside the normal subgroup `K` lies in the `ℂ`-span of the family
+`{Ind_K^L θ : θ ∈ Irr K}`: combine `eq_induce_restrict_of_supported` (`ψ = Ind_K^L(e⁻¹ Res ψ)`,
+so `ψ ∈ Ind_K^L(CF K)`) with `induce_mem_span_induce_irr`.  This is the spanning input that, after
+the degree-`0` reduction (`mem_span_psi_of_apply_one_zero`), supplies the `hspan` hypothesis of
+`chiRho_decomp_proof`. -/
+theorem supported_mem_span_induce_irr (K : Subgroup L) [K.Normal] [Fintype ↥K]
+    [Invertible (Nat.card ↥K : ℂ)] (ψ : ClassFunction L ℂ)
+    (hψ : ∀ y : L, y ∉ K → ψ y = 0) :
+    ψ ∈ Submodule.span ℂ
+      (Set.range (fun θ : IrreducibleCharacter ↥K =>
+        ClassFunction.induce K (θ : ClassFunction ↥K ℂ))) := by
+  rw [eq_induce_restrict_of_supported K ψ hψ]
+  exact induce_mem_span_induce_irr K _
+
 /-- **Positive-definiteness of Peterfalvi's class-function inner product.**  Over `ℂ`,
 `⟨η, η⟩ = 0` forces `η = 0`.  Indeed `⟨η, η⟩ = |G|⁻¹ Σ_g |η(g)|²`, a sum of non-negative reals, so
 it vanishes only when every `η(g) = 0`.  This is the non-degeneracy used in Peterfalvi's (7.7.a)
@@ -321,6 +357,21 @@ theorem induce_family_orthogonal (K : Subgroup L) [K.Normal] [Fintype ↥K] [Inv
         (ClassFunction.induce K (θ b : ClassFunction ↥K ℂ)) = 0 :=
   fun a b hab => inner_induce_eq_zero_of_not_conj (θ a) (θ b) (hnc a b hab)
 
+/-- **An injective induced family is pairwise orthogonal** (Peterfalvi (7.6)/(7.7.a)).  When the
+map `i ↦ Ind_K^L θ_i` is injective, the `θ_i` are pairwise non-conjugate (a conjugacy would force
+equal inductions, `induce_eq_induce_iff_conj`), so `induce_family_orthogonal` applies.  This is the
+form of `horth` actually supplied by the enumeration of the *distinct* induced characters. -/
+theorem induce_family_orthogonal_of_injective (K : Subgroup L) [K.Normal] [Fintype ↥K]
+    [Invertible (Nat.card L : ℂ)] [Invertible (Nat.card ↥K : ℂ)] {n : ℕ}
+    (θ : Fin (n + 1) → IrreducibleCharacter ↥K)
+    (hinj : Function.Injective
+      (fun i => ClassFunction.induce K (θ i : ClassFunction ↥K ℂ))) :
+    ∀ a b : Fin (n + 1), a ≠ b →
+      ClassFunction.inner (ClassFunction.induce K (θ a : ClassFunction ↥K ℂ))
+        (ClassFunction.induce K (θ b : ClassFunction ↥K ℂ)) = 0 :=
+  induce_family_orthogonal K θ fun a b hab g hg =>
+    hab (hinj ((induce_eq_induce_iff_conj (θ a) (θ b)).mpr ⟨g, hg⟩))
+
 /-- **The difference `ψ_i = ζ_i − d_i ζ_0` is supported on `K^#`** (Peterfalvi (7.6)/(7.7.a)
 hypothesis).  With `ζ = Ind_K^L θ` and the degree relation `ζ_i(1) = d_i ζ_0(1)`, the difference
 `Ind θ − d • Ind θ₀` vanishes off `K` (induction from the normal `K` is `K`-supported) and at `1`
@@ -390,5 +441,72 @@ theorem mem_span_psi_of_apply_one_zero {n : ℕ} (ζ : Fin (n + 1) → ClassFunc
   rw [← hcombo]
   refine Submodule.sum_mem _ fun i hi => Submodule.smul_mem _ _ (Submodule.subset_span ?_)
   exact ⟨i, Finset.ne_of_mem_erase hi, rfl⟩
+
+/-- **Peterfalvi (7.7.a), the spanning hypothesis from a covering induced family.**  Given a family
+`ζ : Fin (n+1) → CF(L)` whose values *cover* every induced irreducible `Ind_K^L θ` (`hcover`) and
+satisfy the degree relation `ζ_i(1) = d_i ζ_0(1)` with `ζ_0(1) ≠ 0`, any class function `ψ`
+supported inside the normal subgroup `K` and vanishing at `1` lies in the span of the difference
+vectors `{ψ_i = ζ_i − d_i ζ_0 : i ≠ 0}`.
+
+This is the `hspan` hypothesis of `chiRho_decomp_proof`: `supported_mem_span_induce_irr` places `ψ`
+in the span of the induced irreducibles, `hcover` + `Submodule.span_mono` transports this to the
+span of `{ζ_i}`, and `mem_span_psi_of_apply_one_zero` performs the degree-`0` reduction. -/
+theorem supported_mem_span_psi (K : Subgroup L) [K.Normal] [Fintype ↥K]
+    [Invertible (Nat.card ↥K : ℂ)] {n : ℕ}
+    (ζ : Fin (n + 1) → ClassFunction L ℂ) (d : Fin (n + 1) → ℂ)
+    (hcover : ∀ θ : IrreducibleCharacter ↥K,
+      ClassFunction.induce K (θ : ClassFunction ↥K ℂ) ∈ Set.range ζ)
+    (hdeg : ∀ i : Fin (n + 1), ζ i (1 : L) = d i * ζ 0 (1 : L)) (hz0 : ζ 0 (1 : L) ≠ 0)
+    {ψ : ClassFunction L ℂ} (hsupp : ∀ y : L, y ∉ K → ψ y = 0) (hψ1 : ψ (1 : L) = 0) :
+    ψ ∈ Submodule.span ℂ ((fun i => ζ i - d i • ζ 0) '' {i : Fin (n + 1) | i ≠ 0}) := by
+  refine mem_span_psi_of_apply_one_zero ζ d hdeg hz0 ?_ hψ1
+  refine Submodule.span_mono ?_ (supported_mem_span_induce_irr K ψ hsupp)
+  rintro v ⟨θ, rfl⟩
+  exact hcover θ
+
+/-- **Enumeration of the distinct induced characters** (Peterfalvi (7.6) family).  For a normal
+subgroup `K ◁ L`, the family `T = {Ind_K^L θ : θ ∈ Irr K}` of induced characters is finite; listing
+its *distinct* members as `ζ_i = Ind_K^L θ_i` over `Fin (n+1)` (nonempty: the trivial character
+contributes) yields a representative family `θ : Fin (n+1) → Irr K` for which `i ↦ Ind_K^L θ_i` is
+**injective** (distinct members) and **covers** every induced irreducible.
+
+These are precisely the `hinj`/`hcover` inputs of `induce_family_orthogonal_of_injective` and
+`supported_mem_span_psi`, i.e. the orthogonality and spanning hypotheses of `chiRho_decomp_proof`.
+The enumeration is the standard `Finset.equivFin` listing of `Finset.univ.image (Ind_K^L ·)`. -/
+theorem exists_distinct_induced_family (K : Subgroup L) [K.Normal] [Fintype ↥K]
+    [Invertible (Nat.card L : ℂ)] [Invertible (Nat.card ↥K : ℂ)] :
+    ∃ (n : ℕ) (θ : Fin (n + 1) → IrreducibleCharacter ↥K),
+      Function.Injective (fun i => ClassFunction.induce K (θ i : ClassFunction ↥K ℂ)) ∧
+      ∀ φ : IrreducibleCharacter ↥K,
+        ClassFunction.induce K (φ : ClassFunction ↥K ℂ) ∈
+          Set.range (fun i => ClassFunction.induce K (θ i : ClassFunction ↥K ℂ)) := by
+  classical
+  haveI : Finite ↥K := Finite.of_fintype _
+  let V : Finset (ClassFunction L ℂ) :=
+    Finset.univ.image (fun φ : IrreducibleCharacter ↥K =>
+      ClassFunction.induce K (φ : ClassFunction ↥K ℂ))
+  have hVne : V.Nonempty :=
+    ⟨_, Finset.mem_image_of_mem _ (Finset.mem_univ (trivialIrreducibleCharacter ↥K))⟩
+  obtain ⟨n, hn⟩ : ∃ n, V.card = n + 1 :=
+    ⟨V.card - 1, (Nat.succ_pred_eq_of_pos hVne.card_pos).symm⟩
+  let e : ↥V ≃ Fin (n + 1) := V.equivFin.trans (finCongr hn)
+  have hrep : ∀ i : Fin (n + 1), ∃ φ : IrreducibleCharacter ↥K,
+      ClassFunction.induce K (φ : ClassFunction ↥K ℂ) = (e.symm i : ClassFunction L ℂ) := by
+    intro i
+    obtain ⟨φ, _, hφ⟩ := Finset.mem_image.mp (e.symm i).2
+    exact ⟨φ, hφ⟩
+  choose θ hθ using hrep
+  refine ⟨n, θ, ?_, ?_⟩
+  · intro i j hij
+    have hval : (e.symm i : ClassFunction L ℂ) = (e.symm j : ClassFunction L ℂ) := by
+      rw [← hθ i, ← hθ j]; exact hij
+    exact e.symm.injective (Subtype.ext hval)
+  · intro φ
+    have hmem : ClassFunction.induce K (φ : ClassFunction ↥K ℂ) ∈ V :=
+      Finset.mem_image_of_mem _ (Finset.mem_univ φ)
+    refine ⟨e ⟨_, hmem⟩, ?_⟩
+    show ClassFunction.induce K (θ (e ⟨_, hmem⟩) : ClassFunction ↥K ℂ) = _
+    rw [hθ (e ⟨_, hmem⟩)]
+    exact congrArg Subtype.val (Equiv.symm_apply_apply e ⟨_, hmem⟩)
 
 end OddOrder.Peterfalvi.S09.Cert
