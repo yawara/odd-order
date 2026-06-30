@@ -2214,12 +2214,40 @@ theorem chiefFactor_centralizer_inf_derived {M : Subgroup G}
   rw [OddOrder.BG.Ch1.S03h.centralizer_subgroupOf, Set.image_singleton]
   simp only [Subgroup.subgroupOf, ← Subgroup.comap_inf, Subgroup.coe_subtype, hamb]
 
-/-- **Peterfalvi (8.4.d), `centralizer_W̄₂`**: in `L = ↥M ⧸ H₀`, for a nontrivial `x̄ ∈ W̄₁`,
-`C_L(x̄) ⊓ K̄ = W̄₂` where `K̄ = M'/H₀` and `W̄₂ = W₂ H₀/H₀`.  Lift `x̄ = x H₀`, apply the coprime
-centralizer-quotient `centralizer_map_mk'_eq_of_coprime_zpowers` (step 1, `gcd(|⟨x⟩|,|H₀|)=1`),
-pull the image out of `⊓ K̄` (`map_inf_map_of_ker_le`, `ker = H₀ ≤ M'`, step 2), and finish with
-`C_{↥M}(x) ⊓ M' = W₂` (`chiefFactor_centralizer_inf_derived`, step 3).  This is the (8.4.d)
-certain-type `centralizer_W₂` field of `S06.Hypothesis (M/H₀)`. -/
+/-- **Peterfalvi (8.4.d) `centralizer_W̄₂`, generic in the quotient kernel `N'`** (reused for both
+`N' = H₀` and `N' = H₀C`): for `N' ◁ ↥M` with `N' ≤ M' = derivedInG M` and `gcd(|W₁|, |N'|) = 1`,
+and a nontrivial `x̄ ∈ W̄₁ = W₁ N'/N'`, `C_{↥M/N'}(x̄) ⊓ (M'/N') = W₂ N'/N'`.  Three steps with the
+`N'`-dependence isolated to the coprimality and the containment `ker (mk' N') = N' ≤ M'`:
+`centralizer_map_mk'_eq_of_coprime_zpowers` (`gcd(|⟨x⟩|,|N'|)=1`), `map_inf_map_of_ker_le`, and the
+`N'`-independent `C_{↥M}(x) ⊓ M' = W₂` (`chiefFactor_centralizer_inf_derived`). -/
+theorem centralizer_W2bar_quotient [Finite G] {M : Subgroup G}
+    {data : TypesIIIIIIVSetup M} (N' : Subgroup ↥M) [N'.Normal]
+    (hN'le : N' ≤ (derivedInG M).subgroupOf M)
+    (hcopW1 : Nat.Coprime (Nat.card ↥data.W1) (Nat.card ↥N'))
+    (xbar : ↥M ⧸ N')
+    (hxbar : xbar ∈ (data.W1.subgroupOf M).map (QuotientGroup.mk' N'))
+    (hxbar1 : xbar ≠ 1) :
+    Subgroup.centralizer ({xbar} : Set (↥M ⧸ N'))
+        ⊓ ((derivedInG M).subgroupOf M).map (QuotientGroup.mk' N')
+      = (data.W2.subgroupOf M).map (QuotientGroup.mk' N') := by
+  obtain ⟨x, hx_mem, rfl⟩ := Subgroup.mem_map.mp hxbar
+  have hx1 : x ≠ 1 := fun h => hxbar1 (by rw [h]; exact map_one _)
+  have hxW1 : ((x : ↥M) : G) ∈ data.W1 := Subgroup.mem_subgroupOf.mp hx_mem
+  have hxG1 : ((x : ↥M) : G) ≠ 1 := fun h => hx1 (Subtype.ext h)
+  have hcardW1 : Nat.card ↥(data.W1.subgroupOf M) = Nat.card ↥data.W1 :=
+    Nat.card_congr (Subgroup.subgroupOfEquivOfLe data.typeP.W1_le).toEquiv
+  have hcop : Nat.Coprime (Nat.card ↥(Subgroup.zpowers x)) (Nat.card ↥N') := by
+    refine hcopW1.coprime_dvd_left ?_
+    rw [← hcardW1]
+    exact Subgroup.card_dvd_of_le (Subgroup.zpowers_le.mpr hx_mem)
+  rw [centralizer_map_mk'_eq_of_coprime_zpowers x hcop,
+    map_inf_map_of_ker_le (B := (derivedInG M).subgroupOf M) (by
+      rw [QuotientGroup.ker_mk']; exact hN'le),
+    chiefFactor_centralizer_inf_derived x hxW1 hxG1]
+
+/-- **Peterfalvi (8.4.d), `centralizer_W̄₂`** (the `N' = H₀` instance of `centralizer_W2bar_quotient`):
+in `L = ↥M ⧸ H₀`, for a nontrivial `x̄ ∈ W̄₁`, `C_L(x̄) ⊓ K̄ = W̄₂` where `K̄ = M'/H₀` and
+`W̄₂ = W₂ H₀/H₀`.  This is the (8.4.d) certain-type `centralizer_W₂` field of `S06.Hypothesis (M/H₀)`. -/
 theorem chiefFactor_centralizer_W2bar [Finite G] {M : Subgroup G}
     {data : TypesIIIIIIVSetup M} (chief : ChiefFactorData data)
     [(chief.H0.subgroupOf M).Normal]
@@ -2229,25 +2257,11 @@ theorem chiefFactor_centralizer_W2bar [Finite G] {M : Subgroup G}
     Subgroup.centralizer ({xbar} : Set (↥M ⧸ (chief.H0.subgroupOf M)))
         ⊓ ((derivedInG M).subgroupOf M).map (QuotientGroup.mk' (chief.H0.subgroupOf M))
       = (data.W2.subgroupOf M).map (QuotientGroup.mk' (chief.H0.subgroupOf M)) := by
-  obtain ⟨x, hx_mem, rfl⟩ := Subgroup.mem_map.mp hxbar
-  have hx1 : x ≠ 1 := fun h => hxbar1 (by rw [h]; exact map_one _)
-  have hxW1 : ((x : ↥M) : G) ∈ data.W1 := Subgroup.mem_subgroupOf.mp hx_mem
-  have hxG1 : ((x : ↥M) : G) ≠ 1 := fun h => hx1 (Subtype.ext h)
-  have hcardW1 : Nat.card ↥(data.W1.subgroupOf M) = Nat.card ↥data.W1 :=
-    Nat.card_congr (Subgroup.subgroupOfEquivOfLe data.typeP.W1_le).toEquiv
   have hcardH0 : Nat.card ↥(chief.H0.subgroupOf M) = Nat.card ↥chief.H0 :=
     Nat.card_congr (Subgroup.subgroupOfEquivOfLe (chief.H0_lt_H.le.trans (H_le_M data))).toEquiv
-  have hcop : Nat.Coprime (Nat.card ↥(Subgroup.zpowers x))
-      (Nat.card ↥(chief.H0.subgroupOf M)) := by
-    rw [hcardH0]
-    refine (chiefFactor_coprime_H0_W1 chief).symm.coprime_dvd_left ?_
-    rw [← hcardW1]
-    exact Subgroup.card_dvd_of_le (Subgroup.zpowers_le.mpr hx_mem)
-  rw [centralizer_map_mk'_eq_of_coprime_zpowers x hcop,
-    map_inf_map_of_ker_le (B := (derivedInG M).subgroupOf M) (by
-      rw [QuotientGroup.ker_mk']
-      exact Subgroup.comap_mono (chief.H0_lt_H.le.trans data.typeP.H_le)),
-    chiefFactor_centralizer_inf_derived x hxW1 hxG1]
+  refine centralizer_W2bar_quotient (chief.H0.subgroupOf M) ?_ ?_ xbar hxbar hxbar1
+  · exact Subgroup.comap_mono (chief.H0_lt_H.le.trans data.typeP.H_le)
+  · rw [hcardH0]; exact (chiefFactor_coprime_H0_W1 chief).symm
 
 /-! ### (9.7) The chief factor `H̄ = H/H₀` as an `𝔽ₚ[U W₁]`-module
 
