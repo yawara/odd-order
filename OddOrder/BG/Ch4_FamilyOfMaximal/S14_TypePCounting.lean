@@ -9863,6 +9863,39 @@ theorem isTypeP1_conj_smul [Finite G] (g : G) (M : Subgroup G) :
   unfold IsTypeP1
   rw [kappa_conj_smul, sigmaComplementPrimes_conj_smul, isTypeP_conj_smul]
 
+/-- **κ-Hall data transfers under conjugation of the ambient maximal**: if `conj g • N = M` and
+`KN.subgroupOf N` is a Hall `κ(N)`-subgroup, then `(conj g • KN).subgroupOf M` is a Hall
+`κ(M)`-subgroup.  Conjugation by `g` restricts to a `↥N ≃ ↥M` preserving both `Nat.card` and the
+index, and `κ` is conjugation-invariant.  This is the fix-`W` data step: it lets a conjugate
+type-`P` maximal's `Ẑ` be related to a fixed reference `Ẑ`. -/
+theorem isHall_kappa_subgroupOf_conj [Finite G] (g : G) {M N KN : Subgroup G}
+    (hg : MulAut.conj g • N = M) (hKNN : KN ≤ N)
+    (hKN : Ch03.IsHallSubgroup (kappa N) (KN.subgroupOf N)) :
+    Ch03.IsHallSubgroup (kappa M) ((MulAut.conj g • KN).subgroupOf M) := by
+  have hkap : kappa M = kappa N := by rw [← hg, kappa_conj_smul]
+  have hle : MulAut.conj g • KN ≤ M := by
+    rw [← hg]; exact Subgroup.pointwise_smul_le_pointwise_smul_iff.mpr hKNN
+  -- `Nat.card` is conjugation-invariant; the two `subgroupOf`s have equal card (both `= Nat.card KN`).
+  have hcardKN : Nat.card ↥(MulAut.conj g • KN) = Nat.card ↥KN := by
+    rw [Subgroup.pointwise_smul_def]
+    exact (Nat.card_congr (Subgroup.equivMapOfInjective _ _ (MulAut.conj g).injective).toEquiv).symm
+  have hcardamb : Nat.card ↥(MulAut.conj g • N) = Nat.card ↥N := by
+    rw [Subgroup.pointwise_smul_def]
+    exact (Nat.card_congr (Subgroup.equivMapOfInjective _ _ (MulAut.conj g).injective).toEquiv).symm
+  have hcard : Nat.card ↥((MulAut.conj g • KN).subgroupOf M) = Nat.card ↥(KN.subgroupOf N) := by
+    rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hle).toEquiv,
+      Nat.card_congr (Subgroup.subgroupOfEquivOfLe hKNN).toEquiv, hcardKN]
+  -- the indices agree, via `index · card = card ambient` and the card equalities above.
+  have hidx : ((MulAut.conj g • KN).subgroupOf M).index = (KN.subgroupOf N).index := by
+    have hMrel := ((MulAut.conj g • KN).subgroupOf M).index_mul_card
+    have hNrel := (KN.subgroupOf N).index_mul_card
+    have hMN : Nat.card ↥M = Nat.card ↥N := by rw [← hg]; exact hcardamb
+    rw [hcard, hMN] at hMrel
+    rw [← hNrel] at hMrel
+    exact Nat.eq_of_mul_eq_mul_right Nat.card_pos hMrel
+  unfold Ch03.IsHallSubgroup at hKN ⊢
+  rw [hkap, hcard, hidx]; exact hKN
+
 /-- **Type-`P` data constructor**: every maximal subgroup `M` carries the Theorem 14.7 data — a
 Hall `κ(M)`-subgroup `K ≤ M`, the swap `K* = M_σ ∩ C_G(K)`, and a Hall `(κ ∪ σ)ᶜ`-subgroup `U` —
 obtained from Hall's theorem in the solvable `↥M`.  This is the missing constructor that lets the
