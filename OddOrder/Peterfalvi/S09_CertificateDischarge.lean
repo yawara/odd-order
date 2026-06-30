@@ -595,6 +595,55 @@ theorem induce_family_comp_perm_covering {K : Subgroup L} [Fintype ↥K]
   obtain ⟨i, hi⟩ := hcover φ
   exact ⟨σ.symm i, by simpa using hi⟩
 
+/-- **Placement of the distinguished and trivial members of the induced family** (the family shape
+`hypothesis78OfDade` consumes).  Given the distinguished induced character `χ_dist` (in the range of
+`Ind`, distinct from `Ind 1_K`), reindex the `distinctInducedFamily` so that `Ind (θ 0) = χ_dist`
+(the `zetaDistinct = 0` slot) and `θ ind1H = 1_K` at some `ind1H ≠ 0` (the `Ind 1_H` slot).
+
+The trivial character is its own induced fibre — `Ind φ = Ind 1_K ⟹ φ = 1_K` by
+`induce_injective_of_inertia_stable` (the trivial char is conjugation-stable), so its
+`distinctInducedFamily` representative *is* `1_K`.  The swap `0 ↔ j_dist` moves the distinguished
+representative to index `0`; `j_dist ≠ j_triv` because `χ_dist ≠ Ind 1_K`. -/
+theorem exists_placed_induced_family (K : Subgroup L) [K.Normal] [Fintype ↥K]
+    [Invertible (Nat.card L : ℂ)] [Invertible (Nat.card ↥K : ℂ)]
+    (χdist : ClassFunction L ℂ)
+    (hχ_range : χdist ∈ Set.range (fun φ : IrreducibleCharacter ↥K =>
+      ClassFunction.induce K (φ : ClassFunction ↥K ℂ)))
+    (hχ_ne : χdist ≠ ClassFunction.induce K
+      (trivialIrreducibleCharacter ↥K : ClassFunction ↥K ℂ)) :
+    ∃ (n : ℕ) (θ : Fin (n + 1) → IrreducibleCharacter ↥K) (ind1H : Fin (n + 1)),
+      ind1H ≠ 0 ∧
+      ClassFunction.induce K (θ 0 : ClassFunction ↥K ℂ) = χdist ∧
+      θ ind1H = trivialIrreducibleCharacter ↥K ∧
+      Function.Injective (fun i => ClassFunction.induce K (θ i : ClassFunction ↥K ℂ)) ∧
+      ∀ φ : IrreducibleCharacter ↥K, ClassFunction.induce K (φ : ClassFunction ↥K ℂ) ∈
+        Set.range (fun i => ClassFunction.induce K (θ i : ClassFunction ↥K ℂ)) := by
+  classical
+  obtain ⟨φ0, hφ0⟩ := hχ_range
+  obtain ⟨jd, hjd⟩ := (distinctInducedFamily K).cover φ0
+  obtain ⟨jt, hjt⟩ := (distinctInducedFamily K).cover (trivialIrreducibleCharacter ↥K)
+  have htriv : (distinctInducedFamily K).θ jt = trivialIrreducibleCharacter ↥K :=
+    induce_injective_of_inertia_stable
+      (fun g => by
+        rw [← IrreducibleCharacter.conjByPerm_apply]
+        exact OddOrder.RepresentationTheory.conjByPerm_trivialIrreducibleCharacter g)
+      hjt.symm
+  have hjne : jd ≠ jt := by
+    rintro rfl
+    exact hχ_ne (hφ0.symm.trans (hjd.symm.trans hjt))
+  refine ⟨(distinctInducedFamily K).n,
+    fun i => (distinctInducedFamily K).θ (Equiv.swap 0 jd i), Equiv.swap 0 jd jt,
+    ?_, ?_, ?_, ?_, ?_⟩
+  · intro h
+    have h2 : jt = jd := by
+      have hc := congrArg (Equiv.swap 0 jd) h
+      rwa [Equiv.swap_apply_self, Equiv.swap_apply_left] at hc
+    exact hjne h2.symm
+  · simp only [Equiv.swap_apply_left]; exact hjd.trans hφ0
+  · simp only [Equiv.swap_apply_self]; exact htriv
+  · exact induce_family_comp_perm_injective (distinctInducedFamily K).inj (Equiv.swap 0 jd)
+  · exact induce_family_comp_perm_covering (distinctInducedFamily K).cover (Equiv.swap 0 jd)
+
 /-- **Discharge of the (7.7.a) certificate for an induced family** (Peterfalvi (7.7.a)).  This is
 the consolidation of `chiRho_decomp_proof` for the concrete family `ζ_i = Ind_K^L θ_i`: the
 orthogonality (`horth`) and spanning (`hspan`) hypotheses of the basis argument are *derived* from
