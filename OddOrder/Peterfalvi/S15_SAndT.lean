@@ -289,6 +289,65 @@ theorem exists_conj_typeP_U_of_coprime [Finite G]
   refine Subgroup.eq_of_le_of_card_ge hle (le_of_eq ?_)
   rw [hconj_card, hcardU]
 
+/-- **Peterfalvi (14.11)**, base-derived: `|W₁| + |W₂| = p + q`.  Immediate from the (13.1) prime
+data `q = |W₁|`, `p = |W₂|`.  Supplies the `card_W1_add_W2_eq` field of `MHypothesis` (currently
+isolated to the §16 carrier), de-gating it to an elementary consequence of the base `Hypothesis`. -/
+theorem card_W1_add_W2 (hyp : Hypothesis (G := G)) :
+    Nat.card ↥hyp.W1 + Nat.card ↥hyp.W2 = hyp.p + hyp.q := by
+  rw [← hyp.q_eq_card_W1, ← hyp.p_eq_card_W2]; omega
+
+/-- **Peterfalvi (14.11)**, base-derived: `|W| = p q`.  `W = W₁ ⊔ W₂` (`W_eq_join`) is the internal
+direct product of the elementwise-commuting (`W1_commutes_W2`), trivially-intersecting
+(`W1_inf_W2_eq_bot`) cyclic factors `W₁` (order `q`) and `W₂` (order `p`), so
+`|W| = |W₁| · |W₂| = q p = p q` via the disjoint-normalizer product formula.  Supplies the `card_W_eq`
+field of `MHypothesis`, de-gating it from a §13-14 σ-prerequisite to a base consequence. -/
+theorem card_W_eq_pq [Finite G] (hyp : Hypothesis (G := G)) :
+    Nat.card ↥hyp.W = hyp.p * hyp.q := by
+  -- `W₁` normalizes `W₂`: each `x ∈ W₁` centralizes `W₂`, hence fixes it under conjugation.
+  have hconj : ∀ x ∈ hyp.W1, ∀ a ∈ hyp.W2, x * a * x⁻¹ ∈ hyp.W2 := by
+    intro x hx a ha
+    have hc : Commute x a := hyp.W1_commutes_W2 x hx a ha
+    have hxa : x * a * x⁻¹ = a := by rw [hc.eq]; group
+    rw [hxa]; exact ha
+  have hW1norm : hyp.W1 ≤ Subgroup.normalizer (hyp.W2 : Set G) := by
+    intro x hx
+    rw [Subgroup.mem_normalizer_iff]
+    intro a
+    refine ⟨fun ha => hconj x hx a ha, fun ha => ?_⟩
+    have hb := hconj x⁻¹ (hyp.W1.inv_mem hx) (x * a * x⁻¹) ha
+    simpa [mul_assoc] using hb
+  rw [hyp.W_eq_join,
+    OddOrder.BG.Ch3.S12.card_sup_eq_mul_of_le_normalizer_of_disjoint hW1norm hyp.W1_inf_W2_eq_bot,
+    ← hyp.q_eq_card_W1, ← hyp.p_eq_card_W2]
+  exact mul_comm hyp.q hyp.p
+
+/-- **Peterfalvi (14.11.3)**, base-derived: the exceptional set `W − (W₁ ∪ W₂)` is nonempty.
+`|W| = p q` (`card_W_eq_pq`) strictly exceeds `|W₁ ∪ W₂| ≤ |W₁| + |W₂| = q + p` since `(p−1)(q−1) > 0`
+for the odd primes `p, q ≥ 3`, so `W` cannot be covered by `W₁ ∪ W₂`.  Supplies the `W_set_nonempty`
+field of `MHypothesis`. -/
+theorem W_sdiff_nonempty [Finite G] (hyp : Hypothesis (G := G)) :
+    ((hyp.W : Set G) \ ((hyp.W1 : Set G) ∪ (hyp.W2 : Set G))).Nonempty := by
+  rw [Set.diff_nonempty]
+  intro hsub
+  have hWc : (hyp.W : Set G).ncard = hyp.p * hyp.q := by
+    rw [← Nat.card_coe_set_eq]; simp only [SetLike.coe_sort_coe]; exact card_W_eq_pq hyp
+  have hW1c : (hyp.W1 : Set G).ncard = hyp.q := by
+    rw [← Nat.card_coe_set_eq]; simp only [SetLike.coe_sort_coe]; exact hyp.q_eq_card_W1.symm
+  have hW2c : (hyp.W2 : Set G).ncard = hyp.p := by
+    rw [← Nat.card_coe_set_eq]; simp only [SetLike.coe_sort_coe]; exact hyp.p_eq_card_W2.symm
+  have hle : (hyp.W : Set G).ncard ≤ ((hyp.W1 : Set G) ∪ (hyp.W2 : Set G)).ncard :=
+    Set.ncard_le_ncard hsub (Set.toFinite _)
+  have hunion : ((hyp.W1 : Set G) ∪ (hyp.W2 : Set G)).ncard ≤
+      (hyp.W1 : Set G).ncard + (hyp.W2 : Set G).ncard := Set.ncard_union_le _ _
+  rw [hWc] at hle
+  rw [hW1c, hW2c] at hunion
+  have hp3 : 3 ≤ hyp.p := hyp.three_le_p
+  have hq3 : 3 ≤ hyp.q := hyp.three_le_q
+  have hkey : hyp.p * hyp.q ≤ hyp.q + hyp.p := le_trans hle hunion
+  have h3q : 3 * hyp.q ≤ hyp.p * hyp.q := mul_le_mul_right' hp3 hyp.q
+  have h3p : hyp.p * 3 ≤ hyp.p * hyp.q := mul_le_mul_left' hq3 hyp.p
+  omega
+
 /-- **Coprimality of the configuration complement from disjointness** (the Hall mechanism of
 Phase 0): for `S` of type II, if the complement `U` meets the Fitting kernel `P = S_F` trivially
 (`P ⊓ U = ⊥`), then `|U|` is coprime to `|P|`.

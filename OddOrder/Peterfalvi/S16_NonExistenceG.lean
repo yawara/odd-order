@@ -1677,18 +1677,14 @@ structure MHypothesis (hyp : Hypothesis (G := G)) where
   W_normalizer_V : ∀ X : Set G, X.Nonempty →
     X ⊆ (hyp.base.W : Set G) \ ((hyp.base.W1 : Set G) ∪ (hyp.base.W2 : Set G)) →
     Subgroup.normalizer X = hyp.base.W
-  /-- The exceptional set `W − (W₁∪W₂)` is nonempty (`(p−1)(q−1) ≥ 1`). -/
-  W_set_nonempty :
-    ((hyp.base.W : Set G) \ ((hyp.base.W1 : Set G) ∪ (hyp.base.W2 : Set G))).Nonempty
+  -- **Peterfalvi (14.11)/(14.11.3)**: `|W| = p q`, `|W₁| + |W₂| = p + q`, and the nonemptiness of
+  -- `W − (W₁∪W₂)` are **base-derived** (`S15.card_W_eq_pq`, `S15.card_W1_add_W2`,
+  -- `S15.W_sdiff_nonempty`), so they are no longer carried as fields — the `W = W₁ × W₂` cyclic
+  -- structure is an elementary consequence of the base `Hypothesis`, not a §13-14 σ-obligation.
   /-- **Peterfalvi §8**: `P` is a TI-subgroup (distinct conjugates meet trivially). -/
   P_isTI : Subgroup.IsTI hyp.base.P
   /-- **Peterfalvi §8**: `Q` is a TI-subgroup. -/
   Q_isTI : Subgroup.IsTI hyp.base.Q
-  /-- **Peterfalvi (14.11)**: `|W| = p q` (the cyclic group `W = W₁ × W₂`). -/
-  card_W_eq : Nat.card ↥hyp.base.W = hyp.base.p * hyp.base.q
-  /-- **Peterfalvi (14.11)**: `|W₁| + |W₂| = p + q` (so `{|W₁|, |W₂|} = {p, q}`). -/
-  card_W1_add_W2_eq :
-    Nat.card ↥hyp.base.W1 + Nat.card ↥hyp.base.W2 = hyp.base.p + hyp.base.q
   /-- **Peterfalvi (14.11.4)**: `|N_G(P)| = |P| u q` (the Type-II partner `S = (H ⋊ U) ⋊ W₂`). -/
   card_normalizer_P_eq : Nat.card ↥(Subgroup.normalizer (hyp.base.P : Set G))
     = Nat.card ↥hyp.base.P * hyp.base.u * hyp.base.q
@@ -2946,7 +2942,7 @@ theorem MHypothesis.line83_le_displayed_upper [Finite G]
     omega
   -- orbit measures (equalities).
   have hWm := orbit_sdiff_sup_normSq_term hyp.base.W_cyclic hyp.base.W_eq_join
-    Mdata.W_normalizer_V Mdata.W_set_nonempty
+    Mdata.W_normalizer_V (S15.W_sdiff_nonempty hyp.base)
   have hPm := orbit_sharpSubgroup_normSq_term Mdata.P_isTI
   have hQm := orbit_sharpSubgroup_normSq_term Mdata.Q_isTI
   -- cardinalities of the supports.
@@ -2958,7 +2954,9 @@ theorem MHypothesis.line83_le_displayed_upper [Finite G]
       = (hyp.base.p : ℝ) * hyp.base.q + 1 - hyp.base.p - hyp.base.q := by
     have : ((hyp.base.W : Set G) \ ((hyp.base.W1 : Set G) ∪ (hyp.base.W2 : Set G))).ncard
         + (hyp.base.p + hyp.base.q) = hyp.base.p * hyp.base.q + 1 := by
-      rw [← Mdata.card_W1_add_W2_eq, ← Mdata.card_W_eq]; omega
+      rw [← S15.card_W1_add_W2 hyp.base,
+        ← S15.card_W_eq_pq hyp.base]
+      omega
     have hR : (((hyp.base.W : Set G) \ ((hyp.base.W1 : Set G) ∪ (hyp.base.W2 : Set G))).ncard : ℝ)
         + ((hyp.base.p : ℝ) + hyp.base.q) = (hyp.base.p : ℝ) * hyp.base.q + 1 := by
       exact_mod_cast this
@@ -2971,7 +2969,7 @@ theorem MHypothesis.line83_le_displayed_upper [Finite G]
         + 1 / ((hyp.base.p * hyp.base.q : ℕ) : ℝ) := by
     rw [hWm, hWsetR]
     have hWcardR : (Nat.card ↥hyp.base.W : ℝ) = (hyp.base.p : ℝ) * hyp.base.q := by
-      rw [Mdata.card_W_eq]; push_cast; ring
+      rw [S15.card_W_eq_pq hyp.base]; push_cast; ring
     rw [hWcardR]; push_cast; field_simp; ring
   have hPterm : (OddOrder.GroupTheory.conjClassSet
         (OddOrder.GroupTheory.sharpSubgroup hyp.base.P)).ncard / (Nat.card G : ℝ)
