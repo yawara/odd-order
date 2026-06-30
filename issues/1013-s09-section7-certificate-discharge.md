@@ -187,3 +187,27 @@ degree 関係, **ν + coherence agreement** `(ζ_i−d_iζ_zd)^τ=νζ_i−d_i�
 (4) c'_{i₁}=(β,χ) (d'_{i₁}=1 ∵ degree)、(5) building blocks で ζ'_{i₁}(x)=‖ζ'_{i₁}‖²=K.index、
 (6) sum_collapse_to_single → star(β,χ)。次に `hypothesis78OfDade` constructor で配線
 (hyp76 を hypothesis76OfDade で構築 ⟹ zeta=Ind∘θ、ind1H/zetaDistinct 設定、ν+agreement 入力)。
+
+### 2026-07-01 (loop 継続⁴): ⭐⭐⭐ (7.8.c.i) formula discharge 完成 — chiRho_eq_inner_beta_induced
+
+**(7.8.c.i) certificate formula を sorry-free + axiom-clean で証明** (commit 32ede97d、
+[propext, Classical.choice, Quot.sound] のみ)。permutation を回避する設計:
+**区別された ζ を index 0 に固定** (Ind 1_K は ind1H≠0)。証明 =
+chiRho_decomp_induced ((7.7.a)) → sum_collapse_to_single で ind1H 項に collapse
+(非 ind1H 係数 = hagree (coherence τ=ν on S 差分) + hortho (χ⊥S^ν) +
+inner_sub_smul_left_eq_zero で消滅; ζ_{ind1H}=Ind 1_K ゆえ building blocks で hcrux)。
+結論 χ^ρ(x) = star((ζ_{ind1H}−d_{ind1H}ζ_0)^τ, χ)。
+
+**§7 hard floor の core math 完成**: (7.7.a) chiRho_decomp_induced + (7.8.c.i)
+chiRho_eq_inner_beta_induced + hypothesis76OfDade、全 axiom-clean。
+
+**残 = `hypothesis78OfDade` constructor (最終 integration)**:
+- 入力 = H71+hτ+H◁L+A=H\{1} (hyp76OfDade 経由) + coherence data (S coherent の ν +
+  agreement + 区別された ζ∈S∩Irr L of degree e)。
+- **family arrangement**: chiRho_eq_inner_beta_induced は index 0=区別 ζ を要求。
+  distinctInducedFamily は任意順 → swap(0, j_ζ) で ζ-rep を index 0 に配置 (j_ζ=ζ の index)。
+  ind1H = swap(0,j_ζ) j_triv (j_triv = Ind 1_K の index、∃ ∵ trivial の orbit={trivial})。
+- 全 Hypothesis78 field 構築 + chiRho_eq_inner_beta_induced で certificate discharge。
+- これで Hypothesis78 構成可能 → (12.16) hB + lane γ (14.11) h78 unblock。
+- **代替検討**: (7.8.b) `zetaNuRho_norm_sq_ge` も formula discharge 可能か (full Hyp78 構成回避)。
+  hB が要するのは (7.8.b) ゆえ、(7.8.b) を直接 formula 化できれば constructor 不要かも。次回精査。
