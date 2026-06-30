@@ -1778,6 +1778,26 @@ theorem cInHu_le_uInHu (data : TypesIIIIIIVSetup M) (chief : ChiefFactorData dat
     cInHu data chief ≤ uInHu data :=
   Subgroup.subgroupOf_mono _ (Subgroup.subgroupOf_mono _ (cSub_le_U data chief))
 
+/-- **`H ⊓ C = ⊥` inside `HU`** (realized `hInHu ⊓ cInHu = ⊥`): `C ≤ U` and `H ⊓ U = ⊥`
+(`typeP_H_inf_U`), so `H ⊓ C ≤ H ⊓ U = ⊥`.  A foundational input for the second-isomorphism
+`HC/H₀C ≅ H̄` behind the (9.8.c) irreducible-character construction. -/
+theorem hInHu_inf_cInHu_eq_bot {M : Subgroup G} (data : TypesIIIIIIVSetup M)
+    (chief : ChiefFactorData data) : hInHu data ⊓ cInHu data chief = ⊥ := by
+  rw [eq_bot_iff]
+  intro x hx
+  obtain ⟨hxH, hxC⟩ := Subgroup.mem_inf.mp hx
+  have hxU := cInHu_le_uInHu data chief hxC
+  rw [Subgroup.mem_bot]
+  have hxH' : x ∈ (data.H.subgroupOf M).subgroupOf (huSub data) := hxH
+  have hxU' : x ∈ (data.U.subgroupOf M).subgroupOf (huSub data) := hxU
+  have keyH : ((x : ↥M) : G) ∈ data.H :=
+    Subgroup.mem_subgroupOf.mp (Subgroup.mem_subgroupOf.mp hxH')
+  have keyU : ((x : ↥M) : G) ∈ data.U :=
+    Subgroup.mem_subgroupOf.mp (Subgroup.mem_subgroupOf.mp hxU')
+  have key : ((x : ↥M) : G) ∈ data.typeP.H ⊓ data.typeP.U := ⟨keyH, keyU⟩
+  rw [typeP_H_inf_U data.typeP, Subgroup.mem_bot] at key
+  exact Subtype.ext (Subtype.ext key)
+
 open Subgroup in
 /-- **`C ◁ U` inside `HU`** (realized form): `cInHu ◁ uInHu`, transported from `cSub ◁ U`
 (`cSub_subgroupOf_U_normal`) along the realization iso `↥uInHu ≃* ↥U`.  Comap of a normal subgroup
@@ -2564,6 +2584,53 @@ theorem chiefFactor_H0supC_inf_H_eq_H0 {M : Subgroup G}
       Subgroup.mem_inf.mpr ⟨hcH, cSub_le_U data chief hc⟩
     rwa [typeP_H_inf_U data.typeP, Subgroup.mem_bot] at hmem
   simpa [hc1] using hh₀
+
+/-- **`H ⊓ H₀C = H₀` inside `HU`** (realized form): `hInHu ⊓ (H₀C).subgroupOf = (H₀).subgroupOf`.
+Realization of `chiefFactor_H0supC_inf_H_eq_H0` (`(H₀⊔C) ⊓ H = H₀`).  The `H ∩ H₀C = H₀` input of the
+second isomorphism `HC/H₀C ≅ H̄` (`HC = H·H₀C`, so `HC/H₀C ≅ H/(H∩H₀C) = H/H₀ = H̄`) behind the
+(9.8.c) irreducible-character construction. -/
+theorem hInHu_inf_realizedH0supC_eq_realizedH0 {M : Subgroup G}
+    {data : TypesIIIIIIVSetup M} (chief : ChiefFactorData data) :
+    hInHu data ⊓ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf (huSub data)
+      = (chief.H0.subgroupOf M).subgroupOf (huSub data) := by
+  apply le_antisymm
+  · intro x hx
+    obtain ⟨hxH, hxHC⟩ := Subgroup.mem_inf.mp hx
+    have hxH' : x ∈ (data.H.subgroupOf M).subgroupOf (huSub data) := hxH
+    have memH : ((x : ↥M) : G) ∈ data.H :=
+      Subgroup.mem_subgroupOf.mp (Subgroup.mem_subgroupOf.mp hxH')
+    have memHC : ((x : ↥M) : G) ∈ chief.H0 ⊔ cSub data chief :=
+      Subgroup.mem_subgroupOf.mp (Subgroup.mem_subgroupOf.mp hxHC)
+    have memH0 : ((x : ↥M) : G) ∈ chief.H0 := by
+      have hmem : ((x : ↥M) : G) ∈ (chief.H0 ⊔ cSub data chief) ⊓ data.H := ⟨memHC, memH⟩
+      rwa [chiefFactor_H0supC_inf_H_eq_H0] at hmem
+    exact Subgroup.mem_subgroupOf.mpr (Subgroup.mem_subgroupOf.mpr memH0)
+  · intro x hx
+    have memH0 : ((x : ↥M) : G) ∈ chief.H0 :=
+      Subgroup.mem_subgroupOf.mp (Subgroup.mem_subgroupOf.mp hx)
+    refine Subgroup.mem_inf.mpr ⟨?_, ?_⟩
+    · exact Subgroup.mem_subgroupOf.mpr (Subgroup.mem_subgroupOf.mpr (chief.H0_lt_H.le memH0))
+    · exact Subgroup.mem_subgroupOf.mpr (Subgroup.mem_subgroupOf.mpr
+        ((le_sup_left : chief.H0 ≤ chief.H0 ⊔ cSub data chief) memH0))
+
+/-- **realized `H₀C = H₀ ⊔ C` distributes** (realized form): the realized `H₀C` inside `HU` equals
+`(realized H₀) ⊔ cInHu`.  Via `Subgroup.subgroupOf_sup` (twice, with `H₀,C ≤ M` and
+`H₀.subgroupOf M, C.subgroupOf M ≤ huSub`).  Lets the second isomorphism use `N = realized H₀C`
+with `hInHu ⊔ N = HC` (`realized H₀ ≤ hInHu`) and `hInHu ⊓ N = realized H₀` (modular law +
+`hInHu_inf_cInHu_eq_bot`), avoiding `⊔`-realization friction in the (9.8.c) construction. -/
+theorem realizedH0supC_eq_realizedH0_sup_cInHu {M : Subgroup G}
+    {data : TypesIIIIIIVSetup M} (chief : ChiefFactorData data) :
+    ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf (huSub data)
+      = (chief.H0.subgroupOf M).subgroupOf (huSub data) ⊔ cInHu data chief := by
+  have hH0M : chief.H0 ≤ M := chief.H0_lt_H.le.trans (H_le_M data)
+  have hCM : cSub data chief ≤ M := (cSub_le_U data chief).trans (U_le_M data)
+  rw [Subgroup.subgroupOf_sup hH0M hCM]
+  have hH0sub : (chief.H0.subgroupOf M) ≤ huSub data :=
+    Subgroup.subgroupOf_mono M (le_trans chief.H0_lt_H.le le_sup_left)
+  have hCsub : (cSub data chief).subgroupOf M ≤ huSub data :=
+    Subgroup.subgroupOf_mono M (le_trans (cSub_le_U data chief) le_sup_right)
+  rw [Subgroup.subgroupOf_sup hH0sub hCsub]
+  rfl
 
 /-- **`H₀C ≤ M' = HU`**: `H₀ ≤ H ≤ M'` (`typeP.H_le`) and `C ≤ U ≤ M'` (`typeP.U_le`).  The second
 input (`K ≤ HU`) of the generic reducible-count hypothesis (Coq `PFsection9` `nb_redM`) for the
