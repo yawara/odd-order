@@ -113,3 +113,27 @@ sorry-free 構築 (commit 2d37fd94 まで):
   orthogonality = `inner_induce_eq_zero_of_not_conj` (既存) / spanning = eq_induce_restrict + degree-0
   reduction / supported = psi_support。これで Hypothesis76 を concrete 族から構成し chiRho_decomp を discharge。
 - **chiRho_eq_inner_beta (7.8.c.i)**: (7.7.a) を ζ_0=ζ, ζ_1=Ind 1_H で適用 (c_1=(β,χ), c_i=0)。
+
+### 2026-06-30 (loop 継続): ⭐⭐ (7.7.a) discharge 完成 — chiRho_decomp_induced
+
+**(7.7.a) の hard math 完全 sorry-free 完成。** 族構成 + determination + consolidation
+全達成 (commits 57dca9c1→6859c397, S09 直接編集なし):
+
+- **spanning** (`induce_mem_span_induce_irr`/`supported_mem_span_induce_irr`): CF(L,A) ⊆
+  span{Ind θ:θ∈Irr K} (span_irreducibleCharacter_eq_top + induce 線形性)。
+- **suppliers**: `induce_family_orthogonal_of_injective` (injective⟹horth via
+  induce_eq_induce_iff_conj 対偶)、`supported_mem_span_psi` (covering+degree⟹hspan)、
+  `induce_apply_one_ne_zero` (degree well-def)。
+- **族列挙** `exists_distinct_induced_family`: distinct 誘導族を Finset.equivFin で列挙、
+  injective + covering を供給。
+- **capstone** `chiRho_decomp_induced`: chiRho_decomp_proof を具体族に特化、horth/hspan を
+  injective/covering から導出。残入力は A⊆K^# の幾何 (hAK_off/hA_one/hAconj) のみ。
+  S09 構造にも subgroupOf にも非依存 ⟹ S09 並行編集に robust。
+
+**残 (mechanical wiring + 別 certificate)**:
+- **Hypothesis76 constructor** (subgroupOf 配線): K=H.subgroupOf L で chiRho_decomp_induced を
+  cite し Hypothesis76 を (7.1)+H◁L+A=H\{1}+IsDadeIsometry から構成 (certificate 不要)。
+  bridges: subgroupOf normality / mem_subgroupOf 経由の hAK_off/hA_one/hAconj /
+  induce_eq_zero_of_not_mem_normal (zeta vanish) / induce_diff_support (psi_support)。
+- **(7.8.c.i)** `chiRho_eq_inner_beta`: (7.7.a) を ind1H/zetaDistinct で適用 + τ↔ν coherence
+  collapse (χ⊥S^ν)。τ=ν on ℤ[S] 関係が要追加 (Hypothesis78 の nu field + coherence)。より深い。
