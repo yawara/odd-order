@@ -426,8 +426,21 @@ S11:4549 sorry。全 transport 補題が repo 実在ゆえ機械的に組める:
 - ⟹ `reducible_count_sOf_H0` / `reducible_count_sOf_H0C` 両方 実証明、`reducible_mem_sOf_H0C` honest、
   caseB conjunct 3 (degree+membership) 完全 honest。
 
-**残 §9 (還元 count とは別経路)**: caseA_character_counts (9.8.c/d), caseB_character_counts
-conjunct 4 (9.9.c exceptional), `exceptional_case_frobenius_realization` (9.10), `sibleyTarget_H0C`。
+**残 §9 (還元 count とは別経路、各 substantial な新 machinery 要)**:
+- **caseA conjunct b (degree+membership)**: membership ✅ citeable (`reducible_mem_sOf_H0C hG chars`、
+  commit f92cf378 で case-agnostic 化済)。degree = **要 `caseA_degree_qu` (9.8.a-analog)** =
+  caseA chief-factor-constituent machinery (`caseB_exists_chiefFactorConstituent` (S11:4880) の
+  caseA 版)。χ∈𝒳 の χ(1)=u は定義から自明でない (xiSet=`{χ|H⊄ker χ}` のみ、degree 条件なし) — 真の定理。
+  **次 iteration の最有力** (caseB 機構の直接 analog、doc 順最上流)。
+- **caseA conjunct c (9.8.c)**: ∃ irreducible degree qu in 𝒮(H₀C)。
+- **caseA conjunct d (9.8.d)**: irreducible count 下界 in 𝒮(H₀U')。
+- **caseB conjunct 4 (9.9.c)**: 𝒮(H₀C') に irr 無 ⟹ C=⊥ ∧ u=(p^q-1)/(p-1) (exceptional)。
+- **(9.10) `exceptional_case_frobenius_realization`**: `quotientSemidirectFrobenius` free field +
+  Singer field model 依存 (別 deep)。
+- **`sibleyTarget_H0C`**: coherence wiring。
+
+**注**: 還元 count (中核) 完了後、残は各々 caseB constituent 並みの新 machinery を要する phase。
+fresh context で 1 つずつ。次着手 = caseA degree machinery。
 
 ## 完了条件
 
