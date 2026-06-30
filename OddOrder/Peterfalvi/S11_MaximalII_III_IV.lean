@@ -2192,6 +2192,32 @@ theorem constant_of_perm_invariant_of_transitive {ι α : Type*}
   obtain ⟨k, hk⟩ := htrans i j
   rw [← hk, key]
 
+/-- **Regular character from a bijective product map.**  The char-construction core of
+`exists_regular_char`, taking the internal-direct-product witness as `noncommPiCoprod` *bijective*
+(rather than `iSupIndep` + spanning).  This lets the elementary `(9.7)` count
+(`noncommPiCoprod_bijective_of_card`) feed the construction directly, sidestepping the
+`iSupIndep`-from-injectivity gap. -/
+theorem exists_regular_char_of_bijective {Hbar : Type*} [CommGroup Hbar] [Finite Hbar]
+    {ι : Type*} [Fintype ι] {S : ι → Subgroup Hbar}
+    (hcomm : Pairwise fun i j : ι => ∀ x y : Hbar, x ∈ S i → y ∈ S j → Commute x y)
+    (hbij : Function.Bijective (Subgroup.noncommPiCoprod hcomm))
+    (hp : ∀ i, (Nat.card ↥(S i)).Prime) :
+    ∃ θ : Hbar →* ℂˣ, ∀ i, ∃ x ∈ S i, θ x ≠ 1 := by
+  classical
+  choose ψ hψ using fun i => exists_ne_one_hom_of_prime_card (hp i)
+  let eEquiv : (∀ i : ι, ↥(S i)) ≃* Hbar :=
+    MulEquiv.ofBijective (Subgroup.noncommPiCoprod hcomm) hbij
+  refine ⟨(MonoidHom.noncommPiCoprod ψ
+      (fun i j _ x y => mul_comm (ψ i x) (ψ j y))).comp eEquiv.symm.toMonoidHom, fun i => ?_⟩
+  obtain ⟨z, hz⟩ := DFunLike.ne_iff.mp (hψ i)
+  rw [MonoidHom.one_apply] at hz
+  refine ⟨↑z, z.2, ?_⟩
+  have hsymm : eEquiv.symm ↑z = Pi.mulSingle i z :=
+    eEquiv.symm_apply_eq.mpr (Subgroup.noncommPiCoprod_mulSingle (hcomm := hcomm) i z).symm
+  rw [MonoidHom.comp_apply, MulEquiv.coe_toMonoidHom, hsymm,
+    MonoidHom.noncommPiCoprod_mulSingle]
+  exact hz
+
 /-- **A regular character exists on an internal direct product of prime-order subgroups.**
 If `Hbar` is the internal direct product (`iSupIndep` + spanning) of order-`p` subgroups `Hpart i`,
 there is a character `θ : Hbar →* ℂˣ` nontrivial on every summand.  Combine per-factor nontrivial
@@ -2203,26 +2229,11 @@ theorem exists_regular_char {Hbar : Type*} [CommGroup Hbar] [Finite Hbar]
     (hindep : iSupIndep Hpart) (hspan : ⨆ i, Hpart i = ⊤)
     (hp : ∀ i, (Nat.card ↥(Hpart i)).Prime) :
     ∃ θ : Hbar →* ℂˣ, ∀ i, ∃ x ∈ Hpart i, θ x ≠ 1 := by
-  classical
-  choose ψ hψ using fun i => exists_ne_one_hom_of_prime_card (hp i)
   have hcomm : Pairwise fun i j : ι => ∀ x y : Hbar, x ∈ Hpart i → y ∈ Hpart j → Commute x y :=
     fun i j _ x y _ _ => mul_comm x y
-  have hinj : Function.Injective (Subgroup.noncommPiCoprod hcomm) :=
-    Subgroup.injective_noncommPiCoprod_of_iSupIndep hindep
-  have hsurj : Function.Surjective (Subgroup.noncommPiCoprod hcomm) := by
-    rw [← MonoidHom.range_eq_top, Subgroup.noncommPiCoprod_range]; exact hspan
-  let eEquiv : (∀ i : ι, ↥(Hpart i)) ≃* Hbar :=
-    MulEquiv.ofBijective (Subgroup.noncommPiCoprod hcomm) ⟨hinj, hsurj⟩
-  refine ⟨(MonoidHom.noncommPiCoprod ψ
-      (fun i j _ x y => mul_comm (ψ i x) (ψ j y))).comp eEquiv.symm.toMonoidHom, fun i => ?_⟩
-  obtain ⟨z, hz⟩ := DFunLike.ne_iff.mp (hψ i)
-  rw [MonoidHom.one_apply] at hz
-  refine ⟨↑z, z.2, ?_⟩
-  have hsymm : eEquiv.symm ↑z = Pi.mulSingle i z :=
-    eEquiv.symm_apply_eq.mpr (Subgroup.noncommPiCoprod_mulSingle (hcomm := hcomm) i z).symm
-  rw [MonoidHom.comp_apply, MulEquiv.coe_toMonoidHom, hsymm,
-    MonoidHom.noncommPiCoprod_mulSingle]
-  exact hz
+  refine exists_regular_char_of_bijective hcomm ⟨?_, ?_⟩ hp
+  · exact Subgroup.injective_noncommPiCoprod_of_iSupIndep hindep
+  · rw [← MonoidHom.range_eq_top, Subgroup.noncommPiCoprod_range]; exact hspan
 
 /-- Case (a) of Peterfalvi (9.7): `H/H_0` splits as a direct product of `q`
 order-`p` factors permuted by `W_1`.
