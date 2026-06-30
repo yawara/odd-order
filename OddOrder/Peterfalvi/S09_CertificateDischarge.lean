@@ -1335,4 +1335,97 @@ theorem chiRho_eq_inner_beta_induced {G : Type*} [Group G] [Fintype G] {A : Set 
         = trivialClassFunction ↥K from rfl,
       induce_trivialChar_apply_eq_index K hxK, induce_trivialChar_normSq_eq_index K]
 
+/-- **Construction of `Hypothesis78` from coherence data** (Peterfalvi (7.8)).  Given the
+`(7.1)`/`(7.6)` data (`H71`, `hτ`, `H ⊴ L`, `A = H^#`), an enumerating family `θ` of the distinct
+induced characters with the **distinguished** member `ζ` at index `0` and the induced principal
+`Ind 1_H` at `ind1H`, together with the **coherence inputs** of `(7.8)` — the coherent isometric
+extension `ν` and the agreement `τ(ψ_i) = ν ζ_i − d_i ν ζ_0` on `S` — the entire `Hypothesis78`
+structure is built, *including* the `(7.8.c.i)` certificate `chiRho_eq_inner_beta`, which is
+discharged by `chiRho_eq_inner_beta_induced`.
+
+The distinguished `ζ = ζ_0` has `ζ(1) = (Ind 1_H)(1)` (`hdeg_match`), forcing `d_{ind1H} = 1`, so the
+certificate's `β = τ(Ind 1_H − ζ)` matches the family-difference `τ(ζ_{ind1H} − ζ_0)`.  Together with
+`hypothesis76OfFamily` this realizes the issue-1013 goal: `Hypothesis78` (the §7 floor cited by
+`(12.16)` / `(14.11)`) is constructible from `(7.1)` + coherence alone, with no certificate assumed. -/
+noncomputable def hypothesis78OfDade
+    {G : Type*} [Group G] [Fintype G] {A : Set G} {L : Subgroup G}
+    [Fintype L] [Invertible (Nat.card L : ℂ)] [Invertible (Nat.card G : ℂ)]
+    (H71 : Hypothesis71 G A L)
+    (hτ : OddOrder.Peterfalvi.S04.IsDadeIsometry (G := G) (k := ℂ) (L := L) H71.τ)
+    (H : Subgroup G) (hHL : H ≤ L)
+    (hHnorm : ∀ (l : ↥L) {h : G}, h ∈ H → (l : G) * h * (l : G)⁻¹ ∈ H)
+    (hAH : A = (H : Set G) \ {1})
+    [Fintype ↥(H.subgroupOf L)] [Invertible (Nat.card ↥(H.subgroupOf L) : ℂ)] {n : ℕ}
+    (θ : Fin (n + 1) → IrreducibleCharacter ↥(H.subgroupOf L))
+    (hinj : Function.Injective
+      (fun i => ClassFunction.induce (H.subgroupOf L) (θ i : ClassFunction _ ℂ)))
+    (hcover : ∀ φ : IrreducibleCharacter ↥(H.subgroupOf L),
+      ClassFunction.induce (H.subgroupOf L) (φ : ClassFunction _ ℂ) ∈
+        Set.range (fun i => ClassFunction.induce (H.subgroupOf L) (θ i : ClassFunction _ ℂ)))
+    (d : Fin (n + 1) → ℂ)
+    (psi_support : ∀ i, (ClassFunction.induce (H.subgroupOf L) (θ i : ClassFunction _ ℂ)
+        - d i • ClassFunction.induce (H.subgroupOf L) (θ 0 : ClassFunction _ ℂ)).support ⊆
+      OddOrder.Peterfalvi.S04.supportInSubgroup A L)
+    (hdeg : ∀ i, ClassFunction.induce (H.subgroupOf L) (θ i : ClassFunction _ ℂ) (1 : ↥L)
+        = d i * ClassFunction.induce (H.subgroupOf L) (θ 0 : ClassFunction _ ℂ) (1 : ↥L))
+    (ind1H : Fin (n + 1)) (hind1H : ind1H ≠ 0)
+    (hzeta_ind1H : θ ind1H = trivialIrreducibleCharacter ↥(H.subgroupOf L))
+    (hdeg_match : ClassFunction.induce (H.subgroupOf L) (θ 0 : ClassFunction _ ℂ) (1 : ↥L)
+        = ClassFunction.induce (H.subgroupOf L) (θ ind1H : ClassFunction _ ℂ) (1 : ↥L))
+    (ν : ClassFunction ↥L ℂ →ₗ[ℤ] ClassFunction G ℂ)
+    (hnu_isometry : ∀ φ ψ : ClassFunction ↥L ℂ,
+      ClassFunction.inner (ν φ) (ν ψ) = ClassFunction.inner φ ψ)
+    (hagree : ∀ i : Fin (n + 1), i ≠ 0 → i ≠ ind1H →
+      H71.τ ⟨ClassFunction.induce (H.subgroupOf L) (θ i : ClassFunction _ ℂ)
+          - d i • ClassFunction.induce (H.subgroupOf L) (θ 0 : ClassFunction _ ℂ), psi_support i⟩
+        = ν (ClassFunction.induce (H.subgroupOf L) (θ i : ClassFunction _ ℂ))
+          - d i • ν (ClassFunction.induce (H.subgroupOf L) (θ 0 : ClassFunction _ ℂ))) :
+    Hypothesis78 G A L := by
+  classical
+  haveI hKnorm : (H.subgroupOf L).Normal := subgroupOf_normal_of_conj hHnorm
+  -- `d_{ind1H} = 1` from the degree match `ζ_0(1) = ζ_{ind1H}(1)`.
+  have hz0 : ClassFunction.induce (H.subgroupOf L) (θ 0 : ClassFunction _ ℂ) (1 : ↥L) ≠ 0 :=
+    induce_apply_one_ne_zero _ (θ 0)
+  have hd1 : d ind1H = 1 := by
+    have h := hdeg ind1H
+    rw [← hdeg_match] at h
+    have h2 : d ind1H * ClassFunction.induce (H.subgroupOf L) (θ 0 : ClassFunction _ ℂ) (1 : ↥L)
+        = 1 * ClassFunction.induce (H.subgroupOf L) (θ 0 : ClassFunction _ ℂ) (1 : ↥L) := by
+      rw [one_mul, ← h]
+    exact mul_right_cancel₀ hz0 h2
+  -- `ζ_{ind1H} − ζ_0` is supported on `A` (difference of induced characters of equal degree).
+  have hdiff : (ClassFunction.induce (H.subgroupOf L) (θ ind1H : ClassFunction _ ℂ)
+      - ClassFunction.induce (H.subgroupOf L) (θ 0 : ClassFunction _ ℂ)).support ⊆
+      OddOrder.Peterfalvi.S04.supportInSubgroup A L := by
+    have h := induce_diff_support (θ ind1H) (θ 0) 1 (by rw [one_mul, ← hdeg_match])
+    rw [one_smul] at h
+    refine h.trans ?_
+    intro x hx
+    rw [Set.mem_diff, SetLike.mem_coe, Subgroup.mem_subgroupOf, Set.mem_singleton_iff] at hx
+    exact (mem_supportInSubgroup_sharp_iff H hAH x).mpr
+      ⟨hx.1, fun h1 => hx.2 (OneMemClass.coe_eq_one.mp h1)⟩
+  refine
+    { hyp76 := hypothesis76OfFamily H71 hτ H hHL hHnorm hAH θ hinj hcover
+      ind1H := ind1H
+      zetaDistinct := 0
+      zetaDistinct_ne_ind1H := Ne.symm hind1H
+      zeta_one_eq_ind1H_one := hdeg_match
+      diff_support := hdiff
+      nu := ν
+      nu_isometry := hnu_isometry
+      chiRho_eq_inner_beta := fun χ _ hortho {x} hx => by
+        -- Reduce `hyp76.hyp71` to `H71` (`rfl`) so `chiRho_eq_inner_beta_induced` rewrites the LHS.
+        rw [show (hypothesis76OfFamily H71 hτ H hHL hHnorm hAH θ hinj hcover).hyp71 = H71 from rfl,
+          chiRho_eq_inner_beta_induced H71 (H.subgroupOf L) θ d psi_support hinj hcover hdeg
+            (supportInSubgroup_sharp_conj_mem_iff H hAH hHnorm)
+            (fun y => supportInSubgroup_sharp_subset_subgroupOf H hAH)
+            (one_not_mem_supportInSubgroup_sharp H hAH) ind1H hind1H hzeta_ind1H ν χ hagree hortho hx]
+        -- Bridge the `(7.7.a)` coefficient `d_{ind1H}` (`= 1`) to the bare difference `ζ_{ind1H} − ζ_0`.
+        refine congrArg star (congrArg (ClassFunction.inner · χ) (congrArg H71.τ ?_))
+        apply Subtype.ext
+        show ClassFunction.induce (H.subgroupOf L) (θ ind1H : ClassFunction _ ℂ)
+            - d ind1H • ClassFunction.induce (H.subgroupOf L) (θ 0 : ClassFunction _ ℂ) = _
+        rw [hd1, one_smul]
+        rfl }
+
 end OddOrder.Peterfalvi.S09.Cert
