@@ -1411,6 +1411,105 @@ theorem mem_of_coprime_index [Finite G] {M N : Subgroup G} (hNM : N ≤ M)
   rw [← hm]
   exact pow_mem hpow m
 
+/-- **The index `[M : U ⊔ M_σ]` is a `κ(M)`-number** (`M` maximal, `M_σ` the `σ(M)`-Hall, `U` a
+`(κ∪σ)′`-Hall).  Since `M_σ ≤ U ⊔ M_σ` and `U ≤ U ⊔ M_σ`, `[M : U⊔M_σ]` divides both `[M : M_σ]` (a
+`σ′`-number, `Msigma_subgroupOf_isHall`) and `[M : U]` (a `κ∪σ`-number, `hU`), so each of its primes
+avoids `σ` yet lies in `κ ∪ σ`, i.e. in `κ(M)`.  Combined with `mem_of_coprime_index`, this gives the
+`A(M)`-piece absorption "a `κ(M)′`-element of `M` lies in `U ⊔ M_σ`" of BG Theorem E. -/
+theorem index_U_sup_Msigma_primeFactors_subset_kappa [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M U : Subgroup G} (hM : M ∈ maximalSubgroups G)
+    (hU : Ch03.IsHallSubgroup ((kappa M ∪ OddOrder.BG.Ch3.S10.sigma M)ᶜ) (U.subgroupOf M))
+    {p : ℕ} (hp : p ∈ ((U ⊔ OddOrder.BG.Ch3.S10.Msigma M).subgroupOf M).index.primeFactors) :
+    p ∈ kappa M := by
+  have hpp : p.Prime := Nat.prime_of_mem_primeFactors hp
+  have hpdvd : p ∣ ((U ⊔ OddOrder.BG.Ch3.S10.Msigma M).subgroupOf M).index :=
+    Nat.dvd_of_mem_primeFactors hp
+  have hdvdMσ : ((U ⊔ OddOrder.BG.Ch3.S10.Msigma M).subgroupOf M).index ∣
+      ((OddOrder.BG.Ch3.S10.Msigma M).subgroupOf M).index :=
+    Subgroup.index_dvd_of_le (Subgroup.subgroupOf_mono M le_sup_right)
+  have hdvdU : ((U ⊔ OddOrder.BG.Ch3.S10.Msigma M).subgroupOf M).index ∣ (U.subgroupOf M).index :=
+    Subgroup.index_dvd_of_le (Subgroup.subgroupOf_mono M le_sup_left)
+  have hpnσ : p ∉ OddOrder.BG.Ch3.S10.sigma M :=
+    (OddOrder.BG.Ch3.S10.Msigma_subgroupOf_isHall hG hM).index_no_pi p
+      (Nat.mem_primeFactors.mpr ⟨hpp, hpdvd.trans hdvdMσ, Subgroup.index_ne_zero_of_finite⟩)
+  have hpnκσ : p ∉ (kappa M ∪ OddOrder.BG.Ch3.S10.sigma M)ᶜ :=
+    hU.index_no_pi p
+      (Nat.mem_primeFactors.mpr ⟨hpp, hpdvd.trans hdvdU, Subgroup.index_ne_zero_of_finite⟩)
+  simp only [Set.mem_compl_iff, not_not, Set.mem_union] at hpnκσ
+  exact hpnκσ.resolve_right hpnσ
+
+/-- **`|H ⊔ N|` divides `|H| · |N|`** for `N ◁ G` (Noether's second isomorphism: `[H⊔N : N] =
+[H : H⊓N]`, so `|H⊔N| = [H : H⊓N]·|N|` with `[H : H⊓N] ∣ |H|`).  Used to bound `π(U ⊔ M_σ) ⊆ κ′`
+from `π(U) ⊆ (κ∪σ)′` and `π(M_σ) ⊆ σ` (the `A(M)`-piece forward, with `M_σ ◁ M`). -/
+theorem card_sup_dvd_mul_of_normal {H N : Subgroup G} [N.Normal] :
+    Nat.card ↥(H ⊔ N) ∣ Nat.card ↥H * Nat.card ↥N := by
+  have e : (N.subgroupOf H).index = (N.subgroupOf (H ⊔ N)).index := by
+    have h := Nat.card_congr (QuotientGroup.quotientInfEquivProdNormalQuotient H N).toEquiv
+    simpa [Subgroup.index] using h
+  have hN : Nat.card ↥(N.subgroupOf (H ⊔ N)) = Nat.card ↥N :=
+    Nat.card_congr (Subgroup.subgroupOfEquivOfLe le_sup_right).toEquiv
+  have h1 : Nat.card ↥(H ⊔ N) = (N.subgroupOf (H ⊔ N)).index * Nat.card ↥N := by
+    rw [← Subgroup.card_mul_index (N.subgroupOf (H ⊔ N)), hN, mul_comm]
+  rw [h1, ← e]
+  exact mul_dvd_mul_right (N.subgroupOf H).index_dvd_card (Nat.card ↥N)
+
+/-- **`U ⊔ M_σ`-membership is exactly being a `κ(M)′`-element** (for `x ∈ M`, given `U⊔M_σ ◁ M` as
+`hnorm`).  `U⊔M_σ` is the normal `κ(M)′`-Hall of `M`: forward, `|U⊔M_σ| ∣ |U||M_σ|`
+(`card_sup_dvd_mul_of_normal`, `M_σ ◁ M`) and `π(U), π(M_σ) ⊆ κ′`, so any `x ∈ U⊔M_σ` is a
+`κ′`-element; backward, `[M:U⊔M_σ]` is a `κ`-number (`index_U_sup_Msigma_primeFactors_subset_kappa`),
+coprime to a `κ′`-element's order, so `mem_of_coprime_index` puts it in `U⊔M_σ`.  The `A(M)`-piece of
+BG Theorem E's "distinct orders": `U⊔M_σ`-membership of an element of `M` is order-determined. -/
+theorem mem_U_sup_Msigma_iff_isPiElement_kappa_compl [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M U : Subgroup G} (hM : M ∈ maximalSubgroups G)
+    (hUM : U ≤ M)
+    (hU : Ch03.IsHallSubgroup ((kappa M ∪ OddOrder.BG.Ch3.S10.sigma M)ᶜ) (U.subgroupOf M))
+    (hnorm : ((U ⊔ OddOrder.BG.Ch3.S10.Msigma M).subgroupOf M).Normal)
+    {x : G} (hxM : x ∈ M) :
+    x ∈ U ⊔ OddOrder.BG.Ch3.S10.Msigma M ↔ IsPiElement (kappa M)ᶜ x := by
+  haveI := hnorm
+  have hMσM : OddOrder.BG.Ch3.S10.Msigma M ≤ M := OddOrder.BG.Ch3.S10.Msigma_le M
+  refine ⟨fun hx p hp => ?_, fun hpi => ?_⟩
+  · -- forward: `x ∈ U⊔M_σ ⟹` `p ∈ π(orderOf x) ⟹ p ∉ κ`.
+    have hpord : p ∣ orderOf x := Nat.dvd_of_mem_primeFactors hp
+    have hpp : p.Prime := Nat.prime_of_mem_primeFactors hp
+    have h1 : orderOf x ∣ Nat.card ↥(U ⊔ OddOrder.BG.Ch3.S10.Msigma M) := by
+      have heq : orderOf x = orderOf (⟨x, hx⟩ : ↥(U ⊔ OddOrder.BG.Ch3.S10.Msigma M)) :=
+        orderOf_injective (U ⊔ OddOrder.BG.Ch3.S10.Msigma M).subtype
+          (U ⊔ OddOrder.BG.Ch3.S10.Msigma M).subtype_injective ⟨x, hx⟩
+      rw [heq]; exact orderOf_dvd_natCard _
+    have h2 : Nat.card ↥(U ⊔ OddOrder.BG.Ch3.S10.Msigma M) ∣
+        Nat.card ↥U * Nat.card ↥(OddOrder.BG.Ch3.S10.Msigma M) := by
+      haveI : ((OddOrder.BG.Ch3.S10.Msigma M).subgroupOf M).Normal := by
+        rw [OddOrder.BG.Ch3.S10.Msigma_subgroupOf]; infer_instance
+      have hdvd := card_sup_dvd_mul_of_normal (H := U.subgroupOf M)
+        (N := (OddOrder.BG.Ch3.S10.Msigma M).subgroupOf M)
+      rw [← Subgroup.subgroupOf_sup hUM hMσM,
+        Nat.card_congr (Subgroup.subgroupOfEquivOfLe (sup_le hUM hMσM)).toEquiv,
+        Nat.card_congr (Subgroup.subgroupOfEquivOfLe hUM).toEquiv,
+        Nat.card_congr (Subgroup.subgroupOfEquivOfLe hMσM).toEquiv] at hdvd
+      exact hdvd
+    have hp2 : p ∣ Nat.card ↥U * Nat.card ↥(OddOrder.BG.Ch3.S10.Msigma M) :=
+      (hpord.trans h1).trans h2
+    rcases (hpp.dvd_mul.mp hp2) with hpU | hpMσ
+    · have hpfU : p ∈ (Nat.card ↥(U.subgroupOf M)).primeFactors :=
+        Nat.mem_primeFactors.mpr ⟨hpp,
+          (Nat.card_congr (Subgroup.subgroupOfEquivOfLe hUM).toEquiv) ▸ hpU, Nat.card_pos.ne'⟩
+      have := hU.primeFactors_card_subset p hpfU
+      simp only [Set.mem_compl_iff, Set.mem_union, not_or] at this
+      exact this.1
+    · have hpfMσ : p ∈ (Nat.card ↥((OddOrder.BG.Ch3.S10.Msigma M).subgroupOf M)).primeFactors :=
+        Nat.mem_primeFactors.mpr ⟨hpp,
+          (Nat.card_congr (Subgroup.subgroupOfEquivOfLe hMσM).toEquiv) ▸ hpMσ, Nat.card_pos.ne'⟩
+      exact fun hpκ => kappa_subset_sigmaCompl hpκ
+        ((OddOrder.BG.Ch3.S10.Msigma_subgroupOf_isHall hG hM).primeFactors_card_subset p hpfMσ)
+  · -- backward: `κ′`-element of `M` lies in `U⊔M_σ`.
+    refine mem_of_coprime_index (sup_le hUM hMσM) hxM ?_
+    refine (Nat.disjoint_primeFactors Subgroup.index_ne_zero_of_finite
+      (orderOf_pos x).ne').mp ?_
+    rw [Finset.disjoint_left]
+    intro p hpfκ hpfo
+    exact (hpi p hpfo) (index_U_sup_Msigma_primeFactors_subset_kappa hG hM hU hpfκ)
+
 /-- For a `σ(M)`-element `x`, every `σ(L)`-part (`L` maximal) is either `x` or `1`: if `L` is
 conjugate to `M` then `σ(L) = σ(M)` contains all primes of `x` (`sigmaPart L x = x`); otherwise
 `σ(M) ∩ σ(L) = ∅` (`sigma_disjoint_of_nonconjugate`) so `x` avoids `σ(L)` (`sigmaPart L x = 1`). -/

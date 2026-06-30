@@ -792,6 +792,40 @@ theorem caseB_lambda_norm_core {Scard Pm1 u q : ℕ} {s sₐ lam1 : ℝ} {b : �
     nlinarith [hinfl, hfac, mul_nonneg (sq_nonneg (q : ℝ)) hquadR]
   linarith [hdecomp, hcross]
 
+open scoped Classical in
+/-- **Peterfalvi (13.6), character-theoretic bound**: the norm lower bound
+`∑_{x∈H#}|λ^{τ₁}(x)|² ≥ |S| − λ(1)²`, assembled from the (13.5) machinery.
+
+For the irreducible `λ ∈ S` of degree `λ(1) = uq` induced from a linear character of `H = PC`
+(so `‖λ‖² = 1`, `a = 1`, hence `κ = 1`), this chains the generic (13.5.b) decomposition
+`sum_normSq_sharp_chi_decomp` (with `ζ = λ`, `χ = λ^{τ₁}`, `κ = 1`) into the arithmetic core
+`caseB_lambda_norm_core`.  The character-theoretic content is exposed as explicit honest
+hypotheses, each discharged from the (13.6) setup once it lands:
+* `hvanish` — `λ` vanishes on `S − H` (induced from `H`, `H ⊴ S`);
+* `hinner` — `(Res_H λ, α) = 0` (the `P`-kernel orthogonality of (13.5.a));
+* `hχ` — the (13.5.a) point formula `λ^{τ₁} = λ + α` on `H#` (orthogonality from `S`-coherence);
+* `hT` — `∑_S|λ|² = |S|` (`sum_normSq_eq_card_mul_inner` with `‖λ‖² = 1`);
+* `hζ1`, `hcross` — `λ(1) = lam1` real and `Re(λ(1)·conj α(1)) = lam1·qb` (the `α(1) = qb`
+  congruence of (13.5.a)+(1.10));
+* `hinfl` — `(|P|−1)(qb)² ≤ ∑_{H#}|α|²` (Peterfalvi (13.5.c)); `hu` — `2u ≤ |P|−1` (13.2.c). -/
+theorem caseB_lambda_norm_bound {S : Type*} [Group S] [Fintype S]
+    (H : Subgroup S) (ζ α χ : S → ℂ) {Scard Pm1 u q : ℕ} {lam1 : ℝ} {b : ℤ}
+    (hvanish : ∀ x : S, x ∉ H → ζ x = 0)
+    (hinner : ∑ x ∈ Finset.univ.filter (· ∈ H), ζ x * (starRingEnd ℂ) (α x) = 0)
+    (hχ : ∀ x ∈ (Finset.univ.filter (· ∈ H)).erase 1, χ x = ζ x + α x)
+    (hT : ∑ x : S, ‖ζ x‖ ^ 2 = (Scard : ℝ))
+    (hζ1 : ‖ζ 1‖ ^ 2 = lam1 ^ 2)
+    (hcross : (ζ 1 * (starRingEnd ℂ) (α 1)).re = lam1 * ((q : ℝ) * b))
+    (hlam1 : lam1 = (u : ℝ) * q)
+    (hinfl : (Pm1 : ℝ) * ((q : ℝ) * b) ^ 2
+        ≤ ∑ x ∈ (Finset.univ.filter (· ∈ H)).erase 1, ‖α x‖ ^ 2)
+    (hu : 2 * u ≤ Pm1) :
+    (Scard : ℝ) - lam1 ^ 2 ≤ ∑ x ∈ (Finset.univ.filter (· ∈ H)).erase 1, ‖χ x‖ ^ 2 := by
+  refine caseB_lambda_norm_core hlam1 ?_ hinfl hu
+  rw [sum_normSq_sharp_chi_decomp H ζ α χ 1 hvanish hinner
+    (by intro x hx; rw [hχ x hx, Complex.ofReal_one, one_mul]), hT, hζ1, hcross]
+  ring
+
 /-- **Arithmetic core of Peterfalvi (13.7)**: the norm lower bound `∑_{x∈H#}|η₁₀(x)|² ≥ |H#|`.
 
 In (13.7), for `α = η₁₀` on `H#` with `α(1) = d` and squared norm `‖α‖² = n`, one has:
@@ -835,6 +869,31 @@ theorem caseB_eta_norm_core {H P d n s : ℕ}
     have hd : d ^ 2 = 1 := habelian rfl
     omega
 
+/-- **Peterfalvi (13.7), character-theoretic bound**: the norm lower bound
+`∑_{x∈H#}|η₁₀(x)|² ≥ |H#|`, assembled from the (13.5) machinery.
+
+For `χ = η₁₀` the (13.5) hypothesis holds with `a = 0`, so the (13.5.a) point formula collapses to
+`η₁₀ = α` on `H#` (no `ζ₁` term — `hχ`); hence `∑_{H#}|η₁₀|² = ∑_{H#}|α|²`.  The character-theoretic
+sum is an integer `s` (`hs`: `∑_{H#}|α|² = s`, since `∑_{x∈H}|α|² = |H|‖α‖²` is an integer and
+`α(1) ∈ ℤ`), and the arithmetic core `caseB_eta_norm_core` gives `s ≥ |H| − 1 = |H#|`.  Bridges the
+nat-valued core to the real-valued cascade input consumed by the (13.10) analytic inequality.
+Honest hypotheses: `hχ` the (13.5.a) `a = 0` point formula; `hs` integrality; `hParseval`
+`s + α(1)² = |H|‖α‖²`; `hInflation` (13.5.c); `habelian` (13.2.b, `H` abelian + `α` faithful). -/
+theorem caseB_eta_norm_bound {S : Type*} [Group S] [Fintype S]
+    (α χ : S → ℂ) (A : Finset S) {Hcard P d n s : ℕ}
+    (hH : 1 ≤ Hcard)
+    (hχ : ∀ x ∈ A, χ x = α x)
+    (hs : ∑ x ∈ A, ‖α x‖ ^ 2 = (s : ℝ))
+    (hP : 2 ≤ P) (hn : 1 ≤ n) (hParseval : s + d ^ 2 = Hcard * n)
+    (hInflation : (P - 1) * d ^ 2 ≤ s) (habelian : n = 1 → d ^ 2 = 1) :
+    ((Hcard : ℝ) - 1) ≤ ∑ x ∈ A, ‖χ x‖ ^ 2 := by
+  have hsum : ∑ x ∈ A, ‖χ x‖ ^ 2 = ∑ x ∈ A, ‖α x‖ ^ 2 :=
+    Finset.sum_congr rfl (fun x hx => by rw [hχ x hx])
+  rw [hsum, hs]
+  have hnat : Hcard - 1 ≤ s := caseB_eta_norm_core hP hn hParseval hInflation habelian
+  have h := (Nat.cast_le (α := ℝ)).mpr hnat
+  rwa [Nat.cast_sub hH, Nat.cast_one] at h
+
 /-- **Arithmetic assembly of Peterfalvi (13.8)**: the norm lower bound `∑_{x∈H#}|η₀₁(x)|² ≥ |S'| − u²`.
 
 By (13.3.c) there are `j` and `δ = ±1` with `μ_j^{τ₁} = δ ∑_{0≤i<q} η_{i1}`, so the (13.5) hypothesis
@@ -861,6 +920,35 @@ theorem caseB_eta01_norm_core {Pm1 u : ℕ} {firstTerm s sₐ : ℝ} {α1 δ : �
         = (Pm1 : ℝ) * (α1 : ℝ) ^ 2 - 2 * (δ : ℝ) * u * α1 := by rw [hsq]; ring
     nlinarith [hinfl, hfac, hquadR]
   linarith [hdecomp, hcross]
+
+open scoped Classical in
+/-- **Peterfalvi (13.8), character-theoretic bound**: the norm lower bound
+`∑_{x∈H#}|η₀₁(x)|² ≥ firstTerm` (textbook `|S'| − u²`), assembled from the (13.5) machinery.
+
+For `χ = η₀₁` the (13.5) hypothesis holds with `ζ = μ_j` (`‖μ_j‖² = 1`) and `a = δ = ±1`, so the
+inflation factor is `κ = δ`.  This chains `sum_normSq_sharp_chi_decomp` (with `κ = δ`) into the
+arithmetic core `caseB_eta01_norm_core`; `δ² = 1` collapses the `ζ`-term coefficient.  The
+character-theoretic content is exposed as explicit honest hypotheses (discharged from the (13.8)
+setup): `hvanish`/`hinner` as in (13.6); `hχ` the (13.5.a) point formula `η₀₁ = δ·μ_j + α` on `H#`;
+`hfirstTerm` identifies `∑_S|μ_j|² − μ_j(1)²` with `firstTerm`; `hcross` the cross term
+`Re(μ_j(1)·conj α(1)) = u·α(1)`; `hinfl` (13.5.c); `hu` (13.2.c). -/
+theorem caseB_eta01_norm_bound {S : Type*} [Group S] [Fintype S]
+    (H : Subgroup S) (ζ α χ : S → ℂ) {Pm1 u : ℕ} {firstTerm : ℝ} {α1 δ : ℤ}
+    (hvanish : ∀ x : S, x ∉ H → ζ x = 0)
+    (hinner : ∑ x ∈ Finset.univ.filter (· ∈ H), ζ x * (starRingEnd ℂ) (α x) = 0)
+    (hχ : ∀ x ∈ (Finset.univ.filter (· ∈ H)).erase 1, χ x = (δ : ℂ) * ζ x + α x)
+    (hfirstTerm : (∑ x : S, ‖ζ x‖ ^ 2) - ‖ζ 1‖ ^ 2 = firstTerm)
+    (hcross : (ζ 1 * (starRingEnd ℂ) (α 1)).re = (u : ℝ) * (α1 : ℝ))
+    (hδ : δ ^ 2 = 1)
+    (hinfl : (Pm1 : ℝ) * (α1 : ℝ) ^ 2
+        ≤ ∑ x ∈ (Finset.univ.filter (· ∈ H)).erase 1, ‖α x‖ ^ 2)
+    (hu : 2 * u ≤ Pm1) :
+    firstTerm ≤ ∑ x ∈ (Finset.univ.filter (· ∈ H)).erase 1, ‖χ x‖ ^ 2 := by
+  refine caseB_eta01_norm_core hδ ?_ hinfl hu
+  have hδR : (δ : ℝ) ^ 2 = 1 := by exact_mod_cast hδ
+  rw [sum_normSq_sharp_chi_decomp H ζ α χ (δ : ℝ) hvanish hinner
+    (by intro x hx; rw [hχ x hx]; push_cast; ring), hcross, hfirstTerm, hδR]
+  push_cast; ring
 
 /-- Carrier for Peterfalvi (13.5), the TI-subset orthogonality calculation. -/
 structure TISubsetOrthogonalityData (hyp : Hypothesis (G := G)) where
