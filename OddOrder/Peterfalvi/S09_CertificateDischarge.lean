@@ -1525,4 +1525,21 @@ theorem chiRho_norm_sq_collapse {G : Type*} [Group G] [Fintype G] {A : Set G} {L
     refine Finset.sum_congr rfl fun i _ => ?_
     rw [Finset.sum_div]
 
+/-- **Diagonal-sum split at `ind1H`** for the (7.8.b) collapse.  Splitting the `Ioi 0` diagonal sum
+`Σ_i c̄_i c_i / N_i` at the distinguished index `ind1H`, where `c_{ind1H} = cval` and `c_i = −d_i`
+for `i ≠ 0, ind1H`, gives `c̄val·cval/N_{ind1H} + Σ_{i ≠ ind1H} d̄_i d_i / N_i` (the sign cancels).
+This isolates the `(a−1)²/e` term from the off-distinguished `d_i`-sum. -/
+theorem sum_diag_split_ind1H {n : ℕ} (c N d : Fin (n + 1) → ℂ) (cval : ℂ)
+    {ind1H : Fin (n + 1)} (hind : ind1H ≠ 0)
+    (hc_ind1H : c ind1H = cval)
+    (hc_rest : ∀ i, i ≠ 0 → i ≠ ind1H → c i = -(d i)) :
+    ∑ i ∈ Finset.Ioi (0 : Fin (n + 1)), star (c i) * c i / N i =
+      star cval * cval / N ind1H
+        + ∑ i ∈ (Finset.Ioi (0 : Fin (n + 1))).erase ind1H, star (d i) * d i / N i := by
+  rw [← Finset.add_sum_erase _ _ (Finset.mem_Ioi.mpr (Fin.pos_iff_ne_zero.mpr hind)), hc_ind1H]
+  congr 1
+  refine Finset.sum_congr rfl fun i hi => ?_
+  obtain ⟨hi_ne, hi_ioi⟩ := Finset.mem_erase.mp hi
+  rw [hc_rest i (Finset.mem_Ioi.mp hi_ioi).ne' hi_ne, star_neg, neg_mul, mul_neg, neg_neg]
+
 end OddOrder.Peterfalvi.S09.Cert
