@@ -2702,6 +2702,28 @@ theorem orbit_sdiff_sup_normSq_term [Finite G] {W W1 W2 : Subgroup G}
   orbit_normSq_term (isTISubset_sdiff_sup_of_normalizer_eq hWcyc hWeq hnorm)
     (conj_smul_sdiff_sup_eq_of_normalizer_eq hnorm hne)
 
+/-- **`|W − (W₁ ∪ W₂)| + |W₁| + |W₂| = |W| + 1`** — the cardinality of the exceptional set, by
+inclusion–exclusion with `W₁ ∩ W₂ = {1}` (`hdisj`).  The numerator of the `W`-orbit term
+`|W − (W₁ ∪ W₂)|/|W|` of Peterfalvi (14.11.4) (additive form, avoiding `ℕ`-truncation). -/
+theorem ncard_sdiff_sup_add_eq [Finite G] {W W1 W2 : Subgroup G}
+    (hW1le : W1 ≤ W) (hW2le : W2 ≤ W) (hdisj : W1 ⊓ W2 = ⊥) :
+    ((W : Set G) \ ((W1 : Set G) ∪ (W2 : Set G))).ncard + Nat.card ↥W1 + Nat.card ↥W2
+      = Nat.card ↥W + 1 := by
+  have hsub : ((W1 : Set G) ∪ (W2 : Set G)) ⊆ (W : Set G) :=
+    Set.union_subset (SetLike.coe_subset_coe.mpr hW1le) (SetLike.coe_subset_coe.mpr hW2le)
+  have h1 := Set.ncard_diff_add_ncard_of_subset hsub
+  have h2 := Set.ncard_union_add_ncard_inter (W1 : Set G) (W2 : Set G)
+  have h3 : ((W1 : Set G) ∩ (W2 : Set G)).ncard = 1 := by
+    rw [← Subgroup.coe_inf, hdisj, Subgroup.coe_bot, Set.ncard_singleton]
+  have hcW : Nat.card ↥W = (W : Set G).ncard := by
+    rw [← Nat.card_coe_set_eq]; exact Nat.card_congr (Equiv.refl _)
+  have hcW1 : Nat.card ↥W1 = (W1 : Set G).ncard := by
+    rw [← Nat.card_coe_set_eq]; exact Nat.card_congr (Equiv.refl _)
+  have hcW2 : Nat.card ↥W2 = (W2 : Set G).ncard := by
+    rw [← Nat.card_coe_set_eq]; exact Nat.card_congr (Equiv.refl _)
+  rw [hcW, hcW1, hcW2]
+  omega
+
 open scoped Classical OddOrder.Peterfalvi.S12.FiniteInduce in
 /-- **Peterfalvi (14.11.4), the upper-bound §8 TI-counting step** (04.16 lines 109–115).  Brings the
 line-83 bound `|A(M)|/|M| + (1/|G|)(|famG₀| − |G₀|)` (the RHS of `chiRhoNormSq_psi_le_line83`,

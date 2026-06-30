@@ -6921,3 +6921,9 @@ reduced to `hnorm` (= the §13 `normalizer_V` fact, from the partner type-`P` st
 Axiom-clean. -/
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S16.conj_smul_sdiff_sup_eq_of_normalizer_eq
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S16.orbit_sdiff_sup_normSq_term
+
+/-! **Peterfalvi (14.11.4) `|W − (W₁∪W₂)|` cardinality** (`S16_NonExistenceG`, lane γ/POLE-2).
+`ncard_sdiff_sup_add_eq`: `|W − (W₁∪W₂)| + |W₁| + |W₂| = |W| + 1` by inclusion–exclusion with
+`W₁ ∩ W₂ = {1}`.  The numerator of the `W`-orbit term `|W − (W₁∪W₂)|/|W|` of (14.11.4).
+Axiom-clean. -/
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S16.ncard_sdiff_sup_add_eq
