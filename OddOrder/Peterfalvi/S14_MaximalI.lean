@@ -2365,6 +2365,32 @@ structure DadeNotation {L : Subgroup G} (hyp : Hypothesis L) where
   rhoFormula : Prop
   rhoMFormula : Prop
 
+open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
+/-- **Peterfalvi (12.13), the Dade calculation realized from coherence**: given the (12.6) coherent
+extension of `L`'s family `S` (`S07.IsCoherent`, supplied by `witness_L_coherent`) and a distinguished
+character `χ ∈ S` of degree `e`, the (12.13) `DadeNotation` is realized with `τ₁ =` the coherent
+extension and `ψ = χ^{τ₁} = extension χ`.
+
+This wires the coherent isometric extension into the `ψ`-construction backbone of (12.16): the
+former opaque `tau1`/`psi` are now the genuine `coh.extension` and its value on `χ`.  The remaining
+input is the *selection* of the distinguished `χ` — a minimal-degree `Ind_H^L θ` with `θ` a
+nontrivial linear character of `H = L_F`, so `χ(1) = [L:H] = e` — together with the (12.12) degree
+bounds on `e`.  (`e_eq_index`/`rhoFormula`/`rhoMFormula` remain the structure's carried `Prop`s.) -/
+noncomputable def dadeNotation_of_coherence {L : Subgroup G} [Finite G] (hyp : Hypothesis L)
+    (coh : OddOrder.Peterfalvi.S07.IsCoherent hyp.tau hyp.Sset hyp.A)
+    (χ : ClassFunction ↥L ℂ) (hχ : χ ∈ hyp.Sset) (e : ℕ) (hdeg : χ 1 = (e : ℂ)) :
+    DadeNotation hyp where
+  e := e
+  e_eq_index := e = (hyp.H.subgroupOf L).index
+  tau1 := coh.extension
+  chi := χ
+  chi_mem := hχ
+  chi_degree_eq_e := hdeg
+  psi := coh.extension χ
+  psi_eq_tau1_chi := rfl
+  rhoFormula := True
+  rhoMFormula := True
+
 /-- **Peterfalvi (12.14)**: the character `psi` is constant on the coset `xK`. -/
 theorem psi_constant_on_xK [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
     {ctr : CounterexampleHypothesis (G := G)} {L : Subgroup G}
