@@ -1072,3 +1072,21 @@ HC/H₀C ≅ hInHu/H₀ ≅ H̄ (hInHuEquivH 経由)。manual semidirect bookkee
 - L5: M-level I_M=HU (not-fixed) → induceHU(χ) irr deg qu (huSub_normal)。
 - L6: χ∈𝒳(H₀C) + induceHU∈𝒮(H₀C) → conjunct c (5166)。
 seed (inertia heart) は L3 の中核入力。
+
+
+## conjunct c — iso/hom DONE (10 lemmas); inertia(ψ)=HC が次の深部 (2026-07-01)
+
+**Landed (10 construction lemmas、axiom-clean)**: subgroup foundation (H∩C=⊥, H∩H₀C=H₀,
+H₀C=H₀⊔C, H⊔H₀C=HC) + H₀C◁HU + transports (realizedH₀C.subgroupOf hInHu=realizedH₀, =N.comap,
+.map=N) + **2nd iso hcQuotientEquivHbar (HC/H₀C≅H̄、crux)** + **hcHom (HC→H̄ inflation hom)**。
+
+**次: ψ = linearIrreducibleCharacter(θ.comp hcHom) + inertia(ψ)=HC**:
+- 重要: inertia framework は H◁G 要。**HC◁HU は hcInHu_normal で成立** ⟹ inertia(ψ) 定義可、
+  isIrreducibleCharacter_induce_of_inertia_eq 適用可。
+- inertia(ψ)=HC: ≥ は subgroup_le_inertia。≤ は inertia(ψ)⊆inertia(Res_hInHu ψ)=inertia(θ₀)=HC
+  (seed)。restriction-inertia (conjBy が restrict と可換、hInHu◁HC◁HU) が key sub-lemma (build/find)。
+  conjBy_restrict (Inertia.lean:154) が近い。**OR Clifford 対応 lemma (ψ over θ₀ ⟹ inertia(ψ)=inertia(θ₀))**。
+- **degree ζ(1)=u は既存 apply_one_eq_index_of_liesOver_linear_inertia** で ANY ζ over θ₀ + over linear ψ。
+- ζ=Ind_{HC}^{HU}(ψ) irr (isIrreducibleCharacter_induce_of_inertia_eq + inertia(ψ)=HC)。
+- 残: ζ∈xiOf(H₀C) (H⊄ker: θ̄ nontrivial、H₀C⊆ker: ψ inflation) + not-W1-fixed → χ=induceHU(ζ) irr qu。
+- HC=hInHu⊔realizedH₀C=hInHu⊔cInHu (hInHu_sup_realizedH0supC) で seed inertia と同定。
