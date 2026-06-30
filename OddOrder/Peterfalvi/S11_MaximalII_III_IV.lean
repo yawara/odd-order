@@ -2158,6 +2158,24 @@ theorem exists_ne_one_hom_of_prime_card {K : Type*} [CommGroup K] [Finite K]
     CommGroup.exists_apply_ne_one_of_hasEnoughRootsOfUnity (G := K) (M := ℂ) ha
   exact ⟨ψ, fun h => hψa (by rw [h]; rfl)⟩
 
+/-- **A permutation-invariant function on a transitive orbit is constant.**  If `σ` acts
+transitively (`∀ i j, ∃ k, σ^k i = j`) and `f` is `σ`-invariant (`f (σ i) = f i`), then `f` is
+constant.  Contrapositive: a non-constant `f` is not `σ`-invariant — the combinatorial core of the
+free-W1-orbit (aperiodic-tuple) construction for the Clifford case-(a) degree, where `W1` permutes
+the `q` order-`p` factors as a `q`-cycle and a regular character with non-constant factor-data has
+trivial `W1`-stabilizer. -/
+theorem constant_of_perm_invariant_of_transitive {ι α : Type*}
+    (σ : Equiv.Perm ι) (htrans : ∀ i j : ι, ∃ k : ℕ, (σ ^ k) i = j)
+    {f : ι → α} (hinv : ∀ i, f (σ i) = f i) : ∀ i j, f i = f j := by
+  have key : ∀ (k : ℕ) (i : ι), f ((σ ^ k) i) = f i := by
+    intro k
+    induction k with
+    | zero => simp
+    | succ n ih => intro i; rw [pow_succ', Equiv.Perm.mul_apply, hinv, ih]
+  intro i j
+  obtain ⟨k, hk⟩ := htrans i j
+  rw [← hk, key]
+
 /-- **A regular character exists on an internal direct product of prime-order subgroups.**
 If `Hbar` is the internal direct product (`iSupIndep` + spanning) of order-`p` subgroups `Hpart i`,
 there is a character `θ : Hbar →* ℂˣ` nontrivial on every summand.  Combine per-factor nontrivial
