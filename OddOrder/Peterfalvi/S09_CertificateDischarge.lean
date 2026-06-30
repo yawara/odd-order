@@ -295,4 +295,30 @@ theorem chiRho_decomp_proof {G : Type*} [Group G] [Fintype G] {A : Set G} {L : S
   rw [hval, hcand, ClassFunction.finset_sum_apply]
   exact Finset.sum_congr rfl fun i _ => by rw [ClassFunction.smul_apply]
 
+/-- **Induced irreducible characters have nonzero norm.**  `‖Ind_K^L θ‖² ≠ 0`, since
+`|K|·‖Ind θ‖² = |I_L(θ)| > 0` (`card_mul_inner_self_induce_eq_card_inertia`).  Supplies the
+`hnorm` hypothesis of `chiRho_decomp_proof` for the family `ζ_i = Ind θ_i` of (7.6)/(7.7.a). -/
+theorem induce_norm_ne_zero (K : Subgroup L) [K.Normal] [Fintype ↥K] [Invertible (Nat.card L : ℂ)]
+    [Invertible (Nat.card ↥K : ℂ)] (θ : IrreducibleCharacter ↥K) :
+    ClassFunction.inner (ClassFunction.induce K (θ : ClassFunction ↥K ℂ))
+      (ClassFunction.induce K (θ : ClassFunction ↥K ℂ)) ≠ 0 := by
+  intro h0
+  have hkey := card_mul_inner_self_induce_eq_card_inertia (G := L) θ
+  rw [h0, mul_zero] at hkey
+  exact (Nat.cast_ne_zero.mpr Nat.card_pos.ne') hkey.symm
+
+/-- **The induced family is pairwise orthogonal** (Peterfalvi (7.6)/(7.7.a) hypothesis).  For a
+family `θ : Fin (n+1) → Irr K` of pairwise non-conjugate irreducibles, the induced characters
+`ζ_i = Ind_K^L θ_i` are pairwise orthogonal — the `horth` hypothesis of `chiRho_decomp_proof`.
+Direct from `inner_induce_eq_zero_of_not_conj`. -/
+theorem induce_family_orthogonal (K : Subgroup L) [K.Normal] [Fintype ↥K] [Invertible (Nat.card L : ℂ)]
+    [Invertible (Nat.card ↥K : ℂ)] {n : ℕ}
+    (θ : Fin (n + 1) → IrreducibleCharacter ↥K)
+    (hnc : ∀ a b : Fin (n + 1), a ≠ b →
+      ∀ g : L, IrreducibleCharacter.conjBy g (θ a) ≠ θ b) :
+    ∀ a b : Fin (n + 1), a ≠ b →
+      ClassFunction.inner (ClassFunction.induce K (θ a : ClassFunction ↥K ℂ))
+        (ClassFunction.induce K (θ b : ClassFunction ↥K ℂ)) = 0 :=
+  fun a b hab => inner_induce_eq_zero_of_not_conj (θ a) (θ b) (hnc a b hab)
+
 end OddOrder.Peterfalvi.S09.Cert
