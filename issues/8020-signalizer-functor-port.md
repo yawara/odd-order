@@ -773,3 +773,28 @@ piece「|M_σ[x]|>1 ⟹ ∃ type-P maximal」** (Coq Ptype_structure 構築の�
 ⟹ **§14 cover の数学核 (Lemma 14.6 + Cor 14.9 cover identity + covering equality) は完成**。gate-2 完全 close
 は signalizer→type-P 逆向き (新 deep port) が gating。**overstatement 懸念は解消** (cover_subset_kernels は真、
 ただし deep)。次 = (a)「|M_σ[x]|>1 ⟹ type-P」port (Coq Ptype_structure 逆、~multi-session) or (b) lane 再配分検討。
+
+## 🔎 進捗 (lane d, 2026-06-30 /loop³¹): gate-2 cover_subset_kernels の tractable path 特定 — FittingIsTI-for-typeF に還元
+
+新規 Lean なし (path 精緻化)。/loop³⁰ の「cover_subset_kernels = R(x)=1-under-typeF は 14.7 reverse (vague deep)」を
+**具体的で tractable な sub-path に還元**:
+
+**還元チェーン**: cover_subset_kernels ⟺ R(x)=1 under all-type-F ⟺ |M_σ[x]|=1 for x∈M_σ# (∀ type-F M)
+ ⟸ **M_σ TI for type-F** (M_σ∩(M_σ)^g=1 for g∉M)。
+- 論拠: N∈M_σ[x] (x∈N_σ∩M_σ) で N≠M なら Thm 13.9 (`sigma_disjoint_of_nonconjugate`) で M,N 共役 N=M^g、
+  x∈M_σ∩(M_σ)^g。M_σ TI ⟹ =1 ⟹ x=1 矛盾。∴ |M_σ[x]|=1、Rsub=⊥。
+
+**M_σ TI for type-F = `FittingIsTI M` for type-F** (M_F=M_σ via `maxNilpotentNormalHall_eq_Msigma_of_isTypeF`、
+F(M)/M_F/M_σ の一致要確認)。repo 状況:
+- ✅ `fittingIsTI_of_isTypeP2` (S15:8960) — type-P2 のみ。
+- ❌ `fittingIsTI_of_isTypeF` **未ポート** = 真の missing piece (= Frobenius-kernel-TI for type-F、
+  type-F M は M_σ⋊E Frobenius ゆえ kernel M_σ は TI; Isaacs Ch06 Frobenius TI infra が使える可能性)。
+- `maxNilpotentNormalHall_sharp_isTISubset_of_fittingIsTI` (S16:1890): FittingIsTI ⟹ (M_F)# TI-subset。
+
+**🔑 二重 unblock**: `fittingIsTI_of_isTypeF` は (1) consumer `exists_typeICovering` の **`isTI` field**
+(= (M_F)# TI、`maxNilpotentNormalHall_sharp_isTISubset_of_fittingIsTI` 経由) と (2) **`covers` field**
+(= cover_subset_kernels、R(x)=1 経由) の**両 residual sorry を同時に解禁**。
+
+**▶▶ 次 = `fittingIsTI_of_isTypeF` の port** (type-F M の Frobenius kernel M_σ が TI)。Isaacs Ch06 Frobenius-kernel-TI
++ type-F の Frobenius 構造 (M_σ⋊E、`isFrobeniusGroup_E_of_caseTau1` 系) を接続。これが gate-2 TypeICovering branch の
+唯一の deep input (cover_nonidentity ✅ + pairwise ✅ は済)。NonTypeICovering branch (Ẑ) は別 deep。
