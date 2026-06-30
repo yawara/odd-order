@@ -774,4 +774,37 @@ theorem support_mutual_exclusion [Finite G]
 -- without opaque placeholder propositions.
 --
 
+/-! ### Route-B (M̃-cover) `G₀ = {1}` reduction for the (7.4) Dade-support family
+
+The all-type-I non-existence proof (Peterfalvi (12.17), `S14.not_all_maximal_typeI`) needs
+`G₀ = {1}`: once the family's supports cover `G#`, no nonidentity element survives in `G₀`.  For
+the kernel-cover `FrobeniusFamily` this is inline in `not_all_maximal_typeI`; the *faithful*
+M̃-cover route (issue 8022) rebuilds the family as a `FamilyHypothesis71` whose Dade supports
+`A_i^{τ_i} = 𝒞_G(M̃_i)` are the lane-d-proven cover
+(`S14.sharpSubgroup_top_eq_iUnion_conjClassSet_Mtilde_of_typeF`).  These two helpers supply the
+matching `G₀ = {1}` step for that family; the (7.5) `S09.family_inequality` then yields the
+contradiction (the §7/§8 character inputs to
+`S09.not_trivial_G0_of_family71_coherent_zeta_source_data` remain the gated lane-a/c residual). -/
+
+/-- `1 ∈ G₀` for a `(7.4)` Dade-support family: the identity lies in no Dade support `A_i^{τ_i}`
+(`one_notMem_dadeSupport`). -/
+theorem familyHyp71_one_mem_G0 {G : Type*} [Group G] [Fintype G]
+    [Invertible (Nat.card G : ℂ)] {k : ℕ}
+    (F : OddOrder.Peterfalvi.S09.FamilyHypothesis71 G k) : (1 : G) ∈ F.G0 :=
+  F.mem_G0_iff.mpr fun i => (F.hyp71 i).hyp.one_notMem_dadeSupport
+
+/-- **Peterfalvi (7.4)(d), the covered case** for a `FamilyHypothesis71`: if every nonidentity
+element of `G` lies in some Dade support `A_i^{τ_i}` (the family covers `G#`), then `G₀ = {1}`.
+Pure set theory given the cover — the route-B / M̃-cover analogue of the `FrobeniusFamily`
+kernel-cover `G₀ = {1}` step in `S14.not_all_maximal_typeI`. -/
+theorem familyHyp71_G0_eq_singleton_one_of_cover {G : Type*} [Group G] [Fintype G]
+    [Invertible (Nat.card G : ℂ)] {k : ℕ}
+    (F : OddOrder.Peterfalvi.S09.FamilyHypothesis71 G k)
+    (hcov : ∀ x : G, x ≠ 1 → ∃ i, x ∈ (F.hyp71 i).hyp.dadeSupport) :
+    F.G0 = {1} :=
+  Set.eq_singleton_iff_unique_mem.mpr ⟨familyHyp71_one_mem_G0 F, fun x hx => by
+    by_contra hx1
+    obtain ⟨i, hi⟩ := hcov x hx1
+    exact F.mem_G0_iff.mp hx i hi⟩
+
 end OddOrder.Peterfalvi.S10
