@@ -545,6 +545,31 @@ theorem exists_distinct_induced_family (K : Subgroup L) [K.Normal] [Fintype ↥K
   let F := distinctInducedFamily K
   ⟨F.n, F.θ, F.inj, F.cover⟩
 
+/-- **Reindexing the induced family preserves injectivity.**  For any permutation `σ`, the family
+`i ↦ Ind_K^L θ_{σ i}` is injective when `i ↦ Ind_K^L θ_i` is.  Used to move the distinguished member
+to index `0` (`σ = Equiv.swap 0 j`) before applying `chiRho_eq_inner_beta_induced` (which expects
+the distinguished `ζ` at index `0`). -/
+theorem induce_family_comp_perm_injective {K : Subgroup L} [Fintype ↥K]
+    [Invertible (Nat.card ↥K : ℂ)] {n : ℕ} {θ : Fin (n + 1) → IrreducibleCharacter ↥K}
+    (hinj : Function.Injective (fun i => ClassFunction.induce K (θ i : ClassFunction ↥K ℂ)))
+    (σ : Equiv.Perm (Fin (n + 1))) :
+    Function.Injective (fun i => ClassFunction.induce K (θ (σ i) : ClassFunction ↥K ℂ)) :=
+  hinj.comp σ.injective
+
+/-- **Reindexing the induced family preserves covering.** -/
+theorem induce_family_comp_perm_covering {K : Subgroup L} [Fintype ↥K]
+    [Invertible (Nat.card ↥K : ℂ)] {n : ℕ} {θ : Fin (n + 1) → IrreducibleCharacter ↥K}
+    (hcover : ∀ φ : IrreducibleCharacter ↥K,
+      ClassFunction.induce K (φ : ClassFunction ↥K ℂ) ∈
+        Set.range (fun i => ClassFunction.induce K (θ i : ClassFunction ↥K ℂ)))
+    (σ : Equiv.Perm (Fin (n + 1))) :
+    ∀ φ : IrreducibleCharacter ↥K,
+      ClassFunction.induce K (φ : ClassFunction ↥K ℂ) ∈
+        Set.range (fun i => ClassFunction.induce K (θ (σ i) : ClassFunction ↥K ℂ)) := by
+  intro φ
+  obtain ⟨i, hi⟩ := hcover φ
+  exact ⟨σ.symm i, by simpa using hi⟩
+
 /-- **Discharge of the (7.7.a) certificate for an induced family** (Peterfalvi (7.7.a)).  This is
 the consolidation of `chiRho_decomp_proof` for the concrete family `ζ_i = Ind_K^L θ_i`: the
 orthogonality (`horth`) and spanning (`hspan`) hypotheses of the basis argument are *derived* from
@@ -786,5 +811,68 @@ theorem inner_sub_smul_left_eq_zero {G : Type*} [Group G] [Fintype G]
     ClassFunction.inner (a - d • b) χ = 0 := by
   rw [ClassFunction.inner_sub_left, ClassFunction.inner_smul_left,
     inner_conj_symm χ a, ha, star_zero, inner_conj_symm χ b, hb, star_zero, mul_zero, sub_zero]
+
+/-- **Discharge of the (7.8.c.i) certificate for an induced family** (Peterfalvi (7.8.c)).  With the
+distinguished `ζ = Ind_K^L θ_0` at index `0` (so the induced principal character `Ind_K^L 1_K` is at
+some `ind1H ≠ 0`), `χ` orthogonal to `S^ν` (`hortho`), and the coherence agreement
+`(ζ_i − d_i ζ_0)^τ = ζ_i^ν − d_i ζ_0^ν` for the non-distinguished, non-`ind1H` indices (`hagree`),
+the `(7.7.a)` decomposition collapses to the single `ind1H` term: every other coefficient vanishes
+(`inner_sub_smul_left_eq_zero`), and the surviving term simplifies via `ζ_{ind1H}(x) = ‖ζ_{ind1H}‖²`
+(`induce_trivialChar_apply_eq_index`/`_normSq_eq_index`, both `= [L:K]`).  Hence
+`χ^ρ(x) = star((ζ_{ind1H} − d_{ind1H} ζ_0)^τ, χ)`; with `d_{ind1H} = 1` this is `star(β,χ)`. -/
+theorem chiRho_eq_inner_beta_induced {G : Type*} [Group G] [Fintype G] {A : Set G} {L : Subgroup G}
+    [Fintype L] [Invertible (Nat.card L : ℂ)] [Invertible (Nat.card G : ℂ)]
+    (H71 : Hypothesis71 G A L) (K : Subgroup ↥L) [K.Normal] [Fintype ↥K]
+    [Invertible (Nat.card ↥K : ℂ)] {n : ℕ}
+    (θ : Fin (n + 1) → IrreducibleCharacter ↥K) (d : Fin (n + 1) → ℂ)
+    (psi_support : ∀ i, (ClassFunction.induce K (θ i : ClassFunction ↥K ℂ)
+        - d i • ClassFunction.induce K (θ 0 : ClassFunction ↥K ℂ)).support ⊆
+      OddOrder.Peterfalvi.S04.supportInSubgroup A L)
+    (hinj : Function.Injective (fun i => ClassFunction.induce K (θ i : ClassFunction ↥K ℂ)))
+    (hcover : ∀ φ : IrreducibleCharacter ↥K,
+      ClassFunction.induce K (φ : ClassFunction ↥K ℂ) ∈
+        Set.range (fun i => ClassFunction.induce K (θ i : ClassFunction ↥K ℂ)))
+    (hdeg : ∀ i, ClassFunction.induce K (θ i : ClassFunction ↥K ℂ) (1 : ↥L)
+        = d i * ClassFunction.induce K (θ 0 : ClassFunction ↥K ℂ) (1 : ↥L))
+    (hAconj : ∀ g h : ↥L, h * g * h⁻¹ ∈ OddOrder.Peterfalvi.S04.supportInSubgroup A L ↔
+      g ∈ OddOrder.Peterfalvi.S04.supportInSubgroup A L)
+    (hAK_off : ∀ y : ↥L, y ∈ OddOrder.Peterfalvi.S04.supportInSubgroup A L → y ∈ K)
+    (hA_one : (1 : ↥L) ∉ OddOrder.Peterfalvi.S04.supportInSubgroup A L)
+    (ind1H : Fin (n + 1)) (hind1H : ind1H ≠ 0)
+    (hzeta_ind1H : θ ind1H = trivialIrreducibleCharacter ↥K)
+    (ν : ClassFunction ↥L ℂ →ₗ[ℤ] ClassFunction G ℂ) (χ : ClassFunction G ℂ)
+    (hagree : ∀ i : Fin (n + 1), i ≠ 0 → i ≠ ind1H →
+      H71.τ ⟨ClassFunction.induce K (θ i : ClassFunction ↥K ℂ)
+          - d i • ClassFunction.induce K (θ 0 : ClassFunction ↥K ℂ), psi_support i⟩
+        = ν (ClassFunction.induce K (θ i : ClassFunction ↥K ℂ))
+          - d i • ν (ClassFunction.induce K (θ 0 : ClassFunction ↥K ℂ)))
+    (hortho : ∀ i : Fin (n + 1), i ≠ ind1H →
+      ClassFunction.inner χ (ν (ClassFunction.induce K (θ i : ClassFunction ↥K ℂ))) = 0)
+    {x : ↥L} (hx : (x : G) ∈ A) :
+    H71.chiRho χ x = star (ClassFunction.inner (H71.τ
+      ⟨ClassFunction.induce K (θ ind1H : ClassFunction ↥K ℂ)
+          - d ind1H • ClassFunction.induce K (θ 0 : ClassFunction ↥K ℂ),
+        psi_support ind1H⟩) χ) := by
+  classical
+  rw [chiRho_decomp_induced H71 K θ d psi_support hinj hcover hdeg hAconj hAK_off hA_one χ hx]
+  have hxK : x ∈ K := hAK_off x (by rw [OddOrder.Peterfalvi.S04.mem_supportInSubgroup]; exact hx)
+  refine sum_collapse_to_single (fun i => ClassFunction.induce K (θ i : ClassFunction ↥K ℂ))
+    (fun i => ClassFunction.inner (H71.τ ⟨ClassFunction.induce K (θ i : ClassFunction ↥K ℂ)
+        - d i • ClassFunction.induce K (θ 0 : ClassFunction ↥K ℂ), psi_support i⟩) χ)
+    (Fin.pos_iff_ne_zero.mpr hind1H) ?_ ?_ (induce_norm_ne_zero K (θ ind1H))
+  · -- the non-`ind1H` coefficients vanish by coherence
+    intro i hi hne
+    show ClassFunction.inner (H71.τ ⟨ClassFunction.induce K (θ i : ClassFunction ↥K ℂ)
+        - d i • ClassFunction.induce K (θ 0 : ClassFunction ↥K ℂ), psi_support i⟩) χ = 0
+    rw [hagree i (Finset.mem_Ioi.mp hi).ne' hne]
+    exact inner_sub_smul_left_eq_zero (hortho i hne) (hortho 0 (Ne.symm hind1H))
+  · -- the distinguished term: `ζ_{ind1H}(x) = ‖ζ_{ind1H}‖² = [L:K]`
+    show ClassFunction.induce K (θ ind1H : ClassFunction ↥K ℂ) x
+      = ClassFunction.inner (ClassFunction.induce K (θ ind1H : ClassFunction ↥K ℂ))
+          (ClassFunction.induce K (θ ind1H : ClassFunction ↥K ℂ))
+    rw [hzeta_ind1H,
+      show ((trivialIrreducibleCharacter ↥K : IrreducibleCharacter ↥K) : ClassFunction ↥K ℂ)
+        = trivialClassFunction ↥K from rfl,
+      induce_trivialChar_apply_eq_index K hxK, induce_trivialChar_normSq_eq_index K]
 
 end OddOrder.Peterfalvi.S09.Cert
