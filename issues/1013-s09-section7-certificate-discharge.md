@@ -781,3 +781,24 @@ proof ゆえ revert (build green 維持)。
 - どちらも intricate。次フェーズで careful に。§7 floor + bridge hard content + 全 ingredient は完成
   (keystone/coherence_hagree/coherence_hagree_dadeMap/typeIA_eq_sharp/coherence_extension_inner_eq_on_family/
   inner_self_induce_eq_one_of_frobeniusGroup)。assembly のみ残。
+
+### 2026-07-01 (loop 継続³³): nu_isometry 弱化 ✅ DONE (前回の "fragile" は誤診断)
+
+前回 "delicate γ-side proof を破壊" と判断して revert したが、**真因は私の書いた `hine` helper
+`(Finset.mem_erase.mp (by simpa [hs] using hi)).1` が ambient Finset を metavar に残し simpa が
+over-simplify していただけ**。`Finset.ne_of_mem_erase (hs ▸ hi)` に直すと weightedNuSum collapse
+proof は無傷で通る。さらに option F (global isometry) は **存在しない可能性** (isometric embedding
+`CF(L)→CF(G)` だが dim CF(L) > dim CF(G) があり得る) ゆえ弱化は必須と確定。
+
+弱化を完遂 (commit ea61e2a4): field を family 形
+`∀ i j, i≠ind1H → j≠ind1H → (ν(ζi),ν(ζj))=(ζi,ζj)` にし、全 consumer を threading:
+- S09_Nonexistence: nu_zeta_inner_self_eq_one(+_of_irr), zetaImage_*, weightedNuSum collapse ×2。
+- S09_Cert 8 lemma: inner_weightedNuSum_nu_gen/_nu, betaDecomp_gamma_orth_nu_gen/_nu,
+  cCoeff_nu_zeta_zero_eq_neg_d (+`0≠ind1H`), hypothesis78OfDade/betaDecompOfDade/zetaNuRhoNormSqGeOfDade。
+- `nu_isometry := hnu_isometry` の defeq (`hyp76.zeta i ≡ induce (H.subgroupOf L) (θ i)`) OK、
+  cCoeff の h0ind は `Ne.symm hind1H` で供給。full build 3889 green。
+
+**hypothesis78OfDade は coherence_extension_inner_eq_on_family がそのまま供給できる family-isometry を
+受け取る形になった**。残りの bridge assembly: (b) family 構成 (θ_0=distinguished, ind1H≠0 で trivial)、
+(c) hzeta0nu, (d) degrees、(e) S14 で witness-L 組み立て。教訓: "fragile" 判定は真因 (helper の書き方) を
+特定してから; 弱化必須性は dimension argument で確認。[[feedback-no-avoiding-hard-parts]]
