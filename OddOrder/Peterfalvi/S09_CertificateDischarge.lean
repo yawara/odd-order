@@ -1663,4 +1663,26 @@ theorem cexpr_re_eq_normQuad (a e h G : ℝ) (he : e ≠ 0) (hh : h ≠ 0)
       push_cast; ring,
     Complex.ofReal_re, normEstimate_matching a e h G he hh hG]
 
+/-- **(7.8.b) identification** (last mile).  Given the ℂ-level norm identity (`h_inner`, supplied by
+`zetaNuRho_inner_eq_cexpr` with `a, e, G` as the real casts `hBD.a`, `complementIndex`, and the
+`(1.5.d)` degree-sum value), the real norm `‖ζ_0^{νρ}‖²` equals
+`normQuadraticCorrection + (1 − e/h)`.  Fed to `zetaNuRhoNormSq_ge_of_normQuadraticCorrection_eq`,
+this yields the Peterfalvi (7.8.b) lower bound. -/
+theorem zetaNuRhoNormSq_eq_normQuad {G : Type*} [Group G] [Fintype G] {A : Set G} {L : Subgroup G}
+    [Fintype L] [Invertible (Nat.card L : ℂ)] [Invertible (Nat.card G : ℂ)]
+    (H78 : OddOrder.Peterfalvi.S09.Hypothesis78 G A L) (hBD : H78.BetaDecomp)
+    (a_ℝ e_ℝ h_ℝ G_ℝ : ℝ) (he : e_ℝ ≠ 0) (hh : h_ℝ ≠ 0)
+    (hG : G_ℝ = e_ℝ * (h_ℝ - 1) - e_ℝ ^ 2)
+    (ha : a_ℝ = (hBD.a : ℝ)) (he' : e_ℝ = (H78.complementIndex : ℝ))
+    (hh' : h_ℝ = (H78.kernelOrder : ℝ))
+    (h_inner : ClassFunction.inner H78.zetaNuRho H78.zetaNuRho =
+      ((a_ℝ : ℂ) - 1) ^ 2 / (e_ℝ : ℂ) + (G_ℝ : ℂ) / (e_ℝ : ℂ) ^ 2
+        - (((a_ℝ : ℂ) - 1) - (G_ℝ : ℂ) / (e_ℝ : ℂ)) ^ 2 / ((e_ℝ : ℂ) * (h_ℝ : ℂ))) :
+    H78.zetaNuRhoNormSq =
+      H78.normQuadraticCorrection hBD
+        + (1 - (H78.complementIndex : ℝ) / (H78.kernelOrder : ℝ)) := by
+  unfold OddOrder.Peterfalvi.S09.Hypothesis78.zetaNuRhoNormSq
+  rw [h_inner, cexpr_re_eq_normQuad a_ℝ e_ℝ h_ℝ G_ℝ he hh hG,
+    OddOrder.Peterfalvi.S09.Hypothesis78.normQuadraticCorrection, ha, he', hh']
+
 end OddOrder.Peterfalvi.S09.Cert
