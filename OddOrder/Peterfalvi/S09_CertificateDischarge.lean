@@ -357,6 +357,21 @@ theorem induce_family_orthogonal (K : Subgroup L) [K.Normal] [Fintype ↥K] [Inv
         (ClassFunction.induce K (θ b : ClassFunction ↥K ℂ)) = 0 :=
   fun a b hab => inner_induce_eq_zero_of_not_conj (θ a) (θ b) (hnc a b hab)
 
+/-- **An injective induced family is pairwise orthogonal** (Peterfalvi (7.6)/(7.7.a)).  When the
+map `i ↦ Ind_K^L θ_i` is injective, the `θ_i` are pairwise non-conjugate (a conjugacy would force
+equal inductions, `induce_eq_induce_iff_conj`), so `induce_family_orthogonal` applies.  This is the
+form of `horth` actually supplied by the enumeration of the *distinct* induced characters. -/
+theorem induce_family_orthogonal_of_injective (K : Subgroup L) [K.Normal] [Fintype ↥K]
+    [Invertible (Nat.card L : ℂ)] [Invertible (Nat.card ↥K : ℂ)] {n : ℕ}
+    (θ : Fin (n + 1) → IrreducibleCharacter ↥K)
+    (hinj : Function.Injective
+      (fun i => ClassFunction.induce K (θ i : ClassFunction ↥K ℂ))) :
+    ∀ a b : Fin (n + 1), a ≠ b →
+      ClassFunction.inner (ClassFunction.induce K (θ a : ClassFunction ↥K ℂ))
+        (ClassFunction.induce K (θ b : ClassFunction ↥K ℂ)) = 0 :=
+  induce_family_orthogonal K θ fun a b hab g hg =>
+    hab (hinj ((induce_eq_induce_iff_conj (θ a) (θ b)).mpr ⟨g, hg⟩))
+
 /-- **The difference `ψ_i = ζ_i − d_i ζ_0` is supported on `K^#`** (Peterfalvi (7.6)/(7.7.a)
 hypothesis).  With `ζ = Ind_K^L θ` and the degree relation `ζ_i(1) = d_i ζ_0(1)`, the difference
 `Ind θ − d • Ind θ₀` vanishes off `K` (induction from the normal `K` is `K`-supported) and at `1`
@@ -426,5 +441,27 @@ theorem mem_span_psi_of_apply_one_zero {n : ℕ} (ζ : Fin (n + 1) → ClassFunc
   rw [← hcombo]
   refine Submodule.sum_mem _ fun i hi => Submodule.smul_mem _ _ (Submodule.subset_span ?_)
   exact ⟨i, Finset.ne_of_mem_erase hi, rfl⟩
+
+/-- **Peterfalvi (7.7.a), the spanning hypothesis from a covering induced family.**  Given a family
+`ζ : Fin (n+1) → CF(L)` whose values *cover* every induced irreducible `Ind_K^L θ` (`hcover`) and
+satisfy the degree relation `ζ_i(1) = d_i ζ_0(1)` with `ζ_0(1) ≠ 0`, any class function `ψ`
+supported inside the normal subgroup `K` and vanishing at `1` lies in the span of the difference
+vectors `{ψ_i = ζ_i − d_i ζ_0 : i ≠ 0}`.
+
+This is the `hspan` hypothesis of `chiRho_decomp_proof`: `supported_mem_span_induce_irr` places `ψ`
+in the span of the induced irreducibles, `hcover` + `Submodule.span_mono` transports this to the
+span of `{ζ_i}`, and `mem_span_psi_of_apply_one_zero` performs the degree-`0` reduction. -/
+theorem supported_mem_span_psi (K : Subgroup L) [K.Normal] [Fintype ↥K]
+    [Invertible (Nat.card ↥K : ℂ)] {n : ℕ}
+    (ζ : Fin (n + 1) → ClassFunction L ℂ) (d : Fin (n + 1) → ℂ)
+    (hcover : ∀ θ : IrreducibleCharacter ↥K,
+      ClassFunction.induce K (θ : ClassFunction ↥K ℂ) ∈ Set.range ζ)
+    (hdeg : ∀ i : Fin (n + 1), ζ i (1 : L) = d i * ζ 0 (1 : L)) (hz0 : ζ 0 (1 : L) ≠ 0)
+    {ψ : ClassFunction L ℂ} (hsupp : ∀ y : L, y ∉ K → ψ y = 0) (hψ1 : ψ (1 : L) = 0) :
+    ψ ∈ Submodule.span ℂ ((fun i => ζ i - d i • ζ 0) '' {i : Fin (n + 1) | i ≠ 0}) := by
+  refine mem_span_psi_of_apply_one_zero ζ d hdeg hz0 ?_ hψ1
+  refine Submodule.span_mono ?_ (supported_mem_span_induce_irr K ψ hsupp)
+  rintro v ⟨θ, rfl⟩
+  exact hcover θ
 
 end OddOrder.Peterfalvi.S09.Cert
