@@ -1163,3 +1163,29 @@ inertia heart + degree-u irreducible 完成 (最難部分)。残は giant-term �
 4. χ∈SOf(H₀C) = `mem_sOf.mpr ⟨ζ, ζ∈xiOf, rfl⟩` → conjunct c (caseA_character_counts:5270)。
 
 inertia heart + ζ-irreducible + degree + H₀C⊆Ker 完成。残=xiSet membership (LiesOver descent) + M-level。
+
+
+## ζ∈𝒳(H₀C) 完成 + M-level route 確定 (2026-07-01, commits 2c428020/a6225c3a)
+
+**LANDED**: `hcZeta_mem_xiSet` (H⊄Ker ζ, Frobenius/LiesOver descent — construction 方向の xiSet
+産出、新領域) + `hcZeta_mem_xiOf` (両半分合成)。**ζ = Ind_{HC}^{HU}(ψ) ∈ 𝒳(H₀C) 完全確立**。
+
+**残 = M-level のみ (conjunct c の最終ゲート)**:
+- **degree (easy)**: `induceHU (ζ:CF)(1) = q·ζ(1) = q·u = qu`。`induceHU_apply_one_eq_q_mul` +
+  `hcZeta_apply_one` (ζ(1)=u、既 landed)。coe_mk で bundled→induce HC ψ。
+- **χ∈SOf (easy)**: `mem_sOf ⟨ζ, hcZeta_mem_xiOf, rfl⟩` (SOf=sOf, chars.C=cSub data chief 確認済)。
+- **IsIrreducibleCharacter (induceHU ζ) (hard, propagation 要)**:
+  - `isIrreducibleCharacter_induce_of_inertia_eq` at M-level: I_M(ζ)=HU → induceHU ζ irreducible。
+  - **I_M(ζ)=HU** via `eq_of_le_of_prime_index` (S11:2230, HU≤I≤M ∧ [M:HU]=q prime ∧ I≠M → I=HU):
+    - HU≤I_M(ζ): subgroup_le_inertia (HU◁M)。
+    - [M:HU]=q: huSub_index_eq_q (既 landed)。
+    - **I_M(ζ)≠M (= ζ not-W1-fixed) = 残る実質ゲート**: θ̄ は `clifford_caseA_exists_regular_char_not_fixed`
+      (S11:4914) で regular ∧ θ̄.comp(act.φ w₀)≠θ̄ (non-W1-fixed) を産出済。propagation
+      **θ̄^{w₀}≠θ̄ → ζ^{w₀}≠ζ → I_M(ζ)≠M** を新規に組む (conjugation が induction+inflation と可換;
+      ζ^{w₀}=ζ → 各 LiesOver constituent θ₀ も θ₀^{w₀} と一致 → θ̄^{w₀}=θ̄ の対偶)。これが (9.8.c) の
+      最後の本質的数学。
+
+**assembly**: 上 3 つ + hcZeta 構築 (CliffordCaseAData の θ̄ + inertia fact hθ₀ + instances) →
+caseA_character_counts:5270 conjunct c。caseA_character_counts は H₀C machinery 後 (file 末) に relocate。
+
+inertia heart + ζ-irreducible(HU) + degree + H₀C⊆Ker + xiSet + xiOf 完成。残=M-level propagation のみ。
