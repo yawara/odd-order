@@ -944,3 +944,111 @@ inertia) / step2-apply `clifford_caseA_regular_inertia_hc` (I_HU(θ₀)=HC for W
 - **degree-qu** (step5): `isIrreducibleCharacter_induce_of_inertia_eq` + huSub_normal ⟹
   Ind_{HU}^M(ζ) irreducible deg qu。
 - **𝒳** (step6): kernel 条件 → χ∈𝒳(H₀C) → caseA_character_counts conjunct c。
+
+
+## conjunct c — bridge/seed DONE; 残=degree-u/qu induction (2026-07-01)
+
+**Landed**: `clifford_caseA_exists_char_inertia_hc_not_fixed` (= (9.8.c) seed: ∃ θ hom, I_HU(θ₀)=HC
+∧ ∃w₀ not-W1-fixed)。inertia heart 完成 (steps 1/2/2-apply/bridge、25 feature commits)。
+conjunct c の sorry = caseA_character_counts:5166 (refine の 2 番目 ?_、∃χ∈𝒮(H₀C) irr deg qu)。
+
+**残 path + 利用機構**:
+- **degree-u** (Clifford 拡張 + 誘導): I_HU(θ on H)=HC → ψ on HC → Ind_{HC}^{HU}(ψ) irr deg u。
+  Coq の θ_f は HC 上直接 (cfDprodl→HCbar)。**OPEN: Clifford 拡張 (θ on H→ψ on HC) の所在**。
+  機構: `isIrreducibleCharacter_induce_of_inertia_eq` (θ:IrreducibleCharacter H, inertia=H → Ind irr)
+  + `hcInHu_normal` (HC◁HU)。**次の調査: 既存 (9.9.a) caseB_degree_qu (S11:5579) が I_HU=HC→deg-u を
+  どう作るか** (拡張パターン流用; 既存に有れば conjunct c はそれを呼ぶだけ)。
+- **degree-qu** (M-level): ζ not-W1-fixed (⟸ θ not-fixed) → I_M(ζ)=HU (prime-index, eq_of_le_of_prime_index,
+  [M:HU]=q) → χ=induceHU(ζ) irr (huSub_normal + isIrreducibleCharacter_induce_of_inertia_eq) deg q·u=qu
+  (induceHU_apply_one_eq_q_mul)。
+- **𝒳**: ζ∈𝒳(H₀C) (kernel 条件 + xiOf membership) → χ=induceHU(ζ)∈𝒮(H₀C) (sOf_iff)。
+
+
+## conjunct c — 𝒳 framework解明 + 完全構成マップ (2026-07-01)
+
+**𝒳 def** (S11): `xiSet` = HU の irreducible char で **H ⊄ ker** (H 上 nontrivial)。
+`xiOf(Y)` = xiSet ∩ {Y ⊆ ker}。⟹ **𝒳(H₀C) = HU irr char、H 上 nontrivial かつ H₀C ⊆ ker**。
+conjunct c (5166): ∃ζ∈xiOf(H₀C), ζ(1)=u ∧ induceHU(ζ) irr (deg q·u=qu、induceHU_apply_one_eq_q_mul)。
+
+**重要簡略化**: H∩C=1 ∧ [H,C]≤H₀ ⟹ **HC/H₀C ≅ H̄** ⟹ ψ on HC = **θ̄ の inflation** (H₀C 自動的に
+ker、Clifford 拡張不要)。⟹ 私の I_HU=HC seed (clifford_caseA_exists_char_inertia_hc_not_fixed) が
+正しい入力。Coq cfDprodl も同じ (Cbar 上 trivial = inflation)。
+
+**残 layers (多層 plumbing、機構は全て同定済)**:
+1. ψ on HC = inflate θ̄ (HC↠HC/H₀C≅H̄)。← iso HC/H₀C≅H̄ の構成 (H∩C=1 + [H,C]≤H₀、both repo に有:
+   commutator_cSub_H_le_H0)。
+2. inertia_{HU}(ψ)=HC: clifford_caseA_regular_inertia_hc (H-part の inertia=HC) +
+   restriction-inertia relation (inertia(ψ)⊆inertia(ψ|_H) + ψ HC-invariant)。Coq sub_inertia_Res。
+3. ζ=Ind_{HC}^{HU}(ψ) irr deg u: `isIrreducibleCharacter_induce_of_inertia_eq` + `hcInHu_normal`。
+4. M-level I_M(ζ)=HU: ζ not-W1-fixed (⟸ θ̄ not-fixed の伝播) → I_M≠M → prime-index
+   `eq_of_le_of_prime_index` ([M:HU]=q)。
+5. χ=induceHU(ζ) irr deg qu: `huSub_normal` + `isIrreducibleCharacter_induce_of_inertia_eq`。
+6. 𝒳: ζ∈xiOf(H₀C) (H⊄ker: θ̄ nontrivial on H̄; H₀C⊆ker: inflation で自動) → χ∈𝒮(H₀C) (sOf_iff)。
+
+inertia heart (seed) は完成、残は char-construction plumbing (多層だが機構既知)。layer 1-2 が次。
+
+
+## conjunct c — extraction lemma 同定、forward construction が残 (2026-07-01)
+
+`caseB_exists_chiefFactorConstituent` (S11:5529) = **extraction** (χ∈𝒳 → θ₀ over、inertia=HC、linear)。
+(9.9.a) degree 決定用。conjunct c は **forward** (θ₀ regular → χ∈𝒳(H₀C) over θ₀ 構成) が必要。
+利用機構: `IrreducibleCharacter.LiesOver` / `exists_constituent_not_subset_characterKernel` /
+`exists_compHom_eq_of_subset_characterKernel` / `isIrreducibleCharacter_induce_of_inertia_eq` /
+`hcInHu_normal` / `huSub_normal`。
+
+**layer 1 (次)**: ψ on HC = inflate θ̄ — realized HC↠H̄ hom (HC=hInHu⊔cInHu⊆huSub、quotient
+HC/H₀C≅H̄)。これが realized-subgroup setting で intricate (subgroupOf chain + quotient iso)。
+seed (I_HU=HC + not-fixed、inertia heart) は完成、残は forward Clifford correspondence + M-level + 𝒳。
+
+
+## conjunct c — caseB machinery は degree-determination、construction は新規 (2026-07-01)
+
+caseB_degree_qu / apply_one_eq_index_of_liesOver_linear_inertia / caseB_exists_chiefFactorConstituent
+は **与えられた χ の degree 決定** (extraction 方向)。conjunct c は χ の **construction** (新規)。
+私の seed (clifford_caseA_exists_char_inertia_hc_not_fixed) は θ₀ on hInHu (linear, inertia=HC) を
+直接供給 = caseB_exists_chiefFactorConstituent の出力と同形 ⟹ 正しい入力。
+
+**construction layer 1 (crux)**: θ₀ on hInHu を ψ on HC=hInHu⊔cInHu に拡張 (cInHu 上 trivial) =
+realized HC↠H̄ hom (hInHu→H̄ の f=(mk'N)∘hInHuEquivH を HC へ延長)。intricate subgroupOf-chain。
+**layer 2+**: χ=Ind_{HC}^{HU}(ψ) irr (isIrreducibleCharacter_induce_of_inertia_eq + inertia(ψ)=HC,
+ψ HC-inv + restriction-inertia) → χ∈𝒳(H₀C) over θ₀ deg u → not-fixed → I_M=HU → induceHU deg qu。
+利用可能: exists_liesOver / coe_eq_induce_of_liesOver_of_isIrreducibleCharacter_induce (CliffordSingleOrbit)。
+
+
+## conjunct c — build 方針確定: explicit realized inflation hom (2026-07-01)
+
+**確認**: (1) `typeP_H_inf_U` (S11:134) = H∩U=⊥ ⟹ HC=hInHu⋊cInHu (internal semidirect、hInHu∩cInHu=⊥)。
+(2) repo に abstract char-extension lemma 無し (linearIrreducibleCharacter 系のみ) ⟹ ψ は
+**explicit realized inflation hom HC↠H̄ を構成**するしかない (semidirect 経由、~50-100 行)。
+
+**layer 1 build approach (post-summarization で実行)**:
+- hom ↥(hInHu⊔cInHu)→↥H⧸N: hInHu◁HC + HC=hInHu·cInHu (semidirect) を使い、g=h·c↦f(h)
+  (f=(mk'N)∘hInHuEquivH on hInHu、cInHu 上 trivial)。well-defined: f は cInHu-invariant
+  (θ̄ on H̄、C 中心化) + hInHu∩cInHu=⊥。
+- ψ=linearIrreducibleCharacter(θ̄∘(この hom))、ψ on HC、cInHu⊆ker、ψ|_hInHu=θ₀。
+- χ=Ind_{HC}^{HU}(ψ) irr (isIrreducibleCharacter_induce_of_inertia_eq + inertia(ψ)=HC via
+  clifford_caseA_regular_inertia_hc + restriction-inertia)。→ χ∈𝒳(H₀C) over θ₀ deg u。
+- M-level: not-fixed → I_M=HU → induceHU(χ) irr deg qu → conjunct c (5166)。
+
+seed (inertia heart) 完成。残 = explicit inflation hom + induction chain (機構・facts 全確定、fresh context で build)。
+
+
+## conjunct c — 🔑 戦略転換: counting で explicit construction を回避できる可能性 (2026-07-01)
+
+**重大発見**: repo は explicit char construction を**系統的に counting/antitone で回避**している:
+- `reducible_mem_sOf_H0C` (5766): `Set.eq_of_subset_of_ncard_le` (両者 p-1 ⟹ subset=whole)。
+- `forall_mem_sOf_H0C_apply_one_eq_qu` (5728): `sOf_antitone` + caseB_degree_qu。
+- `HC/H₀=H̄×(C/H₀)` dprod は docstring のみ (実証明は使わない)。
+
+⟹ **conjunct c (∃ irreducible deg-qu ∈ 𝒮(H₀C)) も counting で出せる可能性大** —
+explicit inflation hom 不要。方針: |𝒮(H₀C)| - |reducibles(=p-1)| = |irreducibles| > 0 ⟹ ∃ irreducible。
+`reducible_count_sOf_H0C` (p-1、§9↔§6 bijection、no explicit construction) は既存。
+Coq oXtheta: u·|Xtheta|=(p-1)^q ⟹ |Xtheta|=(p-1)^q/u ≥ 1 (irreducible 存在)。
+
+**次の探索 (counting 路線、explicit hom より優先)**:
+- 全 𝒮(H₀C) member は deg qu か (case-A 版 forall_degree_qu)? caseA_character_counts conjunct 2
+  (reducibles deg qu) + irreducible も同 → ∃ irreducible で conjunct c。
+- |𝒮(H₀C)| total count or |irreducibles|>0 を §9↔§6 bijection / 既存 count から出せるか。
+- 出せれば explicit inflation hom (intricate) を完全回避。出せなければ explicit construction に戻る。
+
+seed (inertia heart) は両路線で不要になる可能性 (counting なら) だが、explicit fallback では中核入力。
