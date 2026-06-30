@@ -8121,6 +8121,31 @@ theorem one_not_mem_Mtilde [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
       (hordeq ▸ hpdvd).trans ((OddOrder.BG.Ch3.S10.Msigma N).orderOf_dvd_natCard hxN),
       Nat.card_pos.ne'⟩))
 
+/-- **BG Corollary 14.9, the `G#` cover under all-type-`F`** (the covering equality of the
+`(8.8.a)` type-I case): when every maximal subgroup is of type `F`, the nonidentity elements of
+`G` are exactly the union of the faithful covers `𝒞_G(M̃)` over the maximal subgroups.  The `⊆`
+direction is `exists_mem_conjClassSet_Mtilde_of_ne_one` (the discharged form of BG Lemma 14.6),
+and `⊇` is `one_not_mem_Mtilde` (`1 ∉ M̃`, so `1 ∉ 𝒞_G(M̃)`).  This is the `cover_nonidentity`
+field of `BGTheoremETypeICovering`, modulo replacing the union over all maximals by the union over
+conjugacy representatives (`conjClassSet (Mtilde …)` depends only on the conjugacy class via
+`Mtilde_conj_smul`). -/
+theorem sharpSubgroup_top_eq_iUnion_conjClassSet_Mtilde_of_typeF [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hall : ∀ M ∈ maximalSubgroups G, IsTypeF M) :
+    sharpSubgroup (⊤ : Subgroup G)
+      = ⋃ M ∈ maximalSubgroups G,
+          conjClassSet (Mtilde hG (genuineSigmaDecomposition hG) M) := by
+  set D := genuineSigmaDecomposition hG with hD
+  ext g
+  simp only [sharpSubgroup, Set.mem_diff, Set.mem_singleton_iff, SetLike.mem_coe,
+    Subgroup.mem_top, true_and, Set.mem_iUnion₂]
+  constructor
+  · intro hg1
+    obtain ⟨M, hM, hgM⟩ := exists_mem_conjClassSet_Mtilde_of_ne_one hG hall hg1
+    exact ⟨M, hM, hgM⟩
+  · rintro ⟨M, hM, t, ht, c, hc⟩ rfl
+    exact one_not_mem_Mtilde hG D hM ((mul_eq_left.mp (mul_inv_eq_one.mp hc)) ▸ ht)
+
 /-- **BG 14.7, the per-member `σ`-Hall identity** (mmd L4039): for a type-`P₁` member `N` of the
 type-`P` family, `|N_σ|·[G : N] = [G : Z]·kᵢ*` where `kᵢ* = |Z ⊓ N_σ|` is the canonical family
 factor.  This is the cancellation crux of the density inequality: it turns each
