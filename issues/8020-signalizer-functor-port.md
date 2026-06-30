@@ -664,3 +664,22 @@ AxiomsCheck 登録、full build 3888 green):
 **🔧 メモ**: `tau2_element_sigmaLength_one` / `maximalContaining_centralizer_eq_singleton_of_tau2_element`
 (直近 2 commit) は AxiomsCheck 未登録のまま (lane が登録省略)。本 commit で sigma_diagnostic 系の登録 gap として
 follow-up 候補 (issue or 次 /loop で登録)。次 = full dichotomy assembly。
+
+## ✅ 進捗 (lane d, 2026-06-30 /loop²⁶): BG Lemma 14.6 — `g∈M` dichotomy corollary + σ-elt M_σ membership
+
+dichotomy assembly に向けた 2 building block を landed (S14、axiom-clean、AxiomsCheck 登録、full build 3888 green):
+- **`mem_Msigma_of_isPiElement_sigma_of_mem`** (Coq `mem_Hall_pcore (Msigma_Hall maxM)`): σ(M)-element x∈M
+  ⟹ x∈M_σ (`isPiElement_sigma_of_mem_Msigma` の逆)。証明 = x の像 (M/M_σ 内) は σ(M)-elt かつ M_σ が σ(M)-Hall
+  ゆえ M/M_σ は σ(M)'-group → 像 trivial → x∈M_σ。quotient orderOf 論法 (`orderOf_map_dvd` + `index_no_pi`)。
+  **既存は conjugate 版 `exists_mem_Msigma_of_isPiElement_sigma` のみ; same-M 版は s'g に必須だった**。
+- **`branchA_or_branchB_of_mem_maximal`** (Coq `s'g` の g∈M corollary = dichotomy disjunction for g∈M):
+  g∈M maximal・σ(M)-part(g)≠1 ⟹ **signalizerBranch(g) ∨ κBranch(g)**。x=piPart(σM)g, x'=x⁻¹g で
+  `mem_Msigma_…` (x∈M_σ^#) + `signalizer_coset_or_kappa_of_sigmaSharp` (s'g core) を合成。b=1 (g=x) は
+  signalizer branch (x⁻¹g=1∈R(x)) で直接処理。**dichotomy の disjunction を g∈M ケースで実現**。
+
+**▶▶ 残り Lemma 14.6 (full dichotomy `g≠1 ⟹ branchA ∨ branchB`)**: 残る gap = **g∉M ケース** (Coq 第2半
+BGsection14:1264-1287)。σ_decomp(g)≠∅ で x=σ-part≠1 の M₀ を取るが g∉M₀ 一般 ⟹ branchA_or_branchB は不適用。
+Coq は ¬A∧¬B 下で FT_signalizer N[x] + Hall conjugacy (`Hall_subJ`) で ⟨g⟩ を M₀∩N に conjugate → σ-part=1 矛盾。
+deps: `exists_length_one_factor` (S14:4617 ✓ σ-decomp 入力)・`sigmaLength_one_centralizer_structure` (FT_signalizer ✓)・
+`centralizer_le_of_maximalSigma_ncard_eq_one` (本 commit ✓)・Hall conjugacy (Lean 名 未確認、要調査)。
+⟹ 次 /loop = full dichotomy の g∉M assembly。その後 cover identity (type-F で κBranch 排除) で gate 2 close。

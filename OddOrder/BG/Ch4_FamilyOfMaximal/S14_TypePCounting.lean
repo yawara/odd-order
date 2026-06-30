@@ -5092,6 +5092,41 @@ theorem ncard_conjugates_eq_index_of_normalizer_eq_self [Finite G] {M : Subgroup
     (Nat.card_congr (Equiv.ofBijective f' hbij)).symm
   rw [← Nat.card_coe_set_eq, h_card_eq, ← Subgroup.index]
 
+/-- **Converse of `isPiElement_sigma_of_mem_Msigma`** (Coq `mem_Hall_pcore (Msigma_Hall maxM)`):
+a `σ(M)`-element `x ∈ M` lies in `M_σ`.  The image of `x` in the quotient `M / M_σ` is a
+`σ(M)`-element (a power of `x`), but `M_σ` is a Hall `σ(M)`-subgroup of `M` so `M / M_σ` is a
+`σ(M)′`-group; hence the image is trivial and `x ∈ M_σ`. -/
+theorem mem_Msigma_of_isPiElement_sigma_of_mem [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} (hM : M ∈ maximalSubgroups G)
+    {x : G} (hxM : x ∈ M)
+    (hxpi : OddOrder.GroupTheory.IsPiElement (OddOrder.BG.Ch3.S10.sigma M) x) :
+    x ∈ OddOrder.BG.Ch3.S10.Msigma M := by
+  classical
+  set Ms : Subgroup ↥M := (OddOrder.BG.Ch3.S10.Msigma M).subgroupOf M with hMs
+  haveI hNorm : Ms.Normal := by rw [hMs, OddOrder.BG.Ch3.S10.Msigma_subgroupOf]; infer_instance
+  have hHall : Ch03.IsHallSubgroup (OddOrder.BG.Ch3.S10.sigma M) Ms :=
+    OddOrder.BG.Ch3.S10.Msigma_subgroupOf_isHall hG hM
+  set xM : ↥M := ⟨x, hxM⟩ with hxMdef
+  have hord : orderOf xM = orderOf x :=
+    (orderOf_injective M.subtype M.subtype_injective xM).symm
+  set q : ↥M ⧸ Ms := QuotientGroup.mk' Ms xM with hq
+  have h1 : orderOf q ∣ orderOf xM := by
+    rw [hq]; exact orderOf_map_dvd (QuotientGroup.mk' Ms) xM
+  have hq1 : orderOf q = 1 := by
+    by_contra hne
+    obtain ⟨p, hpprime, hpdvd⟩ := (orderOf q).exists_prime_and_dvd hne
+    have hpσ : p ∈ OddOrder.BG.Ch3.S10.sigma M :=
+      hxpi p (Nat.mem_primeFactors.mpr
+        ⟨hpprime, (hpdvd.trans h1).trans (dvd_of_eq hord), (orderOf_pos x).ne'⟩)
+    have hpidx : p ∈ Ms.index.primeFactors :=
+      Nat.mem_primeFactors.mpr ⟨hpprime, by
+        rw [Subgroup.index_eq_card]; exact hpdvd.trans (orderOf_dvd_natCard q),
+        by rw [Subgroup.index_eq_card]; exact Nat.card_pos.ne'⟩
+    exact hHall.index_no_pi p hpidx hpσ
+  have hqone : q = 1 := orderOf_eq_one_iff.mp hq1
+  have hxMmem : xM ∈ Ms := (QuotientGroup.eq_one_iff xM).mp hqone
+  exact Subgroup.mem_subgroupOf.mp hxMmem
+
 /-- **Coq `cent1_sub_uniq_sigma_mmax`** (BGsection14:1008, a supplement to Theorem 14.4): if
 `𝓜_σ(x)` is a singleton, its unique element `M` contains `C_G(x)`.  Conjugation by any
 `y ∈ C_G(x)` permutes `𝓜_σ(x)` (it fixes `x`), hence fixes the unique element `M`, so
@@ -5160,7 +5195,7 @@ theorem signalizer_coset_or_kappa_of_sigmaSharp [Finite G]
     · exact Set.mem_diff_singleton.mpr ⟨Subgroup.mem_inf.mpr ⟨hx'M, hx'cent⟩, hx'1⟩
     · intro p hp
       refine hκ p ?_
-      show p ∈ (Nat.card ↥(Subgroup.closure ({x'} : Set G))).primeFactors
+      change p ∈ (Nat.card ↥(Subgroup.closure ({x'} : Set G))).primeFactors
       rwa [show Nat.card ↥(Subgroup.closure ({x'} : Set G)) = orderOf x' from by
         rw [← Subgroup.zpowers_eq_closure, Nat.card_zpowers]]
   · -- **signalizer branch** (τ₂ case): `y = x'`, `x'⁻¹ g = x ∈ R(x')`.
@@ -5192,7 +5227,7 @@ theorem signalizer_coset_or_kappa_of_sigmaSharp [Finite G]
             have h0 : 0 < orderOf x' := orderOf_pos x'
             omega)
         refine hx'sigma p ?_ (hx'σM p hp)
-        show p ∈ (Nat.card ↥(Subgroup.closure ({x'} : Set G))).primeFactors
+        change p ∈ (Nat.card ↥(Subgroup.closure ({x'} : Set G))).primeFactors
         rwa [show Nat.card ↥(Subgroup.closure ({x'} : Set G)) = orderOf x' from by
           rw [← Subgroup.zpowers_eq_closure, Nat.card_zpowers]]
     -- the neighbour `N = N(x')` of Theorem 14.4, with `R(x') = N_σ ∩ C_G(x')`.
@@ -5205,6 +5240,49 @@ theorem signalizer_coset_or_kappa_of_sigmaSharp [Finite G]
     refine Subgroup.mem_inf.mpr ⟨hxMσ, ?_⟩
     rw [Subgroup.mem_centralizer_iff]
     intro z hz; rw [Set.mem_singleton_iff.mp hz, ← hcomm]
+
+/-- **Coq `s'g`, the `g ∈ M` corollary** — the σ-decomposition dichotomy for an element contained
+in a maximal subgroup.  If `g ∈ M` (maximal) and the `σ(M)`-part of `g` is nontrivial, then `g`
+lands in the signalizer branch or the κ branch.  Combines `mem_Msigma_of_isPiElement_sigma_of_mem`
+(to see the `σ(M)`-part `x ∈ M_σ^#`) with `signalizer_coset_or_kappa_of_sigmaSharp` (applied to `x`
+and the `σ(M)′`-part `x' = x⁻¹g`).  This is the form consumed by the full BG Lemma 14.6 assembly. -/
+theorem branchA_or_branchB_of_mem_maximal [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (D : SigmaDecompositionData G)
+    {M : Subgroup G} (hM : M ∈ maximalSubgroups G) {g : G} (hg : g ∈ M)
+    (hne : sigmaPart M g ≠ 1) :
+    (∃ y, D.length y = 1 ∧ y⁻¹ * g ∈ Rsub hG D y)
+    ∨ (∃ y, D.length y = 1 ∧ ∃ N, N ∈ maximalSigmaSubgroupsOfElement y ∧
+        y⁻¹ * g ∈ sharpSubgroup (N ⊓ Subgroup.centralizer ({y} : Set G)) ∧
+        OddOrder.GroupTheory.IsPiElement (kappa N) (y⁻¹ * g)) := by
+  classical
+  simp only [sigmaPart] at hne
+  obtain ⟨b, hbmul, hbcomm, hxπ, hbπ, hxz, hbz⟩ := piPart_spec (OddOrder.BG.Ch3.S10.sigma M) g
+  set x := piPart (OddOrder.BG.Ch3.S10.sigma M) g with hxdef
+  have hx1 : x ≠ 1 := hne
+  have hxM : x ∈ M := Subgroup.zpowers_le.mpr hg hxz
+  have hbM : b ∈ M := Subgroup.zpowers_le.mpr hg hbz
+  have hxMσ : x ∈ OddOrder.BG.Ch3.S10.Msigma M :=
+    mem_Msigma_of_isPiElement_sigma_of_mem hG hM hxM hxπ
+  have hxsharp : x ∈ sigmaSharp M := by
+    rw [sigmaSharp, sharpSubgroup]; exact Set.mem_diff_singleton.mpr ⟨hxMσ, hx1⟩
+  have hxg : x⁻¹ * g = b := by rw [← hbmul, ← mul_assoc, inv_mul_cancel, one_mul]
+  have hlen : D.length x = 1 := length_one_of_isPiElement_sigma hG D hM hx1 hxπ
+  by_cases hb1 : b = 1
+  · refine Or.inl ⟨x, hlen, ?_⟩
+    rw [hxg, hb1]; exact Subgroup.one_mem _
+  · have hbcent : b ∈ Subgroup.centralizer ({x} : Set G) := by
+      rw [Subgroup.mem_centralizer_iff]; intro z hz
+      rw [Set.mem_singleton_iff.mp hz]; exact hbcomm
+    have hbσ : ∀ p ∈ piSet (Subgroup.closure {b}), p ∉ OddOrder.BG.Ch3.S10.sigma M := by
+      intro p hp
+      refine hbπ p ?_
+      rwa [show orderOf b = Nat.card ↥(Subgroup.closure ({b} : Set G)) from by
+        rw [← Subgroup.zpowers_eq_closure, Nat.card_zpowers]]
+    rcases signalizer_coset_or_kappa_of_sigmaSharp hG D hM hxsharp hbM hb1 hbcent hbσ with hA | hB
+    · obtain ⟨y, hyl, hyr⟩ := hA
+      exact Or.inl ⟨y, hyl, by rwa [hbmul] at hyr⟩
+    · obtain ⟨hxl, hMmem, hbsharp, hbκ⟩ := hB
+      exact Or.inr ⟨x, hxl, M, hMmem, by rw [hxg]; exact hbsharp, by rw [hxg]; exact hbκ⟩
 
 /-- `|L_σ^#| = |M_σ^#|` whenever `L` is a conjugate of `M`: conjugation is an order-preserving
 bijection, so `|L_σ| = |M_σ|` and removing the (fixed) identity preserves the count. -/

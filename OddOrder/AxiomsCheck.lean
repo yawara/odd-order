@@ -5150,6 +5150,17 @@ of the `|𝓜_σ(x')| > 1` step of BG Lemma 14.6.  Axiom-clean. -/
 Direct consumer of `sigma_diagnostic` (Cor 14.3); the τ₂ branch uses
 `centralizer_le_of_maximalSigma_ncard_eq_one` + `exists_neighbor_eq_Rsub`.  Axiom-clean. -/
 #assert_only_allowed_axioms OddOrder.BG.Ch4.S14.signalizer_coset_or_kappa_of_sigmaSharp
+/-! **σ-element of `M` lies in `M_σ`** (`S14_TypePCounting`,
+`mem_Msigma_of_isPiElement_sigma_of_mem`, Coq `mem_Hall_pcore (Msigma_Hall maxM)`): the converse of
+`isPiElement_sigma_of_mem_Msigma` — the image of a `σ(M)`-element `x ∈ M` in the `σ(M)′`-quotient
+`M / M_σ` is trivial.  Axiom-clean. -/
+#assert_only_allowed_axioms OddOrder.BG.Ch4.S14.mem_Msigma_of_isPiElement_sigma_of_mem
+/-! **BG Lemma 14.6 core, `g ∈ M` corollary** (`S14_TypePCounting`,
+`branchA_or_branchB_of_mem_maximal`): for `g` in a maximal `M` with nontrivial `σ(M)`-part, `g`
+lands in the signalizer branch or the κ branch.  Combines `mem_Msigma_of_isPiElement_sigma_of_mem`
+with `signalizer_coset_or_kappa_of_sigmaSharp`.  The form consumed by the full Lemma 14.6
+assembly.  Axiom-clean. -/
+#assert_only_allowed_axioms OddOrder.BG.Ch4.S14.branchA_or_branchB_of_mem_maximal
 /-! **BG Lemma 14.6, exclusivity** (`S14_TypePCounting`, `not_type1_of_type2`): a type-2 element
 (`g = y·y'`, `y'` a nonidentity `κ(M)`-element of `C_M(y)`, `y ∈ M_σ^#`) is not of type-1
 (`g = x·x'`, `ℓ_σ(x)=1`, `x' ∈ R(x)`).  The `T ∩ H̃ = ∅` input to Theorem 14.7. -/
