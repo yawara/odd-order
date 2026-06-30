@@ -5606,6 +5606,12 @@ carries a Hall `κ(M)`-subgroup `K ≤ M`, the swap `K* = M_σ ∩ C_G(K)`, and 
 `U` (Hall's theorem in the solvable `↥M`).  The missing constructor feeding `exists_partner` /
 `typeP_covering` from a bare `M ∈ maximalTypePFamily` (used by Cor 14.8 part 2).  Axiom-clean. -/
 #assert_only_allowed_axioms OddOrder.BG.Ch4.S14.exists_typeP_data
+/-! **BG Corollary 14.8** (`S14_TypePCounting`, `typeP1_conjugate_and_typeP_twoClasses`): the
+type-`P₁` maximal subgroups are all conjugate, and the type-`P` family is exactly two conjugacy
+classes (`M` and its Theorem 14.7 partner `M*`).  Part 1 uses `isTypeP2_or_isTypeP2_partner` (the
+partner is type-`P₂`, so `N ~ M*` would make `N` non-`P₁`); part 2 is `exists_partner` +
+`typeP_covering`.  Both via the `exists_typeP_data` constructor.  Axiom-clean. -/
+#assert_only_allowed_axioms OddOrder.BG.Ch4.S14.typeP1_conjugate_and_typeP_twoClasses
 
 /-! **Hall `κ`-subgroup inside a nilpotent group is cyclic** (`S14_TypePCounting`,
 `isCyclic_kappaHall_of_le_nilpotent`): a Hall `κ(N)`-subgroup `K' ≤ N` contained in a nilpotent
