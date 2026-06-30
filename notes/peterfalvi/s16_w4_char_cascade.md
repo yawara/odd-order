@@ -557,3 +557,28 @@ attack した結果、**「lane c frontier は fully cross-lane gated」とい�
   BG §10/§14 σ-theory (docstring「no repo theorem yet」)。これは harvest 不可、別 attack。
 次 /loop = TypeIIData harvest で次の gated fact を非-gated 化 (例 `normalizer_not_le` 共役 transfer、
 or derivedInG S 系の直接 cite)。[[feedback-no-avoiding-hard-parts]] [[scaffold-sorry-free-not-done]]
+
+### cont.¹⁴ (2026-06-30 lane c=γ /loop): 🛑 HUB 裁定で Tdata dead-end 結論を撤回 — Tdata carrier 着地 (V-side step 2)
+
+**hub 裁定 (issue 4001:116-136 + LAUNCH.md)**: cont.¹²/issue 4001 で「Tdata carrier = 設計 dead-end /
+architecturally significant cross-lane infra」を理由に戦略 fork を flag した件、hub が**🛑STOP 条件 (a)
+違反 (自クラスタ hard body を gated 理由で放置・relane 要求)** として却下。**「難所回避は無意味」「正面突破せよ」**。
+
+**cont.¹² の dead-end 結論は誤りと確定・撤回**: `T_nonI : IsTypeNonI T → IsTypeP T` ゆえ
+**`TypePData T` は存在する** (type-P であって、`FeitThompson:276` docstring の懸念した type-**P₂** 特定性は
+TypePData に不要)。当初「T type-P₂ は §14 結論ゆえ Tdata 不可」は type-P と type-P₂ を混同していた。
+Tdata carrier の追加先 (base `Hypothesis` = S15_SAndT_Setup:80 / S16_NonExistenceGCore:42) は **lane-c
+自身の所有ファイル**で cross-lane 依存ゼロ。
+
+**genuine landing (commit `737a15de`, full build 3888 green)**: base `Hypothesis` に
+`Tdata : TypePData T` + `Tdata_V_eq : Tdata.U = V` / `Tdata_W2_eq : Tdata.W1 = W2` を Sdata の dual で追加。
+cascade = S15.Hypothesis / Section16TypePStructure / Section16Inputs の 3-field + `_of_components` の
+Td params + producer の T-side mirror (`typePData_of_kappaHall_hallComplement` for T を S-side そのまま
+mirror)。`Section16TypePStructure:276` の「no symmetric Tdata」docstring も訂正。
+**唯一の新 sorry = `hTP2 : IsTypeP2 mp.T`** (producer、= (14.9) T type II。producer は Hypothesis 構築前
+ゆえ T_typeII を循環なしに cite 不可、§14.9 gate を単一 isolate)。
+
+**次 /loop = V-side step 3**: `typeII_overNormalizer_frobenius` (S15:1070) / `exists_typeI_maximal_overNormalizer_U`
+(S15:609 ~350 行) の **V-side dual を S/U-side mirror で構成** (Tdata を消費)。途中 genuine lane-b char に
+当たれば sorried signature cite (hub: 再導出・待機・再配置しない)。multi-iteration。
+[[feedback-no-avoiding-hard-parts]] [[hub-check-issue-before-asking-on-scope-violation]] [[scaffold-sorry-free-not-done]]
