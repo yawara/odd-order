@@ -4778,6 +4778,61 @@ theorem clifford_caseA_exists_regular_char_on_conjugates [Finite G] {M : Subgrou
     (wConjugate_coprod_bijective hUnorm hS₀inv hspan hKcard)
     (fun w => by rw [card_pointwise_smul, hS₀card]; exact chief.p_prime)
 
+/-- **A regular character not fixed by some `W1`-element** (Clifford case (a)).  As
+`clifford_caseA_exists_regular_char_on_conjugates`, but additionally `θ` is *not* fixed by the
+`W1`-action `act.φ(w₀)` for some `w₀` — the free-`W1`-orbit character, via
+`exists_regular_char_not_fixed` (`τ = act.φ(w₀)` permutes the conjugate factors, `i₀=1 ≠ j₀=w₀`).
+Needs `3 ≤ p` (odd order).  This non-`W1`-fixedness supplies `I_M(χ) ≠ M` ⟹ `I_M(χ) = HU` for the
+`induceHU`-irreducible character of degree `qu` in (9.8.c). -/
+theorem clifford_caseA_exists_regular_char_not_fixed [Finite G] {M : Subgroup G}
+    {data : TypesIIIIIIVSetup M} (chief : ChiefFactorData data)
+    {S₀ : Subgroup (↥data.H ⧸ chief.N)} (hS₀ne : S₀ ≠ ⊥)
+    (hS₀inv : IsAInvariant ((typeP_quotientCoprimeAction data.typeP data.nontrivial.1
+        chief.N_aInvariant).φ.comp (typeP_quotientCoprimeAction data.typeP data.nontrivial.1
+        chief.N_aInvariant).U.subtype) S₀)
+    (hS₀card : Nat.card ↥S₀ = chief.p) (hp3 : 3 ≤ chief.p) :
+    ∃ θ : (↥data.H ⧸ chief.N) →* ℂˣ,
+      (∀ w : ↥(typeP_quotientCoprimeAction data.typeP data.nontrivial.1 chief.N_aInvariant).E,
+        ∃ x ∈ (typeP_quotientCoprimeAction data.typeP data.nontrivial.1
+            chief.N_aInvariant).φ ↑w • S₀, θ x ≠ 1) ∧
+      ∃ w₀ : ↥(typeP_quotientCoprimeAction data.typeP data.nontrivial.1 chief.N_aInvariant).E,
+        θ.comp ((typeP_quotientCoprimeAction data.typeP data.nontrivial.1
+          chief.N_aInvariant).φ ↑w₀).toMonoidHom ≠ θ := by
+  classical
+  letI : CommGroup (↥data.H ⧸ chief.N) :=
+    { (inferInstance : Group (↥data.H ⧸ chief.N)) with
+      mul_comm := chief.quotient_elementaryAbelian.comm }
+  set act := typeP_quotientCoprimeAction data.typeP data.nontrivial.1 chief.N_aInvariant with hact
+  haveI : Fintype ↥act.E := Fintype.ofFinite _
+  have hUnorm : act.U.Normal := (typeP_uW1_frobenius data.typeP data.nontrivial.1).isNormal
+  have hspan0 : ⨆ a, act.φ a • S₀ = ⊤ :=
+    iSup_smul_eq_top_of_irreducible (φ := act.φ) chief.quotient_chiefFactor hS₀ne
+  have htop : act.U ⊔ act.E = ⊤ := by
+    show data.typeP.U.subgroupOf (data.typeP.U ⊔ data.typeP.W1)
+        ⊔ data.typeP.W1.subgroupOf (data.typeP.U ⊔ data.typeP.W1) = ⊤
+    rw [← Subgroup.subgroupOf_sup le_sup_left le_sup_right, Subgroup.subgroupOf_self]
+  have hspan : ⨆ a : ↥(act.U ⊔ act.E), act.φ ↑a • S₀ = ⊤ := by
+    refine le_antisymm le_top ?_
+    rw [← hspan0]
+    exact iSup_le fun b => le_iSup (fun a : ↥(act.U ⊔ act.E) => act.φ ↑a • S₀)
+      ⟨b, htop.ge (Subgroup.mem_top b)⟩
+  have hEcard : Fintype.card ↥act.E = data.q := by
+    rw [Fintype.card_eq_nat_card]
+    exact Nat.card_congr (Subgroup.subgroupOfEquivOfLe le_sup_right).toEquiv
+  have hKcard : Nat.card (↥data.H ⧸ chief.N) = (Nat.card ↥S₀) ^ (Fintype.card ↥act.E) := by
+    rw [hS₀card, hEcard, chiefFactor_quotient_card chief]
+  haveI : Nontrivial ↥act.E := Finite.one_lt_card_iff_nontrivial.mp
+    (by rw [Nat.card_eq_fintype_card, hEcard]; exact data.nontrivial.2.1.one_lt)
+  obtain ⟨w₀, hw₀⟩ := exists_ne (1 : ↥act.E)
+  obtain ⟨θ, hreg, hnf⟩ := exists_regular_char_not_fixed
+    (S := fun w : ↥act.E => act.φ ↑w • S₀) _
+    (wConjugate_coprod_bijective hUnorm hS₀inv hspan hKcard)
+    (fun w => by rw [card_pointwise_smul, hS₀card]; exact chief.p_prime)
+    (fun w => by rw [card_pointwise_smul, hS₀card]; exact hp3)
+    (Ne.symm hw₀) (act.φ ↑w₀)
+    (by simp only [Subgroup.coe_one, map_one, one_smul])
+  exact ⟨θ, hreg, w₀, hnf⟩
+
 /-- **Peterfalvi (9.7)**: the Clifford-theory dichotomy for the action on the chief factor `H/H_0`.
 
 The case split is `chiefFactor_clifford_U_dichotomy`: `U` acts on `H̄ = H/H₀` either irreducibly
