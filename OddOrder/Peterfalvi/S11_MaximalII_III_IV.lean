@@ -4682,6 +4682,69 @@ theorem caseB_xi_H0_degree_dvd_u [Finite G]
     exact_mod_cast hcast
   exact ⟨e * d₀, by rw [hdeq]; ring⟩
 
+/-- **Peterfalvi (9.9.b), degree part**: every member of `𝒮(H₀C)` has degree `qu`.
+
+Immediate from `caseB_degree_qu` (degree `qu` on `𝒮(H₀C')`): since `C' = ⁅C,C⁆ ≤ C`
+(`Cprime_le_C`), we have `H₀C' ≤ H₀C`, so `𝒮(H₀C) ⊆ 𝒮(H₀C')` (`sOf_antitone` — a larger kernel
+demand selects fewer characters).  Thus the (9.9.b) degree claim (each reducible member of `𝒮(H₀)`
+has degree `qu`) reduces to its membership claim (the reducibles lie in `𝒮(H₀C)`): once a reducible
+`φ ∈ 𝒮(H₀)` is shown to lie in `𝒮(H₀C)`, this lemma gives its degree.  The membership itself is the
+deep Clifford crux — reducible `Ind_{HU}^M χ` ⟺ `χ` is `W₁`/`M`-invariant, and via the direct
+product `HC/H₀ = H̄ × (C/H₀)` the underlying `HC`-linear character is `C`-trivial (Peterfalvi
+(9.9.b)/(9.8.b) shared subproof, Coq `PFsection9` `Part_a`). -/
+theorem forall_mem_sOf_H0C_apply_one_eq_qu [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    {M : Subgroup G} {data : TypesIIIIIIVSetup M} {chief : ChiefFactorData data}
+    (chars : Section11CharacterData data chief) (caseB : CliffordCaseBData chars) :
+    ∀ φ ∈ chars.SOf (chief.H0 ⊔ chars.C), φ 1 = ((data.q * chars.u : ℕ) : ℂ) := by
+  intro φ hφ
+  refine caseB_degree_qu hG chars caseB φ ?_
+  rw [Section11CharacterData.SOf_eq] at hφ ⊢
+  exact sOf_antitone data (sup_le_sup_left chars.Cprime_le_C chief.H0) hφ
+
+/-- **Peterfalvi (9.9.b), the `H₀C` reducible count** — parallel to `reducible_count_sOf_H0`.
+
+`𝒮(H₀C)` contains exactly `p − 1` reducible characters.  The same §9↔§6 bijection as
+`reducible_count_sOf_H0`, but with the `M/(H₀C)`-certain-type hypothesis: Peterfalvi (8.4.d) holds
+for `L = M/(H₀C)` as well as `L = M/H₀`, and `W̄₂' = W₂`-image in `M/(H₀C)` still has order `p`
+(`W₂ ∩ H₀C = W₂ ∩ H₀`, since `W₂ ≤ H` and `C ≤ U` meet `H` trivially).  Closing this is the
+remaining work — a parallel of the `chiefFactorQuotientHypothesis` + bijection construction with the
+normal subgroup `H₀ ⊔ C` in place of `H₀` (issue 1012). -/
+theorem reducible_count_sOf_H0C [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    {M : Subgroup G} {data : TypesIIIIIIVSetup M} {chief : ChiefFactorData data}
+    (chars : Section11CharacterData data chief) (caseB : CliffordCaseBData chars) :
+    {φ ∈ sOf data (chief.H0 ⊔ chars.C) | ¬ IsIrreducibleCharacter φ}.ncard = chief.p - 1 := by
+  sorry
+
+/-- **Peterfalvi (9.9.b), membership**: every reducible member of `𝒮(H₀)` lies in `𝒮(H₀C)`.
+
+A clean **cardinality** argument that avoids the full §9 character construction: `𝒮(H₀C) ⊆ 𝒮(H₀)`
+(`sOf_antitone`, `H₀ ≤ H₀C`), so the reducibles of `𝒮(H₀C)` are a subset of those of `𝒮(H₀)`; both
+number `p − 1` (`reducible_count_sOf_H0C` / `reducible_count_sOf_H0`).  A subset of equal finite
+cardinality is the whole set (`Set.eq_of_subset_of_ncard_le`, finiteness from `p − 1 ≠ 0` as `p` is
+prime).  Hence every reducible `𝒮(H₀)`-member already lies in `𝒮(H₀C)`.  Together with
+`forall_mem_sOf_H0C_apply_one_eq_qu` (degree), this is the full (9.9.b) degree+membership conjunct. -/
+theorem reducible_mem_sOf_H0C [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    {M : Subgroup G} {data : TypesIIIIIIVSetup M} {chief : ChiefFactorData data}
+    (chars : Section11CharacterData data chief) (caseB : CliffordCaseBData chars) :
+    ∀ φ ∈ sOf data chief.H0, ¬ IsIrreducibleCharacter φ →
+      φ ∈ sOf data (chief.H0 ⊔ chars.C) := by
+  intro φ hφ hred
+  have hBA : {ψ ∈ sOf data (chief.H0 ⊔ chars.C) | ¬ IsIrreducibleCharacter ψ}
+      ⊆ {ψ ∈ sOf data chief.H0 | ¬ IsIrreducibleCharacter ψ} := by
+    rintro ψ ⟨hψS, hψr⟩
+    exact ⟨sOf_antitone data le_sup_left hψS, hψr⟩
+  have hAfin : {ψ ∈ sOf data chief.H0 | ¬ IsIrreducibleCharacter ψ}.Finite :=
+    Set.finite_of_ncard_ne_zero (by
+      rw [reducible_count_sOf_H0 hG chief]
+      exact Nat.sub_ne_zero_of_lt chief.p_prime.one_lt)
+  have hAB : {ψ ∈ sOf data (chief.H0 ⊔ chars.C) | ¬ IsIrreducibleCharacter ψ}
+      = {ψ ∈ sOf data chief.H0 | ¬ IsIrreducibleCharacter ψ} :=
+    Set.eq_of_subset_of_ncard_le hBA
+      (le_of_eq (by rw [reducible_count_sOf_H0 hG chief, reducible_count_sOf_H0C hG chars caseB]))
+      hAfin
+  have hφmem : φ ∈ {ψ ∈ sOf data (chief.H0 ⊔ chars.C) | ¬ IsIrreducibleCharacter ψ} := by
+    rw [hAB]; exact ⟨hφ, hred⟩
+  exact hφmem.1
 
 /-- **Peterfalvi (9.9)**: character-count consequences in Clifford case (b).
 
@@ -4710,7 +4773,9 @@ theorem caseB_character_counts [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G
   -- (9.9.b) degree/membership and (9.9.c) exceptional remain.
   refine ⟨caseB_degree_qu hG chars caseB, ?_, ?_, ?_⟩
   · exact reducible_count_sOf_H0 hG chief
-  · sorry
+  · intro φ hφ hred
+    have hmem := reducible_mem_sOf_H0C hG chars caseB φ hφ hred
+    exact ⟨forall_mem_sOf_H0C_apply_one_eq_qu hG chars caseB φ hmem, hmem⟩
   · sorry
 
 /-- **Peterfalvi (9.10)**: in the exceptional case where `𝒮(H₀C')` contains no irreducible
