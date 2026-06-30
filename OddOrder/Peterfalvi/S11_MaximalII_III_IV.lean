@@ -6076,5 +6076,42 @@ theorem hcInHu_realized_normal [Finite G] {M : Subgroup G}
   rw [hInHu_sup_realizedH0supC]
   exact hcInHu_normal data chief
 
+/-- **`hcHom ∘ inclusion = f` on `hInHu`**: `hcHom (incl h) = mk'_N (hInHuEquivH h)`, the seed
+inflation.  The second iso sends the `hInHu`-class to the `HC`-class via inclusion
+(`hfwd`: `quotientInf (mk' h) = mk' (incl h)`), then `congr_mk` applies `hInHuEquivH`.  Gives
+`ψ|_hInHu = θ₀`, the input to the restriction-inertia `inertia(ψ) = HC`. -/
+theorem hcHom_inclusion [Finite G] {M : Subgroup G}
+    {data : TypesIIIIIIVSetup M} (chief : ChiefFactorData data) (h : ↥(hInHu data)) :
+    hcHom chief (Subgroup.inclusion le_sup_left h)
+      = QuotientGroup.mk' chief.N (hInHuEquivH data h) := by
+  haveI hN := realizedH0supC_normal_huSub chief
+  haveI hNsub := hN.subgroupOf
+    (hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf (huSub data))
+  haveI := chief.N_normal
+  haveI hNh : ((((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf (huSub data)).subgroupOf
+      (hInHu data)).Normal := hN.subgroupOf (hInHu data)
+  have hfwd : (QuotientGroup.quotientInfEquivProdNormalQuotient (hInHu data)
+        (((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf (huSub data)))
+      (QuotientGroup.mk' _ h)
+      = QuotientGroup.mk' _ (Subgroup.inclusion le_sup_left h) := by
+    simp only [QuotientGroup.quotientInfEquivProdNormalQuotient,
+      QuotientGroup.quotientInfEquivProdNormalizerQuotient, MulEquiv.trans_apply,
+      QuotientGroup.quotientMulEquivOfEq_mk, QuotientGroup.quotientKerEquivOfSurjective,
+      QuotientGroup.quotientKerEquivOfRightInverse, MulEquiv.coe_mk, MulEquiv.symm_mk,
+      MonoidHom.toMulEquiv_apply, QuotientGroup.kerLift_mk]
+    rfl
+  show (hcQuotientEquivHbar chief)
+      (QuotientGroup.mk' _ (Subgroup.inclusion le_sup_left h)) = _
+  rw [← hfwd]
+  show ((QuotientGroup.quotientInfEquivProdNormalQuotient (hInHu data)
+        (((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf (huSub data))).symm.trans
+      (QuotientGroup.congr ((((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf (huSub data)).subgroupOf
+        (hInHu data)) chief.N (hInHuEquivH data) _))
+      ((QuotientGroup.quotientInfEquivProdNormalQuotient (hInHu data)
+        (((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf (huSub data)))
+        (QuotientGroup.mk' _ h)) = _
+  rw [MulEquiv.trans_apply, MulEquiv.symm_apply_apply]
+  exact QuotientGroup.congr_mk _ chief.N (hInHuEquivH data) _ h
+
 end OddOrder.Peterfalvi.S11
 
