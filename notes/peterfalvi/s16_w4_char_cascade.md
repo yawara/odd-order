@@ -498,3 +498,62 @@ mirror 中** (s14 note 明記)。但し全て **L (witness 第二極大) 対象*
 **bedrock 確定**: tractable solo lane-c frontier (group-theory/arithmetic) は枯渇。次は**戦略判断**
 (wait-and-cite / 再配分 / §13 char solo 構築の是非) = ユーザーに flag。[[feedback-flag-poor-progress]]
 [[scaffold-sorry-free-not-done]] [[s09-is-section7-chirho-complete]] (duplication 回避)
+
+### cont.¹² (2026-06-30 lane c=γ /loop): ユーザー裁定「V-side 構成続行」→ Tdata carrier は**設計上の dead-end** と判明、真の gate = T_typeII (14.9) 深 char
+
+ユーザーが AskUserQuestion で「§16 V-side 構成を続行」を選択 (issue 4002 標準ルール路線)。
+最大 item `exists_MHypothesis` (V-side Dade 構成) の forward path を正面調査した結果、
+**当初仮説 (base Hypothesis に Tdata carrier 追加) は誤りと判明**:
+
+- **🔑 設計上の意図的非対称** (`FeitThompson.lean:276` docstring 明記): 「**T (larger-κ member) need
+  not be type-P₂, so no symmetric Tdata**」。S は maximal pair の smaller-κ member で type-P₂ 固定
+  (`S_typeP2` 入力 + `Sdata` carrier)、**T の type-P₂ 性は §14 の結論 (`T_typeII` 14.9)** であって入力でない。
+  ⟹ Tdata を入力 carrier として追加すると「T type-P₂」(§14 結論) を入力に格上げしてしまい設計違反。**Tdata
+  carrier path は dead-end**。issue 4001 の前 entry (「Tdata carrier 欠如が blocker」) を本 entry で訂正。
+- **真の V-side gate = `T_typeII` (14.9)**: V-side 構成は T の type-P 構造を要し、それは `T_typeII`
+  (本 iteration で BG-structural reduction 済 → `T_typeII_structural_inputs` の 5 連言) 経由でのみ得る。
+  そして 5 連言は **`TypeIIData T` の field そのもの** (`MaximalSubgroupType.lean:208-213`:
+  common/U_commutative/normalizer_not_le/derived_typeF/derived_fitting_eq) = 「T は type II (P2≠P1)」
+  の genuine §14.9 char。tractable sub-conjunct **無し** (各々が P2-vs-P1 distinction の深 char)。
+- **§14.9 char の citability**: 教科書 14.9 証明 (type-III orthogonality contradiction) は §5/§11/§13
+  inner-product machinery 依存で、cont.¹⁰ 既述「cite 可能 lemma なし」。⟹ V-side は lane b char 成熟か
+  cross-lane signature authoring を要し、structural shortcut が存在しない。
+
+**∴ V-side 構成の正確な構造** (次 iteration の出発点):
+1. `exists_typeI_maximal_overNormalizer_V` (S-side `exists_typeI_maximal_overNormalizer_U` S15:609 の
+   ~350 行 dual) = V-side type-I maximal over N_G(V) 存在。**T type-P data 経由 (T_typeII gated) + 多数の
+   V-side helper (not_normalizer_V_le_T / card_LF_coprime dual / typeI_overNormalizer_V_le_fitting 等)**
+   の chain を要す。Tdata でなく T_typeII を上流とする。
+2. それを consume して `exists_MHypothesis` の ~35 field を assemble (構造 field + §7 h78 coherence +
+   §8 counting carrier、後者は deep)。
+⟹ **multi-iteration の V-side helper chain build**。Tdata dead-end を除外できたのが本 iteration の成果。
+次 = `exists_typeI_maximal_overNormalizer_V` の helper chain から着手 (T_typeII gated、fresh context 推奨)。
+[[feedback-no-avoiding-hard-parts]] [[scaffold-sorry-free-not-done]] [[feedback-flag-poor-progress]]
+
+### cont.¹³ (2026-06-30 lane c=γ /loop): 🎯 「fully-gated」結論は過早だった — TypeIIData harvest で §13.2.a 非-gated 化 (`isMulCommutative_U`)
+
+ユーザーが「待つな・lane c を進めろ」と push (×3)。それを受けて §15/§13.2 の gated 構造事実を**正面から**
+attack した結果、**「lane c frontier は fully cross-lane gated」という本 session 前半の結論は過早**と判明
+([[feedback-no-avoiding-hard-parts]] の warning 通り、試行不足だった)。
+
+**genuine landing** (commit `100e4d73`, full build 3888 green): **`S15.isMulCommutative_U`** (sorry-free) =
+型-P₂ member S の complement U が可換 (Pf 13.2.a)。これまで §16-gated な `basic_structure_gated.U_commutative`
+経由でしか得られなかった事実を**非-gated に実証明**:
+- **鍵 = sorry-free type determination の harvest**: S は type II (`isTypeII_of_isTypeP2`, sorry-free
+  from `S_typeP2`) ゆえ `TypeIIData S` witness `tdata` が**只で手に入る**。`tdata.U_commutative` は
+  witness の U の可換性。
+- carrier U (=Sdata.U) と tdata.typeP.U は M'=[S,S] 内で M_F=P の complement ⟹ Schur–Zassenhaus
+  (`IsComplement'.exists_conj_of_coprime`, |P|⊥|U| from `coprime_card_U_card_P_of_disjoint`) で M'-共役
+  ⟹ `isMulCommutative_of_mulEquiv` chain で可換性 transfer。
+- 消費者 `typeI_overNormalizer_U_le_fitting:646` の gated 参照を本 lemma に置換。
+
+**⟹ 反復可能な lane-c 技法 (次 iteration の方針)**: **sorry-free type determination が与える
+`TypeIIData S` (= `hSII.some`) の field を harvest して gated §13.2 構造事実を非-gated 化**する。
+- witness 非依存 field (derivedInG S 関連: `derived_typeF` = `IsTypeF (derivedInG S)`,
+  `derived_fitting_eq`) は**直接** citable (transfer 不要、derivedInG S は canonical)。
+- U-witness 依存 field (`U_commutative` ✅, `normalizer_not_le` = ¬N_G(U)≤S) は**complement 共役
+  transfer** (本 `isMulCommutative_U` pattern)。
+- 真に deep な残り = σ-structure (`P_order` |P|=p^q, `P_elementaryAbelian`, `u_bound`, `A0S_TI`) =
+  BG §10/§14 σ-theory (docstring「no repo theorem yet」)。これは harvest 不可、別 attack。
+次 /loop = TypeIIData harvest で次の gated fact を非-gated 化 (例 `normalizer_not_le` 共役 transfer、
+or derivedInG S 系の直接 cite)。[[feedback-no-avoiding-hard-parts]] [[scaffold-sorry-free-not-done]]
