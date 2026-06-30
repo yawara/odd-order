@@ -747,6 +747,33 @@ theorem caseB_eta_norm_core {H P d n s : ℕ}
     have hd : d ^ 2 = 1 := habelian rfl
     omega
 
+/-- **Arithmetic assembly of Peterfalvi (13.8)**: the norm lower bound `∑_{x∈H#}|η₀₁(x)|² ≥ |S'| − u²`.
+
+By (13.3.c) there are `j` and `δ = ±1` with `μ_j^{τ₁} = δ ∑_{0≤i<q} η_{i1}`, so the (13.5) hypothesis
+holds with `ζ₁ = μ_j` (degree `qu`, `‖μ_j‖² = q`), `χ = η₀₁`, `a = δ`.  The (13.5.b) decomposition then
+gives `s = firstTerm − 2δu·α(1) + sₐ` where `firstTerm = (1/q)(|S| − (qu)²/q) = |S|/q − u² = |S'| − u²`
+(as `[S:S'] = q`) and `sₐ = ∑_{H#}|α|²`.  With `(|P|−1)α(1)² ≤ sₐ` (13.5.c), `α(1) ∈ ℤ`, `δ² = 1`, and
+`2u ≤ |P|−1` (13.2.c), the cross terms are nonnegative — setting `b = δ·α(1)`,
+`−2δu·α(1) + (|P|−1)α(1)² = (|P|−1)b² − 2ub ≥ 0` (`caseB_quadratic_nonneg`) — whence `firstTerm ≤ s`.
+Carrier-free arithmetic core; the character-theoretic decomposition is supplied by the (13.5) engine. -/
+theorem caseB_eta01_norm_core {Pm1 u : ℕ} {firstTerm s sₐ : ℝ} {α1 δ : ℤ}
+    (hδ : δ ^ 2 = 1)
+    (hdecomp : s = firstTerm - 2 * (δ : ℝ) * u * α1 + sₐ)
+    (hinfl : (Pm1 : ℝ) * (α1 : ℝ) ^ 2 ≤ sₐ)
+    (hu : 2 * u ≤ Pm1) :
+    firstTerm ≤ s := by
+  have hquad : (0 : ℤ) ≤ (Pm1 : ℤ) * (δ * α1) ^ 2 - 2 * (u : ℤ) * (δ * α1) :=
+    caseB_quadratic_nonneg hu (δ * α1)
+  have hquadR : (0 : ℝ) ≤ (Pm1 : ℝ) * ((δ : ℝ) * α1) ^ 2 - 2 * (u : ℝ) * ((δ : ℝ) * α1) := by
+    exact_mod_cast hquad
+  have hδR : (δ : ℝ) ^ 2 = 1 := by exact_mod_cast hδ
+  have hcross : 0 ≤ -2 * (δ : ℝ) * u * α1 + sₐ := by
+    have hsq : ((δ : ℝ) * α1) ^ 2 = (α1 : ℝ) ^ 2 := by rw [mul_pow, hδR, one_mul]
+    have hfac : (Pm1 : ℝ) * ((δ : ℝ) * α1) ^ 2 - 2 * (u : ℝ) * ((δ : ℝ) * α1)
+        = (Pm1 : ℝ) * (α1 : ℝ) ^ 2 - 2 * (δ : ℝ) * u * α1 := by rw [hsq]; ring
+    nlinarith [hinfl, hfac, hquadR]
+  linarith [hdecomp, hcross]
+
 /-- Carrier for Peterfalvi (13.5), the TI-subset orthogonality calculation. -/
 structure TISubsetOrthogonalityData (hyp : Hypothesis (G := G)) where
   S1 : Set (ClassFunction ↥hyp.S ℂ)
