@@ -77,4 +77,28 @@ theorem eq_induce_restrict_of_supported (K : Subgroup L) [K.Normal]
   rw [ClassFunction.induce_smul, induce_restrict_eq_index_smul K ψ hψ, smul_smul,
     inv_mul_cancel₀ (Nat.cast_ne_zero.mpr K.index_ne_zero_of_finite), one_smul]
 
+/-- **Positive-definiteness of Peterfalvi's class-function inner product.**  Over `ℂ`,
+`⟨η, η⟩ = 0` forces `η = 0`.  Indeed `⟨η, η⟩ = |G|⁻¹ Σ_g |η(g)|²`, a sum of non-negative reals, so
+it vanishes only when every `η(g) = 0`.  This is the non-degeneracy used in Peterfalvi's (7.7.a)
+basis argument: a class function in `CF(L,A)` orthogonal to a spanning set is zero. -/
+theorem inner_self_eq_zero [Invertible (Nat.card L : ℂ)] {η : ClassFunction L ℂ}
+    (h : ClassFunction.inner η η = 0) :
+    η = 0 := by
+  have hsum : ClassFunction.innerSum η η = 0 := by
+    rw [ClassFunction.inner_eq_inv_card_mul_innerSum] at h
+    have := congrArg (fun z => (Nat.card L : ℂ) * z) h
+    simpa [← mul_assoc, mul_invOf_self] using this
+  have hreal : (∑ g : L, Complex.normSq (η g)) = 0 := by
+    have hcast : (∑ g : L, η g * star (η g)) = ((∑ g : L, Complex.normSq (η g) : ℝ) : ℂ) := by
+      push_cast
+      exact Finset.sum_congr rfl fun g _ => Complex.mul_conj (η g)
+    have : ((∑ g : L, Complex.normSq (η g) : ℝ) : ℂ) = 0 := by
+      rw [← hcast]; exact hsum
+    exact_mod_cast this
+  have hzero : ∀ g : L, Complex.normSq (η g) = 0 :=
+    fun g => (Finset.sum_eq_zero_iff_of_nonneg fun g _ => Complex.normSq_nonneg _).mp hreal g
+      (Finset.mem_univ g)
+  ext g
+  simpa using Complex.normSq_eq_zero.mp (hzero g)
+
 end OddOrder.Peterfalvi.S09.Cert
