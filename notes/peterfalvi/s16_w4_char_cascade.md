@@ -896,3 +896,18 @@ alpha bound `sum_normSq_erase_one_ge_of_const_on_subgroup` の入力) が得ら�
 (tail の forward だけで足りる)。**⚠ 注意**: H76 family は θ_i : ClassFunction ↥(H.subgroupOf S) で
 induction は ↥S 内 (Ind_K^L, K=H.subgroupOf S, L=S) ⟹ partition/orthogonality/α 構成は
 subgroup-of-S setup での careful work。次 iteration = producer 組立 (step 1-4) を engage。
+
+### cont.²⁸ (2026-07-01 lane c=γ /loop): (13.5.a) point-formula 算術核 LANDED (sorry-free)
+
+`H_sharp_point_formula` (S15_SAndT_Setup, commit 7cea5ee8) = (13.5.a) の**代数核を証明**。
+H^# 上で `χ(a:G) = (c̄_{i₁}/‖ζ_{i₁}‖²)ζ_{i₁}(a) + ∑_{i∈filter(P⊆ker ζ_i)(Ioi 0)}(c̄_i/‖ζ_i‖²)ζ_i(a)`。
+証明 = base decomp `H_sharp_chiRho_eq_explicit` → `Finset.add_sum_erase` で i₁ 抽出 →
+`Finset.sum_filter_add_sum_filter_not` で P⊆ker / P⊄ker 分割 → middle (P⊄ker, ≠i₁) を
+直交仮説 `hmiddle` (cCoeff χ i=0) で `Finset.sum_eq_zero` drop → `filter_erase`+`erase_eq_self`。
+**パラメータ**: distinguished index `i₁` (`hi1`: 0<i₁, `hi1_ker`: P⊄ker ζ_{i₁}), 直交 `hmiddle`
+(∀ i, 0<i → i≠i₁ → P⊄ker ζ_i → cCoeff χ i=0)。α = RHS の tail Σ (P⊆ker, pointwise 値)。
+
+**残 (13.5)**: (b) norm formula = ‖χ‖²_{H#} を point formula + facts1/2 (`sum_normSq_sharp...` /
+`sum_mul_conj_sharp...`) + Parseval 核 (`sum_normSq_real_smul_add`) で展開 (κ²‖ζ₁‖²+2κRe(...)+‖α‖²)。
+(c) alpha_norm_bound = α P-const (各 tail ζ_i が P⊆ker ⟹ pointwise const) + `sum_normSq_erase_one_ge...`。
+全 prerequisite landing 済 = 次 increment は (13.5.b) 組立。[[scaffold-sorry-free-not-done]]
