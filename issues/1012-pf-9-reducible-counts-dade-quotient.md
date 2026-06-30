@@ -1261,3 +1261,33 @@ factor-arrangement 保存) から θ̄^{w₀} ∉ U-orbit(θ̄) を導く (= fre
 Coq oXtheta 構造を精査し、explicit(free-orbit) vs counting のどちらが tractable か判断。
 
 construction 完成 (assembly まで)。残 = hIM 1 本 (free-orbit content、deep)。
+
+
+## propagation — 完全構造設計 (build-ready lemma chain) (2026-07-01)
+
+**次 iteration は BUILD (再分析でなく)**。hIM = `ClassFunction.inertia (induce HC ψ) ≠ ⊤` を以下の
+lemma chain で。machinery 在庫確認済 (inner_conjBy_conjBy, SingleOrbit, exists_conj, liesOver_conjBy)。
+
+**L1 (新, restriction-conjBy commute across levels)**: `Res_{hInHu}(conjBy_{M,HU} m ζ)
+= conjBy_{M,hInHu} m (Res_{hInHu} ζ)` (m∈M)。proof = ext x; 両辺 ζ(m⁻¹ x m)。`conjBy_restrict`
+(Inertia:154) は G-char 専用で不適 (ζ は HU-char、M-char でない) → 新規。多段 coercion
+(hInHu→HU→M) に注意。
+
+**L2 (M-equivariance of restrictionMultiplicity)**: `restrictionMultiplicity (conjBy m χ) (conjBy m θ)
+= restrictionMultiplicity χ θ` = inner(Res(conjBy m χ))(conjBy m θ) =[L1] inner(conjBy m (Res χ))(conjBy m θ)
+=[inner_conjBy_conjBy, Inertia:173] inner(Res χ)(θ)。
+
+**L3 (構造 reduction、hIM core)**: `(∃m∈M, conjBy m θ₀ ∉ HU-orbit(θ₀)) ∧ ζ LiesOver θ₀ → hIM`。
+conjBy m ζ=ζ 仮定 → [L2] ζ LiesOver conjBy m θ₀ → [restrictionConstituentsSingleOrbit_of_isIrreducible
+ζ + exists_conj] conjBy m θ₀ ∈ HU-orbit(θ₀) 矛盾 → m∉inertia(ζ) → inertia≠⊤。
+(ζ LiesOver θ₀ は exists_constituent_not_subset_characterKernel から、ζ∈xiSet ゆえ)。
+
+**L4 (∉ U-orbit、最深 gap)**: conjBy m θ₀ ∉ HU-orbit(θ₀) を θ̄^{w₀}∉U-orbit(θ̄) から。
+**θ̄ non-constant factor-data + U が factor 内で作用 (S₀ U-inv → 各 act.φ w•S₀ U-保存) +
+W1 が q factor を q-cycle 置換** → θ̄^{w₀}(置換) ≠ θ̄^u(factor 内 twist) ∀u。
+`exists_regular_char_not_fixed` (S11:2314, θ̄^{τ}≠θ̄ のみ) を ∉ U-orbit に**強化要** (per-factor
+support 比較、全 u∈U)。free-W1-orbit の真の content。
+
+**L5 (W1 realization)**: w₀∈act.E → 実 W1≤M elt m。conjBy m と act.φ w₀ の対応。
+
+construction (assembly まで) 完成・full build green。残 = L1-L5 (deep §9 free-orbit、複数 iteration)。
