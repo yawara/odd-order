@@ -2158,6 +2158,22 @@ theorem exists_ne_one_hom_of_prime_card {K : Type*} [CommGroup K] [Finite K]
     CommGroup.exists_apply_ne_one_of_hasEnoughRootsOfUnity (G := K) (M := ℂ) ha
   exact ⟨ψ, fun h => hψa (by rw [h]; rfl)⟩
 
+/-- **`noncommPiCoprod` is bijective from a cardinality count.**  A spanning commuting family of
+subgroups whose cardinalities multiply to `|K|` realises `K` as their internal direct product: the
+product map `(∀ i, S i) →* K` is surjective (spanning) and its domain has the same cardinality
+(`Nat.card_pi`), hence bijective.  The elementary count behind the `(9.7)` decomposition
+`H̄ = ⊕_{w} H1^w` (`q` order-`p` `W1`-conjugates spanning order-`p^q`), bypassing character Clifford
+theory. -/
+theorem noncommPiCoprod_bijective_of_card {K : Type*} [Group K] [Finite K] {ι : Type*} [Fintype ι]
+    {S : ι → Subgroup K}
+    (hcomm : Pairwise fun i j : ι => ∀ x y : K, x ∈ S i → y ∈ S j → Commute x y)
+    (hspan : ⨆ i, S i = ⊤)
+    (hcard : ∏ i, Nat.card ↥(S i) = Nat.card K) :
+    Function.Bijective (Subgroup.noncommPiCoprod hcomm) := by
+  rw [Nat.bijective_iff_surjective_and_card]
+  refine ⟨MonoidHom.range_eq_top.mp (by rw [Subgroup.noncommPiCoprod_range]; exact hspan), ?_⟩
+  rw [Nat.card_pi]; exact hcard
+
 /-- **A permutation-invariant function on a transitive orbit is constant.**  If `σ` acts
 transitively (`∀ i j, ∃ k, σ^k i = j`) and `f` is `σ`-invariant (`f (σ i) = f i`), then `f` is
 constant.  Contrapositive: a non-constant `f` is not `σ`-invariant — the combinatorial core of the
