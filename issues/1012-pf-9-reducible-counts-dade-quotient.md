@@ -583,3 +583,54 @@ sorry-free (上流 §6 obligation cite は可)。**還元 count 部分は完了*
 - `caseB_degree_qu` (9.9.a, 完成): S11_MaximalII_III_IV.lean、commit ab2b1557 系。
 - 原典: Pf (9.8)/(9.9)/(9.10) = `references/peterfalvi/04.11_*`; (4.5)/(4.7) = `04.6_*`。
 - 関連: issue 2030 (count-statement audit)、notes/peterfalvi/s10_13_maximal_structure.md §12。
+
+
+## 進捗 2026-06-30 (caseA inertia core 実証明完了)
+
+**caseA degree の inertia 核を完全形式化** (当初「research impasse」と誤判定 → Coq-first `def_Itheta`
+で routine reconstruction と判明 → 完遂)。7 commits:
+1. `injective_of_prime_card_of_ne_one` — prime-order group の nontrivial char は injective。
+2. `mulAut_eq_one_of_fixes_ne_one_hom` — それを固定する auto は id。
+3. `mulAut_eq_one_of_fixes_irr_ne_trivial_of_prime_card` — per-factor stabilizer (IrreducibleCharacter
+   framework、LinearCharacter.lean の `exists_linearIrreducibleCharacter_eq_of_isMulCommutative` bridge)。
+4. `mulAut_eq_one_of_eq_id_on_iSup` — piece D: spanning family 上 trivial な auto は id。
+5. `mulAut_eq_one_of_fixes_regular_on_prime_span` — **assembly**: regular char を固定する auto on
+   prime-span は id (pieces C+D+bridge を element-wise per-factor で合成)。
+6. **de-opacify CliffordCaseAData**: `Hpart_iSup` (spanning) + `Hpart_aInvariant` (U-invariance) 露出、
+   producer `clifford_caseA_data` で証明 (spanning は exists_supIndep choose_spec を Fin q reindex)。
+7. **`chiefFactor_caseA_char_inertia`** = caseB core の analog。regular θ (各 order-p Hpart 上 nontrivial)
+   を固定する φ_U(g) は =1。assembly を de-opacified 構造で instantiate。axiom-clean、full build green
+   (3889 jobs)。
+
+**残 (caseA conjunct b degree への接続)**:
+- **(9.8.b) regular**: reducible χ ⟹ 構成 θ̄ が各 Hpart summand 上 nontrivial (= regular)。これが
+  `chiefFactor_caseA_char_inertia` の `hreg` を供給。Clifford 還元 (reducible ⟺ regular) の content。
+- **plumbing 配線**: caseA core を既存の parametrized inertia plumbing (`inertia_eq_hcInHu_of_inf_le` /
+  `caseB_inertia_realized_of_charInertia` / `caseB_char_inertia_inflation_of_core` — core を引数に取る)
+  に通して caseA inertia=HC → degree u → `caseA_character_counts` conjunct b。
+
+
+## caseA degree (conjunct b) wiring plan — Coq PFsection9 併読 (2026-06-30)
+
+Coq `typeP_nonGalois_characters` (L845, = Pf (9.8)) の核心構造 `isIndHC` (L840):
+```
+isIndHC zeta := [/\ zeta 1 = (q*u), zeta ∈ S_ H0C & ∃ xi : CF(HC), xi linear & zeta = Ind xi]
+```
+- **(b)** reducibles `mu_j` は全て `isIndHC` を満たす (`{in mu_, isIndHC}`)。
+- **(c)** ∃ irreducible `chi_t`, `isIndHC chi_t`。
+
+⟹ **degree qu の出所** = `mu_j = Ind_{HC}^M(xi)` (xi LINEAR ∈ CF(HC))。linear ⟹ xi(1)=1 ⟹
+`(Ind xi)(1) = [M:HC]·1 = [M:HU]·[HU:HC] = q·u` (q=|W1|=[M:HU], u=[U:C]=[HU:HC])。
+
+**chiefFactor_caseA_char_inertia (proven) の役割**: reducible mu_j に対応する chief-factor char θ̄ が
+**regular** (各 Hpart summand 上 nontrivial) ⟹ inertia I_{HU}(θ̄)=HC (= my core) ⟹ HC-constituent が
+HC 上 linear で induce ⟹ mu_j = Ind_{HC}(linear)。∴ my core は on-path (degree の Ind 構造を license)。
+
+**残ステップ (caseA degree 配線)**:
+1. **reducible ⟹ regular θ̄**: mu_j reducible (prTIred) ⟹ 対応 θ̄ が各 Hpart 上 nontrivial。Coq
+   `Part_a` (L883) / `typeP_reducible_core_Ind` (L1423) / `typeP_reducible_core_cases` (L1439) 参照。
+2. **mu_j = Ind_{HC}(linear)**: 1 + my core (inertia=HC) + Clifford induction。
+3. **degree [M:HC]=qu**: index 算術 ([M:HU]=q=|W1|, [HU:HC]=u)。caseB_degree_qu の
+   `induceHU_apply_one_eq_q_mul` 系が部分再利用可。
+caseB_degree_qu (irreducible, S_ H0C') の構造 (caseB_exists_chiefFactorConstituent → inertia → degree)
+が template。caseA は reducible 版で parallel。

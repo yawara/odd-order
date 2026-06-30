@@ -2106,6 +2106,46 @@ theorem mulAut_eq_one_of_eq_id_on_iSup {H : Type*} [Group H] (α : MulAut H)
   show α x = x
   exact htop.ge (Subgroup.mem_top x)
 
+open OddOrder.RepresentationTheory in
+/-- **Non-Galois (9.8) core, structural form** (Peterfalvi `def_Itheta`): given the chief factor
+`H̄` written as the span of order-`p` `φg`-invariant summands `Hpart i`, and a character `θ` that is
+nontrivial on each summand (regular), any `φg` fixing `θ` is the identity.  `θ` is linear
+(`= χ`), faithful on each order-`p` summand (`injective_of_prime_card_of_ne_one`), so `φg` is the
+identity there (per-factor), hence on the spanning `H̄` (`mulAut_eq_one_of_eq_id_on_iSup`). -/
+theorem mulAut_eq_one_of_fixes_regular_on_prime_span {Hbar : Type*} [Group Hbar] [Finite Hbar]
+    [IsMulCommutative Hbar] (φg : MulAut Hbar) {ι : Type*} (Hpart : ι → Subgroup Hbar)
+    (hp : ∀ i, (Nat.card ↥(Hpart i)).Prime)
+    (hpreserve : ∀ i, ∀ x ∈ Hpart i, φg x ∈ Hpart i)
+    (hspan : ⨆ i, Hpart i = ⊤)
+    (θ : IrreducibleCharacter Hbar)
+    (hreg : ∀ i, ∃ x ∈ Hpart i,
+      (θ : ClassFunction Hbar ℂ) x ≠ (θ : ClassFunction Hbar ℂ) 1)
+    (hfix : ∀ x, (θ : ClassFunction Hbar ℂ) (φg x) = (θ : ClassFunction Hbar ℂ) x) :
+    φg = 1 := by
+  obtain ⟨χ, hχ⟩ := θ.isIrreducible.exists_linearIrreducibleCharacter_eq_of_isMulCommutative
+  have hcoe : ∀ x, (θ : ClassFunction Hbar ℂ) x = (χ x : ℂ) := by
+    intro x; rw [← hχ]; exact linearIrreducibleCharacter_apply χ x
+  refine mulAut_eq_one_of_eq_id_on_iSup φg Hpart hspan (fun i x hx => ?_)
+  set χi : ↥(Hpart i) →* ℂˣ := χ.comp (Hpart i).subtype with hχi
+  have hχine : χi ≠ 1 := by
+    obtain ⟨y, hy, hyne⟩ := hreg i
+    intro h0
+    apply hyne
+    have hχy : χ y = 1 := by
+      have : χi ⟨y, hy⟩ = 1 := by rw [h0]; rfl
+      simpa [hχi, MonoidHom.comp_apply] using this
+    rw [hcoe, hcoe, hχy]
+    simp
+  have hinj : Function.Injective χi := injective_of_prime_card_of_ne_one (hp i) χi hχine
+  have hval : χi ⟨φg x, hpreserve i x hx⟩ = χi ⟨x, hx⟩ := by
+    apply Units.val_injective
+    have hcx : (χi ⟨φg x, hpreserve i x hx⟩ : ℂ) = (θ : ClassFunction Hbar ℂ) (φg x) := by
+      rw [hcoe]; rfl
+    have hcy : (χi ⟨x, hx⟩ : ℂ) = (θ : ClassFunction Hbar ℂ) x := by
+      rw [hcoe]; rfl
+    rw [hcx, hcy, hfix x]
+  exact Subtype.ext_iff.mp (hinj hval)
+
 /-- Case (a) of Peterfalvi (9.7): `H/H_0` splits as a direct product of `q`
 order-`p` factors permuted by `W_1`.
 
@@ -2116,6 +2156,10 @@ structure CliffordCaseAData {M : Subgroup G} {data : TypesIIIIIIVSetup M}
     {chief : ChiefFactorData data} (chars : Section11CharacterData data chief) where
   Hpart : Fin data.q → Subgroup (↥data.H ⧸ chief.N)
   Hpart_order : ∀ i, Nat.card ↥(Hpart i) = chief.p
+  /-- The `q` order-`p` Clifford summands span the chief factor `H̄` (non-opaque (9.7) structure). -/
+  Hpart_iSup : ⨆ i, Hpart i = ⊤
+  /-- Each Clifford summand is `U`-invariant (non-opaque (9.7) structure). -/
+  Hpart_aInvariant : ∀ i, IsAInvariant (uActionHom data chief) (Hpart i)
   W1_transitive_on_parts : Prop
   W1_transitive_on_parts_holds : W1_transitive_on_parts
   a : ℕ
@@ -3961,6 +4005,33 @@ theorem chiefFactor_caseB_char_inertia [Finite G] {M : Subgroup G}
   rw [h1] at hx
   simpa using hx.symm
 
+/-- **Peterfalvi (9.8), case (a) non-Galois core**: the case-(a) analog of
+`chiefFactor_caseB_char_inertia`.  When `U` acts on `H̄ = H/N` with a `U`-invariant order-`p` factor
+(case (a) of (9.7), packaged as `CliffordCaseAData`), a character `θ` that is **regular** (nontrivial
+on each of the `q` order-`p` Clifford summands `Hpart i`) and fixed by `φ_U(g)` forces `φ_U(g) = 1`.
+
+This is the `def_Itheta` computation `I_{HU}(θ̄) = HC` for the *reducible* (= regular) characters in
+case (a): `θ̄` linear and faithful on each order-`p` summand
+(`mulAut_eq_one_of_fixes_regular_on_prime_span`), with the summand data supplied non-opaquely by
+`CliffordCaseAData.Hpart_order`/`Hpart_iSup`/`Hpart_aInvariant`. -/
+theorem chiefFactor_caseA_char_inertia [Finite G] {M : Subgroup G}
+    {data : TypesIIIIIIVSetup M} {chief : ChiefFactorData data}
+    {chars : Section11CharacterData data chief} (caseA : CliffordCaseAData chars)
+    {θ : IrreducibleCharacter (↥data.H ⧸ chief.N)}
+    (hreg : ∀ i, ∃ x ∈ caseA.Hpart i,
+      (θ : ClassFunction (↥data.H ⧸ chief.N) ℂ) x
+        ≠ (θ : ClassFunction (↥data.H ⧸ chief.N) ℂ) 1)
+    (g : ↥(typeP_quotientCoprimeAction data.typeP data.nontrivial.1 chief.N_aInvariant).U)
+    (hinv : ∀ x, (θ : ClassFunction (↥data.H ⧸ chief.N) ℂ) ((uActionHom data chief) g x)
+        = (θ : ClassFunction (↥data.H ⧸ chief.N) ℂ) x) :
+    (uActionHom data chief) g = 1 := by
+  haveI : IsMulCommutative (↥data.H ⧸ chief.N) :=
+    IsMulCommutative.of_comm chief.quotient_elementaryAbelian.comm
+  refine mulAut_eq_one_of_fixes_regular_on_prime_span ((uActionHom data chief) g) caseA.Hpart
+    (fun i => ?_) (fun i x hx => ?_) caseA.Hpart_iSup θ hreg hinv
+  · rw [caseA.Hpart_order i]; exact chief.p_prime
+  · exact (caseA.Hpart_aInvariant i).smul_mem g hx
+
 /-- **Inflation equivariance for the chief-factor action.**  The inflation map
 `compHom (mk' N) : ClassFunction (↥H/N) → ClassFunction ↥H` intertwines the conjugation action
 `typeP_conjAction a` on `↥H` (upstairs) with the descended action `quotientMulAutHom a` on the
@@ -4297,6 +4368,36 @@ theorem inertia_eq_hcInHu [Finite G] {M : Subgroup G} (data : TypesIIIIIIVSetup 
       = hInHu data ⊔ cInHu data chief :=
   inertia_eq_hcInHu_of_inf_le data chief (inertia_inf_uInHu_le_cInHu data chief hcaseB hθbar)
 
+/-- **Inertia lift `I_{HU}(θ₀) = HC` in Clifford case (a)** — the non-Galois analog of
+`inertia_eq_hcInHu`.  For a **regular** chief-factor character `θ̄` (nontrivial on each order-`p`
+Clifford summand `Hpart i`), the inertia of its inflation `θ₀` in `HU` is `HC`.  Feeds the proven
+case-(a) core `chiefFactor_caseA_char_inertia` through the same case-agnostic plumbing
+(`caseB_char_inertia_inflation_of_core` → `caseB_inertia_realized_of_charInertia` →
+`inertia_inf_uInHu_le_cInHu_of_realized` → `inertia_eq_hcInHu_of_inf_le`) that case (b) uses with
+`chiefFactor_caseB_char_inertia`.  This is the (9.8.b)/(9.8.c) degree input for the reducible
+(= regular) characters. -/
+theorem inertia_eq_hcInHu_caseA [Finite G] {M : Subgroup G} (data : TypesIIIIIIVSetup M)
+    (chief : ChiefFactorData data) {chars : Section11CharacterData data chief}
+    (caseA : CliffordCaseAData chars)
+    {θbar : IrreducibleCharacter (↥data.H ⧸ chief.N)}
+    (hreg : ∀ i, ∃ x ∈ caseA.Hpart i,
+      (θbar : ClassFunction (↥data.H ⧸ chief.N) ℂ) x
+        ≠ (θbar : ClassFunction (↥data.H ⧸ chief.N) ℂ) 1) :
+    ClassFunction.inertia (G := ↥(huSub data)) (H := hInHu data)
+        (ClassFunction.compHom (hInHuEquivH data).toMonoidHom
+          (ClassFunction.compHom (QuotientGroup.mk' chief.N)
+            (θbar : ClassFunction (↥data.H ⧸ chief.N) ℂ)))
+      = hInHu data ⊔ cInHu data chief :=
+  inertia_eq_hcInHu_of_inf_le data chief
+    (inertia_inf_uInHu_le_cInHu_of_realized data chief
+      (fun a g hag hfix =>
+        caseB_inertia_realized_of_charInertia
+          (fun g' hfix' =>
+            caseB_char_inertia_inflation_of_core
+              (fun g'' hinv => chiefFactor_caseA_char_inertia caseA hreg g'' hinv)
+              g' hfix')
+          a g hag hfix))
+
 /-- **Peterfalvi (9.7) case (b) carrier.**  When `U` acts irreducibly on the chief factor
 `H̄ = H/H₀` (Clifford case (b), the left branch of `chiefFactor_clifford_U_dichotomy`), the
 field-model divisibilities of `CliffordCaseBData` hold: with `chars.u = |Ū|` (pinned in
@@ -4365,6 +4466,13 @@ noncomputable def clifford_caseA_data [Finite G] {M : Subgroup G}
   refine
     { Hpart := fun j => act.φ ↑(e.symm j) • S₀
       Hpart_order := fun j => (card_pointwise_smul act.φ _ S₀).trans hS₀card
+      Hpart_iSup := by
+        rw [← hexist.choose_spec.2.2.1]
+        refine le_antisymm (iSup_le fun j => le_iSup₂_of_le _ (e.symm j).2 le_rfl) ?_
+        exact iSup₂_le fun i hi =>
+          le_iSup_of_le (e ⟨i, hi⟩) (le_of_eq (by rw [Equiv.symm_apply_apply]))
+      Hpart_aInvariant := fun j =>
+        isAInvariant_comp_subtype_pointwise_smul hUnorm hS₀inv ↑(e.symm j)
       W1_transitive_on_parts := True
       W1_transitive_on_parts_holds := trivial
       a := Nat.card ↥(aInvariantRestrictAut hS₀inv).range
