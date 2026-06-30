@@ -6004,5 +6004,52 @@ theorem realizedH0_map_hInHuEquivH_eq_N {M : Subgroup G}
   rw [realizedH0_subgroupOf_hInHu_eq_comap]
   exact Subgroup.map_comap_eq_self_of_surjective (hInHuEquivH data).surjective chief.N
 
+/-- **Second isomorphism `HC/H₀C ≅ H̄`**: `(hInHu ⊔ H₀C)/H₀C ≃* ↥H ⧸ N`.  Composes
+`quotientInfEquivProdNormalQuotient hInHu (realized H₀C)` (`HC/H₀C ≅ hInHu/(H₀C∩hInHu)`) with
+`QuotientGroup.congr hInHuEquivH` (`hInHu/realizedH₀ ≅ ↥H ⧸ N`, using
+`realizedH0supC_subgroupOf_hInHu_eq` + `realizedH0_map_hInHuEquivH_eq_N`).  The inflation `θ̄ ∘ this`
+gives the `HC`-linear character `ψ` of the (9.8.c) construction.  Type inferred to avoid the
+`⊔`/`⧸` precedence trap. -/
+noncomputable def hcQuotientEquivHbar [Finite G] {M : Subgroup G}
+    {data : TypesIIIIIIVSetup M} (chief : ChiefFactorData data) :=
+  letI hN := realizedH0supC_normal_huSub chief
+  letI hN' : ((((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf (huSub data)).subgroupOf
+      (hInHu data)).Normal := hN.subgroupOf (hInHu data)
+  letI := chief.N_normal
+  (QuotientGroup.quotientInfEquivProdNormalQuotient (hInHu data)
+      (((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf (huSub data))).symm.trans
+    (QuotientGroup.congr
+      ((((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf (huSub data)).subgroupOf
+        (hInHu data)) chief.N (hInHuEquivH data)
+      (by rw [realizedH0supC_subgroupOf_hInHu_eq]; exact realizedH0_map_hInHuEquivH_eq_N chief))
+
+/-- **Inflation hom `HC → H̄`**: `↥(hInHu ⊔ H₀C) →* (↥H ⧸ N)`, the quotient map `mk'` by `H₀C`
+followed by the second iso `hcQuotientEquivHbar`.  Composing a chief-factor character `θ̄` with this
+gives the `HC`-linear character `ψ` (trivial on `H₀C`, inflation of `θ̄`) of the (9.8.c)
+construction. -/
+noncomputable def hcHom [Finite G] {M : Subgroup G}
+    {data : TypesIIIIIIVSetup M} (chief : ChiefFactorData data) :
+    ↥(hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf (huSub data)) →*
+      (↥data.H ⧸ chief.N) :=
+  letI hN := realizedH0supC_normal_huSub chief
+  letI : ((((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf (huSub data)).subgroupOf
+      (hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf (huSub data))).Normal :=
+    hN.subgroupOf _
+  (hcQuotientEquivHbar chief).toMonoidHom.comp
+    (QuotientGroup.mk' ((((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf (huSub data)).subgroupOf
+      (hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf (huSub data))))
+
+/-- **The `HC`-linear character `ψ`** of the (9.8.c) construction: for a chief-factor character
+`θ : H̄ →* ℂˣ` (the seed's regular character), `ψ = θ ∘ hcHom` is the inflation of `θ` to `HC`,
+a linear (degree-one) irreducible character of `HC = hInHu ⊔ H₀C`, trivial on `H₀C`.  Its inertia in
+`HU` is `HC` (`hInHu ◁ HC ◁ HU`, restriction to `θ₀`); `Ind_{HC}^{HU} ψ` is the degree-`u`
+irreducible of `𝒳(H₀C)`. -/
+noncomputable def hcPsi [Finite G] {M : Subgroup G}
+    {data : TypesIIIIIIVSetup M} (chief : ChiefFactorData data)
+    (θ : (↥data.H ⧸ chief.N) →* ℂˣ) :
+    IrreducibleCharacter
+      ↥(hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf (huSub data)) :=
+  linearIrreducibleCharacter (θ.comp (hcHom chief))
+
 end OddOrder.Peterfalvi.S11
 
