@@ -908,6 +908,42 @@ theorem inner_family_diff (K : Subgroup L) [K.Normal] [Fintype ↥K]
     horth ind1H i (Ne.symm hi_ind), horth ind1H 0 hind0, horth 0 i (Ne.symm hi0)]
   ring
 
+/-- **The inner product `⟨β, ζ_i^ν − d_i ζ_0^ν⟩`** (Peterfalvi (7.8.a), `a_φ` step).  With
+`β = (ζ_{ind1H} − ζ_0)^τ` and the coherence agreement `ζ_i^ν − d_i ζ_0^ν = (ζ_i − d_i ζ_0)^τ`
+(`hagree_i`), the Dade isometry (`hτ : IsDadeIsometry`) turns the `G`-side inner product into the
+`L`-side family inner product `⟨ζ_{ind1H} − ζ_0, ζ_i − d_i ζ_0⟩ = star(d_i) ‖ζ_0‖²`
+(`inner_family_diff`).  No `ρ`-projection is needed — only the two isometries. -/
+theorem inner_beta_nuDiff {G : Type*} [Group G] [Fintype G] {A : Set G} {L : Subgroup G}
+    [Fintype L] [Invertible (Nat.card L : ℂ)] [Invertible (Nat.card G : ℂ)]
+    (H71 : Hypothesis71 G A L)
+    (hτ : OddOrder.Peterfalvi.S04.IsDadeIsometry (G := G) (k := ℂ) (L := L) H71.τ)
+    (K : Subgroup ↥L) [K.Normal] [Fintype ↥K] [Invertible (Nat.card ↥K : ℂ)] {n : ℕ}
+    (θ : Fin (n + 1) → IrreducibleCharacter ↥K)
+    (hinj : Function.Injective (fun i => ClassFunction.induce K (θ i : ClassFunction ↥K ℂ)))
+    (d : Fin (n + 1) → ℂ)
+    (psi_support : ∀ i, (ClassFunction.induce K (θ i : ClassFunction ↥K ℂ)
+        - d i • ClassFunction.induce K (θ 0 : ClassFunction ↥K ℂ)).support ⊆
+      OddOrder.Peterfalvi.S04.supportInSubgroup A L)
+    {ind1H : Fin (n + 1)} (hind0 : ind1H ≠ 0)
+    (diffβ : (ClassFunction.induce K (θ ind1H : ClassFunction ↥K ℂ)
+        - ClassFunction.induce K (θ 0 : ClassFunction ↥K ℂ)).support ⊆
+      OddOrder.Peterfalvi.S04.supportInSubgroup A L)
+    {i : Fin (n + 1)} (hi0 : i ≠ 0) (hi_ind : i ≠ ind1H)
+    (ν : ClassFunction ↥L ℂ →ₗ[ℤ] ClassFunction G ℂ)
+    (hagree_i : ν (ClassFunction.induce K (θ i : ClassFunction ↥K ℂ))
+        - d i • ν (ClassFunction.induce K (θ 0 : ClassFunction ↥K ℂ))
+      = H71.τ ⟨ClassFunction.induce K (θ i : ClassFunction ↥K ℂ)
+          - d i • ClassFunction.induce K (θ 0 : ClassFunction ↥K ℂ), psi_support i⟩) :
+    ClassFunction.inner
+        (H71.τ ⟨ClassFunction.induce K (θ ind1H : ClassFunction ↥K ℂ)
+            - ClassFunction.induce K (θ 0 : ClassFunction ↥K ℂ), diffβ⟩)
+        (ν (ClassFunction.induce K (θ i : ClassFunction ↥K ℂ))
+          - d i • ν (ClassFunction.induce K (θ 0 : ClassFunction ↥K ℂ)))
+      = star (d i) * ClassFunction.inner (ClassFunction.induce K (θ 0 : ClassFunction ↥K ℂ))
+          (ClassFunction.induce K (θ 0 : ClassFunction ↥K ℂ)) := by
+  rw [hagree_i, hτ.inner_eq]
+  exact inner_family_diff K θ hinj d hi0 hi_ind hind0
+
 /-- **The (7.8.c) collapse of the (7.7.a) sum to a single term.**  If, in the `(7.7.a)`
 decomposition `χ^ρ(x) = ∑_{i ≥ 1} (c̄_i/‖ζ_i‖²) ζ_i(x)`, all coefficients `c_i` (`i ≥ 1`) vanish
 except at one index `i₁`, and the distinguished member satisfies `ζ_{i₁}(x) = ‖ζ_{i₁}‖²`
