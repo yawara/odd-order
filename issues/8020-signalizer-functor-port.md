@@ -947,3 +947,27 @@ gate-2 disjunction (`bgTheoremE_cover_data`, S10:581) の **TypeICovering branch
   connector + cover_nonidentity)。disjointness は density_pieces で既済。gate-2 を直接は閉じない (TypeICovering が
   block) が ¬all-type-F branch を埋める。
 - 注: §14 cover MATH (κ→Ẑ + 一般 cover ⊆) は完了済。残りは (A) 1 lemma + (B) plumbing で、sprawling gap ではない。
+
+## 🎯🎯 scoping 確定 (lane d, 2026-06-30 /loop⁴⁴-⁴⁵): **gate-2 真の blocker = Theorem D(4)** (issue 8019 と接続)
+
+§16 を精査し gate-2 全閉の deep blocker を **Theorem D(4)** (`S16:1585` sorry) に確定。issue 8019 (BG Theorem E
+cover/partition) と接続:
+- ✅ **Theorem D(1)** (`msigma_fusion_control`) / **D(2)** (`Msigma_inf_conj_isCyclic`) — issue 8019 で既済。
+- ✅ **Theorem D(3)** (`exists_RData_of_mem_sigmaSharp`, S16:1510) — **sorry-free**。|𝓜_σ(x)|>1 は
+  `RData_of_gt_one` (S16:428)、≤1 は R=⊥ (`centralizer_le_of_maximalSigma_le_one` + singleton)。
+- ❌ **Theorem D(4)** (S16:1561-1585 sorry): `¬C(x)≤M ⟹ ∃R, RData ∧ ∃! N (escaping maximal)` +
+  型構造 (`IsTypeP2 N → IsTypeP M ∧ ¬FittingIsTI M`)。escaping-centralizer signalizer tail、deep。
+- **cover_subset_kernels** (= gate-2 TypeICovering branch、type-F⟹R(x)=1⟹M̃=M_F#) は
+  **type-F ⟹ |𝓜_σ(x)|≤1** に帰着。これは D(4) の `IsTypeP2 N→IsTypeP M` の contrapositive 近傍
+  (type-F M で escaping neighbor が type-P2 なら矛盾) だが D(4) full proof 待ち。Theorem A(8) は M_F≠M_σ
+  しか cover せず type-F (M_F=M_σ) を与えない。
+
+**∴ D-lane gate-2 残 = (A) Theorem D(4) [S16:1585、escaping signalizer tail、deep multi-session] +
+(B) NonTypeICovering plumbing [gate-2 を単独では unblock せず]**。§14 cover math (κ→Ẑ + 一般 cover ⊆) は完了。
+
+**進捗 (B 着手)**: `typeP_Z_inf_Msigma_eq_Kstar` (S14、sorry-free): `Z⊓M_σ=K*` (base member)。
+`typeP_neighbor_Kstar_eq_Z_inf_Msigma` を N=M に特殊化。`Tset=zTilde` connector の base case
+(残: partner の `Z⊓Mstar_σ=K` + family={M,Mstar} で `Tset=Z∖(K∪K*)=zTilde`)。
+
+**⚠ frontier flag**: 真の gate-2 blocker (Theorem D(4)) は BG signalizer functor 最深部・multi-session 大型。
+§14 cover math 完了後、tractable な単一 win は connector/plumbing (gate-2 を単独 unblock せず) のみ。

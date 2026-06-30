@@ -6755,6 +6755,19 @@ theorem typeP_neighbor_Kstar_eq_Z_inf_Msigma [Finite G]
   exact le_centralizerFactor_of_le_sup_of_le_Msigma inf_le_right inf_le_left hKNMσbot
     inf_le_left inf_le_right
 
+/-- **Base member of the type-`P` family**: `Z ⊓ M_σ = K*` for `M` itself.  Specialises
+`typeP_neighbor_Kstar_eq_Z_inf_Msigma` to `N = M`, `K_N = K` (so `K* = M_σ ⊓ C(K)` is the
+canonical `σ(M)`-part of `Z = K ⊔ K*`).  This is the base case of the `T = Ẑ` identification:
+the exceptional set `T = Z ∖ ⋃_{N} (Z ⊓ N_σ)` removes `K*` (from `N = M`) and `K` (from the
+partner), collapsing to `zTilde K K* = Z ∖ (K ∪ K*)`. -/
+theorem typeP_Z_inf_Msigma_eq_Kstar [Finite G] {M K Kstar : Subgroup G} (hKM : K ≤ M)
+    (hK : Ch03.IsHallSubgroup (kappa M) (K.subgroupOf M))
+    (hKstar : Kstar = OddOrder.BG.Ch3.S10.Msigma M ⊓ Subgroup.centralizer (K : Set G)) :
+    (K ⊔ Kstar) ⊓ OddOrder.BG.Ch3.S10.Msigma M = Kstar := by
+  have h := typeP_neighbor_Kstar_eq_Z_inf_Msigma (N := M) (KN := K) (K := K) (Kstar := Kstar)
+    hKM hK (by rw [hKstar])
+  rw [← h, ← hKstar]
+
 /-- **BG 14.7, per-neighbour swap package** (mmd L3997-4009): for a type-`P` maximal `M` with Hall
 data `K`, `K*`, a line `X ∈ ℰ_p¹(K)` (`C_{M_σ}(X) ≠ 1`) and a maximal `N ⊇ N_G(X)`, there is a
 Hall `κ(N)`-subgroup `K_N` of `N` realising the swap: `Z = K ⊔ K* = K_N ⊔ K_N*` with the canonical
