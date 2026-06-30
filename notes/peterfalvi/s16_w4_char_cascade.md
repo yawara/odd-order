@@ -440,3 +440,26 @@ Q-term = raw bound (`normCascade_upper_loosen` で displayed へ、u,v>0 は nor
 **残 §16 sorry** (normCascadeData は閉じた): `exists_MHypothesis` (全 carrier 供給、最大)、`eta_generic_data`
 (§3 Dade)、`betaM_expansion`、`orthogonality_switch` (14.14、最深)、v formulas、CaseBContradictionData。
 次 = exists_MHypothesis の carrier 供給 (deep §13-14) or orthogonality_switch。[[feedback-no-avoiding-hard-parts]]
+
+### cont.¹⁰ (2026-06-30 lane c=γ /loop): main_size_bounds reduction + solo frontier 枯渇の確定
+
+§16 char 義務 solo 続行 (ユーザー裁可) で 1 reduction 着地: `main_size_bounds_structural` (14.11.1)
+の quotient bound `(k−1)/e ≥ (v−1)/p` を第1連言 `k>2pv` から純算術で genuine 化 (commit `fd9a55b8`)。
+obligation = `k>2pv` のみ (構造 residual)。
+
+**solo tractable frontier 枯渇の確定** (残 §16 sorry を網羅調査):
+- `main_size_bounds_structural`: `k>2pv` のみ残 (deep、cyclotomic v-value + M order gated)。
+- `T_side_caseB_facts` (136、v-formula `v=(q^p−1)/(q−1)`): S-side dual `caseB_order_u` も sorry、§13
+  cyclotomic 構築要。
+- `T_typeII` (1564、14.9): char argument (type-III ⟹ `(v−1)/p≤(u−1)/q`、§5/§11/§13 inner-product)
+  は **cite 可能 lemma なし** ((14.8) `key_ratio_inequality_of_caseB_data` は在庫だが片側のみ)。
+- `eta_generic_data` (2345): §3 Dade η-grid 整数性。
+- `U_cyclic_and_Q_elemAbelian` (3438)/`V_cyclic` (3518): §9/§11 char (docstring 明記)。
+- `CaseBContradictionData` (4360): §14.16 L-side β decomp + orthogonality。
+- `exists_MHypothesis` (4426/4502): 全 carrier 供給 = type-I M 完全構成 (最深)。
+
+⟹ **残 §16 は全て non-citable な deep §13/§14/§9/§11 partner char theory を一から構築要**で、lane a
+(§9-13 char core)・lane b (§12 Dade) と深く重複。lane c の group-theory/arithmetic shaped 生産 frontier
+(§8 counting + main_size_bounds 等) は枯渇。これ以上の solo は (a) 同 sorry 再調査 (空転) or (b) §13 char
+を lane a と重複構築。**hub/ユーザー判断要** (lane a/b char 成熟を待って cite [[feedback-cite-sorried-lemmas-if-signature-correct]]、
+lane c 再配分、or §13 char solo 構築の是非)。[[feedback-flag-poor-progress]] [[cross-lane-sync-via-notes]]
