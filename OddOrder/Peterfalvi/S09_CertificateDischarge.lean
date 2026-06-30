@@ -669,24 +669,24 @@ distinct induced characters, the degree ratios are `d_i = ζ_i(1)/ζ_0(1)`, and 
 discharged by `chiRho_decomp_induced` (its `hinj`/`hcover` from the enumeration, the geometric
 `A = H^#` inputs from `Subgroup.mem_subgroupOf` + normality of `H`).  This realizes the issue-1013
 goal: `Hypothesis76` (hence the `(7.7.a)` content) is constructible from coherence/`(7.1)` data alone. -/
-noncomputable def hypothesis76OfDade
+noncomputable def hypothesis76OfFamily
     {G : Type*} [Group G] [Fintype G] {A : Set G} {L : Subgroup G}
     [Fintype L] [Invertible (Nat.card L : ℂ)] [Invertible (Nat.card G : ℂ)]
     (H71 : Hypothesis71 G A L)
     (hτ : OddOrder.Peterfalvi.S04.IsDadeIsometry (G := G) (k := ℂ) (L := L) H71.τ)
     (H : Subgroup G) (hHL : H ≤ L)
     (hHnorm : ∀ (l : ↥L) {h : G}, h ∈ H → (l : G) * h * (l : G)⁻¹ ∈ H)
-    (hAH : A = (H : Set G) \ {1}) :
+    (hAH : A = (H : Set G) \ {1})
+    [Fintype ↥(H.subgroupOf L)] [Invertible (Nat.card ↥(H.subgroupOf L) : ℂ)] {n : ℕ}
+    (θ : Fin (n + 1) → IrreducibleCharacter ↥(H.subgroupOf L))
+    (hinj : Function.Injective
+      (fun i => ClassFunction.induce (H.subgroupOf L) (θ i : ClassFunction _ ℂ)))
+    (hcover : ∀ φ : IrreducibleCharacter ↥(H.subgroupOf L),
+      ClassFunction.induce (H.subgroupOf L) (φ : ClassFunction _ ℂ) ∈
+        Set.range (fun i => ClassFunction.induce (H.subgroupOf L) (θ i : ClassFunction _ ℂ))) :
     Hypothesis76 G A L := by
   classical
   haveI hKnorm : (H.subgroupOf L).Normal := subgroupOf_normal_of_conj hHnorm
-  haveI : Invertible (Nat.card ↥(H.subgroupOf L) : ℂ) :=
-    invertibleOfNonzero (by exact_mod_cast Nat.card_pos.ne')
-  let F := distinctInducedFamily (H.subgroupOf L)
-  set n := F.n with hn
-  set θ := F.θ with hθdef
-  have hinj := F.inj
-  have hcover := F.cover
   -- The induced family `ζ` and degree ratios `d`.
   set ζ : Fin (n + 1) → ClassFunction ↥L ℂ :=
     fun i => ClassFunction.induce (H.subgroupOf L) (θ i : ClassFunction _ ℂ) with hζ
@@ -756,6 +756,25 @@ noncomputable def hypothesis76OfDade
         intro χ x hx
         exact chiRho_decomp_induced H71 (H.subgroupOf L) θ d hpsupp hinj hcover hdeg hAconj
           hAK_off hA_one χ hx }
+
+/-- **Construction of `Hypothesis76` from `(7.1)` data** (Peterfalvi (7.6)/(7.7.a)).  The induced
+family is the canonical `distinctInducedFamily` enumeration; this is `hypothesis76OfFamily`
+specialised to that family.  See `hypothesis76OfFamily` for the construction details. -/
+noncomputable def hypothesis76OfDade
+    {G : Type*} [Group G] [Fintype G] {A : Set G} {L : Subgroup G}
+    [Fintype L] [Invertible (Nat.card L : ℂ)] [Invertible (Nat.card G : ℂ)]
+    (H71 : Hypothesis71 G A L)
+    (hτ : OddOrder.Peterfalvi.S04.IsDadeIsometry (G := G) (k := ℂ) (L := L) H71.τ)
+    (H : Subgroup G) (hHL : H ≤ L)
+    (hHnorm : ∀ (l : ↥L) {h : G}, h ∈ H → (l : G) * h * (l : G)⁻¹ ∈ H)
+    (hAH : A = (H : Set G) \ {1}) :
+    Hypothesis76 G A L := by
+  classical
+  haveI hKnorm : (H.subgroupOf L).Normal := subgroupOf_normal_of_conj hHnorm
+  haveI : Invertible (Nat.card ↥(H.subgroupOf L) : ℂ) :=
+    invertibleOfNonzero (by exact_mod_cast Nat.card_pos.ne')
+  exact hypothesis76OfFamily H71 hτ H hHL hHnorm hAH (distinctInducedFamily (H.subgroupOf L)).θ
+    (distinctInducedFamily (H.subgroupOf L)).inj (distinctInducedFamily (H.subgroupOf L)).cover
 
 /-! ### (7.8.c) building blocks: the induced principal character on `A`
 
