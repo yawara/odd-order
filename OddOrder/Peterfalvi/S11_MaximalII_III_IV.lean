@@ -5949,5 +5949,20 @@ noncomputable def coherent_H0C_commutator [Fintype G]
     OddOrder.Peterfalvi.S07.IsCoherent chars.tau chars.S chars.H0CprimeSupport :=
   CoherenceWiring.cohereOfSibleyTarget (sibleyTarget_H0C chars)
 
+/-! ### (9.8.c) irreducible-character construction
+
+The construction of the degree-`qu` irreducible character of `𝒮(H₀C)` for Clifford case (a)
+(conjunct c of `caseA_character_counts`).  Built here at the end of the file so the `H₀C` machinery
+(`chiefFactor_H0supC_subgroupOf_normal` etc.) is in scope; `caseA_character_counts` is relocated
+after it. -/
+
+/-- **realized `H₀C ◁ HU`** (in `huSub`): restricts `chiefFactor_H0supC_subgroupOf_normal`
+(`(H₀C).subgroupOf M ◁ ↥M`) along `huSub ≤ ↥M`.  The `N ◁ G` hypothesis of the second isomorphism
+`HC/H₀C ≅ H̄` in the (9.8.c) character construction. -/
+theorem realizedH0supC_normal_huSub [Finite G] {M : Subgroup G}
+    {data : TypesIIIIIIVSetup M} (chief : ChiefFactorData data) :
+    (((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf (huSub data)).Normal :=
+  (chiefFactor_H0supC_subgroupOf_normal chief).subgroupOf (huSub data)
+
 end OddOrder.Peterfalvi.S11
 
