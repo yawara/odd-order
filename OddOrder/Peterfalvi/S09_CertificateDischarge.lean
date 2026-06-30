@@ -139,6 +139,19 @@ theorem inner_self_eq_zero [Invertible (Nat.card L : ℂ)] {η : ClassFunction L
   ext g
   simpa using Complex.normSq_eq_zero.mp (hzero g)
 
+/-- **The inner product only sees the second factor on the support of the first.**  If `ψ` and `ψ'`
+agree wherever `α` is nonzero, then `⟨α, ψ⟩ = ⟨α, ψ'⟩`.  Used in (7.8.a)/(7.8.c) where a class
+function supported on `A` is paired against `(1_G)^ρ`, which equals `1_L` on `A`. -/
+theorem inner_eq_of_eqOn_support [Invertible (Nat.card L : ℂ)] {α ψ ψ' : ClassFunction L ℂ}
+    (h : ∀ g : L, α g ≠ 0 → ψ g = ψ' g) :
+    ClassFunction.inner α ψ = ClassFunction.inner α ψ' := by
+  rw [ClassFunction.inner_eq_inv_card_mul_innerSum, ClassFunction.inner_eq_inv_card_mul_innerSum,
+    ClassFunction.innerSum, ClassFunction.innerSum]
+  refine congrArg _ (Finset.sum_congr rfl fun g _ => ?_)
+  by_cases hg : α g = 0
+  · rw [hg, zero_mul, zero_mul]
+  · rw [h g hg]
+
 /-- **Peterfalvi (7.7.a), the uniqueness principle.**  If `η` lies in the `ℂ`-span of a set `S` of
 class functions and is orthogonal to every member of `S`, then `η = 0`.  This is the
 non-degeneracy of the inner product on a spanned subspace: the linear functional `⟨·, η⟩` vanishes
@@ -797,6 +810,23 @@ theorem inner_induce_constOne_eq_zero (K : Subgroup L) [Fintype ↥K]
         = (trivialIrreducibleCharacter ↥K : ClassFunction ↥K ℂ) from by
       ext h; rw [ClassFunction.restrict_apply]; rfl,
     irreducibleCharacter_inner_eq_ite, if_neg hθ]
+
+/-- **The Dade image of a supported class function is orthogonal to `1_G` iff the source is to
+`1_L`** (Peterfalvi (7.8.a), the `(2.7)`-for-`1_G` instance).  For `α ∈ CF(L,A)`,
+`⟨α^τ, 1_G⟩_G = ⟨α, 1_L⟩_L`: by the adjoint formula `chiRho_adjoint` `⟨α^τ, 1_G⟩ = ⟨α, (1_G)^ρ⟩`,
+and `(1_G)^ρ = 1` on `A` (`chiRho_constOne`) where `α` is supported (`inner_eq_of_eqOn_support`). -/
+theorem inner_tau_supported_constOne {G : Type*} [Group G] [Fintype G] {A : Set G} {L : Subgroup G}
+    [Fintype L] [Invertible (Nat.card L : ℂ)] [Invertible (Nat.card G : ℂ)]
+    (H71 : Hypothesis71 G A L)
+    (α : OddOrder.Peterfalvi.S04.SupportedClassFunctions (G := G) ℂ A L) :
+    ClassFunction.inner (H71.τ α) (Hypothesis71.constOne G)
+      = ClassFunction.inner (α : ClassFunction L ℂ) (Hypothesis71.constOne L) := by
+  rw [H71.chiRho_adjoint]
+  refine inner_eq_of_eqOn_support fun g hg => ?_
+  have hgA : (g : G) ∈ A := by
+    have h := (ClassFunction.mem_supportedSubmodule.mp α.2) (ClassFunction.mem_support.mpr hg)
+    rwa [OddOrder.Peterfalvi.S04.mem_supportInSubgroup] at h
+  rw [H71.chiRhoCF_apply, H71.chiRho_constOne, if_pos hgA, Hypothesis71.constOne_apply]
 
 /-- **The (7.8.c) collapse of the (7.7.a) sum to a single term.**  If, in the `(7.7.a)`
 decomposition `χ^ρ(x) = ∑_{i ≥ 1} (c̄_i/‖ζ_i‖²) ζ_i(x)`, all coefficients `c_i` (`i ≥ 1`) vanish
