@@ -472,6 +472,18 @@ membership half は ✅ (`reducible_mem_sOf_H0C hG chars`、case-agnostic 済)�
 ゆえ caseB_degree_qu の「χ=Ind_HC(linear)⟹degree u」機構は **reducibles にも直接転用不可**。
 ⟹ caseA reducible degree は **CliffordCaseAData.Hpart 直積構造経由の inertia 解析が必須**
 (Coq Part_a の non-Galois 版)。= 真の deep piece、case-agnostic 経路は全て排除済。
+
+**✅ crux 精密 localize 完了 (2026-06-30)**: caseA conjunct b degree の唯一の欠落 piece =
+**`inertia θ₀ = HC for reducible-inducing χ`**。`caseB_degree_qu` の構成要素を分解すると、
+**case-agnostic で既存**: constituent 存在+linearity (`caseB_exists_chiefFactorConstituent` の
+step 1/2/4)、degree extraction `apply_one_eq_index_of_liesOver_linear_inertia` (χ over θ₀ (inertia I,
+linear) + ψ (linear) ⟹ χ(1)=[HU:I])、index `[HU:HC]=u` (`index_hcInHu_eq_relindex_cInHu` +
+`index_cInHu_subgroupOf_uInHu_eq_u`)。**caseB-specific は `inertia_eq_hcInHu` のみ** (S11:4115、
+`≤` 方向の `inertia_inf_uInHu_le_cInHu` が U-既約 `hcaseB` を使用 = U-elt が θ₀ 固定⟹H̄ 中心化)。
+caseA (non-Galois) では一般 χ で inertia≠HC だが、**reducible χ (M-invariant) は W₁ が Hpart factors を
+transitive permute ゆえ全 factor 対称 ⟹ inertia=HC** が成り立つはず (要 Hpart-inertia 証明、Coq
+PFsection9 `Part_a` L883-940 の reducible 部分)。⟹ build = `caseA_inertia_eq_hc_for_reducible`
+(Hpart 解析) → 残は case-agnostic machinery を caseB と同形に組むだけ。**well-delimited な deep piece**。
 **注 (FT spine)**: (10.7) typeII_derived_frobenius が要するのは (9.8.b)+(9.9.b)+(9.10)。(9.9.b) は
 caseB conjunct 3 込み完了、(9.8.b) は count 完了 + **degree (caseA conjunct b) が残**。⟹ FT-spine-critical
 残 §9 = **caseA conjunct b degree** + **(9.10)** のみ (caseA c/d・caseB 9.9.c は (10.7) 非依存の可能性大)。
