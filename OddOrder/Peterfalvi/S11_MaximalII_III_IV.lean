@@ -2585,6 +2585,34 @@ theorem chiefFactor_H0supC_inf_H_eq_H0 {M : Subgroup G}
     rwa [typeP_H_inf_U data.typeP, Subgroup.mem_bot] at hmem
   simpa [hc1] using hh₀
 
+/-- **`H ⊓ H₀C = H₀` inside `HU`** (realized form): `hInHu ⊓ (H₀C).subgroupOf = (H₀).subgroupOf`.
+Realization of `chiefFactor_H0supC_inf_H_eq_H0` (`(H₀⊔C) ⊓ H = H₀`).  The `H ∩ H₀C = H₀` input of the
+second isomorphism `HC/H₀C ≅ H̄` (`HC = H·H₀C`, so `HC/H₀C ≅ H/(H∩H₀C) = H/H₀ = H̄`) behind the
+(9.8.c) irreducible-character construction. -/
+theorem hInHu_inf_realizedH0supC_eq_realizedH0 {M : Subgroup G}
+    {data : TypesIIIIIIVSetup M} (chief : ChiefFactorData data) :
+    hInHu data ⊓ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf (huSub data)
+      = (chief.H0.subgroupOf M).subgroupOf (huSub data) := by
+  apply le_antisymm
+  · intro x hx
+    obtain ⟨hxH, hxHC⟩ := Subgroup.mem_inf.mp hx
+    have hxH' : x ∈ (data.H.subgroupOf M).subgroupOf (huSub data) := hxH
+    have memH : ((x : ↥M) : G) ∈ data.H :=
+      Subgroup.mem_subgroupOf.mp (Subgroup.mem_subgroupOf.mp hxH')
+    have memHC : ((x : ↥M) : G) ∈ chief.H0 ⊔ cSub data chief :=
+      Subgroup.mem_subgroupOf.mp (Subgroup.mem_subgroupOf.mp hxHC)
+    have memH0 : ((x : ↥M) : G) ∈ chief.H0 := by
+      have hmem : ((x : ↥M) : G) ∈ (chief.H0 ⊔ cSub data chief) ⊓ data.H := ⟨memHC, memH⟩
+      rwa [chiefFactor_H0supC_inf_H_eq_H0] at hmem
+    exact Subgroup.mem_subgroupOf.mpr (Subgroup.mem_subgroupOf.mpr memH0)
+  · intro x hx
+    have memH0 : ((x : ↥M) : G) ∈ chief.H0 :=
+      Subgroup.mem_subgroupOf.mp (Subgroup.mem_subgroupOf.mp hx)
+    refine Subgroup.mem_inf.mpr ⟨?_, ?_⟩
+    · exact Subgroup.mem_subgroupOf.mpr (Subgroup.mem_subgroupOf.mpr (chief.H0_lt_H.le memH0))
+    · exact Subgroup.mem_subgroupOf.mpr (Subgroup.mem_subgroupOf.mpr
+        ((le_sup_left : chief.H0 ≤ chief.H0 ⊔ cSub data chief) memH0))
+
 /-- **`H₀C ≤ M' = HU`**: `H₀ ≤ H ≤ M'` (`typeP.H_le`) and `C ≤ U ≤ M'` (`typeP.U_le`).  The second
 input (`K ≤ HU`) of the generic reducible-count hypothesis (Coq `PFsection9` `nb_redM`) for the
 quotient `M/H₀C`; combined with `chiefFactor_H0supC_inf_H_eq_H0` and `H₀C ◁ M` it makes the §9↔§6
