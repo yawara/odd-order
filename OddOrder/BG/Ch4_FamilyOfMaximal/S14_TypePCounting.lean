@@ -6768,6 +6768,20 @@ theorem typeP_Z_inf_Msigma_eq_Kstar [Finite G] {M K Kstar : Subgroup G} (hKM : K
     hKM hK (by rw [hKstar])
   rw [← h, ← hKstar]
 
+/-- **BG 14.7 partner-side connector** (mmd L4001, dual of `typeP_Z_inf_Msigma_eq_Kstar`): for the
+partner maximal `M*` whose `κ(M*)`-Hall is `K*` and whose canonical factor is `K = (M*)_σ ⊓ C(K*)`,
+the swap `Z = K ⊔ K*` meets `(M*)_σ` in `K` (the roles of `K`/`K*` swap between `M` and `M*`).
+Immediate from `typeP_Z_inf_Msigma_eq_Kstar` applied to `M*` with `K := K*`, `K* := K`.  Together
+with the base connector this gives the two intersection facts `Z ⊓ M_σ = K*`, `Z ⊓ (M*)_σ = K` that
+identify the density-pieces `Tset = Z ∖ (K ∪ K*) = zTilde K K*` for the `NonTypeICovering` cover. -/
+theorem typeP_Z_inf_Mstarsigma_eq_K [Finite G] {Mstar K Kstar : Subgroup G}
+    (hKstarMstar : Kstar ≤ Mstar)
+    (hKstarHall : Ch03.IsHallSubgroup (kappa Mstar) (Kstar.subgroupOf Mstar))
+    (hK : K = OddOrder.BG.Ch3.S10.Msigma Mstar ⊓ Subgroup.centralizer (Kstar : Set G)) :
+    (K ⊔ Kstar) ⊓ OddOrder.BG.Ch3.S10.Msigma Mstar = K := by
+  rw [sup_comm]
+  exact typeP_Z_inf_Msigma_eq_Kstar hKstarMstar hKstarHall hK
+
 /-- **BG 14.7, per-neighbour swap package** (mmd L3997-4009): for a type-`P` maximal `M` with Hall
 data `K`, `K*`, a line `X ∈ ℰ_p¹(K)` (`C_{M_σ}(X) ≠ 1`) and a maximal `N ⊇ N_G(X)`, there is a
 Hall `κ(N)`-subgroup `K_N` of `N` realising the swap: `Z = K ⊔ K* = K_N ⊔ K_N*` with the canonical
