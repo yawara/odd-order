@@ -2158,6 +2158,34 @@ theorem exists_ne_one_hom_of_prime_card {K : Type*} [CommGroup K] [Finite K]
     CommGroup.exists_apply_ne_one_of_hasEnoughRootsOfUnity (G := K) (M := ℂ) ha
   exact ⟨ψ, fun h => hψa (by rw [h]; rfl)⟩
 
+/-- **A nontrivial character avoiding a prescribed precomposition.**  For a prime-order (`≥ 3`)
+target `K'`, an iso `α : K ≃* K'`, and any `A : K →* ℂˣ`, some nontrivial `B : K' →* ℂˣ` has
+`B ∘ α ≠ A`: the character group `K' →* ℂˣ` has `|K'| ≥ 3` elements
+(`card_monoidHom_of_hasEnoughRootsOfUnity`), and only `{1, A ∘ α⁻¹}` are excluded.  Used to make the
+free-`W1`-orbit character non-`W1`-fixed: choosing the `w₀`-conjugate factor-char `B` so its
+`α`-pullback differs from the identity-conjugate char `A`. -/
+theorem exists_ne_one_hom_comp_ne {K K' : Type*} [CommGroup K] [CommGroup K'] [Finite K']
+    (hp : 3 ≤ Nat.card K') (α : K ≃* K') (A : K →* ℂˣ) :
+    ∃ B : K' →* ℂˣ, B ≠ 1 ∧ B.comp α.toMonoidHom ≠ A := by
+  classical
+  haveI : Fintype (K' →* ℂˣ) := Fintype.ofFinite _
+  set C : K' →* ℂˣ := A.comp α.symm.toMonoidHom with hC
+  by_contra hcon
+  push_neg at hcon
+  have hsub : (Finset.univ : Finset (K' →* ℂˣ)) ⊆ {1, C} := by
+    intro B _
+    rcases eq_or_ne B 1 with h | h
+    · simp [h]
+    · have hBC : B = C := by
+        rw [hC, ← hcon B h]; ext x; simp
+      simp [hBC]
+  have hle := Finset.card_le_card hsub
+  rw [Finset.card_univ, Fintype.card_eq_nat_card,
+    CommGroup.card_monoidHom_of_hasEnoughRootsOfUnity K' ℂ] at hle
+  have hle2 : ({1, C} : Finset (K' →* ℂˣ)).card ≤ 2 :=
+    (Finset.card_insert_le _ _).trans (by simp)
+  omega
+
 /-- **`noncommPiCoprod` is bijective from a cardinality count.**  A spanning commuting family of
 subgroups whose cardinalities multiply to `|K|` realises `K` as their internal direct product: the
 product map `(∀ i, S i) →* K` is surjective (spanning) and its domain has the same cardinality
