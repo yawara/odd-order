@@ -268,6 +268,42 @@ injective (distinct χ₂ → distinct `Ind_K̄ (chiRestrict χ₂)`)。`chiRest
 inflate iso (xiOf↔Irr(K̄)) + commute + Set.ncard 全単射 を chain する **~100-150 行の inline glue**。
 loop-fragment 不適 (分割不能・Fintype 管理重) ⟹ **focused session 推奨**。
 
+**✅ 2026-06-30 (commit 9b3b916d): bijection の最後の 2 つの reusable piece landed (全 axiom-clean)**:
+- **`subset_characterKernel_compHom_iff`** (`InflationCharacter.lean`、general): `f:H→*G`, χ̄:ClassFunction G,
+  A≤H で `A⊆ker(compHom f χ̄) ⟺ A.map f⊆ker χ̄`。= **`H⊄ker χ ⟺ H̄⊄ker χ̄` transport** (§9 `hInHu⊄ker`↔§6 `H̄⊄ker`)。
+  proof = `simp[Set.subset_def,SetLike.mem_coe,Subgroup.mem_map,mem_characterKernel,characterDegree_def,compHom_apply,map_one]` + 両向き。
+- **`Hypothesis.induce_injective_on_reducible`** (`S06_CertainTypeClifford.lean`): `induce_chiRestrict_injective` の
+  一般形 — reducible-inducing **全** χ∈Irr(K) で `induce χ=induce χ' → χ=χ'` (各 χ は column `chiRestrict χ₂`、
+  `induce_not_isIrreducible_iff`+`induce_chiRestrict_injective`)。= bijection **InjOn** が要する形。
+
+**📋 残 bijection の完全実行レシピ (2026-06-30 確定、focused session 用)**: target `caseB_character_counts`
+S11:4549 sorry。全 transport 補題が repo 実在ゆえ機械的に組める:
+- **set-up**: `N:=chief.H0.subgroupOf M`、`[N.Normal]` = `chiefFactor_H0_subgroupOf_normal chief` (haveI)。
+  `hodd:Odd(card G)` (hG から)。`hHall:Coprime(card↥(derivedInG M))(card↥W1)` = `data.nontrivial.1`
+  (=`hU:U≠⊥`) + S11:404-410 の derivation (`derived_complement.card_mul`+`typeP_coprime_{H,U}_W1`)。
+  `h:=chiefFactorQuotientHypothesis chief hodd hHall`。`q:=mk' N`。`KbarM:=(huSub data).map q`。
+  `hKeq:h.K=KbarM` = `chiefFactorQuotientHypothesis_K_eq`。`letI Fintype ↥M` + Invertible 群を 1 つの scope に。
+- **Φ** (§6→§9): `χ̄:Irr(KbarM) ↦ induceHU data (compHom (q.subgroupMap (huSub data)) χ̄)`。
+- **commute**: `induce_compHom_subgroupMap_mk' N (chiefFactor_H0_le_huSub data chief) χ̄`
+  ⟹ `induceHU(compHom(q.subgroupMap huSub)χ̄)=compHom q (induce KbarM χ̄)` (inline、両辺同一 Fintype↥M)。
+- **B' set** (§6 columns): `{χ̄:Irr(KbarM)|¬irr(induce KbarM χ̄)∧¬(H̄⊆ker χ̄)}`、H̄=`hInHu.map(q.subgroupMap huSub)`。
+- **image 等式** `{φ∈sOf chief.H0|¬irr}=Φ''B'`: 
+  - 順 (φ∈§9→Φ''B'): φ=induceHU χ, χ∈xiOf chief.H0 (H₀⊆ker χ ∵ ker(q.subgroupMap huSub)=`(N).subgroupOf huSub`)。
+    `exists_compHom_eq_of_subset_characterKernel` (S11:4382 が同型 pattern) で χ=compHom(q.subgroupMap huSub)χ̄。
+    χ̄∈B': ¬irr ← commute+`isIrreducibleCharacter_compHom_mk'_iff`; H̄⊄ker ← `subset_characterKernel_compHom_iff`。
+  - 逆 (Φ''B'⊆§9): compHom χ̄∈xiOf chief.H0 (H⊄ker←kernel iff、H₀⊆ker←ker(map)⊆ker(compHom))+¬irr φ←commute。
+- **InjOn Φ on B'**: Φχ̄=Φχ̄' →(commute)→ compHom q(induce KbarM χ̄)=compHom q(induce KbarM χ̄')
+  →(`compHom_injective_of_surjective`)→ induce KbarM χ̄=induce KbarM χ̄' →(transport hKeq + `induce_compHom_subgroupCongr`)→
+  induce h.K (...)=induce h.K (...) →(`induce_injective_on_reducible`)→ χ̄=χ̄' (h.K↔KbarM 同定後)。
+- **ncard**: `Set.ncard_image_of_injOn` で `(Φ''B').ncard=B'.ncard`; `B'.ncard=Nat.card B'`
+  (`Set.Nat.card_coe_set_eq`); `rw[hKeq]` で B' を Irr(h.K) 形に → §6 count
+  `h.card_reducible_Hnontrivial_induce_eq_W2_sub_one hW2H` (hW2H:`h.W2.subgroupOf h.K≤H̄'`、`data.W2≤data.H`
+  =`(data.W2_le ·).1` + map/subgroupOf_mono) + `chiefFactorQuotient_card_W2_eq_p` ⟹ p-1。
+  ⚠ `rw[hKeq]` が H̄ (=hInHu.map…) と §6 の H̄' を同定する必要 — H̄=KbarM 設定 vs H̄'=h.K 設定。
+  ここが唯一の非自明 glue (両 H̄ が同一 underlying 部分群 = (data.H.subgroupOf M).map q を Set 同定)。
+- **下流 conjunct** (S11:4550 degree+membership / 4551 (9.9.c)): degree=qu は `induceHU_apply_one_eq_q_mul`+
+  χ̄(1)=1 (column linear); membership 𝒮(H₀C)・(9.9.c) は別途 (B' の column が C-trivial の構造)。
+
 > **状況 (2026-06-29)**: §6 side + (8.4.d) bridge B1 (structural Hypothesis(M/H₀)) 完成 (全 axiom-clean)。
 > 残 = B2 (inflation character bridge、最難所 = induction-inflation commute lemma) + B3 (|W̄₂|=p +
 > instantiate)。本プロジェクトで「最難・最高コスト」と記された指標終盤の最後の山。
