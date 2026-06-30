@@ -315,9 +315,19 @@ conjunct 3) / (9.9.c) exceptional (caseB conjunct 4) / (9.8.b,c,d) (caseA conjun
    Coq L834-835 は K=H₀C の `K∩H=H₀` を `group_modl` (Dedekind) + `tiHU` (H⊓U=1) で証明 — Lean でも同型。
    - **landed (S11, axiom-clean)**: `chiefFactor_H0supC_inf_H_eq_H0` ((H₀⊔C)⊓H=H₀, Dedekind crux =
      統一条件) + `chiefFactor_H0supC_le_derived` (H₀C≤M'=HU)。= 構造入力 2/3。
-   - **残 1/3 = H₀C ◁ M** (Coq `Ptype_Fcore_extensions_normal` L240, semidirect 構造経由)。
-     M normalizes H₀ (既) + H₀ が C の非正規性を吸収 (gCg⁻¹⊆H₀C ⟸ [C,H]≤H₀ (S11:4263) + C◁U +
-     W₁ action)。非自明 — 次 iteration。その後 generic count refactor。
+   - **残 1/3 = H₀C ◁ M** (Coq `Ptype_Fcore_extensions_normal` L240)。`M ≤ N(H₀⊔C)` を
+     `M=⟨H,U,W₁⟩` の生成元別に (各 g で `conj g • (H₀⊔C) = (conj g•H₀)⊔(conj g•C)`、H₀ は M-normal
+     ⟹ gH₀g⁻¹=H₀、残 = gCg⁻¹⊆H₀⊔C):
+     - **H ≤ N(H₀C)**: H≤M≤N(H₀) + hCh⁻¹⊆H₀C (∵ `commutator_cSub_H_le_H0` [C,H]≤H₀ ⟹ hch⁻¹=[h,c]·c∈H₀·C)。
+     - **U ≤ N(H₀C)**: U≤M≤N(H₀) + C◁U (`cSub_subgroupOf_U_normal`)。
+     - **🛑 crux = W₁ ≤ N(C)** (W₁≤M≤N(H₀) は既): C=`ker(uActionHom)`=U⊓ker(full action)。**full action
+       は U⊔W₁ 全体に存在** (`typeP_conjAction : ↥(U⊔W₁)→*MulAut↥H` S11:199、`quotientMulAutHom
+       chief.N_aInvariant : ↥(U⊔W₁)→*MulAut↥(↥H⧸N)`)。L=↥(U⊔W₁) で Kfull=ker(quotientMulAutHom)◁L、
+       U'=U.subgroupOf L ◁L (Frobenius `hUnorm`)、C-realized=U'⊓Kfull。W₁'=W₁.subgroupOf L は U' と
+       Kfull (共に◁L) を正規化 ⟹ U'⊓Kfull=C-realized を正規化 ⟹ cSub=(C-realized).map(L.subtype) も
+       W₁-stable。~50-100 行、realization transport friction ([[lean-induce-transport-instance-desync]])。
+     - 組立: M=(H⊔U)⊔W₁ (M'=H⊔U via `derivedInG_eq_fitting_sup_U`+M_complement) ⟹ closure(H∪U∪W₁)。
+     その後 generic count refactor (chiefFactorQuotientHypothesis を N' (3条件) 一般化 + H₀/H₀C instance)。
 - **⚠ caseA は独自 degree lemma 要**: caseA_character_counts は caseB を scope に持たない ⟹
   `caseB_degree_qu` cite 不可。(9.8.b) degree も caseA 版 chief-factor-constituent で別途。
 - **⚠ caseA は独自 degree lemma 要**: caseA_character_counts は caseB を scope に持たない ⟹
