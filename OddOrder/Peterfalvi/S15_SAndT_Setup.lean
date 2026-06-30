@@ -938,6 +938,23 @@ noncomputable def H_sharp_hypothesis76 [Fintype G] [Invertible (Nat.card G : ℂ
         OddOrder.Peterfalvi.S04.mem_sharp.mpr ⟨hh, h1⟩
       exact (OddOrder.Peterfalvi.S04.mem_sharp.mp (S_normalizes_H_sharp hG hyp l hsh)).1
 
+/-- **TI-subset `ρ`-map collapse** (the `χ = χ^ρ` bridge of Peterfalvi (13.5.a)): when the local
+subgroups of a (7.1) datum are trivial (`H(a) = ⊥`, as for the TI-subset Dade construction
+`H_sharp_dadeHypothesis`), the `ρ`-map is the identity on the support — `χ^ρ(a) = χ(a)` for `a ∈ A`.
+Direct from the `chiRho` definition: the average `|H(a)|⁻¹ ∑_{x∈H(a)} χ(a·x)` over `H(a) = ⊥` is the
+single term `χ(a·1) = χ(a)`.  This identifies the (13.5.a) point formula's left side with `χ` itself,
+so the (7.7.a) `chiRho_explicit_formula` decomposition reads off `χ(x)` on `H^#` directly. -/
+theorem chiRho_eq_self_of_H_eq_bot {G : Type*} [Group G] [Fintype G] {A : Set G} {L : Subgroup G}
+    (H71 : OddOrder.Peterfalvi.S09.Hypothesis71 G A L)
+    (hHbot : ∀ a : {a : G // a ∈ A}, H71.hyp.H a = ⊥)
+    (χ : ClassFunction G ℂ) (a : L) (ha : (a : G) ∈ A) :
+    H71.chiRho χ a = χ (a : G) := by
+  rw [OddOrder.Peterfalvi.S09.Hypothesis71.chiRho, dif_pos ha, hHbot ⟨(a : G), ha⟩,
+    Subgroup.card_bot, Nat.cast_one, inv_one, one_mul]
+  simp only [Finset.univ_unique, Finset.sum_singleton]
+  rw [show ((default : ↥(⊥ : Subgroup G)) : G) = 1 from
+    Subgroup.mem_bot.mp (default : ↥(⊥ : Subgroup G)).2, mul_one]
+
 /-- **Peterfalvi (13.5)**: the TI-subset calculation on `H = P C` gives a
 pointwise formula and two norm estimates. -/
 theorem tiSubset_character_orthogonality [Finite G]
