@@ -435,12 +435,20 @@ S11:4549 sorry。全 transport 補題が repo 実在ゆえ機械的に組める:
 な hypothesis で parametrize、caseB は delegate。⟹ caseA inertia chain は parametrized 連鎖の trivial
 適用 + 単一 core `chiefFactor_caseA_char_inertia` に還元。
 
-**残 (deep)**: (1) **core `chiefFactor_caseA_char_inertia`** — ⚠ 注意: caseB core は θ nontrivial で
-g 固定⟹g trivial だが、caseA では一般 θ で偽 (U が H̄ に可約作用)。**reducible-relevant θbar (W₁ が
-Hpart factors を transitive permute ゆえ全 factor 対称) に限り成立** — この θbar の characterization +
-stabilizer 論が core の本体 (Hpart Clifford)。(2) **caseA_exists_chiefFactorConstituent** (reducible χ
-から上記 θbar 構成 + inertia=HC を parametrized chain で計算) + (3) **caseA_degree_qu** + wiring
-(caseB と同形 mechanical)。次着手 = core の Hpart W₁-symmetric θbar 解析 (ChatGPT 相談候補)。
+**残 (deep)**: (1) **core `chiefFactor_caseA_char_inertia`** — caseB core は θ nontrivial で g 固定⟹
+g trivial だが caseA では一般 θ で偽; reducible-relevant θbar (W₁-transitive Hpart 対称) 限定で成立。
+(2) caseA_exists_for_reducible + (3) caseA_degree_qu + wiring。
+
+**🛑 2026-06-30 重大発見: caseA core は (9.7) case-a 構造の de-opacify に gated**:
+`CliffordCaseAData` の `W1_transitive_on_parts` / `quotient_factors_cyclic_order_a` /
+`Ubar_embeds_product` は **opaque な bare `Prop` field** (trivial `_holds`)。⟹ core が要する W₁-transitivity
+は **usably 形式化されていない scaffold**。caseB は対応する genuine content を standalone lemma
+(`chiefFactor_caseB_action_fpf` 等) + `hcaseB` (既約性 hypothesis) で供給 — caseA も同様に **(9.7)
+case-a 構造 (H̄=⊕Hpart_i 直積, W₁ transitive permute, Ū embeds in product) の concrete lemma/hypothesis**
+が必要。これは genuine な §9 Clifford 形式化 = substantial upstream piece。
+⟹ **caseA degree = inertia plumbing (✅完了) + (9.7) case-a 形式化 (deep, 未着手) + core + assembly**。
+(9.7) case-a 形式化が真の bottleneck。focused session / ChatGPT 相談候補。inertia plumbing は
+(9.7) 形式化後に core を供給すれば即座に caseA inertia=HC を与える reusable 基盤として残る。
 
 ## 進捗サマリ (2026-06-30 更新)
 
