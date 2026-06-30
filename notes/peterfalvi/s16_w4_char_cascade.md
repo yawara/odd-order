@@ -764,3 +764,26 @@ scaffold (exists_MHypothesis skeleton、index bridge が初手) / (c) BG Fitting
 **次 = exists_MHypothesis skeleton の structural field を順次供給** (M/K/typeIHyp via
 exists_typeI_hypothesis + V-side producer、e=pq via 本 index bridge、T_typeII sorried cite)、char
 field は named obligation に isolate。[[scaffold-sorry-free-not-done]] [[feedback-no-avoiding-hard-parts]]
+
+### cont.²³ (2026-06-30 lane c=γ /loop): exists_MHypothesis の structural 半 = `exists_M_structural` 完成 (sorry-free)
+
+**landed (commit `723b897c`)**: `exists_M_structural` (S15_SAndT、sorry-free) = `IsTypeII hyp.T →
+∃ M (typeIHyp : S14.Hypothesis M), M ∈ maximalSubgroups ∧ N_G(V) ≤ M ∧ |M : M_F| = p q`。
+`typeII_overNormalizer_frobenius_V` + `S14.exists_typeI_hypothesis` + index bridge
+(`typeIFrobenius_kernel_index_eq_complement`) を組立。**exists_MHypothesis の structural 半
+(M/K=M_F/typeIHyp/e_eq_index/complement_card_eq_pq) を 1 lemma に集約済**。
+
+**⟹ exists_MHypothesis 残 = char carrier ~25 field** (h78/Mset/tau/tau1/psi/betaM/betaSigns/betaGrid/
+psi_tau1_*/h78_*/P_isTI/Q_isTI/card_normalizer_P,Q/W_normalizer_V/G0*)。これらは deep §7 coherence
+(h78、producer 無)・§8 σ・§13 char で **lane c solo では body 埋まらず**。
+
+**次 iteration の wiring 設計 (fresh context、mechanical だが voluminous)**: spine sorry regression
+回避のため inline-sorry でなく **`MCharData` bundle 方式**:
+1. `structure MCharData (hyp) (M K : Subgroup G) (typeIHyp : S14.Hypothesis M) (e k : ℕ)` =
+   MHypothesis の char field ~25 を parameterized copy (self-ref M/typeIHyp/e/k を param 化、
+   field 型は MHypothesis L1606-1719 から literal copy)。
+2. `exists_MCharData : ∀ …, Nonempty (MCharData …) := sorry` (1 named obligation = deep char 全体)。
+3. `exists_MHypothesis := exists_M_structural で structural obtain + exists_MCharData で char obtain →
+   32-field assembly`。⟹ spine bare-sorry 1→1 (exists_MHypothesis sorry → exists_MCharData sorry)、
+   structural 半は proven 化 = de-opacify。[[feedback-gated-endpoint-skeleton-pattern]]
+   [[scaffold-sorry-free-not-done]] [[feedback-no-avoiding-hard-parts]]
