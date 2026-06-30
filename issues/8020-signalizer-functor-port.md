@@ -798,3 +798,41 @@ F(M)/M_F/M_σ の一致要確認)。repo 状況:
 **▶▶ 次 = `fittingIsTI_of_isTypeF` の port** (type-F M の Frobenius kernel M_σ が TI)。Isaacs Ch06 Frobenius-kernel-TI
 + type-F の Frobenius 構造 (M_σ⋊E、`isFrobeniusGroup_E_of_caseTau1` 系) を接続。これが gate-2 TypeICovering branch の
 唯一の deep input (cover_nonidentity ✅ + pairwise ✅ は済)。NonTypeICovering branch (Ẑ) は別 deep。
+
+## ✅ 進捗 (lane d, 2026-06-30 /loop³²): BG Cor 14.8 part 2 (two classes) 証明 + 型-P data constructor
+
+cover frontier (cover_subset_kernels = FittingIsTI-for-typeF、deep) を一旦保留し、completed Theorem 14.7 を使う
+**Cor 14.8 (`typeP1_conjugate_and_typeP_twoClasses`) の part 2 を genuine 証明** (S14、full build green):
+- **`exists_typeP_data`** (新 helper、sorry-free + axiom-clean + AxiomsCheck 登録): 任意極大 M に Theorem 14.7
+  data (κ(M)-Hall K≤M / swap K*=M_σ⊓C(K) / (κ∪σ)ᶜ-Hall U) を `hall_E_exists` (solvable ↥M) で構成。
+  **family-level corollary を bare `M∈maximalTypePFamily` から `exists_partner`/`typeP_covering` へ繋ぐ
+  missing constructor**。
+- **Cor 14.8 part 2** (𝓜_P = two conjugacy classes): `exists_typeP_data` + `exists_partner` (partner M*) +
+  `typeP_family_member_data` (M* maximal+typeP) + `typeP_family_pairwise_nonconjugate` (¬conj) +
+  `typeP_covering` (∀H~M∨~M*) で genuine 証明。
+- **Cor 14.8 part 1** (𝓜_{P₁} single class) = isolated sorry: 「partner pair が両方 P1 でない (一方 P2)」
+  = κ/κ* の type 解析が要り、clean な standalone lemma 未在 (deep 証明内に embed)。次の sub-target。
+
+**残 §14 (δ-lane frontier)**: (a) gate-2 cover_subset_kernels = FittingIsTI-for-typeF (deep TI port) /
+(b) Cor 14.8 part 1 = partner-pair-not-both-P1 (κ type 解析) / (c) Cor 14.10 (ℓ_σ≤2 general、cover-gated) /
+(d) NonTypeICovering Ẑ (deep)。いずれも substantial。§14 cover の rapid-win phase は完了 (Lemma 14.6 + Cor 14.9
++ covering equality + Cor 14.8 part 2)。
+
+## ✅ 進捗 (lane d, 2026-06-30 /loop³³): **BG Cor 14.8 完全証明** (part 1 + part 2、sorry CLOSED)
+
+`typeP1_conjugate_and_typeP_twoClasses` を **両 part 完全証明** (S14、axiom-clean、AxiomsCheck 登録、full build
+3888 green) — §14 の 1 sorry CLOSED:
+- **part 1** (𝓜_{P₁} single class): M,N type-P1 で `exists_typeP_data`+`exists_partner` の partner M* が
+  `isTypeP2_or_isTypeP2_partner` (M P1 ⟹ ¬P2 M ⟹ P2 M*) で type-P2 ⟹ `typeP_covering` の N~M∨N~M* で
+  N~M* は (`isTypeP1_conj_smul` で M* P1、P2 と矛盾) 排除 ⟹ N~M ⟹ M~N。
+- **part 2** (前 /loop³² 既証): two conjugacy classes。
+- **配置修正**: `kappa_conj_smul`/`sigmaComplementPrimes_conj_smul`/`isTypeP_conj_smul`/`isTypeP1_conj_smul`
+  (旧 10643~、Cor 14.8 の後) を Cor 14.8 前へ移動 (forward-ref 解消、deps は sigma_conj_smul_eq[3279 private]
+  等で全て前)。
+
+**🔧 cleanup note**: `sigma_conjSmul_eq` (5099、public、/loop²⁸ で私が追加) は既存 private `sigma_conj_smul_eq`
+(3279) の重複 (当時 private を grep 見落とし)。consolidate 候補 (3279 を public 化 + 5099 削除 + dichotomy/AxiomsCheck
+更新)。minor、別途。
+
+**§14 δ-lane 残 sorry** (substantial): cover_subset_kernels (FittingIsTI-for-typeF) / Cor 14.10 (cover-gated) /
+NonTypeICovering Ẑ / sigmaLength_one_frobenius_type。Cor 14.8 完了で family corollary 群は片付いた。
