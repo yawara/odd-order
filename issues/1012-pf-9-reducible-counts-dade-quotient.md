@@ -276,8 +276,29 @@ wire 済**。下記「完全実行レシピ」を全て landed:
 
 **残 §9 (別 conjunct、reducible count とは独立)**: (9.9.b) degree=qu + membership 𝒮(H₀C) (caseB
 conjunct 3) / (9.9.c) exceptional (caseB conjunct 4) / (9.8.b,c,d) (caseA conjunct 2,3,4) /
-(9.10) `exceptional_case_frobenius_realization`。これらは degree formula `induceHU_apply_one_eq_q_mul`
-+ column linearity + certain-type 構造 (reducible count とは別経路)。
+(9.10) `exceptional_case_frobenius_realization`。
+
+**2026-06-30 精密分析 (caseB conjunct 3 = (9.9.b) degree+membership)**:
+- **degree は free**: `caseB_degree_qu` が 𝒮(H₀C') 全体で degree=qu を既証明、`𝒮(H₀C)⊆𝒮(H₀C')`
+  (C'≤C, `sOf_antitone`) ゆえ。**✅ landed `forall_mem_sOf_H0C_apply_one_eq_qu`** (commit a4676bc6)。
+  ⟹ conjunct 3 は **membership に帰着**: reducible φ∈𝒮(H₀) → φ∈𝒮(H₀C) が分かれば degree は cite で済む。
+- **🛑 membership crux = 唯一の deep 残**: reducible χ∈𝒳(H₀) ⟹ C⊆ker χ。**deep Clifford** (Coq
+  `PFsection9` `Part_a` @ L884+、(9.9.b)/(9.8.b) 共有 subproof):
+  - reducible `Ind_{HU}^M χ` ⟺ I_M(χ)=M ⟺ **χ は M(=W₁)-invariant** (M/HU≅W₁ cyclic prime q ゆえ
+    inertia は HU か M のみ; reducible⟺inertia=M)。← repo に prime-quotient dichotomy + 私の column
+    work (`chiRestrict_conjBy_eq` L-invariance) が部品。
+  - **HC/H₀ = H̄ × (C/H₀) 直積** (Coq `defHCbar`)。χ=Ind_{HC}^{HU}ψ (ψ∈Irr(HC), I_HU(θ₀)=HC)、
+    χ M-invariant ⟹ ψ の W₁-orbit 構造 ⟹ **underlying HC-linear char ψ は C-trivial** (C⊆ker ψ)。
+  - `C⊴HU` + χ|_C=u·(ψ|_C) ⟹ C⊆ker χ ⟸ C⊆ker ψ。
+  これは multi-lemma 再構築 (reducible⟹M-inv / HC 直積 / ψ C-trivial / Ind-kernel)、bijection 並みの
+  focused 仕事。次 lane-a target。
+- **⚠ caseA は独自 degree lemma 要**: caseA_character_counts は caseB を scope に持たない ⟹
+  `caseB_degree_qu` cite 不可。(9.8.b) degree も caseA 版 chief-factor-constituent で別途。
+- **(9.9.c)/(9.10)** = exceptional (C=⊥ ∧ u=(p^q-1)/(p-1) + Frobenius)。`quotientSemidirectFrobenius`
+  free field 絡みで Singer field model 依存の見込み (別 deep)。
+
+これらは reducible count とは別経路の deep §9 Clifford。frontier は「quick fill 枯渇、各片が bijection
+並み」フェーズに入った。
 
 ---
 （以下、完成前の分析メモ — 履歴として保存）
