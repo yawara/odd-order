@@ -1395,3 +1395,16 @@ counting だが conjunct c の M-level IsIrreducibleCharacter は I_M=HU を要�
 hIM ⟸ θ̄^{w₀}∉U-orbit。残 = (1) **free-orbit factor inertia** (深、Coq inertia_bigdprod_irr guide) +
 (2) g→a∈U realization (wiring) + (3) L5 (w₀→m, ζ LiesOver θ₀) + assembly。free-orbit が
 research-level に深ければ Coq 熟読 → ChatGPT escalation も選択肢 ([[feedback-ask-chatgpt-for-elided-gaps]])。
+
+
+## ChatGPT consult SENT — free-orbit strategy (2026-07-01)
+
+free-orbit θ̄^{w₀}∉U-orbit (深部 crux、cleanest Lean strategy 不明) を ChatGPT Pro (model 最高)
+に送信。**tabId 1470253202** (chatgpt.com、新 chat、ログイン済 石田和 Pro)。プロンプト =
+`notes/peterfalvi/s11_freeorbit_chatgpt_prompt.md` (commit済)。質問: (a) factor-permutation/
+direct-product inertia vs (b) Frobenius-subgroup argument vs (c) cleaner; θ̄^{w₀}≠θ̄ で十分か
+"no U-conjugate is W1-fixed" が要るか; 構築時に ∉U-orbit を即時にする θ̄ の選び方; precise lemmas。
+
+**次 iteration**: `mcp__Claude_in_Chrome__get_page_text{tabId:1470253202}` で回答を回収 (Pro は
+思考 ~10min)。回答を厳密検証してから free-orbit を formalize。未了なら再 poll + 並行で wiring
+(ζ LiesOver θ₀, realization) を build。tools: ToolSearch{query:"chrome browser tab navigate page"}。
