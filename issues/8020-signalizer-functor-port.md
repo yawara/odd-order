@@ -909,3 +909,19 @@ lemma 群に分解して完遂** (S14、全 axiom-clean、AxiomsCheck 登録、f
 (3) pairwise (`conjClassSet_Mtilde_disjoint` 在) / (4) exceptional_disjoint (Ẑ∩M̃=∅、Coq trivIset) / struct 組立。
 **κ→Ẑ の deep heart は完了**; 残は struct plumbing + Ẑ-fixing。TypeICovering branch は別途 cover_subset_kernels
 (FittingIsTI-for-typeF gap) 待ち。
+
+## 🔍 調査 (lane d, 2026-06-30 /loop⁴¹): **NonTypeICovering disjointness は density_pieces で既済** — path 明確化
+
+NonTypeICovering の hard と思っていた disjointness 群が **`density_pieces_ncard_le` (S14:8252) で既に組まれている**ことを発見 (重複構築を回避):
+- `conjClassSet_T_Mtilde_disjoint` (S14:7995, **BG Lemma 14.6 = exceptional_disjoint**): `Disjoint (𝒞_G(Tset)) (𝒞_G(M̃ᵢ))` ✅
+  - `Tset = (K⊔Kstar)\(⋃ N∈ZFamilyFinset, (K⊔Kstar)⊓N_σ)` = **exceptional Ẑ** (refined)。
+- `conjClassSet_Mtilde_disjoint` 経由 `hpair` (pairwise M̃) ✅ / `one_not_mem_conjClassSet`+`one_not_mem_Mtilde` で
+  `h1A,h1U` (1∉pieces) ✅ / `hsub`: **A∪U ⊆ G# (partition の ⊇)** ✅。
+- つまり NonTypeICovering の **disjointness + ⊇ + avoid-1 は全部済**。残るは **cover ⊆ (= 私の `exists_mem_conjClassSet_Mtilde_or_zTilde_of_ne_one`) を fixed-family の A=𝒞_G(Tset) に接続**。
+
+**▶ 次の clean build = `Tset = zTilde` connector**: 2-member family `{M,Mstar}` (`exists_partner` の `hpart`) で
+`⋃ = (Z⊓M_σ)∪(Z⊓Mstar_σ) = Kstar∪K` ⟹ `Tset = Z\(K∪Kstar) = zTilde K Kstar`。要 intersection facts
+`(K⊔Kstar)⊓M_σ=Kstar`・`(K⊔Kstar)⊓Mstar_σ=K` (σ/κ Hall 分解、未 port、fiddly だが tractable)。これで density_pieces の A を
+私の cover ⊆ に橋渡し → cover_nonidentity (G#=A∪U) → struct 組立。
+**注意: gate-2 disjunction は依然 TypeICovering の `cover_subset_kernels` (FittingIsTI-for-typeF, A(8) M_F=M_σ deep gap) で block**。
+NonTypeICovering 完成は ¬all-type-F branch を埋めるが gate-2 全閉には cover_subset_kernels が必須。
