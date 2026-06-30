@@ -1593,4 +1593,27 @@ theorem rank1_eval_generic {n : ℕ} (c N P d : Fin (n + 1) → ℂ) (a e : ℂ)
     ← Finset.sum_mul]
   ring
 
+/-- **Rank-one sum evaluation, conjugate-weight form** (`Y`).  The collapse's second rank-one
+factor `Σ_j c_j \overline{P_j} / N_j` (note: bare `c_j`, conjugated `P_j`) evaluates to the same
+`(a−1) − (Σ_{i ≠ ind1H} P_i²/N_i)/e` as `rank1_eval_generic`, using that the degrees `P_i` are real
+(`\overline{P_i} = P_i`).  Together with `rank1_eval_generic` this gives `X·Y = ((a−1) − G/e)²`. -/
+theorem rank1_eval_Y_generic {n : ℕ} (c N P d : Fin (n + 1) → ℂ) (a e : ℂ)
+    {ind1H : Fin (n + 1)} (hind : ind1H ≠ 0)
+    (hc_ind1H : c ind1H = a - 1) (hc_rest : ∀ i, i ≠ 0 → i ≠ ind1H → c i = -(d i))
+    (hP_real : ∀ i, star (P i) = P i) (hd : ∀ i, d i = P i / e)
+    (hN_ind1H : N ind1H = e) (hP_ind1H : P ind1H = e) (he : e ≠ 0) :
+    ∑ i ∈ Finset.Ioi (0 : Fin (n + 1)), c i * star (P i) / N i =
+      (a - 1) - (∑ i ∈ (Finset.Ioi (0 : Fin (n + 1))).erase ind1H, P i ^ 2 / N i) / e := by
+  rw [← Finset.add_sum_erase _ _ (Finset.mem_Ioi.mpr (Fin.pos_iff_ne_zero.mpr hind)),
+    hc_ind1H, hP_real ind1H, hP_ind1H, hN_ind1H, mul_div_assoc, div_self he, mul_one,
+    sub_eq_add_neg]
+  congr 1
+  rw [show (∑ i ∈ (Finset.Ioi (0 : Fin (n + 1))).erase ind1H, c i * star (P i) / N i)
+        = ∑ i ∈ (Finset.Ioi (0 : Fin (n + 1))).erase ind1H, P i ^ 2 / N i * (-(1 / e)) from
+      Finset.sum_congr rfl fun i hi => by
+        obtain ⟨hi_ne, hi_ioi⟩ := Finset.mem_erase.mp hi
+        rw [hc_rest i (Finset.mem_Ioi.mp hi_ioi).ne' hi_ne, hP_real i, hd i]; ring,
+    ← Finset.sum_mul]
+  ring
+
 end OddOrder.Peterfalvi.S09.Cert
