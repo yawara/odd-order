@@ -78,3 +78,20 @@ general tool を sorry-free 構築 (S09 直接編集なし、衝突回避):
 - **chiRho_eq_inner_beta (7.8.c.i)**: (7.7.a) を ζ_0=ζ, ζ_1=Ind 1_H で適用。
 
 **realism**: 族構成 (orthogonality + spanning) が残る山。general foundation は完了。
+
+### 2026-06-30 (loop¹⁴): ⭐ 訂正 — 族直交性 machinery は既存 (§7 discharge は tractable)
+
+**重要訂正**: 「Mackey/誘導指標直交性は repo 不在 (API gap)」は**誤り**。
+`OddOrder/GroupTheory/RepresentationTheory/InducedIrreducible.lean` に既存:
+- `card_smul_restrict_induce`: **Mackey restriction** (正規部分群) `|H|•Res_H(Ind θ)=Σ_x conjBy x⁻¹ θ`。
+- `inner_induce_eq_zero_of_not_conj` (L151): **非共役 irreducible の誘導は直交** `⟨Ind θ, Ind ψ⟩=0`
+  (θ,ψ が distinct G-orbit)。← 族 ζ_i の **pairwise orthogonality** がこれで即。
+- `card_mul_inner_self_induce_eq_card_inertia` (L172): `‖Ind θ‖²=[I_G(θ):H]` (族ノルム)。
+
+つまり族構成の核 (orthogonality + norms) は揃っている。残:
+- **族列挙**: ζ_i = Ind θ_i (Irr H の G-orbit 代表、distinct)。conjByOrbit/inertia machinery 既存。
+- **ψ_i spanning CF(L,A)**: image-form spanning (eq_induce_restrict_of_supported) + 族が Ind range を覆う。
+- **determination**: 直交性 + uniqueness (eq_zero_of_mem_span_orthogonal) + Gram で χ^ρ=Σ c̄_i/‖ζ_i‖² ζ_i。
+
+**改訂 realism**: §7 discharge は当初評価の「巨大 API-gap mountain」でなく **tractable な multi-iteration build**
+(核 machinery 既存)。次イテレーション = determination または族 Gram を既存直交性で構築。
