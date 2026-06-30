@@ -172,12 +172,6 @@ structure Section16Inputs (G : Type*) [Group G] [Finite G] where
   Sdata : TypePData S
   Sdata_U_eq : Sdata.U = U
   Sdata_W1_eq : Sdata.W1 = W1
-  /-- **Peterfalvi (13.1.b) carrier (T-side, dual of `Sdata`)**: the type-`P` data of `T` with its
-  complement `V` and cyclic factor `W₂` reconciled to the menu's `V`/`W2`.  Sourced from the `tp`
-  producer (`Section16TypePStructure.Tdata`); threaded into `S15.Hypothesis` to supply its V-side. -/
-  Tdata : TypePData T
-  Tdata_V_eq : Tdata.U = V
-  Tdata_W2_eq : Tdata.W1 = W2
 
 /-! ### Partition of `Section16Inputs` into three independent producer obligations
 
@@ -278,20 +272,11 @@ structure Section16TypePStructure {G : Type*} [Group G] [Finite G]
   `W₁` reconciled (`Sdata_U_eq`/`Sdata_W1_eq`) to the structure's `U`/`W1`.  Built from `mp.S_typeP2`
   (Pf (13.2.a)) via `typePData_of_kappaHall_hallComplement`; it supplies the U-side facts
   (`U` complements `M_F = P`, `W₁ ≤ N_G(U)`, `U` nilpotent) that Peterfalvi §15 reads off `S`
-  (`basic_structure` U-side, `exists_typeI_maximal_overNormalizer_U`). -/
+  (`basic_structure` U-side, `exists_typeI_maximal_overNormalizer_U`).  Only `S` is determinate —
+  `T` (the larger-κ member) need not be type-`P₂`, so no symmetric `Tdata`. -/
   Sdata : TypePData mp.S
   Sdata_U_eq : Sdata.U = U
   Sdata_W1_eq : Sdata.W1 = W1
-  /-- **Peterfalvi (13.1.b) carrier (T-side, dual of `Sdata`)**: the type-`P` structure data of the
-  larger-κ member `T` (`T = (Q ⋊ V) ⋊ W₂`, `Q = T_F`), with its complement `V` and cyclic factor
-  `W₂` reconciled (`Tdata_V_eq`/`Tdata_W2_eq`) to the structure's `V`/`W2`.  `T` is type `P`
-  (`mp.T_typeP`), so `TypePData mp.T` exists; built by the `S`-side mirror
-  (`typePData_of_kappaHall_hallComplement` for `T`), with the type-`P₂` reconciliation isolated to
-  the (14.9) `IsTypeP2 T` gate at the producer.  Supplies the `V`-side facts that §14's
-  `exists_typeI_maximal_overNormalizer_V` (dual of the `U`-side) reads off `T`. -/
-  Tdata : TypePData mp.T
-  Tdata_V_eq : Tdata.U = V
-  Tdata_W2_eq : Tdata.W1 = W2
 
 /-- **Peterfalvi §13 coherent Dade-grid output** — *owned by lane-b*.
 
@@ -759,8 +744,7 @@ noncomputable def section16TypePStructure_of_components {G : Type*} [Group G] [F
     (hSnorm : W1 ≤ Subgroup.normalizer (U : Set G))
     (hTnorm : W2 ≤ Subgroup.normalizer (V : Set G))
     (hlt : Nat.card ↥W1 < Nat.card ↥W2)
-    (Sd : TypePData mp.S) (hSdU : Sd.U = U) (hSdW1 : Sd.W1 = W1)
-    (Td : TypePData mp.T) (hTdV : Td.U = V) (hTdW2 : Td.W1 = W2) :
+    (Sd : TypePData mp.S) (hSdU : Sd.U = U) (hSdW1 : Sd.W1 = W1) :
     Section16TypePStructure mp where
   W1 := W1
   W2 := W2
@@ -796,9 +780,6 @@ noncomputable def section16TypePStructure_of_components {G : Type*} [Group G] [F
   Sdata := Sd
   Sdata_U_eq := hSdU
   Sdata_W1_eq := hSdW1
-  Tdata := Td
-  Tdata_V_eq := hTdV
-  Tdata_W2_eq := hTdW2
 
 /-- **BG §14 type-P duality producer** — *lane-f* (BG §14 `typeP_duality`).
 Given the maximal pair, constructs the cyclic structure `W = W₁W₂`, the complements
@@ -879,21 +860,6 @@ noncomputable def section16TypePStructure_of_isMinimalSimpleOdd {G : Type*} [Gro
     hScompl.choose_spec.1 hScompl.choose_spec.2.2
   have hKne : mp.K ≠ ⊥ := fun h =>
     BG.Ch4.S14.card_kappaHall_ne_one mp.S_typeP mp.K_le_S mp.K_hall (Subgroup.card_eq_one.mpr h)
-  -- **T-side `TypePData` carrier** (V-side dual of the S-side, hub directive 2026-06-30): the chosen
-  -- complement `V = hTcompl.choose` to `M_F = Q` in `T'` is the `(κ∪σ)'`-Hall, so the S-side
-  -- machinery (`typePData_of_kappaHall_hallComplement` for `T`) produces a `TypePData mp.T` with
-  -- `.W₁ = mp.Kstar = W2` and `.U = V`, reconciling `Tdata` to the structure's `V`/`W2`.  The single
-  -- genuine §14.9 gate (`T` is type II = type-`P₂`, the (14.9) `T_typeII` conclusion, which cannot be
-  -- cited here without circularity since it consumes the very `Hypothesis` being built) is isolated
-  -- as `hTP2`; everything else is the genuine S-side mirror.
-  have hTP2 : BG.Ch4.S14.IsTypeP2 mp.T := sorry
-  have hVM : hTcompl.choose ≤ mp.T :=
-    (le_sup_right.trans_eq hTcompl.choose_spec.1.symm).trans (Subgroup.map_subtype_le _)
-  have hVhall := isHall_kappaSigmaCompl_of_isTypeP2_complement hG mp.T_maximal hTP2 hVM
-    hTcompl.choose_spec.1 hTcompl.choose_spec.2.2
-  have hKstarNe : mp.Kstar ≠ ⊥ := fun h =>
-    BG.Ch4.S14.card_kappaHall_ne_one mp.T_typeP mp.Kstar_le_T mp.Kstar_hall
-      (Subgroup.card_eq_one.mpr h)
   exact section16TypePStructure_of_components mp.K mp.Kstar hScompl.choose hTcompl.choose
     hScompl.choose_spec.1 hTcompl.choose_spec.1 hprimes.1 hprimes.2
     hWjoin hWcyc hbot hcomm hScompl.choose_spec.2.1 hTcompl.choose_spec.2.1 mp.K_lt_Kstar
@@ -903,12 +869,6 @@ noncomputable def section16TypePStructure_of_isMinimalSimpleOdd {G : Type*} [Gro
       hUM hUhall hScompl.choose_spec.2.1)
     (typePData_of_kappaHall_hallComplement_W1 hG mp.S_maximal mp.S_typeP2 mp.K_le_S hKne mp.K_hall
       hUM hUhall hScompl.choose_spec.2.1)
-    (typePData_of_kappaHall_hallComplement hG mp.T_maximal hTP2 mp.Kstar_le_T hKstarNe mp.Kstar_hall
-      hVM hVhall hTcompl.choose_spec.2.1)
-    (typePData_of_kappaHall_hallComplement_U hG mp.T_maximal hTP2 mp.Kstar_le_T hKstarNe mp.Kstar_hall
-      hVM hVhall hTcompl.choose_spec.2.1)
-    (typePData_of_kappaHall_hallComplement_W1 hG mp.T_maximal hTP2 mp.Kstar_le_T hKstarNe mp.Kstar_hall
-      hVM hVhall hTcompl.choose_spec.2.1)
 
 /-- **Certain-type §6 hypothesis from κ-Hall pairing data** — *lane-b* (cd producer building block).
 
@@ -1833,10 +1793,7 @@ noncomputable def section16Inputs_of_isMinimalSimpleOdd {G : Type*} [Group G] [F
     q_lt_p := tp.q_lt_p
     Sdata := tp.Sdata
     Sdata_U_eq := tp.Sdata_U_eq
-    Sdata_W1_eq := tp.Sdata_W1_eq
-    Tdata := tp.Tdata
-    Tdata_V_eq := tp.Tdata_V_eq
-    Tdata_W2_eq := tp.Tdata_W2_eq }
+    Sdata_W1_eq := tp.Sdata_W1_eq }
 
 /-- **Assembly of the Section 16 configuration from named inputs** (`sorry`-free).
 
@@ -1934,10 +1891,7 @@ noncomputable def sectionSixteenHypothesis_of_inputs {G : Type*} [Group G] [Fini
       m_eq := rfl
       Sdata := inp.Sdata
       Sdata_U_eq := inp.Sdata_U_eq
-      Sdata_W1_eq := inp.Sdata_W1_eq
-      Tdata := inp.Tdata
-      Tdata_V_eq := inp.Tdata_V_eq
-      Tdata_W2_eq := inp.Tdata_W2_eq }
+      Sdata_W1_eq := inp.Sdata_W1_eq }
   q_lt_p := inp.q_lt_p
 
 /-- **The one remaining upstream obligation.** From a minimal simple group of odd

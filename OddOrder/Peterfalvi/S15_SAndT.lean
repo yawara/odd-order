@@ -475,28 +475,46 @@ theorem coprime_card_V_card_Q_of_disjoint [Finite G]
   rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hQ_le).toEquiv, hidx] at hcop_idx
   exact hcop_idx.symm
 
+/-- **T-side type-`P` structure reconciled to the abstract `V`/`W₂`** (the honest replacement for the
+withdrawn `Tdata` spine carrier; HUB tick² 2026-06-30).  `T` is type non-I (`T_nonI`), hence type-`P`,
+and the §16-chosen complement `V` (κ-Hall-invariant) / cyclic factor `W₂` form a type-`P`
+decomposition of `T`: there is a `TypePData T` with `.U = V` and `.W1 = W₂`.
+
+This is the genuine §13 reconciliation — **TRUE** (unlike `IsTypeP2 T`, which is strictly stronger
+than the (14.9) `T_typeII` conclusion `TypeIIData T` and generally false, so the earlier `Tdata`
+spine supply was a dead-end).  It lives **off the FT spine**: the `V`-side helpers cite this obligation,
+keeping `section16TypePStructure_of_isMinimalSimpleOdd` sorry-free.  Gated on §13; declared sorried. -/
+theorem reconciled_typePData_T [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hyp : Hypothesis (G := G)) :
+    ∃ data : TypePData hyp.T, data.U = hyp.V ∧ data.W1 = hyp.W2 := sorry
+
+/-- `Q ⊓ V = ⊥` from a reconciled `TypePData T` (`tpd.U = V`): `V` complements `Q = T_F` in
+`M' = [T,T]`.  Used by the V-side helpers in place of the withdrawn `Tdata` carrier. -/
+theorem Q_inf_V_eq_bot_of_reconciled [Finite G] (hyp : Hypothesis (G := G))
+    {tpd : TypePData hyp.T} (htpdV : tpd.U = hyp.V) : hyp.Q ⊓ hyp.V = ⊥ := by
+  have key : tpd.H ⊓ tpd.U = ⊥ := by
+    have hd := disjoint_iff.mp tpd.derived_complement.disjoint
+    rw [eq_bot_iff]
+    rintro x ⟨hxH, hxU⟩
+    have hxD : x ∈ derivedInG hyp.T := tpd.H_le hxH
+    have hmem : (⟨x, hxD⟩ : ↥(derivedInG hyp.T)) ∈
+        (tpd.H.subgroupOf (derivedInG hyp.T)) ⊓ (tpd.U.subgroupOf (derivedInG hyp.T)) :=
+      ⟨Subgroup.mem_subgroupOf.mpr hxH, Subgroup.mem_subgroupOf.mpr hxU⟩
+    rw [hd, Subgroup.mem_bot] at hmem
+    rw [Subgroup.mem_bot]
+    simpa using Subtype.ext_iff.mp hmem
+  rw [hyp.Q_eq_TF, ← tpd.H_eq, ← htpdV]
+  exact key
+
 /-- **`T`-side dual of `isMulCommutative_U`** (Pf (13.2.a), V-side): the complement `V` of the
-type-II member `T` is commutative.  Mirror of `isMulCommutative_U`; here `IsTypeII T` is a
-hypothesis (the (14.9) `T_typeII` conclusion, supplied by the caller) since — unlike `S` — `T`'s
-type-II-ness is not sorry-free from the carrier.  Consumes the `Tdata` carrier (`Tdata_V_eq`). -/
+type-II member `T` is commutative.  Mirror of `isMulCommutative_U`; `IsTypeII T` is a hypothesis
+(the (14.9) `T_typeII` conclusion, supplied by the caller).  Sources the `T`-side type-`P` structure
+from the off-spine `reconciled_typePData_T` (not the withdrawn `Tdata` carrier). -/
 theorem isMulCommutative_V [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
     (hyp : Hypothesis (G := G)) (hTTypeII : IsTypeII hyp.T) : IsMulCommutative ↥hyp.V := by
   obtain ⟨tdata⟩ := hTTypeII
-  have hdisj : hyp.Q ⊓ hyp.V = ⊥ := by
-    have key : hyp.Tdata.H ⊓ hyp.Tdata.U = ⊥ := by
-      have hd := disjoint_iff.mp hyp.Tdata.derived_complement.disjoint
-      rw [eq_bot_iff]
-      rintro x ⟨hxH, hxU⟩
-      have hxD : x ∈ derivedInG hyp.T := hyp.Tdata.H_le hxH
-      have hmem : (⟨x, hxD⟩ : ↥(derivedInG hyp.T)) ∈
-          (hyp.Tdata.H.subgroupOf (derivedInG hyp.T)) ⊓
-            (hyp.Tdata.U.subgroupOf (derivedInG hyp.T)) :=
-        ⟨Subgroup.mem_subgroupOf.mpr hxH, Subgroup.mem_subgroupOf.mpr hxU⟩
-      rw [hd, Subgroup.mem_bot] at hmem
-      rw [Subgroup.mem_bot]
-      simpa using Subtype.ext_iff.mp hmem
-    rw [hyp.Q_eq_TF, ← hyp.Tdata.H_eq, ← hyp.Tdata_V_eq]
-    exact key
+  obtain ⟨tpd, htpdV, _⟩ := reconciled_typePData_T _hG hyp
+  have hdisj : hyp.Q ⊓ hyp.V = ⊥ := Q_inf_V_eq_bot_of_reconciled hyp htpdV
   have hQH : hyp.Q = tdata.typeP.H := by rw [hyp.Q_eq_TF, tdata.typeP.H_eq]
   have hQ_le : hyp.Q ≤ derivedInG hyp.T := by rw [hyp.T_deriv_eq_QV]; exact le_sup_left
   have hV_le : hyp.V ≤ derivedInG hyp.T := by rw [hyp.T_deriv_eq_QV]; exact le_sup_right
@@ -903,8 +921,8 @@ theorem typeI_overNormalizer_U_le_fitting [Finite G]
 
 /-- **`T`-side dual of `typeI_U_le_fitting_of_coprime`** (Pf (13.17.b), V-side): for `T` type II and
 a type-`I` maximal `L` over `N_G(V)` with `|L_F| ⟂ pq`, the complement `V ⊆ L_F`.  Mirror of the
-`U`-side; the `V W₂` Frobenius is built directly from the `Tdata` carrier
-(`typeP_uW1_frobenius hyp.Tdata`) rather than `basic_structure` (which is `S`-side only). -/
+`U`-side; the `V W₂` Frobenius is built from the reconciled `TypePData T`
+(`typeP_uW1_frobenius`) rather than `basic_structure` (which is `S`-side only). -/
 theorem typeI_V_le_fitting_of_coprime [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     (hyp : Hypothesis (G := G)) (hTTypeII : IsTypeII hyp.T) {L : Subgroup G}
     (hLmax : L ∈ maximalSubgroups G) (hLI : IsTypeI L)
@@ -912,6 +930,7 @@ theorem typeI_V_le_fitting_of_coprime [Finite G] (hG : OddOrder.BG.IsMinimalSimp
     (hcop : Nat.Coprime (Nat.card ↥(maxNilpotentNormalHall L)) (hyp.p * hyp.q)) :
     hyp.V ≤ maxNilpotentNormalHall L := by
   obtain ⟨tdata⟩ := hTTypeII
+  obtain ⟨tpd, htpdV, htpdW2⟩ := reconciled_typePData_T hG hyp
   obtain ⟨frob, _⟩ := OddOrder.Peterfalvi.S14.typeI_frobenius hG hLmax hLI
   have hHeq : frob.typeI.typeF.H = maxNilpotentNormalHall L := frob.typeI.typeF.H_eq
   have hfrobLF : OddOrder.Isaacs.Ch06.IsFrobeniusGroup ↥L
@@ -919,17 +938,17 @@ theorem typeI_V_le_fitting_of_coprime [Finite G] (hG : OddOrder.BG.IsMinimalSimp
   have hVleL : hyp.V ≤ L := Subgroup.le_normalizer.trans hNVL
   have hW2leL : hyp.W2 ≤ L := hyp.W2_normalizes_V.trans hNVL
   have hLFleL : maxNilpotentNormalHall L ≤ L := OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_le L
-  have hTdataVne : hyp.Tdata.U ≠ ⊥ := by
+  have htpdVne : tpd.U ≠ ⊥ := by
     intro hbot
-    have h1 : Nat.card ↥hyp.Tdata.U = Nat.card ↥tdata.typeP.U := by
-      rw [hyp.Tdata.card_U_eq_index, tdata.typeP.card_U_eq_index]
+    have h1 : Nat.card ↥tpd.U = Nat.card ↥tdata.typeP.U := by
+      rw [tpd.card_U_eq_index, tdata.typeP.card_U_eq_index]
     rw [hbot, Subgroup.card_bot] at h1
     exact tdata.common.1 (Subgroup.card_eq_one.mp h1.symm)
   have hVW2frob : OddOrder.Isaacs.Ch06.IsFrobeniusGroup
       ↥(hyp.V ⊔ hyp.W2) (hyp.V.subgroupOf (hyp.V ⊔ hyp.W2))
         (hyp.W2.subgroupOf (hyp.V ⊔ hyp.W2)) := by
-    have h := OddOrder.Peterfalvi.S11.typeP_uW1_frobenius hyp.Tdata hTdataVne
-    rwa [hyp.Tdata_V_eq, hyp.Tdata_W2_eq] at h
+    have h := OddOrder.Peterfalvi.S11.typeP_uW1_frobenius tpd htpdVne
+    rwa [htpdV, htpdW2] at h
   have hsolv : IsSolvable ↥(maxNilpotentNormalHall L) := by
     haveI := OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_isNilpotent L
     exact IsNilpotent.to_isSolvable
@@ -1170,28 +1189,15 @@ theorem sConjugate_fitting_data [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd
 type II, a maximal subgroup `L` over `N_G(V)` is type I with `V ⊆ L_F`.  Mirror of the `U`-side with
 the two exclusion branches swapped: `L ~ T` is ruled out by the Hall conjugacy `N_G(V) ⊄ T`
 (`not_normalizer_V_le_T`), and `L ~ S` by the `|L_F| = p^q` order contradiction
-(`sConjugate_fitting_data`) against the `V W₂` Frobenius (from the `Tdata` carrier). -/
+(`sConjugate_fitting_data`) against the `V W₂` Frobenius (from the reconciled `TypePData T`). -/
 theorem exists_typeI_maximal_overNormalizer_V [Finite G]
     (_hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
     (hTTypeII : IsTypeII hyp.T) :
     ∃ L : Subgroup G, L ∈ maximalSubgroups G ∧ IsTypeI L ∧
       Subgroup.normalizer (hyp.V : Set G) ≤ L ∧ hyp.V ≤ maxNilpotentNormalHall L := by
   obtain ⟨tdata⟩ := hTTypeII
-  have hdisj : hyp.Q ⊓ hyp.V = ⊥ := by
-    have key : hyp.Tdata.H ⊓ hyp.Tdata.U = ⊥ := by
-      have hd := disjoint_iff.mp hyp.Tdata.derived_complement.disjoint
-      rw [eq_bot_iff]
-      rintro x ⟨hxH, hxU⟩
-      have hxD : x ∈ derivedInG hyp.T := hyp.Tdata.H_le hxH
-      have hmem : (⟨x, hxD⟩ : ↥(derivedInG hyp.T)) ∈
-          (hyp.Tdata.H.subgroupOf (derivedInG hyp.T)) ⊓
-            (hyp.Tdata.U.subgroupOf (derivedInG hyp.T)) :=
-        ⟨Subgroup.mem_subgroupOf.mpr hxH, Subgroup.mem_subgroupOf.mpr hxU⟩
-      rw [hd, Subgroup.mem_bot] at hmem
-      rw [Subgroup.mem_bot]
-      simpa using Subtype.ext_iff.mp hmem
-    rw [hyp.Q_eq_TF, ← hyp.Tdata.H_eq, ← hyp.Tdata_V_eq]
-    exact key
+  obtain ⟨tpd, htpdV, htpdW2⟩ := reconciled_typePData_T _hG hyp
+  have hdisj : hyp.Q ⊓ hyp.V = ⊥ := Q_inf_V_eq_bot_of_reconciled hyp htpdV
   have hcop : Nat.Coprime (Nat.card ↥hyp.V) (Nat.card ↥hyp.Q) :=
     coprime_card_V_card_Q_of_disjoint hyp tdata hdisj
   have hNVT : ¬ Subgroup.normalizer (hyp.V : Set G) ≤ hyp.T :=
@@ -1216,13 +1222,13 @@ theorem exists_typeI_maximal_overNormalizer_V [Finite G]
     mem_maximalSubgroups.mpr ⟨hLmaximal.1, fun b hLb => by
       by_contra hbne
       exact lt_irrefl L (lt_of_lt_of_le hLb (hLmaximal.2 hbne hLb.le))⟩
-  -- `V W₂` Frobenius from the `Tdata` carrier (used by both exclusion branches).
-  have hTdataVne : hyp.Tdata.U ≠ ⊥ := by rw [hyp.Tdata_V_eq]; exact hVne
+  -- `V W₂` Frobenius from the reconciled `TypePData T` (used by both exclusion branches).
+  have htpdVne : tpd.U ≠ ⊥ := by rw [htpdV]; exact hVne
   have hVW2frob : OddOrder.Isaacs.Ch06.IsFrobeniusGroup
       ↥(hyp.V ⊔ hyp.W2) (hyp.V.subgroupOf (hyp.V ⊔ hyp.W2))
         (hyp.W2.subgroupOf (hyp.V ⊔ hyp.W2)) := by
-    have h := OddOrder.Peterfalvi.S11.typeP_uW1_frobenius hyp.Tdata hTdataVne
-    rwa [hyp.Tdata_V_eq, hyp.Tdata_W2_eq] at h
+    have h := OddOrder.Peterfalvi.S11.typeP_uW1_frobenius tpd htpdVne
+    rwa [htpdV, htpdW2] at h
   rcases hyp.theorem88_caseB L hLmem with hLI | hLconjS | hLconjT
   · exact ⟨L, hLmem, hLI, hNVL,
       typeI_overNormalizer_V_le_fitting _hG hyp ⟨tdata⟩ hLmem hLI hNVL⟩
@@ -1272,9 +1278,9 @@ theorem exists_typeI_maximal_overNormalizer_V [Finite G]
             (Subgroup.subgroupOfEquivOfLe (le_sup_right : hyp.W2 ≤ hyp.V ⊔ hyp.W2)).toEquiv] at h
       have hQleM' : hyp.Q ≤ derivedInG hyp.T := le_sup_left.trans hyp.T_deriv_eq_QV.ge
       have hidxM' : ((derivedInG hyp.T).subgroupOf hyp.T).index = Nat.card ↥hyp.W2 := by
-        rw [← hyp.Tdata_W2_eq, ← hyp.Tdata.card_W1_eq_derived_index]
+        rw [← htpdW2, ← tpd.card_W1_eq_derived_index]
       have hidxQ : (hyp.Q.subgroupOf (derivedInG hyp.T)).index = Nat.card ↥hyp.V := by
-        rw [hyp.Q_eq_TF, ← hyp.Tdata.card_U_eq_index, hyp.Tdata_V_eq]
+        rw [hyp.Q_eq_TF, ← tpd.card_U_eq_index, htpdV]
       have hTcard : Nat.card ↥hyp.T
           = Nat.card ↥hyp.W2 * (Nat.card ↥hyp.V * Nat.card ↥hyp.Q) := by
         have e1 := ((derivedInG hyp.T).subgroupOf hyp.T).index_mul_card
