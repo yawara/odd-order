@@ -4723,6 +4723,28 @@ theorem reducible_count_sOf_H0 [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G
   exact Subgroup.mem_subgroupOf.mp (hle hyM)
 
 
+/-- **A regular chief-factor character exists in Clifford case (a)**: an irreducible character of
+`H̄ = H/N` nontrivial on each order-`p` Clifford summand `Hpart i`.  Instantiates
+`exists_regular_char` with the internal-direct-product structure of `CliffordCaseAData`
+(`Hpart_iSupIndep` + `Hpart_iSup` + `Hpart_order`), packaged as a linear `IrreducibleCharacter`.
+Supplies the `hreg` of `inertia_eq_hcInHu_caseA` / `chiefFactor_caseA_char_inertia`. -/
+theorem exists_regular_irr_caseA [Finite G] {M : Subgroup G}
+    {data : TypesIIIIIIVSetup M} {chief : ChiefFactorData data}
+    {chars : Section11CharacterData data chief} (caseA : CliffordCaseAData chars) :
+    ∃ θbar : IrreducibleCharacter (↥data.H ⧸ chief.N), ∀ i, ∃ x ∈ caseA.Hpart i,
+      (θbar : ClassFunction (↥data.H ⧸ chief.N) ℂ) x
+        ≠ (θbar : ClassFunction (↥data.H ⧸ chief.N) ℂ) 1 := by
+  letI : CommGroup (↥data.H ⧸ chief.N) :=
+    { (inferInstance : Group (↥data.H ⧸ chief.N)) with
+      mul_comm := chief.quotient_elementaryAbelian.comm }
+  obtain ⟨θ, hθ⟩ := exists_regular_char caseA.Hpart caseA.Hpart_iSupIndep caseA.Hpart_iSup
+    (fun i => by rw [caseA.Hpart_order i]; exact chief.p_prime)
+  refine ⟨linearIrreducibleCharacter θ, fun i => ?_⟩
+  obtain ⟨x, hx, hne⟩ := hθ i
+  refine ⟨x, hx, ?_⟩
+  rw [linearIrreducibleCharacter_apply, linearIrreducibleCharacter_apply, map_one, Units.val_one]
+  simpa using hne
+
 /-- **Peterfalvi (9.8)**: character-count consequences in Clifford case (a).
 
 Faithful to Peterfalvi (9.8.b,c,d) (count-statement audit, issue 2030):
