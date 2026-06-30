@@ -1324,7 +1324,7 @@ theorem theoremD_msigma_conjugacy_and_centralizers_of_inputs [Finite G]
             Subgroup.IsComplement' ((M ⊓ N).subgroupOf N)
               ((OddOrder.BG.Ch3.S10.Msigma N).subgroupOf N) ∧
             (S14.IsTypeP2 N →
-              S14.IsTypeP M ∧ ¬ S15.FittingIsTI M ∧
+              S14.IsTypeF M ∧ ¬ S15.FittingIsTI M ∧
                 ∃ E : Subgroup G,
                   E ≤ M ∧ IsCyclic ↥E ∧
                   Subgroup.IsComplement' ((OddOrder.BG.Ch3.S10.Msigma M).subgroupOf M)
@@ -1347,7 +1347,7 @@ theorem theoremD_msigma_conjugacy_and_centralizers_of_inputs [Finite G]
             Subgroup.IsComplement' ((M ⊓ N).subgroupOf N)
               ((OddOrder.BG.Ch3.S10.Msigma N).subgroupOf N) ∧
             (S14.IsTypeP2 N →
-              S14.IsTypeP M ∧ ¬ S15.FittingIsTI M ∧
+              S14.IsTypeF M ∧ ¬ S15.FittingIsTI M ∧
                 ∃ E : Subgroup G,
                   E ≤ M ∧ IsCyclic ↥E ∧
                   Subgroup.IsComplement' ((OddOrder.BG.Ch3.S10.Msigma M).subgroupOf M)
@@ -1544,45 +1544,10 @@ theorem exists_RData_of_mem_sigmaSharp [Finite G] (hG : OddOrder.BG.IsMinimalSim
         fun r hr => Subgroup.mem_bot.mp hr.1⟩
     exact ⟨⊥, hc1, hc2, hc3, hc4⟩
 
-/-- **BG Theorem D** (mmd L4317, recovered tail L4368): conjugacy and centralizer
-control for `M_sigma`, including the `R(x)` normal complement, its sharply transitive
-action, and the unique maximal subgroup attached to escaping centralizers.
-
-The final conjunct is the recovered BG D(4) tail: `M ∩ N` complements `N_sigma` in
-`N`, and if `N` is type `P2` then `M` is type `P`, Frobenius with cyclic complement,
-and `M_F` is not TI. -/
-theorem theoremD_msigma_conjugacy_and_centralizers [Finite G]
-    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G}
-    (hM : M ∈ maximalSubgroups G) :
-    (∀ x ∈ OddOrder.BG.Ch3.S10.Msigma M, ∀ y ∈ OddOrder.BG.Ch3.S10.Msigma M,
-      (∃ g : G, y = g * x * g⁻¹) → ∃ m ∈ M, y = m * x * m⁻¹) ∧
-      (∀ g : G, g ∉ M → IsCyclic ↥(OddOrder.BG.Ch3.S10.Msigma M ⊓ (MulAut.conj g • M))) ∧
-      (∀ x : G, x ∈ sigmaSharp M → ∃ R : Subgroup G, RData M x R) ∧
-      (∀ x : G, x ∈ sigmaSharp M → ¬ Subgroup.centralizer ({x} : Set G) ≤ M →
-        ∃ R : Subgroup G,
-          RData M x R ∧
-          ∃! N : Subgroup G,
-            N ∈ maximalSubgroupsContaining (Subgroup.centralizer ({x} : Set G)) ∧
-            R = OddOrder.BG.Ch3.S10.Msigma N ⊓ Subgroup.centralizer ({x} : Set G) ∧
-            S15.MF N = OddOrder.BG.Ch3.S10.Msigma N ∧
-            x ∈ ASet N ⊤ \ (OddOrder.BG.Ch3.S10.Msigma N : Set G) ∧
-            (S14.IsTypeF N ∨ S14.IsTypeP2 N) ∧
-            Subgroup.IsComplement' ((M ⊓ N).subgroupOf N)
-              ((OddOrder.BG.Ch3.S10.Msigma N).subgroupOf N) ∧
-            (S14.IsTypeP2 N →
-              S14.IsTypeP M ∧ ¬ S15.FittingIsTI M ∧
-                ∃ E : Subgroup G,
-                  E ≤ M ∧ IsCyclic ↥E ∧
-                  Subgroup.IsComplement' ((OddOrder.BG.Ch3.S10.Msigma M).subgroupOf M)
-                    (E.subgroupOf M) ∧
-                  OddOrder.Isaacs.Ch06.IsFrobeniusGroup ↥M
-                    ((OddOrder.BG.Ch3.S10.Msigma M).subgroupOf M) (E.subgroupOf M))) := by
-  -- D(1) `M_σ`-fusion (`msigma_fusion_control`, Cor 15.3) and D(2) `M_σ ∩ M^g` cyclic
-  -- (`Msigma_inf_conj_isCyclic`, Lemma 12.17) are proven; D(3)/D(4) are the deep `R(x)`
-  -- signalizer normal complement (issue 8019, multi-session).
-  refine ⟨msigma_fusion_control hG hM, fun g hg => Msigma_inf_conj_isCyclic hG hM hg, ?_, ?_⟩
-  · exact exists_RData_of_mem_sigmaSharp hG hM
-  · sorry
+-- `theoremD_msigma_conjugacy_and_centralizers` is defined later (after
+-- `maxNilpotentNormalHall_eq_Msigma_of_isTypeF_or_isTypeP2`), because its D(4) conjunct
+-- (`exists_RData_escape_structure`) forward-references that lemma.  Its only consumers are in
+-- `theoremII_tame_embedding` (further below), so the later placement is safe.
 
 /-- **BG Theorem E, `σ(Mᵢ)`-disjointness conjunct** (mmd L4370): distinct
 representatives of the conjugacy classes of maximal subgroups have disjoint
@@ -5329,6 +5294,124 @@ theorem maxNilpotentNormalHall_eq_Msigma_of_isTypeF_or_isTypeP2 [Finite G]
   rcases h with hF | hP2
   · exact hcls.2.2.2.2.2.mpr (Or.inl (hcls.1.mpr hF))
   · exact hcls.2.2.2.2.2.mpr (Or.inr (Or.inl (hcls.2.1.mpr hP2)))
+
+/-- **BG Theorem D(4), the escape structure** (the `hD4` conjunct of
+`theoremD_msigma_conjugacy_and_centralizers`): for `x ∈ M_σ^#` whose centralizer escapes `M`, the
+normal-complement data `R(x)` exists and is attached to a *unique* maximal `N ⊇ C_G(x)` of type `F`
+or `P₂`.  Assembled from the signalizer structure (`signalizer_structure_of_mem_sigmaSharp`), the
+`τ₂`-element centralizer uniqueness (`maximalContaining_centralizer_eq_singleton_of_tau2_element`,
+giving `ℳ(C_G(x)) = {N}`), `RData_of_inputs`, `maxNilpotentNormalHall_eq_Msigma_of_isTypeF_or_isTypeP2`,
+and the `P₂`-escape package (`centralizer_escape_final_local`). -/
+theorem exists_RData_escape_structure [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} (hM : M ∈ maximalSubgroups G)
+    {x : G} (hx : x ∈ sigmaSharp M) (hesc : ¬ Subgroup.centralizer ({x} : Set G) ≤ M) :
+    ∃ R : Subgroup G,
+      RData M x R ∧
+      ∃! N : Subgroup G,
+        N ∈ maximalSubgroupsContaining (Subgroup.centralizer ({x} : Set G)) ∧
+        R = OddOrder.BG.Ch3.S10.Msigma N ⊓ Subgroup.centralizer ({x} : Set G) ∧
+        S15.MF N = OddOrder.BG.Ch3.S10.Msigma N ∧
+        x ∈ ASet N ⊤ \ (OddOrder.BG.Ch3.S10.Msigma N : Set G) ∧
+        (S14.IsTypeF N ∨ S14.IsTypeP2 N) ∧
+        Subgroup.IsComplement' ((M ⊓ N).subgroupOf N)
+          ((OddOrder.BG.Ch3.S10.Msigma N).subgroupOf N) ∧
+        (S14.IsTypeP2 N →
+          S14.IsTypeF M ∧ ¬ S15.FittingIsTI M ∧
+            ∃ E : Subgroup G,
+              E ≤ M ∧ IsCyclic ↥E ∧
+              Subgroup.IsComplement' ((OddOrder.BG.Ch3.S10.Msigma M).subgroupOf M)
+                (E.subgroupOf M) ∧
+              OddOrder.Isaacs.Ch06.IsFrobeniusGroup ↥M
+                ((OddOrder.BG.Ch3.S10.Msigma M).subgroupOf M) (E.subgroupOf M)) := by
+  have hx1 : x ≠ 1 := hx.2
+  have hxMσ : x ∈ OddOrder.BG.Ch3.S10.Msigma M := hx.1
+  -- `|𝓜_σ(x)| > 1` from the escape.
+  have hgt : 1 < (S14.maximalSigmaSubgroupsOfElement x).ncard := by
+    by_contra h
+    push_neg at h
+    exact hesc (centralizer_le_of_maximalSigma_le_one hG hM hxMσ hx1 h)
+  -- The signalizer neighbour `N`.
+  obtain ⟨N, hNstruct, -⟩ := signalizer_structure_of_mem_sigmaSharp hG hM hx hgt
+  obtain ⟨hNmax, hCN, hRne, hRhall, hxtau2, hNtype, hforall⟩ := hNstruct
+  have hxN : x ∈ N := hCN (Subgroup.mem_centralizer_iff.mpr
+    (fun y hy => by rw [Set.mem_singleton_iff.mp hy]))
+  -- Uniqueness: `ℳ(C_G(x)) = {N}` (Cor 14.3 τ₂-uniqueness applied to `N`).
+  have hMC : maximalSubgroupsContaining (Subgroup.centralizer ({x} : Set G)) = {N} :=
+    maximalContaining_centralizer_eq_singleton_of_tau2_element hG hNmax hxN hx1 hxtau2 hRne
+  have hxM_mem : x ∈ M := OddOrder.BG.Ch3.S10.Msigma_le M hxMσ
+  obtain ⟨-, -, hMcompl, hMsharp⟩ := hforall M ⟨hM, hxMσ⟩
+  -- `x ∉ M_σ(N)` since `x` is a `τ₂(N)`-element (`σ(N)′`).
+  have hxnotMσN : x ∉ (OddOrder.BG.Ch3.S10.Msigma N : Set G) := by
+    intro hxMσN
+    obtain ⟨p, hpp, hpdvd⟩ := (orderOf x).exists_prime_and_dvd
+      (fun h => hx1 (orderOf_eq_one_iff.mp h))
+    have hpπx : p ∈ S14.piSet (Subgroup.closure ({x} : Set G)) := by
+      rw [S14.piSet, ← Subgroup.zpowers_eq_closure, Nat.card_zpowers]
+      exact Nat.mem_primeFactors.mpr ⟨hpp, hpdvd, (orderOf_pos x).ne'⟩
+    have hpτ2 : p ∈ tau2 N := hxtau2 p hpπx
+    have hpσN : p ∈ OddOrder.BG.Ch3.S10.sigma N :=
+      OddOrder.BG.Ch3.S10.Msigma_isPiGroup N p (Nat.mem_primeFactors.mpr ⟨hpp,
+        hpdvd.trans ((OddOrder.BG.Ch3.S10.Msigma N).orderOf_dvd_natCard
+          (SetLike.mem_coe.mp hxMσN)), Nat.card_pos.ne'⟩)
+    exact ((mem_tau2_iff N p).mp hpτ2).1 hpσN
+  refine ⟨OddOrder.BG.Ch3.S10.Msigma N ⊓ Subgroup.centralizer ({x} : Set G),
+    RData_of_inputs hG hM hxMσ hx1 hCN hMsharp hRhall
+      (signalizer_centralizer_isComplement hMcompl hCN hxM_mem),
+    N, ⟨?_, rfl, ?_, ⟨?_, hxnotMσN⟩, hNtype, hMcompl.symm, ?_⟩, ?_⟩
+  · rw [hMC]; rfl
+  · exact maxNilpotentNormalHall_eq_Msigma_of_isTypeF_or_isTypeP2 hG hNmax hNtype
+  · -- `x ∈ ASet N ⊤ = hatMsigma N`.
+    show x ∈ ASet N ⊤
+    refine ⟨⟨hxN, hRne⟩, ?_⟩
+    simp
+  · -- `IsTypeP2 N → IsTypeF M ∧ ¬FittingIsTI M ∧ Frobenius`.
+    intro hP2
+    have hNnotF : ¬ S14.IsTypeF N := fun hF => S14.not_isTypeP_and_isTypeF ⟨hP2.1, hF⟩
+    have hNmem : N ∈ maximalSubgroupsContaining (Subgroup.centralizer ({x} : Set G)) := by
+      rw [hMC]; rfl
+    obtain ⟨hFM, hnotTI, -, E, hEM, hEcompl, hEcyc, hEfrob, -⟩ :=
+      centralizer_escape_final_local hG hM hNmax hx hesc hNmem hNnotF
+    exact ⟨hFM, hnotTI, E, hEM, hEcyc, hEcompl, hEfrob⟩
+  · rintro N' ⟨hN'mem, -⟩
+    rw [hMC] at hN'mem
+    exact hN'mem
+
+/-- **BG Theorem D** (mmd L4317, recovered tail L4368): conjugacy and centralizer
+control for `M_sigma`, including the `R(x)` normal complement, its sharply transitive
+action, and the unique maximal subgroup attached to escaping centralizers.
+
+The final conjunct is the recovered BG D(4) tail: `M ∩ N` complements `N_sigma` in
+`N`, and if `N` is type `P2` then `M` is type `F`, Frobenius with cyclic complement,
+and `M_F` is not TI. -/
+theorem theoremD_msigma_conjugacy_and_centralizers [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G}
+    (hM : M ∈ maximalSubgroups G) :
+    (∀ x ∈ OddOrder.BG.Ch3.S10.Msigma M, ∀ y ∈ OddOrder.BG.Ch3.S10.Msigma M,
+      (∃ g : G, y = g * x * g⁻¹) → ∃ m ∈ M, y = m * x * m⁻¹) ∧
+      (∀ g : G, g ∉ M → IsCyclic ↥(OddOrder.BG.Ch3.S10.Msigma M ⊓ (MulAut.conj g • M))) ∧
+      (∀ x : G, x ∈ sigmaSharp M → ∃ R : Subgroup G, RData M x R) ∧
+      (∀ x : G, x ∈ sigmaSharp M → ¬ Subgroup.centralizer ({x} : Set G) ≤ M →
+        ∃ R : Subgroup G,
+          RData M x R ∧
+          ∃! N : Subgroup G,
+            N ∈ maximalSubgroupsContaining (Subgroup.centralizer ({x} : Set G)) ∧
+            R = OddOrder.BG.Ch3.S10.Msigma N ⊓ Subgroup.centralizer ({x} : Set G) ∧
+            S15.MF N = OddOrder.BG.Ch3.S10.Msigma N ∧
+            x ∈ ASet N ⊤ \ (OddOrder.BG.Ch3.S10.Msigma N : Set G) ∧
+            (S14.IsTypeF N ∨ S14.IsTypeP2 N) ∧
+            Subgroup.IsComplement' ((M ⊓ N).subgroupOf N)
+              ((OddOrder.BG.Ch3.S10.Msigma N).subgroupOf N) ∧
+            (S14.IsTypeP2 N →
+              S14.IsTypeF M ∧ ¬ S15.FittingIsTI M ∧
+                ∃ E : Subgroup G,
+                  E ≤ M ∧ IsCyclic ↥E ∧
+                  Subgroup.IsComplement' ((OddOrder.BG.Ch3.S10.Msigma M).subgroupOf M)
+                    (E.subgroupOf M) ∧
+                  OddOrder.Isaacs.Ch06.IsFrobeniusGroup ↥M
+                    ((OddOrder.BG.Ch3.S10.Msigma M).subgroupOf M) (E.subgroupOf M))) := by
+  refine ⟨msigma_fusion_control hG hM, fun g hg => Msigma_inf_conj_isCyclic hG hM hg, ?_, ?_⟩
+  · exact exists_RData_of_mem_sigmaSharp hG hM
+  · exact fun x hx hesc => exists_RData_escape_structure hG hM hx hesc
 
 /-- **Type I and non-Type-I are mutually exclusive** (corollary of Proposition
 16.1(a)–(d)).  A maximal subgroup of a minimal simple group of odd order that is
