@@ -834,3 +834,24 @@ Coq `PFsection9.v` L323-365 精読完了:
 **∴ (9.7) port の hard core = Clifford dprod 分解 (H̄=⊕H1^w)** = rep-theory 重量級、`Clifford.lean`
 (clifford_decomposition 等) 活用、fresh focused context 推奨。これが caseA degree (conjunct b/c/d) の
 唯一の真の gate。完成済は全て gate まで (HU-inertia + regular θ̄ + combinatorial core)。
+
+
+## 真の bottom 確定: caseA degree は Clifford rep-theory core (issue 0026) に gated (2026-06-30)
+
+決定的調査結果: `Clifford.lean` の `clifford_decomposition` は **conditional 再包装のみ** (Clifford data
+t,e,θ を**仮説として取る**)。docstring 明記: 実構築は「InducedCharacter + SecondOrthogonality proof
+core (issues/0026-peterfalvi-clifford-core.md に分離)」を要し、**未構築**。Coq (9.7) dprod は
+**module Clifford 理論** (`abelem_repr` + `Clifford_basis`) を使用。
+
+**∴ caseA degree の完全 dependency chain**:
+```
+conjunct b/c/d → (9.7) port → Clifford dprod (H̄=⊕H1^w) → Clifford rep-theory core (issue 0026、
+  InducedCharacter + SecondOrthogonality、partially-unbuilt、substantial)
+```
+caseA degree は **deep rep-theory gate (issue 0026) に transitively gated**。完成済 HU-level milestone
+(inertia core+lift, regular θ̄, combinatorial core = 12 commits) は **この gate まで到達可能な境界そのもの**。
+
+**lane-a 戦略含意**: caseA degree (conjunct b/c/d) は issue 0026 (Clifford core) が真の上流。これは
+major rep-theory 形式化 (InducedCharacter + 2nd orthogonality)。**upstream-first ⟹ 次の真の作業は
+issue 0026 の Clifford core** (or それを回避する別 lane-a FT-path 作業の再評価)。caseA degree の HU-level
+milestone は honest かつ完備で、deep gate ゆえ此処が自然な区切り。
