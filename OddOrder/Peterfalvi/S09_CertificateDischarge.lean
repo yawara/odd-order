@@ -920,16 +920,44 @@ theorem inner_tau_supported_constOne {G : Type*} [Group G] [Fintype G] {A : Set 
     rwa [OddOrder.Peterfalvi.S04.mem_supportInSubgroup] at h
   rw [H71.chiRhoCF_apply, H71.chiRho_constOne, if_pos hgA, Hypothesis71.constOne_apply]
 
+/-- **Peterfalvi (7.8.a), `S^ν ⊥ 1_G`, generic family form.**  Abstracted over an arbitrary family
+`ζ : Fin (n+1) → CF(L)` (not necessarily induced), with the coherence agreement
+`(ζ_i − d_i ζ_0)^τ = ζ_i^ν − d_i ζ_0^ν` (`hagree`), the distinguished image orthogonality
+`⟨ζ_0^ν, 1_G⟩ = 0` (`hzeta0nu`), and the source-side fact `⟨ζ_i, 1_L⟩ = 0` for `i ≠ ind1H`
+(`hzeta_orth_one`, true for nonprincipal induced characters), every `ζ_i^ν` (`i ≠ ind1H`) is
+orthogonal to `1_G`.  This is the family-agnostic core; the `induce`-specific
+`betaDecomp_orth_one` and the abstract-`Hypothesis78`-level constructor both instantiate it. -/
+theorem betaDecomp_orth_one_gen {G : Type*} [Group G] [Fintype G] {A : Set G} {L : Subgroup G}
+    [Fintype L] [Invertible (Nat.card L : ℂ)] [Invertible (Nat.card G : ℂ)]
+    (H71 : Hypothesis71 G A L) {n : ℕ} (ζ : Fin (n + 1) → ClassFunction ↥L ℂ) (d : Fin (n + 1) → ℂ)
+    (psi_support : ∀ i, (ζ i - d i • ζ 0).support ⊆ OddOrder.Peterfalvi.S04.supportInSubgroup A L)
+    (ind1H : Fin (n + 1)) (hind1H : ind1H ≠ 0)
+    (ν : ClassFunction ↥L ℂ →ₗ[ℤ] ClassFunction G ℂ)
+    (hagree : ∀ i : Fin (n + 1), i ≠ 0 → i ≠ ind1H →
+      H71.τ ⟨ζ i - d i • ζ 0, psi_support i⟩ = ν (ζ i) - d i • ν (ζ 0))
+    (hzeta0nu : ClassFunction.inner (ν (ζ 0)) (Hypothesis71.constOne G) = 0)
+    (hzeta_orth_one : ∀ i : Fin (n + 1), i ≠ ind1H →
+      ClassFunction.inner (ζ i) (Hypothesis71.constOne L) = 0) :
+    ∀ i : Fin (n + 1), i ≠ ind1H →
+      ClassFunction.inner (ν (ζ i)) (Hypothesis71.constOne G) = 0 := by
+  intro i hi
+  by_cases hi0 : i = 0
+  · rw [hi0]; exact hzeta0nu
+  · have hrearrange : ν (ζ i)
+        = H71.τ ⟨ζ i - d i • ζ 0, psi_support i⟩ + d i • ν (ζ 0) := by
+      rw [hagree i hi0 hi]; abel
+    rw [hrearrange, ClassFunction.inner_add_left, ClassFunction.inner_smul_left, hzeta0nu,
+      mul_zero, add_zero, inner_tau_supported_constOne]
+    show ClassFunction.inner (ζ i - d i • ζ 0) (Hypothesis71.constOne L) = 0
+    rw [ClassFunction.inner_sub_left, ClassFunction.inner_smul_left,
+      hzeta_orth_one i hi, hzeta_orth_one 0 (Ne.symm hind1H), mul_zero, sub_zero]
+
 /-- **Peterfalvi (7.8.a), `S^ν ⊥ 1_G`** (the `orth_one` field of `BetaDecomp`), carrier-conditional
 on the coherence of `ν`.  With the distinguished `ζ = Ind_K^L θ_0` at index `0`, the principal
 `Ind_K^L 1_K` at `ind1H ≠ 0`, the coherence agreement `(ζ_i − d_i ζ_0)^τ = ζ_i^ν − d_i ζ_0^ν`
 (`hagree`), and the single base fact `⟨ζ_0^ν, 1_G⟩ = 0` (`hzeta0nu`, the distinguished image is
-nonprincipal), every `ζ_i^ν` (`i ≠ ind1H`) is orthogonal to `1_G`:
-
-* `i = 0` is `hzeta0nu`;
-* for `i ≠ 0, ind1H`, `⟨ζ_i^ν, 1_G⟩ = ⟨(ζ_i − d_i ζ_0)^τ, 1_G⟩ + d_i ⟨ζ_0^ν, 1_G⟩` (`hagree`), the
-  first summand is `⟨ζ_i − d_i ζ_0, 1_L⟩ = 0` (`inner_tau_supported_constOne` +
-  `inner_induce_constOne_eq_zero`, as `θ_i, θ_0 ≠ 1_K`), the second is `0` (`hzeta0nu`). -/
+nonprincipal), every `ζ_i^ν` (`i ≠ ind1H`) is orthogonal to `1_G`.  The `induce`-specific
+`⟨Ind θ_i, 1_L⟩ = 0` (`θ_i ≠ 1_K`) source-orthogonality is supplied to `betaDecomp_orth_one_gen`. -/
 theorem betaDecomp_orth_one {G : Type*} [Group G] [Fintype G] {A : Set G} {L : Subgroup G}
     [Fintype L] [Invertible (Nat.card L : ℂ)] [Invertible (Nat.card G : ℂ)]
     (H71 : Hypothesis71 G A L) (K : Subgroup ↥L) [K.Normal] [Fintype ↥K]
@@ -959,22 +987,9 @@ theorem betaDecomp_orth_one {G : Type*} [Group G] [Fintype G] {A : Set G} {L : S
     show ClassFunction.induce K (θ j : ClassFunction ↥K ℂ)
       = ClassFunction.induce K (θ ind1H : ClassFunction ↥K ℂ)
     rw [hcontra, hzeta_ind1H]
-  intro i hi
-  by_cases hi0 : i = 0
-  · rw [hi0]; exact hzeta0nu
-  · have hrearrange : ν (ClassFunction.induce K (θ i : ClassFunction ↥K ℂ))
-        = H71.τ ⟨ClassFunction.induce K (θ i : ClassFunction ↥K ℂ)
-            - d i • ClassFunction.induce K (θ 0 : ClassFunction ↥K ℂ), psi_support i⟩
-          + d i • ν (ClassFunction.induce K (θ 0 : ClassFunction ↥K ℂ)) := by
-      rw [hagree i hi0 hi]; abel
-    rw [hrearrange, ClassFunction.inner_add_left, ClassFunction.inner_smul_left, hzeta0nu,
-      mul_zero, add_zero, inner_tau_supported_constOne]
-    show ClassFunction.inner (ClassFunction.induce K (θ i : ClassFunction ↥K ℂ)
-        - d i • ClassFunction.induce K (θ 0 : ClassFunction ↥K ℂ)) (Hypothesis71.constOne L) = 0
-    rw [ClassFunction.inner_sub_left, ClassFunction.inner_smul_left,
-      inner_induce_constOne_eq_zero K (θ i) (hne_triv i hi),
-      inner_induce_constOne_eq_zero K (θ 0) (hne_triv 0 (Ne.symm hind1H)),
-      mul_zero, sub_zero]
+  exact betaDecomp_orth_one_gen H71 (fun i => ClassFunction.induce K (θ i : ClassFunction ↥K ℂ))
+    d psi_support ind1H hind1H ν hagree hzeta0nu
+    (fun i hi => inner_induce_constOne_eq_zero K (θ i) (hne_triv i hi))
 
 /-- **The family-difference inner product** (Peterfalvi (7.8.a), `a_φ` computation).  For pairwise
 distinct family members, `⟨ζ_{ind1H} − ζ_0, ζ_i − d_i ζ_0⟩ = star(d_i) ‖ζ_0‖²` (`i ≠ 0, ind1H`,
@@ -1185,12 +1200,40 @@ theorem betaDecomp_gamma_orth_nu {G : Type*} [Group G] [Fintype G] {A : Set G} {
       rw [hd j, star_div₀, induce_apply_one_star, induce_apply_one_star]
     rw [hstar]; ring
 
+/-- **Peterfalvi (7.8.a), `Γ ⊥ 1_G`, generic family form.**  Abstracted over an arbitrary family
+`ζ` and taking the family-agnostic `⟨β, 1_G⟩ = 1` (`hβ1`).  For the residual
+`Γ = β − (1_G − ζ_0^ν + a · W)`, `⟨Γ, 1_G⟩ = ⟨β,1_G⟩ − ⟨1_G,1_G⟩ + ⟨ζ_0^ν,1_G⟩ − ā⟨W,1_G⟩
+= 1 − 1 + 0 − 0 = 0` (`⟨ζ_0^ν,1_G⟩ = 0` and `⟨W,1_G⟩ = 0` from `horth1`).  Instantiated by the
+`induce`-specific `betaDecomp_gamma_orth_one` (which computes `⟨β,1_G⟩ = 1`) and the
+`Hypothesis78`-level constructor. -/
+theorem betaDecomp_gamma_orth_one_gen {G : Type*} [Group G] [Fintype G]
+    {L : Subgroup G} [Fintype L] [Invertible (Nat.card L : ℂ)] [Invertible (Nat.card G : ℂ)]
+    {n : ℕ} (ζ : Fin (n + 1) → ClassFunction ↥L ℂ)
+    {ind1H : Fin (n + 1)} (hind0 : ind1H ≠ 0)
+    (ν : ClassFunction ↥L ℂ →ₗ[ℤ] ClassFunction G ℂ)
+    (horth1 : ∀ i : Fin (n + 1), i ≠ ind1H →
+      ClassFunction.inner (ν (ζ i)) (Hypothesis71.constOne G) = 0)
+    (β : ClassFunction G ℂ) (hβ1 : ClassFunction.inner β (Hypothesis71.constOne G) = 1)
+    (a : ℂ) (W : ClassFunction G ℂ)
+    (hW : W = ∑ i ∈ Finset.univ.erase ind1H,
+      (ζ i (1 : ↥L) / (ζ 0 (1 : ↥L) * ClassFunction.inner (ζ i) (ζ i)) : ℂ) • ν (ζ i)) :
+    ClassFunction.inner (β - (Hypothesis71.constOne G - ν (ζ 0) + a • W))
+      (Hypothesis71.constOne G) = 0 := by
+  have hW0 : ClassFunction.inner W (Hypothesis71.constOne G) = 0 := by
+    rw [hW, inner_sum_left]
+    refine Finset.sum_eq_zero fun i hi => ?_
+    rw [ClassFunction.inner_smul_left, horth1 i (Finset.mem_erase.mp hi).1, mul_zero]
+  rw [ClassFunction.inner_sub_left, ClassFunction.inner_add_left, ClassFunction.inner_sub_left,
+    ClassFunction.inner_smul_left, hβ1, hW0, horth1 0 (Ne.symm hind0),
+    Hypothesis71.constOne_inner_self_eq_one]
+  ring
+
 /-- **Peterfalvi (7.8.a), `Γ ⊥ 1_G`** (the `Gamma_orth_one` field of `BetaDecomp`).  For the residual
 `Γ = β − (1_G − ζ_0^ν + a · W)`, `⟨Γ, 1_G⟩ = ⟨β,1_G⟩ − ⟨1_G,1_G⟩ + ⟨ζ_0^ν,1_G⟩ − a⟨W,1_G⟩`, where
 `⟨β,1_G⟩ = ⟨Ind 1_K − ζ_0, 1_L⟩ = 1 − 0 = 1` (`inner_tau_supported_constOne` +
 `inner_induce_trivialChar_constOne_eq_one`/`inner_induce_constOne_eq_zero`), `⟨1_G,1_G⟩ = 1`,
 `⟨ζ_0^ν,1_G⟩ = 0` (`orth_one`), and `⟨W,1_G⟩ = 0` (`orth_one` for each summand) — giving
-`1 − 1 + 0 − 0 = 0`. -/
+`1 − 1 + 0 − 0 = 0`.  The `⟨β,1_G⟩ = 1` computation is fed to `betaDecomp_gamma_orth_one_gen`. -/
 theorem betaDecomp_gamma_orth_one {G : Type*} [Group G] [Fintype G] {A : Set G} {L : Subgroup G}
     [Fintype L] [Invertible (Nat.card L : ℂ)] [Invertible (Nat.card G : ℂ)]
     (H71 : Hypothesis71 G A L)
@@ -1231,14 +1274,8 @@ theorem betaDecomp_gamma_orth_one {G : Type*} [Group G] [Fintype G] {A : Set G} 
         = ClassFunction.induce K (trivialIrreducibleCharacter ↥K : ClassFunction ↥K ℂ) from by
         rw [hzeta_ind1H],
       inner_induce_trivialChar_constOne_eq_one, inner_induce_constOne_eq_zero K (θ 0) hθ0, sub_zero]
-  have hW0 : ClassFunction.inner W (Hypothesis71.constOne G) = 0 := by
-    rw [hW, inner_sum_left]
-    refine Finset.sum_eq_zero fun i hi => ?_
-    rw [ClassFunction.inner_smul_left, horth1 i (Finset.mem_erase.mp hi).1, mul_zero]
-  rw [ClassFunction.inner_sub_left, ClassFunction.inner_add_left, ClassFunction.inner_sub_left,
-    ClassFunction.inner_smul_left, hβ1, hW0, horth1 0 (Ne.symm hind0),
-    Hypothesis71.constOne_inner_self_eq_one]
-  ring
+  exact betaDecomp_gamma_orth_one_gen (fun i => ClassFunction.induce K (θ i : ClassFunction ↥K ℂ))
+    hind0 ν horth1 β hβ1 a W hW
 
 /-- **The (7.8.c) collapse of the (7.7.a) sum to a single term.**  If, in the `(7.7.a)`
 decomposition `χ^ρ(x) = ∑_{i ≥ 1} (c̄_i/‖ζ_i‖²) ζ_i(x)`, all coefficients `c_i` (`i ≥ 1`) vanish
@@ -1792,5 +1829,117 @@ theorem family_degree_sum_Ioi {L : Type*} [Group L] [Fintype L] [Invertible (Nat
   rw [hIoi, Finset.sum_erase_eq_sub h0mem,
     family_degree_sum K θ hinj hcover ind1H hzeta_ind1H, hz0_deg, hz0_norm]
   ring
+
+/-- **(7.8.b) ℂ-level norm identity at the `Hypothesis78` level** (the `h_inner` producer).  Lifts
+`zetaNuRho_inner_eq_cexpr` (stated for `chiRhoCF (ν ζ_0)`) to
+`H78.zetaNuRho = chiRhoCF (ν ζ_{zetaDistinct})` under the constructor convention `zetaDistinct = 0`,
+then identifies the off-distinguished degree sum
+`G = Σ_{i ∈ Ioi 0, i ≠ ind1H} ζ_i(1)²/‖ζ_i‖²` with `e·(h−1) − e²` (via `hGsum`, the `(1.5.d)`
+`family_degree_sum_Ioi` value) and `|L| = e·h` (Lagrange
+`kernelOrder_mul_complementIndex_eq_card_L`).
+The conclusion is in the `(e_ℝ:ℂ)` real-cast shape consumed by `zetaNuRhoNormSq_eq_normQuad`. -/
+theorem zetaNuRho_inner_eq_cexpr_H78 {G : Type*} [Group G] [Fintype G] {A : Set G} {L : Subgroup G}
+    [Fintype L] [Invertible (Nat.card L : ℂ)] [Invertible (Nat.card G : ℂ)]
+    (H78 : OddOrder.Peterfalvi.S09.Hypothesis78 G A L) (hBD : H78.BetaDecomp)
+    (hzd : H78.zetaDistinct = 0)
+    (horth : ∀ i j : Fin (H78.hyp76.n + 1), i ≠ j →
+      ClassFunction.inner (H78.hyp76.zeta i) (H78.hyp76.zeta j) = 0)
+    (hc_ind1H : H78.hyp76.cCoeff (H78.nu (H78.hyp76.zeta 0)) H78.ind1H = (hBD.a : ℂ) - 1)
+    (hc_rest : ∀ i, i ≠ 0 → i ≠ H78.ind1H →
+      H78.hyp76.cCoeff (H78.nu (H78.hyp76.zeta 0)) i = -(H78.hyp76.d i))
+    (hd_real : ∀ i, star (H78.hyp76.d i) = H78.hyp76.d i)
+    (hP_real : ∀ i, star (H78.hyp76.zeta i 1) = H78.hyp76.zeta i 1)
+    (hd : ∀ i, H78.hyp76.d i = H78.hyp76.zeta i 1 / (H78.complementIndex : ℂ))
+    (hN_ind1H : H78.hyp76.zetaNormSq H78.ind1H = (H78.complementIndex : ℂ))
+    (hP_ind1H : H78.hyp76.zeta H78.ind1H 1 = (H78.complementIndex : ℂ))
+    (hGsum : ∑ i ∈ (Finset.Ioi (0 : Fin (H78.hyp76.n + 1))).erase H78.ind1H,
+        H78.hyp76.zeta i 1 ^ 2 / H78.hyp76.zetaNormSq i
+      = (H78.complementIndex : ℂ) * ((H78.kernelOrder : ℂ) - 1) - (H78.complementIndex : ℂ) ^ 2) :
+    ClassFunction.inner H78.zetaNuRho H78.zetaNuRho =
+      (((hBD.a : ℝ) : ℂ) - 1) ^ 2 / ((H78.complementIndex : ℝ) : ℂ)
+        + (((H78.complementIndex : ℝ) * ((H78.kernelOrder : ℝ) - 1)
+              - (H78.complementIndex : ℝ) ^ 2 : ℝ) : ℂ) / ((H78.complementIndex : ℝ) : ℂ) ^ 2
+        - ((((hBD.a : ℝ) : ℂ) - 1)
+            - (((H78.complementIndex : ℝ) * ((H78.kernelOrder : ℝ) - 1)
+                  - (H78.complementIndex : ℝ) ^ 2 : ℝ) : ℂ) / ((H78.complementIndex : ℝ) : ℂ)) ^ 2
+          / (((H78.complementIndex : ℝ) : ℂ) * ((H78.kernelOrder : ℝ) : ℂ)) := by
+  have he_ne : (H78.complementIndex : ℂ) ≠ 0 :=
+    Nat.cast_ne_zero.mpr H78.complementIndex_pos.ne'
+  have hind : H78.ind1H ≠ 0 := fun h => H78.zetaDistinct_ne_ind1H (hzd.trans h.symm)
+  have ha1_real : star ((hBD.a : ℂ) - 1) = (hBD.a : ℂ) - 1 := by simp
+  have hLcard : (Nat.card L : ℂ) = (H78.complementIndex : ℂ) * (H78.kernelOrder : ℂ) := by
+    rw [mul_comm]; exact_mod_cast H78.kernelOrder_mul_complementIndex_eq_card_L.symm
+  simp only [OddOrder.Peterfalvi.S09.Hypothesis78.zetaNuRho, hzd]
+  rw [zetaNuRho_inner_eq_cexpr H78.hyp76 H78.nu (hBD.a : ℂ) (H78.complementIndex : ℂ) hind horth
+      hc_ind1H hc_rest ha1_real hd_real hP_real hd hN_ind1H hP_ind1H he_ne,
+    hGsum, hLcard]
+  push_cast
+  ring
+
+/-- **Peterfalvi (7.8.b), the `ζ`-norm lower bound** (`Hypothesis78` level).  Assembles the full
+chain: the `h_inner` identity `zetaNuRho_inner_eq_cexpr_H78`, the real-part identification
+`zetaNuRhoNormSq_eq_normQuad` (`‖ζ_0^{νρ}‖² = normQuadraticCorrection + (1 − e/h)`), and the
+nonnegativity reduction `zetaNuRhoNormSq_ge_of_normQuadraticCorrection_eq` (valid under
+`2e + 1 ≤ h`).  The result `1 − e/h ≤ ‖ζ_0^{νρ}‖²` is exactly the (7.8.b)
+`NormEstimates.zetaNuRho_norm_sq_ge` target, discharged from the abstract
+`(7.8.a)`-decomposition / coherence / degree facts. -/
+theorem zetaNuRhoNormSq_eq_normQuad_of_facts {G : Type*} [Group G] [Fintype G] {A : Set G}
+    {L : Subgroup G} [Fintype L] [Invertible (Nat.card L : ℂ)] [Invertible (Nat.card G : ℂ)]
+    (H78 : OddOrder.Peterfalvi.S09.Hypothesis78 G A L) (hBD : H78.BetaDecomp)
+    (hzd : H78.zetaDistinct = 0)
+    (horth : ∀ i j : Fin (H78.hyp76.n + 1), i ≠ j →
+      ClassFunction.inner (H78.hyp76.zeta i) (H78.hyp76.zeta j) = 0)
+    (hc_ind1H : H78.hyp76.cCoeff (H78.nu (H78.hyp76.zeta 0)) H78.ind1H = (hBD.a : ℂ) - 1)
+    (hc_rest : ∀ i, i ≠ 0 → i ≠ H78.ind1H →
+      H78.hyp76.cCoeff (H78.nu (H78.hyp76.zeta 0)) i = -(H78.hyp76.d i))
+    (hd_real : ∀ i, star (H78.hyp76.d i) = H78.hyp76.d i)
+    (hP_real : ∀ i, star (H78.hyp76.zeta i 1) = H78.hyp76.zeta i 1)
+    (hd : ∀ i, H78.hyp76.d i = H78.hyp76.zeta i 1 / (H78.complementIndex : ℂ))
+    (hN_ind1H : H78.hyp76.zetaNormSq H78.ind1H = (H78.complementIndex : ℂ))
+    (hP_ind1H : H78.hyp76.zeta H78.ind1H 1 = (H78.complementIndex : ℂ))
+    (hGsum : ∑ i ∈ (Finset.Ioi (0 : Fin (H78.hyp76.n + 1))).erase H78.ind1H,
+        H78.hyp76.zeta i 1 ^ 2 / H78.hyp76.zetaNormSq i
+      = (H78.complementIndex : ℂ) * ((H78.kernelOrder : ℂ) - 1) - (H78.complementIndex : ℂ) ^ 2) :
+    H78.zetaNuRhoNormSq =
+      H78.normQuadraticCorrection hBD
+        + (1 - (H78.complementIndex : ℝ) / (H78.kernelOrder : ℝ)) :=
+  zetaNuRhoNormSq_eq_normQuad H78 hBD (hBD.a : ℝ) (H78.complementIndex : ℝ) (H78.kernelOrder : ℝ)
+    ((H78.complementIndex : ℝ) * ((H78.kernelOrder : ℝ) - 1) - (H78.complementIndex : ℝ) ^ 2)
+    (Nat.cast_ne_zero.mpr H78.complementIndex_pos.ne')
+    (Nat.cast_ne_zero.mpr H78.kernelOrder_pos.ne') rfl rfl rfl rfl
+    (zetaNuRho_inner_eq_cexpr_H78 H78 hBD hzd horth hc_ind1H hc_rest hd_real hP_real hd
+      hN_ind1H hP_ind1H hGsum)
+
+/-- **Peterfalvi (7.8.b), the `ζ`-norm lower bound** (`Hypothesis78` level).  The direct `≤` form of
+the (7.8.b) target `NormEstimates.zetaNuRho_norm_sq_ge`: from the `zetaNuRhoNormSq_eq_normQuad_of_facts`
+identity and the `smallIndex` (`2e + 1 ≤ h`) nonnegativity reduction
+`zetaNuRhoNormSq_ge_of_normQuadraticCorrection_eq`, the coherent `ζ`-image satisfies
+`1 − e/h ≤ ‖ζ_0^{νρ}‖²`.
+
+To obtain the *full* (7.8.b) `NormEstimates` (both the `ζ` bound and the `Γ` bound `‖Γ‖² ≤ e − 1`),
+feed `zetaNuRhoNormSq_eq_normQuad_of_facts` as the `hzeta` argument of the already-assembled source-side
+`OddOrder.Peterfalvi.S09.Hypothesis78.normEstimates_of_source_orthogonal`. -/
+theorem zetaNuRhoNormSq_ge_of_facts {G : Type*} [Group G] [Fintype G] {A : Set G} {L : Subgroup G}
+    [Fintype L] [Invertible (Nat.card L : ℂ)] [Invertible (Nat.card G : ℂ)]
+    (H78 : OddOrder.Peterfalvi.S09.Hypothesis78 G A L) (hBD : H78.BetaDecomp)
+    (hzd : H78.zetaDistinct = 0)
+    (horth : ∀ i j : Fin (H78.hyp76.n + 1), i ≠ j →
+      ClassFunction.inner (H78.hyp76.zeta i) (H78.hyp76.zeta j) = 0)
+    (hc_ind1H : H78.hyp76.cCoeff (H78.nu (H78.hyp76.zeta 0)) H78.ind1H = (hBD.a : ℂ) - 1)
+    (hc_rest : ∀ i, i ≠ 0 → i ≠ H78.ind1H →
+      H78.hyp76.cCoeff (H78.nu (H78.hyp76.zeta 0)) i = -(H78.hyp76.d i))
+    (hd_real : ∀ i, star (H78.hyp76.d i) = H78.hyp76.d i)
+    (hP_real : ∀ i, star (H78.hyp76.zeta i 1) = H78.hyp76.zeta i 1)
+    (hd : ∀ i, H78.hyp76.d i = H78.hyp76.zeta i 1 / (H78.complementIndex : ℂ))
+    (hN_ind1H : H78.hyp76.zetaNormSq H78.ind1H = (H78.complementIndex : ℂ))
+    (hP_ind1H : H78.hyp76.zeta H78.ind1H 1 = (H78.complementIndex : ℂ))
+    (hGsum : ∑ i ∈ (Finset.Ioi (0 : Fin (H78.hyp76.n + 1))).erase H78.ind1H,
+        H78.hyp76.zeta i 1 ^ 2 / H78.hyp76.zetaNormSq i
+      = (H78.complementIndex : ℂ) * ((H78.kernelOrder : ℂ) - 1) - (H78.complementIndex : ℂ) ^ 2)
+    (hsmall : H78.smallIndex) :
+    1 - (H78.complementIndex : ℝ) / (H78.kernelOrder : ℝ) ≤ H78.zetaNuRhoNormSq :=
+  H78.zetaNuRhoNormSq_ge_of_normQuadraticCorrection_eq hBD
+    (zetaNuRhoNormSq_eq_normQuad_of_facts H78 hBD hzd horth hc_ind1H hc_rest hd_real hP_real hd
+      hN_ind1H hP_ind1H hGsum) hsmall
 
 end OddOrder.Peterfalvi.S09.Cert
