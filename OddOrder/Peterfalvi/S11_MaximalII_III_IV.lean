@@ -6113,5 +6113,22 @@ theorem hcHom_inclusion [Finite G] {M : Subgroup G}
   rw [MulEquiv.trans_apply, MulEquiv.symm_apply_apply]
   exact QuotientGroup.congr_mk _ chief.N (hInHuEquivH data) _ h
 
+/-- **`ψ|_hInHu = θ₀`** (pointwise): on the inclusion of `h ∈ hInHu`, the `HC`-linear character
+`ψ = hcPsi θ` equals the seed's inflation `θ₀ = compHom hInHuEquivH (compHom mk'_N (linearIrr θ))`.
+Both equal `(θ ((mk'_N) (hInHuEquivH h)) : ℂ)` via `hcHom_inclusion`.  This is the restriction
+identity feeding the restriction-inertia `inertia(ψ) ⊆ inertia(θ₀) = HC`. -/
+theorem hcPsi_apply_inclusion [Finite G] {M : Subgroup G}
+    {data : TypesIIIIIIVSetup M} (chief : ChiefFactorData data)
+    (θ : (↥data.H ⧸ chief.N) →* ℂˣ) (h : ↥(hInHu data)) :
+    (hcPsi chief θ : ClassFunction
+        ↥(hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf (huSub data)) ℂ)
+      (Subgroup.inclusion le_sup_left h)
+      = (ClassFunction.compHom (hInHuEquivH data).toMonoidHom
+          (ClassFunction.compHom (QuotientGroup.mk' chief.N)
+            (linearIrreducibleCharacter θ : ClassFunction (↥data.H ⧸ chief.N) ℂ)))
+        h := by
+  simp only [hcPsi, linearIrreducibleCharacter_apply, MonoidHom.comp_apply,
+    ClassFunction.compHom_apply, MulEquiv.coe_toMonoidHom, hcHom_inclusion]
+
 end OddOrder.Peterfalvi.S11
 
