@@ -810,3 +810,27 @@ aperiodic regular θ̄ → I_M=HU (prime-index, relindex 不在ゆえ Nat.card �
 → conjunct c。conjunct b は reducible=特定 W1-orbit。
 **次の真の作業 = (9.7) typeP_Galois_Pn の Lean port** (Coq PFsection9 の typeP_Galois_Pn 周辺精読 +
 W1-conjugate 分解構築)。これは数十行〜の coherent な新規形式化、fresh context 推奨。
+
+
+## (9.7) port の precise design — Coq typeP_Galois_Pn 精読 (2026-06-30、Coq-first)
+
+Coq `PFsection9.v` L323-365 精読完了:
+- `typeP_Galois := acts_irreducibly U Hbar` (= caseB、CliffordCaseBData.actsIrreducibly に対応)。
+- `typeP_Galois_Pn (~~Galois)` (= caseA) → `{H1 | #|H1|=p, U/H0 ⊂ N(H1), [acts U on H1],`
+  `⊕_(w∈W1bar) H1:^w = Hbar, a-property}`。
+- **構築**: H1 = U-minimal-normal subgroup of H̄ (mingroup_exists; ~~irreducible ゆえ proper、order p)。
+  = **my producer の S₀ に相当** (U-invariant order-p factor)。
+- **核心 = Clifford dprod 分解** `⊕_(w∈W1bar) H1:^w = Hbar`: UW1-表現 rUW1 (abelem_repr) に Clifford
+  理論 (`Clifford_basis irrUW1 simV1`) を適用、H1 = U-simple submodule の W1-conjugates が H̄ を
+  direct-sum 分解。W1 が conjugates を置換 = W1-transitivity (by construction)。
+
+**port 設計 (Lean)**:
+1. `typeP_Galois` predicate = U-action irreducible (既 CliffordCaseBData.actsIrreducibly)。
+2. caseA: U-minimal H1 ≤ H̄ (order p, U-inv) を取る (= 現 producer の S₀ 役)。
+3. **H̄ = ⊕_(w∈W1bar) H1^w** を Clifford 理論 (repo `Clifford.lean`) で構築 — **rep-theory-heavy 核心**。
+4. producer rework: Hpart j := H1^{w_j} (W1-conjugates、現 maximal-SupIndep 族を置換) ⟹ W1-action
+   (W1 permutes conjugates) + transitivity が by-construction で出る。
+
+**∴ (9.7) port の hard core = Clifford dprod 分解 (H̄=⊕H1^w)** = rep-theory 重量級、`Clifford.lean`
+(clifford_decomposition 等) 活用、fresh focused context 推奨。これが caseA degree (conjunct b/c/d) の
+唯一の真の gate。完成済は全て gate まで (HU-inertia + regular θ̄ + combinatorial core)。
