@@ -343,6 +343,20 @@ theorem induce_norm_ne_zero (K : Subgroup L) [K.Normal] [Fintype ↥K] [Invertib
   rw [h0, mul_zero] at hkey
   exact (Nat.cast_ne_zero.mpr Nat.card_pos.ne') hkey.symm
 
+/-- **An induced irreducible character is nonzero at `1`.**  `Ind_K^L θ (1) = [L:K] · θ(1)`
+(`induce_apply_one`), and both factors are nonzero: `[L:K] ≠ 0` (finite index) and `θ(1)` is the
+positive natural number `dim θ` (`irreducibleCharacter_apply_one_eq_pos_natCast`).  This supplies
+`ζ_0(1) ≠ 0` (`hz0`), hence the well-definedness of the degree ratios `d_i = ζ_i(1)/ζ_0(1)` and the
+degree relation `ζ_i(1) = d_i ζ_0(1)` for the family `ζ_i = Ind_K^L θ_i`. -/
+theorem induce_apply_one_ne_zero (K : Subgroup L) [Fintype ↥K] [Invertible (Nat.card ↥K : ℂ)]
+    (θ : IrreducibleCharacter ↥K) :
+    ClassFunction.induce K (θ : ClassFunction ↥K ℂ) (1 : L) ≠ 0 := by
+  rw [ClassFunction.induce_apply_one]
+  obtain ⟨d, hd, hval⟩ := irreducibleCharacter_apply_one_eq_pos_natCast θ
+  refine mul_ne_zero (Nat.cast_ne_zero.mpr K.index_ne_zero_of_finite) ?_
+  rw [hval]
+  exact Nat.cast_ne_zero.mpr hd.ne'
+
 /-- **The induced family is pairwise orthogonal** (Peterfalvi (7.6)/(7.7.a) hypothesis).  For a
 family `θ : Fin (n+1) → Irr K` of pairwise non-conjugate irreducibles, the induced characters
 `ζ_i = Ind_K^L θ_i` are pairwise orthogonal — the `horth` hypothesis of `chiRho_decomp_proof`.
