@@ -1141,3 +1141,24 @@ reps + family_inequality + M̃-cover) は lane-d-doable だが 8.15/isometry が
 **∴ lane-d の岐路**: (a) §16 unconsumed endpoints 完遂 (group theory, 低 spine value) / (b) route B
 (spine-critical, §8-gated)。**project 方針 (spine>endpoint) は (b)**。次 = route B の assembly に着手
 (8.15 を cite した FamilyHypothesis71 構成、§8 residual は別途/lane-a-c 協調)。
+
+## 🏁 lane-d milestone closure (ユーザー裁定 2026-06-30 /loop⁵⁷): D(4) で一区切り + route B → lane-a/c
+
+ユーザーが「D(4) milestone で一区切り / 再配分」を選択。lane-d の BG §14-16 群論 high-value work は完了:
+- **✅ Theorem D 完全証明** (D(1)-D(4), commit fe606202) — escape signalizer 構造、uniqueness は
+  cent1_nreg_sigma_uniq で解決。
+- **✅ M̃-cover** (sharpSubgroup_top_eq_iUnion_conjClassSet_Mtilde_of_typeF) — route B の lane-d 入力。
+- **✅ §14 signalizer/cover 群論** (κ→Ẑ, general cover⊆, Cor 14.8/14.9, Lem 14.6, hD3, 14.5c cluster,
+  両 connector typeP_Z_inf_Msigma_eq_Kstar/partner_canonical_eq, family_inf_msigma_union_eq)。
+
+**残りは lane-d の high-value 範囲外**:
+- **spine-critical = route B** (cover_subset_kernels 回避の M̃-cover re-route): §8 Dade
+  (`dadeSupportHypotheses_typeI`=8.15 + Dade isometry + HConjInvariant + family_inequality contradiction)
+  に gated = **lane-a/c (POLE-2/§8) 担当**。lane-d の input (M̃-cover) は提供済。正本=issue 8022。
+- **low-value (unconsumed, spine 非cite)**: NonTypeICovering struct (assemblable, pieces 揃: zTilde +
+  family_inf_msigma_union_eq で Tset=zTilde + conjClassSet_Mtilde/T_disjoint + cover⊆ + one_not_mem_zTilde) /
+  theoremE (R-param + conjunct5=NonTypeICovering) / theoremII (§9 uniqueness + cross-piece) / aSets / theoremB。
+  いずれも gate-2 を閉じず spine 前進せず。orphaned≠defer ゆえ assigned だが優先度低。
+
+**hub への handoff**: lane-d /loop 停止。(a) route B §8 を lane-a/c に委ねる (issue 8022), (b) lane-d は
+別クラスタへ再配分 or higher-value task arise (§8 unblock 後の route B assembly) まで待機。
