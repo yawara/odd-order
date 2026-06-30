@@ -467,6 +467,15 @@ caseA inertia 解析 (CliffordCaseAData の Hpart 直積構造経由)。Coq `Par
 `isIndHC` (reducible mu_j=Ind linear HC char ⟹ degree qu) 参照。**caseB-constituent 並みの multi-iteration。**
 membership half は ✅ (`reducible_mem_sOf_H0C hG chars`、case-agnostic 済)。
 
+**❌ inertia=HC shortcut も無効 (2026-06-30 確認)**: `inertia_eq_hcInHu` (S11:4115) は
+`caseB.actsIrreducibly` (U が H̄ 上既約) を要求 — caseB-specific。caseA (non-Galois) では θ₀ の inertia≠HC
+ゆえ caseB_degree_qu の「χ=Ind_HC(linear)⟹degree u」機構は **reducibles にも直接転用不可**。
+⟹ caseA reducible degree は **CliffordCaseAData.Hpart 直積構造経由の inertia 解析が必須**
+(Coq Part_a の non-Galois 版)。= 真の deep piece、case-agnostic 経路は全て排除済。
+**注 (FT spine)**: (10.7) typeII_derived_frobenius が要するのは (9.8.b)+(9.9.b)+(9.10)。(9.9.b) は
+caseB conjunct 3 込み完了、(9.8.b) は count 完了 + **degree (caseA conjunct b) が残**。⟹ FT-spine-critical
+残 §9 = **caseA conjunct b degree** + **(9.10)** のみ (caseA c/d・caseB 9.9.c は (10.7) 非依存の可能性大)。
+
 ## 完了条件
 
 S11 の caseB_character_counts / caseA_character_counts / exceptional_case_frobenius_realization が
