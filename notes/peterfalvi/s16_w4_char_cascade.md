@@ -966,3 +966,28 @@ norm 三対 (conditional) を cite して (13.9) cover → (13.10) analytic → 
 c_eq_one (13.12) の assembly を構築。c_eq_one は char facts 条件付きで proven になる。
 次 = (13.9) global_character_bound (cover counting: H#/Q# 共役が G を covering) を engage。
 [[scaffold-sorry-free-not-done]]
+
+### cont.³² (2026-07-01 lane c=γ /loop): [Is] 3.14 AM–GM 核 LANDED + §13 downstream gating map 確定
+
+`sum_ge_card_of_one_le_prod` (commit 107ab73e) = [Is] Lemma 3.14 の**解析半** (∏f≥1 ⟹ ∑f≥|s|,
+log-AM–GM)。(13.9.b) cover bound の数論核。self-contained・ungated。
+
+**🗺 §13 downstream gating map (重要 — analytic_inequality_arith は h1/h2/h3/h139b を仮説で取る
+完全 parameterized 済 ⟹ engine 層なし、genuine content = 各 deep fact 自体):**
+- **(13.9.a) cover** (λ^{τ1}(x)≠0 ∨ η10(x)≠0 on G0): `mu_tau1_formula` (posited opaque Prop) +
+  η relations (3.2/3.4/3.9) + 代数的整数矛盾 ⟹ **gated on posited char data**。
+- **(13.9.b)** = (13.9.a) + [Is]3.14。[Is]3.14 解析半 done、**残=Galois 半** (χ(a^k) が χ(a) の
+  Galois 共役 + |N|≥1、**deep cyclotomic NT**、ungated だが mathlib Galois/cyclotomic API 要)。
+- **h1/h2 (13.10.1/2)** = global Parseval (`sum_normSq_eq_card_mul_inner` 在庫) + **TI 分解**
+  (∑_G=1+∑_{G0}+[G:S]∑_{H#}+…) + bound 三対 (cite)。TI 分解 = **gated on §8 TI** (`H_sharp_isTISubset`/
+  `S_normalizes_H_sharp` sorried §8 (8.5.a)/(8.6.a))。
+- **h3 (13.10.3) counting** = disjoint union + orbit size |(H#)^G|=|H#|[G:S]。**gated on §8 TI** (同上)。
+- **char facts (bound 三対の仮説)** = §13 char construction (λ/τ1/formula concrete) ⟹ **gated on
+  §11-12 coherence (lane a/b) + posited carrier de-opacification**。
+
+**⟹ strategic juncture**: lane c の §13 **「pure」+ ungated work は概ね landing** (generic 13.5
+machinery + bound 三対 + [Is]3.14 解析核)。残 §13 downstream は (i) deep self-contained NT/GT
+([Is]3.14 Galois 半・§8 TI structure、ungated だが large) か (ii) lane a/b の coherence construction
++ posited carrier に gated。次候補 = [Is]3.14 Galois 半 or §8 TI (H_sharp_isTISubset) を engage。
+ユーザー裁定あれば lane 配分見直し可 (cross-lane は notes 経由 [[cross-lane-sync-via-notes]])。
+[[scaffold-sorry-free-not-done]] [[feedback-cite-sorried-lemmas-if-signature-correct]]

@@ -83,6 +83,21 @@ theorem disjoint_conj_of_not_mem (hA : IsTISubset A L) {g : G} (hg : g ∉ L) :
   intro a ha hga
   exact hg (hA g ⟨a, ha, hga⟩)
 
+/-- **TI overlap ⇒ conjugator ratio in `L`**: if two `G`-conjugates `g·A·g⁻¹` and `h·A·h⁻¹` of a
+TI-subset `A` overlap (share a common element `g·a·g⁻¹ = h·b·h⁻¹` with `a, b ∈ A`), then the
+conjugators differ by an element of the normalizer-bound: `h⁻¹·g ∈ L`.  This is the orbit-stabilizer
+heart of the conjugate-union counting `|A^G| = [G : L]·|A|` (Peterfalvi (13.10.3) disjoint-union
+counting `G = {1} ⊔ G₀ ⊔ (H^#)^G ⊔ (Q^#)^G`): distinct cosets `gL` give *disjoint* conjugates.
+Proof: `(h⁻¹g)·a·(h⁻¹g)⁻¹ = h⁻¹·(g·a·g⁻¹)·h = h⁻¹·(h·b·h⁻¹)·h = b ∈ A`, so the TI condition
+places `h⁻¹g ∈ L`. -/
+theorem mem_of_conj_mem_conj (hA : IsTISubset A L) {g h a b : G}
+    (ha : a ∈ A) (hb : b ∈ A) (hab : g * a * g⁻¹ = h * b * h⁻¹) : h⁻¹ * g ∈ L := by
+  refine hA (h⁻¹ * g) ⟨a, ha, ?_⟩
+  have key : (h⁻¹ * g) * a * (h⁻¹ * g)⁻¹ = b := by
+    have e : (h⁻¹ * g) * a * (h⁻¹ * g)⁻¹ = h⁻¹ * (g * a * g⁻¹) * h := by group
+    rw [e, hab]; group
+  rw [key]; exact hb
+
 /-- 対偶の逆: 「`L` 外で全ての `a ∈ A` の共役が `A` 外」⇒ TI. `IsTISubset` の
 構築によく使う introduction form. -/
 theorem of_disjoint_conj
