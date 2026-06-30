@@ -1685,4 +1685,36 @@ theorem zetaNuRhoNormSq_eq_normQuad {G : Type*} [Group G] [Fintype G] {A : Set G
   rw [h_inner, cexpr_re_eq_normQuad a_ℝ e_ℝ h_ℝ G_ℝ he hh hG,
     OddOrder.Peterfalvi.S09.Hypothesis78.normQuadraticCorrection, ha, he', hh']
 
+/-- **(1.5.d) degree-sum over distinct induced characters** (`A = ⊥` specialization of the S08
+orbit-count `sum_div_normSq_induce_kernelFilter_eq`).  Summing `χ(1)²/‖χ‖²` over the distinct
+nontrivially-induced characters `Ind_K^L θ` (`θ ≠ 1`) gives `[L:K]·(|K| − 1)`.  With `K = H ◁ L`
+this is `e·(h − 1)` of Peterfalvi (1.5.d). -/
+theorem induce_degree_sum_bot {L : Type*} [Group L] [Fintype L] [Invertible (Nat.card L : ℂ)]
+    (K : Subgroup L) [K.Normal] [Fintype ↥K] [Invertible (Nat.card ↥K : ℂ)] :
+    ∑ χ ∈ (Finset.univ.filter (fun θ : IrreducibleCharacter ↥K =>
+        θ ≠ trivialIrreducibleCharacter ↥K)).image
+        (fun θ => ClassFunction.induce K θ.toClassFunction),
+      χ 1 ^ 2 / ClassFunction.inner χ χ = (K.index : ℂ) * ((Nat.card ↥K : ℂ) - 1) := by
+  have hbot : (⊥ : Subgroup L).subgroupOf K = ⊥ := by
+    ext x; simp [Subgroup.mem_subgroupOf]
+  have h := OddOrder.Peterfalvi.S08.sum_div_normSq_induce_kernelFilter_eq (G := L) (H := K) (A := ⊥)
+  have hfilter : (Finset.univ.filter (fun θ : IrreducibleCharacter ↥K =>
+      (↑((⊥ : Subgroup L).subgroupOf K) : Set ↥K) ⊆
+          OddOrder.Peterfalvi.S03.characterKernel (θ : ClassFunction ↥K ℂ) ∧
+        θ ≠ trivialIrreducibleCharacter ↥K))
+      = Finset.univ.filter (fun θ : IrreducibleCharacter ↥K =>
+        θ ≠ trivialIrreducibleCharacter ↥K) := by
+    refine Finset.filter_congr fun θ _ => ?_
+    rw [and_iff_right_iff_imp]
+    intro _
+    rw [hbot, Subgroup.coe_bot]
+    intro x hx
+    rw [Set.mem_singleton_iff] at hx
+    rw [hx]
+    exact OddOrder.Peterfalvi.S03.one_mem_characterKernel _
+  rw [hfilter] at h
+  rw [h, hbot]
+  congr 2
+  exact_mod_cast Nat.card_congr QuotientGroup.quotientBot.toEquiv
+
 end OddOrder.Peterfalvi.S09.Cert
