@@ -1291,3 +1291,23 @@ support 比較、全 u∈U)。free-W1-orbit の真の content。
 **L5 (W1 realization)**: w₀∈act.E → 実 W1≤M elt m。conjBy m と act.φ w₀ の対応。
 
 construction (assembly まで) 完成・full build green。残 = L1-L5 (deep §9 free-orbit、複数 iteration)。
+
+
+## propagation build — 新 infrastructure 要 (definitive assessment) (2026-07-01)
+
+L1-L3 の build 着手で判明: **M-conjugation の既存 API が無い**。`conjBy (g:G)(θ:CF ↥H)` は H◁G・g∈G
+を要するが、θ₀ : CF ↥(hInHu data) で hInHu data は **Subgroup ↥(huSub data)** (HU 内)、m∈↥M ゆえ
+**hInHu を ↥M の subgroup として持ち直す transport が必要** (hInHu.map huSub.subtype 等)。
+さらに既存 Clifford framework (`restrictionConstituentsSingleOrbit_of_isIrreducible`,
+`exists_conj`, `restrictionMultiplicity_conjBy_right`) は全て **HU-conjugation (g∈huSub) 前提**で、
+hIM が要する **M-conjugation (m∈M) と framework-bridge が要る**。
+
+**次 iteration が先に build すべき infrastructure (fresh context 推奨)**:
+- (I1) hInHu char の M-conjugation: m∈M に対し h↦mhm⁻¹ を hInHu-aut として実現 (H◁M ゆえ
+  well-def) し `conjBy`-互換な CF ↥(hInHu) を定義、または hInHu.map huSub.subtype で ↥M-subgroup 化。
+- (I2) restrictionMultiplicity の M-equivariance (I1 + inner_conjBy_conjBy)。
+- → その後 L3 (reduction) は既存 SingleOrbit/exists_conj で閉じる。
+- L4 (θ̄^{w₀}∉U-orbit, type-clean だが factor-arrangement deep) + L5 (W1 realization) は別途。
+
+これは **substantial sub-project** (新 conjBy-transport infra + deep factor content)。construction
+(assembly まで) は完成・full build green。残 hIM = この sub-project。stale-green 注意 (rm olean 検証)。
