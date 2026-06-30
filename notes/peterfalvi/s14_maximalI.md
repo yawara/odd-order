@@ -1206,3 +1206,12 @@ project 全体の hard floor** (lane γ と共有)。lane b 単独では (12.16)
 (a) 12.16 の到達可能 field (12.14/12.15/12.12) を引き続き埋める (honest だが hB は残る)、
 (b) 上流 (7.8.c)/(7.7.a) の形式化に pivot (§7、深い、lane γ も unblock するが S09 領域)。
 上流優先原則は (b) を示唆するが S09 は別領域。**ユーザー判断が望ましい** (現状は (a) を継続中)。
+
+### loop⁴⁷ — three_le_index (he:3≤e) 完成
+
+**commit `53605390`**: `three_le_index` (sorry-free) = CounterexampleDadeData の `he : 3 ≤ e`。
+e=[L:H]=|U| (Frobenius complement、typeF.complement.symm.index_eq_card)、非自明 (U_nontrivial) ∧
+奇数 (∣|G| odd) → ≥3。**field 表更新: he = DONE**。残 reachable: ε/hε (easy), 基数/positivity (easy),
+h_const(12.14 cite)/h_psig_int(12.15 cite)/h2e(12.12)/hidx(8.1.c)/hM(12.11) = cite-able。
+**trajectory**: 残り cite-able を埋めて exists_counterexample_dade_data を hA/hB/hC のみ残す real partial
+assembly にする (hB=hard floor を明示 isolate)。次: ε/hε + 基数 (easy reals)。
