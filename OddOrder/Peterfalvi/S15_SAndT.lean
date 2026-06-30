@@ -901,6 +901,92 @@ theorem typeI_overNormalizer_U_le_fitting [Finite G]
   exact typeI_U_le_fitting_of_coprime _hG hyp _hSTypeII _hLmax _hLI _hNUL
     (card_LF_coprime_pq _hG hyp _hLmax _hLI hnS hnT)
 
+/-- **`T`-side dual of `typeI_U_le_fitting_of_coprime`** (Pf (13.17.b), V-side): for `T` type II and
+a type-`I` maximal `L` over `N_G(V)` with `|L_F| ⟂ pq`, the complement `V ⊆ L_F`.  Mirror of the
+`U`-side; the `V W₂` Frobenius is built directly from the `Tdata` carrier
+(`typeP_uW1_frobenius hyp.Tdata`) rather than `basic_structure` (which is `S`-side only). -/
+theorem typeI_V_le_fitting_of_coprime [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hyp : Hypothesis (G := G)) (hTTypeII : IsTypeII hyp.T) {L : Subgroup G}
+    (hLmax : L ∈ maximalSubgroups G) (hLI : IsTypeI L)
+    (hNVL : Subgroup.normalizer (hyp.V : Set G) ≤ L)
+    (hcop : Nat.Coprime (Nat.card ↥(maxNilpotentNormalHall L)) (hyp.p * hyp.q)) :
+    hyp.V ≤ maxNilpotentNormalHall L := by
+  obtain ⟨tdata⟩ := hTTypeII
+  obtain ⟨frob, _⟩ := OddOrder.Peterfalvi.S14.typeI_frobenius hG hLmax hLI
+  have hHeq : frob.typeI.typeF.H = maxNilpotentNormalHall L := frob.typeI.typeF.H_eq
+  have hfrobLF : OddOrder.Isaacs.Ch06.IsFrobeniusGroup ↥L
+      ((maxNilpotentNormalHall L).subgroupOf L) frob.complement := hHeq ▸ frob.frobenius
+  have hVleL : hyp.V ≤ L := Subgroup.le_normalizer.trans hNVL
+  have hW2leL : hyp.W2 ≤ L := hyp.W2_normalizes_V.trans hNVL
+  have hLFleL : maxNilpotentNormalHall L ≤ L := OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_le L
+  have hTdataVne : hyp.Tdata.U ≠ ⊥ := by
+    intro hbot
+    have h1 : Nat.card ↥hyp.Tdata.U = Nat.card ↥tdata.typeP.U := by
+      rw [hyp.Tdata.card_U_eq_index, tdata.typeP.card_U_eq_index]
+    rw [hbot, Subgroup.card_bot] at h1
+    exact tdata.common.1 (Subgroup.card_eq_one.mp h1.symm)
+  have hVW2frob : OddOrder.Isaacs.Ch06.IsFrobeniusGroup
+      ↥(hyp.V ⊔ hyp.W2) (hyp.V.subgroupOf (hyp.V ⊔ hyp.W2))
+        (hyp.W2.subgroupOf (hyp.V ⊔ hyp.W2)) := by
+    have h := OddOrder.Peterfalvi.S11.typeP_uW1_frobenius hyp.Tdata hTdataVne
+    rwa [hyp.Tdata_V_eq, hyp.Tdata_W2_eq] at h
+  have hsolv : IsSolvable ↥(maxNilpotentNormalHall L) := by
+    haveI := OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_isNilpotent L
+    exact IsNilpotent.to_isSolvable
+  have hcopLFp : Nat.Coprime (Nat.card ↥(maxNilpotentNormalHall L)) hyp.p :=
+    Nat.Coprime.coprime_dvd_right (dvd_mul_right hyp.p hyp.q) hcop
+  have hW2LF : hyp.W2 ⊓ maxNilpotentNormalHall L = ⊥ :=
+    Subgroup.inf_eq_bot_of_coprime (by rw [← hyp.p_eq_card_W2]; exact hcopLFp.symm)
+  have hVmeets : hyp.V ⊓ maxNilpotentNormalHall L ≠ ⊥ := by
+    intro hbot
+    have hcopV : Nat.Coprime (Nat.card ↥hyp.V) (Nat.card ↥(maxNilpotentNormalHall L)) :=
+      OddOrder.GroupTheory.IsFrobeniusGroup.coprime_card_of_inf_kernel_eq_bot_le
+        hLFleL hVleL hfrobLF hbot
+    have hcopW2 : Nat.Coprime (Nat.card ↥hyp.W2) (Nat.card ↥(maxNilpotentNormalHall L)) :=
+      OddOrder.GroupTheory.IsFrobeniusGroup.coprime_card_of_inf_kernel_eq_bot_le
+        hLFleL hW2leL hfrobLF hW2LF
+    have hcardVW2 : Nat.card ↥(hyp.V ⊔ hyp.W2) = Nat.card ↥hyp.V * Nat.card ↥hyp.W2 := by
+      rw [← hVW2frob.isComplement.card_mul,
+        Nat.card_congr (Subgroup.subgroupOfEquivOfLe le_sup_left).toEquiv,
+        Nat.card_congr (Subgroup.subgroupOfEquivOfLe le_sup_right).toEquiv]
+    have hcopVW2 : Nat.Coprime (Nat.card ↥(maxNilpotentNormalHall L))
+        (Nat.card ↥(hyp.V ⊔ hyp.W2)) := by
+      rw [hcardVW2]; exact Nat.Coprime.mul_right hcopV.symm hcopW2.symm
+    have hLFbot : maxNilpotentNormalHall L = ⊥ :=
+      OddOrder.GroupTheory.isFrobenius_kernel_eq_bot_of_frobenius_subgroup hLFleL
+        (sup_le hVleL hW2leL) ⟨frob.complement, hfrobLF⟩ hVW2frob hbot hW2LF hsolv hcopVW2
+    exact frob.frobenius.ne_bot_kernel (by rw [hHeq, hLFbot, Subgroup.bot_subgroupOf])
+  have hVab : IsMulCommutative ↥(hyp.V.subgroupOf L) :=
+    OddOrder.GroupTheory.isMulCommutative_of_mulEquiv
+      (Subgroup.subgroupOfEquivOfLe hVleL).symm (isMulCommutative_V hG hyp ⟨tdata⟩)
+  have hinf : (hyp.V.subgroupOf L) ⊓ ((maxNilpotentNormalHall L).subgroupOf L) ≠ ⊥ := by
+    rw [show (hyp.V.subgroupOf L) ⊓ ((maxNilpotentNormalHall L).subgroupOf L)
+        = (hyp.V ⊓ maxNilpotentNormalHall L).subgroupOf L from (Subgroup.comap_inf _ _ _).symm]
+    intro h
+    apply hVmeets
+    have hle : hyp.V ⊓ maxNilpotentNormalHall L ≤ L := inf_le_right.trans hLFleL
+    rw [← inf_eq_left.mpr hle]
+    exact disjoint_iff.mp (Subgroup.subgroupOf_eq_bot.mp h)
+  have hsub := le_kernel_of_isMulCommutative_of_inf_ne_bot hfrobLF hVab hinf
+  calc hyp.V = (hyp.V.subgroupOf L).map L.subtype := (Subgroup.map_subgroupOf_eq_of_le hVleL).symm
+    _ ≤ ((maxNilpotentNormalHall L).subgroupOf L).map L.subtype := Subgroup.map_mono hsub
+    _ = maxNilpotentNormalHall L := Subgroup.map_subgroupOf_eq_of_le hLFleL
+
+/-- **`T`-side dual of `typeI_overNormalizer_U_le_fitting`** (Pf (13.17.b), V-side): for `T` type II
+and a type-`I` maximal `L` over `N_G(V)`, `V ⊆ L_F`.  Mirror; cites the (8.17.a) coprimality
+`card_LF_coprime_pq` (gated, BG Thm E) and the V-side FPF residual `typeI_V_le_fitting_of_coprime`. -/
+theorem typeI_overNormalizer_V_le_fitting [Finite G]
+    (_hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
+    (hTTypeII : IsTypeII hyp.T) {L : Subgroup G} (hLmax : L ∈ maximalSubgroups G)
+    (hLI : IsTypeI L) (hNVL : Subgroup.normalizer (hyp.V : Set G) ≤ L) :
+    hyp.V ≤ maxNilpotentNormalHall L := by
+  have hnS : ¬ ∃ g : G, MulAut.conj g • L = hyp.S :=
+    not_conj_of_isTypeI_of_isTypeNonI _hG hLI hyp.S_maximal hyp.S_nonI
+  have hnT : ¬ ∃ g : G, MulAut.conj g • L = hyp.T :=
+    not_conj_of_isTypeI_of_isTypeNonI _hG hLI hyp.T_maximal hyp.T_nonI
+  exact typeI_V_le_fitting_of_coprime _hG hyp hTTypeII hLmax hLI hNVL
+    (card_LF_coprime_pq _hG hyp hLmax hLI hnS hnT)
+
 /-- **Peterfalvi (13.17.a/b)**: a maximal subgroup `L` over `N_G(U)` (for `S` of type II) is of
 type I with `U ⊆ L_F`.  *Proof (Pf pp.81-82):* take any maximal `L ⊇ N_G(U)` (proper since
 `U ≠ 1` and `G` is simple).  `L` is not conjugate to `S` (else `N_G(U) ⊆ S`, against
