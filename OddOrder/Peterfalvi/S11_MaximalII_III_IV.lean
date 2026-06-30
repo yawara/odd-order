@@ -2160,6 +2160,9 @@ structure CliffordCaseAData {M : Subgroup G} {data : TypesIIIIIIVSetup M}
   Hpart_iSup : ⨆ i, Hpart i = ⊤
   /-- Each Clifford summand is `U`-invariant (non-opaque (9.7) structure). -/
   Hpart_aInvariant : ∀ i, IsAInvariant (uActionHom data chief) (Hpart i)
+  /-- The `q` order-`p` Clifford summands are independent (non-opaque (9.7) structure): together
+  with `Hpart_iSup` this exhibits `H̄` as their internal direct product. -/
+  Hpart_iSupIndep : iSupIndep Hpart
   W1_transitive_on_parts : Prop
   W1_transitive_on_parts_holds : W1_transitive_on_parts
   a : ℕ
@@ -4473,6 +4476,7 @@ noncomputable def clifford_caseA_data [Finite G] {M : Subgroup G}
           le_iSup_of_le (e ⟨i, hi⟩) (le_of_eq (by rw [Equiv.symm_apply_apply]))
       Hpart_aInvariant := fun j =>
         isAInvariant_comp_subtype_pointwise_smul hUnorm hS₀inv ↑(e.symm j)
+      Hpart_iSupIndep := hexist.choose_spec.1.independent.comp e.symm.injective
       W1_transitive_on_parts := True
       W1_transitive_on_parts_holds := trivial
       a := Nat.card ↥(aInvariantRestrictAut hS₀inv).range

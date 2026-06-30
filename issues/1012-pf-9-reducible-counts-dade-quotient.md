@@ -634,3 +634,64 @@ HC 上 linear で induce ⟹ mu_j = Ind_{HC}(linear)。∴ my core は on-path (
    `induceHU_apply_one_eq_q_mul` 系が部分再利用可。
 caseB_degree_qu (irreducible, S_ H0C') の構造 (caseB_exists_chiefFactorConstituent → inertia → degree)
 が template。caseA は reducible 版で parallel。
+
+
+## 進捗 2026-06-30 追記 (caseA inertia 機構 完備)
+
+`inertia_eq_hcInHu_caseA` 実証明 (commit 85ada93a)。regular θ̄ の inflation θ₀ の HU-inertia = HC。
+proven な `chiefFactor_caseA_char_inertia` を **parametrized plumbing** (`caseB_char_inertia_inflation_of_core`
+→ `caseB_inertia_realized_of_charInertia` → `inertia_inf_uInHu_le_cInHu_of_realized` →
+`inertia_eq_hcInHu_of_inf_le` — 全て core/realized/inf を引数に取る case-agnostic 設計) に通すだけ。
+
+⟹ **caseA inertia side = 完全に DONE** (core + lift、caseB と parallel)。degree の inertia 入力完備。
+
+**残 (caseA degree、inertia 以外)**:
+1. **reducible χ ⟹ θ̄ regular** (= 各 Hpart summand 上 nontrivial): これが `inertia_eq_hcInHu_caseA` の
+   `hreg` を供給。**prTIred 機構** (reducibles = prime-TI reducible chars) の content。Coq `Part_a`
+   (L883-905, `[exists w in W1bar, Res theta != 1]` の各 w 版) + reducible↔θ̄ 対応。
+2. **`caseA_exists_chiefFactorConstituent`** (caseB の analog, L5005): inertia step を
+   `inertia_eq_hcInHu_caseA` に差し替え + regular 仮説。θ₀ + inertia=HC + linear を供給。
+3. **`caseA_degree_qu`** (caseB_degree_qu の analog, L5090): 2 + Clifford degree → φ(1)=qu。
+4. **配線**: `caseA_character_counts` conjunct b の degree sorry を埋める。
+caseB は (1) 不要 (irreducibility で全 θ inertia HC); caseA は regular に限るので (1) が固有の追加。
+
+
+## caseA degree side — Coq 精読 + infra 査定 (2026-06-30)
+
+**Coq `typeP_reducible_core_Ind` (L1423)**: reducibles `mu_j` は **prime-TI reducible chars
+`primeTIred ptiWM j`** (j≠0) と同定。degree (isIndHC) は本体 `typeP_nonGalois_characters` (9.8) に委譲。
+**`typeP_reducible_core_cases` (L1439)**: conjunct c の irreducible も isIndHC (= `Ind_M,HC(linear)`,
+deg [M:HC]=qu) で構成。
+
+**degree path (my inertia 機構経由)**: reducible φ ⟹ 構成 θ̄ regular ⟹ `I_HU(θ̄)=HC`
+(`inertia_eq_hcInHu_caseA` ✅) ⟹ HC 上 linear に extend ⟹ φ=Ind_HC(linear) ⟹ deg [M:HC]=qu。
+
+**infra 査定**: prime-TI/Dade 機構は Lean §5–8 (S05_TICyclic / S05_SigmaIsometry / S06–S08) に存在。
+但し **§11 reducibles ↔ primeTIred ↔ regular θ̄ の接続は未 port** で §13 cyclic-TI に entangle。
+
+**最短 path 判定 (次セッション)**:
+- **conjunct c (∃ irreducible deg qu)** が conjunct b より tractable な可能性: reducible↔regular の
+  prime-TI 同定を回避し、**regular θ̄ を直接構成** (H̄ elementary abelian = ⊕ Hpart の各 factor 上
+  nontrivial な linear char = 各 Hpart* の nontrivial char の direct product) → my lift → induce で
+  irreducible deg qu。要 **SupIndep 露出** (de-opacify 追加; producer は exists_supIndep で既に保持) +
+  Clifford induction (caseB_degree_qu に部分実在)。
+- **conjunct b** は reducible φ の構成 θ̄ が regular であることの証明が必要 (= reducibles=primeTIred の
+  spread 性) で prime-TI 同定に依存 = より重い。
+∴ 次は **conjunct c 経由 + SupIndep de-opacify + regular θ̄ 構成** を優先検討。my inertia 機構
+(core+lift) は両 conjunct の共通 enabling ingredient で完備。
+
+
+## regular θ̄ 構成の mathlib 機構 (2026-06-30)
+
+conjunct c の regular θ̄ (各 Hpart 上 nontrivial な linear char) 構成に使える mathlib:
+- `CommGroup.exists_apply_ne_one_of_hasEnoughRootsOfUnity {a≠1} : ∃ χ:G→*Mˣ, χ a ≠ 1`
+  (FiniteAbelian/Duality.lean:64) — char が点を分離 (ℂ は hasEnoughRootsOfUnity)。
+- `MonoidHom.restrict_surjective (H:Subgroup G) : Surjective (G→*Mˣ の H 制限)` (同:108) —
+  部分群の char は G へ拡張可。
+- 構成: H̄ = ⊕ Hpart (Hpart_iSupIndep + Hpart_iSup) ⟹ H̄ ≅ ∏ Hpart (internal direct product iso;
+  `Subgroup.noncommPiCoprod` / `DirectSum.IsInternal` 系) ⟹ θ̄ = (∏ ψ_i) ∘ iso⁻¹ (各 ψ_i nontrivial)。
+  regular char 数 = (p-1)^q > 0 ゆえ存在は確実。union-bound は弱すぎ (q<p 不要)、tuple 対応 (iso) が正道。
+
+**次の構成ステップ**: (1) H̄ ≅ ∏ Hpart の iso (iSupIndep+iSup=⊤ から; elementary abelian ゆえ
+additive `DirectSum.IsInternal` も可)、(2) 各 Hpart i の nontrivial char (exists_apply_ne_one)、
+(3) 合成で regular θ̄、(4) `inertia_eq_hcInHu_caseA` → induce → conjunct c。multi-piece、fresh context 推奨。
