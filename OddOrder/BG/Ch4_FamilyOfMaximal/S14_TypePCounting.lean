@@ -1378,6 +1378,23 @@ theorem isPiElement_sigma_of_mem_Msigma [Finite G] {M : Subgroup G} {x : G}
   exact OddOrder.BG.Ch3.S10.Msigma_isPiGroup M p
     (Nat.primeFactors_mono hdvd (Nat.card_pos).ne' hp)
 
+/-- **`M_σ`-membership is exactly being a `σ(M)`-element** (for `x ∈ M`).  `M_σ` is the *normal*
+`σ(M)`-Hall of `M` (`Msigma_isHall`), so it absorbs every `σ(M)`-subgroup; hence `x ∈ M_σ ⟺ ⟨x⟩` is
+a `σ(M)`-group `⟺ x` is a `σ(M)`-element.  In particular `M_σ`-membership of an element of `M` is
+determined by its order, so it is conjugation-invariant (`isPiElement_conj`) — the BG Theorem E
+"distinct orders across pieces" content for the `M_σ` piece. -/
+theorem mem_Msigma_iff_isPiElement_sigma [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    {M : Subgroup G} (hM : M ∈ maximalSubgroups G) {x : G} (hxM : x ∈ M) :
+    x ∈ OddOrder.BG.Ch3.S10.Msigma M ↔ IsPiElement (OddOrder.BG.Ch3.S10.sigma M) x := by
+  refine ⟨isPiElement_sigma_of_mem_Msigma, fun hpi => ?_⟩
+  have hzpi : Ch03.Subgroup.IsPiGroup (OddOrder.BG.Ch3.S10.sigma M) (Subgroup.zpowers x) := by
+    intro p hp
+    rw [Nat.card_zpowers] at hp
+    exact hpi p hp
+  exact OddOrder.BG.Ch3.S10.sigma_subgroup_le_Msigma_of_isHall
+    (OddOrder.BG.Ch3.S10.Msigma_isHall hG hM) (Subgroup.zpowers_le.mpr hxM) hzpi
+    (Subgroup.mem_zpowers x)
+
 /-- For a `σ(M)`-element `x`, every `σ(L)`-part (`L` maximal) is either `x` or `1`: if `L` is
 conjugate to `M` then `σ(L) = σ(M)` contains all primes of `x` (`sigmaPart L x = x`); otherwise
 `σ(M) ∩ σ(L) = ∅` (`sigma_disjoint_of_nonconjugate`) so `x` avoids `σ(L)` (`sigmaPart L x = 1`). -/
