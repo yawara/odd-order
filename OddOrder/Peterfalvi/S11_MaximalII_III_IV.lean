@@ -2158,6 +2158,35 @@ theorem exists_ne_one_hom_of_prime_card {K : Type*} [CommGroup K] [Finite K]
     CommGroup.exists_apply_ne_one_of_hasEnoughRootsOfUnity (G := K) (M := ℂ) ha
   exact ⟨ψ, fun h => hψa (by rw [h]; rfl)⟩
 
+/-- **A nontrivial character avoiding a prescribed precomposition.**  For a prime-order (`≥ 3`)
+target `K'`, an iso `α : K ≃* K'`, and any `A : K →* ℂˣ`, some nontrivial `B : K' →* ℂˣ` has
+`B ∘ α ≠ A`: the character group `K' →* ℂˣ` has `|K'| ≥ 3` elements
+(`card_monoidHom_of_hasEnoughRootsOfUnity`), and only `{1, A ∘ α⁻¹}` are excluded.  Used to make the
+free-`W1`-orbit character non-`W1`-fixed: choosing the `w₀`-conjugate factor-char `B` so its
+`α`-pullback differs from the identity-conjugate char `A`. -/
+theorem exists_ne_one_hom_comp_ne {K K' : Type*} [CommGroup K] [CommGroup K'] [Finite K']
+    (hp : 3 ≤ Nat.card K') (α : K ≃* K') (A : K →* ℂˣ) :
+    ∃ B : K' →* ℂˣ, B ≠ 1 ∧ B.comp α.toMonoidHom ≠ A := by
+  classical
+  haveI : Fintype (K' →* ℂˣ) := Fintype.ofFinite _
+  set C : K' →* ℂˣ := A.comp α.symm.toMonoidHom with hC
+  by_contra hcon
+  push_neg at hcon
+  have hsub : (Finset.univ : Finset (K' →* ℂˣ)) ⊆ {1, C} := by
+    intro B _
+    rcases eq_or_ne B 1 with h | h
+    · simp [h]
+    · have hBC : B = C := by
+        rw [hC, ← hcon B h]; ext x; simp
+      simp [hBC]
+  have hle := Finset.card_le_card hsub
+  rw [Finset.card_univ, Fintype.card_eq_nat_card,
+    CommGroup.card_monoidHom_of_hasEnoughRootsOfUnity K' ℂ] at hle
+  have hle2 : ({1, C} : Finset (K' →* ℂˣ)).card ≤ 2 :=
+    (Finset.card_insert_le _ _).trans (by simp)
+  omega
+
+
 /-- **`noncommPiCoprod` is bijective from a cardinality count.**  A spanning commuting family of
 subgroups whose cardinalities multiply to `|K|` realises `K` as their internal direct product: the
 product map `(∀ i, S i) →* K` is surjective (spanning) and its domain has the same cardinality
@@ -2233,6 +2262,75 @@ theorem exists_regular_char_of_bijective {Hbar : Type*} [CommGroup Hbar] [Finite
   rw [MonoidHom.comp_apply, MulEquiv.coe_toMonoidHom, hsymm,
     MonoidHom.noncommPiCoprod_mulSingle]
   exact hz
+
+/-- **A character with prescribed restriction to each factor**, from a bijective product map.
+Given per-factor characters `ψ i : S i →* ℂˣ`, the composite `(∏ ψ) ∘ e⁻¹` (with `e` the
+internal-direct-product iso) restricts to `ψ i` on `S i`.  The construction underlying
+`exists_regular_char_of_bijective`, exposing the restriction `θ ↑x = ψ i x` — used to control the
+factor-data for the free-`W1`-orbit (non-`W1`-fixed) character of the `(9.7)` analysis. -/
+theorem char_eq_on_factors_of_bijective {Hbar : Type*} [CommGroup Hbar] [Finite Hbar]
+    {ι : Type*} [Fintype ι] {S : ι → Subgroup Hbar}
+    (hcomm : Pairwise fun i j : ι => ∀ x y : Hbar, x ∈ S i → y ∈ S j → Commute x y)
+    (hbij : Function.Bijective (Subgroup.noncommPiCoprod hcomm))
+    (ψ : ∀ i, ↥(S i) →* ℂˣ) :
+    ∃ θ : Hbar →* ℂˣ, ∀ (i : ι) (x : ↥(S i)), θ ↑x = ψ i x := by
+  classical
+  let eEquiv : (∀ i : ι, ↥(S i)) ≃* Hbar :=
+    MulEquiv.ofBijective (Subgroup.noncommPiCoprod hcomm) hbij
+  refine ⟨(MonoidHom.noncommPiCoprod ψ
+      (fun i j _ x y => mul_comm (ψ i x) (ψ j y))).comp eEquiv.symm.toMonoidHom, fun i x => ?_⟩
+  rw [MonoidHom.comp_apply, MulEquiv.coe_toMonoidHom,
+    show eEquiv.symm ↑x = Pi.mulSingle i x from
+      eEquiv.symm_apply_eq.mpr (Subgroup.noncommPiCoprod_mulSingle (hcomm := hcomm) i x).symm,
+    MonoidHom.noncommPiCoprod_mulSingle]
+
+/-- **A regular character not fixed by a factor-permuting automorphism.**  Given the internal
+direct product `(noncommPiCoprod hbij)` of prime-order (`≥ 3`) factors `S i`, and an automorphism
+`τ` mapping factor `S i₀` onto a *different* factor `S j₀`, there is a character nontrivial on every
+factor (regular) yet `θ ∘ τ ≠ θ`.  Choose the `j₀`-factor char `B` so its `τ`-pullback differs from
+the `i₀`-factor char `A` (`exists_ne_one_hom_comp_ne`), set the data by `Function.update`, and read
+off `θ(τ y) = B(α y) ≠ A(y) = θ(y)` via `char_eq_on_factors_of_bijective`.  The free-`W1`-orbit
+character of the `(9.7)` analysis (`τ = act.φ(w₀)`, `S i = S₀^{·}`). -/
+theorem exists_regular_char_not_fixed {Hbar : Type*} [CommGroup Hbar] [Finite Hbar]
+    {ι : Type*} [Fintype ι] {S : ι → Subgroup Hbar}
+    (hcomm : Pairwise fun i j : ι => ∀ x y : Hbar, x ∈ S i → y ∈ S j → Commute x y)
+    (hbij : Function.Bijective (Subgroup.noncommPiCoprod hcomm))
+    (hp : ∀ i, (Nat.card ↥(S i)).Prime) (hp3 : ∀ i, 3 ≤ Nat.card ↥(S i))
+    {i₀ j₀ : ι} (hij : i₀ ≠ j₀) (τ : MulAut Hbar) (hτ : τ • S i₀ = S j₀) :
+    ∃ θ : Hbar →* ℂˣ, (∀ i, ∃ x ∈ S i, θ x ≠ 1) ∧ θ.comp τ.toMonoidHom ≠ θ := by
+  classical
+  have hmap : (S i₀).map τ.toMonoidHom = S j₀ := hτ
+  let α : ↥(S i₀) ≃* ↥(S j₀) :=
+    (Subgroup.equivMapOfInjective (S i₀) τ.toMonoidHom τ.injective).trans
+      (MulEquiv.subgroupCongr hmap)
+  have hαcoe : ∀ z : ↥(S i₀), ((α z : ↥(S j₀)) : Hbar) = τ z := fun z => rfl
+  obtain ⟨A, hAne⟩ := exists_ne_one_hom_of_prime_card (hp i₀)
+  obtain ⟨B, hBne, hBcomp⟩ := exists_ne_one_hom_comp_ne (hp3 j₀) α A
+  choose ψ0 hψ0 using fun i => exists_ne_one_hom_of_prime_card (hp i)
+  set ψ : ∀ i, ↥(S i) →* ℂˣ := Function.update (Function.update ψ0 i₀ A) j₀ B with hψdef
+  have hψi₀ : ψ i₀ = A := by rw [hψdef, Function.update_of_ne hij, Function.update_self]
+  have hψj₀ : ψ j₀ = B := by rw [hψdef, Function.update_self]
+  obtain ⟨θ, hθ⟩ := char_eq_on_factors_of_bijective hcomm hbij ψ
+  refine ⟨θ, fun i => ?_, ?_⟩
+  · -- regular: ψ i ≠ 1 ⟹ ∃ x ∈ S i, θ x ≠ 1
+    have hψine : ψ i ≠ 1 := by
+      rcases eq_or_ne i j₀ with h | h
+      · subst h; rw [hψj₀]; exact hBne
+      · rw [hψdef, Function.update_of_ne h]
+        rcases eq_or_ne i i₀ with h2 | h2
+        · subst h2; rw [Function.update_self]; exact hAne
+        · rw [Function.update_of_ne h2]; exact hψ0 i
+    obtain ⟨z, hz⟩ := DFunLike.ne_iff.mp hψine
+    rw [MonoidHom.one_apply] at hz
+    exact ⟨↑z, z.2, by rw [hθ i z]; exact hz⟩
+  · -- not fixed: ∃ y, θ (τ y) ≠ θ y
+    rw [DFunLike.ne_iff]
+    obtain ⟨z, hz⟩ := DFunLike.ne_iff.mp hBcomp
+    refine ⟨↑z, ?_⟩
+    rw [MonoidHom.comp_apply, MulEquiv.coe_toMonoidHom,
+      show τ ↑z = ((α z : ↥(S j₀)) : Hbar) from (hαcoe z).symm,
+      hθ j₀ (α z), hθ i₀ z, hψj₀, hψi₀]
+    exact hz
 
 /-- **A regular character exists on an internal direct product of prime-order subgroups.**
 If `Hbar` is the internal direct product (`iSupIndep` + spanning) of order-`p` subgroups `Hpart i`,

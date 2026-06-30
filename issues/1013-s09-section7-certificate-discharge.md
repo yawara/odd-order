@@ -277,3 +277,18 @@ integer-coefficient structure / (β,ζ^ν) 関係が無い。
 (S09 structure 変更、並行編集注意) **or** (b) §8 coherence machinery が (β,ζ^ν) 関係を直接供給。
 → **lane-b 単独で §7 floor を閉じる tractable 部分は orth_one まで**。残は §8 coherence
 (Pf §1-9 spine、実質 sorry-free のはずだが Hypothesis78.nu との接続が未) との integration。
+
+### 2026-07-01 (loop 継続⁸): ⭐ 自己訂正 — (7.8.a) Gamma_orth_nu は **tractable** (τ isometry 経由)
+
+**前回の「Gamma_orth_nu は §8-integration blocked」評価は ERROR だった** ((7.8.c) の (β,χ)
+ρ-formula と (7.8.a) の (β,ζ^ν) を混同; 後者は ρ 不要)。原文 (7.8.a) proof (mmd L63-72) 精読で確定:
+`(β, φ^ν − (φ(1)/e)ζ^ν) = (β, (φ−(φ(1)/e)ζ)^τ)` [coherence agreement] `= ((Ind1H−ζ)^τ, (φ−cζ)^τ)`
+[β=(Ind1H−ζ)^τ] `= (Ind1H−ζ, φ−cζ)` [**IsDadeIsometry.inner_eq** (τα,τβ)=(α,β)、S04:3720 既存]
+`= φ(1)/e` [family 直交性]。これと (β,ζ^ν)=a−1 から (β,φ^ν)=(φ(1)/e)·a、よって a_φ=a·φ(1)/(e‖φ‖²)、
+Gamma_orth_nu (⟨Γ,φ^ν⟩=0) が出る。**ρ は一切不要**。
+
+**(7.8.a) は carrier-conditional に tractable** (入力 = coherence agreement のみ; IsDadeIsometry +
+nu_isometry (Hyp78 field) + family 直交性 (induce_family_orthogonal) は既存)。orth_one と同様
+legitimate (hoisting でない、§7 reasoning 実証明)。整数 a = (β,ζ^ν)+1 ∈ ℤ は β,ζ^ν virtual char
+から (integrality 別途)。残構築 = family-diff 内積 + (β,ζ_i^ν) 計算 + a + Γ + 全 orthogonality。
+区別 ζ∈Irr L (‖ζ‖²=1) の irreducibility が family setup property。
