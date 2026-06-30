@@ -654,3 +654,28 @@ proven な `chiefFactor_caseA_char_inertia` を **parametrized plumbing** (`case
 3. **`caseA_degree_qu`** (caseB_degree_qu の analog, L5090): 2 + Clifford degree → φ(1)=qu。
 4. **配線**: `caseA_character_counts` conjunct b の degree sorry を埋める。
 caseB は (1) 不要 (irreducibility で全 θ inertia HC); caseA は regular に限るので (1) が固有の追加。
+
+
+## caseA degree side — Coq 精読 + infra 査定 (2026-06-30)
+
+**Coq `typeP_reducible_core_Ind` (L1423)**: reducibles `mu_j` は **prime-TI reducible chars
+`primeTIred ptiWM j`** (j≠0) と同定。degree (isIndHC) は本体 `typeP_nonGalois_characters` (9.8) に委譲。
+**`typeP_reducible_core_cases` (L1439)**: conjunct c の irreducible も isIndHC (= `Ind_M,HC(linear)`,
+deg [M:HC]=qu) で構成。
+
+**degree path (my inertia 機構経由)**: reducible φ ⟹ 構成 θ̄ regular ⟹ `I_HU(θ̄)=HC`
+(`inertia_eq_hcInHu_caseA` ✅) ⟹ HC 上 linear に extend ⟹ φ=Ind_HC(linear) ⟹ deg [M:HC]=qu。
+
+**infra 査定**: prime-TI/Dade 機構は Lean §5–8 (S05_TICyclic / S05_SigmaIsometry / S06–S08) に存在。
+但し **§11 reducibles ↔ primeTIred ↔ regular θ̄ の接続は未 port** で §13 cyclic-TI に entangle。
+
+**最短 path 判定 (次セッション)**:
+- **conjunct c (∃ irreducible deg qu)** が conjunct b より tractable な可能性: reducible↔regular の
+  prime-TI 同定を回避し、**regular θ̄ を直接構成** (H̄ elementary abelian = ⊕ Hpart の各 factor 上
+  nontrivial な linear char = 各 Hpart* の nontrivial char の direct product) → my lift → induce で
+  irreducible deg qu。要 **SupIndep 露出** (de-opacify 追加; producer は exists_supIndep で既に保持) +
+  Clifford induction (caseB_degree_qu に部分実在)。
+- **conjunct b** は reducible φ の構成 θ̄ が regular であることの証明が必要 (= reducibles=primeTIred の
+  spread 性) で prime-TI 同定に依存 = より重い。
+∴ 次は **conjunct c 経由 + SupIndep de-opacify + regular θ̄ 構成** を優先検討。my inertia 機構
+(core+lift) は両 conjunct の共通 enabling ingredient で完備。
