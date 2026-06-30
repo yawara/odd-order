@@ -2234,6 +2234,27 @@ theorem exists_regular_char_of_bijective {Hbar : Type*} [CommGroup Hbar] [Finite
     MonoidHom.noncommPiCoprod_mulSingle]
   exact hz
 
+/-- **A character with prescribed restriction to each factor**, from a bijective product map.
+Given per-factor characters `ψ i : S i →* ℂˣ`, the composite `(∏ ψ) ∘ e⁻¹` (with `e` the
+internal-direct-product iso) restricts to `ψ i` on `S i`.  The construction underlying
+`exists_regular_char_of_bijective`, exposing the restriction `θ ↑x = ψ i x` — used to control the
+factor-data for the free-`W1`-orbit (non-`W1`-fixed) character of the `(9.7)` analysis. -/
+theorem char_eq_on_factors_of_bijective {Hbar : Type*} [CommGroup Hbar] [Finite Hbar]
+    {ι : Type*} [Fintype ι] {S : ι → Subgroup Hbar}
+    (hcomm : Pairwise fun i j : ι => ∀ x y : Hbar, x ∈ S i → y ∈ S j → Commute x y)
+    (hbij : Function.Bijective (Subgroup.noncommPiCoprod hcomm))
+    (ψ : ∀ i, ↥(S i) →* ℂˣ) :
+    ∃ θ : Hbar →* ℂˣ, ∀ (i : ι) (x : ↥(S i)), θ ↑x = ψ i x := by
+  classical
+  let eEquiv : (∀ i : ι, ↥(S i)) ≃* Hbar :=
+    MulEquiv.ofBijective (Subgroup.noncommPiCoprod hcomm) hbij
+  refine ⟨(MonoidHom.noncommPiCoprod ψ
+      (fun i j _ x y => mul_comm (ψ i x) (ψ j y))).comp eEquiv.symm.toMonoidHom, fun i x => ?_⟩
+  rw [MonoidHom.comp_apply, MulEquiv.coe_toMonoidHom,
+    show eEquiv.symm ↑x = Pi.mulSingle i x from
+      eEquiv.symm_apply_eq.mpr (Subgroup.noncommPiCoprod_mulSingle (hcomm := hcomm) i x).symm,
+    MonoidHom.noncommPiCoprod_mulSingle]
+
 /-- **A regular character exists on an internal direct product of prime-order subgroups.**
 If `Hbar` is the internal direct product (`iSupIndep` + spanning) of order-`p` subgroups `Hpart i`,
 there is a character `θ : Hbar →* ℂˣ` nontrivial on every summand.  Combine per-factor nontrivial
