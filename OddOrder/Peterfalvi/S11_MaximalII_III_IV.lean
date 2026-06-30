@@ -6640,5 +6640,24 @@ theorem hcZeta_inertia_ne_top_of_free {M : Subgroup G} {data : TypesIIIIIIVSetup
   rw [ClassFunction.mem_inertia] at hmem
   exact hfree (hcZeta_exists_conj_of_fixed m ζ θ₀ hlo hmem)
 
+/-- **`φ_m`-analog of the inflation-conjugation commute.**  For `m ∈ M` realized by `b ∈ U W₁`
+(`↑m = ↑b`), `compHom φ_m` of an inflation equals the inflation of `typeP_conjAction b`.  Mirrors
+`conjBy_compHom_hInHuEquivH` (both reduce to `m·h·m⁻¹ = b·h·b⁻¹` in `G`), turning the `M`-conjugation
+`compHom φ_m θ₀` of the chief-factor `θ₀` into the abstract `b`-action on `H`. -/
+theorem compHom_hInHuConj_hInHuEquivH {M : Subgroup G} (data : TypesIIIIIIVSetup M)
+    (b : ↥(data.typeP.U ⊔ data.typeP.W1)) (m : ↥M) (hmb : ((m : G)) = (b : G))
+    (θ : ClassFunction ↥data.H ℂ) :
+    ClassFunction.compHom (hInHuConj data m)
+        (ClassFunction.compHom (hInHuEquivH data).toMonoidHom θ)
+      = ClassFunction.compHom (hInHuEquivH data).toMonoidHom
+          (ClassFunction.compHom (typeP_conjAction data.typeP b).toMonoidHom θ) := by
+  ext h
+  rw [ClassFunction.compHom_apply, ClassFunction.compHom_apply, ClassFunction.compHom_apply,
+    ClassFunction.compHom_apply]
+  refine congrArg _ (Subtype.ext ?_)
+  simp only [MulEquiv.coe_toMonoidHom, hInHuEquivH_coe, typeP_conjAction_apply, hInHuConj_coe,
+    Subgroup.coe_mul, Subgroup.coe_inv]
+  rw [hmb]
+
 end OddOrder.Peterfalvi.S11
 
