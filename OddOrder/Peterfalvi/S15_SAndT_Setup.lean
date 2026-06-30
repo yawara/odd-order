@@ -792,6 +792,40 @@ theorem caseB_lambda_norm_core {Scard Pm1 u q : ℕ} {s sₐ lam1 : ℝ} {b : �
     nlinarith [hinfl, hfac, mul_nonneg (sq_nonneg (q : ℝ)) hquadR]
   linarith [hdecomp, hcross]
 
+open scoped Classical in
+/-- **Peterfalvi (13.6), character-theoretic bound**: the norm lower bound
+`∑_{x∈H#}|λ^{τ₁}(x)|² ≥ |S| − λ(1)²`, assembled from the (13.5) machinery.
+
+For the irreducible `λ ∈ S` of degree `λ(1) = uq` induced from a linear character of `H = PC`
+(so `‖λ‖² = 1`, `a = 1`, hence `κ = 1`), this chains the generic (13.5.b) decomposition
+`sum_normSq_sharp_chi_decomp` (with `ζ = λ`, `χ = λ^{τ₁}`, `κ = 1`) into the arithmetic core
+`caseB_lambda_norm_core`.  The character-theoretic content is exposed as explicit honest
+hypotheses, each discharged from the (13.6) setup once it lands:
+* `hvanish` — `λ` vanishes on `S − H` (induced from `H`, `H ⊴ S`);
+* `hinner` — `(Res_H λ, α) = 0` (the `P`-kernel orthogonality of (13.5.a));
+* `hχ` — the (13.5.a) point formula `λ^{τ₁} = λ + α` on `H#` (orthogonality from `S`-coherence);
+* `hT` — `∑_S|λ|² = |S|` (`sum_normSq_eq_card_mul_inner` with `‖λ‖² = 1`);
+* `hζ1`, `hcross` — `λ(1) = lam1` real and `Re(λ(1)·conj α(1)) = lam1·qb` (the `α(1) = qb`
+  congruence of (13.5.a)+(1.10));
+* `hinfl` — `(|P|−1)(qb)² ≤ ∑_{H#}|α|²` (Peterfalvi (13.5.c)); `hu` — `2u ≤ |P|−1` (13.2.c). -/
+theorem caseB_lambda_norm_bound {S : Type*} [Group S] [Fintype S]
+    (H : Subgroup S) (ζ α χ : S → ℂ) {Scard Pm1 u q : ℕ} {lam1 : ℝ} {b : ℤ}
+    (hvanish : ∀ x : S, x ∉ H → ζ x = 0)
+    (hinner : ∑ x ∈ Finset.univ.filter (· ∈ H), ζ x * (starRingEnd ℂ) (α x) = 0)
+    (hχ : ∀ x ∈ (Finset.univ.filter (· ∈ H)).erase 1, χ x = ζ x + α x)
+    (hT : ∑ x : S, ‖ζ x‖ ^ 2 = (Scard : ℝ))
+    (hζ1 : ‖ζ 1‖ ^ 2 = lam1 ^ 2)
+    (hcross : (ζ 1 * (starRingEnd ℂ) (α 1)).re = lam1 * ((q : ℝ) * b))
+    (hlam1 : lam1 = (u : ℝ) * q)
+    (hinfl : (Pm1 : ℝ) * ((q : ℝ) * b) ^ 2
+        ≤ ∑ x ∈ (Finset.univ.filter (· ∈ H)).erase 1, ‖α x‖ ^ 2)
+    (hu : 2 * u ≤ Pm1) :
+    (Scard : ℝ) - lam1 ^ 2 ≤ ∑ x ∈ (Finset.univ.filter (· ∈ H)).erase 1, ‖χ x‖ ^ 2 := by
+  refine caseB_lambda_norm_core hlam1 ?_ hinfl hu
+  rw [sum_normSq_sharp_chi_decomp H ζ α χ 1 hvanish hinner
+    (by intro x hx; rw [hχ x hx, Complex.ofReal_one, one_mul]), hT, hζ1, hcross]
+  ring
+
 /-- **Arithmetic core of Peterfalvi (13.7)**: the norm lower bound `∑_{x∈H#}|η₁₀(x)|² ≥ |H#|`.
 
 In (13.7), for `α = η₁₀` on `H#` with `α(1) = d` and squared norm `‖α‖² = n`, one has:
