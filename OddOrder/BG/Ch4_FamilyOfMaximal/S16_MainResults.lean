@@ -5925,8 +5925,12 @@ theorem maximalSubgroupsContaining_centralizer_eq_singleton_of_sigmaSharp_escape
 
 /-- **BG Theorem II** (mmd L4548): `A(M)` and `A_0(M)` are tamely embedded.  The BG form of the
 centralizer-control input used by Peterfalvi (8.12)--(8.13).  Cites the gated-endpoint skeleton
-`theoremII_tame_embedding_of_inputs`; the two residual obligations — the BG Theorem E cross-piece
-exclusion and the BG §9--§10 maximal-overgroup uniqueness — remain `sorry`. -/
+`theoremII_tame_embedding_of_inputs`; **both residual obligations are now discharged** — the BG
+Theorem E cross-piece exclusion `hPieceInv` via the order-determined `M_σ`/`A(M)`-membership
+(`mem_Msigma_iff_isPiElement_sigma` / `mem_U_sup_Msigma_iff_isPiElement_kappa_compl`), and the BG
+§9--§10 maximal-overgroup uniqueness `hMaxUnique` via the signalizer uniqueness
+(`maximalSubgroupsContaining_centralizer_eq_singleton_of_sigmaSharp_escape`).  (Not axiom-clean: the
+`_of_inputs` skeleton still cites the `sorry`-bearing §16 structure theorems A--D inline.) -/
 theorem theoremII_tame_embedding [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     {M K U : Subgroup G} (hM : M ∈ maximalSubgroups G) (hKM : K ≤ M) (hUM : U ≤ M)
     (hK : Ch03.IsHallSubgroup (S14.kappa M) (K.subgroupOf M))
@@ -5943,8 +5947,45 @@ theorem theoremII_tame_embedding [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd
             N ∈ maximalSubgroupsContaining (Subgroup.centralizer ({x} : Set G)) ∧
             (OddOrder.GroupTheory.IsTypeI N ∨ OddOrder.GroupTheory.IsTypeII N) :=
   theoremII_tame_embedding_of_inputs hG hM hKM hUM hK hU hX
-    -- `hPieceInv`: BG Theorem E cross-piece exclusion.
-    (by sorry)
+    -- `hPieceInv`: BG Theorem E cross-piece exclusion.  `M_σ` (normal `σ`-Hall) and `U⊔M_σ` (normal
+    -- `κ′`-Hall, Theorem A(3)) make `M_σ`- and `A(M)`-membership of an element of `M` order-determined
+    -- (`mem_Msigma_iff_isPiElement_sigma` / `mem_U_sup_Msigma_iff_isPiElement_kappa_compl`), hence
+    -- conjugation-invariant (`isPiElement_conj`).
+    (by
+      have hMσM : OddOrder.BG.Ch3.S10.Msigma M ≤ M := OddOrder.BG.Ch3.S10.Msigma_le M
+      have hnorm : ((U ⊔ OddOrder.BG.Ch3.S10.Msigma M).subgroupOf M).Normal :=
+        (Subgroup.normal_subgroupOf_iff_le_normalizer (sup_le hUM hMσM)).mpr
+          (theoremA_ungated_conjuncts hG hM hKM hUM hK rfl hU).2.2.1
+      intro x hxX y hyX hconj
+      obtain ⟨g, hg⟩ := hconj
+      have hxhat : x ∈ hatMsigma M := by
+        rcases hX with h | h
+        · have hm := h ▸ hxX; simp only [ASet, Set.mem_inter_iff] at hm; exact hm.1
+        · have hm := h ▸ hxX; simp only [A0Set, Set.mem_diff] at hm; exact hm.1
+      have hyhat : y ∈ hatMsigma M := by
+        rcases hX with h | h
+        · have hm := h ▸ hyX; simp only [ASet, Set.mem_inter_iff] at hm; exact hm.1
+        · have hm := h ▸ hyX; simp only [A0Set, Set.mem_diff] at hm; exact hm.1
+      refine ⟨?_, ?_⟩
+      · rw [S14.mem_Msigma_iff_isPiElement_sigma hG hM hxhat.1,
+          S14.mem_Msigma_iff_isPiElement_sigma hG hM hyhat.1]
+        refine ⟨fun h => ?_, fun h => ?_⟩
+        · rw [hg]; exact S14.isPiElement_conj g h
+        · rw [show x = g⁻¹ * y * (g⁻¹)⁻¹ from by rw [hg]; group]
+          exact S14.isPiElement_conj g⁻¹ h
+      · have hAx : x ∈ ASet M U ↔ x ∈ U ⊔ OddOrder.BG.Ch3.S10.Msigma M := by
+          simp only [ASet, Set.mem_inter_iff, SetLike.mem_coe]
+          exact ⟨fun h => h.2, fun h => ⟨hxhat, h⟩⟩
+        have hAy : y ∈ ASet M U ↔ y ∈ U ⊔ OddOrder.BG.Ch3.S10.Msigma M := by
+          simp only [ASet, Set.mem_inter_iff, SetLike.mem_coe]
+          exact ⟨fun h => h.2, fun h => ⟨hyhat, h⟩⟩
+        rw [hAx, hAy,
+          S14.mem_U_sup_Msigma_iff_isPiElement_kappa_compl hG hM hUM hU hnorm hxhat.1,
+          S14.mem_U_sup_Msigma_iff_isPiElement_kappa_compl hG hM hUM hU hnorm hyhat.1]
+        refine ⟨fun h => ?_, fun h => ?_⟩
+        · rw [hg]; exact S14.isPiElement_conj g h
+        · rw [show x = g⁻¹ * y * (g⁻¹)⁻¹ from by rw [hg]; group]
+          exact S14.isPiElement_conj g⁻¹ h)
     -- `hMaxUnique`: BG §9--§10 maximal-overgroup uniqueness `|ℳ(C_G(x))| = 1`, discharged from the
     -- signalizer uniqueness (`maximalSubgroupsContaining_centralizer_eq_singleton_of_sigmaSharp_escape`)
     -- via the `D ⊆ M_σ#` reduction (`mem_sigmaSharp_of_mem_aSet_of_escape`).
