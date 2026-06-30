@@ -759,3 +759,25 @@ char-theory 入力 (Frobenius-induction irreducible)。
 5. assembly: S14 に S09_CertificateDischarge import → hypothesis78OfDade で witness-L H78 →
    betaDecompOfDade/zetaNuRhoNormSqGeOfDade。
 注: full (12.16) は別途 §12 char sorry (12.11/12.14/12.15) が gating。
+
+### 2026-07-01 (loop 継続³²⁻): nu_isometry 弱化を試行→revert (delicate γ-side proof を破壊)
+
+§12 bridge 唯一の真の refactor = `Hypothesis78.nu_isometry` field の global→family-level 弱化を試行。
+field + nu_zeta_inner_self_eq_one(+_of_irreducible, +callers) + weightedNuSum collapse sites を編集。
+**結果: weightedNuSum collapse proof (S09_Nonexistence 3154/3159) が破壊** — `rw [H78.nu_isometry,
+horth i (by simpa [hs] using hi) ...]` の chain が global nu_isometry の rw 挙動に微妙に依存しており、
+indexed 版 + horth の simpa が S metavar で type mismatch。delicate な pre-existing (7.8.b) γ-side
+proof ゆえ revert (build green 維持)。
+
+**教訓 + 解法 path**:
+- 弱化は fragile (delicate γ-side proof に波及)。careful にやるなら horth 引数を explicit
+  `Finset.mem_erase.mpr ⟨hine, mem_univ⟩` 化 + 各 collapse proof の rw chain を再理解して修正 (高リスク)。
+- **より clean = option F (global isometry 供給)**: field を global のまま保ち、§12 bridge では
+  coh.extension に family 上一致する **global-isometric ν'** を hypothesis78OfDade に供給。{ζ_i} は
+  一次独立 (distinct Frobenius-induced irreducible) で coh.extension が Gram 行列保存
+  (extension_inner_eq) ゆえ、family span 上の等長を global unitary へ拡張可能 (Gram-Schmidt /
+  orthonormal completion、intricate だが delicate proof に触れない)。hagree/hζ0norm/hzeta0nu は
+  ν' = coh.extension on family ゆえ成立。
+- どちらも intricate。次フェーズで careful に。§7 floor + bridge hard content + 全 ingredient は完成
+  (keystone/coherence_hagree/coherence_hagree_dadeMap/typeIA_eq_sharp/coherence_extension_inner_eq_on_family/
+  inner_self_induce_eq_one_of_frobeniusGroup)。assembly のみ残。
