@@ -887,3 +887,12 @@ S₁ middle = {Ind θ : P⊄ker θ} (P⊄ker)、tail = {Ind θ : P⊆ker θ}。
 (kernel partition の Lean 化が核心: P⊆ker(Ind θ)⟺P⊆ker θ + tail の Res_H が P⊆ker)。multi-step だが
 全 prerequisite 在庫。fresh context で producer 組立を engage。[[feedback-no-avoiding-hard-parts]]
 [[scaffold-sorry-free-not-done]]
+
+**🔑 kernel lemma 確認 (cont.²⁷ 追記)**: `subsetCharacterKernel_induce_of_subgroupOf`
+(S03_PreliminaryCharacter:618、Pf (1.6.a) **forward**: A⊴G, A≤H, A⊆ker θ ⟹ A⊆ker(Ind_H^G θ)) が
+**在庫** = step 3-4 の核心。これで α=∑_tail Res_H(Ind θ_i) (P⊆ker θ_i) の **P-const** (α(p)=α(1) on P,
+alpha bound `sum_normSq_erase_one_ge_of_const_on_subgroup` の入力) が得られる: P⊆ker(Ind θ)
+[forward lemma] ⟹ Ind θ が P 上 const ⟹ Res_H も。converse (1.6.a 逆) は未形式化だが**不要**
+(tail の forward だけで足りる)。**⚠ 注意**: H76 family は θ_i : ClassFunction ↥(H.subgroupOf S) で
+induction は ↥S 内 (Ind_K^L, K=H.subgroupOf S, L=S) ⟹ partition/orthogonality/α 構成は
+subgroup-of-S setup での careful work。次 iteration = producer 組立 (step 1-4) を engage。
