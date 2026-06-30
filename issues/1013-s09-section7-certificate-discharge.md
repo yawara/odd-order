@@ -402,3 +402,29 @@ tactic def (set/classical/have wrapper) を unfold** するため事実上 non-t
 **次 (7.8.b)**: family-level の bound `‖ζ^{νρ}‖² ≥ 1−e/h` を `chiRho_norm_sq_double_sum` (7.7.b) +
 `sumNontrivialIrreducibleDegreeSq` (degree-sum) + a∈ℤ + quadratic で組む(H78-coupling を避け、
 族データ θ/ν/a で直接)。consumer が inline で使う。
+
+### 2026-07-01 (loop 継続¹⁴⁻): (7.8.b) 教科書 roadmap 確定 + 設計の機微
+
+**(7.8.b) は `zetaNuRhoNormSq_ge_of_normQuadraticCorrection_eq` (S09:2655) で
+identification `zetaNuRhoNormSq = normQuadraticCorrection + (1−e/h)` に還元済**
+(残りの quadratic≥0 は `normQuadraticCorrection_nonneg_of_smallIndex` で済)。
+よって残 = この **identification** (double-sum 計算) のみ。
+
+**教科書 (7.8.b) 証明** (04.9.mmd) の正確な roadmap:
+- (7.7) を **ζ_0 ∈ S−{ζ} (≠ 区別 ζ)**, ζ_1=Ind 1_H, ζ_2=ζ, χ=ζ^ν で適用。
+- 係数: **c_1 = (β+(ζ−d_1ζ_0)^τ, ζ^ν) = a−1+1 = a** (ζ_1=Ind 1_H 項、β 経由)、
+  **c_2 = ((ζ−d_2ζ_0)^τ, ζ^ν) = 1** (ζ_2=ζ)、**c_i = 0 (i>2)**。
+- (7.7.b) で **‖ζ^{νρ}‖² = ua²−2va+w**、u=(1/‖ζ_1‖⁴)(‖ζ_1‖²−ζ_1(1)²/(eh))=(1/e)(1−1/h)、
+  v=(1/(‖ζ_1‖²‖ζ_2‖²))ζ_1(1)ζ_2(1)/(eh)=1/h、w=(1/‖ζ_2‖⁴)(‖ζ_2‖²−ζ_2(1)²/(eh))=1−e/h。
+- ‖Γ‖²=e−1 は `e+1=‖β‖²=1+(a−1)²+a²Σφ(1)²/(e²‖φ‖²)+‖Γ‖²` + (1.5.d) Σθ(1)²=h−1。
+
+⚠ **設計の機微 (要対処)**: 教科書は (7.7) の参照 ζ_0 を **S−{ζ}** に取る (clean c_i=a,1,0)。
+だが `chiRho_norm_sq_double_sum` は **H76 の ζ_0 = zeta 0** を参照に使い、
+hypothesis78OfDade は **zetaDistinct=0 (ζ_0=区別 ζ)** に設定。→ 2 案:
+- **(A)** my ζ_0=ζ のまま messy c_i (c_ind1H=a−1, c_i=−d_i) で計算。族は pairwise 直交
+  (`induce_family_orthogonal`: Ind 1_H ⊥ Ind θ も含む、Frobenius で θ≠1_H ゆえ 0) なので
+  double-sum は Σ|c_i|²/‖ζ_i‖² − (1/|L|)|Σc_iζ_i(1)/‖ζ_i‖²|² に簡約、ua²−2va+w に一致するはず。
+- **(B)** 別 H76' を ζ_0'∈S−{ζ} で `hypothesis76OfFamily` 構成し clean c_i。
+
+次 loop = (A) で identification 構築に着手 (再 indexing 不要、既存 H78 で直接; 族直交
++ degree-sum + c_i 同定 + 代数)。multi-turn の見込み。
