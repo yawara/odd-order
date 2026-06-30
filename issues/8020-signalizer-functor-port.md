@@ -1063,3 +1063,30 @@ target が「漠然 deep gate」から「faithful Lem14.13 + all-type-I escape a
 **∴ gate-2 の honest path は 2 択 (どちらも substantial)**: (A) **M_σ-TI for type-I を port** (= `covers`+`isTI` を同時 unblock、
 deep BG §14 σ-uniqueness、D(2) cyclic→TI 強化) / (B) **cross-lane re-route**: family を M̃-Dade support で再構成し
 M̃-cover に切替 (M_σ-TI 回避、但し S09 再構成要・cross-lane)。τ2-route は無効 (loop⁴⁷)。
+
+## ✅ 進捗 (lane d, 2026-06-30 /loop⁴⁹ — ユーザー「やることないの？」を受け grind 再開): D(4) mis-encoding 修正 + hD4 完全 scope
+
+「deep だから停止」は誤対応 (deep = endgame そのもの) と認識し直し、Theorem D(4) を grind 着手:
+
+- **✅ landed (commit 82050ee2, full build 3125 green)**: `theoremD_msigma_conjugacy_and_centralizers`
+  hD4 conjunct (+ `_of_inputs`) の `IsTypeP2 N → IsTypeP M ∧ ¬FittingIsTI M ∧ Frobenius M` を
+  **`IsTypeF M` に訂正** (mis-encoding)。3 通り確認: Coq BGsummaryD part 4 (N∈P2⟹M∈𝓜_F) /
+  `centralizer_escape_final_local` (S15:9413 IsTypeF M 結論) / 内部矛盾 (IsFrobeniusGroup M (Msigma M) E
+  は M=type-F 要)。consumer `theoremII` (S16:5684) は positional 分解で末尾 `_` 吸収ゆえ非影響。
+
+- **hD4 完全 scope (次 grind の設計図、全ピース特定済)**:
+  - **existence は assemblable** (全ピース在庫): dichotomy `¬C(x)≤M⟹|𝓜_σ|>1`
+    (`centralizer_le_of_maximalSigma_le_one` S16:1456 contrapositive) → `signalizer_structure_of_mem_sigmaSharp`
+    (S16:269) で ∃!N₀ [structure pred] → R:=Msigma N₀⊓C(x), RData は `RData_of_gt_one` (S16:428) パターン →
+    conjuncts: (1)maximalSubgroupsContaining=maximal+C(x)≤N₀ / (2)R def / (3)`maxNilpotentNormalHall_eq_Msigma_of_isTypeF_or_isTypeP2`
+    (S16:5324) / (4)**`ASet N⊤=hatMsigma N`** (∵ U=⊤: `hatMsigma N∩⊤`) = {a∈N|Msigma N⊓C(a)≠⊥}、x∈N+structure の
+    Msigma⊓C(x)≠⊥+x∉Msigma N (τ2-elt) / (5)structure F∨P2 / (6)structure ∀M'(M'=M)+`isComplement'_comm` /
+    (7)`centralizer_escape_final_local` (cite, IsTypeP2→¬IsTypeF 経由)。
+  - **uniqueness = `|ℳ(C(x))|=1`** (Coq `'M('C[x])={N}`、structure pred の ∃! では不足ゆえ別途)。
+    **関連 ported 補題**: `S13_PrimeAction:1076` (`maximalSubgroupsContaining (C(X))={M}`) /
+    `S12_Theorem1213:358`。これが hD4 uniqueness の核。
+  - **🔑 consolidation**: hD4 uniqueness (|ℳ(C(x))|=1) = **`theoremII_tame_embedding` の `hMaxUnique` residual
+    (S16:5724) と同一**。1 本 (|ℳ(C(x))|=1) 証明で **hD4 と theoremII の両 sorry を unblock** (2-for-1)。
+
+**次 = hD4 grind**: existence assembly を書き、uniqueness を §13/§12 uniqueness 補題で埋める (or |ℳ(C(x))|=1
+を escaping x へ適用)。theoremII hMaxUnique も同時 unblock。
