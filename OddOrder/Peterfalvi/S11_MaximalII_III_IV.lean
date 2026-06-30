@@ -6175,5 +6175,28 @@ theorem hcPsi_inertia_eq_hc [Finite G] {M : Subgroup G}
   rw [hθ₀]
   exact (hInHu_sup_realizedH0supC chief).ge
 
+/-- **`ζ = Ind_{HC}^{HU}(ψ)` is irreducible** (degree `u`): direct from
+`isIrreducibleCharacter_induce_of_inertia_eq` and `inertia(ψ) = HC` (`hcPsi_inertia_eq_hc`).  This is
+the degree-`u` irreducible character of `𝒳(H₀C)` over `θ₀` in the (9.8.c) construction. -/
+theorem hcZeta_irreducible [Finite G] {M : Subgroup G}
+    {data : TypesIIIIIIVSetup M} (chief : ChiefFactorData data)
+    (θ : (↥data.H ⧸ chief.N) →* ℂˣ)
+    [Fintype ↥(huSub data)]
+    [Fintype ↥(hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf (huSub data))]
+    [Invertible (Nat.card ↥(huSub data) : ℂ)]
+    [Invertible (Nat.card ↥(hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf
+      (huSub data)) : ℂ)]
+    [(hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf (huSub data)).Normal]
+    (hθ₀ : ClassFunction.inertia (ClassFunction.compHom (hInHuEquivH data).toMonoidHom
+        (ClassFunction.compHom (QuotientGroup.mk' chief.N)
+          (linearIrreducibleCharacter θ : ClassFunction (↥data.H ⧸ chief.N) ℂ)))
+        = hInHu data ⊔ cInHu data chief) :
+    IsIrreducibleCharacter (ClassFunction.induce
+      (hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf (huSub data))
+      (hcPsi chief θ : ClassFunction
+        ↥(hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf (huSub data)) ℂ)) :=
+  OddOrder.RepresentationTheory.isIrreducibleCharacter_induce_of_inertia_eq (hcPsi chief θ)
+    (hcPsi_inertia_eq_hc chief θ hθ₀)
+
 end OddOrder.Peterfalvi.S11
 
