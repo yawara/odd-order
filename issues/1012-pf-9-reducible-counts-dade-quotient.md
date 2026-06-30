@@ -999,3 +999,17 @@ inertia heart (seed) は完成、残は char-construction plumbing (多層だが
 **layer 1 (次)**: ψ on HC = inflate θ̄ — realized HC↠H̄ hom (HC=hInHu⊔cInHu⊆huSub、quotient
 HC/H₀C≅H̄)。これが realized-subgroup setting で intricate (subgroupOf chain + quotient iso)。
 seed (I_HU=HC + not-fixed、inertia heart) は完成、残は forward Clifford correspondence + M-level + 𝒳。
+
+
+## conjunct c — caseB machinery は degree-determination、construction は新規 (2026-07-01)
+
+caseB_degree_qu / apply_one_eq_index_of_liesOver_linear_inertia / caseB_exists_chiefFactorConstituent
+は **与えられた χ の degree 決定** (extraction 方向)。conjunct c は χ の **construction** (新規)。
+私の seed (clifford_caseA_exists_char_inertia_hc_not_fixed) は θ₀ on hInHu (linear, inertia=HC) を
+直接供給 = caseB_exists_chiefFactorConstituent の出力と同形 ⟹ 正しい入力。
+
+**construction layer 1 (crux)**: θ₀ on hInHu を ψ on HC=hInHu⊔cInHu に拡張 (cInHu 上 trivial) =
+realized HC↠H̄ hom (hInHu→H̄ の f=(mk'N)∘hInHuEquivH を HC へ延長)。intricate subgroupOf-chain。
+**layer 2+**: χ=Ind_{HC}^{HU}(ψ) irr (isIrreducibleCharacter_induce_of_inertia_eq + inertia(ψ)=HC,
+ψ HC-inv + restriction-inertia) → χ∈𝒳(H₀C) over θ₀ deg u → not-fixed → I_M=HU → induceHU deg qu。
+利用可能: exists_liesOver / coe_eq_induce_of_liesOver_of_isIrreducibleCharacter_induce (CliffordSingleOrbit)。
