@@ -2548,6 +2548,51 @@ theorem chiefFactor_card_W2bar [Finite G] {M : Subgroup G}
     = chief.p
   exact Nat.eq_of_mul_eq_mul_right hposJ hchain
 
+/-- **Image order under `mk'` depends only on `S ∩ N`** (general): for normal `N₁, N₂` with
+`S ⊓ N₁ = S ⊓ N₂`, the images `S/(S∩Nᵢ)` have equal order, since `|S.map(mk' N)| · |S ⊓ N| = |S|`
+(first isomorphism `nat_card_quotient_subgroupOf_eq_card_map`). -/
+theorem nat_card_map_mk'_eq_of_inf_eq {Γ : Type*} [Group Γ] [Finite Γ]
+    (S N₁ N₂ : Subgroup Γ) [N₁.Normal] [N₂.Normal] (h : S ⊓ N₁ = S ⊓ N₂) :
+    Nat.card ↥(S.map (QuotientGroup.mk' N₁)) = Nat.card ↥(S.map (QuotientGroup.mk' N₂)) := by
+  have hsplit : ∀ (N : Subgroup Γ) [N.Normal],
+      Nat.card ↥(S.map (QuotientGroup.mk' N)) * Nat.card ↥(S ⊓ N) = Nat.card ↥S := by
+    intro N _
+    have hc : Nat.card ↥(N.subgroupOf S) = Nat.card ↥(S ⊓ N) := by
+      rw [inf_comm, ← Subgroup.subgroupOf_map_subtype N S]
+      exact Nat.card_congr (Subgroup.equivMapOfInjective (N.subgroupOf S) S.subtype
+        (Subgroup.subtype_injective S)).toEquiv
+    rw [← hc, ← Subgroup.nat_card_quotient_subgroupOf_eq_card_map]
+    exact (Subgroup.card_eq_card_quotient_mul_card_subgroup (N.subgroupOf S)).symm
+  have h1 := hsplit N₁
+  rw [h] at h1
+  exact Nat.eq_of_mul_eq_mul_right Nat.card_pos (h1.trans (hsplit N₂).symm)
+
+/-- **`|W̄₂'| = p` for the `M/H₀C` quotient** (issue 1012, step A): the chief-factor image `W̄₂'` in
+`↥M ⧸ H₀C` keeps order `p`.  Reduces to the `H₀` case (`chiefFactor_card_W2bar`): the kernels
+coincide, `W₂ ⊓ H₀C = W₂ ⊓ H₀` (as `W₂ ≤ H` and `(H₀C) ⊓ H = H₀` by
+`chiefFactor_H0supC_inf_H_eq_H0`), so by `nat_card_map_mk'_eq_of_inf_eq` the images have equal
+order. -/
+theorem chiefFactor_card_W2bar_H0supC [Finite G] {M : Subgroup G}
+    {data : TypesIIIIIIVSetup M} (chief : ChiefFactorData data)
+    [(chief.H0.subgroupOf M).Normal] [((chief.H0 ⊔ cSub data chief).subgroupOf M).Normal] :
+    Nat.card ↥((data.W2.subgroupOf M).map
+        (QuotientGroup.mk' ((chief.H0 ⊔ cSub data chief).subgroupOf M))) = chief.p := by
+  have hW2H : data.W2 ≤ data.H := data.typeP.W2_le.trans inf_le_left
+  have hG_eq : data.W2 ⊓ (chief.H0 ⊔ cSub data chief) = data.W2 ⊓ chief.H0 := by
+    apply le_antisymm
+    · refine le_inf inf_le_left ?_
+      calc data.W2 ⊓ (chief.H0 ⊔ cSub data chief)
+          ≤ data.H ⊓ (chief.H0 ⊔ cSub data chief) := inf_le_inf_right _ hW2H
+        _ = (chief.H0 ⊔ cSub data chief) ⊓ data.H := inf_comm _ _
+        _ = chief.H0 := chiefFactor_H0supC_inf_H_eq_H0 chief
+    · exact inf_le_inf_left _ le_sup_left
+  have hinf : (data.W2.subgroupOf M) ⊓ ((chief.H0 ⊔ cSub data chief).subgroupOf M)
+      = (data.W2.subgroupOf M) ⊓ (chief.H0.subgroupOf M) := by
+    simp only [Subgroup.subgroupOf, ← Subgroup.comap_inf, hG_eq]
+  rw [nat_card_map_mk'_eq_of_inf_eq (data.W2.subgroupOf M)
+    ((chief.H0 ⊔ cSub data chief).subgroupOf M) (chief.H0.subgroupOf M) hinf]
+  exact chiefFactor_card_W2bar chief
+
 /-- **Induction-inflation commute, term level** (general): for `f : Γ →* Q` with `ker f ≤ H`, the
 induced-character term of the inflated `compHom (f.subgroupMap H) χ̄` at `(x, g)` equals the
 induced-character term of `χ̄` on `H.map f` at `(f x, f g)`.  The conjugate `x⁻¹gx ∈ H` iff
@@ -4946,7 +4991,14 @@ theorem reducible_count_sOf_H0C [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd 
     {M : Subgroup G} {data : TypesIIIIIIVSetup M} {chief : ChiefFactorData data}
     (chars : Section11CharacterData data chief) (caseB : CliffordCaseBData chars) :
     {φ ∈ sOf data (chief.H0 ⊔ chars.C) | ¬ IsIrreducibleCharacter φ}.ncard = chief.p - 1 := by
-  sorry
+  haveI := chiefFactor_H0_subgroupOf_normal chief
+  haveI := chiefFactor_H0supC_subgroupOf_normal chief
+  rw [show chars.C = cSub data chief from rfl]
+  exact reducible_count_sOf_K hG chief (chief.H0 ⊔ cSub data chief)
+    (Subgroup.comap_mono (chiefFactor_H0supC_le_derived chief))
+    (chiefFactor_W1_inf_H0supC_subgroupOf_eq_bot chief)
+    (chiefFactor_W2_not_le_H0supC chief)
+    (chiefFactor_card_W2bar_H0supC chief)
 
 /-- **Peterfalvi (9.9.b), membership**: every reducible member of `𝒮(H₀)` lies in `𝒮(H₀C)`.
 
