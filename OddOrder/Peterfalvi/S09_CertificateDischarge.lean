@@ -2416,4 +2416,47 @@ theorem dadeIntegralCharacterMap_smul_complex {G : Type*} [Group G] {A : Set G} 
   simp only [OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap, LinearMap.restrictScalars_apply,
     map_smul]
 
+/-- **The (7.8.a) coherence agreement from `IsCoherent`** (the §12→§7 bridge, part 1).  For a
+coherent base map `τ` (ℂ-linear via `hτ_smul`, e.g. `dadeIntegralCharacterMap_smul_complex`) with
+extension `ν = hcoh.extension`, and family members `ζ_i, ζ_0 ∈ S` of integer degrees `m_i, m_0`
+(`m_0 ≠ 0`, `d_i = m_i/m_0`) whose difference `ζ_i − d_i ζ_0` is supported on `A`, the (7.8.a)
+agreement `τ(ζ_i − d_i ζ_0) = ν ζ_i − d_i ν ζ_0` holds.
+
+The integer-degree ℤ-combination `c = m_0·ζ_i − m_i·ζ_0 = m_0·(ζ_i − d_i ζ_0) ∈ ℤ[S]` is supported,
+so `ν c = τ c` (`extends_on_supported`); ℤ-linear decomposition (natCast-smul ↔ nsmul) and division
+by `m_0` give `ν ζ_i − d_i ν ζ_0 = τ ζ_i − d_i τ ζ_0`, and `τ`'s ℂ-linearity closes
+`τ(ζ_i − d_i ζ_0) = τ ζ_i − d_i τ ζ_0`. -/
+theorem coherence_hagree {L G : Type*} [Group L] [Group G] [Fintype L] [Fintype G]
+    [Invertible (Nat.card L : ℂ)] [Invertible (Nat.card G : ℂ)]
+    {τ : OddOrder.Peterfalvi.S07.IntegralCharacterMap L G}
+    {S : Set (ClassFunction L ℂ)} {A : Set L}
+    (hcoh : OddOrder.Peterfalvi.S07.IsCoherent τ S A)
+    (hτ_smul : ∀ (c : ℂ) (x : ClassFunction L ℂ), τ (c • x) = c • τ x)
+    {ζi ζ0 : ClassFunction L ℂ} (hζi : ζi ∈ S) (hζ0 : ζ0 ∈ S)
+    {m0 mi : ℕ} (hm0_ne : (m0 : ℂ) ≠ 0) {di : ℂ} (hdi : di = (mi : ℂ) / (m0 : ℂ))
+    (hsupp : (ζi - di • ζ0).support ⊆ A) :
+    τ (ζi - di • ζ0) = hcoh.extension ζi - di • hcoh.extension ζ0 := by
+  classical
+  have hcast : ∀ (f : ClassFunction L ℂ →ₗ[ℤ] ClassFunction G ℂ) (n : ℕ) (x : ClassFunction L ℂ),
+      f ((n : ℂ) • x) = (n : ℂ) • f x := fun f n x => by
+    rw [Nat.cast_smul_eq_nsmul ℂ n x, map_nsmul, Nat.cast_smul_eq_nsmul ℂ n (f x)]
+  have hmi_eq : (mi : ℂ) = (m0 : ℂ) * di := by rw [hdi, mul_div_cancel₀ _ hm0_ne]
+  have hc_eq : (m0 : ℂ) • ζi - (mi : ℂ) • ζ0 = (m0 : ℂ) • (ζi - di • ζ0) := by
+    rw [hmi_eq, smul_sub, smul_smul]
+  have hc_mem : ((m0 : ℂ) • ζi - (mi : ℂ) • ζ0) ∈
+      OddOrder.Peterfalvi.S07.zSupportedSpan (L := L) S A := by
+    refine ⟨?_, ?_⟩
+    · rw [Nat.cast_smul_eq_nsmul ℂ m0 ζi, Nat.cast_smul_eq_nsmul ℂ mi ζ0]
+      exact Submodule.sub_mem _ (nsmul_mem (Submodule.subset_span hζi) m0)
+        (nsmul_mem (Submodule.subset_span hζ0) mi)
+    · rw [hc_eq]
+      exact (ClassFunction.support_smul_subset _ _).trans hsupp
+  have hext := hcoh.extends_on_supported _ hc_mem
+  rw [map_sub, map_sub, hcast, hcast, hcast, hcast, hmi_eq, mul_smul, mul_smul,
+    ← smul_sub, ← smul_sub] at hext
+  have eq2 : hcoh.extension ζi - di • hcoh.extension ζ0 = τ ζi - di • τ ζ0 :=
+    smul_right_injective (ClassFunction G ℂ) hm0_ne hext
+  rw [map_sub, hτ_smul]
+  exact eq2.symm
+
 end OddOrder.Peterfalvi.S09.Cert
