@@ -6290,5 +6290,75 @@ theorem hcZeta_H0supC_subset_ker [Finite G] {M : Subgroup G}
     le_sup_right (hcPsi chief θ)
     (hcPsi_realizedH0supC_subgroupOf_subset_characterKernel chief θ)
 
+set_option maxHeartbeats 1000000 in
+/-- **`H ⊄ Ker ζ`** (`ζ ∈ 𝒳`): the irreducible `ζ = Ind_{HC}^{HU}(ψ)` is nontrivial on `H = hInHu`.
+`ζ` lies over `ψ` (Frobenius: `⟨Ind ψ, ζ⟩ = ⟨ζ,ζ⟩ = 1`), so `H ⊆ Ker ζ` would descend
+(`liesOver_mem_characterKernel`) to `H ⊆ Ker ψ` (`ψ|_H = 1`).  But `ψ|_H` is the inflation of `θ`
+(`hcPsi_apply_inclusion`) and the descent hom `(mk' N) ∘ hInHuEquivH` is surjective, so `ψ|_H = 1`
+forces `θ = 1`, contradicting `hθnt`.  The `xiSet` half of `ζ ∈ 𝒳(H₀C)`. -/
+theorem hcZeta_mem_xiSet [Finite G] {M : Subgroup G}
+    {data : TypesIIIIIIVSetup M} (chief : ChiefFactorData data)
+    (θ : (↥data.H ⧸ chief.N) →* ℂˣ) (hθnt : θ ≠ 1)
+    [Fintype ↥(huSub data)]
+    [Fintype ↥(hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf (huSub data))]
+    [Invertible (Nat.card ↥(huSub data) : ℂ)]
+    [Invertible (Nat.card ↥(hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf
+      (huSub data)) : ℂ)]
+    [(hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf (huSub data)).Normal]
+    (hθ₀ : ClassFunction.inertia (ClassFunction.compHom (hInHuEquivH data).toMonoidHom
+        (ClassFunction.compHom (QuotientGroup.mk' chief.N)
+          (linearIrreducibleCharacter θ : ClassFunction (↥data.H ⧸ chief.N) ℂ)))
+        = hInHu data ⊔ cInHu data chief) :
+    (⟨ClassFunction.induce
+        (hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf (huSub data))
+        (hcPsi chief θ), hcZeta_irreducible chief θ hθ₀⟩ :
+        IrreducibleCharacter ↥(huSub data)) ∈ xiSet data := by
+  classical
+  set ζ : IrreducibleCharacter ↥(huSub data) :=
+    ⟨ClassFunction.induce
+      (hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf (huSub data))
+      (hcPsi chief θ), hcZeta_irreducible chief θ hθ₀⟩ with hζdef
+  -- `ζ` lies over `ψ`: Frobenius `⟨Ind ψ, ζ⟩ = ⟨ζ,ζ⟩ = 1 ≠ 0`.
+  have hlo : OddOrder.RepresentationTheory.IrreducibleCharacter.LiesOver
+      (hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf (huSub data))
+      ζ (hcPsi chief θ) := by
+    rw [← OddOrder.RepresentationTheory.IrreducibleCharacter.inner_induce_ne_zero_iff_liesOver]
+    have hcoe : (ζ : ClassFunction ↥(huSub data) ℂ) = ClassFunction.induce
+        (hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf (huSub data))
+        (hcPsi chief θ) := by rw [hζdef]
+    rw [← hcoe, OddOrder.RepresentationTheory.irreducibleCharacter_inner_eq_ite ζ ζ, if_pos rfl]
+    exact one_ne_zero
+  -- Assume `H ⊆ Ker ζ` for contradiction; show `θ = 1`.
+  rw [xiSet, Set.mem_setOf_eq]
+  intro hsub
+  apply hθnt
+  have hfsurj : Function.Surjective
+      ((QuotientGroup.mk' chief.N).comp (hInHuEquivH data).toMonoidHom) :=
+    (QuotientGroup.mk'_surjective chief.N).comp (hInHuEquivH data).surjective
+  refine MonoidHom.ext fun q => ?_
+  obtain ⟨h, hhq⟩ := hfsurj q
+  -- `(incl h : HU) ∈ H`, so it lies in `Ker ζ`, descending to `incl h ∈ Ker ψ`.
+  have hgmem : ((Subgroup.inclusion
+      (le_sup_left :
+        hInHu data ≤ hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf
+          (huSub data)) h : ↥(hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf
+          (huSub data))) : ↥(huSub data)) ∈ hInHu data := by
+    rw [Subgroup.coe_inclusion]; exact SetLike.coe_mem h
+  have hψker := liesOver_mem_characterKernel hlo (hsub hgmem)
+  have hψ1 : (hcPsi chief θ : ClassFunction
+      ↥(hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf (huSub data)) ℂ) 1 = 1 := by
+    simp [hcPsi]
+  rw [OddOrder.Peterfalvi.S03.mem_characterKernel, OddOrder.Peterfalvi.S03.characterDegree_def,
+    hcPsi_apply_inclusion chief θ h, hψ1,
+    ClassFunction.compHom_apply, ClassFunction.compHom_apply, MulEquiv.coe_toMonoidHom,
+    linearIrreducibleCharacter_apply] at hψker
+  -- `hψker : (θ ((mk' N) (hInHuEquivH h)) : ℂ) = 1`, and `(mk' N)(hInHuEquivH h) = q`.
+  have hqeq : (QuotientGroup.mk' chief.N) ((hInHuEquivH data) h) = q := hhq
+  rw [hqeq] at hψker
+  show θ q = (1 : ℂˣ)
+  refine Units.ext ?_
+  rw [Units.val_one]
+  exact hψker
+
 end OddOrder.Peterfalvi.S11
 
