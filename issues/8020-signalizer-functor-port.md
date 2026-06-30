@@ -855,3 +855,22 @@ cover frontier (deep) を保留し、hygiene + faithfulness を整理 (S14、ful
 equality + Cor 14.8 全)。**残 on-path = deep multi-session のみ**: (1) cover_subset_kernels = FittingIsTI-for-typeF
 (Frobenius-kernel-TI、消費される on-path) / (2) NonTypeICovering = Theorem 14.7(e) Ẑ (deep)。orphaned/scaffold な
 14.10/14.13 は低価値。次の genuine on-path work は (1) の deep TI port。
+
+## 🔎 進捗 (lane d, 2026-06-30 /loop³⁵): gate-2 残依存 survey — FittingIsTI-for-typeF は genuine gap, NonTypeICovering が次の tractable 候補
+
+新規 Lean なし (frontier 精緻化)。gate-2 両 branch の deep 依存を確定:
+- **cover_subset_kernels (= M_σ TI for type-F = FittingIsTI-for-typeF)**: `theoremA8_structure` (S16:4482、
+  Theorem A(8)) は **M_F≠M_σ ケースのみ** (U=1, F(M) TI, |K| prime)。type-F は M_F=M_σ ゆえ **未カバー = genuine gap**。
+  `fittingIsTI_of_isTypeP2` (type-P2) はあるが `_of_isTypeF` 無し。さらに Theorem D(2)
+  (`Msigma_inf_conj_isCyclic`) は M_σ∩M^g **cyclic** までで TI (=1) でない ⟹ FittingIsTI-for-typeF は genuine に
+  強く、Theorem A(8) の M_F=M_σ ケース (未証明) を要する deep piece。
+- **NonTypeICovering (Ẑ branch)**: `cover_subset_kernels` field を**持たない** (W=Ẑ, cover_nonidentity, pairwise,
+  exceptional_disjoint のみ)。cover_nonidentity (G#=⋃𝒞_G(M̃)∪𝒞_G(Ẑ#)) は **proven dichotomy
+  (`sigma_decomposition_dichotomy`) から導出可** (signalizer branch→M̃ [`mem_Mtilde_of_mem_coset` 在]、κ branch→Ẑ
+  [要 zTilde identification、Coq mFT_partition part 2])。⟹ **cover_subset_kernels (type-F TI gap) より tractable**。
+
+**▶▶ 次の concrete target**: (a) **NonTypeICovering Ẑ assembly** (κ branch→𝒞_G(Ẑ#) identification + disjointness、
+~50-80 行、dichotomy 利用、deep だが gap 無し) — gate-2 の 𝓜_𝒫≠∅ 枝。あるいは (b) gate-2 restructure
+(by_cases all-type-F で TypeICovering の cover_nonidentity[在]+pairwise[在] を wire、cover_subset_kernels を
+named sorry に isolate)。(a) が genuine math、(b) が配線。cover_subset_kernels (type-F TI) は Theorem A(8)
+M_F=M_σ ケースの別 deep port。
