@@ -695,3 +695,63 @@ conjunct c の regular θ̄ (各 Hpart 上 nontrivial な linear char) 構成に
 **次の構成ステップ**: (1) H̄ ≅ ∏ Hpart の iso (iSupIndep+iSup=⊤ から; elementary abelian ゆえ
 additive `DirectSum.IsInternal` も可)、(2) 各 Hpart i の nontrivial char (exists_apply_ne_one)、
 (3) 合成で regular θ̄、(4) `inertia_eq_hcInHu_caseA` → induce → conjunct c。multi-piece、fresh context 推奨。
+
+
+## regular θ̄ 構成の正確な mathlib 配線 (2026-06-30、次イテレーション用)
+
+`exists_regular_char` (一般補題、`[CommGroup Hbar]` で述べれば subgroup の CommGroup instance は自動):
+```
+theorem exists_regular_char {Hbar} [CommGroup Hbar] [Finite Hbar] {ι} [Fintype ι]
+  (Hpart : ι → Subgroup Hbar) (hindep : iSupIndep Hpart) (hspan : ⨆ i, Hpart i = ⊤)
+  (hp : ∀ i, (Nat.card ↥(Hpart i)).Prime) : ∃ θ : Hbar →* ℂˣ, ∀ i, ∃ x ∈ Hpart i, θ x ≠ 1
+```
+配線 (GroupTheory/NoncommPiCoprod.lean):
+1. `choose ψ hψ using fun i => exists_ne_one_hom_of_prime_card (hp i)` — ψ i : ↥(Hpart i)→*ℂˣ, ≠1。
+2. commuting: Hbar abelian ⟹ `fun _ _ _ _ _ _ => mul_comm _ _` 系で Pairwise Commute。
+3. `e := Subgroup.noncommPiCoprod Hpart hcomm : (∀ i, ↥(Hpart i)) →* Hbar`。
+4. inj: `injective_noncommPiCoprod_of_iSupIndep` (hindep + 各 subtype inj)。
+   surj: range = `noncommPiCoprod_range`/`noncommPiCoprod_mrange` = ⨆ Hpart = ⊤ (hspan)。
+5. `eEquiv := MulEquiv.ofBijective e ⟨inj, surj⟩`。
+6. `θ := (MonoidHom.noncommPiCoprod ψ (commuting in ℂˣ auto)).comp eEquiv.symm.toMonoidHom`。
+7. nontriv: ψ i ≠1 ⟹ ∃ x:↥(Hpart i), ψ i x ≠1。`eEquiv.symm ↑x = Pi.mulSingle i x` (x∈Hpart i ゆえ
+   coprod の single slot) ⟹ θ ↑x = ψ i x ≠1。`noncommPiCoprod_mulSingle` が single-slot 計算。
+注: 一般補題ゆえ instance friction 無し。use site (Hbar=↥H⧸N) で IsMulCommutative→CommGroup の
+letI が要る (別途)。~50 行、fresh context 推奨。
+
+
+## conjunct c の状態 (2026-06-30、regular θ̄ 機構完成後)
+
+**揃った入力** (全て本セッションで実証明):
+- `exists_regular_irr_caseA`: regular θ̄ (各 Hpart 上 nontrivial) ∃。✅
+- `inertia_eq_hcInHu_caseA`: regular θ̄ ⟹ I_HU(θ₀)=HC。✅
+- `induceHU` (Ind_HU^M) + `induceHU_apply_one_eq_q_mul` (deg = q·χ(1)) + `xiSet`/`sOf`/`mem_sOf`。✅
+
+**欠けている核心 = Clifford correspondence**: 「I_HU(θ₀)=HC ⟹ Ind_{HC}^{HU}(θ₀ 上の linear) は
+irreducible、degree [HU:HC]=u」。これは S11:4402 で**docstring コメントとして言及されるのみ、
+未だ lemma 化されていない**。conjunct c (∃ irreducible deg qu ∈ 𝒮(H₀C)) はこの correspondence を
+要する最大の残ピース。
+
+**次イテレーション手順**:
+1. mathlib の Clifford correspondence (induced-from-inertia-group is irreducible) を探す
+   (`leansearch` / `Mathlib.RepresentationTheory` の Clifford/inertia)。無ければ repo 内
+   `IrreducibleCharacter.LiesOver`/inertia infra で構築。
+2. θ₀ 上の linear HC-char を構成 (inertia=HC ⟹ θ₀ が HC へ linear 拡張)、Ind_{HC}^{HU} で
+   irreducible (deg u) → χ ∈ xiSet ∩ 𝒳(H₀C)。
+3. `induceHU` で 𝒮(H₀C)、deg = q·u (`induceHU_apply_one_eq_q_mul`)。
+conjunct b は更に reducible↔regular (prTIred) を要し別ピース。conjunct d は count。
+
+
+## conjunct c の Clifford correspondence — repo infra 確認 (2026-06-30)
+
+mathlib に Clifford correspondence は**無い**が、**repo 内に Clifford 完備 infra あり**:
+- `OddOrder/GroupTheory/RepresentationTheory/Clifford.lean` — Isaacs Thm 6.5/6.11、**inertia
+  bijection** (induction from inertia T)、`restrictionMultiplicity`、`IrreducibleCharacter.LiesOver`/
+  `inertia`/`inertiaQuotient`、conjBySimpleSemilinear (Clifford module setup)。
+- `InducedIrreducible.lean` — Frobenius irreducibility (Isaacs Thm 6.34、inertia=H 特殊化)、
+  Mackey norm (`card_mul_inner_self_induce` で ‖Ind θ‖²=1 ⟹ irreducible)。
+- `CliffordSingleOrbit.lean` — single-orbit Clifford。
+
+**conjunct c 構築 path**: regular θ̄ (inertia=HC) ⟹ Clifford **Thm 6.11 inertia bijection**
+(Clifford.lean) で「I_HU(θ₀)=HC 上の Irr(HC) char ↔ Irr(HU) over θ₀」⟹ Ind_{HC}^{HU}(θ₀ 拡張 linear)
+irreducible deg [HU:HC]=u ⟹ χ∈xiSet∩𝒳(H₀C) ⟹ induceHU deg q·u。次イテレーションは Clifford.lean の
+Thm 6.11 lemma を特定 (induce-from-inertia-bijective/irreducible の usable form) して適用。

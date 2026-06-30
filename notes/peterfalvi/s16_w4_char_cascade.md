@@ -705,3 +705,36 @@ ADDITION と逆)。**残 σ-carrier (8→5)**: P_isTI/Q_isTI (§8 TI)、card_nor
 として Sdata/typeP から出るか調査) or (b) exists_MHypothesis の structural field skeleton
 (M/K/typeIHyp/e=pq、T_typeII sorried cite + V-side producer)。[[scaffold-sorry-free-not-done]]
 [[feedback-no-avoiding-hard-parts]]
+
+### cont.²¹ (2026-06-30 lane c=γ /loop): σ-carrier 残 field の gate を**定性的に確定** — clean structural win は枯渇、残は deep §13 char/(13.10)・§7 coherence・BG FittingIsTI
+
+cont.²⁰ の次候補 (a)(b) を正面調査し、**残 MHypothesis σ-carrier field の gate を 1 つずつ確定**
+(これで future iteration の re-investigation を防ぐ — anti-spin)。結論: **W-cardinality cluster
+(cont.²⁰) が唯一の clean sorry-free structural win で、残 σ-field は全て deep に gated**:
+
+- **`card_normalizer_P_eq`** (|N(P)|=|P|uq): 構造核 `N_G(P)=S` は `maximalSubgroup_eq_normalizer_maxNilpotentNormalHall`
+  (S14:2813) で sorry-free。order `|S|=|W₁||U||P|` も recipe 在 (S15:1171)。**但し |U|=u に `c_eq_one`
+  (13.12) を要し、`c_eq_one` は S15_SAndT_Setup:1046 で sorried** ⟹ clean でない (carrier field を
+  cite すると normCascadeData body-sorry-free が regress)。
+- **`card_normalizer_Q_eq`**: Q-dual。`reconciled_typePData_T` (sorried §13) + `d_eq_one`(dual) gated。
+- **`P_isTI`/`Q_isTI`**: BG `FittingIsTI` 経由 (`maxNilpotentNormalHall_sharp_isTISubset_of_fittingIsTI`
+  S16_MainResults:1855) = lane d §15-16。TypePData に P⋊U Frobenius 構造は無 (derived_complement のみ)。
+- **`W_normalizer_V`**: TypePData.normalizer_V 在だが Sdata.W2=W2 / Sdata.W=W reconciliation gated。
+- **`h78`** (§7 M-coherence): citable producer 無 (S09 に Hypothesis78 struct のみ)。lane a/b §5-9 coherence。
+
+**🔑 c_eq_one (13.12) の正確な bottom-out** (textbook 04.15:206 + Coq PFsection13:307-322 co-read):
+- **(13.11) m-bounds は formalized sorry-free**: `numeric_bounds` (S15_SAndT_Setup:1029) =
+  m>8/10 (q≥7) / m>7/10 (q≥5) / m>49/100 (q=3)。`m_eq` 経由の genuine 算術。
+- **gate = (13.10) analytic inequality** `u/c > (p²−1)/6` (= `numeric_bounds` q=3 branch の sorry@1040、
+  norm cascade (13.5)-(13.10) の終端) + **W₁-FPF-on-C → c odd ≥ 2q+1**。
+- textbook 証明: c≠1 仮定 → c≥2q+1 → (13.10) で m< uq/(cp^{q-1}) bound → p=3 で q=5 (13.11.a)、
+  p≥5 で q=3 + c∈{7,≥13} → 全て (13.11) m-bound と矛盾。Coq の reducible case (13.3.b) は
+  Frobenius PU の `cent_semiregular` で C=1 (別 case)。
+
+**⟹ 次 iteration の genuine target (fresh context)**: **c_eq_one を de-opacify** — bare sorry を
+(i) (13.10) を named sorried lemma 化 (cite) + (ii) W₁-FPF-on-C 確立 + (iii) numeric_bounds + 算術
+case analysis で wire し、真の gate (13.10) に isolate。これで c_eq_one が honest 化 →
+card_normalizer_P_eq が (13.10)-conditional に。**(13.10) 自体の formalization (norm cascade
+(13.5)-(13.10)) はさらに deep = lane a §13 char と重複** ⟹ (13.10) は cite に留め body は埋めない
+([[feedback-cite-sorried-lemmas-if-signature-correct]])。[[scaffold-sorry-free-not-done]]
+[[feedback-no-avoiding-hard-parts]] [[feedback-flag-poor-progress]]
