@@ -1698,6 +1698,55 @@ theorem mem_conjClassSet_Mtilde_maximals_iff_reps [Finite G]
   exact ⟨Mi, hMirep, by
     rw [← hc, ← S14.Mtilde_conj_smul, S14.conjClassSet_conj_smul]; exact hg⟩
 
+/-- **theoremE conjunct 5** (BG Cor 14.9, over a representative set): `G#` is covered by the
+`𝒞_G(M̃_{Mi})` (`Mi ∈ reps`), plus — exactly when a type-`P` maximal exists — the conjugates of the
+exceptional `Ẑ = zTilde K K*`.  The all-type-`F` case is the lane-d M̃-cover; the type-`P` case is
+the NonTypeICovering fixed-`W` cover.  Both go through the reps-conversion helper. -/
+theorem sharpSubgroup_top_cover_reps_dichotomy [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {reps : Set (Subgroup G)}
+    (hreps_max : ∀ Mi ∈ reps, Mi ∈ maximalSubgroups G)
+    (hreps : ∀ H ∈ maximalSubgroups G, ∃ Mi ∈ reps, S14.IsConjugateSubgroup H Mi)
+    {M K Kstar U : Subgroup G} (hM : M ∈ maximalSubgroups G) (hKM : K ≤ M)
+    (hK : Ch03.IsHallSubgroup (S14.kappa M) (K.subgroupOf M))
+    (hKstar : Kstar = OddOrder.BG.Ch3.S10.Msigma M ⊓ Subgroup.centralizer (K : Set G))
+    (hU : Ch03.IsHallSubgroup ((S14.kappa M ∪ OddOrder.BG.Ch3.S10.sigma M)ᶜ) (U.subgroupOf M)) :
+    (S14.maximalTypePFamily G = ∅ →
+      sharpSubgroup (⊤ : Subgroup G) =
+        {g | ∃ Mi ∈ reps, g ∈ conjClassSet (S14.Mtilde hG (S14.genuineSigmaDecomposition hG) Mi)}) ∧
+    (S14.maximalTypePFamily G ≠ ∅ → S14.IsTypeP M →
+      sharpSubgroup (⊤ : Subgroup G) =
+        {g | ∃ Mi ∈ reps, g ∈ conjClassSet (S14.Mtilde hG (S14.genuineSigmaDecomposition hG) Mi)} ∪
+          conjClassSet (S14.zTilde K Kstar)) := by
+  -- conjugacy-saturation of a `1`-free set lands in `(⊤)#`.
+  have hsub : ∀ S : Set G, (1 : G) ∉ S → conjClassSet S ⊆ sharpSubgroup (⊤ : Subgroup G) := by
+    rintro S hS y ⟨t, ht, g, rfl⟩
+    rw [sharpSubgroup, Set.mem_diff, Set.mem_singleton_iff]
+    exact ⟨Subgroup.mem_top _, fun h1 =>
+      hS ((mul_left_cancel ((mul_inv_eq_one.mp h1).trans (mul_one g).symm) : t = 1) ▸ ht)⟩
+  refine ⟨fun hempty => ?_, fun _ hMP => ?_⟩
+  · -- `𝓜_P = ∅`: every maximal is type-`F`, so the M̃-cover holds; convert to `reps`.
+    have htypeF : ∀ M' ∈ maximalSubgroups G, S14.IsTypeF M' := fun M' hM'max =>
+      S14.isTypeF_iff_not_isTypeP.mpr fun hP =>
+        Set.notMem_empty M' (hempty ▸ (⟨hM'max, hP⟩ : M' ∈ S14.maximalTypePFamily G))
+    rw [S14.sharpSubgroup_top_eq_iUnion_conjClassSet_Mtilde_of_typeF hG htypeF]
+    ext g
+    simp only [Set.mem_iUnion₂, Set.mem_setOf_eq, exists_prop]
+    exact mem_conjClassSet_Mtilde_maximals_iff_reps hG hreps_max hreps g
+  · -- `𝓜_P ≠ ∅`, `M` type-`P`: fixed-`W` cover, convert the M̃ branch to `reps`.
+    apply Set.Subset.antisymm
+    · intro x hx
+      have hx1 : x ≠ 1 := by
+        rw [sharpSubgroup, Set.mem_diff, Set.mem_singleton_iff] at hx; exact hx.2
+      rcases S14.exists_mem_conjClassSet_Mtilde_or_fixed_zTilde hG hM hMP hKM hK hKstar hU hx1 with
+        ⟨M', hM'max, hg⟩ | hxZ
+      · exact Set.mem_union_left _
+          ((mem_conjClassSet_Mtilde_maximals_iff_reps hG hreps_max hreps x).mp ⟨M', hM'max, hg⟩)
+      · exact Set.mem_union_right _ hxZ
+    · rintro y (⟨Mi, hMirep, hg⟩ | hy)
+      · exact hsub _ (S14.one_not_mem_Mtilde hG (S14.genuineSigmaDecomposition hG)
+          (hreps_max Mi hMirep)) hg
+      · exact hsub _ (S14.one_not_mem_zTilde K Kstar) hy
+
 /-- **BG Theorem E** (mmd L4370): with `R(x)` as in Theorem D and
 `\widetilde M = ⋃_{x ∈ M_sigma#} xR(x)`, the conjugacy saturation of
 `\widetilde M` has the stated size, the representative maximal subgroups give a
