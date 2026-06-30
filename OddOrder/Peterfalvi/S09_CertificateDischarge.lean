@@ -1762,4 +1762,35 @@ theorem family_degree_sum {L : Type*} [Group L] [Fintype L] [Invertible (Nat.car
     rw [inner_induce_constOne_eq_zero K φ' hφ'] at hone
     exact one_ne_zero hone.symm
 
+/-- **(1.5.d) off-distinguished degree-sum** (`G`).  Removing the distinguished `ζ_0` (index `0`,
+with `ζ_0(1) = [L:K]` and `‖ζ_0‖² = 1`) from `family_degree_sum` gives the `(7.8.b)` quantity
+`G = Σ_{i ∈ Ioi 0, i ≠ ind1H} ζ_i(1)²/‖ζ_i‖² = [L:K]·(|K|−1) − [L:K]²` (`= e(h−1) − e²`). -/
+theorem family_degree_sum_Ioi {L : Type*} [Group L] [Fintype L] [Invertible (Nat.card L : ℂ)]
+    (K : Subgroup L) [K.Normal] [Fintype ↥K] [Invertible (Nat.card ↥K : ℂ)] {n : ℕ}
+    (θ : Fin (n + 1) → IrreducibleCharacter ↥K)
+    (hinj : Function.Injective (fun i => ClassFunction.induce K (θ i : ClassFunction ↥K ℂ)))
+    (hcover : ∀ φ : IrreducibleCharacter ↥K,
+      ClassFunction.induce K (φ : ClassFunction ↥K ℂ) ∈
+        Set.range (fun i => ClassFunction.induce K (θ i : ClassFunction ↥K ℂ)))
+    (ind1H : Fin (n + 1)) (hind : ind1H ≠ 0)
+    (hzeta_ind1H : θ ind1H = trivialIrreducibleCharacter ↥K)
+    (hz0_deg : ClassFunction.induce K (θ 0 : ClassFunction ↥K ℂ) 1 = (K.index : ℂ))
+    (hz0_norm : ClassFunction.inner (ClassFunction.induce K (θ 0 : ClassFunction ↥K ℂ))
+      (ClassFunction.induce K (θ 0 : ClassFunction ↥K ℂ)) = 1) :
+    ∑ i ∈ (Finset.Ioi (0 : Fin (n + 1))).erase ind1H,
+        ClassFunction.induce K (θ i : ClassFunction ↥K ℂ) 1 ^ 2 /
+          ClassFunction.inner (ClassFunction.induce K (θ i : ClassFunction ↥K ℂ))
+            (ClassFunction.induce K (θ i : ClassFunction ↥K ℂ)) =
+      (K.index : ℂ) * ((Nat.card ↥K : ℂ) - 1) - (K.index : ℂ) ^ 2 := by
+  have hIoi : (Finset.Ioi (0 : Fin (n + 1))).erase ind1H
+      = (Finset.univ.erase ind1H).erase 0 := by
+    ext i
+    simp only [Finset.mem_erase, Finset.mem_Ioi, Finset.mem_univ, and_true, Fin.pos_iff_ne_zero]
+    tauto
+  have h0mem : (0 : Fin (n + 1)) ∈ Finset.univ.erase ind1H :=
+    Finset.mem_erase.mpr ⟨Ne.symm hind, Finset.mem_univ _⟩
+  rw [hIoi, Finset.sum_erase_eq_sub h0mem,
+    family_degree_sum K θ hinj hcover ind1H hzeta_ind1H, hz0_deg, hz0_norm]
+  ring
+
 end OddOrder.Peterfalvi.S09.Cert
