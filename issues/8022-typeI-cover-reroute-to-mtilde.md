@@ -59,9 +59,49 @@ S10+S09+S14_MaximalI を build-green に一括必要な coupled 改修ゆえ、�
 branch は別途) し、`cover_subset_kernels`/M_σ-TI を経由せず consumer chain (→ `not_all_maximal_typeI` →
 `theorem88_caseB_holds` → FT spine) が green。
 
+## 🔴🔴 重大訂正 (lane d, 2026-06-30 /loop⁴⁸ 後半): 「M̃-cover で plumbing だけ」は **私の誤り** — 2 構造の混同
+
+S09 を精読し、**iteration 3 の「lane-d 数学完了、残は plumbing」評価が誤り**と判明。S09 には **2 つの別構造**:
+- **`FrobeniusFamily`** (S09:4242): `G0 = {x|∀i, x∉kernelSpread i}`、`kernelSpread i = {x|∃g, gxg⁻¹∈(H_i)#}`
+  = **kernel 共役ベース**。contradiction = `not_trivial_G0` ((7.10)-(7.11))。
+- **`FamilyHypothesis71`** (S09:632): `G0 = {g|∀i, g∉dadeSupport_i}` = **dadeSupport ベース**。
+  contradiction = `family_inequality` ((7.4)-(7.5))。
+
+**現 consumer `not_all_maximal_typeI` (S14_MaximalI:2787) は `FrobeniusFamily.G0` (kernel-based) を使う**
+(私は iteration 3 で `FamilyHypothesis71.G0` (dadeSupport) と混同した)。∴:
+- **kernel-cover (`cov.covers`, M_σ-TI) が genuinely 必要**。proven M̃-cover (`sharpSubgroup_top_eq_iUnion_conjClassSet_Mtilde_of_typeF`)
+  は **M̃ ⊇ kernel# ゆえ weaker**で、kernel-based G0={1} を **discharge しない**。「lane-d 数学完了」は誤評価。
+- **re-route の実体**: consumer を `FamilyHypothesis71` (dadeSupport=M̃) ベースに **作り直す** = `A_i=M̃-support` +
+  `IsDadeIsometry` + `pairwise_disjoint` の **§8 Dade hypothesis 構成** が要る (Peterfalvi §8 本体、substantial)。
+  `family_inequality` は既存ゆえ contradiction 部は再利用可だが、**M̃-Dade hypothesis の構成が deep**。
+  「simple field swap / plumbing」ではない (私の誤った framing)。
+
+**∴ gate-2 は両 route とも substantial**: (A) **kernel route** = M_σ-TI for type-I (BG §14 escape-impossibility、
+deep、escape が起きれば false) / (B) **M̃ route** = §8 Dade hypothesis for M̃ 構成 + `family_inequality`
+(faithful だが Peterfalvi §8 substantial)。**ユーザーの re-route 裁可は私の「plumbing」誤評価に基づく** ゆえ
+再判断要。M̃-Dade hypothesis (`FT_Dade_support`/`DadeSupportHypothesisData`) の既存度を要確認。
+
 ## 参照
 
-- 正本分析 = issue 8020 (gate-2 reduction 訂正、M_σ-TI/τ2-route 無効、M̃-cover が faithful)。
-- proven lane-d 補題 = S14:5421 / S14:8129 / S14:8102。
-- consumer = `not_all_maximal_typeI` (S14_MaximalI:2787)、`F.G0`/`mem_G0_iff` (S09:660/663)。
+- 正本分析 = issue 8020 (gate-2 reduction 訂正、M_σ-TI/τ2-route 無効)。
+- proven lane-d 補題 = S14:5421 / S14:8129 / S14:8102 (M̃-cover、但し kernel-based consumer を discharge せず)。
+- consumer = `not_all_maximal_typeI` (S14_MaximalI:2787)、`FrobeniusFamily.G0` (S09:4273, **kernel-based**)。
+- 別構造 = `FamilyHypothesis71.G0` (S09:660, dadeSupport-based) + `family_inequality`。
 - [[scaffold-sorry-free-not-done]] [[gate2-typeF-tau2-reduction-is-false]]
+
+## 🚧 route B は lane-a/c の §8 Dade work に block (lane d /loop⁵³ 確定)
+
+route B の FamilyHypothesis71 assembly は **per-rep の §8 Dade 入力**を要し、全て lane-a/c の §8 領域:
+- `dadeSupportHypotheses_typeI` (8.15, S10:467, **sorry**) — type-I の Dade hypothesis 構成 (§8 Dade isometry)。
+- `fullDadeIsometryData` (Dade map τ + IsDadeMap/IsDadeIsometry) — §8。
+- `HConjInvariant` (S04:492) — `HConjInvariant.of_forall_H_eq_bot` は type-I (H=R(x)≠⊥) に不適用ゆえ別途要 §8 証明。
+
+⟹ **lane-d は route B を build-green に単独で進められない** (foundation が §8 character theory = lane-a/c)。
+lane-d の lane-d-doable 貢献 = **assembly skeleton (gated-endpoint pattern)**: `not_all_maximal_typeI` の
+M̃-cover 版を、per-rep の §8 Dade hypothesis を**名前付き仮説 (input)** に取って組む engine を作り、
+M̃-cover (`sharpSubgroup_top_eq_iUnion_conjClassSet_Mtilde_of_typeF`, lane-d 既証) + `family_inequality`
+(既存) で contradiction を出す。§8 入力は cite (lane-a/c が後で充足)。これで route B の §8 residual を
+named inputs に結晶化し、kernel-cover/M_σ-TI (possibly false) 依存を除去。
+
+**hub 要請**: 8.15 (`dadeSupportHypotheses_typeI`) + type-I Dade isometry/HConjInvariant は §8 ゆえ
+lane-a/c 協調が要る。lane-d は assembly skeleton を先行実装可 (次 /loop)。
