@@ -6935,3 +6935,28 @@ Lagrange.  The reusable bridge turning each (14.11.4) orbit `(W#)^G`/`(P#)^G`/`(
 `N_G(X) = W` — generalising `S12.typePData_V_ti` to the abstract `W`/`W₁`/`W₂` + `hnorm` inputs.
 The `W`-orbit TI input to the (14.11.4) §8 TI-count.  Axiom-clean. -/
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S16.isTISubset_sdiff_sup_of_normalizer_eq
+
+/-! **Peterfalvi (14.11.4) `W`-orbit measure** (`S16_NonExistenceG`, lane γ/POLE-2).  The `W`-stab
+`conj_smul_sdiff_sup_eq_of_normalizer_eq` (`W ≤ N_G(set)` normalizes the set) and the assembled
+relative measure `orbit_sdiff_sup_normSq_term`: `|(W − (W₁∪W₂))^G|/|G| = |W − (W₁∪W₂)|/|W|`,
+combining the TI core, the `W`-stability, and `orbit_normSq_term`.  The `W`-orbit term of (14.11.4),
+reduced to `hnorm` (= the §13 `normalizer_V` fact, from the partner type-`P` structure).
+Axiom-clean. -/
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S16.conj_smul_sdiff_sup_eq_of_normalizer_eq
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S16.orbit_sdiff_sup_normSq_term
+
+/-! **Peterfalvi (14.11.4) `|W − (W₁∪W₂)|` cardinality** (`S16_NonExistenceG`, lane γ/POLE-2).
+`ncard_sdiff_sup_add_eq`: `|W − (W₁∪W₂)| + |W₁| + |W₂| = |W| + 1` by inclusion–exclusion with
+`W₁ ∩ W₂ = {1}`.  The numerator of the `W`-orbit term `|W − (W₁∪W₂)|/|W|` of (14.11.4).
+Axiom-clean. -/
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S16.ncard_sdiff_sup_add_eq
+
+/-! **Peterfalvi (14.11.4) `P#`/`Q#`-orbit machinery** (`S16_NonExistenceG`, lane γ/POLE-2).  The
+`P#`-stab `conj_smul_sharpSubgroup_eq_of_mem_normalizer` (`N_G(P)` permutes `P ∖ {1}`), the assembled
+measure `orbit_sharpSubgroup_normSq_term`: `|(P#)^G|/|G| = |P#|/|N_G(P)|` for a TI-subgroup
+`Subgroup.IsTI P` (= `IsTISubset (P ∖ {1}) (N_G(P))`), and the numerator `ncard_sharpSubgroup_add_one`
+(`|P#| + 1 = |P|`).  The `P`/`Q` orbit terms of (14.11.4), reduced to `IsTI P`/`IsTI Q` and the
+`|N_G(P)|`/`|N_G(Q)|` sizes.  Axiom-clean. -/
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S16.conj_smul_sharpSubgroup_eq_of_mem_normalizer
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S16.orbit_sharpSubgroup_normSq_term
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S16.ncard_sharpSubgroup_add_one
