@@ -874,3 +874,26 @@ milestone は honest かつ完備で、deep gate ゆえ此処が自然な区切�
 landed: `noncommPiCoprod_bijective_of_card` (count⟹bijective core)。残: W1-conjugate setup
 (U-inv/not-W1-fixed/span/card の §11 plumbing) → iso H̄≅∏ → aperiodic regular θ̄ (iso 直接、iSupIndep 回避可)
 → I_M=HC → induceHU irreducible → conjunct c。grinding 継続。
+
+
+## conjunct c — char-side 完成 + 構造的発見 (2026-07-01)
+
+**char-side 完成** (21+ commits): elementary (9.7) dprod toolkit + §11 instantiation
+(`clifford_caseA_exists_regular_char_on_conjugates`) + non-W1-fixed char
+(`exists_regular_char_not_fixed`、equivariance 不要、restriction-fact + char-existence で構成)。
+最難の aperiodic char が clean general lemma 化。
+
+**構造的発見 (path に影響)**: non-fixed θ̄ は **W1-conjugates** (act.φ↑w•S₀) 上 regular だが、
+`inertia_eq_hcInHu_caseA` は **caseA.Hpart** (producer の maximal-SupIndep 族) に tied。**別の族**ゆえ
+直接適用不可。**解決**: assembly `mulAut_eq_one_of_fixes_regular_on_prime_span` は Hpart 族に generic
+ゆえ W1-conjugates (order-p ✅ card_pointwise_smul、span ✅ span-reduction、U-inv ✅
+isAInvariant_comp_subtype_pointwise_smul、iSupIndep は bijection 経由不要) を直接 drive 可。
+
+**残 conjunct c 配線 (substantial multi-step)**:
+1. §11 instantiate `exists_regular_char_not_fixed` (τ=act.φ(w₀)、w₀≠1、p≥3 odd) → non-fixed θ̄。
+2. W1-conjugates で inertia 再導出 (assembly + generic plumbing caseB_*_of_core) → I_HU(θ₀)=HC。
+3. M-level: I_M(χ)=HU (non-W1-fixed → I_M≠M → prime-index `eq_of_le_of_prime_index` ✅)。
+4. χ=Ind_{HC}^{HU}(linear) irreducible deg u (`isIrreducibleCharacter_induce_of_inertia_eq` + hcInHu_normal ✅)。
+5. induceHU(χ) irreducible deg qu (M-level、`isIrreducibleCharacter_induce_of_inertia_eq` + huSub_normal ✅)。
+6. χ∈𝒳(H₀C) (kernel 条件) → conjunct c。
+inertia/§6 framework 横断の multi-step。char-side は完備、残は inertia-side 配線。

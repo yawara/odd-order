@@ -5,6 +5,7 @@ Authors: Yawara Ishida
 -/
 import OddOrder.Peterfalvi.S14_MaximalI
 import OddOrder.Peterfalvi.S10_CoherenceWiring
+import OddOrder.Peterfalvi.S09_CertificateDischarge
 import OddOrder.Isaacs.Ch06_FrobeniusActions.OddComplement
 import OddOrder.GroupTheory.MaximalSubgroupTypeConj
 import OddOrder.GroupTheory.WielandtFixedPoint
@@ -510,6 +511,23 @@ theorem sum_normSq_sharp_eq_total_sub_one {S : Type*} [Group S] [Fintype S]
   ring
 
 open scoped Classical in
+/-- **Peterfalvi (13.5), cross-term sum** (the (13.5.b) `−2a ζ₁(1)α(1)/‖ζ₁‖²` term): when the inner
+sum `∑_{x∈H} ζ₁(x)·conj(α(x))` over the subgroup `H` vanishes — which holds in (13.5) because
+`Res_H ζ₁` is a sum of characters with `P` *off* their kernels while every component of `α` has `P`
+*in* its kernel (orthogonal constituents) — the sum over `H# = H ∖ {1}` collapses to the single
+identity term: `∑_{H#} ζ₁·ᾱ = −ζ₁(1)·conj(α(1))`.  Supplies the cross term of the (13.5.b)
+decomposition `sum_normSq_real_smul_add` (with `f = ζ₁`, `g = α`). -/
+theorem sum_mul_conj_sharp_eq_neg_of_inner_zero {S : Type*} [Group S] [Fintype S]
+    (H : Subgroup S) (ζ α : S → ℂ)
+    (hinner : ∑ x ∈ Finset.univ.filter (· ∈ H), ζ x * (starRingEnd ℂ) (α x) = 0) :
+    ∑ x ∈ (Finset.univ.filter (· ∈ H)).erase 1, ζ x * (starRingEnd ℂ) (α x)
+      = -(ζ 1 * (starRingEnd ℂ) (α 1)) := by
+  rw [← Finset.sum_erase_add (Finset.univ.filter (· ∈ H))
+    (fun x => ζ x * (starRingEnd ℂ) (α x))
+    (Finset.mem_filter.mpr ⟨Finset.mem_univ 1, H.one_mem⟩)] at hinner
+  exact eq_neg_of_add_eq_zero_left hinner
+
+open scoped Classical in
 /-- **Permutation-character value**: `(Ind_H^G 1_H)(g) = |H|⁻¹ · |{x ∈ G : x⁻¹gx ∈ H}|`.
 
 The induced trivial character is the permutation character of `G` acting on the cosets `G/H`; at
@@ -874,24 +892,51 @@ theorem H_sharp_hconj [Fintype G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     (H_sharp_dadeHypothesis hG hyp).HConjInvariant :=
   OddOrder.Peterfalvi.S04.Hypothesis.HConjInvariant.of_forall_H_eq_bot _ (fun _ => rfl)
 
+open scoped OddOrder.Peterfalvi.S15.FiniteInduce in
 /-- **Peterfalvi (13.5)/(7.1)**: the (7.1) ρ-hypothesis for `(S, H^#)`.  Mirrors `S14.toHypothesis71`:
 the Dade isometry `τ` is the `fullDadeIsometryData` of the (13.5) Dade datum `H_sharp_dadeHypothesis`,
 and conjugation invariance is `H_sharp_hconj`.  This is the (7.1) datum on which `chiRho` (the `ρ`
 map) and — once the coherence datum is supplied — the (7.7.a) `chiRho_explicit_formula` of the (13.5)
 point formula are evaluated. -/
-noncomputable def H_sharp_hypothesis71 [Fintype G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+noncomputable def H_sharp_hypothesis71 [Fintype G] [Invertible (Nat.card G : ℂ)]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     (hyp : Hypothesis (G := G)) :
     OddOrder.Peterfalvi.S09.Hypothesis71 G (OddOrder.Peterfalvi.S04.sharp (hyp.H : Set G)) hyp.S :=
-  haveI : Fintype ↥hyp.S := Fintype.ofFinite _
-  haveI : Invertible (Nat.card G : ℂ) := invertibleOfNonzero (by exact_mod_cast Nat.card_pos.ne')
-  haveI : Invertible (Nat.card ↥hyp.S : ℂ) :=
-    invertibleOfNonzero (by exact_mod_cast Nat.card_pos.ne')
   { hyp := H_sharp_dadeHypothesis hG hyp
     τ := ((H_sharp_dadeHypothesis hG hyp).fullDadeIsometryData
       (H_sharp_hconj hG hyp)).toDadeIsometryData.toDadeMap
     isDadeMap := ((H_sharp_dadeHypothesis hG hyp).fullDadeIsometryData
       (H_sharp_hconj hG hyp)).toDadeIsometryData.isDadeMap
     hConjInvariant := H_sharp_hconj hG hyp }
+
+open scoped OddOrder.Peterfalvi.S15.FiniteInduce in
+/-- **Peterfalvi (13.5)/(7.6)**: the (7.6) coherent-family datum for `(S, H^#)`, with its (7.7.a)
+certificate.  Built from the (7.1) ρ-hypothesis `H_sharp_hypothesis71` and the Dade-isometry property
+via `S09.hypothesis76OfDade` (issue-1013: the whole `Hypothesis76`, *including* the (7.7.a)
+`chiRho_decomp`, is constructible from `(7.1)` data alone — the induced family `{Ind_H^S θ}` is the
+`exists_distinct_induced_family` enumeration, the certificate is `chiRho_decomp_induced`).  The normal
+subgroup is `H = PC ⊴ S` (`S` normalizes `H^#` ⟹ normalizes `H`).  This is the datum on which the
+(13.5.a) point formula `chiRho_explicit_formula` (7.7.a) is read off. -/
+noncomputable def H_sharp_hypothesis76 [Fintype G] [Invertible (Nat.card G : ℂ)]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hyp : Hypothesis (G := G)) :
+    OddOrder.Peterfalvi.S09.Hypothesis76 G (OddOrder.Peterfalvi.S04.sharp (hyp.H : Set G)) hyp.S := by
+  refine OddOrder.Peterfalvi.S09.Cert.hypothesis76OfDade (H_sharp_hypothesis71 hG hyp) ?_ hyp.H ?_ ?_ rfl
+  · exact ((H_sharp_dadeHypothesis hG hyp).fullDadeIsometryData
+      (H_sharp_hconj hG hyp)).toDadeIsometryData.isDadeIsometry
+  · have hUS : hyp.U ≤ hyp.S := by
+      have h1 : hyp.U ≤ derivedInG hyp.S := by rw [hyp.S_deriv_eq_PU]; exact le_sup_right
+      exact le_trans h1 (Subgroup.map_subtype_le _)
+    show hyp.P ⊔ hyp.C ≤ hyp.S
+    refine sup_le ?_ ?_
+    · rw [hyp.P_eq_SF]; exact OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_le hyp.S
+    · rw [hyp.C_eq]; exact le_trans inf_le_left hUS
+  · intro l h hh
+    by_cases h1 : h = 1
+    · subst h1; simpa using hyp.H.one_mem
+    · have hsh : h ∈ OddOrder.Peterfalvi.S04.sharp (hyp.H : Set G) :=
+        OddOrder.Peterfalvi.S04.mem_sharp.mpr ⟨hh, h1⟩
+      exact (OddOrder.Peterfalvi.S04.mem_sharp.mp (S_normalizes_H_sharp hG hyp l hsh)).1
 
 /-- **Peterfalvi (13.5)**: the TI-subset calculation on `H = P C` gives a
 pointwise formula and two norm estimates. -/
