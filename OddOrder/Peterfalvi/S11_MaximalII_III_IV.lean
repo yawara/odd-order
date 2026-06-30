@@ -6233,5 +6233,62 @@ theorem hcZeta_apply_one [Finite G] {M : Subgroup G}
         (1 : ↥(hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf (huSub data)))
         = 1 from by simp [hcPsi, linearIrreducibleCharacter_apply_one], mul_one]
 
+/-- **`H₀C ⊆ Ker ψ`** (`HC`-level, pointwise): every `x` in the realized `H₀C` lies in the character
+kernel of the `HC`-linear character `ψ`, since `ψ = θ ∘ hcHom` and `hcHom` kills `H₀C`
+(`hcHom_eq_one_of_mem_realizedH0supC`).  Stated *without* the induce/Fintype/Invertible instances so
+the giant `HC` term never enters a `whnf`-exploding unification; the induce-kernel step below cites it
+pointwise. -/
+theorem hcPsi_mem_characterKernel_of_mem_realizedH0supC [Finite G] {M : Subgroup G}
+    {data : TypesIIIIIIVSetup M} (chief : ChiefFactorData data)
+    (θ : (↥data.H ⧸ chief.N) →* ℂˣ)
+    {x : ↥(hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf (huSub data))}
+    (hx : x ∈ (((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf (huSub data)).subgroupOf
+      (hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf (huSub data))) :
+    x ∈ OddOrder.Peterfalvi.S03.characterKernel (hcPsi chief θ : ClassFunction
+        ↥(hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf (huSub data)) ℂ) := by
+  rw [OddOrder.Peterfalvi.S03.mem_characterKernel]
+  simp only [hcPsi]
+  rw [linearIrreducibleCharacter_apply, OddOrder.Peterfalvi.S03.characterDegree_def,
+    linearIrreducibleCharacter_apply_one, MonoidHom.comp_apply,
+    hcHom_eq_one_of_mem_realizedH0supC chief hx, map_one, Units.val_one]
+
+/-- **`H₀C ⊆ Ker ψ`** as a `Set` inclusion (`HC`-level), instance-free.  Packages the pointwise
+`hcPsi_mem_characterKernel_of_mem_realizedH0supC` into the `hker` argument of
+`subsetCharacterKernel_induce_of_subgroupOf`, kept *outside* the induce/Invertible instance scope so
+the giant `HC` card never enters an `isDefEq`-exploding comparison. -/
+theorem hcPsi_realizedH0supC_subgroupOf_subset_characterKernel [Finite G] {M : Subgroup G}
+    {data : TypesIIIIIIVSetup M} (chief : ChiefFactorData data)
+    (θ : (↥data.H ⧸ chief.N) →* ℂˣ) :
+    ((((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf (huSub data)).subgroupOf
+        (hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf (huSub data)) :
+        Set ↥(hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf (huSub data))) ⊆
+      OddOrder.Peterfalvi.S03.characterKernel (hcPsi chief θ) := by
+  intro x hx
+  exact hcPsi_mem_characterKernel_of_mem_realizedH0supC chief θ (SetLike.mem_coe.mp hx)
+
+set_option maxHeartbeats 1000000 in
+/-- **`H₀C ⊆ Ker ζ`**: the realized `H₀C` lies in the character kernel of `ζ = Ind_{HC}^{HU}(ψ)`.
+Since `ψ` is `1` on `H₀C` (`hcPsi_mem_characterKernel_of_mem_realizedH0supC`) and `H₀C ◁ HC ≤ HU`,
+the normal subgroup `H₀C` lies in `Ker(Ind ψ)` (`subsetCharacterKernel_induce_of_subgroupOf`).  This
+is the `H₀C ⊆ Ker` half of `ζ ∈ 𝒳(H₀C)`.  The pointwise body is delegated to the instance-free
+lemma above so the giant `HC`/`ψ` term never enters a `whnf`-exploding manipulation here. -/
+theorem hcZeta_H0supC_subset_ker [Finite G] {M : Subgroup G}
+    {data : TypesIIIIIIVSetup M} (chief : ChiefFactorData data)
+    (θ : (↥data.H ⧸ chief.N) →* ℂˣ)
+    [Fintype ↥(huSub data)]
+    [Fintype ↥(hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf (huSub data))]
+    [Invertible (Nat.card
+        ↥(hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf (huSub data)) : ℂ)] :
+    ((((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf (huSub data) : Set ↥(huSub data))) ⊆
+      OddOrder.Peterfalvi.S03.characterKernel (ClassFunction.induce
+        (hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf (huSub data))
+        (hcPsi chief θ)) := by
+  haveI := realizedH0supC_normal_huSub chief
+  exact OddOrder.Peterfalvi.S03.subsetCharacterKernel_induce_of_subgroupOf
+    (A := ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf (huSub data))
+    (H := hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf (huSub data))
+    le_sup_right (hcPsi chief θ)
+    (hcPsi_realizedH0supC_subgroupOf_subset_characterKernel chief θ)
+
 end OddOrder.Peterfalvi.S11
 
