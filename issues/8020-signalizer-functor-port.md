@@ -1108,3 +1108,19 @@ D(4) の「deep」と恐れた uniqueness が **tractable** と判明 (grind が
   2. **¬FittingIsTI M** (conjunct 7 の唯一 sub-sorry): escape から導出 — c∈C(x)∖M で x∈M_σ∩(M_σ)^c≠1
      (c が x を中心化)、c∉N(M_σ)=M ⟹ (M_σ)# は TI でない ⟹ ¬FittingIsTI M (要 fittingInAmbient M=Msigma M for type-F)。
   3. build-debug (forward-ref で早期停止ゆえ他 conjunct の names/sigs 未検証)。
+
+## ✅✅ 完了 (lane d, 2026-06-30 /loop⁵⁰): **Theorem D(4) escape structure 完全証明** (commit fe606202)
+
+`theoremD_msigma_conjugacy_and_centralizers` を **sorry-free 化** (D(1)-D(4) 全充足、full build 3888 green)。
+- 新 `exists_RData_escape_structure` (sorry-free) で hD4 を証明。**uniqueness (恐れていた deep) は
+  `maximalContaining_centralizer_eq_singleton_of_tau2_element` を neighbor N に適用 → ℳ(C(x))={N} で即解決**
+  (grind が「deep」評価を再び覆した — 原文/ported lemma を読め)。
+- placement: helper を `maxNilpotentNormalHall_eq` 以降へ、theoremD を helper 後へ relocate (consumer=theoremII のみ後方)。
+- S15 `centralizer_escape_final_local` (Cor 15.9, sorry) に faithful な `¬FittingIsTI M` を追加 (唯一 consumer=本 helper)。
+- theoremD は Cor 15.9 (§15 sorry) を cite ゆえ transitively sorry-dependent (axiom-clean でない) だが本体完全証明。
+
+**⚠ commit message の「theoremII hMaxUnique と 2-for-1」は不正確**: theoremII の hMaxUnique は x∈ASet/A0Set
+(M_σ# より広い) を range し、本 helper の x∈M_σ# uniqueness は直接適用できない。theoremII hMaxUnique は
+別途「x∈X escaping → signalizer 構造」接続が要る (follow-up、direct でない)。
+
+**残 §16 lane-d sorry**: theoremA (superseded old form) / theoremB / theoremE / aSets / theoremII (×2)。
