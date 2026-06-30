@@ -112,3 +112,25 @@ T` field そのもの (深 §14.9 char、tractable sub-conjunct 無し)。詳細
 - issue 2009 (POLE-2 `field_normalizer_structure`)、issue 1004 (section16CharacterData, Lane B)
 - issue 4002 (lane allocation 診断: thin downstream consumer)、issue 2020 (§13.2.a char core, lane b)
 - commit ff2338a5 (kickoff)、`89f71cfc` (T_typeII reduction, 本 iteration)
+
+## 2026-06-30 HUB 裁定 — 戦略 fork 却下・lane-c は正面突破
+
+lane-c が cont.¹¹/¹² + 本 issue 末尾診断で **「Tdata carrier 拡張 = architecturally significant
+cross-lane infra」「下流 char-gated / lane-b overlap」を理由に戦略 fork (再配置) をユーザーに flag** した
+件、hub が**却下**。難所回避は無意味 (ユーザー 2026-06-30)。lane-c の LAUNCH.md に直接指示を配置済。
+
+**却下根拠 (既裁定の適用 — 再質問しない)**:
+1. **cross-lane gate は存在しない**。`Tdata` carrier の追加先 base `Hypothesis` は
+   `S16_NonExistenceGCore.lean:42`（+ `S15_SAndT_Setup.lean:80`）= **lane-c 自身の所有ファイル**。
+   `Sdata`/`Sdata_U_eq`/`Sdata_W1_eq` を mirror して `Tdata : TypePData T` + reconciliation を足すのは
+   lane-c 単独で完結する。これを "cross-lane infra" と呼ぶのは誤り。
+2. **fork は既裁定で閉じている**。issue 4002 ⚠訂正 (ユーザー 2026-06-22) が既に「lane-c=B 待ちは過大、
+   真の cross-lane 依存は narrow & citeable、大半は lane-c 自身の §14 Dade char」と裁定。本 issue の
+   診断自身も path (a) を「大規模・**非重複**・あなたの仕事」と認める。同じ punt の再 open は不可。
+3. **下流 char-gated は幻のゲート**。h78 coherence / `Section11CharacterData`/(11.8) に当たったら
+   **sorried signature を cite するだけ**（または `normCascadeData`/§8 で実証済の通り MHypothesis
+   carrier に char content を isolate）。再導出も待機も再配置も不要。
+
+**lane-c への指示 (LAUNCH.md と同一)**: (1) `git merge main` (16 behind 解消) → (2) base `Hypothesis`
+に `Tdata` carrier 追加 → (3) `typeII_overNormalizer_frobenius`/`exists_typeI_maximal_overNormalizer_U`
+の V-side dual を S/U-side mirror で構成 → (4) genuine lane-b char は cite/isolate。fork を立てず淡々と。
