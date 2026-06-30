@@ -2365,6 +2365,81 @@ structure DadeNotation {L : Subgroup G} (hyp : Hypothesis L) where
   rhoFormula : Prop
   rhoMFormula : Prop
 
+open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
+/-- **Peterfalvi (12.13), the Dade calculation realized from coherence**: given the (12.6) coherent
+extension of `L`'s family `S` (`S07.IsCoherent`, supplied by `witness_L_coherent`) and a distinguished
+character `χ ∈ S` of degree `e`, the (12.13) `DadeNotation` is realized with `τ₁ =` the coherent
+extension and `ψ = χ^{τ₁} = extension χ`.
+
+This wires the coherent isometric extension into the `ψ`-construction backbone of (12.16): the
+former opaque `tau1`/`psi` are now the genuine `coh.extension` and its value on `χ`.  The remaining
+input is the *selection* of the distinguished `χ` — a minimal-degree `Ind_H^L θ` with `θ` a
+nontrivial linear character of `H = L_F`, so `χ(1) = [L:H] = e` — together with the (12.12) degree
+bounds on `e`.  (`e_eq_index`/`rhoFormula`/`rhoMFormula` remain the structure's carried `Prop`s.) -/
+noncomputable def dadeNotation_of_coherence {L : Subgroup G} [Finite G] (hyp : Hypothesis L)
+    (coh : OddOrder.Peterfalvi.S07.IsCoherent hyp.tau hyp.Sset hyp.A)
+    (χ : ClassFunction ↥L ℂ) (hχ : χ ∈ hyp.Sset) (e : ℕ) (hdeg : χ 1 = (e : ℂ)) :
+    DadeNotation hyp where
+  e := e
+  e_eq_index := e = (hyp.H.subgroupOf L).index
+  tau1 := coh.extension
+  chi := χ
+  chi_mem := hχ
+  chi_degree_eq_e := hdeg
+  psi := coh.extension χ
+  psi_eq_tau1_chi := rfl
+  rhoFormula := True
+  rhoMFormula := True
+
+open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
+/-- **Peterfalvi (12.13), the distinguished character**: the family `S` of `L` contains a member of
+minimal degree `[L : H]` (`H = L_F`), namely `Ind_H^L θ` for `θ` a nontrivial **linear** character
+of `H`.  Such `θ` exists because `H = L_F` is a nontrivial nilpotent group, so its commutator is
+proper (`H` is not perfect); `exists_irreducibleCharacter_ne_trivial_degree_one_of_commutator_ne_top`
+then supplies a nontrivial degree-one `θ`, and `induce_apply_one` gives the induced degree
+`[L:H]·θ(1) = [L:H]`.  This is the distinguished `χ ∈ S` with `χ(1) = e = [L:H]` of the (12.13)/(12.16)
+Dade calculation — the input to `dadeNotation_of_coherence`. -/
+theorem exists_distinguished_char {L : Subgroup G} [Finite G] (hyp : Hypothesis L) :
+    ∃ χ ∈ hyp.Sset, χ (1 : ↥L) = (((hyp.typeI.typeF.H).subgroupOf L).index : ℂ) := by
+  have hHL : hyp.typeI.typeF.H ≤ L := hyp.typeI.typeF.H_le
+  have e : ↥((hyp.typeI.typeF.H).subgroupOf L) ≃* ↥(hyp.typeI.typeF.H) :=
+    Subgroup.subgroupOfEquivOfLe hHL
+  haveI : Nontrivial ↥(hyp.typeI.typeF.H) :=
+    (Subgroup.nontrivial_iff_ne_bot _).mpr hyp.typeI.typeF.H_nontrivial
+  haveI : Group.IsNilpotent ↥(hyp.typeI.typeF.H) :=
+    hyp.typeI.typeF.H_eq ▸ OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_isNilpotent L
+  haveI : Nontrivial ↥((hyp.typeI.typeF.H).subgroupOf L) := e.toEquiv.nontrivial
+  haveI : IsSolvable ↥((hyp.typeI.typeF.H).subgroupOf L) :=
+    solvable_of_solvable_injective (f := e.toMonoidHom) e.injective
+  have hcomm : commutator ↥((hyp.typeI.typeF.H).subgroupOf L) ≠ ⊤ :=
+    (IsSolvable.commutator_lt_top_of_nontrivial _).ne
+  obtain ⟨θ, hθ_ne, hθ_deg⟩ :=
+    OddOrder.Peterfalvi.S08.exists_irreducibleCharacter_ne_trivial_degree_one_of_commutator_ne_top
+      hcomm
+  have hmem : ClassFunction.induce ((hyp.typeI.typeF.H).subgroupOf L)
+      (θ : ClassFunction ↥((hyp.typeI.typeF.H).subgroupOf L) ℂ) ∈ hyp.Sset :=
+    ⟨θ, hθ_ne, rfl⟩
+  refine ⟨_, hmem, ?_⟩
+  rw [ClassFunction.induce_apply_one, hθ_deg, mul_one]
+
+open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
+/-- **Peterfalvi (12.13) for the witness subgroup `L`**: the second maximal `L` of (12.9) carries a
+full (12.13) `DadeNotation` — the realized `ψ = χ^{τ₁}` of the (12.16) Dade calculation.
+
+Assembles the foundation chain: `witness_L_coherent` supplies the (12.6) coherent extension of `L`'s
+family `S`, `exists_distinguished_char` selects the distinguished `χ ∈ S` of degree `[L:H]`, and
+`dadeNotation_of_coherence` realizes the (12.13) notation with `τ₁ = ` the coherent extension and
+`ψ = χ^{τ₁}`.  This is the `ψ`-data of `CounterexampleDadeData`; what remains for the (12.16)
+contradiction is the value/norm content — (12.14)/(12.15) for `h_const`/`h_psig_int`, the (12.12)
+degree bounds, and the `ρ`/`ρM` norm bounds `hA`/`hB`/`hC`. -/
+theorem exists_witness_dadeNotation [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    {ctr : CounterexampleHypothesis (G := G)} (data : RankTwoWitnessData ctr) :
+    ∃ hyp : Hypothesis data.L, Nonempty (DadeNotation hyp) := by
+  obtain ⟨hyp, ⟨coh⟩⟩ := witness_L_coherent hG data
+  obtain ⟨χ, hχ, hdeg⟩ := exists_distinguished_char hyp
+  exact ⟨hyp, ⟨dadeNotation_of_coherence hyp coh χ hχ
+    ((hyp.typeI.typeF.H).subgroupOf data.L).index hdeg⟩⟩
+
 /-- **Peterfalvi (12.14)**: the character `psi` is constant on the coset `xK`. -/
 theorem psi_constant_on_xK [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
     {ctr : CounterexampleHypothesis (G := G)} {L : Subgroup G}

@@ -8,6 +8,16 @@
 > **レーン配分の正本 = [`ft_lane_reallocation_2026_06_28.md`](ft_lane_reallocation_2026_06_28.md)**
 > (ゲートなし・signature contract 方式)。本ファイルは hub 側の合流手順 + gotcha 集。
 
+> **🔀 一時 cross-lane carve-out (issue 8022, ユーザー裁可 2026-06-30)**: gate-2 の M̃-cover re-route は
+> S10+S09+S14_MaximalI を build-green に一括必要な coupled 改修ゆえ、**lane d に S09/S14_MaximalI への一時
+> cross-lane carve-out を付与**。⟹ step 1.5 で **lane d が `OddOrder/Peterfalvi/S09_NonexistenceCertain.lean`
+> (FrobeniusFamily/FamilyHypothesis71/G0) および `S14_MaximalI.lean` の `not_all_maximal_typeI`/`covers`
+> を編集していても、issue 8022 の M̃-cover re-route の一環なら逸脱としない** (atomic 1 commit/branch で
+> 来る前提)。hub は d のこの atomic 変更を一括合流 (S09/S14/S10 を含む大型 diff)。
+> **a/b/c への要請** (notes 経由): 8022 land まで S09 FrobeniusFamily/FamilyHypothesis71・S14_MaximalI の
+> `not_all_maximal_typeI` 周辺は編集を避ける (d の atomic 変更との衝突回避)。a の §9.9.b (S11)・b の §12 hB
+> chain (S14 の別 decl)・c の §16 size bounds は通常継続可。8022 land 後に本 carve-out は解除。
+
 > **✅ issue 0089 解決 (2026-06-30, ユーザー裁定 D=削除)**: `S07_RhoProjection.lean` は S09 `chiRho`
 > 機構の完全重複ゆえ**削除済** (carve-out 0087 撤回)。(12.16) path は S09 `chiRho`/`Hypothesis78`/
 > `NormEstimates` を cite。旧 HOLD は解除。
