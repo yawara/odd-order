@@ -884,6 +884,30 @@ theorem betaDecomp_orth_one {G : Type*} [Group G] [Fintype G] {A : Set G} {L : S
       inner_induce_constOne_eq_zero K (θ 0) (hne_triv 0 (Ne.symm hind1H)),
       mul_zero, sub_zero]
 
+/-- **The family-difference inner product** (Peterfalvi (7.8.a), `a_φ` computation).  For pairwise
+distinct family members, `⟨ζ_{ind1H} − ζ_0, ζ_i − d_i ζ_0⟩ = star(d_i) ‖ζ_0‖²` (`i ≠ 0, ind1H`,
+`ind1H ≠ 0`): all cross terms vanish by orthogonality (`induce_family_orthogonal_of_injective`),
+leaving the `d_i ζ_0`-against-`ζ_0` term.  Via `IsDadeIsometry.inner_eq` and the coherence agreement
+this equals `⟨β, ζ_i^ν − d_i ζ_0^ν⟩`, the key step in the `(7.8.a)` decomposition. -/
+theorem inner_family_diff (K : Subgroup L) [K.Normal] [Fintype ↥K]
+    [Invertible (Nat.card L : ℂ)] [Invertible (Nat.card ↥K : ℂ)] {n : ℕ}
+    (θ : Fin (n + 1) → IrreducibleCharacter ↥K)
+    (hinj : Function.Injective (fun i => ClassFunction.induce K (θ i : ClassFunction ↥K ℂ)))
+    (d : Fin (n + 1) → ℂ) {i ind1H : Fin (n + 1)}
+    (hi0 : i ≠ 0) (hi_ind : i ≠ ind1H) (hind0 : ind1H ≠ 0) :
+    ClassFunction.inner
+        (ClassFunction.induce K (θ ind1H : ClassFunction ↥K ℂ)
+          - ClassFunction.induce K (θ 0 : ClassFunction ↥K ℂ))
+        (ClassFunction.induce K (θ i : ClassFunction ↥K ℂ)
+          - d i • ClassFunction.induce K (θ 0 : ClassFunction ↥K ℂ))
+      = star (d i) * ClassFunction.inner (ClassFunction.induce K (θ 0 : ClassFunction ↥K ℂ))
+          (ClassFunction.induce K (θ 0 : ClassFunction ↥K ℂ)) := by
+  have horth := induce_family_orthogonal_of_injective K θ hinj
+  rw [ClassFunction.inner_sub_left, ClassFunction.inner_sub_right, ClassFunction.inner_sub_right,
+    ClassFunction.inner_smul_right, ClassFunction.inner_smul_right,
+    horth ind1H i (Ne.symm hi_ind), horth ind1H 0 hind0, horth 0 i (Ne.symm hi0)]
+  ring
+
 /-- **The (7.8.c) collapse of the (7.7.a) sum to a single term.**  If, in the `(7.7.a)`
 decomposition `χ^ρ(x) = ∑_{i ≥ 1} (c̄_i/‖ζ_i‖²) ζ_i(x)`, all coefficients `c_i` (`i ≥ 1`) vanish
 except at one index `i₁`, and the distinguished member satisfies `ζ_{i₁}(x) = ‖ζ_{i₁}‖²`
