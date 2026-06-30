@@ -582,3 +582,23 @@ mirror)。`Section16TypePStructure:276` の「no symmetric Tdata」docstring も
 (S15:609 ~350 行) の **V-side dual を S/U-side mirror で構成** (Tdata を消費)。途中 genuine lane-b char に
 当たれば sorried signature cite (hub: 再導出・待機・再配置しない)。multi-iteration。
 [[feedback-no-avoiding-hard-parts]] [[hub-check-issue-before-asking-on-scope-violation]] [[scaffold-sorry-free-not-done]]
+
+### cont.¹⁵ (2026-06-30 lane c=γ /loop ×3): V-side helper dual 6 本完成 — assembly 手前まで
+
+hub step 3 (V-side dual 構成) を bottom-up で進め、`exists_typeI_maximal_overNormalizer_V` の **V-side
+helper を全て landing** (全 sorry-free・初回 build-green・mechanical S→T mirror、commits `f06417a9`
+`f6397634` `4f18c229`):
+1. `coprime_card_V_card_Q_of_disjoint` (coprime_card_U_card_P dual)
+2. `isMulCommutative_V` (isMulCommutative_U dual、V abelian、IsTypeII T は hypothesis)
+3. `not_normalizer_V_le_T` (not_normalizer_U_le_S dual)
+4. `exists_conj_typeP_V_of_coprime` (exists_conj_typeP_U_of_coprime dual)
+5. `typeI_V_le_fitting_of_coprime` (typeI_U_le_fitting_of_coprime dual、VW₂ Frobenius を
+   `typeP_uW1_frobenius hyp.Tdata` で inline 構築)
+6. `typeI_overNormalizer_V_le_fitting` (typeI_overNormalizer_U_le_fitting dual)
+
+**次 = assembly `exists_typeI_maximal_overNormalizer_V`** (S15:1005 ~356 行 dual)。⚠ **branches swap**:
+S-side の L~S 排除 (Hall-conjugacy via `normalizer_le_of_isHall_subgroupOf_of_conj` [generic] + bdata
+card 計算) ↔ V-side では L~T 排除 (N_G(V)⊄T = `not_normalizer_V_le_T`); S-side L~T 排除
+(`tConjugate_fitting_data` + `card_Q_eq` |Q|=q^p) ↔ V-side L~S 排除 (要 **新 `sConjugate_fitting_data`
+dual** + `card_P_eq` |P|=p^q、gated cite)。intricate ゆえ fresh context で。VW₂ Frobenius は
+Tdata から取得済パターン流用可。[[feedback-no-avoiding-hard-parts]] [[scaffold-sorry-free-not-done]]
