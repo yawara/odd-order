@@ -527,3 +527,24 @@ whnf-wall 回避設計)。BetaDecomp 3 orth field を induce 固有から抽象�
 ζ:=H78.hyp76.zeta で 3 gen lemma を instantiate (whnf-wall なし: H78 は変数)。Gamma:=H78.beta−(1_G−ν(ζ_0)
 +a•H78.weightedNuSum)、a=exists_betaDecomp_a、beta_eq=by abel、hW は weightedNuSum 定義+hzd で。
 → full (7.8.a). 最終 = concrete Dade family で全 facts discharge する bundling (whnf-wall 根治、別途)。
+
+### 2026-07-01 (loop 継続²³⁻): ✅ (7.8.a) BetaDecomp constructor 完成 — (7.8.a)+(7.8.b) 両者が抽象 H78 で discharge
+
+cascade 一般化 (commit 023febd9: inner_family_diff_gen → inner_beta_nuDiff_gen → inner_beta_nu_eq_gen
+/ inner_weightedNuSum_nu_gen → betaDecomp_gamma_orth_nu_gen) に続き、**`betaDecompOfFacts`**
+(commit bd8babcb) で (7.8.a) BetaDecomp 全体を抽象 H78 から構成可能仮説のみで構成。3 orth gen lemma
+を ζ:=H78.hyp76.zeta で instantiate、4 proof field を discharge (Γ=explicit residual、a=integer)。
+**whnf-wall 回避**: H78 が抽象変数ゆえ projection が巨大 def を unfold しない。
+
+**現状**: (7.8.a) BetaDecomp と (7.8.b) NormEstimates の両者が abstract H78 レベルで構成可能仮説のみ
+から discharge 済 (γ-side `normEstimates_of_source_orthogonal` は既存; ζ-side は
+`zetaNuRhoNormSq_eq_normQuad_of_facts`; (7.8.a) は `betaDecompOfFacts`)。§7 の数学的内容は完了。
+
+**残る唯一の §7 frontier = concrete bundling (whnf-wall 根治)**: `hypothesis78OfDade` 出力の
+concrete H78 に対し、上記 producer の facts (horth/hN/hz0/hP_real/hagree/hzeta0nu/hzeta_orth_one/
+hβ1/hζ0norm/a + (7.8.b) facts) を充足する glue。facts 自体は family (zeta=induce) から rfl/standard
+だが、concrete `hypothesis78OfDade` の `.hyp76.n` projection が型に出て whnf-wall。
+**根治候補**: (1) hypothesis76OfFamily/hypothesis78OfDade を tactic-block から clean structure literal へ
+refactor (field を別 lemma に抽出) し projection を cheap 化、(2) H78+BetaDecomp+NormEstimates を
+n free のまま 1 構成で束ねる bundle def。次イテレーションで consumer (exists_MHypothesis /
+exists_counterexample_dade_data) の必要シェイプを確認してから着手。
