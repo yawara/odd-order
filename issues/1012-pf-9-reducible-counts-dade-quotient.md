@@ -1189,3 +1189,26 @@ inertia heart + ζ-irreducible + degree + H₀C⊆Ker 完成。残=xiSet members
 caseA_character_counts:5270 conjunct c。caseA_character_counts は H₀C machinery 後 (file 末) に relocate。
 
 inertia heart + ζ-irreducible(HU) + degree + H₀C⊆Ker + xiSet + xiOf 完成。残=M-level propagation のみ。
+
+
+## M-level 3 pieces LANDED; conjunct c は hIM-gated で組立可 (2026-07-01, commits bb5868ec/4bbbef61/40eaba00)
+
+**LANDED (axiom-clean)**:
+- `hcZeta_induceHU_apply_one`: (Ind_{HU}^M ζ)(1) = q·u = qu。
+- `hcZeta_induceHU_mem_sOf`: Ind_{HU}^M ζ ∈ 𝒮(H₀C)。
+- `hcZeta_induceHU_irreducible` (**hIM-gated honest conditional**): hIM (I_M(ζ)≠⊤) を仮定して
+  Ind_{HU}^M ζ irreducible (HU≤I_M via subgroup_le_inertia, [M:HU]=q prime via huSub_index_eq_q +
+  data.nontrivial.2.1, eq_of_le_of_prime_index → I_M=HU, isIrreducibleCharacter_induce_of_inertia_eq)。
+
+**conjunct c (caseA_character_counts:~5270) は hIM さえあれば組立可**: χ=induceHU(induce HC ψ),
+∈SOf ✓ deg qu ✓ irreducible ✓(hIM)。残 = **hIM discharge (唯一の本質ゲート)**:
+- **propagation θ̄^{w₀}≠θ̄ → conjBy w₀ ζ≠ζ → I_M(ζ)≠⊤** (deep Clifford)。
+  w₀ datum = `clifford_caseA_exists_char_inertia_hc_not_fixed` (S11:5014) が θ + hθ₀ + w₀ 産出。
+  - conjBy(w₀-as-M-elt) (induce_{HC}^{HU} inflation θ) = induce(inflation θ^{w₀}) (conjugation が
+    induce+inflation と可換) ≠ ζ (injective: θ̄↦ζ)。Coq PFsection9.v Part_a (880-915):
+    cfInd_sum_Inertia / inertia_irr_prime / sub_inertia_Res で M-level inertia 計算。**Coq 証明本体を
+    熟読してから組む** (標準 Coq-first)。
+- **assembly**: caseA から S₀/hS₀ne/hS₀inv/hS₀card/hp3 → θ 構築; instances (Fintype/Invertible/Normal
+  for HC) 確立; hIM discharge → conjunct c の sorry 埋め (relocate 後)。
+
+ζ∈𝒳(H₀C) + degree + SOf + M-level irreducible(gated) 完成。残=propagation 1 ゲート + assembly。
