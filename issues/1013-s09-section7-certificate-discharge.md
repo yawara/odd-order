@@ -113,3 +113,55 @@ sorry-free 構築 (commit 2d37fd94 まで):
   orthogonality = `inner_induce_eq_zero_of_not_conj` (既存) / spanning = eq_induce_restrict + degree-0
   reduction / supported = psi_support。これで Hypothesis76 を concrete 族から構成し chiRho_decomp を discharge。
 - **chiRho_eq_inner_beta (7.8.c.i)**: (7.7.a) を ζ_0=ζ, ζ_1=Ind 1_H で適用 (c_1=(β,χ), c_i=0)。
+
+### 2026-06-30 (loop 継続): ⭐⭐ (7.7.a) discharge 完成 — chiRho_decomp_induced
+
+**(7.7.a) の hard math 完全 sorry-free 完成。** 族構成 + determination + consolidation
+全達成 (commits 57dca9c1→6859c397, S09 直接編集なし):
+
+- **spanning** (`induce_mem_span_induce_irr`/`supported_mem_span_induce_irr`): CF(L,A) ⊆
+  span{Ind θ:θ∈Irr K} (span_irreducibleCharacter_eq_top + induce 線形性)。
+- **suppliers**: `induce_family_orthogonal_of_injective` (injective⟹horth via
+  induce_eq_induce_iff_conj 対偶)、`supported_mem_span_psi` (covering+degree⟹hspan)、
+  `induce_apply_one_ne_zero` (degree well-def)。
+- **族列挙** `exists_distinct_induced_family`: distinct 誘導族を Finset.equivFin で列挙、
+  injective + covering を供給。
+- **capstone** `chiRho_decomp_induced`: chiRho_decomp_proof を具体族に特化、horth/hspan を
+  injective/covering から導出。残入力は A⊆K^# の幾何 (hAK_off/hA_one/hAconj) のみ。
+  S09 構造にも subgroupOf にも非依存 ⟹ S09 並行編集に robust。
+
+**残 (mechanical wiring + 別 certificate)**:
+- **Hypothesis76 constructor** (subgroupOf 配線): K=H.subgroupOf L で chiRho_decomp_induced を
+  cite し Hypothesis76 を (7.1)+H◁L+A=H\{1}+IsDadeIsometry から構成 (certificate 不要)。
+  bridges: subgroupOf normality / mem_subgroupOf 経由の hAK_off/hA_one/hAconj /
+  induce_eq_zero_of_not_mem_normal (zeta vanish) / induce_diff_support (psi_support)。
+- **(7.8.c.i)** `chiRho_eq_inner_beta`: (7.7.a) を ind1H/zetaDistinct で適用 + τ↔ν coherence
+  collapse (χ⊥S^ν)。τ=ν on ℤ[S] 関係が要追加 (Hypothesis78 の nu field + coherence)。より深い。
+
+### 2026-06-30 (loop 継続²): ⭐⭐⭐ Hypothesis76 constructor 完成 — hypothesis76OfDade
+
+**(7.7.a) 主目標 完全達成** (commit 7ef9d236、axiom-clean: [propext, Classical.choice,
+Quot.sound] のみ、sorryAx なし)。`hypothesis76OfDade` が Hypothesis76 を
+**certificate を assume せず** (7.1)+H◁L+A=H\{1}+IsDadeIsometry から構成。
+全 13 field 構成、chiRho_decomp は chiRho_decomp_induced で discharge。
+
+- `DistinctInducedFamily` 構造体 + `distinctInducedFamily` data def (∃ でなく data;
+  Type 値 Hypothesis76 構成内で projection 可能。∃ 版は corollary)。
+- `subgroupOf_normal_of_conj`、bridges (mem_subgroupOf/K-normality/induce vanish/diff_support)。
+
+**これで (7.7.a) discharge は完全に閉じた** (Hypothesis76 が (7.1) データから構成可能)。
+
+**残 = (7.8.c.i) のみ** (これが (12.16) hB の最終 blocker):
+- `chiRho_eq_inner_beta` (Hypothesis78 certificate)。χ⊥S^ν で (7.7.a) 分解が単一 β 項に collapse。
+- **要追加入力**: τ↔ν coherence agreement `(τ ψ_i, χ) = (ν ψ_i, χ)` (= τ=ν on ℤ[S])。
+  これは Hypothesis78 の bare field でなく **coherence statement** (§8 Dade=coherent extension)。
+  (7.7.a) が induced-family 構造を要したのと同様、(7.8.c.i) は coherence agreement を要する。
+- **設計**: `chiRho_eq_inner_beta_of_coherence` standalone (chiRho_decomp_induced + coherence
+  agreement → collapse)。collapse algebra + index bookkeeping (ind1H/zetaDistinct/ζ_0) が山。
+- **coherence agreement の所在 (調査済)**: `IsCoherent.tau1_agrees : tau1 (χ−χ.conj) = τ (χ−χ.conj)`
+  (S07_Coherence.lean:1171) が Dade τ ↔ coherent extension τ₁ の agreement。S08_CoherenceCore.lean に
+  `coherentYset.extension` / `inner_tau_eq_inner_restrict` (差 χ−aη の τ-内積を restrict 内積に) 多数。
+  Hypothesis78 の `nu` field は coherent extension に対応するが、τ との agreement (= (τψ_i,χ)=(νψ_i,χ))
+  は bare field でない → discharge theorem の hypothesis に取る (S08 の tau1_agrees 系を供給元に)。
+  原文 mmd 04.9 L103-107 (7.8.c の (7.7) 適用 ζ_0=ζ,ζ_1=Ind 1_H)。S09 docstring (1419-1421) が
+  「coherence-based derivation from (7.7.a) ... not yet formalized」と明記 = 既知 gap。
