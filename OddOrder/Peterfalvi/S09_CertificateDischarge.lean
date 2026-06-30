@@ -1484,4 +1484,62 @@ theorem cCoeff_nu_zeta_zero_ind1H_eq {G : Type*} [Group G] [Fintype G] {A : Set 
   unfold Hypothesis76.cCoeff Hypothesis78.beta
   rw [hsupp]
 
+/-- **Orthogonality collapse of the `(7.7.b)` double sum.**  When the induced family `ζ_i` is
+pairwise orthogonal (`(ζ_i, ζ_j) = 0` for `i ≠ j`, true for the distinct induced characters by
+Frobenius reciprocity), the `(7.7.b)` double sum splits into a diagonal part and a rank-one
+correction: `‖χ^ρ‖² = Σ_i c̄_i c_i/‖ζ_i‖² − (Σ_i c̄_i ζ_i(1)/‖ζ_i‖²)(Σ_j c_j \overline{ζ_j(1)}/‖ζ_j‖²)/|L|`.
+This is the shape used by (7.8.b) (`χ = ζ_0^ν`) before substituting the coefficients. -/
+theorem chiRho_norm_sq_collapse {G : Type*} [Group G] [Fintype G] {A : Set G} {L : Subgroup G}
+    [Fintype L] [Invertible (Nat.card L : ℂ)] [Invertible (Nat.card G : ℂ)]
+    (H76 : Hypothesis76 G A L) (χ : ClassFunction G ℂ)
+    (horth : ∀ i j : Fin (H76.n + 1), i ≠ j →
+      ClassFunction.inner (H76.zeta i) (H76.zeta j) = 0) :
+    ClassFunction.inner (H76.hyp71.chiRhoCF χ) (H76.hyp71.chiRhoCF χ) =
+      (∑ i ∈ Finset.Ioi (0 : Fin (H76.n + 1)),
+        star (H76.cCoeff χ i) * H76.cCoeff χ i / H76.zetaNormSq i)
+      - (∑ i ∈ Finset.Ioi (0 : Fin (H76.n + 1)),
+          star (H76.cCoeff χ i) * H76.zeta i 1 / H76.zetaNormSq i)
+        * (∑ j ∈ Finset.Ioi (0 : Fin (H76.n + 1)),
+            H76.cCoeff χ j * star (H76.zeta j 1) / H76.zetaNormSq j)
+        / (Nat.card L : ℂ) := by
+  rw [H76.chiRho_norm_sq_double_sum χ]
+  have hsplit : ∀ i j : Fin (H76.n + 1),
+      star (H76.cCoeff χ i) * H76.cCoeff χ j / (H76.zetaNormSq i * H76.zetaNormSq j) *
+          (ClassFunction.inner (H76.zeta i) (H76.zeta j)
+            - H76.zeta i 1 * star (H76.zeta j 1) / (Nat.card L : ℂ)) =
+        star (H76.cCoeff χ i) * H76.cCoeff χ j / (H76.zetaNormSq i * H76.zetaNormSq j) *
+            ClassFunction.inner (H76.zeta i) (H76.zeta j)
+          - (star (H76.cCoeff χ i) * H76.zeta i 1 / H76.zetaNormSq i) *
+            (H76.cCoeff χ j * star (H76.zeta j 1) / H76.zetaNormSq j) / (Nat.card L : ℂ) := by
+    intro i j; ring
+  simp only [hsplit, Finset.sum_sub_distrib]
+  congr 1
+  · -- diagonal collapse via orthogonality
+    refine Finset.sum_congr rfl fun i hi => ?_
+    rw [Finset.sum_eq_single i (fun j _ hji => by
+        rw [horth i j (Ne.symm hji), mul_zero]) (fun hi' => absurd hi hi')]
+    rw [show ClassFunction.inner (H76.zeta i) (H76.zeta i) = H76.zetaNormSq i from rfl]
+    field_simp
+  · -- rank-one factoring
+    rw [Finset.sum_mul_sum, Finset.sum_div]
+    refine Finset.sum_congr rfl fun i _ => ?_
+    rw [Finset.sum_div]
+
+/-- **Diagonal-sum split at `ind1H`** for the (7.8.b) collapse.  Splitting the `Ioi 0` diagonal sum
+`Σ_i c̄_i c_i / N_i` at the distinguished index `ind1H`, where `c_{ind1H} = cval` and `c_i = −d_i`
+for `i ≠ 0, ind1H`, gives `c̄val·cval/N_{ind1H} + Σ_{i ≠ ind1H} d̄_i d_i / N_i` (the sign cancels).
+This isolates the `(a−1)²/e` term from the off-distinguished `d_i`-sum. -/
+theorem sum_diag_split_ind1H {n : ℕ} (c N d : Fin (n + 1) → ℂ) (cval : ℂ)
+    {ind1H : Fin (n + 1)} (hind : ind1H ≠ 0)
+    (hc_ind1H : c ind1H = cval)
+    (hc_rest : ∀ i, i ≠ 0 → i ≠ ind1H → c i = -(d i)) :
+    ∑ i ∈ Finset.Ioi (0 : Fin (n + 1)), star (c i) * c i / N i =
+      star cval * cval / N ind1H
+        + ∑ i ∈ (Finset.Ioi (0 : Fin (n + 1))).erase ind1H, star (d i) * d i / N i := by
+  rw [← Finset.add_sum_erase _ _ (Finset.mem_Ioi.mpr (Fin.pos_iff_ne_zero.mpr hind)), hc_ind1H]
+  congr 1
+  refine Finset.sum_congr rfl fun i hi => ?_
+  obtain ⟨hi_ne, hi_ioi⟩ := Finset.mem_erase.mp hi
+  rw [hc_rest i (Finset.mem_Ioi.mp hi_ioi).ne' hi_ne, star_neg, neg_mul, mul_neg, neg_neg]
+
 end OddOrder.Peterfalvi.S09.Cert

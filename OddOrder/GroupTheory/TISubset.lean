@@ -98,6 +98,17 @@ theorem mem_of_conj_mem_conj (hA : IsTISubset A L) {g h a b : G}
     rw [e, hab]; group
   rw [key]; exact hb
 
+/-- **Distinct conjugates of a TI-subset are disjoint**: if the conjugator ratio `h⁻¹·g ∉ L`, then no
+element is simultaneously a `g`-conjugate and an `h`-conjugate of elements of `A` — i.e. `g·A·g⁻¹`
+and `h·A·h⁻¹` are disjoint.  This is the disjoint-union step of the conjugate-union counting
+`|A^G| = [G : L]·|A|`: the conjugates are indexed by cosets `gL` (via `mem_of_conj_mem_conj`) and
+distinct cosets give disjoint conjugates.  Contrapositive of `mem_of_conj_mem_conj`. -/
+theorem conj_disjoint_of_ratio_not_mem (hA : IsTISubset A L) {g h x : G} (hgh : h⁻¹ * g ∉ L)
+    (hxg : ∃ a ∈ A, x = g * a * g⁻¹) (hxh : ∃ b ∈ A, x = h * b * h⁻¹) : False := by
+  obtain ⟨a, ha, hxa⟩ := hxg
+  obtain ⟨b, hb, hxb⟩ := hxh
+  exact hgh (hA.mem_of_conj_mem_conj ha hb (hxa.symm.trans hxb))
+
 /-- 対偶の逆: 「`L` 外で全ての `a ∈ A` の共役が `A` 外」⇒ TI. `IsTISubset` の
 構築によく使う introduction form. -/
 theorem of_disjoint_conj
