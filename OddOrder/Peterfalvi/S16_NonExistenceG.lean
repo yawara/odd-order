@@ -2858,10 +2858,11 @@ line-83 bound `|A(M)|/|M| + (1/|G|)(|famG₀| − |G₀|)` (`chiRhoNormSq_psi_le
 the displayed `NormCascadeData.upper`.  The genuine §8 content: `|A(M)|/|M| = (k−1)/(kpq)`
 (`card_typeIA_eq`/`card_M_eq`); the `G₀`-drop `famG0_sub_filter_card_le_orbit_ncard` (set-reduction,
 proven) plus the orbit measures (`orbit_sdiff_sup_normSq_term`/`orbit_sharpSubgroup_normSq_term`)
-and the structural values (`|W|`/`|N_G(P)|`, `IsTI P`/`IsTI Q`, `normalizer_V`) bound the orbits, then
-`normCascade_upper_loosen`.  The remaining §8 structural input is the TI/normalizer data of the
+and the structural values (`|W|`/`|N_G(P)|`, `IsTI P`/`IsTI Q`, `normalizer_V`) bound the orbits,
+then `normCascade_upper_loosen`.  The remaining §8 structural input is the TI/normalizer data of the
 Frobenius pieces `W`, `P`, `Q` (the type-I analogue of S12 (10.8)'s `G₁ ⊆ (H#)^G ∪ V^G`). -/
-theorem MHypothesis.line83_le_displayed_upper [Finite G] {hyp : Hypothesis (G := G)}
+theorem MHypothesis.line83_le_displayed_upper [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {hyp : Hypothesis (G := G)}
     (Mdata : MHypothesis hyp) :
     (Nat.card ↥(OddOrder.GroupTheory.typeIA Mdata.M Mdata.typeIHyp.typeI) : ℝ)
         / (Nat.card ↥Mdata.M : ℝ)
@@ -2870,7 +2871,123 @@ theorem MHypothesis.line83_le_displayed_upper [Finite G] {hyp : Hypothesis (G :=
       ≤ 1 - (1 : ℝ) / (hyp.base.p : ℝ) - 1 / (hyp.base.q : ℝ)
         + 2 / ((hyp.base.p * hyp.base.q : ℕ) : ℝ)
         + 1 / ((hyp.base.u * hyp.base.q : ℕ) : ℝ)
-        + 1 / ((hyp.base.v * hyp.base.p : ℕ) : ℝ) := sorry
+        + 1 / ((hyp.base.v * hyp.base.p : ℕ) : ℝ) := by
+  haveI := Mdata.finiteG
+  -- abbreviations
+  have hW1le : hyp.base.W1 ≤ hyp.base.W := hyp.base.W_eq_join ▸ le_sup_left
+  have hW2le : hyp.base.W2 ≤ hyp.base.W := hyp.base.W_eq_join ▸ le_sup_right
+  -- positivity (`p`, `q` prime; `u`, `v` from the faithful normalizer carriers; `k`/cards `> 0`).
+  have hp : (0 : ℝ) < hyp.base.p := by exact_mod_cast hyp.base.p_prime.pos
+  have hq : (0 : ℝ) < hyp.base.q := by exact_mod_cast hyp.base.q_prime.pos
+  have hkpos : 0 < Mdata.k := Mdata.k_eq_card_K ▸ Nat.card_pos
+  have hPpos : 0 < Nat.card ↥hyp.base.P := Nat.card_pos
+  have hQpos : 0 < Nat.card ↥hyp.base.Q := Nat.card_pos
+  have hNPpos : 0 < Nat.card ↥(Subgroup.normalizer (hyp.base.P : Set G)) := Nat.card_pos
+  have hNQpos : 0 < Nat.card ↥(Subgroup.normalizer (hyp.base.Q : Set G)) := Nat.card_pos
+  have hupos : 0 < hyp.base.u := by
+    by_contra hc
+    have hu0 : hyp.base.u = 0 := Nat.le_zero.mp (not_lt.mp hc)
+    have : Nat.card ↥(Subgroup.normalizer (hyp.base.P : Set G)) = 0 := by
+      rw [Mdata.card_normalizer_P_eq, hu0, mul_zero, zero_mul]
+    omega
+  have hvpos : 0 < hyp.base.v := by
+    by_contra hc
+    have hv0 : hyp.base.v = 0 := Nat.le_zero.mp (not_lt.mp hc)
+    have : Nat.card ↥(Subgroup.normalizer (hyp.base.Q : Set G)) = 0 := by
+      rw [Mdata.card_normalizer_Q_eq, hv0, mul_zero, zero_mul]
+    omega
+  -- orbit measures (equalities).
+  have hWm := orbit_sdiff_sup_normSq_term hyp.base.W_cyclic hyp.base.W_eq_join
+    Mdata.W_normalizer_V Mdata.W_set_nonempty
+  have hPm := orbit_sharpSubgroup_normSq_term Mdata.P_isTI
+  have hQm := orbit_sharpSubgroup_normSq_term Mdata.Q_isTI
+  -- cardinalities of the supports.
+  have hWc := ncard_sdiff_sup_add_eq hW1le hW2le hyp.base.W1_inf_W2_eq_bot
+  have hPc := ncard_sharpSubgroup_add_one (P := hyp.base.P)
+  have hQc := ncard_sharpSubgroup_add_one (P := hyp.base.Q)
+  -- `|W-set| = pq + 1 − (p+q)`, `|N_G(P)| = |P| u q`, etc. (`ℕ`-level facts → `ℝ`).
+  have hWsetR : (((hyp.base.W : Set G) \ ((hyp.base.W1 : Set G) ∪ (hyp.base.W2 : Set G))).ncard : ℝ)
+      = (hyp.base.p : ℝ) * hyp.base.q + 1 - hyp.base.p - hyp.base.q := by
+    have : ((hyp.base.W : Set G) \ ((hyp.base.W1 : Set G) ∪ (hyp.base.W2 : Set G))).ncard
+        + (hyp.base.p + hyp.base.q) = hyp.base.p * hyp.base.q + 1 := by
+      rw [← Mdata.card_W1_add_W2_eq, ← Mdata.card_W_eq]; omega
+    have hR : (((hyp.base.W : Set G) \ ((hyp.base.W1 : Set G) ∪ (hyp.base.W2 : Set G))).ncard : ℝ)
+        + ((hyp.base.p : ℝ) + hyp.base.q) = (hyp.base.p : ℝ) * hyp.base.q + 1 := by
+      exact_mod_cast this
+    linarith
+  -- the three orbit-term values (equalities).
+  have hWterm : (OddOrder.GroupTheory.conjClassSet
+        ((hyp.base.W : Set G) \ ((hyp.base.W1 : Set G) ∪ (hyp.base.W2 : Set G)))).ncard
+        / (Nat.card G : ℝ)
+      = 1 - 1 / (hyp.base.p : ℝ) - 1 / (hyp.base.q : ℝ)
+        + 1 / ((hyp.base.p * hyp.base.q : ℕ) : ℝ) := by
+    rw [hWm, hWsetR]
+    have hWcardR : (Nat.card ↥hyp.base.W : ℝ) = (hyp.base.p : ℝ) * hyp.base.q := by
+      rw [Mdata.card_W_eq]; push_cast; ring
+    rw [hWcardR]; push_cast; field_simp; ring
+  have hPterm : (OddOrder.GroupTheory.conjClassSet
+        (OddOrder.GroupTheory.sharpSubgroup hyp.base.P)).ncard / (Nat.card G : ℝ)
+      = ((Nat.card ↥hyp.base.P : ℝ) - 1)
+        / ((Nat.card ↥hyp.base.P * hyp.base.u * hyp.base.q : ℕ) : ℝ) := by
+    rw [hPm]
+    have hsharpR : ((OddOrder.GroupTheory.sharpSubgroup hyp.base.P).ncard : ℝ)
+        = (Nat.card ↥hyp.base.P : ℝ) - 1 := by
+      have hR : ((OddOrder.GroupTheory.sharpSubgroup hyp.base.P).ncard : ℝ) + 1
+          = (Nat.card ↥hyp.base.P : ℝ) := by exact_mod_cast hPc
+      linarith
+    rw [hsharpR, Mdata.card_normalizer_P_eq]
+  have hQterm : (OddOrder.GroupTheory.conjClassSet
+        (OddOrder.GroupTheory.sharpSubgroup hyp.base.Q)).ncard / (Nat.card G : ℝ)
+      = ((Nat.card ↥hyp.base.Q : ℝ) - 1)
+        / ((Nat.card ↥hyp.base.Q * hyp.base.v * hyp.base.p : ℕ) : ℝ) := by
+    rw [hQm]
+    have hsharpR : ((OddOrder.GroupTheory.sharpSubgroup hyp.base.Q).ncard : ℝ)
+        = (Nat.card ↥hyp.base.Q : ℝ) - 1 := by
+      have hR : ((OddOrder.GroupTheory.sharpSubgroup hyp.base.Q).ncard : ℝ) + 1
+          = (Nat.card ↥hyp.base.Q : ℝ) := by exact_mod_cast hQc
+      linarith
+    rw [hsharpR, Mdata.card_normalizer_Q_eq]
+  -- `|A(M)|/|M| = (k−1)/(kpq)`.
+  have hAterm : (Nat.card ↥(OddOrder.GroupTheory.typeIA Mdata.M Mdata.typeIHyp.typeI) : ℝ)
+        / (Nat.card ↥Mdata.M : ℝ)
+      = ((Mdata.k : ℝ) - 1) / ((Mdata.k * hyp.base.p * hyp.base.q : ℕ) : ℝ) := by
+    rw [Mdata.card_typeIA_eq hG, Mdata.card_M_eq]
+    have hkR : ((Mdata.k - 1 : ℕ) : ℝ) = (Mdata.k : ℝ) - 1 := by
+      have : 1 ≤ Mdata.k := hkpos
+      push_cast [Nat.cast_sub this]; ring
+    rw [hkR]; push_cast; ring
+  -- the `G₀`-drop, scaled by `1/|G|`.
+  have hGinv : (0 : ℝ) ≤ (Nat.card G : ℝ)⁻¹ := by positivity
+  have hdrop := mul_le_mul_of_nonneg_left Mdata.famG0_sub_filter_card_le_orbit_ncard hGinv
+  -- `(1/|G|)·Σ ncard = Σ (ncard/|G|) = hWterm + hPterm + hQterm`.
+  have hsum : (Nat.card G : ℝ)⁻¹ * (((OddOrder.GroupTheory.conjClassSet
+        ((hyp.base.W : Set G) \ ((hyp.base.W1 : Set G) ∪ (hyp.base.W2 : Set G)))).ncard : ℝ)
+      + ((OddOrder.GroupTheory.conjClassSet
+          (OddOrder.GroupTheory.sharpSubgroup hyp.base.P)).ncard : ℝ)
+      + ((OddOrder.GroupTheory.conjClassSet
+          (OddOrder.GroupTheory.sharpSubgroup hyp.base.Q)).ncard : ℝ))
+      = (1 - 1 / (hyp.base.p : ℝ) - 1 / (hyp.base.q : ℝ) + 1 / ((hyp.base.p * hyp.base.q : ℕ) : ℝ))
+        + ((Nat.card ↥hyp.base.P : ℝ) - 1)
+            / ((Nat.card ↥hyp.base.P * hyp.base.u * hyp.base.q : ℕ) : ℝ)
+        + ((Nat.card ↥hyp.base.Q : ℝ) - 1)
+            / ((Nat.card ↥hyp.base.Q * hyp.base.v * hyp.base.p : ℕ) : ℝ) := by
+    rw [← hWterm, ← hPterm, ← hQterm]; ring
+  -- assemble: `line83-RHS ≤ raw bound`.
+  have hraw : (Nat.card ↥(OddOrder.GroupTheory.typeIA Mdata.M Mdata.typeIHyp.typeI) : ℝ)
+        / (Nat.card ↥Mdata.M : ℝ)
+      + (Nat.card G : ℝ)⁻¹ * ((Nat.card (Mdata.toFamilyHypothesis71).G0 : ℝ)
+        - ((Finset.univ.filter (fun g : G => g ∈ Mdata.G0)).card : ℝ))
+      ≤ 1 - 1 / (hyp.base.p : ℝ) - 1 / (hyp.base.q : ℝ)
+          + 1 / ((hyp.base.p * hyp.base.q : ℕ) : ℝ)
+        + ((Nat.card ↥hyp.base.P : ℝ) - 1)
+            / ((Nat.card ↥hyp.base.P * hyp.base.u * hyp.base.q : ℕ) : ℝ)
+        + ((Nat.card ↥hyp.base.Q : ℝ) - 1)
+            / ((Nat.card ↥hyp.base.Q * hyp.base.v * hyp.base.p : ℕ) : ℝ)
+        + ((Mdata.k : ℝ) - 1) / ((Mdata.k * hyp.base.p * hyp.base.q : ℕ) : ℝ) := by
+    rw [hAterm]; rw [hsum] at hdrop; linarith
+  -- loosen the raw bound to the displayed one.
+  exact le_trans hraw (normCascade_upper_loosen hyp.base.p_prime.pos hyp.base.q_prime.pos
+    hupos hvpos hkpos hPpos hQpos)
 
 /-- **Faithful §7 carrier for the `ρ`-norm two-sided bound of Peterfalvi (14.11.4).**
 
@@ -2927,7 +3044,7 @@ noncomputable def normCascadeData [Finite G]
   lower := Mdata.rhoNormSq_ge_lower
   -- line-83 (`chiRhoNormSq_psi_le_line83`, proven) chained with the §8 TI-counting step
   -- (`line83_le_displayed_upper`, the single remaining gate).
-  upper := le_trans (Mdata.chiRhoNormSq_psi_le_line83 _hG hne) Mdata.line83_le_displayed_upper
+  upper := le_trans (Mdata.chiRhoNormSq_psi_le_line83 _hG hne) (Mdata.line83_le_displayed_upper _hG)
 
 /-- **Peterfalvi (14.11.4)**: the character-theoretic norm calculation produces the displayed
 rational inequality `normCascadeBound hyp k`.
