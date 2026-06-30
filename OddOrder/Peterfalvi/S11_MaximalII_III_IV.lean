@@ -6004,5 +6004,24 @@ theorem realizedH0_map_hInHuEquivH_eq_N {M : Subgroup G}
   rw [realizedH0_subgroupOf_hInHu_eq_comap]
   exact Subgroup.map_comap_eq_self_of_surjective (hInHuEquivH data).surjective chief.N
 
+/-- **Second isomorphism `HC/H₀C ≅ H̄`**: `(hInHu ⊔ H₀C)/H₀C ≃* ↥H ⧸ N`.  Composes
+`quotientInfEquivProdNormalQuotient hInHu (realized H₀C)` (`HC/H₀C ≅ hInHu/(H₀C∩hInHu)`) with
+`QuotientGroup.congr hInHuEquivH` (`hInHu/realizedH₀ ≅ ↥H ⧸ N`, using
+`realizedH0supC_subgroupOf_hInHu_eq` + `realizedH0_map_hInHuEquivH_eq_N`).  The inflation `θ̄ ∘ this`
+gives the `HC`-linear character `ψ` of the (9.8.c) construction.  Type inferred to avoid the
+`⊔`/`⧸` precedence trap. -/
+noncomputable def hcQuotientEquivHbar [Finite G] {M : Subgroup G}
+    {data : TypesIIIIIIVSetup M} (chief : ChiefFactorData data) :=
+  letI hN := realizedH0supC_normal_huSub chief
+  letI hN' : ((((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf (huSub data)).subgroupOf
+      (hInHu data)).Normal := hN.subgroupOf (hInHu data)
+  letI := chief.N_normal
+  (QuotientGroup.quotientInfEquivProdNormalQuotient (hInHu data)
+      (((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf (huSub data))).symm.trans
+    (QuotientGroup.congr
+      ((((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf (huSub data)).subgroupOf
+        (hInHu data)) chief.N (hInHuEquivH data)
+      (by rw [realizedH0supC_subgroupOf_hInHu_eq]; exact realizedH0_map_hInHuEquivH_eq_N chief))
+
 end OddOrder.Peterfalvi.S11
 
