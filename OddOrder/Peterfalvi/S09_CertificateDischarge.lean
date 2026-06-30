@@ -370,6 +370,18 @@ theorem induce_apply_one_ne_zero (K : Subgroup L) [Fintype ↥K] [Invertible (Na
   rw [hval]
   exact Nat.cast_ne_zero.mpr hd.ne'
 
+/-- **The induced character is real at `1`.**  `Ind_K^L θ (1) = [L:K] · θ(1)` is the natural-number
+cast `[L:K] · dim θ`, so it is fixed by complex conjugation.  Supplies `star d_i = d_i` for the
+degree ratios `d_i = ζ_i(1)/ζ_0(1)` in the `(7.8.a)` `Gamma_orth_nu` computation. -/
+theorem induce_apply_one_star (K : Subgroup L) [Fintype ↥K] [Invertible (Nat.card ↥K : ℂ)]
+    (θ : IrreducibleCharacter ↥K) :
+    star (ClassFunction.induce K (θ : ClassFunction ↥K ℂ) (1 : L))
+      = ClassFunction.induce K (θ : ClassFunction ↥K ℂ) (1 : L) := by
+  rw [ClassFunction.induce_apply_one]
+  obtain ⟨d, _, hval⟩ := irreducibleCharacter_apply_one_eq_pos_natCast θ
+  rw [hval, ← Nat.cast_mul]
+  exact star_natCast _
+
 /-- **The induced family is pairwise orthogonal** (Peterfalvi (7.6)/(7.7.a) hypothesis).  For a
 family `θ : Fin (n+1) → Irr K` of pairwise non-conjugate irreducibles, the induced characters
 `ζ_i = Ind_K^L θ_i` are pairwise orthogonal — the `horth` hypothesis of `chiRho_decomp_proof`.
