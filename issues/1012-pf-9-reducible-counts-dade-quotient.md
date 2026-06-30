@@ -1090,3 +1090,25 @@ H₀C=H₀⊔C, H⊔H₀C=HC) + H₀C◁HU + transports (realizedH₀C.subgroupO
 - ζ=Ind_{HC}^{HU}(ψ) irr (isIrreducibleCharacter_induce_of_inertia_eq + inertia(ψ)=HC)。
 - 残: ζ∈xiOf(H₀C) (H⊄ker: θ̄ nontrivial、H₀C⊆ker: ψ inflation) + not-W1-fixed → χ=induceHU(ζ) irr qu。
 - HC=hInHu⊔realizedH₀C=hInHu⊔cInHu (hInHu_sup_realizedH0supC) で seed inertia と同定。
+
+
+## conjunct c — hcHom_inclusion: hfwd 解決、main assembly が letI-unfold で詰まり (2026-07-01)
+
+**13 construction lemmas landed** (iso hcQuotientEquivHbar + hom hcHom + ψ hcPsi + hcHom-kills-H₀C +
+HC◁HU realized + 全 subgroup transports)。
+
+**hcHom_inclusion (hcHom|hInHu=f) 進捗**: hfwd `quotientInf(mk' h)=mk'(incl h)` は **解決**:
+```
+simp only [QuotientGroup.quotientInfEquivProdNormalQuotient,
+  QuotientGroup.quotientInfEquivProdNormalizerQuotient, MulEquiv.trans_apply,
+  QuotientGroup.quotientMulEquivOfEq_mk, QuotientGroup.quotientKerEquivOfSurjective,
+  QuotientGroup.quotientKerEquivOfRightInverse, MulEquiv.coe_mk, MulEquiv.symm_mk,
+  MonoidHom.toMulEquiv_apply, QuotientGroup.kerLift_mk]; rfl
+```
+**残 obstacle (main assembly)**: `hcHom(incl h) = congr(quotientInf.symm(mk'(incl h))) = congr(mk' h)
+= mk'(hInHuEquivH h)`。simp [hcQuotientEquivHbar, trans_apply, ←hfwd, symm_apply_apply, congr_mk] で
+trans_apply/symm_apply_apply/congr_mk が **unused** = hcQuotientEquivHbar (letI-wrapped def) の trans
+構造を simp が露出できず。**fix 候補**: (a) hcQuotientEquivHbar を letI 無し term に再定義 (instances
+を separate instance 化) で unfold 可能に、(b) explicit rw + MulEquiv.trans_apply、(c)
+hcQuotientEquivHbar_apply lemma を別途証明。次 iteration で main assembly を fresh に解決。
+build slow (~2min post-merge) → background build 使用。
