@@ -991,6 +991,45 @@ theorem inner_weightedNuSum_nu {G : Type*} [Group G] [Fintype G] {A : Set G} {L 
     induce_apply_one_ne_zero K (θ 0)
   field_simp
 
+/-- **The inner product `⟨β, ζ_j^ν⟩ = star(d_j) · a`** (Peterfalvi (7.8.a)).  With `a = ⟨β, ζ_0^ν⟩ + 1`
+and `‖ζ_0‖² = 1` (the distinguished `ζ_0 ∈ Irr L`), `inner_beta_nuDiff` (`⟨β, ζ_j^ν − d_j ζ_0^ν⟩ =
+star(d_j) ‖ζ_0‖²`) rearranges to `⟨β, ζ_j^ν⟩ = star(d_j)(⟨β, ζ_0^ν⟩ + 1)` for `j ≠ 0, ind1H`.  This is
+the `⟨β, ζ_j^ν⟩` value that cancels `a ⟨weightedNuSum, ζ_j^ν⟩` in `Gamma_orth_nu`. -/
+theorem inner_beta_nu_eq {G : Type*} [Group G] [Fintype G] {A : Set G} {L : Subgroup G}
+    [Fintype L] [Invertible (Nat.card L : ℂ)] [Invertible (Nat.card G : ℂ)]
+    (H71 : Hypothesis71 G A L)
+    (hτ : OddOrder.Peterfalvi.S04.IsDadeIsometry (G := G) (k := ℂ) (L := L) H71.τ)
+    (K : Subgroup ↥L) [K.Normal] [Fintype ↥K] [Invertible (Nat.card ↥K : ℂ)] {n : ℕ}
+    (θ : Fin (n + 1) → IrreducibleCharacter ↥K)
+    (hinj : Function.Injective (fun i => ClassFunction.induce K (θ i : ClassFunction ↥K ℂ)))
+    (d : Fin (n + 1) → ℂ)
+    (psi_support : ∀ i, (ClassFunction.induce K (θ i : ClassFunction ↥K ℂ)
+        - d i • ClassFunction.induce K (θ 0 : ClassFunction ↥K ℂ)).support ⊆
+      OddOrder.Peterfalvi.S04.supportInSubgroup A L)
+    {ind1H : Fin (n + 1)} (hind0 : ind1H ≠ 0)
+    (diffβ : (ClassFunction.induce K (θ ind1H : ClassFunction ↥K ℂ)
+        - ClassFunction.induce K (θ 0 : ClassFunction ↥K ℂ)).support ⊆
+      OddOrder.Peterfalvi.S04.supportInSubgroup A L)
+    {j : Fin (n + 1)} (hj0 : j ≠ 0) (hj_ind : j ≠ ind1H)
+    (ν : ClassFunction ↥L ℂ →ₗ[ℤ] ClassFunction G ℂ)
+    (hagree_j : ν (ClassFunction.induce K (θ j : ClassFunction ↥K ℂ))
+        - d j • ν (ClassFunction.induce K (θ 0 : ClassFunction ↥K ℂ))
+      = H71.τ ⟨ClassFunction.induce K (θ j : ClassFunction ↥K ℂ)
+          - d j • ClassFunction.induce K (θ 0 : ClassFunction ↥K ℂ), psi_support j⟩)
+    (hζ0norm : ClassFunction.inner (ClassFunction.induce K (θ 0 : ClassFunction ↥K ℂ))
+      (ClassFunction.induce K (θ 0 : ClassFunction ↥K ℂ)) = 1) :
+    ClassFunction.inner
+        (H71.τ ⟨ClassFunction.induce K (θ ind1H : ClassFunction ↥K ℂ)
+            - ClassFunction.induce K (θ 0 : ClassFunction ↥K ℂ), diffβ⟩)
+        (ν (ClassFunction.induce K (θ j : ClassFunction ↥K ℂ)))
+      = star (d j) * (ClassFunction.inner
+          (H71.τ ⟨ClassFunction.induce K (θ ind1H : ClassFunction ↥K ℂ)
+              - ClassFunction.induce K (θ 0 : ClassFunction ↥K ℂ), diffβ⟩)
+          (ν (ClassFunction.induce K (θ 0 : ClassFunction ↥K ℂ))) + 1) := by
+  have key := inner_beta_nuDiff H71 hτ K θ hinj d psi_support hind0 diffβ hj0 hj_ind ν hagree_j
+  rw [ClassFunction.inner_sub_right, ClassFunction.inner_smul_right, hζ0norm, mul_one] at key
+  linear_combination key
+
 /-- **The (7.8.c) collapse of the (7.7.a) sum to a single term.**  If, in the `(7.7.a)`
 decomposition `χ^ρ(x) = ∑_{i ≥ 1} (c̄_i/‖ζ_i‖²) ζ_i(x)`, all coefficients `c_i` (`i ≥ 1`) vanish
 except at one index `i₁`, and the distinguished member satisfies `ζ_{i₁}(x) = ‖ζ_{i₁}‖²`
