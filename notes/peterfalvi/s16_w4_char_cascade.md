@@ -947,3 +947,22 @@ induce-vanishing (13.2 構造調査); (2) hinner = P-kernel 直交 (Res_H ζ₁ 
 (4) congruence α(1)=qb ((1.10.a)); (5) λ/η10/η01/τ1 の object setup (coherent family ← §11-12)。
 これらが揃えば bound → (13.9)/(13.10) cover+analytic → (13.11) numeric → c_eq_one (13.12)。
 [[scaffold-sorry-free-not-done]] [[feedback-cite-sorried-lemmas-if-signature-correct]]
+
+### cont.³¹ (2026-07-01 lane c=γ /loop): norm bound 三対 complete + char facts gating 判明
+
+`caseB_eta_norm_bound` (commit ae16dda5, (13.7)) landing ⟹ **(13.6)/(13.7)/(13.8) norm bound 三対
+complete** (real form, char facts 条件付き)。((13.7) は cont.³⁰ で「inline」判断したが downstream
+(13.10) が三対を real form で要すため標準 bound 化。)
+
+**🔑 strategic finding — char facts は §13 char construction に gated**: char facts (hvanish/
+hinner/hχ) の discharge には (13.6) setup carrier の λ/τ1/formula が**concrete**である必要。だが
+carrier の `lambda_irreducible`/`lambda_induced_from_PC_linear`/`mu_tau1_formula` は **opaque Prop**
+(free field)、`Sset` (coherent family) も **posited free field**。⟹ char facts は λ を coherent
+family から構成する deep upstream (§11-12 coherence = lane a/b + §13 char construction) に gated。
+lane c 単独では posited data の opaque Prop から concrete fact を導けない。
+
+**⟹ 方針: downstream cascade を engage** (gated-endpoint pattern, [[feedback-cite-sorried-lemmas-if-signature-correct]]):
+norm 三対 (conditional) を cite して (13.9) cover → (13.10) analytic → (13.11) numeric →
+c_eq_one (13.12) の assembly を構築。c_eq_one は char facts 条件付きで proven になる。
+次 = (13.9) global_character_bound (cover counting: H#/Q# 共役が G を covering) を engage。
+[[scaffold-sorry-free-not-done]]
