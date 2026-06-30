@@ -1311,3 +1311,22 @@ hIM が要する **M-conjugation (m∈M) と framework-bridge が要る**。
 
 これは **substantial sub-project** (新 conjBy-transport infra + deep factor content)。construction
 (assembly まで) は完成・full build green。残 hIM = この sub-project。stale-green 注意 (rm olean 検証)。
+
+
+## propagation — CLEANER build path (compHom-by-aut, transport 回避) (2026-07-01)
+
+前記 infra assessment の subgroup-transport は**不要**。M-conjugation を **m-conjugation aut で compHom**
+として表せば全て hInHu レベルで閉じる:
+- **φ_m : ↥(hInHu data) →* ↥(hInHu data)**, h ↦ ⟨m·h·m⁻¹, _⟩ (well-def: H◁M ゆえ m が hInHu 正規化)。
+  coercion 鎖 ↥(hInHu)→↥(huSub)→↥M に注意 (huSub data : Subgroup ↥M)。
+- **核心 identity**: `Res_{hInHu}(conjBy (G:=↥M)(H:=huSub) m ζ) = ClassFunction.compHom φ_m (Res_{hInHu} ζ)`
+  (ext + 値計算 ζ(m h m⁻¹))。← これで M-conjugation を compHom-by-aut に変換。
+- conjBy m ζ=ζ → Res ζ = compHom φ_m (Res ζ) → θ₀ constituent なら compHom φ_m θ₀ も constituent
+  (要 **inner-compHom-by-aut invariance**: inner(compHom φ a)(compHom φ b)=inner a b, φ aut; 既存
+  inner_conjBy_conjBy 類似、無ければ build)。
+- `restrictionConstituentsSingleOrbit_of_isIrreducible ζ` + `exists_conj`: ∃g∈huSub,
+  conjBy_{huSub} g θ₀ = compHom φ_m θ₀ → (g-conj = m-conj on θ₀) → θ̄^{w₀}∈U-orbit → free-orbit 矛盾。
+
+**hIM 自体は clean** (inertia_M(ζ)=conjBy (G:=↥M)(H:=huSub) m ζ、huSub data : Subgroup ↥M ゆえ多段不要)。
+fiddly なのは argument 内の Res↔compHom 橋 (φ_m + identity + inner-compHom)。次 iteration build。
+construction 完成・green。
