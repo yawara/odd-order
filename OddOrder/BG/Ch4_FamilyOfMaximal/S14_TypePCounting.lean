@@ -10108,10 +10108,20 @@ theorem nonidentity_covered_by_sigma_pieces [Finite G]
 `κ(Mref)`-element; since `Kref` consists of `σ(Mref*)`-elements for the non-conjugate partner `Mref*`
 (type-P duality), `sigma_cover_decomposition` gives the two-element `σ`-decomposition `{k, k*}`.
 
-**Residual (`sorry`):** the partner-`σ` membership `Kref ≤ M_σ(Mref*)` (the full-`K` strengthening of
-the rank-1 `typeP_neighbor_embed`), plus the `k·k*` split of `z`.  This is the single deep input the
-Cor 14.10 assembly below is gated on; the `M̃`-piece (`sigmaLength_le_two_of_mem_Mtilde`) and the
-cover/conjugation plumbing are sorry-free. -/
+**Proof recipe (verified 2026-07-01, no deep gap — only a mechanical split remains):**
+`typeP_duality hG hMref hMPref hKMref hKref hKstarref` supplies the partner `Mstar` with
+`hK_eq : Kref = M_σ(Mstar) ⊓ C(Kstar)` (so `Kref ≤ M_σ(Mstar)` by `inf_le_left` — the partner-`σ`
+membership is *immediate*, not a residual), `hnc : ¬ IsConjugateSubgroup Mref Mstar`, and `hZcyc`
+(`K ⊔ K*` cyclic).  Then `z ∈ Ẑ` splits as `z = k·k*` (`k ∈ Kref ≤ M_σ(Mstar)#`,
+`k* ∈ Kstarref ≤ M_σ(Mref)`, commuting, both `≠ 1`), and `sigma_cover_decomposition hG hMstarmax
+hMref (·) (Kref ≤ M_σ Mstar applied to k) hk1 (Kstarref ≤ M_σ Mref applied to k*) hcomm` gives
+`sigmaDecomposition (k·k*) = insert k ({k*} \ {1})`, of `ncard ≤ 2`.
+
+**Only mechanical gap (`sorry`):** the `k·k*` split — `z ∈ (Kref ⊔ Kstarref)` with `Kstarref`
+central there.  `Subgroup.mem_sup` (CommGroup `↥(Kref⊔Kstarref)` via `hZcyc.commGroup`) hit an
+instance diamond; redo via `Subgroup.mem_sup_of_normal_left` after establishing
+`(Kstarref.subgroupOf (Kref⊔Kstarref)).Normal` from centrality.  The `M̃`-piece
+(`sigmaLength_le_two_of_mem_Mtilde`) and the Cor 14.10 cover/conjugation plumbing are sorry-free. -/
 theorem sigmaLength_le_two_of_mem_zTilde_of_isTypeP [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) {Mref Kref Kstarref Uref : Subgroup G}
     (hMref : Mref ∈ maximalSubgroups G) (hMPref : IsTypeP Mref) (hKMref : Kref ≤ Mref)
