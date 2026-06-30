@@ -634,3 +634,23 @@ HC 上 linear で induce ⟹ mu_j = Ind_{HC}(linear)。∴ my core は on-path (
    `induceHU_apply_one_eq_q_mul` 系が部分再利用可。
 caseB_degree_qu (irreducible, S_ H0C') の構造 (caseB_exists_chiefFactorConstituent → inertia → degree)
 が template。caseA は reducible 版で parallel。
+
+
+## 進捗 2026-06-30 追記 (caseA inertia 機構 完備)
+
+`inertia_eq_hcInHu_caseA` 実証明 (commit 85ada93a)。regular θ̄ の inflation θ₀ の HU-inertia = HC。
+proven な `chiefFactor_caseA_char_inertia` を **parametrized plumbing** (`caseB_char_inertia_inflation_of_core`
+→ `caseB_inertia_realized_of_charInertia` → `inertia_inf_uInHu_le_cInHu_of_realized` →
+`inertia_eq_hcInHu_of_inf_le` — 全て core/realized/inf を引数に取る case-agnostic 設計) に通すだけ。
+
+⟹ **caseA inertia side = 完全に DONE** (core + lift、caseB と parallel)。degree の inertia 入力完備。
+
+**残 (caseA degree、inertia 以外)**:
+1. **reducible χ ⟹ θ̄ regular** (= 各 Hpart summand 上 nontrivial): これが `inertia_eq_hcInHu_caseA` の
+   `hreg` を供給。**prTIred 機構** (reducibles = prime-TI reducible chars) の content。Coq `Part_a`
+   (L883-905, `[exists w in W1bar, Res theta != 1]` の各 w 版) + reducible↔θ̄ 対応。
+2. **`caseA_exists_chiefFactorConstituent`** (caseB の analog, L5005): inertia step を
+   `inertia_eq_hcInHu_caseA` に差し替え + regular 仮説。θ₀ + inertia=HC + linear を供給。
+3. **`caseA_degree_qu`** (caseB_degree_qu の analog, L5090): 2 + Clifford degree → φ(1)=qu。
+4. **配線**: `caseA_character_counts` conjunct b の degree sorry を埋める。
+caseB は (1) 不要 (irreducibility で全 θ inertia HC); caseA は regular に限るので (1) が固有の追加。
