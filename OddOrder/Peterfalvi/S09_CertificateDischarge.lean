@@ -149,4 +149,42 @@ theorem supportedProj_mem_supported (A : Set L) (hA : ∀ g h : L, h * g * h⁻�
   show supportedProj A hA η x = 0
   simp only [supportedProj_apply, if_neg hxA]
 
+/-- **The supported projection preserves inner products against `CF(L,A)`.**  For `ψ` supported on
+`A`, `⟨ψ, η · 𝟙_A⟩ = ⟨ψ, η⟩`: off `A` the factor `ψ(x)` already vanishes, so multiplying `η` by the
+indicator of `A` changes nothing. -/
+theorem inner_supportedProj [Invertible (Nat.card L : ℂ)] (A : Set L)
+    (hA : ∀ g h : L, h * g * h⁻¹ ∈ A ↔ g ∈ A) {ψ : ClassFunction L ℂ}
+    (hψ : ψ ∈ ClassFunction.supportedSubmodule A) (η : ClassFunction L ℂ) :
+    ClassFunction.inner ψ (supportedProj A hA η) = ClassFunction.inner ψ η := by
+  rw [ClassFunction.inner_eq_inv_card_mul_innerSum, ClassFunction.inner_eq_inv_card_mul_innerSum]
+  congr 1
+  simp only [ClassFunction.innerSum]
+  refine Finset.sum_congr rfl fun x _ => ?_
+  by_cases hx : x ∈ A
+  · rw [supportedProj_apply, if_pos hx]
+  · have hψx : ψ x = 0 := by
+      by_contra h0
+      exact hx ((ClassFunction.mem_supportedSubmodule.mp hψ) (ClassFunction.mem_support.mpr h0))
+    rw [hψx, zero_mul, zero_mul]
+
+/-- **Peterfalvi (7.7.a), the determination step.**  If a set `S` of class functions spans `CF(L,A)`
+(`hspan`) and consists of `A`-supported functions (`hS_supp`), then a class function `η` orthogonal
+to every member of `S` vanishes on `A`.  Apply the uniqueness principle to the supported projection
+`η · 𝟙_A ∈ CF(L,A) = span S`, which is orthogonal to `S` (`inner_supportedProj`), hence zero.
+
+This is the heart of (7.7.a): `χ^ρ − Σ c̄_i/‖ζ_i‖² ζ_i` is orthogonal to the spanning `{ψ_i}` (the
+inner products are the `c_i`), so it vanishes on `A` — pinning down `χ^ρ` there. -/
+theorem eq_zero_on_A_of_inner_zero [Invertible (Nat.card L : ℂ)] (A : Set L)
+    (hA : ∀ g h : L, h * g * h⁻¹ ∈ A ↔ g ∈ A) {S : Set (ClassFunction L ℂ)}
+    (hspan : ClassFunction.supportedSubmodule A ≤ Submodule.span ℂ S)
+    (hS_supp : ∀ v ∈ S, v ∈ ClassFunction.supportedSubmodule A)
+    {η : ClassFunction L ℂ} (horth : ∀ v ∈ S, ClassFunction.inner v η = 0)
+    {x : L} (hx : x ∈ A) :
+    η x = 0 := by
+  have hproj_zero : supportedProj A hA η = 0 :=
+    eq_zero_of_mem_span_orthogonal (hspan (supportedProj_mem_supported A hA η))
+      (fun v hv => by rw [inner_supportedProj A hA (hS_supp v hv) η]; exact horth v hv)
+  have h0 : supportedProj A hA η x = 0 := by rw [hproj_zero]; rfl
+  rwa [supportedProj_apply, if_pos hx] at h0
+
 end OddOrder.Peterfalvi.S09.Cert
