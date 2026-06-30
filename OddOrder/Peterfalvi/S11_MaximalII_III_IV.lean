@@ -4989,7 +4989,7 @@ remaining work — a parallel of the `chiefFactorQuotientHypothesis` + bijection
 normal subgroup `H₀ ⊔ C` in place of `H₀` (issue 1012). -/
 theorem reducible_count_sOf_H0C [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     {M : Subgroup G} {data : TypesIIIIIIVSetup M} {chief : ChiefFactorData data}
-    (chars : Section11CharacterData data chief) (caseB : CliffordCaseBData chars) :
+    (chars : Section11CharacterData data chief) :
     {φ ∈ sOf data (chief.H0 ⊔ chars.C) | ¬ IsIrreducibleCharacter φ}.ncard = chief.p - 1 := by
   haveI := chiefFactor_H0_subgroupOf_normal chief
   haveI := chiefFactor_H0supC_subgroupOf_normal chief
@@ -5010,7 +5010,7 @@ prime).  Hence every reducible `𝒮(H₀)`-member already lies in `𝒮(H₀C)`
 `forall_mem_sOf_H0C_apply_one_eq_qu` (degree), this is the full (9.9.b) degree+membership conjunct. -/
 theorem reducible_mem_sOf_H0C [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     {M : Subgroup G} {data : TypesIIIIIIVSetup M} {chief : ChiefFactorData data}
-    (chars : Section11CharacterData data chief) (caseB : CliffordCaseBData chars) :
+    (chars : Section11CharacterData data chief) :
     ∀ φ ∈ sOf data chief.H0, ¬ IsIrreducibleCharacter φ →
       φ ∈ sOf data (chief.H0 ⊔ chars.C) := by
   intro φ hφ hred
@@ -5025,7 +5025,7 @@ theorem reducible_mem_sOf_H0C [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
   have hAB : {ψ ∈ sOf data (chief.H0 ⊔ chars.C) | ¬ IsIrreducibleCharacter ψ}
       = {ψ ∈ sOf data chief.H0 | ¬ IsIrreducibleCharacter ψ} :=
     Set.eq_of_subset_of_ncard_le hBA
-      (le_of_eq (by rw [reducible_count_sOf_H0 hG chief, reducible_count_sOf_H0C hG chars caseB]))
+      (le_of_eq (by rw [reducible_count_sOf_H0 hG chief, reducible_count_sOf_H0C hG chars]))
       hAfin
   have hφmem : φ ∈ {ψ ∈ sOf data (chief.H0 ⊔ chars.C) | ¬ IsIrreducibleCharacter ψ} := by
     rw [hAB]; exact ⟨hφ, hred⟩
@@ -5059,7 +5059,7 @@ theorem caseB_character_counts [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G
   refine ⟨caseB_degree_qu hG chars caseB, ?_, ?_, ?_⟩
   · exact reducible_count_sOf_H0 hG chief
   · intro φ hφ hred
-    have hmem := reducible_mem_sOf_H0C hG chars caseB φ hφ hred
+    have hmem := reducible_mem_sOf_H0C hG chars φ hφ hred
     exact ⟨forall_mem_sOf_H0C_apply_one_eq_qu hG chars caseB φ hmem, hmem⟩
   · sorry
 
