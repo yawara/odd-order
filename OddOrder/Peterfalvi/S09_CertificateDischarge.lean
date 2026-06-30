@@ -464,4 +464,49 @@ theorem supported_mem_span_psi (K : Subgroup L) [K.Normal] [Fintype ↥K]
   rintro v ⟨θ, rfl⟩
   exact hcover θ
 
+/-- **Enumeration of the distinct induced characters** (Peterfalvi (7.6) family).  For a normal
+subgroup `K ◁ L`, the family `T = {Ind_K^L θ : θ ∈ Irr K}` of induced characters is finite; listing
+its *distinct* members as `ζ_i = Ind_K^L θ_i` over `Fin (n+1)` (nonempty: the trivial character
+contributes) yields a representative family `θ : Fin (n+1) → Irr K` for which `i ↦ Ind_K^L θ_i` is
+**injective** (distinct members) and **covers** every induced irreducible.
+
+These are precisely the `hinj`/`hcover` inputs of `induce_family_orthogonal_of_injective` and
+`supported_mem_span_psi`, i.e. the orthogonality and spanning hypotheses of `chiRho_decomp_proof`.
+The enumeration is the standard `Finset.equivFin` listing of `Finset.univ.image (Ind_K^L ·)`. -/
+theorem exists_distinct_induced_family (K : Subgroup L) [K.Normal] [Fintype ↥K]
+    [Invertible (Nat.card L : ℂ)] [Invertible (Nat.card ↥K : ℂ)] :
+    ∃ (n : ℕ) (θ : Fin (n + 1) → IrreducibleCharacter ↥K),
+      Function.Injective (fun i => ClassFunction.induce K (θ i : ClassFunction ↥K ℂ)) ∧
+      ∀ φ : IrreducibleCharacter ↥K,
+        ClassFunction.induce K (φ : ClassFunction ↥K ℂ) ∈
+          Set.range (fun i => ClassFunction.induce K (θ i : ClassFunction ↥K ℂ)) := by
+  classical
+  haveI : Finite ↥K := Finite.of_fintype _
+  let V : Finset (ClassFunction L ℂ) :=
+    Finset.univ.image (fun φ : IrreducibleCharacter ↥K =>
+      ClassFunction.induce K (φ : ClassFunction ↥K ℂ))
+  have hVne : V.Nonempty :=
+    ⟨_, Finset.mem_image_of_mem _ (Finset.mem_univ (trivialIrreducibleCharacter ↥K))⟩
+  obtain ⟨n, hn⟩ : ∃ n, V.card = n + 1 :=
+    ⟨V.card - 1, (Nat.succ_pred_eq_of_pos hVne.card_pos).symm⟩
+  let e : ↥V ≃ Fin (n + 1) := V.equivFin.trans (finCongr hn)
+  have hrep : ∀ i : Fin (n + 1), ∃ φ : IrreducibleCharacter ↥K,
+      ClassFunction.induce K (φ : ClassFunction ↥K ℂ) = (e.symm i : ClassFunction L ℂ) := by
+    intro i
+    obtain ⟨φ, _, hφ⟩ := Finset.mem_image.mp (e.symm i).2
+    exact ⟨φ, hφ⟩
+  choose θ hθ using hrep
+  refine ⟨n, θ, ?_, ?_⟩
+  · intro i j hij
+    have hval : (e.symm i : ClassFunction L ℂ) = (e.symm j : ClassFunction L ℂ) := by
+      rw [← hθ i, ← hθ j]; exact hij
+    exact e.symm.injective (Subtype.ext hval)
+  · intro φ
+    have hmem : ClassFunction.induce K (φ : ClassFunction ↥K ℂ) ∈ V :=
+      Finset.mem_image_of_mem _ (Finset.mem_univ φ)
+    refine ⟨e ⟨_, hmem⟩, ?_⟩
+    show ClassFunction.induce K (θ (e ⟨_, hmem⟩) : ClassFunction ↥K ℂ) = _
+    rw [hθ (e ⟨_, hmem⟩)]
+    exact congrArg Subtype.val (Equiv.symm_apply_apply e ⟨_, hmem⟩)
+
 end OddOrder.Peterfalvi.S09.Cert
