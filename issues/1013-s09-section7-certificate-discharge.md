@@ -137,3 +137,25 @@ sorry-free 構築 (commit 2d37fd94 まで):
   induce_eq_zero_of_not_mem_normal (zeta vanish) / induce_diff_support (psi_support)。
 - **(7.8.c.i)** `chiRho_eq_inner_beta`: (7.7.a) を ind1H/zetaDistinct で適用 + τ↔ν coherence
   collapse (χ⊥S^ν)。τ=ν on ℤ[S] 関係が要追加 (Hypothesis78 の nu field + coherence)。より深い。
+
+### 2026-06-30 (loop 継続²): ⭐⭐⭐ Hypothesis76 constructor 完成 — hypothesis76OfDade
+
+**(7.7.a) 主目標 完全達成** (commit 7ef9d236、axiom-clean: [propext, Classical.choice,
+Quot.sound] のみ、sorryAx なし)。`hypothesis76OfDade` が Hypothesis76 を
+**certificate を assume せず** (7.1)+H◁L+A=H\{1}+IsDadeIsometry から構成。
+全 13 field 構成、chiRho_decomp は chiRho_decomp_induced で discharge。
+
+- `DistinctInducedFamily` 構造体 + `distinctInducedFamily` data def (∃ でなく data;
+  Type 値 Hypothesis76 構成内で projection 可能。∃ 版は corollary)。
+- `subgroupOf_normal_of_conj`、bridges (mem_subgroupOf/K-normality/induce vanish/diff_support)。
+
+**これで (7.7.a) discharge は完全に閉じた** (Hypothesis76 が (7.1) データから構成可能)。
+
+**残 = (7.8.c.i) のみ** (これが (12.16) hB の最終 blocker):
+- `chiRho_eq_inner_beta` (Hypothesis78 certificate)。χ⊥S^ν で (7.7.a) 分解が単一 β 項に collapse。
+- **要追加入力**: τ↔ν coherence agreement `(τ ψ_i, χ) = (ν ψ_i, χ)` (= τ=ν on ℤ[S])。
+  これは Hypothesis78 の bare field でなく **coherence statement** (§8 Dade=coherent extension)。
+  (7.7.a) が induced-family 構造を要したのと同様、(7.8.c.i) は coherence agreement を要する。
+- **設計**: `chiRho_eq_inner_beta_of_coherence` standalone (chiRho_decomp_induced + coherence
+  agreement → collapse)。collapse algebra + index bookkeeping (ind1H/zetaDistinct/ζ_0) が山。
+  次イテレーションで §8 coherence (Dade isometry ↔ coherent extension の τ=ν) を調査 → 構築。
