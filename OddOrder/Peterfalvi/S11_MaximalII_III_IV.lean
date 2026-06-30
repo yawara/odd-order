@@ -6568,5 +6568,31 @@ theorem hInHuConj_bijective {M : Subgroup G} (data : TypesIIIIIIVSetup M) (m : �
     simp only [hInHuConj_coe]
     group
 
+/-- **L2 result: `LiesOver`-equivariance under an `M`-fixing `m`.**  If `ζ` is fixed by `conjBy m`
+and lies over `θ₀`, then `ζ` also lies over the `φ_m`-conjugate `φθ₀ = compHom φ_m θ₀`.  Proof: the
+restriction multiplicity `⟨Res ζ, φθ₀⟩ = ⟨Res ζ, compHom φ_m θ₀⟩ = ⟨compHom φ_m (Res ζ), compHom φ_m
+θ₀⟩` (by `Res ζ = compHom φ_m (Res ζ)`, from `conjBy m ζ = ζ` and the L1 identity) `= ⟨Res ζ, θ₀⟩ ≠ 0`
+(`inner_compHom_of_bijective`). -/
+theorem hcZeta_liesOver_compHom_of_fixed {M : Subgroup G}
+    {data : TypesIIIIIIVSetup M} (m : ↥M)
+    [Fintype ↥(hInHu data)] [Invertible (Nat.card ↥(hInHu data) : ℂ)]
+    (ζ : IrreducibleCharacter ↥(huSub data)) (θ₀ φθ₀ : IrreducibleCharacter ↥(hInHu data))
+    (hlo : OddOrder.RepresentationTheory.IrreducibleCharacter.LiesOver (hInHu data) ζ θ₀)
+    (hfix : ClassFunction.conjBy m (ζ : ClassFunction ↥(huSub data) ℂ)
+      = (ζ : ClassFunction ↥(huSub data) ℂ))
+    (hφθ₀ : (φθ₀ : ClassFunction ↥(hInHu data) ℂ)
+      = ClassFunction.compHom (hInHuConj data m) (θ₀ : ClassFunction ↥(hInHu data) ℂ)) :
+    OddOrder.RepresentationTheory.IrreducibleCharacter.LiesOver (hInHu data) ζ φθ₀ := by
+  rw [OddOrder.RepresentationTheory.IrreducibleCharacter.liesOver_iff,
+    ClassFunction.restrictionMultiplicity_def, hφθ₀,
+    show ClassFunction.restrict (hInHu data) (ζ : ClassFunction ↥(huSub data) ℂ)
+        = ClassFunction.compHom (hInHuConj data m)
+            (ClassFunction.restrict (hInHu data) (ζ : ClassFunction ↥(huSub data) ℂ)) from by
+        rw [← hInHuConj_restrict_conjBy, hfix],
+    inner_compHom_of_bijective _ (hInHuConj_bijective data m)]
+  have h := hlo
+  rwa [OddOrder.RepresentationTheory.IrreducibleCharacter.liesOver_iff,
+    ClassFunction.restrictionMultiplicity_def] at h
+
 end OddOrder.Peterfalvi.S11
 
