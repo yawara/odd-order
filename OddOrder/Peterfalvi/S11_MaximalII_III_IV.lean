@@ -6051,5 +6051,21 @@ noncomputable def hcPsi [Finite G] {M : Subgroup G}
       ↥(hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf (huSub data)) :=
   linearIrreducibleCharacter (θ.comp (hcHom chief))
 
+/-- **`hcHom` kills `H₀C`**: `hcHom` sends the realized `H₀C` (inside `HC`) to `1`, since
+`hcHom = iso ∘ mk'(H₀C)` and `mk'` kills `H₀C`.  Hence ψ = θ∘hcHom is trivial on `H₀C`, the kernel
+condition `H₀C ⊆ Ker ζ` for `ζ ∈ 𝒳(H₀C)` in the (9.8.c) construction. -/
+theorem hcHom_eq_one_of_mem_realizedH0supC [Finite G] {M : Subgroup G}
+    {data : TypesIIIIIIVSetup M} (chief : ChiefFactorData data)
+    {x : ↥(hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf (huSub data))}
+    (hx : x ∈ (((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf (huSub data)).subgroupOf
+      (hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf (huSub data))) :
+    hcHom chief x = 1 := by
+  haveI hN := realizedH0supC_normal_huSub chief
+  haveI : ((((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf (huSub data)).subgroupOf
+      (hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf (huSub data))).Normal :=
+    hN.subgroupOf _
+  simp only [hcHom, MonoidHom.comp_apply, QuotientGroup.mk'_apply]
+  rw [(QuotientGroup.eq_one_iff x).mpr hx, map_one]
+
 end OddOrder.Peterfalvi.S11
 
