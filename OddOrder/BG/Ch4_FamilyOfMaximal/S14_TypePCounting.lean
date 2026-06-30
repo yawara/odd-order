@@ -1438,6 +1438,21 @@ theorem index_U_sup_Msigma_primeFactors_subset_kappa [Finite G]
   simp only [Set.mem_compl_iff, not_not, Set.mem_union] at hpnκσ
   exact hpnκσ.resolve_right hpnσ
 
+/-- **`|H ⊔ N|` divides `|H| · |N|`** for `N ◁ G` (Noether's second isomorphism: `[H⊔N : N] =
+[H : H⊓N]`, so `|H⊔N| = [H : H⊓N]·|N|` with `[H : H⊓N] ∣ |H|`).  Used to bound `π(U ⊔ M_σ) ⊆ κ′`
+from `π(U) ⊆ (κ∪σ)′` and `π(M_σ) ⊆ σ` (the `A(M)`-piece forward, with `M_σ ◁ M`). -/
+theorem card_sup_dvd_mul_of_normal {H N : Subgroup G} [N.Normal] :
+    Nat.card ↥(H ⊔ N) ∣ Nat.card ↥H * Nat.card ↥N := by
+  have e : (N.subgroupOf H).index = (N.subgroupOf (H ⊔ N)).index := by
+    have h := Nat.card_congr (QuotientGroup.quotientInfEquivProdNormalQuotient H N).toEquiv
+    simpa [Subgroup.index] using h
+  have hN : Nat.card ↥(N.subgroupOf (H ⊔ N)) = Nat.card ↥N :=
+    Nat.card_congr (Subgroup.subgroupOfEquivOfLe le_sup_right).toEquiv
+  have h1 : Nat.card ↥(H ⊔ N) = (N.subgroupOf (H ⊔ N)).index * Nat.card ↥N := by
+    rw [← Subgroup.card_mul_index (N.subgroupOf (H ⊔ N)), hN, mul_comm]
+  rw [h1, ← e]
+  exact mul_dvd_mul_right (N.subgroupOf H).index_dvd_card (Nat.card ↥N)
+
 /-- For a `σ(M)`-element `x`, every `σ(L)`-part (`L` maximal) is either `x` or `1`: if `L` is
 conjugate to `M` then `σ(L) = σ(M)` contains all primes of `x` (`sigmaPart L x = x`); otherwise
 `σ(M) ∩ σ(L) = ∅` (`sigma_disjoint_of_nonconjugate`) so `x` avoids `σ(L)` (`sigmaPart L x = 1`). -/
