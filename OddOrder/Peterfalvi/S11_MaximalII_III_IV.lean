@@ -5974,5 +5974,24 @@ theorem realizedH0supC_subgroupOf_hInHu_eq {M : Subgroup G}
       = ((chief.H0.subgroupOf M).subgroupOf (huSub data)).subgroupOf (hInHu data) := by
   rw [← Subgroup.inf_subgroupOf_left, hInHu_inf_realizedH0supC_eq_realizedH0]
 
+/-- **realized `H₀` in `hInHu` = `N` pulled back along `hInHuEquivH`**: the realized `H₀`,
+as a subgroup of `hInHu`, is `chief.N.comap hInHuEquivH`.  Via `hInHuEquivH_coe` + `chief.H0_eq`
+(`H₀ = N.map H.subtype`): `x ∈ realized H₀ ⟺ ((x:M):G) ∈ H₀ ⟺ (hInHuEquivH x : G) ∈ H₀ ⟺
+hInHuEquivH x ∈ N`.  Feeds `QuotientGroup.congr hInHuEquivH` for `hInHu/realizedH₀ ≅ ↥H ⧸ N = H̄`. -/
+theorem realizedH0_subgroupOf_hInHu_eq_comap {M : Subgroup G}
+    {data : TypesIIIIIIVSetup M} (chief : ChiefFactorData data) :
+    ((chief.H0.subgroupOf M).subgroupOf (huSub data)).subgroupOf (hInHu data)
+      = chief.N.comap (hInHuEquivH data).toMonoidHom := by
+  ext x
+  rw [Subgroup.mem_comap, MulEquiv.coe_toMonoidHom, Subgroup.mem_subgroupOf,
+    Subgroup.mem_subgroupOf, Subgroup.mem_subgroupOf, chief.H0_eq, ← hInHuEquivH_coe,
+    Subgroup.mem_map]
+  constructor
+  · rintro ⟨z, hz, hzeq⟩
+    have hz_eq : z = hInHuEquivH data x := Subgroup.subtype_injective data.H hzeq
+    rwa [hz_eq] at hz
+  · intro h
+    exact ⟨_, h, rfl⟩
+
 end OddOrder.Peterfalvi.S11
 
