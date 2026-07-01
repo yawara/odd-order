@@ -2258,26 +2258,15 @@ issue 2013 / `notes/peterfalvi/s13_17_structural_program.md`. -/
 
 /-- **Peterfalvi (13.17.a) T-side Fitting order (B1)**: `|Q| = |T_F| = q^p`.
 
-This is the `S ↔ T` symmetric companion of `BasicStructureData.P_order` (`|P| = |S_F| = p^q`).
-The `Hypothesis` is `S`/`T`-asymmetric (`one_typeII`, `Q_eq_TF`), so this order is *not* obtained
-by a formal swap of `basic_structure`; it is the genuine §13 structural datum.  Combined with the
-automorphism-equivariance of `M_F` (`maxNilpotentNormalHall_pointwise_smul`), it gives
-`|L_F| = q^p` for every `L` conjugate to `T`, which is what the `L ~ T` exclusion of (13.17.a)
-uses.  Proof gated on the §13 machinery (`:= sorry`, the isolated residual of gate 3). -/
-theorem card_Q_eq [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
-    (hyp : Hypothesis (G := G)) (_hTTypeII : IsTypeNonI hyp.T) :
-    Nat.card ↥hyp.Q = hyp.q ^ hyp.p := sorry
-
-/-- **Peterfalvi (13.17.a), `T`-side Fitting order for the type-II member** — the **proven** form of
-`card_Q_eq` for a type-II `T`, the `T`-side dual of the proven `Hypothesis.card_P_eq` (`|P| = p^q`).
-
-From the (14.9) `IsTypeII T`, the (9.3) Wielandt order relation `typeII_III_IV_order_relations`,
-applied to the reconciled type-`P` data of `T` (`reconciled_typePData_T`), gives
-`|T_F| = |tpd.W2|^|tpd.W1| = |W₁|^|W₂| = q^p` (the intrinsic factors reconcile to `tpd.W2 = W₁`,
-`tpd.W1 = W₂`).  This discharges the `card_Q_eq` residual up to the (14.9) `T_typeII` input, whose
-threading into the §13.17 chain is the one remaining wiring step; the `q^p` counting itself is now
-sorry-free. -/
-theorem card_Q_eq_of_typeII [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+This is the `S ↔ T` symmetric companion of `BasicStructureData.P_order` (`|P| = |S_F| = p^q`), now
+**proven** for the (14.9) type-II member `T`: from `IsTypeII T`, the (9.3) Wielandt order relation
+`typeII_III_IV_order_relations` on the reconciled type-`P` data of `T` (`reconciled_typePData_T`)
+gives `|T_F| = |tpd.W2|^|tpd.W1| = |W₁|^|W₂| = q^p` (the intrinsic factors reconcile to `tpd.W2 = W₁`,
+`tpd.W1 = W₂`).  Combined with the automorphism-equivariance of `M_F`
+(`maxNilpotentNormalHall_pointwise_smul`), it gives `|L_F| = q^p` for every `L` conjugate to `T`,
+which is what the `L ~ T` exclusion of (13.17.a) uses.  The `IsTypeII T` hypothesis is threaded from
+`exists_LHypothesis` (§16, via the (14.9) `T_typeII`). -/
+theorem card_Q_eq [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     (hyp : Hypothesis (G := G)) (hTTypeII : IsTypeII hyp.T) :
     Nat.card ↥hyp.Q = hyp.q ^ hyp.p := by
   obtain ⟨tpd, _htpdV, htpdW1, htpdW2⟩ := reconciled_typePData_T hG hyp
@@ -2927,8 +2916,8 @@ normalization.  The distinctness `p ≠ q` is forced because otherwise `W₁` an
 order-`q` subgroups of the cyclic `W` (`eq_of_card_eq_prime_of_isCyclic`), contradicting
 `W₁ ⊓ W₂ = 1`; then `p ∤ q^p`, and the coprimality `|Q| ⟂ |W₂| = p` gives `Q ⊓ W₂ = 1`.  The only
 gated input is `|Q| = q^p` (`card_Q_eq`, the isolated §13 counting residual B1). -/
-theorem Q_W2_structure [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
-    (hyp : Hypothesis (G := G)) :
+theorem Q_W2_structure [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hyp : Hypothesis (G := G)) (hTTypeII : IsTypeII hyp.T) :
     hyp.W2 ≤ Subgroup.normalizer (hyp.Q : Set G) ∧ hyp.Q ⊓ hyp.W2 = ⊥ ∧
       ¬ hyp.p ∣ Nat.card ↥hyp.Q := by
   -- `W₂ ≤ W = S ⊓ T ≤ T`.
@@ -2960,7 +2949,7 @@ theorem Q_W2_structure [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
     exact hyp.q_prime.one_lt.ne' hq1
   -- Conjunct 3: `p ∤ |Q| = q^p`, since `p ∤ q` (distinct primes).
   have hpQ : ¬ hyp.p ∣ Nat.card ↥hyp.Q := by
-    rw [card_Q_eq _hG hyp hyp.T_nonI]
+    rw [card_Q_eq hG hyp hTTypeII]
     intro hdvd
     exact hpq ((Nat.prime_dvd_prime_iff_eq hyp.p_prime hyp.q_prime).mp
       (hyp.p_prime.dvd_of_dvd_pow hdvd))
@@ -2993,7 +2982,7 @@ has order `p q`.
 §13 facts `E ∩ Q = W₁` and `E ⊄ Q` are isolated in `complement_inf_Q_structure`; everything else is
 sorry-free group theory. -/
 theorem complement_card_eq_pq [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
-    (hyp : Hypothesis (G := G)) {L : Subgroup G}
+    (hyp : Hypothesis (G := G)) (hTTypeII : IsTypeII hyp.T) {L : Subgroup G}
     (frob : OddOrder.Peterfalvi.S14.TypeIFrobeniusData L)
     (hW1E : hyp.W1 ≤ frob.complement.map L.subtype) :
     Nat.card ↥frob.complement = hyp.p * hyp.q := by
@@ -3003,7 +2992,7 @@ theorem complement_card_eq_pq [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd G
   obtain ⟨hInf, hnle⟩ := complement_inf_Q_structure _hG hyp frob hW1E
   -- `E ⊆ Q W₂` (Huppert step) and the `Q ⋊ W₂` structure.
   have hEH : Em ≤ Hg := complement_le_QW2 _hG hyp frob hW1E
-  obtain ⟨hWnorm, hdisj, _⟩ := Q_W2_structure _hG hyp
+  obtain ⟨hWnorm, hdisj, _⟩ := Q_W2_structure _hG hyp hTTypeII
   have hQleH : hyp.Q ≤ Hg := le_sup_left
   -- `|E ∩ Q| = |W₁| = q`.
   have hInfCard : Nat.card ↥(Em ⊓ hyp.Q) = hyp.q := by rw [hInf]; exact hyp.q_eq_card_W1.symm
@@ -3052,7 +3041,8 @@ latter fed `E ⊆ Q W₂` by the Huppert step (`complement_le_QW2`).  The `W₁ 
 Peterfalvi's choice "let `E` be a complement to `H` in `L` such that `W₁ ⊂ E`". -/
 theorem typeI_overNormalizer_complement [Finite G]
     (_hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
-    (hSTypeII : IsTypeII hyp.S) {L : Subgroup G} (hLmax : L ∈ maximalSubgroups G)
+    (hSTypeII : IsTypeII hyp.S) (hTTypeII : IsTypeII hyp.T) {L : Subgroup G}
+    (hLmax : L ∈ maximalSubgroups G)
     (hNUL : Subgroup.normalizer (hyp.U : Set G) ≤ L)
     (hUH : hyp.U ≤ maxNilpotentNormalHall L)
     (frob : OddOrder.Peterfalvi.S14.TypeIFrobeniusData L)
@@ -3060,9 +3050,9 @@ theorem typeI_overNormalizer_complement [Finite G]
     Nat.card ↥frob.complement = hyp.p * hyp.q ∧
       ∃ y ∈ hyp.Q, (MulAut.conj y • hyp.W2 : Subgroup G) ≤
         frob.complement.map L.subtype := by
-  have hcard := complement_card_eq_pq _hG hyp frob hW1E
+  have hcard := complement_card_eq_pq _hG hyp hTTypeII frob hW1E
   refine ⟨hcard, ?_⟩
-  obtain ⟨hWnorm, hdisj, hpQ⟩ := Q_W2_structure _hG hyp
+  obtain ⟨hWnorm, hdisj, hpQ⟩ := Q_W2_structure _hG hyp hTTypeII
   have hEQW2 := complement_le_QW2 _hG hyp frob hW1E
   -- `Q` is solvable: `Q = T_F ≤ T < ⊤`.
   haveI hQsolv : IsSolvable ↥hyp.Q := by
@@ -3156,14 +3146,14 @@ containing a conjugate `W₂^y`).  Assembled from the type-I existence (13.17.a/
 `typeI_overNormalizer_complement`). -/
 theorem typeII_overNormalizer_frobenius [Finite G]
     (_hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
-    (hSTypeII : IsTypeII hyp.S) :
+    (hSTypeII : IsTypeII hyp.S) (hTTypeII : IsTypeII hyp.T) :
     ∃ data : TypeIOverNormalizerData hyp,
       data.frobenius.kernel_eq_MF ∧ (hyp.U ≤ data.H) := by
   obtain ⟨L, hLmax, hLtypeI, hNUL, hUH⟩ :=
     exists_typeI_maximal_overNormalizer_U _hG hyp hSTypeII
   obtain ⟨frob, hker, hW1E⟩ := exists_typeIFrobeniusData_W1_le _hG hyp hLmax hLtypeI hNUL
   obtain ⟨hcard, hy⟩ :=
-    typeI_overNormalizer_complement _hG hyp hSTypeII hLmax hNUL hUH frob hW1E
+    typeI_overNormalizer_complement _hG hyp hSTypeII hTTypeII hLmax hNUL hUH frob hW1E
   exact ⟨⟨L, maxNilpotentNormalHall L, hLmax, rfl, hNUL, frob, hUH, hcard, hy⟩, hker, hUH⟩
 
 /-- **`T`-side dual of `q_not_dvd_kernel`** (V-side): `p = |W₂|` is coprime to the type-I Frobenius
