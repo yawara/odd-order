@@ -1650,3 +1650,27 @@ irreducible-member 状況で discharge) → (C) `abelianization_card_le_of_not_c
 (D) case (c) assembly (H 非可換 = |L/H|>1 ∴ H'≠1; p 奇 = Odd p from odd order; 2 leaf 適用)。
 multi-turn 想定。(6.2) oracle `h62` の irreducible-member discharge (`sMember_index_le_two_psi` 系) が
 case-c で効くかが (B) の鍵 — case c は K=H が p-群ゆえ member Ind_H^L θ は既約 (θ≠1, Frobenius inertia=H)。
+
+### ✅ loop⁶⁹ (2026-07-02 lane-b): (6.5.c) coherence engine を実証明 — case (c) を 3 obligation に集約
+
+**commit `8df995ec`: `nonempty_coherent_SOf_bot_of_index_dvd` (S08_PGroupReduction, axiom-clean, full 3894 green)**。
+発見: 抽象 S07 setup 上の `six_three_of_six_two_oracle` (S08_Theorem62_63_Standalone) が
+(6.2)/(6.3) chain 全体を **(5.6) break-member oracle `h56`** に還元済 (τ 一般、SibleyDade 非依存)。
+→ これに前 commit の 2 leaf (`six_five_c_arith` + `sq_le_card_abelianization_of_isPGroup_of_noncomm`)
+を組み、(6.5.c) 結論「SOf ⊥ coherent」を出す engine を sorry-free で landing:
+背理法 → oracle で |H:H'|≤4|L:H|²+1 (else coherence 矛盾) → 非可換 p-群で p²≤|H:H'| → arith 矛盾。
+
+**engine の signature = case (c) の残 obligation を parameter 化** ([[feedback-gated-endpoint-skeleton-pattern]]):
+`(hp: p 素数) (hHp: IsPGroup p H) (hnonab: H 非可換) (hodd_p) (hodd_LH) (hdvd: |L:H|∣p−1)`
+`(hH'lt: ⁅H,H⁆<H) (hcoh: Coherent(SOf ⁅H,H⁆)) (h56: break-member oracle) → Coherent(SOf ⊥)`。
+
+**残 (次セッション) = witness 供給の 3 件** (これで `frobenius_typeI_coherent_of_cyclicQuotient` を閉じる):
+1. **SOf**: witness の S(A) filtration を定義 (`{Ind_H^L θ | θ∈Irr(H.subgroupOf L), θ≠1, A ⊆ ker θ}`;
+   Sibley `SsubFiltration` を witness τ 用に。SOf ⊥ = hyp.Sset, SOf ⁅H,H⁆ = S(H'))。
+2. **hcoh** = S(H') coherent: θ が H/H' 経由 (linear) ゆえ Ind 次数 = |L:H| 一定 → `coherent_of_constant_degree`
+   (case b `frobenius_typeI_coherent_of_abelianKernel` の Sset lemma 群を subfamily に流用)。
+3. **h56** = (5.6) break oracle: case c は K=H p-群 → member 既約 → Sibley `exists_coherentBreakPair` +
+   (5.6) `coherentDegreeSqNormBound_of_not_coherentW` から組む (最深、multi-turn)。
++ 供給の付随: `hp/hHp` (H が p-群 = (6.5.b) reduction — chief factor 経由; または _hexp から), `hnonab`
+   (¬coherent ⟹ 非 constant-degree ⟹ 非可換), `hdvd` (_hexp の (8.3.c) + (8.2.a) exp(L/H)=|L/H|)。
+注意: H が p-群である事実 (6.5.b) は _hexp が直接与えない — chief-factor reduction が要る (未解決の追加 gap)。
