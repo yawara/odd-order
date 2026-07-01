@@ -817,3 +817,96 @@ lane-b の clean な貢献 = standalone hB-producer (Hypothesis L から (7.8.b)
 (c) degree facts (d/psi_support/hdeg/hdeg_match for placed family)、(d) hagree (coh から、
 coherence_hagree_dadeMap)、(e) ν=coh.extension + hnu_isometry=coherence_extension_inner_eq_on_family、
 (f) hypothesis78OfDade 組み立て→zetaNuRhoNormSqGeOfDade→normRho/kH/e 同定。
+
+### 2026-07-01 (loop 継続⁶): ⭐⭐⭐ witness `Hypothesis78` 組み立て完成 — witness_L_hypothesis78
+
+**(12.16) hB の keystone = witness L の (7.8) 構造構成を完全 sorry-free 達成** (S14_MaximalI.lean、
+証明 body は sorry-free; 継承 sorryAx は `witness_L_coherent`=(12.6)/(12.1) 上流 gate のみ)。
+残務 map の (c)-(f) を全て discharge:
+
+`witness_L_hypothesis78 (hG) (data : RankTwoWitnessData) : ∃ hyp : Hypothesis data.L,
+  Nonempty (Hypothesis78 G (typeIA data.L hyp.typeI) data.L)`
+
+`hypothesis78OfDade` を witness L の 3 材料から組み立て:
+- **coherence** (`witness_L_coherent` の coh): ν=`coh.extension`、hnu_isometry=
+  `coherence_extension_inner_eq_on_family coh (hSmem i) (hSmem j)`、hagree=
+  `coherence_hagree_dadeMap hyp.dadeData.dade hyp.hconj coh …` (m0=1, mi=deg θ_i via
+  `irreducibleCharacter_apply_one_eq_pos_natCast`)。
+- **placed family** (`exists_witness_placed_family`): θ/ind1H/hdeg0/htriv/hinj/hcover。
+- **structural bridges** (新規 proof):
+  - hAH = `Hypothesis.typeIA_eq_sharp` (A(L)=H#)。
+  - hHnorm = subgroupOf-normality (`hKnormal.conj_mem` + `mem_subgroupOf`)。
+  - hSmem (θ_i≠1_K for i≠ind1H via hinj) ⟹ Ind θ_i∈Sset。
+  - d_i=θ_i(1)、hdeg (`induce_apply_one`+hdeg0)、hdeg_match (`induce_trivialChar_apply_eq_index`)、
+    psi_support (`induce_diff_support`+`mem_supportInSubgroup_sharp_subgroupOf_iff`)。
+
+**axiom 状態**: 自 body sorry-free。`#print axioms` の唯一の sorryAx = `witness_L_coherent`
+経由 (`frobenius_typeI_coherent`=(12.6) Frobenius coherence + `hypothesis_of_typeIData`=(12.1)
+Dade support、いずれも §7/§10 上流 gate)。`hypothesis78OfDade`/`coherence_hagree_dadeMap`/
+`exists_witness_placed_family` は全 axiom-clean。CLAUDE.md「signature 正なら sorried 上流を
+cite して下流実証明」に合致。full build 3889 green (~63s)。
+
+**残 = hB 不等式の産出** (次増分): witness_L_hypothesis78 の bridge を再利用し、
+(7.8.b) 固有入力 4 つを追加 → `zetaNuRhoNormSqGeOfDade` で `1-e/kH ≤ normRho` を産出:
+- **hζ0norm** `⟨Ind θ_0, Ind θ_0⟩=1` (Ind θ_0=χ_dist 既約; L=H⋊U Frobenius ゆえ nontrivial θ の誘導は既約)。
+- **hzeta0nu** `⟨ν(Ind θ_0), constOne⟩=0` (coherent 像は 1_G に直交; §7 coherence orthogonality)。
+- **a/ha** `exists_betaDecomp_a` (hdiffZ: Ind θ_{ind1H}−Ind θ_0∈ZIrr L、hζ0nuZ: ν(Ind θ_0)∈ZIrr G)。
+- **hsmall** `H78.smallIndex` (index smallness; def 要確認)。
+その後 hC ((7.3)+(8.17))・他 field と合わせ `exists_counterexample_dade_data` (S14:2779 sorry)。
+
+### 2026-07-01 (loop 継続⁷): hB 完成マップ確定 + Frobenius size 補題 + hzeta0nu crux 特定
+
+witness_L_hypothesis78 を踏まえ hB=(7.8.b) `1 - e/kH ≤ normRho` (`zetaNuRhoNormSqGeOfDade`
+S09:2347 で産出) の残 4 入力を精査。**3 つは tractable、1 つ (hzeta0nu) が genuine gap**:
+
+- ✅ **hζ0norm** `⟨Ind θ_0, Ind θ_0⟩=1`: `inner_self_induce_eq_one_of_frobeniusGroup`
+  (InducedIrreducible.lean:477、docstring が「§12 type-I coherent family」用と明記) で即。
+- ✅ **hsmall** `2e+1≤h` (= `H78.smallIndex`): 一般補題
+  **`frobenius_two_mul_card_complement_add_one_le_card_kernel`** (S14 新規、axiom-clean) で証明。
+  奇位数 Frobenius 群で |A| | |N|-1 (`IsFrobeniusGroup.card_kernel_modEq_one`=Isaacs 6.1) +
+  |N| 奇 ⟹ |N|-1 偶 ⟹ 奇約数 |A| は半分以下 ⟹ 2|A|+1≤|N|。witness 適用は
+  N=H.subgroupOf L, A=C (共に奇 ∵ odd G の section)、complementIndex=|C| (IsComplement' card 分解)。
+- ✅ **a/ha** `exists_betaDecomp_a` (S09:1668): hdiffZ=Ind θ_{ind1H}−Ind θ_0∈ZIrr L
+  (`induce_mem_ZIrr` InducedCharacter:792 ×2)、hζ0nuZ=ν(Ind θ_0)∈ZIrr G (`coh.extension_mem_ZIrr`)。
+  hypothesis76OfFamily.zeta i = Ind θ_i (defeq、alignment OK)。
+- 🛑 **hzeta0nu** `⟨ν(Ind θ_0), constOne G⟩=0` = **genuine gap**。
+  - ν(Ind θ_0) は norm-1 virtual char (isometry `extension_inner_eq` + hζ0norm) = ±既約。
+    ⟨ν ζ_0,1_G⟩=0 ⟺ ν(ζ_0)≠±1_G。
+  - **isometry+hagree だけでは不足**: hagree から ⟨ν ζ_i,1_G⟩=d_i·c (c=⟨ν ζ_0,1_G⟩) が全 i で従うが
+    (τ image ⊥1_G via `inner_tau_supported_constOne` + ⟨ψ_i,1_L⟩=0)、norm 制約
+    Σd_i²|c|²≤1 は c=0 を強制しない。差 ζ_0−ζ_{ind1H} も ζ_{ind1H}=Ind 1_K∉zSpan S ゆえ
+    zSupportedSpan に入らず extends_on_supported 使えず。
+  - **要る machinery = coherent extension の nonprincipality/degree 保存** (ν(χ)(1)=χ(1)=e≥3 なら
+    ν(ζ_0)≠±1_G で即)。抽象 `IsCoherent` (nonzero/extension/inner_eq/extends_on_supported/mem_ZIrr)
+    に degree 保存も nonprincipality も **無い**。`frobenius_typeI_coherent`/retarget/CoherenceWiring も
+    degree 保存 lemma 無し (grep 済)。→ coherence-core を強化する新 §7 定理が必要 (lane-a coherence
+    machinery と overlap 可能性)。**hB の唯一の残 blocker**。
+
+**次増分**: (a) witness instantiation で `frobenius_...le_card_kernel` を H78.smallIndex に接続
+(IsComplement' card 分解 + subgroupOf card equiv)、(b) hζ0norm/a·ha を wire、(c) hzeta0nu を
+coherence degree 保存で discharge (deep) → `zetaNuRhoNormSqGeOfDade` で hB 産出 →
+`exists_counterexample_dade_data` (S14 sorry) の hB field。hC=(7.3)+(8.17) は別途。
+
+### 2026-07-01 (loop 継続⁷ 補足): hzeta0nu root-cause 確定 = IsCoherent が ⊥1_G を捨てている
+
+hzeta0nu の根本原因を特定。Peterfalvi の coherence (5.x) は本来 ℤ[S]→ℤ[Irr G] を
+**1_G の直交補空間**へ写す (S は 1_L に直交する induced-from-nontrivial ばかり、Dade isometry が
+⊥1_G の空間に landing、coherent 拡張がそれを保つ)。しかし本 repo の `IsCoherent` (S07:1596) は
+**isometry + extends-Dade + ZIrr-codomain のみ保持し、⊥1_G を落としている** (nonzero/extension/
+extension_inner_eq/extends_on_supported/extension_mem_ZIrr の 5 field に ⊥1_G も degree 保存も無い)。
+coherence 産出経路 `frobenius_typeI_coherent`→`coherent_of_sibleyTarget`→`nonempty_coherent_of_sibley`
+(S08 Sibley/(6.8)) も抽象 IsCoherent を返すのみ (⊥1_G は construction 内で成立するが露出せず)。
+
+**⟹ hzeta0nu は抽象 IsCoherent から原理的に導けない** (isometry は degree/principal 成分を決定しない;
+hagree からは ⟨ν ζ_i,1_G⟩=d_i·c しか出ず c=0 を強制できない、証明済)。
+
+**修正の 2 択**:
+- (a) **共有 `IsCoherent` に field 追加** (`extension_orthogonal_constOne` or degree 保存
+  `extension_apply_one_eq`) + Sibley 構成 (`nonempty_coherent_of_sibley`)・galoisTransport で証明。
+  = 最もクリーンで全 coherence consumer に裨益するが **shared-structure signature 変更** (全 constructor
+  更新要、他レーン=lane-a/c の coherence 利用に影響) → **CLAUDE.md「signature 無断変更=STOP」に該当、
+  hub/ユーザー裁可が要る設計判断**。
+- (b) **Sibley 構成から standalone lemma** で witness の ν(Ind θ_0) ⊥1_G を直接証明 (IsCoherent に
+  触れず additive)。lane-b-local だが S08 case-B coherence extension machinery への deep dive を要する。
+
+→ hzeta0nu は hB の唯一の残 blocker。上記設計判断を要するため次アクションとして flag。

@@ -2861,6 +2861,145 @@ theorem Hypothesis.typeIA_eq_sharp [Finite G] (hG : OddOrder.BG.IsMinimalSimpleO
     refine ⟨hyp.typeI.typeF.H_le hyN, hy1, y, ⟨hyN, hy1⟩, ?_⟩
     rw [Subgroup.mem_centralizer_singleton_iff]
 
+open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
+open OddOrder.Peterfalvi.S09.Cert in
+/-- **Peterfalvi (7.8)/(12.16), the witness `Hypothesis78`**: the second maximal subgroup `L` of
+(12.9) carries the full §7 (7.8) structure — the `ρ`-machinery `Hypothesis71`, the distinguished
+induced family `{ζ_i = Ind θ_i}`, the coherent extension `ν`, and the (7.8.a) coherence agreement.
+
+Assembles `hypothesis78OfDade` from three genuine ingredients for the witness `L`:
+* the (12.6) coherence `witness_L_coherent` supplies the extension `ν = coh.extension`, whose
+  `IsCoherent.extension_inner_eq`/`extends_on_supported` give the `nu_isometry` (via
+  `coherence_extension_inner_eq_on_family`) and the (7.8.a) agreement (via
+  `coherence_hagree_dadeMap`);
+* the placed family `exists_witness_placed_family` supplies the `Fin (n+1)`-indexed `θ` with the
+  distinguished character at index `0` (`Ind (θ 0)(1) = [L:H] = e`) and the trivial character `1_H`
+  at `ind1H ≠ 0`, injective and covering;
+* the (12.1) support `A(L) = H#` (`typeIA_eq_sharp`) and the degree coefficients `d_i = θ_i(1)`
+  (`induce_apply_one`), with the difference support `ψ_i = ζ_i − d_i ζ_0 ⊆ H#` from
+  `induce_diff_support`.
+
+This is the (7.8) hypothesis to which Peterfalvi's (7.8.b) norm bound `hB` of
+`CounterexampleDadeData` applies (via `zetaNuRhoNormSqGeOfDade`). -/
+theorem witness_L_hypothesis78 [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    {ctr : CounterexampleHypothesis (G := G)} (data : RankTwoWitnessData ctr) :
+    ∃ hyp : Hypothesis data.L,
+      Nonempty (OddOrder.Peterfalvi.S09.Hypothesis78 G (typeIA data.L hyp.typeI) data.L) := by
+  classical
+  obtain ⟨hyp, ⟨coh⟩⟩ := witness_L_coherent hG data
+  refine ⟨hyp, ?_⟩
+  have hHL : hyp.typeI.typeF.H ≤ data.L := hyp.typeI.typeF.H_le
+  haveI hKnormal : ((hyp.typeI.typeF.H).subgroupOf data.L).Normal := by
+    rw [hyp.typeI.typeF.H_eq]
+    exact OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_subgroupOf_normal data.L
+  -- (12.1): the type-I support `A(L)` is `H#`.
+  have hAH : typeIA data.L hyp.typeI = (hyp.typeI.typeF.H : Set G) \ {1} :=
+    Hypothesis.typeIA_eq_sharp hG hyp
+  -- `H = L_F` is `L`-conjugation invariant (from the `subgroupOf`-normality).
+  have hHnorm : ∀ (l : ↥data.L) {h : G}, h ∈ hyp.typeI.typeF.H →
+      (l : G) * h * (l : G)⁻¹ ∈ hyp.typeI.typeF.H := by
+    intro l h hh
+    have hhL : h ∈ data.L := hHL hh
+    have hmem : (⟨h, hhL⟩ : ↥data.L) ∈ (hyp.typeI.typeF.H).subgroupOf data.L :=
+      (Subgroup.mem_subgroupOf).mpr hh
+    have hconj := hKnormal.conj_mem ⟨h, hhL⟩ hmem l
+    rw [Subgroup.mem_subgroupOf] at hconj
+    simpa using hconj
+  -- The placed induced family for `L`.
+  obtain ⟨n, θ, ind1H, hind1H, hdeg0, htriv, hinj, hcover⟩ := exists_witness_placed_family hyp
+  -- Every non-trivial member `Ind θ_i` (`i ≠ ind1H`) lies in the coherent family `S`.
+  have hSmem : ∀ i, i ≠ ind1H →
+      ClassFunction.induce ((hyp.typeI.typeF.H).subgroupOf data.L) (θ i : ClassFunction _ ℂ)
+        ∈ hyp.Sset := by
+    intro i hi
+    refine ⟨θ i, fun htriv_i => hi (hinj ?_), rfl⟩
+    change ClassFunction.induce ((hyp.typeI.typeF.H).subgroupOf data.L) (θ i : ClassFunction _ ℂ)
+        = ClassFunction.induce ((hyp.typeI.typeF.H).subgroupOf data.L) (θ ind1H : ClassFunction _ ℂ)
+    rw [htriv_i, htriv]
+  -- Degree coefficients `d_i = θ_i(1)`.
+  let d : Fin (n + 1) → ℂ :=
+    fun i => (θ i : ClassFunction ↥((hyp.typeI.typeF.H).subgroupOf data.L) ℂ)
+      (1 : ↥((hyp.typeI.typeF.H).subgroupOf data.L))
+  have hd : ∀ i, d i = (θ i : ClassFunction ↥((hyp.typeI.typeF.H).subgroupOf data.L) ℂ)
+      (1 : ↥((hyp.typeI.typeF.H).subgroupOf data.L)) := fun _ => rfl
+  -- `ζ_i(1) = d_i · ζ_0(1)`.
+  have hdeg : ∀ i, ClassFunction.induce ((hyp.typeI.typeF.H).subgroupOf data.L)
+        (θ i : ClassFunction _ ℂ) (1 : ↥data.L)
+      = d i * ClassFunction.induce ((hyp.typeI.typeF.H).subgroupOf data.L)
+        (θ 0 : ClassFunction _ ℂ) (1 : ↥data.L) := by
+    intro i
+    rw [ClassFunction.induce_apply_one ((hyp.typeI.typeF.H).subgroupOf data.L)
+        (θ i : ClassFunction _ ℂ), hdeg0, hd i]
+    ring
+  -- `ζ_0(1) = ζ_{ind1H}(1)` (both `[L:H]`).
+  have hdeg_match : ClassFunction.induce ((hyp.typeI.typeF.H).subgroupOf data.L)
+        (θ 0 : ClassFunction _ ℂ) (1 : ↥data.L)
+      = ClassFunction.induce ((hyp.typeI.typeF.H).subgroupOf data.L)
+        (θ ind1H : ClassFunction _ ℂ) (1 : ↥data.L) := by
+    rw [hdeg0, htriv]
+    change (((hyp.typeI.typeF.H).subgroupOf data.L).index : ℂ)
+        = ClassFunction.induce ((hyp.typeI.typeF.H).subgroupOf data.L)
+          (trivialClassFunction ↥((hyp.typeI.typeF.H).subgroupOf data.L)) (1 : ↥data.L)
+    rw [induce_trivialChar_apply_eq_index _ (Subgroup.one_mem _)]
+  -- `ψ_i = ζ_i − d_i ζ_0` is supported on `A(L) = H#`.
+  have psi_support : ∀ i, (ClassFunction.induce ((hyp.typeI.typeF.H).subgroupOf data.L)
+        (θ i : ClassFunction _ ℂ)
+      - d i • ClassFunction.induce ((hyp.typeI.typeF.H).subgroupOf data.L)
+          (θ 0 : ClassFunction _ ℂ)).support
+      ⊆ OddOrder.Peterfalvi.S04.supportInSubgroup (typeIA data.L hyp.typeI) data.L := by
+    intro i
+    refine (induce_diff_support (θ i) (θ 0) (d i) (hdeg i)).trans ?_
+    intro x hx
+    rw [Set.mem_diff, SetLike.mem_coe, Set.mem_singleton_iff] at hx
+    exact (mem_supportInSubgroup_sharp_subgroupOf_iff hyp.typeI.typeF.H hAH x).mpr ⟨hx.1, hx.2⟩
+  -- Assemble the `Hypothesis78` via `hypothesis78OfDade`.
+  refine ⟨hypothesis78OfDade hyp.toHypothesis71
+    (hyp.dadeData.dade.fullDadeIsometryData hyp.hconj).toDadeIsometryData.isDadeIsometry
+    hyp.typeI.typeF.H hHL hHnorm hAH θ hinj hcover d psi_support hdeg ind1H hind1H htriv hdeg_match
+    coh.extension ?_ ?_⟩
+  · -- `nu_isometry`: the coherent extension is isometric on the family members.
+    intro i j hi hj
+    exact coherence_extension_inner_eq_on_family coh (hSmem i hi) (hSmem j hj)
+  · -- `hagree`: the (7.8.a) coherence agreement `τ ψ_i = ν ζ_i − d_i ν ζ_0`.
+    intro i _ hi_ind
+    obtain ⟨deg_i, -, hdeg_i_eq⟩ := irreducibleCharacter_apply_one_eq_pos_natCast (θ i)
+    exact coherence_hagree_dadeMap hyp.dadeData.dade hyp.hconj coh
+      (hSmem i hi_ind) (hSmem 0 (Ne.symm hind1H)) (m0 := 1) (mi := deg_i) (by norm_num)
+      (by rw [hd i, hdeg_i_eq, Nat.cast_one, div_one]) (psi_support i)
+
+/-- **Peterfalvi (7.8.b)/(12.12) size condition for an odd-order Frobenius group**: if a finite
+Frobenius group has kernel `N` and complement `A` both of **odd** order, with `N ≠ ⊥`, then
+`2|A| + 1 ≤ |N|` (equivalently `e ≤ (h-1)/2`, the `smallIndex` hypothesis of the §7 `(7.8.b)` norm
+bound).  The complement `A` acts freely on `N#`, so `|A| ∣ |N| - 1` (`card_kernel_modEq_one`,
+Isaacs 6.1); as `|N|` is odd, `|N| - 1` is even, and an odd divisor of an even number is at most
+half of it, so `|N| - 1 ≥ 2|A|`.  This is the `2e_i + 1 ≤ h_i` shape consumed by
+`localSmallIndex_of_family_cardinalities` for the witness `L` of (12.16).  (General Frobenius fact,
+hoistable to `Ch06`.) -/
+theorem frobenius_two_mul_card_complement_add_one_le_card_kernel {Γ : Type*} [Group Γ] [Finite Γ]
+    {N A : Subgroup Γ} (hFrob : OddOrder.Isaacs.Ch06.IsFrobeniusGroup Γ N A)
+    (hNodd : Odd (Nat.card ↥N)) (hAodd : Odd (Nat.card ↥A)) (hNnt : N ≠ ⊥) :
+    2 * Nat.card ↥A + 1 ≤ Nat.card ↥N := by
+  haveI : Nontrivial ↥N := (Subgroup.nontrivial_iff_ne_bot N).mpr hNnt
+  have hN1 : 1 < Nat.card ↥N := Finite.one_lt_card
+  -- `|A| ∣ |N| - 1` from `|N| ≡ 1 [MOD |A|]` (Isaacs 6.1).
+  obtain ⟨m, hm⟩ : Nat.card ↥A ∣ Nat.card ↥N - 1 :=
+    (Nat.modEq_iff_dvd' hN1.le).mp hFrob.card_kernel_modEq_one.symm
+  -- `|N| - 1` is even (`|N|` odd), `|A|` is odd, so the cofactor `m` is even.
+  have hNm1_even : Even (Nat.card ↥N - 1) := Nat.Odd.sub_odd hNodd odd_one
+  have hm_even : Even m := by
+    rcases (Nat.even_mul.mp (hm ▸ hNm1_even)) with hA | hm
+    · exact absurd hA (Nat.not_even_iff_odd.mpr hAodd)
+    · exact hm
+  -- `m ≠ 0` (else `|N| = 1`), so `m ≥ 2`; hence `|N| - 1 = |A|·m ≥ 2|A|`.
+  have hApos : 0 < Nat.card ↥A := Nat.card_pos
+  have hm_pos : 0 < m := by
+    rcases Nat.eq_zero_or_pos m with h0 | hp
+    · rw [h0, Nat.mul_zero] at hm; omega
+    · exact hp
+  have hm2 : 2 ≤ m := Nat.le_of_dvd hm_pos hm_even.two_dvd
+  have hge : Nat.card ↥A * 2 ≤ Nat.card ↥A * m := Nat.mul_le_mul_left _ hm2
+  omega
+
 /-! ## (12.17): forcing case (b) of Theorem (8.8) — the all-type-I non-existence argument
 
 Peterfalvi (12.17) shows that case (a) of Theorem (8.8) — *every* maximal subgroup of `G` being of

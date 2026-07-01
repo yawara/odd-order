@@ -5,6 +5,7 @@ Authors: Yawara Ishida
 -/
 import Lean
 import OddOrder.Algebra.AlgInt
+import OddOrder.Algebra.GaloisRationalInteger
 import OddOrder.GroupTheory.ChermakDelgado
 import OddOrder.GroupTheory.CoprimeFixedPoints
 import OddOrder.GroupTheory.MinimalInvariantNormal
@@ -785,6 +786,18 @@ set_option linter.style.longLine false in
 -- COMMUTING with `x`, `ψ(xy)-ψ(y) = (1-ε)·z`.  Reduce to the abelian subgroup `A=⟨x,y⟩` via
 -- `restrict_mem_ZIrr` + `exists_integral_zirr_apply_sub`.  Directly usable by (12.16)/(13.5).
 #assert_only_allowed_axioms OddOrder.RepresentationTheory.exists_integral_apply_sub_of_commute
+-- [Isaacs] Lemma 3.14 / Pf (13.9.b) ANT core: an algebraic integer `α : ℂ` fixed by every ring
+-- automorphism `σ : ℂ ≃+* ℂ` is a rational integer (works inside the splitting field `ℚ(rootSet)`,
+-- Galois correspondence + `ℤ` integrally closed in `ℚ`).  Feeds the field-norm-`≥ 1` step of (13.9.b).
+#assert_only_allowed_axioms OddOrder.Algebra.exists_int_of_isIntegral_of_forall_complexRingEquiv_fixed
+-- [Isaacs] 3.14 support: every `σ : ℂ ≃+* ℂ` acts as a uniform power `(· ^ k)` (`k` coprime `n`) on
+-- the `n`-th roots of unity — the converse of `exists_complexRingEquiv_pow_of_rootsOfUnity`.
+#assert_only_allowed_axioms OddOrder.Algebra.exists_pow_of_complexRingEquiv
+-- [Isaacs] 3.14 character bridge: for a cyclic-closed `Finset A` (closed under `x ↦ x^k`, `k` coprime
+-- `|G|`), `∏_{x∈A} χ(x)` is a rational integer (algebraic integer fixed by all `σ`, via (1.9)
+-- `σ(χ x)=χ(x^k)` + reindex).  Its nowhere-zero form gives `∏_{x∈A} ‖χ(x)‖² ≥ 1` (field-norm `≥ 1`).
+#assert_only_allowed_axioms OddOrder.Algebra.exists_int_prod_character_of_cyclicClosed
+#assert_only_allowed_axioms OddOrder.Algebra.one_le_prod_normSq_character_of_cyclicClosed
 -- Pf (12.4) pin (b) step 1: general TI-induction self-value — for a TI subset `A` rel. `L` and an
 -- `A`-supported class function `α`, `Ind_L^G α` agrees with `α` on `A`.  Generalizes the TI-cyclic
 -- `induce_apply_eq_self_of_mem_V` to arbitrary TI subsets (the value-half of "Dade map = Ind").

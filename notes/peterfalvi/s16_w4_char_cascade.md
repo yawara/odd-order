@@ -1014,3 +1014,69 @@ ungated path として (13.10.3) disjoint-union counting (`|G|=1+|G0|+|(H#)^G|+|
 **注意**: (13.10.3) は (13.10) の 4 入力 (h1/h2/h3/h139b) の 1 つ、かつ §8 TI (sorried
 H_sharp_isTISubset) を cite。h1/h2/h139b は別途 gated ゆえ (13.10) endpoint は unblock せず。
 [[scaffold-sorry-free-not-done]]
+
+### cont.³⁴ (2026-07-01 lane c=γ 再開): 🔀 cont.³³ orbit-count は既存 `ncard_conjClassSet_of_isTISubset` の重複と判明 → [Is] 3.14 ANT core を sorry-free landing
+
+**cont.³³ の方向 (「残 = orbit cardinality `|(H#)^G|=|H#|·[G:S]` を TISubset.lean で multi-piece
+build」) は既存定理の重複再構築と判明**。`OddOrder/BG/Ch4_FamilyOfMaximal/S14_TypePCounting.lean:6200`
+の **`ncard_conjClassSet_of_isTISubset` (sorry-free, allowlist 登録) が `|𝒞_G(A)| = |A|·[G:L]`
+(TI-subset A, L-stab) を既に完全証明済**。cont.⁶/⁹ で「在庫」と明記されていたのを cont.³³ が見落とし。
+TISubset.lean の 2 heart lemma (`mem_of_conj_mem_conj`/`conj_disjoint_of_ratio_not_mem`) は generic
+reusable ゆえ残置 (害なし、既 commit 済)。[[verify-port-state-by-number-not-coq-name]]
+[[s09-is-section7-chirho-complete]]
+
+**軌道修正 = cont.³² が挙げた本来の ungated 候補「[Is] 3.14 Galois 半」を engage** (χ(a^k) は χ(a)
+の Galois 共役ゆえ `∏_k|χ(a^k)|²=|N(χ(a))|²≥1`、非零代数的整数の場) — その **ANT 核心を sorry-free
+landing** (新 leaf `OddOrder/Algebra/GaloisRationalInteger.lean`、commit `35c88da5`、full build 3890
+green、全 axiom-clean 3 axioms):
+- **`exists_int_of_isIntegral_of_forall_complexRingEquiv_fixed`** (核心): 代数的整数 α:ℂ が全
+  σ:ℂ≃+*ℂ で不変なら有理整数 (∃ z:ℤ, z=α)。証明 = splitting field K=ℚ(rootSet (minpoly ℚ α))
+  (有限 Galois、`adjoin_rootSet_isSplittingField`+`Normal.of_isSplittingField`+char0 で
+  `IsGalois`) 内で **`IsGalois.mem_bot_iff_fixed`** (全 K-自己同型で fixed ⟹ mem ⊥=ℚ) を適用し、
+  各 σ_K を repo `exists_complexRingEquiv_extends` で ℂ へ持ち上げて hfix 発火。ℚ 化後は ℤ の
+  integrally-closed (`IsIntegrallyClosed.isIntegral_iff`) で有理代数的整数 ⟹ ℤ。
+  ⚠ ℂ/ℚ は非代数的ゆえ `isConjRoot_iff_exists_algEquiv` を ℂ に直接使えない (Normal ℚ ℂ 偽) →
+  splitting field 内で Galois を使うのが正道。
+- **`exists_pow_of_complexRingEquiv`**: 任意の σ:ℂ≃+*ℂ は n乗根に一様冪 (·^k) (k coprime n) で作用
+  (repo `exists_complexRingEquiv_pow_of_rootsOfUnity` の逆向き)。primitive root μ↦μ^k
+  (`map_of_injective`+`eq_pow_of_pow_eq_one`+`pow_iff_coprime`) から。
+- helper `exists_int_of_isIntegral_of_mem_range_rat` (有理な代数的整数 ⟹ 有理整数)。
+
+**次 = character 接続** (multi-iteration): `P := ∏_{k coprime m} φ(a^k)` (m=orderOf a) が全 σ で不変
+⟹ 有理整数 ⟹ `1≤‖P‖²`。部品:
+1. **P 不変**: `map_character_eq_character_pow` ((1.9)、σ(χ g)=χ(g^k)) + `exists_pow_of_complexRingEquiv`
+   で σ(P)=∏φ(a^{ik})、units 上 k-乗 reindex bijection (k coprime m) で =P。
+2. **P 代数的整数**: `character_isIntegral` (ClassSumAlgebra:1201) + `IsIntegral.prod`。
+3. **‖P‖²=∏‖φ(a^k)‖²**: `character_inv` (χ(g⁻¹)=conj χ(g)) + conj 積の乗法性 (P real も従う)。
+4. → cyclic-class 分割 → `sum_ge_card_of_one_le_prod` ([Is]3.14 AM-GM 核、既 landing) で
+   `∑_{x∈A}‖φ(x)‖²≥|A|` (cyclic-closed A, φ≠0) → **(13.9.b) `g0≤slam+seta`** (`global_character_bound`
+   S15_SAndT_Setup:1180 の sorry を discharge、`analytic_inequality_arith` の h139b 入力)。
+これで (13.9.b) が ungated に閉じる (h1/h2/h3 の §8-TI gate とは独立)。[[feedback-no-avoiding-hard-parts]]
+[[scaffold-sorry-free-not-done]] [[feedback-quick-win-not-a-criterion]]
+
+### cont.³⁵ (2026-07-01 lane c=γ): [Is] 3.14 character bridge 完成 + issue 0092 再配分の handoff
+
+**[Is] 3.14 ANT infra 完成** (`OddOrder/Algebra/GaloisRationalInteger.lean`, commits `35c88da5`+`a6a532c7`、
+全 sorry-free/axiom-clean 3 axioms、full build 3890 green)。5 補題:
+1. `exists_int_of_isIntegral_of_mem_range_rat` (有理な代数的整数 ⟹ ℤ)。
+2. `exists_int_of_isIntegral_of_forall_complexRingEquiv_fixed` (ANT 核心: 全 σ 不変な代数的整数 ⟹ 有理整数)。
+3. `exists_pow_of_complexRingEquiv` (σ:ℂ≃+*ℂ は n乗根に一様冪 ·^k, k coprime n)。
+4. `exists_int_prod_character_of_cyclicClosed` (cyclic-closed A で ∏_{x∈A}φ(x) は有理整数)。
+5. **`one_le_prod_normSq_character_of_cyclicClosed`** ([Is] 3.14 product form: φ≠0 on A ⟹ `1≤∏‖φ(x)‖²`)。
+
+**⚠ issue 0092 再配分 (2026-07-01 ユーザー裁定)**: `S15_SAndT_Setup.lean` は **lane d 所有**に移管
+(γ import 最上流の 16 sorry を lane d が upstream-first で埋める)。**lane c は編集停止**、下流
+(`S15_SAndT.lean` 13.16/13.17 + `S16_NonExistenceG.lean` orthogonality_switch 14.14/exists_MHypothesis
+14.10/betaM_expansion 14.11.2/T_typeII 14.9) を保持。∴ (13.9.b) `global_character_bound`
+(S15_SAndT_Setup:1180) の wiring は **lane d の担当**。
+
+**🤝 lane d への handoff (重複再構築防止 — cont.³³ 教訓)**: (13.9.b) を埋める際、[Is] 3.14 の
+field-norm≥1 は上記 shared leaf `OddOrder.Algebra.one_le_prod_normSq_character_of_cyclicClosed`
+(`1≤∏_{x∈A}‖φ(x)‖²`, cyclic-closed A + φ≠0) を **cite せよ (再構築するな)**。残 = (a) G₀ が
+cyclic-closed (∀x∈G₀ ∀k coprime |G|, x^k∈G₀ — G₀=G#−orbits は同じ cyclic 生成ゆえ真) の確認、
+(b) 各 character (λ^{τ1}/η10) の φ≠0 (= (13.9.a) cover)、(c) `sum_ge_card_of_one_le_prod`
+(S15_SAndT_Setup:1201、AM-GM、既 landing) で `∏‖φ‖²≥1 ⟹ ∑_{x∈G₀}‖φ‖²≥|G₀|`。(a)+(c) は ungated、
+(b) は cover (13.9.a) = §13 char。
+
+**lane c 次手** = 保持下流の deep char (S15_SAndT 13.16/13.17 or S16 orthogonality_switch 14.14)。
+[[scaffold-sorry-free-not-done]] [[s09-is-section7-chirho-complete]] [[feedback-cite-sorried-lemmas-if-signature-correct]]
