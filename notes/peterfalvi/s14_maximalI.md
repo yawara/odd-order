@@ -1244,3 +1244,24 @@ assembly にする (hB=hard floor を明示 isolate)。次: ε/hε + 基数 (eas
 
 **(12.16) の lane b 成果は temporal に一段落** (ψ/he/hM real、残 field は §7 unblock 待ち or deep)。
 次イテレーション = (7.7.a) chiRho_decomp の standalone 証明に着手 (新ファイル)。
+
+### loop⁴⁹ (2026-07-01 lane-b resume²): §7 完了 → §12 char frontier map + 次標的確定
+
+**§7 certificate discharge 完了** (hzeta0nu + witness_L_zeta_bound、commit 58de8be2/285232d7)。
+lane-b frontier を §12 char 残 sorry に移す。**frontier map (全 gate 調査済)**:
+- **12.11** intersection_complement_structure: **(8.13.c1)** [absent, "L=L_F⋊(M∩L)"] gated。
+- **12.12** complement_cyclic_order_dvd: 12.10/12.11 + T=Ω₁(Z(O_p(H))) p-group 構成 gated
+  (rep-theory core=my p+1 は済)。
+- **12.14** psi_constant_on_xK: **CharacterDecompositionData** (M-side) 経由 (12.3 proven+12.4 proven
+  で ψ⊥R(χ_M)→constant on xK)。CharacterDecompositionData は **typeI_induced_char_constituents (12.2.a)**
+  producer 不在で gated。
+- **12.15** rhoM_integer_values: **rhoMFormula opaque Prop** (faithful 化要) + ρ_M。
+- **12.2.a** typeI_induced_char_constituents: 一般 type-I は **(8.2.c)** [I(θ)∩U⊆U₁, §8 型 F inertia]
+  gated。**ただし Frobenius L (witness=12.10, 相当 consumer) では χ=Ind θ が既約 ⟹ 構成要素は自明
+  (単一 = χ 自身)**、非実=奇位数 (`not_isReal_of_ne_trivial_of_odd_card'`, 済ツール)、
+  support=K normal ゆえ Ind は K 外で消える → K^# ⊆ supportInSubgroup (mem_supportInSubgroup_sharp_subgroupOf_iff)。
+
+**⭐ 次標的 = `frobenius_characterDecompositionData` (Frobenius 版 12.2.a producer)**: 
+`(hyp)(hfrob: IsFrobeniusGroup ↥L K C)(χ∈Sset) → CharacterDecompositionData hyp χ`。5 field 全て
+Frobenius+奇位数で構成可能 ((8.2.c) 不要)。これで witness-L の (12.3)/(12.4) 応用 (→ψ⊥R(χ)→coset
+constant) が unblock、12.14 の witness-side path が開通。一般 type-I (非 Frobenius) の (8.2.c) は別 gate。
