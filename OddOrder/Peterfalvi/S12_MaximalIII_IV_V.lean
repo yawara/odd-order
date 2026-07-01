@@ -3144,30 +3144,37 @@ theorem w2_prime_and_parameter_independence [Finite G]
   obtain ⟨params, -, h2⟩ := hyp.exists_charParameters hG
   exact ⟨params, hyp.w2_prime hG, h2⟩
 
-/-- **`ζ` is non-real (`ζ̄ ≠ ζ`)** — the `hzconj` input to the (10.6.b) Dade-value lemmas, **directly
-from Peterfalvi (1.1)**.  The degree-`w₁` `ζ` is a *nontrivial* (degree `w₁ > 1`) irreducible
-character of the *odd-order* group `M`, so by `not_isReal_of_ne_trivial_of_odd_card'`
-(the only self-conjugate irreducible of an odd group is the trivial one) `ζ` is not real, i.e.
-`ζ.conj ≠ ζ`.  No induced-character / orbit argument is needed — `ζ` itself being a nontrivial
-odd-group irreducible suffices.  Takes `hz1 : ζ(1) = w₁` (one of the (10.6.b) conditions, supplied by
-`exists_charParameters`) to witness `ζ ≠ 1_M`. -/
-theorem Hypothesis.zeta_conj_ne [Finite G]
+/-- **Every degree-`w₁` irreducible of `M` is non-real (`χ̄ ≠ χ`), Peterfalvi (1.1)**.  A degree-`w₁`
+irreducible character `χ` of the *odd-order* group `M` is *nontrivial* (`χ(1) = w₁ > 1`), so by
+`not_isReal_of_ne_trivial_of_odd_card'` (the only self-conjugate irreducible of an odd group is the
+trivial one) `χ` is not real, i.e. `χ.conj ≠ χ`.  No induced-character / orbit argument is needed.
+This is the general form feeding both `zeta_conj_ne` and the `S(HC)` `τ₁`-vanishing arguments (each
+`S(HC)` member `λ` — a degree-`w₁` irreducible — is non-real, so `λ^{τ₁}` vanishes on `V`). -/
+theorem Hypothesis.inducedFamily_degree_w1_conj_ne [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} (hyp : Hypothesis M)
-    {params : CharacterParameters hyp} (hz1 : params.zeta 1 = (hyp.w1 : ℂ)) :
-    (params.zeta).conj ≠ params.zeta := by
+    {χ : ClassFunction ↥M ℂ} (hχirr : IsIrreducibleCharacter χ) (hχ1 : χ 1 = (hyp.w1 : ℂ)) :
+    χ.conj ≠ χ := by
   haveI := hyp.finiteG
   have hModd : Odd (Nat.card ↥M) := hG.odd.of_dvd_nat (Subgroup.card_subgroup_dvd_card M)
   have hw1 : 1 < hyp.w1 := (Subgroup.one_lt_card_iff_ne_bot _).mpr hyp.typeP.W1_nontrivial
-  have hne : (⟨params.zeta, params.zeta_irreducible⟩ : IrreducibleCharacter ↥M)
-      ≠ trivialIrreducibleCharacter ↥M := by
+  have hne : (⟨χ, hχirr⟩ : IrreducibleCharacter ↥M) ≠ trivialIrreducibleCharacter ↥M := by
     intro h
-    have hz : params.zeta 1 = (1 : ℂ) := by
+    have hz : χ 1 = (1 : ℂ) := by
       have hcoe := congrArg (fun c : IrreducibleCharacter ↥M => (c : ClassFunction ↥M ℂ) 1) h
       simpa using hcoe
-    rw [hz1] at hz
+    rw [hχ1] at hz
     have : hyp.w1 = 1 := by exact_mod_cast hz
     omega
   exact OddOrder.RepresentationTheory.not_isReal_of_ne_trivial_of_odd_card' hModd hne
+
+/-- **`ζ` is non-real (`ζ̄ ≠ ζ`)** — the `hzconj` input to the (10.6.b) Dade-value lemmas, **directly
+from Peterfalvi (1.1)**.  Thin `CharacterParameters` specialisation of
+`inducedFamily_degree_w1_conj_ne` at `χ = params.zeta`. -/
+theorem Hypothesis.zeta_conj_ne [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} (hyp : Hypothesis M)
+    {params : CharacterParameters hyp} (hz1 : params.zeta 1 = (hyp.w1 : ℂ)) :
+    (params.zeta).conj ≠ params.zeta :=
+  hyp.inducedFamily_degree_w1_conj_ne hG params.zeta_irreducible hz1
 
 /-- **Parameter package with all (10.6.b) hypotheses** (the `tau1_values_and_norm_bound` /
 `zeta_tau1_norm_ge_one` inputs).  Strengthens `exists_charParameters` to also expose the seven
@@ -7369,6 +7376,20 @@ theorem Hypothesis.SHC_tau1_zeta_vanishes_on_typePV [Finite G] {M : Subgroup G}
   have hs1 : ClassFunction.inner (tic.chiFam hVeq app (a', b')) (tic.chiFam hVeq app (a', b')) = 1 := by
     rw [(tic.chiFam_spec hVeq app).2.2.1, if_pos rfl]
   exact inner_left_eq_zero_of_inner_sub_eq_zero haZ hsZ ha1 hb1 hs1 hab hdiff
+
+open scoped FiniteInduce in
+/-- **`S(HC)` `τ₁`-image vanishes on `V`** for any degree-`w₁` irreducible `χ ∈ inducedFamily M`.
+The non-reality hypothesis `χ̄ ≠ χ` of `SHC_tau1_zeta_vanishes_on_typePV` is discharged via
+`inducedFamily_degree_w1_conj_ne` (Peterfalvi (1.1)), so this needs only `χ ∈ S(HC)`.  Used to vanish
+the `∑_{λ∈S₁} λ^{τ₁}` correction of the (11.8.2) residual `X = α^τ + nζ^{τ₁} − a∑λ^{τ₁}` on `V` in
+the general `a ∈ {0, 2}` case. -/
+theorem Hypothesis.SHC_extension_vanishes_on_typePV [Finite G] {M : Subgroup G}
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis M) (hodd : Odd (Nat.card G))
+    {χ : ClassFunction ↥M ℂ} (hχS : χ ∈ inducedFamily M) (hχirr : IsIrreducibleCharacter χ)
+    (hχ1 : χ 1 = (hyp.w1 : ℂ)) {v : G} (hv : v ∈ typePV M hyp.typeP) :
+    (hyp.SHC_isCoherent hG).extension χ v = 0 :=
+  hyp.SHC_tau1_zeta_vanishes_on_typePV hG hodd hχS hχirr hχ1
+    (hyp.inducedFamily_degree_w1_conj_ne hG hχirr hχ1) hv
 
 open scoped FiniteInduce in
 /-- **Peterfalvi (10.5), `ψ = X − δ(ω^σ diff)` vanishes on `V`, S(HC)-coherent version** (`a = 0`
