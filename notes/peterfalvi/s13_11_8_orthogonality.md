@@ -815,3 +815,19 @@ general-a 注意) が要 → `SHC_extension_vanishes_on_typePV` (∀λ∈S(HC), 
 trichotomy → Y=δ(ω^σ diff)。⚠ residual_norm を Y∈ZIrr + 分解式露出に拡張要 (exists_intProjection 直呼び)。
 または (11.8.3) β real (document-order 次、(4.8)/(4.10)/(5.9) cite) を先行も可。
 (11.8) closure は依然 doubly-gated (§9↔§10 の (11.8.1)、§14 の (11.8.6))。
+
+## 2026-07-02 cont.⁴⁵ (lane-a) — **一般 (11.8.2) X=ω^σ diff (a∈{0,2}) LANDED — (11.8.2) 完成**
+3-part refactor+payoff (leaf green 3850 jobs, all sorry-free):
+1. **root lemma 拡張** `inner_self_eq_sum_sq_add_of_intProjection` (S12): 結論に `φ=∑c•α+Y ∧ Y∈ZIrr` 追加
+   (hdecomp は exists_intProjection が既に供給; Y∈ZIrr = φ−∑(c•α), `Int.cast_smul_eq_zsmul`+`zsmul_mem`)。
+2. **`residual_norm` 拡張** (S12): 結論に `Y∈ZIrr ∧ (∀v∈typePV, Y v = α^τ v)` 追加。hYV = hdecomp で Y=α^τ−∑c•β,
+   各 β=SHC.ext λ (hRrev) が V で消える (`SHC_extension_vanishes_on_typePV` cont.⁴⁴) → ∑c•β(v)=0 →
+   Y v=α^τ v。`ClassFunction.finset_sum_apply` で sum-apply。proj_a_mem の destructure も +2 更新。
+3. **`SHC_residual_eq_omegaSigma_diff`** (S12:7875, **payoff**): residual_norm から a,Y 取得 → a∈{0,2} で
+   ψ=Y−δ(ω^σ diff) が V で消える (hYV + `tau_muGridAlpha_apply_eq_on_typePV`) → trichotomy
+   `eq_smul_chiFam_diff_of_vanishOnV` → **Y=δ(ω_{ij}^σ−ω_{i0}^σ)**。**一発 green**。
+
+**意義**: (11.8.2) の residual characterization が a∈{0,2} 一般で完成 (a=0 は cont.⁴³ の
+`SHC_tau_muGridAlpha_eq` = full identity、本 cont.⁴⁵ は a∈{0,2} で Y=ω^σ diff)。**次 = (11.8.5) a=0**:
+本 Y=ω^σ diff + β 定義 (β=α^τ−(ω^σ diff)+nζ^{τ₁}) ⟹ β=a∑λ^{τ₁} → `SHC_extension_inner_alignedOmegaSigma_eq_zero`
+(5.3.b) で a=0。あるいは (11.8.3) β real 先行。(11.8) closure は依然 doubly-gated (§9↔§10、§14)。

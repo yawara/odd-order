@@ -7678,25 +7678,31 @@ theorem inner_self_eq_sum_sq_add_of_intProjection [Finite G] {φ : ClassFunction
     ∃ (c : ClassFunction G ℂ → ℤ) (Y : ClassFunction G ℂ),
       (∀ α ∈ R, ClassFunction.inner φ α = (c α : ℂ)) ∧
       ClassFunction.inner φ φ = (∑ α ∈ R, (c α : ℂ) ^ 2) + ClassFunction.inner Y Y ∧
-      (∀ α ∈ R, ClassFunction.inner Y α = 0) := by
+      (∀ α ∈ R, ClassFunction.inner Y α = 0) ∧
+      φ = (∑ α ∈ R, (c α : ℂ) • α) + Y ∧ Y ∈ ZIrr G := by
   obtain ⟨c, Y, hcoeff, hdecomp, hYorth⟩ :=
     OddOrder.RepresentationTheory.ClassFunction.exists_intProjection_of_orthonormal_ZIrr hφ hZ horth
-  refine ⟨c, Y, hcoeff, ?_, hYorth⟩
-  have hXY : ClassFunction.inner (∑ α ∈ R, (c α : ℂ) • α) Y = 0 := by
-    rw [inner_sum_left]
-    refine Finset.sum_eq_zero fun a ha => ?_
-    rw [ClassFunction.inner_smul_left]
-    have haY : ClassFunction.inner a Y = 0 := by
-      rw [inner_conj_symm Y a, hYorth a ha, star_zero]
-    rw [haY, mul_zero]
-  have hYX : ClassFunction.inner Y (∑ α ∈ R, (c α : ℂ) • α) = 0 := by
-    rw [inner_sum_right]
-    refine Finset.sum_eq_zero fun a ha => ?_
-    rw [OddOrder.RepresentationTheory.inner_smul_right, hYorth a ha, mul_zero]
-  conv_lhs => rw [hdecomp]
-  rw [ClassFunction.inner_add_left, ClassFunction.inner_add_right, ClassFunction.inner_add_right,
-    inner_self_orthonormalSum_eq_sum_sq horth, hXY, hYX]
-  ring
+  refine ⟨c, Y, hcoeff, ?_, hYorth, hdecomp, ?_⟩
+  · have hXY : ClassFunction.inner (∑ α ∈ R, (c α : ℂ) • α) Y = 0 := by
+      rw [inner_sum_left]
+      refine Finset.sum_eq_zero fun a ha => ?_
+      rw [ClassFunction.inner_smul_left]
+      have haY : ClassFunction.inner a Y = 0 := by
+        rw [inner_conj_symm Y a, hYorth a ha, star_zero]
+      rw [haY, mul_zero]
+    have hYX : ClassFunction.inner Y (∑ α ∈ R, (c α : ℂ) • α) = 0 := by
+      rw [inner_sum_right]
+      refine Finset.sum_eq_zero fun a ha => ?_
+      rw [OddOrder.RepresentationTheory.inner_smul_right, hYorth a ha, mul_zero]
+    conv_lhs => rw [hdecomp]
+    rw [ClassFunction.inner_add_left, ClassFunction.inner_add_right, ClassFunction.inner_add_right,
+      inner_self_orthonormalSum_eq_sum_sq horth, hXY, hYX]
+    ring
+  · have hsumZ : (∑ α ∈ R, (c α : ℂ) • α) ∈ ZIrr G :=
+      Submodule.sum_mem _ fun α hα => by
+        rw [Int.cast_smul_eq_zsmul]; exact zsmul_mem (hZ α hα) _
+    have hYeq : Y = φ - (∑ α ∈ R, (c α : ℂ) • α) := by rw [hdecomp]; abel
+    rw [hYeq]; exact Submodule.sub_mem _ hφ hsumZ
 
 open scoped Classical in
 /-- **Sum of squares with one distinguished coefficient.**  If `e ∈ R`, `f e = x`, and `f β = y` for
@@ -7769,11 +7775,15 @@ theorem Hypothesis.muGridAlpha_tau_residual_norm [Finite G] {M : Subgroup G}
         ((hyp.SHC_isCoherent hG).extension ζ) = (a : ℂ) - (n : ℂ) ∧
       ClassFunction.inner Y Y
         = (2 : ℂ) + (n : ℂ) ^ 2 - (((a : ℂ) - (n : ℂ)) ^ 2 + ((n : ℂ) - 1) * (a : ℂ) ^ 2) ∧
-      ((a = 0 ∨ a = 2) → ClassFunction.inner Y Y = 2) := by
+      ((a = 0 ∨ a = 2) → ClassFunction.inner Y Y = 2) ∧
+      Y ∈ ZIrr G ∧
+      (∀ v ∈ typePV M hyp.typeP,
+        Y v = hyp.tau
+          (hyp.muGrid hG hodd i j - (δ : ℂ) • hyp.muGrid hG hodd i 0 - (n : ℂ) • ζ) v) := by
   classical
   have hζR : (hyp.SHC_isCoherent hG).extension ζ ∈ R := hRmem ζ hζS hζirr hζ1
   have hαZ := hyp.muGridAlpha_tau_mem_ZIrr hG hodd i hj0 hζS hζirr hdeg hμ0 hζ1 hnf hδj
-  obtain ⟨c, Y, hcoeff, hnorm, hYorth⟩ :=
+  obtain ⟨c, Y, hcoeff, hnorm, hYorth, hdecomp, hYZ⟩ :=
     inner_self_eq_sum_sq_add_of_intProjection hαZ hZ horth
   set a : ℤ := c ((hyp.SHC_isCoherent hG).extension ζ) + (n : ℤ) with hadef
   have hcζ : c ((hyp.SHC_isCoherent hG).extension ζ) = a - (n : ℤ) := by rw [hadef]; ring
@@ -7803,7 +7813,21 @@ theorem Hypothesis.muGridAlpha_tau_residual_norm [Finite G] {M : Subgroup G}
       linear_combination -hnorm
     have hfinal : (n : ℤ) * (a ^ 2 - 2 * a) ≤ 2 := by nlinarith [hineq]
     exact charParam_a_mem_of_norm_ineq hn2 hfinal
-  refine ⟨a, Y, hbound, hYorth, ?_, hnormY, ?_⟩
+  have hYV : ∀ v ∈ typePV M hyp.typeP,
+      Y v = hyp.tau
+        (hyp.muGrid hG hodd i j - (δ : ℂ) • hyp.muGrid hG hodd i 0 - (n : ℂ) • ζ) v := by
+    intro v hv
+    have hsumv : (∑ β ∈ R, (c β : ℂ) • β) v = 0 := by
+      rw [ClassFunction.finset_sum_apply]
+      refine Finset.sum_eq_zero fun β hβR => ?_
+      obtain ⟨φ, hφS, hφirr, hφ1, rfl⟩ := hRrev β hβR
+      rw [ClassFunction.smul_apply,
+        hyp.SHC_extension_vanishes_on_typePV hG hodd hφS hφirr hφ1 hv, mul_zero]
+    have hYeq : Y = hyp.tau
+        (hyp.muGrid hG hodd i j - (δ : ℂ) • hyp.muGrid hG hodd i 0 - (n : ℂ) • ζ)
+        - (∑ β ∈ R, (c β : ℂ) • β) := by rw [hdecomp]; abel
+    rw [hYeq, ClassFunction.sub_apply, hsumv, sub_zero]
+  refine ⟨a, Y, hbound, hYorth, ?_, hnormY, ?_, hYZ, hYV⟩
   · rw [hcoeff _ hζR, hcζ]; push_cast; ring
   · intro ha02
     rw [hnormY]
@@ -7832,9 +7856,69 @@ theorem Hypothesis.muGridAlpha_tau_proj_a_mem [Finite G] {M : Subgroup G}
       ClassFunction.inner
         (hyp.tau (hyp.muGrid hG hodd i j - (δ : ℂ) • hyp.muGrid hG hodd i 0 - (n : ℂ) • ζ))
         ((hyp.SHC_isCoherent hG).extension ζ) = (a : ℂ) - (n : ℂ) := by
-  obtain ⟨a, _, ha, _, hinner, _, _⟩ := hyp.muGridAlpha_tau_residual_norm hG hodd i hj0 hζS hζirr
-    hζ1 hdeg hμ0 hnf hδj hdζ h0ζ hδpm hn2 hRn hZ horth hRmem hRrev
+  obtain ⟨a, _, ha, _, hinner, _, _, _, _⟩ := hyp.muGridAlpha_tau_residual_norm hG hodd i hj0 hζS
+    hζirr hζ1 hdeg hμ0 hnf hδj hdζ h0ζ hδpm hn2 hRn hZ horth hRmem hRrev
   exact ⟨a, ha, hinner⟩
+
+open scoped Classical FiniteInduce in
+/-- **Peterfalvi (11.8.2), the residual is a `σ`-grid difference** (general `a ∈ {0, 2}` case):
+the residual `X = α_{ij}^τ + n·ζ^{τ₁} − a·∑_{λ∈S₁} λ^{τ₁}` (`= Y`, the `S₁^{τ₁}`-orthogonal Parseval
+remainder) equals `δ·(ω_{ij}^σ − ω_{i0}^σ)` when `a ∈ {0, 2}` (`‖X‖² = 2`).
+
+Feeds the (11.8.5) `a = 0` argument (`β = a·∑λ^{τ₁}` then (5.3.b)).  From
+`muGridAlpha_tau_residual_norm` the residual `Y` satisfies `‖Y‖² = 2` (for `a ∈ {0, 2}`),
+`Y ∈ ℤ[Irr G]`, and — crucially — `Y = α_{ij}^τ` on `V` (the `∑λ^{τ₁}` correction vanishes there, each
+`λ ∈ S(HC)` being a non-real degree-`w₁` irreducible, `SHC_extension_vanishes_on_typePV`).  Then
+`ψ = Y − δ(ω^σ diff)` vanishes on `V` (with the value-on-`V` leg `tau_muGridAlpha_apply_eq_on_typePV`,
+`α^τ = δ(ω^σ diff)` there), so the norm-`2` Dade-image trichotomy `eq_smul_chiFam_diff_of_vanishOnV`
+forces `Y = δ(ω_{ij}^σ − ω_{i0}^σ)`. -/
+theorem Hypothesis.SHC_residual_eq_omegaSigma_diff [Finite G] {M : Subgroup G}
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis M) (hodd : Odd (Nat.card G))
+    (i : Fin hyp.w1) {j : Fin hyp.w2} (hj0 : j ≠ 0)
+    {ζ : ClassFunction ↥M ℂ} (hζS : ζ ∈ inducedFamily M) (hζirr : IsIrreducibleCharacter ζ)
+    (hζ1 : ζ 1 = (hyp.w1 : ℂ)) {d : ℕ} {δ : ℤ} {n : ℕ}
+    (hdeg : hyp.muGrid hG hodd i j 1 = (d : ℂ)) (hμ0 : hyp.muGrid hG hodd i 0 1 = 1)
+    (hnf : (n : ℤ) * (hyp.w1 : ℤ) = (d : ℤ) - δ) (hδj : hyp.muColumnSign hG hodd j = δ)
+    (hdζ : hyp.muGrid hG hodd i j 1 ≠ ζ 1) (h0ζ : hyp.muGrid hG hodd i 0 1 ≠ ζ 1)
+    (hδpm : δ = 1 ∨ δ = -1) (hn2 : 2 ≤ n)
+    {R : Finset (ClassFunction G ℂ)} (hRn : R.card = n)
+    (hZ : ∀ β ∈ R, β ∈ ZIrr G)
+    (horth : ∀ α ∈ R, ∀ β ∈ R, ClassFunction.inner α β = if α = β then (1 : ℂ) else 0)
+    (hRmem : ∀ φ : ClassFunction ↥M ℂ, φ ∈ inducedFamily M → IsIrreducibleCharacter φ →
+      φ 1 = (hyp.w1 : ℂ) → (hyp.SHC_isCoherent hG).extension φ ∈ R)
+    (hRrev : ∀ β ∈ R, ∃ φ : ClassFunction ↥M ℂ, φ ∈ inducedFamily M ∧ IsIrreducibleCharacter φ ∧
+      φ 1 = (hyp.w1 : ℂ) ∧ β = (hyp.SHC_isCoherent hG).extension φ) :
+    ∃ (a : ℤ) (Y : ClassFunction G ℂ),
+      (a = 0 ∨ a = 1 ∨ a = 2) ∧
+      ClassFunction.inner
+        (hyp.tau (hyp.muGrid hG hodd i j - (δ : ℂ) • hyp.muGrid hG hodd i 0 - (n : ℂ) • ζ))
+        ((hyp.SHC_isCoherent hG).extension ζ) = (a : ℂ) - (n : ℂ) ∧
+      ((a = 0 ∨ a = 2) → Y = (δ : ℂ) • (hyp.alignedOmegaSigmaGrid hG hodd i j
+          - hyp.alignedOmegaSigmaGrid hG hodd i 0)) := by
+  obtain ⟨a, Y, hbound, hYorth, hinner, hnorm, hnorm2case, hYZ, hYV⟩ :=
+    hyp.muGridAlpha_tau_residual_norm hG hodd i hj0 hζS hζirr hζ1 hdeg hμ0 hnf hδj hdζ h0ζ hδpm hn2
+      hRn hZ horth hRmem hRrev
+  refine ⟨a, Y, hbound, hinner, ?_⟩
+  intro ha02
+  haveI := hyp.finiteG
+  classical
+  obtain ⟨P, hPinj, hP⟩ := hyp.exists_alignedOmegaSigmaGrid_chiFam_family hG hodd i
+  let tic := typePData_toTICyclicHypothesis hyp.typeP hodd
+  haveI : NeZero (Nat.card ↥tic.W1) := ⟨Nat.card_pos.ne'⟩
+  haveI : NeZero (Nat.card ↥tic.W2) := ⟨Nat.card_pos.ne'⟩
+  let app := hyp.canonicalFullDadeApp hG hodd
+  have hVeq : tic.V = tic.Vdiff := rfl
+  have hPne : P j ≠ P 0 := fun h => hj0 (hPinj h)
+  have hPj' : tic.chiFam hVeq app (P j) = hyp.alignedOmegaSigmaGrid hG hodd i j := (hP j).symm
+  have hP0' : tic.chiFam hVeq app (P 0) = hyp.alignedOmegaSigmaGrid hG hodd i 0 := (hP 0).symm
+  have hψV : ∀ v ∈ tic.V,
+      (Y - (δ : ℂ) • (tic.chiFam hVeq app (P j) - tic.chiFam hVeq app (P 0))) v = 0 := by
+    intro v hv
+    rw [hPj', hP0']
+    have hleg := hyp.tau_muGridAlpha_apply_eq_on_typePV hG hodd hj0 hζS hdeg hμ0 hζ1 hnf hδj hv
+    rw [ClassFunction.sub_apply, hYV v hv, hleg, sub_self]
+  rw [← hPj', ← hP0']
+  exact tic.eq_smul_chiFam_diff_of_vanishOnV hVeq app hYZ (hnorm2case ha02) hPne hδpm hψV
 
 open scoped FiniteInduce in
 /-- **Peterfalvi (11.8), the genuine non-orthogonality** (lane-b W3 obligation, issue 2020).
