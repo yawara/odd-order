@@ -380,6 +380,26 @@ theorem typeF_inertia_inf_le_U1 {Γ : Type*} [Group Γ] [Finite Γ]
     exact ClassFunction.mem_inertia.mp hgI
   exact hθ (fixed_irreducible_eq_trivial_of_card_fixedClasses_eq_one g hcard1 hfixθ)
 
+/-- **Companion to Peterfalvi (8.2.c): the inertia-complement `I(θ) ∩ U` is abelian.**  For a
+nontrivial `θ ∈ Irr H` in a type-`F` group, (8.2.c) (`typeF_inertia_inf_le_U1`) puts `I(θ) ∩ U`
+inside `U₁`, which is abelian (`TypeFData.U1_commutative`); a subgroup of an abelian group is abelian
+(`isMulCommutative_of_le`).  Since `H ⊴ Γ` gives `H ≤ I(θ)` and (by the Dedekind modular law in the
+coprime factorization `Γ = H U`) `I(θ) = H · (I(θ) ∩ U)`, this is exactly the statement that the
+inertia quotient `I(θ)/H` is abelian — the precondition that makes `Ind_H^L θ` multiplicity-free with
+equal-degree constituents (Pf (1.7)), feeding the general type-I (12.2.a)
+`typeI_induced_char_constituents`. -/
+theorem typeF_inertia_inf_U_isMulCommutative {Γ : Type*} [Group Γ] [Finite Γ]
+    {H U U1 : Subgroup Γ} [H.Normal]
+    (hUHcop : Nat.Coprime (Nat.card ↥U) (Nat.card ↥H))
+    (hcent : ∀ x ∈ H, x ≠ 1 → U ⊓ Subgroup.centralizer ({x} : Set Γ) ≤ U1)
+    (hU1comm : IsMulCommutative ↥U1)
+    (θ : IrreducibleCharacter ↥H) (hθ : θ ≠ trivialIrreducibleCharacter ↥H) :
+    IsMulCommutative ↥(ClassFunction.inertia (θ : ClassFunction ↥H ℂ) ⊓ U) := by
+  have hle := typeF_inertia_inf_le_U1 hUHcop hcent θ hθ
+  refine IsMulCommutative.of_comm (fun a b => Subtype.ext ?_)
+  have hcomm := (isMulCommutative_iff.mp hU1comm) ⟨(a : Γ), hle a.2⟩ ⟨(b : Γ), hle b.2⟩
+  simpa [Subgroup.coe_mul] using congrArg Subtype.val hcomm
+
 /-- **Type-`F` induced-character constituent structure** (Peterfalvi (8.2.c) + (1.2)/(1.5.a) +
 (1.7.c) + Clifford; a faithful §8 obligation — the deep content is type-`F` character theory living
 in §8, not §12).  For a type-I maximal `L` and `χ = Ind_H^L θ ∈ S` (`θ ∈ Irr H ∖ {1}`), `χ` is the
