@@ -8121,6 +8121,24 @@ theorem Hypothesis.R_sum_inner_zeroColumnOmegaSigma_sum [Finite G] {M : Subgroup
   exact hyp.SHC_extension_inner_zeroColumnOmegaSigma_sum hG hodd hφS hφirr hφ1
     (hyp.inducedFamily_degree_w1_conj_ne hG hφirr hφ1)
 
+open scoped Classical in
+/-- **Cross-Parseval for a virtual character.**  For `Δ ∈ ZIrr G` and any `φ`,
+`⟨φ, Δ⟩ = ∑_{χ : Irr} ⟨φ, χ⟩ · ⟨Δ, χ⟩`.  From the Fourier reconstruction `Δ = ∑_χ ⟨Δ,χ⟩·χ`
+(`sum_inner_irreducibleCharacter_smul`) and `inner_smul_right`; the `star` from conjugate-linearity
+vanishes because `⟨Δ,χ⟩` is a real integer (`mem_ZIrr_inner_int`). -/
+theorem mem_ZIrr_inner_eq_sum_over_irr [Finite G] [Fintype G] [Fintype (IrreducibleCharacter G)]
+    [Invertible (Nat.card G : ℂ)] {φ Δ : ClassFunction G ℂ} (hΔ : Δ ∈ ZIrr G) :
+    ClassFunction.inner φ Δ
+      = ∑ χ : IrreducibleCharacter G,
+          ClassFunction.inner φ (χ : ClassFunction G ℂ)
+            * ClassFunction.inner Δ (χ : ClassFunction G ℂ) := by
+  conv_lhs => rw [← OddOrder.RepresentationTheory.sum_inner_irreducibleCharacter_smul Δ]
+  rw [OddOrder.RepresentationTheory.inner_sum_right]
+  refine Finset.sum_congr rfl fun χ _ => ?_
+  rw [OddOrder.RepresentationTheory.inner_smul_right]
+  obtain ⟨m, hm⟩ := OddOrder.RepresentationTheory.mem_ZIrr_inner_int χ hΔ
+  rw [hm, star_intCast, mul_comm]
+
 /-- **Parity of a sum over a fixed-point-free involution** with an involution-invariant integer
 weight.  If `g` is a fixed-point-free involution on `s` and `f (g a) = f a` for all `a ∈ s`, then
 `∑_{a ∈ s} f a` is even — each orbit `{a, g a}` contributes `2·f a`.  (Proof via `ZMod 2`:
@@ -8140,6 +8158,61 @@ theorem even_sum_of_involution {α : Type*} [DecidableEq α] {s : Finset α} {f 
   intro a ha
   rw [hf a ha]
   exact CharTwo.add_self_eq_zero _
+
+open scoped Classical in
+/-- **Parity of the inner product of two real virtual characters orthogonal to `1`** (Peterfalvi
+(11.8.5) "`a` even from `β` real").  For `Δ₁, Δ₂ ∈ ZIrr G` (odd `G`) with `conjPerm`-symmetric Fourier
+coefficients `⟨Δᵢ, χ̄⟩ = ⟨Δᵢ, χ⟩` (the consequence of `IsReal Δᵢ`) and `⟨Δᵢ, 1⟩ = 0`, the integer
+`⟨Δ₁, Δ₂⟩` is even.  Cross-Parseval (`mem_ZIrr_inner_eq_sum_over_irr`) gives
+`⟨Δ₁,Δ₂⟩ = ∑_χ c₁(χ)c₂(χ)` with `cᵢ(χ) = ⟨Δᵢ,χ⟩ ∈ ℤ`; the `χ = 1` term vanishes, and on `Irr ∖ {1}`
+the conjugation involution `conjPerm` is fixed-point-free (`conjPerm_eq_self_iff` +
+`not_isReal_of_ne_trivial_of_odd_card'`) with `cᵢ` invariant, so `even_sum_of_involution` applies. -/
+theorem even_inner_of_conjPerm_symmetric [Finite G] [Fintype G]
+    [Invertible (Nat.card G : ℂ)] (hodd : Odd (Nat.card G))
+    {Δ₁ Δ₂ : ClassFunction G ℂ} (h₁ : Δ₁ ∈ ZIrr G) (h₂ : Δ₂ ∈ ZIrr G)
+    (hsym₁ : ∀ χ : IrreducibleCharacter G, ClassFunction.inner Δ₁
+      ((IrreducibleCharacter.conjPerm G χ : IrreducibleCharacter G) : ClassFunction G ℂ)
+        = ClassFunction.inner Δ₁ (χ : ClassFunction G ℂ))
+    (hsym₂ : ∀ χ : IrreducibleCharacter G, ClassFunction.inner Δ₂
+      ((IrreducibleCharacter.conjPerm G χ : IrreducibleCharacter G) : ClassFunction G ℂ)
+        = ClassFunction.inner Δ₂ (χ : ClassFunction G ℂ))
+    (htriv₁ : ClassFunction.inner Δ₁ (trivialIrreducibleCharacter G : ClassFunction G ℂ) = 0)
+    (htriv₂ : ClassFunction.inner Δ₂ (trivialIrreducibleCharacter G : ClassFunction G ℂ) = 0) :
+    ∃ z : ℤ, ClassFunction.inner Δ₁ Δ₂ = (z : ℂ) ∧ Even z := by
+  choose c₁ hc₁ using fun χ : IrreducibleCharacter G =>
+    OddOrder.RepresentationTheory.mem_ZIrr_inner_int χ h₁
+  choose c₂ hc₂ using fun χ : IrreducibleCharacter G =>
+    OddOrder.RepresentationTheory.mem_ZIrr_inner_int χ h₂
+  have hz : ClassFunction.inner Δ₁ Δ₂
+      = ((∑ χ : IrreducibleCharacter G, c₁ χ * c₂ χ : ℤ) : ℂ) := by
+    rw [mem_ZIrr_inner_eq_sum_over_irr h₂]
+    push_cast
+    exact Finset.sum_congr rfl fun χ _ => by rw [hc₁ χ, hc₂ χ]
+  refine ⟨_, hz, ?_⟩
+  have hc1t : c₁ (trivialIrreducibleCharacter G) = 0 := by
+    have hh := hc₁ (trivialIrreducibleCharacter G); rw [htriv₁] at hh; exact_mod_cast hh.symm
+  have hsymc₁ : ∀ χ, c₁ (IrreducibleCharacter.conjPerm G χ) = c₁ χ := fun χ => by
+    have hh := ((hc₁ (IrreducibleCharacter.conjPerm G χ)).symm.trans (hsym₁ χ)).trans (hc₁ χ)
+    exact_mod_cast hh
+  have hsymc₂ : ∀ χ, c₂ (IrreducibleCharacter.conjPerm G χ) = c₂ χ := fun χ => by
+    have hh := ((hc₂ (IrreducibleCharacter.conjPerm G χ)).symm.trans (hsym₂ χ)).trans (hc₂ χ)
+    exact_mod_cast hh
+  have htrivfix : IrreducibleCharacter.conjPerm G (trivialIrreducibleCharacter G)
+      = trivialIrreducibleCharacter G :=
+    (IrreducibleCharacter.conjPerm_eq_self_iff (trivialIrreducibleCharacter G)).mpr (by simp)
+  rw [← Finset.add_sum_erase Finset.univ (fun χ => c₁ χ * c₂ χ)
+      (Finset.mem_univ (trivialIrreducibleCharacter G)),
+    hc1t, zero_mul, zero_add]
+  refine even_sum_of_involution (fun χ _ => IrreducibleCharacter.conjPerm G χ)
+    (fun χ hχ => ?_) (fun χ hχ => ?_) (fun χ _ => (IrreducibleCharacter.conjPerm G).left_inv χ)
+    (fun χ _ => by rw [hsymc₁, hsymc₂])
+  · rw [Finset.mem_erase] at hχ ⊢
+    refine ⟨fun h => hχ.1 ?_, Finset.mem_univ _⟩
+    exact (IrreducibleCharacter.conjPerm G).injective (h.trans htrivfix.symm)
+  · rw [Finset.mem_erase] at hχ
+    intro h
+    exact OddOrder.RepresentationTheory.not_isReal_of_ne_trivial_of_odd_card' hodd hχ.1
+      ((IrreducibleCharacter.conjPerm_eq_self_iff χ).mp h)
 
 open scoped Classical FiniteInduce in
 /-- **Peterfalvi (11.8.5), `a = 0` under the (11.8.4) hypothesis** (the residual-orthogonal case).
