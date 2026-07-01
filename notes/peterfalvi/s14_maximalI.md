@@ -1589,3 +1589,31 @@ refine ⟨(coherent_of_constant_degree ⟨hyp.tau, (fun _ _ _ _ ha hb hc hd => S
   χ̄∈Sset (conj_closed), χ≠χ̄ (non-real) → `Set.one_lt_ncard`/{χ,χ̄}⊆Sset。∃θ≠1 は card(Irr)=card(ConjClasses)>1
   経由 (`card_irreducibleCharacter_eq`, CharacterCompleteness:558; nontrivial group の conjClasses>1 要確認)。
 next: この assembly を書いて frobenius_typeI_coherent_of_abelianKernel を close → (12.6) case-b 完了。
+
+### ✅✅ loop⁶⁷ (2026-07-02 lane-b): `frobenius_typeI_coherent_of_abelianKernel` PROVEN — (12.6) case (b) sorry-free
+
+commit `9ba65c40`. **(12.6) case (b) 完全 discharge** — witness の abelian rank-2 kernel で S coherent。
+assembly = 10 witness lemma (loop⁶⁶) から `S07.Hypothesis hyp.Sset hyp.A` を構成 + Dade-compatible
+`coherent_of_constant_degree` (S07 refactor d31b9763) 呼び出し。残 finiteness hyp も discharge:
+- `hSfin`: S ⊆ range(θ↦Ind θ)、`finite_irreducibleCharacter` で有限。
+- `hcard`: nontrivial abelian kernel → ∃θ≠1 (`card_irreducibleCharacter_eq` + nontrivial ConjClasses
+  via `mk_eq_mk_iff_isConj`/`isConj_one_left`) → {Ind θ, Ind θ̄} distinct non-real → `Set.ncard_pair`。
+- `hdeg0`=`index_ne_zero_of_finite`, `h1A`=`one_not_mem_supportInSubgroup_sharp`。
+
+**ハマり所 (次の同種 assembly で再利用)**:
+1. **FiniteInduce instance diamond**: witness の Sset は `S12.FiniteInduce` scoped instance
+   (`finiteSubFintype L` 等) で構築。assembly で `[Fintype ↥L]`/`[Invertible]` を signature に持つと
+   別 instance になり `induce`/`τ` が Sset 要素と不一致。→ **frobenius_typeI_coherent chain (case b/c +
+   hub) の explicit instance binder を全削除**し `[Finite G]` + `open scoped …FiniteInduce in` に統一
+   (sibling `frobenius_typeI_induced_char_constituents` と同型)。
+2. **`open scoped … in` は docstring の前**に置く (docstring と theorem の間だと構文エラー)。
+3. **strict-implicit ⦃a b c d⦄ の field lambda**: `fun ha hb hc hd =>` は ⦃⦄ を食う → membership が
+   ClassFunction 扱いに。`fun _ _ _ _ ha hb hc hd =>` と placeholder 要。
+4. **`typeIA_eq_sharp` は forward ref** (typeI_frobenius 経由、後方定義) → `typeIA_eq_sharp_of_frobenius`
+   (hfrob param 版) を case-b 前に切り出し、既存 typeIA_eq_sharp は dedup で cite。
+5. **coherent_of_constant_degree は S07_CoherenceConstantDegree** — S14 に import 追加要。
+6. **term-mode `rfl` の metavar/coercion**: Sset membership/range membership は `simp only [Sset,
+   mem_setOf_eq]` unfold + `refine ⟨…, ?_⟩; rfl` (tactic) で。`θ.toClassFunction` が normal form。
+
+**残 lane-b (issue 9001)**: (6.5.c) coherence producer (case c = `frobenius_typeI_coherent_of_cyclicQuotient`,
+まだ sorry) + 構成的 Clifford (M-side)。case (c) は §6.5 汎用 coherence infra が要 (S07/S08 在庫なし)。
