@@ -3100,10 +3100,20 @@ theorem typeF_H_subgroupOf_isNilpotent [Finite G] {L : Subgroup G} (hyp : Hypoth
   exact nilpotent_of_mulEquiv (Subgroup.subgroupOfEquivOfLe hyp.typeI.typeF.H_le).symm
 
 open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
-/-- **Peterfalvi (12.6) case (c): cyclic-quotient kernel → (6.5.c) coherence.**
-Def (8.3) case (c): `H` is a `p`-group and `|L/H|` divides `p − 1` (via (8.2.a)/(8.3.c)); `S` is
-coherent by (6.5.c).  (Gap: the (6.5.c) coherence producer for `|L/H| ∣ p−1` is not yet in the
-coherence library — see issue 2032 / hub issue 9001.) -/
+/-- **Peterfalvi (12.6) case (c): cyclic-quotient kernel → (6.5.c) coherence.** `sorry`-free.
+Def (8.3) case (c): `exp(U) ∣ p − 1` for every `p ∣ |H|`; `S` is coherent by (6.5.c).
+
+The proof feeds the abstract (6.5.c) engine `S08.nonempty_coherent_SOf_bot_of_index_dvd` on the
+witness filtration `S(A) = SsubFiltration A` (`SOf`), `τ = tau`, `A0 = A`, kernel `K = (L_F).subgroupOf L`:
+* **abelian branch** (`K` commutative): `⁅K,K⁆ = ⊥`, so `S(⁅K,K⁆) = S(⊥) = S` is coherent directly
+  by `hcoh` (the `S(H′)` coherence `SsubFiltration_commutator_coherent`);
+* **non-abelian branch**: the engine derives "`K` is a `p`-group" internally (6.5.b) from the
+  Frobenius structure and the (6.3) index bound, then closes by the (6.5.c) arithmetic; its two
+  genuine character-theoretic inputs are `hcoh` and the **(5.6) break-member oracle**
+  `Sset_six_two_index_bound` (`h56`).
+The divisibility `[L:H] ∣ p − 1` (`hdvd`) comes from `_hexp`: the odd Frobenius complement `C` is a
+Z-group (`S10.isZGroup_of_isFrobeniusGroup_of_odd`), Schur–Zassenhaus makes `C ≃ U`, so `U` is a
+Z-group and `[L:H] = |U| = exp(U)` (Def (8.3.c)). Closes issue 2032 / hub issue 9001. -/
 theorem frobenius_typeI_coherent_of_cyclicQuotient [Finite G]
     (_hG : OddOrder.BG.IsMinimalSimpleOdd G) {L : Subgroup G}
     (hyp : Hypothesis L)
@@ -3113,7 +3123,101 @@ theorem frobenius_typeI_coherent_of_cyclicQuotient [Finite G]
         Monoid.exponent hyp.typeI.typeF.U ∣ p - 1) ∧
       ∃ p : ℕ, p.Prime ∧ p ∈ (Nat.card ↥hyp.typeI.typeF.H).primeFactors ∧
         IsCyclic ↥(OddOrder.GroupTheory.opiCoreInG {p}ᶜ hyp.typeI.typeF.H)) :
-    Nonempty (OddOrder.Peterfalvi.S07.IsCoherent hyp.tau hyp.Sset hyp.A) := sorry
+    Nonempty (OddOrder.Peterfalvi.S07.IsCoherent hyp.tau hyp.Sset hyp.A) := by
+  classical
+  haveI := hyp.finiteG
+  obtain ⟨C, hfrob⟩ := _hfrob
+  have hfrobK : OddOrder.Isaacs.Ch06.IsFrobeniusGroup ↥L
+      ((hyp.typeI.typeF.H).subgroupOf L) C := hfrob
+  have hodd : Odd (Nat.card ↥L) := _hG.odd.of_dvd_nat (Subgroup.card_subgroup_dvd_card L)
+  have hAH : hyp.ambientA = ((hyp.typeI.typeF.H) : Set G) \ {1} :=
+    hyp.typeIA_eq_sharp_of_frobenius hfrobK
+  haveI hKnilp : Group.IsNilpotent ↥((hyp.typeI.typeF.H).subgroupOf L) :=
+    typeF_H_subgroupOf_isNilpotent hyp
+  haveI hKnorm : ((hyp.typeI.typeF.H).subgroupOf L).Normal := typeF_H_subgroupOf_normal hyp
+  haveI hKntriv : Nontrivial ↥((hyp.typeI.typeF.H).subgroupOf L) := by
+    rw [Subgroup.nontrivial_iff_ne_bot, Ne, Subgroup.subgroupOf_eq_bot]
+    intro hdisj
+    have h := disjoint_iff.mp hdisj
+    rw [inf_of_le_left hyp.typeI.typeF.H_le] at h
+    exact hyp.typeI.typeF.H_nontrivial h
+  -- `⁅K,K⁆ ⊊ K` (nontrivial nilpotent kernel is not perfect).
+  have hH'lt : (⁅(hyp.typeI.typeF.H).subgroupOf L, (hyp.typeI.typeF.H).subgroupOf L⁆
+      : Subgroup ↥L) < (hyp.typeI.typeF.H).subgroupOf L := by
+    have h1 : _root_.commutator ↥((hyp.typeI.typeF.H).subgroupOf L) < ⊤ :=
+      IsSolvable.commutator_lt_top_of_nontrivial _
+    rw [← OddOrder.Peterfalvi.S08.commutator_subgroupOf_self] at h1
+    refine lt_of_le_of_ne (Subgroup.commutator_le_left _ _) (fun heq => ?_)
+    rw [heq, Subgroup.subgroupOf_self] at h1
+    exact lt_irrefl _ h1
+  have hcoh : Nonempty (OddOrder.Peterfalvi.S07.IsCoherent hyp.tau
+      (hyp.SsubFiltration ⁅(hyp.typeI.typeF.H).subgroupOf L,
+        (hyp.typeI.typeF.H).subgroupOf L⁆) hyp.A) :=
+    SsubFiltration_commutator_coherent hyp hodd hfrobK hAH
+  -- `[L:H] ∣ p − 1` for every prime `p ∣ |H|`: the complement `C` is an odd Frobenius complement,
+  -- hence a Z-group; by Schur–Zassenhaus `C ≃ U`, so `U` is a Z-group and
+  -- `[L:H] = |U| = exp(U)` (Def (8.3.c), `_hexp`).
+  have hdvd : ∀ p : ℕ, p.Prime → p ∣ Nat.card ↥((hyp.typeI.typeF.H).subgroupOf L) →
+      ((hyp.typeI.typeF.H).subgroupOf L).index ∣ p - 1 := by
+    have hCodd : Odd (Nat.card ↥C) := Odd.of_dvd_nat hodd C.card_subgroup_dvd_card
+    haveI hZC : _root_.IsZGroup ↥C :=
+      OddOrder.Peterfalvi.S10.isZGroup_of_isFrobeniusGroup_of_odd hfrobK hCodd
+    have hN : Nat.Coprime (Nat.card ↥((hyp.typeI.typeF.H).subgroupOf L))
+        ((hyp.typeI.typeF.H).subgroupOf L).index := by
+      rw [hfrobK.isComplement.symm.index_eq_card]
+      exact hfrobK.coprime_card_kernel_complement
+    obtain ⟨n, -, hconj⟩ := Subgroup.IsComplement'.exists_conj_of_coprime hN
+      (Or.inl inferInstance) hfrobK.isComplement hyp.typeI.typeF.complement
+    have e := Subgroup.equivMapOfInjective C (MulAut.conj n).toMonoidHom (MulAut.conj n).injective
+    rw [hconj] at e
+    haveI hZUsub : _root_.IsZGroup ↥((hyp.typeI.typeF.U).subgroupOf L) :=
+      _root_.IsZGroup.of_injective (f := e.symm.toMonoidHom) e.symm.injective
+    haveI hZU : _root_.IsZGroup ↥(hyp.typeI.typeF.U) :=
+      _root_.IsZGroup.of_injective
+        (f := (Subgroup.subgroupOfEquivOfLe hyp.typeI.typeF.U_le).symm.toMonoidHom)
+        (Subgroup.subgroupOfEquivOfLe hyp.typeI.typeF.U_le).symm.injective
+    have hidxU : ((hyp.typeI.typeF.H).subgroupOf L).index = Nat.card ↥(hyp.typeI.typeF.U) := by
+      rw [hyp.typeI.typeF.complement.symm.index_eq_card,
+        Nat.card_congr (Subgroup.subgroupOfEquivOfLe hyp.typeI.typeF.U_le).toEquiv]
+    have hexpU : Monoid.exponent ↥(hyp.typeI.typeF.U) = Nat.card ↥(hyp.typeI.typeF.U) :=
+      _root_.IsZGroup.exponent_eq_card (G := ↥hyp.typeI.typeF.U)
+    intro p hp hpK
+    have hpH : p ∣ Nat.card ↥(hyp.typeI.typeF.H) := by
+      rwa [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hyp.typeI.typeF.H_le).toEquiv] at hpK
+    have hmem : p ∈ (Nat.card ↥(hyp.typeI.typeF.H)).primeFactors :=
+      Nat.mem_primeFactors.mpr ⟨hp, hpH, Nat.card_pos.ne'⟩
+    have hdvd1 := _hexp.1 p hp hmem
+    rwa [hidxU, ← hexpU]
+  by_cases hnonab : ¬ ∀ a b : ↥((hyp.typeI.typeF.H).subgroupOf L), a * b = b * a
+  · -- **Non-abelian branch:** the genuine (6.5.c) contradiction via the engine.
+    rw [← hyp.SsubFiltration_bot]
+    refine OddOrder.Peterfalvi.S08.nonempty_coherent_SOf_bot_of_index_dvd hKnorm hyp.tau hyp.A
+      hyp.SsubFiltration
+      hfrobK hnonab hodd hdvd hH'lt hcoh
+      (fun A B _ _ hBA hAle _ hSAcoh hSBncoh =>
+        Sset_six_two_index_bound hyp hodd hfrobK hAH (hyp.SsubFiltration_antitone hBA)
+          ?_ hSAcoh hSBncoh)
+    · -- `commutator (K / A) ≠ ⊤` from `A ≤ ⁅K,K⁆ < K` (nilpotent quotient not perfect).
+      have hnle : ¬ ((hyp.typeI.typeF.H).subgroupOf L) ≤ A :=
+        fun hle => lt_irrefl _ (lt_of_le_of_lt (le_trans hle hAle) hH'lt)
+      have hAne : A.subgroupOf ((hyp.typeI.typeF.H).subgroupOf L) ≠ ⊤ := by
+        rw [Ne, Subgroup.subgroupOf_eq_top]; exact hnle
+      haveI : Nontrivial (↥((hyp.typeI.typeF.H).subgroupOf L) ⧸
+          A.subgroupOf ((hyp.typeI.typeF.H).subgroupOf L)) :=
+        Subgroup.nontrivial_quotient_of_ne_top hAne
+      exact (IsSolvable.commutator_lt_top_of_nontrivial _).ne
+  · -- **Abelian branch:** `⁅K,K⁆ = ⊥`, so `S(⁅K,K⁆) = S(⊥) = Sset` is coherent by `hcoh`.
+    push_neg at hnonab
+    have hcomm_bot : (⁅(hyp.typeI.typeF.H).subgroupOf L,
+        (hyp.typeI.typeF.H).subgroupOf L⁆ : Subgroup ↥L) = ⊥ := by
+      rw [eq_bot_iff, Subgroup.commutator_le]
+      intro p hp q hq
+      rw [Subgroup.mem_bot, commutatorElement_eq_one_iff_commute]
+      have h := hnonab ⟨p, hp⟩ ⟨q, hq⟩
+      have h3 := Subtype.ext_iff.mp h
+      simpa using h3
+    rw [← hyp.SsubFiltration_bot, ← hcomm_bot]
+    exact hcoh
 
 open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
 /-- **Peterfalvi (12.6)**: if `L` is Frobenius with kernel `H = L_F`, then `S` is coherent.
@@ -3124,7 +3228,10 @@ The textbook proof **case-splits** on the type-I trichotomy `Definition (8.3)` (
 (`frobenius_typeI_coherent_of_cyclicQuotient`).  The (12.16) witness lands in case (b) or (c)
 (Peterfalvi (12.10): its `H^#` is *not* TI), so the (6.8) route alone is insufficient — the earlier
 single-`sibleyTarget_frobI` proof was unsound (issue 2032).  This assembly carries no `sorry` of its
-own; the per-case gaps are isolated in the three delegated lemmas. -/
+own.  Cases (b) `frobenius_typeI_coherent_of_abelianKernel` and (c)
+`frobenius_typeI_coherent_of_cyclicQuotient` are now `sorry`-free; the only residual gap is in case
+(a) `sibleyTarget_frobI`, whose (6.8) route transitively cites the (8.18.c) geometric obligation
+`nonconjugate_diffImage_inner_zero` (§10 thickened-support). -/
 theorem frobenius_typeI_coherent [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) {L : Subgroup G}
     (hyp : Hypothesis L)

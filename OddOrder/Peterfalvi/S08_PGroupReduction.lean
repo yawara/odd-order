@@ -231,25 +231,30 @@ theorem sq_le_card_abelianization_of_isPGroup_of_noncomm
 
 /-- **Peterfalvi (6.5)(c) coherence producer** (abstract (6.1)/(5.2) form, over the `S07` setup).
 
-The (6.5)(c) conclusion "`S = SOf ⊥` is coherent" for a nilpotent `p`-group kernel `H` with
-`|L:H| ∣ p − 1`, assembled over the abstract `S07` coherence setup (`τ`, `A0`, filtration `SOf`).
-By contradiction: if `SOf ⊥` is not coherent, then `six_three_of_six_two_oracle` (with `M = ⊥`,
-`H₁ = ⁅H,H⁆`, `K = H`) forces `|H:H′| ≤ 4|L:H|² + 1` (else it would produce coherence); but a
-non-abelian `p`-group has `p² ≤ |H:H′|` (`sq_le_card_abelianization_of_isPGroup_of_noncomm`), and
-`six_five_c_arith` turns `|L:H| ∣ p − 1` into a contradiction.
+The (6.5)(c) conclusion "`S = SOf ⊥` is coherent" for a nilpotent **Frobenius kernel** `H` (kernel of
+`hF : IsFrobeniusGroup ↥L H C`) with the divisibility `|L:H| ∣ p − 1` for every `p ∣ |H|` (`hdvd`),
+assembled over the abstract `S07` coherence setup (`τ`, `A0`, filtration `SOf`).  By contradiction:
+if `SOf ⊥` is not coherent, then `six_three_of_six_two_oracle` (with `M = ⊥`, `H₁ = ⁅H,H⁆`, `K = H`)
+forces `|H:H′| ≤ 4|L:H|² + 1` (else it would produce coherence).  The **(6.5.b) reduction** is done
+*here*: from the Frobenius structure + that index bound, `isPGroup_of_isFrobeniusGroup_of_card_le`
+produces the prime `p` with `IsPGroup p H`; a non-abelian `p`-group has `p² ≤ |H:H′|`
+(`sq_le_card_abelianization_of_isPGroup_of_noncomm`), and `six_five_c_arith` turns `|L:H| ∣ p − 1`
+into a contradiction.  (The caller supplies non-abelianness `hnonab`; the abelian case is handled
+upstream — `H` abelian ⟹ `⁅H,H⁆ = ⊥` ⟹ `SOf ⁅H,H⁆ = SOf ⊥`, coherent by `hcoh`.)
 
-This is the honest (6.5)(c) assembly engine: the genuine residual obligations of Peterfalvi (12.6)
-case (c) are exactly the parameters — the **(5.6) break-member oracle** `h56` (the remaining
-character-theoretic core; for the `p`-group kernel here every member `Ind_H^L θ` is irreducible, so
-`h56` is discharged by the (5.6)/(6.2) engine), the **`S(H′)` coherence** `hcoh` (constant-degree
-(5.7)), and the filtration `SOf`.  Everything numeric — the (6.3) descent, the `p²`-index gap, and
-the (6.5)(c) arithmetic — is proved here. -/
-theorem nonempty_coherent_SOf_bot_of_index_dvd [Group.IsNilpotent ↥H] (hHnorm : H.Normal)
+This is the honest (6.5)(c) assembly engine: the genuine residual obligations are exactly the
+parameters — the **(5.6) break-member oracle** `h56` (the remaining character-theoretic core), the
+**`S(H′)` coherence** `hcoh` (constant-degree (5.7)), and the filtration `SOf`.  Everything numeric —
+the (6.3) descent, the (6.5.b) `p`-group reduction, the `p²`-index gap, and the (6.5.c) arithmetic —
+is proved here.  Oddness side-conditions are discharged from `|L|` odd (`hLodd`). -/
+theorem nonempty_coherent_SOf_bot_of_index_dvd [Finite ↥L] [Group.IsNilpotent ↥H]
+    (hHnorm : H.Normal)
     (τ : OddOrder.Peterfalvi.S07.IntegralCharacterMap ↥L G) (A0 : Set ↥L)
     (SOf : Subgroup ↥L → Set (ClassFunction ↥L ℂ))
-    {p : ℕ} (hp : p.Prime) (hHp : IsPGroup p ↥H)
+    {C : Subgroup ↥L} (hF : OddOrder.Isaacs.Ch06.IsFrobeniusGroup ↥L H C)
     (hnonab : ¬ ∀ a b : ↥H, a * b = b * a)
-    (hodd_p : Odd p) (hodd_LH : Odd H.index) (hdvd : H.index ∣ p - 1)
+    (hLodd : Odd (Nat.card ↥L))
+    (hdvd : ∀ p : ℕ, p.Prime → p ∣ Nat.card ↥H → H.index ∣ p - 1)
     (hH'lt : (⁅H, H⁆ : Subgroup ↥L) < H)
     (hcoh : Nonempty (OddOrder.Peterfalvi.S07.IsCoherent τ (SOf ⁅H, H⁆) A0))
     (h56 : ∀ (A B : Subgroup ↥L) [A.Normal] [B.Normal], B ≤ A → A ≤ ⁅H, H⁆ →
@@ -270,11 +275,38 @@ theorem nonempty_coherent_SOf_bot_of_index_dvd [Group.IsNilpotent ↥H] (hHnorm 
     by_contra hgt
     rw [not_le] at hgt
     exact hncoh (six_three_of_six_two_oracle hHnorm bot_le hH'lt le_rfl τ A0 SOf h56 hcoh hgt)
+  -- `|L:H| = |C|` (Frobenius complement); convert to the abelianization/complement bound.
+  have hidxC : H.index = Nat.card ↥C := hF.isComplement.symm.index_eq_card
+  have hbound : Nat.card (Abelianization ↥H) ≤ 4 * Nat.card ↥C ^ 2 + 1 := by
+    have hle' := hle
+    rwa [commutator_subgroupOf_self, hidxC] at hle'
+  -- Odd orders, all from `|L|` odd.
+  have hHabodd : Odd (Nat.card (Abelianization ↥H)) :=
+    Odd.of_dvd_nat (Odd.of_dvd_nat hLodd H.card_subgroup_dvd_card)
+      (Subgroup.card_quotient_dvd_card (_root_.commutator ↥H))
+  have hCodd : Odd (Nat.card ↥C) := Odd.of_dvd_nat hLodd C.card_subgroup_dvd_card
+  -- **(6.5)(b) reduction:** the nilpotent Frobenius kernel `H` is a `p`-group.
+  obtain ⟨p, hp, hHp⟩ := isPGroup_of_isFrobeniusGroup_of_card_le hF hHabodd hCodd hbound
+  haveI : Fact (Nat.Prime p) := ⟨hp⟩
+  -- `p ∣ |H|` (nontrivial `p`-group), hence `p` odd and `|L:H| ∣ p − 1`.
+  haveI : Nontrivial ↥H := by
+    rcases subsingleton_or_nontrivial ↥H with h | h
+    · exact absurd (fun a b => Subsingleton.elim (a * b) (b * a)) hnonab
+    · exact h
+  have hpdvd : p ∣ Nat.card ↥H := by
+    obtain ⟨n, hn⟩ := hHp.exists_card_eq
+    have h1 : 1 < Nat.card ↥H := Finite.one_lt_card_iff_nontrivial.mpr inferInstance
+    rw [hn] at h1 ⊢
+    exact dvd_pow_self p (by rintro rfl; simp at h1)
+  have hodd_p : Odd p :=
+    Odd.of_dvd_nat (Odd.of_dvd_nat hLodd H.card_subgroup_dvd_card) hpdvd
+  have hodd_LH : Odd H.index := hidxC ▸ hCodd
+  have hdvd' : H.index ∣ p - 1 := hdvd p hp hpdvd
   -- Non-abelian `p`-group ⟹ `p² ≤ |H:H′|`.
   have hsq : p ^ 2 ≤ Nat.card (↥H ⧸ (⁅H, H⁆ : Subgroup ↥L).subgroupOf H) := by
     rw [commutator_subgroupOf_self]
     exact sq_le_card_abelianization_of_isPGroup_of_noncomm hp hHp hnonab
-  exact six_five_c_arith hp hodd_p hodd_LH hdvd hsq hle
+  exact six_five_c_arith hp hodd_p hodd_LH hdvd' hsq hle
 
 /-- **`H` is non-abelian** in the `X`-nonempty branch: `X(⁅H,H⁆) ≠ ∅` forces `⁅H,H⁆ ≠ ⊥`, hence
 `commutator ↥H ≠ ⊥`.  (If `⁅H,H⁆ = ⊥` then `S(⁅H,H⁆) = S(⊥) = S`, so `X(⁅H,H⁆) = S − S = ∅`.) -/
