@@ -2030,6 +2030,65 @@ theorem Sset_diff_supported [Finite G] {L : Subgroup G} (hyp : Hypothesis L)
     ⟨Subgroup.mem_subgroupOf.mpr hxH, hx1⟩
 
 open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
+open OddOrder.Peterfalvi.S09.Cert in
+/-- **`S(H′)` member differences are `A(L)`-supported** — the `hab`-free subfamily analogue of
+`Sset_diff_supported` for the (6.5.c) `hcoh`.  Members of `S(⁅K,K⁆)` vanish off `H` (as `Sset`
+members, `Sset_vanishes_off_H`) and share the constant degree `|L:K|` at `1`
+(`SsubFiltration_commutator_apply_one_eq_index`, replacing the case-(b) `Sset_apply_one_eq_index`
+that needs `H` abelian), so their difference is supported on `H^# = A(L)`. -/
+theorem SsubFiltration_commutator_diff_supported [Finite G] {L : Subgroup G} (hyp : Hypothesis L)
+    (hAH : hyp.ambientA = ((hyp.typeI.typeF.H) : Set G) \ {1})
+    {a b : ClassFunction ↥L ℂ}
+    (ha : a ∈ hyp.SsubFiltration
+      ⁅(hyp.typeI.typeF.H).subgroupOf L, (hyp.typeI.typeF.H).subgroupOf L⁆)
+    (hb : b ∈ hyp.SsubFiltration
+      ⁅(hyp.typeI.typeF.H).subgroupOf L, (hyp.typeI.typeF.H).subgroupOf L⁆) :
+    (a - b).support ⊆ OddOrder.Peterfalvi.S04.supportInSubgroup hyp.ambientA L := by
+  intro x hx
+  have hx0 : (a - b) x ≠ 0 := ClassFunction.mem_support.mp hx
+  rw [ClassFunction.sub_apply] at hx0
+  have haS : a ∈ hyp.Sset := hyp.SsubFiltration_subset_Sset ha
+  have hbS : b ∈ hyp.Sset := hyp.SsubFiltration_subset_Sset hb
+  have hxH : (x : G) ∈ hyp.H := by
+    by_contra h
+    exact hx0 (by rw [Sset_vanishes_off_H hyp haS h, Sset_vanishes_off_H hyp hbS h, sub_zero])
+  have hx1 : x ≠ 1 := by
+    rintro rfl
+    exact hx0 (by
+      rw [SsubFiltration_commutator_apply_one_eq_index hyp ha,
+          SsubFiltration_commutator_apply_one_eq_index hyp hb, sub_self])
+  exact (mem_supportInSubgroup_sharp_subgroupOf_iff hyp.typeI.typeF.H hAH x).mpr
+    ⟨Subgroup.mem_subgroupOf.mpr hxH, hx1⟩
+
+open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
+/-- **The witness Dade map is a difference-isometry on `S(H′)`** — the `tau_isometry_diff` field of
+the subfamily `S07.Hypothesis` (`hab`-free), mirroring `Sset_tau_isometry_diff` via
+`SsubFiltration_commutator_diff_supported`. -/
+theorem SsubFiltration_commutator_tau_isometry_diff [Finite G] {L : Subgroup G}
+    (hyp : Hypothesis L) (hAH : hyp.ambientA = ((hyp.typeI.typeF.H) : Set G) \ {1})
+    {a b c d : ClassFunction ↥L ℂ}
+    (ha : a ∈ hyp.SsubFiltration
+      ⁅(hyp.typeI.typeF.H).subgroupOf L, (hyp.typeI.typeF.H).subgroupOf L⁆)
+    (hb : b ∈ hyp.SsubFiltration
+      ⁅(hyp.typeI.typeF.H).subgroupOf L, (hyp.typeI.typeF.H).subgroupOf L⁆)
+    (hc : c ∈ hyp.SsubFiltration
+      ⁅(hyp.typeI.typeF.H).subgroupOf L, (hyp.typeI.typeF.H).subgroupOf L⁆)
+    (hd : d ∈ hyp.SsubFiltration
+      ⁅(hyp.typeI.typeF.H).subgroupOf L, (hyp.typeI.typeF.H).subgroupOf L⁆) :
+    ClassFunction.inner (hyp.tau (a - b)) (hyp.tau (c - d))
+      = ClassFunction.inner (a - b) (c - d) := by
+  have hS : ∀ s ∈ ({a - b, c - d} : Set (ClassFunction ↥L ℂ)),
+      s.support ⊆ OddOrder.Peterfalvi.S04.supportInSubgroup hyp.ambientA L := by
+    intro s hs
+    simp only [Set.mem_insert_iff, Set.mem_singleton_iff] at hs
+    rcases hs with rfl | rfl
+    · exact SsubFiltration_commutator_diff_supported hyp hAH ha hb
+    · exact SsubFiltration_commutator_diff_supported hyp hAH hc hd
+  exact OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap_inner_eq_on_supported_span
+    hyp.dadeData.dade hyp.hconj hS (Submodule.subset_span (Set.mem_insert _ _))
+    (Submodule.subset_span (Set.mem_insert_of_mem _ rfl))
+
+open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
 /-- **The witness Dade map is a difference-isometry on `S`** — the `tau_isometry_diff` field of the
 lattice-relative `S07.Hypothesis` (issue 9001).  For members `a, b, c, d ∈ S`, both differences are
 `A(L)`-supported (`Sset_diff_supported`), so the genuine §10 Dade isometry preserves their inner
