@@ -158,3 +158,110 @@ coherence の genuine upstream (要 lane B/§3-5 調整) か、lane a §11/§9 �
 - `OddOrder/BG/Ch4_FamilyOfMaximal/S15_MF.lean:806` (`typeP_hall_derived_eq_and_abelian`, U abelian)
 - `OddOrder/Peterfalvi/S13_MaximalIII_IV.lean:425` (`H_elementaryAbelian`, sorried, Pf 11.7)
 - issue 3001 (`Sdata.W2 = W2` reconciliation)
+
+## exhaustive frontier verification (2026-07-01 loop⁶⁰, code-level)
+
+前回 handoff の結論を**コード精読で完全確証**。lane d territory 全体を検証:
+
+### S15 char cascade — H#-intrinsic 機構は完成、残は全て grid/σ gated
+既に sorry-free で存在 (前セッション群の成果):
+- (13.5.a) `H_sharp_point_formula` (:1180) — point formula χ=(a/‖ζ₁‖²)ζ₁+α on H#
+- (13.5.b) `sum_normSq_sharp_chi_decomp` (:569) — norm-sum decomposition
+- (13.5.c) `sum_normSq_erase_one_ge_of_const_on_subgroup` (:741) — Σ_{H#}|α|²≥(|P|-1)α(1)²
+- (13.6/7/8) `caseB_{lambda,eta,eta01}_norm_bound` (:837/908/961) + arith core
+- `caseB_u_bound_arith` (:768) — u_bound arith bridge `(p-1)^{q-1}≤(p^q-1)/(p-1)`
+- `analytic_inequality_arith` (:1314) / `caseB_numeric_forces_q_three` (:1452) — numeric elim core
+
+残 15 sorry (tiSubset_char_orth/lambda_norm_lower/…/analytic_inequality/c_eq_one/…) は全て
+**具体 τ₁ grid character (λ^τ₁, η₁₀, η₀₁) を honest hypotheses (hvanish/hχ/hcross) に discharge する
+assembly** で、base gate = `sibleyTarget_S` (13.2.d、S-side coherence)。
+
+### c_eq_one (13.12) route を Coq `FTtypeP_Ind_Fitting_reg_Fcore` (PFsection13.v:1266) で完全確定
+✅ done: `regCW1`(semiregular C W₁)・`dv_2q_c1`(2q∣c-1)・c≥2q+1 structural・`le_maxNilpotentNormalHall`
+(Fcore_max、S15_MF)・numeric elim arith core。
+gated: `ub_m` = (13.10) analytic [char grid = lane B] + `typeP_Galois` dichotomy [**repo に未実装**、
+lane a §11 σ-theory] + `u_dv_31`(Galois case、lane a)。
+⟹ c_eq_one は grid (lane B) + typeP_Galois (lane a、未実装) の両方が要る。単一 lane で閉じない。
+
+### δ BG §14-16 の 7 real code sorry は**全て off-feitThompson-path** (確証)
+feitThompson spine は BG §16 から **`proposition_type_classification` (Prop 16.1, sorry-free) のみ**
+消費 (FeitThompson.lean:352/359/395/396/481)。BG signalizer functor (Theorem D/E, R(x)) は
+Peterfalvi の character route で **bypass** され spine 外。よって:
+- `centralizer_escape_final_local` (Cor 15.9, S15_MF:9421) → `exists_RData_escape_structure` →
+  `theoremD_msigma_conjugacy_and_centralizers` (Theorem D signalizer) = spine 外。
+- `tau2_transfer_constraint` (Thm 15.8) = docstring 消費のみ。
+- `nonidentity_covered_by_sigma_pieces` (S14:10235) = docstring「BG に対し false、prove するな」。
+- `sigmaLength_one_frobenius_type` (S14:12050) = orphaned (issue 8020)。
+- `aSets_support_slice` = 0 consumer。
+- `theoremA_maximal_structure`/`theoremB_U_and_A_tame` = monolith、faithful variant で迂回済。
+(注: `typeP_partner_existsUnique`/`typeP2_neighbor_is_typeF` は **sorry-free**。前 handoff の "S14 2 sorry"
+の attribution は line-map ずれ; 実 S14 sorry は 10235/12050 の 2 off-path のみ。)
+
+### 結論 = lane d の on-feitThompson-path in-territory ungated frontier は**枯渇** (verified)
+残る productive on-path work は全て cross-lane:
+- lane B: `sibleyTarget_S` (§14 Sibley + (6.8) `sibleySetup_is_coherent`、active S08 cluster) →
+  S15 cascade 全体を unblock。
+- lane a: §11 `typeP_Galois` (未実装) / `H_elementaryAbelian` (sorried) → basic_structure + c_eq_one Galois。
+- lane a: §9 Singer → u_bound。
+
+⟹ **大規模 cross-lane 再配分の判断案件** (hub/user)。lane d を a/B のどの深部に振るか、
+あるいは generic σ-theory (semilinear/near-field、typeP_Galois の下)を新 shared-infra leaf
+(`OddOrder/GroupTheory/**`, policy B) として建てるか。
+
+## ⚠⚠ 決定的 synthesis (loop⁶⁰): lane d 担当2クラスタは両方 feitThompson spine 外
+
+FeitThompson.lean:1739-1770 の carrier `section16CharacterData_of_isMinimalSimpleOdd` 精読で確定:
+- **W-side grid** (`tau3:=tau3W`, `eta=τ₃∘ω`, `omega/mu/nu/delta:=Section16CharacterData.*`) = **real 構成**。
+- **S-side coherence** (`tauS:=0`, `Sset:=∅`, `A0S:=∅`) = **vestigial placeholder**。carrier コメント明記:
+  「§13/§16 contradiction は eta=τ₃∘ω (W-side Dade grid) で routed、**never through S/T-side τ_S,τ_T**。
+  tauS/tauT の唯一の参照 = sorry-stubbed *uncited* coherence-wiring in S15_SAndT_Setup, off the FT path。
+  Hypothesis は6 field に Prop 制約なし ⟹ placeholder は unsound 依存を導入しない。
+  **User decision 2026-06-24 issue 1004**: close producer on verified-vestigial finding。」
+
+**帰結**: lane d の担当 = {δ BG §14-16, S15_SAndT_Setup S-side}:
+1. **δ signalizer** (Theorem D/E, Cor 15.9, Thm 15.8) = spine 外 (spine は Prop 16.1 のみ消費)。
+2. **S15 S-side coherence** (sibleyTarget_S / S_coherent / 13.5–13.15 char cascade の S-side τ₁=tauS grid 部)
+   = issue 1004 で **vestigial** (spine は W-side eta grid、tauS=0)。
+
+∴ lane d の assigned territory に **on-feitThompson-spine な ungated genuine work は無い**:
+- S15 の残 sorry は S-side τ₁ grid (vestigial/off-path) 経由か、structural 結論 (c=1, basic_structure type facts)
+  が **lane a §9/§11 (typeP_Galois 未実装・H_elementaryAbelian sorried・Singer) gated**。
+- δ の残 sorry は全 off-path。
+
+**未解決の architecture 疑問** (issue 1004 の射程だが記録): S16 は `c_eq_one` を 14× cite (c=1 rewrite)。
+c_eq_one の Coq route (13.10 ub_m) は S-side λ^{τ₁} を使う (= tauS、vestigial)。tauS=0 では honest に
+閉じない ⟹ **c=1 の spine-consumed 結論は W-side/structural route で導出可能か、それとも S16 の c=1 使用も
+vestigial か** を要確認 (issue 1004 決定の射程内なら settled)。これが lane d の唯一の potential on-path 論点。
+
+**⟹ 大規模 cross-lane 再配分案件**: lane d の on-spine work は (a) lane a §9/§11 の structural gate
+(typeP_Galois/Singer、basic_structure+c_eq_one の structural 結論を unblock)、(b) generic σ-theory
+(semilinear/near-field) を新 shared-infra leaf (`OddOrder/GroupTheory/**`, policy B) で建てて typeP_Galois
+を unblock、のいずれか。hub/user 裁定。
+
+## ✅ HUB 裁定 (2026-07-01, ユーザー承認) — option (b): σ-theory 新 leaf
+
+hub 監視 tick で本 issue を検討 → ユーザー裁定 = **option (b)**。lane d を **generic σ-theory
+(semilinear/near-field) = `typeP_Galois` の土台**を新 shared-infra leaf `OddOrder/GroupTheory/**` として
+実証明する方向へ再配分する (policy 5(A)/(B)、genuine upstream FT math)。
+
+**hub 裏取り (grep 確証, 2026-07-01)**:
+- `typeP_Galois` は **repo 未実装** (S15_SAndT_Setup:1717 の Coq 参照コメントのみ)。
+- `c_eq_one` (S15_SAndT_Setup:1703) は **honest sorry** かつ **20× consume** (S16_NonExistenceG 含む = on-spine)。
+  ⟹ 現状 soundness 違反なし (sorried-cite は合法)。本 issue lines 54-68/179-184 の解析どおり
+  c_eq_one の honest route は **structural + W-side (η grid)、vestigial tauS 非依存** ゆえ
+  「c_eq_one が vestigial tauS placeholder から消費される」soundness 懸念は **live gap でない**
+  (issue 1004 射程内で settled)。**ただし c_eq_one を閉じる者は W-side/structural route を使い、
+  carrier の `tauS=0` placeholder には依存しないこと** (この制約を守れば soundness は保たれる)。
+
+**lane d への指示 (次 main 同期で拾う)**:
+1. **claim-first (必須, policy 6)**: build 着手前に 9000 番台 issue で σ-theory leaf を claim
+   (`bin/new-issue --base 9000 …`)。既存 infra を再構築しないため **`OddOrder/GroupTheory/RepresentationTheory/`
+   の `SingerField.lean` / `GaloisCharacter.lean` / `ExtraspecialSinger.lean` / `SkolemNoether.lean` を
+   先に scan** し、typeP_Galois の Galois-case (Singer cyclic) は既存を cite、未存在の
+   semilinear/near-field (非 Galois case) 部分のみ新規に建てる。
+2. **所有**: 新 σ-theory leaf は `OddOrder/GroupTheory/**` (全 lane 共有ゾーン) ゆえ range-check 逸脱にならない。
+   lane d が主実装、**lane a §11 は typeP_Galois を再実装せず cite する** (dup 回避)。lane a には notes 経由で通知。
+3. **target**: typeP_Galois は `basic_structure_gated` の `P_elementaryAbelian`/`u_bound` (Galois 分岐) +
+   `c_eq_one` の Galois 分岐 (`u ∣ 31`) を unblock する。これらは S16 が heavy に cite する structural 結論。
+4. lane d は S15_SAndT_Setup + BG/** 所有を dormant 保持。σ-theory leaf 完成後、in-territory の
+   basic_structure/c_eq_one を新 leaf cite で closeable。

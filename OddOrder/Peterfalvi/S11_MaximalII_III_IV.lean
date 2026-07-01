@@ -5953,6 +5953,92 @@ theorem caseB_exists_chiefFactorConstituent [Finite G]
     simp only [ClassFunction.compHom_apply, map_one]
     exact θbar.isIrreducible.apply_one_eq_one_of_isMulCommutative
 
+/-- **caseA constituent extraction (hom form)** (Peterfalvi (9.8.c) surjectivity route): any
+`χ ∈ 𝒳` with `H₀ ⊆ Ker χ` lies over a nontrivial *linear* chief-factor constituent
+`linearIrreducibleCharacter (θbar ∘ mk'N ∘ hInHuEquivH)` for some nontrivial `θbar : H̄ →* ℂˣ`.
+
+Case-agnostic (no `U`-irreducibility): mirrors `caseB_exists_chiefFactorConstituent`'s constituent
+extraction but returns the *hom-form* seed `θbar : H̄ →* ℂˣ` — needed for the per-`Hpart` regularity
+argument of the (9.8.c) surjectivity route, which multiplies `θbar` by the `Hpart i` inclusions
+(`θbar.comp (caseA.Hpart i).subtype`).  Extract a constituent `θ` of `Res_H χ` not killing `H`
+(`exists_constituent_not_subset_characterKernel`), inflate it through `f = mk'N ∘ hInHuEquivH`
+(`H₀ ⊆ Ker χ ⟹ f.ker ⊆ Ker θ`, `exists_compHom_eq_of_subset_characterKernel`), and convert the
+resulting irreducible `H̄`-character to hom form (`H̄` abelian,
+`exists_units_monoidHom_of_isIrreducibleCharacter_of_isMulCommutative`).  The caseA regularity of
+`θbar` (from `M`-fixedness of `χ`) is established separately. -/
+theorem exists_hom_constituent_of_mem_xiSet_H0 [Finite G]
+    {M : Subgroup G} {data : TypesIIIIIIVSetup M} {chief : ChiefFactorData data}
+    [Fintype ↥(hInHu data)] [Invertible (Nat.card ↥(hInHu data) : ℂ)]
+    {χ : IrreducibleCharacter ↥(huSub data)}
+    (hχX : χ ∈ xiSet data)
+    (hχH0 : ((chief.H0.subgroupOf M).subgroupOf (huSub data) : Set ↥(huSub data)) ⊆
+        OddOrder.Peterfalvi.S03.characterKernel (χ : ClassFunction ↥(huSub data) ℂ)) :
+    ∃ θbar : (↥data.H ⧸ chief.N) →* ℂˣ,
+      θbar ≠ 1 ∧
+      IrreducibleCharacter.LiesOver (hInHu data) χ
+        (linearIrreducibleCharacter (θbar.comp ((QuotientGroup.mk' chief.N).comp
+          (hInHuEquivH data).toMonoidHom))) := by
+  classical
+  haveI : Fintype ↥(huSub data) := Fintype.ofFinite _
+  haveI : Invertible (Nat.card ↥(huSub data) : ℂ) :=
+    invertibleOfNonzero (Nat.cast_ne_zero.mpr Nat.card_pos.ne')
+  haveI : Fintype (IrreducibleCharacter ↥(hInHu data)) := Fintype.ofFinite _
+  -- A nontrivial constituent `θ` of `Res^{HU}_H χ` (`H ⊄ Ker χ`).
+  obtain ⟨θ, hθlo, hθnt⟩ :=
+    OddOrder.RepresentationTheory.exists_constituent_not_subset_characterKernel
+      (A := hInHu data) (B := hInHu data) le_rfl χ hχX
+  -- The descent hom `f = (mk' N) ∘ hInHuEquivH : ↥(hInHu) → H̄ = ↥H ⧸ N`.
+  set f : ↥(hInHu data) →* (↥data.H ⧸ chief.N) :=
+    (QuotientGroup.mk' chief.N).comp (hInHuEquivH data).toMonoidHom with hf
+  have hfsurj : Function.Surjective f :=
+    (QuotientGroup.mk'_surjective chief.N).comp (hInHuEquivH data).surjective
+  -- `f.ker ⊆ ker θ`: `f x = 1` puts the `G`-coordinate of `x` in `H₀ ⊆ ker χ`.
+  have hfker : (f.ker : Set ↥(hInHu data)) ⊆
+      OddOrder.Peterfalvi.S03.characterKernel (θ : ClassFunction ↥(hInHu data) ℂ) := by
+    intro x hx
+    have hxN : (hInHuEquivH data) x ∈ chief.N := by
+      have hx1 : f x = 1 := hx
+      rw [hf, MonoidHom.comp_apply, MulEquiv.coe_toMonoidHom, QuotientGroup.mk'_apply,
+        QuotientGroup.eq_one_iff] at hx1
+      exact hx1
+    have hxH0 : (((x : ↥(huSub data)) : ↥M) : G) ∈ chief.H0 := by
+      rw [chief.H0_eq, ← hInHuEquivH_coe data x]
+      exact Subgroup.mem_map_of_mem data.H.subtype hxN
+    have hxχ : (x : ↥(huSub data)) ∈
+        OddOrder.Peterfalvi.S03.characterKernel (χ : ClassFunction ↥(huSub data) ℂ) := by
+      apply hχH0
+      rw [SetLike.mem_coe, Subgroup.mem_subgroupOf, Subgroup.mem_subgroupOf]
+      exact hxH0
+    exact liesOver_mem_characterKernel hθlo hxχ
+  -- `θ` is an inflation `θ = compHom f θbar_irr` for some `θbar_irr ∈ Irr(H̄)`.
+  obtain ⟨θbar_irr, hθbar⟩ :=
+    OddOrder.RepresentationTheory.exists_compHom_eq_of_subset_characterKernel hfsurj θ hfker
+  -- `H̄` abelian, so `θbar_irr` is a linear character `θbar : H̄ →* ℂˣ`.
+  haveI : IsMulCommutative (↥data.H ⧸ chief.N) :=
+    ⟨⟨chief.quotient_elementaryAbelian.1⟩⟩
+  obtain ⟨θbar, hθbarval⟩ :=
+    exists_units_monoidHom_of_isIrreducibleCharacter_of_isMulCommutative θbar_irr.isIrreducible
+  have hθbar_eq : (θbar_irr : ClassFunction (↥data.H ⧸ chief.N) ℂ)
+      = (linearIrreducibleCharacter θbar : ClassFunction (↥data.H ⧸ chief.N) ℂ) := by
+    ext g
+    rw [linearIrreducibleCharacter_apply, hθbarval]
+  have hθ_eq : (θ : ClassFunction ↥(hInHu data) ℂ)
+      = (linearIrreducibleCharacter (θbar.comp f) : ClassFunction ↥(hInHu data) ℂ) := by
+    rw [← hθbar, hθbar_eq, ClassFunction.compHom_linearIrreducibleCharacter]
+  have hθθ : θ = linearIrreducibleCharacter (θbar.comp f) := IrreducibleCharacter.ext hθ_eq
+  refine ⟨θbar, ?_, ?_⟩
+  · -- `θbar ≠ 1`: else `θ = linear(1) = trivial`, contradicting `H ⊄ Ker θ`.
+    intro h0
+    apply hθnt
+    rw [Subgroup.subgroupOf_self]
+    intro y _
+    rw [OddOrder.Peterfalvi.S03.mem_characterKernel,
+      OddOrder.Peterfalvi.S03.characterDegree_def, hθ_eq, h0]
+    simp
+  · show IrreducibleCharacter.LiesOver (hInHu data) χ
+      (linearIrreducibleCharacter (θbar.comp f))
+    rw [← hθθ]; exact hθlo
+
 /-- **Peterfalvi (9.9.a)**: every member of `𝒮(H₀C')` has degree `qu`.
 
 For `φ = Ind_{HU}^M χ ∈ 𝒮(H₀C')` (so `χ ∈ 𝒳(H₀C')`, i.e. `χ ∈ Irr(HU)` with `H ⊄ Ker χ` and
@@ -7359,5 +7445,104 @@ theorem conjBy_eq_compHom_iff_quotient [Finite G] {M : Subgroup G} {data : Types
       (ClassFunction.compHom_injective_of_surjective (hInHuEquivH data).surjective h)
   · intro h
     rw [h]
+
+/-- **step 2 core: `M`-fixedness gives a `U`-conjugation** (Peterfalvi (9.8.c) surjectivity route).
+If `χ` is fixed by `conjBy m` (`m ∈ M`) and lies over `θ₀`, then there is a `U`-part element
+`u ∈ uInHu` with `conjBy u θ₀ = compHom φ_m θ₀`.  The single-orbit `g ∈ HU` of L3
+(`hcZeta_exists_conj_of_fixed`) decomposes as `g = h·u` (`hInHu_sup_uInHu_eq_top`, `HU = H·U`); the
+`H`-part `h` fixes `θ₀` (`h ∈ hInHu ≤ inertia θ₀`, `subgroup_le_inertia`), so
+`conjBy g θ₀ = conjBy u (conjBy h θ₀) = conjBy u θ₀` (`conjBy_mul`).  Realizing the `M`-fixed
+factor-permutation by a `U`-element (in `U ⊔ W₁`) is what lets `conjBy_eq_compHom_iff_quotient` turn
+it into the `H̄`-level `q(u)θbar = q(w)θbar` (`θbar∘q(w)` in the `U`-orbit of `θbar`). -/
+theorem exists_uInHu_conjBy_eq_of_fixed [Finite G] {M : Subgroup G}
+    {data : TypesIIIIIIVSetup M} (m : ↥M)
+    [Fintype ↥(hInHu data)] [Invertible (Nat.card ↥(hInHu data) : ℂ)]
+    (ζ : IrreducibleCharacter ↥(huSub data)) (θ₀ : IrreducibleCharacter ↥(hInHu data))
+    (hlo : OddOrder.RepresentationTheory.IrreducibleCharacter.LiesOver (hInHu data) ζ θ₀)
+    (hfix : ClassFunction.conjBy m (ζ : ClassFunction ↥(huSub data) ℂ)
+      = (ζ : ClassFunction ↥(huSub data) ℂ)) :
+    ∃ u : ↥(huSub data), u ∈ uInHu data ∧
+      ClassFunction.conjBy u (θ₀ : ClassFunction ↥(hInHu data) ℂ)
+        = ClassFunction.compHom (hInHuConj data m) (θ₀ : ClassFunction ↥(hInHu data) ℂ) := by
+  haveI := hInHu_normal data
+  obtain ⟨g, hg⟩ := hcZeta_exists_conj_of_fixed m ζ θ₀ hlo hfix
+  -- `g = h · u` with `h ∈ hInHu`, `u ∈ uInHu` (`HU = H·U`, `hInHu ◁ HU`).
+  have hgtop : g ∈ hInHu data ⊔ uInHu data :=
+    hInHu_sup_uInHu_eq_top data ▸ Subgroup.mem_top g
+  rw [← SetLike.mem_coe, Subgroup.normal_mul] at hgtop
+  obtain ⟨h, hh, u, hu, rfl⟩ := hgtop
+  refine ⟨u, hu, ?_⟩
+  -- `conjBy (h·u) θ₀ = conjBy u (conjBy h θ₀) = conjBy u θ₀` since `h` fixes `θ₀`.
+  have hhfix : ClassFunction.conjBy (h : ↥(huSub data)) (θ₀ : ClassFunction ↥(hInHu data) ℂ)
+      = (θ₀ : ClassFunction ↥(hInHu data) ℂ) :=
+    ClassFunction.mem_inertia.mp
+      (ClassFunction.subgroup_le_inertia (θ₀ : ClassFunction ↥(hInHu data) ℂ) hh)
+  rw [ClassFunction.conjBy_mul, hhfix] at hg
+  exact hg
+
+/-- **step 2: `M`-fixedness gives an `H̄`-level orbit equality** (Peterfalvi (9.8.c) surjectivity).
+If `χ` is fixed by `conjBy m` (`↑m = ↑b`, `b ∈ U ⊔ W₁`) and lies over the inflation `θ₀` of the seed
+`θbar : H̄ →* ℂˣ`, then there is a `U`-element `a` with `θbar ∘ q(a) = θbar ∘ q(b)`
+(`q = quotientMulAutHom`).  Chains the `U`-conjugation `exists_uInHu_conjBy_eq_of_fixed`, the L4
+bridge `conjBy_eq_compHom_iff_quotient` (turning it into `q(a)θbar = q(b)θbar` at the `H̄`-level), and
+`linearIrreducibleCharacter_injective` (stripping the linear wrapper).  Thus the `W₁`-twist
+`θbar ∘ q(b)` lies in the `U`-orbit `{θbar ∘ q(a) : a ∈ U}` of `θbar` — the input to the
+factor-permutation invariance of the nontrivial-`Hpart` set. -/
+theorem exists_uPart_theta_comp_quotient_eq_of_fixed [Finite G] {M : Subgroup G}
+    {data : TypesIIIIIIVSetup M} {chief : ChiefFactorData data}
+    (m : ↥M) (b : ↥(data.typeP.U ⊔ data.typeP.W1)) (hbm : ((m : G)) = (b : G))
+    (θbar : (↥data.H ⧸ chief.N) →* ℂˣ)
+    [Fintype ↥(hInHu data)] [Invertible (Nat.card ↥(hInHu data) : ℂ)]
+    (ζ : IrreducibleCharacter ↥(huSub data))
+    (hlo : OddOrder.RepresentationTheory.IrreducibleCharacter.LiesOver (hInHu data) ζ
+      (linearIrreducibleCharacter (θbar.comp ((QuotientGroup.mk' chief.N).comp
+        (hInHuEquivH data).toMonoidHom))))
+    (hfix : ClassFunction.conjBy m (ζ : ClassFunction ↥(huSub data) ℂ)
+      = (ζ : ClassFunction ↥(huSub data) ℂ)) :
+    ∃ a : ↥(data.typeP.U ⊔ data.typeP.W1), ((a : G)) ∈ data.typeP.U ∧
+      θbar.comp (quotientMulAutHom chief.N_aInvariant a).toMonoidHom
+        = θbar.comp (quotientMulAutHom chief.N_aInvariant b).toMonoidHom := by
+  obtain ⟨u, hu, hconj⟩ := exists_uInHu_conjBy_eq_of_fixed m ζ
+    (linearIrreducibleCharacter (θbar.comp ((QuotientGroup.mk' chief.N).comp
+      (hInHuEquivH data).toMonoidHom))) hlo hfix
+  have huU : ((u : ↥M) : G) ∈ data.typeP.U :=
+    Subgroup.mem_subgroupOf.mp (Subgroup.mem_subgroupOf.mp hu)
+  refine ⟨⟨((u : ↥M) : G), Subgroup.mem_sup_left huU⟩, huU, ?_⟩
+  -- form alignment: the step-1 `θ₀` equals the `conjBy_eq_compHom_iff_quotient` inflation form.
+  have hinfl : (linearIrreducibleCharacter (θbar.comp ((QuotientGroup.mk' chief.N).comp
+        (hInHuEquivH data).toMonoidHom)) : ClassFunction ↥(hInHu data) ℂ)
+      = ClassFunction.compHom (hInHuEquivH data).toMonoidHom
+          (ClassFunction.compHom (QuotientGroup.mk' chief.N)
+            (linearIrreducibleCharacter θbar : ClassFunction (↥data.H ⧸ chief.N) ℂ)) := by
+    ext x
+    simp only [ClassFunction.compHom_apply, linearIrreducibleCharacter_apply,
+      MulEquiv.coe_toMonoidHom, MonoidHom.comp_apply]
+  -- L4 bridge with `θbar_CF = linearIrr θbar`.
+  have hbridge := (conjBy_eq_compHom_iff_quotient
+    (⟨((u : ↥M) : G), Subgroup.mem_sup_left huU⟩ : ↥(data.typeP.U ⊔ data.typeP.W1)) b u m rfl hbm
+    (linearIrreducibleCharacter θbar : ClassFunction (↥data.H ⧸ chief.N) ℂ)).mp (by
+      rw [← hinfl]; exact hconj)
+  rw [ClassFunction.compHom_linearIrreducibleCharacter,
+    ClassFunction.compHom_linearIrreducibleCharacter] at hbridge
+  exact linearIrreducibleCharacter_injective (IrreducibleCharacter.ext hbridge)
+
+/-- **step 2 D₁: `Ū` preserves per-`Hpart` nontriviality** (Peterfalvi (9.8.c) surjectivity).  For a
+`U`-part element `a` (`a ∈ U ⊔ W₁` with `↑a ∈ U`), the twist `θbar ∘ q(a)` is trivial on the Clifford
+summand `Hpart i` iff `θbar` is (`q = quotientMulAutHom`).  A form-alignment wrapper over
+`caseA_uActionHom_comp_subtype_eq_one_iff`: `uActionHom data chief ⟨a, ·⟩ = quotientMulAutHom a`
+(`uActionHom` is `quotientMulAutHom ∘ U.subgroupOf.subtype`), so the `Ū`-action on the factors matches
+`q(a)`.  Combined with the orbit equality `θbar∘q(a) = θbar∘q(w)` (`exists_uPart_..._of_fixed`), this
+makes the nontrivial-`Hpart` set invariant under the `W₁`-twist `q(w)`. -/
+theorem caseA_theta_comp_quotient_uPart_comp_subtype_eq_one_iff [Finite G] {M : Subgroup G}
+    {data : TypesIIIIIIVSetup M} {chief : ChiefFactorData data}
+    {chars : Section11CharacterData data chief} (caseA : CliffordCaseAData chars)
+    {a : ↥(data.typeP.U ⊔ data.typeP.W1)} (haU : ((a : G)) ∈ data.typeP.U)
+    {i : Fin data.q} (θbar : (↥data.H ⧸ chief.N) →* ℂˣ) :
+    (θbar.comp (quotientMulAutHom chief.N_aInvariant a).toMonoidHom).comp
+        (caseA.Hpart i).subtype = 1
+      ↔ θbar.comp (caseA.Hpart i).subtype = 1 :=
+  caseA_uActionHom_comp_subtype_eq_one_iff caseA
+    (⟨a, Subgroup.mem_subgroupOf.mpr haU⟩ :
+      ↥(typeP_quotientCoprimeAction data.typeP data.nontrivial.1 chief.N_aInvariant).U) θbar
 
 end OddOrder.Peterfalvi.S11

@@ -261,6 +261,15 @@
 
 ## 現状メモ
 
+- **2026-07-01 — hub tick 合流 a/b/c/d (4 lane) + lane d σ-theory 再々配分 (issue 4014 hub 裁定)**:
+  cron tick で全 4 レーン合流 (a=Pf 9.8.c constituent / b=Pf 5.5 L-side+12.14 horth / c=Pf 13.16 W₁-side
+  conjunct 1+N_G(W₁)≤T / d=issue 4014 gating-map)。push `1144248a..aee8043f`、sorry 120→122 (全 scaffold)。
+  lane d が「§15 S&T setup + δ BG §14–16 の on-spine ungated frontier 枯渇」を code-level 確証 (issue 4014)
+  → **ユーザー裁定 = option (b): lane d を generic σ-theory (typeP_Galois 土台) の新 shared-infra leaf
+  `OddOrder/GroupTheory/**` 構築へ再配分** (claim-first、既存 SingerField/GaloisCharacter 等を scan)。
+  ⟹ cron の range-check: **lane d が `OddOrder/GroupTheory/**` に新 σ-theory leaf を追加しても共有ゾーンゆえ
+  逸脱でない**。ただし step 1.6 の shared-infra dup 検出は継続 (lane a §11 typeP_Galois と衝突しないか監視;
+  lane a は cite するだけの取り決め)。詳細 = issue 4014「HUB 裁定」節 + ft_lane_reallocation。
 - **2026-07-01 — policy 規約化 (自律 frontier 選択 + shared-infra claim) + lane b dup 保留 (issue 0093)**:
   ユーザー裁定 2026-07-01 を lane b/c が両方 codify。**c 版 (superset: CLAUDE + ft_path_policy §0 policy
   5-6 + merge_monitor §1.6 + issue_management 9000-range) を採用・合流** (`f6507084`)。b 版
