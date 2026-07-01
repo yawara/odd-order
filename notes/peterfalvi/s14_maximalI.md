@@ -1734,3 +1734,21 @@ Quot.sound])。(12.6) 3 case のうち (b)(loop⁶⁷ 9ba65c40)・(c) が完了�
 (12.10) で排除できれば witness_L_coherent は (b)(c) 済みゆえ sorry-free になる → (12.16) Dade 計算の coherence
 入力 `hB` が閉じる。要調査: witness Hypothesis が「H^# not TI」を carry するか (12.10 の所在)、hTI→False の導出。
 これが (12.16)→(16) 最終矛盾への実質前進。case (a) の (8.18.c) 幾何本体 (S14:665) は general 12.7 用で FT witness 経路外。
+
+## loop⁹⁰: (12.10) 非-TI で witness coherence を (8.18.c) から decouple (commit b04c306f)
+
+`witness_L_coherent`・`witness_L_zeta_bound` を **(12.6) case (b)/(c) のみ**経由に変更 (3-case
+`frobenius_typeI_coherent` を経由しない)。case (a) `sibleyTarget_frobI` は (8.18.c) §10 thickened-support
+幾何を推移的に要するが、**witness は非-TI** (Pf (12.10)) ゆえ case (a) を取らない。
+検証済: `_of_abelianKernel` (b)・`_of_cyclicQuotient` (c) 共 [propext, Classical.choice, Quot.sound] (axiom-clean)。
+∴ `witness_L_coherent` の sorryAx source は now **(12.9)/(12.10)/(12.11) の genuine witness 事実のみ** で
+(8.18.c) を含まない。
+
+**新 `witness_H_sharp_not_isTISubset` ((12.10) 非-TI 節)**: reduction は**実証明** — `N_G(H)=L` を inline
+(coatom L + simplicity で `N_G(L_F)=⊤` を排除、`maxNilpotentNormalHall_le{,_normalizer}`)、TI-failure は
+`g ∈ C_G(x)∖L` が `x ∈ H^#` を中心化 (`gxg⁻¹=x`, `g∉N_G(H)=L`、`data.centralizer_x_not_le_L`) で witness。
+唯一の残 `sorry` = 精密な (12.11)-gated 事実 `x ∈ H` (`x ∈ M⊓L ≤ L_F`)。
+
+**次 frontier (loop⁹¹+, task 5)**: (12.11) `intersection_complement_structure` を証明 → hxH を fill
+(x∈M は P0_le_M、x∈L は mainSubgroup≤L の 5-type case-split)。その後 witness path の残 genuine gap は
+(12.10) `witness_L_frobenius`。doc-order 上流優先で (12.11)→(12.10)。
