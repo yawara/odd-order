@@ -67,7 +67,22 @@ off-path tauS cascade 非依存:
 3. numeric elimination で c_eq_one 完成。
 (P_elab/u_bound は lane a §11 structural type-P σ-theory = `H_elementaryAbelian`/typeP_Galois に cite。)
 
-### B. char/numeric spine (13.5–13.15、10 sorry) — **character grid + coherence gated**
+### c_eq_one (13.12) 進捗 (2026-07-01 loop、structural part 完成)
+
+Coq `FTtypeP_Ind_Fitting_reg_Fcore` の route を実装:
+- ✅ `W1_fpf_C` — W₁ が C 上 fpf 共役作用 (typeP_uW1_frobenius transfer)。
+- ✅ `W1_le_normalizer_C` — W₁ ≤ N_G(C)。
+- ✅ `c_modEq_one` — **c ≡ 1 (mod q)** (q-group 類等式 + fpf ⟹ C_C(W₁)={1})。
+- ✅ `two_mul_q_dvd_c_pred` — **2q ∣ c−1** (= Coq `dv_2q_c1`、c 奇 + Gauss)。
+- ✅ `c_eq_one` restructure — c>1 枝で **c ≥ 2q+1** を structural に確立。
+
+**残 c_eq_one deep 部** (α cluster、multi-turn): (i) (13.10) analytic inequality `ub_m`
+(W-side character norm cascade、grid gated) + (ii) `typeP_Galois` 二分岐 (σ-structure、lane a §11)
++ (iii) `u ∣ 31` (Galois case) + (iv) `Fcore_max` structural contradiction (PC nilpotent normal
+Hall ⊋ P=S_F の矛盾)。arith core (`caseB_numeric_forces_q_three`/`m_value_*`) は済だが、char/σ 部が
+deep。次: (13.10) の grid 供給可否を assess。
+
+## B. char/numeric spine (13.5–13.15、10 sorry) — **character grid + coherence gated**
 
 `tiSubset_character_orthogonality` (13.5) / `lambda_norm_lower` (13.6) / `eta10_norm_lower` (13.7) /
 `eta01_norm_lower` (13.8) / `global_character_bound` (13.9) / `analytic_inequality` (13.10) /
