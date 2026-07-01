@@ -49,6 +49,16 @@ instance instMul : Mul (ClassFunction G k) where
     compHom f (φ * ψ) = compHom f φ * compHom f ψ := by
   ext x; simp
 
+/-- **Twisting by a factor that is `1` on `H` does not change the restriction to `H`.**  If
+`lam x = 1` for every `x ∈ H`, then `Res_H (χ · lam) = Res_H χ`.  In Gallagher's theorem `lam =
+Inf(β)` is inflated from `I/H`, hence `1` on `H`, so `χ · Inf(β)` restricts to `Res_H χ = θ` — i.e.
+it lies over `θ` — and `⟨Ind_H^I θ, χ·Inf(β)⟩ = ⟨θ, Res_H(χ·Inf β)⟩ = ⟨θ, θ⟩ = 1`. -/
+theorem restrict_mul_of_apply_eq_one {H : Subgroup G} (χ lam : ClassFunction G k)
+    (hlam : ∀ x : ↥H, lam (x : G) = 1) :
+    restrict H (χ * lam) = restrict H χ := by
+  ext h
+  simp only [restrict_apply, mul_apply, hlam, mul_one]
+
 end ClassFunction
 
 variable {G : Type*} [Group G]
