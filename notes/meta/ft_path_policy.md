@@ -71,6 +71,20 @@
    - **spine-consumed sorried input の扱い**: 消費が genuine（vestigial でない）と確認されたら、honest 化は
      (α) 構造 route を建てる → (γ) 明示 sorried input として許容し spine が載る事実を**隠さず flag** の順で降りる。
      **(β) vestigial finding での dodge は消費が実際に off-path のときのみ**（消費 footprint を code-level 検証してから）。
+8. **重複発覚時は hub 裁定（ユーザー裁定 2026-07-02, issue 9000）。** claim-before-build（policy 6）の search が
+   他レーンの **in-progress work を見落とす**ことがある（同一 math が別レーンの *所有 file* 内で別抽象レベル・
+   別 namespace で構築中のとき。実例: σ-theory infra を `GroupTheory/**` leaf で claim したが、lane a が S11 で
+   **subgroup-level に同じ Singer 機構を concurrent 構築**していた、2026-07-02）。重複を発覚したレーンは：
+   1. **不 unilateral**: どちらの版が勝つか / どちらを消すかを沈黙で決めない。
+   2. **不 user-ask**: AskUserQuestion しない（home 一本化の *判断* は hub の機能、channel 違い = policy 7 と同型）。
+   3. **hub に flag**: 重複を claim issue + hub 宛 async issue に記録（どの補題が重複・どのレーン・どの home が自然か・
+      非重複部は何か）、home 一本化を hub に defer。
+   4. **待たず非重複部を進める**: genuine に非重複な piece は続行（[[lanes-are-equivalent-no-specialty]]）、
+      重複 piece は hub 裁定まで**凍結**（重複を広げない）。
+   5. **hub 側の予防（再発防止）**: (a) policy 6 の search は shared-infra namespace だけでなく、**同一 math content が
+      他レーンの owned file で in-progress でないか**も確認する（consumer が他レーンにいる infra は特に、grep は
+      subgroup-level / module-level 両抽象を跨ぐ）。(b) hub が「lane X が cite する infra」を別レーンに再配分するとき
+      は **lane X が既にその infra を build 中でないか先に確認**する（policy 7 step 4「既存判定を勘案」と同型の齟齬防止）。
 
 ---
 
