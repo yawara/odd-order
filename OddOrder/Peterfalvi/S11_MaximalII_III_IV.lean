@@ -4968,6 +4968,55 @@ noncomputable def clifford_caseA_data [Finite G] {M : Subgroup G}
   have hdvd := aInvariantRestrictAut_range_card_dvd hS₀inv (hS₀card ▸ chief.p_prime)
   rwa [hS₀card] at hdvd
 
+/-- **`|S₀| = p`**: the orbit generator `S₀` (`CliffordCaseAData.S0`) has order `p`.  Each summand
+`Hpart j = φ(orbitRep j) • S₀` (`Hpart_orbit`) is an automorphic image of `S₀` under the chief-factor
+action `φ = quotientMulAutHom`, hence has the same order (`card_pointwise_smul`), which is `p`
+(`Hpart_order`).  A foundational input for the (9.8.c) constant-factor-data construction (`S₀ ≅ ℤ/p`
+has exactly `p` characters, `p-1` of them nontrivial). -/
+theorem caseA_S0_card [Finite G] {M : Subgroup G}
+    {data : TypesIIIIIIVSetup M} {chief : ChiefFactorData data}
+    {chars : Section11CharacterData data chief} (caseA : CliffordCaseAData chars) :
+    Nat.card ↥caseA.S0 = chief.p := by
+  have h := caseA.Hpart_order ⟨0, data.nontrivial.2.1.pos⟩
+  rwa [caseA.Hpart_orbit ⟨0, data.nontrivial.2.1.pos⟩, card_pointwise_smul] at h
+
+/-- **Orbit-transport iso** `S₀ ≃* Hpart j`: the chief-factor automorphism `φ(orbitRep j)` maps the
+generator `S₀` isomorphically onto the summand `Hpart j = φ(orbitRep j) • S₀` (`Hpart_orbit`).  The
+transport used to define the (9.8.c) constant-factor-data characters (assign one `S₀`-character to
+every summand). -/
+noncomputable def caseA_orbitEquiv [Finite G] {M : Subgroup G}
+    {data : TypesIIIIIIVSetup M} {chief : ChiefFactorData data}
+    {chars : Section11CharacterData data chief} (caseA : CliffordCaseAData chars) (j : Fin data.q) :
+    ↥caseA.S0 ≃* ↥(caseA.Hpart j) :=
+  (Subgroup.equivMapOfInjective caseA.S0
+      (quotientMulAutHom chief.N_aInvariant (caseA.orbitRep j)).toMonoidHom
+      (quotientMulAutHom chief.N_aInvariant (caseA.orbitRep j)).injective).trans
+    (MulEquiv.subgroupCongr (by rw [caseA.Hpart_orbit j]; rfl))
+
+/-- **Reducible induction ⟹ full inertia** (prime-index Clifford dichotomy): if `Ind_{HU}^M χ` is
+reducible for `χ ∈ Irr(HU)`, then `I_M(χ) = ⊤` (`χ` is `M`-invariant).  `HU ◁ M` with `[M:HU] = q`
+prime (`huSub_index_eq_q`), so `HU ≤ I_M(χ) ≤ M` forces `I_M(χ) ∈ {HU, M}`
+(`eq_of_le_of_prime_index`); reducibility excludes `I_M(χ) = HU` (contrapositive of
+`isIrreducibleCharacter_induce_of_inertia_eq`).  The `M`-fixedness feeding the (9.8.c) `Xmu`
+injectivity (`induce_injective_of_inertia_stable`) in the surjectivity route to `|Xmu| = p-1`. -/
+theorem inertia_eq_top_of_induceHU_not_irreducible [Finite G] {M : Subgroup G}
+    (data : TypesIIIIIIVSetup M) [Fintype ↥M] [Invertible (Nat.card ↥(huSub data) : ℂ)]
+    (χ : IrreducibleCharacter ↥(huSub data))
+    (hred : ¬ IsIrreducibleCharacter
+      (ClassFunction.induce (huSub data) (χ : ClassFunction ↥(huSub data) ℂ))) :
+    ClassFunction.inertia (χ : ClassFunction ↥(huSub data) ℂ) = ⊤ := by
+  haveI := huSub_normal data
+  letI : Fintype ↥(huSub data) := Fintype.ofFinite _
+  letI : Invertible (Nat.card ↥M : ℂ) :=
+    invertibleOfNonzero (Nat.cast_ne_zero.mpr Nat.card_pos.ne')
+  have hne : ClassFunction.inertia (χ : ClassFunction ↥(huSub data) ℂ) ≠ huSub data :=
+    mt (isIrreducibleCharacter_induce_of_inertia_eq χ) hred
+  have hle : huSub data ≤ ClassFunction.inertia (χ : ClassFunction ↥(huSub data) ℂ) :=
+    ClassFunction.subgroup_le_inertia _
+  have hprime : (huSub data).index.Prime := by rw [huSub_index_eq_q]; exact data.nontrivial.2.1
+  by_contra hnt
+  exact hne (eq_of_le_of_prime_index hle hprime hnt)
+
 /-- **A regular character nontrivial on each `W1`-conjugate of `S₀`** (Clifford case (a)).
 Instantiates the elementary `(9.7)` decomposition `H̄ = ⊕_{w∈W1} S₀^w` (`wConjugate_coprod_bijective`,
 with the chief-factor `U`-action, `act.U ⊔ act.E = ⊤`, `|H̄| = p^{|W1|}`) and feeds the resulting
