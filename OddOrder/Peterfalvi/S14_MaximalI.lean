@@ -387,6 +387,23 @@ theorem character_decomposition_and_dade_domain [Finite G]
   obtain ⟨S, hne, hdecomp, hdeg, hreal, hsupp⟩ := typeI_induced_char_constituents hyp hchi
   exact ⟨⟨hchi, S, hne, hdecomp, hdeg, hreal, hsupp⟩, rfl⟩
 
+/-- **Peterfalvi (12.2.a) `CharacterDecompositionData` for a Frobenius type-I `L`** —
+`character_decomposition_and_dade_domain` without the (8.2.c)-gated `typeI_induced_char_constituents`
+obligation.  For a Frobenius `L` (kernel `H = L_F`) the constituent structure is the trivial
+singleton `{χ}` (`frobenius_typeI_induced_char_constituents`), so the carrier is **sorry-free**.
+This is the `data` the witness-`L` side of (12.16) needs (`ψ ∈ ℤ[R(χ_L)]` via (5.5), and the
+`R(χ_L) ⊥ R(χ_M)` orthogonality of (12.3)); the witness `L` is Frobenius by (12.10)
+(`witness_L_frobenius`), whose `hfrob` is cited under the signature contract. -/
+theorem frobenius_character_decomposition_and_dade_domain [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {L : Subgroup G} (hyp : Hypothesis L) {C : Subgroup ↥L}
+    (hfrob : OddOrder.Isaacs.Ch06.IsFrobeniusGroup ↥L ((hyp.typeI.typeF.H).subgroupOf L) C)
+    (hAH : hyp.ambientA = ((hyp.typeI.typeF.H) : Set G) \ {1})
+    {chi : ClassFunction ↥L ℂ} (hchi : chi ∈ hyp.Sset) :
+    ∃ data : CharacterDecompositionData hyp chi, data.chi_mem = hchi := by
+  obtain ⟨S, hne, hdecomp, hdeg, hreal, hsupp⟩ :=
+    frobenius_typeI_induced_char_constituents hG hyp hfrob hAH hchi
+  exact ⟨⟨hchi, S, hne, hdecomp, hdeg, hreal, hsupp⟩, rfl⟩
+
 /-! ## (12.2.b): the orthonormal Dade-image families `R₁(φ)` and `R(χ)` -/
 
 open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
