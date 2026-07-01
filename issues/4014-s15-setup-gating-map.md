@@ -58,12 +58,45 @@ carrier の `TypePData.fitting_eq` (= Pf (8.5.a)) で closed (issue 4013、commi
 
 このマップは調査記録。個別 sorry の closure は A/B/C の gate 解除に従う (別 issue/lane)。
 
+## construction-site 実地調査 (2026-07-01, lane d) — **in-territory と判明**
+
+`S15.Hypothesis` の **唯一の constructor は `FeitThompson.lean`** (δ = lane d dormant territory):
+- `sectionSixteenHypothesis_of_isMinimalSimpleOdd` (:1740、`tp`=`Section16TypePStructure` menu 経由)
+- `sectionSixteenHypothesis_of_inputs` (:1817、`inp`=`Section16Inputs` 経由)
+- menu builder `section16TypePStructure_of_isMinimalSimpleOdd` (:795)
+- `S14_MaximalI:3427` は **S12 Hypothesis** 構築 (S15 でない) → lane B touch 不要。
+- `S16_NonExistenceGCore` は `base : S15.Hypothesis` を **受け取るだけ** (base field 構築せず) → 不変。
+
+⟹ **carrier 拡張は S15_SAndT_Setup (mine) + FeitThompson carrier宣言群 (δ dormant = mine) で完結、
+cross-lane でない**。α の `:426` (feitThompson 本体) には非接触。
+
+**供給元も在庫確認済** (`section16TypePStructure_of_isMinimalSimpleOdd` :795 の scope 内):
+- Hall `(κ∪σ)'`-subgroup `U₀` を `hall_E_exists` で既取得 (:800)。
+- W-side は `typeP_pair_W_structure` (BG 14.7)、W₂ = `mp.Kstar`。
+- U-side は `exists_kappaHall_invariant_complement_to_MF` (BG §1 Prop 1.5.b invariant Schur–Zassenhaus)。
+
+## 具体 拡張プラン (in-territory、lane d 実施可)
+
+S15.Hypothesis + menu chain (`Section16MaximalPair`/`Section16TypePStructure`/`Section16Inputs`) に
+reconciliation field を足し、`section16TypePStructure_of_isMinimalSimpleOdd` で供給:
+
+| 追加 field | close する basic_structure_gated field | 供給 supply-proof | gate 残 |
+|---|---|---|---|
+| `Sdata_W2_eq : Sdata.W2 = W2` | `P_order` (`card_P_eq` 即適用) | `Sdata.W2 = mp.Kstar` = W₂↔K* 同定 (typeP_duality/14.7)。要確認 | なし (在庫で closable 見込) |
+| `S_U_commutative : IsMulCommutative ↥U` | `U_commutative` | `U` = Hall `U₀` (or 共役) → BG§15 `typeP_hall_derived_eq_and_abelian` (sorry-free)。`U` と `U₀` の同定が要 | なし (在庫で closable 見込) |
+| (`P_elementaryAbelian`) | `P_elementaryAbelian` | lane a `H_elementaryAbelian` (Pf 11.7) cite = **sorried** + `S13.Hypothesis S` 構築 (重) | lane a §11 に残 gated |
+
+**BG/** dormant genuine-need part** (Option 1 並行作業): 上表の supply-proof が要求する reconciliation
+lemma (`Sdata.W2 = Kstar` / `U = Hall U₀`) が BG §14/§16 に在庫か確認 → 無ければ BG/** で実証明
+(typeP_duality 周辺、mine dormant territory)。これが extension の genuine upstream math。
+
 ## 次手 recommendation (lane d)
 
-1. **A の carrier reconciliation** が最高 ROI (12× cite) だが signature 変更で cross-lane 裁定要。
-   → hub/ユーザーに「S15.Hypothesis に U-Hall / W2 / P-elab reconciliation field を足し、
-   construction site (FeitThompson + S16_NonExistenceGCore) で供給する」案の可否を確認。
-2. それまで lane d は BG/** dormant の genuine-need 部か、A の construction-site 供給可否の実地調査へ。
+1. `Sdata_W2_eq` / `S_U_commutative` supply-proof が要求する BG reconciliation lemma の在庫確認 →
+   無ければ BG/** で実証明 (genuine upstream、in-territory)。
+2. 揃ったら menu chain に field threading して `P_order` / `U_commutative` を close (in-territory)。
+3. `P_elementaryAbelian` は lane a `H_elementaryAbelian` の sorried-cite skeleton で前倒し可
+   (S13.Hyp bridge)、本体は lane a §11 待ち。
 
 ## 参照
 
