@@ -1309,3 +1309,20 @@ ConjugationBrauer の conjByPerm 定義、要 bridge 確認)。
 
 **scope**: type-F class-fixing variant (~40-60 行) + π-part helper。M-side data
 (typeI_induced_char_constituents 一般版) は (8.2.c) + Clifford decomp を要すので (8.2.c) は 1 input。
+
+### loop⁵⁴⁻⁵⁶ (2026-07-01 lane-b resume²): ✅ (8.2.c) 完全証明 — M-side gate 突破
+
+**(8.2.c) `typeF_inertia_inf_le_U1` (I(θ)∩U⊆U₁) を sorry-free + axiom-clean で完全証明**
+(commits 43a28f4d/da833a9a/8c8688d4)。§12 char frontier の M-side critical-path gate 突破。
+- `mem_zpowers_mul_of_commute_coprime` (π-part、汎用 GT)。
+- `fixed_conjClass_eq_one_of_typeF` (核): g∈U-U₁ は自明 H-class のみ固定 ((2.1) exists_mem_centralizer_conj
+  + π-part + centralizer_le_U1 field)。
+- `card_fixedPoints_conjClassPerm_eq_one_of_typeF` + `typeF_inertia_inf_le_U1` (Brauer chain +
+  IrreducibleCharacter.coe_conjBy inertia bridge)。
+
+**残 = 一般 typeI_induced_char_constituents (S14:~350 sorry)**: (8.2.c) は **equal degree** input
+(inertia bound ⟹ 構成要素の共通次数)。だが**構成要素の decomposition 自体は Clifford theory** 要
+(Ind_H^L θ の constituents = I_L(θ)/H 構造)。次: (a) Clifford decomposition (clifford_decomposition
+在庫、Ind の constituents 列挙)、(b) (8.2.c) を TypeFData field (Hall coprime hUHcop + centralizer_le_U1)
+に接続、(c) equal degree/support/non-real 組み上げ。これで M-side CharacterDecompositionData →
+12.14 の (12.4)-for-M 応用が開通。
