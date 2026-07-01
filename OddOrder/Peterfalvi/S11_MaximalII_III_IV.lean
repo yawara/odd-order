@@ -7567,4 +7567,38 @@ theorem caseA_theta_comp_quotient_uPart_comp_subtype_eq_one_iff [Finite G] {M : 
     (⟨a, Subgroup.mem_subgroupOf.mpr haU⟩ :
       ↥(typeP_quotientCoprimeAction data.typeP data.nontrivial.1 chief.N_aInvariant).U) θbar
 
+/-- **`Ū`-invariance of nontriviality on a `U`-invariant `K`, `quotientMulAutHom` form**: for a
+`U`-invariant `K` and a `U`-part element `a` (`↑a ∈ U`), `θ ∘ q(a)` is trivial on `K` iff `θ` is
+(`q = quotientMulAutHom`).  The form-alignment (`uActionHom ⟨a,·⟩ = q(a)`) version of
+`comp_uActionHom_comp_subtype_eq_one_iff_of_aInvariant` for the general-`K` uses in the (9.8.c)
+surjectivity regularity argument (`K = q(w) • S₀` and `K = S₀`). -/
+theorem comp_quotient_uPart_comp_subtype_eq_one_iff_of_aInvariant [Finite G] {M : Subgroup G}
+    {data : TypesIIIIIIVSetup M} {chief : ChiefFactorData data}
+    {K : Subgroup (↥data.H ⧸ chief.N)} (hK : IsAInvariant (uActionHom data chief) K)
+    {a : ↥(data.typeP.U ⊔ data.typeP.W1)} (haU : ((a : G)) ∈ data.typeP.U)
+    (θ : (↥data.H ⧸ chief.N) →* ℂˣ) :
+    (θ.comp (quotientMulAutHom chief.N_aInvariant a).toMonoidHom).comp K.subtype = 1
+      ↔ θ.comp K.subtype = 1 :=
+  comp_uActionHom_comp_subtype_eq_one_iff_of_aInvariant hK
+    (⟨a, Subgroup.mem_subgroupOf.mpr haU⟩ :
+      ↥(typeP_quotientCoprimeAction data.typeP data.nontrivial.1 chief.N_aInvariant).U) θ
+
+/-- **step 2 D₂: precompose–pointwise-smul bridge**.  A character `θ` is trivial on the translate
+`a • S` (`a : MulAut K`) iff its precomposition `θ ∘ a` is trivial on `S` (any element of `a • S` is
+`a s` for `s ∈ S`).  Used with `a = q(v)` (`quotientMulAutHom`) and `S = S₀` to turn nontriviality on
+the Clifford summand `Hpart i = q(orbitRep i) • S₀` into nontriviality of `θbar ∘ q(orbitRep i)` on
+the generator `S₀`, the last bridge of the (9.8.c) surjectivity regularity argument. -/
+theorem comp_subtype_pointwise_smul_eq_one_iff {K : Type*} [Group K] (a : MulAut K)
+    (θ : K →* ℂˣ) (S : Subgroup K) :
+    θ.comp (a • S).subtype = 1 ↔ (θ.comp a.toMonoidHom).comp S.subtype = 1 := by
+  rw [MonoidHom.ext_iff, MonoidHom.ext_iff]
+  refine ⟨fun h s => ?_, fun h y => ?_⟩
+  · have hval := h ⟨a • (s : K), (Subgroup.smul_mem_pointwise_smul_iff).mpr s.2⟩
+    simpa only [MonoidHom.comp_apply, Subgroup.subtype_apply, MonoidHom.one_apply,
+      MulEquiv.coe_toMonoidHom, MulAut.smul_def] using hval
+  · have hval := h ⟨a⁻¹ • (y : K), (Subgroup.mem_pointwise_smul_iff_inv_smul_mem).mp y.2⟩
+    simp only [MonoidHom.comp_apply, Subgroup.subtype_apply, MonoidHom.one_apply,
+      MulEquiv.coe_toMonoidHom, MulAut.smul_def, MulAut.apply_inv_self] at hval ⊢
+    exact hval
+
 end OddOrder.Peterfalvi.S11
