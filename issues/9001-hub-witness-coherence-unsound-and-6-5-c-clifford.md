@@ -55,7 +55,64 @@ claim して build? α も §10-13 char で要する見込み — 重複回避�
 2. (6.5.c) coherence を lane b が build するか、別レーン/別 issue に割り当てるか。
 3. 構成的 Clifford (issue 0026) の claim を lane b が取るか、α と調整するか。
 
+## ✅ HUB 裁定 (2026-07-02, cron tick)
+
+**事項 1 (case-split unsound 是正) → ✅ 承認・合流済 (commit `ed34cdc8`)**。
+`frobenius_typeI_coherent` の 3-case split は、sibleyTarget_frobI を非TI witness に適用する unsound
+routing を是正した **soundness 改善**。assembly は sorry-free、+2 sorry (case b/c delegate) は honest
+scaffold ゆえ **非 regression** (CLAUDE.md doneness 原則 = unsound < honest sorry に完全合致)。owned file
+(S14) 内で正しく進めた。hub は今後も unsound→honest-scaffold 置換を regression 扱いしない。
+
+**事項 2 (shared coherence/char infra 割当) → lane b が build (claim-first)**。
+σ-theory 再配分 (issue 4014) と同原則: shared infra は **immediate consumer + context を持つレーンが
+claim-first で build、他レーンは cite (dup 回避)**。lane b は (12.6)/(12.14) の直接 consumer + turnkey 分析
+済ゆえ 3 件すべて lane b が担当:
+- **(A) (6.5.c) coherence producer**: lane b が build。**9000 番台で claim** (既存 §6.5 在庫を scan、
+  `six_five_*` は numerical のみと確認済)。shared leaf (`OddOrder/GroupTheory/**` または Peterfalvi §6.5
+  shared infra ファイル)。α (§10-13) が要すれば cite。
+- **(A') (5.7)/S07 lattice-relative refactor**: lane b が実施 (turnkey = 機械的・contained と確認済:
+  weakened (5.2) Hypothesis を commonImage/pairDecomp'/xFamily_inner に通すだけ、coherentEqualDegree 無改造)。
+  S07 は shared ゆえ in-scope。⚠ **S07 の既存 consumer (lane a coherence) を build-green に保つこと** —
+  hypothesis 一般化ゆえ既存 caller は影響なしのはずだが、merge gate + full build で強制する。
+- **(B) 構成的 Clifford (issue 0026)**: lane b が **9000 番台で claim** して build (issue 0026 を subsume)。
+  α は着手前に open 9000 issue を scan して cite (dup 回避)。
+
+**根拠**: policy 5(B) (未所有 leaf は consumer が他レーンでも in-scope) + policy 6 (claim-before-build) +
+policy 7 (σ-theory 先例)。shared-infra 割当ゆえ hub 権限内 (whole-lane 再配分でない、user escalation 不要)。
+**dedup**: lane b が (A)/(B) の 9000 番台 claim を切ったら、hub は次 tick で α が同 leaf を沈黙構築して
+いないか step 1.6 で監視。
+
+## HUB→lane c 指示 (2026-07-02, cont.⁴³ への応答)
+
+lane c (cont.⁴³) が「deep char frontier は 9001 shared coherence infra に gated、hub 裁定待ち」と記録
+(main より 10 commits 遅れで本裁定を未同期)。**裁定は完了。lane c は idle にならず以下で engage する**
+(STOP 条件 (a)「上流待ち/starve を口実に hard body 放置」を避ける):
+
+1. **coherence は lane b が build (本裁定)。lane c は再構築せず cite する** (dup 回避)。
+2. **lane c は coherence 一辺倒に gated でない — 今すぐ engage できる ungated frontier がある**
+   (hub が S16 残 sorry を精査、2026-07-02):
+   - **σ-theory-dual structural (lane d が今 tick landed、cite 可)**: `S16:166 v=(q^p−1)/(q−1)`
+     (= T-side v-value = lane d の `TypePGaloisUBound` u_bound dichotomy の**完全 dual**)、`S16:3431`
+     (IsCyclic U ∧ IsElementaryAbelian Q)、`S16:3511` (IsCyclic V)。**lane d の σ-theory leaf
+     (SingerLineBound/TypePGaloisUBound) を T-side に cite して discharge 可** (coherence 不要)。
+   - **coherence-gated deep char は signature-first で skeleton**: `orthogonality_switch`(14.14)/
+     `exists_MHypothesis`(14.10)/13.18/13.19 は S07 の宣言済 `IsCoherent` 等を cite して downstream
+     の Dade cascade skeleton を前倒し ([[feedback-gated-endpoint-skeleton-pattern]])。unsound は lane b が
+     是正済 (ed34cdc8) ゆえ honest sorried signature の cite は安全。
+3. **binding-pole の deep char は本質的に multi-turn。** slow discharge は正常、metric は sorry 数でなく
+   genuine math ([[scaffold-sorry-free-not-done]])。1 iteration で landing しないことは止める理由でない。
+
+## やること (裁定後)
+- [x] 事項 1 case-split: 承認・合流済 (`ed34cdc8`)。
+- [ ] lane b: (6.5.c) coherence を 9000 番台で claim → build (shared leaf)。
+- [ ] lane b: (5.7)/S07 lattice-relative refactor を実施 (S07 consumer build-green 維持)。
+- [ ] lane b: 構成的 Clifford (issue 0026) を 9000 番台で claim → build。
+- [ ] α: 着手前に open 9000 issue を scan、coherence/Clifford は lane b leaf を cite (再構築しない)。
+- [ ] lane c: idle 回避。σ-theory-dual structural (S16:166/3431/3511) を lane d leaf cite で discharge +
+  coherence-gated deep char を signature-first で skeleton。coherence は再構築しない。
+
 ## 参照
 - issues/2032 (sibleyTarget_frobI unsound 詳細), issue 0026 (Clifford core)
 - notes/peterfalvi/s14_maximalI.md loop⁶⁰-⁶²
 - Pf 原文: 04.8 (6.8), 04.14 (12.6/12.9/12.10)
+- hub 裁定根拠: ft_path_policy.md §0 policy 5(B)/6/7、issue 4014 (σ-theory 先例)

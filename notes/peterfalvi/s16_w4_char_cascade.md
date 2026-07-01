@@ -1181,3 +1181,30 @@ cont.³⁹ が「T の FittingIsTI 源 要調査」で止めた W₁-side (`norm
   - `normalizer_W1_structure` assemble = ⟨W1_le_Q, Q_elementaryAbelian_T.comm, normalizer_W1_le_QW2⟩ (要 IsTypeII T + line155→機構後方 relocate)。
 
 **IsTypeII T threading の構造 (次手)**: §13.17 S15 chain は現在 **IsTypeNonI T / IsTypeII S** で回る (`Q_W2_structure`/`typeI_overNormalizer_complement`(hSTypeII)/`typeII_overNormalizer_frobenius`(hSTypeII) → S16 `exists_LHypothesis`:78 が hSII をローカル取得)。`T_typeII` (14.9, S16:1581) は `typePData_of_isTypeNonI` + sorried `T_typeII_structural_inputs` から**独立に proven** (normalizer_W1 chain に非依存=**循環なし**)。⟹ threading 可能: (a) S15 §13.17 chain 各 theorem に `hTTypeII : IsTypeII T` 追加、(b) S16 で `T_typeII` を `exists_LHypothesis` 等の前に reorder し供給。ripple ~10 theorem・2 file の deliberate wiring。[[verify-port-state-by-number-not-coq-name]]
+
+
+### cont.⁴² (2026-07-01 lane c=γ /loop): §13.16/13.17.a structural discharge 完了 — 残 lane-c は deep char に集約 (tractable structural exhausted)
+
+IsTypeII↔IsTypeP2 (cont.⁴¹) + card_Q_eq/card_P_eq proven の波及で、§13.16 + §13.17.a の **structural facts を一巡 discharge 完了**:
+- **§13.16 W₁-side 完成** (cont.⁴⁰): confinement (crux=coprime 固定点 / core=Gorenstein 2.3+Wielandt) + `normalizer_W1_structure` assemble (conjunct 1,3 proven、2=Q_elementaryAbelian_T residual)。
+- **card_Q_eq** (|Q|=q^p) proven → IsTypeII T を §13.17→§16 chain (Q_W2_structure/typeI_overNormalizer_complement/typeII_overNormalizer_frobenius/exists_typeI_maximal_overNormalizer_U) に threading、T_typeII を exists_LHypothesis 前へ reorder。
+- **fittingIsTI_T** proven (IsTypeII→IsTypeP2→fittingIsTI_of_isTypeP2)。
+- **tConjugate_fitting_data** (L~T: |L_F|=q^p ∧ W₁≤L_F ∧ L_F⊓U=⊥) + **sConjugate_fitting_data** (L~S dual、card_P_eq 経由) 完全 proven (part1=card equiv、part2=pgroup_le_of_normal_coprime_index、part3=coprime)。
+
+**残 lane-c = 全て deep char / blocked (tractable structural 無し、実調査確認)**:
+- **deep char (binding pole、multi-turn Dade machinery)**: `beta_support_norm_and_remainder` (13.18 BetaData 構築)、`typeI_orthogonality_dichotomy` (13.19 TypeIOrthogonalityData)、`exists_MHypothesis` (14.10 MHypothesis: Dade ext+beta_M)、`betaM_expansion` (14.11.2)、`orthogonality_switch` (14.14)、`main_size_bounds_structural` の k>2pv (14.11.1、cyclotomic v-value gated)、`EtaGenericData` (2389)。
+- **blocked residuals (S-side dual も sorried)**: `reconciled_typePData_T` (§16 reconciliation)、`Q_elementaryAbelian_T` (dual=P_elementaryAbelian sorried)、`V_inf_centralizer_Q_eq_bot` d=1 (dual=c_eq_one 13.12 sorried)、`T_typeII_structural_inputs` (14.9 TypeIIData fields)。
+- **cross-lane gated**: `card_LF_coprime_pq` (bgTheoremE、owner F)、`complement_inf_Q_structure` (13.19.c1 char + Frobenius)。
+
+**次フェーズ = deep char engagement** (per-turn structural discharge から Dade char machinery の sustained 構築へモード変化)。carrier 構築は all-or-nothing で multi-turn。[[feedback-ask-chatgpt-for-elided-gaps]] (char 省略の再構成) 検討価値。[[feedback-flag-poor-progress]] に従い tractability の質的変化を明示。
+
+
+### cont.⁴³ (2026-07-02 lane c=γ /loop): deep char frontier は issue 9001 の shared coherence infra (hub adjudication 中) に gated 判明
+
+cont.⁴² で「残 lane-c = deep char」と確定後、engage を進めるも、merge で入った **hub issue 9001** が char cascade 基盤の soundness/infra 問題を明示:
+- **§12 coherence unsound** (issue 2032): `frobenius_typeI_coherent`/`sibleyTarget_frobI` は witness で (6.8)(a) の H^# TI 前提が (12.10) と矛盾 → unprovable。lane b が (6.8)/(5.7)/(6.5.c) の 3-case split で修正中。
+- **shared char infra 未実装 + hub 割当中**: (6.5.c) coherence producer (case(c) |L/H|∣p-1) と構成的 Clifford (issue 0026) が S07/S08 在庫なし。9001 明記「**α (§10-13 char) も要する見込み**」= char cascade の共通 upstream。case(b) (5.7) route も S07 の (5.2) Hypothesis を lattice-relative isometry に weaken する shared refactor 要 (機械的だが shared)。
+
+**lane-c deep char (§14-16 Dade) はこの coherence machinery を transitive 基盤とする** (coherent ψ・Dade image・Hypothesis78 は §7 coherence 経由)。∴ **lane-c deep char frontier = 9001 の hub-adjudicated shared coherence infra に gated**。unsound/未完の base 上の build は premature (scaffold リスク)。
+
+**判断**: これは cross-lane coordination gate + soundness (valid-stop: 想定違反/設計分岐)。lane-c の tractable structural (§13.16/13.17.a) は完了。deep char は 9001 shared-infra 割当 (hub) を待つ or lane-c が claim-before-build で 1 つ建てる (policy 5A、要 hub dedup) の分岐。[[cross-lane-sync-via-notes]] [[feedback-flag-poor-progress]]

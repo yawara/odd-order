@@ -82,4 +82,29 @@ theorem card_dvd_cyclotomicQuotient_of_faithful_irreducible_fpf
     coprime_card_sub_one_of_faithful_irreducible_comm_fpf mul_comm hfaith σ hfpf
   exact dvd_div_of_coprime_of_dvd_sub_one hp hdvd hcop
 
+/-- **Singer line bound, `≤` form** (Peterfalvi (13.2.c) Galois branch): under the hypotheses of
+`card_dvd_cyclotomicQuotient_of_faithful_irreducible_fpf` and `q ≥ 1`,
+
+  `|C| ≤ (p^q − 1)/(p − 1)`.
+
+The divisibility upgrades to the inequality since the quotient is positive (`p^q ≥ p`, so
+`p^q − 1 ≥ p − 1 > 0`, and `(p−1) ∣ p^q − 1`).  This is precisely `basic_structure.u_bound`'s
+Galois half: `u = |Ū| ≤ (p^q − 1)/(p − 1)`. -/
+theorem card_le_cyclotomicQuotient_of_faithful_irreducible_fpf
+    {p q : ℕ} [Fact p.Prime] {C M : Type u}
+    [CommGroup C] [Finite C] [AddCommGroup M] [Finite M]
+    [Module (MonoidAlgebra (ZMod p) C) M] [IsSimpleModule (MonoidAlgebra (ZMod p) C) M]
+    (hq : 1 ≤ q) (hcardM : Nat.card M = p ^ q)
+    (hfaith : ∀ c : C, (∀ x : M, MonoidAlgebra.of (ZMod p) C c • x = x) → c = 1)
+    (σ : M ≃+ M)
+    (hfpf : ∀ c : C, (∀ x : M, σ (MonoidAlgebra.of (ZMod p) C c • x)
+                              = MonoidAlgebra.of (ZMod p) C c • σ x) → c = 1) :
+    Nat.card C ≤ (p ^ q - 1) / (p - 1) := by
+  have hp2 : 2 ≤ p := (Fact.out (p := p.Prime)).two_le
+  have hdvd := card_dvd_cyclotomicQuotient_of_faithful_irreducible_fpf hcardM hfaith σ hfpf
+  -- `(p^q − 1)/(p − 1) > 0`: `p − 1 ≤ p^q − 1` (as `p ≤ p^q`) and `0 < p − 1`.
+  have hple : p ≤ p ^ q := Nat.le_self_pow (by omega) p
+  have hpos : 0 < (p ^ q - 1) / (p - 1) := Nat.div_pos (by omega) (by omega)
+  exact Nat.le_of_dvd hpos hdvd
+
 end OddOrder.RepresentationTheory
