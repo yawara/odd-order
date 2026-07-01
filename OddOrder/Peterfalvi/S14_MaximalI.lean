@@ -657,12 +657,19 @@ noncomputable def Rset {L : Subgroup G} {hyp : Hypothesis L} {chi : ClassFunctio
 open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
 /-- **§8/§10 support-exclusion obligation for the Dade domains** (pinned; Peterfalvi (8.18.c) /
 `S10.support_mutual_exclusion`).  For non-conjugate type-I maximals `L1, L2`, the Dade supports
-`dadeSupport = 𝒞_G(A(L_i))` are disjoint.  This is the §10 thickened-support geometry — the τ-images
-`τ_i(φ_i − φ̄_i)` vanish off `dadeSupport(L_i)` (below), and the M̃-cover disjointness
-`conjClassSet_Mtilde_disjoint` (via `dadeSupport ⊆ 𝒞_G((L_i)_F) ⊆ 𝒞_G(M̃(L_i))`) makes the two
-domains disjoint.  The M̃ machinery lives in `S10`/BG (not reachable from this file); pinned here as
-the residual lane-a obligation that the (8.18.c) vanishing consumes (relocate / real-cite once the
-`dadeSupport ⊆ 𝒞_G(M̃)` bridge lands — hub issue 9003 Cluster B). -/
+`dadeSupport(L_i)` are disjoint.  The (8.18.c) vanishing below consumes this.
+
+**Proof path (provable in this file — the M̃ machinery `conjClassSet_Mtilde_disjoint` IS reachable
+from S14, contrary to an earlier note):** `dadeSupport(L) = ⋃_{a ∈ A(L)} 𝒞_G(a · dade.H a)` with
+`dade.H a = supportKernel L L A(L) a ≤ L_F` (`DadeSupportHypothesisData.dade_H_eq`,
+`supportKernel_le_maxNilpotentNormalHall`).  When `L` is **Frobenius** (the (12.16) witness case, via
+(12.10)), `A(L) = typeIA L = (L_F)^# ⊆ L_F` (`centralizerSupport_sharp_eq_of_frobenius`), so
+`a · dade.H a ⊆ L_F` and `dadeSupport(L) ⊆ 𝒞_G(L_F)`
+(cf. `thickenedSupport_subset_conjClassSet_maxNilpotentNormalHall`).  Then `(L_F)^# = M_σ^# ⊆ M̃(L)`
+(`sigmaSharp_subset_Mtilde`) and `conjClassSet_Mtilde_disjoint` (BG 14.5(b)) give disjointness for
+non-conjugate `L1, L2` (plus `1 ∉ dadeSupport`).  Residual work: the Frobenius bridge likely needs
+`L1, L2` Frobenius hypotheses threaded from the (12.16) callers, and the `1`-handling.  Hub issue
+9003 Cluster B. -/
 theorem dadeSupport_disjoint_of_nonconjugate {L1 L2 : Subgroup G} [Finite G]
     (hyp1 : Hypothesis L1) (hyp2 : Hypothesis L2)
     (hnot_conj : ¬ ∃ g : G, MulAut.conj g • L1 = L2) :
