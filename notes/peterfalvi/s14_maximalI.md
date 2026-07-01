@@ -1794,3 +1794,17 @@ S14 到達不可)。→ (8.18.c)→(12.3)→(12.16) chain はこの 1 幾何事�
 
 **次 (loop⁹⁴, task 8)**: `dadeSupport_disjoint_of_nonconjugate` を証明。M̃ 機構が S14 不到達ゆえ relocate to
 S10 (hub 要調整、loop⁹² の S10 逸脱 flag への応答を確認) / S14 import / lane a 所有化 のいずれか。
+
+## loop⁹⁵: dadeSupport ⊆ 𝒞_G(L_F) (Frobenius) を PROVE + M-side subtlety 発見 (commit この iter)
+
+`dadeSupport_subset_conjClassSet_maxNilpotentNormalHall_of_frobenius` を証明 (Frobenius L で
+dadeSupport⊆𝒞_G(L_F)): `dadeSupport=thickenedSupport L L typeIA` (dadeSupport_eq_thickenedSupport) +
+`typeIA⊆L_F` (Frobenius centralizer_kernel_le を inline) + thickenedSupport_subset_conjClassSet。
+supportKernel_le/thickenedSupport_subset を file 前方へ relocate (self-contained)。
+
+**発見した subtlety (task 9)**: dadeSupport_disjoint は両 L に Frobenius を要すが、(12.3) call site
+(coherent_extension_constituent_orthogonal_Rset_of_nonconjugate S14:1278) は Frobenius 無し。(12.16) で
+witness L は Frobenius だが **M は非-Frobenius** (counterexample)。∴ subset lemma は L には効くが M には効かない。
+要調査: (8.18.c) 実 statement が typeIA 両側か typeIA-L/A₁-M mixed か ((M_F)^#⊆M_F は Frobenius 不要ゆえ
+M-side は無条件で 𝒞_G(M_F) に入る可能性); nonconjugate_diffImage が hyp2.tau=typeIA なのと (12.15) の ρ_M=A₁(M)
+の整合。M-side を A₁-based general subset で証明できれば dadeSupport_disjoint 完成。M̃ は S14 到達可。
