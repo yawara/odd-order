@@ -1524,3 +1524,26 @@ inertia(inflated θ in HU) = HC を証明 = 「Ū=U/C が regular θ 上 free �
 
 **level 注意**: 𝒳(H₀C)=`xiOf data H0C` (HU-char)、𝒮(H₀C)=`sOf`=Ind_M 𝒳 (M-char)。conjunct c は
 𝒮(H₀C) member = Ind_M(s), s∈Xtheta⊆𝒳(H₀C)。Xtheta=regular ones (Coq: Xtheta⊆X_H0C、**等号不要**)。
+
+## ⭐ 訂正: def_Itheta は既に PROVEN (`inertia_eq_hcInHu_caseA`) (2026-07-01 cont.²)
+
+**上の「次 crux = def_Itheta (deep 未証明)」は誤り** ([[verify-port-state-by-number-not-coq-name]]
+の教訓そのもの — descriptive 名で grep せず deep 判定しかけた)。`inertia_eq_hcInHu_caseA`
+(S11:4858) が **まさに def_Itheta**: regular θ̄ (∀i, θ̄ nontrivial on Hpart i) に対し
+`I_{HU}(inflated θ₀) = hInHu ⊔ cInHu (=HC)` を**証明済み** (`inertia_eq_hcInHu_gen` →
+`chiefFactor_caseA_char_inertia` 経由、case-agnostic plumbing)。これは `hcZeta_irreducible`
+(6312) の `hθ₀` 仮定そのもの。
+
+**⟹ 各 regular θ に対し degree-u irreducible ζ_θ = Ind_{HC}^{HU}(hcPsi θ) ∈ 𝒳(H₀C) は
+既に構成可能** (`hcZeta_irreducible` に `inertia_eq_hcInHu_caseA` を hθ₀ として渡すだけ)。
+
+**残 oXtheta = u-to-1 counting のみ (deep でない)**: 写像 θ ↦ ζ_θ ({regular H̄-char} → 𝒳(H₀C))。
+- fiber = Ū-orbit (ζ_θ=ζ_θ' ⟺ hcPsi θ, hcPsi θ' が HU-共役 ⟺ θ, θ' が Ū-共役)。
+- inertia=HC ⟹ Ū が regular θ 上 free (Stab_Ū=1) ⟹ 各 fiber size = |Ū| = u。
+- ⟹ u·|Xtheta| = |{regular θ}| = (p-1)^q (`card_regular_chars_Hbar`)。
+- 要: Ū-action on regular chars 設定 + free-action orbit count (mathlib MulAction) or
+  induction-imset count (Coq `card_imset_Ind_irr` 相当)。**moderate**。
+
+**残全体 (全て moderate、deep なし)**: (a) oXtheta u-to-1 count、(b) (E) reducible⟹Xmu
+(cfclass 対偶)、(c) u odd (odd-order)、(d) assembly (`exists_regular_not_reducible_of_odd`)。
+reducible count (B) = `reducible_count_sOf_H0` 既存。
