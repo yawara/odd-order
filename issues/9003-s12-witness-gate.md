@@ -43,9 +43,12 @@ BG piece `conjClassSet_Mtilde_disjoint` (BG S14_TypePCounting:8042)・`conjClass
 
 - [x] **`S10.support_mutual_exclusion`** (Cluster B): **DONE** (commit 65a2be52, axiom-clean)。type-I +
   nonconjugacy 仮説を追加 (旧 statement は conjugate S=T で偽) → conjClassSet_Mtilde_disjoint で証明。
-- [ ] **(8.18.c) `nonconjugate_diffImage_inner_zero` assembly** (S14:665): support_mutual_exclusion +
-  Dade-image support (supp(τ(φ−φ̄))⊆𝒞_G(A(L))) + `inner_eq_zero_of_disjoint_support`。Ã/A1/𝒞_G の
-  対応に注意 (mutual-support 形 → conjClassSet-disjoint 形が要る)。→ (12.3)→(12.16) FT chain を閉じる。
+- [x] **(8.18.c) `nonconjugate_diffImage_inner_zero` reduction** (S14): **DONE** (commit cec700a5)。
+  Dade vanishing (supp(τ(φ−φ̄))⊆dadeSupport) + `constituentDiff_support_subset` + `inner_eq_zero_of_disjoint_support`
+  で inner=0 を実証明。唯一の残 sorry = **`dadeSupport_disjoint_of_nonconjugate`** (S14:665) = §10 M̃ geometry
+  (`dadeSupport⊆𝒞_G(M̃)` + `conjClassSet_Mtilde_disjoint`)。
+- [ ] **`dadeSupport_disjoint_of_nonconjugate`** (§10、最後の Cluster B piece): M̃ 機構が S14 から到達不可
+  (0 uses)。relocate to S10 (hub 要調整) か S14 import 追加 (巨大 rebuild) か lane a 所有化。→ (12.16) 閉じる。
 - [ ] Cluster A ((12.10) type-analysis) は §8-§11 の大きな multi-theorem effort。§-owning lane に割当?
 
 ## 完了条件

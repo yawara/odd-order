@@ -1782,3 +1782,15 @@ y∈A₁(S)⊆M̃(S)⊆𝒞_G(M̃(S))、片方向 support で y∈𝒞_G(M̃(T))
 **次 (loop⁹³, task 7)**: (8.18.c) `nonconjugate_diffImage_inner_zero` (S14:665) の assembly —
 support_mutual_exclusion + Dade-image support (supp(τ(φ−φ̄))⊆𝒞_G(A(L))) + inner_eq_zero_of_disjoint_support。
 Ã/A1/𝒞_G 対応注意 (mutual-support→conjClassSet-disjoint 形要)。→ (12.3)→(12.16) FT chain 閉じる。
+
+## loop⁹³: (8.18.c) inner-vanishing reduction を PROVE (commit cec700a5)
+
+`nonconjugate_diffImage_inner_zero` (8.18.c, S14:665) を bare sorry → **実 reduction 証明**化 (hub 指示通り
+S14 のみ)。τ-image `τ_i(φ_i−φ̄_i)` は dadeSupport(L_i) 外で消える (`constituentDiff_support_subset` =
+R1_diffsupp のミラー + `dadeIntegralCharacterMap_apply_of_support` + `map_eq_zero_of_not_mem_dadeSupport`)
+→ supp ⊆ dadeSupport、nonconjugate で disjoint → `inner_eq_zero_of_disjoint_support`。唯一の残 sorry =
+**`dadeSupport_disjoint_of_nonconjugate`** (§10 M̃ geometry: dadeSupport⊆𝒞_G(M̃)+conjClassSet_Mtilde_disjoint、
+S14 到達不可)。→ (8.18.c)→(12.3)→(12.16) chain はこの 1 幾何事実 modulo で閉じた。
+
+**次 (loop⁹⁴, task 8)**: `dadeSupport_disjoint_of_nonconjugate` を証明。M̃ 機構が S14 不到達ゆえ relocate to
+S10 (hub 要調整、loop⁹² の S10 逸脱 flag への応答を確認) / S14 import / lane a 所有化 のいずれか。
