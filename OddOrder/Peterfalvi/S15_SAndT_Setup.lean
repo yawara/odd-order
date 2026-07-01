@@ -1700,9 +1700,23 @@ theorem numeric_bounds [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
     sorry
 
 /-- **Peterfalvi (13.12)**: the centralizer parameter `c` is `1`. -/
-theorem c_eq_one [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
+theorem c_eq_one [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     (hyp : Hypothesis (G := G)) :
     hyp.c = 1 := by
+  by_contra hne
+  -- `c > 1`; with `2q ∣ c − 1` (`two_mul_q_dvd_c_pred`) this forces `c ≥ 2q + 1`.
+  have hc1 : 1 ≤ hyp.c := by rw [hyp.c_eq_card_C]; exact Nat.card_pos
+  have hcgt : 1 < hyp.c := lt_of_le_of_ne hc1 (Ne.symm hne)
+  have hc_ge : 2 * hyp.q + 1 ≤ hyp.c := by
+    have h2q : 2 * hyp.q ≤ hyp.c - 1 := Nat.le_of_dvd (by omega) (hyp.two_mul_q_dvd_c_pred hG)
+    omega
+  -- The `c ≥ 2q + 1` lower bound (structural, `dv_2q_c1`) contradicts Peterfalvi's numeric
+  -- elimination: the (13.10) analytic inequality bounds `m` above by `q·p^q/(c·p^(q−1)·(p−1))`, which
+  -- with the `m > 7/10` lower bounds (13.11) and `c ≥ 2q+1` forces `q = 3, p = 5, c = 7, u ∣ 31`;
+  -- then `PC` would be a normal nilpotent Hall subgroup of `S` strictly containing `P = S_F`,
+  -- contradicting `P = maxNilpotentNormalHall S` (Coq `FTtypeP_Ind_Fitting_reg_Fcore`: `typeP_Galois`
+  -- dichotomy + Fitting-core maximality `Fcore_max`).  Deep §13 char/σ residual.
+  clear hcgt hc1
   sorry
 
 /-- **Peterfalvi (13.13)**: if case (9.7.a) holds for `S`, then
