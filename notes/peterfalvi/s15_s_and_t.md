@@ -8,6 +8,63 @@
 
 ---
 
+## ✅ LIVE STATUS (2026-07-01, lane c = (13.16) W₂-confinement — Dedekind 還元 landed + 核プラン検証)
+
+**このセッションの landing (build-green, 3856 jobs)**:
+1. `C_eq_bot` / `U_inf_centralizer_P_eq_bot` — (13.12) `c=1` finish を再利用補題に抽出
+   (`C = U ⊓ C_G(P) = ⊥`)。S16 のインライン重複を集約。
+2. **`normalizer_W2_within_S` 実証明** — (13.16) W₂-side residual `N_G(W₂) ⊓ S ≤ P ⊔ W₁` を
+   単一の群論核 `normalizer_U_inf_W2_eq_bot : U ⊓ N_G(W₂) = ⊥` に**群 Dedekind** で還元:
+   - Sub-goal A (`BG.Ch3.S12.eq_sup_inf_of_le_normalizer`): `M' ⊓ N_G(W₂) = P`
+     (`M'=derivedInG S=P⊔U`, `U ≤ N_G(P)`, `(M'⊓N)⊓U = U⊓N = ⊥`)。
+   - Sub-goal B (`coe_mul_of_left_le_normalizer_right`): `S = W₁·M'` で `g=w·m` 分解 →
+     `m ∈ M'⊓N_G(W₂) = P` → `g ∈ P⊔W₁`。
+   - ⚠ 一般群の部分群束は非 modular (`IsModularLattice (Subgroup ·)` は CommGroup 限定) ゆえ
+     lattice modular law 不可 → 群論的 Dedekind (正規性) を使用。
+
+### ▶▶ 核 `normalizer_U_inf_W2_eq_bot : U ⊓ N_G(W₂) = ⊥` の**検証済フル証明プラン** (次チャンク, 新 infra 不要)
+
+`K := U ⊓ N_G(W₂)` と置く。**全 cited 補題は repo に在庫確認済** (下記)。核は ~200 行の
+MulAut plumbing だが新規 infra は不要。2 段構成:
+
+**① crux (ungated, 抽象 W₂ について): `K ≤ C_G(W₂)` — ✅ PROVEN
+(`normalizer_U_inf_W2_le_centralizer_W2`)**。`coprime_fixedPoints_quotient` (Isaacs Cor 3.28) で:
+- `W₁` は abelian `U` に conjugation で coprime 作用 (`φ:↥W₁→MulAut ↥U`; coprime は
+  `UW1_frobenius.coprime_card_kernel_complement`)、fixed points `C_U(W₁) = ⊥`
+  (✅ `centralizer_W1_inf_U_eq_bot`)。
+- `N := C_U(W₂)` は abelian U で normal・W₁-invariant。`g∈K` の coset は W₁-fixed
+  (✅ `conj_W1_mem_centralizer_W2`: `g⁻¹(wgw⁻¹)∈C(W₂)`) → Cor 3.28 で W₁-fixed 代表元
+  `c∈C_U(W₁)=⊥` → `c=1` → `g∈C_G(W₂)`。
+- **3 補題全て build-green・ungated で landing 済** (commit `8614fad4`/`338d7a92`/`eeb212ed`)。
+
+**② assembly (`K≤C_G(W₂)` 前提)** — 2 つの Coq 比の simplification:
+- **full `U⋊W₁` Frobenius を使う** (`K⋊W₁` でなく) → `Frobenius_subl` 不要。U abelian ⟹
+  `U ≤ N_G(⁅P,K⁆)`、Wielandt (`frobenius_kernel_centralizes_of_complement_fpf`, `N:=⁅P,K⁆`) で
+  `U ≤ C_G(⁅P,K⁆)`。
+- **Gorenstein Thm 2.3** `P = C_P(K) × ⁅P,K⁆` (`fixedPoints_inf_actionCommutator_eq_bot_of_abelian`,
+  `CoprimeAbelianPGroup`/`Ch04`) で Maschke complement 構築を回避。
+- FPF `C_{⁅P,K⁆}(W₁) = ⁅P,K⁆ ⊓ C_P(W₁) = ⁅P,K⁆ ⊓ W₂ ⊆ ⁅P,K⁆ ⊓ C_P(K) = ⊥` — `W₂≤C_P(K)` (crux) +
+  **regularity `C_P(W₁)=W₂`** (`TypePData.centralizer_W1`)。
+- ⁅P,K⁆ ≤ C_P(U) ≤ C_P(K) → `⁅P,K⁆ ⊆ C_P(K)⊓⁅P,K⁆ = ⊥` → `K≤C_G(P)` → `K ≤ U⊓C_G(P) = ⊥`
+  (`U_inf_centralizer_P_eq_bot`)。
+
+⚠ **唯一の外部 gate = `Sdata.W2 = W2` reconciliation** (assembly の regularity 段のみ)。Hypothesis
+field でなく明示仮説 (`S15_SAndT_Setup.lean:349` が `(hSdataW2 : Sdata.W2 = W2)` で取る形)。§16-carrier
+content (`Section16TypePStructure`, issue 3001 隣接)。crux ① は hyp.W₂ 直接ゆえ ungated。
+⟹ 実装時は `Sdata.W2 = W2` を仮説引数に取る engine か、sorried-cite で discharge。
+
+**在庫確認済** (grep 実証): `coprime_fixedPoints_quotient` ✅ / `frobenius_kernel_centralizes_of_complement_fpf`
+✅ (docstring が「Pf (13.16) で使う」と明記) / `fixedPoints_inf_actionCommutator_eq_bot_of_abelian` ✅ /
+`BasicStructureData.{UW1_frobenius,U_commutative,P_elementaryAbelian}` ✅ / `TypePData.centralizer_W1` ✅ /
+`U_inf_centralizer_P_eq_bot` ✅。**未在庫: なし** (Maschke complement と Frobenius_subl は上記 2
+simplification で回避)。
+
+### 残 (13.16) W₁-side: `normalizer_W1_structure` (S15:158, sorry)
+`W₁≤Q ∧ Q abelian ∧ N_G(W₁)≤Q⊔W₂` の 3-tuple。前 2 conjunct は **T-side dual (issue 3001 の Q/Sdata_T
+gated)**、第 3 は上記核の W₁↔W₂ dual。W₂-side (核) を先に閉じてから T-side carrier 経由で dual 化推奨。
+
+---
+
 ## ✅ LIVE STATUS (2026-07-01, lane d = γ 上流 S15_SAndT_Setup 再配分後の初手)
 
 **issue 0092 で lane d は S15_SAndT_Setup へ再配分** (旧 δ BG§14–16 は FT deliverable 実質完成)。

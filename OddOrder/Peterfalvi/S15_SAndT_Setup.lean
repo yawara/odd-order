@@ -192,6 +192,15 @@ structure Hypothesis where
   Sdata : TypePData S
   Sdata_U_eq : Sdata.U = U
   Sdata_W1_eq : Sdata.W1 = W1
+  /-- **Peterfalvi (13.2.a), U-side**: the complement `U` is abelian.  Supplied at construction from
+  BG Lemma 15.1(b) (`typeP_hall_derived_eq_and_abelian`, with `U` the `(κ∪σ)'`-Hall of `S`), so §15
+  need not re-derive it; discharges the `U_commutative` field of `basic_structure_gated`. -/
+  S_U_commutative : IsMulCommutative ↥U
+  /-- **Reconciliation (W₂-side)**: the intrinsic dual factor `Sdata.W2 = C_{S'}(W₁#)` equals the
+  abstract `W₂` (complement of `W₁` in the cyclic `W = S ∩ T`).  Supplied at construction as
+  `Sdata.W2 = K*` (`typePData_of_kappaHall_hallComplement_W2`); discharges `card_P_eq` and hence
+  `basic_structure_gated.P_order` (issue 3001/4014). -/
+  Sdata_W2_eq : Sdata.W2 = W2
 
 namespace Hypothesis
 
@@ -279,10 +288,72 @@ structure BasicStructureGated (hyp : Hypothesis (G := G)) where
   tauS_eq_induction : Prop
   tauS_eq_induction_holds : tauS_eq_induction
 
+/-- **Peterfalvi (13.2.b), order part**: the Fitting kernel `P = S_F` has order `p^q`.
+
+This is the order half of (13.2.b) ("`P` is elementary abelian of order `p^q`").  `S` is of Type II
+from the κ-Hall carrier `S_typeP2` (`isTypeII_of_isTypeP2`), so §11's Wielandt fixed-point order
+relation `typeII_III_IV_order_relations` (Peterfalvi (9.3)) applies to the type-II setup on `S` with
+`typeP := Sdata`, giving `|S_F| = |W₂|^q`.
+
+The one input not derivable from the bare `Hypothesis` fields is the reconciliation `Sdata.W2 = W2`
+between the *intrinsic* type-`P` `W₂` of `S` (`Sdata.W2 = C_{S'}(W₁#)`) and the abstract `W₂`
+(complement of `W₁` in the cyclic `W = S ∩ T`) — the `W₂`-analogue of the carried
+`Sdata_U_eq` / `Sdata_W1_eq`.  It is honest §16-carrier content (`Section16TypePStructure`, which
+builds `Sdata`); taken here as an explicit hypothesis so the order computation is unconditional on
+its proof.  See issue 3001 for threading it through the carrier (then `basic_structure_gated`'s
+`P_order` field discharges). -/
+theorem Hypothesis.card_P_eq [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hyp : Hypothesis (G := G)) (hSdataW2 : hyp.Sdata.W2 = hyp.W2) :
+    Nat.card ↥hyp.P = hyp.p ^ hyp.q := by
+  have hSII : IsTypeII hyp.S :=
+    OddOrder.BG.Ch4.S16.isTypeII_of_isTypeP2 hG hyp.S_maximal hyp.S_typeP2
+  have tdata : TypeIIData hyp.S := hSII.some
+  -- `Sdata.U ≠ ⊥`: its order is the witness-independent index `[S' : S_F]`, which is `≠ 1`
+  -- because the type-II witness has `U ≠ 1` at the same index.
+  have hUne : hyp.Sdata.U ≠ ⊥ := by
+    intro hbot
+    have h1 : Nat.card ↥hyp.Sdata.U = Nat.card ↥tdata.typeP.U := by
+      rw [hyp.Sdata.card_U_eq_index, tdata.typeP.card_U_eq_index]
+    rw [hbot, Subgroup.card_bot] at h1
+    exact tdata.common.1 (Subgroup.card_eq_one.mp h1.symm)
+  have hW1prime : (Nat.card ↥hyp.Sdata.W1).Prime := by
+    rw [hyp.Sdata_W1_eq, ← hyp.q_eq_card_W1]; exact hyp.q_prime
+  -- the `A_0(S)` TI-subset clause of the nontrivial core depends only on `S` (witness-independent).
+  have hTI := tdata.common.2.2
+  -- (9.3) Wielandt order relation for the type-II setup on `S`.
+  have hord := (OddOrder.Peterfalvi.S11.typeII_III_IV_order_relations hG
+    { maximal := hyp.S_maximal
+      typeP := hyp.Sdata
+      nontrivial := ⟨hUne, hW1prime, hTI⟩
+      type_alt := Or.inl hSII }).1 hSII
+  have hord2 : Nat.card ↥hyp.Sdata.H
+      = Nat.card ↥hyp.Sdata.W2 ^ Nat.card ↥hyp.Sdata.W1 := hord.2
+  have hW2card : Nat.card ↥hyp.Sdata.W2 = hyp.p := by
+    rw [hSdataW2, ← hyp.p_eq_card_W2]
+  rw [hyp.Sdata.H_eq, ← hyp.P_eq_SF, hW2card, hyp.Sdata_W1_eq, ← hyp.q_eq_card_W1] at hord2
+  exact hord2
+
 /-- **Peterfalvi (13.2.b,c,e)** structural producer: the `M_F`-structure of the type-`P₂` member
-`S`.  Faithful obligation gated on the §16 σ-structure (`BasicStructureGated` docstring). -/
-noncomputable def basic_structure_gated [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
-    (hyp : Hypothesis (G := G)) : BasicStructureGated hyp := sorry
+`S`.  Faithful obligation on the §16 σ-structure (`BasicStructureGated` docstring).
+
+`U_commutative` (13.2.a U-side) and `P_order` (13.2.b order part) are now **genuine**:
+* `U_commutative` from the carried `S_U_commutative` (BG Lemma 15.1(b) `typeP_hall_derived_eq_and_abelian`, `U` the `(κ∪σ)'`-Hall, supplied at construction);
+* `P_order` = `|P| = p^q` from `card_P_eq` fed by the carried `Sdata_W2_eq` (the intrinsic dual factor `Sdata.W2 = C_{S'}(W₁#)` equals the abstract `W₂ = K*`, via `typePData_of_kappaHall_hallComplement_W2`).
+
+The `A_0(S)`/`τ_S` clauses are the opaque scaffold Props (`True`).  The two remaining concrete
+residuals are the genuinely upstream σ-structure facts:
+* `P_elementaryAbelian` — Pf (11.7) = `S13_MaximalIII_IV.H_elementaryAbelian` (lane a §11);
+* `u_bound` — Pf (9.7) Singer-field bound `u ∣ (p^q−1)/(p−1)` (lane a §9). -/
+noncomputable def basic_structure_gated [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hyp : Hypothesis (G := G)) : BasicStructureGated hyp where
+  U_commutative := hyp.S_U_commutative
+  P_elementaryAbelian := sorry
+  P_order := hyp.card_P_eq hG hyp.Sdata_W2_eq
+  u_bound := sorry
+  A0S_TI := True
+  A0S_TI_holds := trivial
+  tauS_eq_induction := True
+  tauS_eq_induction_holds := trivial
 
 /-- **Peterfalvi (13.2.a--c,e)**: `S` is type II or III, `P` is elementary
 abelian of order `p^q`, `u` is bounded, and `A_0(S)` is a TI-subset.
@@ -330,51 +401,6 @@ theorem basic_structure [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
             tauS_eq_induction := core.tauS_eq_induction
             tauS_eq_induction_holds := core.tauS_eq_induction_holds }, ?_⟩
   exact ⟨Or.inl hSII, core.P_elementaryAbelian, core.P_order, core.u_bound, core.A0S_TI_holds⟩
-
-/-- **Peterfalvi (13.2.b), order part**: the Fitting kernel `P = S_F` has order `p^q`.
-
-This is the order half of (13.2.b) ("`P` is elementary abelian of order `p^q`").  `S` is of Type II
-from the κ-Hall carrier `S_typeP2` (`isTypeII_of_isTypeP2`), so §11's Wielandt fixed-point order
-relation `typeII_III_IV_order_relations` (Peterfalvi (9.3)) applies to the type-II setup on `S` with
-`typeP := Sdata`, giving `|S_F| = |W₂|^q`.
-
-The one input not derivable from the bare `Hypothesis` fields is the reconciliation `Sdata.W2 = W2`
-between the *intrinsic* type-`P` `W₂` of `S` (`Sdata.W2 = C_{S'}(W₁#)`) and the abstract `W₂`
-(complement of `W₁` in the cyclic `W = S ∩ T`) — the `W₂`-analogue of the carried
-`Sdata_U_eq` / `Sdata_W1_eq`.  It is honest §16-carrier content (`Section16TypePStructure`, which
-builds `Sdata`); taken here as an explicit hypothesis so the order computation is unconditional on
-its proof.  See issue 3001 for threading it through the carrier (then `basic_structure_gated`'s
-`P_order` field discharges). -/
-theorem Hypothesis.card_P_eq [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
-    (hyp : Hypothesis (G := G)) (hSdataW2 : hyp.Sdata.W2 = hyp.W2) :
-    Nat.card ↥hyp.P = hyp.p ^ hyp.q := by
-  have hSII : IsTypeII hyp.S :=
-    OddOrder.BG.Ch4.S16.isTypeII_of_isTypeP2 hG hyp.S_maximal hyp.S_typeP2
-  have tdata : TypeIIData hyp.S := hSII.some
-  -- `Sdata.U ≠ ⊥`: its order is the witness-independent index `[S' : S_F]`, which is `≠ 1`
-  -- because the type-II witness has `U ≠ 1` at the same index.
-  have hUne : hyp.Sdata.U ≠ ⊥ := by
-    intro hbot
-    have h1 : Nat.card ↥hyp.Sdata.U = Nat.card ↥tdata.typeP.U := by
-      rw [hyp.Sdata.card_U_eq_index, tdata.typeP.card_U_eq_index]
-    rw [hbot, Subgroup.card_bot] at h1
-    exact tdata.common.1 (Subgroup.card_eq_one.mp h1.symm)
-  have hW1prime : (Nat.card ↥hyp.Sdata.W1).Prime := by
-    rw [hyp.Sdata_W1_eq, ← hyp.q_eq_card_W1]; exact hyp.q_prime
-  -- the `A_0(S)` TI-subset clause of the nontrivial core depends only on `S` (witness-independent).
-  have hTI := tdata.common.2.2
-  -- (9.3) Wielandt order relation for the type-II setup on `S`.
-  have hord := (OddOrder.Peterfalvi.S11.typeII_III_IV_order_relations hG
-    { maximal := hyp.S_maximal
-      typeP := hyp.Sdata
-      nontrivial := ⟨hUne, hW1prime, hTI⟩
-      type_alt := Or.inl hSII }).1 hSII
-  have hord2 : Nat.card ↥hyp.Sdata.H
-      = Nat.card ↥hyp.Sdata.W2 ^ Nat.card ↥hyp.Sdata.W1 := hord.2
-  have hW2card : Nat.card ↥hyp.Sdata.W2 = hyp.p := by
-    rw [hSdataW2, ← hyp.p_eq_card_W2]
-  rw [hyp.Sdata.H_eq, ← hyp.P_eq_SF, hW2card, hyp.Sdata_W1_eq, ← hyp.q_eq_card_W1] at hord2
-  exact hord2
 
 /-- **Structural input for Peterfalvi (13.2.d) — §14-gated.**
 
@@ -963,18 +989,72 @@ structure TISubsetOrthogonalityData (hyp : Hypothesis (G := G)) where
   norm_formula : Prop
   alpha_norm_bound : Prop
 
+/-- **Peterfalvi (8.5.a)**: `H = PC = F(S)`.  The type-`P` carrier `Sdata` records (8.5.a),
+`F(S) = M_F · C_U(M_F) = M_F ⊔ (U ⊓ C_S(M_F))`, as its `fitting_eq` field (`TypePData.fitting_eq`,
+whose left side is the ambient realization `(fitting ↥S).map S.subtype = fittingInG S`).
+Reconciled through `P = M_F = Sdata.H` (`P_eq_SF`/`Sdata.H_eq`) and `Sdata.U = U` (`Sdata_U_eq`),
+the right side is exactly `P ⊔ (U ⊓ C_S(P)) = P ⊔ C = H`.  This §8 identity makes the (13.5)
+ρ-machinery unconditional, superseding the σ-structure-gated P-abelian route of issue 4013:
+`Sdata.fitting_eq` *is* (8.5.a). -/
+theorem Hypothesis.H_eq_fittingInG (hyp : Hypothesis (G := G)) :
+    hyp.H = OddOrder.BG.Ch2.S08.fittingInG hyp.S := by
+  have hPH : hyp.P = hyp.Sdata.H := by rw [hyp.P_eq_SF, hyp.Sdata.H_eq]
+  change hyp.P ⊔ hyp.C = OddOrder.BG.Ch2.S08.fittingInG hyp.S
+  rw [hyp.C_eq, hPH, ← hyp.Sdata_U_eq]
+  exact hyp.Sdata.fitting_eq.symm
+
 /-- **Peterfalvi (8.5.a)/(8.6.a)**: `H^# = (PC)^#` is a TI-subset of `G` with normalizer `S` —
 distinct `G`-conjugates of `H^#` meet trivially, and any conjugator landing `H^#` back in `H^#` lies
-in `S`.  The §8 structural input to the (13.5) ρ-machinery; carried as a §8 obligation. -/
-theorem H_sharp_isTISubset [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
-    (hyp : Hypothesis (G := G)) :
-    OddOrder.GroupTheory.IsTISubset (OddOrder.Peterfalvi.S04.sharp (hyp.H : Set G)) hyp.S := sorry
+in `S`.  The §8 structural input to the (13.5) ρ-machinery.
 
-/-- **Peterfalvi (8.5.a)**: `S` normalizes `H^# = (PC)^#` (the `S`-side of `S = N_G(H^#)`). -/
-theorem S_normalizes_H_sharp [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
+Proof: `H = F(S)` (`H_eq_fittingInG`, the carrier's (8.5.a) `fitting_eq`), and `F(S)^#` is a
+TI-subset with normalizer `N_G(F(S)) = S` — BG (15.7)(a) `fittingIsTI_of_isTypeP2` (from the
+type-`P₂` carrier `S_typeP2`) with `normalizer_fittingInAmbient_eq_self` pinning the bound to `S`.
+Rewriting `H^# = F(S)^#` closes it. -/
+theorem H_sharp_isTISubset [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hyp : Hypothesis (G := G)) :
+    OddOrder.GroupTheory.IsTISubset (OddOrder.Peterfalvi.S04.sharp (hyp.H : Set G)) hyp.S := by
+  have hHF : hyp.H = OddOrder.BG.Ch2.S08.fittingInG hyp.S := hyp.H_eq_fittingInG
+  have hTI : OddOrder.BG.Ch4.S15.FittingIsTI hyp.S :=
+    OddOrder.BG.Ch4.S15.fittingIsTI_of_isTypeP2 hG hyp.S_maximal hyp.S_typeP2
+  have hnorm : Subgroup.normalizer (OddOrder.BG.Ch4.S15.fittingInAmbient hyp.S : Set G) = hyp.S :=
+    OddOrder.BG.Ch4.S16.normalizer_fittingInAmbient_eq_self hG hyp.S_maximal
+  have hTI0 : OddOrder.GroupTheory.IsTISubset (OddOrder.BG.Ch4.S15.fittingSharp hyp.S)
+      (Subgroup.normalizer (OddOrder.BG.Ch4.S15.fittingInAmbient hyp.S : Set G)) := hTI
+  rw [hnorm] at hTI0
+  -- `H^# = F(S)^#` as sets, so the TI property transfers.
+  have hset : OddOrder.Peterfalvi.S04.sharp (hyp.H : Set G)
+      = OddOrder.BG.Ch4.S15.fittingSharp hyp.S := by
+    change (hyp.H : Set G) \ {1}
+      = (OddOrder.BG.Ch4.S15.fittingInAmbient hyp.S : Set G) \ {1}
+    rw [hHF]
+  rw [hset]
+  exact hTI0
+
+/-- **Peterfalvi (8.5.a)**: `S` normalizes `H^# = (PC)^#` (the `S`-side of `S = N_G(H^#)`).
+
+Proof: `H = F(S)` (`H_eq_fittingInG`) and `S = N_G(F(S))` (`normalizer_fittingInAmbient_eq_self`),
+so every `l ∈ S` normalizes `F(S)`; conjugation keeps `a ∈ F(S)^#` inside `F(S)` and
+nonidentity. -/
+theorem S_normalizes_H_sharp [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     (hyp : Hypothesis (G := G)) :
     ∀ (l : hyp.S) ⦃a : G⦄, a ∈ OddOrder.Peterfalvi.S04.sharp (hyp.H : Set G) →
-      (l : G) * a * (l : G)⁻¹ ∈ OddOrder.Peterfalvi.S04.sharp (hyp.H : Set G) := sorry
+      (l : G) * a * (l : G)⁻¹ ∈ OddOrder.Peterfalvi.S04.sharp (hyp.H : Set G) := by
+  have hHF : hyp.H = OddOrder.BG.Ch2.S08.fittingInG hyp.S := hyp.H_eq_fittingInG
+  have hnorm : Subgroup.normalizer (OddOrder.BG.Ch4.S15.fittingInAmbient hyp.S : Set G) = hyp.S :=
+    OddOrder.BG.Ch4.S16.normalizer_fittingInAmbient_eq_self hG hyp.S_maximal
+  intro l a ha
+  rw [OddOrder.Peterfalvi.S04.mem_sharp] at ha ⊢
+  obtain ⟨haH, ha1⟩ := ha
+  rw [hHF] at haH ⊢
+  have hlnorm : (l : G) ∈
+      Subgroup.normalizer (OddOrder.BG.Ch4.S15.fittingInAmbient hyp.S : Set G) := by
+    rw [hnorm]; exact l.2
+  refine ⟨(Subgroup.mem_set_normalizer_iff.mp hlnorm a).mp haH, ?_⟩
+  intro heq
+  refine ha1 ?_
+  calc a = (l : G)⁻¹ * ((l : G) * a * (l : G)⁻¹) * (l : G) := by group
+    _ = 1 := by rw [heq]; group
 
 /-- **Peterfalvi (13.5)/(7.1)**: the §4 Dade hypothesis for the TI-subset `(S, H^#)`.  Since `H^#` is a
 TI-subset of `G` with normalizer `S` ((8.5.a)/(8.6.a)), `S04.of_isTISubset` builds the Dade datum

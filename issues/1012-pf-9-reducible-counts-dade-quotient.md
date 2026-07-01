@@ -1622,3 +1622,66 @@ conjugation-invariant Finset `T` の各 fibre `{θ∈T|induce θ=induce θ₀}.c
 (2) regularity (A_g factor 保存、U-action 接続)、(3) T-invariance 組立 + oXtheta 集約
 (card_filter fiberwise)。その後 Xmu⊆Xtheta+|Xmu|=p-1 (reducible bijection) + 最終 assembly
 (exists_regular_not_reducible_of_odd で witness、whnf 注意)。crux は multi-session (deep char endgame)。
+
+## ✅ regularity half (T-invariance step (2)) COMPLETE — A_g↔U-action crux 解決 (2026-07-01 cont.⁵)
+
+step (2) の crux (「A_g↔U-action 接続」= cont.⁴ で identified された唯一の深部) を **6 補題で完全形式化**
+(S11、全 axiom-clean `[propext,Classical.choice,Quot.sound]`、S11 leaf green):
+- **P3 `hcConjDescend_eq_uActionHom`**: `u∈uInHu` に対し `∃a, ∀z, hcConjDescend u z = uActionHom a z`
+  (A_u = U-action の realization a)。証明 = `z=hcHom(incl h)` (hcHom∘incl 全射) で両辺を
+  `mk'_N(G値 u_G·h_G·u_G⁻¹)` に落とす: 左 = `hcConjDescend_hcHom`+`hcHom_inclusion`+conjugate∈hInHu
+  (normal.conj_mem)、右 = `quotientMulAutHom_apply_mk'`+`typeP_conjAction_apply`。**A_g↔U-action 接続の核心**。
+- **factor-preservation `hcConjDescend_maps_Hpart`**: `∀g∈HU, z∈Hpart i → A_g z∈Hpart i`。
+  分解 `g=h·u` (`Subgroup.normal_mul`+`hInHu_sup_uInHu_eq_top`) → `A_g=A_h∘A_u=A_u` (`hcConjDescend_mul`+
+  `_eq_id_of_mem_hc`、h∈hInHu⊆HC) → P3 → `Hpart_aInvariant.smul_mem`。= cont.⁴ (1616) の `A_g(Hpart i)=Hpart i`。
+- **`hcConjDescend_one`** (A_1=id、1∈HC) + **`hcConjDescend_apply_inv_apply`** (A_g∘A_{g⁻¹}=id、mul+A_1)
+  ⟹ A_g は各 Hpart 上 bijection。
+- **`hcConjDescend_comp_subtype_eq_one_iff`** (per-factor) + **`hcConjDescend_comp_regular_iff`**:
+  `(∀i, θ∘A_g nontrivial on Hpart i) ⟺ (∀i, θ nontrivial on Hpart i)` = **regularity preservation**。
+  bijection ゆえ value multiset 一致。
+
+**⟹ step (2) 完了**。commute (step 1 `hcPsi_conjBy_eq`、既 landed) + regularity preservation で
+**T={hcPsi θ|θ regular} は HU-conjugation で閉じる**: `conjBy g (hcPsi θ)=hcPsi(θ∘A_g)` (commute)、
+`θ∘A_g regular ⟺ θ regular` (regularity)。
+
+**⟹ step (3) T-invariance 組立 + oXtheta 集約 も COMPLETE (2026-07-01 cont.⁶)**。3 補題で
+oXtheta numerator を完全形式化 (S11、axiom-clean、leaf green):
+- **T-invariance closure** (前 commit): `hcPsi_irreducibleConjBy_eq` (IrreducibleChar 版 commute) +
+  `hcPsi_regular_conjBy` (∃θ' regular, (hcPsi θ)^g=hcPsi θ' = T 閉性)。
+- **`comp_subtype_ne_one_iff_exists`**: regularity hom-form ↔ pointwise-form bridge
+  (card_regular_chars_Hbar↔hcPsi_inertia_index_eq_u 接続)。
+- **`oXtheta_count`**: **u·|Xθ|=(p-1)^q** (Xθ=T.image induce の distinct 集合)。組立 =
+  T=RegF.image(hcPsi) 閉性 (hcPsi_regular_conjBy) → `card_filter_induce_eq_index_inertia` で各 fibre=
+  [HU:HC]=u (hcPsi_inertia_index_eq_u) → `Finset.card_eq_sum_card_fiberwise` で |T|=u·|Xθ| →
+  |T|=(p-1)^q (hcPsi_injective + card_regular_chars_Hbar) ⟹ 結論。
+  **instance-diamond 対処 (note の warn)**: `induce`/`Finset.univ` が statement-level で
+  Fintype/Invertible を要する ⟹ explicit instance binder (`[Fintype ↥huSub][Fintype ((↥H⧸N)→*ℂˣ)]
+  [Invertible (card huSub:ℂ)][Invertible (card HC:ℂ)]`) で解決。`set HC` は induce の
+  instance-guarded occurrence を fold しない ⟹ carrier は `_` 推論に任せ goal と同一 FULL 式に統一。
+
+**残 = caseA conjunct c 最終 assembly (parity 適用)**: `exists_regular_not_reducible_of_odd` (S11:~5350,
+既 landed: X⊇Xmu (|Xmu|=p-1) ∧ u·|X|=(p-1)^q ∧ u odd ∧ p-1 even>0 ∧ q≥2 → ∃s∈X∖Xmu) に oXtheta_count
++ u_odd + Xmu (reducibles, |Xmu|=p-1) を供給 → witness s∈Xθ∖Xmu → s∉Xmu ⟹ Ind_M(s) irreducible
+(reducible↔Xmu 対偶) → caseA_character_counts:~5270 conjunct c。
+**要 wiring**: (i) Xθ (oXtheta の image) を X に同定、(ii) Xmu = reducible-inducing の image を
+|Xmu|=p-1 で (reducible_count 系)、(iii) s∈Xθ∖Xmu → Ind_M(s) irr deg qu (M-level、既 hcZeta_induceHU_*
+の hIM を parity witness が供給)。deep math 無し・char-level plumbing (whnf/instance 注意)。
+
+## ★ conjunct c は hIM discharge に完全還元 — endpoint 特定 (2026-07-01 cont.⁷)
+
+**重要発見**: `hcZeta_exists_irreducible_sOf` (S11:7028、既 landed) が **hIM-gated conjunct c そのもの** —
+regular θ + hθnt(θ≠1) + hθ₀(inertia=HC、inertia_eq_hcInHu_caseA で供給) + **hIM
+(`inertia(Ind_{HC}^{HU}(hcPsi θ)) ≠ ⊤` = ζ_θ が M-level で W₁-fixed でない)** を受けて
+`∃χ∈𝒮(H₀C), IsIrr χ ∧ χ1=qu` (= conjunct c) を返す。⟹ **conjunct c ⟺ ある regular θ≠1 で hIM**。
+
+私の **oXtheta_count** + `exists_regular_not_reducible_of_odd` (parity) がこの hIM を供給する経路:
+witness s∈Xθ∖Xmu → Ind_M(s) irr ⟺ hIM。∴ 残 = parity の 2 入力のみ:
+- **|Xmu|=p-1**: Xmu={ζ_θ : θ constant factor-data} の count (constant nonzero 値 p-1 個の直接 count、
+  または reducible_count_sOf_H0C との bijection)。
+- **(E)**: `Ind_M(ζ_θ) reducible → θ constant factor-data` (対偶、Coq cfclass_Ind_irrP/ResIndXmu、
+  **W₁-inertia 数論を回避する Clifford 論**)。free-orbit route の θ̄^{w₀}∉U-orbit より弱く済む。
+
+⟹ **conjunct c assembly = (Xθ/Xmu を Set 化 + |Xmu|=p-1 + (E)) → exists_regular_not_reducible_of_odd
+→ hIM 抽出 → hcZeta_exists_irreducible_sOf**。oXtheta numerator + endpoint は landed、残は
+(E)+Xmu-count の fresh Clifford 単位 (deep でないが substantial、reducible-count infra と接続)。
+次 iteration の着手 = Xmu (constant factor-data) の定義 + count + (E)。
