@@ -7343,6 +7343,30 @@ theorem Hypothesis.muGridAlpha_tau_inner_SHC_extension_sub [Finite G] {M : Subgr
     hyp.muGridAlpha_inner_zeta_sub_irr hG hodd i j hζirr hηirr hdζ h0ζ (hη1.trans hζ1.symm) hηne]
 
 open scoped FiniteInduce in
+/-- **`SHC_isCoherent.extension` is injective on `S(HC)`** (α-grid `S₁`-`τ₁` input to (11.8.2)):
+distinct degree-`w₁` irreducibles of `S(HC)` have distinct coherent images.  Immediate from the
+orthonormality (`SHC_extension_inner_self` = 1, `SHC_extension_inner_of_ne` = 0): if the images
+coincided, `1 = ⟨φ^{τ₁}, φ^{τ₁}⟩ = ⟨φ^{τ₁}, ψ^{τ₁}⟩ = 0`.  Needed to materialize
+`{λ^{τ₁} : λ ∈ S(HC)}` as an orthonormal `Finset` for the (11.8.2) integer projection
+(`exists_intProjection_of_orthonormal_ZIrr`). -/
+theorem Hypothesis.SHC_extension_inj [Finite G] {M : Subgroup G}
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis M)
+    {φ ψ : ClassFunction ↥M ℂ}
+    (hφS : φ ∈ inducedFamily M) (hφirr : IsIrreducibleCharacter φ) (hφ1 : φ 1 = (hyp.w1 : ℂ))
+    (hψS : ψ ∈ inducedFamily M) (hψirr : IsIrreducibleCharacter ψ) (hψ1 : ψ 1 = (hyp.w1 : ℂ))
+    (heq : (hyp.SHC_isCoherent hG).extension φ = (hyp.SHC_isCoherent hG).extension ψ) :
+    φ = ψ := by
+  by_contra hne
+  have h0 : ClassFunction.inner ((hyp.SHC_isCoherent hG).extension φ)
+      ((hyp.SHC_isCoherent hG).extension ψ) = 0 :=
+    hyp.SHC_extension_inner_of_ne hG hφS hφirr hφ1 hψS hψirr hψ1 hne
+  have h1 : ClassFunction.inner ((hyp.SHC_isCoherent hG).extension φ)
+      ((hyp.SHC_isCoherent hG).extension ψ) = 1 := by
+    rw [← heq]; exact hyp.SHC_extension_inner_self hG hφS hφirr hφ1
+  rw [h0] at h1
+  exact one_ne_zero h1.symm
+
+open scoped FiniteInduce in
 /-- **Peterfalvi (11.8), the genuine non-orthogonality** (lane-b W3 obligation, issue 2020).
 
 Under Hypothesis (10.1), there is an irreducible `ζ ∈ S = inducedFamily M` of degree `w₁` —
