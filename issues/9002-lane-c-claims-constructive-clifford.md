@@ -97,8 +97,11 @@ Coq (1.7)(b) `cfInd_central_Inertia` の hypothesis は `abelian (T/H)` (T=I(θ)
 - [x] **Pf (1.7)/(8.2.c) 原文精読** — 設計点解決 commit `0482afa0` (abelian で十分、cyclic 不要)。
 - [x] **induction-in-stages** — **既に landed** (`S08_CaseBCoherence2.induce_induce_subgroupOf`)。cite のみ。
 - [x] **慣性商 abelian 完成** — `S14.typeF_inertia_commutator_le` (`⁅I(θ),I(θ)⁆ ≤ H`, sorry-free, cont.³)。
-- [ ] **(G1) 拡張 lemma** を build (`OddOrder/GroupTheory/RepresentationTheory/` 新/既存 leaf)。coprime
-      Hall (H=L_F normal Hall, U abelian complement) の下で I/H cyclic → θ 拡張 (Isaacs 6.28/11.22)。
+- [ ] **(G1) 拡張 lemma** を build。coprime Hall (H=L_F normal Hall) の下で θ を I に拡張 (Isaacs *Character
+      Theory* 6.28/8.16、coprime extension via 決定行列式)。**⚠ 注意: proof は Isaacs *CT* book (=project .mmd 外)**。
+      **infra build 開始 (cont.¹³)**: `RepresentationDeterminant.representationDeterminant` (det∘ρ : G→*ℂˣ,
+      sorry-free) — coprime extension の engine (extension を det 順序で pin)。**残 infra = 決定行列式の順序 +
+      coprime extension 構成**(Isaacs *CT* 8.16、多段・fresh session 推奨、必要なら ChatGPT で argument 再構成)。
 - [x] **char-product infra (Gallagher 前提)** — `RepresentationTheory/CharacterProduct.lean` (新 leaf, sorry-free,
       axiom-clean, cont.⁴): `ClassFunction` に pointwise `Mul` + `IsCharacter.mul` (χ·ψ = char of `tprod`,
       `Representation.char_tensor` 経由) + `mul_mem_ZIrr` (ZIrr は積で閉じる=部分環)。Gallagher の
