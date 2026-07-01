@@ -655,24 +655,77 @@ noncomputable def Rset {L : Subgroup G} {hyp : Hypothesis L} {chi : ClassFunctio
 /-! ## (12.3)--(12.5): orthogonality and rho-constancy -/
 
 open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
-/-- **Peterfalvi (12.3), the geometric obligation** ((8.18.c) + (5.9) + Dade support).  For
-non-conjugate type-I maximal subgroups `L₁, L₂` and constituents `φ₁ ∈ S(χ₁)`, `φ₂ ∈ S(χ₂)`, the
-Dade difference-images `(φ₁−φ̄₁)^{τ₁}` and `(φ₂−φ̄₂)^{τ₂}` are orthogonal: their supports lie in the
-disjoint thickened Dade domains `Ã(L₁)`, `Ã₁(L₂)` (Peterfalvi (8.18.c),
-`S10.support_mutual_exclusion`).  A faithful §8/§10 obligation — the thickened-support theory and
-its mutual-exclusion are §10 (lane-d/f) territory; (12.3) cites this as the geometric input to the
-(4.1) assembly. -/
+/-- **§8/§10 support-exclusion obligation for the Dade domains** (pinned; Peterfalvi (8.18.c) /
+`S10.support_mutual_exclusion`).  For non-conjugate type-I maximals `L1, L2`, the Dade supports
+`dadeSupport = 𝒞_G(A(L_i))` are disjoint.  This is the §10 thickened-support geometry — the τ-images
+`τ_i(φ_i − φ̄_i)` vanish off `dadeSupport(L_i)` (below), and the M̃-cover disjointness
+`conjClassSet_Mtilde_disjoint` (via `dadeSupport ⊆ 𝒞_G((L_i)_F) ⊆ 𝒞_G(M̃(L_i))`) makes the two
+domains disjoint.  The M̃ machinery lives in `S10`/BG (not reachable from this file); pinned here as
+the residual lane-a obligation that the (8.18.c) vanishing consumes (relocate / real-cite once the
+`dadeSupport ⊆ 𝒞_G(M̃)` bridge lands — hub issue 9003 Cluster B). -/
+theorem dadeSupport_disjoint_of_nonconjugate {L1 L2 : Subgroup G} [Finite G]
+    (hyp1 : Hypothesis L1) (hyp2 : Hypothesis L2)
+    (hnot_conj : ¬ ∃ g : G, MulAut.conj g • L1 = L2) :
+    Disjoint hyp1.dadeData.dade.dadeSupport hyp2.dadeData.dade.dadeSupport := by
+  sorry
+
+/-- The difference `φ − φ̄` of a constituent is supported in `A(L)` (each constituent is supported in
+`A(L) ∪ {1}` by `data.supported`, and `(φ − φ̄)(1) = 0` by equal degree — `φ(1)` is real). -/
+theorem constituentDiff_support_subset {L : Subgroup G} {hyp : Hypothesis L}
+    {chi : ClassFunction ↥L ℂ} (data : CharacterDecompositionData hyp chi)
+    {φ : IrreducibleCharacter ↥L} (hφ : φ ∈ data.constituents) :
+    ((φ : ClassFunction ↥L ℂ) - (φ : ClassFunction ↥L ℂ).conj).support ⊆
+      OddOrder.Peterfalvi.S04.supportInSubgroup hyp.ambientA L := by
+  haveI := hyp.finiteG
+  have hsupp_eq : (φ : ClassFunction ↥L ℂ).conj.support = (φ : ClassFunction ↥L ℂ).support := by
+    ext y
+    simp only [ClassFunction.mem_support, ne_eq, ClassFunction.conj_apply, star_eq_zero]
+  intro x hx
+  have hx0 : ((φ : ClassFunction ↥L ℂ) - (φ : ClassFunction ↥L ℂ).conj) x ≠ 0 := hx
+  have hxsupp : x ∈ (φ : ClassFunction ↥L ℂ).support := by
+    have hxU := ClassFunction.support_sub_subset _ _ hx
+    rwa [hsupp_eq, Set.union_self] at hxU
+  rcases data.supported φ hφ hxsupp with h | h
+  · exact h
+  · exfalso
+    rw [Set.mem_singleton_iff] at h
+    subst h
+    obtain ⟨d, _, hd⟩ := irreducibleCharacter_apply_one_eq_pos_natCast φ
+    exact hx0 (by rw [ClassFunction.sub_apply, ClassFunction.conj_apply, hd, star_natCast, sub_self])
+
+open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
 theorem nonconjugate_diffImage_inner_zero {L1 L2 : Subgroup G} [Finite G]
     (hyp1 : Hypothesis L1) (hyp2 : Hypothesis L2)
     (hnot_conj : ¬ ∃ g : G, MulAut.conj g • L1 = L2)
     {chi1 : ClassFunction ↥L1 ℂ} (data1 : CharacterDecompositionData hyp1 chi1)
-    {φ1 : IrreducibleCharacter ↥L1} (_hφ1 : φ1 ∈ data1.constituents)
+    {φ1 : IrreducibleCharacter ↥L1} (hφ1 : φ1 ∈ data1.constituents)
     {chi2 : ClassFunction ↥L2 ℂ} (data2 : CharacterDecompositionData hyp2 chi2)
-    {φ2 : IrreducibleCharacter ↥L2} (_hφ2 : φ2 ∈ data2.constituents) :
+    {φ2 : IrreducibleCharacter ↥L2} (hφ2 : φ2 ∈ data2.constituents) :
     ClassFunction.inner
         (hyp1.tau ((φ1 : ClassFunction ↥L1 ℂ) - (φ1 : ClassFunction ↥L1 ℂ).conj))
         (hyp2.tau ((φ2 : ClassFunction ↥L2 ℂ) - (φ2 : ClassFunction ↥L2 ℂ).conj)) = 0 := by
-  sorry
+  haveI := hyp1.finiteG
+  -- The τ-image `τ_i(φ_i − φ̄_i)` vanishes off `dadeSupport(L_i)`.
+  have hvanish : ∀ {L : Subgroup G} (hyp : Hypothesis L) {chi}
+      (data : CharacterDecompositionData hyp chi) {φ : IrreducibleCharacter ↥L},
+      φ ∈ data.constituents → ∀ {g : G}, g ∉ hyp.dadeData.dade.dadeSupport →
+      (hyp.tau ((φ : ClassFunction ↥L ℂ) - (φ : ClassFunction ↥L ℂ).conj)) g = 0 := by
+    intro L hyp chi data φ hφ g hg
+    haveI := hyp.finiteG
+    rw [Hypothesis.tau,
+      OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap_apply_of_support hyp.dadeData.dade _
+        (constituentDiff_support_subset data hφ)]
+    exact (hyp.dadeData.dade.isDadeMap_dadeMap (k := ℂ)).map_eq_zero_of_not_mem_dadeSupport _ g hg
+  -- Disjoint supports (each in its Dade domain; the domains are disjoint for non-conjugate L1,L2).
+  apply ClassFunction.inner_eq_zero_of_disjoint_support
+  rw [Set.disjoint_left]
+  intro z hz1 hz2
+  rw [ClassFunction.mem_support] at hz1 hz2
+  have hzd1 : z ∈ hyp1.dadeData.dade.dadeSupport := by
+    by_contra hg; exact hz1 (hvanish hyp1 data1 hφ1 hg)
+  have hzd2 : z ∈ hyp2.dadeData.dade.dadeSupport := by
+    by_contra hg; exact hz2 (hvanish hyp2 data2 hφ2 hg)
+  exact Set.disjoint_left.mp (dadeSupport_disjoint_of_nonconjugate hyp1 hyp2 hnot_conj) hzd1 hzd2
 
 open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
 /-- **Peterfalvi (12.3)**: for non-conjugate type-I maximal subgroups `L₁, L₂`, the families
