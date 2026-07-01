@@ -844,3 +844,15 @@ Y−nζ^{τ₁}+a∑β (本分解式)⟩ を展開 (5.3.b で ⟨ω^σ,ζ^{τ₁
 M側 = ⟨μ₀−ζ, α_{ij}⟩ (Dade τ isometry) = μ inner products。等値 ⟹ a=⟨∑ω_{r0}^σ,β⟩、β=a∑λ (Y=ω^σ diff cont.⁴⁵)
 ⟹ a=a·0=0 (5.3.b)。⚠ 大 lemma: M側 μ-grid inner products (⟨μ_{r0},μ_{ij}⟩ 等) の材料要。
 (11.8) closure は依然 doubly-gated (§9↔§10 の (11.8.1)、§14 の (11.8.6))。
+
+## 2026-07-02 cont.⁴⁷ (lane-a) — **(11.8.5) M-side ⟨α_{ij}, μ₀−ζ⟩ = n−δ LANDED**
+`muGridAlpha_inner_zeroColumnSum_sub_zeta` (S12, leaf green, sorry-free): μ₀=∑_{i'}μ_{i'0} (col-0 sum) で
+`⟨α_{ij}, μ₀−ζ⟩ = (n:ℂ)−(δ:ℂ)`。証明 = `muGridAlpha_inner_muColumn_self_sub_conj` (3519) と同型:
+⟨α,μ_{i'0}⟩ = −δ[i=i'] (`muGrid_inner_cross_column` j≠0・`muGrid_inner_self`/`_within_column` col-0 orthonormal・
+`muGrid_inner_eq_zero_of_apply_one_ne` ζ degree-distinct)、Σ_{i'} = −δ (`Finset.sum_ite_eq`); ⟨α,ζ⟩=−n
+(degree-distinct + ⟨ζ,ζ⟩=1)。M-side は既存 μ-grid inner infra で完全に組めた (新 μ 材料不要)。
+
+**次 = (11.8.5) G-side + 等値 → a=0**: ⟨(μ₀−ζ)^τ, α^τ⟩ を Dade isometry で M-side (本=n−δ) と結合。
+(11.8.4) hypothesis (μ₀−ζ)^τ=∑ω_{r0}^σ−ζ^{τ₁} の下で G-side を分解式 (cont.⁴⁶) + 5.3.b/orthonormal で
+展開 → n−δ と等値 → a=0。⚠ (11.8.4) は by-contra 仮定なので (11.8.5) は仮定パラメータ化 or by-contra 内で。
+(11.8) closure は依然 doubly-gated (§9↔§10 の (11.8.1)、§14 の (11.8.6))。

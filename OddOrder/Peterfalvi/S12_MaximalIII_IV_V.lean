@@ -3563,6 +3563,58 @@ theorem Hypothesis.muGridAlpha_inner_muColumn_self_sub_conj [Finite G]
   simp
 
 open scoped FiniteInduce in
+/-- **Peterfalvi (11.8.5) M-side inner product** `(α_{ij}, μ₀ − ζ) = n − δ`, where `μ₀ = ∑_{i'} μ_{i'0}`
+is the column-`0` sum (`0 < j`).  Within column `0` the `μ_{i'0}` are orthonormal, so only `i' = i`
+survives in `(δ·μ_{i0}, μ₀)`, giving `−δ`; `μ_{ij}` (column `j ≠ 0`) is cross-column to column `0`;
+`ζ` (degree `w₁ > 1`) is degree-distinct from every `μ_{i'0}` (degree `1`) and from `μ_{ij}`/`μ_{i0}`,
+and `(ζ, ζ) = 1` gives `(α_{ij}, ζ) = −n`.  Hence `(α_{ij}, μ₀ − ζ) = −δ − (−n) = n − δ`.  This is the
+`M`-side of the (11.8.5) two-way computation of `((μ₀ − ζ)^τ, α_{ij}^τ) = (μ₀ − ζ, α_{ij})` (Dade
+isometry), which together with the `G`-side (via (11.8.4)) forces `a = 0`. -/
+theorem Hypothesis.muGridAlpha_inner_zeroColumnSum_sub_zeta [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} [Invertible (Nat.card ↥M : ℂ)]
+    (hyp : Hypothesis M) (hodd : Odd (Nat.card G)) (i : Fin hyp.w1) (j : Fin hyp.w2) (hj0 : j ≠ 0)
+    {ζ : ClassFunction ↥M ℂ} (hζirr : IsIrreducibleCharacter ζ) (hζ1 : ζ 1 = (hyp.w1 : ℂ))
+    (hdζ : hyp.muGrid hG hodd i j 1 ≠ ζ 1) (h0ζ : hyp.muGrid hG hodd i 0 1 ≠ ζ 1) {δ : ℤ} {n : ℕ} :
+    ClassFunction.inner (hyp.muGrid hG hodd i j - (δ : ℂ) • hyp.muGrid hG hodd i 0 - (n : ℂ) • ζ)
+        ((∑ i' : Fin hyp.w1, hyp.muGrid hG hodd i' 0) - ζ) = (n : ℂ) - (δ : ℂ) := by
+  haveI := hyp.finiteG
+  classical
+  have hw1 : 1 < hyp.w1 := (Subgroup.one_lt_card_iff_ne_bot _).mpr hyp.typeP.W1_nontrivial
+  have hcol0ζ : ∀ i' : Fin hyp.w1, hyp.muGrid hG hodd i' 0 1 ≠ ζ 1 := fun i' => by
+    rw [hyp.muGrid_zero_column_apply_one hG hodd i', hζ1]
+    intro he; have : hyp.w1 = 1 := by exact_mod_cast he.symm
+    omega
+  -- `(α_{ij}, ζ) = −n`: `μ_{ij}`, `μ_{i0}` degree-distinct from `ζ`, and `(ζ, ζ) = 1`.
+  have hαζ : ClassFunction.inner
+      (hyp.muGrid hG hodd i j - (δ : ℂ) • hyp.muGrid hG hodd i 0 - (n : ℂ) • ζ) ζ = -(n : ℂ) := by
+    have a1 := hyp.muGrid_inner_eq_zero_of_apply_one_ne hG hodd i j hζirr hdζ
+    have a2 := hyp.muGrid_inner_eq_zero_of_apply_one_ne hG hodd i 0 hζirr h0ζ
+    have a3 : ClassFunction.inner ζ ζ = 1 := by
+      rw [OddOrder.RepresentationTheory.irr_cf_inner hζirr hζirr, if_pos rfl]
+    simp only [ClassFunction.inner_sub_left, ClassFunction.inner_smul_left, a1, a2, a3,
+      mul_zero, sub_zero, mul_one, zero_sub]
+  -- `(α_{ij}, μ_{i'0}) = −δ·[i = i']`.
+  have hrow : ∀ i' : Fin hyp.w1,
+      ClassFunction.inner (hyp.muGrid hG hodd i j - (δ : ℂ) • hyp.muGrid hG hodd i 0 - (n : ℂ) • ζ)
+        (hyp.muGrid hG hodd i' 0) = (if i = i' then -(δ : ℂ) else 0) := by
+    intro i'
+    have h1 := hyp.muGrid_inner_cross_column hG hodd i i' hj0
+    have h2 : ClassFunction.inner (hyp.muGrid hG hodd i 0) (hyp.muGrid hG hodd i' 0)
+        = (if i = i' then (1 : ℂ) else 0) := by
+      by_cases hii' : i = i'
+      · rw [if_pos hii', ← hii']; exact hyp.muGrid_inner_self hG hodd i 0
+      · rw [if_neg hii']; exact hyp.muGrid_inner_within_column hG hodd 0 hii'
+    have h3 : ClassFunction.inner ζ (hyp.muGrid hG hodd i' 0) = 0 := by
+      rw [OddOrder.RepresentationTheory.inner_conj_symm (hyp.muGrid hG hodd i' 0) ζ,
+        hyp.muGrid_inner_eq_zero_of_apply_one_ne hG hodd i' 0 hζirr (hcol0ζ i'), star_zero]
+    simp only [ClassFunction.inner_sub_left, ClassFunction.inner_smul_left, h1, h2, h3,
+      mul_zero, zero_sub, sub_zero]
+    by_cases hii' : i = i' <;> simp [hii']
+  rw [ClassFunction.inner_sub_right, hαζ, OddOrder.RepresentationTheory.inner_sum_right,
+    Finset.sum_congr rfl (fun i' _ => hrow i'), Finset.sum_ite_eq, if_pos (Finset.mem_univ i)]
+  ring
+
+open scoped FiniteInduce in
 /-- **§10 support of an equal-degree difference in `S`** (Peterfalvi (10.5)/(11.8)): for two members
 `ζ₁, ζ₂ ∈ S = inducedFamily M` of *equal degree* (`ζ₁(1) = ζ₂(1)`), the difference `ζ₁ − ζ₂` is
 supported in `A_0(M)`.  Both are induced from the normal `M' = [M,M]`, hence vanish off `M'`; and
