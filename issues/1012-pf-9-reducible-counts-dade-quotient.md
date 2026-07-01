@@ -1949,3 +1949,32 @@ step 2 (regularity crux) 完成後の最後の assembly ゆえ、深いが grind
   ζ over θ₀ regular の抽出 (caseA 版 `caseB_exists_chiefFactorConstituent` 相当が要るか grep)。
   `inertia_eq_top_of_induceHU_not_irreducible` (5009: reducible⟹M-fixed)、`caseA_induceHU_inj_of_reducible`
   (5033) は landed。
+
+## conjunct (b) 完成 + (c) plan (2026-07-02 cont.¹⁹)
+
+**landed (commits, 全 axiom-clean)**:
+- **`caseA_reducible_induceHU_apply_one_eq_qu`**: reducible φ∈𝒮(H₀) は degree qu (9.8.b degree)。
+  step-5 assembly の初 consumer。extraction (`exists_hom_constituent_of_mem_xiSet_H0`) + C-kernel
+  (`reducible_mem_sOf_H0C` cardinality + `caseA_induceHU_inj_of_reducible`) + `caseA_reducible_eq_hcZeta`
+  + `hcZeta_induceHU_apply_one`。
+- **`caseA_character_counts` conjunct (b) 完成** + 末尾へ relocate (step-5 machinery を cite するため;
+  コード comment 6337 が既に予告)。(b) = count (`reducible_count_sOf_H0`) + degree (上記) + membership
+  (`reducible_mem_sOf_H0C`)。conjunct (c)/(d) は sorry (S11:8143/8144)。
+
+**次 = conjunct (c) = 9.8.c: |Xmu|=p-1 Finset bijection assembly**:
+- **Xθ** (`oXtheta_count` 内) = `RegF.image (fun θ => Ind_{HC}(hcPsi θ))` (RegF={θ regular})。
+  `u·|Xθ|=(p-1)^q` (`oXtheta_count`)。
+- **Xmu** := `Xθ.filter (fun ζ => ¬irr (induceHU ζ))`。
+- **|Xmu|=p-1 の証明** (cleanest, Set/Finset bridge):
+  1. `↑(Xmu.image (induceHU data)) = {φ∈𝒮(H₀)|¬irr}` (Set 等式)。⊆: ζ∈Xmu ⟹ induceHU ζ ∈𝒮(H₀)
+     (ζ∈Xθ ⟹ ⟨ζ,hcZeta_irreducible⟩∈xiOf(H0)=hcZeta_mem_xiOf) ∧ reducible。⊇: reducible φ ⟹
+     source χ = Ind_{HC}(hcPsi θbar) (extraction+`caseA_reducible_eq_hcZeta`), θbar regular
+     (`caseA_reducible_theta_regular`) ⟹ χ∈Xθ ∧ reducible ⟹ χ∈Xmu、φ=induceHU χ。
+  2. `Xmu.card = (Xmu.image induceHU).card` (`Finset.card_image_of_injOn`、`caseA_induceHU_inj_of_reducible`)。
+  3. `= ncard {reducibles} = p-1` (`Set.ncard_coe_Finset` + `reducible_count_sOf_H0`)。
+- **conjunct (c) 組立**: `exists_regular_not_reducible_of_odd` (X=Xθ, |Xmu|=p-1, u·|Xθ|=(p-1)^q,
+  `u_odd`, p-1 even, q≥2) → ζ∈Xθ\Xmu (Ind_{HU}^M ζ **irreducible** 直接)。ζ=Ind_{HC}(hcPsi θ)
+  (θ∈RegF regular⟹θ≠1) ⟹ witness = induceHU ζ ∈𝒮(H₀C) (`hcZeta_induceHU_mem_sOf`)、irreducible
+  (ζ∉Xmu 直接、hIM 経由不要)、degree qu (`hcZeta_induceHU_apply_one`)。
+- **共有 helper 案** `caseA_reducible_source_eq_hcZeta`: reducible φ∈𝒮(H₀) ⟹ ∃θbar regular,
+  φ=induceHU(Ind_{HC}(hcPsi θbar))。degree lemma と Xmu 全射の両方が使う extraction+C-kernel+eq_hcZeta。
