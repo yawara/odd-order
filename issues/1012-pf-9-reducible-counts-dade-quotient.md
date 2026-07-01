@@ -2001,3 +2001,24 @@ payoff。`caseA_character_counts` (末尾へ relocate 済) の conjunct (b)+(c) 
 **残 = conjunct (d) = 9.8.d のみ** (S11:8343): `𝒮(H₀U')` に degree qa の irreducible が
 `((p-1)/a)·(|U|/(a|U'|))` 個以上。別構造 (a divisor、Uprime、type-P Galois の a=|U:C_U(...)|)。step-5
 machinery とは独立の新 phase。full build green (3893 jobs)。
+
+## 残 §9 frontier 精査 (2026-07-02 cont.²¹) — 全て deep/opaque-gated、caseA step-5 の続きでない
+9.8.b/c 完了後の残 S11 sorry を精査。**clean な小 win は無い**。honest な次手は下記いずれかの新 sub-phase:
+
+- **9.8.d** (S11:8343, caseA conjunct d): 🛑 **opaque-gated**。degree-qa の Galois a-family count
+  (`((p-1)/a)·(|U|/(a|U'|))` 個以上)。`CliffordCaseAData.quotient_factors_cyclic_order_a := True` /
+  `Ubar_embeds_product := True` (S11:4970-4973) が **opaque `True` stub**。honest に建てるには
+  type-P non-Galois の Galois 構造 (H1、a=|U:C_U(H1)|、cyclic Ū、theta family = Coq `theta f`) を
+  de-opacify 要 (CliffordCaseAData への field 追加=構造変更)。**`True` stub の上に建てるのは doneness 違反**
+  ([[scaffold-sorry-free-not-done]])。Coq: PFsection9 `typeP_nonGalois_characters` (d) part。
+- **9.9.c** (S11:6256, caseB conjunct c): deep exceptional。`(¬∃irr∈𝒮(H₀C')) → C=⊥ ∧ u=(p^q-1)/(p-1)`。
+  **caseB (Galois case) 固有** — u=(p^q-1)/(p-1) は Galois-specific で caseA parity
+  (`exists_regular_not_reducible_of_odd`、u=(p-1)^(q-1) を出す) から**出ない**。Coq: PFsection9
+  `typeP_Galois_characters` 系。9.8.c の Hpart/S₀ machinery は caseA 専用ゆえ流用不可。
+- **9.10** (S11:6277, `exceptional_case_frobenius_realization`): opaque field
+  `quotientSemidirectFrobenius` de-opacify + 全 body sorry。Coq: PFsection10 (coherence/Frobenius)。
+- **9.11 `sibleyTarget_H0C`** (S11:6293): §14-gated + lane-B (6.8) 依存。**lane-A 即時対象外**。
+
+**次 iteration の honest 着手候補** (document-order): 9.8.d の Galois 構造 de-opacify (H1/a/theta) が
+文書順最上流だが構造変更大。または 9.9.c (caseB exceptional, 構造変更不要だが deep §9-10 coherence 依存)。
+どちらも fresh-context で Coq `typeP_{non,}Galois_characters` 精読からの multi-iteration build。
