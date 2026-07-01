@@ -76,6 +76,7 @@ issues/
 | **1000** | **1000-1999** | **Peterfalvi 系並行セッション (確定)** | `issues/SEQUENCE.1000` |
 | 2000 | 2000-2999 | その他の ad-hoc 並行セッション #1 | `issues/SEQUENCE.2000` |
 | 3000+ | (1000 ごと) | その他の ad-hoc 並行セッション #2… | `issues/SEQUENCE.N` |
+| **9000** | **9000-9999** | **shared-infra claim (未所有 leaf 着手宣言, 確定 2026-07-01)** | `issues/SEQUENCE.9000` |
 
 **Peterfalvi の並行作業は base 1000 に固定**(`ODD_ISSUE_BASE=1000`)。これは予約済みなので
 他の並行セッションには使わない。Peterfalvi 以外の ad-hoc な並行作業は 2000 以降を割り当てる。
@@ -91,6 +92,27 @@ issues/
 - 既存の 0001-0046 は全て main レンジ (base 0). **移行不要**.
 - レンジ幅 1000 を使い切ると `new-issue` がエラーで知らせる = **採番レンジを
   再分割 / 幅を見直すタイミング** (issue が増えてきたら再考).
+
+### shared-infra claim (9000 番台, 確定 2026-07-01)
+
+**未所有 leaf**（`OddOrder/Algebra|GroupTheory/**` 等、どのレーンも所有しない共有 infra）を
+新設して genuine FT math を積むとき（`ft_path_policy.md` §0 policy 5(A)(B) の「gated → 上流 ungated
+infra に降りる」で発生）、**複数レーンが同じ上流 infra を同時並行で構築する重複を防ぐ**ための
+着手宣言プロトコル。所有 file 内の作業には不要。
+
+1. **検索**（着手前・必須）: repo を「教科書番号 + descriptive 名 2 案以上 + import grep」で検索し、
+   既存を確認（[[verify-port-state-by-number-not-coq-name]] [[s09-is-section7-chirho-complete]]）。
+   既に在れば cite（再構築しない）。
+2. **claim**: 不在確認後、`bin/new-issue --base 9000 <slug> "claim: <leaf> — <補題名/教科書 ref> (lane X)"`
+   で 9000 番台 issue を 1 件切り、**着手の最初のコミットで main に乗せる**（`export ODD_ISSUE_BASE=9000`）。
+   本文に target leaf・提供する補題（署名）・consumer・lane を書く。
+3. **scan**（着手前・必須）: 全レーンは shared infra 着手前に `issues/` の **open 9000 番台**を読む
+   （定期 main 同期にフック）。同一 ref の claim が在れば重複回避（cite する / その lane に委ねる）。
+4. **完了/放棄で `git mv` closed**。hub (merge_monitor) は重複 claim / 台帳に無い新 shared-infra leaf を
+   検出して STOP flag（[`merge_monitor.md`](merge_monitor.md)）。
+5. **grandfather**: プロトコル制定 (2026-07-01) 前に landing 済の shared leaf
+   （`OddOrder/Algebra/GaloisRationalInteger.lean` = [Is] 3.14 等）は事後 claim 不要
+   （既に main 上で全レーン可視ゆえ重複リスク解消済）。
 - 万一 **同一レンジ内**で衝突した場合 (同 base の 2 セッション等) のみ, 従来どおり
   マージ時に手動リナンバ + 該当 SEQUENCE 解決 (Django migrations と同じ割り切り).
 

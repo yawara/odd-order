@@ -1586,3 +1586,39 @@ heartbeats** (induce-coercion defeq 爆発、[[lean-induce-transport-instance-de
 
 **残タスク (再掲、全 moderate、def_Itheta は proven)**: (a) oXtheta u-to-1 count (whnf 注意)、
 (b) (E) reducible⟹Xmu、(c) u odd、(d) assembly (`exists_regular_not_reducible_of_odd`)。
+
+## ★ oXtheta 設計確定 + crux 非依存入力 3 点 landed (2026-07-01 cont.⁴)
+
+**セッション成果 (commits 8b1f996e/dd2dd97f、S11 leaf green、全 axiom-clean)**: oXtheta
+`u·|Xtheta|=(p-1)^q` (θ↦ζ_θ=induce(hcPsi θ) の u-to-1 fibre count) の **crux 非依存入力 3 点**:
+- `u_odd`: `Odd chars.u` (u=|Ū|=|range uActionHom| ∣ |U⊔W₁| ∣ |G| odd)。parity 入力。
+- `hcHom_surjective` + `hcPsi_injective`: θ↦hcPsi θ 単射 ⟹ |{hcPsi θ|regular}|=(p-1)^q
+  (`card_regular_chars_Hbar` の分子)。
+- `hcPsi_inertia_index_eq_u`: regular θ で `[HU:I_{HU}(hcPsi θ)]=u` (inertia_eq_hcInHu_caseA→
+  hcPsi_inertia_eq_hc→HC, hc_index_eq_u)。= 一様 fibre size。
+
+**oXtheta engine 確定 = `card_filter_induce_eq_index_inertia`** (`InducedIrreducible.lean:259`):
+conjugation-invariant Finset `T` の各 fibre `{θ∈T|induce θ=induce θ₀}.card=[G:I(θ₀)]`。
+⟹ `T=RegSet.image (hcPsi chief)` (|T|=(p-1)^q), `image=T.image (induce HC ·)`,
+`T.card=Σ_{ζ∈image} u = u·|image|` (Finset.card_eq_sum_card_fiberwise + 各 fibre=u)。
+
+**残 crux = T conjugation-invariance** (`∀χ∈T,∀g, conjBy g χ∈T`)。分析確定:
+1. **commute**: `(hcPsi θ:ClassFunction)=compHom hcHom (linearIrr θ)`
+   (`ClassFunction.compHom_linearIrreducibleCharacter`)。`conjBy g χ=compHom (conjByMulEquiv g) χ`
+   (定義: conjBy g θ h=θ(g h g⁻¹)=θ(conjByMulEquiv g h))。⟹ conjBy g (hcPsi θ)=
+   compHom (hcHom.comp (conjByMulEquiv g)) (linearIrr θ)。
+2. **factoring A_g**: `hcHom.comp (conjByMulEquiv g)=A_g.comp hcHom` (ker hcHom=H₀C=
+   ker(hcHom∘conjByMulEquiv g) ∵ H₀C◁HU normal ゆえ g H₀C g⁻¹=H₀C)。A_g:H̄→*H̄ を
+   MonoidHom.liftOfRightInverse (hcHom surj) or QuotientGroup.map + iso 経由で構成。
+   ⟹ conjBy g (hcPsi θ)=compHom hcHom (linearIrr (θ.comp A_g))=hcPsi (θ.comp A_g)。
+3. **regularity** (深部): θ.comp A_g regular ⟺ θ regular。要 A_g が各 Hpart factor 保存。
+   g∈HU (W₁ 成分なし) ⟹ U-action は各 factor 保存 (`Hpart_aInvariant`)、H-part は H̄ 上 trivial
+   ⟹ A_g(Hpart i)=Hpart i。**A_g↔U-action 接続が crux** (free-orbit の compHom_hInHuConj_hInHuEquivH
+   の HC-level analog、L1-L3 並み)。`conjBy_compHom_eq_compHom_conjBy` (ConjugationBrauer:306) が
+   inflation-conj equivariance だが H'≤G/M 形で hcHom の iso 層 (hcQuotientEquivHbar) が挟まり
+   直接非適用 — iso 分解 (hcHom=iso∘mk') して mk' 部分に適用する要あり。
+
+**次着手**: (1) commute existence `hcPsi_conjBy_eq: conjBy g (hcPsi θ)=hcPsi (θ.comp A_g)` (A_g 構成)、
+(2) regularity (A_g factor 保存、U-action 接続)、(3) T-invariance 組立 + oXtheta 集約
+(card_filter fiberwise)。その後 Xmu⊆Xtheta+|Xmu|=p-1 (reducible bijection) + 最終 assembly
+(exists_regular_not_reducible_of_odd で witness、whnf 注意)。crux は multi-session (deep char endgame)。

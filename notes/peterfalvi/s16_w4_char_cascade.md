@@ -1080,3 +1080,44 @@ cyclic-closed (∀x∈G₀ ∀k coprime |G|, x^k∈G₀ — G₀=G#−orbits は
 
 **lane c 次手** = 保持下流の deep char (S15_SAndT 13.16/13.17 or S16 orthogonality_switch 14.14)。
 [[scaffold-sorry-free-not-done]] [[s09-is-section7-chirho-complete]] [[feedback-cite-sorried-lemmas-if-signature-correct]]
+
+### cont.³⁶ (2026-07-01 lane c=γ): 保持下流 §13.16–19 は未形式化 cyclic-TI 機構に gated (cross-lane scope 発見)
+
+issue 0092 再配分後の lane-c 保持下流のうち最上流 sorry = **`normalizer_W1` (S15_SAndT:144, Pf 13.16)**
+= `N_G(W₁) = C_G(W₁) ∧ C_G(W₁) = Q ⊔ W₂` を上流優先で engage・正面調査した結果、**未形式化の
+cyclic-TI 機構に gated** と確定 (難所回避でなく実調査の結論):
+- **Coq PFsection13 は `cyclicTI_hypothesis`/`FT_cyclicTI_hyp`/`cycTIiso` フレームワーク依存**
+  (PFsection13.v:107/897/1063)。(13.16) の N=C=Q⊔W₂ は cyclic TI-torus W=W₁×W₂ の構造定理。
+- **repo に cyclic-TI 機構は皆無** (`grep cyclicTI OddOrder/` 空)。`Hypothesis` 構造 (S15_SAndT_Setup:81)
+  にも W₁ の normalizer/centralizer 系フィールドは無 (`W1_normalizes_U` のみ)。
+- elementary に取れるのは `W₂ ≤ C_G(W₁)` (`W1_commutes_W2` 由来) と `C ≤ N` (自明) のみ。hard 方向
+  (N≤C, C≤Q⊔W₂) は cyclic-TI 構造必須。
+- 消費者 = (13.17.c) `normalizer_W1` cite (S15_SAndT:1427)。dual `normalizer_W2` も (13.16) analogue
+  未 port で sorried (S15_SAndT:1745)。
+
+**⟹ cyclic-TI 機構 = §13.16–19 の共通 gate**。policy 5(A) では「gated → 上流 ungated math を実証明」だが、
+cyclic-TI 機構は (a) 大規模 (Peterfalvi §13 の主要 machinery 一節相当)、(b) **lane-a/b coherence
+(cycTIiso はコヒーレンス transport に使う) と重複領域** ゆえ、solo shared-infra 化は policy 6 の重複
+リスク大。これは **cross-lane scope 決定** (誰が cyclic-TI 機構を建てるか = shared infra claim か
+lane-a/b coherence 領域か)。[[cross-lane-sync-via-notes]]
+
+**本セッション lane-c 成果**: (1) cont.³³ 重複軌道修正、(2) [Is] 3.14 ANT infra 5 補題 (cont.³⁴/³⁵)、
+(3) 自律 frontier + claim-before-build 規約化 (ft_path_policy §0 policy 5-6)、(4) 本 gate 発見。
+[[scaffold-sorry-free-not-done]] [[feedback-no-avoiding-hard-parts]]
+
+
+### cont.³⁷ (2026-07-01 lane c=γ /loop 継続): cont.³⁶「cyclic-TI 機構 absent/gated」は phantom gate (4件) → (13.16) normalizer_W1 de-opacify landing
+
+**⚠ cont.³³/³⁶ の「未実装/absent/gated」判定は 4 件すべて phantom gate だった** ([[verify-port-state-by-number-not-coq-name]] 再発)。cont.³⁶ は `grep cyclicTI OddOrder/` (空) で「cyclic-TI 皆無」と結論したが repo は Coq 名でなく descriptive 名を使う:
+
+1. **cyclic-TI 機構は存在**: `OddOrder/Peterfalvi/S05_TICyclic.lean` (993行) `TICyclicHypothesis` (W/W1/W2 cyclic + `V_ti : IsTISubset V W` + `toDadeHypothesis` + `mapOfInjective`)。FeitThompson.lean が `sdiffTICyclicHypothesis` で多用。
+2. **(7.5) family_inequality は存在**: `S09.family_inequality` + `S09.FamilyHypothesis71`。`MHypothesis.toFamilyHypothesis71` bridge (S16:1732) + 適用する `chiRhoNormSq_psi_le_line83` (14.11.4, S16:2462) + `generic_character_bound` (14.11.3) は **既に sorry-free**。cont の「(7.5) 未実装」は stale。
+3. **Wielandt fixed-point は存在**: `OddOrder/GroupTheory/{WielandtFixedPoint,WielandtAssembly,CoprimeFixedPoints,CoprimeAction,CoprimeFrobeniusKernel,CoprimeAbelianPGroup}.lean`。(13.16) Coq proof (`FTtypeP_norm_cent_compl`, PFsection13.v:1519) の核心エンジン。
+4. **norm cascade は Dade producer 2 本に bottom-out**: 残 genuine sorry = `eta_generic_data` (S16:2389) + `betaM_expansion_data` (§3/§4 Dade concrete)。`normCascadeData` は現 sorry リストに無し。
+
+**genuine landing: (13.16) normalizer_W1 de-opacification** (S15_SAndT.lean、leaf build 3856 green):
+- `normalizer_W1` (13.16) を **sorry-free 化**。反対称 chain `Q⊔W₂ ≤ C_G(W₁) ≤ N_G(W₁) ≤ Q⊔W₂` で N=C=Q⊔W₂ collapse。
+- proven: `W₂ ≤ C_G(W₁)` (`W1_commutes_W2`, W abelian)、`Q ≤ C_G(W₁)` (`W₁≤Q`+Q abelian ⟹ `le_centralizer_iff_isMulCommutative`+`centralizer_le`)、`C≤N` (`centralizer_le_normalizer`)。
+- 残 sorry を `normalizer_W1_structure` (新) に isolate = 3 atomic 構造事実: `W₁ ≤ Q` (W2_le_P の T-side dual)、`IsMulCommutative ↥Q` (P_elementaryAbelian の T-side dual)、`N_G(W₁) ≤ Q⊔W₂` (Frobenius/Wielandt、machinery は #1/#3)。
+
+**次手 (lane c)** = `normalizer_W1_structure` の `N_G(W₁) ≤ Q⊔W₂` を WielandtFixedPoint + TICyclicHypothesis bridge で実証明。T-side dual の `W₁≤Q`/Q-abelian は T-side basic_structure gated (issue 3001) だが cite 可。dual `normalizer_W2` も同パターン。[[feedback-cite-sorried-lemmas-if-signature-correct]] [[scaffold-sorry-free-not-done]]

@@ -8,6 +8,42 @@
 
 ---
 
+## ✅ LIVE STATUS (2026-07-01, lane d = γ 上流 S15_SAndT_Setup 再配分後の初手)
+
+**issue 0092 で lane d は S15_SAndT_Setup へ再配分** (旧 δ BG§14–16 は FT deliverable 実質完成)。
+
+### ⚠ 重複回避: (13.9.b) [Is] 3.14 数論核は **lane c が並行 landing 済** (共有 infra へ集約)
+
+lane d が同セッションで (13.9.b) の「Galois-invariant 代数的整数 → 有理整数」核
+(`∏‖χ(aᵏ)‖²≥1`) を S15_SAndT_Setup に実証明したが、**merge 時に lane c が同核を先に
+`OddOrder/Algebra/GaloisRationalInteger.lean` (共有 infra) へ landing 済と判明**
+(`a6a532c7`/`35c88da5`)。lane c 版 = `IsCharacter φ` + 一般 cyclic-closed Finset
+(`exists_int_prod_character_of_cyclicClosed` / `one_le_prod_normSq_character_of_cyclicClosed`)。
+lane d 版は (ZMod n)ˣ-orbit 特殊化ゆえ **冗長 → 除去** (反重複方針)。
+
+- **(13.9.b) consumer は lane c 版を cite せよ**: cyclic class `{aʲ : gcd(j,orderOf a)=1}` は
+  coprime-to-|G| power closure を満たす (orderOf a | |G|) ので lane c の `hclosed` に適合。
+  λ^{τ₁} は Dade 等距の像 = ±genuine character ゆえ `‖λ^{τ₁}‖²=‖θ‖²` で `IsCharacter` 版適用可。
+- **教訓 (coordination)**: 2026-06-29 notes が「残る genuine work」の筆頭に (13.9.b) ANT 核を
+  flag → lane c/d 双方が同時着手し重複。次の flagged-but-unowned work は着手前に main log grep で
+  他レーン進行を確認する ([[cross-lane-sync-via-notes]])。
+
+⟹ **lane d の S15_SAndT_Setup 実 landing はこの回まだゼロ** (重複除去で相殺)。残 16 sorry は全て
+grid carrier (issue 3002) / σ-structure / char cascade gated。次手は下記 frontier 参照。
+
+### ▶ §8 TI-subset (13.5 群論入力) を精査 — 完全な path 特定 + crux 1 つに de-risk (issue 4013)
+
+ユーザー裁定で §8 TI-subset (`H_sharp_isTISubset` / `S_normalizes_H_sharp`、lane c 未着手の群論) に着手。
+**両 sorry は `hyp.H = fittingInG S` (= Pf (8.5.a) `F(S)=M_F·C_U(M_F)`) に帰着**することを確定。全 TI 機構は
+在庫確認済 (`FittingIsTI`=(8.6.a) / `fittingIsTI_of_isTypeP2` / `normalizer_fittingInAmbient_eq_self` /
+`maxNilpotentNormalHall_le_fittingInG` / `IsTISubset.subset`)。**残る唯一の crux = `C=C_U(M_F) ≤ fittingInG S`**
+= Pf (8.5.a) 本体 (M'=HU coprime-order 論法、(8.4.c) 依存) で repo 未整備。`centralizer_fittingInG_inf` route
+(C が F(S) 全体中心化を要す) と Theorem 127 の A₀ (tau2 特殊ケース) は共に不一致。⟹ **次手 = (8.5.a)
+`fittingInG S = P ⊔ C_U(P)` を type-P S で形式化** (carrier reconciliation 不要、P/C は Hypothesis 直取り)。
+詳細 = **issue 4013**。
+
+---
+
 ## ✅ LIVE STATUS (2026-06-29, 正本 — ゲートなし方針で再開, lane c /loop)
 
 > **下の 2026-06-23 ブロックの「§15 lane-c ungated closable work 枯渇 / 全 cross-lane gated」は
