@@ -1,5 +1,5 @@
 ---
-id: 9000
+id: 9001
 slug: hub-witness-coherence-unsound-and-6-5-c-clifford
 title: "HUB裁定: witness coherence (12.6) 3-case 修正の優先度 + (6.5.c)/構成的Clifford の shared-infra 割当"
 created: 2026-07-01

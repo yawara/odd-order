@@ -1791,7 +1791,7 @@ theorem frobenius_typeI_coherent_of_abelianKernel [Finite G] [Fintype G]
 /-- **Peterfalvi (12.6) case (c): cyclic-quotient kernel → (6.5.c) coherence.**
 Def (8.3) case (c): `H` is a `p`-group and `|L/H|` divides `p − 1` (via (8.2.a)/(8.3.c)); `S` is
 coherent by (6.5.c).  (Gap: the (6.5.c) coherence producer for `|L/H| ∣ p−1` is not yet in the
-coherence library — see issue 2032 / hub issue 9000.) -/
+coherence library — see issue 2032 / hub issue 9001.) -/
 theorem frobenius_typeI_coherent_of_cyclicQuotient [Finite G] [Fintype G]
     (_hG : OddOrder.BG.IsMinimalSimpleOdd G) {L : Subgroup G} [Fintype ↥L]
     [Invertible (Nat.card ↥L : ℂ)] [Invertible (Nat.card G : ℂ)]
