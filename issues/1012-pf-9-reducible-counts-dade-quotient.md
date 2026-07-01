@@ -1622,3 +1622,32 @@ conjugation-invariant Finset `T` の各 fibre `{θ∈T|induce θ=induce θ₀}.c
 (2) regularity (A_g factor 保存、U-action 接続)、(3) T-invariance 組立 + oXtheta 集約
 (card_filter fiberwise)。その後 Xmu⊆Xtheta+|Xmu|=p-1 (reducible bijection) + 最終 assembly
 (exists_regular_not_reducible_of_odd で witness、whnf 注意)。crux は multi-session (deep char endgame)。
+
+## ✅ regularity half (T-invariance step (2)) COMPLETE — A_g↔U-action crux 解決 (2026-07-01 cont.⁵)
+
+step (2) の crux (「A_g↔U-action 接続」= cont.⁴ で identified された唯一の深部) を **6 補題で完全形式化**
+(S11、全 axiom-clean `[propext,Classical.choice,Quot.sound]`、S11 leaf green):
+- **P3 `hcConjDescend_eq_uActionHom`**: `u∈uInHu` に対し `∃a, ∀z, hcConjDescend u z = uActionHom a z`
+  (A_u = U-action の realization a)。証明 = `z=hcHom(incl h)` (hcHom∘incl 全射) で両辺を
+  `mk'_N(G値 u_G·h_G·u_G⁻¹)` に落とす: 左 = `hcConjDescend_hcHom`+`hcHom_inclusion`+conjugate∈hInHu
+  (normal.conj_mem)、右 = `quotientMulAutHom_apply_mk'`+`typeP_conjAction_apply`。**A_g↔U-action 接続の核心**。
+- **factor-preservation `hcConjDescend_maps_Hpart`**: `∀g∈HU, z∈Hpart i → A_g z∈Hpart i`。
+  分解 `g=h·u` (`Subgroup.normal_mul`+`hInHu_sup_uInHu_eq_top`) → `A_g=A_h∘A_u=A_u` (`hcConjDescend_mul`+
+  `_eq_id_of_mem_hc`、h∈hInHu⊆HC) → P3 → `Hpart_aInvariant.smul_mem`。= cont.⁴ (1616) の `A_g(Hpart i)=Hpart i`。
+- **`hcConjDescend_one`** (A_1=id、1∈HC) + **`hcConjDescend_apply_inv_apply`** (A_g∘A_{g⁻¹}=id、mul+A_1)
+  ⟹ A_g は各 Hpart 上 bijection。
+- **`hcConjDescend_comp_subtype_eq_one_iff`** (per-factor) + **`hcConjDescend_comp_regular_iff`**:
+  `(∀i, θ∘A_g nontrivial on Hpart i) ⟺ (∀i, θ nontrivial on Hpart i)` = **regularity preservation**。
+  bijection ゆえ value multiset 一致。
+
+**⟹ step (2) 完了**。commute (step 1 `hcPsi_conjBy_eq`、既 landed) + regularity preservation で
+**T={hcPsi θ|θ regular} は HU-conjugation で閉じる**: `conjBy g (hcPsi θ)=hcPsi(θ∘A_g)` (commute)、
+`θ∘A_g regular ⟺ θ regular` (regularity)。
+
+**残 step (3) = T-invariance 組立 + oXtheta 集約**: (a) T を `Finset (IrreducibleCharacter carrier)`
+として materialize (RegSet.image hcPsi)、(b) `IrreducibleCharacter.conjBy` ↔ ClassFunction.conjBy +
+hcPsi_conjBy_eq + regular_iff で `card_filter_induce_eq_index_inertia` の hT (T-invariance) を供給、
+(c) fibre size = u (`hcPsi_inertia_index_eq_u`、既 landed) で `u·|Xtheta|=(p-1)^q`
+(numerator=`card_regular_chars_Hbar`、既 landed)。その後 parity dichotomy
+(`exists_regular_not_reducible_of_odd`+`u_odd`、既 landed) で witness → conjunct c。
+残は char-level plumbing (whnf 注意、bundled ζ_θ 構成) で deep math は無し。
