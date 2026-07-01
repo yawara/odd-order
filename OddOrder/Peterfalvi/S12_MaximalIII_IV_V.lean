@@ -8418,6 +8418,55 @@ theorem Hypothesis.muGridAlpha_inner_trivial_M [Finite G] {M : Subgroup G}
     ClassFunction.inner_smul_left, ClassFunction.inner_smul_left, hμij, hμi0, hζ,
     mul_zero, mul_zero, sub_zero, sub_zero]
 
+open scoped FiniteInduce in
+/-- **Peterfalvi (11.8.5), the parity anchor `a = (∑_r ω_{r0}^σ, β)`**: the residual coefficient `a`
+(defined by `(α_{ij}^τ, ζ^{τ₁}) = a − n`, `hinner`) equals the `σ`-grid inner product of the (11.8.3)
+residual `β = α_{ij}^τ − δ(ω_{ij}^σ − ω_{i0}^σ) + nζ^{τ₁}`.  This is the identity feeding the parity
+assembly `a_even_of_eq_inner_sumOmegaSigma` (β real virtual character ⊥ 1 ⇒ `a` even), the input
+that excludes `a = 1` unconditionally.  Computation: `(α_{ij}^τ, ∑_r ω_{r0}^σ) = a − δ` (from
+`muGridAlpha_tau_inner_zeroColumnSum_sub_zeta` `= n − δ`, the (11.8.4) rewrite `h114`, and `hinner`);
+`(ω^σ diff, ∑ω) = −1` (`alignedOmegaSigma_diff_inner_zeroColumnSum`); `(ζ^{τ₁}, ∑ω) = 0`
+(`SHC_extension_inner_zeroColumnOmegaSigma_sum`, (5.3.b)) — so `(β, ∑ω) = (a − δ) − δ·(−1) + 0 = a`,
+and conjugate-symmetry gives `(∑ω, β) = a`.  The `δ` in `β`'s coefficient cancels the `δ` from the
+`α^τ` term, so this holds for **all** `δ` (not only `δ = 1`). -/
+theorem Hypothesis.muGridAlpha_a_eq_inner_sumOmegaSigma_beta [Finite G] {M : Subgroup G}
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis M)
+    (hodd : Odd (Nat.card G)) (i : Fin hyp.w1) {j : Fin hyp.w2} (hj0 : j ≠ 0)
+    {ζ : ClassFunction ↥M ℂ} (hζS : ζ ∈ inducedFamily M) (hζirr : IsIrreducibleCharacter ζ)
+    (hζ1 : ζ 1 = (hyp.w1 : ℂ)) (hζne : ζ.conj ≠ ζ) {d : ℕ} {δ : ℤ} {n : ℕ}
+    (hdeg : hyp.muGrid hG hodd i j 1 = (d : ℂ)) (hμ0 : hyp.muGrid hG hodd i 0 1 = 1)
+    (hnf : (n : ℤ) * (hyp.w1 : ℤ) = (d : ℤ) - δ) (hδj : hyp.muColumnSign hG hodd j = δ)
+    (hdζ : hyp.muGrid hG hodd i j 1 ≠ ζ 1) (h0ζ : hyp.muGrid hG hodd i 0 1 ≠ ζ 1) {a : ℤ}
+    (hinner : ClassFunction.inner
+        (hyp.tau (hyp.muGrid hG hodd i j - (δ : ℂ) • hyp.muGrid hG hodd i 0 - (n : ℂ) • ζ))
+        ((hyp.SHC_isCoherent hG).extension ζ) = (a : ℂ) - (n : ℂ))
+    (h114 : hyp.tau ((∑ i' : Fin hyp.w1, hyp.muGrid hG hodd i' 0) - ζ)
+        = (∑ r : Fin hyp.w1, hyp.alignedOmegaSigmaGrid hG hodd r 0)
+          - (hyp.SHC_isCoherent hG).extension ζ) :
+    (a : ℂ) = ClassFunction.inner (∑ r : Fin hyp.w1, hyp.alignedOmegaSigmaGrid hG hodd r 0)
+        (hyp.tau (hyp.muGrid hG hodd i j - (δ : ℂ) • hyp.muGrid hG hodd i 0 - (n : ℂ) • ζ)
+          - (δ : ℂ) • (hyp.alignedOmegaSigmaGrid hG hodd i j - hyp.alignedOmegaSigmaGrid hG hodd i 0)
+          + (n : ℂ) • (hyp.SHC_isCoherent hG).extension ζ) := by
+  have hαω : ClassFunction.inner
+      (hyp.tau (hyp.muGrid hG hodd i j - (δ : ℂ) • hyp.muGrid hG hodd i 0 - (n : ℂ) • ζ))
+      (∑ r : Fin hyp.w1, hyp.alignedOmegaSigmaGrid hG hodd r 0) = (a : ℂ) - (δ : ℂ) := by
+    have h := hyp.muGridAlpha_tau_inner_zeroColumnSum_sub_zeta hG hodd i hj0 hζS hζirr hζ1 hdeg hμ0
+      hnf hδj hdζ h0ζ
+    rw [h114, ClassFunction.inner_sub_right, hinner] at h
+    linear_combination h
+  have hβω : ClassFunction.inner
+      (hyp.tau (hyp.muGrid hG hodd i j - (δ : ℂ) • hyp.muGrid hG hodd i 0 - (n : ℂ) • ζ)
+        - (δ : ℂ) • (hyp.alignedOmegaSigmaGrid hG hodd i j - hyp.alignedOmegaSigmaGrid hG hodd i 0)
+        + (n : ℂ) • (hyp.SHC_isCoherent hG).extension ζ)
+      (∑ r : Fin hyp.w1, hyp.alignedOmegaSigmaGrid hG hodd r 0) = (a : ℂ) := by
+    simp only [ClassFunction.inner_add_left, ClassFunction.inner_sub_left,
+      ClassFunction.inner_smul_left, hαω,
+      hyp.alignedOmegaSigma_diff_inner_zeroColumnSum hG hodd i hj0,
+      hyp.SHC_extension_inner_zeroColumnOmegaSigma_sum hG hodd hζS hζirr hζ1 hζne,
+      star_natCast, star_intCast]
+    ring
+  rw [OddOrder.RepresentationTheory.inner_conj_symm, hβω, star_intCast]
+
 open scoped Classical FiniteInduce in
 /-- **Peterfalvi (11.8.5), `a = 0` under the (11.8.4) hypothesis** (the residual-orthogonal case).
 Given the (11.8.4) by-contradiction consequence `(μ₀ − ζ)^τ = ∑_r ω_{r0}^σ − ζ^{τ₁}` (`μ₀ = ∑ μ_{i'0}`),
