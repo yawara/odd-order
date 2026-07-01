@@ -255,6 +255,131 @@ structure CharacterDecompositionData {L : Subgroup G} (hyp : Hypothesis L)
   supported : ∀ φ ∈ constituents, (φ : ClassFunction ↥L ℂ).support ⊆
     OddOrder.Peterfalvi.S04.supportInSubgroup hyp.ambientA L ∪ {1}
 
+/-- **A commuting element of coprime order is a power of the product** — `g ∈ ⟨zg⟩` when `z`, `g`
+commute with coprime orders.  `(zg)^{|z|} = g^{|z|}` (commuting, `z^{|z|}=1`), and `g ∈ ⟨g^{|z|}⟩`
+since `gcd(|z|, |g|) = 1` (`mem_zpowers_pow_iff`); hence `g ∈ ⟨(zg)^{|z|}⟩ ≤ ⟨zg⟩`.  This is the
+`π`-part step of Peterfalvi (8.2.c): once `(2.1)` conjugates `cg` to a *commuting* product `zg`
+(`z ∈ C_H(g)`), `g` is a power of `zg`, so `g` centralizes whatever `zg` does. -/
+theorem mem_zpowers_mul_of_commute_coprime {Γ : Type*} [Group Γ] {z g : Γ}
+    (hzg : Commute z g) (hcop : Nat.Coprime (orderOf z) (orderOf g)) :
+    g ∈ Subgroup.zpowers (z * g) := by
+  have hpow : (z * g) ^ orderOf z = g ^ orderOf z := by
+    rw [hzg.mul_pow, pow_orderOf_eq_one, one_mul]
+  have hg : g ∈ Subgroup.zpowers (g ^ orderOf z) := mem_zpowers_pow_iff.mpr hcop
+  rw [← hpow] at hg
+  have hle : Subgroup.zpowers ((z * g) ^ orderOf z) ≤ Subgroup.zpowers (z * g) :=
+    Subgroup.zpowers_le.mpr ((Subgroup.zpowers (z * g)).pow_mem (Subgroup.mem_zpowers _) _)
+  exact hle hg
+
+/-- **Type-`F` class-fixing: an element of `U ∖ U₁` fixes only the identity `H`-class**
+(the core of Peterfalvi (8.2.c)).  This is the type-`F` analogue of
+`ConjugationBrauer.fixed_eq_one_of_not_mem_of_centralizer_le`, which uses the Frobenius condition
+`C_G(h) ≤ H`; here the weaker type-`F` condition `U ⊓ C_G(x) ≤ U₁` (`TypeFData.centralizer_le_U1`)
+suffices, at the cost of the coprime `(2.1)` step.  If `g ∈ U ∖ U₁` (`g` coprime to `H`, normalizing
+`H`) fixes a class `⟦h⟧` (`h ≠ 1`), then some `c·g` centralizes `h` (`IsConj`); by (2.1)
+(`exists_mem_centralizer_conj`) `c·g` is `H`-conjugate to `z·g` with `z ∈ C_H(g)`, so `z·g`
+centralizes `w = yhy⁻¹ ≠ 1`; as `z` commutes with `g` coprimely, `g ∈ ⟨z·g⟩` centralizes `w`
+(`mem_zpowers_mul_of_commute_coprime`), whence `g ∈ U ⊓ C_G(w) ≤ U₁` — contradiction. -/
+theorem fixed_conjClass_eq_one_of_typeF {Γ : Type*} [Group Γ] [Finite Γ]
+    {H U U1 : Subgroup Γ} [hHN : H.Normal] {g : Γ}
+    (hcop : Nat.Coprime (orderOf g) (Nat.card ↥H)) (hgU : g ∈ U) (hgU1 : g ∉ U1)
+    (hcent : ∀ x ∈ H, x ≠ 1 → U ⊓ Subgroup.centralizer ({x} : Set Γ) ≤ U1)
+    {C : ConjClasses ↥H}
+    (hfix : ConjClasses.conjByPerm (G := Γ) (H := H) g C = C) :
+    C = 1 := by
+  classical
+  have hnorm : ∀ x ∈ H, g * x * g⁻¹ ∈ H := fun x hx => hHN.conj_mem x hx g
+  rcases ConjClasses.exists_rep C with ⟨h, rfl⟩
+  by_cases hh : h = 1
+  · rw [hh, ConjClasses.one_eq_mk_one]
+  exfalso
+  have hmk : ConjClasses.mk (ClassFunction.conjByMulEquiv (G := Γ) (H := H) g h)
+      = ConjClasses.mk h := by simpa [ConjClasses.conjByPerm_mk] using hfix
+  have hisConj : IsConj (ClassFunction.conjByMulEquiv (G := Γ) (H := H) g h) h :=
+    ConjClasses.mk_eq_mk_iff_isConj.mp hmk
+  obtain ⟨c, hc⟩ := isConj_iff.mp hisConj
+  have hcG : (c : Γ) * (g * (h : Γ) * g⁻¹) * (c : Γ)⁻¹ = (h : Γ) := by
+    simpa only [Subgroup.coe_mul, Subgroup.coe_inv, ClassFunction.conjByMulEquiv_apply]
+      using congrArg Subtype.val hc
+  have hxconj : ((c : Γ) * g) * (h : Γ) * (((c : Γ) * g)⁻¹) = (h : Γ) := by
+    simpa [mul_assoc] using hcG
+  have hxcent : (c : Γ) * g ∈ Subgroup.centralizer ({(h : Γ)} : Set Γ) := by
+    rw [Subgroup.mem_centralizer_singleton_iff]
+    have hmul := congrArg (fun y : Γ => y * ((c : Γ) * g)) hxconj
+    simpa [mul_assoc] using hmul
+  -- (2.1): `c·g ∈ Hg` is `H`-conjugate to `z·g` with `z ∈ C_H(g)`.
+  obtain ⟨z, hz, y, hy, hyz⟩ :=
+    exists_mem_centralizer_conj (g := g) (H := H) hcop hnorm c.property
+  have hzC : z ∈ Subgroup.centralizer ({g} : Set Γ) := (Subgroup.mem_inf.mp hz).2
+  have hzH : z ∈ H := (Subgroup.mem_inf.mp hz).1
+  -- `w = y·h·y⁻¹ ∈ H`, `w ≠ 1`.
+  set w : Γ := y * (h : Γ) * y⁻¹ with hwdef
+  have hwH : w ∈ H := H.mul_mem (H.mul_mem hy (h.property)) (H.inv_mem hy)
+  have hh1 : (h : Γ) ≠ 1 := fun hc1 => hh (Subtype.ext hc1)
+  have hw1 : w ≠ 1 := by
+    rw [hwdef]; intro hc1
+    exact hh1 (by
+      have := congrArg (fun t : Γ => y⁻¹ * t * y) hc1
+      simpa [mul_assoc] using this)
+  -- `z·g` centralizes `w`.
+  have hzgw : z * g ∈ Subgroup.centralizer ({w} : Set Γ) := by
+    rw [Subgroup.mem_centralizer_singleton_iff, ← hyz, hwdef]
+    have hce := (Subgroup.mem_centralizer_singleton_iff).mp hxcent
+    calc y * ((c : Γ) * g) * y⁻¹ * (y * (h : Γ) * y⁻¹)
+        = y * (((c : Γ) * g) * (h : Γ)) * y⁻¹ := by group
+      _ = y * ((h : Γ) * ((c : Γ) * g)) * y⁻¹ := by rw [hce]
+      _ = y * (h : Γ) * y⁻¹ * (y * ((c : Γ) * g) * y⁻¹) := by group
+  -- `z` commutes with `g` coprimely ⟹ `g ∈ ⟨z·g⟩` centralizes `w`.
+  have hCommute : Commute z g :=
+    Subgroup.mem_centralizer_singleton_iff.mp hzC
+  have hcopzg : Nat.Coprime (orderOf z) (orderOf g) := by
+    have hzdvd : orderOf z ∣ Nat.card ↥H := by
+      have := orderOf_dvd_natCard (⟨z, hzH⟩ : ↥H)
+      simpa [orderOf_injective (H.subtype) H.subtype_injective ⟨z, hzH⟩] using this
+    exact (Nat.Coprime.coprime_dvd_right hzdvd hcop).symm
+  have hgzpow : g ∈ Subgroup.zpowers (z * g) := mem_zpowers_mul_of_commute_coprime hCommute hcopzg
+  have hgw : g ∈ Subgroup.centralizer ({w} : Set Γ) :=
+    (Subgroup.zpowers_le.mpr hzgw) hgzpow
+  exact hgU1 (hcent w hwH hw1 (Subgroup.mem_inf.mpr ⟨hgU, hgw⟩))
+
+/-- **Type-`F` fixed-class count is `1`** for `g ∈ U ∖ U₁`: the identity is the unique fixed
+`H`-class (`fixed_conjClass_eq_one_of_typeF`), so `#{fixed classes} = 1`. -/
+theorem card_fixedPoints_conjClassPerm_eq_one_of_typeF {Γ : Type*} [Group Γ] [Finite Γ]
+    {H U U1 : Subgroup Γ} [H.Normal] {g : Γ}
+    (hcop : Nat.Coprime (orderOf g) (Nat.card ↥H)) (hgU : g ∈ U) (hgU1 : g ∉ U1)
+    (hcent : ∀ x ∈ H, x ≠ 1 → U ⊓ Subgroup.centralizer ({x} : Set Γ) ≤ U1) :
+    Nat.card (Function.fixedPoints (ConjClasses.conjByPerm (G := Γ) (H := H) g)) = 1 := by
+  rw [Nat.card_eq_one_iff_unique]
+  refine ⟨⟨fun C D => Subtype.ext ?_⟩,
+    ⟨⟨1, ConjClasses.conjByPerm_one (G := Γ) (H := H) g⟩⟩⟩
+  exact (fixed_conjClass_eq_one_of_typeF hcop hgU hgU1 hcent C.2).trans
+    (fixed_conjClass_eq_one_of_typeF hcop hgU hgU1 hcent D.2).symm
+
+/-- **Peterfalvi (8.2.c): `I(θ) ∩ U ⊆ U₁`** for a type-`F` group.  If `θ ∈ Irr H ∖ {1}` and
+`g ∈ I(θ) ∩ U` but `g ∉ U₁`, then (`g` coprime to `H`) `g` fixes only the identity `H`-class
+(`card_fixedPoints_conjClassPerm_eq_one_of_typeF`), so by Brauer's permutation lemma
+(`fixed_irreducible_eq_trivial_of_card_fixedClasses_eq_one`) `g` fixes only the trivial character —
+contradicting `g ∈ I(θ)`, `θ ≠ 1`.  Hence `g ∈ U₁`.  This is the inertia bound feeding the equal
+degree of the constituents of `Ind_H^L θ` in the general type-I (12.2.a). -/
+theorem typeF_inertia_inf_le_U1 {Γ : Type*} [Group Γ] [Finite Γ]
+    {H U U1 : Subgroup Γ} [H.Normal]
+    (hUHcop : Nat.Coprime (Nat.card ↥U) (Nat.card ↥H))
+    (hcent : ∀ x ∈ H, x ≠ 1 → U ⊓ Subgroup.centralizer ({x} : Set Γ) ≤ U1)
+    (θ : IrreducibleCharacter ↥H) (hθ : θ ≠ trivialIrreducibleCharacter ↥H) :
+    ClassFunction.inertia (θ : ClassFunction ↥H ℂ) ⊓ U ≤ U1 := by
+  intro g hg
+  have hgI := (Subgroup.mem_inf.mp hg).1
+  have hgU := (Subgroup.mem_inf.mp hg).2
+  by_contra hgU1
+  have hcop : Nat.Coprime (orderOf g) (Nat.card ↥H) :=
+    Nat.Coprime.coprime_dvd_left (Subgroup.orderOf_dvd_natCard U hgU) hUHcop
+  have hcard1 := card_fixedPoints_conjClassPerm_eq_one_of_typeF hcop hgU hgU1 hcent
+  have hfixθ : IrreducibleCharacter.conjByPerm (G := Γ) (H := H) g θ = θ := by
+    apply IrreducibleCharacter.ext
+    rw [IrreducibleCharacter.conjByPerm_apply, IrreducibleCharacter.coe_conjBy]
+    exact ClassFunction.mem_inertia.mp hgI
+  exact hθ (fixed_irreducible_eq_trivial_of_card_fixedClasses_eq_one g hcard1 hfixθ)
+
 /-- **Type-`F` induced-character constituent structure** (Peterfalvi (8.2.c) + (1.2)/(1.5.a) +
 (1.7.c) + Clifford; a faithful §8 obligation — the deep content is type-`F` character theory living
 in §8, not §12).  For a type-I maximal `L` and `χ = Ind_H^L θ ∈ S` (`θ ∈ Irr H ∖ {1}`), `χ` is the
@@ -3888,3 +4013,4 @@ theorem theorem88_caseB_holds [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
 end OddOrder.Peterfalvi.S14
 
 #print axioms OddOrder.Peterfalvi.S14.frobenius_typeI_induced_char_constituents
+#print axioms OddOrder.Peterfalvi.S14.fixed_conjClass_eq_one_of_typeF
