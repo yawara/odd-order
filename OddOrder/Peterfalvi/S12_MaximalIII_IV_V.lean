@@ -8039,11 +8039,13 @@ theorem Hypothesis.SHC_residual_eq_omegaSigma_diff [Finite G] {M : Subgroup G}
         (hyp.tau (hyp.muGrid hG hodd i j - (δ : ℂ) • hyp.muGrid hG hodd i 0 - (n : ℂ) • ζ))
         ((hyp.SHC_isCoherent hG).extension ζ) = (a : ℂ) - (n : ℂ) ∧
       ((a = 0 ∨ a = 2) → Y = (δ : ℂ) • (hyp.alignedOmegaSigmaGrid hG hodd i j
-          - hyp.alignedOmegaSigmaGrid hG hodd i 0)) := by
-  obtain ⟨a, Y, hbound, hYorth, hinner, hnorm, hnorm2case, hYZ, hYV, _⟩ :=
+          - hyp.alignedOmegaSigmaGrid hG hodd i 0)) ∧
+      hyp.tau (hyp.muGrid hG hodd i j - (δ : ℂ) • hyp.muGrid hG hodd i 0 - (n : ℂ) • ζ)
+        = Y - (n : ℂ) • (hyp.SHC_isCoherent hG).extension ζ + (a : ℂ) • ∑ β ∈ R, β := by
+  obtain ⟨a, Y, hbound, hYorth, hinner, hnorm, hnorm2case, hYZ, hYV, hdecompA⟩ :=
     hyp.muGridAlpha_tau_residual_norm hG hodd i hj0 hζS hζirr hζ1 hdeg hμ0 hnf hδj hdζ h0ζ hδpm hn2
       hRn hZ horth hRmem hRrev
-  refine ⟨a, Y, hbound, hinner, ?_⟩
+  refine ⟨a, Y, hbound, hinner, ?_, hdecompA⟩
   intro ha02
   haveI := hyp.finiteG
   classical
@@ -8118,6 +8120,67 @@ theorem Hypothesis.R_sum_inner_zeroColumnOmegaSigma_sum [Finite G] {M : Subgroup
   obtain ⟨φ, hφS, hφirr, hφ1, rfl⟩ := hRrev β hβR
   exact hyp.SHC_extension_inner_zeroColumnOmegaSigma_sum hG hodd hφS hφirr hφ1
     (hyp.inducedFamily_degree_w1_conj_ne hG hφirr hφ1)
+
+open scoped Classical FiniteInduce in
+/-- **Peterfalvi (11.8.5), `a = 0` under the (11.8.4) hypothesis** (the residual-orthogonal case).
+Given the (11.8.4) by-contradiction consequence `(μ₀ − ζ)^τ = ∑_r ω_{r0}^σ − ζ^{τ₁}` (`μ₀ = ∑ μ_{i'0}`),
+the two-way computation of `(α_{ij}^τ, (μ₀ − ζ)^τ)` forces `a = 0` when `a ∈ {0, 2}`:
+* `M`-side (via the Dade isometry, `muGridAlpha_tau_inner_zeroColumnSum_sub_zeta`): `= n − δ`;
+* `G`-side (via (11.8.4) + the residual decomposition `α_{ij}^τ = δ(ω^σ diff) − nζ^{τ₁} + a∑β`
+  for `a ∈ {0, 2}`, `SHC_residual_eq_omegaSigma_diff`, with `(ω^σ diff, ∑ω_{r0}^σ) = −1`
+  (`alignedOmegaSigma_diff_inner_zeroColumnSum`) and the (5.3.b) orthogonalities
+  `(ζ^{τ₁}, ∑ω) = (∑β, ∑ω) = 0`): `= −δ − (a − n) = n − δ − a`.
+Equating gives `a = 0`.  With the parity `a` even (Peterfalvi (11.8.3), `β` real, excluding `a = 1`)
+this is the full (11.8.5): under the residual-orthogonality assumption every column coefficient
+`a = 0`, the key input to (11.8.6)'s `μ_j^{τ₂} = ∑ ω_{ij}^σ` coherence contradiction. -/
+theorem Hypothesis.charParam_a_eq_zero_of_residualEq [Finite G] {M : Subgroup G}
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis M) (hodd : Odd (Nat.card G))
+    (i : Fin hyp.w1) {j : Fin hyp.w2} (hj0 : j ≠ 0)
+    {ζ : ClassFunction ↥M ℂ} (hζS : ζ ∈ inducedFamily M) (hζirr : IsIrreducibleCharacter ζ)
+    (hζ1 : ζ 1 = (hyp.w1 : ℂ)) {d : ℕ} {δ : ℤ} {n : ℕ}
+    (hdeg : hyp.muGrid hG hodd i j 1 = (d : ℂ)) (hμ0 : hyp.muGrid hG hodd i 0 1 = 1)
+    (hnf : (n : ℤ) * (hyp.w1 : ℤ) = (d : ℤ) - δ) (hδj : hyp.muColumnSign hG hodd j = δ)
+    (hdζ : hyp.muGrid hG hodd i j 1 ≠ ζ 1) (h0ζ : hyp.muGrid hG hodd i 0 1 ≠ ζ 1)
+    (hδpm : δ = 1 ∨ δ = -1) (hn2 : 2 ≤ n)
+    {R : Finset (ClassFunction G ℂ)} (hRn : R.card = n)
+    (hZ : ∀ β ∈ R, β ∈ ZIrr G)
+    (horth : ∀ α ∈ R, ∀ β ∈ R, ClassFunction.inner α β = if α = β then (1 : ℂ) else 0)
+    (hRmem : ∀ φ : ClassFunction ↥M ℂ, φ ∈ inducedFamily M → IsIrreducibleCharacter φ →
+      φ 1 = (hyp.w1 : ℂ) → (hyp.SHC_isCoherent hG).extension φ ∈ R)
+    (hRrev : ∀ β ∈ R, ∃ φ : ClassFunction ↥M ℂ, φ ∈ inducedFamily M ∧ IsIrreducibleCharacter φ ∧
+      φ 1 = (hyp.w1 : ℂ) ∧ β = (hyp.SHC_isCoherent hG).extension φ)
+    (h114 : hyp.tau ((∑ i' : Fin hyp.w1, hyp.muGrid hG hodd i' 0) - ζ)
+        = (∑ r : Fin hyp.w1, hyp.alignedOmegaSigmaGrid hG hodd r 0)
+          - (hyp.SHC_isCoherent hG).extension ζ) :
+    ∃ a : ℤ, (a = 0 ∨ a = 1 ∨ a = 2) ∧
+      ClassFunction.inner
+        (hyp.tau (hyp.muGrid hG hodd i j - (δ : ℂ) • hyp.muGrid hG hodd i 0 - (n : ℂ) • ζ))
+        ((hyp.SHC_isCoherent hG).extension ζ) = (a : ℂ) - (n : ℂ) ∧
+      ((a = 0 ∨ a = 2) → a = 0) := by
+  obtain ⟨a, Y, hbound, hinner, hYeq, hdecompA⟩ :=
+    hyp.SHC_residual_eq_omegaSigma_diff hG hodd i hj0 hζS hζirr hζ1 hdeg hμ0 hnf hδj hdζ h0ζ hδpm
+      hn2 hRn hZ horth hRmem hRrev
+  refine ⟨a, hbound, hinner, ?_⟩
+  intro ha02
+  have hζne := hyp.inducedFamily_degree_w1_conj_ne hG hζirr hζ1
+  have hYd := hYeq ha02
+  have htrans := hyp.muGridAlpha_tau_inner_zeroColumnSum_sub_zeta hG hodd i hj0 hζS hζirr hζ1
+    hdeg hμ0 hnf hδj hdζ h0ζ
+  rw [h114] at htrans
+  have hαω : ClassFunction.inner
+      (hyp.tau (hyp.muGrid hG hodd i j - (δ : ℂ) • hyp.muGrid hG hodd i 0 - (n : ℂ) • ζ))
+      (∑ r : Fin hyp.w1, hyp.alignedOmegaSigmaGrid hG hodd r 0) = -(δ : ℂ) := by
+    rw [hdecompA, hYd]
+    simp only [ClassFunction.inner_add_left, ClassFunction.inner_sub_left,
+      ClassFunction.inner_smul_left,
+      hyp.alignedOmegaSigma_diff_inner_zeroColumnSum hG hodd i hj0,
+      hyp.SHC_extension_inner_zeroColumnOmegaSigma_sum hG hodd hζS hζirr hζ1 hζne,
+      hyp.R_sum_inner_zeroColumnOmegaSigma_sum hG hodd hRrev,
+      star_natCast, star_intCast]
+    ring
+  rw [ClassFunction.inner_sub_right, hαω, hinner] at htrans
+  have ha0 : (a : ℂ) = 0 := by linear_combination -htrans
+  exact_mod_cast ha0
 
 open scoped FiniteInduce in
 /-- **Peterfalvi (11.8), the genuine non-orthogonality** (lane-b W3 obligation, issue 2020).
