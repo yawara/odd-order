@@ -69,8 +69,49 @@ structural 入力。
 - [x] step 1 (Galois): line 精緻化 `u ∣ (p^q−1)/(p−1)` — **DONE** (`SingerLineBound.lean`,
       `card_dvd_cyclotomicQuotient_of_faithful_irreducible_fpf` + 算術核
       `dvd_div_of_coprime_of_dvd_sub_one`、sorry-free、既存 SingerField 2定理 assembly)。
-- [ ] step 2 (non-Galois): imprimitivity 分解 + `u ≤ (p−1)^{q−1}`。
-- [ ] step 3: dichotomy 組立 + lane a cite signature 告知。
+- [~] step 2 (non-Galois): imprimitivity 分解 + `u ≤ (p−1)^{q−1}`。
+      - [x] **generic 算術 engine** (`SemilinearImprimitiveBound.lean`, sorry-free):
+        `card_le_pow_of_injective_to_pi` (embedding → `|U|≤|M|^n`) +
+        `card_le_pow_sub_one_of_injective_imprimitive` (injective `Ū↪Fin(q−1)→A`, `|A|=a`, `a≤p−1`
+        → `u≤(p−1)^{q−1}`)。Coq `psi` embedding (`PFsection9.v:442`) の算術核。
+      - [x] **cyclotomic-quotient bridge**: `pow_sub_one_le_cyclotomicQuotient`
+        ((p−1)^{q−1}≤(p^q−1)/(p−1)) + `card_le_cyclotomicQuotient_of_injective_imprimitive`
+        (imprimitive embedding → u≤(p^q−1)/(p−1))。**両分岐が同一結論に到達** (Galois=SingerLineBound、
+        non-Galois=SemilinearImprimitiveBound)。
+        ⚠ dup 記録: `pow_sub_one_le_cyclotomicQuotient` = S15 `caseB_u_bound_arith` と同内容。
+        infra(GroupTheory)が正位置ゆえ後で S15 を本 leaf cite 化可 (S15=lane d dormant、後日)。
+      - [x] **psi embedding injectivity core** (`card_le_pow_of_block_scalars`, sorry-free):
+        block scalars `φ : Fin(n+1)→(Ū→*A)` + no-global-scalar (`hconst`) → ratio 埋め込み
+        `x↦(φ_{i+1}(x)/φ_0(x))` injective → `|Ū|≤|A|^n=a^{q−1}`。Coq `psi` (PFsection9.v:442) の
+        crux を generic 構成。lane a は block scalars φ を供給するだけ (module 分解から)。
+      - [ ] **残: 構造的 block 分解** (deep, type-P-specific): Maschke 半単純 (instance 済) +
+        W₁-permutation で `Hbar=⊕H1^w` (|H1|=p, q blocks) → 各 block の scalar hom φ_i を取り出す
+        + `a∣p−1` (block action → Z_pˣ = SingerField |M|=p 特殊化直接 cite) + `hconst` (Ū に
+        nonidentity global scalar 無し = 型 P quotient 構造)。W₁/Ū 依存ゆえ lane a assembly。
+- [x] step 3: dichotomy 組立 — **DONE** (`TypePGaloisUBound.lean`,
+      `card_le_cyclotomicQuotient_of_faithful_fpf`、sorry-free)。IsSimpleModule で case-split:
+      Galois 分岐は完全証明 (SingerLineBound)、non-Galois 分岐は `hReducible` hypothesis
+      (caller が imprimitive engine で discharge)。
+
+## 📣 lane a 向け cite signature (hub 裁定「typeP_Galois を再実装せず本 leaf を cite」)
+
+`OddOrder.RepresentationTheory` namespace、`import
+OddOrder.GroupTheory.RepresentationTheory.TypePGaloisUBound` で全て入る:
+
+- **u_bound entry point**: `card_le_cyclotomicQuotient_of_faithful_fpf` —
+  faithful fpf abelian U on M≅F_p^q → `|U| ≤ (p^q−1)/(p−1)`。Galois 分岐は内部証明済、
+  非 Galois 分岐 `hReducible` は下記 engine で discharge。
+- **Galois 分岐** (直接も使える): `card_le_cyclotomicQuotient_of_faithful_irreducible_fpf`
+  (`|U|∣(p^q−1)/(p−1)`) / `card_le_cyclotomicQuotient_of_faithful_irreducible_fpf` の ≤ 形。
+- **非 Galois engine**: `card_le_cyclotomicQuotient_of_injective_imprimitive` —
+  imprimitive ratio embedding `Ū↪Fin(q−1)→A` (|A|=a, a≤p−1) → `|U|≤(p^q−1)/(p−1)`。
+  lane a は構造的 imprimitivity (Hbar=⊕H1^w、psi injectivity、a∣p−1=SingerField|M|=p) を
+  組んで本 engine に渡す (W₁ 依存部)。
+- **block a∣p−1**: `RepresentationTheory.SingerField.isCyclic_and_card_dvd_card_sub_one_of_faithful_irreducible`
+  を |M|=p で直接 (別 lemma 不要)。
+
+**残 (lane a assembly、W₁ 依存)**: 構造的 imprimitivity 分解 + psi injectivity。generic 算術・
+embedding・両分岐 bound は本 leaf で供給済。
 
 ## 参照
 
