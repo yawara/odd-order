@@ -1714,4 +1714,25 @@ H1-char) が canonical に定義できない (factor 間の canonical iso が W�
 `induce_injective_of_inertia_stable` (M-fixed→Ind injective)、`induce_eq_induce_iff_conj`、
 `card_mul_inner_self_induce_eq_card_inertia`。⟹ def_IXmu/ResIndXmu/Smu=mu_/(E) の wiring は
 これらで組める。**本体 = W₁-transitivity de-opacify (structure+producer refactor、substantial upstream)**。
-次着手 = CliffordCaseAData に orbit 構造 field 追加 + producer refactor + W₁-transitivity lemma。
+
+### ✅ de-opacify 第一歩 DONE (commit 38f474f5, 2026-07-01 cont.⁹)
+CliffordCaseAData の opaque `W1_transitive_on_parts:Prop:=True` を usable orbit 構造に置換
+(**S0**:order-p 生成子 / **orbitRep**:Fin q→↥(U⊔W₁) / **Hpart_orbit**:`Hpart j = quotientMulAutHom
+chief.N_aInvariant (orbitRep j) • S0`)。Finite-free `quotientMulAutHom` で phrase
+(typeP_quotientCoprimeAction.φ:=quotientMulAutHom hN の defeq、producer で rfl 充足)。consumer 無し・
+full build 緑。
+
+### ⚠ 深部発見: |Xmu|=p-1 の injectivity は Ū-action 構造にも依存 (cont.⁹)
+constant-data 構成 recipe を精査: constant θ (値 θ_0 on S0、各 Hpart j に translate φ(orbitRep j) で
+transport) の集合 ≅ {θ_0:S0→*ℂˣ}、regular (θ_0≠1) で **p-1 個**。だが Xmu=|{ζ_θ:θ constant}| の count は
+**θ_0 ↦ ζ_θ の injectivity** を要し、これは「distinct constant θ が distinct Ū-orbit」= **Ū∩Δ={1}**
+(Ū に非自明な対角 scaling (s,…,s) 無し) に帰着。Ū-conjugate constant θ_0,θ_0' ⟺ ∃ū diagonal
+s_j(ū)=s ∀j かつ θ_0'=θ_0^s ⟺ (Ū∩Δ={1} なら) θ_0=θ_0'。Coq の `Ū↪(cyclic_a)^{q-1}=∏^q/Δ`
+(L15 note) が正に Ū∩Δ={1} (∏→∏/Δ injective)。⟹ **これも opaque field `Ubar_embeds_product` の
+de-opacify に依存** (orbit 構造だけでは不足)。
+
+**⟹ conjunct c = 最深ピース**: (1) orbit de-opacify ✅ + (2) Ū-action de-opacify (Ū∩Δ={1}、
+`Ubar_embeds_product` 露出) + (3) constant-char 構成 (direct-product 上) + (4) constant→W₁-fixed→I_M=M
+(def_IXmu) + (5) Smu=reducibles (|Smu|=p-1=|mu_|) + (6) (E) + parity → hcZeta_exists_irreducible_sOf。
+各片 substantial (char-theory construction + Clifford)。次着手 = Ū-action 構造の露出 (Ū∩Δ={1} が核)
+or constant-char 構成 (orbit fields で transport 定義可)。**deep 多反復、Coq PFsection9:992-1108 を逐次 port**。
