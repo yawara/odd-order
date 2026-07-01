@@ -114,3 +114,14 @@ S14 で完結でき、loop⁹² の S10 逸脱懸念は将来の作業には無�
 Frobenius L で `typeIA=(L_F)^#⊆L_F` (centralizerSupport_sharp_eq_of_frobenius 済) ⟹ `dadeSupport⊆𝒞_G(L_F)`;
 `(L_F)^#⊆M̃` + conjClassSet_Mtilde_disjoint で disjoint。**残**: Frobenius 仮説を 8.18.c→12.3 に thread
 (署名 refactor; (12.16) caller が両 L に Frobenius 供給するか要確認) + 1-handling。次 iter で engage。
+
+## 🔧 lane b 追記 (2026-07-02, loop⁹⁷) — (8.18.c) を tight A₁ 形へ restructure + Pin1 PROVEN
+
+**soundness fix + 実証明** (commit 33aa8553): 旧 `dadeSupport_disjoint` pin (A-based `Ã(L₁)∩Ã(L₂)=∅`)
+は Peterfalvi の mixed 形からして**偽の可能性大**ゆえ削除。§8 source の通り constituent は Ind_{L_F}^L θ の
+成分で normal L_F 外で消える → diff image は **𝒞_G((L_F)^#)** に supported (sharp A₁ 形)。
+- **PROVEN Pin1** `conjClassSet_sigmaSharp_disjoint_of_nonconjugate` (sorry-free, Frobenius 不要):
+  `𝒞_G((L_F1)^#)∩𝒞_G((L_F2)^#)=∅` (sigmaSharp⊆M̃ + conjClassSet_Mtilde_disjoint + Disjoint.mono)。
+- **残 sole sorry = Pin2** `diffImage_support_subset_conjClassSet_sigmaSharp`: tight
+  `supp(τ(φ−φ̄))⊆𝒞_G((L_F)^#)`。§4 Dade obligation (tight constituent support + Hypothesis.restrict
+  vanishing、Frobenius 不要)。→ Pin2 で (8.18.c)→(12.3)→(12.16) 完 (Cluster B done)。task 10。
