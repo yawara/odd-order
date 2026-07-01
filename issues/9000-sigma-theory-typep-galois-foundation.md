@@ -63,8 +63,12 @@ structural 入力。
 
 ## 進め方 (上流順)
 
-- [ ] step 0: 既存 SingerField/Clifford/NearField の被覆域を精読し gap 1-3 の正確な signature 確定。
-- [ ] step 1 (Galois): line 精緻化 `u ∣ (p^q−1)/(p−1)`。
+- [x] step 0: 既存 SingerField/Clifford/NearField の被覆域を精読し gap 1-3 の正確な signature 確定。
+      → Galois/abelian 側は SingerField が大きく被覆 (`isCyclic_and_card_dvd_card_sub_one` +
+      `coprime_card_sub_one_..._fpf`)。gap = line 精緻化 + non-Galois imprimitivity + dichotomy。
+- [x] step 1 (Galois): line 精緻化 `u ∣ (p^q−1)/(p−1)` — **DONE** (`SingerLineBound.lean`,
+      `card_dvd_cyclotomicQuotient_of_faithful_irreducible_fpf` + 算術核
+      `dvd_div_of_coprime_of_dvd_sub_one`、sorry-free、既存 SingerField 2定理 assembly)。
 - [ ] step 2 (non-Galois): imprimitivity 分解 + `u ≤ (p−1)^{q−1}`。
 - [ ] step 3: dichotomy 組立 + lane a cite signature 告知。
 
