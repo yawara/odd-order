@@ -3409,6 +3409,44 @@ theorem Hypothesis.muGridAlpha_inner_zeta_sub_conj [Finite G]
     star_intCast, star_natCast, mul_zero, zero_mul, sub_zero, zero_sub, mul_one]
 
 open scoped FiniteInduce in
+/-- **Peterfalvi (11.8.2), `(α_{ij}, ζ − η) = −n`** for any degree-`w₁` irreducible `η ∈ S(HC)`
+distinct from `ζ`.  General-`η` companion of `muGridAlpha_inner_zeta_sub_conj` (the `η = ζ̄` case):
+since `η` has the same degree as `ζ` (`hη1 : η(1) = ζ(1)`), both `μ_{ij}, μ_{i0}` are degree-distinct
+from — hence orthogonal to — `η` (`muGrid_inner_eq_zero_of_apply_one_ne`), and `(ζ, η) = 0`
+(`η ≠ ζ`, both irreducible), so only the `−nζ` term survives:
+`(α_{ij}, ζ − η) = −n(ζ, ζ) = −n` (independent of `δ`).
+
+This is the source value that (11.8.2) lifts (via the `τ`-isometry) to `(α_{ij}^τ, (ζ − η)^τ) = −n`
+for every `η ∈ S₁ = S(HC)`, `η ≠ ζ` — pinning the `ζ^{τ₁}`-coefficient of the `α_{ij}^τ` projection
+onto the orthonormal `S₁^{τ₁}` (`SHC_extension_inner_*`) to `−n`. -/
+theorem Hypothesis.muGridAlpha_inner_zeta_sub_irr [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} [Invertible (Nat.card ↥M : ℂ)]
+    (hyp : Hypothesis M) (hodd : Odd (Nat.card G)) (i : Fin hyp.w1) (j : Fin hyp.w2)
+    {ζ η : ClassFunction ↥M ℂ} (hζirr : IsIrreducibleCharacter ζ) (hηirr : IsIrreducibleCharacter η)
+    {δ : ℤ} {n : ℕ}
+    (hdζ : hyp.muGrid hG hodd i j 1 ≠ ζ 1) (h0ζ : hyp.muGrid hG hodd i 0 1 ≠ ζ 1)
+    (hη1 : η 1 = ζ 1) (hηne : η ≠ ζ) :
+    ClassFunction.inner (hyp.muGrid hG hodd i j - (δ : ℂ) • hyp.muGrid hG hodd i 0 - (n : ℂ) • ζ)
+        (ζ - η) = -(n : ℂ) := by
+  haveI := hyp.finiteG
+  classical
+  have hμijζ : ClassFunction.inner (hyp.muGrid hG hodd i j) ζ = 0 :=
+    hyp.muGrid_inner_eq_zero_of_apply_one_ne hG hodd i j hζirr hdζ
+  have hμi0ζ : ClassFunction.inner (hyp.muGrid hG hodd i 0) ζ = 0 :=
+    hyp.muGrid_inner_eq_zero_of_apply_one_ne hG hodd i 0 hζirr h0ζ
+  have hμijη : ClassFunction.inner (hyp.muGrid hG hodd i j) η = 0 :=
+    hyp.muGrid_inner_eq_zero_of_apply_one_ne hG hodd i j hηirr (by rw [hη1]; exact hdζ)
+  have hμi0η : ClassFunction.inner (hyp.muGrid hG hodd i 0) η = 0 :=
+    hyp.muGrid_inner_eq_zero_of_apply_one_ne hG hodd i 0 hηirr (by rw [hη1]; exact h0ζ)
+  have hζζ : ClassFunction.inner ζ ζ = 1 := by
+    rw [OddOrder.RepresentationTheory.irr_cf_inner hζirr hζirr, if_pos rfl]
+  have hζη : ClassFunction.inner ζ η = 0 := by
+    rw [OddOrder.RepresentationTheory.irr_cf_inner hζirr hηirr, if_neg (Ne.symm hηne)]
+  simp only [ClassFunction.inner_sub_left, ClassFunction.inner_sub_right,
+    ClassFunction.inner_smul_left, hμijζ, hμi0ζ, hμijη, hμi0η, hζζ, hζη,
+    star_intCast, star_natCast, mul_zero, zero_mul, sub_zero, zero_sub, mul_one]
+
+open scoped FiniteInduce in
 /-- **Peterfalvi (10.5), `(α_{ij}, μ_k − dζ̄) = 0`** (M-side, `0 < k < w₂`, `k ≠ j`): the inner
 product of `α_{ij} = μ_{ij} − δ·μ_{i0} − n·ζ` against `μ_k − dζ̄`, where `μ_k = ∑_{0≤i'<w₁} μ_{i'k}`
 is the `W₂`-column-`k` sum.  Since `k ≠ j` and `k ≠ 0`, every `μ_{i'k}` is cross-column-orthogonal

@@ -594,3 +594,14 @@ S₂=S(C)−S(HC)。(9.11)→S₂ coherent (11.7)、μ_k∈S₂ (9.8.b/9.9.b)。
 3. **(11.8.4)** residual 仮定→(μ_0−ζ)^τ 形: norm+isometry。
 4. **(11.8.5)** a=0: 1-3 + (5.3.b ✅) + source inner (μ_0−ζ,α_{ij})=−1+n + (β,1_G)=0。
 5. **(11.8.6)** = §14-gated (S₂), 前倒し skeleton 可。
+
+## 2026-07-02 cont.³¹ (lane-a) — (11.8.2) source input landed: ⟨α_{ij}, ζ−η⟩=−n (∀η∈S(HC),η≠ζ)
+**`Hypothesis.muGridAlpha_inner_zeta_sub_irr`** landed (S12, leaf green): 任意の degree-w₁ 既約
+η∈S(HC), η≠ζ で `⟨α_{ij}, ζ−η⟩ = −n` (coh-free source)。既存 `muGridAlpha_inner_zeta_sub_conj`
+(η=ζ̄ 特例) の一般化 — η(1)=ζ(1) ゆえ μ_{ij},μ_{i0}⊥η (degree distinctness
+`muGrid_inner_eq_zero_of_apply_one_ne`)、(ζ,η)=0 (η≠ζ)、−nζ 項のみ残る。
+(11.8.2) projection の ζ^{τ₁}-係数を −n に pin (isometry lift 後)。
+
+**次 = (11.8.2) 残**: isometry lift `⟨α_{ij}^τ,(ζ−η)^τ⟩=−n` (tau_inner_eq_of_supported、ζ−η supported)
++ orthonormal projection (α_{ij}^τ = X−nζ^{τ₁}+a∑λ^{τ₁}、係数 a、X⊥S₁^{τ₁}) + norm bound
+((a−n)²+(|S₁|−1)a²≤n²+2 → a∈{0,1,2}) + a∈{0,2}→X=ω^σ diff (‖X‖²=2)。
