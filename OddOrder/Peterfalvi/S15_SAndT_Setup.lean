@@ -1570,6 +1570,113 @@ theorem Hypothesis.W1_fpf_C [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
   push_cast
   exact heq
 
+/-- `W₁` normalizes `C = U ⊓ C_G(P)`: `W₁ ≤ S ≤ N_G(P)` (so it normalizes `C_G(P)`) and
+`W₁ ≤ N_G(U)` (`W1_normalizes_U`), hence it normalizes their intersection.  The `N_G(C)`-input to
+the conjugation action of the (13.12) `c ≡ 1 (mod q)` step. -/
+theorem Hypothesis.W1_le_normalizer_C (hyp : Hypothesis (G := G)) :
+    hyp.W1 ≤ Subgroup.normalizer (hyp.C : Set G) := by
+  have hW1S : hyp.W1 ≤ hyp.S := by
+    have h1 : hyp.W1 ≤ hyp.W := by rw [hyp.W_eq_join]; exact le_sup_left
+    have h2 : hyp.W ≤ hyp.S := by rw [hyp.W_eq_inter]; exact inf_le_left
+    exact h1.trans h2
+  have hSP : hyp.S ≤ Subgroup.normalizer (hyp.P : Set G) := by
+    rw [hyp.P_eq_SF]; exact OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_le_normalizer hyp.S
+  intro w hw
+  have hwP := hSP (hW1S hw)
+  have hwU := hyp.W1_normalizes_U hw
+  rw [Subgroup.mem_set_normalizer_iff]
+  intro x
+  rw [hyp.C_eq]
+  simp only [Subgroup.mem_inf, SetLike.mem_coe]
+  -- `w` normalizes `U` and `C_G(P)`; combine.
+  have hU_iff : x ∈ hyp.U ↔ w * x * w⁻¹ ∈ hyp.U :=
+    Subgroup.mem_set_normalizer_iff.mp hwU x
+  have hCP_iff : x ∈ Subgroup.centralizer (hyp.P : Set G) ↔
+      w * x * w⁻¹ ∈ Subgroup.centralizer (hyp.P : Set G) := by
+    constructor
+    · intro hx
+      rw [Subgroup.mem_centralizer_iff]
+      intro p hp
+      have hp' : w⁻¹ * p * w ∈ (hyp.P : Set G) := (Subgroup.mem_set_normalizer_iff''.mp hwP p).mp hp
+      have hcomm := (Subgroup.mem_centralizer_iff.mp hx) _ hp'
+      calc p * (w * x * w⁻¹) = w * ((w⁻¹ * p * w) * x) * w⁻¹ := by group
+        _ = w * (x * (w⁻¹ * p * w)) * w⁻¹ := by rw [hcomm]
+        _ = (w * x * w⁻¹) * p := by group
+    · intro hx
+      rw [Subgroup.mem_centralizer_iff]
+      intro p hp
+      have hp' : w * p * w⁻¹ ∈ (hyp.P : Set G) := (Subgroup.mem_set_normalizer_iff.mp hwP p).mp hp
+      have hcomm := (Subgroup.mem_centralizer_iff.mp hx) _ hp'
+      calc p * x = w⁻¹ * ((w * p * w⁻¹) * (w * x * w⁻¹)) * w := by group
+        _ = w⁻¹ * ((w * x * w⁻¹) * (w * p * w⁻¹)) * w := by rw [hcomm]
+        _ = x * p := by group
+  rw [hU_iff, hCP_iff]
+
+/-- **Peterfalvi (13.12), structural step**: `c ≡ 1 (mod q)`.
+
+The cyclic factor `W₁` (order `q`) acts fixed-point-freely on `C ⊆ U` by conjugation
+(`W1_fpf_C`, `W1_le_normalizer_C`).  Since `W₁` is a `q`-group, the class equation
+(`IsPGroup.card_modEq_card_fixedPoints`) gives `|C| ≡ |C_C(W₁)| (mod q)`, and the fpf condition
+makes `C_C(W₁) = {1}`.  This is the Coq `dv_2q_c1` ingredient (`q ∣ c − 1`) of
+`FTtypeP_Ind_Fitting_reg_Fcore`. -/
+theorem Hypothesis.c_modEq_one [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hyp : Hypothesis (G := G)) : hyp.c ≡ 1 [MOD hyp.q] := by
+  classical
+  haveI : Fact hyp.q.Prime := ⟨hyp.q_prime⟩
+  have hfpf := hyp.W1_fpf_C hG
+  letI : MulAction ↥hyp.W1 ↥hyp.C :=
+    MulAction.compHom ↥hyp.C (Subgroup.inclusion hyp.W1_le_normalizer_C)
+  have hsmul : ∀ (w : ↥hyp.W1) (x : ↥hyp.C), ((w • x : ↥hyp.C) : G) = (w : G) * (x : G) * (w : G)⁻¹ :=
+    fun _ _ => rfl
+  have hW1pg : IsPGroup hyp.q ↥hyp.W1 := IsPGroup.of_card (by rw [← hyp.q_eq_card_W1, pow_one])
+  have hmod : Nat.card ↥hyp.C ≡ Nat.card ↥(MulAction.fixedPoints ↥hyp.W1 ↥hyp.C) [MOD hyp.q] :=
+    hW1pg.card_modEq_card_fixedPoints ↥hyp.C
+  -- `W₁ ≠ ⊥`, pick `w₀ ∈ W₁ #`.
+  have hW1ne : hyp.W1 ≠ ⊥ := by
+    intro h; have h3 := hyp.three_le_q
+    rw [hyp.q_eq_card_W1, h, Subgroup.card_bot] at h3; omega
+  haveI : Nontrivial ↥hyp.W1 := (Subgroup.nontrivial_iff_ne_bot _).mpr hW1ne
+  obtain ⟨⟨w₀, hw₀W1⟩, hw₀ne⟩ := exists_ne (1 : ↥hyp.W1)
+  have hw₀ne' : w₀ ≠ 1 := by rintro rfl; exact hw₀ne rfl
+  -- `C_C(W₁) = {1}`.
+  have hfixset : MulAction.fixedPoints ↥hyp.W1 ↥hyp.C = {1} := by
+    ext a
+    simp only [MulAction.mem_fixedPoints, Set.mem_singleton_iff]
+    constructor
+    · intro hafix
+      by_contra hane
+      have hav : (a : G) ≠ 1 := fun h => hane (Subtype.ext h)
+      have hc := congrArg (Subtype.val) (hafix ⟨w₀, hw₀W1⟩)
+      rw [hsmul] at hc
+      exact hfpf w₀ hw₀W1 hw₀ne' (a : G) a.2 hav hc
+    · rintro rfl w
+      apply Subtype.ext
+      rw [hsmul]; simp
+  have hfix : Nat.card ↥(MulAction.fixedPoints ↥hyp.W1 ↥hyp.C) = 1 := by
+    rw [hfixset]; simp
+  rw [hfix, ← hyp.c_eq_card_C] at hmod
+  exact hmod
+
+/-- **Peterfalvi (13.12), `dv_2q_c1`**: `2q ∣ c − 1`.  `c ≡ 1 (mod q)` (`c_modEq_one`) and `c` is
+odd (`|C| ∣ |G|`, `|G|` odd), so both `q` and `2` divide `c − 1`; coprimality (`q` odd) gives
+`2q ∣ c − 1`.  In the `c > 1` branch this forces `c ≥ 2q + 1`, the lower bound Peterfalvi's numeric
+elimination contradicts. -/
+theorem Hypothesis.two_mul_q_dvd_c_pred [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hyp : Hypothesis (G := G)) : 2 * hyp.q ∣ hyp.c - 1 := by
+  have hc1 : 1 ≤ hyp.c := by rw [hyp.c_eq_card_C]; exact Nat.card_pos
+  have hq : hyp.q ∣ hyp.c - 1 := (Nat.modEq_iff_dvd' hc1).mp (hyp.c_modEq_one hG).symm
+  have hcodd : ¬ 2 ∣ hyp.c := by
+    have hcG : hyp.c ∣ Nat.card G := by
+      rw [hyp.c_eq_card_C]; exact Subgroup.card_subgroup_dvd_card _
+    have hodd : Nat.card G % 2 = 1 := Nat.odd_iff.mp hG.odd
+    intro h2c
+    have h2G : (2 : ℕ) ∣ Nat.card G := h2c.trans hcG
+    omega
+  have h2 : 2 ∣ hyp.c - 1 := by omega
+  have hcop : Nat.Coprime 2 hyp.q :=
+    (Nat.coprime_primes Nat.prime_two hyp.q_prime).mpr (Ne.symm hyp.q_ne_two)
+  exact hcop.mul_dvd_of_dvd_of_dvd h2 hq
+
 /-- **Peterfalvi (13.11)**: the elementary numerical bounds for `m`.
 
 The `q ≥ 7` and `q ≥ 5` bounds are the genuine arithmetic estimates
@@ -1593,9 +1700,23 @@ theorem numeric_bounds [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
     sorry
 
 /-- **Peterfalvi (13.12)**: the centralizer parameter `c` is `1`. -/
-theorem c_eq_one [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
+theorem c_eq_one [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     (hyp : Hypothesis (G := G)) :
     hyp.c = 1 := by
+  by_contra hne
+  -- `c > 1`; with `2q ∣ c − 1` (`two_mul_q_dvd_c_pred`) this forces `c ≥ 2q + 1`.
+  have hc1 : 1 ≤ hyp.c := by rw [hyp.c_eq_card_C]; exact Nat.card_pos
+  have hcgt : 1 < hyp.c := lt_of_le_of_ne hc1 (Ne.symm hne)
+  have hc_ge : 2 * hyp.q + 1 ≤ hyp.c := by
+    have h2q : 2 * hyp.q ≤ hyp.c - 1 := Nat.le_of_dvd (by omega) (hyp.two_mul_q_dvd_c_pred hG)
+    omega
+  -- The `c ≥ 2q + 1` lower bound (structural, `dv_2q_c1`) contradicts Peterfalvi's numeric
+  -- elimination: the (13.10) analytic inequality bounds `m` above by `q·p^q/(c·p^(q−1)·(p−1))`, which
+  -- with the `m > 7/10` lower bounds (13.11) and `c ≥ 2q+1` forces `q = 3, p = 5, c = 7, u ∣ 31`;
+  -- then `PC` would be a normal nilpotent Hall subgroup of `S` strictly containing `P = S_F`,
+  -- contradicting `P = maxNilpotentNormalHall S` (Coq `FTtypeP_Ind_Fitting_reg_Fcore`: `typeP_Galois`
+  -- dichotomy + Fitting-core maximality `Fcore_max`).  Deep §13 char/σ residual.
+  clear hcgt hc1
   sorry
 
 /-- **Peterfalvi (13.13)**: if case (9.7.a) holds for `S`, then
