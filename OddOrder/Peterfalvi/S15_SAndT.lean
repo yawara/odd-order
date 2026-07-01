@@ -1357,6 +1357,70 @@ theorem W1_le_Q [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
   rw [← htpdW1, ← hHeq]
   exact le_trans tpd.W2_le inf_le_left
 
+/-- **`T`-side Fitting-TI source** (Pf (13.16), dual of the `S`-side `fittingIsTI_of_isTypeP2`):
+`F(T)^#` is a TI-subset of `G` (with normalizer `T`).
+
+On the `W₂`-side, `normalizer_W2_le_S` reduces `N_G(W₂) ≤ S` using BG Theorem 15.7(a) applied to `S`'s
+type-`P₂` carrier `S_typeP2` (`fittingIsTI_of_isTypeP2`).  For the `W₁`-side the ambient subgroup is
+`T`, which is type-`P` but **not** type-`P₂` (the κ-Hall ordering `q < p` makes `S` the determinate
+type-`P₂` member), so `fittingIsTI_of_isTypeP2` does not apply to `T`.
+
+`FittingIsTI T` is nonetheless **TRUE** for the (13.1) configuration: `T` is genuinely type-`P₁`
+(equivalently `M_F(T) ≠ M_σ(T)`, `fitting_isTI_of_mf_ne_msigma`); the type-`V` alternative
+(`M_F = M_σ`, `isTypeV_of_isTypeP1_mf_eq_msigma`) is excluded by the nontrivial complement `V ≠ ⊥`,
+which is the (14.9) `T_typeII` content (`IsTypeII T ⟹ ¬ IsTypeV T`, `not_isTypeII_of_isTypeV`).
+Isolated here as the `T`-side dual of the `S`-side type-`P₂` carrier — the genuine §14-gated residual
+of the (13.16) `W₁`-confinement TI reduction, cited (not re-derived) by `normalizer_W1_le_T`. -/
+theorem fittingIsTI_T [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hyp : Hypothesis (G := G)) : OddOrder.BG.Ch4.S15.FittingIsTI hyp.T := sorry
+
+/-- **Peterfalvi (13.16), TI reduction for the `W₁`-side**: `N_G(W₁) ≤ T`.
+
+The `T`-side dual of `normalizer_W2_le_S`.  `W₁ ≤ Q = T_F ≤ F(T)` (`W1_le_Q` +
+`maxNilpotentNormalHall_le_fittingInG`), and `F(T)^#` is a TI-subset whose normalizer is `T`
+(`fittingIsTI_T` + `normalizer_fittingInAmbient_eq_self`).  Any `g` normalizing `W₁` sends a
+nonidentity `a ∈ W₁ ⊆ F(T)^#` to `g a g⁻¹ ∈ W₁ ⊆ F(T)^#`, so the TI condition places
+`g ∈ N_G(F(T)) = T`.  This is the first (TI) half of the (13.16) `W₁`-confinement; the residual
+`N_G(W₁) ⊓ T ≤ Q ⊔ W₂` is the Maschke/Wielandt core (the dual of `normalizer_W2_within_S`). -/
+theorem normalizer_W1_le_T [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hyp : Hypothesis (G := G)) :
+    Subgroup.normalizer (hyp.W1 : Set G) ≤ hyp.T := by
+  have hTI := fittingIsTI_T hG hyp
+  have hNorm := OddOrder.BG.Ch4.S16.normalizer_fittingInAmbient_eq_self hG hyp.T_maximal
+  -- `W₁ ≤ Q ≤ F(T)`.
+  have hW1F : hyp.W1 ≤ OddOrder.BG.Ch4.S15.fittingInAmbient hyp.T := by
+    refine (W1_le_Q hG hyp).trans ?_
+    rw [hyp.Q_eq_TF]
+    exact OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_le_fittingInG hyp.T
+  -- a nonidentity element `a ∈ W₁` (`|W₁| = q ≥ 3`).
+  have hW1ne : hyp.W1 ≠ ⊥ := by
+    intro hbot
+    have hq1 : hyp.q = 1 := by rw [hyp.q_eq_card_W1, hbot, Subgroup.card_bot]
+    exact hyp.q_prime.one_lt.ne' hq1
+  haveI : Nontrivial ↥hyp.W1 := (Subgroup.nontrivial_iff_ne_bot _).mpr hW1ne
+  obtain ⟨x, hx1⟩ := exists_ne (1 : ↥hyp.W1)
+  set a : G := (x : G) with ha
+  have haW1 : a ∈ hyp.W1 := x.2
+  have hane : a ≠ 1 := fun h => hx1 (OneMemClass.coe_eq_one.mp (ha ▸ h))
+  intro g hg
+  rw [Subgroup.mem_normalizer_iff] at hg
+  have hgaW1 : g * a * g⁻¹ ∈ hyp.W1 := (hg a).mp haW1
+  have hgane : g * a * g⁻¹ ≠ 1 := by
+    intro h
+    have key : a = g⁻¹ * (g * a * g⁻¹) * g := by group
+    rw [h] at key; simp only [mul_one, inv_mul_cancel] at key
+    exact hane key
+  have ha_sharp : a ∈ OddOrder.BG.Ch4.S15.fittingSharp hyp.T := by
+    show a ∈ (OddOrder.BG.Ch4.S15.fittingInAmbient hyp.T : Set G) \ {1}
+    exact ⟨hW1F haW1, hane⟩
+  have hga_sharp : g * a * g⁻¹ ∈ OddOrder.BG.Ch4.S15.fittingSharp hyp.T := by
+    show g * a * g⁻¹ ∈ (OddOrder.BG.Ch4.S15.fittingInAmbient hyp.T : Set G) \ {1}
+    exact ⟨hW1F hgaW1, hgane⟩
+  have hgN : g ∈ Subgroup.normalizer
+      (OddOrder.BG.Ch4.S15.fittingInAmbient hyp.T : Set G) :=
+    hTI g ⟨a, ha_sharp, hga_sharp⟩
+  rwa [hNorm] at hgN
+
 /-- **`T`-side dual of `isMulCommutative_U`** (Pf (13.2.a), V-side): the complement `V` of the
 type-II member `T` is commutative.  Mirror of `isMulCommutative_U`; `IsTypeII T` is a hypothesis
 (the (14.9) `T_typeII` conclusion, supplied by the caller).  Sources the `T`-side type-`P` structure
