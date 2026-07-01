@@ -286,4 +286,16 @@ theorem eq_sum_of_inner_eq_one_of_inner_self_eq_card {G : Type*} [Group G] [Fini
     (fun χ _ hχ => by rw [hzero χ hχ, zero_smul])]
   exact Finset.sum_congr rfl fun χ hχ => by rw [h1 χ hχ, one_smul]
 
+/-- **An abelian group has exactly `|G|` irreducible characters.**  For a finite commutative group
+every conjugacy class is a singleton (`isConj_iff_eq`), so `|ConjClasses G| = |G|`, and the number of
+irreducible characters equals the number of conjugacy classes (`card_irreducibleCharacter_eq`).  In
+Gallagher's theorem this counts `|Irr(I/H)| = [I:H]` — the number of linear characters `β` twisting
+`χ` — so the `[I:H]` distinct constituents `χ·Inf(β)` exhaust `Ind_H^I θ`. -/
+theorem card_irreducibleCharacter_eq_card_of_commGroup {G : Type*} [CommGroup G] [Finite G] :
+    Nat.card (IrreducibleCharacter G) = Nat.card G := by
+  rw [card_irreducibleCharacter_eq]
+  exact (Nat.card_congr (Equiv.ofBijective ConjClasses.mk
+    ⟨fun a b h => isConj_iff_eq.mp (ConjClasses.mk_eq_mk_iff_isConj.mp h),
+      ConjClasses.mk_surjective⟩)).symm
+
 end OddOrder.RepresentationTheory
