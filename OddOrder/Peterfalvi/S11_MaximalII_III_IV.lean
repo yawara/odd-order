@@ -2327,6 +2327,54 @@ theorem char_eq_of_eq_on_factors {Hbar : Type*} [CommGroup Hbar] [Finite Hbar]
   have hy := DFunLike.congr_fun hcomp (eEquiv.symm y)
   simpa using hy
 
+/-- **The character-restriction bijection on an internal direct product**:
+`(Hbar →* ℂˣ) ≃ (∀ i, ↥(S i) →* ℂˣ)`, sending a character to its tuple of factor-restrictions.
+Injective by `char_eq_of_eq_on_factors` (Lemma C, `left_inv`), surjective by
+`char_eq_on_factors_of_bijective` (`right_inv`).  This is the counting bridge for Peterfalvi (9.8):
+it identifies the regular characters of `H̄` (nontrivial on every factor) with the tuples of nonzero
+per-factor characters, giving `|regular chars| = (p-1)^q` (`card_regular_chars`, the `oXtheta`
+numerator). -/
+noncomputable def charRestrictEquiv {Hbar : Type*} [CommGroup Hbar] [Finite Hbar]
+    {ι : Type*} [Fintype ι] {S : ι → Subgroup Hbar}
+    (hcomm : Pairwise fun i j : ι => ∀ x y : Hbar, x ∈ S i → y ∈ S j → Commute x y)
+    (hbij : Function.Bijective (Subgroup.noncommPiCoprod hcomm)) :
+    (Hbar →* ℂˣ) ≃ (∀ i, ↥(S i) →* ℂˣ) where
+  toFun χ i := χ.comp (S i).subtype
+  invFun ψ := (char_eq_on_factors_of_bijective hcomm hbij ψ).choose
+  left_inv χ := by
+    refine char_eq_of_eq_on_factors hcomm hbij (fun i x => ?_)
+    exact (char_eq_on_factors_of_bijective hcomm hbij
+      (fun i => χ.comp (S i).subtype)).choose_spec i x
+  right_inv ψ := by
+    funext i
+    exact MonoidHom.ext fun x =>
+      (char_eq_on_factors_of_bijective hcomm hbij ψ).choose_spec i x
+
+/-- **The count of regular characters** (Peterfalvi (9.8) `oXtheta` numerator, `card_pffun_on`):
+on an internal direct product `Hbar = ⊕ᵢ Sᵢ` of `q = |ι|` factors each of order `p`, the characters
+nontrivial on *every* factor number `(p-1)^q`.  Via `charRestrictEquiv` these correspond to tuples of
+nonzero per-factor characters; each factor `Sᵢ` (order `p`) has `p` characters
+(`card_monoidHom_of_hasEnoughRootsOfUnity`), hence `p-1` nonzero ones, and the product is
+`(p-1)^q`. -/
+theorem card_regular_chars {Hbar : Type*} [CommGroup Hbar] [Finite Hbar]
+    {ι : Type*} [Fintype ι] {S : ι → Subgroup Hbar}
+    (hcomm : Pairwise fun i j : ι => ∀ x y : Hbar, x ∈ S i → y ∈ S j → Commute x y)
+    (hbij : Function.Bijective (Subgroup.noncommPiCoprod hcomm))
+    {p : ℕ} (hp : ∀ i, Nat.card ↥(S i) = p) :
+    Nat.card {χ : Hbar →* ℂˣ // ∀ i, χ.comp (S i).subtype ≠ 1} = (p - 1) ^ (Fintype.card ι) := by
+  classical
+  haveI : ∀ i, Fintype (↥(S i) →* ℂˣ) := fun _ => Fintype.ofFinite _
+  have e1 : {χ : Hbar →* ℂˣ // ∀ i, χ.comp (S i).subtype ≠ 1} ≃
+      {ψ : ∀ i, ↥(S i) →* ℂˣ // ∀ i, ψ i ≠ 1} :=
+    (charRestrictEquiv hcomm hbij).subtypeEquiv (fun _ => Iff.rfl)
+  rw [Nat.card_congr e1, Nat.card_congr (Equiv.subtypePiEquivPi (p := fun i (ψ : ↥(S i) →* ℂˣ) =>
+        ψ ≠ 1)), Nat.card_eq_fintype_card, Fintype.card_pi]
+  have hfac : ∀ i, Fintype.card {ψ : ↥(S i) →* ℂˣ // ψ ≠ 1} = p - 1 := by
+    intro i
+    rw [Fintype.card_subtype_compl, Fintype.card_subtype_eq, ← Nat.card_eq_fintype_card,
+      CommGroup.card_monoidHom_of_hasEnoughRootsOfUnity ↥(S i) ℂ, hp i]
+  rw [Finset.prod_congr rfl (fun i _ => hfac i), Finset.prod_const, Finset.card_univ]
+
 /-- **A regular character not fixed by a factor-permuting automorphism.**  Given the internal
 direct product `(noncommPiCoprod hbij)` of prime-order (`≥ 3`) factors `S i`, and an automorphism
 `τ` mapping factor `S i₀` onto a *different* factor `S j₀`, there is a character nontrivial on every
