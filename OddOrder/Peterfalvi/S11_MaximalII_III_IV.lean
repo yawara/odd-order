@@ -7720,4 +7720,72 @@ theorem caseA_reducible_theta_regular [Finite G] {M : Subgroup G}
     caseA_theta_comp_quotient_on_S0_eq_one_iff_of_fixed caseA θbar ζ hlo hMfix (caseA.orbitRep i)]
   exact hS0
 
+/-- **step 5 foundation: a reducible constituent seed has inflation-inertia `HC`** (Peterfalvi
+(9.8.c)).  Chains the regularity `caseA_reducible_theta_regular` (a reducible `M`-fixed `ζ`'s
+constituent seed `θbar` is regular) into `inertia_eq_hcInHu_caseA` (a regular seed's inflation `θ₀`
+has `HU`-inertia `HC`), converting the hom-form regularity to the `IrreducibleCharacter` pointwise
+form via `comp_subtype_ne_one_iff_exists`.  This `I_{HU}(θ₀) = HC` is what makes `Ind_{HC}(hcPsi θbar)`
+irreducible (`hcZeta_irreducible`) and drives the Clifford-correspondence identification
+`ζ = Ind_{HC}(hcPsi θbar) ∈ Xθ` closing the `Xmu`-surjectivity. -/
+theorem caseA_reducible_inflation_inertia_eq [Finite G] {M : Subgroup G}
+    {data : TypesIIIIIIVSetup M} {chief : ChiefFactorData data}
+    {chars : Section11CharacterData data chief} (caseA : CliffordCaseAData chars)
+    (θbar : (↥data.H ⧸ chief.N) →* ℂˣ)
+    [Fintype ↥(hInHu data)] [Invertible (Nat.card ↥(hInHu data) : ℂ)]
+    (ζ : IrreducibleCharacter ↥(huSub data))
+    (hlo : OddOrder.RepresentationTheory.IrreducibleCharacter.LiesOver (hInHu data) ζ
+      (linearIrreducibleCharacter (θbar.comp ((QuotientGroup.mk' chief.N).comp
+        (hInHuEquivH data).toMonoidHom))))
+    (hMfix : ClassFunction.inertia (ζ : ClassFunction ↥(huSub data) ℂ) = ⊤)
+    (hnt : θbar ≠ 1) :
+    ClassFunction.inertia (ClassFunction.compHom (hInHuEquivH data).toMonoidHom
+        (ClassFunction.compHom (QuotientGroup.mk' chief.N)
+          (linearIrreducibleCharacter θbar : ClassFunction (↥data.H ⧸ chief.N) ℂ)))
+      = hInHu data ⊔ cInHu data chief := by
+  refine inertia_eq_hcInHu_caseA data chief caseA (fun i => ?_)
+  obtain ⟨x, hx, hne⟩ := (comp_subtype_ne_one_iff_exists caseA θbar i).mp
+    (caseA_reducible_theta_regular caseA θbar ζ hlo hMfix hnt i)
+  refine ⟨x, hx, ?_⟩
+  rw [linearIrreducibleCharacter_apply, linearIrreducibleCharacter_apply, map_one, Units.val_one]
+  simpa using hne
+
+/-- **Restriction transitivity** (general): for `H ≤ K ≤ G`, restricting a class function to `K`
+and then to `H` (realised in `K` as `H.subgroupOf K`) equals restricting directly to `H`, transported
+along the iso `H.subgroupOf K ≃* H`.  Foundational for the lies-over transitivity in the (9.8.c)
+Clifford-correspondence step 5 (`ξ` over `θ₀` at `H = hInHu ⊆ HC` factors through an `HC`-constituent).
+Pointwise both sides are `φ` at the common `G`-image. -/
+theorem restrict_restrict_subgroupOf {Γ k : Type*} [Group Γ] [CommRing k]
+    {H K : Subgroup Γ} (hHK : H ≤ K) (φ : ClassFunction Γ k) :
+    ClassFunction.restrict (H.subgroupOf K) (ClassFunction.restrict K φ)
+      = ClassFunction.compHom (Subgroup.subgroupOfEquivOfLe hHK).toMonoidHom
+          (ClassFunction.restrict H φ) := by
+  ext x
+  simp only [ClassFunction.restrict_apply, ClassFunction.compHom_apply, MulEquiv.coe_toMonoidHom]
+  congr 1
+
+/-- **`innerSum` is preserved under `compHom` by a group isomorphism** (reindex the sum by the iso).
+Generalises `innerSum_compHom_of_bijective` (an endomorphism) to a `MulEquiv A ≃* B`. -/
+theorem innerSum_compHom_mulEquiv {A B : Type*} [Group A] [Group B] [Fintype A] [Fintype B]
+    (e : A ≃* B) (a b : ClassFunction B ℂ) :
+    ClassFunction.innerSum (ClassFunction.compHom e.toMonoidHom a)
+        (ClassFunction.compHom e.toMonoidHom b) = ClassFunction.innerSum a b := by
+  simpa only [ClassFunction.innerSum, ClassFunction.compHom_apply, MulEquiv.coe_toMonoidHom] using
+    Fintype.sum_equiv e.toEquiv
+      (fun x => a (e x) * star (b (e x))) (fun y => a y * star (b y)) (fun _ => rfl)
+
+/-- **Inner product is preserved under `compHom` by a group isomorphism**.  Generalises
+`inner_compHom_of_bijective` (an endomorphism) to a `MulEquiv A ≃* B`.  Used in the lies-over
+transitivity of the (9.8.c) Clifford-correspondence step 5, where the intermediate subgroup
+`H.subgroupOf K ≃* H` transports the restriction. -/
+theorem inner_compHom_mulEquiv {A B : Type*} [Group A] [Group B] [Fintype A] [Fintype B]
+    [Invertible (Nat.card A : ℂ)] [Invertible (Nat.card B : ℂ)] (e : A ≃* B)
+    (a b : ClassFunction B ℂ) :
+    ClassFunction.inner (ClassFunction.compHom e.toMonoidHom a)
+        (ClassFunction.compHom e.toMonoidHom b) = ClassFunction.inner a b := by
+  have hcard : (Nat.card A : ℂ) = Nat.card B := by rw [Nat.card_congr e.toEquiv]
+  rw [ClassFunction.inner_eq_inv_card_mul_innerSum, ClassFunction.inner_eq_inv_card_mul_innerSum,
+    innerSum_compHom_mulEquiv]
+  congr 1
+  rw [invOf_eq_inv, invOf_eq_inv, hcard]
+
 end OddOrder.Peterfalvi.S11
