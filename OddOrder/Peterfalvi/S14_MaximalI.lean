@@ -2494,6 +2494,58 @@ theorem Sset_index_le_two_psi [Finite G] {L : Subgroup G} (hyp : Hypothesis L)
   exact le_of_mul_le_mul_left key hidx_pos
 
 open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
+/-- **`Sset` is finite** — a subset of the (finite) range of `θ ↦ Ind_K^L θ`. -/
+theorem Sset_finite [Finite G] {L : Subgroup G} (hyp : Hypothesis L) : hyp.Sset.Finite := by
+  haveI := hyp.finiteG
+  haveI := finite_irreducibleCharacter (G := ↥((hyp.typeI.typeF.H).subgroupOf L))
+  have hsub : hyp.Sset ⊆ Set.range
+      (fun θ : IrreducibleCharacter ↥((hyp.typeI.typeF.H).subgroupOf L) =>
+        ClassFunction.induce ((hyp.typeI.typeF.H).subgroupOf L) θ.toClassFunction) := by
+    rintro χ ⟨θ, _, rfl⟩; exact ⟨θ, rfl⟩
+  exact (Set.finite_range _).subset hsub
+
+/-- **Every filtration level `S(A)` is finite** (subset of the finite `Sset`) — the finiteness input
+of `exists_coherentBreakPair` (h56). -/
+theorem SsubFiltration_finite [Finite G] {L : Subgroup G} (hyp : Hypothesis L) (A : Subgroup ↥L) :
+    (hyp.SsubFiltration A).Finite :=
+  (Sset_finite hyp).subset hyp.SsubFiltration_subset_Sset
+
+open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
+/-- **Every filtration level `S(A)` is closed under conjugation** (kernel preserved by
+`characterKernel_conj`) — the conjugation-closure input of `exists_coherentBreakPair` (h56).  General
+`A` version of `SsubFiltration_commutator_closedUnderConjugate`. -/
+theorem SsubFiltration_closedUnderConjugate [Finite G] {L : Subgroup G} (hyp : Hypothesis L)
+    (A : Subgroup ↥L) : OddOrder.Peterfalvi.S03.ClosedUnderConjugate (hyp.SsubFiltration A) := by
+  classical
+  intro χ hχ
+  simp only [Hypothesis.SsubFiltration, Set.mem_setOf_eq] at hχ ⊢
+  obtain ⟨θ, hθ_ne, hker, hφeq⟩ := hχ
+  refine ⟨⟨(θ : ClassFunction ↥((hyp.typeI.typeF.H).subgroupOf L) ℂ).conj,
+    θ.isIrreducible.conj⟩, ?_, ?_, ?_⟩
+  · intro h
+    apply hθ_ne
+    have hcoe : (θ : ClassFunction ↥((hyp.typeI.typeF.H).subgroupOf L) ℂ).conj
+        = trivialClassFunction ↥((hyp.typeI.typeF.H).subgroupOf L) := by
+      simpa using congrArg
+        (fun c : IrreducibleCharacter ↥((hyp.typeI.typeF.H).subgroupOf L) =>
+          (c : ClassFunction ↥((hyp.typeI.typeF.H).subgroupOf L) ℂ)) h
+    apply Subtype.ext
+    show (θ : ClassFunction ↥((hyp.typeI.typeF.H).subgroupOf L) ℂ)
+      = trivialClassFunction ↥((hyp.typeI.typeF.H).subgroupOf L)
+    rw [← ClassFunction.conj_conj
+      (θ : ClassFunction ↥((hyp.typeI.typeF.H).subgroupOf L) ℂ), hcoe]
+    exact trivialClassFunction_isReal
+  · rw [show ((⟨(θ : ClassFunction ↥((hyp.typeI.typeF.H).subgroupOf L) ℂ).conj,
+          θ.isIrreducible.conj⟩ : IrreducibleCharacter ↥((hyp.typeI.typeF.H).subgroupOf L)) :
+          ClassFunction ↥((hyp.typeI.typeF.H).subgroupOf L) ℂ)
+        = (θ : ClassFunction ↥((hyp.typeI.typeF.H).subgroupOf L) ℂ).conj from rfl,
+      OddOrder.Peterfalvi.S03.characterKernel_conj]
+    exact hker
+  · rw [hφeq]
+    simpa using ClassFunction.induce_conj ((hyp.typeI.typeF.H).subgroupOf L)
+      (θ : ClassFunction ↥((hyp.typeI.typeF.H).subgroupOf L) ℂ)
+
+open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
 open OddOrder.Peterfalvi.S09.Cert in
 /-- **`S(H′)` member differences are `A(L)`-supported** — the `hab`-free subfamily analogue of
 `Sset_diff_supported` for the (6.5.c) `hcoh`.  Members of `S(⁅K,K⁆)` vanish off `H` (as `Sset`
