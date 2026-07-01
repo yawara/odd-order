@@ -1804,6 +1804,46 @@ theorem xFamily_inner_dade {L : Subgroup G} [Fintype G] [Fintype ↥L]
     ClassFunction.inner_sub_right, ClassFunction.inner_sub_right, hχ00]
   ring
 
+open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
+/-- **Witness `S = {Ind_H^L θ}` has no real characters** ((5.2) input for case (b)/(12.6)).  Each
+member is a Frobenius-induced irreducible (`frobenius_induce_char_singleton`), non-real by the odd
+order of `L` (`not_isReal_of_ne_trivial_of_odd_card'`). -/
+theorem Sset_hasNoRealCharacters [Finite G] {L : Subgroup G} (hyp : Hypothesis L)
+    (hodd : Odd (Nat.card ↥L)) {C : Subgroup ↥L}
+    (hfrob : OddOrder.Isaacs.Ch06.IsFrobeniusGroup ↥L ((hyp.typeI.typeF.H).subgroupOf L) C) :
+    OddOrder.Peterfalvi.S03.HasNoRealCharacters hyp.Sset := by
+  classical
+  intro χ hχ
+  simp only [Hypothesis.Sset, Set.mem_setOf_eq] at hχ
+  obtain ⟨θ, hθ_ne, rfl⟩ := hχ
+  haveI hKnormal : ((hyp.typeI.typeF.H).subgroupOf L).Normal := by
+    rw [hyp.typeI.typeF.H_eq]
+    exact OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_subgroupOf_normal L
+  obtain ⟨ξ, hξcoe, hξreal, _⟩ := frobenius_induce_char_singleton hodd hfrob θ hθ_ne
+  rw [← hξcoe]; exact hξreal
+
+open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
+/-- **Witness `S = {Ind_H^L θ}` is pairwise orthogonal** ((5.2) input for case (b)/(12.6)).  Each
+member is an irreducible character of `L` (Frobenius induction), so two distinct members are
+orthogonal by row orthogonality (`irreducibleCharacter_inner_eq_ite`). -/
+theorem Sset_pairwiseOrthogonal [Finite G] {L : Subgroup G} (hyp : Hypothesis L)
+    (hodd : Odd (Nat.card ↥L)) {C : Subgroup ↥L}
+    (hfrob : OddOrder.Isaacs.Ch06.IsFrobeniusGroup ↥L ((hyp.typeI.typeF.H).subgroupOf L) C) :
+    OddOrder.Peterfalvi.S03.PairwiseOrthogonal hyp.Sset := by
+  classical
+  haveI hKnormal : ((hyp.typeI.typeF.H).subgroupOf L).Normal := by
+    rw [hyp.typeI.typeF.H_eq]
+    exact OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_subgroupOf_normal L
+  intro χ ψ hχ hψ hne
+  simp only [Hypothesis.Sset, Set.mem_setOf_eq] at hχ hψ
+  obtain ⟨θ, hθ_ne, rfl⟩ := hχ
+  obtain ⟨θ', hθ'_ne, rfl⟩ := hψ
+  obtain ⟨ξ, hξcoe, _, _⟩ := frobenius_induce_char_singleton hodd hfrob θ hθ_ne
+  obtain ⟨ξ', hξ'coe, _, _⟩ := frobenius_induce_char_singleton hodd hfrob θ' hθ'_ne
+  rw [← hξcoe, ← hξ'coe, irreducibleCharacter_inner_eq_ite, if_neg]
+  intro h
+  exact hne (by rw [← hξcoe, ← hξ'coe, h])
+
 /-- **Peterfalvi (12.6) case (b): abelian rank-2 kernel → equal-degree coherence (5.7).**
 When `H = L_F` is abelian (Def (8.3) case (b)), every `θ ∈ Irr H` is linear, so every member
 `Ind_H^L θ ∈ S` has the same degree `[L:H]`; `S` is then coherent by (5.7), built Dade-compatibly
