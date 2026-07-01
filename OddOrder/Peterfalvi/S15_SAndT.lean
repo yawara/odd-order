@@ -191,6 +191,180 @@ theorem normalizer_W1 [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
   exact ⟨le_antisymm (hN_le.trans hQW2_le_C) hC_le_N,
     le_antisymm (hC_le_N.trans hN_le) hQW2_le_C⟩
 
+/-- **A `p`-subgroup lies in a normal subgroup of coprime-to-`p` index.**  If `W ≤ S`,
+`P.subgroupOf S ⊴ S`, `[S : P]` is coprime to `|P|`, and `p ∣ |P|`, then every element of `W` of
+order dividing `p` lies in `P`: its image in `S/P` has order dividing both `p` and `[S : P]`, hence
+`1`.  Generic group theory (used to place the prime-order factors `W₁`, `W₂` inside the Fitting
+kernels `Q`, `P`). -/
+theorem pgroup_le_of_normal_coprime_index [Finite G]
+    {S P W : Subgroup G} {p : ℕ} (hp : p.Prime)
+    (hWS : W ≤ S) (hPnorm : (P.subgroupOf S).Normal)
+    (hcop : Nat.Coprime (Nat.card ↥P) (P.subgroupOf S).index)
+    (hpP : p ∣ Nat.card ↥P) (hWp : ∀ w ∈ W, orderOf w ∣ p) : W ≤ P := by
+  haveI := hPnorm
+  have hp_not_index : ¬ p ∣ (P.subgroupOf S).index := by
+    intro hdvd
+    have : p ∣ 1 := hcop ▸ Nat.dvd_gcd hpP hdvd
+    exact Nat.Prime.not_dvd_one hp this
+  have hcop2 : Nat.Coprime p (P.subgroupOf S).index :=
+    (hp.coprime_iff_not_dvd).mpr hp_not_index
+  intro w hw
+  have hwS : w ∈ S := hWS hw
+  have horder : orderOf w ∣ p := hWp w hw
+  have hmk : QuotientGroup.mk' (P.subgroupOf S) ⟨w, hwS⟩ = 1 := by
+    rw [← orderOf_eq_one_iff]
+    have hd1 : orderOf (QuotientGroup.mk' (P.subgroupOf S) ⟨w, hwS⟩) ∣ p := by
+      refine (orderOf_map_dvd _ _).trans ?_
+      rw [show orderOf (⟨w, hwS⟩ : ↥S) = orderOf w from
+        (orderOf_injective S.subtype Subtype.coe_injective ⟨w, hwS⟩).symm]
+      exact horder
+    have hd2 : orderOf (QuotientGroup.mk' (P.subgroupOf S) ⟨w, hwS⟩) ∣
+        (P.subgroupOf S).index := orderOf_dvd_natCard _
+    exact Nat.dvd_one.mp (hcop2 ▸ Nat.dvd_gcd hd1 hd2)
+  have hmem : (⟨w, hwS⟩ : ↥S) ∈ P.subgroupOf S := by
+    rw [← QuotientGroup.eq_one_iff, ← QuotientGroup.mk'_apply]
+    exact hmk
+  rwa [Subgroup.mem_subgroupOf] at hmem
+
+/-- **Peterfalvi (13.2.b)/(14.2.a): `W₂ ≤ P`.**  `W₂` is a `p`-group (`|W₂| = p`) inside `S`
+(`W₂ ≤ W = S ⊓ T ≤ S`), while `P = S_F` is the normal Hall `p`-subgroup of `S` of order `p^q`
+(`basic_structure`); hence `W₂ ≤ P` — the `F_p ⊆ F` identification of (14.2.a). -/
+theorem W2_le_P [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hyp : Hypothesis (G := G)) : hyp.W2 ≤ hyp.P := by
+  obtain ⟨_, _, _, hP_card, _, _⟩ := basic_structure _hG hyp
+  have hP_le_S : hyp.P ≤ hyp.S := by
+    rw [hyp.P_eq_SF]; exact OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_le hyp.S
+  refine pgroup_le_of_normal_coprime_index (S := hyp.S) hyp.p_prime ?_ ?_ ?_ ?_ ?_
+  · have h1 : hyp.W2 ≤ hyp.W := by rw [hyp.W_eq_join]; exact le_sup_right
+    have h2 : hyp.W ≤ hyp.S := by rw [hyp.W_eq_inter]; exact inf_le_left
+    exact h1.trans h2
+  · rw [hyp.P_eq_SF]
+    exact OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_subgroupOf_normal hyp.S
+  · have hHall := OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_isHall hyp.S
+    rw [← hyp.P_eq_SF] at hHall
+    have hcard_eq : Nat.card ↥(hyp.P.subgroupOf hyp.S) = Nat.card ↥hyp.P :=
+      Nat.card_congr (Subgroup.subgroupOfEquivOfLe hP_le_S).toEquiv
+    exact hcard_eq ▸ Ch03.IsHallSubgroup.coprime_index hHall
+  · rw [hP_card]; exact dvd_pow_self hyp.p hyp.q_prime.pos.ne'
+  · intro w hw
+    have heq : orderOf (⟨w, hw⟩ : ↥hyp.W2) = orderOf w :=
+      (orderOf_injective hyp.W2.subtype Subtype.coe_injective ⟨w, hw⟩).symm
+    have h1 : orderOf (⟨w, hw⟩ : ↥hyp.W2) ∣ Nat.card ↥hyp.W2 := orderOf_dvd_natCard _
+    rw [heq, ← hyp.p_eq_card_W2] at h1
+    exact h1
+
+/-- **Peterfalvi (13.16), TI reduction for the `W₂`-side**: `N_G(W₂) ≤ S`.
+
+`W₂ ≤ P = S_F ≤ F(S)` (`W2_le_P` + `maxNilpotentNormalHall_le_fittingInG`), and `F(S)^#` is a
+TI-subset whose normalizer is `S` (BG Theorem 15.7(a), `fittingIsTI_of_isTypeP2` from the type-`P₂`
+carrier `S_typeP2`; `normalizer_fittingInAmbient_eq_self`).  Any `g` normalizing `W₂` sends a
+nonidentity `a ∈ W₂ ⊆ F(S)^#` to `g a g⁻¹ ∈ W₂ ⊆ F(S)^#`, so the TI condition places
+`g ∈ N_G(F(S)) = S`.  This is the first (TI) half of the (13.16) `W₂`-confinement; the residual
+`N_G(W₂) ⊓ S ≤ P ⊔ W₁` is the Maschke/Wielandt core (`normalizer_W2_within_S`). -/
+theorem normalizer_W2_le_S [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hyp : Hypothesis (G := G)) :
+    Subgroup.normalizer (hyp.W2 : Set G) ≤ hyp.S := by
+  have hTI := OddOrder.BG.Ch4.S15.fittingIsTI_of_isTypeP2 hG hyp.S_maximal hyp.S_typeP2
+  have hNorm := OddOrder.BG.Ch4.S16.normalizer_fittingInAmbient_eq_self hG hyp.S_maximal
+  -- `W₂ ≤ P ≤ F(S)`.
+  have hW2F : hyp.W2 ≤ OddOrder.BG.Ch4.S15.fittingInAmbient hyp.S := by
+    refine (W2_le_P hG hyp).trans ?_
+    rw [hyp.P_eq_SF]
+    exact OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_le_fittingInG hyp.S
+  -- a nonidentity element `a ∈ W₂` (`|W₂| = p ≥ 3`).
+  have hW2ne : hyp.W2 ≠ ⊥ := by
+    intro hbot
+    have hp1 : hyp.p = 1 := by rw [hyp.p_eq_card_W2, hbot, Subgroup.card_bot]
+    exact hyp.p_prime.one_lt.ne' hp1
+  haveI : Nontrivial ↥hyp.W2 := (Subgroup.nontrivial_iff_ne_bot _).mpr hW2ne
+  obtain ⟨x, hx1⟩ := exists_ne (1 : ↥hyp.W2)
+  set a : G := (x : G) with ha
+  have haW2 : a ∈ hyp.W2 := x.2
+  have hane : a ≠ 1 := fun h => hx1 (OneMemClass.coe_eq_one.mp (ha ▸ h))
+  intro g hg
+  rw [Subgroup.mem_normalizer_iff] at hg
+  have hgaW2 : g * a * g⁻¹ ∈ hyp.W2 := (hg a).mp haW2
+  have hgane : g * a * g⁻¹ ≠ 1 := by
+    intro h
+    have key : a = g⁻¹ * (g * a * g⁻¹) * g := by group
+    rw [h] at key; simp only [mul_one, inv_mul_cancel] at key
+    exact hane key
+  have ha_sharp : a ∈ OddOrder.BG.Ch4.S15.fittingSharp hyp.S := by
+    show a ∈ (OddOrder.BG.Ch4.S15.fittingInAmbient hyp.S : Set G) \ {1}
+    exact ⟨hW2F haW2, hane⟩
+  have hga_sharp : g * a * g⁻¹ ∈ OddOrder.BG.Ch4.S15.fittingSharp hyp.S := by
+    show g * a * g⁻¹ ∈ (OddOrder.BG.Ch4.S15.fittingInAmbient hyp.S : Set G) \ {1}
+    exact ⟨hW2F hgaW2, hgane⟩
+  have hgN : g ∈ Subgroup.normalizer
+      (OddOrder.BG.Ch4.S15.fittingInAmbient hyp.S : Set G) :=
+    hTI g ⟨a, ha_sharp, hga_sharp⟩
+  rwa [hNorm] at hgN
+
+/-- **Peterfalvi (13.16), Maschke/Wielandt core for the `W₂`-side**: `N_G(W₂) ⊓ S ≤ P ⊔ W₁`.
+
+The `S`-internal residual of the (13.16) `W₂`-confinement (after the TI reduction `N_G(W₂) ≤ S` of
+`normalizer_W2_le_S`).  `P = S_F` (elementary abelian) is decomposed by Maschke, and the coprime
+`U ⋊ W₁`-action on each direct factor is forced trivial by the Wielandt fixed-point theorem
+(`OddOrder.GroupTheory.WielandtFixedPoint`), so `N_U(W₂) = 1` and the normalizer has no `U`-part:
+`N_S(W₂) ≤ P W₁`.  The machinery is present (`WielandtFixedPoint`, `CoprimeAction`); this is the
+isolated Maschke/Wielandt assembly (Coq `FTtypeP_norm_cent_compl`, the inner `N_S` computation). -/
+theorem normalizer_W2_within_S [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hyp : Hypothesis (G := G)) :
+    Subgroup.normalizer (hyp.W2 : Set G) ⊓ hyp.S ≤ hyp.P ⊔ hyp.W1 := sorry
+
+/-- **Peterfalvi (13.16), structural core for the `W₂`-side**: the Frobenius/Wielandt containment
+`N_G(W₂) ≤ P ⊔ W₁`.  Assembled from the TI reduction `N_G(W₂) ≤ S` (`normalizer_W2_le_S`, proven)
+and the Maschke/Wielandt core `N_G(W₂) ⊓ S ≤ P ⊔ W₁` (`normalizer_W2_within_S`, the isolated
+residual): every `g ∈ N_G(W₂)` lies in `S`, hence in `N_G(W₂) ⊓ S ≤ P ⊔ W₁`. -/
+theorem normalizer_W2_structure [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hyp : Hypothesis (G := G)) :
+    Subgroup.normalizer (hyp.W2 : Set G) ≤ hyp.P ⊔ hyp.W1 := by
+  intro g hg
+  have hgS : g ∈ hyp.S := normalizer_W2_le_S hG hyp hg
+  exact normalizer_W2_within_S hG hyp (Subgroup.mem_inf.mpr ⟨hg, hgS⟩)
+
+/-- **Peterfalvi (13.16), `W₂`-side**: `N_G(W₂) = C_G(W₂) = P ⊔ W₁` (the `S↔T`, `W₁↔W₂`, `P↔Q`
+dual of `normalizer_W1`; the form stated directly in Coq `FTtypeP_norm_cent_compl`).
+
+Proved from `normalizer_W2_structure` by the antisymmetric chain
+`P ⊔ W₁ ≤ C_G(W₂) ≤ N_G(W₂) ≤ P ⊔ W₁`:
+
+* `W₁ ≤ C_G(W₂)` because `W = W₁ × W₂` is abelian (`W1_commutes_W2`);
+* `P ≤ C_G(W₂)` because `W₂ ≤ P` (`W2_le_P`) and `P` is elementary abelian (`basic_structure`);
+* `C_G(W₂) ≤ N_G(W₂)` always (`centralizer_le_normalizer`);
+* `N_G(W₂) ≤ P ⊔ W₁` is the Frobenius/Wielandt containment (`normalizer_W2_structure`).
+
+Supplies the `W₂`-side of the (13.17.c) Huppert step (`E ≤ P W₁`). -/
+theorem normalizer_W2 [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hyp : Hypothesis (G := G)) :
+    Subgroup.normalizer (hyp.W2 : Set G) = Subgroup.centralizer (hyp.W2 : Set G) ∧
+      Subgroup.centralizer (hyp.W2 : Set G) = hyp.P ⊔ hyp.W1 := by
+  have hN_le : Subgroup.normalizer (hyp.W2 : Set G) ≤ hyp.P ⊔ hyp.W1 :=
+    normalizer_W2_structure hG hyp
+  -- `W₁ ≤ C_G(W₂)`: `W = W₁ × W₂` is abelian.
+  have hW1_le_C : hyp.W1 ≤ Subgroup.centralizer (hyp.W2 : Set G) := by
+    intro x hx
+    rw [Subgroup.mem_centralizer_iff]
+    intro y hy
+    exact (hyp.W1_commutes_W2 x hx y (SetLike.mem_coe.mp hy)).symm
+  -- `P ≤ C_G(W₂)`: `W₂ ≤ P` and `P` elementary abelian give `P` centralizes `W₂`.
+  have hP_le_C : hyp.P ≤ Subgroup.centralizer (hyp.W2 : Set G) := by
+    obtain ⟨_, _, hP_elemAb, _, _, _⟩ := basic_structure hG hyp
+    have hW2P := W2_le_P hG hyp
+    intro g hg
+    rw [Subgroup.mem_centralizer_iff]
+    intro y hy
+    have hyP : y ∈ hyp.P := hW2P (SetLike.mem_coe.mp hy)
+    have h := hP_elemAb.comm (⟨y, hyP⟩ : ↥hyp.P) (⟨g, hg⟩ : ↥hyp.P)
+    have h2 := congrArg (Subgroup.subtype hyp.P) h
+    simpa using h2
+  have hPW1_le_C : hyp.P ⊔ hyp.W1 ≤ Subgroup.centralizer (hyp.W2 : Set G) :=
+    sup_le hP_le_C hW1_le_C
+  have hC_le_N : Subgroup.centralizer (hyp.W2 : Set G) ≤
+      Subgroup.normalizer (hyp.W2 : Set G) := Subgroup.centralizer_le_normalizer _
+  exact ⟨le_antisymm (hN_le.trans hPW1_le_C) hC_le_N,
+    le_antisymm (hC_le_N.trans hN_le) hPW1_le_C⟩
+
 /-- Carrier for Peterfalvi (13.17), the type-I maximal subgroup over
 `N_G(U)`. -/
 structure TypeIOverNormalizerData (hyp : Hypothesis (G := G)) where
@@ -1788,14 +1962,72 @@ theorem complement_inf_P_structure [Finite G] (_hG : OddOrder.BG.IsMinimalSimple
     frob.complement.map L.subtype ⊓ hyp.P = hyp.W2 ∧
       ¬ frob.complement.map L.subtype ≤ hyp.P := sorry
 
-/-- **`S`-side dual of `complement_le_QW2`** (V-side Huppert step, gated): the `W₂`-containing
-Frobenius complement `E` satisfies `E ≤ P W₁`.  Mirror; the Huppert step needs a `normalizer_W2`
-analogue of (13.16) (not yet ported), so declared sorried per the hub cite-gated directive. -/
+/-- **`S`-side dual of `complement_le_QW2`** (V-side Huppert step): the `W₂`-containing Frobenius
+complement `E` satisfies `E ≤ P W₁`.  Mirror of `complement_le_QW2` with `W₁/Q ↔ W₂/P`: `W₂` (of
+prime order `p`) is normal in the Frobenius complement `E` (Huppert V.8.18b,
+`normal_of_card_prime_of_isFrobeniusGroup_of_odd`), so `E ≤ N_G(W₂)`, and (13.16) `normalizer_W2`
+gives `N_G(W₂) = P ⊔ W₁`.  (The Frobenius/Wielandt content of (13.16) is isolated in
+`normalizer_W2_structure`.) -/
 theorem complement_le_PW1 [Finite G]
     (_hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
     {L : Subgroup G} (frob : OddOrder.Peterfalvi.S14.TypeIFrobeniusData L)
     (hW2E : hyp.W2 ≤ frob.complement.map L.subtype) :
-    frob.complement.map L.subtype ≤ hyp.P ⊔ hyp.W1 := sorry
+    frob.complement.map L.subtype ≤ hyp.P ⊔ hyp.W1 := by
+  set E := frob.complement with hEdef
+  -- `W₂ ≤ L`, and `W₂` (as a subgroup of `↥L`) is contained in `E`.
+  have hEleL : E.map L.subtype ≤ L := Subgroup.map_subtype_le E
+  have hW2L : hyp.W2 ≤ L := hW2E.trans hEleL
+  have hW2L_le_E : hyp.W2.subgroupOf L ≤ E := by
+    intro x hx
+    rw [Subgroup.mem_subgroupOf] at hx
+    obtain ⟨e, he, hee⟩ := hW2E hx
+    have hex : e = x := Subtype.coe_injective (by simpa using hee)
+    rw [← hex]; exact he
+  -- `R := W₂` viewed inside `E`, of prime order `p`.
+  set R : Subgroup ↥E := (hyp.W2.subgroupOf L).subgroupOf E with hRdef
+  have hRcard : Nat.card ↥R = hyp.p := by
+    rw [hRdef, Nat.card_congr (Subgroup.subgroupOfEquivOfLe hW2L_le_E).toEquiv,
+      Nat.card_congr (Subgroup.subgroupOfEquivOfLe hW2L).toEquiv]
+    exact hyp.p_eq_card_W2.symm
+  have hEdvd : Nat.card ↥E ∣ Nat.card G :=
+    (Subgroup.card_subgroup_dvd_card E).trans (Subgroup.card_subgroup_dvd_card L)
+  have hodd : Odd (Nat.card ↥E) := _hG.odd.of_dvd_nat hEdvd
+  -- Huppert V.8.18 b): `W₂` is normal in `E`, so `E` normalizes `W₂` in `↥L`.
+  haveI hRnormal : R.Normal :=
+    OddOrder.Isaacs.Ch06.normal_of_card_prime_of_isFrobeniusGroup_of_odd
+      frob.frobenius hodd hyp.p_prime hRcard
+  have hEnorm := (Subgroup.normal_subgroupOf_iff_le_normalizer hW2L_le_E).mp hRnormal
+  -- Lift to `G`: `E.map L.subtype ≤ N_G(W₂)`.
+  have hEN : E.map L.subtype ≤ Subgroup.normalizer (hyp.W2 : Set G) := by
+    rintro _ ⟨e, he, rfl⟩
+    have heN := hEnorm he
+    rw [Subgroup.mem_normalizer_iff] at heN ⊢
+    intro w
+    constructor
+    · intro hw
+      have hwL : w ∈ L := hW2L hw
+      have hw' : (⟨w, hwL⟩ : ↥L) ∈ hyp.W2.subgroupOf L := by
+        rw [Subgroup.mem_subgroupOf]; exact hw
+      have hconj := ((heN ⟨w, hwL⟩).mp hw')
+      rw [Subgroup.mem_subgroupOf] at hconj
+      simpa using hconj
+    · intro hw
+      have he' : (L.subtype e : G) ∈ L := e.2
+      have hwL : w ∈ L := by
+        have hrw : w = (L.subtype e)⁻¹ * ((L.subtype e) * w * (L.subtype e)⁻¹) * (L.subtype e) := by
+          group
+        rw [hrw]
+        exact L.mul_mem (L.mul_mem (L.inv_mem he') (hW2L hw)) he'
+      have hconjmem : (e * ⟨w, hwL⟩ * e⁻¹) ∈ hyp.W2.subgroupOf L := by
+        rw [Subgroup.mem_subgroupOf]; simpa using hw
+      have hfin := (heN ⟨w, hwL⟩).mpr hconjmem
+      rw [Subgroup.mem_subgroupOf] at hfin
+      simpa using hfin
+  -- (13.16): `N_G(W₂) = C_G(W₂) = P W₁`.
+  have h1316 := normalizer_W2 _hG hyp
+  calc E.map L.subtype ≤ Subgroup.normalizer (hyp.W2 : Set G) := hEN
+    _ = Subgroup.centralizer (hyp.W2 : Set G) := h1316.1
+    _ = hyp.P ⊔ hyp.W1 := h1316.2
 
 /-- **`S`-side dual of `Q_W2_structure`** (V-side, gated): `W₁ ≤ N_G(P)`, `P ⊓ W₁ = ⊥`, and
 `q ∤ |P|`.  Mirror of the gated `Q_W2_structure`; declared sorried per the hub cite-gated directive

@@ -3411,69 +3411,14 @@ theorem u_modEq_one_mod_p_of_LHypothesis [Finite G]
     rw [hH0_eq_H]; exact hU_le_H hu
   exact Hypothesis.u_modEq_one_mod_p_of_fpf hG hyp hW2y_norm hfpf
 
-/-- **A `p`-subgroup is contained in a normal subgroup of coprime-to-`p` index.**  If `W ≤ S`,
-`P.subgroupOf S ⊴ S`, the index `[S : P]` is coprime to `|P|`, and `p ∣ |P|`, then every `p`-element
-of `W` (every element of order dividing `p`) lies in `P`: its image in `S/P` has order dividing both
-`p` and `[S : P]`, hence `1`.  Used to place `W₂` (a `p`-group) inside the normal Hall `p`-subgroup
-`P = S_F`. -/
-theorem pgroup_le_of_normal_coprime_index [Finite G]
-    {S P W : Subgroup G} {p : ℕ} (hp : p.Prime)
-    (hWS : W ≤ S) (hPnorm : (P.subgroupOf S).Normal)
-    (hcop : Nat.Coprime (Nat.card ↥P) (P.subgroupOf S).index)
-    (hpP : p ∣ Nat.card ↥P) (hWp : ∀ w ∈ W, orderOf w ∣ p) : W ≤ P := by
-  haveI := hPnorm
-  have hp_not_index : ¬ p ∣ (P.subgroupOf S).index := by
-    intro hdvd
-    have : p ∣ 1 := hcop ▸ Nat.dvd_gcd hpP hdvd
-    exact Nat.Prime.not_dvd_one hp this
-  have hcop2 : Nat.Coprime p (P.subgroupOf S).index :=
-    (hp.coprime_iff_not_dvd).mpr hp_not_index
-  intro w hw
-  have hwS : w ∈ S := hWS hw
-  have horder : orderOf w ∣ p := hWp w hw
-  have hmk : QuotientGroup.mk' (P.subgroupOf S) ⟨w, hwS⟩ = 1 := by
-    rw [← orderOf_eq_one_iff]
-    have hd1 : orderOf (QuotientGroup.mk' (P.subgroupOf S) ⟨w, hwS⟩) ∣ p := by
-      refine (orderOf_map_dvd _ _).trans ?_
-      rw [show orderOf (⟨w, hwS⟩ : ↥S) = orderOf w from
-        (orderOf_injective S.subtype Subtype.coe_injective ⟨w, hwS⟩).symm]
-      exact horder
-    have hd2 : orderOf (QuotientGroup.mk' (P.subgroupOf S) ⟨w, hwS⟩) ∣
-        (P.subgroupOf S).index := orderOf_dvd_natCard _
-    exact Nat.dvd_one.mp (hcop2 ▸ Nat.dvd_gcd hd1 hd2)
-  have hmem : (⟨w, hwS⟩ : ↥S) ∈ P.subgroupOf S := by
-    rw [← QuotientGroup.eq_one_iff, ← QuotientGroup.mk'_apply]
-    exact hmk
-  rwa [Subgroup.mem_subgroupOf] at hmem
-
 /-- **Peterfalvi (13.2.b)/(14.2.a): `W₂ ≤ P`.**  `W₂` is a `p`-group (`|W₂| = p`) inside `S`
 (`W₂ ≤ W = S ⊓ T`), while `P = S_F` is a normal Hall `p`-subgroup of `S` (normal by
 `maxNilpotentNormalHall_subgroupOf_normal`, Hall by `maxNilpotentNormalHall_isHall`, and a
 `p`-group of order `p^q` by `basic_structure`).  Hence `W₂ ≤ P` — the `F_p ⊆ F` identification of
 (14.2.a). -/
 theorem W2_le_P [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
-    (hyp : Hypothesis (G := G)) : hyp.base.W2 ≤ hyp.base.P := by
-  obtain ⟨_, _, _, hP_card, _, _⟩ := OddOrder.Peterfalvi.S15.basic_structure _hG hyp.base
-  have hP_le_S : hyp.base.P ≤ hyp.base.S := by
-    rw [hyp.base.P_eq_SF]; exact OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_le hyp.base.S
-  refine pgroup_le_of_normal_coprime_index (S := hyp.base.S) hyp.base.p_prime ?_ ?_ ?_ ?_ ?_
-  · have h1 : hyp.base.W2 ≤ hyp.base.W := by rw [hyp.base.W_eq_join]; exact le_sup_right
-    have h2 : hyp.base.W ≤ hyp.base.S := by rw [hyp.base.W_eq_inter]; exact inf_le_left
-    exact h1.trans h2
-  · rw [hyp.base.P_eq_SF]
-    exact OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_subgroupOf_normal hyp.base.S
-  · have hHall := OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_isHall hyp.base.S
-    rw [← hyp.base.P_eq_SF] at hHall
-    have hcard_eq : Nat.card ↥(hyp.base.P.subgroupOf hyp.base.S) = Nat.card ↥hyp.base.P :=
-      Nat.card_congr (Subgroup.subgroupOfEquivOfLe hP_le_S).toEquiv
-    exact hcard_eq ▸ Ch03.IsHallSubgroup.coprime_index hHall
-  · rw [hP_card]; exact dvd_pow_self hyp.base.p hyp.base.q_prime.pos.ne'
-  · intro w hw
-    have heq : orderOf (⟨w, hw⟩ : ↥hyp.base.W2) = orderOf w :=
-      (orderOf_injective hyp.base.W2.subtype Subtype.coe_injective ⟨w, hw⟩).symm
-    have h1 : orderOf (⟨w, hw⟩ : ↥hyp.base.W2) ∣ Nat.card ↥hyp.base.W2 := orderOf_dvd_natCard _
-    rw [heq, ← hyp.base.p_eq_card_W2] at h1
-    exact h1
+    (hyp : Hypothesis (G := G)) : hyp.base.W2 ≤ hyp.base.P :=
+  OddOrder.Peterfalvi.S15.W2_le_P _hG hyp.base
 
 /-- **Peterfalvi (13.2.a)/(13.2.b dual) for the (14.7) field model**: `U` is cyclic (13.2.a `UW₁`
 Frobenius with abelian kernel `U`, `c = 1`) and `Q` is elementary abelian (13.2.b applied to the
