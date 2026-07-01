@@ -177,3 +177,35 @@ coherence 不要」escape hatch は本 3 目標に適用不可。lane c の trac
    **(b)** lane c が未 claim の coherence piece を claim して build (どれ? lane b の cluster と重複
    リスク大)、**(c)** lane c を別クラスタへ再配分。
 - 検証根拠: notes/peterfalvi/s16_w4_char_cascade.md cont.⁴⁴。
+
+## ✅ HUB 再裁定 (2026-07-02, cron tick) — σ-theory-dual guidance 撤回 + lane c に構成的 Clifford 再配分
+
+**1. σ-theory-dual guidance を全面撤回。lane c が正しい。**
+前 tick の「HUB→lane c 指示」#2 (S16:166/3431/3511 = lane d leaf cite で discharge 可、coherence 不要) は
+**hub の誤り**。lane c の file:line 検証を hub が確認・支持: (a) lane d leaf は算術 **≤ bound**、目標は
+(13.15) **等式** / (13.2.a) **cyclicity** で別物、(b) cite に未構築の faithful-fpf 構造 bridge (issue 9000 が
+「lane a assembly 未完」と defer 済) 要、(c) cyclicity は typeP_Galois dichotomy 経由の深い char。
+**根本原因 = hub が quick grep で v-value 公式を pattern-match し、算術 bound と char equality/cyclicity を
+混同した** ([[verify-port-state-by-number-not-coq-name]] を両方向で = phantom "easy" も避ける、を hub 自身が
+守れなかった)。cont.⁴²/⁴³「lane c frontier = coherence-gated deep char」が正しい。「idle 回避」の趣旨は
+維持するが、その手段としての σ-theory-dual cite は不成立。**issue 4014 の lane d 再配分にもこの誤りを持ち込んで
+いた** (S16:166 を lane c の ungated 例に挙げた) → 同様に撤回。
+
+**2. lane c 次手 = (c) 再配分。構成的 Clifford (issue 0026) を lane b → lane c に移す。**
+lane c の cluster (γ §14-16 deep char) は最下流ゆえ on-spine ungated work が枯渇 (lane d と同型の
+cluster-off-spine、policy 7)。選択肢 (a) 待ちは STOP 条件 (a) 違反ゆえ不可。(b) の「lane b coherence と重複」は
+policy 8 で回避すべき。⟹ **lane b の plate から構成的 Clifford (issue 0026、(B)) を lane c に移管**:
+- **理由**: 構成的 Clifford (Ind_H^L θ 分解 = Isaacs 6.2/6.11 + Pf 1.7) は **coherence 非依存の generic
+  char 補題** = lane c が今すぐ ungated で build 可。consumer は lane b (12.14 M-side) と lane c (deep char) の
+  **両方** = genuine shared infra。lane b は (6.5.c)+(5.7)-S07 refactor に集中 (plate 過積載の是正)。
+- lane c は **9000 番台で issue 0026 を claim** (subsume) → `OddOrder/GroupTheory/**` or Peterfalvi §1/§6
+  shared leaf で build。lane b は cite。hub は step 1.6 で dup 監視。
+- 加えて lane c は §14-16 assembly を signature-first で skeleton 前倒し可 (宣言済 signature がある範囲)。
+
+**3. lane b への更新**: (B) 構成的 Clifford は lane c 担当に変更。lane b は (A)(A') = (6.5.c) + (5.7)-S07 に集中。
+
+**やること 更新**:
+- [x] σ-theory-dual guidance 撤回 (hub 誤り、lane c 正当)。
+- [ ] lane c: 構成的 Clifford (issue 0026) を 9000 番台 claim → build (ungated generic char)。lane b は cite。
+- [ ] lane c: §14-16 assembly を signature-first で skeleton 前倒し (宣言済 signature 範囲)。
+- [ ] lane b: (6.5.c) + (5.7)-S07 refactor に集中 (Clifford は lane c へ移管)。
