@@ -8231,6 +8231,70 @@ theorem caseA_Xmu_card_eq [Finite G] {M : Subgroup G}
   rw [← Set.ncard_coe_finset Xmu, ← Set.ncard_image_of_injOn hinj, himg,
     reducible_count_sOf_H0 hG chief]
 
+set_option linter.style.openClassical false in
+open scoped Classical in
+set_option maxHeartbeats 1000000 in
+/-- **Peterfalvi (9.8.c): `𝒮(H₀C)` contains an irreducible character of degree `qu`.**  The parity
+dichotomy `exists_regular_not_reducible_of_odd` applied to `X = Xθ` (`u·|Xθ| = (p-1)^q` by
+`oXtheta_count`, `p-1` even as `p ∤ |G|` is odd, `u` odd by `u_odd`) and its `p-1`-element subfamily
+`Xmu` (`caseA_Xmu_card_eq`) yields a regular seed's `ζ = Ind_{HC}(hcPsi θ)` outside `Xmu`, i.e. with
+`Ind_{HU}^M ζ` *irreducible*.  That `Ind_{HU}^M ζ` is the required member: in `𝒮(H₀C)`
+(`hcZeta_induceHU_mem_sOf`), irreducible, of degree `q·u` (`hcZeta_induceHU_apply_one`). -/
+theorem caseA_exists_irreducible_sOf_H0C [Finite G] {M : Subgroup G}
+    {data : TypesIIIIIIVSetup M} {chief : ChiefFactorData data}
+    {chars : Section11CharacterData data chief} (caseA : CliffordCaseAData chars)
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    [Fintype ((↥data.H ⧸ chief.N) →* ℂˣ)]
+    [Fintype ↥(hInHu data)] [Invertible (Nat.card ↥(hInHu data) : ℂ)]
+    [Fintype ↥(huSub data)]
+    [Fintype ↥(hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf (huSub data))]
+    [Invertible (Nat.card ↥(hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf
+      (huSub data)) : ℂ)]
+    [(hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf (huSub data)).Normal] :
+    ∃ χ ∈ sOf data (chief.H0 ⊔ chars.C), IsIrreducibleCharacter χ ∧
+      χ (1 : ↥M) = ((data.q * chars.u : ℕ) : ℂ) := by
+  letI : Fintype ↥M := Fintype.ofFinite _
+  letI : Invertible (Nat.card ↥(huSub data) : ℂ) :=
+    invertibleOfNonzero (Nat.cast_ne_zero.mpr Nat.card_pos.ne')
+  have hq : 0 < data.q := data.nontrivial.2.1.pos
+  -- `p ∣ |G|` (odd), so `p` is odd and `p-1` even.
+  have hpq : chief.p ^ data.q ∣ Nat.card ↥data.H := ⟨Nat.card ↥chief.H0, chief.quotient_order⟩
+  have hp_dvd : chief.p ∣ Nat.card G :=
+    (dvd_pow_self chief.p hq.ne').trans (hpq.trans (Subgroup.card_subgroup_dvd_card data.H))
+  have hp_ne2 : chief.p ≠ 2 := fun h =>
+    (Nat.not_even_iff_odd.mpr hG.odd) (even_iff_two_dvd.mpr (h ▸ hp_dvd))
+  have hp1_even : Even (chief.p - 1) := by
+    obtain ⟨k, hk⟩ := chief.p_prime.odd_of_ne_two hp_ne2
+    exact ⟨k, by omega⟩
+  set RegF := Finset.univ.filter fun θ : (↥data.H ⧸ chief.N) →* ℂˣ =>
+    ∀ i, θ.comp (caseA.Hpart i).subtype ≠ 1 with hRegF
+  set Xθ := RegF.image fun θ =>
+      ClassFunction.induce (hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf
+        (huSub data)) (hcPsi chief θ).toClassFunction with hXθ
+  set Xmu := Xθ.filter fun ζ => ¬ IsIrreducibleCharacter (induceHU data ζ) with hXmu
+  -- a regular seed inducing irreducibly (`ζ ∈ Xθ \ Xmu`).
+  have hcard : (↑Xmu : Set (ClassFunction ↥(huSub data) ℂ)).ncard = chief.p - 1 := by
+    rw [Set.ncard_coe_finset]; exact caseA_Xmu_card_eq caseA hG
+  have hcount : chars.u * (↑Xθ : Set (ClassFunction ↥(huSub data) ℂ)).ncard
+      = (chief.p - 1) ^ data.q := by
+    rw [Set.ncard_coe_finset]; exact oXtheta_count caseA
+  obtain ⟨ζ, hζ, hζn⟩ := exists_regular_not_reducible_of_odd Xθ.finite_toSet
+    (Finset.coe_subset.mpr (Finset.filter_subset _ _)) hcard hcount
+    (Nat.sub_pos_of_lt chief.p_prime.one_lt) hp1_even (u_odd hG chars) data.nontrivial.2.1.two_le
+  rw [Finset.mem_coe, hXθ, Finset.mem_image] at hζ
+  obtain ⟨θ, hθ, rfl⟩ := hζ
+  have hreg := (Finset.mem_filter.mp hθ).2
+  have hnt : θ ≠ 1 := fun h => hreg ⟨0, hq⟩ (by rw [h]; exact MonoidHom.one_comp _)
+  have hirr : IsIrreducibleCharacter (induceHU data (ClassFunction.induce
+      (hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf (huSub data))
+      (hcPsi chief θ).toClassFunction)) := by
+    by_contra h
+    refine hζn ?_
+    simp only [Finset.mem_coe, hXmu, Finset.mem_filter, hXθ, Finset.mem_image]
+    exact ⟨⟨θ, hθ, rfl⟩, h⟩
+  exact ⟨_, hcZeta_induceHU_mem_sOf chars θ hnt (caseA_regular_inflation_inertia_eq caseA θ hreg),
+    hirr, hcZeta_induceHU_apply_one chars θ⟩
+
 /-- **Peterfalvi (9.8)**: character-count consequences in Clifford case (a).
 
 Faithful to Peterfalvi (9.8.b,c,d) (count-statement audit, issue 2030):
@@ -8263,7 +8327,19 @@ theorem caseA_character_counts [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G
   refine ⟨reducible_count_sOf_H0 hG chief, fun φ hφ hred =>
     ⟨caseA_reducible_induceHU_apply_one_eq_qu caseA hG φ hφ hred,
       reducible_mem_sOf_H0C hG chars φ hφ hred⟩, ?_, ?_⟩
-  · sorry
+  · -- (c) 9.8.c: an irreducible `𝒮(H₀C)`-member of degree `qu` (parity dichotomy on `Xθ`/`Xmu`).
+    letI : Fintype ((↥data.H ⧸ chief.N) →* ℂˣ) := Fintype.ofFinite _
+    letI : Fintype ↥(hInHu data) := Fintype.ofFinite _
+    letI : Fintype ↥(huSub data) := Fintype.ofFinite _
+    letI : Fintype ↥(hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf
+      (huSub data)) := Fintype.ofFinite _
+    letI : Invertible (Nat.card ↥(hInHu data) : ℂ) :=
+      invertibleOfNonzero (Nat.cast_ne_zero.mpr Nat.card_pos.ne')
+    letI : Invertible (Nat.card ↥(hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf
+      (huSub data)) : ℂ) := invertibleOfNonzero (Nat.cast_ne_zero.mpr Nat.card_pos.ne')
+    haveI : (hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf
+      (huSub data)).Normal := hcInHu_realized_normal chief
+    exact caseA_exists_irreducible_sOf_H0C caseA hG
   · sorry
 
 end OddOrder.Peterfalvi.S11
