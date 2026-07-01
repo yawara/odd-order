@@ -1265,3 +1265,22 @@ lane-b frontier を §12 char 残 sorry に移す。**frontier map (全 gate 調
 `(hyp)(hfrob: IsFrobeniusGroup ↥L K C)(χ∈Sset) → CharacterDecompositionData hyp χ`。5 field 全て
 Frobenius+奇位数で構成可能 ((8.2.c) 不要)。これで witness-L の (12.3)/(12.4) 応用 (→ψ⊥R(χ)→coset
 constant) が unblock、12.14 の witness-side path が開通。一般 type-I (非 Frobenius) の (8.2.c) は別 gate。
+
+### loop⁵⁰⁻⁵¹ (2026-07-01 lane-b resume²): L-side (12.2.a) 完了 + M-side (8.2.c) proof map
+
+**L-side landed** (commit 2ce97734/042e06df, sorry-free axiom-clean):
+- `frobenius_induce_char_singleton` (clean-instance helper): 奇 Frobenius Γ で非自明 Ind_H^Γ θ は
+  単一既約 ξ (opaque)、非実、support⊆H (正規)。FiniteInduce scope whnf 回避。
+- `frobenius_typeI_induced_char_constituents` + `frobenius_character_decomposition_and_dade_domain`:
+  Frobenius L の CharacterDecompositionData を (8.2.c) なしで sorry-free 構成。
+
+**(12.16) critical path 確認**: 12.14 は L-side (ψ∈ℤ[R(χ_L)] via (5.5) + R(χ_L)⊥R(χ_M) via (12.3
+proven)) **と** M-side ((12.4)-for-M、M の CharacterDecompositionData) の両方を要す。L-side data は
+上記で ready。残 critical path 2 件:
+- **(5.5)** [§5, ψ∈ℤ[R(χ)]]: 文書順で (8.2.c) より上流。S07 coherence 機構に在庫確認要 (次)。
+- **(8.2.c)** [§8, I(θ)∩U⊆U₁ type-F inertia]: M-side data の gate。**proof map (mmd 04.10)**:
+  g∈U-U₁ ⟹ g は H の非自明 class を normalize しない (C={1}、(2.1) coprime action + Frobenius
+  complement 構造) ⟹ **Brauer 6.32** (`card_fixedPoints_conjByPermIrr_eq_card_fixedPoints_conjClassPerm`
+  = ConjugationBrauer.lean:186、**在庫**) で #g-invariant char = #g-invariant class = 1 ⟹ θ≠1 は
+  g-invariant でない ⟹ g∉I(θ)。**key 材料 (Brauer 6.32 + (2.1)) は在庫**、残は TypeFData の U₀/U₁
+  構造 exposure + C={1} step。focused §8 effort (multi-iteration)。
