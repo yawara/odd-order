@@ -1677,6 +1677,30 @@ structure TypeIFrobeniusData (M : Subgroup G) where
   frobenius : OddOrder.Isaacs.Ch06.IsFrobeniusGroup
     ↥M (typeI.typeF.H.subgroupOf M) complement
 
+/-- **Transporting a §4 Dade datum along an equality of its support set preserves the Dade isometry
+`dadeIntegralCharacterMap`.**  The isometry's codomain `IntegralCharacterMap ↥L G` does not mention
+the support `A`, so rewriting `A` to `A'` in the datum leaves the map unchanged (`subst` + `rfl`).
+This lets the (6.8) `SibleyDadeHypothesis` (Dade datum on `sharpImage H`) carry *exactly* the (12.1)
+isometry `hyp.tau` (Dade datum on `A(L)`) after the ambient identification `sharpImage H = A(L)` —
+the map is an *arbitrary* linear extension off the supported lattice
+(`dadeIntegralCharacterMap_apply_of_support`), so only the identical datum (transported), not a
+re-construction via `of_isTISubset`, reproduces `hyp.tau`. -/
+theorem hconj_transport_ambient {L : Subgroup G} [Fintype G] {A A' : Set G} (hEq : A = A')
+    (dade : OddOrder.Peterfalvi.S04.Hypothesis G A L) (hconj : dade.HConjInvariant) :
+    (hEq ▸ dade : OddOrder.Peterfalvi.S04.Hypothesis G A' L).HConjInvariant := by
+  subst hEq; exact hconj
+
+theorem dadeIntegralCharacterMap_transport_ambient {L : Subgroup G} [Fintype G] [Fintype ↥L]
+    [Invertible (Nat.card ↥L : ℂ)] [Invertible (Nat.card G : ℂ)]
+    {A A' : Set G} (hEq : A = A')
+    (dade : OddOrder.Peterfalvi.S04.Hypothesis G A L) (hconj : dade.HConjInvariant)
+    (hconj' : (hEq ▸ dade : OddOrder.Peterfalvi.S04.Hypothesis G A' L).HConjInvariant) :
+    OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap (hEq ▸ dade)
+        ((hEq ▸ dade).fullDadeIsometryData hconj')
+      = OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap dade
+        (dade.fullDadeIsometryData hconj) := by
+  subst hEq; rfl
+
 /-- **The centralizer-support of `N^#` collapses to `N^#` for a Frobenius `L` with kernel `N`.**
 The (12.1) type-I Dade support is `A(L) = centralizerSupport (N^#) L`; when `L` is a Frobenius group
 with kernel `N` (`N.subgroupOf L`), the extra centralizer condition is vacuous — a `y` centralizing
