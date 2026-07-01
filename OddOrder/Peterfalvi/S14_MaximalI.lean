@@ -5,6 +5,7 @@ Authors: Yawara Ishida
 -/
 import OddOrder.Peterfalvi.S13_MaximalIII_IV
 import OddOrder.Peterfalvi.S10_CoherenceWiring
+import OddOrder.Peterfalvi.S09_CertificateDischarge
 import OddOrder.GroupTheory.RepresentationTheory.SingerField
 import OddOrder.GroupTheory.RepresentationTheory.CyclotomicCharacterCongruence
 import Mathlib.RepresentationTheory.Irreducible
@@ -2422,6 +2423,39 @@ theorem exists_distinguished_char {L : Subgroup G} [Finite G] (hyp : Hypothesis 
   refine ⟨_, hmem, ?_⟩
   rw [ClassFunction.induce_apply_one, hθ_deg, mul_one]
 
+open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
+/-- **The placed induced family for the witness `L`** (§12→§7 bridge, the `θ`/`ind1H` shape
+`hypothesis78OfDade` consumes).  Applies `exists_placed_induced_family` to the distinguished
+`χ = Ind θ_lin ∈ S` of `exists_distinguished_char` (`θ_lin` nontrivial linear, so `χ ≠ Ind 1_K` by
+`induce_ne_trivialChar_induce`): the distinguished char lands at index `0` with induced degree
+`[L:K]` (`= e`), the trivial char `1_K` lands at some `ind1H ≠ 0`, and the family is
+injective/covering.  `K = (L_F).subgroupOf L` is normal in `L` (`maxNilpotentNormalHall_..._normal`).
+This is the family input to the witness-`L` `Hypothesis78`. -/
+theorem exists_witness_placed_family {L : Subgroup G} [Finite G] (hyp : Hypothesis L) :
+    ∃ (n : ℕ) (θ : Fin (n + 1) → IrreducibleCharacter ↥((hyp.typeI.typeF.H).subgroupOf L))
+      (ind1H : Fin (n + 1)),
+      ind1H ≠ 0 ∧
+      ClassFunction.induce ((hyp.typeI.typeF.H).subgroupOf L)
+          (θ 0 : ClassFunction _ ℂ) (1 : ↥L) = (((hyp.typeI.typeF.H).subgroupOf L).index : ℂ) ∧
+      θ ind1H = trivialIrreducibleCharacter ↥((hyp.typeI.typeF.H).subgroupOf L) ∧
+      Function.Injective (fun i => ClassFunction.induce ((hyp.typeI.typeF.H).subgroupOf L)
+        (θ i : ClassFunction _ ℂ)) ∧
+      ∀ φ : IrreducibleCharacter ↥((hyp.typeI.typeF.H).subgroupOf L),
+        ClassFunction.induce ((hyp.typeI.typeF.H).subgroupOf L) (φ : ClassFunction _ ℂ) ∈
+          Set.range (fun i => ClassFunction.induce ((hyp.typeI.typeF.H).subgroupOf L)
+            (θ i : ClassFunction _ ℂ)) := by
+  haveI hKnormal : ((hyp.typeI.typeF.H).subgroupOf L).Normal := by
+    rw [hyp.typeI.typeF.H_eq]
+    exact OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_subgroupOf_normal L
+  obtain ⟨χ, hχ, hdeg⟩ := exists_distinguished_char hyp
+  obtain ⟨θlin, hθ_ne, hχ_eq⟩ := hχ
+  obtain ⟨n, θ, ind1H, hind, h0, htriv, hinj, hcov⟩ :=
+    OddOrder.Peterfalvi.S09.Cert.exists_placed_induced_family ((hyp.typeI.typeF.H).subgroupOf L) χ
+      ⟨θlin, hχ_eq.symm⟩
+      (hχ_eq ▸ OddOrder.Peterfalvi.S09.Cert.induce_ne_trivialChar_induce
+        ((hyp.typeI.typeF.H).subgroupOf L) θlin hθ_ne)
+  exact ⟨n, θ, ind1H, hind, by rw [h0]; exact hdeg, htriv, hinj, hcov⟩
+
 /-- **Peterfalvi (12.13)/(12.16), the degree lower bound `e ≥ 3`**: the distinguished degree
 `e = [L:H]` (`H = L_F`) of a type-I `Hypothesis` is at least `3`.  It equals the order of the
 Frobenius complement `U` (`H` complements `U` in `L`, `typeF.complement`), which is **nontrivial**
@@ -2785,6 +2819,47 @@ theorem typeI_frobenius [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
            kernel_eq_MF := True
            kernel_eq_MF_holds := trivial
            frobenius := typeI_frobenius_of_pi_empty hG (pi_empty hG) hM data }, trivial⟩
+
+/-- **The type-I Dade support is `H#`** (Peterfalvi (8.3)/(12.1) for the witness subgroup `L`).
+`typeIA L = centralizerSupport (H#) L` collapses to `H# = (H : Set G) \ {1}` (`H = L_F`): the
+Frobenius structure of `L` (from (12.7) `typeI_frobenius`) makes the centralizer condition vacuous
+on `H#` (`IsFrobeniusGroup.centralizer_kernel_le`).  This supplies the `A = H#` shape that
+`S09.Cert.hypothesis78OfDade` needs (the `hAH` argument of the §12→§7 Dade bridge).
+
+Re-derives the `centralizerSupport = sharp` argument of
+`S16.centralizerSupport_sharpSubgroup_eq_of_frobenius` — which lives downstream of `S14` and so
+cannot be cited here; a hub dedup hoisting that pure-group-theory fact to a shared file (e.g.
+`MaximalSubgroupType`) is tracked in issue 1013. -/
+theorem Hypothesis.typeIA_eq_sharp [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    {L : Subgroup G} (hyp : Hypothesis L) :
+    OddOrder.GroupTheory.typeIA L hyp.typeI
+      = OddOrder.GroupTheory.sharpSubgroup hyp.typeI.typeF.H := by
+  obtain ⟨fdata, _⟩ := typeI_frobenius hG hyp.maximal ⟨hyp.typeI⟩
+  have hKf : fdata.typeI.typeF.H = hyp.typeI.typeF.H := by
+    rw [fdata.typeI.typeF.H_eq, hyp.typeI.typeF.H_eq]
+  have hfrob : OddOrder.Isaacs.Ch06.IsFrobeniusGroup ↥L
+      (hyp.typeI.typeF.H.subgroupOf L) fdata.complement := hKf ▸ fdata.frobenius
+  show OddOrder.GroupTheory.centralizerSupport
+      (OddOrder.GroupTheory.sharpSubgroup hyp.typeI.typeF.H) L
+    = OddOrder.GroupTheory.sharpSubgroup hyp.typeI.typeF.H
+  ext y
+  simp only [OddOrder.GroupTheory.centralizerSupport, OddOrder.GroupTheory.sharpSubgroup,
+    Set.mem_setOf_eq, Set.mem_diff, SetLike.mem_coe, Set.mem_singleton_iff]
+  constructor
+  · rintro ⟨hyL, hy1, x, ⟨hxN, hx1⟩, hyx⟩
+    have hxL : x ∈ L := hyp.typeI.typeF.H_le hxN
+    have hxsub : (⟨x, hxL⟩ : ↥L) ∈ hyp.typeI.typeF.H.subgroupOf L :=
+      (Subgroup.mem_subgroupOf).mpr hxN
+    have hx1' : (⟨x, hxL⟩ : ↥L) ≠ 1 := fun h => hx1 (congrArg Subtype.val h)
+    have hycomm : (⟨y, hyL⟩ : ↥L) ∈ Subgroup.centralizer ({(⟨x, hxL⟩ : ↥L)} : Set ↥L) := by
+      rw [Subgroup.mem_centralizer_singleton_iff] at hyx ⊢
+      exact Subtype.ext hyx
+    have hyN : (⟨y, hyL⟩ : ↥L) ∈ hyp.typeI.typeF.H.subgroupOf L :=
+      hfrob.centralizer_kernel_le _ hxsub hx1' hycomm
+    exact ⟨(Subgroup.mem_subgroupOf).mp hyN, hy1⟩
+  · rintro ⟨hyN, hy1⟩
+    refine ⟨hyp.typeI.typeF.H_le hyN, hy1, y, ⟨hyN, hy1⟩, ?_⟩
+    rw [Subgroup.mem_centralizer_singleton_iff]
 
 /-! ## (12.17): forcing case (b) of Theorem (8.8) — the all-type-I non-existence argument
 

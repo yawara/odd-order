@@ -1163,3 +1163,321 @@ inertia heart + degree-u irreducible 完成 (最難部分)。残は giant-term �
 4. χ∈SOf(H₀C) = `mem_sOf.mpr ⟨ζ, ζ∈xiOf, rfl⟩` → conjunct c (caseA_character_counts:5270)。
 
 inertia heart + ζ-irreducible + degree + H₀C⊆Ker 完成。残=xiSet membership (LiesOver descent) + M-level。
+
+
+## ζ∈𝒳(H₀C) 完成 + M-level route 確定 (2026-07-01, commits 2c428020/a6225c3a)
+
+**LANDED**: `hcZeta_mem_xiSet` (H⊄Ker ζ, Frobenius/LiesOver descent — construction 方向の xiSet
+産出、新領域) + `hcZeta_mem_xiOf` (両半分合成)。**ζ = Ind_{HC}^{HU}(ψ) ∈ 𝒳(H₀C) 完全確立**。
+
+**残 = M-level のみ (conjunct c の最終ゲート)**:
+- **degree (easy)**: `induceHU (ζ:CF)(1) = q·ζ(1) = q·u = qu`。`induceHU_apply_one_eq_q_mul` +
+  `hcZeta_apply_one` (ζ(1)=u、既 landed)。coe_mk で bundled→induce HC ψ。
+- **χ∈SOf (easy)**: `mem_sOf ⟨ζ, hcZeta_mem_xiOf, rfl⟩` (SOf=sOf, chars.C=cSub data chief 確認済)。
+- **IsIrreducibleCharacter (induceHU ζ) (hard, propagation 要)**:
+  - `isIrreducibleCharacter_induce_of_inertia_eq` at M-level: I_M(ζ)=HU → induceHU ζ irreducible。
+  - **I_M(ζ)=HU** via `eq_of_le_of_prime_index` (S11:2230, HU≤I≤M ∧ [M:HU]=q prime ∧ I≠M → I=HU):
+    - HU≤I_M(ζ): subgroup_le_inertia (HU◁M)。
+    - [M:HU]=q: huSub_index_eq_q (既 landed)。
+    - **I_M(ζ)≠M (= ζ not-W1-fixed) = 残る実質ゲート**: θ̄ は `clifford_caseA_exists_regular_char_not_fixed`
+      (S11:4914) で regular ∧ θ̄.comp(act.φ w₀)≠θ̄ (non-W1-fixed) を産出済。propagation
+      **θ̄^{w₀}≠θ̄ → ζ^{w₀}≠ζ → I_M(ζ)≠M** を新規に組む (conjugation が induction+inflation と可換;
+      ζ^{w₀}=ζ → 各 LiesOver constituent θ₀ も θ₀^{w₀} と一致 → θ̄^{w₀}=θ̄ の対偶)。これが (9.8.c) の
+      最後の本質的数学。
+
+**assembly**: 上 3 つ + hcZeta 構築 (CliffordCaseAData の θ̄ + inertia fact hθ₀ + instances) →
+caseA_character_counts:5270 conjunct c。caseA_character_counts は H₀C machinery 後 (file 末) に relocate。
+
+inertia heart + ζ-irreducible(HU) + degree + H₀C⊆Ker + xiSet + xiOf 完成。残=M-level propagation のみ。
+
+
+## M-level 3 pieces LANDED; conjunct c は hIM-gated で組立可 (2026-07-01, commits bb5868ec/4bbbef61/40eaba00)
+
+**LANDED (axiom-clean)**:
+- `hcZeta_induceHU_apply_one`: (Ind_{HU}^M ζ)(1) = q·u = qu。
+- `hcZeta_induceHU_mem_sOf`: Ind_{HU}^M ζ ∈ 𝒮(H₀C)。
+- `hcZeta_induceHU_irreducible` (**hIM-gated honest conditional**): hIM (I_M(ζ)≠⊤) を仮定して
+  Ind_{HU}^M ζ irreducible (HU≤I_M via subgroup_le_inertia, [M:HU]=q prime via huSub_index_eq_q +
+  data.nontrivial.2.1, eq_of_le_of_prime_index → I_M=HU, isIrreducibleCharacter_induce_of_inertia_eq)。
+
+**conjunct c (caseA_character_counts:~5270) は hIM さえあれば組立可**: χ=induceHU(induce HC ψ),
+∈SOf ✓ deg qu ✓ irreducible ✓(hIM)。残 = **hIM discharge (唯一の本質ゲート)**:
+- **propagation θ̄^{w₀}≠θ̄ → conjBy w₀ ζ≠ζ → I_M(ζ)≠⊤** (deep Clifford)。
+  w₀ datum = `clifford_caseA_exists_char_inertia_hc_not_fixed` (S11:5014) が θ + hθ₀ + w₀ 産出。
+  - conjBy(w₀-as-M-elt) (induce_{HC}^{HU} inflation θ) = induce(inflation θ^{w₀}) (conjugation が
+    induce+inflation と可換) ≠ ζ (injective: θ̄↦ζ)。Coq PFsection9.v Part_a (880-915):
+    cfInd_sum_Inertia / inertia_irr_prime / sub_inertia_Res で M-level inertia 計算。**Coq 証明本体を
+    熟読してから組む** (標準 Coq-first)。
+- **assembly**: caseA から S₀/hS₀ne/hS₀inv/hS₀card/hp3 → θ 構築; instances (Fintype/Invertible/Normal
+  for HC) 確立; hIM discharge → conjunct c の sorry 埋め (relocate 後)。
+
+ζ∈𝒳(H₀C) + degree + SOf + M-level irreducible(gated) 完成。残=propagation 1 ゲート + assembly。
+
+
+## conjunct-c FULLY ASSEMBLED — 残ゲートは propagation 1 本のみ (2026-07-01, commit 96e9c0a8)
+
+**hcZeta_exists_irreducible_sOf** (hIM-gated): ∃ χ∈𝒮(H₀C), IsIrreducibleCharacter χ ∧ χ(1)=qu を
+3 ピース (mem_sOf + irreducible + deg) で組立完了。conjunct c は **hIM さえ discharge すれば閉じる**。
+
+**build-red 修正 (重要)**: 40eaba00 の hcZeta_induceHU_irreducible は **leaf stale-green** で commit された
+build-red だった。原因 = (1) Invertible (card M) 未供給、(2) induceHU vs ClassFunction.induce の
+**letI/haveI desync** (induceHU は letI で instance を焼込むので、ambient も **letI (透明) で供給せねば
+defeq せず** exact/show/convert 全滅; haveI=opaque で破綻)。修正 = 全 instance を letI 供給 → exact 一発。
+正本 memory = [[lean-induce-transport-instance-desync]]。**clean rebuild (rm olean) で検証必須**
+([[leaf-build-stale-green]])。
+
+**残 = hIM discharge のみ (唯一の本質ゲート)**: θ̄^{w₀}≠θ̄ → conjBy w₀ ζ≠ζ → I_M(ζ)≠⊤ (deep Clifford)。
+machinery 在庫: `liesOver_conjBy`/`liesOver_conjBy_iff` (Clifford:836/846, conjBy equivariance),
+`RestrictionConstituentsSingleOrbit` (Clifford:870, 単一軌道), `induce_conjBy_eq` (Clifford:531),
+`clifford_caseA_exists_char_inertia_hc_not_fixed` (S11:5014, θ+hθ₀+w₀ 産出)。
+route: ζ LiesOver θ₀ → conjBy w₀ ζ=ζ なら ζ LiesOver conjBy w₀ θ₀ → 単一軌道で θ₀,conjBy w₀ θ₀ が
+HU-共役 → θ̄^{w₀}∈U-orbit(θ̄) → free-orbit 矛盾。Coq PFsection9 Part_a (880-915) +
+factor-permutation (980-994: conjg_Iirr) を熟読してから組む。
+
+ζ∈𝒳(H₀C) + degree + SOf + M-level irreducible(gated) + assembly 完成。残=propagation 1 本。
+
+
+## propagation (hIM) 完全 mapping — 残ゲートの precise gap 特定 (2026-07-01)
+
+**explicit route (全 producer 在庫確認)**:
+1. ζ LiesOver θ₀ (hInHu-level): `exists_constituent_not_subset_characterKernel` (ζ∈xiSet=H⊄ker ζ →
+   ∃θ₀ constituent nontrivial on hInHu)。θ₀ = inflation of 何らかの nontrivial θ̄'。
+2. SingleOrbit ζ: `restrictionConstituentsSingleOrbit_of_isIrreducible ζ` (CliffordSingleOrbit:120,
+   Clifford Thm 6.5、[hInHu.Normal][Fintype][Invertible] で直接適用)。
+3. 仮定 conjBy w₀_M ζ=ζ → `liesOver_conjBy` で ζ LiesOver conjBy w₀_M θ₀。
+4. `RestrictionConstituentsSingleOrbit.exists_conj` (Clifford:828): θ₀, conjBy w₀_M θ₀ HU-共役
+   → ∃h∈HU, conjBy h θ₀ = conjBy w₀_M θ₀ → **θ̄^{w₀} ∈ U-orbit(θ̄)** (h の U-成分)。
+
+**precise gap (残る本質)**: 矛盾には **θ̄^{w₀} ∉ U-orbit(θ̄)** が要る。現 seed
+`clifford_caseA_exists_char_inertia_hc_not_fixed` は **θ̄^{w₀}≠θ̄ しか与えない** (U-orbit が
+θ̄^{w₀} を含めば ≠ でも矛盾せず; U-stab(θ̄)=C≠U ゆえ U-orbit は u 元で非自明)。
+**strengthen 要**: regular θ̄ の factor 構造 (W1 が q factor を q-cycle で置換、U は
+factor-arrangement 保存) から θ̄^{w₀} ∉ U-orbit(θ̄) を導く (= free-W1-orbit の真の content)。
++ **w₀ の M-realization** (act.E elt → M elt) + conjBy。deep、複数 iteration。
+
+**alternative route (counting、要検討)**: Coq `oXtheta` (PFsection9:952) `u·|Xtheta|=(p-1)^q>0` →
+∃ irreducible 𝒮(H₀C)-member (個別構成+I_M=HU 不要、cardinality から存在)。conjunct c は
+∃ で足りるので、total |𝒮(H₀C)| count - reducible(p-1) > 0 で済む可能性。次 iteration で
+Coq oXtheta 構造を精査し、explicit(free-orbit) vs counting のどちらが tractable か判断。
+
+construction 完成 (assembly まで)。残 = hIM 1 本 (free-orbit content、deep)。
+
+
+## propagation — 完全構造設計 (build-ready lemma chain) (2026-07-01)
+
+**次 iteration は BUILD (再分析でなく)**。hIM = `ClassFunction.inertia (induce HC ψ) ≠ ⊤` を以下の
+lemma chain で。machinery 在庫確認済 (inner_conjBy_conjBy, SingleOrbit, exists_conj, liesOver_conjBy)。
+
+**L1 (新, restriction-conjBy commute across levels)**: `Res_{hInHu}(conjBy_{M,HU} m ζ)
+= conjBy_{M,hInHu} m (Res_{hInHu} ζ)` (m∈M)。proof = ext x; 両辺 ζ(m⁻¹ x m)。`conjBy_restrict`
+(Inertia:154) は G-char 専用で不適 (ζ は HU-char、M-char でない) → 新規。多段 coercion
+(hInHu→HU→M) に注意。
+
+**L2 (M-equivariance of restrictionMultiplicity)**: `restrictionMultiplicity (conjBy m χ) (conjBy m θ)
+= restrictionMultiplicity χ θ` = inner(Res(conjBy m χ))(conjBy m θ) =[L1] inner(conjBy m (Res χ))(conjBy m θ)
+=[inner_conjBy_conjBy, Inertia:173] inner(Res χ)(θ)。
+
+**L3 (構造 reduction、hIM core)**: `(∃m∈M, conjBy m θ₀ ∉ HU-orbit(θ₀)) ∧ ζ LiesOver θ₀ → hIM`。
+conjBy m ζ=ζ 仮定 → [L2] ζ LiesOver conjBy m θ₀ → [restrictionConstituentsSingleOrbit_of_isIrreducible
+ζ + exists_conj] conjBy m θ₀ ∈ HU-orbit(θ₀) 矛盾 → m∉inertia(ζ) → inertia≠⊤。
+(ζ LiesOver θ₀ は exists_constituent_not_subset_characterKernel から、ζ∈xiSet ゆえ)。
+
+**L4 (∉ U-orbit、最深 gap)**: conjBy m θ₀ ∉ HU-orbit(θ₀) を θ̄^{w₀}∉U-orbit(θ̄) から。
+**θ̄ non-constant factor-data + U が factor 内で作用 (S₀ U-inv → 各 act.φ w•S₀ U-保存) +
+W1 が q factor を q-cycle 置換** → θ̄^{w₀}(置換) ≠ θ̄^u(factor 内 twist) ∀u。
+`exists_regular_char_not_fixed` (S11:2314, θ̄^{τ}≠θ̄ のみ) を ∉ U-orbit に**強化要** (per-factor
+support 比較、全 u∈U)。free-W1-orbit の真の content。
+
+**L5 (W1 realization)**: w₀∈act.E → 実 W1≤M elt m。conjBy m と act.φ w₀ の対応。
+
+construction (assembly まで) 完成・full build green。残 = L1-L5 (deep §9 free-orbit、複数 iteration)。
+
+
+## propagation build — 新 infrastructure 要 (definitive assessment) (2026-07-01)
+
+L1-L3 の build 着手で判明: **M-conjugation の既存 API が無い**。`conjBy (g:G)(θ:CF ↥H)` は H◁G・g∈G
+を要するが、θ₀ : CF ↥(hInHu data) で hInHu data は **Subgroup ↥(huSub data)** (HU 内)、m∈↥M ゆえ
+**hInHu を ↥M の subgroup として持ち直す transport が必要** (hInHu.map huSub.subtype 等)。
+さらに既存 Clifford framework (`restrictionConstituentsSingleOrbit_of_isIrreducible`,
+`exists_conj`, `restrictionMultiplicity_conjBy_right`) は全て **HU-conjugation (g∈huSub) 前提**で、
+hIM が要する **M-conjugation (m∈M) と framework-bridge が要る**。
+
+**次 iteration が先に build すべき infrastructure (fresh context 推奨)**:
+- (I1) hInHu char の M-conjugation: m∈M に対し h↦mhm⁻¹ を hInHu-aut として実現 (H◁M ゆえ
+  well-def) し `conjBy`-互換な CF ↥(hInHu) を定義、または hInHu.map huSub.subtype で ↥M-subgroup 化。
+- (I2) restrictionMultiplicity の M-equivariance (I1 + inner_conjBy_conjBy)。
+- → その後 L3 (reduction) は既存 SingleOrbit/exists_conj で閉じる。
+- L4 (θ̄^{w₀}∉U-orbit, type-clean だが factor-arrangement deep) + L5 (W1 realization) は別途。
+
+これは **substantial sub-project** (新 conjBy-transport infra + deep factor content)。construction
+(assembly まで) は完成・full build green。残 hIM = この sub-project。stale-green 注意 (rm olean 検証)。
+
+
+## propagation — CLEANER build path (compHom-by-aut, transport 回避) (2026-07-01)
+
+前記 infra assessment の subgroup-transport は**不要**。M-conjugation を **m-conjugation aut で compHom**
+として表せば全て hInHu レベルで閉じる:
+- **φ_m : ↥(hInHu data) →* ↥(hInHu data)**, h ↦ ⟨m·h·m⁻¹, _⟩ (well-def: H◁M ゆえ m が hInHu 正規化)。
+  coercion 鎖 ↥(hInHu)→↥(huSub)→↥M に注意 (huSub data : Subgroup ↥M)。
+- **核心 identity**: `Res_{hInHu}(conjBy (G:=↥M)(H:=huSub) m ζ) = ClassFunction.compHom φ_m (Res_{hInHu} ζ)`
+  (ext + 値計算 ζ(m h m⁻¹))。← これで M-conjugation を compHom-by-aut に変換。
+- conjBy m ζ=ζ → Res ζ = compHom φ_m (Res ζ) → θ₀ constituent なら compHom φ_m θ₀ も constituent
+  (要 **inner-compHom-by-aut invariance**: inner(compHom φ a)(compHom φ b)=inner a b, φ aut; 既存
+  inner_conjBy_conjBy 類似、無ければ build)。
+- `restrictionConstituentsSingleOrbit_of_isIrreducible ζ` + `exists_conj`: ∃g∈huSub,
+  conjBy_{huSub} g θ₀ = compHom φ_m θ₀ → (g-conj = m-conj on θ₀) → θ̄^{w₀}∈U-orbit → free-orbit 矛盾。
+
+**hIM 自体は clean** (inertia_M(ζ)=conjBy (G:=↥M)(H:=huSub) m ζ、huSub data : Subgroup ↥M ゆえ多段不要)。
+fiddly なのは argument 内の Res↔compHom 橋 (φ_m + identity + inner-compHom)。次 iteration build。
+construction 完成・green。
+
+
+## propagation Clifford reduction 完全完成 (L1+L2+L3+assembly) — 残 L4/L5 (2026-07-01)
+
+**LANDED (commits 94a76573/7412a9e1/afc5c7a1/8d4162ac/239bbd27/1d8e5293、全 clean-rebuild green)**:
+- L1: `hInHuConj` (φ_m, m-conjugation aut) + `hInHuConj_restrict_conjBy` (Res(conjBy m ζ)=compHom φ_m(Res ζ))。
+- L2: `innerSum/inner_compHom_of_bijective` + `hInHuConj_bijective` + `hcZeta_liesOver_compHom_of_fixed`
+  (conjBy m ζ=ζ ∧ ζ LiesOver θ₀ → ζ LiesOver φ_m·θ₀)。
+- L3: `hcZeta_exists_conj_of_fixed` (→ ∃g∈HU, conjBy g θ₀=compHom φ_m θ₀)。
+- assembly: `hcZeta_inertia_ne_top_of_free` (**hIM ⟸ free-orbit hfree + ζ LiesOver θ₀**)。
+
+**残 L4 (free-orbit hfree、deep) — 大量 reuse 判明**:
+- `conjBy_compHom_hInHuEquivH` (S11:4500) = **inflation-conjugation commute 既存**:
+  conjBy g (compHom hInHuEquivH θ) = compHom hInHuEquivH (compHom (typeP_conjAction a) θ) (↑g=↑a)。
+- θ₀ = compHom hInHuEquivH (compHom (mk' N) (linearIrr θ̄))。conjBy g θ₀ / compHom φ_m θ₀ を
+  これ + compHom_comp で quotient action on θ̄ に落とす (caseB_char_inertia 系が手本)。φ_m (m∈M) 側は
+  conjBy_compHom_hInHuEquivH の m∈M 類似が要 (または hInHuConj を huSub-conjBy 経由で接続)。
+- inflation injective (exists_compHom_eq 系) → hfree ⟺ θ̄^{w₀}∉U-orbit。
+- **free-orbit θ̄^{w₀}∉U-orbit**: `exists_regular_char_not_fixed` (S11:2314、θ̄^{τ}≠θ̄) を ∉U-orbit に強化
+  (regular θ̄ non-constant factor、W1 q-cycle 置換、U factor 内): per-factor support 比較。
+**残 L5**: w₀∈act.E の m∈M realization + 構築 ζ の ζ LiesOver θ₀ → assemble hIM →
+`hcZeta_inertia_ne_top_of_free` → `hcZeta_induceHU_irreducible` → `hcZeta_exists_irreducible_sOf` → conjunct c。
+
+Clifford reduction (genuinely new infra) 完成。残=L4 (free-orbit 深) + L5 (realization wiring)。
+
+
+## L4 connection chain — caseB inertia machinery で大量 pre-built (2026-07-01)
+
+L4 の connection chain (hfree ⟺ θ̄^{w₀}∈U-orbit) は **caseB inertia machinery でほぼ既存**:
+- `conjBy_compHom_hInHuEquivH` (conjBy g) + `compHom_hInHuConj_hInHuEquivH` (compHom φ_m、新規 build 済):
+  両 conjugation を typeP_conjAction a/b (↑g=↑a, ↑m=↑b) へ。
+- `compHom_typeP_conjAction_inflation` (S11:4400、**rfl**): typeP_conjAction a (compHom (mk' N) θ̄)
+  = compHom (mk' N) (quotientMulAutHom a θ̄)。← descent to quotient action。
+- `compHom_injective_of_surjective` (hInHuEquivH surj + mk' N surj): 二重 inflation strip。
+- → conjBy g θ₀=compHom φ_m θ₀ ⟺ quotientMulAutHom (g-image) θ̄ = quotientMulAutHom (w₀) θ̄
+  ⟺ θ̄^{act.φ(U-image of g)} = θ̄^{w₀}。g∈huSub の quotient image は huSub/hInHu≅U で U-element
+  (H-part は inner=trivial) → ∃g ⟺ **θ̄^{w₀}∈act.φ-U-orbit**。
+- `caseB_inertia_realized` (S11:4570) が realization+descent の手本 (a∈U, g∈huSub, ↑g=↑a)。
+
+**残 L4 = (1) connection reduction lemma** (上を組む、realization g→U-image 込) **+ (2) 深部
+free-orbit θ̄^{w₀}∉act.φ-U-orbit** (`clifford_caseA_exists_char_inertia_hc_not_fixed` は θ̄^{w₀}≠θ̄
+のみ → ∉U-orbit に強化: regular θ̄ non-constant factor、W1 q-cycle 置換、U factor 内)。
+**残 L5 = w₀ realization (m∈M) + 構築 ζ の ζ LiesOver θ₀** (ζ LiesOver ψ→θ₀、restriction 推移)。
+→ assemble hIM → hcZeta_induceHU_irreducible → conjunct c。
+
+Clifford reduction + connection commutes 完成。残=connection reduction wiring + free-orbit (深) + L5。
+
+
+## free-orbit = factor-structure inertia (Coq def_Itheta) — 深部 crux 確定 (2026-07-01)
+
+connection core (eebacf96) で hfree ⟺ θ̄^{w₀}∉U-orbit (≡ I_M(θ₀)≤HU、≡ Stab_{UW1}(θ̄)≤U) に帰着。
+これは **θ̄^{w₀}≠θ̄ より真に強い** (U が factor char に transitive だと ≠ でも ∈U-orbit になりうる)。
+
+**Coq PFsection9 def_Itheta (938-948)**: `f∈Ftheta → I_HU[theta f]=HC` を **`inertia_bigdprod_irr`
++ `inertia_irr_prime`** で証明 = **factor-structure (bigdprod) inertia 機構**。free-orbit は
+この factor inertia 論 (W1-conjugate factors {act.φ w•S₀} の bigdprod、U は各 factor 保存、
+W1 は q-cycle 置換、regular θ̄ の per-factor char が factor 跨ぎで非自明) を要する。Lean に
+inertia_bigdprod_irr 相当が無ければ新規 (substantial §9 機構)。Coq oXtheta (u·|Xtheta|=(p-1)^q) は
+counting だが conjunct c の M-level IsIrreducibleCharacter は I_M=HU を要し、現 explicit approach
+(L1-L3+connection core 完成) が直接提供 — 残 free-orbit 1 本。
+
+**propagation 完成度**: L1+L2+L3+assembly+connection commutes+connection core = 9 commits、
+hIM ⟸ θ̄^{w₀}∉U-orbit。残 = (1) **free-orbit factor inertia** (深、Coq inertia_bigdprod_irr guide) +
+(2) g→a∈U realization (wiring) + (3) L5 (w₀→m, ζ LiesOver θ₀) + assembly。free-orbit が
+research-level に深ければ Coq 熟読 → ChatGPT escalation も選択肢 ([[feedback-ask-chatgpt-for-elided-gaps]])。
+
+
+## ChatGPT consult SENT — free-orbit strategy (2026-07-01)
+
+free-orbit θ̄^{w₀}∉U-orbit (深部 crux、cleanest Lean strategy 不明) を ChatGPT Pro (model 最高)
+に送信。**tabId 1470253202** (chatgpt.com、新 chat、ログイン済 石田和 Pro)。プロンプト =
+`notes/peterfalvi/s11_freeorbit_chatgpt_prompt.md` (commit済)。質問: (a) factor-permutation/
+direct-product inertia vs (b) Frobenius-subgroup argument vs (c) cleaner; θ̄^{w₀}≠θ̄ で十分か
+"no U-conjugate is W1-fixed" が要るか; 構築時に ∉U-orbit を即時にする θ̄ の選び方; precise lemmas。
+
+**次 iteration**: `mcp__Claude_in_Chrome__get_page_text{tabId:1470253202}` で回答を回収 (Pro は
+思考 ~10min)。回答を厳密検証してから free-orbit を formalize。未了なら再 poll + 並行で wiring
+(ζ LiesOver θ₀, realization) を build。tools: ToolSearch{query:"chrome browser tab navigate page"}。
+
+
+## ChatGPT consult ANSWER (verified) — 構築 strengthen 要・lemma chain 確定 (2026-07-01)
+
+回答回収・**厳密検証済** (counterexample 具体的に正しい、Lemma A/F の証明正しい)。正本=
+`notes/peterfalvi/s11_freeorbit_chatgpt_answer.md`。**重大**: 現構築 (fact 2 = θ̄^{w₀}≠θ̄) は
+**θ̄^{w₀}∉U-orbit に不十分** (反例 C₇⋊C₃/p=29、uw₀ が θ̄ を固定しうる)。
+
+**lemma chain (formalize 対象)**:
+- **Lemma A** (semidirect stabilizer、q prime): I_G(x)≤U ⟺ x^{w₀}∉x^U。pure group theory。
+- **Lemma C** (direct-product char extensionality), **D/E** (component formula + factor-orbit
+  separation): θ̄^w∈θ̄^U ⟺ ∃u,∀i transport_w(θ_{w⁻¹i})=θ_i^u; ∃i で ∉U-orbit(θ_i) なら θ̄^w∉θ̄^U。
+- **Lemma F** (marked-factor): U-orbit-label i↦[θ_i]_U 非定数 → q-cycle (q prime) で固定不可 →
+  θ̄^{w₀}∉U-orbit。**要 ≥2 U-orbit on Irr(factor)^# = im(U→F_pˣ) proper (u<p-1)**。
+- im(U) transitive なら **exponent criterion (Lemma G)**: Δ_{w₀}(a)∉ρ(U)。u=1 なら fact 2 で十分。
+
+**redirected plan**: 現 reduction (hcZeta_inertia_ne_top_of_free, hfree 取る) は正しく構築済。
+残 = hfree (θ̄^{w₀}∉U-orbit) を **marked-factor 構築 (strengthen clifford_caseA_exists_char_not_fixed)
++ Lemma C/D/E/F chain** で discharge。**要 caseA で u<p-1 (im(U) proper) を確認** (否なら Lemma G)。
++ realization wiring (g→a) で connection core を全 g に lift。
+
+
+## free-orbit 構築: a∣p-1、marked-factor は a<p-1 要、exponent criterion が robust (2026-07-01)
+
+`CliffordCaseAData.a` (a∣p-1) = U の factor 上 action order (|im(U→F_pˣ)|=a)。U-orbit-class 数 =
+(p-1)/a。**marked-factor (Lemma F) は ≥2 class 要 = (p-1)/a≥2 = a<p-1** (a∣p-1 では保証されない;
+a=p-1 なら U transitive で marked-factor 不可)。
+
+**→ exponent-vector criterion (Lemma G) が robust path** (a 不問): θ̄ を exponents e=(e_i)∈(F_pˣ)^q
+で encode、U-action ρ(u)∈(F_pˣ)^q (factor 毎 scalar)、Δ_{w₀}(e)_i:=e_i⁻¹ e_{w₀⁻¹i}。
+θ̄^{w₀}∈U-orbit ⟺ Δ_{w₀}(e)∈ρ(U)。|ρ(U)|=a ≤ p-1 << (p-1)^q (q≥2) ゆえ大半の e で Δ_{w₀}(e)∉ρ(U)
+→ 構築時に e を選べば θ̄^{w₀}∉U-orbit。**exists_regular_char を Δ_{w₀}(e)∉ρ(U) 込で強化**。
+
+**残 build (次 iteration、深 construction)**: (1) Lemma C (direct-product char ext: χ=ψ⟺∀i factor 上等)
++ D/E (factor-orbit separation)、(2) θ̄ 構築 (Δ_{w₀}(e)∉ρ(U) or marked-factor if a<p-1 確認) →
+θ̄^{w₀}∉U-orbit = hfree、(3) g→a realization で connection core を全 g lift →
+hcZeta_inertia_ne_top_of_free → conjunct c。reduction+connection 完成済; 残=construction-side discharge。
+session 巨大 (compaction 近); 次 fire は fresh context で深 construction を engage。
+
+## ★ 重大 redirect: (9.8.c) は counting+parity であって free-orbit/exponent でない (2026-07-01)
+
+**Coq PFsection9.v `typeP_nonGalois_characters` (= Peterfalvi (9.8)) part (c) を精読** (CLAUDE.md の
+Coq-first で行間補完)。part (c) = `exists t, isIndHC 'chi_t` で `isIndHC zeta := [/\ zeta 1 = (q*u),
+zeta ∈ S_ H0C & ∃ xi linear, zeta = 'Ind xi]` — **これが我々の conjunct c そのもの** (degree qu の
+M-irreducible 𝒮(H₀C)-member)。
+
+**Coq の証明は free-orbit/exponent 構築でなく counting + parity** (PFsection9.v:1083-1107):
+- `Xtheta` = HU-level の degree-u irr chars (𝒳(H₀C) に相当)、`oXtheta: u·|Xtheta| = (p-1)^q`。
+- `Xmu` ⊆ `Xtheta` = **constant factor-data** から来る reducible-producing ζ、`|Xmu| = p-1`
+  (`mu_f i := [ffun w => if w∈W1bar then i else 0]`、`sW1_Imu`: constant data は W1-invariant)。
+- **parity dichotomy**: `Xmu ⊆ Xtheta` を `eqVproper` で2分:
+  - **proper (Xmu ⊊ Xtheta)**: ∃ s ∈ Xtheta\Xmu → `'Ind[M] 'chi_s ∈ irr M` (reducible なら mu_ に
+    入り s∈Xmu に矛盾、`cfclass_Ind_irrP`/`ResIndXmu` 経由) → degree qu witness。
+  - **equality (Xmu = Xtheta)**: `|Xtheta|=|Xmu|=p-1` → oXtheta から `u = (p-1)^{q-1}`。p odd で
+    (p-1) even ⟹ u even。だが **u は ODD** (odd-order: u=|Ū| ∣ |G| odd) ⟹ 矛盾。∴ この場合は不可能。
+- ∴ parity が強制的に proper case を選び、witness t を生む。**number-theory (ρ(U)=K) gap を完全回避**。
+
+**→ 新 plan (free-orbit/exponent route を放棄)**: conjunct c を以下で閉じる:
+1. **(A) total count `u·|𝒳(H₀C)| = (p-1)^q`** (oXtheta) — **未形式化、最大の残ピース**。bijection
+   𝒳(H₀C) ↔ regular factor-data Ftheta (|Ftheta|=(p-1)^q)、u-fold induction fiber。
+2. **(B) reducibles ⊆ 𝒳(H₀C)、count p-1**: `reducible_count_sOf_K` 既存 ✓ (Xmu 相当)。
+3. **(C) u odd**: odd-order から導出 (要 wiring)。
+4. **(D) parity**: |𝒳(H₀C)| ≥ p-1 (B) かつ等号なら u=(p-1)^{q-1} even が u-odd と矛盾 ⟹ **|𝒳(H₀C)| > p-1 厳密** ⟹ ∃ ζ ∉ reducible-set。
+5. **(E) ζ ∈ 𝒳\reducible ⟹ Ind_M(ζ) irreducible** (degree qu): cfclass 論 (reducible⟹mu_⟹矛盾)。
+
+**既存 free-orbit machinery** (hcZeta_inertia_ne_top_of_free, conjBy_eq_compHom_iff_quotient,
+Clifford conjugation reduction、~13 commits) は **green・保存** だが conjunct-c の主経路からは外れる
+(別 route として valid、機械は再利用可)。**Lemma C (char_eq_of_eq_on_factors) は commit 382b02df で
+landed** (counting route でも factor-data bijection で有用)。
+
+**次 iteration**: (A) total count の形式化に着手 (𝒳(H₀C) ↔ Ftheta bijection、|Ftheta|=(p-1)^q)。
+これが counting route の心臓。Coq PFsection9.v:956 `oXtheta` + 920-960 の `theta f`/`inj_theta`/
+`card_imset_Ind_irr` を port。session 巨大 (compaction 近)。
