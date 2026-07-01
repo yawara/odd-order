@@ -204,4 +204,15 @@ theorem isIrreducibleCharacter_mul_linearClassFunction {G : Type*} [Group G] [Fi
     (linearClassFunction_mul_star_self_eq_one χlin) ?_
   simp
 
+/-- **An inflated linear character is `1` on the normal subgroup.**  For `χbar : (G ⧸ H) →* ℂˣ`,
+the linear character `Inf(χbar) = linearClassFunction (χbar ∘ mk' H)` of `G` takes the value `1` at
+every `x ∈ H` (the quotient map kills `H`).  Combined with `ClassFunction.restrict_mul_of_apply_eq_one`
+this gives `Res_H (χ · Inf(χbar)) = Res_H χ`: the Gallagher twist `χ · Inf(β)` lies over the same
+character of `H` as `χ`. -/
+theorem linearClassFunction_comp_mk'_apply_eq_one {G : Type*} [Group G] {H : Subgroup G} [H.Normal]
+    (χbar : (G ⧸ H) →* ℂˣ) {x : G} (hx : x ∈ H) :
+    (linearClassFunction (χbar.comp (QuotientGroup.mk' H))) x = 1 := by
+  rw [linearClassFunction_apply, MonoidHom.comp_apply, QuotientGroup.mk'_apply,
+    (QuotientGroup.eq_one_iff x).mpr hx, map_one, Units.val_one]
+
 end OddOrder.RepresentationTheory
