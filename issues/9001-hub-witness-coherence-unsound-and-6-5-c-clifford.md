@@ -116,3 +116,96 @@ lane c (cont.⁴³) が「deep char frontier は 9001 shared coherence infra に
 - notes/peterfalvi/s14_maximalI.md loop⁶⁰-⁶²
 - Pf 原文: 04.8 (6.8), 04.14 (12.6/12.9/12.10)
 - hub 裁定根拠: ft_path_policy.md §0 policy 5(B)/6/7、issue 4014 (σ-theory 先例)
+
+## ⚠ lane c → HUB 応答 (cont.⁴⁴, 2026-07-02): 上記「HUB→lane c 指示」#2 の前提は誤り — レビュー要請
+
+hub 指示 (本 issue lines 85-112) は lane c に「σ-theory-dual structural (S16:166/3431/3511) を
+**lane d leaf cite で discharge 可 (coherence 不要)**」と指示したが、lane c が 3 目標すべてを frontier
+精査した結果、**この前提は verifiably 誤り**。3 目標は全て **coherence-gated な深い §13 char 残余**で、
+lane d の算術 leaf の cite だけでは discharge できない。ユーザー裁定 (2026-07-02)「hub と認識共有・レビュー」。
+
+### 目標ごとの実際の gate (file:line 検証済)
+
+1. **S16:3431 `U_cyclic_and_Q_elemAbelian`** (`IsCyclic U ∧ IsElementaryAbelian q Q`, bare sorry):
+   - **U cyclic**: Coq `PFsection13.v:194/204` (13.2.a) は `abelian U` のみ (compl2facts/compl3facts 由来)、
+     **cyclic ではない**。cyclicity は Galois/Singer 構造 (U 既約 → U↪𝔽^× cyclic) = 深い typeP_Galois
+     dichotomy 経由で、lane d の算術 bound では出ない。
+   - **Q elem abelian**: S-side dual `P_elementaryAbelian` (`S15_SAndT_Setup.lean:350`, **sorried**) は
+     Pf (11.7) `H_elementaryAbelian` (`S13_MaximalIII_IV.lean:429`, **sorried**) ← `core_structure`
+     (`S13:409`, 3 char-gated sorry) に bottom-out。coherence-gated。
+2. **S16:3511 `V_cyclic`** (bare sorry): U cyclic の dual、同じ深い char。
+3. **S16:166 `T_side_caseB_facts`** (`D=⊥ ∧ v=(q^p−1)/(q−1)`, bare sorry):
+   - **D=⊥**: S-side dual `c_eq_one` (`S15_SAndT_Setup.lean:1703`) は **sorried** (`:1720`)、docstring
+     明記「Deep §13 char/σ residual」= (13.10) 解析不等式 + (13.11) bounds + typeP_Galois + Fcore_max 要。
+   - **v-value**: **等式** = Coq (13.15) (`PFsection13.v:1014` `T_Galois := [typeP_Galois ∧ D=1 ∧
+     v=(q^p−1)/(q−1)]`、"the bulk of the proof of (13.15)")。lane d leaf は **≤ bound のみ**
+     (`TypePGaloisUBound.card_le_cyclotomicQuotient_of_faithful_fpf`)、等式ではない。route =
+     Pf (13.4) `lambda_forces_T_caseB` (`Setup:463` sorried) ← (13.3) `character_degree_analysis`
+     (`Setup:453` sorried)。
+
+### 前提ずれの根本原因
+
+lane d leaf (`TypePGaloisUBound`, issue 9000) は **算術 `u_bound` `|U|≤(p^q−1)/(p−1)`** を module 仮説
+の下で供給する。だが (a) それは **≤ bound**、σ-theory-dual 目標は **(13.15) 等式** / **(13.2.a)
+cyclicity** を要す。(b) cite 自体に **構造的 bridge** (V が Q に faithful・fpf に作用、非 Galois の
+imprimitive 分解) が要り、これは issue 9000 自身が「**lane a assembly, W₁-dependent, 未完**」と defer
+している部分。S-side `u_bound` (`Setup:352`) がまさにこの理由で今も **sorried**。
+
+### 検証済 gate 構造 (全 lane-c 構造目標)
+
+§13.2 / §13.10-15 numeric-char (→c=1/D=⊥/v) / §13.16-19 / §14 Dade cascade / §14.10 exists_MHypothesis
+は全て推移的に (i) §7 coherence (h78/tau isometry/Dade grid) = **lane b の build (本 issue)**、
+(ii) sorried numeric endpoint c_eq_one/lambda_forces_T_caseB/character_degree_analysis (解析入力
+h1/h2/h139b が coherence grid 依存) に gated。
+
+**既に構築済 (lane c 過去成果)**:
+- 純算術 core: 13.9.b (`Setup:710/1275`)、13.10 core (`:1293`)、13.11 m-bounds (`:1382/1395/1410`)、
+  13.12/15 `caseB_numeric_forces_q_three` (`:1452`) — 全 sorry-free。
+- 純群論: §13.16-17 Wielandt/Gorenstein confinement (cont.⁴⁰-⁴²) — 完了。
+- §14.11 cascade skeleton: `generic_character_bound` (`S16:2402`)、`chiRhoNormSq_psi_le_line83`
+  (`:2464`)、line83 assembly (`:3095`)、`betaM_expansion` (carrier 経由, `:2185`) — proven。
+- 残 bare-sorry endpoint `exists_MHypothesis` (14.10, `S16:4492`) は full Dade/coherence content 要。
+
+### 結論 + hub へのレビュー要請
+
+cont.⁴²/⁴³ は正しかった: **lane c の frontier は coherence-gated deep char**。hub の「cite lane d,
+coherence 不要」escape hatch は本 3 目標に適用不可。lane c の tractable な非-char 作業は枯渇。
+
+**hub にレビュー・裁定を求める**:
+1. σ-theory-dual 指示 (S16:166/3431/3511 = clean cite) の撤回/修正を確認願う。
+2. lane c の次手裁定: **(a)** lane b の coherence + numeric endpoint (c_eq_one/13.3/13.4) 完成を待つ、
+   **(b)** lane c が未 claim の coherence piece を claim して build (どれ? lane b の cluster と重複
+   リスク大)、**(c)** lane c を別クラスタへ再配分。
+- 検証根拠: notes/peterfalvi/s16_w4_char_cascade.md cont.⁴⁴。
+
+## ✅ HUB 再裁定 (2026-07-02, cron tick) — σ-theory-dual guidance 撤回 + lane c に構成的 Clifford 再配分
+
+**1. σ-theory-dual guidance を全面撤回。lane c が正しい。**
+前 tick の「HUB→lane c 指示」#2 (S16:166/3431/3511 = lane d leaf cite で discharge 可、coherence 不要) は
+**hub の誤り**。lane c の file:line 検証を hub が確認・支持: (a) lane d leaf は算術 **≤ bound**、目標は
+(13.15) **等式** / (13.2.a) **cyclicity** で別物、(b) cite に未構築の faithful-fpf 構造 bridge (issue 9000 が
+「lane a assembly 未完」と defer 済) 要、(c) cyclicity は typeP_Galois dichotomy 経由の深い char。
+**根本原因 = hub が quick grep で v-value 公式を pattern-match し、算術 bound と char equality/cyclicity を
+混同した** ([[verify-port-state-by-number-not-coq-name]] を両方向で = phantom "easy" も避ける、を hub 自身が
+守れなかった)。cont.⁴²/⁴³「lane c frontier = coherence-gated deep char」が正しい。「idle 回避」の趣旨は
+維持するが、その手段としての σ-theory-dual cite は不成立。**issue 4014 の lane d 再配分にもこの誤りを持ち込んで
+いた** (S16:166 を lane c の ungated 例に挙げた) → 同様に撤回。
+
+**2. lane c 次手 = (c) 再配分。構成的 Clifford (issue 0026) を lane b → lane c に移す。**
+lane c の cluster (γ §14-16 deep char) は最下流ゆえ on-spine ungated work が枯渇 (lane d と同型の
+cluster-off-spine、policy 7)。選択肢 (a) 待ちは STOP 条件 (a) 違反ゆえ不可。(b) の「lane b coherence と重複」は
+policy 8 で回避すべき。⟹ **lane b の plate から構成的 Clifford (issue 0026、(B)) を lane c に移管**:
+- **理由**: 構成的 Clifford (Ind_H^L θ 分解 = Isaacs 6.2/6.11 + Pf 1.7) は **coherence 非依存の generic
+  char 補題** = lane c が今すぐ ungated で build 可。consumer は lane b (12.14 M-side) と lane c (deep char) の
+  **両方** = genuine shared infra。lane b は (6.5.c)+(5.7)-S07 refactor に集中 (plate 過積載の是正)。
+- lane c は **9000 番台で issue 0026 を claim** (subsume) → `OddOrder/GroupTheory/**` or Peterfalvi §1/§6
+  shared leaf で build。lane b は cite。hub は step 1.6 で dup 監視。
+- 加えて lane c は §14-16 assembly を signature-first で skeleton 前倒し可 (宣言済 signature がある範囲)。
+
+**3. lane b への更新**: (B) 構成的 Clifford は lane c 担当に変更。lane b は (A)(A') = (6.5.c) + (5.7)-S07 に集中。
+
+**やること 更新**:
+- [x] σ-theory-dual guidance 撤回 (hub 誤り、lane c 正当)。
+- [ ] lane c: 構成的 Clifford (issue 0026) を 9000 番台 claim → build (ungated generic char)。lane b は cite。
+- [ ] lane c: §14-16 assembly を signature-first で skeleton 前倒し (宣言済 signature 範囲)。
+- [ ] lane b: (6.5.c) + (5.7)-S07 refactor に集中 (Clifford は lane c へ移管)。
