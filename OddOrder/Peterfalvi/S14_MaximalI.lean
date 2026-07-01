@@ -1752,32 +1752,109 @@ theorem sharpImage_H_subgroupOf_eq_typeIA [Finite G] {L : Subgroup G} (hyp : Hyp
     centralizerSupport_sharp_eq_of_frobenius (N := hyp.typeI.typeF.H) hfrob hyp.typeI.typeF.H_le]
   simp only [OddOrder.Peterfalvi.S08.sharpImage, OddOrder.GroupTheory.sharpSubgroup, hmap]
 
-/-- **Structural input for Peterfalvi (12.6) — Frobenius case.**
+/-- **Structural input for Peterfalvi (12.6) — TI-kernel Frobenius case (6.8)(c1).**
 
-When `L` is already Frobenius with kernel `H`, the Sibley Dade setup of (6.8) takes its
-case-(c1) (Frobenius) branch, so a `SibleyTarget` for `(τ, S, A)` is available.  Exhibiting it
-is the remaining structural obligation; once it lands, and once lane B supplies the (6.8) proof
-body of `S08.sibleySetup_is_coherent`, `frobenius_typeI_coherent` is unconditional. -/
+For the (6.8) case-(c1) route, `L` is Frobenius **and** `H^#` is a TI-subset of `G`
+(Peterfalvi (6.8)(a) requires *both*: being Frobenius is (c1), but the ambient TI-ness is a
+separate hypothesis).  Under TI, the §4 Dade datum's local subgroups vanish
+(`dade.H a = ⊥`), which is exactly the `SibleyDadeHypothesis.dade_H_eq_bot` field, so a
+`SibleyTarget` is available.
+
+**Note (2026-07-01, issue 2032):** the earlier `_hfrob`-only signature was *unsound* — the (12.16)
+witness `L` is Frobenius but its `H^#` is **not** TI in `G` (Peterfalvi (12.10): "By (12.9), `H^#` is
+not a TI-subset of `G`"), so `dade_H_eq_bot` fails there.  The `_hTI` hypothesis restores soundness;
+the witness (non-TI) is handled by the case-(b)/(c) routes of `frobenius_typeI_coherent`, not by this
+TI-only carrier. -/
 noncomputable def sibleyTarget_frobI [Fintype G] {L : Subgroup G} [Fintype ↥L]
     [Invertible (Nat.card ↥L : ℂ)] [Invertible (Nat.card G : ℂ)] (hyp : Hypothesis L)
     (_hfrob : ∃ C : Subgroup ↥L,
-      OddOrder.Isaacs.Ch06.IsFrobeniusGroup ↥L (hyp.H.subgroupOf L) C) :
+      OddOrder.Isaacs.Ch06.IsFrobeniusGroup ↥L (hyp.H.subgroupOf L) C)
+    (_hTI : OddOrder.GroupTheory.IsTISubset
+      (OddOrder.GroupTheory.sharpSubgroup hyp.typeI.typeF.H)
+      (Subgroup.normalizer (hyp.typeI.typeF.H : Set G))) :
     CoherenceWiring.SibleyTarget hyp.tau hyp.Sset hyp.A := sorry
 
-/-- **Peterfalvi (12.6)**: if `L` is already Frobenius with kernel `H`, then the
-family `S` is coherent.
+/-- **Lattice-relative `xFamily_inner`** — the (5.7) `X`-family orthonormality `⟨Xᵢ, Xⱼ⟩ = ⟨χᵢ, χⱼ⟩`
+(`Xⱼ = β − τ(χ₀ − χⱼ)`) **without a global isometry**.  `S07.xFamily_inner` (S07:472) uses the
+isometry only on the supported differences `χ₀ − χⱼ` (S07:487); this variant takes exactly that
+lattice-relative fact `hdiff`, so it applies to the Feit–Thompson **Dade** map (which is *not* a
+global `IsIntegralIsometry` — `dim CF(L) > dim CF(G)` — but *is* isometric on the `A(L)`-supported
+differences).  Identical proof, sourcing the difference inner product from `hdiff`.  This is the one
+place the (5.7) equal-degree coherence used the global isometry (issue 9001), so it is the load-bearing
+step for a Dade-compatible `frobenius_typeI_coherent_of_abelianKernel`. -/
+theorem xFamily_inner_dade {L : Subgroup G} [Fintype G] [Fintype ↥L]
+    [Invertible (Nat.card ↥L : ℂ)] [Invertible (Nat.card G : ℂ)]
+    {τ : OddOrder.Peterfalvi.S07.IntegralCharacterMap ↥L G} {n : ℕ} [NeZero n]
+    (χ : Fin n → ClassFunction ↥L ℂ) (β : ClassFunction G ℂ)
+    (hdiff : ∀ i j, ClassFunction.inner (τ (χ 0 - χ i)) (τ (χ 0 - χ j))
+      = ClassFunction.inner (χ 0 - χ i) (χ 0 - χ j))
+    (hββ : ClassFunction.inner β β = 1)
+    (hB : ∀ j, ClassFunction.inner β (τ (χ 0 - χ j)) = 1 - ClassFunction.inner (χ 0) (χ j))
+    (i j : Fin n) :
+    ClassFunction.inner (β - τ (χ 0 - χ i)) (β - τ (χ 0 - χ j))
+      = ClassFunction.inner (χ i) (χ j) := by
+  have hχ00 : ClassFunction.inner (χ 0) (χ 0) = 1 := by
+    have h := hB 0; rw [sub_self, map_zero, ClassFunction.inner_zero_right] at h
+    linear_combination h
+  have hai : ClassFunction.inner (τ (χ 0 - χ i)) β = 1 - ClassFunction.inner (χ i) (χ 0) := by
+    rw [OddOrder.RepresentationTheory.inner_conj_symm, hB i, star_sub, star_one,
+      ← OddOrder.RepresentationTheory.inner_conj_symm]
+  rw [ClassFunction.inner_sub_left, ClassFunction.inner_sub_right, ClassFunction.inner_sub_right,
+    hββ, hB j, hai, hdiff i j, ClassFunction.inner_sub_left,
+    ClassFunction.inner_sub_right, ClassFunction.inner_sub_right, hχ00]
+  ring
 
-Wired to the (6.8) capstone through the coherence-wiring bridge: given the Frobenius-case
-structural witness `sibleyTarget_frobI`, coherence is exactly (6.8).  The proof carries no
-`sorry` of its own; its gaps are `sibleyTarget_frobI` (Frobenius structure) and (6.8) (lane B). -/
-theorem frobenius_typeI_coherent [Finite G] [Fintype G]
+/-- **Peterfalvi (12.6) case (b): abelian rank-2 kernel → equal-degree coherence (5.7).**
+When `H = L_F` is abelian (Def (8.3) case (b)), every `θ ∈ Irr H` is linear, so every member
+`Ind_H^L θ ∈ S` has the same degree `[L:H]`; `S` is then coherent by (5.7), built Dade-compatibly
+via `coherentEqualDegree` (already lattice-relative) + `xFamily_inner_dade` (the global-isometry-free
+`X`-family orthonormality).  (Gap: assemble the `X`-family `β − τ(χ₀−χⱼ)` and its `hdiff`/`hB` inputs
+from `hyp.dadeData`; the `β` common image is the (5.4) `ofProjection` `X`-side — see issue 9001.) -/
+theorem frobenius_typeI_coherent_of_abelianKernel [Finite G] [Fintype G]
     (_hG : OddOrder.BG.IsMinimalSimpleOdd G) {L : Subgroup G} [Fintype ↥L]
+    [Invertible (Nat.card ↥L : ℂ)] [Invertible (Nat.card G : ℂ)]
+    (hyp : Hypothesis L)
+    (_hfrob : ∃ C : Subgroup ↥L,
+      OddOrder.Isaacs.Ch06.IsFrobeniusGroup ↥L (hyp.H.subgroupOf L) C)
+    (_hab : IsMulCommutative ↥hyp.typeI.typeF.H ∧ rank ↥hyp.typeI.typeF.H = 2) :
+    Nonempty (OddOrder.Peterfalvi.S07.IsCoherent hyp.tau hyp.Sset hyp.A) := sorry
+
+/-- **Peterfalvi (12.6) case (c): cyclic-quotient kernel → (6.5.c) coherence.**
+Def (8.3) case (c): `H` is a `p`-group and `|L/H|` divides `p − 1` (via (8.2.a)/(8.3.c)); `S` is
+coherent by (6.5.c).  (Gap: the (6.5.c) coherence producer for `|L/H| ∣ p−1` is not yet in the
+coherence library — see issue 2032 / hub issue 9001.) -/
+theorem frobenius_typeI_coherent_of_cyclicQuotient [Finite G] [Fintype G]
+    (_hG : OddOrder.BG.IsMinimalSimpleOdd G) {L : Subgroup G} [Fintype ↥L]
+    [Invertible (Nat.card ↥L : ℂ)] [Invertible (Nat.card G : ℂ)]
+    (hyp : Hypothesis L)
+    (_hfrob : ∃ C : Subgroup ↥L,
+      OddOrder.Isaacs.Ch06.IsFrobeniusGroup ↥L (hyp.H.subgroupOf L) C)
+    (_hexp : (∀ p : ℕ, p.Prime → p ∈ (Nat.card ↥hyp.typeI.typeF.H).primeFactors →
+        Monoid.exponent hyp.typeI.typeF.U ∣ p - 1) ∧
+      ∃ p : ℕ, p.Prime ∧ p ∈ (Nat.card ↥hyp.typeI.typeF.H).primeFactors ∧
+        IsCyclic ↥(OddOrder.GroupTheory.opiCoreInG {p}ᶜ hyp.typeI.typeF.H)) :
+    Nonempty (OddOrder.Peterfalvi.S07.IsCoherent hyp.tau hyp.Sset hyp.A) := sorry
+
+/-- **Peterfalvi (12.6)**: if `L` is Frobenius with kernel `H = L_F`, then `S` is coherent.
+
+The textbook proof **case-splits** on the type-I trichotomy `Definition (8.3)` (carried by
+`hyp.typeI.alternative`): (a) `H^#` TI in `G` → (6.8) (`sibleyTarget_frobI`); (b) `H` abelian rank 2
+→ equal-degree (5.7) (`frobenius_typeI_coherent_of_abelianKernel`); (c) `|L/H| ∣ p−1` → (6.5.c)
+(`frobenius_typeI_coherent_of_cyclicQuotient`).  The (12.16) witness lands in case (b) or (c)
+(Peterfalvi (12.10): its `H^#` is *not* TI), so the (6.8) route alone is insufficient — the earlier
+single-`sibleyTarget_frobI` proof was unsound (issue 2032).  This assembly carries no `sorry` of its
+own; the per-case gaps are isolated in the three delegated lemmas. -/
+theorem frobenius_typeI_coherent [Finite G] [Fintype G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {L : Subgroup G} [Fintype ↥L]
     [Invertible (Nat.card ↥L : ℂ)] [Invertible (Nat.card G : ℂ)]
     (hyp : Hypothesis L)
     (hfrob : ∃ C : Subgroup ↥L,
       OddOrder.Isaacs.Ch06.IsFrobeniusGroup ↥L (hyp.H.subgroupOf L) C) :
-    Nonempty (OddOrder.Peterfalvi.S07.IsCoherent hyp.tau hyp.Sset hyp.A) :=
-  CoherenceWiring.coherent_of_sibleyTarget (sibleyTarget_frobI hyp hfrob)
+    Nonempty (OddOrder.Peterfalvi.S07.IsCoherent hyp.tau hyp.Sset hyp.A) := by
+  rcases hyp.typeI.alternative with hTI | hab | hexp
+  · exact CoherenceWiring.coherent_of_sibleyTarget (sibleyTarget_frobI hyp hfrob hTI)
+  · exact frobenius_typeI_coherent_of_abelianKernel hG hyp hfrob hab
+  · exact frobenius_typeI_coherent_of_cyclicQuotient hG hyp hfrob hexp
 
 /-- **Frobenius realization bridge for type `F`** (the (8.2.b) consumer behind (12.10)/(12.16)).
 A type-`F` maximal `M` whose complement `U` is a **Z-group** (every Sylow subgroup cyclic) is a
