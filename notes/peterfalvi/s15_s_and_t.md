@@ -12,24 +12,24 @@
 
 **issue 0092 で lane d は S15_SAndT_Setup へ再配分** (旧 δ BG§14–16 は FT deliverable 実質完成)。
 
-### ✅ (13.9.b) / [Isaacs] Lemma 3.14 の**数論的核**を着地 (self-contained, sorry-free, `S15_SAndT_Setup.lean`)
+### ⚠ 重複回避: (13.9.b) [Is] 3.14 数論核は **lane c が並行 landing 済** (共有 infra へ集約)
 
-2026-06-29 lane-c 評価で「残る genuine work」の筆頭に挙がっていた
-**「Galois-invariant cyclotomic 元 → rational integer」橋** (∏|χ(aᵏ)|²≥1) を実証明。3 補題:
+lane d が同セッションで (13.9.b) の「Galois-invariant 代数的整数 → 有理整数」核
+(`∏‖χ(aᵏ)‖²≥1`) を S15_SAndT_Setup に実証明したが、**merge 時に lane c が同核を先に
+`OddOrder/Algebra/GaloisRationalInteger.lean` (共有 infra) へ landing 済と判明**
+(`a6a532c7`/`35c88da5`)。lane c 版 = `IsCharacter φ` + 一般 cyclic-closed Finset
+(`exists_int_prod_character_of_cyclicClosed` / `one_le_prod_normSq_character_of_cyclicClosed`)。
+lane d 版は (ZMod n)ˣ-orbit 特殊化ゆえ **冗長 → 除去** (反重複方針)。
 
-- **`apply_pow_units_ne_zero`**: 各 `χ(aᵏ)` (k∈(ZMod n)ˣ) は非零 — Galois auto `uₖ`
-  (`exists_complexRingEquiv_pow_of_rootsOfUnity`) が `χ(a)↦χ(aᵏ)` で injective。
-- **`one_le_prod_normSq_units_pow_of_apply_ne_zero`** (核): `1 ≤ ∏_{k∈(ZMod n)ˣ} ‖χ(aᵏ)‖²`。
-  P=∏χ(aᵏ) は (i) 全 ℂ-auto 固定 (`u` が factor を `k↦k·i` で置換; 鍵 = `mapRingEquiv_apply_eq_apply_pow_of_mem_ZIrr`
-  + `exists_pow_forall_rootsOfUnity`)、(ii) 代数的整数 (`isIntegral_apply_of_mem_ZIrr`) ⟹
-  **`exists_ratCast_of_forall_complexRingEquiv_eq` (S05 既存橋) + `isIntegral_rat_imp_int` で有理整数** m。
-  P≠0 ⟹ ‖P‖²=m²≥1。**未整備とされた橋は S05 に既存**だったのが決め手 (歴史的経緯の想定より軽い build)。
-- **`card_units_le_sum_normSq_units_pow_of_apply_ne_zero`** (13.9.b per-class 本文):
-  `φ(n) ≤ ∑_{k} ‖χ(aᵏ)‖²` — 核 + 既存 AM-GM `card_le_sum_of_one_le_prod`。
+- **(13.9.b) consumer は lane c 版を cite せよ**: cyclic class `{aʲ : gcd(j,orderOf a)=1}` は
+  coprime-to-|G| power closure を満たす (orderOf a | |G|) ので lane c の `hclosed` に適合。
+  λ^{τ₁} は Dade 等距の像 = ±genuine character ゆえ `‖λ^{τ₁}‖²=‖θ‖²` で `IsCharacter` 版適用可。
+- **教訓 (coordination)**: 2026-06-29 notes が「残る genuine work」の筆頭に (13.9.b) ANT 核を
+  flag → lane c/d 双方が同時着手し重複。次の flagged-but-unowned work は着手前に main log grep で
+  他レーン進行を確認する ([[cross-lane-sync-via-notes]])。
 
-⟹ (13.9.b) の cyclic-class 寄与が sorry-free reusable に。`global_character_bound` (13.9) wrapper が
-grid carrier 着地時にこれを直接 cite 可能。leaf build 3855 green、AxiomsCheck 追加 axiom 無し。
-残 16 sorry は全て grid carrier (issue 3002) / σ-structure / char cascade gated (下記 2026-06-29 参照)。
+⟹ **lane d の S15_SAndT_Setup 実 landing はこの回まだゼロ** (重複除去で相殺)。残 16 sorry は全て
+grid carrier (issue 3002) / σ-structure / char cascade gated。次手は下記 frontier 参照。
 
 ---
 
