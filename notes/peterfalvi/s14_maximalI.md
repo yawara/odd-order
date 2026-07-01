@@ -1483,3 +1483,21 @@ build で、landing すれば `frobenius_typeI_coherent` (12.6) → `witness_L_c
 sharpImage_H_subgroupOf_eq_typeIA / transport 2 件) は**一般に正しく再利用可** (typeIA=H^# は真、transport も真)
 — sibleyTarget_frobI の TI-case や case(b)/(c) build で使える。unsound なのは sibleyTarget_frobI の
 「全 Frobenius で成立」claim のみ。
+
+### loop⁶³ (2026-07-01 lane-b resume³): ✅ 3-case split 修正 landing + case b/c infra 課題特定
+
+**ユーザー裁定 (2026-07-01)**: 設計分岐・想定違反は止まって聞かず **hub 裁定 9000-issue を立てて続行** ([[feedback-file-hub-issue-dont-stop]])。→ issue 9000 起票済、続行。
+
+**landing (commit c774360d, build-green)**: `frobenius_typeI_coherent` を `hyp.typeI.alternative`
+(Def8.3 trichotomy) で **3-case split** に是正。`sibleyTarget_frobI` は `_hTI` 仮説追加で TI-case 限定
+(偽 claim 解消)。case(b)=`frobenius_typeI_coherent_of_abelianKernel` / case(c)=`..._of_cyclicQuotient`
+を scoped lemma に分離。全 sorry が真の fillable statement に (従来の偽 sibleyTarget claim 解消)。
+
+**case b/c の追加 infra 課題 (issue 9000 に追記)**:
+- **case(c)** = (6.5.c) coherence producer、S07/S08 に在庫なし → 要 build。
+- **case(b)** = `coherent_of_constant_degree` (S07:513) は `S07.Hypothesis(5.2)` の **global
+  `IsIntegralIsometry`** を要求。witness Dade map hyp.tau は dim CF(L)>dim CF(G) ゆえ global 等長でない
+  (IsCoherent が lattice-relative に weakened の理由と同じ)。⟹ **Dade-map ベースの等次数 coherence
+  producer** (`isCoherent_pair_of_differenceImage` (S07:86) の n-member 一般化) が要る。
+両者とも coherence infra の build 事項 = hub 9000 で claim 調整。次: case(b) の Dade 等次数 coherence を
+`isCoherent_pair_of_differenceImage` + retarget family から一般化して build 試行 (最 tractable)。

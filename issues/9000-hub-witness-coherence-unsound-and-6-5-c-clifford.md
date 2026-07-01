@@ -24,6 +24,14 @@ lane b (β, Pf §12/S14) が (5.5) landing 後の frontier 精査で発見した
 現状 S07/S08 に**在庫なし** (`six_five_*` は numerical contradiction のみ)。§6.5 = 汎用 coherence infra。
 → **どのレーンが build する? lane b が自 case-split の一部として build してよい? α (§10-13 char) も要する見込み?**
 
+**(A') case(b) の (5.7) route も infra 課題あり** (2026-07-01 追記): `coherent_of_constant_degree`
+(S07:513) は `S07.Hypothesis` (5.2, S07:1704) を要求し、その `tau_isometry : IsIntegralIsometry tau`
+は **global 等長** (全 CF(L))。だが witness の Dade map `hyp.tau` は dim CF(L) > dim CF(G) ゆえ
+global isometry でない (IsCoherent が lattice-relative に weakened されている理由と同じ)。⟹
+`coherent_of_constant_degree` を witness の hyp.tau に直接使えない。case(b) は **Dade-map ベースの
+等次数 coherence producer** (global isometry を要さない lattice-relative 版、`isCoherent_pair_of_differenceImage`
+(S07:86) の等次数 n-member 一般化) が要る。→ **これも coherence infra の build 事項。**
+
 **(B) 構成的 Clifford correspondence (issue 0026)** — M-side (12.14) が gated (issue 0026, notes loop⁶¹)。
 `typeI_induced_char_constituents` / `constituent_diff_support_subset_nonescaping` が
 Ind_H^L θ の構成要素分解 (Isaacs 6.2/6.11 + Pf 1.7) を要す。現状 `clifford_decomposition` は
