@@ -1697,3 +1697,13 @@ case-c で効くかが (B) の鍵 — case c は K=H が p-群ゆえ member Ind_
   ⁅K,K⁆=⊥ ゆえ SOf⁅K,K⁆=SOf⊥、hcoh が hncoh 矛盾 → engine 内で導出可) → hdvd/hcyc (_hexp の (8.3.c)+(8.2.a))
   → engine + `SsubFiltration_bot` で Coherent(Sset)=goal。
 - engine 改良案: hnonab/IsPGroup を engine 内部で導出 (Frobenius 構造を取る) すると配線が減る (未実施)。
+
+**loop⁷⁶ h56 de-risking (重要)**: h56 chain を精査。**抽象 (5.6) core `coherentDegreeSqNormBound_of_not_coherentW`
+(S08_CoherenceWeighted:635) は `S04.Hypothesis G A L` + `dadeIntegralCharacterMap hyp (fullDadeIsometryData
+hconj)` 上 — これは witness τ の形そのもの** (`hyp.tau = dadeIntegralCharacterMap hyp.dadeData.dade
+(fullDadeIsometryData hyp.hconj)`)。∴ **core は witness に直接適用可、根本 blocker なし**。h56 の作業 = core の
+~20 仮説 (χmem 列挙・mc・Dmem 分解・orthogonality・tau1・a1 等) を witness 構造から供給 (Sibley
+`sMember_degreeSumBound_of_not_coherent` (CorePart2:2912) をミラー) + wrapper 算術 (sMember_degreeSqReBound
+→ sMember_index_le_two_psi → six_two_index_bound)。case c は member 既約ゆえ mc i=1 (‖·‖=1)、Dmem は
+singleton 分解。Frobenius index=card は `IsComplement.card_right (isComplement'_def.mp hfrob.isComplement)`
+の 1 行。次: witness `sMember_degreeSumBound` 版から bottom-up に build (core の仮説供給が本体)。
