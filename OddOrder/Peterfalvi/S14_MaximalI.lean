@@ -272,6 +272,109 @@ theorem typeI_induced_char_constituents [Finite G] {L : Subgroup G} (hyp : Hypot
         OddOrder.Peterfalvi.S04.supportInSubgroup hyp.ambientA L ∪ {1}) := by
   sorry
 
+open scoped Classical in
+/-- **Odd-order Frobenius: a nontrivial induced character is a single non-real irreducible supported
+on the (normal) kernel.**  In a Frobenius group `Γ` of odd order with kernel `H`, for `θ ∈ Irr H`,
+`θ ≠ 1`, the induced `Ind_H^Γ θ` is irreducible (`isIrreducibleCharacter_induce_of_frobeniusGroup`),
+**non-real** (odd order, `not_isReal_of_ne_trivial_of_odd_card'`, `χ ≠ 1` via `⟨Ind θ, 1⟩ = 0`),
+and supported on `H` (it vanishes off the **normal** `H`, `induceSum_eq_zero_of_not_conjugatesInto`).
+Packaged as an **opaque** `ξ : Irr Γ` (with `↑ξ = Ind θ`) — stated with explicit `Fintype`/
+`Invertible` binders (not the `FiniteInduce` scope) so the coset-sum coercion stays `whnf`-cheap.
+Discharges the type-I (12.2.a) constituent structure trivially for a Frobenius `L`
+(`frobenius_typeI_induced_char_constituents`). -/
+theorem frobenius_induce_char_singleton {Γ : Type*} [Group Γ] [Fintype Γ]
+    [Invertible (Nat.card Γ : ℂ)] {H : Subgroup Γ} [H.Normal] [Fintype ↥H]
+    [Invertible (Nat.card ↥H : ℂ)] (hodd : Odd (Nat.card Γ)) {W : Subgroup Γ}
+    (hF : OddOrder.Isaacs.Ch06.IsFrobeniusGroup Γ H W)
+    (θ : IrreducibleCharacter ↥H) (hθ : θ ≠ trivialIrreducibleCharacter ↥H) :
+    ∃ ξ : IrreducibleCharacter Γ,
+      (ξ : ClassFunction Γ ℂ) = ClassFunction.induce H (θ : ClassFunction ↥H ℂ) ∧
+      ¬ ClassFunction.IsReal (ξ : ClassFunction Γ ℂ) ∧
+      (ξ : ClassFunction Γ ℂ).support ⊆ (H : Set Γ) := by
+  have hirr := isIrreducibleCharacter_induce_of_frobeniusGroup hF θ hθ
+  have hne_triv : (⟨ClassFunction.induce H (θ : ClassFunction ↥H ℂ), hirr⟩ :
+      IrreducibleCharacter Γ) ≠ trivialIrreducibleCharacter Γ := by
+    intro h
+    have hrestrict : ClassFunction.restrict H
+          (trivialIrreducibleCharacter Γ : ClassFunction Γ ℂ)
+        = (trivialIrreducibleCharacter ↥H : ClassFunction ↥H ℂ) := by
+      ext x
+      simp [ClassFunction.restrict_apply, IrreducibleCharacter.coe_trivialIrreducibleCharacter,
+        trivialClassFunction_apply]
+    have hzero : ClassFunction.inner (ClassFunction.induce H (θ : ClassFunction ↥H ℂ))
+        (trivialIrreducibleCharacter Γ : ClassFunction Γ ℂ) = 0 := by
+      rw [ClassFunction.inner_induce_eq_inner_restrict, hrestrict,
+        irreducibleCharacter_inner_eq_ite, if_neg hθ]
+    have hcf : ClassFunction.induce H (θ : ClassFunction ↥H ℂ)
+        = (trivialIrreducibleCharacter Γ : ClassFunction Γ ℂ) :=
+      congrArg (fun c : IrreducibleCharacter Γ => (c : ClassFunction Γ ℂ)) h
+    rw [hcf, irreducibleCharacter_inner_eq_ite, if_pos rfl] at hzero
+    exact one_ne_zero hzero
+  refine ⟨⟨ClassFunction.induce H (θ : ClassFunction ↥H ℂ), hirr⟩, rfl,
+    not_isReal_of_ne_trivial_of_odd_card' hodd hne_triv, ?_⟩
+  -- support: `Ind θ` vanishes off the normal `H`.
+  intro x hx
+  rw [ClassFunction.mem_support] at hx
+  by_contra hxH
+  refine hx ?_
+  have hconj : (x : Γ) ∉ ClassFunction.conjugatesInto H := by
+    rw [ClassFunction.mem_conjugatesInto]
+    rintro ⟨y, hy⟩
+    have hcm := ‹H.Normal›.conj_mem (y⁻¹ * x * y) hy y
+    have he : y * (y⁻¹ * x * y) * y⁻¹ = x := by group
+    exact hxH (he ▸ hcm)
+  rw [ClassFunction.induce_apply, ← ClassFunction.induceSum_apply,
+    ClassFunction.induceSum_eq_zero_of_not_conjugatesInto _ hconj, mul_zero]
+
+open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
+open OddOrder.Peterfalvi.S09.Cert in
+/-- **Peterfalvi (12.2.a) for a Frobenius type-I `L`** — the constituent decomposition is
+**trivial**.  When `L` is a Frobenius group with kernel `H = L_F` (e.g. the witness `L` of (12.10),
+`witness_L_frobenius`), every `χ = Ind_H^L θ ∈ S` (`θ ≠ 1`) is already **irreducible**, so its
+constituent set is the singleton `{χ}`: decomposition, equal-degree, nonemptiness immediate;
+non-realness from the odd order of `L`; support `H#` because `Ind θ` vanishes off the normal `H`.
+This discharges `typeI_induced_char_constituents` **without (8.2.c)** for the Frobenius case — the
+one the (12.16) witness-side `R(χ)`/(12.3)/(12.4) machinery actually consumes.  The heavy content is
+in `frobenius_induce_char_singleton` (clean instances); here only the `H# ⊆ supportInSubgroup` bridge
+and the singleton packaging remain. -/
+theorem frobenius_typeI_induced_char_constituents [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {L : Subgroup G} (hyp : Hypothesis L) {C : Subgroup ↥L}
+    (hfrob : OddOrder.Isaacs.Ch06.IsFrobeniusGroup ↥L ((hyp.typeI.typeF.H).subgroupOf L) C)
+    (hAH : hyp.ambientA = ((hyp.typeI.typeF.H) : Set G) \ {1})
+    {chi : ClassFunction ↥L ℂ} (hchi : chi ∈ hyp.Sset) :
+    ∃ S : Finset (IrreducibleCharacter ↥L), S.Nonempty ∧
+      chi = ∑ φ ∈ S, (φ : ClassFunction ↥L ℂ) ∧
+      (∀ φ ∈ S, ∀ φ' ∈ S, ((φ : ClassFunction ↥L ℂ) : ↥L → ℂ) 1
+        = ((φ' : ClassFunction ↥L ℂ) : ↥L → ℂ) 1) ∧
+      (∀ φ ∈ S, ¬ ClassFunction.IsReal (φ : ClassFunction ↥L ℂ)) ∧
+      (∀ φ ∈ S, (φ : ClassFunction ↥L ℂ).support ⊆
+        OddOrder.Peterfalvi.S04.supportInSubgroup hyp.ambientA L ∪ {1}) := by
+  classical
+  obtain ⟨θ, hθ_ne, rfl⟩ := hchi
+  have hodd : Odd (Nat.card ↥L) := hG.odd.of_dvd_nat (Subgroup.card_subgroup_dvd_card L)
+  haveI hKnormal : ((hyp.typeI.typeF.H).subgroupOf L).Normal := by
+    rw [hyp.typeI.typeF.H_eq]
+    exact OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_subgroupOf_normal L
+  obtain ⟨ξ, hξcoe, hξreal, hξsupp⟩ :=
+    frobenius_induce_char_singleton hodd hfrob θ hθ_ne
+  refine ⟨{ξ}, Finset.singleton_nonempty _, ?_, ?_, ?_, ?_⟩
+  · rw [Finset.sum_singleton, hξcoe]
+  · intro φ hφ φ' hφ'
+    rw [Finset.mem_singleton] at hφ hφ'
+    rw [hφ, hφ']
+  · intro φ hφ
+    rw [Finset.mem_singleton] at hφ
+    rw [hφ]; exact hξreal
+  · intro φ hφ
+    rw [Finset.mem_singleton] at hφ
+    rw [hφ]
+    intro x hx
+    by_cases hx1 : x = 1
+    · exact Or.inr hx1
+    · refine Or.inl ?_
+      have hxK : x ∈ (hyp.typeI.typeF.H).subgroupOf L := SetLike.mem_coe.mp (hξsupp hx)
+      exact (mem_supportInSubgroup_sharp_subgroupOf_iff hyp.typeI.typeF.H hAH x).mpr ⟨hxK, hx1⟩
+
 /-- **Peterfalvi (12.2.a)**: each `χ ∈ S` decomposes (multiplicity one) into irreducible
 constituents of equal degree, each non-real and supported in `A(L) ∪ {1}`.  The §12 assembly:
 unpack the type-`F` constituent structure (`typeI_induced_char_constituents`) into the genuine
@@ -3767,3 +3870,4 @@ theorem theorem88_caseB_holds [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
 
 end OddOrder.Peterfalvi.S14
 
+#print axioms OddOrder.Peterfalvi.S14.frobenius_typeI_induced_char_constituents
