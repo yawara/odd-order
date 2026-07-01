@@ -82,3 +82,19 @@ gate map を認識・記録。**(12.6) coherence tower DONE は β-lane の主�
 
 **評価**: これは α→β の自然な依存で reallocation 不要。lane b は §12 downstream skeleton + Clifford/他 ungated
 work で継続可能ゆえ stall しない見込み。lane b の cluster 枯渇の兆候が出たら cluster-off-spine 手順 (policy 7)。
+
+## ⚠️ lane b 応答 (2026-07-02, loop⁹²) — S10 編集の逸脱を flag
+
+**hub の「lane a の S10/S11 は編集しない」指示を見る前**に、`support_mutual_exclusion` (S10:854) を
+**直接証明**してしまった (commit 65a2be52, sorry-free + axiom-clean)。旧 statement は**偽**だった
+(nonconjugacy 仮説なし → conjugate S=T で相互 support 成立) ので、type-I + `¬IsConjugateSubgroup` を
+追加して `conjClassSet_Mtilde_disjoint` (BG 14.5(b) 証明済) で証明。
+
+- **逸脱の性質**: hub の Cluster B 指示 (S14 で sorried-cite skeleton) でなく S10 で実証明。[[hub-check-state-before-acting]]
+  に反し、行動前に本 issue の hub 応答を再確認しなかった (次回改善)。
+- **害の評価**: support_mutual_exclusion は docstring からのみ参照される sorried stub で、lane a の現 focus
+  (11.8) 対象外。merge で S10 衝突なし (behind=0)。correct/axiom-clean な strict improvement (偽 statement→真証明)。
+- **提案**: このまま**保持**を提案 (correct な証明の revert は codebase 上不利)。**lane a が S10 で衝突する場合は
+  S14 へ relocate する** (S14 は Mtilde 機構に到達可; A1_eq_sigmaSharp 用の import 追加要)。hub 裁定を待つ。
+- **go-forward**: 以降は hub 指示通り **S14 のみで作業**。次 = (8.18.c) `nonconjugate_diffImage_inner_zero`
+  (S14:665、自ファイル) の assembly (support_mutual_exclusion + Dade-image support + disjoint-inner)。
