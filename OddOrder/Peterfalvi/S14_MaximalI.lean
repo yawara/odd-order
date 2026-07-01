@@ -1976,6 +1976,47 @@ noncomputable def Sset_differenceImage [Finite G] {L : Subgroup G} (hyp : Hypoth
     (Sset_hasNoRealCharacters hyp hodd hfrob hχ)
     (Sset_diff_supported hyp hab hAH (Sset_closedUnderConjugate hyp hχ) hχ)
 
+open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
+/-- **Peterfalvi (5.2.e) orthogonality of witness difference images** — the
+`difference_images_orthogonal` field.  For members `φ, χ ∈ S` with `⟨φ,χ⟩ = ⟨φ,χ̄⟩ = 0`, the signed
+Dade images `(φ−φ̄)^τ`, `(χ−χ̄)^τ` are orthogonal: the conjugate-differences are `A(L)`-supported, so
+the Dade isometry (`Sset_tau_isometry_diff`) reduces the pairing to the source
+`⟨φ−φ̄, χ−χ̄⟩`, which expands to the four cross terms — all zero by orthogonality and irreducibility
+(`Sset_pairwiseOrthogonal`, `Sset_inner_self_eq_one`). -/
+theorem Sset_differenceImages_orthogonal [Finite G] {L : Subgroup G} (hyp : Hypothesis L)
+    (hodd : Odd (Nat.card ↥L)) {C : Subgroup ↥L}
+    (hfrob : OddOrder.Isaacs.Ch06.IsFrobeniusGroup ↥L ((hyp.typeI.typeF.H).subgroupOf L) C)
+    (hab : IsMulCommutative ↥hyp.typeI.typeF.H)
+    (hAH : hyp.ambientA = ((hyp.typeI.typeF.H) : Set G) \ {1})
+    {φ χ : ClassFunction ↥L ℂ} (hφ : φ ∈ hyp.Sset) (hχ : χ ∈ hyp.Sset)
+    (h1 : ClassFunction.inner φ χ = 0) (h2 : ClassFunction.inner φ χ.conj = 0) :
+    (Sset_differenceImage hyp hodd hfrob hab hAH hφ).Orthogonal
+      (Sset_differenceImage hyp hodd hfrob hab hAH hχ) := by
+  have hφc := Sset_closedUnderConjugate hyp hφ
+  have hχc := Sset_closedUnderConjugate hyp hχ
+  refine OddOrder.Peterfalvi.S07.CharacterDifferenceImage.orthogonal_of_signedDifference_inner_eq_zero
+    _ _ ?_
+  rw [← (Sset_differenceImage hyp hodd hfrob hab hAH hφ).image_conjugateDifference,
+      ← (Sset_differenceImage hyp hodd hfrob hab hAH hχ).image_conjugateDifference]
+  show ClassFunction.inner (hyp.tau (φ - φ.conj)) (hyp.tau (χ - χ.conj)) = 0
+  rw [Sset_tau_isometry_diff hyp hab hAH hφ hφc hχ hχc]
+  have hne1 : φ.conj ≠ χ := by
+    intro heq
+    have hcc : χ.conj = φ := by rw [← heq, ClassFunction.conj_conj]
+    rw [hcc, Sset_inner_self_eq_one hyp hfrob hφ] at h2
+    exact one_ne_zero h2
+  have hne2 : φ.conj ≠ χ.conj := by
+    intro heq
+    have hpc : φ = χ := by
+      have h := congrArg ClassFunction.conj heq
+      rwa [ClassFunction.conj_conj, ClassFunction.conj_conj] at h
+    rw [hpc, Sset_inner_self_eq_one hyp hfrob hχ] at h1
+    exact one_ne_zero h1
+  rw [ClassFunction.inner_sub_left, ClassFunction.inner_sub_right, ClassFunction.inner_sub_right,
+    h1, h2, Sset_pairwiseOrthogonal hyp hodd hfrob hφc hχ hne1,
+    Sset_pairwiseOrthogonal hyp hodd hfrob hφc hχc hne2]
+  ring
+
 /-- **Peterfalvi (12.6) case (b): abelian rank-2 kernel → equal-degree coherence (5.7).**
 When `H = L_F` is abelian (Def (8.3) case (b)), every `θ ∈ Irr H` is linear, so every member
 `Ind_H^L θ ∈ S` has the same degree `[L:H]`; `S` is then coherent by (5.7), built Dade-compatibly
