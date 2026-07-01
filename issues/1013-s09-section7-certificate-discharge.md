@@ -817,3 +817,39 @@ lane-b の clean な貢献 = standalone hB-producer (Hypothesis L から (7.8.b)
 (c) degree facts (d/psi_support/hdeg/hdeg_match for placed family)、(d) hagree (coh から、
 coherence_hagree_dadeMap)、(e) ν=coh.extension + hnu_isometry=coherence_extension_inner_eq_on_family、
 (f) hypothesis78OfDade 組み立て→zetaNuRhoNormSqGeOfDade→normRho/kH/e 同定。
+
+### 2026-07-01 (loop 継続⁶): ⭐⭐⭐ witness `Hypothesis78` 組み立て完成 — witness_L_hypothesis78
+
+**(12.16) hB の keystone = witness L の (7.8) 構造構成を完全 sorry-free 達成** (S14_MaximalI.lean、
+証明 body は sorry-free; 継承 sorryAx は `witness_L_coherent`=(12.6)/(12.1) 上流 gate のみ)。
+残務 map の (c)-(f) を全て discharge:
+
+`witness_L_hypothesis78 (hG) (data : RankTwoWitnessData) : ∃ hyp : Hypothesis data.L,
+  Nonempty (Hypothesis78 G (typeIA data.L hyp.typeI) data.L)`
+
+`hypothesis78OfDade` を witness L の 3 材料から組み立て:
+- **coherence** (`witness_L_coherent` の coh): ν=`coh.extension`、hnu_isometry=
+  `coherence_extension_inner_eq_on_family coh (hSmem i) (hSmem j)`、hagree=
+  `coherence_hagree_dadeMap hyp.dadeData.dade hyp.hconj coh …` (m0=1, mi=deg θ_i via
+  `irreducibleCharacter_apply_one_eq_pos_natCast`)。
+- **placed family** (`exists_witness_placed_family`): θ/ind1H/hdeg0/htriv/hinj/hcover。
+- **structural bridges** (新規 proof):
+  - hAH = `Hypothesis.typeIA_eq_sharp` (A(L)=H#)。
+  - hHnorm = subgroupOf-normality (`hKnormal.conj_mem` + `mem_subgroupOf`)。
+  - hSmem (θ_i≠1_K for i≠ind1H via hinj) ⟹ Ind θ_i∈Sset。
+  - d_i=θ_i(1)、hdeg (`induce_apply_one`+hdeg0)、hdeg_match (`induce_trivialChar_apply_eq_index`)、
+    psi_support (`induce_diff_support`+`mem_supportInSubgroup_sharp_subgroupOf_iff`)。
+
+**axiom 状態**: 自 body sorry-free。`#print axioms` の唯一の sorryAx = `witness_L_coherent`
+経由 (`frobenius_typeI_coherent`=(12.6) Frobenius coherence + `hypothesis_of_typeIData`=(12.1)
+Dade support、いずれも §7/§10 上流 gate)。`hypothesis78OfDade`/`coherence_hagree_dadeMap`/
+`exists_witness_placed_family` は全 axiom-clean。CLAUDE.md「signature 正なら sorried 上流を
+cite して下流実証明」に合致。full build 3889 green (~63s)。
+
+**残 = hB 不等式の産出** (次増分): witness_L_hypothesis78 の bridge を再利用し、
+(7.8.b) 固有入力 4 つを追加 → `zetaNuRhoNormSqGeOfDade` で `1-e/kH ≤ normRho` を産出:
+- **hζ0norm** `⟨Ind θ_0, Ind θ_0⟩=1` (Ind θ_0=χ_dist 既約; L=H⋊U Frobenius ゆえ nontrivial θ の誘導は既約)。
+- **hzeta0nu** `⟨ν(Ind θ_0), constOne⟩=0` (coherent 像は 1_G に直交; §7 coherence orthogonality)。
+- **a/ha** `exists_betaDecomp_a` (hdiffZ: Ind θ_{ind1H}−Ind θ_0∈ZIrr L、hζ0nuZ: ν(Ind θ_0)∈ZIrr G)。
+- **hsmall** `H78.smallIndex` (index smallness; def 要確認)。
+その後 hC ((7.3)+(8.17))・他 field と合わせ `exists_counterexample_dade_data` (S14:2779 sorry)。
