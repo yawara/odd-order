@@ -542,3 +542,55 @@ full-coh `tau_zeta_sub_conj_eq_tau1` の SHC 版。**SHC (5.3.b) の必須 ingre
 (a=SHC.ext λ, b=SHC.ext λ̄, s=ω^σ) + orthonormal API (norm1/pairwise0 ✅) + 本 bridge +
 coh-free `tau_zeta_sub_conj_vanishes_on_typePV`/sigmaNC≤2 (tau1_zeta_vanishes の SHC 複製)。
 これで (11.8.5) a=0 が組める。(11.8.6) は S₂ coherence (§14-gated) 残。
+
+## 2026-07-02 cont.²⁹ (lane-a) — 🎯 SHC (5.3.b) LANDED — `⟨ω^σ, ζ^{τ₁}⟩=0` (11.8.5 a=0 の core)
+**`Hypothesis.SHC_extension_inner_alignedOmegaSigma_eq_zero`** landed (S12, leaf green):
+`⟨SHC.extension ζ, alignedOmegaSigmaGrid i j⟩=0` (ζ∈S(HC) degree-w₁ 既約)。
+`tau1_zeta_vanishes_on_typePV` の中間 (vanishing-on-V の手前) を SHC に port:
+- `exists_alignedOmegaSigmaGrid_chiFam_family` で ω_{ij}^σ=chiFam(P j) (同一 tic/canonicalFullDadeApp)。
+- 差 ζ^{τ₁}−ζ̄^{τ₁}=(ζ−ζ̄)^τ (cont.²⁸ bridge) の σ-coeff は sigmaNC≤2<min(w₁,w₂) (各 norm-1 で ≤1、
+  `ncard_inner_chiFam_ne_zero_le_one`) ⟹ `sigmaCoeff_eq_zero_of_sigmaNC_lt` で ⟨差,χ_{P j}⟩=0。
+- `inner_left_eq_zero_of_inner_sub_eq_zero` (orthonormal API: norm1/pairwise0) で ⟨ζ^{τ₁},χ_{P j}⟩=0。
+transitive sorryAx は SHC/muGrid 経由 (genuine deferred)。
+
+**これで (11.8.5) a=0 の (5.3.b) 依存が解消**。残 a=0 pieces:
+- (11.8.2) α^τ 分解 `α_{ij}^τ = X − nζ^{τ₁} + a∑λ^{τ₁}` (X⊥S₁^{τ₁}, a∈{0,1,2}) — projection + norm。
+- τ-isometry reduction `((μ_0−ζ)^τ,α_{ij}^τ)=(μ_0−ζ,α_{ij})=−1+n` → `a=(∑ω^σ,β)`。
+- β real ⟹ a even、+ (5.3.b) ⟹ a=0。
+**次 iteration = (11.8.2) 分解 or a=(∑ω^σ,β) の isometry reduction を組む** (5.3.b 済で a=0 に王手)。
+
+## 2026-07-02 cont.³⁰ (lane-a) — 📄 MISSING PAGE 復元: (11.8.2)-(11.8.6) 完全 proof (PDF p.66-67)
+04.13 mmd の `[MISSING_PAGE_FAIL:3]` (= 11.8.2-11.8.4) を PDF `04.13...pdf` p.66-67 から復元
+([[nougat-missing-page-recovery]])。**(11.8) 完全 proof roadmap 確定**:
+
+**(11.8.1)** d=u,δ=1,n=|S₁|=(u−1)/q。μ_j(1)=qu (9.8/9.9)→d=μ_{ij}(1)=u。(U/C)⋊W₁ Frobenius→u≡1 mod q→δ=1,n=(u−1)/q。
+
+**(11.8.2)** α_{ij}^τ = X − nζ^{τ₁} + a∑_{λ∈S₁}λ^{τ₁}, X∈ℤ[Irr G]⊥S₁^{τ₁}, a∈{0,1,2}; a=0 or 2 ⟹ X=ω_{ij}^σ−ω_{i0}^σ。
+proof: λ∈S₁,λ≠ζ で (α_{ij}^τ,(ζ−λ)^τ)=(α_{ij},ζ−λ)=−n [isometry+source]。∴ ∃a∈ℤ,X⊥S₁^{τ₁} で分解。
+norm: **(a−n)²+(|S₁|−1)a² = ‖−nζ^{τ₁}+a∑λ^{τ₁}‖² ≤ ‖α_{ij}^τ‖²=n²+2**。→ |S₁|a²−2an≤2 → n(a²−2a)≤2 (11.8.1) → 0≤a≤2。
+a=0 or 2 → ‖−nζ^{τ₁}+a∑λ^{τ₁}‖²=n² → ‖X‖²=2 → (10.5 と同様) X=ω_{ij}^σ−ω_{i0}^σ。
+
+**(11.8.3)** β=α_{ij}^τ−(ω_{ij}^σ−ω_{i0}^σ)+nζ^{τ₁} は i,j 独立 (j≠0)、real。
+proof: (α_{ij}−α_{ik})^τ=(μ_{ij}−μ_{ik})^τ=ω_{ij}^σ−ω_{ik}^σ [(4.8)] → β_{ij} j 独立。
+(α_{ij}−α_{0j})^τ=ω_{ij}^σ−ω_{i0}^σ−ω_{0j}^σ+ω_{00}^σ [(4.10)] → β_{ij}=β_{0j} i,j 独立。real: β̄_{0j}=β_{0k}=β [(3.9.a),(4.3.b),(5.9)、ω̄_{0j}=ω_{0k}]。
+
+**(11.8.4)** [背理法: residual⊥(Irr W)^σ 仮定下] (μ_0−ζ)^τ=∑_{0≤i<q}ω_{i0}^σ−ζ^{τ₁} と仮定してよい。
+proof: (μ_0−ζ)^τ=∑ω_{i0}^σ−χ と置く。‖χ‖²=‖μ_0−ζ‖²−q=1。((μ_0−ζ)^τ,(ζ̄−ζ)^τ) 考察 → χ=ζ^{τ₁} or −ζ̄^{τ₁}。
+|S₁|>2,λ∈S₁−{ζ,ζ̄} で ((μ_0−ζ)^τ,(λ−ζ)^τ)=1 → χ=ζ^{τ₁}。|S₁|=2,χ=−ζ̄^{τ₁} なら ζ^{τ₁},ζ̄^{τ₁} を −ζ̄^{τ₁},−ζ^{τ₁} に置換。
+
+**(11.8.5)** a=0。((μ_0−ζ)^τ,α_{ij}^τ)=(∑ω_{r0}^σ−ζ^{τ₁}, β+ω_{ij}^σ−ω_{i0}^σ−nζ^{τ₁})=(∑ω_{r0}^σ,β)−1−a+n。
+(μ_0−ζ,α_{ij})=(∑μ_{r0}−ζ,μ_{ij}−μ_{i0}−nζ)=−1+n。isometry で等置 → a=(∑ω_{r0}^σ,β)。
+(β,1_G)=(α_{ij}^τ,1_G)=(α_{ij},1_M)=0 (i≠0)。β real → a even。(11.8.2) → X=ω^σ diff → β=a∑λ^{τ₁}。
+(5.3.b) → a=(∑ω_{r0}^σ,β)=0。 ✅ **(5.3.b)=cont.²⁹ landed**。
+
+**(11.8.6)** [結論] α_{ij}^τ=ω_{ij}^σ−ω_{i0}^σ−nζ^{τ₁} (∀i, by 11.8.2+11.8.5)。→ (μ_j−dζ)^τ=∑_iω_{ij}^σ−dζ^{τ₁}。
+S₂=S(C)−S(HC)。(9.11)→S₂ coherent (11.7)、μ_k∈S₂ (9.8.b/9.9.b)。τ₂ extends τ to ℤ[S₂]。(5.3.b)+(5.5)→S₁^{τ₁}⊥S₂^{τ₂}。
+(μ_j−dζ)^τ=μ_j^{τ₂}−dζ^{τ₁} なら S(C)=S₁∪S₂ coherent → (11.3) 矛盾。∴ μ_j^{τ₂}=∑_iω_{ij}^σ を示せば十分 [(4.9)/(5.8)]。
+**⚠ (11.8.6) は S₂ coherence=(9.11)=§14/lane-b gated**。
+
+### 攻略順 (次 iteration〜、ungated 部)
+1. **(11.8.2)** 分解+norm (最大): source inner (α_{ij},ζ−λ)=−n / ‖α^τ‖²=2+n² (✅) + orthonormal projection + a∈{0,2}→X=ω^σ diff。
+2. **(11.8.3)** β 独立+real: (4.8)/(4.10) 系 + (3.9.a)/(4.3.b)/(5.9)。
+3. **(11.8.4)** residual 仮定→(μ_0−ζ)^τ 形: norm+isometry。
+4. **(11.8.5)** a=0: 1-3 + (5.3.b ✅) + source inner (μ_0−ζ,α_{ij})=−1+n + (β,1_G)=0。
+5. **(11.8.6)** = §14-gated (S₂), 前倒し skeleton 可。
