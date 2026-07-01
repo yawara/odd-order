@@ -856,3 +856,18 @@ M側 = ⟨μ₀−ζ, α_{ij}⟩ (Dade τ isometry) = μ inner products。等値
 (11.8.4) hypothesis (μ₀−ζ)^τ=∑ω_{r0}^σ−ζ^{τ₁} の下で G-side を分解式 (cont.⁴⁶) + 5.3.b/orthonormal で
 展開 → n−δ と等値 → a=0。⚠ (11.8.4) は by-contra 仮定なので (11.8.5) は仮定パラメータ化 or by-contra 内で。
 (11.8) closure は依然 doubly-gated (§9↔§10 の (11.8.1)、§14 の (11.8.6))。
+
+## 2026-07-02 cont.⁴⁸ (lane-a) — **(11.8.5) M-side → Dade image transport LANDED**
+2 lemma landed (S12, leaf green, both sorry-free):
+1. **`zeroColumnSum_sub_zeta_support`**: `(∑_{i'}μ_{i'0} − ζ).support ⊆ A0`。= `muColumn_sub_conj_support`
+   (3720) の k=0/d=1/ζ (not ζ̄) 版 mirror。μ₀, ζ とも M'-induced で M' 外消滅、(μ₀−ζ)(1)=w₁−w₁=0 → M'^#⊆A0。
+   ⚠ `open scoped FiniteInduce in` 要 (∑ ClassFunction の apply に Fintype ↥M)。
+2. **`muGridAlpha_tau_inner_zeroColumnSum_sub_zeta`**: `⟨α^τ, (μ₀−ζ)^τ⟩ = n−δ`。= `tau_inner_eq_of_supported`
+   (Dade isometry、α supported=`muGrid_alpha_support`, μ₀−ζ supported=lemma 1) で M-side (cont.⁴⁷ の
+   `muGridAlpha_inner_zeroColumnSum_sub_zeta`=n−δ) を G-level に transport。3 行 (`muGridAlpha_tau_inner_muColumn_sub_conj` 3783 と同型)。
+
+**次 = (11.8.5) 完成 (a=0)**: by-contra 仮定 (11.8.4) `(μ₀−ζ)^τ=∑ω_{r0}^σ−ζ^{τ₁}` を本 τ-transport に代入
+→ `⟨α^τ, ∑ω_{r0}^σ−ζ^{τ₁}⟩ = n−δ`。G-side を分解式 (α^τ=δ(ω^σ diff)−nζ^{τ₁}+a∑β, a∈{0,2}, cont.⁴⁵/⁴⁶) +
+`alignedOmegaSigmaGrid_inner` (ω orthonormal) + `SHC_extension_inner_alignedOmegaSigma_eq_zero` (5.3.b,
+⟨ω^σ,ζ^{τ₁}⟩=⟨ω^σ,β⟩=0) で展開 → n−δ−a → 等値で a=0。a=1 除外は β real (11.8.3, 別途)。
+(11.8) closure は依然 doubly-gated (§9↔§10 の (11.8.1)、§14 の (11.8.6))。

@@ -3769,6 +3769,83 @@ theorem Hypothesis.muColumn_sub_conj_support [Finite G] (hG : OddOrder.BG.IsMini
     Subgroup.mem_centralizer_singleton_iff.mpr rfl⟩
 
 open scoped FiniteInduce in
+/-- **`∑_{i'} μ_{i'0} − ζ` is `A_0`-supported** (Peterfalvi (11.8.5)).  The column-`0` sum `μ₀` and the
+degree-`w₁` irreducible `ζ` are both induced from the normal `M' = [M,M]`, so both vanish off `M'`;
+and `(μ₀ − ζ)(1) = w₁·1 − w₁ = 0`, so the support lies in `M'^# ⊆ A_0`.  Companion of
+`muColumn_sub_conj_support` with `k = 0`, `d = 1` and `ζ` in place of `ζ̄`, used to transport the
+(11.8.5) `M`-side inner product `(α_{ij}, μ₀ − ζ)` to the Dade image via `tau_inner_eq_of_supported`. -/
+theorem Hypothesis.zeroColumnSum_sub_zeta_support [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    {M : Subgroup G} (hyp : Hypothesis M) (hodd : Odd (Nat.card G))
+    {ζ : ClassFunction ↥M ℂ} (hζS : ζ ∈ inducedFamily M) (hζirr : IsIrreducibleCharacter ζ)
+    (hζ1 : ζ 1 = (hyp.w1 : ℂ)) :
+    ((∑ i : Fin hyp.w1, hyp.muGrid hG hodd i 0) - ζ).support ⊆ hyp.A0 := by
+  haveI := hyp.finiteG
+  classical
+  obtain ⟨θ, _hθne, hζeq⟩ := hζS
+  have hKcomm : (derivedInG M).subgroupOf M = commutator ↥M := by
+    rw [derivedInG, Subgroup.subgroupOf, Subgroup.comap_map_eq_self_of_injective M.subtype_injective]
+  haveI hKnormal : ((derivedInG M).subgroupOf M).Normal := by rw [hKcomm]; infer_instance
+  have hζvanish : ∀ {w : ↥M}, w ∉ (derivedInG M).subgroupOf M → ζ w = 0 := fun {w} hw => by
+    rw [hζeq]; exact ClassFunction.induce_eq_zero_of_not_mem_normal _ hw
+  have hsumapply : ∀ (w : ↥M), (∑ i : Fin hyp.w1, hyp.muGrid hG hodd i 0) w
+      = ∑ i : Fin hyp.w1, hyp.muGrid hG hodd i 0 w := by
+    intro w
+    refine Finset.univ.induction_on (motive := fun s =>
+      (∑ i ∈ s, hyp.muGrid hG hodd i 0) w = ∑ i ∈ s, hyp.muGrid hG hodd i 0 w) ?_ ?_
+    · simp
+    · intro a s ha ih
+      rw [Finset.sum_insert ha, Finset.sum_insert ha, ClassFunction.add_apply, ih]
+  intro z hz
+  rw [ClassFunction.mem_support] at hz
+  have hzK : z ∈ (derivedInG M).subgroupOf M := by
+    by_contra hzK
+    apply hz
+    rw [ClassFunction.sub_apply,
+      hyp.muGrid_column_sum_vanishes_off_derived hG hodd 0 hzK, hζvanish hzK, sub_zero]
+  have hz1 : z ≠ 1 := by
+    rintro rfl
+    apply hz
+    rw [ClassFunction.sub_apply, hζ1, hsumapply 1,
+      Finset.sum_congr rfl (fun i _ => hyp.muGrid_zero_column_apply_one hG hodd i),
+      Finset.sum_const, Finset.card_univ, Fintype.card_fin, nsmul_eq_mul, mul_one]
+    ring
+  have hzM' : (z : G) ∈ derivedInG M := Subgroup.mem_subgroupOf.mp hzK
+  show (z : G) ∈ typePA0 M hyp.typeP
+  unfold typePA0
+  rw [Set.mem_union]
+  left
+  exact ⟨hzM', fun h0 => hz1 (Subtype.ext h0), (z : G),
+    ⟨z.2, fun h0 => hz1 (Subtype.ext (Set.mem_singleton_iff.mp h0))⟩,
+    Subgroup.mem_centralizer_singleton_iff.mpr rfl⟩
+
+open scoped FiniteInduce in
+/-- **Peterfalvi (11.8.5), `M`-side transferred to the Dade image** `(α_{ij}^τ, (μ₀ − ζ)^τ) = n − δ`,
+where `μ₀ = ∑_{i'} μ_{i'0}`.  Both `α_{ij}` (`muGrid_alpha_support`) and `μ₀ − ζ`
+(`zeroColumnSum_sub_zeta_support`) are `A_0`-supported, so the Dade isometry `τ` preserves their inner
+product (`tau_inner_eq_of_supported`), and the `M`-side value is `n − δ`
+(`muGridAlpha_inner_zeroColumnSum_sub_zeta`).  Under the (11.8.4) by-contradiction hypothesis
+`(μ₀ − ζ)^τ = ∑ ω_{r0}^σ − ζ^{τ₁}`, this becomes `(α_{ij}^τ, ∑ ω_{r0}^σ − ζ^{τ₁}) = n − δ`, whose
+`G`-side expansion (via the residual decomposition `α_{ij}^τ = δ(ω^σ diff) − nζ^{τ₁} + a∑β`) equals
+`n − δ − a`, forcing `a = 0`. -/
+theorem Hypothesis.muGridAlpha_tau_inner_zeroColumnSum_sub_zeta [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} [Invertible (Nat.card ↥M : ℂ)]
+    (hyp : Hypothesis M) (hodd : Odd (Nat.card G)) (i : Fin hyp.w1) {j : Fin hyp.w2} (hj0 : j ≠ 0)
+    {ζ : ClassFunction ↥M ℂ} (hζS : ζ ∈ inducedFamily M) (hζirr : IsIrreducibleCharacter ζ)
+    (hζ1 : ζ 1 = (hyp.w1 : ℂ)) {d : ℕ} {δ : ℤ} {n : ℕ}
+    (hdeg : hyp.muGrid hG hodd i j 1 = (d : ℂ)) (hμ0 : hyp.muGrid hG hodd i 0 1 = 1)
+    (hnf : (n : ℤ) * (hyp.w1 : ℤ) = (d : ℤ) - δ) (hδj : hyp.muColumnSign hG hodd j = δ)
+    (hdζ : hyp.muGrid hG hodd i j 1 ≠ ζ 1) (h0ζ : hyp.muGrid hG hodd i 0 1 ≠ ζ 1) :
+    ClassFunction.inner
+        (hyp.tau (hyp.muGrid hG hodd i j - (δ : ℂ) • hyp.muGrid hG hodd i 0 - (n : ℂ) • ζ))
+        (hyp.tau ((∑ i' : Fin hyp.w1, hyp.muGrid hG hodd i' 0) - ζ)) = (n : ℂ) - (δ : ℂ) := by
+  haveI := hyp.finiteG
+  classical
+  have hαsupp := hyp.muGrid_alpha_support hG hodd hj0 hζS hdeg hμ0 hζ1 hnf hδj
+  have hμsupp := hyp.zeroColumnSum_sub_zeta_support hG hodd hζS hζirr hζ1
+  rw [hyp.tau_inner_eq_of_supported hαsupp hμsupp]
+  exact hyp.muGridAlpha_inner_zeroColumnSum_sub_zeta hG hodd i j hj0 hζirr hζ1 hdζ h0ζ
+
+open scoped FiniteInduce in
 /-- **Peterfalvi (10.5), `(α_{ij}^τ, (μ_k − dζ̄)^τ) = 0`** (`0 < k < w₂`, `k ≠ j`): the Dade-image
 inner product, transferred to the `M`-side.  Both `α_{ij}` (`muGrid_alpha_support`) and `μ_k − dζ̄`
 (`muColumn_sub_conj_support`) are `A_0`-supported, so the Dade isometry `τ` preserves their inner
