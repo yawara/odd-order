@@ -1915,3 +1915,66 @@ exists_regular_not_reducible_of_odd (oXtheta+u odd) → hIM → hcZeta_exists_ir
 **⚠ 判断分岐**: (1)-(3) の general-Clifford (restriction/lies-over 推移性 + inertia 包含) は Clifford.lean
 上流に置くべき shared infra だが、まず S11 local で build → 動作後に上流移動を検討 (claim-before-build)。
 step 2 (regularity crux) 完成後の最後の assembly ゆえ、深いが grindable。
+
+## step 5 assembly 完成 (2026-07-02 cont.¹⁸) — reducible ζ = Ind_{HC}(hcPsi θbar) landed
+
+**landed (全 axiom-clean [propext, Classical.choice, Quot.sound]、commit `<this>`)**:
+- **`caseA_reducible_eq_hcZeta`** (S11): reducible (M-fixed) ζ∈𝒳(H₀C) が seed inflation θ₀ に over
+  (θbar regular ≠1) ⟹ **ζ = Ind_{HC}^{HU}(hcPsi θbar)**。step-5 (a)-(g) chain を collapse。
+  - **重要な簡約**: plan の step 3 (inertia(ψ')=HC 独立計算) と step 4 (ψ' linear) は **bypass**。
+    Ind_{HC}(hcPsi θbar) の既約性は `hcZeta_irreducible` + foundation
+    `caseA_reducible_inflation_inertia_eq` (I_{HU}(θ₀)=HC) から出る (ψ' の inertia を独立計算しない)。
+    ψ' linear は `exists_hcPsi_eq_of_hcHom_ker_subset` が H̄ abelian から自動導出 (step (e)/(f) subsumed)。
+  - chain: `exists_liesOver_intermediate` (lies-over 推移) → HC-constituent ψ' (ζ over ψ' ∧ ψ' over θ₀')
+    → ζ trivial on H₀C=Ker hcHom を `liesOver_mem_characterKernel` で descend (Ker hcHom⊆Ker ψ')
+    → ψ'=hcPsi θbar'' (`exists_hcPsi_eq_of_hcHom_ker_subset`) → ψ' linear ⟹ Res single irr で seed
+    identification θbar''=θbar → `coe_eq_induce_of_liesOver_...` で ζ=Ind_{HC}(hcPsi θbar)。
+- **supporting general lemmas** (reusable): `hcPsi_restrict_hInHu_subgroupOf` (hcPsi θ の hInHu.subgroupOf HC
+  制限 = transported seed inflation、subgroupOf 版 hcPsi_apply_inclusion); `eq_of_liesOver_of_restrict_eq_irr`
+  (χ over θ + Res χ=irr η ⟹ η=θ、Clifford 直交); `hcPsi_seed_eq_of_restrict_eq` (hInHu-制限が seed を決定)。
+- step 5 (g) `exists_hcPsi_eq_of_hcHom_ker_subset` の壊れた uncommitted work も修正 landed (coercion 明示化)。
+
+### 次の frontier = 抽出 (extraction) — conjunct 2 (9.8.b) と conjunct 3 (9.8.c) 共通の上流
+`caseA_character_counts` (S11:5560) 現状: conjunct 1 (reducible count=p-1) = **proven**
+(`reducible_count_sOf_H0`)。conjunct 2/3/4 = sorry (5573-5575)。上流優先+文書順 ⟹ 次は **extraction**:
+
+- **共通上流 (要 build)**: **reducible φ∈𝒮(H₀) → M-fixed HU-constituent ζ∈𝒳(H₀C) over θ₀ regular ∧
+  φ=Ind_{HU}^M ζ**。これが得られれば:
+  - **conjunct 2 (9.8.b 後半)**: φ=Ind_{HU}^M(Ind_{HC}(hcPsi θbar)) (caseA_reducible_eq_hcZeta) ⟹
+    degree qu (`hcZeta_induceHU_apply_one`) ∧ ∈𝒮(H₀C) (`hcZeta_induceHU_mem_sOf`)。
+  - **conjunct 3 (9.8.c)**: |Xmu|=p-1 (extraction で reducible↔Xmu bijection + `caseA_induceHU_inj_of_reducible`
+    injective + reducible_count) → `exists_regular_not_reducible_of_odd` (oXtheta_count u·|Xθ|=(p-1)^q + u_odd)
+    → 非 M-fixed regular θ (hIM) → `hcZeta_exists_irreducible_sOf` (7258) → conjunct 3。
+- **要確認 infra**: reducible φ → HU-source ζ (φ=Ind_{HU}^M ζ、Clifford at HU/M level); ζ∈𝒳(H₀C) ∧
+  ζ over θ₀ regular の抽出 (caseA 版 `caseB_exists_chiefFactorConstituent` 相当が要るか grep)。
+  `inertia_eq_top_of_induceHU_not_irreducible` (5009: reducible⟹M-fixed)、`caseA_induceHU_inj_of_reducible`
+  (5033) は landed。
+
+## conjunct (b) 完成 + (c) plan (2026-07-02 cont.¹⁹)
+
+**landed (commits, 全 axiom-clean)**:
+- **`caseA_reducible_induceHU_apply_one_eq_qu`**: reducible φ∈𝒮(H₀) は degree qu (9.8.b degree)。
+  step-5 assembly の初 consumer。extraction (`exists_hom_constituent_of_mem_xiSet_H0`) + C-kernel
+  (`reducible_mem_sOf_H0C` cardinality + `caseA_induceHU_inj_of_reducible`) + `caseA_reducible_eq_hcZeta`
+  + `hcZeta_induceHU_apply_one`。
+- **`caseA_character_counts` conjunct (b) 完成** + 末尾へ relocate (step-5 machinery を cite するため;
+  コード comment 6337 が既に予告)。(b) = count (`reducible_count_sOf_H0`) + degree (上記) + membership
+  (`reducible_mem_sOf_H0C`)。conjunct (c)/(d) は sorry (S11:8143/8144)。
+
+**次 = conjunct (c) = 9.8.c: |Xmu|=p-1 Finset bijection assembly**:
+- **Xθ** (`oXtheta_count` 内) = `RegF.image (fun θ => Ind_{HC}(hcPsi θ))` (RegF={θ regular})。
+  `u·|Xθ|=(p-1)^q` (`oXtheta_count`)。
+- **Xmu** := `Xθ.filter (fun ζ => ¬irr (induceHU ζ))`。
+- **|Xmu|=p-1 の証明** (cleanest, Set/Finset bridge):
+  1. `↑(Xmu.image (induceHU data)) = {φ∈𝒮(H₀)|¬irr}` (Set 等式)。⊆: ζ∈Xmu ⟹ induceHU ζ ∈𝒮(H₀)
+     (ζ∈Xθ ⟹ ⟨ζ,hcZeta_irreducible⟩∈xiOf(H0)=hcZeta_mem_xiOf) ∧ reducible。⊇: reducible φ ⟹
+     source χ = Ind_{HC}(hcPsi θbar) (extraction+`caseA_reducible_eq_hcZeta`), θbar regular
+     (`caseA_reducible_theta_regular`) ⟹ χ∈Xθ ∧ reducible ⟹ χ∈Xmu、φ=induceHU χ。
+  2. `Xmu.card = (Xmu.image induceHU).card` (`Finset.card_image_of_injOn`、`caseA_induceHU_inj_of_reducible`)。
+  3. `= ncard {reducibles} = p-1` (`Set.ncard_coe_Finset` + `reducible_count_sOf_H0`)。
+- **conjunct (c) 組立**: `exists_regular_not_reducible_of_odd` (X=Xθ, |Xmu|=p-1, u·|Xθ|=(p-1)^q,
+  `u_odd`, p-1 even, q≥2) → ζ∈Xθ\Xmu (Ind_{HU}^M ζ **irreducible** 直接)。ζ=Ind_{HC}(hcPsi θ)
+  (θ∈RegF regular⟹θ≠1) ⟹ witness = induceHU ζ ∈𝒮(H₀C) (`hcZeta_induceHU_mem_sOf`)、irreducible
+  (ζ∉Xmu 直接、hIM 経由不要)、degree qu (`hcZeta_induceHU_apply_one`)。
+- **共有 helper 案** `caseA_reducible_source_eq_hcZeta`: reducible φ∈𝒮(H₀) ⟹ ∃θbar regular,
+  φ=induceHU(Ind_{HC}(hcPsi θbar))。degree lemma と Xmu 全射の両方が使う extraction+C-kernel+eq_hcZeta。
