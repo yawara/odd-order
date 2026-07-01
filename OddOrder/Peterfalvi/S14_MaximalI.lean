@@ -2223,6 +2223,127 @@ theorem Sset_breakPair_fields [Finite G] {L : Subgroup G} (hyp : Hypothesis L)
 
 open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
 open OddOrder.Peterfalvi.S09.Cert in
+/-- **Peterfalvi (6.2) member-family degree-sum bound over the witness `τ`** — the witness analogue
+of the Sibley `sMember_degreeSumBound_of_not_coherent`, feeding the (5.6) core
+`coherentDegreeSumBound_of_not_coherent` (over `hyp.dadeData.dade`, the same Dade datum as
+`hyp.tau`).  Assembled from the six witness member-family helpers + the abstract §7 generation
+bridges.  If `S₁` (coherent, containing a degree-`|L:K|` anchor `χ₁`) breaks against `{ψ, ψ̄}`, then
+`∑ⱼ degⱼ² ≤ 2a` where `χmemⱼ(1) = degⱼ·χ₁(1)`, `ψ(1) = a·χ₁(1)`. -/
+theorem Sset_degreeSumBound_of_not_coherent [Finite G] {L : Subgroup G} (hyp : Hypothesis L)
+    (hodd : Odd (Nat.card ↥L)) {C : Subgroup ↥L}
+    (hfrob : OddOrder.Isaacs.Ch06.IsFrobeniusGroup ↥L ((hyp.typeI.typeF.H).subgroupOf L) C)
+    (hAH : hyp.ambientA = ((hyp.typeI.typeF.H) : Set G) \ {1})
+    {S₁ : Set (ClassFunction ↥L ℂ)} (hS₁sub : S₁ ⊆ hyp.Sset)
+    (hS₁conj : OddOrder.Peterfalvi.S03.ClosedUnderConjugate S₁) (hS₁fin : S₁.Finite)
+    (hS₁coh : OddOrder.Peterfalvi.S07.IsCoherent hyp.tau S₁ hyp.A)
+    {χ₁ : ClassFunction ↥L ℂ} (hχ₁S₁ : χ₁ ∈ S₁)
+    (hχ₁deg : χ₁ 1 = (((hyp.typeI.typeF.H).subgroupOf L).index : ℂ))
+    {ψ : ClassFunction ↥L ℂ} (hψS : ψ ∈ hyp.Sset) (hψirr : IsIrreducibleCharacter ψ)
+    (hψnotS1 : ψ ∉ S₁) (hψcnotS1 : ψ.conj ∉ S₁)
+    (hnc : ¬ Nonempty (OddOrder.Peterfalvi.S07.IsCoherent hyp.tau (S₁ ∪ {ψ, ψ.conj}) hyp.A)) :
+    ∃ (k : ℕ) (χmem : Fin k → IrreducibleCharacter ↥L) (deg : Fin k → ℕ) (a : ℕ),
+      Function.Injective χmem ∧
+      Set.range (fun j => (χmem j : ClassFunction ↥L ℂ)) = S₁ ∧
+      (∀ j, (χmem j : ClassFunction ↥L ℂ) 1 = (deg j : ℂ) * χ₁ 1) ∧
+      ψ 1 = (a : ℂ) * χ₁ 1 ∧
+      ∑ j : Fin k, ((deg j : ℝ)) ^ 2 ≤ 2 * (a : ℝ) := by
+  classical
+  obtain ⟨k, χmem, hχinj, hrange, hmemreal, hmemdiffsupp, hmemS1, hmembarS1, hmemconjortho,
+      hmemortho⟩ := Sset_exists_orthonormalFamily hyp hodd hfrob hAH hS₁sub hS₁conj hS₁fin
+  have hχ₁range : χ₁ ∈ Set.range (fun j => (χmem j : ClassFunction ↥L ℂ)) := by
+    rw [hrange]; exact hχ₁S₁
+  obtain ⟨i₁, hi₁eq0⟩ := hχ₁range
+  have hi₁eq : (χmem i₁ : ClassFunction ↥L ℂ) = χ₁ := hi₁eq0
+  have hmemS : ∀ j, (χmem j : ClassFunction ↥L ℂ) ∈ hyp.Sset := fun j => hS₁sub (hmemS1 j)
+  have hanchordeg : (χmem i₁ : ClassFunction ↥L ℂ) 1 =
+      (((hyp.typeI.typeF.H).subgroupOf L).index : ℂ) := by rw [hi₁eq]; exact hχ₁deg
+  obtain ⟨deg, hdeg_i₁, _hdeg_pos, hdeg_eq, hmemdegdiffsupp⟩ :=
+    Sset_exists_degreeData hyp hfrob hAH hmemS hanchordeg
+  obtain ⟨hrealψ, hdiffsuppψ, hψψ, hψbarψbar, hψψbar, hψbarψ, hψ_S1, hψbar_S1⟩ :=
+    Sset_breakPair_fields hyp hodd hfrob hAH hψS hS₁sub hψnotS1 hψcnotS1
+  obtain ⟨a, _ha_pos, hψratio0⟩ := Sset_charValue_one_eq_mul_index hyp hψS
+  have hψratio : ψ 1 = (a : ℂ) * (χmem i₁ : ClassFunction ↥L ℂ) 1 := by rw [hψratio0, ← hanchordeg]
+  have hdiffasuppψ : (ψ - a • (χmem i₁ : ClassFunction ↥L ℂ)).support ⊆
+      OddOrder.Peterfalvi.S04.supportInSubgroup hyp.ambientA L :=
+    Sset_scaledDiff_supported hyp hfrob hAH hψS (hmemS i₁) hψratio
+  have htau1ψ : hyp.tau (ψ - a • (χmem i₁ : ClassFunction ↥L ℂ)) ∈ ZIrr G :=
+    OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap_mem_ZIrr_of_supported
+      hyp.dadeData.dade hyp.hconj hdiffasuppψ
+      (Submodule.sub_mem _ (IrreducibleCharacter.mem_ZIrr ⟨ψ, hψirr⟩)
+        (nsmul_mem (IrreducibleCharacter.mem_ZIrr (χmem i₁)) a))
+  have hcover : ∀ x ∈ S₁, ∃ j, j ∈ (Finset.univ : Finset (Fin k)) ∧
+      (χmem j : ClassFunction ↥L ℂ) = x := by
+    intro x hx; rw [← hrange] at hx; obtain ⟨j, hj⟩ := hx; exact ⟨j, Finset.mem_univ j, hj⟩
+  have hSgen := OddOrder.Peterfalvi.S07.span_subset_span_zSupportedSpan_union_anchor_of_scaledDiffs
+    (s := (Finset.univ : Finset (Fin k))) (χmem := fun j => (χmem j : ClassFunction ↥L ℂ))
+    (deg := deg) (i₁ := i₁) hcover (Finset.mem_univ i₁) (fun j _ => hmemS1 j)
+    (fun j _ => hmemdegdiffsupp j)
+  have hbar1 : ψ.conj 1 = ψ 1 := by
+    rw [ClassFunction.conj_apply]
+    obtain ⟨n, -, hn1, -⟩ := hψirr.exists_natDegree_charValue_one_dvd_card
+    rw [hn1, star_natCast]
+  have hchi1_ne : (χmem i₁ : ClassFunction ↥L ℂ) 1 ≠ 0 := by
+    rw [hanchordeg]; exact Nat.cast_ne_zero.mpr Subgroup.index_ne_zero_of_finite
+  have h1A : (1 : ↥L) ∉ OddOrder.Peterfalvi.S04.supportInSubgroup hyp.ambientA L :=
+    one_not_mem_supportInSubgroup_sharp hyp.typeI.typeF.H hAH
+  have hgen := OddOrder.Peterfalvi.S07.zSupportedSpan_adjoinPair_subset_span_of_anchorGeneration
+    (χ := ψ) (chibar := ψ.conj) (chi1 := (χmem i₁ : ClassFunction ↥L ℂ)) (a := a)
+    hSgen hψratio hbar1 hchi1_ne h1A
+  refine ⟨k, χmem, deg, a, hχinj, hrange, fun j => by rw [hdeg_eq j, hi₁eq],
+    by rw [hψratio, hi₁eq], ?_⟩
+  have hbound := OddOrder.Peterfalvi.S08.coherentDegreeSumBound_of_not_coherent
+    hyp.dadeData.dade hyp.hconj hS₁coh ⟨ψ, hψirr⟩ hrealψ hdiffsuppψ hψψ hψbarψbar hψψbar hψbarψ
+    hψ_S1 hψbar_S1 (Finset.univ : Finset (Fin k)) χmem deg i₁ (Finset.mem_univ i₁)
+    (fun j _ => hmemreal j) (fun j _ => hmemdiffsupp j) (fun j _ => hmemdegdiffsupp j)
+    (fun j _ => hmemS1 j) (fun j _ => hmembarS1 j) (fun j _ => hmemconjortho j)
+    (fun i _ j _ => by rw [hmemortho i j]; rcases eq_or_ne i j with h | h <;> simp [h])
+    hdiffasuppψ htau1ψ hdeg_i₁ hSgen hgen hnc
+  simpa using hbound
+
+open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
+/-- **Peterfalvi (6.2) member-family degree-square bound** (real form, witness `τ`) — rescales
+`Sset_degreeSumBound_of_not_coherent`'s `∑ⱼ degⱼ² ≤ 2a` by the anchor degree `χ₁(1)` into the
+character-degree-square sum `∑ⱼ (χⱼ(1).re)² ≤ 2·ψ(1).re·χ₁(1).re`.  Mirror of the Sibley
+`sMember_degreeSqReBound_of_not_coherent`. -/
+theorem Sset_degreeSqReBound_of_not_coherent [Finite G] {L : Subgroup G} (hyp : Hypothesis L)
+    (hodd : Odd (Nat.card ↥L)) {C : Subgroup ↥L}
+    (hfrob : OddOrder.Isaacs.Ch06.IsFrobeniusGroup ↥L ((hyp.typeI.typeF.H).subgroupOf L) C)
+    (hAH : hyp.ambientA = ((hyp.typeI.typeF.H) : Set G) \ {1})
+    {S₁ : Set (ClassFunction ↥L ℂ)} (hS₁sub : S₁ ⊆ hyp.Sset)
+    (hS₁conj : OddOrder.Peterfalvi.S03.ClosedUnderConjugate S₁) (hS₁fin : S₁.Finite)
+    (hS₁coh : OddOrder.Peterfalvi.S07.IsCoherent hyp.tau S₁ hyp.A)
+    {χ₁ : ClassFunction ↥L ℂ} (hχ₁S₁ : χ₁ ∈ S₁)
+    (hχ₁deg : χ₁ 1 = (((hyp.typeI.typeF.H).subgroupOf L).index : ℂ))
+    {ψ : ClassFunction ↥L ℂ} (hψS : ψ ∈ hyp.Sset) (hψirr : IsIrreducibleCharacter ψ)
+    (hψnotS1 : ψ ∉ S₁) (hψcnotS1 : ψ.conj ∉ S₁)
+    (hnc : ¬ Nonempty (OddOrder.Peterfalvi.S07.IsCoherent hyp.tau (S₁ ∪ {ψ, ψ.conj}) hyp.A)) :
+    ∃ (k : ℕ) (χmem : Fin k → IrreducibleCharacter ↥L),
+      Function.Injective χmem ∧
+      Set.range (fun j => (χmem j : ClassFunction ↥L ℂ)) = S₁ ∧
+      (∀ j, (χmem j : ClassFunction ↥L ℂ) ∈ S₁) ∧
+      ∑ j : Fin k, (((χmem j : ClassFunction ↥L ℂ) 1).re) ^ 2 ≤ 2 * (ψ 1).re * (χ₁ 1).re := by
+  obtain ⟨k, χmem, deg, a, hχinj, hrange, hdeg_eq, hψ_eq, hbound⟩ :=
+    Sset_degreeSumBound_of_not_coherent hyp hodd hfrob hAH hS₁sub hS₁conj hS₁fin hS₁coh hχ₁S₁
+      hχ₁deg hψS hψirr hψnotS1 hψcnotS1 hnc
+  have hmemS1 : ∀ j, (χmem j : ClassFunction ↥L ℂ) ∈ S₁ := by
+    intro j; rw [← hrange]; exact ⟨j, rfl⟩
+  refine ⟨k, χmem, hχinj, hrange, hmemS1, ?_⟩
+  have hdegre : ∀ j, ((χmem j : ClassFunction ↥L ℂ) 1).re = (deg j : ℝ) * (χ₁ 1).re := by
+    intro j; rw [hdeg_eq j, Complex.mul_re, Complex.natCast_re, Complex.natCast_im]; ring
+  have hψre : (ψ 1).re = (a : ℝ) * (χ₁ 1).re := by
+    rw [hψ_eq, Complex.mul_re, Complex.natCast_re, Complex.natCast_im]; ring
+  have hre_nonneg : (0 : ℝ) ≤ (χ₁ 1).re ^ 2 := sq_nonneg _
+  calc ∑ j : Fin k, (((χmem j : ClassFunction ↥L ℂ) 1).re) ^ 2
+      = ∑ j : Fin k, ((deg j : ℝ) * (χ₁ 1).re) ^ 2 := by
+        refine Finset.sum_congr rfl (fun j _ => ?_); rw [hdegre j]
+    _ = (χ₁ 1).re ^ 2 * ∑ j : Fin k, (deg j : ℝ) ^ 2 := by
+        rw [Finset.mul_sum]; refine Finset.sum_congr rfl (fun j _ => ?_); ring
+    _ ≤ (χ₁ 1).re ^ 2 * (2 * (a : ℝ)) := mul_le_mul_of_nonneg_left hbound hre_nonneg
+    _ = 2 * ((a : ℝ) * (χ₁ 1).re) * (χ₁ 1).re := by ring
+    _ = 2 * (ψ 1).re * (χ₁ 1).re := by rw [hψre]
+
+open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
+open OddOrder.Peterfalvi.S09.Cert in
 /-- **`S(H′)` member differences are `A(L)`-supported** — the `hab`-free subfamily analogue of
 `Sset_diff_supported` for the (6.5.c) `hcoh`.  Members of `S(⁅K,K⁆)` vanish off `H` (as `Sset`
 members, `Sset_vanishes_off_H`) and share the constant degree `|L:K|` at `1`
