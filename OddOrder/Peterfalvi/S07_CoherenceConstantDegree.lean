@@ -169,17 +169,49 @@ noncomputable abbrev imageFam (hyp : Hypothesis (L := L) (G := G) S A)
     OrthonormalCharacterImageFamily (L := L) (G := G) hyp.tau χ :=
   (hyp.difference_image hχ).toOrthonormalImage
 
+/-- **Difference-isometry extends to the `zSpan` of two differences.**  From the four generator
+inner-product equalities `⟨τ dᵢ, τ dⱼ⟩ = ⟨dᵢ, dⱼ⟩` (`i, j ∈ {1, 2}`), the isometry holds on every
+`ℤ`-combination `φ, ψ ∈ zSpan {d₁, d₂}`, by bilinear expansion (`τ` is `ℤ`-linear, `⟨·,·⟩` is
+`ℤ`-sesquilinear).  This feeds the lattice-relative `ofProjection` isometry input from the
+difference-isometry field `Hypothesis.tau_isometry_diff` (issue 9001), replacing the former global
+`IsIntegralIsometry`. -/
+theorem inner_eq_on_zSpan_pair {τ : IntegralCharacterMap L G} {d₁ d₂ : ClassFunction L ℂ}
+    (h₁₁ : ClassFunction.inner (τ d₁) (τ d₁) = ClassFunction.inner d₁ d₁)
+    (h₁₂ : ClassFunction.inner (τ d₁) (τ d₂) = ClassFunction.inner d₁ d₂)
+    (h₂₁ : ClassFunction.inner (τ d₂) (τ d₁) = ClassFunction.inner d₂ d₁)
+    (h₂₂ : ClassFunction.inner (τ d₂) (τ d₂) = ClassFunction.inner d₂ d₂)
+    {φ ψ : ClassFunction L ℂ}
+    (hφ : φ ∈ zSpan (L := L) ({d₁, d₂} : Set (ClassFunction L ℂ)))
+    (hψ : ψ ∈ zSpan (L := L) ({d₁, d₂} : Set (ClassFunction L ℂ))) :
+    ClassFunction.inner (τ φ) (τ ψ) = ClassFunction.inner φ ψ := by
+  obtain ⟨a, b, rfl⟩ := Submodule.mem_span_pair.mp hφ
+  obtain ⟨c, d, rfl⟩ := Submodule.mem_span_pair.mp hψ
+  -- push `τ` through the `ℤ`-combinations first (keeping `zsmul`, before the scalar cast).
+  simp only [map_add, map_zsmul]
+  -- expand both bilinear forms and apply the four generator equalities.
+  simp only [ClassFunction.inner_add_left, ClassFunction.inner_add_right,
+    ← Int.cast_smul_eq_zsmul ℂ, ClassFunction.inner_smul_left, ClassFunction.inner_smul_right,
+    star_intCast, h₁₁, h₁₂, h₂₁, h₂₂]
+
 /-- **(5.7) per-pair decomposition.**  For members `χ, ζ ∈ S` with `⟨χ,ζ⟩ = ⟨χ̄,ζ⟩ = 0` and the
 supported-difference virtual-character fact `(χ − ζ)^τ ∈ ℤ[Irr G]`, the (5.4) decomposition of
-`(χ − ζ)^τ` against `R(χ)`, built against the fixed Dade isometry `τ` (`tau1 := τ`, whose isometry
-and `χ − χ̄` agreement are immediate from `hyp.tau_isometry`). -/
+`(χ − ζ)^τ` against `R(χ)`, built against the fixed Dade isometry `τ` (`tau1 := τ`).  The
+`ofProjection` isometry input on `zSpan {χ − χ̄, χ − ζ}` comes from the lattice-relative
+difference-isometry `hyp.tau_isometry_diff` (issue 9001) via `inner_eq_on_zSpan_pair` — no global
+`IsIntegralIsometry` is needed, so this applies to the Feit–Thompson Dade map. -/
 noncomputable def pairDecomp (hyp : Hypothesis (L := L) (G := G) S A)
-    {χ ζ : ClassFunction L ℂ} (hχ : χ ∈ S)
+    {χ ζ : ClassFunction L ℂ} (hχ : χ ∈ S) (hζ : ζ ∈ S)
     (hχζ : ClassFunction.inner χ ζ = 0) (hχbarζ : ClassFunction.inner χ.conj ζ = 0)
     (hZ : hyp.tau (χ - ζ) ∈ ZIrr G) :
     CharacterPsiDecomposition (L := L) (G := G) hyp.tau χ ζ :=
   CharacterPsiDecomposition.ofProjection (imageFam hyp hχ) hyp.tau
-    (fun φ ψ _ _ => hyp.tau_isometry.inner_eq φ ψ)
+    (fun _ _ hφ hψ =>
+      inner_eq_on_zSpan_pair
+        (hyp.tau_isometry_diff hχ (hyp.conjugate_mem hχ) hχ (hyp.conjugate_mem hχ))
+        (hyp.tau_isometry_diff hχ (hyp.conjugate_mem hχ) hχ hζ)
+        (hyp.tau_isometry_diff hχ hζ hχ (hyp.conjugate_mem hχ))
+        (hyp.tau_isometry_diff hχ hζ hχ hζ)
+        hφ hψ)
     rfl hZ hχζ hχbarζ
     (hyp.pairwise_orthogonal hχ (hyp.conjugate_mem hχ) (hyp.ne_conj hχ))
 
@@ -315,7 +347,7 @@ noncomputable def pairDecomp' (hyp : Hypothesis (L := L) (G := G) S A)
     {χ ζ : ClassFunction L ℂ} (h : DiffPair χ ζ) (hχ : χ ∈ S) (hζ : ζ ∈ S)
     (hZ : hyp.tau (χ - ζ) ∈ ZIrr G) :
     CharacterPsiDecomposition (L := L) (G := G) hyp.tau χ ζ :=
-  pairDecomp hyp hχ (hyp.pairwise_orthogonal hχ hζ h.1)
+  pairDecomp hyp hχ hζ (hyp.pairwise_orthogonal hχ hζ h.1)
     (hyp.pairwise_orthogonal (hyp.conjugate_mem hχ) hζ h.conj_ne) hZ
 
 /-- The defining image equation `(χ − ζ)^τ = D.X − D.Y` for `D = pairDecomp' …` (the `tau1_image`
@@ -425,7 +457,7 @@ theorem commonImage_inner_other (hyp : Hypothesis (L := L) (G := G) S A)
   rw [inner_X_perp D₀ Dζ.Y_orthogonal, sub_zero]
   -- isometry: `⟨(χ₀−ζ₀)^τ, (χ₀−ζ)^τ⟩ = ⟨χ₀−ζ₀, χ₀−ζ⟩`.
   have hiso : ClassFunction.inner (hyp.tau (χ₀ - ζ₀)) (hyp.tau (χ₀ - ζ))
-      = ClassFunction.inner (χ₀ - ζ₀) (χ₀ - ζ) := hyp.tau_isometry.inner_eq _ _
+      = ClassFunction.inner (χ₀ - ζ₀) (χ₀ - ζ) := hyp.tau_isometry_diff hχ₀ hζ₀ hχ₀ hζ
   rw [pairDecomp'_image hyp hdp hχ₀ hζ₀ (hZIrr χ₀ hχ₀ ζ₀ hζ₀),
     pairDecomp'_image hyp hdpχ hχ₀ hζ (hZIrr χ₀ hχ₀ ζ hζ)] at hiso
   -- the cross terms.
@@ -468,10 +500,16 @@ theorem commonImage_inner (hyp : Hypothesis (L := L) (G := G) S A)
 /-- **(5.7) the retargeted family is an isometric image of the source.**  For the auxiliary isometry
 `τ₁` of (5.7) given by `χⱼ^{τ₁} = X j := β − (χ₀ − χⱼ)^τ` (`χ₀ := χ 0`, `β = χ₀^{τ₁}`), one has
 `⟨Xᵢ, Xⱼ⟩ = ⟨χᵢ, χⱼ⟩`, from `‖β‖² = 1` (A), the uniform fact `⟨β, (χ₀ − χⱼ)^τ⟩ = 1 − ⟨χ₀, χⱼ⟩`
-(B), and `τ` being an isometry.  (Hence `τ₁` is an isometry — Peterfalvi's closing remark.) -/
+(B), and the **lattice-relative** difference-isometry `hdiff`
+(`⟨(χ₀−χᵢ)^τ, (χ₀−χⱼ)^τ⟩ = ⟨χ₀−χᵢ, χ₀−χⱼ⟩`).  This is the *only* place (5.7) used the isometry, and it
+uses it solely on supported differences (issue 9001), so **no global `IsIntegralIsometry` is needed**
+— the theorem applies directly to the Feit–Thompson Dade map (`dim CF(L) > dim CF(G)`, isometric only
+on `A(L)`-supported functions).  (Hence `τ₁` is an isometry — Peterfalvi's closing remark.) -/
 theorem xFamily_inner {τ : IntegralCharacterMap L G} {n : ℕ} [NeZero n]
     (χ : Fin n → ClassFunction L ℂ)
-    (β : ClassFunction G ℂ) (hτiso : IsIntegralIsometry (L := L) (G := G) τ)
+    (β : ClassFunction G ℂ)
+    (hdiff : ∀ i j, ClassFunction.inner (τ (χ 0 - χ i)) (τ (χ 0 - χ j))
+      = ClassFunction.inner (χ 0 - χ i) (χ 0 - χ j))
     (hββ : ClassFunction.inner β β = 1)
     (hB : ∀ j, ClassFunction.inner β (τ (χ 0 - χ j)) = 1 - ClassFunction.inner (χ 0) (χ j))
     (i j : Fin n) :
@@ -484,7 +522,7 @@ theorem xFamily_inner {τ : IntegralCharacterMap L G} {n : ℕ} [NeZero n]
     rw [OddOrder.RepresentationTheory.inner_conj_symm, hB i, star_sub, star_one,
       ← OddOrder.RepresentationTheory.inner_conj_symm]
   rw [ClassFunction.inner_sub_left, ClassFunction.inner_sub_right, ClassFunction.inner_sub_right,
-    hββ, hB j, hai, hτiso.inner_eq (χ 0 - χ i) (χ 0 - χ j), ClassFunction.inner_sub_left,
+    hββ, hB j, hai, hdiff i j, ClassFunction.inner_sub_left,
     ClassFunction.inner_sub_right, ClassFunction.inner_sub_right, hχ00]
   ring
 
@@ -572,8 +610,8 @@ theorem coherent_of_constant_degree
       · -- `horthX`: `⟨Xᵢ, Xⱼ⟩ = ⟨χᵢ, χⱼ⟩` (`xFamily_inner`), then `horthχ`.
         intro i j
         rw [hXdef,
-          xFamily_inner χ β hyp.tau_isometry (commonImage_self hyp hirr hZIrr hdp0 (hmem 0) hζ₀S)
-            hB i j]
+          xFamily_inner χ β (fun p q => hyp.tau_isometry_diff (hmem 0) (hmem p) (hmem 0) (hmem q))
+            (commonImage_self hyp hirr hZIrr hdp0 (hmem 0) hζ₀S) hB i j]
         exact horthχ i j
       · -- `himg`: `(χⱼ − χ₀)^τ = Xⱼ − X₀`.
         intro j
