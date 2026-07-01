@@ -97,8 +97,11 @@ Coq (1.7)(b) `cfInd_central_Inertia` の hypothesis は `abelian (T/H)` (T=I(θ)
 - [x] **Pf (1.7)/(8.2.c) 原文精読** — 設計点解決 commit `0482afa0` (abelian で十分、cyclic 不要)。
 - [x] **induction-in-stages** — **既に landed** (`S08_CaseBCoherence2.induce_induce_subgroupOf`)。cite のみ。
 - [x] **慣性商 abelian 完成** — `S14.typeF_inertia_commutator_le` (`⁅I(θ),I(θ)⁆ ≤ H`, sorry-free, cont.³)。
-- [ ] **(G1) 拡張 lemma** を build (`OddOrder/GroupTheory/RepresentationTheory/` 新/既存 leaf)。coprime
-      Hall (H=L_F normal Hall, U abelian complement) の下で I/H cyclic → θ 拡張 (Isaacs 6.28/11.22)。
+- [ ] **(G1) 拡張 lemma** を build。coprime Hall (H=L_F normal Hall) の下で θ を I に拡張 (Isaacs *Character
+      Theory* 6.28/8.16、coprime extension via 決定行列式)。**⚠ 注意: proof は Isaacs *CT* book (=project .mmd 外)**。
+      **infra build 開始 (cont.¹³)**: `RepresentationDeterminant.representationDeterminant` (det∘ρ : G→*ℂˣ,
+      sorry-free) — coprime extension の engine (extension を det 順序で pin)。**残 infra = 決定行列式の順序 +
+      coprime extension 構成**(Isaacs *CT* 8.16、多段・fresh session 推奨、必要なら ChatGPT で argument 再構成)。
 - [x] **char-product infra (Gallagher 前提)** — `RepresentationTheory/CharacterProduct.lean` (新 leaf, sorry-free,
       axiom-clean, cont.⁴): `ClassFunction` に pointwise `Mul` + `IsCharacter.mul` (χ·ψ = char of `tprod`,
       `Representation.char_tensor` 経由) + `mul_mem_ZIrr` (ZIrr は積で閉じる=部分環)。Gallagher の
@@ -120,7 +123,11 @@ Coq (1.7)(b) `cfInd_central_Inertia` の hypothesis は `abelian (T/H)` (T=I(θ)
       `restrict_mul`/`compHom_mul` (積が Res/pullback と可換) + `restrict_mul_of_apply_eq_one`
       (`lam` が H 上 1 ⟹ `Res_H(χ·lam)=Res_H χ` = 「χ·Inf(β) は θ 上に lie」)。これで
       `⟨Ind_H^I θ, χ·Inf β⟩ = ⟨θ, Res_H χ⟩ = ⟨θ,θ⟩=1` (χ extends θ の下) が出せる。
-- [ ] **(G2) Gallagher 本体 = decomposition/bijection** — twist-既約 + lies-over は完成。残:
+- [x] **decomposition capstone** — `CharacterProduct.eq_sum_of_inner_eq_one_of_inner_self_eq_card`
+      (cont.¹¹, sorry-free, axiom-clean): `S⊆Irr` の各 χ が `⟨φ,χ⟩=1` かつ `⟨φ,φ⟩=|S|` ⟹ `φ=∑_{χ∈S} χ`
+      (Parseval `⟨φ,φ⟩=∑|⟨φ,χ⟩|²` + normSq≥0 で S 外係数消失、Fourier 展開を collapse)。任意の類関数で成立
+      (ZIrr 仮説不要と判明)。「[I:H] 個 mult-1 constituents が norm² を尽くす ⟹ Ind_H^I θ = それらの和」を出す capstone。
+- [ ] **(G2) Gallagher 本体 = decomposition/bijection** — twist-既約 + lies-over + capstone は完成。残:
       **(a) 単射/全射/[I:H] 個** (I/H abelian ⟹ Irr(I/H)=linear、count)。
       **⚠ 真の深い blocker = extension (G1) `θ→χ∈Irr(I)`** (Isaacs 6.28 coprime、`Res_H χ=θ`): **repo に infra
       皆無** (grep 確認、char-extension/determinant/coprime-cohomology いずれも未収録)。これが decomposition
