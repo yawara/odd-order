@@ -300,6 +300,24 @@ theorem normalizer_W2_le_S [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     hTI g ⟨a, ha_sharp, hga_sharp⟩
   rwa [hNorm] at hgN
 
+/-- **Peterfalvi (13.12) `c = 1`, as `C = ⊥`**: the centralizer datum `C = U ⊓ C_G(P)` is trivial.
+Since `c := |C| = 1` (`c_eq_one`), `C` is the trivial subgroup.  This is the regularity *finish* of
+the (13.16) `W₂`-confinement Maschke/Wielandt core: the residual kernel `N_U(W₂)` centralizes
+`P = S_F` (Maschke + Wielandt), hence lies in `U ⊓ C_G(P) = C = 1`. -/
+theorem C_eq_bot [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hyp : Hypothesis (G := G)) : hyp.C = ⊥ := by
+  have hcard : Nat.card ↥hyp.C = 1 := by rw [← hyp.c_eq_card_C, c_eq_one hG hyp]
+  exact Subgroup.card_eq_one.mp hcard
+
+/-- **Peterfalvi (13.12) `c = 1`, usable form**: `U ⊓ C_G(P) = ⊥` — no nonidentity element of the
+complement `U` centralizes the Fitting kernel `P = S_F` (`U` acts faithfully on `P`).  Immediate from
+`C_eq_bot` and `C = U ⊓ C_G(P)` (`C_eq`).  The Maschke/Wielandt core of (13.16) concludes
+`N_U(W₂) ≤ U ⊓ C_G(P) = ⊥`. -/
+theorem U_inf_centralizer_P_eq_bot [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hyp : Hypothesis (G := G)) :
+    hyp.U ⊓ Subgroup.centralizer (hyp.P : Set G) = ⊥ := by
+  rw [← hyp.C_eq]; exact C_eq_bot hG hyp
+
 /-- **Peterfalvi (13.16), Maschke/Wielandt core for the `W₂`-side**: `N_G(W₂) ⊓ S ≤ P ⊔ W₁`.
 
 The `S`-internal residual of the (13.16) `W₂`-confinement (after the TI reduction `N_G(W₂) ≤ S` of
