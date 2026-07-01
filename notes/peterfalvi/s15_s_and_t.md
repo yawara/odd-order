@@ -31,6 +31,17 @@ lane d 版は (ZMod n)ˣ-orbit 特殊化ゆえ **冗長 → 除去** (反重複�
 ⟹ **lane d の S15_SAndT_Setup 実 landing はこの回まだゼロ** (重複除去で相殺)。残 16 sorry は全て
 grid carrier (issue 3002) / σ-structure / char cascade gated。次手は下記 frontier 参照。
 
+### ▶ §8 TI-subset (13.5 群論入力) を精査 — 完全な path 特定 + crux 1 つに de-risk (issue 4013)
+
+ユーザー裁定で §8 TI-subset (`H_sharp_isTISubset` / `S_normalizes_H_sharp`、lane c 未着手の群論) に着手。
+**両 sorry は `hyp.H = fittingInG S` (= Pf (8.5.a) `F(S)=M_F·C_U(M_F)`) に帰着**することを確定。全 TI 機構は
+在庫確認済 (`FittingIsTI`=(8.6.a) / `fittingIsTI_of_isTypeP2` / `normalizer_fittingInAmbient_eq_self` /
+`maxNilpotentNormalHall_le_fittingInG` / `IsTISubset.subset`)。**残る唯一の crux = `C=C_U(M_F) ≤ fittingInG S`**
+= Pf (8.5.a) 本体 (M'=HU coprime-order 論法、(8.4.c) 依存) で repo 未整備。`centralizer_fittingInG_inf` route
+(C が F(S) 全体中心化を要す) と Theorem 127 の A₀ (tau2 特殊ケース) は共に不一致。⟹ **次手 = (8.5.a)
+`fittingInG S = P ⊔ C_U(P)` を type-P S で形式化** (carrier reconciliation 不要、P/C は Hypothesis 直取り)。
+詳細 = **issue 4013**。
+
 ---
 
 ## ✅ LIVE STATUS (2026-06-29, 正本 — ゲートなし方針で再開, lane c /loop)
