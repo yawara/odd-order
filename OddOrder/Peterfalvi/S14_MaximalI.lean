@@ -1677,6 +1677,57 @@ structure TypeIFrobeniusData (M : Subgroup G) where
   frobenius : OddOrder.Isaacs.Ch06.IsFrobeniusGroup
     ↥M (typeI.typeF.H.subgroupOf M) complement
 
+/-- **The centralizer-support of `N^#` collapses to `N^#` for a Frobenius `L` with kernel `N`.**
+The (12.1) type-I Dade support is `A(L) = centralizerSupport (N^#) L`; when `L` is a Frobenius group
+with kernel `N` (`N.subgroupOf L`), the extra centralizer condition is vacuous — a `y` centralizing
+a nontrivial `x ∈ N` lands in the kernel `N` (`IsFrobeniusGroup.centralizer_kernel_le`), so the
+support is just `N^#`.  This is the **non-circular** upstream twin of the §16
+`centralizerSupport_sharpSubgroup_eq_of_frobenius`: it takes the Frobenius structure as a hypothesis
+(supplied for the (12.16) witness by (12.10) `witness_L_frobenius`) rather than routing through the
+final (12.7), so it is available before the minimal-counterexample machinery. -/
+theorem centralizerSupport_sharp_eq_of_frobenius [Finite G] {M N : Subgroup G} {C : Subgroup ↥M}
+    (hfrob : OddOrder.Isaacs.Ch06.IsFrobeniusGroup ↥M (N.subgroupOf M) C) (hNM : N ≤ M) :
+    OddOrder.GroupTheory.centralizerSupport (OddOrder.GroupTheory.sharpSubgroup N) M
+      = OddOrder.GroupTheory.sharpSubgroup N := by
+  ext y
+  simp only [OddOrder.GroupTheory.centralizerSupport, OddOrder.GroupTheory.sharpSubgroup,
+    Set.mem_setOf_eq, Set.mem_diff, SetLike.mem_coe, Set.mem_singleton_iff]
+  constructor
+  · rintro ⟨hyM, hy1, x, ⟨hxN, hx1⟩, hyx⟩
+    have hxM : x ∈ M := hNM hxN
+    have hxMsub : (⟨x, hxM⟩ : ↥M) ∈ N.subgroupOf M := (Subgroup.mem_subgroupOf).mpr hxN
+    have hx1' : (⟨x, hxM⟩ : ↥M) ≠ 1 := fun h => hx1 (congrArg Subtype.val h)
+    have hycomm : (⟨y, hyM⟩ : ↥M) ∈ Subgroup.centralizer ({(⟨x, hxM⟩ : ↥M)} : Set ↥M) := by
+      rw [Subgroup.mem_centralizer_singleton_iff] at hyx ⊢
+      exact Subtype.ext hyx
+    have hyN : (⟨y, hyM⟩ : ↥M) ∈ N.subgroupOf M :=
+      hfrob.centralizer_kernel_le _ hxMsub hx1' hycomm
+    exact ⟨(Subgroup.mem_subgroupOf).mp hyN, hy1⟩
+  · rintro ⟨hyN, hy1⟩
+    refine ⟨hNM hyN, hy1, y, ⟨hyN, hy1⟩, ?_⟩
+    rw [Subgroup.mem_centralizer_singleton_iff]
+
+/-- **Ambient match for the (6.8) Sibley setup**: the `H^#`-image `sharpImage (H.subgroupOf L)` of
+the Fitting kernel (`H = L_F`), pushed back to `G`, is exactly the type-I Dade support
+`A(L) = typeIA L`.  Here `A(L) = centralizerSupport (H^#) L` (`typeIA` def) collapses to `H^#` for
+the **Frobenius** `L` (`centralizerSupport_sharp_eq_of_frobenius`, non-circular from `hfrob`), and
+`(H.subgroupOf L).map L.subtype = H ⊓ L = H` (`subgroupOf_map_subtype`, `H ≤ L`) matches the two
+`H^#` descriptions.  This is the ambient identification that lets the (6.8) `SibleyDadeHypothesis`
+(Dade datum on `sharpImage H`) reuse the (12.1) datum `hyp.dadeData.dade` (on `A(L)`), preserving
+the isometry `hyp.tau` exactly. -/
+theorem sharpImage_H_subgroupOf_eq_typeIA [Finite G] {L : Subgroup G} (hyp : Hypothesis L)
+    {C : Subgroup ↥L}
+    (hfrob : OddOrder.Isaacs.Ch06.IsFrobeniusGroup ↥L (hyp.H.subgroupOf L) C) :
+    OddOrder.Peterfalvi.S08.sharpImage (hyp.H.subgroupOf L) = typeIA L hyp.typeI := by
+  have hmap : (hyp.H.subgroupOf L).map L.subtype = hyp.typeI.typeF.H := by
+    rw [Subgroup.subgroupOf_map_subtype]
+    exact inf_eq_left.mpr hyp.typeI.typeF.H_le
+  rw [show typeIA L hyp.typeI
+        = OddOrder.GroupTheory.centralizerSupport
+          (OddOrder.GroupTheory.sharpSubgroup hyp.typeI.typeF.H) L from rfl,
+    centralizerSupport_sharp_eq_of_frobenius (N := hyp.typeI.typeF.H) hfrob hyp.typeI.typeF.H_le]
+  simp only [OddOrder.Peterfalvi.S08.sharpImage, OddOrder.GroupTheory.sharpSubgroup, hmap]
+
 /-- **Structural input for Peterfalvi (12.6) — Frobenius case.**
 
 When `L` is already Frobenius with kernel `H`, the Sibley Dade setup of (6.8) takes its
