@@ -1284,3 +1284,28 @@ proven)) **と** M-side ((12.4)-for-M、M の CharacterDecompositionData) の両
   = ConjugationBrauer.lean:186、**在庫**) で #g-invariant char = #g-invariant class = 1 ⟹ θ≠1 は
   g-invariant でない ⟹ g∉I(θ)。**key 材料 (Brauer 6.32 + (2.1)) は在庫**、残は TypeFData の U₀/U₁
   構造 exposure + C={1} step。focused §8 effort (multi-iteration)。
+
+### loop⁵²⁻⁵³ (2026-07-01 lane-b resume²): (8.2.c) 完全 scoping — 全 piece 特定、proof 確定
+
+**(8.2.c) I(θ)∩U⊆U₁ は tractable、全 infrastructure 特定済**。次 iteration で実装:
+
+**必要 piece (全在庫 or 明確)**:
+- `centralizer_le_U1` = TypeFData **field** (`∀ x∈H, x≠1 → U⊓C_G(x)⊆U₁`)。crux。
+- Brauer chain **完全在庫** (ConjugationBrauer.lean):
+  - `card_fixedPoints_conjByPermIrr_eq_card_fixedPoints_conjClassPerm` (Brauer 6.32)。
+  - `fixed_irreducible_eq_trivial_of_card_fixedClasses_eq_one` (#fixed class=1 ⟹ fixed char=trivial)。
+  - `fixed_eq_one_of_not_mem_of_centralizer_le` (**Frobenius 版**、C_G≤H 条件、type-F 版に adapt 要)。
+- (2.1) conjugacy form = `coset_eq_cosetConjImage` (S04、Hg=⨆(C_H(g)g)^x)。
+- π-part step `g=(zg)^m` (z∈C_H(g), coprime): mathlib Commute+coprime power (要検索/構築、~数行)。
+
+**proof (type-F class-fixing variant, fixed_eq_one_of_not_mem_of_centralizer_le の type-F 版)**:
+g∈U-U₁, g fixes class ⟦h⟧ (h∈H^#) ⟹ ∃c∈H, cg∈C_G(h) [Frobenius 版と同じ導出] ⟹ (2.1
+coset_eq_cosetConjImage) cg~zg (z∈C_H(g)、y∈H で (cg)^y=zg) ⟹ zg centralizes h^y ⟹ g=(zg)^m ゆえ
+g centralizes h^y∈H^# ⟹ g∈U⊓C_G(h^y)⊆U₁ (centralizer_le_U1) 矛盾。⟹ #fixed class=1 ⟹
+(Brauer) θ≠1 not g-inv ⟹ g∉I(θ)。∴ I(θ)∩U⊆U₁ (contrapositive: g∈I(θ)∩U ⟹ g∈U₁)。
+
+**inertia↔conjByPerm 接続**: g∈I(θ) ⟺ IrreducibleCharacter.conjByPerm g θ = θ (Inertia.lean +
+ConjugationBrauer の conjByPerm 定義、要 bridge 確認)。
+
+**scope**: type-F class-fixing variant (~40-60 行) + π-part helper。M-side data
+(typeI_induced_char_constituents 一般版) は (8.2.c) + Clifford decomp を要すので (8.2.c) は 1 input。
