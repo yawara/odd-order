@@ -4993,6 +4993,30 @@ noncomputable def caseA_orbitEquiv [Finite G] {M : Subgroup G}
       (quotientMulAutHom chief.N_aInvariant (caseA.orbitRep j)).injective).trans
     (MulEquiv.subgroupCongr (by rw [caseA.Hpart_orbit j]; rfl))
 
+/-- **Reducible induction ⟹ full inertia** (prime-index Clifford dichotomy): if `Ind_{HU}^M χ` is
+reducible for `χ ∈ Irr(HU)`, then `I_M(χ) = ⊤` (`χ` is `M`-invariant).  `HU ◁ M` with `[M:HU] = q`
+prime (`huSub_index_eq_q`), so `HU ≤ I_M(χ) ≤ M` forces `I_M(χ) ∈ {HU, M}`
+(`eq_of_le_of_prime_index`); reducibility excludes `I_M(χ) = HU` (contrapositive of
+`isIrreducibleCharacter_induce_of_inertia_eq`).  The `M`-fixedness feeding the (9.8.c) `Xmu`
+injectivity (`induce_injective_of_inertia_stable`) in the surjectivity route to `|Xmu| = p-1`. -/
+theorem inertia_eq_top_of_induceHU_not_irreducible [Finite G] {M : Subgroup G}
+    (data : TypesIIIIIIVSetup M) [Fintype ↥M] [Invertible (Nat.card ↥(huSub data) : ℂ)]
+    (χ : IrreducibleCharacter ↥(huSub data))
+    (hred : ¬ IsIrreducibleCharacter
+      (ClassFunction.induce (huSub data) (χ : ClassFunction ↥(huSub data) ℂ))) :
+    ClassFunction.inertia (χ : ClassFunction ↥(huSub data) ℂ) = ⊤ := by
+  haveI := huSub_normal data
+  letI : Fintype ↥(huSub data) := Fintype.ofFinite _
+  letI : Invertible (Nat.card ↥M : ℂ) :=
+    invertibleOfNonzero (Nat.cast_ne_zero.mpr Nat.card_pos.ne')
+  have hne : ClassFunction.inertia (χ : ClassFunction ↥(huSub data) ℂ) ≠ huSub data :=
+    mt (isIrreducibleCharacter_induce_of_inertia_eq χ) hred
+  have hle : huSub data ≤ ClassFunction.inertia (χ : ClassFunction ↥(huSub data) ℂ) :=
+    ClassFunction.subgroup_le_inertia _
+  have hprime : (huSub data).index.Prime := by rw [huSub_index_eq_q]; exact data.nontrivial.2.1
+  by_contra hnt
+  exact hne (eq_of_le_of_prime_index hle hprime hnt)
+
 /-- **A regular character nontrivial on each `W1`-conjugate of `S₀`** (Clifford case (a)).
 Instantiates the elementary `(9.7)` decomposition `H̄ = ⊕_{w∈W1} S₀^w` (`wConjugate_coprod_bijective`,
 with the chief-factor `U`-action, `act.U ⊔ act.E = ⊤`, `|H̄| = p^{|W1|}`) and feeds the resulting
