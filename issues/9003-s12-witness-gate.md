@@ -101,3 +101,16 @@ work で継続可能ゆえ stall しない見込み。lane b の cluster 枯渇�
   S14 へ relocate する** (S14 は Mtilde 機構に到達可; A1_eq_sigmaSharp 用の import 追加要)。hub 裁定を待つ。
 - **go-forward**: 以降は hub 指示通り **S14 のみで作業**。次 = (8.18.c) `nonconjugate_diffImage_inner_zero`
   (S14:665、自ファイル) の assembly (support_mutual_exclusion + Dade-image support + disjoint-inner)。
+
+## 📌 lane b 追記 (2026-07-02, loop⁹⁴) — dadeSupport_disjoint は S14 で証明可 (S10 編集不要)
+
+**重要な訂正**: M̃ 機構 (`conjClassSet_Mtilde_disjoint`, `A1_eq_sigmaSharp_of_typeI_or_II`,
+`sigmaSharp_subset_Mtilde`) は **S14 から到達可** (#check で確認)。∴ `dadeSupport_disjoint_of_nonconjugate`
+は **S14 内で証明可能**（hub 指示通り、S10 編集・import 追加とも不要）。→ 今後の Cluster B 作業は完全に
+S14 で完結でき、loop⁹² の S10 逸脱懸念は将来の作業には無関係 (support_mutual_exclusion の S10 保持/relocate
+は別途 hub 裁定待ち)。
+
+**dadeSupport_disjoint 証明 path** (S14): `dadeSupport(L)=⋃_a 𝒞_G(a·dade.H a)`、`dade.H a=supportKernel≤L_F`;
+Frobenius L で `typeIA=(L_F)^#⊆L_F` (centralizerSupport_sharp_eq_of_frobenius 済) ⟹ `dadeSupport⊆𝒞_G(L_F)`;
+`(L_F)^#⊆M̃` + conjClassSet_Mtilde_disjoint で disjoint。**残**: Frobenius 仮説を 8.18.c→12.3 に thread
+(署名 refactor; (12.16) caller が両 L に Frobenius 供給するか要確認) + 1-handling。次 iter で engage。
