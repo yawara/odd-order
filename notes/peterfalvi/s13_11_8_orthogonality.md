@@ -767,3 +767,7 @@ frontier map: **(10.5) の X=ω^σ diff 機構 (`alpha_tau_image` S12:4464) は 
 本 vanishing + `tau_muGridAlpha_apply_eq_on_typePV` (α^τ=δ(ω^σ diff) on V) で ψ vanish → norm-2 trichotomy
 `eq_smul_chiFam_diff_of_vanishOnV` で X=δ(ω^σ diff) (SHC 版 `alpha_tau_image`)。(11.8) closure は依然
 doubly-gated (§9↔§10 の (11.8.1)、§14 の (11.8.6))。
+- ⚠ **general-a 注意**: (10.5) `muGridPsi` は a=0 前提 (X_{10.5}=α^τ+nζ^{τ₁})。(11.8.2) の residual X (=Parseval Y)
+  は X=α^τ+nζ^{τ₁}−a∑λ^{τ₁} で a∈{0,2} 両方要 (a=0 は (11.8.5) の結論、先取り不可)。ψ(v)=0 には
+  **∑_{λ∈S₁}λ^{τ₁}(v)=0** も要 → 各 λ∈S(HC) (degree w₁) に `SHC_tau1_zeta_vanishes` 適用 (λ̄≠λ 要;
+  odd order ⟹ degree>1 は non-real で成立、但し per-λ に λ̄≠λ の供給要)。a=0 mainline を先に組んで a=2 を別扱いも可。

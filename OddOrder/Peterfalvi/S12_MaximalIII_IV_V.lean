@@ -7371,6 +7371,32 @@ theorem Hypothesis.SHC_tau1_zeta_vanishes_on_typePV [Finite G] {M : Subgroup G}
   exact inner_left_eq_zero_of_inner_sub_eq_zero haZ hsZ ha1 hb1 hs1 hab hdiff
 
 open scoped FiniteInduce in
+/-- **Peterfalvi (10.5), `ψ = X − δ(ω^σ diff)` vanishes on `V`, S(HC)-coherent version** (`a = 0`
+form).  Port of `muGridPsi_vanishes_on_typePV` to `S(HC)`-coherence: with `X = α_{ij}^τ + n·ζ^{τ₁}`
+(`ζ^{τ₁} = SHC_isCoherent.extension ζ`), the virtual character `ψ = X − δ·(ω_{ij}^σ − ω_{i0}^σ)`
+vanishes on `V = typePV`.  Combines the value-on-`V` leg `tau_muGridAlpha_apply_eq_on_typePV`
+(`α^τ = δ(ω^σ diff)` on `V`, coherence-free) with `SHC_tau1_zeta_vanishes_on_typePV`
+(`ζ^{τ₁}` vanishes on `V`).  For the general `(11.8.2)` residual `X = α^τ + n·ζ^{τ₁} − a·∑λ^{τ₁}`
+(`a ∈ {0, 2}`) the extra `∑λ^{τ₁}` also vanishes on `V` (each `λ ∈ S(HC)`, same lemma). -/
+theorem Hypothesis.SHC_muGridPsi_vanishes_on_typePV [Finite G] {M : Subgroup G}
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis M) (hodd : Odd (Nat.card G))
+    {i : Fin hyp.w1} {j : Fin hyp.w2} (hj : j ≠ 0)
+    {ζ : ClassFunction ↥M ℂ} (hζS : ζ ∈ inducedFamily M) (hζirr : IsIrreducibleCharacter ζ)
+    (hζ1 : ζ 1 = (hyp.w1 : ℂ)) (hζne : ζ.conj ≠ ζ) {d : ℕ} {δ : ℤ} {n : ℕ}
+    (hdeg : hyp.muGrid hG hodd i j 1 = (d : ℂ)) (hμ0 : hyp.muGrid hG hodd i 0 1 = 1)
+    (hnf : (n : ℤ) * (hyp.w1 : ℤ) = (d : ℤ) - δ) (hδj : hyp.muColumnSign hG hodd j = δ)
+    {v : G} (hv : v ∈ typePV M hyp.typeP) :
+    (hyp.tau (hyp.muGrid hG hodd i j - (δ : ℂ) • hyp.muGrid hG hodd i 0 - (n : ℂ) • ζ)
+        + (n : ℂ) • (hyp.SHC_isCoherent hG).extension ζ
+        - (δ : ℂ) • (hyp.alignedOmegaSigmaGrid hG hodd i j
+            - hyp.alignedOmegaSigmaGrid hG hodd i 0)) v = 0 := by
+  have hleg := hyp.tau_muGridAlpha_apply_eq_on_typePV hG hodd hj hζS hdeg hμ0 hζ1 hnf hδj hv
+  have hζv := hyp.SHC_tau1_zeta_vanishes_on_typePV hG hodd hζS hζirr hζ1 hζne hv
+  simp only [ClassFunction.sub_apply, ClassFunction.add_apply, ClassFunction.smul_apply] at hleg ⊢
+  rw [hleg, hζv]
+  simp
+
+open scoped FiniteInduce in
 /-- **General `S(HC)`-coherence split** `(ζ − η)^τ = ζ^{τ₁} − η^{τ₁}` for degree-`w₁` irreducibles
 `ζ, η ∈ S(HC)` (α-grid `S₁`-`τ₁` input to (11.8.2)).  Generalizes `tau_zeta_sub_conj_eq_SHC_extension`
 (the `η = ζ̄` case) to an arbitrary `S(HC)` member: since `ζ, η ∈ S(HC)` have equal degree `w₁`, the
