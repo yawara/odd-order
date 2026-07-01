@@ -414,7 +414,55 @@ theorem typeII_normalizer_not_le_of_typePData [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} (data : TypePData M)
     (hM : M ∈ maximalSubgroups G) (hII : IsTypeII M) :
     ¬ Subgroup.normalizer (data.U : Set G) ≤ M := by
-  sorry
+  classical
+  obtain ⟨td⟩ := hII
+  -- The Type-II witness carries `¬ N_G(U₀) ≤ M` for its own complement `U₀ = td.typeP.U`.
+  -- `M_F = maxNilpotentNormalHall M` also equals `maxNilpotentNormalHall M'` (type II Fitting).
+  have hMFeq : maxNilpotentNormalHall (derivedInG M) = maxNilpotentNormalHall M :=
+    td.derived_fitting_eq.trans td.typeP.H_eq
+  -- Kernel `N = M_F` inside `M' = derivedInG M`: normal and Hall (hence coprime index).
+  haveI hNnormal : ((maxNilpotentNormalHall (derivedInG M)).subgroupOf (derivedInG M)).Normal :=
+    OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_subgroupOf_normal (derivedInG M)
+  have hcop : Nat.Coprime
+      (Nat.card ↥((maxNilpotentNormalHall (derivedInG M)).subgroupOf (derivedInG M)))
+      ((maxNilpotentNormalHall (derivedInG M)).subgroupOf (derivedInG M)).index :=
+    (OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_isHall (derivedInG M)).coprime_index
+  -- Both `td.typeP.U` and `data.U` complement `M_F` in `M'` (Definition (8.4) `derived_complement`).
+  have hTd_compl : Subgroup.IsComplement'
+      ((maxNilpotentNormalHall (derivedInG M)).subgroupOf (derivedInG M))
+      (td.typeP.U.subgroupOf (derivedInG M)) := by
+    have h := td.typeP.derived_complement; rwa [td.typeP.H_eq, ← hMFeq] at h
+  have hData_compl : Subgroup.IsComplement'
+      ((maxNilpotentNormalHall (derivedInG M)).subgroupOf (derivedInG M))
+      (data.U.subgroupOf (derivedInG M)) := by
+    have h := data.derived_complement; rwa [data.H_eq, ← hMFeq] at h
+  -- `M'` (and hence `M_F ≤ M'`) is solvable, giving Schur–Zassenhaus conjugacy of complements.
+  haveI : IsSolvable ↥M := hG.solvable_of_mem_maximalSubgroups hM
+  have hM'leM : derivedInG M ≤ M := Subgroup.map_subtype_le _
+  haveI : IsSolvable ↥(derivedInG M) :=
+    solvable_of_solvable_injective (Subgroup.inclusion_injective hM'leM)
+  obtain ⟨n, -, hnconj⟩ :=
+    Subgroup.IsComplement'.exists_conj_of_coprime hcop (Or.inl inferInstance) hTd_compl hData_compl
+  -- Lift the `M'`-conjugation to `G`: `conj (↑n) • td.typeP.U = data.U`, with `↑n ∈ M' ≤ M`.
+  have hnM : (n : G) ∈ M := hM'leM (SetLike.coe_mem n)
+  have hconjG : MulAut.conj (n : G) • td.typeP.U = data.U := by
+    have h2 : MulAut.conj (n : G) •
+          ((td.typeP.U.subgroupOf (derivedInG M)).map (derivedInG M).subtype)
+          = (data.U.subgroupOf (derivedInG M)).map (derivedInG M).subtype := by
+      rw [← map_subtype_conj_smul]
+      exact congrArg (Subgroup.map (derivedInG M).subtype) hnconj
+    rwa [Subgroup.map_subgroupOf_eq_of_le td.typeP.U_le,
+      Subgroup.map_subgroupOf_eq_of_le data.U_le] at h2
+  -- If `N_G(data.U) ≤ M`, transport back to `N_G(U₀) ≤ M`, contradicting the Type-II witness.
+  intro hle
+  refine td.normalizer_not_le ?_
+  have htrans : Subgroup.normalizer (data.U : Set G)
+      = MulAut.conj (n : G) • Subgroup.normalizer (td.typeP.U : Set G) := by
+    rw [normalizer_pointwise_smul, hconjG]
+  have hMconj : MulAut.conj (n : G) • M = M :=
+    conj_smul_eq_self_of_mem_normalizer (Subgroup.le_normalizer hnM)
+  rw [htrans] at hle
+  exact Subgroup.pointwise_smul_le_pointwise_smul_iff.mp (hle.trans_eq hMconj.symm)
 
 /-- **Peterfalvi (8.13)**: centralizers escaping a maximal subgroup are controlled
 by `A_1(M)` and a unique maximal subgroup of type I or II.

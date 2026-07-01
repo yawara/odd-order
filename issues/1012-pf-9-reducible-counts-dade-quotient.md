@@ -2038,3 +2038,36 @@ cont.²¹ の opaque-gating を追跡 → **remaining §9 (9.8.d/9.9.c/9.10) は
 issues 1013 (S09 §7 certificate)、1015 (hzeta0nu coherence orth)、1016 (T-side typePdata threading)、
 0065 (Cor 12.16)。文書順+上流優先で選択。caseA/B_character_counts は現状 §12-13 に consumer 無
 (endpoint) ゆえ §9 残の緊急度は低い。
+
+## S10 §8 pivot 着手 (2026-07-02 cont.²³) — (8.2.a) + (8.6.b II) closed, 残の gating map
+
+cont.²² の pivot 判断 (§9 残 = hub-gated Galois → ungated S10/S13 へ) を実行。S10
+(`S10_MinimalSimpleStructure.lean`, 文書順最上流) から着手。**S10 sorry 11→9**、いずれも axiom-clean
+[propext, Classical.choice, Quot.sound]:
+
+- **(8.2.a) `typeF_card_U0_eq_exponent`** (commit `997e7c5e`): 型 F で |U₀|=exp(U)。
+  `frobenius_HU0` の複体 U₀ = 奇位数 Frobenius 複体 ⟹ Z-group (全 Sylow cyclic; [BG] Prop 3.9 /
+  Huppert V.8.18) ⟹ `IsZGroup.exponent_eq_card`。新 helper `isZGroup_of_isFrobeniusGroup_of_odd`
+  (既存 action 形式 `isZGroup_of_isFrobeniusAction_of_odd` の pair-form bridge)。奇位数仮説
+  `Odd (Nat.card G)` を追加 (数学的に必須、無いと U₀=Q8 反例; consumer 0 ゆえ安全)。
+- **(8.6.b II) `typeII_normalizer_not_le_of_typePData`** (commit `a5ce54dd`): 型 II で任意型 P データ
+  data に ¬N_G(data.U)≤M。data.U と型 II witness td.typeP.U は M'=derivedInG M 内で M_F の補群 ⟹
+  Schur–Zassenhaus 共役 (`exists_conj_of_coprime`) ⟹ normalizer 移送 + M 自己共役で td.normalizer_not_le
+  に帰着。`card_Msigma_inf_centralizer_eq_card_W2` の共役パターンを鏡写し。
+
+### S10 残 9 sorry の gating map (次 iteration 用)
+S10_BGInterface.lean (0 sorry) の docstring が明示する通り、残の多くは **BG §14–16 (sorried) gated**:
+- **(8.11) `hall_maxNilpotentNormalHall_and_mainSubgroup`**: 型 I/II は済
+  (`S10_BGInterface.maxNilpotentNormalHall_isHall_of_typeI_or_II`)、**型 III/IV は M_s=M', M_F は M_σ の
+  proper Hall ⟹ 未証明 BG §14–15 構造 gated**。full 版は型 III/IV 必須ゆえ現状不可。
+- **(8.12.b) `typeI_or_typeII_centralizer_unique`** / **(8.13) `escapingCentralizers_control`**: BG §16
+  Thm B + Prop 16.1 (要 sorried 状態確認)。`isUniquelyMaximal_of_maximalSubgroupsContaining_eq_singleton`
+  (S10_BGInterface, bridge) は済。
+- **(8.15) `dadeSupportHypotheses_{typeI,typeP}`** / **(8.16) `typeII_A_sets_{TI,normalizer}`**: 復元済
+  (8.14)-(8.17) support 記法 + BG §16/Pf (2.3) 依存。
+- **(8.17) bgTheoremE type-I cover branch** (`bgTheoremE_cover_data` の `𝓜_P=∅` 枝): §8 route-B endpoint gated。
+- **(8.18) `support_mutual_exclusion`**: BG Theorem E cover 依存。
+
+**次 iteration 着手判断**: (8.12.b)/(8.13) の BG §16 Thm B / Prop 16.1 の sorried 状態を確認し、
+signature 正なら sorried-cite で wiring、genuine local 論証が要るなら実証明。BG-gated が深いなら S13
+(§11、10 sorry) か issues 1013/1015/1016/0065 へ (文書順+上流優先)。
