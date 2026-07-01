@@ -1078,3 +1078,35 @@ threaded hyp 無)。**残 = a=(∑ω_{r0}^σ,β) application**: β real=(11.8.3,
 これが landed すれば `residualCoeff_eq_zero` の hβr が discharge され、(11.8.5) parity 側が完全 sorry-free。
 (11.8) endpoint は依然 doubly-gated (§9↔§10 の |S₁|=n、§14 の S₂ coherence) — a=0 は (11.8.6) の
 `μ_j^{τ₂}=∑ω_{ij}^σ` 矛盾の鍵入力だが endpoint closure は §14 gate 残。**次 = β real (11.8.3)**。
+
+### β real (11.8.3) 実装計画 — Coq `PFsection11.v` 809-830 の構造 (cont.⁶³ 調査)
+Coq `Rbeta: cfReal beta` の recipe (β = β_{0 j1}、row 0 に betaE で還元後):
+```
+have betaE i j: j != 0 -> beta_ i j = beta.   (* (11.8.3) 前半: i,j 独立 *)
+  ... prDade_sub_TIirr / prDade_sub2_TIirr (= (4.8)/(4.10)) で β_{ij}=β_{i j1}=β_{0 j1} *)
+have Rbeta: cfReal beta.                        (* (11.8.3) 後半: β̄=β *)
+  rewrite rmorphD !rmorphB (conj を β の各項に分配)
+  ... cfAut_cycTIiso (σ が conj と可換: conj(η_{0j})=η_{0,k}, k=aut_Iirr conjC j)
+  ... Dade_aut (τ が conj と可換: conj(τ φ)=τ(conj φ))
+  set k := aut_Iirr conjC j; rewrite -(betaE 0 k)  (* β_{0k}=β *)
+  rewrite cfConjC_Dade_coherent coh_tau1 ?mFT_odd  (* τ₁ が conjC と可換 — 奇数位数必須 *)
+  Dtau1 cfAut_seqInd (τ₁ on ζ̄)
+```
+**必要な 5 ピース (上流順)** — ⚠**重要発見 (cont.⁶³): piece 2,3 の Galois-equiv 中核は `S07_CoherenceGalois.lean`
+に既存**。β real は「ゼロから構築」でなく「既存 comm lemma の wiring + assembly」→ 規模大幅縮小:
+1. **σ Galois-equiv (一般 column, row 0)**: `conj(ω_{0j}^σ) = ω_{0,k}^σ`, k=w2 column-conjugate。
+   既存 `exists_rowInv_alignedOmegaSigma_conj` は **column 0 の row-conjugation** (w1 側)。row-0 の
+   **column-conjugation** (w2 側) が新規。machinery: `sigma_mapRingEquiv_comm`+`galoisMap_conj_omega`
+   +`omegaProdChar_inv` は共通、w2CharEquiv の inversion が要 (w1CharEquiv_rowInv の w2 版)。**未実装**。
+2. **τ Galois-equiv (`Dade_aut`)** ✅ **LANDED (cont.⁶³, `tau_mapRingEquiv_comm`)**: `hyp.tau(φ^{σc})=（hyp.tau φ)^{σc}`
+   (A0-supp φ)。`hyp.tau`=`dadeIntegralCharacterMap ...` (def) ゆえ `S07.dadeIntegralCharacterMap_mapRingEquiv_comm`
+   を直接 `exact` (一発 green)。σc=conjAe で reality。
+3. **τ₁ (SHC extension) Galois-equiv (`cfConjC_Dade_coherent`)**: `SHC.ext(ζ^{σc})=(SHC.ext ζ)^{σc}`。
+   ⚠ 中核は `S07.IsCoherent.extension_mapRingEquiv_comm` (Pf (5.9)(a)) に**既存** (general `hτ:IsCoherent`)。
+   SHC への instantiate + 前提 (hSirr/hspan/hSu/hlat/h2) 供給が要 (wiring)。**次の着手**。
+4. **betaE (β independence)**: (4.8)/(4.10) SHC port。`tau_muGrid_column_diff` (4772) は full-coh `coh`
+   依存 → SHC 版 extract 要 (Dade/σ isometry は coh 非依存ゆえ抽出可能なはず)。**未実装**。
+5. **Rbeta assembly**: 1-4 を上記 recipe で組む。
+**規模 (改訂)**: piece 2 済、3 は既存 wiring、1/4 が新規実装、5 assembly。3-4 iteration に縮小。上流順 3→1→4→5。
+**gate 確認**: §14 下流でなく (11.8.5) の genuine prerequisite (document-order 11.8.3<11.8.5、本来上流)。
+SHC context で全て可能 (α^τ/ω^σ/ζ^{τ₁} は既に SHC で構築済み、conj 可換性を足すのみ)。

@@ -357,6 +357,19 @@ noncomputable def tau {M : Subgroup G} (hyp : Hypothesis M) :
     (hyp.dadeData.dade.fullDadeIsometryData hyp.hconj)
 
 open scoped FiniteInduce in
+/-- **The §10 Dade isometry `τ` commutes with coefficientwise ring automorphisms** (Peterfalvi
+`Dade_aut`): for `A_0`-supported `φ`, `(φ^{σc})^τ = (φ^τ)^{σc}`.  The Dade integral character map is
+pointwise (its value is `φ(a)` at a base point, `0` elsewhere), so applying `σc` to coefficients
+commutes with it (`dadeIntegralCharacterMap_mapRingEquiv_comm`).  Taking `σc = conjAe` this is the
+`τ`-side Galois-equivariance feeding the (11.8.3) reality `β̄ = β`. -/
+theorem Hypothesis.tau_mapRingEquiv_comm [Finite G] {M : Subgroup G} (hyp : Hypothesis M)
+    (σc : ℂ ≃+* ℂ) {φ : ClassFunction ↥M ℂ} (hφ : φ.support ⊆ hyp.A0) :
+    hyp.tau (ClassFunction.mapRingEquiv σc φ) = ClassFunction.mapRingEquiv σc (hyp.tau φ) := by
+  haveI := hyp.finiteG
+  exact OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap_mapRingEquiv_comm
+    hyp.dadeData.dade (hyp.dadeData.dade.fullDadeIsometryData hyp.hconj) σc hφ
+
+open scoped FiniteInduce in
 /-- **Peterfalvi (8.16) for the type-`P` support `A(M)`**: `N_G(A(M)) = M`.
 
 The genuine (10.1) `Hypothesis` records `N_G(A_0(M)) = M` (`hyp.dadeData.normalizer_eq`, the (8.15)
