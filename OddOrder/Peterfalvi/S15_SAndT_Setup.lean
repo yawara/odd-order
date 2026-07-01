@@ -1570,6 +1570,48 @@ theorem Hypothesis.W1_fpf_C [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
   push_cast
   exact heq
 
+/-- `W₁` normalizes `C = U ⊓ C_G(P)`: `W₁ ≤ S ≤ N_G(P)` (so it normalizes `C_G(P)`) and
+`W₁ ≤ N_G(U)` (`W1_normalizes_U`), hence it normalizes their intersection.  The `N_G(C)`-input to
+the conjugation action of the (13.12) `c ≡ 1 (mod q)` step. -/
+theorem Hypothesis.W1_le_normalizer_C (hyp : Hypothesis (G := G)) :
+    hyp.W1 ≤ Subgroup.normalizer (hyp.C : Set G) := by
+  have hW1S : hyp.W1 ≤ hyp.S := by
+    have h1 : hyp.W1 ≤ hyp.W := by rw [hyp.W_eq_join]; exact le_sup_left
+    have h2 : hyp.W ≤ hyp.S := by rw [hyp.W_eq_inter]; exact inf_le_left
+    exact h1.trans h2
+  have hSP : hyp.S ≤ Subgroup.normalizer (hyp.P : Set G) := by
+    rw [hyp.P_eq_SF]; exact OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_le_normalizer hyp.S
+  intro w hw
+  have hwP := hSP (hW1S hw)
+  have hwU := hyp.W1_normalizes_U hw
+  rw [Subgroup.mem_set_normalizer_iff]
+  intro x
+  rw [hyp.C_eq]
+  simp only [Subgroup.mem_inf, SetLike.mem_coe]
+  -- `w` normalizes `U` and `C_G(P)`; combine.
+  have hU_iff : x ∈ hyp.U ↔ w * x * w⁻¹ ∈ hyp.U :=
+    Subgroup.mem_set_normalizer_iff.mp hwU x
+  have hCP_iff : x ∈ Subgroup.centralizer (hyp.P : Set G) ↔
+      w * x * w⁻¹ ∈ Subgroup.centralizer (hyp.P : Set G) := by
+    constructor
+    · intro hx
+      rw [Subgroup.mem_centralizer_iff]
+      intro p hp
+      have hp' : w⁻¹ * p * w ∈ (hyp.P : Set G) := (Subgroup.mem_set_normalizer_iff''.mp hwP p).mp hp
+      have hcomm := (Subgroup.mem_centralizer_iff.mp hx) _ hp'
+      calc p * (w * x * w⁻¹) = w * ((w⁻¹ * p * w) * x) * w⁻¹ := by group
+        _ = w * (x * (w⁻¹ * p * w)) * w⁻¹ := by rw [hcomm]
+        _ = (w * x * w⁻¹) * p := by group
+    · intro hx
+      rw [Subgroup.mem_centralizer_iff]
+      intro p hp
+      have hp' : w * p * w⁻¹ ∈ (hyp.P : Set G) := (Subgroup.mem_set_normalizer_iff.mp hwP p).mp hp
+      have hcomm := (Subgroup.mem_centralizer_iff.mp hx) _ hp'
+      calc p * x = w⁻¹ * ((w * p * w⁻¹) * (w * x * w⁻¹)) * w := by group
+        _ = w⁻¹ * ((w * x * w⁻¹) * (w * p * w⁻¹)) * w := by rw [hcomm]
+        _ = x * p := by group
+  rw [hU_iff, hCP_iff]
+
 /-- **Peterfalvi (13.11)**: the elementary numerical bounds for `m`.
 
 The `q ≥ 7` and `q ≥ 5` bounds are the genuine arithmetic estimates
