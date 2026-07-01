@@ -1657,6 +1657,26 @@ theorem Hypothesis.c_modEq_one [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G
   rw [hfix, ← hyp.c_eq_card_C] at hmod
   exact hmod
 
+/-- **Peterfalvi (13.12), `dv_2q_c1`**: `2q ∣ c − 1`.  `c ≡ 1 (mod q)` (`c_modEq_one`) and `c` is
+odd (`|C| ∣ |G|`, `|G|` odd), so both `q` and `2` divide `c − 1`; coprimality (`q` odd) gives
+`2q ∣ c − 1`.  In the `c > 1` branch this forces `c ≥ 2q + 1`, the lower bound Peterfalvi's numeric
+elimination contradicts. -/
+theorem Hypothesis.two_mul_q_dvd_c_pred [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hyp : Hypothesis (G := G)) : 2 * hyp.q ∣ hyp.c - 1 := by
+  have hc1 : 1 ≤ hyp.c := by rw [hyp.c_eq_card_C]; exact Nat.card_pos
+  have hq : hyp.q ∣ hyp.c - 1 := (Nat.modEq_iff_dvd' hc1).mp (hyp.c_modEq_one hG).symm
+  have hcodd : ¬ 2 ∣ hyp.c := by
+    have hcG : hyp.c ∣ Nat.card G := by
+      rw [hyp.c_eq_card_C]; exact Subgroup.card_subgroup_dvd_card _
+    have hodd : Nat.card G % 2 = 1 := Nat.odd_iff.mp hG.odd
+    intro h2c
+    have h2G : (2 : ℕ) ∣ Nat.card G := h2c.trans hcG
+    omega
+  have h2 : 2 ∣ hyp.c - 1 := by omega
+  have hcop : Nat.Coprime 2 hyp.q :=
+    (Nat.coprime_primes Nat.prime_two hyp.q_prime).mpr (Ne.symm hyp.q_ne_two)
+  exact hcop.mul_dvd_of_dvd_of_dvd h2 hq
+
 /-- **Peterfalvi (13.11)**: the elementary numerical bounds for `m`.
 
 The `q ≥ 7` and `q ≥ 5` bounds are the genuine arithmetic estimates
