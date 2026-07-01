@@ -7343,6 +7343,81 @@ theorem Hypothesis.muGridAlpha_tau_inner_SHC_extension_sub [Finite G] {M : Subgr
     hyp.muGridAlpha_inner_zeta_sub_irr hG hodd i j hζirr hηirr hdζ h0ζ (hη1.trans hζ1.symm) hηne]
 
 open scoped FiniteInduce in
+/-- **`SHC_isCoherent.extension` is injective on `S(HC)`** (α-grid `S₁`-`τ₁` input to (11.8.2)):
+distinct degree-`w₁` irreducibles of `S(HC)` have distinct coherent images.  Immediate from the
+orthonormality (`SHC_extension_inner_self` = 1, `SHC_extension_inner_of_ne` = 0): if the images
+coincided, `1 = ⟨φ^{τ₁}, φ^{τ₁}⟩ = ⟨φ^{τ₁}, ψ^{τ₁}⟩ = 0`.  Needed to materialize
+`{λ^{τ₁} : λ ∈ S(HC)}` as an orthonormal `Finset` for the (11.8.2) integer projection
+(`exists_intProjection_of_orthonormal_ZIrr`). -/
+theorem Hypothesis.SHC_extension_inj [Finite G] {M : Subgroup G}
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis M)
+    {φ ψ : ClassFunction ↥M ℂ}
+    (hφS : φ ∈ inducedFamily M) (hφirr : IsIrreducibleCharacter φ) (hφ1 : φ 1 = (hyp.w1 : ℂ))
+    (hψS : ψ ∈ inducedFamily M) (hψirr : IsIrreducibleCharacter ψ) (hψ1 : ψ 1 = (hyp.w1 : ℂ))
+    (heq : (hyp.SHC_isCoherent hG).extension φ = (hyp.SHC_isCoherent hG).extension ψ) :
+    φ = ψ := by
+  by_contra hne
+  have h0 : ClassFunction.inner ((hyp.SHC_isCoherent hG).extension φ)
+      ((hyp.SHC_isCoherent hG).extension ψ) = 0 :=
+    hyp.SHC_extension_inner_of_ne hG hφS hφirr hφ1 hψS hψirr hψ1 hne
+  have h1 : ClassFunction.inner ((hyp.SHC_isCoherent hG).extension φ)
+      ((hyp.SHC_isCoherent hG).extension ψ) = 1 := by
+    rw [← heq]; exact hyp.SHC_extension_inner_self hG hφS hφirr hφ1
+  rw [h0] at h1
+  exact one_ne_zero h1.symm
+
+open scoped Classical FiniteInduce in
+/-- **`{λ^{τ₁} : λ ∈ S(HC)}` as an orthonormal `ZIrr` `Finset`** (α-grid (11.8.2) setup).  The
+coherent images of the degree-`w₁` irreducibles of `S(HC)` form an orthonormal family of virtual
+characters of `G`, ready for the integer projection `exists_intProjection_of_orthonormal_ZIrr` of
+`α_{ij}^τ` in (11.8.2).  Materialized as the image of the `S(HC)` `IrreducibleCharacter` `Finset`
+(the same filter used by `SHC_isCoherent`) under `extension`; orthonormality is
+`SHC_extension_inner_self`/`SHC_extension_inner_of_ne` + the injectivity `SHC_extension_inj`. -/
+theorem Hypothesis.exists_SHC_extension_orthonormal [Finite G] {M : Subgroup G}
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis M) :
+    ∃ R : Finset (ClassFunction G ℂ),
+      (∀ β ∈ R, β ∈ ZIrr G) ∧
+      (∀ α ∈ R, ∀ β ∈ R, ClassFunction.inner α β = if α = β then (1 : ℂ) else 0) ∧
+      (∀ φ : ClassFunction ↥M ℂ, φ ∈ inducedFamily M → IsIrreducibleCharacter φ →
+        φ 1 = (hyp.w1 : ℂ) → (hyp.SHC_isCoherent hG).extension φ ∈ R) ∧
+      (∀ β ∈ R, ∃ φ : ClassFunction ↥M ℂ, φ ∈ inducedFamily M ∧ IsIrreducibleCharacter φ ∧
+        φ 1 = (hyp.w1 : ℂ) ∧ β = (hyp.SHC_isCoherent hG).extension φ) := by
+  haveI := hyp.finiteG
+  classical
+  set s : Finset (IrreducibleCharacter ↥M) :=
+    Finset.univ.filter (fun χ => (χ : ClassFunction ↥M ℂ) ∈ inducedFamily M ∧
+      (χ : ClassFunction ↥M ℂ) 1 = (hyp.w1 : ℂ)) with hs
+  refine ⟨s.image (fun χ : IrreducibleCharacter ↥M =>
+      (hyp.SHC_isCoherent hG).extension (χ : ClassFunction ↥M ℂ)), ?_, ?_, ?_, ?_⟩
+  · intro β hβ
+    rw [Finset.mem_image] at hβ
+    obtain ⟨χ, hχs, rfl⟩ := hβ
+    rw [hs, Finset.mem_filter] at hχs
+    exact (hyp.SHC_isCoherent hG).extension_mem_ZIrr _
+      (Submodule.subset_span ⟨hχs.2.1, χ.2, hχs.2.2⟩)
+  · intro α hα β hβ
+    rw [Finset.mem_image] at hα hβ
+    obtain ⟨χ, hχs, rfl⟩ := hα
+    obtain ⟨χ', hχ's, rfl⟩ := hβ
+    rw [hs, Finset.mem_filter] at hχs hχ's
+    by_cases hχχ' : χ = χ'
+    · subst hχχ'; rw [if_pos rfl]
+      exact hyp.SHC_extension_inner_self hG hχs.2.1 χ.2 hχs.2.2
+    · have hne : (χ : ClassFunction ↥M ℂ) ≠ (χ' : ClassFunction ↥M ℂ) :=
+        fun h => hχχ' (Subtype.ext h)
+      rw [hyp.SHC_extension_inner_of_ne hG hχs.2.1 χ.2 hχs.2.2 hχ's.2.1 χ'.2 hχ's.2.2 hne,
+        if_neg (fun hαβ => hχχ' (Subtype.ext
+          (hyp.SHC_extension_inj hG hχs.2.1 χ.2 hχs.2.2 hχ's.2.1 χ'.2 hχ's.2.2 hαβ)))]
+  · intro φ hφS hφirr hφ1
+    rw [Finset.mem_image]
+    exact ⟨⟨φ, hφirr⟩, by rw [hs, Finset.mem_filter]; exact ⟨Finset.mem_univ _, hφS, hφ1⟩, rfl⟩
+  · intro β hβ
+    rw [Finset.mem_image] at hβ
+    obtain ⟨χ, hχs, rfl⟩ := hβ
+    rw [hs, Finset.mem_filter] at hχs
+    exact ⟨χ, hχs.2.1, χ.2, hχs.2.2, rfl⟩
+
+open scoped FiniteInduce in
 /-- **Peterfalvi (11.8), the genuine non-orthogonality** (lane-b W3 obligation, issue 2020).
 
 Under Hypothesis (10.1), there is an irreducible `ζ ∈ S = inducedFamily M` of degree `w₁` —

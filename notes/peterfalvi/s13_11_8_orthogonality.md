@@ -619,3 +619,34 @@ S₂=S(C)−S(HC)。(9.11)→S₂ coherent (11.7)、μ_k∈S₂ (9.8.b/9.9.b)。
 - projection: X:=α^τ−∑_λ c_λ λ^{τ₁} ⊥ S₁^{τ₁} (orthonormal API); ‖α^τ‖²=‖X‖²+∑|c_λ|² (Parseval)。
 - norm: ‖α^τ‖²=2+n² (`muGridAlpha_tau_inner_self` coh-free ✅) ⟹ (a−n)²+(|S₁|−1)a²≤2+n² ⟹ |S₁|a²−2an≤2
   ⟹ n(a²−2a)≤2 (n=|S₁|=(u−1)/q, 11.8.1) ⟹ a∈{0,1,2}。a∈{0,2}⟹‖X‖²=2⟹X=ω^σ diff (‖X‖²=2、10.5 同様)。
+
+## 2026-07-02 cont.³³ (lane-a) — 🔑 (11.8.2) 鍵機構発見 `exists_intProjection_of_orthonormal_ZIrr` + injectivity
+**鍵機構**: `ClassFunction.exists_intProjection_of_orthonormal_ZIrr` (InducedCharacter.lean):
+`φ∈ZIrr, R:Finset(ZIrr) orthonormal → ∃ (c:·→ℤ)(Y), (∀α∈R,⟨φ,α⟩=c α) ∧ φ=∑_{α∈R}(c α)•α+Y ∧ ∀α∈R,⟨Y,α⟩=0`。
+= **(11.8.2) 分解そのもの** (φ=α^τ, R={λ^{τ₁}:λ∈S(HC)})。整数係数 c + 直交剰余 Y=X を供給。
+∴ (11.8.2) の「biggest load」= 手製 Bessel は不要、この機構に R を渡すだけ。
+
+**landed**: `Hypothesis.SHC_extension_inj` — SHC.extension は S(HC) 上単射 (orthonormal: 像一致なら 1=⟨⟩=0 矛盾)。
+R (={λ^{τ₁}} Finset) materialization の injectivity 要件。
+
+**(11.8.2) 残 build plan (次〜)**:
+1. **R materialization**: S(HC) Finset (SHC_isCoherent の `s=univ.filter p` 再利用) → `s.image SHC.extension` = R。
+   hZ (extension_mem_ZIrr)、horth (SHC_extension_inner_self/of_ne + inj で if α=β then 1 else 0)、|R|=|S₁|=n。
+2. **exists_intProjection** で φ=α^τ → c, Y。係数: c(ζ^{τ₁})=a−n, c(η^{τ₁})=a (cont.³² coefficient relation)。
+3. **norm**: ‖α^τ‖²=∑_{α∈R}|c α|²+‖Y‖² (Y⊥R orthonormal Parseval) = (a−n)²+(n−1)a²+‖Y‖²。=2+n² (coh-free ✅)。
+   ⟹ (a−n)²+(n−1)a²≤2+n² ⟹ n(a²−2a)≤2 (n≥2) ⟹ a∈{0,1,2}。
+4. **a∈{0,2}⟹X=ω^σ diff** (‖X‖²=2、10.5 同様の grid_trichotomy)。
+
+## 2026-07-02 cont.³⁴ (lane-a) — R materialization landed (11.8.2 projection 準備完了)
+**`Hypothesis.exists_SHC_extension_orthonormal`** landed (S12, leaf green): S(HC)^{τ₁}={λ^{τ₁}:λ∈S(HC)}
+を orthonormal ZIrr Finset R として materialize。∃R, hZ (∀β∈R,∈ZIrr) ∧ horth (∀α,β∈R,⟨α,β⟩=if α=β then 1 else 0)
+∧ membership (λ∈S(HC)⟹SHC.ext λ∈R) ∧ reverse (β∈R⟹∃λ∈S(HC),β=SHC.ext λ)。
+= S(HC) IrreducibleCharacter Finset (SHC_isCoherent と同 filter) の SHC.extension image。
+orthonormal = SHC_extension_inner_self/of_ne + SHC_extension_inj (cont.³³)。
+**⟹ exists_intProjection_of_orthonormal_ZIrr に R を渡す準備完了**。
+
+**次 = exists_intProjection 適用 + norm bound**:
+1. `exists_intProjection_of_orthonormal_ZIrr (α^τ∈ZIrr) hZ horth` → c:·→ℤ, Y, α^τ=∑_{β∈R}(c β)•β+Y, Y⊥R。
+2. 係数: c(SHC.ext ζ)=a−n, c(SHC.ext η)=a (η≠ζ) — cont.³² coefficient relation + cont.²⁶ integrality。
+3. norm: ‖α^τ‖²=∑_{β∈R}(c β)²+‖Y‖² (Parseval, Y⊥R orthonormal) = (a−n)²+(|R|−1)a²+‖Y‖²。
+   |R|=|S(HC)|=n (image injective via SHC_extension_inj)。=2+n² (coh-free) ⟹ n(a²−2a)≤2 ⟹ a∈{0,1,2}。
