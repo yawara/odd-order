@@ -1431,5 +1431,24 @@ bijection [Is 6.11] + cyclic/coprime mult-one [(1.7)]) は未在** = 大規模 s
 prereq (1.2)[S03b done], (1.5.a)[Clifford.lean 一部] は available。**次の genuine 上流 = issue 0026 (Clifford core)**
 だが shared infra ゆえ claim-before-build (9000 issue) 対象。α レーン (§10-13 char) も要すると見込まれ、coordination point。
 
-**L-side 別 gate**: witness coherence `sibleyTarget_frobI` (S14:1652, sorry) = (6.8) case-c1 Sibley target
-+ `S08.sibleySetup_is_coherent` (6.8 body)。これは Clifford と独立の §6.8/§8 coherence build。
+**L-side 別 gate**: witness coherence `sibleyTarget_frobI` (S14:1652, sorry) = (6.8) case-c1 Sibley target。
+**重要: S08 は 0 sorry — (6.8) body `sibleySetup_is_coherent` は proven**。∴ 唯一の gap = Frobenius witness の
+`SibleyDadeHypothesis` producer (現在 producer 無し、consumer のみ)。これは Clifford 非依存の tractable L-side
+build で、landing すれば `frobenius_typeI_coherent` (12.6) → `witness_L_coherent` (S14:2458→2463 が `sibleyTarget_frobI`
+経由 sorry) → witness の (5.5) 実適用が全て unconditional化。**高価値・次セッション最有力**。
+
+**`sibleyTarget_frobI` 構成 route (turnkey)**: `SibleyTarget hyp.tau hyp.Sset hyp.A` を構成。
+`SibleyDadeHypothesis` (S08_CoherenceCorePart1:3265) の 15 field:
+- `H := hyp.H.subgroupOf L`, `W1 := C` (hfrob の complement)。
+- `H_ne_bot`/`H_normal`/`H_nilpotent`/`split`(L=H⋊W1)/`W1_nontrivial`/`card_L_odd`: hyp+hfrob から直接。
+- `dade`: **crux**。ambient `sharpImage (hyp.H.subgroupOf L)` は `typeIA L hyp.typeI` (=H^#) と命題的等号
+  (`typeIA_eq_sharp` (S14:3289) + `sharpImage`=map∘subtype∘subgroupOf の計算; defeq でない)。
+  **cleaner route = fresh 構成** `S04.of_isTISubset` (S04:267, `hA_sharp`/`hA_L`/`hL_norm`/`hTI` 入力) →
+  `of_isTISubset_H` (S04:304) が `dade.H a=⊥` を自動供給 (= `dade_H_eq_bot` field)。TI 性は witness の
+  A(L)=H^# TI (8.12.c/12.9) から。
+- `tau_eq : sib.tau = hyp.tau`: 両者 TI Dade map (= Ind_L^G on supported lattice) ゆえ `IsDadeMap.unique`
+  (S04:3645) で一致。要 hyp.dadeData.dade も TI map = `∀a, hyp.dadeData.dade.H a=⊥` (witness Frobenius ゆえ;
+  `H_eq_supportKernel` + escaping 空)。`isDadeMap_induce_of_forall_H_eq_bot` (S14:1180) が両側を Ind に落とす。
+- `S`/`S_eq`: hyp.Sset は既に {Ind_H^L θ|θ≠1} 形 (S14:85) ゆえ S_eq 直接。`A0_eq`: `supportInSubgroup (sharpImage H) L
+  = hyp.A` を sharpImage=typeIA から congr。`cases := Or.inl hfrob`。`hconj`: hyp.hconj (ambient 一致下)。
+推定 ~150-250 行 + 補助 (TI 性・forall_H_eq_bot・sharpImage=typeIA)。fresh-dade route が transport 回避で最善。
