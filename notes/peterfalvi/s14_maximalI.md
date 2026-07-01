@@ -1553,3 +1553,39 @@ helper `inner_eq_on_zSpan_pair` (差-等長→zSpan 双線型拡張、`Submodule
 - `hAH : ambientA = H\{1}` は `typeIA_eq_sharp` (S14:3289) から供給。
 順序: 上流=character/degree facts (tractable) → Dade fields (tau_isometry_diff/difference_image) →
 (5.2.e) difference_images_orthogonal (deep) → assembly。multi-turn 想定。
+
+### ✅ loop⁶⁶ (2026-07-02 lane-b cont.): 12.6 case-b の hard core 完了 — witness S07.Hypothesis 全 field + coherent 主 hyp を実証明
+
+`frobenius_typeI_coherent_of_abelianKernel` (S14, まだ sorry) 用の witness 事実を **10 named lemma** で
+実証明 landing (全 build-green、7 commit)。**S07.Hypothesis hyp.Sset hyp.A の 7 field 全て + coherent_of_constant_degree
+の主要 hyp が揃った**。ソース lemma (全て S14, `open scoped …FiniteInduce in` + 必要なら `open …S09.Cert in` 付):
+- `Sset_isIrreducibleCharacter` (hfrob): 各 Ind θ 既約 (`isIrreducibleCharacter_induce_of_frobeniusGroup`)。
+- `Sset_hasNoRealCharacters` (hodd, hfrob): no_real field。
+- `Sset_pairwiseOrthogonal` (hodd, hfrob): pairwise field。
+- `Sset_inner_self_eq_one` (hfrob): hirr (`inner_self_induce_eq_one_of_frobeniusGroup`)。
+- `Sset_apply_one_eq_index` (hab): 等次数 [L:H] (hconst/hdeg0; `induce_apply_one`+`apply_one_eq_one_of_isMulCommutative`,
+  `subgroupOf_isMulCommutative` instance)。
+- `Sset_diff_supported` (hab, hAH): hsuppdiff + tau_isometry の supp (member vanish off H + 等次数 → H^# supp)。
+- `Sset_tau_isometry_diff` (hab, hAH): tau_isometry_diff field (`dadeIntegralCharacterMap_inner_eq_on_supported_span`)。
+- `Sset_tau_diff_mem_ZIrr` (hfrob, hab, hAH): hZIrr (`dadeIntegralCharacterMap_mem_ZIrr_of_supported`)。
+- `Sset_differenceImage` (hodd, hfrob, hab, hAH): difference_image field (`dadeCharacterDifferenceImageOfDiff`)。
+- `Sset_differenceImages_orthogonal` (hodd, hfrob, hab, hAH): (5.2.e) field — signedDiff→`Sset_tau_isometry_diff`
+  で source `⟨φ−φ̄,χ−χ̄⟩` に落とし 4 項 orthogonality (φ̄≠χ,χ̄ は ⟨φ,χ⟩=⟨φ,χ̄⟩=0 から)。**最深、一発 green**。
+
+**残 = assembly のみ** (`frobenius_typeI_coherent_of_abelianKernel` の sorry を置換):
+```
+obtain ⟨C, hfrob⟩ := _hfrob   -- kernel hyp.H.subgroupOf L =defeq (typeF.H).subgroupOf L
+have hab := _hab.1
+have hodd : Odd (Nat.card ↥L) := hG.odd.of_dvd_nat (Subgroup.card_subgroup_dvd_card L)
+have hAH : hyp.ambientA = (typeF.H : Set G)\{1} := by rw[Hypothesis.ambientA, hyp.typeIA_eq_sharp hG]; rfl -- sharpSubgroup=\{1}
+refine ⟨(coherent_of_constant_degree ⟨hyp.tau, (fun _ _ _ _ ha hb hc hd => Sset_tau_isometry_diff …), Sset_closedUnderConjugate hyp, Sset_hasNoRealCharacters …, Sset_pairwiseOrthogonal …, (fun _ hχ => Sset_differenceImage …), (fun _ _ hφ hχ => Sset_differenceImages_orthogonal …)⟩ hSfin hcard (fun ζ hζ => Sset_inner_self_eq_one …) (fun a ha b hb => Sset_tau_diff_mem_ZIrr …) hconst hdeg0 h1A (fun a ha b hb => Sset_diff_supported …)).some⟩
+```
+の 4 finiteness hyp を埋める (infra 確認済):
+- `h1A := one_not_mem_supportInSubgroup_sharp hyp.typeI.typeF.H hAH` (S09:744; hyp.A = supportInSubgroup ambientA L)。
+- `hdeg0`: `Sset_apply_one_eq_index …` で index に、`Nat.cast_ne_zero.mpr (Subgroup.index_ne_zero_of_finite)` (mathlib Index:524)。
+- `hconst`: `fun a ha b hb => by rw[Sset_apply_one_eq_index … ha, Sset_apply_one_eq_index … hb]`。
+- `hSfin`: Sset ⊆ range(θ↦induce θ), `Set.finite_range` (要 `Finite (IrreducibleCharacter ↥H_sub)` = Finite.of_fintype/ofFinite)。
+- **`hcard : 2 ≤ Sset.ncard`** (唯一の fiddly): ∃θ≠1 (H_sub nontrivial ← typeF.H_nontrivial + subgroupOf) → χ=induce θ,
+  χ̄∈Sset (conj_closed), χ≠χ̄ (non-real) → `Set.one_lt_ncard`/{χ,χ̄}⊆Sset。∃θ≠1 は card(Irr)=card(ConjClasses)>1
+  経由 (`card_irreducibleCharacter_eq`, CharacterCompleteness:558; nontrivial group の conjClasses>1 要確認)。
+next: この assembly を書いて frobenius_typeI_coherent_of_abelianKernel を close → (12.6) case-b 完了。
