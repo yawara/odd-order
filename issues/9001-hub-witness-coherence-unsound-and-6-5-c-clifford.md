@@ -112,7 +112,9 @@ lane c (cont.⁴³) が「deep char frontier は 9001 shared coherence infra に
   **`coherent_of_constant_degree` が Dade-compatible に**。full build green (3893 jobs, axioms OK)。
   S07.Hypothesis は未 construction ゆえ lane-a regression なし。
 - [ ] lane b: (6.5.c) coherence を 9000 番台で claim → build (shared leaf)。
-- [ ] lane b: 構成的 Clifford (issue 0026) を 9000 番台で claim → build。
+- [x] lane b: (5.7)/S07 lattice-relative refactor 完了 (`d31b9763`, full build green, 2026-07-02 hub 合流済)。
+- ~~lane b: 構成的 Clifford~~ → **lane c に再配分済** (下記「HUB 再裁定」節、issue 9002 で lane c が claim)。
+  lane b は Clifford を build しない (dup 回避)。
 
 ### 次: `frobenius_typeI_coherent_of_abelianKernel` (12.6 case b) 埋め — S14 witness の S07.Hypothesis 構成
 refactor で `coherent_of_constant_degree` が witness Dade map で使えるように。残タスク = S14 witness
