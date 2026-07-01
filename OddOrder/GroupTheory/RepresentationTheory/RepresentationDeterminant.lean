@@ -47,4 +47,12 @@ theorem representationDeterminant_comp {H : Type*} [Group H] (ρ : Representatio
   ext h
   simp only [representationDeterminant_apply, MonoidHom.comp_apply]
 
+/-- **The determinant character has values that are `|G|`-th roots of unity.**  For a finite group,
+`(det ρ g)^{|G|} = det ρ (g^{|G|}) = det ρ 1 = 1` (`pow_card_eq_one'`).  Hence the order of `det ρ`
+in `Hom(G, ℂˣ)` divides `|G|` — the arithmetic that, against `gcd([K:H], |H|) = 1`, drives the
+uniqueness of the coprime extension (Isaacs *CT* 8.16). -/
+theorem representationDeterminant_pow_card [Finite G] (ρ : Representation ℂ G V) (g : G) :
+    representationDeterminant ρ g ^ Nat.card G = 1 := by
+  rw [← map_pow, pow_card_eq_one', map_one]
+
 end OddOrder.RepresentationTheory
