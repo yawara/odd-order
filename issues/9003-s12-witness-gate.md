@@ -125,3 +125,20 @@ Frobenius L で `typeIA=(L_F)^#⊆L_F` (centralizerSupport_sharp_eq_of_frobenius
 - **残 sole sorry = Pin2** `diffImage_support_subset_conjClassSet_sigmaSharp`: tight
   `supp(τ(φ−φ̄))⊆𝒞_G((L_F)^#)`。§4 Dade obligation (tight constituent support + Hypothesis.restrict
   vanishing、Frobenius 不要)。→ Pin2 で (8.18.c)→(12.3)→(12.16) 完 (Cluster B done)。task 10。
+
+## ⚠️ lane b 訂正 (2026-07-02, loop⁹⁸) — (8.18.c) は deep §8; loop⁹⁷ over-reach を revert
+
+**soundness 訂正** (commit 7c40c3c2): loop⁹⁷ の tight-support pin Pin2
+(`diffImage_support_subset_conjClassSet_sigmaSharp`) は**非-Frobenius L で偽**だった。§8/§12 source 精読で:
+(8.18.c) = **mixed asymmetric** `Ã₁(L₁)∩Ã(L₂)=∅` (Ã₁=thickened (L_F)^#、Ã=thickened A=typeIA);
+constituent は full A=typeIA 上 supported (Frobenius L でのみ A=A₁); (12.15) は (12.3) を L₁=Frobenius
+witness / L₂=N **非-Frobenius** で適用 ⟹ 対称 A₁-only 論法は**偽**。∴ Pin2 削除、
+`nonconjugate_diffImage_inner_zero` を honest sorry へ revert (true だが deep §8 obligation)。
+
+**KEPT (correct)**: `conjClassSet_sigmaSharp_disjoint_of_nonconjugate` (Pin1、証明済 = Ã₁∩Ã₁ 部分、
+単独では不十分)、`support_mutual_exclusion` (S10、証明済)。
+
+**残 (8.18.c)**: mixed Ã₁∩Ã は §8 support theory ((8.13.c) escaping centralizer、(8.17) order-coprime、
+(8.18)) の形式化を要す — substantial §8、lane-a/shared 領域の公算。**β の cleanly-ownable coherence は完了、
+(8.18.c)+Cluster A は共に deep §8 で β 最適作業とは言い難い**。hub 検討: §8 support theory 着手 / ungated
+§12 char pivot / reallocation。正確な理解 (task 11 + 本 issue) が durable handoff。
