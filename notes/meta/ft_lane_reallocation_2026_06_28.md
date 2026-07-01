@@ -47,8 +47,18 @@
 |---|---|---|---|---|
 | **a** | `odd-order-a` | **α** Pf §10–11–13 中央指標核 | `Peterfalvi/{S10_MinimalSimpleStructure, S11_MaximalII_III_IV, S12_MaximalIII_IV_V, S13_MaximalIII_IV}.lean` + `FeitThompson.lean:426` (`card_kappaHall_lt_of_isTypeIIIorIV`) | 1000 |
 | **b** | `odd-order-b` | **β** Pf §12 all-Type-I Dade tower | `Peterfalvi/S14_MaximalI.lean` | 2000 |
-| **c** | `odd-order-c` | **γ** POLE-2 §14–16 + §15 S&T (Arm B) | `Peterfalvi/{S15_SAndT, S15_SAndT_Setup, S16_NonExistenceG}.lean` | 3000 |
-| **d** | `odd-order-d` | **δ** BG §14–16 局所解析 + type-P carrier | `BG/Ch4_FamilyOfMaximal/{S14_TypePCounting, S15_MF, S16_MainResults, S16_PairIntersection}.lean` + `FeitThompson.lean` の type-P carrier 宣言群 | 4000 |
+| **c** | `odd-order-c` | **γ** POLE-2 §14–16 下流 (Arm B) | `Peterfalvi/{S15_SAndT, S16_NonExistenceG}.lean` | 3000 |
+| **d** | `odd-order-d` | **γ 上流 §15 S&T setup** (2026-07-01 再配分) + δ BG §14–16 (dormant, 実質完成) | `Peterfalvi/S15_SAndT_Setup.lean` (主) + `BG/**` + `FeitThompson.lean` type-P carrier (dormant) | 4000 |
+
+> **⚠ 2026-07-01 再配分 (ユーザー裁定, issue 0092)**: lane d の旧クラスタ δ (BG §14–16 → Peterfalvi
+> interface) の FT deliverable は**実質完成** (kappa/IsTypeP/M_F/Prop 16.1/typeP_duality/type-P carrier/
+> bgTheoremE_cover_data/theoremD_*/theoremE_*/FT_signalizer は全 sorry-free で spine 消費済)。残 §14–16
+> owned sorry (Thm A/B monolith=faithful variant で迂回済 / tau2_transfer_constraint 15.8 / unconsumed
+> endpoint 3) は marginal FT value 低。⟹ **lane d の主焦点を binding pole γ の import-上流最上流
+> `S15_SAndT_Setup.lean` (16 sorry) へ移す**。lane c は下流 `S15_SAndT` + `S16_NonExistenceG` (21 sorry) を
+> 保持。import chain = `S15_SAndT_Setup → S15_SAndT → S16_NonExistenceG` ゆえ upstream-first + signature
+> contract で clean decouple。lane d は BG/** 所有を保持 (dormant、必要時のみ)。lane c は以後
+> **S15_SAndT_Setup を編集しない** (逸脱扱い)。
 
 ### carve-out (sub-file 所有例外、ユーザー裁可)
 
