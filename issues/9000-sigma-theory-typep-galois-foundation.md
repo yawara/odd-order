@@ -133,10 +133,16 @@ structural 入力。
         block scalars `φ : Fin(n+1)→(Ū→*A)` + no-global-scalar (`hconst`) → ratio 埋め込み
         `x↦(φ_{i+1}(x)/φ_0(x))` injective → `|Ū|≤|A|^n=a^{q−1}`。Coq `psi` (PFsection9.v:442) の
         crux を generic 構成。lane a は block scalars φ を供給するだけ (module 分解から)。
-      - [ ] **残: 構造的 block 分解** (deep, type-P-specific): Maschke 半単純 (instance 済) +
-        W₁-permutation で `Hbar=⊕H1^w` (|H1|=p, q blocks) → 各 block の scalar hom φ_i を取り出す
-        + `a∣p−1` (block action → Z_pˣ = SingerField |M|=p 特殊化直接 cite) + `hconst` (Ū に
-        nonidentity global scalar 無し = 型 P quotient 構造)。W₁/Ū 依存ゆえ lane a assembly。
+      - [x] **generic block-scalar extraction** (`LineScalarCharacter.lean`, sorry-free, 2026-07-02):
+        `lineScalarChar ρ hdim : U →* (ZMod p)ˣ` = 各 block (1-dim 𝔽_p-line) 上の U-作用の scalar
+        character (homothety `𝔽_p ≃+* End(line)` 経由) + `lineScalarChar_smul` (`ρ u x = φ u • x`,
+        hconst 変換用) + `card_dvd_sub_one_of_faithful_line` (faithful line → `|U|∣p−1`, `a∣p−1` の
+        generic 版)。Coq `phi w` (PFsection9.v:442) の generic 核。**ExtraspecialSinger の private
+        `card_dvd_sub_one_of_faithful_one_dim` を本 generic に dedup 済** (route B が cite)。
+      - [ ] **残 (lane a assembly, W₁/Ū 依存)**: 構造的 block 分解 `Hbar=⊕H1^w` (Maschke 半単純
+        instance 済 + W₁-permutation, |H1|=p, q blocks) → 各 block を `lineScalarChar` に渡して φ_i
+        family を組む + `hconst` (Ū に nonidentity global scalar 無し = 型 P quotient 構造 = C=1
+        Frobenius, `lineScalarChar_smul` で scalar 等式に変換)。scalar 抽出・`a∣p−1` は本 leaf 供給済。
 - [x] step 3: dichotomy 組立 — **DONE** (`TypePGaloisUBound.lean`,
       `card_le_cyclotomicQuotient_of_faithful_fpf`、sorry-free)。IsSimpleModule で case-split:
       Galois 分岐は完全証明 (SingerLineBound)、non-Galois 分岐は `hReducible` hypothesis
@@ -156,10 +162,14 @@ OddOrder.GroupTheory.RepresentationTheory.TypePGaloisUBound` で全て入る:
   imprimitive ratio embedding `Ū↪Fin(q−1)→A` (|A|=a, a≤p−1) → `|U|≤(p^q−1)/(p−1)`。
   lane a は構造的 imprimitivity (Hbar=⊕H1^w、psi injectivity、a∣p−1=SingerField|M|=p) を
   組んで本 engine に渡す (W₁ 依存部)。
-- **block a∣p−1**: `RepresentationTheory.SingerField.isCyclic_and_card_dvd_card_sub_one_of_faithful_irreducible`
-  を |M|=p で直接 (別 lemma 不要)。
+- **block scalar φ_i + a∣p−1**: `RepresentationTheory.lineScalarChar ρ_i hdim_i : U →* (ZMod p)ˣ`
+  (`LineScalarCharacter`) = block i (1-dim 𝔽_p-line) 上の scalar character。`lineScalarChar_smul`
+  (`ρ u x = φ u • x`) で hconst を scalar 等式に変換、`card_dvd_sub_one_of_faithful_line` で
+  `a=|U:C|∣p−1`。lane a は各 block の restricted representation を `lineScalarChar` に渡して
+  `card_le_pow_of_block_scalars` の φ family を組む。
 
-**残 (lane a assembly、W₁ 依存)**: 構造的 imprimitivity 分解 + psi injectivity。generic 算術・
+**残 (lane a assembly、W₁ 依存)**: 構造的 imprimitivity 分解 (`Hbar=⊕H1^w` の internal direct sum
++ 各 block U-invariant) + hconst (C=1 Frobenius)。generic scalar 抽出 (`lineScalarChar`)・算術・
 embedding・両分岐 bound は本 leaf で供給済。
 
 ## 参照
