@@ -34,8 +34,8 @@
 |---|---|---|---|---|---|
 | **a** | `a` | `odd-order-a` | α Pf §10–13 中央指標核 (bare spine sorry 11.8) | `Peterfalvi/S(0[3-9]|1[0-3])*` + `FeitThompson.lean:426` | 1000 |
 | **b** | `b` | `odd-order-b` | β Pf §12 Dade tower (12.16) | `Peterfalvi/S14_MaximalI.lean` (carve-out 0087=S07_RhoProjection は issue 0089 で削除済) | 2000 |
-| **c** | `c` | `odd-order-c` | γ POLE-2 §14–16 + §15 (最長 pole) | `Peterfalvi/{S15_SAndT,S15_SAndT_Setup,S16_NonExistenceG}.lean` | 3000 |
-| **d** | `d` | `odd-order-d` | δ BG §14–16 局所解析 + carrier | `BG/**`（特に Ch4_FamilyOfMaximal/{S14_TypePCounting,S15_MF,S16_MainResults,S16_PairIntersection}）+ `FeitThompson.lean` carrier 宣言 | 4000 |
+| **c** | `c` | `odd-order-c` | γ POLE-2 §14–16 下流 (最長 pole) | `Peterfalvi/{S15_SAndT,S16_NonExistenceG}.lean`（**S15_SAndT_Setup は 2026-07-01 に lane d へ移管, issue 0092**）| 3000 |
+| **d** | `d` | `odd-order-d` | γ 上流 §15 setup (2026-07-01 再配分) + δ BG §14–16 (dormant) | `Peterfalvi/S15_SAndT_Setup.lean` (主) + `BG/**` + `FeitThompson.lean` carrier 宣言 | 4000 |
 
 **signature-first interface (ゲートは幻)**: 上流が sorried signature を export → 下流が cite。各レーンは独立クラスタを
 正面から埋め、cross-cluster は signature contract で媒介 (待たない)。詳細 = ft_lane_reallocation_2026_06_28.md。
@@ -75,8 +75,8 @@
 > |---|---|---|
 > | **a** | α Pf §10–13 中央指標核 | `OddOrder/Peterfalvi/S(0[3-9]|1[0-3])*` + `OddOrder/FeitThompson.lean:426` |
 > | **b** | β Pf §12 Dade tower | `OddOrder/Peterfalvi/S14_MaximalI.lean`（**ただし `exists_typeICovering` carrier-consumer は lane d、carve-out 0088**）〔旧 carve-out 0087=S07_RhoProjection は issue 0089 で削除済〕 |
-> | **c** | γ POLE-2 §14–16 + §15 | `OddOrder/Peterfalvi/S1[56]*`（S15_SAndT/S15_SAndT_Setup/S16_NonExistenceG）|
-> | **d** | δ BG §14–16 + carrier | `OddOrder/BG/**` + `OddOrder/FeitThompson.lean` carrier 宣言 + **S10 の bgTheoremE_cover_data carrier ブロック**（carve-out 0086）+ **S14_MaximalI の `exists_typeICovering` carrier-consumer**（carve-out 0088、下記） |
+> | **c** | γ POLE-2 §14–16 下流 | `OddOrder/Peterfalvi/S15_SAndT.lean` + `OddOrder/Peterfalvi/S16_NonExistenceG.lean`（**S15_SAndT_Setup は lane d 所有, issue 0092; lane c が S15_SAndT_Setup を編集したら逸脱**）|
+> | **d** | γ 上流 §15 setup + δ BG §14–16 (dormant) + carrier | `OddOrder/Peterfalvi/S15_SAndT_Setup.lean`（主, 2026-07-01 再配分）+ `OddOrder/BG/**` + `OddOrder/FeitThompson.lean` carrier 宣言 + **S10 の bgTheoremE_cover_data carrier ブロック**（carve-out 0086）+ **S14_MaximalI の `exists_typeICovering` carrier-consumer**（carve-out 0088、下記）; **lane d が S15_SAndT / S16_NonExistenceG を編集したら逸脱** |
 > | **共有（全 lane 可）** | — | `OddOrder/AxiomsCheck.lean` / `OddOrder.lean` / `OddOrder/GroupTheory/**` / `OddOrder/Mathlib/**`（汎用 mathlib-shim、全 lane 加算可）/ **`OddOrder/FeitThompson.lean`**（宣言単位: a=:426、d=carrier、prefix-split で衝突回避）/ `notes/**` / `issues/**` |
 >
 > **carve-out (issue 0086, ユーザー裁可 2026-06-29)**: `OddOrder/Peterfalvi/S10_MinimalSimpleStructure.lean` は
@@ -247,6 +247,11 @@
 
 ## 現状メモ
 
+- **2026-07-01 — lane d 再配分 (issue 0092, ユーザー裁定)**: lane d の旧クラスタ δ (BG §14–16) の FT
+  deliverable は実質完成 (spine 消費 endpoint 全 sorry-free) と監査確定。**lane d の主焦点を binding pole
+  γ の import-上流最上流 `S15_SAndT_Setup.lean` (16 sorry) へ移管**。lane c は下流 `S15_SAndT` +
+  `S16_NonExistenceG` を保持。以後 range-check: lane c が S15_SAndT_Setup 編集=逸脱 / lane d が S15_SAndT・
+  S16_NonExistenceG 編集=逸脱。lane d は BG/** 所有を dormant 保持。cron 所有マップも更新済。
 - **2026-07-01 — hub 監視再開 + lane b cross-lane 裁定 (issue 0091)**: 第1 tick で lane a 合流
   (Pf 9.8.c propagation + S11 build-red 修正, issue 1014 CLOSED, `2eb5389f`, push 済)。lane b は
   `Hypothesis78.nu_isometry` を global→family に弱める **範囲逸脱 (S09_NonexistenceCertain=lane a 所有) +
