@@ -1769,3 +1769,16 @@ bridge assembly、(8.18.c)→(12.16) 全体を unblock。Cluster A は §8-§11 
 の上へ移動 + `hxH` を実導出化 (x∈P₀≤M ∧ x∈P₀≤L_s≤L ⟹ x∈M⊓L≤L_F、(12.11) cite)。→
 `witness_H_sharp_not_isTISubset` は body sorry-free ((12.10) 非-TI reduction 完全組立、唯一の sorry は
 cite 先の (12.11) = Peterfalvi が置く場所)。
+
+## loop⁹²: (8.18.c) 前提 `support_mutual_exclusion` を PROVE (commit 65a2be52, issue 9003 Cluster B)
+
+`S10.support_mutual_exclusion` (Pf 8.18.c、S10_MinimalSimpleStructure:854) を sorry-free + axiom-clean 化。
+**旧 statement は偽**だった (nonconjugacy 仮説なし → conjugate S=T で sharp set が相互 support)。必要な
+`IsTypeI S/T` + `¬ IsConjugateSubgroup S T` を追加 (全て (8.18.c) caller `nonconjugate_diffImage_inner_zero`
+の hyp1/hyp2 type-I + hnot_conj から供給可)。証明: type-I ⟹ A₁=M_σ^# (`A1_eq_sigmaSharp_of_typeI_or_II`)、
+y∈A₁(S)⊆M̃(S)⊆𝒞_G(M̃(S))、片方向 support で y∈𝒞_G(M̃(T))、`conjClassSet_Mtilde_disjoint` (BG 14.5(b) 証明済)
+で矛盾。`import S10_BGInterface` 追加 (cycle 無)。§10 (lane-d/f) file の false/sorried statement の fix。
+
+**次 (loop⁹³, task 7)**: (8.18.c) `nonconjugate_diffImage_inner_zero` (S14:665) の assembly —
+support_mutual_exclusion + Dade-image support (supp(τ(φ−φ̄))⊆𝒞_G(A(L))) + inner_eq_zero_of_disjoint_support。
+Ã/A1/𝒞_G 対応注意 (mutual-support→conjClassSet-disjoint 形要)。→ (12.3)→(12.16) FT chain 閉じる。

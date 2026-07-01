@@ -41,8 +41,11 @@ BG piece `conjClassSet_Mtilde_disjoint` (BG S14_TypePCounting:8042)・`conjClass
 
 ## やること (最高レバレッジ unblock = 次 β target 候補)
 
-- [ ] **`S10.support_mutual_exclusion`** (Cluster B): BG disjoint piece が証明済ゆえ A1↔M̃ bridge
-  assembly (新規深部理論でない)、(8.18.c)→(12.3)→(12.16) final-contradiction chain 全体を unblock。
+- [x] **`S10.support_mutual_exclusion`** (Cluster B): **DONE** (commit 65a2be52, axiom-clean)。type-I +
+  nonconjugacy 仮説を追加 (旧 statement は conjugate S=T で偽) → conjClassSet_Mtilde_disjoint で証明。
+- [ ] **(8.18.c) `nonconjugate_diffImage_inner_zero` assembly** (S14:665): support_mutual_exclusion +
+  Dade-image support (supp(τ(φ−φ̄))⊆𝒞_G(A(L))) + `inner_eq_zero_of_disjoint_support`。Ã/A1/𝒞_G の
+  対応に注意 (mutual-support 形 → conjClassSet-disjoint 形が要る)。→ (12.3)→(12.16) FT chain を閉じる。
 - [ ] Cluster A ((12.10) type-analysis) は §8-§11 の大きな multi-theorem effort。§-owning lane に割当?
 
 ## 完了条件
