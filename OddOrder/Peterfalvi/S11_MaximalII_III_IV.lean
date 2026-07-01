@@ -5017,6 +5017,30 @@ theorem inertia_eq_top_of_induceHU_not_irreducible [Finite G] {M : Subgroup G}
   by_contra hnt
   exact hne (eq_of_le_of_prime_index hle hprime hnt)
 
+/-- **`Ind_{HU}^M` is injective on reducible-inducing characters** (`Xmu` injectivity): if
+`Ind_{HU}^M χ` is reducible and `Ind_{HU}^M χ = Ind_{HU}^M ψ`, then `ψ = χ`.  Reducibility makes `χ`
+`M`-invariant (`inertia_eq_top_of_induceHU_not_irreducible`), and a full-inertia character is
+`Ind`-injective (`induce_injective_of_inertia_stable`, via `induce_eq_induce_iff_conj`).  Combined
+with `reducible_count_sOf_H0C` (`|reducibles| = p-1`) this gives `|Xmu| = p-1` for the (9.8.c)
+parity dichotomy (`Xmu = {ζ ∈ Xθ | Ind_M ζ reducible}`), the surjectivity route to conjunct (c). -/
+theorem caseA_induceHU_inj_of_reducible [Finite G] {M : Subgroup G}
+    (data : TypesIIIIIIVSetup M) [Fintype ↥M] [Invertible (Nat.card ↥(huSub data) : ℂ)]
+    {χ ψ : IrreducibleCharacter ↥(huSub data)}
+    (hχred : ¬ IsIrreducibleCharacter
+      (ClassFunction.induce (huSub data) (χ : ClassFunction ↥(huSub data) ℂ)))
+    (h : ClassFunction.induce (huSub data) (χ : ClassFunction ↥(huSub data) ℂ)
+      = ClassFunction.induce (huSub data) (ψ : ClassFunction ↥(huSub data) ℂ)) :
+    ψ = χ := by
+  haveI := huSub_normal data
+  letI : Fintype ↥(huSub data) := Fintype.ofFinite _
+  letI : Invertible (Nat.card ↥M : ℂ) :=
+    invertibleOfNonzero (Nat.cast_ne_zero.mpr Nat.card_pos.ne')
+  have hinertia := inertia_eq_top_of_induceHU_not_irreducible data χ hχred
+  refine induce_injective_of_inertia_stable (fun g => ?_) h
+  apply IrreducibleCharacter.ext
+  rw [IrreducibleCharacter.coe_conjBy]
+  exact ClassFunction.mem_inertia.mp (by rw [hinertia]; exact Subgroup.mem_top g)
+
 /-- **A regular character nontrivial on each `W1`-conjugate of `S₀`** (Clifford case (a)).
 Instantiates the elementary `(9.7)` decomposition `H̄ = ⊕_{w∈W1} S₀^w` (`wConjugate_coprod_bijective`,
 with the chief-factor `U`-action, `act.U ⊔ act.E = ⊤`, `|H̄| = p^{|W1|}`) and feeds the resulting
