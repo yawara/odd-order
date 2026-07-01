@@ -7431,6 +7431,39 @@ theorem charParam_a_mem_of_norm_ineq {a : ℤ} {n : ℕ} (hn : 2 ≤ n)
   have hge : 3 ≤ a ^ 2 - 2 * a := by rcases ha with h | h <;> nlinarith
   nlinarith [hge, hn2]
 
+open scoped Classical FiniteInduce in
+/-- **Parseval with orthogonal remainder** for the integer projection of a virtual character onto an
+orthonormal `ZIrr` family.  For `φ ∈ ZIrr G` and an orthonormal family `R ⊆ ZIrr G`, the integer
+projection `exists_intProjection_of_orthonormal_ZIrr` gives coefficients `c` and remainder `Y ⊥ R`
+with `φ = ∑ c_α·α + Y`; then `‖φ‖² = ∑_{α∈R} c_α² + ‖Y‖²` (`inner_self_orthonormalSum_eq_sum_sq`,
+the cross terms vanishing by `Y ⊥ R`).  This is the (11.8.2) projection-norm identity feeding
+`(a − n)² + (|S₁| − 1)a² ≤ ‖α^τ‖²`. -/
+theorem inner_self_eq_sum_sq_add_of_intProjection [Finite G] {φ : ClassFunction G ℂ}
+    (hφ : φ ∈ ZIrr G) {R : Finset (ClassFunction G ℂ)} (hZ : ∀ α ∈ R, α ∈ ZIrr G)
+    (horth : ∀ α ∈ R, ∀ β ∈ R, ClassFunction.inner α β = if α = β then (1 : ℂ) else 0) :
+    ∃ (c : ClassFunction G ℂ → ℤ) (Y : ClassFunction G ℂ),
+      (∀ α ∈ R, ClassFunction.inner φ α = (c α : ℂ)) ∧
+      ClassFunction.inner φ φ = (∑ α ∈ R, (c α : ℂ) ^ 2) + ClassFunction.inner Y Y ∧
+      (∀ α ∈ R, ClassFunction.inner Y α = 0) := by
+  obtain ⟨c, Y, hcoeff, hdecomp, hYorth⟩ :=
+    OddOrder.RepresentationTheory.ClassFunction.exists_intProjection_of_orthonormal_ZIrr hφ hZ horth
+  refine ⟨c, Y, hcoeff, ?_, hYorth⟩
+  have hXY : ClassFunction.inner (∑ α ∈ R, (c α : ℂ) • α) Y = 0 := by
+    rw [inner_sum_left]
+    refine Finset.sum_eq_zero fun a ha => ?_
+    rw [ClassFunction.inner_smul_left]
+    have haY : ClassFunction.inner a Y = 0 := by
+      rw [inner_conj_symm Y a, hYorth a ha, star_zero]
+    rw [haY, mul_zero]
+  have hYX : ClassFunction.inner Y (∑ α ∈ R, (c α : ℂ) • α) = 0 := by
+    rw [inner_sum_right]
+    refine Finset.sum_eq_zero fun a ha => ?_
+    rw [OddOrder.RepresentationTheory.inner_smul_right, hYorth a ha, mul_zero]
+  conv_lhs => rw [hdecomp]
+  rw [ClassFunction.inner_add_left, ClassFunction.inner_add_right, ClassFunction.inner_add_right,
+    inner_self_orthonormalSum_eq_sum_sq horth, hXY, hYX]
+  ring
+
 open scoped FiniteInduce in
 /-- **Peterfalvi (11.8), the genuine non-orthogonality** (lane-b W3 obligation, issue 2020).
 

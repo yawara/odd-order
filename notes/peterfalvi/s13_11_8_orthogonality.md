@@ -669,3 +669,14 @@ ungated middle (11.8.2-11.8.5 の projection/norm/5.3.b machinery) は cont.²�
 |S₁|=n を hypothesis 化して endpoint skeleton) を build 続行 (deferred-payoff) or §9↔§10 bridge (d=u) 攻略。
 d=u = μ_j(1) の §9↔§10 接続で cont.²⁴ existential を回避できるか要再検 (μ_j(1)=w₁·d は symbolic、existential は
 individual μ_{ij} value)。
+
+## 2026-07-02 cont.³⁶ (lane-a) — Parseval-with-remainder landed (11.8.2 norm identity, axiom-clean)
+**`inner_self_eq_sum_sq_add_of_intProjection`** landed (S12, leaf green): φ∈ZIrr を orthonormal ZIrr
+family R に射影 (`exists_intProjection`) → c, Y (Y⊥R)、`‖φ‖² = ∑_{α∈R}(c α)² + ‖Y‖²` (Parseval)。
+= `ZIrrFourier.inner_self_orthonormalSum_eq_sum_sq` + cross term 消去 (Y⊥R、inner_conj_symm)。
+**general/reusable、axiom-clean** (φ,R を hypothesis 化ゆえ char machinery 非依存)。
+
+**次 = (11.8.2) 組立**: φ=α^τ, R=exists_SHC_extension_orthonormal に本 Parseval 適用 →
+‖α^τ‖²=∑c_β²+‖Y‖²。‖α^τ‖²=2+n² (coh-free)。∑c_β² 分割: c(SHC.ext ζ)=a−n (cont.²⁶ int + cont.³²),
+c(SHC.ext η)=a (η≠ζ) ⟹ ∑c_β²=(a−n)²+(|R|−1)a²。⟹ (a−n)²+(|R|−1)a²≤2+n² ⟹ |R|a²−2an≤2。
+|R|=n (=11.8.1 |S₁|=n、§9↔§10 gated) + `charParam_a_mem_of_norm_ineq` (cont.³⁵) ⟹ a∈{0,1,2}。
