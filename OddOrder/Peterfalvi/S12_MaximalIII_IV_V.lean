@@ -8191,7 +8191,8 @@ theorem inner_conjPerm_eq_of_isReal [Finite G] [Fintype G] [Invertible (Nat.card
 open scoped Classical in
 /-- **Parity of the inner product of two real virtual characters orthogonal to `1`** (Peterfalvi
 (11.8.5) "`a` even from `β` real").  For `Δ₁, Δ₂ ∈ ZIrr G` (odd `G`) that are real (`IsReal`) — hence
-with `conjPerm`-symmetric Fourier coefficients `⟨Δᵢ, χ̄⟩ = ⟨Δᵢ, χ⟩` — and `⟨Δᵢ, 1⟩ = 0`, the integer
+with `conjPerm`-symmetric Fourier coefficients `⟨Δᵢ, χ̄⟩ = ⟨Δᵢ, χ⟩` — with `⟨Δ₂, 1⟩ = 0` (only one
+factor need be orthogonal to `1`, since the `χ = 1` term `c₁(1)·c₂(1)` vanishes), the integer
 `⟨Δ₁, Δ₂⟩` is even.  Cross-Parseval (`mem_ZIrr_inner_eq_sum_over_irr`) gives
 `⟨Δ₁,Δ₂⟩ = ∑_χ c₁(χ)c₂(χ)` with `cᵢ(χ) = ⟨Δᵢ,χ⟩ ∈ ℤ`; the `χ = 1` term vanishes, and on `Irr ∖ {1}`
 the conjugation involution `conjPerm` is fixed-point-free (`conjPerm_eq_self_iff` +
@@ -8200,7 +8201,6 @@ theorem even_inner_of_conjPerm_symmetric [Finite G] [Fintype G]
     [Invertible (Nat.card G : ℂ)] (hodd : Odd (Nat.card G))
     {Δ₁ Δ₂ : ClassFunction G ℂ} (h₁ : Δ₁ ∈ ZIrr G) (h₂ : Δ₂ ∈ ZIrr G)
     (hr₁ : ClassFunction.IsReal Δ₁) (hr₂ : ClassFunction.IsReal Δ₂)
-    (htriv₁ : ClassFunction.inner Δ₁ (trivialIrreducibleCharacter G : ClassFunction G ℂ) = 0)
     (htriv₂ : ClassFunction.inner Δ₂ (trivialIrreducibleCharacter G : ClassFunction G ℂ) = 0) :
     ∃ z : ℤ, ClassFunction.inner Δ₁ Δ₂ = (z : ℂ) ∧ Even z := by
   have hsym₁ := fun χ => inner_conjPerm_eq_of_isReal h₁ hr₁ χ
@@ -8215,8 +8215,8 @@ theorem even_inner_of_conjPerm_symmetric [Finite G] [Fintype G]
     push_cast
     exact Finset.sum_congr rfl fun χ _ => by rw [hc₁ χ, hc₂ χ]
   refine ⟨_, hz, ?_⟩
-  have hc1t : c₁ (trivialIrreducibleCharacter G) = 0 := by
-    have hh := hc₁ (trivialIrreducibleCharacter G); rw [htriv₁] at hh; exact_mod_cast hh.symm
+  have hc2t : c₂ (trivialIrreducibleCharacter G) = 0 := by
+    have hh := hc₂ (trivialIrreducibleCharacter G); rw [htriv₂] at hh; exact_mod_cast hh.symm
   have hsymc₁ : ∀ χ, c₁ (IrreducibleCharacter.conjPerm G χ) = c₁ χ := fun χ => by
     have hh := ((hc₁ (IrreducibleCharacter.conjPerm G χ)).symm.trans (hsym₁ χ)).trans (hc₁ χ)
     exact_mod_cast hh
@@ -8228,7 +8228,7 @@ theorem even_inner_of_conjPerm_symmetric [Finite G] [Fintype G]
     (IrreducibleCharacter.conjPerm_eq_self_iff (trivialIrreducibleCharacter G)).mpr (by simp)
   rw [← Finset.add_sum_erase Finset.univ (fun χ => c₁ χ * c₂ χ)
       (Finset.mem_univ (trivialIrreducibleCharacter G)),
-    hc1t, zero_mul, zero_add]
+    hc2t, mul_zero, zero_add]
   refine even_sum_of_involution (fun χ _ => IrreducibleCharacter.conjPerm G χ)
     (fun χ hχ => ?_) (fun χ hχ => ?_) (fun χ _ => (IrreducibleCharacter.conjPerm G).left_inv χ)
     (fun χ _ => by rw [hsymc₁, hsymc₂])

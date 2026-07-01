@@ -985,3 +985,16 @@ g_mem=conjPerm injective+conjPerm triv=triv (`trivialClassFunction_isReal`)、hf
 threaded hyp 無)。**残 = a=(∑ω_{r0}^σ,β) application**: β real=(11.8.3, (4.8)/(4.10)/(5.9) SHC port、大) +
 ∑ω_{r0}^σ real + 両者⊥1_G。それで parity lemma 適用 → a even → (11.8.5) full a=0。⚠ β real は大 sub-chain。
 (11.8) closure は依然 doubly-gated (§9↔§10、§14) — a-even 完成しても endpoint は §14 gate 残。
+
+## 2026-07-02 cont.⁵⁷ (lane-a) — **parity lemma を「片側⊥1」に弱化 (application 適合)**
+`even_inner_of_conjPerm_symmetric` の htriv を **片側 (`⟨Δ₂,1⟩=0`) のみ**に弱化 (leaf green, sorry-free):
+χ=1 項 `c₁(1)·c₂(1)` は c₂(1)=0 だけで消える (mul_zero)。**理由**: application で Δ₁=∑ω_{r0}^σ は **⊥1 でない**
+(⟨∑ω, ω_{00}^σ=trivial⟩=1、`alignedOmegaSigmaGrid_zero_zero`+`_inner`)、Δ₂=β のみ ⊥1。両者 real は必要
+(係数対称)。より一般化した正しい版。
+
+**a-even application の残ピース map (cont.⁵⁷ 調査)**:
+- **∑ω_{r0}^σ real**: `exists_rowInv_alignedOmegaSigma_conj` (S12:5829、conj(ω_{i0})=ω_{i'0} 対合) + `.conj=mapRingEquiv conjAe`
+  bridge (S12:4926) + reindex。`zeta_tau1_norm_ge_one` (5988) が pointwise で同 pairing 使用。~40 行 (choice+involutive+conj-sum+reindex)。
+- **β real**: (11.8.3) = (4.8)/(4.10)/(5.9) の SHC port (大)。`tau_muGrid_column_diff` (4772, full-coh)=(4.8)。
+- **β⊥1**: ⟨β,1⟩=⟨α^τ,1⟩−δ⟨ω^σ diff,1⟩+n⟨ζ^{τ₁},1⟩。
+(11.8) closure は依然 doubly-gated (§9↔§10、§14)。
