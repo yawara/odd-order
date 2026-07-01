@@ -6662,6 +6662,37 @@ theorem hcConjDescend_comp_regular_iff [Finite G] {M : Subgroup G}
       ↔ (∀ i, θ.comp (caseA.Hpart i).subtype ≠ 1) :=
   forall_congr' fun _ => not_congr (hcConjDescend_comp_subtype_eq_one_iff caseA g θ)
 
+/-- **Conjugation-commute at the `IrreducibleCharacter` level**: `(hcPsi θ)^g = hcPsi (θ ∘ A_g)`.
+The `IrreducibleCharacter`-level form of `hcPsi_conjBy_eq` (`coe_conjBy` + `IrreducibleCharacter.ext`),
+the shape consumed by the conjugation-closure hypothesis of `card_filter_induce_eq_index_inertia`. -/
+theorem hcPsi_irreducibleConjBy_eq [Finite G] {M : Subgroup G}
+    {data : TypesIIIIIIVSetup M} (chief : ChiefFactorData data) (g : ↥(huSub data))
+    (θ : (↥data.H ⧸ chief.N) →* ℂˣ)
+    [(hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf (huSub data)).Normal] :
+    IrreducibleCharacter.conjBy g (hcPsi chief θ)
+      = hcPsi chief (θ.comp (hcConjDescend chief g)) := by
+  apply IrreducibleCharacter.ext
+  rw [IrreducibleCharacter.coe_conjBy, hcPsi_conjBy_eq]
+
+/-- **The regular-inflated set is `HU`-conjugation-closed** (`oXtheta` `T`-invariance).  For a regular
+seed `θ` (nontrivial on every Clifford factor `Hpart i`) and `g ∈ HU`, the conjugate `(hcPsi θ)^g`
+equals `hcPsi θ'` for the regular seed `θ' = θ ∘ A_g`: the commute `hcPsi_irreducibleConjBy_eq` gives
+the identity, and `hcConjDescend_comp_regular_iff` gives the regularity of `θ'`.  This is exactly the
+conjugation-closure hypothesis `hT` of `card_filter_induce_eq_index_inertia` for the induction
+`θ ↦ Ind_{HC}^{HU}(hcPsi θ)` over `T = {hcPsi θ | θ regular}`, whose fibres have size `u`
+(`hcPsi_inertia_index_eq_u`), giving the `oXtheta` count `u·|Xθ| = (p-1)^q`
+(`card_regular_chars_Hbar`). -/
+theorem hcPsi_regular_conjBy [Finite G] {M : Subgroup G}
+    {data : TypesIIIIIIVSetup M} {chief : ChiefFactorData data}
+    {chars : Section11CharacterData data chief} (caseA : CliffordCaseAData chars)
+    [(hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf (huSub data)).Normal]
+    {θ : (↥data.H ⧸ chief.N) →* ℂˣ} (hθ : ∀ i, θ.comp (caseA.Hpart i).subtype ≠ 1)
+    (g : ↥(huSub data)) :
+    ∃ θ', (∀ i, θ'.comp (caseA.Hpart i).subtype ≠ 1) ∧
+      IrreducibleCharacter.conjBy g (hcPsi chief θ) = hcPsi chief θ' :=
+  ⟨θ.comp (hcConjDescend chief g), (hcConjDescend_comp_regular_iff caseA g θ).mpr hθ,
+    hcPsi_irreducibleConjBy_eq chief g θ⟩
+
 /-- **`ζ(1) = u`**: the degree of `ζ = Ind_{HC}^{HU}(ψ)` is `u`.  `induce_apply_one` gives
 `ζ(1) = [HU:HC]·ψ(1) = u·1` (`hc_index_eq_u`, and `ψ` linear so `ψ(1)=1`).  This is the degree-`u`
 of the (9.8.c) irreducible; `induceHU ζ` then has degree `q·u = qu`. -/
