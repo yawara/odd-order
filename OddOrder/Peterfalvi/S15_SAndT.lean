@@ -2268,6 +2268,40 @@ theorem card_Q_eq [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
     (hyp : Hypothesis (G := G)) (_hTTypeII : IsTypeNonI hyp.T) :
     Nat.card ↥hyp.Q = hyp.q ^ hyp.p := sorry
 
+/-- **Peterfalvi (13.17.a), `T`-side Fitting order for the type-II member** — the **proven** form of
+`card_Q_eq` for a type-II `T`, the `T`-side dual of the proven `Hypothesis.card_P_eq` (`|P| = p^q`).
+
+From the (14.9) `IsTypeII T`, the (9.3) Wielandt order relation `typeII_III_IV_order_relations`,
+applied to the reconciled type-`P` data of `T` (`reconciled_typePData_T`), gives
+`|T_F| = |tpd.W2|^|tpd.W1| = |W₁|^|W₂| = q^p` (the intrinsic factors reconcile to `tpd.W2 = W₁`,
+`tpd.W1 = W₂`).  This discharges the `card_Q_eq` residual up to the (14.9) `T_typeII` input, whose
+threading into the §13.17 chain is the one remaining wiring step; the `q^p` counting itself is now
+sorry-free. -/
+theorem card_Q_eq_of_typeII [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hyp : Hypothesis (G := G)) (hTTypeII : IsTypeII hyp.T) :
+    Nat.card ↥hyp.Q = hyp.q ^ hyp.p := by
+  obtain ⟨tpd, _htpdV, htpdW1, htpdW2⟩ := reconciled_typePData_T hG hyp
+  have tdata : TypeIIData hyp.T := hTTypeII.some
+  have hUne : tpd.U ≠ ⊥ := by
+    intro hbot
+    have h1 : Nat.card ↥tpd.U = Nat.card ↥tdata.typeP.U := by
+      rw [tpd.card_U_eq_index, tdata.typeP.card_U_eq_index]
+    rw [hbot, Subgroup.card_bot] at h1
+    exact tdata.common.1 (Subgroup.card_eq_one.mp h1.symm)
+  have hW1prime : (Nat.card ↥tpd.W1).Prime := by
+    rw [htpdW1, ← hyp.p_eq_card_W2]; exact hyp.p_prime
+  have hTI := tdata.common.2.2
+  have hord := (OddOrder.Peterfalvi.S11.typeII_III_IV_order_relations hG
+    { maximal := hyp.T_maximal
+      typeP := tpd
+      nontrivial := ⟨hUne, hW1prime, hTI⟩
+      type_alt := Or.inl hTTypeII }).1 hTTypeII
+  have hord2 : Nat.card ↥tpd.H = Nat.card ↥tpd.W2 ^ Nat.card ↥tpd.W1 := hord.2
+  have hW2card : Nat.card ↥tpd.W2 = hyp.q := by
+    rw [htpdW2, ← hyp.q_eq_card_W1]
+  rw [tpd.H_eq, ← hyp.Q_eq_TF, hW2card, htpdW1, ← hyp.p_eq_card_W2] at hord2
+  exact hord2
+
 /-- **Peterfalvi (13.17.a) T-conjugate Fitting structure**: for a maximal subgroup `L` conjugate
 to `T` (`conj g • L = T`), the Fitting kernel `L_F` is a `q`-group of order `q^p` that contains
 the cyclic factor `W₁` and meets the complement `U` trivially.
