@@ -702,6 +702,121 @@ theorem card_le_sum_of_one_le_prod {ι : Type*} (s : Finset ι) (x : ι → ℝ)
     _ = ∑ i ∈ s, (1 + Real.log (x i)) := by rw [Finset.sum_add_distrib]
     _ ≤ ∑ i ∈ s, x i := Finset.sum_le_sum hlog
 
+/-- Each value `χ(aᵏ)` for `k` a unit mod `n = orderOf a` is a nonzero Galois conjugate of the
+nonzero value `χ(a)`: the automorphism `uₖ` acting on `n`-th roots of unity as `(· ^ k)`
+(`exists_complexRingEquiv_pow_of_rootsOfUnity`) sends `χ(a)` to `χ(aᵏ)`
+(`mapRingEquiv_apply_eq_apply_pow_of_mem_ZIrr`) and is injective. -/
+theorem apply_pow_units_ne_zero [Fintype G] {χ : ClassFunction G ℂ} (hχ : χ ∈ ZIrr G)
+    {a : G} {n : ℕ} [NeZero n] (ha_ord : orderOf a = n) (ha : χ a ≠ 0) (k : (ZMod n)ˣ) :
+    χ (a ^ ((k : ZMod n).val)) ≠ 0 := by
+  have hn : n ≠ 0 := NeZero.ne n
+  have hfin : IsOfFinOrder a :=
+    orderOf_pos_iff.mp (by rw [ha_ord]; exact Nat.pos_of_ne_zero hn)
+  have hcop : ((k : ZMod n).val).Coprime n := ZMod.val_coe_unit_coprime k
+  obtain ⟨u, hu⟩ := exists_complexRingEquiv_pow_of_rootsOfUnity hn hcop
+  have hpow : ClassFunction.mapRingEquiv u χ a = χ (a ^ ((k : ZMod n).val)) :=
+    mapRingEquiv_apply_eq_apply_pow_of_mem_ZIrr hχ u hfin (fun ζ hζ => hu ζ (ha_ord ▸ hζ))
+  have huval : u (χ a) = χ (a ^ ((k : ZMod n).val)) := by
+    rw [← ClassFunction.mapRingEquiv_apply u χ a]; exact hpow
+  rw [← huval]
+  exact fun h => ha (u.injective (h.trans (map_zero u).symm))
+
+/-- **Number-theoretic core of [Isaacs] Lemma 3.14 / Peterfalvi (13.9.b)**: for a virtual character
+`χ ∈ ℤ[Irr G]` and `a : G` of order `n` with `χ(a) ≠ 0`, the product of the squared norms
+`‖χ(aᵏ)‖²` over the residues `k` coprime to `n` is at least `1`.
+
+The values `χ(aᵏ)` (`k` a unit mod `n`) are the Galois conjugates of `χ(a)`, so their product
+`P = ∏ₖ χ(aᵏ)` is fixed by every ring automorphism of `ℂ` (each `u` acts on `n`-th roots of unity
+as `(· ^ i)` with `i` coprime to `n`, permuting the factors by `k ↦ k·i`), is an algebraic integer,
+and is nonzero (each factor is `uₖ(χ(a)) ≠ 0` for the automorphism `uₖ` realizing the `k`-th power).
+A nonzero rational algebraic integer `N = P` satisfies `‖N‖² ≥ 1`, and `∏ₖ ‖χ(aᵏ)‖² = ‖P‖²`.
+With `card_le_sum_of_one_le_prod` this yields the (13.9.b) sum bound `Σ_{⟨x⟩=⟨a⟩}‖χ(x)‖² ≥ φ(n)`. -/
+theorem one_le_prod_normSq_units_pow_of_apply_ne_zero [Fintype G]
+    {χ : ClassFunction G ℂ} (hχ : χ ∈ ZIrr G) {a : G} {n : ℕ} [NeZero n]
+    (ha_ord : orderOf a = n) (ha : χ a ≠ 0) :
+    (1 : ℝ) ≤ ∏ k : (ZMod n)ˣ, ‖χ (a ^ ((k : ZMod n).val))‖ ^ 2 := by
+  classical
+  have hn : n ≠ 0 := NeZero.ne n
+  have hordpos : 0 < orderOf a := by rw [ha_ord]; exact Nat.pos_of_ne_zero hn
+  have hfin : IsOfFinOrder a := orderOf_pos_iff.mp hordpos
+  -- STEP 1: each factor `χ (a^k.val)` is nonzero (it is `uₖ (χ a)` for an automorphism `uₖ`).
+  have hfac_ne : ∀ k : (ZMod n)ˣ, χ (a ^ ((k : ZMod n).val)) ≠ 0 :=
+    fun k => apply_pow_units_ne_zero hχ ha_ord ha k
+  -- the Galois-orbit product `P = ∏ₖ χ(aᵏ)`.
+  set P : ℂ := ∏ k : (ZMod n)ˣ, χ (a ^ ((k : ZMod n).val)) with hP_def
+  have hP_ne : P ≠ 0 := Finset.prod_ne_zero_iff.mpr (fun k _ => hfac_ne k)
+  -- STEP 2: `P` is fixed by every ring automorphism of `ℂ`.
+  have hP_fix : ∀ u : ℂ ≃+* ℂ, u P = P := by
+    intro u
+    obtain ⟨i, hicop, hipow⟩ := OddOrder.Peterfalvi.S05.exists_pow_forall_rootsOfUnity u hn
+    set iUnit : (ZMod n)ˣ := ZMod.unitOfCoprime i hicop with hiUnit_def
+    have hfactor : ∀ k : (ZMod n)ˣ,
+        u (χ (a ^ ((k : ZMod n).val)))
+          = χ (a ^ (((k * iUnit) : (ZMod n)ˣ) : ZMod n).val) := by
+      intro k
+      have hfin_pow : IsOfFinOrder (a ^ ((k : ZMod n).val)) := hfin.pow
+      have hdvd : orderOf (a ^ ((k : ZMod n).val)) ∣ orderOf a :=
+        orderOf_dvd_of_pow_eq_one
+          (by rw [← pow_mul, mul_comm, pow_mul, pow_orderOf_eq_one, one_pow])
+      have hpow : ClassFunction.mapRingEquiv u χ (a ^ ((k : ZMod n).val))
+          = χ ((a ^ ((k : ZMod n).val)) ^ i) := by
+        refine mapRingEquiv_apply_eq_apply_pow_of_mem_ZIrr hχ u hfin_pow (fun ζ hζ => ?_)
+        refine hipow ζ ?_
+        obtain ⟨t, ht⟩ := hdvd
+        have h1 : ζ ^ orderOf a = 1 := by rw [ht, pow_mul, hζ, one_pow]
+        rwa [ha_ord] at h1
+      rw [← ClassFunction.mapRingEquiv_apply u χ (a ^ ((k : ZMod n).val)), hpow, ← pow_mul]
+      have hiu : (iUnit : ZMod n) = (i : ZMod n) := by
+        rw [hiUnit_def, ZMod.coe_unitOfCoprime]
+      have hmod : (k : ZMod n).val * i
+          ≡ (((k * iUnit) : (ZMod n)ˣ) : ZMod n).val [MOD orderOf a] := by
+        rw [ha_ord, ← ZMod.natCast_eq_natCast_iff]
+        simp only [Nat.cast_mul, ZMod.natCast_zmod_val, Units.val_mul, hiu]
+      rw [pow_eq_pow_iff_modEq.mpr hmod]
+    rw [hP_def, map_prod]
+    calc ∏ k : (ZMod n)ˣ, u (χ (a ^ ((k : ZMod n).val)))
+        = ∏ k : (ZMod n)ˣ, χ (a ^ (((k * iUnit) : (ZMod n)ˣ) : ZMod n).val) :=
+          Finset.prod_congr rfl (fun k _ => hfactor k)
+      _ = ∏ k : (ZMod n)ˣ, χ (a ^ ((k : ZMod n).val)) :=
+          Equiv.prod_comp (Equiv.mulRight iUnit) (fun k => χ (a ^ ((k : ZMod n).val)))
+  -- STEP 3: `P` is an algebraic integer, hence (being Galois-fixed) a rational integer.
+  have hP_int : IsIntegral ℤ P := by
+    rw [hP_def]
+    exact IsIntegral.prod _ (fun k _ => OddOrder.Peterfalvi.S05.isIntegral_apply_of_mem_ZIrr hχ _)
+  obtain ⟨q, hq⟩ := OddOrder.Peterfalvi.S05.exists_ratCast_of_forall_complexRingEquiv_eq
+    (hP_int.tower_top (A := ℚ)) hP_fix
+  obtain ⟨m, hm⟩ := isIntegral_rat_imp_int (hq ▸ hP_int)
+  have hPm : P = (m : ℂ) := hq.trans hm
+  have hm_ne : m ≠ 0 := by
+    intro h0; rw [h0, Int.cast_zero] at hPm; exact hP_ne hPm
+  -- STEP 4: `∏ₖ ‖χ(aᵏ)‖² = ‖P‖² = m² ≥ 1`.
+  have hprod_norm : ∏ k : (ZMod n)ˣ, ‖χ (a ^ ((k : ZMod n).val))‖ ^ 2 = ‖P‖ ^ 2 := by
+    rw [hP_def, norm_prod, ← Finset.prod_pow]
+  rw [hprod_norm, hPm]
+  have hm1 : (1 : ℝ) ≤ ‖(m : ℂ)‖ := by
+    rw [Complex.norm_intCast, ← Int.cast_abs]
+    exact_mod_cast Int.one_le_abs hm_ne
+  exact one_le_pow₀ hm1
+
+/-- **Peterfalvi (13.9.b) per-class bound / [Isaacs] Lemma 3.14**: for a virtual character
+`χ ∈ ℤ[Irr G]` and `a : G` of order `n` with `χ(a) ≠ 0`, the sum of the squared norms `‖χ(aᵏ)‖²`
+over the residues `k` coprime to `n` is at least the number `φ(n)` of such residues.
+
+This is the cyclic-class contribution to Peterfalvi (13.9.b): the values on the class
+`{aᵏ : gcd(k,n)=1}` are the Galois conjugates of `χ(a)`, and their squared-norm product is `≥ 1`
+(`one_le_prod_normSq_units_pow_of_apply_ne_zero`), so the AM-GM bound
+`card_le_sum_of_one_le_prod` gives the sum estimate. -/
+theorem card_units_le_sum_normSq_units_pow_of_apply_ne_zero [Fintype G]
+    {χ : ClassFunction G ℂ} (hχ : χ ∈ ZIrr G) {a : G} {n : ℕ} [NeZero n]
+    (ha_ord : orderOf a = n) (ha : χ a ≠ 0) :
+    (Fintype.card (ZMod n)ˣ : ℝ)
+      ≤ ∑ k : (ZMod n)ˣ, ‖χ (a ^ ((k : ZMod n).val))‖ ^ 2 := by
+  have h := card_le_sum_of_one_le_prod (Finset.univ : Finset (ZMod n)ˣ)
+    (fun k => ‖χ (a ^ ((k : ZMod n).val))‖ ^ 2)
+    (fun k _ => pow_pos (norm_pos_iff.mpr (apply_pow_units_ne_zero hχ ha_ord ha k)) 2)
+    (one_le_prod_normSq_units_pow_of_apply_ne_zero hχ ha_ord ha)
+  rwa [Finset.card_univ] at h
+
 /-- **Inflation norm lower bound — the carrier-free core of Peterfalvi (13.5.c)**.
 
 If a function `α : H → ℂ` is constant on a finite subgroup `P ≤ H` (equal to `α 1` on all of `P`)
