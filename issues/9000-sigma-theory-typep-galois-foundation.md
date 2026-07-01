@@ -74,10 +74,16 @@ structural 入力。
         `card_le_pow_of_injective_to_pi` (embedding → `|U|≤|M|^n`) +
         `card_le_pow_sub_one_of_injective_imprimitive` (injective `Ū↪Fin(q−1)→A`, `|A|=a`, `a≤p−1`
         → `u≤(p−1)^{q−1}`)。Coq `psi` embedding (`PFsection9.v:442`) の算術核。
-      - [ ] **構造的 imprimitivity** (deep, type-P-specific): Maschke 半単純 + W₁-permutation で
-        `Hbar=⊕H1^w` (|H1|=p, q blocks) + block-scalar ratio embedding `psi` の injectivity
-        + `a∣p−1` (block action → Z_pˣ)。W₁ 依存ゆえ lane a assembly か別 deeper piece。
-- [ ] step 3: dichotomy 組立 + lane a cite signature 告知。
+      - [x] **cyclotomic-quotient bridge**: `pow_sub_one_le_cyclotomicQuotient`
+        ((p−1)^{q−1}≤(p^q−1)/(p−1)) + `card_le_cyclotomicQuotient_of_injective_imprimitive`
+        (imprimitive embedding → u≤(p^q−1)/(p−1))。**両分岐が同一結論に到達** (Galois=SingerLineBound、
+        non-Galois=SemilinearImprimitiveBound)。
+        ⚠ dup 記録: `pow_sub_one_le_cyclotomicQuotient` = S15 `caseB_u_bound_arith` と同内容。
+        infra(GroupTheory)が正位置ゆえ後で S15 を本 leaf cite 化可 (S15=lane d dormant、後日)。
+      - [ ] **構造的 imprimitivity** (deep, type-P-specific): Maschke 半単純 (instance 済) + W₁-permutation
+        で `Hbar=⊕H1^w` (|H1|=p, q blocks) + block-scalar ratio embedding `psi` の injectivity
+        + `a∣p−1` (block action → Z_pˣ = SingerField |M|=p 特殊化、直接 cite)。W₁ 依存ゆえ lane a assembly。
+- [ ] step 3: dichotomy 組立 (Galois/non-Galois case-split で u≤(p^q−1)/(p−1)) + lane a cite signature 告知。
 
 ## 参照
 

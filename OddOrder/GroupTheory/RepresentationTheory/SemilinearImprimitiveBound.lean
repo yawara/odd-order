@@ -57,4 +57,36 @@ theorem card_le_pow_sub_one_of_injective_imprimitive
     rwa [hcardA] at this
   exact hb.trans (Nat.pow_le_pow_left ha _)
 
+/-- **Non-Galois → cyclotomic-quotient bridge**: `(p − 1)^{q−1} ≤ (p^q − 1)/(p − 1)`.
+
+`(p−1)^{q−1}·(p−1) = (p−1)^q < p^q`, so `(p−1)^q ≤ p^q − 1`, and dividing by `p − 1` gives the claim.
+Pure `ℕ` arithmetic, `sorry`-free.  Lifts the non-Galois bound `u ≤ (p−1)^{q−1}` to the uniform
+`u ≤ (p^q − 1)/(p − 1)` matching the Galois branch (`SingerLineBound`). -/
+theorem pow_sub_one_le_cyclotomicQuotient {p q : ℕ} (hp : 2 ≤ p) (hq : 1 ≤ q) :
+    (p - 1) ^ (q - 1) ≤ (p ^ q - 1) / (p - 1) := by
+  have hp1 : 0 < p - 1 := by omega
+  rw [Nat.le_div_iff_mul_le hp1]
+  have hpow : (p - 1) ^ (q - 1) * (p - 1) = (p - 1) ^ q := by
+    rw [← pow_succ]; congr 1; omega
+  rw [hpow]
+  have hlt : (p - 1) ^ q < p ^ q := Nat.pow_lt_pow_left (by omega) (by omega)
+  have hpq1 : 1 ≤ p ^ q := Nat.one_le_pow _ _ (by omega)
+  omega
+
+/-- **Imprimitive order bound, cyclotomic-quotient form** (Peterfalvi (13.2.c) non-Galois half):
+under the hypotheses of `card_le_pow_sub_one_of_injective_imprimitive` and `2 ≤ p`, `1 ≤ q`,
+
+  `|U| ≤ (p^q − 1)/(p − 1)`,
+
+matching the Galois branch's conclusion so the two combine into `basic_structure.u_bound`.  Chains
+`card_le_pow_sub_one_of_injective_imprimitive` (`≤ (p−1)^{q−1}`) with the bridge
+`pow_sub_one_le_cyclotomicQuotient`. -/
+theorem card_le_cyclotomicQuotient_of_injective_imprimitive
+    {U A : Type*} [Finite A] {p q a : ℕ} (hp : 2 ≤ p) (hq : 1 ≤ q)
+    (hcardA : Nat.card A = a) (ha : a ≤ p - 1)
+    {f : U → (Fin (q - 1) → A)} (hf : Function.Injective f) :
+    Nat.card U ≤ (p ^ q - 1) / (p - 1) :=
+  (card_le_pow_sub_one_of_injective_imprimitive hcardA ha hf).trans
+    (pow_sub_one_le_cyclotomicQuotient hp hq)
+
 end OddOrder.RepresentationTheory
