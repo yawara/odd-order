@@ -5055,6 +5055,32 @@ theorem eq_univ_of_nonempty_of_mul_mem_left {W : Type*} [Group W] {T : Set W}
   have := hclosed (w * t⁻¹) t ht
   simpa using this
 
+/-- **`Ū`-invariance of the per-factor nontrivial set**: a character `θ` of `H̄` is nontrivial on the
+Clifford summand `Hpart i` iff its `U`-translate `θ ∘ φ_U(a)` is.  Since `φ_U(a)` restricts to a
+bijection of `Hpart i` (`Hpart_aInvariant`, invertible), the two restrictions have the same triviality.
+So the set of summands on which a constituent `θ̄₀` is nontrivial is constant along the `Ū`-orbit of
+`θ̄₀` — the input (together with `M`-invariance = `W₁`-invariance and `eq_univ_of_nonempty_of_mul_mem_left`)
+to the (9.8.c) surjectivity that a reducible constituent is regular. -/
+theorem caseA_uActionHom_comp_subtype_eq_one_iff [Finite G] {M : Subgroup G}
+    {data : TypesIIIIIIVSetup M} {chief : ChiefFactorData data}
+    {chars : Section11CharacterData data chief} (caseA : CliffordCaseAData chars)
+    (a : ↥(typeP_quotientCoprimeAction data.typeP data.nontrivial.1 chief.N_aInvariant).U)
+    {i : Fin data.q} (θ : (↥data.H ⧸ chief.N) →* ℂˣ) :
+    (θ.comp (uActionHom data chief a).toMonoidHom).comp (caseA.Hpart i).subtype = 1
+      ↔ θ.comp (caseA.Hpart i).subtype = 1 := by
+  constructor
+  · intro h
+    refine MonoidHom.ext fun y => ?_
+    have hval := DFunLike.congr_fun h ⟨_, (caseA.Hpart_aInvariant i).inv_smul_mem a y.2⟩
+    simp only [MonoidHom.comp_apply, Subgroup.subtype_apply, MonoidHom.one_apply,
+      MulEquiv.coe_toMonoidHom, MulAut.apply_inv_self] at hval ⊢
+    exact hval
+  · intro h
+    refine MonoidHom.ext fun x => ?_
+    have hval := DFunLike.congr_fun h ⟨_, (caseA.Hpart_aInvariant i).smul_mem a x.2⟩
+    simpa only [MonoidHom.comp_apply, Subgroup.subtype_apply, MonoidHom.one_apply,
+      MulEquiv.coe_toMonoidHom] using hval
+
 /-- **A regular character nontrivial on each `W1`-conjugate of `S₀`** (Clifford case (a)).
 Instantiates the elementary `(9.7)` decomposition `H̄ = ⊕_{w∈W1} S₀^w` (`wConjugate_coprod_bijective`,
 with the chief-factor `U`-action, `act.U ⊔ act.E = ⊤`, `|H̄| = p^{|W1|}`) and feeds the resulting
