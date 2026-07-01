@@ -39,7 +39,19 @@ Pf (8.5.a): `F(S) = M_F · C_U(M_F) = P·C`。ゆえ **`hyp.H = fittingInG S` (=
 - ⟹ 一般 (8.5.a) `F(M)=M_F·C_U(M_F)` (mmd `04.10:63` の M'=HU + coprime-order 論法; (8.4.c) 依存) が
   repo 未整備。これを形式化するのが本 issue の本丸。
 
-## 次手 (Pf (8.5.a) 形式化 = bounded §8 piece)
+## 別 route も同じ σ-structure gate に bottom out (2026-07-01 追記)
+
+(8.5.a) を回避する **P-abelian route** も検討したが同じ壁:
+`hyp.H = P·C_U(P)` は P abelian のとき Dedekind modular law で `= C_S(P) ⊓ M'` (M'=`derivedInG S`=P⊔U)。
+C_S(P)◁S・M'◁S ⟹ **hyp.H ◁ S** (`S_normalizes_H_sharp`)。さらに P・C_U(P) は abelian (P,C_U(P) 互いに
+中心化) ⟹ nilpotent normal ⟹ **hyp.H ⊆ F(S)** ⟹ `H_sharp_isTISubset` (FittingIsTI + subset)。
+⟹ **両 sorry が P abelian だけで landable**。だが **P abelian = (13.2.b)/(11.7) `P_elementaryAbelian`**
+(`basic_structure_gated` の σ-structure field、sorried) で未整備。M_σ は一般に abelian でない
+(el-ab は type-II 固有の (11.7)=`S13.H_elementaryAbelian`、rich carrier 入力)。
+⟹ **§8 TI-subset は (8.5.a) route も P-abelian route も σ-structure に gated** (formalization-order
+accident でなく genuine 構造 gate)。basic_structure_gated と同じ gate 族。
+
+## 次手 (2 択、いずれも bounded)
 
 `fittingInG S = maxNilpotentNormalHall S ⊔ (U ⊓ centralizer (maxNilpotentNormalHall S))` を type-P S で
 証明 (⊇ は M_F, C_U(M_F) 共に nilpotent normal ⟹ ⊆ F(S); ⊆ は g∈C_M(M_F)⟹g∈M'=HU⟹coprime-order で
