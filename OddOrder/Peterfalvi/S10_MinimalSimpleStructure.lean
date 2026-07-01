@@ -7,6 +7,7 @@ import OddOrder.Peterfalvi.S04_DadeIsometry
 import OddOrder.Peterfalvi.S09_NonexistenceCertain
 import OddOrder.GroupTheory.MaximalSubgroupType
 import OddOrder.GroupTheory.MaximalSubgroup
+import OddOrder.Isaacs.Ch06_FrobeniusActions.OddComplement
 import OddOrder.BG.Ch2_Uniqueness.Setup
 import OddOrder.BG.Ch4_FamilyOfMaximal.S16_MainResults
 
@@ -73,11 +74,51 @@ abbrev TypeIVData (M : Subgroup G) := OddOrder.GroupTheory.TypeIVData M
 /-- **Peterfalvi (8.7)**: data for a maximal subgroup of type V. -/
 abbrev TypeVData (M : Subgroup G) := OddOrder.GroupTheory.TypeVData M
 
-/-- **Peterfalvi (8.2.a)**: in type `F`, the chosen `U_0` has order equal to the
-exponent of the complement `U`.  The proof quotes BG Proposition 3.9. -/
-theorem typeF_card_U0_eq_exponent [Finite G] {M : Subgroup G} (data : TypeFData M) :
+/-- **Group form of `isZGroup_of_isFrobeniusAction_of_odd`** ([BG] Proposition 3.9 / Huppert
+V.8.18): the complement `A` of a finite Frobenius group `G' = N ⋊ A` whose complement has **odd
+order** is a Z-group (every Sylow subgroup is cyclic).  This bridges the pair form
+`IsFrobeniusGroup` to the action-based `isZGroup_of_isFrobeniusAction_of_odd`, mirroring
+`normal_of_card_prime_of_isFrobeniusGroup_of_odd`. -/
+theorem isZGroup_of_isFrobeniusGroup_of_odd {G' : Type*} [Group G'] [Finite G']
+    {N A : Subgroup G'} (hFrob : OddOrder.Isaacs.Ch06.IsFrobeniusGroup G' N A)
+    (hodd : Odd (Nat.card ↥A)) : _root_.IsZGroup ↥A := by
+  letI : N.Normal := hFrob.isNormal
+  letI : MulDistribMulAction ↥A ↥N :=
+    MulDistribMulAction.compHom ↥N ((MulAut.conjNormal (H := N)).comp A.subtype)
+  haveI : Nontrivial ↥N := (Subgroup.nontrivial_iff_ne_bot N).mpr hFrob.ne_bot_kernel
+  exact OddOrder.Isaacs.Ch06.isZGroup_of_isFrobeniusAction_of_odd hFrob.toFrobeniusAction hodd
+
+/-- **Peterfalvi (8.2.a)**: in type `F`, the chosen `U_0` has order equal to the exponent of the
+complement `U`.
+
+**Proof** ([Pf] (8.2.a), quoting [BG] Proposition 3.9).  `U_0` is a Frobenius complement of odd
+order (`data.frobenius_HU0` says `H U_0` is Frobenius with kernel `H`), so its Sylow subgroups are
+cyclic — i.e. `U_0` is a Z-group (`isZGroup_of_isFrobeniusGroup_of_odd`).  For a finite Z-group,
+`|U_0| = exp(U_0)` (`IsZGroup.exponent_eq_card`: each cyclic Sylow `p`-subgroup contributes an
+element of order `|U_0|_p`, so `|U_0| = ∏_p |U_0|_p ∣ exp(U_0)`, and `exp(U_0) ∣ |U_0|` always).
+Finally `exp(U_0) = exp(U)` is `data.exponent_eq` (part of the type-`F` datum (8.1.c)).
+
+The odd-order hypothesis is essential: without it `U_0` could be (generalized) quaternion, where
+`exp < |U_0|`.  It is supplied here as `Odd (Nat.card G)`, from which `Odd |U_0|` follows since
+`|U_0| ∣ |G|`. -/
+theorem typeF_card_U0_eq_exponent [Finite G] (hodd : Odd (Nat.card G)) {M : Subgroup G}
+    (data : TypeFData M) :
     Nat.card ↥data.U0 = Monoid.exponent data.U := by
-  sorry
+  classical
+  have hU0le : data.U0 ≤ data.H ⊔ data.U0 := le_sup_right
+  let e : ↥(data.U0.subgroupOf (data.H ⊔ data.U0)) ≃* ↥data.U0 :=
+    Subgroup.subgroupOfEquivOfLe hU0le
+  have hcardA : Nat.card ↥(data.U0.subgroupOf (data.H ⊔ data.U0)) = Nat.card ↥data.U0 :=
+    Nat.card_congr e.toEquiv
+  have hdvd : Nat.card ↥data.U0 ∣ Nat.card G := Subgroup.card_subgroup_dvd_card data.U0
+  have hoddA : Odd (Nat.card ↥(data.U0.subgroupOf (data.H ⊔ data.U0))) := by
+    rw [hcardA]; exact Odd.of_dvd_nat hodd hdvd
+  haveI hZA : _root_.IsZGroup ↥(data.U0.subgroupOf (data.H ⊔ data.U0)) :=
+    isZGroup_of_isFrobeniusGroup_of_odd data.frobenius_HU0 hoddA
+  haveI hZU0 : _root_.IsZGroup ↥data.U0 := by
+    have hinj : Function.Injective ⇑(e.symm.toMonoidHom) := by simpa using e.symm.injective
+    exact _root_.IsZGroup.of_injective hinj
+  rw [← _root_.IsZGroup.exponent_eq_card (G := ↥data.U0), data.exponent_eq]
 
 /-- **Peterfalvi (8.2.b), one direction**: when the complement has cyclic Sylow
 subgroups, type `F` collapses to a Frobenius group with kernel `M_F`.

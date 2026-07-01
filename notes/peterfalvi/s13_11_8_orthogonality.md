@@ -402,3 +402,26 @@ landed** (commit 5fdc6f12)。enumeration の「Clifford 数え上げ」評価は
 
 本 session = 4 commit (3 Lean: inducedFamily_sub_support / _isCoherent_of_equalDegreeFamily / SHC_isCoherent
 + note)。update¹⁰ の churn (0 commit/7 反復) を脱し flagged bottleneck を突破。
+
+## §9 char-gate 前進 (2026-07-02, lane-a) — 11.8.1/11.8.6 の μ_j(1)=qu gate クリア
+lane-a が §9 (repo S11) の (11.8.1)/(11.8.6) char-gate を landing (全 axiom-clean):
+- **(11.8.1) d=u gate**: `caseA_reducible_induceHU_apply_one_eq_qu` (9.8.b) + `caseB_degree_qu` (9.9.a) で
+  μ_j(1)=qu 確立。μ_{ij}(1)=u (q 個の和) は §10 carrier 側で d=μ_{ij}(1) に接続要。
+- **(11.8.6) μ_k∈S₂ gate**: `caseA_character_counts` conjunct(b) + `caseB_character_counts` conjunct(b)
+  (= `reducible_mem_sOf_H0C` case-agnostic) で reducible μ_k ∈ 𝒮(H₀C) 確立 (9.8.b/9.9.b)。
+- **9.8.c 存在**: `caseA_exists_irreducible_sOf_H0C` (𝒮(H₀C) に irr degree-qu) landed — 例外(9.10) trigger の
+  否定側 (non-exceptional) を caseA で供給。
+
+**∴ 11.8 の §9-char gate は substantially cleared** (残 §9 = 9.11 coherence = §14/lane-b gated、
+9.8.d/9.9.c = hub-frozen Galois = 11.8 本体には不要)。
+
+### 11.8 残 gate (次 iteration frontier、carrier 側)
+1. **S(HC)/S₂ carrier 材料化**: S13 `OrthogonalityData` の S1/S2 + `hyp.SOf` opaque field を §9 の
+   `sOf`/`xiOf` (S11、materialized) と bridge。§10 muGrid/tau carrier ↔ §11 Hypothesis の `hyp.base`。
+2. **(11.8.1) d=u 接続**: §10 `CharacterParameters.d` = μ_{ij}(1) を §9 μ_j(1)=qu / μ_{ij}(1)=u に接続。
+   δ=1,n=(u−1)/q は Frobenius (U/C)⋊W₁ の u≡1 mod q (要 carrier)。
+3. **(11.8.2)-(11.8.3)** σ/α 算術: `muGridAlpha_tau_inner_self` (‖α^τ‖²=2+n² ✅) + §4/§5 cite。
+4. **(11.8.4)** landed (10.9) 直結 (`residual_alignedOmegaSigma_inner_eq_zero_of_w1_lt_w2` ✅)。
+5. **(11.8.5)-(11.8.6)** 矛盾導出: a=0 + S₂ coherence (9.11=§14 gate) + (11.3) `S_H0C_not_coherent` ✅。
+
+**次 iteration 着手** = carrier bridge (S(HC)/S₂ 材料化) or (11.8.1) d=u 接続 (§9 landed ゆえ最短)。

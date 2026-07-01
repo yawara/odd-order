@@ -129,3 +129,23 @@ Frobenius sub-case は proven ゆえ witness (12.16) 経路は現状も通る; �
   `Clifford.lean` / `Inertia.lean`
 - consumer: `S14_MaximalI.lean:389` (lane c) / Pf (12.14) M-side (lane b)
 - Pf 原文: 03 §3 (1.5)/(1.7)、04.8 §8 (8.2.c)
+
+## ⚠ HUB 裁定 (2026-07-02, cron tick) — 範囲逸脱: S14 でなく shared leaf に置くこと
+
+**検出**: lane c が `typeF_inertia_inf_U_isMulCommutative` (S14:391) + `typeF_inertia_commutator_le`
+(S14:417) を **`S14_MaximalI.lean` (= lane b 所有) に追加** = 範囲逸脱 (3 レーンマップ: c の所有は
+S15_SAndT_Setup/S15_SAndT/S16 + Clifford は **shared leaf**)。⟹ **lane c は今 tick 合流せず** (a/b は合流済)。
+
+**裁定 (benign・明快ゆえ hard-STOP でなく relocate 指示)**:
+- 2 lemma は generic (`{Γ : Type*}` 抽象、FT の G に非依存) = **shared inertia/Clifford leaf に置く**。
+  既存 **`Inertia.lean`** (issue 9002 landed 核) or GroupTheory/** の Clifford leaf が正位置。**S14 に置かない**。
+- 既存 S14 `typeF_inertia_inf_le_U1` (S14:364、generic だが lane b file に grandfather 済) を depend するなら
+  **cross-file cite** (citing ≠ editing、逸脱でない)。将来 shared 化するなら hub prefix-split で対応 (lane b 調整)。
+- consumer 側の wiring が lane b の S14 内 (issue 9002 が言う ":389") に要るなら、それは **lane b が cite** する
+  (lane c は shared lemma を供給、lane b が S14 で消費)。lane c は S14 を編集しない。
+
+**lane c への指示**: 次 sync で本裁定を拾い、2 lemma を S14 から shared leaf へ **relocate** (S14 の追加を revert +
+shared leaf に再配置)。relocate 後は通常合流。**relocate まで hub は c を skip** (a/b は継続監視、loop は止めない)。
+
+**⚠ 逸脱の再発防止**: lane c の Clifford (9002) は **必ず shared leaf** で build (S14/他レーン file を編集しない)。
+generic Clifford/inertia は `Inertia.lean`/`Clifford*.lean`/GroupTheory/** に置き、各 consumer が cite。
