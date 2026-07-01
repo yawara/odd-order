@@ -910,3 +910,26 @@ hagree からは ⟨ν ζ_i,1_G⟩=d_i·c しか出ず c=0 を強制できない
   触れず additive)。lane-b-local だが S08 case-B coherence extension machinery への deep dive を要する。
 
 → hzeta0nu は hB の唯一の残 blocker。上記設計判断を要するため次アクションとして flag。
+
+### 2026-07-01 (loop 継続⁸): ✅ hzeta0nu 実証明 — 前回の「設計判断要」flag は premature だった
+
+**前回 (継続⁷ 補足) の root-cause 分析が第3 route を見落としていた**。「抽象 IsCoherent は ⊥1_G を
+落とすので (a) shared structure field 追加 (signature 変更=STOP) か (b) S08 Sibley deep dive」の
+2択で flag したが、**複素共役 ζ̄_0 を第二の同次数メンバーに使う** clean route を見落とし。
+奇位数ゆえ Ind θ_0 は非実 (`not_isReal_of_ne_trivial_of_odd_card'`) → ζ̄_0=Ind θ̄_0∈S は ζ_0 と
+distinct・同次数 e。⟨ν ζ_0,1_G⟩=⟨ν ζ̄_0,1_G⟩=c (Dade ⊥1 on 差)、両像 norm-1 ±既約、c=±1 なら両方
+±1_G で ⟨ν ζ_0,ν ζ̄_0⟩=⟨ζ_0,ζ̄_0⟩=0 に矛盾 ⟹ c=0。IsCoherent 変更も S08 dive も不要。
+
+**landed (commit 58de8be2, 全 axiom-clean, full build 3890 green)**:
+- `inner_constOne_eq_zero_of_orthonormal_pair` (S09_Cert): 純線形代数 core。
+- `coherence_extension_orthogonal_constOne` (S09_Cert): 抽象 IsCoherent 版 (coherence_hagree で ⊥1)。
+- `inner_induce_conj_eq_zero_of_frobenius_of_odd` (S14, 汎用再利用可 = lane γ 14.11 も): 奇 Frobenius
+  ⟨Ind θ, Ind θ̄⟩=0。**明示 instance binder** で whnf-cheap (FiniteInduce scope 内は coset-sum coercion
+  が whnf 爆発 1.6M 要 → 抽出で 12s、[[lean-finiteinduce-scope-whnf-extract]])。
+- `witness_L_hzeta0nu` (S14): witness L distinguished θ_0 に配線。body sorry-free (継承 sorryAx は
+  typeIA_eq_sharp=(12.1) 支持同一視の別 gate のみ、⊥1_G content は完全 sorry-free)。
+
+**残 = hB producer 組み立て** (task): `zetaNuRhoNormSqGeOfDade` に witness_L_hzeta0nu(hzeta0nu) +
+hζ0norm (inner_self_induce_eq_one_of_frobeniusGroup) + a/ha (exists_betaDecomp_a) + hsmall
+(frobenius_two_mul_card_complement_add_one_le_card_kernel) を供給 → CounterexampleDadeData.hB。
+その後 exists_counterexample_dade_data の他 field (§12 char sorry: 12.11/12.14/12.15) が gating。
