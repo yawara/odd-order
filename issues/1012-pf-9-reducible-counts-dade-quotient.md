@@ -1731,8 +1731,25 @@ s_j(ū)=s ∀j かつ θ_0'=θ_0^s ⟺ (Ū∩Δ={1} なら) θ_0=θ_0'。Coq の
 (L15 note) が正に Ū∩Δ={1} (∏→∏/Δ injective)。⟹ **これも opaque field `Ubar_embeds_product` の
 de-opacify に依存** (orbit 構造だけでは不足)。
 
-**⟹ conjunct c = 最深ピース**: (1) orbit de-opacify ✅ + (2) Ū-action de-opacify (Ū∩Δ={1}、
-`Ubar_embeds_product` 露出) + (3) constant-char 構成 (direct-product 上) + (4) constant→W₁-fixed→I_M=M
-(def_IXmu) + (5) Smu=reducibles (|Smu|=p-1=|mu_|) + (6) (E) + parity → hcZeta_exists_irreducible_sOf。
-各片 substantial (char-theory construction + Clifford)。次着手 = Ū-action 構造の露出 (Ū∩Δ={1} が核)
-or constant-char 構成 (orbit fields で transport 定義可)。**deep 多反復、Coq PFsection9:992-1108 を逐次 port**。
+### ✅ de-opacify foundations DONE (commits f800adfa/99f6cad7, cont.¹⁰)
+- `caseA_S0_card`: |S₀|=p (Hpart_orbit + card_pointwise_smul)。
+- `caseA_orbitEquiv j : ↥S₀ ≃* ↥(Hpart j)` (transport iso、equivMapOfInjective + subgroupCongr)。
+
+### ★★ SURJECTIVITY route 発見 (cont.¹⁰) — constant-char 構成を回避、|Xmu|=p-1 が cleaner
+**Xmu := {ζ∈Xθ : Ind_M(ζ) reducible}** と直接定義すると (E) が trivial + |Xmu|=p-1 が既 landed
+reducible_count に bijection で還元:
+- **injective** (landable now): reducible → I_M(ζ)=M (⟨Ind,Ind⟩=|I|/|HU|>1 ⟺ I≠HU、prime index
+  [M:HU]=q で I=M) → M-fixed → `induce_injective_of_inertia_stable` (landed) ⟹ |Xmu|≤p-1。
+- **surjective** (crux、W₁-transitivity 依存): reducible φ=Ind_M(ξ)∈𝒮(H₀C)、ξ M-fixed。ξ の HC-構成子
+  θ̄_0 が **regular**: θ̄_0 が Hpart i で trivial ⟹ Ū-conjugates も trivial (**U が各 Hpart 保存**、
+  既 Hpart_aInvariant) ⟹ {θ̄_0 nontrivial な Hpart} は Ū-不変かつ (ξ W₁-fixed で) **W₁-不変** ⟹
+  W₁-transitive で ∅ or 全体、H⊄ker で非空 ⟹ 全体 = θ̄_0 regular ⟹ ξ=ζ_θ∈Xθ。⟹ Ind_M:Xmu→reducibles
+  全単射 ⟹ **|Xmu|=|reducibles of 𝒮(H₀C)|=p-1** (`reducible_count_sOf_H0C` LANDED)。
+- **⟹ constant-char 構成 + Ū∩Δ={1} injectivity は不要** (surjectivity route が全部を reducible_count に還元)。
+
+**⟹ conjunct c 残 = (1) orbit de-opacify ✅ + (2) W₁-transitivity lemma (factors=W₁-orbit、W₁ 推移;
+orbitRep∈W₁ に refine or 「W₁-不変 Hpart-set は ∅/全体」) + (3) injective (reducible→M-fixed、既 infra)
++ (4) surjective (reducible→θ̄_0 regular、W₁-transitivity + 構成子解析) + (5) parity 組立**。
+crux = W₁-transitivity + surjectivity の 構成子解析 (Coq PFsection9 の Res-constituent 論)。次着手 =
+W₁-transitivity lemma (producer で factors=W₁-orbit、orbitRep を W₁ に取れる) or injective lemma
+(self-contained、landable)。**deep だが constant-char 構成より短い経路**。
