@@ -853,3 +853,36 @@ cite して下流実証明」に合致。full build 3889 green (~63s)。
 - **a/ha** `exists_betaDecomp_a` (hdiffZ: Ind θ_{ind1H}−Ind θ_0∈ZIrr L、hζ0nuZ: ν(Ind θ_0)∈ZIrr G)。
 - **hsmall** `H78.smallIndex` (index smallness; def 要確認)。
 その後 hC ((7.3)+(8.17))・他 field と合わせ `exists_counterexample_dade_data` (S14:2779 sorry)。
+
+### 2026-07-01 (loop 継続⁷): hB 完成マップ確定 + Frobenius size 補題 + hzeta0nu crux 特定
+
+witness_L_hypothesis78 を踏まえ hB=(7.8.b) `1 - e/kH ≤ normRho` (`zetaNuRhoNormSqGeOfDade`
+S09:2347 で産出) の残 4 入力を精査。**3 つは tractable、1 つ (hzeta0nu) が genuine gap**:
+
+- ✅ **hζ0norm** `⟨Ind θ_0, Ind θ_0⟩=1`: `inner_self_induce_eq_one_of_frobeniusGroup`
+  (InducedIrreducible.lean:477、docstring が「§12 type-I coherent family」用と明記) で即。
+- ✅ **hsmall** `2e+1≤h` (= `H78.smallIndex`): 一般補題
+  **`frobenius_two_mul_card_complement_add_one_le_card_kernel`** (S14 新規、axiom-clean) で証明。
+  奇位数 Frobenius 群で |A| | |N|-1 (`IsFrobeniusGroup.card_kernel_modEq_one`=Isaacs 6.1) +
+  |N| 奇 ⟹ |N|-1 偶 ⟹ 奇約数 |A| は半分以下 ⟹ 2|A|+1≤|N|。witness 適用は
+  N=H.subgroupOf L, A=C (共に奇 ∵ odd G の section)、complementIndex=|C| (IsComplement' card 分解)。
+- ✅ **a/ha** `exists_betaDecomp_a` (S09:1668): hdiffZ=Ind θ_{ind1H}−Ind θ_0∈ZIrr L
+  (`induce_mem_ZIrr` InducedCharacter:792 ×2)、hζ0nuZ=ν(Ind θ_0)∈ZIrr G (`coh.extension_mem_ZIrr`)。
+  hypothesis76OfFamily.zeta i = Ind θ_i (defeq、alignment OK)。
+- 🛑 **hzeta0nu** `⟨ν(Ind θ_0), constOne G⟩=0` = **genuine gap**。
+  - ν(Ind θ_0) は norm-1 virtual char (isometry `extension_inner_eq` + hζ0norm) = ±既約。
+    ⟨ν ζ_0,1_G⟩=0 ⟺ ν(ζ_0)≠±1_G。
+  - **isometry+hagree だけでは不足**: hagree から ⟨ν ζ_i,1_G⟩=d_i·c (c=⟨ν ζ_0,1_G⟩) が全 i で従うが
+    (τ image ⊥1_G via `inner_tau_supported_constOne` + ⟨ψ_i,1_L⟩=0)、norm 制約
+    Σd_i²|c|²≤1 は c=0 を強制しない。差 ζ_0−ζ_{ind1H} も ζ_{ind1H}=Ind 1_K∉zSpan S ゆえ
+    zSupportedSpan に入らず extends_on_supported 使えず。
+  - **要る machinery = coherent extension の nonprincipality/degree 保存** (ν(χ)(1)=χ(1)=e≥3 なら
+    ν(ζ_0)≠±1_G で即)。抽象 `IsCoherent` (nonzero/extension/inner_eq/extends_on_supported/mem_ZIrr)
+    に degree 保存も nonprincipality も **無い**。`frobenius_typeI_coherent`/retarget/CoherenceWiring も
+    degree 保存 lemma 無し (grep 済)。→ coherence-core を強化する新 §7 定理が必要 (lane-a coherence
+    machinery と overlap 可能性)。**hB の唯一の残 blocker**。
+
+**次増分**: (a) witness instantiation で `frobenius_...le_card_kernel` を H78.smallIndex に接続
+(IsComplement' card 分解 + subgroupOf card equiv)、(b) hζ0norm/a·ha を wire、(c) hzeta0nu を
+coherence degree 保存で discharge (deep) → `zetaNuRhoNormSqGeOfDade` で hB 産出 →
+`exists_counterexample_dade_data` (S14 sorry) の hB field。hC=(7.3)+(8.17) は別途。
