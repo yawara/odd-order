@@ -1104,3 +1104,20 @@ lane-a/b coherence 領域か)。[[cross-lane-sync-via-notes]]
 **本セッション lane-c 成果**: (1) cont.³³ 重複軌道修正、(2) [Is] 3.14 ANT infra 5 補題 (cont.³⁴/³⁵)、
 (3) 自律 frontier + claim-before-build 規約化 (ft_path_policy §0 policy 5-6)、(4) 本 gate 発見。
 [[scaffold-sorry-free-not-done]] [[feedback-no-avoiding-hard-parts]]
+
+
+### cont.³⁷ (2026-07-01 lane c=γ /loop 継続): cont.³⁶「cyclic-TI 機構 absent/gated」は phantom gate (4件) → (13.16) normalizer_W1 de-opacify landing
+
+**⚠ cont.³³/³⁶ の「未実装/absent/gated」判定は 4 件すべて phantom gate だった** ([[verify-port-state-by-number-not-coq-name]] 再発)。cont.³⁶ は `grep cyclicTI OddOrder/` (空) で「cyclic-TI 皆無」と結論したが repo は Coq 名でなく descriptive 名を使う:
+
+1. **cyclic-TI 機構は存在**: `OddOrder/Peterfalvi/S05_TICyclic.lean` (993行) `TICyclicHypothesis` (W/W1/W2 cyclic + `V_ti : IsTISubset V W` + `toDadeHypothesis` + `mapOfInjective`)。FeitThompson.lean が `sdiffTICyclicHypothesis` で多用。
+2. **(7.5) family_inequality は存在**: `S09.family_inequality` + `S09.FamilyHypothesis71`。`MHypothesis.toFamilyHypothesis71` bridge (S16:1732) + 適用する `chiRhoNormSq_psi_le_line83` (14.11.4, S16:2462) + `generic_character_bound` (14.11.3) は **既に sorry-free**。cont の「(7.5) 未実装」は stale。
+3. **Wielandt fixed-point は存在**: `OddOrder/GroupTheory/{WielandtFixedPoint,WielandtAssembly,CoprimeFixedPoints,CoprimeAction,CoprimeFrobeniusKernel,CoprimeAbelianPGroup}.lean`。(13.16) Coq proof (`FTtypeP_norm_cent_compl`, PFsection13.v:1519) の核心エンジン。
+4. **norm cascade は Dade producer 2 本に bottom-out**: 残 genuine sorry = `eta_generic_data` (S16:2389) + `betaM_expansion_data` (§3/§4 Dade concrete)。`normCascadeData` は現 sorry リストに無し。
+
+**genuine landing: (13.16) normalizer_W1 de-opacification** (S15_SAndT.lean、leaf build 3856 green):
+- `normalizer_W1` (13.16) を **sorry-free 化**。反対称 chain `Q⊔W₂ ≤ C_G(W₁) ≤ N_G(W₁) ≤ Q⊔W₂` で N=C=Q⊔W₂ collapse。
+- proven: `W₂ ≤ C_G(W₁)` (`W1_commutes_W2`, W abelian)、`Q ≤ C_G(W₁)` (`W₁≤Q`+Q abelian ⟹ `le_centralizer_iff_isMulCommutative`+`centralizer_le`)、`C≤N` (`centralizer_le_normalizer`)。
+- 残 sorry を `normalizer_W1_structure` (新) に isolate = 3 atomic 構造事実: `W₁ ≤ Q` (W2_le_P の T-side dual)、`IsMulCommutative ↥Q` (P_elementaryAbelian の T-side dual)、`N_G(W₁) ≤ Q⊔W₂` (Frobenius/Wielandt、machinery は #1/#3)。
+
+**次手 (lane c)** = `normalizer_W1_structure` の `N_G(W₁) ≤ Q⊔W₂` を WielandtFixedPoint + TICyclicHypothesis bridge で実証明。T-side dual の `W₁≤Q`/Q-abelian は T-side basic_structure gated (issue 3001) だが cite 可。dual `normalizer_W2` も同パターン。[[feedback-cite-sorried-lemmas-if-signature-correct]] [[scaffold-sorry-free-not-done]]
