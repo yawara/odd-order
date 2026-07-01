@@ -3409,6 +3409,44 @@ theorem Hypothesis.muGridAlpha_inner_zeta_sub_conj [Finite G]
     star_intCast, star_natCast, mul_zero, zero_mul, sub_zero, zero_sub, mul_one]
 
 open scoped FiniteInduce in
+/-- **Peterfalvi (11.8.2), `(α_{ij}, ζ − η) = −n`** for any degree-`w₁` irreducible `η ∈ S(HC)`
+distinct from `ζ`.  General-`η` companion of `muGridAlpha_inner_zeta_sub_conj` (the `η = ζ̄` case):
+since `η` has the same degree as `ζ` (`hη1 : η(1) = ζ(1)`), both `μ_{ij}, μ_{i0}` are degree-distinct
+from — hence orthogonal to — `η` (`muGrid_inner_eq_zero_of_apply_one_ne`), and `(ζ, η) = 0`
+(`η ≠ ζ`, both irreducible), so only the `−nζ` term survives:
+`(α_{ij}, ζ − η) = −n(ζ, ζ) = −n` (independent of `δ`).
+
+This is the source value that (11.8.2) lifts (via the `τ`-isometry) to `(α_{ij}^τ, (ζ − η)^τ) = −n`
+for every `η ∈ S₁ = S(HC)`, `η ≠ ζ` — pinning the `ζ^{τ₁}`-coefficient of the `α_{ij}^τ` projection
+onto the orthonormal `S₁^{τ₁}` (`SHC_extension_inner_*`) to `−n`. -/
+theorem Hypothesis.muGridAlpha_inner_zeta_sub_irr [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} [Invertible (Nat.card ↥M : ℂ)]
+    (hyp : Hypothesis M) (hodd : Odd (Nat.card G)) (i : Fin hyp.w1) (j : Fin hyp.w2)
+    {ζ η : ClassFunction ↥M ℂ} (hζirr : IsIrreducibleCharacter ζ) (hηirr : IsIrreducibleCharacter η)
+    {δ : ℤ} {n : ℕ}
+    (hdζ : hyp.muGrid hG hodd i j 1 ≠ ζ 1) (h0ζ : hyp.muGrid hG hodd i 0 1 ≠ ζ 1)
+    (hη1 : η 1 = ζ 1) (hηne : η ≠ ζ) :
+    ClassFunction.inner (hyp.muGrid hG hodd i j - (δ : ℂ) • hyp.muGrid hG hodd i 0 - (n : ℂ) • ζ)
+        (ζ - η) = -(n : ℂ) := by
+  haveI := hyp.finiteG
+  classical
+  have hμijζ : ClassFunction.inner (hyp.muGrid hG hodd i j) ζ = 0 :=
+    hyp.muGrid_inner_eq_zero_of_apply_one_ne hG hodd i j hζirr hdζ
+  have hμi0ζ : ClassFunction.inner (hyp.muGrid hG hodd i 0) ζ = 0 :=
+    hyp.muGrid_inner_eq_zero_of_apply_one_ne hG hodd i 0 hζirr h0ζ
+  have hμijη : ClassFunction.inner (hyp.muGrid hG hodd i j) η = 0 :=
+    hyp.muGrid_inner_eq_zero_of_apply_one_ne hG hodd i j hηirr (by rw [hη1]; exact hdζ)
+  have hμi0η : ClassFunction.inner (hyp.muGrid hG hodd i 0) η = 0 :=
+    hyp.muGrid_inner_eq_zero_of_apply_one_ne hG hodd i 0 hηirr (by rw [hη1]; exact h0ζ)
+  have hζζ : ClassFunction.inner ζ ζ = 1 := by
+    rw [OddOrder.RepresentationTheory.irr_cf_inner hζirr hζirr, if_pos rfl]
+  have hζη : ClassFunction.inner ζ η = 0 := by
+    rw [OddOrder.RepresentationTheory.irr_cf_inner hζirr hηirr, if_neg (Ne.symm hηne)]
+  simp only [ClassFunction.inner_sub_left, ClassFunction.inner_sub_right,
+    ClassFunction.inner_smul_left, hμijζ, hμi0ζ, hμijη, hμi0η, hζζ, hζη,
+    star_intCast, star_natCast, mul_zero, zero_mul, sub_zero, zero_sub, mul_one]
+
+open scoped FiniteInduce in
 /-- **Peterfalvi (10.5), `(α_{ij}, μ_k − dζ̄) = 0`** (M-side, `0 < k < w₂`, `k ≠ j`): the inner
 product of `α_{ij} = μ_{ij} − δ·μ_{i0} − n·ζ` against `μ_k − dζ̄`, where `μ_k = ∑_{0≤i'<w₁} μ_{i'k}`
 is the `W₂`-column-`k` sum.  Since `k ≠ j` and `k ≠ 0`, every `μ_{i'k}` is cross-column-orthogonal
@@ -7244,6 +7282,65 @@ theorem Hypothesis.SHC_extension_inner_alignedOmegaSigma_eq_zero [Finite G] {M :
   have hs1 : ClassFunction.inner (tic.chiFam hVeq app (P j)) (tic.chiFam hVeq app (P j)) = 1 := by
     rw [(tic.chiFam_spec hVeq app).2.2.1, if_pos rfl]
   exact inner_left_eq_zero_of_inner_sub_eq_zero haZ hsZ ha1 hb1 hs1 hab hdiff
+
+open scoped FiniteInduce in
+/-- **General `S(HC)`-coherence split** `(ζ − η)^τ = ζ^{τ₁} − η^{τ₁}` for degree-`w₁` irreducibles
+`ζ, η ∈ S(HC)` (α-grid `S₁`-`τ₁` input to (11.8.2)).  Generalizes `tau_zeta_sub_conj_eq_SHC_extension`
+(the `η = ζ̄` case) to an arbitrary `S(HC)` member: since `ζ, η ∈ S(HC)` have equal degree `w₁`, the
+difference `ζ − η` is `A₀`-supported (`inducedFamily_sub_support`) and lies in `ℤ[S(HC)]`, where
+`SHC_isCoherent.extension` agrees with `hyp.tau` (`extends_on_supported`). -/
+theorem Hypothesis.tau_sub_eq_SHC_extension [Finite G] {M : Subgroup G}
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis M)
+    {ζ η : ClassFunction ↥M ℂ}
+    (hζS : ζ ∈ inducedFamily M) (hζirr : IsIrreducibleCharacter ζ) (hζ1 : ζ 1 = (hyp.w1 : ℂ))
+    (hηS : η ∈ inducedFamily M) (hηirr : IsIrreducibleCharacter η) (hη1 : η 1 = (hyp.w1 : ℂ)) :
+    hyp.tau (ζ - η)
+      = (hyp.SHC_isCoherent hG).extension ζ - (hyp.SHC_isCoherent hG).extension η := by
+  have hspanζ : ζ ∈ OddOrder.Peterfalvi.S07.zSpan
+      {φ : ClassFunction ↥M ℂ | φ ∈ inducedFamily M ∧ IsIrreducibleCharacter φ ∧
+        ((φ : ↥M → ℂ) 1 = (hyp.w1 : ℂ))} :=
+    Submodule.subset_span ⟨hζS, hζirr, hζ1⟩
+  have hspanη : η ∈ OddOrder.Peterfalvi.S07.zSpan
+      {φ : ClassFunction ↥M ℂ | φ ∈ inducedFamily M ∧ IsIrreducibleCharacter φ ∧
+        ((φ : ↥M → ℂ) 1 = (hyp.w1 : ℂ))} :=
+    Submodule.subset_span ⟨hηS, hηirr, hη1⟩
+  have hmem : (ζ - η) ∈ OddOrder.Peterfalvi.S07.zSupportedSpan
+      {φ : ClassFunction ↥M ℂ | φ ∈ inducedFamily M ∧ IsIrreducibleCharacter φ ∧
+        ((φ : ↥M → ℂ) 1 = (hyp.w1 : ℂ))} hyp.A0 :=
+    ⟨Submodule.sub_mem _ hspanζ hspanη, hyp.inducedFamily_sub_support hζS hηS (hζ1.trans hη1.symm)⟩
+  rw [← (hyp.SHC_isCoherent hG).extends_on_supported _ hmem, map_sub]
+
+open scoped FiniteInduce in
+/-- **Peterfalvi (11.8.2), the `S₁^{τ₁}`-projection coefficient relation**:
+`(α_{ij}^τ, ζ^{τ₁}) − (α_{ij}^τ, η^{τ₁}) = −n` for any degree-`w₁` irreducible `η ∈ S(HC)`, `η ≠ ζ`.
+Combining the general split `(ζ − η)^τ = ζ^{τ₁} − η^{τ₁}` (`tau_sub_eq_SHC_extension`), the `τ`-isometry
+on the supported `α_{ij}` and `ζ − η` (`tau_inner_eq_of_supported`), and the source value `−n`
+(`muGridAlpha_inner_zeta_sub_irr`).  Since the orthonormal `{λ^{τ₁} : λ ∈ S₁}` gives
+`(α_{ij}^τ, λ^{τ₁})` as the projection coefficient, this forces `(α_{ij}^τ, η^{τ₁}) = a` (constant in
+`η ≠ ζ`) and `(α_{ij}^τ, ζ^{τ₁}) = a − n` — the coefficient structure of the (11.8.2) decomposition
+`α_{ij}^τ = X − nζ^{τ₁} + a∑_{λ∈S₁}λ^{τ₁}`. -/
+theorem Hypothesis.muGridAlpha_tau_inner_SHC_extension_sub [Finite G] {M : Subgroup G}
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis M) (hodd : Odd (Nat.card G))
+    (i : Fin hyp.w1) {j : Fin hyp.w2} (hj0 : j ≠ 0)
+    {ζ η : ClassFunction ↥M ℂ} (hζS : ζ ∈ inducedFamily M) (hζirr : IsIrreducibleCharacter ζ)
+    (hζ1 : ζ 1 = (hyp.w1 : ℂ)) (hηS : η ∈ inducedFamily M) (hηirr : IsIrreducibleCharacter η)
+    (hη1 : η 1 = (hyp.w1 : ℂ)) (hηne : η ≠ ζ) {d : ℕ} {δ : ℤ} {n : ℕ}
+    (hdeg : hyp.muGrid hG hodd i j 1 = (d : ℂ)) (hμ0 : hyp.muGrid hG hodd i 0 1 = 1)
+    (hnf : (n : ℤ) * (hyp.w1 : ℤ) = (d : ℤ) - δ) (hδj : hyp.muColumnSign hG hodd j = δ)
+    (hdζ : hyp.muGrid hG hodd i j 1 ≠ ζ 1) (h0ζ : hyp.muGrid hG hodd i 0 1 ≠ ζ 1) :
+    ClassFunction.inner
+        (hyp.tau (hyp.muGrid hG hodd i j - (δ : ℂ) • hyp.muGrid hG hodd i 0 - (n : ℂ) • ζ))
+        ((hyp.SHC_isCoherent hG).extension ζ)
+      - ClassFunction.inner
+        (hyp.tau (hyp.muGrid hG hodd i j - (δ : ℂ) • hyp.muGrid hG hodd i 0 - (n : ℂ) • ζ))
+        ((hyp.SHC_isCoherent hG).extension η) = -(n : ℂ) := by
+  have hαsupp := hyp.muGrid_alpha_support hG hodd hj0 hζS hdeg hμ0 hζ1 hnf hδj
+  have hζηsupp : (ζ - η).support ⊆ hyp.A0 :=
+    hyp.inducedFamily_sub_support hζS hηS (hζ1.trans hη1.symm)
+  rw [← ClassFunction.inner_sub_right,
+    ← hyp.tau_sub_eq_SHC_extension hG hζS hζirr hζ1 hηS hηirr hη1,
+    hyp.tau_inner_eq_of_supported hαsupp hζηsupp,
+    hyp.muGridAlpha_inner_zeta_sub_irr hG hodd i j hζirr hηirr hdζ h0ζ (hη1.trans hζ1.symm) hηne]
 
 open scoped FiniteInduce in
 /-- **Peterfalvi (11.8), the genuine non-orthogonality** (lane-b W3 obligation, issue 2020).
