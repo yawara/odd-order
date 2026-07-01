@@ -364,6 +364,101 @@ theorem centralizer_W1_inf_U_eq_bot [Finite G] (hG : OddOrder.BG.IsMinimalSimple
     simp only [Subgroup.coe_mul, InvMemClass.coe_inv]
     rw [hcomm]; group)
 
+/-- **Peterfalvi (13.16), the coprime-action datum**: `Coprime |P| |U ⋊ W₁|` — the complement
+`U ⋊ W₁` acts coprimely on the Fitting kernel `P = S_F`.
+
+`P = S_F` is the normal nilpotent Hall subgroup of `S` (`maxNilpotentNormalHall`, so
+`Coprime |P| [S:P]`), and `U ⋊ W₁` complements `P` in `S`: from the `Sdata` complements
+`M' ⋊ W₁ = S` (`M_complement`) and `P ⋊ U = M'` (`derived_complement`) one reads off
+`P ⊓ (U ⊔ W₁) = ⊥` and `P ⊔ (U ⊔ W₁) = S`, so `[S:P] = |U ⊔ W₁|`.  This is the coprimality
+datum consumed by the (13.16) core `normalizer_U_inf_W2_eq_bot` (ungated: `Sdata` supplies it). -/
+theorem coprime_card_P_card_UW1 [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hyp : Hypothesis (G := G)) :
+    Nat.Coprime (Nat.card ↥hyp.P) (Nat.card ↥(hyp.U ⊔ hyp.W1)) := by
+  have hM'_le_S : derivedInG hyp.S ≤ hyp.S := Subgroup.map_subtype_le _
+  have hP_le_M' : hyp.P ≤ derivedInG hyp.S := by rw [hyp.S_deriv_eq_PU]; exact le_sup_left
+  have hU_le_M' : hyp.U ≤ derivedInG hyp.S := by rw [hyp.S_deriv_eq_PU]; exact le_sup_right
+  have hP_le_S : hyp.P ≤ hyp.S := hP_le_M'.trans hM'_le_S
+  have hW1_le_S : hyp.W1 ≤ hyp.S := hyp.Sdata_W1_eq ▸ hyp.Sdata.W1_le
+  have hUW1_le_S : hyp.U ⊔ hyp.W1 ≤ hyp.S := sup_le (hU_le_M'.trans hM'_le_S) hW1_le_S
+  -- `P ⊓ U = ⊥` (`derived_complement`).
+  have hdisj : hyp.P ⊓ hyp.U = ⊥ := by
+    have hd := disjoint_iff.mp hyp.Sdata.derived_complement.disjoint
+    rw [eq_bot_iff]; rintro x ⟨hxH, hxU⟩
+    have hxD : x ∈ derivedInG hyp.S := hyp.Sdata.H_le (by rwa [hyp.Sdata.H_eq, ← hyp.P_eq_SF])
+    have hmem : (⟨x, hxD⟩ : ↥(derivedInG hyp.S)) ∈
+        (hyp.Sdata.H.subgroupOf (derivedInG hyp.S)) ⊓ (hyp.Sdata.U.subgroupOf (derivedInG hyp.S)) :=
+      ⟨Subgroup.mem_subgroupOf.mpr (by rwa [hyp.Sdata.H_eq, ← hyp.P_eq_SF]),
+        Subgroup.mem_subgroupOf.mpr (hyp.Sdata_U_eq ▸ hxU)⟩
+    rw [hd, Subgroup.mem_bot] at hmem
+    rw [Subgroup.mem_bot]; simpa using Subtype.ext_iff.mp hmem
+  -- `M' ⊓ W₁ = ⊥` (`M_complement`).
+  have hM'W1 : derivedInG hyp.S ⊓ hyp.W1 = ⊥ := by
+    have hd := disjoint_iff.mp hyp.Sdata.M_complement.disjoint
+    rw [eq_bot_iff]; rintro x ⟨hxM', hxW1⟩
+    have hxS : x ∈ hyp.S := hM'_le_S hxM'
+    have hmem : (⟨x, hxS⟩ : ↥hyp.S) ∈
+        ((derivedInG hyp.S).subgroupOf hyp.S) ⊓ (hyp.Sdata.W1.subgroupOf hyp.S) :=
+      ⟨Subgroup.mem_subgroupOf.mpr hxM', Subgroup.mem_subgroupOf.mpr (hyp.Sdata_W1_eq ▸ hxW1)⟩
+    rw [hd, Subgroup.mem_bot] at hmem
+    rw [Subgroup.mem_bot]; simpa using Subtype.ext_iff.mp hmem
+  -- `P ⊔ (U ⊔ W₁) = S`.
+  have hSsup : hyp.P ⊔ (hyp.U ⊔ hyp.W1) = hyp.S := by
+    have htop := hyp.Sdata.M_complement.sup_eq_top
+    have hmap := congrArg (Subgroup.map hyp.S.subtype) htop
+    rw [Subgroup.map_sup, Subgroup.map_subgroupOf_eq_of_le hM'_le_S,
+      Subgroup.map_subgroupOf_eq_of_le hyp.Sdata.W1_le, ← MonoidHom.range_eq_map,
+      Subgroup.range_subtype] at hmap
+    rw [hyp.Sdata_W1_eq, hyp.S_deriv_eq_PU] at hmap
+    rw [← sup_assoc]; exact hmap
+  -- `P ⊓ (U ⊔ W₁) = ⊥` (write `y ∈ U ⊔ W₁ = U · W₁`, push into `M' ⊓ W₁` and `P ⊓ U`).
+  have hPUW1_disj : hyp.P ⊓ (hyp.U ⊔ hyp.W1) = ⊥ := by
+    rw [eq_bot_iff]; intro x hx
+    obtain ⟨hxP, hxUW1⟩ := Subgroup.mem_inf.mp hx
+    have hxUW1' : (x : G) ∈ (↑(hyp.U ⊔ hyp.W1) : Set G) := hxUW1
+    rw [Subgroup.coe_mul_of_right_le_normalizer_left hyp.U hyp.W1 hyp.W1_normalizes_U] at hxUW1'
+    obtain ⟨u, hu, w, hw, huw⟩ := Set.mem_mul.mp hxUW1'
+    have hwM' : w ∈ derivedInG hyp.S := by
+      have : w = u⁻¹ * x := by rw [← huw]; group
+      rw [this]
+      exact Subgroup.mul_mem _ (Subgroup.inv_mem _ (hU_le_M' (SetLike.mem_coe.mp hu)))
+        (hP_le_M' hxP)
+    have hw1 : w = 1 := by
+      have : w ∈ derivedInG hyp.S ⊓ hyp.W1 := Subgroup.mem_inf.mpr ⟨hwM', SetLike.mem_coe.mp hw⟩
+      rwa [hM'W1, Subgroup.mem_bot] at this
+    have hxu : x = u := by rw [← huw, hw1, mul_one]
+    have hxPU : x ∈ hyp.P ⊓ hyp.U := Subgroup.mem_inf.mpr ⟨hxP, hxu ▸ SetLike.mem_coe.mp hu⟩
+    rwa [hdisj, Subgroup.mem_bot] at hxPU
+  -- `U ⋊ W₁` complements `P` in `↥S`; hence `[S:P] = |U ⋊ W₁|`.
+  have hS_norm_P : hyp.S ≤ Subgroup.normalizer (hyp.P : Set G) := by
+    rw [hyp.P_eq_SF]; exact OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_le_normalizer hyp.S
+  haveI hPnorm : (hyp.P.subgroupOf hyp.S).Normal :=
+    (Subgroup.normal_subgroupOf_iff_le_normalizer hP_le_S).mpr hS_norm_P
+  have hcompl : Subgroup.IsComplement' ((hyp.U ⊔ hyp.W1).subgroupOf hyp.S)
+      (hyp.P.subgroupOf hyp.S) := by
+    apply Subgroup.isComplement'_of_disjoint_and_mul_eq_univ
+    · rw [disjoint_iff, eq_bot_iff]
+      intro y hy
+      rw [Subgroup.mem_inf, Subgroup.mem_subgroupOf, Subgroup.mem_subgroupOf] at hy
+      have hyPU : (y : G) ∈ hyp.P ⊓ (hyp.U ⊔ hyp.W1) := ⟨hy.2, hy.1⟩
+      rw [hPUW1_disj, Subgroup.mem_bot] at hyPU
+      rw [Subgroup.mem_bot]; exact Subtype.ext hyPU
+    · have hsup : ((hyp.U ⊔ hyp.W1).subgroupOf hyp.S) ⊔ (hyp.P.subgroupOf hyp.S) = ⊤ := by
+        rw [sup_comm, ← Subgroup.subgroupOf_sup hP_le_S hUW1_le_S, hSsup, Subgroup.subgroupOf_self]
+      rw [← Subgroup.mul_normal, hsup, Subgroup.coe_top]
+  have hindex : (hyp.P.subgroupOf hyp.S).index = Nat.card ↥(hyp.U ⊔ hyp.W1) := by
+    rw [hcompl.index_eq_card]
+    exact Nat.card_congr (Subgroup.subgroupOfEquivOfLe hUW1_le_S).toEquiv
+  -- `P` is Hall in `S`: `Coprime |P| [S:P]`.
+  have hHall := OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_isHall hyp.S
+  rw [← hyp.P_eq_SF] at hHall
+  have hcopIdx : Nat.Coprime (Nat.card ↥hyp.P) (hyp.P.subgroupOf hyp.S).index := by
+    have hcard_eq : Nat.card ↥(hyp.P.subgroupOf hyp.S) = Nat.card ↥hyp.P :=
+      Nat.card_congr (Subgroup.subgroupOfEquivOfLe hP_le_S).toEquiv
+    exact hcard_eq ▸ OddOrder.Isaacs.Ch03.IsHallSubgroup.coprime_index hHall
+  rw [hindex] at hcopIdx
+  exact hcopIdx
+
 /-- **Peterfalvi (13.16), `W₁`-triviality on `K/C_K(W₂)`**: for `g ∈ N_G(W₂)` and `w ∈ W₁`, the
 "twisted commutator" `g⁻¹ (w g w⁻¹) ∈ C_G(W₂)` — conjugating `g` by `w ∈ W₁ ≤ C_G(W₂)` changes it
 only by an element centralizing `W₂`.
@@ -673,9 +768,10 @@ in the repo (see `notes/peterfalvi/s15_s_and_t.md`, the (13.16) core plan block)
 theorem normalizer_U_inf_W2_eq_bot [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     (hyp : Hypothesis (G := G)) :
     hyp.U ⊓ Subgroup.normalizer (hyp.W2 : Set G) = ⊥ :=
-  -- The two §16-carrier faithfulness data (`P ⊓ U = ⊥` = (13.2), `Sdata.W2 = W2` = the type-`P`
-  -- reconciliation) are supplied by the enriched §16 `Hypothesis` construction (issue 3001/4014).
-  normalizer_U_inf_W2_eq_bot_of_data hG hyp sorry sorry
+  -- The coprime-action datum is discharged by `coprime_card_P_card_UW1` (ungated); the type-`P`
+  -- reconciliation is the `Hypothesis` field `Sdata_W2_eq` (§16-carrier, supplied by the enriched
+  -- §16 construction via `typePData_of_kappaHall_hallComplement_W2`).
+  normalizer_U_inf_W2_eq_bot_of_data hG hyp (coprime_card_P_card_UW1 hG hyp) hyp.Sdata_W2_eq
 
 /-- **Peterfalvi (13.16), Maschke/Wielandt core for the `W₂`-side**: `N_G(W₂) ⊓ S ≤ P ⊔ W₁`.
 
@@ -2487,13 +2583,44 @@ theorem complement_le_PW1 [Finite G]
     _ = Subgroup.centralizer (hyp.W2 : Set G) := h1316.1
     _ = hyp.P ⊔ hyp.W1 := h1316.2
 
-/-- **`S`-side dual of `Q_W2_structure`** (V-side, gated): `W₁ ≤ N_G(P)`, `P ⊓ W₁ = ⊥`, and
-`q ∤ |P|`.  Mirror of the gated `Q_W2_structure`; declared sorried per the hub cite-gated directive
-(the `q ∤ |P|` and `P ⊓ W₁ = ⊥` parts bottom out on `|P| = p^q`, the §13 σ-structure). -/
-theorem P_W1_structure [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
+/-- **`S`-side of the (13.17.c) `W₁`-structure**: `W₁ ≤ N_G(P)`, `P ⊓ W₁ = ⊥`, and `q ∤ |P|`.
+
+All three are ungated `S`-side facts: `W₁ ≤ S ≤ N_G(P)` (`P = S_F ⊴ S`); `P ⊓ W₁ ≤ M' ⊓ W₁ = ⊥`
+(`P ≤ M' = derivedInG S`, `M_complement` disjointness); and `q ∤ |P|` from
+`Coprime |P| |U ⋊ W₁|` (`coprime_card_P_card_UW1`) with `|W₁| = q ∣ |U ⋊ W₁|`. -/
+theorem P_W1_structure [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     (hyp : Hypothesis (G := G)) :
     hyp.W1 ≤ Subgroup.normalizer (hyp.P : Set G) ∧ hyp.P ⊓ hyp.W1 = ⊥ ∧
-      ¬ hyp.q ∣ Nat.card ↥hyp.P := sorry
+      ¬ hyp.q ∣ Nat.card ↥hyp.P := by
+  have hM'_le_S : derivedInG hyp.S ≤ hyp.S := Subgroup.map_subtype_le _
+  have hP_le_M' : hyp.P ≤ derivedInG hyp.S := by rw [hyp.S_deriv_eq_PU]; exact le_sup_left
+  have hW1_le_S : hyp.W1 ≤ hyp.S := hyp.Sdata_W1_eq ▸ hyp.Sdata.W1_le
+  have hS_norm_P : hyp.S ≤ Subgroup.normalizer (hyp.P : Set G) := by
+    rw [hyp.P_eq_SF]; exact OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_le_normalizer hyp.S
+  have hM'W1 : derivedInG hyp.S ⊓ hyp.W1 = ⊥ := by
+    have hd := disjoint_iff.mp hyp.Sdata.M_complement.disjoint
+    rw [eq_bot_iff]; rintro x ⟨hxM', hxW1⟩
+    have hxS : x ∈ hyp.S := hM'_le_S hxM'
+    have hmem : (⟨x, hxS⟩ : ↥hyp.S) ∈
+        ((derivedInG hyp.S).subgroupOf hyp.S) ⊓ (hyp.Sdata.W1.subgroupOf hyp.S) :=
+      ⟨Subgroup.mem_subgroupOf.mpr hxM', Subgroup.mem_subgroupOf.mpr (hyp.Sdata_W1_eq ▸ hxW1)⟩
+    rw [hd, Subgroup.mem_bot] at hmem
+    rw [Subgroup.mem_bot]; simpa using Subtype.ext_iff.mp hmem
+  refine ⟨hW1_le_S.trans hS_norm_P, ?_, ?_⟩
+  · rw [eq_bot_iff]; intro x hx
+    obtain ⟨hxP, hxW1⟩ := Subgroup.mem_inf.mp hx
+    have hxm : x ∈ derivedInG hyp.S ⊓ hyp.W1 := Subgroup.mem_inf.mpr ⟨hP_le_M' hxP, hxW1⟩
+    rwa [hM'W1] at hxm
+  · intro hq
+    have hcop := coprime_card_P_card_UW1 hG hyp
+    have hW1dvd : Nat.card ↥hyp.W1 ∣ Nat.card ↥(hyp.U ⊔ hyp.W1) := by
+      rw [← Nat.card_congr (Subgroup.subgroupOfEquivOfLe (le_sup_right)).toEquiv]
+      exact Subgroup.card_subgroup_dvd_card _
+    have hcopPW1 : Nat.Coprime (Nat.card ↥hyp.P) (Nat.card ↥hyp.W1) :=
+      hcop.coprime_dvd_right hW1dvd
+    rw [← hyp.q_eq_card_W1] at hcopPW1
+    have hqdvd1 : hyp.q ∣ 1 := hcopPW1 ▸ Nat.dvd_gcd hq (dvd_refl hyp.q)
+    exact hyp.q_prime.one_lt.ne' (Nat.dvd_one.mp hqdvd1)
 
 /-- **`T`-side dual of `complement_card_eq_pq`** (Pf (13.17.c)/(14.5), V-side): the `W₂`-containing
 Frobenius complement of the type-I subgroup `L` over `N_G(V)` has order `p q`.  Mirror with the
