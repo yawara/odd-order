@@ -116,3 +116,64 @@ lane c (cont.⁴³) が「deep char frontier は 9001 shared coherence infra に
 - notes/peterfalvi/s14_maximalI.md loop⁶⁰-⁶²
 - Pf 原文: 04.8 (6.8), 04.14 (12.6/12.9/12.10)
 - hub 裁定根拠: ft_path_policy.md §0 policy 5(B)/6/7、issue 4014 (σ-theory 先例)
+
+## ⚠ lane c → HUB 応答 (cont.⁴⁴, 2026-07-02): 上記「HUB→lane c 指示」#2 の前提は誤り — レビュー要請
+
+hub 指示 (本 issue lines 85-112) は lane c に「σ-theory-dual structural (S16:166/3431/3511) を
+**lane d leaf cite で discharge 可 (coherence 不要)**」と指示したが、lane c が 3 目標すべてを frontier
+精査した結果、**この前提は verifiably 誤り**。3 目標は全て **coherence-gated な深い §13 char 残余**で、
+lane d の算術 leaf の cite だけでは discharge できない。ユーザー裁定 (2026-07-02)「hub と認識共有・レビュー」。
+
+### 目標ごとの実際の gate (file:line 検証済)
+
+1. **S16:3431 `U_cyclic_and_Q_elemAbelian`** (`IsCyclic U ∧ IsElementaryAbelian q Q`, bare sorry):
+   - **U cyclic**: Coq `PFsection13.v:194/204` (13.2.a) は `abelian U` のみ (compl2facts/compl3facts 由来)、
+     **cyclic ではない**。cyclicity は Galois/Singer 構造 (U 既約 → U↪𝔽^× cyclic) = 深い typeP_Galois
+     dichotomy 経由で、lane d の算術 bound では出ない。
+   - **Q elem abelian**: S-side dual `P_elementaryAbelian` (`S15_SAndT_Setup.lean:350`, **sorried**) は
+     Pf (11.7) `H_elementaryAbelian` (`S13_MaximalIII_IV.lean:429`, **sorried**) ← `core_structure`
+     (`S13:409`, 3 char-gated sorry) に bottom-out。coherence-gated。
+2. **S16:3511 `V_cyclic`** (bare sorry): U cyclic の dual、同じ深い char。
+3. **S16:166 `T_side_caseB_facts`** (`D=⊥ ∧ v=(q^p−1)/(q−1)`, bare sorry):
+   - **D=⊥**: S-side dual `c_eq_one` (`S15_SAndT_Setup.lean:1703`) は **sorried** (`:1720`)、docstring
+     明記「Deep §13 char/σ residual」= (13.10) 解析不等式 + (13.11) bounds + typeP_Galois + Fcore_max 要。
+   - **v-value**: **等式** = Coq (13.15) (`PFsection13.v:1014` `T_Galois := [typeP_Galois ∧ D=1 ∧
+     v=(q^p−1)/(q−1)]`、"the bulk of the proof of (13.15)")。lane d leaf は **≤ bound のみ**
+     (`TypePGaloisUBound.card_le_cyclotomicQuotient_of_faithful_fpf`)、等式ではない。route =
+     Pf (13.4) `lambda_forces_T_caseB` (`Setup:463` sorried) ← (13.3) `character_degree_analysis`
+     (`Setup:453` sorried)。
+
+### 前提ずれの根本原因
+
+lane d leaf (`TypePGaloisUBound`, issue 9000) は **算術 `u_bound` `|U|≤(p^q−1)/(p−1)`** を module 仮説
+の下で供給する。だが (a) それは **≤ bound**、σ-theory-dual 目標は **(13.15) 等式** / **(13.2.a)
+cyclicity** を要す。(b) cite 自体に **構造的 bridge** (V が Q に faithful・fpf に作用、非 Galois の
+imprimitive 分解) が要り、これは issue 9000 自身が「**lane a assembly, W₁-dependent, 未完**」と defer
+している部分。S-side `u_bound` (`Setup:352`) がまさにこの理由で今も **sorried**。
+
+### 検証済 gate 構造 (全 lane-c 構造目標)
+
+§13.2 / §13.10-15 numeric-char (→c=1/D=⊥/v) / §13.16-19 / §14 Dade cascade / §14.10 exists_MHypothesis
+は全て推移的に (i) §7 coherence (h78/tau isometry/Dade grid) = **lane b の build (本 issue)**、
+(ii) sorried numeric endpoint c_eq_one/lambda_forces_T_caseB/character_degree_analysis (解析入力
+h1/h2/h139b が coherence grid 依存) に gated。
+
+**既に構築済 (lane c 過去成果)**:
+- 純算術 core: 13.9.b (`Setup:710/1275`)、13.10 core (`:1293`)、13.11 m-bounds (`:1382/1395/1410`)、
+  13.12/15 `caseB_numeric_forces_q_three` (`:1452`) — 全 sorry-free。
+- 純群論: §13.16-17 Wielandt/Gorenstein confinement (cont.⁴⁰-⁴²) — 完了。
+- §14.11 cascade skeleton: `generic_character_bound` (`S16:2402`)、`chiRhoNormSq_psi_le_line83`
+  (`:2464`)、line83 assembly (`:3095`)、`betaM_expansion` (carrier 経由, `:2185`) — proven。
+- 残 bare-sorry endpoint `exists_MHypothesis` (14.10, `S16:4492`) は full Dade/coherence content 要。
+
+### 結論 + hub へのレビュー要請
+
+cont.⁴²/⁴³ は正しかった: **lane c の frontier は coherence-gated deep char**。hub の「cite lane d,
+coherence 不要」escape hatch は本 3 目標に適用不可。lane c の tractable な非-char 作業は枯渇。
+
+**hub にレビュー・裁定を求める**:
+1. σ-theory-dual 指示 (S16:166/3431/3511 = clean cite) の撤回/修正を確認願う。
+2. lane c の次手裁定: **(a)** lane b の coherence + numeric endpoint (c_eq_one/13.3/13.4) 完成を待つ、
+   **(b)** lane c が未 claim の coherence piece を claim して build (どれ? lane b の cluster と重複
+   リスク大)、**(c)** lane c を別クラスタへ再配分。
+- 検証根拠: notes/peterfalvi/s16_w4_char_cascade.md cont.⁴⁴。

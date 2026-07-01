@@ -1208,3 +1208,21 @@ cont.⁴² で「残 lane-c = deep char」と確定後、engage を進めるも�
 **lane-c deep char (§14-16 Dade) はこの coherence machinery を transitive 基盤とする** (coherent ψ・Dade image・Hypothesis78 は §7 coherence 経由)。∴ **lane-c deep char frontier = 9001 の hub-adjudicated shared coherence infra に gated**。unsound/未完の base 上の build は premature (scaffold リスク)。
 
 **判断**: これは cross-lane coordination gate + soundness (valid-stop: 想定違反/設計分岐)。lane-c の tractable structural (§13.16/13.17.a) は完了。deep char は 9001 shared-infra 割当 (hub) を待つ or lane-c が claim-before-build で 1 つ建てる (policy 5A、要 hub dedup) の分岐。[[cross-lane-sync-via-notes]] [[feedback-flag-poor-progress]]
+
+
+### cont.⁴⁴ (2026-07-02 lane c=γ 再開): hub 9001 の「σ-theory-dual = cite lane d で discharge 可」前提を検証 → **誤りと判明**、hub にレビュー要請 (ユーザー裁定)
+
+再開時、merge で入った hub 裁定 (9001 lines 85-112) が lane c に「idle にならず σ-theory-dual structural (S16:166 v値 / 3431 U巡回∧Q基本可換 / 3511 V巡回) を **lane d leaf cite で discharge 可 (coherence 不要)**」と指示。cont.⁴³ の「deep char gated」判断に対する hub の push-back。**3 目標を frontier 精査した結果、hub 前提は verifiably 誤り** ([[verify-port-state-by-number-not-coq-name]] を両方向で適用: phantom gate も phantom "easy" も避ける)。
+
+**検証結果 (file:line、issue 9001 に詳細記録)**:
+- **S16:3431 U cyclic**: Coq PFsection13.v:194/204 (13.2.a) は **abelian U のみ** (cyclic でない)。cyclicity は Galois/Singer (深い typeP_Galois dichotomy) 経由。**Q elem abelian**: S-side dual `P_elementaryAbelian` (Setup:350 sorried) ← Pf(11.7) `H_elementaryAbelian` (S13:429 sorried) ← `core_structure` (S13:409, 3 char-gated sorry)。
+- **S16:3511 V cyclic**: U cyclic の dual、同深さ。
+- **S16:166 T_side_caseB_facts**: **D=⊥** = `c_eq_one` (Setup:1703) の dual、後者は **sorried** (Setup:1720、"Deep §13 char/σ residual")。**v-value** は **等式** = Coq (13.15) (PFsection13.v:1014 T_Galois)、lane d leaf は **≤ bound のみ** (`card_le_cyclotomicQuotient_of_faithful_fpf`)。route = Pf(13.4) `lambda_forces_T_caseB` (Setup:463 sorried) ← (13.3) `character_degree_analysis` (Setup:453 sorried)。
+
+**根本原因**: lane d leaf (`TypePGaloisUBound`) は算術 `u_bound |U|≤(p^q−1)/(p−1)` を module 仮説下で供給。だが σ-theory-dual 目標は (a) **≤ でなく (13.15) 等式 / (13.2.a) cyclicity** を要し、(b) cite 自体に **構造的 bridge** (V が Q に faithful fpf 作用、非-Galois imprimitive 分解) 要 = issue 9000 が「lane a assembly, W₁-dependent, 未完」と defer 済。S-side `u_bound` (Setup:352) が同理由で今も sorried。
+
+**確定 gate 構造**: §13.2/§13.10-15 numeric-char/§13.16-19/§14 cascade/§14.10 exists_MHypothesis は全て推移的に (i) §7 coherence (h78/tau/Dade grid = lane b build) + (ii) sorried numeric endpoint (c_eq_one/13.3/13.4、解析入力が coherence grid 依存) に gated。**純算術 core (13.9.b/13.10/13.11/caseB_numeric_forces_q_three) + 純群論 (§13.16-17) + §14.11 cascade skeleton (generic_character_bound/chiRhoNormSq/line83/betaM_expansion) は全て構築済**。残 bare-sorry = `exists_MHypothesis` (S16:4492、full Dade content 要)。
+
+**cont.⁴²/⁴³ は正しかった**: lane c frontier = coherence-gated deep char。tractable 非-char 作業は枯渇。
+
+**ユーザー裁定 (2026-07-02)**: 「hub と認識共有・レビューしてもらって」→ 検証済所見を issue 9001 に「lane c → HUB 応答」節で記録、hub レビュー・次手裁定 ((a) lane b 待ち / (b) lane c が未claim coherence piece を claim / (c) 再配分) を要請。[[feedback-file-hub-issue-dont-stop]] [[feedback-flag-poor-progress]] [[feedback-decide-frontier-autonomously]]
