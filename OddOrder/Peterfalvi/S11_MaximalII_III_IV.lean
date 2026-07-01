@@ -5545,34 +5545,9 @@ theorem u_odd [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
   rcases hdvd with ⟨k, hk⟩
   exact (Nat.odd_mul.mp (hk ▸ hG.odd)).1
 
-/-- **Peterfalvi (9.8)**: character-count consequences in Clifford case (a).
-
-Faithful to Peterfalvi (9.8.b,c,d) (count-statement audit, issue 2030):
-* **(b)** `𝒮(H₀)` contains exactly `p-1` *reducible* characters; each has degree `qu` and lies
-  in `𝒮(H₀C)`.
-* **(c)** `𝒮(H₀C)` contains an *irreducible* character of degree `qu`.
-* **(d)** `𝒮(H₀U')` contains at least `((p-1)/a)·(|U|/(a|U'|))` irreducible characters of
-  degree `qa`.
-
-All `𝒮(H₀·)` sets carry the `H₀`-join (`chief.H0 ⊔ ·`): Peterfalvi's `𝒮(H₀C)`/`𝒮(H₀U')` require
-`H₀C`/`H₀U'` in the kernel, not `C`/`U'` alone.  Reducibility/irreducibility is
-`IsIrreducibleCharacter`. -/
-theorem caseA_character_counts [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
-    {M : Subgroup G} {data : TypesIIIIIIVSetup M} {chief : ChiefFactorData data}
-    (chars : Section11CharacterData data chief) (caseA : CliffordCaseAData chars) :
-    {φ ∈ chars.SOf chief.H0 | ¬ IsIrreducibleCharacter φ}.ncard = chief.p - 1 ∧
-      (∀ φ ∈ chars.SOf chief.H0, ¬ IsIrreducibleCharacter φ →
-        φ 1 = ((data.q * chars.u : ℕ) : ℂ) ∧ φ ∈ chars.SOf (chief.H0 ⊔ chars.C)) ∧
-      (∃ χ ∈ chars.SOf (chief.H0 ⊔ chars.C), IsIrreducibleCharacter χ ∧
-        χ 1 = ((data.q * chars.u : ℕ) : ℂ)) ∧
-      ((chief.p - 1) / caseA.a) * (Nat.card ↥data.U / (caseA.a * Nat.card ↥chars.Uprime)) ≤
-        {χ ∈ chars.SOf (chief.H0 ⊔ chars.Uprime) |
-          IsIrreducibleCharacter χ ∧ χ 1 = ((data.q * caseA.a : ℕ) : ℂ)}.ncard := by
-  -- (9.8.b) reducible count is the §9↔§6 bijection `reducible_count_sOf_H0` (case-agnostic).
-  refine ⟨reducible_count_sOf_H0 hG chief, ?_, ?_, ?_⟩
-  · sorry
-  · sorry
-  · sorry
+-- `caseA_character_counts` (Peterfalvi (9.8)) is defined at the end of the file, after the (9.8.c)
+-- `H₀C` character machinery (`caseA_reducible_eq_hcZeta`, `caseA_reducible_induceHU_apply_one_eq_qu`,
+-- etc.) that its (b)/(c) conjuncts cite.
 
 section
 open scoped IsMulCommutative
@@ -8132,5 +8107,40 @@ theorem caseA_reducible_induceHU_apply_one_eq_qu [Finite G] {M : Subgroup G}
   show induceHU data (χ : ClassFunction ↥(huSub data) ℂ) (1 : ↥M) = _
   rw [hζeq]
   exact hcZeta_induceHU_apply_one chars θbar
+
+/-- **Peterfalvi (9.8)**: character-count consequences in Clifford case (a).
+
+Faithful to Peterfalvi (9.8.b,c,d) (count-statement audit, issue 2030):
+* **(b)** `𝒮(H₀)` contains exactly `p-1` *reducible* characters; each has degree `qu` and lies
+  in `𝒮(H₀C)`.
+* **(c)** `𝒮(H₀C)` contains an *irreducible* character of degree `qu`.
+* **(d)** `𝒮(H₀U')` contains at least `((p-1)/a)·(|U|/(a|U'|))` irreducible characters of
+  degree `qa`.
+
+All `𝒮(H₀·)` sets carry the `H₀`-join (`chief.H0 ⊔ ·`): Peterfalvi's `𝒮(H₀C)`/`𝒮(H₀U')` require
+`H₀C`/`H₀U'` in the kernel, not `C`/`U'` alone.  Reducibility/irreducibility is
+`IsIrreducibleCharacter`.
+
+Relocated after the (9.8.c) `H₀C` character machinery so the (b)/(c) conjuncts can cite it.  (b) =
+`reducible_count_sOf_H0` (count) + `caseA_reducible_induceHU_apply_one_eq_qu` (degree) +
+`reducible_mem_sOf_H0C` (membership).  (c)/(d) remain open. -/
+theorem caseA_character_counts [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    {M : Subgroup G} {data : TypesIIIIIIVSetup M} {chief : ChiefFactorData data}
+    (chars : Section11CharacterData data chief) (caseA : CliffordCaseAData chars) :
+    {φ ∈ chars.SOf chief.H0 | ¬ IsIrreducibleCharacter φ}.ncard = chief.p - 1 ∧
+      (∀ φ ∈ chars.SOf chief.H0, ¬ IsIrreducibleCharacter φ →
+        φ 1 = ((data.q * chars.u : ℕ) : ℂ) ∧ φ ∈ chars.SOf (chief.H0 ⊔ chars.C)) ∧
+      (∃ χ ∈ chars.SOf (chief.H0 ⊔ chars.C), IsIrreducibleCharacter χ ∧
+        χ 1 = ((data.q * chars.u : ℕ) : ℂ)) ∧
+      ((chief.p - 1) / caseA.a) * (Nat.card ↥data.U / (caseA.a * Nat.card ↥chars.Uprime)) ≤
+        {χ ∈ chars.SOf (chief.H0 ⊔ chars.Uprime) |
+          IsIrreducibleCharacter χ ∧ χ 1 = ((data.q * caseA.a : ℕ) : ℂ)}.ncard := by
+  -- (b) count = §9↔§6 bijection `reducible_count_sOf_H0`; degree = caseA step-5 assembly; membership
+  -- = case-agnostic cardinality argument `reducible_mem_sOf_H0C`.
+  refine ⟨reducible_count_sOf_H0 hG chief, fun φ hφ hred =>
+    ⟨caseA_reducible_induceHU_apply_one_eq_qu caseA hG φ hφ hred,
+      reducible_mem_sOf_H0C hG chars φ hφ hred⟩, ?_, ?_⟩
+  · sorry
+  · sorry
 
 end OddOrder.Peterfalvi.S11
