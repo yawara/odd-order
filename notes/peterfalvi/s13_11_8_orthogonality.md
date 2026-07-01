@@ -511,3 +511,16 @@ a∈{0,1,2}、a=0 or 2、a=0 ⟹ X=ω_{ij}^σ−ω_{i0}^σ ((11.8.5))。μ_k^{τ
   SHC 版は SHC.extension に対する ofProjection 適応が要 (§5 (5.5)/(5.3.b) が SHC-coherence で効くか確認)。
 - 要 **‖α^τ‖²=2+n²** (`muGridAlpha_tau_inner_self` coh-free ✅) + norm 展開で a²·|S₁|+… ≤ 2 → a∈{0,1} → integrality で a=0。
 - 次 iteration = ω^σ ⊥ SHC.extension (5.5 ofProjection) の tractability 確認 → a=0 projection。
+
+### cont.²⁷ 追記 — (5.5) ofProjection は SHC に transfer しない; a=0 は fixed-vector projection
+scoped (5.5) `ofProjection`/`eq_sum_of_psi_eq_zero` (S07:1224/1561): `μ_j^{tau1}` を R(μ_j) image family
+に projection。**tau1 が μ_j に定義要** ⟹ full-coh (coh.tau1 on all S) は可、**SHC.extension (S(HC) 上のみ、
+μ_j∉S(HC)) は不可**。∴ full-coh a=0 machinery (`columnImageFamily`+ofProjection) は SHC 非適応 (plan 既知障害を code 確認)。
+
+**SHC a=0 の正しい形** = fixed vector `α^τ = hyp.tau α` (coh-free, α supported ゆえ定義) を **S₁^{τ₁} 部分空間
+(span{λ^{τ₁}:λ∈S(HC)}, orthonormal API 完備) に projection**:
+`α^τ = (⊥S₁^{τ₁} 成分) + ∑_{λ∈S(HC)} ⟨α^τ,λ^{τ₁}⟩·λ^{τ₁}`。
+(11.8.2) 主張 = ⟨α^τ,ζ^{τ₁}⟩=-n+a、⟨α^τ,λ^{τ₁}⟩=a (λ≠ζ、**uniform**)。
+- **crux = ⟨α^τ,λ^{τ₁}⟩ の λ 一様性**: なぜ全 λ∈S(HC)\{ζ} で同値 a か (Peterfalvi 構造論拠、要精読 04.11 (11.8.2))。
+- norm: ‖α^τ‖²=2+n² = ‖⊥成分‖² + ‖-nζ^{τ₁}+a∑λ^{τ₁}‖² (orthonormal) = ‖⊥‖² + (n²·? + a²·|S₁| + cross) → a bound。
+- 次 iteration = 04.11 (11.8.2) 原文で uniformity 論拠を確認 → projection lemma。orthonormal API (norm1/pairwise0/int) は消費準備済。
