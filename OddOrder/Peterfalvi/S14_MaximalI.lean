@@ -3962,6 +3962,55 @@ theorem witness_L_frobenius [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     ∃ frob : TypeIFrobeniusData data.L, frob.kernel_eq_MF := by
   sorry
 
+/-- **Peterfalvi (12.10), non-TI clause**: for the (12.9) witness `L`, its Frobenius kernel
+`H = L_F` has `H^#` **not** a TI-subset of `G`.  This is the "By (12.9), `H^#` is not a TI-subset"
+step of (12.10): the rank-two witness `x ∈ Ω₁(P₀)^#` has `C_G(x) ⊄ L` (`data.centralizer_x_not_le_L`)
+while `N_G(H) = L` (maximality of `L` + `H = L_F` normal); pick `g ∈ C_G(x) ∖ L`, then `g ∉ N_G(H)`
+yet `g x g⁻¹ = x ∈ H^#`, witnessing the TI failure (`x ∈ H^# ∩ (H^#)^g`).
+
+This is the honest (12.9)/(12.10) prerequisite of the *witness* coherence route: with it,
+`witness_L_coherent` dispatches only through the (b)/(c) cases of (12.6) (which are `sorry`-free),
+never the TI-only case (a) — so the witness coherence depends on this genuine (12.9) fact rather
+than on the (8.18.c) geometry that case (a) (`sibleyTarget_frobI`) transitively needs. -/
+theorem witness_H_sharp_not_isTISubset [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    {ctr : CounterexampleHypothesis (G := G)} (data : RankTwoWitnessData ctr)
+    (frob : TypeIFrobeniusData data.L) (hker : frob.kernel_eq_MF) :
+    ¬ OddOrder.GroupTheory.IsTISubset
+        (OddOrder.GroupTheory.sharpSubgroup frob.typeI.typeF.H)
+        (Subgroup.normalizer (frob.typeI.typeF.H : Set G)) := by
+  intro hTI
+  -- `N_G(H) = L` (`H = L_F` self-normalizing at the maximal coatom `L`; simplicity kills `N = ⊤`).
+  have hne : maxNilpotentNormalHall data.L ≠ ⊥ := by
+    rw [← frob.typeI.typeF.H_eq]; exact frob.typeI.typeF.H_nontrivial
+  have hNL : Subgroup.normalizer (frob.typeI.typeF.H : Set G) = data.L := by
+    rw [frob.typeI.typeF.H_eq]
+    have hco : IsCoatom data.L := data.L_maximal
+    have hLleN : data.L ≤ Subgroup.normalizer (maxNilpotentNormalHall data.L : Set G) :=
+      OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_le_normalizer data.L
+    refine (le_antisymm hLleN ?_).symm
+    rcases hLleN.lt_or_eq with hlt | heq
+    · exfalso
+      have hNtop := hco.2 _ hlt
+      haveI hHnormal : (maxNilpotentNormalHall data.L).Normal :=
+        Subgroup.normalizer_eq_top_iff.mp hNtop
+      rcases hG.simple.eq_bot_or_eq_top_of_normal (maxNilpotentNormalHall data.L) hHnormal with
+        hb | ht
+      · exact hne hb
+      · have hle := OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_le data.L
+        rw [ht] at hle; exact hco.1 (top_le_iff.mp hle)
+    · exact heq.ge
+  -- The rank-two witness `x ∈ H^#` with `C_G(x) ⊄ L`: `x ∈ H = L_F` is `x ∈ M ⊓ L ≤ L_F` by (12.11)
+  -- (`intersection_complement_structure`).  Isolated here as the sole (12.11)-gated fact.
+  have hxH : data.x ∈ frob.typeI.typeF.H := sorry
+  have hxsharp : data.x ∈ OddOrder.GroupTheory.sharpSubgroup frob.typeI.typeF.H :=
+    ⟨hxH, by simpa using data.x_ne_one⟩
+  -- Pick `g ∈ C_G(x) ∖ L`; it centralizes `x`, so `g x g⁻¹ = x ∈ H^#`, yet `g ∉ L = N_G(H)`.
+  obtain ⟨g, hgC, hgL⟩ := SetLike.not_le_iff_exists.mp data.centralizer_x_not_le_L
+  have hgc : g * data.x * g⁻¹ = data.x := by
+    rw [mul_inv_eq_iff_eq_mul]
+    exact Subgroup.mem_centralizer_singleton_iff.mp hgC
+  exact hgL (hNL ▸ hTI g ⟨data.x, hxsharp, by rw [hgc]; exact hxsharp⟩)
+
 /-- **Peterfalvi (12.1) for the witness subgroup `L`, with its Frobenius witness**: the second
 maximal subgroup `L` of (12.9) carries the (12.1) Hypothesis together with an explicit Frobenius
 decomposition of its kernel `H = L_F`.  Since `L` is type I (Frobenius, by (12.10)
@@ -3971,14 +4020,18 @@ transfers to `hyp.H`.  This Frobenius witness is the structural input to coheren
 theorem witness_L_hypothesis_frobenius [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     {ctr : CounterexampleHypothesis (G := G)} (data : RankTwoWitnessData ctr) :
     ∃ hyp : Hypothesis data.L, ∃ C : Subgroup ↥data.L,
-      OddOrder.Isaacs.Ch06.IsFrobeniusGroup ↥data.L (hyp.H.subgroupOf data.L) C := by
-  obtain ⟨frob, _⟩ := witness_L_frobenius hG data
+      OddOrder.Isaacs.Ch06.IsFrobeniusGroup ↥data.L (hyp.H.subgroupOf data.L) C ∧
+      ¬ OddOrder.GroupTheory.IsTISubset
+          (OddOrder.GroupTheory.sharpSubgroup hyp.typeI.typeF.H)
+          (Subgroup.normalizer (hyp.typeI.typeF.H : Set G)) := by
+  obtain ⟨frob, hker⟩ := witness_L_frobenius hG data
   obtain ⟨hyp, hhyp⟩ := hypothesis_of_typeIData hG data.L_maximal frob.typeI
-  refine ⟨hyp, frob.complement, ?_⟩
-  have hH : hyp.H = frob.typeI.typeF.H := by
-    rw [show hyp.H = hyp.typeI.typeF.H from rfl, hhyp]
-  rw [hH]
-  exact frob.frobenius
+  have hH : hyp.typeI.typeF.H = frob.typeI.typeF.H := by rw [hhyp]
+  refine ⟨hyp, frob.complement, ?_, ?_⟩
+  · rw [show hyp.H = hyp.typeI.typeF.H from rfl, hH]
+    exact frob.frobenius
+  · rw [hH]
+    exact witness_H_sharp_not_isTISubset hG data frob hker
 
 /-- **Peterfalvi (12.1) Hypothesis for the witness subgroup `L`** (forgetful form of
 `witness_L_hypothesis_frobenius`). -/
@@ -3991,15 +4044,22 @@ theorem witness_L_hypothesis [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
 open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
 /-- **Peterfalvi (12.6) for the witness subgroup `L`**: the type-I family `S` of `L` is coherent.
 Combines the Hypothesis + Frobenius witness of `witness_L_hypothesis_frobenius` with the (12.6)
-Frobenius-case coherence `frobenius_typeI_coherent`.  This is the coherence input "`S` coherent" of
-the (12.16) Dade calculation — it feeds the `(7.8.b)` norm bound `hB` of `CounterexampleDadeData`
-via the §7 `Hypothesis78`/`NormEstimates`. -/
+Frobenius-case coherence.  Crucially the witness dispatches only through the **(b)/(c)** cases
+(both `sorry`-free): its `H^#` is *not* TI (Peterfalvi (12.10), `witness_H_sharp_not_isTISubset`),
+so the TI-only case (a) `sibleyTarget_frobI` is excluded — hence this coherence never depends on the
+(8.18.c) geometry that case (a) transitively needs, only on the genuine (12.9)/(12.10) witness facts.
+This is the coherence input "`S` coherent" of the (12.16) Dade calculation — it feeds the `(7.8.b)`
+norm bound `hB` of `CounterexampleDadeData` via the §7 `Hypothesis78`/`NormEstimates`. -/
 theorem witness_L_coherent [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     {ctr : CounterexampleHypothesis (G := G)} (data : RankTwoWitnessData ctr) :
     ∃ hyp : Hypothesis data.L,
       Nonempty (OddOrder.Peterfalvi.S07.IsCoherent hyp.tau hyp.Sset hyp.A) := by
-  obtain ⟨hyp, C, hC⟩ := witness_L_hypothesis_frobenius hG data
-  exact ⟨hyp, frobenius_typeI_coherent hG hyp ⟨C, hC⟩⟩
+  obtain ⟨hyp, C, hC, hNonTI⟩ := witness_L_hypothesis_frobenius hG data
+  refine ⟨hyp, ?_⟩
+  rcases hyp.typeI.alternative with hTI | hab | hexp
+  · exact absurd hTI hNonTI
+  · exact frobenius_typeI_coherent_of_abelianKernel hG hyp ⟨C, hC⟩ hab
+  · exact frobenius_typeI_coherent_of_cyclicQuotient hG hyp ⟨C, hC⟩ hexp
 
 /-- **Peterfalvi (12.11)**: `M inter L` complements `K` in `M` and lies in the
 Fitting kernel `H` of the witness subgroup `L`. -/
@@ -5157,8 +5217,13 @@ theorem witness_L_zeta_bound [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
       ∃ H78 : OddOrder.Peterfalvi.S09.Hypothesis78 G (typeIA data.L hyp.typeI) data.L,
         (1 : ℝ) - (H78.complementIndex : ℝ) / (H78.kernelOrder : ℝ) ≤ H78.zetaNuRhoNormSq := by
   classical
-  obtain ⟨hyp, C, hC⟩ := witness_L_hypothesis_frobenius hG data
-  obtain ⟨coh⟩ := frobenius_typeI_coherent hG hyp ⟨C, hC⟩
+  obtain ⟨hyp, C, hC, hNonTI⟩ := witness_L_hypothesis_frobenius hG data
+  -- The witness dispatches only through (12.6) cases (b)/(c) (`H^#` non-TI), never case (a).
+  obtain ⟨coh⟩ : Nonempty (OddOrder.Peterfalvi.S07.IsCoherent hyp.tau hyp.Sset hyp.A) := by
+    rcases hyp.typeI.alternative with hTI | hab | hexp
+    · exact absurd hTI hNonTI
+    · exact frobenius_typeI_coherent_of_abelianKernel hG hyp ⟨C, hC⟩ hab
+    · exact frobenius_typeI_coherent_of_cyclicQuotient hG hyp ⟨C, hC⟩ hexp
   have hHL : hyp.typeI.typeF.H ≤ data.L := hyp.typeI.typeF.H_le
   haveI hKnormal : ((hyp.typeI.typeF.H).subgroupOf data.L).Normal := by
     rw [hyp.typeI.typeF.H_eq]
