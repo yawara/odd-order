@@ -80,9 +80,14 @@ structural 入力。
         non-Galois=SemilinearImprimitiveBound)。
         ⚠ dup 記録: `pow_sub_one_le_cyclotomicQuotient` = S15 `caseB_u_bound_arith` と同内容。
         infra(GroupTheory)が正位置ゆえ後で S15 を本 leaf cite 化可 (S15=lane d dormant、後日)。
-      - [ ] **構造的 imprimitivity** (deep, type-P-specific): Maschke 半単純 (instance 済) + W₁-permutation
-        で `Hbar=⊕H1^w` (|H1|=p, q blocks) + block-scalar ratio embedding `psi` の injectivity
-        + `a∣p−1` (block action → Z_pˣ = SingerField |M|=p 特殊化、直接 cite)。W₁ 依存ゆえ lane a assembly。
+      - [x] **psi embedding injectivity core** (`card_le_pow_of_block_scalars`, sorry-free):
+        block scalars `φ : Fin(n+1)→(Ū→*A)` + no-global-scalar (`hconst`) → ratio 埋め込み
+        `x↦(φ_{i+1}(x)/φ_0(x))` injective → `|Ū|≤|A|^n=a^{q−1}`。Coq `psi` (PFsection9.v:442) の
+        crux を generic 構成。lane a は block scalars φ を供給するだけ (module 分解から)。
+      - [ ] **残: 構造的 block 分解** (deep, type-P-specific): Maschke 半単純 (instance 済) +
+        W₁-permutation で `Hbar=⊕H1^w` (|H1|=p, q blocks) → 各 block の scalar hom φ_i を取り出す
+        + `a∣p−1` (block action → Z_pˣ = SingerField |M|=p 特殊化直接 cite) + `hconst` (Ū に
+        nonidentity global scalar 無し = 型 P quotient 構造)。W₁/Ū 依存ゆえ lane a assembly。
 - [x] step 3: dichotomy 組立 — **DONE** (`TypePGaloisUBound.lean`,
       `card_le_cyclotomicQuotient_of_faithful_fpf`、sorry-free)。IsSimpleModule で case-split:
       Galois 分岐は完全証明 (SingerLineBound)、non-Galois 分岐は `hReducible` hypothesis

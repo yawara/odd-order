@@ -57,6 +57,42 @@ theorem card_le_pow_sub_one_of_injective_imprimitive
     rwa [hcardA] at this
   exact hb.trans (Nat.pow_le_pow_left ha _)
 
+/-- **Ratio embedding from block scalars** (the injectivity core of Peterfalvi (9.7)(a)'s `psi`,
+`PFsection9.v:442`): given a finite commutative group `Ū` with `q = n+1` scalar characters
+`φ : Fin (n+1) → (Ū →* A)` (the action of `Ū` on the `n+1` imprimitivity blocks, each `𝔽_p`-line, so
+`A = 𝔽_p^×`) such that **no nonidentity element acts by a single scalar on every block**
+(`hconst`), the ratio map `x ↦ (φ_{i+1}(x)·φ_0(x)⁻¹)_i : Ū → (Fin n → A)` is injective, whence
+
+  `|Ū| ≤ |A|^n`.
+
+The `−1` (`n = q − 1` free coordinates) comes from normalizing by block `0`.  With `|A| = a ∣ p − 1`
+this is `u ≤ a^{q−1} ≤ (p−1)^{q−1}` (`card_le_cyclotomicQuotient_of_injective_imprimitive`).  The
+caller supplies the block scalars `φ` and `hconst` from the imprimitive `𝔽_p`-module decomposition
+(the `W₁`-permuted blocks). -/
+theorem card_le_pow_of_block_scalars {Ubar A : Type*} [CommGroup Ubar] [Finite Ubar]
+    [CommGroup A] [Finite A]
+    {n : ℕ} (φ : Fin (n + 1) → (Ubar →* A))
+    (hconst : ∀ x : Ubar, (∀ i : Fin (n + 1), φ i x = φ 0 x) → x = 1) :
+    Nat.card Ubar ≤ Nat.card A ^ n := by
+  have hinj : Function.Injective
+      (fun x : Ubar => fun i : Fin n => φ i.succ x / φ 0 x) := by
+    intro x y hxy
+    have hxy' : ∀ i : Fin n, φ i.succ x / φ 0 x = φ i.succ y / φ 0 y :=
+      fun i => congrFun hxy i
+    have hz : x * y⁻¹ = 1 := by
+      apply hconst
+      refine Fin.cases rfl (fun j => ?_)
+      have h : φ j.succ x * φ 0 y = φ j.succ y * φ 0 x :=
+        (div_eq_div_iff_mul_eq_mul).mp (hxy' j)
+      show φ j.succ (x * y⁻¹) = φ 0 (x * y⁻¹)
+      rw [map_mul, map_mul, map_inv, map_inv, ← div_eq_mul_inv, ← div_eq_mul_inv,
+        div_eq_div_iff_mul_eq_mul, mul_comm (φ 0 x)]
+      exact h
+    exact mul_inv_eq_one.mp hz
+  calc Nat.card Ubar
+      ≤ Nat.card (Fin n → A) := Nat.card_le_card_of_injective _ hinj
+    _ = Nat.card A ^ n := by simp [Nat.card_pi]
+
 /-- **Non-Galois → cyclotomic-quotient bridge**: `(p − 1)^{q−1} ≤ (p^q − 1)/(p − 1)`.
 
 `(p−1)^{q−1}·(p−1) = (p−1)^q < p^q`, so `(p−1)^q ≤ p^q − 1`, and dividing by `p − 1` gives the claim.
