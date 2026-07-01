@@ -1141,3 +1141,43 @@ cont.³⁸ の `normalizer_W2_structure` (N_G(W₂)≤P⊔W₁, Wielandt confine
 - **`normalizer_W2_structure`** を `normalizer_W2_le_S` + 新 residual `normalizer_W2_within_S` (`N_G(W₂)⊓S ≤ P⊔W₁`, Maschke/Wielandt core) から実証明。residual は full confinement → S-内部 Maschke/Wielandt core に縮小。
 
 次手 = `normalizer_W2_within_S` (N_U(W₂)=1 の Maschke 分解 + `WielandtFixedPoint` の core assembly)。W₁-side (normalizer_W1_structure) の TI 還元は F(T)^# TI が T=非-type-P₂ ゆえ fittingIsTI_of_isTypeP2 不適用 → 別 route (T の FittingIsTI 源) 要調査。
+
+
+### cont.⁴⁰ (2026-07-01 lane c=γ): (13.16) W₁-side confinement を W₂-side の完全 role-swap で hard math 全 proven (10 lemmas) + 3 clean residual
+
+cont.³⁹ が「T の FittingIsTI 源 要調査」で止めた W₁-side (`normalizer_W1_structure`, S15_SAndT:155, 3-conjunct bare sorry) を **W₂-side machinery の完全 dual として正面突破**。role-swap = (P→Q, U→V, W1→W2, W2→W1, S→T, Sdata→reconciled tpd)。**全 mirror が一発 build green** (mirror discipline)。
+
+**設計確定 (Coq PFsection13.v:1522/1749)**: W₁-side `N_G(W₁)=Q⊔W₂` は `FTtypeP_norm_cent_compl` を **T に適用**したもの (`maxT TtypeP`)。`TtypeP` は `FTtypeP_pair_witness maxS StypeP` 由来の定理 = Lean `reconciled_typePData_T` (T の一般 type-P、type-P₂ でない・非循環)。cont.³⁹ の「type-P₂ 源要」は誤読で、実源は **一般 type-P + 非-type-V**、後者は (14.9) `T_typeII` (`IsTypeII T ⟹ ¬IsTypeV T`) 由来 = HUB の「V-side gate = T_typeII」。
+
+**proven (10, sorry-free)**:
+- `W1_le_Q` (conjunct 1): W₁=tpd.W2≤tpd.H=Q。`reconciled_typePData_T` を正 3-conjunct (`.U=V ∧ .W1=W₂ ∧ .W2=W₁`) に強化。
+- `normalizer_W1_le_T` (TI 還元 N_G(W₁)≤T): `normalizer_W2_le_S` dual、`fittingIsTI_T` cite。
+- `centralizer_W2_inf_V_eq_bot` (C_V(W₂)=⊥) + `conj_W2_mem_centralizer_W1` (純 GT) = crux 入力。
+- `normalizer_V_inf_W1_le_centralizer_W1` (crux K≤C_G(W₁)): W₂ の abelian V 上 coprime 作用 + `coprime_fixedPoints_quotient` (Isaacs 3.28)。
+- `normalizer_V_inf_W1_eq_bot_of_data` (core N_V(W₁)=⊥): Gorenstein 2.3 (`fitting_coprime_abelian_decomp`) + Wielandt (`frobenius_kernel_centralizes_of_complement_fpf`) の ~130 行、gated 入力を explicit hyp に取り本体 sorry-free。
+- `coprime_card_Q_card_VW2` (Coprime |Q| |V⋊W₂|): `coprime_card_P_card_UW1` dual、ungated。
+- `normalizer_V_inf_W1_eq_bot` (wrapper) / `normalizer_W1_within_T` (Dedekind, `normalizer_W2_within_S` dual) / `normalizer_W1_le_QW2` (**conjunct 3 = N_G(W₁)≤Q⊔W₂**, `normalizer_W2_structure` dual)。
+
+**残 = 3 named residual (TRUE・14.9 T_typeII gated・S-side の exact dual)**:
+- `fittingIsTI_T` (F(T)^# TI = `fittingIsTI_of_isTypeP2` の dual、T type-P₁ ⟺ MF≠Msigma、非-type-V が (14.9))。
+- `Q_elementaryAbelian_T` (Q=T_F elem abelian = `BasicStructureGated.P_elementaryAbelian` dual)。
+- `V_inf_centralizer_Q_eq_bot` (d=1: V⊓C(Q)=⊥ = `c_eq_one`/`U_inf_centralizer_P_eq_bot` dual)。
+
+**次手 (final assembly, cross-file wiring unit)**: `normalizer_W1_structure` を `⟨W1_le_Q, IsMulCommutative.of_comm Q_elementaryAbelian_T.comm, normalizer_W1_le_QW2⟩` で assemble。要 **hTTypeII (IsTypeII T) を chain に threading** = `normalizer_W1_structure`(155)→`normalizer_W1`(172)→`complement_le_QW2`(2715)→`typeI_overNormalizer_complement`(3014, 現 hSTypeII のみ)→…→S16 `exists_MHypothesis` (T_typeII=14.9 source)。①155 の宣言を機構後方へ relocate、②chain 各所に hTTypeII 追加、③S16 側で T_typeII 供給を確認。ripple ~5-10 theorem・2 file。難所回避でなく hard math 完了後の deliberate wiring。[[feedback-cite-sorried-lemmas-if-signature-correct]] [[scaffold-sorry-free-not-done]]
+
+
+### cont.⁴¹ (2026-07-01 lane c=γ /loop): IsTypeII↔IsTypeP2 発見で fittingIsTI_T discharge + card_Q_eq_of_typeII proven; 残 T-side は「IsTypeII T を §13.17 chain に threading」に集約
+
+**鍵の発見**: `BG.Ch4.S16.proposition_type_classification` は **`IsTypeII M ↔ IsTypeP2 M`** を結論 (2nd conjunct)。∴ (14.9) `T_typeII` は T を **type-P₂** にする。従来 notes/docstring の「T は type-P₁・IsTypeP2 T は generally false」は**誤り** (S/T の matched-pair labelling は κ-Hall ordering q<p が決めるが型でなく、type-P₂ pair は両メンバー type-P₂)。
+
+**この turn の discharge (2)**:
+- `fittingIsTI_T` (proven): IsTypeII T →[proposition_type_classification] IsTypeP2 T →[`fittingIsTI_of_isTypeP2`] FittingIsTI T。W₁-side TI 源 residual を除去 (3→2)。
+- `card_Q_eq_of_typeII` (proven, 新 lemma): |Q|=q^p を proven `card_P_eq` の完全 mirror で (typeII_III_IV_order_relations on reconciled tpd)。sorried `card_Q_eq` (IsTypeNonI T) には未接続。
+
+**残 T-side gate の性質 (確定)**:
+- **深い (S-side dual が sorried)**: `Q_elementaryAbelian_T` (dual = `BasicStructureGated.P_elementaryAbelian` sorried, Setup:350)、`V_inf_centralizer_Q_eq_bot` d=1 (dual = `c_eq_one` 13.12 sorried, Setup:1720)。→ 同じ深い σ-theory/char content 共有、quick discharge 不可。
+- **wiring (threading)**: 下記 T-side facts は「IsTypeII T を §13.17 chain に流す」だけで proven 化する。genuine math は済 (card_Q_eq_of_typeII / normalizer_W1_le_QW2 等)、残は signature threading:
+  - `card_Q_eq` := `card_Q_eq_of_typeII` (要 IsTypeII T)。
+  - `normalizer_W1_structure` assemble = ⟨W1_le_Q, Q_elementaryAbelian_T.comm, normalizer_W1_le_QW2⟩ (要 IsTypeII T + line155→機構後方 relocate)。
+
+**IsTypeII T threading の構造 (次手)**: §13.17 S15 chain は現在 **IsTypeNonI T / IsTypeII S** で回る (`Q_W2_structure`/`typeI_overNormalizer_complement`(hSTypeII)/`typeII_overNormalizer_frobenius`(hSTypeII) → S16 `exists_LHypothesis`:78 が hSII をローカル取得)。`T_typeII` (14.9, S16:1581) は `typePData_of_isTypeNonI` + sorried `T_typeII_structural_inputs` から**独立に proven** (normalizer_W1 chain に非依存=**循環なし**)。⟹ threading 可能: (a) S15 §13.17 chain 各 theorem に `hTTypeII : IsTypeII T` 追加、(b) S16 で `T_typeII` を `exists_LHypothesis` 等の前に reorder し供給。ripple ~10 theorem・2 file の deliberate wiring。[[verify-port-state-by-number-not-coq-name]]
