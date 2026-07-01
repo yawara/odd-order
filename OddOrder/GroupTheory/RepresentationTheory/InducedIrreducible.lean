@@ -469,6 +469,21 @@ theorem isIrreducibleCharacter_induce_of_frobeniusGroup {W : Subgroup G}
   isIrreducibleCharacter_induce_of_inertia_eq θ
     (inertia_eq_of_frobeniusGroup hF hθ_ne)
 
+/-- **Norm of a Frobenius-induced character is `1`.**  In a Frobenius group with kernel `H`, a
+nontrivial irreducible `θ` of `H` induces with `‖Ind_H^G θ‖² = |I_G(θ)|/|H| = 1` — the inertia is
+`H` (`inertia_eq_of_frobeniusGroup`), so `card_mul_inner_self_induce_eq_card_inertia` reads
+`|H|·‖Ind θ‖² = |H|`.  This is the `‖ζ_0‖² = 1` input that the §7 (7.8) `Hypothesis78` norm
+machinery needs for an `Ind`-distinguished family member (e.g. the §12 type-I coherent family). -/
+theorem inner_self_induce_eq_one_of_frobeniusGroup {W : Subgroup G}
+    (hF : OddOrder.Isaacs.Ch06.IsFrobeniusGroup G H W)
+    (θ : IrreducibleCharacter H) (hθ_ne : θ ≠ trivialIrreducibleCharacter H) :
+    ClassFunction.inner (induce H (θ : ClassFunction H ℂ))
+      (induce H (θ : ClassFunction H ℂ)) = 1 := by
+  have hcardH : (Nat.card H : ℂ) ≠ 0 := by rw [Nat.cast_ne_zero]; exact Nat.card_pos.ne'
+  have h := card_mul_inner_self_induce_eq_card_inertia θ
+  rw [inertia_eq_of_frobeniusGroup hF hθ_ne] at h
+  exact mul_left_cancel₀ hcardH (by rw [h, mul_one])
+
 omit hH [Fintype G] [Invertible (Nat.card G : ℂ)] in
 /-- **Degree from restriction multiplicities** (the degree side of Clifford's theorem).  For
 `H ⊴ G` and any class function `χ` of `G`, the degree `χ(1)` equals `∑_θ ⟨Res χ, θ⟩ · θ(1)` over

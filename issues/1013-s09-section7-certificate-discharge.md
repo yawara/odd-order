@@ -527,3 +527,293 @@ whnf-wall 回避設計)。BetaDecomp 3 orth field を induce 固有から抽象�
 ζ:=H78.hyp76.zeta で 3 gen lemma を instantiate (whnf-wall なし: H78 は変数)。Gamma:=H78.beta−(1_G−ν(ζ_0)
 +a•H78.weightedNuSum)、a=exists_betaDecomp_a、beta_eq=by abel、hW は weightedNuSum 定義+hzd で。
 → full (7.8.a). 最終 = concrete Dade family で全 facts discharge する bundling (whnf-wall 根治、別途)。
+
+### 2026-07-01 (loop 継続²³⁻): ✅ (7.8.a) BetaDecomp constructor 完成 — (7.8.a)+(7.8.b) 両者が抽象 H78 で discharge
+
+cascade 一般化 (commit 023febd9: inner_family_diff_gen → inner_beta_nuDiff_gen → inner_beta_nu_eq_gen
+/ inner_weightedNuSum_nu_gen → betaDecomp_gamma_orth_nu_gen) に続き、**`betaDecompOfFacts`**
+(commit bd8babcb) で (7.8.a) BetaDecomp 全体を抽象 H78 から構成可能仮説のみで構成。3 orth gen lemma
+を ζ:=H78.hyp76.zeta で instantiate、4 proof field を discharge (Γ=explicit residual、a=integer)。
+**whnf-wall 回避**: H78 が抽象変数ゆえ projection が巨大 def を unfold しない。
+
+**現状**: (7.8.a) BetaDecomp と (7.8.b) NormEstimates の両者が abstract H78 レベルで構成可能仮説のみ
+から discharge 済 (γ-side `normEstimates_of_source_orthogonal` は既存; ζ-side は
+`zetaNuRhoNormSq_eq_normQuad_of_facts`; (7.8.a) は `betaDecompOfFacts`)。§7 の数学的内容は完了。
+
+**残る唯一の §7 frontier = concrete bundling (whnf-wall 根治)**: `hypothesis78OfDade` 出力の
+concrete H78 に対し、上記 producer の facts (horth/hN/hz0/hP_real/hagree/hzeta0nu/hzeta_orth_one/
+hβ1/hζ0norm/a + (7.8.b) facts) を充足する glue。facts 自体は family (zeta=induce) から rfl/standard
+だが、concrete `hypothesis78OfDade` の `.hyp76.n` projection が型に出て whnf-wall。
+**根治候補**: (1) hypothesis76OfFamily/hypothesis78OfDade を tactic-block から clean structure literal へ
+refactor (field を別 lemma に抽出) し projection を cheap 化、(2) H78+BetaDecomp+NormEstimates を
+n free のまま 1 構成で束ねる bundle def。次イテレーションで consumer (exists_MHypothesis /
+exists_counterexample_dade_data) の必要シェイプを確認してから着手。
+
+### 2026-07-01 (loop 継続²³⁻ cont): 🎯 FT-path 接続確認 — consumer = exists_counterexample_dade_data (S14:2740, sorry)
+
+§7 producer の実 consumer を特定。`counterexample_contradiction` (12.16, S14:2753) は
+`exists_counterexample_dade_data` (S14:2740, **現状 sorry**) から `CounterexampleDadeData` を得て
+`counterexample_contradiction_of_facts` に渡す。`CounterexampleDadeData` (S14:2701) のフィールド:
+- **`hB : (1:ℝ) − (e:ℝ)/kH ≤ normRho`** = まさに my (7.8.b) ζ-bound `zetaNuRhoNormSq_ge_of_facts`
+  (e=complementIndex, kH=kernelOrder=h, normRho=‖ζ_0^{νρ}‖²)。
+- `hA : (kK−kKp)/kM * mval² ≤ normRhoM` = Γ/ρM bound (γ-side)。
+- 他: hε/hψ (§12 char)、he (3≤e)、h2e (2e≤p+1)、h_const/h_psix/h_psig_int (12.14/12.15)、
+  hkKp/hkM/hkH/hidx/hM (index 不等式)、hC (capstone < 1)。
+
+→ **次フェーズ = exists_counterexample_dade_data sorry の discharge** (FT-path payoff)。
+docstring (S14:2729) 指示: witness L (type I by 12.10) の Hypothesis(78) 構築 + Dade τ₁ + coherent
+family S (12.6) + DadeNotation (12.13) → 各 field を §12 定理 (psi_constant_on_xK 12.14 /
+rhoM_integer_values 12.15 / intersection_complement_structure 12.11) + §7 norm estimates
+(`NormEstimates` / `zetaNuRhoNormSq_ge_of_facts` for hB) で discharge。whnf-wall は hB の
+concrete fact 充足で再来 → ここで根治 (clean literal / bundle) が必要。(12.6)/(12.10)/(12.11) は
+signature contract 経由 cite。これが §7→§12→(12.16)→FT の実接続。
+
+### 2026-07-01 (loop 継続²⁴⁻): ⭐ whnf-wall は幻だった + betaDecompOfDade (concrete (7.8.a))
+
+**whnf-wall の再検証で否定**: probe (variable inputs で `hypothesis78OfDade` 適用→projection) により
+`.hyp76.n` / `.hyp76.zeta` / `.nu` / `.hyp76.hyp71` / `.ind1H` / `.zetaDistinct` がすべて default
+heartbeats で `rfl` projection 可能と実証。従来「`.hyp76.n` が巨大 tactic def を unfold して
+>1M heartbeats」は誤りで、旧 `betaDecompOfDade` failure は coupled tactic 固有の問題だった。
+**concrete instantiation は wall-free**。
+
+✅ **`betaDecompOfDade` (commit 5c80fedb)**: `hypothesis78OfDade` 出力 concrete H78 に
+`betaDecompOfFacts` を適用し (7.8.a) BetaDecomp を構成。facts discharge:
+- family 直交/ノルム/degree-real = induce 補題 (`induce_family_orthogonal_of_injective` /
+  `induce_norm_ne_zero` / `induce_apply_one_ne_zero` / `induce_apply_one_star`) を defeq で。
+- coherence agreement: 供給 hagree (passed-d) を computed-d (`H78.hyp76.d i = ζ_i(1)/ζ_0(1)`, hdeq)
+  へ `Subtype.ext` で輸送 (dependent subtype の motive 破綻を回避: show を induce 形で書き
+  post-`rw [hdeq i]` が syntactic rfl になるよう)。
+- ⟨β,1_G⟩=1 内部計算 (beta_def + inner_tau_supported_constOne + induce 補題)。
+- 残 genuine §7 入力 = hzeta0nu (ζ_0^ν⊥1_G)・hζ0norm (‖ζ_0‖²=1)・整数 a/ha。
+
+**concrete path 開通**: `hypothesis78OfDade` → concrete H78 → `betaDecompOfDade` → BetaDecomp。
+**次 = NormEstimates concrete** (同パターンで (7.8.b) producer `zetaNuRhoNormSq_eq_normQuad_of_facts`
++ γ-side を concrete H78 へ; facts は同様に induce で discharge) → **`exists_counterexample_dade_data`
+(S14:2740 sorry) 接続** (witness L の H78 構築 + CounterexampleDadeData.hB=my (7.8.b) bound)。
+full build 3889 jobs 緑、AxiomsCheck OK。
+
+### 2026-07-01 (loop 継続²⁵⁻): §12 consumer survey + complementIndex bridge (concrete (7.8.b) 着手)
+
+**§12 consumer の状態**: `exists_counterexample_dade_data` (S14:2740, **sorry**) は (12.16)
+`counterexample_contradiction` の deep obligation で、`CounterexampleDadeData` (S14:2701) を構築。
+依存する §12 lemma の多くが sorry: `witness_L_frobenius` (12.10, 2024)・
+`intersection_complement_structure` (12.11, 2070)・`psi_constant_on_xK` (12.14, 2502)・
+`rhoM_integer_values` (12.15, 2511)。§12 は `Hypothesis L`/`DadeNotation`/`Coherence` 構造を使い、
+my §7 `Hypothesis78` と直結しない (bridge 未在)。full integration は deep な別フェーズ。
+
+**`CounterexampleDadeData` フィールド→source**: hB (1−e/kH≤normRho) = **my (7.8.b) ζ-bound**、
+hA = Γ/ρM (γ-side)、hε/hψ=§12 char、he/h2e=12.12 degree、h_const=12.14、h_psig_int=12.15、
+hk*/hidx/hM=index 不等式、hC=capstone。
+
+**着手: concrete (7.8.b)**。`complementIndex_eq_subgroupOf_index` (commit de0ac155) =
+`e = (H.subgroupOf L).index` bridge (induce-index → complement-index)。**次 = `zetaNuRhoNormSqGeOfDade`**
+(betaDecompOfDade と同パターン、concrete (7.8.b) ζ-bound): hBD:=betaDecompOfDade、
+`zetaNuRhoNormSq_ge_of_facts` へ facts 供給 — hzd=rfl、horth=induce 直交、
+hc_ind1H=cCoeff_nu_zeta_zero_ind1H_eq+ha (hBD.a=a)、hc_rest=cCoeff_nu_zeta_zero_eq_neg_d
+(hagree を psiSupp/computed-d 形へ Subtype.ext 変換、betaDecompOfDade の hagree' と同)、
+hd_real/hP_real=induce_apply_one_star、hd=ζ_i(1)/e (ζ_0(1)=ζ_ind1H(1)=e via zeta_one_eq_ind1H_one)、
+hN_ind1H/hP_ind1H=induce_trivialChar_normSq/apply_eq_index + complementIndex_eq_subgroupOf_index、
+hGsum=family_degree_sum_Ioi (hz0_deg=ζ_0(1)=e from zeta_one_eq_ind1H_one、hz0_norm=hζ0norm)、hsmall。
+betaDecompOfDade で landing 実証済 = 既知 feasible。
+
+### 2026-07-01 (loop 継続²⁶⁻): ✅ concrete §7 (7.8) producer 完備 — betaDecompOfDade + zetaNuRhoNormSqGeOfDade
+
+`zetaNuRhoNormSqGeOfDade` (commit 400aa905): Dade family → concrete H78 に対し (7.8.b) ζ-bound
+`1−e/h ≤ ‖ζ_0^{νρ}‖²` を産出 (= `CounterexampleDadeData.hB`)。`betaDecompOfDade` +
+`zetaNuRhoNormSq_ge_of_facts` を bundle、(7.8.b) facts を全 discharge (係数同定 cCoeff_nu_zeta_zero_*
++ Subtype.ext で hagree を computed-d 形へ / reality induce_apply_one_star / degree ratio
+zeta_one_eq_ind1H_one / index facts induce_trivialChar_* + complementIndex_eq_subgroupOf_index /
+(1.5.d) family_degree_sum_Ioi)。2 build cycle で landing。
+
+**§7 (7.8) は abstract + concrete 共に完備**:
+- abstract: betaDecompOfFacts (7.8.a) / zetaNuRhoNormSq_eq_normQuad_of_facts (7.8.b keystone) +
+  既存 normEstimates_of_source_orthogonal (γ-side)。
+- concrete (Dade family): betaDecompOfDade (7.8.a BetaDecomp) / zetaNuRhoNormSqGeOfDade (7.8.b hB)。
+
+**残る FT-path = §12 integration (別フェーズ、deep)**: `exists_counterexample_dade_data` (S14:2740 sorry)
+で `CounterexampleDadeData` を組む。必要:
+1. **§12 `Hypothesis L`/`Coherence`/`DadeNotation` → §7 `hypothesis78OfDade` 入力の bridge** (構造変換、
+   witness-L H78 を構築するため。現状 bridge 未在 = 鍵)。
+2. CounterexampleDadeData の各 field: hB=zetaNuRhoNormSqGeOfDade、hA=γ-side、hε/hψ/he/h2e/h_const/
+   h_psix/h_psig_int/hk*/hidx/hM/hC=§12 (12.12/12.14/12.15 等、多くが sorry)。
+§12 sorry (witness_L_frobenius 12.10 / intersection_complement_structure 12.11 / psi_constant_on_xK
+12.14 / rhoM_integer_values 12.15) が gating。次イテレーション = §12 Coherence→Hypothesis78 bridge の
+feasibility 調査 + 着手。
+
+### 2026-07-01 (loop 継続²⁷⁻): §12 Coherence→Hypothesis78 bridge 解析 — ℤ/ℚ-linearity の核心 difficulty + 解法
+
+§7 producer を (12.16) consumer に繋ぐ bridge `Hypothesis L` (+`IsCoherent`) → `hypothesis78OfDade`
+を精査。判明した構造と difficulty:
+
+**既存の足場**:
+- `Hypothesis.toHypothesis71` (S14:110) = §12 `Hypothesis L` → §7 `S09.Hypothesis71` (済、docstring も
+  「7.8.b を L に適用可能にする」と明記)。
+- `witness_L_coherent` (S14:2061) = `IsCoherent hyp.tau hyp.Sset hyp.A` (Nonempty)。
+- `IsCoherent` (S07:1596): `extension : IntegralCharacterMap L G` (=ν)、`extends_on_supported`
+  (ν φ = τ φ for φ∈zSupportedSpan)、`extension_inner_eq` (zSpan 上 isometry)、`extension_mem_ZIrr`。
+
+**核心 difficulty (ℤ vs ℚ linearity)**: `IntegralCharacterMap = CF→ₗ[ℤ]CF` は **ℤ-線形**。だが
+`hypothesis78OfDade.hagree` = `τ(ζ_i − d_i ζ_0) = ν(ζ_i) − d_i•ν(ζ_0)` は `d_i=ζ_i(1)/ζ_0(1)∈ℚ` の
+非ℤ結合。`extends_on_supported` は zSupportedSpan (=ℤ-span∩supported) 上のみ → ψ_i=ζ_i−d_iζ_0 は
+ℚ結合ゆえ直接適用不可。
+
+**解法 path**: **ℤ結合** `ζ_0(1)•ζ_i − ζ_i(1)•ζ_0 ∈ ℤ[S]` (degree は整数) は supported (=ζ_0(1)•ψ_i)
+かつ ℤ-span ゆえ zSupportedSpan ∈ → `ν = τ` 適用可。degree の natCast-smul は nsmul に等しく ℤ-線形
+が効く (ν((n:ℂ)•x)=(n:ℂ)•ν x, n:ℕ; mathlib `map_natCast_smul` 等)。両辺を ζ_0(1)(≠0) で割れば ψ_i
+agreement 取得。
+
+**bridge の残り部品** (全て multi-lemma、次フェーズ):
+1. 上記 coherence-agreement lemma (ℤ結合→割算→ψ_i hagree)。
+2. `toHypothesis71.τ` (DadeMap) ↔ `hyp.tau` (IntegralCharacterMap) の同一視 (IsCoherent は hyp.tau、
+   hagree は H71.τ)。
+3. Sset 列挙 → Fin (n+1) family (hinj/hcover/ind1H; distinctInducedFamily 利用)。
+4. `typeIA L hyp.typeI = (hyp.H : Set G) \ {1}` (A 一致、(12.1)/(8.3) fact)。
+5. degree data (d/hdeg/hdeg_match)。
+→ 揃えば `hypothesis78OfDade` で witness-L H78 構築 → betaDecompOfDade/zetaNuRhoNormSqGeOfDade で
+BetaDecomp/hB。次イテレーション = 部品1 (coherence-agreement lemma) から着手。
+
+### 2026-07-01 (loop 継続²⁷⁻ cont): §12 bridge crux RESOLVED — hyp.tau は ℂ-線形 (keystone landed)
+
+前記 ℤ/ℚ-linearity difficulty を解決。`dadeIntegralCharacterMap` (=hyp.tau) の定義 (S07:5272) は
+`(LinearMap.exists_extend hyp.dadeLinearMap (k:=ℂ)).choose.restrictScalars ℤ` = **ℂ-線形** Dade map
+拡張を ℤ-線形として読んだもの。∴ underlying map は ℂ-線形、`τ(c•x)=c•τ x` (c:ℂ) 成立。
+`dadeIntegralCharacterMap_smul_complex` (commit 87dcbd03) がこれを供給。
+
+**hagree 導出 path (確定)**: ζ_i,ζ_0∈S、整数次数 m_i=ζ_i(1),m_0=ζ_0(1)、d_i=m_i/m_0。
+ℤ結合 c:=m_0•ζ_i − m_i•ζ_0 = m_0•(ζ_i−d_iζ_0) は supported (=m_0•ψ_i) かつ ℤ-span ∈ →
+`extends_on_supported`: ν c = τ c。ℤ-線形 decompose + m_0 で除算 → `ν ζ_i − d_i ν ζ_0 = τ ζ_i − d_i τ ζ_0`。
+ℂ-linearity (`dadeIntegralCharacterMap_smul_complex`): `τ(ζ_i−d_iζ_0)=τ ζ_i − d_i τ ζ_0`。
+両者で `τ(ζ_i−d_iζ_0) = ν ζ_i − d_i ν ζ_0` = hagree。
+
+⚠ **S14/S16 とも type-I family の hagree (coherence agreement) は未構築** (S16.toFamilyHypothesis71
+は Hypothesis71 止まり、(7.8) は NormEstimates を carrier 扱い)。本 bridge が初。
+
+**次 = coherence_hagree lemma** (上記 path を Lean 化): IsCoherent + 整数次数 + supported から hagree。
+その後 part 2-5 (τ↔H71.τ 同一視 / Sset→Fin family / typeIA=H^# / degree) → witness-L Hypothesis78
+構築 → betaDecompOfDade/zetaNuRhoNormSqGeOfDade で BetaDecomp/hB → CounterexampleDadeData。
+
+### 2026-07-01 (loop 継続²⁸⁻²⁹): §12 bridge parts 1+2+4 完成
+
+§12→§7 Dade bridge を部品単位で構築 (各 1-2 build cycle, full build 緑):
+- keystone `dadeIntegralCharacterMap_smul_complex` (commit 87dcbd03): hyp.tau の ℂ-linearity。
+- part 1 `coherence_hagree` (f2ce7b25): IsCoherent から (7.8.a) agreement (IntegralCharacterMap レベル)。
+- parts 1+2 `coherence_hagree_dadeMap` (200fe2a5): agreement を DadeMap 形へ (= hypothesis78OfDade の hagree)。
+  [上記 3 つは S09_CertificateDischarge]
+- part 4 `Hypothesis.typeIA_eq_sharp` (399c33c5, **S14**): typeIA L = H^# (= hAH)。typeI_frobenius
+  (proven) + Frobenius centralizer_kernel_le。
+
+⚠ **hub dedup task**: `centralizerSupport_sharpSubgroup_eq_of_frobenius` (S16:2584, pure GT) を
+S14 が cite できない (S16 は S14 下流) ため typeIA_eq_sharp 内で再導出。共有ファイル
+(MaximalSubgroupType, IsFrobeniusGroup 既 import) へ hoist すれば S14/S16 両用で dedup 可能。
+
+**残 bridge parts** (witness-L Hypothesis78 assembly へ): part 3 (Sset→Fin (n+1) family:
+distinctInducedFamily で hinj/hcover/ind1H、Sset={induce θ|θ≠1} は trivial 抜き) / part 5
+(degrees d/hdeg/hdeg_match) / hnu_isometry (IsCoherent.extension_inner_eq) / H71+hτ
+(toHypothesis71 + IsDadeIsometry)。**assembly は S14 に S09_CertificateDischarge を import して**
+hypothesis78OfDade を呼ぶ (S14 が consumer exists_counterexample_dade_data の home)。
+
+### 2026-07-01 (loop 継続³⁰⁻): §12 bridge 残部品の精査 + family-isometry supplier
+
+bridge 残部品を精査し、必要な入力と障害を確定:
+- ✅ `coherence_extension_inner_eq_on_family` (commit 12b657ea): IsCoherent から family-level isometry
+  ⟨ν ζ_i, ν ζ_j⟩=⟨ζ_i,ζ_j⟩。
+- ✅ 区別 char (zetaDistinct=0, 次数 [L:K]) は `exists_distinguished_char hyp` (S14:2402, proven) で取得可
+  (χ∈Sset, χ(1)=(typeF.H.subgroupOf L).index)。χ=induce(linear θ_0)。
+- ⚠ **nu_isometry interface 問題**: hypothesis78OfDade の nu_isometry field は global (∀ φ ψ) だが
+  §12 coherent ν は family span 上のみ isometry。全使用箇所が family-level ゆえ field を
+  `∀ i j, ⟨ν(zeta i),ν(zeta j)⟩=⟨zeta i,zeta j⟩` へ弱める refactor が必要 (~6-8 sites, contained:
+  constructor=hypothesis78OfDade のみ、consumer 全て my §7 files)。**次フェーズ最初の step**。
+- 残: family construction (θ_0=区別 char rep at 0、trivial at ind1H≠0、cover/inj は
+  distinctInducedFamily ベース + 2-member 配置) / hζ0norm (‖χ‖²=1、L Frobenius ゆえ Ind θ
+  (θ≠1) irreducible) / hzeta0nu (⟨ν χ,1_G⟩=0) / degrees (hdeg/hdeg_match) / H71+hτ
+  (toHypothesis71) / assembly (S14 に S09_CertificateDischarge import)。
+- 注: full (12.16) は別途 §12 char sorry (psi_constant_on_xK 12.14 / rhoM_integer_values 12.15 /
+  intersection_complement_structure 12.11) が gating。
+
+bridge progress: keystone (ℂ-linearity) + parts 1/2 (coherence agreement DadeMap 形) + part 4
+(typeIA=H^#) + family-isometry。**hard math content 完了**、残は構造 refactor + family 構成 +
+char-theory 入力 (Frobenius-induction irreducible)。
+
+### 2026-07-01 (loop 継続³¹⁻): §12 bridge ingredient 一覧 完備 — hζ0norm supplier landed
+
+`inner_self_induce_eq_one_of_frobeniusGroup` (commit 73a241ea, InducedIrreducible): Frobenius 群で
+非自明既約の誘導 ‖Ind θ‖²=1 → hypothesis78OfDade の hζ0norm。これで bridge の全 ingredient が
+所在確定:
+- hagree: `coherence_hagree_dadeMap` ✓
+- nu_isometry (family-level): `coherence_extension_inner_eq_on_family` ✓ (⚠ field 弱化 refactor 必要)
+- hAH (typeIA=H^#): `Hypothesis.typeIA_eq_sharp` ✓
+- hζ0norm (‖ζ_0‖²=1): `inner_self_induce_eq_one_of_frobeniusGroup` ✓
+- 区別 char χ(1)=[L:K]: `exists_distinguished_char` ✓
+- Frobenius-induce-irreducible: `isIrreducibleCharacter_induce_of_frobeniusGroup` ✓
+- H71+hτ: `Hypothesis.toHypothesis71` ✓ (IsDadeIsometry from fullDadeIsometryData)
+- Frobenius 構造: `typeI_frobenius` ✓
+
+**残 (assembly フェーズ)**:
+1. **nu_isometry field 弱化** (Hypothesis78 の global → `∀ i j, i≠ind1H → j≠ind1H → ...`、
+   ~6-8 sites、pre-existing gamma-side consumer の rw に ≠ind1H proof を thread; shared
+   S09_Nonexistence ゆえ atomic + 注意)。これが唯一の真の refactor。
+2. **family 構成** (distinctInducedFamily ベース、区別 char rep を index 0、trivial を ind1H≠0 に配置、
+   cover/inj 保存; 2-member 配置の intricate 構成)。
+3. hzeta0nu (⟨ν χ, 1_G⟩=0、非自明 coherent image ⊥ 1_G)。
+4. degrees (d/hdeg/hdeg_match)。
+5. assembly: S14 に S09_CertificateDischarge import → hypothesis78OfDade で witness-L H78 →
+   betaDecompOfDade/zetaNuRhoNormSqGeOfDade。
+注: full (12.16) は別途 §12 char sorry (12.11/12.14/12.15) が gating。
+
+### 2026-07-01 (loop 継続³²⁻): nu_isometry 弱化を試行→revert (delicate γ-side proof を破壊)
+
+§12 bridge 唯一の真の refactor = `Hypothesis78.nu_isometry` field の global→family-level 弱化を試行。
+field + nu_zeta_inner_self_eq_one(+_of_irreducible, +callers) + weightedNuSum collapse sites を編集。
+**結果: weightedNuSum collapse proof (S09_Nonexistence 3154/3159) が破壊** — `rw [H78.nu_isometry,
+horth i (by simpa [hs] using hi) ...]` の chain が global nu_isometry の rw 挙動に微妙に依存しており、
+indexed 版 + horth の simpa が S metavar で type mismatch。delicate な pre-existing (7.8.b) γ-side
+proof ゆえ revert (build green 維持)。
+
+**教訓 + 解法 path**:
+- 弱化は fragile (delicate γ-side proof に波及)。careful にやるなら horth 引数を explicit
+  `Finset.mem_erase.mpr ⟨hine, mem_univ⟩` 化 + 各 collapse proof の rw chain を再理解して修正 (高リスク)。
+- **より clean = option F (global isometry 供給)**: field を global のまま保ち、§12 bridge では
+  coh.extension に family 上一致する **global-isometric ν'** を hypothesis78OfDade に供給。{ζ_i} は
+  一次独立 (distinct Frobenius-induced irreducible) で coh.extension が Gram 行列保存
+  (extension_inner_eq) ゆえ、family span 上の等長を global unitary へ拡張可能 (Gram-Schmidt /
+  orthonormal completion、intricate だが delicate proof に触れない)。hagree/hζ0norm/hzeta0nu は
+  ν' = coh.extension on family ゆえ成立。
+- どちらも intricate。次フェーズで careful に。§7 floor + bridge hard content + 全 ingredient は完成
+  (keystone/coherence_hagree/coherence_hagree_dadeMap/typeIA_eq_sharp/coherence_extension_inner_eq_on_family/
+  inner_self_induce_eq_one_of_frobeniusGroup)。assembly のみ残。
+
+### 2026-07-01 (loop 継続³³): nu_isometry 弱化 ✅ DONE (前回の "fragile" は誤診断)
+
+前回 "delicate γ-side proof を破壊" と判断して revert したが、**真因は私の書いた `hine` helper
+`(Finset.mem_erase.mp (by simpa [hs] using hi)).1` が ambient Finset を metavar に残し simpa が
+over-simplify していただけ**。`Finset.ne_of_mem_erase (hs ▸ hi)` に直すと weightedNuSum collapse
+proof は無傷で通る。さらに option F (global isometry) は **存在しない可能性** (isometric embedding
+`CF(L)→CF(G)` だが dim CF(L) > dim CF(G) があり得る) ゆえ弱化は必須と確定。
+
+弱化を完遂 (commit ea61e2a4): field を family 形
+`∀ i j, i≠ind1H → j≠ind1H → (ν(ζi),ν(ζj))=(ζi,ζj)` にし、全 consumer を threading:
+- S09_Nonexistence: nu_zeta_inner_self_eq_one(+_of_irr), zetaImage_*, weightedNuSum collapse ×2。
+- S09_Cert 8 lemma: inner_weightedNuSum_nu_gen/_nu, betaDecomp_gamma_orth_nu_gen/_nu,
+  cCoeff_nu_zeta_zero_eq_neg_d (+`0≠ind1H`), hypothesis78OfDade/betaDecompOfDade/zetaNuRhoNormSqGeOfDade。
+- `nu_isometry := hnu_isometry` の defeq (`hyp76.zeta i ≡ induce (H.subgroupOf L) (θ i)`) OK、
+  cCoeff の h0ind は `Ne.symm hind1H` で供給。full build 3889 green。
+
+**hypothesis78OfDade は coherence_extension_inner_eq_on_family がそのまま供給できる family-isometry を
+受け取る形になった**。残りの bridge assembly: (b) family 構成 (θ_0=distinguished, ind1H≠0 で trivial)、
+(c) hzeta0nu, (d) degrees、(e) S14 で witness-L 組み立て。教訓: "fragile" 判定は真因 (helper の書き方) を
+特定してから; 弱化必須性は dimension argument で確認。[[feedback-no-avoiding-hard-parts]]
+
+### 2026-07-01 (loop 継続³⁴): bridge 部品 (b) family 構成 ✅ exists_placed_induced_family
+
+§12 bridge の family 構成 (part b) を landing (commit 6ceea07b): `exists_placed_induced_family`
+は distinctInducedFamily を reindex し θ 0 を distinguished (Ind(θ0)=χ_dist)、ind1H≠0 を trivial
+(θ ind1H=1_K) に配置 (inj/cover 保存)。trivial の fibre は inertia-stable ゆえ rep が 1_K 自身、
+swap 0 j_dist で distinguished を 0 へ、j_dist≠j_triv は χ_dist≠Ind 1_K から。
+
+§12 で確認した assembly target: `Hypothesis L → toHypothesis71 → hypothesis78OfDade →
+Hypothesis78.NormEstimates (7.8.b)` で CounterexampleDadeData.hB (=`1−e/kH≤normRho`) を産む。
+endpoint `exists_counterexample_dade_data` (S14:2740 sorry) は 25-field 構造で hB は 1 field。
+lane-b の clean な貢献 = standalone hB-producer (Hypothesis L から (7.8.b) bound)。残り bridge 部品:
+(c) degree facts (d/psi_support/hdeg/hdeg_match for placed family)、(d) hagree (coh から、
+coherence_hagree_dadeMap)、(e) ν=coh.extension + hnu_isometry=coherence_extension_inner_eq_on_family、
+(f) hypothesis78OfDade 組み立て→zetaNuRhoNormSqGeOfDade→normRho/kH/e 同定。

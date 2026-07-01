@@ -1,5 +1,10 @@
 # Pf §16 POLE-2 char cascade — W4 (lane-h, 2026-06-25 relane #9)
 
+> 🔔 **2026-07-01 cross-lane 通知 (issue 0091)**: `Hypothesis78.nu_isometry` (14.11 h78 / (12.16) hB が
+> cite する §7 interface) が **global → family isometry** に弱められ合流済 (Peterfalvi 忠実版)。field を
+> 直接 cite する箇所は現状なし。global 内積保存を前提にした証明があれば family + support 直交で再構成要
+> (full build では該当破綻なし)。詳細 = issue 0091。
+
 > lane-h = **W4 = POLE-2 `field_normalizer_structure` (Pf 14.2) char cascade + §15 setup**
 > (正本 `notes/meta/ft_frontier_remap_2026_06_25.md` §2 W4、issue 0083)。Arm B = 最終矛盾の
 > 独立アーム。W1 (lane-f) と upstream gate を共有しない。
