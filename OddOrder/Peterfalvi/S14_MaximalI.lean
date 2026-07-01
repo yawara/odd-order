@@ -2496,6 +2496,18 @@ theorem SsubFiltration_commutator_coherent [Finite G] {L : Subgroup G}
   · exact OddOrder.Peterfalvi.S09.Cert.one_not_mem_supportInSubgroup_sharp hyp.typeI.typeF.H hAH
   · exact fun a ha b hb => SsubFiltration_commutator_diff_supported hyp hAH ha hb
 
+/-- **The witness kernel `K = (L_F).subgroupOf L` is nilpotent** — the `[IsNilpotent ↥K]` input of
+`SsubFiltration_commutator_coherent` (and the (6.5) engine).  `L_F = maxNilpotentNormalHall L` is
+nilpotent (`maxNilpotentNormalHall_isNilpotent`), and `K ≃* L_F` (`subgroupOfEquivOfLe`, `L_F ≤ L`)
+transfers nilpotency. -/
+theorem typeF_H_subgroupOf_isNilpotent [Finite G] {L : Subgroup G} (hyp : Hypothesis L) :
+    Group.IsNilpotent ↥((hyp.typeI.typeF.H).subgroupOf L) := by
+  haveI := hyp.finiteG
+  haveI : Group.IsNilpotent ↥(hyp.typeI.typeF.H) := by
+    rw [hyp.typeI.typeF.H_eq]
+    exact OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_isNilpotent L
+  exact nilpotent_of_mulEquiv (Subgroup.subgroupOfEquivOfLe hyp.typeI.typeF.H_le).symm
+
 open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
 /-- **Peterfalvi (12.6) case (c): cyclic-quotient kernel → (6.5.c) coherence.**
 Def (8.3) case (c): `H` is a `p`-group and `|L/H|` divides `p − 1` (via (8.2.a)/(8.3.c)); `S` is
