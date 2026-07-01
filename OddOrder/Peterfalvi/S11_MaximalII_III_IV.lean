@@ -7749,4 +7749,18 @@ theorem caseA_reducible_inflation_inertia_eq [Finite G] {M : Subgroup G}
   rw [linearIrreducibleCharacter_apply, linearIrreducibleCharacter_apply, map_one, Units.val_one]
   simpa using hne
 
+/-- **Restriction transitivity** (general): for `H ≤ K ≤ G`, restricting a class function to `K`
+and then to `H` (realised in `K` as `H.subgroupOf K`) equals restricting directly to `H`, transported
+along the iso `H.subgroupOf K ≃* H`.  Foundational for the lies-over transitivity in the (9.8.c)
+Clifford-correspondence step 5 (`ξ` over `θ₀` at `H = hInHu ⊆ HC` factors through an `HC`-constituent).
+Pointwise both sides are `φ` at the common `G`-image. -/
+theorem restrict_restrict_subgroupOf {Γ k : Type*} [Group Γ] [CommRing k]
+    {H K : Subgroup Γ} (hHK : H ≤ K) (φ : ClassFunction Γ k) :
+    ClassFunction.restrict (H.subgroupOf K) (ClassFunction.restrict K φ)
+      = ClassFunction.compHom (Subgroup.subgroupOfEquivOfLe hHK).toMonoidHom
+          (ClassFunction.restrict H φ) := by
+  ext x
+  simp only [ClassFunction.restrict_apply, ClassFunction.compHom_apply, MulEquiv.coe_toMonoidHom]
+  congr 1
+
 end OddOrder.Peterfalvi.S11
