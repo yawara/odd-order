@@ -253,19 +253,75 @@ theorem W2_le_P [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
     rw [heq, ← hyp.p_eq_card_W2] at h1
     exact h1
 
-/-- **Peterfalvi (13.16), structural core for the `W₂`-side** (Coq `FTtypeP_norm_cent_compl`,
-`PFsection13.v:1519`, stated for `W₂`): the single Frobenius/Wielandt containment
-`N_G(W₂) ≤ P ⊔ W₁`.  `P = S_F` (elementary abelian) is decomposed by Maschke and the coprime
-`U ⋊ W₁`-action is forced trivial on each direct factor via
-`OddOrder.GroupTheory.WielandtFixedPoint`, confining the normalizer of the `p`-factor `W₂` to
-`P ⊔ W₁`.  The machinery is present (`S05_TICyclic` + `OddOrder/GroupTheory/{WielandtFixedPoint,
-CoprimeAction,TISubset}`); the TI reduction `N_G(W₂) = N_S(W₂)` needs concrete `A₀(S)`-TI (currently
-the opaque `BasicStructureGated.A0S_TI`).  Unlike the `W₁`-side (`normalizer_W1_structure`), the
-`S`-side facts (`W₂ ≤ P` via `W2_le_P`, `P` abelian via `basic_structure`) are proven outright, so
-this containment is the sole residual. -/
-theorem normalizer_W2_structure [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
+/-- **Peterfalvi (13.16), TI reduction for the `W₂`-side**: `N_G(W₂) ≤ S`.
+
+`W₂ ≤ P = S_F ≤ F(S)` (`W2_le_P` + `maxNilpotentNormalHall_le_fittingInG`), and `F(S)^#` is a
+TI-subset whose normalizer is `S` (BG Theorem 15.7(a), `fittingIsTI_of_isTypeP2` from the type-`P₂`
+carrier `S_typeP2`; `normalizer_fittingInAmbient_eq_self`).  Any `g` normalizing `W₂` sends a
+nonidentity `a ∈ W₂ ⊆ F(S)^#` to `g a g⁻¹ ∈ W₂ ⊆ F(S)^#`, so the TI condition places
+`g ∈ N_G(F(S)) = S`.  This is the first (TI) half of the (13.16) `W₂`-confinement; the residual
+`N_G(W₂) ⊓ S ≤ P ⊔ W₁` is the Maschke/Wielandt core (`normalizer_W2_within_S`). -/
+theorem normalizer_W2_le_S [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     (hyp : Hypothesis (G := G)) :
-    Subgroup.normalizer (hyp.W2 : Set G) ≤ hyp.P ⊔ hyp.W1 := sorry
+    Subgroup.normalizer (hyp.W2 : Set G) ≤ hyp.S := by
+  have hTI := OddOrder.BG.Ch4.S15.fittingIsTI_of_isTypeP2 hG hyp.S_maximal hyp.S_typeP2
+  have hNorm := OddOrder.BG.Ch4.S16.normalizer_fittingInAmbient_eq_self hG hyp.S_maximal
+  -- `W₂ ≤ P ≤ F(S)`.
+  have hW2F : hyp.W2 ≤ OddOrder.BG.Ch4.S15.fittingInAmbient hyp.S := by
+    refine (W2_le_P hG hyp).trans ?_
+    rw [hyp.P_eq_SF]
+    exact OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_le_fittingInG hyp.S
+  -- a nonidentity element `a ∈ W₂` (`|W₂| = p ≥ 3`).
+  have hW2ne : hyp.W2 ≠ ⊥ := by
+    intro hbot
+    have hp1 : hyp.p = 1 := by rw [hyp.p_eq_card_W2, hbot, Subgroup.card_bot]
+    exact hyp.p_prime.one_lt.ne' hp1
+  haveI : Nontrivial ↥hyp.W2 := (Subgroup.nontrivial_iff_ne_bot _).mpr hW2ne
+  obtain ⟨x, hx1⟩ := exists_ne (1 : ↥hyp.W2)
+  set a : G := (x : G) with ha
+  have haW2 : a ∈ hyp.W2 := x.2
+  have hane : a ≠ 1 := fun h => hx1 (OneMemClass.coe_eq_one.mp (ha ▸ h))
+  intro g hg
+  rw [Subgroup.mem_normalizer_iff] at hg
+  have hgaW2 : g * a * g⁻¹ ∈ hyp.W2 := (hg a).mp haW2
+  have hgane : g * a * g⁻¹ ≠ 1 := by
+    intro h
+    have key : a = g⁻¹ * (g * a * g⁻¹) * g := by group
+    rw [h] at key; simp only [mul_one, inv_mul_cancel] at key
+    exact hane key
+  have ha_sharp : a ∈ OddOrder.BG.Ch4.S15.fittingSharp hyp.S := by
+    show a ∈ (OddOrder.BG.Ch4.S15.fittingInAmbient hyp.S : Set G) \ {1}
+    exact ⟨hW2F haW2, hane⟩
+  have hga_sharp : g * a * g⁻¹ ∈ OddOrder.BG.Ch4.S15.fittingSharp hyp.S := by
+    show g * a * g⁻¹ ∈ (OddOrder.BG.Ch4.S15.fittingInAmbient hyp.S : Set G) \ {1}
+    exact ⟨hW2F hgaW2, hgane⟩
+  have hgN : g ∈ Subgroup.normalizer
+      (OddOrder.BG.Ch4.S15.fittingInAmbient hyp.S : Set G) :=
+    hTI g ⟨a, ha_sharp, hga_sharp⟩
+  rwa [hNorm] at hgN
+
+/-- **Peterfalvi (13.16), Maschke/Wielandt core for the `W₂`-side**: `N_G(W₂) ⊓ S ≤ P ⊔ W₁`.
+
+The `S`-internal residual of the (13.16) `W₂`-confinement (after the TI reduction `N_G(W₂) ≤ S` of
+`normalizer_W2_le_S`).  `P = S_F` (elementary abelian) is decomposed by Maschke, and the coprime
+`U ⋊ W₁`-action on each direct factor is forced trivial by the Wielandt fixed-point theorem
+(`OddOrder.GroupTheory.WielandtFixedPoint`), so `N_U(W₂) = 1` and the normalizer has no `U`-part:
+`N_S(W₂) ≤ P W₁`.  The machinery is present (`WielandtFixedPoint`, `CoprimeAction`); this is the
+isolated Maschke/Wielandt assembly (Coq `FTtypeP_norm_cent_compl`, the inner `N_S` computation). -/
+theorem normalizer_W2_within_S [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hyp : Hypothesis (G := G)) :
+    Subgroup.normalizer (hyp.W2 : Set G) ⊓ hyp.S ≤ hyp.P ⊔ hyp.W1 := sorry
+
+/-- **Peterfalvi (13.16), structural core for the `W₂`-side**: the Frobenius/Wielandt containment
+`N_G(W₂) ≤ P ⊔ W₁`.  Assembled from the TI reduction `N_G(W₂) ≤ S` (`normalizer_W2_le_S`, proven)
+and the Maschke/Wielandt core `N_G(W₂) ⊓ S ≤ P ⊔ W₁` (`normalizer_W2_within_S`, the isolated
+residual): every `g ∈ N_G(W₂)` lies in `S`, hence in `N_G(W₂) ⊓ S ≤ P ⊔ W₁`. -/
+theorem normalizer_W2_structure [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hyp : Hypothesis (G := G)) :
+    Subgroup.normalizer (hyp.W2 : Set G) ≤ hyp.P ⊔ hyp.W1 := by
+  intro g hg
+  have hgS : g ∈ hyp.S := normalizer_W2_le_S hG hyp hg
+  exact normalizer_W2_within_S hG hyp (Subgroup.mem_inf.mpr ⟨hg, hgS⟩)
 
 /-- **Peterfalvi (13.16), `W₂`-side**: `N_G(W₂) = C_G(W₂) = P ⊔ W₁` (the `S↔T`, `W₁↔W₂`, `P↔Q`
 dual of `normalizer_W1`; the form stated directly in Coq `FTtypeP_norm_cent_compl`).

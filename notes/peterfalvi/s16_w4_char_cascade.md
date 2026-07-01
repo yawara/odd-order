@@ -1131,3 +1131,13 @@ cont.³⁷ の (13.16) W₁-side に続き W₂-dual を landing (S15_SAndT.lean
 - **`pgroup_le_of_normal_coprime_index`** (generic 群論) を S16 → S15_SAndT に上流化 (S16 の `W2_le_P` は S15 版へ delegate、重複解消・DAG 衛生)。
 
 残 (13.16) 核心 = `normalizer_W1_structure`/`normalizer_W2_structure` の Wielandt confinement (`N_G(W_i) ≤ (other-side Fitting)⊔W_j`)。machinery (WielandtFixedPoint + TICyclic) 在庫、TI 還元は concrete `A0S_TI` (現 opaque `BasicStructureGated.A0S_TI`) の de-opacify 待ち。次手 = A0S_TI 具体化 or Wielandt confinement 直接組立。
+
+
+### cont.³⁹ (2026-07-01 lane c=γ /loop): (13.16) W₂-confinement の TI 還元 N_G(W₂)≤S を実証明 (FittingIsTI 適用)
+
+cont.³⁸ の `normalizer_W2_structure` (N_G(W₂)≤P⊔W₁, Wielandt confinement) を前進 (S15_SAndT.lean, full build 3890 green, AxiomsCheck OK):
+- **「opaque A0S_TI 待ち」も phantom gate だった** (issue 4013 経由判明): `FittingIsTI S` (F(S)^# は TI, normalizer=S) は `OddOrder.BG.Ch4.S15.fittingIsTI_of_isTypeP2 hG S_maximal S_typeP2` (BG Thm 15.7a) で即取得。`S16.normalizer_fittingInAmbient_eq_self` + `S15.maxNilpotentNormalHall_le_fittingInG` も在庫。
+- **`normalizer_W2_le_S`** (新, sorry-free): TI 還元 `N_G(W₂)≤S`。W₂≤P≤F(S) + F(S)^# TI ⟹ g∈N(W₂) は非零 a∈W₂⊆F(S)^# を F(S)^# 内に共役 ⟹ g∈N(F(S))=S。`IsTISubset` の直定義 (∀g,(∃a∈A,gag⁻¹∈A)→g∈L) を適用。
+- **`normalizer_W2_structure`** を `normalizer_W2_le_S` + 新 residual `normalizer_W2_within_S` (`N_G(W₂)⊓S ≤ P⊔W₁`, Maschke/Wielandt core) から実証明。residual は full confinement → S-内部 Maschke/Wielandt core に縮小。
+
+次手 = `normalizer_W2_within_S` (N_U(W₂)=1 の Maschke 分解 + `WielandtFixedPoint` の core assembly)。W₁-side (normalizer_W1_structure) の TI 還元は F(T)^# TI が T=非-type-P₂ ゆえ fittingIsTI_of_isTypeP2 不適用 → 別 route (T の FittingIsTI 源) 要調査。
