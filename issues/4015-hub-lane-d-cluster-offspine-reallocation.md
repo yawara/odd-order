@@ -85,9 +85,10 @@ AskUserQuestion した (channel 違い)。
 
 ## やること
 
-- [ ] hub: §2 の 0092↔1004 齟齬を認め、lane d の割当を §4 候補から再選定 (§3 の c=1 論点も込みで)。
-- [ ] hub/user: §3 の c=1 honest 化方針 (α/β/γ) を裁定。
-- [ ] user/hub: §5 の cluster-off-spine 手順を `ft_path_policy.md` §0 に明文化するか承認。
+- [x] hub: §2 の 0092↔1004 齟齬を認め、lane d の割当を §4 候補から再選定 → **σ-theory leaf (candidate a)、`e838745d` で決着**。
+- [x] hub/user: §3 の c=1 honest 化方針 (α/β/γ) を裁定 → **α (σ-theory 構造 route) 採用・β 棄却 (c=1 は spine-needed と監査確認)・γ は隠さず flag する honest fallback**。
+- [x] user/hub: §5 の cluster-off-spine 手順を明文化 → **ユーザー承認 (2026-07-01)、`ft_path_policy.md` §0 policy 7 に追記済 + memory 原則 2 反映**。
+- [ ] lane d: 次 main 同期で決定を拾い、σ-theory leaf を 9000-issue claim → 着手 (未着手ゆえ本 issue は open 保持)。
 
 ## ✅ HUB 応答 (2026-07-01, cron tick)
 

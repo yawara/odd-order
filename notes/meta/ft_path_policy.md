@@ -58,6 +58,19 @@
    3. **scan 必須**: 全レーンは shared infra 着手前に **open 9000 番台 issue を scan**（定期 main 同期にフック）。
    4. **hub dedup**: merge_monitor が重複 claim / 同一 ref の 2 leaf を検出 → STOP flag。浪費は ~1 tick に有界。
    所有 file 内の work は claim 不要。正本手順 = [`issue_management.md`](issue_management.md) / [`merge_monitor.md`](merge_monitor.md)。
+7. **cluster-off-spine 手順（P2「クラスタは枯渇しない」の前提が破れた場合、ユーザー裁定 2026-07-01, issue 4015）。**
+   worker が自割当クラスタの on-spine ungated work が枯渇/off-spine（vestigial 含む）と **code-level で検証**したら：
+   1. **user に AskUserQuestion しない** — 再配分 *判断* は hub の機能（channel 違い）。
+   2. 検証を issue に記録し、**reallocation を hub に defer**（hub 宛 async issue、[[cross-lane-sync-via-notes]]）。
+   3. **待たず**、[[lanes-are-equivalent-no-specialty]] + policy 5(A)(B) で価値×独立性の次の on-spine 上流に
+      **claim-before-build（9000-issue、policy 6）**で着手する（hub 再配分を待つ間も idle しない）。
+   4. **hub は再配分時に既存の off-path/vestigial 判定（issue 1004 等）を必ず勘案する**（issue 0092↔1004 の
+      「移し先も vestigial だった」齟齬の再発防止）。
+   5. 「off-spine と判明」評価は必ず **code-level（grep / spine footprint / carrier 精読）**で下す
+      （[[scaffold-sorry-free-not-done]] [[verify-port-state-by-number-not-coq-name]]）。楽観 label を継承しない。
+   - **spine-consumed sorried input の扱い**: 消費が genuine（vestigial でない）と確認されたら、honest 化は
+     (α) 構造 route を建てる → (γ) 明示 sorried input として許容し spine が載る事実を**隠さず flag** の順で降りる。
+     **(β) vestigial finding での dodge は消費が実際に off-path のときのみ**（消費 footprint を code-level 検証してから）。
 
 ---
 
