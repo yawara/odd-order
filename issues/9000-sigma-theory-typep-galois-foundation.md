@@ -69,7 +69,14 @@ structural 入力。
 - [x] step 1 (Galois): line 精緻化 `u ∣ (p^q−1)/(p−1)` — **DONE** (`SingerLineBound.lean`,
       `card_dvd_cyclotomicQuotient_of_faithful_irreducible_fpf` + 算術核
       `dvd_div_of_coprime_of_dvd_sub_one`、sorry-free、既存 SingerField 2定理 assembly)。
-- [ ] step 2 (non-Galois): imprimitivity 分解 + `u ≤ (p−1)^{q−1}`。
+- [~] step 2 (non-Galois): imprimitivity 分解 + `u ≤ (p−1)^{q−1}`。
+      - [x] **generic 算術 engine** (`SemilinearImprimitiveBound.lean`, sorry-free):
+        `card_le_pow_of_injective_to_pi` (embedding → `|U|≤|M|^n`) +
+        `card_le_pow_sub_one_of_injective_imprimitive` (injective `Ū↪Fin(q−1)→A`, `|A|=a`, `a≤p−1`
+        → `u≤(p−1)^{q−1}`)。Coq `psi` embedding (`PFsection9.v:442`) の算術核。
+      - [ ] **構造的 imprimitivity** (deep, type-P-specific): Maschke 半単純 + W₁-permutation で
+        `Hbar=⊕H1^w` (|H1|=p, q blocks) + block-scalar ratio embedding `psi` の injectivity
+        + `a∣p−1` (block action → Z_pˣ)。W₁ 依存ゆえ lane a assembly か別 deeper piece。
 - [ ] step 3: dichotomy 組立 + lane a cite signature 告知。
 
 ## 参照
