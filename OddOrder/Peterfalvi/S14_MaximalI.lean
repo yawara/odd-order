@@ -255,6 +255,22 @@ structure CharacterDecompositionData {L : Subgroup G} (hyp : Hypothesis L)
   supported : ∀ φ ∈ constituents, (φ : ClassFunction ↥L ℂ).support ⊆
     OddOrder.Peterfalvi.S04.supportInSubgroup hyp.ambientA L ∪ {1}
 
+/-- **A commuting element of coprime order is a power of the product** — `g ∈ ⟨zg⟩` when `z`, `g`
+commute with coprime orders.  `(zg)^{|z|} = g^{|z|}` (commuting, `z^{|z|}=1`), and `g ∈ ⟨g^{|z|}⟩`
+since `gcd(|z|, |g|) = 1` (`mem_zpowers_pow_iff`); hence `g ∈ ⟨(zg)^{|z|}⟩ ≤ ⟨zg⟩`.  This is the
+`π`-part step of Peterfalvi (8.2.c): once `(2.1)` conjugates `cg` to a *commuting* product `zg`
+(`z ∈ C_H(g)`), `g` is a power of `zg`, so `g` centralizes whatever `zg` does. -/
+theorem mem_zpowers_mul_of_commute_coprime {Γ : Type*} [Group Γ] {z g : Γ}
+    (hzg : Commute z g) (hcop : Nat.Coprime (orderOf z) (orderOf g)) :
+    g ∈ Subgroup.zpowers (z * g) := by
+  have hpow : (z * g) ^ orderOf z = g ^ orderOf z := by
+    rw [hzg.mul_pow, pow_orderOf_eq_one, one_mul]
+  have hg : g ∈ Subgroup.zpowers (g ^ orderOf z) := mem_zpowers_pow_iff.mpr hcop
+  rw [← hpow] at hg
+  have hle : Subgroup.zpowers ((z * g) ^ orderOf z) ≤ Subgroup.zpowers (z * g) :=
+    Subgroup.zpowers_le.mpr ((Subgroup.zpowers (z * g)).pow_mem (Subgroup.mem_zpowers _) _)
+  exact hle hg
+
 /-- **Type-`F` induced-character constituent structure** (Peterfalvi (8.2.c) + (1.2)/(1.5.a) +
 (1.7.c) + Clifford; a faithful §8 obligation — the deep content is type-`F` character theory living
 in §8, not §12).  For a type-I maximal `L` and `χ = Ind_H^L θ ∈ S` (`θ ∈ Irr H ∖ {1}`), `χ` is the
