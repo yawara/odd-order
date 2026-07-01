@@ -364,6 +364,46 @@ theorem centralizer_W1_inf_U_eq_bot [Finite G] (hG : OddOrder.BG.IsMinimalSimple
     simp only [Subgroup.coe_mul, InvMemClass.coe_inv]
     rw [hcomm]; group)
 
+/-- **Peterfalvi (13.16), `W₁`-triviality on `K/C_K(W₂)`**: for `g ∈ N_G(W₂)` and `w ∈ W₁`, the
+"twisted commutator" `g⁻¹ (w g w⁻¹) ∈ C_G(W₂)` — conjugating `g` by `w ∈ W₁ ≤ C_G(W₂)` changes it
+only by an element centralizing `W₂`.
+
+Since `w` centralizes `W₂` (`W = W₁ × W₂` abelian) and `g` normalizes `W₂`, the elements `w g w⁻¹`
+and `g` induce the **same** conjugation on `W₂` (`w` fixes `g y g⁻¹ ∈ W₂`), so
+`g⁻¹ (w g w⁻¹)` centralizes `W₂`.  This is the "`W₁` acts trivially on `K/C_K(W₂)`" input to the
+coprime fixed-point lifting (`coprime_fixedPoints_quotient`) of the crux `K ≤ C_G(W₂)` in
+`normalizer_U_inf_W2_eq_bot`. -/
+theorem conj_W1_mem_centralizer_W2 [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hyp : Hypothesis (G := G)) {g : G} (hg : g ∈ Subgroup.normalizer (hyp.W2 : Set G))
+    {w : G} (hw : w ∈ hyp.W1) :
+    g⁻¹ * (w * g * w⁻¹) ∈ Subgroup.centralizer (hyp.W2 : Set G) := by
+  -- `w` centralizes `W₂`.
+  have hwC : ∀ z ∈ hyp.W2, w * z = z * w := fun z hz => hyp.W1_commutes_W2 w hw z hz
+  rw [Subgroup.mem_centralizer_iff]
+  intro y hy
+  have hyW2 : y ∈ hyp.W2 := hy
+  -- `g y g⁻¹ ∈ W₂`.
+  have hy1 : g * y * g⁻¹ ∈ hyp.W2 := (Subgroup.mem_normalizer_iff.mp hg y).mp hyW2
+  -- `w⁻¹ y w = y` and `w (g y g⁻¹) w⁻¹ = g y g⁻¹`.
+  have h1 : w⁻¹ * y * w = y := by
+    rw [mul_assoc, ← hwC y hyW2, inv_mul_cancel_left]
+  have h2 : w * (g * y * g⁻¹) * w⁻¹ = g * y * g⁻¹ := by
+    rw [hwC _ hy1, mul_assoc, mul_inv_cancel, mul_one]
+  -- `w g w⁻¹` and `g` induce the same conjugation on `y`.
+  have hsame : (w * g * w⁻¹) * y * (w * g * w⁻¹)⁻¹ = g * y * g⁻¹ := by
+    calc (w * g * w⁻¹) * y * (w * g * w⁻¹)⁻¹
+        = w * g * (w⁻¹ * y * w) * g⁻¹ * w⁻¹ := by group
+      _ = w * g * y * g⁻¹ * w⁻¹ := by rw [h1]
+      _ = w * (g * y * g⁻¹) * w⁻¹ := by group
+      _ = g * y * g⁻¹ := h2
+  -- hence `n' := g⁻¹ (w g w⁻¹)` fixes `y`.
+  have hn' : (g⁻¹ * (w * g * w⁻¹)) * y * (g⁻¹ * (w * g * w⁻¹))⁻¹ = y := by
+    calc (g⁻¹ * (w * g * w⁻¹)) * y * (g⁻¹ * (w * g * w⁻¹))⁻¹
+        = g⁻¹ * ((w * g * w⁻¹) * y * (w * g * w⁻¹)⁻¹) * g := by group
+      _ = g⁻¹ * (g * y * g⁻¹) * g := by rw [hsame]
+      _ = y := by group
+  exact (mul_inv_eq_iff_eq_mul.mp hn').symm
+
 /-- **Peterfalvi (13.16), the Maschke/Wielandt core proper**: `N_U(W₂) = 1`, i.e.
 `U ⊓ N_G(W₂) = ⊥` — no nonidentity element of the complement `U` normalizes `W₂`.
 
