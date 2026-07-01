@@ -8,6 +8,33 @@
 
 ---
 
+## ✅✅ MILESTONE (2026-07-01, lane c): (13.16) W₂-side が **gate ゼロで完全 proven**
+
+**(13.16) W₂-confinement 全体が sorry-free** (S15 sorry 12→10、full build 3890 green, AxiomsCheck OK):
+- `normalizer_W2_le_S` (BG 15.7 TI reduction) / `normalizer_W2_within_S` (群 Dedekind) /
+  `normalizer_W2` (N=C=P⊔W₁) — 全 proven。
+- 核 `normalizer_U_inf_W2_eq_bot : U⊓N(W₂)=⊥` — **完全 proven**:
+  - crux `normalizer_U_inf_W2_le_centralizer_W2 : K≤C(W₂)` (coprime FPF lifting, Isaacs Cor 3.28)
+    + 2 入力 `centralizer_W1_inf_U_eq_bot` (Frobenius FPF) / `conj_W1_mem_centralizer_W2` (W₁-triviality)。
+  - assembly `normalizer_U_inf_W2_eq_bot_of_data` (Gorenstein 2.3 `fitting_coprime_abelian_decomp`
+    + Wielandt `frobenius_kernel_centralizes_of_complement_fpf`)。
+  - gate 2 つとも解消: **hcop** = `coprime_card_P_card_UW1` (ungated: P Hall + U⋊W₁ complement で
+    Coprime|P||U⋊W₁| 実証明)、**hrec** = Hypothesis field `Sdata_W2_eq` (§16-carrier、session 中に
+    main で追加、constructor が supply)。
+- **副産物**: `P_W1_structure` (13.17.c S-side: W₁≤N(P) ∧ P⊓W₁=⊥ ∧ q∤|P|) も coprime_card_P_card_UW1
+  経由で ungated 実証明。
+
+### 残 §13.16-17 frontier (C レーン)
+- **W₁-side `normalizer_W1_structure` (S15:158)** = W₂-side の S↔T,P↔Q,U↔V,W₁↔W₂ dual。
+  Hypothesis に **T-side type-P 構造 (Tdata) が無い**ため gated (T が type-P と assert されていない;
+  Q=T_F elementary abelian 等が無い)。dualize には T-side basic_structure 構築が要 (issue 3001)。
+- T-side sorry群 (`reconciled_typePData_T`/`card_Q_eq`/`tConjugate_fitting_data`/
+  `complement_inf_Q_structure`) — 同 T-side gated。
+- `card_LF_coprime_pq` — BG Theorem E (`bgTheoremE_cover_data`, owner=F) gated。
+- 13.17 char (`beta_support_norm_and_remainder`/`typeI_orthogonality_dichotomy`) — char cascade。
+
+---
+
 ## ✅ LIVE STATUS (2026-07-01, lane c = (13.16) W₂-confinement — Dedekind 還元 landed + 核プラン検証)
 
 **このセッションの landing (build-green, 3856 jobs)**:
