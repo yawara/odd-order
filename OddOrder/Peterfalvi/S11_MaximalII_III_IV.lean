@@ -5041,6 +5041,20 @@ theorem caseA_induceHU_inj_of_reducible [Finite G] {M : Subgroup G}
   rw [IrreducibleCharacter.coe_conjBy]
   exact ClassFunction.mem_inertia.mp (by rw [hinertia]; exact Subgroup.mem_top g)
 
+/-- **A nonempty left-translation-closed subset of a group is everything.**  If `T` is nonempty and
+closed under left multiplication by *every* group element (`∀ a b, b ∈ T → a·b ∈ T`), then `T = univ`
+(any `w = (w·t⁻¹)·t ∈ T`).  The `W₁`-transitivity core of the (9.8.c) surjectivity route: the set of
+`W₁`-conjugates `S₀^w` on which a constituent `θ̄₀` is nontrivial is `W₁`-translation-invariant (from
+`M`-invariance of the reducible constituent) — so if nonempty (`H ⊄ ker`) it is *all* conjugates,
+making `θ̄₀` regular.  Since the `W₁`-conjugates are indexed by `W₁` itself with `W₁` acting by
+translation, transitivity is free (no producer `W₁`-permutation is needed). -/
+theorem eq_univ_of_nonempty_of_mul_mem_left {W : Type*} [Group W] {T : Set W}
+    (hne : T.Nonempty) (hclosed : ∀ a : W, ∀ b ∈ T, a * b ∈ T) : T = Set.univ := by
+  obtain ⟨t, ht⟩ := hne
+  refine Set.eq_univ_of_forall fun w => ?_
+  have := hclosed (w * t⁻¹) t ht
+  simpa using this
+
 /-- **A regular character nontrivial on each `W1`-conjugate of `S₀`** (Clifford case (a)).
 Instantiates the elementary `(9.7)` decomposition `H̄ = ⊕_{w∈W1} S₀^w` (`wConjugate_coprod_bijective`,
 with the chief-factor `U`-action, `act.U ⊔ act.E = ⊤`, `|H̄| = p^{|W1|}`) and feeds the resulting
