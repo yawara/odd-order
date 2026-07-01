@@ -3,6 +3,39 @@
 > 導入 2026-06-23 (ユーザー裁可)。各 lane worktree の `LAUNCH.md` から参照される正本。
 > main worktree (hub) = `/home/ywr/odd-order`。
 
+## ⭐ 現行メカニズム: ScheduleWakeup ポーリング (推奨、2026-07-02 ユーザー裁可)
+
+**hub 判断待ち / 上流 cite 待ちで停止したら、`ScheduleWakeup` で ~10 分 (600s) 間隔の自己ポーリングを
+arm する** (旧 cron 方式より優先)。理由:
+
+- **`/model` 切替に頑健** — ScheduleWakeup は harness の loop 機構でモデルを直接再起動する。cron
+  ([[cron-dies-on-model-switch]]) と違い消えない (起動時 re-arm 不要)。
+- **cite 待ちも対象** — 旧 cron トリガ (LAUNCH.md 変化 / issue closed) に加え、**「上流レーンの lemma
+  が sorry-free 化して cite 可能になる」cite 待ち**もポーリングで拾える (旧方式は cite 待ちを除外して
+  いたが、ScheduleWakeup 方式では毎発火で `git merge main` して upstream landing を確認する)。
+
+**手順** (lane が「hub 判断待ち / 上流 cite 待ちで停止」と決めたとき):
+1. `ScheduleWakeup(delaySeconds: 600, prompt: <下記テンプレ>, reason: <何を待つか>)` を arm。
+2. 1 行「hub 判断待ち / cite 待ちで停止、ScheduleWakeup(600s) arm (待機対象=…)」を残して待機。
+3. **発火時** (harness が prompt でモデル再起動): 下記テンプレに従い解決判定 → 解決なら engage / 未解決
+   なら **同 prompt・delaySeconds=600 で ScheduleWakeup を再 arm** して待機継続。
+
+**ScheduleWakeup prompt テンプレ**:
+```
+<lane> 待機ポーリング (10分間隔 wakeup, 待機対象=<hub issue N の裁定 / 上流 lemma X の sorry-free 化>)。
+起動時に必ず先に cd <path> && git merge main --no-edit で同期。
+解決判定: (a) 待機 issue に hub 応答/裁定が追記 or issues/closed/ へ移動、(b) LAUNCH.md 変化、
+(c) 上流 leaf が landing (cite 対象が sorry-free / 新 shared-infra leaf 出現)。
+いずれか成立→ 割当に従い genuine work を engage。未成立→ 無駄な churn (marginal forward-build/scaffold)
+をせず、同 prompt・delaySeconds 600 で ScheduleWakeup 再 arm して待機。
+```
+
+**⚠ 限定発動は不変**: 本ポーリングも「投機的な新規作業を作らない」原則を守る (下記「限定発動」節)。
+発火して未解決なら**何も作らず**再 arm するだけ。**間隔 = ~10 分 (600s)** がユーザー永続方針
+(裁定・upstream landing は分〜十分オーダーで変化; prompt cache TTL=5分を跨ぐが responsiveness 優先)。
+
+> 以下は旧 cron 方式 (2026-06-23〜、~5 分)。ScheduleWakeup が使えない状況の fallback として残置。
+
 ## 目的と適用範囲
 
 lane が **hub に判断をあおいで停止** (= HUB 宛 issue を起票して hub の解決を待つ) したとき、
