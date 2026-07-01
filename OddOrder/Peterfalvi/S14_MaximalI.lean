@@ -1844,6 +1844,38 @@ theorem Sset_pairwiseOrthogonal [Finite G] {L : Subgroup G} (hyp : Hypothesis L)
   intro h
   exact hne (by rw [← hξcoe, ← hξ'coe, h])
 
+open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
+/-- **Witness `S = {Ind_H^L θ}` members are unit-norm** (the `hirr` input of (5.7)/(12.6) case (b)).
+Each `Ind_H^L θ` (`θ ≠ 1`) is a Frobenius-induced irreducible, so `‖Ind_H^L θ‖² = 1`
+(`inner_self_induce_eq_one_of_frobeniusGroup`, the inertia-`H` norm computation). -/
+theorem Sset_inner_self_eq_one [Finite G] {L : Subgroup G} (hyp : Hypothesis L) {C : Subgroup ↥L}
+    (hfrob : OddOrder.Isaacs.Ch06.IsFrobeniusGroup ↥L ((hyp.typeI.typeF.H).subgroupOf L) C)
+    {χ : ClassFunction ↥L ℂ} (hχ : χ ∈ hyp.Sset) :
+    ClassFunction.inner χ χ = 1 := by
+  classical
+  simp only [Hypothesis.Sset, Set.mem_setOf_eq] at hχ
+  obtain ⟨θ, hθ_ne, rfl⟩ := hχ
+  haveI hKnormal : ((hyp.typeI.typeF.H).subgroupOf L).Normal := by
+    rw [hyp.typeI.typeF.H_eq]
+    exact OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_subgroupOf_normal L
+  exact inner_self_induce_eq_one_of_frobeniusGroup hfrob θ hθ_ne
+
+open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
+/-- **Witness `S = {Ind_H^L θ}` members share the degree `[L:H]`** (the `hconst`/`hdeg0` input of
+(5.7)/(12.6) case (b)).  With `H = L_F` abelian (Def (8.3) case (b)), every `θ ∈ Irr H` is linear
+(`θ(1) = 1`, `IsIrreducibleCharacter.apply_one_eq_one_of_isMulCommutative`; commutativity transfers
+to `H.subgroupOf L` by the `subgroupOf_isMulCommutative` instance), so
+`(Ind_H^L θ)(1) = [L:H]·θ(1) = [L:H]` (`induce_apply_one`). -/
+theorem Sset_apply_one_eq_index [Finite G] {L : Subgroup G} (hyp : Hypothesis L)
+    (hab : IsMulCommutative ↥hyp.typeI.typeF.H)
+    {χ : ClassFunction ↥L ℂ} (hχ : χ ∈ hyp.Sset) :
+    (χ : ↥L → ℂ) 1 = (((hyp.typeI.typeF.H).subgroupOf L).index : ℂ) := by
+  classical
+  haveI : IsMulCommutative ↥hyp.typeI.typeF.H := hab
+  simp only [Hypothesis.Sset, Set.mem_setOf_eq] at hχ
+  obtain ⟨θ, hθ_ne, rfl⟩ := hχ
+  rw [ClassFunction.induce_apply_one, θ.isIrreducible.apply_one_eq_one_of_isMulCommutative, mul_one]
+
 /-- **Peterfalvi (12.6) case (b): abelian rank-2 kernel → equal-degree coherence (5.7).**
 When `H = L_F` is abelian (Def (8.3) case (b)), every `θ ∈ Irr H` is linear, so every member
 `Ind_H^L θ ∈ S` has the same degree `[L:H]`; `S` is then coherent by (5.7), built Dade-compatibly
