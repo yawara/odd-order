@@ -1547,3 +1547,42 @@ inertia(inflated θ in HU) = HC を証明 = 「Ū=U/C が regular θ 上 free �
 **残全体 (全て moderate、deep なし)**: (a) oXtheta u-to-1 count、(b) (E) reducible⟹Xmu
 (cfclass 対偶)、(c) u odd (odd-order)、(d) assembly (`exists_regular_not_reducible_of_odd`)。
 reducible count (B) = `reducible_count_sOf_H0` 既存。
+
+## discharge recipe 確認済 + ⚠ whnf 壁 (bundled ζ_θ 構成) (2026-07-01 cont.³)
+
+**hθ₀ discharge recipe は正しく型検査を通る** (試作で確認): regular θ:(↥H⧸N)→*ℂˣ から
+```
+have hreg' : ∀ i, ∃ x ∈ caseA.Hpart i,
+    (linearIrreducibleCharacter θ : ClassFunction _ ℂ) x ≠ (linearIrreducibleCharacter θ : ...) 1 :=
+  fun i => by obtain ⟨x,hx,hne⟩ := hreg i; exact ⟨x,hx, by
+    rw [linearIrreducibleCharacter_apply, linearIrreducibleCharacter_apply, map_one, Units.val_one];
+    simpa using hne⟩
+have hθ₀ := inertia_eq_hcInHu_caseA data chief caseA hreg'  -- : hcZeta の hθ₀ そのもの
+```
+`hθ₀` は `hcZeta_irreducible`/`hcZeta_mem_xiOf`/`hcZeta_induceHU_*` の hθ₀ 引数に直接渡せる
+(型一致確認済)。regular θ は `exists_regular_char caseA.Hpart Hpart_iSupIndep Hpart_iSup
+(order→p_prime)` で取得 (要 `letI : CommGroup (↥H⧸N) := {inferInstance with mul_comm :=
+chief.quotient_elementaryAbelian.comm}`、sub-block に scope)。θ≠1 は
+`hreg ⟨0, data.nontrivial.2.1.pos⟩` (data.nontrivial.2.1 : (data.q).Prime) から。
+instances (Fintype/Invertible huSub+sup、Normal sup=`hcInHu_realized_normal`) は proof 内 letI/haveI
+で供給可 (存在文なら signature threading 不要)。
+
+**⚠ 但し bundled ζ_θ 項の構成が whnf 壁**: `⟨ClassFunction.induce _ (hcPsi chief θ),
+hcZeta_irreducible chief θ hθ₀⟩ : IrreducibleCharacter ↥(huSub data)` を作って coerce
+(degree via `hcZeta_apply_one`、membership via `hcZeta_mem_xiOf`) すると **whnf timeout >2M
+heartbeats** (induce-coercion defeq 爆発、[[lean-induce-transport-instance-desync]] /
+[[lean-giant-declaration-debugging]])。`hcZeta_mem_xiOf` 自体は maxHeartbeats 1000000 で通るが、
+呼び出し側で bundled 項を組むと爆発。試作 `exists_irr_deg_u_xiOf_caseA` は revert 済。
+
+**次 iteration の対処** (count 構築時):
+- coercion whnf を回避: `show`/`change` で ClassFunction 形に pin、degree/membership goal を分割、
+  Invertible instance を named-arg `(Z:=)(S:=)` で pin、`rw` でなく `exact`。
+- または **ClassFunction レベルで作業し bundled IrreducibleCharacter を最後に一度だけ materialize**
+  (count は Set/Finset の ncard なので、写像 θ↦ζ_θ を ClassFunction 値で定義し injectivity/fiber を
+  ClassFunction 等式で示す方が whnf 安全な可能性)。
+- `hcZeta_induceHU_irreducible`/`hcZeta_exists_irreducible_sOf` (free-orbit endpoint) は既に
+  同型の bundled 項を hIM 付きで扱っており、そこでの whnf 対処 (letI transparent 保持、6585 の
+  hunfold idiom) が手本。
+
+**残タスク (再掲、全 moderate、def_Itheta は proven)**: (a) oXtheta u-to-1 count (whnf 注意)、
+(b) (E) reducible⟹Xmu、(c) u odd、(d) assembly (`exists_regular_not_reducible_of_odd`)。
