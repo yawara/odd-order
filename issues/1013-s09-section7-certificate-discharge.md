@@ -886,3 +886,27 @@ S09:2347 で産出) の残 4 入力を精査。**3 つは tractable、1 つ (hze
 (IsComplement' card 分解 + subgroupOf card equiv)、(b) hζ0norm/a·ha を wire、(c) hzeta0nu を
 coherence degree 保存で discharge (deep) → `zetaNuRhoNormSqGeOfDade` で hB 産出 →
 `exists_counterexample_dade_data` (S14 sorry) の hB field。hC=(7.3)+(8.17) は別途。
+
+### 2026-07-01 (loop 継続⁷ 補足): hzeta0nu root-cause 確定 = IsCoherent が ⊥1_G を捨てている
+
+hzeta0nu の根本原因を特定。Peterfalvi の coherence (5.x) は本来 ℤ[S]→ℤ[Irr G] を
+**1_G の直交補空間**へ写す (S は 1_L に直交する induced-from-nontrivial ばかり、Dade isometry が
+⊥1_G の空間に landing、coherent 拡張がそれを保つ)。しかし本 repo の `IsCoherent` (S07:1596) は
+**isometry + extends-Dade + ZIrr-codomain のみ保持し、⊥1_G を落としている** (nonzero/extension/
+extension_inner_eq/extends_on_supported/extension_mem_ZIrr の 5 field に ⊥1_G も degree 保存も無い)。
+coherence 産出経路 `frobenius_typeI_coherent`→`coherent_of_sibleyTarget`→`nonempty_coherent_of_sibley`
+(S08 Sibley/(6.8)) も抽象 IsCoherent を返すのみ (⊥1_G は construction 内で成立するが露出せず)。
+
+**⟹ hzeta0nu は抽象 IsCoherent から原理的に導けない** (isometry は degree/principal 成分を決定しない;
+hagree からは ⟨ν ζ_i,1_G⟩=d_i·c しか出ず c=0 を強制できない、証明済)。
+
+**修正の 2 択**:
+- (a) **共有 `IsCoherent` に field 追加** (`extension_orthogonal_constOne` or degree 保存
+  `extension_apply_one_eq`) + Sibley 構成 (`nonempty_coherent_of_sibley`)・galoisTransport で証明。
+  = 最もクリーンで全 coherence consumer に裨益するが **shared-structure signature 変更** (全 constructor
+  更新要、他レーン=lane-a/c の coherence 利用に影響) → **CLAUDE.md「signature 無断変更=STOP」に該当、
+  hub/ユーザー裁可が要る設計判断**。
+- (b) **Sibley 構成から standalone lemma** で witness の ν(Ind θ_0) ⊥1_G を直接証明 (IsCoherent に
+  触れず additive)。lane-b-local だが S08 case-B coherence extension machinery への deep dive を要する。
+
+→ hzeta0nu は hB の唯一の残 blocker。上記設計判断を要するため次アクションとして flag。
