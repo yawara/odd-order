@@ -7096,6 +7096,32 @@ theorem Hypothesis.muGridAlpha_tau_inner_SHC_extension_mem_int [Finite G] {M : S
   exact ClassFunction.inner_mem_ZIrr_int hαZ hζZ
 
 open scoped FiniteInduce in
+/-- **`⟨φ^{τ₁}, ψ^{τ₁}⟩ = 0` for distinct `S(HC)` members** (α-grid `S₁`-`τ₁` input to (11.8.2)).
+Together with `SHC_extension_inner_self` (`‖φ^{τ₁}‖² = 1`) this says the coherent images
+`{φ^{τ₁} : φ ∈ S(HC)}` form an **orthonormal family** — the `S₁^{τ₁}` basis against which the
+(11.8.2) decomposition `α_{ij}^τ = X − nζ^{τ₁} + a·∑_{λ∈S₁} λ^{τ₁}` projects.  Proof: `τ₁` is an
+isometry on `ℤ[S(HC)]` (`extension_inner_eq`), so `(φ^{τ₁}, ψ^{τ₁}) = (φ, ψ) = 0` for distinct
+irreducibles.  Available from `SHC_isCoherent` alone (no full-`S` `coh`). -/
+theorem Hypothesis.SHC_extension_inner_of_ne [Finite G] {M : Subgroup G}
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis M)
+    {φ ψ : ClassFunction ↥M ℂ}
+    (hφS : φ ∈ inducedFamily M) (hφirr : IsIrreducibleCharacter φ) (hφ1 : φ 1 = (hyp.w1 : ℂ))
+    (hψS : ψ ∈ inducedFamily M) (hψirr : IsIrreducibleCharacter ψ) (hψ1 : ψ 1 = (hyp.w1 : ℂ))
+    (hne : φ ≠ ψ) :
+    ClassFunction.inner ((hyp.SHC_isCoherent hG).extension φ)
+      ((hyp.SHC_isCoherent hG).extension ψ) = 0 := by
+  have hspanφ : φ ∈ OddOrder.Peterfalvi.S07.zSpan
+      {χ : ClassFunction ↥M ℂ | χ ∈ inducedFamily M ∧ IsIrreducibleCharacter χ ∧
+        ((χ : ↥M → ℂ) 1 = (hyp.w1 : ℂ))} :=
+    Submodule.subset_span ⟨hφS, hφirr, hφ1⟩
+  have hspanψ : ψ ∈ OddOrder.Peterfalvi.S07.zSpan
+      {χ : ClassFunction ↥M ℂ | χ ∈ inducedFamily M ∧ IsIrreducibleCharacter χ ∧
+        ((χ : ↥M → ℂ) 1 = (hyp.w1 : ℂ))} :=
+    Submodule.subset_span ⟨hψS, hψirr, hψ1⟩
+  rw [(hyp.SHC_isCoherent hG).extension_inner_eq _ _ hspanφ hspanψ,
+    OddOrder.RepresentationTheory.irr_cf_inner hφirr hψirr, if_neg hne]
+
+open scoped FiniteInduce in
 /-- **Peterfalvi (11.8), the genuine non-orthogonality** (lane-b W3 obligation, issue 2020).
 
 Under Hypothesis (10.1), there is an irreducible `ζ ∈ S = inducedFamily M` of degree `w₁` —

@@ -497,3 +497,17 @@ the **exact next buildable lemma** (次 iteration = BUILD、survey しない):
 **次 = (11.8.2) a=0 導出** (これらを消費): `‖α^τ‖²=2+n²` (`muGridAlpha_tau_inner_self` coh-free ✅) +
 上記 integrality + S(HC) 直交 (`inducedFamily_pairwiseOrthogonal` ✅) で α^τ を S₁^{τ₁} basis に分解、
 a∈{0,1,2}、a=0 or 2、a=0 ⟹ X=ω_{ij}^σ−ω_{i0}^σ ((11.8.5))。μ_k^{τ₁} 経由 (S(HC) 外) を避ける新 CS 論法。
+
+## 2026-07-02 cont.²⁷ (lane-a) — S(HC)^{τ₁} orthonormal basis API 完成 (pairwise-orth landed)
+- **`Hypothesis.SHC_extension_inner_of_ne`** landed (S12, leaf green): distinct S(HC) 既約 φ≠ψ で
+  `⟨φ^{τ₁},ψ^{τ₁}⟩=0` (extension_inner_eq isometry + irr_cf_inner + if_neg)。
+- ∴ **{φ^{τ₁} : φ∈S(HC)} は orthonormal** (norm 1 = cont.²⁶ `SHC_extension_inner_self` + pairwise 0 = 本 lemma)。
+  (11.8.2) の α^τ 分解が projection する S₁^{τ₁} basis。integrality (cont.²⁶) と合わせ **α-grid S₁-τ₁ の
+  inner-product API 3 本完備**。transitive sorryAx は SHC_isCoherent 経由 (cont.²⁶ と同、genuine deferred)。
+
+**次 = (11.8.2) a=0 projection** (orthonormal API を消費):
+- α^τ = X − nζ^{τ₁} + a∑_{λ∈S₁}λ^{τ₁}, X⊥S₁^{τ₁}, a∈{0,1,2}。projection 係数 = ⟨α^τ,λ^{τ₁}⟩ (orthonormal ゆえ)。
+- 要 **ω^σ ⊥ S₁^{τ₁}**: full-coh は (5.5) `ofProjection` (coh.tau1, ψ=0) で ω^σ⊥coh.tau1 (S12:4869)。
+  SHC 版は SHC.extension に対する ofProjection 適応が要 (§5 (5.5)/(5.3.b) が SHC-coherence で効くか確認)。
+- 要 **‖α^τ‖²=2+n²** (`muGridAlpha_tau_inner_self` coh-free ✅) + norm 展開で a²·|S₁|+… ≤ 2 → a∈{0,1} → integrality で a=0。
+- 次 iteration = ω^σ ⊥ SHC.extension (5.5 ofProjection) の tractability 確認 → a=0 projection。
