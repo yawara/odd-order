@@ -3962,6 +3962,24 @@ theorem witness_L_frobenius [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     ∃ frob : TypeIFrobeniusData data.L, frob.kernel_eq_MF := by
   sorry
 
+/-- The type-`τ` **main subgroup** `M_s` is contained in `M` (both `M_F` and `[M,M]` are). -/
+theorem mainSubgroup_le (M : Subgroup G) (tau : OddOrder.GroupTheory.PeterfalviType) :
+    OddOrder.GroupTheory.mainSubgroup M tau ≤ M := by
+  cases tau <;>
+    simp only [OddOrder.GroupTheory.mainSubgroup, OddOrder.GroupTheory.derivedInG] <;>
+    first
+      | exact OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_le M
+      | exact Subgroup.map_subtype_le _
+
+/-- **Peterfalvi (12.11)**: `M inter L` complements `K` in `M` and lies in the
+Fitting kernel `H` of the witness subgroup `L`. -/
+theorem intersection_complement_structure [Finite G]
+    (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    {ctr : CounterexampleHypothesis (G := G)} (data : RankTwoWitnessData ctr) :
+    Subgroup.IsComplement' (ctr.K.subgroupOf ctr.M) ((ctr.M ⊓ data.L).subgroupOf ctr.M) ∧
+      ctr.M ⊓ data.L ≤ maxNilpotentNormalHall data.L := by
+  sorry
+
 /-- **Peterfalvi (12.10), non-TI clause**: for the (12.9) witness `L`, its Frobenius kernel
 `H = L_F` has `H^#` **not** a TI-subset of `G`.  This is the "By (12.9), `H^#` is not a TI-subset"
 step of (12.10): the rank-two witness `x ∈ Ω₁(P₀)^#` has `C_G(x) ⊄ L` (`data.centralizer_x_not_le_L`)
@@ -4000,8 +4018,12 @@ theorem witness_H_sharp_not_isTISubset [Finite G] (hG : OddOrder.BG.IsMinimalSim
         rw [ht] at hle; exact hco.1 (top_le_iff.mp hle)
     · exact heq.ge
   -- The rank-two witness `x ∈ H^#` with `C_G(x) ⊄ L`: `x ∈ H = L_F` is `x ∈ M ⊓ L ≤ L_F` by (12.11)
-  -- (`intersection_complement_structure`).  Isolated here as the sole (12.11)-gated fact.
-  have hxH : data.x ∈ frob.typeI.typeF.H := sorry
+  -- (`intersection_complement_structure`), with `x ∈ P₀ ≤ M` and `x ∈ P₀ ≤ L_s ≤ L`.
+  have hxH : data.x ∈ frob.typeI.typeF.H := by
+    rw [frob.typeI.typeF.H_eq]
+    exact (intersection_complement_structure hG data).2
+      ⟨ctr.P0_le_M data.x_mem_P0,
+        mainSubgroup_le data.L data.L_type (data.P0_le_Ls data.x_mem_P0)⟩
   have hxsharp : data.x ∈ OddOrder.GroupTheory.sharpSubgroup frob.typeI.typeF.H :=
     ⟨hxH, by simpa using data.x_ne_one⟩
   -- Pick `g ∈ C_G(x) ∖ L`; it centralizes `x`, so `g x g⁻¹ = x ∈ H^#`, yet `g ∉ L = N_G(H)`.
@@ -4061,14 +4083,6 @@ theorem witness_L_coherent [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
   · exact frobenius_typeI_coherent_of_abelianKernel hG hyp ⟨C, hC⟩ hab
   · exact frobenius_typeI_coherent_of_cyclicQuotient hG hyp ⟨C, hC⟩ hexp
 
-/-- **Peterfalvi (12.11)**: `M inter L` complements `K` in `M` and lies in the
-Fitting kernel `H` of the witness subgroup `L`. -/
-theorem intersection_complement_structure [Finite G]
-    (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
-    {ctr : CounterexampleHypothesis (G := G)} (data : RankTwoWitnessData ctr) :
-    Subgroup.IsComplement' (ctr.K.subgroupOf ctr.M) ((ctr.M ⊓ data.L).subgroupOf ctr.M) ∧
-      ctr.M ⊓ data.L ≤ maxNilpotentNormalHall data.L := by
-  sorry
 
 /-- **(12.12) Case A core.**  A finite group `E` acting faithfully on a one-dimensional
 `𝔽_p`-space `V` is cyclic, with `|E| ∣ |V| - 1 = p - 1`.  This is the reducible / rank-one case
