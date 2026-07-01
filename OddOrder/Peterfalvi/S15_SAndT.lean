@@ -1316,10 +1316,13 @@ and the §16-chosen complement `V` (κ-Hall-invariant) / cyclic factor `W₂` fo
 decomposition of `T`: there is a `TypePData T` with `.U = V`, `.W1 = W₂`, and `.W2 = W₁` (the dual
 cyclic factor `C_{T'}(W₂#)` of `T`'s type-`P` structure is exactly the shared `W₁`).
 
-This is the genuine §13 reconciliation — **TRUE** (unlike `IsTypeP2 T`, which is strictly stronger
-than the (14.9) `T_typeII` conclusion `TypeIIData T` and generally false, so the earlier `Tdata`
-spine supply was a dead-end).  It lives **off the FT spine**: the `V`-side helpers cite this obligation,
-keeping `section16TypePStructure_of_isMinimalSimpleOdd` sorry-free.  Gated on §13; declared sorried. -/
+This is the genuine §13 reconciliation — **TRUE**, and the right §13-level statement: it asserts only
+the *general* type-`P` structure of `T` (available from `T_nonI` at §13), reconciled to the abstract
+`V`/`W₂`.  (The sharper `IsTypeP2 T` is *equivalent* to the (14.9) conclusion `IsTypeII T` by the BG
+type dictionary `proposition_type_classification` — `IsTypeII M ↔ IsTypeP2 M` — but is not needed for
+the reconciliation itself, so this stays a clean §13 obligation.)  It lives **off the FT spine**: the
+`V`-side helpers cite this obligation, keeping `section16TypePStructure_of_isMinimalSimpleOdd`
+sorry-free.  Gated on §13; declared sorried. -/
 theorem reconciled_typePData_T [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
     (hyp : Hypothesis (G := G)) :
     ∃ data : TypePData hyp.T, data.U = hyp.V ∧ data.W1 = hyp.W2 ∧ data.W2 = hyp.W1 := sorry
@@ -1361,18 +1364,18 @@ theorem W1_le_Q [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
 `F(T)^#` is a TI-subset of `G` (with normalizer `T`).
 
 On the `W₂`-side, `normalizer_W2_le_S` reduces `N_G(W₂) ≤ S` using BG Theorem 15.7(a) applied to `S`'s
-type-`P₂` carrier `S_typeP2` (`fittingIsTI_of_isTypeP2`).  For the `W₁`-side the ambient subgroup is
-`T`, which is type-`P` but **not** type-`P₂` (the κ-Hall ordering `q < p` makes `S` the determinate
-type-`P₂` member), so `fittingIsTI_of_isTypeP2` does not apply to `T`.
-
-`FittingIsTI T` is nonetheless **TRUE** for the (13.1) configuration: `T` is genuinely type-`P₁`
-(equivalently `M_F(T) ≠ M_σ(T)`, `fitting_isTI_of_mf_ne_msigma`); the type-`V` alternative
-(`M_F = M_σ`, `isTypeV_of_isTypeP1_mf_eq_msigma`) is excluded by the nontrivial complement `V ≠ ⊥`,
-which is the (14.9) `T_typeII` content (`IsTypeII T ⟹ ¬ IsTypeV T`, `not_isTypeII_of_isTypeV`).
-Isolated here as the `T`-side dual of the `S`-side type-`P₂` carrier — the genuine §14-gated residual
-of the (13.16) `W₁`-confinement TI reduction, cited (not re-derived) by `normalizer_W1_le_T`. -/
-theorem fittingIsTI_T [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
-    (hyp : Hypothesis (G := G)) : OddOrder.BG.Ch4.S15.FittingIsTI hyp.T := sorry
+type-`P₂` carrier `S_typeP2` (`fittingIsTI_of_isTypeP2`).  The `W₁`-side dual applies the same
+Theorem 15.7(a) to `T`: the (14.9) conclusion `IsTypeII T`, together with the BG type dictionary
+`proposition_type_classification` (`IsTypeII M ↔ IsTypeP2 M`), makes `T` **type-`P₂`**, so
+`fittingIsTI_of_isTypeP2` applies directly.  (The `q < p` κ-Hall ordering pins the *matched-pair*
+labelling `S`/`T`, not the type: both members of a type-`P₂` pair are type-`P₂` — the earlier belief
+that `T` is type-`P₁` and needed the `M_F ≠ M_σ` route was mistaken.) -/
+theorem fittingIsTI_T [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hyp : Hypothesis (G := G)) (hTTypeII : IsTypeII hyp.T) :
+    OddOrder.BG.Ch4.S15.FittingIsTI hyp.T := by
+  have hP2 : OddOrder.BG.Ch4.S14.IsTypeP2 hyp.T :=
+    ((OddOrder.BG.Ch4.S16.proposition_type_classification hG hyp.T_maximal).2.1).mp hTTypeII
+  exact OddOrder.BG.Ch4.S15.fittingIsTI_of_isTypeP2 hG hyp.T_maximal hP2
 
 /-- **Peterfalvi (13.16), TI reduction for the `W₁`-side**: `N_G(W₁) ≤ T`.
 
@@ -1383,9 +1386,9 @@ nonidentity `a ∈ W₁ ⊆ F(T)^#` to `g a g⁻¹ ∈ W₁ ⊆ F(T)^#`, so the 
 `g ∈ N_G(F(T)) = T`.  This is the first (TI) half of the (13.16) `W₁`-confinement; the residual
 `N_G(W₁) ⊓ T ≤ Q ⊔ W₂` is the Maschke/Wielandt core (the dual of `normalizer_W2_within_S`). -/
 theorem normalizer_W1_le_T [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
-    (hyp : Hypothesis (G := G)) :
+    (hyp : Hypothesis (G := G)) (hTTypeII : IsTypeII hyp.T) :
     Subgroup.normalizer (hyp.W1 : Set G) ≤ hyp.T := by
-  have hTI := fittingIsTI_T hG hyp
+  have hTI := fittingIsTI_T hG hyp hTTypeII
   have hNorm := OddOrder.BG.Ch4.S16.normalizer_fittingInAmbient_eq_self hG hyp.T_maximal
   -- `W₁ ≤ Q ≤ F(T)`.
   have hW1F : hyp.W1 ≤ OddOrder.BG.Ch4.S15.fittingInAmbient hyp.T := by
@@ -1946,10 +1949,12 @@ theorem coprime_card_Q_card_VW2 [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd 
 kernel `Q = T_F` is elementary abelian of exponent `q`.
 
 On the `S`-side this is the `§16`-carrier fact `P_elementaryAbelian` (from the type-`P₂` structure of
-`S`); for `T` (type-`P₁`, type II by (14.9)) the same σ-structure fact holds — `T_σ = T_F` is the
-elementary-abelian `q`-group of rank `p` on which the prime-order `κ`-factor `W₂` acts.  Isolated as
-the localized `T`-side structural residual (the exact dual of `P_elementaryAbelian`), gated on the
-(14.9) `T_typeII` σ-structure; supplies the `hQ_elemAb` input of `normalizer_V_inf_W1_eq_bot_of_data`. -/
+`S`); `T` is likewise type-`P₂` (`IsTypeII T ↔ IsTypeP2 T`, `proposition_type_classification`), so the
+same σ-structure fact holds — `T_σ = T_F` is the elementary-abelian `q`-group of rank `p` on which the
+prime-order `κ`-factor `W₂` acts.  Isolated as the localized `T`-side structural residual (the exact
+dual of `P_elementaryAbelian`, which is **itself sorried** on the `S`-side, `S15_SAndT_Setup`); gated
+on the same deep σ-structure content; supplies the `hQ_elemAb` input of
+`normalizer_V_inf_W1_eq_bot_of_data`. -/
 theorem Q_elementaryAbelian_T [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
     (hyp : Hypothesis (G := G)) (_hTTypeII : IsTypeII hyp.T) :
     IsElementaryAbelian hyp.q ↥hyp.Q := sorry
@@ -2075,7 +2080,7 @@ theorem normalizer_W1_le_QW2 [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     (hyp : Hypothesis (G := G)) (hTTypeII : IsTypeII hyp.T) :
     Subgroup.normalizer (hyp.W1 : Set G) ≤ hyp.Q ⊔ hyp.W2 := by
   intro g hg
-  have hgT : g ∈ hyp.T := normalizer_W1_le_T hG hyp hg
+  have hgT : g ∈ hyp.T := normalizer_W1_le_T hG hyp hTTypeII hg
   exact normalizer_W1_within_T hG hyp hTTypeII (Subgroup.mem_inf.mpr ⟨hg, hgT⟩)
 
 /-- **`T`-side dual of `not_normalizer_U_le_S`** (Pf (13.17), V-side): if `V` is a `T`-conjugate of
