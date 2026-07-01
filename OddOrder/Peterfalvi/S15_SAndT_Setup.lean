@@ -1612,6 +1612,51 @@ theorem Hypothesis.W1_le_normalizer_C (hyp : Hypothesis (G := G)) :
         _ = x * p := by group
   rw [hU_iff, hCP_iff]
 
+/-- **Peterfalvi (13.12), structural step**: `c ≡ 1 (mod q)`.
+
+The cyclic factor `W₁` (order `q`) acts fixed-point-freely on `C ⊆ U` by conjugation
+(`W1_fpf_C`, `W1_le_normalizer_C`).  Since `W₁` is a `q`-group, the class equation
+(`IsPGroup.card_modEq_card_fixedPoints`) gives `|C| ≡ |C_C(W₁)| (mod q)`, and the fpf condition
+makes `C_C(W₁) = {1}`.  This is the Coq `dv_2q_c1` ingredient (`q ∣ c − 1`) of
+`FTtypeP_Ind_Fitting_reg_Fcore`. -/
+theorem Hypothesis.c_modEq_one [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hyp : Hypothesis (G := G)) : hyp.c ≡ 1 [MOD hyp.q] := by
+  classical
+  haveI : Fact hyp.q.Prime := ⟨hyp.q_prime⟩
+  have hfpf := hyp.W1_fpf_C hG
+  letI : MulAction ↥hyp.W1 ↥hyp.C :=
+    MulAction.compHom ↥hyp.C (Subgroup.inclusion hyp.W1_le_normalizer_C)
+  have hsmul : ∀ (w : ↥hyp.W1) (x : ↥hyp.C), ((w • x : ↥hyp.C) : G) = (w : G) * (x : G) * (w : G)⁻¹ :=
+    fun _ _ => rfl
+  have hW1pg : IsPGroup hyp.q ↥hyp.W1 := IsPGroup.of_card (by rw [← hyp.q_eq_card_W1, pow_one])
+  have hmod : Nat.card ↥hyp.C ≡ Nat.card ↥(MulAction.fixedPoints ↥hyp.W1 ↥hyp.C) [MOD hyp.q] :=
+    hW1pg.card_modEq_card_fixedPoints ↥hyp.C
+  -- `W₁ ≠ ⊥`, pick `w₀ ∈ W₁ #`.
+  have hW1ne : hyp.W1 ≠ ⊥ := by
+    intro h; have h3 := hyp.three_le_q
+    rw [hyp.q_eq_card_W1, h, Subgroup.card_bot] at h3; omega
+  haveI : Nontrivial ↥hyp.W1 := (Subgroup.nontrivial_iff_ne_bot _).mpr hW1ne
+  obtain ⟨⟨w₀, hw₀W1⟩, hw₀ne⟩ := exists_ne (1 : ↥hyp.W1)
+  have hw₀ne' : w₀ ≠ 1 := by rintro rfl; exact hw₀ne rfl
+  -- `C_C(W₁) = {1}`.
+  have hfixset : MulAction.fixedPoints ↥hyp.W1 ↥hyp.C = {1} := by
+    ext a
+    simp only [MulAction.mem_fixedPoints, Set.mem_singleton_iff]
+    constructor
+    · intro hafix
+      by_contra hane
+      have hav : (a : G) ≠ 1 := fun h => hane (Subtype.ext h)
+      have hc := congrArg (Subtype.val) (hafix ⟨w₀, hw₀W1⟩)
+      rw [hsmul] at hc
+      exact hfpf w₀ hw₀W1 hw₀ne' (a : G) a.2 hav hc
+    · rintro rfl w
+      apply Subtype.ext
+      rw [hsmul]; simp
+  have hfix : Nat.card ↥(MulAction.fixedPoints ↥hyp.W1 ↥hyp.C) = 1 := by
+    rw [hfixset]; simp
+  rw [hfix, ← hyp.c_eq_card_C] at hmod
+  exact hmod
+
 /-- **Peterfalvi (13.11)**: the elementary numerical bounds for `m`.
 
 The `q ≥ 7` and `q ≥ 5` bounds are the genuine arithmetic estimates
