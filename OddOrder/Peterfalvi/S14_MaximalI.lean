@@ -1876,6 +1876,31 @@ theorem Sset_apply_one_eq_index [Finite G] {L : Subgroup G} (hyp : Hypothesis L)
   obtain ⟨θ, hθ_ne, rfl⟩ := hχ
   rw [ClassFunction.induce_apply_one, θ.isIrreducible.apply_one_eq_one_of_isMulCommutative, mul_one]
 
+open OddOrder.Peterfalvi.S09.Cert in
+open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
+/-- **Witness member differences are `A(L)`-supported** (the `hsuppdiff` input of (5.7)/(12.6) case
+(b), and the support that lets the Dade isometry apply — `tau_isometry_diff`).  Two members
+`a, b ∈ S = {Ind_H^L θ}` both vanish off `H` (`Sset_vanishes_off_H`) and share the degree `[L:H]`
+(`Sset_apply_one_eq_index`), so `a − b` vanishes off `H` and at `1`, i.e. is supported in
+`A(L) = H^# = supportInSubgroup (H \ {1}) L`. -/
+theorem Sset_diff_supported [Finite G] {L : Subgroup G} (hyp : Hypothesis L)
+    (hab : IsMulCommutative ↥hyp.typeI.typeF.H)
+    (hAH : hyp.ambientA = ((hyp.typeI.typeF.H) : Set G) \ {1})
+    {a b : ClassFunction ↥L ℂ} (ha : a ∈ hyp.Sset) (hb : b ∈ hyp.Sset) :
+    (a - b).support ⊆ OddOrder.Peterfalvi.S04.supportInSubgroup hyp.ambientA L := by
+  intro x hx
+  have hx0 : (a - b) x ≠ 0 := ClassFunction.mem_support.mp hx
+  rw [ClassFunction.sub_apply] at hx0
+  have hxH : (x : G) ∈ hyp.H := by
+    by_contra h
+    exact hx0 (by rw [Sset_vanishes_off_H hyp ha h, Sset_vanishes_off_H hyp hb h, sub_zero])
+  have hx1 : x ≠ 1 := by
+    rintro rfl
+    exact hx0 (by
+      rw [Sset_apply_one_eq_index hyp hab ha, Sset_apply_one_eq_index hyp hab hb, sub_self])
+  exact (mem_supportInSubgroup_sharp_subgroupOf_iff hyp.typeI.typeF.H hAH x).mpr
+    ⟨Subgroup.mem_subgroupOf.mpr hxH, hx1⟩
+
 /-- **Peterfalvi (12.6) case (b): abelian rank-2 kernel → equal-degree coherence (5.7).**
 When `H = L_F` is abelian (Def (8.3) case (b)), every `θ ∈ Irr H` is linear, so every member
 `Ind_H^L θ ∈ S` has the same degree `[L:H]`; `S` is then coherent by (5.7), built Dade-compatibly
