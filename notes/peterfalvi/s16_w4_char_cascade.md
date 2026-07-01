@@ -1053,3 +1053,30 @@ green、全 axiom-clean 3 axioms):
    S15_SAndT_Setup:1180 の sorry を discharge、`analytic_inequality_arith` の h139b 入力)。
 これで (13.9.b) が ungated に閉じる (h1/h2/h3 の §8-TI gate とは独立)。[[feedback-no-avoiding-hard-parts]]
 [[scaffold-sorry-free-not-done]] [[feedback-quick-win-not-a-criterion]]
+
+### cont.³⁵ (2026-07-01 lane c=γ): [Is] 3.14 character bridge 完成 + issue 0092 再配分の handoff
+
+**[Is] 3.14 ANT infra 完成** (`OddOrder/Algebra/GaloisRationalInteger.lean`, commits `35c88da5`+`a6a532c7`、
+全 sorry-free/axiom-clean 3 axioms、full build 3890 green)。5 補題:
+1. `exists_int_of_isIntegral_of_mem_range_rat` (有理な代数的整数 ⟹ ℤ)。
+2. `exists_int_of_isIntegral_of_forall_complexRingEquiv_fixed` (ANT 核心: 全 σ 不変な代数的整数 ⟹ 有理整数)。
+3. `exists_pow_of_complexRingEquiv` (σ:ℂ≃+*ℂ は n乗根に一様冪 ·^k, k coprime n)。
+4. `exists_int_prod_character_of_cyclicClosed` (cyclic-closed A で ∏_{x∈A}φ(x) は有理整数)。
+5. **`one_le_prod_normSq_character_of_cyclicClosed`** ([Is] 3.14 product form: φ≠0 on A ⟹ `1≤∏‖φ(x)‖²`)。
+
+**⚠ issue 0092 再配分 (2026-07-01 ユーザー裁定)**: `S15_SAndT_Setup.lean` は **lane d 所有**に移管
+(γ import 最上流の 16 sorry を lane d が upstream-first で埋める)。**lane c は編集停止**、下流
+(`S15_SAndT.lean` 13.16/13.17 + `S16_NonExistenceG.lean` orthogonality_switch 14.14/exists_MHypothesis
+14.10/betaM_expansion 14.11.2/T_typeII 14.9) を保持。∴ (13.9.b) `global_character_bound`
+(S15_SAndT_Setup:1180) の wiring は **lane d の担当**。
+
+**🤝 lane d への handoff (重複再構築防止 — cont.³³ 教訓)**: (13.9.b) を埋める際、[Is] 3.14 の
+field-norm≥1 は上記 shared leaf `OddOrder.Algebra.one_le_prod_normSq_character_of_cyclicClosed`
+(`1≤∏_{x∈A}‖φ(x)‖²`, cyclic-closed A + φ≠0) を **cite せよ (再構築するな)**。残 = (a) G₀ が
+cyclic-closed (∀x∈G₀ ∀k coprime |G|, x^k∈G₀ — G₀=G#−orbits は同じ cyclic 生成ゆえ真) の確認、
+(b) 各 character (λ^{τ1}/η10) の φ≠0 (= (13.9.a) cover)、(c) `sum_ge_card_of_one_le_prod`
+(S15_SAndT_Setup:1201、AM-GM、既 landing) で `∏‖φ‖²≥1 ⟹ ∑_{x∈G₀}‖φ‖²≥|G₀|`。(a)+(c) は ungated、
+(b) は cover (13.9.a) = §13 char。
+
+**lane c 次手** = 保持下流の deep char (S15_SAndT 13.16/13.17 or S16 orthogonality_switch 14.14)。
+[[scaffold-sorry-free-not-done]] [[s09-is-section7-chirho-complete]] [[feedback-cite-sorried-lemmas-if-signature-correct]]
