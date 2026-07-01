@@ -4,6 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
 import OddOrder.GroupTheory.RepresentationTheory.Clifford
+import OddOrder.GroupTheory.RepresentationTheory.InducedIrreducible
 
 /-!
 # Pointwise product of class functions; products of characters
@@ -110,5 +111,43 @@ theorem inner_mul_self_eq_of_star_mul_self_eq_one {G : Type*} [Group G] [Fintype
   simp only [ClassFunction.mul_apply, star_mul']
   rw [show χ g * lam g * (star (χ g) * star (lam g))
         = χ g * star (χ g) * (lam g * star (lam g)) from by ring, hlam g, mul_one]
+
+/-- **An irreducible character has squared norm one** (`⟨χ, χ⟩ = 1`), `Prop`-level restatement of the
+orthonormality `irreducibleCharacter_inner_eq_ite` for the bundled `⟨χ, hχ⟩ : IrreducibleCharacter G`. -/
+theorem IsIrreducibleCharacter.inner_self_eq_one {G : Type*} [Group G] [Finite G] [Fintype G]
+    [Invertible (Nat.card G : ℂ)] {χ : ClassFunction G ℂ} (hχ : IsIrreducibleCharacter χ) :
+    ClassFunction.inner χ χ = 1 := by
+  simpa using irreducibleCharacter_inner_eq_ite (⟨χ, hχ⟩ : IrreducibleCharacter G) ⟨χ, hχ⟩
+
+/-- **An irreducible character has a positive natural degree** (`χ(1) = d`, `0 < d`), `Prop`-level
+restatement of `irreducibleCharacter_apply_one_eq_pos_natCast` for the bundled `⟨χ, hχ⟩`. -/
+theorem IsIrreducibleCharacter.exists_apply_one_eq_pos_natCast {G : Type*} [Group G] [Finite G]
+    {χ : ClassFunction G ℂ} (hχ : IsIrreducibleCharacter χ) :
+    ∃ d : ℕ, 0 < d ∧ (χ : G → ℂ) 1 = (d : ℂ) := by
+  obtain ⟨d, hd, h1⟩ :=
+    irreducibleCharacter_apply_one_eq_pos_natCast (⟨χ, hχ⟩ : IrreducibleCharacter G)
+  exact ⟨d, hd, by simpa using h1⟩
+
+/-- **Twisting an irreducible character by a unit-norm degree-one character preserves
+irreducibility.**  If `χ ∈ Irr G` and `lam` is a genuine character with unit norm everywhere
+(`lam g · conj (lam g) = 1`) and degree one (`lam 1 = 1`) — e.g. a linear character — then
+`χ · lam ∈ Irr G`.  Indeed `χ · lam` is a virtual character (`IsCharacter.mul` + `mem_ZIrr`) of
+squared norm `⟨χ · lam, χ · lam⟩ = ⟨χ, χ⟩ = 1` (`inner_mul_self_eq_of_star_mul_self_eq_one` +
+`inner_self_eq_one`) and positive degree `(χ · lam)(1) = χ(1) · 1 = χ(1) > 0`; so it is irreducible
+(`isIrreducibleCharacter_of_inner_self_one_of_apply_one_pos`).  This is the irreducibility engine of
+Gallagher's theorem: `χ · Inf(β)` (with `Inf(β)` a linear character) is irreducible. -/
+theorem isIrreducibleCharacter_mul_of_unit_norm {G : Type*} [Group G] [Finite G] [Fintype G]
+    [Invertible (Nat.card G : ℂ)] {χ lam : ClassFunction G ℂ}
+    (hχ : IsIrreducibleCharacter χ) (hlamC : IsCharacter lam)
+    (hlamU : ∀ g, lam g * star (lam g) = 1) (hlam1 : (lam : G → ℂ) 1 = 1) :
+    IsIrreducibleCharacter (χ * lam) := by
+  have hzirr : (χ * lam) ∈ ZIrr G := (hχ.isCharacter.mul hlamC).mem_ZIrr
+  have hnorm : ClassFunction.inner (χ * lam) (χ * lam) = 1 := by
+    rw [inner_mul_self_eq_of_star_mul_self_eq_one χ hlamU, hχ.inner_self_eq_one]
+  have hpos : ∃ d : ℕ, 0 < d ∧ (χ * lam) 1 = (d : ℂ) := by
+    obtain ⟨d, hd, h1⟩ := hχ.exists_apply_one_eq_pos_natCast
+    refine ⟨d, hd, ?_⟩
+    simp only [ClassFunction.mul_apply, hlam1, mul_one, h1]
+  exact isIrreducibleCharacter_of_inner_self_one_of_apply_one_pos hzirr hnorm hpos
 
 end OddOrder.RepresentationTheory
