@@ -56,3 +56,13 @@ main は前 tick green (`781194c7`) に復帰済。
 - main green 復帰点 `781194c7`
 - memory `leaf-build-stale-green` (leaf build の stale-green 罠 — full build で節目確認)
 - `notes/meta/merge_monitor.md` ⛔ STOP プロトコル (build 失敗 → abort + cron 停止 + 報告)
+
+
+## RESOLVED (2026-07-01, commit 96e9c0a8)
+
+lane a 自身が修正済。原因は報告通りの (1) `Invertible (Nat.card M)` 欠落 **に加え**、
+(2) `induceHU` (letI 焼込) vs `ClassFunction.induce` (ambient) の **letI/haveI instance desync**
+(haveI=opaque だと defeq せず exact 不成立)。修正 = 全 instance を **letI** で供給 →
+`isIrreducibleCharacter_induce_of_inertia_eq` が exact 一発。clean rebuild (rm olean) +
+full build (3889 jobs, AxiomsCheck OK) で green 確認。正本 = issue 1012 + memory
+lean-induce-transport-instance-desync。stale-green leaf build が build-red を隠していた点に注意。

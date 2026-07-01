@@ -247,6 +247,12 @@
 
 ## 現状メモ
 
+- **2026-07-01 — hub 監視再開 + lane b cross-lane 裁定 (issue 0091)**: 第1 tick で lane a 合流
+  (Pf 9.8.c propagation + S11 build-red 修正, issue 1014 CLOSED, `2eb5389f`, push 済)。lane b は
+  `Hypothesis78.nu_isometry` を global→family に弱める **範囲逸脱 (S09_NonexistenceCertain=lane a 所有) +
+  signature contract 改変 + issue 1013 charter 違反** で STOP → **ユーザー裁定=受理** (family 版が Peterfalvi
+  忠実版, full build green で下流無破壊確認)。詳細 = issue 0091。⚠ **standing carve-out ではない**:
+  以後 lane b が S09_NonexistenceCertain を編集したら通常通り逸脱。
 - **2026-06-28 — レーン再配分 (a/b/c/d) + 監視再開**: ゲートなし・signature contract 方式へ全面再配分
   (正本 `ft_lane_reallocation_2026_06_28.md`)。worktree を `odd-order-{a,b,c,d}` に rename (`git worktree move`/
   repair、`.lake/build` cache 流用、coq submodule back-pointer 修復済)。全 4 レーン main `5f1c0be2` に同期・

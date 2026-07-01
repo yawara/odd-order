@@ -2304,6 +2304,77 @@ theorem char_eq_on_factors_of_bijective {Hbar : Type*} [CommGroup Hbar] [Finite 
       eEquiv.symm_apply_eq.mpr (Subgroup.noncommPiCoprod_mulSingle (hcomm := hcomm) i x).symm,
     MonoidHom.noncommPiCoprod_mulSingle]
 
+/-- **Character extensionality on an internal direct product** (Lemma C — uniqueness companion to
+`char_eq_on_factors_of_bijective`).  Two characters of `Hbar` that agree on every factor `S i` are
+equal: the factors span `Hbar` (`noncommPiCoprod` surjective), so a character is determined by its
+per-factor data.  The `⟸` half of the free-`W1`-orbit separation of `(9.8.c)` — per-factor agreement
+forces global equality (the `⟹` half, global equality restricting to the factors, is `congr_fun`). -/
+theorem char_eq_of_eq_on_factors {Hbar : Type*} [CommGroup Hbar] [Finite Hbar]
+    {ι : Type*} [Fintype ι] {S : ι → Subgroup Hbar}
+    (hcomm : Pairwise fun i j : ι => ∀ x y : Hbar, x ∈ S i → y ∈ S j → Commute x y)
+    (hbij : Function.Bijective (Subgroup.noncommPiCoprod hcomm))
+    {χ ψ : Hbar →* ℂˣ} (h : ∀ (i : ι) (x : ↥(S i)), χ ↑x = ψ ↑x) : χ = ψ := by
+  classical
+  let eEquiv : (∀ i : ι, ↥(S i)) ≃* Hbar :=
+    MulEquiv.ofBijective (Subgroup.noncommPiCoprod hcomm) hbij
+  have hcomp : χ.comp eEquiv.toMonoidHom = ψ.comp eEquiv.toMonoidHom := by
+    refine MonoidHom.functions_ext ℂˣ _ _ (fun i x => ?_)
+    rw [MonoidHom.comp_apply, MonoidHom.comp_apply, MulEquiv.coe_toMonoidHom,
+      show eEquiv (Pi.mulSingle i x) = (↑x : Hbar) from
+        Subgroup.noncommPiCoprod_mulSingle (hcomm := hcomm) i x]
+    exact h i x
+  refine MonoidHom.ext fun y => ?_
+  have hy := DFunLike.congr_fun hcomp (eEquiv.symm y)
+  simpa using hy
+
+/-- **The character-restriction bijection on an internal direct product**:
+`(Hbar →* ℂˣ) ≃ (∀ i, ↥(S i) →* ℂˣ)`, sending a character to its tuple of factor-restrictions.
+Injective by `char_eq_of_eq_on_factors` (Lemma C, `left_inv`), surjective by
+`char_eq_on_factors_of_bijective` (`right_inv`).  This is the counting bridge for Peterfalvi (9.8):
+it identifies the regular characters of `H̄` (nontrivial on every factor) with the tuples of nonzero
+per-factor characters, giving `|regular chars| = (p-1)^q` (`card_regular_chars`, the `oXtheta`
+numerator). -/
+noncomputable def charRestrictEquiv {Hbar : Type*} [CommGroup Hbar] [Finite Hbar]
+    {ι : Type*} [Fintype ι] {S : ι → Subgroup Hbar}
+    (hcomm : Pairwise fun i j : ι => ∀ x y : Hbar, x ∈ S i → y ∈ S j → Commute x y)
+    (hbij : Function.Bijective (Subgroup.noncommPiCoprod hcomm)) :
+    (Hbar →* ℂˣ) ≃ (∀ i, ↥(S i) →* ℂˣ) where
+  toFun χ i := χ.comp (S i).subtype
+  invFun ψ := (char_eq_on_factors_of_bijective hcomm hbij ψ).choose
+  left_inv χ := by
+    refine char_eq_of_eq_on_factors hcomm hbij (fun i x => ?_)
+    exact (char_eq_on_factors_of_bijective hcomm hbij
+      (fun i => χ.comp (S i).subtype)).choose_spec i x
+  right_inv ψ := by
+    funext i
+    exact MonoidHom.ext fun x =>
+      (char_eq_on_factors_of_bijective hcomm hbij ψ).choose_spec i x
+
+/-- **The count of regular characters** (Peterfalvi (9.8) `oXtheta` numerator, `card_pffun_on`):
+on an internal direct product `Hbar = ⊕ᵢ Sᵢ` of `q = |ι|` factors each of order `p`, the characters
+nontrivial on *every* factor number `(p-1)^q`.  Via `charRestrictEquiv` these correspond to tuples of
+nonzero per-factor characters; each factor `Sᵢ` (order `p`) has `p` characters
+(`card_monoidHom_of_hasEnoughRootsOfUnity`), hence `p-1` nonzero ones, and the product is
+`(p-1)^q`. -/
+theorem card_regular_chars {Hbar : Type*} [CommGroup Hbar] [Finite Hbar]
+    {ι : Type*} [Fintype ι] {S : ι → Subgroup Hbar}
+    (hcomm : Pairwise fun i j : ι => ∀ x y : Hbar, x ∈ S i → y ∈ S j → Commute x y)
+    (hbij : Function.Bijective (Subgroup.noncommPiCoprod hcomm))
+    {p : ℕ} (hp : ∀ i, Nat.card ↥(S i) = p) :
+    Nat.card {χ : Hbar →* ℂˣ // ∀ i, χ.comp (S i).subtype ≠ 1} = (p - 1) ^ (Fintype.card ι) := by
+  classical
+  haveI : ∀ i, Fintype (↥(S i) →* ℂˣ) := fun _ => Fintype.ofFinite _
+  have e1 : {χ : Hbar →* ℂˣ // ∀ i, χ.comp (S i).subtype ≠ 1} ≃
+      {ψ : ∀ i, ↥(S i) →* ℂˣ // ∀ i, ψ i ≠ 1} :=
+    (charRestrictEquiv hcomm hbij).subtypeEquiv (fun _ => Iff.rfl)
+  rw [Nat.card_congr e1, Nat.card_congr (Equiv.subtypePiEquivPi (p := fun i (ψ : ↥(S i) →* ℂˣ) =>
+        ψ ≠ 1)), Nat.card_eq_fintype_card, Fintype.card_pi]
+  have hfac : ∀ i, Fintype.card {ψ : ↥(S i) →* ℂˣ // ψ ≠ 1} = p - 1 := by
+    intro i
+    rw [Fintype.card_subtype_compl, Fintype.card_subtype_eq, ← Nat.card_eq_fintype_card,
+      CommGroup.card_monoidHom_of_hasEnoughRootsOfUnity ↥(S i) ℂ, hp i]
+  rw [Finset.prod_congr rfl (fun i _ => hfac i), Finset.prod_const, Finset.card_univ]
+
 /-- **A regular character not fixed by a factor-permuting automorphism.**  Given the internal
 direct product `(noncommPiCoprod hbij)` of prime-order (`≥ 3`) factors `S i`, and an automorphism
 `τ` mapping factor `S i₀` onto a *different* factor `S j₀`, there is a character nontrivial on every
@@ -6359,6 +6430,332 @@ theorem hcZeta_mem_xiSet [Finite G] {M : Subgroup G}
   refine Units.ext ?_
   rw [Units.val_one]
   exact hψker
+
+set_option maxHeartbeats 1000000 in
+/-- **`ζ ∈ 𝒳(H₀C)`**: combining the two halves `H ⊄ Ker ζ` (`hcZeta_mem_xiSet`) and `H₀C ⊆ Ker ζ`
+(`hcZeta_H0supC_subset_ker`).  This is the source character of the (9.8.c) `𝒮(H₀C)`-member
+`Ind_{HU}^M ζ` of degree `qu`. -/
+theorem hcZeta_mem_xiOf [Finite G] {M : Subgroup G}
+    {data : TypesIIIIIIVSetup M} (chief : ChiefFactorData data)
+    (θ : (↥data.H ⧸ chief.N) →* ℂˣ) (hθnt : θ ≠ 1)
+    [Fintype ↥(huSub data)]
+    [Fintype ↥(hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf (huSub data))]
+    [Invertible (Nat.card ↥(huSub data) : ℂ)]
+    [Invertible (Nat.card ↥(hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf
+      (huSub data)) : ℂ)]
+    [(hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf (huSub data)).Normal]
+    (hθ₀ : ClassFunction.inertia (ClassFunction.compHom (hInHuEquivH data).toMonoidHom
+        (ClassFunction.compHom (QuotientGroup.mk' chief.N)
+          (linearIrreducibleCharacter θ : ClassFunction (↥data.H ⧸ chief.N) ℂ)))
+        = hInHu data ⊔ cInHu data chief) :
+    (⟨ClassFunction.induce
+        (hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf (huSub data))
+        (hcPsi chief θ), hcZeta_irreducible chief θ hθ₀⟩ :
+        IrreducibleCharacter ↥(huSub data)) ∈ xiOf data (chief.H0 ⊔ cSub data chief) := by
+  rw [mem_xiOf]
+  exact ⟨hcZeta_mem_xiSet chief θ hθnt hθ₀, hcZeta_H0supC_subset_ker chief θ⟩
+
+/-- **Degree of the (9.8.c) `𝒮`-member**: `(Ind_{HU}^M ζ)(1) = q·u = qu`.  Combines the `HU→M`
+index `[M:HU] = q` (`induceHU_apply_one_eq_q_mul`) with `ζ(1) = u` (`hcZeta_apply_one`). -/
+theorem hcZeta_induceHU_apply_one [Finite G] {M : Subgroup G}
+    {data : TypesIIIIIIVSetup M} {chief : ChiefFactorData data}
+    (chars : Section11CharacterData data chief)
+    (θ : (↥data.H ⧸ chief.N) →* ℂˣ)
+    [Fintype ↥(huSub data)]
+    [Fintype ↥(hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf (huSub data))]
+    [Invertible (Nat.card ↥(hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf
+      (huSub data)) : ℂ)] :
+    induceHU data (ClassFunction.induce
+        (hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf (huSub data))
+        (hcPsi chief θ) : ClassFunction ↥(huSub data) ℂ) (1 : ↥M)
+      = ((data.q * chars.u : ℕ) : ℂ) := by
+  rw [induceHU_apply_one_eq_q_mul, hcZeta_apply_one chars θ, Nat.cast_mul]
+
+/-- **`Ind_{HU}^M ζ ∈ 𝒮(H₀C)`**: the (9.8.c) degree-`qu` character is a member of `𝒮(H₀C)`, witnessed
+by its source `ζ ∈ 𝒳(H₀C)` (`hcZeta_mem_xiOf`). -/
+theorem hcZeta_induceHU_mem_sOf [Finite G] {M : Subgroup G}
+    {data : TypesIIIIIIVSetup M} {chief : ChiefFactorData data}
+    (chars : Section11CharacterData data chief)
+    (θ : (↥data.H ⧸ chief.N) →* ℂˣ) (hθnt : θ ≠ 1)
+    [Fintype ↥(huSub data)]
+    [Fintype ↥(hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf (huSub data))]
+    [Invertible (Nat.card ↥(huSub data) : ℂ)]
+    [Invertible (Nat.card ↥(hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf
+      (huSub data)) : ℂ)]
+    [(hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf (huSub data)).Normal]
+    (hθ₀ : ClassFunction.inertia (ClassFunction.compHom (hInHuEquivH data).toMonoidHom
+        (ClassFunction.compHom (QuotientGroup.mk' chief.N)
+          (linearIrreducibleCharacter θ : ClassFunction (↥data.H ⧸ chief.N) ℂ)))
+        = hInHu data ⊔ cInHu data chief) :
+    induceHU data (ClassFunction.induce
+        (hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf (huSub data))
+        (hcPsi chief θ) : ClassFunction ↥(huSub data) ℂ)
+      ∈ sOf data (chief.H0 ⊔ cSub data chief) := by
+  rw [mem_sOf]
+  exact ⟨⟨ClassFunction.induce
+      (hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf (huSub data))
+      (hcPsi chief θ), hcZeta_irreducible chief θ hθ₀⟩,
+    hcZeta_mem_xiOf chief θ hθnt hθ₀, rfl⟩
+
+/-- **`Ind_{HU}^M ζ` is irreducible** given `ζ` is not `W₁`-fixed (`I_M(ζ) ≠ M`).  Since `HU ◁ M`
+with `[M : HU] = q` prime, `HU ≤ I_M(ζ) ≤ M` and `I_M(ζ) ≠ M` force `I_M(ζ) = HU`
+(`eq_of_le_of_prime_index`), whence `Ind_{HU}^M ζ` is irreducible
+(`isIrreducibleCharacter_induce_of_inertia_eq`).  The remaining input `hIM` (`ζ` not `W₁`-fixed) is
+supplied by propagating `θ̄`'s free-`W₁`-orbit (`clifford_caseA_exists_char_inertia_hc_not_fixed`'s
+`w₀` datum) through the construction. -/
+theorem hcZeta_induceHU_irreducible [Finite G] {M : Subgroup G}
+    {data : TypesIIIIIIVSetup M} {chief : ChiefFactorData data}
+    (chars : Section11CharacterData data chief)
+    (θ : (↥data.H ⧸ chief.N) →* ℂˣ)
+    [Fintype ↥(huSub data)]
+    [Fintype ↥(hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf (huSub data))]
+    [Invertible (Nat.card ↥(hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf
+      (huSub data)) : ℂ)]
+    [(hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf (huSub data)).Normal]
+    (hθ₀ : ClassFunction.inertia (ClassFunction.compHom (hInHuEquivH data).toMonoidHom
+        (ClassFunction.compHom (QuotientGroup.mk' chief.N)
+          (linearIrreducibleCharacter θ : ClassFunction (↥data.H ⧸ chief.N) ℂ)))
+        = hInHu data ⊔ cInHu data chief)
+    (hIM : ClassFunction.inertia (ClassFunction.induce
+        (hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf (huSub data))
+        (hcPsi chief θ) : ClassFunction ↥(huSub data) ℂ) ≠ ⊤) :
+    IsIrreducibleCharacter (induceHU data (ClassFunction.induce
+      (hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf (huSub data))
+      (hcPsi chief θ) : ClassFunction ↥(huSub data) ℂ)) := by
+  -- `letI` (not `haveI`) keeps the instances transparent so `induceHU = ClassFunction.induce`
+  -- holds by `rfl` (matching `induceHU`'s own `letI`s); cf. the `hunfold` idiom at `reducible_count`.
+  letI : Fintype ↥M := Fintype.ofFinite _
+  letI : Invertible (Nat.card ↥(huSub data) : ℂ) :=
+    invertibleOfNonzero (Nat.cast_ne_zero.mpr Nat.card_pos.ne')
+  letI : Invertible (Nat.card ↥M : ℂ) :=
+    invertibleOfNonzero (Nat.cast_ne_zero.mpr Nat.card_pos.ne')
+  have hIeq : ClassFunction.inertia (ClassFunction.induce
+      (hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf (huSub data))
+      (hcPsi chief θ) : ClassFunction ↥(huSub data) ℂ) = huSub data := by
+    refine eq_of_le_of_prime_index (ClassFunction.subgroup_le_inertia _) ?_ hIM
+    rw [huSub_index_eq_q]; exact data.nontrivial.2.1
+  exact isIrreducibleCharacter_induce_of_inertia_eq
+    (⟨ClassFunction.induce
+      (hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf (huSub data))
+      (hcPsi chief θ), hcZeta_irreducible chief θ hθ₀⟩ : IrreducibleCharacter ↥(huSub data)) hIeq
+
+/-- **Conjunct (c) of (9.8.c), `hIM`-gated assembly**: given the not-`W₁`-fixed datum (`hIM`), the
+(9.8.c) construction `Ind_{HU}^M ζ` witnesses an irreducible `𝒮(H₀C)`-member of degree `qu`.  Bundles
+the membership (`hcZeta_induceHU_mem_sOf`), irreducibility (`hcZeta_induceHU_irreducible`), and degree
+(`hcZeta_induceHU_apply_one`).  Discharging `hIM` (the free-`W₁`-orbit propagation `θ̄^{w₀}≠θ̄ ⟹
+ζ^{w₀}≠ζ`) closes conjunct (c) of `caseA_character_counts`. -/
+theorem hcZeta_exists_irreducible_sOf [Finite G] {M : Subgroup G}
+    {data : TypesIIIIIIVSetup M} {chief : ChiefFactorData data}
+    (chars : Section11CharacterData data chief)
+    (θ : (↥data.H ⧸ chief.N) →* ℂˣ) (hθnt : θ ≠ 1)
+    [Fintype ↥(huSub data)]
+    [Fintype ↥(hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf (huSub data))]
+    [Invertible (Nat.card ↥(huSub data) : ℂ)]
+    [Invertible (Nat.card ↥(hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf
+      (huSub data)) : ℂ)]
+    [(hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf (huSub data)).Normal]
+    (hθ₀ : ClassFunction.inertia (ClassFunction.compHom (hInHuEquivH data).toMonoidHom
+        (ClassFunction.compHom (QuotientGroup.mk' chief.N)
+          (linearIrreducibleCharacter θ : ClassFunction (↥data.H ⧸ chief.N) ℂ)))
+        = hInHu data ⊔ cInHu data chief)
+    (hIM : ClassFunction.inertia (ClassFunction.induce
+        (hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf (huSub data))
+        (hcPsi chief θ) : ClassFunction ↥(huSub data) ℂ) ≠ ⊤) :
+    ∃ χ ∈ sOf data (chief.H0 ⊔ cSub data chief),
+      IsIrreducibleCharacter χ ∧ χ (1 : ↥M) = ((data.q * chars.u : ℕ) : ℂ) :=
+  ⟨induceHU data (ClassFunction.induce
+      (hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf (huSub data))
+      (hcPsi chief θ) : ClassFunction ↥(huSub data) ℂ),
+    hcZeta_induceHU_mem_sOf chars θ hθnt hθ₀,
+    hcZeta_induceHU_irreducible chars θ hθ₀ hIM,
+    hcZeta_induceHU_apply_one chars θ⟩
+
+/-- **`H ◁ M`** realized: `(data.H.subgroupOf M).Normal`.  Extracted as in `hInHu_normal`. -/
+theorem hSubgroupOfM_normal {M : Subgroup G} (data : TypesIIIIIIVSetup M) :
+    (data.H.subgroupOf M).Normal := by
+  rw [show data.H = maxNilpotentNormalHall M from data.typeP.H_eq]
+  exact OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_subgroupOf_normal M
+
+/-- **The `m`-conjugation automorphism of `hInHu`** (`m ∈ M`).  Well-defined since `H ◁ M`
+(`hSubgroupOfM_normal`), so `m` normalizes `hInHu`.  Realizing the `M`-conjugation of an
+`hInHu`-character as `compHom` by this hom keeps the (9.8.c) free-`W₁`-orbit argument at the `hInHu`
+level (no subgroup-realization transport). -/
+noncomputable def hInHuConj {M : Subgroup G} (data : TypesIIIIIIVSetup M) (m : ↥M) :
+    ↥(hInHu data) →* ↥(hInHu data) where
+  toFun h := ⟨ClassFunction.conjByMulEquiv (G := ↥M) (H := huSub data) m (h : ↥(huSub data)), by
+    refine Subgroup.mem_subgroupOf.mpr ?_
+    rw [ClassFunction.conjByMulEquiv_apply]
+    exact (hSubgroupOfM_normal data).conj_mem _ (Subgroup.mem_subgroupOf.mp h.2) m⟩
+  map_one' := by
+    apply Subtype.ext
+    simp
+  map_mul' h₁ h₂ := by
+    apply Subtype.ext
+    simp [map_mul]
+
+@[simp] theorem hInHuConj_coe {M : Subgroup G} (data : TypesIIIIIIVSetup M) (m : ↥M)
+    (h : ↥(hInHu data)) :
+    (((hInHuConj data m h : ↥(hInHu data)) : ↥(huSub data)) : ↥M)
+      = m * ((h : ↥(huSub data)) : ↥M) * m⁻¹ :=
+  rfl
+
+/-- **Core identity for L1**: restricting the `M`-conjugate `conjBy m ζ` of an `HU`-character `ζ`
+to `H = hInHu` equals `compHom`-by-`φ_m` of `Res ζ`.  Both evaluate at `h ∈ hInHu` to
+`ζ(m·h·m⁻¹)`.  This converts the `M`-conjugation (needed for `I_M(ζ)`) into a `compHom`-by-aut
+at the `hInHu` level, the hinge of the (9.8.c) free-`W₁`-orbit argument. -/
+theorem hInHuConj_restrict_conjBy {M : Subgroup G} (data : TypesIIIIIIVSetup M) (m : ↥M)
+    (ζ : ClassFunction ↥(huSub data) ℂ) :
+    ClassFunction.restrict (hInHu data) (ClassFunction.conjBy m ζ)
+      = ClassFunction.compHom (hInHuConj data m) (ClassFunction.restrict (hInHu data) ζ) := by
+  ext h
+  rfl
+
+/-- **Inner sum is invariant under `compHom` by a bijective endomorphism** (reindexing the sum by
+the induced permutation).  Mirrors `innerSum_conjBy_conjBy`. -/
+theorem innerSum_compHom_of_bijective {H : Type*} [Group H] [Fintype H]
+    (e : H →* H) (he : Function.Bijective e) (a b : ClassFunction H ℂ) :
+    ClassFunction.innerSum (ClassFunction.compHom e a) (ClassFunction.compHom e b)
+      = ClassFunction.innerSum a b := by
+  simpa [ClassFunction.innerSum, ClassFunction.compHom_apply] using
+    Fintype.sum_equiv (Equiv.ofBijective e he)
+      (fun h => a (e h) * star (b (e h))) (fun h => a h * star (b h)) (fun _ => rfl)
+
+/-- **Inner product is invariant under `compHom` by a bijective endomorphism.** -/
+theorem inner_compHom_of_bijective {H : Type*} [Group H] [Fintype H]
+    [Invertible (Nat.card H : ℂ)] (e : H →* H) (he : Function.Bijective e)
+    (a b : ClassFunction H ℂ) :
+    ClassFunction.inner (ClassFunction.compHom e a) (ClassFunction.compHom e b)
+      = ClassFunction.inner a b := by
+  simp [ClassFunction.inner, innerSum_compHom_of_bijective e he]
+
+/-- **`φ_m` is bijective** (inverse `φ_{m⁻¹}`), so `compHom φ_m` preserves inner products and
+irreducibility. -/
+theorem hInHuConj_bijective {M : Subgroup G} (data : TypesIIIIIIVSetup M) (m : ↥M) :
+    Function.Bijective (hInHuConj data m) := by
+  refine Function.bijective_iff_has_inverse.mpr ⟨hInHuConj data m⁻¹, ?_, ?_⟩ <;>
+  · intro h
+    apply Subtype.ext
+    apply Subtype.ext
+    simp only [hInHuConj_coe]
+    group
+
+/-- **L2 result: `LiesOver`-equivariance under an `M`-fixing `m`.**  If `ζ` is fixed by `conjBy m`
+and lies over `θ₀`, then `ζ` also lies over the `φ_m`-conjugate `φθ₀ = compHom φ_m θ₀`.  Proof: the
+restriction multiplicity `⟨Res ζ, φθ₀⟩ = ⟨Res ζ, compHom φ_m θ₀⟩ = ⟨compHom φ_m (Res ζ), compHom φ_m
+θ₀⟩` (by `Res ζ = compHom φ_m (Res ζ)`, from `conjBy m ζ = ζ` and the L1 identity) `= ⟨Res ζ, θ₀⟩ ≠ 0`
+(`inner_compHom_of_bijective`). -/
+theorem hcZeta_liesOver_compHom_of_fixed {M : Subgroup G}
+    {data : TypesIIIIIIVSetup M} (m : ↥M)
+    [Fintype ↥(hInHu data)] [Invertible (Nat.card ↥(hInHu data) : ℂ)]
+    (ζ : IrreducibleCharacter ↥(huSub data)) (θ₀ φθ₀ : IrreducibleCharacter ↥(hInHu data))
+    (hlo : OddOrder.RepresentationTheory.IrreducibleCharacter.LiesOver (hInHu data) ζ θ₀)
+    (hfix : ClassFunction.conjBy m (ζ : ClassFunction ↥(huSub data) ℂ)
+      = (ζ : ClassFunction ↥(huSub data) ℂ))
+    (hφθ₀ : (φθ₀ : ClassFunction ↥(hInHu data) ℂ)
+      = ClassFunction.compHom (hInHuConj data m) (θ₀ : ClassFunction ↥(hInHu data) ℂ)) :
+    OddOrder.RepresentationTheory.IrreducibleCharacter.LiesOver (hInHu data) ζ φθ₀ := by
+  rw [OddOrder.RepresentationTheory.IrreducibleCharacter.liesOver_iff,
+    ClassFunction.restrictionMultiplicity_def, hφθ₀,
+    show ClassFunction.restrict (hInHu data) (ζ : ClassFunction ↥(huSub data) ℂ)
+        = ClassFunction.compHom (hInHuConj data m)
+            (ClassFunction.restrict (hInHu data) (ζ : ClassFunction ↥(huSub data) ℂ)) from by
+        rw [← hInHuConj_restrict_conjBy, hfix],
+    inner_compHom_of_bijective _ (hInHuConj_bijective data m)]
+  have h := hlo
+  rwa [OddOrder.RepresentationTheory.IrreducibleCharacter.liesOver_iff,
+    ClassFunction.restrictionMultiplicity_def] at h
+
+/-- **L3: SingleOrbit reduction.**  If `ζ` is fixed by `conjBy m` and lies over `θ₀`, then `θ₀` and
+its `φ_m`-conjugate are `HU`-conjugate: there is `g ∈ HU` with `conjBy g θ₀ = compHom φ_m θ₀`.  By
+the L2 equivariance `ζ` lies over both `θ₀` and `φ_m·θ₀`, and Clifford's single-orbit theorem
+(`restrictionConstituentsSingleOrbit_of_isIrreducible`) puts both constituents in one `HU`-orbit
+(`exists_conj`).  The free-`W₁`-orbit hypothesis (L4) will deny exactly this. -/
+theorem hcZeta_exists_conj_of_fixed {M : Subgroup G} {data : TypesIIIIIIVSetup M} (m : ↥M)
+    [Fintype ↥(hInHu data)] [Invertible (Nat.card ↥(hInHu data) : ℂ)]
+    (ζ : IrreducibleCharacter ↥(huSub data)) (θ₀ : IrreducibleCharacter ↥(hInHu data))
+    (hlo : OddOrder.RepresentationTheory.IrreducibleCharacter.LiesOver (hInHu data) ζ θ₀)
+    (hfix : ClassFunction.conjBy m (ζ : ClassFunction ↥(huSub data) ℂ)
+      = (ζ : ClassFunction ↥(huSub data) ℂ)) :
+    ∃ g : ↥(huSub data), ClassFunction.conjBy g (θ₀ : ClassFunction ↥(hInHu data) ℂ)
+      = ClassFunction.compHom (hInHuConj data m) (θ₀ : ClassFunction ↥(hInHu data) ℂ) := by
+  have hirr : IsIrreducibleCharacter
+      (ClassFunction.compHom (hInHuConj data m) (θ₀ : ClassFunction ↥(hInHu data) ℂ)) :=
+    θ₀.isIrreducible.compHom_of_surjective (hInHuConj_bijective data m).surjective
+  set φθ₀ : IrreducibleCharacter ↥(hInHu data) :=
+    ⟨ClassFunction.compHom (hInHuConj data m) (θ₀ : ClassFunction ↥(hInHu data) ℂ), hirr⟩
+    with hφdef
+  have hη := hcZeta_liesOver_compHom_of_fixed m ζ θ₀ φθ₀ hlo hfix rfl
+  obtain ⟨g, hg⟩ :=
+    OddOrder.RepresentationTheory.IrreducibleCharacter.RestrictionConstituentsSingleOrbit.exists_conj
+      (OddOrder.RepresentationTheory.restrictionConstituentsSingleOrbit_of_isIrreducible ζ) hlo hη
+  refine ⟨g, ?_⟩
+  have hc := congrArg (fun x : IrreducibleCharacter ↥(hInHu data) =>
+    (x : ClassFunction ↥(hInHu data) ℂ)) hg
+  simpa [OddOrder.RepresentationTheory.IrreducibleCharacter.coe_conjBy, hφdef] using hc
+
+/-- **`I_M(ζ) ≠ M` from the free-`W₁`-orbit** (the reduction side of `hIM`, complete).  If there is
+*no* `g ∈ HU` with `conjBy g θ₀ = compHom φ_m θ₀` (the free-orbit hypothesis L4), then `m ∉ I_M(ζ)`,
+so `I_M(ζ) ≠ ⊤ = M`.  Indeed `m ∈ I_M(ζ)` would give `conjBy m ζ = ζ`, and L3
+(`hcZeta_exists_conj_of_fixed`) would then produce exactly the forbidden `g`.  Combined with
+`HU ≤ I_M(ζ) ≤ M` and `[M:HU]=q` prime, this is `hIM` for `hcZeta_induceHU_irreducible`. -/
+theorem hcZeta_inertia_ne_top_of_free {M : Subgroup G} {data : TypesIIIIIIVSetup M} (m : ↥M)
+    [Fintype ↥(hInHu data)] [Invertible (Nat.card ↥(hInHu data) : ℂ)]
+    (ζ : IrreducibleCharacter ↥(huSub data)) (θ₀ : IrreducibleCharacter ↥(hInHu data))
+    (hlo : OddOrder.RepresentationTheory.IrreducibleCharacter.LiesOver (hInHu data) ζ θ₀)
+    (hfree : ¬ ∃ g : ↥(huSub data), ClassFunction.conjBy g (θ₀ : ClassFunction ↥(hInHu data) ℂ)
+      = ClassFunction.compHom (hInHuConj data m) (θ₀ : ClassFunction ↥(hInHu data) ℂ)) :
+    ClassFunction.inertia (ζ : ClassFunction ↥(huSub data) ℂ) ≠ ⊤ := by
+  intro htop
+  have hmem : m ∈ ClassFunction.inertia (ζ : ClassFunction ↥(huSub data) ℂ) :=
+    htop ▸ Subgroup.mem_top m
+  rw [ClassFunction.mem_inertia] at hmem
+  exact hfree (hcZeta_exists_conj_of_fixed m ζ θ₀ hlo hmem)
+
+/-- **`φ_m`-analog of the inflation-conjugation commute.**  For `m ∈ M` realized by `b ∈ U W₁`
+(`↑m = ↑b`), `compHom φ_m` of an inflation equals the inflation of `typeP_conjAction b`.  Mirrors
+`conjBy_compHom_hInHuEquivH` (both reduce to `m·h·m⁻¹ = b·h·b⁻¹` in `G`), turning the `M`-conjugation
+`compHom φ_m θ₀` of the chief-factor `θ₀` into the abstract `b`-action on `H`. -/
+theorem compHom_hInHuConj_hInHuEquivH {M : Subgroup G} (data : TypesIIIIIIVSetup M)
+    (b : ↥(data.typeP.U ⊔ data.typeP.W1)) (m : ↥M) (hmb : ((m : G)) = (b : G))
+    (θ : ClassFunction ↥data.H ℂ) :
+    ClassFunction.compHom (hInHuConj data m)
+        (ClassFunction.compHom (hInHuEquivH data).toMonoidHom θ)
+      = ClassFunction.compHom (hInHuEquivH data).toMonoidHom
+          (ClassFunction.compHom (typeP_conjAction data.typeP b).toMonoidHom θ) := by
+  ext h
+  rw [ClassFunction.compHom_apply, ClassFunction.compHom_apply, ClassFunction.compHom_apply,
+    ClassFunction.compHom_apply]
+  refine congrArg _ (Subtype.ext ?_)
+  simp only [MulEquiv.coe_toMonoidHom, hInHuEquivH_coe, typeP_conjAction_apply, hInHuConj_coe,
+    Subgroup.coe_mul, Subgroup.coe_inv]
+  rw [hmb]
+
+/-- **L4 connection core**: the free-orbit equality `conjBy g θ₀ = compHom φ_m θ₀` (for `θ₀` the
+inflation of `θ̄`, `↑g = ↑a`, `↑m = ↑b`) is equivalent to the quotient-level equality
+`quotientMulAutHom a θ̄ = quotientMulAutHom b θ̄`.  Chains the two inflation-conjugation commutes
+(`conjBy_compHom_hInHuEquivH`, `compHom_hInHuConj_hInHuEquivH`), the descent
+(`compHom_typeP_conjAction_inflation`, `rfl`), and double inflation injectivity
+(`compHom_injective_of_surjective` for `hInHuEquivH` and `mk' N`).  This turns `hfree` into the pure
+free-`W₁`-orbit statement `θ̄^{w₀} ∉ U-orbit`. -/
+theorem conjBy_eq_compHom_iff_quotient [Finite G] {M : Subgroup G} {data : TypesIIIIIIVSetup M}
+    {chief : ChiefFactorData data} (a b : ↥(data.typeP.U ⊔ data.typeP.W1))
+    (g : ↥(huSub data)) (m : ↥M) (hag : ((g : ↥M) : G) = (a : G)) (hbm : ((m : G)) = (b : G))
+    (θbar : ClassFunction (↥data.H ⧸ chief.N) ℂ) :
+    ClassFunction.conjBy g (ClassFunction.compHom (hInHuEquivH data).toMonoidHom
+        (ClassFunction.compHom (QuotientGroup.mk' chief.N) θbar))
+      = ClassFunction.compHom (hInHuConj data m)
+          (ClassFunction.compHom (hInHuEquivH data).toMonoidHom
+            (ClassFunction.compHom (QuotientGroup.mk' chief.N) θbar))
+    ↔ ClassFunction.compHom (quotientMulAutHom chief.N_aInvariant a).toMonoidHom θbar
+      = ClassFunction.compHom (quotientMulAutHom chief.N_aInvariant b).toMonoidHom θbar := by
+  rw [conjBy_compHom_hInHuEquivH data a g hag, compHom_hInHuConj_hInHuEquivH data b m hbm,
+    compHom_typeP_conjAction_inflation, compHom_typeP_conjAction_inflation]
+  constructor
+  · intro h
+    exact ClassFunction.compHom_injective_of_surjective (QuotientGroup.mk'_surjective chief.N)
+      (ClassFunction.compHom_injective_of_surjective (hInHuEquivH data).surjective h)
+  · intro h
+    rw [h]
 
 end OddOrder.Peterfalvi.S11
 

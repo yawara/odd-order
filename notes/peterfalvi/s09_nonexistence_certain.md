@@ -1,5 +1,11 @@
 # Peterfalvi §9: Non-existence of a Certain Type of Group of Odd Order — mini-roadmap
 
+> 🔔 **2026-07-01 cross-lane 通知 (issue 0091)**: `Hypothesis78.nu_isometry` フィールドが
+> lane b により **global (`∀ φ ψ`) → family (`∀ i j, i≠ind1H → j≠ind1H`)** に弱められ、
+> ユーザー裁定で合流済 (family 版が Peterfalvi 忠実版; global 拡張は次元不整合で一般に不存在)。
+> 派生 `nu_zeta_inner_self_eq_one(_of_irreducible)` は `hi : i ≠ ind1H` 引数を追加取得。field は
+> 引き続き lane a 所有。今後の変更は HUB issue 経由。詳細 = issue 0091。
+
 **スコープ**: Peterfalvi §9 (pp. 38-43), mmd `04.9_pp_38_43_Non-existence_of_a_Certain_Type_of_Group_of_Odd_Order.mmd` (162 行).
 形式化先: [`OddOrder/Peterfalvi/S09_NonexistenceCertain.lean`](../../OddOrder/Peterfalvi/S09_NonexistenceCertain.lean) (作成済 — statement scaffold).
 ROADMAP 上の位置: **Phase 2b 第 4 波** (§3-§8 完成後着手).
