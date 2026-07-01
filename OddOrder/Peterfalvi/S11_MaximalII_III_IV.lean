@@ -5953,6 +5953,92 @@ theorem caseB_exists_chiefFactorConstituent [Finite G]
     simp only [ClassFunction.compHom_apply, map_one]
     exact θbar.isIrreducible.apply_one_eq_one_of_isMulCommutative
 
+/-- **caseA constituent extraction (hom form)** (Peterfalvi (9.8.c) surjectivity route): any
+`χ ∈ 𝒳` with `H₀ ⊆ Ker χ` lies over a nontrivial *linear* chief-factor constituent
+`linearIrreducibleCharacter (θbar ∘ mk'N ∘ hInHuEquivH)` for some nontrivial `θbar : H̄ →* ℂˣ`.
+
+Case-agnostic (no `U`-irreducibility): mirrors `caseB_exists_chiefFactorConstituent`'s constituent
+extraction but returns the *hom-form* seed `θbar : H̄ →* ℂˣ` — needed for the per-`Hpart` regularity
+argument of the (9.8.c) surjectivity route, which multiplies `θbar` by the `Hpart i` inclusions
+(`θbar.comp (caseA.Hpart i).subtype`).  Extract a constituent `θ` of `Res_H χ` not killing `H`
+(`exists_constituent_not_subset_characterKernel`), inflate it through `f = mk'N ∘ hInHuEquivH`
+(`H₀ ⊆ Ker χ ⟹ f.ker ⊆ Ker θ`, `exists_compHom_eq_of_subset_characterKernel`), and convert the
+resulting irreducible `H̄`-character to hom form (`H̄` abelian,
+`exists_units_monoidHom_of_isIrreducibleCharacter_of_isMulCommutative`).  The caseA regularity of
+`θbar` (from `M`-fixedness of `χ`) is established separately. -/
+theorem exists_hom_constituent_of_mem_xiSet_H0 [Finite G]
+    {M : Subgroup G} {data : TypesIIIIIIVSetup M} {chief : ChiefFactorData data}
+    [Fintype ↥(hInHu data)] [Invertible (Nat.card ↥(hInHu data) : ℂ)]
+    {χ : IrreducibleCharacter ↥(huSub data)}
+    (hχX : χ ∈ xiSet data)
+    (hχH0 : ((chief.H0.subgroupOf M).subgroupOf (huSub data) : Set ↥(huSub data)) ⊆
+        OddOrder.Peterfalvi.S03.characterKernel (χ : ClassFunction ↥(huSub data) ℂ)) :
+    ∃ θbar : (↥data.H ⧸ chief.N) →* ℂˣ,
+      θbar ≠ 1 ∧
+      IrreducibleCharacter.LiesOver (hInHu data) χ
+        (linearIrreducibleCharacter (θbar.comp ((QuotientGroup.mk' chief.N).comp
+          (hInHuEquivH data).toMonoidHom))) := by
+  classical
+  haveI : Fintype ↥(huSub data) := Fintype.ofFinite _
+  haveI : Invertible (Nat.card ↥(huSub data) : ℂ) :=
+    invertibleOfNonzero (Nat.cast_ne_zero.mpr Nat.card_pos.ne')
+  haveI : Fintype (IrreducibleCharacter ↥(hInHu data)) := Fintype.ofFinite _
+  -- A nontrivial constituent `θ` of `Res^{HU}_H χ` (`H ⊄ Ker χ`).
+  obtain ⟨θ, hθlo, hθnt⟩ :=
+    OddOrder.RepresentationTheory.exists_constituent_not_subset_characterKernel
+      (A := hInHu data) (B := hInHu data) le_rfl χ hχX
+  -- The descent hom `f = (mk' N) ∘ hInHuEquivH : ↥(hInHu) → H̄ = ↥H ⧸ N`.
+  set f : ↥(hInHu data) →* (↥data.H ⧸ chief.N) :=
+    (QuotientGroup.mk' chief.N).comp (hInHuEquivH data).toMonoidHom with hf
+  have hfsurj : Function.Surjective f :=
+    (QuotientGroup.mk'_surjective chief.N).comp (hInHuEquivH data).surjective
+  -- `f.ker ⊆ ker θ`: `f x = 1` puts the `G`-coordinate of `x` in `H₀ ⊆ ker χ`.
+  have hfker : (f.ker : Set ↥(hInHu data)) ⊆
+      OddOrder.Peterfalvi.S03.characterKernel (θ : ClassFunction ↥(hInHu data) ℂ) := by
+    intro x hx
+    have hxN : (hInHuEquivH data) x ∈ chief.N := by
+      have hx1 : f x = 1 := hx
+      rw [hf, MonoidHom.comp_apply, MulEquiv.coe_toMonoidHom, QuotientGroup.mk'_apply,
+        QuotientGroup.eq_one_iff] at hx1
+      exact hx1
+    have hxH0 : (((x : ↥(huSub data)) : ↥M) : G) ∈ chief.H0 := by
+      rw [chief.H0_eq, ← hInHuEquivH_coe data x]
+      exact Subgroup.mem_map_of_mem data.H.subtype hxN
+    have hxχ : (x : ↥(huSub data)) ∈
+        OddOrder.Peterfalvi.S03.characterKernel (χ : ClassFunction ↥(huSub data) ℂ) := by
+      apply hχH0
+      rw [SetLike.mem_coe, Subgroup.mem_subgroupOf, Subgroup.mem_subgroupOf]
+      exact hxH0
+    exact liesOver_mem_characterKernel hθlo hxχ
+  -- `θ` is an inflation `θ = compHom f θbar_irr` for some `θbar_irr ∈ Irr(H̄)`.
+  obtain ⟨θbar_irr, hθbar⟩ :=
+    OddOrder.RepresentationTheory.exists_compHom_eq_of_subset_characterKernel hfsurj θ hfker
+  -- `H̄` abelian, so `θbar_irr` is a linear character `θbar : H̄ →* ℂˣ`.
+  haveI : IsMulCommutative (↥data.H ⧸ chief.N) :=
+    ⟨⟨chief.quotient_elementaryAbelian.1⟩⟩
+  obtain ⟨θbar, hθbarval⟩ :=
+    exists_units_monoidHom_of_isIrreducibleCharacter_of_isMulCommutative θbar_irr.isIrreducible
+  have hθbar_eq : (θbar_irr : ClassFunction (↥data.H ⧸ chief.N) ℂ)
+      = (linearIrreducibleCharacter θbar : ClassFunction (↥data.H ⧸ chief.N) ℂ) := by
+    ext g
+    rw [linearIrreducibleCharacter_apply, hθbarval]
+  have hθ_eq : (θ : ClassFunction ↥(hInHu data) ℂ)
+      = (linearIrreducibleCharacter (θbar.comp f) : ClassFunction ↥(hInHu data) ℂ) := by
+    rw [← hθbar, hθbar_eq, ClassFunction.compHom_linearIrreducibleCharacter]
+  have hθθ : θ = linearIrreducibleCharacter (θbar.comp f) := IrreducibleCharacter.ext hθ_eq
+  refine ⟨θbar, ?_, ?_⟩
+  · -- `θbar ≠ 1`: else `θ = linear(1) = trivial`, contradicting `H ⊄ Ker θ`.
+    intro h0
+    apply hθnt
+    rw [Subgroup.subgroupOf_self]
+    intro y _
+    rw [OddOrder.Peterfalvi.S03.mem_characterKernel,
+      OddOrder.Peterfalvi.S03.characterDegree_def, hθ_eq, h0]
+    simp
+  · show IrreducibleCharacter.LiesOver (hInHu data) χ
+      (linearIrreducibleCharacter (θbar.comp f))
+    rw [← hθθ]; exact hθlo
+
 /-- **Peterfalvi (9.9.a)**: every member of `𝒮(H₀C')` has degree `qu`.
 
 For `φ = Ind_{HU}^M χ ∈ 𝒮(H₀C')` (so `χ ∈ 𝒳(H₀C')`, i.e. `χ ∈ Irr(HU)` with `H ⊄ Ker χ` and
