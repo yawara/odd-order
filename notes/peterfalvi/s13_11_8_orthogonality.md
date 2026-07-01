@@ -1032,3 +1032,23 @@ threaded hyp 無)。**残 = a=(∑ω_{r0}^σ,β) application**: β real=(11.8.3,
 **a-even application 入力状況**: ∑ω real ✓/∑ω∈ZIrr ✓/parity core ✓/assembly ✓/**β⊥1 ✓**。
 **残 = β∈ZIrr + β real (11.8.3, 大) + a=⟨∑ω,β⟩ 2-way calc + hα1M (⟨α_{ij},1_M⟩=0)**。
 (11.8) closure は依然 doubly-gated (§9↔§10、§14)。
+
+## 2026-07-02 cont.⁶¹ (lane-a) — **β∈ZIrr + ⟨α_{ij},1_M⟩=0 LANDED (β⊥1 unconditional)**
+2 lemma landed (両 clean, S12 sorry 4 不変):
+- `Hypothesis.beta_mem_ZIrr` (be55188d): β = α^τ−δ(ω^σ diff)+nζ^{τ₁} ∈ ZIrr G。α^τ∈ZIrr
+  (`muGridAlpha_tau_mem_ZIrr`)、ω^σ 各∈ZIrr (`alignedOmegaSigmaGrid_mem_ZIrr`)、ζ^{τ₁}∈ZIrr
+  (`SHC_isCoherent.extension_mem_ZIrr`); `Submodule.add/sub_mem` + `Int.cast_smul_eq_zsmul`/zsmul_mem +
+  `Nat.cast_smul_eq_nsmul`/nsmul_mem。→ assembly の `hβZ` 充足。
+- `Hypothesis.muGridAlpha_inner_trivial_M` (05a23f31): i≠0 で ⟨α_{ij},1_M⟩=0。**cont.⁶⁰ で threaded した
+  hα1M を実証明で discharge**。1_M=μ_{00} (`muGrid_zero_zero_eq_trivial`) ⇒ ⟨μ_{ij},1_M⟩=⟨μ_{ij},μ_{00}⟩=0
+  (cross-column j≠0)、⟨μ_{i0},1_M⟩=⟨μ_{i0},μ_{00}⟩=0 (within-column i≠0)、⟨ζ,1_M⟩=0 (ζ irr deg w₁>1、
+  `irr_cf_inner`+`if_neg`)。⚠ 発見: grid の 1_M は origin (0,0) に 1 個だけ (`muColumnZero_inner_trivial`=1 と整合);
+  i≠0 だから全 constituents が principal を避ける。→ `beta_inner_trivial` の hα1M が grounded、β⊥1 が i≠0 で unconditional。
+
+**a-even application 入力状況 (更新)**: ∑ω real ✓/∑ω∈ZIrr ✓/parity core ✓/assembly ✓/β⊥1 ✓ (now unconditional)/**β∈ZIrr ✓**/**hα1M ✓**。
+**残 = β real (11.8.3, 大) + a=⟨∑_r ω_{r0}^σ,β⟩ 2-way calc** の 2 本のみ。両揃えば a-even capstone (Even a)
+→ `charParam_a_eq_zero_of_residualEq` で a=0 (unconditional)。endpoint は依然 §14-gated。
+- `ha` (a=⟨∑_r ω_{r0}^σ,β⟩): 展開すると ∑_r⟨ω_{r0}^σ,α^τ⟩ + δ (ω 自己直交 `alignedOmegaSigmaGrid_inner` で
+  cross/within 項が畳まれ、5.3.b で ζ^{τ₁} 項消滅) → 残 = ∑_r⟨ω_{r0}^σ,α^τ⟩ が (11.8.4)-type residual に依存。moderate-big。
+- `β real` (11.8.3): (4.8)/(4.10)/(5.9) SHC port。row-conj involution (`exists_rowInv_alignedOmegaSigma_conj`)
+  + τ₁ conj 交換 + α reality。BIG (multi-iteration)。
