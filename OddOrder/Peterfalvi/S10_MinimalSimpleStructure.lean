@@ -10,6 +10,7 @@ import OddOrder.GroupTheory.MaximalSubgroup
 import OddOrder.Isaacs.Ch06_FrobeniusActions.OddComplement
 import OddOrder.BG.Ch2_Uniqueness.Setup
 import OddOrder.BG.Ch4_FamilyOfMaximal.S16_MainResults
+import OddOrder.Peterfalvi.S10_BGInterface
 
 /-!
 # Peterfalvi Section 10: Structure of a Minimal Simple Group of Odd Order
@@ -845,17 +846,46 @@ theorem bgTheoremE_cover_data [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     -- TypeICovering side, owned by the §8 Dade work in lane-a/c), so this branch remains gated.
     sorry
 
-/-- **Peterfalvi (8.18)**: the final support-exclusion relation in Section 10.
+/-- **Peterfalvi (8.18.c)**: the final support-exclusion relation in Section 10.  For **non-conjugate
+type-I** maximal subgroups `S, T`, the sharp sets `A₁(S) = (S_F)^#` and `A₁(T) = (T_F)^#` cannot
+mutually support each other.
 
-The proof uses the recovered (8.14)--(8.17) support notation and BG Theorem E
-covering facts.  It remains the usable endpoint of the block for downstream
-files. -/
+Proof.  Both are type I, so `A₁(S) = M_σ(S)^#` and `A₁(T) = M_σ(T)^#`
+(`A1_eq_sigmaSharp_of_typeI_or_II`).  Pick `y ∈ A₁(S)` (nonempty: `S_F ≠ ⊥` for type I).  Then
+`y ∈ M_σ(S)^# ⊆ M̃(S) ⊆ 𝒞_G(M̃(S))` (`sigmaSharp_subset_Mtilde`, `subset_conjClassSet`); and the
+support hypothesis `A₁(S) ⊆ 𝒞_G(A₁(T)) = 𝒞_G(M_σ(T)^#) ⊆ 𝒞_G(M̃(T))` (`conjClassSet_mono`).  But
+`𝒞_G(M̃(S)) ∩ 𝒞_G(M̃(T)) = ∅` for non-conjugate `S, T` (`conjClassSet_Mtilde_disjoint`, BG Lemma
+14.5(b)) — contradiction.  Only one support direction is needed. -/
 theorem support_mutual_exclusion [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) {S T : Subgroup G}
-    (hS : S ∈ maximalSubgroups G) (hT : T ∈ maximalSubgroups G) :
+    (hS : S ∈ maximalSubgroups G) (hT : T ∈ maximalSubgroups G)
+    (hSI : IsTypeI S) (hTI : IsTypeI T)
+    (hnc : ¬ OddOrder.BG.Ch4.S14.IsConjugateSubgroup S T) :
     ¬ (Supports (A1 S PeterfalviType.I) (A1 T PeterfalviType.I) ∧
         Supports (A1 T PeterfalviType.I) (A1 S PeterfalviType.I)) := by
-  sorry
+  rintro ⟨hsup, -⟩
+  set D := OddOrder.BG.Ch4.S14.genuineSigmaDecomposition hG with hD
+  have hA1S : A1 S PeterfalviType.I = OddOrder.BG.Ch4.S14.sigmaSharp S :=
+    OddOrder.Peterfalvi.S10Interface.A1_eq_sigmaSharp_of_typeI_or_II hG hS (Or.inl hSI) (Or.inl rfl)
+  have hA1T : A1 T PeterfalviType.I = OddOrder.BG.Ch4.S14.sigmaSharp T :=
+    OddOrder.Peterfalvi.S10Interface.A1_eq_sigmaSharp_of_typeI_or_II hG hT (Or.inl hTI) (Or.inl rfl)
+  -- `A₁(S)` is nonempty: `S_F ≠ ⊥` for type I.
+  obtain ⟨data⟩ := hSI
+  have hHne : maxNilpotentNormalHall S ≠ ⊥ := by
+    rw [← data.typeF.H_eq]; exact data.typeF.H_nontrivial
+  haveI : Nontrivial ↥(maxNilpotentNormalHall S) :=
+    (Subgroup.nontrivial_iff_ne_bot _).mpr hHne
+  obtain ⟨y, hyne⟩ := exists_ne (1 : ↥(maxNilpotentNormalHall S))
+  have hxA1 : (y : G) ∈ A1 S PeterfalviType.I := by
+    show (y : G) ∈ (maxNilpotentNormalHall S : Set G) \ {1}
+    exact ⟨y.2, fun h => hyne (Subtype.ext h)⟩
+  have h1 : (y : G) ∈ conjClassSet (OddOrder.BG.Ch4.S14.Mtilde hG D S) :=
+    subset_conjClassSet (OddOrder.BG.Ch4.S14.sigmaSharp_subset_Mtilde hG D (hA1S ▸ hxA1))
+  have h2 : (y : G) ∈ conjClassSet (OddOrder.BG.Ch4.S14.Mtilde hG D T) := by
+    refine conjClassSet_mono (OddOrder.BG.Ch4.S14.sigmaSharp_subset_Mtilde hG D) ?_
+    rw [← hA1T]; exact hsup hxA1
+  exact Set.disjoint_left.mp
+    (OddOrder.BG.Ch4.S14.conjClassSet_Mtilde_disjoint hG D hS hT hnc) h1 h2
 
 -- TODO (Peterfalvi (8.15), higher Dade specializations): add the recovered
 -- Hypothesis (4.6)/(5.2) statements with `K=M_prime` and `H=M_F` or `M_s`
