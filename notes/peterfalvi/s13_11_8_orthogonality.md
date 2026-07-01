@@ -933,3 +933,15 @@ Pf の一般 parity lemma = 「**odd-order G の real virtual char Δ₁,Δ₂ (
 
 **(11.8) 残 ungated = 一般 parity lemma + (11.8.3) β real → a-even; (11.8.6) full は §14-gated**。
 (11.8) closure は依然 doubly-gated (§9↔§10 の (11.8.1)、§14 の (11.8.6))。
+
+## 2026-07-02 cont.⁵³ (lane-a) — **a-even parity の組合せ核 `even_sum_of_involution` LANDED**
+`even_sum_of_involution` (S12, leaf green, sorry-free、汎用 Finset lemma): 固定点自由 involution `g` on `s`
++ 不変重み `f(g a)=f a` ⟹ `Even (∑_{a∈s} f a)`。証明 = **ZMod 2 経由**: `(f a:ZMod 2)+(f(g a):ZMod 2)=2·(f a)=0`
+(`CharTwo.add_self_eq_zero`) → `Finset.sum_involution` で ∑ mod 2 = 0 → `ZMod.intCast_zmod_eq_zero_iff_dvd`
++ omega で Even。**一発 green (API fix 1 回: Int.even_iff_two_dvd 無 → obtain+omega)**。
+
+これは a-even の**組合せ核** (Irr∖{1} の χ↔χ̄ 対、(1.1) で固定点自由)。**次 = 一般 parity lemma**
+`⟨Δ₁,Δ₂⟩ even (real Δ_i ⊥1_G, odd G)`: cross-Parseval `⟨Δ₁,Δ₂⟩=∑_χ c₁(χ)c₂(χ)` (c_i∈ℤ)、Δ real で
+c_i(χ̄)=c_i(χ)、c_i(1)=0 → 本 `even_sum_of_involution` を conjPerm (χ↦χ̄, `IrreducibleCharacter.conjPerm`) に
+適用。⚠ cross-Parseval + IsReal→c(χ̄)=c(χ) の materialize 要。その後 a=(∑ω_{r0}^σ,β) に適用 (β real=(11.8.3)、
+∑ω_{r0}^σ real + ⊥1)。(11.8) closure は依然 doubly-gated (§9↔§10、§14)。

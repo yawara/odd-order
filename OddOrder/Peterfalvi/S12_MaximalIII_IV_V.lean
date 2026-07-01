@@ -8121,6 +8121,26 @@ theorem Hypothesis.R_sum_inner_zeroColumnOmegaSigma_sum [Finite G] {M : Subgroup
   exact hyp.SHC_extension_inner_zeroColumnOmegaSigma_sum hG hodd hφS hφirr hφ1
     (hyp.inducedFamily_degree_w1_conj_ne hG hφirr hφ1)
 
+/-- **Parity of a sum over a fixed-point-free involution** with an involution-invariant integer
+weight.  If `g` is a fixed-point-free involution on `s` and `f (g a) = f a` for all `a ∈ s`, then
+`∑_{a ∈ s} f a` is even — each orbit `{a, g a}` contributes `2·f a`.  (Proof via `ZMod 2`:
+`(f a : ZMod 2) + (f (g a) : ZMod 2) = 2·(f a) = 0`, so `Finset.sum_involution` kills the sum mod 2.)
+This is the combinatorial core of the Peterfalvi (11.8.5) "`a` even from `β` real" parity — the
+conjugation involution `χ ↦ χ̄` on `Irr G ∖ {1}` is fixed-point-free by Peterfalvi (1.1). -/
+theorem even_sum_of_involution {α : Type*} [DecidableEq α] {s : Finset α} {f : α → ℤ}
+    (g : ∀ a ∈ s, α) (g_mem : ∀ a ha, g a ha ∈ s) (g_ne : ∀ a ha, g a ha ≠ a)
+    (g_inv : ∀ a ha, g (g a ha) (g_mem a ha) = a) (hf : ∀ a ha, f (g a ha) = f a) :
+    Even (∑ a ∈ s, f a) := by
+  suffices h : ((∑ a ∈ s, f a : ℤ) : ZMod 2) = 0 by
+    rw [ZMod.intCast_zmod_eq_zero_iff_dvd] at h
+    obtain ⟨k, hk⟩ := h
+    exact ⟨k, by push_cast at hk; omega⟩
+  rw [Int.cast_sum]
+  refine Finset.sum_involution g ?_ (fun a ha _ => g_ne a ha) g_mem g_inv
+  intro a ha
+  rw [hf a ha]
+  exact CharTwo.add_self_eq_zero _
+
 open scoped Classical FiniteInduce in
 /-- **Peterfalvi (11.8.5), `a = 0` under the (11.8.4) hypothesis** (the residual-orthogonal case).
 Given the (11.8.4) by-contradiction consequence `(μ₀ − ζ)^τ = ∑_r ω_{r0}^σ − ζ^{τ₁}` (`μ₀ = ∑ μ_{i'0}`),
