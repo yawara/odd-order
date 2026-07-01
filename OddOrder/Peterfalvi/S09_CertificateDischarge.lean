@@ -2593,4 +2593,104 @@ theorem coherence_extension_inner_eq_on_family {L G : Type*} [Group L] [Group G]
       = ClassFunction.inner ζi ζj :=
   hcoh.extension_inner_eq ζi ζj (Submodule.subset_span hζi) (Submodule.subset_span hζj)
 
+/-- **Two orthonormal integral characters with equal `1_G`-coefficient are both orthogonal to
+`1_G`** (the linear-algebra core of the coherent `⊥1_G` fact, Peterfalvi (7.8.a)).
+
+If `x, y ∈ ℤ[Irr G]` are norm-`1` (`⟨x,x⟩ = ⟨y,y⟩ = 1`), orthogonal (`⟨x,y⟩ = 0`), and have the
+*same* inner product with the trivial character (`⟨x,1_G⟩ = ⟨y,1_G⟩ =: c`), then `c = 0`.
+
+Proof: by (5.9.a) `exists_zsmul_irreducibleCharacter_of_inner_self_one`, `x = ε·ξ`, `y = δ·ζ`
+with `ε, δ = ±1` and `ξ, ζ` irreducible.  Orthogonality forces `ξ ≠ ζ`, so at most one of `ξ, ζ`
+is the trivial character.  If `ξ` is trivial then `ζ` is not, giving `c = ⟨y,1_G⟩ = 0` while
+`c = ⟨x,1_G⟩ = ±1`, a contradiction; hence `ξ` is nontrivial and `c = ⟨x,1_G⟩ = ε·0 = 0`. -/
+theorem inner_constOne_eq_zero_of_orthonormal_pair {G : Type*} [Group G] [Fintype G]
+    [Invertible (Nat.card G : ℂ)]
+    {x y : ClassFunction G ℂ} (hx : x ∈ ZIrr G) (hy : y ∈ ZIrr G)
+    (hxnorm : ClassFunction.inner x x = 1) (hynorm : ClassFunction.inner y y = 1)
+    (hxy : ClassFunction.inner x y = 0)
+    (hc : ClassFunction.inner x (Hypothesis71.constOne G)
+        = ClassFunction.inner y (Hypothesis71.constOne G)) :
+    ClassFunction.inner x (Hypothesis71.constOne G) = 0 := by
+  classical
+  obtain ⟨ε, ξ, hε, rfl⟩ := exists_zsmul_irreducibleCharacter_of_inner_self_one hx hxnorm
+  obtain ⟨δ, ζ, hδ, rfl⟩ := exists_zsmul_irreducibleCharacter_of_inner_self_one hy hynorm
+  -- `1_G` as the trivial irreducible character (both are the all-ones class function).
+  have hco : Hypothesis71.constOne G = (trivialIrreducibleCharacter G : ClassFunction G ℂ) := rfl
+  -- `⟨m•μ, 1_G⟩ = m · [μ = 1_G]` for an irreducible `μ`.
+  have key : ∀ (m : ℤ) (μ : IrreducibleCharacter G),
+      ClassFunction.inner (m • (μ : ClassFunction G ℂ)) (Hypothesis71.constOne G)
+        = (m : ℂ) * (if μ = trivialIrreducibleCharacter G then 1 else 0) := by
+    intro m μ
+    rw [hco, ← Int.cast_smul_eq_zsmul ℂ m (μ : ClassFunction G ℂ),
+      ClassFunction.inner_smul_left, irreducibleCharacter_inner]
+  -- Orthogonality forces `ξ ≠ ζ`.
+  have hξζ : ξ ≠ ζ := by
+    intro h; subst h
+    rw [← Int.cast_smul_eq_zsmul ℂ ε (ξ : ClassFunction G ℂ),
+      ← Int.cast_smul_eq_zsmul ℂ δ (ξ : ClassFunction G ℂ),
+      ClassFunction.inner_smul_left, ClassFunction.inner_smul_right,
+      irreducibleCharacter_inner, if_pos rfl, mul_one] at hxy
+    have hεne : (ε : ℂ) ≠ 0 := Int.cast_ne_zero.mpr (by rcases hε with h | h <;> simp [h])
+    have hδne : star (δ : ℂ) ≠ 0 := by
+      rw [star_ne_zero]; exact Int.cast_ne_zero.mpr (by rcases hδ with h | h <;> simp [h])
+    exact (mul_ne_zero hεne hδne) hxy
+  rw [key ε ξ] at hc ⊢
+  rw [key δ ζ] at hc
+  by_cases hξ : ξ = trivialIrreducibleCharacter G
+  · -- `ξ` trivial ⟹ `ζ` nontrivial ⟹ `c = 0` from `y`, but `c = ±1` from `x`.
+    exfalso
+    have hζ : ζ ≠ trivialIrreducibleCharacter G := fun h => hξζ (hξ.trans h.symm)
+    rw [if_pos hξ, mul_one, if_neg hζ, mul_zero] at hc
+    rcases hε with h | h <;> rw [h] at hc <;> norm_num at hc
+  · rw [if_neg hξ, mul_zero]
+
+/-- **The coherent image of a distinguished member is orthogonal to `1_G`** (Peterfalvi (7.8.a),
+the `⟨ζ_0^ν, 1_G⟩ = 0` fact — the certificate that the abstract `IsCoherent` structure does not
+carry directly, recovered here from a *second* member of `S` of the **same degree**).
+
+Given the coherence `hcoh` (with `τ` `ℂ`-linear via `hτ_smul`, and `htau1` the Dade `⊥1_G`
+transport `⟨τ φ, 1_G⟩ = ⟨φ, 1_L⟩` on `A`-supported `φ`), and two members `ζ_0, ζ_0' ∈ S` that are
+norm-`1`, orthogonal, both `⊥ 1_L`, with `ζ_0' − ζ_0` `A`-supported (i.e. equal degree), the images
+`ν ζ_0, ν ζ_0'` are orthonormal in `ℤ[Irr G]` with equal `1_G`-coefficient (the equal-degree Dade
+difference is `⊥ 1`), so `inner_constOne_eq_zero_of_orthonormal_pair` forces `⟨ν ζ_0, 1_G⟩ = 0`.
+
+The canonical second member is the complex conjugate `ζ_0' = ζ̄_0`
+(§12 `Sset_closedUnderConjugate`), distinct from `ζ_0` by the odd order of `L`
+(no nontrivial real irreducible). -/
+theorem coherence_extension_orthogonal_constOne {L G : Type*} [Group L] [Group G]
+    [Fintype L] [Fintype G] [Invertible (Nat.card L : ℂ)] [Invertible (Nat.card G : ℂ)]
+    {τ : OddOrder.Peterfalvi.S07.IntegralCharacterMap L G}
+    {S : Set (ClassFunction L ℂ)} {A : Set L}
+    (hcoh : OddOrder.Peterfalvi.S07.IsCoherent τ S A)
+    (hτ_smul : ∀ (c : ℂ) (x : ClassFunction L ℂ), τ (c • x) = c • τ x)
+    (htau1 : ∀ φ : ClassFunction L ℂ, φ.support ⊆ A →
+        ClassFunction.inner (τ φ) (Hypothesis71.constOne G)
+          = ClassFunction.inner φ (Hypothesis71.constOne L))
+    {ζ0 ζ0' : ClassFunction L ℂ} (hζ0 : ζ0 ∈ S) (hζ0' : ζ0' ∈ S)
+    (hnorm0 : ClassFunction.inner ζ0 ζ0 = 1) (hnorm0' : ClassFunction.inner ζ0' ζ0' = 1)
+    (horth : ClassFunction.inner ζ0 ζ0' = 0)
+    (hsupp : (ζ0' - ζ0).support ⊆ A)
+    (hζ0_1 : ClassFunction.inner ζ0 (Hypothesis71.constOne L) = 0)
+    (hζ0'_1 : ClassFunction.inner ζ0' (Hypothesis71.constOne L) = 0) :
+    ClassFunction.inner (hcoh.extension ζ0) (Hypothesis71.constOne G) = 0 := by
+  have hxZ : hcoh.extension ζ0 ∈ ZIrr G := hcoh.extension_mem_ZIrr ζ0 (Submodule.subset_span hζ0)
+  have hyZ : hcoh.extension ζ0' ∈ ZIrr G := hcoh.extension_mem_ZIrr ζ0' (Submodule.subset_span hζ0')
+  have hxn : ClassFunction.inner (hcoh.extension ζ0) (hcoh.extension ζ0) = 1 := by
+    rw [coherence_extension_inner_eq_on_family hcoh hζ0 hζ0]; exact hnorm0
+  have hyn : ClassFunction.inner (hcoh.extension ζ0') (hcoh.extension ζ0') = 1 := by
+    rw [coherence_extension_inner_eq_on_family hcoh hζ0' hζ0']; exact hnorm0'
+  have hxy : ClassFunction.inner (hcoh.extension ζ0) (hcoh.extension ζ0') = 0 := by
+    rw [coherence_extension_inner_eq_on_family hcoh hζ0 hζ0']; exact horth
+  have hc : ClassFunction.inner (hcoh.extension ζ0) (Hypothesis71.constOne G)
+      = ClassFunction.inner (hcoh.extension ζ0') (Hypothesis71.constOne G) := by
+    have hd := coherence_hagree hcoh hτ_smul hζ0' hζ0 (m0 := 1) (mi := 1) (di := 1)
+      (by norm_num) (by norm_num) (by simpa using hsupp)
+    simp only [one_smul] at hd
+    have hτval : ClassFunction.inner (τ (ζ0' - ζ0)) (Hypothesis71.constOne G)
+        = ClassFunction.inner (ζ0' - ζ0) (Hypothesis71.constOne L) := htau1 (ζ0' - ζ0) hsupp
+    rw [hd, ClassFunction.inner_sub_left, ClassFunction.inner_sub_left, hζ0'_1, hζ0_1,
+      sub_zero] at hτval
+    exact (sub_eq_zero.mp hτval).symm
+  exact inner_constOne_eq_zero_of_orthonormal_pair hxZ hyZ hxn hyn hxy hc
+
 end OddOrder.Peterfalvi.S09.Cert
