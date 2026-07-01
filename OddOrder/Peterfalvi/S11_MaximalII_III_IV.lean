@@ -2457,8 +2457,16 @@ structure CliffordCaseAData {M : Subgroup G} {data : TypesIIIIIIVSetup M}
   /-- The `q` order-`p` Clifford summands are independent (non-opaque (9.7) structure): together
   with `Hpart_iSup` this exhibits `H̄` as their internal direct product. -/
   Hpart_iSupIndep : iSupIndep Hpart
-  W1_transitive_on_parts : Prop
-  W1_transitive_on_parts_holds : W1_transitive_on_parts
+  /-- **Orbit generator** `S₀` (non-opaque (9.7) case-(a) structure): the `q` summands are the
+  `U W₁`-translates `Hpart j = φ(orbitRep j) • S₀` of a single order-`p` subgroup `S₀`, where
+  `φ = quotientMulAutHom` is the (`Finite`-free) chief-factor action.  Exposing the orbit (rather than
+  the opaque `W₁`-transitivity `Prop`) is what lets the (9.8.c) constant-factor-data set `Xmu` be
+  constructed and `W₁`-transitivity of the summands proven. -/
+  S0 : Subgroup (↥data.H ⧸ chief.N)
+  /-- Orbit representatives realising each summand as a translate of `S₀`. -/
+  orbitRep : Fin data.q → ↥(data.typeP.U ⊔ data.typeP.W1)
+  /-- Each summand is the `orbitRep`-translate of the generator `S₀`. -/
+  Hpart_orbit : ∀ j, Hpart j = quotientMulAutHom chief.N_aInvariant (orbitRep j) • S0
   a : ℕ
   a_pos : 0 < a
   a_dvd_p_sub_one : a ∣ chief.p - 1
@@ -4946,8 +4954,9 @@ noncomputable def clifford_caseA_data [Finite G] {M : Subgroup G}
       Hpart_aInvariant := fun j =>
         isAInvariant_comp_subtype_pointwise_smul hUnorm hS₀inv ↑(e.symm j)
       Hpart_iSupIndep := hexist.choose_spec.1.independent.comp e.symm.injective
-      W1_transitive_on_parts := True
-      W1_transitive_on_parts_holds := trivial
+      S0 := S₀
+      orbitRep := fun j => ↑(e.symm j)
+      Hpart_orbit := fun j => rfl
       a := Nat.card ↥(aInvariantRestrictAut hS₀inv).range
       a_pos := Nat.card_pos
       a_dvd_p_sub_one := ?_
