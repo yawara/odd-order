@@ -104,9 +104,26 @@ lane c (cont.⁴³) が「deep char frontier は 9001 shared coherence infra に
 
 ## やること (裁定後)
 - [x] 事項 1 case-split: 承認・合流済 (`ed34cdc8`)。
+- [x] **lane b: (5.7)/S07 lattice-relative refactor を実施** (commit `d31b9763`, 2026-07-02)。
+  `S07.Hypothesis.tau_isometry` (global `IsIntegralIsometry`) → **差-等長** `tau_isometry_diff`
+  (`∀ a b c d ∈ S, ⟨τ(a−b),τ(c−d)⟩=⟨a−b,c−d⟩`) に weakened。helper `inner_eq_on_zSpan_pair`
+  (差-等長→zSpan 双線型拡張) で `ofProjection` に供給、`pairDecomp` に `hζ` 追加、`xFamily_inner`
+  を `hdiff` 版に (= S14 `xFamily_inner_dade` を subsume)、unused `tau_inner_eq` 削除。
+  **`coherent_of_constant_degree` が Dade-compatible に**。full build green (3893 jobs, axioms OK)。
+  S07.Hypothesis は未 construction ゆえ lane-a regression なし。
 - [ ] lane b: (6.5.c) coherence を 9000 番台で claim → build (shared leaf)。
-- [ ] lane b: (5.7)/S07 lattice-relative refactor を実施 (S07 consumer build-green 維持)。
 - [ ] lane b: 構成的 Clifford (issue 0026) を 9000 番台で claim → build。
+
+### 次: `frobenius_typeI_coherent_of_abelianKernel` (12.6 case b) 埋め — S14 witness の S07.Hypothesis 構成
+refactor で `coherent_of_constant_degree` が witness Dade map で使えるように。残タスク = S14 witness
+`Hypothesis L` から `S07.Hypothesis hyp.Sset hyp.A` を構成 + `coherent_of_constant_degree` 呼び出し:
+- **在庫あり**: `tau_isometry_diff` (Dade support-isometry + equal-degree supported), `conjugate_closed`
+  (`Sset_closedUnderConjugate` S14:208), `difference_image` (`dadeCharacterDifferenceImageOfDiff` S14:574),
+  `difference_images_orthogonal` (`toOrthonormalImage_inner_eq_zero_across` 経由 S14:644), `Sset_vanishes_off_H`
+  (S14:657 → hsuppdiff 素材)。
+- **要 build (witness char body, deep)**: `no_real_characters`, `pairwise_orthogonal`, `hirr` (Ind_H^L θ
+  irreducible for Frobenius abelian kernel), `hconst` (等次数 [L:H]), `hsuppdiff` (差 A(L)-supported)。
+  Frobenius 群指標論 (Ind from abelian kernel = irreducible, 等次数) が中核。multi-turn 想定。
 - [ ] α: 着手前に open 9000 issue を scan、coherence/Clifford は lane b leaf を cite (再構築しない)。
 - [ ] lane c: idle 回避。σ-theory-dual structural (S16:166/3431/3511) を lane d leaf cite で discharge +
   coherence-gated deep char を signature-first で skeleton。coherence は再構築しない。
