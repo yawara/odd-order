@@ -801,3 +801,33 @@ SHC 版は本 chain (cont.⁴¹→⁴²→trichotomy) で組む。a=0: X=residua
 + `SHC_extension_inner_alignedOmegaSigma_eq_zero` (5.3.b) で β=a∑λ→a=0。a=2 case は ∑λ^{τ₁} vanish (per-λ,
 general-a 注意) が要 → `SHC_extension_vanishes_on_typePV` (∀λ∈S(HC), λ̄≠λ) を先に組むと汎用。
 (11.8) closure は依然 doubly-gated (§9↔§10 の (11.8.1)、§14 の (11.8.6))。
+
+## 2026-07-02 cont.⁴⁴ (lane-a) — **非実性 helper + ∀λ∈S(HC) vanishing LANDED (a=2 path 準備)**
+2 lemma landed (leaf green, both sorry-free):
+1. **`inducedFamily_degree_w1_conj_ne`** (S12:3153): degree-w₁ irreducible χ∈M ⟹ χ̄≠χ (Pf (1.1) 非実性)。
+   = `zeta_conj_ne` (3154) を一般 χ に汎化 (M odd ⟹ non-trivial=degree>1 は non-real、`not_isReal_of_ne_trivial_of_odd_card'`)。
+   `zeta_conj_ne` は本 helper を cite する 1 行 corollary に refactor (重複除去)。
+2. **`SHC_extension_vanishes_on_typePV`** (S12:7386): degree-w₁ irreducible χ∈inducedFamily M ⟹ `(SHC.ext χ) v=0` (v∈V)。
+   = `SHC_tau1_zeta_vanishes` (cont.⁴¹) の hζne を helper 1 で discharge (χ∈S(HC) だけで OK)。∑λ^{τ₁} correction 消去用。
+
+**次 = 一般 (11.8.2) X=ω^σ diff (a∈{0,2})**: residual Y (residual_norm) に Y∈ZIrr + Y=α^τ−∑c_β·β
+(Parseval 分解式) + ∀β∈R β vanish (helper 2 を hRrev の各 λ に) を渡し、ψ=Y−δ(ω^σ diff) vanish →
+trichotomy → Y=δ(ω^σ diff)。⚠ residual_norm を Y∈ZIrr + 分解式露出に拡張要 (exists_intProjection 直呼び)。
+または (11.8.3) β real (document-order 次、(4.8)/(4.10)/(5.9) cite) を先行も可。
+(11.8) closure は依然 doubly-gated (§9↔§10 の (11.8.1)、§14 の (11.8.6))。
+
+## 2026-07-02 cont.⁴⁵ (lane-a) — **一般 (11.8.2) X=ω^σ diff (a∈{0,2}) LANDED — (11.8.2) 完成**
+3-part refactor+payoff (leaf green 3850 jobs, all sorry-free):
+1. **root lemma 拡張** `inner_self_eq_sum_sq_add_of_intProjection` (S12): 結論に `φ=∑c•α+Y ∧ Y∈ZIrr` 追加
+   (hdecomp は exists_intProjection が既に供給; Y∈ZIrr = φ−∑(c•α), `Int.cast_smul_eq_zsmul`+`zsmul_mem`)。
+2. **`residual_norm` 拡張** (S12): 結論に `Y∈ZIrr ∧ (∀v∈typePV, Y v = α^τ v)` 追加。hYV = hdecomp で Y=α^τ−∑c•β,
+   各 β=SHC.ext λ (hRrev) が V で消える (`SHC_extension_vanishes_on_typePV` cont.⁴⁴) → ∑c•β(v)=0 →
+   Y v=α^τ v。`ClassFunction.finset_sum_apply` で sum-apply。proj_a_mem の destructure も +2 更新。
+3. **`SHC_residual_eq_omegaSigma_diff`** (S12:7875, **payoff**): residual_norm から a,Y 取得 → a∈{0,2} で
+   ψ=Y−δ(ω^σ diff) が V で消える (hYV + `tau_muGridAlpha_apply_eq_on_typePV`) → trichotomy
+   `eq_smul_chiFam_diff_of_vanishOnV` → **Y=δ(ω_{ij}^σ−ω_{i0}^σ)**。**一発 green**。
+
+**意義**: (11.8.2) の residual characterization が a∈{0,2} 一般で完成 (a=0 は cont.⁴³ の
+`SHC_tau_muGridAlpha_eq` = full identity、本 cont.⁴⁵ は a∈{0,2} で Y=ω^σ diff)。**次 = (11.8.5) a=0**:
+本 Y=ω^σ diff + β 定義 (β=α^τ−(ω^σ diff)+nζ^{τ₁}) ⟹ β=a∑λ^{τ₁} → `SHC_extension_inner_alignedOmegaSigma_eq_zero`
+(5.3.b) で a=0。あるいは (11.8.3) β real 先行。(11.8) closure は依然 doubly-gated (§9↔§10、§14)。
