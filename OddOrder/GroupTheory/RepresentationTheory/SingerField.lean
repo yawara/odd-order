@@ -525,6 +525,79 @@ theorem isCyclic_and_card_dvd_of_faithful_irreducible_comm [Finite E] [Finite M]
         Nat.card_units (α := MonoidAlgebra (ZMod p) E ⧸ I)
     _ = Nat.card M - 1 := by rw [hKM]
 
+/-- **Singer coprimality core, `𝔽ₚ`-scalar form.**  Adds to the Singer hypotheses (`E` finite
+acting faithfully, commutatively, and irreducibly on the finite `𝔽ₚ[E]`-module `M`) the condition
+that only `e = 1` acts on `M` as an `𝔽ₚ`-scalar (`x ↦ n • x`).  Then `|E|` is coprime to `p - 1`.
+
+The realization `μ : E ↪ Kˣ` (`K = 𝔽ₚ[E] ⧸ I` the Singer field) meets the prime-subfield units
+`ν : 𝔽ₚ* ↪ Kˣ` only in `1`: a common unit `μ e = ν c` makes `e` act as the scalar `(c).val`, so
+`hnonscalar` forces `e = 1`.  Hence `μ.range ⊓ ν.range = ⊥` in the cyclic group `Kˣ`, and
+`coprime_card_of_inf_eq_bot_isCyclic` yields `Coprime |E| (p - 1)`.  The fixed-point-free bridge
+`coprime_card_sub_one_of_faithful_irreducible_comm_fpf` and the `p + 1` refinement of Peterfalvi
+(12.12) both specialize this by supplying the non-scalar condition from their own structure. -/
+theorem coprime_card_sub_one_of_faithful_irreducible_comm_nonscalar
+    [Fact p.Prime] [Finite E] [Finite M]
+    [IsSimpleModule (MonoidAlgebra (ZMod p) E) M]
+    (hcomm : ∀ a b : E, a * b = b * a)
+    (hfaith : ∀ e : E, (∀ x : M, MonoidAlgebra.of (ZMod p) E e • x = x) → e = 1)
+    (hnonscalar : ∀ e : E,
+        (∃ n : ℕ, ∀ x : M, MonoidAlgebra.of (ZMod p) E e • x = n • x) → e = 1) :
+    Nat.Coprime (Nat.card E) (p - 1) := by
+  classical
+  letI : CommRing (MonoidAlgebra (ZMod p) E) :=
+    { (inferInstance : Ring (MonoidAlgebra (ZMod p) E)) with
+      mul_comm := mul_comm_monoidAlgebra_of_comm hcomm }
+  obtain ⟨I, hImax, ⟨lequiv⟩⟩ :=
+    (isSimpleModule_iff_quot_maximal (R := MonoidAlgebra (ZMod p) E) (M := M)).mp ‹_›
+  haveI : I.IsMaximal := hImax
+  letI : Field (MonoidAlgebra (ZMod p) E ⧸ I) := Ideal.Quotient.field I
+  haveI : Finite (MonoidAlgebra (ZMod p) E ⧸ I) := Finite.of_equiv _ lequiv.toEquiv
+  let μ : E →* (MonoidAlgebra (ZMod p) E ⧸ I)ˣ :=
+    (Units.map (Ideal.Quotient.mk I : MonoidAlgebra (ZMod p) E →+* _).toMonoidHom).comp
+      (MonoidAlgebra.of (ZMod p) E).toHomUnits
+  let ν : (ZMod p)ˣ →* (MonoidAlgebra (ZMod p) E ⧸ I)ˣ :=
+    Units.map (algebraMap (ZMod p) (MonoidAlgebra (ZMod p) E ⧸ I)).toMonoidHom
+  have hcompat : ∀ (a : E) (x : M),
+      lequiv (MonoidAlgebra.of (ZMod p) E a • x)
+        = (↑(μ a) : MonoidAlgebra (ZMod p) E ⧸ I) * lequiv x := by
+    intro a x
+    rw [map_smul, Algebra.smul_def, Ideal.Quotient.algebraMap_eq]; rfl
+  have hμinj : Function.Injective μ := by
+    rw [injective_iff_map_eq_one]
+    intro e he
+    apply hfaith e
+    intro x
+    apply lequiv.injective
+    rw [hcompat e x, he, Units.val_one, one_mul]
+  have hνinj : Function.Injective ν :=
+    Units.map_injective (algebraMap (ZMod p) (MonoidAlgebra (ZMod p) E ⧸ I)).injective
+  haveI : IsCyclic (MonoidAlgebra (ZMod p) E ⧸ I)ˣ := inferInstance
+  have hdisj : μ.range ⊓ ν.range = ⊥ := by
+    rw [Subgroup.eq_bot_iff_forall]
+    intro z hz
+    rw [Subgroup.mem_inf] at hz
+    obtain ⟨⟨e, he⟩, ⟨c, hc⟩⟩ := hz
+    have hμν : (↑(μ e) : MonoidAlgebra (ZMod p) E ⧸ I)
+        = algebraMap (ZMod p) (MonoidAlgebra (ZMod p) E ⧸ I) (c : ZMod p) := by
+      have heν : μ e = ν c := he.trans hc.symm
+      rw [heν, Units.coe_map]; rfl
+    have hscalar : ∀ x : M, MonoidAlgebra.of (ZMod p) E e • x = (c : ZMod p).val • x := by
+      intro x
+      apply lequiv.injective
+      rw [hcompat e x, hμν, map_nsmul, nsmul_eq_mul]
+      congr 1
+      conv_lhs => rw [← ZMod.natCast_zmod_val (c : ZMod p)]
+      rw [map_natCast]
+    have he1 : e = 1 := hnonscalar e ⟨(c : ZMod p).val, hscalar⟩
+    rw [← he, he1, map_one]
+  have hcop := coprime_card_of_inf_eq_bot_isCyclic hdisj
+  have hcardμ : Nat.card μ.range = Nat.card E :=
+    (Nat.card_congr (MonoidHom.ofInjective hμinj).toEquiv).symm
+  have hcardν : Nat.card ν.range = p - 1 := by
+    rw [← Nat.card_congr (MonoidHom.ofInjective hνinj).toEquiv, Nat.card_eq_fintype_card,
+      ZMod.card_units_eq_totient, Nat.totient_prime (Fact.out)]
+  rwa [hcardμ, hcardν] at hcop
+
 /-- **Peterfalvi (9.7)(b), the coprimality `Coprime |E| (p-1)`.**  Adds to the Singer hypotheses
 (`E` finite abelian acting faithfully, commutatively, and irreducibly on the finite `𝔽ₚ[E]`-module
 `M`) a fixed-point-free additive automorphism `σ` of `M`: the only `e` whose `𝔽ₚ[E]`-action
@@ -545,70 +618,11 @@ theorem coprime_card_sub_one_of_faithful_irreducible_comm_fpf [Fact p.Prime] [Fi
     (σ : M ≃+ M)
     (hfpf : ∀ e : E, (∀ x : M, σ (MonoidAlgebra.of (ZMod p) E e • x)
                               = MonoidAlgebra.of (ZMod p) E e • σ x) → e = 1) :
-    Nat.Coprime (Nat.card E) (p - 1) := by
-  classical
-  letI : CommRing (MonoidAlgebra (ZMod p) E) :=
-    { (inferInstance : Ring (MonoidAlgebra (ZMod p) E)) with
-      mul_comm := mul_comm_monoidAlgebra_of_comm hcomm }
-  obtain ⟨I, hImax, ⟨lequiv⟩⟩ :=
-    (isSimpleModule_iff_quot_maximal (R := MonoidAlgebra (ZMod p) E) (M := M)).mp ‹_›
-  haveI : I.IsMaximal := hImax
-  letI : Field (MonoidAlgebra (ZMod p) E ⧸ I) := Ideal.Quotient.field I
-  haveI : Finite (MonoidAlgebra (ZMod p) E ⧸ I) := Finite.of_equiv _ lequiv.toEquiv
-  -- `μ : E ↪ Kˣ` (Singer realization) and `ν : 𝔽ₚ* ↪ Kˣ` (prime subfield units).
-  let μ : E →* (MonoidAlgebra (ZMod p) E ⧸ I)ˣ :=
-    (Units.map (Ideal.Quotient.mk I : MonoidAlgebra (ZMod p) E →+* _).toMonoidHom).comp
-      (MonoidAlgebra.of (ZMod p) E).toHomUnits
-  let ν : (ZMod p)ˣ →* (MonoidAlgebra (ZMod p) E ⧸ I)ˣ :=
-    Units.map (algebraMap (ZMod p) (MonoidAlgebra (ZMod p) E ⧸ I)).toMonoidHom
-  -- The action of `a` is multiplication by `μ a` after `lequiv`.
-  have hcompat : ∀ (a : E) (x : M),
-      lequiv (MonoidAlgebra.of (ZMod p) E a • x)
-        = (↑(μ a) : MonoidAlgebra (ZMod p) E ⧸ I) * lequiv x := by
-    intro a x
-    rw [map_smul, Algebra.smul_def, Ideal.Quotient.algebraMap_eq]; rfl
-  have hμinj : Function.Injective μ := by
-    rw [injective_iff_map_eq_one]
-    intro e he
-    apply hfaith e
-    intro x
-    apply lequiv.injective
-    rw [hcompat e x, he, Units.val_one, one_mul]
-  have hνinj : Function.Injective ν :=
-    Units.map_injective (algebraMap (ZMod p) (MonoidAlgebra (ZMod p) E ⧸ I)).injective
-  haveI : IsCyclic (MonoidAlgebra (ZMod p) E ⧸ I)ˣ := inferInstance
-  -- Disjointness `μ.range ⊓ ν.range = ⊥`: a common unit makes `e` act as an `𝔽ₚ`-scalar, so FPF.
-  have hdisj : μ.range ⊓ ν.range = ⊥ := by
-    rw [Subgroup.eq_bot_iff_forall]
-    intro z hz
-    rw [Subgroup.mem_inf] at hz
-    obtain ⟨⟨e, he⟩, ⟨c, hc⟩⟩ := hz
-    have hμν : (↑(μ e) : MonoidAlgebra (ZMod p) E ⧸ I)
-        = algebraMap (ZMod p) (MonoidAlgebra (ZMod p) E ⧸ I) (c : ZMod p) := by
-      have heν : μ e = ν c := he.trans hc.symm
-      rw [heν, Units.coe_map]; rfl
-    -- `e` acts as the scalar `(c : ZMod p).val` (an `nsmul`).
-    have hscalar : ∀ x : M, MonoidAlgebra.of (ZMod p) E e • x = (c : ZMod p).val • x := by
-      intro x
-      apply lequiv.injective
-      rw [hcompat e x, hμν, map_nsmul, nsmul_eq_mul]
-      congr 1
-      conv_lhs => rw [← ZMod.natCast_zmod_val (c : ZMod p)]
-      rw [map_natCast]
-    -- Fixed-point-freeness: `σ` commutes with the scalar action, so `e = 1`.
-    have he1 : e = 1 := by
-      apply hfpf
-      intro x
-      rw [hscalar, hscalar, map_nsmul]
-    rw [← he, he1, map_one]
-  -- Conclude via cyclic coprimality, with `|μ.range| = |E|` and `|ν.range| = p - 1`.
-  have hcop := coprime_card_of_inf_eq_bot_isCyclic hdisj
-  have hcardμ : Nat.card μ.range = Nat.card E :=
-    (Nat.card_congr (MonoidHom.ofInjective hμinj).toEquiv).symm
-  have hcardν : Nat.card ν.range = p - 1 := by
-    rw [← Nat.card_congr (MonoidHom.ofInjective hνinj).toEquiv, Nat.card_eq_fintype_card,
-      ZMod.card_units_eq_totient, Nat.totient_prime (Fact.out)]
-  rwa [hcardμ, hcardν] at hcop
+    Nat.Coprime (Nat.card E) (p - 1) :=
+  -- An `𝔽ₚ`-scalar action `x ↦ n • x` commutes with the additive `σ`, so the non-scalar core
+  -- applies with its scalar hypothesis discharged by fixed-point-freeness.
+  coprime_card_sub_one_of_faithful_irreducible_comm_nonscalar hcomm hfaith
+    (fun e ⟨n, hn⟩ => hfpf e (fun x => by rw [hn, hn, map_nsmul]))
 
 end CommGroupFreeSinger
 
