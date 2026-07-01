@@ -99,7 +99,13 @@ Coq (1.7)(b) `cfInd_central_Inertia` の hypothesis は `abelian (T/H)` (T=I(θ)
 - [x] **慣性商 abelian 完成** — `S14.typeF_inertia_commutator_le` (`⁅I(θ),I(θ)⁆ ≤ H`, sorry-free, cont.³)。
 - [ ] **(G1) 拡張 lemma** を build (`OddOrder/GroupTheory/RepresentationTheory/` 新/既存 leaf)。coprime
       Hall (H=L_F normal Hall, U abelian complement) の下で I/H cyclic → θ 拡張 (Isaacs 6.28/11.22)。
-- [ ] **(G2) Gallagher** + **(G3) mult-free-from-abelian-inertia** を build (同 leaf)。core generic 補題。
+- [x] **char-product infra (Gallagher 前提)** — `RepresentationTheory/CharacterProduct.lean` (新 leaf, sorry-free,
+      axiom-clean, cont.⁴): `ClassFunction` に pointwise `Mul` + `IsCharacter.mul` (χ·ψ = char of `tprod`,
+      `Representation.char_tensor` 経由) + `mul_mem_ZIrr` (ZIrr は積で閉じる=部分環)。Gallagher の
+      「χ·Inf(β) は character」(linear twist が norm 保存 → 既約) の核心前提。
+- [ ] **(G2) Gallagher** + **(G3) mult-free-from-abelian-inertia** を build (同/新 leaf)。char-product は上で landed、
+      残 = linear char の |値|=1 → norm 保存 → `isIrreducibleCharacter_of_inner_self_one_of_apply_one_pos`、
+      および bijection Irr(I/H)≃Irr(I|θ)。extension (G1) と組む。
 - [ ] **type-F 適用**: `typeF_inertia_commutator_le` (I(θ)/H abelian) を (G3) に投入。
 - [ ] **(1.5.a)/(1.2) 台**: 各構成要素 φ の台 ⊆ A(L)∪{1}。非実 = 奇数位数 (`not_isReal_of_ne_trivial_of_odd_card'`)。
 - [ ] `typeI_induced_char_constituents` (S14:472) を上記 cite で sorry-free 化。lane b (12.14) は cite。

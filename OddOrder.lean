@@ -35,6 +35,7 @@ import OddOrder.GroupTheory.RepresentationTheory.CenterOrbitFree
 import OddOrder.GroupTheory.RepresentationTheory.CharacterCompleteness
 import OddOrder.GroupTheory.RepresentationTheory.CharacterConjugate
 import OddOrder.GroupTheory.RepresentationTheory.CharacterCount
+import OddOrder.GroupTheory.RepresentationTheory.CharacterProduct
 import OddOrder.GroupTheory.RepresentationTheory.CharacterRowOrthogonality
 import OddOrder.GroupTheory.RepresentationTheory.ClassFunction
 import OddOrder.GroupTheory.RepresentationTheory.ClassSumAlgebra
