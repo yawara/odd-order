@@ -7464,6 +7464,39 @@ theorem inner_self_eq_sum_sq_add_of_intProjection [Finite G] {φ : ClassFunction
     inner_self_orthonormalSum_eq_sum_sq horth, hXY, hYX]
   ring
 
+open scoped Classical in
+/-- **Sum of squares with one distinguished coefficient.**  If `e ∈ R`, `f e = x`, and `f β = y` for
+every `β ∈ R` with `β ≠ e`, then `∑_{β∈R} (f β)² = x² + (|R| − 1)·y²`.  Used in (11.8.2) to evaluate
+`∑_{λ∈S(HC)} c(λ^{τ₁})² = (a − n)² + (|S₁| − 1)·a²` (the `ζ^{τ₁}` coefficient is `a − n`, every other
+coefficient is `a`). -/
+theorem sum_sq_eq_of_split {R : Finset (ClassFunction G ℂ)} {e : ClassFunction G ℂ} (he : e ∈ R)
+    {f : ClassFunction G ℂ → ℤ} {x y : ℤ} (hx : f e = x)
+    (hy : ∀ β ∈ R, β ≠ e → f β = y) :
+    (∑ β ∈ R, (f β : ℂ) ^ 2) = (x : ℂ) ^ 2 + ((R.card : ℂ) - 1) * (y : ℂ) ^ 2 := by
+  classical
+  rw [← Finset.add_sum_erase R (fun β => (f β : ℂ) ^ 2) he]
+  have he2 : ((f e : ℂ)) ^ 2 = (x : ℂ) ^ 2 := by rw [hx]
+  have hsum : ∑ β ∈ R.erase e, (f β : ℂ) ^ 2 = ((R.erase e).card : ℂ) * (y : ℂ) ^ 2 := by
+    rw [Finset.sum_congr rfl fun β hβ => by
+          rw [hy β (Finset.mem_of_mem_erase hβ) (Finset.ne_of_mem_erase hβ)],
+      Finset.sum_const, nsmul_eq_mul]
+  have hcard : ((R.erase e).card : ℂ) = (R.card : ℂ) - 1 := by
+    have h1 : 1 ≤ R.card := Finset.card_pos.mpr ⟨e, he⟩
+    rw [Finset.card_erase_of_mem he, Nat.cast_sub h1, Nat.cast_one]
+  rw [he2, hsum, hcard]
+
+open scoped FiniteInduce in
+/-- **Integer bound from a Parseval remainder.**  If `(A : ℂ) + ⟨Y, Y⟩ = (B : ℂ)` with `A, B ∈ ℤ`,
+then `A ≤ B` — since `⟨Y, Y⟩` is a non-negative real (`inner_self_re_nonneg`).  Turns the (11.8.2)
+Parseval equality `∑ c_β² + ‖Y‖² = ‖α^τ‖²` into the inequality `∑ c_β² ≤ ‖α^τ‖²`. -/
+theorem int_le_of_add_inner_self_eq [Finite G] {A B : ℤ} {Y : ClassFunction G ℂ}
+    (h : (A : ℂ) + ClassFunction.inner Y Y = (B : ℂ)) : A ≤ B := by
+  have hnn : (0 : ℝ) ≤ (ClassFunction.inner Y Y).re := inner_self_re_nonneg Y
+  have hre := congrArg Complex.re h
+  rw [Complex.add_re, Complex.intCast_re, Complex.intCast_re] at hre
+  have hle : (A : ℝ) ≤ (B : ℝ) := by linarith
+  exact_mod_cast hle
+
 open scoped FiniteInduce in
 /-- **Peterfalvi (11.8), the genuine non-orthogonality** (lane-b W3 obligation, issue 2020).
 
