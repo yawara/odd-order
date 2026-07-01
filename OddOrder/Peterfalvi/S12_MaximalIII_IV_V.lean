@@ -7053,6 +7053,49 @@ noncomputable def Hypothesis.SHC_isCoherent [Finite G]
   exact hcoh
 
 open scoped FiniteInduce in
+/-- **`‖ζ^{τ₁}‖² = 1` for the `S(HC)`-coherent extension** (α-grid `S₁`-`τ₁` input to (11.8.2)).
+The `S(HC)`-coherence `τ₁ = SHC_isCoherent.extension` is an isometry on `ℤ[S(HC)]`
+(`extension_inner_eq`) and the degree-`w₁` irreducible `ζ ∈ S(HC)`, so `‖ζ^{τ₁}‖² = ‖ζ‖² = 1`.
+
+Unlike `zeta_tau1_inner_self` (which needs the full-`S` `CoherentHypothesis`), this uses only the
+landed `SHC_isCoherent`, so it is available inside the (11.8) by-contradiction, which lacks the
+full-`S` coherence (the residual-orthogonal branch never obtains `CoherentHypothesis`). -/
+theorem Hypothesis.SHC_extension_inner_self [Finite G] {M : Subgroup G}
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis M)
+    {ζ : ClassFunction ↥M ℂ} (hζS : ζ ∈ inducedFamily M) (hζirr : IsIrreducibleCharacter ζ)
+    (hζ1 : ζ 1 = (hyp.w1 : ℂ)) :
+    ClassFunction.inner ((hyp.SHC_isCoherent hG).extension ζ)
+      ((hyp.SHC_isCoherent hG).extension ζ) = 1 := by
+  have hspan : ζ ∈ OddOrder.Peterfalvi.S07.zSpan
+      {φ : ClassFunction ↥M ℂ | φ ∈ inducedFamily M ∧ IsIrreducibleCharacter φ ∧
+        ((φ : ↥M → ℂ) 1 = (hyp.w1 : ℂ))} :=
+    Submodule.subset_span ⟨hζS, hζirr, hζ1⟩
+  rw [(hyp.SHC_isCoherent hG).extension_inner_eq _ _ hspan hspan,
+    OddOrder.RepresentationTheory.irr_cf_inner hζirr hζirr, if_pos rfl]
+
+open scoped FiniteInduce in
+/-- **`⟨α_{ij}^τ, ζ^{τ₁}⟩ ∈ ℤ` for the `S(HC)`-coherent extension** (α-grid `S₁`-`τ₁` input to
+(11.8.2)).  Both `α_{ij}^τ = hyp.tau(μ_{ij} − δ·μ_{i0} − n·ζ)` (`muGridAlpha_tau_mem_ZIrr`,
+coherence-free) and `ζ^{τ₁} = SHC_isCoherent.extension ζ` (`extension_mem_ZIrr`, since `ζ ∈ S(HC)`)
+lie in `ℤ·Irr G`, so their inner product is an integer.  This is the integrality that the (11.8.2)
+`a`-coefficient argument consumes, now available from `SHC_isCoherent` alone (no full-`S` `coh`). -/
+theorem Hypothesis.muGridAlpha_tau_inner_SHC_extension_mem_int [Finite G] {M : Subgroup G}
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis M) (hodd : Odd (Nat.card G))
+    (i : Fin hyp.w1) {j : Fin hyp.w2} (hj0 : j ≠ 0)
+    {ζ : ClassFunction ↥M ℂ} (hζS : ζ ∈ inducedFamily M) (hζirr : IsIrreducibleCharacter ζ)
+    {d : ℕ} {δ : ℤ} {n : ℕ}
+    (hdeg : hyp.muGrid hG hodd i j 1 = (d : ℂ)) (hμ0 : hyp.muGrid hG hodd i 0 1 = 1)
+    (hζ1 : ζ 1 = (hyp.w1 : ℂ)) (hnf : (n : ℤ) * (hyp.w1 : ℤ) = (d : ℤ) - δ)
+    (hδj : hyp.muColumnSign hG hodd j = δ) :
+    ∃ m : ℤ, ClassFunction.inner
+        (hyp.tau (hyp.muGrid hG hodd i j - (δ : ℂ) • hyp.muGrid hG hodd i 0 - (n : ℂ) • ζ))
+        ((hyp.SHC_isCoherent hG).extension ζ) = (m : ℂ) := by
+  have hαZ := hyp.muGridAlpha_tau_mem_ZIrr hG hodd i hj0 hζS hζirr hdeg hμ0 hζ1 hnf hδj
+  have hζZ : (hyp.SHC_isCoherent hG).extension ζ ∈ ZIrr G :=
+    (hyp.SHC_isCoherent hG).extension_mem_ZIrr ζ (Submodule.subset_span ⟨hζS, hζirr, hζ1⟩)
+  exact ClassFunction.inner_mem_ZIrr_int hαZ hζZ
+
+open scoped FiniteInduce in
 /-- **Peterfalvi (11.8), the genuine non-orthogonality** (lane-b W3 obligation, issue 2020).
 
 Under Hypothesis (10.1), there is an irreducible `ζ ∈ S = inducedFamily M` of degree `w₁` —
