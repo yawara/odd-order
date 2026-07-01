@@ -2022,3 +2022,19 @@ machinery とは独立の新 phase。full build green (3893 jobs)。
 **次 iteration の honest 着手候補** (document-order): 9.8.d の Galois 構造 de-opacify (H1/a/theta) が
 文書順最上流だが構造変更大。または 9.9.c (caseB exceptional, 構造変更不要だが deep §9-10 coherence 依存)。
 どちらも fresh-context で Coq `typeP_{non,}Galois_characters` 精読からの multi-iteration build。
+
+## 🛑 §9 残 = hub-gated (frozen Galois territory) → lane-a pivot (2026-07-02 cont.²²)
+cont.²¹ の opaque-gating を追跡 → **remaining §9 (9.8.d/9.9.c/9.10) は全て type-P Galois 土台 gated、
+かつその土台は issue 9000 で HUB 裁定中 (policy 8, 凍結)**:
+- CliffordCaseAData `quotient_factors_cyclic_order_a`/`Ubar_embeds_product` + CliffordCaseBData
+  `field_model`/`Ubar_cyclic` = 全 opaque `True` stub。de-opacify = typeP_Galois (9.7) 構造構築。
+- **issue 9000**: lane a の S11 Galois pieces (`isCyclic_card_dvd_..._irreducible_faithful_comm`
+  e2a673bd 等) が lane d の σ-theory leaf と**重複**、hub 裁定待ちで**「これ以上広げない」凍結**。
+  ∴ 9.8.d/9.9.c の Galois de-opacify は凍結領域拡張ゆえ **lane-a は今着手不可**。
+- **判定**: policy 8 (lane d は「hub 裁定待ちの間、別 on-spine 上流へ」) を lane a も適用。
+  §9 の残は Galois 土台 land 後に再開 (skeleton 前倒しも凍結ゆえ保留)。
+
+**lane-a pivot 先 (ungated、次 iteration 着手)**: S10 (13 sorry)、S13 (11 sorry)、
+issues 1013 (S09 §7 certificate)、1015 (hzeta0nu coherence orth)、1016 (T-side typePdata threading)、
+0065 (Cor 12.16)。文書順+上流優先で選択。caseA/B_character_counts は現状 §12-13 に consumer 無
+(endpoint) ゆえ §9 残の緊急度は低い。
