@@ -1979,6 +1979,31 @@ theorem Sset_apply_one_eq_index [Finite G] {L : Subgroup G} (hyp : Hypothesis L)
   obtain ⟨θ, hθ_ne, rfl⟩ := hχ
   rw [ClassFunction.induce_apply_one, θ.isIrreducible.apply_one_eq_one_of_isMulCommutative, mul_one]
 
+open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
+/-- **`S(H′)` is constant-degree** (the (5.7) input for `hcoh` of the (6.5.c) engine, without
+assuming `H` abelian).  Every member of `S(⁅K,K⁆)` (`K = (L_F).subgroupOf L`) is `Ind_K^L θ` with
+`⁅K,K⁆ ⊆ Ker θ`; then `θ` factors through the abelian `K/⁅K,K⁆`, so `θ(1) = 1`
+(`apply_one_eq_one_of_subset_characterKernel_of_isMulCommutative_quotient`) and `Ind θ (1) = |L:K|`.
+This is Peterfalvi's `η_j(1) = |W₁|` for the `Y = S(H′)` family — the subfamily replacement for the
+case-(b) `Sset_apply_one_eq_index` (which needs all of `H` abelian). -/
+theorem SsubFiltration_commutator_apply_one_eq_index [Finite G] {L : Subgroup G}
+    (hyp : Hypothesis L) {χ : ClassFunction ↥L ℂ}
+    (hχ : χ ∈ hyp.SsubFiltration
+      ⁅(hyp.typeI.typeF.H).subgroupOf L, (hyp.typeI.typeF.H).subgroupOf L⁆) :
+    (χ : ↥L → ℂ) 1 = (((hyp.typeI.typeF.H).subgroupOf L).index : ℂ) := by
+  classical
+  simp only [Hypothesis.SsubFiltration, Set.mem_setOf_eq] at hχ
+  obtain ⟨θ, _hθ_ne, hker, rfl⟩ := hχ
+  have hθ1 : (θ : ClassFunction ↥((hyp.typeI.typeF.H).subgroupOf L) ℂ) 1 = 1 := by
+    haveI : IsMulCommutative (↥((hyp.typeI.typeF.H).subgroupOf L) ⧸
+        commutator ↥((hyp.typeI.typeF.H).subgroupOf L)) :=
+      inferInstanceAs (IsMulCommutative (Abelianization ↥((hyp.typeI.typeF.H).subgroupOf L)))
+    refine OddOrder.RepresentationTheory.apply_one_eq_one_of_subset_characterKernel_of_isMulCommutative_quotient
+      (N := commutator ↥((hyp.typeI.typeF.H).subgroupOf L)) θ ?_
+    rw [← OddOrder.Peterfalvi.S08.commutator_subgroupOf_self ((hyp.typeI.typeF.H).subgroupOf L)]
+    exact hker
+  rw [ClassFunction.induce_apply_one, hθ1, mul_one]
+
 open OddOrder.Peterfalvi.S09.Cert in
 open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
 /-- **Witness member differences are `A(L)`-supported** (the `hsuppdiff` input of (5.7)/(12.6) case
