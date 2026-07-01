@@ -771,3 +771,16 @@ doubly-gated (§9↔§10 の (11.8.1)、§14 の (11.8.6))。
   は X=α^τ+nζ^{τ₁}−a∑λ^{τ₁} で a∈{0,2} 両方要 (a=0 は (11.8.5) の結論、先取り不可)。ψ(v)=0 には
   **∑_{λ∈S₁}λ^{τ₁}(v)=0** も要 → 各 λ∈S(HC) (degree w₁) に `SHC_tau1_zeta_vanishes` 適用 (λ̄≠λ 要;
   odd order ⟹ degree>1 は non-real で成立、但し per-λ に λ̄≠λ の供給要)。a=0 mainline を先に組んで a=2 を別扱いも可。
+
+## 2026-07-02 cont.⁴² (lane-a) — **SHC ψ vanishes on V LANDED (a=0 form)**
+`Hypothesis.SHC_muGridPsi_vanishes_on_typePV` (S12:7381, leaf green, sorry-free): a=0 form
+`ψ = (α_{ij}^τ+n·ζ^{τ₁}) − δ(ω_{ij}^σ−ω_{i0}^σ)` が V で消える。証明 4 行 = `tau_muGridAlpha_apply_eq_on_typePV`
+(α^τ=δ(ω^σ diff) on V, coh-free) + cont.⁴¹ `SHC_tau1_zeta_vanishes` → `rw; simp`。muGridPsi (4195) の
+機械 port (coh.tau1→SHC.ext)。**一発 green**。
+
+**次 = norm-2 Dade-image trichotomy → X=δ(ω^σ diff) (SHC `alpha_tau_image`)**:
+`eq_smul_chiFam_diff_of_vanishOnV` (§5 の (4.8) endgame 一般化) に ‖X‖²=2 (cont.⁴⁰) + ψ vanish (本) を
+食わせて X=δ(ω_{ij}^σ−ω_{i0}^σ)。⚠ (10.5) endpoint `alpha_tau_image` (4464) は full-coh gerekli の完成形;
+SHC 版は本 chain (cont.⁴¹→⁴²→trichotomy) で組む。a=0: X=residual Y 直結。a=2: X=Y+2∑λ で ∑λ^{τ₁} vanish 要
+(general-a 注意 above)。trichotomy lemma の署名確認 → X の norm-2/vanish/ZIrr を渡す。
+(11.8) closure は依然 doubly-gated (§9↔§10 の (11.8.1)、§14 の (11.8.6))。
