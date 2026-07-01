@@ -8313,6 +8313,47 @@ theorem Hypothesis.a_even_of_eq_inner_sumOmegaSigma [Finite G]
     exact_mod_cast hcast
   rw [haz]; exact hev
 
+open scoped FiniteInduce in
+/-- **Peterfalvi (11.8.5), `β ⊥ 1_G`** (`i ≠ 0`): `⟨α_{ij}^τ − δ(ω_{ij}^σ − ω_{i0}^σ) + nζ^{τ₁},
+1_G⟩ = 0`.  Via the Dade adjoint `tau_inner_trivial` (`⟨α_{ij}^τ, 1_G⟩ = ⟨α_{ij}, 1_M⟩ = 0`, `hα1M`);
+`1_G = ω_{00}^σ` (`alignedOmegaSigmaGrid_zero_zero`), so `⟨ω_{ij}^σ − ω_{i0}^σ, 1_G⟩ = 0`
+(`alignedOmegaSigmaGrid_inner`, using `i ≠ 0`); and `⟨ζ^{τ₁}, 1_G⟩ = 0`
+(Peterfalvi (5.3.b), `SHC_extension_inner_alignedOmegaSigma_eq_zero`).  This is the `β ⊥ 1` input to
+the `a`-even parity `a_even_of_eq_inner_sumOmegaSigma`. -/
+theorem Hypothesis.beta_inner_trivial [Finite G] {M : Subgroup G}
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis M) (hodd : Odd (Nat.card G))
+    (i : Fin hyp.w1) {j : Fin hyp.w2} (hj0 : j ≠ 0) (hi0 : i ≠ 0)
+    {ζ : ClassFunction ↥M ℂ} (hζS : ζ ∈ inducedFamily M) (hζirr : IsIrreducibleCharacter ζ)
+    (hζ1 : ζ 1 = (hyp.w1 : ℂ)) (hζne : ζ.conj ≠ ζ) {d : ℕ} {δ : ℤ} {n : ℕ}
+    (hdeg : hyp.muGrid hG hodd i j 1 = (d : ℂ)) (hμ0 : hyp.muGrid hG hodd i 0 1 = 1)
+    (hnf : (n : ℤ) * (hyp.w1 : ℤ) = (d : ℤ) - δ) (hδj : hyp.muColumnSign hG hodd j = δ)
+    (hα1M : ClassFunction.inner
+      (hyp.muGrid hG hodd i j - (δ : ℂ) • hyp.muGrid hG hodd i 0 - (n : ℂ) • ζ)
+      (trivialClassFunction ↥M) = 0) :
+    ClassFunction.inner
+      (hyp.tau (hyp.muGrid hG hodd i j - (δ : ℂ) • hyp.muGrid hG hodd i 0 - (n : ℂ) • ζ)
+        - (δ : ℂ) • (hyp.alignedOmegaSigmaGrid hG hodd i j - hyp.alignedOmegaSigmaGrid hG hodd i 0)
+        + (n : ℂ) • (hyp.SHC_isCoherent hG).extension ζ)
+      (trivialClassFunction G) = 0 := by
+  have hsupp := hyp.muGrid_alpha_support hG hodd hj0 hζS hdeg hμ0 hζ1 hnf hδj
+  have hατ1 : ClassFunction.inner
+      (hyp.tau (hyp.muGrid hG hodd i j - (δ : ℂ) • hyp.muGrid hG hodd i 0 - (n : ℂ) • ζ))
+      (trivialClassFunction G) = 0 := by
+    rw [hyp.tau_inner_trivial hsupp]; exact hα1M
+  have hωdiff1 : ClassFunction.inner
+      (hyp.alignedOmegaSigmaGrid hG hodd i j - hyp.alignedOmegaSigmaGrid hG hodd i 0)
+      (trivialClassFunction G) = 0 := by
+    rw [← hyp.alignedOmegaSigmaGrid_zero_zero hG hodd, ClassFunction.inner_sub_left,
+      hyp.alignedOmegaSigmaGrid_inner hG hodd i 0 j 0,
+      hyp.alignedOmegaSigmaGrid_inner hG hodd i 0 0 0,
+      if_neg (fun h => hi0 h.1), if_neg (fun h => hi0 h.1), sub_zero]
+  have hζτ1 : ClassFunction.inner ((hyp.SHC_isCoherent hG).extension ζ)
+      (trivialClassFunction G) = 0 := by
+    rw [← hyp.alignedOmegaSigmaGrid_zero_zero hG hodd]
+    exact hyp.SHC_extension_inner_alignedOmegaSigma_eq_zero hG hodd hζS hζirr hζ1 hζne 0 0
+  rw [ClassFunction.inner_add_left, ClassFunction.inner_sub_left, ClassFunction.inner_smul_left,
+    ClassFunction.inner_smul_left, hατ1, hωdiff1, hζτ1, mul_zero, mul_zero, sub_zero, add_zero]
+
 open scoped Classical FiniteInduce in
 /-- **Peterfalvi (11.8.5), `a = 0` under the (11.8.4) hypothesis** (the residual-orthogonal case).
 Given the (11.8.4) by-contradiction consequence `(μ₀ − ζ)^τ = ∑_r ω_{r0}^σ − ζ^{τ₁}` (`μ₀ = ∑ μ_{i'0}`),

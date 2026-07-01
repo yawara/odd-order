@@ -1021,3 +1021,14 @@ threaded hyp 無)。**残 = a=(∑ω_{r0}^σ,β) application**: β real=(11.8.3,
 **a=⟨∑ω,β⟩ の 2-way calc** (general a、私の a∈{0,2} calc と別) + **β real=(11.8.3, 大)** + β⊥1。
 これらが揃えば a even → a∈{0,2} → `charParam_a_eq_zero_of_residualEq` で a=0 (unconditional)。
 (11.8) closure は依然 doubly-gated (§9↔§10、§14) — a-even 完成しても endpoint は §14 gate 残。
+
+## 2026-07-02 cont.⁶⁰ (lane-a) — **β⊥1_G `beta_inner_trivial` LANDED**
+`Hypothesis.beta_inner_trivial` (S12, leaf green, sorry-free、**一発 green**): i≠0 で
+`⟨α^τ − δ(ω^σ diff) + nζ^{τ₁}, 1_G⟩ = 0`。証明: ⟨α^τ,1_G⟩=⟨α_{ij},1_M⟩ (`tau_inner_trivial` 5520 Dade 随伴、
+α_{ij} A0-supp=`muGrid_alpha_support`) =0 (hα1M threaded); 1_G=ω_{00}^σ (`alignedOmegaSigmaGrid_zero_zero`) で
+⟨ω^σ diff,1_G⟩=0 (`alignedOmegaSigmaGrid_inner`、i≠0 で両 [i=0]=false); ⟨ζ^{τ₁},1_G⟩=0 (5.3.b)。
+`inner_add/sub/smul_left` で組んで ring。⚠ hα1M (⟨α_{ij},1_M⟩=0) は threaded (μ_{i0}≠1_M for i≠0 が要、非自明)。
+
+**a-even application 入力状況**: ∑ω real ✓/∑ω∈ZIrr ✓/parity core ✓/assembly ✓/**β⊥1 ✓**。
+**残 = β∈ZIrr + β real (11.8.3, 大) + a=⟨∑ω,β⟩ 2-way calc + hα1M (⟨α_{ij},1_M⟩=0)**。
+(11.8) closure は依然 doubly-gated (§9↔§10、§14)。
