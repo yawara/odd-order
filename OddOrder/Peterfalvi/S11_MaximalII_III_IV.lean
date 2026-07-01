@@ -4968,6 +4968,18 @@ noncomputable def clifford_caseA_data [Finite G] {M : Subgroup G}
   have hdvd := aInvariantRestrictAut_range_card_dvd hS₀inv (hS₀card ▸ chief.p_prime)
   rwa [hS₀card] at hdvd
 
+/-- **`|S₀| = p`**: the orbit generator `S₀` (`CliffordCaseAData.S0`) has order `p`.  Each summand
+`Hpart j = φ(orbitRep j) • S₀` (`Hpart_orbit`) is an automorphic image of `S₀` under the chief-factor
+action `φ = quotientMulAutHom`, hence has the same order (`card_pointwise_smul`), which is `p`
+(`Hpart_order`).  A foundational input for the (9.8.c) constant-factor-data construction (`S₀ ≅ ℤ/p`
+has exactly `p` characters, `p-1` of them nontrivial). -/
+theorem caseA_S0_card [Finite G] {M : Subgroup G}
+    {data : TypesIIIIIIVSetup M} {chief : ChiefFactorData data}
+    {chars : Section11CharacterData data chief} (caseA : CliffordCaseAData chars) :
+    Nat.card ↥caseA.S0 = chief.p := by
+  have h := caseA.Hpart_order ⟨0, data.nontrivial.2.1.pos⟩
+  rwa [caseA.Hpart_orbit ⟨0, data.nontrivial.2.1.pos⟩, card_pointwise_smul] at h
+
 /-- **A regular character nontrivial on each `W1`-conjugate of `S₀`** (Clifford case (a)).
 Instantiates the elementary `(9.7)` decomposition `H̄ = ⊕_{w∈W1} S₀^w` (`wConjugate_coprod_bijective`,
 with the chief-factor `U`-action, `act.U ⊔ act.E = ⊤`, `|H̄| = p^{|W1|}`) and feeds the resulting
