@@ -11,6 +11,55 @@ created: 2026-07-01
 > (semilinear/near-field) = `typeP_Galois` の土台を新 shared-infra leaf `OddOrder/GroupTheory/**`
 > で実証明する。lane a §11 は typeP_Galois を再実装せず本 leaf を **cite**。他レーンは着手前に本 issue を scan。
 
+## 🛑 重複発覚 → HUB 裁定案件 (2026-07-02, policy 8 適用)
+
+**lane a が S11 で同じ typeP_Galois (9.7) Singer 機構を concurrent 構築していた** (claim-before-build の
+search が見落とし — lane a のは Peterfalvi/S11 *所有 file* 内 subgroup-level ゆえ shared-infra scan に掛からず)。
+これは policy 8 (重複発覚→hub 裁定) + hub 齟齬 (issue 4014 再配分が lane a の in-progress を勘案せず) の実例。
+
+**重複 map**:
+| math | lane a S11 (既存 commit) | 私の σ-theory leaf | 判定 |
+|---|---|---|---|
+| Galois Singer \|Ū\|∣p^q−1 | `isCyclic_card_dvd_of_aInvariant_irreducible_faithful_comm` (`e2a673bd`) | `card_dvd..._irreducible_fpf` | **重複** (両 SingerField wrap、subgroup vs module level) |
+| FPF→coprime(\|Ū\|,p−1) | `5efa6b5c` | 同 (SingerField cite) | **重複** |
+| refined \|Ū\|∣(p^q−1)/(p−1) | S11:4333 (`Nat.dvd_div_iff_mul_dvd`) | `card_dvd_cyclotomicQuotient...` + 算術核 | **重複** (Galois 側) |
+| non-Galois \|Ū\|≤(p−1)^{q−1} | Clifford/Hpart 解析 (S11:4471+、別アプローチ) | imprimitive embedding + `card_le_pow_of_block_scalars` (psi core) | **非重複** (別 route) |
+| 汎用算術 (`dvd_div_of_coprime_of_dvd_sub_one` 等) | inline | named 版 | 弱重複 (cite 可) |
+
+**hub に defer する判断** (policy 8 step 3): σ-theory の home 一本化 — (i) lane a の subgroup-level を私の
+generic module-level leaf に cite 化するか、(ii) 私の Galois leaf を撤退し lane a の subgroup 版に一本化するか、
+(iii) 私は非重複な non-Galois imprimitive engine + psi core + 汎用算術のみ残すか。
+
+**凍結** (policy 8 step 4): 重複 Galois piece (`SingerLineBound.lean` の module-level refined bound) は hub 裁定まで
+**これ以上広げない**。非重複部 (non-Galois imprimitive engine `SemilinearImprimitiveBound.lean` の psi core +
+embedding、`TypePGaloisUBound` dichotomy) は genuine ゆえ保持。lane d は hub 裁定待ちの間、別 on-spine 上流へ。
+
+## ✅ HUB 裁定 (2026-07-02, cron tick) — home = lane d の generic module-level leaf
+
+**決定: Galois-side Singer bound の home は lane d の generic module-level leaf に一本化** (option (i))。
+lane d は Galois leaf (`SingerLineBound`) を**凍結解除**して canonical home とする。
+
+**決め手 (generic が subgroup 版に決定的に優位)**: generic module-level lemma は **S-side (lane a の
+`basic_structure.u_bound`) と T-side (lane c の `S16:166 v=(q^p−1)/(q−1)`、hub が 2026-07-02 に flag) の
+両方に同一 lemma で効く**。lane a の subgroup-level 版 (`isCyclic_card_dvd_of_aInvariant_irreducible_faithful_comm`
+等) は S-side 専用で T-side に効かない。σ-theory 再配分 (issue 4014 = lane d が generic σ-theory 所有・
+他レーン cite) とも一致。
+
+**lane a への指示 (dedup 実施、S11 は lane a 所有)**:
+- 重複 3 定理 (`isCyclic_card_dvd_of_aInvariant_irreducible_faithful_comm` (`e2a673bd`)、
+  FPF→coprime (`5efa6b5c`)、refined bound (S11:4333)) を **retire し lane d の generic leaf を cite**
+  (`card_dvd_cyclotomicQuotient_of_faithful_irreducible_fpf` 等、必要なら thin subgroup→module adapter)。
+- **保持**: genuinely 非重複な S11-specific 構造 feed (W₁ block 分解 / psi injectivity の構造部 =
+  lane d generic engine への供給) + 非-Galois Clifford/Hpart route (別 route ゆえ当面共存、u_bound consumer は
+  lane d の imprimitive engine を cite)。
+- **S11 build-green 維持** (swap は merge gate + full build で強制)。急がば dup 凍結のまま cite 移行を優先。
+
+**hub 自己反省 (齟齬)**: issue 4014 の σ-theory 再配分が lane a の S11 in-progress Singer work を勘案せず、
+重複を生んだ (lane d 指摘は正当)。**policy 8 step 5 で再発防止済** (search を subgroup/module 両抽象跨ぎに +
+再配分時に既存 in-progress を先に確認)。lane d に非はない (claim-search 手順は正しく踏んだ)。
+
+**lane d**: Galois leaf 凍結解除・保持継続。dedup は lane a が S11 側で実施ゆえ lane d は待たず次 on-spine 上流へ。
+
 ## 目標
 
 Coq `typeP_Galois := acts_irreducibly U Hbar 'Q` (PFsection9.v:323 = **Pf (9.7)**) の二分岐を

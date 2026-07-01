@@ -1501,3 +1501,23 @@ sharpImage_H_subgroupOf_eq_typeIA / transport 2 件) は**一般に正しく再�
   producer** (`isCoherent_pair_of_differenceImage` (S07:86) の n-member 一般化) が要る。
 両者とも coherence infra の build 事項 = hub 9001 で claim 調整。次: case(b) の Dade 等次数 coherence を
 `isCoherent_pair_of_differenceImage` + retarget family から一般化して build 試行 (最 tractable)。
+
+### ✅ loop⁶⁴ (2026-07-02): HUB 裁定完了 — lane b が shared coherence/Clifford infra を build (unblock)
+
+issue 9001 に **HUB 裁定** (2026-07-02 cron tick)。coordination-block 解消:
+- **事項1 (3-case split unsound 是正)**: ✅ 承認・main 合流済 (`ed34cdc8`)。soundness 改善で非 regression と
+  hub 認定 (unsound < honest sorry、CLAUDE.md doneness 原則合致)。今後も unsound→honest-scaffold 置換は非 regression。
+- **事項2 (shared infra 割当)**: **3 件すべて lane b が claim-first で build** (policy 5B/6/7 + σ-theory 先例):
+  - **(A') S07 (5.7) lattice-relative refactor** — turnkey (機械的: weakened (5.2) Hypothesis を
+    commonImage/pairDecomp'/xFamily_inner に通す、coherentEqualDegree 無改造)。⚠ S07 既存 consumer
+    (lane a coherence) を build-green 維持 (hypothesis 一般化ゆえ既存 caller 無影響のはず、full build で強制)。
+  - **(A) (6.5.c) coherence producer** — 9000 番台で claim → build (shared leaf)。
+  - **(B) 構成的 Clifford (issue 0026)** — 9000 番台で claim → build (0026 を subsume)。α は cite (dup 回避)。
+
+**次セッションの優先 (unblocked、lane b assigned)**:
+1. **(A') S07 lattice-relative refactor** が最優先 (turnkey・機械的・case(b) を直接 unblock、xFamily_inner_dade は
+   その一部として既 landing)。weakened (5.2) Hypothesis を作り chain に通す → `coherent_of_constant_degree` の
+   Dade-compatible 版 → `frobenius_typeI_coherent_of_abelianKernel` 埋め。S07 consumer は full build で green 検証。
+2. **(6.5.c)** producer (case c) → `frobenius_typeI_coherent_of_cyclicQuotient` 埋め。→ witness coherence 完成。
+3. **構成的 Clifford** (M-side、大規模) → `typeI_induced_char_constituents` 等。
+これで witness_L_coherent → (12.13)/(12.14)/(12.16) の witness Dade 経路が全 unblock。
