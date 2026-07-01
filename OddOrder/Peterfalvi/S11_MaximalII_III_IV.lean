@@ -6536,6 +6536,132 @@ theorem hcConjDescend_mul [Finite G] {M : Subgroup G}
   simp only [ClassFunction.conjByMulEquiv_apply, Subgroup.coe_mul, Subgroup.coe_inv]
   group
 
+/-- **`A_u = uActionHom(a)` for a `U`-part element `u ∈ uInHu`** (P3 of the case-A
+factor-preservation).  For `u ∈ uInHu` (a realized `U`-element inside `HU`), the descended
+conjugation `A_u = hcConjDescend u` agrees on `H̄ = H/N` with the abstract `U`-action
+`uActionHom data chief a`, where `a` is the realization of `u` in `↥(U.subgroupOf (U ⊔ W₁))`.
+Both descend the conjugation `x ↦ u·x·u⁻¹` to `H̄`, matched pointwise by the shared `G`-value
+`u_G·h_G·u_G⁻¹`: on the left via `hcHom_inclusion` (`hcHom` on the `H`-part is `mk'_N ∘ hInHuEquivH`)
+and the factoring `hcConjDescend_hcHom`, on the right via `quotientMulAutHom_apply_mk'` and
+`typeP_conjAction_apply`.  Combined with `hcConjDescend_mul`/`hcConjDescend_eq_id_of_mem_hc` (the
+`H`-part `A_h` is the identity), this reduces the case-A factor-preservation `A_g(Hpart i) ⊆ Hpart i`
+to the `U`-invariance `Hpart_aInvariant`. -/
+theorem hcConjDescend_eq_uActionHom [Finite G] {M : Subgroup G}
+    {data : TypesIIIIIIVSetup M} (chief : ChiefFactorData data) {u : ↥(huSub data)}
+    [(hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf (huSub data)).Normal]
+    (hu : u ∈ uInHu data) :
+    ∃ a, ∀ z, hcConjDescend chief u z = uActionHom data chief a z := by
+  have huU : ((u : ↥M) : G) ∈ data.typeP.U :=
+    Subgroup.mem_subgroupOf.mp (Subgroup.mem_subgroupOf.mp hu)
+  set x₀ : ↥(data.typeP.U ⊔ data.typeP.W1) := ⟨((u : ↥M) : G), Subgroup.mem_sup_left huU⟩ with hx₀
+  refine ⟨⟨x₀, Subgroup.mem_subgroupOf.mpr huU⟩, fun z => ?_⟩
+  obtain ⟨y, rfl⟩ := QuotientGroup.mk'_surjective chief.N z
+  obtain ⟨h, rfl⟩ := (hInHuEquivH data).surjective y
+  -- right side: the abstract `U`-action descends `mk'_N` to `typeP_conjAction x₀`
+  have hRHS : uActionHom data chief ⟨x₀, Subgroup.mem_subgroupOf.mpr huU⟩
+        (QuotientGroup.mk' chief.N (hInHuEquivH data h))
+      = QuotientGroup.mk' chief.N (typeP_conjAction data.typeP x₀ (hInHuEquivH data h)) := by
+    show (quotientMulAutHom chief.N_aInvariant) x₀
+        (QuotientGroup.mk' chief.N (hInHuEquivH data h)) = _
+    rw [OddOrder.Isaacs.Ch04.OddOrder.Isaacs.Ch03.IsAInvariant.quotientMulAutHom_apply_mk']
+  -- left side: `A_u ∘ hcHom` = `hcHom ∘ conjBy u`, and the conjugate lands in `hInHu`
+  have hmem' : (u : ↥(huSub data)) * (h : ↥(huSub data)) * (u : ↥(huSub data))⁻¹ ∈ hInHu data :=
+    (hInHu_normal data).conj_mem (h : ↥(huSub data)) h.2 (u : ↥(huSub data))
+  have hincl : (ClassFunction.conjByMulEquiv u (Subgroup.inclusion le_sup_left h)
+      : ↥(hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf (huSub data)))
+      = Subgroup.inclusion le_sup_left ⟨_, hmem'⟩ := by
+    apply Subtype.ext
+    rw [ClassFunction.conjByMulEquiv_apply, Subgroup.coe_inclusion, Subgroup.coe_inclusion]
+  rw [hRHS, ← hcHom_inclusion chief h, hcConjDescend_hcHom, hincl, hcHom_inclusion]
+  -- both sides are `mk'_N` of the same `H`-element (equal `G`-value `u_G·h_G·u_G⁻¹`)
+  refine congrArg (QuotientGroup.mk' chief.N) (Subtype.ext ?_)
+  simp only [hInHuEquivH_coe, typeP_conjAction_apply, hx₀, Subgroup.coe_mul, Subgroup.coe_inv]
+
+/-- **Case-A factor-preservation: `A_g` maps each Clifford summand `Hpart i` into itself.**  For any
+`g ∈ HU`, the descended conjugation `A_g = hcConjDescend g` maps the order-`p` chief-factor summand
+`caseA.Hpart i` into itself.  Decompose `g = h·u` (`h ∈ hInHu`, `u ∈ uInHu`, from
+`hInHu_sup_uInHu_eq_top` + normality of `hInHu`); then `A_g = A_h ∘ A_u = A_u` (`hcConjDescend_mul`
+and `hcConjDescend_eq_id_of_mem_hc`, since `h ∈ hInHu ⊆ HC`), and `A_u = uActionHom a`
+(`hcConjDescend_eq_uActionHom`) preserves `Hpart i` by `Hpart_aInvariant`.  This is the geometric
+core of the regularity half of the `oXtheta` `T`-invariance: `A_g` permutes the summands trivially
+(each stays fixed setwise), so `θ ∘ A_g` is regular iff `θ` is. -/
+theorem hcConjDescend_maps_Hpart [Finite G] {M : Subgroup G}
+    {data : TypesIIIIIIVSetup M} {chief : ChiefFactorData data}
+    {chars : Section11CharacterData data chief} (caseA : CliffordCaseAData chars)
+    (g : ↥(huSub data)) {i : Fin data.q} {z : ↥data.H ⧸ chief.N}
+    [(hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf (huSub data)).Normal]
+    (hz : z ∈ caseA.Hpart i) :
+    hcConjDescend chief g z ∈ caseA.Hpart i := by
+  -- decompose `g = h·u` with `h ∈ hInHu`, `u ∈ uInHu`
+  have hgtop : g ∈ hInHu data ⊔ uInHu data := by rw [hInHu_sup_uInHu_eq_top]; exact Subgroup.mem_top g
+  rw [← SetLike.mem_coe, Subgroup.normal_mul] at hgtop
+  obtain ⟨h, hh, u, hu, rfl⟩ := hgtop
+  -- `A_{h·u} = A_h ∘ A_u`, and `A_h = id` (`h ∈ hInHu ⊆ HC`)
+  rw [hcConjDescend_mul, MonoidHom.comp_apply,
+    hcConjDescend_eq_id_of_mem_hc chief (Subgroup.mem_sup_left hh), MonoidHom.id_apply]
+  -- `A_u = uActionHom a` preserves `Hpart i`
+  obtain ⟨a, ha⟩ := hcConjDescend_eq_uActionHom chief hu
+  rw [ha]
+  exact (caseA.Hpart_aInvariant i).smul_mem a hz
+
+/-- **`A_1 = id`**: `hcConjDescend 1` is the identity, since `1 ∈ HC`
+(`hcConjDescend_eq_id_of_mem_hc`). -/
+theorem hcConjDescend_one [Finite G] {M : Subgroup G}
+    {data : TypesIIIIIIVSetup M} (chief : ChiefFactorData data)
+    [(hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf (huSub data)).Normal] :
+    hcConjDescend chief (1 : ↥(huSub data)) = MonoidHom.id (↥data.H ⧸ chief.N) :=
+  hcConjDescend_eq_id_of_mem_hc chief (Subgroup.one_mem _)
+
+/-- **`A_g ∘ A_{g⁻¹} = id`**: `A_g (A_{g⁻¹} z) = z`, from multiplicativity (`hcConjDescend_mul`)
+and `A_1 = id` (`hcConjDescend_one`).  Together with `hcConjDescend_maps_Hpart` this makes `A_g`
+restrict to a *bijection* of each Clifford summand `Hpart i`. -/
+theorem hcConjDescend_apply_inv_apply [Finite G] {M : Subgroup G}
+    {data : TypesIIIIIIVSetup M} (chief : ChiefFactorData data) (g : ↥(huSub data))
+    [(hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf (huSub data)).Normal]
+    (z : ↥data.H ⧸ chief.N) :
+    hcConjDescend chief g (hcConjDescend chief g⁻¹ z) = z := by
+  rw [← MonoidHom.comp_apply, ← hcConjDescend_mul, mul_inv_cancel, hcConjDescend_one,
+    MonoidHom.id_apply]
+
+/-- **Regularity preservation (per factor)**: for `g ∈ HU`, the precomposed character `θ ∘ A_g` is
+trivial on the Clifford summand `Hpart i` iff `θ` is.  `A_g` restricts to a bijection of `Hpart i`
+(`hcConjDescend_maps_Hpart` for both `g` and `g⁻¹`, inverted by `hcConjDescend_apply_inv_apply`),
+so the value multisets `{θ(A_g x) | x ∈ Hpart i}` and `{θ(y) | y ∈ Hpart i}` coincide. -/
+theorem hcConjDescend_comp_subtype_eq_one_iff [Finite G] {M : Subgroup G}
+    {data : TypesIIIIIIVSetup M} {chief : ChiefFactorData data}
+    {chars : Section11CharacterData data chief} (caseA : CliffordCaseAData chars)
+    (g : ↥(huSub data)) {i : Fin data.q}
+    [(hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf (huSub data)).Normal]
+    (θ : (↥data.H ⧸ chief.N) →* ℂˣ) :
+    (θ.comp (hcConjDescend chief g)).comp (caseA.Hpart i).subtype = 1
+      ↔ θ.comp (caseA.Hpart i).subtype = 1 := by
+  constructor
+  · intro h
+    refine MonoidHom.ext fun y => ?_
+    have hval := DFunLike.congr_fun h ⟨_, hcConjDescend_maps_Hpart caseA g⁻¹ y.2⟩
+    simp only [MonoidHom.comp_apply, Subgroup.subtype_apply, MonoidHom.one_apply] at hval ⊢
+    rwa [hcConjDescend_apply_inv_apply] at hval
+  · intro h
+    refine MonoidHom.ext fun x => ?_
+    have hval := DFunLike.congr_fun h ⟨_, hcConjDescend_maps_Hpart caseA g x.2⟩
+    simpa only [MonoidHom.comp_apply, Subgroup.subtype_apply, MonoidHom.one_apply] using hval
+
+/-- **Regularity preservation**: for `g ∈ HU`, `θ ∘ A_g` is regular (nontrivial on every Clifford
+summand `Hpart i`) iff `θ` is.  Immediate from the per-factor
+`hcConjDescend_comp_subtype_eq_one_iff`.  This is the regularity half of the `oXtheta`
+`T`-invariance: combined with the conjugation-commute `hcPsi_conjBy_eq`
+(`conjBy g (hcPsi θ) = hcPsi (θ ∘ A_g)`), it shows the regular-inflated set `{hcPsi θ | θ regular}`
+is closed under `HU`-conjugation — the input to the `card_filter` fibre count `u·|Xθ| = (p-1)^q`. -/
+theorem hcConjDescend_comp_regular_iff [Finite G] {M : Subgroup G}
+    {data : TypesIIIIIIVSetup M} {chief : ChiefFactorData data}
+    {chars : Section11CharacterData data chief} (caseA : CliffordCaseAData chars)
+    (g : ↥(huSub data))
+    [(hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf (huSub data)).Normal]
+    (θ : (↥data.H ⧸ chief.N) →* ℂˣ) :
+    (∀ i, (θ.comp (hcConjDescend chief g)).comp (caseA.Hpart i).subtype ≠ 1)
+      ↔ (∀ i, θ.comp (caseA.Hpart i).subtype ≠ 1) :=
+  forall_congr' fun _ => not_congr (hcConjDescend_comp_subtype_eq_one_iff caseA g θ)
+
 /-- **`ζ(1) = u`**: the degree of `ζ = Ind_{HC}^{HU}(ψ)` is `u`.  `induce_apply_one` gives
 `ζ(1) = [HU:HC]·ψ(1) = u·1` (`hc_index_eq_u`, and `ψ` linear so `ψ(1)=1`).  This is the degree-`u`
 of the (9.8.c) irreducible; `induceHU ζ` then has degree `q·u = qu`. -/
