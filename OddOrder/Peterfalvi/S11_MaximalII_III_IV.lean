@@ -8165,6 +8165,72 @@ theorem caseA_hcZeta_irreducible_of_regular [Finite G] {M : Subgroup G}
       (hcPsi chief θ)) :=
   hcZeta_irreducible chief θ (caseA_regular_inflation_inertia_eq caseA θ hreg)
 
+set_option linter.style.openClassical false in
+open scoped Classical in
+set_option maxHeartbeats 1000000 in
+/-- **|Xmu| = p-1** (Peterfalvi (9.8.c), the reducible-inducing regular seeds).  `Xmu` = the
+`Xθ`-members `ζ = Ind_{HC}(hcPsi θ)` (regular `θ`) whose `M`-induction `Ind_{HU}^M ζ` is *reducible*.
+The map `ζ ↦ Ind_{HU}^M ζ` is a bijection `Xmu ≃ {reducible 𝒮(H₀)-members}`: injective on reducibles
+(`caseA_induceHU_inj_of_reducible`) and surjective (every reducible `𝒮(H₀)`-member is
+`Ind_{HU}^M(Ind_{HC}(hcPsi θbar))` for a regular seed, `caseA_reducible_source_eq_hcZeta`), so
+`|Xmu| = |{reducibles}| = p-1` (`reducible_count_sOf_H0`).  The `|Xmu|` half of the (9.8.c) parity
+dichotomy `exists_regular_not_reducible_of_odd`. -/
+theorem caseA_Xmu_card_eq [Finite G] {M : Subgroup G}
+    {data : TypesIIIIIIVSetup M} {chief : ChiefFactorData data}
+    {chars : Section11CharacterData data chief} (caseA : CliffordCaseAData chars)
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    [Fintype ((↥data.H ⧸ chief.N) →* ℂˣ)]
+    [Fintype ↥(hInHu data)] [Invertible (Nat.card ↥(hInHu data) : ℂ)]
+    [Fintype ↥(huSub data)]
+    [Fintype ↥(hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf (huSub data))]
+    [Invertible (Nat.card ↥(hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf
+      (huSub data)) : ℂ)]
+    [(hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf (huSub data)).Normal] :
+    (((Finset.univ.filter fun θ : (↥data.H ⧸ chief.N) →* ℂˣ =>
+          ∀ i, θ.comp (caseA.Hpart i).subtype ≠ 1).image fun θ =>
+        ClassFunction.induce (hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf
+          (huSub data)) (hcPsi chief θ).toClassFunction).filter fun ζ =>
+        ¬ IsIrreducibleCharacter (induceHU data ζ)).card
+      = chief.p - 1 := by
+  classical
+  set RegF := Finset.univ.filter fun θ : (↥data.H ⧸ chief.N) →* ℂˣ =>
+    ∀ i, θ.comp (caseA.Hpart i).subtype ≠ 1 with hRegF
+  set Xθ := RegF.image fun θ =>
+      ClassFunction.induce (hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf
+        (huSub data)) (hcPsi chief θ).toClassFunction with hXθ
+  set Xmu := Xθ.filter fun ζ => ¬ IsIrreducibleCharacter (induceHU data ζ) with hXmu
+  letI : Fintype ↥M := Fintype.ofFinite _
+  letI : Invertible (Nat.card ↥(huSub data) : ℂ) :=
+    invertibleOfNonzero (Nat.cast_ne_zero.mpr Nat.card_pos.ne')
+  have hq : 0 < data.q := data.nontrivial.2.1.pos
+  -- `Ind_{HU}^M` is injective on `Xmu` (its members induce reducibly).
+  have hinj : Set.InjOn (induceHU data) ↑Xmu := by
+    intro ζ₁ hζ₁ ζ₂ hζ₂ heq
+    rw [Finset.mem_coe, hXmu, Finset.mem_filter, hXθ, Finset.mem_image] at hζ₁ hζ₂
+    obtain ⟨⟨θ₁, hθ₁, rfl⟩, hred₁⟩ := hζ₁
+    obtain ⟨⟨θ₂, hθ₂, rfl⟩, _⟩ := hζ₂
+    have hirr₁ := caseA_hcZeta_irreducible_of_regular caseA θ₁ (Finset.mem_filter.mp hθ₁).2
+    have hirr₂ := caseA_hcZeta_irreducible_of_regular caseA θ₂ (Finset.mem_filter.mp hθ₂).2
+    have hχ := caseA_induceHU_inj_of_reducible data (χ := ⟨_, hirr₁⟩) (ψ := ⟨_, hirr₂⟩) hred₁ heq
+    exact congrArg IrreducibleCharacter.toClassFunction hχ.symm
+  -- `Ind_{HU}^M '' Xmu = {reducible 𝒮(H₀)-members}`.
+  have himg : induceHU data '' ↑Xmu = {φ ∈ sOf data chief.H0 | ¬ IsIrreducibleCharacter φ} := by
+    ext φ
+    simp only [Set.mem_image, Finset.mem_coe, hXmu, Finset.mem_filter, hXθ, Finset.mem_image,
+      Set.mem_setOf_eq]
+    constructor
+    · rintro ⟨_, ⟨⟨θ, hθ, rfl⟩, hζred⟩, rfl⟩
+      have hreg := (Finset.mem_filter.mp hθ).2
+      have hnt : θ ≠ 1 := fun h => hreg ⟨0, hq⟩ (by rw [h]; exact MonoidHom.one_comp _)
+      exact ⟨sOf_antitone data le_sup_left
+        (hcZeta_induceHU_mem_sOf chars θ hnt (caseA_regular_inflation_inertia_eq caseA θ hreg)),
+        hζred⟩
+    · rintro ⟨hφS, hφred⟩
+      obtain ⟨θbar, hreg, rfl⟩ := caseA_reducible_source_eq_hcZeta caseA hG φ hφS hφred
+      exact ⟨_, ⟨⟨θbar, Finset.mem_filter.mpr ⟨Finset.mem_univ _, hreg⟩, rfl⟩, hφred⟩, rfl⟩
+  rw [← Set.ncard_coe_finset Xmu, ← Set.ncard_image_of_injOn hinj, himg,
+    reducible_count_sOf_H0 hG chief]
+
 /-- **Peterfalvi (9.8)**: character-count consequences in Clifford case (a).
 
 Faithful to Peterfalvi (9.8.b,c,d) (count-statement audit, issue 2030):
