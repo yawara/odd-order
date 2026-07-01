@@ -1978,3 +1978,96 @@ step 2 (regularity crux) 完成後の最後の assembly ゆえ、深いが grind
   (ζ∉Xmu 直接、hIM 経由不要)、degree qu (`hcZeta_induceHU_apply_one`)。
 - **共有 helper 案** `caseA_reducible_source_eq_hcZeta`: reducible φ∈𝒮(H₀) ⟹ ∃θbar regular,
   φ=induceHU(Ind_{HC}(hcPsi θbar))。degree lemma と Xmu 全射の両方が使う extraction+C-kernel+eq_hcZeta。
+
+## conjunct (c) = 9.8.c 完成 (2026-07-02 cont.²⁰) — 𝒮(H₀C) irreducible degree-qu
+
+**✅✅✅ 9.8.c 完全クローズ (全 axiom-clean [propext, Classical.choice, Quot.sound])**。step-5 の headline
+payoff。`caseA_character_counts` (末尾へ relocate 済) の conjunct (b)+(c) proven、残 (d) のみ sorry
+(S11:8343)。以下 landed (commits):
+- **`caseA_reducible_source_eq_hcZeta`** (shared extraction core): reducible φ∈𝒮(H₀) ⟹ ∃regular θbar,
+  φ=Ind_{HU}^M(Ind_{HC}(hcPsi θbar))。degree lemma と Xmu 全射が共有。
+- **`caseA_regular_inflation_inertia_eq`** / **`caseA_hcZeta_irreducible_of_regular`**: regular seed θ ⟹
+  I(θ₀)=HC ⟹ Ind_{HC}(hcPsi θ) irreducible (Xθ-member を IrreducibleCharacter に bundle)。
+- **`caseA_Xmu_card_eq`**: |Xmu|=p-1。ζ↦Ind_{HU}^M ζ が Xmu ≃ {reducible 𝒮(H₀)} の bijection
+  (inj=`caseA_induceHU_inj_of_reducible`、surj=`caseA_reducible_source_eq_hcZeta`)、
+  `induceHU '' Xmu = reducibles` + `Set.ncard_image_of_injOn` + `reducible_count_sOf_H0`。
+  ⚠ `open scoped Classical in` 要 (statement の filter DecidablePred; `set` が classical tactic だけでは
+  拾えない)。
+- **`caseA_exists_irreducible_sOf_H0C`** (= 9.8.c): `exists_regular_not_reducible_of_odd`
+  (X=Xθ, u·|Xθ|=(p-1)^q via `oXtheta_count`, p-1 even ∵ p∣|G| odd, u odd via `u_odd`, |Xmu|=p-1) →
+  ζ∈Xθ\Xmu (Ind_{HU}^M ζ **irreducible** 直接、hIM 不要) → witness=induceHU ζ (∈𝒮(H₀C)
+  `hcZeta_induceHU_mem_sOf`、irreducible、degree qu `hcZeta_induceHU_apply_one`)。
+
+**残 = conjunct (d) = 9.8.d のみ** (S11:8343): `𝒮(H₀U')` に degree qa の irreducible が
+`((p-1)/a)·(|U|/(a|U'|))` 個以上。別構造 (a divisor、Uprime、type-P Galois の a=|U:C_U(...)|)。step-5
+machinery とは独立の新 phase。full build green (3893 jobs)。
+
+## 残 §9 frontier 精査 (2026-07-02 cont.²¹) — 全て deep/opaque-gated、caseA step-5 の続きでない
+9.8.b/c 完了後の残 S11 sorry を精査。**clean な小 win は無い**。honest な次手は下記いずれかの新 sub-phase:
+
+- **9.8.d** (S11:8343, caseA conjunct d): 🛑 **opaque-gated**。degree-qa の Galois a-family count
+  (`((p-1)/a)·(|U|/(a|U'|))` 個以上)。`CliffordCaseAData.quotient_factors_cyclic_order_a := True` /
+  `Ubar_embeds_product := True` (S11:4970-4973) が **opaque `True` stub**。honest に建てるには
+  type-P non-Galois の Galois 構造 (H1、a=|U:C_U(H1)|、cyclic Ū、theta family = Coq `theta f`) を
+  de-opacify 要 (CliffordCaseAData への field 追加=構造変更)。**`True` stub の上に建てるのは doneness 違反**
+  ([[scaffold-sorry-free-not-done]])。Coq: PFsection9 `typeP_nonGalois_characters` (d) part。
+- **9.9.c** (S11:6256, caseB conjunct c): deep exceptional。`(¬∃irr∈𝒮(H₀C')) → C=⊥ ∧ u=(p^q-1)/(p-1)`。
+  **caseB (Galois case) 固有** — u=(p^q-1)/(p-1) は Galois-specific で caseA parity
+  (`exists_regular_not_reducible_of_odd`、u=(p-1)^(q-1) を出す) から**出ない**。Coq: PFsection9
+  `typeP_Galois_characters` 系。9.8.c の Hpart/S₀ machinery は caseA 専用ゆえ流用不可。
+- **9.10** (S11:6277, `exceptional_case_frobenius_realization`): opaque field
+  `quotientSemidirectFrobenius` de-opacify + 全 body sorry。Coq: PFsection10 (coherence/Frobenius)。
+- **9.11 `sibleyTarget_H0C`** (S11:6293): §14-gated + lane-B (6.8) 依存。**lane-A 即時対象外**。
+
+**次 iteration の honest 着手候補** (document-order): 9.8.d の Galois 構造 de-opacify (H1/a/theta) が
+文書順最上流だが構造変更大。または 9.9.c (caseB exceptional, 構造変更不要だが deep §9-10 coherence 依存)。
+どちらも fresh-context で Coq `typeP_{non,}Galois_characters` 精読からの multi-iteration build。
+
+## 🛑 §9 残 = hub-gated (frozen Galois territory) → lane-a pivot (2026-07-02 cont.²²)
+cont.²¹ の opaque-gating を追跡 → **remaining §9 (9.8.d/9.9.c/9.10) は全て type-P Galois 土台 gated、
+かつその土台は issue 9000 で HUB 裁定中 (policy 8, 凍結)**:
+- CliffordCaseAData `quotient_factors_cyclic_order_a`/`Ubar_embeds_product` + CliffordCaseBData
+  `field_model`/`Ubar_cyclic` = 全 opaque `True` stub。de-opacify = typeP_Galois (9.7) 構造構築。
+- **issue 9000**: lane a の S11 Galois pieces (`isCyclic_card_dvd_..._irreducible_faithful_comm`
+  e2a673bd 等) が lane d の σ-theory leaf と**重複**、hub 裁定待ちで**「これ以上広げない」凍結**。
+  ∴ 9.8.d/9.9.c の Galois de-opacify は凍結領域拡張ゆえ **lane-a は今着手不可**。
+- **判定**: policy 8 (lane d は「hub 裁定待ちの間、別 on-spine 上流へ」) を lane a も適用。
+  §9 の残は Galois 土台 land 後に再開 (skeleton 前倒しも凍結ゆえ保留)。
+
+**lane-a pivot 先 (ungated、次 iteration 着手)**: S10 (13 sorry)、S13 (11 sorry)、
+issues 1013 (S09 §7 certificate)、1015 (hzeta0nu coherence orth)、1016 (T-side typePdata threading)、
+0065 (Cor 12.16)。文書順+上流優先で選択。caseA/B_character_counts は現状 §12-13 に consumer 無
+(endpoint) ゆえ §9 残の緊急度は低い。
+
+## S10 §8 pivot 着手 (2026-07-02 cont.²³) — (8.2.a) + (8.6.b II) closed, 残の gating map
+
+cont.²² の pivot 判断 (§9 残 = hub-gated Galois → ungated S10/S13 へ) を実行。S10
+(`S10_MinimalSimpleStructure.lean`, 文書順最上流) から着手。**S10 sorry 11→9**、いずれも axiom-clean
+[propext, Classical.choice, Quot.sound]:
+
+- **(8.2.a) `typeF_card_U0_eq_exponent`** (commit `997e7c5e`): 型 F で |U₀|=exp(U)。
+  `frobenius_HU0` の複体 U₀ = 奇位数 Frobenius 複体 ⟹ Z-group (全 Sylow cyclic; [BG] Prop 3.9 /
+  Huppert V.8.18) ⟹ `IsZGroup.exponent_eq_card`。新 helper `isZGroup_of_isFrobeniusGroup_of_odd`
+  (既存 action 形式 `isZGroup_of_isFrobeniusAction_of_odd` の pair-form bridge)。奇位数仮説
+  `Odd (Nat.card G)` を追加 (数学的に必須、無いと U₀=Q8 反例; consumer 0 ゆえ安全)。
+- **(8.6.b II) `typeII_normalizer_not_le_of_typePData`** (commit `a5ce54dd`): 型 II で任意型 P データ
+  data に ¬N_G(data.U)≤M。data.U と型 II witness td.typeP.U は M'=derivedInG M 内で M_F の補群 ⟹
+  Schur–Zassenhaus 共役 (`exists_conj_of_coprime`) ⟹ normalizer 移送 + M 自己共役で td.normalizer_not_le
+  に帰着。`card_Msigma_inf_centralizer_eq_card_W2` の共役パターンを鏡写し。
+
+### S10 残 9 sorry の gating map (次 iteration 用)
+S10_BGInterface.lean (0 sorry) の docstring が明示する通り、残の多くは **BG §14–16 (sorried) gated**:
+- **(8.11) `hall_maxNilpotentNormalHall_and_mainSubgroup`**: 型 I/II は済
+  (`S10_BGInterface.maxNilpotentNormalHall_isHall_of_typeI_or_II`)、**型 III/IV は M_s=M', M_F は M_σ の
+  proper Hall ⟹ 未証明 BG §14–15 構造 gated**。full 版は型 III/IV 必須ゆえ現状不可。
+- **(8.12.b) `typeI_or_typeII_centralizer_unique`** / **(8.13) `escapingCentralizers_control`**: BG §16
+  Thm B + Prop 16.1 (要 sorried 状態確認)。`isUniquelyMaximal_of_maximalSubgroupsContaining_eq_singleton`
+  (S10_BGInterface, bridge) は済。
+- **(8.15) `dadeSupportHypotheses_{typeI,typeP}`** / **(8.16) `typeII_A_sets_{TI,normalizer}`**: 復元済
+  (8.14)-(8.17) support 記法 + BG §16/Pf (2.3) 依存。
+- **(8.17) bgTheoremE type-I cover branch** (`bgTheoremE_cover_data` の `𝓜_P=∅` 枝): §8 route-B endpoint gated。
+- **(8.18) `support_mutual_exclusion`**: BG Theorem E cover 依存。
+
+**次 iteration 着手判断**: (8.12.b)/(8.13) の BG §16 Thm B / Prop 16.1 の sorried 状態を確認し、
+signature 正なら sorried-cite で wiring、genuine local 論証が要るなら実証明。BG-gated が深いなら S13
+(§11、10 sorry) か issues 1013/1015/1016/0065 へ (文書順+上流優先)。

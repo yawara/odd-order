@@ -7,6 +7,7 @@ import OddOrder.Peterfalvi.S04_DadeIsometry
 import OddOrder.Peterfalvi.S09_NonexistenceCertain
 import OddOrder.GroupTheory.MaximalSubgroupType
 import OddOrder.GroupTheory.MaximalSubgroup
+import OddOrder.Isaacs.Ch06_FrobeniusActions.OddComplement
 import OddOrder.BG.Ch2_Uniqueness.Setup
 import OddOrder.BG.Ch4_FamilyOfMaximal.S16_MainResults
 
@@ -73,11 +74,51 @@ abbrev TypeIVData (M : Subgroup G) := OddOrder.GroupTheory.TypeIVData M
 /-- **Peterfalvi (8.7)**: data for a maximal subgroup of type V. -/
 abbrev TypeVData (M : Subgroup G) := OddOrder.GroupTheory.TypeVData M
 
-/-- **Peterfalvi (8.2.a)**: in type `F`, the chosen `U_0` has order equal to the
-exponent of the complement `U`.  The proof quotes BG Proposition 3.9. -/
-theorem typeF_card_U0_eq_exponent [Finite G] {M : Subgroup G} (data : TypeFData M) :
+/-- **Group form of `isZGroup_of_isFrobeniusAction_of_odd`** ([BG] Proposition 3.9 / Huppert
+V.8.18): the complement `A` of a finite Frobenius group `G' = N ⋊ A` whose complement has **odd
+order** is a Z-group (every Sylow subgroup is cyclic).  This bridges the pair form
+`IsFrobeniusGroup` to the action-based `isZGroup_of_isFrobeniusAction_of_odd`, mirroring
+`normal_of_card_prime_of_isFrobeniusGroup_of_odd`. -/
+theorem isZGroup_of_isFrobeniusGroup_of_odd {G' : Type*} [Group G'] [Finite G']
+    {N A : Subgroup G'} (hFrob : OddOrder.Isaacs.Ch06.IsFrobeniusGroup G' N A)
+    (hodd : Odd (Nat.card ↥A)) : _root_.IsZGroup ↥A := by
+  letI : N.Normal := hFrob.isNormal
+  letI : MulDistribMulAction ↥A ↥N :=
+    MulDistribMulAction.compHom ↥N ((MulAut.conjNormal (H := N)).comp A.subtype)
+  haveI : Nontrivial ↥N := (Subgroup.nontrivial_iff_ne_bot N).mpr hFrob.ne_bot_kernel
+  exact OddOrder.Isaacs.Ch06.isZGroup_of_isFrobeniusAction_of_odd hFrob.toFrobeniusAction hodd
+
+/-- **Peterfalvi (8.2.a)**: in type `F`, the chosen `U_0` has order equal to the exponent of the
+complement `U`.
+
+**Proof** ([Pf] (8.2.a), quoting [BG] Proposition 3.9).  `U_0` is a Frobenius complement of odd
+order (`data.frobenius_HU0` says `H U_0` is Frobenius with kernel `H`), so its Sylow subgroups are
+cyclic — i.e. `U_0` is a Z-group (`isZGroup_of_isFrobeniusGroup_of_odd`).  For a finite Z-group,
+`|U_0| = exp(U_0)` (`IsZGroup.exponent_eq_card`: each cyclic Sylow `p`-subgroup contributes an
+element of order `|U_0|_p`, so `|U_0| = ∏_p |U_0|_p ∣ exp(U_0)`, and `exp(U_0) ∣ |U_0|` always).
+Finally `exp(U_0) = exp(U)` is `data.exponent_eq` (part of the type-`F` datum (8.1.c)).
+
+The odd-order hypothesis is essential: without it `U_0` could be (generalized) quaternion, where
+`exp < |U_0|`.  It is supplied here as `Odd (Nat.card G)`, from which `Odd |U_0|` follows since
+`|U_0| ∣ |G|`. -/
+theorem typeF_card_U0_eq_exponent [Finite G] (hodd : Odd (Nat.card G)) {M : Subgroup G}
+    (data : TypeFData M) :
     Nat.card ↥data.U0 = Monoid.exponent data.U := by
-  sorry
+  classical
+  have hU0le : data.U0 ≤ data.H ⊔ data.U0 := le_sup_right
+  let e : ↥(data.U0.subgroupOf (data.H ⊔ data.U0)) ≃* ↥data.U0 :=
+    Subgroup.subgroupOfEquivOfLe hU0le
+  have hcardA : Nat.card ↥(data.U0.subgroupOf (data.H ⊔ data.U0)) = Nat.card ↥data.U0 :=
+    Nat.card_congr e.toEquiv
+  have hdvd : Nat.card ↥data.U0 ∣ Nat.card G := Subgroup.card_subgroup_dvd_card data.U0
+  have hoddA : Odd (Nat.card ↥(data.U0.subgroupOf (data.H ⊔ data.U0))) := by
+    rw [hcardA]; exact Odd.of_dvd_nat hodd hdvd
+  haveI hZA : _root_.IsZGroup ↥(data.U0.subgroupOf (data.H ⊔ data.U0)) :=
+    isZGroup_of_isFrobeniusGroup_of_odd data.frobenius_HU0 hoddA
+  haveI hZU0 : _root_.IsZGroup ↥data.U0 := by
+    have hinj : Function.Injective ⇑(e.symm.toMonoidHom) := by simpa using e.symm.injective
+    exact _root_.IsZGroup.of_injective hinj
+  rw [← _root_.IsZGroup.exponent_eq_card (G := ↥data.U0), data.exponent_eq]
 
 /-- **Peterfalvi (8.2.b), one direction**: when the complement has cyclic Sylow
 subgroups, type `F` collapses to a Frobenius group with kernel `M_F`.
@@ -373,7 +414,55 @@ theorem typeII_normalizer_not_le_of_typePData [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} (data : TypePData M)
     (hM : M ∈ maximalSubgroups G) (hII : IsTypeII M) :
     ¬ Subgroup.normalizer (data.U : Set G) ≤ M := by
-  sorry
+  classical
+  obtain ⟨td⟩ := hII
+  -- The Type-II witness carries `¬ N_G(U₀) ≤ M` for its own complement `U₀ = td.typeP.U`.
+  -- `M_F = maxNilpotentNormalHall M` also equals `maxNilpotentNormalHall M'` (type II Fitting).
+  have hMFeq : maxNilpotentNormalHall (derivedInG M) = maxNilpotentNormalHall M :=
+    td.derived_fitting_eq.trans td.typeP.H_eq
+  -- Kernel `N = M_F` inside `M' = derivedInG M`: normal and Hall (hence coprime index).
+  haveI hNnormal : ((maxNilpotentNormalHall (derivedInG M)).subgroupOf (derivedInG M)).Normal :=
+    OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_subgroupOf_normal (derivedInG M)
+  have hcop : Nat.Coprime
+      (Nat.card ↥((maxNilpotentNormalHall (derivedInG M)).subgroupOf (derivedInG M)))
+      ((maxNilpotentNormalHall (derivedInG M)).subgroupOf (derivedInG M)).index :=
+    (OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_isHall (derivedInG M)).coprime_index
+  -- Both `td.typeP.U` and `data.U` complement `M_F` in `M'` (Definition (8.4) `derived_complement`).
+  have hTd_compl : Subgroup.IsComplement'
+      ((maxNilpotentNormalHall (derivedInG M)).subgroupOf (derivedInG M))
+      (td.typeP.U.subgroupOf (derivedInG M)) := by
+    have h := td.typeP.derived_complement; rwa [td.typeP.H_eq, ← hMFeq] at h
+  have hData_compl : Subgroup.IsComplement'
+      ((maxNilpotentNormalHall (derivedInG M)).subgroupOf (derivedInG M))
+      (data.U.subgroupOf (derivedInG M)) := by
+    have h := data.derived_complement; rwa [data.H_eq, ← hMFeq] at h
+  -- `M'` (and hence `M_F ≤ M'`) is solvable, giving Schur–Zassenhaus conjugacy of complements.
+  haveI : IsSolvable ↥M := hG.solvable_of_mem_maximalSubgroups hM
+  have hM'leM : derivedInG M ≤ M := Subgroup.map_subtype_le _
+  haveI : IsSolvable ↥(derivedInG M) :=
+    solvable_of_solvable_injective (Subgroup.inclusion_injective hM'leM)
+  obtain ⟨n, -, hnconj⟩ :=
+    Subgroup.IsComplement'.exists_conj_of_coprime hcop (Or.inl inferInstance) hTd_compl hData_compl
+  -- Lift the `M'`-conjugation to `G`: `conj (↑n) • td.typeP.U = data.U`, with `↑n ∈ M' ≤ M`.
+  have hnM : (n : G) ∈ M := hM'leM (SetLike.coe_mem n)
+  have hconjG : MulAut.conj (n : G) • td.typeP.U = data.U := by
+    have h2 : MulAut.conj (n : G) •
+          ((td.typeP.U.subgroupOf (derivedInG M)).map (derivedInG M).subtype)
+          = (data.U.subgroupOf (derivedInG M)).map (derivedInG M).subtype := by
+      rw [← map_subtype_conj_smul]
+      exact congrArg (Subgroup.map (derivedInG M).subtype) hnconj
+    rwa [Subgroup.map_subgroupOf_eq_of_le td.typeP.U_le,
+      Subgroup.map_subgroupOf_eq_of_le data.U_le] at h2
+  -- If `N_G(data.U) ≤ M`, transport back to `N_G(U₀) ≤ M`, contradicting the Type-II witness.
+  intro hle
+  refine td.normalizer_not_le ?_
+  have htrans : Subgroup.normalizer (data.U : Set G)
+      = MulAut.conj (n : G) • Subgroup.normalizer (td.typeP.U : Set G) := by
+    rw [normalizer_pointwise_smul, hconjG]
+  have hMconj : MulAut.conj (n : G) • M = M :=
+    conj_smul_eq_self_of_mem_normalizer (Subgroup.le_normalizer hnM)
+  rw [htrans] at hle
+  exact Subgroup.pointwise_smul_le_pointwise_smul_iff.mp (hle.trans_eq hMconj.symm)
 
 /-- **Peterfalvi (8.13)**: centralizers escaping a maximal subgroup are controlled
 by `A_1(M)` and a unique maximal subgroup of type I or II.
