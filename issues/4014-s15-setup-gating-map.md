@@ -51,12 +51,21 @@ S15_SAndT_Setup 外で **0 cite (= off-path、issue 1004 verified)**:
 - `character_degree_analysis`(13.3)/`lambda_forces_T_caseB`(13.4)/`tiSubset_character_orthogonality`(13.5)/
   norm cascade (13.6–10 `*_norm_lower`/`global_character_bound`/`analytic_inequality`)/`caseA_parameters`(13.13) — 全 0 cite。
 
-**未解決 (次 turn)**: `c_eq_one`(13.12)/`caseB_order_u`(13.15) は on-path だが、textbook proof は
-(13.10) analytic_inequality (= norm cascade、tauS 依存の λ^{τ1} norm を含む) を要する。
-⟹ norm cascade が **c_eq_one 経由で transitively on-path** か、それとも c_eq_one に W-side/構造 route が
-あって tauS 迂回可能かを判定する (issue 1004 は isometry lemma のみ off-path と主張、numeric contradiction
-の帰属は未確定)。これが lane d の次の on-path frontier 判定。**off-path と即断せず route を精査**
-([[feedback-cite-sorried-lemmas-if-signature-correct]] のゲート幻論に注意)。
+**route 精査完了 (Coq PFsection13.v 読解)**: `c_eq_one`(13.12) は **structural + on-path analytic**、
+off-path tauS cascade 非依存:
+- Coq `FTtypeP_Ind_Fitting_reg_Fcore`: (i) `semiregular C W₁` (W₁ が `C ⊆ U` に fpf、
+  `UW₁` Frobenius の `Frobenius_reg_ker` から) → **`2q ∣ c−1`** (`regular_norm_dvd_pred` +
+  oddness/Gauss)。(ii) `m` の上界 `ub_m` (13.10 analytic、W-side cyclicTI = on-path η grid、
+  tauS 非依存)。(iii) numeric elimination → q=3,p≥5 → 矛盾。
+- `u_bound`(13.2.c) も **structural**: Coq `FTtypeP_facts` は `typeP_Galois` 二分岐
+  (Galois: `u ∣ (p^q−1)/(p−1)`; 非 Galois: `u ≤ (p−1)^{q−1}` semilinear/matrix bound)。char 非依存。
+
+⟹ **`c_eq_one`/`u_bound` は in-territory で closeable** (off-path char でない)。lane d の次 on-path build:
+1. **`c ≡ 1 mod q`** (→ `2q ∣ c−1`) を `typeP_uW1_frobenius` (W₁ fpf on U⊇C) + `IsFrobeniusAction.card_modEq_one`
+   から構築 (S15_SAndT_Setup、structural、Coq route 上)。
+2. (13.10) analytic の W-side (cyclicTI/η) route を assemble (arith core `analytic_inequality_arith` 済)。
+3. numeric elimination で c_eq_one 完成。
+(P_elab/u_bound は lane a §11 structural type-P σ-theory = `H_elementaryAbelian`/typeP_Galois に cite。)
 
 ### B. char/numeric spine (13.5–13.15、10 sorry) — **character grid + coherence gated**
 
