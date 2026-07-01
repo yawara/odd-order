@@ -2155,6 +2155,66 @@ theorem isCyclic_and_card_dvd_of_odd_two_dim_irreducible
     exact he v
   exact isCyclic_and_card_dvd_of_faithful_irreducible_comm (M := V) hcomm hfaith'
 
+/-- **(12.12) `p + 1` refinement, irreducible case.**  An odd-order group `E` (`p ∤ |E|`) acting
+faithfully and irreducibly on a two-dimensional `𝔽_p`-space `V`, with **no nontrivial element
+acting as an `𝔽_p`-scalar** (`hnonscalar`), is cyclic with `|E| ∣ p + 1`.
+
+This is the rank-two refinement of Peterfalvi (12.12): the plain irreducible core
+(`isCyclic_and_card_dvd_of_odd_two_dim_irreducible`) only bounds `|E| ∣ p² - 1`.  The Singer
+realization places `E` inside the cyclic group `𝔽_{p²}ˣ` (order `p² - 1`), where the non-scalar
+hypothesis makes it meet the scalar subgroup `𝔽_pˣ` (order `p - 1`) trivially, so
+`coprime_card_sub_one_of_faithful_irreducible_comm_nonscalar` gives `Coprime |E| (p - 1)`.  Together
+with `|E| ∣ p² - 1 = (p - 1)(p + 1)`, coprimality to the first factor forces `|E| ∣ p + 1`. -/
+theorem isCyclic_and_card_dvd_add_one_of_two_dim_irreducible_nonscalar
+    {p : ℕ} [Fact p.Prime] {E V : Type*} [Group E] [Finite E] (hodd : Odd (Nat.card E))
+    [AddCommGroup V] [Module (ZMod p) V] [Finite V]
+    (ρ : Representation (ZMod p) E V) (hfaith : Function.Injective ρ)
+    (hirr : Representation.IsIrreducible ρ)
+    (hdim : Module.finrank (ZMod p) V = 2) (hp_ndvd : ¬ p ∣ Nat.card E)
+    (hnonscalar : ∀ e : E, (∃ n : ℕ, ∀ x : V, ρ e x = n • x) → e = 1) :
+    IsCyclic E ∧ Nat.card E ∣ p + 1 := by
+  classical
+  haveI : Module.Finite (ZMod p) V := Module.Finite.of_finite
+  -- `|E| ∣ p² - 1` and cyclicity from the irreducible core.
+  obtain ⟨hcyc, hdvd_sq⟩ :=
+    isCyclic_and_card_dvd_of_odd_two_dim_irreducible hodd ρ hfaith hirr hdim hp_ndvd
+  refine ⟨hcyc, ?_⟩
+  have hcardV : Nat.card V = p ^ 2 := by
+    rw [Module.natCard_eq_pow_finrank (K := ZMod p), hdim, Nat.card_eq_fintype_card, ZMod.card]
+  rw [hcardV] at hdvd_sq
+  -- Singer non-scalar core ⟹ `Coprime |E| (p - 1)`.  Reuse the `𝔽ₚ[E]`-module setup of the core.
+  have hchar : ∀ q : ℕ, q.Prime → q ∣ Nat.card E → ¬ CharP (ZMod p) q := fun q _ hqdvd hcharq =>
+    hp_ndvd ((CharP.eq (ZMod p) hcharq (ZMod.charP p)) ▸ hqdvd)
+  have hcomm : ∀ a b : E, a * b = b * a :=
+    (OddOrder.BG.Ch1.S02.odd_two_dim_abelian hodd hdim ρ hfaith hchar).comm
+  letI : Module (MonoidAlgebra (ZMod p) E) V := Module.compHom V (ρ.asAlgebraHom).toRingHom
+  have hsmul : ∀ (e : E) (x : V), MonoidAlgebra.of (ZMod p) E e • x = ρ e x := fun e x => by
+    show (ρ.asAlgebraHom) (MonoidAlgebra.of (ZMod p) E e) x = ρ e x
+    rw [Representation.asAlgebraHom_of]
+  haveI : IsSimpleModule (MonoidAlgebra (ZMod p) E) V :=
+    (Representation.irreducible_iff_isSimpleModule_asModule ρ).mp hirr
+  have hfaith' : ∀ e : E, (∀ x : V, MonoidAlgebra.of (ZMod p) E e • x = x) → e = 1 := by
+    intro e he
+    apply hfaith
+    ext v
+    rw [map_one, Module.End.one_apply, ← hsmul e v]
+    exact he v
+  have hns' : ∀ e : E,
+      (∃ n : ℕ, ∀ x : V, MonoidAlgebra.of (ZMod p) E e • x = n • x) → e = 1 := by
+    rintro e ⟨n, hn⟩
+    exact hnonscalar e ⟨n, fun x => by rw [← hsmul e x]; exact hn x⟩
+  have hcop : Nat.Coprime (Nat.card E) (p - 1) :=
+    OddOrder.RepresentationTheory.coprime_card_sub_one_of_faithful_irreducible_comm_nonscalar
+      hcomm hfaith' hns'
+  -- `|E| ∣ (p - 1)(p + 1) = p² - 1` and `Coprime |E| (p - 1)` force `|E| ∣ p + 1`.
+  have hpq : (p - 1) * (p + 1) = p ^ 2 - 1 := by
+    obtain ⟨n, rfl⟩ : ∃ n, p = n + 2 := ⟨p - 2, by have := (Fact.out (p := p.Prime)).two_le; omega⟩
+    show (n + 1) * (n + 3) = (n + 2) ^ 2 - 1
+    have hexp : (n + 2) ^ 2 = (n + 1) * (n + 3) + 1 := by ring
+    omega
+  rw [← hpq] at hdvd_sq
+  exact hcop.dvd_of_dvd_mul_left hdvd_sq
+
 /-- **(12.12) rep-theory core (combined).**  A finite odd-order group `E` (`p ∤ |E|`) acting
 **fixed-point-freely** (no nonzero vector is fixed by a nontrivial element) on an `𝔽_p`-space `V`
 of dimension `1` or `2` is **cyclic**, with `|E| ∣ |V| - 1`.  Dispatches the two (12.12) cores:
