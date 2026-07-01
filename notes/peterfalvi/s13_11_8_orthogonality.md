@@ -733,3 +733,19 @@ degree-w₁, β=SHC.ext η) → `∃ a:ℤ, (a=0∨a=1∨a=2) ∧ ⟨α^τ, SHC.
 **次 = (11.8.2) 残 + (11.8.3)–(11.8.5)**: α^τ=X−nζ^{τ₁}+a∑λ^{τ₁} 分解 (X=ω^σ diff, a=0/2 case) →
 (11.8.3) β real → (11.8.4) residual form → (11.8.5) a=0 assembly。(11.8) closure は依然 doubly-gated
 (§9↔§10 の (11.8.1) |S₁|=n、§14 の (11.8.6) S₂ coherence)。
+
+## 2026-07-02 cont.⁴⁰ (lane-a) — **(11.8.2) residual decomposition + norm LANDED; ‖X‖²=2 (a∈{0,2})**
+**`Hypothesis.muGridAlpha_tau_residual_norm`** landed (S12:7514, leaf green 3850 jobs, sorry-free body)。
+`muGridAlpha_tau_proj_a_mem` (cont.³⁹) を包含する rich 版に昇格 (proj_a_mem は 3 行 projection に refactor、重複なし)。
+署名 = proj_a_mem と同一 hyp。結論 (residual X = Parseval remainder Y を露出):
+`∃ (a:ℤ)(Y:ClassFunction G ℂ), (a=0∨1∨2) ∧ (∀β∈R,⟨Y,β⟩=0) ∧ ⟨α^τ,ζ^{τ₁}⟩=(a:ℂ)−n ∧`
+`⟨Y,Y⟩=(2:ℂ)+n²−((a−n)²+(n−1)a²) ∧ ((a=0∨a=2)→⟨Y,Y⟩=2)`。
+- 証明追加分 (proj_a_mem 比): `hnormY` (hnorm を `push_cast`+`linear_combination -hnorm` で ⟨Y,Y⟩=norm式に),
+  `a∈{0,2}→⟨Y,Y⟩=2` は `rw[hnormY]; rcases; rw[h]; push_cast; ring` (a=0: 2+n²−n²=2; a=2: (2−n)²+(n−1)4=n²)。
+- **honest**: body sorry-free。transitive dep = SHC/muGrid §10→§6 bridge のみ。`hRn:R.card=n`(=(11.8.1)) は hypothesis 化。
+- **意義**: `‖X‖²=2` (a∈{0,2}) + `X⊥S₁^{τ₁}` は Peterfalvi の `X=ω_{ij}^σ−ω_{i0}^σ` ((10.5)-類似) の直接 input。
+  X (=Y) を露出したので (11.8.5) の ((μ₀−ζ)^τ,α_{ij}^τ) 2-way calc で消費可能。
+
+**次 = X=ω_{ij}^σ−ω_{i0}^σ (norm-2 characterization) or (11.8.3) β**: X⊥S₁^{τ₁} + ‖X‖²=2 + X∈ℤ[ω-grid]
+((10.5) Dade-image) ⟹ X=±(ω_a−ω_b)。ω-grid infra は `alignedOmegaSigmaGrid`(+`_inner` orthonormal) 既存。
+(11.8) closure は依然 doubly-gated (§9↔§10 の (11.8.1)、§14 の (11.8.6))。
