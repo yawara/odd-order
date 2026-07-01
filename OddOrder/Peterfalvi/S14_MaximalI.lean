@@ -3027,6 +3027,172 @@ theorem witness_L_hypothesis78 [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G
       (hSmem i hi_ind) (hSmem 0 (Ne.symm hind1H)) (m0 := 1) (mi := deg_i) (by norm_num)
       (by rw [hd i, hdeg_i_eq, Nat.cast_one, div_one]) (psi_support i)
 
+open scoped Classical in
+/-- **Odd-order Frobenius: a nontrivial induced irreducible is orthogonal to its complex
+conjugate.**  In a Frobenius group `Γ` of odd order with kernel `H`, for `θ ∈ Irr H`, `θ ≠ 1`,
+the induced `Ind_H^Γ θ` is irreducible (`isIrreducibleCharacter_induce_of_frobeniusGroup`) and
+nontrivial (`⟨Ind θ, 1_Γ⟩ = ⟨θ, 1_H⟩ = 0 ≠ 1`), hence — `Γ` odd — **not real**
+(`not_isReal_of_ne_trivial_of_odd_card'`): `(Ind θ)‾ = Ind θ̄ ≠ Ind θ`.  Distinct irreducibles are
+orthogonal, so `⟨Ind θ, Ind θ̄⟩ = 0`.  This is the `⟨ζ_0, ζ̄_0⟩ = 0` input for the §7 (7.8.a)
+`⊥ 1_G` argument (`witness_L_hzeta0nu`).  Stated with **explicit** `Fintype`/`Invertible` binders
+(not the `FiniteInduce` scope) so the `induce`/`inner` coercions stay `whnf`-cheap. -/
+theorem inner_induce_conj_eq_zero_of_frobenius_of_odd {Γ : Type*} [Group Γ] [Fintype Γ]
+    [Invertible (Nat.card Γ : ℂ)] {H : Subgroup Γ} [H.Normal] [Fintype ↥H]
+    [Invertible (Nat.card ↥H : ℂ)] (hodd : Odd (Nat.card Γ)) {W : Subgroup Γ}
+    (hF : OddOrder.Isaacs.Ch06.IsFrobeniusGroup Γ H W)
+    (θ : IrreducibleCharacter ↥H) (hθ : θ ≠ trivialIrreducibleCharacter ↥H) :
+    ClassFunction.inner (ClassFunction.induce H (θ : ClassFunction ↥H ℂ))
+      (ClassFunction.induce H ((θ : ClassFunction ↥H ℂ).conj)) = 0 := by
+  -- `θ̄` is again a nontrivial irreducible character of `H`.
+  have hθbar_ne : (⟨(θ : ClassFunction ↥H ℂ).conj, θ.isIrreducible.conj⟩ :
+      IrreducibleCharacter ↥H) ≠ trivialIrreducibleCharacter ↥H := by
+    intro h
+    apply hθ
+    have hcoe : (θ : ClassFunction ↥H ℂ).conj = trivialClassFunction ↥H := by
+      have h2 := congrArg (fun c : IrreducibleCharacter ↥H => (c : ClassFunction ↥H ℂ)) h
+      simpa using h2
+    apply Subtype.ext
+    show (θ : ClassFunction ↥H ℂ) = trivialClassFunction ↥H
+    rw [← ClassFunction.conj_conj (θ : ClassFunction ↥H ℂ), hcoe]
+    exact trivialClassFunction_isReal
+  have hirr := isIrreducibleCharacter_induce_of_frobeniusGroup hF θ hθ
+  have hirr' := isIrreducibleCharacter_induce_of_frobeniusGroup hF
+    (⟨(θ : ClassFunction ↥H ℂ).conj, θ.isIrreducible.conj⟩ : IrreducibleCharacter ↥H) hθbar_ne
+  -- `Ind θ` is nontrivial: `⟨Ind θ, 1_Γ⟩ = ⟨θ, 1_H⟩ = 0`, but `⟨1_Γ, 1_Γ⟩ = 1`.
+  have hne_triv : (⟨ClassFunction.induce H (θ : ClassFunction ↥H ℂ), hirr⟩ :
+      IrreducibleCharacter Γ) ≠ trivialIrreducibleCharacter Γ := by
+    intro h
+    have hrestrict : ClassFunction.restrict H
+          (trivialIrreducibleCharacter Γ : ClassFunction Γ ℂ)
+        = (trivialIrreducibleCharacter ↥H : ClassFunction ↥H ℂ) := by
+      ext x
+      simp [ClassFunction.restrict_apply, IrreducibleCharacter.coe_trivialIrreducibleCharacter,
+        trivialClassFunction_apply]
+    have hzero : ClassFunction.inner (ClassFunction.induce H (θ : ClassFunction ↥H ℂ))
+        (trivialIrreducibleCharacter Γ : ClassFunction Γ ℂ) = 0 := by
+      rw [ClassFunction.inner_induce_eq_inner_restrict, hrestrict,
+        irreducibleCharacter_inner_eq_ite, if_neg hθ]
+    have hcf : ClassFunction.induce H (θ : ClassFunction ↥H ℂ)
+        = (trivialIrreducibleCharacter Γ : ClassFunction Γ ℂ) :=
+      congrArg (fun c : IrreducibleCharacter Γ => (c : ClassFunction Γ ℂ)) h
+    rw [hcf, irreducibleCharacter_inner_eq_ite, if_pos rfl] at hzero
+    exact one_ne_zero hzero
+  -- Odd order ⟹ `Ind θ` not real ⟹ `(Ind θ)‾ ≠ Ind θ`.
+  have hnotreal := not_isReal_of_ne_trivial_of_odd_card' hodd hne_triv
+  have hconj_eq : (ClassFunction.induce H (θ : ClassFunction ↥H ℂ)).conj
+      = ClassFunction.induce H ((θ : ClassFunction ↥H ℂ).conj) :=
+    ClassFunction.induce_conj H (θ : ClassFunction ↥H ℂ)
+  have hne : ClassFunction.induce H (θ : ClassFunction ↥H ℂ)
+      ≠ ClassFunction.induce H ((θ : ClassFunction ↥H ℂ).conj) :=
+    fun heq => hnotreal (hconj_eq.trans heq.symm)
+  -- Distinct irreducibles are orthogonal.
+  have hii := irreducibleCharacter_inner_eq_ite
+    (⟨ClassFunction.induce H (θ : ClassFunction ↥H ℂ), hirr⟩ : IrreducibleCharacter Γ)
+    ⟨ClassFunction.induce H ((θ : ClassFunction ↥H ℂ).conj), hirr'⟩
+  rwa [if_neg (fun h => hne (congrArg (fun c : IrreducibleCharacter Γ =>
+    (c : ClassFunction Γ ℂ)) h))] at hii
+
+open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
+open OddOrder.Peterfalvi.S09 in
+open OddOrder.Peterfalvi.S09.Cert in
+/-- **Peterfalvi (7.8.a) for the witness `L`: `⟨ζ_0^ν, 1_G⟩ = 0`** (`hzeta0nu`, the last input to
+the (7.8.b) bound `hB`).  The abstract `IsCoherent` does not carry orthogonality to `1_G`, but it
+is recovered from the **complex conjugate** `ζ̄_0 = Ind θ̄_0 ∈ S` (`Sset_closedUnderConjugate`) — a
+second member of the *same degree*, distinct from `ζ_0` because `L` has odd order (no nontrivial
+real irreducible, `not_isReal_of_ne_trivial_of_odd_card'`).  `coherence_extension_orthogonal_constOne`
+then forces `⟨ν ζ_0, 1_G⟩ = 0`.  Holds for **any** nontrivial `θ_0` (degree-`e`/linearity unused). -/
+theorem witness_L_hzeta0nu [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    {L : Subgroup G} (hyp : Hypothesis L) {C : Subgroup ↥L}
+    (hfrob : OddOrder.Isaacs.Ch06.IsFrobeniusGroup ↥L ((hyp.typeI.typeF.H).subgroupOf L) C)
+    (coh : OddOrder.Peterfalvi.S07.IsCoherent hyp.tau hyp.Sset hyp.A)
+    (θ0 : IrreducibleCharacter ↥((hyp.typeI.typeF.H).subgroupOf L))
+    (hθ0 : θ0 ≠ trivialIrreducibleCharacter ↥((hyp.typeI.typeF.H).subgroupOf L)) :
+    ClassFunction.inner
+        (coh.extension (ClassFunction.induce ((hyp.typeI.typeF.H).subgroupOf L)
+          (θ0 : ClassFunction _ ℂ))) (Hypothesis71.constOne G) = 0 := by
+  classical
+  have hodd : Odd (Nat.card ↥L) := hG.odd.of_dvd_nat (Subgroup.card_subgroup_dvd_card L)
+  haveI hKnormal : ((hyp.typeI.typeF.H).subgroupOf L).Normal := by
+    rw [hyp.typeI.typeF.H_eq]
+    exact OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_subgroupOf_normal L
+  -- The complex conjugate character `θ̄_0` is again nontrivial irreducible.  Introduce it
+  -- **opaquely** (via `obtain`, not `let`), carrying only its coercion `↑θ̄_0 = (↑θ_0)‾`: a `let`
+  -- gets its coercion re-unfolded inside every `induce` coset sum, blowing the `whnf` budget.
+  obtain ⟨θ0', hθ0'coe⟩ :
+      ∃ t : IrreducibleCharacter ↥((hyp.typeI.typeF.H).subgroupOf L),
+        (t : ClassFunction ↥((hyp.typeI.typeF.H).subgroupOf L) ℂ)
+          = (θ0 : ClassFunction ↥((hyp.typeI.typeF.H).subgroupOf L) ℂ).conj :=
+    ⟨⟨(θ0 : ClassFunction _ ℂ).conj, θ0.isIrreducible.conj⟩, rfl⟩
+  have hθ0' : θ0' ≠ trivialIrreducibleCharacter ↥((hyp.typeI.typeF.H).subgroupOf L) := by
+    intro h
+    apply hθ0
+    have hcoe : (θ0 : ClassFunction ↥((hyp.typeI.typeF.H).subgroupOf L) ℂ).conj
+        = trivialClassFunction ↥((hyp.typeI.typeF.H).subgroupOf L) := by
+      rw [← hθ0'coe]
+      have h2 := congrArg
+        (fun c : IrreducibleCharacter ↥((hyp.typeI.typeF.H).subgroupOf L) =>
+          (c : ClassFunction ↥((hyp.typeI.typeF.H).subgroupOf L) ℂ)) h
+      simpa using h2
+    apply Subtype.ext
+    show (θ0 : ClassFunction ↥((hyp.typeI.typeF.H).subgroupOf L) ℂ)
+      = trivialClassFunction ↥((hyp.typeI.typeF.H).subgroupOf L)
+    rw [← ClassFunction.conj_conj (θ0 : ClassFunction ↥((hyp.typeI.typeF.H).subgroupOf L) ℂ), hcoe]
+    exact trivialClassFunction_isReal
+  -- The two members `ζ_0 = Ind θ_0`, `ζ̄_0 = Ind θ̄_0 ∈ S`.
+  have hmem0 : ClassFunction.induce ((hyp.typeI.typeF.H).subgroupOf L)
+      (θ0 : ClassFunction _ ℂ) ∈ hyp.Sset := ⟨θ0, hθ0, rfl⟩
+  have hmem0' : ClassFunction.induce ((hyp.typeI.typeF.H).subgroupOf L)
+      (θ0' : ClassFunction _ ℂ) ∈ hyp.Sset := ⟨θ0', hθ0', rfl⟩
+  -- Norms `= 1` (Frobenius), orthogonality to `1_L`, irreducibility.
+  have hnorm0 := inner_self_induce_eq_one_of_frobeniusGroup hfrob θ0 hθ0
+  have hnorm0' := inner_self_induce_eq_one_of_frobeniusGroup hfrob θ0' hθ0'
+  have h1_0 := inner_induce_constOne_eq_zero ((hyp.typeI.typeF.H).subgroupOf L) θ0 hθ0
+  have h1_0' := inner_induce_constOne_eq_zero ((hyp.typeI.typeF.H).subgroupOf L) θ0' hθ0'
+  -- `⟨ζ_0, ζ̄_0⟩ = 0` (odd-order Frobenius: `ζ_0` non-real), from the reusable general helper
+  -- (`hθ0'coe : ↑θ̄_0 = (↑θ_0)‾` reindexes it to `θ_0'`).
+  have horth : ClassFunction.inner
+      (ClassFunction.induce ((hyp.typeI.typeF.H).subgroupOf L) (θ0 : ClassFunction _ ℂ))
+      (ClassFunction.induce ((hyp.typeI.typeF.H).subgroupOf L) (θ0' : ClassFunction _ ℂ)) = 0 := by
+    rw [hθ0'coe]
+    exact inner_induce_conj_eq_zero_of_frobenius_of_odd hodd hfrob θ0 hθ0
+  -- The equal-degree difference is `A(L) = H#`-supported.
+  have hAH : typeIA L hyp.typeI = ((hyp.typeI.typeF.H) : Set G) \ {1} :=
+    Hypothesis.typeIA_eq_sharp hG hyp
+  have hdeg' : ClassFunction.induce ((hyp.typeI.typeF.H).subgroupOf L) (θ0' : ClassFunction _ ℂ)
+        (1 : ↥L)
+      = 1 * ClassFunction.induce ((hyp.typeI.typeF.H).subgroupOf L) (θ0 : ClassFunction _ ℂ)
+        (1 : ↥L) := by
+    rw [one_mul, ClassFunction.induce_apply_one, ClassFunction.induce_apply_one]
+    congr 1
+    rw [hθ0'coe, ClassFunction.conj_apply]
+    obtain ⟨n, -, hn⟩ := irreducibleCharacter_apply_one_eq_pos_natCast θ0
+    rw [hn, star_natCast]
+  have hsupp : (ClassFunction.induce ((hyp.typeI.typeF.H).subgroupOf L) (θ0' : ClassFunction _ ℂ)
+      - ClassFunction.induce ((hyp.typeI.typeF.H).subgroupOf L)
+        (θ0 : ClassFunction _ ℂ)).support ⊆ hyp.A := by
+    have hds := induce_diff_support (K := (hyp.typeI.typeF.H).subgroupOf L) θ0' θ0 1 hdeg'
+    rw [one_smul] at hds
+    intro x hx
+    have hxd := hds hx
+    rw [Set.mem_diff, SetLike.mem_coe, Set.mem_singleton_iff] at hxd
+    exact (mem_supportInSubgroup_sharp_subgroupOf_iff hyp.typeI.typeF.H hAH x).mpr ⟨hxd.1, hxd.2⟩
+  -- The Dade `⊥ 1_G` transport and `ℂ`-linearity of `τ = hyp.tau`.
+  have htau1 : ∀ φ : ClassFunction ↥L ℂ, φ.support ⊆ hyp.A →
+      ClassFunction.inner (hyp.tau φ) (Hypothesis71.constOne G)
+        = ClassFunction.inner φ (Hypothesis71.constOne L) := by
+    intro φ hφ
+    rw [show hyp.tau φ = hyp.dadeData.dade.dadeMap
+        ⟨φ, (ClassFunction.mem_supportedSubmodule).mpr hφ⟩ from
+      OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap_apply_of_support hyp.dadeData.dade
+        (hyp.dadeData.dade.fullDadeIsometryData hyp.hconj) hφ]
+    exact inner_tau_supported_constOne hyp.toHypothesis71
+      ⟨φ, (ClassFunction.mem_supportedSubmodule).mpr hφ⟩
+  have hτ_smul : ∀ (c : ℂ) (x : ClassFunction ↥L ℂ), hyp.tau (c • x) = c • hyp.tau x :=
+    dadeIntegralCharacterMap_smul_complex hyp.dadeData.dade
+      (hyp.dadeData.dade.fullDadeIsometryData hyp.hconj)
+  exact coherence_extension_orthogonal_constOne coh hτ_smul htau1 hmem0 hmem0'
+    hnorm0 hnorm0' horth hsupp h1_0 h1_0'
+
 /-- **Peterfalvi (7.8.b)/(12.12) size condition for an odd-order Frobenius group**: if a finite
 Frobenius group has kernel `N` and complement `A` both of **odd** order, with `N ≠ ⊥`, then
 `2|A| + 1 ≤ |N|` (equivalently `e ≤ (h-1)/2`, the `smallIndex` hypothesis of the §7 `(7.8.b)` norm
@@ -3448,3 +3614,4 @@ theorem theorem88_caseB_holds [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
   (theorem88_dichotomy hG).resolve_left (not_all_maximal_typeI hG)
 
 end OddOrder.Peterfalvi.S14
+
