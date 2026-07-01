@@ -34,23 +34,6 @@
    - **文書順タイブレーク**: 着手可能な選択肢が複数あるとき（どれも上流端）は、
      **教科書（BG / Peterfalvi）上で出現が早いもの**（番号の若い §/定理/補題）から着手する。
      線型 spine（BG §1→§16, Pf §3→§16）では「上流＝文書で早い」がほぼ一致する。
-   - **次の1つは規約から一意に導出する（"どれをやるか" をユーザーに訊かない）**（ユーザー 2026-07-01）。
-     未証明の on-path leaf が複数あっても、次は下記の機械手順で**常に一意に決まる**。焦点が
-     自動決定できない/曖昧なら、それは**規約の穴** → 訊く前に規約側（本ファイル / CLAUDE.md）を直す。
-     `AskUserQuestion` を "どの piece を次に" の判断で使わない。**機械手順**:
-     1. FT on-path の未証明 piece を **上流優先 → 文書順タイブレーク**で並べ、先頭を選ぶ。
-        **難易度・深さ・多反復・quick-win の有無は無関係**（[[feedback-quick-win-not-a-criterion]]）。
-     2. その piece が **lane 内 clean-additive に進められるか**判定（= 自 lane のファイルへの新規宣言追加＋
-        既存宣言 cite だけで進むか）。進められれば着手（深くても engage、[[feedback-no-avoiding-hard-parts]]）。
-     3. 進められない = (i) STOP 条件（signature 無断変更・新 axiom・unsound carrier）を要する、または
-        (ii) **他 active session の共有ファイル**（典型: coherence-core S07/S08, spine 構造体）の改変を
-        要する場合 → その piece を **coordinated issue で flag**（[[cross-lane-sync-via-notes]]）し、
-        **文書順で次の、lane 内 clean-additive に進められる piece** へ移る。
-   - **判定軸は「難易度」でなく「cross-lane / STOP」**（重要）。深いだけなら engage（移らない）。
-     移るのは STOP か他 lane active file 改変を要するときのみ。例: witness hB の hzeta0nu
-     (⟨ν(Ind θ_0),1_G⟩=0, issue 1015) は §7 で最上流だが、証明に coherence-core（S07 IsCoherent field 追加
-     か S08 Sibley 内部露出）を要し lane-b の S14 だけでは clean-additive に進めない → issue 1015 で flag し
-     §12 の次 piece（(12.11) 等、lane-b の S14 で完結）へ移る。共有 coherence 強化は lane-a と協調。
    - **FT 経路限定**: 対象は item 1 の on-path のみ。off-path は凍結（順序判断の対象外）。
    - これは**作業の選択順序**の規則であり、doneness 判定（item 3）とは独立。
 5. **レーン内 frontier 選択は自律判断する（聞きに来ない）。**（ユーザー裁定 2026-07-01）
