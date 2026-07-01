@@ -7720,4 +7720,33 @@ theorem caseA_reducible_theta_regular [Finite G] {M : Subgroup G}
     caseA_theta_comp_quotient_on_S0_eq_one_iff_of_fixed caseA θbar ζ hlo hMfix (caseA.orbitRep i)]
   exact hS0
 
+/-- **step 5 foundation: a reducible constituent seed has inflation-inertia `HC`** (Peterfalvi
+(9.8.c)).  Chains the regularity `caseA_reducible_theta_regular` (a reducible `M`-fixed `ζ`'s
+constituent seed `θbar` is regular) into `inertia_eq_hcInHu_caseA` (a regular seed's inflation `θ₀`
+has `HU`-inertia `HC`), converting the hom-form regularity to the `IrreducibleCharacter` pointwise
+form via `comp_subtype_ne_one_iff_exists`.  This `I_{HU}(θ₀) = HC` is what makes `Ind_{HC}(hcPsi θbar)`
+irreducible (`hcZeta_irreducible`) and drives the Clifford-correspondence identification
+`ζ = Ind_{HC}(hcPsi θbar) ∈ Xθ` closing the `Xmu`-surjectivity. -/
+theorem caseA_reducible_inflation_inertia_eq [Finite G] {M : Subgroup G}
+    {data : TypesIIIIIIVSetup M} {chief : ChiefFactorData data}
+    {chars : Section11CharacterData data chief} (caseA : CliffordCaseAData chars)
+    (θbar : (↥data.H ⧸ chief.N) →* ℂˣ)
+    [Fintype ↥(hInHu data)] [Invertible (Nat.card ↥(hInHu data) : ℂ)]
+    (ζ : IrreducibleCharacter ↥(huSub data))
+    (hlo : OddOrder.RepresentationTheory.IrreducibleCharacter.LiesOver (hInHu data) ζ
+      (linearIrreducibleCharacter (θbar.comp ((QuotientGroup.mk' chief.N).comp
+        (hInHuEquivH data).toMonoidHom))))
+    (hMfix : ClassFunction.inertia (ζ : ClassFunction ↥(huSub data) ℂ) = ⊤)
+    (hnt : θbar ≠ 1) :
+    ClassFunction.inertia (ClassFunction.compHom (hInHuEquivH data).toMonoidHom
+        (ClassFunction.compHom (QuotientGroup.mk' chief.N)
+          (linearIrreducibleCharacter θbar : ClassFunction (↥data.H ⧸ chief.N) ℂ)))
+      = hInHu data ⊔ cInHu data chief := by
+  refine inertia_eq_hcInHu_caseA data chief caseA (fun i => ?_)
+  obtain ⟨x, hx, hne⟩ := (comp_subtype_ne_one_iff_exists caseA θbar i).mp
+    (caseA_reducible_theta_regular caseA θbar ζ hlo hMfix hnt i)
+  refine ⟨x, hx, ?_⟩
+  rw [linearIrreducibleCharacter_apply, linearIrreducibleCharacter_apply, map_one, Units.val_one]
+  simpa using hne
+
 end OddOrder.Peterfalvi.S11
