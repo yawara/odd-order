@@ -1326,3 +1326,21 @@ ConjugationBrauer の conjByPerm 定義、要 bridge 確認)。
 在庫、Ind の constituents 列挙)、(b) (8.2.c) を TypeFData field (Hall coprime hUHcop + centralizer_le_U1)
 に接続、(c) equal degree/support/non-real 組み上げ。これで M-side CharacterDecompositionData →
 12.14 の (12.4)-for-M 応用が開通。
+
+### loop⁵⁷ (2026-07-01 lane-b resume²): 一般 typeI_induced_char_constituents 残 = induced-char Clifford (substantial fresh effort)
+
+**(8.2.c) は completed** (equal-degree input ready)。だが一般 typeI_induced_char_constituents は
+**Ind_H^L θ の構成要素 decomposition** を要し、これは既存 `clifford_decomposition` (Clifford.lean、
+**Res_H χ = e·Σθ の restriction 版**) の **dual** = 誘導指標の構成要素列挙で、repo に readily 不在。
+substantial な Clifford-theory build (誘導指標 → 構成要素、(8.2.c) で equal degree、multiplicity) が要る。
+
+**次 focused effort の scope** (fresh session 推奨):
+- 誘導指標 Ind_H^L θ (H◁L) の構成要素 = I_L(θ) 上の Clifford 対応。(8.2.c) I(θ)∩U⊆U₁ で
+  I_L(θ)=H·(I(θ)∩U)⊆H·U₁ を bound → 構成要素の共通次数 [L:I_L(θ)]·(...)。
+- 既存 machinery: `card_mul_inner_self_induce_eq_card_inertia` (‖Ind θ‖²=[I_L(θ):H])、
+  `inner_induce_eq_zero_of_not_conj`、CliffordSingleOrbit。誘導版 decomposition producer は未在。
+- L-side (Frobenius) は済 (frobenius_typeI_induced_char_constituents、I_L(θ)=H 自明)。
+  一般 (I_L(θ)>H) が残。
+
+**セッション成果 (全 committed, build-green, axiom-clean)**: §7 hzeta0nu → witness_L_zeta_bound (hB) →
+L-side (12.2.a) → π-part helper → **(8.2.c) typeF_inertia_inf_le_U1 (M-side gate、hard §8 実証明)**。
