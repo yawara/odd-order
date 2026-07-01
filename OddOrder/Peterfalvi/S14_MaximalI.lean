@@ -92,6 +92,58 @@ noncomputable def Sset {L : Subgroup G} (hyp : Hypothesis L) :
         (θ : ClassFunction ↥((hyp.typeI.typeF.H).subgroupOf L) ℂ) }
 
 open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
+/-- The **filtration** `S(A) = {Ind_H^L θ | θ ≠ 1, A ⊆ Ker θ}` of the witness family `Sset`
+(Peterfalvi (6.1)), indexed by subgroups `A ≤ L`.  `S(⊥) = Sset`, and the abstract Peterfalvi (6.3)
+descent `six_three_of_six_two_oracle` runs on this filtration (with `SOf = SsubFiltration`,
+`τ = tau`, `A0 = A`, kernel `H = L_F`).  Mirrors the Sibley `SibleyDadeHypothesis.SsubFiltration`
+but over the witness's canonical `(L_F).subgroupOf L` kernel and Dade map. -/
+noncomputable def SsubFiltration {L : Subgroup G} (hyp : Hypothesis L) (A : Subgroup ↥L) :
+    Set (ClassFunction ↥L ℂ) :=
+  haveI := hyp.finiteG
+  { φ | ∃ θ : IrreducibleCharacter ↥((hyp.typeI.typeF.H).subgroupOf L),
+      θ ≠ trivialIrreducibleCharacter ↥((hyp.typeI.typeF.H).subgroupOf L) ∧
+      ((A.subgroupOf ((hyp.typeI.typeF.H).subgroupOf L)) :
+          Set ↥((hyp.typeI.typeF.H).subgroupOf L)) ⊆
+        OddOrder.Peterfalvi.S03.characterKernel
+          (θ : ClassFunction ↥((hyp.typeI.typeF.H).subgroupOf L) ℂ) ∧
+      φ = ClassFunction.induce ((hyp.typeI.typeF.H).subgroupOf L)
+        (θ : ClassFunction ↥((hyp.typeI.typeF.H).subgroupOf L) ℂ) }
+
+/-- `S(⊥) = Sset`: the kernel condition `⊥ ⊆ Ker θ` is vacuous (Peterfalvi's `S(1) = S`). -/
+theorem SsubFiltration_bot {L : Subgroup G} (hyp : Hypothesis L) :
+    hyp.SsubFiltration ⊥ = hyp.Sset := by
+  ext φ
+  simp only [SsubFiltration, Sset, Set.mem_setOf_eq]
+  constructor
+  · rintro ⟨θ, hθ, -, hφ⟩; exact ⟨θ, hθ, hφ⟩
+  · rintro ⟨θ, hθ, hφ⟩
+    refine ⟨θ, hθ, ?_, hφ⟩
+    rw [Subgroup.bot_subgroupOf, Subgroup.coe_bot]
+    intro x hx
+    rw [Set.mem_singleton_iff] at hx; subst hx
+    exact OddOrder.Peterfalvi.S03.one_mem_characterKernel _
+
+/-- Every member of a filtration level `S(A)` lies in the ambient family `Sset`. -/
+theorem SsubFiltration_subset_Sset {L : Subgroup G} (hyp : Hypothesis L) {A : Subgroup ↥L} :
+    hyp.SsubFiltration A ⊆ hyp.Sset := by
+  intro φ hφ
+  simp only [SsubFiltration, Set.mem_setOf_eq] at hφ
+  obtain ⟨θ, hθ, -, hφeq⟩ := hφ
+  simp only [Sset, Set.mem_setOf_eq]
+  exact ⟨θ, hθ, hφeq⟩
+
+/-- The filtration is **antitone**: a larger kernel-constraint subgroup gives fewer members,
+`A ≤ B → S(B) ⊆ S(A)` (Peterfalvi (6.1)). -/
+theorem SsubFiltration_antitone {L : Subgroup G} (hyp : Hypothesis L) {A B : Subgroup ↥L}
+    (hAB : A ≤ B) : hyp.SsubFiltration B ⊆ hyp.SsubFiltration A := by
+  intro φ hφ
+  simp only [SsubFiltration, Set.mem_setOf_eq] at hφ ⊢
+  obtain ⟨θ, hθ, hker, hφeq⟩ := hφ
+  refine ⟨θ, hθ, ?_, hφeq⟩
+  intro x hxA
+  exact hker (Subgroup.mem_subgroupOf.mpr (hAB (Subgroup.mem_subgroupOf.mp hxA)))
+
+open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
 /-- Peterfalvi's Dade isometry `τ` relative to `(A(L), L, G)` of (12.1), pinned to
 the genuine `S07.dadeIntegralCharacterMap` of the (8.15) support data `dadeData`.
 No longer an unconstrained field. -/
