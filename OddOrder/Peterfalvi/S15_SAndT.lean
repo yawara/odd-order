@@ -510,7 +510,7 @@ reconciliation `hrec : Sdata.W2 = W2`, the assembly closes the core from the pro
   `K ≤ U ⊓ C_G(P) = ⊥` (`U_inf_centralizer_P_eq_bot`). -/
 theorem normalizer_U_inf_W2_eq_bot_of_data [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
-    (hcopUP : Nat.Coprime (Nat.card ↥hyp.U) (Nat.card ↥hyp.P))
+    (hcop : Nat.Coprime (Nat.card ↥hyp.P) (Nat.card ↥(hyp.U ⊔ hyp.W1)))
     (hrec : hyp.Sdata.W2 = hyp.W2) :
     hyp.U ⊓ Subgroup.normalizer (hyp.W2 : Set G) = ⊥ := by
   obtain ⟨data, _, hP_elemAb, _, _, _⟩ := basic_structure hG hyp
@@ -522,12 +522,15 @@ theorem normalizer_U_inf_W2_eq_bot_of_data [Finite G]
     normalizer_U_inf_W2_le_centralizer_W2 hG hyp
   -- `P` abelian.
   haveI hPcomm : IsMulCommutative ↥hyp.P := IsMulCommutative.of_comm hP_elemAb.comm
-  -- `Coprime |P| |K|` (from the (13.2) datum `Coprime |U| |P|`).
+  -- divisibilities `|K| ∣ |U| ∣ |U⋊W₁|`, from the coprime-action datum `hcop`.
+  have hUdvdUW1 : Nat.card ↥hyp.U ∣ Nat.card ↥(hyp.U ⊔ hyp.W1) := by
+    rw [← Nat.card_congr (Subgroup.subgroupOfEquivOfLe (le_sup_left)).toEquiv]
+    exact Subgroup.card_subgroup_dvd_card _
   have hKdvdU : Nat.card ↥K ∣ Nat.card ↥hyp.U := by
     rw [← Nat.card_congr (Subgroup.subgroupOfEquivOfLe hK_le_U).toEquiv]
     exact Subgroup.card_subgroup_dvd_card _
   have hcopPK : Nat.Coprime (Nat.card ↥hyp.P) (Nat.card ↥K) :=
-    hcopUP.symm.coprime_dvd_right hKdvdU
+    hcop.coprime_dvd_right (hKdvdU.trans hUdvdUW1)
   -- normalizer facts: `S ≤ N(P)`, `U ≤ S`, `W₁ ≤ S`, `W₁ ≤ N(W₂)`.
   have hMFleM : maxNilpotentNormalHall hyp.S ≤ hyp.S :=
     OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_le hyp.S
@@ -581,10 +584,12 @@ theorem normalizer_U_inf_W2_eq_bot_of_data [Finite G]
       have h := hP_elemAb.comm (⟨(a : G), hPK_le_P a.2⟩ : ↥hyp.P) (⟨(b : G), hPK_le_P b.2⟩ : ↥hyp.P)
       have h2 := congrArg (Subgroup.subtype hyp.P) h
       simpa using h2))
-  -- `Coprime |⁅P,K⁆| |U⋊W₁|`: `⁅P,K⁆` is a `p`-group and `p ∤ |U⋊W₁|` (`p ∤ |U|` from `hcopUP`,
-  -- `p ≠ q = |W₁|` from `W = W₁ × W₂` cyclic).  Structural, deferred.
+  -- `Coprime |⁅P,K⁆| |U⋊W₁|`: `⁅P,K⁆ ≤ P` and `hcop`.
+  have hPKdvdP : Nat.card ↥(⁅hyp.P, K⁆ : Subgroup G) ∣ Nat.card ↥hyp.P := by
+    rw [← Nat.card_congr (Subgroup.subgroupOfEquivOfLe hPK_le_P).toEquiv]
+    exact Subgroup.card_subgroup_dvd_card _
   have hcopPKfrob : Nat.Coprime (Nat.card ↥(⁅hyp.P, K⁆ : Subgroup G))
-      (Nat.card ↥(hyp.U ⊔ hyp.W1)) := sorry
+      (Nat.card ↥(hyp.U ⊔ hyp.W1)) := hcop.coprime_dvd_left hPKdvdP
   have hUcent : hyp.U ≤ Subgroup.centralizer ((⁅hyp.P, K⁆ : Subgroup G) : Set G) :=
     frobenius_kernel_centralizes_of_complement_fpf hUEnorm data.UW1_frobenius hPKsolv hcopPKfrob
       (by
