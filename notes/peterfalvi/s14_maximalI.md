@@ -260,14 +260,26 @@ The book proof of (12.12): let `P = O_p(H)`, `T = Ω₁(Z(P))` (elem-ab of order
     the `Additive ↥T` diamond, recovers `finrank∈{1,2}` from `|T|∈{p,p²}` via
     `FiniteField.pow_finrank_eq_natCard` + `Nat.pow_right_injective`.  **This is exactly the form
     the full (12.12) `T`-setup feeds.**
+- **✅✅✅ `p+1` refinement rep-theory core LANDED** (2026-07-01 lane-b resume, commit `45f18adc`,
+  sorry-free): **`isCyclic_and_card_dvd_add_one_of_two_dim_irreducible_nonscalar`** (S14) — an odd
+  `E` (`p∤|E|`) acting faithfully + irreducibly on 2-dim `V` with **no nontrivial element acting as
+  an `𝔽_p`-scalar** ⟹ cyclic, `|E| ∣ p+1` (previously Case B core only gave `|E| ∣ p²−1`).  Realizes
+  the `p+1` half via the new Singer core **`coprime_card_sub_one_of_faithful_irreducible_comm_nonscalar`**
+  (`SingerField.lean`): the realization `μ:E↪Kˣ` meets the prime-subfield units `ν:𝔽_pˣ↪Kˣ` trivially
+  (the non-scalar condition) ⟹ `Coprime |E| (p−1)`; combined with `|E| ∣ p²−1 = (p−1)(p+1)` this forces
+  `|E| ∣ p+1`.  `..._fpf` (the (9.7)(b) bridge) refactored to a thin wrapper over this core (−50 lines
+  dup, signature unchanged, S11 consumer intact).  full build 3890 jobs green, AxiomsCheck OK.
 - **gate (remaining)**: only the `T = Ω₁(Z(O_p(H)))` **construction** (`|T|∈{p,p²}` from (12.9)
-  rank 2; `E` normalizes & acts FPF on `T` from (12.10) Frobenius) + the `p+1` refinement (`A=1` via
-  (12.11)/(12.9)) — these consume **(12.10)/(12.11)** [char/§8-gated, lane-b] and the intricate
-  `O_p/Z/Ω₁` p-group structure.  ⟹ `complement_cyclic_order_dvd` (full disjunction) stays gated;
-  the **rep-theory + conjugation bridge is the ungated reusable part and is now COMPLETE**
-  (`E`-FPF-on-elem-ab-rank≤2 ⟹ cyclic+order, the subgroup form, sorry-free).  Wiring (12.12) to
-  consume the bridge is "保険 skeleton" over a genuinely-blocked upstream ((12.10)) — defer per
-  ft_path_policy until (12.10) lands or by hub decision.
+  rank 2; `E` normalizes & acts FPF on `T` from (12.10) Frobenius) + **discharging the non-scalar
+  condition** (the abstract "`A=1`") from the `N_G(⟨x⟩)⊆M` witness structure ((12.9)/(12.11)) —
+  these consume **(12.10)/(12.11)** [char/§8-gated, lane-b] and the intricate `O_p/Z/Ω₁` p-group
+  structure.  ⚠ Also `complement_cyclic_order_dvd` **as currently stated** takes only `frob`+`ctr`
+  (no `RankTwoWitnessData`), so it lacks the witness data (`x`, `N_G(⟨x⟩)⊆M`) needed to establish
+  non-scalar-ness for the `p+1` branch — its **statement likely needs the witness added** before it
+  can cite the new core.  ⟹ `complement_cyclic_order_dvd` (full disjunction) stays gated; the
+  **rep-theory core (incl. the `p+1` half) is the ungated reusable part and is now COMPLETE**.  Wiring
+  (12.12) to consume it is "保険 skeleton" over a genuinely-blocked upstream ((12.10)/(12.11)) — defer
+  per ft_path_policy until (12.10)/(12.11) land or by hub decision.
 
    ### ⚠ Instance-engineering blocker (diagnosed 2026-06-22 — ✅ SUPERSEDED/RESOLVED, see "RESOLVED" block above; kept as a record of the dead ends)
    The clean composition is **blocked** because the Singer lemma requires `[CommGroup C]` but
