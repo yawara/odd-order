@@ -650,3 +650,22 @@ orthonormal = SHC_extension_inner_self/of_ne + SHC_extension_inj (cont.³³)。
 2. 係数: c(SHC.ext ζ)=a−n, c(SHC.ext η)=a (η≠ζ) — cont.³² coefficient relation + cont.²⁶ integrality。
 3. norm: ‖α^τ‖²=∑_{β∈R}(c β)²+‖Y‖² (Parseval, Y⊥R orthonormal) = (a−n)²+(|R|−1)a²+‖Y‖²。
    |R|=|S(HC)|=n (image injective via SHC_extension_inj)。=2+n² (coh-free) ⟹ n(a²−2a)≤2 ⟹ a∈{0,1,2}。
+
+## 2026-07-02 cont.³⁵ (lane-a) — ⚠ (11.8) は DOUBLY-gated 判明 + 算術核 landed (axiom-clean)
+**重要な finding**: (11.8.2) の `a∈{0,1,2}` 結論は **(11.8.1) `|S(HC)|=n`** を要す (norm ineq
+`(a−n)²+(|S₁|−1)a²≤n²+2` → `|S₁|a²−2an≤2` を `n(a²−2a)≤2` に変換するのに |S₁|=n が必要)。
+`exists_charParamArith` (S12:2954) は n を **abstract** に産出 (n·w₁=d−δ, 2≤n のみ、n=|S(HC)| は baked-in でない)。
+∴ |S₁|=n = (11.8.1) d=u,δ=1 = **§9↔§10 carrier bridge gated** (cont.²⁴ の muGrid-degree existential dead-end)。
+
+**∴ (11.8) は DOUBLY-gated**:
+- **§9↔§10** (11.8.1 |S₁|=n / d=u): μ_j(1)=qu (§9 landed) を §10 muGrid μ_j(1)=w₁·d に接続 = carrier 材料化 (deep)。
+- **§14** (11.8.6 S₂ coherence = 9.11 sibleyTarget_H0C): lane-b/§14 gated。
+ungated middle (11.8.2-11.8.5 の projection/norm/5.3.b machinery) は cont.²⁶-³⁴ で build 済 (11 lemmas)。
+
+**landed (axiom-clean [propext,Classical.choice,Quot.sound]、sorryAx 無)**: `charParam_a_mem_of_norm_ineq`
+— `n(a²−2a)≤2 ∧ 2≤n → a∈{0,1,2}` (整数算術核、char machinery 非依存ゆえ clean)。(11.8.2) の a∈{0,1,2} の数値核。
+
+**次 iteration frontier 判断**: ungated norm decomposition (Parseval `‖α^τ‖²=∑c_β²+‖Y‖²` + inequality、
+|S₁|=n を hypothesis 化して endpoint skeleton) を build 続行 (deferred-payoff) or §9↔§10 bridge (d=u) 攻略。
+d=u = μ_j(1) の §9↔§10 接続で cont.²⁴ existential を回避できるか要再検 (μ_j(1)=w₁·d は symbolic、existential は
+individual μ_{ij} value)。

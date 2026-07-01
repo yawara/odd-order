@@ -7417,6 +7417,20 @@ theorem Hypothesis.exists_SHC_extension_orthonormal [Finite G] {M : Subgroup G}
     rw [hs, Finset.mem_filter] at hχs
     exact ⟨χ, hχs.2.1, χ.2, hχs.2.2, rfl⟩
 
+/-- **Peterfalvi (11.8.2) arithmetic core**: the integer inequality `n·(a² − 2a) ≤ 2` with `2 ≤ n`
+forces `a ∈ {0, 1, 2}`.  (If `a ∉ {0, 1, 2}` then `a ≤ −1` or `a ≥ 3`, so `a² − 2a ≥ 3` and
+`n·(a² − 2a) ≥ 2·3 = 6 > 2`.)  This is the numeric heart of (11.8.2)'s `a = 0/1/2` conclusion, fed by
+the projection-norm bound `(a − n)² + (|S₁| − 1)a² ≤ n² + 2` once `|S₁| = n` (Peterfalvi (11.8.1)). -/
+theorem charParam_a_mem_of_norm_ineq {a : ℤ} {n : ℕ} (hn : 2 ≤ n)
+    (h : (n : ℤ) * (a ^ 2 - 2 * a) ≤ 2) : a = 0 ∨ a = 1 ∨ a = 2 := by
+  have hn2 : (2 : ℤ) ≤ (n : ℤ) := by exact_mod_cast hn
+  by_contra hcon
+  push_neg at hcon
+  obtain ⟨ha0, ha1, ha2⟩ := hcon
+  have ha : a ≤ -1 ∨ 3 ≤ a := by omega
+  have hge : 3 ≤ a ^ 2 - 2 * a := by rcases ha with h | h <;> nlinarith
+  nlinarith [hge, hn2]
+
 open scoped FiniteInduce in
 /-- **Peterfalvi (11.8), the genuine non-orthogonality** (lane-b W3 obligation, issue 2020).
 
