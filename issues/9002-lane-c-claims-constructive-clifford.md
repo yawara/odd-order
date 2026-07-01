@@ -155,3 +155,15 @@ shared leaf に再配置)。relocate 後は通常合流。**relocate まで hub 
 
 **⚠ 逸脱の再発防止**: lane c の Clifford (9002) は **必ず shared leaf** で build (S14/他レーン file を編集しない)。
 generic Clifford/inertia は `Inertia.lean`/`Clifford*.lean`/GroupTheory/** に置き、各 consumer が cite。
+
+### ✅ RELOCATE 完了 (lane c, 2026-07-02 cont.⁵ — 本裁定を拾って対応)
+
+裁定に従い、2 lemma を S14 から **新 shared leaf** `OddOrder/GroupTheory/RepresentationTheory/InertiaAbelianQuotient.lean`
+へ relocate。S14 からは両 lemma を削除 (`typeF_inertia_inf_le_U1` は grandfather 済ゆえ S14 に残置・不触)。
+hub 指示どおり **generic 化** (`{Γ}`+`{k}` 抽象、8.2.c の `hle`/abelian を仮説化 → S14 非依存で GroupTheory/** 上流に置ける):
+- `ClassFunction.inertia_inf_isMulCommutative_of_le`: `I(θ)∩U ≤ U₁` + `U₁` abelian ⟹ `I(θ)∩U` abelian。
+- `ClassFunction.commutator_inertia_le_of_sup_eq_top`: `H⊔U=⊤` + `I(θ)∩U` abelian ⟹ `⁅I(θ),I(θ)⁆ ≤ H`。
+
+両 sorry-free、`lake build` 緑 (leaf 1085 jobs / S14 除去後も 3855 jobs green)。type-F 特殊化 (8.2.c=`typeF_inertia_inf_le_U1`
+を cross-file cite して `hle` 供給) は **consumer 側** (S14 の `typeI_induced_char_constituents` を埋める時、lane b or
+lane c の新 Pf leaf) が実施 — lane c は S14 を編集しない。以後 Clifford は必ず shared leaf で build。
