@@ -1882,3 +1882,36 @@ regular θbar → ζ∈Xθ の chain:
 **次着手**: (a)(b) の general Clifford infra (lies-over 推移性 + inertia 包含) を build → step 5 assembly。
 または Xmu を「reducible ξ そのもの」で定義し Xθ 経由を避ける再設計を検討 (ξ=Ind_{HC}(hcPsi θbar) を
 明示せず、reducible ξ の集合と Xθ∩reducible の bijection を count で)。
+
+## step 5 deep 精密 build plan — general-Clifford correspondence 存在形 (2026-07-01 cont.¹⁴)
+
+**infra 確認**: coe_eq_induce_of_liesOver_of_isIrreducibleCharacter_induce (CliffordSingleOrbit:235、
+ψ を与えて ζ=Ind ψ) と inner_induce_ne_zero_iff_liesOver (Clifford:583) はあるが、**Clifford
+correspondence 存在形 (ζ→ψ') + restriction/lies-over 推移性は無い**。step 5 foundation
+(caseA_reducible_inflation_inertia_eq: I_HU(θ₀)=HC) は landed (3ab7a5ea)。
+
+**目標**: reducible ξ∈xiOf(H₀C) (M-fixed, seed θbar regular) → **ξ = Ind_{HC}(hcPsi θbar) ∈ Xθ**。
+coe_eq_induce with ψ=hcPsi θbar が使える (Ind_{HC}(hcPsi θbar) irreducible = hcZeta_irreducible +
+foundation の I_HU(θ₀)=HC) — 要 **ξ lies over hcPsi θbar**。
+
+**ξ lies over hcPsi θbar の証明 (要 general-Clifford infra, 次 iteration build 順)**:
+1. **restriction 推移性** (新規, general): H≤K≤G で `restrict (H.subgroupOf K) (restrict K φ) =
+   compHom (subgroupOfEquivOfLe hHK).symm (restrict H φ)` (subgroupOf transport, ext+pointwise)。
+2. **lies-over 推移性** (新規, general, 1 依存): ξ over θ₀ (H=hInHu⊆HC) → ∃ψ'∈Irr(HC), ξ over ψ' ∧
+   ψ' over θ₀ (Res_H(ξ)=Res_H(Res_{HC}ξ)=Σ e_ψ Res_H(ψ)、⟨·,θ₀⟩≠0 で ∃ψ')。
+3. **inertia(ψ')=HC** (新規, general): ψ' over θ₀ ⟹ I(ψ')⊆I(θ₀)=HC (conjBy preserves lies-over:
+   g∈I(ψ')→ψ'=ψ'^g over θ₀^g、single-orbit で θ₀^g H-conj θ₀→g∈I(θ₀))、⊇HC 常。
+4. **ψ' linear**: ξ(1)=u, ξ=Ind_{HC}(ψ') (coe_eq_induce with 2,3,c) ⟹ u=[HU:HC]ψ'(1)=uψ'(1) ⟹ ψ'(1)=1。
+5. **ψ' trivial on H₀C**: ξ trivial on H₀C (∈xiOf(H₀C)) + liesOver_mem_characterKernel ⟹ H₀C⊆ker ψ'。
+6. **ψ'=hcPsi θbar** (crux, tractable): linear ψ' (=linearIrreducibleCharacter ψ_hom via
+   exists_units_monoidHom) trivial on H₀C ⟹ ψ_hom factors через hcHom (ker=H₀C surjective) ⟹
+   ψ'=hcPsi θ''; ψ' over θ₀=inflation θbar ⟹ θ''=θbar (inflation injective)。
+7. ⟹ ξ over hcPsi θbar (=ψ') → coe_eq_induce → **ξ=Ind_{HC}(hcPsi θbar)∈Xθ**。
+
+**その後**: Xmu surjective (全 reducible∈Xθ) → |Xmu|=p-1 (bijection + reducible_count) →
+exists_regular_not_reducible_of_odd (oXtheta+u odd) → hIM → hcZeta_exists_irreducible_sOf → conjunct c
+(S11:5552)。
+
+**⚠ 判断分岐**: (1)-(3) の general-Clifford (restriction/lies-over 推移性 + inertia 包含) は Clifford.lean
+上流に置くべき shared infra だが、まず S11 local で build → 動作後に上流移動を検討 (claim-before-build)。
+step 2 (regularity crux) 完成後の最後の assembly ゆえ、深いが grindable。
