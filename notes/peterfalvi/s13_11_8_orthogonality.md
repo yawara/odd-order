@@ -475,3 +475,25 @@ the **exact next buildable lemma** (次 iteration = BUILD、survey しない):
 - **next iteration = BUILD** this α-decomposition (survey 済、foundation 確認済)。SHC_isCoherent の τ₁ API
   (`CoherentHypothesis.tau1` 相当の SHC 版) を読み、ζ^{τ₁} と α^τ の inner を muGridAlpha_tau_inner_self の
   proof 構造で組む。§14-gate (S₂) は最後の union でのみ効く (α 分解自体は ungated)。
+
+## 2026-07-02 cont.²⁶ (lane-a) — 🔨 first α-grid S₁-τ₁ building blocks LANDED (grind 実行)
+
+ユーザー裁定「α-grid S₁-τ₁ grind」を実行、build-light 連続を脱し **2 lemma landed** (S12、leaf green):
+- **`Hypothesis.SHC_extension_inner_self`**: `‖ζ^{τ₁}‖²=1` for `S(HC)`-coherence τ₁
+  (`SHC_isCoherent.extension`)。full-coh `zeta_tau1_inner_self` の SHC 版 (by_contra で full coh 無でも使える)。
+  proof = `extension_inner_eq` (isometry) + `irr_cf_inner`。
+- **`Hypothesis.muGridAlpha_tau_inner_SHC_extension_mem_int`**: `⟨α_{ij}^τ, ζ^{τ₁}⟩ ∈ ℤ` (integrality)。
+  coh-free `muGridAlpha_tau_mem_ZIrr` (α^τ∈ZIrr) + `extension_mem_ZIrr` (ζ^{τ₁}∈ZIrr) + `inner_mem_ZIrr_int`。
+- **⚠ instance gotcha 解決** ([[lean-induce-transport-instance-desync]]): `open scoped FiniteInduce in` で
+  Fintype↥M/Invertible を carrier (SHC_isCoherent 内部 = `FiniteInduce.finiteSubFintype`) と統一。explicit
+  `[Fintype ↥M]` は "synthesized ≠ inferred" mismatch。open は docstring の**前**に置く。
+
+**axiom profile (honest)**: 両 lemma は literal sorry 無 (honest 完全証明) だが **transitive sorryAx あり** —
+`muGrid`/`SHC_isCoherent` が S12 自身の §10→§6 carrier bridge sorry (`typePData_toS06Hypothesis` S12:1113、
+`typePData_WEquiv_mem_W2` S12:1011) に依存。これは genuine な deferred lane-a prerequisite (vacuous scaffold
+でない) ゆえ cite 正当 ([[feedback-cite-sorried-lemmas-if-signature-correct]])。§8.2.a/8.6.b II の clean 群論と
+違い、char endgame は sorried carrier 上に積む (回避不能)。
+
+**次 = (11.8.2) a=0 導出** (これらを消費): `‖α^τ‖²=2+n²` (`muGridAlpha_tau_inner_self` coh-free ✅) +
+上記 integrality + S(HC) 直交 (`inducedFamily_pairwiseOrthogonal` ✅) で α^τ を S₁^{τ₁} basis に分解、
+a∈{0,1,2}、a=0 or 2、a=0 ⟹ X=ω_{ij}^σ−ω_{i0}^σ ((11.8.5))。μ_k^{τ₁} 経由 (S(HC) 外) を避ける新 CS 論法。
