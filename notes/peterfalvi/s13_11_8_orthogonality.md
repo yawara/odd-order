@@ -1052,3 +1052,29 @@ threaded hyp 無)。**残 = a=(∑ω_{r0}^σ,β) application**: β real=(11.8.3,
   cross/within 項が畳まれ、5.3.b で ζ^{τ₁} 項消滅) → 残 = ∑_r⟨ω_{r0}^σ,α^τ⟩ が (11.8.4)-type residual に依存。moderate-big。
 - `β real` (11.8.3): (4.8)/(4.10)/(5.9) SHC port。row-conj involution (`exists_rowInv_alignedOmegaSigma_conj`)
   + τ₁ conj 交換 + α reality。BIG (multi-iteration)。
+
+## 2026-07-02 cont.⁶² (lane-a) — **ha 連結 + (11.8.5) capstone LANDED (a-even 全組立完了、残 β real のみ)**
+まず**投資判断の検証** (重要): 私の β は係数 **δ** (α^τ−**δ**(ω diff)+nζ^{τ₁})、note 旧記述 (line 31/573) は係数 1。
+`charParam` の `hαω`=⟨α^τ,∑ω⟩=−δ は a∈{0,2} 特殊値 (hYd 依存) で**無条件でない**。無条件展開すると
+⟨α^τ,∑ω⟩=**a−δ** (`muGridAlpha_tau_inner_zeroColumnSum_sub_zeta`=n−δ + h114 + hinner(=a−n))。
+⟹ ⟨β,∑ω⟩=(a−δ)−δ·(−1)+n·0=**a** (β の δ 係数が α^τ の δ を相殺) ⟹ **全 δ で成立** (δ=1 に限らない)。
+∴ **係数 δ の私の β が正しい一般 (11.8.3) 残差** (note 旧係数 1 は δ=1 専用)。cont.⁶⁰⁻⁶¹ の β-pieces は正しい対象。
+
+2 lemma + capstone landed (全 clean, S12 sorry 4 不変):
+- `muGridAlpha_a_eq_inner_sumOmegaSigma_beta` (62230243): **ha 連結** (a:ℂ)=⟨∑_r ω_{r0}^σ,β⟩。
+  ⟨α^τ,∑ω⟩=a−δ (`have hαω`、linear_combination) → ⟨β,∑ω⟩=a (`simp only [inner_add/sub/smul_left, hαω,
+  alignedOmegaSigma_diff_inner_zeroColumnSum(=−1), SHC_extension_inner_zeroColumnOmegaSigma_sum(=0),
+  star_int/natCast]; ring`) → `inner_conj_symm`+`star_intCast` で ⟨∑ω,β⟩=a。⚠ `[Invertible (card ↥M:ℂ)]`
+  明示 binder は FiniteInduce scoped instance と非defeq衝突 → 除去 (charParam/beta_mem_ZIrr と同様 scope 供給)。
+  ⚠ `rw [star_intCast]` は inner_smul_left の `starRingEnd ℂ` に非match → `simp only` で bridge。
+- `residualCoeff_eq_zero` (c837cb6f、**capstone**): **無条件 a=0** = ⟨α^τ,ζ^{τ₁}⟩=−n、β real (hβr) threaded のみ。
+  `charParam_a_eq_zero_of_residualEq` (a∈{0,1,2}+((Even a)→a=0)) + `beta_mem_ZIrr` + `beta_inner_trivial`
+  (hα1M=`muGridAlpha_inner_trivial_M`) + `muGridAlpha_a_eq_inner_sumOmegaSigma_beta` (ha) +
+  `a_even_of_eq_inner_sumOmegaSigma` (Even a) → a=0。trivial-char bridge (`trivialClassFunction G` vs
+  `trivialIrreducibleCharacter G`) は defeq (`coe_trivialIrreducibleCharacter`=rfl) → exact 直結。
+
+**a-even application = 完全組立済み。残る genuine prerequisite は β real (11.8.3) ただ 1 本**
+((4.8)/(4.10)/(5.9) SHC port; row-conj involution `exists_rowInv_alignedOmegaSigma_conj` + τ₁ conj 交換 + α real)。
+これが landed すれば `residualCoeff_eq_zero` の hβr が discharge され、(11.8.5) parity 側が完全 sorry-free。
+(11.8) endpoint は依然 doubly-gated (§9↔§10 の |S₁|=n、§14 の S₂ coherence) — a=0 は (11.8.6) の
+`μ_j^{τ₂}=∑ω_{ij}^σ` 矛盾の鍵入力だが endpoint closure は §14 gate 残。**次 = β real (11.8.3)**。
