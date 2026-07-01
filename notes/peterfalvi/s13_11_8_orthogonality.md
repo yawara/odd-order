@@ -680,3 +680,37 @@ family R に射影 (`exists_intProjection`) → c, Y (Y⊥R)、`‖φ‖² = ∑
 ‖α^τ‖²=∑c_β²+‖Y‖²。‖α^τ‖²=2+n² (coh-free)。∑c_β² 分割: c(SHC.ext ζ)=a−n (cont.²⁶ int + cont.³²),
 c(SHC.ext η)=a (η≠ζ) ⟹ ∑c_β²=(a−n)²+(|R|−1)a²。⟹ (a−n)²+(|R|−1)a²≤2+n² ⟹ |R|a²−2an≤2。
 |R|=n (=11.8.1 |S₁|=n、§9↔§10 gated) + `charParam_a_mem_of_norm_ineq` (cont.³⁵) ⟹ a∈{0,1,2}。
+
+## 2026-07-02 cont.³⁷ (lane-a) — sum-split landed; (11.8.2) support 完備、次は full assembly
+**`sum_sq_eq_of_split`** landed (S12, leaf green): e∈R, f e=x, ∀β∈R,β≠e→f β=y ⟹
+`∑_{β∈R}(f β)²=x²+(|R|−1)y²` (general Finset、axiom-clean)。(11.8.2) の
+`∑c_β²=(a−n)²+(|S₁|−1)a²` 評価用 (c(ζ^{τ₁})=a−n, 他=a)。
+
+**(11.8.2) support 全部 landed** — full assembly の材料完備:
+- Parseval-with-remainder (cont.³⁶): ‖α^τ‖²=∑c_β²+‖Y‖²。
+- sum-split (本): ∑c_β²=(a−n)²+(|R|−1)a²。
+- 算術核 (cont.³⁵): n(a²−2a)≤2 → a∈{0,1,2}。
+- R materialization (cont.³⁴)、coefficient relation (cont.³²)、integrality (cont.²⁶)、‖α^τ‖²=2+n² (coh-free)。
+
+**次 = full (11.8.2) assembly**: R+α^τ に Parseval → c,Y。coeff 同定 c(SHC.ext ζ)=a−n (cont.²⁶ int
++ cont.³² relation), c(SHC.ext η)=a (η≠ζ)。sum-split → ∑c_β²=(a−n)²+(|R|−1)a²。‖Y‖²≥0 (real part) +
+‖α^τ‖²=2+n² ⟹ (a−n)²+(|R|−1)a²≤2+n² ⟹ |R|a²−2an≤2。|R|=n (11.8.1 gated) + 算術核 ⟹ a∈{0,1,2}。
+⚠ 残 fiddly = ℂ→ℤ/ℝ 変換 (‖Y‖².re≥0)、|R|=n は §9↔§10 gated (hypothesis 化)。
+
+## 2026-07-02 cont.³⁸ (lane-a) — ℂ→ℤ helper landed; (11.8.2) 全 support + helper 完備
+**`int_le_of_add_inner_self_eq`** landed (S12, leaf green): `(A:ℂ)+⟨Y,Y⟩=(B:ℂ)` (A,B∈ℤ) ⟹ A≤B
+(`inner_self_re_nonneg` で ⟨Y,Y⟩.re≥0、real part 取り)。Parseval 等式 ∑c_β²+‖Y‖²=‖α^τ‖² を
+∑c_β²≤‖α^τ‖² に変換。⚠ `open scoped FiniteInduce in` 要 (inner over G の Fintype)。
+
+**(11.8.2) full assembly の材料 全 landed**:
+- Parseval-with-remainder (cont.³⁶)、sum-split (cont.³⁷)、算術核 (cont.³⁵)、ℂ→ℤ helper (本)。
+- R materialization (cont.³⁴)、coefficient relation (cont.³²)、integrality (cont.²⁶)、‖α^τ‖²=2+n² (coh-free)。
+
+**次 = full (11.8.2) assembly (一気に組む)**:
+1. R := exists_SHC_extension_orthonormal。α^τ∈ZIrr (muGridAlpha_tau_mem_ZIrr)。
+2. Parseval → c, Y, ‖α^τ‖²=∑c_β²+‖Y‖², ∀β∈R,⟨α^τ,β⟩=c_β。
+3. a := c(SHC.ext ζ)+n。coeff 同定: c(SHC.ext ζ)=a−n (def)、∀η∈S(HC),η≠ζ→c(SHC.ext η)=a (cont.³² relation)。
+4. sum-split (e=SHC.ext ζ, x=a−n, y=a): ∑c_β²=(a−n)²+(|R|−1)a²。
+   ⚠ sum-split の hy: ∀β∈R,β≠SHC.ext ζ→c_β=a は reverse (β=SHC.ext η) + inj (η≠ζ) + cont.³² で。
+5. ‖α^τ‖²=2+n² (coh-free) → (a−n)²+(|R|−1)a²+‖Y‖²=2+n² → ℂ→ℤ helper → (a−n)²+(|R|−1)a²≤2+n²。
+6. |R|=n (11.8.1、hypothesis 化 or S(HC) Finset card=n) → n(a²−2a)≤2 → 算術核 → a∈{0,1,2}。
