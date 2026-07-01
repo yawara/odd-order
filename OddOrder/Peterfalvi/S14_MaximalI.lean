@@ -4067,12 +4067,44 @@ theorem exists_rankTwoWitness [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
            CKx_not_le_Kprime := hCKx, normalizer_closure_x_le_M := hNx,
            centralizer_x_not_le_L := hCx }⟩
 
-/-- **Peterfalvi (12.10)**: the maximal subgroup `L` supplied by (12.9) is
-Frobenius with kernel `L_F`. -/
+/-- **Peterfalvi (12.10) obligation A**: the (12.9) witness `L` is of Type I.  (12.10) rules out
+type `P`: Type II via (8.16) (`C_G(y) ⊆ L` for `y ∈ A(L)`, contradicting (12.9)); Type III via
+Theorem (10.10) + (11.9.c) + (11.6) `C_U(H)=1` + (9.7.b) `U` cyclic, whence `P₀ ⊂ H` and (8.6.a)
+`C_G(y) ⊆ L` for `y ∈ H^#`, again contradicting (12.9).  Deep §8–§11 type-analysis; pinned
+(hub 9003 Cluster A). -/
+theorem witness_L_isTypeI [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    {ctr : CounterexampleHypothesis (G := G)} (data : RankTwoWitnessData ctr) :
+    IsTypeI data.L := by
+  sorry
+
+/-- **Peterfalvi (12.10) obligation B**: the type-I witness `L`'s complement `U` is a Z-group.  A
+prime `q ∣ |L/H|` has `q < p`: in case (8.3.c) `q ∣ p−1`; in case (8.3.b) a Sylow `p`-subgroup of `H`
+has rank 2 and (8.1.c) gives an order-`q` element of `L` acting fixed-point-freely on `Ω₁(P)`, so
+`q ∣ p²−1`, hence `q ∣ p−1` or `q ∣ p+1`, so `q < p`.  By the minimality of `p` (12.8) a Sylow
+`q`-subgroup of `L` is cyclic; thus `U` is a Z-group.  Deep §8 minimality argument; pinned
+(hub 9003 Cluster A). -/
+theorem witness_L_complement_isZGroup [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    {ctr : CounterexampleHypothesis (G := G)} (data : RankTwoWitnessData ctr)
+    (typeI : TypeIData data.L) :
+    _root_.IsZGroup ↥typeI.typeF.U := by
+  sorry
+
+/-- **Peterfalvi (12.10)**: the maximal subgroup `L` supplied by (12.9) is Frobenius with kernel
+`L_F`.  **Assembly** (`sorry`-free modulo the two (12.10) obligations): `L` is Type I
+(`witness_L_isTypeI`) and its complement `U` is a Z-group (`witness_L_complement_isZGroup`), so the
+(8.2.b) bridge `typeI_frobenius_of_isZGroup_complement` yields the Frobenius structure with kernel
+`H = L_F` (`typeF.H_eq`). -/
 theorem witness_L_frobenius [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     {ctr : CounterexampleHypothesis (G := G)} (data : RankTwoWitnessData ctr) :
     ∃ frob : TypeIFrobeniusData data.L, frob.kernel_eq_MF := by
-  sorry
+  obtain ⟨typeI⟩ := witness_L_isTypeI hG data
+  exact ⟨{ typeI := typeI
+           complement := typeI.typeF.U.subgroupOf data.L
+           kernel_eq_MF := typeI.typeF.H = maxNilpotentNormalHall data.L
+           kernel_eq_MF_holds := typeI.typeF.H_eq
+           frobenius := typeI_frobenius_of_isZGroup_complement typeI
+             (witness_L_complement_isZGroup hG data typeI) },
+         typeI.typeF.H_eq⟩
 
 /-- The type-`τ` **main subgroup** `M_s` is contained in `M` (both `M_F` and `[M,M]` are). -/
 theorem mainSubgroup_le (M : Subgroup G) (tau : OddOrder.GroupTheory.PeterfalviType) :
