@@ -2292,6 +2292,24 @@ theorem card_Q_eq [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
   rw [tpd.H_eq, ← hyp.Q_eq_TF, hW2card, htpdW1, ← hyp.p_eq_card_W2] at hord2
   exact hord2
 
+/-- **Peterfalvi (13.17.a), `T`-conjugate Fitting order** — the **proven** part (1) of
+`tConjugate_fitting_data`: for `L` conjugate to `T` (`conj g • L = T`), `|L_F| = q^p`.
+
+`M_F` is automorphism-equivariant (`maxNilpotentNormalHall_pointwise_smul`), so
+`conj g • L_F = maxNilpotentNormalHall (conj g • L) = maxNilpotentNormalHall T = Q`; conjugation
+preserves cardinality, so `|L_F| = |Q| = q^p` (`card_Q_eq`, now proven for the (14.9) type-II `T`). -/
+theorem tConjugate_card_LF [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hyp : Hypothesis (G := G)) (hTTypeII : IsTypeII hyp.T)
+    {L : Subgroup G} {g : G} (hconj : MulAut.conj g • L = hyp.T) :
+    Nat.card ↥(maxNilpotentNormalHall L) = hyp.q ^ hyp.p := by
+  have hMF : MulAut.conj g • maxNilpotentNormalHall L = hyp.Q := by
+    rw [maxNilpotentNormalHall_pointwise_smul, hconj, ← hyp.Q_eq_TF]
+  have hcard : Nat.card ↥(maxNilpotentNormalHall L) = Nat.card ↥hyp.Q := by
+    rw [← hMF]
+    exact Nat.card_congr
+      (Subgroup.equivSMul (MulAut.conj g) (maxNilpotentNormalHall L)).toEquiv
+  rw [hcard]; exact card_Q_eq hG hyp hTTypeII
+
 /-- **Peterfalvi (13.17.a) T-conjugate Fitting structure**: for a maximal subgroup `L` conjugate
 to `T` (`conj g • L = T`), the Fitting kernel `L_F` is a `q`-group of order `q^p` that contains
 the cyclic factor `W₁` and meets the complement `U` trivially.
