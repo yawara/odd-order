@@ -450,3 +450,28 @@ the **exact next buildable lemma** (次 iteration = BUILD、survey しない):
 
 **教訓 (honest)**: cont.²⁴ は survey 過多 (0 code)。次 iteration は本ノートの `muGrid i j 1 = u` から
 **即 build 着手** (再 survey 禁止)。carrier trace は muGrid_apply_one_within_column の §6 接続を読むところから。
+
+## 2026-07-02 cont.²⁵ (lane-a) — ユーザー裁定「α-grid S₁-τ₁ を継続 grind」; cont.²⁴ muGrid pin は dead-end
+
+**cont.²⁴ の `muGrid i j 1 = u` pin は dead-end 確認**: `columnFamily := (exists_columnSignedFamily χ₂).choose`
+(S06_CertainTypeCharacters:432) = **existential-choice**。`.mu` の絶対次数は construction で pin されず
+(`columnFamily_difference_apply_one` は差=0 のみ)。∴ d=u は existential 次数を u に接続する deep 別論法要 =
+単一 lemma 不可。→ このルートは凍結。
+
+**ユーザー裁定 (AskUserQuestion)**: 「**α-grid S₁-τ₁ を継続 grind**」。SHC_isCoherent で unblock された
+未着手 piece を反復 build。payoff は §14-gated (S₂ coherence) だが on-cluster prerequisite として積む。
+
+**pinned 次 build target = S(HC)-coherence 版 α^τ 分解 (11.8.2)**:
+- **foundation available ✅**:
+  - `muGridAlpha_tau_inner_self` (S12:3349): `‖α_{ij}^τ‖² = 2 + n²` — **coh-FREE** (hyp.tau のみ、full-coh 不要)
+    ゆえ by_contra で直接使える。
+  - `SHC_isCoherent` (S12, landed): `IsCoherent hyp.tau {φ∈inducedFamily|irr∧φ(1)=w₁} A0` = S₁=S(HC) の
+    τ₁ coherent 拡張。ζ (degree w₁ 既約 ∈ inducedFamily) ∈ この S(HC) family。
+- **target lemma** (新規、S₁-τ₁ 版): `tau_muGridAlpha_eq` (S12:4359、**full-coh 要求**の分解
+  `α^τ = δ·(ω_{ij}^σ−ω_{i0}^σ) − n·coh.tau1 ζ`) の **SHC-coherence 版**。by_contra では full `coh` 無 →
+  SHC_isCoherent の τ₁ (S(HC) 上) で `α_{ij}^τ = X − n·ζ^{τ₁} + a·∑_{λ∈S₁}λ^{τ₁}` (X⊥S₁^{τ₁}, a∈{0,1,2})
+  を導出 ((11.8.2))。‖α^τ‖²=2+n² (coh-free) + S(HC) 直交性 (`inducedFamily_pairwiseOrthogonal` ✅) で
+  a=0 or 2、a=0 ⟹ X=ω_{ij}^σ−ω_{i0}^σ ((11.8.5))。
+- **next iteration = BUILD** this α-decomposition (survey 済、foundation 確認済)。SHC_isCoherent の τ₁ API
+  (`CoherentHypothesis.tau1` 相当の SHC 版) を読み、ζ^{τ₁} と α^τ の inner を muGridAlpha_tau_inner_self の
+  proof 構造で組む。§14-gate (S₂) は最後の union でのみ効く (α 分解自体は ungated)。
