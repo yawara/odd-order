@@ -57,8 +57,16 @@ module-theoretic Clifford core (orbit transitivity)、3-5 セッション」と�
 - **(G3) mult-free 判定**: I/H **abelian** ⟹ Ind_H^L θ は multiplicity-free、構成要素は [I:H] 個・全て
   等次数 [L:I]·θ(1) (Clifford correspondence [Is] 6.11 で Irr(I|θ)↔Irr(L|θ) + G2 で β(1)=1)。
 
+## 進捗 (2026-07-02)
+
+- [x] **慣性商 abelian 前提の中核**: `S14.typeF_inertia_inf_U_isMulCommutative` (generic, sorry-free,
+      commit `e6f0dbd9`) — (8.2.c) + `U₁` abelian ⟹ `I(θ)∩U` abelian。残 = Dedekind `I(θ)=H·(I(θ)∩U)`
+      で `I(θ)/H` abelian を完成 (要 Γ=HU / H≤I(θ)≤HU)。
+- 一時中断 (2026-07-02, lane D 退役で区切り)。次セッション再開点 = 下記 (G1) 拡張から。
+
 ## やること (bottom-up、generic は shared leaf)
 
+- [ ] **慣性商 abelian 完成**: Dedekind `I(θ)=H·(I(θ)∩U)` + `I(θ)/H ≃ I(θ)∩U` abelian (上記の残)。
 - [ ] **(G1) 拡張 lemma** を build (`OddOrder/GroupTheory/RepresentationTheory/` 新/既存 leaf)。coprime
       Hall (H=L_F normal Hall, U abelian complement) の下で I/H cyclic → θ 拡張。
 - [ ] **(G2) Gallagher** + **(G3) mult-free-from-abelian-inertia** を build (同 leaf)。core generic 補題。
