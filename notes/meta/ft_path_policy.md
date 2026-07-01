@@ -36,6 +36,28 @@
      線型 spine（BG §1→§16, Pf §3→§16）では「上流＝文書で早い」がほぼ一致する。
    - **FT 経路限定**: 対象は item 1 の on-path のみ。off-path は凍結（順序判断の対象外）。
    - これは**作業の選択順序**の規則であり、doneness 判定（item 3）とは独立。
+5. **レーン内 frontier 選択は自律判断する（聞きに来ない）。**（ユーザー裁定 2026-07-01）
+   「次に何を触るか」は item 4（上流優先 + 文書順）で一意に決まる ⟹ **frontier 選択で hub/ユーザーに
+   聞かない・報告して止まらない**。停止してよいのは STOP 条件（想定違反・allowlist 外新 axiom・
+   signature 無断変更）と真の設計分岐のみ（[[feedback-quick-win-not-a-criterion]]）。gated / deep / quick-win
+   の有無は着手判断の基準でない。
+   - **(A) gated endpoint の扱い**: 自レーン最上流 sorry が他レーン coherence 等に gated でも deferral
+     理由でない。**さらに上流の ungated な genuine math（未所有 shared infra を含む）に降りて実証明する**
+     （例: Pf (13.9.b) が §13 char に gated → [Is] 3.14 field-norm≥1 =
+     `OddOrder/Algebra/GaloisRationalInteger` を実証明）。gated endpoint 自体は sorried-cite skeleton で
+     前倒し（[[feedback-gated-endpoint-skeleton-pattern]] [[feedback-cite-sorried-lemmas-if-signature-correct]]）。
+   - **(B) shared infra は常に in-scope**: 未所有 leaf（`OddOrder/Algebra|GroupTheory/**` 等）を新設して
+     genuine FT math を積むのは、consumer が他レーンの endpoint でも in-scope。territorial なのは
+     **所有 file のみ**（[[cross-lane-sync-via-notes]]）。
+6. **shared infra は claim-before-build（policy 5(A)(B) の重複防止、ユーザー裁定 2026-07-01）。**
+   policy 5(A) で複数の gated レーンが同じ上流 infra に収束しうる ⟹ 未所有 leaf の新設は沈黙で行わない：
+   1. **検索必須**: 着手前に repo を教科書番号 + descriptive 名 2 案以上 + import grep で検索
+      （[[verify-port-state-by-number-not-coq-name]] [[s09-is-section7-chirho-complete]]、既存を再構築しない）。
+   2. **issue で claim**: 不在確認後、**9000 番台（shared-infra 専用レンジ）で issue を 1 件切る**
+      （target leaf + 補題名/教科書 ref + lane）。着手の最初の commit で main に乗せる。
+   3. **scan 必須**: 全レーンは shared infra 着手前に **open 9000 番台 issue を scan**（定期 main 同期にフック）。
+   4. **hub dedup**: merge_monitor が重複 claim / 同一 ref の 2 leaf を検出 → STOP flag。浪費は ~1 tick に有界。
+   所有 file 内の work は claim 不要。正本手順 = [`issue_management.md`](issue_management.md) / [`merge_monitor.md`](merge_monitor.md)。
 
 ---
 

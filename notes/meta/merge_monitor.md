@@ -125,7 +125,21 @@
    shared_re='^OddOrder/AxiomsCheck\.lean$|^OddOrder\.lean$|^OddOrder/GroupTheory/|^OddOrder/Mathlib/|^OddOrder/Algebra/|^OddOrder/FeitThompson'  # GroupTheory/Mathlib/Algebra=汎用 infra (全 lane 加算可)、FeitThompson は a/d 共有
    git diff --name-only main...$b -- '*.lean' | grep -vE "$owned_re" | grep -vE "$shared_re" | grep . && echo "範囲逸脱 → STOP"
    ```
-   逸脱なし（空）→ step 2 へ。共有ファイル・notes・issues のみの差分は逸脱でない。
+   逸脱なし（空）→ step 1.6 へ。共有ファイル・notes・issues のみの差分は逸脱でない。
+1.6. **shared-infra 重複検出（claim-before-build 運用、ユーザー裁定 2026-07-01）**:
+   `ft_path_policy.md` §0 policy 6 で、複数の gated レーンが同じ上流 shared infra
+   （未所有 leaf `OddOrder/(Algebra|GroupTheory|Mathlib)/**`）を同時並行構築する重複を防ぐ。各 tick で:
+   - **(a) 同一 leaf path の衝突**: 2 つ以上のレーンが**同じ新規** shared-infra `.lean` を追加していないか。
+     ```
+     for L in a b c d; do git diff --name-only --diff-filter=A main...$L -- \
+       'OddOrder/Algebra/**' 'OddOrder/GroupTheory/**' 'OddOrder/Mathlib/**'; done | sort | uniq -d | grep . \
+       && echo "shared-infra path 衝突 → STOP"
+     ```
+   - **(b) claim なしの新規 shared-infra leaf**: 新規追加された shared-infra `.lean` に対応する open 9000
+     番台 claim issue が**無い**（`issues/9*-*.md` を grep）→ ⚠ flag（沈黙構築 = policy 6 違反の疑い）。
+   - **(c) 同一 ref の 2 claim**: open 9000 番台 issue に同じ教科書 ref / 補題名の claim が 2 件 → STOP。
+   検出したら **STOP + 報告**（より完成度の高い方を残し、他方を cite に rebase させる指示。浪費は ~1 tick に
+   有界）。空 → step 2 へ。**grandfather**: 2026-07-01 前 landing 済 leaf（`GaloisRationalInteger.lean` 等）は対象外。
 2. **a → b → c → d の順**で（独立レーンゆえ順序は形式的、上流→下流の自然順）、未マージがあれば自動合流:
    - マージ前の実 sorry 数を記録: `bin/count-sorry`
      （prose 偽陽性 [sorry-free / sorryAx / `sorry'd` / backtick 引用] を除外する判定器。
@@ -247,6 +261,12 @@
 
 ## 現状メモ
 
+- **2026-07-01 — policy 規約化 (自律 frontier 選択 + shared-infra claim) + lane b dup 保留 (issue 0093)**:
+  ユーザー裁定 2026-07-01 を lane b/c が両方 codify。**c 版 (superset: CLAUDE + ft_path_policy §0 policy
+  5-6 + merge_monitor §1.6 + issue_management 9000-range) を採用・合流** (`f6507084`)。b 版
+  (`47bd6a0f`、CLAUDE/ft_path_policy の別 wording) は **supersede→保留**。⚠ 次 tick で `main...b` に
+  CLAUDE.md/ft_path_policy が出て merge conflict しても **superseded policy dup (issue 0093)** ゆえ
+  abort + 「b: policy dup 未解消」1 行報告に留め **STOP しない**。b が drop したら通常復帰。
 - **2026-07-01 — lane d 再配分 (issue 0092, ユーザー裁定)**: lane d の旧クラスタ δ (BG §14–16) の FT
   deliverable は実質完成 (spine 消費 endpoint 全 sorry-free) と監査確定。**lane d の主焦点を binding pole
   γ の import-上流最上流 `S15_SAndT_Setup.lean` (16 sorry) へ移管**。lane c は下流 `S15_SAndT` +
