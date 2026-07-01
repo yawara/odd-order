@@ -1644,10 +1644,25 @@ step (2) の crux (「A_g↔U-action 接続」= cont.⁴ で identified され�
 **T={hcPsi θ|θ regular} は HU-conjugation で閉じる**: `conjBy g (hcPsi θ)=hcPsi(θ∘A_g)` (commute)、
 `θ∘A_g regular ⟺ θ regular` (regularity)。
 
-**残 step (3) = T-invariance 組立 + oXtheta 集約**: (a) T を `Finset (IrreducibleCharacter carrier)`
-として materialize (RegSet.image hcPsi)、(b) `IrreducibleCharacter.conjBy` ↔ ClassFunction.conjBy +
-hcPsi_conjBy_eq + regular_iff で `card_filter_induce_eq_index_inertia` の hT (T-invariance) を供給、
-(c) fibre size = u (`hcPsi_inertia_index_eq_u`、既 landed) で `u·|Xtheta|=(p-1)^q`
-(numerator=`card_regular_chars_Hbar`、既 landed)。その後 parity dichotomy
-(`exists_regular_not_reducible_of_odd`+`u_odd`、既 landed) で witness → conjunct c。
-残は char-level plumbing (whnf 注意、bundled ζ_θ 構成) で deep math は無し。
+**⟹ step (3) T-invariance 組立 + oXtheta 集約 も COMPLETE (2026-07-01 cont.⁶)**。3 補題で
+oXtheta numerator を完全形式化 (S11、axiom-clean、leaf green):
+- **T-invariance closure** (前 commit): `hcPsi_irreducibleConjBy_eq` (IrreducibleChar 版 commute) +
+  `hcPsi_regular_conjBy` (∃θ' regular, (hcPsi θ)^g=hcPsi θ' = T 閉性)。
+- **`comp_subtype_ne_one_iff_exists`**: regularity hom-form ↔ pointwise-form bridge
+  (card_regular_chars_Hbar↔hcPsi_inertia_index_eq_u 接続)。
+- **`oXtheta_count`**: **u·|Xθ|=(p-1)^q** (Xθ=T.image induce の distinct 集合)。組立 =
+  T=RegF.image(hcPsi) 閉性 (hcPsi_regular_conjBy) → `card_filter_induce_eq_index_inertia` で各 fibre=
+  [HU:HC]=u (hcPsi_inertia_index_eq_u) → `Finset.card_eq_sum_card_fiberwise` で |T|=u·|Xθ| →
+  |T|=(p-1)^q (hcPsi_injective + card_regular_chars_Hbar) ⟹ 結論。
+  **instance-diamond 対処 (note の warn)**: `induce`/`Finset.univ` が statement-level で
+  Fintype/Invertible を要する ⟹ explicit instance binder (`[Fintype ↥huSub][Fintype ((↥H⧸N)→*ℂˣ)]
+  [Invertible (card huSub:ℂ)][Invertible (card HC:ℂ)]`) で解決。`set HC` は induce の
+  instance-guarded occurrence を fold しない ⟹ carrier は `_` 推論に任せ goal と同一 FULL 式に統一。
+
+**残 = caseA conjunct c 最終 assembly (parity 適用)**: `exists_regular_not_reducible_of_odd` (S11:~5350,
+既 landed: X⊇Xmu (|Xmu|=p-1) ∧ u·|X|=(p-1)^q ∧ u odd ∧ p-1 even>0 ∧ q≥2 → ∃s∈X∖Xmu) に oXtheta_count
++ u_odd + Xmu (reducibles, |Xmu|=p-1) を供給 → witness s∈Xθ∖Xmu → s∉Xmu ⟹ Ind_M(s) irreducible
+(reducible↔Xmu 対偶) → caseA_character_counts:~5270 conjunct c。
+**要 wiring**: (i) Xθ (oXtheta の image) を X に同定、(ii) Xmu = reducible-inducing の image を
+|Xmu|=p-1 で (reducible_count 系)、(iii) s∈Xθ∖Xmu → Ind_M(s) irr deg qu (M-level、既 hcZeta_induceHU_*
+の hIM を parity witness が供給)。deep math 無し・char-level plumbing (whnf/instance 注意)。
