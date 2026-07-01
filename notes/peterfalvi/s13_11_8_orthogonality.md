@@ -714,3 +714,22 @@ c(SHC.ext η)=a (η≠ζ) ⟹ ∑c_β²=(a−n)²+(|R|−1)a²。⟹ (a−n)²+(
    ⚠ sum-split の hy: ∀β∈R,β≠SHC.ext ζ→c_β=a は reverse (β=SHC.ext η) + inj (η≠ζ) + cont.³² で。
 5. ‖α^τ‖²=2+n² (coh-free) → (a−n)²+(|R|−1)a²+‖Y‖²=2+n² → ℂ→ℤ helper → (a−n)²+(|R|−1)a²≤2+n²。
 6. |R|=n (11.8.1、hypothesis 化 or S(HC) Finset card=n) → n(a²−2a)≤2 → 算術核 → a∈{0,1,2}。
+
+## 2026-07-02 cont.³⁹ (lane-a) — **full (11.8.2) `a∈{0,1,2}` assembly LANDED (sorry-free body)**
+**`Hypothesis.muGridAlpha_tau_proj_a_mem`** landed (S12:7512, leaf green 3850 jobs). 上記 6 段を一気に
+組んだ全 (11.8.2) 核。署名: α-params + `{R : Finset (ClassFunction ↥M ℂ)} (hRn : R.card = n)` +
+`hZ`(⊆ZIrr)/`horth`(orthonormal, `if β=β' then 1 else 0`)/`hRmem`(SHC.ext ζ∈R)/`hRrev`(∀β∈R,∃η∈S(HC)
+degree-w₁, β=SHC.ext η) → `∃ a:ℤ, (a=0∨a=1∨a=2) ∧ ⟨α^τ, SHC.ext ζ⟩ = (a:ℂ)−(n:ℂ)`。
+- 証明: `exists_intProjection_of_orthonormal_ZIrr` で Parseval (c,Y,hcoeff,hnorm,hYorth) → `set a := c(SHC.ext ζ)+n`
+  → hcζ (c(ζ^{τ₁})=a−n, def) + hcη (∀β∈R,β≠SHC.ext ζ→c β=a, hRrev+inj+`muGridAlpha_tau_inner_SHC_extension_sub`
+  cont.³² relation を `linear_combination`) → `sum_sq_eq_of_split hζR hcζ hcη` + `rw [hRn]` → `muGridAlpha_tau_inner_self`
+  (‖α^τ‖²=2+n²) → `int_le_of_add_inner_self_eq` (ℂ→ℤ, cont.³⁸) → `nlinarith` (n(a²−2a)≤2) → `charParam_a_mem_of_norm_ineq`。
+- **honest 状態**: body は **sorry-free**。transitive dep = SHC_isCoherent / muGrid の §10→§6 bridge (既知 sorried carrier) のみ。
+  `hRn : R.card = n` (=|S₁|=n = (11.8.1)) は §9↔§10-gated ゆえ **hypothesis 化**して caller に供給させる (deferred-payoff)。
+- ⚠ Lean 固有ハマり: 署名の `horth` の `if β=β' then 1 else 0` は `open scoped Classical` 要 (Decidable);
+  `int_le_of_add_inner_self_eq` の `linear_combination -hnorm` は goal と hnorm 両方 `push_cast at hnorm ⊢`
+  で `(a−n:ℤ):ℂ` vs `(a:ℂ)−(n:ℂ)` の atom 不一致を解消。
+
+**次 = (11.8.2) 残 + (11.8.3)–(11.8.5)**: α^τ=X−nζ^{τ₁}+a∑λ^{τ₁} 分解 (X=ω^σ diff, a=0/2 case) →
+(11.8.3) β real → (11.8.4) residual form → (11.8.5) a=0 assembly。(11.8) closure は依然 doubly-gated
+(§9↔§10 の (11.8.1) |S₁|=n、§14 の (11.8.6) S₂ coherence)。
