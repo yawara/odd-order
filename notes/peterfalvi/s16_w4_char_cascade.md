@@ -1080,3 +1080,27 @@ cyclic-closed (∀x∈G₀ ∀k coprime |G|, x^k∈G₀ — G₀=G#−orbits は
 
 **lane c 次手** = 保持下流の deep char (S15_SAndT 13.16/13.17 or S16 orthogonality_switch 14.14)。
 [[scaffold-sorry-free-not-done]] [[s09-is-section7-chirho-complete]] [[feedback-cite-sorried-lemmas-if-signature-correct]]
+
+### cont.³⁶ (2026-07-01 lane c=γ): 保持下流 §13.16–19 は未形式化 cyclic-TI 機構に gated (cross-lane scope 発見)
+
+issue 0092 再配分後の lane-c 保持下流のうち最上流 sorry = **`normalizer_W1` (S15_SAndT:144, Pf 13.16)**
+= `N_G(W₁) = C_G(W₁) ∧ C_G(W₁) = Q ⊔ W₂` を上流優先で engage・正面調査した結果、**未形式化の
+cyclic-TI 機構に gated** と確定 (難所回避でなく実調査の結論):
+- **Coq PFsection13 は `cyclicTI_hypothesis`/`FT_cyclicTI_hyp`/`cycTIiso` フレームワーク依存**
+  (PFsection13.v:107/897/1063)。(13.16) の N=C=Q⊔W₂ は cyclic TI-torus W=W₁×W₂ の構造定理。
+- **repo に cyclic-TI 機構は皆無** (`grep cyclicTI OddOrder/` 空)。`Hypothesis` 構造 (S15_SAndT_Setup:81)
+  にも W₁ の normalizer/centralizer 系フィールドは無 (`W1_normalizes_U` のみ)。
+- elementary に取れるのは `W₂ ≤ C_G(W₁)` (`W1_commutes_W2` 由来) と `C ≤ N` (自明) のみ。hard 方向
+  (N≤C, C≤Q⊔W₂) は cyclic-TI 構造必須。
+- 消費者 = (13.17.c) `normalizer_W1` cite (S15_SAndT:1427)。dual `normalizer_W2` も (13.16) analogue
+  未 port で sorried (S15_SAndT:1745)。
+
+**⟹ cyclic-TI 機構 = §13.16–19 の共通 gate**。policy 5(A) では「gated → 上流 ungated math を実証明」だが、
+cyclic-TI 機構は (a) 大規模 (Peterfalvi §13 の主要 machinery 一節相当)、(b) **lane-a/b coherence
+(cycTIiso はコヒーレンス transport に使う) と重複領域** ゆえ、solo shared-infra 化は policy 6 の重複
+リスク大。これは **cross-lane scope 決定** (誰が cyclic-TI 機構を建てるか = shared infra claim か
+lane-a/b coherence 領域か)。[[cross-lane-sync-via-notes]]
+
+**本セッション lane-c 成果**: (1) cont.³³ 重複軌道修正、(2) [Is] 3.14 ANT infra 5 補題 (cont.³⁴/³⁵)、
+(3) 自律 frontier + claim-before-build 規約化 (ft_path_policy §0 policy 5-6)、(4) 本 gate 発見。
+[[scaffold-sorry-free-not-done]] [[feedback-no-avoiding-hard-parts]]
