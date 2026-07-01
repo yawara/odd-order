@@ -733,3 +733,41 @@ degree-w₁, β=SHC.ext η) → `∃ a:ℤ, (a=0∨a=1∨a=2) ∧ ⟨α^τ, SHC.
 **次 = (11.8.2) 残 + (11.8.3)–(11.8.5)**: α^τ=X−nζ^{τ₁}+a∑λ^{τ₁} 分解 (X=ω^σ diff, a=0/2 case) →
 (11.8.3) β real → (11.8.4) residual form → (11.8.5) a=0 assembly。(11.8) closure は依然 doubly-gated
 (§9↔§10 の (11.8.1) |S₁|=n、§14 の (11.8.6) S₂ coherence)。
+
+## 2026-07-02 cont.⁴⁰ (lane-a) — **(11.8.2) residual decomposition + norm LANDED; ‖X‖²=2 (a∈{0,2})**
+**`Hypothesis.muGridAlpha_tau_residual_norm`** landed (S12:7514, leaf green 3850 jobs, sorry-free body)。
+`muGridAlpha_tau_proj_a_mem` (cont.³⁹) を包含する rich 版に昇格 (proj_a_mem は 3 行 projection に refactor、重複なし)。
+署名 = proj_a_mem と同一 hyp。結論 (residual X = Parseval remainder Y を露出):
+`∃ (a:ℤ)(Y:ClassFunction G ℂ), (a=0∨1∨2) ∧ (∀β∈R,⟨Y,β⟩=0) ∧ ⟨α^τ,ζ^{τ₁}⟩=(a:ℂ)−n ∧`
+`⟨Y,Y⟩=(2:ℂ)+n²−((a−n)²+(n−1)a²) ∧ ((a=0∨a=2)→⟨Y,Y⟩=2)`。
+- 証明追加分 (proj_a_mem 比): `hnormY` (hnorm を `push_cast`+`linear_combination -hnorm` で ⟨Y,Y⟩=norm式に),
+  `a∈{0,2}→⟨Y,Y⟩=2` は `rw[hnormY]; rcases; rw[h]; push_cast; ring` (a=0: 2+n²−n²=2; a=2: (2−n)²+(n−1)4=n²)。
+- **honest**: body sorry-free。transitive dep = SHC/muGrid §10→§6 bridge のみ。`hRn:R.card=n`(=(11.8.1)) は hypothesis 化。
+- **意義**: `‖X‖²=2` (a∈{0,2}) + `X⊥S₁^{τ₁}` は Peterfalvi の `X=ω_{ij}^σ−ω_{i0}^σ` ((10.5)-類似) の直接 input。
+  X (=Y) を露出したので (11.8.5) の ((μ₀−ζ)^τ,α_{ij}^τ) 2-way calc で消費可能。
+
+**次 = X=ω_{ij}^σ−ω_{i0}^σ (norm-2 characterization) or (11.8.3) β**: X⊥S₁^{τ₁} + ‖X‖²=2 + X∈ℤ[ω-grid]
+((10.5) Dade-image) ⟹ X=±(ω_a−ω_b)。ω-grid infra は `alignedOmegaSigmaGrid`(+`_inner` orthonormal) 既存。
+(11.8) closure は依然 doubly-gated (§9↔§10 の (11.8.1)、§14 の (11.8.6))。
+
+## 2026-07-02 cont.⁴¹ (lane-a) — **SHC ζ^{τ₁} vanishes on V LANDED (X=ω^σ diff の鍵入力)**
+frontier map: **(10.5) の X=ω^σ diff 機構 (`alpha_tau_image` S12:4464) は full `coh:CoherentHypothesis` 依存**
+→ (11.8.2) の by-contra (SHC only) では直接使えず **SHC-port が必要**と確定。既 landed の SHC-port:
+- `SHC_extension_inner_alignedOmegaSigma_eq_zero` (7209) = (5.3.b) SHC 版 `⟨ζ^{τ₁},ω_{ij}^σ⟩=0` (既存)。
+
+**本 landed**: `Hypothesis.SHC_tau1_zeta_vanishes_on_typePV` (S12:7298, leaf green, sorry-free)。
+= (10.5) `tau1_zeta_vanishes_on_typePV` (4307, full-coh) の **SHC-port**: degree-w₁ irreducible ζ∈S(HC),
+ζ̄≠ζ で `(SHC.ext ζ) v = 0` (∀v∈V=typePV)。証明 = full-coh 版の機械的 port (coh.tau1→SHC.extension):
+(ζ−ζ̄)^τ=ζ^{τ₁}−ζ̄^{τ₁} (`tau_zeta_sub_conj_eq_SHC_extension`) が V で消え NC≤2<min(w₁,w₂) →
+`sigmaCoeff_eq_zero_of_sigmaNC_lt` → 各 χ_{pq} で ⟨ζ^{τ₁}−ζ̄^{τ₁},χ⟩=0 → `inner_left_eq_zero_of_inner_sub_eq_zero`
+で ⟨ζ^{τ₁},χ⟩=0 → `eq_zero_of_mem_V_of_inner_chiFam_eq_zero` (3.2.d)。**ζ̄∈S(HC)** (conj は degree-w₁+irr 保存)
+ゆえ SHC API (`SHC_extension_inner_self/of_ne`, `extension_mem_ZIrr`) が両方に効く。**一発 green** (port 精確)。
+
+**次 = SHC-port of `muGridPsi_vanishes_on_typePV` (4195) → ψ=X−δ(ω^σ diff) が V で消える**:
+本 vanishing + `tau_muGridAlpha_apply_eq_on_typePV` (α^τ=δ(ω^σ diff) on V) で ψ vanish → norm-2 trichotomy
+`eq_smul_chiFam_diff_of_vanishOnV` で X=δ(ω^σ diff) (SHC 版 `alpha_tau_image`)。(11.8) closure は依然
+doubly-gated (§9↔§10 の (11.8.1)、§14 の (11.8.6))。
+- ⚠ **general-a 注意**: (10.5) `muGridPsi` は a=0 前提 (X_{10.5}=α^τ+nζ^{τ₁})。(11.8.2) の residual X (=Parseval Y)
+  は X=α^τ+nζ^{τ₁}−a∑λ^{τ₁} で a∈{0,2} 両方要 (a=0 は (11.8.5) の結論、先取り不可)。ψ(v)=0 には
+  **∑_{λ∈S₁}λ^{τ₁}(v)=0** も要 → 各 λ∈S(HC) (degree w₁) に `SHC_tau1_zeta_vanishes` 適用 (λ̄≠λ 要;
+  odd order ⟹ degree>1 は non-real で成立、但し per-λ に λ̄≠λ の供給要)。a=0 mainline を先に組んで a=2 を別扱いも可。
