@@ -971,6 +971,157 @@ theorem constituent_diff_tau_mem_span {L : Subgroup G} [Finite G] (hyp : Hypothe
   rw [hμrel φ₁ hφ₁T φ₂ hφ₂T]
   exact Submodule.smul_mem _ _ (Submodule.sub_mem _ (hmu_mem φ₁ h₁) (hmu_mem φ₂ h₂))
 
+open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
+/-- **Peterfalvi (5.5)** (`χ^{τ₁} ∈ ℤ[R(χ)]` for a coherent extension).  For the coherent
+extension `coh` of the type-I family `S` of a `Hypothesis L`, and a non-real member `χ ∈ S`
+(as an `IrreducibleCharacter`) whose difference `χ − χ̄` is supported in the Dade domain `A(L)`
+and which is orthogonal to its conjugate (`⟨χ, χ̄⟩ = 0`), the Dade character `ψ = χ^{τ₁} =
+coh.extension χ` lies in the integral span of the orthonormal image family
+`R(χ) = dadeOrthonormalCharacterImageFamilyOfDiff … χ`.
+
+This is the `ψ = 0` case of the (5.4) decomposition `(χ − ψ)^{τ₁} = X − Y`.  Taking the coherent
+extension as the auxiliary isometry `τ₁`, its `ZIrr`-codomain (`extension_mem_ZIrr`, the
+virtual-character property the general **unsupported** `X`-family `Ind θ` lacks — `χ(1) ≠ 0`)
+supplies the single number-theoretic input to `CharacterPsiDecomposition.ofProjection`; then
+`eq_sum_of_psi_eq_zero` forces `Y = 0`, so `χ^{τ₁} = X = ∑_{α ∈ E ⊆ R(χ)} α ∈ ℤ[R(χ)]`.  This is
+the L-side `ψ ∈ ℤ[R(χ_L)]` which, combined with the (12.3) cross-`L` orthogonality
+`R(χ_L) ⊥ R(χ_M)` (`nonconjugate_typeI_R_orthogonal`), yields `ψ ⊥ R(χ_M)` — the `horth` input of
+the (12.14) coset-constancy `psi_constant_on_xK`. -/
+theorem coherent_extension_mem_span_imageFamily {L : Subgroup G} [Finite G] (hyp : Hypothesis L)
+    (coh : OddOrder.Peterfalvi.S07.IsCoherent hyp.tau hyp.Sset hyp.A)
+    (χ : IrreducibleCharacter ↥L)
+    (hχmem : (χ : ClassFunction ↥L ℂ) ∈ hyp.Sset)
+    (hχreal : ¬ ClassFunction.IsReal (χ : ClassFunction ↥L ℂ))
+    (hdiffsupp : ((χ : ClassFunction ↥L ℂ).conj - (χ : ClassFunction ↥L ℂ)).support ⊆
+      OddOrder.Peterfalvi.S04.supportInSubgroup (typeIA L hyp.typeI) L)
+    (hχχbar : ClassFunction.inner (χ : ClassFunction ↥L ℂ) (χ : ClassFunction ↥L ℂ).conj = 0) :
+    coh.extension (χ : ClassFunction ↥L ℂ) ∈
+      Submodule.span ℤ
+        ((OddOrder.Peterfalvi.S07.dadeOrthonormalCharacterImageFamilyOfDiff
+          hyp.dadeData.dade hyp.hconj χ hχreal hdiffsupp).imageSet :
+          Set (ClassFunction G ℂ)) := by
+  classical
+  set imF := OddOrder.Peterfalvi.S07.dadeOrthonormalCharacterImageFamilyOfDiff
+    hyp.dadeData.dade hyp.hconj χ hχreal hdiffsupp with himF
+  -- membership of `χ`, `χ̄`, and `χ − χ̄` in the coherent lattice `ℤ[S]`.
+  have hχ_zSpan : (χ : ClassFunction ↥L ℂ) ∈ OddOrder.Peterfalvi.S07.zSpan hyp.Sset :=
+    Submodule.subset_span hχmem
+  have hχbar_mem : (χ : ClassFunction ↥L ℂ).conj ∈ hyp.Sset :=
+    (Sset_closedUnderConjugate hyp).conj_mem hχmem
+  have hχbar_zSpan : (χ : ClassFunction ↥L ℂ).conj ∈ OddOrder.Peterfalvi.S07.zSpan hyp.Sset :=
+    Submodule.subset_span hχbar_mem
+  have hdiff_zSpan : (χ : ClassFunction ↥L ℂ) - (χ : ClassFunction ↥L ℂ).conj ∈
+      OddOrder.Peterfalvi.S07.zSpan hyp.Sset :=
+    Submodule.sub_mem _ hχ_zSpan hχbar_zSpan
+  -- `χ − χ̄` is supported in `A(L)` (sign flip of the given `χ̄ − χ` support).
+  have hdiffsupp' : ((χ : ClassFunction ↥L ℂ) - (χ : ClassFunction ↥L ℂ).conj).support ⊆
+      hyp.A := by
+    have heq : (χ : ClassFunction ↥L ℂ) - (χ : ClassFunction ↥L ℂ).conj
+        = -((χ : ClassFunction ↥L ℂ).conj - (χ : ClassFunction ↥L ℂ)) := by abel
+    rw [heq, ClassFunction.support_neg]
+    exact hdiffsupp
+  -- the sublattice `ℤ[χ − χ̄, χ − 0]` sits inside `ℤ[S]`.
+  have hsub : OddOrder.Peterfalvi.S07.zSpan (L := ↥L)
+        {(χ : ClassFunction ↥L ℂ) - (χ : ClassFunction ↥L ℂ).conj,
+          (χ : ClassFunction ↥L ℂ) - 0} ≤
+      OddOrder.Peterfalvi.S07.zSpan hyp.Sset := by
+    show Submodule.span ℤ _ ≤ Submodule.span ℤ _
+    rw [Submodule.span_le]
+    intro x hx
+    simp only [Set.mem_insert_iff, Set.mem_singleton_iff] at hx
+    rcases hx with rfl | rfl
+    · exact hdiff_zSpan
+    · rw [sub_zero]; exact hχ_zSpan
+  -- build the (5.4) decomposition with `ψ = 0` and `τ₁ = coh.extension`, forcing `Y = 0`.
+  obtain ⟨-, hτ1χ, E, hEsub, hXsum, -⟩ :=
+    OddOrder.Peterfalvi.S07.CharacterPsiDecomposition.eq_sum_of_psi_eq_zero
+      (OddOrder.Peterfalvi.S07.CharacterPsiDecomposition.ofProjection (ψ := 0) imF coh.extension
+        (fun φ ζ hφ hζ => coh.extension_inner_eq φ ζ (hsub hφ) (hsub hζ))
+        (coh.extends_on_supported
+          ((χ : ClassFunction ↥L ℂ) - (χ : ClassFunction ↥L ℂ).conj)
+          ⟨hdiff_zSpan, hdiffsupp'⟩)
+        (by rw [sub_zero]; exact coh.extension_mem_ZIrr _ hχ_zSpan)
+        (ClassFunction.inner_zero_right _)
+        (ClassFunction.inner_zero_right _)
+        hχχbar)
+  -- `coh.extension χ = χ^{τ₁} = X = ∑_{α ∈ E} α ∈ ℤ[R(χ)]`.
+  have hgoal : coh.extension (χ : ClassFunction ↥L ℂ) = ∑ α ∈ E, α := hτ1χ.trans hXsum
+  rw [hgoal]
+  exact Submodule.sum_mem _ fun α hα => Submodule.subset_span (Finset.mem_coe.mpr (hEsub hα))
+
+open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
+/-- **Peterfalvi (5.5) → (12.2.b), constituent form**: the coherent Dade image `χ^{τ₁} =
+coh.extension φ` of a constituent `φ ∈ S(χ)` (`data.constituents`) that is itself a member of the
+family `S` lies in `ℤ[R(χ)] = Submodule.span ℤ (Rset data)`.
+
+The (5.5) image family `dadeOrthonormalCharacterImageFamilyOfDiff … φ` is *definitionally* the block
+`R₁(φ) = R1 data hφ` — both are the `toOrthonormalImage` of the same
+`dadeCharacterDifferenceImageOfDiff hyp.dadeData.dade hyp.hconj φ (data.not_real φ hφ)
+(R1_diffsupp data hφ)` — which is a subfamily of `R(χ) = Rset data`, so
+`coherent_extension_mem_span_imageFamily` lands in `ℤ[R(χ)]` after `span_mono`.  The orthogonality
+`⟨φ, φ̄⟩ = 0` comes for free from `data.not_real φ hφ` (a non-real irreducible is orthogonal to its
+conjugate).  This is the L-side `ψ ∈ ℤ[R(χ_L)]` for the (12.16) witness: the distinguished
+`χ_L = Ind θ` is irreducible (Frobenius), so its unique constituent is itself, in `S`. -/
+theorem coherent_extension_constituent_mem_span_Rset {L : Subgroup G} [Finite G]
+    (hyp : Hypothesis L) (coh : OddOrder.Peterfalvi.S07.IsCoherent hyp.tau hyp.Sset hyp.A)
+    {chi : ClassFunction ↥L ℂ} (data : CharacterDecompositionData hyp chi)
+    {φ : IrreducibleCharacter ↥L} (hφ : φ ∈ data.constituents)
+    (hφmem : (φ : ClassFunction ↥L ℂ) ∈ hyp.Sset) :
+    coh.extension (φ : ClassFunction ↥L ℂ) ∈ Submodule.span ℤ (Rset data) := by
+  classical
+  -- a non-real irreducible is orthogonal to its complex conjugate.
+  have hφne : φ ≠ IrreducibleCharacter.conjPerm ↥L φ := fun h =>
+    data.not_real φ hφ ((IrreducibleCharacter.conjPerm_eq_self_iff φ).mp h.symm)
+  have hχχbar :
+      ClassFunction.inner (φ : ClassFunction ↥L ℂ) (φ : ClassFunction ↥L ℂ).conj = 0 := by
+    have h0 := irreducibleCharacter_inner_eq_ite φ (IrreducibleCharacter.conjPerm ↥L φ)
+    rw [if_neg hφne] at h0
+    rwa [IrreducibleCharacter.conjPerm_apply_coe] at h0
+  -- (5.5): `coh.extension φ ∈ ℤ[R₁(φ)]`; and `R₁(φ) ⊆ R(χ) = Rset data`.
+  have h55 := coherent_extension_mem_span_imageFamily hyp coh φ hφmem
+    (data.not_real φ hφ) (R1_diffsupp data hφ) hχχbar
+  refine Submodule.span_mono ?_ h55
+  intro α hα
+  exact ⟨φ, hφ, Finset.mem_coe.mp hα⟩
+
+open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
+/-- **Peterfalvi (5.5) + (12.3): the L-side Dade character `ψ = χ_L^{τ₁}` is orthogonal to
+`R(χ_M)`.**  For two non-conjugate type-I maximal subgroups `L`, `M` and a constituent
+`φ_L ∈ S(χ_L)` of the L-side family that is itself a member of `S` (the Frobenius witness case,
+where `χ_L = Ind θ` is irreducible), the coherent Dade image `ψ = coh_L.extension φ_L` is orthogonal
+to every element of `R(χ_M) = Rset data_M`.
+
+Two ingredients combine: (5.5) `coherent_extension_constituent_mem_span_Rset` puts
+`ψ ∈ ℤ[R(χ_L)]`, and (12.3) `nonconjugate_typeI_R_orthogonal` gives the cross-`L` orthogonality
+`R(χ_L) ⊥ R(χ_M)`; since `⟨·,·⟩` is conjugate-symmetric and additive, orthogonality of `ψ` to all
+of `R(χ_M)` follows from `inner_eq_zero_of_mem_zSpan`.  This is precisely the per-`χ_M` piece of the
+`horth` hypothesis that the (12.4)/(12.14) coset-constancy chain (`Sset_coeff_equal`,
+`psi_constant_on_xK`) consumes: `ψ` restricted to the `M`-structure has equal coefficients across
+`S(χ_M)`, forcing `ψ` constant on the `M_F`-cosets. -/
+theorem coherent_extension_constituent_orthogonal_Rset_of_nonconjugate {L M : Subgroup G}
+    [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hyp_L : Hypothesis L)
+    (coh_L : OddOrder.Peterfalvi.S07.IsCoherent hyp_L.tau hyp_L.Sset hyp_L.A)
+    {chi_L : ClassFunction ↥L ℂ} (data_L : CharacterDecompositionData hyp_L chi_L)
+    {φ_L : IrreducibleCharacter ↥L} (hφ_L : φ_L ∈ data_L.constituents)
+    (hφ_L_mem : (φ_L : ClassFunction ↥L ℂ) ∈ hyp_L.Sset)
+    (hyp_M : Hypothesis M) (hnot_conj : ¬ ∃ g : G, MulAut.conj g • L = M)
+    {chi_M : ClassFunction ↥M ℂ} (data_M : CharacterDecompositionData hyp_M chi_M) :
+    ∀ α ∈ Rset data_M,
+      ClassFunction.inner (coh_L.extension (φ_L : ClassFunction ↥L ℂ)) α = 0 := by
+  -- (5.5): `ψ = coh_L.extension φ_L ∈ ℤ[R(χ_L)]`.
+  have h55 := coherent_extension_constituent_mem_span_Rset hyp_L coh_L data_L hφ_L hφ_L_mem
+  -- (12.3): `R(χ_L) ⊥ R(χ_M)`.
+  have horth := nonconjugate_typeI_R_orthogonal hG hyp_L hyp_M hnot_conj data_L data_M
+  intro α hα
+  -- `α ⊥ R(χ_L)` (conjugate-swap of (12.3)), hence `α ⊥ ℤ[R(χ_L)] ∋ ψ`; conjugate back.
+  have hαperp : ∀ β ∈ Rset data_L, ClassFunction.inner α β = 0 := by
+    intro β hβ
+    rw [inner_conj_symm β α, horth β hβ α hα, star_zero]
+  have h0 : ClassFunction.inner α (coh_L.extension (φ_L : ClassFunction ↥L ℂ)) = 0 :=
+    OddOrder.Peterfalvi.S07.IntegralCharacterMap.inner_eq_zero_of_mem_zSpan hαperp h55
+  rw [inner_conj_symm α (coh_L.extension (φ_L : ClassFunction ↥L ℂ)), h0, star_zero]
+
 open scoped Classical in
 /-- **General TI-induction self-value** (Isaacs 7.x / Peterfalvi (3.2.c) value half), generalized
 from `TICyclicHypothesis.induce_apply_eq_self_of_mem_V` to an arbitrary TI subset.  For a TI subset
@@ -4014,3 +4165,9 @@ end OddOrder.Peterfalvi.S14
 
 #print axioms OddOrder.Peterfalvi.S14.frobenius_typeI_induced_char_constituents
 #print axioms OddOrder.Peterfalvi.S14.fixed_conjClass_eq_one_of_typeF
+#print axioms OddOrder.Peterfalvi.S14.coherent_extension_mem_span_imageFamily
+#print axioms OddOrder.Peterfalvi.S14.coherent_extension_constituent_mem_span_Rset
+-- `coherent_extension_constituent_orthogonal_Rset_of_nonconjugate` is sorry-free in its own body
+-- but transitively cites `nonconjugate_typeI_R_orthogonal` (12.3), whose geometric obligation
+-- `nonconjugate_diffImage_inner_zero` (8.18.c, §10 thickened-support) is the one remaining sorry;
+-- so it is intentionally *not* in the axiom-clean block above (would show `sorryAx`).

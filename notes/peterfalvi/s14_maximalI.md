@@ -1379,3 +1379,30 @@ eq_sum_of_psi_eq_zero 在庫)。これで ψ∈ℤ[R(χ_L)] (12.14 L-side) が l
 
 **残 critical-path map (全 scoped)**: (5.5) [上記 recipe、L-side] → 12.14 は + M-side ((12.4)-for-M、
 一般 typeI_induced_char_constituents via induced-char Clifford + (8.2.c) 接続) → 12.16。
+
+### loop⁶⁰ (2026-07-01 lane-b resume³): ✅ (5.5) L-side + horth-combine 完成 — 3 lemma landing
+
+loop⁵⁹ recipe を実装し、(12.14) L-side wiring を確定 (全 build-green、+157 行, 2 commit):
+
+1. **`coherent_extension_mem_span_imageFamily`** ((5.5) 核, 一般形, **axiom-clean**): 非実
+   `χ∈S` + coherent `coh` で `coh.extension χ ∈ span ℤ R(χ)`。ψ=0 の `CharacterPsiDecomposition.ofProjection`
+   (τ₁=coh.extension, 唯一の数論入力 = `extension_mem_ZIrr` — 一般 unsupported X-family が欠く virtual-char 性)
+   → `eq_sum_of_psi_eq_zero` で Y=0 → χ^{τ₁}=X=Σ_{α∈E⊆R(χ)}α。recipe 通り、build 一発 (defeq 全通過)。
+2. **`coherent_extension_constituent_mem_span_Rset`** (Rset bridge, **axiom-clean**): 構成要素
+   `φ∈S(χ)∩S` で `coh.extension φ ∈ span ℤ (Rset data)`。(5.5) image family は R1 data hφ と
+   **defeq** (同一 dadeCharacterDifferenceImageOfDiff, proof-irrelevant support 入力) → span_mono。
+   ⟨φ,φ̄⟩=0 は `data.not_real` から自動 (非実既約⊥共役、conjPerm 経由)。
+3. **`coherent_extension_constituent_orthogonal_Rset_of_nonconjugate`** (horth-combine): 非共役
+   L,M で `∀α∈Rset data_M, ⟨coh_L.extension φ_L, α⟩=0`。(5.5)[2] + (12.3)
+   `nonconjugate_typeI_R_orthogonal` + `inner_eq_zero_of_mem_zSpan` + conj-symm。body sorry-free
+   だが (12.3) の geometric obligation `nonconjugate_diffImage_inner_zero` (8.18.c, §10=lane-d) を
+   signature-contract cite ⟹ sorryAx transitively (axiom-clean block 外, コメント明記)。
+
+**これで (12.14) `psi_constant_on_xK` の horth (ψ⊥R(χ_M)) の L-side は確定**。残 (12.14)→(12.16):
+- **M-side data**: `typeI_induced_char_constituents` (S14:389, sorry) = 一般 induced-char Clifford
+  decomposition (Ind_H^L θ → 等次数・非実・A(L)∪{1}-supported 構成要素)。**次の deep frontier**。
+  (8.2.c)[done] + (1.7.c) 誘導次数 + (1.5.a)/(1.2) support。既存機構: `clifford_decomposition`
+  (restriction 版), `CliffordSingleOrbit`, `card_mul_inner_self_induce_eq_card_inertia`,
+  `apply_one_le_induce_apply_one_of_liesOver`。誘導版 decomposition producer は要 build (substantial)。
+- coset-constancy assembly `psi_constant_on_xK` (S14:2959): horth[3 の全 χ_M 集約] + M data + psi_constant chain。
+- witness coherence `sibleyTarget_frobI` (S14:1652, sorry) = (6.8) case-c1 Sibley target (別 deep piece)。
