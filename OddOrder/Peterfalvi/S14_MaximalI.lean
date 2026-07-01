@@ -2148,6 +2148,35 @@ theorem Sset_scaledDiff_supported [Finite G] {L : Subgroup G} (hyp : Hypothesis 
   exact (mem_supportInSubgroup_sharp_subgroupOf_iff hyp.typeI.typeF.H hAH x).mpr
     ⟨Subgroup.mem_subgroupOf.mpr hxH, hx1⟩
 
+/-- **Degree data for an enumerated `S`-family** — the witness analogue of the Sibley
+`exists_sMemberDegreeData`, the integer-degree-ratio input of the (5.6) break bound (h56).  Against a
+minimal-degree anchor `χmem i₁` of degree `|L:K|`, each member has an integer ratio
+`deg j = χmem j(1)/|L:K|` (`Sset_charValue_one_eq_mul_index`), `deg i₁ = 1`, and the scaled
+difference `χmem j − deg j·χmem i₁` is `A(L)`-supported (`Sset_scaledDiff_supported`). -/
+theorem Sset_exists_degreeData [Finite G] {L : Subgroup G} (hyp : Hypothesis L) {C : Subgroup ↥L}
+    (hfrob : OddOrder.Isaacs.Ch06.IsFrobeniusGroup ↥L ((hyp.typeI.typeF.H).subgroupOf L) C)
+    (hAH : hyp.ambientA = ((hyp.typeI.typeF.H) : Set G) \ {1})
+    {k : ℕ} {χmem : Fin k → IrreducibleCharacter ↥L} {i₁ : Fin k}
+    (hmemS : ∀ j, (χmem j : ClassFunction ↥L ℂ) ∈ hyp.Sset)
+    (hanchordeg : (χmem i₁ : ClassFunction ↥L ℂ) 1 =
+      (((hyp.typeI.typeF.H).subgroupOf L).index : ℂ)) :
+    ∃ deg : Fin k → ℕ, deg i₁ = 1 ∧ (∀ j, 0 < deg j) ∧
+      (∀ j, (χmem j : ClassFunction ↥L ℂ) 1 = (deg j : ℂ) * (χmem i₁ : ClassFunction ↥L ℂ) 1) ∧
+      (∀ j, ((χmem j : ClassFunction ↥L ℂ) - deg j • (χmem i₁ : ClassFunction ↥L ℂ)).support ⊆
+        OddOrder.Peterfalvi.S04.supportInSubgroup hyp.ambientA L) := by
+  choose deg hdeg_pos hdeg_eq using fun j => Sset_charValue_one_eq_mul_index hyp (hmemS j)
+  have hdeg_eq' : ∀ j, (χmem j : ClassFunction ↥L ℂ) 1 =
+      (deg j : ℂ) * (χmem i₁ : ClassFunction ↥L ℂ) 1 := fun j => by
+    rw [hdeg_eq j, hanchordeg]
+  refine ⟨deg, ?_, hdeg_pos, hdeg_eq', fun j =>
+    Sset_scaledDiff_supported hyp hfrob hAH (hmemS j) (hmemS i₁) (hdeg_eq' j)⟩
+  have h := hdeg_eq i₁
+  rw [hanchordeg] at h
+  have hidx_ne : (((hyp.typeI.typeF.H).subgroupOf L).index : ℂ) ≠ 0 :=
+    Nat.cast_ne_zero.mpr Subgroup.index_ne_zero_of_finite
+  have hdeg1 : (deg i₁ : ℂ) = 1 := mul_right_cancel₀ hidx_ne (by rw [one_mul]; exact h.symm)
+  exact_mod_cast hdeg1
+
 open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
 open OddOrder.Peterfalvi.S09.Cert in
 /-- **`S(H′)` member differences are `A(L)`-supported** — the `hab`-free subfamily analogue of
