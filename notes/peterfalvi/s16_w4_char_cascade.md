@@ -1197,3 +1197,14 @@ IsTypeII↔IsTypeP2 (cont.⁴¹) + card_Q_eq/card_P_eq proven の波及で、§1
 - **cross-lane gated**: `card_LF_coprime_pq` (bgTheoremE、owner F)、`complement_inf_Q_structure` (13.19.c1 char + Frobenius)。
 
 **次フェーズ = deep char engagement** (per-turn structural discharge から Dade char machinery の sustained 構築へモード変化)。carrier 構築は all-or-nothing で multi-turn。[[feedback-ask-chatgpt-for-elided-gaps]] (char 省略の再構成) 検討価値。[[feedback-flag-poor-progress]] に従い tractability の質的変化を明示。
+
+
+### cont.⁴³ (2026-07-02 lane c=γ /loop): deep char frontier は issue 9001 の shared coherence infra (hub adjudication 中) に gated 判明
+
+cont.⁴² で「残 lane-c = deep char」と確定後、engage を進めるも、merge で入った **hub issue 9001** が char cascade 基盤の soundness/infra 問題を明示:
+- **§12 coherence unsound** (issue 2032): `frobenius_typeI_coherent`/`sibleyTarget_frobI` は witness で (6.8)(a) の H^# TI 前提が (12.10) と矛盾 → unprovable。lane b が (6.8)/(5.7)/(6.5.c) の 3-case split で修正中。
+- **shared char infra 未実装 + hub 割当中**: (6.5.c) coherence producer (case(c) |L/H|∣p-1) と構成的 Clifford (issue 0026) が S07/S08 在庫なし。9001 明記「**α (§10-13 char) も要する見込み**」= char cascade の共通 upstream。case(b) (5.7) route も S07 の (5.2) Hypothesis を lattice-relative isometry に weaken する shared refactor 要 (機械的だが shared)。
+
+**lane-c deep char (§14-16 Dade) はこの coherence machinery を transitive 基盤とする** (coherent ψ・Dade image・Hypothesis78 は §7 coherence 経由)。∴ **lane-c deep char frontier = 9001 の hub-adjudicated shared coherence infra に gated**。unsound/未完の base 上の build は premature (scaffold リスク)。
+
+**判断**: これは cross-lane coordination gate + soundness (valid-stop: 想定違反/設計分岐)。lane-c の tractable structural (§13.16/13.17.a) は完了。deep char は 9001 shared-infra 割当 (hub) を待つ or lane-c が claim-before-build で 1 つ建てる (policy 5A、要 hub dedup) の分岐。[[cross-lane-sync-via-notes]] [[feedback-flag-poor-progress]]
