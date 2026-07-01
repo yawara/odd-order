@@ -8241,6 +8241,54 @@ theorem even_inner_of_conjPerm_symmetric [Finite G] [Fintype G]
       ((IrreducibleCharacter.conjPerm_eq_self_iff χ).mp h)
 
 open scoped Classical FiniteInduce in
+/-- **The `σ`-column sum `∑_r ω_{r0}^σ` is real** (Peterfalvi (3.9)(a)).  The column-`0` `σ`-images
+are permuted by the row-conjugation involution `σ` (`exists_rowInv_alignedOmegaSigma_conj`:
+`conj ω_{r0}^σ = ω_{σr,0}^σ`), so the sum is conjugation-invariant.  This is the `M`-side reality
+feeding the (11.8.5) `a = ⟨∑ω_{r0}^σ, β⟩` parity (`even_inner_of_conjPerm_symmetric`). -/
+theorem Hypothesis.sum_alignedOmegaSigma_zeroColumn_isReal [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} (hyp : Hypothesis M)
+    (hodd : Odd (Nat.card G)) :
+    ClassFunction.IsReal (∑ r : Fin hyp.w1, hyp.alignedOmegaSigmaGrid hG hodd r 0) := by
+  haveI := hyp.finiteG
+  classical
+  choose σ hσ using fun i => hyp.exists_rowInv_alignedOmegaSigma_conj hG hodd i
+  have hbridge : ∀ X : ClassFunction G ℂ,
+      X.conj = ClassFunction.mapRingEquiv Complex.conjAe.toRingEquiv X := fun X => by
+    ext g; rw [ClassFunction.conj_apply, ClassFunction.mapRingEquiv_apply]; rfl
+  have hgridinj : ∀ a b : Fin hyp.w1,
+      hyp.alignedOmegaSigmaGrid hG hodd a 0 = hyp.alignedOmegaSigmaGrid hG hodd b 0 → a = b := by
+    intro a b hab
+    by_contra hne
+    have hii := hyp.alignedOmegaSigmaGrid_inner hG hodd a b 0 0
+    rw [← hab, hyp.alignedOmegaSigmaGrid_inner hG hodd a a 0 0, if_pos ⟨rfl, rfl⟩,
+      if_neg (fun h => hne h.1)] at hii
+    exact one_ne_zero hii
+  have hσinv : Function.Involutive σ := fun r => by
+    apply hgridinj
+    calc hyp.alignedOmegaSigmaGrid hG hodd (σ (σ r)) 0
+        = ClassFunction.mapRingEquiv Complex.conjAe.toRingEquiv
+            (hyp.alignedOmegaSigmaGrid hG hodd (σ r) 0) := ((hσ (σ r)).1).symm
+      _ = ClassFunction.mapRingEquiv Complex.conjAe.toRingEquiv
+            (ClassFunction.mapRingEquiv Complex.conjAe.toRingEquiv
+              (hyp.alignedOmegaSigmaGrid hG hodd r 0)) := by rw [(hσ r).1]
+      _ = hyp.alignedOmegaSigmaGrid hG hodd r 0 := by
+            rw [← hbridge, ← hbridge, ClassFunction.conj_conj]
+  have hconjsum : ∀ s : Finset (Fin hyp.w1),
+      (∑ r ∈ s, hyp.alignedOmegaSigmaGrid hG hodd r 0).conj
+        = ∑ r ∈ s, (hyp.alignedOmegaSigmaGrid hG hodd r 0).conj := by
+    intro s
+    induction s using Finset.induction with
+    | empty => simp
+    | insert a s ha ih =>
+        rw [Finset.sum_insert ha, ClassFunction.conj_add, ih, Finset.sum_insert ha]
+  rw [ClassFunction.IsReal, hconjsum Finset.univ,
+    show (∑ r : Fin hyp.w1, (hyp.alignedOmegaSigmaGrid hG hodd r 0).conj)
+        = ∑ r : Fin hyp.w1, hyp.alignedOmegaSigmaGrid hG hodd (σ r) 0 from
+      Finset.sum_congr rfl fun r _ => by rw [hbridge]; exact (hσ r).1]
+  exact Equiv.sum_comp (Equiv.ofBijective σ hσinv.bijective)
+    (fun r => hyp.alignedOmegaSigmaGrid hG hodd r 0)
+
+open scoped Classical FiniteInduce in
 /-- **Peterfalvi (11.8.5), `a = 0` under the (11.8.4) hypothesis** (the residual-orthogonal case).
 Given the (11.8.4) by-contradiction consequence `(μ₀ − ζ)^τ = ∑_r ω_{r0}^σ − ζ^{τ₁}` (`μ₀ = ∑ μ_{i'0}`),
 the two-way computation of `(α_{ij}^τ, (μ₀ − ζ)^τ)` forces `a = 0` when `a ∈ {0, 2}`:

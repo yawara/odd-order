@@ -998,3 +998,15 @@ threaded hyp 無)。**残 = a=(∑ω_{r0}^σ,β) application**: β real=(11.8.3,
 - **β real**: (11.8.3) = (4.8)/(4.10)/(5.9) の SHC port (大)。`tau_muGrid_column_diff` (4772, full-coh)=(4.8)。
 - **β⊥1**: ⟨β,1⟩=⟨α^τ,1⟩−δ⟨ω^σ diff,1⟩+n⟨ζ^{τ₁},1⟩。
 (11.8) closure は依然 doubly-gated (§9↔§10、§14)。
+
+## 2026-07-02 cont.⁵⁸ (lane-a) — **∑ω_{r0}^σ real LANDED (a-even M-side reality)**
+`Hypothesis.sum_alignedOmegaSigma_zeroColumn_isReal` (S12, leaf green, sorry-free): `IsReal (∑_r ω_{r0}^σ)`
+(Pf (3.9)(a))。証明: `exists_rowInv_alignedOmegaSigma_conj` (5829) で choice → 行対合 σ (conj(ω_{r0})=ω_{σr,0})、
+σ involutive (`hgridinj` = alignedOmegaSigmaGrid_inner の 1≠0、+ conj_conj) → bijective; conj-sum は Finset.induction
+(`conj_add`/`conj_zero`)、`.conj=mapRingEquiv conjAe` bridge (4926) で各項 (hσ r).1、`Equiv.sum_comp` で reindex。
+⚠ API ハマり: `map_sum` は mapRingEquiv (非 bundled coe) に非適用 → induction; sum_congr は g 明示 `show..from`;
+挿入で charParam の `open scoped FiniteInduce in` が分離 → 再付与。
+
+**a-even application 残 = β real (11.8.3, 大) + β⊥1**。∑ω real は landed、片側⊥1 (parity cont.⁵⁷) ゆえ
+∑ω は⊥1 不要 (ω_{00}=1 成分持つが Δ₂=β のみ⊥1)。∑ω∈ZIrr も要 (ω^σ は ZIrr、要確認)。
+(11.8) closure は依然 doubly-gated (§9↔§10、§14) — a-even 完成しても endpoint は §14 gate 残。
