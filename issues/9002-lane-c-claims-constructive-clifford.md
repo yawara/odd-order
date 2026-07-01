@@ -116,11 +116,17 @@ Coq (1.7)(b) `cfInd_central_Inertia` の hypothesis は `abelian (T/H)` (T=I(θ)
         (`(χ h)^|H|=χ(h^|H|)=1` root-of-unity → `norm_eq_one_of_pow_eq_one` → `RCLike.inv_eq_conj`)。
       - **`isIrreducibleCharacter_mul_linearClassFunction`**: `χ∈Irr` × `χlin:G→*ℂˣ` ⟹ `χ·linearClassFunction χlin ∈ Irr`。
         = Gallagher の「χ·Inf(β) 既約」(Inf(β)=linearClassFunction of quotient hom)。
-- [ ] **(G2) Gallagher 本体 = bijection Irr(I/H)≃Irr(I|θ)** — twist-既約は上で完成。残:
-      **(a) 単射**: `χ·Inf(β₁)=χ·Inf(β₂) ⟹ β₁=β₂` (χ で割る=`linearClassFunction` injective)。
-      **(b) 全射**: `ψ∈Irr(I|θ)` (χ 上に lie) ⟹ `ψ=χ·Inf(β)` for some β (`ψ·χ⁻¹` が I/H-inflation)。
-      **(c) 次数保存 + [I:H] 個** (I/H abelian ⟹ Irr(I/H)=linear、`|Irr(I/H)|=[I:H]`)。
-      `LinearCharacter.exists_linearIrreducibleCharacter_eq_of_isMulCommutative` + inflation で組む。extension (G1) と合流。
+- [x] **decomposition 準備 (multiplicativity + lies-over)** — `CharacterProduct` (cont.⁹, sorry-free):
+      `restrict_mul`/`compHom_mul` (積が Res/pullback と可換) + `restrict_mul_of_apply_eq_one`
+      (`lam` が H 上 1 ⟹ `Res_H(χ·lam)=Res_H χ` = 「χ·Inf(β) は θ 上に lie」)。これで
+      `⟨Ind_H^I θ, χ·Inf β⟩ = ⟨θ, Res_H χ⟩ = ⟨θ,θ⟩=1` (χ extends θ の下) が出せる。
+- [ ] **(G2) Gallagher 本体 = decomposition/bijection** — twist-既約 + lies-over は完成。残:
+      **(a) 単射/全射/[I:H] 個** (I/H abelian ⟹ Irr(I/H)=linear、count)。
+      **⚠ 真の深い blocker = extension (G1) `θ→χ∈Irr(I)`** (Isaacs 6.28 coprime、`Res_H χ=θ`): **repo に infra
+      皆無** (grep 確認、char-extension/determinant/coprime-cohomology いずれも未収録)。これが decomposition
+      `Ind_H^I θ = ∑_β χ·Inf(β)` を書くのに必須 (χ が要る)。**次の主要 frontier = extension G1 の genuine build**
+      (Isaacs 6.28 の determinant/canonical-extension route; multi-session、正面から engage)。
+      decomposition engine は extension を仮説パラメータ化して先行 build 可 (gated-endpoint)。
 - [ ] **type-F 適用**: `typeF_inertia_commutator_le` (I(θ)/H abelian) を (G3) に投入。
 - [ ] **(1.5.a)/(1.2) 台**: 各構成要素 φ の台 ⊆ A(L)∪{1}。非実 = 奇数位数 (`not_isReal_of_ne_trivial_of_odd_card'`)。
 - [ ] `typeI_induced_char_constituents` (S14:472) を上記 cite で sorry-free 化。lane b (12.14) は cite。
