@@ -60,9 +60,14 @@ module-theoretic Clifford core (orbit transitivity)、3-5 セッション」と�
 ## 進捗 (2026-07-02)
 
 - [x] **慣性商 abelian 前提の中核**: `S14.typeF_inertia_inf_U_isMulCommutative` (generic, sorry-free,
-      commit `e6f0dbd9`) — (8.2.c) + `U₁` abelian ⟹ `I(θ)∩U` abelian。残 = Dedekind `I(θ)=H·(I(θ)∩U)`
-      で `I(θ)/H` abelian を完成 (要 Γ=HU / H≤I(θ)≤HU)。
-- 一時中断 (2026-07-02, lane D 退役で区切り)。次セッション再開点 = 下記 (G1) 拡張から。
+      commit `e6f0dbd9`) — (8.2.c) + `U₁` abelian ⟹ `I(θ)∩U` abelian。
+- [x] **慣性商 abelian 完成** (2026-07-02, cont.³): `S14.typeF_inertia_commutator_le` (sorry-free) —
+      `Γ=HU` (`H⊔U=⊤`) + `H≤I(θ)` の Dedekind 分解 `s=h·u` (`h∈H`, `u=h⁻¹s∈I(θ)∩U`) を `Γ⧸H` に落とし、
+      `I(θ)∩U` abelian ⟹ `⁅s,t⁆∈H` ⟹ **`⁅I(θ),I(θ)⁆ ≤ H`** = 「`I(θ)/H` abelian」証明書
+      (`ClassFunction.inertiaQuotient`)。これが (1.7)(b) hypothesis そのもの。**残 = 生成的 char (G1)-(G3)**。
+- **⚠ 訂正 (stale 検出)**: **induction-in-stages は既に landed** = `S08_CaseBCoherence2.induce_induce_subgroupOf`
+      (sorry-free, `Ind^M_H(Ind^H_{K.subgroupOf H}(ψ∘e)) = Ind^M_K ψ`、`inner_compHom_of_mulEquiv` 経由)。
+      下記 cont.² の「Lean 未実装 (foundational)」は誤り → cite するだけ。**再構築禁止** ([[verify-port-state-by-number-not-coq-name]])。
 
 ## Coq-confirmed 経路 + missing pieces の精密化 (2026-07-02, cont.²)
 
@@ -89,15 +94,24 @@ Coq (1.7)(b) `cfInd_central_Inertia` の hypothesis は `abelian (T/H)` (T=I(θ)
 
 ## やること (bottom-up、generic は shared leaf)
 
-- [ ] **Pf (1.7)/(8.2.c) 原文精読** — mult-one/equal-degree の正確な機構 (cyclic 要否) を確定。
-- [ ] **induction-in-stages** `induce I (induce (H.subgroupOf I) θ) = induce H θ` を build (foundational)。
-- [ ] **慣性商 abelian 完成**: Dedekind `I(θ)=H·(I(θ)∩U)` + `I(θ)/H ≃ I(θ)∩U` abelian (`sup_inf_assoc_of_le`)。
+- [x] **Pf (1.7)/(8.2.c) 原文精読** — 設計点解決 commit `0482afa0` (abelian で十分、cyclic 不要)。
+- [x] **induction-in-stages** — **既に landed** (`S08_CaseBCoherence2.induce_induce_subgroupOf`)。cite のみ。
+- [x] **慣性商 abelian 完成** — `S14.typeF_inertia_commutator_le` (`⁅I(θ),I(θ)⁆ ≤ H`, sorry-free, cont.³)。
 - [ ] **(G1) 拡張 lemma** を build (`OddOrder/GroupTheory/RepresentationTheory/` 新/既存 leaf)。coprime
-      Hall (H=L_F normal Hall, U abelian complement) の下で I/H cyclic → θ 拡張。
+      Hall (H=L_F normal Hall, U abelian complement) の下で I/H cyclic → θ 拡張 (Isaacs 6.28/11.22)。
 - [ ] **(G2) Gallagher** + **(G3) mult-free-from-abelian-inertia** を build (同 leaf)。core generic 補題。
-- [ ] **type-F 適用**: (8.2.c) I(θ)∩U⊆U₁⊆U(abelian) ⟹ I(θ)/H abelian → (G3) 適用。
+- [ ] **type-F 適用**: `typeF_inertia_commutator_le` (I(θ)/H abelian) を (G3) に投入。
 - [ ] **(1.5.a)/(1.2) 台**: 各構成要素 φ の台 ⊆ A(L)∪{1}。非実 = 奇数位数 (`not_isReal_of_ne_trivial_of_odd_card'`)。
-- [ ] `typeI_induced_char_constituents` (S14:398) を上記 cite で sorry-free 化。lane b (12.14) は cite。
+- [ ] `typeI_induced_char_constituents` (S14:472) を上記 cite で sorry-free 化。lane b (12.14) は cite。
+
+## 次の frontier + 判明した真の上流 bottleneck (2026-07-02 cont.³)
+
+**Clifford correspondence 全単射の核 = `Ind_I^G ψ` 既約 (Isaacs 6.11、I=I_G(θ) 非正規) は「一般 (非正規)
+Mackey」を要する**: 既存 norm 機構 `InducedIrreducible.card_mul_inner_self_induce` /
+`card_smul_restrict_induce` は **`[H.Normal]` 前提** (`induceTerm_of_mem_normal` 経由) ゆえ、慣性群 `I`
+(一般に非正規) の `⟨Ind_I^G ψ, Ind_I^G ψ⟩` に直接使えない。∴ 上流未収録の **general Mackey 公式** が
+(G1)-(G3) と並ぶ真の最上流。document 順は 6.11 (Clifford corr) < 6.16 (Gallagher) < 6.28 (extension)。
+次セッションはこの general Mackey か Gallagher (拡張仮説付き) から着手 (両者 multi-session、正面から engage)。
 
 **性質**: genuine multi-session char build (G1-G3 は Isaacs §6/§11 の generic char theory で repo 未収録)。
 Frobenius sub-case は proven ゆえ witness (12.16) 経路は現状も通る; 本 issue は一般 (12.14) 用の shared infra。
