@@ -65,6 +65,7 @@ import OddOrder.GroupTheory.RepresentationTheory.IdempotentDirectSum
 import OddOrder.GroupTheory.RepresentationTheory.SingerField
 import OddOrder.GroupTheory.RepresentationTheory.SingerLineBound
 import OddOrder.GroupTheory.RepresentationTheory.SemilinearImprimitiveBound
+import OddOrder.GroupTheory.RepresentationTheory.LineScalarCharacter
 import OddOrder.GroupTheory.RepresentationTheory.TypePGaloisUBound
 import OddOrder.GroupTheory.RepresentationTheory.ExtraspecialSinger
 import OddOrder.GroupTheory.RepresentationTheory.SkolemNoether
