@@ -49,6 +49,16 @@ instance instMul : Mul (ClassFunction G k) where
     compHom f (φ * ψ) = compHom f φ * compHom f ψ := by
   ext x; simp
 
+/-- **Twisting by a factor that is `1` on `H` does not change the restriction to `H`.**  If
+`lam x = 1` for every `x ∈ H`, then `Res_H (χ · lam) = Res_H χ`.  In Gallagher's theorem `lam =
+Inf(β)` is inflated from `I/H`, hence `1` on `H`, so `χ · Inf(β)` restricts to `Res_H χ = θ` — i.e.
+it lies over `θ` — and `⟨Ind_H^I θ, χ·Inf(β)⟩ = ⟨θ, Res_H(χ·Inf β)⟩ = ⟨θ, θ⟩ = 1`. -/
+theorem restrict_mul_of_apply_eq_one {H : Subgroup G} (χ lam : ClassFunction G k)
+    (hlam : ∀ x : ↥H, lam (x : G) = 1) :
+    restrict H (χ * lam) = restrict H χ := by
+  ext h
+  simp only [restrict_apply, mul_apply, hlam, mul_one]
+
 end ClassFunction
 
 variable {G : Type*} [Group G]
@@ -193,5 +203,16 @@ theorem isIrreducibleCharacter_mul_linearClassFunction {G : Type*} [Group G] [Fi
   refine isIrreducibleCharacter_mul_of_unit_norm hχ hlirr.isCharacter
     (linearClassFunction_mul_star_self_eq_one χlin) ?_
   simp
+
+/-- **An inflated linear character is `1` on the normal subgroup.**  For `χbar : (G ⧸ H) →* ℂˣ`,
+the linear character `Inf(χbar) = linearClassFunction (χbar ∘ mk' H)` of `G` takes the value `1` at
+every `x ∈ H` (the quotient map kills `H`).  Combined with `ClassFunction.restrict_mul_of_apply_eq_one`
+this gives `Res_H (χ · Inf(χbar)) = Res_H χ`: the Gallagher twist `χ · Inf(β)` lies over the same
+character of `H` as `χ`. -/
+theorem linearClassFunction_comp_mk'_apply_eq_one {G : Type*} [Group G] {H : Subgroup G} [H.Normal]
+    (χbar : (G ⧸ H) →* ℂˣ) {x : G} (hx : x ∈ H) :
+    (linearClassFunction (χbar.comp (QuotientGroup.mk' H))) x = 1 := by
+  rw [linearClassFunction_apply, MonoidHom.comp_apply, QuotientGroup.mk'_apply,
+    (QuotientGroup.eq_one_iff x).mpr hx, map_one, Units.val_one]
 
 end OddOrder.RepresentationTheory
