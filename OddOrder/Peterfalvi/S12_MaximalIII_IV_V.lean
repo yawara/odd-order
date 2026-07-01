@@ -8156,12 +8156,19 @@ theorem Hypothesis.charParam_a_eq_zero_of_residualEq [Finite G] {M : Subgroup G}
       ClassFunction.inner
         (hyp.tau (hyp.muGrid hG hodd i j - (δ : ℂ) • hyp.muGrid hG hodd i 0 - (n : ℂ) • ζ))
         ((hyp.SHC_isCoherent hG).extension ζ) = (a : ℂ) - (n : ℂ) ∧
-      ((a = 0 ∨ a = 2) → a = 0) := by
+      (Even a → a = 0) := by
   obtain ⟨a, Y, hbound, hinner, hYeq, hdecompA⟩ :=
     hyp.SHC_residual_eq_omegaSigma_diff hG hodd i hj0 hζS hζirr hζ1 hdeg hμ0 hnf hδj hdζ h0ζ hδpm
       hn2 hRn hZ horth hRmem hRrev
   refine ⟨a, hbound, hinner, ?_⟩
-  intro ha02
+  intro heven
+  -- `a` even and `a ∈ {0,1,2}` gives `a ∈ {0,2}` (Peterfalvi (11.8.3)/(11.8.5): the parity `a` even
+  -- from `β` real excludes `a = 1`).
+  have ha02 : a = 0 ∨ a = 2 := by
+    rcases hbound with h | h | h
+    · exact Or.inl h
+    · obtain ⟨k, hk⟩ := heven; omega
+    · exact Or.inr h
   have hζne := hyp.inducedFamily_degree_w1_conj_ne hG hζirr hζ1
   have hYd := hYeq ha02
   have htrans := hyp.muGridAlpha_tau_inner_zeroColumnSum_sub_zeta hG hodd i hj0 hζS hζirr hζ1

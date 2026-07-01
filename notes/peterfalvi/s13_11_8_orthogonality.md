@@ -918,3 +918,18 @@ h114 ((11.8.4)) を仮定パラメータ化。証明 = M-level identity `μ_j−
 **次 = (11.8.6) full**: μ_j^{τ₂}=∑ω_{ij}^σ ((4.9) or (5.8)) → S(C)=S₁∪S₂ coherent → (11.3) `S_H0C_not_coherent`
 矛盾。⚠ S₂ coherence (§14 gate: (9.11)+(11.7))、μ_k∈S₂ ((9.8.b)/(9.9.b))、τ₂ 拡張。or (11.8.3) β real 先行。
 (11.8) closure は依然 doubly-gated (§9↔§10 の (11.8.1)、§14 の (11.8.6))。
+
+## 2026-07-02 cont.⁵² (lane-a) — **(11.8.5) 結論を `Even a → a=0` に強化 (a-even を明示 hypothesis 化)**
+`charParam_a_eq_zero_of_residualEq` の結論を `((a=0∨a=2)→a=0)` → **`(Even a → a=0)`** に強化 (leaf green,
+sorry-free)。a-even (Pf の "β real ⟹ a even") を明示 threaded hypothesis 化 → 下流 (endpoint) が
+consume する自然形。証明: Even a + a∈{0,1,2} で a≠1 (`obtain ⟨k,hk⟩:=heven; omega`) → a∈{0,2} → 既存 2-way calc。
+
+**★ a-even の中身 (未実装、次の ungated piece)** — mmd 04.13 l.59 + 04.9 l.109 照合で判明:
+Pf の一般 parity lemma = 「**odd-order G の real virtual char Δ₁,Δ₂ (⊥1_G) に対し ⟨Δ₁,Δ₂⟩ は even**」
+((1.1) 非実性で Irr∖{1} が χ↔χ̄ で対、Δ real で係数対等 → ∑=2·(pairs))。a=(∑ω_{r0}^σ,β) に適用: β real
+((11.8.3)) + ∑ω_{r0}^σ real + 両者⊥1 で a even。⚠ 一般 parity lemma は involved (`conjPerm` involution
++ cross-Parseval `⟨φ,ψ⟩=∑_χ⟨φ,χ⟩·conj⟨ψ,χ⟩` の pairing、~80 行)。infra: `IrreducibleCharacter.conjPerm`
+(BrauerPermutationUnconditional)、ZIrrFourier Parseval 既存。(11.8.3) β real は (4.8)/(4.10)/(5.9)。
+
+**(11.8) 残 ungated = 一般 parity lemma + (11.8.3) β real → a-even; (11.8.6) full は §14-gated**。
+(11.8) closure は依然 doubly-gated (§9↔§10 の (11.8.1)、§14 の (11.8.6))。
