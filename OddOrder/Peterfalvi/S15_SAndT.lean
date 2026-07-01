@@ -2583,13 +2583,44 @@ theorem complement_le_PW1 [Finite G]
     _ = Subgroup.centralizer (hyp.W2 : Set G) := h1316.1
     _ = hyp.P ⊔ hyp.W1 := h1316.2
 
-/-- **`S`-side dual of `Q_W2_structure`** (V-side, gated): `W₁ ≤ N_G(P)`, `P ⊓ W₁ = ⊥`, and
-`q ∤ |P|`.  Mirror of the gated `Q_W2_structure`; declared sorried per the hub cite-gated directive
-(the `q ∤ |P|` and `P ⊓ W₁ = ⊥` parts bottom out on `|P| = p^q`, the §13 σ-structure). -/
-theorem P_W1_structure [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
+/-- **`S`-side of the (13.17.c) `W₁`-structure**: `W₁ ≤ N_G(P)`, `P ⊓ W₁ = ⊥`, and `q ∤ |P|`.
+
+All three are ungated `S`-side facts: `W₁ ≤ S ≤ N_G(P)` (`P = S_F ⊴ S`); `P ⊓ W₁ ≤ M' ⊓ W₁ = ⊥`
+(`P ≤ M' = derivedInG S`, `M_complement` disjointness); and `q ∤ |P|` from
+`Coprime |P| |U ⋊ W₁|` (`coprime_card_P_card_UW1`) with `|W₁| = q ∣ |U ⋊ W₁|`. -/
+theorem P_W1_structure [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     (hyp : Hypothesis (G := G)) :
     hyp.W1 ≤ Subgroup.normalizer (hyp.P : Set G) ∧ hyp.P ⊓ hyp.W1 = ⊥ ∧
-      ¬ hyp.q ∣ Nat.card ↥hyp.P := sorry
+      ¬ hyp.q ∣ Nat.card ↥hyp.P := by
+  have hM'_le_S : derivedInG hyp.S ≤ hyp.S := Subgroup.map_subtype_le _
+  have hP_le_M' : hyp.P ≤ derivedInG hyp.S := by rw [hyp.S_deriv_eq_PU]; exact le_sup_left
+  have hW1_le_S : hyp.W1 ≤ hyp.S := hyp.Sdata_W1_eq ▸ hyp.Sdata.W1_le
+  have hS_norm_P : hyp.S ≤ Subgroup.normalizer (hyp.P : Set G) := by
+    rw [hyp.P_eq_SF]; exact OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_le_normalizer hyp.S
+  have hM'W1 : derivedInG hyp.S ⊓ hyp.W1 = ⊥ := by
+    have hd := disjoint_iff.mp hyp.Sdata.M_complement.disjoint
+    rw [eq_bot_iff]; rintro x ⟨hxM', hxW1⟩
+    have hxS : x ∈ hyp.S := hM'_le_S hxM'
+    have hmem : (⟨x, hxS⟩ : ↥hyp.S) ∈
+        ((derivedInG hyp.S).subgroupOf hyp.S) ⊓ (hyp.Sdata.W1.subgroupOf hyp.S) :=
+      ⟨Subgroup.mem_subgroupOf.mpr hxM', Subgroup.mem_subgroupOf.mpr (hyp.Sdata_W1_eq ▸ hxW1)⟩
+    rw [hd, Subgroup.mem_bot] at hmem
+    rw [Subgroup.mem_bot]; simpa using Subtype.ext_iff.mp hmem
+  refine ⟨hW1_le_S.trans hS_norm_P, ?_, ?_⟩
+  · rw [eq_bot_iff]; intro x hx
+    obtain ⟨hxP, hxW1⟩ := Subgroup.mem_inf.mp hx
+    have hxm : x ∈ derivedInG hyp.S ⊓ hyp.W1 := Subgroup.mem_inf.mpr ⟨hP_le_M' hxP, hxW1⟩
+    rwa [hM'W1] at hxm
+  · intro hq
+    have hcop := coprime_card_P_card_UW1 hG hyp
+    have hW1dvd : Nat.card ↥hyp.W1 ∣ Nat.card ↥(hyp.U ⊔ hyp.W1) := by
+      rw [← Nat.card_congr (Subgroup.subgroupOfEquivOfLe (le_sup_right)).toEquiv]
+      exact Subgroup.card_subgroup_dvd_card _
+    have hcopPW1 : Nat.Coprime (Nat.card ↥hyp.P) (Nat.card ↥hyp.W1) :=
+      hcop.coprime_dvd_right hW1dvd
+    rw [← hyp.q_eq_card_W1] at hcopPW1
+    have hqdvd1 : hyp.q ∣ 1 := hcopPW1 ▸ Nat.dvd_gcd hq (dvd_refl hyp.q)
+    exact hyp.q_prime.one_lt.ne' (Nat.dvd_one.mp hqdvd1)
 
 /-- **`T`-side dual of `complement_card_eq_pq`** (Pf (13.17.c)/(14.5), V-side): the `W₂`-containing
 Frobenius complement of the type-I subgroup `L` over `N_G(V)` has order `p q`.  Mirror with the
