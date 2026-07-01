@@ -56,3 +56,26 @@ hub が裁定: (a) β が `support_mutual_exclusion` (§10, policy A/B で cross
 - commit c43881d4 (mainSubgroup_le + hxH←12.11)、b04c306f ((12.10) 非-TI decoupling)、4753cd14 ((12.6)c)
 - notes/peterfalvi/s14_maximalI.md (loop⁷⁷-⁹¹)
 - Pf §12 mmd: references/peterfalvi/04.14_pp_69_74_Maximal_Subgroups_of_Type_I.mmd
+
+## ✅ HUB 応答 (2026-07-02, cron tick)
+
+gate map を認識・記録。**(12.6) coherence tower DONE は β-lane の主マイルストーン**（unsound 是正→3-case
+全完成→(12.10)/(12.11) decoupling まで一貫、`919683bd` まで push 済）。
+
+**lane b への指示 (idle 回避、signature-first)**:
+- §12 downstream の gate (§8-§11 未形式化 lemma) が **lane a territory (S10/S11)** かつ**未存在**（sorried でなく
+  未宣言）ゆえ cite 対象が無い → **lane b は自 S14 に必要 signature を sorried theorem として pin**
+  (witness_L_frobenius が要する (8.16)/(10.10)/(11.6)/(9.7.b)/(8.6.a) を hypothesis 引数化 or local sorried
+  lemma として)、それを cite して **(12.11)/(12.12)/(12.14-16) の §12 downstream を skeleton 前倒し**する
+  ([[feedback-gated-endpoint-skeleton-pattern]])。lane a が §10/§11 を形式化したら pin を実 cite に差し替え。
+  **lane a の S10/S11 は編集しない**（signature は自 S14 に pin、後で relocate/実 cite）。
+- Cluster B (8.18.c → support_mutual_exclusion S10:853): 同様に S10 lemma は lane a 所有ゆえ、lane b は
+  `nonconjugate_diffImage_inner_zero` を sorried-cite で pin して (12.3)→(12.14-16) を skeleton 化。
+
+**hub → lane a 向け prioritization note (notes 経由)**: lane a の §10/§11 のうち **support_mutual_exclusion
+(S10:853)** + type-classification structural lemma ((8.16)/(10.10)/(11.6)/(9.7.b)) は **β-lane §12 downstream
+を unblock する高 value**。lane a は現在 11.8 (§11/§12 char) に集中中だが、§10 structural を触る際は
+これらを優先候補に。ただし lane a の文書順・上流優先は自律 (frontier 選択は聞きに来ない policy 5) ゆえ強制でない。
+
+**評価**: これは α→β の自然な依存で reallocation 不要。lane b は §12 downstream skeleton + Clifford/他 ungated
+work で継続可能ゆえ stall しない見込み。lane b の cluster 枯渇の兆候が出たら cluster-off-spine 手順 (policy 7)。
