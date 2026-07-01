@@ -1313,7 +1313,8 @@ theorem coprime_card_V_card_Q_of_disjoint [Finite G]
 /-- **T-side type-`P` structure reconciled to the abstract `V`/`W₂`** (the honest replacement for the
 withdrawn `Tdata` spine carrier; HUB tick² 2026-06-30).  `T` is type non-I (`T_nonI`), hence type-`P`,
 and the §16-chosen complement `V` (κ-Hall-invariant) / cyclic factor `W₂` form a type-`P`
-decomposition of `T`: there is a `TypePData T` with `.U = V` and `.W1 = W₂`.
+decomposition of `T`: there is a `TypePData T` with `.U = V`, `.W1 = W₂`, and `.W2 = W₁` (the dual
+cyclic factor `C_{T'}(W₂#)` of `T`'s type-`P` structure is exactly the shared `W₁`).
 
 This is the genuine §13 reconciliation — **TRUE** (unlike `IsTypeP2 T`, which is strictly stronger
 than the (14.9) `T_typeII` conclusion `TypeIIData T` and generally false, so the earlier `Tdata`
@@ -1321,7 +1322,7 @@ spine supply was a dead-end).  It lives **off the FT spine**: the `V`-side helpe
 keeping `section16TypePStructure_of_isMinimalSimpleOdd` sorry-free.  Gated on §13; declared sorried. -/
 theorem reconciled_typePData_T [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
     (hyp : Hypothesis (G := G)) :
-    ∃ data : TypePData hyp.T, data.U = hyp.V ∧ data.W1 = hyp.W2 := sorry
+    ∃ data : TypePData hyp.T, data.U = hyp.V ∧ data.W1 = hyp.W2 ∧ data.W2 = hyp.W1 := sorry
 
 /-- `Q ⊓ V = ⊥` from a reconciled `TypePData T` (`tpd.U = V`): `V` complements `Q = T_F` in
 `M' = [T,T]`.  Used by the V-side helpers in place of the withdrawn `Tdata` carrier. -/
@@ -1341,6 +1342,21 @@ theorem Q_inf_V_eq_bot_of_reconciled [Finite G] (hyp : Hypothesis (G := G))
   rw [hyp.Q_eq_TF, ← tpd.H_eq, ← htpdV]
   exact key
 
+/-- **Peterfalvi (13.2.b)/(14.2.a), `T`-side dual of `W2_le_P`: `W₁ ≤ Q`.**  The cyclic factor `W₁`
+(of prime order `q`) lies in `Q = T_F`, the maximal nilpotent normal Hall subgroup of `T`.  Dual to
+`W2_le_P` (`W₂ ≤ P`), but read off the `T`-side type-`P` decomposition (`reconciled_typePData_T`)
+rather than the coprime-index order count: the intrinsic dual cyclic factor
+`data.W2 = C_{T'}(W₂#) = W₁` sits inside `data.H = maxNilpotentNormalHall T = Q`
+(`data.W2_le`, `data.H_eq`, `Q_eq_TF`).  This is conjunct (1) of the (13.16) `normalizer_W1_structure`
+and is consumed by the `W₁`-side Maschke/Wielandt confinement (the dual of the `W₂`-side, where
+`normalizer_U_inf_W2_eq_bot_of_data` uses `W2_le_P` at the analogous step). -/
+theorem W1_le_Q [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hyp : Hypothesis (G := G)) : hyp.W1 ≤ hyp.Q := by
+  obtain ⟨tpd, _, _, htpdW1⟩ := reconciled_typePData_T hG hyp
+  have hHeq : tpd.H = hyp.Q := by rw [tpd.H_eq, hyp.Q_eq_TF]
+  rw [← htpdW1, ← hHeq]
+  exact le_trans tpd.W2_le inf_le_left
+
 /-- **`T`-side dual of `isMulCommutative_U`** (Pf (13.2.a), V-side): the complement `V` of the
 type-II member `T` is commutative.  Mirror of `isMulCommutative_U`; `IsTypeII T` is a hypothesis
 (the (14.9) `T_typeII` conclusion, supplied by the caller).  Sources the `T`-side type-`P` structure
@@ -1348,7 +1364,7 @@ from the off-spine `reconciled_typePData_T` (not the withdrawn `Tdata` carrier).
 theorem isMulCommutative_V [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
     (hyp : Hypothesis (G := G)) (hTTypeII : IsTypeII hyp.T) : IsMulCommutative ↥hyp.V := by
   obtain ⟨tdata⟩ := hTTypeII
-  obtain ⟨tpd, htpdV, _⟩ := reconciled_typePData_T _hG hyp
+  obtain ⟨tpd, htpdV, _, _⟩ := reconciled_typePData_T _hG hyp
   have hdisj : hyp.Q ⊓ hyp.V = ⊥ := Q_inf_V_eq_bot_of_reconciled hyp htpdV
   have hQH : hyp.Q = tdata.typeP.H := by rw [hyp.Q_eq_TF, tdata.typeP.H_eq]
   have hQ_le : hyp.Q ≤ derivedInG hyp.T := by rw [hyp.T_deriv_eq_QV]; exact le_sup_left
@@ -1765,7 +1781,7 @@ theorem typeI_V_le_fitting_of_coprime [Finite G] (hG : OddOrder.BG.IsMinimalSimp
     (hcop : Nat.Coprime (Nat.card ↥(maxNilpotentNormalHall L)) (hyp.p * hyp.q)) :
     hyp.V ≤ maxNilpotentNormalHall L := by
   obtain ⟨tdata⟩ := hTTypeII
-  obtain ⟨tpd, htpdV, htpdW2⟩ := reconciled_typePData_T hG hyp
+  obtain ⟨tpd, htpdV, htpdW2, _⟩ := reconciled_typePData_T hG hyp
   obtain ⟨frob, _⟩ := OddOrder.Peterfalvi.S14.typeI_frobenius hG hLmax hLI
   have hHeq : frob.typeI.typeF.H = maxNilpotentNormalHall L := frob.typeI.typeF.H_eq
   have hfrobLF : OddOrder.Isaacs.Ch06.IsFrobeniusGroup ↥L
@@ -2031,7 +2047,7 @@ theorem exists_typeI_maximal_overNormalizer_V [Finite G]
     ∃ L : Subgroup G, L ∈ maximalSubgroups G ∧ IsTypeI L ∧
       Subgroup.normalizer (hyp.V : Set G) ≤ L ∧ hyp.V ≤ maxNilpotentNormalHall L := by
   obtain ⟨tdata⟩ := hTTypeII
-  obtain ⟨tpd, htpdV, htpdW2⟩ := reconciled_typePData_T _hG hyp
+  obtain ⟨tpd, htpdV, htpdW2, _⟩ := reconciled_typePData_T _hG hyp
   have hdisj : hyp.Q ⊓ hyp.V = ⊥ := Q_inf_V_eq_bot_of_reconciled hyp htpdV
   have hcop : Nat.Coprime (Nat.card ↥hyp.V) (Nat.card ↥hyp.Q) :=
     coprime_card_V_card_Q_of_disjoint hyp tdata hdisj
