@@ -90,13 +90,22 @@ reconciliation field を足し、`section16TypePStructure_of_isMinimalSimpleOdd`
 lemma (`Sdata.W2 = Kstar` / `U = Hall U₀`) が BG §14/§16 に在庫か確認 → 無ければ BG/** で実証明
 (typeP_duality 周辺、mine dormant territory)。これが extension の genuine upstream math。
 
-## 次手 recommendation (lane d)
+## 進捗 (2026-07-01, lane d)
 
-1. `Sdata_W2_eq` / `S_U_commutative` supply-proof が要求する BG reconciliation lemma の在庫確認 →
-   無ければ BG/** で実証明 (genuine upstream、in-territory)。
-2. 揃ったら menu chain に field threading して `P_order` / `U_commutative` を close (in-territory)。
-3. `P_elementaryAbelian` は lane a `H_elementaryAbelian` の sorried-cite skeleton で前倒し可
-   (S13.Hyp bridge)、本体は lane a §11 待ち。
+- ✅ §8 TI-subset pair (`H_sharp_isTISubset`/`S_normalizes_H_sharp`) — carrier `fitting_eq` (commit `2a0ec49`)。
+- ✅ `basic_structure_gated.U_commutative` — BG§15 経由 carrier 拡張 (commit `d20c02d`)。
+- ✅ `basic_structure_gated.P_order` — `card_P_eq` + `Sdata_W2_eq` carrier 拡張 (commit `eac53c3`)。
+
+**basic_structure_gated 残 2 sorry (両方 lane a 上流 gated)**:
+- `P_elementaryAbelian` — Pf (11.7) = lane a `S13_MaximalIII_IV.H_elementaryAbelian` (sorried) +
+  `S13.Hypothesis S` 構築 (chief/base/s11Setup 大構造)。sorried-cite skeleton は可だが genuine math は
+  lane a §11 待ち (S13.Hyp bridge が重く、cite しても sorry は lane a へ移るだけ)。
+- `u_bound` — Pf (9.7) Singer `u ∣ (p^q-1)/(p-1)` (lane a §9、case-split)。arith bridge
+  `(p-1)^{q-1} ≤ (p^q-1)/(p-1)` は mine で proof 可だが (9.7) 本体が要 = lane a。
+
+**char/numeric spine (13.5–15、10 sorry)** は依然 grid + coherence (`sibleyTarget_S`=lane B) gated
+(§B 参照)。lane d の S15 in-territory ungated frontier は上記 4 close で一巡。次は char grid /
+coherence の genuine upstream (要 lane B/§3-5 調整) か、lane a §11/§9 の待ち解除後の残 2 field。
 
 ## 参照
 
