@@ -6693,6 +6693,75 @@ theorem hcPsi_regular_conjBy [Finite G] {M : Subgroup G}
   ⟨θ.comp (hcConjDescend chief g), (hcConjDescend_comp_regular_iff caseA g θ).mpr hθ,
     hcPsi_irreducibleConjBy_eq chief g θ⟩
 
+/-- **Regularity, hom-form ↔ pointwise-form.**  `θ` is nontrivial on the Clifford summand `Hpart i`
+(as a hom, `θ ∘ (Hpart i).subtype ≠ 1`) iff it is nontrivial at some point of `Hpart i`
+(`∃ x ∈ Hpart i, θ x ≠ 1`).  Bridges the hom-form regularity of `card_regular_chars_Hbar` to the
+pointwise-form `hreg` consumed by `hcPsi_inertia_index_eq_u` in the `oXtheta` fibre count. -/
+theorem comp_subtype_ne_one_iff_exists {M : Subgroup G}
+    {data : TypesIIIIIIVSetup M} {chief : ChiefFactorData data}
+    {chars : Section11CharacterData data chief} (caseA : CliffordCaseAData chars)
+    (θ : (↥data.H ⧸ chief.N) →* ℂˣ) (i : Fin data.q) :
+    θ.comp (caseA.Hpart i).subtype ≠ 1 ↔ ∃ x ∈ caseA.Hpart i, θ x ≠ 1 := by
+  rw [Ne, MonoidHom.ext_iff, not_forall]
+  simp only [MonoidHom.comp_apply, Subgroup.subtype_apply, MonoidHom.one_apply, Subtype.exists,
+    exists_prop]
+
+open scoped Classical in
+/-- **The `oXtheta` count** (Peterfalvi (9.8) `oXtheta`): `u · |Xθ| = (p-1)^q`, where `Xθ` is the set
+of distinct `HU`-induced characters `Ind_{HC}^{HU}(hcPsi θ)` over regular seeds `θ` (nontrivial on
+every Clifford factor `Hpart i`).  The induction `θ ↦ Ind(hcPsi θ)` is `u`-to-1: its fibres are the
+`HU`-conjugation orbits (`card_filter_induce_eq_index_inertia`, using the `T`-invariance
+`hcPsi_regular_conjBy`), each of size `[HU:HC] = u` (`hcPsi_inertia_index_eq_u`); the domain of
+regular seeds has size `(p-1)^q` (`card_regular_chars_Hbar`, `hcPsi_injective`).  This is the
+numerator of the (9.8.c) parity dichotomy `exists_regular_not_reducible_of_odd`. -/
+theorem oXtheta_count [Finite G] {M : Subgroup G}
+    {data : TypesIIIIIIVSetup M} {chief : ChiefFactorData data}
+    {chars : Section11CharacterData data chief} (caseA : CliffordCaseAData chars)
+    [(hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf (huSub data)).Normal]
+    [Fintype ↥(huSub data)] [Fintype ((↥data.H ⧸ chief.N) →* ℂˣ)]
+    [Invertible (Nat.card ↥(huSub data) : ℂ)]
+    [Invertible (Nat.card ↥(hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf
+      (huSub data)) : ℂ)] :
+    chars.u * ((Finset.univ.filter fun θ : (↥data.H ⧸ chief.N) →* ℂˣ =>
+          ∀ i, θ.comp (caseA.Hpart i).subtype ≠ 1).image fun θ =>
+        ClassFunction.induce (hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf
+          (huSub data)) (hcPsi chief θ).toClassFunction).card
+      = (chief.p - 1) ^ data.q := by
+  classical
+  letI : Fintype ↥(hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf
+    (huSub data)) := Fintype.ofFinite _
+  set RegF := Finset.univ.filter fun θ : (↥data.H ⧸ chief.N) →* ℂˣ =>
+    ∀ i, θ.comp (caseA.Hpart i).subtype ≠ 1 with hRegF
+  set T := RegF.image (hcPsi chief) with hTdef
+  -- `T = {hcPsi θ | θ regular}` is closed under `HU`-conjugation (T-invariance)
+  have hTinv : ∀ χ ∈ T, ∀ g : ↥(huSub data), IrreducibleCharacter.conjBy g χ ∈ T := by
+    intro χ hχ g
+    obtain ⟨θ, hθ, rfl⟩ := Finset.mem_image.mp hχ
+    obtain ⟨θ', hθ', heq⟩ := hcPsi_regular_conjBy caseA (Finset.mem_filter.mp hθ).2 g
+    exact heq ▸ Finset.mem_image.mpr ⟨θ', Finset.mem_filter.mpr ⟨Finset.mem_univ _, hθ'⟩, rfl⟩
+  -- each induction fibre has size `u`
+  have hfib : ∀ b ∈ T.image fun χ => ClassFunction.induce _ χ.toClassFunction,
+      (T.filter fun χ => ClassFunction.induce _ χ.toClassFunction = b).card = chars.u := by
+    intro b hb
+    obtain ⟨χ₀, hχ₀, rfl⟩ := Finset.mem_image.mp hb
+    rw [card_filter_induce_eq_index_inertia (G := ↥(huSub data)) T hTinv χ₀ hχ₀]
+    obtain ⟨θ₀, hθ₀, rfl⟩ := Finset.mem_image.mp hχ₀
+    exact hcPsi_inertia_index_eq_u caseA
+      (fun i => (comp_subtype_ne_one_iff_exists caseA θ₀ i).mp ((Finset.mem_filter.mp hθ₀).2 i))
+  -- fibrewise: `|T| = u · |Xθ|`
+  have key : T.card
+      = chars.u * (T.image fun χ => ClassFunction.induce _ χ.toClassFunction).card := by
+    rw [Finset.card_eq_sum_card_fiberwise
+        (fun χ hχ => Finset.mem_image_of_mem (fun χ => ClassFunction.induce _ χ.toClassFunction) hχ),
+      Finset.sum_congr rfl hfib, Finset.sum_const, smul_eq_mul, mul_comm]
+  -- `|T| = |RegF| = (p-1)^q`
+  have hTeq : T.card = (chief.p - 1) ^ data.q := by
+    rw [hTdef, Finset.card_image_of_injective _ (hcPsi_injective chief), hRegF,
+      ← card_regular_chars_Hbar chars caseA, Nat.card_eq_fintype_card, Fintype.card_subtype]
+  -- assemble: `u · |Xθ| = |T| = (p-1)^q`
+  rw [key, hTdef, Finset.image_image] at hTeq
+  exact hTeq
+
 /-- **`ζ(1) = u`**: the degree of `ζ = Ind_{HC}^{HU}(ψ)` is `u`.  `induce_apply_one` gives
 `ζ(1) = [HU:HC]·ψ(1) = u·1` (`hc_index_eq_u`, and `ψ` linear so `ψ(1)=1`).  This is the degree-`u`
 of the (9.8.c) irreducible; `induceHU ζ` then has degree `q·u = qu`. -/
