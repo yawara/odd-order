@@ -933,3 +933,21 @@ distinct・同次数 e。⟨ν ζ_0,1_G⟩=⟨ν ζ̄_0,1_G⟩=c (Dade ⊥1 on �
 hζ0norm (inner_self_induce_eq_one_of_frobeniusGroup) + a/ha (exists_betaDecomp_a) + hsmall
 (frobenius_two_mul_card_complement_add_one_le_card_kernel) を供給 → CounterexampleDadeData.hB。
 その後 exists_counterexample_dade_data の他 field (§12 char sorry: 12.11/12.14/12.15) が gating。
+
+### 2026-07-01 (loop 継続⁹): ✅✅ hB producer 完成 — witness_L_zeta_bound (§7 hard-floor 消費 realize)
+
+hzeta0nu discharge に続き **(7.8.b) hB 下界を witness L で構成完了** (commit 285232d7):
+`witness_L_zeta_bound` (S14, body sorry-free) が `1 − e/h ≤ ‖ζ_0^{νρ}‖²` (= CounterexampleDadeData.hB)
+を `zetaNuRhoNormSqGeOfDade` で産出。4 input 全て供給:
+- hzeta0nu=witness_L_hzeta0nu、hζ0norm=inner_self_induce_eq_one_of_frobeniusGroup、
+- a/ha=exists_betaDecomp_a (H78 projection は concrete で wall-free、loop 継続²⁴ どおり)、
+- hsmall=frobenius_two_mul_card_complement_add_one_le_card_kernel (card 同定:
+  kernelOrder=|H| via subgroupOfEquivOfLe、complementIndex=|C| via IsComplement'.card_mul_card)。
+
+**issue 1013 の core 目標達成**: (12.16) hB が §7 から実証明で構成可能。継承 sorryAx は上流 gate
+(12.10 witness_L_frobenius / 6.8 frobenius_typeI_coherent / 12.1 typeIA_eq_sharp) のみ。
+
+**§7 certificate discharge は実質完了** (7.7.a/7.8.a/7.8.b/7.8.c.i 全 discharge + hB producer)。
+残 (12.16) capstone = hA (γ-side ρ_M norm) + hC (7.3 sum<1) + §12 char sorry
+(12.11 intersection_complement_structure / 12.14 psi_constant_on_xK / 12.15 rhoM_integer_values)。
+lane γ (14.11 h78) も本 §7 producer を共有消費可能。
