@@ -7788,4 +7788,111 @@ theorem inner_compHom_mulEquiv {A B : Type*} [Group A] [Group B] [Fintype A] [Fi
   congr 1
   rw [invOf_eq_inv, invOf_eq_inv, hcard]
 
+/-- **Lies-over transitivity** (general Clifford): for `H ≤ K ≤ Γ`, if the irreducible `χ` of `Γ`
+lies over `θ ∈ Irr H`, then there is an intermediate irreducible `ψ ∈ Irr K` such that `χ` lies over
+`ψ` and `ψ` lies over `θ` (transported to `H.subgroupOf K` by `subgroupOfEquivOfLe`).  The
+`Res_H χ = Res_{H.subgroupOf K}(Res_K χ)` transitivity (`restrict_restrict_subgroupOf`,
+`inner_compHom_mulEquiv`) plus the `K`-irreducible decomposition `Res_K χ = Σ_ψ ⟨Res_K χ, ψ⟩ ψ`
+(`sum_inner_irreducibleCharacter_smul`) split the nonzero multiplicity `⟨Res_H χ, θ⟩` as
+`Σ_ψ ⟨Res_K χ, ψ⟩ · ⟨Res_{H.sK} ψ, θ'⟩`, so some `ψ` has both factors nonzero.  This is the (a) input
+to the (9.8.c) Clifford-correspondence step 5 (a reducible `ξ` over `θ₀ ∈ Irr H` factors through an
+`HC`-constituent). -/
+theorem exists_liesOver_intermediate {Γ : Type*} [Group Γ] [Finite Γ]
+    {H K : Subgroup Γ} (hHK : H ≤ K)
+    [Fintype ↥H] [Fintype ↥K] [Fintype ↥(H.subgroupOf K)]
+    [Invertible (Nat.card ↥H : ℂ)] [Invertible (Nat.card ↥K : ℂ)]
+    [Invertible (Nat.card ↥(H.subgroupOf K) : ℂ)]
+    (χ : IrreducibleCharacter Γ) (θ : IrreducibleCharacter ↥H)
+    (hover : OddOrder.RepresentationTheory.IrreducibleCharacter.LiesOver H χ θ) :
+    ∃ ψ : IrreducibleCharacter ↥K,
+      OddOrder.RepresentationTheory.IrreducibleCharacter.LiesOver K χ ψ ∧
+      OddOrder.RepresentationTheory.IrreducibleCharacter.LiesOver (H.subgroupOf K) ψ
+        ⟨ClassFunction.compHom (Subgroup.subgroupOfEquivOfLe hHK).toMonoidHom
+            (θ : ClassFunction ↥H ℂ),
+          θ.isIrreducible.compHom_of_surjective (Subgroup.subgroupOfEquivOfLe hHK).surjective⟩ := by
+  classical
+  haveI : Fintype (IrreducibleCharacter ↥K) := Fintype.ofFinite _
+  set e := Subgroup.subgroupOfEquivOfLe hHK with hedef
+  set θ' : IrreducibleCharacter ↥(H.subgroupOf K) :=
+    ⟨ClassFunction.compHom e.toMonoidHom (θ : ClassFunction ↥H ℂ),
+      θ.isIrreducible.compHom_of_surjective e.surjective⟩ with hθ'def
+  -- Transport `⟨Res_H χ, θ⟩` to `⟨Res_{H.sK}(Res_K χ), θ'⟩`.
+  rw [OddOrder.RepresentationTheory.IrreducibleCharacter.liesOver_iff,
+    ClassFunction.restrictionMultiplicity_def] at hover
+  have htrans : ClassFunction.inner
+      (ClassFunction.restrict (H.subgroupOf K) (ClassFunction.restrict K (χ : ClassFunction Γ ℂ)))
+      (θ' : ClassFunction ↥(H.subgroupOf K) ℂ) ≠ 0 := by
+    rw [restrict_restrict_subgroupOf hHK (χ : ClassFunction Γ ℂ),
+      show (θ' : ClassFunction ↥(H.subgroupOf K) ℂ)
+        = ClassFunction.compHom e.toMonoidHom (θ : ClassFunction ↥H ℂ) from rfl,
+      inner_compHom_mulEquiv e (ClassFunction.restrict H (χ : ClassFunction Γ ℂ))
+        (θ : ClassFunction ↥H ℂ)]
+    exact hover
+  -- Decompose `Res_K χ = Σ_ψ ⟨Res_K χ, ψ⟩ ψ` and split the inner product.
+  have hkey : ClassFunction.inner
+      (ClassFunction.restrict (H.subgroupOf K) (ClassFunction.restrict K (χ : ClassFunction Γ ℂ)))
+      (θ' : ClassFunction ↥(H.subgroupOf K) ℂ)
+      = ∑ ψ : IrreducibleCharacter ↥K,
+          ClassFunction.inner (ClassFunction.restrict K (χ : ClassFunction Γ ℂ))
+              (ψ : ClassFunction ↥K ℂ)
+            * ClassFunction.inner
+              (ClassFunction.restrict (H.subgroupOf K) (ψ : ClassFunction ↥K ℂ))
+              (θ' : ClassFunction ↥(H.subgroupOf K) ℂ) := by
+    conv_lhs => rw [← sum_inner_irreducibleCharacter_smul
+      (ClassFunction.restrict K (χ : ClassFunction Γ ℂ))]
+    have hrs : ClassFunction.restrict (H.subgroupOf K)
+          (∑ ψ : IrreducibleCharacter ↥K,
+            ClassFunction.inner (ClassFunction.restrict K (χ : ClassFunction Γ ℂ))
+                (ψ : ClassFunction ↥K ℂ) • (ψ : ClassFunction ↥K ℂ))
+        = ∑ ψ : IrreducibleCharacter ↥K,
+            ClassFunction.inner (ClassFunction.restrict K (χ : ClassFunction Γ ℂ))
+                (ψ : ClassFunction ↥K ℂ)
+              • ClassFunction.restrict (H.subgroupOf K) (ψ : ClassFunction ↥K ℂ) := by
+      ext x
+      simp only [ClassFunction.restrict_apply, ClassFunction.finset_sum_apply,
+        ClassFunction.smul_apply]
+    rw [hrs, OddOrder.RepresentationTheory.inner_sum_left]
+    refine Finset.sum_congr rfl (fun ψ _ => ?_)
+    rw [ClassFunction.inner_smul_left]
+  rw [hkey] at htrans
+  obtain ⟨ψ, -, hψ⟩ := Finset.exists_ne_zero_of_sum_ne_zero htrans
+  refine ⟨ψ, ?_, ?_⟩
+  · rw [OddOrder.RepresentationTheory.IrreducibleCharacter.liesOver_iff,
+      ClassFunction.restrictionMultiplicity_def]
+    exact fun h => hψ (by rw [h, zero_mul])
+  · rw [OddOrder.RepresentationTheory.IrreducibleCharacter.liesOver_iff,
+      ClassFunction.restrictionMultiplicity_def]
+    exact fun h => hψ (by rw [h, mul_zero])
+
+/-- **step 5 (g): a `hcHom`-kernel-trivial `HC`-character is `hcPsi θbar`** (Peterfalvi (9.8.c)).
+An irreducible `HC`-character `ψ` trivial on `Ker hcHom` (`= H₀C`) inflates from `H̄ = HC/H₀C`
+(`exists_compHom_eq_of_subset_characterKernel`, `hcHom` surjective); since `H̄` is abelian the
+inflation is *linear*, so `ψ = hcPsi θbar` for a hom-form seed `θbar : H̄ →* ℂˣ`.  This collapses the
+step-5 (e)(linear)/(f)(trivial)/(g)(identification) chain: the reducible `ξ`'s `HC`-constituent `ψ'`,
+being trivial on `H₀C` (from `ξ ∈ 𝒳(H₀C)`), is automatically linear and of `hcPsi` form. -/
+theorem exists_hcPsi_eq_of_hcHom_ker_subset [Finite G] {M : Subgroup G}
+    {data : TypesIIIIIIVSetup M} (chief : ChiefFactorData data)
+    (ψ : IrreducibleCharacter
+      ↥(hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf (huSub data)))
+    (hker : ((hcHom chief).ker : Set ↥(hInHu data ⊔
+        ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf (huSub data)))
+      ⊆ OddOrder.Peterfalvi.S03.characterKernel (ψ : ClassFunction _ ℂ)) :
+    ∃ θbar : (↥data.H ⧸ chief.N) →* ℂˣ,
+      (ψ : ClassFunction _ ℂ) = (hcPsi chief θbar : ClassFunction
+        ↥(hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf (huSub data)) ℂ) := by
+  obtain ⟨θbar_irr, heq⟩ :=
+    OddOrder.RepresentationTheory.exists_compHom_eq_of_subset_characterKernel
+      (hcHom_surjective chief) ψ hker
+  haveI : IsMulCommutative (↥data.H ⧸ chief.N) :=
+    ⟨⟨chief.quotient_elementaryAbelian.1⟩⟩
+  obtain ⟨θbar, hθbarval⟩ :=
+    exists_units_monoidHom_of_isIrreducibleCharacter_of_isMulCommutative θbar_irr.isIrreducible
+  refine ⟨θbar, ?_⟩
+  have hθbar_eq : (θbar_irr : ClassFunction (↥data.H ⧸ chief.N) ℂ)
+      = (linearIrreducibleCharacter θbar : ClassFunction (↥data.H ⧸ chief.N) ℂ) := by
+    ext g
+    rw [linearIrreducibleCharacter_apply, hθbarval]
+  rw [← heq, hθbar_eq, ClassFunction.compHom_linearIrreducibleCharacter]
+  rfl
+
 end OddOrder.Peterfalvi.S11
