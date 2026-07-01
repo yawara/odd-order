@@ -82,12 +82,34 @@ policy 7 (σ-theory 先例)。shared-infra 割当ゆえ hub 権限内 (whole-lan
 **dedup**: lane b が (A)/(B) の 9000 番台 claim を切ったら、hub は次 tick で α が同 leaf を沈黙構築して
 いないか step 1.6 で監視。
 
+## HUB→lane c 指示 (2026-07-02, cont.⁴³ への応答)
+
+lane c (cont.⁴³) が「deep char frontier は 9001 shared coherence infra に gated、hub 裁定待ち」と記録
+(main より 10 commits 遅れで本裁定を未同期)。**裁定は完了。lane c は idle にならず以下で engage する**
+(STOP 条件 (a)「上流待ち/starve を口実に hard body 放置」を避ける):
+
+1. **coherence は lane b が build (本裁定)。lane c は再構築せず cite する** (dup 回避)。
+2. **lane c は coherence 一辺倒に gated でない — 今すぐ engage できる ungated frontier がある**
+   (hub が S16 残 sorry を精査、2026-07-02):
+   - **σ-theory-dual structural (lane d が今 tick landed、cite 可)**: `S16:166 v=(q^p−1)/(q−1)`
+     (= T-side v-value = lane d の `TypePGaloisUBound` u_bound dichotomy の**完全 dual**)、`S16:3431`
+     (IsCyclic U ∧ IsElementaryAbelian Q)、`S16:3511` (IsCyclic V)。**lane d の σ-theory leaf
+     (SingerLineBound/TypePGaloisUBound) を T-side に cite して discharge 可** (coherence 不要)。
+   - **coherence-gated deep char は signature-first で skeleton**: `orthogonality_switch`(14.14)/
+     `exists_MHypothesis`(14.10)/13.18/13.19 は S07 の宣言済 `IsCoherent` 等を cite して downstream
+     の Dade cascade skeleton を前倒し ([[feedback-gated-endpoint-skeleton-pattern]])。unsound は lane b が
+     是正済 (ed34cdc8) ゆえ honest sorried signature の cite は安全。
+3. **binding-pole の deep char は本質的に multi-turn。** slow discharge は正常、metric は sorry 数でなく
+   genuine math ([[scaffold-sorry-free-not-done]])。1 iteration で landing しないことは止める理由でない。
+
 ## やること (裁定後)
 - [x] 事項 1 case-split: 承認・合流済 (`ed34cdc8`)。
 - [ ] lane b: (6.5.c) coherence を 9000 番台で claim → build (shared leaf)。
 - [ ] lane b: (5.7)/S07 lattice-relative refactor を実施 (S07 consumer build-green 維持)。
 - [ ] lane b: 構成的 Clifford (issue 0026) を 9000 番台で claim → build。
 - [ ] α: 着手前に open 9000 issue を scan、coherence/Clifford は lane b leaf を cite (再構築しない)。
+- [ ] lane c: idle 回避。σ-theory-dual structural (S16:166/3431/3511) を lane d leaf cite で discharge +
+  coherence-gated deep char を signature-first で skeleton。coherence は再構築しない。
 
 ## 参照
 - issues/2032 (sibleyTarget_frobI unsound 詳細), issue 0026 (Clifford core)
