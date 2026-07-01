@@ -1705,7 +1705,14 @@ structure Hypothesis (S : Set (ClassFunction L ℂ)) (A : Set L)
     [Fintype L] [Fintype G]
     [Invertible (Nat.card L : ℂ)] [Invertible (Nat.card G : ℂ)] where
   tau : IntegralCharacterMap L G
-  tau_isometry : IsIntegralIsometry (L := L) (G := G) tau
+  /-- **Lattice-relative (5.2) isometry** (issue 9001): `τ` preserves the inner products of
+  *differences of `S`-members* `a − b`, `c − d`.  This is the difference-isometry weakening of a
+  global `IsIntegralIsometry`, which does **not** exist for the Feit–Thompson Dade map
+  (`dim CF(L) > dim CF(G)`) but *does* hold on the `A`-supported member differences.  Any global
+  isometry supplies it trivially (`fun _ _ _ _ => iso.inner_eq _ _`); the §14 Dade witness supplies it
+  from `dadeIntegralCharacterMap_inner_eq_on_supported_span` together with equal-degree support. -/
+  tau_isometry_diff : ∀ ⦃a b c d : ClassFunction L ℂ⦄, a ∈ S → b ∈ S → c ∈ S → d ∈ S →
+    ClassFunction.inner (tau (a - b)) (tau (c - d)) = ClassFunction.inner (a - b) (c - d)
   conjugate_closed : OddOrder.Peterfalvi.S03.ClosedUnderConjugate S
   no_real_characters : OddOrder.Peterfalvi.S03.HasNoRealCharacters S
   pairwise_orthogonal : OddOrder.Peterfalvi.S03.PairwiseOrthogonal S
@@ -1725,11 +1732,6 @@ variable [Invertible (Nat.card L : ℂ)] [Invertible (Nat.card G : ℂ)]
 /-- The map carried by a §7 hypothesis, as a coherence predicate target. -/
 abbrev IsCoherentTarget (hyp : Hypothesis (L := L) (G := G) S A) :=
   IsCoherent hyp.tau S A
-
-theorem tau_inner_eq (hyp : Hypothesis (L := L) (G := G) S A)
-    (φ ψ : ClassFunction L ℂ) :
-    ClassFunction.inner (hyp.tau φ) (hyp.tau ψ) = ClassFunction.inner φ ψ :=
-  hyp.tau_isometry.inner_eq φ ψ
 
 /-- The signed irreducible-difference image of `χ - χ̄` supplied by a §7
 hypothesis. -/
