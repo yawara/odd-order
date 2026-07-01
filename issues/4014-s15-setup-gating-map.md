@@ -237,3 +237,31 @@ vestigial か** を要確認 (issue 1004 決定の射程内なら settled)。こ
 (typeP_Galois/Singer、basic_structure+c_eq_one の structural 結論を unblock)、(b) generic σ-theory
 (semilinear/near-field) を新 shared-infra leaf (`OddOrder/GroupTheory/**`, policy B) で建てて typeP_Galois
 を unblock、のいずれか。hub/user 裁定。
+
+## ✅ HUB 裁定 (2026-07-01, ユーザー承認) — option (b): σ-theory 新 leaf
+
+hub 監視 tick で本 issue を検討 → ユーザー裁定 = **option (b)**。lane d を **generic σ-theory
+(semilinear/near-field) = `typeP_Galois` の土台**を新 shared-infra leaf `OddOrder/GroupTheory/**` として
+実証明する方向へ再配分する (policy 5(A)/(B)、genuine upstream FT math)。
+
+**hub 裏取り (grep 確証, 2026-07-01)**:
+- `typeP_Galois` は **repo 未実装** (S15_SAndT_Setup:1717 の Coq 参照コメントのみ)。
+- `c_eq_one` (S15_SAndT_Setup:1703) は **honest sorry** かつ **20× consume** (S16_NonExistenceG 含む = on-spine)。
+  ⟹ 現状 soundness 違反なし (sorried-cite は合法)。本 issue lines 54-68/179-184 の解析どおり
+  c_eq_one の honest route は **structural + W-side (η grid)、vestigial tauS 非依存** ゆえ
+  「c_eq_one が vestigial tauS placeholder から消費される」soundness 懸念は **live gap でない**
+  (issue 1004 射程内で settled)。**ただし c_eq_one を閉じる者は W-side/structural route を使い、
+  carrier の `tauS=0` placeholder には依存しないこと** (この制約を守れば soundness は保たれる)。
+
+**lane d への指示 (次 main 同期で拾う)**:
+1. **claim-first (必須, policy 6)**: build 着手前に 9000 番台 issue で σ-theory leaf を claim
+   (`bin/new-issue --base 9000 …`)。既存 infra を再構築しないため **`OddOrder/GroupTheory/RepresentationTheory/`
+   の `SingerField.lean` / `GaloisCharacter.lean` / `ExtraspecialSinger.lean` / `SkolemNoether.lean` を
+   先に scan** し、typeP_Galois の Galois-case (Singer cyclic) は既存を cite、未存在の
+   semilinear/near-field (非 Galois case) 部分のみ新規に建てる。
+2. **所有**: 新 σ-theory leaf は `OddOrder/GroupTheory/**` (全 lane 共有ゾーン) ゆえ range-check 逸脱にならない。
+   lane d が主実装、**lane a §11 は typeP_Galois を再実装せず cite する** (dup 回避)。lane a には notes 経由で通知。
+3. **target**: typeP_Galois は `basic_structure_gated` の `P_elementaryAbelian`/`u_bound` (Galois 分岐) +
+   `c_eq_one` の Galois 分岐 (`u ∣ 31`) を unblock する。これらは S16 が heavy に cite する structural 結論。
+4. lane d は S15_SAndT_Setup + BG/** 所有を dormant 保持。σ-theory leaf 完成後、in-territory の
+   basic_structure/c_eq_one を新 leaf cite で closeable。

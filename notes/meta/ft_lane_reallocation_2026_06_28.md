@@ -48,7 +48,18 @@
 | **a** | `odd-order-a` | **α** Pf §10–11–13 中央指標核 | `Peterfalvi/{S10_MinimalSimpleStructure, S11_MaximalII_III_IV, S12_MaximalIII_IV_V, S13_MaximalIII_IV}.lean` + `FeitThompson.lean:426` (`card_kappaHall_lt_of_isTypeIIIorIV`) | 1000 |
 | **b** | `odd-order-b` | **β** Pf §12 all-Type-I Dade tower | `Peterfalvi/S14_MaximalI.lean` | 2000 |
 | **c** | `odd-order-c` | **γ** POLE-2 §14–16 下流 (Arm B) | `Peterfalvi/{S15_SAndT, S16_NonExistenceG}.lean` | 3000 |
-| **d** | `odd-order-d` | **γ 上流 §15 S&T setup** (2026-07-01 再配分) + δ BG §14–16 (dormant, 実質完成) | `Peterfalvi/S15_SAndT_Setup.lean` (主) + `BG/**` + `FeitThompson.lean` type-P carrier (dormant) | 4000 |
+| **d** | `odd-order-d` | **σ-theory (typeP_Galois 土台) 新 shared-infra leaf** (2026-07-01 再々配分, issue 4014 hub 裁定) + γ §15 S&T setup / δ BG §14–16 (dormant) | `OddOrder/GroupTheory/**` σ-theory leaf (主, claim-first) + `Peterfalvi/S15_SAndT_Setup.lean` + `BG/**` + `FeitThompson.lean` carrier (dormant) | 4000/9000 |
+
+> **⚠ 2026-07-01 再々配分 (ユーザー裁定, issue 4014 hub 裁定)**: lane d は §15 S&T setup / δ BG §14–16 の
+> **on-feitThompson-spine な ungated genuine work が枯渇** (code-level 確証)。残 on-spine 前進は全て他レーン
+> 上流に gated (typeP_Galois 未実装 / lane a §11 H_elementaryAbelian sorried / §9 Singer / lane b (6.8)
+> Sibley coherence)。⟹ **lane d の主焦点を generic σ-theory (semilinear/near-field) = `typeP_Galois` の土台
+> 新 shared-infra leaf `OddOrder/GroupTheory/**` へ移す** (policy 5(A)/(B) = 未所有 upstream leaf は consumer が
+> 他レーンでも in-scope)。**claim-first 必須** (9000 番台 issue、既存 `SingerField`/`GaloisCharacter`/
+> `ExtraspecialSinger`/`SkolemNoether` を scan して dup 回避)。**lane a §11 は typeP_Galois を再実装せず cite**。
+> typeP_Galois は S16 が heavy に cite する `basic_structure` (P_elementaryAbelian/u_bound) + `c_eq_one`
+> (Galois 分岐, 20× cite) の structural 結論を unblock する。lane d は S15_SAndT_Setup + BG/** を dormant 保持。
+> 詳細 = issue 4014「HUB 裁定」節。
 
 > **⚠ 2026-07-01 再配分 (ユーザー裁定, issue 0092)**: lane d の旧クラスタ δ (BG §14–16 → Peterfalvi
 > interface) の FT deliverable は**実質完成** (kappa/IsTypeP/M_F/Prop 16.1/typeP_duality/type-P carrier/
