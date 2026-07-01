@@ -1481,3 +1481,46 @@ landed** (counting route でも factor-data bijection で有用)。
 **次 iteration**: (A) total count の形式化に着手 (𝒳(H₀C) ↔ Ftheta bijection、|Ftheta|=(p-1)^q)。
 これが counting route の心臓。Coq PFsection9.v:956 `oXtheta` + 920-960 の `theta f`/`inj_theta`/
 `card_imset_Ind_irr` を port。session 巨大 (compaction 近)。
+
+## ★ counting route 3 片 landed — 次 crux = def_Itheta (U-inertia) (2026-07-01 cont.)
+
+前 redirect (counting+parity) に沿って **3 lemma landed (全 axiom-clean [propext/Classical.choice/
+Quot.sound]、commits 5bd37de3/62aeb4f0)**:
+1. `charRestrictEquiv`+`card_regular_chars` (抽象、S11:2337/2359): internal direct product
+   H̄=⊕Sᵢ (各 order p、q factor) の全 factor 上非自明 char 数 = (p-1)^q。charRestrictEquiv
+   (char ≃ factor-restriction tuple、inj=Lemma C `char_eq_of_eq_on_factors`/surj=
+   `char_eq_on_factors_of_bijective`) + subtypeEquiv + `card_monoidHom_of_hasEnoughRootsOfUnity`。
+2. `card_regular_chars_Hbar` (concrete、S11:~2471): 上を `CliffordCaseAData.Hpart` に instantiate。
+   H̄=↥H⧸N の各 Hpart i 上非自明 char 数 = (p-1)^q。Hpart_iSupIndep+iSup で noncommPiCoprod
+   bij、`IsMulCommutative→CommGroup`=scoped instance (`open scoped IsMulCommutative`)。= **oXtheta 分子**。
+3. `exists_regular_not_reducible_of_odd` (parity 核、S11:~5350): finite X⊇Xmu (|Xmu|=p-1)、
+   u·|X|=(p-1)^q、u odd、p-1 even>0、q≥2 ⟹ ∃s∈X, s∉Xmu。equality |X|=p-1 ⟹ u=(p-1)^{q-1}
+   が (q-1≥1・p-1 even で) even となり u-odd 矛盾。= **(9.8.c) dichotomy 抽象核**。
+
+**既存 (9.8.c) construction 機構 (free-orbit route 由来だが counting でも再利用可)**:
+- `hcPsi θ` (6118): θ:H̄→*ℂˣ から HC-linear char ψ=θ∘hcHom (trivial on H₀C)。
+- `hcQuotientEquivHbar` (6084): HC/H₀C ≅ H̄ (第二同型)。
+- `hcZeta_irreducible` (6312): **hθ₀ を仮定すれば** Ind_{HC}^{HU}(hcPsi θ) irreducible (degree u)。
+  hθ₀ = `inertia(compHom hInHuEquivH (compHom mk'_N (linearIrr θ))) = hInHu ⊔ cInHu` (=HC at HU-level)。
+
+**次 crux = def_Itheta (hθ₀ の証明、= U-inertia)**: regular θ (全 Hpart i 上非自明) に対し
+inertia(inflated θ in HU) = HC を証明 = 「Ū=U/C が regular θ 上 free に作用」。
+- 易半 HC ≤ inertia: `subgroup_le_inertia` (C=C_U(H̄) は H̄ に trivial 作用 → θ 固定)。
+- 難半 inertia ≤ HC: U∖C の元は regular θ を動かす。**Hpart_aInvariant (U が各 factor 保存 ⟹
+  Coq の factor-permutation case を回避、単純化)** ゆえ inertia(⊗θ_i)=∩ᵢ Stab_U(θ_i)、
+  nontrivial θ_i on order-p factor で Stab_U(θ_i)=C-related (CliffordCaseAData.a 絡み)。
+  要 新 machinery: (i) 「内部直積上の product char の inertia = ∩ factor inertia」(一般 reusable) +
+  (ii) 「order-p factor 上 nontrivial char の U-stabilizer = C」。Coq inertia_bigdprod_irr+
+  inertia_irr_prime。**deep、multi-iteration、fresh context 推奨**。
+
+**assembly (def_Itheta 後)**:
+- **oXtheta**: u·|Xtheta| = (p-1)^q。Xtheta={Ind_{HC}^{HU}(hcPsi θ) | regular θ}⊆𝒳(H₀C)。
+  u-fold fiber = Ū-conjugate θ が同一 ζ を産む (def_Itheta の帰結)。numerator=`card_regular_chars_Hbar`。
+- **(E) reducible⟹Xmu**: s∈Xtheta∖Xmu ⟹ Ind_M(chi_s) irreducible。対偶=reducible なら
+  constant-factor-data (Xmu) に入る (Coq `cfclass_Ind_irrP`/`ResIndXmu`)。**W1-inertia 数論を回避**。
+- **(C) u odd**: odd-order (|Ū|∣|G| odd)。
+- **assembly**: `exists_regular_not_reducible_of_odd` + (E) → conjunct c。reducible count (B)=
+  `reducible_count_sOf_H0` (既存、5347 で conjunct b1 に wire 済)。
+
+**level 注意**: 𝒳(H₀C)=`xiOf data H0C` (HU-char)、𝒮(H₀C)=`sOf`=Ind_M 𝒳 (M-char)。conjunct c は
+𝒮(H₀C) member = Ind_M(s), s∈Xtheta⊆𝒳(H₀C)。Xtheta=regular ones (Coq: Xtheta⊆X_H0C、**等号不要**)。
