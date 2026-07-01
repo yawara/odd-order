@@ -2188,6 +2188,128 @@ theorem Sset_differenceImages_orthogonal [Finite G] {L : Subgroup G} (hyp : Hypo
   ring
 
 open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
+/-- **`S(H′)` is closed under conjugation** — the `conjugate_closed` field for the subfamily
+`S07.Hypothesis`.  Mirrors `Sset_closedUnderConjugate` (`χ.conj = Ind_K^L θ̄`, `θ̄ ≠ 1`), with the
+extra `S(H′)`-kernel condition preserved because `Ker θ̄ = Ker θ` (`characterKernel_conj`). -/
+theorem SsubFiltration_commutator_closedUnderConjugate [Finite G] {L : Subgroup G}
+    (hyp : Hypothesis L) {χ : ClassFunction ↥L ℂ}
+    (hχ : χ ∈ hyp.SsubFiltration
+      ⁅(hyp.typeI.typeF.H).subgroupOf L, (hyp.typeI.typeF.H).subgroupOf L⁆) :
+    χ.conj ∈ hyp.SsubFiltration
+      ⁅(hyp.typeI.typeF.H).subgroupOf L, (hyp.typeI.typeF.H).subgroupOf L⁆ := by
+  classical
+  simp only [Hypothesis.SsubFiltration, Set.mem_setOf_eq] at hχ ⊢
+  obtain ⟨θ, hθ_ne, hker, hφeq⟩ := hχ
+  refine ⟨⟨(θ : ClassFunction ↥((hyp.typeI.typeF.H).subgroupOf L) ℂ).conj,
+    θ.isIrreducible.conj⟩, ?_, ?_, ?_⟩
+  · intro h
+    apply hθ_ne
+    have hcoe : (θ : ClassFunction ↥((hyp.typeI.typeF.H).subgroupOf L) ℂ).conj
+        = trivialClassFunction ↥((hyp.typeI.typeF.H).subgroupOf L) := by
+      simpa using congrArg
+        (fun c : IrreducibleCharacter ↥((hyp.typeI.typeF.H).subgroupOf L) =>
+          (c : ClassFunction ↥((hyp.typeI.typeF.H).subgroupOf L) ℂ)) h
+    apply Subtype.ext
+    show (θ : ClassFunction ↥((hyp.typeI.typeF.H).subgroupOf L) ℂ)
+      = trivialClassFunction ↥((hyp.typeI.typeF.H).subgroupOf L)
+    rw [← ClassFunction.conj_conj
+      (θ : ClassFunction ↥((hyp.typeI.typeF.H).subgroupOf L) ℂ), hcoe]
+    exact trivialClassFunction_isReal
+  · rw [show ((⟨(θ : ClassFunction ↥((hyp.typeI.typeF.H).subgroupOf L) ℂ).conj,
+          θ.isIrreducible.conj⟩ : IrreducibleCharacter ↥((hyp.typeI.typeF.H).subgroupOf L)) :
+          ClassFunction ↥((hyp.typeI.typeF.H).subgroupOf L) ℂ)
+        = (θ : ClassFunction ↥((hyp.typeI.typeF.H).subgroupOf L) ℂ).conj from rfl,
+      OddOrder.Peterfalvi.S03.characterKernel_conj]
+    exact hker
+  · rw [hφeq]
+    simpa using ClassFunction.induce_conj ((hyp.typeI.typeF.H).subgroupOf L)
+      (θ : ClassFunction ↥((hyp.typeI.typeF.H).subgroupOf L) ℂ)
+
+open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
+/-- **`S(H′)` member differences map into `ℤ[Irr G]`** — the `hZIrr` input for the subfamily
+`coherent_of_constant_degree`.  `hab`-free mirror of `Sset_tau_diff_mem_ZIrr` via
+`SsubFiltration_commutator_diff_supported`; irreducibility is inherited from `Sset`. -/
+theorem SsubFiltration_commutator_tau_diff_mem_ZIrr [Finite G] {L : Subgroup G} (hyp : Hypothesis L)
+    {C : Subgroup ↥L}
+    (hfrob : OddOrder.Isaacs.Ch06.IsFrobeniusGroup ↥L ((hyp.typeI.typeF.H).subgroupOf L) C)
+    (hAH : hyp.ambientA = ((hyp.typeI.typeF.H) : Set G) \ {1})
+    {a b : ClassFunction ↥L ℂ}
+    (ha : a ∈ hyp.SsubFiltration
+      ⁅(hyp.typeI.typeF.H).subgroupOf L, (hyp.typeI.typeF.H).subgroupOf L⁆)
+    (hb : b ∈ hyp.SsubFiltration
+      ⁅(hyp.typeI.typeF.H).subgroupOf L, (hyp.typeI.typeF.H).subgroupOf L⁆) :
+    hyp.tau (a - b) ∈ ZIrr G := by
+  refine OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap_mem_ZIrr_of_supported
+    hyp.dadeData.dade hyp.hconj (SsubFiltration_commutator_diff_supported hyp hAH ha hb) ?_
+  exact Submodule.sub_mem _
+    (IrreducibleCharacter.mem_ZIrr
+      ⟨a, Sset_isIrreducibleCharacter hyp hfrob (hyp.SsubFiltration_subset_Sset ha)⟩)
+    (IrreducibleCharacter.mem_ZIrr
+      ⟨b, Sset_isIrreducibleCharacter hyp hfrob (hyp.SsubFiltration_subset_Sset hb)⟩)
+
+open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
+/-- **(5.2.d) difference image for an `S(H′)` member** — the `difference_image` field, `hab`-free
+mirror of `Sset_differenceImage` via `SsubFiltration_commutator_diff_supported` and the subfamily
+conjugation-closure. -/
+noncomputable def SsubFiltration_commutator_differenceImage [Finite G] {L : Subgroup G}
+    (hyp : Hypothesis L) (hodd : Odd (Nat.card ↥L)) {C : Subgroup ↥L}
+    (hfrob : OddOrder.Isaacs.Ch06.IsFrobeniusGroup ↥L ((hyp.typeI.typeF.H).subgroupOf L) C)
+    (hAH : hyp.ambientA = ((hyp.typeI.typeF.H) : Set G) \ {1})
+    {χ : ClassFunction ↥L ℂ}
+    (hχ : χ ∈ hyp.SsubFiltration
+      ⁅(hyp.typeI.typeF.H).subgroupOf L, (hyp.typeI.typeF.H).subgroupOf L⁆) :
+    OddOrder.Peterfalvi.S07.CharacterDifferenceImage hyp.tau χ :=
+  OddOrder.Peterfalvi.S07.dadeCharacterDifferenceImageOfDiff hyp.dadeData.dade hyp.hconj
+    ⟨χ, Sset_isIrreducibleCharacter hyp hfrob (hyp.SsubFiltration_subset_Sset hχ)⟩
+    (Sset_hasNoRealCharacters hyp hodd hfrob (hyp.SsubFiltration_subset_Sset hχ))
+    (SsubFiltration_commutator_diff_supported hyp hAH
+      (SsubFiltration_commutator_closedUnderConjugate hyp hχ) hχ)
+
+open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
+/-- **(5.2.e) orthogonality of `S(H′)` difference images** — the `difference_images_orthogonal`
+field, `hab`-free mirror of `Sset_differenceImages_orthogonal`. -/
+theorem SsubFiltration_commutator_differenceImages_orthogonal [Finite G] {L : Subgroup G}
+    (hyp : Hypothesis L) (hodd : Odd (Nat.card ↥L)) {C : Subgroup ↥L}
+    (hfrob : OddOrder.Isaacs.Ch06.IsFrobeniusGroup ↥L ((hyp.typeI.typeF.H).subgroupOf L) C)
+    (hAH : hyp.ambientA = ((hyp.typeI.typeF.H) : Set G) \ {1})
+    {φ χ : ClassFunction ↥L ℂ}
+    (hφ : φ ∈ hyp.SsubFiltration
+      ⁅(hyp.typeI.typeF.H).subgroupOf L, (hyp.typeI.typeF.H).subgroupOf L⁆)
+    (hχ : χ ∈ hyp.SsubFiltration
+      ⁅(hyp.typeI.typeF.H).subgroupOf L, (hyp.typeI.typeF.H).subgroupOf L⁆)
+    (h1 : ClassFunction.inner φ χ = 0) (h2 : ClassFunction.inner φ χ.conj = 0) :
+    (SsubFiltration_commutator_differenceImage hyp hodd hfrob hAH hφ).Orthogonal
+      (SsubFiltration_commutator_differenceImage hyp hodd hfrob hAH hχ) := by
+  have hφc := SsubFiltration_commutator_closedUnderConjugate hyp hφ
+  have hχc := SsubFiltration_commutator_closedUnderConjugate hyp hχ
+  have hφS := hyp.SsubFiltration_subset_Sset hφ
+  have hχS := hyp.SsubFiltration_subset_Sset hχ
+  have hφcS := hyp.SsubFiltration_subset_Sset hφc
+  have hχcS := hyp.SsubFiltration_subset_Sset hχc
+  refine OddOrder.Peterfalvi.S07.CharacterDifferenceImage.orthogonal_of_signedDifference_inner_eq_zero
+    _ _ ?_
+  rw [← (SsubFiltration_commutator_differenceImage hyp hodd hfrob hAH hφ).image_conjugateDifference,
+      ← (SsubFiltration_commutator_differenceImage hyp hodd hfrob hAH hχ).image_conjugateDifference]
+  show ClassFunction.inner (hyp.tau (φ - φ.conj)) (hyp.tau (χ - χ.conj)) = 0
+  rw [SsubFiltration_commutator_tau_isometry_diff hyp hAH hφ hφc hχ hχc]
+  have hne1 : φ.conj ≠ χ := by
+    intro heq
+    have hcc : χ.conj = φ := by rw [← heq, ClassFunction.conj_conj]
+    rw [hcc, Sset_inner_self_eq_one hyp hfrob hφS] at h2
+    exact one_ne_zero h2
+  have hne2 : φ.conj ≠ χ.conj := by
+    intro heq
+    have hpc : φ = χ := by
+      have h := congrArg ClassFunction.conj heq
+      rwa [ClassFunction.conj_conj, ClassFunction.conj_conj] at h
+    rw [hpc, Sset_inner_self_eq_one hyp hfrob hχS] at h1
+    exact one_ne_zero h1
+  rw [ClassFunction.inner_sub_left, ClassFunction.inner_sub_right, ClassFunction.inner_sub_right,
+    h1, h2, Sset_pairwiseOrthogonal hyp hodd hfrob hφcS hχS hne1,
+    Sset_pairwiseOrthogonal hyp hodd hfrob hφcS hχcS hne2]
+  ring
+
+open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
 /-- **Peterfalvi (12.6) case (b): abelian rank-2 kernel → equal-degree coherence (5.7).**
 When `H = L_F` is abelian (Def (8.3) case (b)), every `θ ∈ Irr H` is linear, so every member
 `Ind_H^L θ ∈ S` has the same degree `[L:H]`; `S` is then coherent by (5.7).  The witness
