@@ -39,6 +39,16 @@ instance instMul : Mul (ClassFunction G k) where
 
 @[simp] theorem mul_apply (φ ψ : ClassFunction G k) (g : G) : (φ * ψ) g = φ g * ψ g := rfl
 
+/-- Restriction to a subgroup is multiplicative for the pointwise product. -/
+@[simp] theorem restrict_mul (H : Subgroup G) (φ ψ : ClassFunction G k) :
+    restrict H (φ * ψ) = restrict H φ * restrict H ψ := by
+  ext h; simp
+
+/-- Pullback along a group homomorphism is multiplicative for the pointwise product. -/
+@[simp] theorem compHom_mul {K : Type*} [Group K] (f : K →* G) (φ ψ : ClassFunction G k) :
+    compHom f (φ * ψ) = compHom f φ * compHom f ψ := by
+  ext x; simp
+
 end ClassFunction
 
 variable {G : Type*} [Group G]
