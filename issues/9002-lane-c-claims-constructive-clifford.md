@@ -41,13 +41,33 @@ module-theoretic Clifford core (orbit transitivity)、3-5 セッション」と�
   - (1.5.a) `(Res_H φ,1_H)=0` + (1.2) → 台 A(L)∪{1}。
   - 非実 = 奇数位数 (`not_isReal_of_ne_trivial_of_odd_card'` 既存)。
 
-## やること
+## 精査確定 (2026-07-02): landed vs missing の正確な境界
 
-- [ ] Pf (1.7) 一般 mult-one 等次数 Ind 分解が landed か精査 (CliffordMultiplicityOne/InducedIrreducible)。
-      無ければ generic shared leaf (`OddOrder/GroupTheory/RepresentationTheory/` or Pf §3
-      `S03_PreliminaryCharacter`) で build。
-- [ ] (8.2.c) inertia bound + (1.5.a)/(1.2) 台 argument を §8/§14 で assemble。
-- [ ] `typeI_induced_char_constituents` (S14:398) を sorry-free 化。lane b (12.14) は cite。
+**landed (在庫、cite 可)**:
+- `CliffordSingleOrbit.restrictionConstituentsSingleOrbit_of_isIrreducible` (Res χ 構成要素=単一 orbit)。
+- `InducedIrreducible.isIrreducibleCharacter_induce_of_inertia_eq` ([Is] 6.34: I(θ)=H → Ind θ 既約)。
+- `InducedIrreducible.card_mul_inner_self_induce_eq_card_inertia` (⟨Ind θ,Ind θ⟩=[I:H])。
+- `InducedIrreducible.{sum_div_normSq_induce_image_eq, apply_one_eq_sum_restrictionMultiplicity_mul,
+  card_filter_induce_eq_index_inertia}` (Pf (6.2) orbit-count/degree apparatus)。
+- `S14.typeF_inertia_inf_le_U1` (8.2.c: I(θ)∩U⊆U₁, proven)。`frobenius_induce_char_singleton` (Frobenius 既約)。
+
+**missing (generic char、要 build — Isaacs §6/§11、repo 未収録)**:
+- **(G1) 指標拡張**: θ∈Irr H を I=I_L(θ) に拡張 (I/H cyclic ⟹ 拡張存在、[Is] 6.28/11.22 coprime 版)。
+- **(G2) Gallagher** ([Is] 6.17): θ が I 上拡張 θ̃ を持てば Irr(I|θ)={θ̃·β: β∈Irr(I/H)}、⟨Res_H(θ̃β),θ⟩=β(1)。
+- **(G3) mult-free 判定**: I/H **abelian** ⟹ Ind_H^L θ は multiplicity-free、構成要素は [I:H] 個・全て
+  等次数 [L:I]·θ(1) (Clifford correspondence [Is] 6.11 で Irr(I|θ)↔Irr(L|θ) + G2 で β(1)=1)。
+
+## やること (bottom-up、generic は shared leaf)
+
+- [ ] **(G1) 拡張 lemma** を build (`OddOrder/GroupTheory/RepresentationTheory/` 新/既存 leaf)。coprime
+      Hall (H=L_F normal Hall, U abelian complement) の下で I/H cyclic → θ 拡張。
+- [ ] **(G2) Gallagher** + **(G3) mult-free-from-abelian-inertia** を build (同 leaf)。core generic 補題。
+- [ ] **type-F 適用**: (8.2.c) I(θ)∩U⊆U₁⊆U(abelian) ⟹ I(θ)/H abelian → (G3) 適用。
+- [ ] **(1.5.a)/(1.2) 台**: 各構成要素 φ の台 ⊆ A(L)∪{1}。非実 = 奇数位数 (`not_isReal_of_ne_trivial_of_odd_card'`)。
+- [ ] `typeI_induced_char_constituents` (S14:398) を上記 cite で sorry-free 化。lane b (12.14) は cite。
+
+**性質**: genuine multi-session char build (G1-G3 は Isaacs §6/§11 の generic char theory で repo 未収録)。
+Frobenius sub-case は proven ゆえ witness (12.16) 経路は現状も通る; 本 issue は一般 (12.14) 用の shared infra。
 
 ## 完了条件
 
