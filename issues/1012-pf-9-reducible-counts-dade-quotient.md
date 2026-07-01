@@ -1685,3 +1685,33 @@ witness s∈Xθ∖Xmu → Ind_M(s) irr ⟺ hIM。∴ 残 = parity の 2 入力�
 → hIM 抽出 → hcZeta_exists_irreducible_sOf**。oXtheta numerator + endpoint は landed、残は
 (E)+Xmu-count の fresh Clifford 単位 (deep でないが substantial、reducible-count infra と接続)。
 次 iteration の着手 = Xmu (constant factor-data) の定義 + count + (E)。
+
+## ★ conjunct c の残 gate 精密確定 (Coq PFsection9:992-1108 精読, 2026-07-01 cont.⁸)
+
+**私の oXtheta_count + exists_regular_not_reducible_of_odd は Coq の Xtheta/oXtheta/eqVproper と
+EXACT 一致確認** (Coq-first 精読):
+- Coq `Xtheta := [set cfIirr('Ind[HU] chi_t)]` (L954) = **HU-level** ⟹ 私の Xθ (HU-level) 正しい ✓。
+- `oXtheta: u·#|Xtheta|=p.-1^q` (L955) = 私の `oXtheta_count` ✓。
+- `Xmu ⊆ Xtheta` の `eqVproper` (L1083-1108): equality→u=(p-1)^{q-1} even vs u odd 矛盾 /
+  proper→∃s∉Xmu→`contraR ... red_Ind_s` で Ind_M(s) irr = 私の `exists_regular_not_reducible_of_odd` ✓。
+
+**残 gate = |Xmu|=p-1 で、Coq は Xmu を constant factor-data で構成** (`mu_f i:=[ffun w=>if w∈W1bar
+then i else 0]`, `Xmu:=[set cfIirr(mk_mu i)|i in predC1 0]`, `|Xmu|=cardC1·card_Iirr_abelian=p-1`,
+L1047/1071/1108)。これは **W₁-orbit 構造 (bigdprod over W1bar)** に依存:
+- `sW1_Imu` (L996): constant data は W₁-stable (`I_M ⊇ W₁`)。
+- `def_IXmu` (L1048): I_M(chi_s)=M for s∈Xmu (M-fixed→Ind_M reducible)。
+- surjectivity (`Dmu: Smu=mu_`, L1073): |Smu|=p-1=|mu_|(reducible_count) + Smu⊆mu_ ⟹ 全 reducible が
+  constant-data の Ind。∴ |Xmu|=p-1 は constant 構成が本質 (単なる injective では |Xmu|≤p-1 止まり)。
+
+**⟹ conjunct c は `CliffordCaseAData.W1_transitive_on_parts` の DE-OPACIFY に gated** (現状 opaque
+`Prop:=True`)。W₁ が q factor を q-cycle で置換する構造を **usable field 化** (orbit generator S₀ +
+act.φ(w)•S₀ の W₁-indexing + W₁-transitivity lemma) しないと constant factor-data (= 各 factor に同一
+H1-char) が canonical に定義できない (factor 間の canonical iso が W₁-transitivity 由来)。producer =
+`chiefFactor_clifford_U_dichotomy` case-a 枝 (S₀ の W₁-orbit で Hpart 構成、transitivity は construction
+に implicit だが field 化されてない)。
+
+**利用可能 Clifford infra (landed)**: `card_smul_restrict_induce` (|H|•Res(Ind)=∑conjBy)、
+`induce_injective_of_inertia_stable` (M-fixed→Ind injective)、`induce_eq_induce_iff_conj`、
+`card_mul_inner_self_induce_eq_card_inertia`。⟹ def_IXmu/ResIndXmu/Smu=mu_/(E) の wiring は
+これらで組める。**本体 = W₁-transitivity de-opacify (structure+producer refactor、substantial upstream)**。
+次着手 = CliffordCaseAData に orbit 構造 field 追加 + producer refactor + W₁-transitivity lemma。
