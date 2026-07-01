@@ -10,6 +10,7 @@ import OddOrder.GroupTheory.IsExtraspecial
 import OddOrder.GroupTheory.PRank
 import OddOrder.GroupTheory.FrattiniPGroup
 import OddOrder.GroupTheory.RepresentationTheory.SingerField
+import OddOrder.GroupTheory.RepresentationTheory.LineScalarCharacter
 import OddOrder.BG.Ch1_Preliminary.OperatorMaschke
 
 /-!
@@ -283,32 +284,9 @@ private theorem card_dvd_of_injective_to_cyclic_forall_pow {C : Type*}
   rw [(orderOf_eq_card_of_forall_mem_zpowers hg).symm]
   exact orderOf_dvd_of_pow_eq_one (hKn g)
 
-open scoped Classical in
-/-- **A faithful representation of a cyclic `p'`-group `K` on a `1`-dimensional `𝔽_p`-space
-has `|K| ∣ p - 1`** (the reducible / split-torus case of route B).  Every endomorphism of a line
-is a homothety, so `K ↪ (ℤ/p)ˣ`, of order `p - 1`. -/
-private theorem card_dvd_sub_one_of_faithful_one_dim {V : Type*}
-    [AddCommGroup V] [Module (ZMod p) V] [Finite V]
-    (ρ : Representation (ZMod p) K V) (hfaith : Function.Injective ρ)
-    (hdim : Module.finrank (ZMod p) V = 1) : Nat.card K ∣ p - 1 := by
-  haveI : Nontrivial V := Module.nontrivial_of_finrank_eq_succ hdim
-  haveI : Module.Finite (ZMod p) V := Module.Finite.of_finite
-  have hsurj : Function.Surjective (algebraMap (ZMod p) (Module.End (ZMod p) V)) := fun u => by
-    obtain ⟨c, hc, -⟩ := LinearMap.existsUnique_eq_smul_id_of_finrank_eq_one hdim u
-    exact ⟨c, by rw [Algebra.algebraMap_eq_smul_one, hc, Module.End.one_eq_id]⟩
-  let eRing : ZMod p ≃+* Module.End (ZMod p) V :=
-    RingEquiv.ofBijective _ ⟨(algebraMap (ZMod p) (Module.End (ZMod p) V)).injective, hsurj⟩
-  let ψ : K →* (ZMod p)ˣ :=
-    (Units.mapEquiv eRing.toMulEquiv).symm.toMonoidHom.comp (MonoidHom.toHomUnits ρ)
-  have hψinj : Function.Injective ψ := fun a b hab => by
-    apply hfaith
-    have h1 : (MonoidHom.toHomUnits ρ) a = (MonoidHom.toHomUnits ρ) b :=
-      (Units.mapEquiv eRing.toMulEquiv).symm.injective (by simpa [ψ] using hab)
-    simpa using congrArg Units.val h1
-  calc Nat.card K = Nat.card ψ.range := Nat.card_congr (MonoidHom.ofInjective hψinj).toEquiv
-    _ ∣ Nat.card (ZMod p)ˣ := Subgroup.card_subgroup_dvd_card _
-    _ = p - 1 := by
-        rw [Nat.card_eq_fintype_card, ZMod.card_units_eq_totient, Nat.totient_prime (Fact.out)]
+/- The split-torus bound `|K| ∣ p − 1` for a faithful line action (route B, reducible case) is the
+generic `OddOrder.RepresentationTheory.card_dvd_sub_one_of_faithful_line` of `LineScalarCharacter`
+(every endomorphism of a line is a homothety, so `K ↪ (ℤ/p)ˣ`); it is cited directly below. -/
 
 open OddOrder.BG.Ch1_Preliminary
 open OddOrder.Isaacs.Ch04.OddOrder.Isaacs.Ch03.IsAInvariant (quotientMulAutHom quotientMulAutHom_apply)
@@ -508,7 +486,8 @@ theorem card_dvd_succ_of_primeAction_extraspecial (hodd : Odd p)
         have := congrArg Subtype.val hfix
         simpa [Subrepresentation.toRepresentation, LinearMap.restrict_coe_apply] using this
       exact hfpfρ (b⁻¹ * a) hba w hfixV
-    exact hndvd (card_dvd_sub_one_of_faithful_one_dim W.toRepresentation hfaithW hWdim)
+    exact hndvd (OddOrder.RepresentationTheory.card_dvd_sub_one_of_faithful_line
+      W.toRepresentation hWdim hfaithW)
   -- Singer realization: `V ≅ 𝔽_{p²}` with `μ : K ↪ 𝔽_{p²}ˣ`.
   have hcommK : ∀ a b : K, a * b = b * a := fun a b =>
     commutative_of_cyclic_center_quotient (MonoidHom.id K)
