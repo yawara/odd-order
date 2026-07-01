@@ -2546,6 +2546,37 @@ theorem SsubFiltration_closedUnderConjugate [Finite G] {L : Subgroup G} (hyp : H
       (θ : ClassFunction ↥((hyp.typeI.typeF.H).subgroupOf L) ℂ)
 
 open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
+/-- **Every filtration level `S(A)` has no real characters** — the no-real input of
+`exists_coherentBreakPair` (h56).  Each `S(A)` member is a non-real `Sset` member. -/
+theorem SsubFiltration_hasNoRealCharacters [Finite G] {L : Subgroup G} (hyp : Hypothesis L)
+    (hodd : Odd (Nat.card ↥L)) {C : Subgroup ↥L}
+    (hfrob : OddOrder.Isaacs.Ch06.IsFrobeniusGroup ↥L ((hyp.typeI.typeF.H).subgroupOf L) C)
+    (A : Subgroup ↥L) :
+    OddOrder.Peterfalvi.S03.HasNoRealCharacters (hyp.SsubFiltration A) := by
+  intro χ hχ
+  exact Sset_hasNoRealCharacters hyp hodd hfrob (hyp.SsubFiltration_subset_Sset hχ)
+
+open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
+/-- **`S(A)` contains a member of degree `|L:K|`** (the anchor `χ₁` of the (6.2) index bound).  When
+`K/(A.subgroupOf K)` is not perfect, it has a nontrivial degree-`1` character trivial on `A`
+(`exists_irreducibleCharacter_ne_trivial_subset_kernel_of_commutator_ne_top`); its induction
+`Ind_K^L θ ∈ S(A)` has degree `|L:K|·1 = |L:K|` (`induce_apply_one`). -/
+theorem exists_mem_SsubFiltration_degree_index [Finite G] {L : Subgroup G} (hyp : Hypothesis L)
+    {A : Subgroup ↥L} [A.Normal]
+    (h : commutator (↥((hyp.typeI.typeF.H).subgroupOf L) ⧸
+      A.subgroupOf ((hyp.typeI.typeF.H).subgroupOf L)) ≠ ⊤) :
+    ∃ φ, φ ∈ hyp.SsubFiltration A ∧
+      φ 1 = (((hyp.typeI.typeF.H).subgroupOf L).index : ℂ) := by
+  haveI := hyp.finiteG
+  haveI : (A.subgroupOf ((hyp.typeI.typeF.H).subgroupOf L)).Normal := (‹A.Normal›).subgroupOf _
+  obtain ⟨θ, hθne, hθker, hθdeg⟩ :=
+    OddOrder.Peterfalvi.S08.exists_irreducibleCharacter_ne_trivial_subset_kernel_of_commutator_ne_top
+      (A.subgroupOf ((hyp.typeI.typeF.H).subgroupOf L)) h
+  refine ⟨ClassFunction.induce ((hyp.typeI.typeF.H).subgroupOf L) θ.toClassFunction, ?_, ?_⟩
+  · simp only [Hypothesis.SsubFiltration, Set.mem_setOf_eq]; exact ⟨θ, hθne, hθker, rfl⟩
+  · rw [ClassFunction.induce_apply_one, hθdeg, mul_one]
+
+open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
 open OddOrder.Peterfalvi.S09.Cert in
 /-- **`S(H′)` member differences are `A(L)`-supported** — the `hab`-free subfamily analogue of
 `Sset_diff_supported` for the (6.5.c) `hcoh`.  Members of `S(⁅K,K⁆)` vanish off `H` (as `Sset`
