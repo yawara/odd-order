@@ -1958,6 +1958,24 @@ theorem Sset_tau_diff_mem_ZIrr [Finite G] {L : Subgroup G} (hyp : Hypothesis L) 
     (IrreducibleCharacter.mem_ZIrr ⟨a, Sset_isIrreducibleCharacter hyp hfrob ha⟩)
     (IrreducibleCharacter.mem_ZIrr ⟨b, Sset_isIrreducibleCharacter hyp hfrob hb⟩)
 
+open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
+/-- **Peterfalvi (5.2.d) difference image for a witness member** — the `difference_image` field of the
+`S07.Hypothesis`.  Each `χ ∈ S` is a non-real irreducible (`Sset_isIrreducibleCharacter`,
+`Sset_hasNoRealCharacters`) whose conjugate-difference `χ̄ − χ` is `A(L)`-supported
+(`Sset_diff_supported`), so the genuine Dade map sends `χ − χ̄` to a signed difference of two
+irreducibles of `G` (`dadeCharacterDifferenceImageOfDiff`). -/
+noncomputable def Sset_differenceImage [Finite G] {L : Subgroup G} (hyp : Hypothesis L)
+    (hodd : Odd (Nat.card ↥L)) {C : Subgroup ↥L}
+    (hfrob : OddOrder.Isaacs.Ch06.IsFrobeniusGroup ↥L ((hyp.typeI.typeF.H).subgroupOf L) C)
+    (hab : IsMulCommutative ↥hyp.typeI.typeF.H)
+    (hAH : hyp.ambientA = ((hyp.typeI.typeF.H) : Set G) \ {1})
+    {χ : ClassFunction ↥L ℂ} (hχ : χ ∈ hyp.Sset) :
+    OddOrder.Peterfalvi.S07.CharacterDifferenceImage hyp.tau χ :=
+  OddOrder.Peterfalvi.S07.dadeCharacterDifferenceImageOfDiff hyp.dadeData.dade hyp.hconj
+    ⟨χ, Sset_isIrreducibleCharacter hyp hfrob hχ⟩
+    (Sset_hasNoRealCharacters hyp hodd hfrob hχ)
+    (Sset_diff_supported hyp hab hAH (Sset_closedUnderConjugate hyp hχ) hχ)
+
 /-- **Peterfalvi (12.6) case (b): abelian rank-2 kernel → equal-degree coherence (5.7).**
 When `H = L_F` is abelian (Def (8.3) case (b)), every `θ ∈ Irr H` is linear, so every member
 `Ind_H^L θ ∈ S` has the same degree `[L:H]`; `S` is then coherent by (5.7), built Dade-compatibly
