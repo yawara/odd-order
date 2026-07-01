@@ -735,25 +735,6 @@ theorem conjClassSet_sigmaSharp_disjoint_of_nonconjugate [Finite G]
     (OddOrder.BG.Ch4.S14.conjClassSet_Mtilde_disjoint hG
       (OddOrder.BG.Ch4.S14.genuineSigmaDecomposition hG) hL1 hL2 hnc)
 
-open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
-/-- **Tight Dade-image support (pinned)**: the difference image `τ(φ − φ̄)` of a constituent `φ ∈ S(χ)`
-is supported in the **`(L_F)^#`-conjugates** `𝒞_G((L_F)^#) = conjClassSet (sigmaSharp L)`.
-
-This is the *sharp* (A₁-based) refinement of the (8.18.c) support statement: the constituents of
-`χ = Ind_{L_F}^L θ` vanish off the normal kernel `L_F` (`induce_eq_zero_of_not_mem_normal`), so
-`supp(φ − φ̄) ⊆ (L_F)^# = A₁(L)` (tighter than the `data.supported` bound `A(L) = typeIA L`); then
-`τ` restricted to the `A₁`-supported lattice (§4 `Hypothesis.restrict`) lands in the thickened
-`A₁`-domain `Ã₁(L) ⊆ 𝒞_G((L_F)^#)`.  This *sharp* form (unlike the `A`-based `dadeSupport = Ã(L)`,
-whose disjointness is only the mixed (8.18.c) `Ã₁ ∩ Ã`) is Frobenius-free and pairs with
-`conjClassSet_sigmaSharp_disjoint_of_nonconjugate` to give the (8.18.c) orthogonality.  Residual §4
-Dade obligation (hub issue 9003 Cluster B): the tight constituent support + the `restrict` vanishing. -/
-theorem diffImage_support_subset_conjClassSet_sigmaSharp [Finite G] {L : Subgroup G}
-    (hyp : Hypothesis L) {chi : ClassFunction ↥L ℂ} (data : CharacterDecompositionData hyp chi)
-    {φ : IrreducibleCharacter ↥L} (hφ : φ ∈ data.constituents) :
-    (hyp.tau ((φ : ClassFunction ↥L ℂ) - (φ : ClassFunction ↥L ℂ).conj)).support ⊆
-      conjClassSet (OddOrder.BG.Ch4.S14.sigmaSharp L) := by
-  sorry
-
 /-- The difference `φ − φ̄` of a constituent is supported in `A(L)` (each constituent is supported in
 `A(L) ∪ {1}` by `data.supported`, and `(φ − φ̄)(1) = 0` by equal degree — `φ(1)` is real). -/
 theorem constituentDiff_support_subset {L : Subgroup G} {hyp : Hypothesis L}
@@ -779,8 +760,21 @@ theorem constituentDiff_support_subset {L : Subgroup G} {hyp : Hypothesis L}
     exact hx0 (by rw [ClassFunction.sub_apply, ClassFunction.conj_apply, hd, star_natCast, sub_self])
 
 open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
+/-- **Peterfalvi (8.18.c) difference-image orthogonality** (pinned; the geometric obligation of
+(12.3)).  For non-conjugate type-I maximals `L1, L2` and constituents `φ_i`, the Dade difference
+images `τ_i(φ_i − φ̄_i)` are orthogonal.
+
+**This is a genuine §8 support-theory obligation** — NOT a simple disjoint-support argument on the
+`A`-based Dade domains `Ã(L_i)`.  Peterfalvi's proof uses (8.18.c) in the **mixed asymmetric** form
+`Ã₁(L₁) ∩ Ã(L₂) = ∅` (or the swap; `Ã₁ =` thickened `(L_F)^#`, `Ã =` thickened `A(L) = typeIA`) via
+the (8.13)/(8.17) support theory: a *full* member `χ₂ = Ind_{L₂_F}^{L₂} θ₂` is supported on the
+**normal** `L₂_F` so `(χ₂−χ̄₂)^{τ₂} ⊆ Ã₁(L₂)`, while a *constituent* image is only `Ã(L₁)`-supported.
+Crucially the (12.16) callers apply this with `L₁` **Frobenius** (so `A(L₁)=A₁(L₁)`) and `L₂ = N`
+**non-Frobenius** (`(12.15)`: `N` is not Frobenius), so the two supports are genuinely `Ã₁`-vs-`Ã`
+and a symmetric `A₁`-only argument is *false*.  The clean M̃ piece
+`conjClassSet_sigmaSharp_disjoint_of_nonconjugate` (proven above) gives only the `Ã₁ ∩ Ã₁` part;
+the mixed `Ã₁ ∩ Ã` needs the full (8.18)/(8.13.c)/(8.17) machinery.  Hub issue 9003 Cluster B. -/
 theorem nonconjugate_diffImage_inner_zero {L1 L2 : Subgroup G} [Finite G]
-    (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     (hyp1 : Hypothesis L1) (hyp2 : Hypothesis L2)
     (hnot_conj : ¬ ∃ g : G, MulAut.conj g • L1 = L2)
     {chi1 : ClassFunction ↥L1 ℂ} (data1 : CharacterDecompositionData hyp1 chi1)
@@ -790,15 +784,7 @@ theorem nonconjugate_diffImage_inner_zero {L1 L2 : Subgroup G} [Finite G]
     ClassFunction.inner
         (hyp1.tau ((φ1 : ClassFunction ↥L1 ℂ) - (φ1 : ClassFunction ↥L1 ℂ).conj))
         (hyp2.tau ((φ2 : ClassFunction ↥L2 ℂ) - (φ2 : ClassFunction ↥L2 ℂ).conj)) = 0 := by
-  -- Each difference image is supported in `𝒞_G((L_i)_F^#)` (`diffImage_support_subset_...`); those
-  -- are disjoint for non-conjugate `L1, L2` (`conjClassSet_sigmaSharp_disjoint_...`).
-  apply ClassFunction.inner_eq_zero_of_disjoint_support
-  refine Set.disjoint_left.mpr fun z hz1 hz2 => ?_
-  have hzd1 := diffImage_support_subset_conjClassSet_sigmaSharp hyp1 data1 hφ1 hz1
-  have hzd2 := diffImage_support_subset_conjClassSet_sigmaSharp hyp2 data2 hφ2 hz2
-  exact Set.disjoint_left.mp
-    (conjClassSet_sigmaSharp_disjoint_of_nonconjugate hG hyp1.maximal hyp2.maximal hnot_conj)
-    hzd1 hzd2
+  sorry
 
 open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
 /-- **Peterfalvi (12.3)**: for non-conjugate type-I maximal subgroups `L₁, L₂`, the families
@@ -811,7 +797,7 @@ differences `⟨(φ₁−φ̄₁)^{τ₁}, (φ₂−φ̄₂)^{τ₂}⟩ = 0` (`i
 obligation `nonconjugate_diffImage_inner_zero` ((8.18.c): the supports lie in disjoint `Ã(L₁)`,
 `Ã₁(L₂)`). -/
 theorem nonconjugate_typeI_R_orthogonal {L1 L2 : Subgroup G} [Finite G]
-    (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
     (hyp1 : Hypothesis L1) (hyp2 : Hypothesis L2)
     (hnot_conj : ¬ ∃ g : G, MulAut.conj g • L1 = L2)
     {chi1 : ClassFunction ↥L1 ℂ} (data1 : CharacterDecompositionData hyp1 chi1)
@@ -825,7 +811,7 @@ theorem nonconjugate_typeI_R_orthogonal {L1 L2 : Subgroup G} [Finite G]
   rw [← OddOrder.Peterfalvi.S07.CharacterDifferenceImage.image_eq_signedDifference
         (R1cdi data1 hφ1),
     ← OddOrder.Peterfalvi.S07.CharacterDifferenceImage.image_eq_signedDifference (R1cdi data2 hφ2)]
-  exact nonconjugate_diffImage_inner_zero hG hyp1 hyp2 hnot_conj data1 hφ1 data2 hφ2
+  exact nonconjugate_diffImage_inner_zero hyp1 hyp2 hnot_conj data1 hφ1 data2 hφ2
 
 open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
 /-- **Peterfalvi (12.4)/(12.5) input**: each member `χ = Ind_H^L θ` of `S` vanishes on `L − H`.
