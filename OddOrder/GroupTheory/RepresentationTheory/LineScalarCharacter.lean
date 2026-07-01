@@ -7,6 +7,7 @@ import Mathlib.RepresentationTheory.Basic
 import Mathlib.LinearAlgebra.Dimension.Free
 import Mathlib.Data.ZMod.Units
 import Mathlib.FieldTheory.Finite.Basic
+import Mathlib.FieldTheory.Finiteness
 
 /-!
 # The scalar character of a line (a `1`-dimensional `𝔽_p`-representation)
@@ -99,5 +100,20 @@ theorem card_dvd_sub_one_of_faithful_line [Finite U] (ρ : Representation (ZMod 
     _ ∣ Nat.card (ZMod p)ˣ := Subgroup.card_subgroup_dvd_card _
     _ = p - 1 := by
         rw [Nat.card_eq_fintype_card, ZMod.card_units_eq_totient, Nat.totient_prime Fact.out]
+
+/-- **An `𝔽_p`-module of cardinality `p` is a line** (`finrank = 1`).  The bridge from the
+concrete "block has order `p`" that a caller (e.g. the Pf (9.7)(a) imprimitive block decomposition)
+has, to the `finrank = 1` hypothesis of `lineScalarChar`. -/
+theorem finrank_eq_one_of_card_eq_prime {p : ℕ} [Fact p.Prime] {V : Type*}
+    [AddCommGroup V] [Module (ZMod p) V] [Finite V] (hcard : Nat.card V = p) :
+    Module.finrank (ZMod p) V = 1 := by
+  haveI : NeZero p := ⟨(Fact.out : p.Prime).pos.ne'⟩
+  haveI : Module.Finite (ZMod p) V := Module.Finite.of_finite
+  have hcardZ : Nat.card (ZMod p) = p := by rw [Nat.card_eq_fintype_card, ZMod.card]
+  have hpow : Nat.card V = Nat.card (ZMod p) ^ Module.finrank (ZMod p) V :=
+    Module.natCard_eq_pow_finrank
+  rw [hcard, hcardZ] at hpow
+  have h1 : p ^ 1 = p ^ Module.finrank (ZMod p) V := by rw [pow_one]; exact hpow
+  exact (Nat.pow_right_injective (Fact.out : p.Prime).two_le h1).symm
 
 end OddOrder.RepresentationTheory

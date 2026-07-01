@@ -147,6 +147,13 @@ structural 入力。
       `card_le_cyclotomicQuotient_of_faithful_fpf`、sorry-free)。IsSimpleModule で case-split:
       Galois 分岐は完全証明 (SingerLineBound)、non-Galois 分岐は `hReducible` hypothesis
       (caller が imprimitive engine で discharge)。
+- [x] **step 3b: module-level 一発 entry (2026-07-02)** — **DONE** (`TypePGaloisUBound.lean`,
+      `card_le_cyclotomicQuotient_of_blocks`、sorry-free): order-p subrepresentation family +
+      hconst → `|U|≤(p^(n+1)−1)/(p−1)`。`lineScalarChar` 抽出 + `finrank_eq_one_of_card_eq_prime`
+      (card=p→finrank=1) + `card_le_pow_of_block_scalars` + cyclotomic bridge を一本化。これで
+      `hReducible` 枝が block 分解から discharge 可能に (lane a の interface = blocks + hconst のみ)。
+      **σ-theory generic u_bound engine は本 commit で完成** (Galois/non-Galois 両分岐 + module-level
+      entry)。残 = lane a の type-P block 分解 (`Hbar=⊕H1^w`) + hconst (=C=1 Frobenius) の供給のみ。
 
 ## 📣 lane a 向け cite signature (hub 裁定「typeP_Galois を再実装せず本 leaf を cite」)
 
@@ -158,10 +165,15 @@ OddOrder.GroupTheory.RepresentationTheory.TypePGaloisUBound` で全て入る:
   非 Galois 分岐 `hReducible` は下記 engine で discharge。
 - **Galois 分岐** (直接も使える): `card_le_cyclotomicQuotient_of_faithful_irreducible_fpf`
   (`|U|∣(p^q−1)/(p−1)`) / `card_le_cyclotomicQuotient_of_faithful_irreducible_fpf` の ≤ 形。
-- **非 Galois engine**: `card_le_cyclotomicQuotient_of_injective_imprimitive` —
-  imprimitive ratio embedding `Ū↪Fin(q−1)→A` (|A|=a, a≤p−1) → `|U|≤(p^q−1)/(p−1)`。
-  lane a は構造的 imprimitivity (Hbar=⊕H1^w、psi injectivity、a∣p−1=SingerField|M|=p) を
-  組んで本 engine に渡す (W₁ 依存部)。
+- **非 Galois engine (module-level 一発 entry, 推奨)**: `card_le_cyclotomicQuotient_of_blocks` —
+  order-p subrepresentation family `B : Fin(n+1)→Subrepresentation ρ` (各 `Nat.card=p` = block H1^w)
+  + `hconst` (nonidentity で全 block 同一 scalar 無し = C_U(M)=1 mod scalars) → `|U|≤(p^(n+1)−1)/(p−1)`。
+  lane a は **block subrepresentation と hconst のみ供給** — scalar 抽出 (`lineScalarChar`)・ratio embedding・
+  finrank=1 (`finrank_eq_one_of_card_eq_prime`)・算術は本 leaf discharge。`card_le_cyclotomicQuotient_of_faithful_fpf`
+  の `hReducible` 枝はこれで discharge (`hReducible := fun _ => card_le_cyclotomicQuotient_of_blocks …`)。
+- **非 Galois engine (low-level, φ 直接供給)**: `card_le_cyclotomicQuotient_of_injective_imprimitive` —
+  imprimitive ratio embedding `Ū↪Fin(q−1)→A` (|A|=a, a≤p−1) → `|U|≤(p^q−1)/(p−1)`。block を自前で
+  φ family 化したい場合。
 - **block scalar φ_i + a∣p−1**: `RepresentationTheory.lineScalarChar ρ_i hdim_i : U →* (ZMod p)ˣ`
   (`LineScalarCharacter`) = block i (1-dim 𝔽_p-line) 上の scalar character。`lineScalarChar_smul`
   (`ρ u x = φ u • x`) で hconst を scalar 等式に変換、`card_dvd_sub_one_of_faithful_line` で
