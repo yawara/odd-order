@@ -1752,3 +1752,20 @@ Quot.sound])。(12.6) 3 case のうち (b)(loop⁶⁷ 9ba65c40)・(c) が完了�
 **次 frontier (loop⁹¹+, task 5)**: (12.11) `intersection_complement_structure` を証明 → hxH を fill
 (x∈M は P0_le_M、x∈L は mainSubgroup≤L の 5-type case-split)。その後 witness path の残 genuine gap は
 (12.10) `witness_L_frobenius`。doc-order 上流優先で (12.11)→(12.10)。
+
+## loop⁹¹: §12 witness-path gate map (issue 9003) + hxH←(12.11) 配線 (commit c43881d4)
+
+**調査結論**: β-lane の (12.6) coherence は完了。§12 下流は全て gated (issue 9003 が正本 map):
+- **Cluster A (構造)**: (12.10) `witness_L_frobenius` [sorry] が linchpin、未形式化 §8-§11
+  ((8.16)(8.6.a)(9.7.b)(10.10)(11.9.c)(11.6)) を要す。(12.11)(12.12)(hxH) は (12.10) に gated。
+- **Cluster B (幾何)**: (8.18.c) `nonconjugate_diffImage_inner_zero` [sorry] → (12.3)→(12.14/15/16)。
+  = `S10.support_mutual_exclusion` [S10:853, sorry] に gated。BG piece `conjClassSet_Mtilde_disjoint`
+  は**証明済**、欠 bridge = A1↔M̃。
+
+**次 β target (最高レバレッジ)** = `S10.support_mutual_exclusion`: BG disjoint piece 済ゆえ A1↔M̃
+bridge assembly、(8.18.c)→(12.16) 全体を unblock。Cluster A は §8-§11 大 effort (§-owning lane 検討)。
+
+**本 iter 概念的成果 (c43881d4)**: `mainSubgroup_le` (M_s ≤ M、ungated) 追加 + (12.11) を witness_H_sharp
+の上へ移動 + `hxH` を実導出化 (x∈P₀≤M ∧ x∈P₀≤L_s≤L ⟹ x∈M⊓L≤L_F、(12.11) cite)。→
+`witness_H_sharp_not_isTISubset` は body sorry-free ((12.10) 非-TI reduction 完全組立、唯一の sorry は
+cite 先の (12.11) = Peterfalvi が置く場所)。
