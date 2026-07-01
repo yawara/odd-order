@@ -5,6 +5,7 @@ Authors: Yawara Ishida
 -/
 import OddOrder.GroupTheory.RepresentationTheory.Clifford
 import OddOrder.GroupTheory.RepresentationTheory.InducedIrreducible
+import OddOrder.GroupTheory.RepresentationTheory.LinearCharacter
 
 /-!
 # Pointwise product of class functions; products of characters
@@ -149,5 +150,38 @@ theorem isIrreducibleCharacter_mul_of_unit_norm {G : Type*} [Group G] [Finite G]
     refine ⟨d, hd, ?_⟩
     simp only [ClassFunction.mul_apply, hlam1, mul_one, h1]
   exact isIrreducibleCharacter_of_inner_self_one_of_apply_one_pos hzirr hnorm hpos
+
+/-- **A linear character has unit norm at every element.**  For `χ : H →* ℂˣ` on a *finite* group,
+the value `(χ h : ℂ)` is a root of unity — `(χ h)^{|H|} = χ(h^{|H|}) = χ(1) = 1` (`pow_card_eq_one'`) —
+so `‖χ h‖ = 1` (`Complex.norm_eq_one_of_pow_eq_one`), whence `star (χ h) = (χ h)⁻¹`
+(`RCLike.inv_eq_conj`) and `(χ h) · star (χ h) = 1`.  This supplies the unit-norm hypothesis of
+`isIrreducibleCharacter_mul_of_unit_norm`, so twisting an irreducible character by the linear
+character `linearClassFunction χ` (e.g. `Inf(β)` in Gallagher's theorem) preserves irreducibility. -/
+theorem linearClassFunction_mul_star_self_eq_one {H : Type*} [Group H] [Finite H]
+    (χ : H →* ℂˣ) (h : H) :
+    (linearClassFunction χ) h * star ((linearClassFunction χ) h) = 1 := by
+  have hpow : (χ h : ℂ) ^ (Nat.card H) = 1 := by
+    rw [← Units.val_pow_eq_pow_val, ← map_pow, pow_card_eq_one', map_one, Units.val_one]
+  have hnorm : ‖(χ h : ℂ)‖ = 1 := Complex.norm_eq_one_of_pow_eq_one hpow Nat.card_pos.ne'
+  have hstar : star (χ h : ℂ) = (χ h : ℂ)⁻¹ := by
+    rw [RCLike.inv_eq_conj hnorm, starRingEnd_apply]
+  rw [linearClassFunction_apply, hstar]
+  exact mul_inv_cancel₀ (Units.ne_zero (χ h))
+
+/-- **Twisting an irreducible character by a linear character preserves irreducibility.**
+Specialization of `isIrreducibleCharacter_mul_of_unit_norm` to `lam = linearClassFunction χlin`
+(`χlin : G →* ℂˣ`): the linear character is a genuine character of unit norm
+(`linearClassFunction_mul_star_self_eq_one`) and degree one, so `χ · linearClassFunction χlin ∈
+Irr G` whenever `χ ∈ Irr G`.  This is the form used in Gallagher's theorem (`χlin = Inf(β)`). -/
+theorem isIrreducibleCharacter_mul_linearClassFunction {G : Type*} [Group G] [Finite G] [Fintype G]
+    [Invertible (Nat.card G : ℂ)] {χ : ClassFunction G ℂ} (hχ : IsIrreducibleCharacter χ)
+    (χlin : G →* ℂˣ) :
+    IsIrreducibleCharacter (χ * linearClassFunction χlin) := by
+  have hlirr : IsIrreducibleCharacter (linearClassFunction χlin) := by
+    have h := (linearIrreducibleCharacter χlin).isIrreducible
+    rwa [linearIrreducibleCharacter_coe] at h
+  refine isIrreducibleCharacter_mul_of_unit_norm hχ hlirr.isCharacter
+    (linearClassFunction_mul_star_self_eq_one χlin) ?_
+  simp
 
 end OddOrder.RepresentationTheory

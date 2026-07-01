@@ -111,10 +111,16 @@ Coq (1.7)(b) `cfInd_central_Inertia` の hypothesis は `abelian (T/H)` (T=I(θ)
       - bridge (B) `IsIrreducibleCharacter.exists_apply_one_eq_pos_natCast` (`χ(1)=正整数`)。
       - **`isIrreducibleCharacter_mul_of_unit_norm`**: `χ∈Irr` + `lam` genuine char + unit-norm (`∀g,lam g·conj=1`) +
         `lam(1)=1` ⟹ `χ·lam ∈ Irr`。(norm 保存 + `isIrreducibleCharacter_of_inner_self_one_of_apply_one_pos`)。
-- [ ] **(G2) Gallagher 本体** — 上の twist-既約 + `LinearCharacter.lean` infra (`map_mul_of_apply_one_eq_one`,
-      `apply_one_eq_one_of_isMulCommutative`, `exists_linearIrreducibleCharacter_eq_of_isMulCommutative`) を cite。
-      残: **(B') linear char の unit-norm 供給** (`linearClassFunction (χ:H→*ℂˣ)` の値=1の冪根 → `map_mul`+root-of-unity)、
-      **bijection Irr(I/H)≃Irr(I|θ)** (β↦χ·Inf(β) が全単射; 単射=twist injective, 全射=Res 数え)。extension (G1) と組む。
+- [x] **twist by linear char 完成** — `CharacterProduct` (cont.⁸, sorry-free, axiom-clean):
+      - `linearClassFunction_mul_star_self_eq_one`: 有限群で `linearClassFunction (χ:H→*ℂˣ)` は unit-norm
+        (`(χ h)^|H|=χ(h^|H|)=1` root-of-unity → `norm_eq_one_of_pow_eq_one` → `RCLike.inv_eq_conj`)。
+      - **`isIrreducibleCharacter_mul_linearClassFunction`**: `χ∈Irr` × `χlin:G→*ℂˣ` ⟹ `χ·linearClassFunction χlin ∈ Irr`。
+        = Gallagher の「χ·Inf(β) 既約」(Inf(β)=linearClassFunction of quotient hom)。
+- [ ] **(G2) Gallagher 本体 = bijection Irr(I/H)≃Irr(I|θ)** — twist-既約は上で完成。残:
+      **(a) 単射**: `χ·Inf(β₁)=χ·Inf(β₂) ⟹ β₁=β₂` (χ で割る=`linearClassFunction` injective)。
+      **(b) 全射**: `ψ∈Irr(I|θ)` (χ 上に lie) ⟹ `ψ=χ·Inf(β)` for some β (`ψ·χ⁻¹` が I/H-inflation)。
+      **(c) 次数保存 + [I:H] 個** (I/H abelian ⟹ Irr(I/H)=linear、`|Irr(I/H)|=[I:H]`)。
+      `LinearCharacter.exists_linearIrreducibleCharacter_eq_of_isMulCommutative` + inflation で組む。extension (G1) と合流。
 - [ ] **type-F 適用**: `typeF_inertia_commutator_le` (I(θ)/H abelian) を (G3) に投入。
 - [ ] **(1.5.a)/(1.2) 台**: 各構成要素 φ の台 ⊆ A(L)∪{1}。非実 = 奇数位数 (`not_isReal_of_ne_trivial_of_odd_card'`)。
 - [ ] `typeI_induced_char_constituents` (S14:472) を上記 cite で sorry-free 化。lane b (12.14) は cite。
