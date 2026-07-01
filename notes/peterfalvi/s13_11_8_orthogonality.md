@@ -871,3 +871,32 @@ M側 = ⟨μ₀−ζ, α_{ij}⟩ (Dade τ isometry) = μ inner products。等値
 `alignedOmegaSigmaGrid_inner` (ω orthonormal) + `SHC_extension_inner_alignedOmegaSigma_eq_zero` (5.3.b,
 ⟨ω^σ,ζ^{τ₁}⟩=⟨ω^σ,β⟩=0) で展開 → n−δ−a → 等値で a=0。a=1 除外は β real (11.8.3, 別途)。
 (11.8) closure は依然 doubly-gated (§9↔§10 の (11.8.1)、§14 の (11.8.6))。
+
+## 2026-07-02 cont.⁴⁹ (lane-a) — **(11.8.5) G-side ω-inner-product 材料 3 本 LANDED**
+G-side 展開の inner-product 部品を 3 本 landed (S12, leaf green, all sorry-free、いずれも一発 green):
+1. **`alignedOmegaSigma_diff_inner_zeroColumnSum`**: `⟨ω_{ij}^σ−ω_{i0}^σ, ∑_r ω_{r0}^σ⟩ = −1`。
+   `alignedOmegaSigmaGrid_inner` (⟨ω_{ij},ω_{r0}⟩=[i=r∧j=0]) で ⟨ω_{ij},Σ⟩=0 (j≠0)・⟨ω_{i0},Σ⟩=1 → 0−1。
+   (`Finset.sum_const_zero`/`sum_ite_eq`)。
+2. **`SHC_extension_inner_zeroColumnOmegaSigma_sum`**: `⟨ζ^{τ₁}, ∑_r ω_{r0}^σ⟩ = 0` (5.3.b 各項 sum)。
+3. **`R_sum_inner_zeroColumnOmegaSigma_sum`**: `⟨∑_{β∈R}β, ∑_r ω_{r0}^σ⟩ = 0` (各 β=λ^{τ₁} に helper 2、
+   λ̄≠λ は `inducedFamily_degree_w1_conj_ne`)。
+
+**次 = (11.8.5) full assembly (a=0)**: τ-transport (cont.⁴⁸=n−δ) + (11.8.4) 代入 + 分解式 (cont.⁴⁶) +
+本 3 部品で ⟨α^τ, ∑ω_{r0}^σ−ζ^{τ₁}⟩ = n−δ−a を計算 → 等値 → a=0。⚠ 分解式は α^τ が第 1 引数 (inner_*_left,
+star scalar) or conj-symm で第 2 引数化。SHC_residual_eq_omegaSigma_diff を hdecompA 露出に拡張すると
+a,Y 一貫取得可。(11.8) closure は依然 doubly-gated (§9↔§10、§14)。
+
+## 2026-07-02 cont.⁵⁰ (lane-a) — **★ (11.8.5) a=0 完成 (charParam_a_eq_zero_of_residualEq)**
+`charParam_a_eq_zero_of_residualEq` (S12:8136, leaf green, **sorry-free**, **一発 green**)。
+(11.8.4) hypothesis `h114 : (μ₀−ζ)^τ = ∑ω_{r0}^σ − ζ^{τ₁}` を取り、`∃ a, a∈{0,1,2} ∧ ⟨α^τ,ζ^{τ₁}⟩=a−n
+∧ ((a=0∨a=2)→a=0)` を結論 (a=1 除外は 11.8.3 β real で別途 → 完全 a=0)。証明:
+- SHC_residual_eq_omegaSigma_diff (hdecompA 露出に拡張) で a,Y,hbound,hinner,hYeq,hdecompA 一貫取得。
+- τ-transport (cont.⁴⁸) に h114 代入 → `htrans : ⟨α^τ, ∑ω_{r0}^σ − ζ^{τ₁}⟩ = n−δ` (M-side)。
+- G-side `hαω : ⟨α^τ, ∑ω_{r0}^σ⟩ = −δ`: `rw[hdecompA, hYd]` (α^τ=δ(ω^σ diff)−nζ^{τ₁}+a∑β) →
+  `simp only [inner_add/sub/smul_left, 3 部品 (cont.⁴⁹), star_nat/intCast]; ring`。
+- `rw[inner_sub_right, hαω, hinner] at htrans` → `−δ−(a−n)=n−δ` → `linear_combination -htrans` → (a:ℂ)=0 → a=0。
+
+**意義**: **(11.8.2)+(11.8.5) 完成** — residual-orthogonal 仮定下で全列係数 a=0。これは (11.8.6) の
+`μ_j^{τ₂}=∑ω_{ij}^σ` coherence 矛盾の鍵入力。**次 = (11.8.3) β real (a even, a=1 除外)** or (11.8.6)
+assembly (S₂ coherence=§14 gate、S(C) coherent → (11.3) 矛盾)。h114 (11.8.4) は landed (10.9) から
+by-contra 内で establish (residual⊥ 仮定)。(11.8) closure は依然 doubly-gated (§9↔§10 の (11.8.1)、§14 の (11.8.6))。
