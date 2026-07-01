@@ -1,6 +1,6 @@
 # main 合流モニター — a/b/c/d レーン自動合流の運用手順
 
-> 横断運用ドキュメント。**標準監視ペース = 30 分間隔** (cron `13,43 * * * *`、:00/:30 回避・30 分均等、ユーザー 2026-06-29; 旧 15 分から変更)。cron は session-only ([[cron-dies-on-model-switch]]; CronCreate `durable:true` は本環境で disk 永続せず session-only 扱い) ゆえ、**再作成時は必ずこのペース `13,43` で**作る。main worktree = `/home/ywr/odd-order`。
+> 横断運用ドキュメント。**標準監視ペース = 15 分間隔** (cron `7,22,37,52 * * * *`、:00/:30 回避・15 分均等、ユーザー 2026-07-02; 2026-06-29〜07-02 は 30 分 `13,43`、それ以前は 15 分)。cron は session-only ([[cron-dies-on-model-switch]]; CronCreate `durable:true` は本環境で disk 永続せず session-only 扱い) ゆえ、**再作成時は必ずこのペース `7,22,37,52` で**作る。main worktree = `/home/ywr/odd-order`。
 > ユーザー方針: **「検証通過は自動合流」** — build green + axiom-clean + sorry regression なし + 新 axiom なしを
 > 満たすレーンを `--no-ff` で自動マージ。満たさなければ `git merge --abort` で報告。合流成立時は最後に
 > `git push origin main`（変化なし/全 abort なら push しない）。
@@ -69,15 +69,15 @@
 > 「監視ループ再開（cron id <new-id>）」を 1 行記録する。**この stop→resolve→resume サイクルが監視ループの
 > 正規ライフサイクル**であり、停止は一時退避でしかない。
 
-> **🔒 レーン所有マップ (step 1.5 範囲逸脱チェック用、2026-06-28 再配分 a/b/c/d)**:
+> **🔒 レーン所有マップ (step 1.5 範囲逸脱チェック用、2026-07-02 3 レーン再編 a/b/c、lane d 退役)**:
 > 正本 = [`ft_lane_reallocation_2026_06_28.md`](ft_lane_reallocation_2026_06_28.md)。
 > | lane | クラスタ | 所有 .lean（これ以外の Pf/BG S-ファイル編集 = 逸脱→停止） |
 > |---|---|---|
-> | **a** | α Pf §10–13 中央指標核 | `OddOrder/Peterfalvi/S(0[3-9]|1[0-3])*` + `OddOrder/FeitThompson.lean:426` |
-> | **b** | β Pf §12 Dade tower | `OddOrder/Peterfalvi/S14_MaximalI.lean`（**ただし `exists_typeICovering` carrier-consumer は lane d、carve-out 0088**）〔旧 carve-out 0087=S07_RhoProjection は issue 0089 で削除済〕 |
-> | **c** | γ POLE-2 §14–16 下流 | `OddOrder/Peterfalvi/S15_SAndT.lean` + `OddOrder/Peterfalvi/S16_NonExistenceG.lean`（**S15_SAndT_Setup は lane d 所有, issue 0092; lane c が S15_SAndT_Setup を編集したら逸脱**）|
-> | **d** | γ 上流 §15 setup + δ BG §14–16 (dormant) + carrier | `OddOrder/Peterfalvi/S15_SAndT_Setup.lean`（主, 2026-07-01 再配分）+ `OddOrder/BG/**` + `OddOrder/FeitThompson.lean` carrier 宣言 + **S10 の bgTheoremE_cover_data carrier ブロック**（carve-out 0086）+ **S14_MaximalI の `exists_typeICovering` carrier-consumer**（carve-out 0088、下記）; **lane d が S15_SAndT / S16_NonExistenceG を編集したら逸脱** |
-> | **共有（全 lane 可）** | — | `OddOrder/AxiomsCheck.lean` / `OddOrder.lean` / `OddOrder/GroupTheory/**` / `OddOrder/Mathlib/**` / `OddOrder/Algebra/**`（汎用 mathlib-shim/ANT・全 lane 加算可）/ **`OddOrder/FeitThompson.lean`**（宣言単位: a=:426、d=carrier、prefix-split で衝突回避）/ `notes/**` / `issues/**` |
+> | **a** | α Pf §10–13 中央指標核 + σ-theory tail | `OddOrder/Peterfalvi/S(0[3-9]|1[0-3])*` + `OddOrder/FeitThompson.lean`（:426 + 旧 d carrier 宣言群 = 全体、d 退役で fold）+ **S10 bgTheoremE carrier**（旧 carve-out 0086 解消）+ σ-theory tail (S11 imprimitivity + dup retire は S11 内、GroupTheory/** 共有で cite) |
+> | **b** | β Pf §12 Dade tower + coherence infra | `OddOrder/Peterfalvi/S14_MaximalI.lean`（**全体**、旧 carve-out 0088 `exists_typeICovering` は b に解消）+ coherence infra ((6.5.c) 等、GroupTheory/** or §6 shared) |
+> | **c** | γ POLE-2 §15–16 chain 一本化 | `OddOrder/Peterfalvi/{S15_SAndT_Setup, S15_SAndT, S16_NonExistenceG}.lean`（**S15_SAndT_Setup は 2026-07-02 に lane d→c、§15→16 全 chain を c が所有**）+ 構成的 Clifford (issue 9002、GroupTheory/** shared) |
+> | **~~d~~ 退役** | — | **2026-07-02 退役**。σ-theory leaf (`GroupTheory/**`, sorry-free) は共有ゾーンに残置 (a が tail 完成)。BG/** は完了・共有凍結。FeitThompson carrier は a に fold。**branch `d` は git に温存 (作業は全 merge 済)、worktree セッションは停止**。 |
+> | **共有（全 lane 可）** | — | `OddOrder/AxiomsCheck.lean` / `OddOrder.lean` / `OddOrder/GroupTheory/**` / `OddOrder/Mathlib/**` / `OddOrder/Algebra/**`（全 lane 加算可）/ **`OddOrder/FeitThompson.lean`**（d 退役で主に a、宣言境界で衝突回避）/ `OddOrder/BG/**`（完了・共有）/ `notes/**` / `issues/**` |
 >
 > **carve-out (issue 0086, ユーザー裁可 2026-06-29)**: `OddOrder/Peterfalvi/S10_MinimalSimpleStructure.lean` は
 > 原則 lane a 所有だが、その中の `BGTheoremECoverData` 構造 + `BGTheoremETypeICovering` / `BGTheoremENonTypeICovering` +
@@ -261,6 +261,15 @@
 
 ## 現状メモ
 
+- **2026-07-02 — 3 レーン再編 (ユーザー裁定): lane d 退役、a/b/c に縮約**。char endgame が密結合パイプライン
+  (coherence→σ-theory→§10-13→§13-16→S16) と判明、ungated frontier 上流集中で下流 (c/d) が反復 stall →
+  3 レーンに縮約。**lane d 退役** (σ-theory dichotomy sorry-free 完成、残 tail = S11 consumer=a に fold、
+  δ BG/** 完了・共有凍結、carrier done)。**S15_SAndT_Setup は lane d→c** (§15→16 chain 一本化)。carve-out
+  0086 (S10 carrier→a) / 0088 (S14 exists_typeICovering→b) は file owner に解消。σ-theory generic leaf は
+  `GroupTheory/**` 共有残置 (a が tail 完成 + S11 dup retire→cite)。**cron は a/b/c のみ監視** (d は branch
+  温存だが session 停止、未マージは常に 0)。ISSUE_BASE 4000 退役 (9000 shared-infra は継続)。詳細 =
+  `ft_lane_reallocation_2026_06_28.md` の「3 レーン再編」節。⚠ 次 tick 以降 `main..d` は常に 0 (skip)、
+  万一 d が新 commit を出したら (session 生存) 通常 range-check して合流可。
 - **2026-07-01 — hub tick 合流 a/b/c/d (4 lane) + lane d σ-theory 再々配分 (issue 4014 hub 裁定)**:
   cron tick で全 4 レーン合流 (a=Pf 9.8.c constituent / b=Pf 5.5 L-side+12.14 horth / c=Pf 13.16 W₁-side
   conjunct 1+N_G(W₁)≤T / d=issue 4014 gating-map)。push `1144248a..aee8043f`、sorry 120→122 (全 scaffold)。
