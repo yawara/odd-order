@@ -172,6 +172,8 @@ structure Section16Inputs (G : Type*) [Group G] [Finite G] where
   Sdata : TypePData S
   Sdata_U_eq : Sdata.U = U
   Sdata_W1_eq : Sdata.W1 = W1
+  /-- **Peterfalvi (13.2.a) U-side**: `U` abelian (BG Lemma 15.1(b), `U` the `(κ∪σ)'`-Hall). -/
+  S_U_commutative : IsMulCommutative ↥U
 
 /-! ### Partition of `Section16Inputs` into three independent producer obligations
 
@@ -277,6 +279,8 @@ structure Section16TypePStructure {G : Type*} [Group G] [Finite G]
   Sdata : TypePData mp.S
   Sdata_U_eq : Sdata.U = U
   Sdata_W1_eq : Sdata.W1 = W1
+  /-- **Peterfalvi (13.2.a) U-side**: `U` abelian (BG Lemma 15.1(b), `U` the `(κ∪σ)'`-Hall). -/
+  S_U_commutative : IsMulCommutative ↥U
 
 /-- **Peterfalvi §13 coherent Dade-grid output** — *owned by lane-b*.
 
@@ -744,7 +748,8 @@ noncomputable def section16TypePStructure_of_components {G : Type*} [Group G] [F
     (hSnorm : W1 ≤ Subgroup.normalizer (U : Set G))
     (hTnorm : W2 ≤ Subgroup.normalizer (V : Set G))
     (hlt : Nat.card ↥W1 < Nat.card ↥W2)
-    (Sd : TypePData mp.S) (hSdU : Sd.U = U) (hSdW1 : Sd.W1 = W1) :
+    (Sd : TypePData mp.S) (hSdU : Sd.U = U) (hSdW1 : Sd.W1 = W1)
+    (hUcomm : IsMulCommutative ↥U) :
     Section16TypePStructure mp where
   W1 := W1
   W2 := W2
@@ -780,6 +785,7 @@ noncomputable def section16TypePStructure_of_components {G : Type*} [Group G] [F
   Sdata := Sd
   Sdata_U_eq := hSdU
   Sdata_W1_eq := hSdW1
+  S_U_commutative := hUcomm
 
 /-- **BG §14 type-P duality producer** — *lane-f* (BG §14 `typeP_duality`).
 Given the maximal pair, constructs the cyclic structure `W = W₁W₂`, the complements
@@ -869,6 +875,8 @@ noncomputable def section16TypePStructure_of_isMinimalSimpleOdd {G : Type*} [Gro
       hUM hUhall hScompl.choose_spec.2.1)
     (typePData_of_kappaHall_hallComplement_W1 hG mp.S_maximal mp.S_typeP2 mp.K_le_S hKne mp.K_hall
       hUM hUhall hScompl.choose_spec.2.1)
+    (BG.Ch4.S15.typeP_hall_derived_eq_and_abelian hG mp.S_maximal mp.K_le_S hUM hKne mp.K_hall
+      hUhall).2
 
 /-- **Certain-type §6 hypothesis from κ-Hall pairing data** — *lane-b* (cd producer building block).
 
@@ -1793,7 +1801,8 @@ noncomputable def section16Inputs_of_isMinimalSimpleOdd {G : Type*} [Group G] [F
     q_lt_p := tp.q_lt_p
     Sdata := tp.Sdata
     Sdata_U_eq := tp.Sdata_U_eq
-    Sdata_W1_eq := tp.Sdata_W1_eq }
+    Sdata_W1_eq := tp.Sdata_W1_eq
+    S_U_commutative := tp.S_U_commutative }
 
 /-- **Assembly of the Section 16 configuration from named inputs** (`sorry`-free).
 
@@ -1891,7 +1900,8 @@ noncomputable def sectionSixteenHypothesis_of_inputs {G : Type*} [Group G] [Fini
       m_eq := rfl
       Sdata := inp.Sdata
       Sdata_U_eq := inp.Sdata_U_eq
-      Sdata_W1_eq := inp.Sdata_W1_eq }
+      Sdata_W1_eq := inp.Sdata_W1_eq
+      S_U_commutative := inp.S_U_commutative }
   q_lt_p := inp.q_lt_p
 
 /-- **The one remaining upstream obligation.** From a minimal simple group of odd

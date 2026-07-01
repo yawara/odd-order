@@ -192,6 +192,10 @@ structure Hypothesis where
   Sdata : TypePData S
   Sdata_U_eq : Sdata.U = U
   Sdata_W1_eq : Sdata.W1 = W1
+  /-- **Peterfalvi (13.2.a), U-side**: the complement `U` is abelian.  Supplied at construction from
+  BG Lemma 15.1(b) (`typeP_hall_derived_eq_and_abelian`, with `U` the `(κ∪σ)'`-Hall of `S`), so §15
+  need not re-derive it; discharges the `U_commutative` field of `basic_structure_gated`. -/
+  S_U_commutative : IsMulCommutative ↥U
 
 namespace Hypothesis
 
@@ -280,9 +284,25 @@ structure BasicStructureGated (hyp : Hypothesis (G := G)) where
   tauS_eq_induction_holds : tauS_eq_induction
 
 /-- **Peterfalvi (13.2.b,c,e)** structural producer: the `M_F`-structure of the type-`P₂` member
-`S`.  Faithful obligation gated on the §16 σ-structure (`BasicStructureGated` docstring). -/
+`S`.  Faithful obligation on the §16 σ-structure (`BasicStructureGated` docstring).
+
+`U_commutative` (13.2.a U-side) is now **genuine**: the S15 hypothesis carries `S_U_commutative`
+(supplied at construction from BG Lemma 15.1(b) `typeP_hall_derived_eq_and_abelian`, `U` the
+`(κ∪σ)'`-Hall).  The `A_0(S)`/`τ_S` clauses are the opaque scaffold Props (`True`).  The two
+remaining concrete residuals are the genuinely upstream σ-structure facts:
+* `P_elementaryAbelian` — Pf (11.7) = `S13_MaximalIII_IV.H_elementaryAbelian` (lane a §11);
+* `P_order` — `card_P_eq` modulo the `Sdata.W2 = W2` carrier reconciliation (issue 3001 / 4014);
+* `u_bound` — Pf (9.7) Singer-field bound `u ∣ (p^q−1)/(p−1)` (lane a §9). -/
 noncomputable def basic_structure_gated [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
-    (hyp : Hypothesis (G := G)) : BasicStructureGated hyp := sorry
+    (hyp : Hypothesis (G := G)) : BasicStructureGated hyp where
+  U_commutative := hyp.S_U_commutative
+  P_elementaryAbelian := sorry
+  P_order := sorry
+  u_bound := sorry
+  A0S_TI := True
+  A0S_TI_holds := trivial
+  tauS_eq_induction := True
+  tauS_eq_induction_holds := trivial
 
 /-- **Peterfalvi (13.2.a--c,e)**: `S` is type II or III, `P` is elementary
 abelian of order `p^q`, `u` is bounded, and `A_0(S)` is a TI-subset.
