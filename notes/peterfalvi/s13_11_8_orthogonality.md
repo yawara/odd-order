@@ -971,3 +971,17 @@ g_mem=conjPerm injective+conjPerm triv=triv (`trivialClassFunction_isReal`)、hf
 **次 = (a) IsReal Δ → hsym (inner-conj identity `⟨Δ,χ̄⟩=conj⟨Δ,χ⟩` 整備); (b) a=(∑ω_{r0}^σ,β) application**:
 β real=(11.8.3) + ∑ω real + 両者⊥1 で本 lemma 適用 → a even → (11.8.5) full a=0。⚠ (11.8.3) β real は
 (4.8)/(4.10)/(5.9) の SHC port が要 (大)。(11.8) closure は依然 doubly-gated (§9↔§10、§14)。
+
+## 2026-07-02 cont.⁵⁶ (lane-a) — **parity core 自己完結化 (IsReal 版) — inner-conj identity LANDED**
+2 lemma landed + parity lemma refactor (S12, leaf green, all sorry-free):
+1. **`inner_conj_conj`**: `⟨φ̄, ψ̄⟩ = star⟨φ,ψ⟩` (汎用)。証明 = innerSum pointwise (`conj_apply`+`star_mul`+`star_star`)
+   → `card·inner` に乗じて `mul_left_cancel₀` (⅟card の star motive 問題を回避; `card_mul_inner`+`star_natCast`)。
+2. **`inner_conjPerm_eq_of_isReal`**: real Δ∈ZIrr で `⟨Δ, conjPerm χ⟩ = ⟨Δ,χ⟩`。= `conjPerm_apply_coe`
+   (χ̄=χ.conj) + Δ=Δ.conj (IsReal) + inner_conj_conj (star⟨Δ,χ⟩) + `mem_ZIrr_inner_int` (⟨Δ,χ⟩∈ℤ real で star 消滅)。
+3. **`even_inner_of_conjPerm_symmetric` refactor**: hsym threaded → **`IsReal Δᵢ` を直接取る**自己完結版
+   (内部で hsym を `inner_conjPerm_eq_of_isReal` で導出)。
+
+**a-even parity core 完成** (`even_sum_of_involution`→cross-Parseval→inner_conj_conj→parity lemma、全て IsReal ベース、
+threaded hyp 無)。**残 = a=(∑ω_{r0}^σ,β) application**: β real=(11.8.3, (4.8)/(4.10)/(5.9) SHC port、大) +
+∑ω_{r0}^σ real + 両者⊥1_G。それで parity lemma 適用 → a even → (11.8.5) full a=0。⚠ β real は大 sub-chain。
+(11.8) closure は依然 doubly-gated (§9↔§10、§14) — a-even 完成しても endpoint は §14 gate 残。

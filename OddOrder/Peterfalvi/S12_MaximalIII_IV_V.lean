@@ -8159,10 +8159,39 @@ theorem even_sum_of_involution {α : Type*} [DecidableEq α] {s : Finset α} {f 
   rw [hf a ha]
   exact CharTwo.add_self_eq_zero _
 
+/-- **Inner product of two conjugated class functions** `⟨φ̄, ψ̄⟩ = conj ⟨φ, ψ⟩`.  Pointwise:
+`∑_g star(φ g)·ψ g = conj (∑_g φ g · star(ψ g))`, and `⅟|G|` is real. -/
+theorem inner_conj_conj [Fintype G] [Invertible (Nat.card G : ℂ)] (φ ψ : ClassFunction G ℂ) :
+    ClassFunction.inner φ.conj ψ.conj = star (ClassFunction.inner φ ψ) := by
+  have hsum : ClassFunction.innerSum φ.conj ψ.conj = star (ClassFunction.innerSum φ ψ) := by
+    rw [ClassFunction.innerSum, ClassFunction.innerSum, star_sum]
+    refine Finset.sum_congr rfl fun g _ => ?_
+    rw [ClassFunction.conj_apply, ClassFunction.conj_apply, star_mul, star_star, mul_comm]
+  have hcard : (Nat.card G : ℂ) ≠ 0 := (isUnit_of_invertible (Nat.card G : ℂ)).ne_zero
+  refine mul_left_cancel₀ hcard ?_
+  rw [ClassFunction.card_mul_inner, hsum, ← ClassFunction.card_mul_inner, star_mul, star_natCast,
+    mul_comm]
+
+/-- For a **real** `Δ ∈ ZIrr G`, the Fourier coefficient is `conjPerm`-symmetric:
+`⟨Δ, χ̄⟩ = ⟨Δ, χ⟩`.  Since `Δ̄ = Δ` (`IsReal`), `⟨Δ, χ̄⟩ = ⟨Δ̄, χ̄⟩ = conj⟨Δ,χ⟩` (`inner_conj_conj`),
+and `⟨Δ,χ⟩` is a real integer (`mem_ZIrr_inner_int`), so the `conj` is inert. -/
+theorem inner_conjPerm_eq_of_isReal [Finite G] [Fintype G] [Invertible (Nat.card G : ℂ)]
+    {Δ : ClassFunction G ℂ} (hΔ : Δ ∈ ZIrr G) (hr : ClassFunction.IsReal Δ)
+    (χ : IrreducibleCharacter G) :
+    ClassFunction.inner Δ
+        ((IrreducibleCharacter.conjPerm G χ : IrreducibleCharacter G) : ClassFunction G ℂ)
+      = ClassFunction.inner Δ (χ : ClassFunction G ℂ) := by
+  rw [IrreducibleCharacter.conjPerm_apply_coe]
+  have key : ClassFunction.inner Δ ((χ : ClassFunction G ℂ).conj)
+      = ClassFunction.inner Δ.conj ((χ : ClassFunction G ℂ).conj) := by rw [hr]
+  rw [key, inner_conj_conj]
+  obtain ⟨m, hm⟩ := OddOrder.RepresentationTheory.mem_ZIrr_inner_int χ hΔ
+  rw [hm, star_intCast]
+
 open scoped Classical in
 /-- **Parity of the inner product of two real virtual characters orthogonal to `1`** (Peterfalvi
-(11.8.5) "`a` even from `β` real").  For `Δ₁, Δ₂ ∈ ZIrr G` (odd `G`) with `conjPerm`-symmetric Fourier
-coefficients `⟨Δᵢ, χ̄⟩ = ⟨Δᵢ, χ⟩` (the consequence of `IsReal Δᵢ`) and `⟨Δᵢ, 1⟩ = 0`, the integer
+(11.8.5) "`a` even from `β` real").  For `Δ₁, Δ₂ ∈ ZIrr G` (odd `G`) that are real (`IsReal`) — hence
+with `conjPerm`-symmetric Fourier coefficients `⟨Δᵢ, χ̄⟩ = ⟨Δᵢ, χ⟩` — and `⟨Δᵢ, 1⟩ = 0`, the integer
 `⟨Δ₁, Δ₂⟩` is even.  Cross-Parseval (`mem_ZIrr_inner_eq_sum_over_irr`) gives
 `⟨Δ₁,Δ₂⟩ = ∑_χ c₁(χ)c₂(χ)` with `cᵢ(χ) = ⟨Δᵢ,χ⟩ ∈ ℤ`; the `χ = 1` term vanishes, and on `Irr ∖ {1}`
 the conjugation involution `conjPerm` is fixed-point-free (`conjPerm_eq_self_iff` +
@@ -8170,15 +8199,12 @@ the conjugation involution `conjPerm` is fixed-point-free (`conjPerm_eq_self_iff
 theorem even_inner_of_conjPerm_symmetric [Finite G] [Fintype G]
     [Invertible (Nat.card G : ℂ)] (hodd : Odd (Nat.card G))
     {Δ₁ Δ₂ : ClassFunction G ℂ} (h₁ : Δ₁ ∈ ZIrr G) (h₂ : Δ₂ ∈ ZIrr G)
-    (hsym₁ : ∀ χ : IrreducibleCharacter G, ClassFunction.inner Δ₁
-      ((IrreducibleCharacter.conjPerm G χ : IrreducibleCharacter G) : ClassFunction G ℂ)
-        = ClassFunction.inner Δ₁ (χ : ClassFunction G ℂ))
-    (hsym₂ : ∀ χ : IrreducibleCharacter G, ClassFunction.inner Δ₂
-      ((IrreducibleCharacter.conjPerm G χ : IrreducibleCharacter G) : ClassFunction G ℂ)
-        = ClassFunction.inner Δ₂ (χ : ClassFunction G ℂ))
+    (hr₁ : ClassFunction.IsReal Δ₁) (hr₂ : ClassFunction.IsReal Δ₂)
     (htriv₁ : ClassFunction.inner Δ₁ (trivialIrreducibleCharacter G : ClassFunction G ℂ) = 0)
     (htriv₂ : ClassFunction.inner Δ₂ (trivialIrreducibleCharacter G : ClassFunction G ℂ) = 0) :
     ∃ z : ℤ, ClassFunction.inner Δ₁ Δ₂ = (z : ℂ) ∧ Even z := by
+  have hsym₁ := fun χ => inner_conjPerm_eq_of_isReal h₁ hr₁ χ
+  have hsym₂ := fun χ => inner_conjPerm_eq_of_isReal h₂ hr₂ χ
   choose c₁ hc₁ using fun χ : IrreducibleCharacter G =>
     OddOrder.RepresentationTheory.mem_ZIrr_inner_int χ h₁
   choose c₂ hc₂ using fun χ : IrreducibleCharacter G =>
