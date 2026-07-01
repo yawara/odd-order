@@ -404,6 +404,95 @@ theorem conj_W1_mem_centralizer_W2 [Finite G] (_hG : OddOrder.BG.IsMinimalSimple
       _ = y := by group
   exact (mul_inv_eq_iff_eq_mul.mp hn').symm
 
+/-- **Peterfalvi (13.16), the crux `K ≤ C_G(W₂)`**: every element of `K := U ⊓ N_G(W₂)` centralizes
+`W₂`.
+
+The conjugation action of `W₁` on the abelian `U` is coprime (`(|W₁|, |U|) = 1` from the `U ⋊ W₁`
+Frobenius structure) with fixed points `C_U(W₁) = ⊥` (`centralizer_W1_inf_U_eq_bot`).  For `g ∈ K`,
+`W₁` fixes the coset `g · C_U(W₂)` (`conj_W1_mem_centralizer_W2`: `g⁻¹ (w g w⁻¹) ∈ C_G(W₂)`), so the
+coprime fixed-point lifting `Isaacs.Ch04.coprime_fixedPoints_quotient` (Cor 3.28) produces a
+`W₁`-fixed representative `c ∈ C_U(W₁) = ⊥`; hence `g ≡ 1 (mod C_U(W₂))`, i.e. `g ∈ C_G(W₂)`. -/
+theorem normalizer_U_inf_W2_le_centralizer_W2 [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G)) :
+    hyp.U ⊓ Subgroup.normalizer (hyp.W2 : Set G) ≤ Subgroup.centralizer (hyp.W2 : Set G) := by
+  obtain ⟨data, _⟩ := basic_structure hG hyp
+  have hfrob := data.UW1_frobenius
+  haveI hUcomm := data.U_commutative
+  -- conjugation action `φ : ↥W₁ → MulAut ↥U`.
+  letI actU : MulDistribMulAction ↥hyp.W1 ↥hyp.U :=
+    MulDistribMulAction.compHom (M := ↥(Subgroup.normalizer (hyp.U : Set G))) ↥hyp.U
+      (Subgroup.inclusion hyp.W1_normalizes_U)
+  set φ : ↥hyp.W1 →* MulAut ↥hyp.U := MulDistribMulAction.toMulAut ↥hyp.W1 ↥hyp.U with hφ
+  have hφ_coe : ∀ (a : ↥hyp.W1) (x : ↥hyp.U),
+      (hyp.U.subtype ((φ a) x)) = (↑a) * (hyp.U.subtype x) * (↑a)⁻¹ := fun _ _ => rfl
+  -- `N := C_U(W₂)`, normal in the abelian `↥U`.
+  set N : Subgroup ↥hyp.U :=
+    (hyp.U ⊓ Subgroup.centralizer (hyp.W2 : Set G)).subgroupOf hyp.U with hN_def
+  haveI hNnorm : N.Normal := by
+    refine ⟨fun n _ g => ?_⟩
+    have hc : g * n * g⁻¹ = n := by rw [mul_comm' g n, mul_inv_cancel_right]
+    rw [hc]; assumption
+  -- coprimality `(|W₁|, |U|) = 1`.
+  have hCop : Nat.Coprime (Nat.card ↥hyp.W1) (Nat.card ↥hyp.U) := by
+    have hk := hfrob.coprime_card_kernel_complement
+    rwa [Nat.card_congr (Subgroup.subgroupOfEquivOfLe (le_sup_left)).toEquiv,
+      Nat.card_congr (Subgroup.subgroupOfEquivOfLe (le_sup_right)).toEquiv,
+      Nat.coprime_comm] at hk
+  -- `W₁ ≤ C_G(W₂)`, so `N` is `W₁`-invariant.
+  have hW1_le_C : hyp.W1 ≤ Subgroup.centralizer (hyp.W2 : Set G) := by
+    intro x hx
+    rw [Subgroup.mem_centralizer_iff]
+    intro z hz
+    exact (hyp.W1_commutes_W2 x hx z hz).symm
+  have hN_inv : OddOrder.Isaacs.Ch03.IsAInvariant φ N := by
+    rw [OddOrder.Isaacs.Ch03.isAInvariant_iff_smul_mem]
+    intro a x hx
+    rw [hN_def, Subgroup.mem_subgroupOf] at hx ⊢
+    obtain ⟨_, hxC⟩ := Subgroup.mem_inf.mp hx
+    have hval : (hyp.U.subtype ((φ a) x)) = (↑a) * (hyp.U.subtype x) * (↑a)⁻¹ := hφ_coe a x
+    refine Subgroup.mem_inf.mpr ⟨((φ a) x).2, ?_⟩
+    rw [show ((φ a) x : G) = (hyp.U.subtype ((φ a) x)) from rfl, hval]
+    exact (Subgroup.centralizer (hyp.W2 : Set G)).mul_mem
+      (Subgroup.mul_mem _ (hW1_le_C a.2) hxC) (Subgroup.inv_mem _ (hW1_le_C a.2))
+  -- main: `g ∈ U ⊓ N_G(W₂)` ⟹ `g ∈ C_G(W₂)`.
+  intro g hg
+  obtain ⟨hgU, hgNW2⟩ := Subgroup.mem_inf.mp hg
+  set gg : ↥hyp.U := ⟨g, hgU⟩ with hgg
+  -- `W₁` fixes the coset `gg · N`.
+  have hg_fix : ∀ a : ↥hyp.W1, ∃ n ∈ N, (φ a) gg = gg * n := by
+    intro a
+    refine ⟨gg⁻¹ * (φ a) gg, ?_, (mul_inv_cancel_left _ _).symm⟩
+    rw [hN_def, Subgroup.mem_subgroupOf]
+    refine Subgroup.mem_inf.mpr ⟨(gg⁻¹ * (φ a) gg).2, ?_⟩
+    have hval : ((gg⁻¹ * (φ a) gg : ↥hyp.U) : G) = g⁻¹ * ((a : G) * g * (a : G)⁻¹) := by
+      rw [Subgroup.coe_mul, InvMemClass.coe_inv,
+        show ((φ a) gg : G) = (hyp.U.subtype ((φ a) gg)) from rfl, hφ_coe a gg]
+      rfl
+    rw [hval]
+    exact conj_W1_mem_centralizer_W2 hG hyp hgNW2 a.2
+  obtain ⟨c, hc_fix, m, hm, hc_eq⟩ :=
+    OddOrder.Isaacs.Ch04.coprime_fixedPoints_quotient (φ := φ) hCop
+      (Or.inr (isSolvable_of_comm (fun a b => mul_comm' a b))) hN_inv hg_fix
+  -- `c` is `W₁`-fixed ⟹ `(c:G) ∈ C_U(W₁) = ⊥` ⟹ `c = 1`.
+  have hc1 : c = 1 := by
+    have hcmem : (c : G) ∈ hyp.U ⊓ Subgroup.centralizer (hyp.W1 : Set G) := by
+      refine Subgroup.mem_inf.mpr ⟨c.2, ?_⟩
+      rw [Subgroup.mem_centralizer_iff]
+      intro w hw
+      have hfix := hc_fix ⟨w, hw⟩
+      have hco : (hyp.U.subtype c) = (w : G) * (hyp.U.subtype c) * (w : G)⁻¹ := by
+        have e1 := hφ_coe ⟨w, hw⟩ c
+        rw [hfix] at e1
+        exact e1
+      exact mul_inv_eq_iff_eq_mul.mp hco.symm
+    rw [centralizer_W1_inf_U_eq_bot hG hyp, Subgroup.mem_bot] at hcmem
+    exact Subtype.ext hcmem
+  -- `gg = m⁻¹ ∈ N` ⟹ `g ∈ C_G(W₂)`.
+  rw [hc1, eq_comm, mul_eq_one_iff_eq_inv] at hc_eq
+  have hggN : gg ∈ N := by rw [hc_eq]; exact N.inv_mem hm
+  rw [hN_def, Subgroup.mem_subgroupOf] at hggN
+  exact (Subgroup.mem_inf.mp hggN).2
+
 /-- **Peterfalvi (13.16), the Maschke/Wielandt core proper**: `N_U(W₂) = 1`, i.e.
 `U ⊓ N_G(W₂) = ⊥` — no nonidentity element of the complement `U` normalizes `W₂`.
 
