@@ -425,3 +425,28 @@ lane-a が §9 (repo S11) の (11.8.1)/(11.8.6) char-gate を landing (全 axiom
 5. **(11.8.5)-(11.8.6)** 矛盾導出: a=0 + S₂ coherence (9.11=§14 gate) + (11.3) `S_H0C_not_coherent` ✅。
 
 **次 iteration 着手** = carrier bridge (S(HC)/S₂ 材料化) or (11.8.1) d=u 接続 (§9 landed ゆえ最短)。
+
+## 2026-07-02 cont.²⁴ (lane-a) — 🎯 concrete next-build target pinned = `muGrid i j 1 = u`
+
+S10 §8 structural work (8.2.a/8.6.b II) landed this session; re-examined (11.8) frontier and pinned
+the **exact next buildable lemma** (次 iteration = BUILD、survey しない):
+
+**(11.8.1) d=u connection reduces to `hyp.muGrid hG hodd i j 1 = u` (j≠0)**:
+- `params.d := μ_{ij}(1)` (via `degree_independent`, producer `exists_charParameters_full` S12:3179 sets
+  `d` from `exists_charParamArith`). `muGrid_apply_one_eq` (S12:2029) proves μ_{ij}(1) は **constant** across
+  (i,j) j≠0 — but NOT the value.
+- 残 = **value bridge**: §9 landed `μ_j(1)=qu` (column sum, `caseA_reducible_induceHU_apply_one_eq_qu` /
+  `caseB_degree_qu`, S11) を §10 muGrid 表現に接続。column μ_j=∑_i μ_{ij}, 各項 constant=d ⟹ μ_j(1)=w₁·d.
+  w₁=q (type III/IV, |W₁|=q) ⟹ q·d=qu ⟹ d=u。要: (a) μ_j(1)=w₁·d の §10 muGrid 形、(b) μ_j(1)=qu の §9→§10
+  carrier 接続 (muGrid_apply_one_within_column/_cross_column S12 ↔ §6 columnFamily ↔ §9 sOf degree)、(c) w₁=q。
+- trace 起点: `muGrid` def S12:1308 (§10→§6 bridge via `toCertainTypeHypothesis`→`columnFamily`);
+  `muGrid_apply_one_within_column`/`_cross_column` (2029 の内部) が §6 columnFamily degree に接続する箇所。
+
+**(11.8) 全体の gate 再確認** (post SHC_isCoherent + §9 gate landing):
+- S₁=S(HC) coherence ✅ (`SHC_isCoherent` landed)。
+- S₂=S(C)−S(HC) coherence = (9.11)`coherent_H0C_commutator`(S11 sibleyTarget_H0C sorry)+(11.7) = **§14/lane-b gated**。
+- α-grid calc (11.8.2-3) = S₁-τ₁ 版 α-lemma 群が要 (既存 `muGridAlpha_tau_*` は full-S coh 要求で by_contra 不可)。
+- ∴ (11.8) full closure は S₂ leg で §14-gated。だが d=u / α-grid S₁-τ₁ lemma は ungated で先行 build 可。
+
+**教訓 (honest)**: cont.²⁴ は survey 過多 (0 code)。次 iteration は本ノートの `muGrid i j 1 = u` から
+**即 build 着手** (再 survey 禁止)。carrier trace は muGrid_apply_one_within_column の §6 接続を読むところから。

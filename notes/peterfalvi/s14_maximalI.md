@@ -1617,3 +1617,36 @@ assembly = 10 witness lemma (loop⁶⁶) から `S07.Hypothesis hyp.Sset hyp.A` 
 
 **残 lane-b (issue 9001)**: (6.5.c) coherence producer (case c = `frobenius_typeI_coherent_of_cyclicQuotient`,
 まだ sorry) + 構成的 Clifford (M-side)。case (c) は §6.5 汎用 coherence infra が要 (S07/S08 在庫なし)。
+
+### ✅ loop⁶⁸ (2026-07-02 lane-b): (12.6) case (c) の全景マップ + (6.5.c) の 2 普遍 leaf を実証明
+
+**(12.6) case (c) の教科書構造を確定** (mmd 04.14 L45 の (12.6) proof + 04.8 §6):
+case (c) = Def(8.3)(c) (H^# **非 TI**, |L/H|∣p−1)。proof は **(6.5.c) 経由の矛盾**:
+S 非可換 coherent と仮定 → (6.5.a) `six_three_index_bound` で |H:H'|≤4|L:H|²+1 + (6.5.b) H 非可換 p-群
+→ (8.2.a)+(8.3.c) で |L/H|∣p−1 → (6.5.c) が |L:H|∤p−1 を主張 → 矛盾。∴ S coherent。
+
+**commit `f612848a`: (6.5.c) に要る 2 普遍 leaf を S08_PGroupReduction に実証明 (axiom-clean, full 3894 green)**:
+- `six_five_c_arith` (算術核): p 奇素数, d 奇, d∣p−1, p²≤HH', HH'≤4d²+1 ⟹ False。
+- `sq_le_card_abelianization_of_isPGroup_of_noncomm`: 非可換有限 p-群 ⟹ p²≤|Abelianization P| (Burnside basis)。
+  + helper `isCyclic_of_isPGroup_of_isCyclic_quotient_commutator` (P⧸⁅P,P⁆ 巡回⟹P巡回,
+  `commutator_le_frattini_of_pgroup` (Isaacs Ch04) + `frattini_nongenerating`)。
+これらは reduction がどの形でも消費する普遍事実。
+
+**⚠ 判明した真の gap (次セッションの本丸)**: S08 の (6.5)/(6.8) 機構
+(`isPGroup_of_not_coherent` c1・`abelianization_card_le_of_not_coherent_c2` c2 — 共に sorry-free で
+(6.5.a) index 上界+p-群を ¬coherent から出す) は **すべて `SibleyDadeHypothesis` 上**。
+`SibleyDadeHypothesis` は **`H_sharp_ti` (H^# TI) を必須 field に持つ** (CorePart1:3279)。
+**case (c) は H^# 非 TI** (A=A(L)=`supportInSubgroup typeIA L`, τ=Dade rel A(L)) ゆえ witness
+`Hypothesis L` は SibleyDade に直接該当せず。よって case (c) を閉じるには:
+**(6.5) reduction (「¬coherent ⟹ index 上界」) を witness の A(L)-Dade setup へ一般化**する必要がある
+(= `abelianization_card_le_of_not_coherent` の A=A(L) 版; six_two/six_three の τ を witness τ に張り替え)。
+(6.8) full coherence (caseA/B) は要らない — case (c) は 2 leaf の矛盾で閉じるショートカットゆえ、
+reduction (index 上界+p-群) だけ witness τ で出せれば `six_five_c_arith` + `sq_le_...noncomm` で終わる。
+
+**次 (優先順)**: (A) witness `Hypothesis L` の (5.2)/(6.1)/(6.4) 充足を確認 (τ=dadeIntegralCharacterMap が
+(5.2) を満たすか, S07.Hypothesis 経由で既知か) → (B) `six_two_index_bound`/`six_three` の witness-τ 版
+(または general `six_three_descent` (S08_Theorem62_63_Standalone, (6.2) oracle `h62` 経由) を case-c の
+irreducible-member 状況で discharge) → (C) `abelianization_card_le_of_not_coherent` witness 版 →
+(D) case (c) assembly (H 非可換 = |L/H|>1 ∴ H'≠1; p 奇 = Odd p from odd order; 2 leaf 適用)。
+multi-turn 想定。(6.2) oracle `h62` の irreducible-member discharge (`sMember_index_le_two_psi` 系) が
+case-c で効くかが (B) の鍵 — case c は K=H が p-群ゆえ member Ind_H^L θ は既約 (θ≠1, Frobenius inertia=H)。

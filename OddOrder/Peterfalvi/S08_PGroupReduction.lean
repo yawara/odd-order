@@ -4,6 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 -/
 import OddOrder.Peterfalvi.S08_CaseBSeedGlue
 import OddOrder.Peterfalvi.S08_CoherenceCore
+import OddOrder.Isaacs.Ch04_Commutators.Main
 
 /-!
 # Peterfalvi (6.5): reduction to a non-abelian `p`-group — `(6.8)` application
@@ -132,6 +133,100 @@ theorem three_le_of_isPGroup_H (hyp : SibleyDadeHypothesis G L H)
   · interval_cases p
     · exact absurd hpodd (by decide)
   · exact h
+
+/-- **Peterfalvi (6.5)(c) — the arithmetic contradiction.**  The numeric heart of (6.5)(c): a
+non-abelian `p`-group kernel is incompatible with `|L:H| ∣ p − 1` under the (6.5)(a) index bound.
+
+Given a prime `p` that is odd, an odd `d` (playing `|L:H|`) with `d ∣ p − 1`, and naturals with
+`p² ≤ HH'` (the non-abelian `p`-group bound `p² ≤ |H:H′|`) and `HH' ≤ 4·d² + 1` (the (6.5)(a) index
+bound `|H:H′| ≤ 4|L:H|² + 1`), we derive `False`.
+
+Peterfalvi's argument (mmd 04.8 L72): `d ∣ p − 1` with `d` odd and `p − 1` even forces the quotient
+`(p−1)/d` to be even, hence `≥ 2`, so `p − 1 ≥ 2d`, `p ≥ 2d + 1`, and
+`p² ≥ (2d+1)² = 4d² + 4d + 1 > 4d² + 1 ≥ p²`.  This is exactly (6.5)(c): if `|L:K| ∣ p − 1` then the
+(6.5)(a) bound `|K:H₁| ≤ 4|L:K|² + 1` fails for the non-abelian `p`-group `K/M`. -/
+theorem six_five_c_arith {d p HH' : ℕ} (hp : p.Prime) (hpodd : Odd p)
+    (hdodd : Odd d) (hdvd : d ∣ p - 1) (hpsq : p ^ 2 ≤ HH')
+    (hbound : HH' ≤ 4 * d ^ 2 + 1) : False := by
+  have hp2 : 2 ≤ p := hp.two_le
+  have hdpos : 0 < d := hdodd.pos
+  obtain ⟨k, hk⟩ := hdvd
+  -- `p − 1` is even; `d` odd with `d·k = p − 1` even forces `k` even, hence `k ≥ 2`.
+  have hp1even : Even (p - 1) := Nat.Odd.sub_odd hpodd odd_one
+  have hkeven : Even k :=
+    (Nat.even_mul.mp (hk ▸ hp1even)).resolve_left (Nat.not_even_iff_odd.mpr hdodd)
+  have hk0 : k ≠ 0 := by rintro rfl; simp only [mul_zero] at hk; omega
+  have hk2 : 2 ≤ k := by obtain ⟨m, rfl⟩ := hkeven; omega
+  -- `p ≥ 2d + 1`.
+  have hpk : p = d * k + 1 := by omega
+  have hdk : 2 * d ≤ d * k := by
+    calc 2 * d = d * 2 := by ring
+      _ ≤ d * k := by gcongr
+  have hpge : 2 * d + 1 ≤ p := by omega
+  -- square it against the (6.5)(a) bound.
+  have hsq : (2 * d + 1) ^ 2 ≤ p ^ 2 := Nat.pow_le_pow_left hpge 2
+  have hexp : (2 * d + 1) ^ 2 = 4 * d ^ 2 + 4 * d + 1 := by ring
+  omega
+
+/-- **A finite `p`-group with cyclic abelianization is cyclic** (Burnside-basis, rank-1 case).
+If `P ⧸ ⁅P,P⁆` is cyclic, a lift `x` of a generator satisfies `⟨x⟩ ⊔ ⁅P,P⁆ = ⊤`; since
+`⁅P,P⁆ ≤ Φ(P)` (`commutator_le_frattini_of_pgroup`), the non-generating property
+`frattini_nongenerating` upgrades this to `⟨x⟩ ⊔ Φ(P) = ⊤`, forcing `⟨x⟩ = ⊤`, i.e. `P` cyclic. -/
+theorem isCyclic_of_isPGroup_of_isCyclic_quotient_commutator
+    {P : Type*} [Group P] [Finite P] {p : ℕ} [Fact p.Prime] (hP : IsPGroup p P)
+    (hcyc : IsCyclic (P ⧸ commutator P)) : IsCyclic P := by
+  obtain ⟨q, hq⟩ := hcyc.exists_generator
+  obtain ⟨x, rfl⟩ := QuotientGroup.mk'_surjective (commutator P) q
+  -- `⟨x⟩ ⊔ ⁅P,P⁆ = ⊤`: every `g` is `x^k` times a commutator, using that `mk x` generates.
+  have htop : Subgroup.zpowers x ⊔ commutator P = ⊤ := by
+    rw [eq_top_iff]
+    intro g _
+    obtain ⟨k, hk⟩ := hq (QuotientGroup.mk' (commutator P) g)
+    have heq : (QuotientGroup.mk (x ^ k) : P ⧸ commutator P) = QuotientGroup.mk g := by
+      have h := (map_zpow (QuotientGroup.mk' (commutator P)) x k).trans hk
+      simpa only [QuotientGroup.mk'_apply] using h
+    have hmem : (x ^ k)⁻¹ * g ∈ commutator P := QuotientGroup.eq.mp heq
+    have hg : g = x ^ k * ((x ^ k)⁻¹ * g) := by group
+    rw [hg]
+    exact mul_mem (Subgroup.mem_sup_left (Subgroup.mem_zpowers_iff.mpr ⟨k, rfl⟩))
+      (Subgroup.mem_sup_right hmem)
+  -- upgrade `⁅P,P⁆` to `Φ(P)` and use non-generation.
+  have hfr : Subgroup.zpowers x ⊔ frattini P = ⊤ :=
+    top_le_iff.mp (htop ▸ sup_le_sup_left
+      (OddOrder.Isaacs.Ch04.commutator_le_frattini_of_pgroup hP) (Subgroup.zpowers x))
+  have hxtop : Subgroup.zpowers x = ⊤ := frattini_nongenerating hfr
+  have hgen : ∀ y : P, y ∈ Subgroup.zpowers x := fun y => by rw [hxtop]; exact Subgroup.mem_top y
+  exact ⟨⟨x, hgen⟩⟩
+
+/-- **A non-abelian finite `p`-group has `p² ≤ |P : P′|`** — the Burnside-basis input to
+Peterfalvi (6.5)(c).  If `P` is a `p`-group that is not commutative, then `p² ≤ |Abelianization P|`.
+
+`|Abelianization P|` is a power `pⁿ`; if it were `< p²` then `pⁿ ∣ p`, so the abelianization is
+cyclic (`isCyclic_of_card_dvd_prime`), whence `P` is cyclic
+(`isCyclic_of_isPGroup_of_isCyclic_quotient_commutator`) and therefore abelian — contradicting
+non-commutativity. -/
+theorem sq_le_card_abelianization_of_isPGroup_of_noncomm
+    {P : Type*} [Group P] [Finite P] {p : ℕ} (hp : p.Prime) (hP : IsPGroup p P)
+    (hnc : ¬ ∀ a b : P, a * b = b * a) :
+    p ^ 2 ≤ Nat.card (Abelianization P) := by
+  haveI : Fact p.Prime := ⟨hp⟩
+  by_contra hlt
+  rw [not_le] at hlt
+  haveI hpg : IsPGroup p (Abelianization P) := hP.to_quotient (commutator P)
+  obtain ⟨n, hn⟩ := hpg.exists_card_eq
+  have hn2 : n < 2 := by
+    by_contra h; rw [not_lt] at h
+    exact absurd (hn.symm ▸ Nat.pow_le_pow_right hp.pos h) (not_le.mpr hlt)
+  haveI : IsCyclic (Abelianization P) :=
+    isCyclic_of_card_dvd_prime (p := p)
+      (by rw [hn]; exact (pow_dvd_pow p (by omega : n ≤ 1)).trans (dvd_of_eq (pow_one p)))
+  have hcyc : IsCyclic P :=
+    isCyclic_of_isPGroup_of_isCyclic_quotient_commutator hP this
+  obtain ⟨x, hx⟩ := hcyc.exists_generator
+  refine hnc fun a b => ?_
+  obtain ⟨m, hm⟩ := hx a
+  obtain ⟨l, hl⟩ := hx b
+  rw [← hm, ← hl, ← zpow_add, ← zpow_add, add_comm]
 
 /-- **`H` is non-abelian** in the `X`-nonempty branch: `X(⁅H,H⁆) ≠ ∅` forces `⁅H,H⁆ ≠ ⊥`, hence
 `commutator ↥H ≠ ⊥`.  (If `⁅H,H⁆ = ⊥` then `S(⁅H,H⁆) = S(⊥) = S`, so `X(⁅H,H⁆) = S − S = ∅`.) -/
