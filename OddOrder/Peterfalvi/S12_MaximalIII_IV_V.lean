@@ -7096,6 +7096,66 @@ theorem Hypothesis.muGridAlpha_tau_inner_SHC_extension_mem_int [Finite G] {M : S
   exact ClassFunction.inner_mem_ZIrr_int hαZ hζZ
 
 open scoped FiniteInduce in
+/-- **`⟨φ^{τ₁}, ψ^{τ₁}⟩ = 0` for distinct `S(HC)` members** (α-grid `S₁`-`τ₁` input to (11.8.2)).
+Together with `SHC_extension_inner_self` (`‖φ^{τ₁}‖² = 1`) this says the coherent images
+`{φ^{τ₁} : φ ∈ S(HC)}` form an **orthonormal family** — the `S₁^{τ₁}` basis against which the
+(11.8.2) decomposition `α_{ij}^τ = X − nζ^{τ₁} + a·∑_{λ∈S₁} λ^{τ₁}` projects.  Proof: `τ₁` is an
+isometry on `ℤ[S(HC)]` (`extension_inner_eq`), so `(φ^{τ₁}, ψ^{τ₁}) = (φ, ψ) = 0` for distinct
+irreducibles.  Available from `SHC_isCoherent` alone (no full-`S` `coh`). -/
+theorem Hypothesis.SHC_extension_inner_of_ne [Finite G] {M : Subgroup G}
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis M)
+    {φ ψ : ClassFunction ↥M ℂ}
+    (hφS : φ ∈ inducedFamily M) (hφirr : IsIrreducibleCharacter φ) (hφ1 : φ 1 = (hyp.w1 : ℂ))
+    (hψS : ψ ∈ inducedFamily M) (hψirr : IsIrreducibleCharacter ψ) (hψ1 : ψ 1 = (hyp.w1 : ℂ))
+    (hne : φ ≠ ψ) :
+    ClassFunction.inner ((hyp.SHC_isCoherent hG).extension φ)
+      ((hyp.SHC_isCoherent hG).extension ψ) = 0 := by
+  have hspanφ : φ ∈ OddOrder.Peterfalvi.S07.zSpan
+      {χ : ClassFunction ↥M ℂ | χ ∈ inducedFamily M ∧ IsIrreducibleCharacter χ ∧
+        ((χ : ↥M → ℂ) 1 = (hyp.w1 : ℂ))} :=
+    Submodule.subset_span ⟨hφS, hφirr, hφ1⟩
+  have hspanψ : ψ ∈ OddOrder.Peterfalvi.S07.zSpan
+      {χ : ClassFunction ↥M ℂ | χ ∈ inducedFamily M ∧ IsIrreducibleCharacter χ ∧
+        ((χ : ↥M → ℂ) 1 = (hyp.w1 : ℂ))} :=
+    Submodule.subset_span ⟨hψS, hψirr, hψ1⟩
+  rw [(hyp.SHC_isCoherent hG).extension_inner_eq _ _ hspanφ hspanψ,
+    OddOrder.RepresentationTheory.irr_cf_inner hφirr hψirr, if_neg hne]
+
+open scoped FiniteInduce in
+/-- **SHC-coherence analog of `tau_zeta_sub_conj_eq_tau1`** (α-grid `S₁`-`τ₁` bridge for (11.8.5)).
+For a degree-`w₁` irreducible `ζ ∈ S(HC)`, the Dade image of the supported difference `ζ − ζ̄`
+equals the `S(HC)`-coherent split `ζ^{τ₁} − ζ̄^{τ₁}`.  Since `ζ, ζ̄ ∈ S(HC)` and `ζ − ζ̄` is supported
+on `A₀`, it lies in the supported lattice `ℤ[S(HC), A₀]` where `SHC_isCoherent.extension` agrees with
+`hyp.tau` (`extends_on_supported`); `extension`-linearity (`map_sub`) then splits it.
+
+This is the essential SHC ingredient of the (5.3.b) `⟨ω^σ, ζ^{τ₁}⟩ = 0` argument (via
+`inner_left_eq_zero_of_inner_sub_eq_zero` and the coherence-free `(ζ − ζ̄)^τ ⊥ ω^σ`), which the
+(11.8.5) `a = 0` step needs — the by-contradiction has `SHC_isCoherent` but not the full-`S` `coh`. -/
+theorem Hypothesis.tau_zeta_sub_conj_eq_SHC_extension [Finite G] {M : Subgroup G}
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis M) (hodd : Odd (Nat.card G))
+    {ζ : ClassFunction ↥M ℂ} (hζS : ζ ∈ inducedFamily M) (hζirr : IsIrreducibleCharacter ζ)
+    (hζ1 : ζ 1 = (hyp.w1 : ℂ)) :
+    hyp.tau (ζ - ζ.conj)
+      = (hyp.SHC_isCoherent hG).extension ζ - (hyp.SHC_isCoherent hG).extension ζ.conj := by
+  have hζcS : ζ.conj ∈ inducedFamily M := inducedFamily_closedUnderConjugate M hζS
+  have hζcirr : IsIrreducibleCharacter ζ.conj := hζirr.conj
+  have hζc1 : ζ.conj 1 = (hyp.w1 : ℂ) := by
+    rw [ClassFunction.conj_apply, hζ1, star_natCast]
+  have hspanζ : ζ ∈ OddOrder.Peterfalvi.S07.zSpan
+      {φ : ClassFunction ↥M ℂ | φ ∈ inducedFamily M ∧ IsIrreducibleCharacter φ ∧
+        ((φ : ↥M → ℂ) 1 = (hyp.w1 : ℂ))} :=
+    Submodule.subset_span ⟨hζS, hζirr, hζ1⟩
+  have hspanζc : ζ.conj ∈ OddOrder.Peterfalvi.S07.zSpan
+      {φ : ClassFunction ↥M ℂ | φ ∈ inducedFamily M ∧ IsIrreducibleCharacter φ ∧
+        ((φ : ↥M → ℂ) 1 = (hyp.w1 : ℂ))} :=
+    Submodule.subset_span ⟨hζcS, hζcirr, hζc1⟩
+  have hmem : (ζ - ζ.conj) ∈ OddOrder.Peterfalvi.S07.zSupportedSpan
+      {φ : ClassFunction ↥M ℂ | φ ∈ inducedFamily M ∧ IsIrreducibleCharacter φ ∧
+        ((φ : ↥M → ℂ) 1 = (hyp.w1 : ℂ))} hyp.A0 :=
+    ⟨Submodule.sub_mem _ hspanζ hspanζc, hyp.zeta_sub_conj_support hG hodd hζS hζirr⟩
+  rw [← (hyp.SHC_isCoherent hG).extends_on_supported _ hmem, map_sub]
+
+open scoped FiniteInduce in
 /-- **Peterfalvi (11.8), the genuine non-orthogonality** (lane-b W3 obligation, issue 2020).
 
 Under Hypothesis (10.1), there is an irreducible `ζ ∈ S = inducedFamily M` of degree `w₁` —

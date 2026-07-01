@@ -497,3 +497,48 @@ the **exact next buildable lemma** (次 iteration = BUILD、survey しない):
 **次 = (11.8.2) a=0 導出** (これらを消費): `‖α^τ‖²=2+n²` (`muGridAlpha_tau_inner_self` coh-free ✅) +
 上記 integrality + S(HC) 直交 (`inducedFamily_pairwiseOrthogonal` ✅) で α^τ を S₁^{τ₁} basis に分解、
 a∈{0,1,2}、a=0 or 2、a=0 ⟹ X=ω_{ij}^σ−ω_{i0}^σ ((11.8.5))。μ_k^{τ₁} 経由 (S(HC) 外) を避ける新 CS 論法。
+
+## 2026-07-02 cont.²⁷ (lane-a) — S(HC)^{τ₁} orthonormal basis API 完成 (pairwise-orth landed)
+- **`Hypothesis.SHC_extension_inner_of_ne`** landed (S12, leaf green): distinct S(HC) 既約 φ≠ψ で
+  `⟨φ^{τ₁},ψ^{τ₁}⟩=0` (extension_inner_eq isometry + irr_cf_inner + if_neg)。
+- ∴ **{φ^{τ₁} : φ∈S(HC)} は orthonormal** (norm 1 = cont.²⁶ `SHC_extension_inner_self` + pairwise 0 = 本 lemma)。
+  (11.8.2) の α^τ 分解が projection する S₁^{τ₁} basis。integrality (cont.²⁶) と合わせ **α-grid S₁-τ₁ の
+  inner-product API 3 本完備**。transitive sorryAx は SHC_isCoherent 経由 (cont.²⁶ と同、genuine deferred)。
+
+**次 = (11.8.2) a=0 projection** (orthonormal API を消費):
+- α^τ = X − nζ^{τ₁} + a∑_{λ∈S₁}λ^{τ₁}, X⊥S₁^{τ₁}, a∈{0,1,2}。projection 係数 = ⟨α^τ,λ^{τ₁}⟩ (orthonormal ゆえ)。
+- 要 **ω^σ ⊥ S₁^{τ₁}**: full-coh は (5.5) `ofProjection` (coh.tau1, ψ=0) で ω^σ⊥coh.tau1 (S12:4869)。
+  SHC 版は SHC.extension に対する ofProjection 適応が要 (§5 (5.5)/(5.3.b) が SHC-coherence で効くか確認)。
+- 要 **‖α^τ‖²=2+n²** (`muGridAlpha_tau_inner_self` coh-free ✅) + norm 展開で a²·|S₁|+… ≤ 2 → a∈{0,1} → integrality で a=0。
+- 次 iteration = ω^σ ⊥ SHC.extension (5.5 ofProjection) の tractability 確認 → a=0 projection。
+
+### cont.²⁷ 追記 — (5.5) ofProjection は SHC に transfer しない; a=0 は fixed-vector projection
+scoped (5.5) `ofProjection`/`eq_sum_of_psi_eq_zero` (S07:1224/1561): `μ_j^{tau1}` を R(μ_j) image family
+に projection。**tau1 が μ_j に定義要** ⟹ full-coh (coh.tau1 on all S) は可、**SHC.extension (S(HC) 上のみ、
+μ_j∉S(HC)) は不可**。∴ full-coh a=0 machinery (`columnImageFamily`+ofProjection) は SHC 非適応 (plan 既知障害を code 確認)。
+
+**SHC a=0 の正しい形** = fixed vector `α^τ = hyp.tau α` (coh-free, α supported ゆえ定義) を **S₁^{τ₁} 部分空間
+(span{λ^{τ₁}:λ∈S(HC)}, orthonormal API 完備) に projection**:
+`α^τ = (⊥S₁^{τ₁} 成分) + ∑_{λ∈S(HC)} ⟨α^τ,λ^{τ₁}⟩·λ^{τ₁}`。
+(11.8.2) 主張 = ⟨α^τ,ζ^{τ₁}⟩=-n+a、⟨α^τ,λ^{τ₁}⟩=a (λ≠ζ、**uniform**)。
+- **crux = ⟨α^τ,λ^{τ₁}⟩ の λ 一様性**: なぜ全 λ∈S(HC)\{ζ} で同値 a か (Peterfalvi 構造論拠、要精読 04.11 (11.8.2))。
+- norm: ‖α^τ‖²=2+n² = ‖⊥成分‖² + ‖-nζ^{τ₁}+a∑λ^{τ₁}‖² (orthonormal) = ‖⊥‖² + (n²·? + a²·|S₁| + cross) → a bound。
+- 次 iteration = 04.11 (11.8.2) 原文で uniformity 論拠を確認 → projection lemma。orthonormal API (norm1/pairwise0/int) は消費準備済。
+
+## 2026-07-02 cont.²⁸ (lane-a) — (11.8) 原文精読 + SHC (5.3.b) bridge landed
+04.13 (11.8) 原文精読 ([MISSING_PAGE_FAIL:3] = 11.8.2-11.8.4 は落丁だが 11.8.5/11.8.6 は取得):
+- **(11.8.5) a=0 構造**: `((μ_0−ζ)^τ,α_{ij}^τ)` を τ-isometry で source ((μ_0−ζ,α_{ij})=−1+n) と等置
+  → `a=(∑ω_{r0}^σ,β)`。β=a∑_{λ∈S₁}λ^{τ₁} (11.8.2 の X=ω_{ij}^σ−ω_{i0}^σ 後)。**(5.3.b) ω^σ⊥S₁^{τ₁}**
+  ⟹ a=(∑ω^σ,a∑λ^{τ₁})=0。β real ⟹ a even も併用。
+- **key tool 発見**: `inner_left_eq_zero_of_inner_sub_eq_zero` (S12:4214、汎用): norm-1 ZIrr a,b,s で
+  a⊥b ∧ (a−b)⊥s ⟹ a⊥s (integral geometry ‖s−xa−xb‖²=1−2x²≥0 ⟹ x=0)。(5.3.b) を R(ζ) machinery
+  回避で出す。full-coh `tau1_zeta_vanishes_on_typePV` (4269) が内部で ⟨ζ^{τ₁},ω^σ⟩=0 をこれで出す。
+
+**landed (S12, leaf green)**: **`Hypothesis.tau_zeta_sub_conj_eq_SHC_extension`** — SHC 版
+`hyp.tau(ζ−ζ̄) = SHC.extension ζ − SHC.extension ζ̄` (extends_on_supported、ζ−ζ̄∈ℤ[S(HC),A₀] supported)。
+full-coh `tau_zeta_sub_conj_eq_tau1` の SHC 版。**SHC (5.3.b) の必須 ingredient** (a−b=ζ^{τ₁}−ζ̄^{τ₁}=hyp.tau(ζ−ζ̄))。
+
+**次 = SHC (5.3.b) 完成** `⟨ω^σ, SHC.extension λ⟩=0`: `inner_left_eq_zero_of_inner_sub_eq_zero`
+(a=SHC.ext λ, b=SHC.ext λ̄, s=ω^σ) + orthonormal API (norm1/pairwise0 ✅) + 本 bridge +
+coh-free `tau_zeta_sub_conj_vanishes_on_typePV`/sigmaNC≤2 (tau1_zeta_vanishes の SHC 複製)。
+これで (11.8.5) a=0 が組める。(11.8.6) は S₂ coherence (§14-gated) 残。
