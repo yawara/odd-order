@@ -1452,3 +1452,34 @@ build で、landing すれば `frobenius_typeI_coherent` (12.6) → `witness_L_c
 - `S`/`S_eq`: hyp.Sset は既に {Ind_H^L θ|θ≠1} 形 (S14:85) ゆえ S_eq 直接。`A0_eq`: `supportInSubgroup (sharpImage H) L
   = hyp.A` を sharpImage=typeIA から congr。`cases := Or.inl hfrob`。`hconj`: hyp.hconj (ambient 一致下)。
 推定 ~150-250 行 + 補助 (TI 性・forall_H_eq_bot・sharpImage=typeIA)。fresh-dade route が transport 回避で最善。
+
+### 🛑 loop⁶² (2026-07-01 lane-b resume³): sibleyTarget_frobI は witness で unsound — loop⁶¹ plan 撤回
+
+**上の loop⁶¹ plan は誤り** (「A(L)=H^# TI、escaping 空」は witness で偽)。構成中に発覚:
+
+**Peterfalvi 原文三重確認**:
+- **(6.8)(a)** (mmd 04.8:138): 「\(H^{\#}\) is a **TI-subset of \(G\)** with normalizer \(L\)」— (6.8) coherence の必須前提。
+- **(12.10) proof** (mmd 04.14:59): witness L につき「**By (12.9), \(H^{\#}\) is not a TI-subset of \(G\)**」と明言。
+  (12.9) の x∈Ω₁(P₀)^#⊆H^# は C_G(x)⊄L (escaping)。∴ `dade.H x = supportKernel L L H^# x
+  = maxNilpotentNormalHall L ⊓ C_G(x) = H⊓C_G(x) ∋ x ≠ ⊥` (S14:1311-1314 の supportKernel 定義)。
+- **(12.6) proof** (mmd 04.14:45): coherence は **3-case split** — (i) H^# TI ⟹ (6.8); (ii) Def(8.3) case(b)
+  [H abelian rank 2] ⟹ 全 S 同次数 ⟹ (5.7); (iii) case(c) [|L/H|∣p-1] ⟹ (6.5.c)。witness は非TI = case(b)/(c)。
+
+**帰結 — 現行 architecture の mis-modeling**:
+- `SibleyDadeHypothesis.dade_H_eq_bot` (∀a∈H^#, dade.H a=⊥) = H^# TI in G を hardcode。
+- `sibleyTarget_frobI` (cases:=Or.inl hfrob, (6.8)(c1) branch) は dade_H_eq_bot 必須 → **witness で数学的に unprovable**
+  (dade.H x ≠ ⊥)。docstring 「Frobenius だから (6.8) SibleyTarget available」は overclaim ((6.8) は Frobenius に
+  加え (a) TI も要求; witness は TI を欠く)。
+- `frobenius_typeI_coherent` (12.6) は全 Frobenius L を sibleyTarget_frobI 経由にする → **TI case しかカバーせず**、
+  非TI witness (case b/c) を取りこぼす。`witness_L_coherent`→`exists_witness_dadeNotation`→(12.16) capstone +
+  (5.5) の witness 適用が全てこの unsound carrier に依存。
+
+**正しい fix (設計分岐、要ユーザー判断)**: `frobenius_typeI_coherent` を `hyp.typeI.alternative`
+(TypeIData の Def-8.3 3-way disjunction, MaximalSubgroupType:109) で case-split:
+- case(a) TI: sibleyTarget_frobI (要 TI 仮説を signature に追加して honest 化) 経由 (6.8)。
+- case(b) abelian rank 2: (5.7) 等次数 coherence (`S07_CoherenceConstantDegree` 在庫)。
+- case(c) exponent∣p-1: (6.5.c) coherence (**在庫未確認 = 要 build の可能性**)。
+残タスク: issue に記録。loop⁶⁰-⁶¹ で landing した補題 (centralizerSupport_sharp_eq_of_frobenius /
+sharpImage_H_subgroupOf_eq_typeIA / transport 2 件) は**一般に正しく再利用可** (typeIA=H^# は真、transport も真)
+— sibleyTarget_frobI の TI-case や case(b)/(c) build で使える。unsound なのは sibleyTarget_frobI の
+「全 Frobenius で成立」claim のみ。
