@@ -5,6 +5,7 @@ Authors: Yawara Ishida
 -/
 import OddOrder.Peterfalvi.S13_MaximalIII_IV
 import OddOrder.Peterfalvi.S10_CoherenceWiring
+import OddOrder.Peterfalvi.S09_CertificateDischarge
 import OddOrder.GroupTheory.RepresentationTheory.SingerField
 import OddOrder.GroupTheory.RepresentationTheory.CyclotomicCharacterCongruence
 import Mathlib.RepresentationTheory.Irreducible
@@ -2421,6 +2422,39 @@ theorem exists_distinguished_char {L : Subgroup G} [Finite G] (hyp : Hypothesis 
     ⟨θ, hθ_ne, rfl⟩
   refine ⟨_, hmem, ?_⟩
   rw [ClassFunction.induce_apply_one, hθ_deg, mul_one]
+
+open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
+/-- **The placed induced family for the witness `L`** (§12→§7 bridge, the `θ`/`ind1H` shape
+`hypothesis78OfDade` consumes).  Applies `exists_placed_induced_family` to the distinguished
+`χ = Ind θ_lin ∈ S` of `exists_distinguished_char` (`θ_lin` nontrivial linear, so `χ ≠ Ind 1_K` by
+`induce_ne_trivialChar_induce`): the distinguished char lands at index `0` with induced degree
+`[L:K]` (`= e`), the trivial char `1_K` lands at some `ind1H ≠ 0`, and the family is
+injective/covering.  `K = (L_F).subgroupOf L` is normal in `L` (`maxNilpotentNormalHall_..._normal`).
+This is the family input to the witness-`L` `Hypothesis78`. -/
+theorem exists_witness_placed_family {L : Subgroup G} [Finite G] (hyp : Hypothesis L) :
+    ∃ (n : ℕ) (θ : Fin (n + 1) → IrreducibleCharacter ↥((hyp.typeI.typeF.H).subgroupOf L))
+      (ind1H : Fin (n + 1)),
+      ind1H ≠ 0 ∧
+      ClassFunction.induce ((hyp.typeI.typeF.H).subgroupOf L)
+          (θ 0 : ClassFunction _ ℂ) (1 : ↥L) = (((hyp.typeI.typeF.H).subgroupOf L).index : ℂ) ∧
+      θ ind1H = trivialIrreducibleCharacter ↥((hyp.typeI.typeF.H).subgroupOf L) ∧
+      Function.Injective (fun i => ClassFunction.induce ((hyp.typeI.typeF.H).subgroupOf L)
+        (θ i : ClassFunction _ ℂ)) ∧
+      ∀ φ : IrreducibleCharacter ↥((hyp.typeI.typeF.H).subgroupOf L),
+        ClassFunction.induce ((hyp.typeI.typeF.H).subgroupOf L) (φ : ClassFunction _ ℂ) ∈
+          Set.range (fun i => ClassFunction.induce ((hyp.typeI.typeF.H).subgroupOf L)
+            (θ i : ClassFunction _ ℂ)) := by
+  haveI hKnormal : ((hyp.typeI.typeF.H).subgroupOf L).Normal := by
+    rw [hyp.typeI.typeF.H_eq]
+    exact OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_subgroupOf_normal L
+  obtain ⟨χ, hχ, hdeg⟩ := exists_distinguished_char hyp
+  obtain ⟨θlin, hθ_ne, hχ_eq⟩ := hχ
+  obtain ⟨n, θ, ind1H, hind, h0, htriv, hinj, hcov⟩ :=
+    OddOrder.Peterfalvi.S09.Cert.exists_placed_induced_family ((hyp.typeI.typeF.H).subgroupOf L) χ
+      ⟨θlin, hχ_eq.symm⟩
+      (hχ_eq ▸ OddOrder.Peterfalvi.S09.Cert.induce_ne_trivialChar_induce
+        ((hyp.typeI.typeF.H).subgroupOf L) θlin hθ_ne)
+  exact ⟨n, θ, ind1H, hind, by rw [h0]; exact hdeg, htriv, hinj, hcov⟩
 
 /-- **Peterfalvi (12.13)/(12.16), the degree lower bound `e ≥ 3`**: the distinguished degree
 `e = [L:H]` (`H = L_F`) of a type-I `Hypothesis` is at least `3`.  It equals the order of the

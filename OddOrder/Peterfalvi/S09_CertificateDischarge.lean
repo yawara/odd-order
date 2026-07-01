@@ -952,6 +952,21 @@ theorem inner_induce_trivialChar_constOne_eq_one (K : Subgroup L) [Fintype ↥K]
       ext h; rw [ClassFunction.restrict_apply]; rfl,
     irreducibleCharacter_inner_eq_ite, if_pos rfl]
 
+/-- **An induced nonprincipal character differs from the induced principal** (the irreducible-vs-
+permutation-character distinction).  `Ind_K^L θ ≠ Ind_K^L 1_K` for `θ ≠ 1_K`, since they have
+different inner products with `1_L` (`0` vs `1`, by `inner_induce_constOne_eq_zero` /
+`inner_induce_trivialChar_constOne_eq_one`).  This supplies the `χ_dist ≠ Ind 1_K` input to
+`exists_placed_induced_family` from a distinguished `χ = Ind θ ∈ S` (`θ ≠ 1_K`). -/
+theorem induce_ne_trivialChar_induce (K : Subgroup L) [Fintype ↥K]
+    [Invertible (Nat.card L : ℂ)] [Invertible (Nat.card ↥K : ℂ)]
+    (θ : IrreducibleCharacter ↥K) (hθ : θ ≠ trivialIrreducibleCharacter ↥K) :
+    ClassFunction.induce K (θ : ClassFunction ↥K ℂ)
+      ≠ ClassFunction.induce K (trivialIrreducibleCharacter ↥K : ClassFunction ↥K ℂ) := by
+  intro h
+  have h0 := inner_induce_constOne_eq_zero K θ hθ
+  rw [h, inner_induce_trivialChar_constOne_eq_one] at h0
+  exact one_ne_zero h0
+
 /-- **The Dade image of a supported class function is orthogonal to `1_G` iff the source is to
 `1_L`** (Peterfalvi (7.8.a), the `(2.7)`-for-`1_G` instance).  For `α ∈ CF(L,A)`,
 `⟨α^τ, 1_G⟩_G = ⟨α, 1_L⟩_L`: by the adjoint formula `chiRho_adjoint` `⟨α^τ, 1_G⟩ = ⟨α, (1_G)^ρ⟩`,
