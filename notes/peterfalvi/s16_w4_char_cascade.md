@@ -1121,3 +1121,13 @@ lane-a/b coherence 領域か)。[[cross-lane-sync-via-notes]]
 - 残 sorry を `normalizer_W1_structure` (新) に isolate = 3 atomic 構造事実: `W₁ ≤ Q` (W2_le_P の T-side dual)、`IsMulCommutative ↥Q` (P_elementaryAbelian の T-side dual)、`N_G(W₁) ≤ Q⊔W₂` (Frobenius/Wielandt、machinery は #1/#3)。
 
 **次手 (lane c)** = `normalizer_W1_structure` の `N_G(W₁) ≤ Q⊔W₂` を WielandtFixedPoint + TICyclicHypothesis bridge で実証明。T-side dual の `W₁≤Q`/Q-abelian は T-side basic_structure gated (issue 3001) だが cite 可。dual `normalizer_W2` も同パターン。[[feedback-cite-sorried-lemmas-if-signature-correct]] [[scaffold-sorry-free-not-done]]
+
+
+### cont.³⁸ (2026-07-01 lane c=γ /loop): (13.16) W₂-dual normalizer_W2 + complement_le_PW1 実証明 + pgroup_le 上流化
+
+cont.³⁷ の (13.16) W₁-side に続き W₂-dual を landing (S15_SAndT.lean, full build 3890 green, AxiomsCheck OK):
+- **`normalizer_W2`** (13.16 W₂-side = Coq `FTtypeP_norm_cent_compl` の直接形 `N_G(W₂)=C_G(W₂)=P⊔W₁`) を sorry-free 化。反対称 chain で collapse。**W₁-side と違い easy 方向を両方実証明**: `P≤C(W₂)` (`W₂≤P` = 新 `W2_le_P` + P elementary abelian = `basic_structure`)、`W₁≤C(W₂)` (`W1_commutes_W2`)。∴ 残 residual は **単一 clean fact `normalizer_W2_structure : N_G(W₂)≤P⊔W₁`** (Frobenius/Wielandt confinement; W₁-side の 3-fact residual より clean)。
+- **`complement_le_PW1`** (13.17.c V-side Huppert step; 旧 sorried「normalizer_W2 未 port ゆえ gated」) を **実証明** = `complement_le_QW2` (W₁-side) の機械 mirror + 新 `normalizer_W2` cite。normalizer_W2 の value 具体化 (→ `complement_card_eq_pq_V` 13.17.c V-side order argument に供給)。
+- **`pgroup_le_of_normal_coprime_index`** (generic 群論) を S16 → S15_SAndT に上流化 (S16 の `W2_le_P` は S15 版へ delegate、重複解消・DAG 衛生)。
+
+残 (13.16) 核心 = `normalizer_W1_structure`/`normalizer_W2_structure` の Wielandt confinement (`N_G(W_i) ≤ (other-side Fitting)⊔W_j`)。machinery (WielandtFixedPoint + TICyclic) 在庫、TI 還元は concrete `A0S_TI` (現 opaque `BasicStructureGated.A0S_TI`) の de-opacify 待ち。次手 = A0S_TI 具体化 or Wielandt confinement 直接組立。
