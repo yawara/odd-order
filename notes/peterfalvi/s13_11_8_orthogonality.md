@@ -784,3 +784,20 @@ doubly-gated (§9↔§10 の (11.8.1)、§14 の (11.8.6))。
 SHC 版は本 chain (cont.⁴¹→⁴²→trichotomy) で組む。a=0: X=residual Y 直結。a=2: X=Y+2∑λ で ∑λ^{τ₁} vanish 要
 (general-a 注意 above)。trichotomy lemma の署名確認 → X の norm-2/vanish/ZIrr を渡す。
 (11.8) closure は依然 doubly-gated (§9↔§10 の (11.8.1)、§14 の (11.8.6))。
+
+## 2026-07-02 cont.⁴³ (lane-a) — **SHC alpha_tau_image (a=0) LANDED — X=ω^σ diff 完成**
+2 lemma landed (leaf green 3850 jobs, both sorry-free):
+1. **`SHC_muGridAlpha_tau_X_inner`** (S12:7407): a=0 で `⟨X,ζ^{τ₁}⟩=0 ∧ ‖X‖²=2` (X=α^τ+n·ζ^{τ₁})。
+   仮定 `hα0:⟨α^τ,ζ^{τ₁}⟩=−n` (=(11.8.2) a=0)。証明 = `muGridAlpha_tau_X_inner` (4146) の SHC port:
+   `muGridAlpha_tau_inner_self` (‖α^τ‖²=2+n², coh-free) + `SHC_extension_inner_self` (‖ζ^{τ₁}‖²=1) +
+   `inner_conj_symm` → `simp; ring`。**一発 green**。
+2. **`SHC_tau_muGridAlpha_eq`** (S12:7454): a=0 で **`α_{ij}^τ = δ(ω_{ij}^σ−ω_{i0}^σ) − n·ζ^{τ₁}`** (SHC)。
+   = full-coh `tau_muGridAlpha_eq` (4397) の SHC port: X∈ZIrr + ‖X‖²=2 (lemma 1) + ψ vanish (cont.⁴²) →
+   `eq_smul_chiFam_diff_of_vanishOnV` trichotomy → X=δ(ω^σ diff)。`exists_alignedOmegaSigmaGrid_chiFam_family`
+   で ω^σ=chiFam(P j)。**一発 green** (4416-4448 の機械 port)。
+
+**意義**: (10.5) Dade-image identity の SHC 版が a=0 で完成 → (11.8.6) の `α^τ=ω^σ diff−nζ^{τ₁}` を SHC のみで
+入手可能に。**次 = (11.8.3) β real/independence or (11.8.5) a=0 の 2-way calc**。(11.8.5) は本 SHC identity
++ `SHC_extension_inner_alignedOmegaSigma_eq_zero` (5.3.b) で β=a∑λ→a=0。a=2 case は ∑λ^{τ₁} vanish (per-λ,
+general-a 注意) が要 → `SHC_extension_vanishes_on_typePV` (∀λ∈S(HC), λ̄≠λ) を先に組むと汎用。
+(11.8) closure は依然 doubly-gated (§9↔§10 の (11.8.1)、§14 の (11.8.6))。
