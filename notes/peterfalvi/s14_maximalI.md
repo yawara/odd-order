@@ -1674,3 +1674,26 @@ case-c で効くかが (B) の鍵 — case c は K=H が p-群ゆえ member Ind_
 + 供給の付随: `hp/hHp` (H が p-群 = (6.5.b) reduction — chief factor 経由; または _hexp から), `hnonab`
    (¬coherent ⟹ 非 constant-degree ⟹ 非可換), `hdvd` (_hexp の (8.3.c) + (8.2.a) exp(L/H)=|L/H|)。
 注意: H が p-群である事実 (6.5.b) は _hexp が直接与えない — chief-factor reduction が要る (未解決の追加 gap)。
+
+### ✅ loop⁷⁰-⁷⁵ (2026-07-02 lane-b): hcoh 完成 + nilpotency — case (c) の残は h56 のみに集約
+
+**loop⁷⁰-⁷⁴ で (6.5.c) engine の hcoh 引数 (S(H') coherent) を完全 landing** (全 axiom-clean):
+- SOf (SsubFiltration + bot/subset/antitone) `b31979dc`。
+- S(H') 等次数 (inflation で θ(1)=1) `1dbe96bb`。
+- 部分族 S07.Hypothesis 7 field (diff_supported/tau_isometry/conjugate_closed/tau_diff_ZIrr/
+  differenceImage/differenceImages_orthogonal; no_real/pairwise は subset で inline) `77ec8c1d`+`31024a16`。
+  **鍵: case-b の field 群で hab が要るのは等次数 (x=1) のみ → S(H') では commutator-kernel lemma で代替。**
+- `SsubFiltration_commutator_coherent` (hcoh 本体、coherent_of_constant_degree 呼び) `acdf9a79`。
+- `typeF_H_subgroupOf_isNilpotent` ([IsNilpotent ↥K]、maxNilpotentNormalHall + 転送) `8993253a`。
+
+**残 case (c) = h56 (最深) + それに従属する配線**:
+- **h56 = (5.6) break-member bound over witness τ**。Sibley 版 `six_two_index_bound` (CorePart2:3750) =
+  `exists_coherentBreakPair` (抽象、τ 一般で OK) + `sMember_index_le_two_psi` (CorePart2:3343、**SibleyDade
+  固有の (5.6) 深部**)。h56 を witness で得るには **`sMember_index_le_two_psi` を抽象 τ/S/A0 へ一般化**する
+  必要 (case c は K=H p-群ゆえ member 既約 = irreducible case、reducible の一般 oracle=issue 2022 より易しい
+  はず)。これが最深の残タスク (2-3 iteration 想定、cross-lane (6.2) oracle と重なる可能性)。
+- h56 が出れば: index 上界 (six_three_of_six_two_oracle 対偶) → IsPGroup
+  (`isPGroup_of_isFrobeniusGroup_of_card_le`、card W₁=K.index bookkeeping 要) → hnonab (K abelian なら
+  ⁅K,K⁆=⊥ ゆえ SOf⁅K,K⁆=SOf⊥、hcoh が hncoh 矛盾 → engine 内で導出可) → hdvd/hcyc (_hexp の (8.3.c)+(8.2.a))
+  → engine + `SsubFiltration_bot` で Coherent(Sset)=goal。
+- engine 改良案: hnonab/IsPGroup を engine 内部で導出 (Frobenius 構造を取る) すると配線が減る (未実施)。
