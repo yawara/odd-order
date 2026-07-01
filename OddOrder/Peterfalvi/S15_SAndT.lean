@@ -323,23 +323,32 @@ theorem U_inf_centralizer_P_eq_bot [Finite G] (hG : OddOrder.BG.IsMinimalSimpleO
 
 This is the single group-theoretic fact carrying the genuine content of the `W₂`-side of (13.16)
 (Coq `FTtypeP_norm_cent_compl`, the `K := 'N_U(W₂)` computation).  Writing `K := U ⊓ N_G(W₂)`, the
-Coq argument runs:
+proof plan below has been **verified to need no new infrastructure** — every cited lemma is present
+in the repo (see `notes/peterfalvi/s15_s_and_t.md`, the (13.16) core plan block).
 
-* `K W₁` is a Frobenius subgroup of the Frobenius group `U W₁` (`Sdata` type-`P` structure), with
-  kernel `K` and complement `W₁`, acting coprimely (`p ∤ |U|·q`) on the elementary abelian
-  `P = S_F`;
-* **Maschke** decomposes `P = W₂ × Q₁` with `Q₁` a `K W₁`-invariant complement to `W₂`
-  (`fixedPoints_sup_actionCommutator_eq_top` / Gorenstein Thm 2.3 for the abelian `P`);
-* `W₁` acts **fixed-point-freely** on `Q₁` (`C_P(W₁) = W₂` by the type-`P` regularity
-  `TypePData.centralizer_W1`, and `Q₁ ⊓ W₂ = ⊥`), so the **Wielandt fixed-point theorem**
-  (`frobenius_kernel_centralizes_of_complement_fpf`) forces `K ≤ C_G(Q₁)`;
-* the Frobenius structure forces `K ≤ C_G(W₂)` (the conjugation action of `W₁` on `K/C_K(W₂)` is
-  both trivial — `W₁` centralizes `W₂` — and fixed-point-free, hence `K = C_K(W₂)`);
-* therefore `K ≤ C_G(W₂) ⊓ C_G(Q₁) = C_G(W₂ ⊔ Q₁) = C_G(P)`, so
+**Crux (ungated, about the abstract `W₂`): `K ≤ C_G(W₂)`.**  `W₁` acts on `K` by conjugation
+(`K ≤ U` is `W₁`-invariant: `U` abelian, `W₁ ≤ N_G(U)`, `W₁ ≤ N_G(W₂)`), coprimely (`|W₁| = q`
+coprime to `|U|` from the `U ⋊ W₁` Frobenius structure `BasicStructureData.UW1_frobenius`), with
+`C_K(W₁) ≤ C_U(W₁) = ⊥` (Frobenius fixed-point-freeness).  `W₁` acts **trivially** on `K/C_K(W₂)`
+(`W₁` centralizes `W₂` by `W1_commutes_W2`, so `w k w⁻¹` and `k` induce the same map on `W₂`), so by
+the coprime fixed-point lifting `Isaacs.Ch04.coprime_fixedPoints_quotient` (Cor 3.28) every element
+of `K` is `≡` a `W₁`-fixed point `= 1`, forcing `K = C_K(W₂) ≤ C_G(W₂)`.
+
+**Assembly (given `K ≤ C_G(W₂)`).**  Two simplifications over the Coq route:
+* use the **full** `U ⋊ W₁` Frobenius (not `K ⋊ W₁`), so no `Frobenius_subl` is needed — `U`
+  abelian ⟹ `U ≤ N_G(⁅P,K⁆)`, and the Wielandt fixed-point theorem
+  (`frobenius_kernel_centralizes_of_complement_fpf`, `N := ⁅P,K⁆`) yields `U ≤ C_G(⁅P,K⁆)`;
+* use **Gorenstein Thm 2.3** `P = C_P(K) × ⁅P,K⁆` (`fixedPoints_inf_actionCommutator_eq_bot_of_abelian`
+  for the coprime `K`-action on the abelian `P`) instead of a Maschke complement to `W₂`.
+
+  The `W₁`-fixed-point-freeness on `⁅P,K⁆` is `C_{⁅P,K⁆}(W₁) = ⁅P,K⁆ ⊓ C_P(W₁) = ⁅P,K⁆ ⊓ W₂ ⊆
+  ⁅P,K⁆ ⊓ C_P(K) = ⊥` — using `W₂ ≤ C_P(K)` (from the crux) and the **regularity** `C_P(W₁) = W₂`
+  (`TypePData.centralizer_W1`, the one **`Sdata.W2 = W₂` reconciliation gate**, §16-carrier content
+  threaded through the enriched §16 `Hypothesis`, issue 3001-adjacent).  Then `⁅P,K⁆ ≤ C_P(U) ≤
+  C_P(K)`, so `⁅P,K⁆ ⊆ C_P(K) ⊓ ⁅P,K⁆ = ⊥`, giving `K ≤ C_G(P)`, hence
   `K ≤ U ⊓ C_G(P) = ⊥` (`U_inf_centralizer_P_eq_bot`, the `c = 1` finish).
 
-The Wielandt/Frobenius fixed-point machinery is present (`WielandtFixedPoint`, `CoprimeAction`,
-`CoprimeAbelianPGroup`); this isolates the Maschke complement + Frobenius-quotient assembly. -/
+`normalizer_W2_within_S` (the Dedekind reduction) already discharges (13.16) from this fact. -/
 theorem normalizer_U_inf_W2_eq_bot [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     (hyp : Hypothesis (G := G)) :
     hyp.U ⊓ Subgroup.normalizer (hyp.W2 : Set G) = ⊥ := sorry
