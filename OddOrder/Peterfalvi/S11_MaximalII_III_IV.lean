@@ -5380,6 +5380,27 @@ theorem exists_regular_not_reducible_of_odd {α : Type*} {X Xmu : Set α}
   rw [hXeq, hXmu] at hlt
   exact (lt_irrefl _) hlt
 
+/-- **`u = |Ū|` is odd**: `u` is the order of the range of the `U`-action `uActionHom` on the chief
+factor, so by the first isomorphism theorem `u ∣ |U.subgroupOf (U ⊔ W₁)| ∣ |U ⊔ W₁| ∣ |G|`, and `|G|`
+is odd (odd-order hypothesis).  The parity input `hu` to `exists_regular_not_reducible_of_odd` in the
+(9.8.c) counting argument (`u` odd + `p-1` even forces `|𝒳(H₀C)| > p-1`). -/
+theorem u_odd [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    {M : Subgroup G} {data : TypesIIIIIIVSetup M} {chief : ChiefFactorData data}
+    (chars : Section11CharacterData data chief) : Odd chars.u := by
+  have hdvd : chars.u ∣ Nat.card G := by
+    rw [chars.u_eq_card_quotient]
+    set g := (quotientMulAutHom (N := chief.N) chief.N_aInvariant).comp
+      (data.typeP.U.subgroupOf (data.typeP.U ⊔ data.typeP.W1)).subtype
+    have hA : Nat.card ↥g.range ∣ Nat.card ↥(data.typeP.U.subgroupOf
+        (data.typeP.U ⊔ data.typeP.W1)) := by
+      rw [← Nat.card_congr (QuotientGroup.quotientKerEquivRange g).toEquiv]
+      exact Subgroup.card_quotient_dvd_card g.ker
+    exact hA.trans
+      (((data.typeP.U.subgroupOf (data.typeP.U ⊔ data.typeP.W1)).card_subgroup_dvd_card).trans
+        (data.typeP.U ⊔ data.typeP.W1).card_subgroup_dvd_card)
+  rcases hdvd with ⟨k, hk⟩
+  exact (Nat.odd_mul.mp (hk ▸ hG.odd)).1
+
 /-- **Peterfalvi (9.8)**: character-count consequences in Clifford case (a).
 
 Faithful to Peterfalvi (9.8.b,c,d) (count-statement audit, issue 2030):
@@ -6181,6 +6202,32 @@ noncomputable def hcPsi [Finite G] {M : Subgroup G}
     IrreducibleCharacter
       ↥(hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf (huSub data)) :=
   linearIrreducibleCharacter (θ.comp (hcHom chief))
+
+/-- **`hcHom` is surjective**: `hcHom = (second iso) ∘ mk'(H₀C)`, a composite of the surjective
+quotient map and the isomorphism `hcQuotientEquivHbar`.  Used to make `θ ↦ hcPsi θ` injective. -/
+theorem hcHom_surjective [Finite G] {M : Subgroup G}
+    {data : TypesIIIIIIVSetup M} (chief : ChiefFactorData data) :
+    Function.Surjective (hcHom chief) := by
+  haveI := realizedH0supC_normal_huSub chief
+  haveI : ((((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf (huSub data)).subgroupOf
+      (hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf (huSub data))).Normal :=
+    (realizedH0supC_normal_huSub chief).subgroupOf _
+  intro y
+  obtain ⟨x, rfl⟩ := (hcQuotientEquivHbar chief).surjective y
+  obtain ⟨z, rfl⟩ := (QuotientGroup.mk'_surjective _) x
+  exact ⟨z, rfl⟩
+
+/-- **`θ ↦ hcPsi θ` is injective**: `hcPsi θ = linearIrreducibleCharacter (θ ∘ hcHom)`; distinct `θ`
+give distinct `θ ∘ hcHom` (`hcHom` surjective, `MonoidHom.cancel_right`), hence distinct linear
+characters (`linearIrreducibleCharacter_injective`).  So the regular seeds `θ` inject into the
+`HC`-linear characters `hcPsi θ`, giving `|{hcPsi θ | θ regular}| = (p-1)^q` for the `oXtheta` count. -/
+theorem hcPsi_injective [Finite G] {M : Subgroup G}
+    {data : TypesIIIIIIVSetup M} (chief : ChiefFactorData data) :
+    Function.Injective (hcPsi chief) := by
+  intro θ θ' h
+  simp only [hcPsi] at h
+  exact (MonoidHom.cancel_right (hcHom_surjective chief)).mp
+    (linearIrreducibleCharacter_injective h)
 
 /-- **`hcHom` kills `H₀C`**: `hcHom` sends the realized `H₀C` (inside `HC`) to `1`, since
 `hcHom = iso ∘ mk'(H₀C)` and `mk'` kills `H₀C`.  Hence ψ = θ∘hcHom is trivial on `H₀C`, the kernel
