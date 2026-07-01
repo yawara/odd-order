@@ -524,3 +524,21 @@ scoped (5.5) `ofProjection`/`eq_sum_of_psi_eq_zero` (S07:1224/1561): `μ_j^{tau1
 - **crux = ⟨α^τ,λ^{τ₁}⟩ の λ 一様性**: なぜ全 λ∈S(HC)\{ζ} で同値 a か (Peterfalvi 構造論拠、要精読 04.11 (11.8.2))。
 - norm: ‖α^τ‖²=2+n² = ‖⊥成分‖² + ‖-nζ^{τ₁}+a∑λ^{τ₁}‖² (orthonormal) = ‖⊥‖² + (n²·? + a²·|S₁| + cross) → a bound。
 - 次 iteration = 04.11 (11.8.2) 原文で uniformity 論拠を確認 → projection lemma。orthonormal API (norm1/pairwise0/int) は消費準備済。
+
+## 2026-07-02 cont.²⁸ (lane-a) — (11.8) 原文精読 + SHC (5.3.b) bridge landed
+04.13 (11.8) 原文精読 ([MISSING_PAGE_FAIL:3] = 11.8.2-11.8.4 は落丁だが 11.8.5/11.8.6 は取得):
+- **(11.8.5) a=0 構造**: `((μ_0−ζ)^τ,α_{ij}^τ)` を τ-isometry で source ((μ_0−ζ,α_{ij})=−1+n) と等置
+  → `a=(∑ω_{r0}^σ,β)`。β=a∑_{λ∈S₁}λ^{τ₁} (11.8.2 の X=ω_{ij}^σ−ω_{i0}^σ 後)。**(5.3.b) ω^σ⊥S₁^{τ₁}**
+  ⟹ a=(∑ω^σ,a∑λ^{τ₁})=0。β real ⟹ a even も併用。
+- **key tool 発見**: `inner_left_eq_zero_of_inner_sub_eq_zero` (S12:4214、汎用): norm-1 ZIrr a,b,s で
+  a⊥b ∧ (a−b)⊥s ⟹ a⊥s (integral geometry ‖s−xa−xb‖²=1−2x²≥0 ⟹ x=0)。(5.3.b) を R(ζ) machinery
+  回避で出す。full-coh `tau1_zeta_vanishes_on_typePV` (4269) が内部で ⟨ζ^{τ₁},ω^σ⟩=0 をこれで出す。
+
+**landed (S12, leaf green)**: **`Hypothesis.tau_zeta_sub_conj_eq_SHC_extension`** — SHC 版
+`hyp.tau(ζ−ζ̄) = SHC.extension ζ − SHC.extension ζ̄` (extends_on_supported、ζ−ζ̄∈ℤ[S(HC),A₀] supported)。
+full-coh `tau_zeta_sub_conj_eq_tau1` の SHC 版。**SHC (5.3.b) の必須 ingredient** (a−b=ζ^{τ₁}−ζ̄^{τ₁}=hyp.tau(ζ−ζ̄))。
+
+**次 = SHC (5.3.b) 完成** `⟨ω^σ, SHC.extension λ⟩=0`: `inner_left_eq_zero_of_inner_sub_eq_zero`
+(a=SHC.ext λ, b=SHC.ext λ̄, s=ω^σ) + orthonormal API (norm1/pairwise0 ✅) + 本 bridge +
+coh-free `tau_zeta_sub_conj_vanishes_on_typePV`/sigmaNC≤2 (tau1_zeta_vanishes の SHC 複製)。
+これで (11.8.5) a=0 が組める。(11.8.6) は S₂ coherence (§14-gated) 残。
