@@ -8121,6 +8121,24 @@ theorem Hypothesis.R_sum_inner_zeroColumnOmegaSigma_sum [Finite G] {M : Subgroup
   exact hyp.SHC_extension_inner_zeroColumnOmegaSigma_sum hG hodd hφS hφirr hφ1
     (hyp.inducedFamily_degree_w1_conj_ne hG hφirr hφ1)
 
+open scoped Classical in
+/-- **Cross-Parseval for a virtual character.**  For `Δ ∈ ZIrr G` and any `φ`,
+`⟨φ, Δ⟩ = ∑_{χ : Irr} ⟨φ, χ⟩ · ⟨Δ, χ⟩`.  From the Fourier reconstruction `Δ = ∑_χ ⟨Δ,χ⟩·χ`
+(`sum_inner_irreducibleCharacter_smul`) and `inner_smul_right`; the `star` from conjugate-linearity
+vanishes because `⟨Δ,χ⟩` is a real integer (`mem_ZIrr_inner_int`). -/
+theorem mem_ZIrr_inner_eq_sum_over_irr [Finite G] [Fintype G] [Fintype (IrreducibleCharacter G)]
+    [Invertible (Nat.card G : ℂ)] {φ Δ : ClassFunction G ℂ} (hΔ : Δ ∈ ZIrr G) :
+    ClassFunction.inner φ Δ
+      = ∑ χ : IrreducibleCharacter G,
+          ClassFunction.inner φ (χ : ClassFunction G ℂ)
+            * ClassFunction.inner Δ (χ : ClassFunction G ℂ) := by
+  conv_lhs => rw [← OddOrder.RepresentationTheory.sum_inner_irreducibleCharacter_smul Δ]
+  rw [OddOrder.RepresentationTheory.inner_sum_right]
+  refine Finset.sum_congr rfl fun χ _ => ?_
+  rw [OddOrder.RepresentationTheory.inner_smul_right]
+  obtain ⟨m, hm⟩ := OddOrder.RepresentationTheory.mem_ZIrr_inner_int χ hΔ
+  rw [hm, star_intCast, mul_comm]
+
 /-- **Parity of a sum over a fixed-point-free involution** with an involution-invariant integer
 weight.  If `g` is a fixed-point-free involution on `s` and `f (g a) = f a` for all `a ∈ s`, then
 `∑_{a ∈ s} f a` is even — each orbit `{a, g a}` contributes `2·f a`.  (Proof via `ZMod 2`:
