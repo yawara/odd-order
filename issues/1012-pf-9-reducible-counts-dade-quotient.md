@@ -1846,3 +1846,39 @@ inertia_eq_hcInHu_caseA → Clifford correspondence → ξ∈Xθ → Xmu surject
 **この session の landed 総括**: step 1 (constituent extraction) + B/C (M-fixed→H̄-orbit equality core
 bridge) + D₁ (Ū preserves Hpart nontriviality)。L1-L5 再利用で surjectivity の crux 大半が landed、
 difficulty 急落。残 = D₂ (trivial) + E (Hpart↔W₁ transport、構造的 subtlety)。
+
+## ✅✅✅ step 2 (M-fixed → regular) 完成 — surjectivity crux LANDED (2026-07-01 cont.¹³)
+
+**caseA_reducible_theta_regular** (commit cd07bb07、full build green): M-fixed ζ (I_M=⊤) +
+LiesOver θ₀=inflation θbar + θbar≠1 → θbar regular。**surjectivity route の deep crux 完成**。
+
+### E-blocker (Hpart は W₁-closed でない) を S0 集約で回避
+cont.¹² の E-blocker (caseA.Hpart family が W₁-permute する保証なし、orbitRep∈U⊔W₁) を、
+**Hpart↔W₁ の直接 transitivity を使わず S0 に集約**して回避:
+- **E foundation** (3737b907): CliffordCaseAData.S0_aInvariant (S0 U-inv を field 化) +
+  comp_uActionHom_..._of_aInvariant (一般 K の Ū-inv)。
+- **D₂ + E2-quotient** (09501be9): comp_subtype_pointwise_smul_eq_one_iff (θ on a•S ⟺ θ∘a on S) +
+  comp_quotient_uPart_..._of_aInvariant (E2 の quotient form)。
+- **step1-W1 / step1** (cd07bb07): C + E2-quotient で W₁ 版 → Frobenius v=u·w (Subgroup.normal_mul) +
+  D₂×2 + E2-quotient で ∀v∈U⊔W₁, θbar∘q(v) on S0 ⟺ θbar on S0。
+- **E-main** (cd07bb07): θbar nontrivial on S0 (Hpart span ⊤ 背理法) + ∀i via D₂ + step1
+  (Hpart_i=q(orbitRep i)•S0、orbitRep∈U⊔W₁ を Frobenius で吸収 — W₁-closure 不要)。
+
+### 残 = step 5 (ζ = Ind_{HC}(hcPsi θbar) ∈ Xθ) — infra gap あり、substantial
+regular θbar → ζ∈Xθ の chain:
+- (a) **lies-over 推移性**: ζ over θ₀ (H⊆HC) → ∃ψ'∈Irr(HC), ζ over ψ' ∧ ψ' over θ₀。**要確認/新規**。
+- (b) **inertia(ψ')=HC**: ψ' over θ₀ ⟹ inertia(ψ')⊆inertia(θ₀)=HC (E-main+inertia_eq_hcInHu_caseA)、
+  ⊇HC 常。**要 general Clifford (conjugation preserves lies-over)**。
+- (c) **Ind_{HC}(ψ') irreducible**: isIrreducibleCharacter_induce_of_inertia_eq (既存)。
+- (d) **ζ=Ind_{HC}(ψ')**: coe_eq_induce_of_liesOver_of_isIrreducibleCharacter_induce (既存、235)。
+- (e) **ψ' linear**: ζ(1)=u ⟹ ψ'(1)=1 (Ind degree)。
+- (f) **ψ' trivial on H₀C**: ζ trivial on H₀C ⟹ constituent も。
+- (g) **ψ'=hcPsi θbar**: linear+trivial HC-char over θ₀ は hcPsi 形 (HC/H₀C≅H̄、hcHom)、over θ₀ で
+  θ''=θbar (inflation injective)。
+- **⚠ infra gap**: Clifford correspondence 存在形 (ζ→ψ') が repo に無い。(a)(b) は general Clifford
+  (lies-over 推移 + conjugation-preserves-lies-over) の新規 build 要。inertia_eq_hcInHu_caseA は
+  IrreducibleCharacter-regular form ゆえ E-main (hom-regular) の変換 (comp_subtype_ne_one_iff_exists) 要。
+
+**次着手**: (a)(b) の general Clifford infra (lies-over 推移性 + inertia 包含) を build → step 5 assembly。
+または Xmu を「reducible ξ そのもの」で定義し Xθ 経由を避ける再設計を検討 (ξ=Ind_{HC}(hcPsi θbar) を
+明示せず、reducible ξ の集合と Xθ∩reducible の bijection を count で)。
