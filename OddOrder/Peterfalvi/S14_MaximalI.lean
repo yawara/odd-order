@@ -1774,11 +1774,42 @@ noncomputable def sibleyTarget_frobI [Fintype G] {L : Subgroup G} [Fintype ↥L]
       (Subgroup.normalizer (hyp.typeI.typeF.H : Set G))) :
     CoherenceWiring.SibleyTarget hyp.tau hyp.Sset hyp.A := sorry
 
+/-- **Lattice-relative `xFamily_inner`** — the (5.7) `X`-family orthonormality `⟨Xᵢ, Xⱼ⟩ = ⟨χᵢ, χⱼ⟩`
+(`Xⱼ = β − τ(χ₀ − χⱼ)`) **without a global isometry**.  `S07.xFamily_inner` (S07:472) uses the
+isometry only on the supported differences `χ₀ − χⱼ` (S07:487); this variant takes exactly that
+lattice-relative fact `hdiff`, so it applies to the Feit–Thompson **Dade** map (which is *not* a
+global `IsIntegralIsometry` — `dim CF(L) > dim CF(G)` — but *is* isometric on the `A(L)`-supported
+differences).  Identical proof, sourcing the difference inner product from `hdiff`.  This is the one
+place the (5.7) equal-degree coherence used the global isometry (issue 9001), so it is the load-bearing
+step for a Dade-compatible `frobenius_typeI_coherent_of_abelianKernel`. -/
+theorem xFamily_inner_dade {L : Subgroup G} [Fintype G] [Fintype ↥L]
+    [Invertible (Nat.card ↥L : ℂ)] [Invertible (Nat.card G : ℂ)]
+    {τ : OddOrder.Peterfalvi.S07.IntegralCharacterMap ↥L G} {n : ℕ} [NeZero n]
+    (χ : Fin n → ClassFunction ↥L ℂ) (β : ClassFunction G ℂ)
+    (hdiff : ∀ i j, ClassFunction.inner (τ (χ 0 - χ i)) (τ (χ 0 - χ j))
+      = ClassFunction.inner (χ 0 - χ i) (χ 0 - χ j))
+    (hββ : ClassFunction.inner β β = 1)
+    (hB : ∀ j, ClassFunction.inner β (τ (χ 0 - χ j)) = 1 - ClassFunction.inner (χ 0) (χ j))
+    (i j : Fin n) :
+    ClassFunction.inner (β - τ (χ 0 - χ i)) (β - τ (χ 0 - χ j))
+      = ClassFunction.inner (χ i) (χ j) := by
+  have hχ00 : ClassFunction.inner (χ 0) (χ 0) = 1 := by
+    have h := hB 0; rw [sub_self, map_zero, ClassFunction.inner_zero_right] at h
+    linear_combination h
+  have hai : ClassFunction.inner (τ (χ 0 - χ i)) β = 1 - ClassFunction.inner (χ i) (χ 0) := by
+    rw [OddOrder.RepresentationTheory.inner_conj_symm, hB i, star_sub, star_one,
+      ← OddOrder.RepresentationTheory.inner_conj_symm]
+  rw [ClassFunction.inner_sub_left, ClassFunction.inner_sub_right, ClassFunction.inner_sub_right,
+    hββ, hB j, hai, hdiff i j, ClassFunction.inner_sub_left,
+    ClassFunction.inner_sub_right, ClassFunction.inner_sub_right, hχ00]
+  ring
+
 /-- **Peterfalvi (12.6) case (b): abelian rank-2 kernel → equal-degree coherence (5.7).**
 When `H = L_F` is abelian (Def (8.3) case (b)), every `θ ∈ Irr H` is linear, so every member
-`Ind_H^L θ ∈ S` has the same degree `[L:H]`; `S` is then coherent by (5.7)
-(`S07.coherent_of_constant_degree`).  (Gap: build the `S07.Hypothesis` (5.2) instance for `(S, A(L))`
-from `hyp.dadeData` and the constant-degree facts.) -/
+`Ind_H^L θ ∈ S` has the same degree `[L:H]`; `S` is then coherent by (5.7), built Dade-compatibly
+via `coherentEqualDegree` (already lattice-relative) + `xFamily_inner_dade` (the global-isometry-free
+`X`-family orthonormality).  (Gap: assemble the `X`-family `β − τ(χ₀−χⱼ)` and its `hdiff`/`hB` inputs
+from `hyp.dadeData`; the `β` common image is the (5.4) `ofProjection` `X`-side — see issue 9001.) -/
 theorem frobenius_typeI_coherent_of_abelianKernel [Finite G] [Fintype G]
     (_hG : OddOrder.BG.IsMinimalSimpleOdd G) {L : Subgroup G} [Fintype ↥L]
     [Invertible (Nat.card ↥L : ℂ)] [Invertible (Nat.card G : ℂ)]
