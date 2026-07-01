@@ -2148,6 +2148,79 @@ theorem Sset_scaledDiff_supported [Finite G] {L : Subgroup G} (hyp : Hypothesis 
   exact (mem_supportInSubgroup_sharp_subgroupOf_iff hyp.typeI.typeF.H hAH x).mpr
     ⟨Subgroup.mem_subgroupOf.mpr hxH, hx1⟩
 
+/-- **Degree data for an enumerated `S`-family** — the witness analogue of the Sibley
+`exists_sMemberDegreeData`, the integer-degree-ratio input of the (5.6) break bound (h56).  Against a
+minimal-degree anchor `χmem i₁` of degree `|L:K|`, each member has an integer ratio
+`deg j = χmem j(1)/|L:K|` (`Sset_charValue_one_eq_mul_index`), `deg i₁ = 1`, and the scaled
+difference `χmem j − deg j·χmem i₁` is `A(L)`-supported (`Sset_scaledDiff_supported`). -/
+theorem Sset_exists_degreeData [Finite G] {L : Subgroup G} (hyp : Hypothesis L) {C : Subgroup ↥L}
+    (hfrob : OddOrder.Isaacs.Ch06.IsFrobeniusGroup ↥L ((hyp.typeI.typeF.H).subgroupOf L) C)
+    (hAH : hyp.ambientA = ((hyp.typeI.typeF.H) : Set G) \ {1})
+    {k : ℕ} {χmem : Fin k → IrreducibleCharacter ↥L} {i₁ : Fin k}
+    (hmemS : ∀ j, (χmem j : ClassFunction ↥L ℂ) ∈ hyp.Sset)
+    (hanchordeg : (χmem i₁ : ClassFunction ↥L ℂ) 1 =
+      (((hyp.typeI.typeF.H).subgroupOf L).index : ℂ)) :
+    ∃ deg : Fin k → ℕ, deg i₁ = 1 ∧ (∀ j, 0 < deg j) ∧
+      (∀ j, (χmem j : ClassFunction ↥L ℂ) 1 = (deg j : ℂ) * (χmem i₁ : ClassFunction ↥L ℂ) 1) ∧
+      (∀ j, ((χmem j : ClassFunction ↥L ℂ) - deg j • (χmem i₁ : ClassFunction ↥L ℂ)).support ⊆
+        OddOrder.Peterfalvi.S04.supportInSubgroup hyp.ambientA L) := by
+  choose deg hdeg_pos hdeg_eq using fun j => Sset_charValue_one_eq_mul_index hyp (hmemS j)
+  have hdeg_eq' : ∀ j, (χmem j : ClassFunction ↥L ℂ) 1 =
+      (deg j : ℂ) * (χmem i₁ : ClassFunction ↥L ℂ) 1 := fun j => by
+    rw [hdeg_eq j, hanchordeg]
+  refine ⟨deg, ?_, hdeg_pos, hdeg_eq', fun j =>
+    Sset_scaledDiff_supported hyp hfrob hAH (hmemS j) (hmemS i₁) (hdeg_eq' j)⟩
+  have h := hdeg_eq i₁
+  rw [hanchordeg] at h
+  have hidx_ne : (((hyp.typeI.typeF.H).subgroupOf L).index : ℂ) ≠ 0 :=
+    Nat.cast_ne_zero.mpr Subgroup.index_ne_zero_of_finite
+  have hdeg1 : (deg i₁ : ℂ) = 1 := mul_right_cancel₀ hidx_ne (by rw [one_mul]; exact h.symm)
+  exact_mod_cast hdeg1
+
+open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
+open OddOrder.Peterfalvi.S09.Cert in
+/-- **Break-pair fields for `{ψ, ψ̄}`** — the witness analogue of the Sibley `sBreakPair_fields`, the
+per-`ψ` inputs the (5.6) bound `coherentDegreeSumBound_of_not_coherent` consumes (in its argument
+order): non-realness, conjugate-difference support, the `{ψ, ψ̄}` orthonormality, and the
+orthogonality of `ψ`, `ψ̄` to every member of `S₁` (distinct irreducibles, since `ψ, ψ̄ ∉ S₁`). -/
+theorem Sset_breakPair_fields [Finite G] {L : Subgroup G} (hyp : Hypothesis L)
+    (hodd : Odd (Nat.card ↥L)) {C : Subgroup ↥L}
+    (hfrob : OddOrder.Isaacs.Ch06.IsFrobeniusGroup ↥L ((hyp.typeI.typeF.H).subgroupOf L) C)
+    (hAH : hyp.ambientA = ((hyp.typeI.typeF.H) : Set G) \ {1})
+    {ψ : ClassFunction ↥L ℂ} (hψS : ψ ∈ hyp.Sset)
+    {S₁ : Set (ClassFunction ↥L ℂ)} (hS₁sub : S₁ ⊆ hyp.Sset)
+    (hψnotS1 : ψ ∉ S₁) (hψcnotS1 : ψ.conj ∉ S₁) :
+    ¬ ClassFunction.IsReal ψ ∧
+    (ψ.conj - ψ).support ⊆ OddOrder.Peterfalvi.S04.supportInSubgroup hyp.ambientA L ∧
+    ClassFunction.inner ψ ψ = 1 ∧
+    ClassFunction.inner ψ.conj ψ.conj = 1 ∧
+    ClassFunction.inner ψ ψ.conj = 0 ∧
+    ClassFunction.inner ψ.conj ψ = 0 ∧
+    (∀ x ∈ S₁, ClassFunction.inner ψ x = 0) ∧
+    (∀ x ∈ S₁, ClassFunction.inner ψ.conj x = 0) := by
+  have hψconjS := Sset_closedUnderConjugate hyp hψS
+  have hne : ψ ≠ ψ.conj := fun h => (Sset_hasNoRealCharacters hyp hodd hfrob hψS) h.symm
+  refine ⟨Sset_hasNoRealCharacters hyp hodd hfrob hψS,
+    Sset_conjDiff_supported hyp hfrob hAH hψS,
+    Sset_inner_self_eq_one hyp hfrob hψS,
+    Sset_inner_self_eq_one hyp hfrob hψconjS,
+    Sset_pairwiseOrthogonal hyp hodd hfrob hψS hψconjS hne,
+    Sset_pairwiseOrthogonal hyp hodd hfrob hψconjS hψS (fun h => hne h.symm), ?_, ?_⟩
+  · intro x hx
+    have hxne : ψ ≠ x := by rintro rfl; exact hψnotS1 hx
+    have hite := OddOrder.RepresentationTheory.irreducibleCharacter_inner_eq_ite
+      ⟨ψ, Sset_isIrreducibleCharacter hyp hfrob hψS⟩
+      ⟨x, Sset_isIrreducibleCharacter hyp hfrob (hS₁sub hx)⟩
+    rwa [if_neg (fun he => hxne
+      (congrArg (fun c : IrreducibleCharacter ↥L => (c : ClassFunction ↥L ℂ)) he))] at hite
+  · intro x hx
+    have hxne : ψ.conj ≠ x := by rintro rfl; exact hψcnotS1 hx
+    have hite := OddOrder.RepresentationTheory.irreducibleCharacter_inner_eq_ite
+      ⟨ψ.conj, Sset_isIrreducibleCharacter hyp hfrob hψconjS⟩
+      ⟨x, Sset_isIrreducibleCharacter hyp hfrob (hS₁sub hx)⟩
+    rwa [if_neg (fun he => hxne
+      (congrArg (fun c : IrreducibleCharacter ↥L => (c : ClassFunction ↥L ℂ)) he))] at hite
+
 open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
 open OddOrder.Peterfalvi.S09.Cert in
 /-- **`S(H′)` member differences are `A(L)`-supported** — the `hab`-free subfamily analogue of
