@@ -900,3 +900,21 @@ a,Y 一貫取得可。(11.8) closure は依然 doubly-gated (§9↔§10、§14)�
 `μ_j^{τ₂}=∑ω_{ij}^σ` coherence 矛盾の鍵入力。**次 = (11.8.3) β real (a even, a=1 除外)** or (11.8.6)
 assembly (S₂ coherence=§14 gate、S(C) coherent → (11.3) 矛盾)。h114 (11.8.4) は landed (10.9) から
 by-contra 内で establish (residual⊥ 仮定)。(11.8) closure は依然 doubly-gated (§9↔§10 の (11.8.1)、§14 の (11.8.6))。
+
+## 2026-07-02 cont.⁵¹ (lane-a) — **源泉照合 (11.8.5/6 verified) + (11.8.6) opening identity LANDED**
+mmd 04.13 (11.8.5)/(11.8.6) を精読 (l.49-70, 復元済)。**自作 (11.8.5) lemma が Peterfalvi と一致確認**:
+M-side (μ_0−ζ,α_{ij})=−1+n (δ=1 で n−δ に一致)、G-side (∑ω_{r0}^σ,β)−1−a+n → a=0。⚠ **a-even (a=1 除外)**:
+Pf は "(β,1_G)=0 + β real ⟹ a even" (§1 一般 parity 参照、詳細略) → a∈{0,2} → (11.8.2) → a=0。**これが未実装の
+残ピース** (β real=(11.8.3): (4.8)/(4.10)/(5.9) + 一般 parity)。自作 lemma は a∈{0,2}→a=0 を直接与えるので
+a-even だけ別途要。
+
+**本 landed**: `tau_muColumnSum_sub_zeta_eq_of_alphaImage` (S12, leaf green, sorry-free) = (11.8.6) opening:
+`(μ_j − dζ)^τ = ∑_i ω_{ij}^σ − dζ^{τ₁}` (δ=1, d=w₁n+1)。halpha (a=0 image ∀i、SHC_tau_muGridAlpha_eq δ=1) +
+h114 ((11.8.4)) を仮定パラメータ化。証明 = M-level identity `μ_j−dζ=(μ_0−ζ)+∑α_{ij}` を τ 線形 (`map_add`,
+`map_sum`、hyp.tau=IntegralCharacterMap linear) で写し → 3 image 代入 → `module`。full-coh 版
+(5462-5510 の (10.6.a) column-sum τ) と同型。⚠ `←Finset.smul_sum` が δ-scalar 無で nζ 項を先取り → `(n*w₁)`
+順 → `mul_comm` 追加で解消。
+
+**次 = (11.8.6) full**: μ_j^{τ₂}=∑ω_{ij}^σ ((4.9) or (5.8)) → S(C)=S₁∪S₂ coherent → (11.3) `S_H0C_not_coherent`
+矛盾。⚠ S₂ coherence (§14 gate: (9.11)+(11.7))、μ_k∈S₂ ((9.8.b)/(9.9.b))、τ₂ 拡張。or (11.8.3) β real 先行。
+(11.8) closure は依然 doubly-gated (§9↔§10 の (11.8.1)、§14 の (11.8.6))。
