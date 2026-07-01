@@ -92,4 +92,23 @@ theorem mul_mem_ZIrr [Finite G] {φ ψ : ClassFunction G ℂ}
       simp only [ClassFunction.mul_apply, ClassFunction.smul_apply]; ring
     rw [hs]; exact Submodule.smul_mem _ c ih
 
+/-- **Twisting by a unit-norm class function preserves the inner product.**  If `lam` has unit norm
+at every element (`lam g · conj (lam g) = 1` — e.g. a linear character, whose values are roots of
+unity), then `⟨χ · lam, χ · lam⟩ = ⟨χ, χ⟩` for every class function `χ`.  Pointwise,
+`(χ·lam)(g) · conj((χ·lam)(g)) = χ(g)·conj(χ(g)) · (lam g · conj (lam g)) = χ(g)·conj(χ(g))`.
+
+This is the norm-preservation behind Gallagher's theorem: `χ · Inf(β)` has the same norm as `χ`, so
+an irreducible `χ` twisted by a linear character `Inf(β)` stays of norm one — hence irreducible. -/
+theorem inner_mul_self_eq_of_star_mul_self_eq_one {G : Type*} [Group G] [Fintype G]
+    [Invertible (Nat.card G : ℂ)] (χ : ClassFunction G ℂ) {lam : ClassFunction G ℂ}
+    (hlam : ∀ g, lam g * star (lam g) = 1) :
+    ClassFunction.inner (χ * lam) (χ * lam) = ClassFunction.inner χ χ := by
+  rw [ClassFunction.inner_eq_inv_card_mul_innerSum, ClassFunction.inner_eq_inv_card_mul_innerSum]
+  congr 1
+  unfold ClassFunction.innerSum
+  refine Finset.sum_congr rfl fun g _ => ?_
+  simp only [ClassFunction.mul_apply, star_mul']
+  rw [show χ g * lam g * (star (χ g) * star (lam g))
+        = χ g * star (χ g) * (lam g * star (lam g)) from by ring, hlam g, mul_one]
+
 end OddOrder.RepresentationTheory

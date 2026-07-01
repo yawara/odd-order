@@ -103,9 +103,16 @@ Coq (1.7)(b) `cfInd_central_Inertia` の hypothesis は `abelian (T/H)` (T=I(θ)
       axiom-clean, cont.⁴): `ClassFunction` に pointwise `Mul` + `IsCharacter.mul` (χ·ψ = char of `tprod`,
       `Representation.char_tensor` 経由) + `mul_mem_ZIrr` (ZIrr は積で閉じる=部分環)。Gallagher の
       「χ·Inf(β) は character」(linear twist が norm 保存 → 既約) の核心前提。
-- [ ] **(G2) Gallagher** + **(G3) mult-free-from-abelian-inertia** を build (同/新 leaf)。char-product は上で landed、
-      残 = linear char の |値|=1 → norm 保存 → `isIrreducibleCharacter_of_inner_self_one_of_apply_one_pos`、
-      および bijection Irr(I/H)≃Irr(I|θ)。extension (G1) と組む。
+- [x] **norm 保存 (twist の核)** — `CharacterProduct.inner_mul_self_eq_of_star_mul_self_eq_one` (cont.⁶,
+      sorry-free): `∀g, lam g·conj(lam g)=1` (unit-norm) ⟹ `⟨χ·lam, χ·lam⟩ = ⟨χ,χ⟩`。linear char で twist しても
+      norm 不変 → 既約保存の核。
+- [ ] **(G2) Gallagher** + **(G3)** を build。**⚠ 重要発見: `LinearCharacter.lean` に linear-char infra が既存**
+      (`IsIrreducibleCharacter.map_mul_of_apply_one_eq_one` = φ(1)=1⟹乗法的, `apply_one_eq_one_of_isMulCommutative`
+      = abelian⟹linear, `exists_linearIrreducibleCharacter_eq_of_isMulCommutative` 等)。次はこれを精読して cite。
+      残 gap: **(A) `IsIrreducibleCharacter χ ⟹ ⟨χ,χ⟩=1`** (Prop 版、bundled `irreducibleCharacter_inner_eq_ite`
+      からの bridge が未) — twist-既約 (`isIrreducibleCharacter_of_inner_self_one_of_apply_one_pos` 適用) の唯一の
+      小 gap。**(B) linear char の unit-norm** = `map_mul_of_apply_one_eq_one` + `char(g⁻¹)=conj char(g)` で導出可。
+      その後 bijection Irr(I/H)≃Irr(I|θ) + extension (G1)。
 - [ ] **type-F 適用**: `typeF_inertia_commutator_le` (I(θ)/H abelian) を (G3) に投入。
 - [ ] **(1.5.a)/(1.2) 台**: 各構成要素 φ の台 ⊆ A(L)∪{1}。非実 = 奇数位数 (`not_isReal_of_ne_trivial_of_odd_card'`)。
 - [ ] `typeI_induced_char_constituents` (S14:472) を上記 cite で sorry-free 化。lane b (12.14) は cite。
