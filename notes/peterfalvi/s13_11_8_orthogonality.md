@@ -542,3 +542,19 @@ full-coh `tau_zeta_sub_conj_eq_tau1` の SHC 版。**SHC (5.3.b) の必須 ingre
 (a=SHC.ext λ, b=SHC.ext λ̄, s=ω^σ) + orthonormal API (norm1/pairwise0 ✅) + 本 bridge +
 coh-free `tau_zeta_sub_conj_vanishes_on_typePV`/sigmaNC≤2 (tau1_zeta_vanishes の SHC 複製)。
 これで (11.8.5) a=0 が組める。(11.8.6) は S₂ coherence (§14-gated) 残。
+
+## 2026-07-02 cont.²⁹ (lane-a) — 🎯 SHC (5.3.b) LANDED — `⟨ω^σ, ζ^{τ₁}⟩=0` (11.8.5 a=0 の core)
+**`Hypothesis.SHC_extension_inner_alignedOmegaSigma_eq_zero`** landed (S12, leaf green):
+`⟨SHC.extension ζ, alignedOmegaSigmaGrid i j⟩=0` (ζ∈S(HC) degree-w₁ 既約)。
+`tau1_zeta_vanishes_on_typePV` の中間 (vanishing-on-V の手前) を SHC に port:
+- `exists_alignedOmegaSigmaGrid_chiFam_family` で ω_{ij}^σ=chiFam(P j) (同一 tic/canonicalFullDadeApp)。
+- 差 ζ^{τ₁}−ζ̄^{τ₁}=(ζ−ζ̄)^τ (cont.²⁸ bridge) の σ-coeff は sigmaNC≤2<min(w₁,w₂) (各 norm-1 で ≤1、
+  `ncard_inner_chiFam_ne_zero_le_one`) ⟹ `sigmaCoeff_eq_zero_of_sigmaNC_lt` で ⟨差,χ_{P j}⟩=0。
+- `inner_left_eq_zero_of_inner_sub_eq_zero` (orthonormal API: norm1/pairwise0) で ⟨ζ^{τ₁},χ_{P j}⟩=0。
+transitive sorryAx は SHC/muGrid 経由 (genuine deferred)。
+
+**これで (11.8.5) a=0 の (5.3.b) 依存が解消**。残 a=0 pieces:
+- (11.8.2) α^τ 分解 `α_{ij}^τ = X − nζ^{τ₁} + a∑λ^{τ₁}` (X⊥S₁^{τ₁}, a∈{0,1,2}) — projection + norm。
+- τ-isometry reduction `((μ_0−ζ)^τ,α_{ij}^τ)=(μ_0−ζ,α_{ij})=−1+n` → `a=(∑ω^σ,β)`。
+- β real ⟹ a even、+ (5.3.b) ⟹ a=0。
+**次 iteration = (11.8.2) 分解 or a=(∑ω^σ,β) の isometry reduction を組む** (5.3.b 済で a=0 に王手)。

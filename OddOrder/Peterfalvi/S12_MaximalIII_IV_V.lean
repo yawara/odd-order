@@ -7156,6 +7156,96 @@ theorem Hypothesis.tau_zeta_sub_conj_eq_SHC_extension [Finite G] {M : Subgroup G
   rw [← (hyp.SHC_isCoherent hG).extends_on_supported _ hmem, map_sub]
 
 open scoped FiniteInduce in
+/-- **Peterfalvi (5.3.b) for the S(HC)-coherent extension** (the (11.8.5) `a = 0` input).  For a
+degree-`w₁` irreducible `ζ ∈ S(HC)`, the coherent image `ζ^{τ₁} = SHC_isCoherent.extension ζ` is
+orthogonal to every aligned `σ`-grid vector `ω_{ij}^σ`.
+
+Port of the intermediate of `tau1_zeta_vanishes_on_typePV` to the `S(HC)`-coherence (the by-contra
+lacks the full-`S` `coh`).  Writing `ω_{ij}^σ = χ_{P j}` (`exists_alignedOmegaSigmaGrid_chiFam_family`,
+the *same* `tic`/`canonicalFullDadeApp`), the difference `ζ^{τ₁} − ζ̄^{τ₁} = (ζ − ζ̄)^τ`
+(`tau_zeta_sub_conj_eq_SHC_extension`) has `≤ 2 < min(w₁, w₂)` nonzero `σ`-coefficients (each of
+`ζ^{τ₁}, ζ̄^{τ₁}` has `≤ 1`, being norm-`1` — `ncard_inner_chiFam_ne_zero_le_one`), so
+`sigmaCoeff_eq_zero_of_sigmaNC_lt` gives `⟨ζ^{τ₁} − ζ̄^{τ₁}, χ_{P j}⟩ = 0`; the norm-`1` projection
+`inner_left_eq_zero_of_inner_sub_eq_zero` (orthonormal `{ζ^{τ₁}, ζ̄^{τ₁}}` via `SHC_extension_inner_*`)
+then upgrades this to `⟨ζ^{τ₁}, χ_{P j}⟩ = 0`. -/
+theorem Hypothesis.SHC_extension_inner_alignedOmegaSigma_eq_zero [Finite G] {M : Subgroup G}
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis M) (hodd : Odd (Nat.card G))
+    {ζ : ClassFunction ↥M ℂ} (hζS : ζ ∈ inducedFamily M) (hζirr : IsIrreducibleCharacter ζ)
+    (hζ1 : ζ 1 = (hyp.w1 : ℂ)) (hζne : ζ.conj ≠ ζ) (i : Fin hyp.w1) (j : Fin hyp.w2) :
+    ClassFunction.inner ((hyp.SHC_isCoherent hG).extension ζ)
+      (hyp.alignedOmegaSigmaGrid hG hodd i j) = 0 := by
+  haveI := hyp.finiteG
+  classical
+  let tic := typePData_toTICyclicHypothesis hyp.typeP hodd
+  haveI : NeZero (Nat.card ↥tic.W1) := ⟨Nat.card_pos.ne'⟩
+  haveI : NeZero (Nat.card ↥tic.W2) := ⟨Nat.card_pos.ne'⟩
+  let app := hyp.canonicalFullDadeApp hG hodd
+  have hVeq : tic.V = tic.Vdiff := rfl
+  obtain ⟨P, _hPinj, hPeq⟩ := hyp.exists_alignedOmegaSigmaGrid_chiFam_family hG hodd i
+  rw [hPeq j]
+  have hζcS : ζ.conj ∈ inducedFamily M := inducedFamily_closedUnderConjugate M hζS
+  have hζcirr : IsIrreducibleCharacter ζ.conj := hζirr.conj
+  have hζc1 : ζ.conj 1 = (hyp.w1 : ℂ) := by rw [ClassFunction.conj_apply, hζ1, star_natCast]
+  have haZ : (hyp.SHC_isCoherent hG).extension ζ ∈ ZIrr G :=
+    (hyp.SHC_isCoherent hG).extension_mem_ZIrr ζ (Submodule.subset_span ⟨hζS, hζirr, hζ1⟩)
+  have hbZ : (hyp.SHC_isCoherent hG).extension ζ.conj ∈ ZIrr G :=
+    (hyp.SHC_isCoherent hG).extension_mem_ZIrr ζ.conj (Submodule.subset_span ⟨hζcS, hζcirr, hζc1⟩)
+  have ha1 : ClassFunction.inner ((hyp.SHC_isCoherent hG).extension ζ)
+      ((hyp.SHC_isCoherent hG).extension ζ) = 1 := hyp.SHC_extension_inner_self hG hζS hζirr hζ1
+  have hb1 : ClassFunction.inner ((hyp.SHC_isCoherent hG).extension ζ.conj)
+      ((hyp.SHC_isCoherent hG).extension ζ.conj) = 1 :=
+    hyp.SHC_extension_inner_self hG hζcS hζcirr hζc1
+  have hab : ClassFunction.inner ((hyp.SHC_isCoherent hG).extension ζ)
+      ((hyp.SHC_isCoherent hG).extension ζ.conj) = 0 :=
+    hyp.SHC_extension_inner_of_ne hG hζS hζirr hζ1 hζcS hζcirr hζc1 (fun h => hζne h.symm)
+  have hvanish : ∀ w ∈ tic.V, hyp.tau (ζ - ζ.conj) w = 0 := fun w hw =>
+    hyp.tau_zeta_sub_conj_vanishes_on_typePV hG hodd hζS hζirr hw
+  have hNC : tic.sigmaNC hVeq app (hyp.tau (ζ - ζ.conj))
+      < min (Nat.card ↥tic.W1) (Nat.card ↥tic.W2) := by
+    have hbound : tic.sigmaNC hVeq app (hyp.tau (ζ - ζ.conj)) ≤ 2 := by
+      have hsub : {pq | tic.sigmaCoeff hVeq app (hyp.tau (ζ - ζ.conj)) pq ≠ 0} ⊆
+          {pq | ClassFunction.inner ((hyp.SHC_isCoherent hG).extension ζ)
+              (tic.chiFam hVeq app pq) ≠ 0} ∪
+          {pq | ClassFunction.inner ((hyp.SHC_isCoherent hG).extension ζ.conj)
+              (tic.chiFam hVeq app pq) ≠ 0} := by
+        intro pq hpq
+        by_contra hcon
+        simp only [Set.mem_union, Set.mem_setOf_eq, not_or, not_not] at hcon
+        apply hpq
+        change ClassFunction.inner (hyp.tau (ζ - ζ.conj)) (tic.chiFam hVeq app pq) = 0
+        rw [hyp.tau_zeta_sub_conj_eq_SHC_extension hG hodd hζS hζirr hζ1,
+          ClassFunction.inner_sub_left, hcon.1, hcon.2, sub_zero]
+      calc tic.sigmaNC hVeq app (hyp.tau (ζ - ζ.conj))
+          = {pq | tic.sigmaCoeff hVeq app (hyp.tau (ζ - ζ.conj)) pq ≠ 0}.ncard := rfl
+        _ ≤ ({pq | ClassFunction.inner ((hyp.SHC_isCoherent hG).extension ζ)
+                (tic.chiFam hVeq app pq) ≠ 0} ∪
+              {pq | ClassFunction.inner ((hyp.SHC_isCoherent hG).extension ζ.conj)
+                (tic.chiFam hVeq app pq) ≠ 0}).ncard :=
+            Set.ncard_le_ncard hsub (Set.toFinite _)
+        _ ≤ {pq | ClassFunction.inner ((hyp.SHC_isCoherent hG).extension ζ)
+                (tic.chiFam hVeq app pq) ≠ 0}.ncard +
+              {pq | ClassFunction.inner ((hyp.SHC_isCoherent hG).extension ζ.conj)
+                (tic.chiFam hVeq app pq) ≠ 0}.ncard :=
+            Set.ncard_union_le _ _
+        _ ≤ 1 + 1 := by
+            gcongr
+            · exact tic.ncard_inner_chiFam_ne_zero_le_one hVeq app haZ ha1
+            · exact tic.ncard_inner_chiFam_ne_zero_le_one hVeq app hbZ hb1
+        _ = 2 := rfl
+    have h3a := tic.three_le_card_W1
+    have h3b := tic.three_le_card_W2
+    omega
+  have hL3 : tic.sigmaCoeff hVeq app (hyp.tau (ζ - ζ.conj)) (P j) = 0 :=
+    tic.sigmaCoeff_eq_zero_of_sigmaNC_lt hVeq app hvanish hNC (P j)
+  have hdiff : ClassFunction.inner ((hyp.SHC_isCoherent hG).extension ζ
+      - (hyp.SHC_isCoherent hG).extension ζ.conj) (tic.chiFam hVeq app (P j)) = 0 := by
+    rw [← hyp.tau_zeta_sub_conj_eq_SHC_extension hG hodd hζS hζirr hζ1]; exact hL3
+  have hsZ : tic.chiFam hVeq app (P j) ∈ ZIrr G := (tic.chiFam_spec hVeq app).2.1 (P j)
+  have hs1 : ClassFunction.inner (tic.chiFam hVeq app (P j)) (tic.chiFam hVeq app (P j)) = 1 := by
+    rw [(tic.chiFam_spec hVeq app).2.2.1, if_pos rfl]
+  exact inner_left_eq_zero_of_inner_sub_eq_zero haZ hsZ ha1 hb1 hs1 hab hdiff
+
+open scoped FiniteInduce in
 /-- **Peterfalvi (11.8), the genuine non-orthogonality** (lane-b W3 obligation, issue 2020).
 
 Under Hypothesis (10.1), there is an irreducible `ζ ∈ S = inducedFamily M` of degree `w₁` —
