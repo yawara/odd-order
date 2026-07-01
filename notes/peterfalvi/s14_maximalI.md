@@ -1406,3 +1406,49 @@ loop⁵⁹ recipe を実装し、(12.14) L-side wiring を確定 (全 build-gree
   `apply_one_le_induce_apply_one_of_liesOver`。誘導版 decomposition producer は要 build (substantial)。
 - coset-constancy assembly `psi_constant_on_xK` (S14:2959): horth[3 の全 χ_M 集約] + M data + psi_constant chain。
 - witness coherence `sibleyTarget_frobI` (S14:1652, sorry) = (6.8) case-c1 Sibley target (別 deep piece)。
+
+### loop⁶¹ (2026-07-01 lane-b resume³): critical-path 精査 — M-side は構成的 Clifford (issue 0026) に gated
+
+(12.16) 原文 (§12 mmd) と (12.4) engine を精読し、(12.14)→(12.16) の残 gap を厳密特定:
+
+**(12.14) 構造 (原文)**: `ψ=χ_L^{τ₁}` (L=witness, Frobenius by 12.10)。「By (5.5), ψ∈ℤ[R(χ)].
+Thus, by (12.3) and (12.4), ψ is constant on xK」。⟹ **(5.5)[done loop⁶⁰] + (12.3) + (12.4)-applied-to-M**。
+- **(12.4) engine は proven** (parameterized on `data`+`horth`): `orthogonal_character_constant_on_coset`
+  (S14:1607) = `Sset_offKernel_vanishes_off_H` + kernel-part。horth 入力 = loop⁶⁰ の horth-combine。
+- **∴ (12.14) の残 gap は (a) data_M (M の CharacterDecompositionData) + (b) `constituent_diff_support_subset_nonescaping`
+  (S14:1274, sorry) の 2 つ**。両方とも **構成的 Clifford** に依存:
+  - **data_M** = `typeI_induced_char_constituents` (M は非 Frobenius counterexample、12.8): (12.2.a) 分解
+    `Ind_H^M θ=Σφ (mult-one)`。原文証明「follows from (8.2.c)+(1.7.c)」。**(1.7.c)** = [T=I_M(θ), T/H abelian,
+    gcd(|H|,[T:H])=1 ⟹ Ind_H^M θ=Σχ_i (n=[T:H], mult-one, 次数 [M:T]θ(1))]。mult-one (e_φ=1) は
+    **coprime ramification 理論** (θ が T へ extend、Gallagher/[Is 6.x]) 要 → 構成的 Clifford correspondence。
+  - **constituent_diff_support_subset_nonescaping**: 原文「Res_H φ_i = Σ conjugates of θ (Clifford [Is 6.2]),
+    ∴ Supp(φ_1-φ_2)⊂A(L)-H^#」。`data` field に無い **Res_H φ=Σ共役θ** (全構成要素で同一) を要 → 同じく Clifford。
+
+**結論**: M-side (12.14) 全体が **構成的 Clifford correspondence (Isaacs 6.2/6.11 + Pf (1.7)) = issue 0026** に
+gated。現状 `clifford_decomposition` は **conditional 形のみ** (Clifford data を外部供給、構成せず)、
+`CliffordSingleOrbit` は LiesOver/次数境界のみ。**構成的 producer (Res の single-orbit core + inertia induction
+bijection [Is 6.11] + cyclic/coprime mult-one [(1.7)]) は未在** = 大規模 shared infra build。
+prereq (1.2)[S03b done], (1.5.a)[Clifford.lean 一部] は available。**次の genuine 上流 = issue 0026 (Clifford core)**
+だが shared infra ゆえ claim-before-build (9000 issue) 対象。α レーン (§10-13 char) も要すると見込まれ、coordination point。
+
+**L-side 別 gate**: witness coherence `sibleyTarget_frobI` (S14:1652, sorry) = (6.8) case-c1 Sibley target。
+**重要: S08 は 0 sorry — (6.8) body `sibleySetup_is_coherent` は proven**。∴ 唯一の gap = Frobenius witness の
+`SibleyDadeHypothesis` producer (現在 producer 無し、consumer のみ)。これは Clifford 非依存の tractable L-side
+build で、landing すれば `frobenius_typeI_coherent` (12.6) → `witness_L_coherent` (S14:2458→2463 が `sibleyTarget_frobI`
+経由 sorry) → witness の (5.5) 実適用が全て unconditional化。**高価値・次セッション最有力**。
+
+**`sibleyTarget_frobI` 構成 route (turnkey)**: `SibleyTarget hyp.tau hyp.Sset hyp.A` を構成。
+`SibleyDadeHypothesis` (S08_CoherenceCorePart1:3265) の 15 field:
+- `H := hyp.H.subgroupOf L`, `W1 := C` (hfrob の complement)。
+- `H_ne_bot`/`H_normal`/`H_nilpotent`/`split`(L=H⋊W1)/`W1_nontrivial`/`card_L_odd`: hyp+hfrob から直接。
+- `dade`: **crux**。ambient `sharpImage (hyp.H.subgroupOf L)` は `typeIA L hyp.typeI` (=H^#) と命題的等号
+  (`typeIA_eq_sharp` (S14:3289) + `sharpImage`=map∘subtype∘subgroupOf の計算; defeq でない)。
+  **cleaner route = fresh 構成** `S04.of_isTISubset` (S04:267, `hA_sharp`/`hA_L`/`hL_norm`/`hTI` 入力) →
+  `of_isTISubset_H` (S04:304) が `dade.H a=⊥` を自動供給 (= `dade_H_eq_bot` field)。TI 性は witness の
+  A(L)=H^# TI (8.12.c/12.9) から。
+- `tau_eq : sib.tau = hyp.tau`: 両者 TI Dade map (= Ind_L^G on supported lattice) ゆえ `IsDadeMap.unique`
+  (S04:3645) で一致。要 hyp.dadeData.dade も TI map = `∀a, hyp.dadeData.dade.H a=⊥` (witness Frobenius ゆえ;
+  `H_eq_supportKernel` + escaping 空)。`isDadeMap_induce_of_forall_H_eq_bot` (S14:1180) が両側を Ind に落とす。
+- `S`/`S_eq`: hyp.Sset は既に {Ind_H^L θ|θ≠1} 形 (S14:85) ゆえ S_eq 直接。`A0_eq`: `supportInSubgroup (sharpImage H) L
+  = hyp.A` を sharpImage=typeIA から congr。`cases := Or.inl hfrob`。`hconj`: hyp.hconj (ambient 一致下)。
+推定 ~150-250 行 + 補助 (TI 性・forall_H_eq_bot・sharpImage=typeIA)。fresh-dade route が transport 回避で最善。
