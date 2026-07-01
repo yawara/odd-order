@@ -271,6 +271,77 @@ theorem mem_zpowers_mul_of_commute_coprime {Γ : Type*} [Group Γ] {z g : Γ}
     Subgroup.zpowers_le.mpr ((Subgroup.zpowers (z * g)).pow_mem (Subgroup.mem_zpowers _) _)
   exact hle hg
 
+/-- **Type-`F` class-fixing: an element of `U ∖ U₁` fixes only the identity `H`-class**
+(the core of Peterfalvi (8.2.c)).  This is the type-`F` analogue of
+`ConjugationBrauer.fixed_eq_one_of_not_mem_of_centralizer_le`, which uses the Frobenius condition
+`C_G(h) ≤ H`; here the weaker type-`F` condition `U ⊓ C_G(x) ≤ U₁` (`TypeFData.centralizer_le_U1`)
+suffices, at the cost of the coprime `(2.1)` step.  If `g ∈ U ∖ U₁` (`g` coprime to `H`, normalizing
+`H`) fixes a class `⟦h⟧` (`h ≠ 1`), then some `c·g` centralizes `h` (`IsConj`); by (2.1)
+(`exists_mem_centralizer_conj`) `c·g` is `H`-conjugate to `z·g` with `z ∈ C_H(g)`, so `z·g`
+centralizes `w = yhy⁻¹ ≠ 1`; as `z` commutes with `g` coprimely, `g ∈ ⟨z·g⟩` centralizes `w`
+(`mem_zpowers_mul_of_commute_coprime`), whence `g ∈ U ⊓ C_G(w) ≤ U₁` — contradiction. -/
+theorem fixed_conjClass_eq_one_of_typeF {Γ : Type*} [Group Γ] [Finite Γ]
+    {H U U1 : Subgroup Γ} [hHN : H.Normal] {g : Γ}
+    (hcop : Nat.Coprime (orderOf g) (Nat.card ↥H)) (hgU : g ∈ U) (hgU1 : g ∉ U1)
+    (hcent : ∀ x ∈ H, x ≠ 1 → U ⊓ Subgroup.centralizer ({x} : Set Γ) ≤ U1)
+    {C : ConjClasses ↥H}
+    (hfix : ConjClasses.conjByPerm (G := Γ) (H := H) g C = C) :
+    C = 1 := by
+  classical
+  have hnorm : ∀ x ∈ H, g * x * g⁻¹ ∈ H := fun x hx => hHN.conj_mem x hx g
+  rcases ConjClasses.exists_rep C with ⟨h, rfl⟩
+  by_cases hh : h = 1
+  · rw [hh, ConjClasses.one_eq_mk_one]
+  exfalso
+  have hmk : ConjClasses.mk (ClassFunction.conjByMulEquiv (G := Γ) (H := H) g h)
+      = ConjClasses.mk h := by simpa [ConjClasses.conjByPerm_mk] using hfix
+  have hisConj : IsConj (ClassFunction.conjByMulEquiv (G := Γ) (H := H) g h) h :=
+    ConjClasses.mk_eq_mk_iff_isConj.mp hmk
+  obtain ⟨c, hc⟩ := isConj_iff.mp hisConj
+  have hcG : (c : Γ) * (g * (h : Γ) * g⁻¹) * (c : Γ)⁻¹ = (h : Γ) := by
+    simpa only [Subgroup.coe_mul, Subgroup.coe_inv, ClassFunction.conjByMulEquiv_apply]
+      using congrArg Subtype.val hc
+  have hxconj : ((c : Γ) * g) * (h : Γ) * (((c : Γ) * g)⁻¹) = (h : Γ) := by
+    simpa [mul_assoc] using hcG
+  have hxcent : (c : Γ) * g ∈ Subgroup.centralizer ({(h : Γ)} : Set Γ) := by
+    rw [Subgroup.mem_centralizer_singleton_iff]
+    have hmul := congrArg (fun y : Γ => y * ((c : Γ) * g)) hxconj
+    simpa [mul_assoc] using hmul
+  -- (2.1): `c·g ∈ Hg` is `H`-conjugate to `z·g` with `z ∈ C_H(g)`.
+  obtain ⟨z, hz, y, hy, hyz⟩ :=
+    exists_mem_centralizer_conj (g := g) (H := H) hcop hnorm c.property
+  have hzC : z ∈ Subgroup.centralizer ({g} : Set Γ) := (Subgroup.mem_inf.mp hz).2
+  have hzH : z ∈ H := (Subgroup.mem_inf.mp hz).1
+  -- `w = y·h·y⁻¹ ∈ H`, `w ≠ 1`.
+  set w : Γ := y * (h : Γ) * y⁻¹ with hwdef
+  have hwH : w ∈ H := H.mul_mem (H.mul_mem hy (h.property)) (H.inv_mem hy)
+  have hh1 : (h : Γ) ≠ 1 := fun hc1 => hh (Subtype.ext hc1)
+  have hw1 : w ≠ 1 := by
+    rw [hwdef]; intro hc1
+    exact hh1 (by
+      have := congrArg (fun t : Γ => y⁻¹ * t * y) hc1
+      simpa [mul_assoc] using this)
+  -- `z·g` centralizes `w`.
+  have hzgw : z * g ∈ Subgroup.centralizer ({w} : Set Γ) := by
+    rw [Subgroup.mem_centralizer_singleton_iff, ← hyz, hwdef]
+    have hce := (Subgroup.mem_centralizer_singleton_iff).mp hxcent
+    calc y * ((c : Γ) * g) * y⁻¹ * (y * (h : Γ) * y⁻¹)
+        = y * (((c : Γ) * g) * (h : Γ)) * y⁻¹ := by group
+      _ = y * ((h : Γ) * ((c : Γ) * g)) * y⁻¹ := by rw [hce]
+      _ = y * (h : Γ) * y⁻¹ * (y * ((c : Γ) * g) * y⁻¹) := by group
+  -- `z` commutes with `g` coprimely ⟹ `g ∈ ⟨z·g⟩` centralizes `w`.
+  have hCommute : Commute z g :=
+    Subgroup.mem_centralizer_singleton_iff.mp hzC
+  have hcopzg : Nat.Coprime (orderOf z) (orderOf g) := by
+    have hzdvd : orderOf z ∣ Nat.card ↥H := by
+      have := orderOf_dvd_natCard (⟨z, hzH⟩ : ↥H)
+      simpa [orderOf_injective (H.subtype) H.subtype_injective ⟨z, hzH⟩] using this
+    exact (Nat.Coprime.coprime_dvd_right hzdvd hcop).symm
+  have hgzpow : g ∈ Subgroup.zpowers (z * g) := mem_zpowers_mul_of_commute_coprime hCommute hcopzg
+  have hgw : g ∈ Subgroup.centralizer ({w} : Set Γ) :=
+    (Subgroup.zpowers_le.mpr hzgw) hgzpow
+  exact hgU1 (hcent w hwH hw1 (Subgroup.mem_inf.mpr ⟨hgU, hgw⟩))
+
 /-- **Type-`F` induced-character constituent structure** (Peterfalvi (8.2.c) + (1.2)/(1.5.a) +
 (1.7.c) + Clifford; a faithful §8 obligation — the deep content is type-`F` character theory living
 in §8, not §12).  For a type-I maximal `L` and `χ = Ind_H^L θ ∈ S` (`θ ∈ Irr H ∖ {1}`), `χ` is the
