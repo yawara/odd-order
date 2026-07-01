@@ -8183,6 +8183,48 @@ theorem Hypothesis.charParam_a_eq_zero_of_residualEq [Finite G] {M : Subgroup G}
   exact_mod_cast ha0
 
 open scoped FiniteInduce in
+/-- **Peterfalvi (11.8.6) opening identity** `(μ_j − dζ)^τ = ∑_i ω_{ij}^σ − dζ^{τ₁}` (`0 < j`, `δ = 1`).
+Given the `a = 0` Dade images `α_{ij}^τ = ω_{ij}^σ − ω_{i0}^σ − nζ^{τ₁}` for all `i` (`halpha`,
+Peterfalvi (11.8.2)+(11.8.5), `SHC_tau_muGridAlpha_eq` at `δ = 1`) and the (11.8.4) value
+`(μ₀ − ζ)^τ = ∑_i ω_{i0}^σ − ζ^{τ₁}` (`h114`), the `M`-level identity `μ_j − dζ = (μ₀ − ζ) + ∑_i α_{ij}`
+(needs `d = w₁·n + 1`, i.e. `δ = 1`) maps through the linear Dade isometry `τ` (`map_add`, `map_sum`)
+to `∑_i ω_{i0}^σ − ζ^{τ₁} + ∑_i (ω_{ij}^σ − ω_{i0}^σ − nζ^{τ₁}) = ∑_i ω_{ij}^σ − dζ^{τ₁}`.  This is the
+key step of (11.8.6): with `μ_j^{τ₂} = ∑_i ω_{ij}^σ` (via (4.9)/(5.8)) it makes `S(C) = S₁ ∪ S₂`
+coherent, contradicting (11.3). -/
+theorem Hypothesis.tau_muColumnSum_sub_zeta_eq_of_alphaImage [Finite G] {M : Subgroup G}
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis M) (hodd : Odd (Nat.card G))
+    (j : Fin hyp.w2) {ζ : ClassFunction ↥M ℂ} {d n : ℕ} (hd : (d : ℂ) = (hyp.w1 : ℂ) * (n : ℂ) + 1)
+    (halpha : ∀ i : Fin hyp.w1,
+      hyp.tau (hyp.muGrid hG hodd i j - hyp.muGrid hG hodd i 0 - (n : ℂ) • ζ)
+        = hyp.alignedOmegaSigmaGrid hG hodd i j - hyp.alignedOmegaSigmaGrid hG hodd i 0
+          - (n : ℂ) • (hyp.SHC_isCoherent hG).extension ζ)
+    (h114 : hyp.tau ((∑ i : Fin hyp.w1, hyp.muGrid hG hodd i 0) - ζ)
+        = (∑ i : Fin hyp.w1, hyp.alignedOmegaSigmaGrid hG hodd i 0)
+          - (hyp.SHC_isCoherent hG).extension ζ) :
+    hyp.tau ((∑ i : Fin hyp.w1, hyp.muGrid hG hodd i j) - (d : ℂ) • ζ)
+      = (∑ i : Fin hyp.w1, hyp.alignedOmegaSigmaGrid hG hodd i j)
+        - (d : ℂ) • (hyp.SHC_isCoherent hG).extension ζ := by
+  have hMlevel : ((∑ i : Fin hyp.w1, hyp.muGrid hG hodd i j) - (d : ℂ) • ζ)
+      = ((∑ i : Fin hyp.w1, hyp.muGrid hG hodd i 0) - ζ)
+        + ∑ i : Fin hyp.w1, (hyp.muGrid hG hodd i j - hyp.muGrid hG hodd i 0 - (n : ℂ) • ζ) := by
+    have hαe : (∑ i : Fin hyp.w1, (hyp.muGrid hG hodd i j - hyp.muGrid hG hodd i 0 - (n : ℂ) • ζ))
+        = (∑ i : Fin hyp.w1, hyp.muGrid hG hodd i j) - (∑ i : Fin hyp.w1, hyp.muGrid hG hodd i 0)
+          - ((hyp.w1 : ℂ) * (n : ℂ)) • ζ := by
+      rw [Finset.sum_sub_distrib, Finset.sum_sub_distrib, ← Finset.smul_sum, Finset.sum_const,
+        Finset.card_univ, Fintype.card_fin, ← Nat.cast_smul_eq_nsmul (R := ℂ), smul_smul, mul_comm]
+    rw [hαe, hd]; module
+  rw [hMlevel, map_add, h114, map_sum, Finset.sum_congr rfl (fun i _ => halpha i)]
+  have hsum : (∑ i : Fin hyp.w1, (hyp.alignedOmegaSigmaGrid hG hodd i j
+        - hyp.alignedOmegaSigmaGrid hG hodd i 0
+        - (n : ℂ) • (hyp.SHC_isCoherent hG).extension ζ))
+      = (∑ i : Fin hyp.w1, hyp.alignedOmegaSigmaGrid hG hodd i j)
+        - (∑ i : Fin hyp.w1, hyp.alignedOmegaSigmaGrid hG hodd i 0)
+        - ((hyp.w1 : ℂ) * (n : ℂ)) • (hyp.SHC_isCoherent hG).extension ζ := by
+    rw [Finset.sum_sub_distrib, Finset.sum_sub_distrib, ← Finset.smul_sum, Finset.sum_const,
+      Finset.card_univ, Fintype.card_fin, ← Nat.cast_smul_eq_nsmul (R := ℂ), smul_smul, mul_comm]
+  rw [hsum, hd]; module
+
+open scoped FiniteInduce in
 /-- **Peterfalvi (11.8), the genuine non-orthogonality** (lane-b W3 obligation, issue 2020).
 
 Under Hypothesis (10.1), there is an irreducible `ζ ∈ S = inducedFamily M` of degree `w₁` —
