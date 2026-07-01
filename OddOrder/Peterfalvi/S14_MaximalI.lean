@@ -6,6 +6,7 @@ Authors: Yawara Ishida
 import OddOrder.Peterfalvi.S13_MaximalIII_IV
 import OddOrder.Peterfalvi.S10_CoherenceWiring
 import OddOrder.Peterfalvi.S09_CertificateDischarge
+import OddOrder.Peterfalvi.S07_CoherenceConstantDegree
 import OddOrder.GroupTheory.RepresentationTheory.SingerField
 import OddOrder.GroupTheory.RepresentationTheory.CyclotomicCharacterCongruence
 import Mathlib.RepresentationTheory.Irreducible
@@ -1804,6 +1805,39 @@ theorem xFamily_inner_dade {L : Subgroup G} [Fintype G] [Fintype ↥L]
     ClassFunction.inner_sub_right, ClassFunction.inner_sub_right, hχ00]
   ring
 
+/-- **Peterfalvi (12.1) support `A(L) = H^#` from a Frobenius witness** — the Frobenius-parameterized
+core of `typeIA_eq_sharp` (below), factored out so the (12.6) case-(b) coherence assembly can cite it
+with the `hfrob` it already has (the full `typeIA_eq_sharp` derives `hfrob` from `typeI_frobenius`,
+which is defined later).  Since `L` is Frobenius with kernel `H`, the centralizer of any `x ∈ H^#`
+lies in `H` (`IsFrobeniusGroup.centralizer_kernel_le`), so the `A(L)`-support (`centralizerSupport`
+of `H^#`) is exactly `H^#`. -/
+theorem Hypothesis.typeIA_eq_sharp_of_frobenius [Finite G] {L : Subgroup G} (hyp : Hypothesis L)
+    {C : Subgroup ↥L}
+    (hfrob : OddOrder.Isaacs.Ch06.IsFrobeniusGroup ↥L ((hyp.typeI.typeF.H).subgroupOf L) C) :
+    OddOrder.GroupTheory.typeIA L hyp.typeI
+      = OddOrder.GroupTheory.sharpSubgroup hyp.typeI.typeF.H := by
+  show OddOrder.GroupTheory.centralizerSupport
+      (OddOrder.GroupTheory.sharpSubgroup hyp.typeI.typeF.H) L
+    = OddOrder.GroupTheory.sharpSubgroup hyp.typeI.typeF.H
+  ext y
+  simp only [OddOrder.GroupTheory.centralizerSupport, OddOrder.GroupTheory.sharpSubgroup,
+    Set.mem_setOf_eq, Set.mem_diff, SetLike.mem_coe, Set.mem_singleton_iff]
+  constructor
+  · rintro ⟨hyL, hy1, x, ⟨hxN, hx1⟩, hyx⟩
+    have hxL : x ∈ L := hyp.typeI.typeF.H_le hxN
+    have hxsub : (⟨x, hxL⟩ : ↥L) ∈ hyp.typeI.typeF.H.subgroupOf L :=
+      (Subgroup.mem_subgroupOf).mpr hxN
+    have hx1' : (⟨x, hxL⟩ : ↥L) ≠ 1 := fun h => hx1 (congrArg Subtype.val h)
+    have hycomm : (⟨y, hyL⟩ : ↥L) ∈ Subgroup.centralizer ({(⟨x, hxL⟩ : ↥L)} : Set ↥L) := by
+      rw [Subgroup.mem_centralizer_singleton_iff] at hyx ⊢
+      exact Subtype.ext hyx
+    have hyN : (⟨y, hyL⟩ : ↥L) ∈ hyp.typeI.typeF.H.subgroupOf L :=
+      hfrob.centralizer_kernel_le _ hxsub hx1' hycomm
+    exact ⟨(Subgroup.mem_subgroupOf).mp hyN, hy1⟩
+  · rintro ⟨hyN, hy1⟩
+    refine ⟨hyp.typeI.typeF.H_le hyN, hy1, y, ⟨hyN, hy1⟩, ?_⟩
+    rw [Subgroup.mem_centralizer_singleton_iff]
+
 open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
 /-- **Witness `S = {Ind_H^L θ}` members are irreducible characters of `L`** — the crux of the (12.6)
 case-(b) reduction: for a Frobenius `L` with kernel `H`, `Ind_H^L θ` (`θ ≠ 1`) is irreducible
@@ -2017,28 +2051,95 @@ theorem Sset_differenceImages_orthogonal [Finite G] {L : Subgroup G} (hyp : Hypo
     Sset_pairwiseOrthogonal hyp hodd hfrob hφc hχc hne2]
   ring
 
+open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
 /-- **Peterfalvi (12.6) case (b): abelian rank-2 kernel → equal-degree coherence (5.7).**
 When `H = L_F` is abelian (Def (8.3) case (b)), every `θ ∈ Irr H` is linear, so every member
-`Ind_H^L θ ∈ S` has the same degree `[L:H]`; `S` is then coherent by (5.7), built Dade-compatibly
-via `coherentEqualDegree` (already lattice-relative) + `xFamily_inner_dade` (the global-isometry-free
-`X`-family orthonormality).  (Gap: assemble the `X`-family `β − τ(χ₀−χⱼ)` and its `hdiff`/`hB` inputs
-from `hyp.dadeData`; the `β` common image is the (5.4) `ofProjection` `X`-side — see issue 9001.) -/
-theorem frobenius_typeI_coherent_of_abelianKernel [Finite G] [Fintype G]
-    (_hG : OddOrder.BG.IsMinimalSimpleOdd G) {L : Subgroup G} [Fintype ↥L]
-    [Invertible (Nat.card ↥L : ℂ)] [Invertible (Nat.card G : ℂ)]
+`Ind_H^L θ ∈ S` has the same degree `[L:H]`; `S` is then coherent by (5.7).  The witness
+`S07.Hypothesis hyp.Sset hyp.A` is assembled from the ten witness lemmas above (all seven §5.2 fields
+plus the `coherent_of_constant_degree` inputs), and the coherence is produced by the now
+lattice-relative `coherent_of_constant_degree` (issue 9001, no global isometry needed).  Nonemptiness
+of `S` (`hcard`) comes from the nontrivial abelian kernel `H` having a nontrivial irreducible `θ`,
+whose induced pair `{Ind θ, Ind θ̄}` is two distinct non-real members. -/
+theorem frobenius_typeI_coherent_of_abelianKernel [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {L : Subgroup G}
     (hyp : Hypothesis L)
-    (_hfrob : ∃ C : Subgroup ↥L,
+    (hfrob' : ∃ C : Subgroup ↥L,
       OddOrder.Isaacs.Ch06.IsFrobeniusGroup ↥L (hyp.H.subgroupOf L) C)
-    (_hab : IsMulCommutative ↥hyp.typeI.typeF.H ∧ rank ↥hyp.typeI.typeF.H = 2) :
-    Nonempty (OddOrder.Peterfalvi.S07.IsCoherent hyp.tau hyp.Sset hyp.A) := sorry
+    (hab' : IsMulCommutative ↥hyp.typeI.typeF.H ∧ rank ↥hyp.typeI.typeF.H = 2) :
+    Nonempty (OddOrder.Peterfalvi.S07.IsCoherent hyp.tau hyp.Sset hyp.A) := by
+  classical
+  obtain ⟨C, hfrob⟩ := hfrob'
+  have hab := hab'.1
+  have hodd : Odd (Nat.card ↥L) := hG.odd.of_dvd_nat (Subgroup.card_subgroup_dvd_card L)
+  have hAH : hyp.ambientA = ((hyp.typeI.typeF.H) : Set G) \ {1} :=
+    hyp.typeIA_eq_sharp_of_frobenius hfrob
+  -- `S` is finite: a subset of the (finite) range of `θ ↦ Ind_H^L θ`.
+  have hSfin : hyp.Sset.Finite := by
+    haveI := finite_irreducibleCharacter (G := ↥((hyp.typeI.typeF.H).subgroupOf L))
+    have hsub : hyp.Sset ⊆ Set.range
+        (fun θ : IrreducibleCharacter ↥((hyp.typeI.typeF.H).subgroupOf L) =>
+          ClassFunction.induce ((hyp.typeI.typeF.H).subgroupOf L) θ.toClassFunction) := by
+      rintro χ ⟨θ, _, rfl⟩
+      refine ⟨θ, ?_⟩
+      rfl
+    exact (Set.finite_range _).subset hsub
+  -- the abelian kernel is nontrivial, so it has a nontrivial irreducible `θ`.
+  have hHsub_ne : ((hyp.typeI.typeF.H).subgroupOf L) ≠ ⊥ := by
+    rw [Ne, Subgroup.subgroupOf_eq_bot]
+    intro hdisj
+    have h := disjoint_iff.mp hdisj
+    rw [inf_of_le_left hyp.typeI.typeF.H_le] at h
+    exact hyp.typeI.typeF.H_nontrivial h
+  haveI : Nontrivial ↥((hyp.typeI.typeF.H).subgroupOf L) :=
+    (Subgroup.nontrivial_iff_ne_bot _).mpr hHsub_ne
+  obtain ⟨g, hg⟩ := exists_ne (1 : ↥((hyp.typeI.typeF.H).subgroupOf L))
+  haveI : Nontrivial (ConjClasses ↥((hyp.typeI.typeF.H).subgroupOf L)) :=
+    ⟨ConjClasses.mk g, ConjClasses.mk 1,
+      fun h => hg (isConj_one_left.mp (ConjClasses.mk_eq_mk_iff_isConj.mp h))⟩
+  haveI := finite_irreducibleCharacter (G := ↥((hyp.typeI.typeF.H).subgroupOf L))
+  haveI : Nontrivial (IrreducibleCharacter ↥((hyp.typeI.typeF.H).subgroupOf L)) :=
+    Finite.one_lt_card_iff_nontrivial.mp
+      (by rw [card_irreducibleCharacter_eq]; exact Finite.one_lt_card_iff_nontrivial.mpr inferInstance)
+  obtain ⟨θ, hθ⟩ := exists_ne (trivialIrreducibleCharacter ↥((hyp.typeI.typeF.H).subgroupOf L))
+  set χ0 := ClassFunction.induce ((hyp.typeI.typeF.H).subgroupOf L) θ.toClassFunction with hχ0
+  have hχ0S : χ0 ∈ hyp.Sset := by
+    simp only [hχ0, Hypothesis.Sset, Set.mem_setOf_eq]
+    refine ⟨θ, hθ, ?_⟩
+    rfl
+  have hχ0cS : χ0.conj ∈ hyp.Sset := Sset_closedUnderConjugate hyp hχ0S
+  have hne : χ0 ≠ χ0.conj := fun h => (Sset_hasNoRealCharacters hyp hodd hfrob hχ0S) h.symm
+  have hcard : 2 ≤ hyp.Sset.ncard := by
+    calc 2 = ({χ0, χ0.conj} : Set (ClassFunction ↥L ℂ)).ncard := (Set.ncard_pair hne).symm
+      _ ≤ hyp.Sset.ncard :=
+          Set.ncard_le_ncard (by rintro x (rfl | rfl); exacts [hχ0S, hχ0cS]) hSfin
+  -- assemble the §5.2 hypothesis and invoke the equal-degree coherence producer.
+  refine OddOrder.Peterfalvi.S07.coherent_of_constant_degree
+    { tau := hyp.tau
+      tau_isometry_diff := fun _ _ _ _ ha hb hc hd => Sset_tau_isometry_diff hyp hab hAH ha hb hc hd
+      conjugate_closed := Sset_closedUnderConjugate hyp
+      no_real_characters := Sset_hasNoRealCharacters hyp hodd hfrob
+      pairwise_orthogonal := Sset_pairwiseOrthogonal hyp hodd hfrob
+      difference_image := fun _ hχ => Sset_differenceImage hyp hodd hfrob hab hAH hχ
+      difference_images_orthogonal := fun _ _ hφ hχ h1 h2 =>
+        Sset_differenceImages_orthogonal hyp hodd hfrob hab hAH hφ hχ h1 h2 }
+    hSfin hcard ?_ ?_ ?_ ?_ ?_ ?_
+  · exact fun ζ hζ => Sset_inner_self_eq_one hyp hfrob hζ
+  · exact fun a ha b hb => Sset_tau_diff_mem_ZIrr hyp hfrob hab hAH ha hb
+  · exact fun a ha b hb => by
+      rw [Sset_apply_one_eq_index hyp hab ha, Sset_apply_one_eq_index hyp hab hb]
+  · exact fun a ha => by
+      rw [Sset_apply_one_eq_index hyp hab ha]
+      exact Nat.cast_ne_zero.mpr Subgroup.index_ne_zero_of_finite
+  · exact OddOrder.Peterfalvi.S09.Cert.one_not_mem_supportInSubgroup_sharp hyp.typeI.typeF.H hAH
+  · exact fun a ha b hb => Sset_diff_supported hyp hab hAH ha hb
 
+open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
 /-- **Peterfalvi (12.6) case (c): cyclic-quotient kernel → (6.5.c) coherence.**
 Def (8.3) case (c): `H` is a `p`-group and `|L/H|` divides `p − 1` (via (8.2.a)/(8.3.c)); `S` is
 coherent by (6.5.c).  (Gap: the (6.5.c) coherence producer for `|L/H| ∣ p−1` is not yet in the
 coherence library — see issue 2032 / hub issue 9001.) -/
-theorem frobenius_typeI_coherent_of_cyclicQuotient [Finite G] [Fintype G]
-    (_hG : OddOrder.BG.IsMinimalSimpleOdd G) {L : Subgroup G} [Fintype ↥L]
-    [Invertible (Nat.card ↥L : ℂ)] [Invertible (Nat.card G : ℂ)]
+theorem frobenius_typeI_coherent_of_cyclicQuotient [Finite G]
+    (_hG : OddOrder.BG.IsMinimalSimpleOdd G) {L : Subgroup G}
     (hyp : Hypothesis L)
     (_hfrob : ∃ C : Subgroup ↥L,
       OddOrder.Isaacs.Ch06.IsFrobeniusGroup ↥L (hyp.H.subgroupOf L) C)
@@ -2048,6 +2149,7 @@ theorem frobenius_typeI_coherent_of_cyclicQuotient [Finite G] [Fintype G]
         IsCyclic ↥(OddOrder.GroupTheory.opiCoreInG {p}ᶜ hyp.typeI.typeF.H)) :
     Nonempty (OddOrder.Peterfalvi.S07.IsCoherent hyp.tau hyp.Sset hyp.A) := sorry
 
+open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
 /-- **Peterfalvi (12.6)**: if `L` is Frobenius with kernel `H = L_F`, then `S` is coherent.
 
 The textbook proof **case-splits** on the type-I trichotomy `Definition (8.3)` (carried by
@@ -2057,9 +2159,8 @@ The textbook proof **case-splits** on the type-I trichotomy `Definition (8.3)` (
 (Peterfalvi (12.10): its `H^#` is *not* TI), so the (6.8) route alone is insufficient — the earlier
 single-`sibleyTarget_frobI` proof was unsound (issue 2032).  This assembly carries no `sorry` of its
 own; the per-case gaps are isolated in the three delegated lemmas. -/
-theorem frobenius_typeI_coherent [Finite G] [Fintype G]
-    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {L : Subgroup G} [Fintype ↥L]
-    [Invertible (Nat.card ↥L : ℂ)] [Invertible (Nat.card G : ℂ)]
+theorem frobenius_typeI_coherent [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {L : Subgroup G}
     (hyp : Hypothesis L)
     (hfrob : ∃ C : Subgroup ↥L,
       OddOrder.Isaacs.Ch06.IsFrobeniusGroup ↥L (hyp.H.subgroupOf L) C) :
@@ -3658,29 +3759,7 @@ theorem Hypothesis.typeIA_eq_sharp [Finite G] (hG : OddOrder.BG.IsMinimalSimpleO
   obtain ⟨fdata, _⟩ := typeI_frobenius hG hyp.maximal ⟨hyp.typeI⟩
   have hKf : fdata.typeI.typeF.H = hyp.typeI.typeF.H := by
     rw [fdata.typeI.typeF.H_eq, hyp.typeI.typeF.H_eq]
-  have hfrob : OddOrder.Isaacs.Ch06.IsFrobeniusGroup ↥L
-      (hyp.typeI.typeF.H.subgroupOf L) fdata.complement := hKf ▸ fdata.frobenius
-  show OddOrder.GroupTheory.centralizerSupport
-      (OddOrder.GroupTheory.sharpSubgroup hyp.typeI.typeF.H) L
-    = OddOrder.GroupTheory.sharpSubgroup hyp.typeI.typeF.H
-  ext y
-  simp only [OddOrder.GroupTheory.centralizerSupport, OddOrder.GroupTheory.sharpSubgroup,
-    Set.mem_setOf_eq, Set.mem_diff, SetLike.mem_coe, Set.mem_singleton_iff]
-  constructor
-  · rintro ⟨hyL, hy1, x, ⟨hxN, hx1⟩, hyx⟩
-    have hxL : x ∈ L := hyp.typeI.typeF.H_le hxN
-    have hxsub : (⟨x, hxL⟩ : ↥L) ∈ hyp.typeI.typeF.H.subgroupOf L :=
-      (Subgroup.mem_subgroupOf).mpr hxN
-    have hx1' : (⟨x, hxL⟩ : ↥L) ≠ 1 := fun h => hx1 (congrArg Subtype.val h)
-    have hycomm : (⟨y, hyL⟩ : ↥L) ∈ Subgroup.centralizer ({(⟨x, hxL⟩ : ↥L)} : Set ↥L) := by
-      rw [Subgroup.mem_centralizer_singleton_iff] at hyx ⊢
-      exact Subtype.ext hyx
-    have hyN : (⟨y, hyL⟩ : ↥L) ∈ hyp.typeI.typeF.H.subgroupOf L :=
-      hfrob.centralizer_kernel_le _ hxsub hx1' hycomm
-    exact ⟨(Subgroup.mem_subgroupOf).mp hyN, hy1⟩
-  · rintro ⟨hyN, hy1⟩
-    refine ⟨hyp.typeI.typeF.H_le hyN, hy1, y, ⟨hyN, hy1⟩, ?_⟩
-    rw [Subgroup.mem_centralizer_singleton_iff]
+  exact hyp.typeIA_eq_sharp_of_frobenius (hKf ▸ fdata.frobenius)
 
 open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
 open OddOrder.Peterfalvi.S09.Cert in
