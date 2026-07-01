@@ -4980,6 +4980,19 @@ theorem caseA_S0_card [Finite G] {M : Subgroup G}
   have h := caseA.Hpart_order ⟨0, data.nontrivial.2.1.pos⟩
   rwa [caseA.Hpart_orbit ⟨0, data.nontrivial.2.1.pos⟩, card_pointwise_smul] at h
 
+/-- **Orbit-transport iso** `S₀ ≃* Hpart j`: the chief-factor automorphism `φ(orbitRep j)` maps the
+generator `S₀` isomorphically onto the summand `Hpart j = φ(orbitRep j) • S₀` (`Hpart_orbit`).  The
+transport used to define the (9.8.c) constant-factor-data characters (assign one `S₀`-character to
+every summand). -/
+noncomputable def caseA_orbitEquiv [Finite G] {M : Subgroup G}
+    {data : TypesIIIIIIVSetup M} {chief : ChiefFactorData data}
+    {chars : Section11CharacterData data chief} (caseA : CliffordCaseAData chars) (j : Fin data.q) :
+    ↥caseA.S0 ≃* ↥(caseA.Hpart j) :=
+  (Subgroup.equivMapOfInjective caseA.S0
+      (quotientMulAutHom chief.N_aInvariant (caseA.orbitRep j)).toMonoidHom
+      (quotientMulAutHom chief.N_aInvariant (caseA.orbitRep j)).injective).trans
+    (MulEquiv.subgroupCongr (by rw [caseA.Hpart_orbit j]; rfl))
+
 /-- **A regular character nontrivial on each `W1`-conjugate of `S₀`** (Clifford case (a)).
 Instantiates the elementary `(9.7)` decomposition `H̄ = ⊕_{w∈W1} S₀^w` (`wConjugate_coprod_bijective`,
 with the chief-factor `U`-action, `act.U ⊔ act.E = ⊤`, `|H̄| = p^{|W1|}`) and feeds the resulting
