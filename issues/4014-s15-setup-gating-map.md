@@ -207,3 +207,33 @@ Peterfalvi の character route で **bypass** され spine 外。よって:
 ⟹ **大規模 cross-lane 再配分の判断案件** (hub/user)。lane d を a/B のどの深部に振るか、
 あるいは generic σ-theory (semilinear/near-field、typeP_Galois の下)を新 shared-infra leaf
 (`OddOrder/GroupTheory/**`, policy B) として建てるか。
+
+## ⚠⚠ 決定的 synthesis (loop⁶⁰): lane d 担当2クラスタは両方 feitThompson spine 外
+
+FeitThompson.lean:1739-1770 の carrier `section16CharacterData_of_isMinimalSimpleOdd` 精読で確定:
+- **W-side grid** (`tau3:=tau3W`, `eta=τ₃∘ω`, `omega/mu/nu/delta:=Section16CharacterData.*`) = **real 構成**。
+- **S-side coherence** (`tauS:=0`, `Sset:=∅`, `A0S:=∅`) = **vestigial placeholder**。carrier コメント明記:
+  「§13/§16 contradiction は eta=τ₃∘ω (W-side Dade grid) で routed、**never through S/T-side τ_S,τ_T**。
+  tauS/tauT の唯一の参照 = sorry-stubbed *uncited* coherence-wiring in S15_SAndT_Setup, off the FT path。
+  Hypothesis は6 field に Prop 制約なし ⟹ placeholder は unsound 依存を導入しない。
+  **User decision 2026-06-24 issue 1004**: close producer on verified-vestigial finding。」
+
+**帰結**: lane d の担当 = {δ BG §14-16, S15_SAndT_Setup S-side}:
+1. **δ signalizer** (Theorem D/E, Cor 15.9, Thm 15.8) = spine 外 (spine は Prop 16.1 のみ消費)。
+2. **S15 S-side coherence** (sibleyTarget_S / S_coherent / 13.5–13.15 char cascade の S-side τ₁=tauS grid 部)
+   = issue 1004 で **vestigial** (spine は W-side eta grid、tauS=0)。
+
+∴ lane d の assigned territory に **on-feitThompson-spine な ungated genuine work は無い**:
+- S15 の残 sorry は S-side τ₁ grid (vestigial/off-path) 経由か、structural 結論 (c=1, basic_structure type facts)
+  が **lane a §9/§11 (typeP_Galois 未実装・H_elementaryAbelian sorried・Singer) gated**。
+- δ の残 sorry は全 off-path。
+
+**未解決の architecture 疑問** (issue 1004 の射程だが記録): S16 は `c_eq_one` を 14× cite (c=1 rewrite)。
+c_eq_one の Coq route (13.10 ub_m) は S-side λ^{τ₁} を使う (= tauS、vestigial)。tauS=0 では honest に
+閉じない ⟹ **c=1 の spine-consumed 結論は W-side/structural route で導出可能か、それとも S16 の c=1 使用も
+vestigial か** を要確認 (issue 1004 決定の射程内なら settled)。これが lane d の唯一の potential on-path 論点。
+
+**⟹ 大規模 cross-lane 再配分案件**: lane d の on-spine work は (a) lane a §9/§11 の structural gate
+(typeP_Galois/Singer、basic_structure+c_eq_one の structural 結論を unblock)、(b) generic σ-theory
+(semilinear/near-field) を新 shared-infra leaf (`OddOrder/GroupTheory/**`, policy B) で建てて typeP_Galois
+を unblock、のいずれか。hub/user 裁定。
