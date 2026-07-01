@@ -1010,3 +1010,14 @@ threaded hyp 無)。**残 = a=(∑ω_{r0}^σ,β) application**: β real=(11.8.3,
 **a-even application 残 = β real (11.8.3, 大) + β⊥1**。∑ω real は landed、片側⊥1 (parity cont.⁵⁷) ゆえ
 ∑ω は⊥1 不要 (ω_{00}=1 成分持つが Δ₂=β のみ⊥1)。∑ω∈ZIrr も要 (ω^σ は ZIrr、要確認)。
 (11.8) closure は依然 doubly-gated (§9↔§10、§14) — a-even 完成しても endpoint は §14 gate 残。
+
+## 2026-07-02 cont.⁵⁹ (lane-a) — **a-even assembly `a_even_of_eq_inner_sumOmegaSigma` LANDED**
+`Hypothesis.a_even_of_eq_inner_sumOmegaSigma` (S12, leaf green, sorry-free、**一発 green**): `a=⟨∑ω_{r0}^σ,β⟩`
++ β∈ZIrr + IsReal β + ⟨β,1⟩=0 ⟹ **`Even a`**。証明 = `∑ω∈ZIrr` (`alignedOmegaSigmaGrid_mem_ZIrr` 1717 +
+`Submodule.sum_mem`、3 行) + `∑ω real` (cont.⁵⁸) + parity core (`even_inner_of_conjPerm_symmetric` cont.⁵⁷)
+→ ⟨∑ω,β⟩=(z:ℂ)∧Even z、a=z (cast) → Even a。**a-even parity CHAIN 完成** (parity core→∑ω real→本 assembly)。
+
+**残 = β-side (deferred, 本 lemma で hypothesis threaded)**: β def (=α^τ−δ(ω^σ diff)+nζ^{τ₁}) +
+**a=⟨∑ω,β⟩ の 2-way calc** (general a、私の a∈{0,2} calc と別) + **β real=(11.8.3, 大)** + β⊥1。
+これらが揃えば a even → a∈{0,2} → `charParam_a_eq_zero_of_residualEq` で a=0 (unconditional)。
+(11.8) closure は依然 doubly-gated (§9↔§10、§14) — a-even 完成しても endpoint は §14 gate 残。

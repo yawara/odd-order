@@ -8289,6 +8289,31 @@ theorem Hypothesis.sum_alignedOmegaSigma_zeroColumn_isReal [Finite G]
     (fun r => hyp.alignedOmegaSigmaGrid hG hodd r 0)
 
 open scoped Classical FiniteInduce in
+/-- **Peterfalvi (11.8.5), the "`a` even" step** (assembled).  If `a = ⟨∑_r ω_{r0}^σ, β⟩` with `β` a
+real virtual character orthogonal to `1_G` (Peterfalvi (11.8.3): `β` is `i,j`-independent and real),
+then `a` is even.  Both factors are real (`∑ω_{r0}^σ` via `sum_alignedOmegaSigma_zeroColumn_isReal`,
+`β` by hypothesis) and lie in `ℤ[Irr G]`, and `β ⊥ 1`, so `even_inner_of_conjPerm_symmetric` gives
+the parity.  This excludes `a = 1` (odd), so with `a ∈ {0,1,2}` (11.8.2) it forces `a ∈ {0,2}`, the
+input to `charParam_a_eq_zero_of_residualEq`. -/
+theorem Hypothesis.a_even_of_eq_inner_sumOmegaSigma [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} (hyp : Hypothesis M)
+    (hodd : Odd (Nat.card G)) {β : ClassFunction G ℂ} (hβZ : β ∈ ZIrr G)
+    (hβr : ClassFunction.IsReal β)
+    (hβ1 : ClassFunction.inner β (trivialIrreducibleCharacter G : ClassFunction G ℂ) = 0)
+    {a : ℤ} (ha : (a : ℂ)
+      = ClassFunction.inner (∑ r : Fin hyp.w1, hyp.alignedOmegaSigmaGrid hG hodd r 0) β) :
+    Even a := by
+  haveI := hyp.finiteG
+  have hωZ : (∑ r : Fin hyp.w1, hyp.alignedOmegaSigmaGrid hG hodd r 0) ∈ ZIrr G :=
+    Submodule.sum_mem _ fun r _ => hyp.alignedOmegaSigmaGrid_mem_ZIrr hG hodd r 0
+  have hωr := hyp.sum_alignedOmegaSigma_zeroColumn_isReal hG hodd
+  obtain ⟨z, hz, hev⟩ := even_inner_of_conjPerm_symmetric hodd hωZ hβZ hωr hβr hβ1
+  have haz : a = z := by
+    have hcast : (a : ℂ) = (z : ℂ) := ha.trans hz
+    exact_mod_cast hcast
+  rw [haz]; exact hev
+
+open scoped Classical FiniteInduce in
 /-- **Peterfalvi (11.8.5), `a = 0` under the (11.8.4) hypothesis** (the residual-orthogonal case).
 Given the (11.8.4) by-contradiction consequence `(μ₀ − ζ)^τ = ∑_r ω_{r0}^σ − ζ^{τ₁}` (`μ₀ = ∑ μ_{i'0}`),
 the two-way computation of `(α_{ij}^τ, (μ₀ − ζ)^τ)` forces `a = 0` when `a ∈ {0, 2}`:
