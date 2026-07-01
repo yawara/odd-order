@@ -945,3 +945,29 @@ Pf の一般 parity lemma = 「**odd-order G の real virtual char Δ₁,Δ₂ (
 c_i(χ̄)=c_i(χ)、c_i(1)=0 → 本 `even_sum_of_involution` を conjPerm (χ↦χ̄, `IrreducibleCharacter.conjPerm`) に
 適用。⚠ cross-Parseval + IsReal→c(χ̄)=c(χ) の materialize 要。その後 a=(∑ω_{r0}^σ,β) に適用 (β real=(11.8.3)、
 ∑ω_{r0}^σ real + ⊥1)。(11.8) closure は依然 doubly-gated (§9↔§10、§14)。
+
+## 2026-07-02 cont.⁵⁴ (lane-a) — **cross-Parseval `mem_ZIrr_inner_eq_sum_over_irr` LANDED**
+`mem_ZIrr_inner_eq_sum_over_irr` (S12, leaf green, sorry-free): `Δ∈ZIrr G` で
+`⟨φ,Δ⟩ = ∑_{χ:Irr} ⟨φ,χ⟩·⟨Δ,χ⟩`。証明 = **Fourier 再構成** `sum_inner_irreducibleCharacter_smul`
+(Δ=∑_χ⟨Δ,χ⟩•χ) + `inner_sum_right`/`inner_smul_right` (star は `mem_ZIrr_inner_int` (⟨Δ,χ⟩∈ℤ real) で
+消滅) → `mul_comm`。**一発 green** (repr-support 経由より遥かに clean; ⚠ `irreducibleCharacters G` は Set
+なので `∑ χ:IrreducibleCharacter G` subtype univ で和; `sum_inner_irreducibleCharacter_smul` は
+CharacterCompleteness (ZIrrFourier 非 import) ゆえ S12 に置く)。
+
+**次 = 一般 parity lemma `even_inner_of_isReal_orthogonal_one`**: cross-Parseval (本) + `even_sum_of_involution`
+(cont.⁵³) を conjPerm (Irr∖{1}) に適用。要: (a) IsReal Δ → ⟨Δ,χ̄⟩=⟨Δ,χ⟩ (`conjPerm_apply_coe` + inner conj)、
+(b) ⟨Δ,1⟩=0 で 1 項除外、(c) univ→univ\{1} で even_sum_of_involution。その後 a=(∑ω,β) application (β real 要)。
+(11.8) closure は依然 doubly-gated (§9↔§10、§14)。
+
+## 2026-07-02 cont.⁵⁵ (lane-a) — **一般 parity lemma `even_inner_of_conjPerm_symmetric` LANDED**
+`even_inner_of_conjPerm_symmetric` (S12, leaf green, sorry-free): Δ₁,Δ₂∈ZIrr G (odd G)、conjPerm-symmetric
+Fourier 係数 `⟨Δᵢ,χ̄⟩=⟨Δᵢ,χ⟩` (hsym、IsReal の帰結) + `⟨Δᵢ,1⟩=0` (htriv) ⟹ **`∃ z, ⟨Δ₁,Δ₂⟩=(z:ℂ) ∧ Even z`**。
+証明: `choose c₁ c₂` (mem_ZIrr_inner_int で ⟨Δᵢ,χ⟩=(cᵢχ:ℂ)) → cross-Parseval (cont.⁵⁴) で ⟨Δ₁,Δ₂⟩=(∑cᵢ:ℂ) →
+c₁(triv)=0 (htriv) で triv 項除外 (`Finset.add_sum_erase`) → `even_sum_of_involution` (cont.⁵³) を conjPerm に:
+g_inv=`(conjPerm G).left_inv`、g_ne=`conjPerm_eq_self_iff`+`not_isReal_of_ne_trivial_of_odd_card'`、
+g_mem=conjPerm injective+conjPerm triv=triv (`trivialClassFunction_isReal`)、hf=cᵢ symmetric (hsymc、hsym+cast)。
+⚠ hsym (`⟨Δ,χ̄⟩=⟨Δ,χ⟩`) は hypothesis threaded (IsReal→係数対称の inner-conj identity 未整備ゆえ)。
+
+**次 = (a) IsReal Δ → hsym (inner-conj identity `⟨Δ,χ̄⟩=conj⟨Δ,χ⟩` 整備); (b) a=(∑ω_{r0}^σ,β) application**:
+β real=(11.8.3) + ∑ω real + 両者⊥1 で本 lemma 適用 → a even → (11.8.5) full a=0。⚠ (11.8.3) β real は
+(4.8)/(4.10)/(5.9) の SHC port が要 (大)。(11.8) closure は依然 doubly-gated (§9↔§10、§14)。
