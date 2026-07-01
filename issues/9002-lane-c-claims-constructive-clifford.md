@@ -64,9 +64,34 @@ module-theoretic Clifford core (orbit transitivity)、3-5 セッション」と�
       で `I(θ)/H` abelian を完成 (要 Γ=HU / H≤I(θ)≤HU)。
 - 一時中断 (2026-07-02, lane D 退役で区切り)。次セッション再開点 = 下記 (G1) 拡張から。
 
+## Coq-confirmed 経路 + missing pieces の精密化 (2026-07-02, cont.²)
+
+Coq PFsection1 (1.7) の経路を確認 (`constt_Inertia_bijection` + `cfIndInd`)。一般ケースの proof は:
+1. **induction-in-stages** `Ind_H^L θ = Ind_I^L (Ind_H^I θ)` (Coq `cfIndInd`)。**Lean 未実装**:
+   `ClassFunction.induce (H : Subgroup G)` は **ambient G へのみ**誘導 (中間 I への stage なし)。
+   → `induce I (induce (H.subgroupOf I) θ') = induce H θ` を build (coset 二重和の再添字、要 subgroupOf iso)。
+2. **Clifford correspondence 全単射** `Ind_I^L : Irr(I|θ) ≃ Irr(L|θ)` (Isaacs 6.11)。**Lean は degree 形のみ landed**
+   (`CliffordSingleOrbit.lean:222-360`)、全単射本体は未。
+3. **local mult-free at I**: I 上で θ-invariant のとき `Ind_H^I θ` の mult-free ⟹ Gallagher (Isaacs 6.17)
+   + 拡張 (Isaacs 6.28/11.22)。**両方 Lean 未実装**。
+
+**✅ 設計点 解決 (Coq PFsection1.v:437-523 精読、2026-07-02)**: **abelian で十分、cyclic 不要**。
+Coq (1.7)(b) `cfInd_central_Inertia` の hypothesis は `abelian (T/H)` (T=I(θ))。結論:
+- ∃ e∈ℕ (e≠0)、`∀t∈calA, e_t = e` (全構成要素が**一様 multiplicity e**)。
+- `Ind_G θ = e · ∑_{j∈calB} χ_j` (distinct 構成要素の e 倍和)。
+- `|calB| = [T:H]/e²`、**`∀i∈calB, χ_i(1) = [G:T]·e·θ(1)`** (全**等次数**)。
+- 機構: T/H abelian → `Irr(T/H)` は linear chars → `LtoT j = (χ_j %% H)·psi1` が calA を parametrize
+  (Gallagher 型)、`Res_H psi1 = e·θ` (Clifford)。
+
+**∴ 私の `typeF_inertia_inf_U_isMulCommutative` (I(θ)/H abelian) が (1.7)(b) hypothesis そのもの、正しく on-route。**
+**mult-one (e=1)** は θ が T へ**拡張**するとき: type-I では `H=L_F` が Hall で `[T:H]` coprime `|H|`
+⟹ coprime 拡張 (Isaacs 6.28/8.16) で θ 拡張 → e=1。equal-degree/non-real/台と合わせ typeI_induced_char_constituents。
+
 ## やること (bottom-up、generic は shared leaf)
 
-- [ ] **慣性商 abelian 完成**: Dedekind `I(θ)=H·(I(θ)∩U)` + `I(θ)/H ≃ I(θ)∩U` abelian (上記の残)。
+- [ ] **Pf (1.7)/(8.2.c) 原文精読** — mult-one/equal-degree の正確な機構 (cyclic 要否) を確定。
+- [ ] **induction-in-stages** `induce I (induce (H.subgroupOf I) θ) = induce H θ` を build (foundational)。
+- [ ] **慣性商 abelian 完成**: Dedekind `I(θ)=H·(I(θ)∩U)` + `I(θ)/H ≃ I(θ)∩U` abelian (`sup_inf_assoc_of_le`)。
 - [ ] **(G1) 拡張 lemma** を build (`OddOrder/GroupTheory/RepresentationTheory/` 新/既存 leaf)。coprime
       Hall (H=L_F normal Hall, U abelian complement) の下で I/H cyclic → θ 拡張。
 - [ ] **(G2) Gallagher** + **(G3) mult-free-from-abelian-inertia** を build (同 leaf)。core generic 補題。
