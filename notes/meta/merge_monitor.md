@@ -77,7 +77,7 @@
 > | **b** | β Pf §12 Dade tower | `OddOrder/Peterfalvi/S14_MaximalI.lean`（**ただし `exists_typeICovering` carrier-consumer は lane d、carve-out 0088**）〔旧 carve-out 0087=S07_RhoProjection は issue 0089 で削除済〕 |
 > | **c** | γ POLE-2 §14–16 下流 | `OddOrder/Peterfalvi/S15_SAndT.lean` + `OddOrder/Peterfalvi/S16_NonExistenceG.lean`（**S15_SAndT_Setup は lane d 所有, issue 0092; lane c が S15_SAndT_Setup を編集したら逸脱**）|
 > | **d** | γ 上流 §15 setup + δ BG §14–16 (dormant) + carrier | `OddOrder/Peterfalvi/S15_SAndT_Setup.lean`（主, 2026-07-01 再配分）+ `OddOrder/BG/**` + `OddOrder/FeitThompson.lean` carrier 宣言 + **S10 の bgTheoremE_cover_data carrier ブロック**（carve-out 0086）+ **S14_MaximalI の `exists_typeICovering` carrier-consumer**（carve-out 0088、下記）; **lane d が S15_SAndT / S16_NonExistenceG を編集したら逸脱** |
-> | **共有（全 lane 可）** | — | `OddOrder/AxiomsCheck.lean` / `OddOrder.lean` / `OddOrder/GroupTheory/**` / `OddOrder/Mathlib/**`（汎用 mathlib-shim、全 lane 加算可）/ **`OddOrder/FeitThompson.lean`**（宣言単位: a=:426、d=carrier、prefix-split で衝突回避）/ `notes/**` / `issues/**` |
+> | **共有（全 lane 可）** | — | `OddOrder/AxiomsCheck.lean` / `OddOrder.lean` / `OddOrder/GroupTheory/**` / `OddOrder/Mathlib/**` / `OddOrder/Algebra/**`（汎用 mathlib-shim/ANT・全 lane 加算可）/ **`OddOrder/FeitThompson.lean`**（宣言単位: a=:426、d=carrier、prefix-split で衝突回避）/ `notes/**` / `issues/**` |
 >
 > **carve-out (issue 0086, ユーザー裁可 2026-06-29)**: `OddOrder/Peterfalvi/S10_MinimalSimpleStructure.lean` は
 > 原則 lane a 所有だが、その中の `BGTheoremECoverData` 構造 + `BGTheoremETypeICovering` / `BGTheoremENonTypeICovering` +
@@ -122,7 +122,7 @@
    `CronDelete` + 報告 + 以降の tick を行わない）。報告には逸脱ファイル名 + lane + 所有者を明記。例 (lane=$b):
    ```
    owned_re='^OddOrder/Peterfalvi/S(0[3-9]|1[0-6])|^OddOrder/BG/|^OddOrder/FeitThompson'  # 全 Pf S03-16 + BG を許容; per-lane 厳密判定は 🔒 マップ (a=S03-13/b=S14_MaximalI/c=S15-16/d=BG)
-   shared_re='^OddOrder/AxiomsCheck\.lean$|^OddOrder\.lean$|^OddOrder/GroupTheory/|^OddOrder/Mathlib/|^OddOrder/FeitThompson'  # GroupTheory/Mathlib=汎用 infra (全 lane 加算可)、FeitThompson は a/d 共有
+   shared_re='^OddOrder/AxiomsCheck\.lean$|^OddOrder\.lean$|^OddOrder/GroupTheory/|^OddOrder/Mathlib/|^OddOrder/Algebra/|^OddOrder/FeitThompson'  # GroupTheory/Mathlib/Algebra=汎用 infra (全 lane 加算可)、FeitThompson は a/d 共有
    git diff --name-only main...$b -- '*.lean' | grep -vE "$owned_re" | grep -vE "$shared_re" | grep . && echo "範囲逸脱 → STOP"
    ```
    逸脱なし（空）→ step 2 へ。共有ファイル・notes・issues のみの差分は逸脱でない。
