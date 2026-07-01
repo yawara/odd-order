@@ -89,9 +89,46 @@ AskUserQuestion した (channel 違い)。
 - [ ] hub/user: §3 の c=1 honest 化方針 (α/β/γ) を裁定。
 - [ ] user/hub: §5 の cluster-off-spine 手順を `ft_path_policy.md` §0 に明文化するか承認。
 
+## ✅ HUB 応答 (2026-07-01, cron tick)
+
+本 issue は lane d が commit `e838745d` (前 tick の σ-theory 再配分裁定) を**未同期**のまま concurrent に
+起票された。次の `git merge main` で `e838745d` + issue 4014「HUB 裁定」節を取り込めば整合する。以下 reconcile:
+
+**§4 再配分 → 決着済 (candidate (a) = σ-theory leaf)**: 前 tick でユーザー裁定済 (issue 4014 HUB 裁定,
+commit `e838745d`)。本 issue の **candidate (a) = hub/user が既に選んだ選択肢と一致**。⟹ lane d は待たず
+**σ-theory (typeP_Galois 土台) 新 shared-infra leaf `OddOrder/GroupTheory/**` を claim-first で着手**
+(既存 `SingerField`/`GaloisCharacter`/`ExtraspecialSinger`/`SkolemNoether` を scan)。§4 の (b)/(c)/(d) は不採用。
+
+**§2 の 0092↔1004 齟齬 → 認容 (now moot)**: 指摘は正当 (0092 は S15 の S-side vestigial 性を見落とした)。
+ただし σ-theory 再配分で lane d は S15 char cascade から離れるので実害は解消。記録として妥当。
+
+**§3 c_eq_one honest 化 → hub 監査で option を絞った (cron tick, grep + docstring 精読)**:
+- **c=1 は genuinely spine-needed (β 棄却)**: S16_NonExistenceG は `card_U_eq_uc` + `c_eq_one` + `mul_one` で
+  `|U|=u` を確定し、これが Singer field model (`exists_pu_field_repr_W2`, `P_inf_U_eq_bot`) の次元計算の根幹
+  (line 637/735/1257/3187/3281/3312/4466)。docstring 明記「§13 producers basic_structure/c_eq_one が land
+  した時点で unconditional 化」。⟹ **c=1 の使用は W-side field model 経由で on-path、vestigial でない**。
+  よって option **β (S16 の c=1 も vestigial finding で close) は棄却**。
+- **⚠ 前 tick の hub 判断を訂正**: issue 4014 line 179-184 (「c_eq_one は W-side η、tauS 非依存」) を根拠に
+  「soundness settled」とした前 tick の判断は**楽観過ぎた**。本 issue §3 (「c=1 の honest 証明は 13.10 analytic
+  = S-side λ を要する、純構造 route は Coq 上も無い」) が正しく問題を鋭くしている。**c=1 の honest 証明が
+  vestigial S-side を回避できるかは open。**
+- **⟹ 採る route = option α (構造的 σ-theory route を建てる) = σ-theory 再配分そのもの**。lane d の σ-theory
+  leaf (typeP_Galois + P 上の faithfulness) が c=1 の構造的 route を供給する狙い。**もし α が genuine に
+  vestigial S-side なしで閉じないと判明したら**、option **γ (c=1 を明示 sorried input として honest に許容)**
+  に落とす — その場合は spine が c=1 に載る事実を**隠さず明示 flag する** ([[scaffold-sorry-free-not-done]])。
+  β には逃げない。
+
+**§5 cluster-off-spine 手順 → hub 是認 (適用推奨)**: 提案は既存 policy ([[feedback-decide-frontier-autonomously]]
+「相談は想定違反・大規模 cross-lane scope のみ」/ policy 5(A)(B)) と整合し、0092↔1004 型齟齬の再発を防ぐ。
+step 4「hub は再配分時に既存 off-path/vestigial 判定を必ず勘案」は特に重要。**ユーザー承認を得て
+`ft_path_policy.md` §0 に明文化する** (下記「やること」でユーザー裁定待ち)。
+
 ## 完了条件
 
 hub が lane d を再配分 (§4) し、§5 の手順が承認 or 却下される。lane d worker は再配分先で着手済。
+
+**更新 (2026-07-01 hub tick)**: §4 = σ-theory leaf で決着 (`e838745d`)。§3 = option α (σ-theory route) 採用・
+β 棄却・γ は honest fallback。§5 = hub 是認、ユーザー承認待ち (`ft_path_policy.md` §0 明文化)。
 
 ## 参照
 
