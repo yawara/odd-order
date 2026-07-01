@@ -7779,7 +7779,9 @@ theorem Hypothesis.muGridAlpha_tau_residual_norm [Finite G] {M : Subgroup G}
       Y ∈ ZIrr G ∧
       (∀ v ∈ typePV M hyp.typeP,
         Y v = hyp.tau
-          (hyp.muGrid hG hodd i j - (δ : ℂ) • hyp.muGrid hG hodd i 0 - (n : ℂ) • ζ) v) := by
+          (hyp.muGrid hG hodd i j - (δ : ℂ) • hyp.muGrid hG hodd i 0 - (n : ℂ) • ζ) v) ∧
+      hyp.tau (hyp.muGrid hG hodd i j - (δ : ℂ) • hyp.muGrid hG hodd i 0 - (n : ℂ) • ζ)
+        = Y - (n : ℂ) • (hyp.SHC_isCoherent hG).extension ζ + (a : ℂ) • ∑ β ∈ R, β := by
   classical
   have hζR : (hyp.SHC_isCoherent hG).extension ζ ∈ R := hRmem ζ hζS hζirr hζ1
   have hαZ := hyp.muGridAlpha_tau_mem_ZIrr hG hodd i hj0 hζS hζirr hdeg hμ0 hζ1 hnf hδj
@@ -7827,7 +7829,21 @@ theorem Hypothesis.muGridAlpha_tau_residual_norm [Finite G] {M : Subgroup G}
         (hyp.muGrid hG hodd i j - (δ : ℂ) • hyp.muGrid hG hodd i 0 - (n : ℂ) • ζ)
         - (∑ β ∈ R, (c β : ℂ) • β) := by rw [hdecomp]; abel
     rw [hYeq, ClassFunction.sub_apply, hsumv, sub_zero]
-  refine ⟨a, Y, hbound, hYorth, ?_, hnormY, ?_, hYZ, hYV⟩
+  have hdecompA : hyp.tau
+      (hyp.muGrid hG hodd i j - (δ : ℂ) • hyp.muGrid hG hodd i 0 - (n : ℂ) • ζ)
+      = Y - (n : ℂ) • (hyp.SHC_isCoherent hG).extension ζ + (a : ℂ) • ∑ β ∈ R, β := by
+    have hkey : (∑ β ∈ R, (c β : ℂ) • β)
+        = -((n : ℂ) • (hyp.SHC_isCoherent hG).extension ζ) + (a : ℂ) • ∑ β ∈ R, β := by
+      rw [Finset.smul_sum,
+        ← Finset.add_sum_erase R (fun β => (c β : ℂ) • β) hζR,
+        ← Finset.add_sum_erase R (fun β => (a : ℂ) • β) hζR, hcζ]
+      have herase : ∑ β ∈ R.erase ((hyp.SHC_isCoherent hG).extension ζ), (c β : ℂ) • β
+          = ∑ β ∈ R.erase ((hyp.SHC_isCoherent hG).extension ζ), (a : ℂ) • β :=
+        Finset.sum_congr rfl fun β hβ => by
+          rw [hcη β (Finset.mem_of_mem_erase hβ) (Finset.ne_of_mem_erase hβ)]
+      rw [herase]; push_cast; module
+    rw [hdecomp, hkey]; abel
+  refine ⟨a, Y, hbound, hYorth, ?_, hnormY, ?_, hYZ, hYV, hdecompA⟩
   · rw [hcoeff _ hζR, hcζ]; push_cast; ring
   · intro ha02
     rw [hnormY]
@@ -7856,7 +7872,7 @@ theorem Hypothesis.muGridAlpha_tau_proj_a_mem [Finite G] {M : Subgroup G}
       ClassFunction.inner
         (hyp.tau (hyp.muGrid hG hodd i j - (δ : ℂ) • hyp.muGrid hG hodd i 0 - (n : ℂ) • ζ))
         ((hyp.SHC_isCoherent hG).extension ζ) = (a : ℂ) - (n : ℂ) := by
-  obtain ⟨a, _, ha, _, hinner, _, _, _, _⟩ := hyp.muGridAlpha_tau_residual_norm hG hodd i hj0 hζS
+  obtain ⟨a, _, ha, _, hinner, _, _, _, _, _⟩ := hyp.muGridAlpha_tau_residual_norm hG hodd i hj0 hζS
     hζirr hζ1 hdeg hμ0 hnf hδj hdζ h0ζ hδpm hn2 hRn hZ horth hRmem hRrev
   exact ⟨a, ha, hinner⟩
 
@@ -7895,7 +7911,7 @@ theorem Hypothesis.SHC_residual_eq_omegaSigma_diff [Finite G] {M : Subgroup G}
         ((hyp.SHC_isCoherent hG).extension ζ) = (a : ℂ) - (n : ℂ) ∧
       ((a = 0 ∨ a = 2) → Y = (δ : ℂ) • (hyp.alignedOmegaSigmaGrid hG hodd i j
           - hyp.alignedOmegaSigmaGrid hG hodd i 0)) := by
-  obtain ⟨a, Y, hbound, hYorth, hinner, hnorm, hnorm2case, hYZ, hYV⟩ :=
+  obtain ⟨a, Y, hbound, hYorth, hinner, hnorm, hnorm2case, hYZ, hYV, _⟩ :=
     hyp.muGridAlpha_tau_residual_norm hG hodd i hj0 hζS hζirr hζ1 hdeg hμ0 hnf hδj hdζ h0ζ hδpm hn2
       hRn hZ horth hRmem hRrev
   refine ⟨a, Y, hbound, hinner, ?_⟩

@@ -831,3 +831,16 @@ trichotomy → Y=δ(ω^σ diff)。⚠ residual_norm を Y∈ZIrr + 分解式露�
 `SHC_tau_muGridAlpha_eq` = full identity、本 cont.⁴⁵ は a∈{0,2} で Y=ω^σ diff)。**次 = (11.8.5) a=0**:
 本 Y=ω^σ diff + β 定義 (β=α^τ−(ω^σ diff)+nζ^{τ₁}) ⟹ β=a∑λ^{τ₁} → `SHC_extension_inner_alignedOmegaSigma_eq_zero`
 (5.3.b) で a=0。あるいは (11.8.3) β real 先行。(11.8) closure は依然 doubly-gated (§9↔§10、§14)。
+
+## 2026-07-02 cont.⁴⁶ (lane-a) — **residual 分解式 α^τ=Y−nζ^{τ₁}+a∑β 露出 (11.8.5 ingredient)**
+`residual_norm` に第 8 conjunct追加 (S12, leaf green, sorry-free):
+`hyp.tau(...) = Y - (n:ℂ)•ζ^{τ₁} + (a:ℂ)•∑_{β∈R}β`。証明 = hdecomp (α^τ=∑c•β+Y) + hkey
+(∑c•β=−n•ζ^{τ₁}+a•∑β)。hkey は `Finset.add_sum_erase` で ζ^{τ₁} を split + hcζ (c_ζ=a−n) +
+hcη (c_β=a, β≠ζ) の `Finset.sum_congr` → `push_cast; module` (smul 線形結合)。**一発 green** (module 有効)。
+proj_a_mem + SHC_residual_eq_omegaSigma_diff の destructure も +1 更新。
+
+**次 = (11.8.5) a=0 の 2-way calc**: ⟨(μ₀−ζ)^τ, α^τ⟩ を 2 通り。G側 = ⟨∑ω_{r0}^σ−ζ^{τ₁} ((11.8.4) landed),
+Y−nζ^{τ₁}+a∑β (本分解式)⟩ を展開 (5.3.b で ⟨ω^σ,ζ^{τ₁}⟩=0・⟨ω^σ,β⟩=0、orthonormal R、alignedOmegaSigmaGrid_inner)。
+M側 = ⟨μ₀−ζ, α_{ij}⟩ (Dade τ isometry) = μ inner products。等値 ⟹ a=⟨∑ω_{r0}^σ,β⟩、β=a∑λ (Y=ω^σ diff cont.⁴⁵)
+⟹ a=a·0=0 (5.3.b)。⚠ 大 lemma: M側 μ-grid inner products (⟨μ_{r0},μ_{ij}⟩ 等) の材料要。
+(11.8) closure は依然 doubly-gated (§9↔§10 の (11.8.1)、§14 の (11.8.6))。
