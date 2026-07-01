@@ -1181,3 +1181,19 @@ cont.³⁹ が「T の FittingIsTI 源 要調査」で止めた W₁-side (`norm
   - `normalizer_W1_structure` assemble = ⟨W1_le_Q, Q_elementaryAbelian_T.comm, normalizer_W1_le_QW2⟩ (要 IsTypeII T + line155→機構後方 relocate)。
 
 **IsTypeII T threading の構造 (次手)**: §13.17 S15 chain は現在 **IsTypeNonI T / IsTypeII S** で回る (`Q_W2_structure`/`typeI_overNormalizer_complement`(hSTypeII)/`typeII_overNormalizer_frobenius`(hSTypeII) → S16 `exists_LHypothesis`:78 が hSII をローカル取得)。`T_typeII` (14.9, S16:1581) は `typePData_of_isTypeNonI` + sorried `T_typeII_structural_inputs` から**独立に proven** (normalizer_W1 chain に非依存=**循環なし**)。⟹ threading 可能: (a) S15 §13.17 chain 各 theorem に `hTTypeII : IsTypeII T` 追加、(b) S16 で `T_typeII` を `exists_LHypothesis` 等の前に reorder し供給。ripple ~10 theorem・2 file の deliberate wiring。[[verify-port-state-by-number-not-coq-name]]
+
+
+### cont.⁴² (2026-07-01 lane c=γ /loop): §13.16/13.17.a structural discharge 完了 — 残 lane-c は deep char に集約 (tractable structural exhausted)
+
+IsTypeII↔IsTypeP2 (cont.⁴¹) + card_Q_eq/card_P_eq proven の波及で、§13.16 + §13.17.a の **structural facts を一巡 discharge 完了**:
+- **§13.16 W₁-side 完成** (cont.⁴⁰): confinement (crux=coprime 固定点 / core=Gorenstein 2.3+Wielandt) + `normalizer_W1_structure` assemble (conjunct 1,3 proven、2=Q_elementaryAbelian_T residual)。
+- **card_Q_eq** (|Q|=q^p) proven → IsTypeII T を §13.17→§16 chain (Q_W2_structure/typeI_overNormalizer_complement/typeII_overNormalizer_frobenius/exists_typeI_maximal_overNormalizer_U) に threading、T_typeII を exists_LHypothesis 前へ reorder。
+- **fittingIsTI_T** proven (IsTypeII→IsTypeP2→fittingIsTI_of_isTypeP2)。
+- **tConjugate_fitting_data** (L~T: |L_F|=q^p ∧ W₁≤L_F ∧ L_F⊓U=⊥) + **sConjugate_fitting_data** (L~S dual、card_P_eq 経由) 完全 proven (part1=card equiv、part2=pgroup_le_of_normal_coprime_index、part3=coprime)。
+
+**残 lane-c = 全て deep char / blocked (tractable structural 無し、実調査確認)**:
+- **deep char (binding pole、multi-turn Dade machinery)**: `beta_support_norm_and_remainder` (13.18 BetaData 構築)、`typeI_orthogonality_dichotomy` (13.19 TypeIOrthogonalityData)、`exists_MHypothesis` (14.10 MHypothesis: Dade ext+beta_M)、`betaM_expansion` (14.11.2)、`orthogonality_switch` (14.14)、`main_size_bounds_structural` の k>2pv (14.11.1、cyclotomic v-value gated)、`EtaGenericData` (2389)。
+- **blocked residuals (S-side dual も sorried)**: `reconciled_typePData_T` (§16 reconciliation)、`Q_elementaryAbelian_T` (dual=P_elementaryAbelian sorried)、`V_inf_centralizer_Q_eq_bot` d=1 (dual=c_eq_one 13.12 sorried)、`T_typeII_structural_inputs` (14.9 TypeIIData fields)。
+- **cross-lane gated**: `card_LF_coprime_pq` (bgTheoremE、owner F)、`complement_inf_Q_structure` (13.19.c1 char + Frobenius)。
+
+**次フェーズ = deep char engagement** (per-turn structural discharge から Dade char machinery の sustained 構築へモード変化)。carrier 構築は all-or-nothing で multi-turn。[[feedback-ask-chatgpt-for-elided-gaps]] (char 省略の再構成) 検討価値。[[feedback-flag-poor-progress]] に従い tractability の質的変化を明示。
