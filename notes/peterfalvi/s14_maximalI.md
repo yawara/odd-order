@@ -1358,3 +1358,24 @@ L-side (12.2.a) → π-part helper → **(8.2.c) typeF_inertia_inf_le_U1 (M-side
 **両者 sustained multi-iteration build** (60s loop increment でなく dedicated effort 向き)。
 (8.2.c) までの成果は全 committed・build-green・axiom-clean。次 dedicated session の第一歩 = (5.5) via
 CharacterPsiDecomposition.ofProjection (witness χ_L, ψ=0)。
+
+### loop⁵⁹ (2026-07-01 lane-b resume²): (5.5) build recipe 完全確定 (次 dedicated session の第一歩)
+
+**(5.5) `eq_sum_of_psi_eq_zero` (S07:1561) は既存** — witness で使うには CharacterPsiDecomposition を
+ofProjection で構成して適用するだけ。**完全 recipe**:
+```
+-- witness hyp/coh (witness_L_coherent), 区別 χ_L=Ind θ₀ (exists_distinguished_char), hfrob (12.10)
+-- 1. χ_L を IrreducibleCharacter 化: ⟨Ind θ₀, isIrreducibleCharacter_induce_of_frobeniusGroup⟩
+-- 2. imageFamily := dadeOrthonormalCharacterImageFamilyOfDiff hyp.dadeData.dade hyp.hconj χ_L
+--      hreal (not_isReal_of_ne_trivial_of_odd_card' 奇位数) hdiffsupp (χ̄_L-χ_L ⊆ A、induce_diff_support 系)
+-- 3. D := CharacterPsiDecomposition.ofProjection imageFamily coh.extension
+--      htau1_inner_eq (coh.extension_inner_eq: χ_L,χ̄_L∈zSpan S ⟹ isometry)
+--      htau1_agrees (coh.extends_on_supported: χ_L-χ̄_L supported)
+--      htau1_mem (coh.extension_mem_ZIrr χ_L)  hχψ/hχbarψ (inner_zero_right)  hχχbar (⟨χ_L,χ̄_L⟩=0 非実)
+-- 4. eq_sum_of_psi_eq_zero D ⟹ coh.extension χ_L = D.X = Σ_{α∈E⊆imageSet} α ∈ span_ℤ R(χ_L)
+```
+~60 行 dedicated build。全 input 特定済 (dadeOrthonormalCharacterImageFamilyOfDiff / ofProjection /
+eq_sum_of_psi_eq_zero 在庫)。これで ψ∈ℤ[R(χ_L)] (12.14 L-side) が landing。
+
+**残 critical-path map (全 scoped)**: (5.5) [上記 recipe、L-side] → 12.14 は + M-side ((12.4)-for-M、
+一般 typeI_induced_char_constituents via induced-char Clifford + (8.2.c) 接続) → 12.16。
