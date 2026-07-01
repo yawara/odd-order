@@ -1915,3 +1915,37 @@ exists_regular_not_reducible_of_odd (oXtheta+u odd) → hIM → hcZeta_exists_ir
 **⚠ 判断分岐**: (1)-(3) の general-Clifford (restriction/lies-over 推移性 + inertia 包含) は Clifford.lean
 上流に置くべき shared infra だが、まず S11 local で build → 動作後に上流移動を検討 (claim-before-build)。
 step 2 (regularity crux) 完成後の最後の assembly ゆえ、深いが grindable。
+
+## step 5 assembly 完成 (2026-07-02 cont.¹⁸) — reducible ζ = Ind_{HC}(hcPsi θbar) landed
+
+**landed (全 axiom-clean [propext, Classical.choice, Quot.sound]、commit `<this>`)**:
+- **`caseA_reducible_eq_hcZeta`** (S11): reducible (M-fixed) ζ∈𝒳(H₀C) が seed inflation θ₀ に over
+  (θbar regular ≠1) ⟹ **ζ = Ind_{HC}^{HU}(hcPsi θbar)**。step-5 (a)-(g) chain を collapse。
+  - **重要な簡約**: plan の step 3 (inertia(ψ')=HC 独立計算) と step 4 (ψ' linear) は **bypass**。
+    Ind_{HC}(hcPsi θbar) の既約性は `hcZeta_irreducible` + foundation
+    `caseA_reducible_inflation_inertia_eq` (I_{HU}(θ₀)=HC) から出る (ψ' の inertia を独立計算しない)。
+    ψ' linear は `exists_hcPsi_eq_of_hcHom_ker_subset` が H̄ abelian から自動導出 (step (e)/(f) subsumed)。
+  - chain: `exists_liesOver_intermediate` (lies-over 推移) → HC-constituent ψ' (ζ over ψ' ∧ ψ' over θ₀')
+    → ζ trivial on H₀C=Ker hcHom を `liesOver_mem_characterKernel` で descend (Ker hcHom⊆Ker ψ')
+    → ψ'=hcPsi θbar'' (`exists_hcPsi_eq_of_hcHom_ker_subset`) → ψ' linear ⟹ Res single irr で seed
+    identification θbar''=θbar → `coe_eq_induce_of_liesOver_...` で ζ=Ind_{HC}(hcPsi θbar)。
+- **supporting general lemmas** (reusable): `hcPsi_restrict_hInHu_subgroupOf` (hcPsi θ の hInHu.subgroupOf HC
+  制限 = transported seed inflation、subgroupOf 版 hcPsi_apply_inclusion); `eq_of_liesOver_of_restrict_eq_irr`
+  (χ over θ + Res χ=irr η ⟹ η=θ、Clifford 直交); `hcPsi_seed_eq_of_restrict_eq` (hInHu-制限が seed を決定)。
+- step 5 (g) `exists_hcPsi_eq_of_hcHom_ker_subset` の壊れた uncommitted work も修正 landed (coercion 明示化)。
+
+### 次の frontier = 抽出 (extraction) — conjunct 2 (9.8.b) と conjunct 3 (9.8.c) 共通の上流
+`caseA_character_counts` (S11:5560) 現状: conjunct 1 (reducible count=p-1) = **proven**
+(`reducible_count_sOf_H0`)。conjunct 2/3/4 = sorry (5573-5575)。上流優先+文書順 ⟹ 次は **extraction**:
+
+- **共通上流 (要 build)**: **reducible φ∈𝒮(H₀) → M-fixed HU-constituent ζ∈𝒳(H₀C) over θ₀ regular ∧
+  φ=Ind_{HU}^M ζ**。これが得られれば:
+  - **conjunct 2 (9.8.b 後半)**: φ=Ind_{HU}^M(Ind_{HC}(hcPsi θbar)) (caseA_reducible_eq_hcZeta) ⟹
+    degree qu (`hcZeta_induceHU_apply_one`) ∧ ∈𝒮(H₀C) (`hcZeta_induceHU_mem_sOf`)。
+  - **conjunct 3 (9.8.c)**: |Xmu|=p-1 (extraction で reducible↔Xmu bijection + `caseA_induceHU_inj_of_reducible`
+    injective + reducible_count) → `exists_regular_not_reducible_of_odd` (oXtheta_count u·|Xθ|=(p-1)^q + u_odd)
+    → 非 M-fixed regular θ (hIM) → `hcZeta_exists_irreducible_sOf` (7258) → conjunct 3。
+- **要確認 infra**: reducible φ → HU-source ζ (φ=Ind_{HU}^M ζ、Clifford at HU/M level); ζ∈𝒳(H₀C) ∧
+  ζ over θ₀ regular の抽出 (caseA 版 `caseB_exists_chiefFactorConstituent` 相当が要るか grep)。
+  `inertia_eq_top_of_induceHU_not_irreducible` (5009: reducible⟹M-fixed)、`caseA_induceHU_inj_of_reducible`
+  (5033) は landed。
