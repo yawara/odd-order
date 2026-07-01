@@ -7864,4 +7864,35 @@ theorem exists_liesOver_intermediate {Γ : Type*} [Group Γ] [Finite Γ]
       ClassFunction.restrictionMultiplicity_def]
     exact fun h => hψ (by rw [h, mul_zero])
 
+/-- **step 5 (g): a `hcHom`-kernel-trivial `HC`-character is `hcPsi θbar`** (Peterfalvi (9.8.c)).
+An irreducible `HC`-character `ψ` trivial on `Ker hcHom` (`= H₀C`) inflates from `H̄ = HC/H₀C`
+(`exists_compHom_eq_of_subset_characterKernel`, `hcHom` surjective); since `H̄` is abelian the
+inflation is *linear*, so `ψ = hcPsi θbar` for a hom-form seed `θbar : H̄ →* ℂˣ`.  This collapses the
+step-5 (e)(linear)/(f)(trivial)/(g)(identification) chain: the reducible `ξ`'s `HC`-constituent `ψ'`,
+being trivial on `H₀C` (from `ξ ∈ 𝒳(H₀C)`), is automatically linear and of `hcPsi` form. -/
+theorem exists_hcPsi_eq_of_hcHom_ker_subset [Finite G] {M : Subgroup G}
+    {data : TypesIIIIIIVSetup M} (chief : ChiefFactorData data)
+    (ψ : IrreducibleCharacter
+      ↥(hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf (huSub data)))
+    (hker : ((hcHom chief).ker : Set ↥(hInHu data ⊔
+        ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf (huSub data)))
+      ⊆ OddOrder.Peterfalvi.S03.characterKernel (ψ : ClassFunction _ ℂ)) :
+    ∃ θbar : (↥data.H ⧸ chief.N) →* ℂˣ,
+      (ψ : ClassFunction _ ℂ) = (hcPsi chief θbar : ClassFunction
+        ↥(hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf (huSub data)) ℂ) := by
+  obtain ⟨θbar_irr, heq⟩ :=
+    OddOrder.RepresentationTheory.exists_compHom_eq_of_subset_characterKernel
+      (hcHom_surjective chief) ψ hker
+  haveI : IsMulCommutative (↥data.H ⧸ chief.N) :=
+    ⟨⟨chief.quotient_elementaryAbelian.1⟩⟩
+  obtain ⟨θbar, hθbarval⟩ :=
+    exists_units_monoidHom_of_isIrreducibleCharacter_of_isMulCommutative θbar_irr.isIrreducible
+  refine ⟨θbar, ?_⟩
+  have hθbar_eq : (θbar_irr : ClassFunction (↥data.H ⧸ chief.N) ℂ)
+      = (linearIrreducibleCharacter θbar : ClassFunction (↥data.H ⧸ chief.N) ℂ) := by
+    ext g
+    rw [linearIrreducibleCharacter_apply, hθbarval]
+  rw [← heq, hθbar_eq, ClassFunction.compHom_linearIrreducibleCharacter]
+  rfl
+
 end OddOrder.Peterfalvi.S11
