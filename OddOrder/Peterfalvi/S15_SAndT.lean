@@ -1845,6 +1845,135 @@ theorem normalizer_V_inf_W1_eq_bot_of_data [Finite G]
   rw [hDbot] at this
   exact le_bot_iff.mp this
 
+/-- **Peterfalvi (13.16), the `W₁`-side coprime-action datum**: `Coprime |Q| |V ⋊ W₂|` — the
+complement `V ⋊ W₂` acts coprimely on the Fitting kernel `Q = T_F`.  The `T`-side dual of
+`coprime_card_P_card_UW1`.
+
+`Q = T_F` is the normal nilpotent Hall subgroup of `T` (`maxNilpotentNormalHall`, so
+`Coprime |Q| [T:Q]`), and `V ⋊ W₂` complements `Q` in `T`: from the reconciled type-`P` complements
+`M' ⋊ W₂ = T` (`tpd.M_complement`) and `Q ⋊ V = M'` (`tpd.derived_complement`) one reads off
+`Q ⊓ (V ⊔ W₂) = ⊥` and `Q ⊔ (V ⊔ W₂) = T`, so `[T:Q] = |V ⊔ W₂|`.  Ungated (`reconciled_typePData_T`
+supplies the complements). -/
+theorem coprime_card_Q_card_VW2 [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hyp : Hypothesis (G := G)) :
+    Nat.Coprime (Nat.card ↥hyp.Q) (Nat.card ↥(hyp.V ⊔ hyp.W2)) := by
+  obtain ⟨tpd, htpdV, htpdW1, _⟩ := reconciled_typePData_T hG hyp
+  have hM'_le_T : derivedInG hyp.T ≤ hyp.T := Subgroup.map_subtype_le _
+  have hQ_le_M' : hyp.Q ≤ derivedInG hyp.T := by rw [hyp.T_deriv_eq_QV]; exact le_sup_left
+  have hV_le_M' : hyp.V ≤ derivedInG hyp.T := by rw [hyp.T_deriv_eq_QV]; exact le_sup_right
+  have hQ_le_T : hyp.Q ≤ hyp.T := hQ_le_M'.trans hM'_le_T
+  have hW2_le_T : hyp.W2 ≤ hyp.T := htpdW1 ▸ tpd.W1_le
+  have hVW2_le_T : hyp.V ⊔ hyp.W2 ≤ hyp.T := sup_le (hV_le_M'.trans hM'_le_T) hW2_le_T
+  -- `Q ⊓ V = ⊥` (`derived_complement`).
+  have hdisj : hyp.Q ⊓ hyp.V = ⊥ := by
+    have hd := disjoint_iff.mp tpd.derived_complement.disjoint
+    rw [eq_bot_iff]; rintro x ⟨hxH, hxV⟩
+    have hxD : x ∈ derivedInG hyp.T := tpd.H_le (by rwa [tpd.H_eq, ← hyp.Q_eq_TF])
+    have hmem : (⟨x, hxD⟩ : ↥(derivedInG hyp.T)) ∈
+        (tpd.H.subgroupOf (derivedInG hyp.T)) ⊓ (tpd.U.subgroupOf (derivedInG hyp.T)) :=
+      ⟨Subgroup.mem_subgroupOf.mpr (by rwa [tpd.H_eq, ← hyp.Q_eq_TF]),
+        Subgroup.mem_subgroupOf.mpr (htpdV ▸ hxV)⟩
+    rw [hd, Subgroup.mem_bot] at hmem
+    rw [Subgroup.mem_bot]; simpa using Subtype.ext_iff.mp hmem
+  -- `M' ⊓ W₂ = ⊥` (`M_complement`).
+  have hM'W2 : derivedInG hyp.T ⊓ hyp.W2 = ⊥ := by
+    have hd := disjoint_iff.mp tpd.M_complement.disjoint
+    rw [eq_bot_iff]; rintro x ⟨hxM', hxW2⟩
+    have hxT : x ∈ hyp.T := hM'_le_T hxM'
+    have hmem : (⟨x, hxT⟩ : ↥hyp.T) ∈
+        ((derivedInG hyp.T).subgroupOf hyp.T) ⊓ (tpd.W1.subgroupOf hyp.T) :=
+      ⟨Subgroup.mem_subgroupOf.mpr hxM', Subgroup.mem_subgroupOf.mpr (htpdW1 ▸ hxW2)⟩
+    rw [hd, Subgroup.mem_bot] at hmem
+    rw [Subgroup.mem_bot]; simpa using Subtype.ext_iff.mp hmem
+  -- `Q ⊔ (V ⊔ W₂) = T`.
+  have hTsup : hyp.Q ⊔ (hyp.V ⊔ hyp.W2) = hyp.T := by
+    have htop := tpd.M_complement.sup_eq_top
+    have hmap := congrArg (Subgroup.map hyp.T.subtype) htop
+    rw [Subgroup.map_sup, Subgroup.map_subgroupOf_eq_of_le hM'_le_T,
+      Subgroup.map_subgroupOf_eq_of_le tpd.W1_le, ← MonoidHom.range_eq_map,
+      Subgroup.range_subtype] at hmap
+    rw [htpdW1, hyp.T_deriv_eq_QV] at hmap
+    rw [← sup_assoc]; exact hmap
+  -- `Q ⊓ (V ⊔ W₂) = ⊥`.
+  have hQVW2_disj : hyp.Q ⊓ (hyp.V ⊔ hyp.W2) = ⊥ := by
+    rw [eq_bot_iff]; intro x hx
+    obtain ⟨hxQ, hxVW2⟩ := Subgroup.mem_inf.mp hx
+    have hxVW2' : (x : G) ∈ (↑(hyp.V ⊔ hyp.W2) : Set G) := hxVW2
+    rw [Subgroup.coe_mul_of_right_le_normalizer_left hyp.V hyp.W2 hyp.W2_normalizes_V] at hxVW2'
+    obtain ⟨v, hv, w, hw, hvw⟩ := Set.mem_mul.mp hxVW2'
+    have hwM' : w ∈ derivedInG hyp.T := by
+      have : w = v⁻¹ * x := by rw [← hvw]; group
+      rw [this]
+      exact Subgroup.mul_mem _ (Subgroup.inv_mem _ (hV_le_M' (SetLike.mem_coe.mp hv)))
+        (hQ_le_M' hxQ)
+    have hw1 : w = 1 := by
+      have : w ∈ derivedInG hyp.T ⊓ hyp.W2 := Subgroup.mem_inf.mpr ⟨hwM', SetLike.mem_coe.mp hw⟩
+      rwa [hM'W2, Subgroup.mem_bot] at this
+    have hxv : x = v := by rw [← hvw, hw1, mul_one]
+    have hxQV : x ∈ hyp.Q ⊓ hyp.V := Subgroup.mem_inf.mpr ⟨hxQ, hxv ▸ SetLike.mem_coe.mp hv⟩
+    rwa [hdisj, Subgroup.mem_bot] at hxQV
+  -- `V ⋊ W₂` complements `Q` in `↥T`; hence `[T:Q] = |V ⋊ W₂|`.
+  have hT_norm_Q : hyp.T ≤ Subgroup.normalizer (hyp.Q : Set G) := by
+    rw [hyp.Q_eq_TF]; exact OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_le_normalizer hyp.T
+  haveI hQnorm : (hyp.Q.subgroupOf hyp.T).Normal :=
+    (Subgroup.normal_subgroupOf_iff_le_normalizer hQ_le_T).mpr hT_norm_Q
+  have hcompl : Subgroup.IsComplement' ((hyp.V ⊔ hyp.W2).subgroupOf hyp.T)
+      (hyp.Q.subgroupOf hyp.T) := by
+    apply Subgroup.isComplement'_of_disjoint_and_mul_eq_univ
+    · rw [disjoint_iff, eq_bot_iff]
+      intro y hy
+      rw [Subgroup.mem_inf, Subgroup.mem_subgroupOf, Subgroup.mem_subgroupOf] at hy
+      have hyQV : (y : G) ∈ hyp.Q ⊓ (hyp.V ⊔ hyp.W2) := ⟨hy.2, hy.1⟩
+      rw [hQVW2_disj, Subgroup.mem_bot] at hyQV
+      rw [Subgroup.mem_bot]; exact Subtype.ext hyQV
+    · have hsup : ((hyp.V ⊔ hyp.W2).subgroupOf hyp.T) ⊔ (hyp.Q.subgroupOf hyp.T) = ⊤ := by
+        rw [sup_comm, ← Subgroup.subgroupOf_sup hQ_le_T hVW2_le_T, hTsup, Subgroup.subgroupOf_self]
+      rw [← Subgroup.mul_normal, hsup, Subgroup.coe_top]
+  have hindex : (hyp.Q.subgroupOf hyp.T).index = Nat.card ↥(hyp.V ⊔ hyp.W2) := by
+    rw [hcompl.index_eq_card]
+    exact Nat.card_congr (Subgroup.subgroupOfEquivOfLe hVW2_le_T).toEquiv
+  -- `Q` is Hall in `T`: `Coprime |Q| [T:Q]`.
+  have hHall := OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_isHall hyp.T
+  rw [← hyp.Q_eq_TF] at hHall
+  have hcopIdx : Nat.Coprime (Nat.card ↥hyp.Q) (hyp.Q.subgroupOf hyp.T).index := by
+    have hcard_eq : Nat.card ↥(hyp.Q.subgroupOf hyp.T) = Nat.card ↥hyp.Q :=
+      Nat.card_congr (Subgroup.subgroupOfEquivOfLe hQ_le_T).toEquiv
+    exact hcard_eq ▸ OddOrder.Isaacs.Ch03.IsHallSubgroup.coprime_index hHall
+  rw [hindex] at hcopIdx
+  exact hcopIdx
+
+/-- **Peterfalvi (14.2.a), `T`-side dual of `BasicStructureGated.P_elementaryAbelian`**: the Fitting
+kernel `Q = T_F` is elementary abelian of exponent `q`.
+
+On the `S`-side this is the `§16`-carrier fact `P_elementaryAbelian` (from the type-`P₂` structure of
+`S`); for `T` (type-`P₁`, type II by (14.9)) the same σ-structure fact holds — `T_σ = T_F` is the
+elementary-abelian `q`-group of rank `p` on which the prime-order `κ`-factor `W₂` acts.  Isolated as
+the localized `T`-side structural residual (the exact dual of `P_elementaryAbelian`), gated on the
+(14.9) `T_typeII` σ-structure; supplies the `hQ_elemAb` input of `normalizer_V_inf_W1_eq_bot_of_data`. -/
+theorem Q_elementaryAbelian_T [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hyp : Hypothesis (G := G)) (_hTTypeII : IsTypeII hyp.T) :
+    IsElementaryAbelian hyp.q ↥hyp.Q := sorry
+
+/-- **Peterfalvi (13.12) `d = 1`, `T`-side dual of `U_inf_centralizer_P_eq_bot`**: `V ⊓ C_G(Q) = ⊥`
+— no nonidentity element of the complement `V` centralizes the Fitting kernel `Q = T_F` (i.e. `V`
+acts faithfully on `Q`).  The `T`-side `d = |D| = 1` finish, dual of the `S`-side `c = 1` (`c_eq_one`,
+`C_eq_bot`, `U_inf_centralizer_P_eq_bot`).  Isolated as the `T`-side residual gated on the (14.9)
+`T_typeII` structure; supplies the `hDbot` input of `normalizer_V_inf_W1_eq_bot_of_data`. -/
+theorem V_inf_centralizer_Q_eq_bot [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hyp : Hypothesis (G := G)) (_hTTypeII : IsTypeII hyp.T) :
+    hyp.V ⊓ Subgroup.centralizer (hyp.Q : Set G) = ⊥ := sorry
+
+/-- **Peterfalvi (13.16), the `W₁`-side core** (`V ⊓ N_G(W₁) = ⊥`), `T`-side dual of
+`normalizer_U_inf_W2_eq_bot`.  Assembles the proven core `normalizer_V_inf_W1_eq_bot_of_data` from the
+ungated coprime-action datum (`coprime_card_Q_card_VW2`) and the two (14.9)-gated `T`-side structural
+residuals `Q_elementaryAbelian_T` and `V_inf_centralizer_Q_eq_bot`.  Consumed by the (13.16)
+`W₁`-confinement `normalizer_W1_within_T` (the Maschke/Wielandt core of `normalizer_W1_structure`). -/
+theorem normalizer_V_inf_W1_eq_bot [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hyp : Hypothesis (G := G)) (hTTypeII : IsTypeII hyp.T) :
+    hyp.V ⊓ Subgroup.normalizer (hyp.W1 : Set G) = ⊥ :=
+  normalizer_V_inf_W1_eq_bot_of_data hG hyp hTTypeII (coprime_card_Q_card_VW2 hG hyp)
+    (Q_elementaryAbelian_T hG hyp hTTypeII) (V_inf_centralizer_Q_eq_bot hG hyp hTTypeII)
+
 /-- **`T`-side dual of `not_normalizer_U_le_S`** (Pf (13.17), V-side): if `V` is a `T`-conjugate of
 the `TypeIIData` witness's complement `tdata.typeP.U`, then `N_G(V) ⊄ T`.  Transfers the type-II
 property `tdata.normalizer_not_le` along the conjugation `V = (typeP.U)^x`, `x ∈ T`. -/
