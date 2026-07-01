@@ -501,13 +501,12 @@ This is the single group-theoretic fact carrying the genuine content of the `W�
 proof plan below has been **verified to need no new infrastructure** — every cited lemma is present
 in the repo (see `notes/peterfalvi/s15_s_and_t.md`, the (13.16) core plan block).
 
-**Crux (ungated, about the abstract `W₂`): `K ≤ C_G(W₂)`.**  `W₁` acts on `K` by conjugation
-(`K ≤ U` is `W₁`-invariant: `U` abelian, `W₁ ≤ N_G(U)`, `W₁ ≤ N_G(W₂)`), coprimely (`|W₁| = q`
-coprime to `|U|` from the `U ⋊ W₁` Frobenius structure `BasicStructureData.UW1_frobenius`), with
-`C_K(W₁) ≤ C_U(W₁) = ⊥` (Frobenius fixed-point-freeness).  `W₁` acts **trivially** on `K/C_K(W₂)`
-(`W₁` centralizes `W₂` by `W1_commutes_W2`, so `w k w⁻¹` and `k` induce the same map on `W₂`), so by
-the coprime fixed-point lifting `Isaacs.Ch04.coprime_fixedPoints_quotient` (Cor 3.28) every element
-of `K` is `≡` a `W₁`-fixed point `= 1`, forcing `K = C_K(W₂) ≤ C_G(W₂)`.
+**Crux (ungated, about the abstract `W₂`): `K ≤ C_G(W₂)` — PROVEN as
+`normalizer_U_inf_W2_le_centralizer_W2`.**  `W₁` acts on the abelian `U` by conjugation, coprimely
+(`|W₁| = q` coprime to `|U|` from `BasicStructureData.UW1_frobenius`), with fixed points
+`C_U(W₁) = ⊥` (`centralizer_W1_inf_U_eq_bot`).  `W₁` acts **trivially** on `K/C_K(W₂)`
+(`conj_W1_mem_centralizer_W2`), so the coprime fixed-point lifting
+`Isaacs.Ch04.coprime_fixedPoints_quotient` (Cor 3.28) forces `K = C_K(W₂) ≤ C_G(W₂)`.
 
 **Assembly (given `K ≤ C_G(W₂)`).**  Two simplifications over the Coq route:
 * use the **full** `U ⋊ W₁` Frobenius (not `K ⋊ W₁`), so no `Frobenius_subl` is needed — `U`
