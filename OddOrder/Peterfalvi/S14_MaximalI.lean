@@ -654,6 +654,70 @@ noncomputable def Rset {L : Subgroup G} {hyp : Hypothesis L} {chi : ClassFunctio
 
 /-! ## (12.3)--(12.5): orthogonality and rho-constancy -/
 
+/-- **§8 thickening kernel containment.**  The subgroup `R(x) = supportKernel L M X x` of
+Peterfalvi (8.14) is always contained in `L_F = maxNilpotentNormalHall L`: on the
+escaping-centralizer set it is `L_F ⊓ C_G(x) ≤ L_F`, and elsewhere it is `⊥`. -/
+theorem supportKernel_le_maxNilpotentNormalHall (L M : Subgroup G) (X : Set G) (x : G) :
+    supportKernel L M X x ≤ maxNilpotentNormalHall L := by
+  classical
+  unfold supportKernel
+  split
+  · exact inf_le_left
+  · exact bot_le
+
+/-- **The type-I thickened cover lands in `L_F`-conjugates.**  If a support set `X` is contained in
+`L_F = maxNilpotentNormalHall L`, then every element of the thickened support
+`⋃_{z ∈ X} (z R(z))^G` (`thickenedSupport L M X`) is conjugate to an element of `L_F`: the coset
+factor `z ∈ X ⊆ L_F` and the kernel factor `r ∈ R(z) ⊆ L_F`
+(`supportKernel_le_maxNilpotentNormalHall`) multiply into `L_F`, which `𝒞_G` saturates.
+
+This is the structural heart of the (12.17) type-I covering: the thickening `R(z)` never escapes
+`L_F`, so the `A_1(L) = (L_F)#` cover by thickened sets is, up to conjugacy, a cover by `L_F`. -/
+theorem thickenedSupport_subset_conjClassSet_maxNilpotentNormalHall
+    {L M : Subgroup G} {X : Set G} (hX : X ⊆ (maxNilpotentNormalHall L : Set G)) :
+    thickenedSupport L M X ⊆ conjClassSet (maxNilpotentNormalHall L : Set G) := by
+  rintro y ⟨z, hz, hyz⟩
+  obtain ⟨w, hw, g, hgwy⟩ := hyz
+  obtain ⟨r, hr, hzrw⟩ := hw
+  have hzMF : z ∈ maxNilpotentNormalHall L := hX hz
+  have hrMF : r ∈ maxNilpotentNormalHall L :=
+    supportKernel_le_maxNilpotentNormalHall L M X z (SetLike.mem_coe.mp hr)
+  have hwMF : w ∈ maxNilpotentNormalHall L := hzrw ▸ mul_mem hzMF hrMF
+  exact ⟨w, SetLike.mem_coe.mpr hwMF, g, hgwy⟩
+
+open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
+/-- **Dade support lands in the `L_F`-conjugates** for a Frobenius type-I `L`.  The (12.1) Dade
+support is the thickened support `Ã(L) = thickenedSupport L L A(L)`
+(`DadeSupportHypothesisData.dadeSupport_eq_thickenedSupport`); for Frobenius `L` the base set
+`A(L) = typeIA L = (L_F)^# ⊆ L_F` (`typeIA_eq_sharp_of_frobenius`), so
+`thickenedSupport_subset_conjClassSet_maxNilpotentNormalHall` places `Ã(L) ⊆ 𝒞_G(L_F)`. -/
+theorem dadeSupport_subset_conjClassSet_maxNilpotentNormalHall_of_frobenius [Finite G]
+    {L : Subgroup G} (hyp : Hypothesis L) {C : Subgroup ↥L}
+    (hfrob : OddOrder.Isaacs.Ch06.IsFrobeniusGroup ↥L ((hyp.typeI.typeF.H).subgroupOf L) C) :
+    hyp.dadeData.dade.dadeSupport ⊆
+      OddOrder.GroupTheory.conjClassSet (maxNilpotentNormalHall L : Set G) := by
+  haveI := hyp.finiteG
+  rw [hyp.dadeData.dadeSupport_eq_thickenedSupport]
+  apply thickenedSupport_subset_conjClassSet_maxNilpotentNormalHall
+  -- `A(L) = typeIA L ⊆ L_F`: for Frobenius `L`, a `y` centralizing a nontrivial `x ∈ L_F` lands in
+  -- `L_F` (`IsFrobeniusGroup.centralizer_kernel_le`) — inlined from `centralizerSupport_sharp_eq`.
+  intro y hy
+  simp only [OddOrder.GroupTheory.typeIA, OddOrder.GroupTheory.centralizerSupport,
+    OddOrder.GroupTheory.sharpSubgroup, Set.mem_setOf_eq, Set.mem_diff, SetLike.mem_coe,
+    Set.mem_singleton_iff] at hy
+  obtain ⟨hyL, _, x, ⟨hxN, hx1⟩, hyx⟩ := hy
+  have hxL : x ∈ L := hyp.typeI.typeF.H_le hxN
+  have hxMsub : (⟨x, hxL⟩ : ↥L) ∈ (hyp.typeI.typeF.H).subgroupOf L :=
+    (Subgroup.mem_subgroupOf).mpr hxN
+  have hx1' : (⟨x, hxL⟩ : ↥L) ≠ 1 := fun h => hx1 (congrArg Subtype.val h)
+  have hycomm : (⟨y, hyL⟩ : ↥L) ∈ Subgroup.centralizer ({(⟨x, hxL⟩ : ↥L)} : Set ↥L) := by
+    rw [Subgroup.mem_centralizer_singleton_iff] at hyx ⊢
+    exact Subtype.ext hyx
+  have hyN : (⟨y, hyL⟩ : ↥L) ∈ (hyp.typeI.typeF.H).subgroupOf L :=
+    hfrob.centralizer_kernel_le _ hxMsub hx1' hycomm
+  rw [← hyp.typeI.typeF.H_eq]
+  exact (Subgroup.mem_subgroupOf).mp hyN
+
 open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
 /-- **§8/§10 support-exclusion obligation for the Dade domains** (pinned; Peterfalvi (8.18.c) /
 `S10.support_mutual_exclusion`).  For non-conjugate type-I maximals `L1, L2`, the Dade supports
@@ -5507,37 +5571,6 @@ structure TypeICovering (hG : OddOrder.BG.IsMinimalSimpleOdd G)
   covers : ∀ x : G, x ≠ 1 →
     ∃ i, ∃ g : G, g * x * g⁻¹ ∈ (maxNilpotentNormalHall (reps i) : Set G) \ {1}
 
-omit [Finite G] in
-/-- **§8 thickening kernel containment.**  The subgroup `R(x) = supportKernel L M X x` of
-Peterfalvi (8.14) is always contained in `L_F = maxNilpotentNormalHall L`: on the
-escaping-centralizer set it is `L_F ⊓ C_G(x) ≤ L_F`, and elsewhere it is `⊥`. -/
-theorem supportKernel_le_maxNilpotentNormalHall (L M : Subgroup G) (X : Set G) (x : G) :
-    supportKernel L M X x ≤ maxNilpotentNormalHall L := by
-  classical
-  unfold supportKernel
-  split
-  · exact inf_le_left
-  · exact bot_le
-
-/-- **The type-I thickened cover lands in `L_F`-conjugates.**  If a support set `X` is contained in
-`L_F = maxNilpotentNormalHall L`, then every element of the thickened support
-`⋃_{z ∈ X} (z R(z))^G` (`thickenedSupport L M X`) is conjugate to an element of `L_F`: the coset
-factor `z ∈ X ⊆ L_F` and the kernel factor `r ∈ R(z) ⊆ L_F`
-(`supportKernel_le_maxNilpotentNormalHall`) multiply into `L_F`, which `𝒞_G` saturates.
-
-This is the structural heart of the (12.17) type-I covering: the thickening `R(z)` never escapes
-`L_F`, so the `A_1(L) = (L_F)#` cover by thickened sets is, up to conjugacy, a cover by `L_F`. -/
-theorem thickenedSupport_subset_conjClassSet_maxNilpotentNormalHall
-    {L M : Subgroup G} {X : Set G} (hX : X ⊆ (maxNilpotentNormalHall L : Set G)) :
-    thickenedSupport L M X ⊆ conjClassSet (maxNilpotentNormalHall L : Set G) := by
-  rintro y ⟨z, hz, hyz⟩
-  obtain ⟨w, hw, g, hgwy⟩ := hyz
-  obtain ⟨r, hr, hzrw⟩ := hw
-  have hzMF : z ∈ maxNilpotentNormalHall L := hX hz
-  have hrMF : r ∈ maxNilpotentNormalHall L :=
-    supportKernel_le_maxNilpotentNormalHall L M X z (SetLike.mem_coe.mp hr)
-  have hwMF : w ∈ maxNilpotentNormalHall L := hzrw ▸ mul_mem hzMF hrMF
-  exact ⟨w, SetLike.mem_coe.mpr hwMF, g, hgwy⟩
 
 /-- **Peterfalvi (8.17)/(8.13.c1), all-type-I case**: the §8 covering inputs of (12.17) exist.
 
