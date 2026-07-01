@@ -38,6 +38,26 @@ carrier の `TypePData.fitting_eq` (= Pf (8.5.a)) で closed (issue 4013、commi
 **signature contract 変更 = STOP 条件 (d) = hub/ユーザー裁定案件**。construction site は type-P₂
 構造を既に建てているので供給は軽い可能性大 (要確認)。
 
+### ⚠ on-path / off-path 精査 (2026-07-01 lane d、grep 検証)
+
+S16_NonExistenceG が cite する S15 producer (= **on-path**):
+- `basic_structure` (13.2) **16×** — done 2/4 (U_comm/P_order)、残 P_elab(§11)/u_bound(§9)=lane a。
+- `c_eq_one` (13.12) **14×** — bare sorry。S16 が `c = 1` の rewrite で多用。
+- `caseB_order_u` (13.15) **2×** — sorry (`caseB_order_u_data` 経由)。
+
+S15_SAndT_Setup 外で **0 cite (= off-path、issue 1004 verified)**:
+- `S_coherent`/`sibleyTarget_S` (13.2.d 一致 isometry) — S16 は η=τ₃∘ω (W-side grid) で迂回、
+  S/T-side maximal-coherent Dade (tauS/tauT) を読まない (user decision 2026-06-24, issue 1004)。
+- `character_degree_analysis`(13.3)/`lambda_forces_T_caseB`(13.4)/`tiSubset_character_orthogonality`(13.5)/
+  norm cascade (13.6–10 `*_norm_lower`/`global_character_bound`/`analytic_inequality`)/`caseA_parameters`(13.13) — 全 0 cite。
+
+**未解決 (次 turn)**: `c_eq_one`(13.12)/`caseB_order_u`(13.15) は on-path だが、textbook proof は
+(13.10) analytic_inequality (= norm cascade、tauS 依存の λ^{τ1} norm を含む) を要する。
+⟹ norm cascade が **c_eq_one 経由で transitively on-path** か、それとも c_eq_one に W-side/構造 route が
+あって tauS 迂回可能かを判定する (issue 1004 は isometry lemma のみ off-path と主張、numeric contradiction
+の帰属は未確定)。これが lane d の次の on-path frontier 判定。**off-path と即断せず route を精査**
+([[feedback-cite-sorried-lemmas-if-signature-correct]] のゲート幻論に注意)。
+
 ### B. char/numeric spine (13.5–13.15、10 sorry) — **character grid + coherence gated**
 
 `tiSubset_character_orthogonality` (13.5) / `lambda_norm_lower` (13.6) / `eta10_norm_lower` (13.7) /
