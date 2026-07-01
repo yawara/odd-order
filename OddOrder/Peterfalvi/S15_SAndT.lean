@@ -137,59 +137,6 @@ theorem exists_mem_conj_W2_le_of_dvd_card [Finite G]
   have hPeq : P = MulAut.conj (q' : G) • W2 :=
     Subgroup.eq_of_le_of_card_ge hconj_le (by rw [hcard_eq, hPcard])
   rw [← hPeq]; exact hPE
-/-- **Peterfalvi (13.16), structural core** (Coq `FTtypeP_norm_cent_compl`, `PFsection13.v:1519`).
-The three atomic facts that carry the genuine content of (13.16):
-
-* `W₁ ≤ Q` — the `T`-side dual of `W₂ ≤ P` (`W2_le_P` in `S16_NonExistenceG`), placing the cyclic
-  `q`-factor `W₁` inside the `T`-Fitting kernel `Q = T_F`;
-* `Q` abelian — the `T`-side dual of `P` elementary abelian (`P_elementaryAbelian`);
-* `N_G(W₁) ≤ Q ⊔ W₂` — the Frobenius/Wielandt fixed-point argument: `P = S_F` (elementary abelian)
-  is decomposed by Maschke, and the coprime `U ⋊ W₁`-action is forced trivial on each direct factor
-  by the Wielandt fixed-point theorem (`OddOrder.GroupTheory.WielandtFixedPoint`), confining the
-  normalizer of the `q`-factor to `Q ⊔ W₂`.
-
-The machinery required for the last containment is all present in the repository — the cyclic-TI
-`W`-setup (`S05_TICyclic.TICyclicHypothesis`) and `OddOrder/GroupTheory/{WielandtFixedPoint,
-CoprimeAction,CoprimeFrobeniusKernel,TISubset}`; the two `T`-side structural duals are gated on the
-`T`-side `basic_structure` (issue 3001).  This isolates the residual assembly. -/
-theorem normalizer_W1_structure [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
-    (hyp : Hypothesis (G := G)) :
-    hyp.W1 ≤ hyp.Q ∧ IsMulCommutative ↥hyp.Q ∧
-      Subgroup.normalizer (hyp.W1 : Set G) ≤ hyp.Q ⊔ hyp.W2 := sorry
-
-/-- **Peterfalvi (13.16)**: `N_G(W₁) = C_G(W₁) = Q ⊔ W₂`.
-
-Proved from the structural core `normalizer_W1_structure` by the antisymmetric chain
-`Q ⊔ W₂ ≤ C_G(W₁) ≤ N_G(W₁) ≤ Q ⊔ W₂`, which collapses all three subgroups:
-
-* `W₂ ≤ C_G(W₁)` because `W = W₁ × W₂` is abelian (`W1_commutes_W2`);
-* `Q ≤ C_G(W₁)` because `W₁ ≤ Q` and `Q` is abelian (both from the core);
-* `C_G(W₁) ≤ N_G(W₁)` always (`centralizer_le_normalizer`);
-* `N_G(W₁) ≤ Q ⊔ W₂` is the Frobenius/Wielandt containment (the core).
-
-Consumed by (13.17.c) at `normalizer_W1` uses below (the `W₁W₂^y`-alternative of the Frobenius
-complement). -/
-theorem normalizer_W1 [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
-    (hyp : Hypothesis (G := G)) :
-    Subgroup.normalizer (hyp.W1 : Set G) = Subgroup.centralizer (hyp.W1 : Set G) ∧
-      Subgroup.centralizer (hyp.W1 : Set G) = hyp.Q ⊔ hyp.W2 := by
-  obtain ⟨hW1_le_Q, hQ_comm, hN_le⟩ := normalizer_W1_structure hG hyp
-  -- `W₂ ≤ C_G(W₁)`: `W = W₁ × W₂` is abelian, so `W₂` centralizes `W₁`.
-  have hW2_le_C : hyp.W2 ≤ Subgroup.centralizer (hyp.W1 : Set G) := by
-    intro y hy
-    rw [Subgroup.mem_centralizer_iff]
-    intro x hx
-    exact hyp.W1_commutes_W2 x (SetLike.mem_coe.mp hx) y hy
-  -- `Q ≤ C_G(W₁)`: `W₁ ≤ Q` and `Q` abelian give `Q ≤ C_G(Q) ≤ C_G(W₁)`.
-  have hQ_le_C : hyp.Q ≤ Subgroup.centralizer (hyp.W1 : Set G) :=
-    (Subgroup.le_centralizer_iff_isMulCommutative.mpr hQ_comm).trans
-      (Subgroup.centralizer_le (SetLike.coe_mono hW1_le_Q))
-  have hQW2_le_C : hyp.Q ⊔ hyp.W2 ≤ Subgroup.centralizer (hyp.W1 : Set G) :=
-    sup_le hQ_le_C hW2_le_C
-  have hC_le_N : Subgroup.centralizer (hyp.W1 : Set G) ≤
-      Subgroup.normalizer (hyp.W1 : Set G) := Subgroup.centralizer_le_normalizer _
-  exact ⟨le_antisymm (hN_le.trans hQW2_le_C) hC_le_N,
-    le_antisymm (hC_le_N.trans hN_le) hQW2_le_C⟩
 
 /-- **A `p`-subgroup lies in a normal subgroup of coprime-to-`p` index.**  If `W ≤ S`,
 `P.subgroupOf S ⊴ S`, `[S : P]` is coprime to `|P|`, and `p ∣ |P|`, then every element of `W` of
@@ -2083,6 +2030,60 @@ theorem normalizer_W1_le_QW2 [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
   have hgT : g ∈ hyp.T := normalizer_W1_le_T hG hyp hTTypeII hg
   exact normalizer_W1_within_T hG hyp hTTypeII (Subgroup.mem_inf.mpr ⟨hg, hgT⟩)
 
+/-- **Peterfalvi (13.16), structural core** (Coq `FTtypeP_norm_cent_compl`, `PFsection13.v:1519`), the
+three atomic facts carrying the content of (13.16), **assembled** for the (14.9) type-II member `T`:
+
+* `W₁ ≤ Q` (`W1_le_Q`, proven) — the `T`-side dual of `W₂ ≤ P`, placing the cyclic `q`-factor `W₁`
+  inside the `T`-Fitting kernel `Q = T_F`;
+* `Q` abelian — from `Q_elementaryAbelian_T` (the one deep §14 σ-residual, dual of the `S`-side
+  `P_elementaryAbelian`, itself sorried);
+* `N_G(W₁) ≤ Q ⊔ W₂` (`normalizer_W1_le_QW2`, proven) — the TI reduction `normalizer_W1_le_T` +
+  the Maschke/Wielandt core `normalizer_W1_within_T`.
+
+`IsTypeII T` is threaded from `exists_LHypothesis` (§16, via (14.9) `T_typeII`); conjuncts 1 and 3 are
+sorry-free, so the residual is exactly conjunct 2. -/
+theorem normalizer_W1_structure [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hyp : Hypothesis (G := G)) (hTTypeII : IsTypeII hyp.T) :
+    hyp.W1 ≤ hyp.Q ∧ IsMulCommutative ↥hyp.Q ∧
+      Subgroup.normalizer (hyp.W1 : Set G) ≤ hyp.Q ⊔ hyp.W2 :=
+  ⟨W1_le_Q hG hyp,
+    IsMulCommutative.of_comm (Q_elementaryAbelian_T hG hyp hTTypeII).comm,
+    normalizer_W1_le_QW2 hG hyp hTTypeII⟩
+
+/-- **Peterfalvi (13.16)**: `N_G(W₁) = C_G(W₁) = Q ⊔ W₂`.
+
+Proved from the structural core `normalizer_W1_structure` by the antisymmetric chain
+`Q ⊔ W₂ ≤ C_G(W₁) ≤ N_G(W₁) ≤ Q ⊔ W₂`, which collapses all three subgroups:
+
+* `W₂ ≤ C_G(W₁)` because `W = W₁ × W₂` is abelian (`W1_commutes_W2`);
+* `Q ≤ C_G(W₁)` because `W₁ ≤ Q` and `Q` is abelian (both from the core);
+* `C_G(W₁) ≤ N_G(W₁)` always (`centralizer_le_normalizer`);
+* `N_G(W₁) ≤ Q ⊔ W₂` is the Frobenius/Wielandt containment (the core).
+
+Consumed by (13.17.c) at `normalizer_W1` uses below (the `W₁W₂^y`-alternative of the Frobenius
+complement). -/
+theorem normalizer_W1 [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hyp : Hypothesis (G := G)) (hTTypeII : IsTypeII hyp.T) :
+    Subgroup.normalizer (hyp.W1 : Set G) = Subgroup.centralizer (hyp.W1 : Set G) ∧
+      Subgroup.centralizer (hyp.W1 : Set G) = hyp.Q ⊔ hyp.W2 := by
+  obtain ⟨hW1_le_Q, hQ_comm, hN_le⟩ := normalizer_W1_structure hG hyp hTTypeII
+  -- `W₂ ≤ C_G(W₁)`: `W = W₁ × W₂` is abelian, so `W₂` centralizes `W₁`.
+  have hW2_le_C : hyp.W2 ≤ Subgroup.centralizer (hyp.W1 : Set G) := by
+    intro y hy
+    rw [Subgroup.mem_centralizer_iff]
+    intro x hx
+    exact hyp.W1_commutes_W2 x (SetLike.mem_coe.mp hx) y hy
+  -- `Q ≤ C_G(W₁)`: `W₁ ≤ Q` and `Q` abelian give `Q ≤ C_G(Q) ≤ C_G(W₁)`.
+  have hQ_le_C : hyp.Q ≤ Subgroup.centralizer (hyp.W1 : Set G) :=
+    (Subgroup.le_centralizer_iff_isMulCommutative.mpr hQ_comm).trans
+      (Subgroup.centralizer_le (SetLike.coe_mono hW1_le_Q))
+  have hQW2_le_C : hyp.Q ⊔ hyp.W2 ≤ Subgroup.centralizer (hyp.W1 : Set G) :=
+    sup_le hQ_le_C hW2_le_C
+  have hC_le_N : Subgroup.centralizer (hyp.W1 : Set G) ≤
+      Subgroup.normalizer (hyp.W1 : Set G) := Subgroup.centralizer_le_normalizer _
+  exact ⟨le_antisymm (hN_le.trans hQW2_le_C) hC_le_N,
+    le_antisymm (hC_le_N.trans hN_le) hQW2_le_C⟩
+
 /-- **`T`-side dual of `not_normalizer_U_le_S`** (Pf (13.17), V-side): if `V` is a `T`-conjugate of
 the `TypeIIData` witness's complement `tdata.typeP.U`, then `N_G(V) ⊄ T`.  Transfers the type-II
 property `tdata.normalizer_not_le` along the conjugation `V = (typeP.U)^x`, `x ∈ T`. -/
@@ -2846,6 +2847,7 @@ structure theory; the remaining order analysis (`|E| ∈ {q, p q}`, cyclic Sylow
 the `(14.5)` exclusion of `E = W₁`) builds on this containment. -/
 theorem complement_le_QW2 [Finite G]
     (_hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
+    (hTTypeII : IsTypeII hyp.T)
     {L : Subgroup G} (frob : OddOrder.Peterfalvi.S14.TypeIFrobeniusData L)
     (hW1E : hyp.W1 ≤ frob.complement.map L.subtype) :
     frob.complement.map L.subtype ≤ hyp.Q ⊔ hyp.W2 := by
@@ -2902,7 +2904,7 @@ theorem complement_le_QW2 [Finite G]
       rw [Subgroup.mem_subgroupOf] at hfin
       simpa using hfin
   -- (13.16): `N_G(W₁) = C_G(W₁) = Q W₂`.
-  have h1316 := normalizer_W1 _hG hyp
+  have h1316 := normalizer_W1 _hG hyp hTTypeII
   calc E.map L.subtype ≤ Subgroup.normalizer (hyp.W1 : Set G) := hEN
     _ = Subgroup.centralizer (hyp.W1 : Set G) := h1316.1
     _ = hyp.Q ⊔ hyp.W2 := h1316.2
@@ -2991,7 +2993,7 @@ theorem complement_card_eq_pq [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd G
   -- §13 residual: `E ∩ Q = W₁` and `E ⊄ Q`.
   obtain ⟨hInf, hnle⟩ := complement_inf_Q_structure _hG hyp frob hW1E
   -- `E ⊆ Q W₂` (Huppert step) and the `Q ⋊ W₂` structure.
-  have hEH : Em ≤ Hg := complement_le_QW2 _hG hyp frob hW1E
+  have hEH : Em ≤ Hg := complement_le_QW2 _hG hyp hTTypeII frob hW1E
   obtain ⟨hWnorm, hdisj, _⟩ := Q_W2_structure _hG hyp hTTypeII
   have hQleH : hyp.Q ≤ Hg := le_sup_left
   -- `|E ∩ Q| = |W₁| = q`.
@@ -3053,7 +3055,7 @@ theorem typeI_overNormalizer_complement [Finite G]
   have hcard := complement_card_eq_pq _hG hyp hTTypeII frob hW1E
   refine ⟨hcard, ?_⟩
   obtain ⟨hWnorm, hdisj, hpQ⟩ := Q_W2_structure _hG hyp hTTypeII
-  have hEQW2 := complement_le_QW2 _hG hyp frob hW1E
+  have hEQW2 := complement_le_QW2 _hG hyp hTTypeII frob hW1E
   -- `Q` is solvable: `Q = T_F ≤ T < ⊤`.
   haveI hQsolv : IsSolvable ↥hyp.Q := by
     have hQT : hyp.Q ≤ hyp.T := by
