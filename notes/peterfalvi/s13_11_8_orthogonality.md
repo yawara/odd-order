@@ -680,3 +680,19 @@ family R に射影 (`exists_intProjection`) → c, Y (Y⊥R)、`‖φ‖² = ∑
 ‖α^τ‖²=∑c_β²+‖Y‖²。‖α^τ‖²=2+n² (coh-free)。∑c_β² 分割: c(SHC.ext ζ)=a−n (cont.²⁶ int + cont.³²),
 c(SHC.ext η)=a (η≠ζ) ⟹ ∑c_β²=(a−n)²+(|R|−1)a²。⟹ (a−n)²+(|R|−1)a²≤2+n² ⟹ |R|a²−2an≤2。
 |R|=n (=11.8.1 |S₁|=n、§9↔§10 gated) + `charParam_a_mem_of_norm_ineq` (cont.³⁵) ⟹ a∈{0,1,2}。
+
+## 2026-07-02 cont.³⁷ (lane-a) — sum-split landed; (11.8.2) support 完備、次は full assembly
+**`sum_sq_eq_of_split`** landed (S12, leaf green): e∈R, f e=x, ∀β∈R,β≠e→f β=y ⟹
+`∑_{β∈R}(f β)²=x²+(|R|−1)y²` (general Finset、axiom-clean)。(11.8.2) の
+`∑c_β²=(a−n)²+(|S₁|−1)a²` 評価用 (c(ζ^{τ₁})=a−n, 他=a)。
+
+**(11.8.2) support 全部 landed** — full assembly の材料完備:
+- Parseval-with-remainder (cont.³⁶): ‖α^τ‖²=∑c_β²+‖Y‖²。
+- sum-split (本): ∑c_β²=(a−n)²+(|R|−1)a²。
+- 算術核 (cont.³⁵): n(a²−2a)≤2 → a∈{0,1,2}。
+- R materialization (cont.³⁴)、coefficient relation (cont.³²)、integrality (cont.²⁶)、‖α^τ‖²=2+n² (coh-free)。
+
+**次 = full (11.8.2) assembly**: R+α^τ に Parseval → c,Y。coeff 同定 c(SHC.ext ζ)=a−n (cont.²⁶ int
++ cont.³² relation), c(SHC.ext η)=a (η≠ζ)。sum-split → ∑c_β²=(a−n)²+(|R|−1)a²。‖Y‖²≥0 (real part) +
+‖α^τ‖²=2+n² ⟹ (a−n)²+(|R|−1)a²≤2+n² ⟹ |R|a²−2an≤2。|R|=n (11.8.1 gated) + 算術核 ⟹ a∈{0,1,2}。
+⚠ 残 fiddly = ℂ→ℤ/ℝ 変換 (‖Y‖².re≥0)、|R|=n は §9↔§10 gated (hypothesis 化)。
