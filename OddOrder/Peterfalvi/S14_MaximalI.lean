@@ -1084,6 +1084,44 @@ theorem coherent_extension_constituent_mem_span_Rset {L : Subgroup G} [Finite G]
   intro α hα
   exact ⟨φ, hφ, Finset.mem_coe.mp hα⟩
 
+open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
+/-- **Peterfalvi (5.5) + (12.3): the L-side Dade character `ψ = χ_L^{τ₁}` is orthogonal to
+`R(χ_M)`.**  For two non-conjugate type-I maximal subgroups `L`, `M` and a constituent
+`φ_L ∈ S(χ_L)` of the L-side family that is itself a member of `S` (the Frobenius witness case,
+where `χ_L = Ind θ` is irreducible), the coherent Dade image `ψ = coh_L.extension φ_L` is orthogonal
+to every element of `R(χ_M) = Rset data_M`.
+
+Two ingredients combine: (5.5) `coherent_extension_constituent_mem_span_Rset` puts
+`ψ ∈ ℤ[R(χ_L)]`, and (12.3) `nonconjugate_typeI_R_orthogonal` gives the cross-`L` orthogonality
+`R(χ_L) ⊥ R(χ_M)`; since `⟨·,·⟩` is conjugate-symmetric and additive, orthogonality of `ψ` to all
+of `R(χ_M)` follows from `inner_eq_zero_of_mem_zSpan`.  This is precisely the per-`χ_M` piece of the
+`horth` hypothesis that the (12.4)/(12.14) coset-constancy chain (`Sset_coeff_equal`,
+`psi_constant_on_xK`) consumes: `ψ` restricted to the `M`-structure has equal coefficients across
+`S(χ_M)`, forcing `ψ` constant on the `M_F`-cosets. -/
+theorem coherent_extension_constituent_orthogonal_Rset_of_nonconjugate {L M : Subgroup G}
+    [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hyp_L : Hypothesis L)
+    (coh_L : OddOrder.Peterfalvi.S07.IsCoherent hyp_L.tau hyp_L.Sset hyp_L.A)
+    {chi_L : ClassFunction ↥L ℂ} (data_L : CharacterDecompositionData hyp_L chi_L)
+    {φ_L : IrreducibleCharacter ↥L} (hφ_L : φ_L ∈ data_L.constituents)
+    (hφ_L_mem : (φ_L : ClassFunction ↥L ℂ) ∈ hyp_L.Sset)
+    (hyp_M : Hypothesis M) (hnot_conj : ¬ ∃ g : G, MulAut.conj g • L = M)
+    {chi_M : ClassFunction ↥M ℂ} (data_M : CharacterDecompositionData hyp_M chi_M) :
+    ∀ α ∈ Rset data_M,
+      ClassFunction.inner (coh_L.extension (φ_L : ClassFunction ↥L ℂ)) α = 0 := by
+  -- (5.5): `ψ = coh_L.extension φ_L ∈ ℤ[R(χ_L)]`.
+  have h55 := coherent_extension_constituent_mem_span_Rset hyp_L coh_L data_L hφ_L hφ_L_mem
+  -- (12.3): `R(χ_L) ⊥ R(χ_M)`.
+  have horth := nonconjugate_typeI_R_orthogonal hG hyp_L hyp_M hnot_conj data_L data_M
+  intro α hα
+  -- `α ⊥ R(χ_L)` (conjugate-swap of (12.3)), hence `α ⊥ ℤ[R(χ_L)] ∋ ψ`; conjugate back.
+  have hαperp : ∀ β ∈ Rset data_L, ClassFunction.inner α β = 0 := by
+    intro β hβ
+    rw [inner_conj_symm β α, horth β hβ α hα, star_zero]
+  have h0 : ClassFunction.inner α (coh_L.extension (φ_L : ClassFunction ↥L ℂ)) = 0 :=
+    OddOrder.Peterfalvi.S07.IntegralCharacterMap.inner_eq_zero_of_mem_zSpan hαperp h55
+  rw [inner_conj_symm α (coh_L.extension (φ_L : ClassFunction ↥L ℂ)), h0, star_zero]
+
 open scoped Classical in
 /-- **General TI-induction self-value** (Isaacs 7.x / Peterfalvi (3.2.c) value half), generalized
 from `TICyclicHypothesis.induce_apply_eq_self_of_mem_V` to an arbitrary TI subset.  For a TI subset
@@ -4129,3 +4167,7 @@ end OddOrder.Peterfalvi.S14
 #print axioms OddOrder.Peterfalvi.S14.fixed_conjClass_eq_one_of_typeF
 #print axioms OddOrder.Peterfalvi.S14.coherent_extension_mem_span_imageFamily
 #print axioms OddOrder.Peterfalvi.S14.coherent_extension_constituent_mem_span_Rset
+-- `coherent_extension_constituent_orthogonal_Rset_of_nonconjugate` is sorry-free in its own body
+-- but transitively cites `nonconjugate_typeI_R_orthogonal` (12.3), whose geometric obligation
+-- `nonconjugate_diffImage_inner_zero` (8.18.c, §10 thickened-support) is the one remaining sorry;
+-- so it is intentionally *not* in the axiom-clean block above (would show `sorryAx`).
