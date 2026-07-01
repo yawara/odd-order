@@ -6497,6 +6497,45 @@ theorem hcConjDescend_bijective [Finite G] {M : Subgroup G}
     simp only [ClassFunction.conjByMulEquiv_apply, Subgroup.coe_mul, Subgroup.coe_inv]
     group
 
+/-- **`A_g = id` for `g ∈ HC`**: conjugation by an `HC`-element descends to the identity on `H̄`,
+because `H̄ = H/N` is abelian and `hcHom` is a homomorphism, so `hcHom(g·x·g⁻¹) = hcHom x`.  Since
+`HC ⊇ hInHu` (the `H`-part of `HU`) and `HC ⊇ C`, the nontrivial part of `A_·` factors through
+`HU/HC ≅ Ū`.  Reduces the case-A factor-preservation `A_g(Hpart i) ⊆ Hpart i` to the `U`-part
+(realizable in `U ⊔ W₁`), where it is the `uActionHom` action (`Hpart_aInvariant`). -/
+theorem hcConjDescend_eq_id_of_mem_hc [Finite G] {M : Subgroup G}
+    {data : TypesIIIIIIVSetup M} (chief : ChiefFactorData data) {g : ↥(huSub data)}
+    [(hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf (huSub data)).Normal]
+    (hg : g ∈ hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf (huSub data)) :
+    hcConjDescend chief g = MonoidHom.id (↥data.H ⧸ chief.N) := by
+  refine MonoidHom.ext fun z => ?_
+  obtain ⟨x, hx⟩ := hcHom_surjective chief z
+  rw [← hx, hcConjDescend_hcHom, MonoidHom.id_apply]
+  have hconj : ClassFunction.conjByMulEquiv g x
+      = (⟨g, hg⟩ : ↥(hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf
+          (huSub data))) * x * (⟨g, hg⟩)⁻¹ := by
+    apply Subtype.ext
+    simp [ClassFunction.conjByMulEquiv_apply]
+  rw [hconj, map_mul, map_mul, map_inv,
+    chief.quotient_elementaryAbelian.comm (hcHom chief ⟨g, hg⟩) (hcHom chief x),
+    mul_assoc, mul_inv_cancel, mul_one]
+
+/-- **`A_·` is multiplicative**: `A_{g₁·g₂} = A_{g₁} ∘ A_{g₂}` (conjugation is a homomorphism into
+`End(H̄)`, preserved by the `QuotientGroup.map` transport).  With `hcConjDescend_eq_id_of_mem_hc`
+(`A_h = id` for `h ∈ HC`) this reduces `A_g` for `g = h·u ∈ HU` (`h ∈ hInHu`, `u ∈ uInHu`) to the
+`U`-part `A_u`, giving the case-A factor-preservation from `Hpart_aInvariant`. -/
+theorem hcConjDescend_mul [Finite G] {M : Subgroup G}
+    {data : TypesIIIIIIVSetup M} (chief : ChiefFactorData data) (g₁ g₂ : ↥(huSub data))
+    [(hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf (huSub data)).Normal] :
+    hcConjDescend chief (g₁ * g₂)
+      = (hcConjDescend chief g₁).comp (hcConjDescend chief g₂) := by
+  refine MonoidHom.ext fun z => ?_
+  obtain ⟨x, hx⟩ := hcHom_surjective chief z
+  rw [← hx, MonoidHom.comp_apply, hcConjDescend_hcHom, hcConjDescend_hcHom, hcConjDescend_hcHom]
+  congr 1
+  apply Subtype.ext
+  simp only [ClassFunction.conjByMulEquiv_apply, Subgroup.coe_mul, Subgroup.coe_inv]
+  group
+
 /-- **`ζ(1) = u`**: the degree of `ζ = Ind_{HC}^{HU}(ψ)` is `u`.  `induce_apply_one` gives
 `ζ(1) = [HU:HC]·ψ(1) = u·1` (`hc_index_eq_u`, and `ψ` linear so `ψ(1)=1`).  This is the degree-`u`
 of the (9.8.c) irreducible; `induceHU ζ` then has degree `q·u = qu`. -/
