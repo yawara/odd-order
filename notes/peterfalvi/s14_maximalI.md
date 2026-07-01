@@ -1707,3 +1707,30 @@ hconj)` 上 — これは witness τ の形そのもの** (`hyp.tau = dadeIntegr
 → sMember_index_le_two_psi → six_two_index_bound)。case c は member 既約ゆえ mc i=1 (‖·‖=1)、Dmem は
 singleton 分解。Frobenius index=card は `IsComplement.card_right (isComplement'_def.mp hfrob.isComplement)`
 の 1 行。次: witness `sMember_degreeSumBound` 版から bottom-up に build (core の仮説供給が本体)。
+
+## loop⁷⁷–⁸⁹: (12.6) case (c) PROVEN (commit 4753cd14)
+
+**`frobenius_typeI_coherent_of_cyclicQuotient` は sorry-free + axiom-clean** ([propext, Classical.choice,
+Quot.sound])。(12.6) 3 case のうち (b)(loop⁶⁷ 9ba65c40)・(c) が完了。full assembly `frobenius_typeI_coherent`
+の残 sorryAx は **case (a) `sibleyTarget_frobI` のみ** (→ (12.3) `nonconjugate_typeI_R_orthogonal` → (8.18.c)
+`nonconjugate_diffImage_inner_zero` @ S14:665、§10 thickened-support 幾何)。
+
+**達成した 2 部構成:**
+1. **engine 強化** `S08.nonempty_coherent_SOf_bot_of_index_dvd`: (6.5.b) p-群還元を **engine 内部化**。
+   旧 `{p}(hHp:IsPGroup p H)` 固定 → 新 `hF:IsFrobeniusGroup ↥L H C`+`hLodd`+`hdvd(∀p||H|)`。by_contra 内で
+   (6.3) index bound → `isPGroup_of_isFrobeniusGroup_of_card_le hF … hbound` で p 生成 (`isPGroup_of_not_coherent`
+   をミラー; bound は ¬coherent 文脈必須ゆえ engine 内でしか導出不可) → `six_five_c_arith`。oddness は |L| odd から。
+2. **witness 配線** (S14): `rw ← SsubFiltration_bot` → K=(L_F).subgroupOf L の abelian 場合分け:
+   - abelian: `⁅K,K⁆=⊥` (commutatorElement_eq_one_iff_commute) → `S(⁅K,K⁆)=S(⊥)=S`、hcoh で coherent。
+   - non-abelian: engine + hcoh + hH'lt (K nilpotent not perfect) + h56=`Sset_six_two_index_bound`
+     (lambda で `commutator(K/A)≠⊤` を `A≤⁅K,K⁆<K`+nilpotent から導出)。
+   - **hdvd** (最大の山): odd Frobenius 補群 C は Z-群 (`S10.isZGroup_of_isFrobeniusGroup_of_odd`) → SZ 共役
+     (`IsComplement'.exists_conj_of_coprime`) で `C≃U` → U も Z-群 → `K.index=[L:H]=|U|=exp(U)`
+     (typeF.complement + `IsZGroup.exponent_eq_card`) → `_hexp` (8.3.c) が `K.index∣p−1` を与える。
+
+**次の B レーン frontier (loop⁹⁰+):** **`witness_L_coherent` を sorry-free 化**。現状 witness_L_coherent (S14:~3958)
+は `frobenius_typeI_coherent`(3 case) を呼ぶため case (a) の sorry を推移的に負う。だが **witness は case (a) を
+取らない** (Peterfalvi (12.10): witness の H^# は non-TI)。∴ witness の `hyp.typeI.alternative` の hTI 枝を
+(12.10) で排除できれば witness_L_coherent は (b)(c) 済みゆえ sorry-free になる → (12.16) Dade 計算の coherence
+入力 `hB` が閉じる。要調査: witness Hypothesis が「H^# not TI」を carry するか (12.10 の所在)、hTI→False の導出。
+これが (12.16)→(16) 最終矛盾への実質前進。case (a) の (8.18.c) 幾何本体 (S14:665) は general 12.7 用で FT witness 経路外。
