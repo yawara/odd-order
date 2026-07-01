@@ -5017,6 +5017,70 @@ theorem inertia_eq_top_of_induceHU_not_irreducible [Finite G] {M : Subgroup G}
   by_contra hnt
   exact hne (eq_of_le_of_prime_index hle hprime hnt)
 
+/-- **`Ind_{HU}^M` is injective on reducible-inducing characters** (`Xmu` injectivity): if
+`Ind_{HU}^M χ` is reducible and `Ind_{HU}^M χ = Ind_{HU}^M ψ`, then `ψ = χ`.  Reducibility makes `χ`
+`M`-invariant (`inertia_eq_top_of_induceHU_not_irreducible`), and a full-inertia character is
+`Ind`-injective (`induce_injective_of_inertia_stable`, via `induce_eq_induce_iff_conj`).  Combined
+with `reducible_count_sOf_H0C` (`|reducibles| = p-1`) this gives `|Xmu| = p-1` for the (9.8.c)
+parity dichotomy (`Xmu = {ζ ∈ Xθ | Ind_M ζ reducible}`), the surjectivity route to conjunct (c). -/
+theorem caseA_induceHU_inj_of_reducible [Finite G] {M : Subgroup G}
+    (data : TypesIIIIIIVSetup M) [Fintype ↥M] [Invertible (Nat.card ↥(huSub data) : ℂ)]
+    {χ ψ : IrreducibleCharacter ↥(huSub data)}
+    (hχred : ¬ IsIrreducibleCharacter
+      (ClassFunction.induce (huSub data) (χ : ClassFunction ↥(huSub data) ℂ)))
+    (h : ClassFunction.induce (huSub data) (χ : ClassFunction ↥(huSub data) ℂ)
+      = ClassFunction.induce (huSub data) (ψ : ClassFunction ↥(huSub data) ℂ)) :
+    ψ = χ := by
+  haveI := huSub_normal data
+  letI : Fintype ↥(huSub data) := Fintype.ofFinite _
+  letI : Invertible (Nat.card ↥M : ℂ) :=
+    invertibleOfNonzero (Nat.cast_ne_zero.mpr Nat.card_pos.ne')
+  have hinertia := inertia_eq_top_of_induceHU_not_irreducible data χ hχred
+  refine induce_injective_of_inertia_stable (fun g => ?_) h
+  apply IrreducibleCharacter.ext
+  rw [IrreducibleCharacter.coe_conjBy]
+  exact ClassFunction.mem_inertia.mp (by rw [hinertia]; exact Subgroup.mem_top g)
+
+/-- **A nonempty left-translation-closed subset of a group is everything.**  If `T` is nonempty and
+closed under left multiplication by *every* group element (`∀ a b, b ∈ T → a·b ∈ T`), then `T = univ`
+(any `w = (w·t⁻¹)·t ∈ T`).  The `W₁`-transitivity core of the (9.8.c) surjectivity route: the set of
+`W₁`-conjugates `S₀^w` on which a constituent `θ̄₀` is nontrivial is `W₁`-translation-invariant (from
+`M`-invariance of the reducible constituent) — so if nonempty (`H ⊄ ker`) it is *all* conjugates,
+making `θ̄₀` regular.  Since the `W₁`-conjugates are indexed by `W₁` itself with `W₁` acting by
+translation, transitivity is free (no producer `W₁`-permutation is needed). -/
+theorem eq_univ_of_nonempty_of_mul_mem_left {W : Type*} [Group W] {T : Set W}
+    (hne : T.Nonempty) (hclosed : ∀ a : W, ∀ b ∈ T, a * b ∈ T) : T = Set.univ := by
+  obtain ⟨t, ht⟩ := hne
+  refine Set.eq_univ_of_forall fun w => ?_
+  have := hclosed (w * t⁻¹) t ht
+  simpa using this
+
+/-- **`Ū`-invariance of the per-factor nontrivial set**: a character `θ` of `H̄` is nontrivial on the
+Clifford summand `Hpart i` iff its `U`-translate `θ ∘ φ_U(a)` is.  Since `φ_U(a)` restricts to a
+bijection of `Hpart i` (`Hpart_aInvariant`, invertible), the two restrictions have the same triviality.
+So the set of summands on which a constituent `θ̄₀` is nontrivial is constant along the `Ū`-orbit of
+`θ̄₀` — the input (together with `M`-invariance = `W₁`-invariance and `eq_univ_of_nonempty_of_mul_mem_left`)
+to the (9.8.c) surjectivity that a reducible constituent is regular. -/
+theorem caseA_uActionHom_comp_subtype_eq_one_iff [Finite G] {M : Subgroup G}
+    {data : TypesIIIIIIVSetup M} {chief : ChiefFactorData data}
+    {chars : Section11CharacterData data chief} (caseA : CliffordCaseAData chars)
+    (a : ↥(typeP_quotientCoprimeAction data.typeP data.nontrivial.1 chief.N_aInvariant).U)
+    {i : Fin data.q} (θ : (↥data.H ⧸ chief.N) →* ℂˣ) :
+    (θ.comp (uActionHom data chief a).toMonoidHom).comp (caseA.Hpart i).subtype = 1
+      ↔ θ.comp (caseA.Hpart i).subtype = 1 := by
+  constructor
+  · intro h
+    refine MonoidHom.ext fun y => ?_
+    have hval := DFunLike.congr_fun h ⟨_, (caseA.Hpart_aInvariant i).inv_smul_mem a y.2⟩
+    simp only [MonoidHom.comp_apply, Subgroup.subtype_apply, MonoidHom.one_apply,
+      MulEquiv.coe_toMonoidHom, MulAut.apply_inv_self] at hval ⊢
+    exact hval
+  · intro h
+    refine MonoidHom.ext fun x => ?_
+    have hval := DFunLike.congr_fun h ⟨_, (caseA.Hpart_aInvariant i).smul_mem a x.2⟩
+    simpa only [MonoidHom.comp_apply, Subgroup.subtype_apply, MonoidHom.one_apply,
+      MulEquiv.coe_toMonoidHom] using hval
+
 /-- **A regular character nontrivial on each `W1`-conjugate of `S₀`** (Clifford case (a)).
 Instantiates the elementary `(9.7)` decomposition `H̄ = ⊕_{w∈W1} S₀^w` (`wConjugate_coprod_bijective`,
 with the chief-factor `U`-action, `act.U ⊔ act.E = ⊤`, `|H̄| = p^{|W1|}`) and feeds the resulting

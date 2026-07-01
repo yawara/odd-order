@@ -1753,3 +1753,26 @@ orbitRep∈W₁ に refine or 「W₁-不変 Hpart-set は ∅/全体」) + (3) 
 crux = W₁-transitivity + surjectivity の 構成子解析 (Coq PFsection9 の Res-constituent 論)。次着手 =
 W₁-transitivity lemma (producer で factors=W₁-orbit、orbitRep を W₁ に取れる) or injective lemma
 (self-contained、landable)。**deep だが constant-char 構成より短い経路**。
+
+### ✅ injective 全 foundation DONE (commits 4947abe2/604b61fe, cont.¹¹)
+- `inertia_eq_top_of_induceHU_not_irreducible`: reducible → I_M=⊤ (induce_of_inertia_eq 対偶 +
+  eq_of_le_of_prime_index、inner-product 不要)。
+- `caseA_induceHU_inj_of_reducible`: reducible-inducing χ で Ind_M inj (mem_inertia +
+  induce_injective_of_inertia_stable)。⟹ |Xmu|≤p-1 の injective 半分完成。
+
+### ★★ 再フレーミング (cont.¹¹): W₁-transitivity は producer refactor 不要 — W₁-conjugate indexing で FREE
+W₁-transitivity を producer で証明する必要は無い。**W₁-conjugate 族 `{act.φ ↑w • S₀ : w∈act.E}`
+(index=act.E=W₁bar、`wConjugate_coprod_bijective` 既存、W₁ が translation `w'·w` で自明に transitive)**
+を使えば W₁-transitivity は index 集合 W₁ の translation 推移性で FREE。機構は family-generic
+(clifford_caseA_exists_regular_char_on_conjugates が既にこの族で regular char 構成)。producer の
+caseA.Hpart (maximal SupIndep) と別族だが assembly は generic。
+
+**⟹ conjunct c の真の crux は「構成子解析」のみ** (W₁-transitivity は free): reducible ξ (M-fixed,
+∈xiOf(H₀C)) → HU-構成子 θ̄_0 が regular:
+- θ̄_0 抽出: `exists_constituent_not_subset_characterKernel` / `IrreducibleCharacter.LiesOver` (既存)。
+- ξ M-fixed → θ̄_0 の Ū-orbit が W₁-invariant (ξ=ξ^w → θ̄_0,θ̄_0^w が HU-conjugate)。
+- {w∈act.E : θ̄_0 nontrivial on φ(w)•S₀} は Ū-inv (U が factor 保存) ∧ W₁-translation-inv ∧ 非空
+  (H⊄ker) → W₁-translation 推移で全体 → θ̄_0 regular → ξ=ζ_θ∈Xθ。⟹ Ind_M:Xmu→reducibles 全射
+  → |Xmu|=p-1。
+次着手 = 構成子解析の逐次 build (θ̄_0 抽出 → Ū-orbit W₁-inv → nontrivial-set 全体 → regular)。
+Clifford char 論だが producer refactor 不要ゆえ tractable。Coq PFsection9 の Res-constituent 論を port。
