@@ -768,9 +768,10 @@ in the repo (see `notes/peterfalvi/s15_s_and_t.md`, the (13.16) core plan block)
 theorem normalizer_U_inf_W2_eq_bot [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     (hyp : Hypothesis (G := G)) :
     hyp.U ⊓ Subgroup.normalizer (hyp.W2 : Set G) = ⊥ :=
-  -- The coprime-action datum is discharged (`coprime_card_P_card_UW1`, ungated); the type-`P`
-  -- reconciliation `Sdata.W2 = W2` is supplied by the enriched §16 `Hypothesis` (issue 3001/4014).
-  normalizer_U_inf_W2_eq_bot_of_data hG hyp (coprime_card_P_card_UW1 hG hyp) sorry
+  -- The coprime-action datum is discharged by `coprime_card_P_card_UW1` (ungated); the type-`P`
+  -- reconciliation is the `Hypothesis` field `Sdata_W2_eq` (§16-carrier, supplied by the enriched
+  -- §16 construction via `typePData_of_kappaHall_hallComplement_W2`).
+  normalizer_U_inf_W2_eq_bot_of_data hG hyp (coprime_card_P_card_UW1 hG hyp) hyp.Sdata_W2_eq
 
 /-- **Peterfalvi (13.16), Maschke/Wielandt core for the `W₂`-side**: `N_G(W₂) ⊓ S ≤ P ⊔ W₁`.
 
