@@ -58,7 +58,28 @@ accident でなく genuine 構造 gate)。basic_structure_gated と同じ gate �
 u∈C_U(M_F))。(8.4.c) `C_M(M_F) ≤ M'` と M'=P⊔U (`S_deriv_eq_PU`) を使う。着地後 `hyp.H = fittingInG S`
 → 両 sorry closes。carrier reconciliation (Sdata) は不要 (P/C は Hypothesis field 直取り)。
 
+## 解決 (2026-07-01, lane d) — crux は carrier に既存だった
+
+上記「(8.5.a) は repo 未整備」の判定は **誤り**だった。`TypePData.fitting_eq`
+(`MaximalSubgroupType.lean:158`) が **まさに (8.5.a)** を carrier field として持つ:
+
+```
+fitting_eq : (Isaacs.Ch01.fitting ↥M).map M.subtype = H ⊔ (U ⊓ centralizer (H:Set G))
+```
+
+LHS = `(fitting ↥S).map S.subtype = fittingInG S`、RHS = `Sdata.H ⊔ (Sdata.U ⊓ C_S(Sdata.H))`。
+`P = M_F = Sdata.H` (`P_eq_SF`/`Sdata.H_eq`)・`Sdata.U = U` (`Sdata_U_eq`) で reconcile すると
+RHS = `P ⊔ (U ⊓ C_S(P)) = P ⊔ C = H`。⟹ **`hyp.H = fittingInG S` が carrier 直取りで landing**
+(`Hypothesis.H_eq_fittingInG`, sorry-free)。P-abelian route も自作 (8.5.a) 形式化も不要。
+
+両 sorry はこれで closed:
+- `H_sharp_isTISubset`: `H = F(S)` + `fittingIsTI_of_isTypeP2` (15.7.a) + `normalizer_fittingInAmbient_eq_self` (bound = S) + `IsTISubset` set-eq。
+- `S_normalizes_H_sharp`: `l ∈ S = N_G(F(S))` が `F(S)` を正規化 → 共役が `F(S)^#` 保存。
+
+`basic_structure_gated` (P el-ab / U abelian) には**非依存** = §8 TI-subset は σ-structure gate に
+bottom out しない (上記「別 route も同じ σ-structure gate」の分析も carrier field を見落としていた)。
+
 ## 状態
 - [x] 全 TI 機構の在庫確認 + crux 特定 (2026-07-01 lane d)
-- [ ] Pf (8.5.a) `fittingInG S = P ⊔ C_U(P)` 形式化
-- [ ] `H_sharp_isTISubset` / `S_normalizes_H_sharp` を assemble
+- [x] crux `hyp.H = fittingInG S` は `Sdata.fitting_eq` (= 8.5.a) で carrier 直取り
+- [x] `H_sharp_isTISubset` / `S_normalizes_H_sharp` を assemble (sorry-free, leaf build green)
