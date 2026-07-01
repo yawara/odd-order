@@ -184,6 +184,45 @@ OddOrder.GroupTheory.RepresentationTheory.TypePGaloisUBound` で全て入る:
 + 各 block U-invariant) + hconst (C=1 Frobenius)。generic scalar 抽出 (`lineScalarChar`)・算術・
 embedding・両分岐 bound は本 leaf で供給済。
 
+## ✅✅ σ-theory u_bound engine 完成 (2026-07-02) + kernel char 追加
+
+`LineScalarCharacter.lean` に **`lineScalarChar_eq_one_iff`** 追加 (sorry-free): `φ u = 1 ↔ u が
+line を pointwise 固定`。order-p block では「u が block の nontrivial char を固定 ⟺ u が block を
+centralize」(𝔽_p^× free action) = Coq `inertia_irr_prime` (PFsection9.v:948) の module-level 版。
+**lane a §9 caseA の order-p stabilizer=centralizer piece (issue 1012 の piece C) の module-framing
+供給** (lane a の char-inertia framing の代替/補完として cite 可)。
+
+⟹ σ-theory u_bound engine の generic API は完全 (Galois/non-Galois bound + block composite +
+scalar char + kernel char + finrank bridge、全 sorry-free、full build green)。
+
+## 🛑 HUB: lane d cluster boundary — 次 target 要裁定 (policy 7, issue 4014 と同型)
+
+**状況 (code-level 検証済 2026-07-02)**: lane d の担当 (σ-theory + owned S15/BG) の on-feitThompson-path
+ungated genuine work は **σ-theory engine 完成で枯渇**:
+- shared `OddOrder/GroupTheory/**`: **sorry-free** (grep 検証)。σ-theory engine 完成。
+- owned S15_SAndT_Setup: `u_bound`/`P_elementaryAbelian` は lane a §11 gated、char cascade は
+  lane b coherence gated (issue 4014)。
+- owned BG §14–16: 残 sorry は全 off-feitThompson-path (signalizer Thm D/E は char route で bypass、
+  monolith/docstring/orphaned — issue 4014 で検証済)。
+- 群論 spine (Isaacs/BG §1–13/Pf §1–9) は sorry-free。**残る FT work = 指標終盤 §10–16 = 全て
+  active char lane (a §9–13 / b §12+coherence / c §14–16) の territory**。
+
+**⟹ lane d の distinct な group/σ-theory 貢献は実質完了**。次の on-spine work は全て active char
+frontier 内 = **carve せずに触ると dup** (σ-theory dup 前例 = issue 9000 冒頭)。これは cluster-complete
+の **cross-cluster 再配分案件** (issue 4014 = ユーザー裁定の前例) で、within-cluster frontier 選択
+([[feedback-decide-frontier-autonomously]] の射程) ではない。
+
+**HUB/user 裁定を要する選択肢**:
+- (A) lane d を binding γ (§14–16, lane c) の非衝突な structural 部分に signature-contract で carve
+  (例: S16:166 v-bound / S16:3431/3511 IsCyclic — 現 issue 9001 で lane c 割当だが lane d の σ-theory
+  leaf が直接 discharge 可能な構造結論)。
+- (B) lane d が hub-confirmed 非-dup な char shared-infra を claim-build (lane a issue 1012 が flag した
+  characterKernel-Subgroup 等、ただし lane a active caseA と重複回避の hub 確認要)。
+- (C) lane d を off-path BG appendix (3 冊網羅の長期目標、FT 経路外) に回す — 現方針の FT-path 限定に反する。
+
+lane d は裁定待ちの間 idle にせず、次 tick で main 同期して (a/b/c の進捗で新規 consumable が出たか /
+hub 応答があるか) 再評価する。
+
 ## 参照
 
 - Coq `coq/theories/PFsection9.v:323-560` (`typeP_Galois` / `typeP_Galois_Pn` (9.7.a) / `typeP_Galois_P` (9.7.b))

@@ -79,6 +79,27 @@ theorem lineScalarChar_smul (ρ : Representation (ZMod p) U V)
         rw [lineEndEquiv_apply]
     _ = (lineScalarChar ρ hdim u : ZMod p) • x := by rw [Module.algebraMap_end_apply]
 
+/-- **Kernel of the scalar character = pointwise stabilizer of the line**: `φ u = 1` iff `u` fixes
+`V` pointwise.  For an order-`p` block this is exactly "`u` fixes a nontrivial character of the
+block iff `u` centralizes the block" — the free action of `𝔽_p^×` on the line — so it discharges the
+order-`p` stabilizer/centralizer identifications of Peterfalvi (9.5)/(9.8) (Coq `inertia_irr_prime`,
+`PFsection9.v:948`). -/
+theorem lineScalarChar_eq_one_iff (ρ : Representation (ZMod p) U V)
+    (hdim : Module.finrank (ZMod p) V = 1) (u : U) :
+    lineScalarChar ρ hdim u = 1 ↔ ∀ x : V, ρ u x = x := by
+  constructor
+  · intro h x
+    rw [lineScalarChar_smul ρ hdim u x, h, Units.val_one, one_smul]
+  · intro h
+    haveI : Nontrivial V := Module.nontrivial_of_finrank_eq_succ hdim
+    obtain ⟨x, hx⟩ := exists_ne (0 : V)
+    have hsx : ((lineScalarChar ρ hdim u : ZMod p) - 1) • x = 0 := by
+      rw [sub_smul, one_smul, ← lineScalarChar_smul ρ hdim u x, h x, sub_self]
+    rcases smul_eq_zero.mp hsx with hc | hx0
+    · have hval : (lineScalarChar ρ hdim u : ZMod p) = 1 := sub_eq_zero.mp hc
+      exact Units.ext (by rw [hval, Units.val_one])
+    · exact absurd hx0 hx
+
 /-- The scalar character of a **faithful** line action is injective: distinct group elements act by
 distinct scalars.  (`ρ` injective and `ρ u x = φ u • x` force `φ` injective.) -/
 theorem lineScalarChar_injective (ρ : Representation (ZMod p) U V)
