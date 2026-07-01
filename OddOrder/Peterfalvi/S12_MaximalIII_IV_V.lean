@@ -7486,6 +7486,18 @@ theorem sum_sq_eq_of_split {R : Finset (ClassFunction G ℂ)} {e : ClassFunction
   rw [he2, hsum, hcard]
 
 open scoped FiniteInduce in
+/-- **Integer bound from a Parseval remainder.**  If `(A : ℂ) + ⟨Y, Y⟩ = (B : ℂ)` with `A, B ∈ ℤ`,
+then `A ≤ B` — since `⟨Y, Y⟩` is a non-negative real (`inner_self_re_nonneg`).  Turns the (11.8.2)
+Parseval equality `∑ c_β² + ‖Y‖² = ‖α^τ‖²` into the inequality `∑ c_β² ≤ ‖α^τ‖²`. -/
+theorem int_le_of_add_inner_self_eq [Finite G] {A B : ℤ} {Y : ClassFunction G ℂ}
+    (h : (A : ℂ) + ClassFunction.inner Y Y = (B : ℂ)) : A ≤ B := by
+  have hnn : (0 : ℝ) ≤ (ClassFunction.inner Y Y).re := inner_self_re_nonneg Y
+  have hre := congrArg Complex.re h
+  rw [Complex.add_re, Complex.intCast_re, Complex.intCast_re] at hre
+  have hle : (A : ℝ) ≤ (B : ℝ) := by linarith
+  exact_mod_cast hle
+
+open scoped FiniteInduce in
 /-- **Peterfalvi (11.8), the genuine non-orthogonality** (lane-b W3 obligation, issue 2020).
 
 Under Hypothesis (10.1), there is an irreducible `ζ ∈ S = inducedFamily M` of degree `w₁` —
