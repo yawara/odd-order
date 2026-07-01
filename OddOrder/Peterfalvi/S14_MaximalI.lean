@@ -1918,6 +1918,46 @@ theorem Sset_diff_supported [Finite G] {L : Subgroup G} (hyp : Hypothesis L)
   exact (mem_supportInSubgroup_sharp_subgroupOf_iff hyp.typeI.typeF.H hAH x).mpr
     ⟨Subgroup.mem_subgroupOf.mpr hxH, hx1⟩
 
+open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
+/-- **The witness Dade map is a difference-isometry on `S`** — the `tau_isometry_diff` field of the
+lattice-relative `S07.Hypothesis` (issue 9001).  For members `a, b, c, d ∈ S`, both differences are
+`A(L)`-supported (`Sset_diff_supported`), so the genuine §10 Dade isometry preserves their inner
+product (`dadeIntegralCharacterMap_inner_eq_on_supported_span`).  No global isometry is used. -/
+theorem Sset_tau_isometry_diff [Finite G] {L : Subgroup G} (hyp : Hypothesis L)
+    (hab : IsMulCommutative ↥hyp.typeI.typeF.H)
+    (hAH : hyp.ambientA = ((hyp.typeI.typeF.H) : Set G) \ {1})
+    {a b c d : ClassFunction ↥L ℂ} (ha : a ∈ hyp.Sset) (hb : b ∈ hyp.Sset)
+    (hc : c ∈ hyp.Sset) (hd : d ∈ hyp.Sset) :
+    ClassFunction.inner (hyp.tau (a - b)) (hyp.tau (c - d))
+      = ClassFunction.inner (a - b) (c - d) := by
+  have hS : ∀ s ∈ ({a - b, c - d} : Set (ClassFunction ↥L ℂ)),
+      s.support ⊆ OddOrder.Peterfalvi.S04.supportInSubgroup hyp.ambientA L := by
+    intro s hs
+    simp only [Set.mem_insert_iff, Set.mem_singleton_iff] at hs
+    rcases hs with rfl | rfl
+    · exact Sset_diff_supported hyp hab hAH ha hb
+    · exact Sset_diff_supported hyp hab hAH hc hd
+  exact OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap_inner_eq_on_supported_span
+    hyp.dadeData.dade hyp.hconj hS (Submodule.subset_span (Set.mem_insert _ _))
+    (Submodule.subset_span (Set.mem_insert_of_mem _ rfl))
+
+open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
+/-- **Witness member differences map into `ℤ[Irr G]`** — the `hZIrr` input of
+`coherent_of_constant_degree`.  Each member is irreducible (`Sset_isIrreducibleCharacter`), so
+`a − b ∈ ℤ[Irr L]`, and it is `A(L)`-supported (`Sset_diff_supported`), so the Dade image is a
+virtual character of `G` (`dadeIntegralCharacterMap_mem_ZIrr_of_supported`). -/
+theorem Sset_tau_diff_mem_ZIrr [Finite G] {L : Subgroup G} (hyp : Hypothesis L) {C : Subgroup ↥L}
+    (hfrob : OddOrder.Isaacs.Ch06.IsFrobeniusGroup ↥L ((hyp.typeI.typeF.H).subgroupOf L) C)
+    (hab : IsMulCommutative ↥hyp.typeI.typeF.H)
+    (hAH : hyp.ambientA = ((hyp.typeI.typeF.H) : Set G) \ {1})
+    {a b : ClassFunction ↥L ℂ} (ha : a ∈ hyp.Sset) (hb : b ∈ hyp.Sset) :
+    hyp.tau (a - b) ∈ ZIrr G := by
+  refine OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap_mem_ZIrr_of_supported
+    hyp.dadeData.dade hyp.hconj (Sset_diff_supported hyp hab hAH ha hb) ?_
+  exact Submodule.sub_mem _
+    (IrreducibleCharacter.mem_ZIrr ⟨a, Sset_isIrreducibleCharacter hyp hfrob ha⟩)
+    (IrreducibleCharacter.mem_ZIrr ⟨b, Sset_isIrreducibleCharacter hyp hfrob hb⟩)
+
 /-- **Peterfalvi (12.6) case (b): abelian rank-2 kernel → equal-degree coherence (5.7).**
 When `H = L_F` is abelian (Def (8.3) case (b)), every `θ ∈ Irr H` is linear, so every member
 `Ind_H^L θ ∈ S` has the same degree `[L:H]`; `S` is then coherent by (5.7), built Dade-compatibly
