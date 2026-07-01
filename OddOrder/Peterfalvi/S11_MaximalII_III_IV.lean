@@ -8063,33 +8063,36 @@ theorem caseA_reducible_eq_hcZeta [Finite G] {M : Subgroup G}
   rwa [hψ'eq, hθbar] at hζψ'
 
 set_option maxHeartbeats 1000000 in
-/-- **step 5 consequence (9.8.b degree, caseA): a reducible `𝒮(H₀)`-member has degree `qu`.**  A
-reducible `φ = Ind_{HU}^M χ ∈ 𝒮(H₀)` has `M`-fixed source `χ`
+/-- **step 5 consequence (caseA): a reducible `𝒮(H₀)`-member is `Ind_{HU}^M(Ind_{HC}(hcPsi θbar))` for
+a regular seed `θbar`.**  A reducible `φ = Ind_{HU}^M χ ∈ 𝒮(H₀)` has `M`-fixed source `χ`
 (`inertia_eq_top_of_induceHU_not_irreducible`); the case-agnostic cardinality argument
 `reducible_mem_sOf_H0C` places `φ ∈ 𝒮(H₀C)`, and `Ind`-injectivity on reducibles
 (`caseA_induceHU_inj_of_reducible`) upgrades `χ`'s kernel to `H₀C ⊆ Ker χ` (`χ ∈ 𝒳(H₀C)`).  The seed
-`θbar` (`exists_hom_constituent_of_mem_xiSet_H0`, nontrivial) is regular by the `M`-fixedness, so
-`caseA_reducible_eq_hcZeta` identifies `χ = Ind_{HC}(hcPsi θbar)`, whence `φ = Ind_{HU}^M ζ` has degree
-`q·u` (`hcZeta_induceHU_apply_one`).  The degree half of `caseA_character_counts` conjunct (b). -/
-theorem caseA_reducible_induceHU_apply_one_eq_qu [Finite G] {M : Subgroup G}
+`θbar` (`exists_hom_constituent_of_mem_xiSet_H0`, nontrivial) is regular by the `M`-fixedness
+(`caseA_reducible_theta_regular`), so `caseA_reducible_eq_hcZeta` identifies
+`χ = Ind_{HC}(hcPsi θbar)`.  The shared extraction behind the (9.8.b) degree
+(`caseA_reducible_induceHU_apply_one_eq_qu`) and the (9.8.c) `Xmu`-surjectivity. -/
+theorem caseA_reducible_source_eq_hcZeta [Finite G] {M : Subgroup G}
     {data : TypesIIIIIIVSetup M} {chief : ChiefFactorData data}
     {chars : Section11CharacterData data chief} (caseA : CliffordCaseAData chars)
+    [Fintype ↥(huSub data)]
+    [Fintype ↥(hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf (huSub data))]
+    [Invertible (Nat.card ↥(hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf
+      (huSub data)) : ℂ)]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     (φ : ClassFunction ↥M ℂ) (hφ : φ ∈ sOf data chief.H0)
     (hred : ¬ IsIrreducibleCharacter φ) :
-    φ (1 : ↥M) = ((data.q * chars.u : ℕ) : ℂ) := by
+    ∃ θbar : (↥data.H ⧸ chief.N) →* ℂˣ, (∀ i, θbar.comp (caseA.Hpart i).subtype ≠ 1) ∧
+      φ = induceHU data (ClassFunction.induce
+        (hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf (huSub data))
+        (hcPsi chief θbar)) := by
   classical
   letI : Fintype ↥M := Fintype.ofFinite _
-  letI : Fintype ↥(huSub data) := Fintype.ofFinite _
   letI : Fintype ↥(hInHu data) := Fintype.ofFinite _
-  letI : Fintype ↥(hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf
-    (huSub data)) := Fintype.ofFinite _
   letI : Invertible (Nat.card ↥(huSub data) : ℂ) :=
     invertibleOfNonzero (Nat.cast_ne_zero.mpr Nat.card_pos.ne')
   letI : Invertible (Nat.card ↥(hInHu data) : ℂ) :=
     invertibleOfNonzero (Nat.cast_ne_zero.mpr Nat.card_pos.ne')
-  letI : Invertible (Nat.card ↥(hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf
-    (huSub data)) : ℂ) := invertibleOfNonzero (Nat.cast_ne_zero.mpr Nat.card_pos.ne')
   haveI : (hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf (huSub data)).Normal :=
     hcInHu_realized_normal chief
   obtain ⟨χ, hχ, rfl⟩ := hφ
@@ -8102,10 +8105,25 @@ theorem caseA_reducible_induceHU_apply_one_eq_qu [Finite G] {M : Subgroup G}
     (induceHU data (χ : ClassFunction ↥(huSub data) ℂ)) ⟨χ, hχ, rfl⟩ hred
   have hχ'χ : χ' = χ := caseA_induceHU_inj_of_reducible data hind_red hχ'eq
   have hH0C := (hχ'χ ▸ hχ'C : χ ∈ xiOf data (chief.H0 ⊔ chars.C)).2
-  -- identify `χ = Ind_{HC}(hcPsi θbar)`, degree `q·u`.
-  have hζeq := caseA_reducible_eq_hcZeta caseA θbar χ hlo hMfix hnt hH0C
-  show induceHU data (χ : ClassFunction ↥(huSub data) ℂ) (1 : ↥M) = _
-  rw [hζeq]
+  refine ⟨θbar, caseA_reducible_theta_regular caseA θbar χ hlo hMfix hnt, ?_⟩
+  exact congrArg (induceHU data) (caseA_reducible_eq_hcZeta caseA θbar χ hlo hMfix hnt hH0C)
+
+/-- **step 5 consequence (9.8.b degree, caseA): a reducible `𝒮(H₀)`-member has degree `qu`.**  By
+`caseA_reducible_source_eq_hcZeta` the reducible `φ = Ind_{HU}^M(Ind_{HC}(hcPsi θbar))`, whose degree
+is `q·u` (`hcZeta_induceHU_apply_one`).  The degree half of `caseA_character_counts` conjunct (b). -/
+theorem caseA_reducible_induceHU_apply_one_eq_qu [Finite G] {M : Subgroup G}
+    {data : TypesIIIIIIVSetup M} {chief : ChiefFactorData data}
+    {chars : Section11CharacterData data chief} (caseA : CliffordCaseAData chars)
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (φ : ClassFunction ↥M ℂ) (hφ : φ ∈ sOf data chief.H0)
+    (hred : ¬ IsIrreducibleCharacter φ) :
+    φ (1 : ↥M) = ((data.q * chars.u : ℕ) : ℂ) := by
+  letI : Fintype ↥(huSub data) := Fintype.ofFinite _
+  letI : Fintype ↥(hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf
+    (huSub data)) := Fintype.ofFinite _
+  letI : Invertible (Nat.card ↥(hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf
+    (huSub data)) : ℂ) := invertibleOfNonzero (Nat.cast_ne_zero.mpr Nat.card_pos.ne')
+  obtain ⟨θbar, _, rfl⟩ := caseA_reducible_source_eq_hcZeta caseA hG φ hφ hred
   exact hcZeta_induceHU_apply_one chars θbar
 
 /-- **Peterfalvi (9.8)**: character-count consequences in Clifford case (a).
