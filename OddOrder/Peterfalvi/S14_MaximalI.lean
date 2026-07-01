@@ -1805,6 +1805,23 @@ theorem xFamily_inner_dade {L : Subgroup G} [Fintype G] [Fintype ↥L]
   ring
 
 open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
+/-- **Witness `S = {Ind_H^L θ}` members are irreducible characters of `L`** — the crux of the (12.6)
+case-(b) reduction: for a Frobenius `L` with kernel `H`, `Ind_H^L θ` (`θ ≠ 1`) is irreducible
+(`isIrreducibleCharacter_induce_of_frobeniusGroup`).  This feeds the unit-norm, orthogonality, and
+`ZIrr`-membership inputs of `coherent_of_constant_degree`. -/
+theorem Sset_isIrreducibleCharacter [Finite G] {L : Subgroup G} (hyp : Hypothesis L) {C : Subgroup ↥L}
+    (hfrob : OddOrder.Isaacs.Ch06.IsFrobeniusGroup ↥L ((hyp.typeI.typeF.H).subgroupOf L) C)
+    {χ : ClassFunction ↥L ℂ} (hχ : χ ∈ hyp.Sset) :
+    IsIrreducibleCharacter χ := by
+  classical
+  simp only [Hypothesis.Sset, Set.mem_setOf_eq] at hχ
+  obtain ⟨θ, hθ_ne, rfl⟩ := hχ
+  haveI hKnormal : ((hyp.typeI.typeF.H).subgroupOf L).Normal := by
+    rw [hyp.typeI.typeF.H_eq]
+    exact OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_subgroupOf_normal L
+  exact isIrreducibleCharacter_induce_of_frobeniusGroup hfrob θ hθ_ne
+
+open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
 /-- **Witness `S = {Ind_H^L θ}` has no real characters** ((5.2) input for case (b)/(12.6)).  Each
 member is a Frobenius-induced irreducible (`frobenius_induce_char_singleton`), non-real by the odd
 order of `L` (`not_isReal_of_ne_trivial_of_odd_card'`). -/
