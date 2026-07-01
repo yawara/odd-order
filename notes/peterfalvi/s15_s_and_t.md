@@ -27,13 +27,15 @@
 `K := U ⊓ N_G(W₂)` と置く。**全 cited 補題は repo に在庫確認済** (下記)。核は ~200 行の
 MulAut plumbing だが新規 infra は不要。2 段構成:
 
-**① crux (ungated, 抽象 W₂ について): `K ≤ C_G(W₂)`** — `coprime_fixedPoints_quotient` (Isaacs
-Cor 3.28, `Ch04/ForwardFromCh03.lean:808`; 実 usage mirror = `S12_Lemma1218.lean:862`) で:
-- `W₁` は `K` に conjugation で coprime 作用 (`K≤U` は W₁-invariant: U abelian + `W1_normalizes_U`
-  + `W₁≤N_G(W₂)≤N_G(N_G(W₂))`; coprime は `BasicStructureData.UW1_frobenius` の `|W₁|=q ⊥ |U|`)。
-- `C_K(W₁) ≤ C_U(W₁) = ⊥` (Frobenius FPF, `IsFrobeniusGroup.conj_frobenius` field)。
-- `W₁` は `K/C_K(W₂)` に**自明作用** (`W1_commutes_W2`: `wkw⁻¹` と `k` は W₂ 上同一作用) →
-  Cor 3.28 で `K = C_K(W₂) ≤ C_G(W₂)`。
+**① crux (ungated, 抽象 W₂ について): `K ≤ C_G(W₂)` — ✅ PROVEN
+(`normalizer_U_inf_W2_le_centralizer_W2`)**。`coprime_fixedPoints_quotient` (Isaacs Cor 3.28) で:
+- `W₁` は abelian `U` に conjugation で coprime 作用 (`φ:↥W₁→MulAut ↥U`; coprime は
+  `UW1_frobenius.coprime_card_kernel_complement`)、fixed points `C_U(W₁) = ⊥`
+  (✅ `centralizer_W1_inf_U_eq_bot`)。
+- `N := C_U(W₂)` は abelian U で normal・W₁-invariant。`g∈K` の coset は W₁-fixed
+  (✅ `conj_W1_mem_centralizer_W2`: `g⁻¹(wgw⁻¹)∈C(W₂)`) → Cor 3.28 で W₁-fixed 代表元
+  `c∈C_U(W₁)=⊥` → `c=1` → `g∈C_G(W₂)`。
+- **3 補題全て build-green・ungated で landing 済** (commit `8614fad4`/`338d7a92`/`eeb212ed`)。
 
 **② assembly (`K≤C_G(W₂)` 前提)** — 2 つの Coq 比の simplification:
 - **full `U⋊W₁` Frobenius を使う** (`K⋊W₁` でなく) → `Frobenius_subl` 不要。U abelian ⟹
