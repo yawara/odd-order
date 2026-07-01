@@ -318,6 +318,52 @@ theorem U_inf_centralizer_P_eq_bot [Finite G] (hG : OddOrder.BG.IsMinimalSimpleO
     hyp.U ⊓ Subgroup.centralizer (hyp.P : Set G) = ⊥ := by
   rw [← hyp.C_eq]; exact C_eq_bot hG hyp
 
+/-- **Peterfalvi (13.16), Frobenius fixed-point-freeness of `W₁` on `U`**: `C_U(W₁) = ⊥` — no
+nonidentity element of the complement `U` centralizes `W₁`.
+
+Immediate from the `U ⋊ W₁` Frobenius structure (`BasicStructureData.UW1_frobenius`,
+`IsFrobeniusGroup.conj_frobenius`): a nonidentity `x ∈ U` centralizing a nonidentity `w ∈ W₁` would
+give `w x w⁻¹ = x`, contradicting the Frobenius condition (the complement acts fixed-point-freely on
+the kernel).  This is the `C_K(W₁) ≤ C_U(W₁) = ⊥` input to the (13.16) core
+`normalizer_U_inf_W2_eq_bot` (the coprime fixed-point lifting of the crux `K ≤ C_G(W₂)`). -/
+theorem centralizer_W1_inf_U_eq_bot [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hyp : Hypothesis (G := G)) :
+    hyp.U ⊓ Subgroup.centralizer (hyp.W1 : Set G) = ⊥ := by
+  obtain ⟨data, _⟩ := basic_structure hG hyp
+  have hfrob := data.UW1_frobenius
+  -- a nonidentity `w ∈ W₁` (`|W₁| = q` prime).
+  have hW1ne : hyp.W1 ≠ ⊥ := by
+    intro hbot
+    have hq1 : hyp.q = 1 := by rw [hyp.q_eq_card_W1, hbot, Subgroup.card_bot]
+    exact hyp.q_prime.one_lt.ne' hq1
+  haveI : Nontrivial ↥hyp.W1 := (Subgroup.nontrivial_iff_ne_bot _).mpr hW1ne
+  obtain ⟨w0, hw0⟩ := exists_ne (1 : ↥hyp.W1)
+  set w : G := (w0 : G) with hw
+  have hwW1 : w ∈ hyp.W1 := w0.2
+  have hwne : w ≠ 1 := fun h => hw0 (OneMemClass.coe_eq_one.mp (hw ▸ h))
+  rw [eq_bot_iff]
+  intro x hx
+  rw [Subgroup.mem_inf] at hx
+  obtain ⟨hxU, hxC⟩ := hx
+  rw [Subgroup.mem_bot]
+  by_contra hx1
+  -- lift `w, x` to `↥(U ⊔ W₁)` and apply `conj_frobenius`.
+  have hxUW1 : x ∈ hyp.U ⊔ hyp.W1 := Subgroup.mem_sup_left hxU
+  have hwUW1 : w ∈ hyp.U ⊔ hyp.W1 := Subgroup.mem_sup_right hwW1
+  have hxN : (⟨x, hxUW1⟩ : ↥(hyp.U ⊔ hyp.W1)) ∈ hyp.U.subgroupOf (hyp.U ⊔ hyp.W1) := by
+    rw [Subgroup.mem_subgroupOf]; exact hxU
+  have hwA : (⟨w, hwUW1⟩ : ↥(hyp.U ⊔ hyp.W1)) ∈ hyp.W1.subgroupOf (hyp.U ⊔ hyp.W1) := by
+    rw [Subgroup.mem_subgroupOf]; exact hwW1
+  have hxN1 : (⟨x, hxUW1⟩ : ↥(hyp.U ⊔ hyp.W1)) ≠ 1 :=
+    fun h => hx1 (by simpa using congrArg (Subgroup.subtype _) h)
+  have hwA1 : (⟨w, hwUW1⟩ : ↥(hyp.U ⊔ hyp.W1)) ≠ 1 :=
+    fun h => hwne (by simpa using congrArg (Subgroup.subtype _) h)
+  have hcomm : w * x = x * w := (Subgroup.mem_centralizer_iff.mp hxC) w hwW1
+  exact hfrob.conj_frobenius _ hwA hwA1 _ hxN hxN1 (by
+    apply Subtype.ext
+    simp only [Subgroup.coe_mul, InvMemClass.coe_inv]
+    rw [hcomm]; group)
+
 /-- **Peterfalvi (13.16), the Maschke/Wielandt core proper**: `N_U(W₂) = 1`, i.e.
 `U ⊓ N_G(W₂) = ⊥` — no nonidentity element of the complement `U` normalizes `W₂`.
 
