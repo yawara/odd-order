@@ -8381,6 +8381,44 @@ theorem Hypothesis.beta_mem_ZIrr [Finite G] {M : Subgroup G}
   · rw [Nat.cast_smul_eq_nsmul]; exact nsmul_mem hζτZ n
 
 open scoped Classical FiniteInduce in
+/-- **Peterfalvi (11.8.5), `⟨α_{ij}, 1_M⟩ = 0` for `i ≠ 0`**: the pre-Dade residual
+`α_{ij} = μ_{ij} − δμ_{i0} − nζ` is orthogonal to the principal character of `M`.  The principal
+character sits at the grid origin `μ_{00} = 1_M` (`muGrid_zero_zero_eq_trivial`), so for `i ≠ 0`,
+`j ≠ 0` all three constituents avoid it: `⟨μ_{ij}, 1_M⟩ = ⟨μ_{ij}, μ_{00}⟩ = 0` (cross-column,
+`j ≠ 0`), `⟨μ_{i0}, 1_M⟩ = ⟨μ_{i0}, μ_{00}⟩ = 0` (within-column, `i ≠ 0`), and `⟨ζ, 1_M⟩ = 0`
+(`ζ(1) = w₁ > 1 ≠ 1`).  This discharges the `hα1M` hypothesis of `beta_inner_trivial`, making
+`β ⊥ 1_G` unconditional for `i ≠ 0`. -/
+theorem Hypothesis.muGridAlpha_inner_trivial_M [Finite G] {M : Subgroup G}
+    [Invertible (Nat.card ↥M : ℂ)] (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis M)
+    (hodd : Odd (Nat.card G)) {i : Fin hyp.w1} (hi0 : i ≠ 0) {j : Fin hyp.w2} (hj0 : j ≠ 0)
+    {ζ : ClassFunction ↥M ℂ} (hζirr : IsIrreducibleCharacter ζ) (hζ1 : ζ 1 = (hyp.w1 : ℂ))
+    {δ : ℤ} {n : ℕ} :
+    ClassFunction.inner
+        (hyp.muGrid hG hodd i j - (δ : ℂ) • hyp.muGrid hG hodd i 0 - (n : ℂ) • ζ)
+        (trivialClassFunction (↥M)) = 0 := by
+  have hμij : ClassFunction.inner (hyp.muGrid hG hodd i j) (trivialClassFunction (↥M)) = 0 := by
+    rw [← hyp.muGrid_zero_zero_eq_trivial hG hodd]
+    exact hyp.muGrid_inner_cross_column hG hodd i 0 hj0
+  have hμi0 : ClassFunction.inner (hyp.muGrid hG hodd i 0) (trivialClassFunction (↥M)) = 0 := by
+    rw [← hyp.muGrid_zero_zero_eq_trivial hG hodd]
+    exact hyp.muGrid_inner_within_column hG hodd 0 hi0
+  have hζ : ClassFunction.inner ζ (trivialClassFunction (↥M)) = 0 := by
+    have hzmem : ζ ∈ irreducibleCharacters (↥M) := mem_irreducibleCharacters.mpr hζirr
+    have htmem : trivialClassFunction (↥M) ∈ irreducibleCharacters (↥M) :=
+      mem_irreducibleCharacters.mpr trivialClassFunction_isIrreducible
+    rw [irr_cf_inner hzmem htmem, if_neg ?_]
+    intro hcontra
+    have h1 : ζ 1 = trivialClassFunction (↥M) 1 :=
+      congrArg (fun f : ClassFunction (↥M) ℂ => (f : (↥M) → ℂ) 1) hcontra
+    rw [hζ1, trivialClassFunction_apply] at h1
+    have hw1 : 1 < hyp.w1 := (Subgroup.one_lt_card_iff_ne_bot _).mpr hyp.typeP.W1_nontrivial
+    have : (hyp.w1 : ℕ) = 1 := by exact_mod_cast h1
+    omega
+  rw [ClassFunction.inner_sub_left, ClassFunction.inner_sub_left,
+    ClassFunction.inner_smul_left, ClassFunction.inner_smul_left, hμij, hμi0, hζ,
+    mul_zero, mul_zero, sub_zero, sub_zero]
+
+open scoped Classical FiniteInduce in
 /-- **Peterfalvi (11.8.5), `a = 0` under the (11.8.4) hypothesis** (the residual-orthogonal case).
 Given the (11.8.4) by-contradiction consequence `(μ₀ − ζ)^τ = ∑_r ω_{r0}^σ − ζ^{τ₁}` (`μ₀ = ∑ μ_{i'0}`),
 the two-way computation of `(α_{ij}^τ, (μ₀ − ζ)^τ)` forces `a = 0` when `a ∈ {0, 2}`:
