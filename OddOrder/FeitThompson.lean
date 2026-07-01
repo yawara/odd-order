@@ -172,6 +172,10 @@ structure Section16Inputs (G : Type*) [Group G] [Finite G] where
   Sdata : TypePData S
   Sdata_U_eq : Sdata.U = U
   Sdata_W1_eq : Sdata.W1 = W1
+  /-- **Peterfalvi (13.2.a) U-side**: `U` abelian (BG Lemma 15.1(b), `U` the `(κ∪σ)'`-Hall). -/
+  S_U_commutative : IsMulCommutative ↥U
+  /-- **W₂-reconciliation**: intrinsic `Sdata.W2 = C_{S'}(W₁#)` equals abstract `W₂` (= `K*`). -/
+  Sdata_W2_eq : Sdata.W2 = W2
 
 /-! ### Partition of `Section16Inputs` into three independent producer obligations
 
@@ -277,6 +281,10 @@ structure Section16TypePStructure {G : Type*} [Group G] [Finite G]
   Sdata : TypePData mp.S
   Sdata_U_eq : Sdata.U = U
   Sdata_W1_eq : Sdata.W1 = W1
+  /-- **Peterfalvi (13.2.a) U-side**: `U` abelian (BG Lemma 15.1(b), `U` the `(κ∪σ)'`-Hall). -/
+  S_U_commutative : IsMulCommutative ↥U
+  /-- **W₂-reconciliation**: intrinsic `Sdata.W2 = C_{S'}(W₁#)` equals abstract `W₂` (= `K*`). -/
+  Sdata_W2_eq : Sdata.W2 = W2
 
 /-- **Peterfalvi §13 coherent Dade-grid output** — *owned by lane-b*.
 
@@ -695,6 +703,33 @@ theorem typePData_of_kappaHall_hallComplement_U {G : Type*} [Group G] [Finite G]
     BG.Ch4.S16.typePData_of_isTypeP_of_inputs BG.Ch4.S16.typePData_of_inputs
   rfl
 
+/-- The dual factor: `data.W2 = K*` (`= M_σ ⊓ C(K)`).  Via the (8.4.b) centralizer law
+`C_{M'}(k) = K*` (`typeP_derivedInG_inf_centralizer_kappaElement_eq`) applied to a nonidentity
+`k ∈ W₁ = K` (`data.centralizer_W1`).  This reconciles the intrinsic `TypePData.W2` with the
+maximal-pair dual factor `mp.Kstar`, discharging the `Sdata.W2 = W2` obligation of §15's
+`card_P_eq` / `basic_structure_gated.P_order`. -/
+theorem typePData_of_kappaHall_hallComplement_W2 {G : Type*} [Group G] [Finite G]
+    (hG : IsMinimalSimpleOdd G) {M K U Kstar : Subgroup G}
+    (hM : M ∈ maximalSubgroups G) (hP2 : BG.Ch4.S14.IsTypeP2 M) (hKM : K ≤ M) (hKne : K ≠ ⊥)
+    (hK : Ch03.IsHallSubgroup (BG.Ch4.S14.kappa M) (K.subgroupOf M)) (hUM : U ≤ M)
+    (hUhall : Ch03.IsHallSubgroup ((BG.Ch4.S14.kappa M ∪ BG.Ch3.S10.sigma M)ᶜ) (U.subgroupOf M))
+    (hKnorm : K ≤ Subgroup.normalizer (U : Set G))
+    (hKstar : Kstar = BG.Ch3.S10.Msigma M ⊓ Subgroup.centralizer (K : Set G)) :
+    (typePData_of_kappaHall_hallComplement hG hM hP2 hKM hKne hK hUM hUhall hKnorm).W2 = Kstar := by
+  haveI := (Subgroup.nontrivial_iff_ne_bot K).mpr hKne
+  obtain ⟨⟨x, hxK⟩, hxne⟩ := exists_ne (1 : ↥K)
+  have hxne' : x ≠ 1 := by rintro rfl; exact hxne rfl
+  have hW1 : (typePData_of_kappaHall_hallComplement hG hM hP2 hKM hKne hK hUM hUhall hKnorm).W1 = K :=
+    typePData_of_kappaHall_hallComplement_W1 hG hM hP2 hKM hKne hK hUM hUhall hKnorm
+  have hxW1 : x ∈ (typePData_of_kappaHall_hallComplement hG hM hP2 hKM hKne hK hUM hUhall hKnorm).W1 := by
+    rw [hW1]; exact hxK
+  have hcen :=
+    (typePData_of_kappaHall_hallComplement hG hM hP2 hKM hKne hK hUM hUhall hKnorm).centralizer_W1
+      x hxW1 hxne'
+  have hkstar :=
+    BG.Ch4.S16.typeP_derivedInG_inf_centralizer_kappaElement_eq hG hM hP2.1 hKM hK hKstar x hxK hxne'
+  exact hcen.symm.trans hkstar
+
 /-- **Matched `TypePData` for a type-`P₂` maximal subgroup** (`sorry`-free; POLE-1 carrier, issue
 4008).  Given a type-`P₂` maximal subgroup `M` and a cyclic κ-Hall `K`, the κ-Hall-invariant
 complement `U` to `M_F` in `M'` (`exists_kappaHall_invariant_complement_to_MF`, supplying
@@ -744,7 +779,8 @@ noncomputable def section16TypePStructure_of_components {G : Type*} [Group G] [F
     (hSnorm : W1 ≤ Subgroup.normalizer (U : Set G))
     (hTnorm : W2 ≤ Subgroup.normalizer (V : Set G))
     (hlt : Nat.card ↥W1 < Nat.card ↥W2)
-    (Sd : TypePData mp.S) (hSdU : Sd.U = U) (hSdW1 : Sd.W1 = W1) :
+    (Sd : TypePData mp.S) (hSdU : Sd.U = U) (hSdW1 : Sd.W1 = W1) (hSdW2 : Sd.W2 = W2)
+    (hUcomm : IsMulCommutative ↥U) :
     Section16TypePStructure mp where
   W1 := W1
   W2 := W2
@@ -780,6 +816,8 @@ noncomputable def section16TypePStructure_of_components {G : Type*} [Group G] [F
   Sdata := Sd
   Sdata_U_eq := hSdU
   Sdata_W1_eq := hSdW1
+  S_U_commutative := hUcomm
+  Sdata_W2_eq := hSdW2
 
 /-- **BG §14 type-P duality producer** — *lane-f* (BG §14 `typeP_duality`).
 Given the maximal pair, constructs the cyclic structure `W = W₁W₂`, the complements
@@ -869,6 +907,10 @@ noncomputable def section16TypePStructure_of_isMinimalSimpleOdd {G : Type*} [Gro
       hUM hUhall hScompl.choose_spec.2.1)
     (typePData_of_kappaHall_hallComplement_W1 hG mp.S_maximal mp.S_typeP2 mp.K_le_S hKne mp.K_hall
       hUM hUhall hScompl.choose_spec.2.1)
+    (typePData_of_kappaHall_hallComplement_W2 hG mp.S_maximal mp.S_typeP2 mp.K_le_S hKne mp.K_hall
+      hUM hUhall hScompl.choose_spec.2.1 mp.Kstar_eq)
+    (BG.Ch4.S15.typeP_hall_derived_eq_and_abelian hG mp.S_maximal mp.K_le_S hUM hKne mp.K_hall
+      hUhall).2
 
 /-- **Certain-type §6 hypothesis from κ-Hall pairing data** — *lane-b* (cd producer building block).
 
@@ -1793,7 +1835,9 @@ noncomputable def section16Inputs_of_isMinimalSimpleOdd {G : Type*} [Group G] [F
     q_lt_p := tp.q_lt_p
     Sdata := tp.Sdata
     Sdata_U_eq := tp.Sdata_U_eq
-    Sdata_W1_eq := tp.Sdata_W1_eq }
+    Sdata_W1_eq := tp.Sdata_W1_eq
+    S_U_commutative := tp.S_U_commutative
+    Sdata_W2_eq := tp.Sdata_W2_eq }
 
 /-- **Assembly of the Section 16 configuration from named inputs** (`sorry`-free).
 
@@ -1891,7 +1935,9 @@ noncomputable def sectionSixteenHypothesis_of_inputs {G : Type*} [Group G] [Fini
       m_eq := rfl
       Sdata := inp.Sdata
       Sdata_U_eq := inp.Sdata_U_eq
-      Sdata_W1_eq := inp.Sdata_W1_eq }
+      Sdata_W1_eq := inp.Sdata_W1_eq
+      S_U_commutative := inp.S_U_commutative
+      Sdata_W2_eq := inp.Sdata_W2_eq }
   q_lt_p := inp.q_lt_p
 
 /-- **The one remaining upstream obligation.** From a minimal simple group of odd
