@@ -2463,6 +2463,12 @@ structure CliffordCaseAData {M : Subgroup G} {data : TypesIIIIIIVSetup M}
   the opaque `W₁`-transitivity `Prop`) is what lets the (9.8.c) constant-factor-data set `Xmu` be
   constructed and `W₁`-transitivity of the summands proven. -/
   S0 : Subgroup (↥data.H ⧸ chief.N)
+  /-- The orbit generator `S₀` is `U`-invariant (the (9.7) case-(a) construction seeds it from a
+  single `U`-invariant order-`p` line).  Exposing this (rather than only the per-`Hpart`
+  `Hpart_aInvariant`) lets the (9.8.c) surjectivity reduce the `W₁`-twist `q(w)•S₀` of a factor to
+  `q(W₁-part)•S₀` (the `U`-part fixes `S₀`), identifying the `Hpart` family with the `W₁`-conjugate
+  family and giving its `W₁`-transitivity. -/
+  S0_aInvariant : IsAInvariant (uActionHom data chief) S0
   /-- Orbit representatives realising each summand as a translate of `S₀`. -/
   orbitRep : Fin data.q → ↥(data.typeP.U ⊔ data.typeP.W1)
   /-- Each summand is the `orbitRep`-translate of the generator `S₀`. -/
@@ -4955,6 +4961,7 @@ noncomputable def clifford_caseA_data [Finite G] {M : Subgroup G}
         isAInvariant_comp_subtype_pointwise_smul hUnorm hS₀inv ↑(e.symm j)
       Hpart_iSupIndep := hexist.choose_spec.1.independent.comp e.symm.injective
       S0 := S₀
+      S0_aInvariant := hS₀inv
       orbitRep := fun j => ↑(e.symm j)
       Hpart_orbit := fun j => rfl
       a := Nat.card ↥(aInvariantRestrictAut hS₀inv).range
@@ -5055,31 +5062,46 @@ theorem eq_univ_of_nonempty_of_mul_mem_left {W : Type*} [Group W] {T : Set W}
   have := hclosed (w * t⁻¹) t ht
   simpa using this
 
+/-- **`Ū`-invariance of nontriviality on any `U`-invariant subgroup**: for a `U`-invariant subgroup
+`K ≤ H̄` (`IsAInvariant (uActionHom data chief) K`), a character `θ` is nontrivial on `K` iff its
+`U`-translate `θ ∘ φ_U(a)` is.  Since `φ_U(a)` restricts to a bijection of `K` (`hK`, invertible), the
+two restrictions have the same triviality.  Generalises `caseA_uActionHom_comp_subtype_eq_one_iff`
+(the `Hpart i` case) to any `U`-invariant `K` — used on the `W₁`-conjugates `q(w) • S₀` (also
+`U`-invariant, `U ◁ U W₁`) in the (9.8.c) surjectivity regularity argument. -/
+theorem comp_uActionHom_comp_subtype_eq_one_iff_of_aInvariant [Finite G] {M : Subgroup G}
+    {data : TypesIIIIIIVSetup M} {chief : ChiefFactorData data}
+    {K : Subgroup (↥data.H ⧸ chief.N)} (hK : IsAInvariant (uActionHom data chief) K)
+    (a : ↥(typeP_quotientCoprimeAction data.typeP data.nontrivial.1 chief.N_aInvariant).U)
+    (θ : (↥data.H ⧸ chief.N) →* ℂˣ) :
+    (θ.comp (uActionHom data chief a).toMonoidHom).comp K.subtype = 1
+      ↔ θ.comp K.subtype = 1 := by
+  constructor
+  · intro h
+    refine MonoidHom.ext fun y => ?_
+    have hval := DFunLike.congr_fun h ⟨_, hK.inv_smul_mem a y.2⟩
+    simp only [MonoidHom.comp_apply, Subgroup.subtype_apply, MonoidHom.one_apply,
+      MulEquiv.coe_toMonoidHom, MulAut.apply_inv_self] at hval ⊢
+    exact hval
+  · intro h
+    refine MonoidHom.ext fun x => ?_
+    have hval := DFunLike.congr_fun h ⟨_, hK.smul_mem a x.2⟩
+    simpa only [MonoidHom.comp_apply, Subgroup.subtype_apply, MonoidHom.one_apply,
+      MulEquiv.coe_toMonoidHom] using hval
+
 /-- **`Ū`-invariance of the per-factor nontrivial set**: a character `θ` of `H̄` is nontrivial on the
-Clifford summand `Hpart i` iff its `U`-translate `θ ∘ φ_U(a)` is.  Since `φ_U(a)` restricts to a
-bijection of `Hpart i` (`Hpart_aInvariant`, invertible), the two restrictions have the same triviality.
-So the set of summands on which a constituent `θ̄₀` is nontrivial is constant along the `Ū`-orbit of
-`θ̄₀` — the input (together with `M`-invariance = `W₁`-invariance and `eq_univ_of_nonempty_of_mul_mem_left`)
-to the (9.8.c) surjectivity that a reducible constituent is regular. -/
+Clifford summand `Hpart i` iff its `U`-translate `θ ∘ φ_U(a)` is.  The `Hpart i` case of
+`comp_uActionHom_comp_subtype_eq_one_iff_of_aInvariant` (`Hpart_aInvariant`).  So the set of summands
+on which a constituent `θ̄₀` is nontrivial is constant along the `Ū`-orbit of `θ̄₀` — the input
+(together with `M`-invariance and `eq_univ_of_nonempty_of_mul_mem_left`) to the (9.8.c) surjectivity
+that a reducible constituent is regular. -/
 theorem caseA_uActionHom_comp_subtype_eq_one_iff [Finite G] {M : Subgroup G}
     {data : TypesIIIIIIVSetup M} {chief : ChiefFactorData data}
     {chars : Section11CharacterData data chief} (caseA : CliffordCaseAData chars)
     (a : ↥(typeP_quotientCoprimeAction data.typeP data.nontrivial.1 chief.N_aInvariant).U)
     {i : Fin data.q} (θ : (↥data.H ⧸ chief.N) →* ℂˣ) :
     (θ.comp (uActionHom data chief a).toMonoidHom).comp (caseA.Hpart i).subtype = 1
-      ↔ θ.comp (caseA.Hpart i).subtype = 1 := by
-  constructor
-  · intro h
-    refine MonoidHom.ext fun y => ?_
-    have hval := DFunLike.congr_fun h ⟨_, (caseA.Hpart_aInvariant i).inv_smul_mem a y.2⟩
-    simp only [MonoidHom.comp_apply, Subgroup.subtype_apply, MonoidHom.one_apply,
-      MulEquiv.coe_toMonoidHom, MulAut.apply_inv_self] at hval ⊢
-    exact hval
-  · intro h
-    refine MonoidHom.ext fun x => ?_
-    have hval := DFunLike.congr_fun h ⟨_, (caseA.Hpart_aInvariant i).smul_mem a x.2⟩
-    simpa only [MonoidHom.comp_apply, Subgroup.subtype_apply, MonoidHom.one_apply,
-      MulEquiv.coe_toMonoidHom] using hval
+      ↔ θ.comp (caseA.Hpart i).subtype = 1 :=
+  comp_uActionHom_comp_subtype_eq_one_iff_of_aInvariant (caseA.Hpart_aInvariant i) a θ
 
 /-- **A regular character nontrivial on each `W1`-conjugate of `S₀`** (Clifford case (a)).
 Instantiates the elementary `(9.7)` decomposition `H̄ = ⊕_{w∈W1} S₀^w` (`wConjugate_coprod_bijective`,
@@ -7544,5 +7566,158 @@ theorem caseA_theta_comp_quotient_uPart_comp_subtype_eq_one_iff [Finite G] {M : 
   caseA_uActionHom_comp_subtype_eq_one_iff caseA
     (⟨a, Subgroup.mem_subgroupOf.mpr haU⟩ :
       ↥(typeP_quotientCoprimeAction data.typeP data.nontrivial.1 chief.N_aInvariant).U) θbar
+
+/-- **`Ū`-invariance of nontriviality on a `U`-invariant `K`, `quotientMulAutHom` form**: for a
+`U`-invariant `K` and a `U`-part element `a` (`↑a ∈ U`), `θ ∘ q(a)` is trivial on `K` iff `θ` is
+(`q = quotientMulAutHom`).  The form-alignment (`uActionHom ⟨a,·⟩ = q(a)`) version of
+`comp_uActionHom_comp_subtype_eq_one_iff_of_aInvariant` for the general-`K` uses in the (9.8.c)
+surjectivity regularity argument (`K = q(w) • S₀` and `K = S₀`). -/
+theorem comp_quotient_uPart_comp_subtype_eq_one_iff_of_aInvariant [Finite G] {M : Subgroup G}
+    {data : TypesIIIIIIVSetup M} {chief : ChiefFactorData data}
+    {K : Subgroup (↥data.H ⧸ chief.N)} (hK : IsAInvariant (uActionHom data chief) K)
+    {a : ↥(data.typeP.U ⊔ data.typeP.W1)} (haU : ((a : G)) ∈ data.typeP.U)
+    (θ : (↥data.H ⧸ chief.N) →* ℂˣ) :
+    (θ.comp (quotientMulAutHom chief.N_aInvariant a).toMonoidHom).comp K.subtype = 1
+      ↔ θ.comp K.subtype = 1 :=
+  comp_uActionHom_comp_subtype_eq_one_iff_of_aInvariant hK
+    (⟨a, Subgroup.mem_subgroupOf.mpr haU⟩ :
+      ↥(typeP_quotientCoprimeAction data.typeP data.nontrivial.1 chief.N_aInvariant).U) θ
+
+/-- **step 2 D₂: precompose–pointwise-smul bridge**.  A character `θ` is trivial on the translate
+`a • S` (`a : MulAut K`) iff its precomposition `θ ∘ a` is trivial on `S` (any element of `a • S` is
+`a s` for `s ∈ S`).  Used with `a = q(v)` (`quotientMulAutHom`) and `S = S₀` to turn nontriviality on
+the Clifford summand `Hpart i = q(orbitRep i) • S₀` into nontriviality of `θbar ∘ q(orbitRep i)` on
+the generator `S₀`, the last bridge of the (9.8.c) surjectivity regularity argument. -/
+theorem comp_subtype_pointwise_smul_eq_one_iff {K : Type*} [Group K] (a : MulAut K)
+    (θ : K →* ℂˣ) (S : Subgroup K) :
+    θ.comp (a • S).subtype = 1 ↔ (θ.comp a.toMonoidHom).comp S.subtype = 1 := by
+  rw [MonoidHom.ext_iff, MonoidHom.ext_iff]
+  refine ⟨fun h s => ?_, fun h y => ?_⟩
+  · have hval := h ⟨a • (s : K), (Subgroup.smul_mem_pointwise_smul_iff).mpr s.2⟩
+    simpa only [MonoidHom.comp_apply, Subgroup.subtype_apply, MonoidHom.one_apply,
+      MulEquiv.coe_toMonoidHom, MulAut.smul_def] using hval
+  · have hval := h ⟨a⁻¹ • (y : K), (Subgroup.mem_pointwise_smul_iff_inv_smul_mem).mp y.2⟩
+    simp only [MonoidHom.comp_apply, Subgroup.subtype_apply, MonoidHom.one_apply,
+      MulEquiv.coe_toMonoidHom, MulAut.smul_def, MulAut.apply_inv_self] at hval ⊢
+    exact hval
+
+/-- **step 2 E (W₁ case): `θbar ∘ q(w)` and `θbar` agree on `S₀` (triviality)** for `w` a
+`W₁`-element, given `χ = ζ` is `M`-fixed.  From `M`-fixedness the orbit equality
+`exists_uPart_theta_comp_quotient_eq_of_fixed` gives `a ∈ U` with `θbar ∘ q(a) = θbar ∘ q(w)`; then
+`comp_quotient_uPart_..._of_aInvariant` (`S₀` is `U`-invariant, `S0_aInvariant`) collapses the
+`U`-twist.  This is the `W₁`-half of the `U ⊔ W₁` orbit-invariance on `S₀`. -/
+theorem caseA_theta_comp_quotient_W1_on_S0_eq_one_iff_of_fixed [Finite G] {M : Subgroup G}
+    {data : TypesIIIIIIVSetup M} {chief : ChiefFactorData data}
+    {chars : Section11CharacterData data chief} (caseA : CliffordCaseAData chars)
+    (θbar : (↥data.H ⧸ chief.N) →* ℂˣ)
+    [Fintype ↥(hInHu data)] [Invertible (Nat.card ↥(hInHu data) : ℂ)]
+    (ζ : IrreducibleCharacter ↥(huSub data))
+    (hlo : OddOrder.RepresentationTheory.IrreducibleCharacter.LiesOver (hInHu data) ζ
+      (linearIrreducibleCharacter (θbar.comp ((QuotientGroup.mk' chief.N).comp
+        (hInHuEquivH data).toMonoidHom))))
+    (hMfix : ClassFunction.inertia (ζ : ClassFunction ↥(huSub data) ℂ) = ⊤)
+    {w : ↥(data.typeP.U ⊔ data.typeP.W1)} (hwW : ((w : G)) ∈ data.typeP.W1) :
+    (θbar.comp (quotientMulAutHom chief.N_aInvariant w).toMonoidHom).comp caseA.S0.subtype = 1
+      ↔ θbar.comp caseA.S0.subtype = 1 := by
+  have hwM : ((w : ↥(data.typeP.U ⊔ data.typeP.W1)) : G) ∈ M := data.typeP.W1_le hwW
+  have hfix : ClassFunction.conjBy (⟨(w : G), hwM⟩ : ↥M) (ζ : ClassFunction ↥(huSub data) ℂ)
+      = (ζ : ClassFunction ↥(huSub data) ℂ) :=
+    ClassFunction.mem_inertia.mp (hMfix ▸ Subgroup.mem_top _)
+  obtain ⟨a, haU, hEq⟩ :=
+    exists_uPart_theta_comp_quotient_eq_of_fixed (⟨(w : G), hwM⟩ : ↥M) w rfl θbar ζ hlo hfix
+  rw [← hEq]
+  exact comp_quotient_uPart_comp_subtype_eq_one_iff_of_aInvariant caseA.S0_aInvariant haU θbar
+
+/-- **step 2 E (`U ⊔ W₁` case): `θbar ∘ q(v)` and `θbar` agree on `S₀`** for any `v ∈ U ⊔ W₁`,
+given `ζ` is `M`-fixed.  Frobenius-decompose `v = u·w` (`U ◁ U W₁`, `Subgroup.normal_mul`); then
+`θbar∘q(u·w)` on `S₀` `= (θbar∘q(u))∘q(w)` on `S₀` `⟺ θbar∘q(u)` on `q(w)•S₀`
+(`comp_subtype_pointwise_smul`) `⟺ θbar` on `q(w)•S₀` (`comp_quotient_uPart_..._of_aInvariant`,
+`q(w)•S₀` `U`-invariant) `⟺ θbar∘q(w)` on `S₀` (`comp_subtype_pointwise_smul`) `⟺ θbar` on `S₀`
+(the `W₁` case).  So `θbar`'s nontriviality on `S₀` is invariant under the whole `U ⊔ W₁`-action —
+the key to reducing per-`Hpart` regularity to a single `S₀` condition. -/
+theorem caseA_theta_comp_quotient_on_S0_eq_one_iff_of_fixed [Finite G] {M : Subgroup G}
+    {data : TypesIIIIIIVSetup M} {chief : ChiefFactorData data}
+    {chars : Section11CharacterData data chief} (caseA : CliffordCaseAData chars)
+    (θbar : (↥data.H ⧸ chief.N) →* ℂˣ)
+    [Fintype ↥(hInHu data)] [Invertible (Nat.card ↥(hInHu data) : ℂ)]
+    (ζ : IrreducibleCharacter ↥(huSub data))
+    (hlo : OddOrder.RepresentationTheory.IrreducibleCharacter.LiesOver (hInHu data) ζ
+      (linearIrreducibleCharacter (θbar.comp ((QuotientGroup.mk' chief.N).comp
+        (hInHuEquivH data).toMonoidHom))))
+    (hMfix : ClassFunction.inertia (ζ : ClassFunction ↥(huSub data) ℂ) = ⊤)
+    (v : ↥(data.typeP.U ⊔ data.typeP.W1)) :
+    (θbar.comp (quotientMulAutHom chief.N_aInvariant v).toMonoidHom).comp caseA.S0.subtype = 1
+      ↔ θbar.comp caseA.S0.subtype = 1 := by
+  haveI hUnorm : (data.typeP.U.subgroupOf (data.typeP.U ⊔ data.typeP.W1)).Normal :=
+    (typeP_uW1_frobenius data.typeP data.nontrivial.1).isNormal
+  have htop : data.typeP.U.subgroupOf (data.typeP.U ⊔ data.typeP.W1)
+      ⊔ data.typeP.W1.subgroupOf (data.typeP.U ⊔ data.typeP.W1) = ⊤ := by
+    rw [← Subgroup.subgroupOf_sup le_sup_left le_sup_right, Subgroup.subgroupOf_self]
+  have hv : v ∈ data.typeP.U.subgroupOf (data.typeP.U ⊔ data.typeP.W1)
+      ⊔ data.typeP.W1.subgroupOf (data.typeP.U ⊔ data.typeP.W1) := htop ▸ Subgroup.mem_top v
+  rw [← SetLike.mem_coe, Subgroup.normal_mul] at hv
+  obtain ⟨u, hu, w, hw, rfl⟩ := hv
+  have huU : ((u : ↥(data.typeP.U ⊔ data.typeP.W1)) : G) ∈ data.typeP.U :=
+    Subgroup.mem_subgroupOf.mp hu
+  have hwW : ((w : ↥(data.typeP.U ⊔ data.typeP.W1)) : G) ∈ data.typeP.W1 :=
+    Subgroup.mem_subgroupOf.mp hw
+  have hsplit : (θbar.comp (quotientMulAutHom chief.N_aInvariant (u * w)).toMonoidHom).comp
+        caseA.S0.subtype
+      = ((θbar.comp (quotientMulAutHom chief.N_aInvariant u).toMonoidHom).comp
+          (quotientMulAutHom chief.N_aInvariant w).toMonoidHom).comp caseA.S0.subtype := by
+    rw [map_mul]; rfl
+  rw [hsplit, ← comp_subtype_pointwise_smul_eq_one_iff,
+    comp_quotient_uPart_comp_subtype_eq_one_iff_of_aInvariant
+      (isAInvariant_comp_subtype_pointwise_smul hUnorm caseA.S0_aInvariant w) huU θbar,
+    comp_subtype_pointwise_smul_eq_one_iff]
+  exact caseA_theta_comp_quotient_W1_on_S0_eq_one_iff_of_fixed caseA θbar ζ hlo hMfix hwW
+
+/-- **step 2 (regularity): a reducible constituent seed is regular** (Peterfalvi (9.8.c)
+surjectivity).  If `ζ` is `M`-fixed (`I_M(ζ) = ⊤`, from reducibility of `Ind_M ζ`) and lies over the
+inflation of a nonzero seed `θbar : H̄ →* ℂˣ`, then `θbar` is *regular*: nontrivial on every Clifford
+summand `Hpart i`.  Two steps, both via the `S₀`-aggregation
+`caseA_theta_comp_quotient_on_S0_eq_one_iff_of_fixed` (`θbar ∘ q(v)` and `θbar` agree on `S₀`):
+`θbar` is nontrivial on `S₀` (else it is trivial on every `Hpart i = q(orbitRep i) • S₀`, hence on
+`⨆ Hpart = ⊤ = H̄`, forcing `θbar = 1`); and then each `Hpart i` inherits nontriviality from `S₀`.
+This is the last input to `ζ = Ind_{HC}(hcPsi θbar) ∈ Xθ` (via `inertia_eq_hcInHu_caseA` and the
+Clifford correspondence), closing the `Xmu`-surjectivity of the (9.8.c) parity dichotomy. -/
+theorem caseA_reducible_theta_regular [Finite G] {M : Subgroup G}
+    {data : TypesIIIIIIVSetup M} {chief : ChiefFactorData data}
+    {chars : Section11CharacterData data chief} (caseA : CliffordCaseAData chars)
+    (θbar : (↥data.H ⧸ chief.N) →* ℂˣ)
+    [Fintype ↥(hInHu data)] [Invertible (Nat.card ↥(hInHu data) : ℂ)]
+    (ζ : IrreducibleCharacter ↥(huSub data))
+    (hlo : OddOrder.RepresentationTheory.IrreducibleCharacter.LiesOver (hInHu data) ζ
+      (linearIrreducibleCharacter (θbar.comp ((QuotientGroup.mk' chief.N).comp
+        (hInHuEquivH data).toMonoidHom))))
+    (hMfix : ClassFunction.inertia (ζ : ClassFunction ↥(huSub data) ℂ) = ⊤)
+    (hnt : θbar ≠ 1) :
+    ∀ i, θbar.comp (caseA.Hpart i).subtype ≠ 1 := by
+  -- `θbar` is nontrivial on `S₀`.
+  have hS0 : θbar.comp caseA.S0.subtype ≠ 1 := by
+    intro h0
+    apply hnt
+    -- Every `Hpart i` is in `ker θbar`, and they span `H̄`, so `θbar = 1`.
+    have hker : ∀ i, caseA.Hpart i ≤ θbar.ker := by
+      intro i x hx
+      have htriv : θbar.comp (caseA.Hpart i).subtype = 1 := by
+        rw [caseA.Hpart_orbit i, comp_subtype_pointwise_smul_eq_one_iff,
+          caseA_theta_comp_quotient_on_S0_eq_one_iff_of_fixed caseA θbar ζ hlo hMfix
+            (caseA.orbitRep i)]
+        exact h0
+      have hval := DFunLike.congr_fun htriv ⟨x, hx⟩
+      rw [MonoidHom.mem_ker]
+      simpa only [MonoidHom.comp_apply, Subgroup.subtype_apply, MonoidHom.one_apply] using hval
+    refine MonoidHom.ext fun x => ?_
+    have hxker : x ∈ θbar.ker :=
+      (caseA.Hpart_iSup ▸ iSup_le hker : (⊤ : Subgroup (↥data.H ⧸ chief.N)) ≤ θbar.ker)
+        (Subgroup.mem_top x)
+    rw [MonoidHom.mem_ker] at hxker
+    rw [hxker, MonoidHom.one_apply]
+  -- Each `Hpart i` inherits nontriviality from `S₀`.
+  intro i
+  rw [ne_eq, caseA.Hpart_orbit i, comp_subtype_pointwise_smul_eq_one_iff,
+    caseA_theta_comp_quotient_on_S0_eq_one_iff_of_fixed caseA θbar ζ hlo hMfix (caseA.orbitRep i)]
+  exact hS0
 
 end OddOrder.Peterfalvi.S11
