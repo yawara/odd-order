@@ -2770,14 +2770,71 @@ theorem exists_typeI_maximal_overNormalizer_U [Finite G]
 
 /-- **`S`-side dual of `tConjugate_fitting_data`** (Pf (13.17.a), V-side L~S exclusion input): for a
 maximal `L` conjugate to `S`, the Fitting kernel `L_F` is a `p`-group of order `p^q` containing `W₂`
-and meeting `V` trivially.  The `card`-equality part is the isolated §13 residual (`card_P_eq`, dual
-of the sorried `card_Q_eq`); declared sorried, the V-side analogue of `tConjugate_fitting_data`. -/
-theorem sConjugate_fitting_data [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
-    (hyp : Hypothesis (G := G)) (_hSTypeII : IsTypeNonI hyp.S)
-    {L : Subgroup G} {g : G} (_hconj : MulAut.conj g • L = hyp.S) :
+and meeting `V` trivially.  **Now proven** (the V-side mirror of `tConjugate_fitting_data`): part (1)
+`|L_F| = p^q` from the proven `card_P_eq` via the `S`-conjugation equivariance of `M_F`; part (2)
+`W₂ ≤ L_F` places the `p`-group `W₂ ⊆ N_G(V) ⊆ L` in the normal `p`-Hall `L_F`; part (3) `L_F ⊓ V = ⊥`
+from `|L_F| = p^q` coprime to `|V|` (`V ⋊ W₂` Frobenius, `(|V|, p) = 1`).  `IsTypeII T` (for the
+`V ⋊ W₂` Frobenius) is threaded from `exists_typeI_maximal_overNormalizer_V`. -/
+theorem sConjugate_fitting_data [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hyp : Hypothesis (G := G)) (hTTypeII : IsTypeII hyp.T)
+    {L : Subgroup G} {g : G} (hconj : MulAut.conj g • L = hyp.S)
+    (hNVL : Subgroup.normalizer (hyp.V : Set G) ≤ L) :
     Nat.card ↥(maxNilpotentNormalHall L) = hyp.p ^ hyp.q ∧
       hyp.W2 ≤ maxNilpotentNormalHall L ∧
-      maxNilpotentNormalHall L ⊓ hyp.V = ⊥ := sorry
+      maxNilpotentNormalHall L ⊓ hyp.V = ⊥ := by
+  -- part 1: `|L_F| = p^q` (`card_P_eq`, proven, via the `S`-conjugation equivariance of `M_F`).
+  have hLFcard : Nat.card ↥(maxNilpotentNormalHall L) = hyp.p ^ hyp.q := by
+    have hMF : MulAut.conj g • maxNilpotentNormalHall L = hyp.P := by
+      rw [maxNilpotentNormalHall_pointwise_smul, hconj, ← hyp.P_eq_SF]
+    have hcard : Nat.card ↥(maxNilpotentNormalHall L) = Nat.card ↥hyp.P := by
+      rw [← hMF]
+      exact Nat.card_congr
+        (Subgroup.equivSMul (MulAut.conj g) (maxNilpotentNormalHall L)).toEquiv
+    rw [hcard]; exact hyp.card_P_eq hG hyp.Sdata_W2_eq
+  -- `W₂ ⊆ N_G(V) ⊆ L`.
+  have hW2leL : hyp.W2 ≤ L := hyp.W2_normalizes_V.trans hNVL
+  -- part 2: `W₂ ≤ L_F` — `W₂` a `p`-group in `L`, `L_F` the normal `p`-Hall subgroup.
+  have hW2leLF : hyp.W2 ≤ maxNilpotentNormalHall L := by
+    refine pgroup_le_of_normal_coprime_index (S := L) hyp.p_prime hW2leL
+      (OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_subgroupOf_normal L) ?_ ?_ ?_
+    · have hHall := OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_isHall L
+      have hcard_eq : Nat.card ↥((maxNilpotentNormalHall L).subgroupOf L)
+          = Nat.card ↥(maxNilpotentNormalHall L) :=
+        Nat.card_congr (Subgroup.subgroupOfEquivOfLe
+          (OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_le L)).toEquiv
+      exact hcard_eq ▸ Ch03.IsHallSubgroup.coprime_index hHall
+    · rw [hLFcard]; exact dvd_pow_self hyp.p hyp.q_prime.pos.ne'
+    · intro w hw
+      have heq : orderOf (⟨w, hw⟩ : ↥hyp.W2) = orderOf w :=
+        (orderOf_injective hyp.W2.subtype Subtype.coe_injective ⟨w, hw⟩).symm
+      have h1 : orderOf (⟨w, hw⟩ : ↥hyp.W2) ∣ Nat.card ↥hyp.W2 := orderOf_dvd_natCard _
+      rw [heq, ← hyp.p_eq_card_W2] at h1
+      exact h1
+  -- part 3: `L_F ⊓ V = ⊥` — `|L_F| = p^q` coprime to `|V|` (`V ⋊ W₂` Frobenius gives `(|V|, p) = 1`).
+  have hLFV : maxNilpotentNormalHall L ⊓ hyp.V = ⊥ := by
+    obtain ⟨tpd, htpdV, htpdW1, _⟩ := reconciled_typePData_T hG hyp
+    obtain ⟨tdata⟩ := hTTypeII
+    have htpdVne : tpd.U ≠ ⊥ := by
+      intro hbot
+      have h1 : Nat.card ↥tpd.U = Nat.card ↥tdata.typeP.U := by
+        rw [tpd.card_U_eq_index, tdata.typeP.card_U_eq_index]
+      rw [hbot, Subgroup.card_bot] at h1
+      exact tdata.common.1 (Subgroup.card_eq_one.mp h1.symm)
+    have hVW2frob : OddOrder.Isaacs.Ch06.IsFrobeniusGroup
+        ↥(hyp.V ⊔ hyp.W2) (hyp.V.subgroupOf (hyp.V ⊔ hyp.W2))
+          (hyp.W2.subgroupOf (hyp.V ⊔ hyp.W2)) := by
+      have h := OddOrder.Peterfalvi.S11.typeP_uW1_frobenius tpd htpdVne
+      rwa [htpdV, htpdW1] at h
+    have hcopVp : Nat.Coprime (Nat.card ↥hyp.V) hyp.p := by
+      have hk := hVW2frob.coprime_card_kernel_complement
+      rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe (le_sup_left)).toEquiv,
+        Nat.card_congr (Subgroup.subgroupOfEquivOfLe (le_sup_right)).toEquiv,
+        ← hyp.p_eq_card_W2] at hk
+      exact hk
+    have hcop : Nat.Coprime (Nat.card ↥(maxNilpotentNormalHall L)) (Nat.card ↥hyp.V) := by
+      rw [hLFcard]; exact hcopVp.symm.pow_left hyp.q
+    exact Subgroup.inf_eq_bot_of_coprime hcop
+  exact ⟨hLFcard, hW2leLF, hLFV⟩
 
 /-- **`T`-side dual of `exists_typeI_maximal_overNormalizer_U`** (Pf (13.17.a/b), V-side): for `T`
 type II, a maximal subgroup `L` over `N_G(V)` is type I with `V ⊆ L_F`.  Mirror of the `U`-side with
@@ -2829,7 +2886,7 @@ theorem exists_typeI_maximal_overNormalizer_V [Finite G]
   · -- `L ~ S` excluded (order contradiction, mirror of the S-side `L ~ T`).
     exfalso
     obtain ⟨g, hg⟩ := hLconjS
-    obtain ⟨_hLFcard, hW2le, hLFV⟩ := sConjugate_fitting_data _hG hyp hyp.S_nonI hg
+    obtain ⟨_hLFcard, hW2le, hLFV⟩ := sConjugate_fitting_data _hG hyp ⟨tdata⟩ hg hNVL
     have hVleL : hyp.V ≤ L := Subgroup.le_normalizer.trans hNVL
     have hV_norm_LF : hyp.V ≤ Subgroup.normalizer (maxNilpotentNormalHall L) :=
       hVleL.trans (OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_le_normalizer L)
