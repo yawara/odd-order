@@ -7526,4 +7526,23 @@ theorem exists_uPart_theta_comp_quotient_eq_of_fixed [Finite G] {M : Subgroup G}
     ClassFunction.compHom_linearIrreducibleCharacter] at hbridge
   exact linearIrreducibleCharacter_injective (IrreducibleCharacter.ext hbridge)
 
+/-- **step 2 D₁: `Ū` preserves per-`Hpart` nontriviality** (Peterfalvi (9.8.c) surjectivity).  For a
+`U`-part element `a` (`a ∈ U ⊔ W₁` with `↑a ∈ U`), the twist `θbar ∘ q(a)` is trivial on the Clifford
+summand `Hpart i` iff `θbar` is (`q = quotientMulAutHom`).  A form-alignment wrapper over
+`caseA_uActionHom_comp_subtype_eq_one_iff`: `uActionHom data chief ⟨a, ·⟩ = quotientMulAutHom a`
+(`uActionHom` is `quotientMulAutHom ∘ U.subgroupOf.subtype`), so the `Ū`-action on the factors matches
+`q(a)`.  Combined with the orbit equality `θbar∘q(a) = θbar∘q(w)` (`exists_uPart_..._of_fixed`), this
+makes the nontrivial-`Hpart` set invariant under the `W₁`-twist `q(w)`. -/
+theorem caseA_theta_comp_quotient_uPart_comp_subtype_eq_one_iff [Finite G] {M : Subgroup G}
+    {data : TypesIIIIIIVSetup M} {chief : ChiefFactorData data}
+    {chars : Section11CharacterData data chief} (caseA : CliffordCaseAData chars)
+    {a : ↥(data.typeP.U ⊔ data.typeP.W1)} (haU : ((a : G)) ∈ data.typeP.U)
+    {i : Fin data.q} (θbar : (↥data.H ⧸ chief.N) →* ℂˣ) :
+    (θbar.comp (quotientMulAutHom chief.N_aInvariant a).toMonoidHom).comp
+        (caseA.Hpart i).subtype = 1
+      ↔ θbar.comp (caseA.Hpart i).subtype = 1 :=
+  caseA_uActionHom_comp_subtype_eq_one_iff caseA
+    (⟨a, Subgroup.mem_subgroupOf.mpr haU⟩ :
+      ↥(typeP_quotientCoprimeAction data.typeP data.nontrivial.1 chief.N_aInvariant).U) θbar
+
 end OddOrder.Peterfalvi.S11
