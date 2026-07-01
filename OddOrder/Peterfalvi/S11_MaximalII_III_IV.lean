@@ -2467,6 +2467,29 @@ structure CliffordCaseAData {M : Subgroup G} {data : TypesIIIIIIVSetup M}
   Ubar_embeds_product : Prop
   Ubar_embeds_product_holds : Ubar_embeds_product
 
+open scoped IsMulCommutative in
+/-- **The `(9.8)` regular-character count on the chief factor** (`oXtheta` numerator): the
+characters of `H̄ = H/H₀` nontrivial on *every* Clifford summand `caseA.Hpart i` number `(p-1)^q`.
+Instantiates the abstract `card_regular_chars` at the internal-direct-product structure carried by
+`CliffordCaseAData` (`Hpart_iSupIndep` + `Hpart_iSup` give `noncommPiCoprod` bijective,
+`Hpart_order` gives each factor order `p`).  This is the numerator of Peterfalvi's `oXtheta`
+(`u·|𝒳(H₀C)| = (p-1)^q`): via inflation (`hcPsi`) and `HU`-induction these regular `H̄`-characters
+parametrise the degree-`qu` members of `𝒮(H₀C)` (Coq `PFsection9` `oXtheta`, `card_pffun_on`). -/
+theorem card_regular_chars_Hbar [Finite G] {M : Subgroup G} {data : TypesIIIIIIVSetup M}
+    {chief : ChiefFactorData data} (chars : Section11CharacterData data chief)
+    (caseA : CliffordCaseAData chars) :
+    Nat.card {χ : (↥data.H ⧸ chief.N) →* ℂˣ // ∀ i, χ.comp (caseA.Hpart i).subtype ≠ 1}
+      = (chief.p - 1) ^ data.q := by
+  haveI : IsMulCommutative (↥data.H ⧸ chief.N) := ⟨⟨chief.quotient_elementaryAbelian.1⟩⟩
+  have hcomm : Pairwise fun i j : Fin data.q =>
+      ∀ x y : (↥data.H ⧸ chief.N), x ∈ caseA.Hpart i → y ∈ caseA.Hpart j → Commute x y :=
+    fun i j _ x y _ _ => mul_comm x y
+  have hbij : Function.Bijective (Subgroup.noncommPiCoprod hcomm) :=
+    ⟨Subgroup.injective_noncommPiCoprod_of_iSupIndep caseA.Hpart_iSupIndep, by
+      rw [← MonoidHom.range_eq_top, Subgroup.noncommPiCoprod_range]; exact caseA.Hpart_iSup⟩
+  have h := card_regular_chars hcomm hbij caseA.Hpart_order
+  rwa [Fintype.card_fin] at h
+
 /-- Case (b) of Peterfalvi (9.7): `U` acts irreducibly on `H/H_0`, modeled by
 the multiplicative group of a field of order `p^q`.
 
@@ -5320,6 +5343,43 @@ theorem exists_regular_irr_caseA [Finite G] {M : Subgroup G}
   rw [linearIrreducibleCharacter_apply, linearIrreducibleCharacter_apply, map_one, Units.val_one]
   simpa using hne
 
+/-- **Parity dichotomy of Peterfalvi (9.8.c)** (`oXtheta` / `eqVproper`): the abstract
+combinatorial core.  If a finite family `X` has a subfamily `Xmu ⊆ X` of size `p-1`, and the total
+count satisfies `u·|X| = (p-1)^q` with `u` odd, `p-1` even and positive, and `q ≥ 2`, then
+`Xmu ⊊ X` — there is a member of `X` outside `Xmu`.  The equality case `|X| = p-1` would force
+`u·(p-1) = (p-1)^q`, i.e. `u = (p-1)^(q-1)`, which is even (`q-1 ≥ 1`, `p-1` even), contradicting
+`u` odd.  In (9.8.c): `X = 𝒳(H₀C)`-regular characters (`u·|X| = (p-1)^q` by `oXtheta`,
+numerator `card_regular_chars_Hbar`), `Xmu` the `p-1` reducibles (`reducible_count_sOf_H0`); the
+produced member induces the degree-`qu` *irreducible* of `𝒮(H₀C)` (Coq `PFsection9`). -/
+theorem exists_regular_not_reducible_of_odd {α : Type*} {X Xmu : Set α}
+    (hXfin : X.Finite) (hsub : Xmu ⊆ X) {p q u : ℕ}
+    (hXmu : Xmu.ncard = p - 1) (hcount : u * X.ncard = (p - 1) ^ q)
+    (hp1_pos : 0 < p - 1) (hp1_even : Even (p - 1)) (hu : Odd u) (hq : 2 ≤ q) :
+    ∃ s ∈ X, s ∉ Xmu := by
+  have hle : p - 1 ≤ X.ncard := hXmu ▸ Set.ncard_le_ncard hsub hXfin
+  have hne : X.ncard ≠ p - 1 := by
+    intro heq
+    rw [heq] at hcount
+    have hsplit : (p - 1) ^ q = (p - 1) * (p - 1) ^ (q - 1) := by
+      rw [← pow_succ']; congr 1; omega
+    rw [hsplit] at hcount
+    have hu_eq : u = (p - 1) ^ (q - 1) :=
+      Nat.eq_of_mul_eq_mul_left hp1_pos (by rw [mul_comm (p - 1) u]; exact hcount)
+    have heven : Even ((p - 1) ^ (q - 1)) := by
+      have hsplit2 : (p - 1) ^ (q - 1) = (p - 1) * (p - 1) ^ (q - 2) := by
+        rw [← pow_succ']; congr 1; omega
+      rw [hsplit2]; exact hp1_even.mul_right _
+    rw [hu_eq, Nat.odd_iff] at hu
+    rw [Nat.even_iff] at heven
+    omega
+  have hlt : p - 1 < X.ncard := lt_of_le_of_ne hle (Ne.symm hne)
+  by_contra hcon
+  push_neg at hcon
+  have hXsub : X ⊆ Xmu := fun s hs => hcon s hs
+  have hXeq : X = Xmu := Set.Subset.antisymm hXsub hsub
+  rw [hXeq, hXmu] at hlt
+  exact (lt_irrefl _) hlt
+
 /-- **Peterfalvi (9.8)**: character-count consequences in Clifford case (a).
 
 Faithful to Peterfalvi (9.8.b,c,d) (count-statement audit, issue 2030):
@@ -6758,4 +6818,3 @@ theorem conjBy_eq_compHom_iff_quotient [Finite G] {M : Subgroup G} {data : Types
     rw [h]
 
 end OddOrder.Peterfalvi.S11
-

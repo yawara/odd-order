@@ -1481,3 +1481,108 @@ landed** (counting route でも factor-data bijection で有用)。
 **次 iteration**: (A) total count の形式化に着手 (𝒳(H₀C) ↔ Ftheta bijection、|Ftheta|=(p-1)^q)。
 これが counting route の心臓。Coq PFsection9.v:956 `oXtheta` + 920-960 の `theta f`/`inj_theta`/
 `card_imset_Ind_irr` を port。session 巨大 (compaction 近)。
+
+## ★ counting route 3 片 landed — 次 crux = def_Itheta (U-inertia) (2026-07-01 cont.)
+
+前 redirect (counting+parity) に沿って **3 lemma landed (全 axiom-clean [propext/Classical.choice/
+Quot.sound]、commits 5bd37de3/62aeb4f0)**:
+1. `charRestrictEquiv`+`card_regular_chars` (抽象、S11:2337/2359): internal direct product
+   H̄=⊕Sᵢ (各 order p、q factor) の全 factor 上非自明 char 数 = (p-1)^q。charRestrictEquiv
+   (char ≃ factor-restriction tuple、inj=Lemma C `char_eq_of_eq_on_factors`/surj=
+   `char_eq_on_factors_of_bijective`) + subtypeEquiv + `card_monoidHom_of_hasEnoughRootsOfUnity`。
+2. `card_regular_chars_Hbar` (concrete、S11:~2471): 上を `CliffordCaseAData.Hpart` に instantiate。
+   H̄=↥H⧸N の各 Hpart i 上非自明 char 数 = (p-1)^q。Hpart_iSupIndep+iSup で noncommPiCoprod
+   bij、`IsMulCommutative→CommGroup`=scoped instance (`open scoped IsMulCommutative`)。= **oXtheta 分子**。
+3. `exists_regular_not_reducible_of_odd` (parity 核、S11:~5350): finite X⊇Xmu (|Xmu|=p-1)、
+   u·|X|=(p-1)^q、u odd、p-1 even>0、q≥2 ⟹ ∃s∈X, s∉Xmu。equality |X|=p-1 ⟹ u=(p-1)^{q-1}
+   が (q-1≥1・p-1 even で) even となり u-odd 矛盾。= **(9.8.c) dichotomy 抽象核**。
+
+**既存 (9.8.c) construction 機構 (free-orbit route 由来だが counting でも再利用可)**:
+- `hcPsi θ` (6118): θ:H̄→*ℂˣ から HC-linear char ψ=θ∘hcHom (trivial on H₀C)。
+- `hcQuotientEquivHbar` (6084): HC/H₀C ≅ H̄ (第二同型)。
+- `hcZeta_irreducible` (6312): **hθ₀ を仮定すれば** Ind_{HC}^{HU}(hcPsi θ) irreducible (degree u)。
+  hθ₀ = `inertia(compHom hInHuEquivH (compHom mk'_N (linearIrr θ))) = hInHu ⊔ cInHu` (=HC at HU-level)。
+
+**次 crux = def_Itheta (hθ₀ の証明、= U-inertia)**: regular θ (全 Hpart i 上非自明) に対し
+inertia(inflated θ in HU) = HC を証明 = 「Ū=U/C が regular θ 上 free に作用」。
+- 易半 HC ≤ inertia: `subgroup_le_inertia` (C=C_U(H̄) は H̄ に trivial 作用 → θ 固定)。
+- 難半 inertia ≤ HC: U∖C の元は regular θ を動かす。**Hpart_aInvariant (U が各 factor 保存 ⟹
+  Coq の factor-permutation case を回避、単純化)** ゆえ inertia(⊗θ_i)=∩ᵢ Stab_U(θ_i)、
+  nontrivial θ_i on order-p factor で Stab_U(θ_i)=C-related (CliffordCaseAData.a 絡み)。
+  要 新 machinery: (i) 「内部直積上の product char の inertia = ∩ factor inertia」(一般 reusable) +
+  (ii) 「order-p factor 上 nontrivial char の U-stabilizer = C」。Coq inertia_bigdprod_irr+
+  inertia_irr_prime。**deep、multi-iteration、fresh context 推奨**。
+
+**assembly (def_Itheta 後)**:
+- **oXtheta**: u·|Xtheta| = (p-1)^q。Xtheta={Ind_{HC}^{HU}(hcPsi θ) | regular θ}⊆𝒳(H₀C)。
+  u-fold fiber = Ū-conjugate θ が同一 ζ を産む (def_Itheta の帰結)。numerator=`card_regular_chars_Hbar`。
+- **(E) reducible⟹Xmu**: s∈Xtheta∖Xmu ⟹ Ind_M(chi_s) irreducible。対偶=reducible なら
+  constant-factor-data (Xmu) に入る (Coq `cfclass_Ind_irrP`/`ResIndXmu`)。**W1-inertia 数論を回避**。
+- **(C) u odd**: odd-order (|Ū|∣|G| odd)。
+- **assembly**: `exists_regular_not_reducible_of_odd` + (E) → conjunct c。reducible count (B)=
+  `reducible_count_sOf_H0` (既存、5347 で conjunct b1 に wire 済)。
+
+**level 注意**: 𝒳(H₀C)=`xiOf data H0C` (HU-char)、𝒮(H₀C)=`sOf`=Ind_M 𝒳 (M-char)。conjunct c は
+𝒮(H₀C) member = Ind_M(s), s∈Xtheta⊆𝒳(H₀C)。Xtheta=regular ones (Coq: Xtheta⊆X_H0C、**等号不要**)。
+
+## ⭐ 訂正: def_Itheta は既に PROVEN (`inertia_eq_hcInHu_caseA`) (2026-07-01 cont.²)
+
+**上の「次 crux = def_Itheta (deep 未証明)」は誤り** ([[verify-port-state-by-number-not-coq-name]]
+の教訓そのもの — descriptive 名で grep せず deep 判定しかけた)。`inertia_eq_hcInHu_caseA`
+(S11:4858) が **まさに def_Itheta**: regular θ̄ (∀i, θ̄ nontrivial on Hpart i) に対し
+`I_{HU}(inflated θ₀) = hInHu ⊔ cInHu (=HC)` を**証明済み** (`inertia_eq_hcInHu_gen` →
+`chiefFactor_caseA_char_inertia` 経由、case-agnostic plumbing)。これは `hcZeta_irreducible`
+(6312) の `hθ₀` 仮定そのもの。
+
+**⟹ 各 regular θ に対し degree-u irreducible ζ_θ = Ind_{HC}^{HU}(hcPsi θ) ∈ 𝒳(H₀C) は
+既に構成可能** (`hcZeta_irreducible` に `inertia_eq_hcInHu_caseA` を hθ₀ として渡すだけ)。
+
+**残 oXtheta = u-to-1 counting のみ (deep でない)**: 写像 θ ↦ ζ_θ ({regular H̄-char} → 𝒳(H₀C))。
+- fiber = Ū-orbit (ζ_θ=ζ_θ' ⟺ hcPsi θ, hcPsi θ' が HU-共役 ⟺ θ, θ' が Ū-共役)。
+- inertia=HC ⟹ Ū が regular θ 上 free (Stab_Ū=1) ⟹ 各 fiber size = |Ū| = u。
+- ⟹ u·|Xtheta| = |{regular θ}| = (p-1)^q (`card_regular_chars_Hbar`)。
+- 要: Ū-action on regular chars 設定 + free-action orbit count (mathlib MulAction) or
+  induction-imset count (Coq `card_imset_Ind_irr` 相当)。**moderate**。
+
+**残全体 (全て moderate、deep なし)**: (a) oXtheta u-to-1 count、(b) (E) reducible⟹Xmu
+(cfclass 対偶)、(c) u odd (odd-order)、(d) assembly (`exists_regular_not_reducible_of_odd`)。
+reducible count (B) = `reducible_count_sOf_H0` 既存。
+
+## discharge recipe 確認済 + ⚠ whnf 壁 (bundled ζ_θ 構成) (2026-07-01 cont.³)
+
+**hθ₀ discharge recipe は正しく型検査を通る** (試作で確認): regular θ:(↥H⧸N)→*ℂˣ から
+```
+have hreg' : ∀ i, ∃ x ∈ caseA.Hpart i,
+    (linearIrreducibleCharacter θ : ClassFunction _ ℂ) x ≠ (linearIrreducibleCharacter θ : ...) 1 :=
+  fun i => by obtain ⟨x,hx,hne⟩ := hreg i; exact ⟨x,hx, by
+    rw [linearIrreducibleCharacter_apply, linearIrreducibleCharacter_apply, map_one, Units.val_one];
+    simpa using hne⟩
+have hθ₀ := inertia_eq_hcInHu_caseA data chief caseA hreg'  -- : hcZeta の hθ₀ そのもの
+```
+`hθ₀` は `hcZeta_irreducible`/`hcZeta_mem_xiOf`/`hcZeta_induceHU_*` の hθ₀ 引数に直接渡せる
+(型一致確認済)。regular θ は `exists_regular_char caseA.Hpart Hpart_iSupIndep Hpart_iSup
+(order→p_prime)` で取得 (要 `letI : CommGroup (↥H⧸N) := {inferInstance with mul_comm :=
+chief.quotient_elementaryAbelian.comm}`、sub-block に scope)。θ≠1 は
+`hreg ⟨0, data.nontrivial.2.1.pos⟩` (data.nontrivial.2.1 : (data.q).Prime) から。
+instances (Fintype/Invertible huSub+sup、Normal sup=`hcInHu_realized_normal`) は proof 内 letI/haveI
+で供給可 (存在文なら signature threading 不要)。
+
+**⚠ 但し bundled ζ_θ 項の構成が whnf 壁**: `⟨ClassFunction.induce _ (hcPsi chief θ),
+hcZeta_irreducible chief θ hθ₀⟩ : IrreducibleCharacter ↥(huSub data)` を作って coerce
+(degree via `hcZeta_apply_one`、membership via `hcZeta_mem_xiOf`) すると **whnf timeout >2M
+heartbeats** (induce-coercion defeq 爆発、[[lean-induce-transport-instance-desync]] /
+[[lean-giant-declaration-debugging]])。`hcZeta_mem_xiOf` 自体は maxHeartbeats 1000000 で通るが、
+呼び出し側で bundled 項を組むと爆発。試作 `exists_irr_deg_u_xiOf_caseA` は revert 済。
+
+**次 iteration の対処** (count 構築時):
+- coercion whnf を回避: `show`/`change` で ClassFunction 形に pin、degree/membership goal を分割、
+  Invertible instance を named-arg `(Z:=)(S:=)` で pin、`rw` でなく `exact`。
+- または **ClassFunction レベルで作業し bundled IrreducibleCharacter を最後に一度だけ materialize**
+  (count は Set/Finset の ncard なので、写像 θ↦ζ_θ を ClassFunction 値で定義し injectivity/fiber を
+  ClassFunction 等式で示す方が whnf 安全な可能性)。
+- `hcZeta_induceHU_irreducible`/`hcZeta_exists_irreducible_sOf` (free-orbit endpoint) は既に
+  同型の bundled 項を hIM 付きで扱っており、そこでの whnf 対処 (letI transparent 保持、6585 の
+  hunfold idiom) が手本。
+
+**残タスク (再掲、全 moderate、def_Itheta は proven)**: (a) oXtheta u-to-1 count (whnf 注意)、
+(b) (E) reducible⟹Xmu、(c) u odd、(d) assembly (`exists_regular_not_reducible_of_odd`)。
