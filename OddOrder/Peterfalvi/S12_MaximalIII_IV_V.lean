@@ -8535,6 +8535,60 @@ theorem Hypothesis.charParam_a_eq_zero_of_residualEq [Finite G] {M : Subgroup G}
   have ha0 : (a : ℂ) = 0 := by linear_combination -htrans
   exact_mod_cast ha0
 
+open scoped Classical FiniteInduce in
+/-- **Peterfalvi (11.8.5), unconditional `a = 0`** (given the (11.8.3) reality `β̄ = β` threaded as
+`hβr`).  Combines the conditional (11.8.5) `charParam_a_eq_zero_of_residualEq` (which gives
+`a ∈ {0,1,2}` and the implication `Even a → a = 0`) with the parity assembly: the (11.8.3) residual
+`β = α_{ij}^τ − δ(ω_{ij}^σ − ω_{i0}^σ) + nζ^{τ₁}` is a virtual character (`beta_mem_ZIrr`) orthogonal
+to `1_G` (`beta_inner_trivial`, its `hα1M` discharged by `muGridAlpha_inner_trivial_M` for `i ≠ 0`),
+and `a = (∑_r ω_{r0}^σ, β)` (`muGridAlpha_a_eq_inner_sumOmegaSigma_beta`); so if `β` is real then
+`a` is even (`a_even_of_eq_inner_sumOmegaSigma`, the general reality-parity of an integer inner
+product of real virtual characters one of which is `⊥ 1_G` in odd order), which excludes `a = 1`.
+Hence `a = 0` unconditionally, i.e. `(α_{ij}^τ, ζ^{τ₁}) = −n`.  This is the full (11.8.5) with the
+parity step; only the (11.8.3) reality `β̄ = β` (the `(4.8)/(4.10)/(5.9)` SHC port) remains threaded. -/
+theorem Hypothesis.residualCoeff_eq_zero [Finite G] {M : Subgroup G}
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis M) (hodd : Odd (Nat.card G))
+    (i : Fin hyp.w1) {j : Fin hyp.w2} (hj0 : j ≠ 0) (hi0 : i ≠ 0)
+    {ζ : ClassFunction ↥M ℂ} (hζS : ζ ∈ inducedFamily M) (hζirr : IsIrreducibleCharacter ζ)
+    (hζ1 : ζ 1 = (hyp.w1 : ℂ)) {d : ℕ} {δ : ℤ} {n : ℕ}
+    (hdeg : hyp.muGrid hG hodd i j 1 = (d : ℂ)) (hμ0 : hyp.muGrid hG hodd i 0 1 = 1)
+    (hnf : (n : ℤ) * (hyp.w1 : ℤ) = (d : ℤ) - δ) (hδj : hyp.muColumnSign hG hodd j = δ)
+    (hdζ : hyp.muGrid hG hodd i j 1 ≠ ζ 1) (h0ζ : hyp.muGrid hG hodd i 0 1 ≠ ζ 1)
+    (hδpm : δ = 1 ∨ δ = -1) (hn2 : 2 ≤ n)
+    {R : Finset (ClassFunction G ℂ)} (hRn : R.card = n) (hZ : ∀ β ∈ R, β ∈ ZIrr G)
+    (horth : ∀ α ∈ R, ∀ β ∈ R, ClassFunction.inner α β = if α = β then (1 : ℂ) else 0)
+    (hRmem : ∀ φ : ClassFunction ↥M ℂ, φ ∈ inducedFamily M → IsIrreducibleCharacter φ →
+      φ 1 = (hyp.w1 : ℂ) → (hyp.SHC_isCoherent hG).extension φ ∈ R)
+    (hRrev : ∀ β ∈ R, ∃ φ : ClassFunction ↥M ℂ, φ ∈ inducedFamily M ∧ IsIrreducibleCharacter φ ∧
+      φ 1 = (hyp.w1 : ℂ) ∧ β = (hyp.SHC_isCoherent hG).extension φ)
+    (h114 : hyp.tau ((∑ i' : Fin hyp.w1, hyp.muGrid hG hodd i' 0) - ζ)
+        = (∑ r : Fin hyp.w1, hyp.alignedOmegaSigmaGrid hG hodd r 0)
+          - (hyp.SHC_isCoherent hG).extension ζ)
+    (hβr : ClassFunction.IsReal
+        (hyp.tau (hyp.muGrid hG hodd i j - (δ : ℂ) • hyp.muGrid hG hodd i 0 - (n : ℂ) • ζ)
+          - (δ : ℂ) • (hyp.alignedOmegaSigmaGrid hG hodd i j - hyp.alignedOmegaSigmaGrid hG hodd i 0)
+          + (n : ℂ) • (hyp.SHC_isCoherent hG).extension ζ)) :
+    ClassFunction.inner
+        (hyp.tau (hyp.muGrid hG hodd i j - (δ : ℂ) • hyp.muGrid hG hodd i 0 - (n : ℂ) • ζ))
+        ((hyp.SHC_isCoherent hG).extension ζ) = -(n : ℂ) := by
+  obtain ⟨a, hbound, hinner, heven_imp⟩ := hyp.charParam_a_eq_zero_of_residualEq hG hodd i hj0 hζS
+    hζirr hζ1 hdeg hμ0 hnf hδj hdζ h0ζ hδpm hn2 hRn hZ horth hRmem hRrev h114
+  have hζne := hyp.inducedFamily_degree_w1_conj_ne hG hζirr hζ1
+  have ha := hyp.muGridAlpha_a_eq_inner_sumOmegaSigma_beta hG hodd i hj0 hζS hζirr hζ1 hζne hdeg hμ0
+    hnf hδj hdζ h0ζ hinner h114
+  have hβZ := hyp.beta_mem_ZIrr hG hodd i hj0 hζS hζirr hζ1 hdeg hμ0 hnf hδj
+  have hβ1 : ClassFunction.inner
+      (hyp.tau (hyp.muGrid hG hodd i j - (δ : ℂ) • hyp.muGrid hG hodd i 0 - (n : ℂ) • ζ)
+        - (δ : ℂ) • (hyp.alignedOmegaSigmaGrid hG hodd i j - hyp.alignedOmegaSigmaGrid hG hodd i 0)
+        + (n : ℂ) • (hyp.SHC_isCoherent hG).extension ζ)
+      (trivialIrreducibleCharacter G : ClassFunction G ℂ) = 0 :=
+    hyp.beta_inner_trivial hG hodd i hj0 hi0 hζS hζirr hζ1 hζne hdeg hμ0 hnf hδj
+      (hyp.muGridAlpha_inner_trivial_M hG hodd hi0 hj0 hζirr hζ1)
+  have heven := hyp.a_even_of_eq_inner_sumOmegaSigma hG hodd hβZ hβr hβ1 ha
+  have ha0 : a = 0 := heven_imp heven
+  rw [ha0] at hinner
+  rw [hinner]; ring
+
 open scoped FiniteInduce in
 /-- **Peterfalvi (11.8.6) opening identity** `(μ_j − dζ)^τ = ∑_i ω_{ij}^σ − dζ^{τ₁}` (`0 < j`, `δ = 1`).
 Given the `a = 0` Dade images `α_{ij}^τ = ω_{ij}^σ − ω_{i0}^σ − nζ^{τ₁}` for all `i` (`halpha`,
