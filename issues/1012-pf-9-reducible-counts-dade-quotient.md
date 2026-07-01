@@ -1666,3 +1666,22 @@ oXtheta numerator を完全形式化 (S11、axiom-clean、leaf green):
 **要 wiring**: (i) Xθ (oXtheta の image) を X に同定、(ii) Xmu = reducible-inducing の image を
 |Xmu|=p-1 で (reducible_count 系)、(iii) s∈Xθ∖Xmu → Ind_M(s) irr deg qu (M-level、既 hcZeta_induceHU_*
 の hIM を parity witness が供給)。deep math 無し・char-level plumbing (whnf/instance 注意)。
+
+## ★ conjunct c は hIM discharge に完全還元 — endpoint 特定 (2026-07-01 cont.⁷)
+
+**重要発見**: `hcZeta_exists_irreducible_sOf` (S11:7028、既 landed) が **hIM-gated conjunct c そのもの** —
+regular θ + hθnt(θ≠1) + hθ₀(inertia=HC、inertia_eq_hcInHu_caseA で供給) + **hIM
+(`inertia(Ind_{HC}^{HU}(hcPsi θ)) ≠ ⊤` = ζ_θ が M-level で W₁-fixed でない)** を受けて
+`∃χ∈𝒮(H₀C), IsIrr χ ∧ χ1=qu` (= conjunct c) を返す。⟹ **conjunct c ⟺ ある regular θ≠1 で hIM**。
+
+私の **oXtheta_count** + `exists_regular_not_reducible_of_odd` (parity) がこの hIM を供給する経路:
+witness s∈Xθ∖Xmu → Ind_M(s) irr ⟺ hIM。∴ 残 = parity の 2 入力のみ:
+- **|Xmu|=p-1**: Xmu={ζ_θ : θ constant factor-data} の count (constant nonzero 値 p-1 個の直接 count、
+  または reducible_count_sOf_H0C との bijection)。
+- **(E)**: `Ind_M(ζ_θ) reducible → θ constant factor-data` (対偶、Coq cfclass_Ind_irrP/ResIndXmu、
+  **W₁-inertia 数論を回避する Clifford 論**)。free-orbit route の θ̄^{w₀}∉U-orbit より弱く済む。
+
+⟹ **conjunct c assembly = (Xθ/Xmu を Set 化 + |Xmu|=p-1 + (E)) → exists_regular_not_reducible_of_odd
+→ hIM 抽出 → hcZeta_exists_irreducible_sOf**。oXtheta numerator + endpoint は landed、残は
+(E)+Xmu-count の fresh Clifford 単位 (deep でないが substantial、reducible-count infra と接続)。
+次 iteration の着手 = Xmu (constant factor-data) の定義 + count + (E)。
