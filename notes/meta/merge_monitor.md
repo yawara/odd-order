@@ -261,6 +261,12 @@
 
 ## 現状メモ
 
+- **2026-07-01 — policy 規約化 (自律 frontier 選択 + shared-infra claim) + lane b dup 保留 (issue 0093)**:
+  ユーザー裁定 2026-07-01 を lane b/c が両方 codify。**c 版 (superset: CLAUDE + ft_path_policy §0 policy
+  5-6 + merge_monitor §1.6 + issue_management 9000-range) を採用・合流** (`f6507084`)。b 版
+  (`47bd6a0f`、CLAUDE/ft_path_policy の別 wording) は **supersede→保留**。⚠ 次 tick で `main...b` に
+  CLAUDE.md/ft_path_policy が出て merge conflict しても **superseded policy dup (issue 0093)** ゆえ
+  abort + 「b: policy dup 未解消」1 行報告に留め **STOP しない**。b が drop したら通常復帰。
 - **2026-07-01 — lane d 再配分 (issue 0092, ユーザー裁定)**: lane d の旧クラスタ δ (BG §14–16) の FT
   deliverable は実質完成 (spine 消費 endpoint 全 sorry-free) と監査確定。**lane d の主焦点を binding pole
   γ の import-上流最上流 `S15_SAndT_Setup.lean` (16 sorry) へ移管**。lane c は下流 `S15_SAndT` +
