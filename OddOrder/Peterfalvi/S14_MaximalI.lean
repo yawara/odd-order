@@ -2179,6 +2179,50 @@ theorem Sset_exists_degreeData [Finite G] {L : Subgroup G} (hyp : Hypothesis L) 
 
 open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
 open OddOrder.Peterfalvi.S09.Cert in
+/-- **Break-pair fields for `{ψ, ψ̄}`** — the witness analogue of the Sibley `sBreakPair_fields`, the
+per-`ψ` inputs the (5.6) bound `coherentDegreeSumBound_of_not_coherent` consumes (in its argument
+order): non-realness, conjugate-difference support, the `{ψ, ψ̄}` orthonormality, and the
+orthogonality of `ψ`, `ψ̄` to every member of `S₁` (distinct irreducibles, since `ψ, ψ̄ ∉ S₁`). -/
+theorem Sset_breakPair_fields [Finite G] {L : Subgroup G} (hyp : Hypothesis L)
+    (hodd : Odd (Nat.card ↥L)) {C : Subgroup ↥L}
+    (hfrob : OddOrder.Isaacs.Ch06.IsFrobeniusGroup ↥L ((hyp.typeI.typeF.H).subgroupOf L) C)
+    (hAH : hyp.ambientA = ((hyp.typeI.typeF.H) : Set G) \ {1})
+    {ψ : ClassFunction ↥L ℂ} (hψS : ψ ∈ hyp.Sset)
+    {S₁ : Set (ClassFunction ↥L ℂ)} (hS₁sub : S₁ ⊆ hyp.Sset)
+    (hψnotS1 : ψ ∉ S₁) (hψcnotS1 : ψ.conj ∉ S₁) :
+    ¬ ClassFunction.IsReal ψ ∧
+    (ψ.conj - ψ).support ⊆ OddOrder.Peterfalvi.S04.supportInSubgroup hyp.ambientA L ∧
+    ClassFunction.inner ψ ψ = 1 ∧
+    ClassFunction.inner ψ.conj ψ.conj = 1 ∧
+    ClassFunction.inner ψ ψ.conj = 0 ∧
+    ClassFunction.inner ψ.conj ψ = 0 ∧
+    (∀ x ∈ S₁, ClassFunction.inner ψ x = 0) ∧
+    (∀ x ∈ S₁, ClassFunction.inner ψ.conj x = 0) := by
+  have hψconjS := Sset_closedUnderConjugate hyp hψS
+  have hne : ψ ≠ ψ.conj := fun h => (Sset_hasNoRealCharacters hyp hodd hfrob hψS) h.symm
+  refine ⟨Sset_hasNoRealCharacters hyp hodd hfrob hψS,
+    Sset_conjDiff_supported hyp hfrob hAH hψS,
+    Sset_inner_self_eq_one hyp hfrob hψS,
+    Sset_inner_self_eq_one hyp hfrob hψconjS,
+    Sset_pairwiseOrthogonal hyp hodd hfrob hψS hψconjS hne,
+    Sset_pairwiseOrthogonal hyp hodd hfrob hψconjS hψS (fun h => hne h.symm), ?_, ?_⟩
+  · intro x hx
+    have hxne : ψ ≠ x := by rintro rfl; exact hψnotS1 hx
+    have hite := OddOrder.RepresentationTheory.irreducibleCharacter_inner_eq_ite
+      ⟨ψ, Sset_isIrreducibleCharacter hyp hfrob hψS⟩
+      ⟨x, Sset_isIrreducibleCharacter hyp hfrob (hS₁sub hx)⟩
+    rwa [if_neg (fun he => hxne
+      (congrArg (fun c : IrreducibleCharacter ↥L => (c : ClassFunction ↥L ℂ)) he))] at hite
+  · intro x hx
+    have hxne : ψ.conj ≠ x := by rintro rfl; exact hψcnotS1 hx
+    have hite := OddOrder.RepresentationTheory.irreducibleCharacter_inner_eq_ite
+      ⟨ψ.conj, Sset_isIrreducibleCharacter hyp hfrob hψconjS⟩
+      ⟨x, Sset_isIrreducibleCharacter hyp hfrob (hS₁sub hx)⟩
+    rwa [if_neg (fun he => hxne
+      (congrArg (fun c : IrreducibleCharacter ↥L => (c : ClassFunction ↥L ℂ)) he))] at hite
+
+open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
+open OddOrder.Peterfalvi.S09.Cert in
 /-- **`S(H′)` member differences are `A(L)`-supported** — the `hab`-free subfamily analogue of
 `Sset_diff_supported` for the (6.5.c) `hcoh`.  Members of `S(⁅K,K⁆)` vanish off `H` (as `Sset`
 members, `Sset_vanishes_off_H`) and share the constant degree `|L:K|` at `1`
