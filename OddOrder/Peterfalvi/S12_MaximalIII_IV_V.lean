@@ -8066,6 +8066,60 @@ theorem Hypothesis.SHC_residual_eq_omegaSigma_diff [Finite G] {M : Subgroup G}
   exact tic.eq_smul_chiFam_diff_of_vanishOnV hVeq app hYZ (hnorm2case ha02) hPne hδpm hψV
 
 open scoped FiniteInduce in
+/-- **Peterfalvi (11.8.5) `G`-side `ω`-grid pairing** `(ω_{ij}^σ − ω_{i0}^σ, ∑_r ω_{r0}^σ) = −1`
+(`0 < j`).  By `alignedOmegaSigmaGrid_inner`: `(ω_{ij}^σ, ω_{r0}^σ) = 0` (`j ≠ 0`) and
+`(ω_{i0}^σ, ω_{r0}^σ) = [i = r]`, so the sum is `0 − 1 = −1`.  Feeds the `(α_{ij}^τ, ∑ω_{r0}^σ) = −δ`
+step of the (11.8.5) two-way computation. -/
+theorem Hypothesis.alignedOmegaSigma_diff_inner_zeroColumnSum [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} (hyp : Hypothesis M)
+    (hodd : Odd (Nat.card G)) (i : Fin hyp.w1) {j : Fin hyp.w2} (hj0 : j ≠ 0) :
+    ClassFunction.inner
+        (hyp.alignedOmegaSigmaGrid hG hodd i j - hyp.alignedOmegaSigmaGrid hG hodd i 0)
+        (∑ r : Fin hyp.w1, hyp.alignedOmegaSigmaGrid hG hodd r 0) = -1 := by
+  classical
+  rw [ClassFunction.inner_sub_left, OddOrder.RepresentationTheory.inner_sum_right,
+    OddOrder.RepresentationTheory.inner_sum_right]
+  have h1 : ∀ r : Fin hyp.w1, ClassFunction.inner (hyp.alignedOmegaSigmaGrid hG hodd i j)
+      (hyp.alignedOmegaSigmaGrid hG hodd r 0) = 0 := fun r => by
+    rw [hyp.alignedOmegaSigmaGrid_inner hG hodd i r j 0, if_neg]; rintro ⟨_, h⟩; exact hj0 h
+  have h2 : ∀ r : Fin hyp.w1, ClassFunction.inner (hyp.alignedOmegaSigmaGrid hG hodd i 0)
+      (hyp.alignedOmegaSigmaGrid hG hodd r 0) = (if i = r then (1 : ℂ) else 0) := fun r => by
+    rw [hyp.alignedOmegaSigmaGrid_inner hG hodd i r 0 0]; simp
+  rw [Finset.sum_congr rfl (fun r _ => h1 r), Finset.sum_congr rfl (fun r _ => h2 r),
+    Finset.sum_const_zero, Finset.sum_ite_eq, if_pos (Finset.mem_univ i)]
+  ring
+
+open scoped FiniteInduce in
+/-- **Peterfalvi (11.8.5) `G`-side (5.3.b) sum** `(ζ^{τ₁}, ∑_r ω_{r0}^σ) = 0`: each
+`(ζ^{τ₁}, ω_{r0}^σ) = 0` (`SHC_extension_inner_alignedOmegaSigma_eq_zero`), summed over the rows. -/
+theorem Hypothesis.SHC_extension_inner_zeroColumnOmegaSigma_sum [Finite G] {M : Subgroup G}
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis M) (hodd : Odd (Nat.card G))
+    {ζ : ClassFunction ↥M ℂ} (hζS : ζ ∈ inducedFamily M) (hζirr : IsIrreducibleCharacter ζ)
+    (hζ1 : ζ 1 = (hyp.w1 : ℂ)) (hζne : ζ.conj ≠ ζ) :
+    ClassFunction.inner ((hyp.SHC_isCoherent hG).extension ζ)
+        (∑ r : Fin hyp.w1, hyp.alignedOmegaSigmaGrid hG hodd r 0) = 0 := by
+  rw [OddOrder.RepresentationTheory.inner_sum_right]
+  refine Finset.sum_eq_zero fun r _ => ?_
+  exact hyp.SHC_extension_inner_alignedOmegaSigma_eq_zero hG hodd hζS hζirr hζ1 hζne r 0
+
+open scoped FiniteInduce in
+/-- **Peterfalvi (11.8.5) `G`-side (5.3.b) sum over `S₁`** `(∑_{β∈R} β, ∑_r ω_{r0}^σ) = 0`: each
+`β = λ^{τ₁}` (`hRrev`) is a degree-`w₁` `S(HC)` coherent image, non-real (`inducedFamily_degree_w1_conj_ne`),
+so `(λ^{τ₁}, ∑_r ω_{r0}^σ) = 0` (`SHC_extension_inner_zeroColumnOmegaSigma_sum`), summed over `R`. -/
+theorem Hypothesis.R_sum_inner_zeroColumnOmegaSigma_sum [Finite G] {M : Subgroup G}
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis M) (hodd : Odd (Nat.card G))
+    {R : Finset (ClassFunction G ℂ)}
+    (hRrev : ∀ β ∈ R, ∃ φ : ClassFunction ↥M ℂ, φ ∈ inducedFamily M ∧ IsIrreducibleCharacter φ ∧
+      φ 1 = (hyp.w1 : ℂ) ∧ β = (hyp.SHC_isCoherent hG).extension φ) :
+    ClassFunction.inner (∑ β ∈ R, β)
+        (∑ r : Fin hyp.w1, hyp.alignedOmegaSigmaGrid hG hodd r 0) = 0 := by
+  rw [inner_sum_left]
+  refine Finset.sum_eq_zero fun β hβR => ?_
+  obtain ⟨φ, hφS, hφirr, hφ1, rfl⟩ := hRrev β hβR
+  exact hyp.SHC_extension_inner_zeroColumnOmegaSigma_sum hG hodd hφS hφirr hφ1
+    (hyp.inducedFamily_degree_w1_conj_ne hG hφirr hφ1)
+
+open scoped FiniteInduce in
 /-- **Peterfalvi (11.8), the genuine non-orthogonality** (lane-b W3 obligation, issue 2020).
 
 Under Hypothesis (10.1), there is an irreducible `ζ ∈ S = inducedFamily M` of degree `w₁` —
