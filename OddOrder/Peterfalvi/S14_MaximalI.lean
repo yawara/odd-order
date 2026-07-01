@@ -2057,6 +2057,54 @@ theorem Sset_conjDiff_supported [Finite G] {L : Subgroup G} (hyp : Hypothesis L)
     ⟨Subgroup.mem_subgroupOf.mpr hxH, hx1⟩
 
 open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
+/-- **Orthonormal enumeration of a coherent `S₁ ⊆ S`** — the witness analogue of the Sibley
+`exists_sMemberOrthonormalFamily`, the family-enumeration input of the (5.6) break bound (h56).
+Members of `S₁` are irreducible (`Sset_isIrreducibleCharacter`), so `exists_finEnum_irreducible`
+lists them as `χmem : Fin k → Irr L`; the per-member fields are the witness `Sset` facts (no-real,
+`Sset_conjDiff_supported`, pairwise/self orthonormality), `hS₁conj` supplies `χ̄ ∈ S₁`. -/
+theorem Sset_exists_orthonormalFamily [Finite G] {L : Subgroup G} (hyp : Hypothesis L)
+    (hodd : Odd (Nat.card ↥L)) {C : Subgroup ↥L}
+    (hfrob : OddOrder.Isaacs.Ch06.IsFrobeniusGroup ↥L ((hyp.typeI.typeF.H).subgroupOf L) C)
+    (hAH : hyp.ambientA = ((hyp.typeI.typeF.H) : Set G) \ {1})
+    {S₁ : Set (ClassFunction ↥L ℂ)} (hS₁sub : S₁ ⊆ hyp.Sset)
+    (hS₁conj : OddOrder.Peterfalvi.S03.ClosedUnderConjugate S₁) (hS₁fin : S₁.Finite) :
+    ∃ (k : ℕ) (χmem : Fin k → IrreducibleCharacter ↥L),
+      Function.Injective χmem ∧
+      Set.range (fun j => (χmem j : ClassFunction ↥L ℂ)) = S₁ ∧
+      (∀ j, ¬ ClassFunction.IsReal (χmem j : ClassFunction ↥L ℂ)) ∧
+      (∀ j, ((χmem j : ClassFunction ↥L ℂ).conj - (χmem j : ClassFunction ↥L ℂ)).support ⊆
+        OddOrder.Peterfalvi.S04.supportInSubgroup hyp.ambientA L) ∧
+      (∀ j, (χmem j : ClassFunction ↥L ℂ) ∈ S₁) ∧
+      (∀ j, (χmem j : ClassFunction ↥L ℂ).conj ∈ S₁) ∧
+      (∀ j, ClassFunction.inner (χmem j : ClassFunction ↥L ℂ)
+        (χmem j : ClassFunction ↥L ℂ).conj = 0) ∧
+      (∀ i j, ClassFunction.inner (χmem i : ClassFunction ↥L ℂ)
+        (χmem j : ClassFunction ↥L ℂ) = if i = j then (1 : ℂ) else 0) := by
+  have hS₁irr : ∀ φ ∈ S₁, IsIrreducibleCharacter φ :=
+    fun φ hφ => Sset_isIrreducibleCharacter hyp hfrob (hS₁sub hφ)
+  obtain ⟨k, χmem, hχinj, hrange⟩ :=
+    OddOrder.Peterfalvi.S08.exists_finEnum_irreducible hS₁fin hS₁irr
+  have hmemS1 : ∀ j, (χmem j : ClassFunction ↥L ℂ) ∈ S₁ := by
+    intro j; rw [← hrange]; exact Set.mem_range_self j
+  refine ⟨k, χmem, hχinj, hrange, ?_, ?_, hmemS1, ?_, ?_, ?_⟩
+  · intro j
+    exact Sset_hasNoRealCharacters hyp hodd hfrob (hS₁sub (hmemS1 j))
+  · intro j
+    exact Sset_conjDiff_supported hyp hfrob hAH (hS₁sub (hmemS1 j))
+  · intro j
+    exact hS₁conj (hmemS1 j)
+  · intro j
+    have hχS := hS₁sub (hmemS1 j)
+    have hne : (χmem j : ClassFunction ↥L ℂ) ≠ (χmem j : ClassFunction ↥L ℂ).conj :=
+      fun h => (Sset_hasNoRealCharacters hyp hodd hfrob hχS) h.symm
+    exact Sset_pairwiseOrthogonal hyp hodd hfrob hχS (Sset_closedUnderConjugate hyp hχS) hne
+  · intro i j
+    rw [OddOrder.RepresentationTheory.irreducibleCharacter_inner_eq_ite (χmem i) (χmem j)]
+    rcases eq_or_ne i j with h | h
+    · subst h; simp
+    · rw [if_neg (fun he => h (hχinj he)), if_neg h]
+
+open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
 open OddOrder.Peterfalvi.S09.Cert in
 /-- **`S(H′)` member differences are `A(L)`-supported** — the `hab`-free subfamily analogue of
 `Sset_diff_supported` for the (6.5.c) `hcoh`.  Members of `S(⁅K,K⁆)` vanish off `H` (as `Sset`
