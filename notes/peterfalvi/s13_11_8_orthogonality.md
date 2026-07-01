@@ -605,3 +605,17 @@ S₂=S(C)−S(HC)。(9.11)→S₂ coherent (11.7)、μ_k∈S₂ (9.8.b/9.9.b)。
 **次 = (11.8.2) 残**: isometry lift `⟨α_{ij}^τ,(ζ−η)^τ⟩=−n` (tau_inner_eq_of_supported、ζ−η supported)
 + orthonormal projection (α_{ij}^τ = X−nζ^{τ₁}+a∑λ^{τ₁}、係数 a、X⊥S₁^{τ₁}) + norm bound
 ((a−n)²+(|S₁|−1)a²≤n²+2 → a∈{0,1,2}) + a∈{0,2}→X=ω^σ diff (‖X‖²=2)。
+
+## 2026-07-02 cont.³² (lane-a) — (11.8.2) 係数構造 landed (general bridge + coefficient relation)
+2 lemma landed (S12, leaf green):
+- **`Hypothesis.tau_sub_eq_SHC_extension`**: 一般 `(ζ−η)^τ = ζ^{τ₁}−η^{τ₁}` (ζ,η∈S(HC) degree-w₁ 既約)。
+  cont.²⁸ bridge (η=ζ̄) の一般化 (inducedFamily_sub_support で同次数差 A₀-supported)。
+- **`Hypothesis.muGridAlpha_tau_inner_SHC_extension_sub`**: `⟨α^τ,ζ^{τ₁}⟩−⟨α^τ,η^{τ₁}⟩=−n` (∀η∈S(HC),η≠ζ)。
+  = general bridge + tau_inner_eq_of_supported (isometry) + muGridAlpha_inner_zeta_sub_irr (cont.³¹ source −n)。
+  ⟹ **projection 係数構造**: c_η:=⟨α^τ,η^{τ₁}⟩=a (η≠ζ で constant)、c_ζ=a−n。
+  ∴ α^τ = X − nζ^{τ₁} + a∑_{λ∈S₁}λ^{τ₁} (X⊥S₁^{τ₁})。
+
+**次 = (11.8.2) 残 = orthonormal projection + norm bound**:
+- projection: X:=α^τ−∑_λ c_λ λ^{τ₁} ⊥ S₁^{τ₁} (orthonormal API); ‖α^τ‖²=‖X‖²+∑|c_λ|² (Parseval)。
+- norm: ‖α^τ‖²=2+n² (`muGridAlpha_tau_inner_self` coh-free ✅) ⟹ (a−n)²+(|S₁|−1)a²≤2+n² ⟹ |S₁|a²−2an≤2
+  ⟹ n(a²−2a)≤2 (n=|S₁|=(u−1)/q, 11.8.1) ⟹ a∈{0,1,2}。a∈{0,2}⟹‖X‖²=2⟹X=ω^σ diff (‖X‖²=2、10.5 同様)。
