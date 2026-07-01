@@ -2105,6 +2105,50 @@ theorem Sset_exists_orthonormalFamily [Finite G] {L : Subgroup G} (hyp : Hypothe
     · rw [if_neg (fun he => h (hχinj he)), if_neg h]
 
 open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
+/-- **A member's degree is `d·|L:K|`** (`d = θ(1)` the source degree) — the integer degree-ratio
+input of the (5.6) degree data (h56).  `χ = Ind_K^L θ` has `χ(1) = |L:K|·θ(1)` (`induce_apply_one`),
+`θ(1)` a positive natural (`θ` irreducible). -/
+theorem Sset_charValue_one_eq_mul_index [Finite G] {L : Subgroup G} (hyp : Hypothesis L)
+    {χ : ClassFunction ↥L ℂ} (hχ : χ ∈ hyp.Sset) :
+    ∃ d : ℕ, 0 < d ∧
+      (χ : ↥L → ℂ) 1 = (d : ℂ) * (((hyp.typeI.typeF.H).subgroupOf L).index : ℂ) := by
+  classical
+  simp only [Hypothesis.Sset, Set.mem_setOf_eq] at hχ
+  obtain ⟨θ, -, rfl⟩ := hχ
+  obtain ⟨d, hd0, hd1, -⟩ := θ.isIrreducible.exists_natDegree_charValue_one_dvd_card
+  refine ⟨d, hd0, ?_⟩
+  rw [ClassFunction.induce_apply_one, hd1]
+  ring
+
+open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
+open OddOrder.Peterfalvi.S09.Cert in
+/-- **A scaled difference `χ − m·χ′` is `A(L)`-supported** when `χ(1) = m·χ′(1)` (any `χ, χ′ ∈ S`) —
+the per-member scaled-difference support of the (5.6) degree data (h56).  Off `H` both vanish
+(`Sset_vanishes_off_H`); at `1` the degree relation makes it vanish; so it is supported on
+`H^# = A(L)`. -/
+theorem Sset_scaledDiff_supported [Finite G] {L : Subgroup G} (hyp : Hypothesis L) {C : Subgroup ↥L}
+    (hfrob : OddOrder.Isaacs.Ch06.IsFrobeniusGroup ↥L ((hyp.typeI.typeF.H).subgroupOf L) C)
+    (hAH : hyp.ambientA = ((hyp.typeI.typeF.H) : Set G) \ {1})
+    {χ χ' : ClassFunction ↥L ℂ} (hχ : χ ∈ hyp.Sset) (hχ' : χ' ∈ hyp.Sset) {m : ℕ}
+    (hdeg : (χ : ↥L → ℂ) 1 = (m : ℂ) * (χ' : ↥L → ℂ) 1) :
+    (χ - m • χ').support ⊆ OddOrder.Peterfalvi.S04.supportInSubgroup hyp.ambientA L := by
+  rw [show (m • χ' : ClassFunction ↥L ℂ) = (m : ℂ) • χ' from
+    (Nat.cast_smul_eq_nsmul ℂ m χ').symm]
+  intro x hx
+  have hx0 : (χ - (m : ℂ) • χ') x ≠ 0 := ClassFunction.mem_support.mp hx
+  rw [ClassFunction.sub_apply, ClassFunction.smul_apply] at hx0
+  have hxH : (x : G) ∈ hyp.H := by
+    by_contra h
+    apply hx0
+    rw [Sset_vanishes_off_H hyp hχ h, Sset_vanishes_off_H hyp hχ' h]; ring
+  have hx1 : x ≠ 1 := by
+    rintro rfl
+    apply hx0
+    rw [hdeg]; ring
+  exact (mem_supportInSubgroup_sharp_subgroupOf_iff hyp.typeI.typeF.H hAH x).mpr
+    ⟨Subgroup.mem_subgroupOf.mpr hxH, hx1⟩
+
+open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
 open OddOrder.Peterfalvi.S09.Cert in
 /-- **`S(H′)` member differences are `A(L)`-supported** — the `hab`-free subfamily analogue of
 `Sset_diff_supported` for the (6.5.c) `hcoh`.  Members of `S(⁅K,K⁆)` vanish off `H` (as `Sset`
