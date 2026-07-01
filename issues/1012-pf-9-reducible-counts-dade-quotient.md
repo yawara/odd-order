@@ -1978,3 +1978,26 @@ step 2 (regularity crux) 完成後の最後の assembly ゆえ、深いが grind
   (ζ∉Xmu 直接、hIM 経由不要)、degree qu (`hcZeta_induceHU_apply_one`)。
 - **共有 helper 案** `caseA_reducible_source_eq_hcZeta`: reducible φ∈𝒮(H₀) ⟹ ∃θbar regular,
   φ=induceHU(Ind_{HC}(hcPsi θbar))。degree lemma と Xmu 全射の両方が使う extraction+C-kernel+eq_hcZeta。
+
+## conjunct (c) = 9.8.c 完成 (2026-07-02 cont.²⁰) — 𝒮(H₀C) irreducible degree-qu
+
+**✅✅✅ 9.8.c 完全クローズ (全 axiom-clean [propext, Classical.choice, Quot.sound])**。step-5 の headline
+payoff。`caseA_character_counts` (末尾へ relocate 済) の conjunct (b)+(c) proven、残 (d) のみ sorry
+(S11:8343)。以下 landed (commits):
+- **`caseA_reducible_source_eq_hcZeta`** (shared extraction core): reducible φ∈𝒮(H₀) ⟹ ∃regular θbar,
+  φ=Ind_{HU}^M(Ind_{HC}(hcPsi θbar))。degree lemma と Xmu 全射が共有。
+- **`caseA_regular_inflation_inertia_eq`** / **`caseA_hcZeta_irreducible_of_regular`**: regular seed θ ⟹
+  I(θ₀)=HC ⟹ Ind_{HC}(hcPsi θ) irreducible (Xθ-member を IrreducibleCharacter に bundle)。
+- **`caseA_Xmu_card_eq`**: |Xmu|=p-1。ζ↦Ind_{HU}^M ζ が Xmu ≃ {reducible 𝒮(H₀)} の bijection
+  (inj=`caseA_induceHU_inj_of_reducible`、surj=`caseA_reducible_source_eq_hcZeta`)、
+  `induceHU '' Xmu = reducibles` + `Set.ncard_image_of_injOn` + `reducible_count_sOf_H0`。
+  ⚠ `open scoped Classical in` 要 (statement の filter DecidablePred; `set` が classical tactic だけでは
+  拾えない)。
+- **`caseA_exists_irreducible_sOf_H0C`** (= 9.8.c): `exists_regular_not_reducible_of_odd`
+  (X=Xθ, u·|Xθ|=(p-1)^q via `oXtheta_count`, p-1 even ∵ p∣|G| odd, u odd via `u_odd`, |Xmu|=p-1) →
+  ζ∈Xθ\Xmu (Ind_{HU}^M ζ **irreducible** 直接、hIM 不要) → witness=induceHU ζ (∈𝒮(H₀C)
+  `hcZeta_induceHU_mem_sOf`、irreducible、degree qu `hcZeta_induceHU_apply_one`)。
+
+**残 = conjunct (d) = 9.8.d のみ** (S11:8343): `𝒮(H₀U')` に degree qa の irreducible が
+`((p-1)/a)·(|U|/(a|U'|))` 個以上。別構造 (a divisor、Uprime、type-P Galois の a=|U:C_U(...)|)。step-5
+machinery とは独立の新 phase。full build green (3893 jobs)。
