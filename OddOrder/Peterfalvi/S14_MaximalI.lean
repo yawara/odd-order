@@ -342,6 +342,44 @@ theorem fixed_conjClass_eq_one_of_typeF {Γ : Type*} [Group Γ] [Finite Γ]
     (Subgroup.zpowers_le.mpr hzgw) hgzpow
   exact hgU1 (hcent w hwH hw1 (Subgroup.mem_inf.mpr ⟨hgU, hgw⟩))
 
+/-- **Type-`F` fixed-class count is `1`** for `g ∈ U ∖ U₁`: the identity is the unique fixed
+`H`-class (`fixed_conjClass_eq_one_of_typeF`), so `#{fixed classes} = 1`. -/
+theorem card_fixedPoints_conjClassPerm_eq_one_of_typeF {Γ : Type*} [Group Γ] [Finite Γ]
+    {H U U1 : Subgroup Γ} [H.Normal] {g : Γ}
+    (hcop : Nat.Coprime (orderOf g) (Nat.card ↥H)) (hgU : g ∈ U) (hgU1 : g ∉ U1)
+    (hcent : ∀ x ∈ H, x ≠ 1 → U ⊓ Subgroup.centralizer ({x} : Set Γ) ≤ U1) :
+    Nat.card (Function.fixedPoints (ConjClasses.conjByPerm (G := Γ) (H := H) g)) = 1 := by
+  rw [Nat.card_eq_one_iff_unique]
+  refine ⟨⟨fun C D => Subtype.ext ?_⟩,
+    ⟨⟨1, ConjClasses.conjByPerm_one (G := Γ) (H := H) g⟩⟩⟩
+  exact (fixed_conjClass_eq_one_of_typeF hcop hgU hgU1 hcent C.2).trans
+    (fixed_conjClass_eq_one_of_typeF hcop hgU hgU1 hcent D.2).symm
+
+/-- **Peterfalvi (8.2.c): `I(θ) ∩ U ⊆ U₁`** for a type-`F` group.  If `θ ∈ Irr H ∖ {1}` and
+`g ∈ I(θ) ∩ U` but `g ∉ U₁`, then (`g` coprime to `H`) `g` fixes only the identity `H`-class
+(`card_fixedPoints_conjClassPerm_eq_one_of_typeF`), so by Brauer's permutation lemma
+(`fixed_irreducible_eq_trivial_of_card_fixedClasses_eq_one`) `g` fixes only the trivial character —
+contradicting `g ∈ I(θ)`, `θ ≠ 1`.  Hence `g ∈ U₁`.  This is the inertia bound feeding the equal
+degree of the constituents of `Ind_H^L θ` in the general type-I (12.2.a). -/
+theorem typeF_inertia_inf_le_U1 {Γ : Type*} [Group Γ] [Finite Γ]
+    {H U U1 : Subgroup Γ} [H.Normal]
+    (hUHcop : Nat.Coprime (Nat.card ↥U) (Nat.card ↥H))
+    (hcent : ∀ x ∈ H, x ≠ 1 → U ⊓ Subgroup.centralizer ({x} : Set Γ) ≤ U1)
+    (θ : IrreducibleCharacter ↥H) (hθ : θ ≠ trivialIrreducibleCharacter ↥H) :
+    ClassFunction.inertia (θ : ClassFunction ↥H ℂ) ⊓ U ≤ U1 := by
+  intro g hg
+  have hgI := (Subgroup.mem_inf.mp hg).1
+  have hgU := (Subgroup.mem_inf.mp hg).2
+  by_contra hgU1
+  have hcop : Nat.Coprime (orderOf g) (Nat.card ↥H) :=
+    Nat.Coprime.coprime_dvd_left (Subgroup.orderOf_dvd_natCard U hgU) hUHcop
+  have hcard1 := card_fixedPoints_conjClassPerm_eq_one_of_typeF hcop hgU hgU1 hcent
+  have hfixθ : IrreducibleCharacter.conjByPerm (G := Γ) (H := H) g θ = θ := by
+    apply IrreducibleCharacter.ext
+    rw [IrreducibleCharacter.conjByPerm_apply, IrreducibleCharacter.coe_conjBy]
+    exact ClassFunction.mem_inertia.mp hgI
+  exact hθ (fixed_irreducible_eq_trivial_of_card_fixedClasses_eq_one g hcard1 hfixθ)
+
 /-- **Type-`F` induced-character constituent structure** (Peterfalvi (8.2.c) + (1.2)/(1.5.a) +
 (1.7.c) + Clifford; a faithful §8 obligation — the deep content is type-`F` character theory living
 in §8, not §12).  For a type-I maximal `L` and `χ = Ind_H^L θ ∈ S` (`θ ∈ Irr H ∖ {1}`), `χ` is the
@@ -3975,3 +4013,4 @@ theorem theorem88_caseB_holds [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
 end OddOrder.Peterfalvi.S14
 
 #print axioms OddOrder.Peterfalvi.S14.frobenius_typeI_induced_char_constituents
+#print axioms OddOrder.Peterfalvi.S14.fixed_conjClass_eq_one_of_typeF
