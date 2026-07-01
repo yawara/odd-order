@@ -8354,6 +8354,32 @@ theorem Hypothesis.beta_inner_trivial [Finite G] {M : Subgroup G}
   rw [ClassFunction.inner_add_left, ClassFunction.inner_sub_left, ClassFunction.inner_smul_left,
     ClassFunction.inner_smul_left, hατ1, hωdiff1, hζτ1, mul_zero, mul_zero, sub_zero, add_zero]
 
+open scoped FiniteInduce in
+/-- **Peterfalvi (11.8.5), `β ∈ ℤ[Irr G]`**: the (11.8.3) residual `β = α_{ij}^τ − δ(ω_{ij}^σ −
+ω_{i0}^σ) + nζ^{τ₁}` is a virtual character.  `α_{ij}^τ ∈ ZIrr` (`muGridAlpha_tau_mem_ZIrr`), the
+aligned `σ`-grid entries `∈ ZIrr` (`alignedOmegaSigmaGrid_mem_ZIrr`), and `ζ^{τ₁} ∈ ZIrr`
+(`SHC_isCoherent.extension_mem_ZIrr`); `ZIrr G` is closed under `ℤ`/`ℕ`-linear combinations. -/
+theorem Hypothesis.beta_mem_ZIrr [Finite G] {M : Subgroup G}
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis M) (hodd : Odd (Nat.card G))
+    (i : Fin hyp.w1) {j : Fin hyp.w2} (hj0 : j ≠ 0)
+    {ζ : ClassFunction ↥M ℂ} (hζS : ζ ∈ inducedFamily M) (hζirr : IsIrreducibleCharacter ζ)
+    (hζ1 : ζ 1 = (hyp.w1 : ℂ)) {d : ℕ} {δ : ℤ} {n : ℕ}
+    (hdeg : hyp.muGrid hG hodd i j 1 = (d : ℂ)) (hμ0 : hyp.muGrid hG hodd i 0 1 = 1)
+    (hnf : (n : ℤ) * (hyp.w1 : ℤ) = (d : ℤ) - δ) (hδj : hyp.muColumnSign hG hodd j = δ) :
+    (hyp.tau (hyp.muGrid hG hodd i j - (δ : ℂ) • hyp.muGrid hG hodd i 0 - (n : ℂ) • ζ)
+        - (δ : ℂ) • (hyp.alignedOmegaSigmaGrid hG hodd i j - hyp.alignedOmegaSigmaGrid hG hodd i 0)
+        + (n : ℂ) • (hyp.SHC_isCoherent hG).extension ζ) ∈ ZIrr G := by
+  have hαZ := hyp.muGridAlpha_tau_mem_ZIrr hG hodd i hj0 hζS hζirr hdeg hμ0 hζ1 hnf hδj
+  have hζτZ : (hyp.SHC_isCoherent hG).extension ζ ∈ ZIrr G :=
+    (hyp.SHC_isCoherent hG).extension_mem_ZIrr ζ (Submodule.subset_span ⟨hζS, hζirr, hζ1⟩)
+  have hωZ : (hyp.alignedOmegaSigmaGrid hG hodd i j - hyp.alignedOmegaSigmaGrid hG hodd i 0)
+      ∈ ZIrr G :=
+    Submodule.sub_mem _ (hyp.alignedOmegaSigmaGrid_mem_ZIrr hG hodd i j)
+      (hyp.alignedOmegaSigmaGrid_mem_ZIrr hG hodd i 0)
+  refine Submodule.add_mem _ (Submodule.sub_mem _ hαZ ?_) ?_
+  · rw [Int.cast_smul_eq_zsmul]; exact zsmul_mem hωZ δ
+  · rw [Nat.cast_smul_eq_nsmul]; exact nsmul_mem hζτZ n
+
 open scoped Classical FiniteInduce in
 /-- **Peterfalvi (11.8.5), `a = 0` under the (11.8.4) hypothesis** (the residual-orthogonal case).
 Given the (11.8.4) by-contradiction consequence `(μ₀ − ζ)^τ = ∑_r ω_{r0}^σ − ζ^{τ₁}` (`μ₀ = ∑ μ_{i'0}`),
