@@ -133,14 +133,27 @@ structural 入力。
         block scalars `φ : Fin(n+1)→(Ū→*A)` + no-global-scalar (`hconst`) → ratio 埋め込み
         `x↦(φ_{i+1}(x)/φ_0(x))` injective → `|Ū|≤|A|^n=a^{q−1}`。Coq `psi` (PFsection9.v:442) の
         crux を generic 構成。lane a は block scalars φ を供給するだけ (module 分解から)。
-      - [ ] **残: 構造的 block 分解** (deep, type-P-specific): Maschke 半単純 (instance 済) +
-        W₁-permutation で `Hbar=⊕H1^w` (|H1|=p, q blocks) → 各 block の scalar hom φ_i を取り出す
-        + `a∣p−1` (block action → Z_pˣ = SingerField |M|=p 特殊化直接 cite) + `hconst` (Ū に
-        nonidentity global scalar 無し = 型 P quotient 構造)。W₁/Ū 依存ゆえ lane a assembly。
+      - [x] **generic block-scalar extraction** (`LineScalarCharacter.lean`, sorry-free, 2026-07-02):
+        `lineScalarChar ρ hdim : U →* (ZMod p)ˣ` = 各 block (1-dim 𝔽_p-line) 上の U-作用の scalar
+        character (homothety `𝔽_p ≃+* End(line)` 経由) + `lineScalarChar_smul` (`ρ u x = φ u • x`,
+        hconst 変換用) + `card_dvd_sub_one_of_faithful_line` (faithful line → `|U|∣p−1`, `a∣p−1` の
+        generic 版)。Coq `phi w` (PFsection9.v:442) の generic 核。**ExtraspecialSinger の private
+        `card_dvd_sub_one_of_faithful_one_dim` を本 generic に dedup 済** (route B が cite)。
+      - [ ] **残 (lane a assembly, W₁/Ū 依存)**: 構造的 block 分解 `Hbar=⊕H1^w` (Maschke 半単純
+        instance 済 + W₁-permutation, |H1|=p, q blocks) → 各 block を `lineScalarChar` に渡して φ_i
+        family を組む + `hconst` (Ū に nonidentity global scalar 無し = 型 P quotient 構造 = C=1
+        Frobenius, `lineScalarChar_smul` で scalar 等式に変換)。scalar 抽出・`a∣p−1` は本 leaf 供給済。
 - [x] step 3: dichotomy 組立 — **DONE** (`TypePGaloisUBound.lean`,
       `card_le_cyclotomicQuotient_of_faithful_fpf`、sorry-free)。IsSimpleModule で case-split:
       Galois 分岐は完全証明 (SingerLineBound)、non-Galois 分岐は `hReducible` hypothesis
       (caller が imprimitive engine で discharge)。
+- [x] **step 3b: module-level 一発 entry (2026-07-02)** — **DONE** (`TypePGaloisUBound.lean`,
+      `card_le_cyclotomicQuotient_of_blocks`、sorry-free): order-p subrepresentation family +
+      hconst → `|U|≤(p^(n+1)−1)/(p−1)`。`lineScalarChar` 抽出 + `finrank_eq_one_of_card_eq_prime`
+      (card=p→finrank=1) + `card_le_pow_of_block_scalars` + cyclotomic bridge を一本化。これで
+      `hReducible` 枝が block 分解から discharge 可能に (lane a の interface = blocks + hconst のみ)。
+      **σ-theory generic u_bound engine は本 commit で完成** (Galois/non-Galois 両分岐 + module-level
+      entry)。残 = lane a の type-P block 分解 (`Hbar=⊕H1^w`) + hconst (=C=1 Frobenius) の供給のみ。
 
 ## 📣 lane a 向け cite signature (hub 裁定「typeP_Galois を再実装せず本 leaf を cite」)
 
@@ -152,15 +165,63 @@ OddOrder.GroupTheory.RepresentationTheory.TypePGaloisUBound` で全て入る:
   非 Galois 分岐 `hReducible` は下記 engine で discharge。
 - **Galois 分岐** (直接も使える): `card_le_cyclotomicQuotient_of_faithful_irreducible_fpf`
   (`|U|∣(p^q−1)/(p−1)`) / `card_le_cyclotomicQuotient_of_faithful_irreducible_fpf` の ≤ 形。
-- **非 Galois engine**: `card_le_cyclotomicQuotient_of_injective_imprimitive` —
-  imprimitive ratio embedding `Ū↪Fin(q−1)→A` (|A|=a, a≤p−1) → `|U|≤(p^q−1)/(p−1)`。
-  lane a は構造的 imprimitivity (Hbar=⊕H1^w、psi injectivity、a∣p−1=SingerField|M|=p) を
-  組んで本 engine に渡す (W₁ 依存部)。
-- **block a∣p−1**: `RepresentationTheory.SingerField.isCyclic_and_card_dvd_card_sub_one_of_faithful_irreducible`
-  を |M|=p で直接 (別 lemma 不要)。
+- **非 Galois engine (module-level 一発 entry, 推奨)**: `card_le_cyclotomicQuotient_of_blocks` —
+  order-p subrepresentation family `B : Fin(n+1)→Subrepresentation ρ` (各 `Nat.card=p` = block H1^w)
+  + `hconst` (nonidentity で全 block 同一 scalar 無し = C_U(M)=1 mod scalars) → `|U|≤(p^(n+1)−1)/(p−1)`。
+  lane a は **block subrepresentation と hconst のみ供給** — scalar 抽出 (`lineScalarChar`)・ratio embedding・
+  finrank=1 (`finrank_eq_one_of_card_eq_prime`)・算術は本 leaf discharge。`card_le_cyclotomicQuotient_of_faithful_fpf`
+  の `hReducible` 枝はこれで discharge (`hReducible := fun _ => card_le_cyclotomicQuotient_of_blocks …`)。
+- **非 Galois engine (low-level, φ 直接供給)**: `card_le_cyclotomicQuotient_of_injective_imprimitive` —
+  imprimitive ratio embedding `Ū↪Fin(q−1)→A` (|A|=a, a≤p−1) → `|U|≤(p^q−1)/(p−1)`。block を自前で
+  φ family 化したい場合。
+- **block scalar φ_i + a∣p−1**: `RepresentationTheory.lineScalarChar ρ_i hdim_i : U →* (ZMod p)ˣ`
+  (`LineScalarCharacter`) = block i (1-dim 𝔽_p-line) 上の scalar character。`lineScalarChar_smul`
+  (`ρ u x = φ u • x`) で hconst を scalar 等式に変換、`card_dvd_sub_one_of_faithful_line` で
+  `a=|U:C|∣p−1`。lane a は各 block の restricted representation を `lineScalarChar` に渡して
+  `card_le_pow_of_block_scalars` の φ family を組む。
 
-**残 (lane a assembly、W₁ 依存)**: 構造的 imprimitivity 分解 + psi injectivity。generic 算術・
+**残 (lane a assembly、W₁ 依存)**: 構造的 imprimitivity 分解 (`Hbar=⊕H1^w` の internal direct sum
++ 各 block U-invariant) + hconst (C=1 Frobenius)。generic scalar 抽出 (`lineScalarChar`)・算術・
 embedding・両分岐 bound は本 leaf で供給済。
+
+## ✅✅ σ-theory u_bound engine 完成 (2026-07-02) + kernel char 追加
+
+`LineScalarCharacter.lean` に **`lineScalarChar_eq_one_iff`** 追加 (sorry-free): `φ u = 1 ↔ u が
+line を pointwise 固定`。order-p block では「u が block の nontrivial char を固定 ⟺ u が block を
+centralize」(𝔽_p^× free action) = Coq `inertia_irr_prime` (PFsection9.v:948) の module-level 版。
+**lane a §9 caseA の order-p stabilizer=centralizer piece (issue 1012 の piece C) の module-framing
+供給** (lane a の char-inertia framing の代替/補完として cite 可)。
+
+⟹ σ-theory u_bound engine の generic API は完全 (Galois/non-Galois bound + block composite +
+scalar char + kernel char + finrank bridge、全 sorry-free、full build green)。
+
+## 🛑 HUB: lane d cluster boundary — 次 target 要裁定 (policy 7, issue 4014 と同型)
+
+**状況 (code-level 検証済 2026-07-02)**: lane d の担当 (σ-theory + owned S15/BG) の on-feitThompson-path
+ungated genuine work は **σ-theory engine 完成で枯渇**:
+- shared `OddOrder/GroupTheory/**`: **sorry-free** (grep 検証)。σ-theory engine 完成。
+- owned S15_SAndT_Setup: `u_bound`/`P_elementaryAbelian` は lane a §11 gated、char cascade は
+  lane b coherence gated (issue 4014)。
+- owned BG §14–16: 残 sorry は全 off-feitThompson-path (signalizer Thm D/E は char route で bypass、
+  monolith/docstring/orphaned — issue 4014 で検証済)。
+- 群論 spine (Isaacs/BG §1–13/Pf §1–9) は sorry-free。**残る FT work = 指標終盤 §10–16 = 全て
+  active char lane (a §9–13 / b §12+coherence / c §14–16) の territory**。
+
+**⟹ lane d の distinct な group/σ-theory 貢献は実質完了**。次の on-spine work は全て active char
+frontier 内 = **carve せずに触ると dup** (σ-theory dup 前例 = issue 9000 冒頭)。これは cluster-complete
+の **cross-cluster 再配分案件** (issue 4014 = ユーザー裁定の前例) で、within-cluster frontier 選択
+([[feedback-decide-frontier-autonomously]] の射程) ではない。
+
+**HUB/user 裁定を要する選択肢**:
+- (A) lane d を binding γ (§14–16, lane c) の非衝突な structural 部分に signature-contract で carve
+  (例: S16:166 v-bound / S16:3431/3511 IsCyclic — 現 issue 9001 で lane c 割当だが lane d の σ-theory
+  leaf が直接 discharge 可能な構造結論)。
+- (B) lane d が hub-confirmed 非-dup な char shared-infra を claim-build (lane a issue 1012 が flag した
+  characterKernel-Subgroup 等、ただし lane a active caseA と重複回避の hub 確認要)。
+- (C) lane d を off-path BG appendix (3 冊網羅の長期目標、FT 経路外) に回す — 現方針の FT-path 限定に反する。
+
+lane d は裁定待ちの間 idle にせず、次 tick で main 同期して (a/b/c の進捗で新規 consumable が出たか /
+hub 応答があるか) 再評価する。
 
 ## 参照
 

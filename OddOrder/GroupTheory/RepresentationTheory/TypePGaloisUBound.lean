@@ -5,6 +5,8 @@ Authors: Yawara Ishida
 -/
 import OddOrder.GroupTheory.RepresentationTheory.SingerLineBound
 import OddOrder.GroupTheory.RepresentationTheory.SemilinearImprimitiveBound
+import OddOrder.GroupTheory.RepresentationTheory.LineScalarCharacter
+import Mathlib.RepresentationTheory.Subrepresentation
 
 /-!
 # The `typeP_Galois` `u`-bound dichotomy: `|U| ≤ (p^q − 1)/(p − 1)`
@@ -15,13 +17,14 @@ The σ-theory foundation entry point (issue 9000, step 3) for Peterfalvi (13.2.c
 
 * **Galois** (`IsSimpleModule` — `U` irreducible): the Singer line bound
   `card_le_cyclotomicQuotient_of_faithful_irreducible_fpf` (`SingerLineBound`) gives it directly.
-* **non-Galois** (reducible): the imprimitive block structure gives `|U| ≤ (p−1)^{q−1} ≤ (p^q−1)/(p−1)`
+* **non-Galois** (reducible): the imprimitive block structure gives
+  `|U| ≤ (p−1)^{q−1} ≤ (p^q−1)/(p−1)`
   (`card_le_cyclotomicQuotient_of_injective_imprimitive`, `SemilinearImprimitiveBound`).
 
-This file packages the case split so a consumer (lane a's Pf (9.7) assembly / `basic_structure`) cites
-one lemma.  The **non-Galois branch is exposed as a hypothesis** `hReducible` — the imprimitive
-decomposition (`Hbar = ⊕ H1^w`, the ratio embedding `Ū ↪ ℤ_a^{q−1}`) is the `𝔽_p`-module +
-`W₁`-permutation content, discharged by the caller via
+This file packages the case split so a consumer (lane a's Pf (9.7) assembly / `basic_structure`)
+cites one lemma.  The **non-Galois branch is exposed as a hypothesis** `hReducible` — the
+imprimitive decomposition (`Hbar = ⊕ H1^w`, the ratio embedding `Ū ↪ ℤ_a^{q−1}`) is the
+`𝔽_p`-module + `W₁`-permutation content, discharged by the caller via
 `card_le_cyclotomicQuotient_of_injective_imprimitive`; the Galois branch is fully proven here.
 -/
 
@@ -32,10 +35,10 @@ universe u
 /-- **`typeP_Galois` `u`-bound dichotomy** (Peterfalvi (13.2.c)): a faithful, fixed-point-free
 abelian `U`-action on `M ≅ 𝔽_p^q` has `|U| ≤ (p^q − 1)/(p − 1)`.
 
-The Galois branch (`IsSimpleModule`) is discharged by the Singer line bound; the non-Galois branch is
-supplied by `hReducible` (the imprimitive `u`-bound, `card_le_cyclotomicQuotient_of_injective_imprimitive`
-applied to the caller's block decomposition).  Combining both is the `u_bound` field of
-`BasicStructureData`. -/
+The Galois branch (`IsSimpleModule`) is discharged by the Singer line bound; the non-Galois branch
+is supplied by `hReducible` (the imprimitive `u`-bound,
+`card_le_cyclotomicQuotient_of_injective_imprimitive` applied to the caller's block decomposition).
+Combining both is the `u_bound` field of `BasicStructureData`. -/
 theorem card_le_cyclotomicQuotient_of_faithful_fpf
     {p q : ℕ} [Fact p.Prime] {U M : Type u}
     [CommGroup U] [Finite U] [AddCommGroup M] [Finite M]
@@ -52,5 +55,40 @@ theorem card_le_cyclotomicQuotient_of_faithful_fpf
   · haveI := hsimple
     exact card_le_cyclotomicQuotient_of_faithful_irreducible_fpf hq hcardM hfaith σ hfpf
   · exact hReducible hsimple
+
+/-- **Non-Galois `u`-bound from an imprimitive block decomposition** (Peterfalvi (9.7)(a),
+module-level entry point): if the abelian `U`-action on `M` restricts to `q = n+1` order-`p`
+subrepresentations `B i` (each an `𝔽_p`-line — the imprimitivity blocks `H1^w`) with **no
+nonidentity element acting by a single scalar on every block** (`hconst`, i.e. `C_U(M) = 1` modulo
+scalars), then `|U| ≤ (p^q − 1)/(p − 1)`.
+
+Assembles the block scalar characters `φ_i = lineScalarChar (B i)` (the action of `U` on each line)
+into `card_le_pow_of_block_scalars` (`|U| ≤ (p−1)^{q−1}`) and lifts through
+`pow_sub_one_le_cyclotomicQuotient`.  This discharges the `hReducible` branch of
+`card_le_cyclotomicQuotient_of_faithful_fpf`: the caller (the Pf (9.7)(a) assembly, lane a) supplies
+only the block subrepresentations and `hconst` — the `W₁`-permuted `𝔽_p`-module content; scalar
+extraction, the ratio embedding, and the arithmetic are all discharged here. -/
+theorem card_le_cyclotomicQuotient_of_blocks {p : ℕ} [Fact p.Prime]
+    {U M : Type u} [CommGroup U] [Finite U] [AddCommGroup M] [Module (ZMod p) M] [Finite M]
+    {n : ℕ} (ρ : Representation (ZMod p) U M) (B : Fin (n + 1) → Subrepresentation ρ)
+    (hBcard : ∀ i, Nat.card (B i).toSubmodule = p)
+    (hconst : ∀ u : U,
+        (∀ i : Fin (n + 1),
+          lineScalarChar (B i).toRepresentation (finrank_eq_one_of_card_eq_prime (hBcard i)) u
+            = lineScalarChar (B 0).toRepresentation (finrank_eq_one_of_card_eq_prime (hBcard 0)) u)
+        → u = 1) :
+    Nat.card U ≤ (p ^ (n + 1) - 1) / (p - 1) := by
+  have hb : Nat.card U ≤ Nat.card (ZMod p)ˣ ^ n :=
+    card_le_pow_of_block_scalars
+      (fun i => lineScalarChar (B i).toRepresentation (finrank_eq_one_of_card_eq_prime (hBcard i)))
+      hconst
+  have hunits : Nat.card (ZMod p)ˣ = p - 1 := by
+    rw [Nat.card_eq_fintype_card, ZMod.card_units_eq_totient, Nat.totient_prime Fact.out]
+  rw [hunits] at hb
+  calc Nat.card U ≤ (p - 1) ^ n := hb
+    _ ≤ (p ^ (n + 1) - 1) / (p - 1) := by
+        have h := pow_sub_one_le_cyclotomicQuotient (p := p) (q := n + 1)
+          (Fact.out : p.Prime).two_le (by omega)
+        simpa using h
 
 end OddOrder.RepresentationTheory

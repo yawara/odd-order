@@ -1521,3 +1521,35 @@ issue 9001 に **HUB 裁定** (2026-07-02 cron tick)。coordination-block 解消
 2. **(6.5.c)** producer (case c) → `frobenius_typeI_coherent_of_cyclicQuotient` 埋め。→ witness coherence 完成。
 3. **構成的 Clifford** (M-side、大規模) → `typeI_induced_char_constituents` 等。
 これで witness_L_coherent → (12.13)/(12.14)/(12.16) の witness Dade 経路が全 unblock。
+
+### ✅ loop⁶⁵ (2026-07-02 lane-b): (A') S07 lattice-relative refactor 完了 + case-b 着手
+
+**(A') S07 refactor landing (commit `d31b9763`, full build green 3893 jobs)**: `S07.Hypothesis.tau_isometry`
+(global `IsIntegralIsometry`) → 差-等長 `tau_isometry_diff` (`∀ a b c d ∈ S, ⟨τ(a−b),τ(c−d)⟩=⟨a−b,c−d⟩`)。
+helper `inner_eq_on_zSpan_pair` (差-等長→zSpan 双線型拡張、`Submodule.mem_span_pair`+2-phase simp)、`pairDecomp`
+に `hζ` 追加、`commonImage_inner_other` は直接 `tau_isometry_diff`、`xFamily_inner` を `hdiff` 版に (= S14
+`xFamily_inner_dade` を subsume、後で dedup 可)、unused `tau_inner_eq` 削除。**`coherent_of_constant_degree`
+が witness Dade map で使えるように**。S07.Hypothesis は未 construction ゆえ lane-a regression 皆無。
+
+**case-b character-side helpers (commit `7c21ca08`)**: `Sset_hasNoRealCharacters` / `Sset_pairwiseOrthogonal`
+を実証明 (既存 `frobenius_induce_char_singleton` 再利用)。⚠ **新 helper には `open scoped …S12.FiniteInduce in`
+必須** (Fintype ↥L 供給; 無いと instance synth 失敗)。
+
+**残: `frobenius_typeI_coherent_of_abelianKernel` (S14:1857, sorry) の埋め** = witness `Hypothesis L` から
+`S07.Hypothesis hyp.Sset hyp.A` を構成 → `coherent_of_constant_degree` 呼び出し。field 別ソース (全 API 確認済):
+- `tau := hyp.tau`; `conjugate_closed := Sset_closedUnderConjugate`; `no_real := Sset_hasNoRealCharacters`✓;
+  `pairwise := Sset_pairwiseOrthogonal`✓。
+- `tau_isometry_diff`: `dadeIntegralCharacterMap_inner_eq_on_supported_span` (S07:5344) + 差が `hyp.A`-supported。
+  A0(dade)=typeIA、supportInSubgroup typeIA L = hyp.A。**差 supported は下記 `Sset_diff_supported` を作って共用**。
+- `difference_image`: `dadeCharacterDifferenceImageOfDiff` (S07:5540, χ を `IrreducibleCharacter ↥L` 化 (=
+  frobenius_induce_char_singleton の ξ) + ¬IsReal + `(χ̄−χ).support ⊆ supportInSubgroup typeIA L`)。
+- `difference_images_orthogonal` (5.2.e): **最深**。`dadeIntegralCharacterMap_inner_conjDifference_eq_zero`
+  (S07:5674) か `toOrthonormalImage_inner_eq_zero_across` 経由。要精査。
+- `coherent_of_constant_degree` の hyp: `hSfin` (Sset 有限, θ-param), `hcard` (≥2: χ≠χ̄ 非実+conj閉), `hirr`
+  (`inner_self_induce_eq_one_of_frobeniusGroup`), `hZIrr` (Dade supported diff→ZIrr, 要 infra 確認),
+  `hconst`/`hdeg0` (等次数 [L:H]: `induce_apply_one`+`apply_one_eq_one_of_isMulCommutative`; ⚠ θ の群は
+  `(typeF.H).subgroupOf L` — `_hab` の `IsMulCommutative ↥(typeF.H)` から subgroupOf に transfer 要
+  `subgroupOfEquivOfLe` 等), `h1A` (1∉A: typeIA_eq_sharp), `hsuppdiff` (= `Sset_diff_supported`)。
+- `hAH : ambientA = H\{1}` は `typeIA_eq_sharp` (S14:3289) から供給。
+順序: 上流=character/degree facts (tractable) → Dade fields (tau_isometry_diff/difference_image) →
+(5.2.e) difference_images_orthogonal (deep) → assembly。multi-turn 想定。
