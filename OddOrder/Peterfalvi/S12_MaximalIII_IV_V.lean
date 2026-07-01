@@ -7497,6 +7497,69 @@ theorem int_le_of_add_inner_self_eq [Finite G] {A B : ℤ} {Y : ClassFunction G 
   have hle : (A : ℝ) ≤ (B : ℝ) := by linarith
   exact_mod_cast hle
 
+open scoped Classical FiniteInduce in
+/-- **Peterfalvi (11.8.2), the `a ∈ {0, 1, 2}` bound** (given `|S₁| = n`, Peterfalvi (11.8.1)).
+Projecting `α_{ij}^τ` onto the orthonormal `S₁^{τ₁} = R` (`exists_intProjection`) gives integer
+coefficients `c_β = ⟨α_{ij}^τ, β⟩` and remainder `Y ⊥ R`.  The coefficient relation
+(`muGridAlpha_tau_inner_SHC_extension_sub`, cont.³²) forces `c(η^{τ₁}) = a` (constant, `η ≠ ζ`) with
+`a := c(ζ^{τ₁}) + n`, so `c(ζ^{τ₁}) = a − n`.  Parseval (`inner_self_eq_sum_sq_add_of_intProjection`)
++ the sum split (`sum_sq_eq_of_split`) give `‖α_{ij}^τ‖² = (a−n)² + (|R|−1)a² + ‖Y‖²`; with
+`‖α_{ij}^τ‖² = 2 + n²` (`muGridAlpha_tau_inner_self`), `‖Y‖² ≥ 0` (`int_le_of_add_inner_self_eq`),
+and `|R| = n`, this is `n(a²−2a) ≤ 2`, whence `a ∈ {0,1,2}` (`charParam_a_mem_of_norm_ineq`).
+
+`R` and `|R| = n` are supplied by the caller: `R` from `exists_SHC_extension_orthonormal`, and
+`|R| = n` is the (11.8.1) `|S₁| = n` (gated on the §9↔§10 carrier bridge). -/
+theorem Hypothesis.muGridAlpha_tau_proj_a_mem [Finite G] {M : Subgroup G}
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis M) (hodd : Odd (Nat.card G))
+    (i : Fin hyp.w1) {j : Fin hyp.w2} (hj0 : j ≠ 0)
+    {ζ : ClassFunction ↥M ℂ} (hζS : ζ ∈ inducedFamily M) (hζirr : IsIrreducibleCharacter ζ)
+    (hζ1 : ζ 1 = (hyp.w1 : ℂ)) {d : ℕ} {δ : ℤ} {n : ℕ}
+    (hdeg : hyp.muGrid hG hodd i j 1 = (d : ℂ)) (hμ0 : hyp.muGrid hG hodd i 0 1 = 1)
+    (hnf : (n : ℤ) * (hyp.w1 : ℤ) = (d : ℤ) - δ) (hδj : hyp.muColumnSign hG hodd j = δ)
+    (hdζ : hyp.muGrid hG hodd i j 1 ≠ ζ 1) (h0ζ : hyp.muGrid hG hodd i 0 1 ≠ ζ 1)
+    (hδpm : δ = 1 ∨ δ = -1) (hn2 : 2 ≤ n)
+    {R : Finset (ClassFunction G ℂ)} (hRn : R.card = n)
+    (hZ : ∀ β ∈ R, β ∈ ZIrr G)
+    (horth : ∀ α ∈ R, ∀ β ∈ R, ClassFunction.inner α β = if α = β then (1 : ℂ) else 0)
+    (hRmem : ∀ φ : ClassFunction ↥M ℂ, φ ∈ inducedFamily M → IsIrreducibleCharacter φ →
+      φ 1 = (hyp.w1 : ℂ) → (hyp.SHC_isCoherent hG).extension φ ∈ R)
+    (hRrev : ∀ β ∈ R, ∃ φ : ClassFunction ↥M ℂ, φ ∈ inducedFamily M ∧ IsIrreducibleCharacter φ ∧
+      φ 1 = (hyp.w1 : ℂ) ∧ β = (hyp.SHC_isCoherent hG).extension φ) :
+    ∃ a : ℤ, (a = 0 ∨ a = 1 ∨ a = 2) ∧
+      ClassFunction.inner
+        (hyp.tau (hyp.muGrid hG hodd i j - (δ : ℂ) • hyp.muGrid hG hodd i 0 - (n : ℂ) • ζ))
+        ((hyp.SHC_isCoherent hG).extension ζ) = (a : ℂ) - (n : ℂ) := by
+  classical
+  have hζR : (hyp.SHC_isCoherent hG).extension ζ ∈ R := hRmem ζ hζS hζirr hζ1
+  have hαZ := hyp.muGridAlpha_tau_mem_ZIrr hG hodd i hj0 hζS hζirr hdeg hμ0 hζ1 hnf hδj
+  obtain ⟨c, Y, hcoeff, hnorm, hYorth⟩ :=
+    inner_self_eq_sum_sq_add_of_intProjection hαZ hZ horth
+  refine ⟨c ((hyp.SHC_isCoherent hG).extension ζ) + (n : ℤ), ?_, ?_⟩
+  · set a : ℤ := c ((hyp.SHC_isCoherent hG).extension ζ) + (n : ℤ) with hadef
+    have hcζ : c ((hyp.SHC_isCoherent hG).extension ζ) = a - (n : ℤ) := by rw [hadef]; ring
+    have hcη : ∀ β ∈ R, β ≠ (hyp.SHC_isCoherent hG).extension ζ → c β = a := by
+      intro β hβR hβne
+      obtain ⟨η, hηS, hηirr, hη1, rfl⟩ := hRrev β hβR
+      have hηζ : η ≠ ζ := fun h => hβne (by rw [h])
+      have hsub := hyp.muGridAlpha_tau_inner_SHC_extension_sub hG hodd i hj0 hζS hζirr hζ1
+        hηS hηirr hη1 hηζ hdeg hμ0 hnf hδj hdζ h0ζ
+      rw [hcoeff _ hζR, hcoeff _ (hRmem η hηS hηirr hη1)] at hsub
+      have hcast : ((c ((hyp.SHC_isCoherent hG).extension η) : ℤ) : ℂ) = ((a : ℤ) : ℂ) := by
+        rw [hadef]; push_cast; push_cast at hsub; linear_combination -hsub
+      exact_mod_cast hcast
+    have hsplit := sum_sq_eq_of_split hζR hcζ hcη
+    rw [hRn] at hsplit
+    have hnorm2 := hyp.muGridAlpha_tau_inner_self hG hodd i hj0 hζS hζirr hdeg hμ0 hζ1 hnf hδj
+      hdζ h0ζ hδpm
+    rw [hnorm2, hsplit] at hnorm
+    have hineq : (a - (n : ℤ)) ^ 2 + ((n : ℤ) - 1) * a ^ 2 ≤ 2 + (n : ℤ) ^ 2 := by
+      apply int_le_of_add_inner_self_eq (Y := Y)
+      push_cast at hnorm ⊢
+      linear_combination -hnorm
+    have hfinal : (n : ℤ) * (a ^ 2 - 2 * a) ≤ 2 := by nlinarith [hineq]
+    exact charParam_a_mem_of_norm_ineq hn2 hfinal
+  · rw [hcoeff _ hζR]; push_cast; ring
+
 open scoped FiniteInduce in
 /-- **Peterfalvi (11.8), the genuine non-orthogonality** (lane-b W3 obligation, issue 2020).
 
