@@ -6414,6 +6414,71 @@ theorem hcPsi_inertia_index_eq_u [Finite G] {M : Subgroup G}
       = chars.u
   rw [hcPsi_inertia_eq_hc chief θ hθ₀, hc_index_eq_u chars]
 
+/-- **Descent of `HU`-conjugation to `H̄`.**  For `g ∈ HU`, conjugation by `g` on `HC` preserves
+`ker hcHom = H₀C` (`H₀C ◁ HU`, `realizedH0supC_normal_huSub`), so it descends through `hcHom` to an
+endomorphism `A_g` of `H̄`: `QuotientGroup.map` on `HC/H₀C` transported by the second iso
+`hcQuotientEquivHbar`.  Satisfies `A_g ∘ hcHom = hcHom ∘ (conjBy g)` (`hcHom_hcConjDescend`), the
+factoring behind the conjugation-commute `conjBy g (hcPsi θ) = hcPsi (θ ∘ A_g)`. -/
+noncomputable def hcConjDescend [Finite G] {M : Subgroup G}
+    {data : TypesIIIIIIVSetup M} (chief : ChiefFactorData data) (g : ↥(huSub data))
+    [(hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf (huSub data)).Normal] :
+    (↥data.H ⧸ chief.N) →* (↥data.H ⧸ chief.N) :=
+  letI hK : ((((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf (huSub data)).subgroupOf
+      (hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf (huSub data))).Normal :=
+    (realizedH0supC_normal_huSub chief).subgroupOf _
+  (hcQuotientEquivHbar chief).toMonoidHom.comp
+    ((QuotientGroup.map
+        ((((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf (huSub data)).subgroupOf
+          (hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf (huSub data)))
+        ((((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf (huSub data)).subgroupOf
+          (hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf (huSub data)))
+        (ClassFunction.conjByMulEquiv g).toMonoidHom
+        (by
+          intro x hx
+          simp only [Subgroup.mem_comap, MulEquiv.coe_toMonoidHom, Subgroup.mem_subgroupOf,
+            ClassFunction.conjByMulEquiv_apply] at hx ⊢
+          exact (realizedH0supC_normal_huSub chief).conj_mem _ hx g)).comp
+      (hcQuotientEquivHbar chief).symm.toMonoidHom)
+
+/-- **Factoring `A_g ∘ hcHom = hcHom ∘ conjBy g`**: `A_g (hcHom x) = hcHom (g·x·g⁻¹)`.  Unwinding
+`A_g = iso ∘ QuotientGroup.map ∘ iso⁻¹` and `hcHom = iso ∘ mk'`, the `iso⁻¹∘iso` cancels and
+`QuotientGroup.map_mk'` turns `map (mk' x)` into `mk' (conjBy g x)`.  The pointwise identity behind
+the conjugation-commute `conjBy g (hcPsi θ) = hcPsi (θ ∘ A_g)`. -/
+theorem hcConjDescend_hcHom [Finite G] {M : Subgroup G}
+    {data : TypesIIIIIIVSetup M} (chief : ChiefFactorData data) (g : ↥(huSub data))
+    [(hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf (huSub data)).Normal]
+    (x : ↥(hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf (huSub data))) :
+    hcConjDescend chief g (hcHom chief x) = hcHom chief (ClassFunction.conjByMulEquiv g x) := by
+  letI hK : ((((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf (huSub data)).subgroupOf
+      (hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf (huSub data))).Normal :=
+    (realizedH0supC_normal_huSub chief).subgroupOf _
+  simp only [hcConjDescend, hcHom, MonoidHom.comp_apply, MulEquiv.coe_toMonoidHom,
+    MulEquiv.symm_apply_apply, QuotientGroup.map_mk']
+  rw [QuotientGroup.mk'_apply]
+
+/-- **Conjugation-commute for `hcPsi`**: `conjBy g (hcPsi θ) = hcPsi (θ ∘ A_g)` for `g ∈ HU`, where
+`A_g = hcConjDescend g`.  Pointwise: `(conjBy g (hcPsi θ)) y = (hcPsi θ)(g·y·g⁻¹) = θ(hcHom(g·y·g⁻¹))
+= θ(A_g(hcHom y)) = (hcPsi (θ∘A_g)) y`, using the factoring `hcConjDescend_hcHom`.  This is the
+`HU`-conjugation ↔ `Ū`-precomposition equivariance: the `HU`-orbit of `hcPsi θ` consists of the
+`hcPsi (θ∘A_g)`, so the regular-inflated set is conjugation-closed (modulo the case-A regularity of
+`θ∘A_g`) — the `T`-invariance input to the `oXtheta` `card_filter` count. -/
+theorem hcPsi_conjBy_eq [Finite G] {M : Subgroup G}
+    {data : TypesIIIIIIVSetup M} (chief : ChiefFactorData data) (g : ↥(huSub data))
+    (θ : (↥data.H ⧸ chief.N) →* ℂˣ)
+    [(hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf (huSub data)).Normal] :
+    ClassFunction.conjBy g (hcPsi chief θ : ClassFunction
+        ↥(hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf (huSub data)) ℂ)
+      = (hcPsi chief (θ.comp (hcConjDescend chief g)) : ClassFunction
+        ↥(hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf (huSub data)) ℂ) := by
+  ext y
+  have hval : ClassFunction.conjBy g (hcPsi chief θ : ClassFunction
+      ↥(hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf (huSub data)) ℂ) y
+      = (hcPsi chief θ : ClassFunction
+        ↥(hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf (huSub data)) ℂ)
+        (ClassFunction.conjByMulEquiv g y) := rfl
+  rw [hval]
+  simp only [hcPsi, linearIrreducibleCharacter_apply, MonoidHom.comp_apply, hcConjDescend_hcHom]
+
 /-- **`ζ(1) = u`**: the degree of `ζ = Ind_{HC}^{HU}(ψ)` is `u`.  `induce_apply_one` gives
 `ζ(1) = [HU:HC]·ψ(1) = u·1` (`hc_index_eq_u`, and `ψ` linear so `ψ(1)=1`).  This is the degree-`u`
 of the (9.8.c) irreducible; `induceHU ζ` then has degree `q·u = qu`. -/
