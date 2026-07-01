@@ -120,7 +120,11 @@ Coq (1.7)(b) `cfInd_central_Inertia` の hypothesis は `abelian (T/H)` (T=I(θ)
       `restrict_mul`/`compHom_mul` (積が Res/pullback と可換) + `restrict_mul_of_apply_eq_one`
       (`lam` が H 上 1 ⟹ `Res_H(χ·lam)=Res_H χ` = 「χ·Inf(β) は θ 上に lie」)。これで
       `⟨Ind_H^I θ, χ·Inf β⟩ = ⟨θ, Res_H χ⟩ = ⟨θ,θ⟩=1` (χ extends θ の下) が出せる。
-- [ ] **(G2) Gallagher 本体 = decomposition/bijection** — twist-既約 + lies-over は完成。残:
+- [x] **decomposition capstone** — `CharacterProduct.eq_sum_of_inner_eq_one_of_inner_self_eq_card`
+      (cont.¹¹, sorry-free, axiom-clean): `S⊆Irr` の各 χ が `⟨φ,χ⟩=1` かつ `⟨φ,φ⟩=|S|` ⟹ `φ=∑_{χ∈S} χ`
+      (Parseval `⟨φ,φ⟩=∑|⟨φ,χ⟩|²` + normSq≥0 で S 外係数消失、Fourier 展開を collapse)。任意の類関数で成立
+      (ZIrr 仮説不要と判明)。「[I:H] 個 mult-1 constituents が norm² を尽くす ⟹ Ind_H^I θ = それらの和」を出す capstone。
+- [ ] **(G2) Gallagher 本体 = decomposition/bijection** — twist-既約 + lies-over + capstone は完成。残:
       **(a) 単射/全射/[I:H] 個** (I/H abelian ⟹ Irr(I/H)=linear、count)。
       **⚠ 真の深い blocker = extension (G1) `θ→χ∈Irr(I)`** (Isaacs 6.28 coprime、`Res_H χ=θ`): **repo に infra
       皆無** (grep 確認、char-extension/determinant/coprime-cohomology いずれも未収録)。これが decomposition

@@ -7,6 +7,8 @@ import OddOrder.GroupTheory.RepresentationTheory.Clifford
 import OddOrder.GroupTheory.RepresentationTheory.InducedIrreducible
 import OddOrder.GroupTheory.RepresentationTheory.LinearCharacter
 
+set_option linter.unusedFintypeInType false
+
 /-!
 # Pointwise product of class functions; products of characters
 
@@ -133,8 +135,8 @@ theorem inner_mul_self_eq_of_star_mul_self_eq_one {G : Type*} [Group G] [Fintype
   rw [show χ g * lam g * (star (χ g) * star (lam g))
         = χ g * star (χ g) * (lam g * star (lam g)) from by ring, hlam g, mul_one]
 
-/-- **An irreducible character has squared norm one** (`⟨χ, χ⟩ = 1`), `Prop`-level restatement of the
-orthonormality `irreducibleCharacter_inner_eq_ite` for the bundled `⟨χ, hχ⟩ : IrreducibleCharacter G`. -/
+/-- **An irreducible character has squared norm one** (`⟨χ, χ⟩ = 1`) — the `Prop`-level restatement
+of orthonormality (`irreducibleCharacter_inner_eq_ite`) for the bundled `⟨χ, hχ⟩`. -/
 theorem IsIrreducibleCharacter.inner_self_eq_one {G : Type*} [Group G] [Finite G] [Fintype G]
     [Invertible (Nat.card G : ℂ)] {χ : ClassFunction G ℂ} (hχ : IsIrreducibleCharacter χ) :
     ClassFunction.inner χ χ = 1 := by
@@ -172,11 +174,11 @@ theorem isIrreducibleCharacter_mul_of_unit_norm {G : Type*} [Group G] [Finite G]
   exact isIrreducibleCharacter_of_inner_self_one_of_apply_one_pos hzirr hnorm hpos
 
 /-- **A linear character has unit norm at every element.**  For `χ : H →* ℂˣ` on a *finite* group,
-the value `(χ h : ℂ)` is a root of unity — `(χ h)^{|H|} = χ(h^{|H|}) = χ(1) = 1` (`pow_card_eq_one'`) —
-so `‖χ h‖ = 1` (`Complex.norm_eq_one_of_pow_eq_one`), whence `star (χ h) = (χ h)⁻¹`
+the value `(χ h : ℂ)` is a root of unity (`(χ h)^{|H|} = χ(h^{|H|}) = 1`, `pow_card_eq_one'`), so
+`‖χ h‖ = 1` (`Complex.norm_eq_one_of_pow_eq_one`), whence `star (χ h) = (χ h)⁻¹`
 (`RCLike.inv_eq_conj`) and `(χ h) · star (χ h) = 1`.  This supplies the unit-norm hypothesis of
 `isIrreducibleCharacter_mul_of_unit_norm`, so twisting an irreducible character by the linear
-character `linearClassFunction χ` (e.g. `Inf(β)` in Gallagher's theorem) preserves irreducibility. -/
+character `linearClassFunction χ` (`Inf(β)` in Gallagher) preserves irreducibility. -/
 theorem linearClassFunction_mul_star_self_eq_one {H : Type*} [Group H] [Finite H]
     (χ : H →* ℂˣ) (h : H) :
     (linearClassFunction χ) h * star ((linearClassFunction χ) h) = 1 := by
@@ -206,13 +208,82 @@ theorem isIrreducibleCharacter_mul_linearClassFunction {G : Type*} [Group G] [Fi
 
 /-- **An inflated linear character is `1` on the normal subgroup.**  For `χbar : (G ⧸ H) →* ℂˣ`,
 the linear character `Inf(χbar) = linearClassFunction (χbar ∘ mk' H)` of `G` takes the value `1` at
-every `x ∈ H` (the quotient map kills `H`).  Combined with `ClassFunction.restrict_mul_of_apply_eq_one`
-this gives `Res_H (χ · Inf(χbar)) = Res_H χ`: the Gallagher twist `χ · Inf(β)` lies over the same
+every `x ∈ H` (the quotient map kills `H`).  Combined with
+`ClassFunction.restrict_mul_of_apply_eq_one` this gives `Res_H (χ · Inf(χbar)) = Res_H χ`: the
+Gallagher twist `χ · Inf(β)` lies over the same
 character of `H` as `χ`. -/
 theorem linearClassFunction_comp_mk'_apply_eq_one {G : Type*} [Group G] {H : Subgroup G} [H.Normal]
     (χbar : (G ⧸ H) →* ℂˣ) {x : G} (hx : x ∈ H) :
     (linearClassFunction (χbar.comp (QuotientGroup.mk' H))) x = 1 := by
   rw [linearClassFunction_apply, MonoidHom.comp_apply, QuotientGroup.mk'_apply,
     (QuotientGroup.eq_one_iff x).mpr hx, map_one, Units.val_one]
+
+/-- **Enough multiplicity-one constituents recover a class function.**  If a finite set `S` of
+irreducible characters each occurs in `φ` with multiplicity one (`⟨φ, χ⟩ = 1`), and the squared
+norm `⟨φ, φ⟩` equals `|S|`, then `φ = ∑_{χ ∈ S} χ` — no other irreducibles occur.
+
+Parseval `⟨φ, φ⟩ = ∑_{χ ∈ Irr} |⟨φ, χ⟩|²` (from the Fourier expansion
+`sum_inner_irreducibleCharacter_smul`) plus the hypotheses force `∑_{χ ∉ S} |⟨φ, χ⟩|² = 0`, so every
+Fourier coefficient off `S` vanishes; the expansion then collapses to `∑_{χ ∈ S} χ`.  This is the
+capstone that turns "`[I:H]` distinct mult-one constituents of `Ind_H^I θ`" into the Gallagher
+decomposition `Ind_H^I θ = ∑_β χ·Inf(β)`. -/
+theorem eq_sum_of_inner_eq_one_of_inner_self_eq_card {G : Type*} [Group G] [Finite G] [Fintype G]
+    [Invertible (Nat.card G : ℂ)] [Fintype (IrreducibleCharacter G)] {φ : ClassFunction G ℂ}
+    {S : Finset (IrreducibleCharacter G)}
+    (h1 : ∀ χ ∈ S, ClassFunction.inner φ (χ : ClassFunction G ℂ) = 1)
+    (hnorm : ClassFunction.inner φ φ = (S.card : ℂ)) :
+    φ = ∑ χ ∈ S, (χ : ClassFunction G ℂ) := by
+  classical
+  -- Parseval: `⟨φ, φ⟩ = ∑_χ ⟨φ,χ⟩ · star ⟨φ,χ⟩`.
+  have hpars : ClassFunction.inner φ φ
+      = ∑ χ : IrreducibleCharacter G, ClassFunction.inner φ (χ : ClassFunction G ℂ)
+          * star (ClassFunction.inner φ (χ : ClassFunction G ℂ)) := by
+    calc ClassFunction.inner φ φ
+        = ClassFunction.inner (∑ χ : IrreducibleCharacter G,
+            ClassFunction.inner φ (χ : ClassFunction G ℂ) • (χ : ClassFunction G ℂ)) φ := by
+          rw [sum_inner_irreducibleCharacter_smul]
+      _ = ∑ χ : IrreducibleCharacter G, ClassFunction.inner
+            (ClassFunction.inner φ (χ : ClassFunction G ℂ) • (χ : ClassFunction G ℂ)) φ :=
+          inner_sum_left _ _ _
+      _ = _ := by
+          refine Finset.sum_congr rfl fun χ _ => ?_
+          rw [ClassFunction.inner_smul_left, inner_conj_symm φ (χ : ClassFunction G ℂ)]
+  -- The `S`-terms already account for the full norm, so the complement sum vanishes.
+  have hSsum : ∑ χ ∈ S, ClassFunction.inner φ (χ : ClassFunction G ℂ)
+      * star (ClassFunction.inner φ (χ : ClassFunction G ℂ)) = (S.card : ℂ) := by
+    rw [Finset.sum_congr rfl fun χ hχ => by rw [h1 χ hχ, star_one, mul_one],
+      Finset.sum_const, nsmul_eq_mul, mul_one]
+  have hcompl : ∑ χ ∈ Finset.univ \ S, ClassFunction.inner φ (χ : ClassFunction G ℂ)
+      * star (ClassFunction.inner φ (χ : ClassFunction G ℂ)) = 0 := by
+    have key : (∑ χ ∈ Finset.univ \ S, ClassFunction.inner φ (χ : ClassFunction G ℂ)
+          * star (ClassFunction.inner φ (χ : ClassFunction G ℂ)))
+        + ∑ χ ∈ S, ClassFunction.inner φ (χ : ClassFunction G ℂ)
+          * star (ClassFunction.inner φ (χ : ClassFunction G ℂ))
+        = ClassFunction.inner φ φ := by
+      rw [hpars, ← Finset.sum_union Finset.sdiff_disjoint,
+        Finset.sdiff_union_of_subset (Finset.subset_univ S)]
+    rw [hSsum, hnorm] at key
+    linear_combination key
+  -- Each complement term is `↑(normSq ⟨φ,χ⟩) ≥ 0`, so the vanishing sum forces `⟨φ,χ⟩ = 0`.
+  have hzero : ∀ χ : IrreducibleCharacter G, χ ∉ S →
+      ClassFunction.inner φ (χ : ClassFunction G ℂ) = 0 := by
+    intro χ hχ
+    have hmem : χ ∈ Finset.univ \ S := Finset.mem_sdiff.mpr ⟨Finset.mem_univ χ, hχ⟩
+    have hcast : ∑ ψ ∈ Finset.univ \ S,
+        ((Complex.normSq (ClassFunction.inner φ (ψ : ClassFunction G ℂ)) : ℝ) : ℂ) = 0 := by
+      rw [← hcompl]
+      refine Finset.sum_congr rfl fun ψ _ => ?_
+      rw [← starRingEnd_apply]
+      exact (Complex.mul_conj _).symm
+    rw [← Complex.ofReal_sum, Complex.ofReal_eq_zero] at hcast
+    have hnn : ∀ ψ ∈ Finset.univ \ S,
+        0 ≤ Complex.normSq (ClassFunction.inner φ (ψ : ClassFunction G ℂ)) :=
+      fun ψ _ => Complex.normSq_nonneg _
+    exact Complex.normSq_eq_zero.mp ((Finset.sum_eq_zero_iff_of_nonneg hnn).mp hcast χ hmem)
+  -- Collapse the Fourier expansion to the `S`-sum.
+  conv_lhs => rw [← sum_inner_irreducibleCharacter_smul φ]
+  rw [← Finset.sum_subset (Finset.subset_univ S)
+    (fun χ _ hχ => by rw [hzero χ hχ, zero_smul])]
+  exact Finset.sum_congr rfl fun χ hχ => by rw [h1 χ hχ, one_smul]
 
 end OddOrder.RepresentationTheory
