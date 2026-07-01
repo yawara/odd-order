@@ -57,14 +57,74 @@ module-theoretic Clifford core (orbit transitivity)、3-5 セッション」と�
 - **(G3) mult-free 判定**: I/H **abelian** ⟹ Ind_H^L θ は multiplicity-free、構成要素は [I:H] 個・全て
   等次数 [L:I]·θ(1) (Clifford correspondence [Is] 6.11 で Irr(I|θ)↔Irr(L|θ) + G2 で β(1)=1)。
 
+## 進捗 (2026-07-02)
+
+- [x] **慣性商 abelian 前提の中核**: `S14.typeF_inertia_inf_U_isMulCommutative` (generic, sorry-free,
+      commit `e6f0dbd9`) — (8.2.c) + `U₁` abelian ⟹ `I(θ)∩U` abelian。
+- [x] **慣性商 abelian 完成** (2026-07-02, cont.³): `S14.typeF_inertia_commutator_le` (sorry-free) —
+      `Γ=HU` (`H⊔U=⊤`) + `H≤I(θ)` の Dedekind 分解 `s=h·u` (`h∈H`, `u=h⁻¹s∈I(θ)∩U`) を `Γ⧸H` に落とし、
+      `I(θ)∩U` abelian ⟹ `⁅s,t⁆∈H` ⟹ **`⁅I(θ),I(θ)⁆ ≤ H`** = 「`I(θ)/H` abelian」証明書
+      (`ClassFunction.inertiaQuotient`)。これが (1.7)(b) hypothesis そのもの。**残 = 生成的 char (G1)-(G3)**。
+- **⚠ 訂正 (stale 検出)**: **induction-in-stages は既に landed** = `S08_CaseBCoherence2.induce_induce_subgroupOf`
+      (sorry-free, `Ind^M_H(Ind^H_{K.subgroupOf H}(ψ∘e)) = Ind^M_K ψ`、`inner_compHom_of_mulEquiv` 経由)。
+      下記 cont.² の「Lean 未実装 (foundational)」は誤り → cite するだけ。**再構築禁止** ([[verify-port-state-by-number-not-coq-name]])。
+
+## Coq-confirmed 経路 + missing pieces の精密化 (2026-07-02, cont.²)
+
+Coq PFsection1 (1.7) の経路を確認 (`constt_Inertia_bijection` + `cfIndInd`)。一般ケースの proof は:
+1. **induction-in-stages** `Ind_H^L θ = Ind_I^L (Ind_H^I θ)` (Coq `cfIndInd`)。**Lean 未実装**:
+   `ClassFunction.induce (H : Subgroup G)` は **ambient G へのみ**誘導 (中間 I への stage なし)。
+   → `induce I (induce (H.subgroupOf I) θ') = induce H θ` を build (coset 二重和の再添字、要 subgroupOf iso)。
+2. **Clifford correspondence 全単射** `Ind_I^L : Irr(I|θ) ≃ Irr(L|θ)` (Isaacs 6.11)。**Lean は degree 形のみ landed**
+   (`CliffordSingleOrbit.lean:222-360`)、全単射本体は未。
+3. **local mult-free at I**: I 上で θ-invariant のとき `Ind_H^I θ` の mult-free ⟹ Gallagher (Isaacs 6.17)
+   + 拡張 (Isaacs 6.28/11.22)。**両方 Lean 未実装**。
+
+**✅ 設計点 解決 (Coq PFsection1.v:437-523 精読、2026-07-02)**: **abelian で十分、cyclic 不要**。
+Coq (1.7)(b) `cfInd_central_Inertia` の hypothesis は `abelian (T/H)` (T=I(θ))。結論:
+- ∃ e∈ℕ (e≠0)、`∀t∈calA, e_t = e` (全構成要素が**一様 multiplicity e**)。
+- `Ind_G θ = e · ∑_{j∈calB} χ_j` (distinct 構成要素の e 倍和)。
+- `|calB| = [T:H]/e²`、**`∀i∈calB, χ_i(1) = [G:T]·e·θ(1)`** (全**等次数**)。
+- 機構: T/H abelian → `Irr(T/H)` は linear chars → `LtoT j = (χ_j %% H)·psi1` が calA を parametrize
+  (Gallagher 型)、`Res_H psi1 = e·θ` (Clifford)。
+
+**∴ 私の `typeF_inertia_inf_U_isMulCommutative` (I(θ)/H abelian) が (1.7)(b) hypothesis そのもの、正しく on-route。**
+**mult-one (e=1)** は θ が T へ**拡張**するとき: type-I では `H=L_F` が Hall で `[T:H]` coprime `|H|`
+⟹ coprime 拡張 (Isaacs 6.28/8.16) で θ 拡張 → e=1。equal-degree/non-real/台と合わせ typeI_induced_char_constituents。
+
 ## やること (bottom-up、generic は shared leaf)
 
+- [x] **Pf (1.7)/(8.2.c) 原文精読** — 設計点解決 commit `0482afa0` (abelian で十分、cyclic 不要)。
+- [x] **induction-in-stages** — **既に landed** (`S08_CaseBCoherence2.induce_induce_subgroupOf`)。cite のみ。
+- [x] **慣性商 abelian 完成** — `S14.typeF_inertia_commutator_le` (`⁅I(θ),I(θ)⁆ ≤ H`, sorry-free, cont.³)。
 - [ ] **(G1) 拡張 lemma** を build (`OddOrder/GroupTheory/RepresentationTheory/` 新/既存 leaf)。coprime
-      Hall (H=L_F normal Hall, U abelian complement) の下で I/H cyclic → θ 拡張。
-- [ ] **(G2) Gallagher** + **(G3) mult-free-from-abelian-inertia** を build (同 leaf)。core generic 補題。
-- [ ] **type-F 適用**: (8.2.c) I(θ)∩U⊆U₁⊆U(abelian) ⟹ I(θ)/H abelian → (G3) 適用。
+      Hall (H=L_F normal Hall, U abelian complement) の下で I/H cyclic → θ 拡張 (Isaacs 6.28/11.22)。
+- [x] **char-product infra (Gallagher 前提)** — `RepresentationTheory/CharacterProduct.lean` (新 leaf, sorry-free,
+      axiom-clean, cont.⁴): `ClassFunction` に pointwise `Mul` + `IsCharacter.mul` (χ·ψ = char of `tprod`,
+      `Representation.char_tensor` 経由) + `mul_mem_ZIrr` (ZIrr は積で閉じる=部分環)。Gallagher の
+      「χ·Inf(β) は character」(linear twist が norm 保存 → 既約) の核心前提。
+- [x] **norm 保存 (twist の核)** — `CharacterProduct.inner_mul_self_eq_of_star_mul_self_eq_one` (cont.⁶,
+      sorry-free): `∀g, lam g·conj(lam g)=1` (unit-norm) ⟹ `⟨χ·lam, χ·lam⟩ = ⟨χ,χ⟩`。linear char で twist しても
+      norm 不変 → 既約保存の核。
+- [ ] **(G2) Gallagher** + **(G3)** を build。**⚠ 重要発見: `LinearCharacter.lean` に linear-char infra が既存**
+      (`IsIrreducibleCharacter.map_mul_of_apply_one_eq_one` = φ(1)=1⟹乗法的, `apply_one_eq_one_of_isMulCommutative`
+      = abelian⟹linear, `exists_linearIrreducibleCharacter_eq_of_isMulCommutative` 等)。次はこれを精読して cite。
+      残 gap: **(A) `IsIrreducibleCharacter χ ⟹ ⟨χ,χ⟩=1`** (Prop 版、bundled `irreducibleCharacter_inner_eq_ite`
+      からの bridge が未) — twist-既約 (`isIrreducibleCharacter_of_inner_self_one_of_apply_one_pos` 適用) の唯一の
+      小 gap。**(B) linear char の unit-norm** = `map_mul_of_apply_one_eq_one` + `char(g⁻¹)=conj char(g)` で導出可。
+      その後 bijection Irr(I/H)≃Irr(I|θ) + extension (G1)。
+- [ ] **type-F 適用**: `typeF_inertia_commutator_le` (I(θ)/H abelian) を (G3) に投入。
 - [ ] **(1.5.a)/(1.2) 台**: 各構成要素 φ の台 ⊆ A(L)∪{1}。非実 = 奇数位数 (`not_isReal_of_ne_trivial_of_odd_card'`)。
-- [ ] `typeI_induced_char_constituents` (S14:398) を上記 cite で sorry-free 化。lane b (12.14) は cite。
+- [ ] `typeI_induced_char_constituents` (S14:472) を上記 cite で sorry-free 化。lane b (12.14) は cite。
+
+## 次の frontier + 判明した真の上流 bottleneck (2026-07-02 cont.³)
+
+**Clifford correspondence 全単射の核 = `Ind_I^G ψ` 既約 (Isaacs 6.11、I=I_G(θ) 非正規) は「一般 (非正規)
+Mackey」を要する**: 既存 norm 機構 `InducedIrreducible.card_mul_inner_self_induce` /
+`card_smul_restrict_induce` は **`[H.Normal]` 前提** (`induceTerm_of_mem_normal` 経由) ゆえ、慣性群 `I`
+(一般に非正規) の `⟨Ind_I^G ψ, Ind_I^G ψ⟩` に直接使えない。∴ 上流未収録の **general Mackey 公式** が
+(G1)-(G3) と並ぶ真の最上流。document 順は 6.11 (Clifford corr) < 6.16 (Gallagher) < 6.28 (extension)。
+次セッションはこの general Mackey か Gallagher (拡張仮説付き) から着手 (両者 multi-session、正面から engage)。
 
 **性質**: genuine multi-session char build (G1-G3 は Isaacs §6/§11 の generic char theory で repo 未収録)。
 Frobenius sub-case は proven ゆえ witness (12.16) 経路は現状も通る; 本 issue は一般 (12.14) 用の shared infra。
@@ -102,3 +162,15 @@ shared leaf に再配置)。relocate 後は通常合流。**relocate まで hub 
 
 **⚠ 逸脱の再発防止**: lane c の Clifford (9002) は **必ず shared leaf** で build (S14/他レーン file を編集しない)。
 generic Clifford/inertia は `Inertia.lean`/`Clifford*.lean`/GroupTheory/** に置き、各 consumer が cite。
+
+### ✅ RELOCATE 完了 (lane c, 2026-07-02 cont.⁵ — 本裁定を拾って対応)
+
+裁定に従い、2 lemma を S14 から **新 shared leaf** `OddOrder/GroupTheory/RepresentationTheory/InertiaAbelianQuotient.lean`
+へ relocate。S14 からは両 lemma を削除 (`typeF_inertia_inf_le_U1` は grandfather 済ゆえ S14 に残置・不触)。
+hub 指示どおり **generic 化** (`{Γ}`+`{k}` 抽象、8.2.c の `hle`/abelian を仮説化 → S14 非依存で GroupTheory/** 上流に置ける):
+- `ClassFunction.inertia_inf_isMulCommutative_of_le`: `I(θ)∩U ≤ U₁` + `U₁` abelian ⟹ `I(θ)∩U` abelian。
+- `ClassFunction.commutator_inertia_le_of_sup_eq_top`: `H⊔U=⊤` + `I(θ)∩U` abelian ⟹ `⁅I(θ),I(θ)⁆ ≤ H`。
+
+両 sorry-free、`lake build` 緑 (leaf 1085 jobs / S14 除去後も 3855 jobs green)。type-F 特殊化 (8.2.c=`typeF_inertia_inf_le_U1`
+を cross-file cite して `hle` 供給) は **consumer 側** (S14 の `typeI_induced_char_constituents` を埋める時、lane b or
+lane c の新 Pf leaf) が実施 — lane c は S14 を編集しない。以後 Clifford は必ず shared leaf で build。
