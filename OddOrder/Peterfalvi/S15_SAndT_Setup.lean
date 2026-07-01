@@ -1516,6 +1516,60 @@ theorem numeric_m_bounds (hyp : Hypothesis (G := G)) :
 
 end Hypothesis
 
+/-- **Arithmetic bridge for Peterfalvi (13.2.c), non-Galois case**: `(p-1)^(q-1) ≤ (p^q-1)/(p-1)`.
+
+In the non-Galois type-`P` case the Singer/semilinear bound gives `u ≤ (p-1)^(q-1)` (Coq
+`FTtypeP_facts`, via `card_mx`), which this relaxes to the uniform (13.2.c) form
+`u ≤ (p^q-1)/(p-1)`.  Elementary: `(p-1)^(q-1) ≤ p^(q-1) ≤ (p^q-1)/(p-1)` (the last since
+`p^(q-1)·(p-1) = p^q - p^(q-1) ≤ p^q - 1`).  Pure `ℕ` arithmetic, `sorry`-free. -/
+theorem pred_pow_le_cyclotomic_quotient {p q : ℕ} (hp : 2 ≤ p) (hq : 1 ≤ q) :
+    (p - 1) ^ (q - 1) ≤ (p ^ q - 1) / (p - 1) := by
+  refine le_trans (Nat.pow_le_pow_left (Nat.sub_le p 1) (q - 1)) ?_
+  have hp1 : 0 < p - 1 := by omega
+  rw [Nat.le_div_iff_mul_le hp1]
+  obtain ⟨d, rfl⟩ : ∃ d, p = d + 1 := ⟨p - 1, by omega⟩
+  simp only [Nat.add_sub_cancel]
+  have ha : 1 ≤ (d + 1) ^ (q - 1) := Nat.one_le_pow _ _ (by omega)
+  have hap' : (d + 1) ^ (q - 1) * d + (d + 1) ^ (q - 1) = (d + 1) ^ q := by
+    have h1 : (d + 1) ^ (q - 1) * d + (d + 1) ^ (q - 1) = (d + 1) ^ (q - 1) * (d + 1) := by ring
+    rw [h1, ← pow_succ]; congr 1; omega
+  omega
+
+/-- **Peterfalvi (8.4.d) restricted to `C`**: `W₁` acts fixed-point-freely on `C ⊆ U` by
+conjugation — no `w ∈ W₁ #` centralizes any `c ∈ C #`.  `U W₁` is a Frobenius group with kernel `U`
+(`typeP_uW1_frobenius`), and `C = U ⊓ C_G(P) ≤ U`, so the Frobenius fpf condition restricts to `C`.
+The fpf input to the (13.12) `c ≡ 1 (mod q)` step (Coq `dv_2q_c1`). -/
+theorem Hypothesis.W1_fpf_C [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hyp : Hypothesis (G := G)) :
+    ∀ w ∈ hyp.W1, w ≠ 1 → ∀ c ∈ hyp.C, c ≠ 1 → w * c * w⁻¹ ≠ c := by
+  have hSII : IsTypeII hyp.S :=
+    OddOrder.BG.Ch4.S16.isTypeII_of_isTypeP2 hG hyp.S_maximal hyp.S_typeP2
+  have tdata : TypeIIData hyp.S := hSII.some
+  have hUne : hyp.Sdata.U ≠ ⊥ := by
+    intro hbot
+    have h1 : Nat.card ↥hyp.Sdata.U = Nat.card ↥tdata.typeP.U := by
+      rw [hyp.Sdata.card_U_eq_index, tdata.typeP.card_U_eq_index]
+    rw [hbot, Subgroup.card_bot] at h1
+    exact tdata.common.1 (Subgroup.card_eq_one.mp h1.symm)
+  have frob := OddOrder.Peterfalvi.S11.typeP_uW1_frobenius hyp.Sdata hUne
+  rw [hyp.Sdata_U_eq, hyp.Sdata_W1_eq] at frob
+  have hCU : hyp.C ≤ hyp.U := by rw [hyp.C_eq]; exact inf_le_left
+  intro w hw hw1 c hc hc1
+  have hwL : w ∈ hyp.U ⊔ hyp.W1 := (le_sup_right : hyp.W1 ≤ _) hw
+  have hcL : c ∈ hyp.U ⊔ hyp.W1 := (le_sup_left : hyp.U ≤ _) (hCU hc)
+  have hne1 : (⟨w, hwL⟩ : ↥(hyp.U ⊔ hyp.W1)) ≠ 1 := fun h => hw1 (by simpa using congrArg Subtype.val h)
+  have hnec : (⟨c, hcL⟩ : ↥(hyp.U ⊔ hyp.W1)) ≠ 1 := fun h => hc1 (by simpa using congrArg Subtype.val h)
+  have hmemw : (⟨w, hwL⟩ : ↥(hyp.U ⊔ hyp.W1)) ∈ hyp.W1.subgroupOf (hyp.U ⊔ hyp.W1) :=
+    Subgroup.mem_subgroupOf.mpr hw
+  have hmemc : (⟨c, hcL⟩ : ↥(hyp.U ⊔ hyp.W1)) ∈ hyp.U.subgroupOf (hyp.U ⊔ hyp.W1) :=
+    Subgroup.mem_subgroupOf.mpr (hCU hc)
+  have hconj := frob.conj_frobenius _ hmemw hne1 _ hmemc hnec
+  intro heq
+  apply hconj
+  apply Subtype.ext
+  push_cast
+  exact heq
+
 /-- **Peterfalvi (13.11)**: the elementary numerical bounds for `m`.
 
 The `q ≥ 7` and `q ≥ 5` bounds are the genuine arithmetic estimates
