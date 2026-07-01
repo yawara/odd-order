@@ -1776,3 +1776,73 @@ caseA.Hpart (maximal SupIndep) と別族だが assembly は generic。
   → |Xmu|=p-1。
 次着手 = 構成子解析の逐次 build (θ̄_0 抽出 → Ū-orbit W₁-inv → nontrivial-set 全体 → regular)。
 Clifford char 論だが producer refactor 不要ゆえ tractable。Coq PFsection9 の Res-constituent 論を port。
+
+## ✅✅ 構成子解析 step 1 + step 2 core LANDED — L1-L5 再利用で difficulty 急落 (2026-07-01 cont.¹²)
+
+**★ 重大発見**: cont.⁷ の **forward hIM propagation 用 L1-L5 machinery** (hInHuConj /
+hcZeta_liesOver_compHom_of_fixed / **hcZeta_exists_conj_of_fixed** [L3=single-orbit] /
+compHom_hInHuConj_hInHuEquivH [L5] / **conjBy_eq_compHom_iff_quotient** [L4 bridge]) が
+**surjectivity 逆向きにそのまま再利用可能**。cont.¹¹ の「構成子解析は substantial」評価は
+over-pessimistic だった — 核心 (single-orbit + M-conj↔chief-action bridge) は landed 済。
+
+### landed (build-green, axiom-clean)
+- **step 1 (commit 64ab0dfa)**: `exists_hom_constituent_of_mem_xiSet_H0` — χ∈𝒳, H₀⊆Ker χ →
+  ∃ nontrivial θbar:H̄→*ℂˣ, LiesOver χ (linearIrreducibleCharacter (θbar∘mk'N∘hInHuEquivH))。
+  caseB_exists_chiefFactorConstituent を template に **hom-form seed** を返す (regularity 論が
+  θbar.comp (Hpart i).subtype で per-factor 測るため)。
+- **step 2 core (commit 1c741e26、2 補題)**:
+  - `exists_uInHu_conjBy_eq_of_fixed` (B): χ M-fixed (conjBy m χ=χ) + LiesOver θ₀ → ∃u∈uInHu,
+    conjBy u θ₀ = compHom φ_m θ₀。L3 の g∈HU を hInHu⊔uInHu 分解 (`Subgroup.normal_mul`)、
+    H-part h∈inertia θ₀ (`subgroup_le_inertia`) で fix → `conjBy_mul` で U-元 u に還元。
+  - `exists_uPart_theta_comp_quotient_eq_of_fixed` (C): θ₀=inflation θbar で
+    `conjBy_eq_compHom_iff_quotient` + `linearIrreducibleCharacter_injective` →
+    **θbar∘q(a) = θbar∘q(b)** (a∈U, q=quotientMulAutHom)。form alignment (step-1 form ↔ inflation
+    form) は ext+simp の hinfl で処理。⟹ **W₁-twist θbar∘q(w) が θbar の U-orbit 内**。
+
+### 残 = D/E (orbit equality → θbar regular)
+- **D (nontrivial-Hpart-set の W₁-permutation-invariance)**: θbar∘q(w) trivial on Hpart_i ⟺
+  θbar trivial on q(w)•Hpart_i (q(w) iso); a∈U preserves Hpart (`Hpart_aInvariant` /
+  `caseA_uActionHom_comp_subtype_eq_one_iff`) + C の θbar∘q(a)=θbar∘q(w) ⟹ nontrivial-set が
+  q(w)-permutation で不変。**form alignment 注意**: q(a) (a∈U⊔W₁) ↔ uActionHom a' の変換
+  (`hcConjDescend_eq_uActionHom` の template、uActionHom def S11:1644)。
+- **E (regularity assembly)**: nontrivial-set が W₁-permutation-inv + 非空 (H⊄ker) + W₁-transitive
+  → full → regular。**crux = Hpart↔W₁ 整合**: Hpart i = q(orbitRep i)•caseA.S0
+  (`Hpart_orbit`)、W₁-conjugate 族 {q(v)•S0 : v∈act.E} で `eq_univ_of_nonempty_of_mul_mem_left`。
+  **subtlety**: (1) caseA.S0 の U-invariance (clifford_caseA_data 構築で使うが structure field で
+  ないので要確認/再構成)、(2) orbitRep i∈U⊔W₁ が act.E(W₁) に入るか (cont.¹¹「orbitRep∈W₁ に
+  refine or W₁-不変 Hpart-set は ∅/全体」)。
+- **次着手 = D** (self-contained: C + Hpart_aInvariant + caseA_uActionHom)。E は Hpart↔W₁ で最難、
+  最後。D+E 後: regular θbar → `inertia_eq_hcInHu_caseA` → Clifford correspondence
+  (`coe_eq_induce_of_liesOver_of_isIrreducibleCharacter_induce`) → ξ=Ind_{HC}(hcPsi θbar)∈Xθ →
+  Xmu surjective → |Xmu|=p-1 → `exists_regular_not_reducible_of_odd` → conjunct c (sorry S11:5552)。
+
+### ⚠ E-blocker 発見 + D₁ landed (2026-07-01 cont.¹² cont.)
+
+**D₁ landed (commit d2d7fd87)**: `caseA_theta_comp_quotient_uPart_comp_subtype_eq_one_iff` —
+a∈U⊔W₁ (↑a∈U) → θbar∘q(a) trivial on Hpart_i ⟺ θbar trivial on Hpart_i。caseA_uActionHom への
+form-alignment (uActionHom = quotientMulAutHom.comp (U.subgroupOf).subtype、defeq)。
+
+**⚠ E-blocker**: clifford_caseA_data (S11:4909) を精読して判明:
+- `Hpart j = act.φ ↑(e.symm j) • S₀`、e.symm j ∈ t = `exists_supIndep_aInvariant_family_of_iSup` の
+  **任意 choice** ⊆ U⊔W₁。orbitRep j∈U⊔W₁ は **W₁ 保証なし**。
+- `CliffordCaseAData` structure に **S0 U-invariance フィールドなし** (construction input hS₀inv のみ、
+  Hpart_aInvariant は各 Hpart の U-inv のみ)。
+- ⟹ W₁ が caseA.Hpart を **transitively permute する保証がない**。E (nontrivial-set の W₁-transitive →
+  full) が block。
+
+**E resolution path** (次 iteration で判断):
+- **(a)** clifford_caseA_data を W₁-conjugate family `{q(w)•S0 : w∈act.E}` で refine (orbitRep を W₁
+  enumerate に)。downstream (oXtheta/hcPsi_regular/card_regular_chars_Hbar) 影響、要検証。
+- **(b) [有力]** 「U-invariant order-p summand は S0 の W₁-conjugate」を証明 (type-P non-Galois 構造:
+  U が H̄=⊕S0^w に diagonal 作用、U-inv line は S0^w のみ) → S0 U-inv で caseA.Hpart_i = q(orbitRep i)•S0
+  = q(W₁-part)•S0 (U-part 消去) → Hpart family = W₁-conjugate family → W₁-transitive。cont.¹¹ の
+  「別族だが assembly generic」= この transport。
+- **(c)** regularity を W₁-conjugate 族で定式化し hcPsi/oXtheta 側を対応 (大改修、非推奨)。
+
+**残 build 順**: D₂ (θbar∘q(w) trivial on Hpart_i ⟺ θbar trivial on q(w)•Hpart_i、precompose-iso の
+一般 lemma、E と独立に landing 可) → E (resolution (a)/(b) 選択 + assembly) → regular θbar →
+inertia_eq_hcInHu_caseA → Clifford correspondence → ξ∈Xθ → Xmu surjective → conjunct c (S11:5552)。
+
+**この session の landed 総括**: step 1 (constituent extraction) + B/C (M-fixed→H̄-orbit equality core
+bridge) + D₁ (Ū preserves Hpart nontriviality)。L1-L5 再利用で surjectivity の crux 大半が landed、
+difficulty 急落。残 = D₂ (trivial) + E (Hpart↔W₁ transport、構造的 subtlety)。
