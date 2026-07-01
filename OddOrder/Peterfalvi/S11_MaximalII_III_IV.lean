@@ -6388,6 +6388,32 @@ theorem hc_index_eq_u [Finite G] {M : Subgroup G}
   exact (index_hcInHu_eq_relindex_cInHu data chief).trans
     (index_cInHu_subgroupOf_uInHu_eq_u data chief chars)
 
+/-- **Inertia index of `hcPsi θ` is `u`** (regular `θ`): for a regular seed `θ` (nontrivial on each
+Clifford factor `Hpart i`), the `HU`-inertia of `ζ_θ = hcPsi θ` is `HC` (`hcPsi_inertia_eq_hc` with the
+`inertia_eq_hcInHu_caseA` seed), so `[HU : I_{HU}(hcPsi θ)] = [HU:HC] = u` (`hc_index_eq_u`).  This is
+the uniform fibre size `[HU : I]` of the induction map `θ ↦ Ind_{HC}^{HU}(hcPsi θ)` in the `oXtheta`
+`u`-to-1 count (each `HU`-conjugation orbit of a regular `hcPsi θ` has `u` elements). -/
+theorem hcPsi_inertia_index_eq_u [Finite G] {M : Subgroup G}
+    {data : TypesIIIIIIVSetup M} {chief : ChiefFactorData data}
+    {chars : Section11CharacterData data chief} (caseA : CliffordCaseAData chars)
+    {θ : (↥data.H ⧸ chief.N) →* ℂˣ}
+    (hreg : ∀ i, ∃ x ∈ caseA.Hpart i, θ x ≠ 1)
+    [(hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf (huSub data)).Normal] :
+    (IrreducibleCharacter.inertia (hcPsi chief θ)).index = chars.u := by
+  have hreg' : ∀ i, ∃ x ∈ caseA.Hpart i,
+      (linearIrreducibleCharacter θ : ClassFunction (↥data.H ⧸ chief.N) ℂ) x
+        ≠ (linearIrreducibleCharacter θ : ClassFunction (↥data.H ⧸ chief.N) ℂ) 1 := by
+    intro i
+    obtain ⟨x, hx, hne⟩ := hreg i
+    refine ⟨x, hx, ?_⟩
+    rw [linearIrreducibleCharacter_apply, linearIrreducibleCharacter_apply, map_one, Units.val_one]
+    simpa using hne
+  have hθ₀ := inertia_eq_hcInHu_caseA data chief caseA hreg'
+  change (ClassFunction.inertia (hcPsi chief θ : ClassFunction
+    ↥(hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf (huSub data)) ℂ)).index
+      = chars.u
+  rw [hcPsi_inertia_eq_hc chief θ hθ₀, hc_index_eq_u chars]
+
 /-- **`ζ(1) = u`**: the degree of `ζ = Ind_{HC}^{HU}(ψ)` is `u`.  `induce_apply_one` gives
 `ζ(1) = [HU:HC]·ψ(1) = u·1` (`hc_index_eq_u`, and `ψ` linear so `ψ(1)=1`).  This is the degree-`u`
 of the (9.8.c) irreducible; `induceHU ζ` then has degree `q·u = qu`. -/
