@@ -7397,6 +7397,106 @@ theorem Hypothesis.SHC_muGridPsi_vanishes_on_typePV [Finite G] {M : Subgroup G}
   simp
 
 open scoped FiniteInduce in
+/-- **Peterfalvi (10.5), `‖X‖² = 2` and `X ⊥ ζ^{τ₁}`, S(HC)-coherent version** (`a = 0`), where
+`X = α_{ij}^τ + n·ζ^{τ₁}` (`ζ^{τ₁} = SHC_isCoherent.extension ζ`).  Given the `a = 0` inner product
+`⟨α_{ij}^τ, ζ^{τ₁}⟩ = −n` (`muGridAlpha_tau_residual_norm` with `a = 0`), with `‖α_{ij}^τ‖² = 2 + n²`
+(`muGridAlpha_tau_inner_self`) and `‖ζ^{τ₁}‖² = 1` (`SHC_extension_inner_self`):
+`⟨X, ζ^{τ₁}⟩ = ⟨α^τ, ζ^{τ₁}⟩ + n‖ζ^{τ₁}‖² = −n + n = 0` and
+`‖X‖² = ‖α^τ‖² + 2n⟨α^τ, ζ^{τ₁}⟩ + n²‖ζ^{τ₁}‖² = (2+n²) − 2n² + n² = 2`.  SHC port of
+`muGridAlpha_tau_X_inner`, the norm-`2` input to the SHC Dade-image trichotomy (SHC `alpha_tau_image`). -/
+theorem Hypothesis.SHC_muGridAlpha_tau_X_inner [Finite G] {M : Subgroup G}
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis M) (hodd : Odd (Nat.card G))
+    (i : Fin hyp.w1) {j : Fin hyp.w2} (hj0 : j ≠ 0)
+    {ζ : ClassFunction ↥M ℂ} (hζS : ζ ∈ inducedFamily M) (hζirr : IsIrreducibleCharacter ζ)
+    (hζ1 : ζ 1 = (hyp.w1 : ℂ)) {d : ℕ} {δ : ℤ} {n : ℕ}
+    (hdeg : hyp.muGrid hG hodd i j 1 = (d : ℂ)) (hμ0 : hyp.muGrid hG hodd i 0 1 = 1)
+    (hnf : (n : ℤ) * (hyp.w1 : ℤ) = (d : ℤ) - δ) (hδj : hyp.muColumnSign hG hodd j = δ)
+    (hdζ : hyp.muGrid hG hodd i j 1 ≠ ζ 1) (h0ζ : hyp.muGrid hG hodd i 0 1 ≠ ζ 1)
+    (hδpm : δ = 1 ∨ δ = -1)
+    (hα0 : ClassFunction.inner
+        (hyp.tau (hyp.muGrid hG hodd i j - (δ : ℂ) • hyp.muGrid hG hodd i 0 - (n : ℂ) • ζ))
+        ((hyp.SHC_isCoherent hG).extension ζ) = -(n : ℂ)) :
+    ClassFunction.inner
+        (hyp.tau (hyp.muGrid hG hodd i j - (δ : ℂ) • hyp.muGrid hG hodd i 0 - (n : ℂ) • ζ)
+          + (n : ℂ) • (hyp.SHC_isCoherent hG).extension ζ)
+        ((hyp.SHC_isCoherent hG).extension ζ) = 0
+    ∧ ClassFunction.inner
+        (hyp.tau (hyp.muGrid hG hodd i j - (δ : ℂ) • hyp.muGrid hG hodd i 0 - (n : ℂ) • ζ)
+          + (n : ℂ) • (hyp.SHC_isCoherent hG).extension ζ)
+        (hyp.tau (hyp.muGrid hG hodd i j - (δ : ℂ) • hyp.muGrid hG hodd i 0 - (n : ℂ) • ζ)
+          + (n : ℂ) • (hyp.SHC_isCoherent hG).extension ζ) = 2 := by
+  have hnorm_a := hyp.muGridAlpha_tau_inner_self hG hodd i hj0 hζS hζirr hdeg hμ0 hζ1 hnf hδj
+    hdζ h0ζ hδpm
+  have hzz := hyp.SHC_extension_inner_self hG hζS hζirr hζ1
+  have hα0' : ClassFunction.inner ((hyp.SHC_isCoherent hG).extension ζ)
+      (hyp.tau (hyp.muGrid hG hodd i j - (δ : ℂ) • hyp.muGrid hG hodd i 0 - (n : ℂ) • ζ))
+      = -(n : ℂ) := by
+    rw [OddOrder.RepresentationTheory.inner_conj_symm, hα0, star_neg, star_natCast]
+  constructor
+  · simp only [ClassFunction.inner_add_left, ClassFunction.inner_smul_left, hα0, hzz, mul_one]
+    ring
+  · simp only [ClassFunction.inner_add_left, ClassFunction.inner_add_right,
+      ClassFunction.inner_smul_left, OddOrder.RepresentationTheory.inner_smul_right,
+      hα0, hα0', hnorm_a, hzz, star_natCast, mul_one]
+    ring
+
+open scoped FiniteInduce in
+/-- **Peterfalvi (10.5) Dade-image identity, S(HC)-coherent version** (`a = 0`):
+`α_{ij}^τ = δ·(ω_{ij}^σ − ω_{i0}^σ) − n·ζ^{τ₁}` with `ζ^{τ₁} = SHC_isCoherent.extension ζ`, given the
+`a = 0` inner product `⟨α_{ij}^τ, ζ^{τ₁}⟩ = −n` (`muGridAlpha_tau_residual_norm` with `a = 0`).
+
+SHC port of `tau_muGridAlpha_eq` (the full-`coh` (10.5) endgame, which the (11.8) by-contradiction
+cannot use).  Writing `X = α_{ij}^τ + n·ζ^{τ₁}` (`∈ ℤ[Irr G]`, `‖X‖² = 2` via
+`SHC_muGridAlpha_tau_X_inner`), the aligned `σ`-grid entries are `χ`-family members
+(`exists_alignedOmegaSigmaGrid_chiFam_family`) and `ψ = X − δ(ω^σ diff)` vanishes on `V`
+(`SHC_muGridPsi_vanishes_on_typePV`), so the norm-`2` Dade-image trichotomy
+`eq_smul_chiFam_diff_of_vanishOnV` forces `X = δ(ω_{ij}^σ − ω_{i0}^σ)`. -/
+theorem Hypothesis.SHC_tau_muGridAlpha_eq [Finite G] {M : Subgroup G}
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis M) (hodd : Odd (Nat.card G))
+    (i : Fin hyp.w1) {j : Fin hyp.w2} (hj0 : j ≠ 0)
+    {ζ : ClassFunction ↥M ℂ} (hζS : ζ ∈ inducedFamily M) (hζirr : IsIrreducibleCharacter ζ)
+    (hζ1 : ζ 1 = (hyp.w1 : ℂ)) (hζne : ζ.conj ≠ ζ) {d : ℕ} {δ : ℤ} {n : ℕ}
+    (hdeg : hyp.muGrid hG hodd i j 1 = (d : ℂ)) (hμ0 : hyp.muGrid hG hodd i 0 1 = 1)
+    (hnf : (n : ℤ) * (hyp.w1 : ℤ) = (d : ℤ) - δ) (hδj : hyp.muColumnSign hG hodd j = δ)
+    (hdζ : hyp.muGrid hG hodd i j 1 ≠ ζ 1) (h0ζ : hyp.muGrid hG hodd i 0 1 ≠ ζ 1)
+    (hδpm : δ = 1 ∨ δ = -1)
+    (hα0 : ClassFunction.inner
+        (hyp.tau (hyp.muGrid hG hodd i j - (δ : ℂ) • hyp.muGrid hG hodd i 0 - (n : ℂ) • ζ))
+        ((hyp.SHC_isCoherent hG).extension ζ) = -(n : ℂ)) :
+    hyp.tau (hyp.muGrid hG hodd i j - (δ : ℂ) • hyp.muGrid hG hodd i 0 - (n : ℂ) • ζ)
+      = (δ : ℂ) • (hyp.alignedOmegaSigmaGrid hG hodd i j - hyp.alignedOmegaSigmaGrid hG hodd i 0)
+        - (n : ℂ) • (hyp.SHC_isCoherent hG).extension ζ := by
+  haveI := hyp.finiteG
+  classical
+  have hXfacts := hyp.SHC_muGridAlpha_tau_X_inner hG hodd i hj0 hζS hζirr hζ1 hdeg hμ0 hnf hδj
+    hdζ h0ζ hδpm hα0
+  have hτ1ζZ : (hyp.SHC_isCoherent hG).extension ζ ∈ ZIrr G :=
+    (hyp.SHC_isCoherent hG).extension_mem_ZIrr ζ (Submodule.subset_span ⟨hζS, hζirr, hζ1⟩)
+  have hαZ := hyp.muGridAlpha_tau_mem_ZIrr hG hodd i hj0 hζS hζirr hdeg hμ0 hζ1 hnf hδj
+  have hXZ : hyp.tau (hyp.muGrid hG hodd i j - (δ : ℂ) • hyp.muGrid hG hodd i 0 - (n : ℂ) • ζ)
+      + (n : ℂ) • (hyp.SHC_isCoherent hG).extension ζ ∈ ZIrr G := by
+    refine Submodule.add_mem _ hαZ ?_
+    rw [Nat.cast_smul_eq_nsmul]; exact nsmul_mem hτ1ζZ n
+  obtain ⟨P, hPinj, hP⟩ := hyp.exists_alignedOmegaSigmaGrid_chiFam_family hG hodd i
+  let tic := typePData_toTICyclicHypothesis hyp.typeP hodd
+  haveI : NeZero (Nat.card ↥tic.W1) := ⟨Nat.card_pos.ne'⟩
+  haveI : NeZero (Nat.card ↥tic.W2) := ⟨Nat.card_pos.ne'⟩
+  let app := hyp.canonicalFullDadeApp hG hodd
+  have hVeq : tic.V = tic.Vdiff := rfl
+  have hPne : P j ≠ P 0 := fun h => hj0 (hPinj h)
+  have hPj' : tic.chiFam hVeq app (P j) = hyp.alignedOmegaSigmaGrid hG hodd i j := (hP j).symm
+  have hP0' : tic.chiFam hVeq app (P 0) = hyp.alignedOmegaSigmaGrid hG hodd i 0 := (hP 0).symm
+  have hψV : ∀ v ∈ tic.V,
+      (hyp.tau (hyp.muGrid hG hodd i j - (δ : ℂ) • hyp.muGrid hG hodd i 0 - (n : ℂ) • ζ)
+          + (n : ℂ) • (hyp.SHC_isCoherent hG).extension ζ
+        - (δ : ℂ) • (tic.chiFam hVeq app (P j) - tic.chiFam hVeq app (P 0))) v = 0 := by
+    intro v hv
+    rw [hPj', hP0']
+    exact hyp.SHC_muGridPsi_vanishes_on_typePV hG hodd hj0 hζS hζirr hζ1 hζne hdeg hμ0 hnf hδj hv
+  rw [eq_sub_iff_add_eq, ← hPj', ← hP0']
+  exact tic.eq_smul_chiFam_diff_of_vanishOnV hVeq app hXZ hXfacts.2 hPne hδpm hψV
+
+open scoped FiniteInduce in
 /-- **General `S(HC)`-coherence split** `(ζ − η)^τ = ζ^{τ₁} − η^{τ₁}` for degree-`w₁` irreducibles
 `ζ, η ∈ S(HC)` (α-grid `S₁`-`τ₁` input to (11.8.2)).  Generalizes `tau_zeta_sub_conj_eq_SHC_extension`
 (the `η = ζ̄` case) to an arbitrary `S(HC)` member: since `ζ, η ∈ S(HC)` have equal degree `w₁`, the
