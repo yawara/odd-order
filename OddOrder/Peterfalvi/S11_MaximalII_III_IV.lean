@@ -6479,6 +6479,24 @@ theorem hcPsi_conjBy_eq [Finite G] {M : Subgroup G}
   rw [hval]
   simp only [hcPsi, linearIrreducibleCharacter_apply, MonoidHom.comp_apply, hcConjDescend_hcHom]
 
+/-- **`A_g = hcConjDescend g` is bijective** (an automorphism of `H̄`), with inverse
+`A_{g⁻¹}`: `A_g(A_{g⁻¹} z) = z` and `A_{g⁻¹}(A_g z) = z` by the factoring `hcConjDescend_hcHom`
+(`hcHom` surjective) and `g·(g⁻¹·y·g)·g⁻¹ = y`.  Together with `A_g(Hpart i) ⊆ Hpart i` (case-A
+`Hpart_aInvariant`, the `U`-action factor-preservation) this gives `A_g(Hpart i) = Hpart i`, hence
+`θ ∘ A_g` regular ⟺ `θ` regular — the regularity half of the `oXtheta` `T`-invariance. -/
+theorem hcConjDescend_bijective [Finite G] {M : Subgroup G}
+    {data : TypesIIIIIIVSetup M} (chief : ChiefFactorData data) (g : ↥(huSub data))
+    [(hInHu data ⊔ ((chief.H0 ⊔ cSub data chief).subgroupOf M).subgroupOf (huSub data)).Normal] :
+    Function.Bijective (hcConjDescend chief g) := by
+  refine Function.bijective_iff_has_inverse.mpr ⟨hcConjDescend chief g⁻¹, ?_, ?_⟩ <;>
+  · intro z
+    obtain ⟨x, rfl⟩ := hcHom_surjective chief z
+    rw [hcConjDescend_hcHom, hcConjDescend_hcHom]
+    congr 1
+    apply Subtype.ext
+    simp only [ClassFunction.conjByMulEquiv_apply, Subgroup.coe_mul, Subgroup.coe_inv]
+    group
+
 /-- **`ζ(1) = u`**: the degree of `ζ = Ind_{HC}^{HU}(ψ)` is `u`.  `induce_apply_one` gives
 `ζ(1) = [HU:HC]·ψ(1) = u·1` (`hc_index_eq_u`, and `ψ` linear so `ψ(1)=1`).  This is the degree-`u`
 of the (9.8.c) irreducible; `induceHU ζ` then has degree `q·u = qu`. -/
