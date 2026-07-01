@@ -7763,4 +7763,29 @@ theorem restrict_restrict_subgroupOf {Γ k : Type*} [Group Γ] [CommRing k]
   simp only [ClassFunction.restrict_apply, ClassFunction.compHom_apply, MulEquiv.coe_toMonoidHom]
   congr 1
 
+/-- **`innerSum` is preserved under `compHom` by a group isomorphism** (reindex the sum by the iso).
+Generalises `innerSum_compHom_of_bijective` (an endomorphism) to a `MulEquiv A ≃* B`. -/
+theorem innerSum_compHom_mulEquiv {A B : Type*} [Group A] [Group B] [Fintype A] [Fintype B]
+    (e : A ≃* B) (a b : ClassFunction B ℂ) :
+    ClassFunction.innerSum (ClassFunction.compHom e.toMonoidHom a)
+        (ClassFunction.compHom e.toMonoidHom b) = ClassFunction.innerSum a b := by
+  simpa only [ClassFunction.innerSum, ClassFunction.compHom_apply, MulEquiv.coe_toMonoidHom] using
+    Fintype.sum_equiv e.toEquiv
+      (fun x => a (e x) * star (b (e x))) (fun y => a y * star (b y)) (fun _ => rfl)
+
+/-- **Inner product is preserved under `compHom` by a group isomorphism**.  Generalises
+`inner_compHom_of_bijective` (an endomorphism) to a `MulEquiv A ≃* B`.  Used in the lies-over
+transitivity of the (9.8.c) Clifford-correspondence step 5, where the intermediate subgroup
+`H.subgroupOf K ≃* H` transports the restriction. -/
+theorem inner_compHom_mulEquiv {A B : Type*} [Group A] [Group B] [Fintype A] [Fintype B]
+    [Invertible (Nat.card A : ℂ)] [Invertible (Nat.card B : ℂ)] (e : A ≃* B)
+    (a b : ClassFunction B ℂ) :
+    ClassFunction.inner (ClassFunction.compHom e.toMonoidHom a)
+        (ClassFunction.compHom e.toMonoidHom b) = ClassFunction.inner a b := by
+  have hcard : (Nat.card A : ℂ) = Nat.card B := by rw [Nat.card_congr e.toEquiv]
+  rw [ClassFunction.inner_eq_inv_card_mul_innerSum, ClassFunction.inner_eq_inv_card_mul_innerSum,
+    innerSum_compHom_mulEquiv]
+  congr 1
+  rw [invOf_eq_inv, invOf_eq_inv, hcard]
+
 end OddOrder.Peterfalvi.S11
