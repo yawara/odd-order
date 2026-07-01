@@ -2342,6 +2342,157 @@ theorem Sset_degreeSqReBound_of_not_coherent [Finite G] {L : Subgroup G} (hyp : 
     _ = 2 * ((a : ℝ) * (χ₁ 1).re) * (χ₁ 1).re := by ring
     _ = 2 * (ψ 1).re * (χ₁ 1).re := by rw [hψre]
 
+/-- **The witness kernel `K = (L_F).subgroupOf L` is normal in `↥L`** — `L_F = maxNilpotentNormalHall L`
+whose `subgroupOf L` is normal (`maxNilpotentNormalHall_subgroupOf_normal`).  Needed by the (6.2) B2
+degree-sum identity and the (6.5) engine's `hHnorm`. -/
+theorem typeF_H_subgroupOf_normal [Finite G] {L : Subgroup G} (hyp : Hypothesis L) :
+    ((hyp.typeI.typeF.H).subgroupOf L).Normal := by
+  rw [hyp.typeI.typeF.H_eq]
+  exact OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_subgroupOf_normal L
+
+open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
+open scoped Classical in
+/-- **Peterfalvi (6.2) B2 — the `S(A)` degree-square identity** (witness form).  Mirror of the Sibley
+`sum_re_sq_induce_kernelFilter_eq`: over the witness kernel `K = (L_F).subgroupOf L`, the filtered
+induced family `{Ind_K^L θ | A ⊆ Ker θ, θ ≠ 1}` has degree-square sum `|L:K|·(|K:A| − 1)`, via the
+abstract B2 `sum_div_normSq_induce_kernelFilter_eq` and that each member is irreducible (`‖·‖² = 1`,
+`χ(1)` a real natural). -/
+theorem Sset_sum_re_sq_induce_kernelFilter_eq [Finite G] {L : Subgroup G} (hyp : Hypothesis L)
+    {C : Subgroup ↥L}
+    (hfrob : OddOrder.Isaacs.Ch06.IsFrobeniusGroup ↥L ((hyp.typeI.typeF.H).subgroupOf L) C)
+    {A : Subgroup ↥L} [A.Normal] :
+    ∑ χ ∈ (Finset.univ.filter
+        (fun θ : IrreducibleCharacter ↥((hyp.typeI.typeF.H).subgroupOf L) =>
+          (↑(A.subgroupOf ((hyp.typeI.typeF.H).subgroupOf L)) :
+              Set ↥((hyp.typeI.typeF.H).subgroupOf L)) ⊆
+            OddOrder.Peterfalvi.S03.characterKernel
+              (θ : ClassFunction ↥((hyp.typeI.typeF.H).subgroupOf L) ℂ) ∧
+            θ ≠ trivialIrreducibleCharacter ↥((hyp.typeI.typeF.H).subgroupOf L))).image
+        (fun θ => ClassFunction.induce ((hyp.typeI.typeF.H).subgroupOf L) θ.toClassFunction),
+        ((χ 1).re) ^ 2
+      = (((hyp.typeI.typeF.H).subgroupOf L).index : ℝ) *
+        ((Nat.card (↥((hyp.typeI.typeF.H).subgroupOf L) ⧸
+          A.subgroupOf ((hyp.typeI.typeF.H).subgroupOf L)) : ℝ) - 1) := by
+  haveI := hyp.finiteG
+  haveI : ((hyp.typeI.typeF.H).subgroupOf L).Normal := typeF_H_subgroupOf_normal hyp
+  have hB2 := OddOrder.Peterfalvi.S08.sum_div_normSq_induce_kernelFilter_eq (G := ↥L)
+    (H := (hyp.typeI.typeF.H).subgroupOf L) (A := A)
+  have hsummand : ∀ χ ∈ (Finset.univ.filter
+      (fun θ : IrreducibleCharacter ↥((hyp.typeI.typeF.H).subgroupOf L) =>
+        (↑(A.subgroupOf ((hyp.typeI.typeF.H).subgroupOf L)) :
+            Set ↥((hyp.typeI.typeF.H).subgroupOf L)) ⊆
+          OddOrder.Peterfalvi.S03.characterKernel
+            (θ : ClassFunction ↥((hyp.typeI.typeF.H).subgroupOf L) ℂ) ∧
+          θ ≠ trivialIrreducibleCharacter ↥((hyp.typeI.typeF.H).subgroupOf L))).image
+      (fun θ => ClassFunction.induce ((hyp.typeI.typeF.H).subgroupOf L) θ.toClassFunction),
+      χ 1 ^ 2 / ClassFunction.inner χ χ = ((((χ 1).re) ^ 2 : ℝ) : ℂ) := by
+    intro χ hχ
+    obtain ⟨θ, hθ, rfl⟩ := Finset.mem_image.mp hχ
+    have hθne : θ ≠ trivialIrreducibleCharacter ↥((hyp.typeI.typeF.H).subgroupOf L) :=
+      (Finset.mem_filter.mp hθ).2.2
+    have hχS : ClassFunction.induce ((hyp.typeI.typeF.H).subgroupOf L)
+        (θ : ClassFunction ↥((hyp.typeI.typeF.H).subgroupOf L) ℂ) ∈ hyp.Sset := by
+      simp only [Hypothesis.Sset, Set.mem_setOf_eq]; exact ⟨θ, hθne, rfl⟩
+    have hirr := Sset_isIrreducibleCharacter hyp hfrob hχS
+    have hinner : ClassFunction.inner
+        (ClassFunction.induce ((hyp.typeI.typeF.H).subgroupOf L)
+          (θ : ClassFunction ↥((hyp.typeI.typeF.H).subgroupOf L) ℂ))
+        (ClassFunction.induce ((hyp.typeI.typeF.H).subgroupOf L)
+          (θ : ClassFunction ↥((hyp.typeI.typeF.H).subgroupOf L) ℂ)) = 1 := by
+      simpa using OddOrder.RepresentationTheory.irreducibleCharacter_inner_eq_ite
+        (⟨_, hirr⟩ : IrreducibleCharacter ↥L) ⟨_, hirr⟩
+    obtain ⟨n, -, hn1, -⟩ := hirr.exists_natDegree_charValue_one_dvd_card
+    rw [hinner, div_one, hn1, Complex.natCast_re]; push_cast; ring
+  have key : ((∑ χ ∈ (Finset.univ.filter
+        (fun θ : IrreducibleCharacter ↥((hyp.typeI.typeF.H).subgroupOf L) =>
+          (↑(A.subgroupOf ((hyp.typeI.typeF.H).subgroupOf L)) :
+              Set ↥((hyp.typeI.typeF.H).subgroupOf L)) ⊆
+            OddOrder.Peterfalvi.S03.characterKernel
+              (θ : ClassFunction ↥((hyp.typeI.typeF.H).subgroupOf L) ℂ) ∧
+            θ ≠ trivialIrreducibleCharacter ↥((hyp.typeI.typeF.H).subgroupOf L))).image
+        (fun θ => ClassFunction.induce ((hyp.typeI.typeF.H).subgroupOf L) θ.toClassFunction),
+        ((χ 1).re) ^ 2 : ℝ) : ℂ)
+      = (((((hyp.typeI.typeF.H).subgroupOf L).index : ℝ) *
+        ((Nat.card (↥((hyp.typeI.typeF.H).subgroupOf L) ⧸
+          A.subgroupOf ((hyp.typeI.typeF.H).subgroupOf L)) : ℝ) - 1)) : ℝ) := by
+    rw [Complex.ofReal_sum, Finset.sum_congr rfl (fun χ hχ => (hsummand χ hχ).symm), hB2]
+    push_cast; ring
+  exact Complex.ofReal_inj.mp key
+
+open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
+open scoped Classical in
+/-- **Peterfalvi (6.2) per-step index bound** (witness form) — if `S(A) ⊆ S₁` (coherent, with a
+degree-`|L:K|` anchor `χ₁`) breaks against `{ψ, ψ̄}`, then `|K:A| − 1 ≤ 2·ψ(1).re`.  The `S(A)`
+degree-square sum `|L:K|·(|K:A|−1)` (B2, `Sset_sum_re_sq_induce_kernelFilter_eq`) is bounded by the
+full enumerated `S₁`-family sum, which the (5.6) bound `Sset_degreeSqReBound_of_not_coherent` caps by
+`2·ψ(1).re·χ₁(1).re`; dividing by `χ₁(1).re = |L:K|`.  Mirror of `sMember_index_le_two_psi`. -/
+theorem Sset_index_le_two_psi [Finite G] {L : Subgroup G} (hyp : Hypothesis L)
+    (hodd : Odd (Nat.card ↥L)) {C : Subgroup ↥L}
+    (hfrob : OddOrder.Isaacs.Ch06.IsFrobeniusGroup ↥L ((hyp.typeI.typeF.H).subgroupOf L) C)
+    (hAH : hyp.ambientA = ((hyp.typeI.typeF.H) : Set G) \ {1})
+    {A : Subgroup ↥L} [A.Normal]
+    {S₁ : Set (ClassFunction ↥L ℂ)} (hS₁sub : S₁ ⊆ hyp.Sset)
+    (hS₁conj : OddOrder.Peterfalvi.S03.ClosedUnderConjugate S₁) (hS₁fin : S₁.Finite)
+    (hSA_S1 : hyp.SsubFiltration A ⊆ S₁)
+    (hS₁coh : OddOrder.Peterfalvi.S07.IsCoherent hyp.tau S₁ hyp.A)
+    {χ₁ : ClassFunction ↥L ℂ} (hχ₁S₁ : χ₁ ∈ S₁)
+    (hχ₁deg : χ₁ 1 = (((hyp.typeI.typeF.H).subgroupOf L).index : ℂ))
+    {ψ : ClassFunction ↥L ℂ} (hψS : ψ ∈ hyp.Sset) (hψirr : IsIrreducibleCharacter ψ)
+    (hψnotS1 : ψ ∉ S₁) (hψcnotS1 : ψ.conj ∉ S₁)
+    (hnc : ¬ Nonempty (OddOrder.Peterfalvi.S07.IsCoherent hyp.tau (S₁ ∪ {ψ, ψ.conj}) hyp.A)) :
+    (Nat.card (↥((hyp.typeI.typeF.H).subgroupOf L) ⧸
+      A.subgroupOf ((hyp.typeI.typeF.H).subgroupOf L)) : ℝ) - 1 ≤ 2 * (ψ 1).re := by
+  obtain ⟨k, χmem, hχinj, hrange, hmemS1, hfambound⟩ :=
+    Sset_degreeSqReBound_of_not_coherent hyp hodd hfrob hAH hS₁sub hS₁conj hS₁fin hS₁coh hχ₁S₁
+      hχ₁deg hψS hψirr hψnotS1 hψcnotS1 hnc
+  have hcfinj : Function.Injective (fun j => (χmem j : ClassFunction ↥L ℂ)) :=
+    fun a b h => hχinj (Subtype.ext h)
+  have hB2 := Sset_sum_re_sq_induce_kernelFilter_eq hyp hfrob (A := A)
+  set SA := (Finset.univ.filter
+      (fun θ : IrreducibleCharacter ↥((hyp.typeI.typeF.H).subgroupOf L) =>
+        (↑(A.subgroupOf ((hyp.typeI.typeF.H).subgroupOf L)) :
+            Set ↥((hyp.typeI.typeF.H).subgroupOf L)) ⊆
+          OddOrder.Peterfalvi.S03.characterKernel
+            (θ : ClassFunction ↥((hyp.typeI.typeF.H).subgroupOf L) ℂ) ∧
+          θ ≠ trivialIrreducibleCharacter ↥((hyp.typeI.typeF.H).subgroupOf L))).image
+      (fun θ => ClassFunction.induce ((hyp.typeI.typeF.H).subgroupOf L) θ.toClassFunction)
+    with hSAdef
+  have hsub : SA ⊆ (Set.range (fun j => (χmem j : ClassFunction ↥L ℂ))).toFinset := by
+    intro χ hχ
+    rw [Set.mem_toFinset, hrange]
+    rw [hSAdef] at hχ
+    obtain ⟨θ, hθ, rfl⟩ := Finset.mem_image.mp hχ
+    obtain ⟨-, hker, hne⟩ := Finset.mem_filter.mp hθ
+    apply hSA_S1
+    simp only [Hypothesis.SsubFiltration, Set.mem_setOf_eq]
+    exact ⟨θ, hne, hker, rfl⟩
+  have hchain : (((hyp.typeI.typeF.H).subgroupOf L).index : ℝ) *
+      ((Nat.card (↥((hyp.typeI.typeF.H).subgroupOf L) ⧸
+        A.subgroupOf ((hyp.typeI.typeF.H).subgroupOf L)) : ℝ) - 1) ≤
+      2 * (ψ 1).re * (χ₁ 1).re := by
+    rw [← hB2]
+    calc ∑ χ ∈ SA, ((χ 1).re) ^ 2
+        ≤ ∑ χ ∈ (Set.range (fun j => (χmem j : ClassFunction ↥L ℂ))).toFinset, ((χ 1).re) ^ 2 :=
+          Finset.sum_le_sum_of_subset_of_nonneg hsub (fun _ _ _ => sq_nonneg _)
+      _ = ∑ j : Fin k, (((χmem j : ClassFunction ↥L ℂ) 1).re) ^ 2 :=
+          OddOrder.Peterfalvi.S08.sum_toFinset_range_eq hcfinj (fun χ => (χ 1).re ^ 2)
+      _ ≤ 2 * (ψ 1).re * (χ₁ 1).re := hfambound
+  have hχ₁re : (χ₁ 1).re = (((hyp.typeI.typeF.H).subgroupOf L).index : ℝ) := by
+    rw [hχ₁deg, Complex.natCast_re]
+  rw [hχ₁re] at hchain
+  have hidx_pos : (0 : ℝ) < (((hyp.typeI.typeF.H).subgroupOf L).index : ℝ) := by
+    exact_mod_cast Nat.pos_of_ne_zero Subgroup.index_ne_zero_of_finite
+  have key : (((hyp.typeI.typeF.H).subgroupOf L).index : ℝ) *
+      ((Nat.card (↥((hyp.typeI.typeF.H).subgroupOf L) ⧸
+        A.subgroupOf ((hyp.typeI.typeF.H).subgroupOf L)) : ℝ) - 1) ≤
+      (((hyp.typeI.typeF.H).subgroupOf L).index : ℝ) * (2 * (ψ 1).re) := by
+    calc (((hyp.typeI.typeF.H).subgroupOf L).index : ℝ) *
+          ((Nat.card (↥((hyp.typeI.typeF.H).subgroupOf L) ⧸
+            A.subgroupOf ((hyp.typeI.typeF.H).subgroupOf L)) : ℝ) - 1)
+        ≤ 2 * (ψ 1).re * (((hyp.typeI.typeF.H).subgroupOf L).index : ℝ) := hchain
+      _ = (((hyp.typeI.typeF.H).subgroupOf L).index : ℝ) * (2 * (ψ 1).re) := by ring
+  exact le_of_mul_le_mul_left key hidx_pos
+
 open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
 open OddOrder.Peterfalvi.S09.Cert in
 /-- **`S(H′)` member differences are `A(L)`-supported** — the `hab`-free subfamily analogue of
