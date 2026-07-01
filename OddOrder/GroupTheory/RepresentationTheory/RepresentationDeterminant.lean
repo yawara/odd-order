@@ -37,4 +37,14 @@ noncomputable def representationDeterminant (ρ : Representation ℂ G V) : G �
     (representationDeterminant ρ g : ℂ) = LinearMap.det (ρ g) := by
   rw [representationDeterminant, MonoidHom.comp_apply, Units.coe_map, ρ.asGroupHom_apply]
 
+/-- The determinant character commutes with pullback along a homomorphism:
+`det (ρ ∘ f) = (det ρ) ∘ f`.  With `f = H.subtype` this is `det (Res_H χ) = Res_H (det χ)` — the
+determinantal character of an extension `χ ∈ Irr(I)` of `θ ∈ Irr(H)` restricts to `det θ`, the
+compatibility that pins the coprime extension. -/
+theorem representationDeterminant_comp {H : Type*} [Group H] (ρ : Representation ℂ G V)
+    (f : H →* G) :
+    representationDeterminant (ρ.comp f) = (representationDeterminant ρ).comp f := by
+  ext h
+  simp only [representationDeterminant_apply, MonoidHom.comp_apply]
+
 end OddOrder.RepresentationTheory

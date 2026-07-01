@@ -2031,6 +2031,33 @@ theorem Sset_diff_supported [Finite G] {L : Subgroup G} (hyp : Hypothesis L)
 
 open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
 open OddOrder.Peterfalvi.S09.Cert in
+/-- **A member's conjugate-difference `χ̄ − χ` is `A(L)`-supported** (any `χ ∈ S`, no constant-degree
+needed) — the per-member support field of the (5.6) family enumeration (h56).  Off `H` both `χ` and
+`χ̄` vanish (`Sset_vanishes_off_H`); at `1`, `χ̄(1) = χ(1)` because `χ(1)` is a (real) natural degree
+(`χ` irreducible), so `χ̄ − χ` is supported on `H^# = A(L)`. -/
+theorem Sset_conjDiff_supported [Finite G] {L : Subgroup G} (hyp : Hypothesis L) {C : Subgroup ↥L}
+    (hfrob : OddOrder.Isaacs.Ch06.IsFrobeniusGroup ↥L ((hyp.typeI.typeF.H).subgroupOf L) C)
+    (hAH : hyp.ambientA = ((hyp.typeI.typeF.H) : Set G) \ {1})
+    {χ : ClassFunction ↥L ℂ} (hχ : χ ∈ hyp.Sset) :
+    (χ.conj - χ).support ⊆ OddOrder.Peterfalvi.S04.supportInSubgroup hyp.ambientA L := by
+  intro x hx
+  have hx0 : (χ.conj - χ) x ≠ 0 := ClassFunction.mem_support.mp hx
+  rw [ClassFunction.sub_apply, ClassFunction.conj_apply] at hx0
+  have hxH : (x : G) ∈ hyp.H := by
+    by_contra h
+    apply hx0
+    rw [Sset_vanishes_off_H hyp hχ h]; simp
+  have hx1 : x ≠ 1 := by
+    rintro rfl
+    apply hx0
+    obtain ⟨n, -, hn1, -⟩ :=
+      (Sset_isIrreducibleCharacter hyp hfrob hχ).exists_natDegree_charValue_one_dvd_card
+    rw [hn1, star_natCast, sub_self]
+  exact (mem_supportInSubgroup_sharp_subgroupOf_iff hyp.typeI.typeF.H hAH x).mpr
+    ⟨Subgroup.mem_subgroupOf.mpr hxH, hx1⟩
+
+open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
+open OddOrder.Peterfalvi.S09.Cert in
 /-- **`S(H′)` member differences are `A(L)`-supported** — the `hab`-free subfamily analogue of
 `Sset_diff_supported` for the (6.5.c) `hcoh`.  Members of `S(⁅K,K⁆)` vanish off `H` (as `Sset`
 members, `Sset_vanishes_off_H`) and share the constant degree `|L:K|` at `1`

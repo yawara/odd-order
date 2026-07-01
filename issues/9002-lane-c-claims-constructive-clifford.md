@@ -99,9 +99,16 @@ Coq (1.7)(b) `cfInd_central_Inertia` の hypothesis は `abelian (T/H)` (T=I(θ)
 - [x] **慣性商 abelian 完成** — `S14.typeF_inertia_commutator_le` (`⁅I(θ),I(θ)⁆ ≤ H`, sorry-free, cont.³)。
 - [ ] **(G1) 拡張 lemma** を build。coprime Hall (H=L_F normal Hall) の下で θ を I に拡張 (Isaacs *Character
       Theory* 6.28/8.16、coprime extension via 決定行列式)。**⚠ 注意: proof は Isaacs *CT* book (=project .mmd 外)**。
-      **infra build 開始 (cont.¹³)**: `RepresentationDeterminant.representationDeterminant` (det∘ρ : G→*ℂˣ,
-      sorry-free) — coprime extension の engine (extension を det 順序で pin)。**残 infra = 決定行列式の順序 +
-      coprime extension 構成**(Isaacs *CT* 8.16、多段・fresh session 推奨、必要なら ChatGPT で argument 再構成)。
+      **infra build 開始 (cont.¹³-¹⁴)**: `RepresentationDeterminant.{representationDeterminant, _comp}`
+      (det∘ρ : G→*ℂˣ + `det(Res χ)=Res(det χ)`, sorry-free)。
+      **具体 build plan (cont.¹⁴、cyclic route = cohomology 回避)**: Isaacs 11.22 の cyclic extension
+      (H⊴K, K/H cyclic, θ K-invariant ⟹ θ extends) を build → abelian I/H は composition series で iterate。
+      **Schur infra 在庫**: `SchurCenterBound.schur`/`center_isScalar`/`classFunctionIntertwiner`。
+      pieces: (i) invariant θ の intertwiner P (θ^g=θ ⟹ ρ_θ≅ρ_θ^g、同 char⟹同型 from completeness)、
+      (ii) P^n scalar (Schur)、(iii) n-th root 調整で P'^n=ρ_θ(g^n)、(iv) `ρ_χ(g^i h)=P'^i ρ_θ(h)` 拡張 +
+      既約性、(v) abelian で iterate (invariance propagation が要注意点)。**genuine multi-session、正面から engage**。
+      ⚠ **lane c 現状 = coupled-pipeline stall** (Clifford=extension massive-gated、S15/16=§13-gated) — 構造的、
+      reallocation note が予期した通り。extension infra を dedicated に build するのが唯一の ungated 前進。
 - [x] **char-product infra (Gallagher 前提)** — `RepresentationTheory/CharacterProduct.lean` (新 leaf, sorry-free,
       axiom-clean, cont.⁴): `ClassFunction` に pointwise `Mul` + `IsCharacter.mul` (χ·ψ = char of `tprod`,
       `Representation.char_tensor` 経由) + `mul_mem_ZIrr` (ZIrr は積で閉じる=部分環)。Gallagher の
