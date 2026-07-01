@@ -29,8 +29,19 @@ lane b (β, Pf §12/S14) が (5.5) landing 後の frontier 精査で発見した
 は **global 等長** (全 CF(L))。だが witness の Dade map `hyp.tau` は dim CF(L) > dim CF(G) ゆえ
 global isometry でない (IsCoherent が lattice-relative に weakened されている理由と同じ)。⟹
 `coherent_of_constant_degree` を witness の hyp.tau に直接使えない。case(b) は **Dade-map ベースの
-等次数 coherence producer** (global isometry を要さない lattice-relative 版、`isCoherent_pair_of_differenceImage`
-(S07:86) の等次数 n-member 一般化) が要る。→ **これも coherence infra の build 事項。**
+等次数 coherence producer** (global isometry を要さない lattice-relative 版) が要る。
+
+**精査結果 (turnkey、2026-07-01)**: この weakening は **機械的で contained**:
+- `coherentEqualDegree` (S07:3621) = producer core は **既に lattice-relative** — global 等長でなく
+  `himg : ∀j, τ(χj-χ0)=Xj-X0` + `horthX` を取る。無改造で使える。
+- `coherent_of_constant_degree` が global 等長を使うのは **1 箇所のみ**: `xFamily_inner` (S07:487) の
+  `hyp.tau_isometry.inner_eq (χ0-χi) (χ0-χj)` — **差にのみ適用**。witness では差は A(L)=H^#-supported
+  (Frobenius: Ind θ は H で消え等次数で 1 で消える) ゆえ Dade map の lattice-relative 等長で足りる。
+- commonImage/pairDecomp' は `ofProjection` ((5.4), lattice-relative) 経由で本質的に global 不要。
+- **∴ 修正 = weakened (5.2) Hypothesis** (`tau_isometry : IsIntegralIsometry` を差-等長の lattice-relative
+  版に置換) を chain (commonImage/pairDecomp'/xFamily_inner) に通すだけ。coherentEqualDegree 無改造。
+  **shared S07 refactor だが機械的**。→ **どのレーンが実施? lane b は S14 owner、S07 は shared、
+  lane a も coherence 使用。hub 割当求む。**
 
 **(B) 構成的 Clifford correspondence (issue 0026)** — M-side (12.14) が gated (issue 0026, notes loop⁶¹)。
 `typeI_induced_char_constituents` / `constituent_diff_support_subset_nonescaping` が
