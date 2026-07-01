@@ -45,12 +45,19 @@
 
 | lane | worktree | クラスタ | 主所有ファイル | ODD_ISSUE_BASE |
 |---|---|---|---|---|
-| **a** | `odd-order-a` | **α** Pf §10–11–13 中央指標核 | `Peterfalvi/{S10_MinimalSimpleStructure, S11_MaximalII_III_IV, S12_MaximalIII_IV_V, S13_MaximalIII_IV}.lean` + `FeitThompson.lean:426` (`card_kappaHall_lt_of_isTypeIIIorIV`) | 1000 |
-| **b** | `odd-order-b` | **β** Pf §12 all-Type-I Dade tower | `Peterfalvi/S14_MaximalI.lean` | 2000 |
-| **c** | `odd-order-c` | **γ** POLE-2 §14–16 下流 (Arm B) | `Peterfalvi/{S15_SAndT, S16_NonExistenceG}.lean` | 3000 |
-| **d** | `odd-order-d` | **σ-theory (typeP_Galois 土台) 新 shared-infra leaf** (2026-07-01 再々配分, issue 4014 hub 裁定) + γ §15 S&T setup / δ BG §14–16 (dormant) | `OddOrder/GroupTheory/**` σ-theory leaf (主, claim-first) + `Peterfalvi/S15_SAndT_Setup.lean` + `BG/**` + `FeitThompson.lean` carrier (dormant) | 4000/9000 |
+| **a** | `odd-order-a` | **α** Pf §10–13 中央指標核 **+ σ-theory tail/dedup** | `Peterfalvi/{S10_MinimalSimpleStructure, S11_MaximalII_III_IV, S12_MaximalIII_IV_V, S13_MaximalIII_IV}.lean` + `FeitThompson.lean:426` + S10 bgTheoremE carrier (旧 carve-out 0086 解消) + σ-theory tail (S11 imprimitivity 完成 + dup 3定理 retire→generic leaf cite) | 1000 |
+| **b** | `odd-order-b` | **β** Pf §12 all-Type-I Dade tower **+ coherence infra** | `Peterfalvi/S14_MaximalI.lean` (全体、旧 carve-out 0088 `exists_typeICovering` 解消) + coherence infra ((6.5.c), S07 refactor 済) | 2000 |
+| **c** | `odd-order-c` | **γ** POLE-2 §15–16 chain **一本化 + Clifford** | `Peterfalvi/{S15_SAndT_Setup, S15_SAndT, S16_NonExistenceG}.lean` (§15→16 全 chain) + 構成的 Clifford (issue 9002) | 3000 |
 
-> **⚠ 2026-07-01 再々配分 (ユーザー裁定, issue 4014 hub 裁定)**: lane d は §15 S&T setup / δ BG §14–16 の
+> **⚠⚠ 2026-07-02 3 レーン再編 (ユーザー裁定) — lane d 退役**: char endgame が「4 独立クラスタ」でなく密結合
+> パイプライン (coherence→σ-theory→§10-13→§13-16→S16) と判明。ungated frontier は上流集中で下流 (c/d) が
+> 反復 stall → 3 レーンに縮約。**lane d 退役**: σ-theory dichotomy は sorry-free 完成、残 tail = S11 consumer
+> (lane a) に fold、δ BG/** は完了済 (共有・凍結)、carrier 群も done。**S15_SAndT_Setup は lane c へ** (§15→16
+> chain を一本化、issue 0092 の decouple は 3 レーンでは不要)。carve-out 0086/0088 は file owner (a/b) に解消。
+> σ-theory generic leaf は `OddOrder/GroupTheory/**` 共有ゾーンに残置、lane a が tail を完成 + S11 dedup を実施。
+> **ISSUE_BASE 4000 は退役** (9000 shared-infra レンジは全レーン継続)。詳細 = 本節 + merge_monitor 現状メモ。
+
+> **⚠ 2026-07-01 再々配分 (issue 4014 hub 裁定, 履歴) → 2026-07-02 に上記 3 レーン再編で superseded**: lane d は §15 S&T setup / δ BG §14–16 の
 > **on-feitThompson-spine な ungated genuine work が枯渇** (code-level 確証)。残 on-spine 前進は全て他レーン
 > 上流に gated (typeP_Galois 未実装 / lane a §11 H_elementaryAbelian sorried / §9 Singer / lane b (6.8)
 > Sibley coherence)。⟹ **lane d の主焦点を generic σ-theory (semilinear/near-field) = `typeP_Galois` の土台
