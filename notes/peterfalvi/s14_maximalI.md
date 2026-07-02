@@ -1769,3 +1769,63 @@ bridge assembly、(8.18.c)→(12.16) 全体を unblock。Cluster A は §8-§11 
 の上へ移動 + `hxH` を実導出化 (x∈P₀≤M ∧ x∈P₀≤L_s≤L ⟹ x∈M⊓L≤L_F、(12.11) cite)。→
 `witness_H_sharp_not_isTISubset` は body sorry-free ((12.10) 非-TI reduction 完全組立、唯一の sorry は
 cite 先の (12.11) = Peterfalvi が置く場所)。
+
+## loop⁹²: (8.18.c) 前提 `support_mutual_exclusion` を PROVE (commit 65a2be52, issue 9003 Cluster B)
+
+`S10.support_mutual_exclusion` (Pf 8.18.c、S10_MinimalSimpleStructure:854) を sorry-free + axiom-clean 化。
+**旧 statement は偽**だった (nonconjugacy 仮説なし → conjugate S=T で sharp set が相互 support)。必要な
+`IsTypeI S/T` + `¬ IsConjugateSubgroup S T` を追加 (全て (8.18.c) caller `nonconjugate_diffImage_inner_zero`
+の hyp1/hyp2 type-I + hnot_conj から供給可)。証明: type-I ⟹ A₁=M_σ^# (`A1_eq_sigmaSharp_of_typeI_or_II`)、
+y∈A₁(S)⊆M̃(S)⊆𝒞_G(M̃(S))、片方向 support で y∈𝒞_G(M̃(T))、`conjClassSet_Mtilde_disjoint` (BG 14.5(b) 証明済)
+で矛盾。`import S10_BGInterface` 追加 (cycle 無)。§10 (lane-d/f) file の false/sorried statement の fix。
+
+**次 (loop⁹³, task 7)**: (8.18.c) `nonconjugate_diffImage_inner_zero` (S14:665) の assembly —
+support_mutual_exclusion + Dade-image support (supp(τ(φ−φ̄))⊆𝒞_G(A(L))) + inner_eq_zero_of_disjoint_support。
+Ã/A1/𝒞_G 対応注意 (mutual-support→conjClassSet-disjoint 形要)。→ (12.3)→(12.16) FT chain 閉じる。
+
+## loop⁹³: (8.18.c) inner-vanishing reduction を PROVE (commit cec700a5)
+
+`nonconjugate_diffImage_inner_zero` (8.18.c, S14:665) を bare sorry → **実 reduction 証明**化 (hub 指示通り
+S14 のみ)。τ-image `τ_i(φ_i−φ̄_i)` は dadeSupport(L_i) 外で消える (`constituentDiff_support_subset` =
+R1_diffsupp のミラー + `dadeIntegralCharacterMap_apply_of_support` + `map_eq_zero_of_not_mem_dadeSupport`)
+→ supp ⊆ dadeSupport、nonconjugate で disjoint → `inner_eq_zero_of_disjoint_support`。唯一の残 sorry =
+**`dadeSupport_disjoint_of_nonconjugate`** (§10 M̃ geometry: dadeSupport⊆𝒞_G(M̃)+conjClassSet_Mtilde_disjoint、
+S14 到達不可)。→ (8.18.c)→(12.3)→(12.16) chain はこの 1 幾何事実 modulo で閉じた。
+
+**次 (loop⁹⁴, task 8)**: `dadeSupport_disjoint_of_nonconjugate` を証明。M̃ 機構が S14 不到達ゆえ relocate to
+S10 (hub 要調整、loop⁹² の S10 逸脱 flag への応答を確認) / S14 import / lane a 所有化 のいずれか。
+
+## loop⁹⁵: dadeSupport ⊆ 𝒞_G(L_F) (Frobenius) を PROVE + M-side subtlety 発見 (commit この iter)
+
+`dadeSupport_subset_conjClassSet_maxNilpotentNormalHall_of_frobenius` を証明 (Frobenius L で
+dadeSupport⊆𝒞_G(L_F)): `dadeSupport=thickenedSupport L L typeIA` (dadeSupport_eq_thickenedSupport) +
+`typeIA⊆L_F` (Frobenius centralizer_kernel_le を inline) + thickenedSupport_subset_conjClassSet。
+supportKernel_le/thickenedSupport_subset を file 前方へ relocate (self-contained)。
+
+**発見した subtlety (task 9)**: dadeSupport_disjoint は両 L に Frobenius を要すが、(12.3) call site
+(coherent_extension_constituent_orthogonal_Rset_of_nonconjugate S14:1278) は Frobenius 無し。(12.16) で
+witness L は Frobenius だが **M は非-Frobenius** (counterexample)。∴ subset lemma は L には効くが M には効かない。
+要調査: (8.18.c) 実 statement が typeIA 両側か typeIA-L/A₁-M mixed か ((M_F)^#⊆M_F は Frobenius 不要ゆえ
+M-side は無条件で 𝒞_G(M_F) に入る可能性); nonconjugate_diffImage が hyp2.tau=typeIA なのと (12.15) の ρ_M=A₁(M)
+の整合。M-side を A₁-based general subset で証明できれば dadeSupport_disjoint 完成。M̃ は S14 到達可。
+
+## loop⁹⁶: (8.18.c) 実 statement を source から解明 — mixed Ã₁/Ã 形 + A₁ resolution
+
+Peterfalvi §8 mmd (04.10) を読了。**(8.18.c) = mixed 形**: `Ã₁(S)∩Ã(T)=∅ ∨ Ã₁(T)∩Ã(S)=∅`
+(A₁=sharp support `(L_F)^#`、A=full `typeIA`)。(12.3) 証明 (04.14) は「(8.18.c) で Ã(L₁)∩Ã₁(L₂)=∅ と
+仮定」= **片側 A₁-based**。
+
+**核心 resolution (Frobenius 不要)**: constituent φ は Ind_{L_F}^L θ の成分ゆえ **(L_F)^# 上 supported**
+(Ind は normal L_F 外で消える、`induce_eq_zero_of_not_mem_normal` @ InducedCharacter:336)。(L_F)^# = A₁ ⊆ L_F
+は**無条件** (Frobenius 不要、sharpSubgroup⊆subgroup)。∴ τ-image を **tight Ã₁-based** にできれば
+`Ã₁(L)⊆𝒞_G(L_F)` が両側で Frobenius 無しに成立 → mixed (8.18.c) で disjoint。
+
+**残 crux (deep §4 Dade)**: tight Dade vanishing `τ(f)⊆Ã₁ for f⊆A₁`。tool = `Hypothesis.restrict`
+(S04:3472、A₁⊆A へ datum 制限、mem_dadeSupport_iff 有)。要: (i) constituent の (L_F)^# support を
+CharacterDecompositionData から tighten (φ≤chi=Ind、supp φ⊆L_F — supp φ⊆supp chi は非自明、要 Ind 構造);
+(ii) restricted datum で tight τ-vanishing; (iii) mixed 形の disjointness 組立。dadeSupport⊆𝒞_G(L_F)
+(Frobenius, 済) は L=witness 側で Ã=Ã₁ ゆえ再利用可。
+
+**評価**: (8.18.c)/dadeSupport は genuine deep §4/§8/§10 Dade-support 理論。loop⁹²-⁹⁶ で実 piece
+(support_mutual_exclusion, reduction, dadeSupport⊆𝒞_G(L_F)) を landing したが完成は §4 restrict 深部を要す
+multi-iteration。β-lane の cleanly-ownable coherence work は完了済。

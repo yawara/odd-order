@@ -654,21 +654,133 @@ noncomputable def Rset {L : Subgroup G} {hyp : Hypothesis L} {chi : ClassFunctio
 
 /-! ## (12.3)--(12.5): orthogonality and rho-constancy -/
 
+/-- **§8 thickening kernel containment.**  The subgroup `R(x) = supportKernel L M X x` of
+Peterfalvi (8.14) is always contained in `L_F = maxNilpotentNormalHall L`: on the
+escaping-centralizer set it is `L_F ⊓ C_G(x) ≤ L_F`, and elsewhere it is `⊥`. -/
+theorem supportKernel_le_maxNilpotentNormalHall (L M : Subgroup G) (X : Set G) (x : G) :
+    supportKernel L M X x ≤ maxNilpotentNormalHall L := by
+  classical
+  unfold supportKernel
+  split
+  · exact inf_le_left
+  · exact bot_le
+
+/-- **The type-I thickened cover lands in `L_F`-conjugates.**  If a support set `X` is contained in
+`L_F = maxNilpotentNormalHall L`, then every element of the thickened support
+`⋃_{z ∈ X} (z R(z))^G` (`thickenedSupport L M X`) is conjugate to an element of `L_F`: the coset
+factor `z ∈ X ⊆ L_F` and the kernel factor `r ∈ R(z) ⊆ L_F`
+(`supportKernel_le_maxNilpotentNormalHall`) multiply into `L_F`, which `𝒞_G` saturates.
+
+This is the structural heart of the (12.17) type-I covering: the thickening `R(z)` never escapes
+`L_F`, so the `A_1(L) = (L_F)#` cover by thickened sets is, up to conjugacy, a cover by `L_F`. -/
+theorem thickenedSupport_subset_conjClassSet_maxNilpotentNormalHall
+    {L M : Subgroup G} {X : Set G} (hX : X ⊆ (maxNilpotentNormalHall L : Set G)) :
+    thickenedSupport L M X ⊆ conjClassSet (maxNilpotentNormalHall L : Set G) := by
+  rintro y ⟨z, hz, hyz⟩
+  obtain ⟨w, hw, g, hgwy⟩ := hyz
+  obtain ⟨r, hr, hzrw⟩ := hw
+  have hzMF : z ∈ maxNilpotentNormalHall L := hX hz
+  have hrMF : r ∈ maxNilpotentNormalHall L :=
+    supportKernel_le_maxNilpotentNormalHall L M X z (SetLike.mem_coe.mp hr)
+  have hwMF : w ∈ maxNilpotentNormalHall L := hzrw ▸ mul_mem hzMF hrMF
+  exact ⟨w, SetLike.mem_coe.mpr hwMF, g, hgwy⟩
+
 open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
-/-- **Peterfalvi (12.3), the geometric obligation** ((8.18.c) + (5.9) + Dade support).  For
-non-conjugate type-I maximal subgroups `L₁, L₂` and constituents `φ₁ ∈ S(χ₁)`, `φ₂ ∈ S(χ₂)`, the
-Dade difference-images `(φ₁−φ̄₁)^{τ₁}` and `(φ₂−φ̄₂)^{τ₂}` are orthogonal: their supports lie in the
-disjoint thickened Dade domains `Ã(L₁)`, `Ã₁(L₂)` (Peterfalvi (8.18.c),
-`S10.support_mutual_exclusion`).  A faithful §8/§10 obligation — the thickened-support theory and
-its mutual-exclusion are §10 (lane-d/f) territory; (12.3) cites this as the geometric input to the
-(4.1) assembly. -/
+/-- **Dade support lands in the `L_F`-conjugates** for a Frobenius type-I `L`.  The (12.1) Dade
+support is the thickened support `Ã(L) = thickenedSupport L L A(L)`
+(`DadeSupportHypothesisData.dadeSupport_eq_thickenedSupport`); for Frobenius `L` the base set
+`A(L) = typeIA L = (L_F)^# ⊆ L_F` (`typeIA_eq_sharp_of_frobenius`), so
+`thickenedSupport_subset_conjClassSet_maxNilpotentNormalHall` places `Ã(L) ⊆ 𝒞_G(L_F)`. -/
+theorem dadeSupport_subset_conjClassSet_maxNilpotentNormalHall_of_frobenius [Finite G]
+    {L : Subgroup G} (hyp : Hypothesis L) {C : Subgroup ↥L}
+    (hfrob : OddOrder.Isaacs.Ch06.IsFrobeniusGroup ↥L ((hyp.typeI.typeF.H).subgroupOf L) C) :
+    hyp.dadeData.dade.dadeSupport ⊆
+      OddOrder.GroupTheory.conjClassSet (maxNilpotentNormalHall L : Set G) := by
+  haveI := hyp.finiteG
+  rw [hyp.dadeData.dadeSupport_eq_thickenedSupport]
+  apply thickenedSupport_subset_conjClassSet_maxNilpotentNormalHall
+  -- `A(L) = typeIA L ⊆ L_F`: for Frobenius `L`, a `y` centralizing a nontrivial `x ∈ L_F` lands in
+  -- `L_F` (`IsFrobeniusGroup.centralizer_kernel_le`) — inlined from `centralizerSupport_sharp_eq`.
+  intro y hy
+  simp only [OddOrder.GroupTheory.typeIA, OddOrder.GroupTheory.centralizerSupport,
+    OddOrder.GroupTheory.sharpSubgroup, Set.mem_setOf_eq, Set.mem_diff, SetLike.mem_coe,
+    Set.mem_singleton_iff] at hy
+  obtain ⟨hyL, _, x, ⟨hxN, hx1⟩, hyx⟩ := hy
+  have hxL : x ∈ L := hyp.typeI.typeF.H_le hxN
+  have hxMsub : (⟨x, hxL⟩ : ↥L) ∈ (hyp.typeI.typeF.H).subgroupOf L :=
+    (Subgroup.mem_subgroupOf).mpr hxN
+  have hx1' : (⟨x, hxL⟩ : ↥L) ≠ 1 := fun h => hx1 (congrArg Subtype.val h)
+  have hycomm : (⟨y, hyL⟩ : ↥L) ∈ Subgroup.centralizer ({(⟨x, hxL⟩ : ↥L)} : Set ↥L) := by
+    rw [Subgroup.mem_centralizer_singleton_iff] at hyx ⊢
+    exact Subtype.ext hyx
+  have hyN : (⟨y, hyL⟩ : ↥L) ∈ (hyp.typeI.typeF.H).subgroupOf L :=
+    hfrob.centralizer_kernel_le _ hxMsub hx1' hycomm
+  rw [← hyp.typeI.typeF.H_eq]
+  exact (Subgroup.mem_subgroupOf).mp hyN
+
+/-- **`(L_F)^#`-conjugates of non-conjugate maximals are disjoint** — the clean M̃-geometry core.
+`(L_F)^# = M_σ(L)^# = sigmaSharp L ⊆ M̃(L)` (`sigmaSharp_subset_Mtilde`), and the thickened
+`M̃`-covers of non-conjugate maximals have disjoint conjugacy-saturations
+(`conjClassSet_Mtilde_disjoint`, BG 14.5(b)).  `sorry`-free; no Frobenius needed (this is the
+identity-free part, `sigmaSharp` excludes `1`). -/
+theorem conjClassSet_sigmaSharp_disjoint_of_nonconjugate [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {L1 L2 : Subgroup G}
+    (hL1 : L1 ∈ maximalSubgroups G) (hL2 : L2 ∈ maximalSubgroups G)
+    (hnc : ¬ OddOrder.BG.Ch4.S14.IsConjugateSubgroup L1 L2) :
+    Disjoint (conjClassSet (OddOrder.BG.Ch4.S14.sigmaSharp L1))
+      (conjClassSet (OddOrder.BG.Ch4.S14.sigmaSharp L2)) :=
+  Disjoint.mono
+    (conjClassSet_mono (OddOrder.BG.Ch4.S14.sigmaSharp_subset_Mtilde hG _))
+    (conjClassSet_mono (OddOrder.BG.Ch4.S14.sigmaSharp_subset_Mtilde hG _))
+    (OddOrder.BG.Ch4.S14.conjClassSet_Mtilde_disjoint hG
+      (OddOrder.BG.Ch4.S14.genuineSigmaDecomposition hG) hL1 hL2 hnc)
+
+/-- The difference `φ − φ̄` of a constituent is supported in `A(L)` (each constituent is supported in
+`A(L) ∪ {1}` by `data.supported`, and `(φ − φ̄)(1) = 0` by equal degree — `φ(1)` is real). -/
+theorem constituentDiff_support_subset {L : Subgroup G} {hyp : Hypothesis L}
+    {chi : ClassFunction ↥L ℂ} (data : CharacterDecompositionData hyp chi)
+    {φ : IrreducibleCharacter ↥L} (hφ : φ ∈ data.constituents) :
+    ((φ : ClassFunction ↥L ℂ) - (φ : ClassFunction ↥L ℂ).conj).support ⊆
+      OddOrder.Peterfalvi.S04.supportInSubgroup hyp.ambientA L := by
+  haveI := hyp.finiteG
+  have hsupp_eq : (φ : ClassFunction ↥L ℂ).conj.support = (φ : ClassFunction ↥L ℂ).support := by
+    ext y
+    simp only [ClassFunction.mem_support, ne_eq, ClassFunction.conj_apply, star_eq_zero]
+  intro x hx
+  have hx0 : ((φ : ClassFunction ↥L ℂ) - (φ : ClassFunction ↥L ℂ).conj) x ≠ 0 := hx
+  have hxsupp : x ∈ (φ : ClassFunction ↥L ℂ).support := by
+    have hxU := ClassFunction.support_sub_subset _ _ hx
+    rwa [hsupp_eq, Set.union_self] at hxU
+  rcases data.supported φ hφ hxsupp with h | h
+  · exact h
+  · exfalso
+    rw [Set.mem_singleton_iff] at h
+    subst h
+    obtain ⟨d, _, hd⟩ := irreducibleCharacter_apply_one_eq_pos_natCast φ
+    exact hx0 (by rw [ClassFunction.sub_apply, ClassFunction.conj_apply, hd, star_natCast, sub_self])
+
+open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
+/-- **Peterfalvi (8.18.c) difference-image orthogonality** (pinned; the geometric obligation of
+(12.3)).  For non-conjugate type-I maximals `L1, L2` and constituents `φ_i`, the Dade difference
+images `τ_i(φ_i − φ̄_i)` are orthogonal.
+
+**This is a genuine §8 support-theory obligation** — NOT a simple disjoint-support argument on the
+`A`-based Dade domains `Ã(L_i)`.  Peterfalvi's proof uses (8.18.c) in the **mixed asymmetric** form
+`Ã₁(L₁) ∩ Ã(L₂) = ∅` (or the swap; `Ã₁ =` thickened `(L_F)^#`, `Ã =` thickened `A(L) = typeIA`) via
+the (8.13)/(8.17) support theory: a *full* member `χ₂ = Ind_{L₂_F}^{L₂} θ₂` is supported on the
+**normal** `L₂_F` so `(χ₂−χ̄₂)^{τ₂} ⊆ Ã₁(L₂)`, while a *constituent* image is only `Ã(L₁)`-supported.
+Crucially the (12.16) callers apply this with `L₁` **Frobenius** (so `A(L₁)=A₁(L₁)`) and `L₂ = N`
+**non-Frobenius** (`(12.15)`: `N` is not Frobenius), so the two supports are genuinely `Ã₁`-vs-`Ã`
+and a symmetric `A₁`-only argument is *false*.  The clean M̃ piece
+`conjClassSet_sigmaSharp_disjoint_of_nonconjugate` (proven above) gives only the `Ã₁ ∩ Ã₁` part;
+the mixed `Ã₁ ∩ Ã` needs the full (8.18)/(8.13.c)/(8.17) machinery.  Hub issue 9003 Cluster B. -/
 theorem nonconjugate_diffImage_inner_zero {L1 L2 : Subgroup G} [Finite G]
     (hyp1 : Hypothesis L1) (hyp2 : Hypothesis L2)
     (hnot_conj : ¬ ∃ g : G, MulAut.conj g • L1 = L2)
     {chi1 : ClassFunction ↥L1 ℂ} (data1 : CharacterDecompositionData hyp1 chi1)
-    {φ1 : IrreducibleCharacter ↥L1} (_hφ1 : φ1 ∈ data1.constituents)
+    {φ1 : IrreducibleCharacter ↥L1} (hφ1 : φ1 ∈ data1.constituents)
     {chi2 : ClassFunction ↥L2 ℂ} (data2 : CharacterDecompositionData hyp2 chi2)
-    {φ2 : IrreducibleCharacter ↥L2} (_hφ2 : φ2 ∈ data2.constituents) :
+    {φ2 : IrreducibleCharacter ↥L2} (hφ2 : φ2 ∈ data2.constituents) :
     ClassFunction.inner
         (hyp1.tau ((φ1 : ClassFunction ↥L1 ℂ) - (φ1 : ClassFunction ↥L1 ℂ).conj))
         (hyp2.tau ((φ2 : ClassFunction ↥L2 ℂ) - (φ2 : ClassFunction ↥L2 ℂ).conj)) = 0 := by
@@ -3955,12 +4067,44 @@ theorem exists_rankTwoWitness [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
            CKx_not_le_Kprime := hCKx, normalizer_closure_x_le_M := hNx,
            centralizer_x_not_le_L := hCx }⟩
 
-/-- **Peterfalvi (12.10)**: the maximal subgroup `L` supplied by (12.9) is
-Frobenius with kernel `L_F`. -/
+/-- **Peterfalvi (12.10) obligation A**: the (12.9) witness `L` is of Type I.  (12.10) rules out
+type `P`: Type II via (8.16) (`C_G(y) ⊆ L` for `y ∈ A(L)`, contradicting (12.9)); Type III via
+Theorem (10.10) + (11.9.c) + (11.6) `C_U(H)=1` + (9.7.b) `U` cyclic, whence `P₀ ⊂ H` and (8.6.a)
+`C_G(y) ⊆ L` for `y ∈ H^#`, again contradicting (12.9).  Deep §8–§11 type-analysis; pinned
+(hub 9003 Cluster A). -/
+theorem witness_L_isTypeI [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    {ctr : CounterexampleHypothesis (G := G)} (data : RankTwoWitnessData ctr) :
+    IsTypeI data.L := by
+  sorry
+
+/-- **Peterfalvi (12.10) obligation B**: the type-I witness `L`'s complement `U` is a Z-group.  A
+prime `q ∣ |L/H|` has `q < p`: in case (8.3.c) `q ∣ p−1`; in case (8.3.b) a Sylow `p`-subgroup of `H`
+has rank 2 and (8.1.c) gives an order-`q` element of `L` acting fixed-point-freely on `Ω₁(P)`, so
+`q ∣ p²−1`, hence `q ∣ p−1` or `q ∣ p+1`, so `q < p`.  By the minimality of `p` (12.8) a Sylow
+`q`-subgroup of `L` is cyclic; thus `U` is a Z-group.  Deep §8 minimality argument; pinned
+(hub 9003 Cluster A). -/
+theorem witness_L_complement_isZGroup [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    {ctr : CounterexampleHypothesis (G := G)} (data : RankTwoWitnessData ctr)
+    (typeI : TypeIData data.L) :
+    _root_.IsZGroup ↥typeI.typeF.U := by
+  sorry
+
+/-- **Peterfalvi (12.10)**: the maximal subgroup `L` supplied by (12.9) is Frobenius with kernel
+`L_F`.  **Assembly** (`sorry`-free modulo the two (12.10) obligations): `L` is Type I
+(`witness_L_isTypeI`) and its complement `U` is a Z-group (`witness_L_complement_isZGroup`), so the
+(8.2.b) bridge `typeI_frobenius_of_isZGroup_complement` yields the Frobenius structure with kernel
+`H = L_F` (`typeF.H_eq`). -/
 theorem witness_L_frobenius [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     {ctr : CounterexampleHypothesis (G := G)} (data : RankTwoWitnessData ctr) :
     ∃ frob : TypeIFrobeniusData data.L, frob.kernel_eq_MF := by
-  sorry
+  obtain ⟨typeI⟩ := witness_L_isTypeI hG data
+  exact ⟨{ typeI := typeI
+           complement := typeI.typeF.U.subgroupOf data.L
+           kernel_eq_MF := typeI.typeF.H = maxNilpotentNormalHall data.L
+           kernel_eq_MF_holds := typeI.typeF.H_eq
+           frobenius := typeI_frobenius_of_isZGroup_complement typeI
+             (witness_L_complement_isZGroup hG data typeI) },
+         typeI.typeF.H_eq⟩
 
 /-- The type-`τ` **main subgroup** `M_s` is contained in `M` (both `M_F` and `[M,M]` are). -/
 theorem mainSubgroup_le (M : Subgroup G) (tau : OddOrder.GroupTheory.PeterfalviType) :
@@ -5447,37 +5591,6 @@ structure TypeICovering (hG : OddOrder.BG.IsMinimalSimpleOdd G)
   covers : ∀ x : G, x ≠ 1 →
     ∃ i, ∃ g : G, g * x * g⁻¹ ∈ (maxNilpotentNormalHall (reps i) : Set G) \ {1}
 
-omit [Finite G] in
-/-- **§8 thickening kernel containment.**  The subgroup `R(x) = supportKernel L M X x` of
-Peterfalvi (8.14) is always contained in `L_F = maxNilpotentNormalHall L`: on the
-escaping-centralizer set it is `L_F ⊓ C_G(x) ≤ L_F`, and elsewhere it is `⊥`. -/
-theorem supportKernel_le_maxNilpotentNormalHall (L M : Subgroup G) (X : Set G) (x : G) :
-    supportKernel L M X x ≤ maxNilpotentNormalHall L := by
-  classical
-  unfold supportKernel
-  split
-  · exact inf_le_left
-  · exact bot_le
-
-/-- **The type-I thickened cover lands in `L_F`-conjugates.**  If a support set `X` is contained in
-`L_F = maxNilpotentNormalHall L`, then every element of the thickened support
-`⋃_{z ∈ X} (z R(z))^G` (`thickenedSupport L M X`) is conjugate to an element of `L_F`: the coset
-factor `z ∈ X ⊆ L_F` and the kernel factor `r ∈ R(z) ⊆ L_F`
-(`supportKernel_le_maxNilpotentNormalHall`) multiply into `L_F`, which `𝒞_G` saturates.
-
-This is the structural heart of the (12.17) type-I covering: the thickening `R(z)` never escapes
-`L_F`, so the `A_1(L) = (L_F)#` cover by thickened sets is, up to conjugacy, a cover by `L_F`. -/
-theorem thickenedSupport_subset_conjClassSet_maxNilpotentNormalHall
-    {L M : Subgroup G} {X : Set G} (hX : X ⊆ (maxNilpotentNormalHall L : Set G)) :
-    thickenedSupport L M X ⊆ conjClassSet (maxNilpotentNormalHall L : Set G) := by
-  rintro y ⟨z, hz, hyz⟩
-  obtain ⟨w, hw, g, hgwy⟩ := hyz
-  obtain ⟨r, hr, hzrw⟩ := hw
-  have hzMF : z ∈ maxNilpotentNormalHall L := hX hz
-  have hrMF : r ∈ maxNilpotentNormalHall L :=
-    supportKernel_le_maxNilpotentNormalHall L M X z (SetLike.mem_coe.mp hr)
-  have hwMF : w ∈ maxNilpotentNormalHall L := hzrw ▸ mul_mem hzMF hrMF
-  exact ⟨w, SetLike.mem_coe.mpr hwMF, g, hgwy⟩
 
 /-- **Peterfalvi (8.17)/(8.13.c1), all-type-I case**: the §8 covering inputs of (12.17) exist.
 

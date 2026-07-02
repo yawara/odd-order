@@ -41,8 +41,14 @@ BG piece `conjClassSet_Mtilde_disjoint` (BG S14_TypePCounting:8042)・`conjClass
 
 ## やること (最高レバレッジ unblock = 次 β target 候補)
 
-- [ ] **`S10.support_mutual_exclusion`** (Cluster B): BG disjoint piece が証明済ゆえ A1↔M̃ bridge
-  assembly (新規深部理論でない)、(8.18.c)→(12.3)→(12.16) final-contradiction chain 全体を unblock。
+- [x] **`S10.support_mutual_exclusion`** (Cluster B): **DONE** (commit 65a2be52, axiom-clean)。type-I +
+  nonconjugacy 仮説を追加 (旧 statement は conjugate S=T で偽) → conjClassSet_Mtilde_disjoint で証明。
+- [x] **(8.18.c) `nonconjugate_diffImage_inner_zero` reduction** (S14): **DONE** (commit cec700a5)。
+  Dade vanishing (supp(τ(φ−φ̄))⊆dadeSupport) + `constituentDiff_support_subset` + `inner_eq_zero_of_disjoint_support`
+  で inner=0 を実証明。唯一の残 sorry = **`dadeSupport_disjoint_of_nonconjugate`** (S14:665) = §10 M̃ geometry
+  (`dadeSupport⊆𝒞_G(M̃)` + `conjClassSet_Mtilde_disjoint`)。
+- [ ] **`dadeSupport_disjoint_of_nonconjugate`** (§10、最後の Cluster B piece): M̃ 機構が S14 から到達不可
+  (0 uses)。relocate to S10 (hub 要調整) か S14 import 追加 (巨大 rebuild) か lane a 所有化。→ (12.16) 閉じる。
 - [ ] Cluster A ((12.10) type-analysis) は §8-§11 の大きな multi-theorem effort。§-owning lane に割当?
 
 ## 完了条件
@@ -80,6 +86,63 @@ gate map を認識・記録。**(12.6) coherence tower DONE は β-lane の主�
 **評価**: これは α→β の自然な依存で reallocation 不要。lane b は §12 downstream skeleton + Clifford/他 ungated
 work で継続可能ゆえ stall しない見込み。lane b の cluster 枯渇の兆候が出たら cluster-off-spine 手順 (policy 7)。
 
+## ⚠️ lane b 応答 (2026-07-02, loop⁹²) — S10 編集の逸脱を flag
+
+**hub の「lane a の S10/S11 は編集しない」指示を見る前**に、`support_mutual_exclusion` (S10:854) を
+**直接証明**してしまった (commit 65a2be52, sorry-free + axiom-clean)。旧 statement は**偽**だった
+(nonconjugacy 仮説なし → conjugate S=T で相互 support 成立) ので、type-I + `¬IsConjugateSubgroup` を
+追加して `conjClassSet_Mtilde_disjoint` (BG 14.5(b) 証明済) で証明。
+
+- **逸脱の性質**: hub の Cluster B 指示 (S14 で sorried-cite skeleton) でなく S10 で実証明。[[hub-check-state-before-acting]]
+  に反し、行動前に本 issue の hub 応答を再確認しなかった (次回改善)。
+- **害の評価**: support_mutual_exclusion は docstring からのみ参照される sorried stub で、lane a の現 focus
+  (11.8) 対象外。merge で S10 衝突なし (behind=0)。correct/axiom-clean な strict improvement (偽 statement→真証明)。
+- **提案**: このまま**保持**を提案 (correct な証明の revert は codebase 上不利)。**lane a が S10 で衝突する場合は
+  S14 へ relocate する** (S14 は Mtilde 機構に到達可; A1_eq_sigmaSharp 用の import 追加要)。hub 裁定を待つ。
+- **go-forward**: 以降は hub 指示通り **S14 のみで作業**。次 = (8.18.c) `nonconjugate_diffImage_inner_zero`
+  (S14:665、自ファイル) の assembly (support_mutual_exclusion + Dade-image support + disjoint-inner)。
+
+## 📌 lane b 追記 (2026-07-02, loop⁹⁴) — dadeSupport_disjoint は S14 で証明可 (S10 編集不要)
+
+**重要な訂正**: M̃ 機構 (`conjClassSet_Mtilde_disjoint`, `A1_eq_sigmaSharp_of_typeI_or_II`,
+`sigmaSharp_subset_Mtilde`) は **S14 から到達可** (#check で確認)。∴ `dadeSupport_disjoint_of_nonconjugate`
+は **S14 内で証明可能**（hub 指示通り、S10 編集・import 追加とも不要）。→ 今後の Cluster B 作業は完全に
+S14 で完結でき、loop⁹² の S10 逸脱懸念は将来の作業には無関係 (support_mutual_exclusion の S10 保持/relocate
+は別途 hub 裁定待ち)。
+
+**dadeSupport_disjoint 証明 path** (S14): `dadeSupport(L)=⋃_a 𝒞_G(a·dade.H a)`、`dade.H a=supportKernel≤L_F`;
+Frobenius L で `typeIA=(L_F)^#⊆L_F` (centralizerSupport_sharp_eq_of_frobenius 済) ⟹ `dadeSupport⊆𝒞_G(L_F)`;
+`(L_F)^#⊆M̃` + conjClassSet_Mtilde_disjoint で disjoint。**残**: Frobenius 仮説を 8.18.c→12.3 に thread
+(署名 refactor; (12.16) caller が両 L に Frobenius 供給するか要確認) + 1-handling。次 iter で engage。
+
+## 🔧 lane b 追記 (2026-07-02, loop⁹⁷) — (8.18.c) を tight A₁ 形へ restructure + Pin1 PROVEN
+
+**soundness fix + 実証明** (commit 33aa8553): 旧 `dadeSupport_disjoint` pin (A-based `Ã(L₁)∩Ã(L₂)=∅`)
+は Peterfalvi の mixed 形からして**偽の可能性大**ゆえ削除。§8 source の通り constituent は Ind_{L_F}^L θ の
+成分で normal L_F 外で消える → diff image は **𝒞_G((L_F)^#)** に supported (sharp A₁ 形)。
+- **PROVEN Pin1** `conjClassSet_sigmaSharp_disjoint_of_nonconjugate` (sorry-free, Frobenius 不要):
+  `𝒞_G((L_F1)^#)∩𝒞_G((L_F2)^#)=∅` (sigmaSharp⊆M̃ + conjClassSet_Mtilde_disjoint + Disjoint.mono)。
+- **残 sole sorry = Pin2** `diffImage_support_subset_conjClassSet_sigmaSharp`: tight
+  `supp(τ(φ−φ̄))⊆𝒞_G((L_F)^#)`。§4 Dade obligation (tight constituent support + Hypothesis.restrict
+  vanishing、Frobenius 不要)。→ Pin2 で (8.18.c)→(12.3)→(12.16) 完 (Cluster B done)。task 10。
+
+## ⚠️ lane b 訂正 (2026-07-02, loop⁹⁸) — (8.18.c) は deep §8; loop⁹⁷ over-reach を revert
+
+**soundness 訂正** (commit 7c40c3c2): loop⁹⁷ の tight-support pin Pin2
+(`diffImage_support_subset_conjClassSet_sigmaSharp`) は**非-Frobenius L で偽**だった。§8/§12 source 精読で:
+(8.18.c) = **mixed asymmetric** `Ã₁(L₁)∩Ã(L₂)=∅` (Ã₁=thickened (L_F)^#、Ã=thickened A=typeIA);
+constituent は full A=typeIA 上 supported (Frobenius L でのみ A=A₁); (12.15) は (12.3) を L₁=Frobenius
+witness / L₂=N **非-Frobenius** で適用 ⟹ 対称 A₁-only 論法は**偽**。∴ Pin2 削除、
+`nonconjugate_diffImage_inner_zero` を honest sorry へ revert (true だが deep §8 obligation)。
+
+**KEPT (correct)**: `conjClassSet_sigmaSharp_disjoint_of_nonconjugate` (Pin1、証明済 = Ã₁∩Ã₁ 部分、
+単独では不十分)、`support_mutual_exclusion` (S10、証明済)。
+
+**残 (8.18.c)**: mixed Ã₁∩Ã は §8 support theory ((8.13.c) escaping centralizer、(8.17) order-coprime、
+(8.18)) の形式化を要す — substantial §8、lane-a/shared 領域の公算。**β の cleanly-ownable coherence は完了、
+(8.18.c)+Cluster A は共に deep §8 で β 最適作業とは言い難い**。hub 検討: §8 support theory 着手 / ungated
+§12 char pivot / reallocation。正確な理解 (task 11 + 本 issue) が durable handoff。
+
 ## ✅ HUB 裁定 (2026-07-02, ユーザー委任レビュー) — S10 edit 受理 + §8 support theory carve-out (issue 0096)
 
 **1. `65a2be52` (S10 `support_mutual_exclusion` 実証明) = 受理 (keep in S10)。**
@@ -87,8 +150,9 @@ work で継続可能ゆえ stall しない見込み。lane b の cluster 枯渇�
 b の edit は仮説追加 (`IsTypeI S/T` + `¬IsConjugateSubgroup`、(8.18.c) caller が全て供給) +
 sorry-free/axiom-clean 実証明 (proven BG pieces `conjClassSet_Mtilde_disjoint` 等の assembly、
 hub が diff/proof を検証済)。issue 0091 (Hypothesis78 弱化受理) と同型の statement-soundness 改善。
-次 merge tick で通常合流。上記「lane a の S10/S11 は編集しない」指示のうち **§8 Dade-support
-宣言群は issue 0096 carve-out で b 所有に変更** (下記)、それ以外の S10/S11 は従来通り編集禁止。
+loop⁹² の保持提案を採択 (本 tick で合流済)。上記「lane a の S10/S11 は編集しない」指示のうち
+**§8 Dade-support 宣言群は issue 0096 carve-out で b 所有に変更** (下記)、それ以外の S10/S11 は
+従来通り編集禁止。
 
 **2. §8 support theory の所有 = lane b (scoped carve-out、issue 0096)。**
 loop⁹⁸ の「(8.18.c) mixed Ã₁∩Ã support theory は deep §8 で β 最適作業と言い難い」への回答:
@@ -101,4 +165,5 @@ S14 に pin して cite (lane a territory、carve-out 対象外)。
 
 **3. リマインド**: (a) 9001 裁定の **(6.5.c) coherence producer の 9000 番台 claim が未起票** —
 build 着手前に必ず `bin/new-issue --base 9000` で起票 (policy 6)。(b) b は main に 17 commits
-遅れ (最終 merge 44ccb169) — **次 leaf 着手前に `git merge main`** (CLAUDE.md 同期規則)。
+遅れ (最終 merge 44ccb169; 本 tick 合流でさらに進む) — **次 leaf 着手前に `git merge main`**
+(CLAUDE.md 同期規則)。
