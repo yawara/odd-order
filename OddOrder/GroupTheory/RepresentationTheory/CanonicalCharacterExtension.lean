@@ -108,4 +108,73 @@ theorem pow_index_eq_one_of_forall_coe_eq_one {μ : K →* ℂˣ}
   rw [MonoidHom.pow_apply, MonoidHom.one_apply, ← map_pow]
   exact hμ ⟨y ^ H.index, H.pow_index_mem y⟩
 
+/-- **Uniqueness of the canonical extension** (Isaacs *CT* 6.25/6.28, uniqueness half; issue
+9002 (v-c4)).  Let `[K:H] = p` be prime and let `θ = Res_H χ₁ = Res_H χ₂` be irreducible of
+degree `d` with `p ∤ d`.  If both extensions have determinantal order coprime to `p`, they
+are **equal**.
+
+The twist `β` between them (`ExtensionLinearTwist`) satisfies: `β^p = 1` (trivial on `H`,
+index-torsion) and `β^d = det χ₂ · (det χ₁)⁻¹` has order dividing both `p` and the coprime
+number `o₁·o₂`, hence is trivial; then `p ∤ d` forces `β = 1`. -/
+theorem extension_unique_of_not_dvd_orderOf_determinant [Finite K]
+    {θ : ClassFunction ↥H ℂ} (hθ : IsIrreducibleCharacter θ)
+    {χ₁ χ₂ : ClassFunction K ℂ}
+    (hχ₁ : IsIrreducibleCharacter χ₁) (hχ₂ : IsIrreducibleCharacter χ₂)
+    (hr₁ : ClassFunction.restrict H χ₁ = θ) (hr₂ : ClassFunction.restrict H χ₂ = θ)
+    {p : ℕ} (hp : p.Prime) (hidx : H.index = p)
+    {d : ℕ} (hd : θ 1 = (d : ℂ)) (hpd : ¬ p ∣ d)
+    (ho₁ : ¬ p ∣ orderOf hχ₁.determinant) (ho₂ : ¬ p ∣ orderOf hχ₂.determinant) :
+    χ₂ = χ₁ := by
+  -- the two extensions differ by a linear character `β` trivial on `H`
+  obtain ⟨β, hβH, hβeq⟩ :=
+    exists_linearClassFunction_mul_of_restrict_eq_restrict hχ₁ hχ₂
+      (hr₁.trans hr₂.symm) (hr₁ ▸ hθ)
+  -- the degree of `χ₁` is `d`
+  have hd₁ : χ₁ 1 = (d : ℂ) := by
+    rw [← hd, ← hr₁]
+    change χ₁ (((1 : ↥H) : K)) = χ₁ 1
+    rw [OneMemClass.coe_one]
+  -- `β` is `p`-torsion
+  have hβp : β ^ p = 1 := by
+    rw [← hidx]
+    exact pow_index_eq_one_of_forall_coe_eq_one hβH
+  -- `β^d` is the determinantal drift, killed by both `p`-torsion and coprime order
+  have hβd : β ^ d = hχ₂.determinant * hχ₁.determinant⁻¹ := by
+    have h1 : hχ₂.determinant = β ^ d * hχ₁.determinant := by
+      have h2 : ∀ (hχ₂' : IsIrreducibleCharacter (χ₁ * linearClassFunction β)),
+          hχ₂'.determinant = β ^ d * hχ₁.determinant := fun hχ₂' =>
+        IsIrreducibleCharacter.determinant_mul_linearClassFunction hχ₁ β hχ₂' hd₁
+      calc hχ₂.determinant = (hβeq ▸ hχ₂ :
+              IsIrreducibleCharacter (χ₁ * linearClassFunction β)).determinant := by
+            congr 1
+        _ = β ^ d * hχ₁.determinant := h2 _
+    rw [h1, mul_assoc, mul_inv_cancel, mul_one]
+  have hβd1 : β ^ d = 1 := by
+    have hdvd_p : orderOf (β ^ d) ∣ p := by
+      refine orderOf_dvd_of_pow_eq_one ?_
+      rw [← pow_mul, mul_comm d p, pow_mul, hβp, one_pow]
+    have hdvd_o : orderOf (β ^ d)
+        ∣ orderOf hχ₂.determinant * orderOf hχ₁.determinant := by
+      refine orderOf_dvd_of_pow_eq_one ?_
+      rw [hβd, mul_pow]
+      have e1 : hχ₂.determinant
+          ^ (orderOf hχ₂.determinant * orderOf hχ₁.determinant) = 1 := by
+        rw [pow_mul, pow_orderOf_eq_one, one_pow]
+      have e2 : (hχ₁.determinant⁻¹)
+          ^ (orderOf hχ₂.determinant * orderOf hχ₁.determinant) = 1 := by
+        rw [inv_pow, mul_comm, pow_mul, pow_orderOf_eq_one, one_pow, inv_one]
+      rw [e1, e2, one_mul]
+    have hcop : Nat.Coprime p (orderOf hχ₂.determinant * orderOf hχ₁.determinant) :=
+      hp.coprime_iff_not_dvd.mpr (fun hcon => (hp.dvd_mul.mp hcon).elim ho₂ ho₁)
+    rw [← orderOf_eq_one_iff]
+    exact Nat.dvd_one.mp (hcop ▸ Nat.dvd_gcd hdvd_p hdvd_o)
+  -- `p ∤ d` upgrades `β^d = 1`, `β^p = 1` to `β = 1`
+  have hβ1 : β = 1 := by
+    have hdvd_d : orderOf β ∣ d := orderOf_dvd_of_pow_eq_one hβd1
+    have hdvd_p : orderOf β ∣ p := orderOf_dvd_of_pow_eq_one hβp
+    have hcop : Nat.Coprime p d := hp.coprime_iff_not_dvd.mpr hpd
+    rw [← orderOf_eq_one_iff]
+    exact Nat.dvd_one.mp (hcop ▸ Nat.dvd_gcd hdvd_p hdvd_d)
+  rw [hβeq, hβ1, ClassFunction.mul_linearClassFunction_one]
+
 end OddOrder.RepresentationTheory
