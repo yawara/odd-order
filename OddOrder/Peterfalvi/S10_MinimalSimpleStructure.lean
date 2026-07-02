@@ -1059,6 +1059,294 @@ theorem ftThickenedSupport_A1_disjoint_of_nonconjugate [Finite G]
     (OddOrder.BG.Ch4.S14.conjClassSet_Mtilde_disjoint hG
       (OddOrder.BG.Ch4.S14.genuineSigmaDecomposition hG) hL1 hL2 hnc)
 
+/-! ### (8.18): the support graph and the mixed `Ã₁ ∩ Ã` disjointness
+
+Peterfalvi (8.18) for a type-I pair, in conjugation-free form.  The deep §16 inputs are pinned:
+(8.13.b) escaping points lie in `A₁` (`escaping_typeIA_mem_A1`), (8.12.b) the unique maximal over
+the centralizer of an `A(T)`-point of `σ(T)′`-order (`typeI_centralizer_le_and_unique`), and the
+(8.13.c2/c4) cross-coprimality under support (`supported_sigma_coprime`).  The (8.18.a/b/c)
+assembly — the `σ`-order bookkeeping, the escape to the proven `Ã₁`-disjointness, the `π`-part
+power argument, and the final two-sided contradiction — is genuine. -/
+
+/-- **Peterfalvi (8.13.b), `D ⊆ A₁` conjunct** (pin; BG §16 Theorem II): an escaping point of the
+type-I support `A(M)` lies in the sharp core `A₁(M)`. -/
+theorem escaping_typeIA_mem_A1 [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    {M : Subgroup G} (hM : M ∈ maximalSubgroups G) (data : TypeIData M)
+    {a : G} (ha : a ∈ OddOrder.GroupTheory.escapingCentralizerSet M (typeIA M data)) :
+    a ∈ A1 M PeterfalviType.I := by
+  sorry
+
+/-- **Peterfalvi (8.12.b), single-point form** (pin; BG §16 Theorem B): for type-I `T` and
+`x ∈ T` of order coprime to `|T_F|` centralizing a nontrivial element of `T_F`, `T` is the unique
+maximal subgroup containing `C_G(x)`.  (The Hall-conjugacy move of `x` into a complement is
+absorbed into the pin.) -/
+theorem typeI_centralizer_le_and_unique [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    {T : Subgroup G} (hT : T ∈ maximalSubgroups G) (dT : TypeIData T)
+    {x : G} (hxT : x ∈ T) (hx1 : x ≠ 1)
+    (hord : Nat.Coprime (orderOf x) (Nat.card (maxNilpotentNormalHall T)))
+    (hwit : ∃ h ∈ maxNilpotentNormalHall T, h ≠ 1 ∧ Commute x h) :
+    Subgroup.centralizer ({x} : Set G) ≤ T ∧
+      ∀ L ∈ maximalSubgroups G, Subgroup.centralizer ({x} : Set G) ≤ L → L = T := by
+  sorry
+
+/-- **Peterfalvi (8.13.c2/c4) cross-coprimality under support** (pin): if some escaping point of
+`A(S)` has its centralizer inside a conjugate of `T`, then `T` "supports" `S` and `|T_σ|` is
+coprime to `|C_S(w)|` for every `w ∈ A(S)`  ((8.13.c2) applied to the supporting maximal
+`N ~ T`, whose Fitting core has the `σ(T)`-order, plus (8.13.c4)). -/
+theorem supported_sigma_coprime [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    {S T : Subgroup G} (hS : S ∈ maximalSubgroups G) (hT : T ∈ maximalSubgroups G)
+    (dS : TypeIData S) (dT : TypeIData T)
+    (hsupp : ∃ z ∈ OddOrder.GroupTheory.escapingCentralizerSet S (typeIA S dS),
+      ∃ N ∈ maximalSubgroups G, Subgroup.centralizer ({z} : Set G) ≤ N ∧
+        OddOrder.BG.Ch4.S14.IsConjugateSubgroup T N) :
+    ∀ w ∈ typeIA S dS,
+      Nat.Coprime (Nat.card (OddOrder.BG.Ch3.S10.Msigma T))
+        (Nat.card (OddOrder.Peterfalvi.S04.centralizerIn S w)) := by
+  sorry
+
+/-- **`π`-part extraction from a commuting coprime product**: if `b, k` commute with coprime
+orders then `b ∈ ⟨b·k⟩` (`b` is the `primeFactors (orderOf b)`-part of `b·k`). -/
+theorem mem_zpowers_mul_right_of_coprime [Finite G] {b k : G} (hcomm : Commute b k)
+    (hcop : Nat.Coprime (orderOf b) (orderOf k)) :
+    b ∈ Subgroup.zpowers (b * k) := by
+  classical
+  set π : Set ℕ := {p | p ∈ (orderOf b).primeFactors} with hπ
+  have hbπ : OddOrder.GroupTheory.IsPiElement π b := fun p hp => hp
+  have hkπ' : OddOrder.GroupTheory.IsPiElement πᶜ k := by
+    intro p hp hpb
+    have hpprime : p.Prime := (Nat.mem_primeFactors.mp hp).1
+    have hpk : p ∣ orderOf k := (Nat.mem_primeFactors.mp hp).2.1
+    have hpb' : p ∣ orderOf b := (Nat.mem_primeFactors.mp hpb).2.1
+    have : p ∣ 1 := hcop ▸ Nat.dvd_gcd hpb' hpk
+    exact hpprime.one_lt.ne' (Nat.dvd_one.mp this)
+  have hmul : OddOrder.BG.Ch4.S14.piPart π (b * k) = b := by
+    rw [OddOrder.BG.Ch4.S14.piPart_mul_of_commute hcomm,
+      OddOrder.BG.Ch4.S14.piPart_self_of_isPiElement hbπ,
+      OddOrder.BG.Ch4.S14.piPart_eq_one_of_isPiElement_compl hkπ', mul_one]
+  have hz := OddOrder.BG.Ch4.S14.piPart_mem_zpowers π (b * k)
+  rwa [hmul] at hz
+
+/-- **(8.18.a), conjugation-free core**: if `x ∈ A₁(S)` and some conjugate `g·x·g⁻¹ ∈ A(T)` for
+non-conjugate type-I `S, T`, then `x` is an escaping point of `A(S)` and its centralizer lies in
+the `T`-conjugate `g⁻¹·T·g`.  Genuine except the (8.12.b) pin: the `σ`-order bookkeeping is
+`sigma_disjoint_of_nonconjugate` + `primeFactors_Msigma_eq_sigma`. -/
+theorem escaping_supported_of_A1_conj_mem_typeIA [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {S T : Subgroup G}
+    (hS : S ∈ maximalSubgroups G) (hT : T ∈ maximalSubgroups G)
+    (dS : TypeIData S) (dT : TypeIData T)
+    (hnc : ¬ OddOrder.BG.Ch4.S14.IsConjugateSubgroup S T)
+    {x g : G} (hxA1 : x ∈ A1 S PeterfalviType.I) (hgx : g * x * g⁻¹ ∈ typeIA T dT) :
+    x ∈ OddOrder.GroupTheory.escapingCentralizerSet S (typeIA S dS) ∧
+      Subgroup.centralizer ({x} : Set G) ≤ MulAut.conj g⁻¹ • T := by
+  obtain ⟨hxMF, hx1s⟩ := (Set.mem_diff x).mp hxA1
+  have hx1 : x ≠ 1 := fun h => hx1s (Set.mem_singleton_iff.mpr h)
+  set y := g * x * g⁻¹ with hydef
+  have hy1 : y ≠ 1 := conj_ne_one hx1
+  -- `orderOf y = orderOf x` is a `σ(S)`-number; `|T_F| = |T_σ|` is a `σ(T)`-number; disjoint.
+  have hxMσ : x ∈ OddOrder.BG.Ch3.S10.Msigma S := by
+    have : x ∈ maxNilpotentNormalHall S := SetLike.mem_coe.mp hxMF
+    rwa [OddOrder.Peterfalvi.S10Interface.maxNilpotentNormalHall_eq_Msigma_of_typeI_or_II hG hS
+      (Or.inl ⟨dS⟩)] at this
+  have hxpi : OddOrder.GroupTheory.IsPiElement (OddOrder.BG.Ch3.S10.sigma S) x :=
+    OddOrder.BG.Ch4.S14.isPiElement_sigma_of_mem_Msigma hxMσ
+  have horder_eq : orderOf y = orderOf x := by
+    have : Function.Injective (MulAut.conj g) := (MulAut.conj g).injective
+    simpa [hydef] using orderOf_injective (MulAut.conj g).toMonoidHom this x
+  have hσdisj : Disjoint (OddOrder.BG.Ch3.S10.sigma S) (OddOrder.BG.Ch3.S10.sigma T) :=
+    OddOrder.BG.Ch3.S13.sigma_disjoint_of_nonconjugate hG hS hT hnc
+  have hord : Nat.Coprime (orderOf y) (Nat.card (maxNilpotentNormalHall T)) := by
+    rw [OddOrder.Peterfalvi.S10Interface.maxNilpotentNormalHall_eq_Msigma_of_typeI_or_II hG hT
+      (Or.inl ⟨dT⟩)]
+    rw [← Nat.disjoint_primeFactors (orderOf_pos y).ne'
+      Nat.card_pos.ne']
+    rw [Finset.disjoint_left]
+    intro p hpy hpT
+    have hpσS : p ∈ OddOrder.BG.Ch3.S10.sigma S := hxpi p (horder_eq ▸ hpy)
+    have hpσT : p ∈ OddOrder.BG.Ch3.S10.sigma T := by
+      have := OddOrder.BG.Ch4.S16.primeFactors_Msigma_eq_sigma hG hT
+      rw [← this]
+      exact hpT
+    exact Set.disjoint_left.mp hσdisj hpσS hpσT
+  -- the (8.12.b) pin at `y`
+  obtain ⟨hyT, -, h, hh, hyh⟩ := hgx
+  have hwit : ∃ h' ∈ maxNilpotentNormalHall T, h' ≠ 1 ∧ Commute y h' := by
+    obtain ⟨hhH, hh1⟩ := (Set.mem_diff h).mp hh
+    refine ⟨h, ?_, fun he => hh1 (Set.mem_singleton_iff.mpr he), ?_⟩
+    · rw [← dT.typeF.H_eq]; exact SetLike.mem_coe.mp hhH
+    · exact (Subgroup.mem_centralizer_singleton_iff.mp hyh)
+  obtain ⟨hCyT, huniq⟩ := typeI_centralizer_le_and_unique hG hT dT hyT hy1 hord hwit
+  constructor
+  · refine ⟨A1_subset_typeIA S dS hxA1, fun hle => ?_⟩
+    -- if `C(x) ≤ S` then `C(y) ≤ g·S·g⁻¹`, a maximal over `C(y)`, so `g·S·g⁻¹ = T` — conjugate.
+    have hCyS : Subgroup.centralizer ({y} : Set G) ≤ MulAut.conj g • S := by
+      intro c hc
+      rw [Subgroup.mem_pointwise_smul_iff_inv_smul_mem]
+      have hc' : g⁻¹ * c * g ∈ Subgroup.centralizer ({x} : Set G) := by
+        rw [Subgroup.mem_centralizer_singleton_iff] at hc ⊢
+        calc g⁻¹ * c * g * x = g⁻¹ * (c * y) * g := by rw [hydef]; group
+          _ = g⁻¹ * (y * c) * g := by rw [hc]
+          _ = x * (g⁻¹ * c * g) := by rw [hydef]; group
+      simpa [MulAut.smul_def] using hle hc'
+    have hmax : MulAut.conj g • S ∈ maximalSubgroups G :=
+      mem_maximalSubgroups.mpr
+        (OddOrder.BG.Ch3.S12.isCoatom_conj_smul (mem_maximalSubgroups.mp hS))
+    exact hnc ⟨g, huniq _ hmax hCyS⟩
+  · intro c hc
+    rw [Subgroup.mem_pointwise_smul_iff_inv_smul_mem]
+    have hc' : g * c * g⁻¹ ∈ Subgroup.centralizer ({y} : Set G) := by
+      rw [Subgroup.mem_centralizer_singleton_iff] at hc ⊢
+      calc g * c * g⁻¹ * y = g * (c * x) * g⁻¹ := by rw [hydef]; group
+        _ = g * (x * c) * g⁻¹ := by rw [hc]
+        _ = y * (g * c * g⁻¹) := by rw [hydef]; group
+    have := hCyT hc'
+    simpa [MulAut.smul_def] using this
+
+/-- **(8.18.b) for a type-I pair**: a nonempty intersection of the thickened supports
+`Ã₁(S) ∩ Ã(T) ≠ ∅` descends to a *bare* intersection: some `x ∈ A₁(S)` has a conjugate in
+`A(T)`.  Genuine: an escaping `A(T)`-point would put the intersection inside
+`Ã₁(S) ∩ Ã₁(T) = ∅` (the proven (8.17.c)); for a non-escaping point the thickening on the
+`T`-side is trivial and the `S`-side coset collapses through the `π`-part power argument
+(`mem_zpowers_mul_right_of_coprime`, orders coprime by the (8.13.c2) pin). -/
+theorem exists_A1_conj_mem_typeIA_of_not_disjoint [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {S T : Subgroup G}
+    (hS : S ∈ maximalSubgroups G) (hT : T ∈ maximalSubgroups G)
+    (dS : TypeIData S) (dT : TypeIData T)
+    (hnc : ¬ OddOrder.BG.Ch4.S14.IsConjugateSubgroup S T)
+    (hint : ¬ Disjoint (ftThickenedSupport S (A1 S PeterfalviType.I))
+      (ftThickenedSupport T (typeIA T dT))) :
+    ∃ x u : G, x ∈ A1 S PeterfalviType.I ∧ u * x * u⁻¹ ∈ typeIA T dT := by
+  rw [Set.not_disjoint_iff] at hint
+  obtain ⟨y, ⟨b, hbA1, hyb⟩, ⟨a, haA, hya⟩⟩ := hint
+  by_cases haesc : a ∈ OddOrder.GroupTheory.escapingCentralizerSet T (typeIA T dT)
+  · -- escaping `a`: `y ∈ Ã₁(S) ∩ Ã₁(T)`, contradicting the proven (8.17.c).
+    exfalso
+    have haA1 : a ∈ A1 T PeterfalviType.I := escaping_typeIA_mem_A1 hG hT dT haesc
+    have hyT1 : y ∈ ftThickenedSupport T (A1 T PeterfalviType.I) := by
+      refine ⟨a, haA1, ?_⟩
+      rwa [ftSupportKernel_eq_of_escaping haesc,
+        ← ftSupportKernel_eq_of_escaping (⟨haA1, haesc.2⟩ :
+          a ∈ OddOrder.GroupTheory.escapingCentralizerSet T (A1 T PeterfalviType.I))] at hya
+    exact Set.disjoint_left.mp
+      (ftThickenedSupport_A1_disjoint_of_nonconjugate hG hS hT (Or.inl ⟨dS⟩) (Or.inl ⟨dT⟩)
+        (Or.inl rfl) (Or.inl rfl) hnc)
+      ⟨b, hbA1, hyb⟩ hyT1
+  · -- non-escaping `a`: the `T`-side thickening is trivial, `y ~ a`.
+    rw [ftSupportKernel_eq_bot_of_not_escaping haesc] at hya
+    obtain ⟨t, ⟨r0, hr0, rfl⟩, w, hw⟩ := hya
+    rw [SetLike.mem_coe, Subgroup.mem_bot] at hr0
+    subst hr0
+    simp only [mul_one] at hw
+    -- `S`-side: `y = v·(b·k)·v⁻¹`.
+    obtain ⟨t', ⟨k, hk, rfl⟩, v, hv⟩ := hyb
+    have hb1 : b ≠ 1 := fun h =>
+      ((Set.mem_diff b).mp hbA1).2 (Set.mem_singleton_iff.mpr h)
+    obtain ⟨haT, ha1, hwitA⟩ := haA
+    by_cases hbesc : b ∈ OddOrder.GroupTheory.escapingCentralizerSet S (A1 S PeterfalviType.I)
+    · -- thick `S`-side: extract `b` as a power of `b·k`.
+      rw [SetLike.mem_coe, ftSupportKernel_eq_of_escaping hbesc] at hk
+      have hbescA : b ∈ OddOrder.GroupTheory.escapingCentralizerSet S (typeIA S dS) :=
+        ⟨A1_subset_typeIA S dS hbesc.1, hbesc.2⟩
+      have hcards := (escaping_typeIA_signalizer_structure hG hS dS hbescA).2.2.2 b
+        (A1_subset_typeIA S dS hbesc.1)
+      have hob : orderOf b ∣ Nat.card (OddOrder.Peterfalvi.S04.centralizerIn S b) :=
+        Subgroup.orderOf_dvd_natCard _
+          (OddOrder.Peterfalvi.S04.mem_centralizerIn.mpr
+            ⟨(A1_subset_typeIA S dS hbA1).1, rfl⟩)
+      have hok : orderOf k ∣ Nat.card (OddOrder.BG.Ch4.S16.FT_signalizer b) :=
+        Subgroup.orderOf_dvd_natCard _ hk
+      have hcop : Nat.Coprime (orderOf b) (orderOf k) :=
+        ((Nat.Coprime.coprime_dvd_left hok hcards).coprime_dvd_right hob).symm
+      have hcomm : Commute b k := by
+        have := OddOrder.BG.Ch4.S16.FT_signalizer_le_centralizer b hk
+        exact (Subgroup.mem_centralizer_singleton_iff.mp this).symm
+      obtain ⟨n, hn⟩ := Subgroup.mem_zpowers_iff.mp
+        (mem_zpowers_mul_right_of_coprime hcomm hcop)
+      -- `a = u·(b·k)·u⁻¹` with `u := w⁻¹·v`; then `a^n = u·b·u⁻¹ ∈ A(T)`.
+      set u := w⁻¹ * v with hudef
+      have hau : a = u * (b * k) * u⁻¹ := by
+        have : w * a * w⁻¹ = v * (b * k) * v⁻¹ := by rw [hw, hv]
+        calc a = w⁻¹ * (w * a * w⁻¹) * w := by group
+          _ = w⁻¹ * (v * (b * k) * v⁻¹) * w := by rw [this]
+          _ = u * (b * k) * u⁻¹ := by rw [hudef]; group
+      have hazn : a ^ n = u * b * u⁻¹ := by
+        rw [hau]
+        calc (u * (b * k) * u⁻¹) ^ n = u * (b * k) ^ n * u⁻¹ := by
+              rw [← MulAut.conj_apply, ← map_zpow, MulAut.conj_apply]
+          _ = u * b * u⁻¹ := by rw [hn]
+      refine ⟨b, u, hbA1, ?_⟩
+      rw [← hazn]
+      obtain ⟨h, hh, hah⟩ := hwitA
+      refine ⟨Subgroup.zpow_mem T haT n, ?_, h, hh, ?_⟩
+      · rw [hazn]
+        exact conj_ne_one hb1
+      · exact Subgroup.zpow_mem _ hah n
+    · -- trivial `S`-side: `k = 1`, `a = u·b·u⁻¹` directly.
+      rw [SetLike.mem_coe, ftSupportKernel_eq_bot_of_not_escaping hbesc,
+        Subgroup.mem_bot] at hk
+      subst hk
+      simp only [mul_one] at hv
+      refine ⟨b, w⁻¹ * v, hbA1, ?_⟩
+      have : w⁻¹ * v * b * (w⁻¹ * v)⁻¹ = a := by
+        have h1 : w * a * w⁻¹ = v * b * v⁻¹ := by rw [hw, hv]
+        calc w⁻¹ * v * b * (w⁻¹ * v)⁻¹ = w⁻¹ * (v * b * v⁻¹) * w := by group
+          _ = w⁻¹ * (w * a * w⁻¹) * w := by rw [h1]
+          _ = a := by group
+      rw [show w⁻¹ * v * b * (w⁻¹ * v)⁻¹ = a from this]
+      exact ⟨haT, ha1, hwitA⟩
+
+/-- **Peterfalvi (8.18.c) for a type-I pair** (mixed `Ã₁ ∩ Ã` disjointness): for non-conjugate
+type-I maximal subgroups `S, T`, `Ã₁(S) ∩ Ã(T) = ∅` or `Ã₁(T) ∩ Ã(S) = ∅`.
+
+Proof (genuine, modulo the three §16 pins): if both intersections were nonempty, (8.18.b) at
+`(S,T)` produces a bare supporting configuration whose (8.18.a) escape feeds the (8.13.c2)
+cross-coprimality `|T_σ| ⊥ |C_S(w)|`; (8.18.b) at `(T,S)` produces `x' ∈ A₁(T)` with a conjugate
+`w ∈ A(S)`, and `orderOf x'` divides both coprime cardinalities — forcing `x' = 1`, absurd. -/
+theorem ftThickenedSupport_mixed_disjoint_of_nonconjugate [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {S T : Subgroup G}
+    (hS : S ∈ maximalSubgroups G) (hT : T ∈ maximalSubgroups G)
+    (dS : TypeIData S) (dT : TypeIData T)
+    (hnc : ¬ OddOrder.BG.Ch4.S14.IsConjugateSubgroup S T) :
+    Disjoint (ftThickenedSupport S (A1 S PeterfalviType.I))
+        (ftThickenedSupport T (typeIA T dT)) ∨
+      Disjoint (ftThickenedSupport T (A1 T PeterfalviType.I))
+        (ftThickenedSupport S (typeIA S dS)) := by
+  by_contra hcon
+  obtain ⟨hST, hTS⟩ := not_or.mp hcon
+  -- (8.18.b) + (8.18.a) at `(S,T)`: a supporting configuration for the coprimality pin.
+  obtain ⟨x, g, hxA1S, hgx⟩ :=
+    exists_A1_conj_mem_typeIA_of_not_disjoint hG hS hT dS dT hnc hST
+  obtain ⟨hxesc, hxle⟩ :=
+    escaping_supported_of_A1_conj_mem_typeIA hG hS hT dS dT hnc hxA1S hgx
+  have hcop := supported_sigma_coprime hG hS hT dS dT
+    ⟨x, hxesc, MulAut.conj g⁻¹ • T,
+      mem_maximalSubgroups.mpr
+        (OddOrder.BG.Ch3.S12.isCoatom_conj_smul (mem_maximalSubgroups.mp hT)),
+      hxle, ⟨g⁻¹, rfl⟩⟩
+  -- (8.18.b) at `(T,S)`: an `A₁(T)`-point with a conjugate in `A(S)`.
+  have hncTS : ¬ OddOrder.BG.Ch4.S14.IsConjugateSubgroup T S := fun h => hnc h.symm
+  obtain ⟨x', u, hx'A1T, hux'⟩ :=
+    exists_A1_conj_mem_typeIA_of_not_disjoint hG hT hS dT dS hncTS hTS
+  -- `orderOf x'` divides the coprime pair `|T_σ|`, `|C_S(u·x'·u⁻¹)|`.
+  set w := u * x' * u⁻¹ with hwdef
+  have hx'1 : x' ≠ 1 := fun h =>
+    ((Set.mem_diff x').mp hx'A1T).2 (Set.mem_singleton_iff.mpr h)
+  have h1 : orderOf x' ∣ Nat.card (OddOrder.BG.Ch3.S10.Msigma T) := by
+    have hx'Mσ : x' ∈ OddOrder.BG.Ch3.S10.Msigma T := by
+      have : x' ∈ maxNilpotentNormalHall T :=
+        SetLike.mem_coe.mp ((Set.mem_diff x').mp hx'A1T).1
+      rwa [OddOrder.Peterfalvi.S10Interface.maxNilpotentNormalHall_eq_Msigma_of_typeI_or_II hG hT
+        (Or.inl ⟨dT⟩)] at this
+    exact Subgroup.orderOf_dvd_natCard _ hx'Mσ
+  have h2 : orderOf x' ∣ Nat.card (OddOrder.Peterfalvi.S04.centralizerIn S w) := by
+    have hworder : orderOf w = orderOf x' := by
+      have : Function.Injective (MulAut.conj u) := (MulAut.conj u).injective
+      simpa [hwdef] using orderOf_injective (MulAut.conj u).toMonoidHom this x'
+    have := Subgroup.orderOf_dvd_natCard (OddOrder.Peterfalvi.S04.centralizerIn S w)
+      (OddOrder.Peterfalvi.S04.mem_centralizerIn.mpr ⟨hux'.1, rfl⟩)
+    rwa [hworder] at this
+  have : orderOf x' ∣ 1 := (hcop w hux') ▸ Nat.dvd_gcd h1 h2
+  exact hx'1 (orderOf_eq_one_iff.mp (Nat.dvd_one.mp this))
+
 /-- **Peterfalvi (8.17)**: BG Theorem E data for a set of conjugacy-class
 representatives of maximal subgroups.
 

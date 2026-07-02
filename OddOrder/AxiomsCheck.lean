@@ -7047,3 +7047,16 @@ All three sorry-free; axiom-cleanliness gated on the BG `Mtilde`/Theorem-14.4 ch
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S10.FT_signalizer_eq_Rsub_of_escape
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S10.ftThickenedSupport_A1_subset_conjClassSet_Mtilde
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S10.ftThickenedSupport_A1_disjoint_of_nonconjugate
+
+/-! **Peterfalvi (8.18) mixed support disjointness, type-I pair** (`S10_MinimalSimpleStructure`,
+lane β, issue 0096).  The (8.18.c) mixed `Ã₁(S) ∩ Ã(T) = ∅ ∨ Ã₁(T) ∩ Ã(S) = ∅` for
+non-conjugate type-I maximals — the geometric obligation of (12.3) — assembled genuinely from
+three precise §16 pins ((8.13.b) `escaping_typeIA_mem_A1`, (8.12.b)
+`typeI_centralizer_le_and_unique`, (8.13.c2/c4) `supported_sigma_coprime`):
+`mem_zpowers_mul_right_of_coprime` (the `π`-part power extraction, sorry-free/axiom-clean),
+`escaping_supported_of_A1_conj_mem_typeIA` ((8.18.a): `σ`-order bookkeeping via
+`sigma_disjoint_of_nonconjugate` + the unique-maximal pin), `exists_A1_conj_mem_typeIA_of_not_disjoint`
+((8.18.b): escaping side lands in the PROVEN `Ã₁`-disjointness, non-escaping side collapses the
+coset by the power argument), and `ftThickenedSupport_mixed_disjoint_of_nonconjugate` ((8.18.c):
+two-sided support forces `orderOf x' ∣ gcd = 1`).  Axiom checks record the pin-gating. -/
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S10.mem_zpowers_mul_right_of_coprime
