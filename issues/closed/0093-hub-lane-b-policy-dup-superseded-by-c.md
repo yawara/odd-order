@@ -39,4 +39,6 @@ created: 2026-07-01
 ## 状態
 
 - [x] c 版 policy を main へ landing (`f6507084`)
-- [ ] lane b が CLAUDE.md/ft_path_policy dup を drop（次 sync 時）
+- [x] lane b が CLAUDE.md/ft_path_policy dup を drop — **検証済** (2026-07-02 hub:
+      `git diff --name-only main...b -- CLAUDE.md notes/meta/ft_path_policy.md` = 空。
+      b の未マージ 17 commits は S10/S14/issues/notes のみ) → **CLOSE**

@@ -98,6 +98,14 @@ checkout 不可ゆえ実マージは hub 側で実施。lane d はこの裁定�
 
 その後の lane d commits (`5f962b5a` 以降) も同性質 (S14_TypePCounting = d 所有 + carrier API faithfulness 修正)。
 
+## ✅ CLOSE (2026-07-02 3 レーン再編) — carve-out 解消、S14_MaximalI は全体 lane b
+
+lane d 退役に伴い本 carve-out は**解消**。`exists_typeICovering` を含む `S14_MaximalI.lean`
+**全体が lane b 所有** (merge_monitor 🔒 3 レーンマップ更新済)。恒久解 (carrier-consumer の
+d 所有 helper 抽出) は不要化 — carrier 側 (S10) も a に fold されたため (issue 0086)、
+今後の carrier API 変更は a→b の通常の cross-lane 通知 (notes/issue) で扱う。
+(2026-07-02 hub、ユーザー委任レビュー)
+
 ## 参照
 - 範囲逸脱検出 tick: main `8982a4d4` (a/b/c 合流済) の直後
 - carve-out 先例: issue `0086` (S10 bgTheoremE carrier), `0087` (S07_RhoProjection)

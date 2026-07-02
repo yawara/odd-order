@@ -43,6 +43,15 @@ bgTheoremE_cover_data の所有が監視マップ上で曖昧でなくなり (ca
 かつ将来の lane a / lane d の S10 編集が衝突しない運用が確立していること。
 理想的には carrier の物理配置 (案 X 維持 or 案 Y 移設) を確定する。
 
+## ✅ CLOSE (2026-07-02 3 レーン再編) — carve-out 解消、carrier は file owner (lane a) に fold
+
+lane d 退役に伴い本 carve-out は**解消**。bgTheoremE carrier (`BGTheoremECoverData` /
+`BGTheoremETypeICovering` / `BGTheoremENonTypeICovering` / `bgTheoremE_cover_data`) の所有 =
+S10 file owner **lane a** (merge_monitor 🔒 3 レーンマップ更新済)。恒久解は「案 X 相当
+(S10 内に残置、所有は file owner)」で確定。残 deep gate (TypeICovering 分岐 = route B) は
+issue 8022 で追跡 (§8 Dade-support 前提は issue 0096 carve-out = lane b)。
+(2026-07-02 hub、ユーザー委任レビュー)
+
 ## 参照
 
 - merge_monitor.md 🔒 所有マップ (carve-out 追記先)

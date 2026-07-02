@@ -56,5 +56,13 @@ hub 監査で lane d の旧クラスタ δ (BG §14–16 → Peterfalvi interfac
 
 - [x] ユーザー裁定 = γ 上流 S15_SAndT_Setup へ
 - [x] 所有マップ更新 (`ft_lane_reallocation_2026_06_28.md` / `merge_monitor.md` / cron / memory)
-- [ ] lane c が S15_SAndT_Setup を停止・引き継ぎ (次 sync 時)
-- [ ] lane d が S15_SAndT_Setup へ切替 (次 sync 時)
+- [ ] ~~lane c が S15_SAndT_Setup を停止・引き継ぎ (次 sync 時)~~ (superseded、下記)
+- [ ] ~~lane d が S15_SAndT_Setup へ切替 (次 sync 時)~~ (superseded、下記)
+
+## ❌ SUPERSEDED → CLOSE (2026-07-02 3 レーン再編)
+
+lane d 退役 (ユーザー裁定 2026-07-02) に伴い、本 issue の操作的指示は**現行と真逆**になった:
+S15_SAndT_Setup は **d→c に移管**され、現行所有 = lane c (§15→16 全 chain 一本化)。
+「lane c は S15_SAndT_Setup を編集停止 / 編集したら逸脱」は**無効** — lane c の編集が正規。
+正本 = `ft_lane_reallocation_2026_06_28.md`「3 レーン再編」節 + `merge_monitor.md` 🔒 3 レーンマップ。
+本 issue は履歴記録として closed へ (2026-07-02 hub、ユーザー委任レビュー)。

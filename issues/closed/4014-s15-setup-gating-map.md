@@ -265,3 +265,13 @@ hub 監視 tick で本 issue を検討 → ユーザー裁定 = **option (b)**�
    `c_eq_one` の Galois 分岐 (`u ∣ 31`) を unblock する。これらは S16 が heavy に cite する structural 結論。
 4. lane d は S15_SAndT_Setup + BG/** 所有を dormant 保持。σ-theory leaf 完成後、in-territory の
    basic_structure/c_eq_one を新 leaf cite で closeable。
+
+## ❌ SUPERSEDED → CLOSE (2026-07-02 3 レーン再編)
+
+lane d 退役 (ユーザー裁定 2026-07-02、ISSUE_BASE 4000 退役)。本 issue の操作的部分は消化済み:
+- σ-theory 再配分 (上記 HUB 裁定節) → issue 9000 で実施・generic engine 完成 (sorry-free 凍結)、
+  残 tail (lane a assembly + S11 dup retire→cite) は **lane a に承継** (issue 9000 の claim 承継節)。
+- S15_SAndT_Setup の作業主体 → **lane c** (§15→16 chain 一本化)。本 issue の gating map
+  (basic_structure 分解 / c_eq_one route / on-path・off-path 精査) は **lane c 向けの有効な調査記録**
+  として参照価値を保つ (レーン割当の記述のみ旧 4 レーン前提で読むこと)。
+(2026-07-02 hub、ユーザー委任レビュー)
