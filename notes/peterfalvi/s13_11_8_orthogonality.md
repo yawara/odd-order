@@ -971,3 +971,150 @@ g_mem=conjPerm injective+conjPerm triv=triv (`trivialClassFunction_isReal`)、hf
 **次 = (a) IsReal Δ → hsym (inner-conj identity `⟨Δ,χ̄⟩=conj⟨Δ,χ⟩` 整備); (b) a=(∑ω_{r0}^σ,β) application**:
 β real=(11.8.3) + ∑ω real + 両者⊥1 で本 lemma 適用 → a even → (11.8.5) full a=0。⚠ (11.8.3) β real は
 (4.8)/(4.10)/(5.9) の SHC port が要 (大)。(11.8) closure は依然 doubly-gated (§9↔§10、§14)。
+
+## 2026-07-02 cont.⁵⁶ (lane-a) — **parity core 自己完結化 (IsReal 版) — inner-conj identity LANDED**
+2 lemma landed + parity lemma refactor (S12, leaf green, all sorry-free):
+1. **`inner_conj_conj`**: `⟨φ̄, ψ̄⟩ = star⟨φ,ψ⟩` (汎用)。証明 = innerSum pointwise (`conj_apply`+`star_mul`+`star_star`)
+   → `card·inner` に乗じて `mul_left_cancel₀` (⅟card の star motive 問題を回避; `card_mul_inner`+`star_natCast`)。
+2. **`inner_conjPerm_eq_of_isReal`**: real Δ∈ZIrr で `⟨Δ, conjPerm χ⟩ = ⟨Δ,χ⟩`。= `conjPerm_apply_coe`
+   (χ̄=χ.conj) + Δ=Δ.conj (IsReal) + inner_conj_conj (star⟨Δ,χ⟩) + `mem_ZIrr_inner_int` (⟨Δ,χ⟩∈ℤ real で star 消滅)。
+3. **`even_inner_of_conjPerm_symmetric` refactor**: hsym threaded → **`IsReal Δᵢ` を直接取る**自己完結版
+   (内部で hsym を `inner_conjPerm_eq_of_isReal` で導出)。
+
+**a-even parity core 完成** (`even_sum_of_involution`→cross-Parseval→inner_conj_conj→parity lemma、全て IsReal ベース、
+threaded hyp 無)。**残 = a=(∑ω_{r0}^σ,β) application**: β real=(11.8.3, (4.8)/(4.10)/(5.9) SHC port、大) +
+∑ω_{r0}^σ real + 両者⊥1_G。それで parity lemma 適用 → a even → (11.8.5) full a=0。⚠ β real は大 sub-chain。
+(11.8) closure は依然 doubly-gated (§9↔§10、§14) — a-even 完成しても endpoint は §14 gate 残。
+
+## 2026-07-02 cont.⁵⁷ (lane-a) — **parity lemma を「片側⊥1」に弱化 (application 適合)**
+`even_inner_of_conjPerm_symmetric` の htriv を **片側 (`⟨Δ₂,1⟩=0`) のみ**に弱化 (leaf green, sorry-free):
+χ=1 項 `c₁(1)·c₂(1)` は c₂(1)=0 だけで消える (mul_zero)。**理由**: application で Δ₁=∑ω_{r0}^σ は **⊥1 でない**
+(⟨∑ω, ω_{00}^σ=trivial⟩=1、`alignedOmegaSigmaGrid_zero_zero`+`_inner`)、Δ₂=β のみ ⊥1。両者 real は必要
+(係数対称)。より一般化した正しい版。
+
+**a-even application の残ピース map (cont.⁵⁷ 調査)**:
+- **∑ω_{r0}^σ real**: `exists_rowInv_alignedOmegaSigma_conj` (S12:5829、conj(ω_{i0})=ω_{i'0} 対合) + `.conj=mapRingEquiv conjAe`
+  bridge (S12:4926) + reindex。`zeta_tau1_norm_ge_one` (5988) が pointwise で同 pairing 使用。~40 行 (choice+involutive+conj-sum+reindex)。
+- **β real**: (11.8.3) = (4.8)/(4.10)/(5.9) の SHC port (大)。`tau_muGrid_column_diff` (4772, full-coh)=(4.8)。
+- **β⊥1**: ⟨β,1⟩=⟨α^τ,1⟩−δ⟨ω^σ diff,1⟩+n⟨ζ^{τ₁},1⟩。
+(11.8) closure は依然 doubly-gated (§9↔§10、§14)。
+
+## 2026-07-02 cont.⁵⁸ (lane-a) — **∑ω_{r0}^σ real LANDED (a-even M-side reality)**
+`Hypothesis.sum_alignedOmegaSigma_zeroColumn_isReal` (S12, leaf green, sorry-free): `IsReal (∑_r ω_{r0}^σ)`
+(Pf (3.9)(a))。証明: `exists_rowInv_alignedOmegaSigma_conj` (5829) で choice → 行対合 σ (conj(ω_{r0})=ω_{σr,0})、
+σ involutive (`hgridinj` = alignedOmegaSigmaGrid_inner の 1≠0、+ conj_conj) → bijective; conj-sum は Finset.induction
+(`conj_add`/`conj_zero`)、`.conj=mapRingEquiv conjAe` bridge (4926) で各項 (hσ r).1、`Equiv.sum_comp` で reindex。
+⚠ API ハマり: `map_sum` は mapRingEquiv (非 bundled coe) に非適用 → induction; sum_congr は g 明示 `show..from`;
+挿入で charParam の `open scoped FiniteInduce in` が分離 → 再付与。
+
+**a-even application 残 = β real (11.8.3, 大) + β⊥1**。∑ω real は landed、片側⊥1 (parity cont.⁵⁷) ゆえ
+∑ω は⊥1 不要 (ω_{00}=1 成分持つが Δ₂=β のみ⊥1)。∑ω∈ZIrr も要 (ω^σ は ZIrr、要確認)。
+(11.8) closure は依然 doubly-gated (§9↔§10、§14) — a-even 完成しても endpoint は §14 gate 残。
+
+## 2026-07-02 cont.⁵⁹ (lane-a) — **a-even assembly `a_even_of_eq_inner_sumOmegaSigma` LANDED**
+`Hypothesis.a_even_of_eq_inner_sumOmegaSigma` (S12, leaf green, sorry-free、**一発 green**): `a=⟨∑ω_{r0}^σ,β⟩`
++ β∈ZIrr + IsReal β + ⟨β,1⟩=0 ⟹ **`Even a`**。証明 = `∑ω∈ZIrr` (`alignedOmegaSigmaGrid_mem_ZIrr` 1717 +
+`Submodule.sum_mem`、3 行) + `∑ω real` (cont.⁵⁸) + parity core (`even_inner_of_conjPerm_symmetric` cont.⁵⁷)
+→ ⟨∑ω,β⟩=(z:ℂ)∧Even z、a=z (cast) → Even a。**a-even parity CHAIN 完成** (parity core→∑ω real→本 assembly)。
+
+**残 = β-side (deferred, 本 lemma で hypothesis threaded)**: β def (=α^τ−δ(ω^σ diff)+nζ^{τ₁}) +
+**a=⟨∑ω,β⟩ の 2-way calc** (general a、私の a∈{0,2} calc と別) + **β real=(11.8.3, 大)** + β⊥1。
+これらが揃えば a even → a∈{0,2} → `charParam_a_eq_zero_of_residualEq` で a=0 (unconditional)。
+(11.8) closure は依然 doubly-gated (§9↔§10、§14) — a-even 完成しても endpoint は §14 gate 残。
+
+## 2026-07-02 cont.⁶⁰ (lane-a) — **β⊥1_G `beta_inner_trivial` LANDED**
+`Hypothesis.beta_inner_trivial` (S12, leaf green, sorry-free、**一発 green**): i≠0 で
+`⟨α^τ − δ(ω^σ diff) + nζ^{τ₁}, 1_G⟩ = 0`。証明: ⟨α^τ,1_G⟩=⟨α_{ij},1_M⟩ (`tau_inner_trivial` 5520 Dade 随伴、
+α_{ij} A0-supp=`muGrid_alpha_support`) =0 (hα1M threaded); 1_G=ω_{00}^σ (`alignedOmegaSigmaGrid_zero_zero`) で
+⟨ω^σ diff,1_G⟩=0 (`alignedOmegaSigmaGrid_inner`、i≠0 で両 [i=0]=false); ⟨ζ^{τ₁},1_G⟩=0 (5.3.b)。
+`inner_add/sub/smul_left` で組んで ring。⚠ hα1M (⟨α_{ij},1_M⟩=0) は threaded (μ_{i0}≠1_M for i≠0 が要、非自明)。
+
+**a-even application 入力状況**: ∑ω real ✓/∑ω∈ZIrr ✓/parity core ✓/assembly ✓/**β⊥1 ✓**。
+**残 = β∈ZIrr + β real (11.8.3, 大) + a=⟨∑ω,β⟩ 2-way calc + hα1M (⟨α_{ij},1_M⟩=0)**。
+(11.8) closure は依然 doubly-gated (§9↔§10、§14)。
+
+## 2026-07-02 cont.⁶¹ (lane-a) — **β∈ZIrr + ⟨α_{ij},1_M⟩=0 LANDED (β⊥1 unconditional)**
+2 lemma landed (両 clean, S12 sorry 4 不変):
+- `Hypothesis.beta_mem_ZIrr` (be55188d): β = α^τ−δ(ω^σ diff)+nζ^{τ₁} ∈ ZIrr G。α^τ∈ZIrr
+  (`muGridAlpha_tau_mem_ZIrr`)、ω^σ 各∈ZIrr (`alignedOmegaSigmaGrid_mem_ZIrr`)、ζ^{τ₁}∈ZIrr
+  (`SHC_isCoherent.extension_mem_ZIrr`); `Submodule.add/sub_mem` + `Int.cast_smul_eq_zsmul`/zsmul_mem +
+  `Nat.cast_smul_eq_nsmul`/nsmul_mem。→ assembly の `hβZ` 充足。
+- `Hypothesis.muGridAlpha_inner_trivial_M` (05a23f31): i≠0 で ⟨α_{ij},1_M⟩=0。**cont.⁶⁰ で threaded した
+  hα1M を実証明で discharge**。1_M=μ_{00} (`muGrid_zero_zero_eq_trivial`) ⇒ ⟨μ_{ij},1_M⟩=⟨μ_{ij},μ_{00}⟩=0
+  (cross-column j≠0)、⟨μ_{i0},1_M⟩=⟨μ_{i0},μ_{00}⟩=0 (within-column i≠0)、⟨ζ,1_M⟩=0 (ζ irr deg w₁>1、
+  `irr_cf_inner`+`if_neg`)。⚠ 発見: grid の 1_M は origin (0,0) に 1 個だけ (`muColumnZero_inner_trivial`=1 と整合);
+  i≠0 だから全 constituents が principal を避ける。→ `beta_inner_trivial` の hα1M が grounded、β⊥1 が i≠0 で unconditional。
+
+**a-even application 入力状況 (更新)**: ∑ω real ✓/∑ω∈ZIrr ✓/parity core ✓/assembly ✓/β⊥1 ✓ (now unconditional)/**β∈ZIrr ✓**/**hα1M ✓**。
+**残 = β real (11.8.3, 大) + a=⟨∑_r ω_{r0}^σ,β⟩ 2-way calc** の 2 本のみ。両揃えば a-even capstone (Even a)
+→ `charParam_a_eq_zero_of_residualEq` で a=0 (unconditional)。endpoint は依然 §14-gated。
+- `ha` (a=⟨∑_r ω_{r0}^σ,β⟩): 展開すると ∑_r⟨ω_{r0}^σ,α^τ⟩ + δ (ω 自己直交 `alignedOmegaSigmaGrid_inner` で
+  cross/within 項が畳まれ、5.3.b で ζ^{τ₁} 項消滅) → 残 = ∑_r⟨ω_{r0}^σ,α^τ⟩ が (11.8.4)-type residual に依存。moderate-big。
+- `β real` (11.8.3): (4.8)/(4.10)/(5.9) SHC port。row-conj involution (`exists_rowInv_alignedOmegaSigma_conj`)
+  + τ₁ conj 交換 + α reality。BIG (multi-iteration)。
+
+## 2026-07-02 cont.⁶² (lane-a) — **ha 連結 + (11.8.5) capstone LANDED (a-even 全組立完了、残 β real のみ)**
+まず**投資判断の検証** (重要): 私の β は係数 **δ** (α^τ−**δ**(ω diff)+nζ^{τ₁})、note 旧記述 (line 31/573) は係数 1。
+`charParam` の `hαω`=⟨α^τ,∑ω⟩=−δ は a∈{0,2} 特殊値 (hYd 依存) で**無条件でない**。無条件展開すると
+⟨α^τ,∑ω⟩=**a−δ** (`muGridAlpha_tau_inner_zeroColumnSum_sub_zeta`=n−δ + h114 + hinner(=a−n))。
+⟹ ⟨β,∑ω⟩=(a−δ)−δ·(−1)+n·0=**a** (β の δ 係数が α^τ の δ を相殺) ⟹ **全 δ で成立** (δ=1 に限らない)。
+∴ **係数 δ の私の β が正しい一般 (11.8.3) 残差** (note 旧係数 1 は δ=1 専用)。cont.⁶⁰⁻⁶¹ の β-pieces は正しい対象。
+
+2 lemma + capstone landed (全 clean, S12 sorry 4 不変):
+- `muGridAlpha_a_eq_inner_sumOmegaSigma_beta` (62230243): **ha 連結** (a:ℂ)=⟨∑_r ω_{r0}^σ,β⟩。
+  ⟨α^τ,∑ω⟩=a−δ (`have hαω`、linear_combination) → ⟨β,∑ω⟩=a (`simp only [inner_add/sub/smul_left, hαω,
+  alignedOmegaSigma_diff_inner_zeroColumnSum(=−1), SHC_extension_inner_zeroColumnOmegaSigma_sum(=0),
+  star_int/natCast]; ring`) → `inner_conj_symm`+`star_intCast` で ⟨∑ω,β⟩=a。⚠ `[Invertible (card ↥M:ℂ)]`
+  明示 binder は FiniteInduce scoped instance と非defeq衝突 → 除去 (charParam/beta_mem_ZIrr と同様 scope 供給)。
+  ⚠ `rw [star_intCast]` は inner_smul_left の `starRingEnd ℂ` に非match → `simp only` で bridge。
+- `residualCoeff_eq_zero` (c837cb6f、**capstone**): **無条件 a=0** = ⟨α^τ,ζ^{τ₁}⟩=−n、β real (hβr) threaded のみ。
+  `charParam_a_eq_zero_of_residualEq` (a∈{0,1,2}+((Even a)→a=0)) + `beta_mem_ZIrr` + `beta_inner_trivial`
+  (hα1M=`muGridAlpha_inner_trivial_M`) + `muGridAlpha_a_eq_inner_sumOmegaSigma_beta` (ha) +
+  `a_even_of_eq_inner_sumOmegaSigma` (Even a) → a=0。trivial-char bridge (`trivialClassFunction G` vs
+  `trivialIrreducibleCharacter G`) は defeq (`coe_trivialIrreducibleCharacter`=rfl) → exact 直結。
+
+**a-even application = 完全組立済み。残る genuine prerequisite は β real (11.8.3) ただ 1 本**
+((4.8)/(4.10)/(5.9) SHC port; row-conj involution `exists_rowInv_alignedOmegaSigma_conj` + τ₁ conj 交換 + α real)。
+これが landed すれば `residualCoeff_eq_zero` の hβr が discharge され、(11.8.5) parity 側が完全 sorry-free。
+(11.8) endpoint は依然 doubly-gated (§9↔§10 の |S₁|=n、§14 の S₂ coherence) — a=0 は (11.8.6) の
+`μ_j^{τ₂}=∑ω_{ij}^σ` 矛盾の鍵入力だが endpoint closure は §14 gate 残。**次 = β real (11.8.3)**。
+
+### β real (11.8.3) 実装計画 — Coq `PFsection11.v` 809-830 の構造 (cont.⁶³ 調査)
+Coq `Rbeta: cfReal beta` の recipe (β = β_{0 j1}、row 0 に betaE で還元後):
+```
+have betaE i j: j != 0 -> beta_ i j = beta.   (* (11.8.3) 前半: i,j 独立 *)
+  ... prDade_sub_TIirr / prDade_sub2_TIirr (= (4.8)/(4.10)) で β_{ij}=β_{i j1}=β_{0 j1} *)
+have Rbeta: cfReal beta.                        (* (11.8.3) 後半: β̄=β *)
+  rewrite rmorphD !rmorphB (conj を β の各項に分配)
+  ... cfAut_cycTIiso (σ が conj と可換: conj(η_{0j})=η_{0,k}, k=aut_Iirr conjC j)
+  ... Dade_aut (τ が conj と可換: conj(τ φ)=τ(conj φ))
+  set k := aut_Iirr conjC j; rewrite -(betaE 0 k)  (* β_{0k}=β *)
+  rewrite cfConjC_Dade_coherent coh_tau1 ?mFT_odd  (* τ₁ が conjC と可換 — 奇数位数必須 *)
+  Dtau1 cfAut_seqInd (τ₁ on ζ̄)
+```
+**必要な 5 ピース (上流順)** — ⚠**重要発見 (cont.⁶³): piece 2,3 の Galois-equiv 中核は `S07_CoherenceGalois.lean`
+に既存**。β real は「ゼロから構築」でなく「既存 comm lemma の wiring + assembly」→ 規模大幅縮小:
+1. **σ Galois-equiv (一般 column, row 0)**: `conj(ω_{0j}^σ) = ω_{0,k}^σ`, k=w2 column-conjugate。
+   既存 `exists_rowInv_alignedOmegaSigma_conj` は **column 0 の row-conjugation** (w1 側)。row-0 の
+   **column-conjugation** (w2 側) が新規。machinery: `sigma_mapRingEquiv_comm`+`galoisMap_conj_omega`
+   +`omegaProdChar_inv` は共通、w2CharEquiv の inversion が要 (w1CharEquiv_rowInv の w2 版)。**未実装**。
+2. **τ Galois-equiv (`Dade_aut`)** ✅ **LANDED (cont.⁶³, `tau_mapRingEquiv_comm`)**: `hyp.tau(φ^{σc})=（hyp.tau φ)^{σc}`
+   (A0-supp φ)。`hyp.tau`=`dadeIntegralCharacterMap ...` (def) ゆえ `S07.dadeIntegralCharacterMap_mapRingEquiv_comm`
+   を直接 `exact` (一発 green)。σc=conjAe で reality。
+3. **τ₁ (SHC extension) Galois-equiv (`cfConjC_Dade_coherent`)**: `SHC.ext(ζ^{σc})=(SHC.ext ζ)^{σc}`。
+   ⚠ 中核は `S07.IsCoherent.extension_mapRingEquiv_comm` (Pf (5.9)(a)) に**既存** (general `hτ:IsCoherent`)。
+   SHC への instantiate + 前提 (hSirr/hspan/hSu/hlat/h2) 供給が要 (wiring)。
+   ✅ **LANDED (cont.⁶⁵, `SHC_extension_conj`)**: `(ζ^{τ₁})‾=(ζ‾)^{τ₁}`。全前提供給:
+   hspan=`SHC_zSpan_vanish_support`; h2=共役対 {ζ,ζ̄} (`inducedFamily_hasNoRealCharacters`);
+   hSu (conjAe)=`inducedFamily_closedUnderConjugate`+irr.conj+deg (`.conj=mapRingEquiv conjAe` bridge 経由);
+   hlat=`extension_mem_ZIrr`; hSirr=`mem_irreducibleCharacters`; hA'=`subset_rfl`。
+   ⚠ `.conj` 2 箇所は `simp only [hbridge]` で一括変換 (rw は inner χ.conj を先に食う)。⚠ `open scoped FiniteInduce in` 要。
+4. **betaE (β independence)**: (4.8)/(4.10) SHC port。`tau_muGrid_column_diff` (4772) は full-coh `coh`
+   依存 → SHC 版 extract 要 (Dade/σ isometry は coh 非依存ゆえ抽出可能なはず)。**未実装**。
+5. **Rbeta assembly**: 1-4 を上記 recipe で組む。
+**規模 (改訂)**: piece 2 ✅、piece 3 ✅ (cont.⁶⁵)。残 = 1 (σ column-conj at row 0)、4 (betaE)、5 (assembly)。上流順 1→4→5。
+**次 = piece 1** (σ column-conjugation at row 0): `conj(ω_{0j}^σ) = ω_{0,k}^σ`, k=w2 column-conjugate。
+既存 `exists_rowInv_alignedOmegaSigma_conj` (column 0 の row-conj、w1 側) の w2 版。machinery
+(`sigma_mapRingEquiv_comm`/`galoisMap_conj_omega`/`omegaProdChar_inv`) 共通、w2CharEquiv inversion が新規。
+**gate 確認**: §14 下流でなく (11.8.5) の genuine prerequisite (document-order 11.8.3<11.8.5、本来上流)。
+SHC context で全て可能 (α^τ/ω^σ/ζ^{τ₁} は既に SHC で構築済み、conj 可換性を足すのみ)。
