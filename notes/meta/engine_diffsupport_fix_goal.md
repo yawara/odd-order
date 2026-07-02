@@ -1,5 +1,7 @@
 # 自走 goal: (6.8) engine support-interface 修正 (§G-A) — 2026-06-03 overnight
 
+> ⚠ **DEAD（退役 worktree `odd-order-pf-engine` 向け 2026-06-03 goal; 終了済）**。本ノートは履歴。(注記 2026-07-02)
+
 ## 作業場所 (厳守)
 - **ONLY** `/home/ywr/odd-order-pf-engine` (branch `pf-engine-support`)。
 - **絶対に触らない**: `/home/ywr/odd-order` (main = 不可侵) / `/home/ywr/odd-order-repr-infra` (別セッション稼働中)。

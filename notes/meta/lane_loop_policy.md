@@ -1,5 +1,9 @@
 # レーン自律 loop ポリシー — LAUNCH.md 駆動の `/loop` 自己選択
 
+> ❄ **FROZEN 2026-06-18** (ユーザー裁定; LAUNCH.md の LOOP GATE 全削除済)。ENTER 条件 3 (sorried cite 禁止) と
+> STOP の gate/depletion 項は 2026-06-28 no-gates 方式 ([`ft_lane_reallocation_2026_06_28.md`](ft_lane_reallocation_2026_06_28.md) §0)
+> と矛盾 — 再開時は要改訂。(注記 2026-07-02)
+
 > 横断運用ドキュメント。各 worktree の `LAUNCH.md`（git-excluded）冒頭にある
 > **「▶ LOOP GATE」ブロック**から参照される正本。**ハブは他セッションに loop を注入できない**
 > （`send_message` は承認必須かつ unsupervised モードで不可、[[cross-lane-sync-via-notes]]）。
@@ -29,13 +33,13 @@
 → 該当: `/loop`。外部ゲート無しの連続作業なので wakeup は短く（60s 即再開、[[feedback-loop-short-wakeup]]）。
    **各周回の型**:
    1. 次の sorry / obligation を **1 つだけ**前進させる（難所は sorry 退避でなく正面突破、[[feedback-no-avoiding-hard-parts]]）。
-   2. `lake build <develop leaf>` が green（leaf-build の stale-green に注意、節目で full build、[[leaf-build-stale-green]]）。
-   3. feature 単位で commit（build-green を別ステップで検証してから、[[feedback-verify-build-before-commit]]；
+   2. `lake build <develop leaf>` が green（leaf-build の stale-green に注意、節目で full build、[[lean-build-discipline]]）。
+   3. feature 単位で commit（build-green を別ステップで検証してから、[[lean-build-discipline]]；
       記号本文は heredoc、[[git-commit-heredoc-for-lean-symbols]]）。
    4. **STOP 条件を再評価**（下記）。真なら loop を抜ける。
    - **⚠ 新 leaf (`.lean`) を作ったら必ず `OddOrder.lean` に `import` 行を追記**（root closure 未登録だと
      `lake build OddOrder` の対象外になり、leaf build が green でも full build / 合流ゲートをすり抜ける、
-     [[leaf-build-stale-green]]）。axiom-clean な新定理は `AxiomsCheck.lean` にも登録する。
+     [[lean-build-discipline]]）。axiom-clean な新定理は `AxiomsCheck.lean` にも登録する。
 
 ### STOP / 入らない — いずれか真なら loop に入らず、1 ステップだけ進めて handoff し停止
 

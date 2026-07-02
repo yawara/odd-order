@@ -1,4 +1,8 @@
-# Peterfalvi (11.8) — the main orthogonality calculation (lane-b W3 handoff)
+# Peterfalvi (11.8) — the main orthogonality calculation (lane-b W3 handoff) (現 lane a)
+
+> ⚠ S12 は 2026-07-02 prefix-split (95fc7ade): 凍結 decl の旧 S12:NNNN (≲6100) は
+> `S12_MaximalIII_IV_V_Core.lean` (+~8 行ずれ)、active (11.8) は 2768 行の
+> `S12_MaximalIII_IV_V.lean` (`exists_zeta_residual_not_orthogonal` は現 :~2645)。
 
 > repo `S13_MaximalIII_IV.lean` = **Pf §11** (file 番号 = §番号 −2)。(11.8) は `card_kappaHall_lt_of_isTypeIIIorIV`
 > (FeitThompson:426, Pf (11.9.b)) の唯一の deep gate。**(10.9)-half + reduction spine は landed**

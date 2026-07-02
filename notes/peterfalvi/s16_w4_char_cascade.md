@@ -1,4 +1,9 @@
-# Pf §16 POLE-2 char cascade — W4 (lane-h, 2026-06-25 relane #9)
+# Pf §16 POLE-2 char cascade — W4 (lane-h, 2026-06-25 relane #9 → **現 lane c**)
+
+> **⚠ 2026-07-02 更新**: 正本 = [`ft_lane_reallocation_2026_06_28.md`](../meta/ft_lane_reallocation_2026_06_28.md)
+> (3 レーン a/b/c、lane c = S15_SAndT_Setup + S15_SAndT + S16_NonExistenceG + 構成的 Clifford 9002)。
+> 下の header の「lane-h / ft_frontier_remap §2 W4 / issue 0083」は履歴 (0083 は closed)。
+> live entry = 末尾の cont.⁴⁰+ と「HUB 裁定 (2026-07-02 全体レビュー)」節。
 
 > 🔔 **2026-07-01 cross-lane 通知 (issue 0091)**: `Hypothesis78.nu_isometry` (14.11 h78 / (12.16) hB が
 > cite する §7 interface) が **global → family isometry** に弱められ合流済 (Peterfalvi 忠実版)。field を
@@ -21,6 +26,10 @@
 「残り §3/§4 layer」) + **(7.5) Frobenius/TI norm formula (repo 未実装)**。
 
 ### 残 sorry の bottom-out 先
+
+> ⚠ **2026-06-25 snapshot** — 現況は cont.⁴²/⁴⁴ を見る。この表のうち `betaM_expansion`・
+> `normCascadeBound_of_charData`・`card_Q_eq`・`normalizer_W1` (13.16) は**その後 proven**
+> (残余は `betaM_expansion_data`/`exists_MHypothesis` 等へ移動)。
 
 | 種別 | sorries (S16_NonExistenceG 他) | gate |
 |---|---|---|
@@ -1236,3 +1245,28 @@ hub 再裁定 (issue 9001「✅ HUB 再裁定」, commit 6d51666b): **(1)** σ-t
 - **⚠ 精査で判明: 一般 Clifford module-core (issue 0026 の「残る唯一の hard blocker BLOCKER B orbit transitivity」) は stale 更新後に sorry-free 化済** — `CliffordSingleOrbit.lean:122` `restrictionConstituentsSingleOrbit_of_isIrreducible` + `:175` degree formula + `InducedIrreducible.lean` (inertia orbit/norm) + `CliffordMultiplicityOne.lean` = 全 0 sorry。hub の「構成的 producer なし」前提も stale。
 - **残 gap = `typeI_induced_char_constituents` (S14_MaximalI.lean:389, sorry :398) 一般ケース**: χ=Ind_H^L θ を等次数・非実・A(L)∪{1}台の mult-one 既約和に分解。**Frobenius ケース (`frobenius_typeI_induced_char_constituents` :465) は proven** (witness (12.16) が実消費するのはこちら)。**(8.2.c) `typeF_inertia_inf_le_U1` (:364) proven** (inertia bound I(θ)∩U⊆U₁、等次数に効く)。
 - **build 方針**: Pf (1.7) cyclic/bounded-inertia → mult-one 等次数 Ind 分解が generic 未 landing (核心 gap)。generic shared leaf (GroupTheory/RepresentationTheory or Pf §3) で build → S14 が (8.2.c)+(1.5.a)/(1.2) 台と合わせ assemble。**genuine multi-turn char build** ([[feedback-no-avoiding-hard-parts]]、[[scaffold-sorry-free-not-done]])。詳細 = issue 9002。
+
+## ✅ HUB 裁定 (2026-07-02 全体レビュー) — c_eq_one route 制約の open 化 + S-side 処分 + γ coherence 供給分担
+
+docs/plan 全体レビューで「closed issue にしか書かれていない制約」を本 note (lane c の live 正本) に再掲・確定する:
+
+**1. `c_eq_one` (13.12, S16 が 14× cite = on-path) の route 制約** (closed/4014 の hub 裁定を承継):
+**閉じる者は structural + W-side route を使う** — structural 部 (`c ≡ 1 mod q`・`2q ∣ c−1`・c≥2q+1) は
+proven 済、解析部 (13.10) `ub_m` は **W-side η grid (cyclicTI)** 経由。**carrier の `tauS = 0`
+placeholder には依存しない** (依存すると unsound)。
+
+**2. S-side cascade の処分** (closed/1004 vestigial 判定の帰結):
+- `sibleyTarget_S` / `S_coherent` (13.2.d) は **vestigial (spine 0-cite)** — **S-side τ₁ 形のまま完成
+  させない**。S15_SAndT_Setup の docstring が誘う「(6.8) 供給で unconditional 化」route は死んでいる
+  (docstring は 2026-07-02 に ⚠ 修正済)。
+- (13.5)–(13.9) の S-side τ₁ 形 statement: 到達時に **W-side restate or retire** を判定してから着手
+  (現形のまま埋めない)。(13.3)/(13.4) は `T_side_caseB_facts` route で on-path (cont.⁴⁴ の検証どおり)。
+
+**3. γ coherence 供給の明示分担** (9001 追加裁定と同文):
+- **lane b** = (6.5.c) coherence producer (9000 番台 claim 起票が前提) + S07 generic producer 群。
+  scope は §12 (12.6) 向け — **γ cascade の char 入力は b の納品物ではない**。
+- **lane c 自身** = η-grid の honest 化 + M 向け `Hypothesis78`/Dade instantiation
+  (`exists_MHypothesis`/`betaM_expansion_data`/(14.11.4) norm 入力) を **自所有 S15/S16 内で
+  upstream-first に build** (b の generic producer は signature contract で cite)。cont.⁴⁴ の
+  「(i) §7 coherence = lane b の build」という読みは**過大** — 待たない。旧 lane-h 課題
+  (06-22「真の long pole = η-grid honest 化」) の後継 owner は c。

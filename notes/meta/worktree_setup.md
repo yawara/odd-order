@@ -18,24 +18,25 @@ mathlib は `lakefile.toml` で `v4.30.0-rc2` に pin されており worktree �
 
 ### 1. 命名
 
-- worktree path = `/Users/ywr/odd-order-<slug>` (main の sibling)
+- worktree path = `/home/ywr/odd-order-<slug>` (main の sibling)
 - branch 名 = `<slug>` (同じ)
 - slug は作業範囲を表す:
   - 章単位: `isaacs-ch05`, `bg-s03`, `peterfalvi-s04`
   - 単一 issue 攻略: `issue-0002-pcomplement` 等
-- 衝突確認: `ls -d /Users/ywr/odd-order*`
+  - 現行 (2026-07-02) の常設レーンは slug = `a`/`b`/`c` (`/home/ywr/odd-order-{a,b,c}`; 配分の正本 = [`ft_lane_reallocation_2026_06_28.md`](ft_lane_reallocation_2026_06_28.md))
+- 衝突確認: `ls -d /home/ywr/odd-order*`
 
 ### 2. 作成 + symlink + olean warm-start コピー (5 コマンド)
 
 ```bash
-git worktree add /Users/ywr/odd-order-<slug> -b <slug>
-mkdir -p /Users/ywr/odd-order-<slug>/.lake
-ln -s /Users/ywr/odd-order/.lake/packages /Users/ywr/odd-order-<slug>/.lake/packages
-ln -s /Users/ywr/odd-order/references /Users/ywr/odd-order-<slug>/references
+git worktree add /home/ywr/odd-order-<slug> -b <slug>
+mkdir -p /home/ywr/odd-order-<slug>/.lake
+ln -s /home/ywr/odd-order/.lake/packages /home/ywr/odd-order-<slug>/.lake/packages
+ln -s /home/ywr/odd-order/references /home/ywr/odd-order-<slug>/references
 # 本プロジェクト olean を main から warm-start コピー (symlink は不可 = 並行ビルド衝突).
 # `cp -a` で mtime を保つと lake の trace fast-path が効く. 新 worktree の HEAD が main と
 # 近い (= 共有コミットが多い) ほど初回ビルドはほぼ no-op、離れていても stale 分だけ再ビルドで無害.
-cp -a /Users/ywr/odd-order/.lake/build /Users/ywr/odd-order-<slug>/.lake/build
+cp -a /home/ywr/odd-order/.lake/build /home/ywr/odd-order-<slug>/.lake/build
 ```
 
 ### 3. references symlink の untracked 抑制 (1 回だけ)
@@ -43,7 +44,7 @@ cp -a /Users/ywr/odd-order/.lake/build /Users/ywr/odd-order-<slug>/.lake/build
 `.gitignore` の `references/` は trailing slash でディレクトリのみマッチ. symlink ファイルは素通りするので `git status` に出る. 修正:
 
 ```bash
-echo "references" >> /Users/ywr/odd-order/.git/info/exclude
+echo "references" >> /home/ywr/odd-order/.git/info/exclude
 ```
 
 `.git/info/exclude` は worktree 共有だが main では `references/` が実ディレクトリで既にマッチ済なので無害. 既に追加済なら再実行不要.
@@ -86,7 +87,7 @@ export ODD_ISSUE_BASE=1000
 
 ```bash
 # main 側から
-git worktree remove /Users/ywr/odd-order-<slug>
+git worktree remove /home/ywr/odd-order-<slug>
 git branch -d <slug>          # 未マージなら -D
 ```
 

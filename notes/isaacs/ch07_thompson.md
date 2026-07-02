@@ -1,5 +1,8 @@
 # Isaacs Ch.7: The Thompson Subgroup — mini-roadmap
 
+> ✅ **COMPLETE (frozen, 2026-07-02)** — Ch.7 全定理 sorry-free
+> (`OddOrder/Isaacs/Ch07_ThompsonSubgroup/`)。以下の「未作成」等は調査時点の記述 (履歴)。
+
 **スコープ**: Isaacs, *Finite Group Theory* (AMS GSM 92, 2008) Ch.7 (pp. 201-222).
 形式化先 (予定): `OddOrder/Isaacs/Ch07_ThompsonSubgroup.lean` (未作成).
 原典抽出: `references/isaacs/finite-group-theory.mmd` lines 3713-4058.

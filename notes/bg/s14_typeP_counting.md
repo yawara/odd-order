@@ -1,5 +1,11 @@
 # BG §14 — Maximal Subgroups of Type P and Counting
 
+> ## ❄ FROZEN (2026-07-02)
+> §14 全結果 landed。残 sorry = **14.9 `nonidentity_covered_by_sigma_pieces` / 14.13
+> `sigmaLength_one_frobenius_type` の 2 点のみ** (両方 do-not-prove mis-encoding、off-spine =
+> memory [[ft-settled-findings]])。PAUSE 裁定 (2026-06-14)・L1769 残リスト
+> (14.8/14.10/14.11/14.12 は証明済)・旧 lane 名 (D/F/G/H) は全て履歴。
+
 > Lane F mini-roadmap. 正本ファイル = `OddOrder/BG/Ch4_FamilyOfMaximal/S14_TypePCounting.lean`。
 > mmd `references/bg/local-analysis.mmd` L3787–4158 (pp. 105–116)。
 

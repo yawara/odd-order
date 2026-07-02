@@ -1,5 +1,11 @@
 # BG §16: The Main Results — per-section 調査ノート (Phase 2a 終結)
 
+> ## ❄ FROZEN (2026-07-02)
+> **Prop 16.1 + Thm D/E/I/II landed** (sorry-free; wrapper/skeleton queue は完了 or moot)。
+> 残 3 sorry = `theoremA_maximal_structure` / `theoremB_U_and_A_tame` / `aSets_support_slice` の
+> overstatement 宣言 (do-not-prove-as-is、faithful variant あり = memory [[ft-settled-findings]])。
+> 以下は履歴。
+
 **スコープ**: BG §16 "The Main Results" (pp.123-134, mmd L4256-4449).
 **結果数**: Theorem A-E の 5 個の主要定理 + Theorem I, II + Proposition 16.1 (基礎補題, 型分類を統合).
 **形式化先** (予定): `OddOrder/BG/Ch4_FamilyOfMaximal/S16_MainResults.lean`.

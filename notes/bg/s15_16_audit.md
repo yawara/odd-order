@@ -1,5 +1,12 @@
 # BG §15 / §16 — faithfulness + dependency + gate audit (Lane G, 2026-06-14, post-13.6)
 
+> ## ❄ FROZEN/SUPERSEDED (2026-07-02)
+> §15/§16 は凍結 (残 5 sorry = S15_MF 2 [15.8/15.9] + S16_MainResults 3、全て
+> overstatement/deep-char の off-spine = memory [[ft-settled-findings]]; feitThompson spine は
+> Prop 16.1 のみ消費で sorry-free)。**Thm A の proof-time 復元プラン (§7/§12) は撤回** —
+> `theoremA_maximal_structure` は do-not-prove-as-is
+> (faithful = `theoremA_maximal_structure_faithful` S16:~4844)。以下は履歴。
+
 Lane G を §13 → BG §15+§16 に再配置した直後の着工前監査。目的は LAUNCH の
 「scaffold の faithful 化 + §14 非依存補題」を実行可能な形に落とすこと。
 正本 mmd = `references/bg/local-analysis.mmd`、§15 = L4086–4255、§16 = L4256–4562。

@@ -1,6 +1,6 @@
 # BG §13: Prime Action — per-section 調査ノート
 
-## 2026-06-12 Lane G session 1: STATEMENT AUDIT — 🛑 BLOCKER (issue 8000)
+## 2026-06-12 Lane G session 1: STATEMENT AUDIT — 🛑→✅ 解消済 (2026-07-02: issue 8000 closed、§13 全証明済 — 以下履歴)
 
 **結論: §13 は現状の §12 surface では着工不能。根の Lemma 13.1 が BG Cor 12.16(a)(b) を要し、
 その statement が repo に存在しない。** LAUNCH.md 手順 3 (着工前必須 audit) の所見。

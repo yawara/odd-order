@@ -1811,6 +1811,8 @@ M-side は無条件で 𝒞_G(M_F) に入る可能性); nonconjugate_diffImage �
 
 ## loop⁹⁶: (8.18.c) 実 statement を source から解明 — mixed Ã₁/Ã 形 + A₁ resolution
 
+> ⚠ 本節の tight-A₁ 案は反証済 (下記 loop⁹⁷/⁹⁸ 追記参照)。
+
 Peterfalvi §8 mmd (04.10) を読了。**(8.18.c) = mixed 形**: `Ã₁(S)∩Ã(T)=∅ ∨ Ã₁(T)∩Ã(S)=∅`
 (A₁=sharp support `(L_F)^#`、A=full `typeIA`)。(12.3) 証明 (04.14) は「(8.18.c) で Ã(L₁)∩Ã₁(L₂)=∅ と
 仮定」= **片側 A₁-based**。
@@ -1829,3 +1831,18 @@ CharacterDecompositionData から tighten (φ≤chi=Ind、supp φ⊆L_F — supp
 **評価**: (8.18.c)/dadeSupport は genuine deep §4/§8/§10 Dade-support 理論。loop⁹²-⁹⁶ で実 piece
 (support_mutual_exclusion, reduction, dadeSupport⊆𝒞_G(L_F)) を landing したが完成は §4 restrict 深部を要す
 multi-iteration。β-lane の cleanly-ownable coherence work は完了済。
+
+## loop⁹⁷/⁹⁸ catch-up (2026-07-02 hub 追記): tight-A₁ 案は反証済・現 frontier 訂正
+
+- **(i) loop⁹⁶ の「核心 resolution (Frobenius 不要、tight A₁ 形)」段落は反証済み**。loop⁹⁷ (33aa8553) で
+  tight A₁ 形 (`diffImage_support_subset_conjClassSet_sigmaSharp`) を実装 → **loop⁹⁸ (7c40c3c2) で FALSE と
+  判明し revert**: constituent は full `A = typeIA` 台であり、対称 A₁-only 論法は (12.15) の非-Frobenius `N`
+  caller で偽。真の obligation = **mixed asymmetric `Ã₁(L₁) ∩ Ã(L₂) = ∅`** (spec =
+  S14_MaximalI.lean:763-776 の docstring)。
+- **(ii) loop⁹³ の「reduction PROVEN + 残 = `dadeSupport_disjoint_of_nonconjugate`」も無効** — 当該 decl は
+  削除済。現状は `nonconjugate_diffImage_inner_zero` が bare honest sorry (S14:777、sorry @ :787)。
+- **(iii) (12.10)**: `witness_L_frobenius` は sorry-free assembly 化 (S14:4097)。残 =
+  `witness_L_isTypeI` (S14:4075) / `witness_L_complement_isZGroup` (S14:4086) の 2 pin (hub 9003 Cluster A)。
+- **(iv) §8 support theory**: issue 0096 carve-out により S10 内の Dade-support 宣言群
+  (typeII_A_sets_TI/normalizer・dadeSupportHypotheses_typeI/typeP・support_mutual_exclusion) は
+  **lane b が S10 内で build** (9003 裁定)。

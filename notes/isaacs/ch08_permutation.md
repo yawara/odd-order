@@ -1,5 +1,8 @@
 # Isaacs Ch.8: Permutation Groups — mini-roadmap
 
+> ⏸ **NOT formalized (2026-07-02)** — FT 経路外につき deferred
+> (CLAUDE.md スコープ: 作業は FT 経路限定; post-FT coverage phase で再訪)。
+
 **スコープ**: Isaacs, *Finite Group Theory* (AMS GSM 92, 2008) Ch.8 (pp. 223-270).
 形式化先 (予定): `OddOrder/Isaacs/Ch08_Permutation.lean` (未作成).
 原典抽出: `references/isaacs/finite-group-theory.mmd` lines 4059-4878.

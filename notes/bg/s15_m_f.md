@@ -6,8 +6,13 @@
 > **Theorem 15.2 (M_F 構造) は step-1〜step (c)/(d)/3 まで sorry-free 構築済**
 > (`isTypeP1_of_mf_ne_msigma` / chief-factor engine / prime-manner / `hsecFit` C-interface /
 > `card_centralizer_quotient_eq_of_kstar` / M_σ/Q nilpotent / Q=O_q(M) Sylow / K-invariant complement D)。
-> **残 = wrapper gate `Q0⊴M` 1 点**。live 状況は memory [[ft-endgame-two-poles]] + issue 8012 が正本、
-> 全体地図は [`../meta/ft_master_roadmap_2026_05_29.md`](../meta/ft_master_roadmap_2026_05_29.md) 冒頭 2026-06-20 ヘッダ。
+> **更新 (2026-07-02)**: **Theorem 15.2 は完全証明済** (wrapper gate `Q0⊴M` も解消)。S15_MF の残
+> sorry = **15.8 `tau2_transfer_constraint` / 15.9 `centralizer_escape_final_local` の 2 点のみ**
+> (off-spine deep char = memory [[ft-settled-findings]])。⚠ 以下の pointer は dead:
+> memory [[ft-endgame-two-poles]] は現存せず、issue 8012 は closed、issue 7007 も本日
+> (2026-07-02) close。
+> (旧記述 2026-06-20: 「残 = wrapper gate `Q0⊴M` 1 点。live 状況は issue 8012 が正本、
+> 全体地図は [`../meta/ft_master_roadmap_2026_05_29.md`](../meta/ft_master_roadmap_2026_05_29.md) 冒頭 2026-06-20 ヘッダ」)
 > 巨大化 (>1500 行) につき split issue [0071](../../issues/0071-s15-mf-split.md) が capstone 後分割を追跡。
 > 以下は当初計画 (歴史的参考) ↓
 
@@ -392,4 +397,5 @@ BGsection15.v:939-1240)。`by_cases IsMulCommutative M_F`:
 ---
 
 **最終更新**: 2026-06-23 (cont.¹³)
-**Next Wave**: hFI 非 abelian 枝 (c) — 正本 issue 7007 cont.¹³
+**Next Wave**: hFI 非 abelian 枝 (c) — 正本 issue 7007 cont.¹³ → ✅ 完了 (2026-07-02:
+`isTypeI_of_isTypeF` / `isTypeF_of_isTypeI` proven、S16_MainResults sorry-free 側に着地)

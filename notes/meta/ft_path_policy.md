@@ -26,7 +26,7 @@
      それは scaffold の枚数を測っているだけで、その仕事が本物の必要な数学かは別。
      **"FT-orphaned"・"閉じても sorry 減らない" の言い回しは使わない**（自家製ジャーゴン、誤読を招く）。
      honest architecture の genuine prerequisite なら、今 consumer 0 でも淡々と完遂する
-     （[[feedback-orphaned-not-reason-to-defer]]）。
+     （[[feedback-cite-sorried-lemmas-if-signature-correct]]）。
 4. **作業順序 = 上流優先 + 文書順タイブレーク**（全レーン共通の標準方針、ユーザー 2026-06-22）。
    - **上流優先**: 各レーンは依存の**上流側から**進める。下流の gated endpoint を先回りで
      skeleton 化（hypothesis 引数化 engine + assembly）するのは**上流が真に block されているときの
@@ -52,7 +52,7 @@
 6. **shared infra は claim-before-build（policy 5(A)(B) の重複防止、ユーザー裁定 2026-07-01）。**
    policy 5(A) で複数の gated レーンが同じ上流 infra に収束しうる ⟹ 未所有 leaf の新設は沈黙で行わない：
    1. **検索必須**: 着手前に repo を教科書番号 + descriptive 名 2 案以上 + import grep で検索
-      （[[verify-port-state-by-number-not-coq-name]] [[s09-is-section7-chirho-complete]]、既存を再構築しない）。
+      （[[verify-port-state-by-number-not-coq-name]]、既存を再構築しない — 実例: S09=§7 chiRho 重複、issue 0089）。
    2. **issue で claim**: 不在確認後、**9000 番台（shared-infra 専用レンジ）で issue を 1 件切る**
       （target leaf + 補題名/教科書 ref + lane）。着手の最初の commit で main に乗せる。
    3. **scan 必須**: 全レーンは shared infra 着手前に **open 9000 番台 issue を scan**（定期 main 同期にフック）。
@@ -90,22 +90,28 @@
 
 ## 1. FT critical path（symbol-anchored, 不変の背骨）
 
+> ✅ **2026-07-02 全面更新**: FT 層の配線は完了 — `FeitThompson.lean` は**実 sorry 0**。旧記述
+> （「`sectionSixteenHypothesis_of_isMinimalSimpleOdd` が唯一の実 sorry」「S16⊃…⊃S10 の extends 鎖」）
+> は stale だったため書き換え（旧版 = git 履歴）。**行番号は書かない** — 数日で rot する。decl 名で参照。
+
 ```
-feitThompson                                    OddOrder/FeitThompson.lean:162   ✅ sorry-free
-└ noMinimalSimpleOdd                            :76
-  ├ sectionSixteenHypothesis_of_isMinimalSimpleOdd  :67   ★★ 唯一の実 sorry（FT 全体の標的）★★
-  │     target = Peterfalvi.S16.Hypothesis      Peterfalvi/S16_NonExistenceG.lean:42
-  └ noMinimalSimpleOdd_of_section16             :48
-        └ BG.AppC.final_contradiction           ✅ done（carrier-conditional, App.C 完成）
+feitThompson                                       OddOrder/FeitThompson.lean   ✅ sorry-free
+└ noMinimalSimpleOdd                               ✅ sorry-free（配線済）
+  ├ sectionSixteenHypothesis_of_isMinimalSimpleOdd ✅ sorry-free
+  │   = sectionSixteenHypothesis_of_inputs ∘ section16Inputs_of_isMinimalSimpleOdd
+  │     （3-producer flat assembly — extends 鎖ではない。検証 = ft_frontier_remap_2026_06_25.md §0）
+  │     producer 1: Section16MaximalPair       ← S14.theorem88_caseB_holds ✅ proven
+  │     producer 2: Section16TypePStructure    ← S12 chain（card_kappaHall_lt_of_isTypeIIIorIV ✅）
+  │     producer 3: Section16CharacterData     ← W-side producer ✅（closed/1004; tauS/tauT は vestigial）
+  └ noMinimalSimpleOdd_of_section16 → BG.AppC.final_contradiction → S16.nonexistence_of_G   ✅
 ```
 
-`feitThompson` を sorry-free にする = `sectionSixteenHypothesis_of_isMinimalSimpleOdd` を埋める
-= minimal simple group から `Peterfalvi.S16.Hypothesis` を **honest に構成**する、ただ一点。
-それ以外（reduction, App.C 最終矛盾）は既に sorry-free。
-
-`Peterfalvi.S16.Hypothesis` は線型 import 鎖の頂点:
-`S16 ⊃ S15 ⊃ S14 ⊃ S13 ⊃ S12 ⊃ S11 ⊃ S10`（各 `Hypothesis` が前段を extends）。
-この **Pf §10–16 spine** を構成可能にすることが残作業の実体。
+残 obligation は FT 層でなく **Pf §9–§16 の分散実 sorry（~74、comment-strip census 2026-07-02）**に住む:
+- **唯一の bare FT-spine sorry** = `S12.exists_zeta_residual_not_orthogonal`（Pf 11.8、lane a frontier）
+  — proven な `card_kappaHall_lt_of_isTypeIIIorIV` が cite する唯一の残余。
+- theorem88 route の sorried floor = `exists_typeICovering` ×2（lane b、route B = 8022/0096）+
+  `S09.card_G0_lower_bound`（lane a、issue 0044 裁定 2026-07-02）。
+- `Peterfalvi.S16.Hypothesis` は **flat record**（現在地 = `S16_NonExistenceGCore.lean`）。
 
 ---
 
@@ -126,8 +132,10 @@ Pf §10–16 spine がこれを consume = **G2 ゲート**。担当 = ~~lane B~~
 coherence infra = lane b、正本 = `ft_lane_reallocation_2026_06_28.md`）。
 
 ### 合流 — Pf §10–16 spine
-G1（BG §16, import 済）と G2（§3–§9, **現状 opaque field で代用＝未 cite**）を両方 consume し
-S16.Hypothesis を生む。**§10–16 が §5/§6/§8 を import していないのが signature gap の核**（§4）。
+G1（BG §16, import 済 — spine 消費は sorry-free の Prop 16.1 のみ、BG は 2026-07-02 凍結完了）と
+G2（§3–§9 char API — **供給側は signature/proof とも完成** (S03–S08 帯 実 sorry 0)、consumer 側
+cite 置換 (endpoint A) も wiring 済）を consume し S16.Hypothesis を生む。
+**旧「signature gap」（opaque field 代用・§5/§6/§8 未 import）は 2026-06-15〜07-02 に解消済**（§4 は履歴）。
 
 ```
 Isaacs✅ ─ BG AppA/B✅ ─ BG §1-16 ─┐
@@ -171,9 +179,16 @@ Isaacs✅ ─ BG AppA/B✅ ─ BG §1-16 ─┐
 
 ## 4. signature 先行整備（並列化の核）
 
-### 問題
+> ✅ **2026-07-02: 本節はほぼ discharge 済（履歴として温存）**。§3–§9 supply は全 pin + proof 完
+> （S03–S08 帯 実 sorry 0、(6.8) `sibleySetup_is_coherent` も proven）。endpoint A の consumer 側
+> wiring も完了。残 = `sibleyTarget_*` producer（issue 7001 — 2026-07-02 裁定: H0C = lane a +
+> soundness 監査必須 / S = vestigial 処分 / frobI = TI-case 限定）と E(残) = §10 hard content のみ。
+> 下の「問題」「S10 が import するのは…」は当時の記述。
+
+### 問題（2026-06-15 当時）
 Pf §10–16 spine は G2（§3–§9 char API）を **opaque field（Prop/carrier）で代用**しており、
-§5/§6/§8 を **import も cite もしていない**（S10 が import するのは S04, S07, S09 のみ）。帰結:
+§5/§6/§8 を **import も cite もしていない**（S10 が import するのは S04, S07, S09 のみ — その後
+S10_CoherenceWiring が S08 を import し解消）。帰結:
 1. §3–§9 が landing しても §10–16 は **自動で benefit しない**（手で wiring が要る）。
 2. 各 lane が互いの proof を待つ形 → **並列化が効かない**。
 
@@ -188,7 +203,7 @@ axiom-clean）→ §10–16 の opaque field を **その signature への cite 
 
 | # | pin する endpoint | consumer（現 opaque, file:line） | supplier（§3–§9） | 状態 |
 |---|---|---|---|---|
-| **A** | maximal 族の coherence producer `Nonempty (S07.IsCoherent …)` | S12 `CharacterParameters.coherent_S`:127 / S15 `S_coherent` / §11–13 coherence riders（~27 sorry） | S08 `sibleySetup_is_coherent`:46 | 🔴 sorry（B (6.8)）。**signature は既に在**＝下流は今すぐ cite 可 |
+| **A** | maximal 族の coherence producer `Nonempty (S07.IsCoherent …)` | S12 `CharacterParameters.coherent_S`:127 / S15 `S_coherent` / §11–13 coherence riders（~27 sorry） | S08 `sibleySetup_is_coherent` | ✅ **(6.8) proven**（S08 帯 実 sorry 0、2026-06 末）。残 = `sibleyTarget_*` producer（issue 7001） |
 | **B** | ω-grid constructor `ω : Fin q→Fin p→CF ↥W` | S15 `omega`:130 / S12 `CharacterParameters` | S05 σ-isometry（`chiFam`/`omegaIrrEquiv`, proof 在） | ✅ **pinned** = `S05.TICyclicHypothesis.omegaGrid`（`S05_OmegaGrid.lean`, 2026-06-15; `charEquiv` を W1/W2 両方向に一般化 + 0↦trivial anchor `omegaGrid_zero_zero`, axiom-clean） |
 | **C** | (3.2) σ/τ₃ `IntegralCharacterMap ↥W G` | S15 `tau3`:144 + `eta_eq_tau_omega`:146 | S05 `sigma`（proof 在） | ✅ **pinned** = `S05.TICyclicHypothesis.sigmaIntegral`（`S05_IntegralSigma.lean`, 2026-06-15; `sigma.restrictScalars ℤ` + 性質 5 補題, axiom-clean） |
 | **D** | μ/ν 族 + (13.1.e) | S15 `mu`:132 / `nu`:133 | S06 (4.3) certainType（proof 在） | 🟡 **(13.1.e) relation pinned** = `S06.Hypothesis.induce_omegaColumnDiff_mu_diff`（`S06_MuColumnBridge.lean`, explicit δ·(μ_i−μ_0) form, `h : S06.Hypothesis` 引数化）。残 = full Fin-grid `muGrid` + S15 整合（W₂-col→Fin p / charEquiv W₁ / Ind の compHom 形 / W-instance context）は **§10-16 owner 側 wiring**（S06.Hypothesis-for-S が要 = §14 構造ゲート） |
@@ -258,5 +273,5 @@ honest FT 経路 (~27 sorry) を **数学的に独立な 4 フロント**に再�
 - §11–13 の gate 内訳・分類表 = [`notes/peterfalvi/s10_13_maximal_structure.md`](../peterfalvi/s10_13_maximal_structure.md)
 - B-lane (6.8)/§5–6 の進捗 = [`notes/peterfalvi/s06_dade_certain_subgroup.md`](../peterfalvi/s06_dade_certain_subgroup.md)
 - scaffold opaque-Prop 規約 = [`notes/meta/scaffold_opaque_prop_convention.md`](scaffold_opaque_prop_convention.md)
-- BG spine の live 状況 = memory [[ft-master-roadmap]]（startup 要約）
+- BG spine の live 状況 = git log + `issues/`（BG は 2026-07-02 凍結完了; 旧 memory [[ft-master-roadmap]] は consolidate 済で不存在）
 - merge / 並列運用 = [`notes/meta/merge_monitor.md`](merge_monitor.md)

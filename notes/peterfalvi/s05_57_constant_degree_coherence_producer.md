@@ -1,5 +1,7 @@
 # Pf (5.7) standalone constant-degree coherence producer — lane-c relane #8 (issue 4012)
 
+> ⚠ 2026-07-02: **HISTORICAL** — lane 名は 2026-07-02 3 レーン再編前; 現行 = [`ft_lane_reallocation_2026_06_28.md`](../meta/ft_lane_reallocation_2026_06_28.md)。
+
 > 割当: 2026-06-23 relane #8 (issue 4012 RESOLVED)。lane-c = Pf §5 (5.7) coherence producer。
 > lane-h relane #7 (§6 (6.2)/(6.3)) と対 = **C:§5 (5.7) / H:§6 (6.2)/(6.3)** で §13 を上流から unblock。
 > consumer = lane-c 自所有 S13 `HC_le_secondDerived` (11.5)。

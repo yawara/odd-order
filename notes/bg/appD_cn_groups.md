@@ -5,6 +5,8 @@
 ROADMAP 上の位置: Phase 2 本筋外 (歴史的価値, optional).
 役割: **Feit-Hall-Thompson 1960 CN-theorem の短縮ルート**. Gorenstein 1968 本書 (G) Ch.14 を BG §1-§9 + Lem D.1/D.2 で大幅短縮.
 
+**更新 (2026-07-02)**: 3-decl skeleton `OddOrder/BG/AppD_CNGroups.lean` が存在 (sorried 3 theorems: `sylow_eq_of_nontrivial_inter` / `sylow_le_commutator_normalizer` / `cnTheorem_reduction`)。off-spine・consumer 0・凍結 (memory [[ft-settled-findings]])。
+
 ## TL;DR — FT 本筋外、CN-theorem を BG 機械で短縮
 
 CN-condition は「∀ x ≠ 1, C_G(x) nilpotent」. Feit, Hall, Thompson (1960) が CN-group of odd order は solvable を証明 (FT 1963 の予兆). BG App.D はその局所解析部を BG §1-§9 (特に **Thm 6.2 normal-J**) と Focal Subgroup Theorem (Thm 1.17) で短縮する **ガイド節**.

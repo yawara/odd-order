@@ -1,5 +1,12 @@
 # Pf §16 — non-existence (`S16_NonExistenceG.lean`) gate map — lane-c (2026-06-22)
 
+> ⚠ **HISTORICAL (2026-06-22 レーン構造; 2026-07-02 追記)**: 現行は 3 レーン再編
+> ([`ft_lane_reallocation_2026_06_28.md`](../meta/ft_lane_reallocation_2026_06_28.md))。
+> `S15_SAndT*` は **lane c 所有** (下記の「S15_SAndT.lean is lane-h (cite only)」記述は無効)。
+> issue 1004 は **closed** (producer landed、S-side vestigial)。`T_typeII` は**消費あり**
+> (S15_SAndT.lean の (14.9)-gated 群; 下記「現 consumer 0」は無効)。
+> live = [`s16_w4_char_cascade.md`](s16_w4_char_cascade.md) + issues 9001/9002/4001。
+
 > Lane-c owns `OddOrder/Peterfalvi/S16_NonExistenceG.lean` (editable tail) +
 > POLE-2 `field_normalizer_structure`. `S16_NonExistenceGCore.lean` is frozen (cite only),
 > `S15_SAndT.lean` is lane-h (cite only). This note maps every remaining `sorry` in the

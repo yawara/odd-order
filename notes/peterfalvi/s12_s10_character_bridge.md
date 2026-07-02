@@ -1,5 +1,7 @@
 # Pf §10–§13 character bridge — Lane B 再開 roadmap (gate #3 proper)
 
+> ⚠ 2026-07-02: lane 表記は 2026-06-2x era (現 = **lane a**, 正本 [`ft_lane_reallocation_2026_06_28.md`](../meta/ft_lane_reallocation_2026_06_28.md)); (10.8) `S_not_coherent` は **landed**; 本 note の S12 行番号は 07-02 prefix-split (95fc7ade) 前; live = [`s13_11_8_orthogonality.md`](s13_11_8_orthogonality.md)。
+
 > 2026-06-20 Lane B 再開時の現地調査結果 (正本)。ユーザーが「§11-13 spine 着手」を選択
 > ((6.8) capstone 締結後)。本 note = §11-13 character theory を honest に閉じるための設計・API 在庫・攻略順。
 > 上位文脈 = 記憶 [[ft-endgame-two-poles]] [[peterfalvi-s10-13-gated-on-bg-spine]]、

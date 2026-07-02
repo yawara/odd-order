@@ -59,3 +59,9 @@ S15 の群構造 field — すべて実構造体 (`IsComplement'`/`IsFrobeniusGr
   ω を (3.3) grid として材料化 → `tau3 = σ`。これは §3/§5 本体の dedicated 形式化 (gate #3 proper)。
 
 grep 手掛かり: `_formula : Prop` / `_formula : G → Prop` / `_holds :` / `: Prop$`。
+
+## 追記 (2026-07-02)
+
+- **σ-pin (`tau3` の完全 σ-pin) は 2026-06-15 完了** (`S05_IntegralSigma`; 上記「残 = `tau3` の完全 σ-pin」は解消済)。
+- `noMinimalSimpleOdd_of_section16` は現在 **axiom-clean**(上記「sorryAx を含む」は 2026-06-01 当時の状態)。
+- opaque field 数 (S15 41 / S16 37 等の表) は **2026-06-01 snapshot**。

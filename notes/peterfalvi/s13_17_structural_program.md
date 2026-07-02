@@ -1,5 +1,7 @@
 # Pf (13.17) 構造論プログラム — 方針① (lane-h, 2026-06-19)
 
+> ⚠ 2026-07-02: **HISTORICAL** — lane 名は 2026-07-02 3 レーン再編前; 現行 = [`ft_lane_reallocation_2026_06_28.md`](../meta/ft_lane_reallocation_2026_06_28.md)。
+
 > POLE-2 (`field_normalizer_structure`) は `exists_LHypothesis` 経由で Pf **(13.17)**
 > `typeII_overNormalizer_frobenius` を cite する。(13.17) は gated-endpoint skeleton 化済
 > (`0d99daf1`): `sorry`-free assembly が (12.7) `S14.typeI_frobenius` を cite + 2 faithful

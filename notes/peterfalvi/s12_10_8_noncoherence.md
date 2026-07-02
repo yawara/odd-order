@@ -1,5 +1,7 @@
 # Peterfalvi (10.8) `S_not_coherent` — the §10 non-coherence keystone (lane-b W3)
 
+> ⚠ 2026-07-02: lane 表記は 2026-06-2x era (現 = **lane a**, 正本 [`ft_lane_reallocation_2026_06_28.md`](../meta/ft_lane_reallocation_2026_06_28.md)); (10.8) `S_not_coherent` は **landed**; 本 note の S12 行番号は 07-02 prefix-split (95fc7ade) 前; live = [`s13_11_8_orthogonality.md`](s13_11_8_orthogonality.md)。
+
 > repo `S12_MaximalIII_IV_V.lean` = **Pf §10**. (10.8) is the keystone cited by **both**
 > (11.3) `S13.S_H0C_not_coherent` and (10.10) `S12.no_typeV_maximal`, hence the most upstream
 > FT-path char obligation in W3 (issue 2020). FT consumer chain:

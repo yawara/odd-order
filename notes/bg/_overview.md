@@ -9,6 +9,11 @@ ROADMAP 上の位置: **Phase 2a** (Phase 1 Isaacs 完了後着手、Phase 2b Pe
 
 **Phase 1 Isaacs は Ch.1–7 完成** (全章 sorry-free, 168 flagship が AxiomsCheck で axiom-clean; **Thm 7.6 `normal_J` = BG Thm 6.2** + **Ch.6 Frobenius 全面** + Hall-Higman/Hall-C/Schur-Zassenhaus 等 BG 前提ゲートは全充足)。**BG §1/§2/§3 は実装完了・sorry-free・OddOrder root 配線済** (S03 は Isaacs Ch.6 を直接利用して sorry-free; S02 は 2026-05-27 に rc2 移行漏れを修復して配線)。共有モジュールは `OddOrder/GroupTheory/` に多数実装済 (下記 audit が予定した Wave 1a 群はほぼ実現: ChiefFactor/FrattiniPGroup/OmegaSubgroup/OpResidual/PRank/SCN/IsExtraspecial/IsMetacyclic/ThompsonSubgroup/ElementaryAbelian/SemiDihedral + RepresentationTheory 一式)。**§4 以降が次フロンティア** (§4/§5 p-group 構造は infra 完備で独立着手可、§6+App.A は FT スパイン)。Peterfalvi §1–§6 も並行着手済。toolchain は v4.30.0-rc2。
 
+**追記 — BG cluster FROZEN-COMPLETE (2026-07-02)**: §1–§16 + App.A–C の spine 完了。残 15 sorry
+= AppD_CNGroups 3 / AppE_FurtherResults 5 / S14_TypePCounting 2 / S15_MF 2 / S16_MainResults 3 の
+off-spine のみ (memory [[ft-settled-findings]]; feitThompson spine は Prop 16.1 のみ消費で
+sorry-free)。
+
 以下 TL;DR 以降は **2026-05-22 作成時点**の調査内容。着手順 (§ "Phase 2a 着手順") の "Phase 1 完了後" 前提は上記で更新済 (Phase 1 は実質完了)。
 
 ## TL;DR

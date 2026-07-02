@@ -32,6 +32,12 @@
   `complement_inf_Q_structure`) — 同 T-side gated。
 - `card_LF_coprime_pq` — BG Theorem E (`bgTheoremE_cover_data`, owner=F) gated。
 - 13.17 char (`beta_support_norm_and_remainder`/`typeI_orthogonality_dichotomy`) — char cascade。
+- **⚠ 2026-07-02 更新 (現 tip)**: `normalizer_W1_structure` (S15:2045) / `card_Q_eq` (S15:2270) /
+  `tConjugate_fitting_data` (S15:2330) は **PROVEN**。S15_SAndT.lean の実残 sorry は **8** =
+  `reconciled_typePData_T` / `Q_elementaryAbelian_T` / `V_inf_centralizer_Q_eq_bot` /
+  `card_LF_coprime_pq` / `complement_inf_Q_structure` / `complement_inf_P_structure` /
+  `beta_support_norm_and_remainder` / `typeI_orthogonality_dichotomy`。
+  live log = [`s16_w4_char_cascade.md`](s16_w4_char_cascade.md) cont.⁴⁰+。
 
 ---
 

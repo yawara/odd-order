@@ -70,7 +70,7 @@
 > 正本 = [`ft_lane_reallocation_2026_06_28.md`](ft_lane_reallocation_2026_06_28.md)。
 > | lane | クラスタ | 所有 .lean（これ以外の Pf/BG S-ファイル編集 = 逸脱→停止） |
 > |---|---|---|
-> | **a** | α Pf §10–13 中央指標核 + σ-theory tail | `OddOrder/Peterfalvi/S(0[3-9]|1[0-3])*` + `OddOrder/FeitThompson.lean`（:426 + 旧 d carrier 宣言群 = 全体、d 退役で fold）+ **S10 bgTheoremE carrier**（旧 carve-out 0086 解消）+ σ-theory tail (S11 imprimitivity + dup retire は S11 内、GroupTheory/** 共有で cite) |
+> | **a** | α Pf §10–13 中央指標核 + σ-theory tail | `OddOrder/Peterfalvi/S(0[3-9]|1[0-3])*` + `OddOrder/FeitThompson.lean`（`card_kappaHall_lt_of_isTypeIIIorIV` (行番号は drift するため decl 名で参照) + 旧 d carrier 宣言群 = 全体、d 退役で fold）+ **S10 bgTheoremE carrier**（旧 carve-out 0086 解消）+ σ-theory tail (S11 imprimitivity + dup retire は S11 内、GroupTheory/** 共有で cite) |
 > | **b** | β Pf §12 Dade tower + coherence infra | `OddOrder/Peterfalvi/S14_MaximalI.lean`（**全体**、旧 carve-out 0088 `exists_typeICovering` は b に解消）+ **coherence infra** = `S07_Coherence*`/`S08_PGroupReduction`（既存 coherence file、(5.7)/(6.5.c)/(6.8) case-B 系、hub authorized 2026-07-02）+ GroupTheory/** coherence leaf。⚠ これらは nominal に a の `S0[3-9]` regex に掛かるが **coherence infra ゆえ b 担当（逸脱でない）**、a の active territory は §9-13 char 核で S07/S08 coherence は非接触 |
 > | **c** | γ POLE-2 §15–16 chain 一本化 | `OddOrder/Peterfalvi/{S15_SAndT_Setup, S15_SAndT, S16_NonExistenceG}.lean`（**S15_SAndT_Setup は 2026-07-02 に lane d→c、§15→16 全 chain を c が所有**）+ 構成的 Clifford (issue 9002、GroupTheory/** shared) |
 > | **~~d~~ 退役** | — | **2026-07-02 退役**。σ-theory leaf (`GroupTheory/**`, sorry-free) は共有ゾーンに残置 (a が tail 完成)。BG/** は完了・共有凍結。FeitThompson carrier は a に fold。**branch `d` は git に温存 (作業は全 merge 済)、worktree セッションは停止**。 |
@@ -186,8 +186,8 @@
        - count-sorry は prose 偽陽性（sorry-free / sorryAx / `sorry'd` / backtick 引用）を除外済（残差 +5 は安定 prose）。
          絶対数 ground truth は build 警告 `uses .sorry.`。
    - 合格 → `git commit`:
-     `Merge '<branch>' (<topic>): <要約>` + 本文に各単位 + 末尾
-     `Co-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>`
+     `Merge '<branch>' (<topic>): <要約>` + 本文に各単位 + 末尾に
+     現行モデルの trailer (harness 既定; 2026-07-02 現在 Claude Fable 5)
    - 不合格 → `git merge --abort` で**報告**（何が落ちたか・どのファイルか）
 3. **新規 forward axiom を含む commit** (`axiom ` 宣言の追加を `git diff --cached` で確認) は
    自動合流せず abort → 報告（上記ポリシー）。
@@ -207,7 +207,7 @@
    失敗は報告)。変化なし/全 abort なら push しない。
 6. **サマリ報告**: 各レーン {マージ済 N commits / コンフリクト abort / 待機 / 変化なし} + 未マージ残数
    + サイズ flag + push 結果。
-7. **LOOP GATE VERDICT 維持 (2026-06-17 追加, [`lane_loop_policy.md`](lane_loop_policy.md); ⚠ 以下の例中のレーン名 h/G/F/B は 2026-06-28 改名前の旧名 = 履歴。現行レーンは a/b/c)**: 各 worktree の
+7. **❄ FROZEN 2026-06-18 — LOOP GATE VERDICT 維持 (2026-06-17 追加, [`lane_loop_policy.md`](lane_loop_policy.md); LOOP GATE 機構停止中。⚠ 以下の例中のレーン名 h/G/F/B は 2026-06-28 改名前の旧名 = 履歴。現行レーンは a/b/c)**: 各 worktree の
    `LAUNCH.md` 冒頭「▶ LOOP GATE」ブロックは各レーンが起動時に `/loop` を自己選択する判定材料。**毎 tick で
    再監査はしない** (重い)。代わりに、今 tick のマージが**他レーンの gate を解いた**ときだけ VERDICT を見直す:
    - `typeP_duality` (lane-h) が proved → G の conjunct 2/assembly + F の §16/POLE-2 が解禁 → G/F の VERDICT を

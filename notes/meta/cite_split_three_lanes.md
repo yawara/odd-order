@@ -1,5 +1,9 @@
 # 3-lane cite-split (2026-06-19)
 
+> ⚠ **SUPERSEDED (注記 2026-07-02)**: 2026-06-28 に
+> [`ft_lane_reallocation_2026_06_28.md`](ft_lane_reallocation_2026_06_28.md) へ移行; B/F/H レーンは消滅。
+> cite-split の設計原則のみ履歴として有効。
+
 > FT 終盤の残務を **cite で大粒度に分割**する設計の正本。各レーンは下流 gate を
 > named obligation / 既存 sorried producer の cite で切り、独立に大チャンクを進める
 > (serial blocking を排除)。プロジェクトの cite-route / gated-endpoint-skeleton 方式

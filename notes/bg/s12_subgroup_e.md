@@ -1,5 +1,8 @@
 # BG §12: 部分群 E — 大規模節の形式化ロードマップ
 
+> ✅ **§12 COMPLETE (2026-07-02)** — Prop 12.15 d.2/e.2 も landed
+> (`S12_*.lean` 全ファイル実 sorry 0)。以下のセッション記録は履歴。
+
 ## 🟢🟢 2026-06-13 (Lane F session 20, Opus 4.8): **Prop 12.15 = 9/11 — E⊇S infra COMPLETE + e.3b landed; 残 d.2/e.2**
 
 session 19 の E⊇S gap を **infra で解消**し e.3b 着地。**build 緑、実 sorry = d.2 / e.2 の 2 個**(9/11)。

@@ -45,7 +45,7 @@
 
 | lane | worktree | クラスタ | 主所有ファイル | ODD_ISSUE_BASE |
 |---|---|---|---|---|
-| **a** | `odd-order-a` | **α** Pf §10–13 中央指標核 **+ σ-theory tail/dedup** | `Peterfalvi/{S10_MinimalSimpleStructure, S11_MaximalII_III_IV, S12_MaximalIII_IV_V, S13_MaximalIII_IV}.lean` + `FeitThompson.lean:426` + S10 bgTheoremE carrier (旧 carve-out 0086 解消) + σ-theory tail (S11 imprimitivity 完成 + dup 3定理 retire→generic leaf cite) | 1000 |
+| **a** | `odd-order-a` | **α** Pf §10–13 中央指標核 **+ σ-theory tail/dedup** | `Peterfalvi/S(0[3-9]|1[0-3])*` 全体 (= S03–S13; 例外 = b carve-out 0090 `S09_CertificateDischarge` / 0096 S10 §8 Dade-support 宣言群 / coherence infra `S07_Coherence*`+`S08_PGroupReduction` = b) + `FeitThompson.lean` **全体** (d 退役で fold) + σ-theory tail (S11 dup 3定理 retire→generic leaf cite + assembly, issue 9000 承継)。prefix-split の `*_Core` leaf は親の owner に従う (例 S12_MaximalIII_IV_V_Core = a) | 1000 |
 | **b** | `odd-order-b` | **β** Pf §12 all-Type-I Dade tower **+ coherence infra** | `Peterfalvi/S14_MaximalI.lean` (全体、旧 carve-out 0088 `exists_typeICovering` 解消) + coherence infra ((6.5.c), S07 refactor 済) | 2000 |
 | **c** | `odd-order-c` | **γ** POLE-2 §15–16 chain **一本化 + Clifford** | `Peterfalvi/{S15_SAndT_Setup, S15_SAndT, S16_NonExistenceG}.lean` (§15→16 全 chain) + 構成的 Clifford (issue 9002) | 3000 |
 
@@ -101,19 +101,39 @@ carrier 宣言とその consumer が複数レーンの所有ファイルに跨�
   `S10_BGInterface.lean` への A₁/σ♯/M̃ bridge 補題追加も b 許容。詳細 = issues/0096 +
   merge_monitor 🔒 マップ直下の carve-out 節。
 
-### 各クラスタの最深 body (2026-06-28 監査の file:line、随時更新)
+### 各クラスタの最深 body (2026-07-02 全面刷新 — decl 名のみ、line anchor は rot するため廃止)
 
-- **α (lane-a)**: `exists_zeta_residual_not_orthogonal` (Pf 11.8, `S12_MaximalIII_IV_V.lean:6762`,
-  **唯一の bare FT spine sorry**)・`typeV_forces_coherence` (10.10)・`typeII_coherence_contradiction_estimate`
-  (10.8)・`typeII_derived_frobenius` (10.7)・§13 coherence reduction 7 本 (`S13_MaximalIII_IV.lean`)・
-  9.9.a caseA/caseB counts (`S11:3335/3417`)。
-- **β (lane-b)**: `counterexample_contradiction` (12.16, `S14_MaximalI.lean:1364`)・12.2–12.6 (`S14:232/258/271/282/306`)・
-  12.10–12.15 (`S14:1040/1049/1324/1348/1357`)・`exists_typeICovering` 詳細 (8.13.c1/8.8.a, `S14:1615/1660`)。
-  headline `theorem88_caseB_holds` は既に sorry-free (δ の `typeP_duality` を cite)。
-- **γ (lane-c)** 【binding constraint = 最長 pole】: `orthogonality_switch` (14.14, `S16_NonExistenceG.lean:3633`)・
-  `exists_MHypothesis` (14.10, `S16:3709`)・`betaM_expansion` (14.11.2, `S16:1954`)・`T_typeII` (14.9, `S16:1564`)・
-  §15 `basic_structure_gated` (13.1.d/e, `S15_SAndT_Setup.lean:283`)・`character_degree_analysis` (`:386`)・
-  `lambda_forces_T_caseB` (`:394`)・`normalizer_W1` (13.16, `S15_SAndT.lean:140`) + 13.17 構造。
+- **α (lane-a)** — 実 sorry 27 (S09 1 / S10 8−0096 分 / S11 4 / S12 4 / S13 10):
+  **spine**: `exists_zeta_residual_not_orthogonal` (Pf 11.8, S12, **唯一の bare FT spine sorry**、
+  live plan = `s13_11_8_orthogonality.md`)・`card_G0_lower_bound` (Pf 7.10, S09 — **0044 裁定 2026-07-02:
+  11.8 チェーン一段落後、σ-tail より先に queue**)。
+  **§10–13 body**: `typeV_forces_coherence` (10.10)・`typeII_coherence_contradiction_estimate` (10.8)・
+  `typeII_derived_frobenius` (10.7)・S13 10 本 (`core_structure`×3・`H_elementaryAbelian` (11.7、γ が
+  cite 待ち)・`coherent_S_of_coherent_SH0C`・`coherent_quotient_bound`・`HC_le_secondDerived`・
+  `orthogonality_setup`・`not_orthogonal_mu0_sub_zeta`・`final_typeIII_conclusions`)・S11 4 本
+  (`caseA/caseB_character_counts`・`exceptional_case_frobenius_realization`・**`sibleyTarget_H0C`
+  (9.11 — 7001 裁定 2026-07-02: a 所有、着工前 soundness 監査必須)**)・S10 structural
+  (`hall_maxNilpotentNormalHall_and_mainSubgroup`・`typeI_or_typeII_centralizer_unique`・
+  `escapingCentralizers_control`・`bgTheoremE_cover_data`)。σ-tail = issue 9000 承継分。
+- **β (lane-b)** — 実 sorry 13 decls (S14) + carve-out 0096 の S10 4 宣言:
+  **最深**: `nonconjugate_diffImage_inner_zero` (8.18.c、mixed Ã₁∩Ã — **0096 の §8 support theory を
+  S10 側で正面 build**)・`exists_typeICovering` ×2 (8.13.c1/8.8.a、route B = 8022)・(12.10) pins
+  `witness_L_isTypeI`/`witness_L_complement_isZGroup`・`intersection_complement_structure` (12.11)・
+  `complement_cyclic_order_dvd` (12.12)・`exists_counterexample_dade_data` (12.16 chain)・
+  `constituent_diff_support_subset_nonescaping`・`rho_constant_on_H_minus_Hprime`・`psi_constant_on_xK`・
+  `rhoM_integer_values`・`sibleyTarget_frobI` (**TI-case 限定**、2032)・`typeI_induced_char_constituents`
+  (9002 = c の Clifford を cite)。+ **(6.5.c) coherence producer (9000 番台 claim 起票が先決)**。
+  headline `theorem88_caseB_holds`/`counterexample_contradiction` (12.16)/(12.6) tower は sorry-free。
+- **γ (lane-c)** 【binding = 最長 pole】 — 実 sorry 32 (Setup 15 / S15 8 / S16 9):
+  **最深**: `orthogonality_switch` (14.14)・`exists_MHypothesis` (14.10)・`eta_generic_data`・
+  `T_typeII_structural_inputs` (旧 `T_typeII`/`betaM_expansion`/`normalizer_W1` は **proven**、残余は
+  これら inputs 系へ移動)・S15 8 本 (`Q_elementaryAbelian_T`・`V_inf_centralizer_Q_eq_bot`・
+  `reconciled_typePData_T` 等)・Setup の `c_eq_one` (**W-side/structural route 制約** = s16_w4 hub 節)・
+  `character_degree_analysis` (13.3)/`lambda_forces_T_caseB` (13.4) (T_side route で on-path)・
+  `basic_structure_gated` (P_elementaryAbelian は a の `H_elementaryAbelian` cite / u_bound は σ-leaf +
+  a assembly)。+ **η-grid honest 化 + M 向け h78/Dade instantiation (9001 追加裁定 2026-07-02 = c 所有)**
+  + Clifford (G1) extension core (9002)。⚠ `sibleyTarget_S`/`S_coherent`/13.5–13.9 S-side 形 =
+  vestigial 処分 (完成させず W-side restate or retire、s16_w4 hub 節)。
 - ~~**δ (lane-d)**~~ **退役 (2026-07-02)**: BG §14–16 の spine 消費 endpoint は全 sorry-free で完了・
   共有凍結。残 owned sorry (signalizer Thm D/E・Thm A/B monolith・`aSets_support_slice` 等 15 個) は
   全て off-feitThompson-path と検証済 ([[ft-settled-findings]] / issues/closed/4014)。headline
@@ -132,9 +152,9 @@ carrier 宣言とその consumer が複数レーンの所有ファイルに跨�
 | β (§12) | α | §10–11 char 結果 (type 判定) |
 | γ (POLE-2) | α | §11 Dade-norm engine |
 | γ (POLE-2) | BG 共有凍結 (旧 δ、sorry-free 済) | §16 構造 (maximal pair / type-P) |
-| FT spine (`FeitThompson.lean`) | a/b/c 全 headline (旧 δ headline `proposition_type_classification` は sorry-free 済) | `Section16Inputs` 3-producer assembly (配線済) + `card_kappaHall_lt_of_isTypeIIIorIV` (:426) + `theorem88_caseB_holds` |
+| FT spine (`FeitThompson.lean`) | a/b/c 全 headline (旧 δ headline `proposition_type_classification` は sorry-free 済) | `Section16Inputs` 3-producer assembly (配線済) + `card_kappaHall_lt_of_isTypeIIIorIV` (proven; 残余 = 11.8 cite) + `theorem88_caseB_holds` |
 
-**`FeitThompson.lean` (2026-07-02 更新)**: **lane a が全体所有** (`:426`
+**`FeitThompson.lean` (2026-07-02 更新)**: **lane a が全体所有** (
 `card_kappaHall_lt_of_isTypeIIIorIV` + 旧 δ carrier 宣言群、d 退役で fold)。他レーンが carrier 宣言
 (`Section16Inputs` 等) に field を追加する必要があるときは hub/issue 経由で承認合流
 (先例: lane c の `S_U_commutative`/`Sdata_W2_eq` 追加 = 構成子供給付き、hub 承認)。
@@ -169,7 +189,9 @@ carrier 宣言とその consumer が複数レーンの所有ファイルに跨�
 
 ---
 
-## 5. 進捗参照 (2026-06-28 評価)
+## 5. 進捗参照 (2026-06-28 評価 — ⚠ 数値は当時 snapshot。2026-07-02 現在: comment-strip 実 sorry 103
+(lane 所有 74 = a 27/b 14 tokens/c 32 + BG 凍結 15 + Pf Appendices 凍結 15)、count-sorry 115。
+FeitThompson.lean 実 sorry 0、唯一の bare spine sorry = Pf 11.8)
 
 - **定理到達度 ≈ 70%** (幅 65–75%)。形式化済み数学の「量」(breadth) ≈ 88%、endgame (指標終盤) の消化 ≈ 55–60%。
 - 群論 spine (Isaacs 全 7 章 + BG §1–13 + Pf §1–9) は実質完成 (sorry-free)。残るは**指標論の終盤** (Pf §10–16 + BG §14–16) = 最難・最高コスト/行。

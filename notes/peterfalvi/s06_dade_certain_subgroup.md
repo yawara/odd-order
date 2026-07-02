@@ -1,5 +1,7 @@
 # Peterfalvi §6: The Dade Isometry for a Certain Type of Subgroup — mini-roadmap
 
+> ⚠ 2026-07-02: **HISTORICAL** — lane 名は 2026-07-02 3 レーン再編前; 現行 = [`ft_lane_reallocation_2026_06_28.md`](../meta/ft_lane_reallocation_2026_06_28.md)。「次 = B レーン戦略判断」は解消済 — coherence 後継 = (6.5.c)/(5.7)-S07 refactor (lane b, issue 9001)。
+
 **スコープ**: Peterfalvi §6 (pp. 21-24), mmd `04.6_pp_21_24_*.mmd` (108 行), **10 結果 ((4.1)-(4.10))** ⚠️ audit 訂正 (旧 5 結果は (4.6) Hypothesis [実は中核], (4.7) Supp, (4.8), (4.9) τ-isometry, (4.10) 4-term identity 完全欠落).
 形式化先 (予定): `OddOrder/Peterfalvi/S06_DadeIsometryCertain.lean`.
 ROADMAP 上の位置: **Phase 2b 第 2 波後半** (§4-§5 完成後).

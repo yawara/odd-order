@@ -1,5 +1,7 @@
 # Pf §6 standalone (6.2)/(6.3) coherence producer — lane-h relane #7 (issue 2021)
 
+> ⚠ 2026-07-02: **HISTORICAL** — lane 名は 2026-07-02 3 レーン再編前; 現行 = [`ft_lane_reallocation_2026_06_28.md`](../meta/ft_lane_reallocation_2026_06_28.md)。
+
 > 割当: 2026-06-23 relane #7 (origin/main `4e4c5ca7`, issue 2021 RESOLVED)。lane-h = Pf §6
 > coherence producer。lane-c の `S13_MaximalIII_IV` が cite する coherence obligation の
 > **standalone 版**を §6/§8 機構から生産する (producer[lane-h] → consumer[lane-c S13])。

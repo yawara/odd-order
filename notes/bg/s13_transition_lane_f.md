@@ -1,5 +1,9 @@
 # BG §13 後半 (Lemma 13.7–13.13) — Lane F 作業ノート
 
+> ✅ **§13 COMPLETE (2026-07-02)** — 13.1–13.13 全 sorry-free
+> (`S13_*.lean` 全ファイル実 sorry 0)。現フロンティア表記 (「13.8 現フロンティア」等)・
+> 13.12/13.13 recon 節は履歴。
+
 > 正本ファイル = `OddOrder/BG/Ch3_MaximalSubgroups/S13_PrimeActionTransition.lean` (Lane F 所有)。
 > 上流 `S13_PrimeAction.lean` (定義 + 13.1–13.6) は **Lane G 領域、cite のみ**。
 > mmd `references/bg/local-analysis.mmd` L3596–3780 / PDF book pp.100–104 (**PDF page = book page + 13**)。

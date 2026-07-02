@@ -1,5 +1,9 @@
 # mathlib カバレッジ (Feit-Thompson 形式化向け)
 
+> **⚠ 2026-07-02 注記**: mathlib 欠落判定 (2026-05 snapshot) は有効だが、✗/△ 項目の大半は `OddOrder/**` に
+> 実装済 (Frobenius 群 = Isaacs Ch06、J(P)/ZJ = `GroupTheory/ThompsonSubgroup`+Ch07、TI = `GroupTheory/TISubset`、
+> Dade = Pf S04/S06、coherence = S07/S08 sorry-free 等)。**本 doc は mathlib coverage の記録であり残作業リストではない**。
+
 mathlib (調査時 `v4.29.1`; **2026-05-27 に `v4.30.0-rc2` へ bump 済** — 本調査自体は v4.29.1 時点のスナップショット, ローカルパス `.lake/packages/mathlib/Mathlib/`) における Feit-Thompson 関連項目の網羅調査結果。**2026-05-21** 実施。mathlib は更新が速いので 3 ヶ月以上経ったら再監査推奨。
 
 ## ✓ 完全に揃っているもの (そのまま使える)

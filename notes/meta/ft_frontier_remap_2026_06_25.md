@@ -3,9 +3,10 @@
 > **⚠ レーン配分は `ft_lane_reallocation_2026_06_28.md` が新正本** (2026-06-28〜、ゲートなし・signature
 > contract 方式、lane 名 `a/b/c/d`)。本ファイルは **honest FT 経路の構造 (Arm A/B、on-path ~27 宣言、
 > 凍結リスト) の参照**として有効 (W1↔δ / W2↔β / W3↔α / W4↔γ に対応)。
-> **このファイルが「honest FT 経路の真の構造 + レーン配分」の正本** (2026-06-25〜)。
-> `ft_path_policy.md` §5 の lane 割当表 / `merge_monitor.md` の 🔒 所有マップは本ファイルへ従属
-> (relane #9)。横断スナップショット (`ft_master_roadmap_2026_05_29.md` 等) は履歴。
+> ~~**このファイルが「honest FT 経路の真の構造 + レーン配分」の正本** (2026-06-25〜)。~~
+> ~~`ft_path_policy.md` §5 の lane 割当表 / `merge_monitor.md` の 🔒 所有マップは本ファイルへ従属 (relane #9)。~~
+> (2026-06-28 に `ft_lane_reallocation_2026_06_28.md` へ移管; 本ファイルは Arm A/B 構造・on-path 宣言リストの
+> 履歴参照。注記 2026-07-02)。横断スナップショット (`ft_master_roadmap_2026_05_29.md` 等) は履歴。
 >
 > **生成**: `ft-frontier-remap` workflow (run `wf_33ba58ab-bf5`, 10 agent / 1.29M tok / 21.5 min)。
 > 6 並列 map (read-only, comment-stripped sorry catalog) → 4 adversarial verify (cite-DAG / import-closure)。
