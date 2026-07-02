@@ -7288,6 +7288,42 @@ theorem Hypothesis.SHC_zSpan_vanish_support [Finite G] {M : Subgroup G}
         exact (ClassFunction.support_smul_subset _ _).trans hx
 
 open scoped FiniteInduce in
+/-- **The `S(HC)`-coherent extension `τ₁` commutes with complex conjugation** (Peterfalvi (5.9)(a) /
+`cfConjC_Dade_coherent`): for a degree-`w₁` irreducible `ζ ∈ S = inducedFamily M`,
+`(ζ^{τ₁})‾ = (ζ‾)^{τ₁}`.  This instantiates the general Galois-equivariance
+`IsCoherent.extension_mapRingEquiv_comm` at `σc = conjAe` for the landed `SHC_isCoherent`
+coherence: the `A_0`-support condition `hspan` is `SHC_zSpan_vanish_support`, `S` is closed under
+conjugation (`inducedFamily_closedUnderConjugate` + `IsIrreducibleCharacter.conj` + degree), the
+images lie in `ℤ[Irr G]` (`extension_mem_ZIrr`), and `|S| ≥ 2` via the conjugate pair `{ζ, ζ‾}`
+(`inducedFamily_hasNoRealCharacters` in odd order).  This is the `τ₁`-side Galois-equivariance
+feeding the (11.8.3) reality `β‾ = β`. -/
+theorem Hypothesis.SHC_extension_conj [Finite G] {M : Subgroup G}
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis M)
+    {χ : ClassFunction ↥M ℂ} (hχS : χ ∈ inducedFamily M) (hχirr : IsIrreducibleCharacter χ)
+    (hχ1 : χ 1 = (hyp.w1 : ℂ)) :
+    ((hyp.SHC_isCoherent hG).extension χ).conj = (hyp.SHC_isCoherent hG).extension χ.conj := by
+  haveI := hyp.finiteG
+  classical
+  have hModd : Odd (Nat.card ↥M) := hG.odd.of_dvd_nat (Subgroup.card_subgroup_dvd_card M)
+  have hbridge : ∀ X : ClassFunction ↥M ℂ,
+      X.conj = ClassFunction.mapRingEquiv Complex.conjAe.toRingEquiv X := fun X => by
+    ext g; rw [ClassFunction.conj_apply, ClassFunction.mapRingEquiv_apply]; rfl
+  simp only [hbridge]
+  refine (hyp.SHC_isCoherent hG).extension_mapRingEquiv_comm subset_rfl
+    (fun ψ hψ => mem_irreducibleCharacters.mpr hψ.2.1)
+    (fun ψ hψ hψ1 => hyp.SHC_zSpan_vanish_support hG hψ hψ1)
+    Complex.conjAe.toRingEquiv ?_
+    (fun ψ hψ => (hyp.SHC_isCoherent hG).extension_mem_ZIrr ψ (Submodule.subset_span hψ))
+    ⟨hχS, hχirr, hχ1⟩ ?_
+  · rintro ψ ⟨hψS, hψirr, hψ1⟩
+    exact ⟨by rw [← hbridge]; exact inducedFamily_closedUnderConjugate M hψS,
+      by rw [← hbridge]; exact hψirr.conj,
+      by rw [← hbridge, ClassFunction.conj_apply, hψ1, star_natCast]⟩
+  · exact ⟨χ.conj, ⟨inducedFamily_closedUnderConjugate M hχS, hχirr.conj, by
+      rw [ClassFunction.conj_apply, hχ1, star_natCast]⟩,
+      fun h => inducedFamily_hasNoRealCharacters hModd hχS h⟩
+
+open scoped FiniteInduce in
 /-- **`‖ζ^{τ₁}‖² = 1` for the `S(HC)`-coherent extension** (α-grid `S₁`-`τ₁` input to (11.8.2)).
 The `S(HC)`-coherence `τ₁ = SHC_isCoherent.extension` is an isometry on `ℤ[S(HC)]`
 (`extension_inner_eq`) and the degree-`w₁` irreducible `ζ ∈ S(HC)`, so `‖ζ^{τ₁}‖² = ‖ζ‖² = 1`.
