@@ -193,31 +193,6 @@ private theorem conj_smul_centralizer_singleton (g a : G) :
       _ = g⁻¹ * (y * (g * a * g⁻¹)) * g := by rw [h]
       _ = g⁻¹ * y * g * a := by group
 
-/-- **Peterfalvi (8.14)/(8.15)**: the support kernel `R(x)` is `M`-conjugation equivariant
-(S14-local copy of the S12 helper).  `supportKernel M M X (g x g⁻¹) = g · supportKernel M M X x`
-for `g ∈ M` and `X` an `M`-invariant set. -/
-private theorem supportKernel_conj_invariant {M : Subgroup G} {X : Set G} {g x : G}
-    (hg : g ∈ M) (hmem : g * x * g⁻¹ ∈ X ↔ x ∈ X) :
-    supportKernel M M X (g * x * g⁻¹) = MulAut.conj g • supportKernel M M X x := by
-  have hMfix : MulAut.conj g • maxNilpotentNormalHall M = maxNilpotentNormalHall M :=
-    conj_smul_eq_self_of_mem_normalizer
-      (OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_le_normalizer M hg)
-  have hMself : MulAut.conj g • M = M :=
-    conj_smul_eq_self_of_mem_normalizer (Subgroup.le_normalizer hg)
-  have hcent : (Subgroup.centralizer ({g * x * g⁻¹} : Set G) ≤ M)
-      ↔ (Subgroup.centralizer ({x} : Set G) ≤ M) := by
-    rw [← conj_smul_centralizer_singleton]
-    conv_lhs => rw [← hMself]
-    exact Subgroup.pointwise_smul_le_pointwise_smul_iff
-  have hescape : (g * x * g⁻¹ ∈ escapingCentralizerSet M X)
-      ↔ (x ∈ escapingCentralizerSet M X) := by
-    simp only [escapingCentralizerSet, Set.mem_setOf_eq, hmem, hcent]
-  unfold supportKernel
-  by_cases hx : x ∈ escapingCentralizerSet M X
-  · rw [if_pos (hescape.mpr hx), if_pos hx, Subgroup.smul_inf, hMfix,
-        conj_smul_centralizer_singleton]
-  · rw [if_neg (fun h => hx (hescape.mp h)), if_neg hx, Subgroup.smul_bot]
-
 open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
 /-- **Peterfalvi (12.1), construction from explicit type-I data**: a type-I maximal subgroup `L`
 with a *given* `TypeIData` carries the (12.1) Hypothesis whose `typeI` field is exactly that data.
@@ -233,14 +208,8 @@ theorem hypothesis_of_typeIData [Finite G]
     ∃ hyp : Hypothesis L, hyp.typeI = data := by
   obtain ⟨dadeData⟩ :=
     (OddOrder.Peterfalvi.S10.dadeSupportHypotheses_typeI hG hL data).1
-  -- (8.14)/(8.15): the support kernels `R(a)` are `L`-conjugation invariant.
-  have hconj : dadeData.dade.HConjInvariant := by
-    intro a l
-    simp only [dadeData.H_eq_supportKernel]
-    refine supportKernel_conj_invariant l.2 ?_
-    exact ⟨fun h => by simpa using dadeData.dade.L_normalizes_A l⁻¹ h,
-      fun h => dadeData.dade.L_normalizes_A l h⟩
-  exact ⟨{ maximal := hL, typeI := data, dadeData := dadeData, hconj := hconj }, rfl⟩
+  -- (8.14)/(8.15): the kernel conjugation invariance is carried by the faithful datum.
+  exact ⟨{ maximal := hL, typeI := data, dadeData := dadeData, hconj := dadeData.hconj }, rfl⟩
 
 /-- **Peterfalvi (12.1), existence**: every type-I maximal subgroup `L` carries the (12.1)
 Hypothesis.  Forgetful form of `hypothesis_of_typeIData`.  Mirrors
@@ -685,38 +654,12 @@ theorem thickenedSupport_subset_conjClassSet_maxNilpotentNormalHall
   have hwMF : w ∈ maxNilpotentNormalHall L := hzrw ▸ mul_mem hzMF hrMF
   exact ⟨w, SetLike.mem_coe.mpr hwMF, g, hgwy⟩
 
-open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
-/-- **Dade support lands in the `L_F`-conjugates** for a Frobenius type-I `L`.  The (12.1) Dade
-support is the thickened support `Ã(L) = thickenedSupport L L A(L)`
-(`DadeSupportHypothesisData.dadeSupport_eq_thickenedSupport`); for Frobenius `L` the base set
-`A(L) = typeIA L = (L_F)^# ⊆ L_F` (`typeIA_eq_sharp_of_frobenius`), so
-`thickenedSupport_subset_conjClassSet_maxNilpotentNormalHall` places `Ã(L) ⊆ 𝒞_G(L_F)`. -/
-theorem dadeSupport_subset_conjClassSet_maxNilpotentNormalHall_of_frobenius [Finite G]
-    {L : Subgroup G} (hyp : Hypothesis L) {C : Subgroup ↥L}
-    (hfrob : OddOrder.Isaacs.Ch06.IsFrobeniusGroup ↥L ((hyp.typeI.typeF.H).subgroupOf L) C) :
-    hyp.dadeData.dade.dadeSupport ⊆
-      OddOrder.GroupTheory.conjClassSet (maxNilpotentNormalHall L : Set G) := by
-  haveI := hyp.finiteG
-  rw [hyp.dadeData.dadeSupport_eq_thickenedSupport]
-  apply thickenedSupport_subset_conjClassSet_maxNilpotentNormalHall
-  -- `A(L) = typeIA L ⊆ L_F`: for Frobenius `L`, a `y` centralizing a nontrivial `x ∈ L_F` lands in
-  -- `L_F` (`IsFrobeniusGroup.centralizer_kernel_le`) — inlined from `centralizerSupport_sharp_eq`.
-  intro y hy
-  simp only [OddOrder.GroupTheory.typeIA, OddOrder.GroupTheory.centralizerSupport,
-    OddOrder.GroupTheory.sharpSubgroup, Set.mem_setOf_eq, Set.mem_diff, SetLike.mem_coe,
-    Set.mem_singleton_iff] at hy
-  obtain ⟨hyL, _, x, ⟨hxN, hx1⟩, hyx⟩ := hy
-  have hxL : x ∈ L := hyp.typeI.typeF.H_le hxN
-  have hxMsub : (⟨x, hxL⟩ : ↥L) ∈ (hyp.typeI.typeF.H).subgroupOf L :=
-    (Subgroup.mem_subgroupOf).mpr hxN
-  have hx1' : (⟨x, hxL⟩ : ↥L) ≠ 1 := fun h => hx1 (congrArg Subtype.val h)
-  have hycomm : (⟨y, hyL⟩ : ↥L) ∈ Subgroup.centralizer ({(⟨x, hxL⟩ : ↥L)} : Set ↥L) := by
-    rw [Subgroup.mem_centralizer_singleton_iff] at hyx ⊢
-    exact Subtype.ext hyx
-  have hyN : (⟨y, hyL⟩ : ↥L) ∈ (hyp.typeI.typeF.H).subgroupOf L :=
-    hfrob.centralizer_kernel_le _ hxMsub hx1' hycomm
-  rw [← hyp.typeI.typeF.H_eq]
-  exact (Subgroup.mem_subgroupOf).mp hyN
+/- (Removed 2026-07-02, lane b: `dadeSupport_subset_conjClassSet_maxNilpotentNormalHall_of_frobenius`
+claimed `Ã(L) ⊆ 𝒞_G(L_F)` for Frobenius `L`.  Under the faithful per-`x` signalizer of (8.14)
+(`S10.ftSupportKernel`) this is **false** when `A(L)` has an escaping element `x`: the coset factor
+`r ∈ R(x) = C_{(N[x])_F}(x)` is a nontrivial `σ(L)′`-element commuting with `x`, so `x·r` has order
+divisible by a `σ(L)′`-prime and is not conjugate into `L_F`.  It was provable only against the
+earlier self-based kernel pin `R(x) = C_{L_F}(x)` (issue 8021 unfaithfulness); no consumers. -/
 
 /-- **`(L_F)^#`-conjugates of non-conjugate maximals are disjoint** — the clean M̃-geometry core.
 `(L_F)^# = M_σ(L)^# = sigmaSharp L ⊆ M̃(L)` (`sigmaSharp_subset_Mtilde`), and the thickened
@@ -1415,9 +1358,8 @@ theorem typeI_tau_eq_induce_of_supported_trivial_H {L : Subgroup G} [Finite G] (
     ⟨f, (ClassFunction.mem_supportedSubmodule).mpr hf⟩
 
 /-- The escaping-centralizer set `{a ∈ X : ¬ C_G(a) ≤ M}` is `M`-conjugation invariant when `X` is
-(`C_G(gag⁻¹) = g·C_G(a)·g⁻¹` and `g ∈ M` normalizes `M`).  Extracted from the
-`supportKernel_conj_invariant` calculation; the `L`-invariance of the trivial-`H` sub-support
-`A(L) ∖ escaping` rests on this. -/
+(`C_G(gag⁻¹) = g·C_G(a)·g⁻¹` and `g ∈ M` normalizes `M`).  The `L`-invariance of the trivial-`H`
+sub-support `A(L) ∖ escaping` rests on this. -/
 private theorem escaping_conj_mem_iff {M : Subgroup G} {X : Set G} {g x : G}
     (hg : g ∈ M) (hmem : g * x * g⁻¹ ∈ X ↔ x ∈ X) :
     g * x * g⁻¹ ∈ escapingCentralizerSet M X ↔ x ∈ escapingCentralizerSet M X := by
@@ -1451,7 +1393,7 @@ the Dade isometry acts as induction on the difference, `(φ₁ − φ₂)^τ = I
 Proof (now genuine, modulo the §8 support obligation): `φ₁ − φ₂` is supported on the non-escaping
 part `A₁ = {a ∈ A(L) : C_G(a) ≤ L}` (`constituent_diff_support_subset_nonescaping`), which is
 `L`-invariant (`escaping_conj_mem_iff` + `A(L)` `L`-invariant) and carries only trivial Dade
-stabilizers (`supportKernel = ⊥` off the escaping set, via `H_eq_supportKernel`).  On such a
+stabilizers (`ftSupportKernel = ⊥` off the escaping set, via `H_eq_ftSupportKernel`).  On such a
 trivial-`H` support the type-I Dade isometry coincides with `Ind_L^G`
 (`typeI_tau_eq_induce_of_supported_trivial_H`, i.e. pin (b) steps 1–3 + the restriction assembly). -/
 theorem constituent_diff_tau_eq_induce {L : Subgroup G} [Finite G] (hyp : Hypothesis L)
@@ -1473,10 +1415,8 @@ theorem constituent_diff_tau_eq_induce {L : Subgroup G} [Finite G] (hyp : Hypoth
       fun hesc => ha.2 ((escaping_conj_mem_iff l.2 (hmem l a)).mp hesc)⟩
   have hH₁ : ∀ a, (hyp.dadeData.dade.restrict hA₁A hA₁norm).H a = ⊥ := by
     intro a
-    rw [OddOrder.Peterfalvi.S04.Hypothesis.restrict_H, hyp.dadeData.H_eq_supportKernel]
-    show supportKernel L L hyp.ambientA a.1 = ⊥
-    unfold supportKernel
-    rw [if_neg a.2.2]
+    rw [OddOrder.Peterfalvi.S04.Hypothesis.restrict_H, hyp.dadeData.H_eq_ftSupportKernel]
+    exact OddOrder.Peterfalvi.S10.ftSupportKernel_eq_bot_of_not_escaping a.2.2
   exact typeI_tau_eq_induce_of_supported_trivial_H hyp hA₁A hA₁norm hH₁
     (constituent_diff_support_subset_nonescaping hyp dχ h₁ h₂)
 

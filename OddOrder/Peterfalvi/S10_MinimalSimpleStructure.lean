@@ -511,6 +511,56 @@ theorem typeII_A_sets_normalizer [Finite G]
 noncomputable abbrev supportKernel (L M : Subgroup G) (X : Set G) (x : G) :=
   OddOrder.GroupTheory.supportKernel L M X x
 
+/-- **Peterfalvi (8.14), the faithful per-`x` signalizer kernel `R(x)`** (Coq `FTsignalizer`,
+PFsection8): on the escaping set (`x ∈ A` with `C_G(x) ⊄ M`) it is the BG Theorem-D signalizer
+`FT_signalizer x = (N[x])_σ ⊓ C_G(x)` attached to the *supporting* maximal `N[x] ⊇ C_G(x)`; off
+the escaping set `R(x) = 1`.  For the supporting `N[x]` (type `F` or `P₂`,
+`signalizer_structure_of_mem_sigmaSharp`) one has `(N[x])_F = (N[x])_σ`
+(`maxNilpotentNormalHall_eq_Msigma_of_isTypeF_or_isTypeP2`), so on the escaping set this is
+Peterfalvi's `R(x) = C_{(N[x])_F}(x)`.
+
+This is **not** `supportKernel M M A` (`= C_{M_F}(x)` on the escaping set): the self-based kernel
+is unsatisfiable as an (2.2) kernel, since for escaping `x` both `C_{M_F}(x)` and `C_M(x)`
+contain `x`, contradicting the `(2.2.b)` complement-disjointness and `(2.2.c)` coprimality (the
+issue-8021 unfaithfulness, at the Dade-hypothesis carrier). -/
+noncomputable def ftSupportKernel (M : Subgroup G) (A : Set G) (x : G) : Subgroup G := by
+  classical
+  exact
+    if x ∈ OddOrder.GroupTheory.escapingCentralizerSet M A then
+      OddOrder.BG.Ch4.S16.FT_signalizer x
+    else ⊥
+
+/-- Off the escaping set the faithful kernel is trivial. -/
+theorem ftSupportKernel_eq_bot_of_not_escaping {M : Subgroup G} {A : Set G} {x : G}
+    (hx : x ∉ OddOrder.GroupTheory.escapingCentralizerSet M A) :
+    ftSupportKernel M A x = ⊥ := by
+  unfold ftSupportKernel
+  rw [if_neg hx]
+
+/-- On the escaping set the faithful kernel is the BG signalizer. -/
+theorem ftSupportKernel_eq_of_escaping {M : Subgroup G} {A : Set G} {x : G}
+    (hx : x ∈ OddOrder.GroupTheory.escapingCentralizerSet M A) :
+    ftSupportKernel M A x = OddOrder.BG.Ch4.S16.FT_signalizer x := by
+  unfold ftSupportKernel
+  rw [if_pos hx]
+
+/-- The escaping-set membership (hence the faithful kernel) only depends on the point, not on
+which support set `A ∋ x` it is tested against: for `x ∈ A₁ ⊆ A`,
+`ftSupportKernel M A₁ x = ftSupportKernel M A x`.  This is what makes the (2.11) restriction of a
+faithful Dade datum to a smaller support again faithful. -/
+theorem ftSupportKernel_restrict {M : Subgroup G} {A A₁ : Set G} (hA₁A : A₁ ⊆ A) {x : G}
+    (hx : x ∈ A₁) :
+    ftSupportKernel M A₁ x = ftSupportKernel M A x := by
+  by_cases hC : Subgroup.centralizer ({x} : Set G) ≤ M
+  · rw [ftSupportKernel_eq_bot_of_not_escaping (fun h => h.2 hC),
+      ftSupportKernel_eq_bot_of_not_escaping (fun h => h.2 hC)]
+  · rw [ftSupportKernel_eq_of_escaping ⟨hx, hC⟩, ftSupportKernel_eq_of_escaping ⟨hA₁A hx, hC⟩]
+
+/-- **Peterfalvi (8.14), the faithful thickened support** `Ã(M,A) = ⋃_{x∈A} (x·R(x))^G`, with the
+per-`x` signalizer `R = ftSupportKernel M A`. -/
+noncomputable def ftThickenedSupport (M : Subgroup G) (A : Set G) : Set G :=
+  {y | ∃ x ∈ A, y ∈ conjClassSet (OddOrder.GroupTheory.leftCosetSet x (ftSupportKernel M A x))}
+
 /-- **Peterfalvi (8.14)**: the thickened support set
 `⋃_{x ∈ X} (x R(x))^G`, shared as `OddOrder.GroupTheory.thickenedSupport`. -/
 noncomputable abbrev thickenedSupport (L M : Subgroup G) (X : Set G) :=
@@ -536,21 +586,57 @@ noncomputable abbrev typePThickenedA0 (L M : Subgroup G) (data : TypePData M) :=
 support set `A`.
 
 It records the part already expressible with the existing §4 API: `L = M`,
-`N_G(A) = M`, the Dade Hypothesis (2.2), the recovered formula `H(a)=R(a)`, and
-that the §4 Dade support is the thickened support from (8.14).  The later
+`N_G(A) = M`, the Dade Hypothesis (2.2), the recovered formula `H(a)=R(a)` with
+the *faithful per-`x`* kernel `ftSupportKernel` of (8.14), and the
+`M`-conjugation invariance of the kernels (Peterfalvi's `R(x^m) = R(x)^m`, from
+the uniqueness of the supporting maximal `N[x]`, BG Theorem D).  The §4 Dade
+support then *is* the faithful thickened support of (8.14)
+(`dadeSupport_eq_ftThickenedSupport`, a lemma rather than a field).  The later
 Hypothesis (4.6)/(5.2) specializations add character-family data and are kept as
-a separate TODO below. -/
+a separate TODO below.
+
+⚠ The earlier revision pinned `H(a) = supportKernel M M A a = C_{M_F}(a)`, which is
+**unsatisfiable** whenever `A` has an escaping element (see `ftSupportKernel`); consumers
+(`S12.Hypothesis`, `S14.Hypothesis`) were therefore vacuously parameterized.  Fixed 2026-07-02
+(lane b, carve-out issue 0096). -/
 structure DadeSupportHypothesisData [Fintype G] (M : Subgroup G) (A : Set G) where
   /-- Peterfalvi (8.15): `M = N_G(A)`. -/
   normalizer_eq : Subgroup.normalizer A = M
   /-- Peterfalvi (8.15): Hypothesis (2.2) holds with `L = M`. -/
   dade : OddOrder.Peterfalvi.S04.Hypothesis G A M
   /-- Peterfalvi (8.15): the subgroups in Hypothesis (2.2) are the recovered
-  `R(a)` from (8.14). -/
-  H_eq_supportKernel :
-    ∀ a : {a : G // a ∈ A}, dade.H a = supportKernel M M A a.1
-  /-- The Dade support from §4 is the thickened support notation of (8.14). -/
-  dadeSupport_eq_thickenedSupport : dade.dadeSupport = thickenedSupport M M A
+  faithful `R(a)` from (8.14). -/
+  H_eq_ftSupportKernel :
+    ∀ a : {a : G // a ∈ A}, dade.H a = ftSupportKernel M A a.1
+  /-- Peterfalvi (8.14)/(8.15): the kernels are `M`-conjugation invariant (`R(x^m) = R(x)^m`,
+  by the uniqueness of the supporting maximal `N[x^m] = N[x]^m`, BG Theorem D). -/
+  hconj : dade.HConjInvariant
+
+namespace DadeSupportHypothesisData
+
+/-- The §4 Dade support of a faithful (8.15) datum is the faithful thickened support
+`Ã(M,A) = ⋃_{x∈A}(x·R(x))^G` of (8.14). -/
+theorem dadeSupport_eq_ftThickenedSupport [Fintype G] {M : Subgroup G} {A : Set G}
+    (d : DadeSupportHypothesisData M A) :
+    d.dade.dadeSupport = ftThickenedSupport M A := by
+  ext g
+  rw [OddOrder.Peterfalvi.S04.Hypothesis.mem_dadeSupport_iff]
+  constructor
+  · rintro ⟨a, h, hh, hconj⟩
+    obtain ⟨c, hc⟩ := isConj_iff.mp hconj
+    refine ⟨a.1, a.2, ?_⟩
+    rw [mem_conjClassSet]
+    refine ⟨a.1 * h, ⟨h, ?_, rfl⟩, c, hc⟩
+    rw [SetLike.mem_coe, ← d.H_eq_ftSupportKernel a]
+    exact hh
+  · rintro ⟨x, hx, hg⟩
+    rw [mem_conjClassSet] at hg
+    obtain ⟨t, ⟨h, hh, rfl⟩, c, hc⟩ := hg
+    refine ⟨⟨x, hx⟩, h, ?_, isConj_iff.mpr ⟨c, hc⟩⟩
+    rw [d.H_eq_ftSupportKernel ⟨x, hx⟩]
+    exact SetLike.mem_coe.mp hh
+
+end DadeSupportHypothesisData
 
 /-- **Peterfalvi (8.15)** for type I: the Dade (2.2) support hypotheses hold
 for `A(M)=A_0(M)` and `A_1(M)`, with `L=M` and `H(a)=R(a)`. -/
