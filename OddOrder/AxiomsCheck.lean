@@ -7031,3 +7031,19 @@ measure `orbit_sharpSubgroup_normSq_term`: `|(P#)^G|/|G| = |P#|/|N_G(P)|` for a 
 (`G0_orbit_cover` carrier) via `Set.ncard_diff` + `Set.ncard_union_le`.  The set-theoretic core of
 the §8 TI-counting of (14.11.4).  Axiom-clean. -/
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S16.MHypothesis.famG0_sub_filter_card_le_orbit_ncard
+
+/-! **Peterfalvi (8.17.c) `Ã₁`-disjointness bridge** (`S10_MinimalSimpleStructure`, lane β,
+issue 0096).  The faithful (8.14) thickened `A₁`-support is the BG `M̃`-cover:
+`FT_signalizer_eq_Rsub_of_escape` reconciles the two Theorem-14.4 signalizer choices through the
+uniqueness of the maximal over `C_G(x)` (escape forces `1 < |𝓜_σ(x)|` via
+`centralizer_le_of_maximalSigma_le_one`, then
+`maximalSubgroupsContaining_centralizer_eq_singleton_of_sigmaSharp_escape` pins both `choose`s);
+`ftThickenedSupport_A1_subset_conjClassSet_Mtilde` sends `Ã₁(M) ⊆ 𝒞_G(M̃)` (escaping points are
+the defining `x·R(x)` generators, non-escaping points the bare `x·1`); and
+`ftThickenedSupport_A1_disjoint_of_nonconjugate` is the (8.17.c) disjointness for non-conjugate
+type-I/II maximals (Coq `FT_Dade1_support_disjoint`), by BG 14.5(b)
+(`conjClassSet_Mtilde_disjoint`).  The `Ã₁`-side geometry consumed by (8.18.c) → (12.3) → (12.16).
+All three sorry-free; axiom-cleanliness gated on the BG `Mtilde`/Theorem-14.4 chain. -/
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S10.FT_signalizer_eq_Rsub_of_escape
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S10.ftThickenedSupport_A1_subset_conjClassSet_Mtilde
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S10.ftThickenedSupport_A1_disjoint_of_nonconjugate

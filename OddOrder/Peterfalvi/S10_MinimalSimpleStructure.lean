@@ -960,6 +960,104 @@ theorem dadeSupportHypotheses_typeP [Fintype G] [Finite G]
         Nonempty (DadeSupportHypothesisData M (A1 M tau)) := by
   sorry
 
+/-! ### (8.17.c) bridge: the faithful thickened `A₁`-support is the BG `M̃`-cover
+
+`Ã₁(M) = ⋃_{x∈A₁}(x·R(x))^G` with the faithful kernel is exactly `𝒞_G(M̃)` for BG's
+`M̃ = ⋃_{x∈M_σ^#} x·R(x)` — for type I/II, `A₁(M) = M_σ^#` (`A1_eq_sigmaSharp_of_typeI_or_II`)
+and both kernels are the Theorem-14.4 signalizer of the **unique** maximal over `C_G(x)`.  The
+(8.17.c) `Ã₁`-disjointness for non-conjugate maximals then *is* BG 14.5(b)
+(`conjClassSet_Mtilde_disjoint`), sorry-free. -/
+
+/-- **The faithful kernel agrees with the BG signalizer on escaping `σ`-sharp points**:
+`FT_signalizer x = Rsub x`.  Escape forces `1 < |𝓜_σ(x)|`
+(`centralizer_le_of_maximalSigma_le_one`), so both branches are live, and both choices are *the*
+unique maximal over `C_G(x)`
+(`maximalSubgroupsContaining_centralizer_eq_singleton_of_sigmaSharp_escape`). -/
+theorem FT_signalizer_eq_Rsub_of_escape [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    {M : Subgroup G} (hM : M ∈ maximalSubgroups G) {x : G}
+    (hx : x ∈ OddOrder.BG.Ch4.S14.sigmaSharp M)
+    (hesc : ¬ Subgroup.centralizer ({x} : Set G) ≤ M) :
+    OddOrder.BG.Ch4.S16.FT_signalizer x
+      = OddOrder.BG.Ch4.S14.Rsub hG (OddOrder.BG.Ch4.S14.genuineSigmaDecomposition hG) x := by
+  classical
+  have hx1 : x ≠ 1 := hx.2
+  have hxMσ : x ∈ OddOrder.BG.Ch3.S10.Msigma M := hx.1
+  have hgt : 1 < (OddOrder.BG.Ch4.S14.maximalSigmaSubgroupsOfElement x).ncard := by
+    by_contra h
+    exact hesc (OddOrder.BG.Ch4.S16.centralizer_le_of_maximalSigma_le_one hG hM hxMσ hx1
+      (not_lt.mp h))
+  have hlen : (OddOrder.BG.Ch4.S14.genuineSigmaDecomposition hG).length x = 1 :=
+    OddOrder.BG.Ch4.S14.Msigma_ell1 hG hM hxMσ hx1
+  obtain ⟨N, hsingle⟩ :=
+    OddOrder.BG.Ch4.S16.maximalSubgroupsContaining_centralizer_eq_singleton_of_sigmaSharp_escape
+      hG hM hx hesc
+  have hbranch : 1 < (OddOrder.BG.Ch4.S14.maximalSigmaSubgroupsOfElement x).ncard ∧
+      (maximalSubgroupsContaining (Subgroup.centralizer ({x} : Set G))).Nonempty :=
+    ⟨hgt, hsingle ▸ ⟨N, rfl⟩⟩
+  -- both `choose`s land in the singleton `{N}`
+  have hbase_eq : OddOrder.BG.Ch4.S16.FT_signalizerBase x = N := by
+    have hmem : OddOrder.BG.Ch4.S16.FT_signalizerBase x
+        ∈ maximalSubgroupsContaining (Subgroup.centralizer ({x} : Set G)) := by
+      rw [show OddOrder.BG.Ch4.S16.FT_signalizerBase x = hbranch.2.choose from dif_pos hbranch]
+      exact hbranch.2.choose_spec
+    rw [hsingle, Set.mem_singleton_iff] at hmem
+    exact hmem
+  have hstruct := (OddOrder.BG.Ch4.S14.sigmaLength_one_centralizer_structure hG
+    (OddOrder.BG.Ch4.S14.genuineSigmaDecomposition hG) hx1 hlen).2 hgt
+  have hN'_eq : hstruct.exists.choose = N := by
+    have hmem : hstruct.exists.choose
+        ∈ maximalSubgroupsContaining (Subgroup.centralizer ({x} : Set G)) :=
+      ⟨mem_maximalSubgroups.mp hstruct.exists.choose_spec.1, hstruct.exists.choose_spec.2.1⟩
+    have hmem2 : hstruct.exists.choose ∈ ({N} : Set (Subgroup G)) := by
+      rw [← hsingle]; exact hmem
+    exact Set.mem_singleton_iff.mp hmem2
+  rw [OddOrder.BG.Ch4.S14.Rsub_eq_inf hG (OddOrder.BG.Ch4.S14.genuineSigmaDecomposition hG)
+    hx1 hlen hgt]
+  show OddOrder.BG.Ch3.S10.Msigma (OddOrder.BG.Ch4.S16.FT_signalizerBase x)
+      ⊓ Subgroup.centralizer ({x} : Set G) = _
+  rw [hbase_eq, hN'_eq]
+
+/-- **The faithful thickened `A₁`-support lands in the `M̃`-cover**:
+`Ã₁(M) ⊆ 𝒞_G(M̃)` for type-I/II `M`.  Escaping points contribute `x·R(x)` with
+`R(x) = FT_signalizer x = Rsub x` (the defining generators of `M̃`); non-escaping points
+contribute the bare `x = x·1 ∈ M̃`. -/
+theorem ftThickenedSupport_A1_subset_conjClassSet_Mtilde [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G}
+    (hM : M ∈ maximalSubgroups G) (hType : IsTypeI M ∨ IsTypeII M)
+    {tau : PeterfalviType} (htau : tau = PeterfalviType.I ∨ tau = PeterfalviType.II) :
+    ftThickenedSupport M (A1 M tau) ⊆
+      conjClassSet (OddOrder.BG.Ch4.S14.Mtilde hG
+        (OddOrder.BG.Ch4.S14.genuineSigmaDecomposition hG) M) := by
+  have hA1σ : A1 M tau = OddOrder.BG.Ch4.S14.sigmaSharp M :=
+    OddOrder.Peterfalvi.S10Interface.A1_eq_sigmaSharp_of_typeI_or_II hG hM hType htau
+  rintro y ⟨x, hxA1, hy⟩
+  have hxσ : x ∈ OddOrder.BG.Ch4.S14.sigmaSharp M := hA1σ ▸ hxA1
+  refine conjClassSet_mono ?_ hy
+  rintro z ⟨r, hr, rfl⟩
+  by_cases hesc : x ∈ OddOrder.GroupTheory.escapingCentralizerSet M (A1 M tau)
+  · rw [SetLike.mem_coe, ftSupportKernel_eq_of_escaping hesc,
+      FT_signalizer_eq_Rsub_of_escape hG hM hxσ hesc.2] at hr
+    exact ⟨x, hxσ, r, hr, rfl⟩
+  · rw [SetLike.mem_coe, ftSupportKernel_eq_bot_of_not_escaping hesc, Subgroup.mem_bot] at hr
+    exact ⟨x, hxσ, r, by rw [hr]; exact one_mem _, rfl⟩
+
+/-- **Peterfalvi (8.17.c), `Ã₁`-disjointness** (the disjointness core of BG Theorem E /
+Coq `FT_Dade1_support_disjoint`): the faithful thickened `A₁`-supports of non-conjugate
+type-I/II maximal subgroups are disjoint.  Sorry-free: both supports embed in the disjoint
+`𝒞_G(M̃)`-covers (`conjClassSet_Mtilde_disjoint`, BG 14.5(b)). -/
+theorem ftThickenedSupport_A1_disjoint_of_nonconjugate [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {L1 L2 : Subgroup G}
+    (hL1 : L1 ∈ maximalSubgroups G) (hL2 : L2 ∈ maximalSubgroups G)
+    (hT1 : IsTypeI L1 ∨ IsTypeII L1) (hT2 : IsTypeI L2 ∨ IsTypeII L2)
+    {tau1 tau2 : PeterfalviType}
+    (ht1 : tau1 = PeterfalviType.I ∨ tau1 = PeterfalviType.II)
+    (ht2 : tau2 = PeterfalviType.I ∨ tau2 = PeterfalviType.II)
+    (hnc : ¬ OddOrder.BG.Ch4.S14.IsConjugateSubgroup L1 L2) :
+    Disjoint (ftThickenedSupport L1 (A1 L1 tau1)) (ftThickenedSupport L2 (A1 L2 tau2)) :=
+  Disjoint.mono (ftThickenedSupport_A1_subset_conjClassSet_Mtilde hG hL1 hT1 ht1)
+    (ftThickenedSupport_A1_subset_conjClassSet_Mtilde hG hL2 hT2 ht2)
+    (OddOrder.BG.Ch4.S14.conjClassSet_Mtilde_disjoint hG
+      (OddOrder.BG.Ch4.S14.genuineSigmaDecomposition hG) hL1 hL2 hnc)
 
 /-- **Peterfalvi (8.17)**: BG Theorem E data for a set of conjugacy-class
 representatives of maximal subgroups.
