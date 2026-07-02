@@ -1103,7 +1103,12 @@ have Rbeta: cfReal beta.                        (* (11.8.3) 後半: β̄=β *)
    を直接 `exact` (一発 green)。σc=conjAe で reality。
 3. **τ₁ (SHC extension) Galois-equiv (`cfConjC_Dade_coherent`)**: `SHC.ext(ζ^{σc})=(SHC.ext ζ)^{σc}`。
    ⚠ 中核は `S07.IsCoherent.extension_mapRingEquiv_comm` (Pf (5.9)(a)) に**既存** (general `hτ:IsCoherent`)。
-   SHC への instantiate + 前提 (hSirr/hspan/hSu/hlat/h2) 供給が要 (wiring)。**次の着手**。
+   SHC への instantiate + 前提 (hSirr/hspan/hSu/hlat/h2) 供給が要 (wiring)。
+   **前提の入手状況 (cont.⁶⁴)**: hspan ✅ **LANDED (`SHC_zSpan_vanish_support`)**; h2 (|S|≥2) = SHC_isCoherent
+   構成の `hcard` パターン (共役対 ζ,ζ̄); hSu (conjAe) = `inducedFamily_closedUnderConjugate`+irr.conj+deg;
+   hlat = `SHC_isCoherent.extension_mem_ZIrr`; hSirr = `mem_irreducibleCharacters`; hA' = A0=supportInSubgroup(refl)。
+   → 全前提 in hand。**次の着手 = piece 3 wiring 本体** (`SHC_isCoherent hG : IsCoherent hyp.tau S_SHC A0` を
+   `extension_mapRingEquiv_comm` に渡す; hyp.tau=dadeIntegralCharacterMap ゆえ型一致)。
 4. **betaE (β independence)**: (4.8)/(4.10) SHC port。`tau_muGrid_column_diff` (4772) は full-coh `coh`
    依存 → SHC 版 extract 要 (Dade/σ isometry は coh 非依存ゆえ抽出可能なはず)。**未実装**。
 5. **Rbeta assembly**: 1-4 を上記 recipe で組む。
