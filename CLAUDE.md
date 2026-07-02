@@ -121,7 +121,7 @@ ROADMAP のチェックリストから対応する `notes/` にリンクして�
 
 単発の作業項目 (1 つの sorry を埋める, 1 つの設計を決める, etc.) は `issues/` 配下のファイルベース issue で追跡する。GitHub Issues は使わない (local-first)。詳細は [`notes/meta/issue_management.md`](notes/meta/issue_management.md)。
 
-- 採番 + scaffold: `bin/new-issue [--base N] <slug> "<title>"` → `issues/NNNN-<slug>.md` を作って `git add`。並行セッションは `--base`/`ODD_ISSUE_BASE` で採番レンジを分けて衝突回避 (main=0, **Peterfalvi=1000 固定**, その他=2000…; 既定 0)
+- 採番 + scaffold: `bin/new-issue [--base N] <slug> "<title>"` → `issues/NNNN-<slug>.md` を作って `git add`。並行セッションは `--base`/`ODD_ISSUE_BASE` で採番レンジを分けて衝突回避 (hub/main=0、**lane 別に 1000 の倍数 base** — 現行 a=1000/b=2000/c=3000、shared-infra claim 専用=9000; 正本 = merge_monitor.md レーン表; 既定 0)
 - 状態 = 配置ディレクトリが source of truth: `issues/` (open) / `issues/pending/` / `issues/closed/`
 - 遷移は `git mv`. frontmatter に `status:` は持たない
 
@@ -137,12 +137,12 @@ ROADMAP のチェックリストから対応する `notes/` にリンクして�
   **(3) 取り込んだら `git rev-list --count HEAD..main` が 0 を確認**。コンフリクトは自所有ファイルなら解決、
   他レーン由来なら notes/issue で hub へ。これは LAUNCH.md の「🔄 起動時 main 同期」ブロックの上位正本
   (LAUNCH.md は git-excluded ゆえ、常時ロードされる本規約が確実な拠り所)。
-- worktree path = `/Users/ywr/odd-order-<slug>` (sibling), branch 名も `<slug>` (例: `isaacs-ch05`, `bg-s03`)
+- worktree path = `/home/ywr/odd-order-<slug>` (sibling), branch 名も `<slug>` (現行 = 単文字レーン `a`/`b`/`c`; 正本 = [`notes/meta/ft_lane_reallocation_2026_06_28.md`](notes/meta/ft_lane_reallocation_2026_06_28.md))
 - `.lake/packages` と `references` は main から **symlink で共有** (mathlib 6.5GB + 初回ビルド数分を節約)
 - `.lake/build/` は worktree ごとに独立 (並行 `lake build` 安全)
 - **`lake update` は worktree で走らせない** (共有 mathlib rev を壊す)
 - forward axiom 経由で章をまたぐ並行作業は合流時の名前衝突に注意 ([`notes/meta/forward_dep_policy.md`](notes/meta/forward_dep_policy.md))
-- 並行 worktree には **issue 採番レンジ**を割り当てる (`export ODD_ISSUE_BASE=N`、base は 1000 の倍数; main=0, **Peterfalvi=1000 固定**, その他の並行=2000…)。採番衝突を予防 ([`notes/meta/issue_management.md`](notes/meta/issue_management.md) 「並行セッションの採番レンジ」)
+- 並行 worktree には **issue 採番レンジ**を割り当てる (`export ODD_ISSUE_BASE=N`、base は 1000 の倍数; hub/main=0、現行 a=1000/b=2000/c=3000、9000=shared-infra claim)。採番衝突を予防 ([`notes/meta/issue_management.md`](notes/meta/issue_management.md) 「並行セッションの採番レンジ」)
 
 ## 主要パス
 
@@ -168,16 +168,14 @@ ROADMAP のチェックリストから対応する `notes/` にリンクして�
 
 ## mathlib カバレッジ
 
-詳細は [`notes/meta/mathlib_coverage.md`](notes/meta/mathlib_coverage.md) に集約。概要: Sylow / `IsPGroup` / `IsSolvable` / `IsNilpotent` / Frattini / Transfer / Schur-Zassenhaus / 表現論・指標の基本は既存。Fitting `F(G)` / `F*(G)` / 一般 π-Hall / Frobenius 群 / ZJ / Thompson subgroup `J(P)` / Dade isometry / Peterfalvi coherence は新規実装が必要。
+詳細は [`notes/meta/mathlib_coverage.md`](notes/meta/mathlib_coverage.md) に集約。概要: Sylow / `IsPGroup` / `IsSolvable` / `IsNilpotent` / Frattini / Transfer / Schur-Zassenhaus / 表現論・指標の基本は mathlib 既存。Fitting `F(G)` / `F*(G)` / 一般 π-Hall / Frobenius 群 / ZJ / Thompson subgroup `J(P)` / Dade isometry / Peterfalvi coherence は mathlib に無く、**本リポジトリ (`OddOrder/**`) で実装済み** (coverage doc は mathlib 欠落の記録であり残作業リストではない)。
 
 ## mathlib API 探索方針 (3 層運用)
 
 mathlib lemma の名前 / 署名を調べるときは, 闇雲に `grep -rn` を叩かず以下の順:
 
-1. **概念は明確で名前が未知** → **Web 検索** (`WebFetch https://leansearch.net/?q=<query>` / `WebSearch "mathlib4 <concept>"`). leansearch.net / moogle.ai が mathlib 専用のセマンティック検索. 候補名は必ず local で確認 (v4.29.1 pin との drift 注意)
+1. **概念は明確で名前が未知** → **Web 検索** (`WebFetch https://leansearch.net/?q=<query>` / `WebSearch "mathlib4 <concept>"`). leansearch.net / moogle.ai が mathlib 専用のセマンティック検索. 候補名は必ず local で確認 (現行 pin = [`lean-toolchain`](lean-toolchain) との drift 注意)
 2. **不慣れなモジュールの API 把握** → **該当ファイルを `Read` で通読**. 個別 grep を 3 回以上叩くなら通読の方が早い (例: `SemidirectProduct.lean`, `Nilpotent.lean`)
 3. **名前細部 (namespace, 引数順) が不確か** → **自然名で書いて `lake build` のエラー任せ**. ~12 秒で決着
 
 `grep -rn` は「使用例を本プロジェクト内で探す」 (Ch.1 等で類似 proof パターンの確認) には引き続き有用. mathlib 名前探索とは目的を分けて運用.
-
-詳細は memory `feedback_mathlib_api_3layer_lookup.md`.
