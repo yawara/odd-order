@@ -130,7 +130,18 @@ Coq (1.7)(b) `cfInd_central_Inertia` の hypothesis は `abelian (T/H)` (T=I(θ)
         **(v-c)** canonical extension (prime-cyclic step): [N':N]=p, gcd(p, o(φ)φ(1))=1 ⟹ ∃! 拡張 χ with
         p∤o(χ) (かつ o(χ)=o(φ))。(v-b) 分類 + det 調整 (det(χβ)=det(χ)·β^{χ(1)}, `LinearMap.det_smul`;
         o の p-part 消去は cyclic ⟨det χ'⟩ の primary 分解)。char-level det の well-definedness は (v-a)
-        (同 char⟹同型⟹同 det)。**具体 bricks (cont.¹⁶ 精密化)**:
+        (同 char⟹同型⟹同 det)。
+        **✅ 進捗 (cont.¹⁷, commits `10cf2443`/`96136160`/`99363888`/`115b41c3`)**: (c1) `twistRep`
+        + char/det 公式、(c2) `IsIrreducibleCharacter.determinant` + `determinant_spec` (rep 非依存)
+        + `determinant_restrict` (RepresentationDeterminant.lean)、新 leaf
+        **CanonicalCharacterExtension.lean** に `determinant_mul_linearClassFunction`
+        (det(χ·lcfβ)=β^d·detχ)、`determinant_conjBy` (conj-equivariance)、
+        `pow_index_eq_one_of_forall_coe_eq_one` ([K:H]-torsion)、
+        **(c4) `extension_unique_of_not_dvd_orderOf_determinant` 完成** (p'-det-order 拡張の一意性、
+        sorry-free axiom-clean)。`mul_linearClassFunction_one` (CharacterProduct)。
+        **残 = (c3) 存在** (Bézout 調整: γ:=(λ'^o)^{-A}, 1=oA+pB; β:=γ^C, 1=dC+pD; χ:=χ'·lcf β —
+        `Int.gcd_eq_gcd_ab` で Bézout 係数; zpow/pow 変換に注意) **+ (c5) o(χ)=o(φ)**。
+        **具体 bricks (cont.¹⁶ 精密化)**:
         (c1) `twistRep ρ β := y ↦ β(y)•ρ(y)` (rep instance + character = β·χ + det = β^{finrank}·det ρ
         via `LinearMap.det_smul`) — χ·lcf(β) の affording rep。
         (c2) `IsIrreducibleCharacter.determinant : K→*ℂˣ` (choose 経由) + spec「χ = χ_σ なる任意の σ で
