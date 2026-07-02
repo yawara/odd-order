@@ -404,4 +404,223 @@ theorem exists_normalized_conjugation_unit [Finite K]
 
 end Normalization
 
+/-! ### Step 4: the extension representation -/
+
+section Extension
+
+variable {ρ : Representation ℂ ↥H V} {g : K} {P : (Module.End ℂ V)ˣ}
+
+/-- Commuting `ρ(h)` past `P^j` from the left: `ρ(h) · P^j = P^j · ρ(g^{-j} h g^j)`.  The
+mirrored form of `conjugation_unit_zpow_comm`, used to normalize products in the extension's
+multiplicativity proof. -/
+theorem conjugation_unit_comm_zpow
+    (hP : ∀ h : ↥H, P * ρ.asGroupHom h
+      = ρ.asGroupHom (ClassFunction.conjByMulEquiv (G := K) (H := H) g h) * P)
+    (j : ℤ) (h : ↥H) :
+    ρ.asGroupHom h * P ^ j
+      = P ^ j * ρ.asGroupHom (ClassFunction.conjByMulEquiv (G := K) (H := H) (g ^ j)⁻¹ h) := by
+  have h1 := conjugation_unit_zpow_comm hP j
+    (ClassFunction.conjByMulEquiv (G := K) (H := H) (g ^ j)⁻¹ h)
+  rw [ClassFunction.conjByMulEquiv_mul, mul_inv_cancel,
+    ClassFunction.conjByMulEquiv_one] at h1
+  exact h1.symm
+
+omit hH in
+/-- **Well-definedness of the extension** (step 4, key computation).  The value
+`P^i · ρ(g^{-i} k)` does not depend on the choice of exponent `i` with `g^{-i} k ∈ H`:
+any two such exponents differ by an element of `{t : ℤ | g^t ∈ H}`, where the normalization
+`P^t = ρ(g^t)` makes the discrepancy cancel. -/
+theorem cyclicExtension_zpow_mul_eq
+    (hPt : ∀ (t : ℤ) (ht : g ^ t ∈ H), P ^ t = ρ.asGroupHom ⟨g ^ t, ht⟩)
+    {k : K} {i j : ℤ} (hi : (g ^ i)⁻¹ * k ∈ H) (hj : (g ^ j)⁻¹ * k ∈ H) :
+    P ^ i * ρ.asGroupHom ⟨(g ^ i)⁻¹ * k, hi⟩
+      = P ^ j * ρ.asGroupHom ⟨(g ^ j)⁻¹ * k, hj⟩ := by
+  have hij : g ^ (i - j) ∈ H := by
+    have heq : ((g ^ j)⁻¹ * k) * ((g ^ i)⁻¹ * k)⁻¹ = g ^ (i - j) := by group
+    exact heq ▸ mul_mem hj (inv_mem hi)
+  have hsplit : (⟨g ^ (i - j), hij⟩ : ↥H) * ⟨(g ^ i)⁻¹ * k, hi⟩ = ⟨(g ^ j)⁻¹ * k, hj⟩ :=
+    Subtype.ext (by
+      change g ^ (i - j) * ((g ^ i)⁻¹ * k) = (g ^ j)⁻¹ * k
+      group)
+  have hzp : P ^ i = P ^ j * P ^ (i - j) := by
+    rw [← zpow_add]
+    congr 1
+    omega
+  calc P ^ i * ρ.asGroupHom ⟨(g ^ i)⁻¹ * k, hi⟩
+      = P ^ j * (P ^ (i - j) * ρ.asGroupHom ⟨(g ^ i)⁻¹ * k, hi⟩) := by
+        rw [hzp, mul_assoc]
+    _ = P ^ j * (ρ.asGroupHom ⟨g ^ (i - j), hij⟩ * ρ.asGroupHom ⟨(g ^ i)⁻¹ * k, hi⟩) := by
+        rw [hPt (i - j) hij]
+    _ = P ^ j * ρ.asGroupHom ⟨(g ^ j)⁻¹ * k, hj⟩ := by
+        rw [← map_mul, hsplit]
+
+variable (ρ g P) in
+/-- The unit-valued extension function: `k = g^i h ↦ P^i · ρ(h)`, for a choice of exponent
+`i` with `g^{-i} k ∈ H` (available since the image of `g` generates `K/H`).  Well-defined by
+`cyclicExtension_zpow_mul_eq`. -/
+noncomputable def cyclicExtensionUnit (hgen : ∀ k : K, ∃ i : ℤ, (g ^ i)⁻¹ * k ∈ H) (k : K) :
+    (Module.End ℂ V)ˣ :=
+  P ^ (hgen k).choose * ρ.asGroupHom ⟨(g ^ (hgen k).choose)⁻¹ * k, (hgen k).choose_spec⟩
+
+omit hH in
+/-- Evaluation of `cyclicExtensionUnit` at **any** valid exponent. -/
+theorem cyclicExtensionUnit_eq
+    (hPt : ∀ (t : ℤ) (ht : g ^ t ∈ H), P ^ t = ρ.asGroupHom ⟨g ^ t, ht⟩)
+    (hgen : ∀ k : K, ∃ i : ℤ, (g ^ i)⁻¹ * k ∈ H)
+    {k : K} (i : ℤ) (hi : (g ^ i)⁻¹ * k ∈ H) :
+    cyclicExtensionUnit ρ g P hgen k = P ^ i * ρ.asGroupHom ⟨(g ^ i)⁻¹ * k, hi⟩ :=
+  cyclicExtension_zpow_mul_eq hPt (hgen k).choose_spec hi
+
+/-- The extension function is multiplicative. -/
+theorem cyclicExtensionUnit_mul
+    (hP : ∀ h : ↥H, P * ρ.asGroupHom h
+      = ρ.asGroupHom (ClassFunction.conjByMulEquiv (G := K) (H := H) g h) * P)
+    (hPt : ∀ (t : ℤ) (ht : g ^ t ∈ H), P ^ t = ρ.asGroupHom ⟨g ^ t, ht⟩)
+    (hgen : ∀ k : K, ∃ i : ℤ, (g ^ i)⁻¹ * k ∈ H) (k₁ k₂ : K) :
+    cyclicExtensionUnit ρ g P hgen (k₁ * k₂)
+      = cyclicExtensionUnit ρ g P hgen k₁ * cyclicExtensionUnit ρ g P hgen k₂ := by
+  obtain ⟨i₁, hi₁⟩ := hgen k₁
+  obtain ⟨i₂, hi₂⟩ := hgen k₂
+  -- the sum of valid exponents is a valid exponent for the product
+  have hmem : (g ^ (i₁ + i₂))⁻¹ * (k₁ * k₂) ∈ H := by
+    have h1 : (g ^ i₂)⁻¹ * ((g ^ i₁)⁻¹ * k₁) * ((g ^ i₂)⁻¹)⁻¹ ∈ H :=
+      hH.conj_mem _ hi₁ (g ^ i₂)⁻¹
+    have h2 := mul_mem h1 hi₂
+    have heq : ((g ^ i₂)⁻¹ * ((g ^ i₁)⁻¹ * k₁) * ((g ^ i₂)⁻¹)⁻¹) * ((g ^ i₂)⁻¹ * k₂)
+        = (g ^ (i₁ + i₂))⁻¹ * (k₁ * k₂) := by group
+    exact heq ▸ h2
+  rw [cyclicExtensionUnit_eq hPt hgen (i₁ + i₂) hmem,
+    cyclicExtensionUnit_eq hPt hgen i₁ hi₁, cyclicExtensionUnit_eq hPt hgen i₂ hi₂]
+  -- commute `ρ(h₁)` past `P^{i₂}` and reassemble
+  have hcomm := conjugation_unit_comm_zpow hP i₂ (⟨(g ^ i₁)⁻¹ * k₁, hi₁⟩ : ↥H)
+  have hfuse : ClassFunction.conjByMulEquiv (G := K) (H := H) (g ^ i₂)⁻¹
+        (⟨(g ^ i₁)⁻¹ * k₁, hi₁⟩ : ↥H) * (⟨(g ^ i₂)⁻¹ * k₂, hi₂⟩ : ↥H)
+      = ⟨(g ^ (i₁ + i₂))⁻¹ * (k₁ * k₂), hmem⟩ :=
+    Subtype.ext (by
+      simp only [Subgroup.coe_mul, ClassFunction.conjByMulEquiv_apply]
+      group)
+  calc P ^ (i₁ + i₂) * ρ.asGroupHom ⟨(g ^ (i₁ + i₂))⁻¹ * (k₁ * k₂), hmem⟩
+      = P ^ i₁ * P ^ i₂ * ρ.asGroupHom
+          (ClassFunction.conjByMulEquiv (G := K) (H := H) (g ^ i₂)⁻¹
+              (⟨(g ^ i₁)⁻¹ * k₁, hi₁⟩ : ↥H)
+            * (⟨(g ^ i₂)⁻¹ * k₂, hi₂⟩ : ↥H)) := by
+        rw [hfuse, ← zpow_add]
+    _ = P ^ i₁ * (ρ.asGroupHom (⟨(g ^ i₁)⁻¹ * k₁, hi₁⟩ : ↥H) * P ^ i₂)
+          * ρ.asGroupHom (⟨(g ^ i₂)⁻¹ * k₂, hi₂⟩ : ↥H) := by
+        rw [hcomm, map_mul]
+        group
+    _ = P ^ i₁ * ρ.asGroupHom ⟨(g ^ i₁)⁻¹ * k₁, hi₁⟩
+          * (P ^ i₂ * ρ.asGroupHom ⟨(g ^ i₂)⁻¹ * k₂, hi₂⟩) := by group
+
+variable (ρ g P) in
+/-- **The extension representation** (step 4 of Isaacs 11.22).  Given a normalized
+conjugation unit `P` for `ρ` and `g` (from `exists_normalized_conjugation_unit`), the map
+`g^i h ↦ P^i · ρ(h)` is a representation of `K` on the same space `V`. -/
+noncomputable def cyclicExtension
+    (hP : ∀ h : ↥H, P * ρ.asGroupHom h
+      = ρ.asGroupHom (ClassFunction.conjByMulEquiv (G := K) (H := H) g h) * P)
+    (hPt : ∀ (t : ℤ) (ht : g ^ t ∈ H), P ^ t = ρ.asGroupHom ⟨g ^ t, ht⟩)
+    (hgen : ∀ k : K, ∃ i : ℤ, (g ^ i)⁻¹ * k ∈ H) :
+    Representation ℂ K V :=
+  (Units.coeHom (Module.End ℂ V)).comp
+    { toFun := cyclicExtensionUnit ρ g P hgen
+      map_one' := by
+        have h0 : (g ^ (0 : ℤ))⁻¹ * (1 : K) ∈ H := by
+          simp
+        rw [cyclicExtensionUnit_eq hPt hgen 0 h0]
+        have hone : (⟨(g ^ (0 : ℤ))⁻¹ * (1 : K), h0⟩ : ↥H) = 1 :=
+          Subtype.ext (by simp)
+        rw [hone, map_one, zpow_zero, one_mul]
+      map_mul' := cyclicExtensionUnit_mul hP hPt hgen }
+
+/-- **The extension restricts to `ρ` on the nose**: `cyclicExtension … ∘ H.subtype = ρ`. -/
+theorem cyclicExtension_comp_subtype
+    (hP : ∀ h : ↥H, P * ρ.asGroupHom h
+      = ρ.asGroupHom (ClassFunction.conjByMulEquiv (G := K) (H := H) g h) * P)
+    (hPt : ∀ (t : ℤ) (ht : g ^ t ∈ H), P ^ t = ρ.asGroupHom ⟨g ^ t, ht⟩)
+    (hgen : ∀ k : K, ∃ i : ℤ, (g ^ i)⁻¹ * k ∈ H) :
+    (cyclicExtension ρ g P hP hPt hgen).comp H.subtype = ρ := by
+  refine MonoidHom.ext fun h => ?_
+  have h0 : (g ^ (0 : ℤ))⁻¹ * (h : K) ∈ H := by
+    simp
+  calc (cyclicExtension ρ g P hP hPt hgen).comp H.subtype h
+      = ↑(cyclicExtensionUnit ρ g P hgen (h : K)) := rfl
+    _ = ↑(P ^ (0 : ℤ) * ρ.asGroupHom ⟨(g ^ (0 : ℤ))⁻¹ * (h : K), h0⟩) := by
+        rw [cyclicExtensionUnit_eq hPt hgen 0 h0]
+    _ = ρ h := by
+        have hcast : (⟨(g ^ (0 : ℤ))⁻¹ * (h : K), h0⟩ : ↥H) = h :=
+          Subtype.ext (by simp)
+        rw [hcast, zpow_zero, one_mul, Representation.asGroupHom_apply]
+
+/-- **The extension is irreducible** whenever `ρ` is: a `K`-invariant submodule is in
+particular `H`-invariant.  Immediate from `cyclicExtension_comp_subtype` and
+`isIrreducible_of_isIrreducible_comp`. -/
+theorem isIrreducible_cyclicExtension [Representation.IsIrreducible ρ]
+    (hP : ∀ h : ↥H, P * ρ.asGroupHom h
+      = ρ.asGroupHom (ClassFunction.conjByMulEquiv (G := K) (H := H) g h) * P)
+    (hPt : ∀ (t : ℤ) (ht : g ^ t ∈ H), P ^ t = ρ.asGroupHom ⟨g ^ t, ht⟩)
+    (hgen : ∀ k : K, ∃ i : ℤ, (g ^ i)⁻¹ * k ∈ H) :
+    Representation.IsIrreducible (cyclicExtension ρ g P hP hPt hgen) :=
+  Representation.isIrreducible_of_isIrreducible_comp (f := H.subtype) _
+    ((cyclicExtension_comp_subtype hP hPt hgen).symm ▸ ‹Representation.IsIrreducible ρ›)
+
+end Extension
+
+/-! ### The character-level extension theorem -/
+
+section CharacterLevel
+
+/-- Bridge from the idiomatic generation hypothesis: if the image of `g` generates `K/H`
+(`zpowers (gH) = ⊤`), then every `k : K` lies in some coset `g^i H`. -/
+theorem forall_exists_zpow_inv_mul_mem {g : K}
+    (htop : Subgroup.zpowers (QuotientGroup.mk' H g) = ⊤) :
+    ∀ k : K, ∃ i : ℤ, (g ^ i)⁻¹ * k ∈ H := by
+  intro k
+  have hk : QuotientGroup.mk' H k ∈ Subgroup.zpowers (QuotientGroup.mk' H g) := by
+    rw [htop]
+    exact Subgroup.mem_top _
+  obtain ⟨i, hi⟩ := Subgroup.mem_zpowers_iff.mp hk
+  refine ⟨i, ?_⟩
+  rw [← QuotientGroup.eq_one_iff, ← QuotientGroup.mk'_apply H, map_mul, map_inv, map_zpow,
+    hi, inv_mul_cancel]
+
+/-- **Extension along a cyclic quotient — Isaacs, _Character Theory_, Theorem 11.22 (cyclic
+case).**  Let `H ⊴ K` with `K` finite and the image of `g : K` generating `K/H`, and let `θ`
+be an irreducible character of `H` fixed by `g`-conjugation (equivalently, `K`-invariant,
+since `H ≤ I_K(θ)` always).  Then `θ` **extends** to `K`: there is an irreducible character
+`χ` of `K` with `Res_H χ = θ`.
+
+This is the (G1) cyclic building block of the constructive Clifford correspondence
+(Peterfalvi (1.7)(b), issue 9002); the abelian inertia quotient case follows by iterating
+along a composition series. -/
+theorem IsIrreducibleCharacter.exists_extension_of_conjBy_eq [Finite K]
+    {θ : ClassFunction ↥H ℂ} (hθ : IsIrreducibleCharacter θ) {g : K}
+    (hgen : ∀ k : K, ∃ i : ℤ, (g ^ i)⁻¹ * k ∈ H)
+    (hinv : ClassFunction.conjBy g θ = θ) :
+    ∃ χ : ClassFunction K ℂ, IsIrreducibleCharacter χ ∧
+      ClassFunction.restrict H χ = θ := by
+  obtain ⟨V, _, _, _, ρ, hρirr, hchar⟩ := hθ
+  haveI := hρirr
+  -- the conjugate representation has the same character, by invariance of `θ`
+  have hinv' : (conjRep ρ g).character = ρ.character := by
+    funext h
+    rw [conjRep_character,
+      ← congrFun hchar (ClassFunction.conjByMulEquiv (G := K) (H := H) g h),
+      ← congrFun hchar h]
+    exact congrFun (congrArg (fun f : ClassFunction ↥H ℂ => (f : ↥H → ℂ)) hinv) h
+  obtain ⟨P, hP, hPt⟩ := exists_normalized_conjugation_unit ρ g hinv'
+  refine ⟨repCharacterClassFunction (cyclicExtension ρ g P hP hPt hgen),
+    ⟨V, inferInstance, inferInstance, inferInstance, cyclicExtension ρ g P hP hPt hgen,
+      isIrreducible_cyclicExtension hP hPt hgen, rfl⟩, ?_⟩
+  ext h
+  rw [ClassFunction.restrict_apply]
+  have h3 : cyclicExtension ρ g P hP hPt hgen ((h : K)) = ρ h :=
+    DFunLike.congr_fun (cyclicExtension_comp_subtype hP hPt hgen) h
+  have h4 : (cyclicExtension ρ g P hP hPt hgen).character (h : K) = ρ.character h :=
+    congrArg (LinearMap.trace ℂ V) h3
+  change (cyclicExtension ρ g P hP hPt hgen).character (h : K) = _
+  rw [h4, ← congrFun hchar h]
+
+end CharacterLevel
+
 end OddOrder.RepresentationTheory
