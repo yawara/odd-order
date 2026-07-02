@@ -427,7 +427,7 @@ The proof is now **fully assembled** from three pieces: (i) the carrier translat
 (`card_Msigma_inf_centralizer_eq_card_W2`, axiom-clean BG §14 group theory); and (iii) the §11
 character reduction `w₂ < w₁` (`S12.w2_lt_w1_of_hypothesis`).  All of (i)/(ii) and the reduction
 spine of (iii) are proven; the *sole* residual is the genuine Peterfalvi (11.8) non-orthogonality
-(`S12.exists_zeta_residual_not_orthogonal`, lane-b char obligation). -/
+(`S12.exists_zeta_residual_not_orthogonal`, lane-a (11.8) char obligation). -/
 theorem card_kappaHall_lt_of_isTypeIIIorIV {G : Type*} [Group G] [Finite G]
     (hG : IsMinimalSimpleOdd G) {S K Kstar : Subgroup G}
     (hS : S ∈ maximalSubgroups G) (hSP : BG.Ch4.S14.IsTypeP S) (hKS : K ≤ S)

@@ -402,25 +402,27 @@ theorem basic_structure [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
             tauS_eq_induction_holds := core.tauS_eq_induction_holds }, ?_⟩
   exact ⟨Or.inl hSII, core.P_elementaryAbelian, core.P_order, core.u_bound, core.A0S_TI_holds⟩
 
-/-- **Structural input for Peterfalvi (13.2.d) — §14-gated.**
+/-- **Structural input for Peterfalvi (13.2.d) — ⚠ VESTIGIAL, do not complete as stated**
+(hub ruling 2026-07-02; provenance: closed issues 1004/4014).
 
-The type II/III maximal subgroup `S` carries the Sibley Dade setup of (6.8) realizing its
-integral character map `tauS`, base family `Sset`, and support `A0S` (a `SibleyTarget`).
-Exhibiting this witness is the maximal-subgroup structure obligation of Pf §14 — exactly what
-Peterfalvi's proof of (13.2.d) reads off before invoking "(6.8) applies to `S`".  It is the sole
-remaining gap in `S_coherent`: once it lands, and once lane B supplies the (6.8) proof body of
-`S08.sibleySetup_is_coherent`, `S_coherent` is unconditional. -/
+The S-side maximal-coherent Dade route (`tauS`/`Sset`/`A0S`) is **off the FT path**: the §13/§16
+contradiction is routed through the W-side grid `eta = tau3 ∘ omega` and the carrier supplies
+`tauS = 0` as a placeholder, so nothing on the spine consumes this witness.  Building it as
+stated would prove an unconsumed S-side statement.  Anyone touching the (13.5)–(13.9) cascade
+must first restate it W-side or retire it — see the 2026-07-02 hub section of
+`notes/peterfalvi/s16_w4_char_cascade.md` (and note (6.8) `S08.sibleySetup_is_coherent` itself
+is already proven; the old "once lane B supplies (6.8)" framing is obsolete). -/
 noncomputable def sibleyTarget_S [Fintype G] (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
     (hyp : Hypothesis (G := G)) [Fintype ↥hyp.S]
     [Invertible (Nat.card ↥hyp.S : ℂ)] [Invertible (Nat.card G : ℂ)] :
     CoherenceWiring.SibleyTarget hyp.tauS hyp.Sset hyp.A0S := sorry
 
-/-- **Peterfalvi (13.2.d)**: the family `S` is coherent.
+/-- **Peterfalvi (13.2.d)**: the family `S` is coherent — ⚠ VESTIGIAL endpoint (0 spine cites).
 
-Wired to the (6.8) capstone `S08.sibleySetup_is_coherent` through the coherence-wiring bridge:
-given the §14 structural witness `sibleyTarget_S`, coherence is exactly (6.8).  The proof carries
-no `sorry` of its own — its dependencies are `sibleyTarget_S` (§14, this file) and (6.8) (lane B),
-each of which closes `S_coherent` automatically as it lands. -/
+Wired to the proven (6.8) capstone `S08.sibleySetup_is_coherent` through the coherence-wiring
+bridge; the only gap is `sibleyTarget_S`, which is ruled **do-not-complete-as-stated** (see its
+docstring — the spine routes through the W-side `eta` grid, `tauS = 0` placeholder).  Kept for
+statement fidelity to Pf (13.2.d); do not invest proof effort here. -/
 theorem S_coherent [Finite G] [Fintype G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     (hyp : Hypothesis (G := G)) [Fintype ↥hyp.S]
     [Invertible (Nat.card ↥hyp.S : ℂ)] [Invertible (Nat.card G : ℂ)] :
