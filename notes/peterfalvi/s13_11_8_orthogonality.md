@@ -1104,14 +1104,17 @@ have Rbeta: cfReal beta.                        (* (11.8.3) 後半: β̄=β *)
 3. **τ₁ (SHC extension) Galois-equiv (`cfConjC_Dade_coherent`)**: `SHC.ext(ζ^{σc})=(SHC.ext ζ)^{σc}`。
    ⚠ 中核は `S07.IsCoherent.extension_mapRingEquiv_comm` (Pf (5.9)(a)) に**既存** (general `hτ:IsCoherent`)。
    SHC への instantiate + 前提 (hSirr/hspan/hSu/hlat/h2) 供給が要 (wiring)。
-   **前提の入手状況 (cont.⁶⁴)**: hspan ✅ **LANDED (`SHC_zSpan_vanish_support`)**; h2 (|S|≥2) = SHC_isCoherent
-   構成の `hcard` パターン (共役対 ζ,ζ̄); hSu (conjAe) = `inducedFamily_closedUnderConjugate`+irr.conj+deg;
-   hlat = `SHC_isCoherent.extension_mem_ZIrr`; hSirr = `mem_irreducibleCharacters`; hA' = A0=supportInSubgroup(refl)。
-   → 全前提 in hand。**次の着手 = piece 3 wiring 本体** (`SHC_isCoherent hG : IsCoherent hyp.tau S_SHC A0` を
-   `extension_mapRingEquiv_comm` に渡す; hyp.tau=dadeIntegralCharacterMap ゆえ型一致)。
+   ✅ **LANDED (cont.⁶⁵, `SHC_extension_conj`)**: `(ζ^{τ₁})‾=(ζ‾)^{τ₁}`。全前提供給:
+   hspan=`SHC_zSpan_vanish_support`; h2=共役対 {ζ,ζ̄} (`inducedFamily_hasNoRealCharacters`);
+   hSu (conjAe)=`inducedFamily_closedUnderConjugate`+irr.conj+deg (`.conj=mapRingEquiv conjAe` bridge 経由);
+   hlat=`extension_mem_ZIrr`; hSirr=`mem_irreducibleCharacters`; hA'=`subset_rfl`。
+   ⚠ `.conj` 2 箇所は `simp only [hbridge]` で一括変換 (rw は inner χ.conj を先に食う)。⚠ `open scoped FiniteInduce in` 要。
 4. **betaE (β independence)**: (4.8)/(4.10) SHC port。`tau_muGrid_column_diff` (4772) は full-coh `coh`
    依存 → SHC 版 extract 要 (Dade/σ isometry は coh 非依存ゆえ抽出可能なはず)。**未実装**。
 5. **Rbeta assembly**: 1-4 を上記 recipe で組む。
-**規模 (改訂)**: piece 2 済、3 は既存 wiring、1/4 が新規実装、5 assembly。3-4 iteration に縮小。上流順 3→1→4→5。
+**規模 (改訂)**: piece 2 ✅、piece 3 ✅ (cont.⁶⁵)。残 = 1 (σ column-conj at row 0)、4 (betaE)、5 (assembly)。上流順 1→4→5。
+**次 = piece 1** (σ column-conjugation at row 0): `conj(ω_{0j}^σ) = ω_{0,k}^σ`, k=w2 column-conjugate。
+既存 `exists_rowInv_alignedOmegaSigma_conj` (column 0 の row-conj、w1 側) の w2 版。machinery
+(`sigma_mapRingEquiv_comm`/`galoisMap_conj_omega`/`omegaProdChar_inv`) 共通、w2CharEquiv inversion が新規。
 **gate 確認**: §14 下流でなく (11.8.5) の genuine prerequisite (document-order 11.8.3<11.8.5、本来上流)。
 SHC context で全て可能 (α^τ/ω^σ/ζ^{τ₁} は既に SHC で構築済み、conj 可換性を足すのみ)。
