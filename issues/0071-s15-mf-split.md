@@ -36,3 +36,11 @@ S15_MF.lean が 1,500 行以下になり、full build + AxiomsCheck green を維
   issues/0064 (S05_NarrowPGroups)
 - frontier tracker: issues/8012 (Thm 15.2 proof body), issues/8008 (Lemma 15.1 gated)
 - merge: 44a636eb (Thm 15.2 step 2 — 超過を発生させた合流)
+
+## 🧾 注記 (2026-07-02 hub 全体レビュー): trigger 発火 — hygiene-only
+
+- 旧 hold 条件「Lane G の active frontier」は**失効**: lane G は退役済 (3 レーン体制
+  a/b/c)、BG 側 frontier は凍結 ⟹ **trigger 発火** (凍結境界は自由に取れる)。
+- 行数 refresh: `S15_MF.lean` = **9603 行** (2026-07-02)。
+- 優先度 = **hygiene-only** (BG 凍結クラスタの粒度整理であり FT 経路の実質的証明では
+  ない)。hub batch の余力枠で実施。

@@ -73,3 +73,10 @@ cite して §13 char-direction を並列生産。lane-h は cite のみ。宛�
 S13 のローカル obligation `coherent_S_of_coherent_SH0C` (Thm 6.3) / `coherent_quotient_bound` (Thm 6.2) の
 standalone 版を **lane-h が §6/§8 新 leaf で生産** (relane #7、issue 2021)。lane-c は landing したら cite して
 (11.3)/(11.4) を discharge。それまで sorried sig を cite して下流を積む ([[feedback-cite-sorried-lemmas-if-signature-correct]])。
+
+## 🧾 注記 (2026-07-02 hub 全体レビュー): ownership 更新
+
+- 3 レーン再編 (正本 `notes/meta/ft_lane_reallocation_2026_06_28.md`) 後の宛先:
+  **S13 char directions の wire = lane a** (Pf S03–S13 所有; 旧 lane-h/lane-c 行は stale)。
+  **(6.2)/(6.3)/h56 producer 側 = lane b** (coherence infra; cf issue 2022)。
+- 本文の **gate map 本体は有効なまま** — lane 名だけ上記に読み替えること。

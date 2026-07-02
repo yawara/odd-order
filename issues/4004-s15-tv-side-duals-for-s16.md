@@ -60,3 +60,13 @@ S15 に上記 dual が (sorried でも) **faithful signature** として存在�
 - issue 4001 (lane-c §16 frontier)、issue 4003 (η-carrier ask, 別の lane-h gate)
 - commit `aff0bc2a` (lane-c resume: caseB_for_S + K_eq_V index 半)
 - S15:1712 `typeII_overNormalizer_frobenius` / S15:533 `caseA_parameters` / S15:693 `caseB_order_u`
+
+## 🧾 注記 (2026-07-02 hub 全体レビュー): ① landed / 残 = lane c intra-lane
+
+- **① は landed**: `typeII_overNormalizer_frobenius_V` が `S15_SAndT.lean:3541` に存在
+  (V-side producer、`exists_MHypothesis` 側 assembly も同ファイル ~3567-3581 で cite 済。
+  2026-07-02 grep 確認)。
+- **残 = ② T-side (13.13)/(13.15) 系** — 宛先 (lane-h) は退役済で、`S15_SAndT.lean` は
+  現在 **lane c 所有** (正本 `notes/meta/ft_lane_reallocation_2026_06_28.md`)。残作業は
+  **lane c 自身の §13/§16 char 作業** (issue 9001 cont.⁴⁴ 参照) であり cross-lane ask
+  ではない。

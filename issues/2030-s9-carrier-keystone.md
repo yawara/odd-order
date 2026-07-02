@@ -7,7 +7,7 @@ created: 2026-06-27
 
 # Pf §9 Clifford counts + `Section11CharacterData` redesign — the W3 keystone
 
-> lane-b (W3). This is the **single deep keystone** the entire W3 frontier converges on: both
+> lane-b (W3) *(現 owner = lane a — 2026-07-02 3 レーン再編、Pf S03–S13 は lane a。正本 `notes/meta/ft_lane_reallocation_2026_06_28.md`)*. This is the **single deep keystone** the entire W3 frontier converges on: both
 > on-path obligations — (10.8)`no_typeV` (via (10.7)) and **(11.8)** (the bare `feitThompson` sorry
 > residual `card_kappaHall_lt_of_isTypeIIIorIV`) — bottom out here.
 

@@ -220,6 +220,25 @@ Hypothesis78.betaNormSq_eq_complementIndex_add_one_of_zeta_ind_orthogonal_of_zet
 - `lake build OddOrder.Peterfalvi.S09_NonexistenceCertain` が通る。
 - (7.11) 主定理が依然 sorry-free。
 
+## ✅ HUB 裁定 + 現況更新 (2026-07-02 全体レビュー) — **owner = lane a、spine 上の orphan を解消**
+
+**spine 状態 (コード検証済)**: `card_G0_lower_bound` は **feitThompson spine 上の on-path sorry**:
+`theorem88_caseB_holds → not_all_maximal_typeI (S14:5780) → S09.not_trivial_G0 (S09:6778) →
+card_G0_lower_bound (S09:6478)`。bypass assembly (`not_trivial_G0_of_family_source_decomposition` /
+`_of_characterEstimateData`) は存在するが wired route は本定理経由。**どのレーンのプランにも
+載っていなかった** (本レビューで検出した唯一の orphaned on-path sorry)。
+
+**stale 行の更新**: (6.8) `sibleySetup_is_coherent` = ✅ sorry-free (S08 帯 全 0 sorry)。
+(7.7.a) certificate = ✅ discharge 済 (`chiRho_decomp_proof`, S09_CertificateDischarge:303, issue 1013)。
+(7.8.b) の witness 側 = `witness_L_zeta_bound` (S14:5372) 等 landed (issue 1015 で hzeta0nu も解消)。
+`Hypothesis78.nu_isometry` は family 版に弱化受理 (issue 0091)。⟹ 残 = **(7.8.a/b) proof 本体 +
+(7.9) proof + `CharacterEstimateData` 構成** ((6.8) gate は消滅)。
+
+**裁定: owner = lane a**。S09 は a 所有、かつ文書順で **Pf §7 < §9 (σ-tail) < §11.8** — 上流優先+
+文書順により、lane a は現行 11.8.3 チェーンの一段落後、**σ-tail (issue 9000) より先に本 issue を
+queue に入れる**。lane b の §7 certificate infra (0090 = S09_CertificateDischarge) と S14 witness 系は
+cite してよい (再構築しない)。
+
 ## 参照
 
 - depends on: `issues/closed/0025-peterfalvi-isometry-difference-core.md` (済)

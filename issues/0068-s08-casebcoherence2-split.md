@@ -46,3 +46,11 @@ S08_CaseBCoherence2 は現 **2157 行**(さらに増、cY 一般化 `per_phi_anc
 case-B 固有部 (ticVdiff 系・coherent extension・columnDecompositionTau 等 ~1052+) は残置。
 ⚠ `per_phi_anchored_image` (cY 一般化済) は S08_CaseBAssembly が import するので、分割後も
 S08_CaseBAssembly の import closure に入ること。
+
+## 🧾 注記 (2026-07-02 hub 全体レビュー): トリガー発火 — 実行可
+
+- **trigger 成立**: (6.8) capstone close 済 — Pf S08 band は **実 sorry 0** (comment-strip
+  で確認, 2026-07-02)。lane b の frontier は §12 tower / (6.5.c) へ移動済。
+- **実行可 (hub batch)**。ただし `S08_PGroupReduction` / `S07_Coherence*` (lane b active)
+  は本 batch の対象外。
+- 行数 refresh (2026-07-02): `S08_CaseBCoherence2.lean` = **2187 行**。

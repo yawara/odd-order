@@ -112,7 +112,6 @@ lane c (cont.⁴³) が「deep char frontier は 9001 shared coherence infra に
   **`coherent_of_constant_degree` が Dade-compatible に**。full build green (3893 jobs, axioms OK)。
   S07.Hypothesis は未 construction ゆえ lane-a regression なし。
 - [ ] lane b: (6.5.c) coherence を 9000 番台で claim → build (shared leaf)。
-- [x] lane b: (5.7)/S07 lattice-relative refactor 完了 (`d31b9763`, full build green, 2026-07-02 hub 合流済)。
 - ~~lane b: 構成的 Clifford~~ → **lane c に再配分済** (下記「HUB 再裁定」節、issue 9002 で lane c が claim)。
   lane b は Clifford を build しない (dup 回避)。
 
@@ -225,6 +224,25 @@ policy 8 で回避すべき。⟹ **lane b の plate から構成的 Clifford (i
 
 **やること 更新**:
 - [x] σ-theory-dual guidance 撤回 (hub 誤り、lane c 正当)。
-- [ ] lane c: 構成的 Clifford (issue 0026) を 9000 番台 claim → build (ungated generic char)。lane b は cite。
+- [x] lane c: 構成的 Clifford を 9000 番台 claim → build (issue 9002 で claim 済、infra 進行中)。lane b は cite。
 - [ ] lane c: §14-16 assembly を signature-first で skeleton 前倒し (宣言済 signature 範囲)。
 - [ ] lane b: (6.5.c) + (5.7)-S07 refactor に集中 (Clifford は lane c へ移管)。
+  ⚠ (5.7)-S07 は完了済 (`d31b9763`)、**(6.5.c) の 9000 番台 claim は依然未起票** (9003 でも 2 回リマインド済)。
+- ~~lane c: σ-theory-dual structural (S16:166/3431/3511) を lane d leaf cite で discharge~~
+  (**撤回済** — 上記「✅ HUB 再裁定」節参照。行のみ残存していたため 2026-07-02 に strike)
+
+## ✅ HUB 追加裁定 (2026-07-02 全体レビュー) — γ (binding pole) coherence 供給の明示分担
+
+docs/plan レビューで「lane c の記録上の gate = 『§7 coherence は lane b の build』だが、b の documented
+scope は §12 向け ((6.5.c) + S07 generic) のみ」というスコープずれを検出。binding pole が誰も約束して
+いない納品物を待つ構図を排除するため、供給を明示分割する:
+
+- **lane b の納品物** = (6.5.c) coherence producer (shared leaf、**9000 番台 claim を今すぐ起票** —
+  本 issue + 9003 に続き 3 度目のリマインド) + S07 generic producer 群 (lattice-relative refactor は
+  完了済)。**γ cascade の M 向け char 入力は b の scope 外。**
+- **lane c の担当** = 自所有 S15/S16 内の **η-grid honest 化 + M 向け `Hypothesis78`/Dade instantiation**
+  (`exists_MHypothesis`/`betaM_expansion_data`/(14.11.4) norm 入力)。upstream-first でこれらを §14.11
+  cascade より先に build し、b の generic producer は signature contract で cite (待たない)。旧 lane-h
+  課題 (2026-06-22「真の long pole = S15 η-grid carrier の honest 化」) の後継 owner = **c**。
+- 詳細・c_eq_one route 制約・S-side 処分は `notes/peterfalvi/s16_w4_char_cascade.md` の
+  「✅ HUB 裁定 (2026-07-02 全体レビュー)」節 (lane c の live 正本) に転記済。

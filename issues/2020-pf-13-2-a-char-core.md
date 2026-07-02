@@ -324,3 +324,13 @@ lower bound (the `Hypothesis78` instance for (M,A(M)), H=M' — config fixed, (7
 certificates are the content) and `hB` TI-counting (§9-blocked via (10.7), the
 `S11.Section11CharacterData` carrier = W3 keystone, shared with (11.8)).  正本 =
 notes/peterfalvi/s12_10_8_noncoherence.md (2026-06-27 cont.⁴).
+
+## 🧾 注記 (2026-07-02 hub 全体レビュー): 宛先更新
+
+- 3 レーン再編 (正本 `notes/meta/ft_lane_reallocation_2026_06_28.md`) 後の宛先:
+  **`S12.exists_zeta_residual_not_orthogonal` (= genuine Pf (11.8)) は lane a の 11.8
+  frontier** (S12_MaximalIII_IV_V.lean:2645; **live plan =
+  `notes/peterfalvi/s13_11_8_orthogonality.md`**)。本 issue 中の「lane-b (W3)」宛先は
+  stale — (11.8) の進行は上記 note を正とする。
+- 本 issue は **`card_kappaHall_lt_of_isTypeP1` (FeitThompson.lean:473) の tracker として
+  open 維持** (obligation は未 discharge、(11.8)/(10.10) 経由の背景分析は有効)。

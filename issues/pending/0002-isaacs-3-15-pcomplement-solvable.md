@@ -39,3 +39,5 @@ owner chapter 規則で Ch.7 (Burnside) ディレクトリの placeholder ファ
 - [notes/meta/forward_dep_policy.md](../notes/meta/forward_dep_policy.md)
 - Isaacs FGT p.84 (Thm 3.15)
 - 関連 issue: 0003 (Thm 3.17, 同じく Burnside 依存)
+
+> 🧾 (2026-07-02 hub 全体レビュー): trigger (Burnside p^aq^b = `burnside_p_pow_q_pow`, axiom-clean) は **fired 済** — ただし本 issue は off-FT-path につき coverage phase まで park 継続。

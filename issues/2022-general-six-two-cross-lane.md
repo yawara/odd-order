@@ -7,6 +7,8 @@ created: 2026-06-23
 
 # general six_two (6.2 bound for reducible induced members) — cross-lane gate for §6 producer
 
+> 🧾 (2026-07-02 hub): 本文の旧 lane 名 (lane-h 等) は stale — **現 owner = lane b** (§6/coherence infra、正本 `notes/meta/ft_lane_reallocation_2026_06_28.md`)。
+
 ## 背景
 
 lane-h relane #7 (issue 2021 RESOLVED) で §6 coherence producer を生産。Pf §11/§13 consumer

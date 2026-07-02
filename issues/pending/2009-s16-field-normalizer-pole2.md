@@ -500,3 +500,12 @@ L/M producers (14.3/14.10) は §13/Dade-gated ゆえ cite/defer。status: pendi
 relane #5 (lane-h→POLE-2) は stale-pointer エラーで無効と判明 (14.7 既に sorry-free、残は全 char-gated、issue 2021)。
 lane-h は §6 coherence producer に再配置 → POLE-2 は常駐レーン無しの driver/await に戻す。char (lane-b/lane-c) +
 Dade landing で auto-wire。status: active → **pending**。
+
+## 🧾 追記 (2026-07-02 hub 全体レビュー): owner-of-record = lane c
+
+- **owner-of-record = lane c** (3 レーン再編、正本 `notes/meta/ft_lane_reallocation_2026_06_28.md`:
+  lane c = S15_SAndT_Setup / S15_SAndT / S16_NonExistenceG)。**§13 producer が land した時点で
+  lane c が activate** する (それまでは pending の driver/await のまま)。旧 lane-h/lane-b
+  宛先は全て stale。
+- issue **0072** (S16_NonExistenceG tail split) 側の trigger 参照も更新済 (旧「2009 が
+  pending/closed になるまで保留」→「lane c の §15/§16 frontier 凍結後」、2026-07-02 注記)。

@@ -2035,8 +2035,8 @@ cont.²¹ の opaque-gating を追跡 → **remaining §9 (9.8.d/9.9.c/9.10) は
   §9 の残は Galois 土台 land 後に再開 (skeleton 前倒しも凍結ゆえ保留)。
 
 **lane-a pivot 先 (ungated、次 iteration 着手)**: S10 (13 sorry)、S13 (11 sorry)、
-issues 1013 (S09 §7 certificate)、1015 (hzeta0nu coherence orth)、1016 (T-side typePdata threading)、
-0065 (Cor 12.16)。文書順+上流優先で選択。caseA/B_character_counts は現状 §12-13 に consumer 無
+issues ~~1013 (S09 §7 certificate)~~、~~1015 (hzeta0nu coherence orth)~~、1016 (T-side typePdata threading)、
+~~0065 (Cor 12.16)~~ (取り消し線 = 2026-07-02 時点で完了済)。文書順+上流優先で選択。caseA/B_character_counts は現状 §12-13 に consumer 無
 (endpoint) ゆえ §9 残の緊急度は低い。
 
 ## S10 §8 pivot 着手 (2026-07-02 cont.²³) — (8.2.a) + (8.6.b II) closed, 残の gating map
@@ -2070,4 +2070,20 @@ S10_BGInterface.lean (0 sorry) の docstring が明示する通り、残の多�
 
 **次 iteration 着手判断**: (8.12.b)/(8.13) の BG §16 Thm B / Prop 16.1 の sorried 状態を確認し、
 signature 正なら sorried-cite で wiring、genuine local 論証が要るなら実証明。BG-gated が深いなら S13
-(§11、10 sorry) か issues 1013/1015/1016/0065 へ (文書順+上流優先)。
+(§11、10 sorry) か issues ~~1013~~/~~1015~~/1016/~~0065~~ へ (文書順+上流優先; 取り消し線 =
+2026-07-02 完了済)。
+
+## 🧾 注記 (2026-07-02 hub 全体レビュー)
+
+- **issue 9000 は裁定済**: 「hub 裁定待ちで凍結」(cont.²²) は解消 — σ-theory claim は
+  lane a に承継され、**S11 dup 3 定理の retire→generic leaf cite (dedup) が lane a の
+  σ-tail 次手** (9000 の 2026-07-02 承継節参照)。凍結を理由にした §9 Galois 保留は今後
+  9000 の残タスク進行に読み替える。
+- done 項目を strike 済: **1013 / 1015 / 0065 は完了** (1013 = §7 certificate discharge
+  実質完了、1015 = hzeta0nu 解消、0065 = Cor 12.16 faithful statement は
+  `S12_Corollary1216.lean` に存在)。
+- **S10 残 = 8 sorry** (comment-strip 計数, 2026-07-02。cont.²³ の「残 9」は stale)。
+- 0080 (closed 系レビュー) から転記の追加タスク: **`S12_MaximalIII_IV_V_Core.lean:1055` の
+  `theoremA_maximal_structure` cite を sorry-free な `typeP_auxiliary_structure`
+  (`S15_MF.lean:1706`) に差替** — BG sorried 依存を 1 本削減できる (swap 後、
+  `theoremA_maximal_structure` は唯一の cross-lane caller を失い dead で削除可)。

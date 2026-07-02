@@ -55,6 +55,16 @@ hunk 位置で判定 (carve-out 0086 と同じ運用)。
 - [ ] 恒久解: §8 support theory が固まったら hub prefix-split で S10 から dedicated leaf
       (例 `S10_DadeSupport.lean`) に分離し、本 carve-out を解消
 
+## 🧾 境界補足 (2026-07-02 全体レビュー)
+
+- **`escapingCentralizers_control` (S10:482, Pf 8.13.c 系, 現 consumer 0)**: 9003 loop⁹⁸ の分析どおり
+  (8.18.c) mixed 形は (8.13.c) escaping-centralizer を要しうる。**b が (8.13.c) piece に到達したら本
+  carve-out に本宣言を拡張する** (hub 承認 1 行で可) — b が S14 側で helper を再導出する形は取らない
+  (dup 防止)。それまでは lane a 保持のまま。
+- **a 保持の S10 structural trio** (`hall_maxNilpotentNormalHall_and_mainSubgroup` (S14 4 call sites) /
+  `typeI_or_typeII_centralizer_unique` / `escapingCentralizers_control`): b が必要なら **9003 pattern
+  (S14 に sorried pin して cite)** が既定。a の queue 到達 (文書順 §8 は 0044→σ-tail の後) を待たない。
+
 ## 完了条件
 
 (8.18.c)/route-B が要する §8 Dade-support 宣言が sorry-free 化し、恒久解 (dedicated leaf 分離) で

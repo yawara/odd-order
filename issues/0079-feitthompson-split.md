@@ -45,3 +45,13 @@ prefix-split すれば FeitThompson.lean が ~1380 行に収まる。ただし c
 
 - `notes/meta/merge_monitor.md` step 4 (size watch) + 🔒 所有マップ (FeitThompson 共有)
 - 既存 split issues: 0069 (S14_TypePCounting) / 0071 (S15_MF) / 0076 (S12) / 0077 (S11) / 0078 (S16_MainResults)
+
+## 🧾 注記 (2026-07-02 hub 全体レビュー): 前提更新 — 4 レーン co-edit は消滅
+
+- **`FeitThompson.lean` は現在 lane a の単独所有** (3 レーン再編 2026-07-02: lane a =
+  Pf S03–S13 + FeitThompson.lean。正本 `notes/meta/ft_lane_reallocation_2026_06_28.md`)。
+  「4 レーンが def 単位で co-edit」という本 issue の特殊事情は**消滅**し、通常の
+  single-owner leaf として扱える (分割は lane a の frontier 凍結境界で hub prefix-split)。
+- 行数 refresh: `FeitThompson.lean` = **2058 行** (2026-07-02)。
+- 2026-06-24 lane-b note の cd cluster 境界 (~1102–1664 / ~1694–1710 / ~1750) は
+  **line 番号 drift の可能性が高い — 実行時に要再検証** (再 grep)。

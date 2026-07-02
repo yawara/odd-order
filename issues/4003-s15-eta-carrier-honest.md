@@ -53,3 +53,12 @@ S15 が上記 η-値性質を faithful signature (sorried 可) で export し、
 - commit `2d517956` / `9f17b010` (foundational cores)
 - `S15_SAndT.lean:135` (`eta` free field)、`:1748` (`OddIntegerInner`)、`:1833`
   (`typeI_orthogonality_dichotomy`, sorried)
+
+## 🧾 注記 (2026-07-02 hub 全体レビュー): 宛先消滅 — lane c intra-lane 化
+
+- **宛先 (lane-h) は退役済で消滅** (3 レーン再編、正本
+  `notes/meta/ft_lane_reallocation_2026_06_28.md`)。`S15_SAndT.lean` は現在 **lane c 所有**
+  ゆえ、本 issue の「lane-h ask」は **lane c の intra-lane 作業**に変わった
+  (cross-lane 手渡しは不要)。
+- η-grid の性質 carry は issue **3002** (grid property carrier enrichment) と同系 —
+  **3002 との統合を検討** (S15.Hypothesis への性質 field 追加はどちらも lane c 自己所有)。

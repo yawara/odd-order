@@ -46,3 +46,20 @@ S08 系の各ファイルが概ね 1,500 行以下に収まり、full build gree
 - 既存 split issue: 0068 (CaseBCoherence2) / 0070 (CaseBAssembly) — 同 trigger
 - 旧 (closed): 0066 (CoherenceCore 初回分割)
 - 規約: CLAUDE.md「ファイル粒度」/ notes/meta/merge_monitor.md「サイズ watch」
+
+## 🧾 注記 (2026-07-02 hub 全体レビュー): トリガー発火 — 実行可
+
+- **trigger 成立**: (6.8) capstone (`S08_CoherenceTheorems:59`) close 済 — Pf S08 band は
+  **実 sorry 0** (comment-strip で確認, 2026-07-02)。
+- **実行可 (hub batch)**。ただし `S08_PGroupReduction` (570 行, lane b active 系) /
+  `S07_Coherence*` (lane b active) は対象外。
+- 行数 refresh (2026-07-02, 1500 行超の S08 系):
+
+  | ファイル | 行数 |
+  |---|---|
+  | `S08_CoherenceCore.lean` | 5842 |
+  | `S08_CoherenceCorePart2.lean` | 4836 |
+  | `S08_CoherenceCorePart1.lean` | 3452 |
+  | `S08_CaseBCoherence2.lean` | 2187 (issue 0068) |
+  | `S08_CaseBAssembly.lean` | 1988 (issue 0070) |
+  | `S08_CaseBCoherence.lean` | 1516 |

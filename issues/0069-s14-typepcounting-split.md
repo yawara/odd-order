@@ -47,3 +47,11 @@ created: 2026-06-15
 
 - 規約: `notes/meta/merge_monitor.md`「サイズ watch」、CLAUDE.md「分割の owner と trigger」
 - 関連: H LAUNCH(S14 所有)、[[feedback-record-deferred-hub-tasks-as-issues]]
+
+## 🧾 注記 (2026-07-02 hub 全体レビュー): hold 失効 — hygiene-only
+
+- 旧 hold 条件「H が S14 に active commit 中」は**失効**: lane H は退役済 (3 レーン体制
+  a/b/c、正本 `notes/meta/ft_lane_reallocation_2026_06_28.md`)、BG 側 frontier は凍結。
+- 行数 refresh: `S14_TypePCounting.lean` = **12098 行** (2026-07-02)。
+- 優先度 = **hygiene-only** (BG 凍結クラスタの粒度整理であり FT 経路の実質的証明では
+  ない)。hub batch の余力枠で実施。

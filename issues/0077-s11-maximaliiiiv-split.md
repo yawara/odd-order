@@ -32,3 +32,12 @@ S11_MaximalII_III_IV.lean が ~1500 行以下 (または topic-coherent な複�
 - issue 4006 ((9.7) Clifford engine = 5-10 session) / 4005 (relane H→C)
 - merge `057953f5` (1589 行到達)
 - [[feedback-record-deferred-hub-tasks-as-issues]]
+
+## 🧾 注記 (2026-07-02 hub 全体レビュー): owner 更新 + sequencing
+
+- **現 owner = lane a** (3 レーン再編 2026-07-02: Pf S03–S13 は lane a 所有、旧 lane-c
+  行は stale。正本 `notes/meta/ft_lane_reallocation_2026_06_28.md`)。
+- 行数 refresh: `S11_MaximalII_III_IV.lean` = **8345 行** (2026-07-02)。
+- **sequencing**: 分割は **issue 9000 の dedup (S11 dup 3 定理 retire → generic σ-theory
+  leaf cite) の後**に実施する。dedup が S11 内の宣言を削る/差し替えるため、先に split
+  すると境界が二度動く。

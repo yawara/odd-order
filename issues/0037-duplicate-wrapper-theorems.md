@@ -110,3 +110,12 @@ OddOrder` で確認. 1 件 1 commit を推奨 (CLAUDE.md commit 規約).
 - `notes/meta/lean_formalization_tips.md` §2.7 (wrapper 例外条件).
 - 検出方法: `grep -rEn '^  OddOrder\.' OddOrder/ --include='*.lean'` で 1 行直呼び
   出し body を抽出 → 各 callsite の statement を上流 theorem と比較.
+
+## 🧾 注記 (2026-07-02 hub 全体レビュー)
+
+- **#6 は削除済**: `normalizer_map_of_coprime_kernel` は
+  `OddOrder/Isaacs/Ch07_ThompsonSubgroup/Main.lean` から既に消えている (grep 0 hits,
+  2026-07-02 確認)。残対象は **#1–#5 のみ**。
+- **#1–#5 の line 番号は drift**: 現在は #1–#3 が `S01_Solvable.lean:1595/1605/1643` 付近、
+  #4–#5 が `S03_PreliminaryCharacter.lean:138/155` 付近。**実行時に必ず再 grep** して
+  callsite を確認すること (本文の行番号を信用しない)。

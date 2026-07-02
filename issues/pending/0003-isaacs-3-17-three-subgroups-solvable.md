@@ -41,3 +41,5 @@ G simple 場合 (M = G) に Burnside `pᵃqᵇ` 必須.
 - [notes/meta/forward_dep_policy.md](../notes/meta/forward_dep_policy.md)
 - Isaacs FGT p.85 (Thm 3.17)
 - 関連 issue: 0002 (Thm 3.15, 同じく Burnside 依存)
+
+> 🧾 (2026-07-02 hub 全体レビュー): trigger (Burnside p^aq^b = `burnside_p_pow_q_pow`, axiom-clean) は **fired 済** — ただし本 issue は off-FT-path につき coverage phase まで park 継続。

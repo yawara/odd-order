@@ -78,3 +78,12 @@ formal-math ベンチ。problem ごとに `Challenge.lean` が文を固定し, �
 - 文献: 100定理の未形式化は幾何/解析/超越数中心で群論の低い果実は無い
   (https://leanprover-community.github.io/100-missing.html); research-level は SOTA でも
   pass 率 ~10% (RLMEval, https://arxiv.org/pdf/2510.25427)
+
+## 🧾 注記 (2026-07-02 hub 全体レビュー)
+
+- 候補表は stale。現状更新 (2026-07-02 確認):
+  - **Burnside p^aq^b 可解性** = ✅ **axiom-clean 完成** (`OddOrder.Isaacs.Ch07.burnside_p_pow_q_pow`,
+    `OddOrder/AxiomsCheck.lean:~621` の `#assert_only_allowed_axioms` pass)。表の 🚧 は旧情報。
+  - **Thompson 系** (正規 p-補群 7.5/7.6) も ✅ のまま提出可能ライン。
+- 本 issue は **off-FT-path** (lean-eval 提出は FT 経路の実質的証明の積み上げでない) につき
+  **park**: FT 経路凍結後の coverage phase まで着手しない (CLAUDE.md「FT 経路限定」)。

@@ -49,3 +49,14 @@ lifting + Gorenstein/Wielandt assembly + `coprime_card_Q_card_VW2` dual)。該�
 - 代替: (13.16) 核を抽象 type-P config 上に generalize (S/T 双方 instantiate)。現 S-side proven 群の
   re-instantiation refactor が要 (リスク) ゆえ thread 案が素直。
 - notes/peterfalvi/s15_s_and_t.md の MILESTONE ブロック
+
+## 🧾 注記 (2026-07-02 hub 全体レビュー): owner 更新
+
+- 検証: `grep Tdata OddOrder/Peterfalvi/S15_SAndT_Setup.lean` = **0 hits** (2026-07-02) —
+  Tdata threading は未実施、本 issue は依然 live。
+- **owner 更新** (3 レーン再編、正本 `notes/meta/ft_lane_reallocation_2026_06_28.md`):
+  - `S15_SAndT_Setup.lean` の Hypothesis 変更 (Tdata fields + T-side basic_structure) =
+    **lane c の自己所有作業** (旧「lane d 所有 + hub 調整」は stale — S15_SAndT_Setup は
+    現在 lane c 所有ゆえ cross-lane 調整は不要)。
+  - 残る cross-lane は **FeitThompson.lean constructor の供給のみ** (lane a 所有) —
+    lane a への手渡し 1 点で済み、**hub tick でも代行可**。

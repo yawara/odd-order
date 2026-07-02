@@ -46,3 +46,11 @@ created: 2026-06-16
 - 規約: `notes/meta/merge_monitor.md`「サイズ watch」、CLAUDE.md「分割の owner と trigger」
 - 関連: issue 0068 (S08_CaseBCoherence2 split, 別ファイル)、[[feedback-record-deferred-hub-tasks-as-issues]]
 - notes: `notes/peterfalvi/s08_6_8_assembly_plan.md` (B の (6.8.2.3) frontier)
+
+## 🧾 注記 (2026-07-02 hub 全体レビュー): トリガー発火 — 実行可
+
+- **trigger 成立**: (6.8) capstone close 済 — Pf S08 band は **実 sorry 0** (comment-strip
+  で確認, 2026-07-02)。lane b の frontier は §12 tower / (6.5.c) へ移動済。
+- **実行可 (hub batch)**。ただし `S08_PGroupReduction` / `S07_Coherence*` (lane b active)
+  は本 batch の対象外。
+- 行数 refresh (2026-07-02): `S08_CaseBAssembly.lean` = **1988 行**。

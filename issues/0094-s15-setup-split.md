@@ -36,3 +36,12 @@ AxiomsCheck green を維持。
 - merge_monitor.md 手順 4 (サイズ watch)
 - 同種 deferred split issue: [0071](0071-s15-mf-split.md) (BG S15_MF), [0077](0077-s11-maximaliiiiv-split.md) (S11)
 - lane d 配分: [0092](0092-hub-reallocate-lane-d-to-s15-setup.md) / gating map: [4014](4014-s15-setup-gating-map.md)
+
+## 🧾 注記 (2026-07-02 hub 全体レビュー): owner 参照更新
+
+- 本文が参照する issue **0092 / 4014 は本日 closed** (`issues/closed/`)。lane d は退役し、
+  `S15_SAndT_Setup.lean` の **active frontier は現在 lane c** (lane c = S15_SAndT_Setup /
+  S15_SAndT / S16_NonExistenceG + 構成的 Clifford 9002、正本
+  `notes/meta/ft_lane_reallocation_2026_06_28.md`)。
+- 行数 refresh: `S15_SAndT_Setup.lean` = **1916 行** (2026-07-02)。
+- **実施は lane c の setup cluster 凍結まで defer** (prefix-split owner = hub は不変)。
