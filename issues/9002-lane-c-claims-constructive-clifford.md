@@ -117,16 +117,35 @@ Coq (1.7)(b) `cfInd_central_Inertia` の hypothesis は `abelian (T/H)` (T=I(θ)
         (`P^t=ρ(g^t)` ∀t: g^t∈H — any-exponent 正規化が well-definedness の鍵)、(iv) `cyclicExtension`
         (`Units.coeHom`∘hom、Res=ρ on the nose、既約性は `isIrreducible_of_isIrreducible_comp` (任意 f で
         既約性 ascend、新規 generic) で無料)。派生 API: `conjRep`/`conjByMulEquiv_{one,mul}` (Inertia.lean)。
-      - [ ] **(v) abelian+coprime iterate の残 bricks** (次 frontier、依存順):
-        **(v-a)** equal-char⟹equiv の一般化 (`nonempty_equiv_of_character_eq`, 2 つの rep が同一 char —
-        現 conjRep 版の proof は既にこの一般性で動く、refactor のみ)。
-        **(v-b)** **extension 分類**: Res_H χ₁ = Res_H χ₂ = θ (irreducible) ⟹ ∃β:K→*ℂˣ trivial on H,
-        χ₂ = χ₁·β。証明 = Schur commutant: 同一空間に正規化後 ρ₁(y)ρ₂(y)⁻¹ が Res の commutant → scalar
-        β(y)、multiplicative。(v-a)+(ii) 在庫で self-contained。
+      - [x] **(v-a) 完成** (cont.¹⁶, commit `b7efdc17`): `nonempty_equiv_of_character_eq` (**強形**:
+        σ 側の既約性仮定なし — dim Hom=1 via `card_inv_mul_sum_char_mul_char_eq_finrank` + Schur、
+        nonzero intertwiner の ker が既約 ρ に対し ⊥、次数一致で bijective) +
+        `Representation.IsIrreducible.of_equiv` (Equiv along irreducibility transport)。
+        CharacterCompleteness.lean に配置。
+      - [x] **(v-b) 完成** (cont.¹⁶, 同 commit): 新 shared leaf `ExtensionLinearTwist.lean`
+        `exists_linearClassFunction_mul_of_restrict_eq_restrict` — Res_H χ₁ = Res_H χ₂ (irreducible)
+        ⟹ ∃β:K→*ℂˣ trivial on H, χ₂ = χ₁·(linearClassFunction β)。transportRep で同一空間に正規化 →
+        S(y)=ρ₂'(y)ρ₁(y)⁻¹ が Res commutant (normality) → Schur scalar → β multiplicative、trace で
+        χ₂=χ₁β。sorry-free, axiom-clean。
         **(v-c)** canonical extension (prime-cyclic step): [N':N]=p, gcd(p, o(φ)φ(1))=1 ⟹ ∃! 拡張 χ with
         p∤o(χ) (かつ o(χ)=o(φ))。(v-b) 分類 + det 調整 (det(χβ)=det(χ)·β^{χ(1)}, `LinearMap.det_smul`;
         o の p-part 消去は cyclic ⟨det χ'⟩ の primary 分解)。char-level det の well-definedness は (v-a)
-        (同 char⟹同型⟹同 det)。
+        (同 char⟹同型⟹同 det)。**具体 bricks (cont.¹⁶ 精密化)**:
+        (c1) `twistRep ρ β := y ↦ β(y)•ρ(y)` (rep instance + character = β·χ + det = β^{finrank}·det ρ
+        via `LinearMap.det_smul`) — χ·lcf(β) の affording rep。
+        (c2) `IsIrreducibleCharacter.determinant : K→*ℂˣ` (choose 経由) + spec「χ = χ_σ なる任意の σ で
+        = representationDeterminant σ」((v-a) 強形: affording rep は自動的に ρ と Equiv ⟹ det 一致は
+        `LinearMap.det_conj`)。派生: det∘restrict 互換 (`representationDeterminant_comp`)、conj-equivariance
+        ((χ^y).det = χ.det ∘ conj_y)。
+        (c3) **存在の Bézout 調整**: 11.22 で χ' 取得、λ':=det χ'、λ:=det θ (o:=o(λ) coprime p)。
+        λ'|_H=λ ⟹ λ'^o trivial on H ⟹ λ'^{op}=1。1=ao+bp と置き γ:=(λ'^o)^{-a} (trivial on H, γ^p=1):
+        λ'γ = λ'^{bp} = (λ'^p)^b は p'-order ((λ'^p)^o=1)。β := γ^{θ(1)⁻¹ mod p} で χ:=χ'β が
+        det = λ'γ = p'-order。
+        (c4) **一意性**: χ₂=χ₁β ((v-b))、det 比 β^{θ(1)} は p'-order (両 det p'-order) かつ p-torsion
+        (β trivial on H, K/H order p ⟹ β^p=1) ⟹ β^{θ(1)}=1 ⟹ β=1 (gcd(θ(1),p)=1) ⟹ χ₂=χ₁·lcf(1)=χ₁
+        (要 mul_one 型 API: lcf(trivial)=trivialClassFunction + χ·triv=χ)。
+        (c5) o(χ)=o(φ) 付随 (iterate の不変量維持): o(φ) | o(χ) (restriction) + o(χ)/o(φ) | p + p'
+        ⟹ =。
         **(v-d)** iterate: K/H abelian + gcd([K:H], o(θ)θ(1))=1 ⟹ canonical 拡張。強帰納法 on [K:H]:
         Cauchy (`exists_prime_orderOf_dvd_card`) で K/H に位数 p 部分群 → preimage N₁⊴K (abelian 商は全
         中間群 normal) → (v-c) で canonical χ₁ → **K-invariance = uniqueness argument** (χ₁^y は θ^y=θ の
