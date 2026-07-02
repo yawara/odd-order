@@ -45,10 +45,12 @@ structure Hypothesis46 (A : Set G) (L : Subgroup G) [Fintype ↥L]
   tic_W1 : tic.W1 = (toCertainTypeHypothesis.W1).map L.subtype
   /-- `W₂` of (3.1) is the image of the certain-type `W₂ ≤ ↥L` under `L ↪ G`. -/
   tic_W2 : tic.W2 = (toCertainTypeHypothesis.W2).map L.subtype
-  /-- (4.6.b)/(4.3.a): the TI-subset `V` of (3.1) is `W − W₂` (viewed in `G` via `L ↪ G`).
-  Peterfalvi (4.3.a) establishes Hypothesis (3.1) for `L` with TI-subset `W − W₂`; (4.6.b) is the
-  ambient `G`-version with the same `W`, so `V = ↑W \ ↑W₂` where `W = W₁ ⊔ W₂` (`tic.W`). -/
-  tic_V : tic.V = (↑tic.W : Set G) \ (↑tic.W2 : Set G)
+  /-- (4.6.b): the TI-subset `V` of the ambient Hypothesis (3.1) is `W − (W₁ ∪ W₂)` (viewed in `G`
+  via `L ↪ G`) — the (3.1) exceptional set (Coq `cyclicTIset`).  Note this is *smaller* than the
+  (4.3.a) `L`-side TI-subset `W − W₂`: only `W − (W₁ ∪ W₂)` is TI in the ambient `G` (in the §8/§10
+  instantiations the `W₁^#`-elements have centralizers reaching outside `N_G(A)`, cf. (8.10)/(8.15)
+  where `A₀(M) = A(M) ∪ V^M` with this `V`; issue 9004). -/
+  tic_V : tic.V = (↑tic.W : Set G) \ ((↑tic.W1 : Set G) ∪ (↑tic.W2 : Set G))
   /-- (4.6.c): a normal subgroup `H ⊴ L`. -/
   subH : Subgroup ↥L
   subH_normal : subH.Normal

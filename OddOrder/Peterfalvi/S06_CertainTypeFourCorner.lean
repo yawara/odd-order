@@ -155,16 +155,19 @@ theorem coe_mem_A0_of_mem_conjugatesOfSet_toTICV (h : Hypothesis46 A L)
   have hVdef : h.toTICyclicHypothesis.V
       = ((h.W1 ⊔ h.W2 : Subgroup ↥L) : Set ↥L) \ ((h.W1 : Set ↥L) ∪ (h.W2 : Set ↥L)) := rfl
   rw [hVdef, Set.mem_diff, Set.mem_union, not_or] at hvV
-  obtain ⟨hvW, _hvnW1, hvnW2⟩ := hvV
+  obtain ⟨hvW, hvnW1, hvnW2⟩ := hvV
   have hvtic : (L.subtype v) ∈ h.tic.V := by
     rw [h.tic_V, Set.mem_diff]
     refine ⟨?_, ?_⟩
     · rw [tic_W_eq_map h]
       exact Subgroup.mem_map.mpr ⟨v, hvW, rfl⟩
-    · rw [h.tic_W2]
-      rintro hmem
-      obtain ⟨w, hwW2, hweq⟩ := Subgroup.mem_map.mp hmem
-      exact hvnW2 (L.subtype_injective hweq ▸ hwW2)
+    · rintro (hmem | hmem)
+      · rw [h.tic_W1] at hmem
+        obtain ⟨w, hwW1, hweq⟩ := Subgroup.mem_map.mp hmem
+        exact hvnW1 (L.subtype_injective hweq ▸ hwW1)
+      · rw [h.tic_W2] at hmem
+        obtain ⟨w, hwW2, hweq⟩ := Subgroup.mem_map.mp hmem
+        exact hvnW2 (L.subtype_injective hweq ▸ hwW2)
   refine Or.inr ⟨L.subtype c, c.2, L.subtype v, hvtic, ?_⟩
   rw [← hc]
   simp [map_mul, map_inv]
@@ -403,7 +406,7 @@ theorem fourCornerDade_apply_eq_of_mem_V (h : Hypothesis46 A L)
     h.tau.toDadeMap (fourCornerDiffSupported h χ₂ i) v
       = certainTypeOmegaSigma h χ₂ i v - certainTypeOmegaSigma h χ₂ 0 v
         - (certainTypeOmegaSigma h 1 i v - certainTypeOmegaSigma h 1 0 v) := by
-  have hv_ticV : v ∈ h.tic.V := by rw [h.tic_V]; exact ⟨hv.1, fun h2 => hv.2 (Or.inr h2)⟩
+  have hv_ticV : v ∈ h.tic.V := by rw [h.tic_V]; exact hv
   have hvA0 : v ∈ (A ∪ {g : G | ∃ l : G, l ∈ L ∧ ∃ u ∈ h.tic.V, g = l * u * l⁻¹} : Set G) :=
     Or.inr ⟨1, Subgroup.one_mem L, v, hv_ticV, by group⟩
   set w : h.sdiffTICyclicHypothesis.W := ticWEquivSdiffW h ⟨v, (ticVdiff h).V_subset_W hv⟩ with hw
