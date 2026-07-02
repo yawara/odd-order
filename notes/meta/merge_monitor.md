@@ -1,4 +1,4 @@
-# main 合流モニター — a/b/c/d レーン自動合流の運用手順
+# main 合流モニター — a/b/c レーン自動合流の運用手順
 
 > 横断運用ドキュメント。**標準監視ペース = 15 分間隔** (cron `7,22,37,52 * * * *`、:00/:30 回避・15 分均等、ユーザー 2026-07-02; 2026-06-29〜07-02 は 30 分 `13,43`、それ以前は 15 分)。cron は session-only ([[cron-dies-on-model-switch]]; CronCreate `durable:true` は本環境で disk 永続せず session-only 扱い) ゆえ、**再作成時は必ずこのペース `7,22,37,52` で**作る。main worktree = `/home/ywr/odd-order`。
 > ユーザー方針: **「検証通過は自動合流」** — build green + axiom-clean + sorry regression なし + 新 axiom なしを
@@ -8,15 +8,10 @@
 > **レーン配分の正本 = [`ft_lane_reallocation_2026_06_28.md`](ft_lane_reallocation_2026_06_28.md)**
 > (ゲートなし・signature contract 方式)。本ファイルは hub 側の合流手順 + gotcha 集。
 
-> **🔀 一時 cross-lane carve-out (issue 8022, ユーザー裁可 2026-06-30)**: gate-2 の M̃-cover re-route は
-> S10+S09+S14_MaximalI を build-green に一括必要な coupled 改修ゆえ、**lane d に S09/S14_MaximalI への一時
-> cross-lane carve-out を付与**。⟹ step 1.5 で **lane d が `OddOrder/Peterfalvi/S09_NonexistenceCertain.lean`
-> (FrobeniusFamily/FamilyHypothesis71/G0) および `S14_MaximalI.lean` の `not_all_maximal_typeI`/`covers`
-> を編集していても、issue 8022 の M̃-cover re-route の一環なら逸脱としない** (atomic 1 commit/branch で
-> 来る前提)。hub は d のこの atomic 変更を一括合流 (S09/S14/S10 を含む大型 diff)。
-> **a/b/c への要請** (notes 経由): 8022 land まで S09 FrobeniusFamily/FamilyHypothesis71・S14_MaximalI の
-> `not_all_maximal_typeI` 周辺は編集を避ける (d の atomic 変更との衝突回避)。a の §9.9.b (S11)・b の §12 hB
-> chain (S14 の別 decl)・c の §16 size bounds は通常継続可。8022 land 後に本 carve-out は解除。
+> **🔀 一時 cross-lane carve-out (issue 8022) — ❌ 失効 (2026-07-02 lane d 退役)**: lane d への
+> S09/S14_MaximalI 一時編集権、および a/b/c への「S09 FrobeniusFamily/FamilyHypothesis71・
+> S14_MaximalI `not_all_maximal_typeI` 周辺の編集回避」要請は**解除**。route B の残作業と owner は
+> issue 8022「🧾 状態整理」節 (per-rep §8 Dade-support 8.15 = lane b、carve-out 0096 経由)。
 
 > **✅ issue 0089 解決 (2026-06-30, ユーザー裁定 D=削除)**: `S07_RhoProjection.lean` は S09 `chiRho`
 > 機構の完全重複ゆえ**削除済** (carve-out 0087 撤回)。(12.16) path は S09 `chiRho`/`Hypothesis78`/
@@ -28,21 +23,23 @@
 > S07 を新規再作成**した場合のみ逸脱。判定: `git log main..b --no-merges` の commit が S07 への新規宣言
 > 追加か (= 再作成) / 既存 S07 への追記止まり (= 残存) か。混在・不明なら skip+報告。
 
-## レーン (2026-06-28 再配分: 4 レーン a/b/c/d)
+## レーン (2026-07-02 3 レーン再編: a/b/c、lane d 退役)
 
 | lane | branch | worktree | クラスタ | 主所有 .lean | issue base |
 |---|---|---|---|---|---|
-| **a** | `a` | `odd-order-a` | α Pf §10–13 中央指標核 (bare spine sorry 11.8) | `Peterfalvi/S(0[3-9]|1[0-3])*` + `FeitThompson.lean:426` | 1000 |
-| **b** | `b` | `odd-order-b` | β Pf §12 Dade tower (12.16) | `Peterfalvi/S14_MaximalI.lean` (carve-out 0087=S07_RhoProjection は issue 0089 で削除済) | 2000 |
-| **c** | `c` | `odd-order-c` | γ POLE-2 §14–16 下流 (最長 pole) | `Peterfalvi/{S15_SAndT,S16_NonExistenceG}.lean`（**S15_SAndT_Setup は 2026-07-01 に lane d へ移管, issue 0092**）| 3000 |
-| **d** | `d` | `odd-order-d` | γ 上流 §15 setup (2026-07-01 再配分) + δ BG §14–16 (dormant) | `Peterfalvi/S15_SAndT_Setup.lean` (主) + `BG/**` + `FeitThompson.lean` carrier 宣言 | 4000 |
+| **a** | `a` | `odd-order-a` | α Pf §10–13 中央指標核 (bare spine sorry 11.8) + σ-theory tail | `Peterfalvi/S(0[3-9]|1[0-3])*` + `FeitThompson.lean` (全体) | 1000 |
+| **b** | `b` | `odd-order-b` | β Pf §12 Dade tower (12.16) + coherence infra | `Peterfalvi/S14_MaximalI.lean` + coherence file 群 + carve-out 0090/0096 | 2000 |
+| **c** | `c` | `odd-order-c` | γ POLE-2 §15–16 chain 一本化 + 構成的 Clifford (issue 9002) | `Peterfalvi/{S15_SAndT_Setup, S15_SAndT, S16_NonExistenceG}.lean` | 3000 |
+
+例外・共有・凍結の正確な判定は下の 🔒 所有マップが正。**lane d は 2026-07-02 退役** (branch `d` は
+温存・全 merge 済で `main..d` は常に 0; 旧 4 レーン表は git 履歴参照)。
 
 **signature-first interface (ゲートは幻)**: 上流が sorried signature を export → 下流が cite。各レーンは独立クラスタを
 正面から埋め、cross-cluster は signature contract で媒介 (待たない)。詳細 = ft_lane_reallocation_2026_06_28.md。
 
 **取り決め**: (1) 各レーンは**自所有ファイルのみ編集**、他は cite (要望は notes/issue 経由)。
 (2) **新規 `axiom` 宣言は abort + ユーザー承認**。(3) **起動時 main 同期** = `git merge main` (3-way、`--ff-only` 禁止)。
-`lake update` 禁止。コミットは main のみ。マージ順 = **a → b → c → d** (独立ゆえ形式的)。
+`lake update` 禁止。コミットは main のみ。マージ順 = **a → b → c** (独立ゆえ形式的)。
 
 **🧭 方向性・cross-lane 判断は HUB 宛 issue 起票 → hub 解決** (title に "HUB:" 冠、選択肢明記)。hub は各 tick で
 新 HUB issue を別枠報告し解決 (read-only 監査 + 必要ならユーザーへ)。軽微な signature 不足通知は notes でよい
@@ -77,9 +74,16 @@
 > | **b** | β Pf §12 Dade tower + coherence infra | `OddOrder/Peterfalvi/S14_MaximalI.lean`（**全体**、旧 carve-out 0088 `exists_typeICovering` は b に解消）+ **coherence infra** = `S07_Coherence*`/`S08_PGroupReduction`（既存 coherence file、(5.7)/(6.5.c)/(6.8) case-B 系、hub authorized 2026-07-02）+ GroupTheory/** coherence leaf。⚠ これらは nominal に a の `S0[3-9]` regex に掛かるが **coherence infra ゆえ b 担当（逸脱でない）**、a の active territory は §9-13 char 核で S07/S08 coherence は非接触 |
 > | **c** | γ POLE-2 §15–16 chain 一本化 | `OddOrder/Peterfalvi/{S15_SAndT_Setup, S15_SAndT, S16_NonExistenceG}.lean`（**S15_SAndT_Setup は 2026-07-02 に lane d→c、§15→16 全 chain を c が所有**）+ 構成的 Clifford (issue 9002、GroupTheory/** shared) |
 > | **~~d~~ 退役** | — | **2026-07-02 退役**。σ-theory leaf (`GroupTheory/**`, sorry-free) は共有ゾーンに残置 (a が tail 完成)。BG/** は完了・共有凍結。FeitThompson carrier は a に fold。**branch `d` は git に温存 (作業は全 merge 済)、worktree セッションは停止**。 |
-> | **共有（全 lane 可）** | — | `OddOrder/AxiomsCheck.lean` / `OddOrder.lean` / `OddOrder/GroupTheory/**` / `OddOrder/Mathlib/**` / `OddOrder/Algebra/**`（全 lane 加算可）/ **`OddOrder/FeitThompson.lean`**（d 退役で主に a、宣言境界で衝突回避）/ `OddOrder/BG/**`（完了・共有）/ `notes/**` / `issues/**` |
+> | **共有（全 lane 可）** | — | `OddOrder/AxiomsCheck.lean` / `OddOrder.lean` / `OddOrder/GroupTheory/**` / `OddOrder/Mathlib/**` / `OddOrder/Algebra/**`（全 lane 加算可）/ `OddOrder/BG/**`（完了・共有凍結）/ `notes/**` / `issues/**` |
+> | **凍結 scaffold** | — | `OddOrder/Peterfalvi/Appendices/**`（off-path・consumer 0、2026-07-02 census 検証済: Huppert 1 / NearFields 2 / Suzuki 5 / Suzuki2Groups 4 / FeitSibley 3 sorry。**どのレーンも編集しない**。σ-theory near-field 等が App B/C を cite する必要が生じたら、その時点で hub が owner 割当 — 自然候補 = a の σ-theory tail 系）|
 >
-> **carve-out (issue 0086, ユーザー裁可 2026-06-29)**: `OddOrder/Peterfalvi/S10_MinimalSimpleStructure.lean` は
+> ⚠ `FeitThompson.lean` は**共有ではなく lane a 所有** (d 退役で carrier 宣言群ごと fold)。他レーンが
+> carrier 宣言 (`Section16Inputs` 等) に field を追加する必要があるときは hub/issue 経由で承認合流
+> (先例: lane c の `S_U_commutative`/`Sdata_W2_eq` 追加 = 構成子供給付き、hub 承認)。
+>
+> **carve-out (issue 0086, ユーザー裁可 2026-06-29) — ❌ 解消 (2026-07-02 lane d 退役)**: bgTheoremE
+> carrier は **file owner = lane a に fold** (issues/closed/0086)。以下は履歴:
+> `OddOrder/Peterfalvi/S10_MinimalSimpleStructure.lean` は
 > 原則 lane a 所有だが、その中の `BGTheoremECoverData` 構造 + `BGTheoremETypeICovering` / `BGTheoremENonTypeICovering` +
 > **`bgTheoremE_cover_data`** 定理 (BG Theorem E carrier, Pf 8.17、b/c/d 共有 consumer) は **lane d 所有**として扱う。
 > ⟹ **step 1.5 の範囲逸脱チェックで、lane d が S10 のうちこれら carrier 宣言**「のみ」**を編集している場合は逸脱としない**
@@ -92,7 +96,9 @@
 > 完全重複と判明し**削除済** (issue 0089, ユーザー裁定 D)。以後この carve-out は無効。lane b が
 > S07_RhoProjection を再作成したら逸脱。
 >
-> **carve-out (issue 0088, ユーザー裁可 2026-06-29)**: `OddOrder/Peterfalvi/S14_MaximalI.lean`（原則 lane b）の
+> **carve-out (issue 0088, ユーザー裁可 2026-06-29) — ❌ 解消 (2026-07-02 lane d 退役)**: S14_MaximalI は
+> **全体 lane b** (issues/closed/0088)。以下は履歴:
+> `OddOrder/Peterfalvi/S14_MaximalI.lean`（原則 lane b）の
 > うち **`exists_typeICovering` 定理（line 2639–2798、(8.17.a) type-I covering）の carrier-consumer 部分**は
 > **lane d 所有**として扱う。理由: この定理は lane d 所有の S10 carrier `BGTheoremECoverData` /
 > `BGTheoremETypeICovering`（carve-out 0086）を直接 consume するので、carrier API の変更
@@ -110,6 +116,19 @@
 > 逸脱としない**（lane a がこのファイルを編集したら逸脱; lane b が他の S09 ファイル＝
 > `S09_NonexistenceCertain.lean` 等を編集したら逸脱）。lane b は別ファイル隔離ゆえ lane a の S09 本体と
 > 衝突しない。恒久解（現状維持 / `S07_*` rename / S09 統合）は issue 0090 で追跡。
+>
+> **carve-out (issue 0096, hub 裁定 2026-07-02 ユーザー委任レビュー)**:
+> `OddOrder/Peterfalvi/S10_MinimalSimpleStructure.lean`（原則 lane a）のうち **§8 Dade-support 宣言群**
+> — `typeII_A_sets_TI` / `typeII_A_sets_normalizer` / `dadeSupportHypotheses_typeI` /
+> `dadeSupportHypotheses_typeP` / `support_mutual_exclusion`（+ これらの直接 helper 新設）— は
+> **lane b 所有**として扱う（(8.18.c)→(12.3)→(12.14–16) chain + issue 8022 route B の前提 = β 主題;
+> b による `support_mutual_exclusion` の実証明 `65a2be52` は false-statement 修正として受理済 =
+> issue 9003 裁定）。`S10_BGInterface.lean` への A₁/σ♯/M̃ bridge 補題の**追加**も b 許容
+> (既存宣言の変更は要 hub flag)。⟹ **step 1.5 で lane b の S10/S10_BGInterface 編集は、hunk が
+> 上記宣言 (+新 helper) の文脈に収まる場合は逸脱としない**。S10 のそれ以外（bgTheoremE carrier・
+> `hall_*`・type-classification structural）を b が編集したら従来通り逸脱; lane a は上記 5 宣言を
+> 編集しない。恒久解 = §8 support theory 完成後に dedicated leaf（例 `S10_DadeSupport.lean`）へ
+> hub prefix-split（issue 0096 で追跡）。
 1. 各レーンの未マージ確認: `git log --oneline main..<branch>`。
    **全レーン 0 なら「変化なし」1行報告で即終了**（build を走らせない）。
 1.5. **レーン範囲逸脱チェック（ユーザー方針 2026-06-22, 永続）**: 未マージがあるレーンについて、
@@ -121,8 +140,8 @@
    **マージせず（trial merge も開始しない）**、⛔ に従いループ停止（abort 不要 = まだ merge していない、
    `CronDelete` + 報告 + 以降の tick を行わない）。報告には逸脱ファイル名 + lane + 所有者を明記。例 (lane=$b):
    ```
-   owned_re='^OddOrder/Peterfalvi/S(0[3-9]|1[0-6])|^OddOrder/BG/|^OddOrder/FeitThompson'  # 全 Pf S03-16 + BG を許容; per-lane 厳密判定は 🔒 マップ (a=S03-13/b=S14_MaximalI/c=S15-16/d=BG)
-   shared_re='^OddOrder/AxiomsCheck\.lean$|^OddOrder\.lean$|^OddOrder/GroupTheory/|^OddOrder/Mathlib/|^OddOrder/Algebra/|^OddOrder/FeitThompson'  # GroupTheory/Mathlib/Algebra=汎用 infra (全 lane 加算可)、FeitThompson は a/d 共有
+   owned_re='^OddOrder/Peterfalvi/S(0[3-9]|1[0-6])|^OddOrder/BG/|^OddOrder/FeitThompson'  # 全 Pf S03-16 + BG を許容; per-lane 厳密判定は 🔒 マップ (a=S03-13+FeitThompson / b=S14_MaximalI+coherence+carve-out 0090/0096 / c=S15-16; BG=共有凍結)
+   shared_re='^OddOrder/AxiomsCheck\.lean$|^OddOrder\.lean$|^OddOrder/GroupTheory/|^OddOrder/Mathlib/|^OddOrder/Algebra/|^OddOrder/FeitThompson'  # GroupTheory/Mathlib/Algebra=汎用 infra (全 lane 加算可)。FeitThompson は regex 互換で残すが実際は lane a 所有 — a 以外の FT 編集は 🔒 マップ注記どおり hub flag
    git diff --name-only main...$b -- '*.lean' | grep -vE "$owned_re" | grep -vE "$shared_re" | grep . && echo "範囲逸脱 → STOP"
    ```
    逸脱なし（空）→ step 1.6 へ。共有ファイル・notes・issues のみの差分は逸脱でない。
@@ -131,7 +150,7 @@
    （未所有 leaf `OddOrder/(Algebra|GroupTheory|Mathlib)/**`）を同時並行構築する重複を防ぐ。各 tick で:
    - **(a) 同一 leaf path の衝突**: 2 つ以上のレーンが**同じ新規** shared-infra `.lean` を追加していないか。
      ```
-     for L in a b c d; do git diff --name-only --diff-filter=A main...$L -- \
+     for L in a b c; do git diff --name-only --diff-filter=A main...$L -- \
        'OddOrder/Algebra/**' 'OddOrder/GroupTheory/**' 'OddOrder/Mathlib/**'; done | sort | uniq -d | grep . \
        && echo "shared-infra path 衝突 → STOP"
      ```
@@ -140,7 +159,7 @@
    - **(c) 同一 ref の 2 claim**: open 9000 番台 issue に同じ教科書 ref / 補題名の claim が 2 件 → STOP。
    検出したら **STOP + 報告**（より完成度の高い方を残し、他方を cite に rebase させる指示。浪費は ~1 tick に
    有界）。空 → step 2 へ。**grandfather**: 2026-07-01 前 landing 済 leaf（`GaloisRationalInteger.lean` 等）は対象外。
-2. **a → b → c → d の順**で（独立レーンゆえ順序は形式的、上流→下流の自然順）、未マージがあれば自動合流:
+2. **a → b → c の順**で（独立レーンゆえ順序は形式的、上流→下流の自然順）、未マージがあれば自動合流:
    - マージ前の実 sorry 数を記録: `bin/count-sorry`
      （prose 偽陽性 [sorry-free / sorryAx / `sorry'd` / backtick 引用] を除外する判定器。
        旧 `grep '(^|[^a-zA-Z-])sorry'` は 259 と過大計上したが count-sorry は 146 ≈ 実 141。
@@ -188,7 +207,7 @@
    失敗は報告)。変化なし/全 abort なら push しない。
 6. **サマリ報告**: 各レーン {マージ済 N commits / コンフリクト abort / 待機 / 変化なし} + 未マージ残数
    + サイズ flag + push 結果。
-7. **LOOP GATE VERDICT 維持 (2026-06-17 追加, [`lane_loop_policy.md`](lane_loop_policy.md))**: 各 worktree の
+7. **LOOP GATE VERDICT 維持 (2026-06-17 追加, [`lane_loop_policy.md`](lane_loop_policy.md); ⚠ 以下の例中のレーン名 h/G/F/B は 2026-06-28 改名前の旧名 = 履歴。現行レーンは a/b/c)**: 各 worktree の
    `LAUNCH.md` 冒頭「▶ LOOP GATE」ブロックは各レーンが起動時に `/loop` を自己選択する判定材料。**毎 tick で
    再監査はしない** (重い)。代わりに、今 tick のマージが**他レーンの gate を解いた**ときだけ VERDICT を見直す:
    - `typeP_duality` (lane-h) が proved → G の conjunct 2/assembly + F の §16/POLE-2 が解禁 → G/F の VERDICT を
@@ -261,6 +280,15 @@
 
 ## 現状メモ
 
+- **2026-07-02 (夕) — hub 全体レビュー (ユーザー委任) + 再編 follow-through 完遂**: lane-role review
+  (5 並列 agent) で a/b/c とも on-role・honest 進捗を確認 (b のみ partial = S10 edit 1 件 → 受理)。実施:
+  (1) issue 整理 — 0086/0088/0092/0093/4014 close (supersede/解消注記)、8022 の d-carve-out 失効注記、
+  9000 claim を lane a へ承継注記。(2) 裁定 (issue 9003) — b の `65a2be52` (S10 `support_mutual_exclusion`
+  実証明 = false-statement 修正) を**受理 (keep in S10)**、**§8 Dade-support 宣言群を lane b に carve-out
+  (issue 0096)**、(6.5.c) claim 未起票と b の main 17 遅れをリマインド。(3) 本ファイル +
+  ft_lane_reallocation + ft_path_policy の 3 レーン整合化 (旧 4 レーン operative 記述を修正/履歴化)。
+  検証: on-path unowned sorry = 0、`FeitThompson.lean` 0 sorry、共有ゾーン 0 sorry (comment-strip census
+  103 sorry: a 28 / b 13 / c 32 / BG 凍結 15 / Pf Appendices 凍結 15)。
 - **2026-07-02 — 3 レーン再編 (ユーザー裁定): lane d 退役、a/b/c に縮約**。char endgame が密結合パイプライン
   (coherence→σ-theory→§10-13→§13-16→S16) と判明、ungated frontier 上流集中で下流 (c/d) が反復 stall →
   3 レーンに縮約。**lane d 退役** (σ-theory dichotomy sorry-free 完成、残 tail = S11 consumer=a に fold、

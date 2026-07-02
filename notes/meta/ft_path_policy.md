@@ -117,11 +117,13 @@ S16.Hypothesis の構成は 2 本の独立トラックの合流:
 Isaacs Ch.1–7 ✅ → BG App.A/B ✅ → BG §1–§16 local 解析 → **BG §16 endpoints**
 （`BG.Ch4_FamilyOfMaximal.S16_MainResults`: Thm A–E / Prop 16.1 / Thm I–II）。
 Pf §10 が `S16_MainResults` を **import 済**（statements 在・sorried・cite 可）= **G1 ゲート**。
-担当 = lanes **F / G / H**。**真の FT ボトルネック**（§14–16 が active frontier）。
+担当 = ~~lanes F / G / H~~（旧レーン名 = 履歴。現行 3 レーン a/b/c、正本 =
+[`ft_lane_reallocation_2026_06_28.md`](ft_lane_reallocation_2026_06_28.md)）。**真の FT ボトルネック**（§14–16 が active frontier）。
 
 ### Track C — character theory（→ G2）
 Pf §3–§9 character API（Dade isometry, coherence, 指標 index 族）。
-Pf §10–16 spine がこれを consume = **G2 ゲート**。担当 = lane **B**。
+Pf §10–16 spine がこれを consume = **G2 ゲート**。担当 = ~~lane B~~（旧レーン名 = 履歴。現行は
+coherence infra = lane b、正本 = `ft_lane_reallocation_2026_06_28.md`）。
 
 ### 合流 — Pf §10–16 spine
 G1（BG §16, import 済）と G2（§3–§9, **現状 opaque field で代用＝未 cite**）を両方 consume し
@@ -146,11 +148,11 @@ Isaacs✅ ─ BG AppA/B✅ ─ BG §1-16 ─┐
 **「今 consume / import されていない」を off-path の根拠にしない**（[[scaffold-sorry-free-not-done]] の逆向きの誤り）。
 
 ### ✅ ON-PATH（ここを作業）
-| 区分 | 範囲 | 担当 |
+| 区分 | 範囲 | 担当 (⚠ 旧レーン名 = 履歴; 現行 a/b/c は `ft_lane_reallocation_2026_06_28.md`) |
 |---|---|---|
-| Track L | BG §7–§16 spine + App.A/B/C | F / G / H |
-| Track C | Pf §3–§9 character API の **§10–16 が consume する slice のみ**（§4 の surface） | B |
-| 合流 | Pf §10–16 spine（opaque→cite 置換 + 実証明） | B / §10–16 owner |
+| Track L | BG §7–§16 spine + App.A/B/C | ~~F / G / H~~ → BG は完了・共有凍結 (2026-07-02) |
+| Track C | Pf §3–§9 character API の **§10–16 が consume する slice のみ**（§4 の surface） | ~~B~~ → b (coherence infra) |
+| 合流 | Pf §10–16 spine（opaque→cite 置換 + 実証明） | ~~B / §10–16 owner~~ → a (§10–13) / b (S14) / c (S15–16) |
 
 ### ❄ OFF-PATH（honest な FT 証明が必要としない — FT が閉じるまで凍結、新規着手しない）
 - **Pf Appendices**（`FeitSibley`/`Huppert`/`NearFields`/`SemilinearField`/`Suzuki`/`Suzuki2Groups`）
@@ -228,7 +230,12 @@ producer（§14/§6 構造 obligation）= issue 7001**。standalone な positive
 
 ---
 
-## 5. lane 割当（2026-06-25 relane #9 = 4 独立フロント W1-W4。正本 = [`ft_frontier_remap_2026_06_25.md`](ft_frontier_remap_2026_06_25.md)）
+## 5. lane 割当（❌ SUPERSEDED — 履歴。現行正本 = [`ft_lane_reallocation_2026_06_28.md`](ft_lane_reallocation_2026_06_28.md) の 3 レーン a/b/c、2026-07-02 再編）
+
+> 本節の W1–W4 × F/C/B/H 割当は 2026-06-25 relane #9 時点の記録
+> （当時の正本 = [`ft_frontier_remap_2026_06_25.md`](ft_frontier_remap_2026_06_25.md)）。
+> **現在の lane↔クラスタ対応・所有はここを読まないこと** — 2026-06-28 に a/b/c/d へ全面再配分、
+> 2026-07-02 に lane d 退役で a/b/c の 3 レーン。以下は温存された履歴。
 
 honest FT 経路 (~27 sorry) を **数学的に独立な 4 フロント**に再カット (検証 `wf_33ba58ab-bf5`)。
 旧「ファイル所有ベース 4 レーン」は 4 フロントとズレており relane #1-#8 の idle の正体だった。

@@ -41,7 +41,7 @@
 
 ---
 
-## 1. 4 クラスタ × 4 レーン (🔒 ownership)
+## 1. 3 クラスタ × 3 レーン (🔒 ownership; 2026-07-02 再編後 — 初版は 4×4、下記履歴注記参照)
 
 | lane | worktree | クラスタ | 主所有ファイル | ODD_ISSUE_BASE |
 |---|---|---|---|---|
@@ -83,16 +83,23 @@
 carrier 宣言とその consumer が複数レーンの所有ファイルに跨るため、以下の sub-file 例外を設ける
 (step 1.5 範囲逸脱チェックの除外規則。詳細手順は [`merge_monitor.md`](merge_monitor.md) の 🔒 マップ直下):
 
-- **issue 0086**: `Peterfalvi/S10_MinimalSimpleStructure.lean` の `BGTheoremECoverData` 構造 +
-  `BGTheoremETypeICovering`/`BGTheoremENonTypeICovering` + `bgTheoremE_cover_data` 定理 (BG Thm E carrier,
-  Pf 8.17) は原則 lane a の S10 内だが **lane d 所有** (b/c/d 共有 consumer)。
+- **issue 0086 — ❌ 解消 (2026-07-02 lane d 退役)**: `Peterfalvi/S10_MinimalSimpleStructure.lean` の
+  `BGTheoremECoverData` 構造 + `BGTheoremETypeICovering`/`BGTheoremENonTypeICovering` +
+  `bgTheoremE_cover_data` 定理 (BG Thm E carrier, Pf 8.17) は旧 lane d 所有だったが、
+  **file owner = lane a に fold** (issues/closed/0086)。
 - **issue 0087 → ❌ 撤回 (issue 0089, 2026-06-30)**: `Peterfalvi/S07_RhoProjection.lean` は lane b 所有として
   導入されたが、S09 `chiRho` 機構 (=教科書 §7、S番号=§+2) の完全重複と判明し**削除済** (ユーザー裁定 D)。
   (12.16) path は S09 `chiRho`/`Hypothesis78`/`NormEstimates` を cite。memory `s09-is-section7-chirho-complete`。
-- **issue 0088**: `Peterfalvi/S14_MaximalI.lean` の `exists_typeICovering` 定理 (8.17.a type-I covering) は原則
-  lane b だが、上記 0086 の S10 carrier API を直接 consume するため、**carrier-consumer 部分は lane d 所有**
-  (role split: b = covering math 8.13.c1/8.8.a の本体、d = carrier API 追従)。恒久解 = carrier-consumer を
-  d 所有 helper に抽出し `exists_typeICovering` から cite (issue 0088 で追跡)。
+- **issue 0088 — ❌ 解消 (2026-07-02 lane d 退役)**: `Peterfalvi/S14_MaximalI.lean` の
+  `exists_typeICovering` carrier-consumer 部分は旧 lane d 所有だったが、**S14_MaximalI 全体が lane b**
+  に一本化 (issues/closed/0088)。今後の carrier API 変更 (S10 = lane a) は a→b の通常 cross-lane
+  通知 (notes/issue) で扱う。
+- **issue 0096 (hub 裁定 2026-07-02, ユーザー委任レビュー)**: `Peterfalvi/S10_MinimalSimpleStructure.lean`
+  の **§8 Dade-support 宣言群** (`typeII_A_sets_TI` / `typeII_A_sets_normalizer` /
+  `dadeSupportHypotheses_typeI` / `dadeSupportHypotheses_typeP` / `support_mutual_exclusion` +
+  直接 helper 新設) は **lane b 所有** ((8.18.c)→(12.3)→(12.14–16) chain + issue 8022 route B の前提)。
+  `S10_BGInterface.lean` への A₁/σ♯/M̃ bridge 補題追加も b 許容。詳細 = issues/0096 +
+  merge_monitor 🔒 マップ直下の carve-out 節。
 
 ### 各クラスタの最深 body (2026-06-28 監査の file:line、随時更新)
 
@@ -107,9 +114,11 @@ carrier 宣言とその consumer が複数レーンの所有ファイルに跨�
   `exists_MHypothesis` (14.10, `S16:3709`)・`betaM_expansion` (14.11.2, `S16:1954`)・`T_typeII` (14.9, `S16:1564`)・
   §15 `basic_structure_gated` (13.1.d/e, `S15_SAndT_Setup.lean:283`)・`character_degree_analysis` (`:386`)・
   `lambda_forces_T_caseB` (`:394`)・`normalizer_W1` (13.16, `S15_SAndT.lean:140`) + 13.17 構造。
-- **δ (lane-d)**: BG Thm D(3)/(4) **signalizer functor** R(x) (issue 8019/8020, `S16_MainResults.lean:1075`)・
-  Thm A/B/E 残 conjunct (`166/276/1223`)・`aSets_support_slice` (`1236`)・reverse bridges (issue 8015)。
-  headline `proposition_type_classification` は既に sorry-free。
+- ~~**δ (lane-d)**~~ **退役 (2026-07-02)**: BG §14–16 の spine 消費 endpoint は全 sorry-free で完了・
+  共有凍結。残 owned sorry (signalizer Thm D/E・Thm A/B monolith・`aSets_support_slice` 等 15 個) は
+  全て off-feitThompson-path と検証済 ([[ft-settled-findings]] / issues/closed/4014)。headline
+  `proposition_type_classification` は sorry-free。σ-theory generic leaf 群は共有ゾーンに sorry-free
+  凍結、tail は lane a に承継 (issue 9000)。
 
 ---
 
@@ -119,14 +128,16 @@ carrier 宣言とその consumer が複数レーンの所有ファイルに跨�
 
 | 消費側 | 生産側 (cite 先) | contract (pin 済み statement) |
 |---|---|---|
-| β (§12) | δ | `typeP_duality` (BG §16, 既存) |
+| β (§12) | BG 共有凍結 (旧 δ、sorry-free 済) | `typeP_duality` (BG §16, 既存) |
 | β (§12) | α | §10–11 char 結果 (type 判定) |
 | γ (POLE-2) | α | §11 Dade-norm engine |
-| γ (POLE-2) | δ | §16 構造 (maximal pair / type-P) |
-| FT spine (`FeitThompson.lean`) | a/b/c/d 全 headline | `Section16Inputs` 3-producer assembly (配線済) + `card_kappaHall_lt_of_isTypeIIIorIV` (:426) + `theorem88_caseB_holds` |
+| γ (POLE-2) | BG 共有凍結 (旧 δ、sorry-free 済) | §16 構造 (maximal pair / type-P) |
+| FT spine (`FeitThompson.lean`) | a/b/c 全 headline (旧 δ headline `proposition_type_classification` は sorry-free 済) | `Section16Inputs` 3-producer assembly (配線済) + `card_kappaHall_lt_of_isTypeIIIorIV` (:426) + `theorem88_caseB_holds` |
 
-**共有ファイル `FeitThompson.lean`**: α が `:426` (`card_kappaHall_lt_of_isTypeIIIorIV`)、δ が carrier 宣言群を
-所有。宣言境界での prefix-split 規律で衝突回避、互いの宣言は触らない。
+**`FeitThompson.lean` (2026-07-02 更新)**: **lane a が全体所有** (`:426`
+`card_kappaHall_lt_of_isTypeIIIorIV` + 旧 δ carrier 宣言群、d 退役で fold)。他レーンが carrier 宣言
+(`Section16Inputs` 等) に field を追加する必要があるときは hub/issue 経由で承認合流
+(先例: lane c の `S_U_commutative`/`Sdata_W2_eq` 追加 = 構成子供給付き、hub 承認)。
 
 **未存在の cross-ref が要るとき**: consuming 側が statement を**先に書いて (sorried theorem として) pin** し、
 `notes/`・issue で hub に告知。両レーンが contract に対して並行作業。**body 完成を待たない。**
