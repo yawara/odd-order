@@ -190,6 +190,98 @@ theorem exists_isIrreducibleCharacter_eq {W : Type*} [AddCommGroup W] [Module �
 
 end Transfer
 
+section EqualCharacter
+
+variable {G : Type*} [Group G] {V W : Type*} [AddCommGroup V] [Module ℂ V]
+  [AddCommGroup W] [Module ℂ W]
+
+set_option backward.isDefEq.respectTransparency false in
+/-- **Irreducibility transports along an equivalence of representations.**  The underlying
+linear equivalence upgrades to a `ℂ[G]`-linear equivalence of the `asModule`s
+(`equivLinearMapAsModule`), and simplicity transports across it. -/
+theorem Representation.IsIrreducible.of_equiv {ρ : Representation ℂ G V}
+    {σ : Representation ℂ G W} [Representation.IsIrreducible ρ] (φ : ρ.Equiv σ) :
+    Representation.IsIrreducible σ := by
+  have hbij : Function.Bijective
+      (Representation.IntertwiningMap.equivLinearMapAsModule ρ σ φ.toIntertwiningMap) :=
+    φ.toLinearEquiv.bijective
+  let L := LinearEquiv.ofBijective
+      (Representation.IntertwiningMap.equivLinearMapAsModule ρ σ φ.toIntertwiningMap) hbij
+  haveI := (Representation.irreducible_iff_isSimpleModule_asModule ρ).mp
+    ‹Representation.IsIrreducible ρ›
+  rw [Representation.irreducible_iff_isSimpleModule_asModule]
+  exact IsSimpleModule.congr L.symm
+
+variable [FiniteDimensional ℂ V] [FiniteDimensional ℂ W]
+
+/-- **A representation with the character of an irreducible one is isomorphic to it**
+(character completeness for representations).  If `ρ` is irreducible and `σ` is any
+finite-dimensional representation with `χ_σ = χ_ρ`, then `ρ ≅ σ` — `σ` is *not* assumed
+irreducible.
+
+`dim Hom_G(ρ, σ) = ⟨χ_σ, χ_ρ⟩ = ⟨χ_ρ, χ_ρ⟩ = dim Hom_G(ρ, ρ) = 1` (Schur), so there is a
+nonzero intertwiner `T : ρ → σ`; its kernel is a proper subrepresentation of the irreducible
+`ρ`, hence `⊥`, so `T` is injective; the dimensions agree (`χ_σ(1) = χ_ρ(1)`), so `T` is an
+isomorphism. -/
+theorem nonempty_equiv_of_character_eq [Finite G] [Invertible (Nat.card G : ℂ)]
+    (ρ : Representation ℂ G V) [Representation.IsIrreducible ρ]
+    (σ : Representation ℂ G W) (hchar : σ.character = ρ.character) :
+    Nonempty (ρ.Equiv σ) := by
+  haveI : Fintype G := Fintype.ofFinite _
+  -- `dim Hom_G(ρ, σ) = dim Hom_G(ρ, ρ) = 1`
+  have h1 := Representation.card_inv_mul_sum_char_mul_char_eq_finrank ρ σ
+  have h2 := Representation.card_inv_mul_sum_char_mul_char_eq_finrank ρ ρ
+  rw [hchar] at h1
+  have hrr : finrank ℂ (Representation.IntertwiningMap ρ ρ) = 1 := by
+    have hbij : Function.Bijective
+        (Algebra.linearMap ℂ (Representation.IntertwiningMap ρ ρ)) :=
+      Representation.IsIrreducible.algebraMap_intertwiningMap_bijective_of_isAlgClosed
+        (ρ := ρ)
+    rw [← (LinearEquiv.ofBijective _ hbij).finrank_eq, Module.finrank_self]
+  have hfr : finrank ℂ (Representation.IntertwiningMap ρ σ) = 1 := by
+    have h3 : ((finrank ℂ (Representation.IntertwiningMap ρ σ) : ℂ))
+        = (finrank ℂ (Representation.IntertwiningMap ρ ρ) : ℂ) := h1.symm.trans h2
+    have h4 : finrank ℂ (Representation.IntertwiningMap ρ σ)
+        = finrank ℂ (Representation.IntertwiningMap ρ ρ) := by exact_mod_cast h3
+    rw [h4, hrr]
+  -- a nonzero intertwiner exists
+  haveI : Nontrivial (Representation.IntertwiningMap ρ σ) :=
+    Module.nontrivial_of_finrank_pos (by rw [hfr]; norm_num)
+  obtain ⟨T, hT0⟩ := exists_ne (0 : Representation.IntertwiningMap ρ σ)
+  -- its kernel is a proper subrepresentation of the irreducible `ρ`, hence trivial
+  have hker : T.ker = ⊥ := by
+    have h5 : IsSimpleOrder (Subrepresentation ρ) := ‹Representation.IsIrreducible ρ›
+    rcases h5.eq_bot_or_eq_top T.ker with h | h
+    · exact h
+    · exfalso
+      apply hT0
+      apply Representation.IntertwiningMap.ext
+      apply LinearMap.ext
+      intro v
+      have hv : v ∈ T.ker := by
+        have h6 : T.ker.toSubmodule = (⊤ : Subrepresentation ρ).toSubmodule := by rw [h]
+        have h7 : v ∈ T.ker.toSubmodule := by
+          rw [h6]
+          exact Submodule.mem_top
+        exact h7
+      rw [Representation.IntertwiningMap.mem_ker] at hv
+      simpa using hv
+  have hinj : Function.Injective T.toLinearMap := by
+    rw [← LinearMap.ker_eq_bot]
+    have h8 : T.ker.toSubmodule = LinearMap.ker T.toLinearMap := rfl
+    rw [← h8, hker]
+    rfl
+  -- equal characters at `1` give equal dimensions, so `T` is an isomorphism
+  have hdim : finrank ℂ V = finrank ℂ W := by
+    have h9 : σ.character 1 = ρ.character 1 := congrFun hchar 1
+    rw [Representation.char_one, Representation.char_one] at h9
+    exact_mod_cast h9.symm
+  have hsurj : Function.Surjective T.toLinearMap :=
+    (LinearMap.injective_iff_surjective_of_finrank_eq_finrank hdim).mp hinj
+  exact ⟨Representation.IntertwiningMap.ofBijective T ⟨hinj, hsurj⟩⟩
+
+end EqualCharacter
+
 section VirtualCharacters
 
 variable {G : Type*} [Group G]
