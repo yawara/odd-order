@@ -202,3 +202,13 @@ hub 指示どおり **generic 化** (`{Γ}`+`{k}` 抽象、8.2.c の `hle`/abeli
 両 sorry-free、`lake build` 緑 (leaf 1085 jobs / S14 除去後も 3855 jobs green)。type-F 特殊化 (8.2.c=`typeF_inertia_inf_le_U1`
 を cross-file cite して `hle` 供給) は **consumer 側** (S14 の `typeI_induced_char_constituents` を埋める時、lane b or
 lane c の新 Pf leaf) が実施 — lane c は S14 を編集しない。以後 Clifford は必ず shared leaf で build。
+
+## 📌 HUB watch note (2026-07-02, ユーザー委任レビュー)
+
+lane-role review で確認: claim・relocate 対応・周辺 infra (~15 補題 sorry-free: CharacterProduct /
+RepresentationDeterminant / InertiaAbelianQuotient) はすべて正当・on-role。**watch item = (G1)
+extension 本体**: 直近 3 commits は小さい周辺 brick (rep-det 系 8–40 行) で、(G1) の core pieces
+(i) invariant-θ intertwiner / (ii) Schur scalar / (iii) n-th root 正規化 / (iv) 拡張構成 / (v) abelian
+iterate は未着手。次回 hub レビューで (i)–(iii) が landing し始めているかを確認する — 周辺 brick の
+追加が続くだけなら難所回避シグナルとして flag ([[feedback-no-avoiding-hard-parts]])。multi-session
+なのは想定内 (slow discharge ≠ stall)。

@@ -79,3 +79,26 @@ gate map を認識・記録。**(12.6) coherence tower DONE は β-lane の主�
 
 **評価**: これは α→β の自然な依存で reallocation 不要。lane b は §12 downstream skeleton + Clifford/他 ungated
 work で継続可能ゆえ stall しない見込み。lane b の cluster 枯渇の兆候が出たら cluster-off-spine 手順 (policy 7)。
+
+## ✅ HUB 裁定 (2026-07-02, ユーザー委任レビュー) — S10 edit 受理 + §8 support theory carve-out (issue 0096)
+
+**1. `65a2be52` (S10 `support_mutual_exclusion` 実証明) = 受理 (keep in S10)。**
+旧 statement は **false as stated** (nonconjugacy 仮説欠落 — 共役な S=T で mutual support が成立)。
+b の edit は仮説追加 (`IsTypeI S/T` + `¬IsConjugateSubgroup`、(8.18.c) caller が全て供給) +
+sorry-free/axiom-clean 実証明 (proven BG pieces `conjClassSet_Mtilde_disjoint` 等の assembly、
+hub が diff/proof を検証済)。issue 0091 (Hypothesis78 弱化受理) と同型の statement-soundness 改善。
+次 merge tick で通常合流。上記「lane a の S10/S11 は編集しない」指示のうち **§8 Dade-support
+宣言群は issue 0096 carve-out で b 所有に変更** (下記)、それ以外の S10/S11 は従来通り編集禁止。
+
+**2. §8 support theory の所有 = lane b (scoped carve-out、issue 0096)。**
+loop⁹⁸ の「(8.18.c) mixed Ã₁∩Ã support theory は deep §8 で β 最適作業と言い難い」への回答:
+**これは β の最深 body そのもの** ((12.3)→(12.14-16)→(12.16) 最終矛盾 + issue 8022 route B の前提)。
+回避・pivot・reallocation はしない。b は S10 の §8 Dade-support 宣言群
+(`typeII_A_sets_TI/normalizer`・`dadeSupportHypotheses_typeI/typeP`・`support_mutual_exclusion` +
+S10_BGInterface bridge 追加) を issue 0096 carve-out の範囲で**正面から build** する。
+Cluster A の type-classification structural ((8.16)/(10.10)/(11.6)/(9.7.b)/(8.6.a)) は従来通り
+S14 に pin して cite (lane a territory、carve-out 対象外)。
+
+**3. リマインド**: (a) 9001 裁定の **(6.5.c) coherence producer の 9000 番台 claim が未起票** —
+build 着手前に必ず `bin/new-issue --base 9000` で起票 (policy 6)。(b) b は main に 17 commits
+遅れ (最終 merge 44ccb169) — **次 leaf 着手前に `git merge main`** (CLAUDE.md 同期規則)。

@@ -223,6 +223,19 @@ frontier 内 = **carve せずに触ると dup** (σ-theory dup 前例 = issue 90
 lane d は裁定待ちの間 idle にせず、次 tick で main 同期して (a/b/c の進捗で新規 consumable が出たか /
 hub 応答があるか) 再評価する。
 
+## 🧾 claim 承継 (2026-07-02 hub、lane d 退役 — issue は OPEN 維持)
+
+claim holder (lane d) は 3 レーン再編で退役。**claim は lane a に承継** (σ-theory tail、
+`ft_lane_reallocation` 3 レーン再編節で fold 済):
+- σ-theory generic engine (`SingerLineBound` / `SemilinearImprimitiveBound` / `LineScalarCharacter` /
+  `TypePGaloisUBound` / `GaloisCharacter` / `SkolemNoether`) は **sorry-free で共有ゾーン凍結**
+  (2026-07-02 comment-strip 検証済)。
+- 残 = 上記「残 (lane a assembly、W₁ 依存)」= block 分解 `Hbar=⊕H1^w` + `hconst` 供給、および
+  HUB 裁定の **S11 dup 3 定理 retire→generic leaf cite**。lane a が 11.8 chain の次の自然な区切りで
+  文書順 (S11=§9 < §11.8) により着手する。
+- 上記「🛑 HUB: lane d cluster boundary — 次 target 要裁定」節は退役で **moot** (選択肢 A/B/C は不要)。
+(2026-07-02 hub、ユーザー委任レビュー)
+
 ## 参照
 
 - Coq `coq/theories/PFsection9.v:323-560` (`typeP_Galois` / `typeP_Galois_Pn` (9.7.a) / `typeP_Galois_P` (9.7.b))

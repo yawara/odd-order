@@ -89,6 +89,19 @@ deep、escape が起きれば false) / (B) **M̃ route** = §8 Dade hypothesis f
 - 別構造 = `FamilyHypothesis71.G0` (S09:660, dadeSupport-based) + `family_inequality`。
 - [[scaffold-sorry-free-not-done]] [[gate2-typeF-tau2-reduction-is-false]]
 
+## 🧾 状態整理 (2026-07-02 hub、lane d 退役後 — issue は OPEN 維持)
+
+- **一時 cross-lane carve-out (lane d への S09/S14_MaximalI 編集権) は lane d 退役で失効**。
+  merge_monitor.md の 🔀 block は除去済。a/b/c への「S09 FrobeniusFamily / S14 `not_all_maximal_typeI`
+  周辺の編集を避ける」要請も**解除** (atomic 変更の主体が退役したため)。
+- lane d の prep は landed 済・有効: M̃-cover 補題群 (S14_TypePCounting) / `familyHyp71_*` G₀={1}
+  helpers (S10) / NonTypeICovering 分岐 sorry-free 化。
+- **残タスク (route B) の owner 更新 (3 レーン)**: per-rep §8 Dade hypothesis
+  (`dadeSupportHypotheses_typeI` 8.15, S10:556) は **issue 0096 carve-out で lane b** (consumer =
+  b の `not_all_maximal_typeI` → `theorem88_caseB_holds` chain)。char 入力 (~30、§7-9 coherence/
+  chiRho) は S09 既存機構 (lane a) + coherence infra (lane b) を cite。
+(2026-07-02 hub、ユーザー委任レビュー)
+
 ## 🚧 route B は lane-a/c の §8 Dade work に block (lane d /loop⁵³ 確定)
 
 route B の FamilyHypothesis71 assembly は **per-rep の §8 Dade 入力**を要し、全て lane-a/c の §8 領域:
