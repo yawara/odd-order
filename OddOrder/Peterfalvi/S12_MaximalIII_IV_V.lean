@@ -7239,6 +7239,54 @@ noncomputable def Hypothesis.SHC_isCoherent [Finite G]
   rw [hrange] at hcoh
   exact hcoh
 
+/-- **`ℤ[S(HC)]`-vanishing-at-`1` combinations are `A_0`-supported** (the Peterfalvi (5.x)
+`ℤ[S, M^#] = ℤ[S, A_0]` condition for the uniform degree-`w₁` family `S(HC)`).  Since every member
+`χ ∈ S(HC)` has the same degree `χ(1) = w₁`, any `φ = ∑ c_χ χ ∈ ℤ[S(HC)]` with `φ(1) = 0` has
+`w₁·∑ c_χ = 0`, hence `∑ c_χ = 0`, so `φ = ∑ c_χ (χ − χ₀)` collapses to a combination of the
+`A_0`-supported differences `χ − χ₀` (`inducedFamily_sub_support`).  Proved by `span_induction` on the
+strengthened invariant `(ψ − (ψ(1)·w₁⁻¹)·χ₀).support ⊆ A_0` (closed under `+`/`•`, `= χ − χ₀` on
+generators), specialized at `φ(1) = 0`.  This is the `hspan` hypothesis of the Galois-equivariance
+`IsCoherent.extension_mapRingEquiv_comm` for the `S(HC)`-coherent `τ₁`. -/
+theorem Hypothesis.SHC_zSpan_vanish_support [Finite G] {M : Subgroup G}
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis M) {φ : ClassFunction ↥M ℂ}
+    (hφ : φ ∈ OddOrder.Peterfalvi.S07.zSpan
+      {ψ : ClassFunction ↥M ℂ | ψ ∈ inducedFamily M ∧ IsIrreducibleCharacter ψ ∧
+        ((ψ : ↥M → ℂ) 1 = (hyp.w1 : ℂ))})
+    (hφ1 : φ 1 = 0) :
+    φ.support ⊆ hyp.A0 := by
+  haveI := hyp.finiteG
+  classical
+  have hw1ne : (hyp.w1 : ℂ) ≠ 0 := by
+    have h1 : 1 < hyp.w1 := (Subgroup.one_lt_card_iff_ne_bot _).mpr hyp.typeP.W1_nontrivial
+    exact_mod_cast Nat.cast_ne_zero.mpr (by omega : hyp.w1 ≠ 0)
+  obtain ⟨χ₀, hχ₀S, hχ₀irr, hχ₀1⟩ := exists_zeta_in_inducedFamily_degree_w1 hyp.typeP hG.odd
+    (typePData_W1_hall_coprime hG hyp.maximal (hyp.bgTypeP hG) hyp.typeP)
+  suffices hstrong : ∀ ψ ∈ OddOrder.Peterfalvi.S07.zSpan
+      {ψ : ClassFunction ↥M ℂ | ψ ∈ inducedFamily M ∧ IsIrreducibleCharacter ψ ∧
+        ((ψ : ↥M → ℂ) 1 = (hyp.w1 : ℂ))},
+      (ψ - (ψ 1 * (hyp.w1 : ℂ)⁻¹) • χ₀).support ⊆ hyp.A0 by
+    have h := hstrong φ hφ
+    rwa [hφ1, zero_mul, zero_smul, sub_zero] at h
+  intro ψ hψ
+  induction hψ using Submodule.span_induction with
+    | mem x hx =>
+        obtain ⟨hxS, _hxirr, hx1⟩ := hx
+        rw [hx1, mul_inv_cancel₀ hw1ne, one_smul]
+        exact hyp.inducedFamily_sub_support hxS hχ₀S (hx1.trans hχ₀1.symm)
+    | zero => simp
+    | add x y _ _ hx hy =>
+        have hrw : (x + y - ((x + y) 1 * (hyp.w1 : ℂ)⁻¹) • χ₀)
+            = (x - (x 1 * (hyp.w1 : ℂ)⁻¹) • χ₀) + (y - (y 1 * (hyp.w1 : ℂ)⁻¹) • χ₀) := by
+          rw [ClassFunction.add_apply]; module
+        rw [hrw]
+        exact (ClassFunction.support_add_subset _ _).trans (Set.union_subset hx hy)
+    | smul c x _ hx =>
+        have hrw : (c • x - ((c • x) 1 * (hyp.w1 : ℂ)⁻¹) • χ₀)
+            = (c : ℂ) • (x - (x 1 * (hyp.w1 : ℂ)⁻¹) • χ₀) := by
+          rw [← Int.cast_smul_eq_zsmul ℂ c x, ClassFunction.smul_apply]; module
+        rw [hrw]
+        exact (ClassFunction.support_smul_subset _ _).trans hx
+
 open scoped FiniteInduce in
 /-- **`‖ζ^{τ₁}‖² = 1` for the `S(HC)`-coherent extension** (α-grid `S₁`-`τ₁` input to (11.8.2)).
 The `S(HC)`-coherence `τ₁ = SHC_isCoherent.extension` is an isometry on `ℤ[S(HC)]`
