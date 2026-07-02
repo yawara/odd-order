@@ -280,6 +280,10 @@
 
 ## 現状メモ
 
+- **2026-07-02 (夜) — 監視停止 (ユーザー指示「監視はとめます。一区切りにします」)**: cron 1af200eb を
+  CronDelete。⛔ 停止 (問題起因) ではないので**自動再開しない** — 次の監視再開はユーザー指示を待って
+  `7,22,37,52 * * * *` で再作成する。停止時点: main = e0d9bcb5 (push 済・tree clean・full build green
+  3898 jobs)、`main..{a,b,c}` = 0、全レーン本日夕方以降 無 commit (lane セッション停止中とみられる)。
 - **2026-07-02 (夕) — hub 全体レビュー (ユーザー委任) + 再編 follow-through 完遂**: lane-role review
   (5 並列 agent) で a/b/c とも on-role・honest 進捗を確認 (b のみ partial = S10 edit 1 件 → 受理)。実施:
   (1) issue 整理 — 0086/0088/0092/0093/4014 close (supersede/解消注記)、8022 の d-carve-out 失効注記、
