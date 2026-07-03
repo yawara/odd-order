@@ -1,0 +1,46 @@
+/-
+Copyright (c) 2026 Yawara ISHIDA. All rights reserved.
+Released under Apache 2.0 license as described in the file LICENSE.
+-/
+import OddOrder.GroupTheory.RepresentationTheory.BrauerPermutationUnconditional
+import OddOrder.Peterfalvi.S08_CoherenceCorePart1
+
+/-!
+# Peterfalvi (7.9) parity primitive — real virtual characters over a group of odd order
+
+The Peterfalvi (7.9) dichotomy consumes the parity fact `cfdot_real_vchar_even`: for two **real**
+virtual characters `φ, ψ ∈ ℤ[Irr G]`,
+`2 ∣ ⟨φ, ψ⟩ ↔ (2 ∣ ⟨φ, 1_G⟩) ∨ (2 ∣ ⟨ψ, 1_G⟩)`.
+
+The proof pairs each irreducible `χ` with its complex conjugate `χ̄` (`IrreducibleCharacter.conjPerm`):
+for real `φ`, the Fourier coefficient `⟨φ, χ̄⟩` equals `⟨φ, χ⟩`, so a non-self-conjugate pair
+`{χ, χ̄}` contributes an even amount `2⟨φ,χ⟩⟨ψ,χ⟩` to `⟨φ,ψ⟩ = ∑_χ ⟨φ,χ⟩⟨χ,ψ⟩`; the only
+self-conjugate irreducible is the trivial one (`G` odd, Peterfalvi (1.1)), whose contribution is
+`⟨φ,1_G⟩⟨ψ,1_G⟩`.  Hence `⟨φ,ψ⟩ ≡ ⟨φ,1_G⟩⟨ψ,1_G⟩ (mod 2)`, and Euclid closes.
+
+This file builds the primitive incrementally.  First: the conjugation involution's only fixed point
+is the trivial character (odd order).
+-/
+
+namespace OddOrder.RepresentationTheory
+
+variable {G : Type*} [Group G] [Finite G]
+
+/-- **The conjugation involution's only fixed point is the trivial character** (odd order).  Combines
+`IrreducibleCharacter.conjPerm_eq_self_iff` (fixed point ↔ real) with Peterfalvi (1.1)
+`not_isReal_of_ne_trivial_of_odd_card'` (odd order ⟹ only the trivial irreducible is real).  This is
+the self-conjugate case in the (7.9) parity `cfdot_real_vchar_even` orbit-pairing argument. -/
+theorem conjPerm_eq_self_iff_eq_trivial_of_odd (hodd : Odd (Nat.card G))
+    (χ : IrreducibleCharacter G) :
+    IrreducibleCharacter.conjPerm G χ = χ ↔ χ = trivialIrreducibleCharacter G := by
+  rw [IrreducibleCharacter.conjPerm_eq_self_iff]
+  constructor
+  · intro hreal
+    by_contra hne
+    exact not_isReal_of_ne_trivial_of_odd_card' hodd hne hreal
+  · rintro rfl
+    have : (trivialIrreducibleCharacter G : ClassFunction G ℂ) = trivialClassFunction G := rfl
+    rw [this]
+    exact trivialClassFunction_isReal
+
+end OddOrder.RepresentationTheory
