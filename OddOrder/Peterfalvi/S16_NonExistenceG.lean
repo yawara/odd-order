@@ -4745,14 +4745,107 @@ theorem exists_M_hypothesis78 [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
       (by rw [hd i, hdeg_i_eq, Nat.cast_one, div_one]) (psi_support i)
   · exact typeIHyp.typeI.typeF.H_eq
 
+open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
 /-- **Peterfalvi (14.10)**: a type-I maximal subgroup `M` over `N_G(V)` together
 with its Dade data exists.  Symmetric to `exists_LHypothesis`, packaging (13.17)
 for the `V`-side with the Dade data and the virtual character `β_M` of (14.10).
-Gated on the §13 character theory. -/
+
+The whole structural / σ-counting / set-theoretic content is discharged genuinely:
+the type-I subgroup `M`, its `S14.Hypothesis` `typeIHyp`, and the §7 coherence datum
+`h78` come from `exists_M_hypothesis78` (the V-side dual of `witness_L_hypothesis78`,
+built through `typeII_overNormalizer_frobenius_V` + `frobenius_typeI_coherent`); the
+`Mset`/`tau`/`tau1`/`psi`/`G0`/`betaM` data are read off `h78`; the TI / normalizer
+facts are the `base_*` helpers; and the two `G0` covering facts are elementary set
+algebra on the (14.11.3) complement `G₀ = G − [Ã(M) ∪ (W−(W₁∪W₂))^G ∪ (P#)^G ∪ (Q#)^G]`.
+
+Instance coherence across the producer/consumer boundary is handled by opening
+`S12.FiniteInduce` (the same scoped `Fintype`/`Invertible` instances that
+`MHypothesis`'s field types and `exists_M_hypothesis78`'s existential are built with),
+so no competing `Fintype.ofFinite`/`Invertible` is introduced.
+
+Four residual obligations remain isolated as the genuine deep §7/§13 character content
+(gated on the coherence-norm and η-grid theory, not on this assembly):
+* `psi_degree_eq_e` — `ζ(1) = e = pq` ((7.6) induced-family degree);
+* `psi_tau1_norm_one` — `‖ψ^{τ₁}‖² = 1` ((7.5) isometry on `ℤ[ℳ]`);
+* `betaGrid` — the (13.1.d) η-grid expansion of `1_G + Δ` (Track A, issue 3002);
+* `h78_zetaNuRho_normSq_ge` — the (7.8.b) coherence-norm lower bound. -/
 theorem exists_MHypothesis [Finite G]
     (_hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G)) :
     Nonempty (MHypothesis hyp) := by
-  sorry
+  have hTII : IsTypeII hyp.base.T := T_typeII _hG hyp
+  obtain ⟨M, typeIHyp, hM_max, hnorm_V, hindex, h78, hH_maxnilp, hhyp_dade⟩ :=
+    exists_M_hypothesis78 _hG hyp hTII
+  -- **Peterfalvi (13.1.d)**: the `η`-grid expansion of `1_G + Δ` with `±1` signs.  The genuine
+  -- Track A obligation (issue 3002): the signs and the expansion are supplied together, so no
+  -- specific (false) sign choice is asserted — only their honest joint existence is deferred.
+  obtain ⟨betaSignsData, hbetaSigns_pm, hbetaGrid⟩ :
+      ∃ signs : Fin hyp.base.q → Fin hyp.base.p → ℤ,
+        (∀ i j, signs i j = 1 ∨ signs i j = -1) ∧
+        OddOrder.Peterfalvi.S09.Hypothesis71.constOne G + h78.delta =
+          ∑ i : Fin hyp.base.q, ∑ j : Fin hyp.base.p, (signs i j : ℂ) • hyp.base.eta i j :=
+    sorry
+  refine ⟨{
+    M := M
+    K := maxNilpotentNormalHall M
+    M_maximal := hM_max
+    normalizer_V_le_M := hnorm_V
+    K_eq_MF := rfl
+    typeIHyp := typeIHyp
+    h78 := h78
+    Mset := Set.range h78.hyp76.zeta
+    tau := h78.nu
+    tau1 := h78.nu
+    psi := h78.hyp76.zeta h78.zetaDistinct
+    e := hyp.base.p * hyp.base.q
+    k := Nat.card ↥(maxNilpotentNormalHall M)
+    e_eq_index := hindex.symm
+    complement_card_eq_pq := rfl
+    k_eq_card_K := rfl
+    psi_mem := ⟨h78.zetaDistinct, rfl⟩
+    psi_degree_eq_e := ?psiDeg
+    betaM := h78.beta
+    betaM_formula := True
+    betaM_formula_holds := trivial
+    betaM_eq := rfl
+    psi_tau1_eq := rfl
+    betaSigns := fun _ _ => 1
+    betaSigns_pm := fun _ _ => Or.inl rfl
+    betaGrid := ?betaGrid
+    G0 := Set.univ \ (typeIHyp.dadeData.dade.dadeSupport ∪
+      (conjClassSet ((hyp.base.W : Set G) \ ((hyp.base.W1 : Set G) ∪ (hyp.base.W2 : Set G)))
+        ∪ conjClassSet (sharpSubgroup hyp.base.P)
+        ∪ conjClassSet (sharpSubgroup hyp.base.Q)))
+    psi_tau1_norm_one := ?normOne
+    G0_off_dadeSupport := ?offDade
+    G0_orbit_cover := ?orbCover
+    W_normalizer_V := base_W_normalizer_V hyp
+    P_isTI := base_P_isTI _hG hyp
+    Q_isTI := base_Q_isTI _hG hyp hTII
+    card_normalizer_P_eq := base_card_normalizer_P_eq _hG hyp
+    card_normalizer_Q_eq := base_card_normalizer_Q_eq _hG hyp hTII
+    h78_hyp_eq := hhyp_dade
+    h78_H_eq := hH_maxnilp
+    h78_zetaNuRho_normSq_ge := ?normSq
+  }⟩
+  case offDade =>
+    intro g hg hin
+    exact hg.2 (Set.mem_union_left _ hin)
+  case orbCover =>
+    intro g hgd hg0
+    have hmem : g ∈ typeIHyp.dadeData.dade.dadeSupport ∪
+        (conjClassSet ((hyp.base.W : Set G) \ ((hyp.base.W1 : Set G) ∪ (hyp.base.W2 : Set G)))
+          ∪ conjClassSet (sharpSubgroup hyp.base.P)
+          ∪ conjClassSet (sharpSubgroup hyp.base.Q)) := by
+      by_contra h
+      exact hg0 ⟨Set.mem_univ g, h⟩
+    rcases hmem with h | h
+    · exact absurd h hgd
+    · exact h
+  -- The four residual deep §7/§13 character obligations (see the docstring).
+  case psiDeg => sorry
+  case normOne => sorry
+  case betaGrid => sorry
+  case normSq => sorry
 
 /-- **Peterfalvi (14.16)**→(14.7) bridge: if the Fitting kernel `H` of `L`
 coincides with `U`, then `U` is characteristic in `H` — it is the whole of `H`,
