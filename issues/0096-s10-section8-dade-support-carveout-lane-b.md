@@ -879,3 +879,14 @@ extension は 1 で同値、+ constant-degree)。**involved だが from-scratch 
 h_psig_int=12.15 の ρM=adjointAverageFun+cyclotomic、hA-C=§7 Hypothesis78/NormEstimates)。
 = sustained multi-iter build (from-scratch でない)。**(12.14) は strong milestone**。
 **次: ψ(1)=e を grind → h_psix landing** (genuine deep build、churn assessment を脱する)。
+
+### loop¹⁵² — ✅ h_psix cyclotomic 合同 landed (commit fcc499a2); 残 = ψ(1)=e
+
+`psi_apply_x_sub_e_cyclotomic` (S14、sorry-free): ψ∈ℤ[Irr G], x^p=1, ε primitive, **ψ(1)=e** ⟹
+∃w integral, ψ(x)-e=(1-ε)w。(1.10.a) exists_integral_apply_sub_of_commute (y=1) + ψ(1)=e。
+build green 3871。**assessment churn (¹⁴⁸⁻¹⁵¹) を脱する実 code landing** — h_psix の cyclotomic 部完成。
+
+**残 h_psix input = ψ(1)=e** (coherence degree-preservation dade.psi(1)=coh.extension χ(1)=χ(1)=e)。
+IsCoherent は isometry+ZIrr のみ ⟹ ψ(1)=e は coherence の degree/sign 性質要 (χ-χ̄ supported diff の
+extension 消失 ⟹ real は出るが =e には不足)。**(12.13) 構成 (dadeNotation_of_coherence) が degree 性質を
+持つか、または coherence 構成から導出**。次: ψ(1)=e の導出可否を examine → 可なら h_psix 完成。
