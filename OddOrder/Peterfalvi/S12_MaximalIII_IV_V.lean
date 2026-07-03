@@ -1058,6 +1058,17 @@ noncomputable def Hypothesis.inducedFamily_isCoherent_of_equalDegreeFamily [Fini
   exact OddOrder.Peterfalvi.S07.coherentEqualDegree_fromDade hyp.dadeData.dade hyp.hconj hn χ
     hχinj hdeg hsuppdiff h1notA
 
+/-- **The degree-`w₁` irreducible subfamily `S(HC) = S₁`** of `S = inducedFamily M`: the
+uniform-degree family whose (5.7) coherence `τ₁` the (11.8) contradiction consumes.  Abbreviates the
+recurring `{φ ∈ S | φ irreducible, φ(1) = w₁}` set comprehension so the (11.8.5)
+extension-generalization lemmas can quantify over an arbitrary coherent extension
+`coh : IsCoherent hyp.tau hyp.SHCSet hyp.A0` (both `SHC_isCoherent` and the branch-2 swap
+`SHC_swap` are such). -/
+abbrev Hypothesis.SHCSet [Finite G] {M : Subgroup G} (hyp : Hypothesis M) :
+    Set (ClassFunction ↥M ℂ) :=
+  {φ : ClassFunction ↥M ℂ | φ ∈ inducedFamily M ∧ IsIrreducibleCharacter φ ∧
+    ((φ : ↥M → ℂ) 1 = (hyp.w1 : ℂ))}
+
 open scoped FiniteInduce in
 /-- **Peterfalvi (11.8)/(5.7): coherence of `S₁ = S(HC)`**, the uniform degree-`w₁` irreducible
 subfamily of `S = inducedFamily M`.
@@ -1258,11 +1269,11 @@ The `S(HC)`-coherence `τ₁ = SHC_isCoherent.extension` is an isometry on `ℤ[
 Specializes the generic `IsCoherent.inner_extension_self_eq_one` to `coh = SHC_isCoherent`. -/
 theorem Hypothesis.SHC_extension_inner_self [Finite G] {M : Subgroup G}
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis M)
+    (coh : OddOrder.Peterfalvi.S07.IsCoherent hyp.tau hyp.SHCSet hyp.A0)
     {ζ : ClassFunction ↥M ℂ} (hζS : ζ ∈ inducedFamily M) (hζirr : IsIrreducibleCharacter ζ)
     (hζ1 : ζ 1 = (hyp.w1 : ℂ)) :
-    ClassFunction.inner ((hyp.SHC_isCoherent hG).extension ζ)
-      ((hyp.SHC_isCoherent hG).extension ζ) = 1 :=
-  (hyp.SHC_isCoherent hG).inner_extension_self_eq_one ⟨hζS, hζirr, hζ1⟩ hζirr
+    ClassFunction.inner (coh.extension ζ) (coh.extension ζ) = 1 :=
+  coh.inner_extension_self_eq_one ⟨hζS, hζirr, hζ1⟩ hζirr
 
 open scoped FiniteInduce in
 /-- **`⟨α_{ij}^τ, ζ^{τ₁}⟩ ∈ ℤ` for the `S(HC)`-coherent extension** (α-grid `S₁`-`τ₁` input to
@@ -1271,7 +1282,8 @@ coherence-free) and `ζ^{τ₁} = SHC_isCoherent.extension ζ` (`extension_mem_Z
 lie in `ℤ·Irr G`, so their inner product is an integer.  This is the integrality that the (11.8.2)
 `a`-coefficient argument consumes, now available from `SHC_isCoherent` alone (no full-`S` `coh`). -/
 theorem Hypothesis.muGridAlpha_tau_inner_SHC_extension_mem_int [Finite G] {M : Subgroup G}
-    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis M) (hodd : Odd (Nat.card G))
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis M)
+    (coh : OddOrder.Peterfalvi.S07.IsCoherent hyp.tau hyp.SHCSet hyp.A0) (hodd : Odd (Nat.card G))
     (i : Fin hyp.w1) {j : Fin hyp.w2} (hj0 : j ≠ 0)
     {ζ : ClassFunction ↥M ℂ} (hζS : ζ ∈ inducedFamily M) (hζirr : IsIrreducibleCharacter ζ)
     {d : ℕ} {δ : ℤ} {n : ℕ}
@@ -1280,10 +1292,10 @@ theorem Hypothesis.muGridAlpha_tau_inner_SHC_extension_mem_int [Finite G] {M : S
     (hδj : hyp.muColumnSign hG hodd j = δ) :
     ∃ m : ℤ, ClassFunction.inner
         (hyp.tau (hyp.muGrid hG hodd i j - (δ : ℂ) • hyp.muGrid hG hodd i 0 - (n : ℂ) • ζ))
-        ((hyp.SHC_isCoherent hG).extension ζ) = (m : ℂ) := by
+        (coh.extension ζ) = (m : ℂ) := by
   have hαZ := hyp.muGridAlpha_tau_mem_ZIrr hG hodd i hj0 hζS hζirr hdeg hμ0 hζ1 hnf hδj
-  have hζZ : (hyp.SHC_isCoherent hG).extension ζ ∈ ZIrr G :=
-    (hyp.SHC_isCoherent hG).extension_mem_ZIrr ζ (Submodule.subset_span ⟨hζS, hζirr, hζ1⟩)
+  have hζZ : coh.extension ζ ∈ ZIrr G :=
+    coh.extension_mem_ZIrr ζ (Submodule.subset_span ⟨hζS, hζirr, hζ1⟩)
   exact ClassFunction.inner_mem_ZIrr_int hαZ hζZ
 
 open scoped FiniteInduce in
@@ -1295,13 +1307,13 @@ isometry on `ℤ[S(HC)]` (`extension_inner_eq`), so `(φ^{τ₁}, ψ^{τ₁}) = 
 irreducibles.  Available from `SHC_isCoherent` alone (no full-`S` `coh`). -/
 theorem Hypothesis.SHC_extension_inner_of_ne [Finite G] {M : Subgroup G}
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis M)
+    (coh : OddOrder.Peterfalvi.S07.IsCoherent hyp.tau hyp.SHCSet hyp.A0)
     {φ ψ : ClassFunction ↥M ℂ}
     (hφS : φ ∈ inducedFamily M) (hφirr : IsIrreducibleCharacter φ) (hφ1 : φ 1 = (hyp.w1 : ℂ))
     (hψS : ψ ∈ inducedFamily M) (hψirr : IsIrreducibleCharacter ψ) (hψ1 : ψ 1 = (hyp.w1 : ℂ))
     (hne : φ ≠ ψ) :
-    ClassFunction.inner ((hyp.SHC_isCoherent hG).extension φ)
-      ((hyp.SHC_isCoherent hG).extension ψ) = 0 :=
-  (hyp.SHC_isCoherent hG).inner_extension_eq_zero_of_ne
+    ClassFunction.inner (coh.extension φ) (coh.extension ψ) = 0 :=
+  coh.inner_extension_eq_zero_of_ne
     ⟨hφS, hφirr, hφ1⟩ hφirr ⟨hψS, hψirr, hψ1⟩ hψirr hne
 
 open scoped FiniteInduce in
@@ -1315,11 +1327,12 @@ This is the essential SHC ingredient of the (5.3.b) `⟨ω^σ, ζ^{τ₁}⟩ = 0
 `inner_left_eq_zero_of_inner_sub_eq_zero` and the coherence-free `(ζ − ζ̄)^τ ⊥ ω^σ`), which the
 (11.8.5) `a = 0` step needs — the by-contradiction has `SHC_isCoherent` but not the full-`S` `coh`. -/
 theorem Hypothesis.tau_zeta_sub_conj_eq_SHC_extension [Finite G] {M : Subgroup G}
-    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis M) (hodd : Odd (Nat.card G))
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis M)
+    (coh : OddOrder.Peterfalvi.S07.IsCoherent hyp.tau hyp.SHCSet hyp.A0) (hodd : Odd (Nat.card G))
     {ζ : ClassFunction ↥M ℂ} (hζS : ζ ∈ inducedFamily M) (hζirr : IsIrreducibleCharacter ζ)
     (hζ1 : ζ 1 = (hyp.w1 : ℂ)) :
     hyp.tau (ζ - ζ.conj)
-      = (hyp.SHC_isCoherent hG).extension ζ - (hyp.SHC_isCoherent hG).extension ζ.conj := by
+      = coh.extension ζ - coh.extension ζ.conj := by
   have hζcS : ζ.conj ∈ inducedFamily M := inducedFamily_closedUnderConjugate M hζS
   have hζcirr : IsIrreducibleCharacter ζ.conj := hζirr.conj
   have hζc1 : ζ.conj 1 = (hyp.w1 : ℂ) := by
@@ -1336,7 +1349,7 @@ theorem Hypothesis.tau_zeta_sub_conj_eq_SHC_extension [Finite G] {M : Subgroup G
       {φ : ClassFunction ↥M ℂ | φ ∈ inducedFamily M ∧ IsIrreducibleCharacter φ ∧
         ((φ : ↥M → ℂ) 1 = (hyp.w1 : ℂ))} hyp.A0 :=
     ⟨Submodule.sub_mem _ hspanζ hspanζc, hyp.zeta_sub_conj_support hG hodd hζS hζirr⟩
-  rw [← (hyp.SHC_isCoherent hG).extends_on_supported _ hmem, map_sub]
+  rw [← coh.extends_on_supported _ hmem, map_sub]
 
 open scoped FiniteInduce in
 /-- **Peterfalvi (11.8.3), the column-conjugation index at row `0`** ((3.9)(a)/(4.9)(a) on the
@@ -1507,7 +1520,8 @@ the `τ`-arguments is the four-corner `μ_{ij} − μ_{0j} − δμ_{i0} + δμ_
 `h410` until the §10 instantiation of Hypothesis (4.6) lands (issue 9004) — and the `ω`-corners
 cancel against the `δ(ω_{ij}^σ − ω_{i0}^σ)` terms. -/
 theorem Hypothesis.beta_row_eq [Finite G] {M : Subgroup G}
-    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis M) (hodd : Odd (Nat.card G))
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis M)
+    (coh : OddOrder.Peterfalvi.S07.IsCoherent hyp.tau hyp.SHCSet hyp.A0) (hodd : Odd (Nat.card G))
     (i : Fin hyp.w1) (j : Fin hyp.w2) {ζ : ClassFunction ↥M ℂ} {δ : ℤ} {n : ℕ}
     (h410 : hyp.tau (hyp.muGrid hG hodd i j - hyp.muGrid hG hodd 0 j
           - (δ : ℂ) • hyp.muGrid hG hodd i 0 + (δ : ℂ) • hyp.muGrid hG hodd 0 0)
@@ -1515,10 +1529,10 @@ theorem Hypothesis.beta_row_eq [Finite G] {M : Subgroup G}
           - hyp.alignedOmegaSigmaGrid hG hodd i 0 + hyp.alignedOmegaSigmaGrid hG hodd 0 0)) :
     hyp.tau (hyp.muGrid hG hodd i j - (δ : ℂ) • hyp.muGrid hG hodd i 0 - (n : ℂ) • ζ)
       - (δ : ℂ) • (hyp.alignedOmegaSigmaGrid hG hodd i j - hyp.alignedOmegaSigmaGrid hG hodd i 0)
-      + (n : ℂ) • (hyp.SHC_isCoherent hG).extension ζ
+      + (n : ℂ) • coh.extension ζ
     = hyp.tau (hyp.muGrid hG hodd 0 j - (δ : ℂ) • hyp.muGrid hG hodd 0 0 - (n : ℂ) • ζ)
       - (δ : ℂ) • (hyp.alignedOmegaSigmaGrid hG hodd 0 j - hyp.alignedOmegaSigmaGrid hG hodd 0 0)
-      + (n : ℂ) • (hyp.SHC_isCoherent hG).extension ζ := by
+      + (n : ℂ) • coh.extension ζ := by
   have harg : (hyp.muGrid hG hodd i j - (δ : ℂ) • hyp.muGrid hG hodd i 0 - (n : ℂ) • ζ)
       = (hyp.muGrid hG hodd 0 j - (δ : ℂ) • hyp.muGrid hG hodd 0 0 - (n : ℂ) • ζ)
         + (hyp.muGrid hG hodd i j - hyp.muGrid hG hodd 0 j
@@ -1536,17 +1550,18 @@ The `−δμ_{00} − nζ` tails of `α_{0j}` and `α_{0k}` are identical, so th
 Peterfalvi (4.8), threaded here as `h48` until the §10 instantiation of Hypothesis (4.6) lands
 (issue 9004). -/
 theorem Hypothesis.beta_column_eq_zeroRow [Finite G] {M : Subgroup G}
-    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis M) (hodd : Odd (Nat.card G))
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis M)
+    (coh : OddOrder.Peterfalvi.S07.IsCoherent hyp.tau hyp.SHCSet hyp.A0) (hodd : Odd (Nat.card G))
     (j k : Fin hyp.w2) {ζ : ClassFunction ↥M ℂ} {δ : ℤ} {n : ℕ}
     (h48 : hyp.tau (hyp.muGrid hG hodd 0 j - hyp.muGrid hG hodd 0 k)
         = (δ : ℂ) • (hyp.alignedOmegaSigmaGrid hG hodd 0 j
             - hyp.alignedOmegaSigmaGrid hG hodd 0 k)) :
     hyp.tau (hyp.muGrid hG hodd 0 j - (δ : ℂ) • hyp.muGrid hG hodd 0 0 - (n : ℂ) • ζ)
       - (δ : ℂ) • (hyp.alignedOmegaSigmaGrid hG hodd 0 j - hyp.alignedOmegaSigmaGrid hG hodd 0 0)
-      + (n : ℂ) • (hyp.SHC_isCoherent hG).extension ζ
+      + (n : ℂ) • coh.extension ζ
     = hyp.tau (hyp.muGrid hG hodd 0 k - (δ : ℂ) • hyp.muGrid hG hodd 0 0 - (n : ℂ) • ζ)
       - (δ : ℂ) • (hyp.alignedOmegaSigmaGrid hG hodd 0 k - hyp.alignedOmegaSigmaGrid hG hodd 0 0)
-      + (n : ℂ) • (hyp.SHC_isCoherent hG).extension ζ := by
+      + (n : ℂ) • coh.extension ζ := by
   have harg : (hyp.muGrid hG hodd 0 j - (δ : ℂ) • hyp.muGrid hG hodd 0 0 - (n : ℂ) • ζ)
       = (hyp.muGrid hG hodd 0 k - (δ : ℂ) • hyp.muGrid hG hodd 0 0 - (n : ℂ) • ζ)
         + (hyp.muGrid hG hodd 0 j - hyp.muGrid hG hodd 0 k) := by
@@ -1572,7 +1587,11 @@ threaded row-`0` (4.8) at the conjugate column `k ≠ 0`).
 The Peterfalvi (4.8)/(4.10) inputs are threaded as `h48`/`h410` until the §10 instantiation of
 Hypothesis (4.6) lands (issue 9004); everything else is proved. -/
 theorem Hypothesis.beta_isReal [Finite G] {M : Subgroup G}
-    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis M) (hodd : Odd (Nat.card G))
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis M)
+    (coh : OddOrder.Peterfalvi.S07.IsCoherent hyp.tau hyp.SHCSet hyp.A0)
+    (hconj : ∀ {χ : ClassFunction ↥M ℂ}, χ ∈ inducedFamily M → IsIrreducibleCharacter χ →
+      χ 1 = (hyp.w1 : ℂ) → (coh.extension χ).conj = coh.extension χ.conj)
+    (hodd : Odd (Nat.card G))
     (i : Fin hyp.w1) {j : Fin hyp.w2} (hj0 : j ≠ 0)
     {ζ : ClassFunction ↥M ℂ} (hζS : ζ ∈ inducedFamily M) (hζirr : IsIrreducibleCharacter ζ)
     (hζ1 : ζ 1 = (hyp.w1 : ℂ)) {d : ℕ} {δ : ℤ} {n : ℕ}
@@ -1589,11 +1608,11 @@ theorem Hypothesis.beta_isReal [Finite G] {M : Subgroup G}
     ClassFunction.IsReal
       (hyp.tau (hyp.muGrid hG hodd i j - (δ : ℂ) • hyp.muGrid hG hodd i 0 - (n : ℂ) • ζ)
         - (δ : ℂ) • (hyp.alignedOmegaSigmaGrid hG hodd i j - hyp.alignedOmegaSigmaGrid hG hodd i 0)
-        + (n : ℂ) • (hyp.SHC_isCoherent hG).extension ζ) := by
+        + (n : ℂ) • coh.extension ζ) := by
   haveI := hyp.finiteG
   classical
   -- reduce to row `0` (the threaded (4.10) row move)
-  have hrow := hyp.beta_row_eq hG hodd i j (ζ := ζ) (n := n) h410
+  have hrow := hyp.beta_row_eq hG coh hodd i j (ζ := ζ) (n := n) h410
   rw [ClassFunction.IsReal, hrow]
   -- the `.conj = mapRingEquiv conjAe` bridges
   have hbridgeG : ∀ X : ClassFunction G ℂ,
@@ -1612,7 +1631,7 @@ theorem Hypothesis.beta_isReal [Finite G] {M : Subgroup G}
       (hyp.tau (hyp.muGrid hG hodd 0 j - (δ : ℂ) • hyp.muGrid hG hodd 0 0 - (n : ℂ) • ζ)
         - (δ : ℂ) • (hyp.alignedOmegaSigmaGrid hG hodd 0 j
             - hyp.alignedOmegaSigmaGrid hG hodd 0 0)
-        + (n : ℂ) • (hyp.SHC_isCoherent hG).extension ζ)
+        + (n : ℂ) • coh.extension ζ)
       = ClassFunction.mapRingEquiv Complex.conjAe.toRingEquiv
           (hyp.tau (hyp.muGrid hG hodd 0 j - (δ : ℂ) • hyp.muGrid hG hodd 0 0 - (n : ℂ) • ζ))
         - (δ : ℂ) • (ClassFunction.mapRingEquiv Complex.conjAe.toRingEquiv
@@ -1620,7 +1639,7 @@ theorem Hypothesis.beta_isReal [Finite G] {M : Subgroup G}
           - ClassFunction.mapRingEquiv Complex.conjAe.toRingEquiv
             (hyp.alignedOmegaSigmaGrid hG hodd 0 0))
         + (n : ℂ) • ClassFunction.mapRingEquiv Complex.conjAe.toRingEquiv
-            ((hyp.SHC_isCoherent hG).extension ζ) := by
+            (coh.extension ζ) := by
     ext g
     simp only [ClassFunction.mapRingEquiv_apply, ClassFunction.add_apply, ClassFunction.sub_apply,
       ClassFunction.smul_apply, map_add, map_sub, map_mul, map_intCast, map_natCast]
@@ -1642,11 +1661,11 @@ theorem Hypothesis.beta_isReal [Finite G] {M : Subgroup G}
   have hτcomm := hyp.tau_mapRingEquiv_comm Complex.conjAe.toRingEquiv
     (hyp.muGrid_alpha_support hG hodd (i := 0) hj0 hζS hdeg0 hμ00 hζ1 hnf hδj)
   have hζτ : ClassFunction.mapRingEquiv Complex.conjAe.toRingEquiv
-      ((hyp.SHC_isCoherent hG).extension ζ) = (hyp.SHC_isCoherent hG).extension ζ.conj := by
-    rw [← hbridgeG, hyp.SHC_extension_conj hG hζS hζirr hζ1]
+      (coh.extension ζ) = coh.extension ζ.conj := by
+    rw [← hbridgeG, hconj hζS hζirr hζ1]
   rw [hbridgeG, hdist, hσconj, hσ0, hζτ, ← hτcomm, hαconj]
   -- trade `ζ̄` for `ζ` through the `S(HC)`-coherence, landing on `β_{0k}`
-  have hcoh := hyp.tau_zeta_sub_conj_eq_SHC_extension hG hodd hζS hζirr hζ1
+  have hcoh := hyp.tau_zeta_sub_conj_eq_SHC_extension hG coh hodd hζS hζirr hζ1
   have hswap : (hyp.muGrid hG hodd 0 k - (δ : ℂ) • hyp.muGrid hG hodd 0 0 - (n : ℂ) • ζ.conj)
       = (hyp.muGrid hG hodd 0 k - (δ : ℂ) • hyp.muGrid hG hodd 0 0 - (n : ℂ) • ζ)
         + (n : ℂ) • (ζ - ζ.conj) := by
@@ -1658,7 +1677,7 @@ theorem Hypothesis.beta_isReal [Finite G] {M : Subgroup G}
       Int.cast_smul_eq_zsmul ℂ (n : ℤ)]
   rw [hswap, map_add, hnτ, hcoh]
   -- the `β_{0j} = β_{0k}` column move (the threaded row-`0` (4.8) at the conjugate column)
-  have hcol := hyp.beta_column_eq_zeroRow hG hodd j k (ζ := ζ) (n := n) (h48 k hk0)
+  have hcol := hyp.beta_column_eq_zeroRow hG coh hodd j k (ζ := ζ) (n := n) (h48 k hk0)
   rw [hcol]
   -- assemble: both sides are `β_{0k}` up to the cancelling `nζ^{τ₁}` swap terms
   module
@@ -1677,10 +1696,11 @@ the *same* `tic`/`canonicalFullDadeApp`), the difference `ζ^{τ₁} − ζ̄^{�
 `inner_left_eq_zero_of_inner_sub_eq_zero` (orthonormal `{ζ^{τ₁}, ζ̄^{τ₁}}` via `SHC_extension_inner_*`)
 then upgrades this to `⟨ζ^{τ₁}, χ_{P j}⟩ = 0`. -/
 theorem Hypothesis.SHC_extension_inner_alignedOmegaSigma_eq_zero [Finite G] {M : Subgroup G}
-    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis M) (hodd : Odd (Nat.card G))
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis M)
+    (coh : OddOrder.Peterfalvi.S07.IsCoherent hyp.tau hyp.SHCSet hyp.A0) (hodd : Odd (Nat.card G))
     {ζ : ClassFunction ↥M ℂ} (hζS : ζ ∈ inducedFamily M) (hζirr : IsIrreducibleCharacter ζ)
     (hζ1 : ζ 1 = (hyp.w1 : ℂ)) (hζne : ζ.conj ≠ ζ) (i : Fin hyp.w1) (j : Fin hyp.w2) :
-    ClassFunction.inner ((hyp.SHC_isCoherent hG).extension ζ)
+    ClassFunction.inner (coh.extension ζ)
       (hyp.alignedOmegaSigmaGrid hG hodd i j) = 0 := by
   haveI := hyp.finiteG
   classical
@@ -1694,45 +1714,45 @@ theorem Hypothesis.SHC_extension_inner_alignedOmegaSigma_eq_zero [Finite G] {M :
   have hζcS : ζ.conj ∈ inducedFamily M := inducedFamily_closedUnderConjugate M hζS
   have hζcirr : IsIrreducibleCharacter ζ.conj := hζirr.conj
   have hζc1 : ζ.conj 1 = (hyp.w1 : ℂ) := by rw [ClassFunction.conj_apply, hζ1, star_natCast]
-  have haZ : (hyp.SHC_isCoherent hG).extension ζ ∈ ZIrr G :=
-    (hyp.SHC_isCoherent hG).extension_mem_ZIrr ζ (Submodule.subset_span ⟨hζS, hζirr, hζ1⟩)
-  have hbZ : (hyp.SHC_isCoherent hG).extension ζ.conj ∈ ZIrr G :=
-    (hyp.SHC_isCoherent hG).extension_mem_ZIrr ζ.conj (Submodule.subset_span ⟨hζcS, hζcirr, hζc1⟩)
-  have ha1 : ClassFunction.inner ((hyp.SHC_isCoherent hG).extension ζ)
-      ((hyp.SHC_isCoherent hG).extension ζ) = 1 := hyp.SHC_extension_inner_self hG hζS hζirr hζ1
-  have hb1 : ClassFunction.inner ((hyp.SHC_isCoherent hG).extension ζ.conj)
-      ((hyp.SHC_isCoherent hG).extension ζ.conj) = 1 :=
-    hyp.SHC_extension_inner_self hG hζcS hζcirr hζc1
-  have hab : ClassFunction.inner ((hyp.SHC_isCoherent hG).extension ζ)
-      ((hyp.SHC_isCoherent hG).extension ζ.conj) = 0 :=
-    hyp.SHC_extension_inner_of_ne hG hζS hζirr hζ1 hζcS hζcirr hζc1 (fun h => hζne h.symm)
+  have haZ : coh.extension ζ ∈ ZIrr G :=
+    coh.extension_mem_ZIrr ζ (Submodule.subset_span ⟨hζS, hζirr, hζ1⟩)
+  have hbZ : coh.extension ζ.conj ∈ ZIrr G :=
+    coh.extension_mem_ZIrr ζ.conj (Submodule.subset_span ⟨hζcS, hζcirr, hζc1⟩)
+  have ha1 : ClassFunction.inner (coh.extension ζ)
+      (coh.extension ζ) = 1 := hyp.SHC_extension_inner_self hG coh hζS hζirr hζ1
+  have hb1 : ClassFunction.inner (coh.extension ζ.conj)
+      (coh.extension ζ.conj) = 1 :=
+    hyp.SHC_extension_inner_self hG coh hζcS hζcirr hζc1
+  have hab : ClassFunction.inner (coh.extension ζ)
+      (coh.extension ζ.conj) = 0 :=
+    hyp.SHC_extension_inner_of_ne hG coh hζS hζirr hζ1 hζcS hζcirr hζc1 (fun h => hζne h.symm)
   have hvanish : ∀ w ∈ tic.V, hyp.tau (ζ - ζ.conj) w = 0 := fun w hw =>
     hyp.tau_zeta_sub_conj_vanishes_on_typePV hG hodd hζS hζirr hw
   have hNC : tic.sigmaNC hVeq app (hyp.tau (ζ - ζ.conj))
       < min (Nat.card ↥tic.W1) (Nat.card ↥tic.W2) := by
     have hbound : tic.sigmaNC hVeq app (hyp.tau (ζ - ζ.conj)) ≤ 2 := by
       have hsub : {pq | tic.sigmaCoeff hVeq app (hyp.tau (ζ - ζ.conj)) pq ≠ 0} ⊆
-          {pq | ClassFunction.inner ((hyp.SHC_isCoherent hG).extension ζ)
+          {pq | ClassFunction.inner (coh.extension ζ)
               (tic.chiFam hVeq app pq) ≠ 0} ∪
-          {pq | ClassFunction.inner ((hyp.SHC_isCoherent hG).extension ζ.conj)
+          {pq | ClassFunction.inner (coh.extension ζ.conj)
               (tic.chiFam hVeq app pq) ≠ 0} := by
         intro pq hpq
         by_contra hcon
         simp only [Set.mem_union, Set.mem_setOf_eq, not_or, not_not] at hcon
         apply hpq
         change ClassFunction.inner (hyp.tau (ζ - ζ.conj)) (tic.chiFam hVeq app pq) = 0
-        rw [hyp.tau_zeta_sub_conj_eq_SHC_extension hG hodd hζS hζirr hζ1,
+        rw [hyp.tau_zeta_sub_conj_eq_SHC_extension hG coh hodd hζS hζirr hζ1,
           ClassFunction.inner_sub_left, hcon.1, hcon.2, sub_zero]
       calc tic.sigmaNC hVeq app (hyp.tau (ζ - ζ.conj))
           = {pq | tic.sigmaCoeff hVeq app (hyp.tau (ζ - ζ.conj)) pq ≠ 0}.ncard := rfl
-        _ ≤ ({pq | ClassFunction.inner ((hyp.SHC_isCoherent hG).extension ζ)
+        _ ≤ ({pq | ClassFunction.inner (coh.extension ζ)
                 (tic.chiFam hVeq app pq) ≠ 0} ∪
-              {pq | ClassFunction.inner ((hyp.SHC_isCoherent hG).extension ζ.conj)
+              {pq | ClassFunction.inner (coh.extension ζ.conj)
                 (tic.chiFam hVeq app pq) ≠ 0}).ncard :=
             Set.ncard_le_ncard hsub (Set.toFinite _)
-        _ ≤ {pq | ClassFunction.inner ((hyp.SHC_isCoherent hG).extension ζ)
+        _ ≤ {pq | ClassFunction.inner (coh.extension ζ)
                 (tic.chiFam hVeq app pq) ≠ 0}.ncard +
-              {pq | ClassFunction.inner ((hyp.SHC_isCoherent hG).extension ζ.conj)
+              {pq | ClassFunction.inner (coh.extension ζ.conj)
                 (tic.chiFam hVeq app pq) ≠ 0}.ncard :=
             Set.ncard_union_le _ _
         _ ≤ 1 + 1 := by
@@ -1745,9 +1765,9 @@ theorem Hypothesis.SHC_extension_inner_alignedOmegaSigma_eq_zero [Finite G] {M :
     omega
   have hL3 : tic.sigmaCoeff hVeq app (hyp.tau (ζ - ζ.conj)) (P j) = 0 :=
     tic.sigmaCoeff_eq_zero_of_sigmaNC_lt hVeq app hvanish hNC (P j)
-  have hdiff : ClassFunction.inner ((hyp.SHC_isCoherent hG).extension ζ
-      - (hyp.SHC_isCoherent hG).extension ζ.conj) (tic.chiFam hVeq app (P j)) = 0 := by
-    rw [← hyp.tau_zeta_sub_conj_eq_SHC_extension hG hodd hζS hζirr hζ1]; exact hL3
+  have hdiff : ClassFunction.inner (coh.extension ζ
+      - coh.extension ζ.conj) (tic.chiFam hVeq app (P j)) = 0 := by
+    rw [← hyp.tau_zeta_sub_conj_eq_SHC_extension hG coh hodd hζS hζirr hζ1]; exact hL3
   have hsZ : tic.chiFam hVeq app (P j) ∈ ZIrr G := (tic.chiFam_spec hVeq app).2.1 (P j)
   have hs1 : ClassFunction.inner (tic.chiFam hVeq app (P j)) (tic.chiFam hVeq app (P j)) = 1 := by
     rw [(tic.chiFam_spec hVeq app).2.2.1, if_pos rfl]
@@ -1766,10 +1786,11 @@ vanishes on `V` with `NC ≤ 2 < min(w₁, w₂)`, so `sigmaCoeff_eq_zero_of_sig
 `⟨ζ^{τ₁} − ζ̄^{τ₁}, χ_{pq}⟩ = 0`, and the norm-`1` projection `inner_left_eq_zero_of_inner_sub_eq_zero`
 (orthonormal `{ζ^{τ₁}, ζ̄^{τ₁}}`) upgrades it to `⟨ζ^{τ₁}, χ_{pq}⟩ = 0` for every `pq`. -/
 theorem Hypothesis.SHC_tau1_zeta_vanishes_on_typePV [Finite G] {M : Subgroup G}
-    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis M) (hodd : Odd (Nat.card G))
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis M)
+    (coh : OddOrder.Peterfalvi.S07.IsCoherent hyp.tau hyp.SHCSet hyp.A0) (hodd : Odd (Nat.card G))
     {ζ : ClassFunction ↥M ℂ} (hζS : ζ ∈ inducedFamily M) (hζirr : IsIrreducibleCharacter ζ)
     (hζ1 : ζ 1 = (hyp.w1 : ℂ)) (hζne : ζ.conj ≠ ζ) {v : G} (hv : v ∈ typePV M hyp.typeP) :
-    (hyp.SHC_isCoherent hG).extension ζ v = 0 := by
+    coh.extension ζ v = 0 := by
   haveI := hyp.finiteG
   classical
   let tic := typePData_toTICyclicHypothesis hyp.typeP hodd
@@ -1780,45 +1801,45 @@ theorem Hypothesis.SHC_tau1_zeta_vanishes_on_typePV [Finite G] {M : Subgroup G}
   have hζcS : ζ.conj ∈ inducedFamily M := inducedFamily_closedUnderConjugate M hζS
   have hζcirr : IsIrreducibleCharacter ζ.conj := hζirr.conj
   have hζc1 : ζ.conj 1 = (hyp.w1 : ℂ) := by rw [ClassFunction.conj_apply, hζ1, star_natCast]
-  have haZ : (hyp.SHC_isCoherent hG).extension ζ ∈ ZIrr G :=
-    (hyp.SHC_isCoherent hG).extension_mem_ZIrr ζ (Submodule.subset_span ⟨hζS, hζirr, hζ1⟩)
-  have hbZ : (hyp.SHC_isCoherent hG).extension ζ.conj ∈ ZIrr G :=
-    (hyp.SHC_isCoherent hG).extension_mem_ZIrr ζ.conj (Submodule.subset_span ⟨hζcS, hζcirr, hζc1⟩)
-  have ha1 : ClassFunction.inner ((hyp.SHC_isCoherent hG).extension ζ)
-      ((hyp.SHC_isCoherent hG).extension ζ) = 1 := hyp.SHC_extension_inner_self hG hζS hζirr hζ1
-  have hb1 : ClassFunction.inner ((hyp.SHC_isCoherent hG).extension ζ.conj)
-      ((hyp.SHC_isCoherent hG).extension ζ.conj) = 1 :=
-    hyp.SHC_extension_inner_self hG hζcS hζcirr hζc1
-  have hab : ClassFunction.inner ((hyp.SHC_isCoherent hG).extension ζ)
-      ((hyp.SHC_isCoherent hG).extension ζ.conj) = 0 :=
-    hyp.SHC_extension_inner_of_ne hG hζS hζirr hζ1 hζcS hζcirr hζc1 (fun h => hζne h.symm)
+  have haZ : coh.extension ζ ∈ ZIrr G :=
+    coh.extension_mem_ZIrr ζ (Submodule.subset_span ⟨hζS, hζirr, hζ1⟩)
+  have hbZ : coh.extension ζ.conj ∈ ZIrr G :=
+    coh.extension_mem_ZIrr ζ.conj (Submodule.subset_span ⟨hζcS, hζcirr, hζc1⟩)
+  have ha1 : ClassFunction.inner (coh.extension ζ)
+      (coh.extension ζ) = 1 := hyp.SHC_extension_inner_self hG coh hζS hζirr hζ1
+  have hb1 : ClassFunction.inner (coh.extension ζ.conj)
+      (coh.extension ζ.conj) = 1 :=
+    hyp.SHC_extension_inner_self hG coh hζcS hζcirr hζc1
+  have hab : ClassFunction.inner (coh.extension ζ)
+      (coh.extension ζ.conj) = 0 :=
+    hyp.SHC_extension_inner_of_ne hG coh hζS hζirr hζ1 hζcS hζcirr hζc1 (fun h => hζne h.symm)
   have hvanish : ∀ w ∈ tic.V, hyp.tau (ζ - ζ.conj) w = 0 := fun w hw =>
     hyp.tau_zeta_sub_conj_vanishes_on_typePV hG hodd hζS hζirr hw
   have hNC : tic.sigmaNC hVeq app (hyp.tau (ζ - ζ.conj))
       < min (Nat.card ↥tic.W1) (Nat.card ↥tic.W2) := by
     have hbound : tic.sigmaNC hVeq app (hyp.tau (ζ - ζ.conj)) ≤ 2 := by
       have hsub : {pq | tic.sigmaCoeff hVeq app (hyp.tau (ζ - ζ.conj)) pq ≠ 0} ⊆
-          {pq | ClassFunction.inner ((hyp.SHC_isCoherent hG).extension ζ)
+          {pq | ClassFunction.inner (coh.extension ζ)
               (tic.chiFam hVeq app pq) ≠ 0} ∪
-          {pq | ClassFunction.inner ((hyp.SHC_isCoherent hG).extension ζ.conj)
+          {pq | ClassFunction.inner (coh.extension ζ.conj)
               (tic.chiFam hVeq app pq) ≠ 0} := by
         intro pq hpq
         by_contra hcon
         simp only [Set.mem_union, Set.mem_setOf_eq, not_or, not_not] at hcon
         apply hpq
         change ClassFunction.inner (hyp.tau (ζ - ζ.conj)) (tic.chiFam hVeq app pq) = 0
-        rw [hyp.tau_zeta_sub_conj_eq_SHC_extension hG hodd hζS hζirr hζ1,
+        rw [hyp.tau_zeta_sub_conj_eq_SHC_extension hG coh hodd hζS hζirr hζ1,
           ClassFunction.inner_sub_left, hcon.1, hcon.2, sub_zero]
       calc tic.sigmaNC hVeq app (hyp.tau (ζ - ζ.conj))
           = {pq | tic.sigmaCoeff hVeq app (hyp.tau (ζ - ζ.conj)) pq ≠ 0}.ncard := rfl
-        _ ≤ ({pq | ClassFunction.inner ((hyp.SHC_isCoherent hG).extension ζ)
+        _ ≤ ({pq | ClassFunction.inner (coh.extension ζ)
                 (tic.chiFam hVeq app pq) ≠ 0} ∪
-              {pq | ClassFunction.inner ((hyp.SHC_isCoherent hG).extension ζ.conj)
+              {pq | ClassFunction.inner (coh.extension ζ.conj)
                 (tic.chiFam hVeq app pq) ≠ 0}).ncard :=
             Set.ncard_le_ncard hsub (Set.toFinite _)
-        _ ≤ {pq | ClassFunction.inner ((hyp.SHC_isCoherent hG).extension ζ)
+        _ ≤ {pq | ClassFunction.inner (coh.extension ζ)
                 (tic.chiFam hVeq app pq) ≠ 0}.ncard +
-              {pq | ClassFunction.inner ((hyp.SHC_isCoherent hG).extension ζ.conj)
+              {pq | ClassFunction.inner (coh.extension ζ.conj)
                 (tic.chiFam hVeq app pq) ≠ 0}.ncard :=
             Set.ncard_union_le _ _
         _ ≤ 1 + 1 := by
@@ -1832,9 +1853,9 @@ theorem Hypothesis.SHC_tau1_zeta_vanishes_on_typePV [Finite G] {M : Subgroup G}
   refine tic.eq_zero_of_mem_V_of_inner_chiFam_eq_zero hVeq app (fun a' b' => ?_) hv
   have hL3 : tic.sigmaCoeff hVeq app (hyp.tau (ζ - ζ.conj)) (a', b') = 0 :=
     tic.sigmaCoeff_eq_zero_of_sigmaNC_lt hVeq app hvanish hNC (a', b')
-  have hdiff : ClassFunction.inner ((hyp.SHC_isCoherent hG).extension ζ
-      - (hyp.SHC_isCoherent hG).extension ζ.conj) (tic.chiFam hVeq app (a', b')) = 0 := by
-    rw [← hyp.tau_zeta_sub_conj_eq_SHC_extension hG hodd hζS hζirr hζ1]; exact hL3
+  have hdiff : ClassFunction.inner (coh.extension ζ
+      - coh.extension ζ.conj) (tic.chiFam hVeq app (a', b')) = 0 := by
+    rw [← hyp.tau_zeta_sub_conj_eq_SHC_extension hG coh hodd hζS hζirr hζ1]; exact hL3
   have hsZ : tic.chiFam hVeq app (a', b') ∈ ZIrr G := (tic.chiFam_spec hVeq app).2.1 (a', b')
   have hs1 : ClassFunction.inner (tic.chiFam hVeq app (a', b')) (tic.chiFam hVeq app (a', b')) = 1 := by
     rw [(tic.chiFam_spec hVeq app).2.2.1, if_pos rfl]
@@ -1847,11 +1868,12 @@ The non-reality hypothesis `χ̄ ≠ χ` of `SHC_tau1_zeta_vanishes_on_typePV` i
 the `∑_{λ∈S₁} λ^{τ₁}` correction of the (11.8.2) residual `X = α^τ + nζ^{τ₁} − a∑λ^{τ₁}` on `V` in
 the general `a ∈ {0, 2}` case. -/
 theorem Hypothesis.SHC_extension_vanishes_on_typePV [Finite G] {M : Subgroup G}
-    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis M) (hodd : Odd (Nat.card G))
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis M)
+    (coh : OddOrder.Peterfalvi.S07.IsCoherent hyp.tau hyp.SHCSet hyp.A0) (hodd : Odd (Nat.card G))
     {χ : ClassFunction ↥M ℂ} (hχS : χ ∈ inducedFamily M) (hχirr : IsIrreducibleCharacter χ)
     (hχ1 : χ 1 = (hyp.w1 : ℂ)) {v : G} (hv : v ∈ typePV M hyp.typeP) :
-    (hyp.SHC_isCoherent hG).extension χ v = 0 :=
-  hyp.SHC_tau1_zeta_vanishes_on_typePV hG hodd hχS hχirr hχ1
+    coh.extension χ v = 0 :=
+  hyp.SHC_tau1_zeta_vanishes_on_typePV hG coh hodd hχS hχirr hχ1
     (hyp.inducedFamily_degree_w1_conj_ne hG hχirr hχ1) hv
 
 open scoped FiniteInduce in
@@ -1863,7 +1885,8 @@ vanishes on `V = typePV`.  Combines the value-on-`V` leg `tau_muGridAlpha_apply_
 (`ζ^{τ₁}` vanishes on `V`).  For the general `(11.8.2)` residual `X = α^τ + n·ζ^{τ₁} − a·∑λ^{τ₁}`
 (`a ∈ {0, 2}`) the extra `∑λ^{τ₁}` also vanishes on `V` (each `λ ∈ S(HC)`, same lemma). -/
 theorem Hypothesis.SHC_muGridPsi_vanishes_on_typePV [Finite G] {M : Subgroup G}
-    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis M) (hodd : Odd (Nat.card G))
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis M)
+    (coh : OddOrder.Peterfalvi.S07.IsCoherent hyp.tau hyp.SHCSet hyp.A0) (hodd : Odd (Nat.card G))
     {i : Fin hyp.w1} {j : Fin hyp.w2} (hj : j ≠ 0)
     {ζ : ClassFunction ↥M ℂ} (hζS : ζ ∈ inducedFamily M) (hζirr : IsIrreducibleCharacter ζ)
     (hζ1 : ζ 1 = (hyp.w1 : ℂ)) (hζne : ζ.conj ≠ ζ) {d : ℕ} {δ : ℤ} {n : ℕ}
@@ -1871,11 +1894,11 @@ theorem Hypothesis.SHC_muGridPsi_vanishes_on_typePV [Finite G] {M : Subgroup G}
     (hnf : (n : ℤ) * (hyp.w1 : ℤ) = (d : ℤ) - δ) (hδj : hyp.muColumnSign hG hodd j = δ)
     {v : G} (hv : v ∈ typePV M hyp.typeP) :
     (hyp.tau (hyp.muGrid hG hodd i j - (δ : ℂ) • hyp.muGrid hG hodd i 0 - (n : ℂ) • ζ)
-        + (n : ℂ) • (hyp.SHC_isCoherent hG).extension ζ
+        + (n : ℂ) • coh.extension ζ
         - (δ : ℂ) • (hyp.alignedOmegaSigmaGrid hG hodd i j
             - hyp.alignedOmegaSigmaGrid hG hodd i 0)) v = 0 := by
   have hleg := hyp.tau_muGridAlpha_apply_eq_on_typePV hG hodd hj hζS hdeg hμ0 hζ1 hnf hδj hv
-  have hζv := hyp.SHC_tau1_zeta_vanishes_on_typePV hG hodd hζS hζirr hζ1 hζne hv
+  have hζv := hyp.SHC_tau1_zeta_vanishes_on_typePV hG coh hodd hζS hζirr hζ1 hζne hv
   simp only [ClassFunction.sub_apply, ClassFunction.add_apply, ClassFunction.smul_apply] at hleg ⊢
   rw [hleg, hζv]
   simp
@@ -1889,7 +1912,8 @@ open scoped FiniteInduce in
 `‖X‖² = ‖α^τ‖² + 2n⟨α^τ, ζ^{τ₁}⟩ + n²‖ζ^{τ₁}‖² = (2+n²) − 2n² + n² = 2`.  SHC port of
 `muGridAlpha_tau_X_inner`, the norm-`2` input to the SHC Dade-image trichotomy (SHC `alpha_tau_image`). -/
 theorem Hypothesis.SHC_muGridAlpha_tau_X_inner [Finite G] {M : Subgroup G}
-    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis M) (hodd : Odd (Nat.card G))
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis M)
+    (coh : OddOrder.Peterfalvi.S07.IsCoherent hyp.tau hyp.SHCSet hyp.A0) (hodd : Odd (Nat.card G))
     (i : Fin hyp.w1) {j : Fin hyp.w2} (hj0 : j ≠ 0)
     {ζ : ClassFunction ↥M ℂ} (hζS : ζ ∈ inducedFamily M) (hζirr : IsIrreducibleCharacter ζ)
     (hζ1 : ζ 1 = (hyp.w1 : ℂ)) {d : ℕ} {δ : ℤ} {n : ℕ}
@@ -1899,20 +1923,20 @@ theorem Hypothesis.SHC_muGridAlpha_tau_X_inner [Finite G] {M : Subgroup G}
     (hδpm : δ = 1 ∨ δ = -1)
     (hα0 : ClassFunction.inner
         (hyp.tau (hyp.muGrid hG hodd i j - (δ : ℂ) • hyp.muGrid hG hodd i 0 - (n : ℂ) • ζ))
-        ((hyp.SHC_isCoherent hG).extension ζ) = -(n : ℂ)) :
+        (coh.extension ζ) = -(n : ℂ)) :
     ClassFunction.inner
         (hyp.tau (hyp.muGrid hG hodd i j - (δ : ℂ) • hyp.muGrid hG hodd i 0 - (n : ℂ) • ζ)
-          + (n : ℂ) • (hyp.SHC_isCoherent hG).extension ζ)
-        ((hyp.SHC_isCoherent hG).extension ζ) = 0
+          + (n : ℂ) • coh.extension ζ)
+        (coh.extension ζ) = 0
     ∧ ClassFunction.inner
         (hyp.tau (hyp.muGrid hG hodd i j - (δ : ℂ) • hyp.muGrid hG hodd i 0 - (n : ℂ) • ζ)
-          + (n : ℂ) • (hyp.SHC_isCoherent hG).extension ζ)
+          + (n : ℂ) • coh.extension ζ)
         (hyp.tau (hyp.muGrid hG hodd i j - (δ : ℂ) • hyp.muGrid hG hodd i 0 - (n : ℂ) • ζ)
-          + (n : ℂ) • (hyp.SHC_isCoherent hG).extension ζ) = 2 := by
+          + (n : ℂ) • coh.extension ζ) = 2 := by
   have hnorm_a := hyp.muGridAlpha_tau_inner_self hG hodd i hj0 hζS hζirr hdeg hμ0 hζ1 hnf hδj
     hdζ h0ζ hδpm
-  have hzz := hyp.SHC_extension_inner_self hG hζS hζirr hζ1
-  have hα0' : ClassFunction.inner ((hyp.SHC_isCoherent hG).extension ζ)
+  have hzz := hyp.SHC_extension_inner_self hG coh hζS hζirr hζ1
+  have hα0' : ClassFunction.inner (coh.extension ζ)
       (hyp.tau (hyp.muGrid hG hodd i j - (δ : ℂ) • hyp.muGrid hG hodd i 0 - (n : ℂ) • ζ))
       = -(n : ℂ) := by
     rw [OddOrder.RepresentationTheory.inner_conj_symm, hα0, star_neg, star_natCast]
@@ -1936,7 +1960,8 @@ cannot use).  Writing `X = α_{ij}^τ + n·ζ^{τ₁}` (`∈ ℤ[Irr G]`, `‖X�
 (`SHC_muGridPsi_vanishes_on_typePV`), so the norm-`2` Dade-image trichotomy
 `eq_smul_chiFam_diff_of_vanishOnV` forces `X = δ(ω_{ij}^σ − ω_{i0}^σ)`. -/
 theorem Hypothesis.SHC_tau_muGridAlpha_eq [Finite G] {M : Subgroup G}
-    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis M) (hodd : Odd (Nat.card G))
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis M)
+    (coh : OddOrder.Peterfalvi.S07.IsCoherent hyp.tau hyp.SHCSet hyp.A0) (hodd : Odd (Nat.card G))
     (i : Fin hyp.w1) {j : Fin hyp.w2} (hj0 : j ≠ 0)
     {ζ : ClassFunction ↥M ℂ} (hζS : ζ ∈ inducedFamily M) (hζirr : IsIrreducibleCharacter ζ)
     (hζ1 : ζ 1 = (hyp.w1 : ℂ)) (hζne : ζ.conj ≠ ζ) {d : ℕ} {δ : ℤ} {n : ℕ}
@@ -1946,19 +1971,19 @@ theorem Hypothesis.SHC_tau_muGridAlpha_eq [Finite G] {M : Subgroup G}
     (hδpm : δ = 1 ∨ δ = -1)
     (hα0 : ClassFunction.inner
         (hyp.tau (hyp.muGrid hG hodd i j - (δ : ℂ) • hyp.muGrid hG hodd i 0 - (n : ℂ) • ζ))
-        ((hyp.SHC_isCoherent hG).extension ζ) = -(n : ℂ)) :
+        (coh.extension ζ) = -(n : ℂ)) :
     hyp.tau (hyp.muGrid hG hodd i j - (δ : ℂ) • hyp.muGrid hG hodd i 0 - (n : ℂ) • ζ)
       = (δ : ℂ) • (hyp.alignedOmegaSigmaGrid hG hodd i j - hyp.alignedOmegaSigmaGrid hG hodd i 0)
-        - (n : ℂ) • (hyp.SHC_isCoherent hG).extension ζ := by
+        - (n : ℂ) • coh.extension ζ := by
   haveI := hyp.finiteG
   classical
-  have hXfacts := hyp.SHC_muGridAlpha_tau_X_inner hG hodd i hj0 hζS hζirr hζ1 hdeg hμ0 hnf hδj
+  have hXfacts := hyp.SHC_muGridAlpha_tau_X_inner hG coh hodd i hj0 hζS hζirr hζ1 hdeg hμ0 hnf hδj
     hdζ h0ζ hδpm hα0
-  have hτ1ζZ : (hyp.SHC_isCoherent hG).extension ζ ∈ ZIrr G :=
-    (hyp.SHC_isCoherent hG).extension_mem_ZIrr ζ (Submodule.subset_span ⟨hζS, hζirr, hζ1⟩)
+  have hτ1ζZ : coh.extension ζ ∈ ZIrr G :=
+    coh.extension_mem_ZIrr ζ (Submodule.subset_span ⟨hζS, hζirr, hζ1⟩)
   have hαZ := hyp.muGridAlpha_tau_mem_ZIrr hG hodd i hj0 hζS hζirr hdeg hμ0 hζ1 hnf hδj
   have hXZ : hyp.tau (hyp.muGrid hG hodd i j - (δ : ℂ) • hyp.muGrid hG hodd i 0 - (n : ℂ) • ζ)
-      + (n : ℂ) • (hyp.SHC_isCoherent hG).extension ζ ∈ ZIrr G := by
+      + (n : ℂ) • coh.extension ζ ∈ ZIrr G := by
     refine Submodule.add_mem _ hαZ ?_
     rw [Nat.cast_smul_eq_nsmul]; exact nsmul_mem hτ1ζZ n
   obtain ⟨P, hPinj, hP⟩ := hyp.exists_alignedOmegaSigmaGrid_chiFam_family hG hodd i
@@ -1972,11 +1997,11 @@ theorem Hypothesis.SHC_tau_muGridAlpha_eq [Finite G] {M : Subgroup G}
   have hP0' : tic.chiFam hVeq app (P 0) = hyp.alignedOmegaSigmaGrid hG hodd i 0 := (hP 0).symm
   have hψV : ∀ v ∈ tic.V,
       (hyp.tau (hyp.muGrid hG hodd i j - (δ : ℂ) • hyp.muGrid hG hodd i 0 - (n : ℂ) • ζ)
-          + (n : ℂ) • (hyp.SHC_isCoherent hG).extension ζ
+          + (n : ℂ) • coh.extension ζ
         - (δ : ℂ) • (tic.chiFam hVeq app (P j) - tic.chiFam hVeq app (P 0))) v = 0 := by
     intro v hv
     rw [hPj', hP0']
-    exact hyp.SHC_muGridPsi_vanishes_on_typePV hG hodd hj0 hζS hζirr hζ1 hζne hdeg hμ0 hnf hδj hv
+    exact hyp.SHC_muGridPsi_vanishes_on_typePV hG coh hodd hj0 hζS hζirr hζ1 hζne hdeg hμ0 hnf hδj hv
   rw [eq_sub_iff_add_eq, ← hPj', ← hP0']
   exact tic.eq_smul_chiFam_diff_of_vanishOnV hVeq app hXZ hXfacts.2 hPne hδpm hψV
 
@@ -1988,11 +2013,12 @@ difference `ζ − η` is `A₀`-supported (`inducedFamily_sub_support`) and lie
 `SHC_isCoherent.extension` agrees with `hyp.tau` (`extends_on_supported`). -/
 theorem Hypothesis.tau_sub_eq_SHC_extension [Finite G] {M : Subgroup G}
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis M)
+    (coh : OddOrder.Peterfalvi.S07.IsCoherent hyp.tau hyp.SHCSet hyp.A0)
     {ζ η : ClassFunction ↥M ℂ}
     (hζS : ζ ∈ inducedFamily M) (hζirr : IsIrreducibleCharacter ζ) (hζ1 : ζ 1 = (hyp.w1 : ℂ))
     (hηS : η ∈ inducedFamily M) (hηirr : IsIrreducibleCharacter η) (hη1 : η 1 = (hyp.w1 : ℂ)) :
     hyp.tau (ζ - η)
-      = (hyp.SHC_isCoherent hG).extension ζ - (hyp.SHC_isCoherent hG).extension η := by
+      = coh.extension ζ - coh.extension η := by
   have hspanζ : ζ ∈ OddOrder.Peterfalvi.S07.zSpan
       {φ : ClassFunction ↥M ℂ | φ ∈ inducedFamily M ∧ IsIrreducibleCharacter φ ∧
         ((φ : ↥M → ℂ) 1 = (hyp.w1 : ℂ))} :=
@@ -2005,7 +2031,7 @@ theorem Hypothesis.tau_sub_eq_SHC_extension [Finite G] {M : Subgroup G}
       {φ : ClassFunction ↥M ℂ | φ ∈ inducedFamily M ∧ IsIrreducibleCharacter φ ∧
         ((φ : ↥M → ℂ) 1 = (hyp.w1 : ℂ))} hyp.A0 :=
     ⟨Submodule.sub_mem _ hspanζ hspanη, hyp.inducedFamily_sub_support hζS hηS (hζ1.trans hη1.symm)⟩
-  rw [← (hyp.SHC_isCoherent hG).extends_on_supported _ hmem, map_sub]
+  rw [← coh.extends_on_supported _ hmem, map_sub]
 
 open scoped FiniteInduce in
 /-- **Peterfalvi (11.8.2), the `S₁^{τ₁}`-projection coefficient relation**:
@@ -2017,7 +2043,8 @@ on the supported `α_{ij}` and `ζ − η` (`tau_inner_eq_of_supported`), and th
 `η ≠ ζ`) and `(α_{ij}^τ, ζ^{τ₁}) = a − n` — the coefficient structure of the (11.8.2) decomposition
 `α_{ij}^τ = X − nζ^{τ₁} + a∑_{λ∈S₁}λ^{τ₁}`. -/
 theorem Hypothesis.muGridAlpha_tau_inner_SHC_extension_sub [Finite G] {M : Subgroup G}
-    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis M) (hodd : Odd (Nat.card G))
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis M)
+    (coh : OddOrder.Peterfalvi.S07.IsCoherent hyp.tau hyp.SHCSet hyp.A0) (hodd : Odd (Nat.card G))
     (i : Fin hyp.w1) {j : Fin hyp.w2} (hj0 : j ≠ 0)
     {ζ η : ClassFunction ↥M ℂ} (hζS : ζ ∈ inducedFamily M) (hζirr : IsIrreducibleCharacter ζ)
     (hζ1 : ζ 1 = (hyp.w1 : ℂ)) (hηS : η ∈ inducedFamily M) (hηirr : IsIrreducibleCharacter η)
@@ -2027,15 +2054,15 @@ theorem Hypothesis.muGridAlpha_tau_inner_SHC_extension_sub [Finite G] {M : Subgr
     (hdζ : hyp.muGrid hG hodd i j 1 ≠ ζ 1) (h0ζ : hyp.muGrid hG hodd i 0 1 ≠ ζ 1) :
     ClassFunction.inner
         (hyp.tau (hyp.muGrid hG hodd i j - (δ : ℂ) • hyp.muGrid hG hodd i 0 - (n : ℂ) • ζ))
-        ((hyp.SHC_isCoherent hG).extension ζ)
+        (coh.extension ζ)
       - ClassFunction.inner
         (hyp.tau (hyp.muGrid hG hodd i j - (δ : ℂ) • hyp.muGrid hG hodd i 0 - (n : ℂ) • ζ))
-        ((hyp.SHC_isCoherent hG).extension η) = -(n : ℂ) := by
+        (coh.extension η) = -(n : ℂ) := by
   have hαsupp := hyp.muGrid_alpha_support hG hodd hj0 hζS hdeg hμ0 hζ1 hnf hδj
   have hζηsupp : (ζ - η).support ⊆ hyp.A0 :=
     hyp.inducedFamily_sub_support hζS hηS (hζ1.trans hη1.symm)
   rw [← ClassFunction.inner_sub_right,
-    ← hyp.tau_sub_eq_SHC_extension hG hζS hζirr hζ1 hηS hηirr hη1,
+    ← hyp.tau_sub_eq_SHC_extension hG coh hζS hζirr hζ1 hηS hηirr hη1,
     hyp.tau_inner_eq_of_supported hαsupp hζηsupp,
     hyp.muGridAlpha_inner_zeta_sub_irr hG hodd i j hζirr hηirr hdζ h0ζ (hη1.trans hζ1.symm) hηne]
 
@@ -2048,18 +2075,17 @@ coincided, `1 = ⟨φ^{τ₁}, φ^{τ₁}⟩ = ⟨φ^{τ₁}, ψ^{τ₁}⟩ = 0`
 (`exists_intProjection_of_orthonormal_ZIrr`). -/
 theorem Hypothesis.SHC_extension_inj [Finite G] {M : Subgroup G}
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis M)
+    (coh : OddOrder.Peterfalvi.S07.IsCoherent hyp.tau hyp.SHCSet hyp.A0)
     {φ ψ : ClassFunction ↥M ℂ}
     (hφS : φ ∈ inducedFamily M) (hφirr : IsIrreducibleCharacter φ) (hφ1 : φ 1 = (hyp.w1 : ℂ))
     (hψS : ψ ∈ inducedFamily M) (hψirr : IsIrreducibleCharacter ψ) (hψ1 : ψ 1 = (hyp.w1 : ℂ))
-    (heq : (hyp.SHC_isCoherent hG).extension φ = (hyp.SHC_isCoherent hG).extension ψ) :
+    (heq : coh.extension φ = coh.extension ψ) :
     φ = ψ := by
   by_contra hne
-  have h0 : ClassFunction.inner ((hyp.SHC_isCoherent hG).extension φ)
-      ((hyp.SHC_isCoherent hG).extension ψ) = 0 :=
-    hyp.SHC_extension_inner_of_ne hG hφS hφirr hφ1 hψS hψirr hψ1 hne
-  have h1 : ClassFunction.inner ((hyp.SHC_isCoherent hG).extension φ)
-      ((hyp.SHC_isCoherent hG).extension ψ) = 1 := by
-    rw [← heq]; exact hyp.SHC_extension_inner_self hG hφS hφirr hφ1
+  have h0 : ClassFunction.inner (coh.extension φ) (coh.extension ψ) = 0 :=
+    coh.inner_extension_eq_zero_of_ne ⟨hφS, hφirr, hφ1⟩ hφirr ⟨hψS, hψirr, hψ1⟩ hψirr hne
+  have h1 : ClassFunction.inner (coh.extension φ) (coh.extension ψ) = 1 := by
+    rw [← heq]; exact coh.inner_extension_self_eq_one ⟨hφS, hφirr, hφ1⟩ hφirr
   rw [h0] at h1
   exact one_ne_zero h1.symm
 
@@ -2071,26 +2097,27 @@ characters of `G`, ready for the integer projection `exists_intProjection_of_ort
 (the same filter used by `SHC_isCoherent`) under `extension`; orthonormality is
 `SHC_extension_inner_self`/`SHC_extension_inner_of_ne` + the injectivity `SHC_extension_inj`. -/
 theorem Hypothesis.exists_SHC_extension_orthonormal [Finite G] {M : Subgroup G}
-    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis M) :
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis M)
+    (coh : OddOrder.Peterfalvi.S07.IsCoherent hyp.tau hyp.SHCSet hyp.A0) :
     ∃ R : Finset (ClassFunction G ℂ),
       (∀ β ∈ R, β ∈ ZIrr G) ∧
       (∀ α ∈ R, ∀ β ∈ R, ClassFunction.inner α β = if α = β then (1 : ℂ) else 0) ∧
       (∀ φ : ClassFunction ↥M ℂ, φ ∈ inducedFamily M → IsIrreducibleCharacter φ →
-        φ 1 = (hyp.w1 : ℂ) → (hyp.SHC_isCoherent hG).extension φ ∈ R) ∧
+        φ 1 = (hyp.w1 : ℂ) → coh.extension φ ∈ R) ∧
       (∀ β ∈ R, ∃ φ : ClassFunction ↥M ℂ, φ ∈ inducedFamily M ∧ IsIrreducibleCharacter φ ∧
-        φ 1 = (hyp.w1 : ℂ) ∧ β = (hyp.SHC_isCoherent hG).extension φ) := by
+        φ 1 = (hyp.w1 : ℂ) ∧ β = coh.extension φ) := by
   haveI := hyp.finiteG
   classical
   set s : Finset (IrreducibleCharacter ↥M) :=
     Finset.univ.filter (fun χ => (χ : ClassFunction ↥M ℂ) ∈ inducedFamily M ∧
       (χ : ClassFunction ↥M ℂ) 1 = (hyp.w1 : ℂ)) with hs
   refine ⟨s.image (fun χ : IrreducibleCharacter ↥M =>
-      (hyp.SHC_isCoherent hG).extension (χ : ClassFunction ↥M ℂ)), ?_, ?_, ?_, ?_⟩
+      coh.extension (χ : ClassFunction ↥M ℂ)), ?_, ?_, ?_, ?_⟩
   · intro β hβ
     rw [Finset.mem_image] at hβ
     obtain ⟨χ, hχs, rfl⟩ := hβ
     rw [hs, Finset.mem_filter] at hχs
-    exact (hyp.SHC_isCoherent hG).extension_mem_ZIrr _
+    exact coh.extension_mem_ZIrr _
       (Submodule.subset_span ⟨hχs.2.1, χ.2, hχs.2.2⟩)
   · intro α hα β hβ
     rw [Finset.mem_image] at hα hβ
@@ -2099,12 +2126,13 @@ theorem Hypothesis.exists_SHC_extension_orthonormal [Finite G] {M : Subgroup G}
     rw [hs, Finset.mem_filter] at hχs hχ's
     by_cases hχχ' : χ = χ'
     · subst hχχ'; rw [if_pos rfl]
-      exact hyp.SHC_extension_inner_self hG hχs.2.1 χ.2 hχs.2.2
+      exact coh.inner_extension_self_eq_one ⟨hχs.2.1, χ.2, hχs.2.2⟩ χ.2
     · have hne : (χ : ClassFunction ↥M ℂ) ≠ (χ' : ClassFunction ↥M ℂ) :=
         fun h => hχχ' (Subtype.ext h)
-      rw [hyp.SHC_extension_inner_of_ne hG hχs.2.1 χ.2 hχs.2.2 hχ's.2.1 χ'.2 hχ's.2.2 hne,
+      rw [coh.inner_extension_eq_zero_of_ne ⟨hχs.2.1, χ.2, hχs.2.2⟩ χ.2 ⟨hχ's.2.1, χ'.2, hχ's.2.2⟩
+          χ'.2 hne,
         if_neg (fun hαβ => hχχ' (Subtype.ext
-          (hyp.SHC_extension_inj hG hχs.2.1 χ.2 hχs.2.2 hχ's.2.1 χ'.2 hχ's.2.2 hαβ)))]
+          (hyp.SHC_extension_inj hG coh hχs.2.1 χ.2 hχs.2.2 hχ's.2.1 χ'.2 hχ's.2.2 hαβ)))]
   · intro φ hφS hφirr hφ1
     rw [Finset.mem_image]
     exact ⟨⟨φ, hφirr⟩, by rw [hs, Finset.mem_filter]; exact ⟨Finset.mem_univ _, hφS, hφ1⟩, rfl⟩
@@ -2215,7 +2243,8 @@ the norm collapses to `‖X‖² = 2` — the input to Peterfalvi's `X = ω_{ij}
 `R` and `|R| = n` are supplied by the caller: `R` from `exists_SHC_extension_orthonormal`, and
 `|R| = n` is the (11.8.1) `|S₁| = n` (gated on the §9↔§10 carrier bridge). -/
 theorem Hypothesis.muGridAlpha_tau_residual_norm [Finite G] {M : Subgroup G}
-    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis M) (hodd : Odd (Nat.card G))
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis M)
+    (coh : OddOrder.Peterfalvi.S07.IsCoherent hyp.tau hyp.SHCSet hyp.A0) (hodd : Odd (Nat.card G))
     (i : Fin hyp.w1) {j : Fin hyp.w2} (hj0 : j ≠ 0)
     {ζ : ClassFunction ↥M ℂ} (hζS : ζ ∈ inducedFamily M) (hζirr : IsIrreducibleCharacter ζ)
     (hζ1 : ζ 1 = (hyp.w1 : ℂ)) {d : ℕ} {δ : ℤ} {n : ℕ}
@@ -2227,15 +2256,15 @@ theorem Hypothesis.muGridAlpha_tau_residual_norm [Finite G] {M : Subgroup G}
     (hZ : ∀ β ∈ R, β ∈ ZIrr G)
     (horth : ∀ α ∈ R, ∀ β ∈ R, ClassFunction.inner α β = if α = β then (1 : ℂ) else 0)
     (hRmem : ∀ φ : ClassFunction ↥M ℂ, φ ∈ inducedFamily M → IsIrreducibleCharacter φ →
-      φ 1 = (hyp.w1 : ℂ) → (hyp.SHC_isCoherent hG).extension φ ∈ R)
+      φ 1 = (hyp.w1 : ℂ) → coh.extension φ ∈ R)
     (hRrev : ∀ β ∈ R, ∃ φ : ClassFunction ↥M ℂ, φ ∈ inducedFamily M ∧ IsIrreducibleCharacter φ ∧
-      φ 1 = (hyp.w1 : ℂ) ∧ β = (hyp.SHC_isCoherent hG).extension φ) :
+      φ 1 = (hyp.w1 : ℂ) ∧ β = coh.extension φ) :
     ∃ (a : ℤ) (Y : ClassFunction G ℂ),
       (a = 0 ∨ a = 1 ∨ a = 2) ∧
       (∀ β ∈ R, ClassFunction.inner Y β = 0) ∧
       ClassFunction.inner
         (hyp.tau (hyp.muGrid hG hodd i j - (δ : ℂ) • hyp.muGrid hG hodd i 0 - (n : ℂ) • ζ))
-        ((hyp.SHC_isCoherent hG).extension ζ) = (a : ℂ) - (n : ℂ) ∧
+        (coh.extension ζ) = (a : ℂ) - (n : ℂ) ∧
       ClassFunction.inner Y Y
         = (2 : ℂ) + (n : ℂ) ^ 2 - (((a : ℂ) - (n : ℂ)) ^ 2 + ((n : ℂ) - 1) * (a : ℂ) ^ 2) ∧
       ((a = 0 ∨ a = 2) → ClassFunction.inner Y Y = 2) ∧
@@ -2244,22 +2273,22 @@ theorem Hypothesis.muGridAlpha_tau_residual_norm [Finite G] {M : Subgroup G}
         Y v = hyp.tau
           (hyp.muGrid hG hodd i j - (δ : ℂ) • hyp.muGrid hG hodd i 0 - (n : ℂ) • ζ) v) ∧
       hyp.tau (hyp.muGrid hG hodd i j - (δ : ℂ) • hyp.muGrid hG hodd i 0 - (n : ℂ) • ζ)
-        = Y - (n : ℂ) • (hyp.SHC_isCoherent hG).extension ζ + (a : ℂ) • ∑ β ∈ R, β := by
+        = Y - (n : ℂ) • coh.extension ζ + (a : ℂ) • ∑ β ∈ R, β := by
   classical
-  have hζR : (hyp.SHC_isCoherent hG).extension ζ ∈ R := hRmem ζ hζS hζirr hζ1
+  have hζR : coh.extension ζ ∈ R := hRmem ζ hζS hζirr hζ1
   have hαZ := hyp.muGridAlpha_tau_mem_ZIrr hG hodd i hj0 hζS hζirr hdeg hμ0 hζ1 hnf hδj
   obtain ⟨c, Y, hcoeff, hnorm, hYorth, hdecomp, hYZ⟩ :=
     inner_self_eq_sum_sq_add_of_intProjection hαZ hZ horth
-  set a : ℤ := c ((hyp.SHC_isCoherent hG).extension ζ) + (n : ℤ) with hadef
-  have hcζ : c ((hyp.SHC_isCoherent hG).extension ζ) = a - (n : ℤ) := by rw [hadef]; ring
-  have hcη : ∀ β ∈ R, β ≠ (hyp.SHC_isCoherent hG).extension ζ → c β = a := by
+  set a : ℤ := c (coh.extension ζ) + (n : ℤ) with hadef
+  have hcζ : c (coh.extension ζ) = a - (n : ℤ) := by rw [hadef]; ring
+  have hcη : ∀ β ∈ R, β ≠ coh.extension ζ → c β = a := by
     intro β hβR hβne
     obtain ⟨η, hηS, hηirr, hη1, rfl⟩ := hRrev β hβR
     have hηζ : η ≠ ζ := fun h => hβne (by rw [h])
-    have hsub := hyp.muGridAlpha_tau_inner_SHC_extension_sub hG hodd i hj0 hζS hζirr hζ1
+    have hsub := hyp.muGridAlpha_tau_inner_SHC_extension_sub hG coh hodd i hj0 hζS hζirr hζ1
       hηS hηirr hη1 hηζ hdeg hμ0 hnf hδj hdζ h0ζ
     rw [hcoeff _ hζR, hcoeff _ (hRmem η hηS hηirr hη1)] at hsub
-    have hcast : ((c ((hyp.SHC_isCoherent hG).extension η) : ℤ) : ℂ) = ((a : ℤ) : ℂ) := by
+    have hcast : ((c (coh.extension η) : ℤ) : ℂ) = ((a : ℤ) : ℂ) := by
       rw [hadef]; push_cast; push_cast at hsub; linear_combination -hsub
     exact_mod_cast hcast
   have hsplit := sum_sq_eq_of_split hζR hcζ hcη
@@ -2287,21 +2316,21 @@ theorem Hypothesis.muGridAlpha_tau_residual_norm [Finite G] {M : Subgroup G}
       refine Finset.sum_eq_zero fun β hβR => ?_
       obtain ⟨φ, hφS, hφirr, hφ1, rfl⟩ := hRrev β hβR
       rw [ClassFunction.smul_apply,
-        hyp.SHC_extension_vanishes_on_typePV hG hodd hφS hφirr hφ1 hv, mul_zero]
+        hyp.SHC_extension_vanishes_on_typePV hG coh hodd hφS hφirr hφ1 hv, mul_zero]
     have hYeq : Y = hyp.tau
         (hyp.muGrid hG hodd i j - (δ : ℂ) • hyp.muGrid hG hodd i 0 - (n : ℂ) • ζ)
         - (∑ β ∈ R, (c β : ℂ) • β) := by rw [hdecomp]; abel
     rw [hYeq, ClassFunction.sub_apply, hsumv, sub_zero]
   have hdecompA : hyp.tau
       (hyp.muGrid hG hodd i j - (δ : ℂ) • hyp.muGrid hG hodd i 0 - (n : ℂ) • ζ)
-      = Y - (n : ℂ) • (hyp.SHC_isCoherent hG).extension ζ + (a : ℂ) • ∑ β ∈ R, β := by
+      = Y - (n : ℂ) • coh.extension ζ + (a : ℂ) • ∑ β ∈ R, β := by
     have hkey : (∑ β ∈ R, (c β : ℂ) • β)
-        = -((n : ℂ) • (hyp.SHC_isCoherent hG).extension ζ) + (a : ℂ) • ∑ β ∈ R, β := by
+        = -((n : ℂ) • coh.extension ζ) + (a : ℂ) • ∑ β ∈ R, β := by
       rw [Finset.smul_sum,
         ← Finset.add_sum_erase R (fun β => (c β : ℂ) • β) hζR,
         ← Finset.add_sum_erase R (fun β => (a : ℂ) • β) hζR, hcζ]
-      have herase : ∑ β ∈ R.erase ((hyp.SHC_isCoherent hG).extension ζ), (c β : ℂ) • β
-          = ∑ β ∈ R.erase ((hyp.SHC_isCoherent hG).extension ζ), (a : ℂ) • β :=
+      have herase : ∑ β ∈ R.erase (coh.extension ζ), (c β : ℂ) • β
+          = ∑ β ∈ R.erase (coh.extension ζ), (a : ℂ) • β :=
         Finset.sum_congr rfl fun β hβ => by
           rw [hcη β (Finset.mem_of_mem_erase hβ) (Finset.ne_of_mem_erase hβ)]
       rw [herase]; push_cast; module
@@ -2316,7 +2345,8 @@ open scoped Classical FiniteInduce in
 /-- **Peterfalvi (11.8.2), the `a ∈ {0, 1, 2}` bound** — the projection of
 `muGridAlpha_tau_residual_norm` onto just the coefficient `a` and `⟨α_{ij}^τ, ζ^{τ₁}⟩ = a − n`. -/
 theorem Hypothesis.muGridAlpha_tau_proj_a_mem [Finite G] {M : Subgroup G}
-    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis M) (hodd : Odd (Nat.card G))
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis M)
+    (coh : OddOrder.Peterfalvi.S07.IsCoherent hyp.tau hyp.SHCSet hyp.A0) (hodd : Odd (Nat.card G))
     (i : Fin hyp.w1) {j : Fin hyp.w2} (hj0 : j ≠ 0)
     {ζ : ClassFunction ↥M ℂ} (hζS : ζ ∈ inducedFamily M) (hζirr : IsIrreducibleCharacter ζ)
     (hζ1 : ζ 1 = (hyp.w1 : ℂ)) {d : ℕ} {δ : ℤ} {n : ℕ}
@@ -2328,14 +2358,14 @@ theorem Hypothesis.muGridAlpha_tau_proj_a_mem [Finite G] {M : Subgroup G}
     (hZ : ∀ β ∈ R, β ∈ ZIrr G)
     (horth : ∀ α ∈ R, ∀ β ∈ R, ClassFunction.inner α β = if α = β then (1 : ℂ) else 0)
     (hRmem : ∀ φ : ClassFunction ↥M ℂ, φ ∈ inducedFamily M → IsIrreducibleCharacter φ →
-      φ 1 = (hyp.w1 : ℂ) → (hyp.SHC_isCoherent hG).extension φ ∈ R)
+      φ 1 = (hyp.w1 : ℂ) → coh.extension φ ∈ R)
     (hRrev : ∀ β ∈ R, ∃ φ : ClassFunction ↥M ℂ, φ ∈ inducedFamily M ∧ IsIrreducibleCharacter φ ∧
-      φ 1 = (hyp.w1 : ℂ) ∧ β = (hyp.SHC_isCoherent hG).extension φ) :
+      φ 1 = (hyp.w1 : ℂ) ∧ β = coh.extension φ) :
     ∃ a : ℤ, (a = 0 ∨ a = 1 ∨ a = 2) ∧
       ClassFunction.inner
         (hyp.tau (hyp.muGrid hG hodd i j - (δ : ℂ) • hyp.muGrid hG hodd i 0 - (n : ℂ) • ζ))
-        ((hyp.SHC_isCoherent hG).extension ζ) = (a : ℂ) - (n : ℂ) := by
-  obtain ⟨a, _, ha, _, hinner, _, _, _, _, _⟩ := hyp.muGridAlpha_tau_residual_norm hG hodd i hj0 hζS
+        (coh.extension ζ) = (a : ℂ) - (n : ℂ) := by
+  obtain ⟨a, _, ha, _, hinner, _, _, _, _, _⟩ := hyp.muGridAlpha_tau_residual_norm hG coh hodd i hj0 hζS
     hζirr hζ1 hdeg hμ0 hnf hδj hdζ h0ζ hδpm hn2 hRn hZ horth hRmem hRrev
   exact ⟨a, ha, hinner⟩
 
@@ -2352,7 +2382,8 @@ Feeds the (11.8.5) `a = 0` argument (`β = a·∑λ^{τ₁}` then (5.3.b)).  Fro
 `α^τ = δ(ω^σ diff)` there), so the norm-`2` Dade-image trichotomy `eq_smul_chiFam_diff_of_vanishOnV`
 forces `Y = δ(ω_{ij}^σ − ω_{i0}^σ)`. -/
 theorem Hypothesis.SHC_residual_eq_omegaSigma_diff [Finite G] {M : Subgroup G}
-    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis M) (hodd : Odd (Nat.card G))
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis M)
+    (coh : OddOrder.Peterfalvi.S07.IsCoherent hyp.tau hyp.SHCSet hyp.A0) (hodd : Odd (Nat.card G))
     (i : Fin hyp.w1) {j : Fin hyp.w2} (hj0 : j ≠ 0)
     {ζ : ClassFunction ↥M ℂ} (hζS : ζ ∈ inducedFamily M) (hζirr : IsIrreducibleCharacter ζ)
     (hζ1 : ζ 1 = (hyp.w1 : ℂ)) {d : ℕ} {δ : ℤ} {n : ℕ}
@@ -2364,20 +2395,20 @@ theorem Hypothesis.SHC_residual_eq_omegaSigma_diff [Finite G] {M : Subgroup G}
     (hZ : ∀ β ∈ R, β ∈ ZIrr G)
     (horth : ∀ α ∈ R, ∀ β ∈ R, ClassFunction.inner α β = if α = β then (1 : ℂ) else 0)
     (hRmem : ∀ φ : ClassFunction ↥M ℂ, φ ∈ inducedFamily M → IsIrreducibleCharacter φ →
-      φ 1 = (hyp.w1 : ℂ) → (hyp.SHC_isCoherent hG).extension φ ∈ R)
+      φ 1 = (hyp.w1 : ℂ) → coh.extension φ ∈ R)
     (hRrev : ∀ β ∈ R, ∃ φ : ClassFunction ↥M ℂ, φ ∈ inducedFamily M ∧ IsIrreducibleCharacter φ ∧
-      φ 1 = (hyp.w1 : ℂ) ∧ β = (hyp.SHC_isCoherent hG).extension φ) :
+      φ 1 = (hyp.w1 : ℂ) ∧ β = coh.extension φ) :
     ∃ (a : ℤ) (Y : ClassFunction G ℂ),
       (a = 0 ∨ a = 1 ∨ a = 2) ∧
       ClassFunction.inner
         (hyp.tau (hyp.muGrid hG hodd i j - (δ : ℂ) • hyp.muGrid hG hodd i 0 - (n : ℂ) • ζ))
-        ((hyp.SHC_isCoherent hG).extension ζ) = (a : ℂ) - (n : ℂ) ∧
+        (coh.extension ζ) = (a : ℂ) - (n : ℂ) ∧
       ((a = 0 ∨ a = 2) → Y = (δ : ℂ) • (hyp.alignedOmegaSigmaGrid hG hodd i j
           - hyp.alignedOmegaSigmaGrid hG hodd i 0)) ∧
       hyp.tau (hyp.muGrid hG hodd i j - (δ : ℂ) • hyp.muGrid hG hodd i 0 - (n : ℂ) • ζ)
-        = Y - (n : ℂ) • (hyp.SHC_isCoherent hG).extension ζ + (a : ℂ) • ∑ β ∈ R, β := by
+        = Y - (n : ℂ) • coh.extension ζ + (a : ℂ) • ∑ β ∈ R, β := by
   obtain ⟨a, Y, hbound, hYorth, hinner, hnorm, hnorm2case, hYZ, hYV, hdecompA⟩ :=
-    hyp.muGridAlpha_tau_residual_norm hG hodd i hj0 hζS hζirr hζ1 hdeg hμ0 hnf hδj hdζ h0ζ hδpm hn2
+    hyp.muGridAlpha_tau_residual_norm hG coh hodd i hj0 hζS hζirr hζ1 hdeg hμ0 hnf hδj hdζ h0ζ hδpm hn2
       hRn hZ horth hRmem hRrev
   refine ⟨a, Y, hbound, hinner, ?_, hdecompA⟩
   intro ha02
@@ -2429,30 +2460,32 @@ open scoped FiniteInduce in
 /-- **Peterfalvi (11.8.5) `G`-side (5.3.b) sum** `(ζ^{τ₁}, ∑_r ω_{r0}^σ) = 0`: each
 `(ζ^{τ₁}, ω_{r0}^σ) = 0` (`SHC_extension_inner_alignedOmegaSigma_eq_zero`), summed over the rows. -/
 theorem Hypothesis.SHC_extension_inner_zeroColumnOmegaSigma_sum [Finite G] {M : Subgroup G}
-    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis M) (hodd : Odd (Nat.card G))
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis M)
+    (coh : OddOrder.Peterfalvi.S07.IsCoherent hyp.tau hyp.SHCSet hyp.A0) (hodd : Odd (Nat.card G))
     {ζ : ClassFunction ↥M ℂ} (hζS : ζ ∈ inducedFamily M) (hζirr : IsIrreducibleCharacter ζ)
     (hζ1 : ζ 1 = (hyp.w1 : ℂ)) (hζne : ζ.conj ≠ ζ) :
-    ClassFunction.inner ((hyp.SHC_isCoherent hG).extension ζ)
+    ClassFunction.inner (coh.extension ζ)
         (∑ r : Fin hyp.w1, hyp.alignedOmegaSigmaGrid hG hodd r 0) = 0 := by
   rw [OddOrder.RepresentationTheory.inner_sum_right]
   refine Finset.sum_eq_zero fun r _ => ?_
-  exact hyp.SHC_extension_inner_alignedOmegaSigma_eq_zero hG hodd hζS hζirr hζ1 hζne r 0
+  exact hyp.SHC_extension_inner_alignedOmegaSigma_eq_zero hG coh hodd hζS hζirr hζ1 hζne r 0
 
 open scoped FiniteInduce in
 /-- **Peterfalvi (11.8.5) `G`-side (5.3.b) sum over `S₁`** `(∑_{β∈R} β, ∑_r ω_{r0}^σ) = 0`: each
 `β = λ^{τ₁}` (`hRrev`) is a degree-`w₁` `S(HC)` coherent image, non-real (`inducedFamily_degree_w1_conj_ne`),
 so `(λ^{τ₁}, ∑_r ω_{r0}^σ) = 0` (`SHC_extension_inner_zeroColumnOmegaSigma_sum`), summed over `R`. -/
 theorem Hypothesis.R_sum_inner_zeroColumnOmegaSigma_sum [Finite G] {M : Subgroup G}
-    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis M) (hodd : Odd (Nat.card G))
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis M)
+    (coh : OddOrder.Peterfalvi.S07.IsCoherent hyp.tau hyp.SHCSet hyp.A0) (hodd : Odd (Nat.card G))
     {R : Finset (ClassFunction G ℂ)}
     (hRrev : ∀ β ∈ R, ∃ φ : ClassFunction ↥M ℂ, φ ∈ inducedFamily M ∧ IsIrreducibleCharacter φ ∧
-      φ 1 = (hyp.w1 : ℂ) ∧ β = (hyp.SHC_isCoherent hG).extension φ) :
+      φ 1 = (hyp.w1 : ℂ) ∧ β = coh.extension φ) :
     ClassFunction.inner (∑ β ∈ R, β)
         (∑ r : Fin hyp.w1, hyp.alignedOmegaSigmaGrid hG hodd r 0) = 0 := by
   rw [inner_sum_left]
   refine Finset.sum_eq_zero fun β hβR => ?_
   obtain ⟨φ, hφS, hφirr, hφ1, rfl⟩ := hRrev β hβR
-  exact hyp.SHC_extension_inner_zeroColumnOmegaSigma_sum hG hodd hφS hφirr hφ1
+  exact hyp.SHC_extension_inner_zeroColumnOmegaSigma_sum hG coh hodd hφS hφirr hφ1
     (hyp.inducedFamily_degree_w1_conj_ne hG hφirr hφ1)
 
 open scoped FiniteInduce in
@@ -2640,7 +2673,7 @@ theorem Hypothesis.tau_muColumnZero_sub_zeta_dichotomy_of_orthogonal [Finite G] 
   -- the (5.3.b) orthogonalities `⟨∑_r ω_{r0}^σ, λ^{τ₁}⟩ = 0`
   have heΩ : ClassFunction.inner ((hyp.SHC_isCoherent hG).extension ζ)
       (∑ r : Fin hyp.w1, hyp.alignedOmegaSigmaGrid hG hodd r 0) = 0 :=
-    hyp.SHC_extension_inner_zeroColumnOmegaSigma_sum hG hodd hζS hζirr hζ1 hζne
+    hyp.SHC_extension_inner_zeroColumnOmegaSigma_sum hG (hyp.SHC_isCoherent hG) hodd hζS hζirr hζ1 hζne
   have hΩe : ClassFunction.inner (∑ r : Fin hyp.w1, hyp.alignedOmegaSigmaGrid hG hodd r 0)
       ((hyp.SHC_isCoherent hG).extension ζ) = 0 := by
     rw [OddOrder.RepresentationTheory.inner_conj_symm, heΩ, star_zero]
@@ -2649,7 +2682,7 @@ theorem Hypothesis.tau_muColumnZero_sub_zeta_dichotomy_of_orthogonal [Finite G] 
     exact hζne.symm
   have heΩc : ClassFunction.inner ((hyp.SHC_isCoherent hG).extension ζ.conj)
       (∑ r : Fin hyp.w1, hyp.alignedOmegaSigmaGrid hG hodd r 0) = 0 :=
-    hyp.SHC_extension_inner_zeroColumnOmegaSigma_sum hG hodd hζcS hζcirr hζc1 hζcne
+    hyp.SHC_extension_inner_zeroColumnOmegaSigma_sum hG (hyp.SHC_isCoherent hG) hodd hζcS hζcirr hζc1 hζcne
   have hΩec : ClassFunction.inner (∑ r : Fin hyp.w1, hyp.alignedOmegaSigmaGrid hG hodd r 0)
       ((hyp.SHC_isCoherent hG).extension ζ.conj) = 0 := by
     rw [OddOrder.RepresentationTheory.inner_conj_symm, heΩc, star_zero]
@@ -2662,16 +2695,16 @@ theorem Hypothesis.tau_muColumnZero_sub_zeta_dichotomy_of_orthogonal [Finite G] 
     rw [hyp.tau_inner_eq_of_supported hsupp hsuppd, ClassFunction.inner_sub_left,
       ClassFunction.inner_sub_right, ClassFunction.inner_sub_right, hμζ, hμζc, hζζ, hζζc]
     ring
-  rw [hyp.tau_zeta_sub_conj_eq_SHC_extension hG hodd hζS hζirr hζ1,
+  rw [hyp.tau_zeta_sub_conj_eq_SHC_extension hG (hyp.SHC_isCoherent hG) hodd hζS hζirr hζ1,
     ClassFunction.inner_sub_right, hs, ht] at hGside
   have hstz : s - t = -1 := by exact_mod_cast hGside
   -- Cauchy–Schwarz bounds and the integer dichotomy `s = −1 ∨ t = 1`
   have hee : ClassFunction.inner ((hyp.SHC_isCoherent hG).extension ζ)
       ((hyp.SHC_isCoherent hG).extension ζ) = 1 :=
-    hyp.SHC_extension_inner_self hG hζS hζirr hζ1
+    hyp.SHC_extension_inner_self hG (hyp.SHC_isCoherent hG) hζS hζirr hζ1
   have heec : ClassFunction.inner ((hyp.SHC_isCoherent hG).extension ζ.conj)
       ((hyp.SHC_isCoherent hG).extension ζ.conj) = 1 :=
-    hyp.SHC_extension_inner_self hG hζcS hζcirr hζc1
+    hyp.SHC_extension_inner_self hG (hyp.SHC_isCoherent hG) hζcS hζcirr hζc1
   have hmA : ClassFunction.inner
       ((∑ r : Fin hyp.w1, hyp.alignedOmegaSigmaGrid hG hodd r 0)
         - hyp.tau ((∑ i' : Fin hyp.w1, hyp.muGrid hG hodd i' 0) - ζ))
@@ -2771,16 +2804,16 @@ theorem Hypothesis.tau_muColumnZero_sub_zeta_dichotomy_of_orthogonal [Finite G] 
       rw [← (hyp.SHC_isCoherent hG).extends_on_supported _ hmemsupp, map_sub]
     have heOmegalam : ClassFunction.inner ((hyp.SHC_isCoherent hG).extension lam)
         (∑ r : Fin hyp.w1, hyp.alignedOmegaSigmaGrid hG hodd r 0) = 0 :=
-      hyp.SHC_extension_inner_zeroColumnOmegaSigma_sum hG hodd hlamS hlamirr hlam1 hlamne
+      hyp.SHC_extension_inner_zeroColumnOmegaSigma_sum hG (hyp.SHC_isCoherent hG) hodd hlamS hlamirr hlam1 hlamne
     have hOmegalam : ClassFunction.inner (∑ r : Fin hyp.w1, hyp.alignedOmegaSigmaGrid hG hodd r 0)
         ((hyp.SHC_isCoherent hG).extension lam) = 0 := by
       rw [OddOrder.RepresentationTheory.inner_conj_symm, heOmegalam, star_zero]
     have heclam : ClassFunction.inner ((hyp.SHC_isCoherent hG).extension ζ.conj)
         ((hyp.SHC_isCoherent hG).extension lam) = 0 :=
-      hyp.SHC_extension_inner_of_ne hG hζcS hζcirr hζc1 hlamS hlamirr hlam1 (Ne.symm hlamzetac)
+      hyp.SHC_extension_inner_of_ne hG (hyp.SHC_isCoherent hG) hζcS hζcirr hζc1 hlamS hlamirr hlam1 (Ne.symm hlamzetac)
     have hece : ClassFunction.inner ((hyp.SHC_isCoherent hG).extension ζ.conj)
         ((hyp.SHC_isCoherent hG).extension ζ) = 0 :=
-      hyp.SHC_extension_inner_of_ne hG hζcS hζcirr hζc1 hζS hζirr hζ1 hζne
+      hyp.SHC_extension_inner_of_ne hG (hyp.SHC_isCoherent hG) hζcS hζcirr hζc1 hζS hζirr hζ1 hζne
     rw [htaulam, ClassFunction.inner_sub_right, hψeq, ClassFunction.inner_add_left,
       ClassFunction.inner_add_left, hOmegalam, heclam, hΩe, hece] at hGlam
     norm_num at hGlam
@@ -2926,7 +2959,7 @@ noncomputable def Hypothesis.SHC_swap [Finite G] {M : Subgroup G}
       abel
     have htaudiff : hyp.tau (ζ - ζ.conj)
         = (hyp.SHC_isCoherent hG).extension ζ - (hyp.SHC_isCoherent hG).extension ζ.conj :=
-      hyp.tau_zeta_sub_conj_eq_SHC_extension hG hodd hζS hζirr hζ1
+      hyp.tau_zeta_sub_conj_eq_SHC_extension hG (hyp.SHC_isCoherent hG) hodd hζS hζirr hζ1
     rw [hφeq, map_zsmul, map_zsmul, hswapdiff, htaudiff]
   · -- **maps into `ZIrr`**
     intro φ hφ
@@ -2964,6 +2997,37 @@ theorem Hypothesis.SHC_swap_h114 [Finite G] {M : Subgroup G}
   rw [hswapζ, sub_neg_eq_add, hbranch2]
 
 open scoped FiniteInduce in
+/-- **The branch-2 swap commutes with complex conjugation** (the `hconj` P4 input the (11.8.5)
+capstone `residualCoeff_eq_zero` needs for the swap branch).  For a degree-`w₁` irreducible
+`χ ∈ S(HC)`, `(SHC_swap.extension χ)‾ = SHC_swap.extension χ‾`.  Both sides equal `−SHC(χ‾‾)`:
+`SHC_swap.extension φ = −SHC(φ‾)`, so `(SHC_swap χ)‾ = (−SHC(χ‾))‾ = −(SHC(χ‾))‾ = −SHC(χ‾‾)`
+(the last by `SHC_extension_conj` at `χ‾`), while `SHC_swap χ‾ = −SHC(χ‾‾)` directly. -/
+theorem Hypothesis.SHC_swap_conj [Finite G] {M : Subgroup G}
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis M) (hodd : Odd (Nat.card G))
+    {ζ : ClassFunction ↥M ℂ} (hζS : ζ ∈ inducedFamily M) (hζirr : IsIrreducibleCharacter ζ)
+    (hζ1 : ζ 1 = (hyp.w1 : ℂ))
+    (htwo : ∀ lam : ClassFunction ↥M ℂ, lam ∈ inducedFamily M → IsIrreducibleCharacter lam →
+      lam 1 = (hyp.w1 : ℂ) → lam = ζ ∨ lam = ζ.conj)
+    {χ : ClassFunction ↥M ℂ} (hχS : χ ∈ inducedFamily M) (hχirr : IsIrreducibleCharacter χ)
+    (hχ1 : χ 1 = (hyp.w1 : ℂ)) :
+    ((hyp.SHC_swap hG hodd hζS hζirr hζ1 htwo).extension χ).conj
+      = (hyp.SHC_swap hG hodd hζS hζirr hζ1 htwo).extension χ.conj := by
+  haveI := hyp.finiteG
+  classical
+  have hχcS : χ.conj ∈ inducedFamily M := inducedFamily_closedUnderConjugate M hχS
+  have hχcirr : IsIrreducibleCharacter χ.conj := hχirr.conj
+  have hχc1 : χ.conj 1 = (hyp.w1 : ℂ) := by rw [ClassFunction.conj_apply, hχ1, star_natCast]
+  have hswap : ∀ φ : ClassFunction ↥M ℂ, (hyp.SHC_swap hG hodd hζS hζirr hζ1 htwo).extension φ
+      = -((hyp.SHC_isCoherent hG).extension φ.conj) := fun φ => by
+    change (-((hyp.SHC_isCoherent hG).extension.comp
+      (ClassFunction.mapRingEquivLinear (G := ↥M) Complex.conjAe.toRingEquiv))) φ = _
+    rw [LinearMap.neg_apply, LinearMap.comp_apply, ClassFunction.mapRingEquivLinear_apply,
+      show ClassFunction.mapRingEquiv Complex.conjAe.toRingEquiv φ = φ.conj from by
+        ext g; rw [ClassFunction.conj_apply, ClassFunction.mapRingEquiv_apply]; rfl]
+  rw [hswap χ, hswap χ.conj, ClassFunction.conj_neg,
+    hyp.SHC_extension_conj hG hχcS hχcirr hχc1]
+
+open scoped FiniteInduce in
 /-- **Peterfalvi (11.8.4), the h114-producing coherent extension.**  Under the (11.8) contradiction
 hypothesis (the residual `(μ₀ − ζ)^τ − ∑_r ω_{r0}^σ` is orthogonal to `(Irr W)^σ`), there is a
 coherent extension `ν` of `τ` to `ℤ[S(HC)]` for which the normalized (11.8.4) identity
@@ -2981,15 +3045,17 @@ theorem Hypothesis.exists_coherent_extension_h114_of_orthogonal [Finite G] {M : 
         ((hyp.tau ((∑ i' : Fin hyp.w1, hyp.muGrid hG hodd i' 0) - ζ))
           - ∑ i' : Fin hyp.w1, hyp.alignedOmegaSigmaGrid hG hodd i' 0)
         (hyp.alignedOmegaSigmaGrid hG hodd i j) = 0) :
-    ∃ ν : OddOrder.Peterfalvi.S07.IsCoherent hyp.tau
-        {φ : ClassFunction ↥M ℂ | φ ∈ inducedFamily M ∧ IsIrreducibleCharacter φ ∧
-          ((φ : ↥M → ℂ) 1 = (hyp.w1 : ℂ))} hyp.A0,
+    ∃ ν : OddOrder.Peterfalvi.S07.IsCoherent hyp.tau hyp.SHCSet hyp.A0,
+      (∀ {χ : ClassFunction ↥M ℂ}, χ ∈ inducedFamily M → IsIrreducibleCharacter χ →
+        χ 1 = (hyp.w1 : ℂ) → (ν.extension χ).conj = ν.extension χ.conj) ∧
       hyp.tau ((∑ i' : Fin hyp.w1, hyp.muGrid hG hodd i' 0) - ζ)
         = (∑ r : Fin hyp.w1, hyp.alignedOmegaSigmaGrid hG hodd r 0) - ν.extension ζ := by
   rcases hyp.tau_muColumnZero_sub_zeta_dichotomy_of_orthogonal hG hodd hζS hζirr hζ1 horth with
     h1 | ⟨htwo, h2⟩
-  · exact ⟨hyp.SHC_isCoherent hG, h1⟩
+  · exact ⟨hyp.SHC_isCoherent hG,
+      (fun hχS hχirr hχ1 => hyp.SHC_extension_conj hG hχS hχirr hχ1), h1⟩
   · exact ⟨hyp.SHC_swap hG hodd hζS hζirr hζ1 htwo,
+      (fun hχS hχirr hχ1 => hyp.SHC_swap_conj hG hodd hζS hζirr hζ1 htwo hχS hχirr hχ1),
       hyp.SHC_swap_h114 hG hodd hζS hζirr hζ1 htwo h2⟩
 
 open scoped Classical in
@@ -3192,7 +3258,8 @@ open scoped FiniteInduce in
 (Peterfalvi (5.3.b), `SHC_extension_inner_alignedOmegaSigma_eq_zero`).  This is the `β ⊥ 1` input to
 the `a`-even parity `a_even_of_eq_inner_sumOmegaSigma`. -/
 theorem Hypothesis.beta_inner_trivial [Finite G] {M : Subgroup G}
-    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis M) (hodd : Odd (Nat.card G))
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis M)
+    (coh : OddOrder.Peterfalvi.S07.IsCoherent hyp.tau hyp.SHCSet hyp.A0) (hodd : Odd (Nat.card G))
     (i : Fin hyp.w1) {j : Fin hyp.w2} (hj0 : j ≠ 0) (hi0 : i ≠ 0)
     {ζ : ClassFunction ↥M ℂ} (hζS : ζ ∈ inducedFamily M) (hζirr : IsIrreducibleCharacter ζ)
     (hζ1 : ζ 1 = (hyp.w1 : ℂ)) (hζne : ζ.conj ≠ ζ) {d : ℕ} {δ : ℤ} {n : ℕ}
@@ -3204,7 +3271,7 @@ theorem Hypothesis.beta_inner_trivial [Finite G] {M : Subgroup G}
     ClassFunction.inner
       (hyp.tau (hyp.muGrid hG hodd i j - (δ : ℂ) • hyp.muGrid hG hodd i 0 - (n : ℂ) • ζ)
         - (δ : ℂ) • (hyp.alignedOmegaSigmaGrid hG hodd i j - hyp.alignedOmegaSigmaGrid hG hodd i 0)
-        + (n : ℂ) • (hyp.SHC_isCoherent hG).extension ζ)
+        + (n : ℂ) • coh.extension ζ)
       (trivialClassFunction G) = 0 := by
   have hsupp := hyp.muGrid_alpha_support hG hodd hj0 hζS hdeg hμ0 hζ1 hnf hδj
   have hατ1 : ClassFunction.inner
@@ -3218,10 +3285,10 @@ theorem Hypothesis.beta_inner_trivial [Finite G] {M : Subgroup G}
       hyp.alignedOmegaSigmaGrid_inner hG hodd i 0 j 0,
       hyp.alignedOmegaSigmaGrid_inner hG hodd i 0 0 0,
       if_neg (fun h => hi0 h.1), if_neg (fun h => hi0 h.1), sub_zero]
-  have hζτ1 : ClassFunction.inner ((hyp.SHC_isCoherent hG).extension ζ)
+  have hζτ1 : ClassFunction.inner (coh.extension ζ)
       (trivialClassFunction G) = 0 := by
     rw [← hyp.alignedOmegaSigmaGrid_zero_zero hG hodd]
-    exact hyp.SHC_extension_inner_alignedOmegaSigma_eq_zero hG hodd hζS hζirr hζ1 hζne 0 0
+    exact hyp.SHC_extension_inner_alignedOmegaSigma_eq_zero hG coh hodd hζS hζirr hζ1 hζne 0 0
   rw [ClassFunction.inner_add_left, ClassFunction.inner_sub_left, ClassFunction.inner_smul_left,
     ClassFunction.inner_smul_left, hατ1, hωdiff1, hζτ1, mul_zero, mul_zero, sub_zero, add_zero]
 
@@ -3231,7 +3298,8 @@ open scoped FiniteInduce in
 aligned `σ`-grid entries `∈ ZIrr` (`alignedOmegaSigmaGrid_mem_ZIrr`), and `ζ^{τ₁} ∈ ZIrr`
 (`SHC_isCoherent.extension_mem_ZIrr`); `ZIrr G` is closed under `ℤ`/`ℕ`-linear combinations. -/
 theorem Hypothesis.beta_mem_ZIrr [Finite G] {M : Subgroup G}
-    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis M) (hodd : Odd (Nat.card G))
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis M)
+    (coh : OddOrder.Peterfalvi.S07.IsCoherent hyp.tau hyp.SHCSet hyp.A0) (hodd : Odd (Nat.card G))
     (i : Fin hyp.w1) {j : Fin hyp.w2} (hj0 : j ≠ 0)
     {ζ : ClassFunction ↥M ℂ} (hζS : ζ ∈ inducedFamily M) (hζirr : IsIrreducibleCharacter ζ)
     (hζ1 : ζ 1 = (hyp.w1 : ℂ)) {d : ℕ} {δ : ℤ} {n : ℕ}
@@ -3239,10 +3307,10 @@ theorem Hypothesis.beta_mem_ZIrr [Finite G] {M : Subgroup G}
     (hnf : (n : ℤ) * (hyp.w1 : ℤ) = (d : ℤ) - δ) (hδj : hyp.muColumnSign hG hodd j = δ) :
     (hyp.tau (hyp.muGrid hG hodd i j - (δ : ℂ) • hyp.muGrid hG hodd i 0 - (n : ℂ) • ζ)
         - (δ : ℂ) • (hyp.alignedOmegaSigmaGrid hG hodd i j - hyp.alignedOmegaSigmaGrid hG hodd i 0)
-        + (n : ℂ) • (hyp.SHC_isCoherent hG).extension ζ) ∈ ZIrr G := by
+        + (n : ℂ) • coh.extension ζ) ∈ ZIrr G := by
   have hαZ := hyp.muGridAlpha_tau_mem_ZIrr hG hodd i hj0 hζS hζirr hdeg hμ0 hζ1 hnf hδj
-  have hζτZ : (hyp.SHC_isCoherent hG).extension ζ ∈ ZIrr G :=
-    (hyp.SHC_isCoherent hG).extension_mem_ZIrr ζ (Submodule.subset_span ⟨hζS, hζirr, hζ1⟩)
+  have hζτZ : coh.extension ζ ∈ ZIrr G :=
+    coh.extension_mem_ZIrr ζ (Submodule.subset_span ⟨hζS, hζirr, hζ1⟩)
   have hωZ : (hyp.alignedOmegaSigmaGrid hG hodd i j - hyp.alignedOmegaSigmaGrid hG hodd i 0)
       ∈ ZIrr G :=
     Submodule.sub_mem _ (hyp.alignedOmegaSigmaGrid_mem_ZIrr hG hodd i j)
@@ -3302,6 +3370,7 @@ and conjugate-symmetry gives `(∑ω, β) = a`.  The `δ` in `β`'s coefficient 
 `α^τ` term, so this holds for **all** `δ` (not only `δ = 1`). -/
 theorem Hypothesis.muGridAlpha_a_eq_inner_sumOmegaSigma_beta [Finite G] {M : Subgroup G}
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis M)
+    (coh : OddOrder.Peterfalvi.S07.IsCoherent hyp.tau hyp.SHCSet hyp.A0)
     (hodd : Odd (Nat.card G)) (i : Fin hyp.w1) {j : Fin hyp.w2} (hj0 : j ≠ 0)
     {ζ : ClassFunction ↥M ℂ} (hζS : ζ ∈ inducedFamily M) (hζirr : IsIrreducibleCharacter ζ)
     (hζ1 : ζ 1 = (hyp.w1 : ℂ)) (hζne : ζ.conj ≠ ζ) {d : ℕ} {δ : ℤ} {n : ℕ}
@@ -3310,14 +3379,14 @@ theorem Hypothesis.muGridAlpha_a_eq_inner_sumOmegaSigma_beta [Finite G] {M : Sub
     (hdζ : hyp.muGrid hG hodd i j 1 ≠ ζ 1) (h0ζ : hyp.muGrid hG hodd i 0 1 ≠ ζ 1) {a : ℤ}
     (hinner : ClassFunction.inner
         (hyp.tau (hyp.muGrid hG hodd i j - (δ : ℂ) • hyp.muGrid hG hodd i 0 - (n : ℂ) • ζ))
-        ((hyp.SHC_isCoherent hG).extension ζ) = (a : ℂ) - (n : ℂ))
+        (coh.extension ζ) = (a : ℂ) - (n : ℂ))
     (h114 : hyp.tau ((∑ i' : Fin hyp.w1, hyp.muGrid hG hodd i' 0) - ζ)
         = (∑ r : Fin hyp.w1, hyp.alignedOmegaSigmaGrid hG hodd r 0)
-          - (hyp.SHC_isCoherent hG).extension ζ) :
+          - coh.extension ζ) :
     (a : ℂ) = ClassFunction.inner (∑ r : Fin hyp.w1, hyp.alignedOmegaSigmaGrid hG hodd r 0)
         (hyp.tau (hyp.muGrid hG hodd i j - (δ : ℂ) • hyp.muGrid hG hodd i 0 - (n : ℂ) • ζ)
           - (δ : ℂ) • (hyp.alignedOmegaSigmaGrid hG hodd i j - hyp.alignedOmegaSigmaGrid hG hodd i 0)
-          + (n : ℂ) • (hyp.SHC_isCoherent hG).extension ζ) := by
+          + (n : ℂ) • coh.extension ζ) := by
   have hαω : ClassFunction.inner
       (hyp.tau (hyp.muGrid hG hodd i j - (δ : ℂ) • hyp.muGrid hG hodd i 0 - (n : ℂ) • ζ))
       (∑ r : Fin hyp.w1, hyp.alignedOmegaSigmaGrid hG hodd r 0) = (a : ℂ) - (δ : ℂ) := by
@@ -3328,12 +3397,12 @@ theorem Hypothesis.muGridAlpha_a_eq_inner_sumOmegaSigma_beta [Finite G] {M : Sub
   have hβω : ClassFunction.inner
       (hyp.tau (hyp.muGrid hG hodd i j - (δ : ℂ) • hyp.muGrid hG hodd i 0 - (n : ℂ) • ζ)
         - (δ : ℂ) • (hyp.alignedOmegaSigmaGrid hG hodd i j - hyp.alignedOmegaSigmaGrid hG hodd i 0)
-        + (n : ℂ) • (hyp.SHC_isCoherent hG).extension ζ)
+        + (n : ℂ) • coh.extension ζ)
       (∑ r : Fin hyp.w1, hyp.alignedOmegaSigmaGrid hG hodd r 0) = (a : ℂ) := by
     simp only [ClassFunction.inner_add_left, ClassFunction.inner_sub_left,
       ClassFunction.inner_smul_left, hαω,
       hyp.alignedOmegaSigma_diff_inner_zeroColumnSum hG hodd i hj0,
-      hyp.SHC_extension_inner_zeroColumnOmegaSigma_sum hG hodd hζS hζirr hζ1 hζne,
+      hyp.SHC_extension_inner_zeroColumnOmegaSigma_sum hG coh hodd hζS hζirr hζ1 hζne,
       star_natCast, star_intCast]
     ring
   rw [OddOrder.RepresentationTheory.inner_conj_symm, hβω, star_intCast]
@@ -3351,7 +3420,8 @@ Equating gives `a = 0`.  With the parity `a` even (Peterfalvi (11.8.3), `β` rea
 this is the full (11.8.5): under the residual-orthogonality assumption every column coefficient
 `a = 0`, the key input to (11.8.6)'s `μ_j^{τ₂} = ∑ ω_{ij}^σ` coherence contradiction. -/
 theorem Hypothesis.charParam_a_eq_zero_of_residualEq [Finite G] {M : Subgroup G}
-    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis M) (hodd : Odd (Nat.card G))
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis M)
+    (coh : OddOrder.Peterfalvi.S07.IsCoherent hyp.tau hyp.SHCSet hyp.A0) (hodd : Odd (Nat.card G))
     (i : Fin hyp.w1) {j : Fin hyp.w2} (hj0 : j ≠ 0)
     {ζ : ClassFunction ↥M ℂ} (hζS : ζ ∈ inducedFamily M) (hζirr : IsIrreducibleCharacter ζ)
     (hζ1 : ζ 1 = (hyp.w1 : ℂ)) {d : ℕ} {δ : ℤ} {n : ℕ}
@@ -3363,19 +3433,19 @@ theorem Hypothesis.charParam_a_eq_zero_of_residualEq [Finite G] {M : Subgroup G}
     (hZ : ∀ β ∈ R, β ∈ ZIrr G)
     (horth : ∀ α ∈ R, ∀ β ∈ R, ClassFunction.inner α β = if α = β then (1 : ℂ) else 0)
     (hRmem : ∀ φ : ClassFunction ↥M ℂ, φ ∈ inducedFamily M → IsIrreducibleCharacter φ →
-      φ 1 = (hyp.w1 : ℂ) → (hyp.SHC_isCoherent hG).extension φ ∈ R)
+      φ 1 = (hyp.w1 : ℂ) → coh.extension φ ∈ R)
     (hRrev : ∀ β ∈ R, ∃ φ : ClassFunction ↥M ℂ, φ ∈ inducedFamily M ∧ IsIrreducibleCharacter φ ∧
-      φ 1 = (hyp.w1 : ℂ) ∧ β = (hyp.SHC_isCoherent hG).extension φ)
+      φ 1 = (hyp.w1 : ℂ) ∧ β = coh.extension φ)
     (h114 : hyp.tau ((∑ i' : Fin hyp.w1, hyp.muGrid hG hodd i' 0) - ζ)
         = (∑ r : Fin hyp.w1, hyp.alignedOmegaSigmaGrid hG hodd r 0)
-          - (hyp.SHC_isCoherent hG).extension ζ) :
+          - coh.extension ζ) :
     ∃ a : ℤ, (a = 0 ∨ a = 1 ∨ a = 2) ∧
       ClassFunction.inner
         (hyp.tau (hyp.muGrid hG hodd i j - (δ : ℂ) • hyp.muGrid hG hodd i 0 - (n : ℂ) • ζ))
-        ((hyp.SHC_isCoherent hG).extension ζ) = (a : ℂ) - (n : ℂ) ∧
+        (coh.extension ζ) = (a : ℂ) - (n : ℂ) ∧
       (Even a → a = 0) := by
   obtain ⟨a, Y, hbound, hinner, hYeq, hdecompA⟩ :=
-    hyp.SHC_residual_eq_omegaSigma_diff hG hodd i hj0 hζS hζirr hζ1 hdeg hμ0 hnf hδj hdζ h0ζ hδpm
+    hyp.SHC_residual_eq_omegaSigma_diff hG coh hodd i hj0 hζS hζirr hζ1 hdeg hμ0 hnf hδj hdζ h0ζ hδpm
       hn2 hRn hZ horth hRmem hRrev
   refine ⟨a, hbound, hinner, ?_⟩
   intro heven
@@ -3398,8 +3468,8 @@ theorem Hypothesis.charParam_a_eq_zero_of_residualEq [Finite G] {M : Subgroup G}
     simp only [ClassFunction.inner_add_left, ClassFunction.inner_sub_left,
       ClassFunction.inner_smul_left,
       hyp.alignedOmegaSigma_diff_inner_zeroColumnSum hG hodd i hj0,
-      hyp.SHC_extension_inner_zeroColumnOmegaSigma_sum hG hodd hζS hζirr hζ1 hζne,
-      hyp.R_sum_inner_zeroColumnOmegaSigma_sum hG hodd hRrev,
+      hyp.SHC_extension_inner_zeroColumnOmegaSigma_sum hG coh hodd hζS hζirr hζ1 hζne,
+      hyp.R_sum_inner_zeroColumnOmegaSigma_sum hG coh hodd hRrev,
       star_natCast, star_intCast]
     ring
   rw [ClassFunction.inner_sub_right, hαω, hinner] at htrans
@@ -3423,7 +3493,11 @@ from the §10 instantiation of Hypothesis (4.6) (`tau_muGrid_zeroRow_diff` /
 `tau_muGrid_fourCorner` via `toHypothesis46`, issue 9004); the residual input is the
 `w₂`-primality `hw2` they need for the (10.3) cross-column degree constancy. -/
 theorem Hypothesis.residualCoeff_eq_zero [Finite G] {M : Subgroup G}
-    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis M) (hodd : Odd (Nat.card G))
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis M)
+    (coh : OddOrder.Peterfalvi.S07.IsCoherent hyp.tau hyp.SHCSet hyp.A0)
+    (hconj : ∀ {χ : ClassFunction ↥M ℂ}, χ ∈ inducedFamily M → IsIrreducibleCharacter χ →
+      χ 1 = (hyp.w1 : ℂ) → (coh.extension χ).conj = coh.extension χ.conj)
+    (hodd : Odd (Nat.card G))
     (i : Fin hyp.w1) {j : Fin hyp.w2} (hj0 : j ≠ 0) (hi0 : i ≠ 0)
     {ζ : ClassFunction ↥M ℂ} (hζS : ζ ∈ inducedFamily M) (hζirr : IsIrreducibleCharacter ζ)
     (hζ1 : ζ 1 = (hyp.w1 : ℂ)) {d : ℕ} {δ : ℤ} {n : ℕ} (hw2 : (hyp.w2).Prime)
@@ -3434,15 +3508,15 @@ theorem Hypothesis.residualCoeff_eq_zero [Finite G] {M : Subgroup G}
     {R : Finset (ClassFunction G ℂ)} (hRn : R.card = n) (hZ : ∀ β ∈ R, β ∈ ZIrr G)
     (horth : ∀ α ∈ R, ∀ β ∈ R, ClassFunction.inner α β = if α = β then (1 : ℂ) else 0)
     (hRmem : ∀ φ : ClassFunction ↥M ℂ, φ ∈ inducedFamily M → IsIrreducibleCharacter φ →
-      φ 1 = (hyp.w1 : ℂ) → (hyp.SHC_isCoherent hG).extension φ ∈ R)
+      φ 1 = (hyp.w1 : ℂ) → coh.extension φ ∈ R)
     (hRrev : ∀ β ∈ R, ∃ φ : ClassFunction ↥M ℂ, φ ∈ inducedFamily M ∧ IsIrreducibleCharacter φ ∧
-      φ 1 = (hyp.w1 : ℂ) ∧ β = (hyp.SHC_isCoherent hG).extension φ)
+      φ 1 = (hyp.w1 : ℂ) ∧ β = coh.extension φ)
     (h114 : hyp.tau ((∑ i' : Fin hyp.w1, hyp.muGrid hG hodd i' 0) - ζ)
         = (∑ r : Fin hyp.w1, hyp.alignedOmegaSigmaGrid hG hodd r 0)
-          - (hyp.SHC_isCoherent hG).extension ζ) :
+          - coh.extension ζ) :
     ClassFunction.inner
         (hyp.tau (hyp.muGrid hG hodd i j - (δ : ℂ) • hyp.muGrid hG hodd i 0 - (n : ℂ) • ζ))
-        ((hyp.SHC_isCoherent hG).extension ζ) = -(n : ℂ) := by
+        (coh.extension ζ) = -(n : ℂ) := by
   -- the (4.8)/(4.10) Dade identities, discharged from the §10 instantiation of (4.6)
   have hdeg0 : hyp.muGrid hG hodd 0 j 1 = (d : ℂ) :=
     (hyp.muGrid_apply_one_eq hG hodd hw2 0 i hj0 hj0).trans hdeg
@@ -3458,20 +3532,20 @@ theorem Hypothesis.residualCoeff_eq_zero [Finite G] {M : Subgroup G}
             - hyp.alignedOmegaSigmaGrid hG hodd 0 k) := fun k hk => by
     have := hyp.tau_muGrid_zeroRow_diff hG hodd hw2 hj0 hk
     rwa [hδj] at this
-  have hβr := hyp.beta_isReal hG hodd i hj0 hζS hζirr hζ1 hdeg0
+  have hβr := hyp.beta_isReal hG coh hconj hodd i hj0 hζS hζirr hζ1 hdeg0
     (hyp.muGrid_zero_column_apply_one hG hodd 0) hnf hδj h410 h48
-  obtain ⟨a, hbound, hinner, heven_imp⟩ := hyp.charParam_a_eq_zero_of_residualEq hG hodd i hj0 hζS
+  obtain ⟨a, hbound, hinner, heven_imp⟩ := hyp.charParam_a_eq_zero_of_residualEq hG coh hodd i hj0 hζS
     hζirr hζ1 hdeg hμ0 hnf hδj hdζ h0ζ hδpm hn2 hRn hZ horth hRmem hRrev h114
   have hζne := hyp.inducedFamily_degree_w1_conj_ne hG hζirr hζ1
-  have ha := hyp.muGridAlpha_a_eq_inner_sumOmegaSigma_beta hG hodd i hj0 hζS hζirr hζ1 hζne hdeg hμ0
+  have ha := hyp.muGridAlpha_a_eq_inner_sumOmegaSigma_beta hG coh hodd i hj0 hζS hζirr hζ1 hζne hdeg hμ0
     hnf hδj hdζ h0ζ hinner h114
-  have hβZ := hyp.beta_mem_ZIrr hG hodd i hj0 hζS hζirr hζ1 hdeg hμ0 hnf hδj
+  have hβZ := hyp.beta_mem_ZIrr hG coh hodd i hj0 hζS hζirr hζ1 hdeg hμ0 hnf hδj
   have hβ1 : ClassFunction.inner
       (hyp.tau (hyp.muGrid hG hodd i j - (δ : ℂ) • hyp.muGrid hG hodd i 0 - (n : ℂ) • ζ)
         - (δ : ℂ) • (hyp.alignedOmegaSigmaGrid hG hodd i j - hyp.alignedOmegaSigmaGrid hG hodd i 0)
-        + (n : ℂ) • (hyp.SHC_isCoherent hG).extension ζ)
+        + (n : ℂ) • coh.extension ζ)
       (trivialIrreducibleCharacter G : ClassFunction G ℂ) = 0 :=
-    hyp.beta_inner_trivial hG hodd i hj0 hi0 hζS hζirr hζ1 hζne hdeg hμ0 hnf hδj
+    hyp.beta_inner_trivial hG coh hodd i hj0 hi0 hζS hζirr hζ1 hζne hdeg hμ0 hnf hδj
       (hyp.muGridAlpha_inner_trivial_M hG hodd hi0 hj0 hζirr hζ1)
   have heven := hyp.a_even_of_eq_inner_sumOmegaSigma hG hodd hβZ hβr hβ1 ha
   have ha0 : a = 0 := heven_imp heven
