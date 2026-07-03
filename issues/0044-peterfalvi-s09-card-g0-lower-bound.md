@@ -353,3 +353,22 @@ foundation (7.1/7.4) は wiring で done** — `characterEstimateData_of_family7
 - (7.9) 𝓑-sum bound (`hBsum`)。
 これらは Hypothesis76 (induced family {Ind_H^L θ} + (5.6)/(6.8) coherence) を要する char 解析。次 iteration
 は Hypothesis76-from-Frobenius の wireability 調査 (S08 Sibley coherence が使えるか)。
+
+## 2026-07-03 cont.⁷ (lane-a, /loop) — Hypothesis76 (7.6) は wireable と確定 (hypothesis76OfDade); 残 = instance detail
+
+**発見**: `S09.Cert.hypothesis76OfDade` (S09_CertificateDischarge:859, lane-b carve-out 0090, downstream)
+が **(7.7.a) `chiRho_decomp` 証明書を discharge 済**で Hypothesis76 を「no certificate assumed」で構成
+(`H71` + `IsDadeIsometry` + `H≤L` + `hHnorm` + `A=H^#` から induced family {Ind_H^L θ} を内部 enumerate)。
+S15 `H_sharp_hypothesis76` が同 constructor の使用例。⟹ **Hypothesis76-from-Frobenius も wiring で可能**。
+
+**アーキテクチャ**: hypothesis76OfDade は S09_CertificateDischarge (NonexistenceCertain の**下流**) に
+あるため、`FrobeniusFamily.hypothesis76` は**新 downstream leaf** に置く。card_G0 の最終 assembly も
+下流で `not_trivial_G0_of_exists_Bsum_bound` 系 bypass (S09:6607, 「still-open card_G0_lower_bound を
+迂回」) 経由が正道 (card_G0_lower_bound の sorry は displayed form のまま、spine consumer not_trivial_G0
+を下流で honest 実証)。
+
+**次 iteration の残**: `FrobeniusFamily.hypothesis76` を新 leaf で作る際、per-member の
+`Invertible (Nat.card ↥(F.L i):ℂ)` instance が hypothesis76OfDade の search に通らない技術的 quirk
+(letI/haveI/@ 全て試行、L-invertibility が見つからない) を解消する。`familyHypothesis71` では field 値
+として同 instance が通った (fun i => invertibleOfNonzero ...) ので、その pattern を downstream constructor
+に写すか、instance を def の `[...]` binder 化する。数学は完了、instance 解決のみ。
