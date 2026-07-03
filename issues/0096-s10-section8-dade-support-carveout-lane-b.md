@@ -420,3 +420,18 @@ typePA0(P1) Dade engine の assembly infra を landed:
 組んで general engine に渡す `dadeSupportHypothesisData_typePA0_of_isTypeP1` → `dadeSupportHypotheses_typeP`
 の typePA0(P1) 成分 discharge (P2 は別 sorry のまま) → S12 (10.1 existence) unblock。deep content は
 全て済み、残りは typePA0=typePA∪V^M の union set-facts の組立。
+
+### loop¹²⁶ — ★★ typePA0(P1) Dade datum CONSTRUCTED (sorry-free) — dadeSupportHypotheses_typeP typePA0(P1) discharge
+
+**`dadeSupportHypothesisData_typePA0_of_isTypeP1`** (sorry-free): type-P1 の A_0(M)=A(M)∪V^M の
+Dade (2.2) support data を general engine + 全 pin + union set-facts (⊆M/≠1/nonempty/M-conj-inv,
+conjClassSetIn API 経由) で **完全構成**。doneness = carrier 構成可能性を満たす (posited でなく実構成)。
+
+**`dadeSupportHypotheses_typeP` の typePA0 成分を P1 で discharge**: by_cases hP1 → P1 は engine helper、
+P2 は sorry (deeper)。現状 dadeSupportHypotheses_typeP: A₁ ✅ + typePA-P1 ✅ + typePA0-P1 ✅、
+残 2 sorry = typePA0-P2 + typePA-P2 (deeper type-P2 (M')# geometry)。
+
+**次 = S12 unblock**: `exists_hypothesis_of_typeIIIorIVorV` (Pf 10.1 existence) は現在
+`(dadeSupportHypotheses_typeP ...).1` を使うが、これは P2 sorry を transitively 含む。**sorry-free な
+`dadeSupportHypothesisData_typePA0_of_isTypeP1` に切替**れば S12 の typePA0 datum が sorry-free に。
+要 hP1 : IsTypeP1 M を IsTypeIII/IV/V から導出 (III/IV/V=P1)。

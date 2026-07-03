@@ -2392,6 +2392,75 @@ theorem coprime_FT_signalizer_centralizerIn_typePA0_of_isTypeP1 [Fintype G]
     exact escaping_sigmaSharp_disjoint_centralizer hG hM haσ haesc hpb.1 hpb.2 hpp hpσ hpC
   · exact coprime_FT_signalizer_centralizerIn_typePV hG hM data haσ haesc hvb
 
+/-- **Peterfalvi (8.15) type-`P₁` `A_0(M)` datum**: the Dade (2.2) support hypotheses hold for the
+full type-`P₁` support `A_0(M) = A(M) ∪ V^M`.  Assembles the `σ`-decomposition-generic engine
+(`dadeSupportHypothesisData_of_subset_escaping_sigmaSharp`) with the type-`P₁` pins: escaping points
+are `σ`-sharp (`escaping_typePA0_mem_sigmaSharp_of_isTypeP1`, `(8.13.b)`), the `conj_in_L`
+(`typePA0_isConj_conj_in_M_of_isTypeP1`, `(8.13.a)`), and the coprimality
+(`coprime_FT_signalizer_centralizerIn_typePA0_of_isTypeP1`, `(8.13.c2)`), plus the union set-facts
+(`A_0 ⊆ M`, non-identity, nonempty, `M`-conjugation-invariant). -/
+theorem dadeSupportHypothesisData_typePA0_of_isTypeP1 [Fintype G] [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G}
+    (hM : M ∈ maximalSubgroups G) (data : TypePData M)
+    (hP1 : OddOrder.BG.Ch4.S14.IsTypeP1 M) :
+    Nonempty (DadeSupportHypothesisData M (typePA0 M data)) := by
+  classical
+  have hVM : typePV M data ⊆ (M : Set G) := by
+    intro v hv
+    have hvW : v ∈ data.W := by simp only [typePV, Set.mem_diff] at hv; exact hv.1
+    exact (show (data.W : Subgroup G) ≤ M by
+      rw [data.W_eq]; exact sup_le data.W1_le (data.W2_le.trans (inf_le_left.trans
+        (data.H_le.trans (Subgroup.map_subtype_le _))))) hvW
+  refine dadeSupportHypothesisData_of_subset_escaping_sigmaSharp hG hM ?_ ?_
+    (fun a ha => escaping_typePA0_mem_sigmaSharp_of_isTypeP1 hG hM data hP1 ha)
+    (fun a ha b hb hab => typePA0_isConj_conj_in_M_of_isTypeP1 hG hM data hP1 ha hb hab)
+    (fun a ha b hb => coprime_FT_signalizer_centralizerIn_typePA0_of_isTypeP1 hG hM data hP1
+      (escaping_typePA0_mem_sigmaSharp_of_isTypeP1 hG hM data hP1 ha) ha.2 hb)
+    ?_ ?_
+  · -- `A_0(M) ⊆ M`
+    intro x hx
+    rcases hx with hpa | hva
+    · rw [typePA_eq_sharpSubgroup_derivedInG] at hpa
+      exact (Subgroup.map_subtype_le _) ((Set.mem_diff _).mp hpa).1
+    · exact conjClassSetIn_subset hVM hva
+  · -- `x ≠ 1`
+    intro x hx
+    rcases hx with hpa | hva
+    · rw [typePA_eq_sharpSubgroup_derivedInG] at hpa
+      exact fun h => ((Set.mem_diff _).mp hpa).2 (Set.mem_singleton_iff.mpr h)
+    · obtain ⟨v, hv, m, hmM, hmv⟩ := hva
+      have hv1 : v ≠ 1 := by
+        rintro rfl
+        have h1 := hv
+        simp only [typePV, Set.mem_diff, Set.mem_union] at h1
+        exact h1.2 (Or.inl (Subgroup.one_mem data.W1))
+      intro hx1
+      apply hv1
+      calc v = m⁻¹ * (m * v * m⁻¹) * m := by group
+        _ = m⁻¹ * x * m := by rw [hmv]
+        _ = m⁻¹ * 1 * m := by rw [hx1]
+        _ = 1 := by group
+  · -- `A_0(M)` nonempty
+    obtain ⟨a, ha1⟩ :=
+      Subgroup.ne_bot_iff_exists_ne_one.mp (OddOrder.BG.Ch3.S10.Msigma_ne_bot hG hM)
+    have ha1' : (a : G) ≠ 1 := fun h => ha1 (Subtype.ext h)
+    refine ⟨a.1, Or.inl ?_⟩
+    rw [typePA_eq_sigmaSharp_of_isTypeP1 hG hM data hP1]
+    exact (Set.mem_diff _).mpr
+      ⟨SetLike.mem_coe.mpr a.2, fun h => ha1' (Set.mem_singleton_iff.mp h)⟩
+  · -- `M`-conjugation invariance
+    intro m x hm
+    simp only [typePA0, Set.mem_union]
+    constructor
+    · rintro (hpa | hva)
+      · exact Or.inl (by
+          have := typePA_conj_mem M data (inv_mem hm) hpa
+          rwa [show m⁻¹ * (m * x * m⁻¹) * m⁻¹⁻¹ = x from by group] at this)
+      · exact Or.inr ((mem_conjClassSetIn_conj_iff hm x).mp hva)
+    · rintro (hpa | hva)
+      · exact Or.inl (typePA_conj_mem M data hm hpa)
+      · exact Or.inr ((mem_conjClassSetIn_conj_iff hm x).mpr hva)
+
 /-- **Peterfalvi (8.15)** for type `P`: the Dade (2.2) support hypotheses hold
 for `A_0(M)`, `A(M)`, and `A_1(M)`, with `L=M` and `H(a)=R(a)`. -/
 theorem dadeSupportHypotheses_typeP [Fintype G] [Finite G]
@@ -2419,8 +2488,12 @@ theorem dadeSupportHypotheses_typeP [Fintype G] [Finite G]
       have h3 : m⁻¹ * (m * x * m⁻¹) * m⁻¹⁻¹ = x := by group
       rwa [h3] at h2
   refine ⟨?_, ?_, hA1⟩
-  · -- `A_0(M) = A(M) ∪ (V ∖ (W₁∪W₂))^M`: the exceptional `V^M` component is a separate obligation.
-    sorry
+  · -- `A_0(M) = A(M) ∪ V^M`.  For `P₁`, the σ-decomposition engine assembles the full datum
+    -- (`dadeSupportHypothesisData_typePA0_of_isTypeP1`); for `P₂` the exceptional `V^M` needs the
+    -- deeper type-`P₂` support geometry.
+    by_cases hP1 : OddOrder.BG.Ch4.S14.IsTypeP1 M
+    · exact dadeSupportHypothesisData_typePA0_of_isTypeP1 hG hM data hP1
+    · sorry
   · -- `A(M) = (M')^#`.  For `P₁`, `A(M) = M_σ^# = A_1(M)` (`typePA_eq_sigmaSharp_of_isTypeP1`
     -- + `A1_eq_sigmaSharp`), so the `A_1` datum transports directly.  For `P₂` (`M_σ ⊊ M'`),
     -- escaping points reduce to `A_1` by the type-`P` (8.13.b) `escaping_typePA_mem_A1` — deeper.
