@@ -553,3 +553,32 @@ target を探すか、type-P engine を fresh session で。
   §12 witness pins (§8-§11 type-analysis)、III/IV (BG §14-15 gate)。
 - S09 card_G0: (7.9)/(11.8) char theory (lane a 系) に gated。
 → 次は (a) 上記 deep pin を fresh focused session で正面 build、または (b) 他レーンの 11.8/7.9 進捗待ち。
+
+## 🚀 lane b 進捗 (2026-07-04, loop¹¹¹) — Pf (12.4) `constituent_diff_support_subset_nonescaping` 実証明 + [Is] 6.2 Clifford 制限 mult-one 版を構築
+
+loop¹¹⁰ の「tractable 枯渇」判定を再検証したところ、**S14_MaximalI (lane b 主所有、§12 Dade tower)
+の 13 sorry が loop¹¹⁰ の survey (S07/S08/S09 のみ) で見落とされていた**。うち Pf (12.4) の §8 support
+obligation を実証明化 (commit 6e5e3275、S14 13→12 sorry)。
+
+**核 = 新 helper `restrict_eq_of_mem_constituents`** = Clifford's theorem [Is] 6.2 の
+**multiplicity-one 版** (S01_Introduction が「Clifford [Is] 6.5 不在」と記録していた foundational
+char theory の必要部分): χ = Ind_K^L θ (K=(L_F).subgroupOf L ⊴ L) の 2 constituent φ₁,φ₂ は
+`Res_K φ₁ = Res_K φ₂`。full inertia 機構を回避し inner-product level で証明:
+- ⟨Res_K φᵢ, ψ⟩ = ⟨φᵢ, Ind_K ψ⟩ (Frobenius); ψ~θ で 1 (mult-one decomp + `induce_conjBy_eq`)、
+  ψ≁θ で 0 (既存 `restrictionConstituentsSingleOrbit_of_isIrreducible`); Fourier で確定。
+- 既存 char infra が想定より充実 (`CliffordSingleOrbit.lean` 等) だったのが決め手。
+
+**application (12.4)**: supp(φ₁−φ₂)⊆A(L)∪{1} (carrier) + degree-cancel → ⊆A(L); escaping 点は
+A₁=H^# ((8.13.b) `escaping_typeIA_mem_A1`) で Res 一致し消える。(12.4) coset chain
+(`constituent_diff_tau_eq_induce`/`Sset_coeff_equal`/`Sset_offKernel_vanishes_off_H`/
+`orthogonal_character_constant_on_coset`) に hG thread (上位は既に _hG)。full build 3910 green。
+
+**残 S14 frontier の深さ評価 (次 iter 向け)**:
+- **(8.2.c) `typeI_induced_char_constituents`** (S14 最上流 sorry、general 版): 非-Frobenius N の
+  (12.3)/(12.4) が要する (on-path)。だが mult-free 分解は type-F inertia (I_L(θ) 解析) を要し
+  自明でない = deep (8.2.c)。Frobenius 版は proven。
+- **(12.5) `rho_constant_on_H_minus_Hprime`**: **現状 consumer 0** + 生 psi の H−H' 上定数性は
+  ρ-reduction 込みでないと偽の可能性 (Pf は ψ^ρ を主張) → faithful 化要検討、blind に埋めない。
+- **(12.10)/(12.11)/(12.12)** = Cluster A (§8-§11 type-analysis) gated (既記載)。
+- **(12.14)/(12.15)/(12.16)** = Dade 計算 + witness assembly (deep)。
+- **helper `restrict_eq_of_mem_constituents` は reusable** — 将来 (8.2.c) や他の Res-of-Ind に流用可。

@@ -1810,19 +1810,126 @@ private theorem escaping_conj_mem_iff {M : Subgroup G} {X : Set G} {g x : G}
   simp only [escapingCentralizerSet, Set.mem_setOf_eq, hmem, hcent]
 
 open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
+/-- **Constituents of `χ = Ind_K^L θ` (`K = (L_F).subgroupOf L ⊴ L`) have equal restriction to `K`**
+(the multiplicity-one case of Clifford's theorem [Is] 6.2, character level).  Two constituents
+`φ₁, φ₂ ∈ S(χ)` both occur in `χ = Ind_K^L θ` with multiplicity one, so both lie over `θ`; by
+Clifford single-orbit (`restrictionConstituentsSingleOrbit_of_isIrreducible`) the constituents of
+`Res_K φᵢ` are exactly the `L`-orbit of `θ`, each with the common multiplicity one, whence
+`Res_K φ₁ = Res_K φ₂`.  Computed at the inner-product level via Fourier: for every `ψ ∈ Irr K`,
+`⟨Res_K φᵢ, ψ⟩ = ⟨φᵢ, Ind_K ψ⟩` (Frobenius) is `1` when `ψ` is `L`-conjugate to `θ`
+(`Ind_K ψ = Ind_K θ = χ`, multiplicity one) and `0` otherwise (single-orbit), independently of `i`.
+This is the [Is] 6.2 input Peterfalvi (12.4) cites for `Supp(φ₁ − φ₂) ⊆ A(L) − H^#`. -/
+theorem restrict_eq_of_mem_constituents {L : Subgroup G} [Finite G] (hyp : Hypothesis L)
+    {chi : ClassFunction ↥L ℂ} (dχ : CharacterDecompositionData hyp chi)
+    {φ₁ φ₂ : IrreducibleCharacter ↥L} (h₁ : φ₁ ∈ dχ.constituents) (h₂ : φ₂ ∈ dχ.constituents) :
+    ClassFunction.restrict ((hyp.typeI.typeF.H).subgroupOf L) (φ₁ : ClassFunction ↥L ℂ)
+      = ClassFunction.restrict ((hyp.typeI.typeF.H).subgroupOf L) (φ₂ : ClassFunction ↥L ℂ) := by
+  haveI := hyp.finiteG
+  classical
+  haveI hKnormal : ((hyp.typeI.typeF.H).subgroupOf L).Normal := by
+    rw [hyp.typeI.typeF.H_eq]
+    exact OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_subgroupOf_normal L
+  set K := (hyp.typeI.typeF.H).subgroupOf L with hKdef
+  obtain ⟨θ, hθ_ne, hchi_eq⟩ := dχ.chi_mem
+  -- Frobenius reciprocity: `⟨φ, Ind_K ψ⟩ = ⟨Res_K φ, ψ⟩`.
+  have hfrob : ∀ (φ : IrreducibleCharacter ↥L) (ψ : IrreducibleCharacter ↥K),
+      ClassFunction.inner (φ : ClassFunction ↥L ℂ) (ClassFunction.induce K (ψ : ClassFunction ↥K ℂ))
+        = ClassFunction.inner (ClassFunction.restrict K (φ : ClassFunction ↥L ℂ))
+          (ψ : ClassFunction ↥K ℂ) := by
+    intro φ ψ
+    rw [OddOrder.RepresentationTheory.inner_conj_symm,
+      ClassFunction.inner_induce_eq_inner_restrict,
+      OddOrder.RepresentationTheory.inner_conj_symm, star_star]
+  -- multiplicity-one: `⟨φ, χ⟩ = 1` for a constituent `φ`.
+  have hmult : ∀ φ ∈ dχ.constituents, ClassFunction.inner (φ : ClassFunction ↥L ℂ) chi = 1 := by
+    intro φ hφ
+    rw [dχ.decomp, inner_sum_right,
+      Finset.sum_eq_single_of_mem φ hφ (fun φ' _ hne => by
+        rw [irreducibleCharacter_inner, if_neg (Ne.symm hne)]),
+      irreducibleCharacter_inner, if_pos rfl]
+  -- per-`ψ` value of `⟨Res_K φ, ψ⟩`, independent of the constituent `φ`.
+  have hval : ∀ φ ∈ dχ.constituents, ∀ ψ : IrreducibleCharacter ↥K,
+      ClassFunction.inner (ClassFunction.restrict K (φ : ClassFunction ↥L ℂ))
+          (ψ : ClassFunction ↥K ℂ)
+        = if (∃ g : ↥L, IrreducibleCharacter.conjBy g θ = ψ) then (1 : ℂ) else 0 := by
+    intro φ hφ ψ
+    rw [← hfrob φ ψ]
+    by_cases hc : ∃ g : ↥L, IrreducibleCharacter.conjBy g θ = ψ
+    · rw [if_pos hc]
+      obtain ⟨g, rfl⟩ := hc
+      rw [IrreducibleCharacter.coe_conjBy, ClassFunction.induce_conjBy_eq, ← hchi_eq]
+      exact hmult φ hφ
+    · rw [if_neg hc]
+      by_contra hne
+      refine hc ?_
+      have hoθ : IrreducibleCharacter.LiesOver K φ θ := by
+        rw [IrreducibleCharacter.LiesOver, ClassFunction.restrictionMultiplicity_def,
+          ← hfrob φ θ, ← hchi_eq, hmult φ hφ]
+        exact one_ne_zero
+      have hoψ : IrreducibleCharacter.LiesOver K φ ψ := by
+        rw [IrreducibleCharacter.LiesOver, ClassFunction.restrictionMultiplicity_def, ← hfrob φ ψ]
+        exact hne
+      exact (restrictionConstituentsSingleOrbit_of_isIrreducible φ).exists_conj hoθ hoψ
+  -- Fourier: equal inner products with every irreducible `ψ ∈ Irr K` force equality.
+  rw [← OddOrder.RepresentationTheory.sum_inner_irreducibleCharacter_smul
+        (ClassFunction.restrict K (φ₁ : ClassFunction ↥L ℂ)),
+      ← OddOrder.RepresentationTheory.sum_inner_irreducibleCharacter_smul
+        (ClassFunction.restrict K (φ₂ : ClassFunction ↥L ℂ))]
+  refine Finset.sum_congr rfl fun ψ _ => ?_
+  rw [hval φ₁ h₁ ψ, hval φ₂ h₂ ψ]
+
+open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
 /-- **Peterfalvi (12.4), the §8 support obligation** ([Is] 6.2 + (8.12.a)): for constituents
 `φ₁, φ₂ ∈ S(χ)`, the difference `φ₁ − φ₂` is supported on the **non-escaping** part of `A(L)`,
 `A₁ = {a ∈ A(L) : C_G(a) ≤ L}` (= `A(L) − H^#`, exactly where the type-I Dade stabilizers vanish).
-By [Is] 6.2 `Res_H φᵢ` is a conjugate-sum of `θ`, so `φᵢ` is supported on `A(L) ∪ {1}` with the
-(8.12.a) restriction to the non-escaping part; the difference cancels the value at `1`.  A faithful
-§8/[Is] obligation — the genuine cross-section content remaining in pin (b). -/
-theorem constituent_diff_support_subset_nonescaping [Finite G] {L : Subgroup G} (hyp : Hypothesis L)
+By [Is] 6.2 `Res_H φ₁ = Res_H φ₂` (`restrict_eq_of_mem_constituents`, the multiplicity-one Clifford
+restriction), so `φ₁ − φ₂` vanishes on `H`; each `φᵢ` is supported on `A(L) ∪ {1}` (carrier
+`supported`) and the difference cancels the value at `1` (equal degree).  The escaping points of
+`A(L)` lie in `A₁ = H^#` ((8.13.b) `escaping_typeIA_mem_A1`), so the difference vanishes there. -/
+theorem constituent_diff_support_subset_nonescaping [Finite G] {L : Subgroup G}
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis L)
     {chi : ClassFunction ↥L ℂ} (dχ : CharacterDecompositionData hyp chi)
     {φ₁ φ₂ : IrreducibleCharacter ↥L} (h₁ : φ₁ ∈ dχ.constituents) (h₂ : φ₂ ∈ dχ.constituents) :
     ((φ₁ : ClassFunction ↥L ℂ) - (φ₂ : ClassFunction ↥L ℂ)).support ⊆
       OddOrder.Peterfalvi.S04.supportInSubgroup
         (hyp.ambientA \ escapingCentralizerSet L hyp.ambientA) L := by
-  sorry
+  haveI := hyp.finiteG
+  classical
+  have hres := restrict_eq_of_mem_constituents hyp dχ h₁ h₂
+  intro x hx
+  rw [ClassFunction.mem_support] at hx
+  rw [OddOrder.Peterfalvi.S04.mem_supportInSubgroup, Set.mem_diff]
+  -- `x` lies in the support of `φ₁` or `φ₂`, hence in `A(L) ∪ {1}`.
+  have hxsupp : x ∈ OddOrder.Peterfalvi.S04.supportInSubgroup hyp.ambientA L ∪ ({1} : Set ↥L) := by
+    rcases ne_or_eq ((φ₁ : ClassFunction ↥L ℂ) x) 0 with h | h
+    · exact dχ.supported φ₁ h₁ (ClassFunction.mem_support.mpr h)
+    · refine dχ.supported φ₂ h₂ (ClassFunction.mem_support.mpr ?_)
+      intro h2
+      exact hx (by rw [ClassFunction.sub_apply, h, h2, sub_zero])
+  -- `x ≠ 1`: the difference vanishes at `1` by equal degree.
+  have hx1 : x ≠ 1 := by
+    rintro rfl
+    exact hx (by rw [ClassFunction.sub_apply, ← dχ.equal_degree φ₁ h₁ φ₂ h₂, sub_self])
+  have hxAmem : (x : G) ∈ hyp.ambientA := by
+    rcases hxsupp with h | h
+    · exact OddOrder.Peterfalvi.S04.mem_supportInSubgroup.mp h
+    · exact absurd (Set.mem_singleton_iff.mp h) hx1
+  refine ⟨hxAmem, fun hesc => ?_⟩
+  -- an escaping point of `A(L)` lies in `A₁ = H^#`, so in `H`, where the two restrictions agree.
+  have hxA1 : (x : G) ∈ A1 L PeterfalviType.I :=
+    OddOrder.Peterfalvi.S10.escaping_typeIA_mem_A1 hG hyp.maximal hyp.typeI hesc
+  have hxH : (x : G) ∈ hyp.typeI.typeF.H := by
+    rw [hyp.typeI.typeF.H_eq]
+    have hmem : (x : G) ∈ OddOrder.GroupTheory.sharpSubgroup (maxNilpotentNormalHall L) := hxA1
+    exact ((Set.mem_diff _).mp hmem).1
+  have hxK : x ∈ (hyp.typeI.typeF.H).subgroupOf L := Subgroup.mem_subgroupOf.mpr hxH
+  refine hx ?_
+  have hev : ClassFunction.restrict ((hyp.typeI.typeF.H).subgroupOf L)
+        (φ₁ : ClassFunction ↥L ℂ) ⟨x, hxK⟩
+      = ClassFunction.restrict ((hyp.typeI.typeF.H).subgroupOf L)
+        (φ₂ : ClassFunction ↥L ℂ) ⟨x, hxK⟩ := by rw [hres]
+  rw [ClassFunction.restrict_apply, ClassFunction.restrict_apply] at hev
+  rw [ClassFunction.sub_apply, hev, sub_self]
 
 open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
 /-- **Peterfalvi (12.4), pin (b)** ([Is] 7.7 + (8.12.c) + [Is] 6.2): for constituents `φ₁, φ₂ ∈ S(χ)`,
@@ -1834,7 +1941,8 @@ part `A₁ = {a ∈ A(L) : C_G(a) ≤ L}` (`constituent_diff_support_subset_none
 stabilizers (`ftSupportKernel = ⊥` off the escaping set, via `H_eq_ftSupportKernel`).  On such a
 trivial-`H` support the type-I Dade isometry coincides with `Ind_L^G`
 (`typeI_tau_eq_induce_of_supported_trivial_H`, i.e. pin (b) steps 1–3 + the restriction assembly). -/
-theorem constituent_diff_tau_eq_induce {L : Subgroup G} [Finite G] (hyp : Hypothesis L)
+theorem constituent_diff_tau_eq_induce {L : Subgroup G} [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis L)
     {chi : ClassFunction ↥L ℂ} (dχ : CharacterDecompositionData hyp chi)
     {φ₁ φ₂ : IrreducibleCharacter ↥L} (h₁ : φ₁ ∈ dχ.constituents) (h₂ : φ₂ ∈ dχ.constituents) :
     hyp.tau ((φ₁ : ClassFunction ↥L ℂ) - (φ₂ : ClassFunction ↥L ℂ)) =
@@ -1856,7 +1964,7 @@ theorem constituent_diff_tau_eq_induce {L : Subgroup G} [Finite G] (hyp : Hypoth
     rw [OddOrder.Peterfalvi.S04.Hypothesis.restrict_H, hyp.dadeData.H_eq_ftSupportKernel]
     exact OddOrder.Peterfalvi.S10.ftSupportKernel_eq_bot_of_not_escaping a.2.2
   exact typeI_tau_eq_induce_of_supported_trivial_H hyp hA₁A hA₁norm hH₁
-    (constituent_diff_support_subset_nonescaping hyp dχ h₁ h₂)
+    (constituent_diff_support_subset_nonescaping hG hyp dχ h₁ h₂)
 
 open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
 /-- **Peterfalvi (12.4), coherence → coefficient-equality bridge** (genuine).  If `ψ ⊥ R(χ)`, then
@@ -1865,7 +1973,8 @@ for `φ₁, φ₂ ∈ S(χ)`.  Proof: `⟨Res_L ψ, φ₁ − φ₂⟩ = ⟨ψ, 
 (Frobenius `inner_induce_eq_inner_restrict` + conjugate symmetry + pin (b)), and this is `0` because
 `(φ₁ − φ₂)^τ ∈ ℤ[R(χ)]` (pin (a)) and `ψ ⊥ R(χ)` (`inner_eq_zero_of_mem_zSpan`).  This is the genuine
 content by which `ψ ⊥ R(χ)` forces the `∪S(χ)`-part of `Res_L ψ` to be `β = ∑_χ c_χ·χ ∈ ℂ[S]`. -/
-theorem Sset_coeff_equal {L : Subgroup G} [Finite G] (hyp : Hypothesis L)
+theorem Sset_coeff_equal {L : Subgroup G} [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis L)
     {chi : ClassFunction ↥L ℂ} (dχ : CharacterDecompositionData hyp chi)
     {psi : ClassFunction G ℂ} (horth : ∀ α ∈ Rset dχ, ClassFunction.inner psi α = 0)
     {φ₁ φ₂ : IrreducibleCharacter ↥L} (h₁ : φ₁ ∈ dχ.constituents) (h₂ : φ₂ ∈ dχ.constituents) :
@@ -1881,7 +1990,7 @@ theorem Sset_coeff_equal {L : Subgroup G} [Finite G] (hyp : Hypothesis L)
   -- `⟨f, Res_L ψ⟩ = ⟨Ind_L^G f, ψ⟩ = ⟨τ f, ψ⟩ = star⟨ψ, τ f⟩ = 0`.
   have hfres : ClassFunction.inner f (ClassFunction.restrict L psi) = 0 := by
     rw [← ClassFunction.inner_induce_eq_inner_restrict L f psi,
-      ← constituent_diff_tau_eq_induce hyp dχ h₁ h₂,
+      ← constituent_diff_tau_eq_induce hG hyp dχ h₁ h₂,
       inner_conj_symm psi (hyp.tau f), hψτ, star_zero]
   -- `⟨Res_L ψ, f⟩ = star⟨f, Res_L ψ⟩ = 0`, then split the difference.
   have hresf : ClassFunction.inner (ClassFunction.restrict L psi) f = 0 := by
@@ -2103,7 +2212,8 @@ Regroup the off-kernel irreducibles by the partition into `S(χ)`
 (`exists_offKernel_constituent_partition`); on each `S(χ)` the coefficient `⟨Res_L ψ, φ⟩` is constant
 (`Sset_coeff_equal`, from `ψ ⊥ R(χ)`), so the `S(χ)`-block is `c_χ·∑_{φ ∈ S(χ)} φ = c_χ·χ`
 (`decomp`), which vanishes at `g ∈ L − H` (`Sset_vanishes_off_H`). -/
-theorem Sset_offKernel_vanishes_off_H {L : Subgroup G} [Finite G] (hyp : Hypothesis L)
+theorem Sset_offKernel_vanishes_off_H {L : Subgroup G} [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis L)
     (data : ∀ χ ∈ hyp.Sset, CharacterDecompositionData hyp χ) {psi : ClassFunction G ℂ}
     (horth : ∀ χ (hχ : χ ∈ hyp.Sset), ∀ α ∈ Rset (data χ hχ), ClassFunction.inner psi α = 0)
     {g : ↥L} (hg : (g : G) ∉ hyp.H) :
@@ -2123,7 +2233,7 @@ theorem Sset_offKernel_vanishes_off_H {L : Subgroup G} [Finite G] (hyp : Hypothe
     rw [Finset.mul_sum]
     refine Finset.sum_congr rfl fun φ hφ => ?_
     rw [ClassFunction.smul_apply,
-      Sset_coeff_equal hyp (data χ.1 χ.2) (horth χ.1 χ.2) hφ hφ₀]
+      Sset_coeff_equal hG hyp (data χ.1 χ.2) (horth χ.1 χ.2) hφ hφ₀]
   have hdecomp : ∑ φ ∈ (data χ.1 χ.2).constituents, (φ : ClassFunction ↥L ℂ) g = χ.1 g := by
     rw [← classFunction_sum_apply, ← (data χ.1 χ.2).decomp]
   rw [hblock, hdecomp, Sset_vanishes_off_H hyp χ.2 hg, mul_zero]
@@ -2139,7 +2249,7 @@ off-kernel part `β` vanishes on `L − H` (`Sset_offKernel_vanishes_off_H`: by 
 coefficient bridge `Sset_coeff_equal`, `β ∈ ℂ[S]` vanishes off `H`).  Hence
 `ψ(xh) = γ(xh) + β(xh) = γ(x) + 0 = γ(x) + β(x) = ψ(x)`. -/
 theorem orthogonal_character_constant_on_coset {L : Subgroup G} [Finite G]
-    (_hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis L)
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis L)
     (data : ∀ χ ∈ hyp.Sset, CharacterDecompositionData hyp χ) {psi : ClassFunction G ℂ}
     (horth : ∀ χ (hχ : χ ∈ hyp.Sset), ∀ α ∈ Rset (data χ hχ), ClassFunction.inner psi α = 0)
     {x : G} (hxL : x ∈ L) (hxH : x ∉ hyp.H) :
@@ -2175,10 +2285,10 @@ theorem orthogonal_character_constant_on_coset {L : Subgroup G} [Finite G]
     rwa [mul_inv_cancel_right] at hmem)
   have hβxh : β (xL * hL) = 0 := by
     rw [hβ]
-    exact Sset_offKernel_vanishes_off_H hyp data horth (g := xL * hL)
+    exact Sset_offKernel_vanishes_off_H hG hyp data horth (g := xL * hL)
       (by rw [Subgroup.coe_mul]; exact hxhH)
   have hβx : β xL = 0 := by
-    rw [hβ]; exact Sset_offKernel_vanishes_off_H hyp data horth (g := xL) hxH
+    rw [hβ]; exact Sset_offKernel_vanishes_off_H hG hyp data horth (g := xL) hxH
   -- Assemble: `ψ(xh) = γ(xh) + β(xh) = γ(x) + 0 = γ(x) + β(x) = ψ(x)`.
   have key : gf (xL * hL) = gf xL := by
     simp only [hsplit, ClassFunction.add_apply, hγconst, hβxh, hβx, add_zero]
