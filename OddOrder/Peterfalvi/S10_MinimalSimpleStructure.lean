@@ -541,7 +541,15 @@ theorem escapingCentralizers_control [Finite G]
 `A_0(M)`, `A(M)`, and `A_1(M)` are TI-subsets of `G` with normalizer `M`.
 
 This is the directly usable part of the PDF-recovered missing page.  The proof is
-BG Section 16 / Peterfalvi (2.3), not a local character-theoretic argument. -/
+BG Section 16 / Peterfalvi (2.3), not a local character-theoretic argument.
+
+⚠ **Overstated / `false`-as-stated (loop¹⁰⁶ finding; currently unconsumed).**  Pf (8.10)/(8.12.c)
+(mmd 04.10 L119/L131) only asserts that `A(M) − A_1(M)` is `TI` (= BG Theorem B(5),
+`OddOrder.BG.Ch4.S16.theoremB_A_minus_Msigma_isTISubset`, **proved**).  The *full* sets `A(M) =
+(M')#` and `A_1(M) = M_σ#` are **not** `TI`: `M_σ` is only *tamely* imbedded (BG Theorem II),
+`M_σ ∩ M_σ^g` being cyclic (Theorem D(2)) rather than trivial, and escaping `σ`-elements
+(`C_G(x) ⊄ M`) exist.  The faithful content is: `A(M) − A_1(M)` TI (B(5)) + the tame embedding
+(`theoremII_tame_embedding`).  Retire or restate to `A(M) − A_1(M)` before wiring any consumer. -/
 theorem typeII_A_sets_TI [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G}
     (hM : M ∈ maximalSubgroups G) (data : TypeIIData M) :
@@ -551,7 +559,11 @@ theorem typeII_A_sets_TI [Finite G]
   sorry
 
 /-- **Peterfalvi (8.16)**, normalizer form: for Type II, the normalizers of
-`A_0(M)`, `A(M)`, and `A_1(M)` are all `M`. -/
+`A_0(M)`, `A(M)`, and `A_1(M)` are all `M`.
+
+⚠ **Overstated / unconsumed** (loop¹⁰⁶): same caveat as `typeII_A_sets_TI` — `N_G(M_σ#) = M`
+would make `M_σ` a `TI`-subgroup, contradicting the tame (not trivial-intersection) embedding of
+`M_σ` (BG Theorem II / Theorem D(2)).  Retire or restate before wiring. -/
 theorem typeII_A_sets_normalizer [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G}
     (hM : M ∈ maximalSubgroups G) (data : TypeIIData M) :

@@ -468,3 +468,25 @@ complement) を (κ∪σ)ᶜ-Hall として供給する必要があるが、そ�
 Hall 本体 = S10_BGInterface) へ relocate すれば S11 も `_hall` に migrate 可能。**hub 調整 issue 要**
 (FeitThompson は lane a 所有、relocate は cross-lane)。sup/inf witness は既存
 (`TypePData.derivedInG_eq_fitting_sup_U` + 要新 `fitting_inf_U_eq_bot`) + `isTypeII_iff_isTypeP2`。
+
+## 📋 loop¹⁰⁶ (2026-07-03) — §8 type-II support cluster の consumer 監査 + vestigial 偽 pin 発見
+
+loop¹⁰⁵ の (8.12.b) を受け、残 S10 §8 type-II pins の consumer 状況 + faithfulness を監査:
+
+**vestigial (0 consumer) + overstated/false-as-stated** — proven せず ⚠ 注記のみ (commit 済):
+- **`typeII_A_sets_TI` / `typeII_A_sets_normalizer` (8.16)**: full `A(M)=(M')#` / `A_1(M)=M_σ#` の
+  TI を主張するが、Pf (8.10/8.12.c, mmd 04.10 L119/L131) は **`A(M)−A_1(M)` のみ TI** (=B(5)、proven)。
+  M_σ は tamely imbedded (Theorem II)、M_σ∩M_σ^g cyclic (Theorem D(2)) ゆえ M_σ# は TI でない。
+  → retire or restate to `A(M)−A_1(M)`。docstring に ⚠ 注記。
+- **`escapingCentralizers_control` (8.13.b)**: 0 consumer だが overstatement ではない (tame-embedding
+  の escaping control、Theorem II/D(4) 内容)。Theorem II で proven 可能な見込み — 注記せず残置。
+
+**real (consumed) — 次 frontier 候補 (各々個別に deep)**:
+- `hall_maxNilpotentNormalHall_and_mainSubgroup` (S14×4): type I/II proven、**type III/IV は
+  M_F⊊M_σ proper-Hall で BG §14-15 に gated** (loop¹⁰³)。
+- `dadeSupportHypotheses_typeP` (S12×3): Dade support hypotheses、type-P。
+- `bgTheoremE_cover_data` (×9): Theorem E cover。
+
+**教訓**: §8 type-II support scaffold は TI/uniqueness を過剰主張しがち (8.12.b・8.16 とも false-as-stated、
+15.7(c) overstatement と同パターン [[ft-settled-findings]])。faithful 核 (A(M)−A_1(M) TI = B(5)、
+tame embedding = Theorem II) は既に proven。consumed pin のみ実 frontier、うち III/IV は BG §14-15 gated。
