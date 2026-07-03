@@ -529,3 +529,38 @@ hnu_isometry hagree`。θ/hinj/hcover/d/hdeg/ind1H = `distinctInducedFamily` (S0
 **その後**: `betaDecompOfDade` + `zetaNuRhoNormSq_ge_of_facts` → chiRhoNormSq bound →
 characterEstimateData → not_trivial_G0_of_exists_Bsum_bound。この monolithic 接続は fresh focused
 session 向き (distinctInducedFamily API + degree data + 型 bridge を一括で組む)。全 intermediate は landed。
+
+## 2026-07-04 cont.¹⁶ (lane-a, /loop) — ★ hypothesis78 COMPLETE: `Hypothesis78 G H_i^# L_i` 実証明・build green
+
+**Landed** (`S09_FrobeniusHypothesis78.lean`, sorry-free, 4.7s leaf build): 各 Frobenius member `i` の
+**Peterfalvi (7.8) 構造 `Hypothesis78 G (H_i^#) (L_i)`** を完全組み立て。cont.¹⁵ で「最大の未知・fresh
+session 向き」とした monolithic 接続を **1 iteration で突破**。§14 `witness_L_hypothesis78` (5447-5531) が
+逐語ブループリントだった。
+
+**cont.¹⁵ の crux 解決** — 既存の §12→§7 bridge を発見・再利用 (再構成不要だった):
+- **`Cert.coherence_hagree_dadeMap`** (S09_CertDischarge:2559): `IsCoherent` から `hagree` shape を直接
+  産出。出力 = `(dade.fullDadeIsometryData hconj).toDadeIsometryData.toDadeMap ⟨ζ_i−d_iζ_0,_⟩ =
+  ν ζ_i − d_i ν ζ_0`。
+- **`Cert.coherence_extension_inner_eq_on_family`** (2586): `hnu_isometry` を `extension_inner_eq` から。
+- **crux の正しい解**: `SibleyDadeHypothesis.tau` は `abbrev` = `dadeIntegralCharacterMap dade
+  (dade.fullDadeIsometryData hconj)` (S08_CoherenceCorePart2:31)。ゆえ `F.coherence i` の型は
+  `coherence_hagree_dadeMap` が要求する `IsCoherent (dadeIntegralCharacterMap dade (fullData hconj)) S
+  (supportInSubgroup (sharpImage H) L)` と **完全一致**。H71' は §14 `toHypothesis71` 流に τ =
+  `fullData.toDadeIsometryData.toDadeMap` で作る (`sibleyToHypothesis71`) → `coherence_hagree_dadeMap`
+  が defeq で match (of_isTISubset.dadeMap 経由の bridge は不要だった)。
+- **distinctInducedFamily は非公開のままで良い**: `Cert.exists_placed_induced_family` (generic、任意の
+  distinguished `χdist` を index 0 に配置) を再利用。distinguished char = 非自明 linear char の induced
+  (degree `[L_i:K_i]`)、`exists_sibley_distinguished_char` で構成 (K_i nilpotent 非自明 ⟹ 非 perfect ⟹
+  `exists_irreducibleCharacter_ne_trivial_degree_one_of_commutator_ne_top`)。
+
+**新規 (S09_FrobeniusHypothesis78.lean)**:
+- `sibleyToHypothesis71` — §14 流 H71' (τ = coherence Dade map、`coherence_hagree_dadeMap` と defeq)。
+- `exists_sibley_distinguished_char` — 非自明 linear induced (degree [L:K])。
+- `hypothesis78 (F)(i)(hodd)[inst](hnilp)(C)(hFrob) : Nonempty (Hypothesis78 G (sharpImage((H_i).subgroupOf L_i)) L_i)`
+  — 完全 assembly (hAH=sharpImage_subgroupOf_eq, hHnorm=mem_kernel_conj_iff, placed family, d/hdeg/
+  hdeg_match/psi_support, hnu_isometry, hagree)。
+
+**次 (下流、cont.¹⁷ 予定)**: `Hypothesis78` を consume する (7.8.b) норм bound
+`zetaNuRhoNormSq_ge_of_facts` + `betaDecompOfDade` → chiRhoNormSq bound →
+`characterEstimateData_of_family71_reduced_estimates` → `not_trivial_G0_of_exists_Bsum_bound` (7.10)。
+coherence gate は突破済、(7.8) 構造も landed。残るは (7.8.b)/(7.9) の norm 評価の per-member 適用と assembly。
