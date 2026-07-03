@@ -624,3 +624,21 @@ Clifford 単一軌道 + Frobenius の assembly。再利用 Clifford infra。buil
 **(12.5) hβconst 進捗** (4 iter): vanishing lemma (¹³²) + statement 訂正/Fourier 還元 (¹³³) + roadmap (¹³⁴)
 + trivIset core (¹³⁵)。**次 = partition cover** (∀ j∈Irr(H), ∃ i∈Irr(H'), j lies over Ind i;
 = Res_{H'} j ≠ 0 の constituent 存在) → partition 組立 → DpsiH → o_rpsi_S (Dade reciprocity)。
+
+### loop¹³⁶ — partition 完成 (cover は既存) + o_rpsi_S 深さ確定; (12.5) 残 core 評価
+
+**partition 完成**: induced-from-H' 分割の 2 事実が両方 available:
+- **trivIset**: `exists_conj_of_common_induce_constituent` (loop¹³⁵ landed)。
+- **cover**: `exists_liesOver` (Clifford:626、**既存・proven**、正規性不要)。∴ cover の build 不要。
+
+**o_rpsi_S 深さ確定 (subtle Lean-Coq alignment)**: Lean は Dade **isometry** `tau_inner_eq_of_supported`
+(⟨τφ,τψ⟩=⟨φ,ψ⟩) + coherence bridge `coherent_extension_constituent_mem_span_Rset` を持つが、
+Lean (12.5) は ψ on G (horth = τ-image 直交) で Coq o_rpsi_S は ⟨ρψ,·⟩ on L。**この reconciliation +
+DpsiH 組立が残 hβconst core** = deep/subtle/multi-iter。
+
+**(12.5) 総括**: 5 iter で reusable infra 全抽出 (induce vanishing ¹³² + partition trivIset ¹³⁵)、
+statement 訂正 + Fourier 還元 (¹³³)、roadmap (¹³⁴)。残 hβconst = o_rpsi_S reconciliation + DpsiH の
+deep orphan build。reusable infra (vanishing/partition) は type-I char 全般で再利用可。
+**次: DpsiH-const 汎用 lemma (係数 class-const → const on H∖H') = partition + cfInd_central_Inertia
+(`exists_extension_induce_eq_sum_distinct_of_inertia_inf_le`) + vanishing の assembly** を build、
+o_rpsi_S を残 hypothesis に isolate。
