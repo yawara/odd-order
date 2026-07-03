@@ -20,6 +20,8 @@ Foundational coordinate lemma first: the Sibley kernel `(H_i).subgroupOf L_i : S
 
 namespace OddOrder.Peterfalvi.S09
 
+open OddOrder.RepresentationTheory
+
 namespace FrobeniusFamily
 
 variable {G : Type*} [Group G] {k : ℕ}
@@ -36,6 +38,58 @@ lemma sharpImage_subgroupOf_eq (F : FrobeniusFamily G k) (i : Fin k) :
     rw [Subgroup.subgroupOf_map_subtype, inf_of_le_left (F.kernel_le i)]
   rw [OddOrder.Peterfalvi.S08.sharpImage, hmap]
   rfl
+
+open scoped Classical in
+/-- **The Peterfalvi (6.8) Sibley datum for the `i`-th Frobenius member** (case c1).  Assembles a
+`SibleyDadeHypothesis G L_i ((H_i).subgroupOf L_i)` from the Frobenius structure `hFrob`
+(`isNormal`/`isComplement`/`ne_bot_*`), the TI/Dade datum of `H_i^#` (`of_isTISubset`, whose local
+subgroups are trivial), and the kernel-nilpotency `hnilp` (available from `frobeniusKernelIsNilpotent`
+for the solvable `L_i` in the FT spine).  Feeding this to `sibleySetup_is_coherent` yields the
+coherent extension `ν` for `S = {Ind_{H_i}^{L_i} θ | θ ≠ 1}` (issue 0044). -/
+noncomputable def sibleyDadeHypothesis_of_frobenius [Fintype G] [Invertible (Nat.card G : ℂ)]
+    (F : FrobeniusFamily G k) (i : Fin k) (hodd : Odd (Nat.card G))
+    [Fintype ↥(F.L i)] [Invertible (Nat.card ↥(F.L i) : ℂ)]
+    [Invertible (Nat.card ↥((F.H i).subgroupOf (F.L i)) : ℂ)]
+    (hnilp : Group.IsNilpotent ↥((F.H i).subgroupOf (F.L i)))
+    (C : Subgroup ↥(F.L i))
+    (hFrob : OddOrder.Isaacs.Ch06.IsFrobeniusGroup ↥(F.L i) ((F.H i).subgroupOf (F.L i)) C) :
+    OddOrder.Peterfalvi.S08.SibleyDadeHypothesis G (F.L i) ((F.H i).subgroupOf (F.L i)) :=
+  letI dade0 : OddOrder.Peterfalvi.S04.Hypothesis G
+      (OddOrder.Peterfalvi.S08.sharpImage ((F.H i).subgroupOf (F.L i))) (F.L i) :=
+    OddOrder.Peterfalvi.S04.Hypothesis.of_isTISubset
+      (by
+        rw [sharpImage_subgroupOf_eq]
+        intro x hx
+        exact OddOrder.Peterfalvi.S04.mem_sharp.mpr
+          ⟨Set.mem_univ x, (OddOrder.Peterfalvi.S04.mem_sharp.mp hx).2⟩)
+      (by
+        rw [sharpImage_subgroupOf_eq]
+        intro x hx
+        exact F.kernel_le i (OddOrder.Peterfalvi.S04.mem_sharp.mp hx).1)
+      (by
+        rw [sharpImage_subgroupOf_eq]
+        intro l a ha
+        exact (F.mem_kernel_sharp_conj_iff_of_mem_L i l.2).mpr ha)
+      (by
+        rw [sharpImage_subgroupOf_eq]
+        exact F.isTI i)
+  { W1 := C
+    H_ne_bot := hFrob.ne_bot_kernel
+    H_normal := hFrob.isNormal
+    H_nilpotent := hnilp
+    split := hFrob.isComplement
+    W1_nontrivial := hFrob.ne_bot_complement
+    card_L_odd := hodd.of_dvd_nat (Subgroup.card_subgroup_dvd_card (F.L i))
+    H_sharp_ti := by rw [sharpImage_subgroupOf_eq]; exact F.isTI i
+    dade := dade0
+    hconj := OddOrder.Peterfalvi.S04.Hypothesis.HConjInvariant.of_forall_H_eq_bot dade0 (fun _ => rfl)
+    dade_H_eq_bot := fun _ => rfl
+    S := {φ : ClassFunction ↥(F.L i) ℂ | ∃ θ : IrreducibleCharacter ↥((F.H i).subgroupOf (F.L i)),
+      θ ≠ OddOrder.RepresentationTheory.trivialIrreducibleCharacter ↥((F.H i).subgroupOf (F.L i)) ∧
+      φ = OddOrder.RepresentationTheory.ClassFunction.induce ((F.H i).subgroupOf (F.L i))
+        (θ : ClassFunction ↥((F.H i).subgroupOf (F.L i)) ℂ)}
+    S_eq := rfl
+    cases := Or.inl hFrob }
 
 end FrobeniusFamily
 
