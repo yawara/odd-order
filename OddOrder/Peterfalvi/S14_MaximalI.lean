@@ -1378,6 +1378,37 @@ theorem nonconjugate_typeI_R_orthogonal {L1 L2 : Subgroup G} [Finite G]
     ← OddOrder.Peterfalvi.S07.CharacterDifferenceImage.image_eq_signedDifference (R1cdi data2 hφ2)]
   exact nonconjugate_diffImage_inner_zero hG hyp1 hyp2 hnot_conj data1 hφ1 data2 hφ2
 
+open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
+/-- **Same-`L` cross-family orthogonality of the type-I `R`-families.**  For two members
+`χ₁, χ₂ ∈ S` of *one* type-I maximal `L`, if the constituents are pairwise distinct across the two
+families and their conjugates (`hcond`: `φ₁ ≠ φ₂`, `φ₁ ≠ φ̄₂`, `φ̄₁ ≠ φ₂` for all `φ₁ ∈ S(χ₁)`,
+`φ₂ ∈ S(χ₂)` — which holds when `χ₁ ∉ {χ₂, χ̄₂}`), the families `R(χ₁) = Rset data1` and
+`R(χ₂) = Rset data2` are mutually orthogonal.
+
+The same-`L` companion of `nonconjugate_typeI_R_orthogonal`: the cross-`L` (4.1) reduction
+`toOrthonormalImage_inner_eq_zero_across` sends `⟨α, β⟩ = 0` to the signed-difference orthogonality,
+here `constituentDiff_tau_inner_eq_zero_of_ne_across` (the two-family block orthogonality) rather than
+the geometric `nonconjugate_diffImage_inner_zero`.  This is the `ζ ∈ ℤ[R(χ)] ⟹ ζ ⊥ R(χ')` input
+(`χ' ≠ χ, χ̄`) behind the (12.14) coset-constancy of the coherent extension. -/
+theorem samegroup_typeI_R_orthogonal {L : Subgroup G} [Finite G]
+    (hyp : Hypothesis L)
+    {chi1 chi2 : ClassFunction ↥L ℂ} (data1 : CharacterDecompositionData hyp chi1)
+    (data2 : CharacterDecompositionData hyp chi2)
+    (hcond : ∀ φ1 ∈ data1.constituents, ∀ φ2 ∈ data2.constituents,
+      φ1 ≠ φ2 ∧ φ1 ≠ OddOrder.Peterfalvi.S07.conjIrreducibleCharacter (L := ↥L) φ2 ∧
+        OddOrder.Peterfalvi.S07.conjIrreducibleCharacter (L := ↥L) φ1 ≠ φ2) :
+    ∀ α ∈ Rset data1, ∀ β ∈ Rset data2, ClassFunction.inner α β = 0 := by
+  intro α hαm β hβm
+  obtain ⟨φ1, hφ1, hα⟩ := hαm
+  obtain ⟨φ2, hφ2, hβ⟩ := hβm
+  obtain ⟨hne, h2, h3⟩ := hcond φ1 hφ1 φ2 hφ2
+  refine OddOrder.Peterfalvi.S07.CharacterDifferenceImage.toOrthonormalImage_inner_eq_zero_across
+    (R1cdi data1 hφ1) (R1cdi data2 hφ2) ?_ hα hβ
+  rw [← OddOrder.Peterfalvi.S07.CharacterDifferenceImage.image_eq_signedDifference
+        (R1cdi data1 hφ1),
+    ← OddOrder.Peterfalvi.S07.CharacterDifferenceImage.image_eq_signedDifference (R1cdi data2 hφ2)]
+  exact constituentDiff_tau_inner_eq_zero_of_ne_across data1 data2 hφ1 hφ2 hne h2 h3
+
 /-- **Difference-uniqueness for signed irreducible-character differences** (Peterfalvi §3, the
 reconciliation core of (1.4)).  If two *signed* differences of distinct irreducible characters
 coincide, `s • (a − b) = t • (c − d)` with `a ≠ b`, `c ≠ d` and a nonzero left scalar `s`, then the
