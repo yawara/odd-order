@@ -227,6 +227,34 @@ PFsection1 `constt_Inertia_bijection` の経路を精読して最短路を採る
 [(G2) 済] で各項既約 [6.11] → (1.7)(b) の等次数 [L:I]·d・mult-one 分解が完成、残りは
 台 (1.5.a)/(1.2) + 非実 + S14 assembly のみ。
 
+### 6.11 の設計確定 (2026-07-03 cont.¹⁸ 精査 — route (ii) θ-part 論法採用、一般 Mackey 不要)
+
+**在庫が予想以上に厚い** (CliffordSingleOrbit / InducedCharacter):
+- `apply_one_eq_restrictionMultiplicity_mul_index_inertia`: **ξ(1) = ⟨Res_H ξ,θ⟩·[G:I(θ)]·θ(1)** (等式!)。
+- `apply_one_le_induce_apply_one_of_liesOver`: **χ(1) ≤ (Ind_I^G ψ)(1)** (構成要素 degree bound)。
+- `coe_eq_induce_of_liesOver_of_isIrreducibleCharacter_induce`: χ over ψ + Ind ψ 既約 ⟹ χ = Ind ψ。
+- `induce_apply_one`: (Ind ψ)(1) = [G:I]·ψ(1)。
+
+**Isaacs 6.11 の Lean 化 (θ-part 勘定)**: H⊴G, T=I_G(θ) (hypothesis: `inertia θ ≤ T` + `T`-invariance
+は transport)、ψ∈Irr(T) lies over θ' (T-level transport 形 `compHom e θ`)。χ := 任意の Irr 構成要素
+of Ind_T^G ψ、m := ⟨Ind ψ, χ⟩ = ⟨Res_T χ, ψ⟩ ≥ 1。
+1. ψ(1) = e·θ(1) where e := ⟨Res_{H'} ψ, θ'⟩ — single-orbit degree 等式を (T, H.subgroupOf T) で
+   適用 (θ' の T-inertia = ⊤: (v-d) の hinv₁ transport idiom 再利用)。
+2. **key 下界 e_χ := ⟨Res_H χ, θ⟩ ≥ m·e**: ⟨Res_H χ, θ⟩ = ⟨Res_{H'}(Res_T χ), θ'⟩ [唯一の
+   inner-transport = `inner_compHom_of_mulEquiv`] = Σ_{ρ∈Irr(T)} ⟨Res_T χ,ρ⟩·⟨Res_{H'} ρ, θ'⟩
+   [Fourier + inner 線形性] ≥ m·e [全項非負]。
+3. 次数勘定: χ(1) = e_χ·[G:T]·θ(1) [1. の等式、I_G(θ)=T] ≥ m·e·[G:T]·θ(1) = m·(Ind ψ)(1)、
+   一方 χ(1) ≤ (Ind ψ)(1) → **m = 1 ∧ χ(1) = (Ind ψ)(1)**。
+4. **degree-exhaustion**: ⟨Ind ψ, χ⟩ = 1 + (Ind ψ)(1) = χ(1) + Ind ψ = Σ_η ⟨,η⟩η (係数∈ℕ≥0)
+   ⟹ Ind ψ = χ 既約。(capstone 類似の新 helper。)
+
+**blocker → issue 9005 起票済**: `inner_compHom_of_mulEquiv` / `induce_induce_subgroupOf` /
+`induce_eq_sum_inner_restrict_smul` が **S08_CaseBCoherence2.lean (lane b 所有) 内の generic 宣言**
+— shared 化の prefix-split を hub に依頼 (GroupTheory/** から Pf leaf への import 逆流は不可)。
+lane c は relocate 非依存部品 (4. degree-exhaustion、1./2. の骨格) を先行 build。
+なお stages (`induce_induce_subgroupOf`) は 6.11 本体には不要 — (1.7)(b) 最終 assembly (Pf leaf 側,
+S08 import 可) でのみ使用。
+
 **性質**: genuine multi-session char build (G1-G3 は Isaacs §6/§11 の generic char theory で repo 未収録)。
 Frobenius sub-case は proven ゆえ witness (12.16) 経路は現状も通る; 本 issue は一般 (12.14) 用の shared infra。
 
