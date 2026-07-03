@@ -1245,3 +1245,38 @@ spine (type-III 判定 (11.9.c) 向け、endpoint は degree facts (9.8.b/9.9.b 
 10.7/10.8/10.10 は on-spine (`no_typeV_maximal`←FeitThompson) だが (7.8.b は S09 で sorry-free 済) +
 type-II 構造 (10.7 carrier scaffold) + §14 に coupled-gated。⟹ 現 lane-a の on-spine ungated frontier
 = **(11.8.5) extension-一般化 refactor** (上記) が最有力。
+
+## 2026-07-03 cont.⁶⁹ (lane-a) — **(11.8.2)–(11.8.5) machinery を任意 coherent extension `coh` に一般化完了 + producer↔capstone wiring 完結**
+
+cont.⁶⁸ が指した「(11.8.5) machinery の extension-一般化 refactor」を**完遂** (2 commits, 全 full-build
+green + AxiomsCheck OK, S12 sorry 4 不変)。
+
+**① 全 subtree を `coh` でパラメタ化** (commit `5a67ee61`): `residualCoeff_eq_zero` 以下の (11.8.2)–
+(11.8.5) 補題群 (~27 本) が固定 `SHC_isCoherent hG` でなく任意 `(coh : IsCoherent hyp.tau hyp.SHCSet hyp.A0)`
+を取る。`coh` が要る性質は全て **generic** (直交正規性 `IsCoherent.inner_extension_*`、ZIrr 所属
+`extension_mem_ZIrr`、`τ(ζ−η)=coh ζ−coh η` = `extends_on_supported`) — 例外は **conj-commute のみ**
+(`beta_isReal`/`residualCoeff_eq_zero` に `hconj : ∀ χ deg-w₁ irr, (coh χ)‾ = coh χ‾` を追加、P4)。
+- 新 `abbrev Hypothesis.SHCSet` (degree-w₁ irr subfamily の略記)。
+- `SHC_extension_inner_self`/`_of_ne` は generic への SHCSet-adapter に。
+- **SHC producers** (`tau_muColumnZero_sub_zeta_dichotomy_of_orthogonal`/`SHC_swap`) は SHC-specific
+  のまま、一般化 leaf へ `hyp.SHC_isCoherent hG` を渡す (9 call sites)。
+- 数学的健全性を**両 branch で検証済**: branch 1 (coh=SHC, a=0, `⟨α^τ,coh ζ⟩=a−n=−n`)、branch 2
+  (coh=swap, two-way computation が SHC-basis 係数 `a=n` を出し `⟨α^τ,swap ζ⟩=−⟨α^τ,SHC ζ̄⟩=−a=−n`) —
+  同一の abstract 論証が両方を被覆。
+
+**② `SHC_swap_conj` + producer 強化** (commit `da165ea8`): (11.8.4) dichotomy producer が capstone の
+消費インターフェースを丁度供給するよう wiring 完結。
+- `SHC_swap_conj`: swap の P4 conj-commute (両辺 `=−SHC(χ‾‾)`)。
+- `exists_coherent_extension_h114_of_orthogonal` を強化し `∃ ν, hconj(ν) ∧ h114(ν)` を返す
+  (branch 1=`SHC_extension_conj`、branch 2=`SHC_swap_conj`)。**h114 は自由仮定でなく orthogonality
+  仮定から producer が生成** (+ ν の conj-commute も) → (11.8.5) `a=0` は h114 スレッド解消済。
+
+**現状 (11.8.5) = 無条件化の interface 完成**。`residualCoeff_eq_zero` は `coh`+`hconj`+`h114` を取り、
+これらは全て producer (h114) か `SHC_extension_conj`/`SHC_swap_conj` (hconj) が供給。**残る endpoint
+`exists_zeta_residual_not_orthogonal` の gate は genuine downstream のみ**:
+- **(11.8.1) count `|S(HC)| = n`** = §9↔§10 carrier bridge (`hRn : R.card = n` の gated 入力)。
+- **(11.8.6) `S(C)`-coherence contradiction** = §14 (S₂=S(C)−S(HC) coherence、lane-b/c の 9.11 sibleyTarget)。
+
+**次 frontier 候補** (上流優先+文書順): endpoint の (11.8.6) assembly は §14-gated ゆえ、lane-a の on-spine
+ungated 上流は §9 count carrier (`card_G0_lower_bound` 7.10 = issue 0044、on-path 確定) か §10-13 structural。
+(11.8) machinery 側は interface 完成につき、これ以上の ungated 前進は endpoint assembly (gated) 待ち。
