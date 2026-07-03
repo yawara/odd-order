@@ -268,3 +268,25 @@ discharge**: `by_cases hP1 : IsTypeP1 M` → P1 branch は `rw [typePA_eq_sigmaS
 **`dadeSupportHypotheses_typeP` 現状**: A₁ (全 tau) ✅ + typePA-P₁ ✅ = **honest**、残 2 sorry =
 **typePA0 (V^M exceptional) + typePA-P₂ ((8.13.b) `escaping_typePA_mem_A1` の escaping 還元)**。
 engine 部分は完了、残りは type-P 固有 support 幾何のみ。次 = (b) type-P (8.13.b) の実証 or (c) V^M。
+
+### loop¹²⁰ — P2-typePA/typePA0 = genuine deep type-P structure と確定 (engine と違い wiring でない)
+
+残 2 sorry を精査:engine の σ-generic wiring とは違い、**type-P 固有の support 幾何が要ると判明**。
+
+**P2-typePA の障害 (precise)**: engine は escaping 点が σ-sharp (∈M_σ#) を要求。P2 は typePA=(M')#⊋M_σ# ゆえ
+escaping (M')# 点が σ-sharp である必要。σ-sharp 化の唯一の route `mem_sigmaSharp_of_mem_aSet_of_escape`
+(S16:6179) は **ASet/A0Set cover gated** (点が cover 内であることが前提)。cover-free の escape→σ-sharp は
+**存在しない**。`typePA ⊆ A0Set M K` bridge も未存在で、要 `(M')# ⊆ hatMsigma M`
+(= 全 x∈(M')# で M_σ⊓C_G(x)≠⊥) = **genuine deep type-P 構造** (case-heavy: W1# 点は `centralizer_W1`→W2⊆H⊆M_σ
+で OK だが、一般 M' 元は nilpotent H=M_F への固定点論法が要り自明でない; 冪零 H への coprime 作用は
+fixed-point-free 可)。**M_F ⊆ M_σ は general** (`maxNilpotentNormalHall_le_Msigma` S15:175) — 部品にはなる。
+
+**typePA0**: typePA ∪ conjClassSetIn M (typePV M data) の **V^M exceptional 成分** (`typePV` S10-GT:305)。
+別 deep obligation。
+
+**次 iteration の第一歩 (優先度確認 + 攻略)**: (1) **downstream consumer 確認** — `dadeSupportHypotheses_typeP`
+の typePA0/typePA 成分が FT critical path で実際に consume されるか grep (A₁ 成分だけで足りる下流なら
+P2-typePA/typePA0 は後回し可; feedback-verify-lane-connects-to-goal)。(2) consume されるなら
+**`(M')# ⊆ hatMsigma` (or escaping 版) を type-P 構造から実証** — TypePData の H⋊U 構造 + centralizer_W1
++ M_F⊆M_σ + 固定点論法。Coq `BGsection15/16` の of_typeP normedTI 'F(M)^# を併読 (PFsection8.v L141:
+`normedTI 'F(M)^# G M`)。これが type-P Dade engine の最後の deep core。
