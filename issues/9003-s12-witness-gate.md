@@ -515,3 +515,26 @@ tame embedding = Theorem II) は既に proven。consumed pin のみ実 frontier�
 `hall_maxNilpotentNormalHall_and_mainSubgroup` III/IV = BG §14-15 gated (loop¹⁰³)。
 → §8 type-II の tractable TI 作業 (8.12.b faithful + vestigial 監査) は完了; 残りは type-P Dade
 geometry (新機構) か BG §14-15 gate。次 session は type-P engine を focused に build するのが妥当。
+
+## 📋 loop¹⁰⁸/¹⁰⁹ (2026-07-03) — type-P Dade engine 前提整備 + Pf/BG A(M) 不一致の発見
+
+**loop¹⁰⁸ landing** (commit 8c85dcac): type-P Dade engine の conj-invariance 前提を build。
+`sharpSubgroup_conj_mem` (general) + `A1_conj_mem` (全 tau、旧 `A1_typeI_conj_mem` を dedup 置換) +
+`typePA_conj_mem`。full build green。
+
+**loop¹⁰⁹ 発見 (検証済み、engine build 前に要 reconciliation)**: type-P の A(M) 定義が Pf と BG で**別物**:
+- **Pf (8.10, mmd 04.10 L117)**: type-P `A(M) = ⋃_{x∈M#} C_{M'}(x)# = (M')#` (Lean `typePA`、
+  `typePA_eq_sharpSubgroup_derivedInG` で確認; x=y で C_{M'}(y)∋y ゆえ全 M'# を被覆)。
+- **BG (§16)**: `A(M) = ASet = hatMsigma ∩ (U⊔M_σ) = hatMsigma ∩ M'` (C_{M_σ}≠1 を要求)。
+- **不一致**: type II で C_H(U)=1 (`typeII_centralizer_U_eq_bot`) ゆえ U-元 a∈U#⊆(M')# は
+  C_{M_σ}(a)=1 → a∉hatMsigma → **a∈typePA だが a∉ASet**。よって typePA=(M')# ⊋ ASet。
+
+**含意**: Pf (8.12.c) 「A(M)−A_1(M) TI」は Pf の A(M)=(M')# ゆえ **(M')#−M_σ# TI** を主張し、
+私の B(5) (`theoremB_A_minus_Msigma_isTISubset` = BG ASet−M_σ TI) と**別主張**。Pf ref は [BG] Thm B
+なので両者は整合するはずだが、その alignment (Pf A(M)−A_1(M) = BG ASet−M_σ、i.e. ∀y∈M'∖M_σ,
+C_{M_σ}(y)≠1) は type-P structure の非自明な事実で、要 careful 証明。→ **type-P Dade engine は
+Pf/BG A(M) 整合 + escaping_typePA_signalizer_structure を要する deep piece、fresh focused session 向け**。
+
+**§8 type-II の tractable 作業は枯渇** (8.12.b faithful + vestigial 監査 + conj 前提)。残 pin は全て
+deep (type-P Dade / §12 witness / §8 III/IV BG§14-15 gate)。次は別クラスタ (S07/S08/S09) の tractable
+target を探すか、type-P engine を fresh session で。
