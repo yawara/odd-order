@@ -480,3 +480,19 @@ carve-out 0096 (type-P Dade **support** geometry) は達成。次 arc = **§12 c
 §12 Dade tower の最深部 (loop¹¹⁷ が "deep char" と識別した領域)。ungated own-work だが genuine deep。
 一部は §9↔§10 carrier bridge に gated の注記あり (L2244)。次 iteration: 上流優先で
 `typeII_derived_frobenius` (10.7) から engage (fresh context 推奨、深い char/structure 証明)。
+
+### loop¹²⁸ cont. — lane-b frontier 全体 survey (type-P support arc 後): S14 type-I Dade tower が主
+
+「lane b mostly blocked」の早計を訂正。lane-b sorry inventory:
+- **S14_MaximalI: 11 sorry** (type-I Dade tower: rho_constant_on_H_minus_Hprime, sibleyTarget_frobI,
+  witness_L_isTypeI/complement_isZGroup, intersection_complement_structure, complement_cyclic_order_dvd,
+  psi_constant_on_xK, rhoM_integer_values, exists_counterexample_dade_data, exists_typeICovering×2)。
+  = lane b の core 型-I char/Dade 解析、ungated own-work 多数。
+- S12_MaximalIII_IV_V: 4 (type-P char body、mixed: 11.8=lane-a gated、11.9.b/§10-11 core=lane-b)。
+- S10 (carve-out): 8 (type-P2 residue 含む + type-II structural 系)。
+
+**FT-path 確認**: exists_hypothesis (10.1) ✅ + w2_lt_w1 (11.9.b, lane-b) → exists_zeta_residual
+(11.8, **lane-a** gated) → card_kappaHall_lt → FT spine。typeII_derived_frobenius (10.7) は 0 consumer。
+
+**次 = S14 type-I Dade tower** (上流優先で engage)。type-P support arc (0096 主目的) 完了後の lane-b
+主 frontier。深い char 解析ゆえ fresh context 推奨。
