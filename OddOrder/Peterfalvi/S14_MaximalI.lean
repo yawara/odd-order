@@ -5492,18 +5492,29 @@ gives `dade.psi(x·g) = dade.psi(x)` for `g ∈ H_M = K`, provided the two input
 * `hxK`: `x ∉ K` — `x` is a nontrivial `p`-element and `p ∤ |K| = |M_F|` (`K` is the `p'`-Hall `M_F`). -/
 theorem psi_constant_on_xK [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     {ctr : CounterexampleHypothesis (G := G)} {L : Subgroup G}
-    (hyp : Hypothesis L) (witness : RankTwoWitnessData ctr)
-    (dade : DadeNotation hyp) :
+    (hyp : Hypothesis L)
+    (coh : OddOrder.Peterfalvi.S07.IsCoherent hyp.tau hyp.Sset hyp.A)
+    (witness : RankTwoWitnessData ctr) (dade : DadeNotation hyp)
+    {chi0 : IrreducibleCharacter ↥L}
+    (data0 : CharacterDecompositionData hyp (chi0 : ClassFunction ↥L ℂ))
+    (hchi0 : chi0 ∈ data0.constituents)
+    (hchi0_mem : (chi0 : ClassFunction ↥L ℂ) ∈ hyp.Sset)
+    (hpsi : dade.psi = coh.extension (chi0 : ClassFunction ↥L ℂ))
+    (hLM : ¬ ∃ g : G, MulAut.conj g • L = ctr.M) :
     ∀ g : G, g ∈ ctr.K → dade.psi (witness.x * g) = dade.psi witness.x := by
   classical
   obtain ⟨hypM⟩ := exists_typeI_hypothesis hG ctr.M_maximal ctr.M_typeI
   have hHK : hypM.H = ctr.K := hypM.typeI.typeF.H_eq.trans ctr.K_eq_MF.symm
   have data_M : ∀ χ ∈ hypM.Sset, CharacterDecompositionData hypM χ :=
     fun χ hχ => (character_decomposition_and_dade_domain hG hypM hχ).choose
-  -- (12.3)/(5.5) cross-group orthogonality `dade.psi ⊥ R_M` (the genuine content; `M ≠ L`).
+  -- (12.3)/(5.5) cross-group orthogonality `dade.psi ⊥ R_M` (the genuine content; `M ≠ L`):
+  -- `dade.psi = coh.extension χ₀ ∈ ℤ[R(χ₀)]` and `R(χ₀) ⊥ R_M` since `L ≠ M`.
   have horth : ∀ χ (hχ : χ ∈ hypM.Sset), ∀ α ∈ Rset (data_M χ hχ),
       ClassFunction.inner dade.psi α = 0 := by
-    sorry
+    intro χ hχ α hα
+    rw [hpsi]
+    exact coherent_extension_constituent_orthogonal_Rset_of_nonconjugate hG hyp coh data0 hchi0
+      hchi0_mem hypM hLM (data_M χ hχ) α hα
   have hxM : witness.x ∈ ctr.M := ctr.P0_le_M witness.x_mem_P0
   -- `x ∉ K`: nontrivial `p`-element, `p ∤ |K|` (K = M_F is the `p'`-Hall since `p ∣ [M:M_F]`).
   have hxK : witness.x ∉ hypM.H := by
