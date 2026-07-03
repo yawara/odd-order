@@ -39,6 +39,31 @@ lemma sharpImage_subgroupOf_eq (F : FrobeniusFamily G k) (i : Fin k) :
   rw [OddOrder.Peterfalvi.S08.sharpImage, hmap]
   rfl
 
+/-- **The (7.1) datum in the sharpImage coordinate.**  `Hypothesis71 G (sharpImage ((H_i).subgroupOf L_i)) L_i`
+— the same TI-subset Dade datum as `hypothesis71`, but with the support written in the
+`SibleyDadeHypothesis`/coherence coordinate (`sharpImage H = (H_i)^#` via `sharpImage_subgroupOf_eq`).
+Its Dade map `τ` is the real Dade map the (6.8) coherence `coherence` is coherent for, so it is the
+`Hypothesis71` to feed `hypothesis78OfDade` alongside `ν = coherence.extension`. -/
+noncomputable def sibleyHypothesis71 [Fintype G] (F : FrobeniusFamily G k) (i : Fin k) :
+    Hypothesis71 G (OddOrder.Peterfalvi.S08.sharpImage ((F.H i).subgroupOf (F.L i))) (F.L i) :=
+  Hypothesis71.of_isTISubset
+    (by
+      rw [sharpImage_subgroupOf_eq]
+      intro x hx
+      exact OddOrder.Peterfalvi.S04.mem_sharp.mpr
+        ⟨Set.mem_univ x, (OddOrder.Peterfalvi.S04.mem_sharp.mp hx).2⟩)
+    (by
+      rw [sharpImage_subgroupOf_eq]
+      intro x hx
+      exact F.kernel_le i (OddOrder.Peterfalvi.S04.mem_sharp.mp hx).1)
+    (by
+      rw [sharpImage_subgroupOf_eq]
+      intro l a ha
+      exact (F.mem_kernel_sharp_conj_iff_of_mem_L i l.2).mpr ha)
+    (by
+      rw [sharpImage_subgroupOf_eq]
+      exact F.isTI i)
+
 open scoped Classical in
 /-- **The Peterfalvi (6.8) Sibley datum for the `i`-th Frobenius member** (case c1).  Assembles a
 `SibleyDadeHypothesis G L_i ((H_i).subgroupOf L_i)` from the Frobenius structure `hFrob`
