@@ -160,4 +160,117 @@ theorem exists_extension_induce_eq_sum_induce_mul
         exact one_ne_zero)
     exact h611
 
+open scoped commutatorElement in
+/-- **The constructive Clifford decomposition, distinct-constituent (multiplicity-free) form**
+(Peterfalvi (1.7)(b), the mult-one packaging).  Under the hypotheses of
+`exists_extension_induce_eq_sum_induce_mul`, the `[T:H]` induced summands `Ind_T^L(χ·Inf β)` of
+`Ind_H^L θ` are **pairwise distinct**: there is an extension `χ ∈ Irr(T)` of `θ` and a finite set
+`S` of `[T:H]` distinct irreducible characters of `L` with
+
+  `Ind_H^L θ = ∑_{φ ∈ S} φ`,
+
+each `φ` of degree `[L:T]·θ(1)` and of the form `Ind_T^L(χ·Inf β)` for some `β`.
+
+Distinctness is the norm count: `⟨Ind_H^L θ, Ind_H^L θ⟩ = [I_L(θ):H] = [T:H]`
+(`card_mul_inner_self_induce_eq_card_inertia`, since `I_L(θ) = T`), which equals the number
+`|Hom(T/H, ℂˣ)|` of summands (`CommGroup.card_monoidHom_of_hasEnoughRootsOfUnity`), so the family
+`β ↦ Ind_T^L(χ·Inf β)` is injective (`injective_of_sum_inner_self_eq_card`) and its image is `S`.
+
+This is layer (a) of the type-I application `typeI_induced_char_constituents`; the non-reality,
+conjugate-distinctness and support (`⊆ A(L) ∪ {1}`) are the §8/type-I bookkeeping (layer (b)) built
+on top of the structural witness `φ = Ind_T^L(χ·Inf β)` exposed here. -/
+theorem exists_extension_induce_eq_sum_distinct_irreducible
+    {H T : Subgroup L} [H.Normal] [(H.subgroupOf T).Normal] (hHT : H ≤ T)
+    [Invertible (Nat.card ↥H : ℂ)] [Invertible (Nat.card ↥T : ℂ)]
+    [Invertible (Nat.card ↥(H.subgroupOf T) : ℂ)]
+    [Fintype ((↥T ⧸ H.subgroupOf T) →* ℂˣ)]
+    {θ : ClassFunction ↥H ℂ} (hθ : IsIrreducibleCharacter θ)
+    (hinertia : ClassFunction.inertia (G := L) θ = T)
+    (hab : ∀ x y : ↥T, ⁅x, y⁆ ∈ H.subgroupOf T)
+    {d : ℕ} (hd : θ 1 = (d : ℂ))
+    (hcop : Nat.Coprime (H.subgroupOf T).index (orderOf hθ.determinant * d)) :
+    ∃ (χ : ClassFunction ↥T ℂ) (_ : IsIrreducibleCharacter χ)
+      (S : Finset (IrreducibleCharacter L)), S.Nonempty ∧
+      S.card = (H.subgroupOf T).index ∧
+      ClassFunction.induce H θ = ∑ φ ∈ S, (φ : ClassFunction L ℂ) ∧
+      (∀ φ ∈ S, (φ : ClassFunction L ℂ) 1 = (T.index : ℂ) * (d : ℂ)) ∧
+      (∀ φ ∈ S, ∃ β : (↥T ⧸ H.subgroupOf T) →* ℂˣ,
+        (φ : ClassFunction L ℂ) = ClassFunction.induce T
+          (χ * linearClassFunction (β.comp (QuotientGroup.mk' (H.subgroupOf T))))) := by
+  classical
+  letI : Fintype ↥H := Fintype.ofFinite _
+  letI : Fintype ↥T := Fintype.ofFinite _
+  obtain ⟨χ, hχ, hres, hdecomp, hirr⟩ :=
+    exists_extension_induce_eq_sum_induce_mul hHT hθ hinertia hab hd hcop
+  refine ⟨χ, hχ, ?_⟩
+  -- `χ` restricts to `θ`, so `χ(1) = θ(1) = d`
+  have hχ1 : χ (1 : ↥T) = (d : ℂ) := by
+    have h := congrArg (fun f : ClassFunction ↥(H.subgroupOf T) ℂ => (f : _ → ℂ) 1) hres
+    simp only [ClassFunction.restrict_apply, ClassFunction.compHom_apply, OneMemClass.coe_one,
+      map_one] at h
+    rw [h]; exact hd
+  -- each induced summand has degree `[L:T]·d`
+  have hdeg : ∀ β : (↥T ⧸ H.subgroupOf T) →* ℂˣ,
+      ClassFunction.induce T (χ * linearClassFunction (β.comp (QuotientGroup.mk' (H.subgroupOf T))))
+          (1 : L) = (T.index : ℂ) * (d : ℂ) := by
+    intro β
+    have hval : (χ * linearClassFunction (β.comp (QuotientGroup.mk' (H.subgroupOf T)))) (1 : ↥T)
+        = (d : ℂ) := by
+      rw [ClassFunction.mul_apply, hχ1, linearClassFunction_apply, map_one, Units.val_one, mul_one]
+    rw [ClassFunction.induce_apply_one, hval]
+  -- the quotient `T/H` is a finite abelian group, so it has `[T:H]` linear characters
+  letI : CommGroup (↥T ⧸ H.subgroupOf T) :=
+    { (inferInstance : Group (↥T ⧸ H.subgroupOf T)) with
+      mul_comm := fun a b => by
+        obtain ⟨x, rfl⟩ := QuotientGroup.mk_surjective a
+        obtain ⟨y, rfl⟩ := QuotientGroup.mk_surjective b
+        rw [← QuotientGroup.mk_mul, ← QuotientGroup.mk_mul]
+        refine (QuotientGroup.eq).mpr ?_
+        have h1 : (x * y)⁻¹ * (y * x) = ⁅y⁻¹, x⁻¹⁆ := by
+          rw [commutatorElement_def]; group
+        rw [h1]; exact hab y⁻¹ x⁻¹ }
+  haveI : NeZero (Monoid.exponent (↥T ⧸ H.subgroupOf T)) := ⟨Monoid.exponent_ne_zero_of_finite⟩
+  have hcardHom : Fintype.card ((↥T ⧸ H.subgroupOf T) →* ℂˣ) = (H.subgroupOf T).index := by
+    rw [← Nat.card_eq_fintype_card]
+    exact CommGroup.card_monoidHom_of_hasEnoughRootsOfUnity (↥T ⧸ H.subgroupOf T) ℂ
+  -- norm identity `⟨Ind_H θ, Ind_H θ⟩ = [T:H] = |Hom(T/H, ℂˣ)|`
+  have hnorm : ClassFunction.inner (ClassFunction.induce H θ) (ClassFunction.induce H θ)
+      = (Fintype.card ((↥T ⧸ H.subgroupOf T) →* ℂˣ) : ℂ) := by
+    rw [hcardHom]
+    have hkey := card_mul_inner_self_induce_eq_card_inertia (G := L)
+      (⟨θ, hθ⟩ : IrreducibleCharacter ↥H)
+    have hcoeθ : ((⟨θ, hθ⟩ : IrreducibleCharacter ↥H) : ClassFunction ↥H ℂ) = θ := rfl
+    rw [hcoeθ, hinertia] at hkey
+    have hcardT : (Nat.card ↥T : ℂ) = ((H.subgroupOf T).index : ℂ) * (Nat.card ↥H : ℂ) := by
+      have h1 : (H.subgroupOf T).index * Nat.card ↥(H.subgroupOf T) = Nat.card ↥T :=
+        Subgroup.index_mul_card (H.subgroupOf T)
+      have h2 : Nat.card ↥(H.subgroupOf T) = Nat.card ↥H :=
+        Nat.card_congr (Subgroup.subgroupOfEquivOfLe hHT).toEquiv
+      rw [h2] at h1
+      rw [← h1]; push_cast; ring
+    rw [hcardT] at hkey
+    have hne : (Nat.card ↥H : ℂ) ≠ 0 := Nat.cast_ne_zero.mpr Nat.card_pos.ne'
+    apply mul_left_cancel₀ hne
+    rw [hkey]; ring
+  -- the irreducible induced summands, indexed by the linear characters of `T/H`
+  -- (a transparent `let` so the coercion `↑(η β)` reduces to `Ind_T(χ·Inf β)` per-term, avoiding
+  -- a sum-level `induce` whnf explosion)
+  let η : ((↥T ⧸ H.subgroupOf T) →* ℂˣ) → IrreducibleCharacter L := fun β =>
+    ⟨ClassFunction.induce T (χ * linearClassFunction (β.comp (QuotientGroup.mk' (H.subgroupOf T)))),
+      hirr β⟩
+  have hsum : ClassFunction.induce H θ = ∑ β, (η β : ClassFunction L ℂ) := by
+    rw [hdecomp]
+  -- distinctness: package the norm-saturating decomposition into a finset of `[T:H]` distinct irreducibles
+  obtain ⟨S, hScard, hSsum, hSwit⟩ := exists_finset_eq_sum_of_sum_inner_self_eq_card η hsum hnorm
+  rw [hcardHom] at hScard
+  refine ⟨S, ?_, hScard, hSsum, ?_, ?_⟩
+  · rw [← Finset.card_pos, hScard]
+    exact Nat.pos_of_ne_zero Subgroup.index_ne_zero_of_finite
+  · intro φ hφ
+    obtain ⟨β, rfl⟩ := hSwit φ hφ
+    exact hdeg β
+  · intro φ hφ
+    obtain ⟨β, rfl⟩ := hSwit φ hφ
+    exact ⟨β, rfl⟩
+
 end OddOrder.RepresentationTheory
