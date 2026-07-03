@@ -595,3 +595,22 @@ Dade reciprocity (`tau_inner_eq_of_supported`) 接続を build。
 
 **(12.5) 進捗**: 2 iteration で opaque sorry → [訂正 statement + γ 実証明 + isolate hβconst + vanishing infra]。
 FT decomposition パターン (mechanical spine 実証明 + deep core を精密 isolate)。
+
+### loop¹³⁴ — (12.5) hβconst 精密 decomposition roadmap (deep multi-iter build、既存 infra へ mapping)
+
+hβconst (β const on H∖H') = Coq (12.5) 本体 (PFsection12:420-475) 精読。各 piece を既存 Lean infra へ mapping:
+1. **o_rpsi_S** (⟨ρψ, ξ1-ξ2⟩=0、等次数 ξ∈S): Dade reciprocity `tau_inner_eq_of_supported`
+   (S12_Core:3586) + coherence `pair_degree_coherence`/`mem_coherent_sum_subseq` + ψ⊥R (horth)。
+2. **induced-from-H' 分割 P_i = constt(Ind_{H'}^H χ_i)** (trivIset + cover):
+   - disjoint: **直接 route** = `inner_induce_eq_zero_of_not_conj` (InducedIrreducible:151、非共役⟹⟨Ind i1,Ind i2⟩=0)
+     + 「直交指標は constituent 非共有」。単一軌道機構 (RestrictionConstituentsSingleOrbit) 不要。
+   - cover: 各 j∈Irr(H) は Res_{H'} j に constituent i を持つ (Clifford) + Frobenius `inner_induce_eq_inner_restrict`。
+   - constt_Ind_Res は `inner_induce_eq_inner_restrict` そのもの (wrapper 不要)。
+3. **cfInd_central_Inertia** (Ind χ_i = e·Σχ_j): `exists_extension_induce_eq_sum_distinct_of_inertia_inf_le`
+   (CliffordDecomposition:290) + `InertiaAbelianQuotient` 系。
+4. **DpsiH assembly** (ρψ|_H = Σ a_A Ind χ_A + a·1): Fourier `cfun_sum_cfdot` + 上記。
+5. **H∖H' vanish**: `induce_apply_eq_zero_of_not_mem_normal` (loop¹³², LANDED)。
+
+∴ hβconst は **既存 infra から assemblable な multi-iteration build** (from-scratch でない)。(12.5) は orphan
+ゆえ FT 即効値は低いが、partition/inertia は type-I char 全般の再利用 infra。
+**次: partition disjointness lemma (直接 route) を build** → cover → DpsiH → o_rpsi_S。
