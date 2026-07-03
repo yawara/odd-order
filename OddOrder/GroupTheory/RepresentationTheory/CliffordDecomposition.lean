@@ -6,6 +6,7 @@ Authors: Yawara Ishida
 import OddOrder.GroupTheory.RepresentationTheory.CanonicalCharacterExtension
 import OddOrder.GroupTheory.RepresentationTheory.GallagherDecomposition
 import OddOrder.GroupTheory.RepresentationTheory.CliffordCorrespondence
+import OddOrder.GroupTheory.RepresentationTheory.InertiaAbelianQuotient
 
 /-!
 # The constructive Clifford decomposition (Peterfalvi (1.7)(b))
@@ -272,5 +273,52 @@ theorem exists_extension_induce_eq_sum_distinct_irreducible
   · intro φ hφ
     obtain ⟨β, rfl⟩ := hSwit φ hφ
     exact ⟨β, rfl⟩
+
+open scoped commutatorElement in
+/-- **The distinct-constituent Clifford decomposition from a type-`F`-style inertia hypothesis**
+(Peterfalvi (1.7)(b), packaged for the type-I application).  This replaces the abstract
+"`T/H` abelian" hypothesis `hab` of `exists_extension_induce_eq_sum_distinct_irreducible` with the
+concrete Peterfalvi (8.2.c) data: a complement `Γ = H U` (`H ⊔ U = ⊤`), the inertia bound
+`I(θ) ∩ U ≤ U₁`, and `U₁` abelian.  From these, `I(θ) ∩ U` is abelian
+(`inertia_inf_isMulCommutative_of_le`) and hence `⁅I(θ), I(θ)⁆ ≤ H`
+(`commutator_inertia_le_of_sup_eq_top`), which is exactly the abelian-quotient hypothesis.
+
+Stated so it can be discharged by the type-`F` consumer (which has (8.2.c) = `typeF_inertia_inf_le_U1`
+and the complement in scope) **without importing the Feit–Thompson `Hypothesis` structure** — the
+leaf stays upstream of Peterfalvi §14, so the general `typeI_induced_char_constituents` can cite it
+without an import cycle. -/
+theorem exists_extension_induce_eq_sum_distinct_of_inertia_inf_le
+    {H U U1 T : Subgroup L} [H.Normal] [(H.subgroupOf T).Normal] (hHT : H ≤ T)
+    [Invertible (Nat.card ↥H : ℂ)] [Invertible (Nat.card ↥T : ℂ)]
+    [Invertible (Nat.card ↥(H.subgroupOf T) : ℂ)]
+    [Fintype ((↥T ⧸ H.subgroupOf T) →* ℂˣ)]
+    {θ : ClassFunction ↥H ℂ} (hθ : IsIrreducibleCharacter θ)
+    (hinertia : ClassFunction.inertia (G := L) θ = T)
+    (hHU : H ⊔ U = ⊤)
+    (hbound : ClassFunction.inertia (G := L) θ ⊓ U ≤ U1)
+    (hU1comm : IsMulCommutative ↥U1)
+    {d : ℕ} (hd : θ 1 = (d : ℂ))
+    (hcop : Nat.Coprime (H.subgroupOf T).index (orderOf hθ.determinant * d)) :
+    ∃ (χ : ClassFunction ↥T ℂ) (_ : IsIrreducibleCharacter χ)
+      (S : Finset (IrreducibleCharacter L)), S.Nonempty ∧
+      S.card = (H.subgroupOf T).index ∧
+      ClassFunction.induce H θ = ∑ φ ∈ S, (φ : ClassFunction L ℂ) ∧
+      (∀ φ ∈ S, (φ : ClassFunction L ℂ) 1 = (T.index : ℂ) * (d : ℂ)) ∧
+      (∀ φ ∈ S, ∃ β : (↥T ⧸ H.subgroupOf T) →* ℂˣ,
+        (φ : ClassFunction L ℂ) = ClassFunction.induce T
+          (χ * linearClassFunction (β.comp (QuotientGroup.mk' (H.subgroupOf T))))) := by
+  -- (8.2.c) + abelian `U₁` ⟹ `I(θ) ∩ U` abelian ⟹ `⁅I(θ), I(θ)⁆ ≤ H` = the abelian-quotient hypothesis
+  have hcomm : IsMulCommutative ↥(ClassFunction.inertia (G := L) θ ⊓ U) :=
+    ClassFunction.inertia_inf_isMulCommutative_of_le θ hbound hU1comm
+  have hcommle : ⁅ClassFunction.inertia (G := L) θ, ClassFunction.inertia (G := L) θ⁆ ≤ H :=
+    ClassFunction.commutator_inertia_le_of_sup_eq_top hHU θ hcomm
+  rw [hinertia] at hcommle
+  have hab : ∀ x y : ↥T, ⁅x, y⁆ ∈ H.subgroupOf T := by
+    intro x y
+    rw [Subgroup.mem_subgroupOf]
+    have hcoe : ((⁅x, y⁆ : ↥T) : L) = ⁅(x : L), (y : L)⁆ := map_commutatorElement T.subtype x y
+    rw [hcoe]
+    exact hcommle (Subgroup.commutator_mem_commutator x.2 y.2)
+  exact exists_extension_induce_eq_sum_distinct_irreducible hHT hθ hinertia hab hd hcop
 
 end OddOrder.RepresentationTheory
