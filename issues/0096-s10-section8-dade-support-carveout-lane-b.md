@@ -528,3 +528,37 @@ Lean 未整備)。Ind[H,H'] χ は H∖H' 上 vanish (H'⊴H) ゆえ Fourier で
 tau_inner + span + horth で即。**(12.5) は 1-2 iteration の tractable build** (from-scratch でない)。
 
 **次 = induced-from-H' Iirr partition (Clifford) を build → (12.5) 組立**。concrete target 確定。
+
+### loop¹³¹ — ★★ territorial 訂正: lane-b frontier = S14 Type-I tower (NOT §10/§9-keystone = lane-a)
+
+**重大訂正**: loop¹²⁵-¹³⁰ で (10.8)`typeII_coherence_contradiction_estimate` / §9-keystone(2030) /
+(11.8) を lane-b frontier と分析していたが、**これらは 2026-07-02 3レーン再編で lane-a 所有**
+(正本 `ft_lane_reallocation_2026_06_28.md`:48「Pf S(0[3-9]|1[0-3])* 全体 = lane a」、:108-111 で
+10.7/10.8/10.10/11.8/S13 は lane-a deepest body)。cross-check: 直近 S12 commit da165ea8/5a67ee61
+=「Pf 11.8.4/5」= lane-a active。**FeitThompson.lean:418/496/855「§10-§12 char owned by lane-b」は
+stale (再編前)** — lane-a 所有 file ゆえ lane-b は編集せず、staleness は lane-a へ notes 通知のみ。
+
+**lane-b の実所有 (再編後)** = `S14_MaximalI.lean` 全体 (§12 all-Type-I Dade tower) + carve-out 0096
+(S10 §8 Dade-support) + coherence infra (6.5.c)。type-P Dade support arc (loop¹¹⁸-¹²⁹) は 0096 = 正しく
+lane-b territory だった (S10)。誤ったのは (10.8)/§9 への pivot のみ。
+
+**lane-b live frontier = S14 の 11 sorry** (comment-strip 実測):
+| Pf | decl | 複雑さ |
+|---|---|---|
+| 8.17 | `exists_typeICovering` (6197) | 8022 M̃-reroute に entangled (旧 lane-d carve-out、d 退役) |
+| 12.5 | `rho_constant_on_H_minus_Hprime` (2413) | orphan(0 consumer) + statement 疑義 (ψ(h)=ψ(1) vs Coq「H∖H' で const」) |
+| 12.10 | `sibleyTarget_frobI` (2521) | TI-case 限定、issue 2032 |
+| 12.10 | `witness_L_isTypeI` (4666) | hub 9003 Cluster A pinned (deep §8-§11 type-analysis) |
+| 12.10 | `witness_L_complement_isZGroup` (4677) | hub 9003 Cluster A pinned (deep §8 minimality) |
+| 12.11 | `intersection_complement_structure` (4711) | 4 consumer だが (12.10) downstream |
+| 12.12 | `complement_cyclic_order_dvd` (5148) | proven `isCyclic_..._fpf_conj_elemAbelian` は ∣p²-1、p+1 は Frobenius torus 構造要 |
+| 12.13 | `exists_counterexample_dade_data` (5578) | 12.16 chain |
+| 12.14 | `psi_constant_on_xK` (5340) | downstream char |
+| 12.15 | `rhoM_integer_values` (5349) | downstream char |
+
+**proven 済** (deepest-body list は stale): `nonconjugate_diffImage_inner_zero` (8.18.c, loop¹⁰⁰)、
+`constituent_diff_support_subset_nonescaping` (loop¹¹¹)。
+
+**次 = S14 tower を正面 engage** (lane-b assigned deep cluster; 全 sorry deep だが territory 内)。
+upstream-most cleanly-lane-b = (12.5) rho_constant (statement 解決 → induced-from-H' partition +
+Dade reciprocity(tau_inner) で build) か (12.12) の Frobenius-torus p+1 refinement。
