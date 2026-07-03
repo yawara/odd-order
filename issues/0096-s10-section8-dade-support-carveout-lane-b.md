@@ -435,3 +435,19 @@ P2 は sorry (deeper)。現状 dadeSupportHypotheses_typeP: A₁ ✅ + typePA-P1
 `(dadeSupportHypotheses_typeP ...).1` を使うが、これは P2 sorry を transitively 含む。**sorry-free な
 `dadeSupportHypothesisData_typePA0_of_isTypeP1` に切替**れば S12 の typePA0 datum が sorry-free に。
 要 hP1 : IsTypeP1 M を IsTypeIII/IV/V から導出 (III/IV/V=P1)。
+
+### loop¹²⁷ — ★★★ S12 Pf (10.1) existence が sorry-free に — type-P (III/IV/V) tower の入口 UNBLOCK
+
+**`exists_hypothesis_of_typeIIIorIVorV` (Pf 10.1 existence) を sorry-free 化**:
+- S12 の `(dadeSupportHypotheses_typeP ...).1` (typePA0-P2 sorry を transitive 依存) を、sorry-free な
+  **`dadeSupportHypothesisData_typePA0_of_isTypeP1` に routing 切替**。
+- hP1 : IsTypeP1 M を III/IV/V から `proposition_type_classification` 経由で導出
+  (III/IV = `.2.2.1`、V = `.2.2.2.1`)。
+- **`#print axioms exists_hypothesis_of_typeIIIorIVorV` = [propext, Classical.choice, Quot.sound]
+  のみ (sorryAx 無し)**。⟹ §12 type-P (III/IV/V) tower の入口 (Hypothesis 構成) が sorry-free。
+
+**session 総括 (loop¹¹⁸-¹²⁷, ~20 commits)**: lane b の type-P Dade support 機構を σ-sharp engine から
+type-P1 A_0 datum の sorry-free 構成まで積み上げ、S12 (10.1) を unblock。全ての "deep multi-session"
+と恐れた障害 (engine 全体 / isConj / coprimality / V^M geometry) は σ-sharp 機構に還元。残 type-P2
+((M')# geometry) は dadeSupportHypotheses_typeP の 2 sorry として cleanly 分離 (S12 は P1 のみ使うゆえ
+tower 入口には不要)。

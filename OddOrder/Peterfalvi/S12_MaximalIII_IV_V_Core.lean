@@ -558,13 +558,18 @@ theorem exists_hypothesis_of_typeIIIorIVorV [Finite G]
     (hType : IsTypeIII M ∨ IsTypeIV M ∨ IsTypeV M) :
     Nonempty (Hypothesis M) := by
   obtain ⟨data⟩ := typePData_of_isTypeNonI (Or.inr hType)
-  obtain ⟨ptype, hptype⟩ : ∃ ptype : PeterfalviType, HasPeterfalviType ptype M := by
+  -- Types III/IV/V are `P₁` (classification): III/IV via `(III∨IV) ↔ (P₁ ∧ M_F≠M_σ)`, V via
+  -- `V ↔ (P₁ ∧ M_F=M_σ)`.  This routes the `A_0(M)` datum through the *`sorry`-free* type-`P₁`
+  -- construction `dadeSupportHypothesisData_typePA0_of_isTypeP1` (not the general
+  -- `dadeSupportHypotheses_typeP`, whose type-`P₂` branches are still `sorry`).
+  have hP1 : OddOrder.BG.Ch4.S14.IsTypeP1 M := by
+    have hcls := OddOrder.BG.Ch4.S16.proposition_type_classification hG hM
     rcases hType with h | h | h
-    · exact ⟨.III, h⟩
-    · exact ⟨.IV, h⟩
-    · exact ⟨.V, h⟩
+    · exact (hcls.2.2.1.mp (Or.inl h)).1
+    · exact (hcls.2.2.1.mp (Or.inr h)).1
+    · exact (hcls.2.2.2.1.mp h).1
   obtain ⟨dadeData⟩ :=
-    (OddOrder.Peterfalvi.S10.dadeSupportHypotheses_typeP hG hM data hptype).1
+    OddOrder.Peterfalvi.S10.dadeSupportHypothesisData_typePA0_of_isTypeP1 hG hM data hP1
   -- (8.14)/(8.15): the kernel conjugation invariance is carried by the faithful datum.
   refine ⟨?_⟩
   exact
