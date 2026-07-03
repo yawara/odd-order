@@ -1331,3 +1331,29 @@ MHypothesis (S16:1595) の 35 field のうち σ-counting/structural (∼15) は
 
 ⟹ 次 iteration は (1) exists_M_hypothesis78 強化 → (2) tau1 構成 の順で assembly を進める (betaGrid は Track A
 sorried isolate)。σ-counting は harvested、残は deep-coherence + Track A。
+
+### cont.⁴⁸ (2026-07-03 lane c=γ /loop): exists_MHypothesis assembly を実装 → instance-coherence 壁を発見 (数学は健全)
+
+**obligation 1 完了** (前 commit): exists_M_hypothesis78 が concrete h78 + compat facts (hyp76.H=K / hyp71.hyp=dadeData) を expose。
+
+**assembly を実装 → 数学は健全と確認、但し instance-coherence で block**:
+- **coherence-image は tractable**: `IntegralCharacterMap L G := ClassFunction L →ₗ[ℤ] ClassFunction G`
+  (単なる ℤ-linear map) → **tau1 := h78.nu 直接、psi_tau1_eq := rfl**、psi := `h78.hyp76.zeta zetaDistinct`。
+- **G0 は定義的**: G0 := `univ \ (dadeSupport ∪ (conjClassSet(W−W₁∪W₂) ∪ conjClassSet(P#) ∪ conjClassSet(Q#)))`
+  → G0_off_dadeSupport / G0_orbit_cover は集合演算で**定義的に proven** (sorry 不要)。
+- ∴ 35 field 中 ~31 は genuine (structural + σ-counting helpers + compat + tau1/psi/G0/betaM)、
+  残 sorry は **4 のみ**: psi_degree_eq_e / psi_tau1_norm_one / betaGrid(Track A) / h78_zetaNuRho_normSq_ge。
+
+**❌ block: instance-coherence 壁**。MHypothesis は section [Group G] のみ (finiteG は field)。h78 field 型
+`Hypothesis78 G A M` は [Fintype G] を要求 (Hypothesis78 def)。existential に obtain した `M` 上で
+exists_M_hypothesis78 が h78 を**特定の Fintype ↥M / Invertible で構築**し、それが h78 の VALUE に焼き付く
+ため、exists_MHypothesis 側で fresh `haveI Fintype.ofFinite` を作ると **defeq 不一致** (`synthesized
+instance not definitionally equal`)。producer と consumer で existential M の instance が別。
+
+**fix path (次 iteration / 要検討)**: (a) **MHypothesis に `[fintypeM : Fintype ↥M]` +
+`[invG : Invertible (Nat.card G:ℂ)]` + `[invM : Invertible (Nat.card ↥M:ℂ)]` を field 化** し、
+exists_M_hypothesis78 が h78 と共にその instance を**返す** (∃ ... (inst) ..., h78 built with inst) →
+exists_MHypothesis が同 instance で MHypothesis を組む。または (b) exists_M_hypothesis78 + exists_MHypothesis
+に `[Fintype G] [Invertible (Nat.card G:ℂ)]` を明示 param 追加 (§16 の 2157/4316/4343 パターン、
+field_normalizer は Mdata.M のみ使うので consumer 追従容易) + M-instance を coherent に。MHypothesis は
+lane c 所有ゆえ (a) は自レーン完結。**数学 (tau1/G0/helpers) は全て済、残は instance plumbing + 4 char sorry**。
