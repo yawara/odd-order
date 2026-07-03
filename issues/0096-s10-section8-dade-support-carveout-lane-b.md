@@ -742,3 +742,23 @@ clean ungated general lemma は抽出できず。
 type-P Dade support engine (S10, type-P arc loop¹¹⁸-¹²⁹)** が Hypothesis M を構成しうる (reuse!)。
 型-I なら type-I Dade 構成。**次: 反例 M の型判定 + type-P Dade engine が Hypothesis M を与えるか確認**
 → 与えれば 12.14-16 chain unblock (major)。Dade reciprocity (adjoint_formula ¹³⁸) は既存。
+
+### loop¹⁴³ — ★★ 重大訂正: (12.14) は ASSEMBLABLE (Hypothesis M 利用可、gated でない)
+
+**loop¹⁴¹ の「Hypothesis M gated」は誤り**: 反例 M は **type-I** (`ctr.M_typeI : IsTypeI M` S14:4220)、
+`exists_typeI_hypothesis hG ctr.M_maximal ctr.M_typeI : Nonempty (Hypothesis M)` (S14:218) で **直接利用可**。
+
+**(12.14) 全 piece 存在 → assemblable**:
+1. Hypothesis M: `exists_typeI_hypothesis` ✓
+2. data_M (∀χ∈Sset_M, CharacterDecompositionData): existence 構成子 (S14:658/675) ✓
+3. horth (dade.psi ⊥ R_M): `coherent_extension_constituent_orthogonal_Rset_of_nonconjugate` (S14:1844、
+   coh.extension ⊥ R_M for L≠M) + dade.psi=coh.extension χ を constituent 和で ✓ (L≠M 要)
+4. (12.4) for M: `orthogonal_character_constant_on_coset` (S14:2448) ✓
+5. hypM.H = ctr.K = maxNilpotentNormalHall M (K_eq_MF) ✓
+6. x∈M (P0≤M) ✓、x∉K (p-element + p∤|K|)
+
+**残 sub-facts**: L≠M non-conjugate (witness 構造から)、dade.psi=coh.extension χ の constituent-和 for horth、
+x∉K の p-element 論法。**(12.14) は ~60 行 assembly** (gated でない、全 piece 存在)。
+
+**★ 訂正の意義**: 「char endgame 全 gated on deep constructions」は **過度に悲観的だった** — M が type-I で
+Hypothesis M 直接利用可ゆえ (12.14)/(12.15)/(12.16) chain は既存 piece から assemblable。次: (12.14) assembly を build。
