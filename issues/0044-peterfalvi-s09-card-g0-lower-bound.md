@@ -377,3 +377,20 @@ S15 `H_sharp_hypothesis76` が同 constructor の使用例。⟹ **Hypothesis76-
 **field** として保持済。downstream の `FrobeniusFamily.hypothesis76` は fresh instance でなく
 `(F.familyHypothesis71).fintypeL i` / `.invertibleL i` を `letI` で使えば、hypothesis76OfDade が期待する
 instance と確実に一致する見込み (field 値は familyHypothesis71 で build 済ゆえ)。
+
+## 2026-07-03 cont.⁸ (lane-a, /loop) — 🎯 (7.6) 層 landed; 構造 trunk 完全 wired (7.1/7.4/7.6)
+
+**Landed** (`73a7cd7b`): `FrobeniusFamily.hypothesis76` (新 leaf `S09_FrobeniusHypothesis76`) — (7.6)
+induced-family datum を certificate discharged で構成 (hypothesis76OfDade)。**instance quirk 解決**:
+per-member `[Fintype ↥(F.L i)] [Invertible (Nat.card ↥(F.L i):ℂ)]` を **explicit binder** 化すれば
+synthesis の coercion-form mismatch を回避。
+
+**構造 trunk 完了**: (7.1) hypothesis71 + (7.4) familyHypothesis71 + (7.6) hypothesis76 全て
+FrobeniusFamily から wired。**残 = (7.8.b)/(7.9) character estimate のみ** (genuine deep 部):
+- (7.8.b) `chiRhoNormSq` 下界 `1-e/h ≤ ‖ζ^{νρ}‖²` + `‖Γ‖² ≤ e-1`。Hypothesis78/BetaDecomp/NormEstimates
+  machinery が部分的に存在 (S09 の cont.⁶⁷〜、witness_L_zeta_bound 等) だが実 bound は open。
+- (7.9) 2-family 非直交 (𝓑-sum bound)。
+- assembly: `characterEstimateData_of_family71_reduced_estimates` に上記 bound + signed-irred χ を渡す →
+  `not_trivial_G0_of_exists_Bsum_bound` bypass で spine 実証。
+次 iteration は (7.8.b) chiRhoNormSq 下界の tractability 精査 (Hypothesis78 machinery が Frobenius family に
+適用できるか)。これが 7.10 の実質的な最終 deep 部。
