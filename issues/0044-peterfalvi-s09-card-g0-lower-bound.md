@@ -267,3 +267,24 @@ cite してよい (再構築しない)。
 
 ⟹ **(7.8.a) は現 tractable な entry** (projection tool + coherence adjoint + 既 bridge の assembly、
 新 scaffold field 追加は不要 = doneness OK)。(7.8.b)/(7.9)/`CharacterEstimateData` 構成は (7.8.a) の後。
+
+## 2026-07-03 cont. (lane-a, /loop) — 真の frontier = Hypothesis76/78-from-Frobenius 構成 (abstract は Ind 構造を捨てている)
+
+(7.8.a) を abstract `Hypothesis78` 上で attack した結果、**abstract 層では原理的に不能**と判明 (深く engage 済):
+- `Hypothesis76.zeta : Fin(n+1) → CF L` は **opaque な class function** (support on H + degree-ratio
+  `zeta_one_eq_d_mul` のみ)。`ζ_i = Ind_H^L θ_i` という induced 構造を**保持していない**。
+- ⟹ `BetaDecomp.orth_one` (⟨ν(ζ_i),1_G⟩=0)・`⟨Ind1H,Ind1H⟩=e`・`⟨ζ,Ind1H⟩=0` は abstract fields から
+  **導出不能** (実際 `characterEstimateData_of_family_source_decomposition` はこれらを **hypothesis 引数**に取り、
+  `BetaDecomp.orth_one` は **field** = 構成者が establish すべき入力)。
+- coherence の degree 保存も abstract `IsCoherent` (isometry + ZIrr-codomain のみ) には無い。
+
+**⟹ 真の on-spine 作業 = `FrobeniusFamily i` から `Hypothesis76`/`Hypothesis78` を Ind 構造込みで構成する**
+(ζ_i := Ind_H^L θ_i を実体化)。これで source 側事実が provable になる:
+- `⟨1_L, Ind_H^L θ⟩ = ⟨1_H, θ⟩` (Frobenius reciprocity `inner_induce_eq_inner_restrict`, 既存
+  `InducedCharacter.lean:785`) ⟹ θ_i≠1 で `⟨1_L,ζ_i⟩=0`、`⟨Ind1H,Ind1H⟩=[L:H]=e` (Mackey, H⊴L)。
+- (2.7) adjoint `⟨χ^ρ,α⟩_L=⟨χ,τ(α)⟩_G` を χ=1_G に適用 ⟹ orth_one (source 側 ⟨1_L,ζ_i⟩=0 経由)。
+- Frobenius (θ≠1 ⟹ Ind_H^L θ irreducible) で `hirr` を establish。
+
+**次 iteration**: `hypothesis76_of_frobenius` 系の constructor に着手 (Ind_H^L θ family + coherence)。
+これは (7.8.a/b)/(7.9) を abstract で attack するより上流の genuine foundation。既存の abstract 層
+scaffold (constructor 群) は Ind-carrying な具体構成が完成すれば consumer になる。
