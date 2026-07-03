@@ -2997,6 +2997,37 @@ theorem Hypothesis.SHC_swap_h114 [Finite G] {M : Subgroup G}
   rw [hswapζ, sub_neg_eq_add, hbranch2]
 
 open scoped FiniteInduce in
+/-- **The branch-2 swap commutes with complex conjugation** (the `hconj` P4 input the (11.8.5)
+capstone `residualCoeff_eq_zero` needs for the swap branch).  For a degree-`w₁` irreducible
+`χ ∈ S(HC)`, `(SHC_swap.extension χ)‾ = SHC_swap.extension χ‾`.  Both sides equal `−SHC(χ‾‾)`:
+`SHC_swap.extension φ = −SHC(φ‾)`, so `(SHC_swap χ)‾ = (−SHC(χ‾))‾ = −(SHC(χ‾))‾ = −SHC(χ‾‾)`
+(the last by `SHC_extension_conj` at `χ‾`), while `SHC_swap χ‾ = −SHC(χ‾‾)` directly. -/
+theorem Hypothesis.SHC_swap_conj [Finite G] {M : Subgroup G}
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis M) (hodd : Odd (Nat.card G))
+    {ζ : ClassFunction ↥M ℂ} (hζS : ζ ∈ inducedFamily M) (hζirr : IsIrreducibleCharacter ζ)
+    (hζ1 : ζ 1 = (hyp.w1 : ℂ))
+    (htwo : ∀ lam : ClassFunction ↥M ℂ, lam ∈ inducedFamily M → IsIrreducibleCharacter lam →
+      lam 1 = (hyp.w1 : ℂ) → lam = ζ ∨ lam = ζ.conj)
+    {χ : ClassFunction ↥M ℂ} (hχS : χ ∈ inducedFamily M) (hχirr : IsIrreducibleCharacter χ)
+    (hχ1 : χ 1 = (hyp.w1 : ℂ)) :
+    ((hyp.SHC_swap hG hodd hζS hζirr hζ1 htwo).extension χ).conj
+      = (hyp.SHC_swap hG hodd hζS hζirr hζ1 htwo).extension χ.conj := by
+  haveI := hyp.finiteG
+  classical
+  have hχcS : χ.conj ∈ inducedFamily M := inducedFamily_closedUnderConjugate M hχS
+  have hχcirr : IsIrreducibleCharacter χ.conj := hχirr.conj
+  have hχc1 : χ.conj 1 = (hyp.w1 : ℂ) := by rw [ClassFunction.conj_apply, hχ1, star_natCast]
+  have hswap : ∀ φ : ClassFunction ↥M ℂ, (hyp.SHC_swap hG hodd hζS hζirr hζ1 htwo).extension φ
+      = -((hyp.SHC_isCoherent hG).extension φ.conj) := fun φ => by
+    change (-((hyp.SHC_isCoherent hG).extension.comp
+      (ClassFunction.mapRingEquivLinear (G := ↥M) Complex.conjAe.toRingEquiv))) φ = _
+    rw [LinearMap.neg_apply, LinearMap.comp_apply, ClassFunction.mapRingEquivLinear_apply,
+      show ClassFunction.mapRingEquiv Complex.conjAe.toRingEquiv φ = φ.conj from by
+        ext g; rw [ClassFunction.conj_apply, ClassFunction.mapRingEquiv_apply]; rfl]
+  rw [hswap χ, hswap χ.conj, ClassFunction.conj_neg,
+    hyp.SHC_extension_conj hG hχcS hχcirr hχc1]
+
+open scoped FiniteInduce in
 /-- **Peterfalvi (11.8.4), the h114-producing coherent extension.**  Under the (11.8) contradiction
 hypothesis (the residual `(μ₀ − ζ)^τ − ∑_r ω_{r0}^σ` is orthogonal to `(Irr W)^σ`), there is a
 coherent extension `ν` of `τ` to `ℤ[S(HC)]` for which the normalized (11.8.4) identity
@@ -3014,15 +3045,17 @@ theorem Hypothesis.exists_coherent_extension_h114_of_orthogonal [Finite G] {M : 
         ((hyp.tau ((∑ i' : Fin hyp.w1, hyp.muGrid hG hodd i' 0) - ζ))
           - ∑ i' : Fin hyp.w1, hyp.alignedOmegaSigmaGrid hG hodd i' 0)
         (hyp.alignedOmegaSigmaGrid hG hodd i j) = 0) :
-    ∃ ν : OddOrder.Peterfalvi.S07.IsCoherent hyp.tau
-        {φ : ClassFunction ↥M ℂ | φ ∈ inducedFamily M ∧ IsIrreducibleCharacter φ ∧
-          ((φ : ↥M → ℂ) 1 = (hyp.w1 : ℂ))} hyp.A0,
+    ∃ ν : OddOrder.Peterfalvi.S07.IsCoherent hyp.tau hyp.SHCSet hyp.A0,
+      (∀ {χ : ClassFunction ↥M ℂ}, χ ∈ inducedFamily M → IsIrreducibleCharacter χ →
+        χ 1 = (hyp.w1 : ℂ) → (ν.extension χ).conj = ν.extension χ.conj) ∧
       hyp.tau ((∑ i' : Fin hyp.w1, hyp.muGrid hG hodd i' 0) - ζ)
         = (∑ r : Fin hyp.w1, hyp.alignedOmegaSigmaGrid hG hodd r 0) - ν.extension ζ := by
   rcases hyp.tau_muColumnZero_sub_zeta_dichotomy_of_orthogonal hG hodd hζS hζirr hζ1 horth with
     h1 | ⟨htwo, h2⟩
-  · exact ⟨hyp.SHC_isCoherent hG, h1⟩
+  · exact ⟨hyp.SHC_isCoherent hG,
+      (fun hχS hχirr hχ1 => hyp.SHC_extension_conj hG hχS hχirr hχ1), h1⟩
   · exact ⟨hyp.SHC_swap hG hodd hζS hζirr hζ1 htwo,
+      (fun hχS hχirr hχ1 => hyp.SHC_swap_conj hG hodd hζS hζirr hζ1 htwo hχS hχirr hχ1),
       hyp.SHC_swap_h114 hG hodd hζS hζirr hζ1 htwo h2⟩
 
 open scoped Classical in
