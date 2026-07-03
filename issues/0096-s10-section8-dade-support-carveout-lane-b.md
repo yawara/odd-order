@@ -363,3 +363,22 @@ b=gag⁻¹→σ-elt (`isPiElement_conj`)、b∈V^M→v∈V σ-elt→v∈M_σ (`s
 +`Msigma_isHall`)=M' (P1, `isTypeP1_derivedInG_eq_Msigma`)、v∉M' (`typePData_typePV_not_mem_derived`)
 で矛盾 = vacuous。⟹ typePA0_isConj (M_σ#/V^M/mixed 3-case) 完成。その後 coprimality + generalized
 engine (X⊆M, escaping⊆M_σ# 版) → typePA0(P1) Dade data discharge → S12 (10.1) unblock。
+
+### loop¹²³ cont. — ★ typePA0_isConj (P1) COMPLETE (mixed-case vacuity landed)
+
+**`typePA0_isConj_conj_in_M_of_isTypeP1`** = typePA0(P1)=M_σ#∪V^M の G-conj→M-conj、**3-case 完成**:
+- both M_σ#: `sigmaSharp_isConj_conj_in_M`。
+- both V^M: `conjClassSetIn_typePV_isConj_conj_in_M`。
+- mixed: `not_isConj_typePA_typePV_of_isTypeP1` (vacuous) — M_σ#=σ-elt、conj で σ-elt 保存、
+  V^M の v は σ-elt なら M_σ=M' (P1) に入り v∉M' と矛盾。σ-chain =
+  isPiElement_sigma_of_mem_Msigma / isPiElement_conj / sigma_subgroup_le_Msigma_of_isHall /
+  isTypeP1_derivedInG_eq_Msigma / typePData_typePV_not_mem_derived。
+
+**技術メモ**: mixed-case lemma が whnf timeout したが原因は `m⁻¹⁻¹` vs `m` の defeq search (heartbeat
+bump 不要)。isPiElement_conj m⁻¹ の型は `m⁻¹*y*m⁻¹⁻¹` で `m` と書くと whnf 爆発。正しい形で即解決。
+
+**typePA0(P1) Dade engine の残 (isConj 完了)**: (1) **coprimality** (escaping a, b∈typePA0 で
+coprime |R(a)| |C_M(b)|; b∈M_σ#→σ-sharp coprimality、b∈V^M→C_M(b)⊆W との coprimality)、
+(2) **generalized engine** (X⊆M, escaping⊆M_σ# 版; sigmaSharp engine を一般化)、(3) assembly →
+dadeSupportHypotheses_typeP typePA0 成分 discharge → S12 (10.1) unblock。pins 済:
+escaping_typePA0_mem_sigmaSharp (8.13.b) + centralizer_typePV_le_M (V^M 非escaping) + isConj。

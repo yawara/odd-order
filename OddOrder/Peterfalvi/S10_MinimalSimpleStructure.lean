@@ -1913,6 +1913,71 @@ theorem sigmaSharp_isConj_conj_in_M [Finite G] (hG : OddOrder.BG.IsMinimalSimple
     _ = g * a * g⁻¹ := by rw [hca]
     _ = b := hg
 
+/-- **Mixed-case vacuity for the type-`P₁` `A_0`-support**: an `M_σ^#`-point (`= A(M)` for `P₁`) and
+a `V^M`-point are never `G`-conjugate.  An `M_σ^#`-point is a `σ(M)`-element, conjugation preserves
+this, and a `σ(M)`-element `v ∈ M` lies in the normal `σ`-Hall `M_σ = M'` (type `P₁`), contradicting
+`v ∉ M'` (`typePData_typePV_not_mem_derived`). -/
+theorem not_isConj_typePA_typePV_of_isTypeP1 [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G}
+    (hM : M ∈ maximalSubgroups G) (data : TypePData M)
+    (hP1 : OddOrder.BG.Ch4.S14.IsTypeP1 M) {x y : G}
+    (hx : x ∈ typePA M data) (hy : y ∈ conjClassSetIn M (typePV M data))
+    (hxy : IsConj x y) : False := by
+  classical
+  rw [typePA_eq_sigmaSharp_of_isTypeP1 hG hM data hP1] at hx
+  have hxpi : IsPiElement (OddOrder.BG.Ch3.S10.sigma M) x :=
+    OddOrder.BG.Ch4.S14.isPiElement_sigma_of_mem_Msigma hx.1
+  obtain ⟨g, hg⟩ := isConj_iff.mp hxy
+  have hypi : IsPiElement (OddOrder.BG.Ch3.S10.sigma M) y :=
+    hg ▸ OddOrder.BG.Ch4.S14.isPiElement_conj g hxpi
+  obtain ⟨v, hv, m, hmM, hmv⟩ := hy
+  have hvpi : IsPiElement (OddOrder.BG.Ch3.S10.sigma M) v := by
+    have h1 : IsPiElement (OddOrder.BG.Ch3.S10.sigma M) (m⁻¹ * y * m⁻¹⁻¹) :=
+      OddOrder.BG.Ch4.S14.isPiElement_conj m⁻¹ hypi
+    rwa [show m⁻¹ * y * m⁻¹⁻¹ = v from by rw [← hmv]; group] at h1
+  have hvW : v ∈ data.W := by
+    have hv' := hv
+    simp only [typePV, Set.mem_diff] at hv'
+    exact hv'.1
+  have hvM : v ∈ M := by
+    have hWM : (data.W : Subgroup G) ≤ M := by
+      rw [data.W_eq]
+      exact sup_le data.W1_le (data.W2_le.trans (inf_le_left.trans
+        (data.H_le.trans (Subgroup.map_subtype_le _))))
+    exact hWM hvW
+  have hvpiG : OddOrder.Isaacs.Ch03.Subgroup.IsPiGroup (OddOrder.BG.Ch3.S10.sigma M)
+      (Subgroup.zpowers v) := by
+    intro p hp
+    rw [Nat.card_zpowers] at hp
+    exact hvpi p hp
+  have hvMσ : v ∈ OddOrder.BG.Ch3.S10.Msigma M :=
+    OddOrder.BG.Ch3.S10.sigma_subgroup_le_Msigma_of_isHall
+      (OddOrder.BG.Ch3.S10.Msigma_isHall hG hM) (Subgroup.zpowers_le.mpr hvM)
+      hvpiG (Subgroup.mem_zpowers v)
+  rw [← OddOrder.BG.Ch4.S16.isTypeP1_derivedInG_eq_Msigma hG hM hP1] at hvMσ
+  exact typePData_typePV_not_mem_derived data hv hvMσ
+
+/-- **Peterfalvi (8.13.a) for the type-`P₁` `A_0`-support**: two `G`-conjugate elements of
+`A_0(M) = A(M) ∪ V^M` are `M`-conjugate.  Three cases: both in `A(M) = M_σ^#`
+(`sigmaSharp_isConj_conj_in_M`), both in `V^M` (`conjClassSetIn_typePV_isConj_conj_in_M`), or one of
+each — the *mixed* case is vacuous (`not_isConj_typePA_typePV_of_isTypeP1`).  This is the `conj_in_L`
+obligation for the type-`P₁` `A_0(M)` Dade support. -/
+theorem typePA0_isConj_conj_in_M_of_isTypeP1 [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G}
+    (hM : M ∈ maximalSubgroups G) (data : TypePData M)
+    (hP1 : OddOrder.BG.Ch4.S14.IsTypeP1 M) {a b : G}
+    (ha : a ∈ typePA0 M data) (hb : b ∈ typePA0 M data) (hab : IsConj a b) :
+    ∃ m : G, m ∈ M ∧ m * a * m⁻¹ = b := by
+  simp only [typePA0, Set.mem_union] at ha hb
+  rcases ha with hpa | hva
+  · rcases hb with hpb | hvb
+    · rw [typePA_eq_sigmaSharp_of_isTypeP1 hG hM data hP1] at hpa hpb
+      exact sigmaSharp_isConj_conj_in_M hG hM hpa hpb hab
+    · exact (not_isConj_typePA_typePV_of_isTypeP1 hG hM data hP1 hpa hvb hab).elim
+  · rcases hb with hpb | hvb
+    · exact (not_isConj_typePA_typePV_of_isTypeP1 hG hM data hP1 hpb hva hab.symm).elim
+    · exact conjClassSetIn_typePV_isConj_conj_in_M data hva hvb hab
+
 /-- **Peterfalvi (8.15)** for type I: the Dade (2.2) support hypotheses hold for `A(M) = A_0(M)`
 and `A₁(M)`, with `L = M` and the faithful `H(a) = R(a)` of (8.14).  Assembly is genuine
 (`dadeSupportHypothesisData_of_subset`); the deep (8.13.a/c1/c2) obligations are the pins above. -/
