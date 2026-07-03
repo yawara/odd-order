@@ -283,15 +283,27 @@ full build 3906 jobs green。
   ⟹ 各構成要素 ≠1) + `forall_mem_not_isReal_of_induce_eq_sum_of_odd` (奇数位数で非実)。
 
 **残 (b) — S14 consumer が cite で組む (lane b wiring or lane c の S14-import leaf)**:
-- **conj-distinct** `∀φφ'∈S, φ̄≠φ'`: θ̄ ≁_L θ ⟹ `⟨Ind θ, Ind θ̄⟩=0` ⟹ S∩S̄=∅。θ̄≁θ は
-  §8/type-I の genuine fact (奇数位数 + normal-Hall、要 (1.5.e) 型論法)。generic 化するなら θ̄≁θ を入力に。
-- **台 ⊆ A(L)∪{1}**: 各 φ (=Ind_T(χ·Inf β)) は normal H の外で消える (Ind from normal) ⟹ supp⊆H#。
-  H# ⊆ A(L) (typeIA) を確認して `supportInSubgroup ambientA L ∪{1}` に落とす (Frobenius 版 bookkeeping 一般化)。
-- **Hall coprimality wiring**: [T:H']|[L:H']=|U'| (complement) + o(θ')·d | |H'| + Coprime|H'||U'|
+- ~~**conj-distinct**~~ **✅ COMPLETE (cont.²¹, commit `a42db267`)**: 全 generic・shared leaf・
+  sorry-free axiom-clean。θ̄≁θ も **奇数位数から generic に証明済** (gate でなかった):
+  - `conj_induce`: `(Ind θ)̄ = Ind θ̄` (star が induce 和に分配)。
+  - `conjBy_ne_conj_of_odd`: θ^g=θ̄ ⟹ θ^{g²}=θ ⟹ g²∈I(θ); g 奇数位数 ⟹ ⟨g⟩=⟨g²⟩
+    (g=(g²)^{(o+1)/2}、**I の正規性不要**) ⟹ g∈I(θ) ⟹ θ=θ̄ 実 ⟹ θ=1 矛盾。
+  - `forall_mem_conj_ne_of_odd`: θ̄≁θ ⟹ ⟨Ind θ,Ind θ̄⟩=0 ⟹ pair-count {(φ,φ'):φ=φ'̄}=0。
+- ~~**非実**~~ **✅ COMPLETE (cont.²⁰, commit `84b37663`)**: `forall_mem_not_isReal_of_induce_eq_sum_of_odd`。
+- **台 ⊆ A(L)∪{1}** (残): 各 φ (=Ind_T(χ·Inf β)) は normal H の外で消える (Ind from normal) ⟹ supp⊆H#。
+  H# ⊆ A(L) (typeIA) を確認して `supportInSubgroup ambientA L ∪{1}` に落とす (Frobenius 版 `frobenius_typeI_induced_char_constituents`
+  の support bookkeeping を一般化)。Frobenius 版は `induceSum_eq_zero_of_not_conjugatesInto` 使用。
+- **Hall coprimality wiring** (残): [T:H']|[L:H']=|U'| (complement) + o(θ')·d | |H'| + Coprime|H'||U'|
   (`IsHallSubgroup.coprime_index`, L_F=maxNilpotentNormalHall Hall) ⟹ hcop。
-- **hcent bridge**: type-F `centralizer_le_U1` (G-level `U⊓C_G(x)≤U1`) → `typeF_inertia_inf_le_U1`
+- **hcent bridge** (残): type-F `centralizer_le_U1` (G-level `U⊓C_G(x)≤U1`) → `typeF_inertia_inf_le_U1`
   の ↥L-level `hcent` (centralizer subgroupOf 移送)。
 - これらが揃えば `typeI_induced_char_constituents` (S14:429 sorry) を cite で sorry-free 化。
+
+**shared leaf 在庫まとめ (cont.²¹ 時点、全 sorry-free axiom-clean、CliffordDecomposition/CharacterProduct)**:
+packaging (`exists_extension_induce_eq_sum_distinct_irreducible`) + type-F inertia 特殊化
+(`..._of_inertia_inf_le`) + 非実 2 本 + conj-distinct 3 本 + generic injective/finset 2 本。
+S14 consumer が必要とする 6 clause 中 4 (nonempty/decomp/等次数/非実/conj-distinct) は cite 可能。
+残 = 台 + coprimality/hcent の type-F→↥L wiring (S14-import 側で組む)。
 
 ### 6.11 の設計確定 (2026-07-02 cont.¹⁸ 精査 — route (ii) θ-part 論法採用、一般 Mackey 不要)
 

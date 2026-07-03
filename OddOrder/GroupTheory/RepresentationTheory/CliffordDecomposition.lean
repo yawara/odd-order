@@ -321,6 +321,70 @@ theorem exists_extension_induce_eq_sum_distinct_of_inertia_inf_le
     exact hcommle (Subgroup.commutator_mem_commutator x.2 y.2)
   exact exists_extension_induce_eq_sum_distinct_irreducible hHT hθ hinertia hab hd hcop
 
+/-- **Induction commutes with complex conjugation**: `(Ind_H^L θ)̄ = Ind_H^L (θ̄)`.  Pointwise
+`star` distributes over the induction sum `⅟|H| · ∑_x induceTerm θ x g` (`star_sum`, `star_invOf`,
+`star_natCast`), and `star (induceTerm θ x g) = induceTerm θ̄ x g` since `θ̄ = star ∘ θ`.  Used to
+identify `(Ind_H^L θ)̄` with `Ind_H^L θ̄` in the conjugate-distinctness argument. -/
+theorem conj_induce {H : Subgroup L} [Invertible (Nat.card ↥H : ℂ)] (θ : ClassFunction ↥H ℂ) :
+    (ClassFunction.induce H θ).conj = ClassFunction.induce H θ.conj := by
+  ext g
+  have hterm : ∀ x : L, star (ClassFunction.induceTerm H θ x g)
+      = ClassFunction.induceTerm H θ.conj x g := by
+    intro x
+    by_cases hx : x⁻¹ * g * x ∈ H
+    · rw [ClassFunction.induceTerm_of_mem θ hx, ClassFunction.induceTerm_of_mem θ.conj hx,
+        ClassFunction.conj_apply]
+    · rw [ClassFunction.induceTerm_of_not_mem θ hx, ClassFunction.induceTerm_of_not_mem θ.conj hx,
+        star_zero]
+  simp only [ClassFunction.conj_apply, ClassFunction.induce_apply]
+  rw [star_mul', star_sum]
+  simp_rw [hterm]
+  have hSAbase : IsSelfAdjoint (Nat.card ↥H : ℂ) := star_natCast (Nat.card ↥H)
+  have hSA : star (⅟ (Nat.card ↥H : ℂ)) = ⅟ (Nat.card ↥H : ℂ) := hSAbase.invOf.star_eq
+  rw [hSA, mul_comm]
+
+/-- **Conjugation by a group element commutes with complex conjugation** of class functions:
+`(θ^g)̄ = (θ̄)^g`.  Both sides evaluate to `star (θ ⟨g h g⁻¹⟩)`. -/
+theorem conjBy_conj {H : Subgroup L} [H.Normal] (g : L) (θ : ClassFunction ↥H ℂ) :
+    (ClassFunction.conjBy g θ).conj = ClassFunction.conjBy g θ.conj := by
+  ext h
+  rw [ClassFunction.conj_apply, ClassFunction.conjBy_apply, ClassFunction.conjBy_apply,
+    ClassFunction.conj_apply]
+
+/-- **In a group of odd order, no `L`-conjugate of `θ ∈ Irr(H)` (`θ ≠ 1`, `H ⊴ L`) equals its
+complex conjugate `θ̄`** (Peterfalvi (1.1)-adjacent).  If `θ^g = θ̄`, apply `^g` again and use
+`θ̄̄ = θ`: `θ^{g²} = θ`, so `g² ∈ I_L(θ)`.  Since `g` has odd order (`Odd (Nat.card L)`),
+`⟨g⟩ = ⟨g²⟩` (`g = (g²)^{(o+1)/2}`), so `g ∈ I_L(θ)` too — hence `θ^g = θ`, i.e. `θ = θ̄` is real,
+forcing `θ = 1_H` (odd order, `not_isReal_of_ne_trivial_of_odd_card'`), a contradiction.  This is the
+`θ̄ ≁_L θ` input that makes the constituents of `Ind_H^L θ` conjugate-distinct. -/
+theorem conjBy_ne_conj_of_odd {H : Subgroup L} [H.Normal] [Invertible (Nat.card ↥H : ℂ)]
+    (hodd : Odd (Nat.card L)) {θ : ClassFunction ↥H ℂ} (hθirr : IsIrreducibleCharacter θ)
+    (hθne : θ ≠ trivialClassFunction ↥H) (g : L) :
+    ClassFunction.conjBy g θ ≠ θ.conj := by
+  intro hconj
+  -- `θ^{g²} = θ`, so `g² ∈ I_L(θ)`
+  have hcomm : (ClassFunction.conjBy g θ).conj = ClassFunction.conjBy g θ.conj := conjBy_conj g θ
+  have hg2 : ClassFunction.conjBy (g * g) θ = θ := by
+    rw [ClassFunction.conjBy_mul, hconj, ← hcomm, hconj, ClassFunction.conj_conj]
+  have hg2I : g * g ∈ ClassFunction.inertia θ := ClassFunction.mem_inertia.mpr hg2
+  -- odd order: `⟨g⟩ = ⟨g²⟩`, so `g ∈ I_L(θ)`
+  have hgI : g ∈ ClassFunction.inertia θ := by
+    obtain ⟨m, hm⟩ := hodd.of_dvd_nat (orderOf_dvd_natCard g)
+    have hgpow : g = (g * g) ^ (m + 1) := by
+      have h1 : (g * g) ^ (m + 1) = g ^ (orderOf g + 1) := by
+        rw [← pow_two, ← pow_mul]; congr 1; rw [hm]; ring
+      rw [h1, pow_succ, pow_orderOf_eq_one, one_mul]
+    rw [hgpow]
+    exact (ClassFunction.inertia θ).pow_mem hg2I (m + 1)
+  -- `g ∈ I_L(θ)` ⟹ `θ = θ̄` real ⟹ `θ = 1_H`, contradicting `θ ≠ 1_H`
+  have hreal : ClassFunction.IsReal θ := by
+    show θ.conj = θ
+    rw [← hconj]; exact ClassFunction.mem_inertia.mp hgI
+  have hoddH : Odd (Nat.card ↥H) := hodd.of_dvd_nat (Subgroup.card_subgroup_dvd_card H)
+  have hbne : (⟨θ, hθirr⟩ : IrreducibleCharacter ↥H) ≠ trivialIrreducibleCharacter ↥H :=
+    fun heq => hθne (congrArg Subtype.val heq)
+  exact not_isReal_of_ne_trivial_of_odd_card' hoddH hbne hreal
+
 /-- **No constituent of `Ind_H^L θ` is the trivial character** (`θ ≠ 1_H`, `H ⊴ L`).  If
 `Ind_H^L θ = ∑_{φ ∈ S} φ` decomposes into irreducibles, then every `φ ∈ S` is nontrivial:
 Frobenius reciprocity gives `⟨Ind_H^L θ, 1_L⟩ = ⟨θ, 1_H⟩ = 0` (`θ ≠ 1_H`, orthonormality), so the
@@ -370,5 +434,60 @@ theorem forall_mem_not_isReal_of_induce_eq_sum_of_odd
     ∀ φ ∈ S, ¬ ClassFunction.IsReal (φ : ClassFunction L ℂ) :=
   fun φ hφ => not_isReal_of_ne_trivial_of_odd_card' hodd
     (forall_mem_ne_trivial_of_induce_eq_sum θ hθne hsum φ hφ)
+
+/-- **The constituents of `Ind_H^L θ` are conjugate-distinct**, for `L` of odd order and `θ ≠ 1_H`
+(`H ⊴ L`): no constituent is the complex conjugate of another, `∀ φ φ' ∈ S, φ̄ ≠ φ'`.
+
+Since `θ̄ ≁_L θ` (`conjBy_ne_conj_of_odd`), `⟨Ind_H^L θ, Ind_H^L θ̄⟩ = 0`
+(`inner_induce_eq_zero_of_not_conj`); and `Ind_H^L θ̄ = (Ind_H^L θ)̄ = ∑_{φ∈S} φ̄` (`conj_induce`).
+Expanding the pairing by orthonormality, `⟨∑ φ, ∑ φ̄⟩` counts the pairs `(φ, φ') ∈ S × S` with
+`φ = φ'̄`; that count being `0` means no such pair exists.  This is the conjugate-distinctness clause
+of `typeI_induced_char_constituents`. -/
+theorem forall_mem_conj_ne_of_odd
+    {H : Subgroup L} [H.Normal] [Invertible (Nat.card ↥H : ℂ)] (hodd : Odd (Nat.card L))
+    (θ : IrreducibleCharacter ↥H) (hθne : θ ≠ trivialIrreducibleCharacter ↥H)
+    {S : Finset (IrreducibleCharacter L)}
+    (hsum : ClassFunction.induce H (θ : ClassFunction ↥H ℂ)
+      = ∑ φ ∈ S, (φ : ClassFunction L ℂ)) :
+    ∀ φ ∈ S, ∀ φ' ∈ S, (φ : ClassFunction L ℂ).conj ≠ (φ' : ClassFunction L ℂ) := by
+  classical
+  letI : Fintype ↥H := Fintype.ofFinite _
+  -- bundled complex conjugate (transparent `let` so `↑(bar ψ)` reduces to `↑ψ.conj`)
+  let bar : IrreducibleCharacter L → IrreducibleCharacter L :=
+    fun ψ => ⟨(ψ : ClassFunction L ℂ).conj, ψ.isIrreducible.conj⟩
+  let θbar : IrreducibleCharacter ↥H := ⟨(θ : ClassFunction ↥H ℂ).conj, θ.isIrreducible.conj⟩
+  have hθneCF : (θ : ClassFunction ↥H ℂ) ≠ trivialClassFunction ↥H :=
+    fun h => hθne (Subtype.ext h)
+  have hnotconj : ∀ g : L, IrreducibleCharacter.conjBy g θ ≠ θbar := fun g hcontra =>
+    conjBy_ne_conj_of_odd hodd θ.isIrreducible hθneCF g
+      (by rw [← IrreducibleCharacter.coe_conjBy, hcontra])
+  -- `⟨∑ φ, ∑ φ̄⟩ = 0`
+  have hconjsum : ∀ T : Finset (IrreducibleCharacter L),
+      (∑ φ ∈ T, (φ : ClassFunction L ℂ)).conj = ∑ φ ∈ T, (φ : ClassFunction L ℂ).conj := by
+    intro T
+    induction T using Finset.induction with
+    | empty => simp
+    | @insert a s ha ih =>
+        rw [Finset.sum_insert ha, ClassFunction.conj_add, ih, Finset.sum_insert ha]
+  have hIθ : ClassFunction.inner (∑ φ ∈ S, (φ : ClassFunction L ℂ))
+      (∑ φ ∈ S, ((bar φ : IrreducibleCharacter L) : ClassFunction L ℂ)) = 0 := by
+    have h1 := inner_induce_eq_zero_of_not_conj (H := H) θ θbar hnotconj
+    have hbc : (θbar : ClassFunction ↥H ℂ) = (θ : ClassFunction ↥H ℂ).conj := rfl
+    rw [hbc, ← conj_induce, hsum, hconjsum S] at h1
+    exact h1
+  -- the pairing counts pairs `(φ, φ') ∈ S × S` with `φ = bar φ'`; that count is `0`
+  have hpair : ((S ×ˢ S).filter (fun p => p.1 = bar p.2)).card = 0 := by
+    have hcount : ((( S ×ˢ S).filter (fun p => p.1 = bar p.2)).card : ℂ) = 0 := by
+      rw [← hIθ, inner_sum_left]
+      simp_rw [inner_sum_right, irreducibleCharacter_inner_eq_ite]
+      rw [← Finset.sum_product', Finset.sum_boole]
+    exact_mod_cast hcount
+  rw [Finset.card_eq_zero] at hpair
+  -- conclude: `φ̄ = φ'` would put `(φ', φ)` in the (empty) pair set
+  intro φ hφ φ' hφ' hcontra
+  have hmem : (φ', φ) ∈ (S ×ˢ S).filter (fun p => p.1 = bar p.2) :=
+    Finset.mem_filter.mpr ⟨Finset.mem_product.mpr ⟨hφ', hφ⟩, Subtype.ext hcontra.symm⟩
+  rw [hpair] at hmem
+  exact absurd hmem (Finset.notMem_empty _)
 
 end OddOrder.RepresentationTheory
