@@ -1647,6 +1647,94 @@ theorem escaping_typePA_mem_sigmaSharp_of_isTypeP1 [Finite G]
   rw [← typePA_eq_sigmaSharp_of_isTypeP1 hG hM data hP1]
   exact ha.1
 
+/-- **Peterfalvi (4.6.b) / (4.3.a), ambient version**: for a type-`P` maximal subgroup, the
+exceptional set `V = W − (W₁ ∪ W₂)` is a TI-subset of `G` with normalizer-bound `W`.
+
+Given `g` conjugating some `a ∈ V` into `V`, the singleton normalizer fact `N_G({a}) = W`
+(`TypePData.normalizer_V`) forces `g` to normalize `W` — both `h ∈ W` and `g h g⁻¹ ∈ W` reduce to
+`h a h⁻¹ = a`.  Since `W = W₁ × W₂` is cyclic with coprime factors, `W₁` and `W₂` are the *unique*
+subgroups of their orders (`cyclic_subgroup_eq_of_card_eq`), hence characteristic, so `g` also
+normalizes `W₁` and `W₂` and therefore `V`; finally `N_G(V) = W` (`normalizer_V` with `X = V`) gives
+`g ∈ W`.  This is the `V`-conjugacy control behind the type-`P` `A_0(M)` support (`(8.13.a)` for the
+exceptional part) and the §10 → §5 ω-grid bridge (S12). -/
+theorem typePData_V_ti [Finite G] {M : Subgroup G} (data : TypePData M) :
+    IsTISubset (typePV M data) data.W := by
+  classical
+  haveI : IsCyclic ↥data.W := data.W_cyclic
+  have hW1le : data.W1 ≤ data.W := data.W_eq ▸ le_sup_left
+  have hW2le : data.W2 ≤ data.W := data.W_eq ▸ le_sup_right
+  have mem_norm_sing : ∀ c z : G,
+      z ∈ Subgroup.normalizer ({c} : Set G) ↔ z * c * z⁻¹ = c := by
+    intro c z
+    rw [Subgroup.mem_set_normalizer_iff]
+    constructor
+    · intro hz
+      have := (hz c).mp rfl
+      simpa using this
+    · intro hz h
+      simp only [Set.mem_singleton_iff]
+      constructor
+      · rintro rfl; exact hz
+      · intro hh
+        have hcc : z * h * z⁻¹ = z * c * z⁻¹ := by rw [hh, hz]
+        exact mul_left_cancel (mul_right_cancel hcc)
+  intro g hg
+  obtain ⟨a, haV, hbV⟩ := hg
+  have hNa : Subgroup.normalizer ({a} : Set G) = data.W :=
+    data.normalizer_V {a} (Set.singleton_nonempty a) (Set.singleton_subset_iff.mpr haV)
+  have hNb : Subgroup.normalizer ({g * a * g⁻¹} : Set G) = data.W :=
+    data.normalizer_V {g * a * g⁻¹} (Set.singleton_nonempty _) (Set.singleton_subset_iff.mpr hbV)
+  have hgW : ∀ h, h ∈ data.W ↔ g * h * g⁻¹ ∈ data.W := by
+    intro h
+    have e1 : (h ∈ data.W) ↔ h * a * h⁻¹ = a := by rw [← hNa, mem_norm_sing]
+    have e2 : (g * h * g⁻¹ ∈ data.W) ↔ h * a * h⁻¹ = a := by
+      rw [← hNb, mem_norm_sing]
+      have hexp : g * h * g⁻¹ * (g * a * g⁻¹) * (g * h * g⁻¹)⁻¹ = g * (h * a * h⁻¹) * g⁻¹ := by
+        group
+      rw [hexp]
+      constructor
+      · intro hh; exact mul_left_cancel (mul_right_cancel hh)
+      · intro hh; rw [hh]
+    rw [e1, e2]
+  have hstab : ∀ (A : Subgroup G), A ≤ data.W → ∀ x : G, g * x * g⁻¹ ∈ A ↔ x ∈ A := by
+    intro A hAW
+    have hmap_le : A.map (MulAut.conj g).toMonoidHom ≤ data.W := by
+      rintro y hy
+      rw [Subgroup.mem_map] at hy
+      obtain ⟨z, hzA, rfl⟩ := hy
+      simp only [MulEquiv.coe_toMonoidHom, MulAut.conj_apply]
+      exact (hgW z).mp (hAW hzA)
+    have hcard : Nat.card ↥(A.map (MulAut.conj g).toMonoidHom) = Nat.card ↥A :=
+      (Nat.card_congr (Subgroup.equivMapOfInjective A (MulAut.conj g).toMonoidHom
+        (MulAut.conj g).injective).toEquiv).symm
+    have hsubeq : (A.map (MulAut.conj g).toMonoidHom).subgroupOf data.W
+        = A.subgroupOf data.W := by
+      apply OddOrder.BG.Ch3.S10.cyclic_subgroup_eq_of_card_eq (C := ↥data.W)
+      rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hmap_le).toEquiv,
+        Nat.card_congr (Subgroup.subgroupOfEquivOfLe hAW).toEquiv, hcard]
+    have hmapeq : A.map (MulAut.conj g).toMonoidHom = A := by
+      rw [← Subgroup.map_subgroupOf_eq_of_le hmap_le, hsubeq,
+        Subgroup.map_subgroupOf_eq_of_le hAW]
+    intro x
+    constructor
+    · intro hx
+      have hmem : g * x * g⁻¹ ∈ A.map (MulAut.conj g).toMonoidHom := by rw [hmapeq]; exact hx
+      rw [Subgroup.mem_map] at hmem
+      obtain ⟨z, hzA, hz⟩ := hmem
+      simp only [MulEquiv.coe_toMonoidHom, MulAut.conj_apply] at hz
+      have hzx : z = x := mul_left_cancel (mul_right_cancel hz)
+      rwa [hzx] at hzA
+    · intro hx
+      have hmem : (MulAut.conj g).toMonoidHom x ∈ A.map (MulAut.conj g).toMonoidHom :=
+        Subgroup.mem_map_of_mem _ hx
+      rw [hmapeq] at hmem
+      simpa only [MulEquiv.coe_toMonoidHom, MulAut.conj_apply] using hmem
+  rw [← data.normalizer_V (typePV M data) ⟨a, haV⟩ Set.Subset.rfl,
+    Subgroup.mem_set_normalizer_iff]
+  intro h
+  simp only [typePV, Set.mem_diff, Set.mem_union, SetLike.mem_coe]
+  rw [hgW h, hstab data.W1 hW1le h, hstab data.W2 hW2le h]
+
 /-- **Type-`P` exceptional points are non-escaping**: for `v ∈ V = W ∖ (W₁ ∪ W₂)`, the singleton
 normalizer `N_G(⟨v⟩) = W` (`TypePData.normalizer_V`) equals `C_G(v)` (singleton: centralizing ⟺
 normalizing), and `W = W₁ ⊔ W₂ ≤ M`.  So `C_G(v) ≤ M`: the exceptional `V^M`-support of `A_0(M)`
@@ -1700,6 +1788,39 @@ theorem escaping_typePA0_mem_sigmaSharp_of_isTypeP1 [Finite G]
         ≤ MulAut.conj m • M :=
           Subgroup.pointwise_smul_le_pointwise_smul_iff.mpr (centralizer_typePV_le_M data hv)
       _ = M := conj_smul_eq_self_of_mem_normalizer (Subgroup.le_normalizer hmM)
+
+/-- **Peterfalvi (8.13.a) for the exceptional `V^M`-support**: two `G`-conjugate elements of
+`V^M = conjClassSetIn M V` are already `M`-conjugate.  Since `V` is a TI-subset with normalizer `W`
+(`typePData_V_ti`), writing `a = m₁v₁m₁⁻¹`, `b = m₂v₂m₂⁻¹` and `b = gag⁻¹`, the element
+`h = m₂⁻¹gm₁` conjugates `v₁ ∈ V` to `v₂ ∈ V`, so `h ∈ W ≤ M`; then `g = m₂·h·m₁⁻¹ ∈ M` is itself
+the `M`-conjugator.  This is the `V^M`-half of the type-`P` `A_0(M)` `isConj` obligation (the
+`M_σ^#`-half is `sigmaSharp_isConj_conj_in_M`). -/
+theorem conjClassSetIn_typePV_isConj_conj_in_M {M : Subgroup G} (data : TypePData M)
+    [Finite G] {a b : G} (ha : a ∈ conjClassSetIn M (typePV M data))
+    (hb : b ∈ conjClassSetIn M (typePV M data)) (hab : IsConj a b) :
+    ∃ m : G, m ∈ M ∧ m * a * m⁻¹ = b := by
+  obtain ⟨v1, hv1, m1, hm1, hm1a⟩ := ha
+  obtain ⟨v2, hv2, m2, hm2, hm2b⟩ := hb
+  obtain ⟨g, hg⟩ := isConj_iff.mp hab
+  have hWM : (data.W : Subgroup G) ≤ M := by
+    rw [data.W_eq]
+    refine sup_le data.W1_le ?_
+    exact data.W2_le.trans (inf_le_left.trans
+      (data.H_le.trans (Subgroup.map_subtype_le _)))
+  have hv2eq : (m2⁻¹ * g * m1) * v1 * (m2⁻¹ * g * m1)⁻¹ = v2 := by
+    calc (m2⁻¹ * g * m1) * v1 * (m2⁻¹ * g * m1)⁻¹
+        = m2⁻¹ * g * (m1 * v1 * m1⁻¹) * g⁻¹ * m2 := by group
+      _ = m2⁻¹ * (g * a * g⁻¹) * m2 := by rw [hm1a]; group
+      _ = m2⁻¹ * b * m2 := by rw [hg]
+      _ = m2⁻¹ * (m2 * v2 * m2⁻¹) * m2 := by rw [hm2b]
+      _ = v2 := by group
+  have hhW : (m2⁻¹ * g * m1) ∈ data.W :=
+    typePData_V_ti data (m2⁻¹ * g * m1) ⟨v1, hv1, by rw [hv2eq]; exact hv2⟩
+  have hgM : g ∈ M := by
+    have hgeq : g = m2 * (m2⁻¹ * g * m1) * m1⁻¹ := by group
+    rw [hgeq]
+    exact mul_mem (mul_mem hm2 (hWM hhW)) (inv_mem hm1)
+  exact ⟨g, hgM, hg⟩
 
 /-- **Peterfalvi (8.13.a) for the `σ`-sharp support**: two `G`-conjugate elements of `M_σ^#`
 are already `M`-conjugate.  This is the `σ`-sharp analogue of `typeIA_isConj_conj_in_M`, but proved

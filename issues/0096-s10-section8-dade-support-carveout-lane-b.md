@@ -335,3 +335,18 @@ typePA0(P1) Dade data の**構造基礎 2 本を build-green で landed**:
 BG A0Set 対応を確認 (A_0(M) 記法の BG↔Pf 一致)、なら typePA0_isConj + coprimality が tame embedding
 から wire 可能で typePA0(P1) engine 完成 → `dadeSupportHypotheses_typeP` typePA0 成分 discharge →
 S12 (10.1 existence) unblock。
+
+### loop¹²² — typePData_V_ti を S10 へ upstream + V^M conjugacy landed (typePA0_isConj の V^M 半分)
+
+typePA0_isConj (typePA0=M_σ#∪V^M の G-conj→M-conj) に向け:
+- **`typePData_V_ti` を S12→S10 へ move** (upstream + dedup): V=W∖(W1∪W2) は TI-subset with
+  normalizer W。self-contained (TypePData + cyclic_subgroup_eq_of_card_eq + IsTISubset) ゆえ S10 で proven、
+  S12 は cite (S12 は S10 を transitive import; `S10.typePData_V_ti` に 2 cite 更新)。
+- **`conjClassSetIn_typePV_isConj_conj_in_M`** (V^M half): a,b∈V^M, b=gag⁻¹ ⟹ M-conj。
+  a=m1v1m1⁻¹, b=m2v2m2⁻¹ で h=m2⁻¹gm1 が v1↦v2 (V内) ⟹ typePData_V_ti で h∈W≤M ⟹
+  **g=m2·h·m1⁻¹∈M 自身が M-conjugator**。
+
+**typePA0_isConj の残 = mixed case** (a∈M_σ#, b∈V^M, G-conj): V 元は W1-成分 (κ-order) 非自明ゆえ
+純 σ-元でない → M_σ#(σ-order) と非共役 (order prime-type mismatch) = **vacuous**。要 κ∩σ=∅ + W1 の
+κ-order 構造。次: mixed-case vacuity → typePA0_isConj 完成 → generalized engine + coprimality →
+typePA0(P1) Dade data discharge → S12 (10.1) unblock。
