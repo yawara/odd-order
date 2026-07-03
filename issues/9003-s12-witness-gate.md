@@ -276,3 +276,35 @@ escaping 点の共役も escaping (`typeIA_conj_mem` + `escapingCentralizerSet_c
 c1 (assembly) / c2 (coprimality core) に分割するのが次手。c2 本体は BG §16 Thm II c2 の
 σ(N) ∩ π(C_M(b)) = ∅ 議論 (Theorem D(2) 系 `sigma N ∩ piSet M' ⊆ beta N` では不足、
 BG 原文 §16 精読が要る) = **次 loop¹⁰² の本丸**。
+
+## 🚀 lane b 進捗 (2026-07-03, loop¹⁰²) — §8 pins 全 6 本 closed: (8.13.c1c2)/(8.13.c2c4) 実証明化
+
+commit 3c6e9fc8。0096 carve-out の Peterfalvi-facing §8 pins は**全部閉じた**。残る上流
+obligation は BG Lemma 14.13(a) の faithful pin 1 本のみ。
+
+1. **BG §16 Theorem II (c) の原文精読** (mmd L4558): cross-coprimality の証明 chain =
+   「共通素数 → σ(N)∩π(M) ≠ ∅ → **Lemma 14.13(a)** で M Frobenius kernel Mσ →
+   C_M(x) ⊆ Mσ → σ(N)∩σ(M) ≠ ∅ → Theorem E(2)/13.9 で N ~ M → τ₂ 不一致で矛盾」。
+2. **S16 に faithful pin `non_disjoint_signalizer_frobenius` 新設** (Coq
+   `non_disjoint_signalizer_Frobenius` BGsection14:2412 準拠)。issue 8020 で flag 済の
+   mis-encoded `sigmaLength_one_frobenius_type` (vacuous 前提) の正しい restatement:
+   第 2 の maximal は 𝓜σ(x) の元でなく **signalizer neighbour N[x]**。ℓσ(x)=1 前提は
+   導出可能ゆえ落とした (soundness 改善 + 8020 の宿題解消)。
+3. **S10 `escaping_sigma_disjoint_centralizer`** ((8.13.c2) core、per-prime 形):
+   Frobenius kernel 吸収は既存 `IsFrobeniusGroup.centralizer_kernel_le` (Isaacs Ch06) を
+   S-level で 2 段適用 (A(S) 点 w が S_F の非自明元を centralize → w ∈ Mσ;
+   C_S(w) の Cauchy p-元 → Mσ) → p ∈ σ(S)。13.9 (`sigma_disjoint_of_nonconjugate`,
+   ported 済) → N[z] ~ S → 新 helper `tau2_conj_smul'` (pRank_eq_of_mulEquiv) で
+   τ₂ transport → `signalizer_structure_of_mem_sigmaSharp` の π(⟨z⟩) ⊆ τ₂(N[z]) と矛盾。
+4. **(8.13.c2c4)** = witness N の singleton 同定 + σ 転送 + core。
+   **(8.13.c1c2)** = c1 が Theorem D(3) assembly (`signalizer_centralizer_isComplement` ←
+   structure の N-complement、normality = `FT_signalizer_normal_in_centralizer`)、
+   c2 が core (|R(a)| の素数 ⊆ σ(N[a]))。
+
+**S10 real sorries 9 → 7 / S16 +1 (14.13(a) pin)**。§8 support theory の Peterfalvi 側は
+これで (8.15)/(8.17)/(8.18) 系すべて BG-native obligations に集約。
+**次 (loop¹⁰³) = 14.13(a) 本体の正面 build**: Coq 証明 ~90 行、必要部品 =
+14.4(d) σ∩π ⊆ β / Cor 12.14 (`cent_der_sigma_uniq` 対応) / 12.1(g) (`tau2_not_beta`) /
+Prop 14.2(g) / Thm 14.7(a)(b) / Cor 12.9・12.10(c) / r_p(N) ≤ 1 議論。まず repo 対応物の
+棚卸しから (settled findings の教訓: grep してから深さ評価)。
+full build 3904 jobs / 1m58s green。
