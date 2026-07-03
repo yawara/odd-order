@@ -10,6 +10,7 @@ import OddOrder.GroupTheory.MaximalSubgroup
 import OddOrder.Isaacs.Ch06_FrobeniusActions.OddComplement
 import OddOrder.BG.Ch2_Uniqueness.Setup
 import OddOrder.BG.Ch4_FamilyOfMaximal.S16_MainResults
+import OddOrder.BG.Ch4_FamilyOfMaximal.S16_Lemma1413
 import OddOrder.Peterfalvi.S10_BGInterface
 
 /-!
@@ -956,8 +957,8 @@ theorem escaping_sigma_disjoint_centralizer [Finite G]
     exact Nat.minFac_dvd _
   rw [hNstr_eq, show OddOrder.BG.Ch4.S16.FT_signalizerBase z = MulAut.conj g⁻¹ • S from by
       rw [← hg, ← mul_smul, ← map_mul, inv_mul_cancel, map_one, one_smul],
-    tau2_conj_smul', htau2S] at hp₀tau2
-  exact Set.notMem_empty p₀ hp₀tau2
+    tau2_conj_smul'] at hp₀tau2
+  exact htau2S p₀ hp₀p hp₀tau2
 
 /-- **Peterfalvi (8.13.c1/c2) at an escaping point of the type-I support** (BG §16 Theorem II +
 Theorem D(3)/(4); Coq `FTsupport_facts` part c).  For escaping `a ∈ A(M)` (`C_G(a) ⊄ M`), with
