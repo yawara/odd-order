@@ -6680,18 +6680,19 @@ formula together with the prime computation `coprimeFrobeniusAction_card_eq_prim
 #assert_only_allowed_axioms OddOrder.GroupTheory.typePA_eq_sharpSubgroup_derivedInG
 
 -- **`𝒞_G(T)` conjugation-invariance** (shared `GroupTheory`) — `mem_conjClassSet_conj_iff`:
--- `g * h * g⁻¹ ∈ 𝒞_G(T) ↔ h ∈ 𝒞_G(T)`, i.e. `N_G(𝒞_G(T)) = G`.  Pure group theory.  Used to prove
--- the (8.16) normalizer fact below (the `V^G` half of `A_0(M) = A(M) ∪ V^G`).  Axiom-clean.
+-- `g * h * g⁻¹ ∈ 𝒞_G(T) ↔ h ∈ 𝒞_G(T)`, i.e. `N_G(𝒞_G(T)) = G`.  Pure group theory (used by the
+-- BG §14/§16 counting and the (10.8) TI-counting).  Axiom-clean.
 #assert_only_allowed_axioms OddOrder.GroupTheory.mem_conjClassSet_conj_iff
 
 -- **Peterfalvi (8.16) for the type-`P` support `A(M)`** (lane-b W3, §7-input prerequisite) —
--- `Hypothesis.normalizer_typePA_eq`: `N_G(A(M)) = M` for the genuine (10.1) `Hypothesis`.  From the
--- carried `N_G(A_0(M)) = M` (`hyp.dadeData.normalizer_eq`, `A_0(M) = A(M) ∪ V^G`): `A(M) =
--- centralizerSupport (M#) M'` is `M`-invariant (`derivedInG_pointwise_smul` /
--- `conj_smul_eq_self_of_mem` / `image_sharpSubgroup`) and `V^G = 𝒞_G(V)` is conjugation-invariant
--- under all of `G` (`mem_conjClassSet_conj_iff`), so `N_G(A(M)) ⊆ N_G(A_0(M)) = M ⊆ N_G(A(M))`.
--- Pure group theory; discharges the formerly-parametrized `hN` of the §7 inputs
--- `toHypothesis71` / `toFamilyHypothesis71` (Peterfalvi (10.8) line 79).  Axiom-clean.
+-- `Hypothesis.normalizer_typePA_eq`: `N_G(A(M)) = M` for the genuine (10.1) `Hypothesis` under
+-- `hG : IsMinimalSimpleOdd G`.  `M ≤ N_G(A(M))` is the `M`-invariance `le_normalizer_typePA`
+-- (`derivedInG_pointwise_smul` / `conj_smul_eq_self_of_mem` / `image_sharpSubgroup`); conversely
+-- `A(M) = (M')#` (`typePA_eq_sharpSubgroup_derivedInG`) makes a set-normalizer of `A(M)` normalize
+-- `M'`, and `N_G(M')` contains the maximal `M`, so it is `M` or `G` — `G` would make the
+-- nontrivial `M' ≤ M < G` normal, contradicting simplicity.  The `M`-invariance half discharges
+-- the formerly-parametrized `hN` of the §7 inputs `toHypothesis71` / `toFamilyHypothesis71`
+-- (Peterfalvi (10.8) line 79).  Axiom-clean.
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S12.Hypothesis.normalizer_typePA_eq
 
 -- **Peterfalvi (10.8) line-87 arithmetic** (lane-b W3, §7-estimate input) —
@@ -7031,3 +7032,32 @@ measure `orbit_sharpSubgroup_normSq_term`: `|(P#)^G|/|G| = |P#|/|N_G(P)|` for a 
 (`G0_orbit_cover` carrier) via `Set.ncard_diff` + `Set.ncard_union_le`.  The set-theoretic core of
 the §8 TI-counting of (14.11.4).  Axiom-clean. -/
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S16.MHypothesis.famG0_sub_filter_card_le_orbit_ncard
+
+/-! **Peterfalvi (8.17.c) `Ã₁`-disjointness bridge** (`S10_MinimalSimpleStructure`, lane β,
+issue 0096).  The faithful (8.14) thickened `A₁`-support is the BG `M̃`-cover:
+`FT_signalizer_eq_Rsub_of_escape` reconciles the two Theorem-14.4 signalizer choices through the
+uniqueness of the maximal over `C_G(x)` (escape forces `1 < |𝓜_σ(x)|` via
+`centralizer_le_of_maximalSigma_le_one`, then
+`maximalSubgroupsContaining_centralizer_eq_singleton_of_sigmaSharp_escape` pins both `choose`s);
+`ftThickenedSupport_A1_subset_conjClassSet_Mtilde` sends `Ã₁(M) ⊆ 𝒞_G(M̃)` (escaping points are
+the defining `x·R(x)` generators, non-escaping points the bare `x·1`); and
+`ftThickenedSupport_A1_disjoint_of_nonconjugate` is the (8.17.c) disjointness for non-conjugate
+type-I/II maximals (Coq `FT_Dade1_support_disjoint`), by BG 14.5(b)
+(`conjClassSet_Mtilde_disjoint`).  The `Ã₁`-side geometry consumed by (8.18.c) → (12.3) → (12.16).
+All three sorry-free; axiom-cleanliness gated on the BG `Mtilde`/Theorem-14.4 chain. -/
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S10.FT_signalizer_eq_Rsub_of_escape
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S10.ftThickenedSupport_A1_subset_conjClassSet_Mtilde
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S10.ftThickenedSupport_A1_disjoint_of_nonconjugate
+
+/-! **Peterfalvi (8.18) mixed support disjointness, type-I pair** (`S10_MinimalSimpleStructure`,
+lane β, issue 0096).  The (8.18.c) mixed `Ã₁(S) ∩ Ã(T) = ∅ ∨ Ã₁(T) ∩ Ã(S) = ∅` for
+non-conjugate type-I maximals — the geometric obligation of (12.3) — assembled genuinely from
+three precise §16 pins ((8.13.b) `escaping_typeIA_mem_A1`, (8.12.b)
+`typeI_centralizer_le_and_unique`, (8.13.c2/c4) `supported_sigma_coprime`):
+`mem_zpowers_mul_right_of_coprime` (the `π`-part power extraction, sorry-free/axiom-clean),
+`escaping_supported_of_A1_conj_mem_typeIA` ((8.18.a): `σ`-order bookkeeping via
+`sigma_disjoint_of_nonconjugate` + the unique-maximal pin), `exists_A1_conj_mem_typeIA_of_not_disjoint`
+((8.18.b): escaping side lands in the PROVEN `Ã₁`-disjointness, non-escaping side collapses the
+coset by the power argument), and `ftThickenedSupport_mixed_disjoint_of_nonconjugate` ((8.18.c):
+two-sided support forces `orderOf x' ∣ gcd = 1`).  Axiom checks record the pin-gating. -/
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S10.mem_zpowers_mul_right_of_coprime

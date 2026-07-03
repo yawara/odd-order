@@ -370,7 +370,7 @@ open scoped FiniteInduce in
 pointwise (its value is `φ(a)` at a base point, `0` elsewhere), so applying `σc` to coefficients
 commutes with it (`dadeIntegralCharacterMap_mapRingEquiv_comm`).  Taking `σc = conjAe` this is the
 `τ`-side Galois-equivariance feeding the (11.8.3) reality `β̄ = β`. -/
-theorem Hypothesis.tau_mapRingEquiv_comm [Finite G] {M : Subgroup G} (hyp : Hypothesis M)
+theorem tau_mapRingEquiv_comm [Finite G] {M : Subgroup G} (hyp : Hypothesis M)
     (σc : ℂ ≃+* ℂ) {φ : ClassFunction ↥M ℂ} (hφ : φ.support ⊆ hyp.A0) :
     hyp.tau (ClassFunction.mapRingEquiv σc φ) = ClassFunction.mapRingEquiv σc (hyp.tau φ) := by
   haveI := hyp.finiteG
@@ -378,71 +378,122 @@ theorem Hypothesis.tau_mapRingEquiv_comm [Finite G] {M : Subgroup G} (hyp : Hypo
     hyp.dadeData.dade (hyp.dadeData.dade.fullDadeIsometryData hyp.hconj) σc hφ
 
 open scoped FiniteInduce in
+/-- **`A(M)` is `M`-invariant**: `M ≤ N_G(A(M))` — the easy half of Peterfalvi (8.16) for the
+type-`P` support, self-contained group theory (no Dade data, no simplicity).
+`A(M) = centralizerSupport (M#) M'` is `M`-invariant: `M` normalizes `M' = derivedInG M`
+(`derivedInG_pointwise_smul` + `conj_smul_eq_self_of_mem`), permutes `M# = M \ {1}`
+(`image_sharpSubgroup`), and conjugates the centralizer condition elementwise.
+
+This is the `M`-stability input to `toHypothesis71` / `toFamilyHypothesis71` (the §7 inputs to
+Peterfalvi (10.8)), so those §7 constructions are self-contained from the genuine `Hypothesis`. -/
+theorem le_normalizer_typePA {M : Subgroup G} (hyp : Hypothesis M) :
+    M ≤ Subgroup.normalizer (typePA M hyp.typeP) := by
+  haveI := hyp.finiteG
+  intro m hm
+  rw [Subgroup.mem_set_normalizer_iff]
+  -- forward `M`-invariance, applied to both `m` and `m⁻¹`.
+  suffices hfwd : ∀ a ∈ M, ∀ y, y ∈ typePA M hyp.typeP → a * y * a⁻¹ ∈ typePA M hyp.typeP by
+    intro h
+    refine ⟨hfwd m hm h, fun hh => ?_⟩
+    have hb := hfwd m⁻¹ (inv_mem hm) _ hh
+    simpa [mul_assoc] using hb
+  intro a ha y hy
+  simp only [typePA, centralizerSupport, Set.mem_setOf_eq] at hy ⊢
+  obtain ⟨hyM', hy1, x, hxM, hyx⟩ := hy
+  -- (i) `a y a⁻¹ ∈ M' = derivedInG M` (`M` normalizes its derived subgroup).
+  have hM'inv : MulAut.conj a • derivedInG M = derivedInG M := by
+    rw [derivedInG_pointwise_smul, Subgroup.conj_smul_eq_self_of_mem ha]
+  have hyM'2 : a * y * a⁻¹ ∈ derivedInG M := by
+    rw [← hM'inv, Subgroup.mem_pointwise_smul_iff_inv_smul_mem]
+    have hsm : (MulAut.conj a)⁻¹ • (a * y * a⁻¹) = y := by
+      rw [← map_inv, MulAut.smul_def, MulAut.conj_apply]; group
+    rw [hsm]; exact hyM'
+  -- (ii) `a y a⁻¹ ≠ 1`.
+  have hne : a * y * a⁻¹ ≠ 1 := by
+    intro h1; apply hy1
+    have hyrw : y = a⁻¹ * (a * y * a⁻¹) * a := by group
+    rw [hyrw, h1]; group
+  -- (iii) `a x a⁻¹ ∈ M# = sharpSubgroup M`.
+  have hxM2 : a * x * a⁻¹ ∈ sharpSubgroup M := by
+    have himg : (MulAut.conj a) '' sharpSubgroup M = sharpSubgroup M := by
+      rw [image_sharpSubgroup, Subgroup.conj_smul_eq_self_of_mem ha]
+    rw [← himg]
+    exact ⟨x, hxM, by rw [MulAut.conj_apply]⟩
+  -- (iv) `a y a⁻¹` centralizes `a x a⁻¹` (conjugate of `y ∈ C_G({x})`).
+  have hcent : a * y * a⁻¹ ∈ Subgroup.centralizer ({a * x * a⁻¹} : Set G) := by
+    rw [Subgroup.mem_centralizer_iff] at hyx ⊢
+    have hxy : x * y = y * x := hyx x rfl
+    rintro z hz
+    rw [Set.mem_singleton_iff] at hz; subst hz
+    calc a * x * a⁻¹ * (a * y * a⁻¹)
+        = a * (x * y) * a⁻¹ := by group
+      _ = a * (y * x) * a⁻¹ := by rw [hxy]
+      _ = a * y * a⁻¹ * (a * x * a⁻¹) := by group
+  exact ⟨hyM'2, hne, a * x * a⁻¹, hxM2, hcent⟩
+
+open scoped FiniteInduce in
 /-- **Peterfalvi (8.16) for the type-`P` support `A(M)`**: `N_G(A(M)) = M`.
 
-The genuine (10.1) `Hypothesis` records `N_G(A_0(M)) = M` (`hyp.dadeData.normalizer_eq`, the (8.15)
-Dade-support datum for `A_0(M) = A(M) ∪ V^G`).  `A(M) = centralizerSupport (M#) M'` is `M`-invariant
-(`M` normalizes `M' = derivedInG M` by `derivedInG_pointwise_smul` + `conj_smul_eq_self_of_mem`,
-permutes `M# = M \ {1}` by `image_sharpSubgroup`, and conjugates the centralizer condition
-elementwise), while `V^G = conjClassSet V` is fixed under conjugation by **every** `g ∈ G`
-(`mem_conjClassSet_conj_iff`).  Hence an element normalizing `A(M)` automatically normalizes the union
-`A_0(M)`, giving `N_G(A(M)) ⊆ N_G(A_0(M)) = M`; conversely `M ⊆ N_G(A(M))` by the `M`-invariance.
-
-This discharges the formerly-parametrized `hN : N_G(A(M)) = M` that `toHypothesis71` /
-`toFamilyHypothesis71` (the §7 inputs to Peterfalvi (10.8)) took as a hypothesis, so those §7
-constructions are now self-contained from the genuine `Hypothesis`. -/
-theorem normalizer_typePA_eq {M : Subgroup G} (hyp : Hypothesis M) :
+`M ≤ N_G(A(M))` is the `M`-invariance `le_normalizer_typePA`.  Conversely, since
+`A(M) = (M')#` (`typePA_eq_sharpSubgroup_derivedInG`), a normalizer of the *set* `A(M)`
+normalizes the subgroup `M' = derivedInG M` (conjugation fixes `1`), so
+`N_G(A(M)) ≤ N_G(M')`.  The latter contains the maximal `M`, so it is `M` or `G`; were it
+`G`, then `M' ⊴ G` with `⊥ ≠ W₂ ≤ M' ≤ M < G` would contradict the simplicity of `G`.
+Hence `N_G(M') = M`. -/
+theorem normalizer_typePA_eq [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    {M : Subgroup G} (hyp : Hypothesis M) :
     Subgroup.normalizer (typePA M hyp.typeP) = M := by
-  haveI := hyp.finiteG
   apply le_antisymm
-  · -- `N_G(A(M)) ⊆ N_G(A_0(M)) = M`, using the conjugation-invariance of `V^G`.
-    intro g hg
-    rw [Subgroup.mem_set_normalizer_iff] at hg
-    rw [← hyp.dadeData.normalizer_eq, Subgroup.mem_set_normalizer_iff]
-    intro h
-    simp only [typePA0, Set.mem_union, hg h, mem_conjClassSet_conj_iff]
-  · -- `M ⊆ N_G(A(M))`: `A(M)` is `M`-invariant.
-    intro m hm
-    rw [Subgroup.mem_set_normalizer_iff]
-    -- forward `M`-invariance, applied to both `m` and `m⁻¹`.
-    suffices hfwd : ∀ a ∈ M, ∀ y, y ∈ typePA M hyp.typeP → a * y * a⁻¹ ∈ typePA M hyp.typeP by
+  · -- Step 1: `N_G(A(M)) ≤ N_G(M')` (a set-normalizer of `(M')#` normalizes `M'`).
+    have hstep : Subgroup.normalizer (typePA M hyp.typeP) ≤
+        Subgroup.normalizer ((derivedInG M : Subgroup G) : Set G) := by
+      intro g hg
+      rw [Subgroup.mem_set_normalizer_iff] at hg ⊢
       intro h
-      refine ⟨hfwd m hm h, fun hh => ?_⟩
-      have hb := hfwd m⁻¹ (inv_mem hm) _ hh
-      simpa [mul_assoc] using hb
-    intro a ha y hy
-    simp only [typePA, centralizerSupport, Set.mem_setOf_eq] at hy ⊢
-    obtain ⟨hyM', hy1, x, hxM, hyx⟩ := hy
-    -- (i) `a y a⁻¹ ∈ M' = derivedInG M` (`M` normalizes its derived subgroup).
-    have hM'inv : MulAut.conj a • derivedInG M = derivedInG M := by
-      rw [derivedInG_pointwise_smul, Subgroup.conj_smul_eq_self_of_mem ha]
-    have hyM'2 : a * y * a⁻¹ ∈ derivedInG M := by
-      rw [← hM'inv, Subgroup.mem_pointwise_smul_iff_inv_smul_mem]
-      have hsm : (MulAut.conj a)⁻¹ • (a * y * a⁻¹) = y := by
-        rw [← map_inv, MulAut.smul_def, MulAut.conj_apply]; group
-      rw [hsm]; exact hyM'
-    -- (ii) `a y a⁻¹ ≠ 1`.
-    have hne : a * y * a⁻¹ ≠ 1 := by
-      intro h1; apply hy1
-      have hyrw : y = a⁻¹ * (a * y * a⁻¹) * a := by group
-      rw [hyrw, h1]; group
-    -- (iii) `a x a⁻¹ ∈ M# = sharpSubgroup M`.
-    have hxM2 : a * x * a⁻¹ ∈ sharpSubgroup M := by
-      have himg : (MulAut.conj a) '' sharpSubgroup M = sharpSubgroup M := by
-        rw [image_sharpSubgroup, Subgroup.conj_smul_eq_self_of_mem ha]
-      rw [← himg]
-      exact ⟨x, hxM, by rw [MulAut.conj_apply]⟩
-    -- (iv) `a y a⁻¹` centralizes `a x a⁻¹` (conjugate of `y ∈ C_G({x})`).
-    have hcent : a * y * a⁻¹ ∈ Subgroup.centralizer ({a * x * a⁻¹} : Set G) := by
-      rw [Subgroup.mem_centralizer_iff] at hyx ⊢
-      have hxy : x * y = y * x := hyx x rfl
-      rintro z hz
-      rw [Set.mem_singleton_iff] at hz; subst hz
-      calc a * x * a⁻¹ * (a * y * a⁻¹)
-          = a * (x * y) * a⁻¹ := by group
-        _ = a * (y * x) * a⁻¹ := by rw [hxy]
-        _ = a * y * a⁻¹ * (a * x * a⁻¹) := by group
-    exact ⟨hyM'2, hne, a * x * a⁻¹, hxM2, hcent⟩
+      by_cases h1 : h = 1
+      · subst h1
+        simp
+      · have hg' := hg h
+        rw [typePA_eq_sharpSubgroup_derivedInG] at hg'
+        simp only [sharpSubgroup, Set.mem_diff, Set.mem_singleton_iff, SetLike.mem_coe] at hg' ⊢
+        constructor
+        · intro hh
+          exact (hg'.mp ⟨hh, h1⟩).1
+        · intro hh
+          have hc1 : g * h * g⁻¹ ≠ 1 := by
+            intro he
+            apply h1
+            have hrw : h = g⁻¹ * (g * h * g⁻¹) * g := by group
+            rw [hrw, he]
+            group
+          exact (hg'.mpr ⟨hh, hc1⟩).1
+    -- Step 2: `N_G(M') = M` by maximality + simplicity.
+    have hMle : M ≤ Subgroup.normalizer ((derivedInG M : Subgroup G) : Set G) := by
+      intro m hm
+      have hM'inv : MulAut.conj m • derivedInG M = derivedInG M := by
+        rw [derivedInG_pointwise_smul, Subgroup.conj_smul_eq_self_of_mem hm]
+      rw [Subgroup.mem_set_normalizer_iff]
+      intro h
+      have hiff : h ∈ derivedInG M ↔
+          (MulAut.conj m) • h ∈ (MulAut.conj m) • derivedInG M :=
+        (Subgroup.smul_mem_pointwise_smul_iff).symm
+      rw [hM'inv] at hiff
+      simpa [MulAut.smul_def, MulAut.conj_apply] using hiff
+    by_cases hN : Subgroup.normalizer ((derivedInG M : Subgroup G) : Set G) = M
+    · exact hstep.trans hN.le
+    · exfalso
+      have htop : Subgroup.normalizer ((derivedInG M : Subgroup G) : Set G) = ⊤ :=
+        hyp.maximal.2 _ (hMle.lt_of_ne (Ne.symm hN))
+      have hnormal : (derivedInG M).Normal := Subgroup.normalizer_eq_top_iff.mp htop
+      rcases hG.simple.eq_bot_or_eq_top_of_normal _ hnormal with hbot | htop'
+      · -- `M' = ⊥` contradicts `⊥ ≠ W₂ ≤ H ≤ M'`.
+        have hW2le : hyp.typeP.W2 ≤ derivedInG M :=
+          hyp.typeP.W2_le.trans (inf_le_left.trans hyp.typeP.H_le)
+        exact hyp.typeP.W2_nontrivial (le_bot_iff.mp (hbot ▸ hW2le))
+      · -- `M' = ⊤` gives `M = ⊤`, contradicting the maximality (coatom) of `M`.
+        exact hyp.maximal.1
+          (top_le_iff.mp (htop' ▸ (Subgroup.map_subtype_le _ : derivedInG M ≤ M)))
+  · exact hyp.le_normalizer_typePA
 
 open scoped FiniteInduce in
 /-- **The Peterfalvi (7.1) `ρ`-machinery data for `(L, A) = (M, A(M))`** — the §7 input to the
@@ -452,7 +503,7 @@ Built genuinely from the §10 Dade isometry on `A_0(M)` (carried by `hyp.dadeDat
 restricting to the `M`-stable subset `A(M) = typePA ⊆ A_0(M) = typePA0` (`Set.subset_union_left`):
 `FullDadeIsometryData.restrict` restricts the Dade map and its `IsDadeMap` certificate, and
 `S04.HConjInvariant.restrict` restricts the `L`-equivariance.  The `M`-stability
-`N_G(A(M)) = M` (Peterfalvi (8.16) for type `P`) is supplied by `normalizer_typePA_eq`, so this
+the `M`-stability of `A(M)` is supplied by `le_normalizer_typePA`, so this
 construction is self-contained from the genuine `Hypothesis` (**sorry-free**, no external `hN`).
 
 This is the foundational `S09.Hypothesis71` instance that lets the §10 estimate apply the family
@@ -462,7 +513,7 @@ noncomputable def toHypothesis71 {M : Subgroup G} [Finite G] (hyp : Hypothesis M
     OddOrder.Peterfalvi.S09.Hypothesis71 G (typePA M hyp.typeP) M :=
   have hnorm : ∀ (l : ↥M) ⦃a : G⦄, a ∈ typePA M hyp.typeP →
       (↑l : G) * a * (↑l : G)⁻¹ ∈ typePA M hyp.typeP := fun l a ha =>
-    ((Subgroup.mem_set_normalizer_iff).mp (by rw [hyp.normalizer_typePA_eq]; exact l.2) a).mp ha
+    ((Subgroup.mem_set_normalizer_iff).mp (hyp.le_normalizer_typePA l.2) a).mp ha
   { hyp := hyp.dadeData.dade.restrict Set.subset_union_left hnorm
     τ := ((hyp.dadeData.dade.fullDadeIsometryData hyp.hconj).restrict
       Set.subset_union_left hnorm).toDadeMap
@@ -475,7 +526,7 @@ open scoped FiniteInduce in
 inequality (7.5) `S09.family_inequality` for the (10.8) estimate.  The single member's (7.1) data is
 `toHypothesis71`; the `IsDadeIsometry` certificate is the restricted Dade isometry's
 (`FullDadeIsometryData.toDadeIsometryData.isDadeIsometry`), and `pairwise_disjoint` is vacuous over
-`Fin 1`.  Sorry-free and self-contained (the `M`-stability is `normalizer_typePA_eq`). -/
+`Fin 1`.  Sorry-free and self-contained (the `M`-stability is `le_normalizer_typePA`). -/
 noncomputable def toFamilyHypothesis71 {M : Subgroup G} [Finite G] (hyp : Hypothesis M) :
     OddOrder.Peterfalvi.S09.FamilyHypothesis71 G 1 where
   L := fun _ => M
@@ -486,61 +537,12 @@ noncomputable def toFamilyHypothesis71 {M : Subgroup G} [Finite G] (hyp : Hypoth
   isDadeIsometry := fun _ => by
     have hnorm : ∀ (l : ↥M) ⦃a : G⦄, a ∈ typePA M hyp.typeP →
         (↑l : G) * a * (↑l : G)⁻¹ ∈ typePA M hyp.typeP := fun l a ha =>
-      ((Subgroup.mem_set_normalizer_iff).mp (by rw [hyp.normalizer_typePA_eq]; exact l.2) a).mp ha
+      ((Subgroup.mem_set_normalizer_iff).mp (hyp.le_normalizer_typePA l.2) a).mp ha
     exact ((hyp.dadeData.dade.fullDadeIsometryData hyp.hconj).restrict
       Set.subset_union_left hnorm).toDadeIsometryData.isDadeIsometry
   pairwise_disjoint := fun i j hij => absurd (Subsingleton.elim i j) hij
 
 end Hypothesis
-
-/-- Conjugation transports the centralizer of a singleton: `g · C_G(a) · g⁻¹ = C_G(g a g⁻¹)`.
-(The singleton analogue of `BG.Ch3.S12.centralizer_conj_smul`.) -/
-private theorem conj_smul_centralizer_singleton (g a : G) :
-    MulAut.conj g • Subgroup.centralizer ({a} : Set G)
-      = Subgroup.centralizer ({g * a * g⁻¹} : Set G) := by
-  ext y
-  rw [Subgroup.mem_pointwise_smul_iff_inv_smul_mem, Subgroup.mem_centralizer_iff,
-      Subgroup.mem_centralizer_iff]
-  have hinv : (MulAut.conj g)⁻¹ • y = g⁻¹ * y * g := by
-    rw [← map_inv, MulAut.smul_def, MulAut.conj_apply, inv_inv]
-  simp only [Set.mem_singleton_iff, forall_eq, hinv]
-  constructor
-  · intro h
-    calc g * a * g⁻¹ * y
-        = g * (a * (g⁻¹ * y * g)) * g⁻¹ := by group
-      _ = g * (g⁻¹ * y * g * a) * g⁻¹ := by rw [h]
-      _ = y * (g * a * g⁻¹) := by group
-  · intro h
-    calc a * (g⁻¹ * y * g)
-        = g⁻¹ * (g * a * g⁻¹ * y) * g := by group
-      _ = g⁻¹ * (y * (g * a * g⁻¹)) * g := by rw [h]
-      _ = g⁻¹ * y * g * a := by group
-
-/-- **Peterfalvi (8.14)/(8.15)**: the support kernel `R(x)` is `M`-conjugation equivariant.
-`supportKernel M M X (g x g⁻¹) = g · supportKernel M M X x · g⁻¹` for `g ∈ M` and `X` an
-`M`-invariant set.  `R(x) = M_F ⊓ C_G(x)` on the escaping-centralizer set (else `⊥`); the
-escaping condition is `M`-invariant, `M_F` is `M`-normal, and the centralizer is equivariant. -/
-private theorem supportKernel_conj_invariant {M : Subgroup G} {X : Set G} {g x : G}
-    (hg : g ∈ M) (hmem : g * x * g⁻¹ ∈ X ↔ x ∈ X) :
-    supportKernel M M X (g * x * g⁻¹) = MulAut.conj g • supportKernel M M X x := by
-  have hMfix : MulAut.conj g • maxNilpotentNormalHall M = maxNilpotentNormalHall M :=
-    conj_smul_eq_self_of_mem_normalizer
-      (OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_le_normalizer M hg)
-  have hMself : MulAut.conj g • M = M :=
-    conj_smul_eq_self_of_mem_normalizer (Subgroup.le_normalizer hg)
-  have hcent : (Subgroup.centralizer ({g * x * g⁻¹} : Set G) ≤ M)
-      ↔ (Subgroup.centralizer ({x} : Set G) ≤ M) := by
-    rw [← conj_smul_centralizer_singleton]
-    conv_lhs => rw [← hMself]
-    exact Subgroup.pointwise_smul_le_pointwise_smul_iff
-  have hescape : (g * x * g⁻¹ ∈ escapingCentralizerSet M X)
-      ↔ (x ∈ escapingCentralizerSet M X) := by
-    simp only [escapingCentralizerSet, Set.mem_setOf_eq, hmem, hcent]
-  unfold supportKernel
-  by_cases hx : x ∈ escapingCentralizerSet M X
-  · rw [if_pos (hescape.mpr hx), if_pos hx, Subgroup.smul_inf, hMfix,
-        conj_smul_centralizer_singleton]
-  · rw [if_neg (fun h => hx (hescape.mp h)), if_neg hx, Subgroup.smul_bot]
 
 open scoped FiniteInduce in
 /-- **Peterfalvi (10.1), existence**: every maximal subgroup `M` of type III, IV,
@@ -562,20 +564,14 @@ theorem exists_hypothesis_of_typeIIIorIVorV [Finite G]
     · exact ⟨.V, h⟩
   obtain ⟨dadeData⟩ :=
     (OddOrder.Peterfalvi.S10.dadeSupportHypotheses_typeP hG hM data hptype).1
-  -- (8.14)/(8.15): the support kernels `R(a)` are `M`-conjugation invariant.
-  have hconj : dadeData.dade.HConjInvariant := by
-    intro a l
-    simp only [dadeData.H_eq_supportKernel]
-    refine supportKernel_conj_invariant l.2 ?_
-    exact ⟨fun h => by simpa using dadeData.dade.L_normalizes_A l⁻¹ h,
-      fun h => dadeData.dade.L_normalizes_A l h⟩
+  -- (8.14)/(8.15): the kernel conjugation invariance is carried by the faithful datum.
   refine ⟨?_⟩
   exact
     { maximal := hM
       typeP := data
       type_alt := hType
       dadeData := dadeData
-      hconj := hconj }
+      hconj := dadeData.hconj }
 
 /-! ## §10 → §5 ω-grid bridge prerequisites (gate #3)
 
@@ -2749,7 +2745,7 @@ This is the **dade0-free** half of (10.5), following Peterfalvi's argument verba
   `z` is conjugate into `W₁^#`, where `α` vanishes), so `x·y ∈ V` and `z ∈ V^M`;
 * a support point `z ∈ M'` lies in `(M')^# ⊆ A(M)` (it centralizes itself).
 
-Hence `Supp(α_{ij}) ⊆ A(M) ∪ V^G = A_0(M)`. -/
+Hence `Supp(α_{ij}) ⊆ A(M) ∪ V^M = A_0(M)`. -/
 theorem Hypothesis.muGrid_alpha_support [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     {M : Subgroup G} (hyp : Hypothesis M) (hodd : Odd (Nat.card G))
     {i : Fin hyp.w1} {j : Fin hyp.w2} (_hj : j ≠ 0)
@@ -2816,9 +2812,9 @@ theorem Hypothesis.muGrid_alpha_support [Finite G] (hG : OddOrder.BG.IsMinimalSi
         hyp.muGrid_apply_eq_columnSign_mul_zeroColumn_of_mem_W1 hG hodd i j hxG hx1, hδj,
         hζvanish hxK]
       ring
-    -- `x·y ∈ V`, so `z ∈ V^M`.
-    rw [OddOrder.GroupTheory.mem_conjClassSet]
-    refine ⟨(x : G) * (y : G), ?_, (c : G), ?_⟩
+    -- `x·y ∈ V`, so `z ∈ V^M` (the conjugator `c` lies in `M`).
+    rw [OddOrder.GroupTheory.mem_conjClassSetIn]
+    refine ⟨(x : G) * (y : G), ?_, (c : G), c.2, ?_⟩
     · -- `(x:G)·(y:G) ∈ typePV`
       have hxyW : (x : G) * (y : G) ∈ hyp.typeP.W := by
         rw [hyp.typeP.W_eq]; exact mul_mem (Subgroup.mem_sup_left hxG) (Subgroup.mem_sup_right hyG)
@@ -3261,7 +3257,7 @@ open scoped FiniteInduce in
 `M` supported on `A_0(M)`, the Dade image `φ^τ = hyp.tau φ` *restores* `φ`'s value at any
 `v ∈ V = typePV M`: `(φ^τ)(v) = φ(v)`.
 
-Since `V = typePV ⊆ conjClassSet (typePV) ⊆ A_0(M)` (`subset_conjClassSet`), this is exactly the
+Since `V = typePV ⊆ V^M ⊆ A_0(M)` (`subset_conjClassSetIn`), this is exactly the
 value-on-support property `dadeIntegralCharacterMap_apply_mem` of the genuine §10 Dade isometry
 `hyp.tau`.  It is the reusable "agrees/vanishes on `V` by definition of `τ`" step underlying the
 Dade-image half of (10.5) (`α_{ij}^τ − δ(ω_{ij}^σ − ω_{i0}^σ)` vanishes on `V`), and the (10.6.b) /
@@ -3273,7 +3269,7 @@ theorem Hypothesis.tau_apply_of_mem_typePV [Finite G] {M : Subgroup G} (hyp : Hy
   haveI := hyp.finiteG
   have hvA0 : v ∈ typePA0 M hyp.typeP := by
     rw [typePA0]
-    exact Set.mem_union_right _ (OddOrder.GroupTheory.subset_conjClassSet hv)
+    exact Set.mem_union_right _ (OddOrder.GroupTheory.subset_conjClassSetIn hv)
   exact OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap_apply_mem hyp.dadeData.dade
     (hyp.dadeData.dade.fullDadeIsometryData hyp.hconj) hφ hvA0
 

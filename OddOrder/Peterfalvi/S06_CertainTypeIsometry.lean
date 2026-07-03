@@ -81,8 +81,7 @@ noncomputable def ticVdiff (h : Hypothesis46 A L) :
     have h2 : (w : G) * v = v * (w : G) := (Subtype.ext_iff.mp h1).symm
     have h3 : (w : G) * v * (w : G)⁻¹ = v := by rw [h2]; exact mul_inv_cancel_right v w
     rw [h3]; exact hv
-  V_ti := h.tic.V_ti.subset (by
-    rw [h.tic_V]; exact fun _ hv => ⟨hv.1, fun h2 => hv.2 (Or.inr h2)⟩)
+  V_ti := h.tic.V_ti.subset (by rw [h.tic_V])
 
 /-- The canonical Dade application driving `σ_G`: the §4 Dade package on `ticVdiff`'s TI set
 `V = W − (W₁ ∪ W₂)`, whose local subgroups are all trivial (`H(a) = ⊥`), so `HConjInvariant` holds
@@ -300,11 +299,23 @@ theorem certainType_diff_supp_subset_A0 (h : Hypothesis46 A L)
         have key := chiRestrict_apply_eq_zero_of_not_mem_union h hξ (g := ⟨z, hzK⟩) hnm
         rwa [h.coe_chiRestrict, ← h.restrict_certainType_eq ξ i, ClassFunction.restrict_apply] at key
       exact hz ((hcoe χ₂ hχ₂).trans (hcoe χ₂' hχ₂').symm)
-    · -- `z ∈ L − K`: land in `V^L`.
+    · -- `z ∈ L − K`: `z ~_L x·y` with `x ∈ W₁^#`, `y ∈ W₂`; moreover `y ≠ 1` (else `z ~ x ∈ W₁`,
+      -- where the difference vanishes by step (2)), so `x·y ∈ V = W − (W₁ ∪ W₂)` and `z ∈ V^L`.
       right
       obtain ⟨c, x, hxW1, hx1, y, hyW2, hcxy⟩ :=
         (h.toCertainTypeHypothesis.toHypothesis).mem_compl_conj_into_W hzK
       have hz_eq : z = c * (x * y) * c⁻¹ := by rw [← hcxy]; group
+      -- `y ≠ 1`: otherwise `μ_{ij} − μ_{ik}` vanishes at `z` (the `W₁`-agreement, step (2)).
+      have hy1 : y ≠ 1 := by
+        intro hy1
+        apply hz
+        have hzx : z = c * x * c⁻¹ := by rw [hz_eq, hy1, mul_one]
+        have hval : ∀ ξ : (h.W2.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ,
+            ((h.columnFamily ξ).mu i : ClassFunction ↥L ℂ) z
+              = ((h.columnFamily ξ).mu i : ClassFunction ↥L ℂ) x := fun ξ => by
+          rw [hzx]; exact ClassFunction.conj_eq _ x c
+        rw [hval χ₂, hval χ₂']
+        exact certainType_apply_eq_of_mem_W1 h χ₂ χ₂' i hdeg hxW1
       -- `tic.W = (W₁ ⊔ W₂).map L.subtype`.
       have htW : h.tic.W = (h.W1 ⊔ h.W2).map L.subtype := by
         rw [← h.tic.W_sup, h.tic_W1, h.tic_W2, ← Subgroup.map_sup]
@@ -315,18 +326,29 @@ theorem certainType_diff_supp_subset_A0 (h : Hypothesis46 A L)
         refine ⟨?_, ?_⟩
         · show L.subtype (x * y) ∈ h.tic.W
           rw [htW]; exact Subgroup.mem_map.mpr ⟨x * y, hxyW, rfl⟩
-        · show L.subtype (x * y) ∉ h.tic.W2
-          rw [h.tic_W2]
-          rintro hmem
-          obtain ⟨w, hwW2, hweq⟩ := Subgroup.mem_map.mp hmem
-          have hwxy : w = x * y := L.subtype_injective hweq
-          have hxyW2 : x * y ∈ h.W2 := hwxy ▸ hwW2
-          have hxW2 : x ∈ h.W2 := by
-            have hx_eq : x = (x * y) * y⁻¹ := by group
-            rw [hx_eq]; exact Subgroup.mul_mem _ hxyW2 (Subgroup.inv_mem _ hyW2)
-          have hxbot : x ∈ h.W1 ⊓ h.W2 := ⟨hxW1, hxW2⟩
-          rw [disjoint_iff.mp h.W_disjoint, Subgroup.mem_bot] at hxbot
-          exact hx1 hxbot
+        · rintro (hmem | hmem)
+          · -- `x·y ∈ W₁` would force `y = 1`.
+            rw [h.tic_W1] at hmem
+            obtain ⟨w, hwW1, hweq⟩ := Subgroup.mem_map.mp hmem
+            have hwxy : w = x * y := L.subtype_injective hweq
+            have hxyW1 : x * y ∈ h.W1 := hwxy ▸ hwW1
+            have hyW1 : y ∈ h.W1 := by
+              have hy_eq : y = x⁻¹ * (x * y) := by group
+              rw [hy_eq]; exact Subgroup.mul_mem _ (Subgroup.inv_mem _ hxW1) hxyW1
+            have hybot : y ∈ h.W1 ⊓ h.W2 := ⟨hyW1, hyW2⟩
+            rw [disjoint_iff.mp h.W_disjoint, Subgroup.mem_bot] at hybot
+            exact hy1 hybot
+          · -- `x·y ∈ W₂` would force `x = 1`.
+            rw [h.tic_W2] at hmem
+            obtain ⟨w, hwW2, hweq⟩ := Subgroup.mem_map.mp hmem
+            have hwxy : w = x * y := L.subtype_injective hweq
+            have hxyW2 : x * y ∈ h.W2 := hwxy ▸ hwW2
+            have hxW2 : x ∈ h.W2 := by
+              have hx_eq : x = (x * y) * y⁻¹ := by group
+              rw [hx_eq]; exact Subgroup.mul_mem _ hxyW2 (Subgroup.inv_mem _ hyW2)
+            have hxbot : x ∈ h.W1 ⊓ h.W2 := ⟨hxW1, hxW2⟩
+            rw [disjoint_iff.mp h.W_disjoint, Subgroup.mem_bot] at hxbot
+            exact hx1 hxbot
       exact ⟨L.subtype c, c.2, L.subtype (x * y), hvV, by rw [hz_eq]; simp [map_mul, map_inv]⟩
 
 /-- `μ_{ij} − μ_{ik}` as an element of Peterfalvi's `CF(L, A₀)` (`SupportedClassFunctions` on
@@ -381,9 +403,8 @@ theorem certainType_diff_dade_apply_eq_of_mem_V (h : Hypothesis46 A L)
     h.tau.toDadeMap (certainTypeDiffSupported h hχ₂ hχ₂' i hdeg) v
       = ((h.columnFamily χ₂).sign : ℂ)
         * (certainTypeOmegaSigma h χ₂ i v - certainTypeOmegaSigma h χ₂' i v) := by
-  -- `v ∈ tic.V` (the larger TI set), hence `v ∈ A₀`
-  have hv_ticV : v ∈ h.tic.V := by
-    rw [h.tic_V]; exact ⟨hv.1, fun h2 => hv.2 (Or.inr h2)⟩
+  -- `v ∈ tic.V` (the same TI set), hence `v ∈ A₀`
+  have hv_ticV : v ∈ h.tic.V := by rw [h.tic_V]; exact hv
   have hvA0 : v ∈ (A ∪ {g : G | ∃ l : G, l ∈ L ∧ ∃ u ∈ h.tic.V, g = l * u * l⁻¹} : Set G) :=
     Or.inr ⟨1, Subgroup.one_mem L, v, hv_ticV, by group⟩
   -- the `sdiff.W` partner `w = e v`, with `(w : L) = ⟨v, _⟩` and `(w : L) ∈ sdiff.V`
