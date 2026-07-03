@@ -3,6 +3,7 @@ Copyright (c) 2026 Yawara Ishida. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
+import OddOrder.GroupTheory.RepresentationTheory.InducedTransport
 import OddOrder.Peterfalvi.S08_CaseBCoherence
 import OddOrder.Peterfalvi.S06_CertainTypeCoherence
 
@@ -402,77 +403,14 @@ theorem inner_induce_self_eq_index_of_le_center
   rw [← hfrob, ← hcardeq] at hstep
   exact mul_left_cancel₀ hcardN hstep
 
-/-- **Constituent decomposition of an induced character** (the `Ind^H_Z φ = ∑ aᵢ θᵢ` step of
-Peterfalvi (6.8.2.3)).  For any class function `φ` of a subgroup `N ≤ M`, the induced character
-expands in the `Irr M` basis with coefficients the Frobenius multiplicities:
-`Ind^M_N φ = ∑_{θ ∈ Irr M} ⟨φ, Res_N θ⟩ • θ`.  Fourier expansion
-(`classFunction_eq_sum_inner_smul`) plus Frobenius reciprocity (`inner_induce_eq_inner_restrict`)
-on each coefficient.
-
-The multiplicities `aᵢ = ⟨φ, Res_N θᵢ⟩` are the `θᵢ(1)` of (6.8.2.3) when `θᵢ` lies over the central
-linear `φ` (`Res_N θᵢ = θᵢ(1)·φ` by [Is] 2.27), and vanish otherwise. -/
-theorem induce_eq_sum_inner_restrict_smul {M : Type*} [Group M] [Fintype M]
-    [Invertible (Nat.card M : ℂ)] {N : Subgroup M} [Fintype ↥N] [Invertible (Nat.card ↥N : ℂ)]
-    (φ : ClassFunction ↥N ℂ) :
-    ClassFunction.induce N φ
-      = ∑ θ : IrreducibleCharacter M,
-        ClassFunction.inner φ (ClassFunction.restrict N (θ : ClassFunction M ℂ))
-          • (θ : ClassFunction M ℂ) := by
-  conv_lhs => rw [classFunction_eq_sum_inner_smul (ClassFunction.induce N φ)]
-  exact Finset.sum_congr rfl
-    (fun θ _ => by rw [ClassFunction.inner_induce_eq_inner_restrict])
-
-/-- **The class-function inner product is preserved by pullback along a group isomorphism.**  For a
-`MulEquiv e : H ≃* G` and `a, b ∈ CF(G)`, `⟨a ∘ e, b ∘ e⟩_H = ⟨a, b⟩_G`: reindexing the inner sum
-`∑_{h ∈ H} a(e h)·\overline{b(e h)} = ∑_{g ∈ G} a(g)·\overline{b(g)}` along the bijection `e` (and
-`|H| = |G|`).  A transport tool for the (6.8.2.3) induction-transitivity seam `W₂ ≅ W₂.subgroupOf H`. -/
-theorem inner_compHom_of_mulEquiv {G' H' : Type*} [Group G'] [Group H'] [Fintype G'] [Fintype H']
-    [Invertible (Nat.card G' : ℂ)] [Invertible (Nat.card H' : ℂ)]
-    (e : H' ≃* G') (a b : ClassFunction G' ℂ) :
-    ClassFunction.inner (ClassFunction.compHom e.toMonoidHom a)
-        (ClassFunction.compHom e.toMonoidHom b) = ClassFunction.inner a b := by
-  have hcard : (Nat.card H' : ℂ) = (Nat.card G' : ℂ) := by rw [Nat.card_congr e.toEquiv]
-  have hsum : (∑ h : H', (ClassFunction.compHom e.toMonoidHom a) h *
-        star ((ClassFunction.compHom e.toMonoidHom b) h))
-      = ∑ g : G', a g * star (b g) := by
-    simp only [ClassFunction.compHom_apply]
-    exact Equiv.sum_comp e.toEquiv (fun g => a g * star (b g))
-  have hinv : ⅟(Nat.card H' : ℂ) = ⅟(Nat.card G' : ℂ) :=
-    invOf_eq_right_inv (by rw [hcard, mul_invOf_self])
-  rw [ClassFunction.inner_eq_inv_card_mul_innerSum, ClassFunction.inner_eq_inv_card_mul_innerSum,
-    ClassFunction.innerSum, ClassFunction.innerSum, hsum, hinv]
-
-/-- **Induction in stages** (Peterfalvi (6.8.2.3) `Ind^H(Ind^H_Z φ) = Ind^L_Z φ`).  For nested
-subgroups `K ≤ H ≤ M`, inducing a class function `ψ` of `K` to `M` in one step agrees with inducing
-first to `H` (of `ψ` transported to `K.subgroupOf H`) and then to `M`:
-`Ind^M_H (Ind^H_{K.subgroupOf H} (ψ ∘ e)) = Ind^M_K ψ`, where `e : K.subgroupOf H ≃* K`.
-
-Proved by completeness (`classFunction_eq_zero_of_orthogonal`): for every `χ ∈ Irr M`, double
-Frobenius reciprocity reduces `⟨LHS, χ⟩` to `⟨ψ∘e, Res_{K.subgroupOf H}(Res_H χ)⟩`, the restriction
-`Res_{K.subgroupOf H}(Res_H χ) = (Res_K χ)∘e` is the same `M`-value, and `inner_compHom_of_mulEquiv`
-strips the transport to give `⟨ψ, Res_K χ⟩ = ⟨Ind^M_K ψ, χ⟩` (Frobenius). -/
-theorem induce_induce_subgroupOf {M : Type*} [Group M] [Fintype M] [Invertible (Nat.card M : ℂ)]
-    {K H : Subgroup M} (hKH : K ≤ H)
-    [Fintype ↥H] [Fintype ↥K] [Fintype ↥(K.subgroupOf H)]
-    [Invertible (Nat.card ↥H : ℂ)] [Invertible (Nat.card ↥K : ℂ)]
-    [Invertible (Nat.card ↥(K.subgroupOf H) : ℂ)]
-    (ψ : ClassFunction ↥K ℂ) :
-    ClassFunction.induce H (ClassFunction.induce (K.subgroupOf H)
-        (ClassFunction.compHom (Subgroup.subgroupOfEquivOfLe hKH).toMonoidHom ψ))
-      = ClassFunction.induce K ψ := by
-  set e := Subgroup.subgroupOfEquivOfLe hKH with he
-  have hres : ∀ χ : IrreducibleCharacter M,
-      ClassFunction.restrict (K.subgroupOf H)
-          (ClassFunction.restrict H (χ : ClassFunction M ℂ))
-        = ClassFunction.compHom e.toMonoidHom (ClassFunction.restrict K (χ : ClassFunction M ℂ)) := by
-    intro χ; ext y
-    rw [ClassFunction.restrict_apply, ClassFunction.restrict_apply, ClassFunction.compHom_apply,
-      ClassFunction.restrict_apply]
-    congr 1
-  refine sub_eq_zero.mp (classFunction_eq_zero_of_orthogonal _ (fun χ => ?_))
-  rw [ClassFunction.inner_sub_left, ClassFunction.inner_induce_eq_inner_restrict,
-    ClassFunction.inner_induce_eq_inner_restrict, hres χ, inner_compHom_of_mulEquiv,
-    ClassFunction.inner_induce_eq_inner_restrict, sub_self]
+/-! The generic transport lemmas `induce_eq_sum_inner_restrict_smul` /
+`inner_compHom_of_mulEquiv` / `induce_induce_subgroupOf` formerly declared here moved to
+`OddOrder/GroupTheory/RepresentationTheory/InducedTransport.lean` (hub prefix-split,
+issue 9005); they resolve below through `open OddOrder.RepresentationTheory`.
+Peterfalvi-context reading: `induce_eq_sum_inner_restrict_smul` is the `Ind^H_Z φ = ∑ aᵢ θᵢ`
+step of (6.8.2.3) (the multiplicities `aᵢ = ⟨φ, Res θᵢ⟩` are the `θᵢ(1)` over a central linear
+`φ` by [Is] 2.27); `induce_induce_subgroupOf` is its `Ind^H(Ind^H_Z φ) = Ind^L_Z φ` seam, with
+`inner_compHom_of_mulEquiv` transporting across `W₂ ≅ W₂.subgroupOf H`. -/
 
 /-- **Induction commutes with a `ℂ`-linear combination over a `Finset`** (the binary `induce_add` /
 `induce_smul` extended to `Ind_H (∑ cᵢ • fᵢ) = ∑ cᵢ • Ind_H fᵢ`). -/
