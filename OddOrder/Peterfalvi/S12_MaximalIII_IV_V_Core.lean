@@ -370,7 +370,7 @@ open scoped FiniteInduce in
 pointwise (its value is `φ(a)` at a base point, `0` elsewhere), so applying `σc` to coefficients
 commutes with it (`dadeIntegralCharacterMap_mapRingEquiv_comm`).  Taking `σc = conjAe` this is the
 `τ`-side Galois-equivariance feeding the (11.8.3) reality `β̄ = β`. -/
-theorem Hypothesis.tau_mapRingEquiv_comm [Finite G] {M : Subgroup G} (hyp : Hypothesis M)
+theorem tau_mapRingEquiv_comm [Finite G] {M : Subgroup G} (hyp : Hypothesis M)
     (σc : ℂ ≃+* ℂ) {φ : ClassFunction ↥M ℂ} (hφ : φ.support ⊆ hyp.A0) :
     hyp.tau (ClassFunction.mapRingEquiv σc φ) = ClassFunction.mapRingEquiv σc (hyp.tau φ) := by
   haveI := hyp.finiteG

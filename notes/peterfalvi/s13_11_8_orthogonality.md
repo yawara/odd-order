@@ -1122,3 +1122,41 @@ have Rbeta: cfReal beta.                        (* (11.8.3) 後半: β̄=β *)
 (`sigma_mapRingEquiv_comm`/`galoisMap_conj_omega`/`omegaProdChar_inv`) 共通、w2CharEquiv inversion が新規。
 **gate 確認**: §14 下流でなく (11.8.5) の genuine prerequisite (document-order 11.8.3<11.8.5、本来上流)。
 SHC context で全て可能 (α^τ/ω^σ/ζ^{τ₁} は既に SHC で構築済み、conj 可換性を足すのみ)。
+
+## 2026-07-02 cont.⁶⁶ (lane-a) — **β real 全 pieces LANDED、(11.8.5) hβr 実証明化。新上流 = issue 9004 (Hypothesis46 修正)**
+
+**landed (leaf green ×3 commit)**:
+- piece 1 `exists_colInv_alignedOmegaSigma_conj` (b6fe2cd5): ∃k, (k=0↔j=0) ∧ conj(ω_{0j}^σ)=ω_{0k}^σ
+  ∧ conj(μ_{0j})=μ_{0k} ∧ δ_k=δ_j。σ/μ 両 grid 同一 k (column index 共有 `finCardEquivCharacterGroup`)。
+  δ_k=δ_j は (4.9)(a) bridge+eq から w2-primality 不要で導出。⚠ ⁻¹-pattern の rw は letI/型表示差で
+  不発 → congrArg+exact (defeq) 迂回; ite 条件は simp が True 化 → if_true (if_pos rfl 不可)。
+- piece 4 `beta_row_eq` + `beta_column_eq_zeroRow` (180ec1eb): betaE 2 分解。row move は
+  four-corner 差 (h410 thread = δ-scaled (4.10))、column move は μ_{0j}−μ_{0k} 差 (h48 thread =
+  row-0 (4.8))。両方 harg (module) + map_add + thread + module の 4 行証明。
+- piece 5 `beta_isReal` (同): Rbeta (Coq PFsection11.v 823-831 忠実)。row-0 還元 → conj 分配
+  (pointwise ext、mapRingEquiv-atom 形) → piece 2/1/3 で各項 conj → coherence bridge
+  `tau_zeta_sub_conj_eq_SHC_extension` で ζ̄→ζ → column move at k。
+- **capstone 配線**: `residualCoeff_eq_zero` の hβr thread を beta_isReal の実証明で置換。
+  残 thread = hdeg0 (row-0 degree、(10.3) で自明 discharge) + **h410/h48 のみ**。
+- piece 2 の宣言名バグ修正: `Hypothesis.Hypothesis.tau_mapRingEquiv_comm` (namespace 内 prefix
+  重複) → `Hypothesis.tau_mapRingEquiv_comm`。
+
+**新発見 (issue 9004、shared-infra 設計逸脱)**: h48/h410 の discharge 先 = S06 の (4.8)
+`certainType_diff_dade_eq`/(4.10) `fourCorner_dade_eq` (両方 landed 済・coherence-free) だが、
+前提の `Hypothesis46` が**原文/Coq から逸脱** — `tic_V = W\W₂ (big V)` + dade0 on A∪V_big^L。
+正 = small V (W−(W₁∪W₂)): 原文 (3.1)/(8.10)/**(8.15) (p.48 mmd MISSING → PDF 直読で回収**:
+「(4.6) holds for L=M, K=M′, A=A(M), A₀=A₀(M), H=M_F or M_s」)/Coq `cyclicTIset`+
+`prime_Dade_definition`。big V は W₁^# ⊆ V を強制し TI-in-G が C_G(x)⊆W (x∈W₁^#) を要求 →
+§10 で供給不能 (位数論法で W₁^# は V_small^M にも A(M)=(M′)^# にも入らない)。
+**Hypothesis46 は未インスタンス化** (全 repo でパラメータ出現のみ) ゆえ latent だった。
+修正案+fallout map (S06 内 ~6 rw-site 単純化 + supp 補題 1 本強化 (W₁-vanishing で y=1 除外) +
+S08 は型不変) は issue 9004。**lane a が claim** (hub 異議あれば差し戻し)。
+
+**残作業 (上流順)**: ① issue 9004 の Hypothesis46 small-V 修正 (S06 refactor)、
+② `Hypothesis.toHypothesis46` (§10 instantiation = (8.15) 形式化; tic は
+`typePData_toTICyclicHypothesis` (already small-V)、A_covers は A(M)=(M′)^# で自明、
+dade0 は typePA0 の conjClassSet (G-conj) vs V^M (M-conj) の照合が要調査)、
+③ (4.8)/(4.10) → aligned grid の bridge lemma (ticVdiff h46 ≟ typePData tic の defeq 確認、
+`certainTypeOmegaSigma` ↔ `alignedOmegaSigmaGrid`、`h46.tau.toDadeMap` ↔ `hyp.tau`)、
+④ h48/h410 discharge。(11.8) endpoint は依然 doubly-gated (§9↔§10、§14) — h114 ((11.8.4)) の
+discharge も③と同根の見込み。
