@@ -2408,15 +2408,69 @@ theorem orthogonal_character_constant_on_coset {L : Subgroup G} [Finite G]
 
 open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
 /-- **Peterfalvi (12.5)**: after the rho-reduction, a class function `ψ` orthogonal
-to every type-I family `R(χ)` is constant on `H − H'`.  The orthogonality hypothesis
-is the genuine `⟨ψ, α⟩ = 0` for `α ∈ R(χ)`, no longer an opaque field. -/
+to every type-I family `R(χ)` is **constant on `H − H'`** (any two points of `H ∖ H'` take the
+same value — Coq `FtypeI_invDade_ortho_constant`, `{in H :\: H' &, ψ x = ψ y}`).  The orthogonality
+hypothesis is the genuine `⟨ψ, α⟩ = 0` for `α ∈ R(χ)`, no longer an opaque field.
+
+**Statement correction (loop¹³³)**: the former conclusion `ψ(h) = ψ(1)` was wrong — `1 ∈ H'`, and
+the DpsiH decomposition `ρψ|_H = Σ a_A · Ind_{H'}^H χ_A + a·1_H` gives `ψ = a` on `H ∖ H'`
+(`induce_apply_eq_zero_of_not_mem_normal`) but `ψ(1) = a + Σ a_A[H:H']χ_A(1) ≠ a`.
+
+**Faithful reduction (landed)**: by the Fourier split `Res_L ψ = γ + β` (as in (12.4)), the
+`H`-kernel part `γ` is constant on **all** of `H` (each `φ` with `H ⊆ ker φ` has `φ(h) = φ(1)`,
+`apply_mul_eq_of_mem_characterKernel`), so `ψ(h₁) = ψ(h₂)` reduces to the single genuine obligation
+`β(h₁) = β(h₂)` for `h₁, h₂ ∈ H ∖ H'` — the off-kernel part `β ∈ ℂ[S]` is constant on `H ∖ H'`
+(where the `o_rpsi_S` Dade-reciprocity / coherence input and the induced-from-`H'` structure live). -/
 theorem rho_constant_on_H_minus_Hprime {L : Subgroup G} [Finite G] [Fintype G]
     [Invertible (Nat.card G : ℂ)] [Invertible (Nat.card ↥L : ℂ)]
     (_hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis L)
     (data : ∀ χ ∈ hyp.Sset, CharacterDecompositionData hyp χ) {psi : ClassFunction G ℂ}
     (horth : ∀ χ (hχ : χ ∈ hyp.Sset), ∀ α ∈ Rset (data χ hχ), ClassFunction.inner psi α = 0) :
-    ∀ h : G, h ∈ hyp.H → h ∉ hyp.Hprime → psi h = psi 1 := by
-  sorry
+    ∀ h1 : G, h1 ∈ hyp.H → h1 ∉ hyp.Hprime → ∀ h2 : G, h2 ∈ hyp.H → h2 ∉ hyp.Hprime →
+      psi h1 = psi h2 := by
+  haveI := hyp.finiteG
+  classical
+  intro h1 hh1 hh1' h2 hh2 hh2'
+  have hh1L : h1 ∈ L := hyp.typeI.typeF.H_le hh1
+  have hh2L : h2 ∈ L := hyp.typeI.typeF.H_le hh2
+  set h1L : ↥L := ⟨h1, hh1L⟩ with hh1Ldef
+  set h2L : ↥L := ⟨h2, hh2L⟩ with hh2Ldef
+  set gf : ClassFunction ↥L ℂ := ClassFunction.restrict L psi with hgf
+  set γ : ClassFunction ↥L ℂ := ∑ φ ∈ Finset.univ.filter (fun φ => InHKernel hyp φ),
+    ClassFunction.inner gf (φ : ClassFunction ↥L ℂ) • (φ : ClassFunction ↥L ℂ) with hγ
+  set β : ClassFunction ↥L ℂ := ∑ φ ∈ Finset.univ.filter (fun φ => ¬ InHKernel hyp φ),
+    ClassFunction.inner gf (φ : ClassFunction ↥L ℂ) • (φ : ClassFunction ↥L ℂ) with hβ
+  have hsplit : gf = γ + β := by
+    rw [hγ, hβ, Finset.sum_filter_add_sum_filter_not]
+    exact (sum_inner_irreducibleCharacter_smul gf).symm
+  -- `γ` is constant on `H` (each `H`-kernel `φ` satisfies `φ(h₁) = φ(1) = φ(h₂)`).
+  have hγconst : γ h1L = γ h2L := by
+    rw [hγ, classFunction_sum_apply, classFunction_sum_apply]
+    refine Finset.sum_congr rfl fun φ hφ => ?_
+    rw [ClassFunction.smul_apply, ClassFunction.smul_apply]
+    have hInK := (Finset.mem_filter.mp hφ).2
+    have hm1 : (h1L : ↥L) ∈
+        OddOrder.Peterfalvi.S03.characterKernel (φ : ClassFunction ↥L ℂ) :=
+      hInK (Subgroup.mem_subgroupOf.mpr hh1)
+    have hm2 : (h2L : ↥L) ∈
+        OddOrder.Peterfalvi.S03.characterKernel (φ : ClassFunction ↥L ℂ) :=
+      hInK (Subgroup.mem_subgroupOf.mpr hh2)
+    have e1 := apply_mul_eq_of_mem_characterKernel φ.isIrreducible hm1 (1 : ↥L)
+    have e2 := apply_mul_eq_of_mem_characterKernel φ.isIrreducible hm2 (1 : ↥L)
+    rw [one_mul] at e1 e2
+    rw [e1, e2]
+  -- **The genuine remaining obligation** (Peterfalvi (12.5) proper): the off-kernel part `β ∈ ℂ[S]`
+  -- is constant on `H ∖ H'`.  This is where the `o_rpsi_S` Dade-reciprocity input
+  -- (`tau_inner_eq_of_supported`) and the induced-from-`H'` structure enter (via the DpsiH
+  -- decomposition + `induce_apply_eq_zero_of_not_mem_normal`).
+  have hβconst : β h1L = β h2L := by
+    sorry
+  have key : gf h1L = gf h2L := by
+    rw [hsplit]
+    simp only [ClassFunction.add_apply, hγconst, hβconst]
+  have hg1 : gf h1L = psi h1 := by rw [hgf, ClassFunction.restrict_apply]
+  have hg2 : gf h2L = psi h2 := by rw [hgf, ClassFunction.restrict_apply]
+  rw [← hg1, ← hg2]; exact key
 
 /-! ## (12.6)--(12.7): type-I Frobenius structure -/
 
