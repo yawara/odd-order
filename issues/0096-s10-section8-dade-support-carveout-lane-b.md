@@ -762,3 +762,23 @@ x∉K の p-element 論法。**(12.14) は ~60 行 assembly** (gated でない�
 
 **★ 訂正の意義**: 「char endgame 全 gated on deep constructions」は **過度に悲観的だった** — M が type-I で
 Hypothesis M 直接利用可ゆえ (12.14)/(12.15)/(12.16) chain は既存 piece から assemblable。次: (12.14) assembly を build。
+
+### loop¹⁴⁴ — (12.14) assembly 完全 scope: statement redesign 要 (coh + L≠M input)
+
+(12.14) 精査: assemblable だが **現 statement は under-specified**:
+- horth (dade.psi ⊥ R_M) は dade.tau1 が coherent extension である必要 → 一般 DadeNotation の tau1 では不足。
+  **coh_L (IsCoherent) 入力要** + dade.psi = coh.extension dade.chi の link。
+- cross-group には **L≠M non-conjugate** 要 (現 statement に無し)。
+→ **statement redesign 要** (coh + hLM 追加; code consumer 0 ゆえ安全)。
+
+**assembly plan** (redesign 後):
+```
+obtain ⟨hypM⟩ := exists_typeI_hypothesis hG ctr.M_maximal ctr.M_typeI
+hHK : hypM.H = ctr.K  := hypM.typeI.typeF.H_eq.trans ctr.K_eq_MF.symm
+data_M := fun χ hχ => (⟨CharacterDecompositionData existence S14:658⟩).choose
+refine orthogonal_character_constant_on_coset hG hypM data_M horth hxM hxK g (hHK▸hg)
+  horth: dade.psi=coh.extension χ ⊥ R_M — χ の constituents で分解 + coherent_extension_orthogonal (L≠M)
+  hxM: witness.x ∈ P0 ≤ M;  hxK: x∉K via p-element + p∤|K|
+```
+**subtlety**: dade.chi は degree e=[L:H] ⟹ Ind_H^L θ (θ linear≠1) ⟹ Frobenius で irreducible ⟹ 単一
+constituent (horth 簡略化)。**次: (12.14) redesign + assembly を build** (~60-80 行、全 piece 存在)。
