@@ -199,3 +199,34 @@ S14 に pin して cite (lane a territory、carve-out 対象外)。
 build 着手前に必ず `bin/new-issue --base 9000` で起票 (policy 6)。(b) b は main に 17 commits
 遅れ (最終 merge 44ccb169; 本 tick 合流でさらに進む) — **次 leaf 着手前に `git merge main`**
 (CLAUDE.md 同期規則)。
+
+## 🚀 lane b 進捗 (2026-07-03, loop¹⁰⁰) — (12.3) bar-trick descent 完成: `nonconjugate_diffImage_inner_zero` 実証明化
+
+loop⁹⁹ 設計どおり 3 部品を構築し S14 の (12.3) geometric obligation を閉じた (commit f8ecb4a5)。
+**descent core `constituent_diffImage_inner_zero_of_disjoint` は axiom-clean** (`#print axioms` =
+propext/Classical.choice/Quot.sound のみ、S14 末尾 block に追加済)。
+
+1. **`ZIrrFourier.inner_conj_conj`**: `⟨f̄, ḡ⟩ = conj ⟨f, g⟩` (両引数 conj の inner 恒等式)。
+2. **S07 `CharacterDifferenceImage.nu_eq_mu_conj`** (= Pf (5.9.b)): τ が `χ−χ̄` 上で conj と
+   可換なら image pair は `ν = μ̄`。§3 keystone の opaque pair が実は conjugate pair。証明 =
+   image 等式を conj → sign 消去 → μ との pairing を `Irr G` orthonormality で評価。
+3. **S14 側** — 要調査だった 3 部品の解決:
+   - τ conj-equivariance = **既存** `dadeIntegralCharacterMap_mapRingEquiv_comm` の conj 特化
+     (`tau_conj_of_supported`; S07_CoherenceGalois は S08 経由で import 済だった)。
+   - integrality = **既存** ZIrr Fourier (`mem_ZIrr_inner_int`) + `inner_conj_symm`
+     (X ∈ ℤ[Irr G] は supported 差の `dadeIntegralCharacterMap_mem_ZIrr_of_supported`)。
+   - same-χ pairwise distinctness = **新 field** `CharacterDecompositionData.conj_not_mem`
+     ((12.2.b) の `⟨χ,χ̄⟩=0` 由来「S(χ)∩conj S(χ)=∅」) + isometry 転送
+     (`constituentDiff_tau_inner_eq_zero_of_ne`) + (4.1) member lemma。field の producer:
+     Frobenius 側 (witness が実際使う側) は**実証明** (singleton = non-realness)、一般側は
+     (8.2.c)-gated obligation `typeI_induced_char_constituents` に conclusion 追加 (sorry 据置)。
+4. **main**: `nonconjugate_diffImage_inner_zero` に `hG` 追加 ((8.18.c) disjunction 消費、
+   swap 側は inner conj-symmetry)、`nonconjugate_typeI_R_orthogonal` が `hG` を通す。
+
+**(12.3) の残 transitive sorryAx** = S10_MinimalSimpleStructure の §8 pins (6 本:
+(8.13.a) `typeIA_isConj_conj_in_M` / (8.13.c1c2) `escaping_typeIA_signalizer_structure` /
+(8.14) `FT_signalizer_conj_smul_of_escaping` / (8.13.b) `escaping_typeIA_mem_A1` /
+(8.12.b) `typeI_centralizer_le_and_unique` / (8.13.c2c4) `supported_sigma_coprime`;
+BG §16 fusion 系、Coq `FTsupport_facts` 対応) + (12.2.a) `typeI_induced_char_constituents`
+((8.2.c))。**次 (loop¹⁰¹) = この §8/§16 pins の正面 build** (0096 carve-out 継続、文書順)。
+full build 3901 jobs / 3m41-4m37s (merge 前後 2 回 green)。
