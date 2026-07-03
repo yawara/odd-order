@@ -234,6 +234,34 @@ theorem hzeta0nu [Fintype G] [Invertible (Nat.card G : ℂ)]
   exact coherence_extension_orthogonal_constOne (F.coherence i hodd hnilp C hFrob) hτ_smul htau1
     hmem0 hmem0' hnorm0 hnorm0' horth hsupp h1_0 h1_0'
 
+/-- **The Sibley (7.1) `ρ`-map equals the family (7.1) `ρ`-map** (the (7.8.b)→(7.5) bridge).  Both
+`sibleyToHypothesis71 i` (the Dade datum coherence is coherent for) and `hypothesis71 i` (the family
+`FamilyHypothesis71` uses) are `of_isTISubset` on the *same* TI subset `H_i^#` (their supports agree
+by `sharpImage_subgroupOf_eq`), with trivial local subgroups, so `chiRho` (hence `chiRhoCF`) is
+restriction to `H_i^#` for both — they coincide (`chiRho_apply_of_trivial_local`).  This identifies
+`H78.zetaNuRhoNormSq` (built on `sibleyToHypothesis71`) with `P.chiRhoNormSq` (built on
+`hypothesis71`), the last link from the (7.8.b) bound to the (7.5) family estimate. -/
+theorem sibleyToHypothesis71_chiRhoCF_eq [Fintype G] [Invertible (Nat.card G : ℂ)]
+    (F : FrobeniusFamily G k) (i : Fin k) (hodd : Odd (Nat.card G))
+    [Fintype ↥(F.L i)] [Invertible (Nat.card ↥(F.L i) : ℂ)]
+    [Invertible (Nat.card ↥((F.H i).subgroupOf (F.L i)) : ℂ)]
+    (hnilp : Group.IsNilpotent ↥((F.H i).subgroupOf (F.L i)))
+    (C : Subgroup ↥(F.L i))
+    (hFrob : OddOrder.Isaacs.Ch06.IsFrobeniusGroup ↥(F.L i) ((F.H i).subgroupOf (F.L i)) C)
+    (χ : ClassFunction G ℂ) :
+    (F.sibleyToHypothesis71 i hodd hnilp C hFrob).chiRhoCF χ = (F.hypothesis71 i).chiRhoCF χ := by
+  ext a
+  rw [Hypothesis71.chiRhoCF_apply, Hypothesis71.chiRhoCF_apply]
+  by_cases ha : (a : G) ∈ OddOrder.Peterfalvi.S04.sharp (F.H i : Set G)
+  · have haS : (a : G) ∈ OddOrder.Peterfalvi.S08.sharpImage ((F.H i).subgroupOf (F.L i)) := by
+      rw [F.sharpImage_subgroupOf_eq i]; exact ha
+    rw [chiRho_apply_of_trivial_local _ (fun _ _ => rfl) χ haS,
+      chiRho_apply_of_trivial_local _ (fun _ _ => rfl) χ ha]
+  · have haS : (a : G) ∉ OddOrder.Peterfalvi.S08.sharpImage ((F.H i).subgroupOf (F.L i)) := by
+      rw [F.sharpImage_subgroupOf_eq i]; exact ha
+    rw [(F.sibleyToHypothesis71 i hodd hnilp C hFrob).chiRho_of_not_mem χ haS,
+      (F.hypothesis71 i).chiRho_of_not_mem χ ha]
+
 open scoped Classical in
 /-- **Peterfalvi (7.8.b) for the `i`-th Frobenius member**: `1 − e_i/h_i ≤ ‖ζ_0^{νρ}‖²`, the norm
 lower bound (`H78.zetaNuRhoNormSq`) feeding the `card_G0_lower_bound` (7.10) estimate (issue 0044).
@@ -248,8 +276,10 @@ theorem zetaNuRhoNormSq_ge [Fintype G] [Invertible (Nat.card G : ℂ)]
     (hnilp : Group.IsNilpotent ↥((F.H i).subgroupOf (F.L i)))
     (C : Subgroup ↥(F.L i))
     (hFrob : OddOrder.Isaacs.Ch06.IsFrobeniusGroup ↥(F.L i) ((F.H i).subgroupOf (F.L i)) C) :
-    ∃ H78 : Hypothesis78 G (OddOrder.Peterfalvi.S08.sharpImage ((F.H i).subgroupOf (F.L i))) (F.L i),
-      (1 : ℝ) - (H78.complementIndex : ℝ) / (H78.kernelOrder : ℝ) ≤ H78.zetaNuRhoNormSq := by
+    ∃ χ : ClassFunction G ℂ, ClassFunction.inner χ χ = 1 ∧
+      (1 : ℝ) - (F.e i : ℝ) / (F.h i : ℝ) ≤
+        (ClassFunction.inner ((F.hypothesis71 i).chiRhoCF χ)
+          ((F.hypothesis71 i).chiRhoCF χ)).re := by
   classical
   haveI hKnorm : ((F.H i).subgroupOf (F.L i)).Normal := hFrob.isNormal
   set coh := F.coherence i hodd hnilp C hFrob with hcoh
@@ -344,7 +374,6 @@ theorem zetaNuRhoNormSq_ge [Fintype G] [Invertible (Nat.card G : ℂ)]
       (F.sibleyToHypothesis71 i hodd hnilp C hFrob).hConjInvariant)
     (F.H i) hHL hHnorm hAH θ hinj hcover d psi_support hdeg ind1H hind1H htriv hdeg_match
     coh.extension hnu_isometry hagree with hH78def
-  refine ⟨H78, ?_⟩
   -- (7.8.a) `a`: `(β, ζ_0^ν) + 1 ∈ ℤ`.
   obtain ⟨a, ha⟩ := exists_betaDecomp_a H78
     (Submodule.sub_mem _
@@ -384,35 +413,49 @@ theorem zetaNuRhoNormSq_ge [Fintype G] [Invertible (Nat.card G : ℂ)]
     coh.extension hnu_isometry hagree hz0
     (inner_self_induce_eq_one_of_frobeniusGroup hFrob (θ 0) hθ0_ne)
     a ha hsmall
-  exact hbound
+  -- Expose the distinguished coherent image `χ = ν(Ind θ_0)` and transport the bound to the
+  -- family `hypothesis71` `chiRhoCF` form (the `H78.zetaNuRho` unfolds to `sibley.chiRhoCF χ` since
+  -- `H78` is `set`-transparent, then `sibleyToHypothesis71_chiRhoCF_eq` rewrites to `hypothesis71`).
+  refine ⟨coh.extension (ClassFunction.induce ((F.H i).subgroupOf (F.L i))
+    (θ 0 : ClassFunction _ ℂ)), ?_, ?_⟩
+  · rw [coherence_extension_inner_eq_on_family coh (hSmem 0 (Ne.symm hind1H))
+      (hSmem 0 (Ne.symm hind1H))]
+    exact inner_self_induce_eq_one_of_frobeniusGroup hFrob (θ 0) hθ0_ne
+  · have he : H78.complementIndex = F.e i := rfl
+    have hh : H78.kernelOrder = F.h i := rfl
+    have hzn : H78.zetaNuRhoNormSq
+        = (ClassFunction.inner ((F.hypothesis71 i).chiRhoCF (coh.extension
+            (ClassFunction.induce ((F.H i).subgroupOf (F.L i)) (θ 0 : ClassFunction _ ℂ))))
+          ((F.hypothesis71 i).chiRhoCF (coh.extension
+            (ClassFunction.induce ((F.H i).subgroupOf (F.L i)) (θ 0 : ClassFunction _ ℂ))))).re := by
+      show (ClassFunction.inner H78.zetaNuRho H78.zetaNuRho).re = _
+      have hzr : H78.zetaNuRho = (F.hypothesis71 i).chiRhoCF (coh.extension
+          (ClassFunction.induce ((F.H i).subgroupOf (F.L i)) (θ 0 : ClassFunction _ ℂ))) := by
+        show (F.sibleyToHypothesis71 i hodd hnilp C hFrob).chiRhoCF (coh.extension
+          (ClassFunction.induce ((F.H i).subgroupOf (F.L i)) (θ 0 : ClassFunction _ ℂ))) = _
+        rw [F.sibleyToHypothesis71_chiRhoCF_eq]
+      rw [hzr]
+    rw [he, hh, hzn] at hbound
+    exact hbound
 
-/-- **The Sibley (7.1) `ρ`-map equals the family (7.1) `ρ`-map** (the (7.8.b)→(7.5) bridge).  Both
-`sibleyToHypothesis71 i` (the Dade datum coherence is coherent for) and `hypothesis71 i` (the family
-`FamilyHypothesis71` uses) are `of_isTISubset` on the *same* TI subset `H_i^#` (their supports agree
-by `sharpImage_subgroupOf_eq`), with trivial local subgroups, so `chiRho` (hence `chiRhoCF`) is
-restriction to `H_i^#` for both — they coincide (`chiRho_apply_of_trivial_local`).  This identifies
-`H78.zetaNuRhoNormSq` (built on `sibleyToHypothesis71`) with `P.chiRhoNormSq` (built on
-`hypothesis71`), the last link from the (7.8.b) bound to the (7.5) family estimate. -/
-theorem sibleyToHypothesis71_chiRhoCF_eq [Fintype G] [Invertible (Nat.card G : ℂ)]
+/-- **The (7.8.b) bound in the family `chiRhoNormSq` coordinate** (the `hi`/`hχ` shape for the (7.10)
+assembly).  The distinguished coherent image `χ = ζ_0^ν = ν(Ind θ_0)` is norm-`1` and satisfies the
+(7.8.b) bound `1 − e_i/h_i ≤ (F.familyHypothesis71).chiRhoNormSq χ i`.  Immediate from
+`zetaNuRhoNormSq_ge` once the ambient `Fintype`/`Invertible` on `↥L_i` are pinned to
+`familyHypothesis71`'s fields (`Fintype.ofFinite`/`invertibleOfNonzero`), so the inner product of
+`zetaNuRhoNormSq_ge` (already in `hypothesis71`'s `chiRhoCF` form via `sibleyToHypothesis71_chiRhoCF_eq`)
+is *definitionally* `chiRhoNormSq`. -/
+theorem exists_chiRhoNormSq_ge [Fintype G] [Invertible (Nat.card G : ℂ)]
     (F : FrobeniusFamily G k) (i : Fin k) (hodd : Odd (Nat.card G))
-    [Fintype ↥(F.L i)] [Invertible (Nat.card ↥(F.L i) : ℂ)]
     [Invertible (Nat.card ↥((F.H i).subgroupOf (F.L i)) : ℂ)]
     (hnilp : Group.IsNilpotent ↥((F.H i).subgroupOf (F.L i)))
     (C : Subgroup ↥(F.L i))
-    (hFrob : OddOrder.Isaacs.Ch06.IsFrobeniusGroup ↥(F.L i) ((F.H i).subgroupOf (F.L i)) C)
-    (χ : ClassFunction G ℂ) :
-    (F.sibleyToHypothesis71 i hodd hnilp C hFrob).chiRhoCF χ = (F.hypothesis71 i).chiRhoCF χ := by
-  ext a
-  rw [Hypothesis71.chiRhoCF_apply, Hypothesis71.chiRhoCF_apply]
-  by_cases ha : (a : G) ∈ OddOrder.Peterfalvi.S04.sharp (F.H i : Set G)
-  · have haS : (a : G) ∈ OddOrder.Peterfalvi.S08.sharpImage ((F.H i).subgroupOf (F.L i)) := by
-      rw [F.sharpImage_subgroupOf_eq i]; exact ha
-    rw [chiRho_apply_of_trivial_local _ (fun _ _ => rfl) χ haS,
-      chiRho_apply_of_trivial_local _ (fun _ _ => rfl) χ ha]
-  · have haS : (a : G) ∉ OddOrder.Peterfalvi.S08.sharpImage ((F.H i).subgroupOf (F.L i)) := by
-      rw [F.sharpImage_subgroupOf_eq i]; exact ha
-    rw [(F.sibleyToHypothesis71 i hodd hnilp C hFrob).chiRho_of_not_mem χ haS,
-      (F.hypothesis71 i).chiRho_of_not_mem χ ha]
+    (hFrob : OddOrder.Isaacs.Ch06.IsFrobeniusGroup ↥(F.L i) ((F.H i).subgroupOf (F.L i)) C) :
+    ∃ χ : ClassFunction G ℂ, ClassFunction.inner χ χ = 1 ∧
+      (1 : ℝ) - (F.e i : ℝ) / (F.h i : ℝ) ≤ (F.familyHypothesis71).chiRhoNormSq χ i := by
+  letI : Fintype ↥(F.L i) := (F.familyHypothesis71).fintypeL i
+  letI : Invertible (Nat.card ↥(F.L i) : ℂ) := (F.familyHypothesis71).invertibleL i
+  exact F.zetaNuRhoNormSq_ge i hodd hnilp C hFrob
 
 end FrobeniusFamily
 

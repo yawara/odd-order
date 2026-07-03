@@ -658,3 +658,29 @@ coh に fold (ν=coh.extension と一致させる)。
 `.re` で同じ instance)、(b) `H78.complementIndex = F.e i` / `H78.kernelOrder = F.h i` (F.e/F.h 定義と
 complementIndex/kernelOrder = |L|/|H|, |H| の対応)。χ = coh.extension (Ind θ_0) = 被評価 signed irr。
 その後 (7.9) 𝓑-sum + hgood (j≠i の good estimate) + min-index → characterEstimateData → card_G0_lower_bound。
+
+## 2026-07-04 cont.²¹ (lane-a, /loop) — ★ hi 完成: exists_chiRhoNormSq_ge (family coordinate の (7.8.b) 下界)
+
+**Landed** (S09_FrobeniusEstimate.lean、sorry-free):
+- `zetaNuRhoNormSq_ge` を **refactor**: 返り値を `∃ H78, 1−e/h ≤ H78.zetaNuRhoNormSq` から
+  **`∃ χ, ⟨χ,χ⟩=1 ∧ 1−e_i/h_i ≤ ⟨(F.hypothesis71 i).chiRhoCF χ, ·⟩.re`** へ変更。χ = νζ_0 =
+  `coh.extension (Ind θ_0)` を露出、norm-1 (coherence isometry + inner_self_induce) も返す。bound は
+  H78 が `set`-transparent な内部で `H78.zetaNuRho = sibley.chiRhoCF χ` を unfold →
+  `sibleyToHypothesis71_chiRhoCF_eq` で hypothesis71 form へ bridge。**opaque H78 問題を回避** (∃ で
+  obtain すると H78 が opaque で unfold 不可だった → 内部で bridge 済ませて form ごと返す)。
+- `exists_chiRhoNormSq_ge`: **`∃ χ, ⟨χ,χ⟩=1 ∧ 1−e_i/h_i ≤ (F.familyHypothesis71).chiRhoNormSq χ i`** —
+  `characterEstimateData_of_family71_reduced_estimates` の **hi/hχ 直接入力形**。証明は
+  `letI := familyHypothesis71.fintypeL/invertibleL` で instance を pin → zetaNuRhoNormSq_ge の inner
+  form が chiRhoNormSq と **defeq** (両者 F.fintypeL instance、chiRhoCF は bridge 済) → そのまま返す。
+
+**instance 対処の要**: `chiRhoNormSq` は内部 `letI := F.fintypeL i` (=Fintype.ofFinite)、
+`zetaNuRhoNormSq_ge` は ambient `[Fintype ↥L_i]` binder。呼出時に `letI := familyHypothesis71.fintypeL i`
+で ambient を pin すれば両 inner が同一 instance → defeq。
+
+**残 (cont.²²+)**: card_G0_lower_bound (7.10) の `CharacterEstimateData` 完成に:
+- **hgood** (j≠i, j∉B: `(h_j−1)/(e_j h_j) ≤ P.chiRhoNormSq χ j`) — 同一 χ の j≠i での ρ-projection 下界。
+  hi と別ソース (7.3-type weak bound、`|A_j|/|L_j| ≤ ‖χ^{ρ_j}‖²`)。
+- **hBsum** (7.9 𝓑-sum: `∑_{j∈B}(h_j−1)/e_j ≤ e_i−1`) — 組合せ。
+- **min-index i** 選択 + **hG0sum** (χ signed irr ⟹ `one_le_G0_norm_sum_of_signed_irreducible`)。
+- これら + exists_chiRhoNormSq_ge の χ を `characterEstimateData_of_family71_reduced_estimates_of_signed_irreducible`
+  へ。χ = νζ_0 ∈ ZIrr かつ norm-1 ⟹ signed irr (5.9.a)。
