@@ -4,6 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 -/
 import OddOrder.Peterfalvi.S06_DadeIsometryCertain
 import OddOrder.Peterfalvi.S05_TICyclic
+import OddOrder.GroupTheory.ConjClassSet
 
 /-!
 # Peterfalvi Hypothesis (4.6): the certain-type Dade configuration in an ambient `G`
@@ -63,10 +64,12 @@ structure Hypothesis46 (A : Set G) (L : Subgroup G) [Fintype ↥L]
   A_covers : ∀ (hh : ↥L), hh ∈ subH → hh ≠ 1 →
     ∀ (x : ↥L), x ∈ Subgroup.centralizer ({hh} : Set ↥L) ⊓ toCertainTypeHypothesis.K →
       x ≠ 1 → (L.subtype x) ∈ A
-  /-- (4.6.d): the §4 Dade datum on the enlarged set `A₀ = A ∪ V^L`, where `V^L` is the set of
-  `L`-conjugates of the TI-subset `V` of (3.1). -/
+  /-- (4.6.d): the §4 Dade datum on the enlarged set `A₀ = A ∪ V^L`, where
+  `V^L = conjClassSetIn L tic.V` is the set of `L`-conjugates of the TI-subset `V` of (3.1)
+  (Coq `class_support`; the same closure the (8.10) `typePA0` uses, so the §10 instantiation
+  aligns definitionally). -/
   dade0 : OddOrder.Peterfalvi.S04.Hypothesis G
-    (A ∪ {g : G | ∃ l : G, l ∈ L ∧ ∃ v ∈ tic.V, g = l * v * l⁻¹}) L
+    (A ∪ OddOrder.GroupTheory.conjClassSetIn L tic.V) L
   /-- (4.6.e): the Dade isometry `τ` relative to `A₀`. -/
   tau : OddOrder.Peterfalvi.S04.FullDadeIsometryData (G := G) dade0
 
