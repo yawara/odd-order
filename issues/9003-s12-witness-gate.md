@@ -320,3 +320,32 @@ full build 3904 jobs / 1m58s green。
   S14_TypePCounting:1022/1882 周辺) — 実体特定が loop¹⁰³ の最初の仕事。
 - **type F + τ₂=∅ → Frobenius 化** (pin 結論の ∃U 部): 独自導出要 (~40 行、κ=∅ +
   π-分割で complement の f.p.f. 性; Coq FtypeP 系対応物の grep も)。
+
+## ✅ lane b 完了 (2026-07-03, loop¹⁰³) — BG 14.13(a) 全証明・axiom-clean
+
+`non_disjoint_signalizer_frobenius` (BG Lemma 14.13(a)) を **sorry-free + axiom-clean** で完成
+(commit chain 60da6782 → 65ac0c1a、新 leaf `S16_Lemma1413.lean`)。§8 type-I support pin の
+最後の 1 本。`#print axioms` = propext/Classical.choice/Quot.sound のみ。
+
+**構成 (4 部品、全 sorry-free)**:
+1. **reduction** (60da6782): signalizer neighbour `N`, 素数 `q ∈ σ(N)∩π(M)` (⟹ β(N)) と
+   `p = minFac(ord x) ∈ σ(M)∩τ₂(N)`; `N` 非共役 `M` (13.9 ⟹ q∉σ(M)); Q conj into N;
+   Cor 12.14 で `ℳ(C(Q))={Nᵍ}`; `p∉β(M)` (12.1(g))。+ `typeF_frobenius_of_tau2_prime_free`
+   (type-F + no-τ₂ ⟹ Frobenius over M_σ) + `beta_conj_smul_eq`/`pRank_conj_smul_eq`。
+   + P₂ case (σ=β via typeP_structure(g) ⇔ p∈σ∖β 矛盾)。
+2. **Part 2 no-τ₂** (6638beb4): `r_{p'}(N)≤1` (π(N)-partition + tau2_not_beta) → Cor 12.9
+   (`commutator_decomp_of_tau1_action`) で非共役 rank-1 `[A,Q]`,`C_A(Q)` → cyclic Sylow で
+   共役 → 矛盾。新 reusable `exists_conj_smul_eq_of_le_of_card_prime` (cyclic-Sylow で order-p
+   部分群は共役)。
+3. **Part 1 type-P₁** (65ac0c1a): dual partner `Mstar=Nᵍ` の `Kstar` が κ(Mstar)-Hall かつ
+   **σ(M)-Hall** ⟹ `p∈σ(M)∩π(Mstar)` で `p∈κ(Mstar)` (rank≤1) vs `r_p(Mstar)=2` 矛盾。
+   新 reusable `kstar_isHall_sigmaM_of_partner` (Coq `Ptype_embedding` の `sMhallKs`; 14.2(f)
+   `typeP_sigma_subgroup_le_Msigma` + Hall superset + σ-disjoint `⁅Y,K⁆≤M_σ⊓Mstar_σ=1`)。
+
+**§8 type-I support 系は全完了** ((8.13.a/b/c1c2/c2c4)/(8.14)/(8.15)/(8.17)/(8.18) + 14.13(a))。
+`escaping_sigma_disjoint_centralizer` (8.13.c2 core) の 14.13(a) 由来 sorryAx は解消。
+残る S10 real sorry 7 本は **type-II / type-P Dade-support obligation** (`typeII_A_sets_TI`
+/`typeII_A_sets_normalizer` (8.15 type-II)、`dadeSupportHypotheses_typeP`、`bgTheoremE_cover_data`、
+`hall_maxNilpotentNormalHall_and_mainSubgroup`、`typeI_or_typeII_centralizer_unique`、
+`escapingCentralizers_control`) = 別クラスタ (0096 carve-out の type-II 側)。次 loop¹⁰⁴ 候補。
+full build 3906 jobs green。
