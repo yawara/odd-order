@@ -4485,6 +4485,144 @@ theorem H_eq_U [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
       _hG Tdata Sdata hcaseB (nc.u_dvd_h _hG) hh_mod_p hh_mod_q
       (hyp.u_modEq_one_mod_q _hG) hx_ne_one_of_quotient
 
+/-- **Peterfalvi §8 / BG 15.7(a)**: the type-`P` Fitting core `P = S_F` is a TI-subgroup of `G`.
+`S` is type-`P₂` (`S_typeP2`), so `F(S)` is TI (`fittingIsTI_of_isTypeP2`), whence the Fitting core
+`S_F#` is TI (`maxNilpotentNormalHall_sharp_isTISubset_of_fittingIsTI`; `sharpSubgroup = ·∖{1}`
+matches `Subgroup.IsTI`).  Supplies the `P_isTI` field of `MHypothesis`. -/
+theorem base_P_isTI [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hyp : Hypothesis (G := G)) : Subgroup.IsTI hyp.base.P := by
+  rw [hyp.base.P_eq_SF]
+  exact OddOrder.BG.Ch4.S16.maxNilpotentNormalHall_sharp_isTISubset_of_fittingIsTI hG
+    hyp.base.S_maximal
+    (OddOrder.BG.Ch4.S15.fittingIsTI_of_isTypeP2 hG hyp.base.S_maximal hyp.base.S_typeP2)
+
+/-- **Peterfalvi §8, `T`-side**: the type-`P` Fitting core `Q = T_F` is a TI-subgroup of `G`.
+`T`-side dual of `base_P_isTI` via `fittingIsTI_T` (`T` type II ⟹ type-`P₂`).  Supplies the `Q_isTI`
+field of `MHypothesis`. -/
+theorem base_Q_isTI [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hyp : Hypothesis (G := G)) (hTII : IsTypeII hyp.base.T) : Subgroup.IsTI hyp.base.Q := by
+  rw [hyp.base.Q_eq_TF]
+  exact OddOrder.BG.Ch4.S16.maxNilpotentNormalHall_sharp_isTISubset_of_fittingIsTI hG
+    hyp.base.T_maximal (OddOrder.Peterfalvi.S15.fittingIsTI_T hG hyp.base hTII)
+
+/-- **Peterfalvi §13 `normalizer_V` (the `W`-exceptional-set normalizer)**: every nonempty
+`X ⊆ W − (W₁ ∪ W₂)` has `N_G(X) = W`.  Read off the S-side type-`P` data `Sdata.normalizer_V`
+((8.8) `W = W₁ × W₂` cyclic-TI structure), reconciled to the base `W`/`W₁`/`W₂`
+(`Sdata_W1_eq`/`Sdata_W2_eq`, `W_eq_join`).  Supplies `MHypothesis`'s `W_normalizer_V`. -/
+theorem base_W_normalizer_V (hyp : Hypothesis (G := G)) :
+    ∀ X : Set G, X.Nonempty →
+      X ⊆ (hyp.base.W : Set G) \ ((hyp.base.W1 : Set G) ∪ (hyp.base.W2 : Set G)) →
+      Subgroup.normalizer X = hyp.base.W := by
+  have hWeq : hyp.base.Sdata.W = hyp.base.W := by
+    rw [hyp.base.Sdata.W_eq, hyp.base.Sdata_W1_eq, hyp.base.Sdata_W2_eq]
+    exact hyp.base.W_eq_join.symm
+  intro X hX hXsub
+  rw [← hWeq]
+  refine hyp.base.Sdata.normalizer_V X hX ?_
+  rw [hWeq, hyp.base.Sdata_W1_eq, hyp.base.Sdata_W2_eq]
+  exact hXsub
+
+/-- **Order factorization of the type-`P` maximal `S`**: `|P| · |U| · |W₁| = |S|`
+(`S = (P ⋊ U) ⋊ W₁`, `P = S_F`, `S' = P ⋊ U`).  From the `Sdata` complement indices
+`card_W1_eq_derived_index` (`|W₁| = [S:S']`) and `card_U_eq_index` (`|U| = [S':P]`) via
+`Subgroup.card_mul_index`. -/
+theorem base_card_S_eq [Finite G] (hyp : Hypothesis (G := G)) :
+    Nat.card ↥hyp.base.P * Nat.card ↥hyp.base.U * Nat.card ↥hyp.base.W1
+      = Nat.card ↥hyp.base.S := by
+  have hW1 : Nat.card ↥hyp.base.W1 = Nat.card ↥hyp.base.Sdata.W1 := by rw [hyp.base.Sdata_W1_eq]
+  have hU : Nat.card ↥hyp.base.U = Nat.card ↥hyp.base.Sdata.U := by rw [hyp.base.Sdata_U_eq]
+  have hP : hyp.base.P = maxNilpotentNormalHall hyp.base.S := hyp.base.P_eq_SF
+  have hDle : derivedInG hyp.base.S ≤ hyp.base.S := Subgroup.map_subtype_le _
+  have hPle : maxNilpotentNormalHall hyp.base.S ≤ derivedInG hyp.base.S := by
+    rw [hyp.base.S_deriv_eq_PU, ← hP]; exact le_sup_left
+  have c1 : Nat.card ↥(derivedInG hyp.base.S) * Nat.card ↥hyp.base.Sdata.W1
+      = Nat.card ↥hyp.base.S := by
+    rw [hyp.base.Sdata.card_W1_eq_derived_index,
+      ← Nat.card_congr (Subgroup.subgroupOfEquivOfLe hDle).toEquiv]
+    exact Subgroup.card_mul_index _
+  have c2 : Nat.card ↥(maxNilpotentNormalHall hyp.base.S) * Nat.card ↥hyp.base.Sdata.U
+      = Nat.card ↥(derivedInG hyp.base.S) := by
+    rw [hyp.base.Sdata.card_U_eq_index,
+      ← Nat.card_congr (Subgroup.subgroupOfEquivOfLe hPle).toEquiv]
+    exact Subgroup.card_mul_index _
+  rw [hW1, hU, hP, ← c1, ← c2]
+
+/-- **Peterfalvi (14.11.4)**: `|N_G(P)| = |P| · u · q`.  The Fitting core `P = S_F` is normal in
+the maximal `S` and nontrivial (`W₂ ≤ P`), so `N_G(P) = S`
+(`normalizer_eq_self_of_subgroupOf_normal_of_ne_bot`); then `|S| = |P|·|U|·|W₁|` (`base_card_S_eq`)
+with `|U| = u·c`, `c = 1` (`S15.c_eq_one`), `|W₁| = q`.  Supplies `MHypothesis`'s
+`card_normalizer_P_eq`. -/
+theorem base_card_normalizer_P_eq [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hyp : Hypothesis (G := G)) :
+    Nat.card ↥(Subgroup.normalizer (hyp.base.P : Set G))
+      = Nat.card ↥hyp.base.P * hyp.base.u * hyp.base.q := by
+  have hPne : maxNilpotentNormalHall hyp.base.S ≠ ⊥ := by
+    intro hbot
+    have hW2 := OddOrder.Peterfalvi.S15.W2_le_P hG hyp.base
+    rw [hyp.base.P_eq_SF, hbot, le_bot_iff] at hW2
+    have hp1 : hyp.base.p = 1 := by rw [hyp.base.p_eq_card_W2, hW2, Subgroup.card_bot]
+    exact hyp.base.p_prime.one_lt.ne' hp1
+  have hNP : Subgroup.normalizer (hyp.base.P : Set G) = hyp.base.S := by
+    rw [hyp.base.P_eq_SF]
+    exact OddOrder.BG.Ch4.S16.normalizer_eq_self_of_subgroupOf_normal_of_ne_bot hG
+      hyp.base.S_maximal (OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_le _)
+      (OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_subgroupOf_normal _) hPne
+  rw [hNP, ← base_card_S_eq hyp, hyp.base.card_U_eq_uc,
+    OddOrder.Peterfalvi.S15.c_eq_one hG hyp.base, mul_one, hyp.base.q_eq_card_W1]
+
+/-- **Order factorization of the type-`P` maximal `T`** (T-side dual of `base_card_S_eq`):
+`|Q| · |V| · |W₂| = |T|`, from a reconciled `TypePData T` (`tpd.U = V`, `tpd.W1 = W₂`, `Q = T_F`)
+via `card_W1_eq_derived_index` / `card_U_eq_index` and `Subgroup.card_mul_index`. -/
+theorem base_card_T_eq [Finite G] (hyp : Hypothesis (G := G))
+    (tpd : OddOrder.GroupTheory.TypePData hyp.base.T) (hU : tpd.U = hyp.base.V)
+    (hW1 : tpd.W1 = hyp.base.W2) :
+    Nat.card ↥hyp.base.Q * Nat.card ↥hyp.base.V * Nat.card ↥hyp.base.W2
+      = Nat.card ↥hyp.base.T := by
+  have hW2c : Nat.card ↥hyp.base.W2 = Nat.card ↥tpd.W1 := by rw [hW1]
+  have hVc : Nat.card ↥hyp.base.V = Nat.card ↥tpd.U := by rw [hU]
+  have hQ : hyp.base.Q = maxNilpotentNormalHall hyp.base.T := hyp.base.Q_eq_TF
+  have hDle : derivedInG hyp.base.T ≤ hyp.base.T := Subgroup.map_subtype_le _
+  have hQle : maxNilpotentNormalHall hyp.base.T ≤ derivedInG hyp.base.T := by
+    rw [hyp.base.T_deriv_eq_QV, ← hQ]; exact le_sup_left
+  have c1 : Nat.card ↥(derivedInG hyp.base.T) * Nat.card ↥tpd.W1 = Nat.card ↥hyp.base.T := by
+    rw [tpd.card_W1_eq_derived_index, ← Nat.card_congr (Subgroup.subgroupOfEquivOfLe hDle).toEquiv]
+    exact Subgroup.card_mul_index _
+  have c2 : Nat.card ↥(maxNilpotentNormalHall hyp.base.T) * Nat.card ↥tpd.U
+      = Nat.card ↥(derivedInG hyp.base.T) := by
+    rw [tpd.card_U_eq_index, ← Nat.card_congr (Subgroup.subgroupOfEquivOfLe hQle).toEquiv]
+    exact Subgroup.card_mul_index _
+  rw [hW2c, hVc, hQ, ← c1, ← c2]
+
+/-- **Peterfalvi (14.11.4)**: `|N_G(Q)| = |Q| · v · p` (T-side dual of `base_card_normalizer_P_eq`).
+`Q = T_F` is normal in the maximal `T` and nontrivial (`W₁ ≤ Q`), so `N_G(Q) = T`; then
+`|T| = |Q|·|V|·|W₂|` (`base_card_T_eq`) with `|V| = v·d`, `d = 1` (`V_inf_centralizer_Q_eq_bot`,
+`D = V ⊓ C_G(Q) = ⊥`), `|W₂| = p`.  Supplies `MHypothesis`'s `card_normalizer_Q_eq`. -/
+theorem base_card_normalizer_Q_eq [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hyp : Hypothesis (G := G)) (hTII : IsTypeII hyp.base.T) :
+    Nat.card ↥(Subgroup.normalizer (hyp.base.Q : Set G))
+      = Nat.card ↥hyp.base.Q * hyp.base.v * hyp.base.p := by
+  obtain ⟨tpd, hU, hW1, hW2⟩ := OddOrder.Peterfalvi.S15.reconciled_typePData_T hG hyp.base
+  have hQne : maxNilpotentNormalHall hyp.base.T ≠ ⊥ := by
+    intro hbot
+    have hW1le : hyp.base.W1 ≤ maxNilpotentNormalHall hyp.base.T := by
+      rw [← hW2]
+      exact le_trans tpd.W2_le (le_trans inf_le_left (le_of_eq tpd.H_eq))
+    rw [hbot, le_bot_iff] at hW1le
+    have hq1 : hyp.base.q = 1 := by rw [hyp.base.q_eq_card_W1, hW1le, Subgroup.card_bot]
+    exact hyp.base.q_prime.one_lt.ne' hq1
+  have hNQ : Subgroup.normalizer (hyp.base.Q : Set G) = hyp.base.T := by
+    rw [hyp.base.Q_eq_TF]
+    exact OddOrder.BG.Ch4.S16.normalizer_eq_self_of_subgroupOf_normal_of_ne_bot hG
+      hyp.base.T_maximal (OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_le _)
+      (OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_subgroupOf_normal _) hQne
+  have hd1 : hyp.base.d = 1 := by
+    have hDbot : hyp.base.D = ⊥ := by
+      rw [hyp.base.D_eq]
+      exact OddOrder.Peterfalvi.S15.V_inf_centralizer_Q_eq_bot hG hyp.base hTII
+    rw [hyp.base.d_eq_card_D, hDbot, Subgroup.card_bot]
+  rw [hNQ, ← base_card_T_eq hyp tpd hU hW1, hyp.base.card_V_eq_vd, hd1, mul_one,
+    hyp.base.p_eq_card_W2]
+
 open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
 open OddOrder.Peterfalvi.S09 in
 open OddOrder.Peterfalvi.S09.Cert in
@@ -4507,8 +4645,10 @@ theorem exists_M_hypothesis78 [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
       M ∈ maximalSubgroups G ∧
         Subgroup.normalizer (hyp.base.V : Set G) ≤ M ∧
           ((maxNilpotentNormalHall M).subgroupOf M).index = hyp.base.p * hyp.base.q ∧
-          Nonempty (OddOrder.Peterfalvi.S09.Hypothesis78 G
-            (OddOrder.GroupTheory.typeIA M typeIHyp.typeI) M) := by
+          ∃ h78 : OddOrder.Peterfalvi.S09.Hypothesis78 G
+              (OddOrder.GroupTheory.typeIA M typeIHyp.typeI) M,
+            h78.hyp76.H = maxNilpotentNormalHall M ∧
+              h78.hyp76.hyp71.hyp = typeIHyp.dadeData.dade := by
   classical
   obtain ⟨vdata, _hker, _hVH⟩ :=
     OddOrder.Peterfalvi.S15.typeII_overNormalizer_frobenius_V hG hyp.base hTII
@@ -4595,7 +4735,7 @@ theorem exists_M_hypothesis78 [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
   refine ⟨hypothesis78OfDade typeIHyp.toHypothesis71
     (typeIHyp.dadeData.dade.fullDadeIsometryData typeIHyp.hconj).toDadeIsometryData.isDadeIsometry
     typeIHyp.typeI.typeF.H hHL hHnorm hAH θ hinj hcover d psi_support hdeg ind1H hind1H htriv
-    hdeg_match coh.extension ?_ ?_⟩
+    hdeg_match coh.extension ?_ ?_, ?_, rfl⟩
   · intro i j hi hj
     exact coherence_extension_inner_eq_on_family coh (hSmem i hi) (hSmem j hj)
   · intro i _ hi_ind
@@ -4603,6 +4743,7 @@ theorem exists_M_hypothesis78 [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     exact coherence_hagree_dadeMap typeIHyp.dadeData.dade typeIHyp.hconj coh
       (hSmem i hi_ind) (hSmem 0 (Ne.symm hind1H)) (m0 := 1) (mi := deg_i) (by norm_num)
       (by rw [hd i, hdeg_i_eq, Nat.cast_one, div_one]) (psi_support i)
+  · exact typeIHyp.typeI.typeF.H_eq
 
 /-- **Peterfalvi (14.10)**: a type-I maximal subgroup `M` over `N_G(V)` together
 with its Dade data exists.  Symmetric to `exists_LHypothesis`, packaging (13.17)

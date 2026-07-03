@@ -1302,3 +1302,32 @@ issue 3002、tractable work 続行):
 - **次**: (a) `exists_MHypothesis` へ wire (h78=exists_M_hypothesis78・structural=同・σ counts=P/Q_isTI/
   card_normalizer・betaGrid+betaM は Track A gated ゆえ sorried sub-obligation に isolate)。(b) Track A
   grid carrier の cross-lane threading (issue 3002、lane a 協調)。
+
+### cont.⁴⁷ (2026-07-03 lane c=γ /loop ×5): exists_MHypothesis の grid-independent σ-counting helper 群 完成 + assembly 残 obligation の精密分解
+
+**σ-counting + h78 helper 群 完成** (全 S16、sorry-free body、grid-independent):
+- `exists_M_hypothesis78` (h78 = V-side M-coherence、`witness_L_hypothesis78` の dual)。
+- `base_P_isTI`/`base_Q_isTI` (P/Q = S_F/T_F は TI-subgroup、`fittingIsTI_of_isTypeP2` +
+  `maxNilpotentNormalHall_sharp_isTISubset_of_fittingIsTI` bridge)。
+- `base_W_normalizer_V` (W-exceptional-set normalizer = W、`Sdata.normalizer_V`)。
+- `base_card_S_eq`/`base_card_T_eq` (|P|·|U|·|W₁|=|S| / |Q|·|V|·|W₂|=|T|、complement index 分解)。
+- `base_card_normalizer_P_eq`/`base_card_normalizer_Q_eq` (|N_G(P)|=|P|·u·q / |N_G(Q)|=|Q|·v·p、
+  N_G(fitting)=maximal + 分解 + c/d=1)。P-side は c_eq_one、Q-side は reconciled_typePData_T +
+  V_inf_centralizer_Q_eq_bot 由来 sorryAx (legitimate sorried-cite)。
+
+**assembly-feasibility 精査で判明した残 exists_MHypothesis obligation** (deep multi-session):
+MHypothesis (S16:1595) の 35 field のうち σ-counting/structural (∼15) は上記 helper + exists_M_hypothesis78 で
+供給可。残:
+1. **h78 concrete 化**: exists_M_hypothesis78 は現 `Nonempty (Hypothesis78)` を返す → assembly には
+   concrete h78 + compat facts (`h78.hyp76.H = K` = maxNilp M、`h78.hyp76.hyp71.hyp = typeIHyp.dadeData.dade`)
+   を expose する強化が必要 (hypothesis78OfDade は hyp76.H:=H arg・hyp71:=H71 を設定 → rfl 近い見込み)。
+2. **coherence-image (tau1/psi/Mset)**: `h78.nu : ClassFunction L →ₗ[ℤ] ClassFunction G` (=coh.extension) は
+   **IntegralCharacterMap でない** → `tau1 : S07.IntegralCharacterMap` を h78.nu (isometry) から構成する必要
+   (psi_tau1_eq/psi_tau1_norm_one)。psi := `h78.hyp76.zeta h78.zetaDistinct`、psi_degree=pq 要確認。deep。
+3. **G0 系**: G0 := (14.11.3) 集合 `G−[Ã(M)∪(W−(W₁∪W₂))^G∪(P#)^G∪(Q#)^G]`。off_dadeSupport は定義的、
+   **orbit_cover は deep §8 TI-counting**。
+4. **betaGrid/betaSigns**: (13.1.d) η-grid 展開 = **Track A gated** (honest η-grid 要、issue 3002)。
+5. **norm estimate** `h78_zetaNuRho_normSq_ge`: h78.NormEstimates + smallIndex (2pq+1≤k)。
+
+⟹ 次 iteration は (1) exists_M_hypothesis78 強化 → (2) tau1 構成 の順で assembly を進める (betaGrid は Track A
+sorried isolate)。σ-counting は harvested、残は deep-coherence + Track A。
