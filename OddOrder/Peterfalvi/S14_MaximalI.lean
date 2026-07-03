@@ -5505,10 +5505,30 @@ theorem psi_constant_on_xK [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
       ClassFunction.inner dade.psi α = 0 := by
     sorry
   have hxM : witness.x ∈ ctr.M := ctr.P0_le_M witness.x_mem_P0
-  -- `x ∉ K`: nontrivial `p`-element, `p ∤ |K|`.
+  -- `x ∉ K`: nontrivial `p`-element, `p ∤ |K|` (K = M_F is the `p'`-Hall since `p ∣ [M:M_F]`).
   have hxK : witness.x ∉ hypM.H := by
     rw [hHK]
-    sorry
+    intro hxmem
+    haveI : Fact ctr.p.Prime := ⟨ctr.p_prime⟩
+    have hord : orderOf witness.x = ctr.p :=
+      orderOf_eq_prime witness.x_mem_omega1 witness.x_ne_one
+    -- `p = orderOf x ∣ |K|`.
+    have hpK : ctr.p ∣ Nat.card ↥ctr.K := by
+      have hd := orderOf_dvd_natCard (⟨witness.x, hxmem⟩ : ↥ctr.K)
+      have he : orderOf (⟨witness.x, hxmem⟩ : ↥ctr.K) = ctr.p := by
+        rw [← hord]
+        exact (orderOf_injective ctr.K.subtype ctr.K.subtype_injective _).symm
+      rwa [he] at hd
+    -- `Coprime |K| [M:K]` (Hall) and `p ∣ [M:K]` ⟹ contradiction.
+    have hKleM : ctr.K ≤ ctr.M :=
+      ctr.K_eq_MF ▸ OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_le ctr.M
+    have hcard : Nat.card ↥(ctr.K.subgroupOf ctr.M) = Nat.card ↥ctr.K :=
+      Nat.card_congr (Subgroup.subgroupOfEquivOfLe hKleM).toEquiv
+    have hcop : Nat.Coprime (Nat.card ↥ctr.K) (ctr.K.relIndex ctr.M) := by
+      have h := (OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_isHall ctr.M).coprime_index
+      rw [← ctr.K_eq_MF, hcard] at h
+      rwa [Subgroup.relIndex]
+    exact Nat.Prime.not_dvd_one ctr.p_prime (hcop ▸ Nat.dvd_gcd hpK ctr.p_dvd_index)
   intro g hg
   exact orthogonal_character_constant_on_coset hG hypM data_M horth hxM hxK g (hHK ▸ hg)
 
