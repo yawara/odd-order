@@ -1194,10 +1194,55 @@ theorem escaping_typeIA_mem_A1 [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G
   rw [hA1]
   exact hσ
 
-/-- **Peterfalvi (8.12.b), single-point form** (pin; BG §16 Theorem B): for type-I `T` and
-`x ∈ T` of order coprime to `|T_F|` centralizing a nontrivial element of `T_F`, `T` is the unique
-maximal subgroup containing `C_G(x)`.  (The Hall-conjugacy move of `x` into a complement is
-absorbed into the pin.) -/
+/-- Conjugation transports the centralizer of a singleton:
+`g · C_G(a) · g⁻¹ = C_G(g a g⁻¹)` (local copy of the S12/S14 helper; pure group theory). -/
+private theorem conj_smul_centralizer_singleton' (g a : G) :
+    MulAut.conj g • Subgroup.centralizer ({a} : Set G)
+      = Subgroup.centralizer ({g * a * g⁻¹} : Set G) := by
+  ext y
+  rw [Subgroup.mem_pointwise_smul_iff_inv_smul_mem, Subgroup.mem_centralizer_iff,
+      Subgroup.mem_centralizer_iff]
+  have hinv : (MulAut.conj g)⁻¹ • y = g⁻¹ * y * g := by
+    rw [← map_inv, MulAut.smul_def, MulAut.conj_apply, inv_inv]
+  simp only [Set.mem_singleton_iff, forall_eq, hinv]
+  constructor
+  · intro h
+    calc g * a * g⁻¹ * y
+        = g * (a * (g⁻¹ * y * g)) * g⁻¹ := by group
+      _ = g * (g⁻¹ * y * g * a) * g⁻¹ := by rw [h]
+      _ = y * (g * a * g⁻¹) := by group
+  · intro h
+    calc a * (g⁻¹ * y * g)
+        = g⁻¹ * (g * a * g⁻¹ * y) * g := by group
+      _ = g⁻¹ * (y * (g * a * g⁻¹)) * g := by rw [h]
+      _ = g⁻¹ * y * g * a := by group
+
+/-- The centralizer of the cyclic subgroup `⟨z⟩` is the centralizer of `z` (powers commute). -/
+private theorem centralizer_zpowers_eq_singleton' (z : G) :
+    Subgroup.centralizer ((Subgroup.zpowers z : Subgroup G) : Set G)
+      = Subgroup.centralizer ({z} : Set G) := by
+  ext c
+  simp only [Subgroup.mem_centralizer_iff]
+  constructor
+  · intro hc y hy
+    rw [Set.mem_singleton_iff] at hy
+    rw [hy]
+    exact hc z (SetLike.mem_coe.mpr (Subgroup.mem_zpowers z))
+  · intro hc y hy
+    obtain ⟨n, rfl⟩ := Subgroup.mem_zpowers_iff.mp (SetLike.mem_coe.mp hy)
+    have hzc : Commute z c := hc z (Set.mem_singleton z)
+    exact (hzc.zpow_left n).eq
+
+/-- **Peterfalvi (8.12.b), single-point form**: for type-I `T` and `x ∈ T` of order coprime to
+`|T_F|` centralizing a nontrivial element of `T_F`, `T` is the unique maximal subgroup
+containing `C_G(x)`.
+
+BG §16 Theorem B, centralizer clause (`theoremB_U_and_A_tame`, conjunct 4), reached through the
+Hall-conjugacy move: `x` is a `(κ ∪ σ)′`-element of the solvable `T` (its order is coprime to
+`|T_F| = |M_σ|`), so Hall D/C (`hall_D`/`hall_C`) conjugate `⟨x⟩` into the type-`F` complement
+`U` by some `t ∈ T`; the conjugated witness keeps `M_σ ⊓ C_G(⟨t x t⁻¹⟩) ≠ ⊥`, so Theorem B pins
+`ℳ(C_G(t x t⁻¹)) = {T}`, and conjugating back by `t ∈ T` (which fixes `T`) gives both
+conjuncts for `x`. -/
 theorem typeI_centralizer_le_and_unique [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     {T : Subgroup G} (hT : T ∈ maximalSubgroups G) (dT : TypeIData T)
     {x : G} (hxT : x ∈ T) (hx1 : x ≠ 1)
@@ -1205,7 +1250,133 @@ theorem typeI_centralizer_le_and_unique [Finite G] (hG : OddOrder.BG.IsMinimalSi
     (hwit : ∃ h ∈ maxNilpotentNormalHall T, h ≠ 1 ∧ Commute x h) :
     Subgroup.centralizer ({x} : Set G) ≤ T ∧
       ∀ L ∈ maximalSubgroups G, Subgroup.centralizer ({x} : Set G) ≤ L → L = T := by
-  sorry
+  classical
+  haveI : IsSolvable ↥T := hG.solvable_of_mem_maximalSubgroups hT
+  have hκ : OddOrder.BG.Ch4.S14.kappa T = ∅ :=
+    (OddOrder.Peterfalvi.S10Interface.isTypeI_iff_isTypeF hG hT).mp ⟨dT⟩
+  have hMFMσ : maxNilpotentNormalHall T = OddOrder.BG.Ch3.S10.Msigma T :=
+    OddOrder.Peterfalvi.S10Interface.maxNilpotentNormalHall_eq_Msigma_of_typeI_or_II
+      hG hT (Or.inl ⟨dT⟩)
+  -- (i) `x` is a `(κ ∪ σ)′`-element of `T`.
+  set xT : ↥T := ⟨x, hxT⟩ with hxTdef
+  have hordeq : orderOf x = orderOf xT :=
+    orderOf_injective T.subtype T.subtype_injective xT
+  have hZπ : ∀ q ∈ (Nat.card ↥(Subgroup.zpowers xT)).primeFactors,
+      q ∈ (OddOrder.BG.Ch4.S14.kappa T ∪ OddOrder.BG.Ch3.S10.sigma T)ᶜ := by
+    intro q hq
+    rw [Nat.card_zpowers, ← hordeq] at hq
+    obtain ⟨hqp, hqdvd, -⟩ := Nat.mem_primeFactors.mp hq
+    simp only [Set.mem_compl_iff, Set.mem_union, hκ, Set.mem_empty_iff_false, false_or]
+    intro hqσ
+    -- `q ∈ σ(T)` divides `|M_σ| = |T_F|`, contradicting the coprimality with `orderOf x`.
+    have hHall := OddOrder.BG.Ch3.S10.Msigma_isHall hG hT
+    have hqnidx : ¬ q ∣ (OddOrder.BG.Ch3.S10.Msigma T).index := fun hdvd =>
+      hHall.2 q (Nat.mem_primeFactors.mpr ⟨hqp, hdvd, Subgroup.index_ne_zero_of_finite⟩) hqσ
+    have hqG : q ∣ Nat.card G := hqdvd.trans ((orderOf_dvd_natCard x).trans dvd_rfl)
+    have hqMσ : q ∣ Nat.card (OddOrder.BG.Ch3.S10.Msigma T) := by
+      rcases (Nat.Prime.dvd_mul hqp).mp
+        ((Subgroup.card_mul_index (OddOrder.BG.Ch3.S10.Msigma T)) ▸ hqG) with h | h
+      · exact h
+      · exact absurd h hqnidx
+    have hgcd : q ∣ Nat.gcd (orderOf x) (Nat.card (maxNilpotentNormalHall T)) :=
+      Nat.dvd_gcd hqdvd (hMFMσ ▸ hqMσ)
+    rw [Nat.Coprime.gcd_eq_one hord] at hgcd
+    exact hqp.one_lt.ne' (Nat.dvd_one.mp hgcd)
+  -- (ii) Hall D + C inside `T`: conjugate `x` into the type-`F` complement `U`.
+  obtain ⟨W, hWhall, hZW⟩ := OddOrder.Isaacs.Ch03.hall_D (G := ↥T) hZπ
+  obtain ⟨t, htmap⟩ := OddOrder.Isaacs.Ch03.hall_C (G := ↥T) hWhall
+    (typeF_complement_isHall_kappa_sigma_compl hG hT dT)
+  set τ : G := (t : G) with hτdef
+  have hτT : τ ∈ T := t.2
+  set x' : G := τ * x * τ⁻¹ with hx'def
+  have hx'U : x' ∈ dT.typeF.U := by
+    have hxW : xT ∈ W := hZW (Subgroup.mem_zpowers xT)
+    have hmem : (MulAut.conj t) xT ∈ W.map (MulAut.conj t).toMonoidHom :=
+      ⟨xT, hxW, rfl⟩
+    rw [htmap] at hmem
+    have := Subgroup.mem_subgroupOf.mp hmem
+    simpa [hx'def, hτdef, MulAut.conj_apply] using this
+  have hx'1 : x' ≠ 1 := by
+    simp only [hx'def, ne_eq, conj_eq_one_iff]
+    exact hx1
+  -- (iii) the conjugated witness keeps `M_σ ⊓ C_G(⟨x'⟩) ≠ ⊥`.
+  obtain ⟨h, hhMF, hh1, hcomm⟩ := hwit
+  have hMFle := OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_le T
+  have hh'MF : τ * h * τ⁻¹ ∈ maxNilpotentNormalHall T := by
+    haveI hnorm := OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_subgroupOf_normal T
+    have hmem : (⟨h, hMFle hhMF⟩ : ↥T) ∈ (maxNilpotentNormalHall T).subgroupOf T :=
+      Subgroup.mem_subgroupOf.mpr hhMF
+    have := Subgroup.mem_subgroupOf.mp (hnorm.conj_mem _ hmem t)
+    simpa [hτdef] using this
+  have hh'1 : τ * h * τ⁻¹ ≠ 1 := by
+    simp only [ne_eq, conj_eq_one_iff]
+    exact hh1
+  have hcomm' : Commute x' (τ * h * τ⁻¹) := by
+    have := hcomm.map (MulAut.conj τ : G →* G)
+    simpa [hx'def, MulAut.conj_apply] using this
+  have hCne : OddOrder.BG.Ch3.S10.Msigma T ⊓
+      Subgroup.centralizer ((Subgroup.zpowers x' : Subgroup G) : Set G) ≠ ⊥ := by
+    intro hbot
+    have hmem : τ * h * τ⁻¹ ∈ OddOrder.BG.Ch3.S10.Msigma T ⊓
+        Subgroup.centralizer ((Subgroup.zpowers x' : Subgroup G) : Set G) := by
+      refine Subgroup.mem_inf.mpr ⟨hMFMσ ▸ hh'MF, ?_⟩
+      rw [centralizer_zpowers_eq_singleton']
+      exact Subgroup.mem_centralizer_iff.mpr fun z hz => by
+        rw [Set.mem_singleton_iff] at hz
+        subst hz
+        exact hcomm'.eq
+    rw [hbot] at hmem
+    exact hh'1 (Subgroup.mem_bot.mp hmem)
+  -- (iv) Theorem B pins `ℳ(C_G(x')) = {T}`.
+  have hB := (OddOrder.BG.Ch4.S16.theoremB_U_and_A_tame hG hT
+    (typeF_complement_isHall_kappa_sigma_compl hG hT dT)).2.2.2.1
+    (Subgroup.zpowers x') (Subgroup.zpowers_le.mpr hx'U)
+    (by simpa [Subgroup.zpowers_eq_bot] using hx'1) hCne
+  rw [centralizer_zpowers_eq_singleton'] at hB
+  -- (v) conjugate back by `τ ∈ T`.
+  have hCconj : Subgroup.centralizer ({x'} : Set G)
+      = MulAut.conj τ • Subgroup.centralizer ({x} : Set G) :=
+    (conj_smul_centralizer_singleton' τ x).symm
+  have hconj_self : ∀ g ∈ T, MulAut.conj g • T = T := by
+    intro g hg
+    ext z
+    rw [Subgroup.mem_pointwise_smul_iff_inv_smul_mem]
+    have hinv : (MulAut.conj g)⁻¹ • z = g⁻¹ * z * g := by
+      rw [← map_inv, MulAut.smul_def, MulAut.conj_apply, inv_inv]
+    rw [hinv]
+    constructor
+    · intro hz
+      have := mul_mem (mul_mem hg hz) (inv_mem hg)
+      simpa [mul_assoc] using this
+    · intro hz
+      exact mul_mem (mul_mem (inv_mem hg) hz) hg
+  have hTmem : T ∈ maximalSubgroupsContaining (Subgroup.centralizer ({x'} : Set G)) := by
+    rw [hB]
+    rfl
+  have hCT' : Subgroup.centralizer ({x'} : Set G) ≤ T :=
+    (mem_maximalSubgroupsContaining.mp hTmem).2
+  constructor
+  · -- `C_G(x) ≤ T`
+    intro c hc
+    have hc' : τ * c * τ⁻¹ ∈ Subgroup.centralizer ({x'} : Set G) := by
+      rw [hCconj]
+      exact ⟨c, hc, rfl⟩
+    have hcT : τ * c * τ⁻¹ ∈ T := hCT' hc'
+    have := mul_mem (mul_mem (inv_mem hτT) hcT) hτT
+    simpa [mul_assoc] using this
+  · -- uniqueness
+    intro L hL hCL
+    have hLconj : MulAut.conj τ • L ∈
+        maximalSubgroupsContaining (Subgroup.centralizer ({x'} : Set G)) := by
+      rw [mem_maximalSubgroupsContaining]
+      refine ⟨OddOrder.BG.Ch3.S12.isCoatom_conj_smul (mem_maximalSubgroups.mp hL), ?_⟩
+      rw [hCconj]
+      exact Subgroup.pointwise_smul_le_pointwise_smul_iff.mpr hCL
+    rw [hB, Set.mem_singleton_iff] at hLconj
+    calc L = MulAut.conj τ⁻¹ • (MulAut.conj τ • L) := by
+            rw [← mul_smul, ← map_mul, inv_mul_cancel, map_one, one_smul]
+      _ = MulAut.conj τ⁻¹ • T := by rw [hLconj]
+      _ = T := hconj_self τ⁻¹ (inv_mem hτT)
 
 /-- **Peterfalvi (8.13.c2/c4) cross-coprimality under support** (pin): if some escaping point of
 `A(S)` has its centralizer inside a conjugate of `T`, then `T` "supports" `S` and `|T_σ|` is
