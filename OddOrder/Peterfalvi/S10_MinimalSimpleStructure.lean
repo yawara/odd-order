@@ -1918,14 +1918,9 @@ theorem dadeSupportHypotheses_typeP [Fintype G] [Finite G]
     Nonempty (DadeSupportHypothesisData M (typePA0 M data)) ∧
       Nonempty (DadeSupportHypothesisData M (typePA M data)) ∧
         Nonempty (DadeSupportHypothesisData M (A1 M tau)) := by
-  refine ⟨?_, ?_, ?_⟩
-  · -- `A_0(M) = A(M) ∪ (V ∖ (W₁∪W₂))^M`: the exceptional `V^M` component is a separate obligation.
-    sorry
-  · -- `A(M) = (M')^#`: for `P₁`, `= M_σ^#` (`typePA_eq_sigmaSharp_of_isTypeP1`, engine below);
-    -- for `P₂`, `M_σ ⊊ M'` and escaping points reduce to `A_1` by the type-`P` (8.13.b)
-    -- `escaping_typePA_mem_A1` — a separate deeper obligation.
-    sorry
-  · -- `A_1(M) = M_σ^#` for every type (`A1_eq_sigmaSharp`): the `σ`-sharp Dade engine applies.
+  -- The `A_1(M) = M_σ^#` datum (all types, `A1_eq_sigmaSharp`) via the `σ`-sharp Dade engine.
+  -- Reused for `A_1(M)` and — since `A(M) = M_σ^#` for `P₁` — the type-`P₁` case of `A(M)`.
+  have hA1 : Nonempty (DadeSupportHypothesisData M (A1 M tau)) := by
     refine dadeSupportHypothesisData_of_subset_sigmaSharp hG hM
       (OddOrder.BG.Ch4.S16.A1_eq_sigmaSharp hG hM hType).subset ?_ ?_
     · obtain ⟨a, ha1⟩ := Subgroup.ne_bot_iff_exists_ne_one.mp
@@ -1940,6 +1935,17 @@ theorem dadeSupportHypotheses_typeP [Fintype G] [Finite G]
       have h2 := A1_conj_mem M tau (inv_mem hm) h
       have h3 : m⁻¹ * (m * x * m⁻¹) * m⁻¹⁻¹ = x := by group
       rwa [h3] at h2
+  refine ⟨?_, ?_, hA1⟩
+  · -- `A_0(M) = A(M) ∪ (V ∖ (W₁∪W₂))^M`: the exceptional `V^M` component is a separate obligation.
+    sorry
+  · -- `A(M) = (M')^#`.  For `P₁`, `A(M) = M_σ^# = A_1(M)` (`typePA_eq_sigmaSharp_of_isTypeP1`
+    -- + `A1_eq_sigmaSharp`), so the `A_1` datum transports directly.  For `P₂` (`M_σ ⊊ M'`),
+    -- escaping points reduce to `A_1` by the type-`P` (8.13.b) `escaping_typePA_mem_A1` — deeper.
+    by_cases hP1 : OddOrder.BG.Ch4.S14.IsTypeP1 M
+    · rw [typePA_eq_sigmaSharp_of_isTypeP1 hG hM data hP1,
+        ← OddOrder.BG.Ch4.S16.A1_eq_sigmaSharp hG hM hType]
+      exact hA1
+    · sorry
 
 /-! ### (8.17.c) bridge: the faithful thickened `A₁`-support is the BG `M̃`-cover
 

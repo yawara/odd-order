@@ -258,3 +258,59 @@ signature 明記の genuine deep obligation。
 typePA=M_σ#、但し `dadeSupportHypotheses_typeP` は tau 一般ゆえ P1 特化には型分岐が要る — data から P1/P2
 を判定して分岐)。(b) **type-P (8.13.b) `escaping_typePA_mem_A1`** (P2-typePA/typePA0 の escaping 還元)。
 (c) **typePA0 の V^M 成分**。engine が完成した今、残りは type-P 固有の support 幾何 ((8.13.b) + V^M)。
+
+### loop¹¹⁹ cont. — P1-typePA も engine で discharge (frontier (a) 完了)
+
+A₁ datum を `have hA1` に抽出 (A₁ bullet + P1-typePA で再利用)。**typePA の P₁ 分岐を engine で honest
+discharge**: `by_cases hP1 : IsTypeP1 M` → P1 branch は `rw [typePA_eq_sigmaSharp_of_isTypeP1,
+← A1_eq_sigmaSharp]` で typePA=M_σ#=A₁ に還元し `exact hA1`。`classical` で任意 Prop に by_cases 可。
+
+**`dadeSupportHypotheses_typeP` 現状**: A₁ (全 tau) ✅ + typePA-P₁ ✅ = **honest**、残 2 sorry =
+**typePA0 (V^M exceptional) + typePA-P₂ ((8.13.b) `escaping_typePA_mem_A1` の escaping 還元)**。
+engine 部分は完了、残りは type-P 固有 support 幾何のみ。次 = (b) type-P (8.13.b) の実証 or (c) V^M。
+
+### loop¹²⁰ — P2-typePA/typePA0 = genuine deep type-P structure と確定 (engine と違い wiring でない)
+
+残 2 sorry を精査:engine の σ-generic wiring とは違い、**type-P 固有の support 幾何が要ると判明**。
+
+**P2-typePA の障害 (precise)**: engine は escaping 点が σ-sharp (∈M_σ#) を要求。P2 は typePA=(M')#⊋M_σ# ゆえ
+escaping (M')# 点が σ-sharp である必要。σ-sharp 化の唯一の route `mem_sigmaSharp_of_mem_aSet_of_escape`
+(S16:6179) は **ASet/A0Set cover gated** (点が cover 内であることが前提)。cover-free の escape→σ-sharp は
+**存在しない**。`typePA ⊆ A0Set M K` bridge も未存在で、要 `(M')# ⊆ hatMsigma M`
+(= 全 x∈(M')# で M_σ⊓C_G(x)≠⊥) = **genuine deep type-P 構造** (case-heavy: W1# 点は `centralizer_W1`→W2⊆H⊆M_σ
+で OK だが、一般 M' 元は nilpotent H=M_F への固定点論法が要り自明でない; 冪零 H への coprime 作用は
+fixed-point-free 可)。**M_F ⊆ M_σ は general** (`maxNilpotentNormalHall_le_Msigma` S15:175) — 部品にはなる。
+
+**typePA0**: typePA ∪ conjClassSetIn M (typePV M data) の **V^M exceptional 成分** (`typePV` S10-GT:305)。
+別 deep obligation。
+
+**次 iteration の第一歩 (優先度確認 + 攻略)**: (1) **downstream consumer 確認** — `dadeSupportHypotheses_typeP`
+の typePA0/typePA 成分が FT critical path で実際に consume されるか grep (A₁ 成分だけで足りる下流なら
+P2-typePA/typePA0 は後回し可; feedback-verify-lane-connects-to-goal)。(2) consume されるなら
+**`(M')# ⊆ hatMsigma` (or escaping 版) を type-P 構造から実証** — TypePData の H⋊U 構造 + centralizer_W1
++ M_F⊆M_σ + 固定点論法。Coq `BGsection15/16` の of_typeP normedTI 'F(M)^# を併読 (PFsection8.v L141:
+`normedTI 'F(M)^# G M`)。これが type-P Dade engine の最後の deep core。
+
+### loop¹²⁰ cont. — ★ 束縛制約 = typePA0 の V^M exceptional 成分 (engine 対象外・deep) と判明
+
+**downstream consumer 確認結果 (重要)**: `dadeSupportHypotheses_typeP` の唯一の consumer =
+`S12_MaximalIII_IV_V_Core.exists_hypothesis_of_typeIIIorIVorV` (Pf **(10.1) existence**, §12 Dade tower
+の入口) が **`.1` = typePA0 成分**を `S12.Hypothesis.dadeData` field に使う (S12:567)。type III/IV/V は
+**全て P1** (`exists_peterfalviType`: P₁ が V/III/IV に分岐) ゆえ、**S12 の束縛制約 = typePA0(P1)**。
+
+**私が実証した A₁/P1-typePA は束縛制約でない** (genuine だが consumer は typePA0 を要求)。engine は
+typePA0 の **M_σ# 部分**を賄うが、**V^M 部分は engine 対象外**:
+- `typePV = W \ (W1∪W2)`、`typePA0 = typePA ∪ conjClassSetIn M typePV`。
+- V 元は W1-成分が非自明 (W=W1⊔W2、V は両成分非自明の diagonal 部) ⟹ W1⊓M'=⊥ (M_complement) ゆえ
+  **V ⊄ M'、V^M ⊄ M_σ#** ⟹ **engine (X⊆M_σ# 前提) 適用不可**。
+- V^M = type-P **exceptional character** の support = deep type-P Dade 幾何。
+
+**∴ 真の frontier = typePA0(P1) の Dade data = [M_σ# 部分 = engine ✅] + [V^M 部分 = deep exceptional]**。
+これが §12 type-P tower (10.1 existence) の束縛制約。P2-typePA は S12 consumer (P1) には不要
+(typePA(P1)=M_σ# で足りる)。
+
+**次 iteration**: (1) `typePA0` の `IsTISubset ... M` (S10:556 area、既 proven か確認) → TI-structure から
+V^M の Dade data が出るか (normedTI 'F(M)^# route, Coq BGsection16 of_typeP)。(2) typePA0(P1) を
+M_σ# ∪ V^M に分解し、M_σ# 部分は engine、V^M 部分を TI/exceptional で。engine の
+`dadeSupportHypothesisData_of_subset_sigmaSharp` は M_σ# を賄うが、typePA0 全体は **union support の
+Dade data 合成** (2 TI-piece の disjoint union) が要る = 新機構。
