@@ -562,3 +562,20 @@ lane-b territory だった (S10)。誤ったのは (10.8)/§9 への pivot の�
 **次 = S14 tower を正面 engage** (lane-b assigned deep cluster; 全 sorry deep だが territory 内)。
 upstream-most cleanly-lane-b = (12.5) rho_constant (statement 解決 → induced-from-H' partition +
 Dade reciprocity(tau_inner) で build) か (12.12) の Frobenius-torus p+1 refinement。
+
+### loop¹³² — ✅ 実 landing: induce vanishing lemma + (12.5) statement 確定
+
+**① LANDED (sorry-free, commit 4f831a66)**: `induce_apply_eq_zero_of_not_mem_normal`
+(InducedCharacter.lean:310) — 一般再利用可能: H ⊴ G で g∉H ⟹ Ind_H^G θ(g)=0 (各 induceTerm が
+正規性 x⁻¹gx∈H⟺g∈H で消える)。build green 3158 jobs。数 iteration ぶりの実コード landing。
+
+**② (12.5) statement 確定 = MIS-STATED (orphan stub)**: Coq `FtypeI_invDade_ortho_constant`
+(PFsection12:417-419) は `{in H:\:H' &, rho psi x = rho psi y}` = **ρψ が H∖H' 上 const**
+(H∖H' 内 2 点比較、ρψ=a という特定定数、line 457)。Lean stub `ψ(h)=ψ(1)` は **1∈H' の値**と比較で
+別物。DpsiH 分解 `ρψ|_H = Σ a_A·Ind_{H'}^H χ_A + a·1_H` で確定: H∖H' 上 Ind 項は上記 lemma で消え
+ρψ(h)=a、だが ρψ(1)=a+Σa_A[H:H']χ_A(1)≠a。∴ **ψ(h)=ψ(1) は偽**、正 = const on H∖H'。
+
+**③ (12.5) deep-proof path**: DpsiH 分解 (o_rpsi_S = Dade reciprocity `tau_inner_eq_of_supported` +
+Irr(H) の induced-from-H' 分割) → 上記 vanishing lemma で finish。induced-from-H' 分割 (Clifford)
+が残 infra。**次: (12.5) statement を const-on-H∖H' に訂正 (orphan ゆえ lane-b 裁量) + DpsiH 組立**、
+または (12.14)/(12.15) downstream char へ。
