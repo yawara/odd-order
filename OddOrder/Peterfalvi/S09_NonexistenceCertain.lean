@@ -4428,6 +4428,24 @@ noncomputable def hypothesis71 [Fintype G] (F : FrobeniusFamily G k) (i : Fin k)
     (fun l a ha => (F.mem_kernel_sharp_conj_iff_of_mem_L i l.2).mpr ha)
     (F.isTI i)
 
+/-- **The Dade support of the `i`-th (7.1) datum is the kernel spread** `(H_i^#)^G`.  For the
+TI-subset construction every local subgroup `H(a) = ⊥`, so each coset `aH(a) = {a}`, and the Dade
+support `⋃_{a ∈ H_i^#} {a}^G` is exactly the conjugacy spread `(H_i^#)^G = kernelSpread i`.  This
+identifies the (7.4) disjointness hypothesis `Disjoint (dadeSupport i) (dadeSupport j)` with the
+already-proven `kernelSpread_disjoint`. -/
+lemma dadeSupport_hypothesis71_eq_kernelSpread [Fintype G] (F : FrobeniusFamily G k) (i : Fin k) :
+    (F.hypothesis71 i).hyp.dadeSupport = F.kernelSpread i := by
+  rw [F.kernelSpread_eq_conjugatesOfSet i]
+  ext g
+  rw [OddOrder.Peterfalvi.S04.Hypothesis.mem_dadeSupport_iff, Group.mem_conjugatesOfSet_iff]
+  constructor
+  · rintro ⟨a, h, hh, hconj⟩
+    have hh1 : h = 1 := Subgroup.mem_bot.mp hh
+    subst hh1
+    exact ⟨a.1, a.2, by simpa using hconj⟩
+  · rintro ⟨y, hy, hconj⟩
+    exact ⟨⟨y, hy⟩, 1, Subgroup.one_mem _, by simpa using hconj⟩
+
 /-- TI for H_i^# says that any element carrying one sharp-kernel element back
 into H_i^# already lies in L_i. -/
 lemma mem_L_of_mem_kernel_sharp_of_conj_mem_kernel_sharp
@@ -4672,6 +4690,29 @@ lemma kernelSpread_pairwiseDisjoint [Finite G] (F : FrobeniusFamily G k) :
     ((Finset.univ : Finset (Fin k)) : Set (Fin k)).PairwiseDisjoint F.kernelSpread := by
   intro i _hi j _hj hij
   exact F.kernelSpread_disjoint hij
+
+/-- **The (7.4) `FamilyHypothesis71` of a Frobenius family** (Peterfalvi (7.10)(a)-(c) ⟹ (7.4)).
+Each member `i` supplies the (7.1) datum `Hypothesis71 G (H_i^#) L_i` (`hypothesis71`), whose Dade map
+is a genuine isometry (`isDadeIsometry_of_isDadeMap`, from `isDadeMap` + `HConjInvariant`); the
+supports `A_i^{τ_i} = dadeSupport_i = (H_i^#)^G` are pairwise disjoint by the coprime-kernel
+`kernelSpread_disjoint` (via `dadeSupport_hypothesis71_eq_kernelSpread`).  This assembles the (7.4)
+input consumed by the (7.5)/(7.10) `characterEstimateData_of_family71_*` machinery. -/
+noncomputable def familyHypothesis71 [Fintype G] [Invertible (Nat.card G : ℂ)]
+    (F : FrobeniusFamily G k) : FamilyHypothesis71 G k where
+  L := F.L
+  A := fun i => OddOrder.Peterfalvi.S04.sharp (F.H i : Set G)
+  fintypeL := fun i => Fintype.ofFinite _
+  invertibleL := fun i => invertibleOfNonzero (Nat.cast_ne_zero.mpr (Nat.card_pos (α := F.L i)).ne')
+  hyp71 := fun i => F.hypothesis71 i
+  isDadeIsometry := fun i => by
+    letI : Fintype ↥(F.L i) := Fintype.ofFinite _
+    letI : Invertible (Nat.card ↥(F.L i) : ℂ) :=
+      invertibleOfNonzero (Nat.cast_ne_zero.mpr (Nat.card_pos (α := F.L i)).ne')
+    exact OddOrder.Peterfalvi.S04.isDadeIsometry_of_isDadeMap (F.hypothesis71 i).hyp
+      (F.hypothesis71 i).τ (F.hypothesis71 i).isDadeMap (F.hypothesis71 i).hConjInvariant
+  pairwise_disjoint := fun i j hij => by
+    rw [F.dadeSupport_hypothesis71_eq_kernelSpread i, F.dadeSupport_hypothesis71_eq_kernelSpread j]
+    exact F.kernelSpread_disjoint hij
 
 lemma G0_disjoint_kernelSpread (F : FrobeniusFamily G k) (i : Fin k) :
     Disjoint F.G0 (F.kernelSpread i) := by
