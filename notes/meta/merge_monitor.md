@@ -280,6 +280,18 @@
 
 ## 現状メモ
 
+- **2026-07-04 (未明) — 監視ループ再開 (ユーザー指示「各レーンを監視します」) + 再開初 tick 合流 a/c**:
+  停止時 cron 死亡を確認 (`CronList` = 空)、**新 cron `c8419068` を規定ペース `7,22,37,52 * * * *` で再作成**。
+  再開初 tick で停止時の未マージ残を合流 (stop 時見込み a:2/c:3 は lane が `git merge main` 再同期で
+  a:1/c:2 に再編、内容同一)。**a** = `f6533c86` refactor(Pf 11.8.5 prep): SHC 機構の isometry 核を
+  reusable `IsCoherent` API (inner_extension_self_eq_one / inner_extension_eq_zero_of_ne) に抽出 (S12、
+  callers 不変・sorry 不変)。**b** = 0 (変化なし)。**c** = `5e81d626`+`d319c0f1` Pf 1.7(b) cont.: type-I
+  Clifford の Hall coprimality input + coprimality COMPLETE (Ito in-repo、CliffordDecomposition.lean =
+  9002 shared infra)。範囲逸脱なし (a→S12 所有 / c→GroupTheory 共有)、新 axiom なし、**sorry 113→113 不変**。
+  merge `3868c3f9`(a)+`eabcbde2`(c)、**full build green 3906 jobs** (3898→3906 = +8, 新 decl 相当)、
+  AxiomsCheck OK、`git push origin main` 成功 (`fab4a354..eabcbde2`)。新規 HUB issue なし
+  (9000 の 2 HUB 項は共に stale: dup 裁定は解決済 = lane d leaf、"lane d 次 target" 項は lane d 退役で moot、
+  stop 記録どおり「lane a 承継・対応不要」)。次 tick 以降 `7,22,37,52` で通常監視。
 - **2026-07-03 (夜) — 監視停止 (ユーザー指示「いったん区切ります」)**: cron a8af8c6a を CronDelete。
   ⛔ 停止 (問題起因) ではないので**自動再開しない** — 次の監視再開はユーザー指示を待って
   `7,22,37,52 * * * *` で再作成する。停止時点: main = `e9119393` (push 済・tree clean・origin 同期)。
