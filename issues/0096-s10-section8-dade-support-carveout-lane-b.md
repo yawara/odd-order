@@ -782,3 +782,17 @@ refine orthogonal_character_constant_on_coset hG hypM data_M horth hxM hxK g (hH
 ```
 **subtlety**: dade.chi は degree e=[L:H] ⟹ Ind_H^L θ (θ linear≠1) ⟹ Frobenius で irreducible ⟹ 単一
 constituent (horth 簡略化)。**次: (12.14) redesign + assembly を build** (~60-80 行、全 piece 存在)。
+
+### loop¹⁴⁵ — ✅ (12.14) reduction landed (commit af21399b)
+
+`psi_constant_on_xK` を opaque sorry → **実 assembly reduction**: (12.4) を Hypothesis M
+(exists_typeI_hypothesis、M=type-I ゆえ直接) に適用。機械部 (Hypothesis M 構成 + hHK[typeF.H_eq+K_eq_MF]
++ data_M[character_decomposition existence] + hxM[P0≤M] + (12.4) 配線) 実証明。build green 3871。
+**loop¹⁴³ unblock (M=type-I) を実 code 化** — 「全 gated」の悲観を実証明で覆した。
+
+**残 2 obligation (既知 path、次)**:
+- **horth** (dade.psi⊥R_M): coherent_extension_constituent_orthogonal_Rset_of_nonconjugate (S14:1844)。
+  要 coh (coherence) + L≠M + dade.psi=coh.extension χ (χ irreducible constituent)。statement redesign 要。
+- **hxK** (x∉K): witness.x は nontrivial p-element、K=M_F は p'-Hall (p∣[M:M_F]) ゆえ p∤|K| → x∉K。
+  witness の x_ne_one + x^p=1 + K の Hall 構造から (自己完結的、redesign 不要)。
+次: hxK (self-contained) を先に埋め、horth は redesign + coherent_extension_orthogonal threading。
