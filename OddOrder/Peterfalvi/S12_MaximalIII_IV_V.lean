@@ -1221,26 +1221,48 @@ theorem Hypothesis.SHC_extension_conj [Finite G] {M : Subgroup G}
       rw [ClassFunction.conj_apply, hχ1, star_natCast]⟩,
       fun h => inducedFamily_hasNoRealCharacters hModd hχS h⟩
 
+/-- **Generic isometry-normalization of a coherent extension**: for any coherent extension `coh`
+of `τ` over a set `S` of irreducible characters, an irreducible `ζ ∈ S` has `‖coh ζ‖² = ‖ζ‖² = 1`.
+The extension-agnostic core of `SHC_extension_inner_self`, reusable for both `SHC_isCoherent`
+and the (11.8.4) branch-2 swap `SHC_swap` (the (11.8.5) extension-generalization). -/
+theorem _root_.OddOrder.Peterfalvi.S07.IsCoherent.inner_extension_self_eq_one
+    {L H : Type*} [Group L] [Group H] [Fintype L] [Fintype H]
+    [Invertible (Nat.card L : ℂ)] [Invertible (Nat.card H : ℂ)]
+    {τ : OddOrder.Peterfalvi.S07.IntegralCharacterMap L H}
+    {S : Set (ClassFunction L ℂ)} {A : Set L}
+    (coh : OddOrder.Peterfalvi.S07.IsCoherent τ S A)
+    {ζ : ClassFunction L ℂ} (hζS : ζ ∈ S) (hζirr : IsIrreducibleCharacter ζ) :
+    ClassFunction.inner (coh.extension ζ) (coh.extension ζ) = 1 := by
+  rw [coh.extension_inner_eq _ _ (Submodule.subset_span hζS) (Submodule.subset_span hζS),
+    OddOrder.RepresentationTheory.irr_cf_inner hζirr hζirr, if_pos rfl]
+
+/-- **Generic orthogonality of coherent images of distinct irreducibles**: for a coherent extension
+`coh` over `S`, distinct irreducibles `φ, ψ ∈ S` have `⟨coh φ, coh ψ⟩ = ⟨φ, ψ⟩ = 0`.  The
+extension-agnostic core of `SHC_extension_inner_of_ne`. -/
+theorem _root_.OddOrder.Peterfalvi.S07.IsCoherent.inner_extension_eq_zero_of_ne
+    {L H : Type*} [Group L] [Group H] [Fintype L] [Fintype H]
+    [Invertible (Nat.card L : ℂ)] [Invertible (Nat.card H : ℂ)]
+    {τ : OddOrder.Peterfalvi.S07.IntegralCharacterMap L H}
+    {S : Set (ClassFunction L ℂ)} {A : Set L}
+    (coh : OddOrder.Peterfalvi.S07.IsCoherent τ S A)
+    {φ ψ : ClassFunction L ℂ} (hφS : φ ∈ S) (hφirr : IsIrreducibleCharacter φ)
+    (hψS : ψ ∈ S) (hψirr : IsIrreducibleCharacter ψ) (hne : φ ≠ ψ) :
+    ClassFunction.inner (coh.extension φ) (coh.extension ψ) = 0 := by
+  rw [coh.extension_inner_eq _ _ (Submodule.subset_span hφS) (Submodule.subset_span hψS),
+    OddOrder.RepresentationTheory.irr_cf_inner hφirr hψirr, if_neg hne]
+
 open scoped FiniteInduce in
 /-- **`‖ζ^{τ₁}‖² = 1` for the `S(HC)`-coherent extension** (α-grid `S₁`-`τ₁` input to (11.8.2)).
 The `S(HC)`-coherence `τ₁ = SHC_isCoherent.extension` is an isometry on `ℤ[S(HC)]`
 (`extension_inner_eq`) and the degree-`w₁` irreducible `ζ ∈ S(HC)`, so `‖ζ^{τ₁}‖² = ‖ζ‖² = 1`.
-
-Unlike `zeta_tau1_inner_self` (which needs the full-`S` `CoherentHypothesis`), this uses only the
-landed `SHC_isCoherent`, so it is available inside the (11.8) by-contradiction, which lacks the
-full-`S` coherence (the residual-orthogonal branch never obtains `CoherentHypothesis`). -/
+Specializes the generic `IsCoherent.inner_extension_self_eq_one` to `coh = SHC_isCoherent`. -/
 theorem Hypothesis.SHC_extension_inner_self [Finite G] {M : Subgroup G}
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis M)
     {ζ : ClassFunction ↥M ℂ} (hζS : ζ ∈ inducedFamily M) (hζirr : IsIrreducibleCharacter ζ)
     (hζ1 : ζ 1 = (hyp.w1 : ℂ)) :
     ClassFunction.inner ((hyp.SHC_isCoherent hG).extension ζ)
-      ((hyp.SHC_isCoherent hG).extension ζ) = 1 := by
-  have hspan : ζ ∈ OddOrder.Peterfalvi.S07.zSpan
-      {φ : ClassFunction ↥M ℂ | φ ∈ inducedFamily M ∧ IsIrreducibleCharacter φ ∧
-        ((φ : ↥M → ℂ) 1 = (hyp.w1 : ℂ))} :=
-    Submodule.subset_span ⟨hζS, hζirr, hζ1⟩
-  rw [(hyp.SHC_isCoherent hG).extension_inner_eq _ _ hspan hspan,
-    OddOrder.RepresentationTheory.irr_cf_inner hζirr hζirr, if_pos rfl]
+      ((hyp.SHC_isCoherent hG).extension ζ) = 1 :=
+  (hyp.SHC_isCoherent hG).inner_extension_self_eq_one ⟨hζS, hζirr, hζ1⟩ hζirr
 
 open scoped FiniteInduce in
 /-- **`⟨α_{ij}^τ, ζ^{τ₁}⟩ ∈ ℤ` for the `S(HC)`-coherent extension** (α-grid `S₁`-`τ₁` input to
@@ -1278,17 +1300,9 @@ theorem Hypothesis.SHC_extension_inner_of_ne [Finite G] {M : Subgroup G}
     (hψS : ψ ∈ inducedFamily M) (hψirr : IsIrreducibleCharacter ψ) (hψ1 : ψ 1 = (hyp.w1 : ℂ))
     (hne : φ ≠ ψ) :
     ClassFunction.inner ((hyp.SHC_isCoherent hG).extension φ)
-      ((hyp.SHC_isCoherent hG).extension ψ) = 0 := by
-  have hspanφ : φ ∈ OddOrder.Peterfalvi.S07.zSpan
-      {χ : ClassFunction ↥M ℂ | χ ∈ inducedFamily M ∧ IsIrreducibleCharacter χ ∧
-        ((χ : ↥M → ℂ) 1 = (hyp.w1 : ℂ))} :=
-    Submodule.subset_span ⟨hφS, hφirr, hφ1⟩
-  have hspanψ : ψ ∈ OddOrder.Peterfalvi.S07.zSpan
-      {χ : ClassFunction ↥M ℂ | χ ∈ inducedFamily M ∧ IsIrreducibleCharacter χ ∧
-        ((χ : ↥M → ℂ) 1 = (hyp.w1 : ℂ))} :=
-    Submodule.subset_span ⟨hψS, hψirr, hψ1⟩
-  rw [(hyp.SHC_isCoherent hG).extension_inner_eq _ _ hspanφ hspanψ,
-    OddOrder.RepresentationTheory.irr_cf_inner hφirr hψirr, if_neg hne]
+      ((hyp.SHC_isCoherent hG).extension ψ) = 0 :=
+  (hyp.SHC_isCoherent hG).inner_extension_eq_zero_of_ne
+    ⟨hφS, hφirr, hφ1⟩ hφirr ⟨hψS, hψirr, hψ1⟩ hψirr hne
 
 open scoped FiniteInduce in
 /-- **SHC-coherence analog of `tau_zeta_sub_conj_eq_tau1`** (α-grid `S₁`-`τ₁` bridge for (11.8.5)).
