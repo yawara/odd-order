@@ -1125,6 +1125,69 @@ noncomputable def characterDifferenceImageOfIsometry
     rw [neg_sub]
   rw [hlhs, map_neg, h1, ← smul_neg, neg_sub]
 
+omit [Finite L] [Fintype L] [Invertible (Nat.card L : ℂ)] in
+/-- **Peterfalvi (5.9.b), the conjugate pairing of the difference image**: when `τ` commutes
+with complex conjugation on the difference `χ − χ̄` (e.g. the Dade base map on a supported
+difference, via `dadeIntegralCharacterMap_mapRingEquiv_comm`), the two irreducibles of the
+image `(χ − χ̄)^τ = ε·(μ − ν)` are conjugate: `ν = μ̄`, so `(χ − χ̄)^τ = ε·(μ − μ̄)`.
+
+Conjugating the image equation gives `ε·(μ̄ − ν̄) = ((χ−χ̄)^τ)‾ = (χ̄−χ)^τ = ε·(ν − μ)`;
+cancelling `ε` and pairing with `μ` against the orthonormality of `Irr G` forces `ν̄ = μ`.
+This is the step of the (12.3) bar-trick that writes `(φ−φ̄)^τ = α − ᾱ`. -/
+theorem CharacterDifferenceImage.nu_eq_mu_conj
+    {τ : IntegralCharacterMap L G} {χ : ClassFunction L ℂ}
+    (hχ : CharacterDifferenceImage (L := L) (G := G) τ χ)
+    (hcomm : τ ((χ - χ.conj).conj) = (τ (χ - χ.conj)).conj) :
+    hχ.nuClassFunction = hχ.muClassFunction.conj := by
+  classical
+  -- Conjugating the image: `((χ−χ̄)^τ)‾ = (χ̄−χ)^τ = −(χ−χ̄)^τ`.
+  have hneg : (τ (χ - χ.conj)).conj = -(τ (χ - χ.conj)) := by
+    calc (τ (χ - χ.conj)).conj
+        = τ ((χ - χ.conj).conj) := hcomm.symm
+      _ = τ (-(χ - χ.conj)) := by
+          rw [ClassFunction.conj_sub, ClassFunction.conj_conj, neg_sub]
+      _ = -(τ (χ - χ.conj)) := map_neg τ _
+  -- Substitute `(χ−χ̄)^τ = ε·(μ − ν)` and push the conjugation through the `ℤ`-scalar.
+  rw [hχ.image_eq] at hneg
+  rw [← Int.cast_smul_eq_zsmul ℂ] at hneg
+  have hconj_smul : (((hχ.sign : ℂ)) •
+        ((hχ.mu : ClassFunction G ℂ) - (hχ.nu : ClassFunction G ℂ))).conj
+      = (hχ.sign : ℂ) •
+        ((hχ.mu : ClassFunction G ℂ).conj - (hχ.nu : ClassFunction G ℂ).conj) := by
+    ext g
+    simp only [ClassFunction.conj_apply, ClassFunction.smul_apply, ClassFunction.sub_apply,
+      star_mul', star_sub, star_intCast]
+  rw [hconj_smul, ← smul_neg, neg_sub] at hneg
+  -- Cancel the nonzero sign: `μ̄ − ν̄ = ν − μ`.
+  have hsign_ne : ((hχ.sign : ℂ)) ≠ 0 := Int.cast_ne_zero.mpr hχ.sign_ne_zero
+  have hkey : (hχ.mu : ClassFunction G ℂ).conj - (hχ.nu : ClassFunction G ℂ).conj
+      = (hχ.nu : ClassFunction G ℂ) - (hχ.mu : ClassFunction G ℂ) :=
+    smul_right_injective (ClassFunction G ℂ) hsign_ne hneg
+  -- Pair with `μ` against the orthonormality of `Irr G`.
+  have hcross : ∀ a c : IrreducibleCharacter G,
+      ClassFunction.inner (a : ClassFunction G ℂ) (c : ClassFunction G ℂ) =
+        if a = c then (1 : ℂ) else 0 :=
+    fun a c => OddOrder.RepresentationTheory.irreducibleCharacter_inner a c
+  have hinner := congrArg
+    (fun f => ClassFunction.inner f (hχ.mu : ClassFunction G ℂ)) hkey
+  simp only [ClassFunction.inner_sub_left] at hinner
+  rw [show (hχ.mu : ClassFunction G ℂ).conj
+        = (conjIrreducibleCharacter (L := G) hχ.mu : ClassFunction G ℂ) from rfl,
+    show (hχ.nu : ClassFunction G ℂ).conj
+        = (conjIrreducibleCharacter (L := G) hχ.nu : ClassFunction G ℂ) from rfl,
+    hcross, hcross, hcross, hcross] at hinner
+  by_cases hcase : conjIrreducibleCharacter (L := G) hχ.nu = hχ.mu
+  · -- `ν̄ = μ`, hence `ν = μ̄`.
+    have hcoe : (hχ.nu : ClassFunction G ℂ).conj = (hχ.mu : ClassFunction G ℂ) :=
+      congrArg (fun c : IrreducibleCharacter G => (c : ClassFunction G ℂ)) hcase
+    show (hχ.nu : ClassFunction G ℂ) = (hχ.mu : ClassFunction G ℂ).conj
+    rw [← hcoe, ClassFunction.conj_conj]
+  · -- Otherwise the pairing equation reads `[μ̄ = μ] − 0 = 0 − 1`, impossible.
+    exfalso
+    rw [if_neg hcase, if_neg (Ne.symm hχ.distinct), if_pos rfl] at hinner
+    revert hinner
+    split_ifs <;> intro h <;> norm_num at h
+
 end DifferenceImageProducer
 
 /-! ### Peterfalvi (5.4): the norm inequalities for `X` and `Y`
