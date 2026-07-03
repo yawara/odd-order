@@ -196,3 +196,30 @@ piece、engine 本体は type-P 固有 (8.13.a/c2) + escaping structure の deep
 他レーン upstream に gated: Cluster A (12.10-12) = lane a §8-§11 (8.16/8.6.a/9.7.b/10.10/11.6, 未形式化)、
 Dade calc (12.14-16) = (12.3)[§16 via 8.18.c=lane c] / Cluster A、(8.18.c) = §16 lane c、S09 card_G0 =
 7.9/11.8 lane a。→ lane b は type-P engine (deep) を focused に進めるか、他レーン upstream 待ち。
+
+## 🎯 loop¹¹⁸ — 2 of 3 pins LANDED: loop¹¹⁷ の「isConj/structure も type-specific-deep」評価を revise
+
+loop¹¹⁷ は「(8.13.a) isConj・escaping structure・(8.13.c2) coprimality すべて type-P 固有 = deep」と
+評価したが、**精査で isConj と structure は σ-decomposition-generic (= wiring) と判明**。3 pin 中 2 本を
+build-green で landed (S10):
+
+1. **`sigmaSharp_isConj_conj_in_M`** (σ-sharp (8.13.a)): `a,b∈M_σ#`, `b=gag⁻¹` ⟹ M-conj。**tame
+   embedding 経由でなく σ-分解から native に証明**: `M` と `g⁻¹Mg` は共に `a` の σ-maximal
+   (`maximalConjugatesContaining_eq_maximalSigma`)、Thm 14.4 `exists_conj_centralizer_of_mem_maximalSigma`
+   で `C_G(a)`-conj、`gc∈N_G(M)=M` (`normalizer_eq_self_of_mem_maximalSubgroups`) が M-conjugator。
+   `A1_eq_sigmaSharp` (全 tau) ゆえ **A₁ の conj_in_L を全 type で discharge**、P1-typePA も
+   (`typePA_eq_sigmaSharp_of_isTypeP1`)。
+2. **`escaping_sigmaSharp_signalizer_structure`** (σ-generic (8.13.c1)): `a∈M_σ#` escaping ⟹
+   `C_G(a)=R(a)⋊C_M(a)` (join/disjoint/normalize)。type-I `escaping_typeIA_signalizer_structure` の
+   step 2-4 は **kappa=∅ を hσa 導出のみに使い、以降は σ-sharp generic** と確認 ⟹ 3-conjunct を抽出。
+   **type-I 版も本 lemma を cite するよう dedup refactor** (~90 行削減、signature 不変ゆえ downstream 不変)。
+
+**残る唯一の type-specific-deep pin = (8.13.c2) coprimality** `escaping_sigma_disjoint_centralizer`
+(S10, kappa=∅ 固有; type-P は kappa≠∅ で Frobenius/τ₂ 論法が異なる)。これは genuine deep (§14 Lemma
+14.13(a) route の type-P 版)。
+
+**次 build path (更新)**: σ-sharp base engine `dadeSupportHypothesisData_of_subset_sigmaSharp` は今や
+pin 2 本 (isConj + structure) + `ftSupportKernel_conj_smul` σ-版 + **(8.13.c2) coprimality の hypothesis
+化 or type-P 証明** で組める。A₁ 成分 (全 tau) は coprimality が `∀ b∈X` で X=M_σ# のとき type-I core が
+効かない (b は typeIA でない) ⟹ σ-sharp coprimality が本当に要る。∴ 次の genuine frontier = **σ-sharp
+(8.13.c2) coprimality** (type-P engine の最後の deep core)。
