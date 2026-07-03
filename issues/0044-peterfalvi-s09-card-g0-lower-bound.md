@@ -640,3 +640,21 @@ coh に fold (ν=coh.extension と一致させる)。
 選択 → `characterEstimateData_of_family71_reduced_estimates` → `card_G0_lower_bound`。
 次 (cont.²⁰): chiRhoNormSq bridge (H78.zetaNuRhoNormSq と P.chiRhoNormSq χ_i の同一視; χ = ν ζ_0 = 
 被評価 signed irreducible)。これが (7.8.b)→(7.5) glue の核。
+
+## 2026-07-04 cont.²⁰ (lane-a, /loop) — (7.8.b)→(7.5) chiRhoCF bridge landed
+
+**Landed** (S09_FrobeniusEstimate.lean、sorry-free):
+- `chiRho_apply_of_trivial_local` (一般): TI Dade datum (local subgroup H(a)=⊥、`of_isTISubset`) では
+  `χ^ρ(a) = χ(a)` on A (coset average が単項に collapse)。`chiRho` は τ でなく `H71.hyp` (support +
+  local subgroups) のみに依存。
+- `FrobeniusFamily.sibleyToHypothesis71_chiRhoCF_eq`: **`sibleyToHypothesis71 i` と `hypothesis71 i` の
+  chiRhoCF が一致**。両者 `of_isTISubset` on 同一 TI subset H_i^# (support は `sharpImage_subgroupOf_eq`
+  で一致、local subgroup ⊥)、ゆえ chiRho = χ|_{H_i^#} で同一。これで
+  `H78.zetaNuRhoNormSq = ‖sibley.chiRhoCF (νζ_0)‖²` と `P.chiRhoNormSq (νζ_0) i = ‖hypothesis71.chiRhoCF (νζ_0)‖²`
+  が同一視可能に (`P = F.familyHypothesis71`、`hyp71 = F.hypothesis71`)。
+
+**残 (cont.²¹)**: `hi : 1 − e_i/h_i ≤ P.chiRhoNormSq χ i` を組む — (a) `zetaNuRhoNormSq_ge` +
+`sibleyToHypothesis71_chiRhoCF_eq` で `H78.zetaNuRhoNormSq = P.chiRhoNormSq (νζ_0) i` (norm は両辺
+`.re` で同じ instance)、(b) `H78.complementIndex = F.e i` / `H78.kernelOrder = F.h i` (F.e/F.h 定義と
+complementIndex/kernelOrder = |L|/|H|, |H| の対応)。χ = coh.extension (Ind θ_0) = 被評価 signed irr。
+その後 (7.9) 𝓑-sum + hgood (j≠i の good estimate) + min-index → characterEstimateData → card_G0_lower_bound。
