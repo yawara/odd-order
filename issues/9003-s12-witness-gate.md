@@ -446,3 +446,110 @@ Pf (8.12.b) 原文 (04.10:129): 「非空 X⊆**U#** (U は complement: type I �
 **(8.16) `typeII_A_sets_TI` (S10:492)**: `IsTISubset (typePA0/typePA/A1) M`。typePA↔BG ASet の
 encoding bridge + `theoremB_A_minus_Msigma_isTISubset` (A(M)∖M_σ) / Theorem C(9) 適用。
 Pf (8.12.c) = A(M)−A_1(M) TI = Theorem B(5) の Pf 名。次 loop で bridge を建てる。
+
+## 🚀 lane b 進捗 (2026-07-03, loop¹⁰⁵) — (8.12.b) faithful 版 `_hall` を axiom-clean で landing (S14 un-gate)
+
+loop¹⁰⁴ の Theorem B(4) を使い、(8.12.b) の faithful 版を実証明。上記 false-as-stated finding を
+**新 theorem `typeI_or_typeII_centralizer_unique_hall`** (S10、axiom-clean) として landing:
+- signature = `hUM : U ≤ M` + `hU : (κ∪σ)ᶜ-Hall (U.subgroupOf M)`。証明 = `⟨X⟩ ≤ U` に
+  `typeP_hall_small_subgroup_cyclic_tau2` (B(4)) 直接適用、`centralizer_closure` + `M_F=M_σ` +
+  `IsUniquelyMaximal.of_unique_maximal`。conjugation 不要 (X⊆U# ゆえ ⟨X⟩≤U)。
+- **S14 caller `centralizer_control_of_CKx` を `_hall` に migrate**: `exists_sigmaKappaCompl_hall_ge_P0`
+  で (κ∪σ)ᶜ-Hall complement U₀⊇P₀∋x を供給 (旧 U=M は非-Hall で偽インスタンスだった)。type-I support
+  path が Theorem B の sorry gate から解放。
+- 旧 `typeI_or_typeII_centralizer_unique` (false-as-stated, sorry) は S11 caller
+  (`typeII_centralizer_U_eq_bot`) のため残置 + deprecated 注記。
+
+**S11 migration の blocker (cross-lane infra、次 loop 候補)**: S11 caller は `data.U` (TypePData
+complement) を (κ∪σ)ᶜ-Hall として供給する必要があるが、その witness
+`isHall_kappaSigmaCompl_of_isTypeP2_complement` + 補助 `isHallSubgroup_of_card_eq` /
+`card_mul_card_of_complement_normal` が **downstream の `FeitThompson.lean` (lane a) に誤配置**
+(全て §11 上流の依存しか使わない generic 補題)。→ 3 補題を上流 (card 2 本 = GroupTheory base、
+Hall 本体 = S10_BGInterface) へ relocate すれば S11 も `_hall` に migrate 可能。**hub 調整 issue 要**
+(FeitThompson は lane a 所有、relocate は cross-lane)。sup/inf witness は既存
+(`TypePData.derivedInG_eq_fitting_sup_U` + 要新 `fitting_inf_U_eq_bot`) + `isTypeII_iff_isTypeP2`。
+
+## 📋 loop¹⁰⁶ (2026-07-03) — §8 type-II support cluster の consumer 監査 + vestigial 偽 pin 発見
+
+loop¹⁰⁵ の (8.12.b) を受け、残 S10 §8 type-II pins の consumer 状況 + faithfulness を監査:
+
+**vestigial (0 consumer) + overstated/false-as-stated** — proven せず ⚠ 注記のみ (commit 済):
+- **`typeII_A_sets_TI` / `typeII_A_sets_normalizer` (8.16)**: full `A(M)=(M')#` / `A_1(M)=M_σ#` の
+  TI を主張するが、Pf (8.10/8.12.c, mmd 04.10 L119/L131) は **`A(M)−A_1(M)` のみ TI** (=B(5)、proven)。
+  M_σ は tamely imbedded (Theorem II)、M_σ∩M_σ^g cyclic (Theorem D(2)) ゆえ M_σ# は TI でない。
+  → retire or restate to `A(M)−A_1(M)`。docstring に ⚠ 注記。
+- **`escapingCentralizers_control` (8.13.b)**: 0 consumer だが overstatement ではない (tame-embedding
+  の escaping control、Theorem II/D(4) 内容)。Theorem II で proven 可能な見込み — 注記せず残置。
+
+**real (consumed) — 次 frontier 候補 (各々個別に deep)**:
+- `hall_maxNilpotentNormalHall_and_mainSubgroup` (S14×4): type I/II proven、**type III/IV は
+  M_F⊊M_σ proper-Hall で BG §14-15 に gated** (loop¹⁰³)。
+- `dadeSupportHypotheses_typeP` (S12×3): Dade support hypotheses、type-P。
+- `bgTheoremE_cover_data` (×9): Theorem E cover。
+
+**教訓**: §8 type-II support scaffold は TI/uniqueness を過剰主張しがち (8.12.b・8.16 とも false-as-stated、
+15.7(c) overstatement と同パターン [[ft-settled-findings]])。faithful 核 (A(M)−A_1(M) TI = B(5)、
+tame embedding = Theorem II) は既に proven。consumed pin のみ実 frontier、うち III/IV は BG §14-15 gated。
+
+## 📋 loop¹⁰⁷ (2026-07-03) — consumed §8 type-II pin の深さ評価: 残りは type-P Dade engine (deep 新機構)
+
+`dadeSupportHypotheses_typeP` (S10:1542, S12×3 consumer) を精査。type-I 版
+`dadeSupportHypotheses_typeI` は proven だが、engine `dadeSupportHypothesisData_of_subset`
+(S10:1415) は **type-I 専用** (`data : TypeIData`、base = `typeIA`、依存 =
+`escaping_typeIA_signalizer_structure` / `typeIA_isConj_conj_in_M` (8.13.a) /
+`ftSupportKernel_conj_smul` — 全て私の loop⁹⁹ type-I (8.15) 機構)。
+
+**type-P 版に要る新機構 (de-risked build plan、次 focused session)**:
+- **`dadeSupportHypothesisData_of_subset_typeP`** (engine、gated-endpoint skeleton 可): assembly は
+  type-I をミラー、base = `typePA M data = (M')#`。isolate すべき type-P pins:
+  1. **`escaping_typePA_signalizer_structure`** — (M')# escaping 点の signalizer 構造 (type-P、
+     K≠1 の σ-support geometry; type-I の類推だが K-structure で異なる)。
+  2. **`typePA_isConj_conj_in_M`** — (8.13.a type-P): (M')# 点の G-共役は M-共役。
+  3. **`ftSupportKernel_conj_smul`** (type-P equivariance)。
+- conj-invariance (`typePA_conj_mem` / `typePA0_conj_mem` / `A1_typeII_conj_mem`) は tractable
+  (M' ⊴ M / M_σ ⊴ M の M-共役不変性)。
+- `dadeSupportHypotheses_typeP` = engine を typePA0 (⊇ V^M 部は conjClassSetIn M ゆえ M-不変) /
+  typePA / A1(=M_σ#⊆(M')#) に適用。
+
+**残 consumed pin の深さ**: `bgTheoremE_cover_data` (×9) = Theorem E cover (deep);
+`hall_maxNilpotentNormalHall_and_mainSubgroup` III/IV = BG §14-15 gated (loop¹⁰³)。
+→ §8 type-II の tractable TI 作業 (8.12.b faithful + vestigial 監査) は完了; 残りは type-P Dade
+geometry (新機構) か BG §14-15 gate。次 session は type-P engine を focused に build するのが妥当。
+
+## 📋 loop¹⁰⁸/¹⁰⁹ (2026-07-03) — type-P Dade engine 前提整備 + Pf/BG A(M) 不一致の発見
+
+**loop¹⁰⁸ landing** (commit 8c85dcac): type-P Dade engine の conj-invariance 前提を build。
+`sharpSubgroup_conj_mem` (general) + `A1_conj_mem` (全 tau、旧 `A1_typeI_conj_mem` を dedup 置換) +
+`typePA_conj_mem`。full build green。
+
+**loop¹⁰⁹ 発見 (検証済み、engine build 前に要 reconciliation)**: type-P の A(M) 定義が Pf と BG で**別物**:
+- **Pf (8.10, mmd 04.10 L117)**: type-P `A(M) = ⋃_{x∈M#} C_{M'}(x)# = (M')#` (Lean `typePA`、
+  `typePA_eq_sharpSubgroup_derivedInG` で確認; x=y で C_{M'}(y)∋y ゆえ全 M'# を被覆)。
+- **BG (§16)**: `A(M) = ASet = hatMsigma ∩ (U⊔M_σ) = hatMsigma ∩ M'` (C_{M_σ}≠1 を要求)。
+- **不一致**: type II で C_H(U)=1 (`typeII_centralizer_U_eq_bot`) ゆえ U-元 a∈U#⊆(M')# は
+  C_{M_σ}(a)=1 → a∉hatMsigma → **a∈typePA だが a∉ASet**。よって typePA=(M')# ⊋ ASet。
+
+**含意**: Pf (8.12.c) 「A(M)−A_1(M) TI」は Pf の A(M)=(M')# ゆえ **(M')#−M_σ# TI** を主張し、
+私の B(5) (`theoremB_A_minus_Msigma_isTISubset` = BG ASet−M_σ TI) と**別主張**。Pf ref は [BG] Thm B
+なので両者は整合するはずだが、その alignment (Pf A(M)−A_1(M) = BG ASet−M_σ、i.e. ∀y∈M'∖M_σ,
+C_{M_σ}(y)≠1) は type-P structure の非自明な事実で、要 careful 証明。→ **type-P Dade engine は
+Pf/BG A(M) 整合 + escaping_typePA_signalizer_structure を要する deep piece、fresh focused session 向け**。
+
+**§8 type-II の tractable 作業は枯渇** (8.12.b faithful + vestigial 監査 + conj 前提)。残 pin は全て
+deep (type-P Dade / §12 witness / §8 III/IV BG§14-15 gate)。次は別クラスタ (S07/S08/S09) の tractable
+target を探すか、type-P engine を fresh session で。
+
+## 📋 loop¹¹⁰ (2026-07-03) — レーン b tractable 作業の枯渇確認 (S07/S08 完成、S09 は 7.9 gated)
+
+§8 type-II 枯渇後、レーン b 別クラスタを survey:
+- **S07_Coherence* / S08_* (PGroupReduction + CaseB + Coherence 全 26 files): 全 sorry-free (完成)**。
+- **S09_CertificateDischarge: sorry-free**。
+- **S09_NonexistenceCertain: 残 1 sorry** = `card_G0_lower_bound` (Pf 7.10, issue 0044) の
+  `CharacterEstimateData` assembly。**(7.9) two-family 非直交 (未証明 interface `Hypothesis79`、
+  proof は follow-on、深い char theory ≈ 11.8 系) に gated** → 独立に tractable でない。
+
+**結論**: レーン b の tractable な on-path 実装作業は枯渇。残る全 frontier は deep か gated:
+- §8 type-II: type-P Dade engine (Pf/BG A(M) reconciliation + escaping structure、fresh session)、
+  §12 witness pins (§8-§11 type-analysis)、III/IV (BG §14-15 gate)。
+- S09 card_G0: (7.9)/(11.8) char theory (lane a 系) に gated。
+→ 次は (a) 上記 deep pin を fresh focused session で正面 build、または (b) 他レーンの 11.8/7.9 進捗待ち。
