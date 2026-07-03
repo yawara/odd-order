@@ -4485,6 +4485,125 @@ theorem H_eq_U [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
       _hG Tdata Sdata hcaseB (nc.u_dvd_h _hG) hh_mod_p hh_mod_q
       (hyp.u_modEq_one_mod_q _hG) hx_ne_one_of_quotient
 
+open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
+open OddOrder.Peterfalvi.S09 in
+open OddOrder.Peterfalvi.S09.Cert in
+/-- **Peterfalvi (7.8) for the V-side `M`** — the §7 coherence datum `S09.Hypothesis78` of the
+type-I maximal subgroup `M` over `N_G(V)`, together with its structural data (maximality,
+`N_G(V) ≤ M`, Fitting-kernel index `p q`).
+
+This is the **V-side dual of `witness_L_hypothesis78`** (the (12.16) witness-side coherence):
+`M`'s coherence is produced by the general type-I Frobenius engine `S14.frobenius_typeI_coherent`
+(`M` is type-I Frobenius over `N_G(V)` with kernel `M_F`, from `typeII_overNormalizer_frobenius_V`),
+and the (7.8) datum is assembled by the same `hypothesis78OfDade` construction (placed family
+`exists_witness_placed_family`, `nu_isometry` from `coherence_extension_inner_eq_on_family`,
+`hagree` from `coherence_hagree_dadeMap`).  Subsumes `exists_M_structural` and additionally supplies
+the `h78` field of `MHypothesis` — the single **grid-independent** honest obligation of
+`exists_MHypothesis` (the `betaGrid`/`betaM` fields remain gated on the §13 `η`-grid carrier, issue
+3002). -/
+theorem exists_M_hypothesis78 [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hyp : Hypothesis (G := G)) (hTII : IsTypeII hyp.base.T) :
+    ∃ (M : Subgroup G) (typeIHyp : OddOrder.Peterfalvi.S14.Hypothesis M),
+      M ∈ maximalSubgroups G ∧
+        Subgroup.normalizer (hyp.base.V : Set G) ≤ M ∧
+          ((maxNilpotentNormalHall M).subgroupOf M).index = hyp.base.p * hyp.base.q ∧
+          Nonempty (OddOrder.Peterfalvi.S09.Hypothesis78 G
+            (OddOrder.GroupTheory.typeIA M typeIHyp.typeI) M) := by
+  classical
+  obtain ⟨vdata, _hker, _hVH⟩ :=
+    OddOrder.Peterfalvi.S15.typeII_overNormalizer_frobenius_V hG hyp.base hTII
+  have hMtypeI : IsTypeI vdata.L := ⟨vdata.frobenius.typeI⟩
+  obtain ⟨typeIHyp⟩ :=
+    OddOrder.Peterfalvi.S14.exists_typeI_hypothesis hG vdata.L_maximal hMtypeI
+  have hindex : ((maxNilpotentNormalHall vdata.L).subgroupOf vdata.L).index
+      = hyp.base.p * hyp.base.q := by
+    rw [OddOrder.Peterfalvi.S15.typeIFrobenius_kernel_index_eq_complement vdata.frobenius]
+    exact vdata.complement_card_eq_pq
+  refine ⟨vdata.L, typeIHyp, vdata.L_maximal, vdata.normalizer_V_le_L, hindex, ?_⟩
+  -- Coherence for `M` via the general type-I Frobenius engine: the Frobenius witness for
+  -- `typeIHyp.H = M_F` comes from `vdata.frobenius` (both kernels are `maxNilpotentNormalHall M`).
+  have hHeq : typeIHyp.typeI.typeF.H = vdata.frobenius.typeI.typeF.H := by
+    rw [typeIHyp.typeI.typeF.H_eq, vdata.frobenius.typeI.typeF.H_eq]
+  have hfrob : ∃ C : Subgroup ↥vdata.L,
+      OddOrder.Isaacs.Ch06.IsFrobeniusGroup ↥vdata.L
+        ((typeIHyp.typeI.typeF.H).subgroupOf vdata.L) C :=
+    ⟨vdata.frobenius.complement, by rw [hHeq]; exact vdata.frobenius.frobenius⟩
+  obtain ⟨coh⟩ := OddOrder.Peterfalvi.S14.frobenius_typeI_coherent hG typeIHyp hfrob
+  -- Mirror `witness_L_hypothesis78`'s `hypothesis78OfDade` assembly (generic in the hypothesis).
+  have hHL : typeIHyp.typeI.typeF.H ≤ vdata.L := typeIHyp.typeI.typeF.H_le
+  haveI hKnormal : ((typeIHyp.typeI.typeF.H).subgroupOf vdata.L).Normal := by
+    rw [typeIHyp.typeI.typeF.H_eq]
+    exact OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_subgroupOf_normal vdata.L
+  have hAH : OddOrder.GroupTheory.typeIA vdata.L typeIHyp.typeI
+      = (typeIHyp.typeI.typeF.H : Set G) \ {1} :=
+    OddOrder.Peterfalvi.S14.Hypothesis.typeIA_eq_sharp hG typeIHyp
+  have hHnorm : ∀ (l : ↥vdata.L) {h : G}, h ∈ typeIHyp.typeI.typeF.H →
+      (l : G) * h * (l : G)⁻¹ ∈ typeIHyp.typeI.typeF.H := by
+    intro l h hh
+    have hhL : h ∈ vdata.L := hHL hh
+    have hmem : (⟨h, hhL⟩ : ↥vdata.L) ∈ (typeIHyp.typeI.typeF.H).subgroupOf vdata.L :=
+      (Subgroup.mem_subgroupOf).mpr hh
+    have hconj := hKnormal.conj_mem ⟨h, hhL⟩ hmem l
+    rw [Subgroup.mem_subgroupOf] at hconj
+    simpa using hconj
+  obtain ⟨n, θ, ind1H, hind1H, hdeg0, htriv, hinj, hcover⟩ :=
+    OddOrder.Peterfalvi.S14.exists_witness_placed_family typeIHyp
+  have hSmem : ∀ i, i ≠ ind1H →
+      ClassFunction.induce ((typeIHyp.typeI.typeF.H).subgroupOf vdata.L)
+          (θ i : ClassFunction _ ℂ) ∈ typeIHyp.Sset := by
+    intro i hi
+    refine ⟨θ i, fun htriv_i => hi (hinj ?_), rfl⟩
+    change ClassFunction.induce ((typeIHyp.typeI.typeF.H).subgroupOf vdata.L)
+        (θ i : ClassFunction _ ℂ)
+        = ClassFunction.induce ((typeIHyp.typeI.typeF.H).subgroupOf vdata.L)
+          (θ ind1H : ClassFunction _ ℂ)
+    rw [htriv_i, htriv]
+  let d : Fin (n + 1) → ℂ :=
+    fun i => (θ i : ClassFunction ↥((typeIHyp.typeI.typeF.H).subgroupOf vdata.L) ℂ)
+      (1 : ↥((typeIHyp.typeI.typeF.H).subgroupOf vdata.L))
+  have hd : ∀ i, d i = (θ i : ClassFunction ↥((typeIHyp.typeI.typeF.H).subgroupOf vdata.L) ℂ)
+      (1 : ↥((typeIHyp.typeI.typeF.H).subgroupOf vdata.L)) := fun _ => rfl
+  have hdeg : ∀ i, ClassFunction.induce ((typeIHyp.typeI.typeF.H).subgroupOf vdata.L)
+        (θ i : ClassFunction _ ℂ) (1 : ↥vdata.L)
+      = d i * ClassFunction.induce ((typeIHyp.typeI.typeF.H).subgroupOf vdata.L)
+        (θ 0 : ClassFunction _ ℂ) (1 : ↥vdata.L) := by
+    intro i
+    rw [ClassFunction.induce_apply_one ((typeIHyp.typeI.typeF.H).subgroupOf vdata.L)
+        (θ i : ClassFunction _ ℂ), hdeg0, hd i]
+    ring
+  have hdeg_match : ClassFunction.induce ((typeIHyp.typeI.typeF.H).subgroupOf vdata.L)
+        (θ 0 : ClassFunction _ ℂ) (1 : ↥vdata.L)
+      = ClassFunction.induce ((typeIHyp.typeI.typeF.H).subgroupOf vdata.L)
+        (θ ind1H : ClassFunction _ ℂ) (1 : ↥vdata.L) := by
+    rw [hdeg0, htriv]
+    change (((typeIHyp.typeI.typeF.H).subgroupOf vdata.L).index : ℂ)
+        = ClassFunction.induce ((typeIHyp.typeI.typeF.H).subgroupOf vdata.L)
+          (trivialClassFunction ↥((typeIHyp.typeI.typeF.H).subgroupOf vdata.L)) (1 : ↥vdata.L)
+    rw [induce_trivialChar_apply_eq_index _ (Subgroup.one_mem _)]
+  have psi_support : ∀ i, (ClassFunction.induce ((typeIHyp.typeI.typeF.H).subgroupOf vdata.L)
+        (θ i : ClassFunction _ ℂ)
+      - d i • ClassFunction.induce ((typeIHyp.typeI.typeF.H).subgroupOf vdata.L)
+          (θ 0 : ClassFunction _ ℂ)).support
+      ⊆ OddOrder.Peterfalvi.S04.supportInSubgroup
+          (OddOrder.GroupTheory.typeIA vdata.L typeIHyp.typeI) vdata.L := by
+    intro i
+    refine (induce_diff_support (θ i) (θ 0) (d i) (hdeg i)).trans ?_
+    intro x hx
+    rw [Set.mem_diff, SetLike.mem_coe, Set.mem_singleton_iff] at hx
+    exact (mem_supportInSubgroup_sharp_subgroupOf_iff typeIHyp.typeI.typeF.H hAH x).mpr
+      ⟨hx.1, hx.2⟩
+  refine ⟨hypothesis78OfDade typeIHyp.toHypothesis71
+    (typeIHyp.dadeData.dade.fullDadeIsometryData typeIHyp.hconj).toDadeIsometryData.isDadeIsometry
+    typeIHyp.typeI.typeF.H hHL hHnorm hAH θ hinj hcover d psi_support hdeg ind1H hind1H htriv
+    hdeg_match coh.extension ?_ ?_⟩
+  · intro i j hi hj
+    exact coherence_extension_inner_eq_on_family coh (hSmem i hi) (hSmem j hj)
+  · intro i _ hi_ind
+    obtain ⟨deg_i, -, hdeg_i_eq⟩ := irreducibleCharacter_apply_one_eq_pos_natCast (θ i)
+    exact coherence_hagree_dadeMap typeIHyp.dadeData.dade typeIHyp.hconj coh
+      (hSmem i hi_ind) (hSmem 0 (Ne.symm hind1H)) (m0 := 1) (mi := deg_i) (by norm_num)
+      (by rw [hd i, hdeg_i_eq, Nat.cast_one, div_one]) (psi_support i)
+
 /-- **Peterfalvi (14.10)**: a type-I maximal subgroup `M` over `N_G(V)` together
 with its Dade data exists.  Symmetric to `exists_LHypothesis`, packaging (13.17)
 for the `V`-side with the Dade data and the virtual character `β_M` of (14.10).

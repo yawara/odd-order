@@ -1270,3 +1270,35 @@ placeholder には依存しない** (依存すると unsound)。
   upstream-first に build** (b の generic producer は signature contract で cite)。cont.⁴⁴ の
   「(i) §7 coherence = lane b の build」という読みは**過大** — 待たない。旧 lane-h 課題
   (06-22「真の long pole = η-grid honest 化」) の後継 owner は c。
+
+### cont.⁴⁶ (2026-07-03 lane c=γ 再開): 9002 detour 完 → §16 復帰。char frontier 全体が grid carrier に収束確認 + M-coherence h78 を landing
+
+**再開時の frontier 全数精査** (9002 Clifford shared supply は cont.²² で完了 = lane b の S14 consumption 待ち)。
+§13/§16 char frontier をコード検証した結論:
+
+- **char frontier 全体が grid carrier honest 化 (= Track A) に収束**: norm cascade (13.6-13.10) は
+  opaque-Prop scaffold で parameterized 算術 engine (`caseB_lambda_norm_core`/`caseB_eta_norm_core`/
+  `caseB_quadratic_nonneg`) は**完備** (issue 3002 通り)、残は S15.Hypothesis の grid 性質 field のみ。
+  `c_eq_one` (13.12) は構造部 (`2q∣c-1`→`c≥2q+1`) proven・残 sorry は (13.10) analytic + Fitting-core σ。
+  `exists_MHypothesis` の `betaGrid` field も honest η-grid 要求。
+- **Track A は cross-lane 確定**: spine (FeitThompson.lean:1727+) は `omega := Section16CharacterData.omegaS`
+  = honest な (3.3) 循環-TI グリッドから構成 (∴ 性質は S05 orthonormality `:733/740` + S07 isometry から
+  導出可能 = **hoist でない**)。しかし S15.Hypothesis + Section16Inputs は `omega`/`tau3` を **bare field**
+  で持ち性質を carry せず。field 追加 = lane c だが threading (Section16Inputs + spine supply) = lane a
+  (FeitThompson.lean 所有) → **lane c 単独で build-green 不可**。issue 3002 の fix-owner 分担どおり。
+
+**Track B = genuine grid-independent lane-c work を landing** (`feedback-file-hub-issue-dont-stop`: Track A は
+issue 3002、tractable work 続行):
+
+- **✅ `exists_M_hypothesis78` (S16, commit 予定)**: V-side M の §7 coherence `S09.Hypothesis78` producer。
+  `witness_L_hypothesis78` (L-side) の V-side dual — coherence source を `witness_L_coherent` から一般
+  `S14.frobenius_typeI_coherent` に差し替え、`hypothesis78OfDade` assembly は同一 (placed family
+  `exists_witness_placed_family` 汎用・nu_isometry `coherence_extension_inner_eq_on_family`・hagree
+  `coherence_hagree_dadeMap`)。**body は sorry-free** (`exists_M_structural` を subsume: M/typeIHyp/
+  maximal/N_G(V)≤M/index=pq + h78)。inherited sorryAx は `frobenius_typeI_coherent` (coherence engine=
+  lane-b infra) + `typeII_overNormalizer_frobenius_V` (V-side 構造 chain) の既存 sorry 由来 = 正当な
+  sorried-cite。MHypothesis.h78 docstring「the single honest obligation that exists_MHypothesis discharges」
+  = これが埋まった。full build 3906 green。
+- **次**: (a) `exists_MHypothesis` へ wire (h78=exists_M_hypothesis78・structural=同・σ counts=P/Q_isTI/
+  card_normalizer・betaGrid+betaM は Track A gated ゆえ sorried sub-obligation に isolate)。(b) Track A
+  grid carrier の cross-lane threading (issue 3002、lane a 協調)。
