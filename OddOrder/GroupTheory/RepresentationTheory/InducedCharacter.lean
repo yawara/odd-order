@@ -620,30 +620,51 @@ section InducedTrivialNorm
 
 variable [Invertible (Nat.card G : ℂ)]
 
-/-- **Norm of the induced trivial character** `⟨Ind_H^G 1_H, Ind_H^G 1_H⟩ = [G : H]` for a normal
-subgroup `H ⊴ G`.  Frobenius reciprocity gives `⟨Ind 1_H, Ind 1_H⟩ = ⟨1_H, Res Ind 1_H⟩`; for `H`
-normal every `G`-conjugate of `h ∈ H` stays in `H`, so `Ind_H^G 1_H` is the constant `[G:H]` on `H`
-(`induce_apply_of_mem_normal_of_const`), i.e. `Res_H Ind_H^G 1_H = [G:H] • 1_H`, and `⟨1_H, 1_H⟩ = 1`.
+/-- **Restriction of the induced trivial character to a normal `H`**: `Res_H Ind_H^G 1_H = [G:H]•1_H`.
+Every `G`-conjugate of `h ∈ H` stays in `H` (normality), so `Ind_H^G 1_H` is the constant `[G:H]` on
+`H` (`induce_apply_of_mem_normal_of_const`). -/
+theorem restrict_induce_trivial (H : Subgroup G) [Fintype ↥H] [H.Normal]
+    [Invertible (Nat.card ↥H : ℂ)] :
+    ClassFunction.restrict H (induce H (trivialClassFunction ↥H))
+      = (H.index : ℂ) • trivialClassFunction ↥H := by
+  ext h
+  rw [ClassFunction.restrict_apply, ClassFunction.smul_apply, trivialClassFunction_apply, mul_one,
+    induce_apply_of_mem_normal_of_const (le_refl H) (trivialClassFunction ↥H)
+      (fun a' ha' => trivialClassFunction_apply (⟨a', ha'⟩ : ↥H)) h.2, mul_one]
+  have hcard : (Nat.card G : ℂ) = (H.index : ℂ) * (Nat.card ↥H : ℂ) := by
+    rw [← Nat.cast_mul, Subgroup.index_mul_card]
+  rw [hcard, mul_comm (H.index : ℂ), ← mul_assoc, invOf_mul_self, one_mul]
 
-For `H ⊴ L` Frobenius (`L = N_G(H)`), this is Peterfalvi's `⟨Ind 1_H, Ind 1_H⟩ = e`, the source-side
-norm behind the (7.8.b) computation `‖β‖² = e + 1`. -/
+/-- **Norm of the induced trivial character** `⟨Ind_H^G 1_H, Ind_H^G 1_H⟩ = [G : H]` for a normal
+`H ⊴ G` (`restrict_induce_trivial` + `⟨1_H, 1_H⟩ = 1`).  For `H ⊴ L` Frobenius this is Peterfalvi's
+`⟨Ind 1_H, Ind 1_H⟩ = e`, the source-side norm behind the (7.8.b) computation `‖β‖² = e + 1`. -/
 theorem induce_trivial_inner_self (H : Subgroup G) [Fintype ↥H] [H.Normal]
     [Invertible (Nat.card ↥H : ℂ)] :
     ClassFunction.inner (induce H (trivialClassFunction ↥H))
         (induce H (trivialClassFunction ↥H)) = (H.index : ℂ) := by
-  rw [inner_induce_eq_inner_restrict]
-  have hres : ClassFunction.restrict H (induce H (trivialClassFunction ↥H))
-      = (H.index : ℂ) • trivialClassFunction ↥H := by
-    ext h
-    rw [ClassFunction.restrict_apply, ClassFunction.smul_apply, trivialClassFunction_apply, mul_one,
-      induce_apply_of_mem_normal_of_const (le_refl H) (trivialClassFunction ↥H)
-        (fun a' ha' => trivialClassFunction_apply (⟨a', ha'⟩ : ↥H)) h.2, mul_one]
-    have hcard : (Nat.card G : ℂ) = (H.index : ℂ) * (Nat.card ↥H : ℂ) := by
-      rw [← Nat.cast_mul, Subgroup.index_mul_card]
-    rw [hcard, mul_comm (H.index : ℂ), ← mul_assoc, invOf_mul_self, one_mul]
-  rw [hres, inner_smul_right, star_natCast,
+  rw [inner_induce_eq_inner_restrict, restrict_induce_trivial, inner_smul_right, star_natCast,
     OddOrder.RepresentationTheory.irr_cf_inner trivialClassFunction_isIrreducible
       trivialClassFunction_isIrreducible, if_pos rfl, mul_one]
+
+/-- **Inner product of an induced character with the induced trivial character** for a normal `H`:
+`⟨Ind_H^G φ, Ind_H^G 1_H⟩ = [G:H]·⟨φ, 1_H⟩`.  Frobenius reciprocity + `restrict_induce_trivial`. -/
+theorem induce_inner_induce_trivial (H : Subgroup G) [Fintype ↥H] [H.Normal]
+    [Invertible (Nat.card ↥H : ℂ)] (φ : ClassFunction ↥H ℂ) :
+    ClassFunction.inner (induce H φ) (induce H (trivialClassFunction ↥H))
+      = (H.index : ℂ) * ClassFunction.inner φ (trivialClassFunction ↥H) := by
+  rw [inner_induce_eq_inner_restrict, restrict_induce_trivial, inner_smul_right, star_natCast]
+
+/-- **Peterfalvi's `⟨ζ, Ind1H⟩ = 0`** (the source-side orthogonality of the (7.8.b) `‖β‖² = e+1`
+computation): for a normal `H` and an irreducible `φ ≠ 1_H`, the induced character `Ind_H^G φ` is
+orthogonal to the induced principal character `Ind_H^G 1_H`.  Immediate from
+`induce_inner_induce_trivial` and `⟨φ, 1_H⟩ = 0`. -/
+theorem induce_inner_induce_trivial_eq_zero_of_irreducible (H : Subgroup G) [Fintype ↥H] [H.Normal]
+    [Invertible (Nat.card ↥H : ℂ)] {φ : ClassFunction ↥H ℂ} (hφ : IsIrreducibleCharacter φ)
+    (hφ1 : φ ≠ trivialClassFunction ↥H) :
+    ClassFunction.inner (induce H φ) (induce H (trivialClassFunction ↥H)) = 0 := by
+  rw [induce_inner_induce_trivial,
+    OddOrder.RepresentationTheory.irr_cf_inner hφ trivialClassFunction_isIrreducible, if_neg hφ1,
+    mul_zero]
 
 end InducedTrivialNorm
 
