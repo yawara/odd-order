@@ -74,7 +74,7 @@
 > | **b** | β Pf §12 Dade tower + coherence infra | `OddOrder/Peterfalvi/S14_MaximalI.lean`（**全体**、旧 carve-out 0088 `exists_typeICovering` は b に解消）+ **coherence infra** = `S07_Coherence*`/`S08_PGroupReduction`（既存 coherence file、(5.7)/(6.5.c)/(6.8) case-B 系、hub authorized 2026-07-02）+ GroupTheory/** coherence leaf。⚠ これらは nominal に a の `S0[3-9]` regex に掛かるが **coherence infra ゆえ b 担当（逸脱でない）**、a の active territory は §9-13 char 核で S07/S08 coherence は非接触。**⚠ b の例外 glob は正確に `S07_Coherence*` + `S08_PGroupReduction` の 2 つのみ** (正本 ft_lane_reallocation §レーン表): `S08_CaseB*`/`S08_CoherenceTheorems` 等その他の S07/S08 file は **lane a 所有** — 2026-07-03 tick で a の `S08_CaseBCoherence2` 1 行追従を「b 所有では」と誤読しかけた (glob 照合で解消、逸脱でない) |
 > | **c** | γ POLE-2 §15–16 chain 一本化 | `OddOrder/Peterfalvi/{S15_SAndT_Setup, S15_SAndT, S16_NonExistenceG}.lean`（**S15_SAndT_Setup は 2026-07-02 に lane d→c、§15→16 全 chain を c が所有**）+ 構成的 Clifford (issue 9002、GroupTheory/** shared) |
 > | **~~d~~ 退役** | — | **2026-07-02 退役**。σ-theory leaf (`GroupTheory/**`, sorry-free) は共有ゾーンに残置 (a が tail 完成)。BG/** は完了・共有凍結。FeitThompson carrier は a に fold。**branch `d` は git に温存 (作業は全 merge 済)、worktree セッションは停止**。 |
-> | **共有（全 lane 可）** | — | `OddOrder/AxiomsCheck.lean` / `OddOrder.lean` / `OddOrder/GroupTheory/**` / `OddOrder/Mathlib/**` / `OddOrder/Algebra/**`（全 lane 加算可）/ `OddOrder/BG/**`（完了・共有凍結）/ `notes/**` / `issues/**` |
+> | **共有（全 lane 可）** | — | `OddOrder/AxiomsCheck.lean` / `OddOrder.lean` / `OddOrder/GroupTheory/**` / `OddOrder/Mathlib/**` / `OddOrder/Algebra/**` / **`OddOrder/Isaacs/**`**（全 lane 加算可）/ `OddOrder/BG/**`（完了・共有凍結）/ `notes/**` / `issues/**`。**⚠ Isaacs 追加 (2026-07-04 hub 裁定)**: `OddOrder/Isaacs/**` は基盤 finite-group-theory ライブラリで**どのレーンの active territory でもない**ゆえ shared foundation として扱う (consumer が proven 補題を additive に加算可、GroupTheory/Algebra 同格)。precedent = c の Isaacs 6.11 使用 / a の (7.8.b) 用 `IsFrobeniusGroup.two_mul_card_complement_add_one_le_card_kernel` 追加 (commit 9f41b6f7)。既存 Isaacs 宣言の statement 改変は要 hub flag (additive のみ非逸脱)。|
 > | **凍結 scaffold** | — | `OddOrder/Peterfalvi/Appendices/**`（off-path・consumer 0、2026-07-02 census 検証済: Huppert 1 / NearFields 2 / Suzuki 5 / Suzuki2Groups 4 / FeitSibley 3 sorry。**どのレーンも編集しない**。σ-theory near-field 等が App B/C を cite する必要が生じたら、その時点で hub が owner 割当 — 自然候補 = a の σ-theory tail 系）|
 >
 > ⚠ `FeitThompson.lean` は**共有ではなく lane a 所有** (d 退役で carrier 宣言群ごと fold)。他レーンが
@@ -147,7 +147,7 @@
    `CronDelete` + 報告 + 以降の tick を行わない）。報告には逸脱ファイル名 + lane + 所有者を明記。例 (lane=$b):
    ```
    owned_re='^OddOrder/Peterfalvi/S(0[3-9]|1[0-6])|^OddOrder/BG/|^OddOrder/FeitThompson'  # 全 Pf S03-16 + BG を許容; per-lane 厳密判定は 🔒 マップ (a=S03-13+FeitThompson / b=S14_MaximalI+coherence+carve-out 0090/0096 / c=S15-16; BG=共有凍結)
-   shared_re='^OddOrder/AxiomsCheck\.lean$|^OddOrder\.lean$|^OddOrder/GroupTheory/|^OddOrder/Mathlib/|^OddOrder/Algebra/|^OddOrder/FeitThompson'  # GroupTheory/Mathlib/Algebra=汎用 infra (全 lane 加算可)。FeitThompson は regex 互換で残すが実際は lane a 所有 — a 以外の FT 編集は 🔒 マップ注記どおり hub flag
+   shared_re='^OddOrder/AxiomsCheck\.lean$|^OddOrder\.lean$|^OddOrder/GroupTheory/|^OddOrder/Mathlib/|^OddOrder/Algebra/|^OddOrder/Isaacs/|^OddOrder/FeitThompson'  # GroupTheory/Mathlib/Algebra/Isaacs=汎用/基盤 infra (全 lane 加算可; Isaacs は 2026-07-04 hub 裁定で shared foundation、additive のみ)。FeitThompson は regex 互換で残すが実際は lane a 所有 — a 以外の FT 編集は 🔒 マップ注記どおり hub flag
    git diff --name-only main...$b -- '*.lean' | grep -vE "$owned_re" | grep -vE "$shared_re" | grep . && echo "範囲逸脱 → STOP"
    ```
    逸脱なし（空）→ step 1.6 へ。共有ファイル・notes・issues のみの差分は逸脱でない。

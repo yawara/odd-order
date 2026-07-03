@@ -4,6 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 -/
 import OddOrder.Peterfalvi.S09_FrobeniusHypothesis78
 import OddOrder.GroupTheory.RepresentationTheory.BrauerPermutationUnconditional
+import OddOrder.Isaacs.Ch06_FrobeniusActions.OddComplement
 
 /-!
 # Peterfalvi (7.8.b) for a Frobenius family — the `ζ`-norm estimate
@@ -211,6 +212,158 @@ theorem hzeta0nu [Fintype G] [Invertible (Nat.card G : ℂ)]
         (F.sibleyDadeHypothesis_of_frobenius i hodd hnilp C hFrob).hconj)
   exact coherence_extension_orthogonal_constOne (F.coherence i hodd hnilp C hFrob) hτ_smul htau1
     hmem0 hmem0' hnorm0 hnorm0' horth hsupp h1_0 h1_0'
+
+open scoped Classical in
+/-- **Peterfalvi (7.8.b) for the `i`-th Frobenius member**: `1 − e_i/h_i ≤ ‖ζ_0^{νρ}‖²`, the norm
+lower bound (`H78.zetaNuRhoNormSq`) feeding the `card_G0_lower_bound` (7.10) estimate (issue 0044).
+Assembles the (7.8) `Hypothesis78` and feeds the bundled §7 producer `zetaNuRhoNormSqGeOfDade` its four
+genuine inputs: `hzeta0nu` (`ζ_0^ν ⊥ 1_G`, `F.hzeta0nu`), `hζ0norm` (`‖ζ_0‖² = 1`, Frobenius),
+`a`/`ha` (`(β, ζ_0^ν) + 1 ∈ ℤ`, `exists_betaDecomp_a`), and `hsmall` (`2e + 1 ≤ h`,
+`IsFrobeniusGroup.two_mul_card_complement_add_one_le_card_kernel`).  Mirrors `S14.witness_L_zeta_bound`. -/
+theorem zetaNuRhoNormSq_ge [Fintype G] [Invertible (Nat.card G : ℂ)]
+    (F : FrobeniusFamily G k) (i : Fin k) (hodd : Odd (Nat.card G))
+    [Fintype ↥(F.L i)] [Invertible (Nat.card ↥(F.L i) : ℂ)]
+    [Invertible (Nat.card ↥((F.H i).subgroupOf (F.L i)) : ℂ)]
+    (hnilp : Group.IsNilpotent ↥((F.H i).subgroupOf (F.L i)))
+    (C : Subgroup ↥(F.L i))
+    (hFrob : OddOrder.Isaacs.Ch06.IsFrobeniusGroup ↥(F.L i) ((F.H i).subgroupOf (F.L i)) C) :
+    ∃ H78 : Hypothesis78 G (OddOrder.Peterfalvi.S08.sharpImage ((F.H i).subgroupOf (F.L i))) (F.L i),
+      (1 : ℝ) - (H78.complementIndex : ℝ) / (H78.kernelOrder : ℝ) ≤ H78.zetaNuRhoNormSq := by
+  classical
+  haveI hKnorm : ((F.H i).subgroupOf (F.L i)).Normal := hFrob.isNormal
+  set coh := F.coherence i hodd hnilp C hFrob with hcoh
+  have hHL : F.H i ≤ F.L i := F.kernel_le i
+  have hHnorm : ∀ (l : ↥(F.L i)) {h : G}, h ∈ F.H i →
+      (l : G) * h * (l : G)⁻¹ ∈ F.H i :=
+    fun l _h hh => (F.mem_kernel_conj_iff_of_mem_L i l.2).mpr hh
+  have hAH : OddOrder.Peterfalvi.S08.sharpImage ((F.H i).subgroupOf (F.L i))
+      = (F.H i : Set G) \ {1} := F.sharpImage_subgroupOf_eq i
+  obtain ⟨χ, hχS, hχdeg⟩ := F.exists_sibley_distinguished_char i hodd hnilp C hFrob
+  obtain ⟨θlin, hθ_ne, hχ_eq⟩ := hχS
+  obtain ⟨n, θ, ind1H, hind1H, h0, htriv, hinj, hcover⟩ :=
+    exists_placed_induced_family ((F.H i).subgroupOf (F.L i)) χ ⟨θlin, hχ_eq.symm⟩
+      (hχ_eq ▸ induce_ne_trivialChar_induce ((F.H i).subgroupOf (F.L i)) θlin hθ_ne)
+  have hdeg0 : ClassFunction.induce ((F.H i).subgroupOf (F.L i)) (θ 0 : ClassFunction _ ℂ)
+      (1 : ↥(F.L i)) = (((F.H i).subgroupOf (F.L i)).index : ℂ) := by rw [h0]; exact hχdeg
+  have hSmem : ∀ j, j ≠ ind1H →
+      ClassFunction.induce ((F.H i).subgroupOf (F.L i)) (θ j : ClassFunction _ ℂ)
+        ∈ (F.sibleyDadeHypothesis_of_frobenius i hodd hnilp C hFrob).S := by
+    intro j hj
+    refine ⟨θ j, fun htriv_j => hj (hinj ?_), rfl⟩
+    change ClassFunction.induce ((F.H i).subgroupOf (F.L i)) (θ j : ClassFunction _ ℂ)
+        = ClassFunction.induce ((F.H i).subgroupOf (F.L i)) (θ ind1H : ClassFunction _ ℂ)
+    rw [htriv_j, htriv]
+  -- `θ_0 ≠ 1` (else `Ind (θ 0) = Ind (θ ind1H)`, so `0 = ind1H` by `hinj`, contra).
+  have hθ0_ne : θ 0 ≠ trivialIrreducibleCharacter ↥((F.H i).subgroupOf (F.L i)) := by
+    intro h
+    refine hind1H (hinj ?_).symm
+    change ClassFunction.induce ((F.H i).subgroupOf (F.L i)) (θ 0 : ClassFunction _ ℂ)
+        = ClassFunction.induce ((F.H i).subgroupOf (F.L i)) (θ ind1H : ClassFunction _ ℂ)
+    rw [h, htriv]
+  let d : Fin (n + 1) → ℂ :=
+    fun j => (θ j : ClassFunction ↥((F.H i).subgroupOf (F.L i)) ℂ)
+      (1 : ↥((F.H i).subgroupOf (F.L i)))
+  have hd : ∀ j, d j = (θ j : ClassFunction ↥((F.H i).subgroupOf (F.L i)) ℂ)
+      (1 : ↥((F.H i).subgroupOf (F.L i))) := fun _ => rfl
+  have hdeg : ∀ j, ClassFunction.induce ((F.H i).subgroupOf (F.L i))
+        (θ j : ClassFunction _ ℂ) (1 : ↥(F.L i))
+      = d j * ClassFunction.induce ((F.H i).subgroupOf (F.L i))
+        (θ 0 : ClassFunction _ ℂ) (1 : ↥(F.L i)) := by
+    intro j
+    rw [ClassFunction.induce_apply_one ((F.H i).subgroupOf (F.L i))
+        (θ j : ClassFunction _ ℂ), hdeg0, hd j]
+    ring
+  have hdeg_match : ClassFunction.induce ((F.H i).subgroupOf (F.L i))
+        (θ 0 : ClassFunction _ ℂ) (1 : ↥(F.L i))
+      = ClassFunction.induce ((F.H i).subgroupOf (F.L i))
+        (θ ind1H : ClassFunction _ ℂ) (1 : ↥(F.L i)) := by
+    rw [hdeg0, htriv]
+    change (((F.H i).subgroupOf (F.L i)).index : ℂ)
+        = ClassFunction.induce ((F.H i).subgroupOf (F.L i))
+          (trivialClassFunction ↥((F.H i).subgroupOf (F.L i))) (1 : ↥(F.L i))
+    rw [induce_trivialChar_apply_eq_index _ (Subgroup.one_mem _)]
+  have psi_support : ∀ j, (ClassFunction.induce ((F.H i).subgroupOf (F.L i))
+        (θ j : ClassFunction _ ℂ)
+      - d j • ClassFunction.induce ((F.H i).subgroupOf (F.L i))
+          (θ 0 : ClassFunction _ ℂ)).support
+      ⊆ OddOrder.Peterfalvi.S04.supportInSubgroup
+          (OddOrder.Peterfalvi.S08.sharpImage ((F.H i).subgroupOf (F.L i))) (F.L i) := by
+    intro j
+    refine (induce_diff_support (θ j) (θ 0) (d j) (hdeg j)).trans ?_
+    intro x hx
+    rw [Set.mem_diff, SetLike.mem_coe, Set.mem_singleton_iff] at hx
+    exact (mem_supportInSubgroup_sharp_subgroupOf_iff (F.H i) hAH x).mpr ⟨hx.1, hx.2⟩
+  have hnu_isometry : ∀ a b : Fin (n + 1), a ≠ ind1H → b ≠ ind1H →
+      ClassFunction.inner (coh.extension
+          (ClassFunction.induce ((F.H i).subgroupOf (F.L i)) (θ a : ClassFunction _ ℂ)))
+          (coh.extension
+          (ClassFunction.induce ((F.H i).subgroupOf (F.L i)) (θ b : ClassFunction _ ℂ)))
+        = ClassFunction.inner
+          (ClassFunction.induce ((F.H i).subgroupOf (F.L i)) (θ a : ClassFunction _ ℂ))
+          (ClassFunction.induce ((F.H i).subgroupOf (F.L i)) (θ b : ClassFunction _ ℂ)) :=
+    fun a b ha hb => coherence_extension_inner_eq_on_family coh (hSmem a ha) (hSmem b hb)
+  have hagree : ∀ a : Fin (n + 1), a ≠ 0 → a ≠ ind1H →
+      (F.sibleyToHypothesis71 i hodd hnilp C hFrob).τ
+          ⟨ClassFunction.induce ((F.H i).subgroupOf (F.L i)) (θ a : ClassFunction _ ℂ)
+          - d a • ClassFunction.induce ((F.H i).subgroupOf (F.L i))
+            (θ 0 : ClassFunction _ ℂ), psi_support a⟩
+        = coh.extension (ClassFunction.induce ((F.H i).subgroupOf (F.L i)) (θ a : ClassFunction _ ℂ))
+          - d a • coh.extension
+            (ClassFunction.induce ((F.H i).subgroupOf (F.L i)) (θ 0 : ClassFunction _ ℂ)) := by
+    intro a _ha0 ha_ind
+    obtain ⟨deg_a, -, hdeg_a_eq⟩ := irreducibleCharacter_apply_one_eq_pos_natCast (θ a)
+    exact coherence_hagree_dadeMap (F.sibleyDadeHypothesis_of_frobenius i hodd hnilp C hFrob).dade
+      (F.sibleyDadeHypothesis_of_frobenius i hodd hnilp C hFrob).hconj coh
+      (hSmem a ha_ind) (hSmem 0 (Ne.symm hind1H)) (m0 := 1) (mi := deg_a) (by norm_num)
+      (by rw [hd a, hdeg_a_eq, Nat.cast_one, div_one]) (psi_support a)
+  -- The concrete `Hypothesis78`.
+  set H78 := hypothesis78OfDade (F.sibleyToHypothesis71 i hodd hnilp C hFrob)
+    (OddOrder.Peterfalvi.S04.isDadeIsometry_of_isDadeMap _ _
+      (F.sibleyToHypothesis71 i hodd hnilp C hFrob).isDadeMap
+      (F.sibleyToHypothesis71 i hodd hnilp C hFrob).hConjInvariant)
+    (F.H i) hHL hHnorm hAH θ hinj hcover d psi_support hdeg ind1H hind1H htriv hdeg_match
+    coh.extension hnu_isometry hagree with hH78def
+  refine ⟨H78, ?_⟩
+  -- (7.8.a) `a`: `(β, ζ_0^ν) + 1 ∈ ℤ`.
+  obtain ⟨a, ha⟩ := exists_betaDecomp_a H78
+    (Submodule.sub_mem _
+      (ClassFunction.induce_mem_ZIrr _ (θ ind1H).property.mem_ZIrr)
+      (ClassFunction.induce_mem_ZIrr _ (θ 0).property.mem_ZIrr))
+    (coh.extension_mem_ZIrr _ (Submodule.subset_span (hSmem 0 (Ne.symm hind1H))))
+  -- (7.8.b) `smallIndex`: `2e + 1 ≤ h`, from the odd-Frobenius size bound.
+  have hoddL : Odd (Nat.card ↥(F.L i)) :=
+    hodd.of_dvd_nat (Subgroup.card_subgroup_dvd_card (F.L i))
+  have hKodd : Odd (Nat.card ↥((F.H i).subgroupOf (F.L i))) :=
+    hoddL.of_dvd_nat (Subgroup.card_subgroup_dvd_card _)
+  have hCodd : Odd (Nat.card ↥C) := hoddL.of_dvd_nat (Subgroup.card_subgroup_dvd_card C)
+  have hcompl : Nat.card ↥((F.H i).subgroupOf (F.L i)) * Nat.card ↥C = Nat.card ↥(F.L i) :=
+    hFrob.isComplement.card_mul_card
+  have hKcard : Nat.card ↥((F.H i).subgroupOf (F.L i)) = Nat.card ↥(F.H i) :=
+    Nat.card_congr (Subgroup.subgroupOfEquivOfLe hHL).toEquiv
+  have hsmall : H78.smallIndex := by
+    have hfrob := hFrob.two_mul_card_complement_add_one_le_card_kernel hKodd hCodd
+      hFrob.ne_bot_kernel
+    show 2 * H78.complementIndex + 1 ≤ H78.kernelOrder
+    have hke : H78.kernelOrder = Nat.card ↥((F.H i).subgroupOf (F.L i)) := by
+      show Nat.card ↥(F.H i) = Nat.card ↥((F.H i).subgroupOf (F.L i))
+      exact hKcard.symm
+    have hce : H78.complementIndex = Nat.card ↥C := by
+      show Nat.card ↥(F.L i) / Nat.card ↥(F.H i) = Nat.card ↥C
+      rw [← hKcard, ← hcompl, Nat.mul_div_cancel_left _ Nat.card_pos]
+    rw [hke, hce]; exact hfrob
+  -- Feed the bundled (7.8.b) producer.  `hzeta0nu` is stated for the literal `F.coherence`; fold it
+  -- to the `set` variable `coh` (via `hcoh`) so `ν = coh.extension` matches.
+  have hz0 := F.hzeta0nu i hodd hnilp C hFrob (θ 0) hθ0_ne
+  rw [← hcoh] at hz0
+  have hbound := zetaNuRhoNormSqGeOfDade (F.sibleyToHypothesis71 i hodd hnilp C hFrob)
+    (OddOrder.Peterfalvi.S04.isDadeIsometry_of_isDadeMap _ _
+      (F.sibleyToHypothesis71 i hodd hnilp C hFrob).isDadeMap
+      (F.sibleyToHypothesis71 i hodd hnilp C hFrob).hConjInvariant)
+    (F.H i) hHL hHnorm hAH θ hinj hcover d psi_support hdeg ind1H hind1H htriv hdeg_match
+    coh.extension hnu_isometry hagree hz0
+    (inner_self_induce_eq_one_of_frobeniusGroup hFrob (θ 0) hθ0_ne)
+    a ha hsmall
+  exact hbound
 
 end FrobeniusFamily
 
