@@ -837,3 +837,18 @@ norm bounds hA/hB/hC (deep §7) + he(3≤e, discharged)。
 cyclotomic + 12.15)。(12.14) done は h_const field を供給 (chain の 1 field 完成)。
 **次: CounterexampleDadeData 構成 (exists_counterexample_dade_data) で 12.14 [h_const] を wire +
 dischargeable field を埋め、deep field (h_psig_int/norm bounds) を isolate** = faithful decomposition。
+
+### loop¹⁴⁹ — CounterexampleDadeData field map: (12.14) done = h_const; 残 = h_psix/h_psig_int/hA-C
+
+`CounterexampleDadeData` (S14:5738) fields = (12.16) contract:
+- **he** (3≤e): discharged。
+- **h_const** (ψ(x·g)=ψ(x)): **= (12.14) DONE** (specific g への適用)。
+- **h_psix** (∃w integral, ψ(x)-e=(1-ε)w): cyclotomic 合同 ψ(x)≡e mod(1-ε)。
+  Coq = vchar_ker_mod_prim; Lean は (1.10.a) `exists_integral_apply_sub_of_commute` 系か。
+- **h_psig_int** (ψ(g)=mval∈ℤ): **= (12.15) deep** (M の ρM=adjointAverageFun + norm 下界 + cyclotomic)。
+- **hA/hB/hC** (norm bounds normRhoM/normRho の不等式): **deep §7 estimates** (Hypothesis78/NormEstimates 系)。
+
+∴ exists_counterexample_dade_data (bundle 構成) の残 = **deep final Dade contradiction**
+(h_psix cyclotomic + h_psig_int 12.15 + hA-C §7 norm)。(12.14) は h_const を供給済。
+**次: h_psix (cyclotomic、(1.10) infra で最 tractable) を build 検討 → CounterexampleDadeData の
+非-deep field を埋める**。deep field (h_psig_int/norm) は multi-session。
