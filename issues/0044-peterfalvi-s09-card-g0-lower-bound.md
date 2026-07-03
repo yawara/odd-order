@@ -305,3 +305,14 @@ induced-char 算術 (degree `induce_apply_one`・vanishing・reciprocity `inner_
 **次 block 候補** (leaf 先行, 上流 trunk へ): `⟨Ind_H^L 1_H, Ind_H^L 1_H⟩=[L:H]=e` (`⟨Ind1H,Ind1H⟩=e`
 source fact; reciprocity + normal-H Mackey `Res_H Ind_H^L 1 = e•1_H`)、その後 Hypothesis71-from-TI trunk。
 /loop は 1 iteration = 1 genuine block で漸進中 (scaffold 追加はしない = doneness)。
+
+## 2026-07-03 cont.³ (lane-a, /loop) — 2nd block landed; leaves ~done, next = trunk
+
+**Landed** (`233ce907`): `induce_trivial_inner_self` (`⟨Ind_H^G 1_H, Ind_H^G 1_H⟩=[G:H]` for H⊴G) —
+the `⟨Ind1H,Ind1H⟩=e` source norm (via `induce_apply_of_mem_normal_of_const` + reciprocity).
+
+**状態**: induced-char **leaves** (degree/vanishing/reciprocity/trivial-inner/trivial-norm) は既存+今回
+2 本で概ね揃った。残る 7.10 は **deep trunk** (fresh context 推奨):
+1. **`Hypothesis71`-from-TI/Frobenius** = (7.1) Dade ρ-setup を TI 構造から構成 (§2/§4 Dade)。次 iteration の第一目標。issue 0045 が (7.1) を sorry-free 化済ゆえ、既存 `Hypothesis71` 補題群から constructor が組めるか要調査。
+2. coherence ((5.6)/(6.8) Sibley、induced family)。
+3. (7.8.b) `chiRhoNormSq` 下界 + (7.9) 2-family 非直交。
