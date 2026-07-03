@@ -29,13 +29,17 @@ prefix-split (凍結済 generic 宣言を上流 GroupTheory leaf へ移し、S08
 
 ## やること (hub)
 
-- [ ] 上記 3 補題 (+ それらだけが使う private helper があれば同伴) を新 shared leaf
-      (例: `OddOrder/GroupTheory/RepresentationTheory/InducedTransport.lean`) へ移動。
-      namespace は現状維持 (`OddOrder.RepresentationTheory` 直下 / `ClassFunction` — 現宣言のまま
-      移せば下流の参照は import 追加のみで不変)。
-- [ ] `S08_CaseBCoherence2.lean` は新 leaf を import (宣言削除 + import 1 行)。
-- [ ] `OddOrder.lean` root に新 leaf を追加。full build green 確認。
-- [ ] **重複検出の付記**: `S11_MaximalII_III_IV.lean` に `inner_compHom_of_bijective` (L7310) /
+- [x] 上記 3 補題を新 shared leaf `OddOrder/GroupTheory/RepresentationTheory/InducedTransport.lean`
+      へ移動 (hub, 2026-07-03)。⚠ 2 適応: (1) namespace は `OddOrder.Peterfalvi.S08` →
+      **`OddOrder.RepresentationTheory`** に変更 (S08 は `open OddOrder.RepresentationTheory` 済ゆえ
+      参照は不変; generic 宣言の正しい所属)。(2) lemma 1 の Fourier 展開は Peterfalvi 側
+      `classFunction_eq_sum_inner_smul` (S08_CoherenceCorePart1、import 逆流不可) の代わりに
+      共有側の同内容 `sum_inner_irreducibleCharacter_smul` (CharacterCompleteness) を cite。
+      `Fintype (IrreducibleCharacter M)` instance のため ColumnOrthogonality も import。
+- [x] `S08_CaseBCoherence2.lean` は新 leaf を import (宣言削除 + 移設注記 + import 1 行)。
+      Peterfalvi 文脈の docstring ((6.8.2.3) 対応) は S08 側に移設注記として温存。
+- [x] `OddOrder.lean` root に新 leaf を追加。full build green (3903 jobs) + AxiomsCheck OK。
+- [ ] **重複検出の付記 (残タスク: split 済み後の統合判定)**: `S11_MaximalII_III_IV.lean` に `inner_compHom_of_bijective` (L7310) /
       `inner_compHom_mulEquiv` (L7755) — S08 の `inner_compHom_of_mulEquiv` と同内容の可能性。
       split 後に S11 側を新 leaf cite に置換できるか lane b/hub で判定 (できれば統合)。
 
