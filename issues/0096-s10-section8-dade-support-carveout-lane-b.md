@@ -614,3 +614,13 @@ hβconst (β const on H∖H') = Coq (12.5) 本体 (PFsection12:420-475) 精読�
 ∴ hβconst は **既存 infra から assemblable な multi-iteration build** (from-scratch でない)。(12.5) は orphan
 ゆえ FT 即効値は低いが、partition/inertia は type-I char 全般の再利用 infra。
 **次: partition disjointness lemma (直接 route) を build** → cover → DpsiH → o_rpsi_S。
+
+### loop¹³⁵ — ✅ partition trivIset core landed (commit 822d37fa)
+
+`exists_conj_of_common_induce_constituent` (CliffordSingleOrbit.lean、sorry-free): H⊴G で θ₁ θ₂∈Irr(H)
+が共通 χ を Ind constituent に持てば G-共役。= induced-from-H' 分割の **trivIset core** (非共役⟹P_i disjoint)。
+Clifford 単一軌道 + Frobenius の assembly。再利用 Clifford infra。build green 3298 jobs。
+
+**(12.5) hβconst 進捗** (4 iter): vanishing lemma (¹³²) + statement 訂正/Fourier 還元 (¹³³) + roadmap (¹³⁴)
++ trivIset core (¹³⁵)。**次 = partition cover** (∀ j∈Irr(H), ∃ i∈Irr(H'), j lies over Ind i;
+= Res_{H'} j ≠ 0 の constituent 存在) → partition 組立 → DpsiH → o_rpsi_S (Dade reciprocity)。
