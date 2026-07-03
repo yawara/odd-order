@@ -642,3 +642,20 @@ deep orphan build。reusable infra (vanishing/partition) は type-I char 全般�
 **次: DpsiH-const 汎用 lemma (係数 class-const → const on H∖H') = partition + cfInd_central_Inertia
 (`exists_extension_induce_eq_sum_distinct_of_inertia_inf_le`) + vanishing の assembly** を build、
 o_rpsi_S を残 hypothesis に isolate。
+
+### loop¹³⁷ — frontier 総括 + (12.5) hβconst に集中決定
+
+**(12.14) 評価**: Coq は (12.4) `FTtype1_ortho_constant` 適用で証明。但し Lean mapping subtle:
+dade.psi = coh.extension χ は span R(χ) 内ゆえ R(χ) と非直交 → (12.4) 適用は cross-family 直交
+(R(χ)⊥R(χ'), χ≠χ') + coset/kernel 構造依存。deep multi-piece。
+
+**lane-b S14 frontier 総括**: 全 target が deep multi-iteration build:
+- (12.5) hβconst: partition (trivIset ¹³⁵ + cover exists_liesOver 既存) + vanishing (¹³²) DONE、残 = o_rpsi_S reconciliation + DpsiH。
+- (12.14): (12.4) 経由だが dade.psi⊥R subtle + cross-family 直交要。
+- (12.11): group theory (support facts + Cauchy/Sylow)。
+- (12.10) witness_L_*: hub 9003 pinned。
+reusable infra (induce vanishing + partition trivIset) は抽出済・type-I char 全般で再利用可。
+
+**決定: (12.5) hβconst に集中** (最多 infra 済 + upstream-most)。o_rpsi_S = horth (ψ⊥R on G) →
+Res_L ψ の S-係数構造 の reconciliation を sustained build。orphan だが CLAUDE.md 上 skip 理由でなく、
+infra 蓄積が最も進んでいる。次: o_rpsi_S の concrete build 着手。
