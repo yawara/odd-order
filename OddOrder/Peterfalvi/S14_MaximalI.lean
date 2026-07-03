@@ -8,6 +8,7 @@ import OddOrder.Peterfalvi.S10_CoherenceWiring
 import OddOrder.Peterfalvi.S09_CertificateDischarge
 import OddOrder.Peterfalvi.S07_CoherenceConstantDegree
 import OddOrder.GroupTheory.RepresentationTheory.SingerField
+import OddOrder.GroupTheory.RepresentationTheory.CliffordDecomposition
 import OddOrder.GroupTheory.RepresentationTheory.CyclotomicCharacterCongruence
 import Mathlib.RepresentationTheory.Irreducible
 
@@ -409,13 +410,15 @@ theorem typeF_inertia_inf_le_U1 {Γ : Type*} [Group Γ] [Finite Γ]
     exact ClassFunction.mem_inertia.mp hgI
   exact hθ (fixed_irreducible_eq_trivial_of_card_fixedClasses_eq_one g hcard1 hfixθ)
 
+open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
 /-- **Type-`F` induced-character constituent structure** (Peterfalvi (8.2.c) + (1.2)/(1.5.a) +
 (1.7.c) + Clifford; a faithful §8 obligation — the deep content is type-`F` character theory living
 in §8, not §12).  For a type-I maximal `L` and `χ = Ind_H^L θ ∈ S` (`θ ∈ Irr H ∖ {1}`), `χ` is the
 multiplicity-one sum of a nonempty finite set of equal-degree, non-real irreducible constituents,
 each supported in `A(L) ∪ {1}`.  Body = §8 type-`F` Clifford theory: (8.2.c) `I(θ) ∩ U ⊆ U₁` +
 induced-degree (1.7.c) for the equal degree, `(Res_H φ, 1_H) = 0` (1.5.a) + (1.2) for the support. -/
-theorem typeI_induced_char_constituents [Finite G] {L : Subgroup G} (hyp : Hypothesis L)
+theorem typeI_induced_char_constituents [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {L : Subgroup G} (hyp : Hypothesis L)
     {chi : ClassFunction ↥L ℂ} (hchi : chi ∈ hyp.Sset) :
     ∃ S : Finset (IrreducibleCharacter ↥L), S.Nonempty ∧
       chi = ∑ φ ∈ S, (φ : ClassFunction ↥L ℂ) ∧
@@ -426,7 +429,113 @@ theorem typeI_induced_char_constituents [Finite G] {L : Subgroup G} (hyp : Hypot
         (φ : ClassFunction ↥L ℂ).conj ≠ (φ' : ClassFunction ↥L ℂ)) ∧
       (∀ φ ∈ S, (φ : ClassFunction ↥L ℂ).support ⊆
         OddOrder.Peterfalvi.S04.supportInSubgroup hyp.ambientA L ∪ {1}) := by
-  sorry
+  haveI := hyp.finiteG
+  classical
+  obtain ⟨θ, hθ_ne, hchi_eq⟩ := hchi
+  -- `H = (L_F).subgroupOf L`, kept as a raw term so `θ`'s type matches (no `set`).
+  haveI hKnormal : ((hyp.typeI.typeF.H).subgroupOf L).Normal := by
+    rw [hyp.typeI.typeF.H_eq]
+    exact OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_subgroupOf_normal L
+  have hodd : Odd (Nat.card ↥L) := hG.odd.of_dvd_nat (Subgroup.card_subgroup_dvd_card L)
+  obtain ⟨d, _hd_pos, hd⟩ := irreducibleCharacter_apply_one_eq_pos_natCast θ
+  have hθirr := θ.isIrreducible
+  have hHT : (hyp.typeI.typeF.H).subgroupOf L ≤ ClassFunction.inertia θ.toClassFunction :=
+    ClassFunction.subgroup_le_inertia _
+  haveI : (((hyp.typeI.typeF.H).subgroupOf L).subgroupOf
+      (ClassFunction.inertia θ.toClassFunction)).Normal := hKnormal.comap _
+  have hHU : (hyp.typeI.typeF.H).subgroupOf L ⊔ (hyp.typeI.typeF.U).subgroupOf L = ⊤ :=
+    hyp.typeI.typeF.complement.sup_eq_top
+  have hHall : Nat.Coprime (Nat.card ↥((hyp.typeI.typeF.H).subgroupOf L))
+      ((hyp.typeI.typeF.H).subgroupOf L).index := by
+    have h := (OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_isHall L).coprime_index
+    rw [hyp.typeI.typeF.H_eq]; exact h
+  have hUHcop : Nat.Coprime (Nat.card ↥((hyp.typeI.typeF.U).subgroupOf L))
+      (Nat.card ↥((hyp.typeI.typeF.H).subgroupOf L)) := by
+    have hidx : Nat.card ↥((hyp.typeI.typeF.U).subgroupOf L)
+        = ((hyp.typeI.typeF.H).subgroupOf L).index :=
+      (hyp.typeI.typeF.complement.symm.index_eq_card).symm
+    rw [hidx]; exact hHall.symm
+  have hcentL : ∀ x ∈ (hyp.typeI.typeF.H).subgroupOf L, x ≠ 1 →
+      (hyp.typeI.typeF.U).subgroupOf L ⊓ Subgroup.centralizer ({x} : Set ↥L)
+        ≤ (hyp.typeI.typeF.U1).subgroupOf L := by
+    intro x hxK hx1 z hz
+    obtain ⟨hzU, hzC⟩ := Subgroup.mem_inf.mp hz
+    have hzUG : (z : G) ∈ hyp.typeI.typeF.U := Subgroup.mem_subgroupOf.mp hzU
+    have hxHG : (x : G) ∈ hyp.typeI.typeF.H := Subgroup.mem_subgroupOf.mp hxK
+    have hx1G : (x : G) ≠ 1 := fun h => hx1 (Subtype.ext h)
+    have hzCG : (z : G) ∈ Subgroup.centralizer ({(x : G)} : Set G) := by
+      rw [Subgroup.mem_centralizer_singleton_iff]
+      exact congrArg Subtype.val (Subgroup.mem_centralizer_singleton_iff.mp hzC)
+    exact Subgroup.mem_subgroupOf.mpr
+      (hyp.typeI.typeF.centralizer_le_U1 (x : G) hxHG hx1G (Subgroup.mem_inf.mpr ⟨hzUG, hzCG⟩))
+  have hbound : ClassFunction.inertia θ.toClassFunction ⊓ (hyp.typeI.typeF.U).subgroupOf L
+      ≤ (hyp.typeI.typeF.U1).subgroupOf L :=
+    typeF_inertia_inf_le_U1 hUHcop hcentL θ hθ_ne
+  have hU1comm : IsMulCommutative ↥((hyp.typeI.typeF.U1).subgroupOf L) := by
+    have hle : hyp.typeI.typeF.U1 ≤ L := le_trans hyp.typeI.typeF.U1_le hyp.typeI.typeF.U_le
+    exact OddOrder.GroupTheory.isMulCommutative_of_mulEquiv
+      (Subgroup.subgroupOfEquivOfLe hle).symm hyp.typeI.typeF.U1_commutative
+  have hcop : Nat.Coprime
+      (((hyp.typeI.typeF.H).subgroupOf L).subgroupOf
+        (ClassFunction.inertia θ.toClassFunction)).index
+      (orderOf hθirr.determinant * d) :=
+    OddOrder.RepresentationTheory.coprime_index_orderOf_determinant_mul_of_coprime_index
+      hHT hHall hθirr hd
+  haveI : Fintype ((ClassFunction.inertia θ.toClassFunction ⧸
+      ((hyp.typeI.typeF.H).subgroupOf L).subgroupOf (ClassFunction.inertia θ.toClassFunction))
+        →* ℂˣ) := Fintype.ofFinite _
+  obtain ⟨_χ, _hχirr, S, hSne, _hScard, hSdecomp, hSdeg, _hSform⟩ :=
+    OddOrder.RepresentationTheory.exists_extension_induce_eq_sum_distinct_of_inertia_inf_le
+      hHT hθirr rfl hHU hbound hU1comm hd hcop
+  have hchisum : chi = ∑ φ ∈ S, (φ : ClassFunction ↥L ℂ) := by rw [hchi_eq]; exact hSdecomp
+  refine ⟨S, hSne, hchisum, ?_, ?_, ?_, ?_⟩
+  · intro φ hφ φ' hφ'; rw [hSdeg φ hφ, hSdeg φ' hφ']
+  · exact OddOrder.RepresentationTheory.forall_mem_not_isReal_of_induce_eq_sum_of_odd
+      hodd θ hθ_ne hSdecomp
+  · exact OddOrder.RepresentationTheory.forall_mem_conj_ne_of_odd hodd θ hθ_ne hSdecomp
+  · -- support `⊆ A(L) ∪ {1}`, via Peterfalvi (1.2)
+    intro φ hφ x hx
+    by_cases hx1 : x = 1
+    · exact Or.inr hx1
+    refine Or.inl ?_
+    rw [OddOrder.Peterfalvi.S04.mem_supportInSubgroup]
+    -- (a) `H ⊄ Ker φ` (φ occurs in `Ind_H θ` with `θ ≠ 1`)
+    have hHker : ¬ (((hyp.typeI.typeF.H).subgroupOf L : Set ↥L) ⊆
+        OddOrder.Peterfalvi.S03.characterKernel (φ : ClassFunction ↥L ℂ)) := by
+      intro hsub
+      have hrestrict : ClassFunction.restrict ((hyp.typeI.typeF.H).subgroupOf L)
+            (φ : ClassFunction ↥L ℂ)
+          = OddOrder.Peterfalvi.S03.characterDegree (φ : ClassFunction ↥L ℂ) •
+            (trivialIrreducibleCharacter ↥((hyp.typeI.typeF.H).subgroupOf L) :
+              ClassFunction _ ℂ) := by
+        ext k
+        rw [ClassFunction.restrict_apply, ClassFunction.smul_apply]
+        have hmem := hsub k.2
+        rw [OddOrder.Peterfalvi.S03.mem_characterKernel] at hmem
+        simp only [hmem, IrreducibleCharacter.coe_trivialIrreducibleCharacter,
+          trivialClassFunction_apply, mul_one]
+      have hzero : ClassFunction.inner chi (φ : ClassFunction ↥L ℂ) = 0 := by
+        rw [hchi_eq, ClassFunction.inner_induce_eq_inner_restrict, hrestrict,
+          OddOrder.RepresentationTheory.inner_smul_right, irreducibleCharacter_inner,
+          if_neg hθ_ne, mul_zero]
+      have hone : ClassFunction.inner chi (φ : ClassFunction ↥L ℂ) = 1 := by
+        rw [hchisum, inner_sum_left,
+          Finset.sum_eq_single_of_mem φ hφ (fun φ' _ hne => by
+            rw [irreducibleCharacter_inner, if_neg hne]),
+          irreducibleCharacter_inner, if_pos rfl]
+      rw [hone] at hzero; exact one_ne_zero hzero
+    -- (b) `C_H(x) = ⊥` would give `φ(x) = 0` (Pf (1.2)); so `C_H(x) ≠ ⊥`, i.e. `(x:G) ∈ A(L)`
+    by_contra hxA
+    rw [ClassFunction.mem_support] at hx
+    refine hx (OddOrder.Peterfalvi.S03.irreducibleCharacter_apply_eq_zero_of_centralizerInSubgroup_eq_bot
+      φ hHker ?_)
+    refine (Subgroup.eq_bot_iff_forall _).mpr (fun z hz => ?_)
+    by_contra hz1
+    obtain ⟨hzK, hzx⟩ := OddOrder.Peterfalvi.S03.mem_centralizerInSubgroup.mp hz
+    refine hxA ⟨SetLike.coe_mem x, fun h => hx1 (Subtype.ext h), (z : G),
+      ⟨Subgroup.mem_subgroupOf.mp hzK, fun h => hz1 (Subtype.ext h)⟩, ?_⟩
+    rw [Subgroup.mem_centralizer_singleton_iff, ← Subgroup.coe_mul, ← Subgroup.coe_mul]
+    exact congrArg Subtype.val hzx.symm
 
 open scoped Classical in
 /-- **Odd-order Frobenius: a nontrivial induced character is a single non-real irreducible supported
@@ -544,11 +653,11 @@ unpack the type-`F` constituent structure (`typeI_induced_char_constituents`) in
 `CharacterDecompositionData` carrier — whose R(χ) blocks of (12.2.b) then come from `R1`/`Rset`.  The deep type-`F` Clifford content ((8.2.c) inertia +
 (1.7.c)/(1.5.a)/(1.2)) is isolated in the obligation, keeping this assembly `sorry`-free. -/
 theorem character_decomposition_and_dade_domain [Finite G]
-    (_hG : OddOrder.BG.IsMinimalSimpleOdd G) {L : Subgroup G} (hyp : Hypothesis L)
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {L : Subgroup G} (hyp : Hypothesis L)
     {chi : ClassFunction ↥L ℂ} (hchi : chi ∈ hyp.Sset) :
     ∃ data : CharacterDecompositionData hyp chi, data.chi_mem = hchi := by
   obtain ⟨S, hne, hdecomp, hdeg, hreal, hconjnm, hsupp⟩ :=
-    typeI_induced_char_constituents hyp hchi
+    typeI_induced_char_constituents hG hyp hchi
   exact ⟨⟨hchi, S, hne, hdecomp, hdeg, hreal, hconjnm, hsupp⟩, rfl⟩
 
 /-- **Peterfalvi (12.2.a) `CharacterDecompositionData` for a Frobenius type-I `L`** —

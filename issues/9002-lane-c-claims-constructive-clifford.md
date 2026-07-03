@@ -513,3 +513,18 @@ type-F wiring: `complement.symm.index_eq_card` (card U=[L:K]) / `complement.sup_
 **API 確定名**: `ClassFunction.subgroup_le_inertia` / `hKnormal.comap T.subtype` / `hθirr.determinant`
 (先に `have hθirr : IsIrreducibleCharacter (θ:CF) := θ.isIrreducible`) / lane-c lemma は
 `OddOrder.RepresentationTheory.` 修飾。
+
+## ✅ lane b 完了 (loop¹¹⁴) — (8.2.c) `typeI_induced_char_constituents` 実証明・landed
+
+前 iter の WIP assembly を fresh session で landing (S14 sorries 11→10、full build 3910+ green)。
+`set K` unification 回避 (raw `(typeF.H).subgroupOf L` 形) + `open scoped FiniteInduce`
+(chi/Sset と instance 一致、instance-diamond 解消) + import `CliffordDecomposition` で解決。
+全 6 clause = lane c 9002 infra + Pf (1.2) の pure cite-assembly:
+- decomp+等次数 = `exists_extension_induce_eq_sum_distinct_of_inertia_inf_le`
+  (type-F data: `complement.sup_eq_top`/`complement.symm.index_eq_card`/`typeF_inertia_inf_le_U1`+↥L-hcent/
+  `isMulCommutative_of_mulEquiv`/`coprime_index_orderOf_determinant_mul_of_coprime_index`)。
+- 非実 = `forall_mem_not_isReal_of_induce_eq_sum_of_odd`、conj-distinct = `forall_mem_conj_ne_of_odd`。
+- 台 ⊆ A(L)∪{1} = Pf (1.2) `S03b.irreducibleCharacter_apply_eq_zero_of_centralizerInSubgroup_eq_bot`
+  (K⊄Ker φ from mult-one + C_K(x)=⊥→typeIA)。
+hG thread → `character_decomposition_and_dade_domain`。**一般 type-I maximal の (12.2.a) carrier が
+sorry-free 化 → 非-Frobenius N の (12.3)/(12.4)/(12.15) が un-gate**。s14_typeI_induced_assembly_wip.txt 削除。
