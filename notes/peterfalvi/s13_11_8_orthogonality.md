@@ -1160,3 +1160,39 @@ dade0 は typePA0 の conjClassSet (G-conj) vs V^M (M-conj) の照合が要調�
 `certainTypeOmegaSigma` ↔ `alignedOmegaSigmaGrid`、`h46.tau.toDadeMap` ↔ `hyp.tau`)、
 ④ h48/h410 discharge。(11.8) endpoint は依然 doubly-gated (§9↔§10、§14) — h114 ((11.8.4)) の
 discharge も③と同根の見込み。
+
+## 2026-07-03 cont.⁶⁷ (lane-a) — **issue 9004 全完了: toHypothesis46 landed、h48/h410 discharge。(11.8.5) 残 thread = h114 のみ**
+
+**landed (4 commits, 全 full-build green + AxiomsCheck OK)**:
+- ①' typePA0 M-共役化 (4623902b): 前提衛生の追加発見 2 (G-共役は subset_L×単純性で充足不能) を修正。
+  `conjClassSetIn H T` (Coq `class_support`) を GroupTheory/ConjClassSet に新設。
+  `normalizer_typePA_eq` は A(M)=(M')# → N_G(M')=M (極大+単純、hG param 追加) で再証明;
+  consumer (toHypothesis71 系) は easy 方向のみ → `le_normalizer_typePA` 抽出で無傷。
+- ①'' (4.6.d) dade0 台集合も conjClassSetIn に統一 (da38b5f7) — §10 照合を definitional 化する布石。
+- ② `Hypothesis.toHypothesis46` (52150245): (8.15)/(10.1) 形式化。**dade0/tau は definitionally
+  `hyp.dadeData.dade`/`fullDadeIsometryData hyp.hconj`** (conjClassSetIn 統一の payoff)、tic_V=rfl、
+  H:=K=M' ((10.1) H=M_s)、A_covers 自明 (A(M)=(M')#)。Hypothesis46 初インスタンス化。
+- ③+④ (f5dd2373): `tau_muGrid_zeroRow_diff` ((4.8) row-0) + `tau_muGrid_fourCorner` ((4.10)
+  δ-scaled) — §6 の `certainType_diff_dade_eq`/`fourCorner_dade_eq` を toHypothesis46 経由で
+  aligned grid に cite。**(11.8.5) capstone `residualCoeff_eq_zero` の hdeg0/h410/h48 thread 除去**
+  (+hw2 : w2.Prime param、CharacterParameters.w2_prime が供給)。
+
+**③ bridge の実装知見 (再利用可)**:
+- defeq が全部通る: `ticVdiff h46 = typePData_toTICyclicHypothesis … := rfl`、
+  `ticVdiffFullDadeApplication h46 = canonicalFullDadeApp … := rfl` (Prop fields は proof-irrel)、
+  `hyp.tau = dadeIntegralCharacterMap h46.dade0 h46.tau := rfl`。
+- σ-bridge `certainTypeOmegaSigma h46 χ₂ⱼ i' = alignedOmegaSigmaGrid i j`: ω-引数の pointwise 一致
+  (`ticWEquivSdiffW h46 g = e g`、二重 Subtype.ext + `coe_ticWEquivSdiffW`/`subgroupCongr_apply`)
+  → `show (ticVdiff h46).sigma …; rw [harg]; unfold alignedOmegaSigmaGrid; rfl`。
+- ⚠ rw の invisible mismatch 2 種: (a) `set`-fvar (χ₂/i0) vs 展開形 → bridge を「χc = 展開形 →
+  ic = 展開形 → 結論」の等式パラメータ形にして rfl-subst; (b) OfNat/instance 差 (h-based vs
+  h46-based の `0 : Fin (Nat.card _.W1)`) → 結論 shape ごとに `have hbN : … := hbridge …`
+  (exact は defeq 許容) してから rw [hbN]。sign 合わせも congrArg+esign.symm (exact ベース)。
+- hXeq ((4.10) の δ-rescale) は h-based atom に揃えて `simp only [difference, classFunction]` 後
+  δ = ±1 で rcases → push_cast → module。
+
+**現状 (11.8.5)**: `residualCoeff_eq_zero` の前提は全て genuine §10 data + **h114 ((11.8.4)
+`(μ₀−ζ)^τ = ∑ω^σ_{r0} − ζ^{τ₁}`) のみ**が residual thread。h114 は ζ^{τ₁} (SHC coherent
+extension) が絡み (4.8)/(4.10) と異質 (coherence-dependent) — Pf 原文 (11.8.4) は「(11.8.1) と
+τ の linearity」による由; 次 frontier はこれの実証明化 (SHC_tau_muGridAlpha_eq 系の在庫確認から)。
+(11.8) endpoint 自体は依然 doubly-gated (§9↔§10 の |S₁|=n、§14 の S₂ coherence)。
