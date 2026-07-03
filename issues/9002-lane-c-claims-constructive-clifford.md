@@ -199,29 +199,33 @@ Coq (1.7)(b) `cfInd_central_Inertia` の hypothesis は `abelian (T/H)` (T=I(θ)
       (cont.¹¹, sorry-free, axiom-clean): `S⊆Irr` の各 χ が `⟨φ,χ⟩=1` かつ `⟨φ,φ⟩=|S|` ⟹ `φ=∑_{χ∈S} χ`
       (Parseval `⟨φ,φ⟩=∑|⟨φ,χ⟩|²` + normSq≥0 で S 外係数消失、Fourier 展開を collapse)。任意の類関数で成立
       (ZIrr 仮説不要と判明)。「[I:H] 個 mult-1 constituents が norm² を尽くす ⟹ Ind_H^I θ = それらの和」を出す capstone。
-- [ ] **(G2) Gallagher 本体 = decomposition/bijection** — twist-既約 + lies-over + capstone は完成。
-      **✅ (G1) extension は完結** (上記 (v-c)/(v-d)、2026-07-03) — decomposition
-      `Ind_H^I θ = ∑_β χ·Inf(β)` の χ が supply された。残 (現 frontier):
-      **(a) Frobenius 相互律** ⟨Ind_H^I θ, ψ⟩ = ⟨θ, Res ψ⟩ の在庫確認/整備 (normal case)。
-      **(b) 単射性 (coprime 形で足りる)**: β ↦ χ̃·Inf(β) injective — det 論法: χ̃β₁=χ̃β₂ ⟹ det 比較
-      (`determinant_mul_linearClassFunction`) ⟹ (β₁β₂⁻¹)^d = 1 ∧ index-torsion (β^[I:H]=1) + gcd(d,[I:H])=1
-      ⟹ β₁=β₂。FT 経路の適用 (1.7(b)) は常に Hall coprime ゆえ coprime 形で十分 (一般 Gallagher 6.17 は不要)。
-      **(c) counting**: |Irr(I/H)| = [I:H] (abelian) = `card_irreducibleCharacter_eq_card_of_commGroup` 済 →
-      |S| = [I:H]。
-      **(d) capstone 適用**: ⟨Ind θ, χ̃β⟩ = 1 (相互律 + lies-over) + ⟨Ind θ, Ind θ⟩ = [I:H]
-      (`card_mul_inner_self_induce_eq_card_inertia`, I = I(θ) 全体) → `eq_sum_of_inner_eq_one_of_inner_self_eq_card`。
+- [x] **✅ (G2) Gallagher 本体 COMPLETE (2026-07-03 cont.¹⁸, commit `09a13625`)** — 新 shared leaf
+      **`GallagherDecomposition.lean`**: `induce_eq_sum_mul_linearClassFunction` (Isaacs 6.17
+      の coprime abelian 特殊化): H⊴K finite, K/H abelian, θ∈Irr(H) K-invariant, deg d,
+      gcd([K:H],d)=1, χ∈Irr(K) 拡張 ⟹ **`Ind_H^K θ = Σ_{β∈Hom(K/H,ℂˣ)} χ·Inf(β)`** (mult-one,
+      [K:H] 個 distinct)。単射性 = det 論法 (coprime; 一般 Gallagher 6.17 不要と確定)、counting =
+      mathlib 有限 abelian 自己双対 (`CommGroup.card_monoidHom_of_hasEnoughRootsOfUnity`) +
+      新 instance `Finite (G →* Mˣ)`、norm = inertia 公式、collapse = capstone。sorry-free
+      axiom-clean。**Lean 教訓: 商の CommGroup instance は letI (haveI だと .toGroup が opaque
+      になり ambient Quotient.group と defeq 切れで下流全滅)**。
 - [ ] **type-F 適用**: `typeF_inertia_commutator_le` (I(θ)/H abelian) を (G3) に投入。
 - [ ] **(1.5.a)/(1.2) 台**: 各構成要素 φ の台 ⊆ A(L)∪{1}。非実 = 奇数位数 (`not_isReal_of_ne_trivial_of_odd_card'`)。
 - [ ] `typeI_induced_char_constituents` (S14:472) を上記 cite で sorry-free 化。lane b (12.14) は cite。
 
-## 次の frontier + 判明した真の上流 bottleneck (2026-07-02 cont.³)
+## 次の frontier + 判明した真の上流 bottleneck (2026-07-02 cont.³; 更新 2026-07-03 cont.¹⁸)
 
-**Clifford correspondence 全単射の核 = `Ind_I^G ψ` 既約 (Isaacs 6.11、I=I_G(θ) 非正規) は「一般 (非正規)
-Mackey」を要する**: 既存 norm 機構 `InducedIrreducible.card_mul_inner_self_induce` /
-`card_smul_restrict_induce` は **`[H.Normal]` 前提** (`induceTerm_of_mem_normal` 経由) ゆえ、慣性群 `I`
-(一般に非正規) の `⟨Ind_I^G ψ, Ind_I^G ψ⟩` に直接使えない。∴ 上流未収録の **general Mackey 公式** が
-(G1)-(G3) と並ぶ真の最上流。document 順は 6.11 (Clifford corr) < 6.16 (Gallagher) < 6.28 (extension)。
-次セッションはこの general Mackey か Gallagher (拡張仮説付き) から着手 (両者 multi-session、正面から engage)。
+**✅ (G1) 6.28/8.16 extension と (G2) 6.17-coprime Gallagher は完結** (2026-07-03)。
+**残る唯一の深い上流 = Clifford correspondence の既約性 (Isaacs 6.11)**:
+`ψ ∈ Irr(I|θ) ⟹ Ind_I^L ψ ∈ Irr(L)` (I = I_L(θ) **非正規**)。既存 norm 機構
+`InducedIrreducible.card_mul_inner_self_induce` / `card_smul_restrict_induce` は **`[H.Normal]`
+前提** (`induceTerm_of_mem_normal` 経由) ゆえ慣性群 `I` に直接使えない。選択肢:
+(i) **一般 (非正規) Mackey 公式** を build して norm 計算、または (ii) **Isaacs 6.11 の
+θ-part 論法** (Mackey 回避: Res_H (Ind_I^L ψ) の θ-成分の multiplicity を直接比較 —
+⟨Res_H Ind ψ, θ⟩ = ⟨Res_H ψ, θ⟩ を single-orbit + degree count で挟む)、または (iii) Coq
+PFsection1 `constt_Inertia_bijection` の経路を精読して最短路を採る。
+これが埋まれば: Ind_H^L θ = Ind_I^L (Ind_H^I θ) [induction-in-stages 済] = Σ_β Ind_I^L(χ̃·Infβ)
+[(G2) 済] で各項既約 [6.11] → (1.7)(b) の等次数 [L:I]·d・mult-one 分解が完成、残りは
+台 (1.5.a)/(1.2) + 非実 + S14 assembly のみ。
 
 **性質**: genuine multi-session char build (G1-G3 は Isaacs §6/§11 の generic char theory で repo 未収録)。
 Frobenius sub-case は proven ゆえ witness (12.16) 経路は現状も通る; 本 issue は一般 (12.14) 用の shared infra。
