@@ -7,6 +7,7 @@ import OddOrder.Peterfalvi.S11_MaximalII_III_IV
 import OddOrder.Peterfalvi.S05_OmegaSigmaGrid
 import OddOrder.Peterfalvi.S05_SigmaTrichotomy
 import OddOrder.Peterfalvi.S08_CaseBEndgame
+import OddOrder.Peterfalvi.S06_CertainTypeFourCorner
 import Mathlib.GroupTheory.IsPerfect
 
 /-!
@@ -3291,6 +3292,334 @@ theorem Hypothesis.exists_charParameters_full [Finite G]
     exact hs
 
 /-! ## (10.5)--(10.6): Dade-isometry calculations -/
+
+open scoped FiniteInduce in
+/-- **Peterfalvi (4.8) on the §10 aligned grid, row `0`** (coherence-free): for two nonzero
+columns `j, k`, `(μ_{0j} − μ_{0k})^τ = δ_j·(ω_{0j}^σ − ω_{0k}^σ)`, where `τ = hyp.tau`,
+`ω^σ = alignedOmegaSigmaGrid`, and `δ_j = muColumnSign j`.
+
+This is the §6 isometry identity `certainType_diff_dade_eq` cited through the (8.15)
+instantiation `toHypothesis46`: the §10 Dade map is *definitionally* the certain-type
+`dadeIntegralCharacterMap h46.dade0 h46.tau`, `muGrid`/`muColumnSign` unfold to the §6
+`columnFamily` data (`unfold … rfl`), the equal-degree input is the (10.3) cross-column
+constancy `muGrid_apply_one_eq` (whence `hw2`), and the §6 σ-image `certainTypeOmegaSigma`
+is the aligned grid (the ω-arguments agree pointwise along `ticWEquivSdiffW = e`).  This
+discharges the `h48` thread of the (11.8.3)/(11.8.5) β-reality argument (issue 9004). -/
+theorem Hypothesis.tau_muGrid_zeroRow_diff [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    {M : Subgroup G} (hyp : Hypothesis M) (hodd : Odd (Nat.card G)) (hw2 : (hyp.w2).Prime)
+    {j k : Fin hyp.w2} (hj : j ≠ 0) (hk : k ≠ 0) :
+    hyp.tau (hyp.muGrid hG hodd 0 j - hyp.muGrid hG hodd 0 k)
+      = (hyp.muColumnSign hG hodd j : ℂ) •
+          (hyp.alignedOmegaSigmaGrid hG hodd 0 j - hyp.alignedOmegaSigmaGrid hG hodd 0 k) := by
+  haveI := hyp.finiteG
+  classical
+  by_cases hjk : j = k
+  · subst hjk
+    simp
+  -- §6 host context (the standard `muGrid`/`alignedOmegaSigmaGrid` let-context)
+  let h := (hyp.toCertainTypeHypothesis hG hodd).toHypothesis
+  haveI hNeZ1 : NeZero (Nat.card h.W1) := ⟨by have := h.one_lt_card_W1; omega⟩
+  haveI : IsCyclic ↥(h.W1 ⊔ h.W2) := h.isCyclic_sup
+  letI : CommGroup ↥(h.W1 ⊔ h.W2) := IsCyclic.commGroup
+  have hW1le : hyp.typeP.W1 ≤ M := hyp.typeP.W1_le
+  have hW2le : hyp.typeP.W2 ≤ M := typePData_W2_le_self hyp.typeP
+  have hcardW1 : Nat.card ↥h.W1 = hyp.w1 :=
+    Nat.card_congr (Subgroup.subgroupOfEquivOfLe hW1le).toEquiv
+  have hcardW2sub : Nat.card ↥(h.W2.subgroupOf (h.W1 ⊔ h.W2)) = hyp.w2 := by
+    rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe (le_sup_right)).toEquiv]
+    exact Nat.card_congr (Subgroup.subgroupOfEquivOfLe hW2le).toEquiv
+  haveI hNeZ2 : NeZero (Nat.card ↥(h.W2.subgroupOf (h.W1 ⊔ h.W2))) := ⟨Nat.card_pos.ne'⟩
+  set χ₂ := finCardEquivCharacterGroup (h.W2.subgroupOf (h.W1 ⊔ h.W2))
+    (finCongr hcardW2sub.symm j) with hχ₂def
+  set χ₂' := finCardEquivCharacterGroup (h.W2.subgroupOf (h.W1 ⊔ h.W2))
+    (finCongr hcardW2sub.symm k) with hχ₂'def
+  set i0 : Fin (Nat.card h.W1) := finCongr hcardW1.symm (0 : Fin hyp.w1) with hi0def
+  -- §5 tic context
+  let tic := typePData_toTICyclicHypothesis hyp.typeP hodd
+  haveI : NeZero (Nat.card ↥tic.W1) := ⟨Nat.card_pos.ne'⟩
+  haveI : NeZero (Nat.card ↥tic.W2) := ⟨Nat.card_pos.ne'⟩
+  let e : ↥tic.W ≃* ↥(h.W1 ⊔ h.W2) :=
+    (Subgroup.subgroupOfEquivOfLe (typePData_W_le_self hyp.typeP)).symm.trans
+      (MulEquiv.subgroupCongr (typePData_sup_subgroupOf_eq hyp.typeP).symm)
+  set h46 := hyp.toHypothesis46 hG hodd with hh46
+  haveI : NeZero (Nat.card ↥h46.W1) := hNeZ1
+  -- column-character facts
+  have hcol_ne : ∀ (l : Fin hyp.w2), l ≠ 0 →
+      finCardEquivCharacterGroup (h.W2.subgroupOf (h.W1 ⊔ h.W2))
+        (finCongr hcardW2sub.symm l) ≠ 1 := by
+    intro l hl heq
+    rw [← finCardEquivCharacterGroup_zero (h.W2.subgroupOf (h.W1 ⊔ h.W2))] at heq
+    have hl0 : finCongr hcardW2sub.symm l = 0 := (finCardEquivCharacterGroup _).injective heq
+    apply hl
+    have hval : (l : ℕ) = 0 := by simpa using congrArg Fin.val hl0
+    exact Fin.ext hval
+  have hχ₂ne1 : χ₂ ≠ 1 := hcol_ne j hj
+  have hχ₂'ne1 : χ₂' ≠ 1 := hcol_ne k hk
+  have hχne : χ₂ ≠ χ₂' := by
+    intro heq
+    apply hjk
+    rw [hχ₂def, hχ₂'def] at heq
+    have := (finCardEquivCharacterGroup _).injective heq
+    have hval : (j : ℕ) = (k : ℕ) := by simpa using congrArg Fin.val this
+    exact Fin.ext hval
+  -- `muGrid` unfolds (definitional, the `unfold … rfl` idiom)
+  have emj : hyp.muGrid hG hodd 0 j = ((h.columnFamily χ₂).mu i0 : ClassFunction ↥M ℂ) := by
+    unfold Hypothesis.muGrid
+    rfl
+  have emk : hyp.muGrid hG hodd 0 k = ((h.columnFamily χ₂').mu i0 : ClassFunction ↥M ℂ) := by
+    unfold Hypothesis.muGrid
+    rfl
+  -- equal degree: the (10.3) cross-column constancy
+  have hdeg : ((h.columnFamily χ₂).mu i0 : ClassFunction ↥M ℂ) 1
+      = ((h.columnFamily χ₂').mu i0 : ClassFunction ↥M ℂ) 1 := by
+    rw [← emj, ← emk]
+    exact hyp.muGrid_apply_one_eq hG hodd hw2 0 0 hj hk
+  -- σ-bridge: `certainTypeOmegaSigma (toHypothesis46) = alignedOmegaSigmaGrid`
+  have hpt : ∀ g : ↥tic.W, OddOrder.Peterfalvi.S06.ticWEquivSdiffW h46 g = e g := by
+    intro g
+    apply Subtype.ext
+    apply Subtype.ext
+    rw [OddOrder.Peterfalvi.S06.coe_ticWEquivSdiffW]
+    show (g : G) = ((MulEquiv.subgroupCongr (typePData_sup_subgroupOf_eq hyp.typeP).symm
+        ((Subgroup.subgroupOfEquivOfLe (typePData_W_le_self hyp.typeP)).symm g) : ↥M) : G)
+    rw [MulEquiv.subgroupCongr_apply]
+    rfl
+  have hbridge : ∀ (χc : (h.W2.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ)
+      (ic : Fin (Nat.card h.W1)) (ii : Fin hyp.w1) (jj : Fin hyp.w2),
+      χc = finCardEquivCharacterGroup (h.W2.subgroupOf (h.W1 ⊔ h.W2))
+        (finCongr hcardW2sub.symm jj) →
+      ic = finCongr hcardW1.symm ii →
+      OddOrder.Peterfalvi.S06.certainTypeOmegaSigma h46 χc ic
+      = hyp.alignedOmegaSigmaGrid hG hodd ii jj := by
+    rintro χc ic ii jj rfl rfl
+    have harg : ((OddOrder.Peterfalvi.S06.ticVdiff h46).omega
+          (OddOrder.Peterfalvi.S06.omegaProdCharTic h46
+            (finCardEquivCharacterGroup (h.W2.subgroupOf (h.W1 ⊔ h.W2))
+              (finCongr hcardW2sub.symm jj)) (finCongr hcardW1.symm ii))
+            : ClassFunction (OddOrder.Peterfalvi.S06.ticVdiff h46).W ℂ)
+        = ClassFunction.compHom e.toMonoidHom
+            ((h.chiColumn (finCardEquivCharacterGroup (h.W2.subgroupOf (h.W1 ⊔ h.W2))
+                (finCongr hcardW2sub.symm jj)) (finCongr hcardW1.symm ii)
+              : ClassFunction h.sdiffTICyclicHypothesis.W ℂ)) := by
+      ext g
+      rw [OddOrder.Peterfalvi.S05.TICyclicHypothesis.omega_apply,
+        ClassFunction.compHom_apply,
+        show e.toMonoidHom g = OddOrder.Peterfalvi.S06.ticWEquivSdiffW h46 g from (hpt g).symm]
+      exact OddOrder.Peterfalvi.S06.omegaProdCharTic_apply h46 _ _ g
+    show (OddOrder.Peterfalvi.S06.ticVdiff h46).sigma rfl
+        (OddOrder.Peterfalvi.S06.ticVdiffFullDadeApplication h46)
+        ((OddOrder.Peterfalvi.S06.ticVdiff h46).omega
+          (OddOrder.Peterfalvi.S06.omegaProdCharTic h46 _ (finCongr hcardW1.symm ii)))
+      = hyp.alignedOmegaSigmaGrid hG hodd ii jj
+    rw [harg]
+    unfold Hypothesis.alignedOmegaSigmaGrid
+    rfl
+  -- `hyp.tau` on the (4.8) supported difference is the certain-type Dade map
+  have hsupp : (hyp.muGrid hG hodd 0 j - hyp.muGrid hG hodd 0 k).support ⊆
+      OddOrder.Peterfalvi.S04.supportInSubgroup
+        (typePA M hyp.typeP ∪ OddOrder.GroupTheory.conjClassSetIn M h46.tic.V) M :=
+    ClassFunction.mem_supportedSubmodule.mp
+      (OddOrder.Peterfalvi.S06.certainTypeDiffSupported h46 hχ₂ne1 hχ₂'ne1 i0 hdeg).2
+  have happly : hyp.tau (hyp.muGrid hG hodd 0 j - hyp.muGrid hG hodd 0 k)
+      = h46.tau.toDadeMap
+          (OddOrder.Peterfalvi.S06.certainTypeDiffSupported h46 hχ₂ne1 hχ₂'ne1 i0 hdeg) := by
+    have h1 : hyp.tau (hyp.muGrid hG hodd 0 j - hyp.muGrid hG hodd 0 k)
+        = h46.dade0.dadeMap (k := ℂ)
+            ⟨hyp.muGrid hG hodd 0 j - hyp.muGrid hG hodd 0 k,
+              ClassFunction.mem_supportedSubmodule.mpr hsupp⟩ :=
+      OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap_apply_of_support h46.dade0 h46.tau hsupp
+    rw [h1, show h46.tau.toDadeMap = h46.dade0.dadeMap (k := ℂ) from
+      OddOrder.Peterfalvi.S04.IsDadeMap.unique h46.tau.toDadeIsometryData.isDadeMap
+        h46.dade0.isDadeMap_dadeMap]
+    have hval : hyp.muGrid hG hodd 0 j - hyp.muGrid hG hodd 0 k
+        = ((h.columnFamily χ₂).mu i0 : ClassFunction ↥M ℂ)
+          - ((h.columnFamily χ₂').mu i0 : ClassFunction ↥M ℂ) := by
+      rw [emj, emk]
+    exact congrArg _ (Subtype.ext hval)
+  -- assemble: (4.8) + σ-bridge + sign reconciliation
+  have esign : hyp.muColumnSign hG hodd j = (h46.columnFamily χ₂).sign := by
+    unfold Hypothesis.muColumnSign
+    rfl
+  rw [happly]
+  refine (OddOrder.Peterfalvi.S06.certainType_diff_dade_eq h46 hχne hχ₂ne1 hχ₂'ne1 i0 hdeg).trans ?_
+  rw [hbridge χ₂ i0 0 j hχ₂def hi0def, hbridge χ₂' i0 0 k hχ₂'def hi0def,
+    ← Int.cast_smul_eq_zsmul ℂ]
+  exact congrArg (fun s : ℤ => (s : ℂ) •
+    (hyp.alignedOmegaSigmaGrid hG hodd 0 j - hyp.alignedOmegaSigmaGrid hG hodd 0 k)) esign.symm
+
+open scoped FiniteInduce in
+/-- **Peterfalvi (4.10) on the §10 aligned grid** (coherence-free, `δ_j`-scaled): the four-corner
+Dade identity `(μ_{ij} − μ_{0j} − δ_j μ_{i0} + δ_j μ_{00})^τ = δ_j·(ω_{ij}^σ − ω_{0j}^σ − ω_{i0}^σ
++ ω_{00}^σ)`.
+
+This is the §6 `fourCorner_dade_eq` cited through the (8.15) instantiation `toHypothesis46`
+(same bridging as `tau_muGrid_zeroRow_diff`), with the book's `δ_j(μ_{ij} − μ_{0j}) − (μ_{i0} −
+μ_{00})` form rescaled by `δ_j` (`δ_j² = 1`, `muColumnSign_eq_one_or_neg_one`) and the trivial
+column-`0` sign `δ_0 = 1` (`muColumnSign_zero`) absorbed.  This discharges the `h410` thread of
+the (11.8.3)/(11.8.5) β-reality argument (issue 9004). -/
+theorem Hypothesis.tau_muGrid_fourCorner [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    {M : Subgroup G} (hyp : Hypothesis M) (hodd : Odd (Nat.card G))
+    (i : Fin hyp.w1) (j : Fin hyp.w2) :
+    hyp.tau (hyp.muGrid hG hodd i j - hyp.muGrid hG hodd 0 j
+        - (hyp.muColumnSign hG hodd j : ℂ) • hyp.muGrid hG hodd i 0
+        + (hyp.muColumnSign hG hodd j : ℂ) • hyp.muGrid hG hodd 0 0)
+      = (hyp.muColumnSign hG hodd j : ℂ) •
+          (hyp.alignedOmegaSigmaGrid hG hodd i j - hyp.alignedOmegaSigmaGrid hG hodd 0 j
+            - hyp.alignedOmegaSigmaGrid hG hodd i 0 + hyp.alignedOmegaSigmaGrid hG hodd 0 0) := by
+  haveI := hyp.finiteG
+  classical
+  -- §6 host context
+  let h := (hyp.toCertainTypeHypothesis hG hodd).toHypothesis
+  haveI hNeZ1 : NeZero (Nat.card h.W1) := ⟨by have := h.one_lt_card_W1; omega⟩
+  haveI : IsCyclic ↥(h.W1 ⊔ h.W2) := h.isCyclic_sup
+  letI : CommGroup ↥(h.W1 ⊔ h.W2) := IsCyclic.commGroup
+  have hW1le : hyp.typeP.W1 ≤ M := hyp.typeP.W1_le
+  have hW2le : hyp.typeP.W2 ≤ M := typePData_W2_le_self hyp.typeP
+  have hcardW1 : Nat.card ↥h.W1 = hyp.w1 :=
+    Nat.card_congr (Subgroup.subgroupOfEquivOfLe hW1le).toEquiv
+  have hcardW2sub : Nat.card ↥(h.W2.subgroupOf (h.W1 ⊔ h.W2)) = hyp.w2 := by
+    rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe (le_sup_right)).toEquiv]
+    exact Nat.card_congr (Subgroup.subgroupOfEquivOfLe hW2le).toEquiv
+  haveI hNeZ2 : NeZero (Nat.card ↥(h.W2.subgroupOf (h.W1 ⊔ h.W2))) := ⟨Nat.card_pos.ne'⟩
+  set χ₂ := finCardEquivCharacterGroup (h.W2.subgroupOf (h.W1 ⊔ h.W2))
+    (finCongr hcardW2sub.symm j) with hχ₂def
+  set i' : Fin (Nat.card h.W1) := finCongr hcardW1.symm i with hi'def
+  have hi00 : (0 : Fin (Nat.card h.W1)) = finCongr hcardW1.symm (0 : Fin hyp.w1) := by
+    apply Fin.ext; simp
+  have hdual0 : finCardEquivCharacterGroup (h.W2.subgroupOf (h.W1 ⊔ h.W2))
+      (finCongr hcardW2sub.symm (0 : Fin hyp.w2)) = 1 := by
+    rw [show finCongr hcardW2sub.symm (0 : Fin hyp.w2) = 0 from by apply Fin.ext; simp,
+      finCardEquivCharacterGroup_zero]
+  -- §5 tic context
+  let tic := typePData_toTICyclicHypothesis hyp.typeP hodd
+  haveI : NeZero (Nat.card ↥tic.W1) := ⟨Nat.card_pos.ne'⟩
+  haveI : NeZero (Nat.card ↥tic.W2) := ⟨Nat.card_pos.ne'⟩
+  let e : ↥tic.W ≃* ↥(h.W1 ⊔ h.W2) :=
+    (Subgroup.subgroupOfEquivOfLe (typePData_W_le_self hyp.typeP)).symm.trans
+      (MulEquiv.subgroupCongr (typePData_sup_subgroupOf_eq hyp.typeP).symm)
+  set h46 := hyp.toHypothesis46 hG hodd with hh46
+  haveI : NeZero (Nat.card ↥h46.W1) := hNeZ1
+  -- signs: `δ_j` matches the §6 column sign, and the trivial column has sign `1`
+  have esign : hyp.muColumnSign hG hodd j = (h.columnFamily χ₂).sign := by
+    unfold Hypothesis.muColumnSign
+    rfl
+  have hδ1 : (h.columnFamily
+      (1 : (h.W2.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ)).sign = 1 := by
+    have e0 : hyp.muColumnSign hG hodd 0 = (h.columnFamily
+        (finCardEquivCharacterGroup (h.W2.subgroupOf (h.W1 ⊔ h.W2))
+          (finCongr hcardW2sub.symm (0 : Fin hyp.w2)))).sign := by
+      unfold Hypothesis.muColumnSign
+      rfl
+    rw [hyp.muColumnSign_zero hG hodd, hdual0] at e0
+    exact e0.symm
+  -- σ-bridge (as in `tau_muGrid_zeroRow_diff`)
+  have hpt : ∀ g : ↥tic.W, OddOrder.Peterfalvi.S06.ticWEquivSdiffW h46 g = e g := by
+    intro g
+    apply Subtype.ext
+    apply Subtype.ext
+    rw [OddOrder.Peterfalvi.S06.coe_ticWEquivSdiffW]
+    show (g : G) = ((MulEquiv.subgroupCongr (typePData_sup_subgroupOf_eq hyp.typeP).symm
+        ((Subgroup.subgroupOfEquivOfLe (typePData_W_le_self hyp.typeP)).symm g) : ↥M) : G)
+    rw [MulEquiv.subgroupCongr_apply]
+    rfl
+  have hbridge : ∀ (χc : (h.W2.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ)
+      (ic : Fin (Nat.card h.W1)) (ii : Fin hyp.w1) (jj : Fin hyp.w2),
+      χc = finCardEquivCharacterGroup (h.W2.subgroupOf (h.W1 ⊔ h.W2))
+        (finCongr hcardW2sub.symm jj) →
+      ic = finCongr hcardW1.symm ii →
+      OddOrder.Peterfalvi.S06.certainTypeOmegaSigma h46 χc ic
+      = hyp.alignedOmegaSigmaGrid hG hodd ii jj := by
+    rintro χc ic ii jj rfl rfl
+    have harg : ((OddOrder.Peterfalvi.S06.ticVdiff h46).omega
+          (OddOrder.Peterfalvi.S06.omegaProdCharTic h46
+            (finCardEquivCharacterGroup (h.W2.subgroupOf (h.W1 ⊔ h.W2))
+              (finCongr hcardW2sub.symm jj)) (finCongr hcardW1.symm ii))
+            : ClassFunction (OddOrder.Peterfalvi.S06.ticVdiff h46).W ℂ)
+        = ClassFunction.compHom e.toMonoidHom
+            ((h.chiColumn (finCardEquivCharacterGroup (h.W2.subgroupOf (h.W1 ⊔ h.W2))
+                (finCongr hcardW2sub.symm jj)) (finCongr hcardW1.symm ii)
+              : ClassFunction h.sdiffTICyclicHypothesis.W ℂ)) := by
+      ext g
+      rw [OddOrder.Peterfalvi.S05.TICyclicHypothesis.omega_apply,
+        ClassFunction.compHom_apply,
+        show e.toMonoidHom g = OddOrder.Peterfalvi.S06.ticWEquivSdiffW h46 g from (hpt g).symm]
+      exact OddOrder.Peterfalvi.S06.omegaProdCharTic_apply h46 _ _ g
+    show (OddOrder.Peterfalvi.S06.ticVdiff h46).sigma rfl
+        (OddOrder.Peterfalvi.S06.ticVdiffFullDadeApplication h46)
+        ((OddOrder.Peterfalvi.S06.ticVdiff h46).omega
+          (OddOrder.Peterfalvi.S06.omegaProdCharTic h46 _ (finCongr hcardW1.symm ii)))
+      = hyp.alignedOmegaSigmaGrid hG hodd ii jj
+    rw [harg]
+    unfold Hypothesis.alignedOmegaSigmaGrid
+    rfl
+  -- the (4.10) four-corner carrier and its `A₀`-support
+  set u : ClassFunction ↥M ℂ :=
+    (h.columnFamily χ₂).signedDifference i'
+      - (h.columnFamily (1 : (h.W2.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ)).signedDifference i'
+    with hudef
+  have hsupp : u.support ⊆ OddOrder.Peterfalvi.S04.supportInSubgroup
+      (typePA M hyp.typeP ∪ OddOrder.GroupTheory.conjClassSetIn M h46.tic.V) M :=
+    ClassFunction.mem_supportedSubmodule.mp
+      (OddOrder.Peterfalvi.S06.fourCornerDiffSupported h46 χ₂ i').2
+  have happly : hyp.tau u = h46.tau.toDadeMap
+      (OddOrder.Peterfalvi.S06.fourCornerDiffSupported h46 χ₂ i') := by
+    have h1 : hyp.tau u = h46.dade0.dadeMap (k := ℂ)
+        ⟨u, ClassFunction.mem_supportedSubmodule.mpr hsupp⟩ :=
+      OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap_apply_of_support h46.dade0 h46.tau hsupp
+    rw [h1, show h46.tau.toDadeMap = h46.dade0.dadeMap (k := ℂ) from
+      OddOrder.Peterfalvi.S04.IsDadeMap.unique h46.tau.toDadeIsometryData.isDadeMap
+        h46.dade0.isDadeMap_dadeMap]
+    exact congrArg _ (Subtype.ext rfl)
+  -- the target τ-argument is `δ_j • u` (`δ_j² = 1`, `δ_0 = 1`)
+  have hXeq : hyp.muGrid hG hodd i j - hyp.muGrid hG hodd 0 j
+      - (hyp.muColumnSign hG hodd j : ℂ) • hyp.muGrid hG hodd i 0
+      + (hyp.muColumnSign hG hodd j : ℂ) • hyp.muGrid hG hodd 0 0
+      = (hyp.muColumnSign hG hodd j : ℂ) • u := by
+    rw [hudef,
+      OddOrder.RepresentationTheory.SignedIrreducibleDifferenceFamily.signedDifference_apply,
+      OddOrder.RepresentationTheory.SignedIrreducibleDifferenceFamily.signedDifference_apply,
+      hδ1, one_zsmul, ← esign]
+    have emij : hyp.muGrid hG hodd i j
+        = ((h.columnFamily χ₂).mu i' : ClassFunction ↥M ℂ) := by
+      unfold Hypothesis.muGrid
+      rfl
+    have em0j : hyp.muGrid hG hodd 0 j
+        = ((h.columnFamily χ₂).mu (finCongr hcardW1.symm 0) : ClassFunction ↥M ℂ) := by
+      unfold Hypothesis.muGrid
+      rfl
+    have emi0 : hyp.muGrid hG hodd i 0
+        = ((h.columnFamily (finCardEquivCharacterGroup (h.W2.subgroupOf (h.W1 ⊔ h.W2))
+            (finCongr hcardW2sub.symm (0 : Fin hyp.w2)))).mu i' : ClassFunction ↥M ℂ) := by
+      unfold Hypothesis.muGrid
+      rfl
+    have em00 : hyp.muGrid hG hodd 0 0
+        = ((h.columnFamily (finCardEquivCharacterGroup (h.W2.subgroupOf (h.W1 ⊔ h.W2))
+            (finCongr hcardW2sub.symm (0 : Fin hyp.w2)))).mu (finCongr hcardW1.symm 0)
+          : ClassFunction ↥M ℂ) := by
+      unfold Hypothesis.muGrid
+      rfl
+    rw [emij, em0j, emi0, em00, hdual0, ← hi00]
+    simp only [OddOrder.RepresentationTheory.SignedIrreducibleDifferenceFamily.difference,
+      OddOrder.RepresentationTheory.SignedIrreducibleDifferenceFamily.classFunction]
+    rcases hyp.muColumnSign_eq_one_or_neg_one hG hodd j with hδ | hδ <;> rw [hδ] <;> push_cast <;>
+      module
+  rw [hXeq, Int.cast_smul_eq_zsmul ℂ, map_smul, happly]
+  rw [show h46.tau.toDadeMap (OddOrder.Peterfalvi.S06.fourCornerDiffSupported h46 χ₂ i')
+      = OddOrder.Peterfalvi.S06.certainTypeOmegaSigma h46 χ₂ i'
+        - OddOrder.Peterfalvi.S06.certainTypeOmegaSigma h46 χ₂ 0
+        - (OddOrder.Peterfalvi.S06.certainTypeOmegaSigma h46 1 i'
+          - OddOrder.Peterfalvi.S06.certainTypeOmegaSigma h46 1 0) from
+    OddOrder.Peterfalvi.S06.fourCorner_dade_eq h46 χ₂ i']
+  have hb1 : OddOrder.Peterfalvi.S06.certainTypeOmegaSigma h46 χ₂ i'
+      = hyp.alignedOmegaSigmaGrid hG hodd i j := hbridge χ₂ i' i j hχ₂def hi'def
+  have hb2 : OddOrder.Peterfalvi.S06.certainTypeOmegaSigma h46 χ₂ 0
+      = hyp.alignedOmegaSigmaGrid hG hodd 0 j := hbridge χ₂ 0 0 j hχ₂def hi00
+  have hb3 : OddOrder.Peterfalvi.S06.certainTypeOmegaSigma h46 1 i'
+      = hyp.alignedOmegaSigmaGrid hG hodd i 0 := hbridge 1 i' i 0 hdual0.symm hi'def
+  have hb4 : OddOrder.Peterfalvi.S06.certainTypeOmegaSigma h46 1 0
+      = hyp.alignedOmegaSigmaGrid hG hodd 0 0 := hbridge 1 0 0 0 hdual0.symm hi00
+  rw [hb1, hb2, hb3, hb4, ← Int.cast_smul_eq_zsmul ℂ]
+  module
 
 /-- **Peterfalvi (10.5), support half**: for `0 < j < w₂`, the virtual character `α_{ij}` is
 supported on `A_0(M)`.  This is now a genuine (dade0-free) theorem, carried by the

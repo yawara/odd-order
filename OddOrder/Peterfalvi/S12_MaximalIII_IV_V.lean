@@ -2861,19 +2861,21 @@ open scoped Classical FiniteInduce in
 `Even a → a = 0`) with the parity assembly: the (11.8.3) residual
 `β = α_{ij}^τ − δ(ω_{ij}^σ − ω_{i0}^σ) + nζ^{τ₁}` is a virtual character (`beta_mem_ZIrr`) orthogonal
 to `1_G` (`beta_inner_trivial`, its `hα1M` discharged by `muGridAlpha_inner_trivial_M` for `i ≠ 0`),
-**real** (`beta_isReal`, the (11.8.3) reality — proved from the threaded row-`0` (4.8)/(4.10)
-Dade identities `h48`/`h410`, issue 9004), and `a = (∑_r ω_{r0}^σ, β)`
+**real** (`beta_isReal`, the (11.8.3) reality), and `a = (∑_r ω_{r0}^σ, β)`
 (`muGridAlpha_a_eq_inner_sumOmegaSigma_beta`); so `a` is even
 (`a_even_of_eq_inner_sumOmegaSigma`, the general reality-parity of an integer inner product of
 real virtual characters one of which is `⊥ 1_G` in odd order), which excludes `a = 1`.  Hence
-`a = 0` unconditionally, i.e. `(α_{ij}^τ, ζ^{τ₁}) = −n`.  This is the full (11.8.5); the only
-remaining threaded inputs are the coherence-free §4 Dade identities `h48`/`h410` (pending the §10
-instantiation of Hypothesis (4.6), issue 9004). -/
+`a = 0` unconditionally, i.e. `(α_{ij}^τ, ζ^{τ₁}) = −n`.  This is the full (11.8.5).
+
+The formerly-threaded row-`0` (4.8)/(4.10) Dade identities `h48`/`h410` are now **discharged**
+from the §10 instantiation of Hypothesis (4.6) (`tau_muGrid_zeroRow_diff` /
+`tau_muGrid_fourCorner` via `toHypothesis46`, issue 9004); the residual input is the
+`w₂`-primality `hw2` they need for the (10.3) cross-column degree constancy. -/
 theorem Hypothesis.residualCoeff_eq_zero [Finite G] {M : Subgroup G}
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis M) (hodd : Odd (Nat.card G))
     (i : Fin hyp.w1) {j : Fin hyp.w2} (hj0 : j ≠ 0) (hi0 : i ≠ 0)
     {ζ : ClassFunction ↥M ℂ} (hζS : ζ ∈ inducedFamily M) (hζirr : IsIrreducibleCharacter ζ)
-    (hζ1 : ζ 1 = (hyp.w1 : ℂ)) {d : ℕ} {δ : ℤ} {n : ℕ}
+    (hζ1 : ζ 1 = (hyp.w1 : ℂ)) {d : ℕ} {δ : ℤ} {n : ℕ} (hw2 : (hyp.w2).Prime)
     (hdeg : hyp.muGrid hG hodd i j 1 = (d : ℂ)) (hμ0 : hyp.muGrid hG hodd i 0 1 = 1)
     (hnf : (n : ℤ) * (hyp.w1 : ℤ) = (d : ℤ) - δ) (hδj : hyp.muColumnSign hG hodd j = δ)
     (hdζ : hyp.muGrid hG hodd i j 1 ≠ ζ 1) (h0ζ : hyp.muGrid hG hodd i 0 1 ≠ ζ 1)
@@ -2886,19 +2888,25 @@ theorem Hypothesis.residualCoeff_eq_zero [Finite G] {M : Subgroup G}
       φ 1 = (hyp.w1 : ℂ) ∧ β = (hyp.SHC_isCoherent hG).extension φ)
     (h114 : hyp.tau ((∑ i' : Fin hyp.w1, hyp.muGrid hG hodd i' 0) - ζ)
         = (∑ r : Fin hyp.w1, hyp.alignedOmegaSigmaGrid hG hodd r 0)
-          - (hyp.SHC_isCoherent hG).extension ζ)
-    (hdeg0 : hyp.muGrid hG hodd 0 j 1 = (d : ℂ))
-    (h410 : hyp.tau (hyp.muGrid hG hodd i j - hyp.muGrid hG hodd 0 j
-          - (δ : ℂ) • hyp.muGrid hG hodd i 0 + (δ : ℂ) • hyp.muGrid hG hodd 0 0)
-        = (δ : ℂ) • (hyp.alignedOmegaSigmaGrid hG hodd i j - hyp.alignedOmegaSigmaGrid hG hodd 0 j
-          - hyp.alignedOmegaSigmaGrid hG hodd i 0 + hyp.alignedOmegaSigmaGrid hG hodd 0 0))
-    (h48 : ∀ k : Fin hyp.w2, k ≠ 0 →
-        hyp.tau (hyp.muGrid hG hodd 0 j - hyp.muGrid hG hodd 0 k)
-          = (δ : ℂ) • (hyp.alignedOmegaSigmaGrid hG hodd 0 j
-              - hyp.alignedOmegaSigmaGrid hG hodd 0 k)) :
+          - (hyp.SHC_isCoherent hG).extension ζ) :
     ClassFunction.inner
         (hyp.tau (hyp.muGrid hG hodd i j - (δ : ℂ) • hyp.muGrid hG hodd i 0 - (n : ℂ) • ζ))
         ((hyp.SHC_isCoherent hG).extension ζ) = -(n : ℂ) := by
+  -- the (4.8)/(4.10) Dade identities, discharged from the §10 instantiation of (4.6)
+  have hdeg0 : hyp.muGrid hG hodd 0 j 1 = (d : ℂ) :=
+    (hyp.muGrid_apply_one_eq hG hodd hw2 0 i hj0 hj0).trans hdeg
+  have h410 : hyp.tau (hyp.muGrid hG hodd i j - hyp.muGrid hG hodd 0 j
+        - (δ : ℂ) • hyp.muGrid hG hodd i 0 + (δ : ℂ) • hyp.muGrid hG hodd 0 0)
+      = (δ : ℂ) • (hyp.alignedOmegaSigmaGrid hG hodd i j - hyp.alignedOmegaSigmaGrid hG hodd 0 j
+        - hyp.alignedOmegaSigmaGrid hG hodd i 0 + hyp.alignedOmegaSigmaGrid hG hodd 0 0) := by
+    have := hyp.tau_muGrid_fourCorner hG hodd i j
+    rwa [hδj] at this
+  have h48 : ∀ k : Fin hyp.w2, k ≠ 0 →
+      hyp.tau (hyp.muGrid hG hodd 0 j - hyp.muGrid hG hodd 0 k)
+        = (δ : ℂ) • (hyp.alignedOmegaSigmaGrid hG hodd 0 j
+            - hyp.alignedOmegaSigmaGrid hG hodd 0 k) := fun k hk => by
+    have := hyp.tau_muGrid_zeroRow_diff hG hodd hw2 hj0 hk
+    rwa [hδj] at this
   have hβr := hyp.beta_isReal hG hodd i hj0 hζS hζirr hζ1 hdeg0
     (hyp.muGrid_zero_column_apply_one hG hodd 0) hnf hδj h410 h48
   obtain ⟨a, hbound, hinner, heven_imp⟩ := hyp.charParam_a_eq_zero_of_residualEq hG hodd i hj0 hζS
