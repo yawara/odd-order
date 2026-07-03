@@ -338,3 +338,18 @@ tractable than the "multi-week from scratch" estimate** — the Dade layer is do
 (side conditions all from family fields: mem_sharp / kernel_le / mem_kernel_sharp_conj_iff_of_mem_L / isTI).
 **次**: (7.4) `FamilyHypothesis71` 束ね (per-member Hypothesis71 + disjoint A_i^{τ_i} 台 ← coprime_kernel)、
 その後 **Hypothesis76** (induced family {Ind_H^L θ} + coherence = trunk の残りの deep part、S08 Sibley wireable か調査)。
+
+## 2026-07-03 cont.⁶ (lane-a, /loop) — 🎯 (7.1)/(7.4) 構造層 完全 wired
+
+**Landed** (`2976980b`): `FrobeniusFamily.familyHypothesis71` + bridge `dadeSupport_hypothesis71_eq_kernelSpread`.
+**`FrobeniusFamily` → `FamilyHypothesis71` (7.4) が完成** (per-member hyp71 + isDadeIsometry_of_isDadeMap +
+pairwise_disjoint ← dadeSupport=kernelSpread + 既存 kernelSpread_disjoint)。**card_G0_lower_bound の構造
+foundation (7.1/7.4) は wiring で done** — `characterEstimateData_of_family71_*` に `F.familyHypothesis71`
+を渡せる。
+
+**残 = genuine char content のみ** (Hypothesis76 coherence 系):
+- (7.8.b) `chiRhoNormSq` 下界 (`hi`/`hgood` in characterEstimateData_of_family71_reduced_estimates)。
+- signed-irreducible χ (exceptional character) の選択。
+- (7.9) 𝓑-sum bound (`hBsum`)。
+これらは Hypothesis76 (induced family {Ind_H^L θ} + (5.6)/(6.8) coherence) を要する char 解析。次 iteration
+は Hypothesis76-from-Frobenius の wireability 調査 (S08 Sibley coherence が使えるか)。
