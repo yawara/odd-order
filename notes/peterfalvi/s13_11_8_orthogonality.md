@@ -1196,3 +1196,52 @@ discharge も③と同根の見込み。
 extension) が絡み (4.8)/(4.10) と異質 (coherence-dependent) — Pf 原文 (11.8.4) は「(11.8.1) と
 τ の linearity」による由; 次 frontier はこれの実証明化 (SHC_tau_muGridAlpha_eq 系の在庫確認から)。
 (11.8) endpoint 自体は依然 doubly-gated (§9↔§10 の |S₁|=n、§14 の S₂ coherence)。
+
+## 2026-07-03 cont.⁶⁸ (lane-a) — **(11.8.4) 完全実証明化: dichotomy + branch-2 swap + h114 producer LANDED**
+
+h114 ((11.8.4) 正規化形) を **原文 p.66 に忠実な dichotomy として実証明** (S12, 全 axiom-clean、
+S12 sorry 4 不変)。「h114 は残 residual thread」という cont.⁶⁷ の評価を解消 — h114 は今や
+`∃ ν coherent extension, h114-for-ν` として無条件に供給可能:
+
+- **`tau_muColumnZero_sub_zeta_dichotomy_of_orthogonal`** (dichotomy): 直交仮定下、
+  `(μ₀−ζ)^τ` は `∑ω_{r0}^σ` と **単一 signed coherent extension** だけずれる:
+  branch 1 = `= ∑ω − ζ^{τ₁}` (= h114、正規形)、または branch 2 = `S(HC)={ζ,ζ̄}` かつ
+  `= ∑ω + ζ̄^{τ₁}`。証明 = `‖χ‖²=1` (Dade 等長 + 直交 pin `⟨ψ,ω_{r0}⟩=1`) → 整数内積
+  `⟨χ,ζ^{τ₁}⟩,⟨χ,ζ̄^{τ₁}⟩` (ZIrr pairing, Cauchy–Schwarz ≤1, 差 −1) → `χ=ζ^{τ₁}` or `χ=−ζ̄^{τ₁}`。
+  汎用 unit-norm 整格子 toolkit (`m²≤1`、`⟨A,θ⟩=±1→A=±θ`) を inline 証明。
+- **`SHC_swap`** (branch-2 「we may assume」の core math): `S(HC)={ζ,ζ̄}` のとき
+  `φ ↦ −SHC.ext(φ̄)` が **再び τ の coherent extension** (原文の ζ^{τ₁},ζ̄^{τ₁} → −ζ̄^{τ₁},−ζ^{τ₁}
+  置換)。4 field 全証明: 等長 = `inner_conj_conj` + ZIrr-pairing 実性、`extends_on_supported` =
+  `S(HC)={ζ,ζ̄}` ゆえ A₀-supported span 元は `a(ζ−ζ̄)` (値 at 1 = `(a+b)w₁=0`)、ZIrr codomain +
+  nonzero witness `ζ−ζ̄` は SHC 継承。**実装知見**: (i) conj の ℤ-linearity は
+  `conj = mapRingEquiv conjAe` bridge + `mapRingEquiv_zsmul` で inline `hconj_zsmul`; (ii) zsmul
+  値抽出は `← Int.cast_smul_eq_zsmul ℂ` + `smul_apply`; (iii) `1∉A₀` は
+  `supportInSubgroup` defeq + `dade.ne_one`; (iv) span-pair 係数 → `a+b=0` は φ(1)=0 経由。
+- **`SHC_swap_h114`**: branch 2 で swap が h114 を満たす (`SHC_swap.ext ζ = −ζ̄^{τ₁}` ゆえ
+  `∑ω − SHC_swap.ext ζ = ∑ω + ζ̄^{τ₁} = (μ₀−ζ)^τ`)。
+- **`exists_coherent_extension_h114_of_orthogonal`** (統合 producer): 直交仮定 →
+  `∃ ν : IsCoherent τ S(HC) A₀, (μ₀−ζ)^τ = ∑ω − ν.ext ζ`。branch 1 = SHC、branch 2 = swap。
+  **(11.8.4) は sorry-free に完全形式化** (residual thread 解消)。
+
+**残 = (11.8.5) machinery の extension-一般化 refactor** (次 frontier): `residualCoeff_eq_zero` と
+その依存 (~20 本: `charParam_a_eq_zero_of_residualEq`/`beta_isReal`/`muGridAlpha_a_eq_inner_sumOmegaSigma_beta`/
+`SHC_residual_eq_omegaSigma_diff`/`SHC_extension_inner_self`/`_of_ne`/`tau_zeta_sub_conj_eq_SHC_extension`/
+`SHC_extension_inner_zeroColumnOmegaSigma_sum` 等) は現状 `hyp.SHC_isCoherent hG` を hardcode。
+これらを **「conj と可換な任意 coherent extension ν」でパラメタ化**すれば (SHC/swap 両方が instance)、
+`exists_coherent_extension_h114_of_orthogonal` の ν を渡して **無条件 (11.8.5) a=0** が出る。
+refactor は各補題に `(ν : IsCoherent …)` + conj-commute 前提を足し SHC 版を薄い specialization に
+する機械的作業 (build-green 保ちつつ 1 本ずつ)。**swap が conj-commute を満たすことは確認済**
+(`SHC_extension_conj` が negation+swap で保存: `(−ext(φ̄)).conj = −(ext(φ̄)).conj = −ext(φ) = swap(φ̄)`)。
+
+**endpoint (`exists_zeta_residual_not_orthogonal`) は依然 §14-gated** (S₂=S(C)−S(HC) coherence、
+lane-b/c の 9.11 sibleyTarget)。(11.8.5) 無条件化は §14 gate の手前まで spine を honest に前進させる
+(deferred-payoff だが genuine、CLAUDE.md「報酬後払いを deprioritize しない」)。
+
+**spine 接続の code-level 確認 (2026-07-03)**: `card_kappaHall_lt_of_isTypeIIIorIV` (spine 唯一の
+bare sorry の consumer) → `w2_lt_w1_of_hypothesis` (11.9.b) → `exists_zeta_residual_not_orthogonal`
+(11.8)。§9 counts の残 (`caseA_character_counts`/`caseB_character_counts` conjunct 4 = (9.8.d)/(9.9.c)、
+`exceptional_case_frobenius_realization` = (9.10)) は **consumer ゼロ** (grep 確認) = 現状 off この
+spine (type-III 判定 (11.9.c) 向け、endpoint は degree facts (9.8.b/9.9.b = 既 proven) のみ要)。
+10.7/10.8/10.10 は on-spine (`no_typeV_maximal`←FeitThompson) だが (7.8.b は S09 で sorry-free 済) +
+type-II 構造 (10.7 carrier scaffold) + §14 に coupled-gated。⟹ 現 lane-a の on-spine ungated frontier
+= **(11.8.5) extension-一般化 refactor** (上記) が最有力。

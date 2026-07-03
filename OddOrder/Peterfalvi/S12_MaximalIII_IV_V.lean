@@ -2771,6 +2771,213 @@ theorem Hypothesis.tau_muColumnZero_sub_zeta_dichotomy_of_orthogonal [Finite G] 
       ClassFunction.inner_add_left, hOmegalam, heclam, hΩe, hece] at hGlam
     norm_num at hGlam
 
+open scoped FiniteInduce in
+/-- **Peterfalvi (11.8.4), the branch-2 "we may assume" swap.**  When the degree-`w₁` family
+`S₁ = S(HC)` is the bare conjugate pair `{ζ, ζ̄}` (the second branch of
+`tau_muColumnZero_sub_zeta_dichotomy_of_orthogonal`), the map `φ ↦ −(ζ̄-side extension of φ̄)`, i.e.
+`SHC_swap.extension φ = −(SHC_isCoherent.extension φ.conj)`, is again a **coherent extension of `τ`
+to `ℤ[S(HC)]`** — the textbook's replacement of `ζ^{τ₁}, ζ̄^{τ₁}` by `−ζ̄^{τ₁}, −ζ^{τ₁}` (p. 66).
+
+The four `IsCoherent` fields:
+* **isometry on `ℤ[S(HC)]`**: `S(HC)` is closed under conjugation (`inducedFamily` is, degrees are
+  preserved), so `φ̄, ψ̄ ∈ ℤ[S(HC)]`; `⟨SHC(φ̄), SHC(ψ̄)⟩ = ⟨φ̄, ψ̄⟩ = star⟨φ,ψ⟩ = ⟨φ,ψ⟩`
+  (`inner_conj_conj` and the reality of a `ZIrr` pairing);
+* **agrees with `τ` on `ℤ[S(HC), A₀]`**: this is where `S(HC) = {ζ, ζ̄}` is used — every
+  `A₀`-supported element of `span{ζ, ζ̄}` is a multiple `a(ζ − ζ̄)` (value at `1` is `(a+b)w₁ = 0`), on which
+  `SHC_swap` and `SHC` both send `ζ − ζ̄ ↦ ζ^{τ₁} − ζ̄^{τ₁} = τ(ζ − ζ̄)`;
+* **maps into `ZIrr`** and **nonzero-supported witness `ζ − ζ̄`**: inherited from `SHC`.
+
+Combined with the dichotomy this gives the h114-producing extension in *both* branches (branch 1:
+`SHC_isCoherent`; branch 2: this swap), i.e. Peterfalvi's "we may assume `(μ₀−ζ)^τ = ∑ω − ζ^{τ₁}`"
+holds for a canonical choice of coherent `τ₁`. -/
+noncomputable def Hypothesis.SHC_swap [Finite G] {M : Subgroup G}
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis M) (hodd : Odd (Nat.card G))
+    {ζ : ClassFunction ↥M ℂ} (hζS : ζ ∈ inducedFamily M) (hζirr : IsIrreducibleCharacter ζ)
+    (hζ1 : ζ 1 = (hyp.w1 : ℂ))
+    (htwo : ∀ lam : ClassFunction ↥M ℂ, lam ∈ inducedFamily M → IsIrreducibleCharacter lam →
+      lam 1 = (hyp.w1 : ℂ) → lam = ζ ∨ lam = ζ.conj) :
+    OddOrder.Peterfalvi.S07.IsCoherent hyp.tau
+      {φ : ClassFunction ↥M ℂ | φ ∈ inducedFamily M ∧ IsIrreducibleCharacter φ ∧
+        ((φ : ↥M → ℂ) 1 = (hyp.w1 : ℂ))} hyp.A0 := by
+  haveI := hyp.finiteG
+  classical
+  set SHCset : Set (ClassFunction ↥M ℂ) :=
+    {φ : ClassFunction ↥M ℂ | φ ∈ inducedFamily M ∧ IsIrreducibleCharacter φ ∧
+      ((φ : ↥M → ℂ) 1 = (hyp.w1 : ℂ))} with hSHCset
+  -- the `ζ̄`-side degree-`w₁` conjugate facts
+  have hζne : ζ.conj ≠ ζ := hyp.inducedFamily_degree_w1_conj_ne hG hζirr hζ1
+  have hζcS : ζ.conj ∈ inducedFamily M := inducedFamily_closedUnderConjugate M hζS
+  have hζcirr : IsIrreducibleCharacter ζ.conj := hζirr.conj
+  have hζc1 : ζ.conj 1 = (hyp.w1 : ℂ) := by rw [ClassFunction.conj_apply, hζ1, star_natCast]
+  have hζmem : ζ ∈ SHCset := ⟨hζS, hζirr, hζ1⟩
+  have hζcmem : ζ.conj ∈ SHCset := ⟨hζcS, hζcirr, hζc1⟩
+  -- `SHCset` is closed under conjugation.
+  have hconj_closed : ∀ φ ∈ SHCset, φ.conj ∈ SHCset := by
+    rintro φ ⟨hφS, hφirr, hφ1⟩
+    exact ⟨inducedFamily_closedUnderConjugate M hφS, hφirr.conj, by
+      rw [ClassFunction.conj_apply, hφ1, star_natCast]⟩
+  -- the swap extension `φ ↦ −SHC(φ̄)`, packaged as an integral character map.
+  set ext' : OddOrder.Peterfalvi.S07.IntegralCharacterMap ↥M G :=
+    -((hyp.SHC_isCoherent hG).extension.comp
+      (ClassFunction.mapRingEquivLinear (G := ↥M) Complex.conjAe.toRingEquiv)) with hext'def
+  have hconjbridge : ∀ φ : ClassFunction ↥M ℂ,
+      ClassFunction.mapRingEquiv Complex.conjAe.toRingEquiv φ = φ.conj := fun φ => by
+    ext g; rw [ClassFunction.conj_apply, ClassFunction.mapRingEquiv_apply]; rfl
+  have hext'apply : ∀ φ : ClassFunction ↥M ℂ,
+      ext' φ = -((hyp.SHC_isCoherent hG).extension φ.conj) := by
+    intro φ
+    rw [hext'def, LinearMap.neg_apply, LinearMap.comp_apply,
+      ClassFunction.mapRingEquivLinear_apply, hconjbridge]
+  have hconj_zsmul : ∀ (n : ℤ) (x : ClassFunction ↥M ℂ), (n • x).conj = n • x.conj := by
+    intro n x
+    rw [← hconjbridge (n • x), ClassFunction.mapRingEquiv_zsmul, hconjbridge x]
+  -- span-level conjugation closure.
+  have hspan_conj : ∀ φ : ClassFunction ↥M ℂ, φ ∈ OddOrder.Peterfalvi.S07.zSpan SHCset →
+      φ.conj ∈ OddOrder.Peterfalvi.S07.zSpan SHCset := by
+    intro φ hφ
+    induction hφ using Submodule.span_induction with
+    | mem x hx => exact Submodule.subset_span (hconj_closed x hx)
+    | zero => rw [ClassFunction.conj_zero]; exact Submodule.zero_mem _
+    | add x y _ _ hx hy => rw [ClassFunction.conj_add]; exact Submodule.add_mem _ hx hy
+    | smul n x _ hx => rw [hconj_zsmul]; exact Submodule.smul_mem _ n hx
+  -- span elements are `ZIrr`-members (so pairings are integers, hence real).
+  have hspan_ZIrr : ∀ φ : ClassFunction ↥M ℂ, φ ∈ OddOrder.Peterfalvi.S07.zSpan SHCset →
+      φ ∈ ZIrr ↥M := by
+    intro φ hφ
+    induction hφ using Submodule.span_induction with
+    | mem x hx => exact hx.2.1.mem_ZIrr
+    | zero => exact Submodule.zero_mem _
+    | add x y _ _ hx hy => exact Submodule.add_mem _ hx hy
+    | smul n x _ hx => exact Submodule.smul_mem _ n hx
+  refine ⟨⟨ζ - ζ.conj, ⟨?_, ?_⟩, ?_⟩, ext', ?_, ?_, ?_⟩
+  · -- `ζ − ζ̄ ∈ ℤ[S(HC)]`
+    exact Submodule.sub_mem _ (Submodule.subset_span hζmem) (Submodule.subset_span hζcmem)
+  · -- `ζ − ζ̄` is `A₀`-supported
+    exact hyp.zeta_sub_conj_support hG hodd hζS hζirr
+  · -- `ζ − ζ̄ ≠ 0`
+    intro h
+    exact hζne (sub_eq_zero.mp h).symm
+  · -- **isometry on `ℤ[S(HC)]`**
+    intro φ ψ hφ hψ
+    have hφc := hspan_conj φ hφ
+    have hψc := hspan_conj ψ hψ
+    rw [hext'apply φ, hext'apply ψ, ClassFunction.inner_neg_left, ClassFunction.inner_neg_right,
+      neg_neg, (hyp.SHC_isCoherent hG).extension_inner_eq _ _ hφc hψc,
+      OddOrder.RepresentationTheory.inner_conj_conj]
+    obtain ⟨m, hm⟩ := ClassFunction.inner_mem_ZIrr_int (hspan_ZIrr φ hφ) (hspan_ZIrr ψ hψ)
+    rw [hm, star_intCast]
+  · -- **agrees with `τ` on `ℤ[S(HC), A₀]`** — uses `S(HC) = {ζ, ζ̄}`
+    rintro φ ⟨hφspan, hφsupp⟩
+    -- `S(HC) = {ζ, ζ̄}` as sets, so `ℤ[S(HC)] = span{ζ, ζ̄}`.
+    have hset_eq : SHCset = {ζ, ζ.conj} := by
+      apply Set.eq_of_subset_of_subset
+      · rintro x ⟨hxS, hxirr, hx1⟩
+        exact htwo x hxS hxirr hx1
+      · rintro x (rfl | rfl)
+        · exact hζmem
+        · exact hζcmem
+    have hφpair : φ ∈ Submodule.span ℤ ({ζ, ζ.conj} : Set (ClassFunction ↥M ℂ)) := by
+      rwa [OddOrder.Peterfalvi.S07.zSpan, hset_eq] at hφspan
+    obtain ⟨a, b, hab⟩ := Submodule.mem_span_pair.mp hφpair
+    -- support in `A₀` (which excludes `1`) forces the value at `1` to vanish, so `a + b = 0`.
+    have h1notA : (1 : ↥M) ∉ hyp.A0 := by
+      intro h1
+      have hg : ((1 : ↥M) : G) ∈ typePA0 M hyp.typeP := h1
+      rw [OneMemClass.coe_one] at hg
+      exact hyp.dadeData.dade.ne_one hg rfl
+    have hφ1 : φ 1 = 0 := by
+      by_contra hne
+      exact h1notA (hφsupp (Function.mem_support.mpr hne))
+    have hval1 : (a : ℂ) * (hyp.w1 : ℂ) + (b : ℂ) * (hyp.w1 : ℂ) = 0 := by
+      have hc := congrArg (fun f : ClassFunction ↥M ℂ => (f : ↥M → ℂ) 1) hab
+      simp only [← Int.cast_smul_eq_zsmul ℂ, ClassFunction.add_apply,
+        ClassFunction.smul_apply] at hc
+      rw [hζ1, hζc1] at hc
+      rw [hc]; exact hφ1
+    have hw1ne : (hyp.w1 : ℂ) ≠ 0 := by
+      have h3 : (3 : ℕ) ≤ hyp.w1 := (typePData_toTICyclicHypothesis hyp.typeP hodd).three_le_card_W1
+      exact_mod_cast (by omega : hyp.w1 ≠ 0)
+    have hab0 : a + b = 0 := by
+      have hfac : ((a : ℂ) + (b : ℂ)) * (hyp.w1 : ℂ) = 0 := by linear_combination hval1
+      have hz : (a : ℂ) + (b : ℂ) = 0 := (mul_eq_zero.mp hfac).resolve_right hw1ne
+      exact_mod_cast hz
+    have hb : b = -a := by omega
+    -- so `φ = a(ζ − ζ̄)`.
+    have hφeq : φ = (a : ℤ) • (ζ - ζ.conj) := by
+      rw [← hab, hb]; module
+    -- both `SHC_swap` and `τ` send `ζ − ζ̄ ↦ ζ^{τ₁} − ζ̄^{τ₁}`.
+    have hswapdiff : ext' (ζ - ζ.conj)
+        = (hyp.SHC_isCoherent hG).extension ζ - (hyp.SHC_isCoherent hG).extension ζ.conj := by
+      rw [map_sub, hext'apply ζ, hext'apply ζ.conj, ClassFunction.conj_conj]
+      abel
+    have htaudiff : hyp.tau (ζ - ζ.conj)
+        = (hyp.SHC_isCoherent hG).extension ζ - (hyp.SHC_isCoherent hG).extension ζ.conj :=
+      hyp.tau_zeta_sub_conj_eq_SHC_extension hG hodd hζS hζirr hζ1
+    rw [hφeq, map_zsmul, map_zsmul, hswapdiff, htaudiff]
+  · -- **maps into `ZIrr`**
+    intro φ hφ
+    rw [hext'apply φ]
+    exact neg_mem ((hyp.SHC_isCoherent hG).extension_mem_ZIrr φ.conj (hspan_conj φ hφ))
+
+open scoped FiniteInduce in
+/-- **h114 for the branch-2 swap.**  In the second branch of
+`tau_muColumnZero_sub_zeta_dichotomy_of_orthogonal` (`S(HC) = {ζ, ζ̄}` and
+`(μ₀−ζ)^τ = ∑ω_{r0}^σ + ζ̄^{τ₁}`), the swapped coherent extension `SHC_swap` satisfies the
+normalized (11.8.4) identity `(μ₀−ζ)^τ = ∑ω_{r0}^σ − SHC_swap.extension ζ`: indeed
+`SHC_swap.extension ζ = −ζ̄^{τ₁}`, so `∑ω − SHC_swap(ζ) = ∑ω + ζ̄^{τ₁} = (μ₀−ζ)^τ`.  This is the
+h114-form the (11.8.5) capstone consumes, now available in branch 2 with the swapped `τ₁`. -/
+theorem Hypothesis.SHC_swap_h114 [Finite G] {M : Subgroup G}
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis M) (hodd : Odd (Nat.card G))
+    {ζ : ClassFunction ↥M ℂ} (hζS : ζ ∈ inducedFamily M) (hζirr : IsIrreducibleCharacter ζ)
+    (hζ1 : ζ 1 = (hyp.w1 : ℂ))
+    (htwo : ∀ lam : ClassFunction ↥M ℂ, lam ∈ inducedFamily M → IsIrreducibleCharacter lam →
+      lam 1 = (hyp.w1 : ℂ) → lam = ζ ∨ lam = ζ.conj)
+    (hbranch2 : hyp.tau ((∑ i' : Fin hyp.w1, hyp.muGrid hG hodd i' 0) - ζ)
+        = (∑ r : Fin hyp.w1, hyp.alignedOmegaSigmaGrid hG hodd r 0)
+          + (hyp.SHC_isCoherent hG).extension ζ.conj) :
+    hyp.tau ((∑ i' : Fin hyp.w1, hyp.muGrid hG hodd i' 0) - ζ)
+        = (∑ r : Fin hyp.w1, hyp.alignedOmegaSigmaGrid hG hodd r 0)
+          - (hyp.SHC_swap hG hodd hζS hζirr hζ1 htwo).extension ζ := by
+  haveI := hyp.finiteG
+  classical
+  have hswapζ : (hyp.SHC_swap hG hodd hζS hζirr hζ1 htwo).extension ζ
+      = -((hyp.SHC_isCoherent hG).extension ζ.conj) := by
+    change (-((hyp.SHC_isCoherent hG).extension.comp
+      (ClassFunction.mapRingEquivLinear (G := ↥M) Complex.conjAe.toRingEquiv))) ζ = _
+    rw [LinearMap.neg_apply, LinearMap.comp_apply, ClassFunction.mapRingEquivLinear_apply,
+      show ClassFunction.mapRingEquiv Complex.conjAe.toRingEquiv ζ = ζ.conj from by
+        ext g; rw [ClassFunction.conj_apply, ClassFunction.mapRingEquiv_apply]; rfl]
+  rw [hswapζ, sub_neg_eq_add, hbranch2]
+
+open scoped FiniteInduce in
+/-- **Peterfalvi (11.8.4), the h114-producing coherent extension.**  Under the (11.8) contradiction
+hypothesis (the residual `(μ₀ − ζ)^τ − ∑_r ω_{r0}^σ` is orthogonal to `(Irr W)^σ`), there is a
+coherent extension `ν` of `τ` to `ℤ[S(HC)]` for which the normalized (11.8.4) identity
+`(μ₀ − ζ)^τ = ∑_r ω_{r0}^σ − ν.extension ζ` holds.  In the generic (first-branch) case `ν` is the
+canonical `SHC_isCoherent`; in the degenerate `S(HC) = {ζ, ζ̄}` case `ν` is the conjugate-swap
+`SHC_swap` — Peterfalvi's "we may assume `(μ₀ − ζ)^τ = ∑ω_{i0}^σ − ζ^{τ₁}`" (p. 66), now a clean
+`∃`-statement with no residual sorry.  This is the interface the (11.8.5) capstone consumes once its
+`τ₁`-machinery is taken over an arbitrary coherent extension. -/
+theorem Hypothesis.exists_coherent_extension_h114_of_orthogonal [Finite G] {M : Subgroup G}
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis M) (hodd : Odd (Nat.card G))
+    {ζ : ClassFunction ↥M ℂ} (hζS : ζ ∈ inducedFamily M) (hζirr : IsIrreducibleCharacter ζ)
+    (hζ1 : ζ 1 = (hyp.w1 : ℂ))
+    (horth : ∀ (i : Fin hyp.w1) (j : Fin hyp.w2),
+      ClassFunction.inner
+        ((hyp.tau ((∑ i' : Fin hyp.w1, hyp.muGrid hG hodd i' 0) - ζ))
+          - ∑ i' : Fin hyp.w1, hyp.alignedOmegaSigmaGrid hG hodd i' 0)
+        (hyp.alignedOmegaSigmaGrid hG hodd i j) = 0) :
+    ∃ ν : OddOrder.Peterfalvi.S07.IsCoherent hyp.tau
+        {φ : ClassFunction ↥M ℂ | φ ∈ inducedFamily M ∧ IsIrreducibleCharacter φ ∧
+          ((φ : ↥M → ℂ) 1 = (hyp.w1 : ℂ))} hyp.A0,
+      hyp.tau ((∑ i' : Fin hyp.w1, hyp.muGrid hG hodd i' 0) - ζ)
+        = (∑ r : Fin hyp.w1, hyp.alignedOmegaSigmaGrid hG hodd r 0) - ν.extension ζ := by
+  rcases hyp.tau_muColumnZero_sub_zeta_dichotomy_of_orthogonal hG hodd hζS hζirr hζ1 horth with
+    h1 | ⟨htwo, h2⟩
+  · exact ⟨hyp.SHC_isCoherent hG, h1⟩
+  · exact ⟨hyp.SHC_swap hG hodd hζS hζirr hζ1 htwo,
+      hyp.SHC_swap_h114 hG hodd hζS hζirr hζ1 htwo h2⟩
+
 open scoped Classical in
 /-- **Cross-Parseval for a virtual character.**  For `Δ ∈ ZIrr G` and any `φ`,
 `⟨φ, Δ⟩ = ∑_{χ : Irr} ⟨φ, χ⟩ · ⟨Δ, χ⟩`.  From the Fourier reconstruction `Δ = ∑_χ ⟨Δ,χ⟩·χ`
