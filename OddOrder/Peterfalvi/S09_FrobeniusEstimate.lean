@@ -95,6 +95,27 @@ namespace OddOrder.Peterfalvi.S09
 open OddOrder.RepresentationTheory
 open OddOrder.Peterfalvi.S09.Cert
 
+/-- **The `ρ`-map is restriction, for a TI Dade datum** (trivial local subgroups `H(a) = ⊥`, the
+`of_isTISubset` case).  For `a ∈ A`, the `(7.2)` coset average
+`χ^ρ(a) = (1/|H(a)|) ∑_{x ∈ H(a)} χ(a·x)` collapses (each `x = 1`, so every summand is `χ(a)`) to
+`χ(a)`.  This is what makes two `Hypothesis71`'s built from the *same* TI subset — even via different
+`of_isTISubset` expressions — agree on `chiRho` (hence `chiRhoCF`/`chiRhoNormSq`). -/
+theorem chiRho_apply_of_trivial_local {G : Type*} [Group G] {A : Set G} {L : Subgroup G}
+    [Fintype G] [Invertible (Nat.card G : ℂ)] (H71 : Hypothesis71 G A L)
+    (hbot : ∀ (a : G) (ha : a ∈ A), H71.hyp.H ⟨a, ha⟩ = ⊥)
+    (χ : ClassFunction G ℂ) {a : L} (ha : (a : G) ∈ A) :
+    H71.chiRho χ a = χ (a : G) := by
+  classical
+  rw [H71.chiRho_of_mem χ ha]
+  have hval : ∀ x : ↥(H71.hyp.H ⟨(a : G), ha⟩), χ ((a : G) * (x : G)) = χ (a : G) := by
+    intro x
+    have hx2 : (x : G) ∈ (⊥ : Subgroup G) := by rw [← hbot (a : G) ha]; exact x.2
+    rw [Subgroup.mem_bot.mp hx2, mul_one]
+  have hne : (Nat.card (H71.hyp.H ⟨(a : G), ha⟩) : ℂ) ≠ 0 :=
+    Nat.cast_ne_zero.mpr (Nat.card_pos).ne'
+  rw [Finset.sum_congr rfl (fun x _ => hval x), Finset.sum_const, Finset.card_univ,
+    ← Nat.card_eq_fintype_card, nsmul_eq_mul, ← mul_assoc, inv_mul_cancel₀ hne, one_mul]
+
 namespace FrobeniusFamily
 
 variable {G : Type*} [Group G] {k : ℕ}
@@ -364,6 +385,34 @@ theorem zetaNuRhoNormSq_ge [Fintype G] [Invertible (Nat.card G : ℂ)]
     (inner_self_induce_eq_one_of_frobeniusGroup hFrob (θ 0) hθ0_ne)
     a ha hsmall
   exact hbound
+
+/-- **The Sibley (7.1) `ρ`-map equals the family (7.1) `ρ`-map** (the (7.8.b)→(7.5) bridge).  Both
+`sibleyToHypothesis71 i` (the Dade datum coherence is coherent for) and `hypothesis71 i` (the family
+`FamilyHypothesis71` uses) are `of_isTISubset` on the *same* TI subset `H_i^#` (their supports agree
+by `sharpImage_subgroupOf_eq`), with trivial local subgroups, so `chiRho` (hence `chiRhoCF`) is
+restriction to `H_i^#` for both — they coincide (`chiRho_apply_of_trivial_local`).  This identifies
+`H78.zetaNuRhoNormSq` (built on `sibleyToHypothesis71`) with `P.chiRhoNormSq` (built on
+`hypothesis71`), the last link from the (7.8.b) bound to the (7.5) family estimate. -/
+theorem sibleyToHypothesis71_chiRhoCF_eq [Fintype G] [Invertible (Nat.card G : ℂ)]
+    (F : FrobeniusFamily G k) (i : Fin k) (hodd : Odd (Nat.card G))
+    [Fintype ↥(F.L i)] [Invertible (Nat.card ↥(F.L i) : ℂ)]
+    [Invertible (Nat.card ↥((F.H i).subgroupOf (F.L i)) : ℂ)]
+    (hnilp : Group.IsNilpotent ↥((F.H i).subgroupOf (F.L i)))
+    (C : Subgroup ↥(F.L i))
+    (hFrob : OddOrder.Isaacs.Ch06.IsFrobeniusGroup ↥(F.L i) ((F.H i).subgroupOf (F.L i)) C)
+    (χ : ClassFunction G ℂ) :
+    (F.sibleyToHypothesis71 i hodd hnilp C hFrob).chiRhoCF χ = (F.hypothesis71 i).chiRhoCF χ := by
+  ext a
+  rw [Hypothesis71.chiRhoCF_apply, Hypothesis71.chiRhoCF_apply]
+  by_cases ha : (a : G) ∈ OddOrder.Peterfalvi.S04.sharp (F.H i : Set G)
+  · have haS : (a : G) ∈ OddOrder.Peterfalvi.S08.sharpImage ((F.H i).subgroupOf (F.L i)) := by
+      rw [F.sharpImage_subgroupOf_eq i]; exact ha
+    rw [chiRho_apply_of_trivial_local _ (fun _ _ => rfl) χ haS,
+      chiRho_apply_of_trivial_local _ (fun _ _ => rfl) χ ha]
+  · have haS : (a : G) ∉ OddOrder.Peterfalvi.S08.sharpImage ((F.H i).subgroupOf (F.L i)) := by
+      rw [F.sharpImage_subgroupOf_eq i]; exact ha
+    rw [(F.sibleyToHypothesis71 i hodd hnilp C hFrob).chiRho_of_not_mem χ haS,
+      (F.hypothesis71 i).chiRho_of_not_mem χ ha]
 
 end FrobeniusFamily
 

@@ -1392,3 +1392,24 @@ projection も同様に reduce する先例)。
 - `h78_zetaNuRho_normSq_ge` (7.8.b coherence-norm 下界): 深 §7.8.b。
 full build 3908 green、AxiomsCheck OK。**§16 endgame の最上流 orphan `exists_MHypothesis` (14.10) は
 sorry-free spine へ 1 段近づいた** (field_normalizer_structure → exists_MHypothesis)。
+
+### cont.⁵⁰ (2026-07-04 lane c=γ /loop cont.): psi_tau1_norm_one も genuine 化 → 残 2 sorry
+
+cont.⁴⁹ で「次 tractable 候補」とした `psi_tau1_norm_one` (‖ψ^{τ₁}‖²=1) を discharge (commit `e8a59466`)。
+main 同期で入った lane a の shared infra (`inner_self_induce_eq_one_of_frobeniusGroup`、`OddOrder.RepresentationTheory`、
+[Is] 6.34 Frobenius 誘導 unit-norm) を cite:
+- **producer 強化**: `exists_M_hypothesis78` に `‖ζ‖²=1` witness 追加。distinguished ζ = ζ_0 = Ind_K θ_0、
+  θ_0≠1_K (θ_0=1 なら hinj で induce 衝突 → 0=ind1H、hind1H 矛盾) → Frobenius witness `hfrob` で unit-norm。
+- **consumer**: `nu_isometry ζ ζ` (τ₁=ν は family isometry、ζ=ψ は non-ind1H) + `‖ζ‖²=1` witness で閉。
+- **overlap 無し**: `inner_self_induce_eq_one_of_frobeniusGroup` は shared `GroupTheory/RepresentationTheory/**`
+  (lane a の (7.8.b) norm-bound machinery には非接触)。
+
+**残 2 sorry** (両方 genuinely gated、この iteration では非着手が正):
+- `betaGrid` (13.1.d η-grid): Track A、issue 3002 (honest η-grid carrier 要)。
+- `h78_zetaNuRho_normSq_ge` (7.8.b): lane a の (7.8.b) 領域。`zetaNuRhoNormSq_ge_of_normQuadraticCorrection_eq`
+  は **BetaDecomp (7.8.a) + quadratic-norm 公式 `hzeta` + smallIndex** を要し clean cite 不可 (hzeta = 実 (7.8.b)
+  計算で open、lane a の `zetaNuRhoNormSqGeOfDade` が目指す先)。⟹ signature-first で sorried、lane a landing 待ち。
+
+**この /loop セッション累計**: exists_MHypothesis の 1 monolithic sorry → 34 genuine field + 4 char obligation を
+isolate → うち 2 (psi_degree_eq_e / psi_tau1_norm_one) を genuine 化。commits `a1faa86d` `e96ade8b` `e8a59466`
+(+ docs)。full build 3910 green、AxiomsCheck OK。
