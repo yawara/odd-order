@@ -453,3 +453,18 @@ SibleyDadeHypothesis producer に移した」)。
 **⟹ 7.10 全体が wiring/既存 machinery で finishable** (SibleyDadeHypothesis 構成 = 最大の残作業、~12 field
 の substantial だが tractable constructor)。次 iteration: 新 leaf で `sibleyDadeHypothesis_of_frobenius` (c1)
 の構成に着手 (H_nilpotent の Thompson + sharpImage 座標合わせが要点)。
+
+## 2026-07-03 cont.¹² (lane-a, /loop) — Sibley wiring 着手: coordinate lemma landed
+
+**Landed** (`0017e521`): 新 leaf `S09_FrobeniusSibley` + `sharpImage_subgroupOf_eq`
+(`sharpImage ((H_i).subgroupOf L_i) = (H_i)^#`、`subgroupOf_map_subtype`+`inf_of_le_left`)。
+SibleyDadeHypothesis の support 座標を `of_isTISubset`/hypothesis71 に揃える foundational lemma。
+
+**確認**: `H_nilpotent` は `frobeniusKernelIsNilpotent` (BG Thm 3.7, S03c、solvable G 版) で入手可
+(FT spine の L_i は minimal-simple の proper subgroup ゆえ solvable)。Isaacs Ch6 の一般 Thompson は
+未着手だが solvable 版で足りる。
+
+**残 = SibleyDadeHypothesis constructor (Frobenius c1) の ~13 field**:
+W1/H_normal/split/W1_nontrivial ← `F.isFrobenius i`; H_nilpotent ← frobeniusKernelIsNilpotent (要 solvable 入力);
+card_L_odd ← G odd; H_sharp_ti ← `F.isTI` + coordinate lemma; dade/hconj/dade_H_eq_bot ← of_isTISubset
+(座標翻訳要); S/S_eq ← induced family; cases ← `Or.inl (F.isFrobenius i)`。次 iteration 継続。
