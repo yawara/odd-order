@@ -1873,3 +1873,20 @@ issue 0096 裁定の §8 build を実施、5 commits (5807febb / 232aaf18 / 6d38
 (δ-展開) で `⟨α,X⟩=0`; (iii) S(χ₂) 内 R₁ pairwise distinctness で per-φ₂ 消滅; member-wise 化は
 `toOrthonormalImage_inner_eq_zero_across` (existing)。要調査: τ conj-equivariance の既存 lemma
 (IntegralCharacterMap level?)、⟨irr, ℤ[Irr]⟩ integrality API、R1cdi same-χ distinctness。
+
+## loop¹⁰⁰ (2026-07-03): (12.3) bar-trick descent 完成 — `nonconjugate_diffImage_inner_zero` 実証明
+
+commit f8ecb4a5。詳細 = issue 9003「lane b 進捗 loop¹⁰⁰」節が正本。要点:
+
+- **descent core `constituent_diffImage_inner_zero_of_disjoint` は axiom-clean**。構成:
+  `X = (χ₂−χ̄₂)^{τ₂} ∈ ℤ[Irr G]`、(8.18.c) disjoint 側で `⟨sd₁, X⟩ = 0` →
+  (5.9.b) `ν₁ = μ̄₁` (`S07.CharacterDifferenceImage.nu_eq_mu_conj`、新規) + `X̄ = −X`
+  (`tau_conj_of_supported` ← 既存 Galois 可換) + 整数 Fourier 係数 (`mem_ZIrr_inner_int` +
+  新規 `ZIrrFourier.inner_conj_conj`) → `⟨μ₁, X⟩ = 0` → block cross-orthogonality
+  (`constituentDiff_tau_inner_eq_zero_of_ne`、新 field `conj_not_mem` 使用) で per-φ₂ 化。
+- **`CharacterDecompositionData.conj_not_mem` field 追加** ((12.2.b)): Frobenius producer 実証明、
+  一般 producer は (8.2.c) obligation に conclusion 追加 (S14 唯一の support sorry のまま)。
+- `nonconjugate_diffImage_inner_zero` は `hG` を取る signature に変更 (caller は
+  `nonconjugate_typeI_R_orthogonal` のみ、`_hG` を活性化)。
+- (12.3) の残 transitive sorryAx = S10_MinimalSimpleStructure の §8 pins 6 本 + (8.2.c)。
+  **次 = loop¹⁰¹: §8/§16 pins 正面 build** (0096 carve-out、文書順 (8.12.b)→(8.13)→(8.14))。
