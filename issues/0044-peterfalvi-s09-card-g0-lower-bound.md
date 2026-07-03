@@ -372,3 +372,8 @@ S15 `H_sharp_hypothesis76` が同 constructor の使用例。⟹ **Hypothesis76-
 (letI/haveI/@ 全て試行、L-invertibility が見つからない) を解消する。`familyHypothesis71` では field 値
 として同 instance が通った (fun i => invertibleOfNonzero ...) ので、その pattern を downstream constructor
 に写すか、instance を def の `[...]` binder 化する。数学は完了、instance 解決のみ。
+
+**次 iteration の instance fix 案** (cont.⁷ 補足): `familyHypothesis71` は `fintypeL`/`invertibleL` を
+**field** として保持済。downstream の `FrobeniusFamily.hypothesis76` は fresh instance でなく
+`(F.familyHypothesis71).fintypeL i` / `.invertibleL i` を `letI` で使えば、hypothesis76OfDade が期待する
+instance と確実に一致する見込み (field 値は familyHypothesis71 で build 済ゆえ)。
