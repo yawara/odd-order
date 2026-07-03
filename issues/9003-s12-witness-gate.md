@@ -376,3 +376,73 @@ deep port (type-I 版 `typeI_centralizer_le_and_unique` は proven なので B(4
 **loop¹⁰⁴ = policy「gated なら ungated 上流 (Theorem B) に降りて実証明」に従い BG Theorem B
 `theoremB_U_and_A_tame` conjunct 4/5 を正面 build** (conjunct 1 は proven、Theorem E の M̃
 machinery `conjClassSet_Mtilde_disjoint` は proven ゆえ conjunct 5 の TI は射程内の可能性)。
+
+## ✅ lane b 完了 (2026-07-03, loop¹⁰⁴) — BG Theorem B(4)(5) 全証明 + Theorem B 全 5 conjunct 完成・axiom-clean
+
+commit 94a34018 (3 files, +332/-25)。§8 type-II support クラスタの共通上流 =
+BG Theorem B(4)(5) を正面 build。**frontier map (loop¹⁰³) の「Theorem E/II deep port」推測は
+grep-before-depth で覆り、実際は Lemma 15.1(c) からの genuine assembly だった**
+([[verify-port-state-by-number-not-coq-name]] の教訓再確認)。
+
+**新規 (S16_MainResults、全 axiom-clean [propext, Classical.choice, Quot.sound])**:
+1. **`theoremB_A_minus_Msigma_isTISubset` (B(5)、mmd L4373)**: `IsTISubset (A(M)∖M_σ) M`。
+   a∈A(M)∖M_σ の (κ∪σ)'-part w=piPart(κ∪σ)ᶜ a に `𝓜(C_G(w))={M}` (下記一般形) →
+   piPart 共役同変 (`piPart_conj`) + `centralizer_pointwise_smul` + coatom 共役
+   (`isCoatom_pointwise_smul`) + `mem_normalizer_of_conj_smul_eq_self` + N_G(M)=M で g∈M。
+   w≠1 は `mem_U_sup_Msigma_iff_isPiElement_kappa_compl` (κ'-ness) + `mem_Msigma_iff_isPiElement_sigma`。
+2. **`uniqueMaximal_of_kappaSigmaCompl_element` (Lemma 15.1(c) 一般形)**: (κ∪σ)'-元 y∈M で
+   C_{M_σ}(y)≠1 → `𝓜(C_G(y))={M}`。`hall_D`/`hall_C` で ⟨y⟩ を U に共役 →
+   `typeP_hall_small_subgroup_cyclic_tau2` (=B(4)、S14 に proven 済) → τ∈M で共役戻し。
+   Pf 8.12.b (`typeI_centralizer_le_and_unique`) の type-independent core。
+
+**`theoremB_U_and_A_tame` faithful 化 + 全 5 conjunct assembled で完全証明**:
+- signature に hKM/hUM/hK 追加 (BG setup M=KUM_σ)、conjunct 1 を `p.Prime` 制限
+  (旧 `∀ p:ℕ` 版は非可換 {q,r}-group で **偽**だった latent unsoundness を是正)。
+- (1) `theoremB_U_sylow_abelian_rank_le_two` / (2) `typeP_centralizerGeneratedBySigma_isMulCommutative`
+  (15.1d) / (3) `typeP_hall_frobenius_factor` (15.1e) + Frobenius fpf
+  (`centralizer_inf_kernel_eq_bot_of_not_mem`) 変換 / (4) `typeP_hall_small_subgroup_cyclic_tau2`
+  (15.1c) / (5) `theoremB_A_minus_Msigma_isTISubset`。
+
+**消費者 un-gate (Theorem B sorry cite → sorry-free cite)**:
+- S16 `theoremII_tame_embedding{,_of_inputs}` + `mem_sigmaSharp_of_mem_aSet_of_escape` (B5 ×3
+  → `theoremB_A_minus_Msigma_isTISubset` 直接 cite)。
+- S10 `typeI_centralizer_le_and_unique` (B4 → `typeP_hall_small_subgroup_cyclic_tau2` 直接 cite)。
+
+toolkit: `isCoatom_pointwise_smul` (MaximalSubgroupTypeConj、downstream private の共通化)。
+full build 3906 jobs green / 2m7s。
+
+### 次 frontier (loop¹⁰⁵) — §8 type-II support pins が un-gate されて tractable に
+
+`theoremII_tame_embedding` (Theorem II conjunct 1) と `uniqueMaximal_of_kappaSigmaCompl_element`
+が axiom-clean になったので、S10 の残 type-II pin (bare sorry) が正面 build 可能に:
+- **`typeI_or_typeII_centralizer_unique` (S10:398, 8.12.b I+II 形)**: X⊆U#, M_F⊓C(X)≠⊥ →
+  C(X)≤M ∧ IsUniquelyMaximal(C(X))。type II で M_F=M_σ ゆえ `uniqueMaximal_of_kappaSigmaCompl_element`
+  を set→element 還元で適用 (X の各元は (κ∪σ)'-元)。
+- **`typeII_A_sets_TI` (S10:492, 8.16)** / **`typeII_A_sets_normalizer` (S10:502)**: A_II sets の TI 性、
+  `theoremB_A_minus_Msigma_isTISubset` を type-II M に適用。
+
+### loop¹⁰⁵ 精査 (2026-07-03) — (8.12.b) `typeI_or_typeII_centralizer_unique` は **false-as-stated** + exact fix 判明
+
+Pf (8.12.b) 原文 (04.10:129): 「非空 X⊆**U#** (U は complement: type I で M=H⋊U、type II で
+[M,M]=H⋊U) で C_H(X)≠1 → M は C_G(X) を含む唯一の maximal」。証明 = [BG] §16 Theorem B(4)。
+
+**Lean `typeI_or_typeII_centralizer_unique` (S10:398) は false-as-stated**:
+- 仮説が `hUle : U ≤ M` (任意) で、caller S14:4366 は **U=M, X={x}⊆M#** を渡す。
+- 反例: escaping σ-元 x∈M_σ# は `M_σ⊓C(x)⊇⟨x⟩≠⊥` (仮説満たす) だが `C(x)⊄M` (escaping の定義)
+  → 結論 `C(X)≤M` を破る。実 caller の x は complement 由来の (κ∪σ)'-元なので使用箇所は健全だが、
+  ∀-statement が偽インスタンスを含む (theoremB conjunct 1 と同種の scaffold soundness issue)。
+
+**exact fix (tractable、B(4) が今 available)**: `hUle : U ≤ M` を
+`hU : Ch03.IsHallSubgroup ((κ∪σ)ᶜ) (U.subgroupOf M)` に faithful 化。証明 =
+`⟨X⟩ ≤ U` (X⊆U# 非空 → ⟨X⟩≠⊥)、`C_G(X)=C_G(⟨X⟩)`、`C_{M_σ}(⟨X⟩)≠⊥` → **Theorem B(4)**
+(`typeP_hall_small_subgroup_cyclic_tau2` / `theoremB_U_and_A_tame` conjunct 4) で 𝓜(C(⟨X⟩))={M}
+→ `IsUniquelyMaximal(C(X))` + `C(X)≤M`。type I/II 共に B(4) は type-agnostic ゆえ両対応。
+
+**cross-lane**: caller 更新が要る (S10 restate = 自、S14 caller = 自 `exists_sigmaKappaCompl_hall_ge_P0`
+で Hall 供給、**S11 caller (lane a) = `isHall_kappaSigmaCompl_of_isTypeP2_complement`
+(FeitThompson.lean、lane a) で data.U を (κ∪σ)'-Hall 化**)。enablers 両方存在
+(`typeF_complement_isHall_kappa_sigma_compl` type I / 上記 type II)。
+
+**(8.16) `typeII_A_sets_TI` (S10:492)**: `IsTISubset (typePA0/typePA/A1) M`。typePA↔BG ASet の
+encoding bridge + `theoremB_A_minus_Msigma_isTISubset` (A(M)∖M_σ) / Theorem C(9) 適用。
+Pf (8.12.c) = A(M)−A_1(M) TI = Theorem B(5) の Pf 名。次 loop で bridge を建てる。
