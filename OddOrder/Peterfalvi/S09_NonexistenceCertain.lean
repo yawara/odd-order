@@ -4413,6 +4413,21 @@ lemma mem_kernel_sharp_conj_iff_of_mem_L (F : FrobeniusFamily G k) (i : Fin k)
       intro hconj
       exact hx.2 (conj_eq_one_iff.mp hconj)⟩
 
+/-- **The Peterfalvi (7.1) Dade ρ-setup for the `i`-th family member.**  The kernel `H_i` of the
+`i`-th Frobenius subgroup has `H_i^#` a TI-subset of `G` (`isTI`) with normalizer `L_i`
+(`normalizer_eq`, so `L_i` conjugates `H_i^#` to itself, `mem_kernel_sharp_conj_iff_of_mem_L`), so
+`Hypothesis71.of_isTISubset` builds the full (7.1) datum `Hypothesis71 G (H_i^#) L_i` (with all
+`H(a) = ⊥` and the canonical Dade isometry `τ`).  This is the per-member (7.1) input assembled by
+(7.4)/(7.10). -/
+noncomputable def hypothesis71 [Fintype G] (F : FrobeniusFamily G k) (i : Fin k) :
+    Hypothesis71 G (OddOrder.Peterfalvi.S04.sharp (F.H i : Set G)) (F.L i) :=
+  Hypothesis71.of_isTISubset
+    (fun x hx => OddOrder.Peterfalvi.S04.mem_sharp.mpr
+      ⟨Set.mem_univ x, (OddOrder.Peterfalvi.S04.mem_sharp.mp hx).2⟩)
+    (fun x hx => F.kernel_le i (OddOrder.Peterfalvi.S04.mem_sharp.mp hx).1)
+    (fun l a ha => (F.mem_kernel_sharp_conj_iff_of_mem_L i l.2).mpr ha)
+    (F.isTI i)
+
 /-- TI for H_i^# says that any element carrying one sharp-kernel element back
 into H_i^# already lies in L_i. -/
 lemma mem_L_of_mem_kernel_sharp_of_conj_mem_kernel_sharp
