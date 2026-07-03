@@ -690,3 +690,17 @@ cross-family R-orthogonality (same-L, R(χ1)⊥R(χ2) χ1≠χ2) prerequisite �
 `toOrthonormalImage_inner_eq_zero_across` (S07:977) + 上記二族 diff 直交 + χ1∉{χ2,χ̄2}→
 disjoint constituents (partition trivIset `exists_conj_of_common_induce_constituent` ¹³⁵) から
 h2/h3 (φ≠φ̄' 等) 導出。(12.14) path の reusable 入力 + nonconjugate 版の companion。
+
+### loop¹⁴⁰ — ✅ 同一L cross-family R-orthogonality landed (commit 44c39a0d)
+
+`samegroup_typeI_R_orthogonal` (S14、sorry-free): 同一 L の χ1,χ2∈S で constituents pairwise distinct
+(hcond, χ1∉{χ2,χ̄2} で成立) なら R(χ1)⊥R(χ2)。nonconjugate 版の companion、前 commit の二族 diff 直交で
+signed-diff を埋める。build green 3871。**2 連続 code landing** (¹³⁹ 二族 diff + ¹⁴⁰ same-L R-ortho)。
+
+**R-orthogonality toolkit 完成**: nonconjugate (異L) + samegroup (同L) + constituentDiff_..._across
+(二族 diff)。type-I char (12.3/12.4/12.14) の reusable 入力。
+
+**(12.14) 残 subtlety**: dade.psi=coh.extension χ0 ∈ ℤ[R(χ0)] は R(χ0) と非直交。(12.4)
+orthogonal_character_constant_on_coset は ⊥ 全 R(χ') 要 → χ'=χ0 で gap。samegroup R-ortho は χ'≠χ0 を
+埋めるが χ0 は残る。Coq (12.14) の FTtype1_ortho_constant 適用の calS/χ0 扱いが要精読。次: (12.14)
+assembly の χ0 subtlety 解決 (Lean 意図 proof / Coq 精読) か、R-orthogonality を別 consumer で活用。
