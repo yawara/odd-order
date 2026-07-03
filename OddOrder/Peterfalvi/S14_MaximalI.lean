@@ -798,7 +798,7 @@ theorem Sset_diff_tau_support_subset_ftThickenedA1 {L : Subgroup G} [Finite G]
     OddOrder.Peterfalvi.S10.A1_subset_typeIA L hyp.typeI
   have hA₁norm : ∀ (l : ↥L) ⦃a : G⦄, a ∈ A1 L PeterfalviType.I →
       (l : G) * a * (l : G)⁻¹ ∈ A1 L PeterfalviType.I := fun l _ ha =>
-    OddOrder.Peterfalvi.S10.A1_typeI_conj_mem L l.2 ha
+    OddOrder.Peterfalvi.S10.A1_conj_mem L OddOrder.GroupTheory.PeterfalviType.I l.2 ha
   have hsuppA1 := Sset_diff_support_subset_A1 hyp data
   have hsuppA : (chi - chi.conj).support ⊆
       OddOrder.Peterfalvi.S04.supportInSubgroup hyp.ambientA L := fun x hx => hA₁A (hsuppA1 hx)
@@ -4359,12 +4359,14 @@ theorem centralizer_control_of_CKx [Finite G] (hG : OddOrder.BG.IsMinimalSimpleO
   -- `M_F ⊓ C_G(x) ≠ ⊥` from `C_K(x) ⊄ K'`.
   have hCKne : maxNilpotentNormalHall ctr.M ⊓ Subgroup.centralizer ({x} : Set G) ≠ ⊥ := by
     intro hbot; apply hCKx; rw [ctr.K_eq_MF, inf_comm, hbot]; exact bot_le
-  have hxsharp : ({x} : Set G) ⊆ sharpSubgroup ctr.M := by
+  -- The genuine `(κ ∪ σ)ᶜ`-Hall complement `U₀ ⊇ P₀ ∋ x` that BG (8.12.b) requires.
+  obtain ⟨U0, hP0U0, hU0M, hU0hall⟩ := exists_sigmaKappaCompl_hall_ge_P0 hG ctr
+  have hxsharp : ({x} : Set G) ⊆ sharpSubgroup U0 := by
     intro y hy; rw [Set.mem_singleton_iff] at hy; subst hy
-    exact ⟨hxM, fun h => hxne (Set.mem_singleton_iff.mp h)⟩
+    exact ⟨hP0U0 hx, fun h => hxne (Set.mem_singleton_iff.mp h)⟩
   -- (8.12.b): `C_G(x) ≤ M` and uniquely maximal.
-  obtain ⟨hCxleM, huniq⟩ := OddOrder.Peterfalvi.S10.typeI_or_typeII_centralizer_unique hG
-    ctr.M_maximal (Or.inl ctr.M_typeI) (le_refl ctr.M) ({x} : Set G) (Set.singleton_nonempty x)
+  obtain ⟨hCxleM, huniq⟩ := OddOrder.Peterfalvi.S10.typeI_or_typeII_centralizer_unique_hall hG
+    ctr.M_maximal (Or.inl ctr.M_typeI) hU0M hU0hall ({x} : Set G) (Set.singleton_nonempty x)
     hxsharp hCKne
   refine ⟨?_, fun hCxleL => hLM (huniq.eq_of_isCoatom_of_le hMcoatom hCxleM hLcoatom hCxleL).symm⟩
   -- `N_G(⟨x⟩) ⊆ M`.

@@ -394,7 +394,16 @@ contains `C_G(X)`** — recorded as `C_G(X) ≤ M` together with `IsUniquelyMaxi
 The earlier formulation recorded only `IsUniquelyMaximal (C_G(X))`, which is strictly weaker:
 for type II `C_G(X)` need not lie in `M`, so without the `C_G(X) ≤ M` clause the result cannot
 identify the unique maximal as `M` (as (9.3) requires).  Reference: [BG], §16, Theorem B and
-Proposition 16.1. -/
+Proposition 16.1.
+
+⚠ **This scaffold form (`hUle : U ≤ M`) is `false`-as-stated** (loop¹⁰⁵ finding): BG (8.12.b) needs
+`U` to be *the* `(κ ∪ σ)ᶜ`-Hall complement, not an arbitrary subgroup.  With `U = M` and an escaping
+`σ`-element `x ∈ M_σ#`, `M_σ ⊓ C_G(x) ⊇ ⟨x⟩ ≠ ⊥` holds yet `C_G(x) ⊄ M`, breaking the conclusion.
+The faithful, `sorry`-free form is `typeI_or_typeII_centralizer_unique_hall` (adds the Hall
+hypothesis; its `⟨X⟩ ≤ U` a `(κ ∪ σ)ᶜ`-subgroup, so BG Theorem B(4) applies).  **Migrate the sole
+remaining caller (`S11.typeII_centralizer_U_eq_bot`) to `_hall`** once the type-`P₂` complement
+Hall witness `isHall_kappaSigmaCompl_of_isTypeP2_complement` (currently in the downstream
+`FeitThompson.lean`) is relocated upstream of §11 (loop¹⁰⁵ follow-up, issue 9003). -/
 theorem typeI_or_typeII_centralizer_unique [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M U : Subgroup G}
     (hM : M ∈ maximalSubgroups G) (hType : IsTypeI M ∨ IsTypeII M) (hUle : U ≤ M) :
@@ -402,6 +411,50 @@ theorem typeI_or_typeII_centralizer_unique [Finite G]
       maxNilpotentNormalHall M ⊓ Subgroup.centralizer X ≠ ⊥ →
         Subgroup.centralizer X ≤ M ∧ IsUniquelyMaximal (Subgroup.centralizer X) := by
   sorry
+
+/-- **Peterfalvi (8.12.b)**, faithful form: type I/II Sylow-complement centralizer control.
+
+For `M` of type I or II, its genuine `(κ ∪ σ)ᶜ`-Hall complement `U` (`M = H ⋊ U` for type I,
+`[M,M] = H ⋊ U` for type II), and every non-empty `X ⊆ U#` with `C_H(X) ≠ 1`, `M` is the unique
+maximal subgroup of `G` over `C_G(X)`.  Proof: `⟨X⟩ ≤ U` is a nontrivial `(κ ∪ σ)ᶜ`-subgroup with
+`C_{M_σ}(⟨X⟩) = C_{M_σ}(X) ≠ 1` (`M_F = M_σ` for type I/II), so BG **Theorem B(4)**
+(`typeP_hall_small_subgroup_cyclic_tau2`) pins `ℳ(C_G(⟨X⟩)) = {M}`, and `C_G(X) = C_G(⟨X⟩)`
+(`centralizer_closure`).  Reference: [BG], §16, Theorem B and Proposition 16.1. -/
+theorem typeI_or_typeII_centralizer_unique_hall [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M U : Subgroup G}
+    (hM : M ∈ maximalSubgroups G) (hType : IsTypeI M ∨ IsTypeII M) (hUM : U ≤ M)
+    (hU : Ch03.IsHallSubgroup
+      ((OddOrder.BG.Ch4.S14.kappa M ∪ OddOrder.BG.Ch3.S10.sigma M)ᶜ) (U.subgroupOf M)) :
+    ∀ X : Set G, X.Nonempty → X ⊆ sharpSubgroup U →
+      maxNilpotentNormalHall M ⊓ Subgroup.centralizer X ≠ ⊥ →
+        Subgroup.centralizer X ≤ M ∧ IsUniquelyMaximal (Subgroup.centralizer X) := by
+  intro X hXne hXU hCX
+  classical
+  -- `Y = ⟨X⟩ ≤ U` is a nontrivial `(κ ∪ σ)ᶜ`-subgroup.
+  set Y : Subgroup G := Subgroup.closure X with hYdef
+  have hXsubU : X ⊆ (U : Set G) := hXU.trans (by rw [sharpSubgroup]; exact Set.diff_subset)
+  have hYU : Y ≤ U := (Subgroup.closure_le U).mpr hXsubU
+  obtain ⟨x0, hx0X⟩ := hXne
+  have hx0mem : x0 ∈ (U : Set G) ∧ x0 ∉ ({1} : Set G) := hXU hx0X
+  have hYne : Y ≠ ⊥ := fun hbot => hx0mem.2
+    (by rw [Set.mem_singleton_iff]; exact Subgroup.mem_bot.mp (hbot ▸ Subgroup.subset_closure hx0X))
+  -- `C_G(X) = C_G(Y)` and `M_F = M_σ` for type I/II.
+  have hCeq : Subgroup.centralizer X = Subgroup.centralizer (Y : Set G) :=
+    (Subgroup.centralizer_closure X).symm
+  have hMFσ : maxNilpotentNormalHall M = OddOrder.BG.Ch3.S10.Msigma M :=
+    OddOrder.Peterfalvi.S10Interface.maxNilpotentNormalHall_eq_Msigma_of_typeI_or_II hG hM hType
+  have hCY : OddOrder.BG.Ch3.S10.Msigma M ⊓ Subgroup.centralizer (Y : Set G) ≠ ⊥ := by
+    rw [← hCeq, ← hMFσ]; exact hCX
+  -- BG Theorem B(4): `ℳ(C_G(Y)) = {M}`.
+  have hM4 := (OddOrder.BG.Ch4.S14.typeP_hall_small_subgroup_cyclic_tau2 hG hM hUM hU hYU hYne hCY).1
+  rw [hCeq]
+  have hCleM : Subgroup.centralizer (Y : Set G) ≤ M :=
+    (mem_maximalSubgroupsContaining.mp (hM4 ▸ Set.mem_singleton M)).2
+  refine ⟨hCleM, IsUniquelyMaximal.of_unique_maximal
+    (hCleM.trans_lt (lt_top_iff_ne_top.mpr hM.1)) hM hCleM (fun K hK hHK => ?_)⟩
+  have hKmem : K ∈ maximalSubgroupsContaining (Subgroup.centralizer (Y : Set G)) := ⟨hK, hHK⟩
+  rw [hM4, Set.mem_singleton_iff] at hKmem
+  exact hKmem
 
 /-- **Peterfalvi (8.6.b II)**, canonical form: for a maximal subgroup `M` of Type II and **any**
 type-`P` data on `M`, the complement `U` has `N_G(U) ⊄ M`.
@@ -488,7 +541,15 @@ theorem escapingCentralizers_control [Finite G]
 `A_0(M)`, `A(M)`, and `A_1(M)` are TI-subsets of `G` with normalizer `M`.
 
 This is the directly usable part of the PDF-recovered missing page.  The proof is
-BG Section 16 / Peterfalvi (2.3), not a local character-theoretic argument. -/
+BG Section 16 / Peterfalvi (2.3), not a local character-theoretic argument.
+
+⚠ **Overstated / `false`-as-stated (loop¹⁰⁶ finding; currently unconsumed).**  Pf (8.10)/(8.12.c)
+(mmd 04.10 L119/L131) only asserts that `A(M) − A_1(M)` is `TI` (= BG Theorem B(5),
+`OddOrder.BG.Ch4.S16.theoremB_A_minus_Msigma_isTISubset`, **proved**).  The *full* sets `A(M) =
+(M')#` and `A_1(M) = M_σ#` are **not** `TI`: `M_σ` is only *tamely* imbedded (BG Theorem II),
+`M_σ ∩ M_σ^g` being cyclic (Theorem D(2)) rather than trivial, and escaping `σ`-elements
+(`C_G(x) ⊄ M`) exist.  The faithful content is: `A(M) − A_1(M)` TI (B(5)) + the tame embedding
+(`theoremII_tame_embedding`).  Retire or restate to `A(M) − A_1(M)` before wiring any consumer. -/
 theorem typeII_A_sets_TI [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G}
     (hM : M ∈ maximalSubgroups G) (data : TypeIIData M) :
@@ -498,7 +559,11 @@ theorem typeII_A_sets_TI [Finite G]
   sorry
 
 /-- **Peterfalvi (8.16)**, normalizer form: for Type II, the normalizers of
-`A_0(M)`, `A(M)`, and `A_1(M)` are all `M`. -/
+`A_0(M)`, `A(M)`, and `A_1(M)` are all `M`.
+
+⚠ **Overstated / unconsumed** (loop¹⁰⁶): same caveat as `typeII_A_sets_TI` — `N_G(M_σ#) = M`
+would make `M_σ` a `TI`-subgroup, contradicting the tame (not trivial-intersection) embedding of
+`M_σ` (BG Theorem II / Theorem D(2)).  Retire or restate before wiring. -/
 theorem typeII_A_sets_normalizer [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G}
     (hM : M ∈ maximalSubgroups G) (data : TypeIIData M) :
@@ -1428,15 +1493,37 @@ theorem A1_subset_typeIA (M : Subgroup G) (data : TypeIData M) :
     x, (Set.mem_diff _).mpr ⟨SetLike.mem_coe.mpr hxH', hx1⟩,
     Subgroup.mem_centralizer_singleton_iff.mpr rfl⟩
 
-/-- `A₁(M)` is `M`-conjugation invariant (via the `M`-normality of `M_F`). -/
-theorem A1_typeI_conj_mem (M : Subgroup G) {m : G} (hm : m ∈ M) {a : G}
-    (ha : a ∈ A1 M PeterfalviType.I) : m * a * m⁻¹ ∈ A1 M PeterfalviType.I := by
+
+/-- **`M`-conjugation invariance of `sharpSubgroup H`** when `M` normalizes `H` (general helper for
+the type-`τ` Dade-support sets `A₁(M) = M_s#`, `A(M) = (M')#`, all of the form `sharpSubgroup H`
+with `H ⊴ M`). -/
+theorem sharpSubgroup_conj_mem {H : Subgroup G} {m : G}
+    (hn : m ∈ Subgroup.normalizer (H : Set G)) {a : G}
+    (ha : a ∈ OddOrder.GroupTheory.sharpSubgroup H) :
+    m * a * m⁻¹ ∈ OddOrder.GroupTheory.sharpSubgroup H := by
   obtain ⟨haH, ha1⟩ := (Set.mem_diff a).mp ha
-  have hnorm := OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_le_normalizer M hm
-  rw [Subgroup.mem_normalizer_iff] at hnorm
-  refine (Set.mem_diff _).mpr ⟨SetLike.mem_coe.mpr ((hnorm a).mp (SetLike.mem_coe.mp haH)), ?_⟩
+  rw [Subgroup.mem_normalizer_iff] at hn
+  refine (Set.mem_diff _).mpr ⟨SetLike.mem_coe.mpr ((hn a).mp (SetLike.mem_coe.mp haH)), ?_⟩
   exact fun h => (conj_ne_one (fun h1 => ha1 (Set.mem_singleton_iff.mpr h1)))
     (Set.mem_singleton_iff.mp h)
+
+/-- **`M`-conjugation invariance of `A₁(M) = M_s#`** for every Peterfalvi type: `M_s` is `M_F`
+(types I, II, V) or `M'` (types III, IV), both `⊴ M`. -/
+theorem A1_conj_mem (M : Subgroup G) (tau : OddOrder.GroupTheory.PeterfalviType) {m : G}
+    (hm : m ∈ M) {a : G} (ha : a ∈ A1 M tau) : m * a * m⁻¹ ∈ A1 M tau := by
+  refine sharpSubgroup_conj_mem (H := OddOrder.GroupTheory.mainSubgroup M tau) ?_ ha
+  cases tau with
+  | I => exact OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_le_normalizer M hm
+  | II => exact OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_le_normalizer M hm
+  | V => exact OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_le_normalizer M hm
+  | III => exact OddOrder.BG.Ch3.S10.le_normalizer_derivedInG M hm
+  | IV => exact OddOrder.BG.Ch3.S10.le_normalizer_derivedInG M hm
+
+/-- **`M`-conjugation invariance of the type-`P` support `A(M) = (M')#`** (`M' ⊴ M`). -/
+theorem typePA_conj_mem (M : Subgroup G) (data : TypePData M) {m : G} (hm : m ∈ M) {a : G}
+    (ha : a ∈ typePA M data) : m * a * m⁻¹ ∈ typePA M data := by
+  rw [typePA_eq_sharpSubgroup_derivedInG] at ha ⊢
+  exact sharpSubgroup_conj_mem (OddOrder.BG.Ch3.S10.le_normalizer_derivedInG M hm) ha
 
 /-- **Peterfalvi (8.15)** for type I: the Dade (2.2) support hypotheses hold for `A(M) = A_0(M)`
 and `A₁(M)`, with `L = M` and the faithful `H(a) = R(a)` of (8.14).  Assembly is genuine
@@ -1455,8 +1542,8 @@ theorem dadeSupportHypotheses_typeI [Fintype G] [Finite G]
   have hiffA1 : ∀ {m x : G}, m ∈ M →
       (m * x * m⁻¹ ∈ A1 M PeterfalviType.I ↔ x ∈ A1 M PeterfalviType.I) := by
     intro m x hm
-    refine ⟨fun h => ?_, A1_typeI_conj_mem M hm⟩
-    have h2 := A1_typeI_conj_mem M (inv_mem hm) h
+    refine ⟨fun h => ?_, A1_conj_mem M OddOrder.GroupTheory.PeterfalviType.I hm⟩
+    have h2 := A1_conj_mem M OddOrder.GroupTheory.PeterfalviType.I (inv_mem hm) h
     have h3 : m⁻¹ * (m * x * m⁻¹) * m⁻¹⁻¹ = x := by group
     rwa [h3] at h2
   constructor
