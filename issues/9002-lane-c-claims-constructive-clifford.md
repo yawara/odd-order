@@ -305,6 +305,39 @@ packaging (`exists_extension_induce_eq_sum_distinct_irreducible`) + type-F inert
 S14 consumer が必要とする 6 clause 中 4 (nonempty/decomp/等次数/非実/conj-distinct) は cite 可能。
 残 = 台 + coprimality/hcent の type-F→↥L wiring (S14-import 側で組む)。
 
+### ✅ coprimality COMPLETE (cont.²² 2026-07-03, commit `5e81d626`)
+
+`coprime_index_orderOf_determinant_mul_of_coprime_index` (CliffordDecomposition.lean, sorry-free
+axiom-clean): `H⊴L` Hall (`gcd(|H|,[L:H])=1`) + θ∈Irr(H) 次数 d ⟹ `Coprime [T:H] (o(det θ)·d)`
+(任意 H≤T≤L)。**Ito 定理は既に repo にあった** (`IsIrreducibleCharacter.exists_natDegree_charValue_one_dvd_card`
+= `finrank_dvd_card`, ZIrr.lean) → `d∣|H|`; `o(det θ)∣|H|` (linear char |H|-torsion);
+`[T:H]∣[L:H]` (`relIndex_mul_index`); Hall で分離。**gate でなかった** ([[feedback-dont-mislabel-formalization-as-research]])。
+
+これで glue `exists_extension_induce_eq_sum_distinct_of_inertia_inf_le` の全入力
+(hinertia/hHU/hbound/hU1comm/hcop/hd) が shared/type-F データから供給可能。
+
+## consumer assembly レシピ (S14-import 側 = lane b or 次 lane c session)
+
+**残 = `typeI_induced_char_constituents` (S14:429) の組み立てのみ。generic 核は全在庫。** 手順:
+1. `chi ∈ hyp.Sset` を unpack → `θ' : Irr(H')`, `θ'≠1`, `chi = Ind_{H'} θ'` (H' = (L_F).subgroupOf L)。
+2. `T := inertia θ'`; `hinertia := rfl`。instances (`(H'.subgroupOf T).Normal` = `subgroupOf_inertia_normal`
+   等、`Invertible (Nat.card : ℂ)` = char 0 finite、`Fintype (Hom)`) を letI/haveI 供給。
+3. **glue 入力**: `hHU` = type-F complement (`data.complement.sup_eq_top` を subgroupOf 化);
+   `hbound` = `typeF_inertia_inf_le_U1` (S14 grandfather、↥L で apply — 要 hcent bridge: G-level
+   `data.centralizer_le_U1` → ↥L-level centralizer、+ hUHcop = Hall); `hU1comm` = `data.U1_commutative`
+   subgroupOf 化; `hcop` = **`coprime_index_orderOf_determinant_mul_of_coprime_index`** + Hall
+   (`(maxNilpotentNormalHall).subgroupOf` の `IsHallSubgroup.coprime_index`); `hd` = θ'(1) の nat 値。
+4. glue → S (nonempty/card/decomp/等次数/witness)。
+5. **非実** = `forall_mem_not_isReal_of_induce_eq_sum_of_odd hodd θ' hθ'ne hSsum` (hodd = L 奇数位数)。
+6. **conj-distinct** = `forall_mem_conj_ne_of_odd hodd θ' hθ'ne hSsum`。
+7. **台 ⊆ A(L)∪{1}** (唯一の type-I 固有・要 build): 各 φ=Ind_T(χ·Inf β) の台。Frobenius 版
+   `frobenius_typeI_induced_char_constituents` は `induceSum_eq_zero_of_not_conjugatesInto` (normal H の外で消滅)
+   使用だが、**一般 T>H では constituent は個別に H 外で消えない** (T\H で非零可) ゆえ Pf (1.2)/(1.5.a)
+   の type-I 論法が要る。A(L)=typeIA の構造 + (1.5.a) `(Res_H φ,1_H)=0` から台を絞る。要原文精読。
+
+**⟹ 残る genuine build は台 (1.2)/(1.5.a) のみ。他は全 cite。** hcent bridge は centralizer subgroupOf 移送
+(機械的だが要注意)。lane b が S14 で消費 (lane c は S14 非編集の shared 供給完了)。
+
 ### 6.11 の設計確定 (2026-07-02 cont.¹⁸ 精査 — route (ii) θ-part 論法採用、一般 Mackey 不要)
 
 **在庫が予想以上に厚い** (CliffordSingleOrbit / InducedCharacter):
