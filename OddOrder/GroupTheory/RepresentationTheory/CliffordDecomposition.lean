@@ -321,6 +321,41 @@ theorem exists_extension_induce_eq_sum_distinct_of_inertia_inf_le
     exact hcommle (Subgroup.commutator_mem_commutator x.2 y.2)
   exact exists_extension_induce_eq_sum_distinct_irreducible hHT hθ hinertia hab hd hcop
 
+/-- **Coprimality of the inertia index with the character order·degree, from a Hall subgroup.**
+For `H ⊴ L` with `gcd(|H|, [L:H]) = 1` (`H` Hall) and `θ ∈ Irr(H)` of degree `d`, the index `[T:H]`
+of `H` in any intermediate `H ≤ T ≤ L` is coprime to `o(det θ)·d`.  Indeed `[T:H] ∣ [L:H]`
+(index tower `relIndex_mul_index`), `d ∣ |H|` (Ito's theorem,
+`exists_natDegree_charValue_one_dvd_card`), and `o(det θ) ∣ |H|` (a linear character's order divides
+the group order, `det θ ^ |H| = 1`); the Hall coprimality `gcd(|H|, [L:H]) = 1` then separates
+`[T:H]` from `o(det θ)·d`.
+
+Supplies the `hcop` hypothesis of `exists_extension_induce_eq_sum_distinct_of_inertia_inf_le` in the
+type-I application, where `H = L_F` is a normal Hall subgroup of `L`. -/
+theorem coprime_index_orderOf_determinant_mul_of_coprime_index
+    {H T : Subgroup L} [H.Normal] (hHT : H ≤ T)
+    (hHall : Nat.Coprime (Nat.card ↥H) H.index)
+    {θ : ClassFunction ↥H ℂ} (hθ : IsIrreducibleCharacter θ) {d : ℕ} (hd : θ 1 = (d : ℂ)) :
+    Nat.Coprime (H.subgroupOf T).index (orderOf hθ.determinant * d) := by
+  haveI : Finite ↥H := inferInstance
+  -- `d ∣ |H|` (Ito's theorem)
+  obtain ⟨n, -, hn_val, hn_dvd⟩ := hθ.exists_natDegree_charValue_one_dvd_card
+  have hdn : d = n := by
+    have hdc : (d : ℂ) = (n : ℂ) := by rw [← hd, hn_val]
+    exact_mod_cast hdc
+  have hd_dvd : d ∣ Nat.card ↥H := hdn ▸ hn_dvd
+  -- `o(det θ) ∣ |H|` (a linear character has `|H|`-torsion)
+  have ho_dvd : orderOf hθ.determinant ∣ Nat.card ↥H := by
+    apply orderOf_dvd_of_pow_eq_one
+    ext h
+    rw [MonoidHom.pow_apply, MonoidHom.one_apply, ← map_pow, pow_card_eq_one', map_one]
+  -- `[T:H] ∣ [L:H]` (index tower)
+  have hidx_dvd : (H.subgroupOf T).index ∣ H.index :=
+    ⟨T.index, (Subgroup.relIndex_mul_index hHT).symm⟩
+  -- combine via the Hall coprimality `gcd(|H|, [L:H]) = 1`
+  have hcop_Hi : Nat.Coprime H.index (Nat.card ↥H) := hHall.symm
+  exact ((hcop_Hi.coprime_dvd_right ho_dvd).mul_right
+    (hcop_Hi.coprime_dvd_right hd_dvd)).coprime_dvd_left hidx_dvd
+
 /-- **Induction commutes with complex conjugation**: `(Ind_H^L θ)̄ = Ind_H^L (θ̄)`.  Pointwise
 `star` distributes over the induction sum `⅟|H| · ∑_x induceTerm θ x g` (`star_sum`, `star_invOf`,
 `star_natCast`), and `star (induceTerm θ x g) = induceTerm θ̄ x g` since `θ̄ = star ∘ θ`.  Used to
