@@ -178,3 +178,21 @@ type-I `escaping_typeIA_signalizer_structure` step 2-4 から抽出)。(2) A1 + 
 (3) P2-typePA の `escaping_typePA_mem_A1` (type-P 8.13.b) + typePA0 の V^M。conj-invariance 前提済 (loop¹⁰⁸)。
 
 **landed** (loop¹¹⁶): `typePA_eq_sigmaSharp_of_isTypeP1` / `escaping_typePA_mem_sigmaSharp_of_isTypeP1` (S10)。
+
+## 📋 lane b 精査 (loop¹¹⁷) — σ-sharp engine の coprimality core は type-specific、engine は genuine multi-session
+
+loop¹¹⁶ の「σ-sharp base engine を type-I engine から抽出」を精査したところ、**clean な抽出は不可**:
+- 抽出対象の type-I `escaping_typeIA_signalizer_structure` step 2-3 (join/disjoint/normalize) は σ-sharp
+  のみ依存で抽出可能。
+- **但し step 4 (coprimality c2) の core `escaping_sigma_disjoint_centralizer` (S10:899) は type-I 固有**:
+  `kappa S = ∅` (type-I=type-F) を使う。type-P (kappa≠∅) では coprimality 論法が異なり、**type-P 版の
+  (8.13.c2) が要る = deep**。
+- 同様に `typeIA_isConj_conj_in_M` (8.13.a)・`ftSupportKernel_conj_smul` も type-P 版が要る。
+
+**∴ type-P Dade engine は genuine multi-session build** (P1 structural bridge = loop¹¹⁶ の clean landed
+piece、engine 本体は type-P 固有 (8.13.a/c2) + escaping structure の deep pieces を要す)。
+
+**⚠ lane b 全体状態 (honest)**: ungated な lane-b own-work は **deep type-P engine のみ**。他は全て
+他レーン upstream に gated: Cluster A (12.10-12) = lane a §8-§11 (8.16/8.6.a/9.7.b/10.10/11.6, 未形式化)、
+Dade calc (12.14-16) = (12.3)[§16 via 8.18.c=lane c] / Cluster A、(8.18.c) = §16 lane c、S09 card_G0 =
+7.9/11.8 lane a。→ lane b は type-P engine (deep) を focused に進めるか、他レーン upstream 待ち。
