@@ -852,3 +852,16 @@ dischargeable field を埋め、deep field (h_psig_int/norm bounds) を isolate*
 (h_psix cyclotomic + h_psig_int 12.15 + hA-C §7 norm)。(12.14) は h_const を供給済。
 **次: h_psix (cyclotomic、(1.10) infra で最 tractable) を build 検討 → CounterexampleDadeData の
 非-deep field を埋める**。deep field (h_psig_int/norm) は multi-session。
+
+### loop¹⁵⁰ — h_psix も ψ(1)=e (coherence degree-preservation) 要; (12.16) chain 全 field deep 確定
+
+h_psix (∃w, ψ(x)-e=(1-ε)w): `exists_integral_apply_sub_of_commute` (CyclotomicCharacterCongruence:234,
+既存) を y=1 で適用 ⟹ ψ(x)-ψ(1)=(1-ε)z。∴ h_psix には **ψ(1)=e** 要 (e=χ(1)、chi_degree_eq_e)。
+だが IsCoherent (S07:1659) は isometry (extension_inner_eq) + ZIrr のみで **degree-preservation
+(coh.extension χ(1)=χ(1)) を直接持たない**。ψ(1)=e は coherence degree/sign 性質要 (isometry⟹±irr
++ degree = χ(1) の導出)。
+
+**∴ (12.16) chain 全 field deep 確定**: h_psix (ψ(1)=e degree-preserv) / h_psig_int (12.15 ρM) /
+hA-C (§7 norm)。**(12.14) は strong milestone (chain 再開 + h_const 供給)**、残は deep final Dade
+contradiction (multi-session)。次: ψ(1)=e (coherence degree-preservation) の導出可否を検討
+(isometry + ZIrr ⟹ ±irr ⟹ degree)、可なら h_psix landing。
