@@ -446,3 +446,25 @@ Pf (8.12.b) 原文 (04.10:129): 「非空 X⊆**U#** (U は complement: type I �
 **(8.16) `typeII_A_sets_TI` (S10:492)**: `IsTISubset (typePA0/typePA/A1) M`。typePA↔BG ASet の
 encoding bridge + `theoremB_A_minus_Msigma_isTISubset` (A(M)∖M_σ) / Theorem C(9) 適用。
 Pf (8.12.c) = A(M)−A_1(M) TI = Theorem B(5) の Pf 名。次 loop で bridge を建てる。
+
+## 🚀 lane b 進捗 (2026-07-03, loop¹⁰⁵) — (8.12.b) faithful 版 `_hall` を axiom-clean で landing (S14 un-gate)
+
+loop¹⁰⁴ の Theorem B(4) を使い、(8.12.b) の faithful 版を実証明。上記 false-as-stated finding を
+**新 theorem `typeI_or_typeII_centralizer_unique_hall`** (S10、axiom-clean) として landing:
+- signature = `hUM : U ≤ M` + `hU : (κ∪σ)ᶜ-Hall (U.subgroupOf M)`。証明 = `⟨X⟩ ≤ U` に
+  `typeP_hall_small_subgroup_cyclic_tau2` (B(4)) 直接適用、`centralizer_closure` + `M_F=M_σ` +
+  `IsUniquelyMaximal.of_unique_maximal`。conjugation 不要 (X⊆U# ゆえ ⟨X⟩≤U)。
+- **S14 caller `centralizer_control_of_CKx` を `_hall` に migrate**: `exists_sigmaKappaCompl_hall_ge_P0`
+  で (κ∪σ)ᶜ-Hall complement U₀⊇P₀∋x を供給 (旧 U=M は非-Hall で偽インスタンスだった)。type-I support
+  path が Theorem B の sorry gate から解放。
+- 旧 `typeI_or_typeII_centralizer_unique` (false-as-stated, sorry) は S11 caller
+  (`typeII_centralizer_U_eq_bot`) のため残置 + deprecated 注記。
+
+**S11 migration の blocker (cross-lane infra、次 loop 候補)**: S11 caller は `data.U` (TypePData
+complement) を (κ∪σ)ᶜ-Hall として供給する必要があるが、その witness
+`isHall_kappaSigmaCompl_of_isTypeP2_complement` + 補助 `isHallSubgroup_of_card_eq` /
+`card_mul_card_of_complement_normal` が **downstream の `FeitThompson.lean` (lane a) に誤配置**
+(全て §11 上流の依存しか使わない generic 補題)。→ 3 補題を上流 (card 2 本 = GroupTheory base、
+Hall 本体 = S10_BGInterface) へ relocate すれば S11 も `_hall` に migrate 可能。**hub 調整 issue 要**
+(FeitThompson は lane a 所有、relocate は cross-lane)。sup/inf witness は既存
+(`TypePData.derivedInG_eq_fitting_sup_U` + 要新 `fitting_inf_U_eq_bot`) + `isTypeII_iff_isTypeP2`。

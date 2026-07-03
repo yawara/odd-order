@@ -394,7 +394,16 @@ contains `C_G(X)`** — recorded as `C_G(X) ≤ M` together with `IsUniquelyMaxi
 The earlier formulation recorded only `IsUniquelyMaximal (C_G(X))`, which is strictly weaker:
 for type II `C_G(X)` need not lie in `M`, so without the `C_G(X) ≤ M` clause the result cannot
 identify the unique maximal as `M` (as (9.3) requires).  Reference: [BG], §16, Theorem B and
-Proposition 16.1. -/
+Proposition 16.1.
+
+⚠ **This scaffold form (`hUle : U ≤ M`) is `false`-as-stated** (loop¹⁰⁵ finding): BG (8.12.b) needs
+`U` to be *the* `(κ ∪ σ)ᶜ`-Hall complement, not an arbitrary subgroup.  With `U = M` and an escaping
+`σ`-element `x ∈ M_σ#`, `M_σ ⊓ C_G(x) ⊇ ⟨x⟩ ≠ ⊥` holds yet `C_G(x) ⊄ M`, breaking the conclusion.
+The faithful, `sorry`-free form is `typeI_or_typeII_centralizer_unique_hall` (adds the Hall
+hypothesis; its `⟨X⟩ ≤ U` a `(κ ∪ σ)ᶜ`-subgroup, so BG Theorem B(4) applies).  **Migrate the sole
+remaining caller (`S11.typeII_centralizer_U_eq_bot`) to `_hall`** once the type-`P₂` complement
+Hall witness `isHall_kappaSigmaCompl_of_isTypeP2_complement` (currently in the downstream
+`FeitThompson.lean`) is relocated upstream of §11 (loop¹⁰⁵ follow-up, issue 9003). -/
 theorem typeI_or_typeII_centralizer_unique [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M U : Subgroup G}
     (hM : M ∈ maximalSubgroups G) (hType : IsTypeI M ∨ IsTypeII M) (hUle : U ≤ M) :
@@ -402,6 +411,50 @@ theorem typeI_or_typeII_centralizer_unique [Finite G]
       maxNilpotentNormalHall M ⊓ Subgroup.centralizer X ≠ ⊥ →
         Subgroup.centralizer X ≤ M ∧ IsUniquelyMaximal (Subgroup.centralizer X) := by
   sorry
+
+/-- **Peterfalvi (8.12.b)**, faithful form: type I/II Sylow-complement centralizer control.
+
+For `M` of type I or II, its genuine `(κ ∪ σ)ᶜ`-Hall complement `U` (`M = H ⋊ U` for type I,
+`[M,M] = H ⋊ U` for type II), and every non-empty `X ⊆ U#` with `C_H(X) ≠ 1`, `M` is the unique
+maximal subgroup of `G` over `C_G(X)`.  Proof: `⟨X⟩ ≤ U` is a nontrivial `(κ ∪ σ)ᶜ`-subgroup with
+`C_{M_σ}(⟨X⟩) = C_{M_σ}(X) ≠ 1` (`M_F = M_σ` for type I/II), so BG **Theorem B(4)**
+(`typeP_hall_small_subgroup_cyclic_tau2`) pins `ℳ(C_G(⟨X⟩)) = {M}`, and `C_G(X) = C_G(⟨X⟩)`
+(`centralizer_closure`).  Reference: [BG], §16, Theorem B and Proposition 16.1. -/
+theorem typeI_or_typeII_centralizer_unique_hall [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M U : Subgroup G}
+    (hM : M ∈ maximalSubgroups G) (hType : IsTypeI M ∨ IsTypeII M) (hUM : U ≤ M)
+    (hU : Ch03.IsHallSubgroup
+      ((OddOrder.BG.Ch4.S14.kappa M ∪ OddOrder.BG.Ch3.S10.sigma M)ᶜ) (U.subgroupOf M)) :
+    ∀ X : Set G, X.Nonempty → X ⊆ sharpSubgroup U →
+      maxNilpotentNormalHall M ⊓ Subgroup.centralizer X ≠ ⊥ →
+        Subgroup.centralizer X ≤ M ∧ IsUniquelyMaximal (Subgroup.centralizer X) := by
+  intro X hXne hXU hCX
+  classical
+  -- `Y = ⟨X⟩ ≤ U` is a nontrivial `(κ ∪ σ)ᶜ`-subgroup.
+  set Y : Subgroup G := Subgroup.closure X with hYdef
+  have hXsubU : X ⊆ (U : Set G) := hXU.trans (by rw [sharpSubgroup]; exact Set.diff_subset)
+  have hYU : Y ≤ U := (Subgroup.closure_le U).mpr hXsubU
+  obtain ⟨x0, hx0X⟩ := hXne
+  have hx0mem : x0 ∈ (U : Set G) ∧ x0 ∉ ({1} : Set G) := hXU hx0X
+  have hYne : Y ≠ ⊥ := fun hbot => hx0mem.2
+    (by rw [Set.mem_singleton_iff]; exact Subgroup.mem_bot.mp (hbot ▸ Subgroup.subset_closure hx0X))
+  -- `C_G(X) = C_G(Y)` and `M_F = M_σ` for type I/II.
+  have hCeq : Subgroup.centralizer X = Subgroup.centralizer (Y : Set G) :=
+    (Subgroup.centralizer_closure X).symm
+  have hMFσ : maxNilpotentNormalHall M = OddOrder.BG.Ch3.S10.Msigma M :=
+    OddOrder.Peterfalvi.S10Interface.maxNilpotentNormalHall_eq_Msigma_of_typeI_or_II hG hM hType
+  have hCY : OddOrder.BG.Ch3.S10.Msigma M ⊓ Subgroup.centralizer (Y : Set G) ≠ ⊥ := by
+    rw [← hCeq, ← hMFσ]; exact hCX
+  -- BG Theorem B(4): `ℳ(C_G(Y)) = {M}`.
+  have hM4 := (OddOrder.BG.Ch4.S14.typeP_hall_small_subgroup_cyclic_tau2 hG hM hUM hU hYU hYne hCY).1
+  rw [hCeq]
+  have hCleM : Subgroup.centralizer (Y : Set G) ≤ M :=
+    (mem_maximalSubgroupsContaining.mp (hM4 ▸ Set.mem_singleton M)).2
+  refine ⟨hCleM, IsUniquelyMaximal.of_unique_maximal
+    (hCleM.trans_lt (lt_top_iff_ne_top.mpr hM.1)) hM hCleM (fun K hK hHK => ?_)⟩
+  have hKmem : K ∈ maximalSubgroupsContaining (Subgroup.centralizer (Y : Set G)) := ⟨hK, hHK⟩
+  rw [hM4, Set.mem_singleton_iff] at hKmem
+  exact hKmem
 
 /-- **Peterfalvi (8.6.b II)**, canonical form: for a maximal subgroup `M` of Type II and **any**
 type-`P` data on `M`, the complement `U` has `N_G(U) ⊄ M`.
