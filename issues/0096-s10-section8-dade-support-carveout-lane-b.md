@@ -465,3 +465,18 @@ Dade tower body、10.1 Hypothesis が入手可能になった今 downstream)。S
 
 type-P Dade support (§8) の carve-out 0096 の主目的 (typePA0 datum 構成 → S12 10.1) は達成。
 以降は §12/§10 char analysis (別 arc、S12 主体)。
+
+### loop¹²⁸ — 次 arc = §12 char body (deep character theory) と characterize
+
+carve-out 0096 (type-P Dade **support** geometry) は達成。次 arc = **§12 char analysis body**
+(`S12_MaximalIII_IV_V.lean` の 4 sorry)、いずれも deep §10/§11 character theory:
+- `typeII_derived_frobenius` (10.7): type-II [S,S] Frobenius 構造 (coherence 仮定下)。
+- `typeII_coherence_contradiction_estimate` (10.8): 「§7 analytic heart」norm-counting estimate。
+- `exists_zeta_residual_not_orthogonal` (11.8.1-6): σ-grid identities + (5.7) S(HC)-coherence +
+  (5.6) coherence-union の deep 非直交計算。
+- `typeV_forces_coherence` (10.10): type-V coherence。
+
+**これは type-P Dade support (σ-generic wiring だった) と質的に異なる deep char body** = lane b の core
+§12 Dade tower の最深部 (loop¹¹⁷ が "deep char" と識別した領域)。ungated own-work だが genuine deep。
+一部は §9↔§10 carrier bridge に gated の注記あり (L2244)。次 iteration: 上流優先で
+`typeII_derived_frobenius` (10.7) から engage (fresh context 推奨、深い char/structure 証明)。
