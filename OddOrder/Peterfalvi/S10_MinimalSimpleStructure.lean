@@ -1728,11 +1728,11 @@ theorem typeI_centralizer_le_and_unique [Finite G] (hG : OddOrder.BG.IsMinimalSi
         exact hcomm'.eq
     rw [hbot] at hmem
     exact hh'1 (Subgroup.mem_bot.mp hmem)
-  -- (iv) Theorem B pins `ℳ(C_G(x')) = {T}`.
-  have hB := (OddOrder.BG.Ch4.S16.theoremB_U_and_A_tame hG hT
-    (typeF_complement_isHall_kappa_sigma_compl hG hT dT)).2.2.2.1
-    (Subgroup.zpowers x') (Subgroup.zpowers_le.mpr hx'U)
-    (by simpa [Subgroup.zpowers_eq_bot] using hx'1) hCne
+  -- (iv) BG Lemma 15.1(c) / Theorem B(4) pins `ℳ(C_G(x')) = {T}` (sorry-free, no Theorem B gate).
+  have hB := (OddOrder.BG.Ch4.S14.typeP_hall_small_subgroup_cyclic_tau2 hG hT dT.typeF.U_le
+    (typeF_complement_isHall_kappa_sigma_compl hG hT dT)
+    (Subgroup.zpowers_le.mpr hx'U)
+    (by simpa [Subgroup.zpowers_eq_bot] using hx'1) hCne).1
   rw [centralizer_zpowers_eq_singleton'] at hB
   -- (v) conjugate back by `τ ∈ T`.
   have hCconj : Subgroup.centralizer ({x'} : Set G)

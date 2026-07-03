@@ -155,6 +155,14 @@ theorem isTISubset_pointwise_smul {A : Set G} {L : Subgroup G} (h : IsTISubset A
     exact hgb.symm
   rw [hconj]; exact hb
 
+/-- `IsCoatom` (maximality) transfers along the pointwise `MulAut` action: conjugates of a
+maximal subgroup are maximal.  Reusable replacement for the downstream `private`
+`isCoatom_conj_smul` copies (S10/S11/S12). -/
+theorem isCoatom_pointwise_smul {M : Subgroup G} (h : IsCoatom M) :
+    IsCoatom (φ • M) := by
+  rw [pointwise_mulAut_smul_eq_map]
+  exact (OrderIso.isCoatom_iff (φ.mapSubgroup) M).mpr h
+
 end Toolkit
 
 /-! ### Transfer of structural predicates along a group isomorphism

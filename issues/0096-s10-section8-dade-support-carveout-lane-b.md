@@ -35,10 +35,19 @@ FamilyHypothesis71 再構成 → `not_all_maximal_typeI` → `theorem88_caseB_ho
 加えて `OddOrder/Peterfalvi/S10_BGInterface.lean` への **A₁/σ♯/M̃ bridge 補題の追加**は b 許容
 (既存宣言の変更は要 hub flag)。
 
-**対象外 (従来通り lane a、b が編集したら逸脱)**: S10 のそれ以外すべて — bgTheoremE carrier
+**追加許容 (2026-07-04 hub 裁定, ユーザー承認 — §8-support consumer の proof-only de-gate)**:
+lane b が §8-support の上流 (BG Theorem B 系) を sorry-free 化したとき、その consumer である
+**§8-support lane-a 宣言の証明本体を「now-sorry-free な upstream を cite する」形に差し替える
+de-gate 編集**は b 許容 (逸脱としない)。**条件**: (i) signature/statement 不変、(ii) sorry/axiom
+regression なし、(iii) 9003 等で self-flag。具体例 = `typeI_centralizer_le_and_unique` (:1728,
+Pf 8.12.b) を B4 full-Theorem-B cite → `typeP_hall_small_subgroup_cyclic_tau2` 直接 cite に
+de-gate (commit 94a34018)。**statement を変える編集は依然 out-of-scope** (下記) で要 hub flag。
+
+**対象外 (従来通り lane a、b が statement 変更したら逸脱)**: S10 のそれ以外すべて — bgTheoremE carrier
 (`BGTheoremECoverData`/`bgTheoremE_cover_data` 等)、`hall_maxNilpotentNormalHall_and_mainSubgroup`、
 `typeI_or_typeII_centralizer_unique`、`escapingCentralizers_control`、type-classification structural
 ((8.16)/(8.6.a) 系を含む Cluster A 前提 — こちらは 9003 どおり S14 に pin して cite)。
+⚠ 上記 de-gate 許容は **proof body のみ**。これら宣言の statement 改変は引き続き逸脱。
 
 **step 1.5 運用 (merge_monitor)**: lane b の S10/S10_BGInterface 編集は、hunk が上記宣言
 (+新 helper) の文脈に収まる場合のみ逸脱としない。曖昧なら `git diff main...b -- …S10…` の
