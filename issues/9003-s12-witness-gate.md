@@ -420,3 +420,29 @@ full build 3906 jobs green / 2m7s。
   を set→element 還元で適用 (X の各元は (κ∪σ)'-元)。
 - **`typeII_A_sets_TI` (S10:492, 8.16)** / **`typeII_A_sets_normalizer` (S10:502)**: A_II sets の TI 性、
   `theoremB_A_minus_Msigma_isTISubset` を type-II M に適用。
+
+### loop¹⁰⁵ 精査 (2026-07-03) — (8.12.b) `typeI_or_typeII_centralizer_unique` は **false-as-stated** + exact fix 判明
+
+Pf (8.12.b) 原文 (04.10:129): 「非空 X⊆**U#** (U は complement: type I で M=H⋊U、type II で
+[M,M]=H⋊U) で C_H(X)≠1 → M は C_G(X) を含む唯一の maximal」。証明 = [BG] §16 Theorem B(4)。
+
+**Lean `typeI_or_typeII_centralizer_unique` (S10:398) は false-as-stated**:
+- 仮説が `hUle : U ≤ M` (任意) で、caller S14:4366 は **U=M, X={x}⊆M#** を渡す。
+- 反例: escaping σ-元 x∈M_σ# は `M_σ⊓C(x)⊇⟨x⟩≠⊥` (仮説満たす) だが `C(x)⊄M` (escaping の定義)
+  → 結論 `C(X)≤M` を破る。実 caller の x は complement 由来の (κ∪σ)'-元なので使用箇所は健全だが、
+  ∀-statement が偽インスタンスを含む (theoremB conjunct 1 と同種の scaffold soundness issue)。
+
+**exact fix (tractable、B(4) が今 available)**: `hUle : U ≤ M` を
+`hU : Ch03.IsHallSubgroup ((κ∪σ)ᶜ) (U.subgroupOf M)` に faithful 化。証明 =
+`⟨X⟩ ≤ U` (X⊆U# 非空 → ⟨X⟩≠⊥)、`C_G(X)=C_G(⟨X⟩)`、`C_{M_σ}(⟨X⟩)≠⊥` → **Theorem B(4)**
+(`typeP_hall_small_subgroup_cyclic_tau2` / `theoremB_U_and_A_tame` conjunct 4) で 𝓜(C(⟨X⟩))={M}
+→ `IsUniquelyMaximal(C(X))` + `C(X)≤M`。type I/II 共に B(4) は type-agnostic ゆえ両対応。
+
+**cross-lane**: caller 更新が要る (S10 restate = 自、S14 caller = 自 `exists_sigmaKappaCompl_hall_ge_P0`
+で Hall 供給、**S11 caller (lane a) = `isHall_kappaSigmaCompl_of_isTypeP2_complement`
+(FeitThompson.lean、lane a) で data.U を (κ∪σ)'-Hall 化**)。enablers 両方存在
+(`typeF_complement_isHall_kappa_sigma_compl` type I / 上記 type II)。
+
+**(8.16) `typeII_A_sets_TI` (S10:492)**: `IsTISubset (typePA0/typePA/A1) M`。typePA↔BG ASet の
+encoding bridge + `theoremB_A_minus_Msigma_isTISubset` (A(M)∖M_σ) / Theorem C(9) 適用。
+Pf (8.12.c) = A(M)−A_1(M) TI = Theorem B(5) の Pf 名。次 loop で bridge を建てる。
