@@ -691,14 +691,113 @@ theorem typeIA_nonempty (M : Subgroup G) (data : TypeIData M) :
     a.1, (Set.mem_diff _).mpr ⟨SetLike.mem_coe.mpr a.2, fun h => ha1' (Set.mem_singleton_iff.mp h)⟩,
     Subgroup.mem_centralizer_singleton_iff.mpr rfl⟩
 
-/-- **Peterfalvi (8.13.a) for the type-I support** (pin): two `G`-conjugate elements of `A(M)` are
-already `M`-conjugate.  Deep §16 fusion obligation (BG §16 Theorem II; Coq `FTsupport_facts`
-part a), `sorry`-pinned for the (8.15) assembly (issue 0096). -/
+/-- **The type-`F` complement `U` is a `(κ ∪ σ)′`-Hall subgroup of `M`.**  For type I,
+`κ(M) = ∅` (Proposition 16.1) and `H = M_F = M_σ` is the `σ`-Hall of `G`, so the complement
+`U` of `H` in `M` has `σ′`-order (`|U| = |M : H|` divides `|G : M_σ|`) and `σ`-index
+(`|M : U| = |H|`).  Supplies the `hU` input of BG Theorem II
+(`theoremII_tame_embedding`) from the shared type-I data. -/
+theorem typeF_complement_isHall_kappa_sigma_compl [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G}
+    (hM : M ∈ maximalSubgroups G) (data : TypeIData M) :
+    OddOrder.Isaacs.Ch03.IsHallSubgroup
+      ((OddOrder.BG.Ch4.S14.kappa M ∪ OddOrder.BG.Ch3.S10.sigma M)ᶜ)
+      (data.typeF.U.subgroupOf M) := by
+  have hκ : OddOrder.BG.Ch4.S14.kappa M = ∅ :=
+    (OddOrder.Peterfalvi.S10Interface.isTypeI_iff_isTypeF hG hM).mp ⟨data⟩
+  have hHMσ : data.typeF.H = OddOrder.BG.Ch3.S10.Msigma M := by
+    rw [data.typeF.H_eq]
+    exact OddOrder.Peterfalvi.S10Interface.maxNilpotentNormalHall_eq_Msigma_of_typeI_or_II
+      hG hM (Or.inl ⟨data⟩)
+  have hcompl := data.typeF.complement
+  have hHall := OddOrder.BG.Ch3.S10.Msigma_isHall hG hM
+  constructor
+  · -- primes of `|U|` avoid `κ ∪ σ = σ`: `|U| = |M : H|` divides `|G : M_σ|`, a `σ′`-number.
+    intro p hp
+    simp only [Set.mem_compl_iff, Set.mem_union, hκ, Set.mem_empty_iff_false, false_or]
+    intro hpσ
+    have hidx : (data.typeF.H.subgroupOf M).index
+        = Nat.card (data.typeF.U.subgroupOf M) := hcompl.symm.index_eq_card
+    have hrel : (data.typeF.H.subgroupOf M).index * M.index = data.typeF.H.index :=
+      Subgroup.relIndex_mul_index data.typeF.H_le
+    have hdvd : p ∣ (OddOrder.BG.Ch3.S10.Msigma M).index := by
+      rw [← hHMσ, ← hrel]
+      exact Dvd.dvd.mul_right (hidx ▸ (Nat.mem_primeFactors.mp hp).2.1) _
+    have hidx_ne : (OddOrder.BG.Ch3.S10.Msigma M).index ≠ 0 :=
+      Subgroup.index_ne_zero_of_finite
+    exact hHall.2 p (Nat.mem_primeFactors.mpr
+      ⟨(Nat.mem_primeFactors.mp hp).1, hdvd, hidx_ne⟩) hpσ
+  · -- primes of `|M : U| = |H| = |M_σ|` lie in `σ ⊆ κ ∪ σ`.
+    intro p hp
+    simp only [Set.mem_compl_iff, Set.mem_union, not_not, hκ, Set.mem_empty_iff_false, false_or]
+    have hidxU : (data.typeF.U.subgroupOf M).index
+        = Nat.card (data.typeF.H.subgroupOf M) := hcompl.index_eq_card
+    have hcardH : Nat.card (data.typeF.H.subgroupOf M) = Nat.card data.typeF.H :=
+      Nat.card_congr (Subgroup.subgroupOfEquivOfLe data.typeF.H_le).toEquiv
+    have hpH : p ∣ Nat.card (OddOrder.BG.Ch3.S10.Msigma M) := by
+      rw [← hHMσ, ← hcardH, ← hidxU]
+      exact (Nat.mem_primeFactors.mp hp).2.1
+    exact hHall.1 p (Nat.mem_primeFactors.mpr
+      ⟨(Nat.mem_primeFactors.mp hp).1, hpH, Nat.card_pos.ne'⟩)
+
+/-- **The type-I support `A(M)` lies in BG's Theorem E set `A(M) = ASet M U`.**  A point
+`y ∈ A(M)` is a nonidentity element of `M` centralizing some `x ∈ H^# = M_σ^#`, so
+`M_σ ⊓ C_G(y) ≠ ⊥` (`y ∈ \widehat{M_σ}`), and `y ∈ M = U ⊔ M_σ` by the type-`F` complement
+decomposition.  The support-set bridge feeding BG Theorem II into the (8.13) pins. -/
+theorem typeIA_subset_ASet [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    {M : Subgroup G} (hM : M ∈ maximalSubgroups G) (data : TypeIData M) :
+    typeIA M data ⊆ OddOrder.BG.Ch4.S16.ASet M data.typeF.U := by
+  have hHMσ : data.typeF.H = OddOrder.BG.Ch3.S10.Msigma M := by
+    rw [data.typeF.H_eq]
+    exact OddOrder.Peterfalvi.S10Interface.maxNilpotentNormalHall_eq_Msigma_of_typeI_or_II
+      hG hM (Or.inl ⟨data⟩)
+  rintro y ⟨hyM, _hy1, x, hxH, hyC⟩
+  obtain ⟨hxHmem, hx1⟩ := (Set.mem_diff _).mp hxH
+  refine ⟨⟨hyM, ?_⟩, ?_⟩
+  · -- `x ∈ M_σ ⊓ C_G(y)` is a nonidentity witness.
+    intro hbot
+    have hxC : x ∈ Subgroup.centralizer ({y} : Set G) :=
+      Subgroup.mem_centralizer_iff.mpr fun z hz => by
+        rw [Set.mem_singleton_iff] at hz
+        subst hz
+        exact (Subgroup.mem_centralizer_iff.mp hyC x (Set.mem_singleton x)).symm
+    have hxmem : x ∈ OddOrder.BG.Ch3.S10.Msigma M ⊓ Subgroup.centralizer ({y} : Set G) :=
+      Subgroup.mem_inf.mpr ⟨hHMσ ▸ SetLike.mem_coe.mp hxHmem, hxC⟩
+    rw [hbot] at hxmem
+    exact hx1 (Set.mem_singleton_iff.mpr (Subgroup.mem_bot.mp hxmem))
+  · -- `y ∈ U ⊔ M_σ`: decompose `y = h · u` along the type-`F` complement.
+    obtain ⟨⟨h, u⟩, hhu, -⟩ := Subgroup.IsComplement.existsUnique
+      data.typeF.complement (⟨y, hyM⟩ : ↥M)
+    have hyval : ((h : ↥M) : G) * ((u : ↥M) : G) = y := by
+      simpa using congrArg (fun z : ↥M => (z : G)) hhu
+    have hh : ((h : ↥M) : G) ∈ OddOrder.BG.Ch3.S10.Msigma M :=
+      hHMσ ▸ Subgroup.mem_subgroupOf.mp h.2
+    have hu : ((u : ↥M) : G) ∈ data.typeF.U := Subgroup.mem_subgroupOf.mp u.2
+    rw [SetLike.mem_coe, ← hyval]
+    exact mul_mem (Subgroup.mem_sup_right hh) (Subgroup.mem_sup_left hu)
+
+/-- **Peterfalvi (8.13.a) for the type-I support**: two `G`-conjugate elements of `A(M)` are
+already `M`-conjugate.  BG §16 Theorem II conjunct 1 (`theoremII_tame_embedding`, whose
+`X = ASet M U` branch receives `A(M)` via `typeIA_subset_ASet`); the `κ`-Hall input is `K = ⊥`
+(`κ(M) = ∅` for type I) and the `(κ ∪ σ)′`-Hall input is the type-`F` complement
+(`typeF_complement_isHall_kappa_sigma_compl`). -/
 theorem typeIA_isConj_conj_in_M [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     {M : Subgroup G} (hM : M ∈ maximalSubgroups G) (data : TypeIData M)
     {a b : G} (ha : a ∈ typeIA M data) (hb : b ∈ typeIA M data) (hab : IsConj a b) :
     ∃ m : G, m ∈ M ∧ m * a * m⁻¹ = b := by
-  sorry
+  have hκ : OddOrder.BG.Ch4.S14.kappa M = ∅ :=
+    (OddOrder.Peterfalvi.S10Interface.isTypeI_iff_isTypeF hG hM).mp ⟨data⟩
+  have hK : OddOrder.Isaacs.Ch03.IsHallSubgroup (OddOrder.BG.Ch4.S14.kappa M)
+      ((⊥ : Subgroup G).subgroupOf M) := by
+    rw [Subgroup.bot_subgroupOf, OddOrder.Isaacs.Ch03.IsHallSubgroup.bot_iff]
+    intro p _
+    rw [hκ]
+    exact Set.notMem_empty p
+  have hII := OddOrder.BG.Ch4.S16.theoremII_tame_embedding hG hM bot_le data.typeF.U_le hK
+    (typeF_complement_isHall_kappa_sigma_compl hG hM data) (Or.inl rfl)
+  obtain ⟨g, hg⟩ := isConj_iff.mp hab
+  obtain ⟨m, hmM, hmb⟩ := hII.1 a (typeIA_subset_ASet hG hM data ha)
+    b (typeIA_subset_ASet hG hM data hb) ⟨g, hg.symm⟩
+  exact ⟨m, hmM, hmb.symm⟩
 
 /-- **Peterfalvi (8.13.c1/c2) at an escaping point of the type-I support** (pin; BG §16
 Theorem II + Theorem D(4); Coq `FTsupport_facts` part c).  For escaping `a ∈ A(M)`
@@ -1068,13 +1167,32 @@ the centralizer of an `A(T)`-point of `σ(T)′`-order (`typeI_centralizer_le_an
 assembly — the `σ`-order bookkeeping, the escape to the proven `Ã₁`-disjointness, the `π`-part
 power argument, and the final two-sided contradiction — is genuine. -/
 
-/-- **Peterfalvi (8.13.b), `D ⊆ A₁` conjunct** (pin; BG §16 Theorem II): an escaping point of the
-type-I support `A(M)` lies in the sharp core `A₁(M)`. -/
+/-- **Peterfalvi (8.13.b), `D ⊆ A₁` conjunct**: an escaping point of the type-I support `A(M)`
+lies in the sharp core `A₁(M)`.  The BG `D ⊆ M_σ^#` reduction of Theorem II conjunct 2
+(`mem_sigmaSharp_of_mem_aSet_of_escape`, fed through the `typeIA_subset_ASet` bridge), with
+`A₁(M) = M_σ^#` the type-I support-set bridge (`A1_eq_sigmaSharp_of_typeI_or_II`). -/
 theorem escaping_typeIA_mem_A1 [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     {M : Subgroup G} (hM : M ∈ maximalSubgroups G) (data : TypeIData M)
     {a : G} (ha : a ∈ OddOrder.GroupTheory.escapingCentralizerSet M (typeIA M data)) :
     a ∈ A1 M PeterfalviType.I := by
-  sorry
+  obtain ⟨haA, hesc⟩ := ha
+  have hκ : OddOrder.BG.Ch4.S14.kappa M = ∅ :=
+    (OddOrder.Peterfalvi.S10Interface.isTypeI_iff_isTypeF hG hM).mp ⟨data⟩
+  have hK : OddOrder.Isaacs.Ch03.IsHallSubgroup (OddOrder.BG.Ch4.S14.kappa M)
+      ((⊥ : Subgroup G).subgroupOf M) := by
+    rw [Subgroup.bot_subgroupOf, OddOrder.Isaacs.Ch03.IsHallSubgroup.bot_iff]
+    intro p _
+    rw [hκ]
+    exact Set.notMem_empty p
+  have hσ : a ∈ OddOrder.BG.Ch4.S14.sigmaSharp M :=
+    OddOrder.BG.Ch4.S16.mem_sigmaSharp_of_mem_aSet_of_escape hG hM bot_le data.typeF.U_le hK
+      (typeF_complement_isHall_kappa_sigma_compl hG hM data) (Or.inl rfl)
+      (typeIA_subset_ASet hG hM data haA) haA.2.1 hesc
+  have hA1 : A1 M PeterfalviType.I = OddOrder.BG.Ch4.S14.sigmaSharp M :=
+    OddOrder.Peterfalvi.S10Interface.A1_eq_sigmaSharp_of_typeI_or_II hG hM
+      (Or.inl ⟨data⟩) (Or.inl rfl)
+  rw [hA1]
+  exact hσ
 
 /-- **Peterfalvi (8.12.b), single-point form** (pin; BG §16 Theorem B): for type-I `T` and
 `x ∈ T` of order coprime to `|T_F|` centralizing a nontrivial element of `T_F`, `T` is the unique
