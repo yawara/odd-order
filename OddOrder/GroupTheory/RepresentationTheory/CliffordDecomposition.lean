@@ -321,4 +321,54 @@ theorem exists_extension_induce_eq_sum_distinct_of_inertia_inf_le
     exact hcommle (Subgroup.commutator_mem_commutator x.2 y.2)
   exact exists_extension_induce_eq_sum_distinct_irreducible hHT hθ hinertia hab hd hcop
 
+/-- **No constituent of `Ind_H^L θ` is the trivial character** (`θ ≠ 1_H`, `H ⊴ L`).  If
+`Ind_H^L θ = ∑_{φ ∈ S} φ` decomposes into irreducibles, then every `φ ∈ S` is nontrivial:
+Frobenius reciprocity gives `⟨Ind_H^L θ, 1_L⟩ = ⟨θ, 1_H⟩ = 0` (`θ ≠ 1_H`, orthonormality), so the
+count of trivial constituents `|{φ ∈ S : φ = 1_L}|` vanishes.  The `1_L ∉ S` step of the type-I
+non-reality bookkeeping. -/
+theorem forall_mem_ne_trivial_of_induce_eq_sum
+    {H : Subgroup L} [H.Normal] [Invertible (Nat.card ↥H : ℂ)]
+    (θ : IrreducibleCharacter ↥H) (hθne : θ ≠ trivialIrreducibleCharacter ↥H)
+    {S : Finset (IrreducibleCharacter L)}
+    (hsum : ClassFunction.induce H (θ : ClassFunction ↥H ℂ)
+      = ∑ φ ∈ S, (φ : ClassFunction L ℂ)) :
+    ∀ φ ∈ S, φ ≠ trivialIrreducibleCharacter L := by
+  classical
+  letI : Fintype ↥H := Fintype.ofFinite _
+  intro φ hφ hφtriv
+  have hrestrict : ClassFunction.restrict H (trivialIrreducibleCharacter L : ClassFunction L ℂ)
+      = (trivialIrreducibleCharacter ↥H : ClassFunction ↥H ℂ) := by
+    ext x
+    simp [ClassFunction.restrict_apply, IrreducibleCharacter.coe_trivialIrreducibleCharacter,
+      trivialClassFunction_apply]
+  have hzero : ClassFunction.inner (ClassFunction.induce H (θ : ClassFunction ↥H ℂ))
+      (trivialIrreducibleCharacter L : ClassFunction L ℂ) = 0 := by
+    rw [ClassFunction.inner_induce_eq_inner_restrict, hrestrict,
+      irreducibleCharacter_inner_eq_ite, if_neg hθne]
+  rw [hsum, inner_sum_left] at hzero
+  simp_rw [irreducibleCharacter_inner_eq_ite] at hzero
+  rw [Finset.sum_boole] at hzero
+  have hcard : (S.filter (fun φ' => φ' = trivialIrreducibleCharacter L)).card = 0 := by
+    exact_mod_cast hzero
+  rw [Finset.card_eq_zero] at hcard
+  have hmem : φ ∈ S.filter (fun φ' => φ' = trivialIrreducibleCharacter L) :=
+    Finset.mem_filter.mpr ⟨hφ, hφtriv⟩
+  rw [hcard] at hmem
+  exact absurd hmem (Finset.notMem_empty φ)
+
+/-- **Every constituent of `Ind_H^L θ` is non-real**, for `L` of odd order and `θ ≠ 1_H`
+(`H ⊴ L`).  Each constituent is nontrivial (`forall_mem_ne_trivial_of_induce_eq_sum`), and in a
+group of odd order a nontrivial irreducible character is non-real (Peterfalvi (1.1),
+`not_isReal_of_ne_trivial_of_odd_card'`).  This is the non-reality clause of
+`typeI_induced_char_constituents`. -/
+theorem forall_mem_not_isReal_of_induce_eq_sum_of_odd
+    {H : Subgroup L} [H.Normal] [Invertible (Nat.card ↥H : ℂ)] (hodd : Odd (Nat.card L))
+    (θ : IrreducibleCharacter ↥H) (hθne : θ ≠ trivialIrreducibleCharacter ↥H)
+    {S : Finset (IrreducibleCharacter L)}
+    (hsum : ClassFunction.induce H (θ : ClassFunction ↥H ℂ)
+      = ∑ φ ∈ S, (φ : ClassFunction L ℂ)) :
+    ∀ φ ∈ S, ¬ ClassFunction.IsReal (φ : ClassFunction L ℂ) :=
+  fun φ hφ => not_isReal_of_ne_trivial_of_odd_card' hodd
+    (forall_mem_ne_trivial_of_induce_eq_sum θ hθne hsum φ hφ)
+
 end OddOrder.RepresentationTheory
