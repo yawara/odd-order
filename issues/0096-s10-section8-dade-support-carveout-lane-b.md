@@ -796,3 +796,15 @@ constituent (horth 簡略化)。**次: (12.14) redesign + assembly を build** (
 - **hxK** (x∉K): witness.x は nontrivial p-element、K=M_F は p'-Hall (p∣[M:M_F]) ゆえ p∤|K| → x∉K。
   witness の x_ne_one + x^p=1 + K の Hall 構造から (自己完結的、redesign 不要)。
 次: hxK (self-contained) を先に埋め、horth は redesign + coherent_extension_orthogonal threading。
+
+### loop¹⁴⁶ — ✅ (12.14) hxK 実証明 (commit 4ec8434c); 残 horth のみ
+
+hxK (x∉K) 実証明: witness.x は nontrivial p-element (orderOf x = p via orderOf_eq_prime)。
+x∈K⟹p∣|K| (Lagrange orderOf_dvd_natCard + orderOf_injective coe)。K=M_F Hall
+(maxNilpotentNormalHall_isHall.coprime_index) + p∣[M:K] (p_dvd_index) で Coprime(|K|,[M:K]) ⟹ p∤|K| ⟹ 矛盾。
+build green 3871。**(12.14) 2 obligation の 1 完了** (¹⁴⁵ reduction + ¹⁴⁶ hxK の 2 連 landing)。
+
+**残 = horth のみ** (dade.psi⊥R_M): dade.psi=dade.tau1 dade.chi。tau1 が coherent extension である必要
+(一般 IntegralCharacterMap では不足) ⟹ **statement redesign 要** (coh:IsCoherent + hpsi:dade.psi=coh.extension χ
++ hLM:L≠M 追加)。coherent_extension_constituent_orthogonal_Rset_of_nonconjugate (S14:1844) で証明。
+χ irreducible constituent 構造 (dade.chi degree=[L:H]⟹Ind linear⟹irreducible) を thread。次: horth 完成 → (12.14) sorry-free。
