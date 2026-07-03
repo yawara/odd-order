@@ -704,3 +704,25 @@ signed-diff を埋める。build green 3871。**2 連続 code landing** (¹³⁹
 orthogonal_character_constant_on_coset は ⊥ 全 R(χ') 要 → χ'=χ0 で gap。samegroup R-ortho は χ'≠χ0 を
 埋めるが χ0 は残る。Coq (12.14) の FTtype1_ortho_constant 適用の calS/χ0 扱いが要精読。次: (12.14)
 assembly の χ0 subtlety 解決 (Lean 意図 proof / Coq 精読) か、R-orthogonality を別 consumer で活用。
+
+### loop¹⁴¹ — (12.14) subtlety 解決 = cross-group + Hypothesis M gated; frontier 全 gated 確定
+
+**(12.14) 解決**: Coq `FTtype1_seqInd_ortho` (237-243) = **cross-group** (非共役 L1,L2) R-orthogonality
+(要 L2∉L1^G)。∴ (12.14) は (12.4) を **M** (counterexample maximal) に適用、dade.psi⊥R_M(φ) は
+cross-group (L vs M 非共役) = 既存 `nonconjugate_typeI_R_orthogonal`。**my ¹³⁹/¹⁴⁰ same-L 版は
+(12.14) の鍵でない** (reusable だが (12.14) は cross-group [既存] 使用)。
+**(12.14) 実 gate**: `Hypothesis M` (M の Dade 設定) 構成要 — CounterexampleHypothesis は
+K=maxNilpotentNormalHall M を持つが Dade Hypothesis M を carry せず。deep 構成。
+
+**★ lane-b S14 frontier 全 gated 確定** (網羅):
+| Pf | gate |
+|---|---|
+| 12.5 | formulation-confused (psi on G vs ρψ on L) + o_rpsi_S/DpsiH |
+| 12.10 | hub 9003 pinned (deep §8-11) |
+| 12.11 | deep Cauchy/Sylow + support facts |
+| 12.14 | Hypothesis M 構成 gated (cross-group R-ortho は既存) |
+| 12.15 | DadeNotation carrier scaffold (free rhoMFormula Prop) |
+
+reusable infra 全抽出 (induce vanishing/partition trivIset/two-family diff/same-L R-ortho)。残 = 各
+deep 構成 (Hypothesis M / carrier genuinize / Cauchy-Sylow) = multi-session。**最 concrete structural =
+(12.11) part-2** (M∩L≤H の Cauchy/Sylow, group theory, 4 consumer)。次: (12.11) part-2 着手。
