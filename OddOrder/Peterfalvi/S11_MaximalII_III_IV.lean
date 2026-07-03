@@ -13,6 +13,7 @@ import OddOrder.GroupTheory.AInvariantPiSubgroups
 import OddOrder.BG.Ch1_Preliminary.OperatorMaschke
 import OddOrder.BG.Ch4_FamilyOfMaximal.S15_MF
 import OddOrder.GroupTheory.RepresentationTheory.SingerField
+import OddOrder.GroupTheory.RepresentationTheory.SingerLineBound
 import OddOrder.GroupTheory.RepresentationTheory.WielandtElabBridge
 import OddOrder.GroupTheory.RepresentationTheory.CliffordSingleOrbit
 import OddOrder.Peterfalvi.S08_CoherenceCorePart1
@@ -3631,32 +3632,29 @@ theorem elabRepresentation_isIrreducible {A K : Type*} [Group A] [CommGroup K] {
 
 set_option backward.isDefEq.respectTransparency false in
 open OddOrder.RepresentationTheory Representation in
-/-- **Subgroup-level Singer mechanism.**  A finite *abelian* group `A` acting *faithfully* and
-*irreducibly* (every `φ`-invariant subgroup of `K` is `⊥` or `⊤`) on a finite elementary abelian
-`p`-group `K` is cyclic, with `|A|` dividing `|K| - 1`.  This is the structural heart of Peterfalvi
-(9.7) case (b): a `U`-irreducible chief factor makes the image `Ū` cyclic of order dividing
-`p^q - 1`.  Via `SingerField`: `K` becomes a simple `𝔽ₚ[A]`-module (`elabRepresentation_isIrreducible`),
-realized inside the units of the Singer field, so `A ↪ Kˣ` is cyclic. -/
-theorem isCyclic_card_dvd_of_aInvariant_irreducible_faithful_comm
-    {A K : Type*} [Group A] [Finite A] [CommGroup K] [Finite K] {p : ℕ}
+/-- **Thin subgroup→module Singer adapter** (issue 9000 dedup): a `φ`-irreducible, faithful
+action of `A` on the elementary abelian `p`-group `K` makes `(elabRepresentation p φ).asModule`
+a *simple* `𝔽ₚ[A]`-module with the faithfulness transported to `𝔽ₚ[A]`-module terms.  This is
+the single subgroup→module conversion through which the §9 case-(b) results cite the canonical
+module-level Singer lemmas of the shared σ-theory leaves (`SingerField` / `SingerLineBound`);
+the former subgroup-level Singer wrappers are retired (hub ruling, issue 9000). -/
+theorem elabRepresentation_isSimpleModule_and_faithful
+    {A K : Type*} [Group A] [CommGroup K] [Finite K] {p : ℕ}
     [Module (ZMod p) (Additive K)] {φ : A →* MulAut K}
-    (hcomm : ∀ a b : A, a * b = b * a) (hnt : Nontrivial K)
+    (hnt : Nontrivial K)
     (hirr : ∀ J : Subgroup K, IsAInvariant φ J → J = ⊥ ∨ J = ⊤)
     (hfaith : ∀ a : A, (∀ x : K, φ a x = x) → a = 1) :
-    IsCyclic A ∧ Nat.card A ∣ Nat.card K - 1 := by
+    IsSimpleModule (MonoidAlgebra (ZMod p) A) (elabRepresentation p φ).asModule ∧
+      ∀ a : A, (∀ y : (elabRepresentation p φ).asModule,
+        MonoidAlgebra.of (ZMod p) A a • y = y) → a = 1 := by
   haveI hirrep : IsSimpleOrder (Subrepresentation (elabRepresentation p φ)) :=
     elabRepresentation_isIrreducible hnt hirr
-  haveI hsimp :
-      IsSimpleModule (MonoidAlgebra (ZMod p) A) (elabRepresentation p φ).asModule := by
-    rw [isSimpleModule_iff]
+  refine ⟨?_, ?_⟩
+  · rw [isSimpleModule_iff]
     exact (OrderIso.isSimpleOrder_iff
       Subrepresentation.subrepresentationSubmoduleOrderIso).mp hirrep
-  haveI : Finite (elabRepresentation p φ).asModule := ‹Finite K›
-  have hM : Nat.card (elabRepresentation p φ).asModule = Nat.card K := rfl
   -- Faithfulness in `𝔽ₚ[A]`-module terms: `of a • y = y` for all `y` ⟹ `φ a x = x` for all `x`.
-  have hfaith' : ∀ a : A, (∀ y : (elabRepresentation p φ).asModule,
-      MonoidAlgebra.of (ZMod p) A a • y = y) → a = 1 := by
-    intro a ha
+  · intro a ha
     refine hfaith a fun x => ?_
     have key : (elabRepresentation p φ).asModuleEquiv
         (MonoidAlgebra.of (ZMod p) A a •
@@ -3665,10 +3663,6 @@ theorem isCyclic_card_dvd_of_aInvariant_irreducible_faithful_comm
     rw [asModuleEquiv_map_smul, asAlgebraHom_of,
       (elabRepresentation p φ).asModuleEquiv.apply_symm_apply, elabRepresentation_apply] at key
     exact Additive.ofMul.injective key
-  obtain ⟨hcyc, hdvd⟩ :=
-    isCyclic_and_card_dvd_of_faithful_irreducible_comm
-      (E := A) (M := (elabRepresentation p φ).asModule) (p := p) hcomm hfaith'
-  exact ⟨hcyc, by rwa [hM] at hdvd⟩
 
 /-- **Fixed-point-freeness of an irreducible action with commuting image.**  If a group `A` acts on
 a group `K` via `φ : A →* MulAut K` whose image is commutative (`hcomm : Commute (φ a) (φ b)`) and
@@ -3792,45 +3786,20 @@ theorem exists_units_monoidHom_of_isIrreducibleCharacter_of_isMulCommutative
 
 set_option backward.isDefEq.respectTransparency false in
 open OddOrder.RepresentationTheory Representation in
-/-- **Subgroup-level Singer fixed-point-free coprimality.**  Strengthens
-`isCyclic_card_dvd_of_aInvariant_irreducible_faithful_comm` with a fixed-point-free `σ : MulAut K`:
-if the only `a` whose action `φ a` commutes with `σ` is `a = 1`, then `|A|` is coprime to `p - 1`.
-
-This is Peterfalvi (9.7) case (b)'s coprimality `Coprime |Ū| (p - 1)`: the image `Ū = φ.range`
-embeds in the cyclic units `Kˣ` of the Singer field, and the prime subfield `𝔽ₚ*` (the
-`𝔽ₚ`-scalars, central in `Aut K`) meets `Ū` only in `1` because an `𝔽ₚ`-scalar commutes with
-`σ = φ(w)` and `σ` is fixed-point-free.  The `MulAut K`-action transports to the additive
-`MulEquiv.toAdditive σ` on `(elabRepresentation p φ).asModule`; the rest is
-`coprime_card_sub_one_of_faithful_irreducible_comm_fpf`. -/
-theorem coprime_card_sub_one_of_aInvariant_irreducible_faithful_comm_fpf
-    {A K : Type*} [Group A] [Finite A] [CommGroup K] [Finite K] {p : ℕ} [Fact p.Prime]
+/-- **Subgroup→module transport of a fixed-point-free `MulAut`** (issue 9000 dedup companion of
+`elabRepresentation_isSimpleModule_and_faithful`): a `σ : MulAut K` carries to an additive
+automorphism `τ` of `(elabRepresentation p φ).asModule` with the commuting-with-`φ` condition
+transported to `𝔽ₚ[A]`-module terms — the `(σ, hfpf)` input shape of the canonical module-level
+`coprime_card_sub_one_of_faithful_irreducible_comm_fpf` (shared `SingerField` leaf). -/
+theorem exists_addEquiv_asModule_fpf
+    {A K : Type*} [Group A] [CommGroup K] [Finite K] {p : ℕ}
     [Module (ZMod p) (Additive K)] {φ : A →* MulAut K}
-    (hcomm : ∀ a b : A, a * b = b * a) (hnt : Nontrivial K)
-    (hirr : ∀ J : Subgroup K, IsAInvariant φ J → J = ⊥ ∨ J = ⊤)
-    (hfaith : ∀ a : A, (∀ x : K, φ a x = x) → a = 1)
     (σ : MulAut K)
     (hfpf : ∀ a : A, (∀ x : K, σ (φ a x) = φ a (σ x)) → a = 1) :
-    Nat.Coprime (Nat.card A) (p - 1) := by
-  haveI hirrep : IsSimpleOrder (Subrepresentation (elabRepresentation p φ)) :=
-    elabRepresentation_isIrreducible hnt hirr
-  haveI hsimp :
-      IsSimpleModule (MonoidAlgebra (ZMod p) A) (elabRepresentation p φ).asModule := by
-    rw [isSimpleModule_iff]
-    exact (OrderIso.isSimpleOrder_iff
-      Subrepresentation.subrepresentationSubmoduleOrderIso).mp hirrep
-  haveI : Finite (elabRepresentation p φ).asModule := ‹Finite K›
-  -- Faithfulness in `𝔽ₚ[A]`-module terms (as in the cyclicity bridge).
-  have hfaith' : ∀ a : A, (∀ y : (elabRepresentation p φ).asModule,
-      MonoidAlgebra.of (ZMod p) A a • y = y) → a = 1 := by
-    intro a ha
-    refine hfaith a fun x => ?_
-    have key : (elabRepresentation p φ).asModuleEquiv
-        (MonoidAlgebra.of (ZMod p) A a •
-          (elabRepresentation p φ).asModuleEquiv.symm (Additive.ofMul x)) = Additive.ofMul x := by
-      rw [ha]; exact (elabRepresentation p φ).asModuleEquiv.apply_symm_apply _
-    rw [asModuleEquiv_map_smul, asAlgebraHom_of,
-      (elabRepresentation p φ).asModuleEquiv.apply_symm_apply, elabRepresentation_apply] at key
-    exact Additive.ofMul.injective key
+    ∃ τ : (elabRepresentation p φ).asModule ≃+ (elabRepresentation p φ).asModule,
+      ∀ a : A, (∀ y : (elabRepresentation p φ).asModule,
+        τ (MonoidAlgebra.of (ZMod p) A a • y)
+          = MonoidAlgebra.of (ZMod p) A a • τ y) → a = 1 := by
   -- The `MulAut K`-action `σ`, carried to an additive automorphism of `asModule = Additive K`.
   let τ : (elabRepresentation p φ).asModule ≃+ (elabRepresentation p φ).asModule :=
     { toFun := fun z => Additive.ofMul (σ (Additive.toMul z))
@@ -3842,6 +3811,7 @@ theorem coprime_card_sub_one_of_aInvariant_irreducible_faithful_comm_fpf
           = Additive.ofMul (σ (Additive.toMul z)) + Additive.ofMul (σ (Additive.toMul w))
         rw [show Additive.toMul (z + w) = Additive.toMul z * Additive.toMul w from rfl, map_mul]
         rfl }
+  refine ⟨τ, ?_⟩
   -- The action `of a • z` is `ρ a z` (the descended representation).
   have hact : ∀ (a : A) (z : (elabRepresentation p φ).asModule),
       MonoidAlgebra.of (ZMod p) A a • z = (elabRepresentation p φ) a z := by
@@ -3851,20 +3821,62 @@ theorem coprime_card_sub_one_of_aInvariant_irreducible_faithful_comm_fpf
     rw [asAlgebraHom_of] at h2
     simpa [Representation.asModuleEquiv] using h2
   -- Fixed-point-freeness in `𝔽ₚ[A]`-module terms.
-  have hfpf' : ∀ a : A, (∀ y : (elabRepresentation p φ).asModule,
-      τ (MonoidAlgebra.of (ZMod p) A a • y)
-        = MonoidAlgebra.of (ZMod p) A a • τ y) → a = 1 := by
-    intro a ha
-    apply hfpf a
-    intro x
-    have h := ha (Additive.ofMul x)
-    rw [hact, hact, elabRepresentation_apply] at h
-    -- `h : τ (ofMul (φ a x)) = ρ a (τ (ofMul x))`, and `τ (ofMul w) = ofMul (σ w)`.
-    have hτ : ∀ w : K, τ (Additive.ofMul w) = Additive.ofMul (σ w) := fun w => rfl
-    rw [hτ, hτ, elabRepresentation_apply] at h
-    exact Additive.ofMul.injective h
+  intro a ha
+  apply hfpf a
+  intro x
+  have h := ha (Additive.ofMul x)
+  rw [hact, hact, elabRepresentation_apply] at h
+  have hτ : ∀ w : K, τ (Additive.ofMul w) = Additive.ofMul (σ w) := fun w => rfl
+  rw [hτ, hτ, elabRepresentation_apply] at h
+  exact Additive.ofMul.injective h
+
+set_option backward.isDefEq.respectTransparency false in
+open OddOrder.RepresentationTheory Representation in
+/-- **Thin subgroup-level entry to the canonical Singer cyclicity+divisibility** (issue 9000
+dedup): the subgroup→module conversion `elabRepresentation_isSimpleModule_and_faithful` followed
+by the single cite of the shared `SingerField` lemma
+`isCyclic_and_card_dvd_of_faithful_irreducible_comm`.  No Singer content lives here — the
+`asModule` types must be elaborated under the `[Module (ZMod p) (Additive K)]` binder, which is
+why the two steps are packaged once instead of being inlined at every §9 use site. -/
+theorem singerAdapter_isCyclic_card_dvd
+    {A K : Type*} [Group A] [Finite A] [CommGroup K] [Finite K] {p : ℕ}
+    [Module (ZMod p) (Additive K)] {φ : A →* MulAut K}
+    (hcomm : ∀ a b : A, a * b = b * a) (hnt : Nontrivial K)
+    (hirr : ∀ J : Subgroup K, IsAInvariant φ J → J = ⊥ ∨ J = ⊤)
+    (hfaith : ∀ a : A, (∀ x : K, φ a x = x) → a = 1) :
+    IsCyclic A ∧ Nat.card A ∣ Nat.card K - 1 := by
+  obtain ⟨hsimp, hfaith'⟩ :=
+    elabRepresentation_isSimpleModule_and_faithful (p := p) hnt hirr hfaith
+  haveI := hsimp
+  haveI : Finite (elabRepresentation p φ).asModule := ‹Finite K›
+  obtain ⟨hcyc, hdvd⟩ := isCyclic_and_card_dvd_of_faithful_irreducible_comm
+    (E := A) (M := (elabRepresentation p φ).asModule) (p := p) hcomm hfaith'
+  exact ⟨hcyc, by
+    rwa [show Nat.card (elabRepresentation p φ).asModule = Nat.card K from rfl] at hdvd⟩
+
+set_option backward.isDefEq.respectTransparency false in
+open OddOrder.RepresentationTheory Representation in
+/-- **Thin subgroup-level entry to the canonical Singer FPF-coprimality** (issue 9000 dedup):
+the subgroup→module conversions (`elabRepresentation_isSimpleModule_and_faithful` +
+`exists_addEquiv_asModule_fpf`) followed by the single cite of the shared `SingerField` lemma
+`coprime_card_sub_one_of_faithful_irreducible_comm_fpf`.  As with
+`singerAdapter_isCyclic_card_dvd`, no Singer content lives here. -/
+theorem singerAdapter_coprime_fpf
+    {A K : Type*} [Group A] [Finite A] [CommGroup K] [Finite K] {p : ℕ} [Fact p.Prime]
+    [Module (ZMod p) (Additive K)] {φ : A →* MulAut K}
+    (hcomm : ∀ a b : A, a * b = b * a) (hnt : Nontrivial K)
+    (hirr : ∀ J : Subgroup K, IsAInvariant φ J → J = ⊥ ∨ J = ⊤)
+    (hfaith : ∀ a : A, (∀ x : K, φ a x = x) → a = 1)
+    (σ : MulAut K)
+    (hfpf : ∀ a : A, (∀ x : K, σ (φ a x) = φ a (σ x)) → a = 1) :
+    Nat.Coprime (Nat.card A) (p - 1) := by
+  obtain ⟨hsimp, hfaith'⟩ :=
+    elabRepresentation_isSimpleModule_and_faithful (p := p) hnt hirr hfaith
+  haveI := hsimp
+  haveI : Finite (elabRepresentation p φ).asModule := ‹Finite K›
+  obtain ⟨τ, hτfpf⟩ := exists_addEquiv_asModule_fpf (p := p) (φ := φ) σ hfpf
   exact coprime_card_sub_one_of_faithful_irreducible_comm_fpf
-    (E := A) (M := (elabRepresentation p φ).asModule) hcomm hfaith' τ hfpf'
+    (E := A) (M := (elabRepresentation p φ).asModule) hcomm hfaith' τ hτfpf
 
 /-- **(9.7) case (a) bound.**  A group `A` acting on a group `K` of prime order `p` has its
 action-image `φ.range` of order dividing `p - 1`: `K` is cyclic, so `MulAut K ≅ (ZMod p)ˣ` has order
@@ -4021,8 +4033,9 @@ dividing `p^q - 1`.
 `Ū` is abelian because `[U, U]` centralizes `H` (Peterfalvi (8.5.b),
 `typeP_commutator_U_centralizes_H`): a commutator `⁅a, b⁆ ∈ [U, U]` acts trivially on `H̄`, so
 `φ_U ⁅a, b⁆ = 1` and the image is commutative.  Faithfulness of the inclusion `Ū ↪ Aut(H̄)` and the
-irreducibility transferred from the case-(b) hypothesis feed the subgroup-level Singer mechanism
-`isCyclic_card_dvd_of_aInvariant_irreducible_faithful_comm`, with `H̄` the elementary abelian
+irreducibility transferred from the case-(b) hypothesis feed the canonical module-level Singer
+mechanism `isCyclic_and_card_dvd_of_faithful_irreducible_comm` (shared `SingerField` leaf) through
+the thin adapter `elabRepresentation_isSimpleModule_and_faithful`, with `H̄` the elementary abelian
 `p`-group of order `p^q` (`chiefFactor_quotient_card`).  This is the structural core behind the
 `Coprime u (p-1)` / `u ∣ (p^q-1)/(p-1)` divisibilities of `CliffordCaseBData` (which additionally
 pin `u = |Ū|` and use the `W₁`-fixed-point-free refinement). -/
@@ -4104,7 +4117,8 @@ theorem chiefFactor_caseB_image_cyclic [Finite G] {M : Subgroup G}
       ext x
       simpa using ha x
     exact Subtype.ext hone
-  obtain ⟨hcyc, hdvd⟩ := isCyclic_card_dvd_of_aInvariant_irreducible_faithful_comm
+  -- Thin adapter into the canonical module-level Singer lemma (shared leaf, issue 9000).
+  obtain ⟨hcyc, hdvd⟩ := singerAdapter_isCyclic_card_dvd
     (A := ↥(φU.range)) (K := ↥data.H ⧸ chief.N) (p := chief.p)
     (φ := (φU.range).subtype) hAcomm hKnt hirr hfaith
   exact ⟨hcyc, by rwa [hKcard] at hdvd⟩
@@ -4121,8 +4135,9 @@ Frobenius structure of `U W₁`: a nonidentity `w₀ ∈ W₁` acts on `Ū` fixe
 `w₀`-fixed coset of `C_U(H̄)`; Isaacs Cor 3.28 (`coprime_fixedPoints_quotient`) extracts a `w₀`-fixed
 representative `c ∈ u·C_U(H̄)`, and `c ∈ C_U(w₀) = 1` by the Frobenius condition
 (`centralizer_complement_le`, `U ⊓ W₁ = ⊥`), forcing `u ∈ C_U(H̄)`, i.e. `φ_U(u) = 1`.  The
-fixed-point-free Singer bridge `coprime_card_sub_one_of_aInvariant_irreducible_faithful_comm_fpf`
-then gives the coprimality. -/
+canonical module-level `coprime_card_sub_one_of_faithful_irreducible_comm_fpf` (shared
+`SingerField` leaf, via `elabRepresentation_isSimpleModule_and_faithful` +
+`exists_addEquiv_asModule_fpf`) then gives the coprimality. -/
 theorem chiefFactor_caseB_image_coprime [Finite G] {M : Subgroup G}
     {data : TypesIIIIIIVSetup M} (chief : ChiefFactorData data)
     (hcaseB : ∀ J : Subgroup (↥data.H ⧸ chief.N),
@@ -4238,68 +4253,73 @@ theorem chiefFactor_caseB_image_coprime [Finite G] {M : Subgroup G}
       obtain ⟨i, hi⟩ := Subgroup.mem_zpowers_iff.mp a.2
       obtain ⟨j, hj⟩ := Subgroup.mem_zpowers_iff.mp b.2
       exact Subtype.ext (by rw [Subgroup.coe_mul, Subgroup.coe_mul, ← hi, ← hj]; group))
-  -- Apply the fixed-point-free Singer bridge.
-  refine coprime_card_sub_one_of_aInvariant_irreducible_faithful_comm_fpf
+  -- The fixed-point-free hypothesis for `σ = act.φ w₀`, in subgroup terms.
+  have hfpfσ : ∀ a : ↥(φU.range),
+      (∀ x : ↥data.H ⧸ chief.N,
+        (act.φ w₀) (((φU.range).subtype a) x) = ((φU.range).subtype a) ((act.φ w₀) x)) →
+      a = 1 := by
+    intro a ha
+    obtain ⟨u₀, hu₀⟩ := a.2
+    -- `↑a = φU u₀ = act.φ u₀'`, and `act.φ w₀` commutes with it.
+    have ha1 : ((φU.range).subtype a : MulAut (↥data.H ⧸ chief.N)) = act.φ (act.U.subtype u₀) :=
+      hu₀.symm
+    have hCm : Commute (act.φ w₀) (act.φ (act.U.subtype u₀)) := by
+      show act.φ w₀ * act.φ (act.U.subtype u₀) = act.φ (act.U.subtype u₀) * act.φ w₀
+      apply MulEquiv.ext
+      intro x
+      rw [MulAut.mul_apply, MulAut.mul_apply, ← ha1]
+      exact ha x
+    -- `hg_fix`: each `w₀^k`-conjugate of `u₀` lands in `u₀ · N`.
+    have hg_fix : ∀ aa : ↥(Subgroup.zpowers w₀),
+        ∃ n ∈ N, (ψ.comp (Subgroup.zpowers w₀).subtype) aa u₀ = u₀ * n := by
+      intro aa
+      refine ⟨u₀⁻¹ * (ψ ((Subgroup.zpowers w₀).subtype aa) u₀), ?_, ?_⟩
+      · rw [hNdef, MonoidHom.mem_ker, map_mul, map_inv, hφUconj]
+        obtain ⟨k, hk⟩ := Subgroup.mem_zpowers_iff.mp aa.2
+        have hcaφ : act.φ ((Subgroup.zpowers w₀).subtype aa) = (act.φ w₀) ^ k := by
+          rw [show (Subgroup.zpowers w₀).subtype aa = w₀ ^ k from hk.symm, map_zpow]
+        have hcomm_k : Commute (act.φ ((Subgroup.zpowers w₀).subtype aa)) (φU u₀) := by
+          rw [hcaφ]; exact hCm.zpow_left k
+        rw [show act.φ ((Subgroup.zpowers w₀).subtype aa) * φU u₀ *
+              (act.φ ((Subgroup.zpowers w₀).subtype aa))⁻¹ = φU u₀ by
+          rw [hcomm_k.eq, mul_assoc, mul_inv_cancel, mul_one], inv_mul_cancel]
+      · rw [MonoidHom.comp_apply, mul_inv_cancel_left]
+    -- Isaacs Cor 3.28: a `w₀`-fixed representative `c ∈ u₀ · N`.
+    obtain ⟨c, hc_fix, n, hn, hc_eq⟩ :=
+      OddOrder.Isaacs.Ch04.coprime_fixedPoints_quotient
+        (φ := ψ.comp (Subgroup.zpowers w₀).subtype) hCop hSolv hN_inv hg_fix
+    -- `c` commutes with `w₀`, so `c ∈ C_U(w₀) ⊆ W₁`; as `c ∈ U`, `c = 1`.
+    have hc_w₀ : ψ w₀ c = c := by
+      have := hc_fix ⟨w₀, Subgroup.mem_zpowers w₀⟩
+      rwa [MonoidHom.comp_apply] at this
+    have hc_comm : (act.U.subtype c : ↥(data.typeP.U ⊔ data.typeP.W1)) * w₀ =
+        w₀ * act.U.subtype c := by
+      have h := congrArg act.U.subtype hc_w₀
+      rw [hψcoe] at h
+      -- `h : w₀ * subtype c * w₀⁻¹ = subtype c`
+      rw [mul_inv_eq_iff_eq_mul] at h
+      exact h.symm
+    have hc_in_E : (act.U.subtype c : ↥(data.typeP.U ⊔ data.typeP.W1)) ∈ act.E := by
+      refine (typeP_uW1_frobenius data.typeP hU).centralizer_complement_le w₀ hw₀E hw₀ne ?_
+      rw [Subgroup.mem_centralizer_singleton_iff]
+      exact hc_comm
+    have hc_in_U : (act.U.subtype c : ↥(data.typeP.U ⊔ data.typeP.W1)) ∈ act.U := c.2
+    have hc1 : (act.U.subtype c : ↥(data.typeP.U ⊔ data.typeP.W1)) = 1 :=
+      Subgroup.disjoint_def.mp (typeP_uW1_frobenius data.typeP hU).isComplement.disjoint
+        hc_in_U hc_in_E
+    have hc0 : c = 1 := act.U.subtype_injective (by rw [hc1, map_one])
+    -- `1 = c = u₀ · n` ⟹ `u₀ ∈ N` ⟹ `φU u₀ = 1` ⟹ `a = 1`.
+    rw [hc0] at hc_eq
+    have hu₀N : u₀ ∈ N := by
+      have : u₀ = n⁻¹ := by rw [eq_inv_iff_mul_eq_one, ← hc_eq]
+      rw [this]; exact N.inv_mem hn
+    apply Subtype.ext
+    rw [← hu₀, Subgroup.coe_one]
+    exact (MonoidHom.mem_ker (f := φU)).mp hu₀N
+  -- Thin adapter into the canonical module-level Singer FPF-coprimality (shared leaf, issue 9000).
+  exact singerAdapter_coprime_fpf
     (A := ↥(φU.range)) (K := ↥data.H ⧸ chief.N) (p := chief.p) (φ := (φU.range).subtype)
-    hAcomm hKnt hirr hfaith (act.φ w₀) ?_
-  intro a ha
-  obtain ⟨u₀, hu₀⟩ := a.2
-  -- `↑a = φU u₀ = act.φ u₀'`, and `act.φ w₀` commutes with it.
-  have ha1 : ((φU.range).subtype a : MulAut (↥data.H ⧸ chief.N)) = act.φ (act.U.subtype u₀) :=
-    hu₀.symm
-  have hCm : Commute (act.φ w₀) (act.φ (act.U.subtype u₀)) := by
-    show act.φ w₀ * act.φ (act.U.subtype u₀) = act.φ (act.U.subtype u₀) * act.φ w₀
-    apply MulEquiv.ext
-    intro x
-    rw [MulAut.mul_apply, MulAut.mul_apply, ← ha1]
-    exact ha x
-  -- `hg_fix`: each `w₀^k`-conjugate of `u₀` lands in `u₀ · N`.
-  have hg_fix : ∀ aa : ↥(Subgroup.zpowers w₀),
-      ∃ n ∈ N, (ψ.comp (Subgroup.zpowers w₀).subtype) aa u₀ = u₀ * n := by
-    intro aa
-    refine ⟨u₀⁻¹ * (ψ ((Subgroup.zpowers w₀).subtype aa) u₀), ?_, ?_⟩
-    · rw [hNdef, MonoidHom.mem_ker, map_mul, map_inv, hφUconj]
-      obtain ⟨k, hk⟩ := Subgroup.mem_zpowers_iff.mp aa.2
-      have hcaφ : act.φ ((Subgroup.zpowers w₀).subtype aa) = (act.φ w₀) ^ k := by
-        rw [show (Subgroup.zpowers w₀).subtype aa = w₀ ^ k from hk.symm, map_zpow]
-      have hcomm_k : Commute (act.φ ((Subgroup.zpowers w₀).subtype aa)) (φU u₀) := by
-        rw [hcaφ]; exact hCm.zpow_left k
-      rw [show act.φ ((Subgroup.zpowers w₀).subtype aa) * φU u₀ *
-            (act.φ ((Subgroup.zpowers w₀).subtype aa))⁻¹ = φU u₀ by
-        rw [hcomm_k.eq, mul_assoc, mul_inv_cancel, mul_one], inv_mul_cancel]
-    · rw [MonoidHom.comp_apply, mul_inv_cancel_left]
-  -- Isaacs Cor 3.28: a `w₀`-fixed representative `c ∈ u₀ · N`.
-  obtain ⟨c, hc_fix, n, hn, hc_eq⟩ :=
-    OddOrder.Isaacs.Ch04.coprime_fixedPoints_quotient
-      (φ := ψ.comp (Subgroup.zpowers w₀).subtype) hCop hSolv hN_inv hg_fix
-  -- `c` commutes with `w₀`, so `c ∈ C_U(w₀) ⊆ W₁`; as `c ∈ U`, `c = 1`.
-  have hc_w₀ : ψ w₀ c = c := by
-    have := hc_fix ⟨w₀, Subgroup.mem_zpowers w₀⟩
-    rwa [MonoidHom.comp_apply] at this
-  have hc_comm : (act.U.subtype c : ↥(data.typeP.U ⊔ data.typeP.W1)) * w₀ =
-      w₀ * act.U.subtype c := by
-    have h := congrArg act.U.subtype hc_w₀
-    rw [hψcoe] at h
-    -- `h : w₀ * subtype c * w₀⁻¹ = subtype c`
-    rw [mul_inv_eq_iff_eq_mul] at h
-    exact h.symm
-  have hc_in_E : (act.U.subtype c : ↥(data.typeP.U ⊔ data.typeP.W1)) ∈ act.E := by
-    refine (typeP_uW1_frobenius data.typeP hU).centralizer_complement_le w₀ hw₀E hw₀ne ?_
-    rw [Subgroup.mem_centralizer_singleton_iff]
-    exact hc_comm
-  have hc_in_U : (act.U.subtype c : ↥(data.typeP.U ⊔ data.typeP.W1)) ∈ act.U := c.2
-  have hc1 : (act.U.subtype c : ↥(data.typeP.U ⊔ data.typeP.W1)) = 1 :=
-    Subgroup.disjoint_def.mp (typeP_uW1_frobenius data.typeP hU).isComplement.disjoint
-      hc_in_U hc_in_E
-  have hc0 : c = 1 := act.U.subtype_injective (by rw [hc1, map_one])
-  -- `1 = c = u₀ · n` ⟹ `u₀ ∈ N` ⟹ `φU u₀ = 1` ⟹ `a = 1`.
-  rw [hc0] at hc_eq
-  have hu₀N : u₀ ∈ N := by
-    have : u₀ = n⁻¹ := by rw [eq_inv_iff_mul_eq_one, ← hc_eq]
-    rw [this]; exact N.inv_mem hn
-  apply Subtype.ext
-  rw [← hu₀, Subgroup.coe_one]
-  exact (MonoidHom.mem_ker (f := φU)).mp hu₀N
+    hAcomm hKnt hirr hfaith (act.φ w₀) hfpfσ
 
 open OddOrder.RepresentationTheory Representation in
 open scoped commutatorElement IsMulCommutative in
@@ -4321,16 +4341,8 @@ theorem chiefFactor_caseB_image_dvd_norm [Finite G] {M : Subgroup G}
           chief.N_aInvariant).U.subtype).range) ∣ (chief.p ^ data.q - 1) / (chief.p - 1) := by
   have hcop := chiefFactor_caseB_image_coprime chief hcaseB
   obtain ⟨_, hdvd⟩ := chiefFactor_caseB_image_cyclic chief hcaseB
-  have hp1 : 1 ≤ chief.p := chief.p_prime.pos
-  -- `(p-1) ∣ (p^q-1)` since `p ≡ 1 [MOD p-1]`.
-  have hpd : (chief.p - 1) ∣ (chief.p ^ data.q - 1) := by
-    have h1 : 1 ≡ chief.p [MOD chief.p - 1] := (Nat.modEq_iff_dvd' hp1).mpr (dvd_refl _)
-    have h2 : 1 ^ data.q ≡ chief.p ^ data.q [MOD chief.p - 1] := h1.pow data.q
-    rw [one_pow] at h2
-    exact (Nat.modEq_iff_dvd' (Nat.one_le_pow _ _ (by omega))).mp h2
-  -- `|Ū|·(p-1) ∣ p^q-1` (coprime), hence `|Ū| ∣ (p^q-1)/(p-1)`.
-  have hmul := hcop.mul_dvd_of_dvd_of_dvd hdvd hpd
-  exact (Nat.dvd_div_iff_mul_dvd hpd).mpr (by rwa [mul_comm] at hmul)
+  -- The arithmetic core is the shared `SingerLineBound` lemma (issue 9000 dedup).
+  exact dvd_div_of_coprime_of_dvd_sub_one chief.p_prime.pos hdvd hcop
 
 open scoped commutatorElement in
 /-- **Peterfalvi (9.7) case (b): the `U`-action on `H̄` is fixed-point-free off `C = C_U(H̄)`.**

@@ -1025,9 +1025,8 @@ directly.  This bridge builds the §6 *structural* Hypothesis (4.2) `S06.Hypothe
 `gcd(|M'|, |W₁|) = 1`, i.e. `W₁` is a *Hall* complement to `M' = [M,M]` in `M`.
 
 A bare complement need not be Hall, but the κ-Hall structure of a type-`P` maximal supplies it: a
-Hall `κ(M)`-subgroup `K ≤ M` (`exists_isHallSubgroup_kappa_ge`) is cyclic (BG Theorem A,
-`theoremA_maximal_structure` — cited here even though its proof currently carries a `sorry`, since
-its statement is the correct BG result and the dependency is honest), so it complements `M'` in `M`
+Hall `κ(M)`-subgroup `K ≤ M` (`exists_isHallSubgroup_kappa_ge`) is cyclic (BG Theorem A, the
+**sorry-free faithful** `S15.typeP_auxiliary_structure`), so it complements `M'` in `M`
 (`typeP_derivedInG_isComplement_kappaHall`); hence `gcd(|K|, |M'|) = 1`
 (`IsHallSubgroup.coprime_index`), and `|K| = [M:M'] = |W₁|` (`card_kappaHall_eq_derived_index`,
 `TypePData.card_W1_eq_derived_index`).  Discharges the `hHall` obligation of the §10 → §6 bridge. -/
@@ -1048,8 +1047,10 @@ theorem typePData_W1_hall_coprime [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOd
     Subgroup.comap_map_eq_self_of_injective M.subtype_injective U'
   have hU : Ch03.IsHallSubgroup ((OddOrder.BG.Ch4.S14.kappa M ∪ OddOrder.BG.Ch3.S10.sigma M)ᶜ)
       ((U'.map M.subtype).subgroupOf M) := by rw [hUeq]; exact hU'hall
-  -- `K` is cyclic by BG Theorem A.
-  haveI : IsCyclic ↥K := (OddOrder.BG.Ch4.S16.theoremA_maximal_structure hG hM hK rfl hU).2.1
+  -- `K` is cyclic by BG Theorem A (the sorry-free faithful `typeP_auxiliary_structure`).
+  haveI : IsCyclic ↥K :=
+    (OddOrder.BG.Ch4.S15.typeP_auxiliary_structure hG hM hKM (Subgroup.map_subtype_le U')
+      hK rfl hU).2.1
   -- Coprimality `gcd(|K|, |M'|) = 1` from the κ-Hall complement (mirrors S14_TypePComplement).
   have hM'le : derivedInG M ≤ M := Subgroup.map_subtype_le _
   have hcompl := OddOrder.BG.Ch4.S14.typeP_derivedInG_isComplement_kappaHall hG hM hP hKM hK

@@ -6474,8 +6474,11 @@ formula together with the prime computation `coprimeFrobeniusAction_card_eq_prim
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S11.chiefFactor_clifford_dim_dvd_q
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S11.chiefFactor_clifford_U_dichotomy
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S11.elabRepresentation_isIrreducible
+-- thin subgroup→module Singer adapter (issue 9000 dedup): the former subgroup-level Singer
+-- wrappers are retired; §9 case-(b) cites the shared `SingerField`/`SingerLineBound` leaves
+-- through this single conversion.
 #assert_only_allowed_axioms
-  OddOrder.Peterfalvi.S11.isCyclic_card_dvd_of_aInvariant_irreducible_faithful_comm
+  OddOrder.Peterfalvi.S11.singerAdapter_isCyclic_card_dvd
 -- (9.7)(b) structural core: an irreducible action with commuting image is fixed-point-free off the
 -- kernel (the Frobenius structure `H̄ ⋊ Ū`).  Pure group theory — no Singer field model needed.
 #assert_only_allowed_axioms
@@ -6517,7 +6520,7 @@ formula together with the prime computation `coprimeFrobeniusAction_card_eq_prim
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S11.typeP_commutator_U_centralizes_H
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S11.chiefFactor_caseB_image_cyclic
 #assert_only_allowed_axioms
-  OddOrder.Peterfalvi.S11.coprime_card_sub_one_of_aInvariant_irreducible_faithful_comm_fpf
+  OddOrder.Peterfalvi.S11.singerAdapter_coprime_fpf
 -- Peterfalvi (9.7)(b): `Coprime |Ū| (p-1)` (fixed-point-free) and the resulting unconditional
 -- divisibility `|Ū| ∣ (p^q-1)/(p-1)`.  The FPF input `C_Ū(w₀) = 1` is supplied from the Frobenius
 -- structure of `U W₁` via Isaacs Cor 3.28 (`coprime_fixedPoints_quotient`).
@@ -6701,10 +6704,19 @@ formula together with the prime computation `coprimeFrobeniusAction_card_eq_prim
 -- *definitionally* `hyp.dadeData.dade` / its `fullDadeIsometryData` (both (8.10) `typePA0` and
 -- (4.6.d) use `conjClassSetIn`); the `A`-side datum is the `restrict` along `le_normalizer_typePA`;
 -- `A_covers` is trivial for `H = K` by `A(M) = (M')#`.  First-ever instantiation of `Hypothesis46`
--- (the carrier was latent-unsatisfiable before the issue-9004 small-V/M-conjugacy fixes).  **Not
--- AxiomsCheck-registered**: it cites `toCertainTypeHypothesis`, whose Hall-coprimality input cites
--- the sorried BG `theoremA_maximal_structure` / `proposition_type_classification` (honest upstream
--- cites; no *new* sorry).
+-- (the carrier was latent-unsatisfiable before the issue-9004 small-V/M-conjugacy fixes).
+-- Axiom-clean since the Hall-coprimality input swapped its BG Theorem A cite to the sorry-free
+-- faithful `S15.typeP_auxiliary_structure` (and `proposition_type_classification` is proven).
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S12.Hypothesis.toHypothesis46
+
+-- **Peterfalvi (4.8)/(4.10) on the §10 aligned grid** (lane-a, issue 9004 payoff) —
+-- `Hypothesis.tau_muGrid_zeroRow_diff`: `(μ_{0j} − μ_{0k})^τ = δ_j(ω_{0j}^σ − ω_{0k}^σ)`, and
+-- `Hypothesis.tau_muGrid_fourCorner`: the δ_j-scaled four-corner Dade identity — the §6
+-- `certainType_diff_dade_eq` / `fourCorner_dade_eq` cited through `toHypothesis46` with the
+-- σ-side bridge `certainTypeOmegaSigma = alignedOmegaSigmaGrid`.  These discharge the `h48`/`h410`
+-- threads of the (11.8.3)/(11.8.5) β-reality chain.  Axiom-clean.
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S12.Hypothesis.tau_muGrid_zeroRow_diff
+#assert_only_allowed_axioms OddOrder.Peterfalvi.S12.Hypothesis.tau_muGrid_fourCorner
 
 -- **Peterfalvi (10.8) line-87 arithmetic** (lane-b W3, §7-estimate input) —
 -- `Hypothesis.card_typePA_div_card_lt_inv_w1`: `|A(M)|/|M| < 1/w₁`.  From `A(M) = (M')#`
