@@ -548,6 +548,25 @@ theorem inner_induce_eq_inner_restrict (H : Subgroup G) [Fintype H]
       = (⅟(Nat.card G : k) * (Nat.card G : k)) * (⅟(Nat.card H : k) * S) := by ring
     _ = ⅟(Nat.card H : k) * S := by rw [invOf_mul_self, one_mul]
 
+/-- **Frobenius reciprocity against the trivial character.**  `⟨Ind_H^G θ, 1_G⟩ = ⟨θ, 1_H⟩`:
+the multiplicity of the principal character of `G` in the induced class function equals the
+multiplicity of the principal character of `H` in `θ` (`= ⟨θ, 1_H⟩ = ⟨Ind_H^G θ, 1_G⟩`).  Immediate
+from `inner_induce_eq_inner_restrict` and `restrict H 1_G = 1_H`.
+
+This is the source-side computation behind Peterfalvi (7.8): for the induced family
+`ζ_i = Ind_H^L θ_i`, a **non-principal** `θ_i ≠ 1_H` gives `⟨ζ_i, 1_L⟩ = ⟨θ_i, 1_H⟩ = 0`, the input
+(via the (2.7) adjoint) to the `S^ν ⊥ 1_G` orthogonality (`BetaDecomp.orth_one`). -/
+theorem induce_inner_trivial (H : Subgroup G) [Fintype H]
+    [Invertible (Nat.card G : ℂ)] [Invertible (Nat.card H : ℂ)]
+    (θ : ClassFunction ↥H ℂ) :
+    ClassFunction.inner (induce H θ) (trivialClassFunction G)
+      = ClassFunction.inner θ (trivialClassFunction ↥H) := by
+  rw [inner_induce_eq_inner_restrict]
+  have hres : ClassFunction.restrict H (trivialClassFunction G) = trivialClassFunction ↥H := by
+    ext h
+    simp [ClassFunction.restrict_apply, trivialClassFunction_apply]
+  rw [hres]
+
 end FrobeniusReciprocity
 
 section NormalSubgroupValue
