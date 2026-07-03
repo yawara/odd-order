@@ -394,3 +394,40 @@ FrobeniusFamily から wired。**残 = (7.8.b)/(7.9) character estimate のみ**
   `not_trivial_G0_of_exists_Bsum_bound` bypass で spine 実証。
 次 iteration は (7.8.b) chiRhoNormSq 下界の tractability 精査 (Hypothesis78 machinery が Frobenius family に
 適用できるか)。これが 7.10 の実質的な最終 deep 部。
+
+## 2026-07-03 cont.⁹ (lane-a, /loop) — (7.8.b) source orthogonalities 全 landed; 残 = coherence ν (deep gate)
+
+**Landed** (`310448b4`): `induce_inner_induce_trivial` (`⟨Ind φ,Ind 1⟩=[G:H]·⟨φ,1⟩`) +
+`induce_inner_induce_trivial_eq_zero_of_irreducible` (`⟨ζ,Ind1H⟩=0`, ζ irr≠1) + `restrict_induce_trivial`
+(dedup)。**(7.8.b) `‖β‖²=e+1` の source 事実 (⟨Ind1H,Ind1H⟩=e / ⟨ζ,Ind1H⟩=0 / ⟨ζ,ζ⟩=1) 全て available**。
+
+**残 deep gate = Frobenius induced-family の coherence ν**: `hypothesis78OfDade` は ν (+ isometry
+hnu_isometry + agreement hagree) を**入力**に取る。NormEstimates も未構成 hypothesis。⟹ Hypothesis78 →
+BetaDecomp → NormEstimates → chiRhoNormSq bound の chain は全て ν に gated。この ν = {Ind_H^L θ} の
+(5.6)/(6.8) Sibley coherence が S07/S08 から wireable かが 7.10 完遂の鍵 (次 iteration の第一調査)。
+
+**現状総括**: 7.10 の構造 trunk (7.1/7.4/7.6) + (7.8.b) source facts = wiring/elementary で landed。
+残 = coherence ν + NormEstimates + (7.9) = genuine deep §5-8 char analysis (multi-week 級の可能性)。
+
+## 2026-07-03 cont.¹⁰ (lane-a, /loop) — coherence ν = deep (5.6) gate 確定; tractable work 完了
+
+**調査結論**: 7.10 の残 (7.8.b full NormEstimates / 7.9 / assembly) は**全て coherence ν に gated**。
+`hypothesis78OfDade` は ν + `hnu_isometry` + `hagree` を入力に取り、ν が無ければ Hypothesis78 →
+BetaDecomp → NormEstimates chain が始まらない。
+
+**ν = Ind_L^G は不可** (検証済): TI-subgroup H の Mackey 公式は `g∉L` の double coset から
+**degree-product 余剰項**を生む ⟹ Ind_L^G は induced character 上で等長でない。また induced family
+{Ind_H^L θ} は degree 変動 (θ(1) 変動) ゆえ `coherentEqualDegree_fromDade` (S07、等次数専用) も不適。
+⟹ **ν は genuine な Peterfalvi (5.6) coherence** (§5-6 Sibley、varying-degree) を要する = deep 部。
+
+**7.10 の tractable work は完了** (この session で landing):
+- 構造 trunk: `Hypothesis71.of_isTISubset` / `FrobeniusFamily.{hypothesis71, familyHypothesis71, hypothesis76}`
+  + `dadeSupport_hypothesis71_eq_kernelSpread`。
+- (7.8.b) source facts: `induce_{inner_trivial, trivial_inner_self, inner_induce_trivial}` +
+  `⟨ζ,Ind1H⟩=0` corollary + `restrict_induce_trivial`。
+**残 = coherence ν (deep (5.6)) → NormEstimates → chiRhoNormSq bound → (7.9) → assembly**。ν 以降は
+既存 machinery (betaDecompOfDade / zetaNuRhoNormSq_ge_of_facts) が多く、ν が最大の単一 gate。
+
+**推奨**: coherence ν の (5.6) 構成は独立した focused effort (multi-iteration/session 級)。次 iteration は
+S07 coherentPair/coherentPairChain engine が {Ind_H^L θ} に適用可能かの精査から (適用可なら wireable、
+不可なら (5.6) を Frobenius induced family 向けに実証する新規 deep work)。
