@@ -213,6 +213,7 @@ import OddOrder.Peterfalvi.S08_RetargetReducible
 import OddOrder.Peterfalvi.S09_NonexistenceCertain
 import OddOrder.Peterfalvi.S09_CertificateDischarge
 import OddOrder.Peterfalvi.S09_FrobeniusHypothesis76
+import OddOrder.Peterfalvi.S09_FrobeniusSibley
 import OddOrder.Peterfalvi.S10_CoherenceWiring
 import OddOrder.Peterfalvi.S10_MinimalSimpleStructure
 import OddOrder.Peterfalvi.S10_BGInterface
