@@ -487,3 +487,29 @@ H⊄Ker χ, C_H(g)=1 ⟹ χ(g)=0」) は **`S03b_Vanishing.irreducibleCharacter_
 純機械的: (i) `H⊔U=⊤` (type-F L=L_F·U)、(ii) hcent bridge (TypeFData.centralizer_le_U1 の ↥L 移送)、
 (iii) 各構成要素の H⊄Ker (φ over θ≠1 から)。**lane b は本 wiring を自 S14 file で進める** (recipe の
 「lane b wiring」path; 衝突回避で lane c に通知: lane c が S14-import leaf 進行中なら本 issue に追記を)。
+
+## 🚧 lane b WIP (loop¹¹³) — (8.2.c) full assembly 執筆済 (notes に保存)、残 = set-unification + 2 sub-proof
+
+(8.2.c) `typeI_induced_char_constituents` の全 assembly を執筆 (~130 行、
+`notes/peterfalvi/s14_typeI_induced_assembly_wip.txt` に保存)。math + API map は正しく、lane c 部品を
+cite: `exists_extension_induce_eq_sum_distinct_of_inertia_inf_le` (decomp+等次数) /
+`coprime_index_orderOf_determinant_mul_of_coprime_index` (Hall) / `forall_mem_not_isReal_of_induce_eq_sum_of_odd` /
+`forall_mem_conj_ne_of_odd` / (1.2) `S03b.irreducibleCharacter_apply_eq_zero_of_centralizerInSubgroup_eq_bot`。
+type-F wiring: `complement.symm.index_eq_card` (card U=[L:K]) / `complement.sup_eq_top` (H⊔U=⊤) /
+`typeF_inertia_inf_le_U1` + ↥L-hcent bridge / `isMulCommutative_of_mulEquiv (subgroupOfEquivOfLe).symm`。
+
+**残 3 点 (fresh session で 1-2 cycle、marathon tail の plumbing friction を回避)**:
+1. **import 追加**: `import OddOrder.GroupTheory.RepresentationTheory.CliffordDecomposition` を S14 へ
+   (現状 S14 は lane-c leaf を未 import ゆえ全 cite が unknown)。
+2. **`set K` 回避**: θ は Sset から raw `↥((L_F).subgroupOf L)` 型で obtain される。`set K := ...` 後の
+   θ は raw のままで `trivialIrreducibleCharacter ↥K` と unification mismatch、`rw [← hKdef]` は
+   dependent motive で失敗。→ **`set K/Usub/U1sub` を使わず** raw `(hyp.typeI.typeF.H).subgroupOf L`
+   を直接使う (θ 型と一致) か、obtain 前に generalize。
+3. **2 sub-proof**: (a) `hHker` (K⊄Ker φ) の inner-induce=0 step = Frobenius `inner_induce_eq_inner_restrict`
+   (S14:1905 `constituents_not_inHKernel` を mirror)。(b) `centralizerInSubgroup K x = ⊥` を
+   (x:G)∉typeIA={y≠1:C_{L_F}(y)≠1} から (`mem_centralizerInSubgroup` unfold)。
+4. hG を `character_decomposition_and_dade_domain` (S14:546, 既 _hG) に thread。
+
+**API 確定名**: `ClassFunction.subgroup_le_inertia` / `hKnormal.comap T.subtype` / `hθirr.determinant`
+(先に `have hθirr : IsIrreducibleCharacter (θ:CF) := θ.isIrreducible`) / lane-c lemma は
+`OddOrder.RepresentationTheory.` 修飾。
