@@ -305,3 +305,75 @@ induced-char 算術 (degree `induce_apply_one`・vanishing・reciprocity `inner_
 **次 block 候補** (leaf 先行, 上流 trunk へ): `⟨Ind_H^L 1_H, Ind_H^L 1_H⟩=[L:H]=e` (`⟨Ind1H,Ind1H⟩=e`
 source fact; reciprocity + normal-H Mackey `Res_H Ind_H^L 1 = e•1_H`)、その後 Hypothesis71-from-TI trunk。
 /loop は 1 iteration = 1 genuine block で漸進中 (scaffold 追加はしない = doneness)。
+
+## 2026-07-03 cont.³ (lane-a, /loop) — 2nd block landed; leaves ~done, next = trunk
+
+**Landed** (`233ce907`): `induce_trivial_inner_self` (`⟨Ind_H^G 1_H, Ind_H^G 1_H⟩=[G:H]` for H⊴G) —
+the `⟨Ind1H,Ind1H⟩=e` source norm (via `induce_apply_of_mem_normal_of_const` + reciprocity).
+
+**状態**: induced-char **leaves** (degree/vanishing/reciprocity/trivial-inner/trivial-norm) は既存+今回
+2 本で概ね揃った。残る 7.10 は **deep trunk** (fresh context 推奨):
+1. **`Hypothesis71`-from-TI/Frobenius** = (7.1) Dade ρ-setup を TI 構造から構成 (§2/§4 Dade)。次 iteration の第一目標。issue 0045 が (7.1) を sorry-free 化済ゆえ、既存 `Hypothesis71` 補題群から constructor が組めるか要調査。
+2. coherence ((5.6)/(6.8) Sibley、induced family)。
+3. (7.8.b) `chiRhoNormSq` 下界 + (7.9) 2-family 非直交。
+
+## 2026-07-03 cont.⁴ (lane-a, /loop) — 🎯 (7.1) trunk layer DONE: Hypothesis71-from-TI wireable
+
+**Landed** (`5d3b03f3`): `Hypothesis71.of_isTISubset` — the (7.1) Dade ρ-setup **constructible from any
+TI-subset**. Key discovery: the Dade-isometry-existence machinery **already exists in S04**
+(`Hypothesis.of_isTISubset` (2.3) + `dadeMap` + `isDadeMap_dadeMap` + `HConjInvariant.of_forall_H_eq_bot`),
+so (7.1) is a genuine **wiring** of real content, NOT a from-scratch build. **7.10 trunk is more
+tractable than the "multi-week from scratch" estimate** — the Dade layer is done.
+
+**次 (tractable wiring 継続)**:
+1. `FrobeniusFamily i` → `Hypothesis71 G (H_i^#) (L_i)`: `isTI` field が `IsTISubset` を、`normalizer_eq`
+   が L=N(H) を供給。残り `hA_sharp`(H^#⊆sharp)/`hA_L`(H^#⊆L)/`hL_norm` は Frobenius から。
+2. **Hypothesis76** (induced family {Ind_H^L θ} + coherence): coherence は S08 Sibley ((6.8) sorry-free
+   per 0044) が wireable か要調査。degree-ratio/support fields は induced-char leaves (今セッション) で埋まる。
+3. (7.8.b)/(7.9)/assembly。
+
+## 2026-07-03 cont.⁵ (lane-a, /loop) — (7.1) family-member wiring DONE
+
+**Landed** (`11f44fa2`): `FrobeniusFamily.hypothesis71` — each member `i` → `Hypothesis71 G (H_i^#) L_i`
+(side conditions all from family fields: mem_sharp / kernel_le / mem_kernel_sharp_conj_iff_of_mem_L / isTI).
+**次**: (7.4) `FamilyHypothesis71` 束ね (per-member Hypothesis71 + disjoint A_i^{τ_i} 台 ← coprime_kernel)、
+その後 **Hypothesis76** (induced family {Ind_H^L θ} + coherence = trunk の残りの deep part、S08 Sibley wireable か調査)。
+
+## 2026-07-03 cont.⁶ (lane-a, /loop) — 🎯 (7.1)/(7.4) 構造層 完全 wired
+
+**Landed** (`2976980b`): `FrobeniusFamily.familyHypothesis71` + bridge `dadeSupport_hypothesis71_eq_kernelSpread`.
+**`FrobeniusFamily` → `FamilyHypothesis71` (7.4) が完成** (per-member hyp71 + isDadeIsometry_of_isDadeMap +
+pairwise_disjoint ← dadeSupport=kernelSpread + 既存 kernelSpread_disjoint)。**card_G0_lower_bound の構造
+foundation (7.1/7.4) は wiring で done** — `characterEstimateData_of_family71_*` に `F.familyHypothesis71`
+を渡せる。
+
+**残 = genuine char content のみ** (Hypothesis76 coherence 系):
+- (7.8.b) `chiRhoNormSq` 下界 (`hi`/`hgood` in characterEstimateData_of_family71_reduced_estimates)。
+- signed-irreducible χ (exceptional character) の選択。
+- (7.9) 𝓑-sum bound (`hBsum`)。
+これらは Hypothesis76 (induced family {Ind_H^L θ} + (5.6)/(6.8) coherence) を要する char 解析。次 iteration
+は Hypothesis76-from-Frobenius の wireability 調査 (S08 Sibley coherence が使えるか)。
+
+## 2026-07-03 cont.⁷ (lane-a, /loop) — Hypothesis76 (7.6) は wireable と確定 (hypothesis76OfDade); 残 = instance detail
+
+**発見**: `S09.Cert.hypothesis76OfDade` (S09_CertificateDischarge:859, lane-b carve-out 0090, downstream)
+が **(7.7.a) `chiRho_decomp` 証明書を discharge 済**で Hypothesis76 を「no certificate assumed」で構成
+(`H71` + `IsDadeIsometry` + `H≤L` + `hHnorm` + `A=H^#` から induced family {Ind_H^L θ} を内部 enumerate)。
+S15 `H_sharp_hypothesis76` が同 constructor の使用例。⟹ **Hypothesis76-from-Frobenius も wiring で可能**。
+
+**アーキテクチャ**: hypothesis76OfDade は S09_CertificateDischarge (NonexistenceCertain の**下流**) に
+あるため、`FrobeniusFamily.hypothesis76` は**新 downstream leaf** に置く。card_G0 の最終 assembly も
+下流で `not_trivial_G0_of_exists_Bsum_bound` 系 bypass (S09:6607, 「still-open card_G0_lower_bound を
+迂回」) 経由が正道 (card_G0_lower_bound の sorry は displayed form のまま、spine consumer not_trivial_G0
+を下流で honest 実証)。
+
+**次 iteration の残**: `FrobeniusFamily.hypothesis76` を新 leaf で作る際、per-member の
+`Invertible (Nat.card ↥(F.L i):ℂ)` instance が hypothesis76OfDade の search に通らない技術的 quirk
+(letI/haveI/@ 全て試行、L-invertibility が見つからない) を解消する。`familyHypothesis71` では field 値
+として同 instance が通った (fun i => invertibleOfNonzero ...) ので、その pattern を downstream constructor
+に写すか、instance を def の `[...]` binder 化する。数学は完了、instance 解決のみ。
+
+**次 iteration の instance fix 案** (cont.⁷ 補足): `familyHypothesis71` は `fintypeL`/`invertibleL` を
+**field** として保持済。downstream の `FrobeniusFamily.hypothesis76` は fresh instance でなく
+`(F.familyHypothesis71).fintypeL i` / `.invertibleL i` を `letI` で使えば、hypothesis76OfDade が期待する
+instance と確実に一致する見込み (field 値は familyHypothesis71 で build 済ゆえ)。
