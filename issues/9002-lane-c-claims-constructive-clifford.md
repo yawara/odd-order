@@ -261,6 +261,38 @@ H = L_F Hall (o(θ)·d | |H|, gcd(|H|,[T:H])=1); 非実 = `not_isReal_of_ne_triv
 (1.2)/(1.5.a) 台: 各 η_β は H の外で… Frobenius ケースの `frobenius_typeI_induced_char_constituents`
 (S14 landed) の bookkeeping を一般化。
 
+### ✅ (a) mult-one packaging COMPLETE + (b) 部分着地 (2026-07-03 cont.²⁰)
+
+全て **shared leaf `CliffordDecomposition.lean` / `CharacterProduct.lean`** に配置 (S14 非依存 ⟹
+将来 `typeI_induced_char_constituents` から import cycle なしで cite 可)。全 sorry-free axiom-clean、
+full build 3906 jobs green。
+
+- **✅ (a) mult-one/distinctness packaging** (commit `63ba174e`, main merged `41f65558`):
+  - `injective_of_sum_inner_self_eq_card` (CharacterProduct): 族 `η:ι→Irr(G)` の和が
+    `⟨∑ηᵢ,∑ηⱼ⟩=|ι|` ⟹ 単射。設計の fiber-count でなく **「equal-value pair 集合 = 対角線」**
+    論法 (⟨,⟩ = |{(i,j):ηᵢ=ηⱼ}| via 直交、対角線が |ι| を尽くす)。より短い。
+  - `exists_finset_eq_sum_of_sum_inner_self_eq_card` (CharacterProduct): 上を Finset S=image に包装。
+  - `exists_extension_induce_eq_sum_distinct_irreducible` (CliffordDecomposition): (1.7)(b) 仮説下で
+    `Ind_H^L θ = Σ_{φ∈S} φ` (S nonempty, |S|=[T:H], 相異), 等次数 `[L:T]·d`, 各 φ=Ind_T(χ·Inf β)。
+    norm-count = `card_mul_inner_self_induce_eq_card_inertia` + `card_monoidHom` + injective 補題。
+- **✅ (b-inertia) type-F 特殊化** (commit `f6cd8258`, main merged): 
+  `exists_extension_induce_eq_sum_distinct_of_inertia_inf_le` — 抽象 `hab` を (8.2.c) 具体データ
+  (`H⊔U=⊤` + `I(θ)∩U≤U₁` + U₁ abelian) に差し替え、`inertia_inf_isMulCommutative_of_le` +
+  `commutator_inertia_le_of_sup_eq_top` で `⁅I,I⁆≤H` 導出 → packaging。
+- **✅ (b-非実) 非実性** (commit `84b37663`): `forall_mem_ne_trivial_of_induce_eq_sum` (⟨Ind θ,1⟩=0
+  ⟹ 各構成要素 ≠1) + `forall_mem_not_isReal_of_induce_eq_sum_of_odd` (奇数位数で非実)。
+
+**残 (b) — S14 consumer が cite で組む (lane b wiring or lane c の S14-import leaf)**:
+- **conj-distinct** `∀φφ'∈S, φ̄≠φ'`: θ̄ ≁_L θ ⟹ `⟨Ind θ, Ind θ̄⟩=0` ⟹ S∩S̄=∅。θ̄≁θ は
+  §8/type-I の genuine fact (奇数位数 + normal-Hall、要 (1.5.e) 型論法)。generic 化するなら θ̄≁θ を入力に。
+- **台 ⊆ A(L)∪{1}**: 各 φ (=Ind_T(χ·Inf β)) は normal H の外で消える (Ind from normal) ⟹ supp⊆H#。
+  H# ⊆ A(L) (typeIA) を確認して `supportInSubgroup ambientA L ∪{1}` に落とす (Frobenius 版 bookkeeping 一般化)。
+- **Hall coprimality wiring**: [T:H']|[L:H']=|U'| (complement) + o(θ')·d | |H'| + Coprime|H'||U'|
+  (`IsHallSubgroup.coprime_index`, L_F=maxNilpotentNormalHall Hall) ⟹ hcop。
+- **hcent bridge**: type-F `centralizer_le_U1` (G-level `U⊓C_G(x)≤U1`) → `typeF_inertia_inf_le_U1`
+  の ↥L-level `hcent` (centralizer subgroupOf 移送)。
+- これらが揃えば `typeI_induced_char_constituents` (S14:429 sorry) を cite で sorry-free 化。
+
 ### 6.11 の設計確定 (2026-07-02 cont.¹⁸ 精査 — route (ii) θ-part 論法採用、一般 Mackey 不要)
 
 **在庫が予想以上に厚い** (CliffordSingleOrbit / InducedCharacter):

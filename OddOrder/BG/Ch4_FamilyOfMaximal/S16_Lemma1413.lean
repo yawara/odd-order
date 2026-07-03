@@ -62,6 +62,11 @@ private noncomputable def conjSubgroupEquiv (g : G) (H : Subgroup G) :
     (MulAut.conj g).injective).trans
     (MulEquiv.subgroupCongr (mulAut_smul_eq_map' (MulAut.conj g) H).symm)
 
+/-- `pRank` is conjugation-invariant: `r_p(M^g) = r_p(M)`. -/
+theorem pRank_conj_smul_eq [Finite G] (g : G) (M : Subgroup G) (p : ℕ) :
+    pRank ↥(MulAut.conj g • M) p = pRank ↥M p :=
+  (OddOrder.BG.Ch3.S13.pRank_eq_of_mulEquiv (p := p) (conjSubgroupEquiv g M)).symm
+
 /-- `β` is conjugation-invariant: `β(M^g) = β(M)`.  `α` transports along the conjugation
 isomorphism (`Nat.card` and `pRank` invariance), and `idealPrime` is a `G`-global condition. -/
 theorem beta_conj_smul_eq [Finite G] (g : G) (M : Subgroup G) :
@@ -70,6 +75,74 @@ theorem beta_conj_smul_eq [Finite G] (g : G) (M : Subgroup G) :
   ext p
   simp only [OddOrder.BG.Ch3.S10.mem_beta_iff, OddOrder.BG.Ch3.S10.mem_alpha_iff]
   rw [Nat.card_congr e.toEquiv, OddOrder.BG.Ch3.S13.pRank_eq_of_mulEquiv (p := p) e]
+
+/-- Transport of a conjugation from `↥N` back to `G`: for `K ≤ N` and `n : ↥N`,
+`(nᶜ • (K.subgroupOf N)).map N.subtype = (↑n)ᶜ • K`.  (Replicates the `private`
+`map_subtype_conj_subgroupOf` of `S13_PrimeAction`.) -/
+private theorem map_subtype_conj_smul_subgroupOf {N : Subgroup G} (n : ↥N) {K : Subgroup G}
+    (hKN : K ≤ N) :
+    (MulAut.conj n • (K.subgroupOf N)).map N.subtype = MulAut.conj (n : G) • K := by
+  have e1 : (MulAut.conj n • (K.subgroupOf N))
+      = (K.subgroupOf N).map ((MulAut.conj n : ↥N →* ↥N)) := by
+    rw [Subgroup.pointwise_smul_def]; rfl
+  have e2 : (MulAut.conj (n : G) • K) = K.map ((MulAut.conj (n : G) : G →* G)) := by
+    rw [Subgroup.pointwise_smul_def]; rfl
+  rw [e1, e2, Subgroup.map_map,
+    show N.subtype.comp ((MulAut.conj n : ↥N →* ↥N))
+        = ((MulAut.conj (n : G) : G →* G)).comp N.subtype from by ext ⟨x, hx⟩; rfl,
+    ← Subgroup.map_map, Subgroup.map_subgroupOf_eq_of_le hKN]
+
+/-- **Order-`p` subgroups of a group with cyclic Sylow `p` are conjugate.**  If `p` is odd,
+`r_p(N) ≤ 1` (so the Sylow `p`-subgroups of `↥N` are cyclic), and `A, B ≤ N` both have order
+`p`, then `A` and `B` are `N`-conjugate.  Each lies in a (cyclic) Sylow `p`-subgroup of `↥N`;
+the Sylows are conjugate, and a cyclic `p`-group has a unique subgroup of order `p`. -/
+theorem exists_conj_smul_eq_of_le_of_card_prime [Finite G] {N : Subgroup G} {p : ℕ}
+    [Fact p.Prime] (hodd : Odd p) (hpr : pRank ↥N p ≤ 1)
+    {A B : Subgroup G} (hAN : A ≤ N) (hBN : B ≤ N)
+    (hAp : Nat.card ↥A = p) (hBp : Nat.card ↥B = p) :
+    ∃ n : G, n ∈ N ∧ MulAut.conj n • A = B := by
+  classical
+  set A' : Subgroup ↥N := A.subgroupOf N with hA'def
+  set B' : Subgroup ↥N := B.subgroupOf N with hB'def
+  have hA'card : Nat.card ↥A' = p := by
+    rw [hA'def, Nat.card_congr (Subgroup.subgroupOfEquivOfLe hAN).toEquiv, hAp]
+  have hB'card : Nat.card ↥B' = p := by
+    rw [hB'def, Nat.card_congr (Subgroup.subgroupOfEquivOfLe hBN).toEquiv, hBp]
+  have hA'pg : IsPGroup p ↥A' := by rw [IsPGroup.iff_card]; exact ⟨1, by rw [hA'card, pow_one]⟩
+  have hB'pg : IsPGroup p ↥B' := by rw [IsPGroup.iff_card]; exact ⟨1, by rw [hB'card, pow_one]⟩
+  obtain ⟨P, hA'P⟩ := hA'pg.exists_le_sylow
+  obtain ⟨Q, hB'Q⟩ := hB'pg.exists_le_sylow
+  haveI : MulAction.IsPretransitive ↥N (Sylow p ↥N) := Sylow.isPretransitive_of_finite
+  obtain ⟨n, hn⟩ := MulAction.exists_smul_eq ↥N P Q
+  haveI hQcyc : IsCyclic ↥(Q : Subgroup ↥N) :=
+    OddOrder.BG.Ch3.S10.isCyclic_of_pRank_le_one Q.isPGroup' hodd
+      (by rw [pRank_sylow_eq Q]; exact hpr)
+  -- `n • A' ≤ Q`.
+  have hnA'Q : (MulAut.conj n • A' : Subgroup ↥N) ≤ (Q : Subgroup ↥N) := by
+    have h1 : (MulAut.conj n • A' : Subgroup ↥N) ≤ MulAut.conj n • (P : Subgroup ↥N) :=
+      Subgroup.pointwise_smul_le_pointwise_smul_iff.mpr hA'P
+    have h2 : (MulAut.conj n • (P : Subgroup ↥N)) = (Q : Subgroup ↥N) := by
+      have := congrArg (Sylow.toSubgroup) hn
+      rwa [Sylow.coe_subgroup_smul] at this
+    rwa [h2] at h1
+  have hnA'card : Nat.card ↥(MulAut.conj n • A' : Subgroup ↥N) = p := by
+    have hsm : (MulAut.conj n • A' : Subgroup ↥N) = A'.map ((MulAut.conj n : ↥N →* ↥N)) := by
+      rw [Subgroup.pointwise_smul_def]; rfl
+    rw [hsm, Nat.card_congr (Subgroup.equivMapOfInjective A' (MulAut.conj n : ↥N →* ↥N)
+      (MulAut.conj n).injective).symm.toEquiv, hA'card]
+  -- Two order-`p` subgroups of the cyclic `Q` coincide.
+  have heqQ : (MulAut.conj n • A' : Subgroup ↥N).subgroupOf Q = B'.subgroupOf Q :=
+    OddOrder.BG.Ch3.S10.cyclic_subgroup_eq_of_card_eq (C := ↥(Q : Subgroup ↥N)) (by
+      rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hnA'Q).toEquiv,
+        Nat.card_congr (Subgroup.subgroupOfEquivOfLe hB'Q).toEquiv, hnA'card, hB'card])
+  have heq : (MulAut.conj n • A' : Subgroup ↥N) = B' := by
+    have h := congrArg (Subgroup.map (Q : Subgroup ↥N).subtype) heqQ
+    rwa [Subgroup.map_subgroupOf_eq_of_le hnA'Q, Subgroup.map_subgroupOf_eq_of_le hB'Q] at h
+  -- Transport to `G`.
+  refine ⟨(n : G), n.2, ?_⟩
+  have hmap := congrArg (Subgroup.map N.subtype) heq
+  rwa [map_subtype_conj_smul_subgroupOf n hAN, hB'def,
+    Subgroup.map_subgroupOf_eq_of_le hBN] at hmap
 
 /-! ## The Frobenius consequence of type `F` with no `τ₂`-primes -/
 
@@ -357,7 +430,140 @@ theorem non_disjoint_signalizer_frobenius [Finite G]
       exact hpβM (hσβ ▸ hpσM)
   -- ### Part 2: no prime lies in `τ₂(M)`
   have ht2M : ∀ p' : ℕ, p'.Prime → p' ∉ tau2 M := by
-    sorry
+    intro p' hp'p hp't2
+    haveI : Fact p'.Prime := ⟨hp'p⟩
+    have hp'σM : p' ∉ OddOrder.BG.Ch3.S10.sigma M := hp't2.1
+    -- Rank-2 witness `A0M ∈ ℰ_p'²(M)`: gives `p' ∈ π(M)`, `¬ idealPrime p'`.
+    obtain ⟨A0M, hA0M, hA0leM⟩ :=
+      OddOrder.BG.Ch3.S12.exists_mem_elemAbelianOfRank_two_le_of_tau2 hp'p hp't2
+    have hp'πM : p' ∈ S14.piSet M := by
+      refine Nat.mem_primeFactors.mpr ⟨hp'p, ?_, Nat.card_pos.ne'⟩
+      calc p' ∣ p' ^ 2 := dvd_pow_self p' two_ne_zero
+        _ = Nat.card ↥A0M := (mem_elemAbelianOfRank.mp hA0M).2.symm
+        _ ∣ Nat.card ↥M := Subgroup.card_dvd_of_le hA0leM
+    have hp'notideal : ¬ OddOrder.BG.Ch3.S10.idealPrime p' G :=
+      (OddOrder.BG.Ch3.S12.isMaximalElementaryAbelian_of_mem_tau2 hG hM hp'p hp't2 hA0leM hA0M).2
+    have hp'nβN : p' ∉ OddOrder.BG.Ch3.S10.beta N := fun hβ => hp'notideal hβ.2
+    have hp'odd : Odd p' := hG.odd.of_dvd_nat
+      ((Nat.mem_primeFactors.mp hp'πM).2.1.trans (Subgroup.card_subgroup_dvd_card M))
+    -- Step A: `r_{p'}(N) ≤ 1`.
+    have hrp'N : pRank ↥N p' ≤ 1 := by
+      by_contra hlt
+      rw [not_le] at hlt
+      have hp'πN : p' ∈ (Nat.card ↥N).primeFactors :=
+        OddOrder.BG.Ch2.S09.mem_primeFactors_card_of_pos_pRank (by omega)
+      by_cases hτ1 : p' ∈ tau1 N
+      · exact absurd (tau1_pRank_eq_one hτ1) (by omega)
+      by_cases hτ2 : p' ∈ tau2 N
+      · exact hp'σM (hst2NsM (Set.mem_inter hτ2 hp'πN))
+      · rcases OddOrder.BG.Ch3.S13.mem_sigma_or_tau3_of_not_tau1_tau2 hG hNmax hp'πN hτ1 hτ2 with
+          hσN | hτ3
+        · exact hp'nβN (hspM_sbN (Set.mem_inter hσN hp'πM))
+        · exact absurd (tau3_pRank_eq_one hτ3) (by omega)
+    -- Step B: an `E`-setup with `Q ≤ E`.
+    have hQ_pi : Subgroup.IsPiSubgroup ((OddOrder.BG.Ch3.S10.sigma M)ᶜ) Q := by
+      intro r hr
+      rw [hQcard, Nat.Prime.primeFactors hq_prime, Finset.mem_singleton] at hr
+      rw [hr]; exact hqσM
+    obtain ⟨E, E₁, E₂, E₃, hsetup, hQE, -⟩ :=
+      OddOrder.BG.Ch3.S12.exists_subgroupESetup_with_le hG hM hQM hQ_pi
+    -- Step C: a rank-2 `A ∈ ℰ_p'²(E)`.
+    have hA0pi : Ch03.Subgroup.IsPiGroup (tau2 M) (A0M.subgroupOf M) := by
+      intro r hr
+      rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hA0leM).toEquiv,
+        (mem_elemAbelianOfRank.mp hA0M).2, Nat.primeFactors_pow p' two_ne_zero,
+        Nat.Prime.primeFactors hp'p] at hr
+      rw [Finset.mem_singleton.mp hr]; exact hp't2
+    obtain ⟨w, -, hwle⟩ := exists_conj_smul_le_hallPiece hG hsetup hsetup.E₂_le
+      hsetup.E₂_hall (tau2_subset_sigma_compl M) hA0leM hA0pi
+    set A : Subgroup G := MulAut.conj w • A0M with hAdef
+    have hA : A ∈ elemAbelianOfRank G p' 2 := conj_smul_mem_elemAbelianOfRank w hA0M
+    have hAE : A ≤ E := hwle.trans hsetup.E₂_le
+    -- `C_G(Q) ≤ Nᵍ`.
+    have hCQNg : Subgroup.centralizer (Q : Set G) ≤ Ng := by
+      have hmem : Ng ∈ maximalSubgroupsContaining (Subgroup.centralizer (Q : Set G)) := by
+        rw [huniqNg]; rfl
+      exact (mem_maximalSubgroupsContaining.mp hmem).2
+    have hNgN : (MulAut.conj g⁻¹ • Ng : Subgroup G) = N := by
+      rw [hNgdef, ← mul_smul, ← map_mul, inv_mul_cancel, map_one, one_smul]
+    -- Step D: `[A,Q] ≠ 1` (else `A ≤ C(Q) ≤ Nᵍ` gives `r_{p'}(N) ≥ 2`).
+    have hAQ : (⁅A, Q⁆ : Subgroup G) ≠ ⊥ := by
+      intro hcomm
+      have hAcQ : A ≤ Subgroup.centralizer (Q : Set G) :=
+        Subgroup.commutator_eq_bot_iff_le_centralizer.mp hcomm
+      have hAN : (MulAut.conj g⁻¹ • A : Subgroup G) ≤ N :=
+        hNgN ▸ Subgroup.pointwise_smul_le_pointwise_smul_iff.mpr (hAcQ.trans hCQNg)
+      have hArank : (MulAut.conj g⁻¹ • A) ∈ elemAbelianOfRank G p' 2 :=
+        conj_smul_mem_elemAbelianOfRank g⁻¹ hA
+      have h2le : 2 ≤ pRank ↥N p' := by
+        have hea : ((MulAut.conj g⁻¹ • A).subgroupOf N).IsElementaryAbelian p' :=
+          IsElementaryAbelian.of_mulEquiv (Subgroup.subgroupOfEquivOfLe hAN).symm
+            (mem_elemAbelianOfRank.mp hArank).1
+        have hle := le_pRank ((MulAut.conj g⁻¹ • A).subgroupOf N) hea
+        rwa [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hAN).toEquiv,
+          (mem_elemAbelianOfRank.mp hArank).2, Nat.log_pow hp'p.one_lt] at hle
+      omega
+    have hQncA : ¬ Q ≤ Subgroup.centralizer (A : Set G) := fun h =>
+      hAQ ((Subgroup.commutator_comm A Q).trans
+        (Subgroup.commutator_eq_bot_iff_le_centralizer.mpr h))
+    -- Step E: `q ∈ τ₁(M)` (Cor 12.10(c): `q ∣ [E : C_E(A)]`, primes of that index are `τ₁`).
+    obtain ⟨-, hEN, hτ1factor⟩ :=
+      (OddOrder.BG.Ch3.S12.nilpotent_sigmaComplement_abelian hG hsetup).2.2.1 p' hp'p hp't2 A hA hAE
+    have hqidx : q ∈
+        (((E ⊓ Subgroup.centralizer (A : Set G)).subgroupOf E).index).primeFactors := by
+      set c : Subgroup G := E ⊓ Subgroup.centralizer (A : Set G) with hcdef
+      have hcE : c ≤ E := inf_le_left
+      haveI hcnorm : (c.subgroupOf E).Normal :=
+        (Subgroup.normal_subgroupOf_iff_le_normalizer hcE).mpr hEN
+      have hQ'qg : IsPGroup q ↥(Q.subgroupOf E) := by
+        rw [IsPGroup.iff_card]
+        exact ⟨1, by rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hQE).toEquiv, hQcard, pow_one]⟩
+      obtain ⟨P, hQ'P⟩ := hQ'qg.exists_le_sylow
+      have hQ'nc : ¬ (Q.subgroupOf E ≤ c.subgroupOf E) := by
+        intro hle
+        apply hQncA
+        have hQc : Q ≤ c := by
+          have hmm := Subgroup.map_mono (f := E.subtype) hle
+          rwa [Subgroup.map_subgroupOf_eq_of_le hQE, Subgroup.map_subgroupOf_eq_of_le hcE] at hmm
+        exact hQc.trans inf_le_right
+      have hPnc : ¬ (P : Subgroup ↥E) ≤ c.subgroupOf E := fun hPc => hQ'nc (hQ'P.trans hPc)
+      exact Nat.mem_primeFactors.mpr
+        ⟨hq_prime, prime_dvd_index_of_sylow_not_le_of_normal P hPnc,
+          Subgroup.index_ne_zero_of_finite⟩
+    have hqτ1 : q ∈ tau1 M := hτ1factor q hqidx
+    -- Step F: `C_{M_σ}(Q) = 1` (else `q ∈ κ(M)`, against type F).
+    have hregQ : OddOrder.BG.Ch3.S10.Msigma M ⊓ Subgroup.centralizer (Q : Set G) = ⊥ := by
+      by_contra hne
+      have hqκ : q ∈ S14.kappa M := ⟨hq_prime, Or.inl hqτ1, Q, hQelem, hQM, hne⟩
+      rw [hFM] at hqκ; exact Set.notMem_empty q hqκ
+    -- Step G: Corollary 12.9 — `A0 = [A,Q]`, `A1 = C_A(Q)`, both rank one, non-conjugate.
+    obtain ⟨⟨hA0elem, -, hA0eq, -⟩, hnconj, hA1elem, -, -⟩ :=
+      OddOrder.BG.Ch3.S12.commutator_decomp_of_tau1_action hG hsetup hp't2 hqτ1 hA hAE
+        hQelem hQE hregQ hAQ
+    -- Step H: `A0 ⊆ N`, `A1^{g⁻¹} ⊆ N`; cyclic Sylow ⟹ conjugate ⟹ contra `hnconj`.
+    have hA0N : (⁅A, Q⁆ : Subgroup G) ≤ N := by
+      rw [hA0eq]
+      refine inf_le_right.trans ((Subgroup.centralizer_le ?_).trans hNC)
+      intro z hz; rw [Set.mem_singleton_iff] at hz; rw [hz]; exact hxM.1
+    have hA0card : Nat.card ↥(⁅A, Q⁆ : Subgroup G) = p' := by
+      rw [(mem_elemAbelianOfRank.mp hA0elem).2, pow_one]
+    have hA1card : Nat.card ↥(A ⊓ Subgroup.centralizer (Q : Set G) : Subgroup G) = p' := by
+      rw [(mem_elemAbelianOfRank.mp hA1elem).2, pow_one]
+    set A1g : Subgroup G := MulAut.conj g⁻¹ • (A ⊓ Subgroup.centralizer (Q : Set G)) with hA1gdef
+    have hA1gN : A1g ≤ N :=
+      hNgN ▸ Subgroup.pointwise_smul_le_pointwise_smul_iff.mpr (inf_le_right.trans hCQNg)
+    have hA1gcard : Nat.card ↥A1g = p' := by
+      rw [hA1gdef, mulAut_smul_eq_map' (MulAut.conj g⁻¹) _,
+        Nat.card_congr (Subgroup.equivMapOfInjective _ (MulAut.conj g⁻¹ : G →* G)
+          (MulAut.conj g⁻¹).injective).symm.toEquiv, hA1card]
+    obtain ⟨n, -, hnconj_eq⟩ :=
+      exists_conj_smul_eq_of_le_of_card_prime hp'odd hrp'N hA0N hA1gN hA0card hA1gcard
+    exact hnconj ⟨g * n, by
+      calc MulAut.conj (g * n) • (⁅A, Q⁆ : Subgroup G)
+          = MulAut.conj g • (MulAut.conj n • ⁅A, Q⁆) := by rw [map_mul, mul_smul]
+        _ = MulAut.conj g • A1g := by rw [hnconj_eq]
+        _ = A ⊓ Subgroup.centralizer (Q : Set G) := by
+            rw [hA1gdef, ← mul_smul, ← map_mul, mul_inv_cancel, map_one, one_smul]⟩
   -- ### Part 3: the Frobenius conclusion
   exact ⟨hFM, ht2M,
     typeF_frobenius_of_tau2_prime_free hG hM hFM ht2M hqπM hqσM⟩
