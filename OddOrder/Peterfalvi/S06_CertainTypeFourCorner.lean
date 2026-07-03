@@ -149,7 +149,7 @@ every such conjugate has the required `A₀` form.  This is the group-theory cor
 `Supp(Ind_W^L α) ⊆ V^L ⊆ A₀`, the L-side packaging that feeds the certain-type Dade map `h.tau`. -/
 theorem coe_mem_A0_of_mem_conjugatesOfSet_toTICV (h : Hypothesis46 A L)
     {z : ↥L} (hz : z ∈ Group.conjugatesOfSet h.toTICyclicHypothesis.V) :
-    (L.subtype z) ∈ (A ∪ {g : G | ∃ l : G, l ∈ L ∧ ∃ v ∈ h.tic.V, g = l * v * l⁻¹} : Set G) := by
+    (L.subtype z) ∈ (A ∪ OddOrder.GroupTheory.conjClassSetIn L h.tic.V : Set G) := by
   obtain ⟨v, hvV, hconj⟩ := Group.mem_conjugatesOfSet_iff.mp hz
   obtain ⟨c, hc⟩ := isConj_iff.mp hconj
   have hVdef : h.toTICyclicHypothesis.V
@@ -168,7 +168,7 @@ theorem coe_mem_A0_of_mem_conjugatesOfSet_toTICV (h : Hypothesis46 A L)
       · rw [h.tic_W2] at hmem
         obtain ⟨w, hwW2, hweq⟩ := Subgroup.mem_map.mp hmem
         exact hvnW2 (L.subtype_injective hweq ▸ hwW2)
-  refine Or.inr ⟨L.subtype c, c.2, L.subtype v, hvtic, ?_⟩
+  refine Or.inr ⟨L.subtype v, hvtic, L.subtype c, c.2, ?_⟩
   rw [← hc]
   simp [map_mul, map_inv]
 
@@ -275,7 +275,7 @@ noncomputable def fourCornerDiffSupported (h : Hypothesis46 A L) [NeZero (Nat.ca
     [Invertible (Nat.card ↥(h.W1 ⊔ h.W2) : ℂ)]
     (χ₂ : (h.W2.subgroupOf (h.W1 ⊔ h.W2)) →* ℂˣ) (i : Fin (Nat.card h.W1)) :
     OddOrder.Peterfalvi.S04.SupportedClassFunctions ℂ
-      (A ∪ {g : G | ∃ l : G, l ∈ L ∧ ∃ v ∈ h.tic.V, g = l * v * l⁻¹}) L :=
+      (A ∪ OddOrder.GroupTheory.conjClassSetIn L h.tic.V) L :=
   ⟨(h.columnFamily χ₂).signedDifference i - (h.columnFamily 1).signedDifference i, by
     rw [ClassFunction.mem_supportedSubmodule]
     intro z hz
@@ -407,8 +407,8 @@ theorem fourCornerDade_apply_eq_of_mem_V (h : Hypothesis46 A L)
       = certainTypeOmegaSigma h χ₂ i v - certainTypeOmegaSigma h χ₂ 0 v
         - (certainTypeOmegaSigma h 1 i v - certainTypeOmegaSigma h 1 0 v) := by
   have hv_ticV : v ∈ h.tic.V := by rw [h.tic_V]; exact hv
-  have hvA0 : v ∈ (A ∪ {g : G | ∃ l : G, l ∈ L ∧ ∃ u ∈ h.tic.V, g = l * u * l⁻¹} : Set G) :=
-    Or.inr ⟨1, Subgroup.one_mem L, v, hv_ticV, by group⟩
+  have hvA0 : v ∈ (A ∪ OddOrder.GroupTheory.conjClassSetIn L h.tic.V : Set G) :=
+    Or.inr (OddOrder.GroupTheory.subset_conjClassSetIn hv_ticV)
   set w : h.sdiffTICyclicHypothesis.W := ticWEquivSdiffW h ⟨v, (ticVdiff h).V_subset_W hv⟩ with hw
   have hwG : ((w : ↥L) : G) = v := coe_ticWEquivSdiffW h ⟨v, (ticVdiff h).V_subset_W hv⟩
   have hwL : (w : ↥L) = ⟨v, h.dade0.mem_L hvA0⟩ := Subtype.ext hwG

@@ -97,7 +97,9 @@ Coq (1.7)(b) `cfInd_central_Inertia` の hypothesis は `abelian (T/H)` (T=I(θ)
 - [x] **Pf (1.7)/(8.2.c) 原文精読** — 設計点解決 commit `0482afa0` (abelian で十分、cyclic 不要)。
 - [x] **induction-in-stages** — **既に landed** (`S08_CaseBCoherence2.induce_induce_subgroupOf`)。cite のみ。
 - [x] **慣性商 abelian 完成** — `S14.typeF_inertia_commutator_le` (`⁅I(θ),I(θ)⁆ ≤ H`, sorry-free, cont.³)。
-- [ ] **(G1) 拡張 lemma** を build。coprime Hall (H=L_F normal Hall) の下で θ を I に拡張 (Isaacs *Character
+- [x] **✅ (G1) 拡張 lemma COMPLETE (2026-07-03)** — 下記 (v-a)〜(v-d) 全 landed で
+      `IsIrreducibleCharacter.exists_extension_of_forall_conjBy_eq` (Isaacs 8.16) が使用可能。
+      coprime Hall (H=L_F normal Hall) の下で θ を I に拡張 (Isaacs *Character
       Theory* 6.28/8.16、coprime extension via 決定行列式)。**⚠ 注意: proof は Isaacs *CT* book (=project .mmd 外)**。
       **infra build 開始 (cont.¹³-¹⁴)**: `RepresentationDeterminant.{representationDeterminant, _comp}`
       (det∘ρ : G→*ℂˣ + `det(Res χ)=Res(det χ)`, sorry-free)。
@@ -139,8 +141,12 @@ Coq (1.7)(b) `cfInd_central_Inertia` の hypothesis は `abelian (T/H)` (T=I(θ)
         `pow_index_eq_one_of_forall_coe_eq_one` ([K:H]-torsion)、
         **(c4) `extension_unique_of_not_dvd_orderOf_determinant` 完成** (p'-det-order 拡張の一意性、
         sorry-free axiom-clean)。`mul_linearClassFunction_one` (CharacterProduct)。
-        **残 = (c3) 存在** (Bézout 調整: γ:=(λ'^o)^{-A}, 1=oA+pB; β:=γ^C, 1=dC+pD; χ:=χ'·lcf β —
-        `Int.gcd_eq_gcd_ab` で Bézout 係数; zpow/pow 変換に注意) **+ (c5) o(χ)=o(φ)**。
+        **✅ (v-c) COMPLETE (2026-07-03 cont.¹⁸, commit `cab41e67`)**: (c3) 存在
+        `IsIrreducibleCharacter.exists_extension_not_dvd_orderOf_determinant` (抽象 Bézout
+        補題 `exists_mem_zpowers_pow_mul_pow_eq_one` — CommGroup で (x^o)^p=1, gcd(o,p)=gcd(d,p)=1
+        ⟹ ∃β∈zpowers(x^o), (β^d·x)^o=1 — + 11.22 拡張 χ' の det 調整 twist) + (c5)
+        `orderOf_determinant_eq_of_restrict_eq_of_not_dvd` (p ∤ o(χ) なる任意拡張で o(χ)=o(θ))。
+        全 sorry-free axiom-clean。
         **具体 bricks (cont.¹⁶ 精密化)**:
         (c1) `twistRep ρ β := y ↦ β(y)•ρ(y)` (rep instance + character = β·χ + det = β^{finrank}·det ρ
         via `LinearMap.det_smul`) — χ·lcf(β) の affording rep。
@@ -157,11 +163,17 @@ Coq (1.7)(b) `cfInd_central_Inertia` の hypothesis は `abelian (T/H)` (T=I(θ)
         (要 mul_one 型 API: lcf(trivial)=trivialClassFunction + χ·triv=χ)。
         (c5) o(χ)=o(φ) 付随 (iterate の不変量維持): o(φ) | o(χ) (restriction) + o(χ)/o(φ) | p + p'
         ⟹ =。
-        **(v-d)** iterate: K/H abelian + gcd([K:H], o(θ)θ(1))=1 ⟹ canonical 拡張。強帰納法 on [K:H]:
-        Cauchy (`exists_prime_orderOf_dvd_card`) で K/H に位数 p 部分群 → preimage N₁⊴K (abelian 商は全
-        中間群 normal) → (v-c) で canonical χ₁ → **K-invariance = uniqueness argument** (χ₁^y は θ^y=θ の
-        拡張で o 同じ → χ₁^y=χ₁; det の conj-equivariance 要) → recurse ([K:N₁]=[K:H]/p, o(χ₁)χ₁(1) =
-        o(θ)θ(1) 不変)。type-I 適用は H=L_F Hall ⟹ o(θ)θ(1) | |H| coprime [I:H] で前提充足。
+        **(v-d)** iterate: **✅ COMPLETE (2026-07-03 cont.¹⁸, commit `b7cba75f`)** —
+        `IsIrreducibleCharacter.exists_extension_of_forall_conjBy_eq` (**Isaacs CT 8.16 abelian
+        case / 6.28**): H⊴K finite, K/H abelian (`∀ x y, ⁅x,y⁆ ∈ H` 形), θ∈Irr(H) K-invariant,
+        gcd([K:H], o(θ)·θ(1))=1 ⟹ ∃χ∈Irr(K), Res_H χ = θ ∧ o(χ)=o(θ)。強帰納法 engine
+        `exists_extension_of_forall_conjBy_eq_aux` (∀-形, [H.Normal] を telescope 内 instance 束縛)。
+        設計どおり: Cauchy (minFac + `exists_prime_orderOf_dvd_card`) → N₁=comap mk' ⟨xbar⟩
+        ([N₁:H]=p は `relIndex_comap`+`relIndex_bot_left`+`Nat.card_zpowers`) → subgroupOfEquivOfLe
+        transport (`compHom_of_surjective` 既約性 + 新 `determinant_compHom`/`orderOf_monoidHom_comp_of_surjective`
+        で det order) → (v-c3) canonical χ₁ → (v-c4) uniqueness で K-invariance → recurse。
+        全 sorry-free axiom-clean, full build 3898 jobs green。
+        type-I 適用は H=L_F Hall ⟹ o(θ)θ(1) | |H| coprime [I:H] で前提充足。
 - [x] **char-product infra (Gallagher 前提)** — `RepresentationTheory/CharacterProduct.lean` (新 leaf, sorry-free,
       axiom-clean, cont.⁴): `ClassFunction` に pointwise `Mul` + `IsCharacter.mul` (χ·ψ = char of `tprod`,
       `Representation.char_tensor` 経由) + `mul_mem_ZIrr` (ZIrr は積で閉じる=部分環)。Gallagher の
@@ -187,13 +199,17 @@ Coq (1.7)(b) `cfInd_central_Inertia` の hypothesis は `abelian (T/H)` (T=I(θ)
       (cont.¹¹, sorry-free, axiom-clean): `S⊆Irr` の各 χ が `⟨φ,χ⟩=1` かつ `⟨φ,φ⟩=|S|` ⟹ `φ=∑_{χ∈S} χ`
       (Parseval `⟨φ,φ⟩=∑|⟨φ,χ⟩|²` + normSq≥0 で S 外係数消失、Fourier 展開を collapse)。任意の類関数で成立
       (ZIrr 仮説不要と判明)。「[I:H] 個 mult-1 constituents が norm² を尽くす ⟹ Ind_H^I θ = それらの和」を出す capstone。
-- [ ] **(G2) Gallagher 本体 = decomposition/bijection** — twist-既約 + lies-over + capstone は完成。残:
-      **(a) 単射/全射/[I:H] 個** (I/H abelian ⟹ Irr(I/H)=linear、count)。
-      **⚠ 真の深い blocker = extension (G1) `θ→χ∈Irr(I)`** (Isaacs 6.28 coprime、`Res_H χ=θ`): **repo に infra
-      皆無** (grep 確認、char-extension/determinant/coprime-cohomology いずれも未収録)。これが decomposition
-      `Ind_H^I θ = ∑_β χ·Inf(β)` を書くのに必須 (χ が要る)。**次の主要 frontier = extension G1 の genuine build**
-      (Isaacs 6.28 の determinant/canonical-extension route; multi-session、正面から engage)。
-      decomposition engine は extension を仮説パラメータ化して先行 build 可 (gated-endpoint)。
+- [ ] **(G2) Gallagher 本体 = decomposition/bijection** — twist-既約 + lies-over + capstone は完成。
+      **✅ (G1) extension は完結** (上記 (v-c)/(v-d)、2026-07-03) — decomposition
+      `Ind_H^I θ = ∑_β χ·Inf(β)` の χ が supply された。残 (現 frontier):
+      **(a) Frobenius 相互律** ⟨Ind_H^I θ, ψ⟩ = ⟨θ, Res ψ⟩ の在庫確認/整備 (normal case)。
+      **(b) 単射性 (coprime 形で足りる)**: β ↦ χ̃·Inf(β) injective — det 論法: χ̃β₁=χ̃β₂ ⟹ det 比較
+      (`determinant_mul_linearClassFunction`) ⟹ (β₁β₂⁻¹)^d = 1 ∧ index-torsion (β^[I:H]=1) + gcd(d,[I:H])=1
+      ⟹ β₁=β₂。FT 経路の適用 (1.7(b)) は常に Hall coprime ゆえ coprime 形で十分 (一般 Gallagher 6.17 は不要)。
+      **(c) counting**: |Irr(I/H)| = [I:H] (abelian) = `card_irreducibleCharacter_eq_card_of_commGroup` 済 →
+      |S| = [I:H]。
+      **(d) capstone 適用**: ⟨Ind θ, χ̃β⟩ = 1 (相互律 + lies-over) + ⟨Ind θ, Ind θ⟩ = [I:H]
+      (`card_mul_inner_self_induce_eq_card_inertia`, I = I(θ) 全体) → `eq_sum_of_inner_eq_one_of_inner_self_eq_card`。
 - [ ] **type-F 適用**: `typeF_inertia_commutator_le` (I(θ)/H abelian) を (G3) に投入。
 - [ ] **(1.5.a)/(1.2) 台**: 各構成要素 φ の台 ⊆ A(L)∪{1}。非実 = 奇数位数 (`not_isReal_of_ne_trivial_of_odd_card'`)。
 - [ ] `typeI_induced_char_constituents` (S14:472) を上記 cite で sorry-free 化。lane b (12.14) は cite。

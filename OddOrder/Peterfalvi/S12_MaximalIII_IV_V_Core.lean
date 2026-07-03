@@ -1156,6 +1156,55 @@ def Hypothesis.toCertainTypeHypothesis [Finite G] (hG : OddOrder.BG.IsMinimalSim
       (typePData_W1_hall_coprime hG hyp.maximal (hyp.bgTypeP hG) hyp.typeP)
     dade := hyp.dadeData.dade }
 
+open scoped FiniteInduce in
+/-- **Peterfalvi (8.15) for type `P` / the (10.1) sentence "Hypothesis (4.6) holds with `L = M`,
+`K = M'`, `A = A(M)`, `A₀ = A₀(M)`, `H = M_s`"**: the §10 `Hypothesis` instantiates the §4/§6
+Hypothesis (4.6) carrier `S06.Hypothesis46 (A(M)) M`.
+
+Field sources:
+* the (4.2) structural part and the `A`-side Dade datum: `toCertainTypeHypothesis`, with the
+  Dade hypothesis restricted from `A₀(M)` to the `M`-stable `A(M)` (`S04.Hypothesis.restrict` +
+  `le_normalizer_typePA`, as in `toHypothesis71`);
+* the ambient (3.1) TI-cyclic data (4.6.b): `typePData_toTICyclicHypothesis`, whose `W`, `W₁`,
+  `W₂`, `V = W − (W₁ ∪ W₂)` are the `TypePData` fields — the `subgroupOf`-vs-ambient matching
+  `tic_W1`/`tic_W2` is `Subgroup.map_subgroupOf_eq_of_le`, and `tic_V` is definitional;
+* (4.6.c): `H := K = M'` (the (10.1) choice `H = M_s`, which equals `M'` for types III/IV and,
+  via `U = ⊥`, also for type V), so `W₂ ≤ H ≤ K` are inherited;
+* (4.6.d): the covering `⋃_{h∈H^#} C_K(h)^# ⊆ A` is trivial for `H = K`:
+  `A(M) = (M')# = K#` (`typePA_eq_sharpSubgroup_derivedInG`) already contains every
+  nonidentity element of `K`;
+* (4.6.d)/(4.6.e): the `A₀`-side Dade datum and isometry are **definitionally** the (8.15)
+  §10 data `hyp.dadeData.dade` / its `fullDadeIsometryData`: `A(M) ∪ conjClassSetIn M tic.V`
+  unfolds to `typePA0 M` (`tic.V = typePV M` by construction) — the payoff of stating both
+  (8.10) `typePA0` and (4.6.d) with `conjClassSetIn`.
+
+This closes the instantiation gap flagged in issue 9004 and lets the §10 grid consume the §6
+(4.8)/(4.10) Dade identities (`certainType_diff_dade_eq`, `fourCorner_dade_eq`) — the `h48`/`h410`
+threads of the (11.8.3) `β`-reality argument. -/
+noncomputable def Hypothesis.toHypothesis46 [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    {M : Subgroup G} (hyp : Hypothesis M) (hodd : Odd (Nat.card G)) :
+    OddOrder.Peterfalvi.S06.Hypothesis46 (typePA M hyp.typeP) M :=
+  haveI := hyp.finiteG
+  have hnorm : ∀ (l : ↥M) ⦃a : G⦄, a ∈ typePA M hyp.typeP →
+      (↑l : G) * a * (↑l : G)⁻¹ ∈ typePA M hyp.typeP := fun l a ha =>
+    ((Subgroup.mem_set_normalizer_iff).mp (hyp.le_normalizer_typePA l.2) a).mp ha
+  { toHypothesis := (hyp.toCertainTypeHypothesis hG hodd).toHypothesis
+    dade := hyp.dadeData.dade.restrict Set.subset_union_left hnorm
+    tic := typePData_toTICyclicHypothesis hyp.typeP hodd
+    tic_W1 := (Subgroup.map_subgroupOf_eq_of_le hyp.typeP.W1_le).symm
+    tic_W2 := (Subgroup.map_subgroupOf_eq_of_le (typePData_W2_le_self hyp.typeP)).symm
+    tic_V := rfl
+    subH := (hyp.toCertainTypeHypothesis hG hodd).K
+    subH_normal := (hyp.toCertainTypeHypothesis hG hodd).K_normal
+    W2_le_subH := (hyp.toCertainTypeHypothesis hG hodd).W2_le_K
+    subH_le_K := le_refl _
+    A_covers := fun _ _ _ x hx hx1 => by
+      rw [typePA_eq_sharpSubgroup_derivedInG]
+      exact ⟨Subgroup.mem_subgroupOf.mp (Subgroup.mem_inf.mp hx).2,
+        fun h1 => hx1 (OneMemClass.coe_eq_one.mp (Set.mem_singleton_iff.mp h1))⟩
+    dade0 := hyp.dadeData.dade
+    tau := hyp.dadeData.dade.fullDadeIsometryData hyp.hconj }
+
 /-- **A finite non-perfect group has a non-trivial linear character.**  If `commutator K ≠ ⊤`
 (the abelianization `K/[K,K]` is non-trivial), there is a non-trivial degree-one irreducible
 character of `K`: a non-trivial element of `K/[K,K]` is separated by some `φ : (K/[K,K]) →* ℂˣ`

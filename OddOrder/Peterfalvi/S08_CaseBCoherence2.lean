@@ -1761,7 +1761,7 @@ noncomputable def columnConstituentDecomposition
     {η₁ : ClassFunction ↥L ℂ} {a : ℕ}
     (hμη₁supp : (OddOrder.Peterfalvi.S06.columnSum h46 χ₂ - a • η₁).support ⊆
       OddOrder.Peterfalvi.S04.supportInSubgroup
-        (sharpImage H ∪ {g : G | ∃ l : G, l ∈ L ∧ ∃ v ∈ h46.tic.V, g = l * v * l⁻¹}) L)
+        (sharpImage H ∪ OddOrder.GroupTheory.conjClassSetIn L h46.tic.V) L)
     (htau1_mema : OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap h46.dade0 h46.tau
       (OddOrder.Peterfalvi.S06.columnSum h46 χ₂ - a • η₁) ∈ ZIrr G)
     (hχψ : ClassFunction.inner (OddOrder.Peterfalvi.S06.columnSum h46 χ₂)

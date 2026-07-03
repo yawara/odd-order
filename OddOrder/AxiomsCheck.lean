@@ -6695,6 +6695,17 @@ formula together with the prime computation `coprimeFrobeniusAction_card_eq_prim
 -- (Peterfalvi (10.8) line 79).  Axiom-clean.
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S12.Hypothesis.normalizer_typePA_eq
 
+-- **Peterfalvi (8.15) for type `P` = the (10.1) "Hypothesis (4.6) holds"** (lane-a, issue 9004) —
+-- `Hypothesis.toHypothesis46`: the §10 `Hypothesis` instantiates `S06.Hypothesis46 (A(M)) M` with
+-- `K = M'`, `H = M_s = M'`, `A = A(M)`, `A₀ = A₀(M)`.  The `A₀`-side Dade datum and isometry are
+-- *definitionally* `hyp.dadeData.dade` / its `fullDadeIsometryData` (both (8.10) `typePA0` and
+-- (4.6.d) use `conjClassSetIn`); the `A`-side datum is the `restrict` along `le_normalizer_typePA`;
+-- `A_covers` is trivial for `H = K` by `A(M) = (M')#`.  First-ever instantiation of `Hypothesis46`
+-- (the carrier was latent-unsatisfiable before the issue-9004 small-V/M-conjugacy fixes).  **Not
+-- AxiomsCheck-registered**: it cites `toCertainTypeHypothesis`, whose Hall-coprimality input cites
+-- the sorried BG `theoremA_maximal_structure` / `proposition_type_classification` (honest upstream
+-- cites; no *new* sorry).
+
 -- **Peterfalvi (10.8) line-87 arithmetic** (lane-b W3, §7-estimate input) —
 -- `Hypothesis.card_typePA_div_card_lt_inv_w1`: `|A(M)|/|M| < 1/w₁`.  From `A(M) = (M')#`
 -- (`typePA_eq_sharpSubgroup_derivedInG`, `|A(M)| = |M'|−1`) and `|M| = w₁·|M'|`

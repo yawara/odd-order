@@ -282,7 +282,7 @@ theorem certainType_diff_supp_subset_A0 (h : Hypothesis46 A L)
     {z : ↥L}
     (hz : (((h.columnFamily χ₂).mu i : ClassFunction ↥L ℂ)
           - ((h.columnFamily χ₂').mu i : ClassFunction ↥L ℂ)) z ≠ 0) :
-    L.subtype z ∈ (A ∪ {g : G | ∃ l : G, l ∈ L ∧ ∃ v ∈ h.tic.V, g = l * v * l⁻¹} : Set G) := by
+    L.subtype z ∈ (A ∪ OddOrder.GroupTheory.conjClassSetIn L h.tic.V : Set G) := by
   rw [ClassFunction.sub_apply, sub_ne_zero] at hz
   by_cases hz1 : z = 1
   · exact absurd (by rw [hz1]; exact hdeg) hz
@@ -349,7 +349,7 @@ theorem certainType_diff_supp_subset_A0 (h : Hypothesis46 A L)
             have hxbot : x ∈ h.W1 ⊓ h.W2 := ⟨hxW1, hxW2⟩
             rw [disjoint_iff.mp h.W_disjoint, Subgroup.mem_bot] at hxbot
             exact hx1 hxbot
-      exact ⟨L.subtype c, c.2, L.subtype (x * y), hvV, by rw [hz_eq]; simp [map_mul, map_inv]⟩
+      exact ⟨L.subtype (x * y), hvV, L.subtype c, c.2, by rw [hz_eq]; simp [map_mul, map_inv]⟩
 
 /-- `μ_{ij} − μ_{ik}` as an element of Peterfalvi's `CF(L, A₀)` (`SupportedClassFunctions` on
 `A₀ = A ∪ V^L`), the domain element fed to the certain-type Dade isometry `τ`.  The support
@@ -362,7 +362,7 @@ noncomputable def certainTypeDiffSupported (h : Hypothesis46 A L)
     (hdeg : ((h.columnFamily χ₂).mu i : ClassFunction ↥L ℂ) 1
           = ((h.columnFamily χ₂').mu i : ClassFunction ↥L ℂ) 1) :
     OddOrder.Peterfalvi.S04.SupportedClassFunctions ℂ
-      (A ∪ {g : G | ∃ l : G, l ∈ L ∧ ∃ v ∈ h.tic.V, g = l * v * l⁻¹}) L :=
+      (A ∪ OddOrder.GroupTheory.conjClassSetIn L h.tic.V) L :=
   ⟨((h.columnFamily χ₂).mu i : ClassFunction ↥L ℂ)
       - ((h.columnFamily χ₂').mu i : ClassFunction ↥L ℂ), by
     rw [ClassFunction.mem_supportedSubmodule]
@@ -377,8 +377,8 @@ own `H`-coset, so the general `map_eq_of_mem_hCoset` applies even though the cer
 need not have trivial local subgroups. -/
 theorem tau_toDadeMap_apply_of_mem (h : Hypothesis46 A L)
     (α : OddOrder.Peterfalvi.S04.SupportedClassFunctions ℂ
-      (A ∪ {g : G | ∃ l : G, l ∈ L ∧ ∃ v ∈ h.tic.V, g = l * v * l⁻¹}) L)
-    {a : G} (ha : a ∈ (A ∪ {g : G | ∃ l : G, l ∈ L ∧ ∃ v ∈ h.tic.V, g = l * v * l⁻¹} : Set G)) :
+      (A ∪ OddOrder.GroupTheory.conjClassSetIn L h.tic.V) L)
+    {a : G} (ha : a ∈ (A ∪ OddOrder.GroupTheory.conjClassSetIn L h.tic.V : Set G)) :
     h.tau.toDadeMap α a = (α : ClassFunction ↥L ℂ) ⟨a, h.dade0.mem_L ha⟩ :=
   h.tau.toDadeIsometryData.isDadeMap.map_eq_of_mem_hCoset α ⟨a, ha⟩
     ⟨1, one_mem _, (mul_one _).symm⟩
@@ -405,8 +405,8 @@ theorem certainType_diff_dade_apply_eq_of_mem_V (h : Hypothesis46 A L)
         * (certainTypeOmegaSigma h χ₂ i v - certainTypeOmegaSigma h χ₂' i v) := by
   -- `v ∈ tic.V` (the same TI set), hence `v ∈ A₀`
   have hv_ticV : v ∈ h.tic.V := by rw [h.tic_V]; exact hv
-  have hvA0 : v ∈ (A ∪ {g : G | ∃ l : G, l ∈ L ∧ ∃ u ∈ h.tic.V, g = l * u * l⁻¹} : Set G) :=
-    Or.inr ⟨1, Subgroup.one_mem L, v, hv_ticV, by group⟩
+  have hvA0 : v ∈ (A ∪ OddOrder.GroupTheory.conjClassSetIn L h.tic.V : Set G) :=
+    Or.inr (OddOrder.GroupTheory.subset_conjClassSetIn hv_ticV)
   -- the `sdiff.W` partner `w = e v`, with `(w : L) = ⟨v, _⟩` and `(w : L) ∈ sdiff.V`
   set w : h.sdiffTICyclicHypothesis.W := ticWEquivSdiffW h ⟨v, (ticVdiff h).V_subset_W hv⟩ with hw
   have hwG : ((w : ↥L) : G) = v := coe_ticWEquivSdiffW h ⟨v, (ticVdiff h).V_subset_W hv⟩
@@ -766,7 +766,7 @@ functions.  The abstract `h.tau.toDadeMap` agrees with the *constructed* Dade ma
 genuine `ℂ`-linear `dadeLinearMap`, hence commutes with `∑`. -/
 theorem tau_toDadeMap_sum (h : Hypothesis46 A L) {ι : Type*} (s : Finset ι)
     (α : ι → OddOrder.Peterfalvi.S04.SupportedClassFunctions ℂ
-      (A ∪ {g : G | ∃ l : G, l ∈ L ∧ ∃ v ∈ h.tic.V, g = l * v * l⁻¹}) L) :
+      (A ∪ OddOrder.GroupTheory.conjClassSetIn L h.tic.V) L) :
     h.tau.toDadeMap (∑ i ∈ s, α i) = ∑ i ∈ s, h.tau.toDadeMap (α i) := by
   have hkey : h.tau.toDadeMap = h.dade0.dadeMap (k := ℂ) :=
     OddOrder.Peterfalvi.S04.IsDadeMap.unique

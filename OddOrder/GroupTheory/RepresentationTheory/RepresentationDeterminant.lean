@@ -157,6 +157,40 @@ theorem IsIrreducibleCharacter.determinant_restrict [Finite G] {H : Subgroup G}
     exact congrFun hc ((h : G))
   rw [h2, representationDeterminant_comp, IsIrreducibleCharacter.determinant_spec hχ ρ hc]
 
+/-- **Pullback compatibility**: if the pullback `χ ∘ f` of an irreducible character along a
+homomorphism `f : G' →* G` is again irreducible (e.g. for `f` surjective,
+`IsIrreducibleCharacter.compHom_of_surjective`, or a group isomorphism), then its
+determinantal character is the pullback `(det χ) ∘ f`.  Homomorphism-general form of
+`IsIrreducibleCharacter.determinant_restrict`. -/
+theorem IsIrreducibleCharacter.determinant_compHom [Finite G] {G' : Type*} [Group G']
+    [Finite G'] {χ : ClassFunction G ℂ} (hχ : IsIrreducibleCharacter χ) (f : G' →* G)
+    (hcomp : IsIrreducibleCharacter (ClassFunction.compHom f χ)) :
+    hcomp.determinant = hχ.determinant.comp f := by
+  obtain ⟨V', _, _, _, ρ, hρ, hc⟩ := id hχ
+  have h1 : ((ClassFunction.compHom f χ : ClassFunction G' ℂ) : G' → ℂ)
+      = Representation.character (ρ.comp f) := by
+    funext y
+    exact congrFun hc (f y)
+  rw [IsIrreducibleCharacter.determinant_spec hcomp (ρ.comp f) h1,
+    representationDeterminant_comp, IsIrreducibleCharacter.determinant_spec hχ ρ hc]
+
+/-- **Precomposition with a surjective homomorphism preserves the order of a homomorphism
+into a commutative monoid**: `orderOf (f ∘ e) = orderOf f` in the monoid of homomorphisms.
+With `f = det χ` and `e` a group isomorphism (a conjugation, or a subgroup-of-subgroup
+identification) this says the determinantal order `o(χ)` is invariant under transport —
+the bookkeeping of the composition-series iterate (Isaacs *CT* 8.16, issue 9002 (v-d)). -/
+theorem orderOf_monoidHom_comp_of_surjective {M M' N : Type*} [MulOneClass M] [MulOneClass M']
+    [CommMonoid N] (f : M →* N) {e : M' →* M} (he : Function.Surjective e) :
+    orderOf (f.comp e) = orderOf f := by
+  refine Nat.dvd_antisymm ?_ ?_
+  · refine orderOf_dvd_of_pow_eq_one (MonoidHom.ext fun y => ?_)
+    rw [MonoidHom.pow_apply, MonoidHom.comp_apply, ← MonoidHom.pow_apply,
+      pow_orderOf_eq_one, MonoidHom.one_apply, MonoidHom.one_apply]
+  · refine orderOf_dvd_of_pow_eq_one (MonoidHom.ext fun x => ?_)
+    obtain ⟨y, rfl⟩ := he x
+    rw [MonoidHom.pow_apply, ← MonoidHom.comp_apply f e, ← MonoidHom.pow_apply,
+      pow_orderOf_eq_one, MonoidHom.one_apply, MonoidHom.one_apply]
+
 end CharacterDeterminant
 
 end OddOrder.RepresentationTheory
