@@ -347,12 +347,12 @@ theorem certainTypeExtension_columnDiff_eq_dade (h : Hypothesis46 A L) [NeZero (
   have hdi := forall_columnFamily_mu_apply_one_eq_of_sum_eq h χ₂ χ₂' hdeg
   have hsupp : (columnSum h χ₂ - columnSum h χ₂').support ⊆
       S04.supportInSubgroup
-        (A ∪ {g : G | ∃ l : G, l ∈ L ∧ ∃ v ∈ h.tic.V, g = l * v * l⁻¹}) L :=
+        (A ∪ OddOrder.GroupTheory.conjClassSetIn L h.tic.V) L :=
     (columnDiff_support_subset h hχ₂ hχ₂' hdeg).trans
       (S04.supportInSubgroup_mono Set.subset_union_left)
   have hval : ((∑ i, certainTypeDiffSupported h hχ₂ hχ₂' i (hdi i) :
         OddOrder.Peterfalvi.S04.SupportedClassFunctions ℂ
-          (A ∪ {g : G | ∃ l : G, l ∈ L ∧ ∃ v ∈ h.tic.V, g = l * v * l⁻¹}) L) :
+          (A ∪ OddOrder.GroupTheory.conjClassSetIn L h.tic.V) L) :
         ClassFunction ↥L ℂ)
       = columnSum h χ₂ - columnSum h χ₂' := by
     rw [AddSubmonoidClass.coe_finset_sum, columnSum_def, columnSum_def, ← Finset.sum_sub_distrib]
@@ -729,7 +729,7 @@ noncomputable def certainTypeDecompositionDa (h : Hypothesis46 A L) [NeZero (Nat
       = (∑ i, ((h.columnFamily χ₂⁻¹).mu i : ClassFunction ↥L ℂ) 1))
     {η₁ : ClassFunction ↥L ℂ} {a : ℕ}
     (hμη₁supp : (columnSum h χ₂ - a • η₁).support ⊆
-      S04.supportInSubgroup (A ∪ {g : G | ∃ l : G, l ∈ L ∧ ∃ v ∈ h.tic.V, g = l * v * l⁻¹}) L)
+      S04.supportInSubgroup (A ∪ OddOrder.GroupTheory.conjClassSetIn L h.tic.V) L)
     (htau1_mema : S07.dadeIntegralCharacterMap h.dade0 h.tau (columnSum h χ₂ - a • η₁) ∈ ZIrr G)
     (hχψ : ClassFunction.inner (columnSum h χ₂) (a • η₁ : ClassFunction ↥L ℂ) = 0)
     (hχbarψ : ClassFunction.inner (columnSum h χ₂).conj (a • η₁ : ClassFunction ↥L ℂ) = 0) :
@@ -738,7 +738,7 @@ noncomputable def certainTypeDecompositionDa (h : Hypothesis46 A L) [NeZero (Nat
   have hSdiff : ∀ s ∈ ({columnSum h χ₂ - (columnSum h χ₂).conj, columnSum h χ₂ - a • η₁} :
       Set (ClassFunction ↥L ℂ)),
       s.support ⊆ S04.supportInSubgroup
-        (A ∪ {g : G | ∃ l : G, l ∈ L ∧ ∃ v ∈ h.tic.V, g = l * v * l⁻¹}) L := by
+        (A ∪ OddOrder.GroupTheory.conjClassSetIn L h.tic.V) L := by
     intro s hs
     simp only [Set.mem_insert_iff, Set.mem_singleton_iff] at hs
     rcases hs with rfl | rfl
