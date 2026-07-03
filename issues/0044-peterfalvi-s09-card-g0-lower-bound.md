@@ -316,3 +316,18 @@ the `⟨Ind1H,Ind1H⟩=e` source norm (via `induce_apply_of_mem_normal_of_const`
 1. **`Hypothesis71`-from-TI/Frobenius** = (7.1) Dade ρ-setup を TI 構造から構成 (§2/§4 Dade)。次 iteration の第一目標。issue 0045 が (7.1) を sorry-free 化済ゆえ、既存 `Hypothesis71` 補題群から constructor が組めるか要調査。
 2. coherence ((5.6)/(6.8) Sibley、induced family)。
 3. (7.8.b) `chiRhoNormSq` 下界 + (7.9) 2-family 非直交。
+
+## 2026-07-03 cont.⁴ (lane-a, /loop) — 🎯 (7.1) trunk layer DONE: Hypothesis71-from-TI wireable
+
+**Landed** (`5d3b03f3`): `Hypothesis71.of_isTISubset` — the (7.1) Dade ρ-setup **constructible from any
+TI-subset**. Key discovery: the Dade-isometry-existence machinery **already exists in S04**
+(`Hypothesis.of_isTISubset` (2.3) + `dadeMap` + `isDadeMap_dadeMap` + `HConjInvariant.of_forall_H_eq_bot`),
+so (7.1) is a genuine **wiring** of real content, NOT a from-scratch build. **7.10 trunk is more
+tractable than the "multi-week from scratch" estimate** — the Dade layer is done.
+
+**次 (tractable wiring 継続)**:
+1. `FrobeniusFamily i` → `Hypothesis71 G (H_i^#) (L_i)`: `isTI` field が `IsTISubset` を、`normalizer_eq`
+   が L=N(H) を供給。残り `hA_sharp`(H^#⊆sharp)/`hA_L`(H^#⊆L)/`hL_norm` は Frobenius から。
+2. **Hypothesis76** (induced family {Ind_H^L θ} + coherence): coherence は S08 Sibley ((6.8) sorry-free
+   per 0044) が wireable か要調査。degree-ratio/support fields は induced-char leaves (今セッション) で埋まる。
+3. (7.8.b)/(7.9)/assembly。
