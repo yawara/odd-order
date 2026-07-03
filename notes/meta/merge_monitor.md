@@ -129,6 +129,12 @@
 > `hall_*`・type-classification structural）を b が編集したら従来通り逸脱; lane a は上記 5 宣言を
 > 編集しない。恒久解 = §8 support theory 完成後に dedicated leaf（例 `S10_DadeSupport.lean`）へ
 > hub prefix-split（issue 0096 で追跡）。
+> **⟹ 2026-07-04 拡張 (ユーザー承認)**: 上記 5 宣言に加え、**§8-support consumer の proof-only
+> de-gate** も b 許容 — b が上流 (BG Theorem B 系) を sorry-free 化したとき、consumer 宣言
+> (例 `typeI_centralizer_le_and_unique` :1728, Pf 8.12.b) の **証明本体のみ**を now-sorry-free
+> upstream cite に差し替える編集は逸脱としない (条件: signature 不変 + sorry/axiom regression なし
+> + self-flag)。**statement 改変は依然 out-of-scope** (要 hub flag)。実例 = commit 94a34018 の
+> S10 de-gate (B4 full-Theorem-B → `typeP_hall_small_subgroup_cyclic_tau2`)。
 1. 各レーンの未マージ確認: `git log --oneline main..<branch>`。
    **全レーン 0 なら「変化なし」1行報告で即終了**（build を走らせない）。
 1.5. **レーン範囲逸脱チェック（ユーザー方針 2026-06-22, 永続）**: 未マージがあるレーンについて、
@@ -280,6 +286,20 @@
 
 ## 現状メモ
 
+- **2026-07-04 — tick: a(docs)/b(BG Theorem B COMPLETE) 合流 + b の S10 de-gate を hub 裁定受理 (carve-out 0096 拡張)**:
+  tick で a=`160ffec9` (docs, issue 0044 = (7.8.a) blocker 解消) → 即合流 (`9c3110b0`)。**b** = `94a34018`
+  (BG Theorem B **全 5 conjunct 完成・axiom-clean**: `theoremB_A_minus_Msigma_isTISubset` B(5) +
+  `uniqueMaximal_of_kappaSigmaCompl_element` Lemma15.1(c)一般形 + `theoremB_U_and_A_tame` faithful化
+  [conjunct1 を `p.Prime` 制限 = 旧 `∀p:ℕ` の latent unsoundness 是正] → Theorem B の standing sorry 除去)
+  +`d8e107a5` (docs)。b は consumer un-gate の一環で **S10 `typeI_centralizer_le_and_unique` (Pf 8.12.b,
+  :1728, lane-a 所有・carve-out 0096 外) の proof body を de-gate** (B4 full-Theorem-B cite →
+  `typeP_hall_small_subgroup_cyclic_tau2` 直接 cite; signature 不変・sorry/axiom regression なし・9003 で
+  self-flag)。⟹ **step 1.5 範囲逸脱を検出し STOP** (cron `c8419068` CronDelete) → **ユーザー裁定 =
+  受理 + carve-out 0096 拡張** (§8-support consumer の proof-only de-gate を b 許容、statement 改変は
+  依然 out-of-scope; 2026-07-03 の同型 S10 edit 受理と整合)。b 合流 `40cf07a9`。検証: **full build green
+  3906 jobs / AxiomsCheck OK / sorry 113→112 (−1, Theorem B gate 除去) / 新 axiom なし**。push
+  `842a1a2f..40cf07a9` (a+b)。carve-out 拡張を issue 0096 + 本マップ note に反映。**監視 cron を
+  `5801a228` で再作成し tick 復帰** (stop→resolve→resume 正規サイクル)。c は本 tick 未マージ 0。
 - **2026-07-04 (未明) — 監視ループ再開 (ユーザー指示「各レーンを監視します」) + 再開初 tick 合流 a/c**:
   停止時 cron 死亡を確認 (`CronList` = 空)、**新 cron `c8419068` を規定ペース `7,22,37,52 * * * *` で再作成**。
   再開初 tick で停止時の未マージ残を合流 (stop 時見込み a:2/c:3 は lane が `git merge main` 再同期で
