@@ -468,3 +468,22 @@ SibleyDadeHypothesis の support 座標を `of_isTISubset`/hypothesis71 に揃�
 W1/H_normal/split/W1_nontrivial ← `F.isFrobenius i`; H_nilpotent ← frobeniusKernelIsNilpotent (要 solvable 入力);
 card_L_odd ← G odd; H_sharp_ti ← `F.isTI` + coordinate lemma; dade/hconj/dade_H_eq_bot ← of_isTISubset
 (座標翻訳要); S/S_eq ← induced family; cases ← `Or.inl (F.isFrobenius i)`。次 iteration 継続。
+
+## 2026-07-03 cont.¹³ (lane-a, /loop) — 🎯🎯🎯 sibleyDadeHypothesis_of_frobenius LANDED — coherence gate crossed
+
+**Landed** (`368ff614`): `FrobeniusFamily.sibleyDadeHypothesis_of_frobenius` — SibleyDadeHypothesis
+(case c1) を Frobenius member から全 field 構成 (full build green)。
+- W1/H_normal/split/H_ne_bot/W1_nontrivial ← `IsFrobeniusGroup` (isNormal/isComplement/ne_bot_*)
+- dade/hconj/dade_H_eq_bot ← `of_isTISubset` on sharpImage coord (`sharpImage_subgroupOf_eq` で各条件を FrobeniusFamily field へ)
+- card_L_odd ← Lagrange; H_sharp_ti ← isTI+coord; S/S_eq ← induced family (rfl); cases ← Or.inl hFrob
+- 入力: hnilp (kernel nilpotency、solvable L_i から frobeniusKernelIsNilpotent)、hodd、(C, hFrob)。
+
+⟹ **`sibleySetup_is_coherent (sibleyDadeHypothesis_of_frobenius ...)` で coherence ν 入手可能**。
+当初「multi-week deep」と恐れた coherence gate は **wiring で crossed**。
+
+**残** (全て既存 machinery + wiring):
+1. ν = `(sibleySetup_is_coherent ...).extension` を抽出、`hnu_isometry` ← `IsCoherent.extension_inner_eq`、
+   `hagree` ← `extends_on_supported` → `hypothesis78OfDade` へ (座標: dade0 と CoherenceTarget の Dade map 一致確認)。
+2. `betaDecompOfDade` + `zetaNuRhoNormSq_ge_of_facts` (既存) + source facts → (7.8.b) chiRhoNormSq bound。
+3. (7.9) 𝓑-sum、assembly → `not_trivial_G0_of_exists_Bsum_bound` bypass。
+次 iteration: ν 抽出 + hypothesis78OfDade 接続。
