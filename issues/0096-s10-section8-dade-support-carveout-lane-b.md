@@ -679,3 +679,14 @@ docstring:「§4 最重要 export、§7/§9/§12/§13/§16 が直接 cite」。�
 **総括**: reusable char infra 抽出完了。残 frontier = deep multi-piece build か carrier-scaffold-gated か
 formulation-confused。**最 tractable FT-path = (12.14)** ((12.4) 経由の明確 path)。次: (12.14) の
 cross-family R-orthogonality (same-L, R(χ1)⊥R(χ2) χ1≠χ2) prerequisite を build。
+
+### loop¹³⁹ — ✅ 二族 constituent-diff 直交 landed (commit 0e7a3b94)
+
+`constituentDiff_tau_inner_eq_zero_of_ne_across` (S14、sorry-free): 同一 L・異 χ1,χ2∈S の
+φ∈S(χ1), φ'∈S(χ2) で φ≠φ'・φ≠φ̄'・φ̄≠φ' なら ⟨τ(φ-φ̄),τ(φ'-φ̄')⟩=0。既存同一-χ 版の二族一般化
+(証明同型)。build green 3871 jobs。code cadence 復帰 (assessment 3連 ¹³⁶⁻¹³⁸ 後)。
+
+**次 = 同一 L cross-family R-orthogonality** (`R(χ1)⊥R(χ2)`, χ1∉{χ2,χ̄2}):
+`toOrthonormalImage_inner_eq_zero_across` (S07:977) + 上記二族 diff 直交 + χ1∉{χ2,χ̄2}→
+disjoint constituents (partition trivIset `exists_conj_of_common_induce_constituent` ¹³⁵) から
+h2/h3 (φ≠φ̄' 等) 導出。(12.14) path の reusable 入力 + nonconjugate 版の companion。
