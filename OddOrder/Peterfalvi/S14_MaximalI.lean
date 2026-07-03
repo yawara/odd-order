@@ -272,6 +272,13 @@ structure CharacterDecompositionData {L : Subgroup G} (hyp : Hypothesis L)
     ((φ : ClassFunction ↥L ℂ) : ↥L → ℂ) 1 = ((φ' : ClassFunction ↥L ℂ) : ↥L → ℂ) 1
   /-- Each constituent is non-real, so `φ ≠ φ̄` and `φ − φ̄ ≠ 0` ((12.2.b)). -/
   not_real : ∀ φ ∈ constituents, ¬ ClassFunction.IsReal (φ : ClassFunction ↥L ℂ)
+  /-- (12.2.b): no constituent is the conjugate of another — `S(χ) ∩ conj S(χ) = ∅`.  From
+  `⟨χ, χ̄⟩ = 0`: `χ̄ ∈ S` (`Sset_closedUnderConjugate`), `χ ≠ χ̄` ((1.5.e)), distinct members
+  of `S` are orthogonal ((1.5.c)), and the decomposition is multiplicity-one, so a shared
+  irreducible between `S(χ)` and `S(χ̄) = conj S(χ)` would force `⟨χ, χ̄⟩ ≥ 1`.  Feeds the
+  cross-`φ` image distinctness of the (12.3) bar-trick descent. -/
+  conj_not_mem : ∀ φ ∈ constituents, ∀ φ' ∈ constituents,
+    (φ : ClassFunction ↥L ℂ).conj ≠ (φ' : ClassFunction ↥L ℂ)
   /-- (12.2.a): each constituent is supported in `A(L) ∪ {1}` (`H ⊄ Ker φ` (1.5.a), then (1.2)),
   so each difference `φ − φ̄` is supported in the Dade domain `A(L)`. -/
   supported : ∀ φ ∈ constituents, (φ : ClassFunction ↥L ℂ).support ⊆
@@ -415,6 +422,8 @@ theorem typeI_induced_char_constituents [Finite G] {L : Subgroup G} (hyp : Hypot
       (∀ φ ∈ S, ∀ φ' ∈ S, ((φ : ClassFunction ↥L ℂ) : ↥L → ℂ) 1
         = ((φ' : ClassFunction ↥L ℂ) : ↥L → ℂ) 1) ∧
       (∀ φ ∈ S, ¬ ClassFunction.IsReal (φ : ClassFunction ↥L ℂ)) ∧
+      (∀ φ ∈ S, ∀ φ' ∈ S,
+        (φ : ClassFunction ↥L ℂ).conj ≠ (φ' : ClassFunction ↥L ℂ)) ∧
       (∀ φ ∈ S, (φ : ClassFunction ↥L ℂ).support ⊆
         OddOrder.Peterfalvi.S04.supportInSubgroup hyp.ambientA L ∪ {1}) := by
   sorry
@@ -494,6 +503,8 @@ theorem frobenius_typeI_induced_char_constituents [Finite G]
       (∀ φ ∈ S, ∀ φ' ∈ S, ((φ : ClassFunction ↥L ℂ) : ↥L → ℂ) 1
         = ((φ' : ClassFunction ↥L ℂ) : ↥L → ℂ) 1) ∧
       (∀ φ ∈ S, ¬ ClassFunction.IsReal (φ : ClassFunction ↥L ℂ)) ∧
+      (∀ φ ∈ S, ∀ φ' ∈ S,
+        (φ : ClassFunction ↥L ℂ).conj ≠ (φ' : ClassFunction ↥L ℂ)) ∧
       (∀ φ ∈ S, (φ : ClassFunction ↥L ℂ).support ⊆
         OddOrder.Peterfalvi.S04.supportInSubgroup hyp.ambientA L ∪ {1}) := by
   classical
@@ -504,7 +515,7 @@ theorem frobenius_typeI_induced_char_constituents [Finite G]
     exact OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_subgroupOf_normal L
   obtain ⟨ξ, hξcoe, hξreal, hξsupp⟩ :=
     frobenius_induce_char_singleton hodd hfrob θ hθ_ne
-  refine ⟨{ξ}, Finset.singleton_nonempty _, ?_, ?_, ?_, ?_⟩
+  refine ⟨{ξ}, Finset.singleton_nonempty _, ?_, ?_, ?_, ?_, ?_⟩
   · rw [Finset.sum_singleton, hξcoe]
   · intro φ hφ φ' hφ'
     rw [Finset.mem_singleton] at hφ hφ'
@@ -512,6 +523,11 @@ theorem frobenius_typeI_induced_char_constituents [Finite G]
   · intro φ hφ
     rw [Finset.mem_singleton] at hφ
     rw [hφ]; exact hξreal
+  · -- `conj_not_mem`: the singleton case is exactly the non-realness `ξ̄ ≠ ξ`.
+    intro φ hφ φ' hφ'
+    rw [Finset.mem_singleton] at hφ hφ'
+    rw [hφ, hφ']
+    exact fun h => hξreal h
   · intro φ hφ
     rw [Finset.mem_singleton] at hφ
     rw [hφ]
@@ -531,8 +547,9 @@ theorem character_decomposition_and_dade_domain [Finite G]
     (_hG : OddOrder.BG.IsMinimalSimpleOdd G) {L : Subgroup G} (hyp : Hypothesis L)
     {chi : ClassFunction ↥L ℂ} (hchi : chi ∈ hyp.Sset) :
     ∃ data : CharacterDecompositionData hyp chi, data.chi_mem = hchi := by
-  obtain ⟨S, hne, hdecomp, hdeg, hreal, hsupp⟩ := typeI_induced_char_constituents hyp hchi
-  exact ⟨⟨hchi, S, hne, hdecomp, hdeg, hreal, hsupp⟩, rfl⟩
+  obtain ⟨S, hne, hdecomp, hdeg, hreal, hconjnm, hsupp⟩ :=
+    typeI_induced_char_constituents hyp hchi
+  exact ⟨⟨hchi, S, hne, hdecomp, hdeg, hreal, hconjnm, hsupp⟩, rfl⟩
 
 /-- **Peterfalvi (12.2.a) `CharacterDecompositionData` for a Frobenius type-I `L`** —
 `character_decomposition_and_dade_domain` without the (8.2.c)-gated `typeI_induced_char_constituents`
@@ -547,9 +564,9 @@ theorem frobenius_character_decomposition_and_dade_domain [Finite G]
     (hAH : hyp.ambientA = ((hyp.typeI.typeF.H) : Set G) \ {1})
     {chi : ClassFunction ↥L ℂ} (hchi : chi ∈ hyp.Sset) :
     ∃ data : CharacterDecompositionData hyp chi, data.chi_mem = hchi := by
-  obtain ⟨S, hne, hdecomp, hdeg, hreal, hsupp⟩ :=
+  obtain ⟨S, hne, hdecomp, hdeg, hreal, hconjnm, hsupp⟩ :=
     frobenius_typeI_induced_char_constituents hG hyp hfrob hAH hchi
-  exact ⟨⟨hchi, S, hne, hdecomp, hdeg, hreal, hsupp⟩, rfl⟩
+  exact ⟨⟨hchi, S, hne, hdecomp, hdeg, hreal, hconjnm, hsupp⟩, rfl⟩
 
 /-! ## (12.2.b): the orthonormal Dade-image families `R₁(φ)` and `R(χ)` -/
 
@@ -879,22 +896,277 @@ theorem constituent_fullDiff_inner_zero_of_disjoint {L1 L2 : Subgroup G} [Finite
       (Sset_diff_tau_support_subset_ftThickenedA1 hyp2 data2) hdisj)
 
 open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
+/-- **The Dade `τ` commutes with complex conjugation on `A(L)`-supported functions** — the
+coefficientwise form of `S07.dadeIntegralCharacterMap_mapRingEquiv_comm` (the map's value at a
+Dade-support point is an evaluation, and `0` elsewhere, so conjugating coefficients commutes).
+The τ/conj commutation input of the (12.3) bar-trick ((5.9.b) via
+`CharacterDifferenceImage.nu_eq_mu_conj`). -/
+theorem tau_conj_of_supported {L : Subgroup G} [Finite G] (hyp : Hypothesis L)
+    {f : ClassFunction ↥L ℂ}
+    (hf : f.support ⊆ OddOrder.Peterfalvi.S04.supportInSubgroup hyp.ambientA L) :
+    hyp.tau f.conj = (hyp.tau f).conj := by
+  haveI := hyp.finiteG
+  have h1 : f.conj = ClassFunction.mapRingEquiv Complex.conjAe.toRingEquiv f := by
+    ext g
+    rw [ClassFunction.conj_apply, ClassFunction.mapRingEquiv_apply]
+    rfl
+  have h2 : (hyp.tau f).conj
+      = ClassFunction.mapRingEquiv Complex.conjAe.toRingEquiv (hyp.tau f) := by
+    ext g
+    rw [ClassFunction.conj_apply, ClassFunction.mapRingEquiv_apply]
+    rfl
+  rw [h1, h2]
+  exact OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap_mapRingEquiv_comm
+    hyp.dadeData.dade _ _ hf
+
+open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
+/-- **(12.2.b) conjugate pairing of the difference-image block `R₁(φ)`**: `ν_φ = μ̄_φ`, so
+`(φ − φ̄)^τ = ε·(μ_φ − μ̄_φ)`.  The (5.9.b) pairing `CharacterDifferenceImage.nu_eq_mu_conj`,
+with the τ/conj commutation supplied by `tau_conj_of_supported` on the `A(L)`-supported
+difference (`constituentDiff_support_subset`). -/
+theorem R1cdi_nu_eq_mu_conj {L : Subgroup G} [Finite G] {hyp : Hypothesis L}
+    {chi : ClassFunction ↥L ℂ} (data : CharacterDecompositionData hyp chi)
+    {φ : IrreducibleCharacter ↥L} (hφ : φ ∈ data.constituents) :
+    (R1cdi data hφ).nuClassFunction = (R1cdi data hφ).muClassFunction.conj := by
+  haveI := hyp.finiteG
+  exact OddOrder.Peterfalvi.S07.CharacterDifferenceImage.nu_eq_mu_conj _
+    (tau_conj_of_supported hyp (constituentDiff_support_subset data hφ))
+
+open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
+/-- **(12.2.b) cross-constituent image orthogonality**: for distinct constituents `φ ≠ φ'` of
+one `χ ∈ S`, the images `(φ−φ̄)^τ` and `(φ'−φ̄')^τ` are orthogonal.  The Dade isometry
+(`dadeIntegralCharacterMap_inner_eq_on_supported_span`) reduces to the `L`-side pairing
+`⟨φ−φ̄, φ'−φ̄'⟩`, where the four irreducibles are pairwise distinct: `φ ≠ φ'` is given,
+conjugation is injective, and `φ̄ ≠ φ'`, `φ ≠ φ̄'` are `data.conj_not_mem` — so all four
+`Irr L` deltas vanish. -/
+theorem constituentDiff_tau_inner_eq_zero_of_ne {L : Subgroup G} [Finite G]
+    {hyp : Hypothesis L} {chi : ClassFunction ↥L ℂ}
+    (data : CharacterDecompositionData hyp chi)
+    {φ φ' : IrreducibleCharacter ↥L} (hφ : φ ∈ data.constituents)
+    (hφ' : φ' ∈ data.constituents) (hne : φ ≠ φ') :
+    ClassFunction.inner
+        (hyp.tau ((φ : ClassFunction ↥L ℂ) - (φ : ClassFunction ↥L ℂ).conj))
+        (hyp.tau ((φ' : ClassFunction ↥L ℂ) - (φ' : ClassFunction ↥L ℂ).conj)) = 0 := by
+  haveI := hyp.finiteG
+  classical
+  -- The two differences form a supported generating family.
+  have hSsupp : ∀ s ∈ ({((φ : ClassFunction ↥L ℂ) - (φ : ClassFunction ↥L ℂ).conj),
+      ((φ' : ClassFunction ↥L ℂ) - (φ' : ClassFunction ↥L ℂ).conj)} :
+        Set (ClassFunction ↥L ℂ)), s.support ⊆
+      OddOrder.Peterfalvi.S04.supportInSubgroup hyp.ambientA L := by
+    intro s hs
+    rcases hs with rfl | hs
+    · exact constituentDiff_support_subset data hφ
+    · rw [Set.mem_singleton_iff] at hs
+      subst hs
+      exact constituentDiff_support_subset data hφ'
+  -- The Dade isometry transports the pairing to `L`.
+  refine Eq.trans (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap_inner_eq_on_supported_span
+    hyp.dadeData.dade hyp.hconj hSsupp
+    (Submodule.subset_span (Set.mem_insert _ _))
+    (Submodule.subset_span (Set.mem_insert_of_mem _ rfl))) ?_
+  -- `L`-side: expand into four `Irr L` deltas, all off-diagonal.
+  have hcross : ∀ a c : IrreducibleCharacter ↥L,
+      ClassFunction.inner (a : ClassFunction ↥L ℂ) (c : ClassFunction ↥L ℂ) =
+        if a = c then (1 : ℂ) else 0 :=
+    fun a c => OddOrder.RepresentationTheory.irreducibleCharacter_inner a c
+  have h2 : φ ≠ OddOrder.Peterfalvi.S07.conjIrreducibleCharacter (L := ↥L) φ' := by
+    intro h
+    exact data.conj_not_mem φ' hφ' φ hφ
+      (congrArg (fun c : IrreducibleCharacter ↥L => (c : ClassFunction ↥L ℂ)) h).symm
+  have h3 : OddOrder.Peterfalvi.S07.conjIrreducibleCharacter (L := ↥L) φ ≠ φ' := by
+    intro h
+    exact data.conj_not_mem φ hφ φ' hφ'
+      (congrArg (fun c : IrreducibleCharacter ↥L => (c : ClassFunction ↥L ℂ)) h)
+  have h4 : OddOrder.Peterfalvi.S07.conjIrreducibleCharacter (L := ↥L) φ
+      ≠ OddOrder.Peterfalvi.S07.conjIrreducibleCharacter (L := ↥L) φ' := by
+    intro h
+    have hcf := congrArg (fun c : IrreducibleCharacter ↥L => (c : ClassFunction ↥L ℂ)) h
+    simp only [OddOrder.Peterfalvi.S07.coe_conjIrreducibleCharacter] at hcf
+    exact hne (IrreducibleCharacter.ext
+      (by rw [← ClassFunction.conj_conj (φ : ClassFunction ↥L ℂ), hcf,
+        ClassFunction.conj_conj]))
+  rw [ClassFunction.inner_sub_left, ClassFunction.inner_sub_right,
+    ClassFunction.inner_sub_right,
+    ← OddOrder.Peterfalvi.S07.coe_conjIrreducibleCharacter (L := ↥L) φ,
+    ← OddOrder.Peterfalvi.S07.coe_conjIrreducibleCharacter (L := ↥L) φ',
+    hcross φ φ', hcross φ _, hcross _ φ', hcross _ _,
+    if_neg hne, if_neg h2, if_neg h3, if_neg h4]
+  norm_num
+
+open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
+open OddOrder.Peterfalvi.S07.CharacterDifferenceImage in
+/-- **The (12.3) bar-trick descent, one-sided core.**  If `Ã(L₁) ∩ Ã₁(L₂) = ∅` ((8.18.c)),
+each `L₁`-constituent image is orthogonal to each `L₂`-constituent image.
+
+Peterfalvi's (12.3) argument: with `X = (χ₂−χ̄₂)^{τ₂}`, the support disjointness gives
+`⟨(φ₁−φ̄₁)^{τ₁}, X⟩ = 0` (`constituent_fullDiff_inner_zero_of_disjoint`); writing
+`(φ₁−φ̄₁)^{τ₁} = ε·(μ₁ − μ̄₁)` ((5.9.b), `R1cdi_nu_eq_mu_conj`) and using `X̄ = −X`
+(`tau_conj_of_supported`) plus the integrality of the Fourier coefficients of `X ∈ ℤ[Irr G]`
+(`mem_ZIrr_inner_int`) yields `⟨μ₁, X⟩ = ⟨μ̄₁, X⟩ = −conj ⟨μ₁, X⟩ = −⟨μ₁, X⟩`, so
+`⟨μ₁, X⟩ = 0`.  Expanding `X = ∑_{φ∈S(χ₂)} (φ−φ̄)^{τ₂}`, the cross-`φ` block orthogonality
+(`constituentDiff_tau_inner_eq_zero_of_ne` + the (4.1) member lemma) lets `μ₁` pair
+nontrivially with at most one block, so every single summand `⟨μ₁, (φ₂−φ̄₂)^{τ₂}⟩` vanishes,
+not just the sum — and likewise for `ν₁ = μ̄₁`. -/
+theorem constituent_diffImage_inner_zero_of_disjoint {L1 L2 : Subgroup G} [Finite G]
+    (hyp1 : Hypothesis L1) (hyp2 : Hypothesis L2)
+    (hdisj : Disjoint (OddOrder.Peterfalvi.S10.ftThickenedSupport L1 (typeIA L1 hyp1.typeI))
+      (OddOrder.Peterfalvi.S10.ftThickenedSupport L2 (A1 L2 PeterfalviType.I)))
+    {chi1 : ClassFunction ↥L1 ℂ} (data1 : CharacterDecompositionData hyp1 chi1)
+    {φ1 : IrreducibleCharacter ↥L1} (hφ1 : φ1 ∈ data1.constituents)
+    {chi2 : ClassFunction ↥L2 ℂ} (data2 : CharacterDecompositionData hyp2 chi2)
+    {φ2 : IrreducibleCharacter ↥L2} (hφ2 : φ2 ∈ data2.constituents) :
+    ClassFunction.inner
+        (hyp1.tau ((φ1 : ClassFunction ↥L1 ℂ) - (φ1 : ClassFunction ↥L1 ℂ).conj))
+        (hyp2.tau ((φ2 : ClassFunction ↥L2 ℂ) - (φ2 : ClassFunction ↥L2 ℂ).conj)) = 0 := by
+  haveI := hyp1.finiteG
+  classical
+  set X : ClassFunction G ℂ := hyp2.tau (chi2 - chi2.conj) with hX
+  -- (a) `χ₂ − χ̄₂ = ∑_{φ∈S(χ₂)} (φ − φ̄)`, hence `X = ∑ (φ−φ̄)^{τ₂}` and `X ∈ ℤ[Irr G]`.
+  have hdiff_eq : chi2 - chi2.conj = ∑ φ ∈ data2.constituents,
+      ((φ : ClassFunction ↥L2 ℂ) - (φ : ClassFunction ↥L2 ℂ).conj) := by
+    have hconj : (∑ φ ∈ data2.constituents, (φ : ClassFunction ↥L2 ℂ)).conj
+        = ∑ φ ∈ data2.constituents, (φ : ClassFunction ↥L2 ℂ).conj := by
+      ext g
+      rw [ClassFunction.conj_apply, classFunction_sum_apply, classFunction_sum_apply, star_sum]
+      exact Finset.sum_congr rfl fun φ _ => by rw [ClassFunction.conj_apply]
+    conv_lhs => rw [data2.decomp]
+    rw [hconj, ← Finset.sum_sub_distrib]
+  have hXsum : X = ∑ φ ∈ data2.constituents,
+      hyp2.tau ((φ : ClassFunction ↥L2 ℂ) - (φ : ClassFunction ↥L2 ℂ).conj) := by
+    rw [hX, hdiff_eq, map_sum]
+  have hfsupp : (chi2 - chi2.conj).support ⊆
+      OddOrder.Peterfalvi.S04.supportInSubgroup hyp2.ambientA L2 := by
+    rw [hdiff_eq]
+    intro x hx
+    rw [ClassFunction.mem_support, classFunction_sum_apply] at hx
+    obtain ⟨φ, hφm, hne0⟩ := Finset.exists_ne_zero_of_sum_ne_zero hx
+    exact constituentDiff_support_subset data2 hφm (ClassFunction.mem_support.mpr hne0)
+  have hXZIrr : X ∈ OddOrder.RepresentationTheory.ZIrr G := by
+    rw [hX]
+    refine OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap_mem_ZIrr_of_supported
+      hyp2.dadeData.dade hyp2.hconj hfsupp ?_
+    rw [hdiff_eq]
+    exact Submodule.sum_mem _ fun φ _ => Submodule.sub_mem _ φ.mem_ZIrr
+      (OddOrder.Peterfalvi.S07.conjIrreducibleCharacter (L := ↥L2) φ).mem_ZIrr
+  -- (b) `⟨a, X⟩` is real for every irreducible `a` (integer Fourier coefficient).
+  have hreal : ∀ a : IrreducibleCharacter G,
+      star (ClassFunction.inner (a : ClassFunction G ℂ) X)
+        = ClassFunction.inner (a : ClassFunction G ℂ) X := by
+    intro a
+    obtain ⟨m, hm⟩ := OddOrder.RepresentationTheory.mem_ZIrr_inner_int a hXZIrr
+    rw [OddOrder.RepresentationTheory.inner_conj_symm X (a : ClassFunction G ℂ), hm,
+      star_star, star_intCast]
+  -- (c) `X̄ = −X` (τ₂ commutes with conjugation on the supported difference).
+  have hXconj : X.conj = -X := by
+    rw [hX, ← tau_conj_of_supported hyp2 hfsupp, ClassFunction.conj_sub,
+      ClassFunction.conj_conj, ← neg_sub, map_neg]
+  -- (d) the bar-trick: `⟨μ₁, X⟩ = ⟨ν₁, X⟩ = 0`.
+  have hfull : ClassFunction.inner
+      (hyp1.tau ((φ1 : ClassFunction ↥L1 ℂ) - (φ1 : ClassFunction ↥L1 ℂ).conj)) X = 0 :=
+    constituent_fullDiff_inner_zero_of_disjoint hyp1 hyp2 hdisj data1 hφ1 data2
+  rw [(R1cdi data1 hφ1).image_eq_signedDifference] at hfull
+  simp only [OddOrder.Peterfalvi.S07.CharacterDifferenceImage.signedDifference,
+    OddOrder.Peterfalvi.S07.CharacterDifferenceImage.difference] at hfull
+  rw [← Int.cast_smul_eq_zsmul ℂ, ClassFunction.inner_smul_left,
+    ClassFunction.inner_sub_left] at hfull
+  have hs1 : (((R1cdi data1 hφ1).sign : ℤ) : ℂ) ≠ 0 :=
+    Int.cast_ne_zero.mpr (R1cdi data1 hφ1).sign_ne_zero
+  have heq : ClassFunction.inner ((R1cdi data1 hφ1).muClassFunction) X
+      = ClassFunction.inner ((R1cdi data1 hφ1).nuClassFunction) X :=
+    sub_eq_zero.mp ((mul_eq_zero.mp hfull).resolve_left hs1)
+  have hnux : ClassFunction.inner ((R1cdi data1 hφ1).nuClassFunction) X
+      = -star (ClassFunction.inner ((R1cdi data1 hφ1).muClassFunction) X) := by
+    rw [R1cdi_nu_eq_mu_conj data1 hφ1]
+    conv_lhs => rw [← ClassFunction.conj_conj X]
+    rw [OddOrder.RepresentationTheory.inner_conj_conj, hXconj,
+      ClassFunction.inner_neg_right, star_neg]
+  have hmux : ClassFunction.inner ((R1cdi data1 hφ1).muClassFunction) X = 0 := by
+    have h1 : ClassFunction.inner ((R1cdi data1 hφ1).muClassFunction) X
+        = -(ClassFunction.inner ((R1cdi data1 hφ1).muClassFunction) X) := by
+      conv_lhs => rw [heq, hnux, hreal (R1cdi data1 hφ1).mu]
+    linear_combination h1 / 2
+  have hnux0 : ClassFunction.inner ((R1cdi data1 hφ1).nuClassFunction) X = 0 :=
+    heq.symm.trans hmux
+  -- (e) descent: an irreducible orthogonal to `X` is orthogonal to the `φ₂`-summand.
+  have hcrossG : ∀ a c : IrreducibleCharacter G,
+      ClassFunction.inner (a : ClassFunction G ℂ) (c : ClassFunction G ℂ) =
+        if a = c then (1 : ℂ) else 0 :=
+    fun a c => OddOrder.RepresentationTheory.irreducibleCharacter_inner a c
+  have hdescend : ∀ a : IrreducibleCharacter G,
+      ClassFunction.inner (a : ClassFunction G ℂ) X = 0 →
+      ClassFunction.inner (a : ClassFunction G ℂ)
+        (hyp2.tau ((φ2 : ClassFunction ↥L2 ℂ) - (φ2 : ClassFunction ↥L2 ℂ).conj)) = 0 := by
+    intro a haX
+    by_contra ht2
+    -- a nonzero pairing with the block of `φ'` puts `a` in its two-element image set.
+    have hmem : ∀ φ' (hm : φ' ∈ data2.constituents),
+        ClassFunction.inner (a : ClassFunction G ℂ)
+          (hyp2.tau ((φ' : ClassFunction ↥L2 ℂ) - (φ' : ClassFunction ↥L2 ℂ).conj)) ≠ 0 →
+        (a : ClassFunction G ℂ) ∈ (R1cdi data2 hm).imageSet := by
+      intro φ' hm hne0
+      rw [(R1cdi data2 hm).image_eq_signedDifference] at hne0
+      simp only [OddOrder.Peterfalvi.S07.CharacterDifferenceImage.signedDifference,
+        OddOrder.Peterfalvi.S07.CharacterDifferenceImage.difference] at hne0
+      rw [← Int.cast_smul_eq_zsmul ℂ, OddOrder.RepresentationTheory.inner_smul_right,
+        ClassFunction.inner_sub_right] at hne0
+      have hsub : ClassFunction.inner (a : ClassFunction G ℂ)
+            ((R1cdi data2 hm).muClassFunction)
+          - ClassFunction.inner (a : ClassFunction G ℂ)
+            ((R1cdi data2 hm).nuClassFunction) ≠ 0 :=
+        fun h => hne0 (by rw [h, mul_zero])
+      rw [OddOrder.Peterfalvi.S07.CharacterDifferenceImage.mem_imageSet_iff]
+      by_cases hc1 : a = (R1cdi data2 hm).mu
+      · exact Or.inl (congrArg (fun c : IrreducibleCharacter G =>
+          (c : ClassFunction G ℂ)) hc1)
+      by_cases hc2 : a = (R1cdi data2 hm).nu
+      · exact Or.inr (congrArg (fun c : IrreducibleCharacter G =>
+          (c : ClassFunction G ℂ)) hc2)
+      exfalso
+      exact hsub (by rw [hcrossG a _, hcrossG a _, if_neg hc1, if_neg hc2, sub_zero])
+    have hmem2 := hmem φ2 hφ2 ht2
+    have hothers : ∀ φ' ∈ data2.constituents, φ' ≠ φ2 →
+        ClassFunction.inner (a : ClassFunction G ℂ)
+          (hyp2.tau ((φ' : ClassFunction ↥L2 ℂ) - (φ' : ClassFunction ↥L2 ℂ).conj)) = 0 := by
+      intro φ' hm' hne'
+      by_contra htne'
+      have hmem' := hmem φ' hm' htne'
+      have hsd : ClassFunction.inner ((R1cdi data2 hm').signedDifference)
+          ((R1cdi data2 hφ2).signedDifference) = 0 := by
+        rw [← (R1cdi data2 hm').image_eq_signedDifference,
+          ← (R1cdi data2 hφ2).image_eq_signedDifference]
+        exact constituentDiff_tau_inner_eq_zero_of_ne data2 hm' hφ2 hne'
+      have hcontra := inner_eq_zero_of_signedDifference_inner_zero_of_mem
+        (R1cdi data2 hm') (R1cdi data2 hφ2) hsd hmem' hmem2
+      rw [hcrossG a a, if_pos rfl] at hcontra
+      exact one_ne_zero hcontra
+    have hsum0 : ∑ φ' ∈ data2.constituents,
+        ClassFunction.inner (a : ClassFunction G ℂ)
+          (hyp2.tau ((φ' : ClassFunction ↥L2 ℂ) - (φ' : ClassFunction ↥L2 ℂ).conj)) = 0 := by
+      rw [← OddOrder.RepresentationTheory.inner_sum_right, ← hXsum]
+      exact haX
+    rw [Finset.sum_eq_single_of_mem φ2 hφ2 hothers] at hsum0
+    exact ht2 hsum0
+  -- (f) conclude: expand `(φ₁−φ̄₁)^{τ₁} = ε·(μ₁ − ν₁)` and apply the two descents.
+  rw [(R1cdi data1 hφ1).image_eq_signedDifference]
+  simp only [OddOrder.Peterfalvi.S07.CharacterDifferenceImage.signedDifference,
+    OddOrder.Peterfalvi.S07.CharacterDifferenceImage.difference]
+  rw [← Int.cast_smul_eq_zsmul ℂ, ClassFunction.inner_smul_left,
+    ClassFunction.inner_sub_left, hdescend (R1cdi data1 hφ1).mu hmux,
+    hdescend (R1cdi data1 hφ1).nu hnux0, sub_zero, mul_zero]
+
+open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
 /-- **Peterfalvi (8.18.c) difference-image orthogonality** (the geometric obligation of (12.3)).
 For non-conjugate type-I maximals `L1, L2` and constituents `φ_i`, the Dade difference images
 `τ_i(φ_i − φ̄_i)` are orthogonal.
 
-**Support side now genuine** (2026-07-02, issue 0096): the mixed asymmetric
-`Ã(L₁) ∩ Ã₁(L₂) = ∅ ∨ swap` is `nonconjugate_thickened_mixed_disjoint_or_swap` (S10 (8.18.c),
-three §16 pins), the full-member image is `Ã₁`-supported
-(`Sset_diff_tau_support_subset_ftThickenedA1`, the (2.11) restriction) and the constituent image
-is `Ã`-supported, so `⟨(φ₁−φ̄₁)^{τ₁}, (χ₂−χ̄₂)^{τ₂}⟩ = 0` (or the swap) holds
-(`constituent_fullDiff_inner_zero_of_disjoint`).  **Remaining: the (12.3) bar-trick**, descending
-from the full-member vanishing to the per-constituent one: `(φ₁−φ̄₁)^{τ₁} = α − ᾱ` with
-`α ∈ R₁(φ₁)`; `⟨α−ᾱ, X⟩ = 0` with `X = (χ₂−χ̄₂)^{τ₂}` plus the integrality of `⟨α, X⟩` give
-`⟨α, X⟩ = 0`; the members of `R(χ₂)` have pairwise-distinct underlying irreducibles, so the
-single potentially-nonzero term of `⟨α, X⟩ = ∑_{β∈R(χ₂)} ⟨α, β⟩` vanishes — in particular
-`⟨α, β⟩ = 0` for `β ∈ R₁(φ₂)`, which sums to this statement.  Hub issue 9003 Cluster B. -/
+**Genuine proof** (2026-07-03, loop¹⁰⁰): the mixed asymmetric `Ã(L₁) ∩ Ã₁(L₂) = ∅ ∨ swap` is
+`nonconjugate_thickened_mixed_disjoint_or_swap` (S10 (8.18.c), three §16 pins); on the
+disjoint side the bar-trick descent `constituent_diffImage_inner_zero_of_disjoint` closes the
+per-constituent orthogonality, and the swap side follows by conjugate symmetry of the inner
+product.  Hub issue 9003 Cluster B. -/
 theorem nonconjugate_diffImage_inner_zero {L1 L2 : Subgroup G} [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     (hyp1 : Hypothesis L1) (hyp2 : Hypothesis L2)
     (hnot_conj : ¬ ∃ g : G, MulAut.conj g • L1 = L2)
     {chi1 : ClassFunction ↥L1 ℂ} (data1 : CharacterDecompositionData hyp1 chi1)
@@ -904,7 +1176,14 @@ theorem nonconjugate_diffImage_inner_zero {L1 L2 : Subgroup G} [Finite G]
     ClassFunction.inner
         (hyp1.tau ((φ1 : ClassFunction ↥L1 ℂ) - (φ1 : ClassFunction ↥L1 ℂ).conj))
         (hyp2.tau ((φ2 : ClassFunction ↥L2 ℂ) - (φ2 : ClassFunction ↥L2 ℂ).conj)) = 0 := by
-  sorry
+  haveI := hyp1.finiteG
+  rcases nonconjugate_thickened_mixed_disjoint_or_swap hG hyp1 hyp2 hnot_conj with h | h
+  · exact constituent_diffImage_inner_zero_of_disjoint hyp1 hyp2 h data1 hφ1 data2 hφ2
+  · have hswap := constituent_diffImage_inner_zero_of_disjoint hyp2 hyp1 h data2 hφ2 data1 hφ1
+    rw [OddOrder.RepresentationTheory.inner_conj_symm
+        (hyp2.tau ((φ2 : ClassFunction ↥L2 ℂ) - (φ2 : ClassFunction ↥L2 ℂ).conj))
+        (hyp1.tau ((φ1 : ClassFunction ↥L1 ℂ) - (φ1 : ClassFunction ↥L1 ℂ).conj)),
+      hswap, star_zero]
 
 open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
 /-- **Peterfalvi (12.3)**: for non-conjugate type-I maximal subgroups `L₁, L₂`, the families
@@ -917,7 +1196,7 @@ differences `⟨(φ₁−φ̄₁)^{τ₁}, (φ₂−φ̄₂)^{τ₂}⟩ = 0` (`i
 obligation `nonconjugate_diffImage_inner_zero` ((8.18.c): the supports lie in disjoint `Ã(L₁)`,
 `Ã₁(L₂)`). -/
 theorem nonconjugate_typeI_R_orthogonal {L1 L2 : Subgroup G} [Finite G]
-    (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     (hyp1 : Hypothesis L1) (hyp2 : Hypothesis L2)
     (hnot_conj : ¬ ∃ g : G, MulAut.conj g • L1 = L2)
     {chi1 : ClassFunction ↥L1 ℂ} (data1 : CharacterDecompositionData hyp1 chi1)
@@ -931,7 +1210,7 @@ theorem nonconjugate_typeI_R_orthogonal {L1 L2 : Subgroup G} [Finite G]
   rw [← OddOrder.Peterfalvi.S07.CharacterDifferenceImage.image_eq_signedDifference
         (R1cdi data1 hφ1),
     ← OddOrder.Peterfalvi.S07.CharacterDifferenceImage.image_eq_signedDifference (R1cdi data2 hφ2)]
-  exact nonconjugate_diffImage_inner_zero hyp1 hyp2 hnot_conj data1 hφ1 data2 hφ2
+  exact nonconjugate_diffImage_inner_zero hG hyp1 hyp2 hnot_conj data1 hφ1 data2 hφ2
 
 /-- **Difference-uniqueness for signed irreducible-character differences** (Peterfalvi §3, the
 reconciliation core of (1.4)).  If two *signed* differences of distinct irreducible characters
@@ -3432,8 +3711,9 @@ The textbook proof **case-splits** on the type-I trichotomy `Definition (8.3)` (
 single-`sibleyTarget_frobI` proof was unsound (issue 2032).  This assembly carries no `sorry` of its
 own.  Cases (b) `frobenius_typeI_coherent_of_abelianKernel` and (c)
 `frobenius_typeI_coherent_of_cyclicQuotient` are now `sorry`-free; the only residual gap is in case
-(a) `sibleyTarget_frobI`, whose (6.8) route transitively cites the (8.18.c) geometric obligation
-`nonconjugate_diffImage_inner_zero` (§10 thickened-support). -/
+(a), the sorried (6.8) target `sibleyTarget_frobI` (the (8.18.c) obligation
+`nonconjugate_diffImage_inner_zero` itself is proven since the (12.3) bar-trick descent,
+2026-07-03). -/
 theorem frobenius_typeI_coherent [Finite G]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) {L : Subgroup G}
     (hyp : Hypothesis L)
@@ -5966,7 +6246,10 @@ end OddOrder.Peterfalvi.S14
 #print axioms OddOrder.Peterfalvi.S14.fixed_conjClass_eq_one_of_typeF
 #print axioms OddOrder.Peterfalvi.S14.coherent_extension_mem_span_imageFamily
 #print axioms OddOrder.Peterfalvi.S14.coherent_extension_constituent_mem_span_Rset
+#print axioms OddOrder.Peterfalvi.S14.constituent_diffImage_inner_zero_of_disjoint
 -- `coherent_extension_constituent_orthogonal_Rset_of_nonconjugate` is sorry-free in its own body
--- but transitively cites `nonconjugate_typeI_R_orthogonal` (12.3), whose geometric obligation
--- `nonconjugate_diffImage_inner_zero` (8.18.c, §10 thickened-support) is the one remaining sorry;
--- so it is intentionally *not* in the axiom-clean block above (would show `sorryAx`).
+-- but transitively cites `nonconjugate_typeI_R_orthogonal` (12.3).  The (12.3) bar-trick descent
+-- (`constituent_diffImage_inner_zero_of_disjoint`, axiom-clean, 2026-07-03) closed the geometric
+-- obligation `nonconjugate_diffImage_inner_zero`; its residual transitive `sorryAx` comes from the
+-- §10 (8.18.c)/(8.15) support pins (§16-gated) and the (12.2.a) constituent obligation
+-- `typeI_induced_char_constituents` ((8.2.c)); so it stays *out* of the axiom-clean block above.

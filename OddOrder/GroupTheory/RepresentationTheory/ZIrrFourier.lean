@@ -6,6 +6,7 @@ Authors: Yawara Ishida
 import Mathlib.Algebra.Module.NatInt
 import Mathlib.LinearAlgebra.Finsupp.LinearCombination
 import OddOrder.GroupTheory.RepresentationTheory.RowOrthogonality
+import OddOrder.GroupTheory.RepresentationTheory.IsReal
 
 /-!
 # Fourier coefficients of virtual characters
@@ -150,6 +151,21 @@ theorem inner_conj_symm (φ ψ : ClassFunction G ℂ) :
     rw [ClassFunction.innerSum, ClassFunction.innerSum, star_sum]
     refine Finset.sum_congr rfl fun g _ => ?_
     rw [star_mul', star_star, mul_comm]
+  have hcard : star (⅟(Nat.card G : ℂ)) = ⅟(Nat.card G : ℂ) := by
+    rw [show (⅟(Nat.card G : ℂ)) = ((Nat.card G : ℂ))⁻¹ from invOf_eq_inv _,
+      star_inv₀, Complex.star_def, Complex.conj_natCast]
+  rw [ClassFunction.inner, ClassFunction.inner, hsum, star_mul', hcard]
+
+omit [Finite G] in
+/-- **Conjugation invariance of `ClassFunction.inner`:** `⟨φ̄, ψ̄⟩ = conj ⟨φ, ψ⟩`.
+Conjugating both arguments conjugates the unscaled sum termwise, and the normalizing
+factor `⅟|G|` is real. -/
+theorem inner_conj_conj (φ ψ : ClassFunction G ℂ) :
+    ClassFunction.inner φ.conj ψ.conj = star (ClassFunction.inner φ ψ) := by
+  have hsum : ClassFunction.innerSum φ.conj ψ.conj = star (ClassFunction.innerSum φ ψ) := by
+    rw [ClassFunction.innerSum, ClassFunction.innerSum, star_sum]
+    refine Finset.sum_congr rfl fun g _ => ?_
+    simp only [ClassFunction.conj_apply, star_mul', star_star]
   have hcard : star (⅟(Nat.card G : ℂ)) = ⅟(Nat.card G : ℂ) := by
     rw [show (⅟(Nat.card G : ℂ)) = ((Nat.card G : ℂ))⁻¹ from invOf_eq_inv _,
       star_inv₀, Complex.star_def, Complex.conj_natCast]
