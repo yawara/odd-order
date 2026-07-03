@@ -7084,3 +7084,17 @@ three precise §16 pins ((8.13.b) `escaping_typeIA_mem_A1`, (8.12.b)
 coset by the power argument), and `ftThickenedSupport_mixed_disjoint_of_nonconjugate` ((8.18.c):
 two-sided support forces `orderOf x' ∣ gcd = 1`).  Axiom checks record the pin-gating. -/
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S10.mem_zpowers_mul_right_of_coprime
+
+/-! **BG Lemma 14.13(a)** (`S16_Lemma1413`, lane β, issue 9003 loop¹⁰³).  The signalizer
+non-disjointness lemma `non_disjoint_signalizer_frobenius` — for `x ∈ M_σ^#` with `1 < |𝓜_σ(x)|`
+and `σ(N[x]) ∩ π(M) ≠ ∅`, `M` is type `F` with no `τ₂`-primes and Frobenius over `M_σ` — is
+**fully proved and axiom-clean**, closing the last Peterfalvi §8 type-I support pin (the
+(8.13.c2) cross-coprimality core `escaping_sigma_disjoint_centralizer` in S10).  Assembled from:
+the type-`F`/no-`τ₂` Frobenius consequence (`typeF_frobenius_of_tau2_prime_free`), the reduction
+(13.9 non-conjugacy, Cor 12.14 `ℳ(C(Q))={Nᵍ}`, 12.1(g) `p∉β(M)`), the no-`τ₂` core (Cor 12.9
+`commutator_decomp_of_tau1_action` + `exists_conj_smul_eq_of_le_of_card_prime` cyclic-Sylow
+conjugacy), and the type-`P₁` core (`kstar_isHall_sigmaM_of_partner` = Coq `Ptype_embedding`'s
+`sMhallKs`, via 14.2(f) `typeP_sigma_subgroup_le_Msigma` + σ-disjoint commutator). -/
+#assert_only_allowed_axioms OddOrder.BG.Ch4.S16.non_disjoint_signalizer_frobenius
+#assert_only_allowed_axioms OddOrder.BG.Ch4.S16.kstar_isHall_sigmaM_of_partner
+#assert_only_allowed_axioms OddOrder.BG.Ch4.S16.exists_conj_smul_eq_of_le_of_card_prime
