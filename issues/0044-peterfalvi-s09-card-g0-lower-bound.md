@@ -288,3 +288,20 @@ cite してよい (再構築しない)。
 **次 iteration**: `hypothesis76_of_frobenius` 系の constructor に着手 (Ind_H^L θ family + coherence)。
 これは (7.8.a/b)/(7.9) を abstract で attack するより上流の genuine foundation。既存の abstract 層
 scaffold (constructor 群) は Ind-carrying な具体構成が完成すれば consumer になる。
+
+## 2026-07-03 cont.² (lane-a, /loop) — first foundation block landed; 7.10 = multi-week construction
+
+**Landed** (`692a8ba4`): `induce_inner_trivial` (`⟨Ind_H^G θ,1_G⟩=⟨θ,1_H⟩`, RepTheory base file) — the
+first genuine building block: gives `⟨ζ_i,1_L⟩=0` for θ_i≠1, source input to `orth_one`.
+
+**⚠ 進捗の透明性 (feedback-flag-poor-progress)**: 7.10 は **multi-week の §6-7 foundation** と確定。
+全 constructor 層は最終的に (7.7)/(7.8.b)/(7.9) の char 内容 + (7.1)/(7.4) の Dade ρ-setup を要求。
+induced-char 算術 (degree `induce_apply_one`・vanishing・reciprocity `inner_induce_eq_inner_restrict`・
+今回 `induce_inner_trivial`) は**既存/整備済**だが、深い trunk は未着手:
+- **Hypothesis71-from-TI** ((7.1) Dade ρ-setup を TI/Frobenius から構成) = §2/§4 Dade 機構。
+- **coherence** (induced family `{Ind_H^L θ}` の (5.6)/(6.8) Sibley coherence) = §5-6。
+- **(7.8.b) `chiRhoNormSq` 下界** + **(7.9) 2-family 非直交**。
+
+**次 block 候補** (leaf 先行, 上流 trunk へ): `⟨Ind_H^L 1_H, Ind_H^L 1_H⟩=[L:H]=e` (`⟨Ind1H,Ind1H⟩=e`
+source fact; reciprocity + normal-H Mackey `Res_H Ind_H^L 1 = e•1_H`)、その後 Hypothesis71-from-TI trunk。
+/loop は 1 iteration = 1 genuine block で漸進中 (scaffold 追加はしない = doneness)。
