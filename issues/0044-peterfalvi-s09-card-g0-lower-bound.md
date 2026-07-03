@@ -684,3 +684,20 @@ complementIndex/kernelOrder = |L|/|H|, |H| の対応)。χ = coh.extension (Ind 
 - **min-index i** 選択 + **hG0sum** (χ signed irr ⟹ `one_le_G0_norm_sum_of_signed_irreducible`)。
 - これら + exists_chiRhoNormSq_ge の χ を `characterEstimateData_of_family71_reduced_estimates_of_signed_irreducible`
   へ。χ = νζ_0 ∈ ZIrr かつ norm-1 ⟹ signed irr (5.9.a)。
+
+## 2026-07-04 cont.²² (lane-a, /loop) — hgood core: chiRhoNormSq_ge_ratio_of_inner_beta_ne_zero
+
+**Landed** (S09_FrobeniusEstimate.lean、sorry-free、H78-level 一般 lemma):
+- `chiRhoNormSq_ge_ratio_of_inner_beta_ne_zero`: χ ∈ Irr G が S^ν に直交 (`hχ_orth`) かつ (β,χ)≠0
+  (`hbeta_ne`、χ は (7.8.a) β の constituent) ならば **`|A|/|L| ≤ ‖χ^ρ‖²`**。証明 = (7.8.c.ii)
+  `chiRho_norm_sq_eq_card_ratio_mul` (‖χ^ρ‖² = (|A|/|L|)·(β,χ)·(β,χ)‾) + (β,χ)∈ℤ
+  (`inner_mem_ZIrr_int`、β∈ZIrr via `beta_mem_ZIrr_of_sourceDiff_mem_ZIrr`、χ∈Irr) ⟹ |(β,χ)|²≥1 ⟹
+  (|A|/|L|)·m² ≥ |A|/|L| (ratio≥0)。**hgood の数学的核**を honest に isolate。
+
+これで hgood = `(h_j−1)/(e_j h_j) ≤ P.chiRhoNormSq χ j` は (a) `card_kernel_sharp_div_card_L_eq_h_sub_one_div_e_mul_h`
+(ratio = (h−1)/(eh)) + (b) 本 lemma (ratio ≤ ‖χ^ρ‖²) に帰着。残る caller 責務 = **χ=νζ_0 が member j
+(≠i) で S^ν_j ⊥ かつ (β_j,χ)≠0** の cross-member coherence 事実 (これが (7.10) の深部)。
+
+**残チェーン**: hgood の cross-member 事実 (χ⊥S^ν_j + β_j constituent) → hgood 完成 → (7.9) 𝓑-sum →
+min-index + hG0sum (signed irr) → `characterEstimateData_of_family71_reduced_estimates_of_signed_irreducible`
+→ card_G0_lower_bound。cont.²³ は cross-member orthogonality/constituent の調査 (textbook 7.9-7.10 + coq PF7)。

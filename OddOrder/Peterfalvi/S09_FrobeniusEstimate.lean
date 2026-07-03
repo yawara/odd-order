@@ -116,6 +116,46 @@ theorem chiRho_apply_of_trivial_local {G : Type*} [Group G] {A : Set G} {L : Sub
   rw [Finset.sum_congr rfl (fun x _ => hval x), Finset.sum_const, Finset.card_univ,
     ← Nat.card_eq_fintype_card, nsmul_eq_mul, ← mul_assoc, inv_mul_cancel₀ hne, one_mul]
 
+/-- **The good-index norm lower bound** (Peterfalvi (7.10), the `hgood` core).  For `χ ∈ Irr G`
+orthogonal to `S^ν` with `(β, χ) ≠ 0` (`χ` is a constituent of the (7.8.a) `β`), the (7.8.c.ii)
+formula `‖χ^ρ‖² = (|A|/|L|)·(β,χ)·(β,χ)‾` together with integrality `(β,χ) ∈ ℤ` (`β ∈ ℤ[Irr]`,
+`χ ∈ Irr`) gives `|(β,χ)|² ≥ 1`, hence `|A|/|L| ≤ ‖χ^ρ‖²`.  This is the per-good-member estimate
+`hgood` of the (7.10) `characterEstimateData` assembly. -/
+theorem chiRhoNormSq_ge_ratio_of_inner_beta_ne_zero {G : Type*} [Group G] [Fintype G]
+    {A : Set G} {L : Subgroup G} [Fintype ↥L] [Invertible (Nat.card ↥L : ℂ)]
+    [Invertible (Nat.card G : ℂ)] (H78 : Hypothesis78 G A L)
+    (χ : ClassFunction G ℂ) (hχ_irr : IsIrreducibleCharacter χ)
+    (hχ_orth : ∀ i : Fin (H78.hyp76.n + 1), i ≠ H78.ind1H →
+      ClassFunction.inner χ (H78.nu (H78.hyp76.zeta i)) = 0)
+    (hdiffZ : H78.hyp76.zeta H78.ind1H - H78.hyp76.zeta H78.zetaDistinct ∈ ZIrr L)
+    (hbeta_ne : ClassFunction.inner H78.beta χ ≠ 0) :
+    (Nat.card A : ℝ) / (Nat.card ↥L : ℝ)
+      ≤ (ClassFunction.inner (H78.hyp76.hyp71.chiRhoCF χ) (H78.hyp76.hyp71.chiRhoCF χ)).re := by
+  have heq := H78.chiRho_norm_sq_eq_card_ratio_mul χ hχ_irr hχ_orth
+  obtain ⟨m, hm⟩ := ClassFunction.inner_mem_ZIrr_int
+    (H78.beta_mem_ZIrr_of_sourceDiff_mem_ZIrr hdiffZ) hχ_irr.mem_ZIrr
+  have hβχ : ClassFunction.inner H78.beta χ = (m : ℂ) := hm
+  have hm_ne : m ≠ 0 := by
+    intro h0
+    apply hbeta_ne
+    rw [hβχ, h0, Int.cast_zero]
+  -- `‖χ^ρ‖² = (|A|/|L|)·m²`, a real number.
+  have hstar : star ((m : ℤ) : ℂ) = ((m : ℤ) : ℂ) := by simp
+  have hRHS : ((Nat.card A : ℂ) / (Nat.card ↥L : ℂ)) *
+        (ClassFunction.inner H78.beta χ * star (ClassFunction.inner H78.beta χ))
+      = (((Nat.card A : ℝ) / (Nat.card ↥L : ℝ) * (m : ℝ) ^ 2 : ℝ) : ℂ) := by
+    rw [hβχ, hstar]
+    push_cast
+    ring
+  rw [heq, hRHS, Complex.ofReal_re]
+  -- `|A|/|L| ≤ |A|/|L| · m²`, since `|A|/|L| ≥ 0` and `m² ≥ 1`.
+  have hratio_nonneg : (0 : ℝ) ≤ (Nat.card A : ℝ) / (Nat.card ↥L : ℝ) := by positivity
+  have hm2 : (1 : ℝ) ≤ (m : ℝ) ^ 2 := by
+    have h1 : (1 : ℤ) ≤ |m| := Int.one_le_abs hm_ne
+    have h2 : (1 : ℝ) ≤ |(m : ℝ)| := by exact_mod_cast h1
+    nlinarith [sq_abs (m : ℝ), abs_nonneg (m : ℝ)]
+  nlinarith [hratio_nonneg, hm2]
+
 namespace FrobeniusFamily
 
 variable {G : Type*} [Group G] {k : ℕ}
