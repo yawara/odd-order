@@ -125,6 +125,17 @@ def conjByMulEquiv (g : G) : H ≃* H where
     (conjByMulEquiv (G := G) (H := H) g h : G) = g * (h : G) * g⁻¹ :=
   rfl
 
+@[simp] theorem conjByMulEquiv_one (h : H) :
+    conjByMulEquiv (G := G) (H := H) (1 : G) h = h :=
+  Subtype.ext (by simp)
+
+/-- Conjugation automorphisms compose like a left action:
+`conj_{g₁} ∘ conj_{g₂} = conj_{g₁ g₂}`. -/
+theorem conjByMulEquiv_mul (g₁ g₂ : G) (h : H) :
+    conjByMulEquiv (G := G) (H := H) g₁ (conjByMulEquiv (G := G) (H := H) g₂ h)
+      = conjByMulEquiv (G := G) (H := H) (g₁ * g₂) h :=
+  Subtype.ext (by simp only [conjByMulEquiv_apply]; group)
+
 @[simp] theorem conjBy_one (θ : ClassFunction ↥H k) : conjBy (1 : G) θ = θ := by
   ext h
   simp

@@ -41,6 +41,15 @@ instance instMul : Mul (ClassFunction G k) where
 
 @[simp] theorem mul_apply (φ ψ : ClassFunction G k) (g : G) : (φ * ψ) g = φ g * ψ g := rfl
 
+/-- **Twisting by the trivial linear character is the identity**: `χ · lcf(1) = χ`.  The
+degenerate case of the extension classification (`β = 1` forces `χ₂ = χ₁`, issue 9002
+(v-c4)). -/
+@[simp] theorem mul_linearClassFunction_one (χ : ClassFunction G ℂ) :
+    χ * linearClassFunction (1 : G →* ℂˣ) = χ := by
+  ext y
+  rw [mul_apply, linearClassFunction_apply]
+  simp
+
 /-- Restriction to a subgroup is multiplicative for the pointwise product. -/
 @[simp] theorem restrict_mul (H : Subgroup G) (φ ψ : ClassFunction G k) :
     restrict H (φ * ψ) = restrict H φ * restrict H ψ := by
