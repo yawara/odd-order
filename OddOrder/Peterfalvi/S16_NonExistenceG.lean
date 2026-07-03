@@ -4505,6 +4505,23 @@ theorem base_Q_isTI [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
   exact OddOrder.BG.Ch4.S16.maxNilpotentNormalHall_sharp_isTISubset_of_fittingIsTI hG
     hyp.base.T_maximal (OddOrder.Peterfalvi.S15.fittingIsTI_T hG hyp.base hTII)
 
+/-- **Peterfalvi §13 `normalizer_V` (the `W`-exceptional-set normalizer)**: every nonempty
+`X ⊆ W − (W₁ ∪ W₂)` has `N_G(X) = W`.  Read off the S-side type-`P` data `Sdata.normalizer_V`
+((8.8) `W = W₁ × W₂` cyclic-TI structure), reconciled to the base `W`/`W₁`/`W₂`
+(`Sdata_W1_eq`/`Sdata_W2_eq`, `W_eq_join`).  Supplies the `W_normalizer_V` field of `MHypothesis`. -/
+theorem base_W_normalizer_V (hyp : Hypothesis (G := G)) :
+    ∀ X : Set G, X.Nonempty →
+      X ⊆ (hyp.base.W : Set G) \ ((hyp.base.W1 : Set G) ∪ (hyp.base.W2 : Set G)) →
+      Subgroup.normalizer X = hyp.base.W := by
+  have hWeq : hyp.base.Sdata.W = hyp.base.W := by
+    rw [hyp.base.Sdata.W_eq, hyp.base.Sdata_W1_eq, hyp.base.Sdata_W2_eq]
+    exact hyp.base.W_eq_join.symm
+  intro X hX hXsub
+  rw [← hWeq]
+  refine hyp.base.Sdata.normalizer_V X hX ?_
+  rw [hWeq, hyp.base.Sdata_W1_eq, hyp.base.Sdata_W2_eq]
+  exact hXsub
+
 open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
 open OddOrder.Peterfalvi.S09 in
 open OddOrder.Peterfalvi.S09.Cert in
