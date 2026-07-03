@@ -305,9 +305,14 @@ def typePA (M : Subgroup G) (_data : TypePData M) : Set G :=
 def typePV (M : Subgroup G) (data : TypePData M) : Set G :=
   (data.W : Set G) \ ((data.W1 : Set G) ∪ (data.W2 : Set G))
 
-/-- Peterfalvi (8.10), `A_0(M) = A(M) union V^G` for type `P` data. -/
+/-- Peterfalvi (8.10), `A_0(M) = A(M) ∪ V^M` for type `P` data.
+
+The exceptional part is the **`M`-conjugacy** closure `V^M = conjClassSetIn M (typePV M data)`
+(Coq `class_support V L`), *not* the `G`-closure `conjClassSet`: the Dade hypothesis (8.15)
+requires `A_0(M) ⊆ M`, and the `G`-closure of the nonempty `V` cannot lie in the proper `M`
+(its normal closure would be a nontrivial proper normal subgroup, contradicting simplicity). -/
 def typePA0 (M : Subgroup G) (data : TypePData M) : Set G :=
-  typePA M data ∪ conjClassSet (typePV M data)
+  typePA M data ∪ conjClassSetIn M (typePV M data)
 
 /-- **The type-`P` support is the sharp of the derived subgroup**: `A(M) = (M')#`.
 

@@ -6680,18 +6680,19 @@ formula together with the prime computation `coprimeFrobeniusAction_card_eq_prim
 #assert_only_allowed_axioms OddOrder.GroupTheory.typePA_eq_sharpSubgroup_derivedInG
 
 -- **`𝒞_G(T)` conjugation-invariance** (shared `GroupTheory`) — `mem_conjClassSet_conj_iff`:
--- `g * h * g⁻¹ ∈ 𝒞_G(T) ↔ h ∈ 𝒞_G(T)`, i.e. `N_G(𝒞_G(T)) = G`.  Pure group theory.  Used to prove
--- the (8.16) normalizer fact below (the `V^G` half of `A_0(M) = A(M) ∪ V^G`).  Axiom-clean.
+-- `g * h * g⁻¹ ∈ 𝒞_G(T) ↔ h ∈ 𝒞_G(T)`, i.e. `N_G(𝒞_G(T)) = G`.  Pure group theory (used by the
+-- BG §14/§16 counting and the (10.8) TI-counting).  Axiom-clean.
 #assert_only_allowed_axioms OddOrder.GroupTheory.mem_conjClassSet_conj_iff
 
 -- **Peterfalvi (8.16) for the type-`P` support `A(M)`** (lane-b W3, §7-input prerequisite) —
--- `Hypothesis.normalizer_typePA_eq`: `N_G(A(M)) = M` for the genuine (10.1) `Hypothesis`.  From the
--- carried `N_G(A_0(M)) = M` (`hyp.dadeData.normalizer_eq`, `A_0(M) = A(M) ∪ V^G`): `A(M) =
--- centralizerSupport (M#) M'` is `M`-invariant (`derivedInG_pointwise_smul` /
--- `conj_smul_eq_self_of_mem` / `image_sharpSubgroup`) and `V^G = 𝒞_G(V)` is conjugation-invariant
--- under all of `G` (`mem_conjClassSet_conj_iff`), so `N_G(A(M)) ⊆ N_G(A_0(M)) = M ⊆ N_G(A(M))`.
--- Pure group theory; discharges the formerly-parametrized `hN` of the §7 inputs
--- `toHypothesis71` / `toFamilyHypothesis71` (Peterfalvi (10.8) line 79).  Axiom-clean.
+-- `Hypothesis.normalizer_typePA_eq`: `N_G(A(M)) = M` for the genuine (10.1) `Hypothesis` under
+-- `hG : IsMinimalSimpleOdd G`.  `M ≤ N_G(A(M))` is the `M`-invariance `le_normalizer_typePA`
+-- (`derivedInG_pointwise_smul` / `conj_smul_eq_self_of_mem` / `image_sharpSubgroup`); conversely
+-- `A(M) = (M')#` (`typePA_eq_sharpSubgroup_derivedInG`) makes a set-normalizer of `A(M)` normalize
+-- `M'`, and `N_G(M')` contains the maximal `M`, so it is `M` or `G` — `G` would make the
+-- nontrivial `M' ≤ M < G` normal, contradicting simplicity.  The `M`-invariance half discharges
+-- the formerly-parametrized `hN` of the §7 inputs `toHypothesis71` / `toFamilyHypothesis71`
+-- (Peterfalvi (10.8) line 79).  Axiom-clean.
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S12.Hypothesis.normalizer_typePA_eq
 
 -- **Peterfalvi (10.8) line-87 arithmetic** (lane-b W3, §7-estimate input) —
