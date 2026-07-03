@@ -91,6 +91,23 @@ noncomputable def sibleyDadeHypothesis_of_frobenius [Fintype G] [Invertible (Nat
     S_eq := rfl
     cases := Or.inl hFrob }
 
+/-- **The Peterfalvi (6.8) coherence for the `i`-th Frobenius member** — the coherent extension `ν`.
+Applies the sorry-free (6.8) capstone `sibleySetup_is_coherent` to
+`sibleyDadeHypothesis_of_frobenius`, producing an `IsCoherent` for the induced family
+`S = {Ind_{H_i}^{L_i} θ | θ ≠ 1}` relative to the real Dade map.  Its `.extension` is Peterfalvi's
+`ν`; `extension_inner_eq` gives the isometry and `extends_on_supported` the Dade agreement — the
+inputs the (7.8.b)/(7.9) estimates of `card_G0_lower_bound` consume. -/
+noncomputable def coherence [Fintype G] [Invertible (Nat.card G : ℂ)]
+    (F : FrobeniusFamily G k) (i : Fin k) (hodd : Odd (Nat.card G))
+    [Fintype ↥(F.L i)] [Invertible (Nat.card ↥(F.L i) : ℂ)]
+    [Invertible (Nat.card ↥((F.H i).subgroupOf (F.L i)) : ℂ)]
+    (hnilp : Group.IsNilpotent ↥((F.H i).subgroupOf (F.L i)))
+    (C : Subgroup ↥(F.L i))
+    (hFrob : OddOrder.Isaacs.Ch06.IsFrobeniusGroup ↥(F.L i) ((F.H i).subgroupOf (F.L i)) C) :
+    (F.sibleyDadeHypothesis_of_frobenius i hodd hnilp C hFrob).CoherenceTarget :=
+  OddOrder.Peterfalvi.S08.sibleySetup_is_coherent
+    (F.sibleyDadeHypothesis_of_frobenius i hodd hnilp C hFrob)
+
 end FrobeniusFamily
 
 end OddOrder.Peterfalvi.S09
