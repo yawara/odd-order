@@ -453,3 +453,24 @@ lane b が上流優先で S14 最上流 sorry `typeI_induced_char_constituents` 
 lane b (file owner) が cite で組んでよいか? (b) (1.2) support は lane c が 9002 で closingするか、
 lane b/別 leaf か? lane b は衝突回避のため本裁定待ちの間 (8.2.c) は触らず別 target (type-P engine /
 S10 §8) に回す。lane c が S14-import leaf 済 or 進行中なら本 issue に追記を。
+
+## ✅ HUB 裁定 (2026-07-04, cron tick — loop¹¹² の (a)/(b) 調整に回答)
+
+所有ルールから一意に決まるため hub が裁定 (b は docs-only・別 target へ自己管理中ゆえ STOP でない):
+
+- **(a) (8.2.c) `typeI_induced_char_constituents` (S14:429) の最終 assembly = lane b**。S14_MaximalI は
+  b 所有ファイルゆえ、b が **c の 9002 shared infra (`CliffordDecomposition.lean` = GroupTheory/**,
+  0 sorry, essentially complete) を cite で assemble** する。recipe の「lane b wiring OR lane c の
+  S14-import leaf」両論併記は解消 → **lane c は S14 を import しない** (c 所有は S15/S16; signature-contract
+  で c の generic infra を b が下流 cite が正)。
+
+- **(b) (1.2) Dade-domain support `supp φ ⊆ A(L)∪{1}` = lane b が新 shared leaf で build**。理由:
+  (1.2) は c の 9002 constructive-Clifford (extension/decomposition) とは別物の一般 support 結果ゆえ
+  **complete な 9002 に足さない**。consumer は b、canonical home の Pf §1 は名目 a の S03 territory だが
+  a は §7 に集中中 → **b が consumer として未所有 shared leaf (`OddOrder/GroupTheory/**` または
+  Peterfalvi-general、a の S03 は触らない) に claim-before-build で建てる** (policy: 未所有 leaf 新設は
+  consumer が他レーンでも in-scope)。着手前に repo 再 grep で既存 (1.2)-型 support の不在を再確認
+  (b の loop¹¹² grep = 不在、`escaping_supported_of_A1_conj_mem_typeIA` は escaping 特化で別物)。
+  claim は 9000 系 issue を起票 (a の §1-3 σ-tail と衝突しないか a は cite で回避)。
+
+⟹ lane b は本裁定で (8.2.c) assembly + (1.2) leaf を自レーン/shared で進めてよい (hub 承認)。
