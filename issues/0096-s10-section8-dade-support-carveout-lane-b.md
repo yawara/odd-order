@@ -659,3 +659,23 @@ reusable infra (induce vanishing + partition trivIset) は抽出済・type-I cha
 **決定: (12.5) hβconst に集中** (最多 infra 済 + upstream-most)。o_rpsi_S = horth (ψ⊥R on G) →
 Res_L ψ の S-係数構造 の reconciliation を sustained build。orphan だが CLAUDE.md 上 skip 理由でなく、
 infra 蓄積が最も進んでいる。次: o_rpsi_S の concrete build 着手。
+
+### loop¹³⁸ — ★ Dade reciprocity 存在確認 (loop¹³⁷ 訂正) + lane-b frontier 網羅評価
+
+**★ 訂正: Dade reciprocity は存在** (loop¹³⁷「invDade 欠如」は誤り、grep 名違い):
+`adjoint_formula` (S04:3894) = ⟨τα, χ⟩_G = ⟨α, ρχ⟩_L (ρχ = `adjointAverageFun` S04:3866)。
+docstring:「§4 最重要 export、§7/§9/§12/§13/§16 が直接 cite」。∴ ρ-based 論法 (o_rpsi_S 等) は
+既存 infra で可能。from-scratch invDade build 不要。
+
+**lane-b S14 frontier 網羅評価** (全 target の性質確定):
+- (12.5) rho_constant: orphan + formulation 混乱 (stub psi は G 上だが真の (12.5) は ρψ=adjointAverageFun ψ on L)
+  + deep o_rpsi_S/DpsiH。**reusable infra 抽出済** (induce vanishing ¹³² + partition trivIset ¹³⁵)。
+- (12.14) psi_constant_on_xK (consumed 3): (12.4) 経由、dade.psi⊥R + cross-family 直交 + coset 構造要。
+- (12.15) rhoM_integer_values (consumed 1): **dade.rhoMFormula = free Prop (scaffold carrier)** → arbitrary dade で
+  unprovable。genuine carrier 構成 gated (S11 §9 keystone 型)。
+- (12.11) (consumed 4): deep group theory (support facts + Cauchy/Sylow)。
+- (12.10) witness_L_*: hub 9003 pinned。
+
+**総括**: reusable char infra 抽出完了。残 frontier = deep multi-piece build か carrier-scaffold-gated か
+formulation-confused。**最 tractable FT-path = (12.14)** ((12.4) 経由の明確 path)。次: (12.14) の
+cross-family R-orthogonality (same-L, R(χ1)⊥R(χ2) χ1≠χ2) prerequisite を build。
