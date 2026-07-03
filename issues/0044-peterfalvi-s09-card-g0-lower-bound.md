@@ -431,3 +431,25 @@ BetaDecomp → NormEstimates chain が始まらない。
 **推奨**: coherence ν の (5.6) 構成は独立した focused effort (multi-iteration/session 級)。次 iteration は
 S07 coherentPair/coherentPairChain engine が {Ind_H^L θ} に適用可能かの精査から (適用可なら wireable、
 不可なら (5.6) を Frobenius induced family 向けに実証する新規 deep work)。
+
+## 2026-07-03 cont.¹¹ (lane-a, /loop) — 🎯🎯 coherence ν は WIREABLE (cont.¹⁰ 評価を revise)
+
+**cont.¹⁰ の「ν = deep (5.6) from-scratch」評価は誤り**。`S08_CoherenceTheorems.sibleySetup_is_coherent`
+(**sorry-free**) が `SibleyDadeHypothesis G L H` から `CoherenceTarget` = **`IsCoherent`** (= ν の実体) を
+`S = {Ind_H^L θ | θ∈Irr H, θ≠1}` に対して生成する。しかも構造の docstring が明言: **Frobenius case (c1) の
+SibleyDadeHypothesis producer は「§9 (7.10) application」= まさに本 issue** (「(4.6)-construction obligation を
+SibleyDadeHypothesis producer に移した」)。
+
+⟹ **ν は wiring で入手可能** (deep from-scratch でない):
+1. `SibleyDadeHypothesis G (F.L i) ((F.H i).subgroupOf (F.L i))` を Frobenius case で構成
+   (fields: W1/H_normal/split/W1_nontrivial ← `F.isFrobenius i`; H_nilpotent ← Thompson (Isaacs Ch6);
+    card_L_odd ← G odd; H_sharp_ti ← `F.isTI`; dade/hconj/dade_H_eq_bot ← `of_isTISubset` (=hypothesis71 の dade);
+    S/S_eq ← induced family; cases ← `Or.inl (F.isFrobenius i の IsFrobeniusGroup)`)。
+2. `sibleySetup_is_coherent` → `IsCoherent`、`.extension` = ν。
+3. `hnu_isometry` ← `IsCoherent.extension_inner_eq`、`hagree` ← `extends_on_supported` → `hypothesis78OfDade` へ。
+4. その後 `betaDecompOfDade` + `zetaNuRhoNormSq_ge_of_facts` (既存) + 今 session の source facts で (7.8.b)、
+   (7.9)、assembly。
+
+**⟹ 7.10 全体が wiring/既存 machinery で finishable** (SibleyDadeHypothesis 構成 = 最大の残作業、~12 field
+の substantial だが tractable constructor)。次 iteration: 新 leaf で `sibleyDadeHypothesis_of_frobenius` (c1)
+の構成に着手 (H_nilpotent の Thompson + sharpImage 座標合わせが要点)。
