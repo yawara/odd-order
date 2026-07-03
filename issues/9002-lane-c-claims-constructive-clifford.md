@@ -227,7 +227,41 @@ PFsection1 `constt_Inertia_bijection` の経路を精読して最短路を採る
 [(G2) 済] で各項既約 [6.11] → (1.7)(b) の等次数 [L:I]·d・mult-one 分解が完成、残りは
 台 (1.5.a)/(1.2) + 非実 + S14 assembly のみ。
 
-### 6.11 の設計確定 (2026-07-03 cont.¹⁸ 精査 — route (ii) θ-part 論法採用、一般 Mackey 不要)
+### ✅ 6.11 + (1.7)(b) core assembly COMPLETE (2026-07-03 cont.¹⁹)
+
+- **✅ Isaacs 6.11 完結** (commit `105200e0`, `CliffordCorrespondence.lean`):
+  `isIrreducibleCharacter_induce_of_liesOver_of_inertia_eq` — H⊴G, inertia θ = T, ψ∈Irr(T)
+  over θ (transport 形 hover) ⟹ Ind_T^G ψ 既約。θ-part 論法 (Mackey 不要) 設計どおり:
+  `restrictionMultiplicity_mul_le_restrictionMultiplicity` (θ-mult 下界、
+  `inner_compHom_of_mulEquiv` は **hub が issue 9005 で InducedTransport.lean に shared 化済**) +
+  single-orbit degree 等式×2 + 構成要素 degree bound + degree exhaustion。
+- **✅ (1.7)(b) core assembly 完結** (commit `488308f2`, 新 leaf `CliffordDecomposition.lean`):
+  `exists_extension_induce_eq_sum_induce_mul` — H⊴L, inertia θ = T, T/H abelian,
+  gcd([T:H], o(θ)·d)=1 ⟹ ∃χ∈Irr(T) 拡張, **`Ind_H^L θ = Σ_{β∈Hom(T/H,ℂˣ)} Ind_T^L(χ·Infβ)`
+  ∧ 各項既約** (次数 [L:T]d は induce_apply_one で自明)。(G1)+(G2)+(G3)+stages の純合成。
+  全 sorry-free axiom-clean、full build 3905 jobs green。
+
+### 次 frontier: mult-one packaging → type-I 適用 (設計固定 2026-07-03)
+
+**S14 consumer の必要形** (`typeI_induced_char_constituents`, S14:418 sorry): `∃ S : Finset (Irr ↥L),
+Nonempty ∧ chi = Σ_{φ∈S} φ ∧ 等次数 ∧ 非実 ∧ conj-distinct (φ.conj ∉ S 対) ∧ 台 ⊆ A(L)∪{1}`。
+
+**(a) mult-one/distinctness packaging (generic, CliffordDecomposition.lean に追加)**:
+norm count 論法。c_χ := ⟨Ind_H^L θ, χ⟩ ∈ ℕ (`inner_induce_coe_eq_restrictionMultiplicity`+natCast)。
+(i) Parseval Σ_χ c_χ² = ⟨Ind θ, Ind θ⟩ (capstone hpars 手法) = [T:H] (inertia norm 公式
+`card_mul_inner_self_induce_eq_card_inertia`: |H|·⟨,⟩=|T|、|T|=[T:H]·|H| は index_mul_card at ↥T +
+card_congr subgroupOfEquivOfLe)。(ii) c_χ = Σ_β [η_β = χ] (`irreducibleCharacter_inner_eq_ite`、
+η_β := Ind_T(χ̃β) 既約) ⟹ Σ_χ c_χ = |Hom| = [T:H] (fiber counting)。(iii) Σc² = Σc (ℕ) ⟹
+∀χ c_χ ≤ 1 ⟹ **β ↦ η_β injective** (fiber ≤ 1)。S := image、card = [T:H]、sum_image で
+`Ind_H^L θ = Σ_{χ∈S} ↑χ`、∀χ∈S ∃β 生成形。
+**(b) type-I 適用 (Pf-side 新 leaf、S08/S14 import 可)**: hinertia は typeF_inertia 系 +
+`commutator_inertia_le_of_sup_eq_top` (I(θ)/H abelian 証明書) から I(θ) = T の同定; coprime は
+H = L_F Hall (o(θ)·d | |H|, gcd(|H|,[T:H])=1); 非実 = `not_isReal_of_ne_trivial_of_odd_card'`
+(χ ≠ 1 は ⟨Ind θ, 1⟩ = ⟨θ, 1⟩ = 0); conj-distinct: φ̄ も S 型構成要素で φ̄ = Ind(χ̃β)-bar …
+(1.2)/(1.5.a) 台: 各 η_β は H の外で… Frobenius ケースの `frobenius_typeI_induced_char_constituents`
+(S14 landed) の bookkeeping を一般化。
+
+### 6.11 の設計確定 (2026-07-02 cont.¹⁸ 精査 — route (ii) θ-part 論法採用、一般 Mackey 不要)
 
 **在庫が予想以上に厚い** (CliffordSingleOrbit / InducedCharacter):
 - `apply_one_eq_restrictionMultiplicity_mul_index_inertia`: **ξ(1) = ⟨Res_H ξ,θ⟩·[G:I(θ)]·θ(1)** (等式!)。
