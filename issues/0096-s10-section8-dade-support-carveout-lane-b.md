@@ -314,3 +314,24 @@ V^M の Dade data が出るか (normedTI 'F(M)^# route, Coq BGsection16 of_typeP
 M_σ# ∪ V^M に分解し、M_σ# 部分は engine、V^M 部分を TI/exceptional で。engine の
 `dadeSupportHypothesisData_of_subset_sigmaSharp` は M_σ# を賄うが、typePA0 全体は **union support の
 Dade data 合成** (2 TI-piece の disjoint union) が要る = 新機構。
+
+### loop¹²¹ — V^M non-escaping + (8.13.b) typePA0-P1 landed; typePA0_isConj は wireable の見込み
+
+typePA0(P1) Dade data の**構造基礎 2 本を build-green で landed**:
+1. **`centralizer_typePV_le_M`**: v∈V=W∖(W1∪W2) で C_G(v)≤M (`normalizer_V`: N_G(⟨v⟩)=W、singleton ゆえ
+   =C_G(v)、W=W1⊔W2≤M)。⟹ **V^M 点は非 escaping** = Dade 構造は trivial (H(v)=⊥)。
+2. **`escaping_typePA0_mem_sigmaSharp_of_isTypeP1`** ((8.13.b) for typePA0-P1): escaping A_0(M) 点は
+   σ-sharp。V^M 点は非 escaping (#1) ゆえ escaping 点は typePA(P1)=M_σ# に居る。engine が **full A_0(M)**
+   (A_1=M_σ# だけでなく) を P1 で賄うのに要る (8.13.b) 還元。
+
+**残: typePA0(P1) engine の 3 piece** — (a) generalized engine (X⊆M, escaping⊆M_σ#; type-I
+`dadeSupportHypothesisData_of_subset` を σ-generic pin + (8.13.b) で駆動)、(b) **typePA0_isConj**
+(G-conj→M-conj)、(c) **coprimality** (b∈typePA0)。
+
+**typePA0_isConj は wireable 見込み** (deep-from-scratch でない): S16 `theoremII` の conjunct-1 内部
+(S16:6010-6030) が piece 別に conjugacy 制御 — M_σ 部=Thm D(1)、**A(M)−M_σ 部=Thm B(5)**、
+**A_0−A (=V^M) 部=Thm C(9)** の `hTI_B`/`hTI_C`。∴ typePA0_isConj は (i) `typePA0 = A0Set M K` (BG A_0)
+対応を示せば tame embedding conjunct-1 直用、or (ii) Thm B(5)/C(9) を抽出。**次 iteration**: typePA0 vs
+BG A0Set 対応を確認 (A_0(M) 記法の BG↔Pf 一致)、なら typePA0_isConj + coprimality が tame embedding
+から wire 可能で typePA0(P1) engine 完成 → `dadeSupportHypotheses_typeP` typePA0 成分 discharge →
+S12 (10.1 existence) unblock。

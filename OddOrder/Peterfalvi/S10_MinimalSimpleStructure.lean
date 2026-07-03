@@ -1647,6 +1647,60 @@ theorem escaping_typePA_mem_sigmaSharp_of_isTypeP1 [Finite G]
   rw [← typePA_eq_sigmaSharp_of_isTypeP1 hG hM data hP1]
   exact ha.1
 
+/-- **Type-`P` exceptional points are non-escaping**: for `v ∈ V = W ∖ (W₁ ∪ W₂)`, the singleton
+normalizer `N_G(⟨v⟩) = W` (`TypePData.normalizer_V`) equals `C_G(v)` (singleton: centralizing ⟺
+normalizing), and `W = W₁ ⊔ W₂ ≤ M`.  So `C_G(v) ≤ M`: the exceptional `V^M`-support of `A_0(M)`
+carries the *trivial* (non-escaping) Dade structure `H(v) = ⊥`, `C_G(v) = C_M(v)` — the only part of
+`A_0(M)` outside `M_σ^#`, and it needs no signalizer. -/
+theorem centralizer_typePV_le_M {M : Subgroup G} (data : TypePData M) {v : G}
+    (hv : v ∈ typePV M data) : Subgroup.centralizer ({v} : Set G) ≤ M := by
+  have hNV : Subgroup.normalizer ({v} : Set G) = data.W :=
+    data.normalizer_V {v} (Set.singleton_nonempty v) (Set.singleton_subset_iff.mpr hv)
+  have hWM : (data.W : Subgroup G) ≤ M := by
+    rw [data.W_eq]
+    refine sup_le data.W1_le ?_
+    exact data.W2_le.trans (inf_le_left.trans
+      (data.H_le.trans (Subgroup.map_subtype_le _)))
+  refine le_trans ?_ (hNV.le.trans hWM)
+  intro g hg
+  rw [Subgroup.mem_set_normalizer_iff]
+  have hgv : g * v * g⁻¹ = v := by
+    have h := Subgroup.mem_centralizer_singleton_iff.mp hg
+    rw [mul_inv_eq_iff_eq_mul]
+    exact h
+  intro n
+  rw [Set.mem_singleton_iff, Set.mem_singleton_iff]
+  constructor
+  · intro h; rw [h]; exact hgv
+  · intro h
+    calc n = g⁻¹ * (g * n * g⁻¹) * g := by group
+      _ = g⁻¹ * v * g := by rw [h]
+      _ = g⁻¹ * (g * v * g⁻¹) * g := by rw [hgv]
+      _ = v := by group
+
+/-- **Peterfalvi (8.13.b) for the type-`P₁` `A_0`-support**: an escaping point of
+`A_0(M) = A(M) ∪ V^M` is `σ`-sharp.  The exceptional `V^M`-points are non-escaping
+(`centralizer_typePV_le_M`: `C_G(m·v·m⁻¹) = m·C_G(v)·m⁻¹ ≤ M`), so an escaping point of `A_0` lies in
+`A(M) = M_σ^#` (`typePA_eq_sigmaSharp_of_isTypeP1`).  This is the `(8.13.b)` reduction the `σ`-sharp
+Dade engine needs to cover the full `A_0(M)` support (not just `A_1 = M_σ^#`) for type `P₁`. -/
+theorem escaping_typePA0_mem_sigmaSharp_of_isTypeP1 [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} (hM : M ∈ maximalSubgroups G)
+    (data : TypePData M) (hP1 : OddOrder.BG.Ch4.S14.IsTypeP1 M) {a : G}
+    (ha : a ∈ OddOrder.GroupTheory.escapingCentralizerSet M (typePA0 M data)) :
+    a ∈ OddOrder.BG.Ch4.S14.sigmaSharp M := by
+  obtain ⟨haA0, hesc⟩ := ha
+  rcases haA0 with hpa | hpv
+  · rw [← typePA_eq_sigmaSharp_of_isTypeP1 hG hM data hP1]
+    exact hpa
+  · exfalso
+    obtain ⟨v, hv, m, hmM, hmva⟩ := hpv
+    apply hesc
+    rw [← hmva, ← conj_smul_centralizer_singleton']
+    calc MulAut.conj m • Subgroup.centralizer ({v} : Set G)
+        ≤ MulAut.conj m • M :=
+          Subgroup.pointwise_smul_le_pointwise_smul_iff.mpr (centralizer_typePV_le_M data hv)
+      _ = M := conj_smul_eq_self_of_mem_normalizer (Subgroup.le_normalizer hmM)
+
 /-- **Peterfalvi (8.13.a) for the `σ`-sharp support**: two `G`-conjugate elements of `M_σ^#`
 are already `M`-conjugate.  This is the `σ`-sharp analogue of `typeIA_isConj_conj_in_M`, but proved
 *natively* from the `σ`-decomposition (BG Theorem 14.4, `exists_conj_centralizer_of_mem_maximalSigma`)
