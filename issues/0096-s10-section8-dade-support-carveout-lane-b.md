@@ -132,3 +132,26 @@ lane a の issue 9004「追加発見 2」: `typePA0` (GroupTheory/MaximalSubgrou
 (M-共役化) は lane a が 9004 で claim 済 (shared MaximalSubgroupType + S12_Core fallout)。
 b は (8.15) typeP 側に着手する前に 9004 を読み、typePA0 定義変更の自動追従を前提にすること
 (typeI 側 = 232aaf18 は影響なし)。lane 間調整は 9004/本 issue への追記経由 (cross-lane-sync-via-notes)。
+
+## 🔎 lane b 精査 (loop¹¹⁵) — type-P Dade engine soundness 解決: (M')# は正しい base、残 = escaping signalizer structure
+
+loop¹⁰⁹ の「typePA=(M')# ⊋ ASet で unsound か?」を Pf (8.10)/(8.13) + Coq PFsection8 で解決:
+
+**✅ (M')# は type-P の正しい Dade base** (Pf (8.10) mmd 04.10 L119): 「A_1(M)=A(M)=(M')# **if M is of
+type III, IV or V**」。∴ type-P M (III/IV/V) では A(M)=(M')#=A_1 が定義どおり正しい。loop¹⁰⁹ の
+(M')#⊋ASet 懸念は **type-II M** の話 (A(M)≠(M')#) で、**type-P engine (III/IV/V) には無関係**。
+Coq: `FT_Dade_support M A` (PFsection8:78) + BGsection16「'A(M) == Peterfalvi (8.10)」で整合確認。
+
+**✅ escaping soundness** (Pf (8.13.b) mmd L139): 「D={x∈A(M):C_G(x)⊄M} ⊂ A_1(M)」。type-P で
+A_1=(M')# ゆえ escaping (M')# ⊂ (M')# (自明)、engine の base として健全。
+
+**⚠ 残る deep piece = `escaping_typePA_signalizer_structure` (type-P (8.13.c))**: **clean な σ-sharp
+還元は不可**。M'=M_F⋊U で U は (κ∪σ)'-complement ゆえ **M' ⊄ M_σ** (U-part が σ')、∴ escaping (M')#
+点は一般に σ-sharp でない → type-I の `signalizer_structure_of_mem_sigmaSharp` (σ-sharp 要) を直接
+使えない。type-P 固有の signalizer 構造 (Pf (8.13.c1/c2) の semidirect、BG §16 の non-σ-sharp escaping
+treatment) が要る = **genuine deep BG §16、focused multi-session**。loop¹⁰⁷ の評価が正しかった。
+
+**次手 (fresh session)**: (a) type-P (8.13.c) signalizer 構造の BG §16 原文 (mmd) + Coq FTsignalizer
+精読、(b) escaping (M')# 点の R(x) 定義 (Pf 8.14 の supporting maximal N[x] 経由、σ-sharp 非依存版が
+あるか)。soundness は解決済ゆえ build は confident に進められる。conj-invariance 前提 (typePA_conj_mem/
+A1_conj_mem, loop¹⁰⁸) は済。
