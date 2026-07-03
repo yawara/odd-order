@@ -808,3 +808,16 @@ build green 3871。**(12.14) 2 obligation の 1 完了** (¹⁴⁵ reduction + �
 (一般 IntegralCharacterMap では不足) ⟹ **statement redesign 要** (coh:IsCoherent + hpsi:dade.psi=coh.extension χ
 + hLM:L≠M 追加)。coherent_extension_constituent_orthogonal_Rset_of_nonconjugate (S14:1844) で証明。
 χ irreducible constituent 構造 (dade.chi degree=[L:H]⟹Ind linear⟹irreducible) を thread。次: horth 完成 → (12.14) sorry-free。
+
+### loop¹⁴⁷ — ✅★ (12.14) 完成 SORRY-FREE (commit 86c17b4b)
+
+horth 実証明で **(12.14) psi_constant_on_xK 完全 sorry-free**。statement redesign (coherence input:
+coh + chi0 IrreducibleCharacter の data/constt/mem + hpsi + hLM) で horth =
+coherent_extension_constituent_orthogonal の 1 行。full assembly 実証明 (Hypothesis M + hHK + data_M
++ horth + hxK + (12.4) 適用)。**3 iter (¹⁴⁵ reduction/¹⁴⁶ hxK/¹⁴⁷ horth) で完成**。build green 3871。
+
+**★ loop¹⁴³ unblock 完全実証**: 「char endgame 全 gated」の悲観 (¹⁴¹) を、M=type-I ⟹ Hypothesis M
+直接利用可 (exists_typeI_hypothesis) の発見 (¹⁴³) → 実 code (¹⁴⁵⁻¹⁴⁷) で覆した。(12.16) chain の 1 piece 完成。
+
+**次 = (12.15) rhoM_integer_values**: 同 Hypothesis M unblock 適用。dade.psi g∈ℤ for g∈K∖K'
+(ρ=adjointAverageFun + Hypothesis M) + rhoMFormula (free Prop、redesign or caller 供給要)。
