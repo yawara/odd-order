@@ -320,3 +320,59 @@ full build 3904 jobs / 1m58s green。
   S14_TypePCounting:1022/1882 周辺) — 実体特定が loop¹⁰³ の最初の仕事。
 - **type F + τ₂=∅ → Frobenius 化** (pin 結論の ∃U 部): 独自導出要 (~40 行、κ=∅ +
   π-分割で complement の f.p.f. 性; Coq FtypeP 系対応物の grep も)。
+
+## ✅ lane b 完了 (2026-07-03, loop¹⁰³) — BG 14.13(a) 全証明・axiom-clean
+
+`non_disjoint_signalizer_frobenius` (BG Lemma 14.13(a)) を **sorry-free + axiom-clean** で完成
+(commit chain 60da6782 → 65ac0c1a、新 leaf `S16_Lemma1413.lean`)。§8 type-I support pin の
+最後の 1 本。`#print axioms` = propext/Classical.choice/Quot.sound のみ。
+
+**構成 (4 部品、全 sorry-free)**:
+1. **reduction** (60da6782): signalizer neighbour `N`, 素数 `q ∈ σ(N)∩π(M)` (⟹ β(N)) と
+   `p = minFac(ord x) ∈ σ(M)∩τ₂(N)`; `N` 非共役 `M` (13.9 ⟹ q∉σ(M)); Q conj into N;
+   Cor 12.14 で `ℳ(C(Q))={Nᵍ}`; `p∉β(M)` (12.1(g))。+ `typeF_frobenius_of_tau2_prime_free`
+   (type-F + no-τ₂ ⟹ Frobenius over M_σ) + `beta_conj_smul_eq`/`pRank_conj_smul_eq`。
+   + P₂ case (σ=β via typeP_structure(g) ⇔ p∈σ∖β 矛盾)。
+2. **Part 2 no-τ₂** (6638beb4): `r_{p'}(N)≤1` (π(N)-partition + tau2_not_beta) → Cor 12.9
+   (`commutator_decomp_of_tau1_action`) で非共役 rank-1 `[A,Q]`,`C_A(Q)` → cyclic Sylow で
+   共役 → 矛盾。新 reusable `exists_conj_smul_eq_of_le_of_card_prime` (cyclic-Sylow で order-p
+   部分群は共役)。
+3. **Part 1 type-P₁** (65ac0c1a): dual partner `Mstar=Nᵍ` の `Kstar` が κ(Mstar)-Hall かつ
+   **σ(M)-Hall** ⟹ `p∈σ(M)∩π(Mstar)` で `p∈κ(Mstar)` (rank≤1) vs `r_p(Mstar)=2` 矛盾。
+   新 reusable `kstar_isHall_sigmaM_of_partner` (Coq `Ptype_embedding` の `sMhallKs`; 14.2(f)
+   `typeP_sigma_subgroup_le_Msigma` + Hall superset + σ-disjoint `⁅Y,K⁆≤M_σ⊓Mstar_σ=1`)。
+
+**§8 type-I support 系は全完了** ((8.13.a/b/c1c2/c2c4)/(8.14)/(8.15)/(8.17)/(8.18) + 14.13(a))。
+`escaping_sigma_disjoint_centralizer` (8.13.c2 core) の 14.13(a) 由来 sorryAx は解消。
+残る S10 real sorry 7 本は **type-II / type-P Dade-support obligation** (`typeII_A_sets_TI`
+/`typeII_A_sets_normalizer` (8.15 type-II)、`dadeSupportHypotheses_typeP`、`bgTheoremE_cover_data`、
+`hall_maxNilpotentNormalHall_and_mainSubgroup`、`typeI_or_typeII_centralizer_unique`、
+`escapingCentralizers_control`) = 別クラスタ (0096 carve-out の type-II 側)。次 loop¹⁰⁴ 候補。
+full build 3906 jobs green。
+
+## 📋 lane b frontier map (2026-07-03, loop¹⁰³ 終) — §8 type-II 系は BG Theorem B に gated
+
+14.13(a) 完了後の残 S10 type-II sorry 7 本の tractability を精査 (grep-before-depth)。
+**3 obligation とも proven でない上流 BG §16 に gated** — 即座の bridge は無い:
+
+- **(8.11) `hall_maxNilpotentNormalHall_and_mainSubgroup`**: M_s=M_σ は全 type で proven
+  (`mainSubgroup_eq_Msigma` + `Msigma_isHall`)。M_F 側は **type I/II のみ proven**
+  (`maxNilpotentNormalHall_isHall_of_typeI_or_II`, S10_BGInterface:96)。**type III/IV は
+  M_F ⊊ M_σ の proper-Hall** で「still-sorry BG §14–§15 structure」に gated
+  (S10_BGInterface:90-94 docstring)。→ tau∈{I,II,V} は建てられるが III/IV M_F が残る。
+- **(8.12.b) `typeI_or_typeII_centralizer_unique`**: `theoremB_U_and_A_tame` conjunct 4
+  (`∀ X≤U, M_σ⊓C(X)≠⊥ ⟹ ℳ(C(X))={M}`, S16_MainResults:690, **sorried** :692) に gated。
+- **(8.16) `typeII_A_sets_TI` / `_normalizer`**: `theoremB_U_and_A_tame` conjunct 5
+  (`IsTISubset (ASet M U ∖ M_σ) M`, S16:691, **sorried**) に gated。sister の Theorem C(9)
+  (`theoremC_paired_structure` A_0∖A) は proven だが A∖M_σ は Theorem B 依存。
+
+**共通の ungated 上流 = BG Theorem B `theoremB_U_and_A_tame`** (S16_MainResults:679, sorried :692)。
+5 conjunct: (1) Sylow abelian rank≤2 (**proven** standalone `theoremB_U_sylow_abelian_rank_le_two`),
+(2) centralizerGeneratedBySigma abelian, (3) U0 witness, (4) centralizer uniqueness [=8.12.b gate],
+(5) ASet TI [=8.16 gate]。`theoremII_tame_embedding` も transitively sorryAx (Theorem B 消費)。
+Theorem B(4)/(5) = BG §16 tame-embedding の核 — Theorem E (M̃ normedTI) / Theorem II を要す
+deep port (type-I 版 `typeI_centralizer_le_and_unique` は proven なので B(4) は部分的に射程内か)。
+
+**loop¹⁰⁴ = policy「gated なら ungated 上流 (Theorem B) に降りて実証明」に従い BG Theorem B
+`theoremB_U_and_A_tame` conjunct 4/5 を正面 build** (conjunct 1 は proven、Theorem E の M̃
+machinery `conjClassSet_Mtilde_disjoint` は proven ゆえ conjunct 5 の TI は射程内の可能性)。
