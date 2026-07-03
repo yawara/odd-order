@@ -1525,6 +1525,35 @@ theorem typePA_conj_mem (M : Subgroup G) (data : TypePData M) {m : G} (hm : m �
   rw [typePA_eq_sharpSubgroup_derivedInG] at ha ⊢
   exact sharpSubgroup_conj_mem (OddOrder.BG.Ch3.S10.le_normalizer_derivedInG M hm) ha
 
+/-- **Type-`P₁` support is `M_σ#`** (`A(M) = (M')# = M_σ#`).  For a type-`P₁` maximal subgroup
+`M' = M_σ` (`isTypeP1_derivedInG_eq_Msigma`, from `mainSubgroup_eq_Msigma`/BG Prop 16.1), so the
+Peterfalvi Dade support `typePA = (M')#` coincides with the BG σ-sharp set `sigmaSharp = M_σ#`.
+
+This is the structural bridge that makes the type-`P` Dade-support escaping structure a **direct**
+application of the σ-sharp signalizer machinery (`signalizer_structure_of_mem_sigmaSharp`), with no
+`ASet` detour: every escaping point of `A(M)` is already `σ`-sharp.  (For type `P₂`, `M_σ ⊊ M'`, so
+`typePA ⊋ M_σ#`; the escaping points still land in `A_1 = M_σ#` by Peterfalvi (8.13.b) +
+`A1_eq_sigmaSharp`, but that reduction is the deeper type-`P₂` obligation.) -/
+theorem typePA_eq_sigmaSharp_of_isTypeP1 [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} (hM : M ∈ maximalSubgroups G)
+    (data : TypePData M) (hP1 : OddOrder.BG.Ch4.S14.IsTypeP1 M) :
+    typePA M data = OddOrder.BG.Ch4.S14.sigmaSharp M := by
+  rw [typePA_eq_sharpSubgroup_derivedInG,
+    OddOrder.BG.Ch4.S16.isTypeP1_derivedInG_eq_Msigma hG hM hP1]
+  rfl
+
+/-- **Escaping type-`P₁` support points are `σ`-sharp** (the soundness lemma for the type-`P₁` Dade
+engine): for a type-`P₁` maximal, an escaping point of `A(M) = (M')#` lies in `M_σ#`.  Immediate from
+`typePA = M_σ#` (`typePA_eq_sigmaSharp_of_isTypeP1`).  This is the type-`P₁` analogue of the type-`I`
+`escaping_typeIA_mem_A1`, but with no `ASet`/`mem_sigmaSharp_of_mem_aSet_of_escape` detour. -/
+theorem escaping_typePA_mem_sigmaSharp_of_isTypeP1 [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} (hM : M ∈ maximalSubgroups G)
+    (data : TypePData M) (hP1 : OddOrder.BG.Ch4.S14.IsTypeP1 M) {a : G}
+    (ha : a ∈ OddOrder.GroupTheory.escapingCentralizerSet M (typePA M data)) :
+    a ∈ OddOrder.BG.Ch4.S14.sigmaSharp M := by
+  rw [← typePA_eq_sigmaSharp_of_isTypeP1 hG hM data hP1]
+  exact ha.1
+
 /-- **Peterfalvi (8.15)** for type I: the Dade (2.2) support hypotheses hold for `A(M) = A_0(M)`
 and `A₁(M)`, with `L = M` and the faithful `H(a) = R(a)` of (8.14).  Assembly is genuine
 (`dadeSupportHypothesisData_of_subset`); the deep (8.13.a/c1/c2) obligations are the pins above. -/

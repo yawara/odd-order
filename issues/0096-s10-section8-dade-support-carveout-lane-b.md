@@ -155,3 +155,26 @@ treatment) が要る = **genuine deep BG §16、focused multi-session**。loop¹
 精読、(b) escaping (M')# 点の R(x) 定義 (Pf 8.14 の supporting maximal N[x] 経由、σ-sharp 非依存版が
 あるか)。soundness は解決済ゆえ build は confident に進められる。conj-invariance 前提 (typePA_conj_mem/
 A1_conj_mem, loop¹⁰⁸) は済。
+
+## 🚀 lane b 進捗 (loop¹¹⁶) — type-P engine build path 確定 + P1 structural bridge landed
+
+type-P Dade engine の build path を `mainSubgroup_eq_Msigma`/`A1_eq_sigmaSharp` (共 proven, S16) を
+軸に確定し、P1 の structural bridge 2 本を landed (S10、full build green)。
+
+**確定した build path** (soundness は loop¹¹⁵ で解決済):
+- **A1 M tau = sigmaSharp = M_σ# (全 tau, `A1_eq_sigmaSharp` proven)**。∴ engine の A1 成分は σ-sharp
+  set への Dade data で、escaping 点は σ-sharp、`signalizer_structure_of_mem_sigmaSharp` 直接適用 = clean。
+- **typePA = (M')#**: P1 (M'=M_σ, `isTypeP1_derivedInG_eq_Msigma`) では **= M_σ# = sigmaSharp** (clean、
+  landed `typePA_eq_sigmaSharp_of_isTypeP1`)。P2 (M_σ⊊M', `maxNilpotentNormalHall_derivedInG_eq_Msigma_of_isTypeP2`
+  は M_F(M')=M_σ を与えるのみ) では typePA⊋M_σ#。
+- **escaping typePA ⊆ σ-sharp (全 type-P)**: (8.13.b) escaping⊆A_1 + A1_eq_sigmaSharp。P1 は自明
+  (landed `escaping_typePA_mem_sigmaSharp_of_isTypeP1`)、P2 は type-P (8.13.b) `escaping_typePA_mem_A1` が要る
+  (deep — typePA⊄ASet ゆえ type-I の ASet route 不可)。
+- **typePA0 = typePA ∪ V^M**: V^M (exceptional) 成分は別途。
+
+**残 build (fresh session、~150 行)**: (1) σ-sharp base engine `dadeSupportHypothesisData_of_subset_sigmaSharp`
+(type-I engine の σ-sharp core を typeIA 非依存に一般化; escaping_sigmaSharp_signalizer_structure を
+type-I `escaping_typeIA_signalizer_structure` step 2-4 から抽出)。(2) A1 + P1-typePA 成分を cite で discharge。
+(3) P2-typePA の `escaping_typePA_mem_A1` (type-P 8.13.b) + typePA0 の V^M。conj-invariance 前提済 (loop¹⁰⁸)。
+
+**landed** (loop¹¹⁶): `typePA_eq_sigmaSharp_of_isTypeP1` / `escaping_typePA_mem_sigmaSharp_of_isTypeP1` (S10)。
