@@ -280,6 +280,20 @@
 
 ## 現状メモ
 
+- **2026-07-03 (夜) — 監視停止 (ユーザー指示「いったん区切ります」)**: cron a8af8c6a を CronDelete。
+  ⛔ 停止 (問題起因) ではないので**自動再開しない** — 次の監視再開はユーザー指示を待って
+  `7,22,37,52 * * * *` で再作成する。停止時点: main = `e9119393` (push 済・tree clean・origin 同期)。
+  **未マージ残 (次回再開時にまず合流): `main..a` = 2, `main..b` = 0, `main..c` = 3** (いずれも lane
+  セッション継続中の新 commit; a=11.8 系, c=Pf 1.7(b) 系の見込み、範囲は再開 tick で通常判定)。
+  本セッションの成果 (再開〜停止): sorry 120→113、a/b/c 全レーンが実証明で前進。特筆:
+  (1) **Pf §8 Dade-support クラスタ type-I 側完結** — (8.12.b)/(8.13.a/b/c)/(8.14)/(8.15) を
+  BG bridge で実証明、supply 元の **BG Lemma 14.13(a) (`non_disjoint_signalizer_frobenius`) が
+  完全証明・axiom-clean** (新 leaf `S16_Lemma1413.lean`)。type-II 系のみ残 (BG Theorem B に gated)。
+  (2) **issue 9004 全完了** (Hypothesis46 small-V + typePA0 M-共役の unsound 是正 → toHypothesis46
+  §10 instantiation + 4.8/4.10 aligned-grid thread discharge、axiom-clean)。(3) **issue 9005 (hub
+  prefix-split)** — S08 generic char 3 補題を `InducedTransport.lean` へ分離、c の Isaacs 6.11
+  Clifford correspondence を unblock。(4) c は **Isaacs 6.11 + Pf 1.7(b) constructive Clifford
+  (mult-one packaging + conj-distinctness + non-reality) COMPLETE** (issue 9002)。
 - **2026-07-03 — 監視再開 (ユーザー指示「各レーンの監視を再開します」) + 初回 tick 全レーン合流**:
   cron a8af8c6a を規定ペース `7,22,37,52 * * * *` で再作成。初回 tick: a=5 / b=8 / c=10 commits を
   a→b→c で合流 (`9aca52bf` / `55e46f1f` / `4847abc3`)、全ゲート green (build 3898/3898/3901 jobs、
