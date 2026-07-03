@@ -735,3 +735,29 @@ sorry-free** (S09_NonexistenceCertain:3770-4260) と判明。これで hgood の
 
 **cont.²⁴**: hypothesis78 を data 化 → `F.hypothesis79 i j` 構築 (最上流 wiring)。一般 cross-ortho
 (`disjoint_coherent_ortho` 相当) が唯一の未形式化 piece の可能性 — 要確認。
+
+## 2026-07-04 cont.²⁶ (lane-a, /loop) — (7.9) conclusion 適用の scope 精査: 深部 = 2 つの §1 primitive
+
+**Landed** (S09_FrobeniusHypothesis79.lean): `hypothesis78_nu_eq` — `(F.hypothesis78 i).nu =
+(F.coherence i).extension` (rfl、(7.9) の hnu 入力)。
+
+**精査結果 — (7.9) `conclusion` producer の未充足入力**: `conclusion_of_..._parity` (4094) は
+hcoh/hnu/hindZ/hzeta_irr/hBD/**hzeta_cross**/**hdelta_even** を要求。うち **hzeta_cross と hdelta_even は
+全 producer で仮説のまま (既存コードで一度も discharge されていない)**。両者の Lean analog は無し:
+- **hzeta_cross** (`⟨ν_iζ_i, ν_jζ_j⟩ = 0`): support-subset route (`zetaImage_cross_eq_zero_of_support_subset`)
+  は **不適用** — ν_iζ_i は irreducible character (ZIrr, norm-1) で Dade support に載らない。coq は
+  `orthonormal_vchar_diff_ortho` (§1 (4.1)) 経由 (`disjoint_coherent_ortho`): {νχ,νχ̄}/{ν'χ',ν'χ'̄} が
+  orthonormal かつ差が直交 (Dade image で disjoint support) ⟹ families 直交。**Lean に primitive 無し**
+  (`IsometryDifferencePair.lean` = §3 (1.4) core は関連するが未 wiring)。
+- **hdelta_even** (`⟨δ_i,δ_j⟩ = even ℤ`): coq `cfdot_real_vchar_even` (§7:509、real virtual char で
+  ⟨D,1⟩=1 ⟹ ⟨D₁,D₂⟩ even)。**Lean に無し**。
+
+**残 = 深部 §1 formalization** (multi-iteration): (1) orthonormal-diff cross-ortho primitive →
+hzeta_cross、(2) real-vchar parity → hdelta_even、(3) BetaDecomp 構成 (betaDecompOfDade/Facts wiring)、
+(4) zetaDistinct irr / ind1H ZIrr 入力 (F.hypothesis78 の pf.θ internals 露出要)、(5) 𝓑-set 構成、
+(6) min-index + hG0sum + assembly。**cont.²⁷ = cross-ortho primitive (orthonormal_vchar_diff_ortho 相当)
+の formalization に着手** (gateway、genuine deep work)。
+
+**進捗総括 (cont.¹⁶–²⁶)**: (7.8) 層完全 + hi + hgood core + (7.9) two-family datum は landed・merged。
+残は Peterfalvi の genuine 難所 (§1 (4.1)/parity primitives) — easy wiring は概ね尽き、深部 formalization
+フェーズへ移行。

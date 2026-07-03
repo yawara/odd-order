@@ -81,6 +81,18 @@ noncomputable def hypothesis79 [Fintype G] [Invertible (Nat.card G : ℂ)]
           = F.kernelSpread j from F.sibley_dadeSupport_eq_kernelSpread j hodd hnilp_j C_j hFrob_j]
     exact F.kernelSpread_disjoint hij
 
+/-- **The `ν` of the `i`-th member's `Hypothesis78` is the coherent extension** (the `hnu` input of
+the (7.9) `conclusion` producers).  Definitional: `hypothesis78` feeds `coh.extension` as the `nu`
+field of `hypothesis78OfDade`. -/
+lemma hypothesis78_nu_eq [Fintype G] [Invertible (Nat.card G : ℂ)]
+    (F : FrobeniusFamily G k) (i : Fin k) (hodd : Odd (Nat.card G))
+    [Fintype ↥(F.L i)] [Invertible (Nat.card ↥(F.L i) : ℂ)]
+    [Invertible (Nat.card ↥((F.H i).subgroupOf (F.L i)) : ℂ)]
+    (hnilp : Group.IsNilpotent ↥((F.H i).subgroupOf (F.L i)))
+    (C : Subgroup ↥(F.L i))
+    (hFrob : OddOrder.Isaacs.Ch06.IsFrobeniusGroup ↥(F.L i) ((F.H i).subgroupOf (F.L i)) C) :
+    (F.hypothesis78 i hodd hnilp C hFrob).nu = (F.coherence i hodd hnilp C hFrob).extension := rfl
+
 end FrobeniusFamily
 
 end OddOrder.Peterfalvi.S09
