@@ -43,7 +43,17 @@ regression なし、(iii) 9003 等で self-flag。具体例 = `typeI_centralizer
 Pf 8.12.b) を B4 full-Theorem-B cite → `typeP_hall_small_subgroup_cyclic_tau2` 直接 cite に
 de-gate (commit 94a34018)。**statement を変える編集は依然 out-of-scope** (下記) で要 hub flag。
 
-**対象外 (従来通り lane a、b が statement 変更したら逸脱)**: S10 のそれ以外すべて — bgTheoremE carrier
+**追加許容 (2026-07-04 hub 裁定 #2, ユーザー承認 — (8.12.b) faithful form の S10 landing + 注記)**:
+lane b は §8-support の (8.12.b) について、以下を S10 で行ってよい (逸脱としない):
+(a) **faithful sorry-free 版の新 decl 追加** (例 `typeI_or_typeII_centralizer_unique_hall` — Hall 仮説
+付き完全証明・axiom-clean、commit 7f863d33)。(b) 旧 false-as-stated / overstated decl
+(`typeI_or_typeII_centralizer_unique`・`escapingCentralizers_control`・`typeII_A_sets_*`) への
+**docstring-only 注記** (false-as-stated/vestigial の警告 + faithful 版へのポインタ)。**条件**:
+statement/proof 改変なし (旧 decl の statement と `sorry` proof は不変)、build green、sorry
+regression なし。**旧 decl の実際の削除・statement 改変・proof 差し替えは要 hub flag** (9006 step 5 の
+旧 `typeI_or_typeII_centralizer_unique` 削除は S11 migration 完了時に別途処理)。
+
+**対象外 (従来通り lane a、b が statement 変更/proof 差し替え/削除したら逸脱)**: S10 のそれ以外すべて — bgTheoremE carrier
 (`BGTheoremECoverData`/`bgTheoremE_cover_data` 等)、`hall_maxNilpotentNormalHall_and_mainSubgroup`、
 `typeI_or_typeII_centralizer_unique`、`escapingCentralizers_control`、type-classification structural
 ((8.16)/(8.6.a) 系を含む Cluster A 前提 — こちらは 9003 どおり S14 に pin して cite)。

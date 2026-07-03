@@ -286,6 +286,21 @@
 
 ## 現状メモ
 
+- **2026-07-04 (夜) — tick: a(RepTheory induce_inner_trivial)/b(Pf 8.12.b faithful) 合流 + b の S10 (8.12.b) landing を hub 裁定受理 (carve-out 0096 拡張 #2) + 9006 relocate 裁定**:
+  a=`692a8ba4` (`induce_inner_trivial` = ⟨Ind_H^G θ,1_G⟩=⟨θ,1_H⟩、GroupTheory/InducedCharacter 共有、
+  grandfather leaf、build green 3906) +`a04539e4`(docs) → 合流 `69f8858b`。**b** = `7f863d33`
+  (Pf (8.12.b) faithful `typeI_or_typeII_centralizer_unique_hall` を S10 に landing = Hall 仮説付き
+  完全証明・axiom-clean; 旧 false-as-stated `typeI_or_typeII_centralizer_unique`/`escapingCentralizers_control`/
+  vestigial-false `typeII_A_sets_*` に **docstring-only 注記**) +`10377c82`(docs §8 type-II 監査)。b の S10
+  (8.12.b) 所有は 2026-07-04 拡張#1 (proof-only de-gate) を超える → **step 1.5 逸脱検出 STOP → ユーザー裁定
+  受理**: carve-out 0096 を「(8.12.b) faithful form の S10 landing + 旧 decl の docstring 注記 (statement/
+  proof 不変)」に拡張#2 (旧 decl の削除/statement 改変は依然要 flag)。**issue 9006 (b 起票, FeitThompson から
+  3 Hall 補題 relocate) = ユーザー裁定「owner 固定せず issue+LAUNCH で全レーン awareness を保てば誰でも可」**
+  → 9006 に運用記載 + lane a LAUNCH.md に周知行。b 合流 `73a66959`。検証: **full build green 3906 jobs /
+  AxiomsCheck OK / sorry 112→112 (新 faithful decl は proven ゆえ中立) / 新 axiom なし**。push
+  `8f0dcd73..73a66959` (a+b)。監視 cron を `a718b710` で再作成。c 本 tick 未マージ 0。
+  ⚠ b の loop¹¹⁰ docs (`9fcf5af5`) が「レーン b tractable 作業枯渇 — S07/S08 完成, S09 は 7.9 gated」を
+  記録 (次 tick 以降 b の frontier 状況を注視; 停滞なら能動報告)。
 - **2026-07-04 — tick: a(docs)/b(BG Theorem B COMPLETE) 合流 + b の S10 de-gate を hub 裁定受理 (carve-out 0096 拡張)**:
   tick で a=`160ffec9` (docs, issue 0044 = (7.8.a) blocker 解消) → 即合流 (`9c3110b0`)。**b** = `94a34018`
   (BG Theorem B **全 5 conjunct 完成・axiom-clean**: `theoremB_A_minus_Msigma_isTISubset` B(5) +
