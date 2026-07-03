@@ -258,3 +258,13 @@ signature 明記の genuine deep obligation。
 typePA=M_σ#、但し `dadeSupportHypotheses_typeP` は tau 一般ゆえ P1 特化には型分岐が要る — data から P1/P2
 を判定して分岐)。(b) **type-P (8.13.b) `escaping_typePA_mem_A1`** (P2-typePA/typePA0 の escaping 還元)。
 (c) **typePA0 の V^M 成分**。engine が完成した今、残りは type-P 固有の support 幾何 ((8.13.b) + V^M)。
+
+### loop¹¹⁹ cont. — P1-typePA も engine で discharge (frontier (a) 完了)
+
+A₁ datum を `have hA1` に抽出 (A₁ bullet + P1-typePA で再利用)。**typePA の P₁ 分岐を engine で honest
+discharge**: `by_cases hP1 : IsTypeP1 M` → P1 branch は `rw [typePA_eq_sigmaSharp_of_isTypeP1,
+← A1_eq_sigmaSharp]` で typePA=M_σ#=A₁ に還元し `exact hA1`。`classical` で任意 Prop に by_cases 可。
+
+**`dadeSupportHypotheses_typeP` 現状**: A₁ (全 tau) ✅ + typePA-P₁ ✅ = **honest**、残 2 sorry =
+**typePA0 (V^M exceptional) + typePA-P₂ ((8.13.b) `escaping_typePA_mem_A1` の escaping 還元)**。
+engine 部分は完了、残りは type-P 固有 support 幾何のみ。次 = (b) type-P (8.13.b) の実証 or (c) V^M。
