@@ -1493,15 +1493,37 @@ theorem A1_subset_typeIA (M : Subgroup G) (data : TypeIData M) :
     x, (Set.mem_diff _).mpr ⟨SetLike.mem_coe.mpr hxH', hx1⟩,
     Subgroup.mem_centralizer_singleton_iff.mpr rfl⟩
 
-/-- `A₁(M)` is `M`-conjugation invariant (via the `M`-normality of `M_F`). -/
-theorem A1_typeI_conj_mem (M : Subgroup G) {m : G} (hm : m ∈ M) {a : G}
-    (ha : a ∈ A1 M PeterfalviType.I) : m * a * m⁻¹ ∈ A1 M PeterfalviType.I := by
+
+/-- **`M`-conjugation invariance of `sharpSubgroup H`** when `M` normalizes `H` (general helper for
+the type-`τ` Dade-support sets `A₁(M) = M_s#`, `A(M) = (M')#`, all of the form `sharpSubgroup H`
+with `H ⊴ M`). -/
+theorem sharpSubgroup_conj_mem {H : Subgroup G} {m : G}
+    (hn : m ∈ Subgroup.normalizer (H : Set G)) {a : G}
+    (ha : a ∈ OddOrder.GroupTheory.sharpSubgroup H) :
+    m * a * m⁻¹ ∈ OddOrder.GroupTheory.sharpSubgroup H := by
   obtain ⟨haH, ha1⟩ := (Set.mem_diff a).mp ha
-  have hnorm := OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_le_normalizer M hm
-  rw [Subgroup.mem_normalizer_iff] at hnorm
-  refine (Set.mem_diff _).mpr ⟨SetLike.mem_coe.mpr ((hnorm a).mp (SetLike.mem_coe.mp haH)), ?_⟩
+  rw [Subgroup.mem_normalizer_iff] at hn
+  refine (Set.mem_diff _).mpr ⟨SetLike.mem_coe.mpr ((hn a).mp (SetLike.mem_coe.mp haH)), ?_⟩
   exact fun h => (conj_ne_one (fun h1 => ha1 (Set.mem_singleton_iff.mpr h1)))
     (Set.mem_singleton_iff.mp h)
+
+/-- **`M`-conjugation invariance of `A₁(M) = M_s#`** for every Peterfalvi type: `M_s` is `M_F`
+(types I, II, V) or `M'` (types III, IV), both `⊴ M`. -/
+theorem A1_conj_mem (M : Subgroup G) (tau : OddOrder.GroupTheory.PeterfalviType) {m : G}
+    (hm : m ∈ M) {a : G} (ha : a ∈ A1 M tau) : m * a * m⁻¹ ∈ A1 M tau := by
+  refine sharpSubgroup_conj_mem (H := OddOrder.GroupTheory.mainSubgroup M tau) ?_ ha
+  cases tau with
+  | I => exact OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_le_normalizer M hm
+  | II => exact OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_le_normalizer M hm
+  | V => exact OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_le_normalizer M hm
+  | III => exact OddOrder.BG.Ch3.S10.le_normalizer_derivedInG M hm
+  | IV => exact OddOrder.BG.Ch3.S10.le_normalizer_derivedInG M hm
+
+/-- **`M`-conjugation invariance of the type-`P` support `A(M) = (M')#`** (`M' ⊴ M`). -/
+theorem typePA_conj_mem (M : Subgroup G) (data : TypePData M) {m : G} (hm : m ∈ M) {a : G}
+    (ha : a ∈ typePA M data) : m * a * m⁻¹ ∈ typePA M data := by
+  rw [typePA_eq_sharpSubgroup_derivedInG] at ha ⊢
+  exact sharpSubgroup_conj_mem (OddOrder.BG.Ch3.S10.le_normalizer_derivedInG M hm) ha
 
 /-- **Peterfalvi (8.15)** for type I: the Dade (2.2) support hypotheses hold for `A(M) = A_0(M)`
 and `A₁(M)`, with `L = M` and the faithful `H(a) = R(a)` of (8.14).  Assembly is genuine
@@ -1520,8 +1542,8 @@ theorem dadeSupportHypotheses_typeI [Fintype G] [Finite G]
   have hiffA1 : ∀ {m x : G}, m ∈ M →
       (m * x * m⁻¹ ∈ A1 M PeterfalviType.I ↔ x ∈ A1 M PeterfalviType.I) := by
     intro m x hm
-    refine ⟨fun h => ?_, A1_typeI_conj_mem M hm⟩
-    have h2 := A1_typeI_conj_mem M (inv_mem hm) h
+    refine ⟨fun h => ?_, A1_conj_mem M OddOrder.GroupTheory.PeterfalviType.I hm⟩
+    have h2 := A1_conj_mem M OddOrder.GroupTheory.PeterfalviType.I (inv_mem hm) h
     have h3 : m⁻¹ * (m * x * m⁻¹) * m⁻¹⁻¹ = x := by group
     rwa [h3] at h2
   constructor

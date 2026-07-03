@@ -798,7 +798,7 @@ theorem Sset_diff_tau_support_subset_ftThickenedA1 {L : Subgroup G} [Finite G]
     OddOrder.Peterfalvi.S10.A1_subset_typeIA L hyp.typeI
   have hA₁norm : ∀ (l : ↥L) ⦃a : G⦄, a ∈ A1 L PeterfalviType.I →
       (l : G) * a * (l : G)⁻¹ ∈ A1 L PeterfalviType.I := fun l _ ha =>
-    OddOrder.Peterfalvi.S10.A1_typeI_conj_mem L l.2 ha
+    OddOrder.Peterfalvi.S10.A1_conj_mem L OddOrder.GroupTheory.PeterfalviType.I l.2 ha
   have hsuppA1 := Sset_diff_support_subset_A1 hyp data
   have hsuppA : (chi - chi.conj).support ⊆
       OddOrder.Peterfalvi.S04.supportInSubgroup hyp.ambientA L := fun x hx => hA₁A (hsuppA1 hx)
