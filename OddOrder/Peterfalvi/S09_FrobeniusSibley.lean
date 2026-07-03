@@ -133,6 +133,21 @@ noncomputable def coherence [Fintype G] [Invertible (Nat.card G : ℂ)]
   OddOrder.Peterfalvi.S08.sibleySetup_is_coherent
     (F.sibleyDadeHypothesis_of_frobenius i hodd hnilp C hFrob)
 
+/-- **Peterfalvi's coherent extension `ν`** for the `i`-th Frobenius member, as the `ℤ`-linear map
+`CF(L_i) →ₗ[ℤ] CF(G)` (`IntegralCharacterMap L_i G` unfolds to exactly this).  This is `.extension`
+of the (6.8) `coherence`; it is the `ν` argument of `hypothesis78OfDade`, with `hnu_isometry` supplied
+by `coherence.extension_inner_eq` on the induced family `S` and `hagree` by
+`coherence.extends_on_supported` on the degree-matched differences `ζ_i − d_i ζ_0`. -/
+noncomputable def nu [Fintype G] [Invertible (Nat.card G : ℂ)]
+    (F : FrobeniusFamily G k) (i : Fin k) (hodd : Odd (Nat.card G))
+    [Fintype ↥(F.L i)] [Invertible (Nat.card ↥(F.L i) : ℂ)]
+    [Invertible (Nat.card ↥((F.H i).subgroupOf (F.L i)) : ℂ)]
+    (hnilp : Group.IsNilpotent ↥((F.H i).subgroupOf (F.L i)))
+    (C : Subgroup ↥(F.L i))
+    (hFrob : OddOrder.Isaacs.Ch06.IsFrobeniusGroup ↥(F.L i) ((F.H i).subgroupOf (F.L i)) C) :
+    ClassFunction ↥(F.L i) ℂ →ₗ[ℤ] ClassFunction G ℂ :=
+  (F.coherence i hodd hnilp C hFrob).extension
+
 end FrobeniusFamily
 
 end OddOrder.Peterfalvi.S09

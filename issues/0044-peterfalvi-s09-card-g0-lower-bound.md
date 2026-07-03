@@ -505,3 +505,27 @@ card_L_odd ← G odd; H_sharp_ti ← `F.isTI` + coordinate lemma; dade/hconj/dad
 **その後**: `betaDecompOfDade` + `zetaNuRhoNormSq_ge_of_facts` → (7.8.b) `chiRhoNormSq` bound →
 `characterEstimateData_of_family71_reduced_estimates` (要 hi/hgood/hBsum) → `not_trivial_G0_of_exists_Bsum_bound`。
 (7.9) 𝓑-sum は別途。次 iteration: ν 抽出 (型変換) + hypothesis78OfDade の引数を距離順に埋める。
+
+## 2026-07-04 cont.¹⁵ (lane-a, /loop) — nu handle landed; hypothesis78OfDade 接続の完全 map (crux 判明)
+
+**Landed** (`30540996`): `FrobeniusFamily.nu` = `coherence.extension`。`IntegralCharacterMap L G` は
+`CF(L)→ₗ[ℤ]CF(G)` に unfold ゆえ hypothesis78OfDade の ν 型と直接一致 (変換不要)。
+
+**接続 crux 判明 (hyp.tau vs H71'.τ)**: `SibleyDadeHypothesis.tau` は **def** = `dadeIntegralCharacterMap
+hyp.dade hyp.hconj` (IntegralCharacterMap = →ₗ[ℤ]、CF(L) 全体)。対して `sibleyHypothesis71.τ` は
+**bare DadeMap field** (supported 上のみ)。**型が違う**。coherence は `IsCoherent hyp.tau ...` ゆえ:
+- `hagree` (H71'.τ(ζ_i−d_iζ_0) = ν(ζ_i)−d_iν(ζ_0)): ν linear + `coherence.extends_on_supported`
+  (ν=hyp.tau on supported) + **`dadeIntegralCharacterMap_apply_of_support`** (S07:5342、hyp.tau=DadeMap
+  値 on supported = H71'.τ 値) で bridge。ζ_i−d_iζ_0 supported は `induce_diff_support`。
+- `hnu_isometry`: `coherence.extension_inner_eq (Ind θ_i) (Ind θ_j) (∈zSpan S) (∈zSpan S)` — Ind θ_i∈S
+  (θ_i≠1) ← S_eq。zSpan S 所属は `Submodule.subset_span`。
+
+**接続の残 monolithic assembly** (~20 args、1 focused effort):
+`hypothesis78OfDade sibleyHypothesis71 (isDadeIsometry) (F.H i).subgroupOf... (kernel_le の subgroupOf 版)
+(hHnorm) (hAH=coordinate) θ hinj hcover d psi_support hdeg ind1H hind1H hzeta_ind1H hdeg_match nu
+hnu_isometry hagree`。θ/hinj/hcover/d/hdeg/ind1H = `distinctInducedFamily` (S09_CertificateDischarge:872
+が hypothesis76OfDade 内部で使う enumerator) の公開 API 化 or 再構成が要 (これが最大の未知)。
+
+**その後**: `betaDecompOfDade` + `zetaNuRhoNormSq_ge_of_facts` → chiRhoNormSq bound →
+characterEstimateData → not_trivial_G0_of_exists_Bsum_bound。この monolithic 接続は fresh focused
+session 向き (distinctInducedFamily API + degree data + 型 bridge を一括で組む)。全 intermediate は landed。
