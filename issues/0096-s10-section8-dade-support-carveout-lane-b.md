@@ -821,3 +821,19 @@ coherent_extension_constituent_orthogonal の 1 行。full assembly 実証明 (H
 
 **次 = (12.15) rhoM_integer_values**: 同 Hypothesis M unblock 適用。dade.psi g∈ℤ for g∈K∖K'
 (ρ=adjointAverageFun + Hypothesis M) + rhoMFormula (free Prop、redesign or caller 供給要)。
+
+### loop¹⁴⁸ — (12.15)/(12.16) chain 評価: (12.14) done、残 = deep final Dade contradiction
+
+(12.15) rhoM_integer_values: Coq `rhoM_psi` は `rhoM := invDade` for M (M の Dade adjoint =
+adjointAverageFun) + norm 下界 `lb_psiM` + cyclotomic `vchar_ker_mod_prim`。**deep** (12.14 より深い)。
++ rhoMFormula/rhoFormula は free Prop (constructor で True) = scaffold carrier。consumer 0。
+
+(12.16) chain: `counterexample_contradiction` (headline) = exists_rankTwoWitness + exists_witness_g +
+**exists_counterexample_dade_data** (deep §7/§12 bundle、sorry S14:5782) + counterexample_contradiction_of_facts。
+`CounterexampleDadeData` fields = ψ-data + **h_const(=12.14 DONE)** + h_psig_int(=12.15 deep) +
+norm bounds hA/hB/hC (deep §7) + he(3≤e, discharged)。
+
+**∴ 残 (12.16) chain content = deep final Dade contradiction** (M の ρM adjoint + §7 norm estimates +
+cyclotomic + 12.15)。(12.14) done は h_const field を供給 (chain の 1 field 完成)。
+**次: CounterexampleDadeData 構成 (exists_counterexample_dade_data) で 12.14 [h_const] を wire +
+dischargeable field を埋め、deep field (h_psig_int/norm bounds) を isolate** = faithful decomposition。
