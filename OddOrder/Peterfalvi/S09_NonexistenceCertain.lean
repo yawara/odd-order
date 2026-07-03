@@ -123,6 +123,24 @@ namespace Hypothesis71
 
 variable {G : Type*} [Group G] [Fintype G] {A : Set G} {L : Subgroup G}
 
+/-- **Construct the Peterfalvi (7.1) data from a TI-subset.**  When `A ⊆ G` is a TI-subset with
+`L`-normalizer (`IsTISubset A L`), every `H(a)` is trivial (`S04.of_isTISubset`, Peterfalvi (2.3)),
+the Dade map is the canonical one (`Hypothesis.dadeMap`, an honest (2.5)/(2.6) Dade isometry by
+`isDadeMap_dadeMap`), and the `H(-)`-conjugation-invariance is automatic
+(`HConjInvariant.of_forall_H_eq_bot`).  This is the (7.1) `Hypothesis71` for a TI-set — in particular
+for `A = H^#`, `L = N_G(H)` of a Frobenius group with kernel `H` (the source of the
+`FrobeniusFamily` (7.4) hypotheses of Peterfalvi (7.10)). -/
+noncomputable def of_isTISubset
+    (hA_sharp : A ⊆ OddOrder.Peterfalvi.S04.sharp (Set.univ : Set G)) (hA_L : A ⊆ L)
+    (hL_norm : ∀ (l : L) ⦃a : G⦄, a ∈ A → (l : G) * a * (l : G)⁻¹ ∈ A)
+    (hTI : OddOrder.GroupTheory.IsTISubset A L) :
+    Hypothesis71 G A L where
+  hyp := OddOrder.Peterfalvi.S04.Hypothesis.of_isTISubset hA_sharp hA_L hL_norm hTI
+  τ := (OddOrder.Peterfalvi.S04.Hypothesis.of_isTISubset hA_sharp hA_L hL_norm hTI).dadeMap
+  isDadeMap := (OddOrder.Peterfalvi.S04.Hypothesis.of_isTISubset hA_sharp hA_L hL_norm hTI).isDadeMap_dadeMap
+  hConjInvariant :=
+    OddOrder.Peterfalvi.S04.Hypothesis.HConjInvariant.of_forall_H_eq_bot _ (fun _ => rfl)
+
 open scoped Classical in
 /-- The **ρ map** of Peterfalvi (7.1).  For `a ∈ A`,
 `χ^ρ(a) = |H(a)|⁻¹ Σ_{x ∈ H(a)} χ(a·x)`; for `a ∉ A`, `χ^ρ(a) = 0`.
