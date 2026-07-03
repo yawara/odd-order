@@ -146,3 +146,13 @@ Hypothesis46 discharge (§6 endpoint の gate) にも同じ修正が必要にな
   S06_CertainTypeFourCorner.lean:440 ((4.10))。
 - notes/peterfalvi/s13_11_8_orthogonality.md cont.⁶⁶ (本 issue の発見経緯)。
 - [[verify-port-state-by-number-not-coq-name]] [[feedback-file-hub-issue-dont-stop]]
+
+## HUB 注記 (2026-07-03, 監視再開 tick)
+
+- 追加発見 2 の `dadeSupportHypotheses_typeP` (S10:566) は **carve-out 0096 = lane b 所有**。
+  b は同 tick で (8.15) carrier を faithful 化済 (`5807febb`, typeI 側実証明 `232aaf18`) —
+  typePA0 M-共役化の statement 追従は型経由で自動だが、b の (8.15) typeP 着手前に本 issue を
+  読む取り決めを 0096 に注記済。S10 内 fallout (`normalizer_typePA_eq` 再編等) で b 所有宣言の
+  本体編集が要る場合は 0096/本 issue 経由で調整。
+- claim 重複なし確認済 (1.6.c): 0096 は (8.15) Dade-support 構築、本 issue は typePA0/Hypothesis46
+  の statement 衛生で相補。

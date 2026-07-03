@@ -70,8 +70,46 @@ hunk 位置で判定 (carve-out 0086 と同じ運用)。
 (8.18.c)/route-B が要する §8 Dade-support 宣言が sorry-free 化し、恒久解 (dedicated leaf 分離) で
 carve-out が不要になること。
 
+## ⚠️ lane b 発見+修正 (2026-07-02, commit 5807febb) — (8.15) carrier が unfaithful pin で uninhabited だった
+
+carve-out task「(8.15) build」の着手時精査で **`DadeSupportHypothesisData.H_eq_supportKernel` が
+issue 8021 と同根の unfaithful pin** と判明: `H(a) = supportKernel M M A a = C_{M_F}(a)` (escaping
+set 上) は、escaping `a ∈ A₁(M)` で `a ∈ C_{M_F}(a) ∩ C_M(a)` となり dade の (2.2.b) disjointness /
+(2.2.c) coprimality と**矛盾** → escaping 元が存在する A で構造体が uninhabited (= S12/S14 の
+`Hypothesis` が vacuous パラメータ化、(8.15) 2 宣言は証明不能)。Pf (8.14) の R(a) は per-x
+supporting maximal `N[a]` の `C_{(N[a])_F}(a)` (Coq `FTsignalizer`/'R[x])。
+
+**修正 (5807febb、本 carve-out 範囲)**: S10 に `ftSupportKernel M A x` (escaping で BG
+`FT_signalizer x`、それ以外 ⊥) + `ftThickenedSupport` を新設し、`H_eq_ftSupportKernel` に差し替え。
+`dadeSupport_eq_thickenedSupport` field は proven lemma `dadeSupport_eq_ftThickenedSupport` に変換。
+`hconj` (R(x) の M-conj 不変性、Theorem D uniqueness 由来) を field 化 (S14/S12 の導出は datum 参照
+1 行に)。S14 の `dadeSupport_subset_conjClassSet_maxNilpotentNormalHall_of_frobenius` は faithful 定義下で
+**偽** (escaping coset factor は σ(L)′-元で L_F に共役不能) のため削除 (consumer 0)。
+
+**cross-lane flag**: `S12_MaximalIII_IV_V_Core.lean` (lane a) に機械的追従 2 hunks
+(`hconj := dadeData.hconj` + dead private `supportKernel_conj_invariant`/helper 削除)。65a2be52 受理
+と同型の statement-soundness 改善で、lane a frontier (11.8/S12 char) と非衝突。full build 3898 green。
+
 ## 参照
 
 - issue 9003 (Cluster B gate map + 本裁定の記載先) / issue 8022 (route B) / issue 0091 (受理前例)
-- commit 65a2be52 (support_mutual_exclusion 実証明) / 3bbbde4c (b 自己 flag)
+- commit 65a2be52 (support_mutual_exclusion 実証明) / 3bbbde4c (b 自己 flag) / 5807febb ((8.15)
+  carrier faithful 化)
 - merge_monitor.md 🔒 マップ + carve-out 先例 0086/0088/0090
+
+## ✅ HUB 裁定 (2026-07-03, 監視再開 tick): S12_Core 追従 2 hunks 受理
+
+上記 cross-lane flag (`5807febb` の S12_MaximalIII_IV_V_Core 機械的追従 2 hunks) は
+**ユーザー裁定 2026-07-03 で受理・合流済** (`55e46f1f`)。hub 検証: merge base 単一で誤検出
+でなし / 削除補題の外部 consumer 0 / lane a の同 file hunk (@370) と非重複。
+**standing carve-out ではない** (issue 0091 と同運用): 以後 lane b が S12_Core を編集したら
+通常どおり逸脱 → 都度 flag + 裁定。
+
+## ⚠ HUB 注記 (2026-07-03): issue 9004 追加発見 2 が本 carve-out の (8.15) typeP 側に波及
+
+lane a の issue 9004「追加発見 2」: `typePA0` (GroupTheory/MaximalSubgroupType.lean:309) の
+**G-共役閉包は unsound** — `S04.Hypothesis` の `subset_L` と G の単純性が矛盾し、b 所有の
+`dadeSupportHypotheses_typeP` (S10:566) 第 1 成分は **statement が偽 (充足不能)**。修正
+(M-共役化) は lane a が 9004 で claim 済 (shared MaximalSubgroupType + S12_Core fallout)。
+b は (8.15) typeP 側に着手する前に 9004 を読み、typePA0 定義変更の自動追従を前提にすること
+(typeI 側 = 232aaf18 は影響なし)。lane 間調整は 9004/本 issue への追記経由 (cross-lane-sync-via-notes)。

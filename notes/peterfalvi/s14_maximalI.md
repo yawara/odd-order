@@ -1846,3 +1846,47 @@ multi-iteration。β-lane の cleanly-ownable coherence work は完了済。
 - **(iv) §8 support theory**: issue 0096 carve-out により S10 内の Dade-support 宣言群
   (typeII_A_sets_TI/normalizer・dadeSupportHypotheses_typeI/typeP・support_mutual_exclusion) は
   **lane b が S10 内で build** (9003 裁定)。
+
+## loop⁹⁹ (2026-07-02/03): §8 support theory 正面 build — (8.15) soundness fix + (8.17.c) axiom-clean + (8.18.c) + (12.3) Step A
+
+issue 0096 裁定の §8 build を実施、5 commits (5807febb / 232aaf18 / 6d384805 / 97cbd6fe / dd82f094)。
+経緯・詳細は issue 9003「lane b 進捗 loop⁹⁹」節が正本。要点:
+
+- **(8.15) carrier が unfaithful pin で uninhabited だった** (escaping a で `H(a)=C_{M_F}(a)∋a` が
+  (2.2.b/c) と矛盾、8021 と同根) → per-x `ftSupportKernel` (escaping ↦ BG `FT_signalizer`) に修正、
+  `dadeSupport_eq_ftThickenedSupport` は proven lemma 化、`hconj` field 化。S12_Core/S14 追従。
+- **(8.15) type-I 実証明** (`dadeSupportHypothesisData_of_subset` 汎用 assembly; A(M)+A₁(M))。
+  pins: `typeIA_isConj_conj_in_M` (8.13.a) / `escaping_typeIA_signalizer_structure` (8.13.c1c2) /
+  `FT_signalizer_conj_smul_of_escaping` (8.14 equivariance)。
+- **(8.17.c)** `ftThickenedSupport_A1_disjoint_of_nonconjugate` **axiom-clean** (choice 同定は
+  proven 済 BG lemmas で closing; escape→1<|𝓜σ| は `centralizer_le_of_maximalSigma_le_one`)。
+- **(8.18.c)** `ftThickenedSupport_mixed_disjoint_of_nonconjugate` (type-I pair、(8.18.a/b/c)
+  assembly 実証明 + π-part 冪 `mem_zpowers_mul_right_of_coprime`)。pins:
+  `escaping_typeIA_mem_A1` (8.13.b) / `typeI_centralizer_le_and_unique` (8.12.b) /
+  `supported_sigma_coprime` (8.13.c2c4)。
+- **(12.3) Step A** (S14): `Sset_diff_support_subset_A1` → (2.11) restriction →
+  `Sset_diff_tau_support_subset_ftThickenedA1`; constituent 版; mixed disjunction;
+  `constituent_fullDiff_inner_zero_of_disjoint`。全 sorry-free。
+
+**次 (loop¹⁰⁰) = bar-trick descent** で `nonconjugate_diffImage_inner_zero` (S14:897) を閉じる。
+設計 (9003 に精密版): (i) τ conj-equivariance → CDI `ν=μ̄` → `conj X = −X`; (ii) integrality
+(δ-展開) で `⟨α,X⟩=0`; (iii) S(χ₂) 内 R₁ pairwise distinctness で per-φ₂ 消滅; member-wise 化は
+`toOrthonormalImage_inner_eq_zero_across` (existing)。要調査: τ conj-equivariance の既存 lemma
+(IntegralCharacterMap level?)、⟨irr, ℤ[Irr]⟩ integrality API、R1cdi same-χ distinctness。
+
+## loop¹⁰⁰ (2026-07-03): (12.3) bar-trick descent 完成 — `nonconjugate_diffImage_inner_zero` 実証明
+
+commit f8ecb4a5。詳細 = issue 9003「lane b 進捗 loop¹⁰⁰」節が正本。要点:
+
+- **descent core `constituent_diffImage_inner_zero_of_disjoint` は axiom-clean**。構成:
+  `X = (χ₂−χ̄₂)^{τ₂} ∈ ℤ[Irr G]`、(8.18.c) disjoint 側で `⟨sd₁, X⟩ = 0` →
+  (5.9.b) `ν₁ = μ̄₁` (`S07.CharacterDifferenceImage.nu_eq_mu_conj`、新規) + `X̄ = −X`
+  (`tau_conj_of_supported` ← 既存 Galois 可換) + 整数 Fourier 係数 (`mem_ZIrr_inner_int` +
+  新規 `ZIrrFourier.inner_conj_conj`) → `⟨μ₁, X⟩ = 0` → block cross-orthogonality
+  (`constituentDiff_tau_inner_eq_zero_of_ne`、新 field `conj_not_mem` 使用) で per-φ₂ 化。
+- **`CharacterDecompositionData.conj_not_mem` field 追加** ((12.2.b)): Frobenius producer 実証明、
+  一般 producer は (8.2.c) obligation に conclusion 追加 (S14 唯一の support sorry のまま)。
+- `nonconjugate_diffImage_inner_zero` は `hG` を取る signature に変更 (caller は
+  `nonconjugate_typeI_R_orthogonal` のみ、`_hG` を活性化)。
+- (12.3) の残 transitive sorryAx = S10_MinimalSimpleStructure の §8 pins 6 本 + (8.2.c)。
+  **次 = loop¹⁰¹: §8/§16 pins 正面 build** (0096 carve-out、文書順 (8.12.b)→(8.13)→(8.14))。

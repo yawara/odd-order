@@ -71,7 +71,7 @@
 > | lane | クラスタ | 所有 .lean（これ以外の Pf/BG S-ファイル編集 = 逸脱→停止） |
 > |---|---|---|
 > | **a** | α Pf §10–13 中央指標核 + σ-theory tail | `OddOrder/Peterfalvi/S(0[3-9]|1[0-3])*` + `OddOrder/FeitThompson.lean`（`card_kappaHall_lt_of_isTypeIIIorIV` (行番号は drift するため decl 名で参照) + 旧 d carrier 宣言群 = 全体、d 退役で fold）+ **S10 bgTheoremE carrier**（旧 carve-out 0086 解消）+ σ-theory tail (S11 imprimitivity + dup retire は S11 内、GroupTheory/** 共有で cite) |
-> | **b** | β Pf §12 Dade tower + coherence infra | `OddOrder/Peterfalvi/S14_MaximalI.lean`（**全体**、旧 carve-out 0088 `exists_typeICovering` は b に解消）+ **coherence infra** = `S07_Coherence*`/`S08_PGroupReduction`（既存 coherence file、(5.7)/(6.5.c)/(6.8) case-B 系、hub authorized 2026-07-02）+ GroupTheory/** coherence leaf。⚠ これらは nominal に a の `S0[3-9]` regex に掛かるが **coherence infra ゆえ b 担当（逸脱でない）**、a の active territory は §9-13 char 核で S07/S08 coherence は非接触 |
+> | **b** | β Pf §12 Dade tower + coherence infra | `OddOrder/Peterfalvi/S14_MaximalI.lean`（**全体**、旧 carve-out 0088 `exists_typeICovering` は b に解消）+ **coherence infra** = `S07_Coherence*`/`S08_PGroupReduction`（既存 coherence file、(5.7)/(6.5.c)/(6.8) case-B 系、hub authorized 2026-07-02）+ GroupTheory/** coherence leaf。⚠ これらは nominal に a の `S0[3-9]` regex に掛かるが **coherence infra ゆえ b 担当（逸脱でない）**、a の active territory は §9-13 char 核で S07/S08 coherence は非接触。**⚠ b の例外 glob は正確に `S07_Coherence*` + `S08_PGroupReduction` の 2 つのみ** (正本 ft_lane_reallocation §レーン表): `S08_CaseB*`/`S08_CoherenceTheorems` 等その他の S07/S08 file は **lane a 所有** — 2026-07-03 tick で a の `S08_CaseBCoherence2` 1 行追従を「b 所有では」と誤読しかけた (glob 照合で解消、逸脱でない) |
 > | **c** | γ POLE-2 §15–16 chain 一本化 | `OddOrder/Peterfalvi/{S15_SAndT_Setup, S15_SAndT, S16_NonExistenceG}.lean`（**S15_SAndT_Setup は 2026-07-02 に lane d→c、§15→16 全 chain を c が所有**）+ 構成的 Clifford (issue 9002、GroupTheory/** shared) |
 > | **~~d~~ 退役** | — | **2026-07-02 退役**。σ-theory leaf (`GroupTheory/**`, sorry-free) は共有ゾーンに残置 (a が tail 完成)。BG/** は完了・共有凍結。FeitThompson carrier は a に fold。**branch `d` は git に温存 (作業は全 merge 済)、worktree セッションは停止**。 |
 > | **共有（全 lane 可）** | — | `OddOrder/AxiomsCheck.lean` / `OddOrder.lean` / `OddOrder/GroupTheory/**` / `OddOrder/Mathlib/**` / `OddOrder/Algebra/**`（全 lane 加算可）/ `OddOrder/BG/**`（完了・共有凍結）/ `notes/**` / `issues/**` |
@@ -280,7 +280,18 @@
 
 ## 現状メモ
 
-- **2026-07-02 (夜) — 監視再開 (ユーザー指示「各レーンを監視します」)**: cron 943218a9 を規定ペース
+- **2026-07-03 — 監視再開 (ユーザー指示「各レーンの監視を再開します」) + 初回 tick 全レーン合流**:
+  cron a8af8c6a を規定ペース `7,22,37,52 * * * *` で再作成。初回 tick: a=5 / b=8 / c=10 commits を
+  a→b→c で合流 (`9aca52bf` / `55e46f1f` / `4847abc3`)、全ゲート green (build 3898/3898/3901 jobs、
+  AxiomsCheck OK、sorry 115→120 = 全て新 decl faithful scaffold pin、新 axiom なし)、push 済。
+  特記: (1) **b の S12_Core cross-lane 2-hunk (S10 (8.15) carrier faithful 化の機械的追従、issue
+  0096 flag 済) はユーザー裁定 2026-07-03 で受理** — 65a2be52 と同型の statement-soundness 改善。
+  standing carve-out ではない (以後の b の S12_Core 編集は通常どおり逸脱)。(2) c の新規 3 file
+  (CyclicCharacterExtension 系) が root closure 外 → 手順 3b で OddOrder.lean に import 追記。
+  (3) サイズ watch: S10 が 905→1703 行で 1500 超え (分割は issue 0096 の恒久解 = S10_DadeSupport
+  prefix-split で追跡済; S12=0076 / S14=0084 も既存)。(4) a の issue 9004 追加発見 2 (typePA0
+  G-共役 unsound) は b 所有の `dadeSupportHypotheses_typeP` (S10:566) の statement 偽を含意 —
+  0096/9004 に相互注記で b へ通知。 cron 943218a9 を規定ペース
   `7,22,37,52 * * * *` で再作成。再開時点: main = 停止時と同一系 (tree clean・origin 同期済)、
   `main..{a,b,c}` = 0 (変化なし)。新規 HUB issue なし (open の 9000 claim は lane a 承継注記済で対応不要)。
 - **2026-07-02 (夜) — 監視停止 (ユーザー指示「監視はとめます。一区切りにします」)**: cron 1af200eb を

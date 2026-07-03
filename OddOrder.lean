@@ -32,6 +32,7 @@ import OddOrder.GroupTheory.RepresentationTheory.PiAlgebraAut
 import OddOrder.GroupTheory.RepresentationTheory.CenterSplitting
 import OddOrder.GroupTheory.RepresentationTheory.CenterSimplesOrbit
 import OddOrder.GroupTheory.RepresentationTheory.CenterOrbitFree
+import OddOrder.GroupTheory.RepresentationTheory.CanonicalCharacterExtension
 import OddOrder.GroupTheory.RepresentationTheory.CharacterCompleteness
 import OddOrder.GroupTheory.RepresentationTheory.CharacterConjugate
 import OddOrder.GroupTheory.RepresentationTheory.CharacterCount
@@ -52,6 +53,7 @@ import OddOrder.GroupTheory.RepresentationTheory.ExtraspecialFaithful
 import OddOrder.GroupTheory.RepresentationTheory.ExtraspecialThm25Final
 import OddOrder.GroupTheory.RepresentationTheory.ExtraspecialThm25Group
 import OddOrder.GroupTheory.RepresentationTheory.GaloisCharacter
+import OddOrder.GroupTheory.RepresentationTheory.GallagherDecomposition
 import OddOrder.GroupTheory.RepresentationTheory.Inertia
 import OddOrder.GroupTheory.RepresentationTheory.InertiaAbelianQuotient
 import OddOrder.GroupTheory.RepresentationTheory.InducedIrreducible

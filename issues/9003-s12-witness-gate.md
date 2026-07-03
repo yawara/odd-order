@@ -143,6 +143,38 @@ witness / L₂=N **非-Frobenius** で適用 ⟹ 対称 A₁-only 論法は**偽
 (8.18.c)+Cluster A は共に deep §8 で β 最適作業とは言い難い**。hub 検討: §8 support theory 着手 / ungated
 §12 char pivot / reallocation。正確な理解 (task 11 + 本 issue) が durable handoff。
 
+## 🚀 lane b 進捗 (2026-07-02/03, loop⁹⁹) — §8 support theory 正面 build: (8.15)/(8.17.c)/(8.18.c) landed
+
+0096 裁定に従い §8 を正面から build した。5 commits (5807febb→dd82f094):
+
+1. **(8.15) carrier soundness fix** (5807febb): `DadeSupportHypothesisData.H_eq_supportKernel` が
+   escaping 点で uninhabited になる unfaithful pin (issue 8021 と同根) と判明 → per-x faithful
+   `ftSupportKernel` (= escaping で BG `FT_signalizer`) に差し替え、`hconj` field 化。詳細 = 0096 追記。
+2. **(8.15) type-I 実証明** (232aaf18): `dadeSupportHypotheses_typeI` の assembly を実証明
+   (A(M)/A₁(M) 両方、汎用 `dadeSupportHypothesisData_of_subset`)。残 = 3 precise pins
+   ((8.13.a) fusion / (8.13.c1c2) escaping structure / (8.14) equivariance)。
+3. **(8.17.c) Ã₁-disjointness axiom-clean** (6d384805): `FT_signalizer = Rsub` の choice 同定
+   (escape → 1<|𝓜_σ| は **proven** `centralizer_le_of_maximalSigma_le_one`、singleton は proven
+   `maximalSubgroupsContaining_centralizer_eq_singleton_of_sigmaSharp_escape`) → faithful
+   `Ã₁(M) ⊆ 𝒞_G(M̃)` → `ftThickenedSupport_A1_disjoint_of_nonconjugate` = **sorry-free +
+   axiom-clean** (BG M̃ chain 全 proven だった)。
+4. **(8.18.c) mixed disjointness** (97cbd6fe): `ftThickenedSupport_mixed_disjoint_of_nonconjugate`
+   (`Ã₁(S)∩Ã(T)=∅ ∨ swap`、type-I pair)。(8.18.a/b/c) assembly **実証明** (π-part 冪抽出
+   `mem_zpowers_mul_right_of_coprime` axiom-clean、escaping 側は (8.17.c) 済で殺す)。残 = 3 pins
+   ((8.13.b) D⊆A₁ / (8.12.b) unique maximal / (8.13.c2c4) supported coprimality)。
+5. **(12.3) mixed-support 機構** (dd82f094): full member の `supp(χ−χ̄)⊆A₁` + (2.11) restriction で
+   `supp((χ−χ̄)^τ)⊆Ã₁` + constituent 版 `⊆Ã` + S14-facing disjunction + disjoint-side inner-zero
+   `constituent_fullDiff_inner_zero_of_disjoint` — 全部 sorry-free。
+
+**残 (8.18.c)→(12.3) 完結 = bar-trick descent** (`nonconjugate_diffImage_inner_zero` S14:897):
+`⟨sd₁, X⟩=0` (X=full image、済) から per-constituent `⟨sd₁, sd_φ₂⟩=0` へ。設計判明済み:
+(i) τ conj-equivariance → CDI の `ν = μ̄` → `conj X = −X`; (ii) `⟨α,X⟩+conj⟨α,X⟩=0` + integrality
+(X ∈ ℤ[Irr]、δ-展開) → `⟨α,X⟩=0`; (iii) S(χ₂) 内 R₁-pairwise-distinctness ((12.2.b)) で
+`⟨α,X⟩=Σ_φ` の hit 高々 1 → 各項 0; member-wise 化は proven
+`inner_eq_zero_of_signedDifference_inner_zero_of_mem` / `toOrthonormalImage_inner_eq_zero_across`。
+要調査 3 部品: τ の conj-equivariance lemma、⟨±irr, ℤ[Irr]⟩ の real/integrality API、
+R1cdi の same-χ pairwise distinctness (Rset orthonormality 系)。
+
 ## ✅ HUB 裁定 (2026-07-02, ユーザー委任レビュー) — S10 edit 受理 + §8 support theory carve-out (issue 0096)
 
 **1. `65a2be52` (S10 `support_mutual_exclusion` 実証明) = 受理 (keep in S10)。**
@@ -167,3 +199,34 @@ S14 に pin して cite (lane a territory、carve-out 対象外)。
 build 着手前に必ず `bin/new-issue --base 9000` で起票 (policy 6)。(b) b は main に 17 commits
 遅れ (最終 merge 44ccb169; 本 tick 合流でさらに進む) — **次 leaf 着手前に `git merge main`**
 (CLAUDE.md 同期規則)。
+
+## 🚀 lane b 進捗 (2026-07-03, loop¹⁰⁰) — (12.3) bar-trick descent 完成: `nonconjugate_diffImage_inner_zero` 実証明化
+
+loop⁹⁹ 設計どおり 3 部品を構築し S14 の (12.3) geometric obligation を閉じた (commit f8ecb4a5)。
+**descent core `constituent_diffImage_inner_zero_of_disjoint` は axiom-clean** (`#print axioms` =
+propext/Classical.choice/Quot.sound のみ、S14 末尾 block に追加済)。
+
+1. **`ZIrrFourier.inner_conj_conj`**: `⟨f̄, ḡ⟩ = conj ⟨f, g⟩` (両引数 conj の inner 恒等式)。
+2. **S07 `CharacterDifferenceImage.nu_eq_mu_conj`** (= Pf (5.9.b)): τ が `χ−χ̄` 上で conj と
+   可換なら image pair は `ν = μ̄`。§3 keystone の opaque pair が実は conjugate pair。証明 =
+   image 等式を conj → sign 消去 → μ との pairing を `Irr G` orthonormality で評価。
+3. **S14 側** — 要調査だった 3 部品の解決:
+   - τ conj-equivariance = **既存** `dadeIntegralCharacterMap_mapRingEquiv_comm` の conj 特化
+     (`tau_conj_of_supported`; S07_CoherenceGalois は S08 経由で import 済だった)。
+   - integrality = **既存** ZIrr Fourier (`mem_ZIrr_inner_int`) + `inner_conj_symm`
+     (X ∈ ℤ[Irr G] は supported 差の `dadeIntegralCharacterMap_mem_ZIrr_of_supported`)。
+   - same-χ pairwise distinctness = **新 field** `CharacterDecompositionData.conj_not_mem`
+     ((12.2.b) の `⟨χ,χ̄⟩=0` 由来「S(χ)∩conj S(χ)=∅」) + isometry 転送
+     (`constituentDiff_tau_inner_eq_zero_of_ne`) + (4.1) member lemma。field の producer:
+     Frobenius 側 (witness が実際使う側) は**実証明** (singleton = non-realness)、一般側は
+     (8.2.c)-gated obligation `typeI_induced_char_constituents` に conclusion 追加 (sorry 据置)。
+4. **main**: `nonconjugate_diffImage_inner_zero` に `hG` 追加 ((8.18.c) disjunction 消費、
+   swap 側は inner conj-symmetry)、`nonconjugate_typeI_R_orthogonal` が `hG` を通す。
+
+**(12.3) の残 transitive sorryAx** = S10_MinimalSimpleStructure の §8 pins (6 本:
+(8.13.a) `typeIA_isConj_conj_in_M` / (8.13.c1c2) `escaping_typeIA_signalizer_structure` /
+(8.14) `FT_signalizer_conj_smul_of_escaping` / (8.13.b) `escaping_typeIA_mem_A1` /
+(8.12.b) `typeI_centralizer_le_and_unique` / (8.13.c2c4) `supported_sigma_coprime`;
+BG §16 fusion 系、Coq `FTsupport_facts` 対応) + (12.2.a) `typeI_induced_char_constituents`
+((8.2.c))。**次 (loop¹⁰¹) = この §8/§16 pins の正面 build** (0096 carve-out 継続、文書順)。
+full build 3901 jobs / 3m41-4m37s (merge 前後 2 回 green)。
