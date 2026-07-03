@@ -1978,6 +1978,85 @@ theorem typePA0_isConj_conj_in_M_of_isTypeP1 [Finite G]
     · exact (not_isConj_typePA_typePV_of_isTypeP1 hG hM data hP1 hpb hva hab.symm).elim
     · exact conjClassSetIn_typePV_isConj_conj_in_M data hva hvb hab
 
+/-- **(8.13.c2) coprimality for the exceptional `V^M`-support** (type `P₁`): for escaping
+`a ∈ M_σ^#` and a `V^M`-point `b`, `|R(a)|` is coprime to `|C_M(b)|`.  `C_M(b)` is `M`-conjugate to
+`C_M(v) = W` (`v ∈ V`: `C_G(v) = N_G(⟨v⟩) = W` by `normalizer_V`, using `W` abelian for `⊇`); picking
+a nonidentity `w ∈ W₂ ⊆ M_σ^#`, `W ≤ C_M(w)` (abelian), so the `σ`-sharp coprimality
+(`escaping_sigmaSharp_disjoint_centralizer`) at `w` kills every common prime.  This reduces the
+exceptional-support coprimality to the σ-sharp one — the `V^M` half of the engine's
+`centralizer_coprime`. -/
+theorem coprime_FT_signalizer_centralizerIn_typePV [Fintype G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G}
+    (hM : M ∈ maximalSubgroups G) (data : TypePData M)
+    {a : G} (haσ : a ∈ OddOrder.BG.Ch4.S14.sigmaSharp M)
+    (haesc : ¬ Subgroup.centralizer ({a} : Set G) ≤ M)
+    {b : G} (hb : b ∈ conjClassSetIn M (typePV M data)) :
+    Nat.Coprime (Nat.card (OddOrder.BG.Ch4.S16.FT_signalizer a))
+      (Nat.card (OddOrder.Peterfalvi.S04.centralizerIn M b)) := by
+  classical
+  obtain ⟨v, hv, m, hmM, hmv⟩ := hb
+  have hvW : v ∈ data.W := by
+    have hv' := hv; simp only [typePV, Set.mem_diff] at hv'; exact hv'.1
+  have hWM : (data.W : Subgroup G) ≤ M := by
+    rw [data.W_eq]
+    exact sup_le data.W1_le (data.W2_le.trans (inf_le_left.trans
+      (data.H_le.trans (Subgroup.map_subtype_le _))))
+  haveI hcyc : IsCyclic ↥data.W := data.W_cyclic
+  letI : CommGroup ↥data.W := hcyc.commGroup
+  -- `C_G(v) = W` (`≤`: `normalizer_V`; `⊇`: `W` abelian).
+  have hCGv : Subgroup.centralizer ({v} : Set G) = data.W := by
+    refine le_antisymm ?_ ?_
+    · rw [← data.normalizer_V {v} (Set.singleton_nonempty v) (Set.singleton_subset_iff.mpr hv)]
+      intro g hg
+      have hgv : g * v * g⁻¹ = v := by
+        have h := Subgroup.mem_centralizer_singleton_iff.mp hg
+        rw [mul_inv_eq_iff_eq_mul]; exact h
+      rw [Subgroup.mem_set_normalizer_iff]
+      intro n
+      rw [Set.mem_singleton_iff, Set.mem_singleton_iff]
+      constructor
+      · intro h; rw [h]; exact hgv
+      · intro h
+        calc n = g⁻¹ * (g * n * g⁻¹) * g := by group
+          _ = g⁻¹ * v * g := by rw [h]
+          _ = g⁻¹ * (g * v * g⁻¹) * g := by rw [hgv]
+          _ = v := by group
+    · intro x hxW
+      rw [Subgroup.mem_centralizer_singleton_iff]
+      have hc : (⟨x, hxW⟩ : ↥data.W) * ⟨v, hvW⟩ = ⟨v, hvW⟩ * ⟨x, hxW⟩ := mul_comm _ _
+      have := congrArg Subtype.val hc
+      simpa using this
+  have hcard_b : Nat.card (OddOrder.Peterfalvi.S04.centralizerIn M b) = Nat.card data.W := by
+    rw [← hmv, OddOrder.Peterfalvi.S04.card_centralizerIn_conj hmM v,
+      OddOrder.Peterfalvi.S04.centralizerIn, hCGv, inf_eq_right.mpr hWM]
+  rw [hcard_b]
+  -- coprime `|R(a)| |W|`: pick `w ∈ W₂^#`, `W ≤ C_M(w)`, and the σ-sharp coprimality.
+  obtain ⟨w, hw1⟩ := Subgroup.ne_bot_iff_exists_ne_one.mp data.W2_nontrivial
+  have hwW : (w : G) ∈ data.W := (data.W_eq ▸ le_sup_right : data.W2 ≤ data.W) w.2
+  have hw1' : (w : G) ≠ 1 := fun h => hw1 (Subtype.ext h)
+  have hwMσ : (w : G) ∈ OddOrder.BG.Ch3.S10.Msigma M := by
+    have hHMσ : data.H ≤ OddOrder.BG.Ch3.S10.Msigma M := by
+      rw [data.H_eq]; exact OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_le_Msigma hG hM
+    exact hHMσ (Subgroup.mem_inf.mp (data.W2_le w.2)).1
+  have hW_le_CMw : data.W ≤ OddOrder.Peterfalvi.S04.centralizerIn M (w : G) := by
+    intro x hxW
+    rw [OddOrder.Peterfalvi.S04.mem_centralizerIn]
+    refine ⟨hWM hxW, ?_⟩
+    have hc : (⟨x, hxW⟩ : ↥data.W) * ⟨(w : G), hwW⟩ = ⟨(w : G), hwW⟩ * ⟨x, hxW⟩ := mul_comm _ _
+    have := congrArg Subtype.val hc
+    simpa using this
+  by_contra hnc
+  obtain ⟨p, hpp, hpR, hpW⟩ := Nat.Prime.not_coprime_iff_dvd.mp hnc
+  have hpσ : p ∈ OddOrder.BG.Ch3.S10.sigma (OddOrder.BG.Ch4.S16.FT_signalizerBase a) := by
+    refine OddOrder.BG.Ch3.S10.Msigma_isPiGroup (OddOrder.BG.Ch4.S16.FT_signalizerBase a) p
+      (Nat.mem_primeFactors.mpr ⟨hpp, ?_, Nat.card_pos.ne'⟩)
+    refine hpR.trans (Subgroup.card_dvd_of_le ?_)
+    rw [OddOrder.BG.Ch4.S16.FT_signalizer]
+    exact inf_le_left
+  have hpCw : p ∣ Nat.card (OddOrder.Peterfalvi.S04.centralizerIn M (w : G)) :=
+    hpW.trans (Subgroup.card_dvd_of_le hW_le_CMw)
+  exact escaping_sigmaSharp_disjoint_centralizer hG hM haσ haesc hwMσ hw1' hpp hpσ hpCw
+
 /-- **Peterfalvi (8.15)** for type I: the Dade (2.2) support hypotheses hold for `A(M) = A_0(M)`
 and `A₁(M)`, with `L = M` and the faithful `H(a) = R(a)` of (8.14).  Assembly is genuine
 (`dadeSupportHypothesisData_of_subset`); the deep (8.13.a/c1/c2) obligations are the pins above. -/

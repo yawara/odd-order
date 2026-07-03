@@ -382,3 +382,26 @@ coprime |R(a)| |C_M(b)|; b∈M_σ#→σ-sharp coprimality、b∈V^M→C_M(b)⊆W
 (2) **generalized engine** (X⊆M, escaping⊆M_σ# 版; sigmaSharp engine を一般化)、(3) assembly →
 dadeSupportHypotheses_typeP typePA0 成分 discharge → S12 (10.1) unblock。pins 済:
 escaping_typePA0_mem_sigmaSharp (8.13.b) + centralizer_typePV_le_M (V^M 非escaping) + isConj。
+
+### loop¹²⁴ — ★ coprimality は tractable (σ-sharp に還元) — typePA0(P1) engine 全 pin 完備
+
+初め「V^M coprimality は deep (σ vs W structure)」と危惧したが、**σ-sharp coprimality に還元できると判明**
+(過去の "deep" 危惧と同様に tractable):
+
+**`coprime_FT_signalizer_centralizerIn_typePV`**: escaping a∈M_σ#, b∈V^M で coprime |R(a)| |C_M(b)|。
+鍵: **C_M(b) は C_M(v)=W に M-共役** (v∈V: C_G(v)=N_G(⟨v⟩)=W by normalizer_V、⊇ は W abelian)、
+`w∈W₂#⊆M_σ#` を取れば W≤C_M(w) (abelian) ⟹ |W| | |C_M(w)| ⟹ **σ-sharp coprimality
+(`escaping_sigmaSharp_disjoint_centralizer`) を w で適用**して共通素数を殺す。card_centralizerIn_conj で
+|C_M(b)|=|C_M(v)|、C_G(v)=W は normalizer_V + W abelian の antisymm。
+
+**typePA0(P1) Dade engine の全 pin 完備**:
+- isConj: `typePA0_isConj_conj_in_M_of_isTypeP1` ✓
+- escaping→σ-sharp (8.13.b): `escaping_typePA0_mem_sigmaSharp_of_isTypeP1` ✓
+- V^M 非escaping: `centralizer_typePV_le_M` ✓
+- coprimality (V^M): `coprime_FT_signalizer_centralizerIn_typePV` ✓ (M_σ# は sigmaSharp engine)
+- escaping structure: `escaping_sigmaSharp_signalizer_structure` ✓
+
+**残 = final assembly のみ**: generalized engine (X=typePA0; sigmaSharp engine を X⊆M+escaping⊆M_σ# に
+一般化、上記 pin で駆動) + ftSupportKernel_conj_smul の typePA0 版 + normalizer_eq(typePA0)。→
+`dadeSupportHypotheses_typeP` typePA0 成分 discharge → S12 (10.1 existence) unblock。deep 部分は無し、
+残りは mechanical assembly。
