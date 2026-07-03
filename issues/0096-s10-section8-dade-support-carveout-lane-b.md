@@ -904,3 +904,19 @@ extension 消失 ⟹ real は出るが =e には不足)。**(12.13) 構成 (dade
 h_psix cyclotomic congruence**。残 = deep final Dade contradiction (coherence-degree + ρM + §7 norm)、
 sustained multi-session char theory。次: ψ(1)=e を coherence 構成 (witness_L_coherent) から build 試行、
 または h_psig_int/norm へ。
+
+### loop¹⁵⁴ — ψ(1)=e 深さ最終確認; (12.16) = deep endgame、measured pace へ
+
+ψ(1)=e: `nu_zeta_isIrreducibleCharacter_of_isCoherent_of_apply_one_pos` (S09:2948) で coh.extension χ =
+irreducible (norm-1 + apply_one>0) は出るが、その degree=χ(1)=e は coherence の **construction-level
+degree-preservation** 要 (isometry+sign では degree が χ(1) に固定されない)。∴ ψ(1)=e は deep sub-fact。
+
+**(12.16) chain 確定 (¹⁴⁸⁻¹⁵⁴ の網羅精査)**: deep final Dade contradiction、各 field は sustained
+per-field char-theory derivation 要:
+- h_psix: cyclotomic 部 landed (¹⁵²)、残 ψ(1)=e = coherence degree-preservation (construction level)。
+- h_psig_int (12.15): M の ρM=adjointAverageFun + norm 下界 + cyclotomic。
+- hA/hB/hC: §7 Hypothesis78/NormEstimates。
+
+**session milestones (strong)**: (12.14) psi_constant_on_xK **sorry-free** (¹⁴⁵⁻¹⁴⁷、Hypothesis M
+unblock 実証)、h_psix cyclotomic 合同 (¹⁵²)。**残 = deep endgame** (multi-session、各 field 深い)。
+rapid churn を避け measured pace で継続 (各 deep field は多 iteration の build)。
