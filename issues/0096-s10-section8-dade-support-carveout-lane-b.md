@@ -865,3 +865,17 @@ h_psix (∃w, ψ(x)-e=(1-ε)w): `exists_integral_apply_sub_of_commute` (Cyclotom
 hA-C (§7 norm)。**(12.14) は strong milestone (chain 再開 + h_const 供給)**、残は deep final Dade
 contradiction (multi-session)。次: ψ(1)=e (coherence degree-preservation) の導出可否を検討
 (isometry + ZIrr ⟹ ±irr ⟹ degree)、可なら h_psix landing。
+
+### loop¹⁵¹ — ψ(1)=e は S07 apply_one infra で導出可能 (deep field は infra 有・from-scratch でない)
+
+h_psix upstream の ψ(1)=e (coherence degree-preservation) の infra 発見:
+- `dadeIntegralCharacterMap_apply_one` (S07_CoherenceGalois:86、"Dade images vanish at 1")。
+- `extension_apply_one_eq_zero_of_supported` (S08:328、supported diff は 1 で消える)。
+- `coherent_of_constant_degree` (S07:551)。S-members は irreducible (`hSirr`)。
+∴ ψ(1)=e は導出可能 (χ-χ' supported diff の extension が 1 で消える ⟹ 同次数 S-member の
+extension は 1 で同値、+ constant-degree)。**involved だが from-scratch でなく、既存 infra から build 可**。
+
+**(12.16) chain 総括**: 全 field deep だが **各に relevant infra 有** (h_psix=S07 apply_one、
+h_psig_int=12.15 の ρM=adjointAverageFun+cyclotomic、hA-C=§7 Hypothesis78/NormEstimates)。
+= sustained multi-iter build (from-scratch でない)。**(12.14) は strong milestone**。
+**次: ψ(1)=e を grind → h_psix landing** (genuine deep build、churn assessment を脱する)。
