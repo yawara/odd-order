@@ -307,4 +307,77 @@ theorem card_irreducibleCharacter_eq_card_of_commGroup {G : Type*} [CommGroup G]
     ⟨fun a b h => isConj_iff_eq.mp (ConjClasses.mk_eq_mk_iff_isConj.mp h),
       ConjClasses.mk_surjective⟩)).symm
 
+/-- **A family of irreducible characters whose sum has squared norm equal to the family size is
+injective.**  If `η : ι → Irr(G)` (`ι` finite) and the sum `φ = ∑_i η_i` has `⟨φ, φ⟩ = |ι|`, then
+`i ↦ η_i` is injective (the summands are pairwise distinct).
+
+Expanding by bilinearity and orthonormality (`irreducibleCharacter_inner_eq_ite`),
+`⟨φ, φ⟩ = ∑_{i,j} ⟨η_i, η_j⟩ = |{(i, j) : η_i = η_j}|`.  The diagonal `{(i, i)}` already contributes
+`|ι|` elements to that "equal-value" set, so `⟨φ, φ⟩ = |ι|` forces the set to be *exactly* the
+diagonal — i.e. `η_a = η_b ⟹ a = b`.
+
+This is the multiplicity-one/distinctness core behind the constructive Clifford decomposition: the
+`[T:H]` induced summands `Ind_T^L(χ·Inf β)` of `Ind_H^L θ` are pairwise distinct because their sum
+has squared norm `[T:H] = [I_L(θ):H]` (`card_mul_inner_self_induce_eq_card_inertia`). -/
+theorem injective_of_sum_inner_self_eq_card {G : Type*} [Group G] [Finite G] [Fintype G]
+    [Invertible (Nat.card G : ℂ)] {ι : Type*} [Fintype ι] (η : ι → IrreducibleCharacter G)
+    (hnorm : ClassFunction.inner (∑ i, (η i : ClassFunction G ℂ))
+        (∑ i, (η i : ClassFunction G ℂ)) = (Fintype.card ι : ℂ)) :
+    Function.Injective η := by
+  classical
+  -- the squared norm counts the pairs `(i, j)` with `η i = η j`
+  have hcardι : (Finset.univ.filter (fun p : ι × ι => η p.1 = η p.2)).card = Fintype.card ι := by
+    have hcount : ((Finset.univ.filter (fun p : ι × ι => η p.1 = η p.2)).card : ℂ)
+        = (Fintype.card ι : ℂ) := by
+      rw [← hnorm, inner_sum_left]
+      simp_rw [inner_sum_right, irreducibleCharacter_inner_eq_ite]
+      rw [← Finset.sum_product', Finset.univ_product_univ, Finset.sum_boole]
+    exact_mod_cast hcount
+  -- the diagonal is contained in the equal-value set and also has `|ι|` elements, so they coincide
+  have hDF : Finset.univ.image (fun i : ι => (i, i))
+      ⊆ Finset.univ.filter (fun p : ι × ι => η p.1 = η p.2) := by
+    intro p hp
+    rw [Finset.mem_image] at hp
+    obtain ⟨i, _, rfl⟩ := hp
+    rw [Finset.mem_filter]
+    exact ⟨Finset.mem_univ _, rfl⟩
+  have hDcard : (Finset.univ.image (fun i : ι => (i, i))).card = Fintype.card ι := by
+    rw [Finset.card_image_of_injective _ (fun a b h => (Prod.ext_iff.mp h).1), Finset.card_univ]
+  have hDF_eq : Finset.univ.image (fun i : ι => (i, i))
+      = Finset.univ.filter (fun p : ι × ι => η p.1 = η p.2) :=
+    Finset.eq_of_subset_of_card_le hDF (le_of_eq (hcardι.trans hDcard.symm))
+  -- injectivity: `η a = η b` puts `(a, b)` in the equal-value set = diagonal, forcing `a = b`
+  intro a b hab
+  have hmem : (a, b) ∈ Finset.univ.filter (fun p : ι × ι => η p.1 = η p.2) := by
+    rw [Finset.mem_filter]; exact ⟨Finset.mem_univ _, hab⟩
+  rw [← hDF_eq, Finset.mem_image] at hmem
+  obtain ⟨i, _, hi⟩ := hmem
+  rw [Prod.ext_iff] at hi
+  exact hi.1.symm.trans hi.2
+
+/-- **A norm-saturating decomposition into irreducibles is multiplicity-free.**  If `φ = ∑_i η_i`
+(a finite family of irreducible characters) and `⟨φ, φ⟩ = |ι|`, then the family is injective
+(`injective_of_sum_inner_self_eq_card`), so `φ` is the sum over the finite set `S = image η` of
+`|ι|` **distinct** irreducibles, each of which is one of the `η_i`.
+
+This packages the distinctness core for the constructive Clifford decomposition: given
+`Ind_H^L θ = ∑_β Ind_T^L(χ·Inf β)` with `⟨Ind_H^L θ, Ind_H^L θ⟩ = [T:H]`, the `[T:H]` summands are
+pairwise distinct and constitute the constituent set of `Ind_H^L θ`. -/
+theorem exists_finset_eq_sum_of_sum_inner_self_eq_card {G : Type*} [Group G] [Finite G] [Fintype G]
+    [Invertible (Nat.card G : ℂ)] {ι : Type*} [Fintype ι] {φ : ClassFunction G ℂ}
+    (η : ι → IrreducibleCharacter G) (hsum : φ = ∑ i, (η i : ClassFunction G ℂ))
+    (hnorm : ClassFunction.inner φ φ = (Fintype.card ι : ℂ)) :
+    ∃ S : Finset (IrreducibleCharacter G), S.card = Fintype.card ι ∧
+      φ = ∑ χ ∈ S, (χ : ClassFunction G ℂ) ∧ (∀ χ ∈ S, ∃ i, η i = χ) := by
+  classical
+  rw [hsum] at hnorm
+  have hinj := injective_of_sum_inner_self_eq_card η hnorm
+  refine ⟨Finset.univ.image η, ?_, ?_, ?_⟩
+  · rw [Finset.card_image_of_injective _ hinj, Finset.card_univ]
+  · rw [hsum, Finset.sum_image (fun a _ b _ h => hinj h)]
+  · intro χ hχ
+    rw [Finset.mem_image] at hχ
+    obtain ⟨i, _, rfl⟩ := hχ
+    exact ⟨i, rfl⟩
+
 end OddOrder.RepresentationTheory
