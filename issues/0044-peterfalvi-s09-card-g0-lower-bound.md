@@ -394,3 +394,17 @@ FrobeniusFamily から wired。**残 = (7.8.b)/(7.9) character estimate のみ**
   `not_trivial_G0_of_exists_Bsum_bound` bypass で spine 実証。
 次 iteration は (7.8.b) chiRhoNormSq 下界の tractability 精査 (Hypothesis78 machinery が Frobenius family に
 適用できるか)。これが 7.10 の実質的な最終 deep 部。
+
+## 2026-07-03 cont.⁹ (lane-a, /loop) — (7.8.b) source orthogonalities 全 landed; 残 = coherence ν (deep gate)
+
+**Landed** (`310448b4`): `induce_inner_induce_trivial` (`⟨Ind φ,Ind 1⟩=[G:H]·⟨φ,1⟩`) +
+`induce_inner_induce_trivial_eq_zero_of_irreducible` (`⟨ζ,Ind1H⟩=0`, ζ irr≠1) + `restrict_induce_trivial`
+(dedup)。**(7.8.b) `‖β‖²=e+1` の source 事実 (⟨Ind1H,Ind1H⟩=e / ⟨ζ,Ind1H⟩=0 / ⟨ζ,ζ⟩=1) 全て available**。
+
+**残 deep gate = Frobenius induced-family の coherence ν**: `hypothesis78OfDade` は ν (+ isometry
+hnu_isometry + agreement hagree) を**入力**に取る。NormEstimates も未構成 hypothesis。⟹ Hypothesis78 →
+BetaDecomp → NormEstimates → chiRhoNormSq bound の chain は全て ν に gated。この ν = {Ind_H^L θ} の
+(5.6)/(6.8) Sibley coherence が S07/S08 から wireable かが 7.10 完遂の鍵 (次 iteration の第一調査)。
+
+**現状総括**: 7.10 の構造 trunk (7.1/7.4/7.6) + (7.8.b) source facts = wiring/elementary で landed。
+残 = coherence ν + NormEstimates + (7.9) = genuine deep §5-8 char analysis (multi-week 級の可能性)。
