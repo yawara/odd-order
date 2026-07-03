@@ -617,3 +617,26 @@ virtual char) / hsmall (`frobenius_two_mul_card_complement_add_one_le_card_kerne
 `zetaNuRhoNormSqGeOfDade` で構築 → `H78.zetaNuRhoNormSq = P.chiRhoNormSq χ` bridge → hi/hgood。
 hsmall の `frobenius_two_mul_card_complement_add_one_le_card_kernel` は "hoistable to Ch06" と §14 が明記、
 Isaacs Ch06 へ hoist が筋 (issue 9007 と同様の shared 判断; ただし純群論ゆえ Ch06 が正所在)。
+
+## 2026-07-04 cont.¹⁹ (lane-a, /loop) — ★ (7.8.b) COMPLETE: FrobeniusFamily.zetaNuRhoNormSq_ge 実証明
+
+**Landed** (sorry-free、build green):
+- `IsFrobeniusGroup.two_mul_card_complement_add_one_le_card_kernel` (**Isaacs Ch06 OddComplement**、
+  commit 9f41b6f7): odd Frobenius で 2|A|+1 ≤ |N|。§14 ローカル copy ("hoistable to Ch06") を正所在へ hoist
+  (純群論、card_kernel_modEq_one のみ依存)。hsmall の producer。
+- `FrobeniusFamily.zetaNuRhoNormSq_ge` (**S09_FrobeniusEstimate.lean**): 各 member の **(7.8.b) 下界
+  `1 − e_i/h_i ≤ H78.zetaNuRhoNormSq`**。`zetaNuRhoNormSqGeOfDade` に hypothesis78OfDade 全引数
+  (hypothesis78 と同一、placed family/d/psi_support/hdeg/hnu_isometry/hagree) + 4-fact
+  (hzeta0nu=F.hzeta0nu / hζ0norm=inner_self_induce_eq_one / a·ha=exists_betaDecomp_a / hsmall) を供給。
+  §14 `witness_L_zeta_bound` を逐語 mirror。返り値 = `∃ H78, 1−e/h ≤ H78.zetaNuRhoNormSq`。
+
+**修正 note**: (1) `H78.kernelOrder = Nat.card hyp76.H` ゆえ `set H78` 経由の hke は `show` で unfold
+(rfl 不可)。(2) `set coh with hcoh` + `rw [← hcoh] at hz0` で F.hzeta0nu (literal F.coherence) を
+coh に fold (ν=coh.extension と一致させる)。
+
+**(7.10) 残チェーン**: `zetaNuRhoNormSq_ge` (per-member (7.8.b)) → **bridge
+`H78.zetaNuRhoNormSq = P.chiRhoNormSq χ`** + `H78.complementIndex=e_i` / `kernelOrder=h_i`
+(`characterEstimateData_of_family71_reduced_estimates` の hi/hgood 形へ) → (7.9) 𝓑-sum + min-index
+選択 → `characterEstimateData_of_family71_reduced_estimates` → `card_G0_lower_bound`。
+次 (cont.²⁰): chiRhoNormSq bridge (H78.zetaNuRhoNormSq と P.chiRhoNormSq χ_i の同一視; χ = ν ζ_0 = 
+被評価 signed irreducible)。これが (7.8.b)→(7.5) glue の核。
