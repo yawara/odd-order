@@ -242,3 +242,22 @@ claim holder (lane d) は 3 レーン再編で退役。**claim は lane a に承
 - issue 4014 (hub 裁定節) / `notes/meta/ft_lane_reallocation_2026_06_28.md` (lane d 再々配分行)
 - 既存: `SingerField.lean` / `CyclotomicGaloisAction.lean` / `Clifford*.lean` / `NearFields.lean`
 - 下流 consumer: `S15_SAndT_Setup.{basic_structure.u_bound, c_eq_one}` / lane a §11 (Pf 9.7 instance)
+
+## ✅ S11 dup retire→cite 完了 (2026-07-03 lane a, commit e82638d9)
+
+hub 裁定の dedup を実施。S11 の subgroup-level Singer shadow assembly を退役:
+- 旧 `isCyclic_card_dvd_of_aInvariant_irreducible_faithful_comm` / 旧
+  `coprime_card_sub_one_of_aInvariant_irreducible_faithful_comm_fpf` → **削除**。
+  代替 = 変換専用 2 piece (`elabRepresentation_isSimpleModule_and_faithful`、
+  `exists_addEquiv_asModule_fpf`) + thin entry 2 本 (`singerAdapter_isCyclic_card_dvd` /
+  `singerAdapter_coprime_fpf`、各々 shared `SingerField` lemma を single cite)。
+  旧 wrapper 2 本が重複させていた plumbing は 1 回に factor。
+- `chiefFactor_caseB_image_dvd_norm` の inline 算術 → shared `SingerLineBound.dvd_div_of_coprime_of_dvd_sub_one`
+  cite (算術核の single home 化)。
+- ⚠ 実装知見: asModule 型の instance 解決は `[Module (ZMod p) (Additive K)]` **binder 文脈が必須**
+  (consumer 側 letI 文脈では `Module (MonoidAlgebra …) asModule` synthesis が stuck) — thin adapter が
+  inline 展開より正しい構造である技術的理由。
+- full build green (3902 jobs) + AxiomsCheck OK (entries は singerAdapter 対に差替)。
+
+**9000 残 (lane a)**: §9 caseA/Galois 側の block 分解 assembly (`Hbar=⊕H1^w` + `hconst` 供給、
+9.8.d de-opacify と一体) — deep sub-phase、着手時は Coq `typeP_Galois` 精読から。

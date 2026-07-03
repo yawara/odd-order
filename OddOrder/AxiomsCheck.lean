@@ -6474,8 +6474,11 @@ formula together with the prime computation `coprimeFrobeniusAction_card_eq_prim
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S11.chiefFactor_clifford_dim_dvd_q
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S11.chiefFactor_clifford_U_dichotomy
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S11.elabRepresentation_isIrreducible
+-- thin subgroup→module Singer adapter (issue 9000 dedup): the former subgroup-level Singer
+-- wrappers are retired; §9 case-(b) cites the shared `SingerField`/`SingerLineBound` leaves
+-- through this single conversion.
 #assert_only_allowed_axioms
-  OddOrder.Peterfalvi.S11.isCyclic_card_dvd_of_aInvariant_irreducible_faithful_comm
+  OddOrder.Peterfalvi.S11.singerAdapter_isCyclic_card_dvd
 -- (9.7)(b) structural core: an irreducible action with commuting image is fixed-point-free off the
 -- kernel (the Frobenius structure `H̄ ⋊ Ū`).  Pure group theory — no Singer field model needed.
 #assert_only_allowed_axioms
@@ -6517,7 +6520,7 @@ formula together with the prime computation `coprimeFrobeniusAction_card_eq_prim
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S11.typeP_commutator_U_centralizes_H
 #assert_only_allowed_axioms OddOrder.Peterfalvi.S11.chiefFactor_caseB_image_cyclic
 #assert_only_allowed_axioms
-  OddOrder.Peterfalvi.S11.coprime_card_sub_one_of_aInvariant_irreducible_faithful_comm_fpf
+  OddOrder.Peterfalvi.S11.singerAdapter_coprime_fpf
 -- Peterfalvi (9.7)(b): `Coprime |Ū| (p-1)` (fixed-point-free) and the resulting unconditional
 -- divisibility `|Ū| ∣ (p^q-1)/(p-1)`.  The FPF input `C_Ū(w₀) = 1` is supplied from the Frobenius
 -- structure of `U W₁` via Isaacs Cor 3.28 (`coprime_fixedPoints_quotient`).
