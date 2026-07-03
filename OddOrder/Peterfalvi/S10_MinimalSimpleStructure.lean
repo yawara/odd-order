@@ -691,14 +691,113 @@ theorem typeIA_nonempty (M : Subgroup G) (data : TypeIData M) :
     a.1, (Set.mem_diff _).mpr ⟨SetLike.mem_coe.mpr a.2, fun h => ha1' (Set.mem_singleton_iff.mp h)⟩,
     Subgroup.mem_centralizer_singleton_iff.mpr rfl⟩
 
-/-- **Peterfalvi (8.13.a) for the type-I support** (pin): two `G`-conjugate elements of `A(M)` are
-already `M`-conjugate.  Deep §16 fusion obligation (BG §16 Theorem II; Coq `FTsupport_facts`
-part a), `sorry`-pinned for the (8.15) assembly (issue 0096). -/
+/-- **The type-`F` complement `U` is a `(κ ∪ σ)′`-Hall subgroup of `M`.**  For type I,
+`κ(M) = ∅` (Proposition 16.1) and `H = M_F = M_σ` is the `σ`-Hall of `G`, so the complement
+`U` of `H` in `M` has `σ′`-order (`|U| = |M : H|` divides `|G : M_σ|`) and `σ`-index
+(`|M : U| = |H|`).  Supplies the `hU` input of BG Theorem II
+(`theoremII_tame_embedding`) from the shared type-I data. -/
+theorem typeF_complement_isHall_kappa_sigma_compl [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G}
+    (hM : M ∈ maximalSubgroups G) (data : TypeIData M) :
+    OddOrder.Isaacs.Ch03.IsHallSubgroup
+      ((OddOrder.BG.Ch4.S14.kappa M ∪ OddOrder.BG.Ch3.S10.sigma M)ᶜ)
+      (data.typeF.U.subgroupOf M) := by
+  have hκ : OddOrder.BG.Ch4.S14.kappa M = ∅ :=
+    (OddOrder.Peterfalvi.S10Interface.isTypeI_iff_isTypeF hG hM).mp ⟨data⟩
+  have hHMσ : data.typeF.H = OddOrder.BG.Ch3.S10.Msigma M := by
+    rw [data.typeF.H_eq]
+    exact OddOrder.Peterfalvi.S10Interface.maxNilpotentNormalHall_eq_Msigma_of_typeI_or_II
+      hG hM (Or.inl ⟨data⟩)
+  have hcompl := data.typeF.complement
+  have hHall := OddOrder.BG.Ch3.S10.Msigma_isHall hG hM
+  constructor
+  · -- primes of `|U|` avoid `κ ∪ σ = σ`: `|U| = |M : H|` divides `|G : M_σ|`, a `σ′`-number.
+    intro p hp
+    simp only [Set.mem_compl_iff, Set.mem_union, hκ, Set.mem_empty_iff_false, false_or]
+    intro hpσ
+    have hidx : (data.typeF.H.subgroupOf M).index
+        = Nat.card (data.typeF.U.subgroupOf M) := hcompl.symm.index_eq_card
+    have hrel : (data.typeF.H.subgroupOf M).index * M.index = data.typeF.H.index :=
+      Subgroup.relIndex_mul_index data.typeF.H_le
+    have hdvd : p ∣ (OddOrder.BG.Ch3.S10.Msigma M).index := by
+      rw [← hHMσ, ← hrel]
+      exact Dvd.dvd.mul_right (hidx ▸ (Nat.mem_primeFactors.mp hp).2.1) _
+    have hidx_ne : (OddOrder.BG.Ch3.S10.Msigma M).index ≠ 0 :=
+      Subgroup.index_ne_zero_of_finite
+    exact hHall.2 p (Nat.mem_primeFactors.mpr
+      ⟨(Nat.mem_primeFactors.mp hp).1, hdvd, hidx_ne⟩) hpσ
+  · -- primes of `|M : U| = |H| = |M_σ|` lie in `σ ⊆ κ ∪ σ`.
+    intro p hp
+    simp only [Set.mem_compl_iff, Set.mem_union, not_not, hκ, Set.mem_empty_iff_false, false_or]
+    have hidxU : (data.typeF.U.subgroupOf M).index
+        = Nat.card (data.typeF.H.subgroupOf M) := hcompl.index_eq_card
+    have hcardH : Nat.card (data.typeF.H.subgroupOf M) = Nat.card data.typeF.H :=
+      Nat.card_congr (Subgroup.subgroupOfEquivOfLe data.typeF.H_le).toEquiv
+    have hpH : p ∣ Nat.card (OddOrder.BG.Ch3.S10.Msigma M) := by
+      rw [← hHMσ, ← hcardH, ← hidxU]
+      exact (Nat.mem_primeFactors.mp hp).2.1
+    exact hHall.1 p (Nat.mem_primeFactors.mpr
+      ⟨(Nat.mem_primeFactors.mp hp).1, hpH, Nat.card_pos.ne'⟩)
+
+/-- **The type-I support `A(M)` lies in BG's Theorem E set `A(M) = ASet M U`.**  A point
+`y ∈ A(M)` is a nonidentity element of `M` centralizing some `x ∈ H^# = M_σ^#`, so
+`M_σ ⊓ C_G(y) ≠ ⊥` (`y ∈ \widehat{M_σ}`), and `y ∈ M = U ⊔ M_σ` by the type-`F` complement
+decomposition.  The support-set bridge feeding BG Theorem II into the (8.13) pins. -/
+theorem typeIA_subset_ASet [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    {M : Subgroup G} (hM : M ∈ maximalSubgroups G) (data : TypeIData M) :
+    typeIA M data ⊆ OddOrder.BG.Ch4.S16.ASet M data.typeF.U := by
+  have hHMσ : data.typeF.H = OddOrder.BG.Ch3.S10.Msigma M := by
+    rw [data.typeF.H_eq]
+    exact OddOrder.Peterfalvi.S10Interface.maxNilpotentNormalHall_eq_Msigma_of_typeI_or_II
+      hG hM (Or.inl ⟨data⟩)
+  rintro y ⟨hyM, _hy1, x, hxH, hyC⟩
+  obtain ⟨hxHmem, hx1⟩ := (Set.mem_diff _).mp hxH
+  refine ⟨⟨hyM, ?_⟩, ?_⟩
+  · -- `x ∈ M_σ ⊓ C_G(y)` is a nonidentity witness.
+    intro hbot
+    have hxC : x ∈ Subgroup.centralizer ({y} : Set G) :=
+      Subgroup.mem_centralizer_iff.mpr fun z hz => by
+        rw [Set.mem_singleton_iff] at hz
+        subst hz
+        exact (Subgroup.mem_centralizer_iff.mp hyC x (Set.mem_singleton x)).symm
+    have hxmem : x ∈ OddOrder.BG.Ch3.S10.Msigma M ⊓ Subgroup.centralizer ({y} : Set G) :=
+      Subgroup.mem_inf.mpr ⟨hHMσ ▸ SetLike.mem_coe.mp hxHmem, hxC⟩
+    rw [hbot] at hxmem
+    exact hx1 (Set.mem_singleton_iff.mpr (Subgroup.mem_bot.mp hxmem))
+  · -- `y ∈ U ⊔ M_σ`: decompose `y = h · u` along the type-`F` complement.
+    obtain ⟨⟨h, u⟩, hhu, -⟩ := Subgroup.IsComplement.existsUnique
+      data.typeF.complement (⟨y, hyM⟩ : ↥M)
+    have hyval : ((h : ↥M) : G) * ((u : ↥M) : G) = y := by
+      simpa using congrArg (fun z : ↥M => (z : G)) hhu
+    have hh : ((h : ↥M) : G) ∈ OddOrder.BG.Ch3.S10.Msigma M :=
+      hHMσ ▸ Subgroup.mem_subgroupOf.mp h.2
+    have hu : ((u : ↥M) : G) ∈ data.typeF.U := Subgroup.mem_subgroupOf.mp u.2
+    rw [SetLike.mem_coe, ← hyval]
+    exact mul_mem (Subgroup.mem_sup_right hh) (Subgroup.mem_sup_left hu)
+
+/-- **Peterfalvi (8.13.a) for the type-I support**: two `G`-conjugate elements of `A(M)` are
+already `M`-conjugate.  BG §16 Theorem II conjunct 1 (`theoremII_tame_embedding`, whose
+`X = ASet M U` branch receives `A(M)` via `typeIA_subset_ASet`); the `κ`-Hall input is `K = ⊥`
+(`κ(M) = ∅` for type I) and the `(κ ∪ σ)′`-Hall input is the type-`F` complement
+(`typeF_complement_isHall_kappa_sigma_compl`). -/
 theorem typeIA_isConj_conj_in_M [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     {M : Subgroup G} (hM : M ∈ maximalSubgroups G) (data : TypeIData M)
     {a b : G} (ha : a ∈ typeIA M data) (hb : b ∈ typeIA M data) (hab : IsConj a b) :
     ∃ m : G, m ∈ M ∧ m * a * m⁻¹ = b := by
-  sorry
+  have hκ : OddOrder.BG.Ch4.S14.kappa M = ∅ :=
+    (OddOrder.Peterfalvi.S10Interface.isTypeI_iff_isTypeF hG hM).mp ⟨data⟩
+  have hK : OddOrder.Isaacs.Ch03.IsHallSubgroup (OddOrder.BG.Ch4.S14.kappa M)
+      ((⊥ : Subgroup G).subgroupOf M) := by
+    rw [Subgroup.bot_subgroupOf, OddOrder.Isaacs.Ch03.IsHallSubgroup.bot_iff]
+    intro p _
+    rw [hκ]
+    exact Set.notMem_empty p
+  have hII := OddOrder.BG.Ch4.S16.theoremII_tame_embedding hG hM bot_le data.typeF.U_le hK
+    (typeF_complement_isHall_kappa_sigma_compl hG hM data) (Or.inl rfl)
+  obtain ⟨g, hg⟩ := isConj_iff.mp hab
+  obtain ⟨m, hmM, hmb⟩ := hII.1 a (typeIA_subset_ASet hG hM data ha)
+    b (typeIA_subset_ASet hG hM data hb) ⟨g, hg.symm⟩
+  exact ⟨m, hmM, hmb.symm⟩
 
 /-- **Peterfalvi (8.13.c1/c2) at an escaping point of the type-I support** (pin; BG §16
 Theorem II + Theorem D(4); Coq `FTsupport_facts` part c).  For escaping `a ∈ A(M)`
@@ -725,17 +824,6 @@ theorem escaping_typeIA_signalizer_structure [Finite G]
           (Nat.card (OddOrder.Peterfalvi.S04.centralizerIn M b))) := by
   sorry
 
-/-- **(8.14) kernel equivariance at an escaping point** (pin): `R(m·a·m⁻¹) = m·R(a)·m⁻¹` for
-`m ∈ M`, from the uniqueness of the supporting maximal (`N[m·a·m⁻¹] = m·N[a]·m⁻¹`, BG Theorem D). -/
-theorem FT_signalizer_conj_smul_of_escaping [Finite G]
-    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G}
-    (hM : M ∈ maximalSubgroups G) (data : TypeIData M)
-    {a m : G} (hm : m ∈ M)
-    (ha : a ∈ OddOrder.GroupTheory.escapingCentralizerSet M (typeIA M data)) :
-    OddOrder.BG.Ch4.S16.FT_signalizer (m * a * m⁻¹)
-      = MulAut.conj m • OddOrder.BG.Ch4.S16.FT_signalizer a := by
-  sorry
-
 /-- The escaping set of an `M`-invariant support is `M`-conjugation invariant: conjugation by
 `m ∈ M` transports centralizers and preserves the non-containment `C_G(x) ⊄ M`. -/
 theorem escapingCentralizerSet_conj_mem {M : Subgroup G} {X : Set G} {m x : G}
@@ -757,12 +845,180 @@ theorem escapingCentralizerSet_conj_mem {M : Subgroup G} {X : Set G} {m x : G}
   constructor
   · rintro ⟨hmx, hesc⟩
     refine ⟨hX.mp hmx, fun hle => hesc ?_⟩
-    have h2 : m * x * m⁻¹ = m * x * m⁻¹ := rfl
     exact key hm hle
   · rintro ⟨hx, hesc⟩
     refine ⟨hX.mpr hx, fun hle => hesc ?_⟩
     have h2 : m⁻¹ * (m * x * m⁻¹) * m⁻¹⁻¹ = x := by group
     exact h2 ▸ key (inv_mem hm) hle
+
+/-- Conjugation by a `MulAut` distributes over the subgroup infimum (the pointwise action is
+an order isomorphism). -/
+private theorem conj_smul_inf' (φ : MulAut G) (H K : Subgroup G) :
+    φ • (H ⊓ K) = φ • H ⊓ φ • K := by
+  ext z
+  simp only [Subgroup.mem_pointwise_smul_iff_inv_smul_mem, Subgroup.mem_inf]
+
+/-- Conjugation transports the centralizer of a singleton:
+`g · C_G(a) · g⁻¹ = C_G(g a g⁻¹)` (local copy of the S12/S14 helper; pure group theory). -/
+private theorem conj_smul_centralizer_singleton' (g a : G) :
+    MulAut.conj g • Subgroup.centralizer ({a} : Set G)
+      = Subgroup.centralizer ({g * a * g⁻¹} : Set G) := by
+  ext y
+  rw [Subgroup.mem_pointwise_smul_iff_inv_smul_mem, Subgroup.mem_centralizer_iff,
+      Subgroup.mem_centralizer_iff]
+  have hinv : (MulAut.conj g)⁻¹ • y = g⁻¹ * y * g := by
+    rw [← map_inv, MulAut.smul_def, MulAut.conj_apply, inv_inv]
+  simp only [Set.mem_singleton_iff, forall_eq, hinv]
+  constructor
+  · intro h
+    calc g * a * g⁻¹ * y
+        = g * (a * (g⁻¹ * y * g)) * g⁻¹ := by group
+      _ = g * (g⁻¹ * y * g * a) * g⁻¹ := by rw [h]
+      _ = y * (g * a * g⁻¹) := by group
+  · intro h
+    calc a * (g⁻¹ * y * g)
+        = g⁻¹ * (g * a * g⁻¹ * y) * g := by group
+      _ = g⁻¹ * (y * (g * a * g⁻¹)) * g := by rw [h]
+      _ = g⁻¹ * y * g * a := by group
+
+/-- `MulAut` smul is `map` along the automorphism (local copy of the S09/S11 helper). -/
+private theorem mulAut_smul_eq_map' (φ : MulAut G) (H : Subgroup G) :
+    φ • H = H.map (φ : G →* G) := by
+  rw [Subgroup.pointwise_smul_def]
+  rfl
+
+/-- `MulAut`-conjugation transports `opiCoreInG` (local copy of the S14 helper). -/
+private theorem conj_smul_opiCoreInG'' [Finite G] (π : Set ℕ) (φ : MulAut G) (H : Subgroup G) :
+    φ • opiCoreInG π H = opiCoreInG π (φ • H) := by
+  have hHmap : H.map (φ : G →* G) = φ • H :=
+    (mulAut_smul_eq_map' φ H).symm
+  let e : ↥H ≃* ↥(φ • H) :=
+    (Subgroup.equivMapOfInjective H (φ : G →* G) φ.injective).trans
+      (MulEquiv.subgroupCongr hHmap)
+  have hcomp : (φ • H).subtype.comp (e : ↥H →* ↥(φ • H)) = (φ : G →* G).comp H.subtype := by
+    ext x; rfl
+  calc φ • opiCoreInG π H
+      = (opiCoreInG π H).map (φ : G →* G) := mulAut_smul_eq_map' φ _
+    _ = ((OddOrder.Isaacs.Ch03.oPiCore π ↥H).map H.subtype).map (φ : G →* G) := rfl
+    _ = (OddOrder.Isaacs.Ch03.oPiCore π ↥H).map ((φ : G →* G).comp H.subtype) := by
+        rw [Subgroup.map_map]
+    _ = (OddOrder.Isaacs.Ch03.oPiCore π ↥H).map
+          ((φ • H).subtype.comp (e : ↥H →* ↥(φ • H))) := by rw [hcomp]
+    _ = ((OddOrder.Isaacs.Ch03.oPiCore π ↥H).map (e : ↥H →* ↥(φ • H))).map
+          (φ • H).subtype := by rw [← Subgroup.map_map]
+    _ = (OddOrder.Isaacs.Ch03.oPiCore π ↥(φ • H)).map (φ • H).subtype := by
+        rw [OddOrder.Isaacs.Ch03.oPiCore.map_eq_of_mulEquiv]
+
+/-- `M_σ` is conjugation-equivariant (local copy of the S14 private helper). -/
+private theorem Msigma_conj_smul' [Finite G] (g : G) (M : Subgroup G) :
+    OddOrder.BG.Ch3.S10.Msigma (MulAut.conj g • M)
+      = MulAut.conj g • OddOrder.BG.Ch3.S10.Msigma M := by
+  simp only [OddOrder.BG.Ch3.S10.Msigma]
+  rw [conj_smul_opiCoreInG'', OddOrder.BG.Ch4.S14.sigma_conj_smul_eq]
+
+/-- **(8.14) kernel equivariance at an escaping point**: `R(m·a·m⁻¹) = m·R(a)·m⁻¹` for `m ∈ M`.
+
+The escaping point and its conjugate are both `σ`-sharp with escaping centralizer
+(`mem_sigmaSharp_of_mem_aSet_of_escape` via the `typeIA_subset_ASet` bridge), so both supporting
+maximals are pinned by the singleton uniqueness
+(`maximalSubgroupsContaining_centralizer_eq_singleton_of_sigmaSharp_escape`, BG Theorem D);
+`MulAut.conj m • N[a]` is maximal over `C_G(m·a·m⁻¹) = m·C_G(a)·m⁻¹`, so
+`N[m·a·m⁻¹] = m·N[a]·m⁻¹`, and `R = N_σ ⊓ C_G(·)` transports by `M_σ`-equivariance. -/
+theorem FT_signalizer_conj_smul_of_escaping [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G}
+    (hM : M ∈ maximalSubgroups G) (data : TypeIData M)
+    {a m : G} (hm : m ∈ M)
+    (ha : a ∈ OddOrder.GroupTheory.escapingCentralizerSet M (typeIA M data)) :
+    OddOrder.BG.Ch4.S16.FT_signalizer (m * a * m⁻¹)
+      = MulAut.conj m • OddOrder.BG.Ch4.S16.FT_signalizer a := by
+  classical
+  obtain ⟨haA, hesc⟩ := ha
+  -- the conjugate is again an escaping support point
+  have hiff : ∀ {x : G}, m * x * m⁻¹ ∈ typeIA M data ↔ x ∈ typeIA M data := by
+    intro x
+    constructor
+    · intro h
+      have := typeIA_conj_mem M data (inv_mem hm) h
+      have hx : m⁻¹ * (m * x * m⁻¹) * m⁻¹⁻¹ = x := by group
+      rwa [hx] at this
+    · exact typeIA_conj_mem M data hm
+  obtain ⟨ha'A, hesc'⟩ :=
+    (escapingCentralizerSet_conj_mem hm hiff).mpr ⟨haA, hesc⟩
+  -- both points are σ-sharp, so both supporting maximals are unique
+  have hκ : OddOrder.BG.Ch4.S14.kappa M = ∅ :=
+    (OddOrder.Peterfalvi.S10Interface.isTypeI_iff_isTypeF hG hM).mp ⟨data⟩
+  have hK : OddOrder.Isaacs.Ch03.IsHallSubgroup (OddOrder.BG.Ch4.S14.kappa M)
+      ((⊥ : Subgroup G).subgroupOf M) := by
+    rw [Subgroup.bot_subgroupOf, OddOrder.Isaacs.Ch03.IsHallSubgroup.bot_iff]
+    intro p _
+    rw [hκ]
+    exact Set.notMem_empty p
+  have hU := typeF_complement_isHall_kappa_sigma_compl hG hM data
+  have hσ : a ∈ OddOrder.BG.Ch4.S14.sigmaSharp M :=
+    OddOrder.BG.Ch4.S16.mem_sigmaSharp_of_mem_aSet_of_escape hG hM bot_le data.typeF.U_le hK hU
+      (Or.inl rfl) (typeIA_subset_ASet hG hM data haA) haA.2.1 hesc
+  have hσ' : m * a * m⁻¹ ∈ OddOrder.BG.Ch4.S14.sigmaSharp M :=
+    OddOrder.BG.Ch4.S16.mem_sigmaSharp_of_mem_aSet_of_escape hG hM bot_le data.typeF.U_le hK hU
+      (Or.inl rfl) (typeIA_subset_ASet hG hM data ha'A) ha'A.2.1 hesc'
+  obtain ⟨N, hN⟩ :=
+    OddOrder.BG.Ch4.S16.maximalSubgroupsContaining_centralizer_eq_singleton_of_sigmaSharp_escape
+      hG hM hσ hesc
+  obtain ⟨N', hN'⟩ :=
+    OddOrder.BG.Ch4.S16.maximalSubgroupsContaining_centralizer_eq_singleton_of_sigmaSharp_escape
+      hG hM hσ' hesc'
+  have hNmem : N ∈ maximalSubgroupsContaining (Subgroup.centralizer ({a} : Set G)) := by
+    rw [hN]; rfl
+  obtain ⟨hNmax, hCN⟩ := mem_maximalSubgroupsContaining.mp hNmem
+  -- branch conditions for the concrete `FT_signalizerBase`
+  have hgt : 1 < (OddOrder.BG.Ch4.S14.maximalSigmaSubgroupsOfElement a).ncard := by
+    by_contra h
+    push_neg at h
+    exact hesc (OddOrder.BG.Ch4.S16.centralizer_le_of_maximalSigma_le_one hG hM hσ.1 haA.2.1 h)
+  have hgt' : 1 < (OddOrder.BG.Ch4.S14.maximalSigmaSubgroupsOfElement (m * a * m⁻¹)).ncard := by
+    by_contra h
+    push_neg at h
+    exact hesc'
+      (OddOrder.BG.Ch4.S16.centralizer_le_of_maximalSigma_le_one hG hM hσ'.1 ha'A.2.1 h)
+  have hbr : 1 < (OddOrder.BG.Ch4.S14.maximalSigmaSubgroupsOfElement a).ncard ∧
+      (maximalSubgroupsContaining (Subgroup.centralizer ({a} : Set G))).Nonempty :=
+    ⟨hgt, ⟨N, hNmem⟩⟩
+  have hbr' : 1 <
+      (OddOrder.BG.Ch4.S14.maximalSigmaSubgroupsOfElement (m * a * m⁻¹)).ncard ∧
+      (maximalSubgroupsContaining
+        (Subgroup.centralizer ({m * a * m⁻¹} : Set G))).Nonempty :=
+    ⟨hgt', ⟨N', by rw [hN']; rfl⟩⟩
+  -- identify the two bases (avoiding a motive dependence on the `Nonempty` proof)
+  have huniq : ∀ L ∈ maximalSubgroupsContaining (Subgroup.centralizer ({a} : Set G)),
+      L = N := by
+    intro L hL
+    rw [hN, Set.mem_singleton_iff] at hL
+    exact hL
+  have huniq' : ∀ L ∈ maximalSubgroupsContaining
+      (Subgroup.centralizer ({m * a * m⁻¹} : Set G)), L = N' := by
+    intro L hL
+    rw [hN', Set.mem_singleton_iff] at hL
+    exact hL
+  have hbase : OddOrder.BG.Ch4.S16.FT_signalizerBase a = N := by
+    have hb : OddOrder.BG.Ch4.S16.FT_signalizerBase a = hbr.2.choose := dif_pos hbr
+    rw [hb]
+    exact huniq _ hbr.2.choose_spec
+  have hCconj : Subgroup.centralizer ({m * a * m⁻¹} : Set G)
+      = MulAut.conj m • Subgroup.centralizer ({a} : Set G) :=
+    (conj_smul_centralizer_singleton' m a).symm
+  have hbase' : OddOrder.BG.Ch4.S16.FT_signalizerBase (m * a * m⁻¹) = MulAut.conj m • N := by
+    have hb : OddOrder.BG.Ch4.S16.FT_signalizerBase (m * a * m⁻¹) = hbr'.2.choose :=
+      dif_pos hbr'
+    have hmemN' : MulAut.conj m • N ∈
+        maximalSubgroupsContaining (Subgroup.centralizer ({m * a * m⁻¹} : Set G)) := by
+      rw [mem_maximalSubgroupsContaining]
+      refine ⟨OddOrder.BG.Ch3.S12.isCoatom_conj_smul (mem_maximalSubgroups.mp hNmax), ?_⟩
+      rw [hCconj]
+      exact Subgroup.pointwise_smul_le_pointwise_smul_iff.mpr hCN
+    rw [hb, huniq' _ hbr'.2.choose_spec]
+    exact (huniq' _ hmemN').symm
+  -- assemble: `R = N_σ ⊓ C_G(·)` transports
+  rw [OddOrder.BG.Ch4.S16.FT_signalizer, OddOrder.BG.Ch4.S16.FT_signalizer, hbase, hbase',
+    Msigma_conj_smul', hCconj, conj_smul_inf']
 
 /-- The faithful kernel is `M`-conjugation equivariant on an `M`-invariant sub-support of `A(M)`
 (escaping side by the Theorem-D pin, non-escaping side trivially `⊥`). -/
@@ -1068,18 +1324,59 @@ the centralizer of an `A(T)`-point of `σ(T)′`-order (`typeI_centralizer_le_an
 assembly — the `σ`-order bookkeeping, the escape to the proven `Ã₁`-disjointness, the `π`-part
 power argument, and the final two-sided contradiction — is genuine. -/
 
-/-- **Peterfalvi (8.13.b), `D ⊆ A₁` conjunct** (pin; BG §16 Theorem II): an escaping point of the
-type-I support `A(M)` lies in the sharp core `A₁(M)`. -/
+/-- **Peterfalvi (8.13.b), `D ⊆ A₁` conjunct**: an escaping point of the type-I support `A(M)`
+lies in the sharp core `A₁(M)`.  The BG `D ⊆ M_σ^#` reduction of Theorem II conjunct 2
+(`mem_sigmaSharp_of_mem_aSet_of_escape`, fed through the `typeIA_subset_ASet` bridge), with
+`A₁(M) = M_σ^#` the type-I support-set bridge (`A1_eq_sigmaSharp_of_typeI_or_II`). -/
 theorem escaping_typeIA_mem_A1 [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     {M : Subgroup G} (hM : M ∈ maximalSubgroups G) (data : TypeIData M)
     {a : G} (ha : a ∈ OddOrder.GroupTheory.escapingCentralizerSet M (typeIA M data)) :
     a ∈ A1 M PeterfalviType.I := by
-  sorry
+  obtain ⟨haA, hesc⟩ := ha
+  have hκ : OddOrder.BG.Ch4.S14.kappa M = ∅ :=
+    (OddOrder.Peterfalvi.S10Interface.isTypeI_iff_isTypeF hG hM).mp ⟨data⟩
+  have hK : OddOrder.Isaacs.Ch03.IsHallSubgroup (OddOrder.BG.Ch4.S14.kappa M)
+      ((⊥ : Subgroup G).subgroupOf M) := by
+    rw [Subgroup.bot_subgroupOf, OddOrder.Isaacs.Ch03.IsHallSubgroup.bot_iff]
+    intro p _
+    rw [hκ]
+    exact Set.notMem_empty p
+  have hσ : a ∈ OddOrder.BG.Ch4.S14.sigmaSharp M :=
+    OddOrder.BG.Ch4.S16.mem_sigmaSharp_of_mem_aSet_of_escape hG hM bot_le data.typeF.U_le hK
+      (typeF_complement_isHall_kappa_sigma_compl hG hM data) (Or.inl rfl)
+      (typeIA_subset_ASet hG hM data haA) haA.2.1 hesc
+  have hA1 : A1 M PeterfalviType.I = OddOrder.BG.Ch4.S14.sigmaSharp M :=
+    OddOrder.Peterfalvi.S10Interface.A1_eq_sigmaSharp_of_typeI_or_II hG hM
+      (Or.inl ⟨data⟩) (Or.inl rfl)
+  rw [hA1]
+  exact hσ
 
-/-- **Peterfalvi (8.12.b), single-point form** (pin; BG §16 Theorem B): for type-I `T` and
-`x ∈ T` of order coprime to `|T_F|` centralizing a nontrivial element of `T_F`, `T` is the unique
-maximal subgroup containing `C_G(x)`.  (The Hall-conjugacy move of `x` into a complement is
-absorbed into the pin.) -/
+/-- The centralizer of the cyclic subgroup `⟨z⟩` is the centralizer of `z` (powers commute). -/
+private theorem centralizer_zpowers_eq_singleton' (z : G) :
+    Subgroup.centralizer ((Subgroup.zpowers z : Subgroup G) : Set G)
+      = Subgroup.centralizer ({z} : Set G) := by
+  ext c
+  simp only [Subgroup.mem_centralizer_iff]
+  constructor
+  · intro hc y hy
+    rw [Set.mem_singleton_iff] at hy
+    rw [hy]
+    exact hc z (SetLike.mem_coe.mpr (Subgroup.mem_zpowers z))
+  · intro hc y hy
+    obtain ⟨n, rfl⟩ := Subgroup.mem_zpowers_iff.mp (SetLike.mem_coe.mp hy)
+    have hzc : Commute z c := hc z (Set.mem_singleton z)
+    exact (hzc.zpow_left n).eq
+
+/-- **Peterfalvi (8.12.b), single-point form**: for type-I `T` and `x ∈ T` of order coprime to
+`|T_F|` centralizing a nontrivial element of `T_F`, `T` is the unique maximal subgroup
+containing `C_G(x)`.
+
+BG §16 Theorem B, centralizer clause (`theoremB_U_and_A_tame`, conjunct 4), reached through the
+Hall-conjugacy move: `x` is a `(κ ∪ σ)′`-element of the solvable `T` (its order is coprime to
+`|T_F| = |M_σ|`), so Hall D/C (`hall_D`/`hall_C`) conjugate `⟨x⟩` into the type-`F` complement
+`U` by some `t ∈ T`; the conjugated witness keeps `M_σ ⊓ C_G(⟨t x t⁻¹⟩) ≠ ⊥`, so Theorem B pins
+`ℳ(C_G(t x t⁻¹)) = {T}`, and conjugating back by `t ∈ T` (which fixes `T`) gives both
+conjuncts for `x`. -/
 theorem typeI_centralizer_le_and_unique [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     {T : Subgroup G} (hT : T ∈ maximalSubgroups G) (dT : TypeIData T)
     {x : G} (hxT : x ∈ T) (hx1 : x ≠ 1)
@@ -1087,7 +1384,133 @@ theorem typeI_centralizer_le_and_unique [Finite G] (hG : OddOrder.BG.IsMinimalSi
     (hwit : ∃ h ∈ maxNilpotentNormalHall T, h ≠ 1 ∧ Commute x h) :
     Subgroup.centralizer ({x} : Set G) ≤ T ∧
       ∀ L ∈ maximalSubgroups G, Subgroup.centralizer ({x} : Set G) ≤ L → L = T := by
-  sorry
+  classical
+  haveI : IsSolvable ↥T := hG.solvable_of_mem_maximalSubgroups hT
+  have hκ : OddOrder.BG.Ch4.S14.kappa T = ∅ :=
+    (OddOrder.Peterfalvi.S10Interface.isTypeI_iff_isTypeF hG hT).mp ⟨dT⟩
+  have hMFMσ : maxNilpotentNormalHall T = OddOrder.BG.Ch3.S10.Msigma T :=
+    OddOrder.Peterfalvi.S10Interface.maxNilpotentNormalHall_eq_Msigma_of_typeI_or_II
+      hG hT (Or.inl ⟨dT⟩)
+  -- (i) `x` is a `(κ ∪ σ)′`-element of `T`.
+  set xT : ↥T := ⟨x, hxT⟩ with hxTdef
+  have hordeq : orderOf x = orderOf xT :=
+    orderOf_injective T.subtype T.subtype_injective xT
+  have hZπ : ∀ q ∈ (Nat.card ↥(Subgroup.zpowers xT)).primeFactors,
+      q ∈ (OddOrder.BG.Ch4.S14.kappa T ∪ OddOrder.BG.Ch3.S10.sigma T)ᶜ := by
+    intro q hq
+    rw [Nat.card_zpowers, ← hordeq] at hq
+    obtain ⟨hqp, hqdvd, -⟩ := Nat.mem_primeFactors.mp hq
+    simp only [Set.mem_compl_iff, Set.mem_union, hκ, Set.mem_empty_iff_false, false_or]
+    intro hqσ
+    -- `q ∈ σ(T)` divides `|M_σ| = |T_F|`, contradicting the coprimality with `orderOf x`.
+    have hHall := OddOrder.BG.Ch3.S10.Msigma_isHall hG hT
+    have hqnidx : ¬ q ∣ (OddOrder.BG.Ch3.S10.Msigma T).index := fun hdvd =>
+      hHall.2 q (Nat.mem_primeFactors.mpr ⟨hqp, hdvd, Subgroup.index_ne_zero_of_finite⟩) hqσ
+    have hqG : q ∣ Nat.card G := hqdvd.trans ((orderOf_dvd_natCard x).trans dvd_rfl)
+    have hqMσ : q ∣ Nat.card (OddOrder.BG.Ch3.S10.Msigma T) := by
+      rcases (Nat.Prime.dvd_mul hqp).mp
+        ((Subgroup.card_mul_index (OddOrder.BG.Ch3.S10.Msigma T)) ▸ hqG) with h | h
+      · exact h
+      · exact absurd h hqnidx
+    have hgcd : q ∣ Nat.gcd (orderOf x) (Nat.card (maxNilpotentNormalHall T)) :=
+      Nat.dvd_gcd hqdvd (hMFMσ ▸ hqMσ)
+    rw [Nat.Coprime.gcd_eq_one hord] at hgcd
+    exact hqp.one_lt.ne' (Nat.dvd_one.mp hgcd)
+  -- (ii) Hall D + C inside `T`: conjugate `x` into the type-`F` complement `U`.
+  obtain ⟨W, hWhall, hZW⟩ := OddOrder.Isaacs.Ch03.hall_D (G := ↥T) hZπ
+  obtain ⟨t, htmap⟩ := OddOrder.Isaacs.Ch03.hall_C (G := ↥T) hWhall
+    (typeF_complement_isHall_kappa_sigma_compl hG hT dT)
+  set τ : G := (t : G) with hτdef
+  have hτT : τ ∈ T := t.2
+  set x' : G := τ * x * τ⁻¹ with hx'def
+  have hx'U : x' ∈ dT.typeF.U := by
+    have hxW : xT ∈ W := hZW (Subgroup.mem_zpowers xT)
+    have hmem : (MulAut.conj t) xT ∈ W.map (MulAut.conj t).toMonoidHom :=
+      ⟨xT, hxW, rfl⟩
+    rw [htmap] at hmem
+    have := Subgroup.mem_subgroupOf.mp hmem
+    simpa [hx'def, hτdef, MulAut.conj_apply] using this
+  have hx'1 : x' ≠ 1 := by
+    simp only [hx'def, ne_eq, conj_eq_one_iff]
+    exact hx1
+  -- (iii) the conjugated witness keeps `M_σ ⊓ C_G(⟨x'⟩) ≠ ⊥`.
+  obtain ⟨h, hhMF, hh1, hcomm⟩ := hwit
+  have hMFle := OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_le T
+  have hh'MF : τ * h * τ⁻¹ ∈ maxNilpotentNormalHall T := by
+    haveI hnorm := OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_subgroupOf_normal T
+    have hmem : (⟨h, hMFle hhMF⟩ : ↥T) ∈ (maxNilpotentNormalHall T).subgroupOf T :=
+      Subgroup.mem_subgroupOf.mpr hhMF
+    have := Subgroup.mem_subgroupOf.mp (hnorm.conj_mem _ hmem t)
+    simpa [hτdef] using this
+  have hh'1 : τ * h * τ⁻¹ ≠ 1 := by
+    simp only [ne_eq, conj_eq_one_iff]
+    exact hh1
+  have hcomm' : Commute x' (τ * h * τ⁻¹) := by
+    have := hcomm.map (MulAut.conj τ : G →* G)
+    simpa [hx'def, MulAut.conj_apply] using this
+  have hCne : OddOrder.BG.Ch3.S10.Msigma T ⊓
+      Subgroup.centralizer ((Subgroup.zpowers x' : Subgroup G) : Set G) ≠ ⊥ := by
+    intro hbot
+    have hmem : τ * h * τ⁻¹ ∈ OddOrder.BG.Ch3.S10.Msigma T ⊓
+        Subgroup.centralizer ((Subgroup.zpowers x' : Subgroup G) : Set G) := by
+      refine Subgroup.mem_inf.mpr ⟨hMFMσ ▸ hh'MF, ?_⟩
+      rw [centralizer_zpowers_eq_singleton']
+      exact Subgroup.mem_centralizer_iff.mpr fun z hz => by
+        rw [Set.mem_singleton_iff] at hz
+        subst hz
+        exact hcomm'.eq
+    rw [hbot] at hmem
+    exact hh'1 (Subgroup.mem_bot.mp hmem)
+  -- (iv) Theorem B pins `ℳ(C_G(x')) = {T}`.
+  have hB := (OddOrder.BG.Ch4.S16.theoremB_U_and_A_tame hG hT
+    (typeF_complement_isHall_kappa_sigma_compl hG hT dT)).2.2.2.1
+    (Subgroup.zpowers x') (Subgroup.zpowers_le.mpr hx'U)
+    (by simpa [Subgroup.zpowers_eq_bot] using hx'1) hCne
+  rw [centralizer_zpowers_eq_singleton'] at hB
+  -- (v) conjugate back by `τ ∈ T`.
+  have hCconj : Subgroup.centralizer ({x'} : Set G)
+      = MulAut.conj τ • Subgroup.centralizer ({x} : Set G) :=
+    (conj_smul_centralizer_singleton' τ x).symm
+  have hconj_self : ∀ g ∈ T, MulAut.conj g • T = T := by
+    intro g hg
+    ext z
+    rw [Subgroup.mem_pointwise_smul_iff_inv_smul_mem]
+    have hinv : (MulAut.conj g)⁻¹ • z = g⁻¹ * z * g := by
+      rw [← map_inv, MulAut.smul_def, MulAut.conj_apply, inv_inv]
+    rw [hinv]
+    constructor
+    · intro hz
+      have := mul_mem (mul_mem hg hz) (inv_mem hg)
+      simpa [mul_assoc] using this
+    · intro hz
+      exact mul_mem (mul_mem (inv_mem hg) hz) hg
+  have hTmem : T ∈ maximalSubgroupsContaining (Subgroup.centralizer ({x'} : Set G)) := by
+    rw [hB]
+    rfl
+  have hCT' : Subgroup.centralizer ({x'} : Set G) ≤ T :=
+    (mem_maximalSubgroupsContaining.mp hTmem).2
+  constructor
+  · -- `C_G(x) ≤ T`
+    intro c hc
+    have hc' : τ * c * τ⁻¹ ∈ Subgroup.centralizer ({x'} : Set G) := by
+      rw [hCconj]
+      exact ⟨c, hc, rfl⟩
+    have hcT : τ * c * τ⁻¹ ∈ T := hCT' hc'
+    have := mul_mem (mul_mem (inv_mem hτT) hcT) hτT
+    simpa [mul_assoc] using this
+  · -- uniqueness
+    intro L hL hCL
+    have hLconj : MulAut.conj τ • L ∈
+        maximalSubgroupsContaining (Subgroup.centralizer ({x'} : Set G)) := by
+      rw [mem_maximalSubgroupsContaining]
+      refine ⟨OddOrder.BG.Ch3.S12.isCoatom_conj_smul (mem_maximalSubgroups.mp hL), ?_⟩
+      rw [hCconj]
+      exact Subgroup.pointwise_smul_le_pointwise_smul_iff.mpr hCL
+    rw [hB, Set.mem_singleton_iff] at hLconj
+    calc L = MulAut.conj τ⁻¹ • (MulAut.conj τ • L) := by
+            rw [← mul_smul, ← map_mul, inv_mul_cancel, map_one, one_smul]
+      _ = MulAut.conj τ⁻¹ • T := by rw [hLconj]
+      _ = T := hconj_self τ⁻¹ (inv_mem hτT)
 
 /-- **Peterfalvi (8.13.c2/c4) cross-coprimality under support** (pin): if some escaping point of
 `A(S)` has its centralizer inside a conjugate of `T`, then `T` "supports" `S` and `|T_σ|` is

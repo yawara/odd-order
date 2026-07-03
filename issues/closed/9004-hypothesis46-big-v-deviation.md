@@ -76,6 +76,27 @@ TI-subset V with normalizer W ⇒ ∀v∈V, C_G(v) ⊆ W。x ∈ W₁^# ⊆ V_bi
   「μ-diff vanishes on W₁」に忠実)、FourCorner 2 箇所。S06/S08 含め full build green
   (3m41s) + AxiomsCheck OK。S08 は predicted 通りパラメータ絶縁で無傷。
 
+## 完了 (2026-07-03 lane a) — 全完了条件達成、CLOSE
+
+- [x] **追加発見 2 (typePA0 M-共役化) landed** (4623902b): `conjClassSetIn H T` (= Coq
+  `class_support`) を GroupTheory/ConjClassSet に新設し `typePA0 = typePA ∪ conjClassSetIn M
+  (typePV)` に修正。fallout: `le_normalizer_typePA` 抽出 (toHypothesis71 系の実需要は easy 方向
+  のみ)、`normalizer_typePA_eq` は A(M)=(M')# → N(M') = M (極大性+単純性、hG param 追加) で再証明、
+  `muGrid_alpha_support` は (2.1) の共役元 c ∈ M を記録するだけで通過 (予測通り)。
+- [x] **(4.6.d) dade0 の台集合を conjClassSetIn に統一** (da38b5f7): §10 instantiation が
+  definitional になる下準備 (13 statement 箇所 + 構成 4 箇所の機械的変換)。
+- [x] **`Hypothesis.toHypothesis46` landed** (52150245): (8.15)/(10.1) の §10 instantiation。
+  dade0/tau は **definitionally** `hyp.dadeData.dade` / `fullDadeIsometryData hyp.hconj`、
+  tic_V は rfl、H := K = M'、A_covers は A(M)=(M')# で自明。Hypothesis46 の初インスタンス化。
+- [x] **(4.8)/(4.10) aligned-grid 化 + h48/h410 discharge** (f5dd2373):
+  `tau_muGrid_zeroRow_diff` ((4.8) row 0) + `tau_muGrid_fourCorner` ((4.10) δ-scaled) を
+  toHypothesis46 経由で実証明 (σ-bridge: `certainTypeOmegaSigma h46 = alignedOmegaSigmaGrid`、
+  ticVdiff h46 ≡ tic は rfl)。(11.8.5) capstone `residualCoeff_eq_zero` の hdeg0/h410/h48
+  thread を除去 (+hw2 param、CharacterParameters.w2_prime が供給)。
+
+**残り**: なし (本 issue スコープ)。(11.8.4) h114 thread は別作業 (coherence 依存で同根でない)。
+§6 (S08) 側の Hypothesis46 discharge は §6 の endpoint gate と共に別途。
+
 ## 追加発見 2 (2026-07-02, §10 instantiation 調査中): typePA0 の G-共役も unsound
 
 `OddOrder/GroupTheory/MaximalSubgroupType.lean:309`:
