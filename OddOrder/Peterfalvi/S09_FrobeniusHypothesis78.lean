@@ -31,6 +31,42 @@ namespace OddOrder.Peterfalvi.S09
 
 open OddOrder.RepresentationTheory
 
+/-- **Data form of the placed induced family** (Peterfalvi (7.6)/(7.8)).  Bundles the `Fin (n+1)`-
+indexed representatives `θ` with the distinguished induced character `χdist` at index `0` and the
+trivial character `1_K` at `ind1H ≠ 0`, as *data* (not `∃`) so it can be projected inside a
+`Type`-valued `Hypothesis78` construction.  Produced from `exists_placed_induced_family` via
+`choose` (`Classical.choose`, hence `noncomputable`). -/
+structure PlacedInducedFamily {L : Type*} [Group L] [Fintype L] (K : Subgroup L) [K.Normal]
+    [Fintype ↥K] [Invertible (Nat.card L : ℂ)] [Invertible (Nat.card ↥K : ℂ)]
+    (χdist : ClassFunction L ℂ) where
+  /-- One less than the number of distinct induced characters. -/
+  n : ℕ
+  /-- Representatives, distinguished member at `0`. -/
+  θ : Fin (n + 1) → IrreducibleCharacter ↥K
+  /-- The index of the trivial character `1_K`. -/
+  ind1H : Fin (n + 1)
+  ind1H_ne_zero : ind1H ≠ 0
+  induce_zero_eq : ClassFunction.induce K (θ 0 : ClassFunction ↥K ℂ) = χdist
+  triv : θ ind1H = trivialIrreducibleCharacter ↥K
+  inj : Function.Injective (fun i => ClassFunction.induce K (θ i : ClassFunction ↥K ℂ))
+  cover : ∀ φ : IrreducibleCharacter ↥K,
+    ClassFunction.induce K (φ : ClassFunction ↥K ℂ) ∈
+      Set.range (fun i => ClassFunction.induce K (θ i : ClassFunction ↥K ℂ))
+
+/-- Construct the placed induced family as data from the existential
+`exists_placed_induced_family`. -/
+noncomputable def placedInducedFamily {L : Type*} [Group L] [Fintype L] (K : Subgroup L) [K.Normal]
+    [Fintype ↥K] [Invertible (Nat.card L : ℂ)] [Invertible (Nat.card ↥K : ℂ)]
+    (χdist : ClassFunction L ℂ)
+    (hχ_range : χdist ∈ Set.range (fun φ : IrreducibleCharacter ↥K =>
+      ClassFunction.induce K (φ : ClassFunction ↥K ℂ)))
+    (hχ_ne : χdist ≠ ClassFunction.induce K
+      (trivialIrreducibleCharacter ↥K : ClassFunction ↥K ℂ)) :
+    PlacedInducedFamily K χdist := by
+  choose n θ ind1H hind1H h0 htriv hinj hcover using
+    OddOrder.Peterfalvi.S09.Cert.exists_placed_induced_family K χdist hχ_range hχ_ne
+  exact ⟨n, θ, ind1H, hind1H, h0, htriv, hinj, hcover⟩
+
 namespace FrobeniusFamily
 
 variable {G : Type*} [Group G] {k : ℕ}
@@ -88,16 +124,17 @@ open OddOrder.Peterfalvi.S09.Cert in
 agreement), the placed induced family (distinguished `Ind θ_lin` at `0`, trivial `1_{K_i}` at
 `ind1H`), and the support/degree data — mirroring `S14.witness_L_hypothesis78`.  This is the (7.8)
 hypothesis to which the (7.8.b) norm bound `zetaNuRhoNormSq_ge_of_facts` applies, en route to
-`card_G0_lower_bound` (7.10, issue 0044). -/
-theorem hypothesis78 [Fintype G] [Invertible (Nat.card G : ℂ)]
+`card_G0_lower_bound` (7.10, issue 0044).  Returned as **data** (not `Nonempty`) so the (7.9)
+two-family `Hypothesis79` wiring can project its `hyp76.hyp71.hyp.dadeSupport`. -/
+noncomputable def hypothesis78 [Fintype G] [Invertible (Nat.card G : ℂ)]
     (F : FrobeniusFamily G k) (i : Fin k) (hodd : Odd (Nat.card G))
     [Fintype ↥(F.L i)] [Invertible (Nat.card ↥(F.L i) : ℂ)]
     [Invertible (Nat.card ↥((F.H i).subgroupOf (F.L i)) : ℂ)]
     (hnilp : Group.IsNilpotent ↥((F.H i).subgroupOf (F.L i)))
     (C : Subgroup ↥(F.L i))
     (hFrob : OddOrder.Isaacs.Ch06.IsFrobeniusGroup ↥(F.L i) ((F.H i).subgroupOf (F.L i)) C) :
-    Nonempty (Hypothesis78 G (OddOrder.Peterfalvi.S08.sharpImage ((F.H i).subgroupOf (F.L i)))
-      (F.L i)) := by
+    Hypothesis78 G (OddOrder.Peterfalvi.S08.sharpImage ((F.H i).subgroupOf (F.L i)))
+      (F.L i) := by
   classical
   haveI hKnorm : ((F.H i).subgroupOf (F.L i)).Normal := hFrob.isNormal
   have coh := F.coherence i hodd hnilp C hFrob
@@ -109,12 +146,24 @@ theorem hypothesis78 [Fintype G] [Invertible (Nat.card G : ℂ)]
   -- The type-I support `A(L_i) = H_i^#`.
   have hAH : OddOrder.Peterfalvi.S08.sharpImage ((F.H i).subgroupOf (F.L i))
       = (F.H i : Set G) \ {1} := F.sharpImage_subgroupOf_eq i
-  -- The placed induced family: distinguished `Ind θ_lin` at `0`, trivial `1_{K}` at `ind1H`.
-  obtain ⟨χ, hχS, hχdeg⟩ := F.exists_sibley_distinguished_char i hodd hnilp C hFrob
-  obtain ⟨θlin, hθ_ne, hχ_eq⟩ := hχS
-  obtain ⟨n, θ, ind1H, hind1H, h0, htriv, hinj, hcover⟩ :=
-    exists_placed_induced_family ((F.H i).subgroupOf (F.L i)) χ ⟨θlin, hχ_eq.symm⟩
-      (hχ_eq ▸ induce_ne_trivialChar_induce ((F.H i).subgroupOf (F.L i)) θlin hθ_ne)
+  -- The placed induced family (as data): distinguished `Ind θ_lin` at `0`, trivial `1_{K}` at `ind1H`.
+  choose χ hχS hχdeg using F.exists_sibley_distinguished_char i hodd hnilp C hFrob
+  choose θlin hθ_ne hχ_eq using hχS
+  let pf := placedInducedFamily ((F.H i).subgroupOf (F.L i)) χ ⟨θlin, hχ_eq.symm⟩
+    (hχ_eq ▸ induce_ne_trivialChar_induce ((F.H i).subgroupOf (F.L i)) θlin hθ_ne)
+  let n := pf.n
+  let θ := pf.θ
+  let ind1H := pf.ind1H
+  have hind1H : ind1H ≠ 0 := pf.ind1H_ne_zero
+  have h0 : ClassFunction.induce ((F.H i).subgroupOf (F.L i)) (θ 0 : ClassFunction _ ℂ) = χ :=
+    pf.induce_zero_eq
+  have htriv : θ ind1H = trivialIrreducibleCharacter ↥((F.H i).subgroupOf (F.L i)) := pf.triv
+  have hinj : Function.Injective
+    (fun j => ClassFunction.induce ((F.H i).subgroupOf (F.L i)) (θ j : ClassFunction _ ℂ)) := pf.inj
+  have hcover : ∀ φ : IrreducibleCharacter ↥((F.H i).subgroupOf (F.L i)),
+      ClassFunction.induce ((F.H i).subgroupOf (F.L i)) (φ : ClassFunction _ ℂ) ∈
+        Set.range fun j => ClassFunction.induce ((F.H i).subgroupOf (F.L i))
+          (θ j : ClassFunction _ ℂ) := pf.cover
   -- `Ind (θ 0)(1) = [L_i:K_i]`.
   have hdeg0 : ClassFunction.induce ((F.H i).subgroupOf (F.L i)) (θ 0 : ClassFunction _ ℂ)
       (1 : ↥(F.L i)) = (((F.H i).subgroupOf (F.L i)).index : ℂ) := by rw [h0]; exact hχdeg
@@ -166,12 +215,12 @@ theorem hypothesis78 [Fintype G] [Invertible (Nat.card G : ℂ)]
     exact (mem_supportInSubgroup_sharp_subgroupOf_iff (F.H i) hAH x).mpr ⟨hx.1, hx.2⟩
   -- Assemble the `Hypothesis78` via `hypothesis78OfDade`.  The `hτ` isometry is the coherence
   -- Dade map's own `isDadeIsometry` (matching `sibleyToHypothesis71.τ` definitionally).
-  refine ⟨hypothesis78OfDade (F.sibleyToHypothesis71 i hodd hnilp C hFrob)
+  refine hypothesis78OfDade (F.sibleyToHypothesis71 i hodd hnilp C hFrob)
     (OddOrder.Peterfalvi.S04.isDadeIsometry_of_isDadeMap _ _
       (F.sibleyToHypothesis71 i hodd hnilp C hFrob).isDadeMap
       (F.sibleyToHypothesis71 i hodd hnilp C hFrob).hConjInvariant)
     (F.H i) hHL hHnorm hAH θ hinj hcover d psi_support hdeg ind1H hind1H htriv hdeg_match
-    coh.extension ?_ ?_⟩
+    coh.extension ?_ ?_
   · -- `nu_isometry`: the coherent extension is isometric on the family members.
     intro a b ha hb
     exact coherence_extension_inner_eq_on_family coh (hSmem a ha) (hSmem b hb)
