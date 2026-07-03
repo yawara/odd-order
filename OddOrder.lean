@@ -215,6 +215,7 @@ import OddOrder.Peterfalvi.S09_CertificateDischarge
 import OddOrder.Peterfalvi.S09_FrobeniusEstimate
 import OddOrder.Peterfalvi.S09_FrobeniusHypothesis76
 import OddOrder.Peterfalvi.S09_FrobeniusHypothesis78
+import OddOrder.Peterfalvi.S09_FrobeniusHypothesis79
 import OddOrder.Peterfalvi.S09_FrobeniusSibley
 import OddOrder.Peterfalvi.S10_CoherenceWiring
 import OddOrder.Peterfalvi.S10_MinimalSimpleStructure
