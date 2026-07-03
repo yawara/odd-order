@@ -50,6 +50,16 @@ landing 済 (commit chain loop¹⁰⁵、issue 9003)。旧 false-as-stated 版�
 generic 補題の proper placement 是正なので lane b が実施してよいか、lane a に委ねるか hub 裁定。
 (補題自体は §11 上流依存のみなので relocate は sound; merge conflict risk は低い。)
 
+### ✅ HUB 裁定 (2026-07-04, ユーザー承認)
+
+**owner は強制しない — 「issue 経由 / LAUNCH.md で全レーンが自覚できていれば誰が実施してもよい」** (ユーザー
+2026-07-04)。⟹ 運用: (1) 本 issue が relocate 計画 + FeitThompson からの削除箇所を追跡 (source of truth)。
+(2) 実施レーン (b or a) は着手前に本 issue を open のまま更新し、**lane a の LAUNCH.md にも 1 行周知**
+(FeitThompson.lean から 3 Hall 補題が上流 relocate され得る旨) を残す。(3) FeitThompson からの削除を伴う
+commit が出たら hub は本 issue を根拠に**逸脱でなく shared-infra hygiene として合流** (通常の range-check は
+FeitThompson=lane a 所有ゆえ flag するが、本裁定で当該 relocate は例外)。(4) 完了で本 issue close + LAUNCH
+周知行を除去。**要点はレーン間の awareness (issue+LAUNCH) であり、owner の固定ではない。**
+
 ## 参照
 
 - issue 9003「loop¹⁰⁵」節 (finding + landing 詳細)
