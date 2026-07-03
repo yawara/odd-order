@@ -308,3 +308,15 @@ obligation は BG Lemma 14.13(a) の faithful pin 1 本のみ。
 Prop 14.2(g) / Thm 14.7(a)(b) / Cor 12.9・12.10(c) / r_p(N) ≤ 1 議論。まず repo 対応物の
 棚卸しから (settled findings の教訓: grep してから深さ評価)。
 full build 3904 jobs / 1m58s green。
+
+### loop¹⁰³ 準備: 14.13(a) 部品の初期棚卸し (2026-07-03)
+
+- **12.1(g)**: `tau2_prime_mem_sigma_diff_beta` (S12_Lemma1211:390) — τ₂→σ∖β、14.13(a) step
+  「π(⟨x⟩) ⊆ τ₂(N) ⊆ σ(M)∖β(M)」の候補。statement 精査要。
+- **Cor 12.14**: S12_Corollary1214 に faithful form ported ✓ (:110 と :415 の 2 形)。
+- **14.4(d) σ∩π ⊆ β**: `signalizer_structure_of_mem_sigmaSharp` conclusion 内
+  (`sigma N ∩ piSet M' ⊆ beta N`, S16:283) ✓ 既取得可。
+- **Prop 14.2(g) / Thm 14.7(a)(b)**: theorem 形の直接 port 未発見 (docstring 言及のみ、
+  S14_TypePCounting:1022/1882 周辺) — 実体特定が loop¹⁰³ の最初の仕事。
+- **type F + τ₂=∅ → Frobenius 化** (pin 結論の ∃U 部): 独自導出要 (~40 行、κ=∅ +
+  π-分割で complement の f.p.f. 性; Coq FtypeP 系対応物の grep も)。
