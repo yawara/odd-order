@@ -701,3 +701,37 @@ complementIndex/kernelOrder = |L|/|H|, |H| の対応)。χ = coh.extension (Ind 
 **残チェーン**: hgood の cross-member 事実 (χ⊥S^ν_j + β_j constituent) → hgood 完成 → (7.9) 𝓑-sum →
 min-index + hG0sum (signed irr) → `characterEstimateData_of_family71_reduced_estimates_of_signed_irreducible`
 → card_G0_lower_bound。cont.²³ は cross-member orthogonality/constituent の調査 (textbook 7.9-7.10 + coq PF7)。
+
+## 2026-07-04 cont.²³ (lane-a, /loop) — ★ 再スコープ: (7.9) machinery は完成済 (sorry-free)、残 (7.10) は wiring
+
+**発見**: coq PFsection7 で (7.9)/(7.10) 構造を精査 → Lean 側に **(7.9) machinery が既に完全形式化・
+sorry-free** (S09_NonexistenceCertain:3770-4260) と判明。これで hgood の「深い cross-member 事実」は
+**新規証明でなく既存 infra の wiring** に再スコープ。
+
+**既存 (7.9) infra (sorry-free)**:
+- `Hypothesis79` (2-member setup、`first`/`second : Hypothesis78` + `dadeSupport_disjoint`)。
+- `conclusion H79 = (β₁,ζ₂^ν)≠0 ∨ (β₂,ζ₁^ν)≠0` (dichotomy = Peterfalvi (7.9))。
+- `zetaImage_cross_eq_zero_of_support_subset` / `beta_inner_beta_eq_zero` (disjoint support ⟹ cross ⊥)。
+- `conclusion_of_ind_mem_ZIrr_of_zeta_irreducible_of_isCoherent_parity` 等 (coherence+parity から dichotomy 産出、
+  = coq `Dade_sub_lin_nonorthogonal`)。
+- `sum_weights_le_of_orthogonal_integer_decomposition` / `sum_rat_weights_le` ((7.10) sum bound の核)。
+
+**coq 対応 (PFsection7)**: `disjoint_coherent_ortho` (= hχ_orth: ζ_i^ν ⊥ S^ν_j)、
+`Dade_sub_lin_nonorthogonal` (= (7.9) dichotomy → hbeta_ne)、`odd_Frobenius_index_ler`
+(= 既 hoist 済 Ch06 two_mul_card_complement_add_one_le_card_kernel)。
+
+**残 (7.10) = wiring チェーン** (深い新規数学ではない):
+1. **per-member concrete Hypothesis78** (現 `F.hypothesis78` は Nonempty → data 化: def 化 or .some)。
+2. **`F.hypothesis79 i j`** (pair setup) = 2 member の Hypothesis78 + `dadeSupport_disjoint`
+   (= `dadeSupport_hypothesis71_eq_kernelSpread` + `kernelSpread_disjoint`、既存)。
+3. (7.9) `conclusion_of_...parity` で pair ごと dichotomy。
+4. **𝓑-set** B = {j≠i | (β_i,ζ_j^ν)≠0}; j∉B は dichotomy で (β_j,ζ_i^ν)≠0 = hbeta_ne。
+5. **hgood** = cont.²² core (`chiRhoNormSq_ge_ratio_of_inner_beta_ne_zero`) + 一般 cross-ortho
+   (ζ_i^ν ⊥ ν_j(S_j)、要 (4.1) orthonormal-diff、`zetaImage_cross_...` は distinguished のみゆえ一般化要) +
+   hbeta_ne。**hi** = cont.²¹ done。
+6. **hBsum** (7.9 sum) + **min-index** (Finset.min) + **hG0sum** (signed irr、`one_le_G0_norm_sum_of_signed_irreducible`) →
+   `characterEstimateData_of_family71_reduced_estimates_of_signed_irreducible` → `lowerBoundTerm_of_characterEstimateData` →
+   card_G0_lower_bound。
+
+**cont.²⁴**: hypothesis78 を data 化 → `F.hypothesis79 i j` 構築 (最上流 wiring)。一般 cross-ortho
+(`disjoint_coherent_ortho` 相当) が唯一の未形式化 piece の可能性 — 要確認。
