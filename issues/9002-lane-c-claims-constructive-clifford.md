@@ -424,3 +424,32 @@ extension 本体**: 直近 3 commits は小さい周辺 brick (rep-det 系 8–4
 iterate は未着手。次回 hub レビューで (i)–(iii) が landing し始めているかを確認する — 周辺 brick の
 追加が続くだけなら難所回避シグナルとして flag ([[feedback-no-avoiding-hard-parts]])。multi-session
 なのは想定内 (slow discharge ≠ stall)。
+
+## 🔎 lane b 精査 (2026-07-04, loop¹¹²) — (8.2.c) consumer は cite-assembly と確認、残 gap = (1.2) support + 調整要
+
+lane b が上流優先で S14 最上流 sorry `typeI_induced_char_constituents` (S14:429) に着手する前に
+本 issue を scan (claim-before-build)。**lane c の 9002 infra は essentially complete と確認**:
+`CliffordDecomposition.lean` = 0 sorry、`exists_extension_induce_eq_sum_distinct_of_inertia_inf_le`
+(decomposition + 等次数) / `coprime_index_orderOf_determinant_mul_of_coprime_index` (Hall coprimality) /
+`forall_mem_not_isReal_of_induce_eq_sum_of_odd` (非実) / `forall_mem_conj_ne_of_odd` (conj-distinct) 全 landed。
+∴ (8.2.c) general は **cite-assembly** (rebuild でない) と確定。
+
+**残 S14-side wiring (recipe cont.²¹ の「残」を精査)**:
+1. **(1.2) support `supp φ ⊆ A(L)∪{1}`** = **genuine gap (未形式化)**。recipe は「Ind from normal で
+   supp⊆H#」とするが、general case (T=I(θ)⊋H) の構成要素 φ=Ind_T(χ·Infβ) は **H の外で消えない**
+   (Frobenius singleton と違い、χ は T∖H で非零; 個々の φ は χ=Σφ が H 外で消えても個別には消えない)。
+   真の target は A(L)∪{1} (⊇H^#) で、Pf **(1.2)** (H⊄Ker φ ⟹ supp⊆A(L)∪{1}, Dade domain の
+   台結果) を要す。repo に (1.2)-型 support lemma 不在 (`escaping_supported_of_A1_conj_mem_typeIA`
+   は escaping 特化で別物)。**これが実質的な残 hard piece**。
+2. **`H⊔U=⊤` 同定**: type-F の L=L_F·complement 構造 (TypeFData の U が full complement か要確認;
+   `frobeniusData over H⊔U0` は U0⊆U で別); 主 lemma の hHU 引数。
+3. **hcent bridge**: TypeFData.`centralizer_le_U1` (G-level `U⊓C_G(x)≤U1`) → 主 lemma の ↥L-level
+   `hbound = inertia θ ⊓ U ≤ U1` (subgroupOf 移送 + `typeF_inertia_inf_le_U1`)。
+4. coprimality/hd/inertia=T は cite/rfl。
+
+**⚠ 調整要 (lane b→lane c/hub)**: 主 lemma 群は landed だが最終 S14 assembly は recipe が
+「**lane b wiring OR lane c の S14-import leaf**」と両論併記 → 所有が曖昧。かつ (1.2) support は
+9002 constructive-Clifford の一部か S14-consumer の別作業か不明。**質問**: (a) 最終 S14 assembly は
+lane b (file owner) が cite で組んでよいか? (b) (1.2) support は lane c が 9002 で closingするか、
+lane b/別 leaf か? lane b は衝突回避のため本裁定待ちの間 (8.2.c) は触らず別 target (type-P engine /
+S10 §8) に回す。lane c が S14-import leaf 済 or 進行中なら本 issue に追記を。
