@@ -5478,13 +5478,39 @@ theorem exists_witness_dadeNotation [Finite G] (hG : OddOrder.BG.IsMinimalSimple
   -- `dade.psi = coh.extension χ` and `χ ∈ S ⊆ ℤ[S]`, so the coherent extension lands in `ℤ[Irr G]`.
   exact coh.extension_mem_ZIrr χ (Submodule.subset_span hχ)
 
-/-- **Peterfalvi (12.14)**: the character `psi` is constant on the coset `xK`. -/
-theorem psi_constant_on_xK [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
+open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
+/-- **Peterfalvi (12.14)**: the character `dade.psi` is constant on the coset `x·K`.
+
+**Assembly** (the (12.4) coset-constancy applied to the counterexample `M`): since `M` is type-I
+(`ctr.M_typeI`), it carries its own Hypothesis (`exists_typeI_hypothesis`), whose kernel is
+`H_M = M_F = ctr.K` (`typeF.H_eq` + `K_eq_MF`).  Applying (12.4)
+(`orthogonal_character_constant_on_coset`) to this `Hypothesis M` with `x = witness.x ∈ P₀ ≤ M`
+gives `dade.psi(x·g) = dade.psi(x)` for `g ∈ H_M = K`, provided the two inputs:
+* `horth`: `dade.psi ⊥ R_M(χ)` for `χ ∈ S_M` — the cross-group orthogonality `L ≠ M`
+  (`coherent_extension_constituent_orthogonal_Rset_of_nonconjugate`, since `dade.psi = coh.extension χ_L`
+  lies in `ℤ[R(χ_L)]` and `R(χ_L) ⊥ R(χ_M)`); needs the coherence `coh` and `L ≠ M` in scope;
+* `hxK`: `x ∉ K` — `x` is a nontrivial `p`-element and `p ∤ |K| = |M_F|` (`K` is the `p'`-Hall `M_F`). -/
+theorem psi_constant_on_xK [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     {ctr : CounterexampleHypothesis (G := G)} {L : Subgroup G}
     (hyp : Hypothesis L) (witness : RankTwoWitnessData ctr)
     (dade : DadeNotation hyp) :
     ∀ g : G, g ∈ ctr.K → dade.psi (witness.x * g) = dade.psi witness.x := by
-  sorry
+  classical
+  obtain ⟨hypM⟩ := exists_typeI_hypothesis hG ctr.M_maximal ctr.M_typeI
+  have hHK : hypM.H = ctr.K := hypM.typeI.typeF.H_eq.trans ctr.K_eq_MF.symm
+  have data_M : ∀ χ ∈ hypM.Sset, CharacterDecompositionData hypM χ :=
+    fun χ hχ => (character_decomposition_and_dade_domain hG hypM hχ).choose
+  -- (12.3)/(5.5) cross-group orthogonality `dade.psi ⊥ R_M` (the genuine content; `M ≠ L`).
+  have horth : ∀ χ (hχ : χ ∈ hypM.Sset), ∀ α ∈ Rset (data_M χ hχ),
+      ClassFunction.inner dade.psi α = 0 := by
+    sorry
+  have hxM : witness.x ∈ ctr.M := ctr.P0_le_M witness.x_mem_P0
+  -- `x ∉ K`: nontrivial `p`-element, `p ∤ |K|`.
+  have hxK : witness.x ∉ hypM.H := by
+    rw [hHK]
+    sorry
+  intro g hg
+  exact orthogonal_character_constant_on_coset hG hypM data_M horth hxM hxK g (hHK ▸ hg)
 
 /-- **Peterfalvi (12.15)**: the rho image is unchanged on `K#`, constant on
 `K - K'`, and has integer values there. -/
