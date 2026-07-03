@@ -230,3 +230,29 @@ propext/Classical.choice/Quot.sound のみ、S14 末尾 block に追加済)。
 BG §16 fusion 系、Coq `FTsupport_facts` 対応) + (12.2.a) `typeI_induced_char_constituents`
 ((8.2.c))。**次 (loop¹⁰¹) = この §8/§16 pins の正面 build** (0096 carve-out 継続、文書順)。
 full build 3901 jobs / 3m41-4m37s (merge 前後 2 回 green)。
+
+## 🚀 lane b 進捗 (2026-07-03, loop¹⁰¹ 前半) — §8 pins 3 本 closed: (8.13.a)/(8.13.b)/(8.12.b)
+
+descent 完成後、(12.3) の残 sorryAx 源である S10 の §8 pins を正面 build (2 commits:
+fb8ab0bf / 530beb3f)。**BG §16 の discharged 済み Theorem II と Theorem B に接続する bridge 方式**
+— pins は「deep fusion obligation」ではなく **BG 側 endpoint への genuine assembly** だった
+([[verify-port-state-by-number-not-coq-name]] の教訓どおり、grep してから深さ評価)。
+
+1. **新 bridge** `typeF_complement_isHall_kappa_sigma_compl` (type-F 補群 U は (κ∪σ)'-Hall;
+   κ=∅ (Prop 16.1 dictionary) + H = M_F = M_σ の index bookkeeping) と
+   `typeIA_subset_ASet` (Pf の A(M) ⊆ BG Theorem E の ASet M U; hatMsigma 条件 =
+   centralizerSupport 条件の言い換え + complement 分解 y = h·u)。
+2. **(8.13.a)** `typeIA_isConj_conj_in_M` = BG Theorem II conjunct 1
+   (`theoremII_tame_embedding`、X = ASet 枝、K = ⊥)。
+3. **(8.13.b)** `escaping_typeIA_mem_A1` = D ⊆ M_σ# reduction
+   (`mem_sigmaSharp_of_mem_aSet_of_escape`) + `A1_eq_sigmaSharp_of_typeI_or_II`。
+4. **(8.12.b)** `typeI_centralizer_le_and_unique` = Theorem B conjunct 4 + **Hall 共役移動**
+   (x は solvable T の (κ∪σ)'-元 → hall_D/hall_C で ⟨x⟩ を U 内へ; witness h も共役輸送;
+   t ∈ T ゆえ conj で T 固定、両 conjunct が戻る)。
+
+S10 real sorries 13 → 10。残 §8 pins = (8.13.c1c2) `escaping_typeIA_signalizer_structure` /
+(8.13.c2c4) `supported_sigma_coprime` / (8.14) `FT_signalizer_conj_smul_of_escaping`
+(signalizer 構造系; BG 側部品 = `signalizer_structure_of_mem_sigmaSharp` (proven) +
+escaping→σ-sharp (今回の (8.13.b) で獲得済!) なので次 loop で同方式の見込み)。
+(8.15) type-I 側の pin (8.13.a)/(8.14) のうち (8.13.a) は closed、(8.14) が残。
+full build 3901 jobs / 1m57-1m59s green ×2。
