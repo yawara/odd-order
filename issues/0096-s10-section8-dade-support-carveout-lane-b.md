@@ -290,3 +290,27 @@ P2-typePA/typePA0 は後回し可; feedback-verify-lane-connects-to-goal)。(2) 
 **`(M')# ⊆ hatMsigma` (or escaping 版) を type-P 構造から実証** — TypePData の H⋊U 構造 + centralizer_W1
 + M_F⊆M_σ + 固定点論法。Coq `BGsection15/16` の of_typeP normedTI 'F(M)^# を併読 (PFsection8.v L141:
 `normedTI 'F(M)^# G M`)。これが type-P Dade engine の最後の deep core。
+
+### loop¹²⁰ cont. — ★ 束縛制約 = typePA0 の V^M exceptional 成分 (engine 対象外・deep) と判明
+
+**downstream consumer 確認結果 (重要)**: `dadeSupportHypotheses_typeP` の唯一の consumer =
+`S12_MaximalIII_IV_V_Core.exists_hypothesis_of_typeIIIorIVorV` (Pf **(10.1) existence**, §12 Dade tower
+の入口) が **`.1` = typePA0 成分**を `S12.Hypothesis.dadeData` field に使う (S12:567)。type III/IV/V は
+**全て P1** (`exists_peterfalviType`: P₁ が V/III/IV に分岐) ゆえ、**S12 の束縛制約 = typePA0(P1)**。
+
+**私が実証した A₁/P1-typePA は束縛制約でない** (genuine だが consumer は typePA0 を要求)。engine は
+typePA0 の **M_σ# 部分**を賄うが、**V^M 部分は engine 対象外**:
+- `typePV = W \ (W1∪W2)`、`typePA0 = typePA ∪ conjClassSetIn M typePV`。
+- V 元は W1-成分が非自明 (W=W1⊔W2、V は両成分非自明の diagonal 部) ⟹ W1⊓M'=⊥ (M_complement) ゆえ
+  **V ⊄ M'、V^M ⊄ M_σ#** ⟹ **engine (X⊆M_σ# 前提) 適用不可**。
+- V^M = type-P **exceptional character** の support = deep type-P Dade 幾何。
+
+**∴ 真の frontier = typePA0(P1) の Dade data = [M_σ# 部分 = engine ✅] + [V^M 部分 = deep exceptional]**。
+これが §12 type-P tower (10.1 existence) の束縛制約。P2-typePA は S12 consumer (P1) には不要
+(typePA(P1)=M_σ# で足りる)。
+
+**次 iteration**: (1) `typePA0` の `IsTISubset ... M` (S10:556 area、既 proven か確認) → TI-structure から
+V^M の Dade data が出るか (normedTI 'F(M)^# route, Coq BGsection16 of_typeP)。(2) typePA0(P1) を
+M_σ# ∪ V^M に分解し、M_σ# 部分は engine、V^M 部分を TI/exceptional で。engine の
+`dadeSupportHypothesisData_of_subset_sigmaSharp` は M_σ# を賄うが、typePA0 全体は **union support の
+Dade data 合成** (2 TI-piece の disjoint union) が要る = 新機構。
