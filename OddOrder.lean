@@ -212,6 +212,7 @@ import OddOrder.Peterfalvi.S08_Theorem62_63_Standalone
 import OddOrder.Peterfalvi.S08_RetargetReducible
 import OddOrder.Peterfalvi.S09_NonexistenceCertain
 import OddOrder.Peterfalvi.S09_CertificateDischarge
+import OddOrder.Peterfalvi.S09_FrobeniusEstimate
 import OddOrder.Peterfalvi.S09_FrobeniusHypothesis76
 import OddOrder.Peterfalvi.S09_FrobeniusHypothesis78
 import OddOrder.Peterfalvi.S09_FrobeniusSibley

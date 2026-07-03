@@ -564,3 +564,56 @@ session 向き」とした monolithic 接続を **1 iteration で突破**。§14
 `zetaNuRhoNormSq_ge_of_facts` + `betaDecompOfDade` → chiRhoNormSq bound →
 `characterEstimateData_of_family71_reduced_estimates` → `not_trivial_G0_of_exists_Bsum_bound` (7.10)。
 coherence gate は突破済、(7.8) 構造も landed。残るは (7.8.b)/(7.9) の norm 評価の per-member 適用と assembly。
+
+## 2026-07-04 cont.¹⁷ (lane-a, /loop) — 残チェーン完全 map: (7.8.b) は `zetaNuRhoNormSqGeOfDade` で 4-fact に縮約
+
+hypothesis78 landing 後、`card_G0_lower_bound` (6552、sole sorry@6560) までの残チェーンを精査:
+```
+card_G0_lower_bound  ← F.CharacterEstimateData
+  ← characterEstimateData_of_family71_reduced_estimates (5809): P=F.familyHypothesis71, χ, i(min-h),
+      B(𝓑-set), hi/hgood(P.chiRhoNormSq 下界), hBsum(7.9), hG0sum, hL/hA/hG0(coordinate)
+    ← hi/hgood ← (7.8.b) `P.chiRhoNormSq χ j` 下界
+      ← **`zetaNuRhoNormSqGeOfDade` (S09_CertDischarge:2347)** = bundled (7.8.b):
+         `hypothesis78OfDade` の全引数 (=hypothesis78 で組済) + **追加 4 fact のみ**で
+         `1 - e/h ≤ H78.zetaNuRhoNormSq` を産出 (係数 identity・betaDecomp・hGsum は内部処理)。
+         追加 4 fact = hzeta0nu(⟨νζ_0,1_G⟩=0) / hζ0norm(‖ζ_0‖²=1) / a·ha / hsmall。
+      + bridge `H78.zetaNuRhoNormSq = P.chiRhoNormSq χ_i` (7.8.b→7.5 glue)
+```
+
+**追加 4 fact の producer は全て存在** (§14 5747-5985 が完全テンプレ = 2nd zetaNuRhoNormSqGeOfDade 適用):
+- hzeta0nu ← `coherence_extension_orthogonal_constOne` (2660) + ζ_0⊥ζ̄_0。
+- hζ0norm ← `isIrreducibleCharacter_induce_of_frobeniusGroup` (InducedIrreducible:465、shared 済) →
+  odd Frobenius で Ind θ_lin irreducible → norm 1。
+- a·ha ← `exists_betaDecomp_a` (1668)。
+- hsmall ← §14:5982 に構成テンプレ。
+
+**次 iteration (cont.¹⁸) の第一手 = hoist**: `inner_induce_conj_eq_zero_of_frobenius_of_odd`
+(現 S14:5652、S09 の下流ゆえ import 不可) は純 rep-theory (odd Frobenius: 非自明 induced ⊥ その共役) →
+`OddOrder/GroupTheory/RepresentationTheory/` へ hoist (S14 は shared 版を import に切替)。その後
+`FrobeniusFamily.zetaNuRhoNormSq_ge` を `zetaNuRhoNormSqGeOfDade` + 4-fact で構築、`chiRhoNormSq` へ bridge。
+その後 (7.9) 𝓑-sum + min-index 選択 + `characterEstimateData_of_family71_reduced_estimates` で assembly。
+**coherence gate + (7.8) 構造は landed**; 残りは (7.8.b) の per-member norm 評価適用 + (7.9) + final assembly。
+
+## 2026-07-04 cont.¹⁸ (lane-a, /loop) — (7.8.b) の 4-fact のうち 2 つ landed: conj-orth + hzeta0nu
+
+**Landed** (`S09_FrobeniusEstimate.lean`, sorry-free, 4.3s):
+- `inner_induce_conj_eq_zero_of_frobenius_of_odd` — odd Frobenius で非自明 `⟨Ind θ, Ind θ̄⟩ = 0`
+  (一般 rep-theory fact)。§14:5652 のローカル copy を移送 (issue 9007)。**共有 RepresentationTheory
+  ホストは不可**と判明: `ClassFunction.induce_conj` が S08 定義 (S08 上流の shared から到達不可)。
+  → lane-a leaf S09_FrobeniusEstimate に配置 (S08 の induce_conj に到達可、S09 名前空間)。
+  真の共有化 = induce_conj chain を InducedCharacter へ relocate する別refactor (issue 9007 で defer)。
+- `FrobeniusFamily.hzeta0nu` — **(7.8.a) `⟨ν ζ_0, 1_G⟩ = 0`**。§14 `witness_L_hzeta0nu` (5717-5807) を
+  逐語 mirror (θ̄_0 opaque obtain で whnf 保護)。`coherence_extension_orthogonal_constOne` に
+  hmem0/hmem0'/hnorm0/hnorm0'/horth(=conj-orth)/hsupp/h1_0/h1_0'/htau1/hτ_smul を供給。全 helper は
+  S09 到達可 (`inner_self_induce_eq_one_of_frobeniusGroup`/`inner_induce_constOne_eq_zero`/
+  `inner_tau_supported_constOne`/`dadeIntegralCharacterMap_smul_complex/_apply_of_support`)。
+
+**`zetaNuRhoNormSqGeOfDade` 4-fact 進捗**: hzeta0nu ✅ / 残 = hζ0norm (‖ζ_0‖²=1、
+`inner_self_induce_eq_one_of_frobeniusGroup` そのもの、ほぼ即) / a·ha (`exists_betaDecomp_a`、要 hdiffZ/hζ0nuZ
+virtual char) / hsmall (`frobenius_two_mul_card_complement_add_one_le_card_kernel` §14:5817 が e≤(h-1)/2 を
+供給、これも §14 ローカルゆえ hoist or 再証明要)。
+
+**次 (cont.¹⁹)**: 残 3-fact (hζ0norm 即 / a·ha / hsmall) を揃え `FrobeniusFamily.zetaNuRhoNormSq_ge` を
+`zetaNuRhoNormSqGeOfDade` で構築 → `H78.zetaNuRhoNormSq = P.chiRhoNormSq χ` bridge → hi/hgood。
+hsmall の `frobenius_two_mul_card_complement_add_one_le_card_kernel` は "hoistable to Ch06" と §14 が明記、
+Isaacs Ch06 へ hoist が筋 (issue 9007 と同様の shared 判断; ただし純群論ゆえ Ch06 が正所在)。
