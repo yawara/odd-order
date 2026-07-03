@@ -579,3 +579,19 @@ Dade reciprocity(tau_inner) で build) か (12.12) の Frobenius-torus p+1 refin
 Irr(H) の induced-from-H' 分割) → 上記 vanishing lemma で finish。induced-from-H' 分割 (Clifford)
 が残 infra。**次: (12.5) statement を const-on-H∖H' に訂正 (orphan ゆえ lane-b 裁量) + DpsiH 組立**、
 または (12.14)/(12.15) downstream char へ。
+
+### loop¹³³ — ✅ (12.5) statement 訂正 + faithful Fourier 還元 landed (commit 7fd6f34d)
+
+(12.5) `rho_constant_on_H_minus_Hprime` を **opaque sorry → 訂正 statement + 実証明還元** に:
+- statement: `ψ(h)=ψ(1)` (偽) → **const on H∖H'** (∀ h1 h2∈H∖H', ψ h1=ψ h2、Coq 準拠)。0 consumer。
+- 還元 (実証明): Fourier `Res_L ψ=γ+β` ((12.4) 同型)、**γ は H 全体で const 実証明**
+  (`apply_mul_eq_of_mem_characterKernel`、各 H-kernel φ で φ(h)=φ(1))。残 sorry = **hβconst**
+  (β const on H∖H') の 1 本のみに isolate。build green 3871 jobs。
+
+**残 (12.5) core = hβconst**: β (off-H-kernel ∈ ℂ[S], S=Ind_H^L θ) が H∖H' で const。
+Coq o_rpsi_S (horth ψ⊥R(χ) → 等次数 ξ の係数構造) + DpsiH (induced-from-H' 分解) →
+`induce_apply_eq_zero_of_not_mem_normal` (loop¹³²) で finish。次: hβconst の S-structure +
+Dade reciprocity (`tau_inner_eq_of_supported`) 接続を build。
+
+**(12.5) 進捗**: 2 iteration で opaque sorry → [訂正 statement + γ 実証明 + isolate hβconst + vanishing infra]。
+FT decomposition パターン (mechanical spine 実証明 + deep core を精密 isolate)。
