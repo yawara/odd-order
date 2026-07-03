@@ -46,6 +46,7 @@ import OddOrder.GroupTheory.RepresentationTheory.CoprimeActionTrivial
 import OddOrder.GroupTheory.RepresentationTheory.Clifford
 import OddOrder.GroupTheory.RepresentationTheory.CliffordAlgClosed
 import OddOrder.GroupTheory.RepresentationTheory.CliffordConjugateChar
+import OddOrder.GroupTheory.RepresentationTheory.CliffordCorrespondence
 import OddOrder.GroupTheory.RepresentationTheory.CliffordMultiplicityOne
 import OddOrder.GroupTheory.RepresentationTheory.CliffordSingleOrbit
 import OddOrder.GroupTheory.RepresentationTheory.ConjugationBrauer
@@ -57,6 +58,7 @@ import OddOrder.GroupTheory.RepresentationTheory.GallagherDecomposition
 import OddOrder.GroupTheory.RepresentationTheory.Inertia
 import OddOrder.GroupTheory.RepresentationTheory.InertiaAbelianQuotient
 import OddOrder.GroupTheory.RepresentationTheory.InducedIrreducible
+import OddOrder.GroupTheory.RepresentationTheory.InducedTransport
 import OddOrder.GroupTheory.RepresentationTheory.IrrIndexing
 import OddOrder.GroupTheory.RepresentationTheory.IsReal
 import OddOrder.GroupTheory.RepresentationTheory.IsometryDifferencePair
