@@ -1846,3 +1846,30 @@ multi-iteration。β-lane の cleanly-ownable coherence work は完了済。
 - **(iv) §8 support theory**: issue 0096 carve-out により S10 内の Dade-support 宣言群
   (typeII_A_sets_TI/normalizer・dadeSupportHypotheses_typeI/typeP・support_mutual_exclusion) は
   **lane b が S10 内で build** (9003 裁定)。
+
+## loop⁹⁹ (2026-07-02/03): §8 support theory 正面 build — (8.15) soundness fix + (8.17.c) axiom-clean + (8.18.c) + (12.3) Step A
+
+issue 0096 裁定の §8 build を実施、5 commits (5807febb / 232aaf18 / 6d384805 / 97cbd6fe / dd82f094)。
+経緯・詳細は issue 9003「lane b 進捗 loop⁹⁹」節が正本。要点:
+
+- **(8.15) carrier が unfaithful pin で uninhabited だった** (escaping a で `H(a)=C_{M_F}(a)∋a` が
+  (2.2.b/c) と矛盾、8021 と同根) → per-x `ftSupportKernel` (escaping ↦ BG `FT_signalizer`) に修正、
+  `dadeSupport_eq_ftThickenedSupport` は proven lemma 化、`hconj` field 化。S12_Core/S14 追従。
+- **(8.15) type-I 実証明** (`dadeSupportHypothesisData_of_subset` 汎用 assembly; A(M)+A₁(M))。
+  pins: `typeIA_isConj_conj_in_M` (8.13.a) / `escaping_typeIA_signalizer_structure` (8.13.c1c2) /
+  `FT_signalizer_conj_smul_of_escaping` (8.14 equivariance)。
+- **(8.17.c)** `ftThickenedSupport_A1_disjoint_of_nonconjugate` **axiom-clean** (choice 同定は
+  proven 済 BG lemmas で closing; escape→1<|𝓜σ| は `centralizer_le_of_maximalSigma_le_one`)。
+- **(8.18.c)** `ftThickenedSupport_mixed_disjoint_of_nonconjugate` (type-I pair、(8.18.a/b/c)
+  assembly 実証明 + π-part 冪 `mem_zpowers_mul_right_of_coprime`)。pins:
+  `escaping_typeIA_mem_A1` (8.13.b) / `typeI_centralizer_le_and_unique` (8.12.b) /
+  `supported_sigma_coprime` (8.13.c2c4)。
+- **(12.3) Step A** (S14): `Sset_diff_support_subset_A1` → (2.11) restriction →
+  `Sset_diff_tau_support_subset_ftThickenedA1`; constituent 版; mixed disjunction;
+  `constituent_fullDiff_inner_zero_of_disjoint`。全 sorry-free。
+
+**次 (loop¹⁰⁰) = bar-trick descent** で `nonconjugate_diffImage_inner_zero` (S14:897) を閉じる。
+設計 (9003 に精密版): (i) τ conj-equivariance → CDI `ν=μ̄` → `conj X = −X`; (ii) integrality
+(δ-展開) で `⟨α,X⟩=0`; (iii) S(χ₂) 内 R₁ pairwise distinctness で per-φ₂ 消滅; member-wise 化は
+`toOrthonormalImage_inner_eq_zero_across` (existing)。要調査: τ conj-equivariance の既存 lemma
+(IntegralCharacterMap level?)、⟨irr, ℤ[Irr]⟩ integrality API、R1cdi same-χ distinctness。
