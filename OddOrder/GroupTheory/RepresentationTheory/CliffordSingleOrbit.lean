@@ -162,6 +162,29 @@ theorem restrictionConstituentsSingleOrbit_of_isIrreducible
   simp only [conjNormalMulAut_apply_coe]
   group
 
+/-- **Induced-character constituents sharing a common `G`-constituent are `G`-conjugate.**
+For a normal `H ⊴ G` and irreducibles `θ₁, θ₂` of `H`, if some `G`-irreducible `χ` is a constituent
+of *both* `Ind_H^G θ₁` and `Ind_H^G θ₂` (`⟨Ind θᵢ, χ⟩ ≠ 0`), then `θ₁` and `θ₂` lie in one
+`G`-conjugation orbit (`∃ g, conjBy g θ₁ = θ₂`).
+
+Immediate from Clifford's single-orbit theorem: `⟨Ind θᵢ, χ⟩ ≠ 0 ⟺ θᵢ` lies over `χ`
+(`inner_induce_ne_zero_iff_liesOver`), and all constituents of `Res^G_H χ` lie in one `G`-orbit
+(`restrictionConstituentsSingleOrbit_of_isIrreducible`).  Contrapositive: the constituent sets of
+`Ind_H^G θ₁` and `Ind_H^G θ₂` are **disjoint** when `θ₁, θ₂` are non-conjugate — the `trivIset` core
+of the induced-from-`H'` partition of `Irr H` used in Peterfalvi (12.5). -/
+theorem exists_conj_of_common_induce_constituent
+    [Fintype G] [Invertible (Nat.card G : ℂ)]
+    {H : Subgroup G} [hH : H.Normal] [Fintype ↥H] [Invertible (Nat.card ↥H : ℂ)]
+    {θ₁ θ₂ : IrreducibleCharacter ↥H} {χ : IrreducibleCharacter G}
+    (h₁ : ClassFunction.inner (ClassFunction.induce H (θ₁ : ClassFunction ↥H ℂ))
+        (χ : ClassFunction G ℂ) ≠ 0)
+    (h₂ : ClassFunction.inner (ClassFunction.induce H (θ₂ : ClassFunction ↥H ℂ))
+        (χ : ClassFunction G ℂ) ≠ 0) :
+    ∃ g : G, IrreducibleCharacter.conjBy g θ₁ = θ₂ :=
+  (restrictionConstituentsSingleOrbit_of_isIrreducible (H := H) χ).exists_conj
+    ((IrreducibleCharacter.inner_induce_ne_zero_iff_liesOver H χ θ₁).mp h₁)
+    ((IrreducibleCharacter.inner_induce_ne_zero_iff_liesOver H χ θ₂).mp h₂)
+
 set_option backward.isDefEq.respectTransparency false in
 /-- **Clifford's theorem, degree formula** ([Isaacs] Thm 6.5).  For a `G`-irreducible character `χ`,
 a normal subgroup `H ⊴ G`, and a constituent `θ₀` of `Res^G_H χ`, the degree factors as
