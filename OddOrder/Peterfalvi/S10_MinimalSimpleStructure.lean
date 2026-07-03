@@ -1732,6 +1732,183 @@ theorem dadeSupportHypotheses_typeI [Fintype G] [Finite G]
     exact ⟨a.1, (Set.mem_diff _).mpr
       ⟨SetLike.mem_coe.mpr haH, fun h => ha1' (Set.mem_singleton_iff.mp h)⟩⟩
 
+/-- **(8.14) kernel equivariance at a `σ`-sharp escaping point** (`σ`-generic form of
+`FT_signalizer_conj_smul_of_escaping`): `R(m·a·m⁻¹) = m·R(a)·m⁻¹` for `m ∈ M`.  The type-I proof
+only used `κ = ∅` to pin `σ`-sharpness of `a` and its conjugate — here both are hypotheses.  Both
+supporting maximals are pinned by singleton uniqueness, `MulAut.conj m • N[a]` is maximal over
+`m·C_G(a)·m⁻¹`, and `R = N_σ ⊓ C_G(·)` transports by `M_σ`-equivariance. -/
+theorem FT_signalizer_conj_smul_of_escaping_sigmaSharp [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G}
+    (hM : M ∈ maximalSubgroups G) {a m : G} (hm : m ∈ M)
+    (hσ : a ∈ OddOrder.BG.Ch4.S14.sigmaSharp M)
+    (hesc : ¬ Subgroup.centralizer ({a} : Set G) ≤ M)
+    (hσ' : m * a * m⁻¹ ∈ OddOrder.BG.Ch4.S14.sigmaSharp M)
+    (hesc' : ¬ Subgroup.centralizer ({m * a * m⁻¹} : Set G) ≤ M) :
+    OddOrder.BG.Ch4.S16.FT_signalizer (m * a * m⁻¹)
+      = MulAut.conj m • OddOrder.BG.Ch4.S16.FT_signalizer a := by
+  classical
+  obtain ⟨N, hN⟩ :=
+    OddOrder.BG.Ch4.S16.maximalSubgroupsContaining_centralizer_eq_singleton_of_sigmaSharp_escape
+      hG hM hσ hesc
+  obtain ⟨N', hN'⟩ :=
+    OddOrder.BG.Ch4.S16.maximalSubgroupsContaining_centralizer_eq_singleton_of_sigmaSharp_escape
+      hG hM hσ' hesc'
+  have hNmem : N ∈ maximalSubgroupsContaining (Subgroup.centralizer ({a} : Set G)) := by
+    rw [hN]; rfl
+  obtain ⟨hNmax, hCN⟩ := mem_maximalSubgroupsContaining.mp hNmem
+  have hgt : 1 < (OddOrder.BG.Ch4.S14.maximalSigmaSubgroupsOfElement a).ncard := by
+    by_contra h
+    push_neg at h
+    exact hesc (OddOrder.BG.Ch4.S16.centralizer_le_of_maximalSigma_le_one hG hM hσ.1 hσ.2 h)
+  have hgt' : 1 < (OddOrder.BG.Ch4.S14.maximalSigmaSubgroupsOfElement (m * a * m⁻¹)).ncard := by
+    by_contra h
+    push_neg at h
+    exact hesc'
+      (OddOrder.BG.Ch4.S16.centralizer_le_of_maximalSigma_le_one hG hM hσ'.1 hσ'.2 h)
+  have hbr : 1 < (OddOrder.BG.Ch4.S14.maximalSigmaSubgroupsOfElement a).ncard ∧
+      (maximalSubgroupsContaining (Subgroup.centralizer ({a} : Set G))).Nonempty :=
+    ⟨hgt, ⟨N, hNmem⟩⟩
+  have hbr' : 1 <
+      (OddOrder.BG.Ch4.S14.maximalSigmaSubgroupsOfElement (m * a * m⁻¹)).ncard ∧
+      (maximalSubgroupsContaining
+        (Subgroup.centralizer ({m * a * m⁻¹} : Set G))).Nonempty :=
+    ⟨hgt', ⟨N', by rw [hN']; rfl⟩⟩
+  have huniq : ∀ L ∈ maximalSubgroupsContaining (Subgroup.centralizer ({a} : Set G)),
+      L = N := by
+    intro L hL
+    rw [hN, Set.mem_singleton_iff] at hL
+    exact hL
+  have huniq' : ∀ L ∈ maximalSubgroupsContaining
+      (Subgroup.centralizer ({m * a * m⁻¹} : Set G)), L = N' := by
+    intro L hL
+    rw [hN', Set.mem_singleton_iff] at hL
+    exact hL
+  have hbase : OddOrder.BG.Ch4.S16.FT_signalizerBase a = N := by
+    have hb : OddOrder.BG.Ch4.S16.FT_signalizerBase a = hbr.2.choose := dif_pos hbr
+    rw [hb]
+    exact huniq _ hbr.2.choose_spec
+  have hCconj : Subgroup.centralizer ({m * a * m⁻¹} : Set G)
+      = MulAut.conj m • Subgroup.centralizer ({a} : Set G) :=
+    (conj_smul_centralizer_singleton' m a).symm
+  have hbase' : OddOrder.BG.Ch4.S16.FT_signalizerBase (m * a * m⁻¹) = MulAut.conj m • N := by
+    have hb : OddOrder.BG.Ch4.S16.FT_signalizerBase (m * a * m⁻¹) = hbr'.2.choose :=
+      dif_pos hbr'
+    have hmemN' : MulAut.conj m • N ∈
+        maximalSubgroupsContaining (Subgroup.centralizer ({m * a * m⁻¹} : Set G)) := by
+      rw [mem_maximalSubgroupsContaining]
+      refine ⟨OddOrder.BG.Ch3.S12.isCoatom_conj_smul (mem_maximalSubgroups.mp hNmax), ?_⟩
+      rw [hCconj]
+      exact Subgroup.pointwise_smul_le_pointwise_smul_iff.mpr hCN
+    rw [hb, huniq' _ hbr'.2.choose_spec]
+    exact (huniq' _ hmemN').symm
+  rw [OddOrder.BG.Ch4.S16.FT_signalizer, OddOrder.BG.Ch4.S16.FT_signalizer, hbase, hbase',
+    Msigma_conj_smul', hCconj, conj_smul_inf']
+
+/-- The faithful kernel is `M`-conjugation equivariant on an `M`-invariant sub-support of `M_σ^#`
+(`σ`-generic form of `ftSupportKernel_conj_smul`). -/
+theorem ftSupportKernel_conj_smul_sigmaSharp [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    {M : Subgroup G} (hM : M ∈ maximalSubgroups G)
+    {X : Set G} (hXσ : X ⊆ OddOrder.BG.Ch4.S14.sigmaSharp M)
+    (hXiff : ∀ {m x : G}, m ∈ M → (m * x * m⁻¹ ∈ X ↔ x ∈ X))
+    {a m : G} (hm : m ∈ M) :
+    ftSupportKernel M X (m * a * m⁻¹) = MulAut.conj m • ftSupportKernel M X a := by
+  by_cases hesc : a ∈ OddOrder.GroupTheory.escapingCentralizerSet M X
+  · have hconj_esc := (escapingCentralizerSet_conj_mem hm (hXiff hm)).mpr hesc
+    rw [ftSupportKernel_eq_of_escaping hconj_esc, ftSupportKernel_eq_of_escaping hesc]
+    exact FT_signalizer_conj_smul_of_escaping_sigmaSharp hG hM hm (hXσ hesc.1) hesc.2
+      (hXσ hconj_esc.1) hconj_esc.2
+  · rw [ftSupportKernel_eq_bot_of_not_escaping
+        (fun h => hesc ((escapingCentralizerSet_conj_mem hm (hXiff hm)).mp h)),
+      ftSupportKernel_eq_bot_of_not_escaping hesc, Subgroup.smul_bot]
+
+/-- **Faithful (8.15) datum for an `M`-invariant sub-support of `M_σ^#`** (`σ`-generic engine): the
+same assembly as `dadeSupportHypothesisData_of_subset`, but driven by the three `σ`-decomposition-
+generic pins (`sigmaSharp_isConj_conj_in_M`, `escaping_sigmaSharp_signalizer_structure`,
+`escaping_sigmaSharp_disjoint_centralizer`) instead of the type-I lemmas.  Any `X ⊆ M_σ^#` that is
+`M`-conjugation-invariant and nonempty carries the Dade (2.2) support data.  Instantiated at
+`X = A₁(M) = M_σ^#` (all types) and the type-`P₁` `A(M) = M_σ^#`. -/
+theorem dadeSupportHypothesisData_of_subset_sigmaSharp [Fintype G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G}
+    (hM : M ∈ maximalSubgroups G)
+    {X : Set G} (hXσ : X ⊆ OddOrder.BG.Ch4.S14.sigmaSharp M) (hXne : X.Nonempty)
+    (hXiff : ∀ {m x : G}, m ∈ M → (m * x * m⁻¹ ∈ X ↔ x ∈ X)) :
+    Nonempty (DadeSupportHypothesisData M X) := by
+  classical
+  have hXsharp : ∀ x ∈ X, x ≠ (1 : G) := fun x hx => (hXσ hx).2
+  have hXM : X ⊆ (M : Set G) := fun x hx => OddOrder.BG.Ch3.S10.Msigma_le M (hXσ hx).1
+  have hstruct : ∀ {a : G}, a ∈ OddOrder.GroupTheory.escapingCentralizerSet M X →
+      Subgroup.centralizer ({a} : Set G)
+          = OddOrder.BG.Ch4.S16.FT_signalizer a ⊔ OddOrder.Peterfalvi.S04.centralizerIn M a ∧
+        Disjoint (OddOrder.BG.Ch4.S16.FT_signalizer a)
+          (OddOrder.Peterfalvi.S04.centralizerIn M a) ∧
+        (∀ c ∈ Subgroup.centralizer ({a} : Set G), ∀ y ∈ OddOrder.BG.Ch4.S16.FT_signalizer a,
+          c * y * c⁻¹ ∈ OddOrder.BG.Ch4.S16.FT_signalizer a) ∧
+        (∀ b ∈ OddOrder.BG.Ch4.S14.sigmaSharp M,
+          Nat.Coprime (Nat.card (OddOrder.BG.Ch4.S16.FT_signalizer a))
+            (Nat.card (OddOrder.Peterfalvi.S04.centralizerIn M b))) := by
+    intro a ha
+    have hσa : a ∈ OddOrder.BG.Ch4.S14.sigmaSharp M := hXσ ha.1
+    obtain ⟨hjoin, hdisj, hnormc⟩ :=
+      escaping_sigmaSharp_signalizer_structure hG hM hσa ha.2
+    refine ⟨hjoin, hdisj, hnormc, ?_⟩
+    intro b hb
+    by_contra hnc
+    obtain ⟨p, hpp, hpR, hpC⟩ := Nat.Prime.not_coprime_iff_dvd.mp hnc
+    have hpσ : p ∈ OddOrder.BG.Ch3.S10.sigma (OddOrder.BG.Ch4.S16.FT_signalizerBase a) := by
+      refine OddOrder.BG.Ch3.S10.Msigma_isPiGroup (OddOrder.BG.Ch4.S16.FT_signalizerBase a) p
+        (Nat.mem_primeFactors.mpr ⟨hpp, ?_, Nat.card_pos.ne'⟩)
+      refine hpR.trans (Subgroup.card_dvd_of_le ?_)
+      rw [OddOrder.BG.Ch4.S16.FT_signalizer]
+      exact inf_le_left
+    exact escaping_sigmaSharp_disjoint_centralizer hG hM hσa ha.2 hb.1 hb.2 hpp hpσ hpC
+  refine ⟨{ normalizer_eq := normalizer_support_eq hG hM hXM hXsharp hXne @hXiff
+            dade :=
+              { subset_sharp := fun x hx =>
+                  OddOrder.Peterfalvi.S04.mem_sharp.mpr ⟨Set.mem_univ x, hXsharp x hx⟩
+                subset_L := fun x hx => hXM hx
+                L_normalizes_A := fun l a ha => (hXiff l.2).mpr ha
+                H := fun a => ftSupportKernel M X a.1
+                conj_in_L := by
+                  intro a b ha hb hab
+                  obtain ⟨m, hmM, hmab⟩ :=
+                    sigmaSharp_isConj_conj_in_M hG hM (hXσ ha) (hXσ hb) hab
+                  exact ⟨⟨m, hmM⟩, hmab⟩
+                centralizer_eq_sup := by
+                  intro a
+                  by_cases hesc : a.1 ∈ OddOrder.GroupTheory.escapingCentralizerSet M X
+                  · rw [ftSupportKernel_eq_of_escaping hesc]
+                    exact (hstruct hesc).1
+                  · have hle : Subgroup.centralizer ({a.1} : Set G) ≤ M := by
+                      by_contra hnle
+                      exact hesc ⟨a.2, hnle⟩
+                    rw [ftSupportKernel_eq_bot_of_not_escaping hesc, bot_sup_eq]
+                    exact (inf_eq_right.mpr hle).symm
+                centralizer_disjoint := by
+                  intro a
+                  by_cases hesc : a.1 ∈ OddOrder.GroupTheory.escapingCentralizerSet M X
+                  · rw [ftSupportKernel_eq_of_escaping hesc]
+                    exact (hstruct hesc).2.1
+                  · rw [ftSupportKernel_eq_bot_of_not_escaping hesc]
+                    exact disjoint_bot_left
+                H_normalized := by
+                  intro a c hc x hx
+                  by_cases hesc : a.1 ∈ OddOrder.GroupTheory.escapingCentralizerSet M X
+                  · rw [ftSupportKernel_eq_of_escaping hesc] at hx ⊢
+                    exact (hstruct hesc).2.2.1 c hc x hx
+                  · rw [ftSupportKernel_eq_bot_of_not_escaping hesc] at hx ⊢
+                    rw [Subgroup.mem_bot] at hx ⊢
+                    rw [hx]
+                    group
+                centralizer_coprime := by
+                  intro a b
+                  by_cases hesc : a.1 ∈ OddOrder.GroupTheory.escapingCentralizerSet M X
+                  · rw [ftSupportKernel_eq_of_escaping hesc]
+                    exact (hstruct hesc).2.2.2 b.1 (hXσ b.2)
+                  · rw [ftSupportKernel_eq_bot_of_not_escaping hesc]
+                    simpa using Nat.coprime_one_left _ }
+            H_eq_ftSupportKernel := fun _ => rfl
+            hconj := fun a l => ftSupportKernel_conj_smul_sigmaSharp hG hM hXσ @hXiff l.2 }⟩
+
 /-- **Peterfalvi (8.15)** for type `P`: the Dade (2.2) support hypotheses hold
 for `A_0(M)`, `A(M)`, and `A_1(M)`, with `L=M` and `H(a)=R(a)`. -/
 theorem dadeSupportHypotheses_typeP [Fintype G] [Finite G]
@@ -1741,7 +1918,28 @@ theorem dadeSupportHypotheses_typeP [Fintype G] [Finite G]
     Nonempty (DadeSupportHypothesisData M (typePA0 M data)) ∧
       Nonempty (DadeSupportHypothesisData M (typePA M data)) ∧
         Nonempty (DadeSupportHypothesisData M (A1 M tau)) := by
-  sorry
+  refine ⟨?_, ?_, ?_⟩
+  · -- `A_0(M) = A(M) ∪ (V ∖ (W₁∪W₂))^M`: the exceptional `V^M` component is a separate obligation.
+    sorry
+  · -- `A(M) = (M')^#`: for `P₁`, `= M_σ^#` (`typePA_eq_sigmaSharp_of_isTypeP1`, engine below);
+    -- for `P₂`, `M_σ ⊊ M'` and escaping points reduce to `A_1` by the type-`P` (8.13.b)
+    -- `escaping_typePA_mem_A1` — a separate deeper obligation.
+    sorry
+  · -- `A_1(M) = M_σ^#` for every type (`A1_eq_sigmaSharp`): the `σ`-sharp Dade engine applies.
+    refine dadeSupportHypothesisData_of_subset_sigmaSharp hG hM
+      (OddOrder.BG.Ch4.S16.A1_eq_sigmaSharp hG hM hType).subset ?_ ?_
+    · obtain ⟨a, ha1⟩ := Subgroup.ne_bot_iff_exists_ne_one.mp
+        (show OddOrder.GroupTheory.mainSubgroup M tau ≠ ⊥ by
+          rw [OddOrder.BG.Ch4.S16.mainSubgroup_eq_Msigma hG hM hType]
+          exact OddOrder.BG.Ch3.S10.Msigma_ne_bot hG hM)
+      have ha1' : (a : G) ≠ 1 := fun h => ha1 (Subtype.ext h)
+      exact ⟨a.1, (Set.mem_diff _).mpr
+        ⟨SetLike.mem_coe.mpr a.2, fun h => ha1' (Set.mem_singleton_iff.mp h)⟩⟩
+    · intro m x hm
+      refine ⟨fun h => ?_, A1_conj_mem M tau hm⟩
+      have h2 := A1_conj_mem M tau (inv_mem hm) h
+      have h3 : m⁻¹ * (m * x * m⁻¹) * m⁻¹⁻¹ = x := by group
+      rwa [h3] at h2
 
 /-! ### (8.17.c) bridge: the faithful thickened `A₁`-support is the BG `M̃`-cover
 

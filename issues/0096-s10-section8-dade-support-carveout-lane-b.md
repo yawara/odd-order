@@ -236,3 +236,25 @@ field を wiring) → `dadeSupportHypotheses_typeP` の **A₁ 成分 (全 tau�
 (typePA=M_σ#) を discharge。残る P2-typePA + typePA0 は typePA⊋M_σ# ゆえ escaping⊆A_1 の (8.13.b)
 `escaping_typePA_mem_A1` (P2) + V^M 成分が要る (別 frontier)。∴ 次 iteration =
 `dadeSupportHypothesisData_of_subset_sigmaSharp` 組立 + `ftSupportKernel_conj_smul` σ-generic 化。
+
+### loop¹¹⁹ — σ-sharp base engine LANDED + `dadeSupportHypotheses_typeP` の A₁ 成分を honest discharge
+
+上記 build path を実行、build green:
+1. **`FT_signalizer_conj_smul_of_escaping_sigmaSharp`** (σ-generic (8.14) kernel 同変性): type-I
+   `FT_signalizer_conj_smul_of_escaping` の κ=∅ σ-sharp 導出を hypothesis 化 (a とその共役の σ-sharp性)。
+2. **`ftSupportKernel_conj_smul_sigmaSharp`** (X⊆M_σ# 上の hconj field 用)。
+3. **`dadeSupportHypothesisData_of_subset_sigmaSharp`** (σ-generic engine): 任意の M-conj-invariant
+   nonempty `X⊆M_σ#` に Dade (2.2) support data。3 pin + normalizer_support_eq (既 generic) + kernel 同変性
+   で組立。type-I `dadeSupportHypothesisData_of_subset` と同構造だが type-I lemma 群でなく σ-generic pin 駆動。
+
+**`dadeSupportHypotheses_typeP` の A₁ 成分を honest 実証**: `refine ⟨?_,?_,?_⟩` で 3 分岐化、
+**A₁(M)=M_σ# (全 tau、`A1_eq_sigmaSharp`) を engine で discharge** (nonempty ← `Msigma_ne_bot` +
+`mainSubgroup_eq_Msigma`、hXiff ← `A1_conj_mem`)。sorry は 1→2 だが A₁ 三分の一が**本物の証明**に
+(doneness = 仮説構成可能性、sorry-count でない)。残 2 sorry = **typePA0 (V^M exceptional 成分) + typePA
+(P2 は escaping⊆A_1 の (8.13.b) `escaping_typePA_mem_A1`; P1 は typePA=M_σ# で engine 適用可)**。両者とも
+signature 明記の genuine deep obligation。
+
+**次 frontier**: (a) **P1-typePA を engine で discharge** (`typePA_eq_sigmaSharp_of_isTypeP1` で
+typePA=M_σ#、但し `dadeSupportHypotheses_typeP` は tau 一般ゆえ P1 特化には型分岐が要る — data から P1/P2
+を判定して分岐)。(b) **type-P (8.13.b) `escaping_typePA_mem_A1`** (P2-typePA/typePA0 の escaping 還元)。
+(c) **typePA0 の V^M 成分**。engine が完成した今、残りは type-P 固有の support 幾何 ((8.13.b) + V^M)。
