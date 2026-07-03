@@ -496,3 +496,20 @@ carve-out 0096 (type-P Dade **support** geometry) は達成。次 arc = **§12 c
 
 **次 = S14 type-I Dade tower** (上流優先で engage)。type-P support arc (0096 主目的) 完了後の lane-b
 主 frontier。深い char 解析ゆえ fresh context 推奨。
+
+### loop¹²⁹ — (12.5) rho_constant 精読: deep multi-session char (Dade reciprocity/inertia/coherence infra 要)
+
+S14 type-I Dade tower の上流 (12.5) `rho_constant_on_H_minus_Hprime` を Coq
+`FtypeI_invDade_ortho_constant` (PFsection12:416) で精読:
+- **(12.4) coset-constancy は Lean で proven** (`orthogonal_character_constant_on_coset` S14:2360,
+  sorry-free): x∈L∖H で ψ(xh)=ψ(x)。
+- **(12.5) は H∖H' 上 (inside-H) の ρ(=invDade) 版で別物・deeper**。Coq 証明は
+  `pair_degree_coherence` + `invDade_reciprocity` (Dade reciprocity) + Iirr-H の
+  Ind[H,H']-partition (P_ i, trivIset/cover) + `cfInd_central_Inertia` (central inertia) を要す。
+- Lean 未整備: Dade reciprocity (invDade)、induced-from-H' partition、central inertia。⟹ **(12.5) は
+  substantial char infra build を要する multi-session effort** (S14 type-I Dade tower 全 11 sorry も同様の
+  deep char)。
+
+**honest 状況**: type-P Dade **support** arc (0096 主目的) 完了 (S12 10.1 sorry-free, FT spine 直結)。
+残 lane-b frontier = **deep multi-session §14 type-I char theory** (coherence/Dade-reciprocity/inertia
+infra build 込み)。type-P support の σ-generic wiring とは質的に異なる。
