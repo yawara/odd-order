@@ -593,3 +593,27 @@ card_G0_lower_bound  ← F.CharacterEstimateData
 `FrobeniusFamily.zetaNuRhoNormSq_ge` を `zetaNuRhoNormSqGeOfDade` + 4-fact で構築、`chiRhoNormSq` へ bridge。
 その後 (7.9) 𝓑-sum + min-index 選択 + `characterEstimateData_of_family71_reduced_estimates` で assembly。
 **coherence gate + (7.8) 構造は landed**; 残りは (7.8.b) の per-member norm 評価適用 + (7.9) + final assembly。
+
+## 2026-07-04 cont.¹⁸ (lane-a, /loop) — (7.8.b) の 4-fact のうち 2 つ landed: conj-orth + hzeta0nu
+
+**Landed** (`S09_FrobeniusEstimate.lean`, sorry-free, 4.3s):
+- `inner_induce_conj_eq_zero_of_frobenius_of_odd` — odd Frobenius で非自明 `⟨Ind θ, Ind θ̄⟩ = 0`
+  (一般 rep-theory fact)。§14:5652 のローカル copy を移送 (issue 9007)。**共有 RepresentationTheory
+  ホストは不可**と判明: `ClassFunction.induce_conj` が S08 定義 (S08 上流の shared から到達不可)。
+  → lane-a leaf S09_FrobeniusEstimate に配置 (S08 の induce_conj に到達可、S09 名前空間)。
+  真の共有化 = induce_conj chain を InducedCharacter へ relocate する別refactor (issue 9007 で defer)。
+- `FrobeniusFamily.hzeta0nu` — **(7.8.a) `⟨ν ζ_0, 1_G⟩ = 0`**。§14 `witness_L_hzeta0nu` (5717-5807) を
+  逐語 mirror (θ̄_0 opaque obtain で whnf 保護)。`coherence_extension_orthogonal_constOne` に
+  hmem0/hmem0'/hnorm0/hnorm0'/horth(=conj-orth)/hsupp/h1_0/h1_0'/htau1/hτ_smul を供給。全 helper は
+  S09 到達可 (`inner_self_induce_eq_one_of_frobeniusGroup`/`inner_induce_constOne_eq_zero`/
+  `inner_tau_supported_constOne`/`dadeIntegralCharacterMap_smul_complex/_apply_of_support`)。
+
+**`zetaNuRhoNormSqGeOfDade` 4-fact 進捗**: hzeta0nu ✅ / 残 = hζ0norm (‖ζ_0‖²=1、
+`inner_self_induce_eq_one_of_frobeniusGroup` そのもの、ほぼ即) / a·ha (`exists_betaDecomp_a`、要 hdiffZ/hζ0nuZ
+virtual char) / hsmall (`frobenius_two_mul_card_complement_add_one_le_card_kernel` §14:5817 が e≤(h-1)/2 を
+供給、これも §14 ローカルゆえ hoist or 再証明要)。
+
+**次 (cont.¹⁹)**: 残 3-fact (hζ0norm 即 / a·ha / hsmall) を揃え `FrobeniusFamily.zetaNuRhoNormSq_ge` を
+`zetaNuRhoNormSqGeOfDade` で構築 → `H78.zetaNuRhoNormSq = P.chiRhoNormSq χ` bridge → hi/hgood。
+hsmall の `frobenius_two_mul_card_complement_add_one_le_card_kernel` は "hoistable to Ch06" と §14 が明記、
+Isaacs Ch06 へ hoist が筋 (issue 9007 と同様の shared 判断; ただし純群論ゆえ Ch06 が正所在)。
