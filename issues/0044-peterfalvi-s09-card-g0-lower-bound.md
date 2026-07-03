@@ -331,3 +331,10 @@ tractable than the "multi-week from scratch" estimate** — the Dade layer is do
 2. **Hypothesis76** (induced family {Ind_H^L θ} + coherence): coherence は S08 Sibley ((6.8) sorry-free
    per 0044) が wireable か要調査。degree-ratio/support fields は induced-char leaves (今セッション) で埋まる。
 3. (7.8.b)/(7.9)/assembly。
+
+## 2026-07-03 cont.⁵ (lane-a, /loop) — (7.1) family-member wiring DONE
+
+**Landed** (`11f44fa2`): `FrobeniusFamily.hypothesis71` — each member `i` → `Hypothesis71 G (H_i^#) L_i`
+(side conditions all from family fields: mem_sharp / kernel_le / mem_kernel_sharp_conj_iff_of_mem_L / isTI).
+**次**: (7.4) `FamilyHypothesis71` 束ね (per-member Hypothesis71 + disjoint A_i^{τ_i} 台 ← coprime_kernel)、
+その後 **Hypothesis76** (induced family {Ind_H^L θ} + coherence = trunk の残りの deep part、S08 Sibley wireable か調査)。
