@@ -890,3 +890,17 @@ build green 3871。**assessment churn (¹⁴⁸⁻¹⁵¹) を脱する実 code 
 IsCoherent は isometry+ZIrr のみ ⟹ ψ(1)=e は coherence の degree/sign 性質要 (χ-χ̄ supported diff の
 extension 消失 ⟹ real は出るが =e には不足)。**(12.13) 構成 (dadeNotation_of_coherence) が degree 性質を
 持つか、または coherence 構成から導出**。次: ψ(1)=e の導出可否を examine → 可なら h_psix 完成。
+
+### loop¹⁵³ — ψ(1)=e は coherence degree-preservation 要 (直接 lemma 無し); (12.16) 残は deep endgame
+
+ψ(1)=e (coh.extension χ(1)=χ(1)) の直接 lemma 探索: `restrict_extension_Yset_degree_value_eq_of_frobenius`
+(S08:2017) は SibleyDadeHypothesis の coherentYset/Xset 構造用で別物。`coherent_of_constant_degree`
+(S07:551) は isometry 構成のみ。**IsCoherent は isometry+ZIrr ⟹ coh.extension χ = ±ζ (norm-1 irr)
+だが degree-preservation (=χ(1)) は出ない** (χ-χ̄ supported ⟹ extension が 1 で χ,χ̄ 同値 = real は出るが
+=e 不足)。∴ ψ(1)=e は coherence の degree/sign 性質から build 要 (involved)。
+
+**(12.16) chain 総括 (確定)**: 全 field deep endgame — h_psix (ψ(1)=e coherence-degree、cyclotomic 部は
+¹⁵² landed) / h_psig_int (12.15 ρM) / hA-C (§7 norm)。**session milestone = (12.14) sorry-free +
+h_psix cyclotomic congruence**。残 = deep final Dade contradiction (coherence-degree + ρM + §7 norm)、
+sustained multi-session char theory。次: ψ(1)=e を coherence 構成 (witness_L_coherent) から build 試行、
+または h_psig_int/norm へ。
