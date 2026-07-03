@@ -884,6 +884,119 @@ private theorem tau2_conj_smul' [Finite G] (g : G) (M : Subgroup G) :
     OddOrder.BG.Ch4.S14.sigma_conj_smul_eq]
   rw [OddOrder.BG.Ch3.S13.pRank_eq_of_mulEquiv (p := p) e.symm]
 
+/-- **Peterfalvi (8.13.c2) coprimality core at a `σ`-sharp point** — the `σ`-decomposition-generic
+form (`non_disjoint_signalizer_frobenius`, BG Lemma 14.13(a), takes any maximal `S`; the type-I
+`escaping_sigma_disjoint_centralizer` only specialises it by deriving `z ∈ M_σ^#` from `κ(S) = ∅`
+and `w ∈ M_σ` from the type-`F` Frobenius absorption — both are hypotheses here).
+
+For an escaping `z ∈ M_σ^#` and any `w ∈ M_σ^#`, no prime `p ∈ σ(N[z])` divides `|C_S(w)|`:
+a common `p ∈ σ(N[z]) ∩ π(S)` makes `S` Frobenius with kernel `S_σ` and `τ₂(S) = ∅`; `w ∈ S_σ`
+absorbs a Cauchy `p`-element of `C_S(w)` into `S_σ`, so `p ∈ σ(S)`, forcing `N[z]` conjugate to `S`
+(`sigma_disjoint_of_nonconjugate`) and transporting `τ₂(N[z]) ∋ π(⟨z⟩) ≠ ∅` onto `τ₂(S) = ∅`. -/
+theorem escaping_sigmaSharp_disjoint_centralizer [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {S : Subgroup G}
+    (hS : S ∈ maximalSubgroups G)
+    {z : G} (hσz : z ∈ OddOrder.BG.Ch4.S14.sigmaSharp S)
+    (hzesc : ¬ Subgroup.centralizer ({z} : Set G) ≤ S)
+    {w : G} (hwMσ : w ∈ OddOrder.BG.Ch3.S10.Msigma S) (hw1 : w ≠ 1)
+    {p : ℕ} (hpp : p.Prime)
+    (hpσ : p ∈ OddOrder.BG.Ch3.S10.sigma (OddOrder.BG.Ch4.S16.FT_signalizerBase z))
+    (hpC : p ∣ Nat.card (OddOrder.Peterfalvi.S04.centralizerIn S w)) : False := by
+  classical
+  have hz1 : z ≠ 1 := hσz.2
+  have hgt : 1 < (OddOrder.BG.Ch4.S14.maximalSigmaSubgroupsOfElement z).ncard := by
+    by_contra h
+    exact hzesc (OddOrder.BG.Ch4.S16.centralizer_le_of_maximalSigma_le_one hG hS hσz.1 hz1
+      (not_lt.mp h))
+  -- `p ∈ π(S)` (it divides `|C_S(w)| ∣ |S|`), so Lemma 14.13(a) fires.
+  have hpS : p ∈ OddOrder.BG.Ch4.S14.piSet S := by
+    refine Nat.mem_primeFactors.mpr ⟨hpp, hpC.trans ?_, Nat.card_pos.ne'⟩
+    exact Subgroup.card_dvd_of_le inf_le_left
+  obtain ⟨-, htau2S, U, -, hfrobU⟩ :=
+    OddOrder.BG.Ch4.S16.non_disjoint_signalizer_frobenius hG hS hσz hgt ⟨p, hpσ, hpS⟩
+  -- Frobenius kernel absorption: commuting with a nontrivial `S_σ`-element lands in `S_σ`.
+  have hker : ∀ {u v : G}, u ∈ S → v ∈ OddOrder.BG.Ch3.S10.Msigma S → v ≠ 1 →
+      Commute u v → u ∈ OddOrder.BG.Ch3.S10.Msigma S := by
+    intro u v huS hvMσ hv1 hcomm
+    have hvS : v ∈ S := OddOrder.BG.Ch3.S10.Msigma_le S hvMσ
+    have hcent := OddOrder.Isaacs.Ch06.IsFrobeniusGroup.centralizer_kernel_le hfrobU
+      (⟨v, hvS⟩ : ↥S) (Subgroup.mem_subgroupOf.mpr hvMσ)
+      (fun h1 => hv1 (congrArg Subtype.val h1))
+    have humem : (⟨u, huS⟩ : ↥S) ∈
+        Subgroup.centralizer ({(⟨v, hvS⟩ : ↥S)} : Set ↥S) := by
+      rw [Subgroup.mem_centralizer_singleton_iff]
+      exact Subtype.ext hcomm.eq
+    exact Subgroup.mem_subgroupOf.mp (hcent humem)
+  have hwS : w ∈ S := OddOrder.BG.Ch3.S10.Msigma_le S hwMσ
+  -- a Cauchy `p`-element of `C_S(w)` lies in `S_σ` (absorption), so `p ∈ σ(S)`.
+  haveI : Fact p.Prime := ⟨hpp⟩
+  obtain ⟨c, hc_ord⟩ := exists_prime_orderOf_dvd_card' p hpC
+  have hcS : (c : G) ∈ S := (Subgroup.mem_inf.mp c.2).1
+  have hcC : Commute (c : G) w := by
+    have := Subgroup.mem_centralizer_singleton_iff.mp (Subgroup.mem_inf.mp c.2).2
+    exact this
+  have hcMσ : (c : G) ∈ OddOrder.BG.Ch3.S10.Msigma S :=
+    hker hcS hwMσ hw1 hcC
+  have hpσS : p ∈ OddOrder.BG.Ch3.S10.sigma S := by
+    refine OddOrder.BG.Ch3.S10.Msigma_isPiGroup S p (Nat.mem_primeFactors.mpr
+      ⟨hpp, ?_, Nat.card_pos.ne'⟩)
+    have hcord : orderOf ((⟨(c : G), hcMσ⟩ :
+        ↥(OddOrder.BG.Ch3.S10.Msigma S))) = p := by
+      rw [← hc_ord]
+      exact (orderOf_injective (OddOrder.BG.Ch3.S10.Msigma S).subtype
+        (OddOrder.BG.Ch3.S10.Msigma S).subtype_injective
+        (⟨(c : G), hcMσ⟩ : ↥(OddOrder.BG.Ch3.S10.Msigma S))).symm.trans
+        (orderOf_injective (OddOrder.Peterfalvi.S04.centralizerIn S w).subtype
+          (OddOrder.Peterfalvi.S04.centralizerIn S w).subtype_injective c)
+    rw [← hcord]
+    exact orderOf_dvd_natCard _
+  -- `σ(N[z]) ∩ σ(S) ≠ ∅` forces `N[z] ~ S`, transporting `τ₂`.
+  have hN₀max : OddOrder.BG.Ch4.S16.FT_signalizerBase z ∈ maximalSubgroups G := by
+    obtain ⟨N₀, hN₀⟩ :=
+      OddOrder.BG.Ch4.S16.maximalSubgroupsContaining_centralizer_eq_singleton_of_sigmaSharp_escape
+        hG hS hσz hzesc
+    have hbr : 1 < (OddOrder.BG.Ch4.S14.maximalSigmaSubgroupsOfElement z).ncard ∧
+        (maximalSubgroupsContaining (Subgroup.centralizer ({z} : Set G))).Nonempty :=
+      ⟨hgt, ⟨N₀, by rw [hN₀]; rfl⟩⟩
+    have hb : OddOrder.BG.Ch4.S16.FT_signalizerBase z = hbr.2.choose :=
+      dif_pos hbr
+    rw [hb]
+    exact (mem_maximalSubgroupsContaining.mp hbr.2.choose_spec).1
+  have hconj : ∃ g : G, MulAut.conj g • OddOrder.BG.Ch4.S16.FT_signalizerBase z = S := by
+    by_contra hnc2
+    exact Set.disjoint_left.mp
+      (OddOrder.BG.Ch3.S13.sigma_disjoint_of_nonconjugate hG hN₀max hS hnc2) hpσ hpσS
+  obtain ⟨g, hg⟩ := hconj
+  obtain ⟨Nstr, ⟨hNstr_max, hNstr_C, -, -, hNstr_tau2, -, -⟩, -⟩ :=
+    OddOrder.BG.Ch4.S16.signalizer_structure_of_mem_sigmaSharp hG hS hσz hgt
+  have hNstr_eq : Nstr = OddOrder.BG.Ch4.S16.FT_signalizerBase z := by
+    obtain ⟨N₀, hN₀⟩ :=
+      OddOrder.BG.Ch4.S16.maximalSubgroupsContaining_centralizer_eq_singleton_of_sigmaSharp_escape
+        hG hS hσz hzesc
+    have huniq : ∀ L ∈ maximalSubgroupsContaining (Subgroup.centralizer ({z} : Set G)),
+        L = N₀ := by
+      intro L hL
+      rw [hN₀, Set.mem_singleton_iff] at hL
+      exact hL
+    have hbr : 1 < (OddOrder.BG.Ch4.S14.maximalSigmaSubgroupsOfElement z).ncard ∧
+        (maximalSubgroupsContaining (Subgroup.centralizer ({z} : Set G))).Nonempty :=
+      ⟨hgt, ⟨N₀, by rw [hN₀]; rfl⟩⟩
+    have hb : OddOrder.BG.Ch4.S16.FT_signalizerBase z = hbr.2.choose := dif_pos hbr
+    rw [hb, huniq _ hbr.2.choose_spec,
+      huniq Nstr (mem_maximalSubgroupsContaining.mpr ⟨hNstr_max, hNstr_C⟩)]
+  -- a prime of `orderOf z` lies in `τ₂(N[z]) = τ₂(S) = ∅`, but `z ≠ 1` — contradiction.
+  set p₀ : ℕ := (orderOf z).minFac with hp₀
+  have hp₀p : p₀.Prime := Nat.minFac_prime (fun h => hz1 (orderOf_eq_one_iff.mp h))
+  have hp₀tau2 : p₀ ∈ OddOrder.BG.Ch3.S12.tau2 Nstr := by
+    refine hNstr_tau2 p₀ ?_
+    refine Nat.mem_primeFactors.mpr ⟨hp₀p, ?_, Nat.card_pos.ne'⟩
+    rw [← Subgroup.zpowers_eq_closure, Nat.card_zpowers]
+    exact Nat.minFac_dvd _
+  rw [hNstr_eq, show OddOrder.BG.Ch4.S16.FT_signalizerBase z = MulAut.conj g⁻¹ • S from by
+      rw [← hg, ← mul_smul, ← map_mul, inv_mul_cancel, map_one, one_smul],
+    tau2_conj_smul'] at hp₀tau2
+  exact htau2S p₀ hp₀p hp₀tau2
+
 /-- **The (8.13.c2) coprimality core**: for an escaping point `z` of the type-I support `A(S)`,
 no prime of `σ(N[z])` (`N[z] = FT_signalizerBase z` the supporting maximal) divides `|C_S(w)|`
 for any `w ∈ A(S)`.
@@ -927,7 +1040,7 @@ theorem escaping_sigma_disjoint_centralizer [Finite G]
   have hpS : p ∈ OddOrder.BG.Ch4.S14.piSet S := by
     refine Nat.mem_primeFactors.mpr ⟨hpp, hpC.trans ?_, Nat.card_pos.ne'⟩
     exact Subgroup.card_dvd_of_le inf_le_left
-  obtain ⟨-, htau2S, U, -, hfrobU⟩ :=
+  obtain ⟨-, -, U, -, hfrobU⟩ :=
     OddOrder.BG.Ch4.S16.non_disjoint_signalizer_frobenius hG hS hσz hgt ⟨p, hpσ, hpS⟩
   -- Frobenius kernel absorption: commuting with a nontrivial `S_σ`-element lands in `S_σ`.
   have hker : ∀ {u v : G}, u ∈ S → v ∈ OddOrder.BG.Ch3.S10.Msigma S → v ≠ 1 →
@@ -942,7 +1055,7 @@ theorem escaping_sigma_disjoint_centralizer [Finite G]
       rw [Subgroup.mem_centralizer_singleton_iff]
       exact Subtype.ext hcomm.eq
     exact Subgroup.mem_subgroupOf.mp (hcent humem)
-  -- `w ∈ S_σ`: it centralizes a nontrivial element of `S_F = S_σ`.
+  -- `w ∈ S_σ`: it centralizes a nontrivial element of `S_F = S_σ` (type-`F` absorption).
   have hMFMσ : maxNilpotentNormalHall S = OddOrder.BG.Ch3.S10.Msigma S :=
     OddOrder.Peterfalvi.S10Interface.maxNilpotentNormalHall_eq_Msigma_of_typeI_or_II
       hG hS (Or.inl ⟨dS⟩)
@@ -955,75 +1068,8 @@ theorem escaping_sigma_disjoint_centralizer [Finite G]
   have hwMσ : w ∈ OddOrder.BG.Ch3.S10.Msigma S := by
     refine hker hwS hhMσ hh1' ?_
     exact Subgroup.mem_centralizer_singleton_iff.mp hwC
-  -- a Cauchy `p`-element of `C_S(w)` lies in `S_σ`, so `p ∈ σ(S)`.
-  haveI : Fact p.Prime := ⟨hpp⟩
-  obtain ⟨c, hc_ord⟩ := exists_prime_orderOf_dvd_card' p hpC
-  have hcS : (c : G) ∈ S := (Subgroup.mem_inf.mp c.2).1
-  have hcC : Commute (c : G) w := by
-    have := Subgroup.mem_centralizer_singleton_iff.mp (Subgroup.mem_inf.mp c.2).2
-    exact this
-  have hcMσ : (c : G) ∈ OddOrder.BG.Ch3.S10.Msigma S :=
-    hker hcS hwMσ hw1 hcC
-  have hpσS : p ∈ OddOrder.BG.Ch3.S10.sigma S := by
-    refine OddOrder.BG.Ch3.S10.Msigma_isPiGroup S p (Nat.mem_primeFactors.mpr
-      ⟨hpp, ?_, Nat.card_pos.ne'⟩)
-    have hcord : orderOf ((⟨(c : G), hcMσ⟩ :
-        ↥(OddOrder.BG.Ch3.S10.Msigma S))) = p := by
-      rw [← hc_ord]
-      exact (orderOf_injective (OddOrder.BG.Ch3.S10.Msigma S).subtype
-        (OddOrder.BG.Ch3.S10.Msigma S).subtype_injective
-        (⟨(c : G), hcMσ⟩ : ↥(OddOrder.BG.Ch3.S10.Msigma S))).symm.trans
-        (orderOf_injective (OddOrder.Peterfalvi.S04.centralizerIn S w).subtype
-          (OddOrder.Peterfalvi.S04.centralizerIn S w).subtype_injective c)
-    rw [← hcord]
-    exact orderOf_dvd_natCard _
-  -- `σ(N[z]) ∩ σ(S) ≠ ∅` forces `N[z] ~ S`, transporting `τ₂`.
-  have hN₀max : OddOrder.BG.Ch4.S16.FT_signalizerBase z ∈ maximalSubgroups G := by
-    obtain ⟨N₀, hN₀⟩ :=
-      OddOrder.BG.Ch4.S16.maximalSubgroupsContaining_centralizer_eq_singleton_of_sigmaSharp_escape
-        hG hS hσz hzesc
-    have hbr : 1 < (OddOrder.BG.Ch4.S14.maximalSigmaSubgroupsOfElement z).ncard ∧
-        (maximalSubgroupsContaining (Subgroup.centralizer ({z} : Set G))).Nonempty :=
-      ⟨hgt, ⟨N₀, by rw [hN₀]; rfl⟩⟩
-    have hb : OddOrder.BG.Ch4.S16.FT_signalizerBase z = hbr.2.choose :=
-      dif_pos hbr
-    rw [hb]
-    exact (mem_maximalSubgroupsContaining.mp hbr.2.choose_spec).1
-  have hconj : ∃ g : G, MulAut.conj g • OddOrder.BG.Ch4.S16.FT_signalizerBase z = S := by
-    by_contra hnc2
-    exact Set.disjoint_left.mp
-      (OddOrder.BG.Ch3.S13.sigma_disjoint_of_nonconjugate hG hN₀max hS hnc2) hpσ hpσS
-  obtain ⟨g, hg⟩ := hconj
-  -- `π(⟨z⟩) ⊆ τ₂(N[z]) = τ₂(S) = ∅`, but `z ≠ 1` — contradiction.
-  obtain ⟨Nstr, ⟨hNstr_max, hNstr_C, -, -, hNstr_tau2, -, -⟩, -⟩ :=
-    OddOrder.BG.Ch4.S16.signalizer_structure_of_mem_sigmaSharp hG hS hσz hgt
-  have hNstr_eq : Nstr = OddOrder.BG.Ch4.S16.FT_signalizerBase z := by
-    obtain ⟨N₀, hN₀⟩ :=
-      OddOrder.BG.Ch4.S16.maximalSubgroupsContaining_centralizer_eq_singleton_of_sigmaSharp_escape
-        hG hS hσz hzesc
-    have huniq : ∀ L ∈ maximalSubgroupsContaining (Subgroup.centralizer ({z} : Set G)),
-        L = N₀ := by
-      intro L hL
-      rw [hN₀, Set.mem_singleton_iff] at hL
-      exact hL
-    have hbr : 1 < (OddOrder.BG.Ch4.S14.maximalSigmaSubgroupsOfElement z).ncard ∧
-        (maximalSubgroupsContaining (Subgroup.centralizer ({z} : Set G))).Nonempty :=
-      ⟨hgt, ⟨N₀, by rw [hN₀]; rfl⟩⟩
-    have hb : OddOrder.BG.Ch4.S16.FT_signalizerBase z = hbr.2.choose := dif_pos hbr
-    rw [hb, huniq _ hbr.2.choose_spec,
-      huniq Nstr (mem_maximalSubgroupsContaining.mpr ⟨hNstr_max, hNstr_C⟩)]
-  -- a prime of `orderOf z` lies in `τ₂(N[z])`.
-  set p₀ : ℕ := (orderOf z).minFac with hp₀
-  have hp₀p : p₀.Prime := Nat.minFac_prime (fun h => hz1 (orderOf_eq_one_iff.mp h))
-  have hp₀tau2 : p₀ ∈ OddOrder.BG.Ch3.S12.tau2 Nstr := by
-    refine hNstr_tau2 p₀ ?_
-    refine Nat.mem_primeFactors.mpr ⟨hp₀p, ?_, Nat.card_pos.ne'⟩
-    rw [← Subgroup.zpowers_eq_closure, Nat.card_zpowers]
-    exact Nat.minFac_dvd _
-  rw [hNstr_eq, show OddOrder.BG.Ch4.S16.FT_signalizerBase z = MulAut.conj g⁻¹ • S from by
-      rw [← hg, ← mul_smul, ← map_mul, inv_mul_cancel, map_one, one_smul],
-    tau2_conj_smul'] at hp₀tau2
-  exact htau2S p₀ hp₀p hp₀tau2
+  -- the remaining `σ`-generic contradiction is the shared coprimality core.
+  exact escaping_sigmaSharp_disjoint_centralizer hG hS hσz hzesc hwMσ hw1 hpp hpσ hpC
 
 /-- **Peterfalvi (8.13.c1) at a `σ`-sharp escaping point** — the `σ`-decomposition-generic core of
 `escaping_typeIA_signalizer_structure`, shared by every Peterfalvi type.  For `a ∈ M_σ^#` with
