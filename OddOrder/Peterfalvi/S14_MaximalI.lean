@@ -5543,6 +5543,25 @@ theorem psi_constant_on_xK [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
   intro g hg
   exact orthogonal_character_constant_on_coset hG hypM data_M horth hxM hxK g (hHK ▸ hg)
 
+/-- **Peterfalvi (12.16), the cyclotomic congruence at `x`** (the `h_psix` field of
+`CounterexampleDadeData`): for a virtual character `ψ ∈ ℤ[Irr G]`, an order-`p` element `x`, and a
+primitive `p`-th root `ε`, if `ψ(1) = e` then `ψ(x) ≡ e (mod 1 - ε)`, i.e. `∃ w` integral with
+`ψ(x) - e = (1 - ε)·w`.
+
+Immediate from (1.10.a) `exists_integral_apply_sub_of_commute` at `y = 1`
+(`ψ(x·1) - ψ(1) = (1-ε)·w`, since `x` commutes with `1`) and the degree hypothesis `ψ(1) = e`.  The
+`ψ(1) = e` input is the coherent-extension degree preservation `dade.psi(1) = χ(1) = e` supplied by
+the (12.13) construction — the one remaining ingredient of `h_psix`. -/
+theorem psi_apply_x_sub_e_cyclotomic [Finite G] {p : ℕ} (hp : 0 < p) {ε : ℂ}
+    (hε : IsPrimitiveRoot ε p) {ψ : ClassFunction G ℂ}
+    (hψ : ψ ∈ OddOrder.RepresentationTheory.ZIrr G) {x : G} (hx : x ^ p = 1) {e : ℕ}
+    (hψ1 : ψ (1 : G) = (e : ℂ)) :
+    ∃ w : ℂ, IsIntegral ℤ w ∧ ψ x - (e : ℂ) = (1 - ε) * w := by
+  obtain ⟨z, hz, hzeq⟩ := OddOrder.RepresentationTheory.exists_integral_apply_sub_of_commute
+    hp hε hψ hx (Commute.one_right x)
+  rw [mul_one, hψ1] at hzeq
+  exact ⟨z, hz, hzeq⟩
+
 /-- **Peterfalvi (12.15)**: the rho image is unchanged on `K#`, constant on
 `K - K'`, and has integer values there. -/
 theorem rhoM_integer_values [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
