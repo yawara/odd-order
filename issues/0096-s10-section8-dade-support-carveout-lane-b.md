@@ -513,3 +513,18 @@ S14 type-I Dade tower の上流 (12.5) `rho_constant_on_H_minus_Hprime` を Coq
 **honest 状況**: type-P Dade **support** arc (0096 主目的) 完了 (S12 10.1 sorry-free, FT spine 直結)。
 残 lane-b frontier = **deep multi-session §14 type-I char theory** (coherence/Dade-reciprocity/inertia
 infra build 込み)。type-P support の σ-generic wiring とは質的に異なる。
+
+### loop¹³⁰ — ★ 訂正: (12.5) は lane-b own-work + 主要 infra 存在 (loop¹²⁹ の過小評価を修正)
+
+claim-before-build 調整で loop¹²⁹「(12.5) は from-scratch multi-session char-infra 要」を**訂正**:
+- **§10-12 char core は lane-b own-work** (FeitThompson:418/496/855: §10-11/§10-12 char は lane-b 所有;
+  lane-a は 11.8 exists_zeta_residual のみ)。→ (12.5) は lane-b own-work、lane-a と非競合。
+- **Dade reciprocity は存在** (`Hypothesis.tau_inner_eq_of_supported` S12_Core:3586、
+  `tau_inner_trivial` 5776)。loop¹²⁹「invDade 無し」は grep 名違い (Lean は tau_inner_*)。
+- **Rset span も存在** (`coherent_extension_constituent_mem_span_Rset` S14:1720)。coherence も (S07/S08)。
+
+**∴ (12.5) の残 infra = induced-from-H' Iirr partition のみ** (Clifford: H'⊴H で Irr(H)=⊔ constt(Ind[H,H'] χ),
+Lean 未整備)。Ind[H,H'] χ は H∖H' 上 vanish (H'⊴H) ゆえ Fourier で ρψ=const on H∖H'。o_rpsi_S 部は
+tau_inner + span + horth で即。**(12.5) は 1-2 iteration の tractable build** (from-scratch でない)。
+
+**次 = induced-from-H' Iirr partition (Clifford) を build → (12.5) 組立**。concrete target 確定。
