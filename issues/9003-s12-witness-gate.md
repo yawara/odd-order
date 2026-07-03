@@ -490,3 +490,28 @@ loop¹⁰⁵ の (8.12.b) を受け、残 S10 §8 type-II pins の consumer 状�
 **教訓**: §8 type-II support scaffold は TI/uniqueness を過剰主張しがち (8.12.b・8.16 とも false-as-stated、
 15.7(c) overstatement と同パターン [[ft-settled-findings]])。faithful 核 (A(M)−A_1(M) TI = B(5)、
 tame embedding = Theorem II) は既に proven。consumed pin のみ実 frontier、うち III/IV は BG §14-15 gated。
+
+## 📋 loop¹⁰⁷ (2026-07-03) — consumed §8 type-II pin の深さ評価: 残りは type-P Dade engine (deep 新機構)
+
+`dadeSupportHypotheses_typeP` (S10:1542, S12×3 consumer) を精査。type-I 版
+`dadeSupportHypotheses_typeI` は proven だが、engine `dadeSupportHypothesisData_of_subset`
+(S10:1415) は **type-I 専用** (`data : TypeIData`、base = `typeIA`、依存 =
+`escaping_typeIA_signalizer_structure` / `typeIA_isConj_conj_in_M` (8.13.a) /
+`ftSupportKernel_conj_smul` — 全て私の loop⁹⁹ type-I (8.15) 機構)。
+
+**type-P 版に要る新機構 (de-risked build plan、次 focused session)**:
+- **`dadeSupportHypothesisData_of_subset_typeP`** (engine、gated-endpoint skeleton 可): assembly は
+  type-I をミラー、base = `typePA M data = (M')#`。isolate すべき type-P pins:
+  1. **`escaping_typePA_signalizer_structure`** — (M')# escaping 点の signalizer 構造 (type-P、
+     K≠1 の σ-support geometry; type-I の類推だが K-structure で異なる)。
+  2. **`typePA_isConj_conj_in_M`** — (8.13.a type-P): (M')# 点の G-共役は M-共役。
+  3. **`ftSupportKernel_conj_smul`** (type-P equivariance)。
+- conj-invariance (`typePA_conj_mem` / `typePA0_conj_mem` / `A1_typeII_conj_mem`) は tractable
+  (M' ⊴ M / M_σ ⊴ M の M-共役不変性)。
+- `dadeSupportHypotheses_typeP` = engine を typePA0 (⊇ V^M 部は conjClassSetIn M ゆえ M-不変) /
+  typePA / A1(=M_σ#⊆(M')#) に適用。
+
+**残 consumed pin の深さ**: `bgTheoremE_cover_data` (×9) = Theorem E cover (deep);
+`hall_maxNilpotentNormalHall_and_mainSubgroup` III/IV = BG §14-15 gated (loop¹⁰³)。
+→ §8 type-II の tractable TI 作業 (8.12.b faithful + vestigial 監査) は完了; 残りは type-P Dade
+geometry (新機構) か BG §14-15 gate。次 session は type-P engine を focused に build するのが妥当。
