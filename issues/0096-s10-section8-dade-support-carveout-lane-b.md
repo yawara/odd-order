@@ -214,12 +214,25 @@ build-green で landed (S10):
    step 2-4 は **kappa=∅ を hσa 導出のみに使い、以降は σ-sharp generic** と確認 ⟹ 3-conjunct を抽出。
    **type-I 版も本 lemma を cite するよう dedup refactor** (~90 行削減、signature 不変ゆえ downstream 不変)。
 
-**残る唯一の type-specific-deep pin = (8.13.c2) coprimality** `escaping_sigma_disjoint_centralizer`
-(S10, kappa=∅ 固有; type-P は kappa≠∅ で Frobenius/τ₂ 論法が異なる)。これは genuine deep (§14 Lemma
-14.13(a) route の type-P 版)。
+### loop¹¹⁸ cont. — 3rd pin も σ-generic: type-P engine 全体が tractable (deep 評価は完全に誤り)
 
-**次 build path (更新)**: σ-sharp base engine `dadeSupportHypothesisData_of_subset_sigmaSharp` は今や
-pin 2 本 (isConj + structure) + `ftSupportKernel_conj_smul` σ-版 + **(8.13.c2) coprimality の hypothesis
-化 or type-P 証明** で組める。A₁ 成分 (全 tau) は coprimality が `∀ b∈X` で X=M_σ# のとき type-I core が
-効かない (b は typeIA でない) ⟹ σ-sharp coprimality が本当に要る。∴ 次の genuine frontier = **σ-sharp
-(8.13.c2) coprimality** (type-P engine の最後の deep core)。
+(8.13.c2) coprimality core `escaping_sigma_disjoint_centralizer` を精読した結果、**これも σ-generic と
+判明** (loop¹¹⁷/loop¹¹⁸-前半 の「coprimality = type-specific-deep」評価も誤り):
+- 中核 `non_disjoint_signalizer_frobenius` (BG Lemma 14.13(a)) は **`TypeIData` を取らず任意の maximal
+  `S` に効く** (common prime ⟹ S Frobenius + τ₂(S)=∅ の implication は general)。
+- type-I 固有部は **(a) `z∈M_σ#` を κ(S)=∅ から導出、(b) `w∈M_σ` を type-F Frobenius 吸収から導出**
+  の 2 点のみ — σ-sharp 版では両方 **hypothesis**。
+- ⟹ `escaping_sigmaSharp_disjoint_centralizer` (σ-generic, hypotheses `hσz`/`hwMσ`/`hw1`) を抽出、
+  **type-I 版も back-half を本 lemma に delegate する dedup** (~68 行削減)。
+
+**∴ 3 pin すべて σ-generic で landed (build green)**:
+`sigmaSharp_isConj_conj_in_M` (8.13.a) / `escaping_sigmaSharp_signalizer_structure` (8.13.c1) /
+`escaping_sigmaSharp_disjoint_centralizer` (8.13.c2)。**type-P Dade engine は deep multi-session でなく
+σ-generic wiring** (loop¹¹⁷ の全評価を revise)。
+
+**次 build path (更新²)**: σ-sharp base engine `dadeSupportHypothesisData_of_subset_sigmaSharp`
+(`dadeSupportHypothesisData_of_subset` を X⊆M_σ# 用に; 3 pin + `ftSupportKernel_conj_smul` σ-版 の hconj
+field を wiring) → `dadeSupportHypotheses_typeP` の **A₁ 成分 (全 tau、A1=M_σ#) + P1-typePA 成分**
+(typePA=M_σ#) を discharge。残る P2-typePA + typePA0 は typePA⊋M_σ# ゆえ escaping⊆A_1 の (8.13.b)
+`escaping_typePA_mem_A1` (P2) + V^M 成分が要る (別 frontier)。∴ 次 iteration =
+`dadeSupportHypothesisData_of_subset_sigmaSharp` 組立 + `ftSupportKernel_conj_smul` σ-generic 化。
