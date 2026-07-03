@@ -453,3 +453,15 @@ lane b が上流優先で S14 最上流 sorry `typeI_induced_char_constituents` 
 lane b (file owner) が cite で組んでよいか? (b) (1.2) support は lane c が 9002 で closingするか、
 lane b/別 leaf か? lane b は衝突回避のため本裁定待ちの間 (8.2.c) は触らず別 target (type-P engine /
 S10 §8) に回す。lane c が S14-import leaf 済 or 進行中なら本 issue に追記を。
+
+## ✏️ lane b 訂正 (loop¹¹³) — (1.2) support は既に形式化済、(8.2.c) は FULLY cite-assembleable
+
+loop¹¹² で「(1.2) support = 未形式化 gap」としたのは**誤り**。Pf (1.2) (「H⊴G, χ∈Irr(G),
+H⊄Ker χ, C_H(g)=1 ⟹ χ(g)=0」) は **`S03b_Vanishing.irreducibleCharacter_apply_eq_zero_of_centralizerInSubgroup_eq_bot`
+(既 landed)** で形式化済。∴ (8.2.c) の support clause も cite (A(L)=typeIA={y≠1:C_{L_F}(y)≠1} +
+(1.2) の対偶: φ(x)≠0,x≠1 ⟹ C_{H}(x)≠⊥ ⟹ x∈typeIA)。
+
+**∴ (8.2.c) general は FULLY cite-assembleable** (全 6 clause 部品 landed)。残る lane-b wiring は
+純機械的: (i) `H⊔U=⊤` (type-F L=L_F·U)、(ii) hcent bridge (TypeFData.centralizer_le_U1 の ↥L 移送)、
+(iii) 各構成要素の H⊄Ker (φ over θ≠1 から)。**lane b は本 wiring を自 S14 file で進める** (recipe の
+「lane b wiring」path; 衝突回避で lane c に通知: lane c が S14-import leaf 進行中なら本 issue に追記を)。
