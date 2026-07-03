@@ -1104,6 +1104,63 @@ theorem constituentDiff_tau_inner_eq_zero_of_ne {L : Subgroup G} [Finite G]
   norm_num
 
 open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
+/-- **Two-family variant of the constituent-difference block orthogonality.**  Same `L`, but the two
+constituents may come from *different* members `χ₁, χ₂ ∈ S`: given `φ ∈ S(χ₁)`, `φ' ∈ S(χ₂)` with the
+distinctness conditions `φ ≠ φ'`, `φ ≠ φ̄'`, `φ̄ ≠ φ'` (a caller supplies these from `χ₁ ∉ {χ₂, χ̄₂}`
++ disjoint constituents), the Dade images of the signed differences are orthogonal.
+
+Generalizes `constituentDiff_tau_inner_eq_zero_of_ne` (same `χ`, where the conditions come from
+`data.conj_not_mem`) — the cross-family input for the same-`L` `R(χ₁) ⊥ R(χ₂)` orthogonality.  The
+proof is identical: the supports of both differences lie in `A(L)` (`constituentDiff_support_subset`,
+one per data), the Dade map is an isometry there, and the `L`-side pairing expands into four
+off-diagonal `Irr L` deltas. -/
+theorem constituentDiff_tau_inner_eq_zero_of_ne_across {L : Subgroup G} [Finite G]
+    {hyp : Hypothesis L} {chi1 chi2 : ClassFunction ↥L ℂ}
+    (data1 : CharacterDecompositionData hyp chi1) (data2 : CharacterDecompositionData hyp chi2)
+    {φ φ' : IrreducibleCharacter ↥L} (hφ : φ ∈ data1.constituents)
+    (hφ' : φ' ∈ data2.constituents) (hne : φ ≠ φ')
+    (h2 : φ ≠ OddOrder.Peterfalvi.S07.conjIrreducibleCharacter (L := ↥L) φ')
+    (h3 : OddOrder.Peterfalvi.S07.conjIrreducibleCharacter (L := ↥L) φ ≠ φ') :
+    ClassFunction.inner
+        (hyp.tau ((φ : ClassFunction ↥L ℂ) - (φ : ClassFunction ↥L ℂ).conj))
+        (hyp.tau ((φ' : ClassFunction ↥L ℂ) - (φ' : ClassFunction ↥L ℂ).conj)) = 0 := by
+  haveI := hyp.finiteG
+  classical
+  have hSsupp : ∀ s ∈ ({((φ : ClassFunction ↥L ℂ) - (φ : ClassFunction ↥L ℂ).conj),
+      ((φ' : ClassFunction ↥L ℂ) - (φ' : ClassFunction ↥L ℂ).conj)} :
+        Set (ClassFunction ↥L ℂ)), s.support ⊆
+      OddOrder.Peterfalvi.S04.supportInSubgroup hyp.ambientA L := by
+    intro s hs
+    rcases hs with rfl | hs
+    · exact constituentDiff_support_subset data1 hφ
+    · rw [Set.mem_singleton_iff] at hs
+      subst hs
+      exact constituentDiff_support_subset data2 hφ'
+  refine Eq.trans (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap_inner_eq_on_supported_span
+    hyp.dadeData.dade hyp.hconj hSsupp
+    (Submodule.subset_span (Set.mem_insert _ _))
+    (Submodule.subset_span (Set.mem_insert_of_mem _ rfl))) ?_
+  have hcross : ∀ a c : IrreducibleCharacter ↥L,
+      ClassFunction.inner (a : ClassFunction ↥L ℂ) (c : ClassFunction ↥L ℂ) =
+        if a = c then (1 : ℂ) else 0 :=
+    fun a c => OddOrder.RepresentationTheory.irreducibleCharacter_inner a c
+  have h4 : OddOrder.Peterfalvi.S07.conjIrreducibleCharacter (L := ↥L) φ
+      ≠ OddOrder.Peterfalvi.S07.conjIrreducibleCharacter (L := ↥L) φ' := by
+    intro h
+    have hcf := congrArg (fun c : IrreducibleCharacter ↥L => (c : ClassFunction ↥L ℂ)) h
+    simp only [OddOrder.Peterfalvi.S07.coe_conjIrreducibleCharacter] at hcf
+    exact hne (IrreducibleCharacter.ext
+      (by rw [← ClassFunction.conj_conj (φ : ClassFunction ↥L ℂ), hcf,
+        ClassFunction.conj_conj]))
+  rw [ClassFunction.inner_sub_left, ClassFunction.inner_sub_right,
+    ClassFunction.inner_sub_right,
+    ← OddOrder.Peterfalvi.S07.coe_conjIrreducibleCharacter (L := ↥L) φ,
+    ← OddOrder.Peterfalvi.S07.coe_conjIrreducibleCharacter (L := ↥L) φ',
+    hcross φ φ', hcross φ _, hcross _ φ', hcross _ _,
+    if_neg hne, if_neg h2, if_neg h3, if_neg h4]
+  norm_num
+
+open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
 open OddOrder.Peterfalvi.S07.CharacterDifferenceImage in
 /-- **The (12.3) bar-trick descent, one-sided core.**  If `Ã(L₁) ∩ Ã₁(L₂) = ∅` ((8.18.c)),
 each `L₁`-constituent image is orthogonal to each `L₂`-constituent image.
