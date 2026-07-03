@@ -487,3 +487,21 @@ card_L_odd ← G odd; H_sharp_ti ← `F.isTI` + coordinate lemma; dade/hconj/dad
 2. `betaDecompOfDade` + `zetaNuRhoNormSq_ge_of_facts` (既存) + source facts → (7.8.b) chiRhoNormSq bound。
 3. (7.9) 𝓑-sum、assembly → `not_trivial_G0_of_exists_Bsum_bound` bypass。
 次 iteration: ν 抽出 + hypothesis78OfDade 接続。
+
+## 2026-07-03 cont.¹⁴ (lane-a, /loop) — sibleyHypothesis71 (H71') landed; 残 = hypothesis78OfDade 接続
+
+**Landed** (`9c5feb74`): `sibleyHypothesis71` — sharpImage 座標の `Hypothesis71 G (sharpImage H) L`
+(coherence の Dade map τ に一致する H71')。
+
+**残の接続 chain (hypothesis78OfDade、~20 引数)**:
+`hypothesis78OfDade (H71' := sibleyHypothesis71) (hτ) (H) (hHL) (hHnorm) (hAH) (θ) (hinj) (hcover)
+(d) (psi_support) (hdeg) (ind1H) (hind1H) (hzeta_ind1H) (hdeg_match) (ν) (hnu_isometry) (hagree)`:
+- θ/hinj/hcover ← `S08.distinctInducedFamily ((F.H i).subgroupOf L_i)` (hypothesis78OfDade 内部で使う既存 enumerator、S09_CertificateDischarge:872 参照)。
+- ν ← `(F.coherence i ...).extension` (IntegralCharacterMap → hypothesis78OfDade の ν は `→ₗ[ℤ]`; `.toLinearMap` or coercion 要確認)。
+- hnu_isometry ← `IsCoherent.extension_inner_eq` (induced family が zSpan S に入ることを確認)。
+- hagree ← `IsCoherent.extends_on_supported` (ζ_i−d_iζ_0 が supported、τ₁=hyp.tau)。**要: sibleyHypothesis71.τ = coherence の hyp.tau** の一致確認 (両者 of_isTISubset(sharpImage H).dadeMap ゆえ defeq 見込み)。
+- d/hdeg/ind1H 等 ← induced family の degree data。
+
+**その後**: `betaDecompOfDade` + `zetaNuRhoNormSq_ge_of_facts` → (7.8.b) `chiRhoNormSq` bound →
+`characterEstimateData_of_family71_reduced_estimates` (要 hi/hgood/hBsum) → `not_trivial_G0_of_exists_Bsum_bound`。
+(7.9) 𝓑-sum は別途。次 iteration: ν 抽出 (型変換) + hypothesis78OfDade の引数を距離順に埋める。
