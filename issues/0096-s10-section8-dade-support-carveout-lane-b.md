@@ -405,3 +405,18 @@ escaping_typePA0_mem_sigmaSharp (8.13.b) + centralizer_typePV_le_M (V^M 非escap
 一般化、上記 pin で駆動) + ftSupportKernel_conj_smul の typePA0 版 + normalizer_eq(typePA0)。→
 `dadeSupportHypotheses_typeP` typePA0 成分 discharge → S12 (10.1 existence) unblock。deep 部分は無し、
 残りは mechanical assembly。
+
+### loop¹²⁵ — general engine + full typePA0 coprimality landed (残 = set-facts + discharge のみ)
+
+typePA0(P1) Dade engine の assembly infra を landed:
+- **`dadeSupportHypothesisData_of_subset_escaping_sigmaSharp`** (general engine): sigmaSharp engine を
+  X⊆M + escaping⊆M_σ# に一般化。(8.13.a) conj_in_L + (8.13.c2) coprimality を hypothesis 化、
+  escaping structure は σ-generic `escaping_sigmaSharp_signalizer_structure`。
+- **`ftSupportKernel_conj_smul_escaping_sigmaSharp`** (general conj_smul, hconj field 用)。
+- **`coprime_FT_signalizer_centralizerIn_typePA0_of_isTypeP1`**: A_0 全体の coprimality
+  (A(M)=M_σ# は σ-sharp、V^M は `coprime_FT_signalizer_centralizerIn_typePV`)。
+
+**残 = mechanical wiring のみ**: typePA0 の set-facts (⊆M / ≠1 / nonempty / M-conj-invariant) を
+組んで general engine に渡す `dadeSupportHypothesisData_typePA0_of_isTypeP1` → `dadeSupportHypotheses_typeP`
+の typePA0(P1) 成分 discharge (P2 は別 sorry のまま) → S12 (10.1 existence) unblock。deep content は
+全て済み、残りは typePA0=typePA∪V^M の union set-facts の組立。

@@ -2268,6 +2268,130 @@ theorem dadeSupportHypothesisData_of_subset_sigmaSharp [Fintype G]
             H_eq_ftSupportKernel := fun _ => rfl
             hconj := fun a l => ftSupportKernel_conj_smul_sigmaSharp hG hM hXσ @hXiff l.2 }⟩
 
+/-- The faithful kernel is `M`-conjugation equivariant when `X ⊆ M` has all *escaping* points
+`σ`-sharp (the general form, driven by `escaping ⊆ M_σ^#` instead of `X ⊆ M_σ^#`). -/
+theorem ftSupportKernel_conj_smul_escaping_sigmaSharp [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} (hM : M ∈ maximalSubgroups G)
+    {X : Set G} (hXesc : ∀ a ∈ OddOrder.GroupTheory.escapingCentralizerSet M X,
+      a ∈ OddOrder.BG.Ch4.S14.sigmaSharp M)
+    (hXiff : ∀ {m x : G}, m ∈ M → (m * x * m⁻¹ ∈ X ↔ x ∈ X))
+    {a m : G} (hm : m ∈ M) :
+    ftSupportKernel M X (m * a * m⁻¹) = MulAut.conj m • ftSupportKernel M X a := by
+  by_cases hesc : a ∈ OddOrder.GroupTheory.escapingCentralizerSet M X
+  · have hconj_esc := (escapingCentralizerSet_conj_mem hm (hXiff hm)).mpr hesc
+    rw [ftSupportKernel_eq_of_escaping hconj_esc, ftSupportKernel_eq_of_escaping hesc]
+    exact FT_signalizer_conj_smul_of_escaping_sigmaSharp hG hM hm (hXesc a hesc) hesc.2
+      (hXesc _ hconj_esc) hconj_esc.2
+  · rw [ftSupportKernel_eq_bot_of_not_escaping
+        (fun h => hesc ((escapingCentralizerSet_conj_mem hm (hXiff hm)).mp h)),
+      ftSupportKernel_eq_bot_of_not_escaping hesc, Subgroup.smul_bot]
+
+/-- **Faithful (8.15) datum for an `M`-invariant `X ⊆ M` whose escaping points are `σ`-sharp**
+(the general `σ`-decomposition engine).  Generalises `dadeSupportHypothesisData_of_subset_sigmaSharp`
+from `X ⊆ M_σ^#` to `X ⊆ M` with escaping points in `M_σ^#`, taking the `(8.13.a)` `conj_in_L` and the
+`(8.13.c2)` coprimality as inputs (the escaping structure `(8.13.c1)` is still the `σ`-generic
+`escaping_sigmaSharp_signalizer_structure`).  Instantiated at `X = A_0(M)` for type `P₁`. -/
+theorem dadeSupportHypothesisData_of_subset_escaping_sigmaSharp [Fintype G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} (hM : M ∈ maximalSubgroups G)
+    {X : Set G} (hXM : X ⊆ (M : Set G)) (hXsharp : ∀ x ∈ X, x ≠ (1 : G))
+    (hXesc : ∀ a ∈ OddOrder.GroupTheory.escapingCentralizerSet M X,
+      a ∈ OddOrder.BG.Ch4.S14.sigmaSharp M)
+    (hXconj : ∀ a ∈ X, ∀ b ∈ X, IsConj a b → ∃ m : G, m ∈ M ∧ m * a * m⁻¹ = b)
+    (hXcop : ∀ a ∈ OddOrder.GroupTheory.escapingCentralizerSet M X, ∀ b ∈ X,
+      Nat.Coprime (Nat.card (OddOrder.BG.Ch4.S16.FT_signalizer a))
+        (Nat.card (OddOrder.Peterfalvi.S04.centralizerIn M b)))
+    (hXne : X.Nonempty)
+    (hXiff : ∀ {m x : G}, m ∈ M → (m * x * m⁻¹ ∈ X ↔ x ∈ X)) :
+    Nonempty (DadeSupportHypothesisData M X) := by
+  classical
+  have hstruct : ∀ {a : G}, a ∈ OddOrder.GroupTheory.escapingCentralizerSet M X →
+      Subgroup.centralizer ({a} : Set G)
+          = OddOrder.BG.Ch4.S16.FT_signalizer a ⊔ OddOrder.Peterfalvi.S04.centralizerIn M a ∧
+        Disjoint (OddOrder.BG.Ch4.S16.FT_signalizer a)
+          (OddOrder.Peterfalvi.S04.centralizerIn M a) ∧
+        (∀ c ∈ Subgroup.centralizer ({a} : Set G), ∀ y ∈ OddOrder.BG.Ch4.S16.FT_signalizer a,
+          c * y * c⁻¹ ∈ OddOrder.BG.Ch4.S16.FT_signalizer a) ∧
+        (∀ b ∈ X, Nat.Coprime (Nat.card (OddOrder.BG.Ch4.S16.FT_signalizer a))
+            (Nat.card (OddOrder.Peterfalvi.S04.centralizerIn M b))) := by
+    intro a ha
+    obtain ⟨hjoin, hdisj, hnormc⟩ :=
+      escaping_sigmaSharp_signalizer_structure hG hM (hXesc a ha) ha.2
+    exact ⟨hjoin, hdisj, hnormc, fun b hb => hXcop a ha b hb⟩
+  refine ⟨{ normalizer_eq := normalizer_support_eq hG hM hXM hXsharp hXne @hXiff
+            dade :=
+              { subset_sharp := fun x hx =>
+                  OddOrder.Peterfalvi.S04.mem_sharp.mpr ⟨Set.mem_univ x, hXsharp x hx⟩
+                subset_L := fun x hx => hXM hx
+                L_normalizes_A := fun l a ha => (hXiff l.2).mpr ha
+                H := fun a => ftSupportKernel M X a.1
+                conj_in_L := by
+                  intro a b ha hb hab
+                  obtain ⟨m, hmM, hmab⟩ := hXconj a ha b hb hab
+                  exact ⟨⟨m, hmM⟩, hmab⟩
+                centralizer_eq_sup := by
+                  intro a
+                  by_cases hesc : a.1 ∈ OddOrder.GroupTheory.escapingCentralizerSet M X
+                  · rw [ftSupportKernel_eq_of_escaping hesc]
+                    exact (hstruct hesc).1
+                  · have hle : Subgroup.centralizer ({a.1} : Set G) ≤ M := by
+                      by_contra hnle
+                      exact hesc ⟨a.2, hnle⟩
+                    rw [ftSupportKernel_eq_bot_of_not_escaping hesc, bot_sup_eq]
+                    exact (inf_eq_right.mpr hle).symm
+                centralizer_disjoint := by
+                  intro a
+                  by_cases hesc : a.1 ∈ OddOrder.GroupTheory.escapingCentralizerSet M X
+                  · rw [ftSupportKernel_eq_of_escaping hesc]
+                    exact (hstruct hesc).2.1
+                  · rw [ftSupportKernel_eq_bot_of_not_escaping hesc]
+                    exact disjoint_bot_left
+                H_normalized := by
+                  intro a c hc x hx
+                  by_cases hesc : a.1 ∈ OddOrder.GroupTheory.escapingCentralizerSet M X
+                  · rw [ftSupportKernel_eq_of_escaping hesc] at hx ⊢
+                    exact (hstruct hesc).2.2.1 c hc x hx
+                  · rw [ftSupportKernel_eq_bot_of_not_escaping hesc] at hx ⊢
+                    rw [Subgroup.mem_bot] at hx ⊢
+                    rw [hx]
+                    group
+                centralizer_coprime := by
+                  intro a b
+                  by_cases hesc : a.1 ∈ OddOrder.GroupTheory.escapingCentralizerSet M X
+                  · rw [ftSupportKernel_eq_of_escaping hesc]
+                    exact (hstruct hesc).2.2.2 b.1 b.2
+                  · rw [ftSupportKernel_eq_bot_of_not_escaping hesc]
+                    simpa using Nat.coprime_one_left _ }
+            H_eq_ftSupportKernel := fun _ => rfl
+            hconj := fun a l =>
+              ftSupportKernel_conj_smul_escaping_sigmaSharp hG hM hXesc @hXiff l.2 }⟩
+
+/-- **(8.13.c2) coprimality for the full type-`P₁` `A_0`-support**: for escaping `a ∈ M_σ^#` and any
+`b ∈ A_0(M)`, `|R(a)|` is coprime to `|C_M(b)|`.  Splits `A_0 = A(M) ∪ V^M`: for `b ∈ A(M) = M_σ^#`
+it is the σ-sharp coprimality (`escaping_sigmaSharp_disjoint_centralizer`); for `b ∈ V^M` it is
+`coprime_FT_signalizer_centralizerIn_typePV`. -/
+theorem coprime_FT_signalizer_centralizerIn_typePA0_of_isTypeP1 [Fintype G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G}
+    (hM : M ∈ maximalSubgroups G) (data : TypePData M)
+    (hP1 : OddOrder.BG.Ch4.S14.IsTypeP1 M)
+    {a : G} (haσ : a ∈ OddOrder.BG.Ch4.S14.sigmaSharp M)
+    (haesc : ¬ Subgroup.centralizer ({a} : Set G) ≤ M)
+    {b : G} (hb : b ∈ typePA0 M data) :
+    Nat.Coprime (Nat.card (OddOrder.BG.Ch4.S16.FT_signalizer a))
+      (Nat.card (OddOrder.Peterfalvi.S04.centralizerIn M b)) := by
+  simp only [typePA0, Set.mem_union] at hb
+  rcases hb with hpb | hvb
+  · rw [typePA_eq_sigmaSharp_of_isTypeP1 hG hM data hP1] at hpb
+    by_contra hnc
+    obtain ⟨p, hpp, hpR, hpC⟩ := Nat.Prime.not_coprime_iff_dvd.mp hnc
+    have hpσ : p ∈ OddOrder.BG.Ch3.S10.sigma (OddOrder.BG.Ch4.S16.FT_signalizerBase a) := by
+      refine OddOrder.BG.Ch3.S10.Msigma_isPiGroup (OddOrder.BG.Ch4.S16.FT_signalizerBase a) p
+        (Nat.mem_primeFactors.mpr ⟨hpp, ?_, Nat.card_pos.ne'⟩)
+      refine hpR.trans (Subgroup.card_dvd_of_le ?_)
+      rw [OddOrder.BG.Ch4.S16.FT_signalizer]
+      exact inf_le_left
+    exact escaping_sigmaSharp_disjoint_centralizer hG hM haσ haesc hpb.1 hpb.2 hpp hpσ hpC
+  · exact coprime_FT_signalizer_centralizerIn_typePV hG hM data haσ haesc hvb
+
 /-- **Peterfalvi (8.15)** for type `P`: the Dade (2.2) support hypotheses hold
 for `A_0(M)`, `A(M)`, and `A_1(M)`, with `L=M` and `H(a)=R(a)`. -/
 theorem dadeSupportHypotheses_typeP [Fintype G] [Finite G]
