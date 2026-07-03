@@ -726,3 +726,19 @@ K=maxNilpotentNormalHall M を持つが Dade Hypothesis M を carry せず。dee
 reusable infra 全抽出 (induce vanishing/partition trivIset/two-family diff/same-L R-ortho)。残 = 各
 deep 構成 (Hypothesis M / carrier genuinize / Cauchy-Sylow) = multi-session。**最 concrete structural =
 (12.11) part-2** (M∩L≤H の Cauchy/Sylow, group theory, 4 consumer)。次: (12.11) part-2 着手。
+
+### loop¹⁴² — root unblock = Hypothesis M 構成 (12.14/12.15/DadeNotation の共通根)
+
+(12.11) part-2 精査: 特定の Frobenius/Sylow 論法 (isPiSubgroup_le_of_normal_isHall [BG S12:43 既存]
+で π-group へ還元、但し L Frobenius [witness_L_frobenius, 10.10 cross-lane gated] + Sylow 構造依存)。
+clean ungated general lemma は抽出できず。
+
+**★ root 発見**: char endgame の gated targets が共通根に収束:
+- (12.14): Hypothesis M (M の Dade 設定) 要 → (12.4) を M に適用。
+- (12.15)/(DadeNotation ρM): ρM = adjointAverageFun (M の Dade adjoint) 要 → **Hypothesis M** 要。
+∴ **Hypothesis M 構成 = 12.14-12.16 chain の root unblock** (lane-b territory)。
+
+**構成可能性**: 反例 M (noncyclic Sylow p, p∣[M:M_F]) の型に依存。型-P なら **既に build 済の
+type-P Dade support engine (S10, type-P arc loop¹¹⁸-¹²⁹)** が Hypothesis M を構成しうる (reuse!)。
+型-I なら type-I Dade 構成。**次: 反例 M の型判定 + type-P Dade engine が Hypothesis M を与えるか確認**
+→ 与えれば 12.14-16 chain unblock (major)。Dade reciprocity (adjoint_formula ¹³⁸) は既存。
