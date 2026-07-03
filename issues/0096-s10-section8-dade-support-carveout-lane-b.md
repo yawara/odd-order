@@ -451,3 +451,17 @@ type-P1 A_0 datum の sorry-free 構成まで積み上げ、S12 (10.1) を unblo
 と恐れた障害 (engine 全体 / isConj / coprimality / V^M geometry) は σ-sharp 機構に還元。残 type-P2
 ((M')# geometry) は dadeSupportHypotheses_typeP の 2 sorry として cleanly 分離 (S12 は P1 のみ使うゆえ
 tower 入口には不要)。
+
+### loop¹²⁷ cont. — 次 frontier survey: §12 char analysis (S12_MaximalIII_IV_V の 4 sorry)
+
+**unblocked 10.1 の downstream consumer (FT critical path 確認)**:
+- **`FeitThompson.lean:446`** (FT spine) — `exists_hypothesis_of_typeIIIorIVorV` を
+  `card_kappaHall_lt_of_isTypeIIIorIV` 経由で使用。⟹ 10.1 unblock は spine に直結。
+- `S12_MaximalIII_IV_V:3666` (type-V contradiction)。
+
+**次 lane-b frontier = `S12_MaximalIII_IV_V.lean` の 4 real sorry** (§12 type-P char analysis /
+Dade tower body、10.1 Hypothesis が入手可能になった今 downstream)。S12_Core は 0 sorry。
+次 iteration: 4 sorry を survey → 上流優先で engage (§10 ω-grid / §5 依存の有無を確認)。
+
+type-P Dade support (§8) の carve-out 0096 の主目的 (typePA0 datum 構成 → S12 10.1) は達成。
+以降は §12/§10 char analysis (別 arc、S12 主体)。
