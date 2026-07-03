@@ -4645,8 +4645,10 @@ theorem exists_M_hypothesis78 [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
       M ∈ maximalSubgroups G ∧
         Subgroup.normalizer (hyp.base.V : Set G) ≤ M ∧
           ((maxNilpotentNormalHall M).subgroupOf M).index = hyp.base.p * hyp.base.q ∧
-          Nonempty (OddOrder.Peterfalvi.S09.Hypothesis78 G
-            (OddOrder.GroupTheory.typeIA M typeIHyp.typeI) M) := by
+          ∃ h78 : OddOrder.Peterfalvi.S09.Hypothesis78 G
+              (OddOrder.GroupTheory.typeIA M typeIHyp.typeI) M,
+            h78.hyp76.H = maxNilpotentNormalHall M ∧
+              h78.hyp76.hyp71.hyp = typeIHyp.dadeData.dade := by
   classical
   obtain ⟨vdata, _hker, _hVH⟩ :=
     OddOrder.Peterfalvi.S15.typeII_overNormalizer_frobenius_V hG hyp.base hTII
@@ -4733,7 +4735,7 @@ theorem exists_M_hypothesis78 [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
   refine ⟨hypothesis78OfDade typeIHyp.toHypothesis71
     (typeIHyp.dadeData.dade.fullDadeIsometryData typeIHyp.hconj).toDadeIsometryData.isDadeIsometry
     typeIHyp.typeI.typeF.H hHL hHnorm hAH θ hinj hcover d psi_support hdeg ind1H hind1H htriv
-    hdeg_match coh.extension ?_ ?_⟩
+    hdeg_match coh.extension ?_ ?_, ?_, rfl⟩
   · intro i j hi hj
     exact coherence_extension_inner_eq_on_family coh (hSmem i hi) (hSmem j hj)
   · intro i _ hi_ind
@@ -4741,6 +4743,7 @@ theorem exists_M_hypothesis78 [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     exact coherence_hagree_dadeMap typeIHyp.dadeData.dade typeIHyp.hconj coh
       (hSmem i hi_ind) (hSmem 0 (Ne.symm hind1H)) (m0 := 1) (mi := deg_i) (by norm_num)
       (by rw [hd i, hdeg_i_eq, Nat.cast_one, div_one]) (psi_support i)
+  · exact typeIHyp.typeI.typeF.H_eq
 
 /-- **Peterfalvi (14.10)**: a type-I maximal subgroup `M` over `N_G(V)` together
 with its Dade data exists.  Symmetric to `exists_LHypothesis`, packaging (13.17)
