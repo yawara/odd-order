@@ -740,55 +740,6 @@ theorem typePData_typePV_ncard [Finite G] {M : Subgroup G} (data : TypePData M) 
     Nat.add_le_mul hw1ge hw2ge
   omega
 
-/-- An element of the exceptional set `V = W − (W₁ ∪ W₂)` of a type-`P` maximal subgroup lies
-outside the derived subgroup `M' = [M,M]`.
-
-Decompose `v ∈ W = W₁ ⊔ W₂` (cyclic, hence abelian) as `v = x·y` with `x ∈ W₁`, `y ∈ W₂`
-(`Subgroup.mem_sup`).  Now `W₂ ≤ M'` (`W₂ ≤ H ⊓ M'' ≤ H ≤ M'`); if `v ∈ M'` then
-`x = v·y⁻¹ ∈ M'`, so `x ∈ W₁ ⊓ M' = ⊥` (`M_complement` disjointness), i.e. `x = 1` and
-`v = y ∈ W₂`, contradicting `v ∉ W₂`.
-
-This is the structural fact behind `ζ` (induced from the normal `M'`) vanishing on `V`, used in the
-Dade-image half of (10.5). -/
-theorem typePData_typePV_not_mem_derived {M : Subgroup G} (data : TypePData M)
-    {v : G} (hv : v ∈ typePV M data) : v ∉ derivedInG M := by
-  simp only [typePV, Set.mem_diff, Set.mem_union, SetLike.mem_coe, not_or] at hv
-  obtain ⟨hvW, _hvnW1, hvnW2⟩ := hv
-  intro hvM'
-  haveI hcyc : IsCyclic ↥data.W := data.W_cyclic
-  letI : CommGroup ↥data.W := hcyc.commGroup
-  have hW1le : data.W1 ≤ data.W := data.W_eq ▸ le_sup_left
-  have hW2le : data.W2 ≤ data.W := data.W_eq ▸ le_sup_right
-  -- Decompose `v` in the abelian `↥W` along `W₁ ⊔ W₂ = ⊤`.
-  have hsup : data.W1.subgroupOf data.W ⊔ data.W2.subgroupOf data.W = ⊤ := by
-    rw [← Subgroup.subgroupOf_sup hW1le hW2le, ← data.W_eq, Subgroup.subgroupOf_self]
-  have hvmem : (⟨v, hvW⟩ : ↥data.W) ∈
-      data.W1.subgroupOf data.W ⊔ data.W2.subgroupOf data.W := by
-    rw [hsup]; exact Subgroup.mem_top _
-  rw [Subgroup.mem_sup] at hvmem
-  obtain ⟨a, ha, b, hb, hab⟩ := hvmem
-  have haW1 : ((a : ↥data.W) : G) ∈ data.W1 := Subgroup.mem_subgroupOf.mp ha
-  have hbW2 : ((b : ↥data.W) : G) ∈ data.W2 := Subgroup.mem_subgroupOf.mp hb
-  have habG : ((a : ↥data.W) : G) * ((b : ↥data.W) : G) = v := by
-    have := congrArg (Subtype.val) hab
-    simpa using this
-  -- `W₂ ≤ M'`, so `b ∈ M'`; with `v ∈ M'` this forces `a = v·b⁻¹ ∈ M'`.
-  have hW2D : data.W2 ≤ derivedInG M := data.W2_le.trans (inf_le_left.trans data.H_le)
-  have haM' : ((a : ↥data.W) : G) ∈ derivedInG M := by
-    have heq : ((a : ↥data.W) : G) = v * ((b : ↥data.W) : G)⁻¹ := by rw [← habG]; group
-    rw [heq]; exact mul_mem hvM' (inv_mem (hW2D hbW2))
-  -- `a ∈ W₁ ⊓ M' = ⊥` (the `M_complement` disjointness), hence `a = 1`.
-  have haM : ((a : ↥data.W) : G) ∈ M := data.W1_le haW1
-  have hdisj := data.M_complement.disjoint
-  rw [Subgroup.disjoint_def] at hdisj
-  have hm1 : (⟨(a : ↥data.W), haM⟩ : ↥M) ∈ (derivedInG M).subgroupOf M :=
-    Subgroup.mem_subgroupOf.mpr haM'
-  have hm2 : (⟨(a : ↥data.W), haM⟩ : ↥M) ∈ data.W1.subgroupOf M :=
-    Subgroup.mem_subgroupOf.mpr haW1
-  have ha1 : ((a : ↥data.W) : G) = 1 := Subtype.ext_iff.mp (hdisj hm1 hm2)
-  -- Then `v = b ∈ W₂`, contradicting `v ∉ W₂`.
-  exact hvnW2 (by rw [← habG, ha1, one_mul]; exact hbW2)
-
 /-- For a type-`P` maximal subgroup, every `l ∈ W` stabilises the exceptional set `V` under
 conjugation: `l ∈ N_G(V) = W` (`TypePData.normalizer_V` with `X = V`), so `(MulAut.conj l) • V = V`.
 This is the `W`-stability input to the `|V^G|` TI-orbit count `ncard_conjClassSet_of_isTISubset`. -/
@@ -3605,7 +3556,7 @@ theorem Hypothesis.tau_muGridAlpha_apply_eq_on_typePV [Finite G]
     haveI hKnormal : ((derivedInG M).subgroupOf M).Normal := by rw [hKcomm]; infer_instance
     have hnotmem : (⟨v, hvM⟩ : ↥M) ∉ (derivedInG M).subgroupOf M := by
       rw [Subgroup.mem_subgroupOf]
-      exact typePData_typePV_not_mem_derived hyp.typeP hv
+      exact OddOrder.Peterfalvi.S10.typePData_typePV_not_mem_derived hyp.typeP hv
     rw [hζeq]
     exact ClassFunction.induce_eq_zero_of_not_mem_normal _ hnotmem
   -- Evaluate `α ⟨v⟩` via the reconciliation (`μ = δ_j·ω^σ`), `δ_0 = 1`, and `ζ(v) = 0`.
@@ -4672,7 +4623,7 @@ theorem Hypothesis.tau_zeta_sub_conj_vanishes_on_typePV [Finite G]
   haveI hKnormal : ((derivedInG M).subgroupOf M).Normal := by rw [hKcomm]; infer_instance
   have hnotmem : (⟨v, hvM⟩ : ↥M) ∉ (derivedInG M).subgroupOf M := by
     rw [Subgroup.mem_subgroupOf]
-    exact typePData_typePV_not_mem_derived hyp.typeP hv
+    exact OddOrder.Peterfalvi.S10.typePData_typePV_not_mem_derived hyp.typeP hv
   have hζv : ζ ⟨v, hvM⟩ = 0 := by
     rw [hζeq]; exact ClassFunction.induce_eq_zero_of_not_mem_normal _ hnotmem
   rw [ClassFunction.sub_apply, ClassFunction.conj_apply, hζv, star_zero, sub_zero]
@@ -5155,7 +5106,7 @@ theorem Hypothesis.muColumn_tau1_vanishes_on_typePV [Finite G] {M : Subgroup G}
     haveI hKnormal : ((derivedInG M).subgroupOf M).Normal := by rw [hKcomm]; infer_instance
     have hnotmem : (⟨v, hvM⟩ : ↥M) ∉ (derivedInG M).subgroupOf M := by
       rw [Subgroup.mem_subgroupOf]
-      exact typePData_typePV_not_mem_derived hyp.typeP hv
+      exact OddOrder.Peterfalvi.S10.typePData_typePV_not_mem_derived hyp.typeP hv
     have hμv : (∑ i : Fin hyp.w1, hyp.muGrid hG hodd i k) ⟨v, hvM⟩ = 0 :=
       hyp.muGrid_column_sum_vanishes_off_derived hG hodd k hnotmem
     have hζv : ζ ⟨v, hvM⟩ = 0 := by

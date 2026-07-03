@@ -350,3 +350,16 @@ typePA0_isConj (typePA0=M_σ#∪V^M の G-conj→M-conj) に向け:
 純 σ-元でない → M_σ#(σ-order) と非共役 (order prime-type mismatch) = **vacuous**。要 κ∩σ=∅ + W1 の
 κ-order 構造。次: mixed-case vacuity → typePA0_isConj 完成 → generalized engine + coprimality →
 typePA0(P1) Dade data discharge → S12 (10.1) unblock。
+
+### loop¹²³ — typePData_typePV_not_mem_derived を S10 へ upstream (mixed-case 準備)
+
+typePA0_isConj の mixed case (a∈M_σ#, b∈V^M は非共役) は「v∈V→v∉M'」を要する。この fact
+(`typePData_typePV_not_mem_derived`, S12) を **S10 へ move** (upstream + dedup): self-contained
+(TypePData の W_cyclic/W_eq/M_complement/W2_le/H_le)。S12 の 5 cite (S12_Core 3 + S12_MaximalIII_IV_V 2)
+を `OddOrder.Peterfalvi.S10.` prefix に更新。両 S12 leaf build green。
+
+**次 (mixed case 完成 → typePA0_isConj)**: a∈M_σ#→σ-elt (`isPiElement_sigma_of_mem_Msigma`)、
+b=gag⁻¹→σ-elt (`isPiElement_conj`)、b∈V^M→v∈V σ-elt→v∈M_σ (`sigma_subgroup_le_Msigma_of_isHall`
++`Msigma_isHall`)=M' (P1, `isTypeP1_derivedInG_eq_Msigma`)、v∉M' (`typePData_typePV_not_mem_derived`)
+で矛盾 = vacuous。⟹ typePA0_isConj (M_σ#/V^M/mixed 3-case) 完成。その後 coprimality + generalized
+engine (X⊆M, escaping⊆M_σ# 版) → typePA0(P1) Dade data discharge → S12 (10.1) unblock。

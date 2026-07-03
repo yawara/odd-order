@@ -653,7 +653,7 @@ theorem orthogonality_of_w1_lt_w2 [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOd
         Subgroup.comap_map_eq_self_of_injective M.subtype_injective]
     haveI hKnormal : ((derivedInG M).subgroupOf M).Normal := by rw [hKcomm]; infer_instance
     have hnotmem : (⟨v, hvM⟩ : ↥M) ∉ (derivedInG M).subgroupOf M := by
-      rw [Subgroup.mem_subgroupOf]; exact typePData_typePV_not_mem_derived hyp.typeP hv
+      rw [Subgroup.mem_subgroupOf]; exact OddOrder.Peterfalvi.S10.typePData_typePV_not_mem_derived hyp.typeP hv
     obtain ⟨θ, _hθne, hζeq⟩ := hzS
     have hζv : params.zeta ⟨v, hvM⟩ = 0 := by
       rw [hζeq]; exact ClassFunction.induce_eq_zero_of_not_mem_normal _ hnotmem
@@ -886,7 +886,7 @@ theorem inner_tau_muColumnZero_sub_zeta_alignedOmegaSigma_of_w1_lt_w2 [Finite G]
         Subgroup.comap_map_eq_self_of_injective M.subtype_injective]
     haveI hKnormal : ((derivedInG M).subgroupOf M).Normal := by rw [hKcomm]; infer_instance
     have hnotmem : (⟨v, hvM⟩ : ↥M) ∉ (derivedInG M).subgroupOf M := by
-      rw [Subgroup.mem_subgroupOf]; exact typePData_typePV_not_mem_derived hyp.typeP hv
+      rw [Subgroup.mem_subgroupOf]; exact OddOrder.Peterfalvi.S10.typePData_typePV_not_mem_derived hyp.typeP hv
     obtain ⟨θ, _hθne, hζeq⟩ := hzS
     have hζv : ζ ⟨v, hvM⟩ = 0 := by
       rw [hζeq]; exact ClassFunction.induce_eq_zero_of_not_mem_normal _ hnotmem

@@ -1735,6 +1735,46 @@ theorem typePData_V_ti [Finite G] {M : Subgroup G} (data : TypePData M) :
   simp only [typePV, Set.mem_diff, Set.mem_union, SetLike.mem_coe]
   rw [hgW h, hstab data.W1 hW1le h, hstab data.W2 hW2le h]
 
+/-- An element of the exceptional set `V = W − (W₁ ∪ W₂)` of a type-`P` maximal subgroup lies
+outside the derived subgroup `M' = [M,M]`.  Decompose `v ∈ W = W₁ ⊔ W₂` (cyclic, abelian) as
+`v = x·y` (`x ∈ W₁`, `y ∈ W₂`); `W₂ ≤ M'`, so `v ∈ M'` forces `x = v·y⁻¹ ∈ W₁ ⊓ M' = ⊥`
+(`M_complement`), i.e. `x = 1` and `v = y ∈ W₂`, contradicting `v ∉ W₂`.  (Upstreamed here for the
+type-`P` `A_0(M)` support geometry; also used in S12's §10 Dade-image analysis.) -/
+theorem typePData_typePV_not_mem_derived {M : Subgroup G} (data : TypePData M)
+    {v : G} (hv : v ∈ typePV M data) : v ∉ derivedInG M := by
+  simp only [typePV, Set.mem_diff, Set.mem_union, SetLike.mem_coe, not_or] at hv
+  obtain ⟨hvW, _hvnW1, hvnW2⟩ := hv
+  intro hvM'
+  haveI hcyc : IsCyclic ↥data.W := data.W_cyclic
+  letI : CommGroup ↥data.W := hcyc.commGroup
+  have hW1le : data.W1 ≤ data.W := data.W_eq ▸ le_sup_left
+  have hW2le : data.W2 ≤ data.W := data.W_eq ▸ le_sup_right
+  have hsup : data.W1.subgroupOf data.W ⊔ data.W2.subgroupOf data.W = ⊤ := by
+    rw [← Subgroup.subgroupOf_sup hW1le hW2le, ← data.W_eq, Subgroup.subgroupOf_self]
+  have hvmem : (⟨v, hvW⟩ : ↥data.W) ∈
+      data.W1.subgroupOf data.W ⊔ data.W2.subgroupOf data.W := by
+    rw [hsup]; exact Subgroup.mem_top _
+  rw [Subgroup.mem_sup] at hvmem
+  obtain ⟨a, ha, b, hb, hab⟩ := hvmem
+  have haW1 : ((a : ↥data.W) : G) ∈ data.W1 := Subgroup.mem_subgroupOf.mp ha
+  have hbW2 : ((b : ↥data.W) : G) ∈ data.W2 := Subgroup.mem_subgroupOf.mp hb
+  have habG : ((a : ↥data.W) : G) * ((b : ↥data.W) : G) = v := by
+    have := congrArg (Subtype.val) hab
+    simpa using this
+  have hW2D : data.W2 ≤ derivedInG M := data.W2_le.trans (inf_le_left.trans data.H_le)
+  have haM' : ((a : ↥data.W) : G) ∈ derivedInG M := by
+    have heq : ((a : ↥data.W) : G) = v * ((b : ↥data.W) : G)⁻¹ := by rw [← habG]; group
+    rw [heq]; exact mul_mem hvM' (inv_mem (hW2D hbW2))
+  have haM : ((a : ↥data.W) : G) ∈ M := data.W1_le haW1
+  have hdisj := data.M_complement.disjoint
+  rw [Subgroup.disjoint_def] at hdisj
+  have hm1 : (⟨(a : ↥data.W), haM⟩ : ↥M) ∈ (derivedInG M).subgroupOf M :=
+    Subgroup.mem_subgroupOf.mpr haM'
+  have hm2 : (⟨(a : ↥data.W), haM⟩ : ↥M) ∈ data.W1.subgroupOf M :=
+    Subgroup.mem_subgroupOf.mpr haW1
+  have ha1 : ((a : ↥data.W) : G) = 1 := Subtype.ext_iff.mp (hdisj hm1 hm2)
+  exact hvnW2 (by rw [← habG, ha1, one_mul]; exact hbW2)
+
 /-- **Type-`P` exceptional points are non-escaping**: for `v ∈ V = W ∖ (W₁ ∪ W₂)`, the singleton
 normalizer `N_G(⟨v⟩) = W` (`TypePData.normalizer_V`) equals `C_G(v)` (singleton: centralizing ⟺
 normalizing), and `W = W₁ ⊔ W₂ ≤ M`.  So `C_G(v) ≤ M`: the exceptional `V^M`-support of `A_0(M)`
