@@ -6004,4 +6004,34 @@ theorem theoremII_tame_embedding [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd
       rw [hMC, Set.mem_singleton_iff] at hN₁ hN₂
       exact hN₁.trans hN₂.symm)
 
+/-- **BG Lemma 14.13(a)** (mmd L4131; Coq `non_disjoint_signalizer_Frobenius`,
+BGsection14:2412), faithful form: for `x ∈ M_σ^#` with more than one `σ`-maximal, if `σ(N[x])`
+meets `π(M)` (`N[x] = FT_signalizerBase x` the signalizer neighbour), then `M` is of type `F`,
+`τ₂(M) = ∅`, and `M` is a Frobenius group with kernel `M_σ`.
+
+This is the faithful restatement flagged on the mis-encoded `S14.sigmaLength_one_frobenius_type`
+(issue 8020, whose `M, N ∈ 𝓜_σ(x)` non-conjugate premise is vacuous): the second maximal is the
+*signalizer neighbour* `N[x]` over `C_G(x)`, not a second `σ`-maximal.  The `ℓ_σ(x) = 1`
+hypothesis of the Coq original is dropped as derivable (`S14.Msigma_ell1`).
+
+Proof (BG Lemma 14.13(a)): `q ∈ π(M) ∩ σ(N[x])` has `q ∈ β(N[x]) ⊆ β(G)` (Theorem 14.4(d)); a
+`q`-subgroup `Q ≤ M` lies in a `σ`-complement `E` and `ℳ(N_G(Q)) = {N[x]^g}` (Corollary 12.14);
+`π(⟨x⟩) ⊆ τ₂(N[x]) ⊆ σ(M) ∖ β(M)` (Theorem 14.4(c), Lemma 12.1(g)) rules out type `P₂`
+(Proposition 14.2(g)) and type `P₁` (Theorem 14.7(a)(b)), so `M` is type `F`; a prime
+`p ∈ τ₂(M)` would give non-conjugate `A₀, A₁ ∈ ℰ_p¹(A)` (Corollary 12.9) both landing in
+`ℰ_p¹(N[x])`-conjugates, contradicting `r_p(N[x]) ≤ 1`.  `sorry`-pinned for the Peterfalvi
+(8.13.c2) cross-coprimality (issue 9003 loop¹⁰²). -/
+theorem non_disjoint_signalizer_frobenius [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G}
+    (hM : M ∈ maximalSubgroups G) {x : G} (hxM : x ∈ S14.sigmaSharp M)
+    (hgt : 1 < (S14.maximalSigmaSubgroupsOfElement x).ncard)
+    (hnd : (OddOrder.BG.Ch3.S10.sigma (FT_signalizerBase x) ∩ S14.piSet M).Nonempty) :
+    S14.IsTypeF M ∧ tau2 M = ∅ ∧
+      ∃ U : Subgroup G,
+        Subgroup.IsComplement' ((OddOrder.BG.Ch3.S10.Msigma M).subgroupOf M)
+          (U.subgroupOf M) ∧
+        OddOrder.Isaacs.Ch06.IsFrobeniusGroup ↥M
+          ((OddOrder.BG.Ch3.S10.Msigma M).subgroupOf M) (U.subgroupOf M) := by
+  sorry
+
 end OddOrder.BG.Ch4.S16
