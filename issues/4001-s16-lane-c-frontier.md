@@ -194,3 +194,24 @@ tick² の指摘 (spine sorry regression + 型が逆 `IsTypeP2 T` + d-carrier �
 - full build 3889 green、AxiomsCheck OK。
 
 残 = exists_MHypothesis wiring (tick² 指示通り TypeIIData T + reconciled_typePData_T 経由)。
+
+## 2026-07-04 lane-c (/loop) — 🎯🎯 exists_MHypothesis (14.10) LANDED — instance 壁 crossed
+
+`exists_MHypothesis` の bare `sorry` を **genuine な MHypothesis carrier 構成に置換** (commit `a1faa86d`
++ `e96ade8b`)。38 field 中 35 が genuine、残 3 のみ deep §7/§13 char sorry。
+
+- **instance-coherence 壁は自作 haveI が原因**と判明 (cont.⁴⁸ の proposed option a/b は不要)。全 instance は
+  `Fintype.ofFinite _` / `invertibleOfNonzero _` に落ち `Finite G` (Prop) は proof-irrelevant ゆえ producer
+  (`exists_M_hypothesis78`) と consumer は **同一 scoped instance に defeq**。⟹ `open scoped S12.FiniteInduce`
+  + competing haveI を入れないだけで解決。
+- **34 genuine field**: exists_M_hypothesis78 (M/typeIHyp/h78) + h78 由来 (tau/tau1/psi/betaM/Mset) +
+  `base_*` helpers (P/Q_isTI, W_normalizer_V, card_normalizer_{P,Q}) + G0 集合演算 (off_dadeSupport/orbit_cover)。
+- **psi_degree_eq_e も genuine 化** (2 本目 commit): exists_M_hypothesis78 に `ζ_{ind1H}(1)=[M:K]` witness 追加
+  → consumer で `zeta_one_eq_ind1H_one` + hindex で discharge。
+- **残 3 char sorry** (全 assembly 非依存の deep obligation): `psi_tau1_norm_one` (7.5 isometry、次 tractable
+  候補 = ζ irreducibility)、`betaGrid` (13.1.d η-grid、Track A / issue 3002)、`h78_zetaNuRho_normSq_ge` (7.8.b)。
+- betaGrid は signs+grid を単一 honest existential で deferred (偽な符号を assert しない)。
+- full build 3908 green、AxiomsCheck OK。詳細 = `notes/peterfalvi/s16_w4_char_cascade.md` cont.⁴⁹。
+
+**spine 前進**: `field_normalizer_structure → exists_MHypothesis` の gate が assembly 完成で 1 段解消
+(残 = 3 char sorry の discharge)。

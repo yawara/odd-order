@@ -474,3 +474,16 @@ S10 §8) に回す。lane c が S14-import leaf 済 or 進行中なら本 issue 
   claim は 9000 系 issue を起票 (a の §1-3 σ-tail と衝突しないか a は cite で回避)。
 
 ⟹ lane b は本裁定で (8.2.c) assembly + (1.2) leaf を自レーン/shared で進めてよい (hub 承認)。
+**⚠ (b) 半分は下記 lane b loop¹¹³ 訂正で上書き** — (1.2) は既 formalized ゆえ新 leaf 不要。(a) は据置。
+
+## ✏️ lane b 訂正 (loop¹¹³) — (1.2) support は既に形式化済、(8.2.c) は FULLY cite-assembleable
+
+loop¹¹² で「(1.2) support = 未形式化 gap」としたのは**誤り**。Pf (1.2) (「H⊴G, χ∈Irr(G),
+H⊄Ker χ, C_H(g)=1 ⟹ χ(g)=0」) は **`S03b_Vanishing.irreducibleCharacter_apply_eq_zero_of_centralizerInSubgroup_eq_bot`
+(既 landed)** で形式化済。∴ (8.2.c) の support clause も cite (A(L)=typeIA={y≠1:C_{L_F}(y)≠1} +
+(1.2) の対偶: φ(x)≠0,x≠1 ⟹ C_{H}(x)≠⊥ ⟹ x∈typeIA)。
+
+**∴ (8.2.c) general は FULLY cite-assembleable** (全 6 clause 部品 landed)。残る lane-b wiring は
+純機械的: (i) `H⊔U=⊤` (type-F L=L_F·U)、(ii) hcent bridge (TypeFData.centralizer_le_U1 の ↥L 移送)、
+(iii) 各構成要素の H⊄Ker (φ over θ≠1 から)。**lane b は本 wiring を自 S14 file で進める** (recipe の
+「lane b wiring」path; 衝突回避で lane c に通知: lane c が S14-import leaf 進行中なら本 issue に追記を)。

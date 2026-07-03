@@ -1357,3 +1357,38 @@ exists_MHypothesis が同 instance で MHypothesis を組む。または (b) exi
 に `[Fintype G] [Invertible (Nat.card G:ℂ)]` を明示 param 追加 (§16 の 2157/4316/4343 パターン、
 field_normalizer は Mdata.M のみ使うので consumer 追従容易) + M-instance を coherent に。MHypothesis は
 lane c 所有ゆえ (a) は自レーン完結。**数学 (tau1/G0/helpers) は全て済、残は instance plumbing + 4 char sorry**。
+
+### cont.⁴⁹ (2026-07-04 lane c=γ /loop): 🎯🎯 exists_MHypothesis LANDED — instance 壁は自作 haveI が原因、field 化不要
+
+**instance-coherence 壁の真因判明 (cont.⁴⁸ の option (a)/(b) は不要)**: 壁は cont.⁴⁸ の attempt が
+`haveI : Fintype G := Fintype.ofFinite G` 等の **fresh instance を持ち込んだ**ことによる自作。全 instance は
+`Fintype.ofFinite _` / `invertibleOfNonzero _` に落ち、引数の `Finite G` は **Prop = proof-irrelevant** ゆえ
+producer (`exists_M_hypothesis78`、`open scoped S12.FiniteInduce`) と consumer (`MHypothesis` field 型、同 open)
+で **同一 scoped instance に defeq**。⟹ 修正 = `exists_MHypothesis` に `open scoped S12.FiniteInduce` を付け、
+**competing haveI を一切入れない**だけ。`toFamilyHypothesis71` の `fintypeL := fun _ => inferInstance` と同型。
+**MHypothesis への instance field 追加 (option a) も明示 param (option b) も不要だった**。
+
+**assembly 全 field 実装 (commit `a1faa86d`)**: 38 field 中 34 が genuine:
+- M/typeIHyp/h78/h78_H_eq/h78_hyp_eq ← `exists_M_hypothesis78` (V-side dual producer)。
+- tau/tau1 := h78.nu (`IntegralCharacterMap = CF→ₗ[ℤ]CF` の abbrev ゆえ直接)、psi := zeta zetaDistinct、
+  betaM := h78.beta、Mset := Set.range zeta (`psi_tau1_eq`/`betaM_eq` = rfl、`psi_mem` = ⟨_,rfl⟩)。
+- e := pq / k := |K| / index・card は hindex・rfl。
+- P_isTI/Q_isTI/W_normalizer_V/card_normalizer_{P,Q}_eq ← `base_*` helpers (hTII := `T_typeII _hG hyp`)。
+- G0 := `univ \ [Ã(M) ∪ (W−(W₁∪W₂))^G ∪ (P#)^G ∪ (Q#)^G]`、G0_off_dadeSupport/G0_orbit_cover は集合演算で proven。
+- **betaGrid の健全性修正**: `betaSigns := fun _ _ => 1` は betaGrid を**具体的に偽な等式**にする (真の (13.1.d) は
+  genuine ±1)。⟹ signs (data) と grid (proof) を**単一 honest existential-sorry** で同時に deferred (偽な符号を
+  assert しない)。
+
+**psi_degree_eq_e を genuine 化 (commit 本 iteration 2 本目)**: `exists_M_hypothesis78` を強化し
+`ζ_{ind1H}(1) = [M:K]` を witness に追加 (`θ ind1H = 1_K` (htriv) + `induce_trivialChar_apply_eq_index`)。
+consumer は `zeta_one_eq_ind1H_one` (ψ(1)=ζ_{ind1H}(1)) + hindex ([M:K]=pq) で `rw` 一発。**producer 内 `.hyp76.zeta
+.ind1H` は defeq で reduce** (hypothesis76OfFamily の `zeta := fun i => induce (θ i)`、既存 h78_H_eq/h78_hyp_eq
+projection も同様に reduce する先例)。
+
+**残 3 char sorry** (全 genuine deep §7/§13、この assembly に非依存):
+- `psi_tau1_norm_one` (‖ψ^{τ₁}‖²=1): `nu_isometry 0 0` (0=zetaDistinct≠ind1H) で `‖ζ‖²` に帰着 → 残 = 距離の
+  distinguished ζ = induce(θ 0) の irreducibility (θ0≠1 + Frobenius)。次の tractable 候補。
+- `betaGrid` (13.1.d η-grid): Track A、issue 3002 (honest η-grid carrier 要)。
+- `h78_zetaNuRho_normSq_ge` (7.8.b coherence-norm 下界): 深 §7.8.b。
+full build 3908 green、AxiomsCheck OK。**§16 endgame の最上流 orphan `exists_MHypothesis` (14.10) は
+sorry-free spine へ 1 段近づいた** (field_normalizer_structure → exists_MHypothesis)。
