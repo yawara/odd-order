@@ -280,7 +280,18 @@
 
 ## 現状メモ
 
-- **2026-07-02 (夜) — 監視再開 (ユーザー指示「各レーンを監視します」)**: cron 943218a9 を規定ペース
+- **2026-07-03 — 監視再開 (ユーザー指示「各レーンの監視を再開します」) + 初回 tick 全レーン合流**:
+  cron a8af8c6a を規定ペース `7,22,37,52 * * * *` で再作成。初回 tick: a=5 / b=8 / c=10 commits を
+  a→b→c で合流 (`9aca52bf` / `55e46f1f` / `4847abc3`)、全ゲート green (build 3898/3898/3901 jobs、
+  AxiomsCheck OK、sorry 115→120 = 全て新 decl faithful scaffold pin、新 axiom なし)、push 済。
+  特記: (1) **b の S12_Core cross-lane 2-hunk (S10 (8.15) carrier faithful 化の機械的追従、issue
+  0096 flag 済) はユーザー裁定 2026-07-03 で受理** — 65a2be52 と同型の statement-soundness 改善。
+  standing carve-out ではない (以後の b の S12_Core 編集は通常どおり逸脱)。(2) c の新規 3 file
+  (CyclicCharacterExtension 系) が root closure 外 → 手順 3b で OddOrder.lean に import 追記。
+  (3) サイズ watch: S10 が 905→1703 行で 1500 超え (分割は issue 0096 の恒久解 = S10_DadeSupport
+  prefix-split で追跡済; S12=0076 / S14=0084 も既存)。(4) a の issue 9004 追加発見 2 (typePA0
+  G-共役 unsound) は b 所有の `dadeSupportHypotheses_typeP` (S10:566) の statement 偽を含意 —
+  0096/9004 に相互注記で b へ通知。 cron 943218a9 を規定ペース
   `7,22,37,52 * * * *` で再作成。再開時点: main = 停止時と同一系 (tree clean・origin 同期済)、
   `main..{a,b,c}` = 0 (変化なし)。新規 HUB issue なし (open の 9000 claim は lane a 承継注記済で対応不要)。
 - **2026-07-02 (夜) — 監視停止 (ユーザー指示「監視はとめます。一区切りにします」)**: cron 1af200eb を
