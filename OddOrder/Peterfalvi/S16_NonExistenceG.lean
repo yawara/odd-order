@@ -4650,7 +4650,9 @@ theorem exists_M_hypothesis78 [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
             h78.hyp76.H = maxNilpotentNormalHall M ∧
               h78.hyp76.hyp71.hyp = typeIHyp.dadeData.dade ∧
               h78.hyp76.zeta h78.ind1H (1 : M)
-                = (((maxNilpotentNormalHall M).subgroupOf M).index : ℂ) := by
+                = (((maxNilpotentNormalHall M).subgroupOf M).index : ℂ) ∧
+              ClassFunction.inner (h78.hyp76.zeta h78.zetaDistinct)
+                (h78.hyp76.zeta h78.zetaDistinct) = 1 := by
   classical
   obtain ⟨vdata, _hker, _hVH⟩ :=
     OddOrder.Peterfalvi.S15.typeII_overNormalizer_frobenius_V hG hyp.base hTII
@@ -4737,7 +4739,7 @@ theorem exists_M_hypothesis78 [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
   refine ⟨hypothesis78OfDade typeIHyp.toHypothesis71
     (typeIHyp.dadeData.dade.fullDadeIsometryData typeIHyp.hconj).toDadeIsometryData.isDadeIsometry
     typeIHyp.typeI.typeF.H hHL hHnorm hAH θ hinj hcover d psi_support hdeg ind1H hind1H htriv
-    hdeg_match coh.extension ?_ ?_, ?_, rfl, ?_⟩
+    hdeg_match coh.extension ?_ ?_, ?_, rfl, ?_, ?_⟩
   · intro i j hi hj
     exact coherence_extension_inner_eq_on_family coh (hSmem i hi) (hSmem j hj)
   · intro i _ hi_ind
@@ -4753,6 +4755,23 @@ theorem exists_M_hypothesis78 [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
         = (((maxNilpotentNormalHall vdata.L).subgroupOf vdata.L).index : ℂ)
     rw [htriv, ← typeIHyp.typeI.typeF.H_eq]
     exact induce_trivialChar_apply_eq_index _ (Subgroup.one_mem _)
+  · -- **Peterfalvi (7.8)**: the distinguished `ζ = ζ_0 = Ind_K θ_0` (`θ_0 ≠ 1_K`) is irreducible
+    -- (Frobenius, [Is] 6.34), hence `‖ζ‖² = 1` — the `ζ_0` unit-norm input to the (7.5)/(7.8) machinery.
+    obtain ⟨C, hFrobG⟩ := hfrob
+    have hθ0_ne : θ 0 ≠ trivialIrreducibleCharacter
+        ↥(typeIHyp.typeI.typeF.H.subgroupOf vdata.L) := by
+      intro h0triv
+      refine hind1H ?_
+      exact (hinj (show ClassFunction.induce (typeIHyp.typeI.typeF.H.subgroupOf vdata.L)
+            (θ 0 : ClassFunction _ ℂ)
+          = ClassFunction.induce (typeIHyp.typeI.typeF.H.subgroupOf vdata.L)
+            (θ ind1H : ClassFunction _ ℂ) from by rw [h0triv, htriv])).symm
+    show ClassFunction.inner
+        (ClassFunction.induce (typeIHyp.typeI.typeF.H.subgroupOf vdata.L)
+          (θ 0 : ClassFunction _ ℂ))
+        (ClassFunction.induce (typeIHyp.typeI.typeF.H.subgroupOf vdata.L)
+          (θ 0 : ClassFunction _ ℂ)) = 1
+    exact inner_self_induce_eq_one_of_frobeniusGroup hFrobG (θ 0) hθ0_ne
 
 open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
 /-- **Peterfalvi (14.10)**: a type-I maximal subgroup `M` over `N_G(V)` together
@@ -4772,21 +4791,24 @@ Instance coherence across the producer/consumer boundary is handled by opening
 `MHypothesis`'s field types and `exists_M_hypothesis78`'s existential are built with),
 so no competing `Fintype.ofFinite`/`Invertible` is introduced.
 
-The `psi_degree_eq_e` obligation (`ζ(1) = e = pq`, the (7.6) induced-principal degree)
-is discharged genuinely: `exists_M_hypothesis78` now also witnesses
-`ζ_{ind1H}(1) = [M:K]` (via `θ ind1H = 1_K` and `induce_trivialChar_apply_eq_index`),
-and `zeta_one_eq_ind1H_one` + `hindex` (`[M:K] = pq`) close it.
+Two obligations are discharged genuinely, via extra witnesses on `exists_M_hypothesis78`:
+* `psi_degree_eq_e` (`ζ(1) = e = pq`): the producer witnesses `ζ_{ind1H}(1) = [M:K]`
+  (`θ ind1H = 1_K` + `induce_trivialChar_apply_eq_index`), then `zeta_one_eq_ind1H_one` +
+  `hindex` (`[M:K] = pq`) close it;
+* `psi_tau1_norm_one` (`‖ψ^{τ₁}‖² = 1`): the producer witnesses `‖ζ‖² = 1` (the distinguished
+  `ζ = Ind_K θ_0`, `θ_0 ≠ 1_K`, is Frobenius-irreducible —
+  `inner_self_induce_eq_one_of_frobeniusGroup`), and `tau1 = ν` is a family isometry on it
+  (`nu_isometry`).
 
-Three residual obligations remain isolated as the genuine deep §7/§13 character content
+Two residual obligations remain isolated as the genuine deep §7/§13 character content
 (gated on the coherence-norm and η-grid theory, not on this assembly):
-* `psi_tau1_norm_one` — `‖ψ^{τ₁}‖² = 1` ((7.5) isometry on `ℤ[ℳ]`);
 * `betaGrid` — the (13.1.d) η-grid expansion of `1_G + Δ` (Track A, issue 3002);
 * `h78_zetaNuRho_normSq_ge` — the (7.8.b) coherence-norm lower bound. -/
 theorem exists_MHypothesis [Finite G]
     (_hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G)) :
     Nonempty (MHypothesis hyp) := by
   have hTII : IsTypeII hyp.base.T := T_typeII _hG hyp
-  obtain ⟨M, typeIHyp, hM_max, hnorm_V, hindex, h78, hH_maxnilp, hhyp_dade, hdeg_ind1H⟩ :=
+  obtain ⟨M, typeIHyp, hM_max, hnorm_V, hindex, h78, hH_maxnilp, hhyp_dade, hdeg_ind1H, hnorm1⟩ :=
     exists_M_hypothesis78 _hG hyp hTII
   -- **Peterfalvi (13.1.d)**: the `η`-grid expansion of `1_G + Δ` with `±1` signs.  The genuine
   -- Track A obligation (issue 3002): the signs and the expansion are supplied together, so no
@@ -4857,8 +4879,13 @@ theorem exists_MHypothesis [Finite G]
   -- **Peterfalvi (7.6)/(14.10)**: `ψ(1) = ζ_{ind1H}(1) = [M:K] = e = pq` — the induced
   -- principal degree, genuinely discharged via `exists_M_hypothesis78`'s degree witness.
   case psiDeg => rw [h78.zeta_one_eq_ind1H_one, hdeg_ind1H, hindex]
-  -- The three residual deep §7/§13 character obligations (see the docstring).
-  case normOne => sorry
+  -- **Peterfalvi (7.5)/(7.8)**: `‖ψ^{τ₁}‖² = ‖ζ‖² = 1` — `τ₁ = ν` is a family isometry
+  -- (`nu_isometry`, `ζ = ψ` non-`ind1H`) and `ζ` is unit-norm (`hnorm1`, Frobenius irreducible).
+  case normOne =>
+    rw [h78.nu_isometry h78.zetaDistinct h78.zetaDistinct h78.zetaDistinct_ne_ind1H
+      h78.zetaDistinct_ne_ind1H]
+    exact hnorm1
+  -- The two residual deep §7/§13 character obligations (see the docstring).
   case betaGrid => sorry
   case normSq => sorry
 

@@ -208,10 +208,13 @@ tick² の指摘 (spine sorry regression + 型が逆 `IsTypeP2 T` + d-carrier �
   `base_*` helpers (P/Q_isTI, W_normalizer_V, card_normalizer_{P,Q}) + G0 集合演算 (off_dadeSupport/orbit_cover)。
 - **psi_degree_eq_e も genuine 化** (2 本目 commit): exists_M_hypothesis78 に `ζ_{ind1H}(1)=[M:K]` witness 追加
   → consumer で `zeta_one_eq_ind1H_one` + hindex で discharge。
-- **残 3 char sorry** (全 assembly 非依存の deep obligation): `psi_tau1_norm_one` (7.5 isometry、次 tractable
-  候補 = ζ irreducibility)、`betaGrid` (13.1.d η-grid、Track A / issue 3002)、`h78_zetaNuRho_normSq_ge` (7.8.b)。
+- **psi_tau1_norm_one も genuine 化** (cont.⁵⁰、commit `e8a59466`): `‖ζ‖²=1` witness (Frobenius 誘導 unit-norm
+  `inner_self_induce_eq_one_of_frobeniusGroup`、shared infra) + `nu_isometry` で discharge。
+- **残 2 char sorry** (両方 genuinely gated): `betaGrid` (13.1.d η-grid、Track A / issue 3002)、
+  `h78_zetaNuRho_normSq_ge` (7.8.b、BetaDecomp + quadratic-norm 公式 gated = lane a 領域、clean cite 不可)。
 - betaGrid は signs+grid を単一 honest existential で deferred (偽な符号を assert しない)。
-- full build 3908 green、AxiomsCheck OK。詳細 = `notes/peterfalvi/s16_w4_char_cascade.md` cont.⁴⁹。
+- full build 3910 green、AxiomsCheck OK。詳細 = `notes/peterfalvi/s16_w4_char_cascade.md` cont.⁴⁹/⁵⁰。
 
-**spine 前進**: `field_normalizer_structure → exists_MHypothesis` の gate が assembly 完成で 1 段解消
-(残 = 3 char sorry の discharge)。
+**spine 前進**: `field_normalizer_structure → exists_MHypothesis` の gate が assembly 完成で解消。
+exists_MHypothesis は 34 genuine field + 2 char obligation (psi_degree/psi_tau1_norm は discharge 済)。
+残 2 は Track A (issue 3002) と (7.8.b) lane a landing 待ち — この 2 が埋まれば §16 endgame は spine 直結。
