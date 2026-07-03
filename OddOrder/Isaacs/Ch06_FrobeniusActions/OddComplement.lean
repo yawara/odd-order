@@ -444,4 +444,35 @@ theorem IsFrobeniusGroup.conjComplement {G : Type*} [Group G] [Finite G] {N A : 
       rw [this, hfix]
     exact h.conj_frobenius _ haAg hb1 _ hmN hm1 hbm
 
+/-- **Size condition for an odd-order Frobenius group**: if a finite Frobenius group has kernel `N`
+and complement `A` both of **odd** order, with `N ≠ ⊥`, then `2|A| + 1 ≤ |N|` (equivalently
+`e ≤ (h-1)/2`).  The complement acts freely on `N#`, so `|A| ∣ |N| - 1` (`card_kernel_modEq_one`,
+Isaacs 6.1); as `|N|` is odd, `|N| - 1` is even, and an odd divisor of an even number is at most half
+of it, so `|N| - 1 ≥ 2|A|`.  This is the `2e + 1 ≤ h` (`smallIndex`) input to the Peterfalvi §7
+`(7.8.b)` norm bound. -/
+theorem IsFrobeniusGroup.two_mul_card_complement_add_one_le_card_kernel {G : Type*} [Group G]
+    [Finite G] {N A : Subgroup G} (hFrob : IsFrobeniusGroup G N A)
+    (hNodd : Odd (Nat.card ↥N)) (hAodd : Odd (Nat.card ↥A)) (hNnt : N ≠ ⊥) :
+    2 * Nat.card ↥A + 1 ≤ Nat.card ↥N := by
+  haveI : Nontrivial ↥N := (Subgroup.nontrivial_iff_ne_bot N).mpr hNnt
+  have hN1 : 1 < Nat.card ↥N := Finite.one_lt_card
+  -- `|A| ∣ |N| - 1` from `|N| ≡ 1 [MOD |A|]` (Isaacs 6.1).
+  obtain ⟨m, hm⟩ : Nat.card ↥A ∣ Nat.card ↥N - 1 :=
+    (Nat.modEq_iff_dvd' hN1.le).mp hFrob.card_kernel_modEq_one.symm
+  -- `|N| - 1` is even (`|N|` odd), `|A|` is odd, so the cofactor `m` is even.
+  have hNm1_even : Even (Nat.card ↥N - 1) := Nat.Odd.sub_odd hNodd odd_one
+  have hm_even : Even m := by
+    rcases (Nat.even_mul.mp (hm ▸ hNm1_even)) with hA | hm
+    · exact absurd hA (Nat.not_even_iff_odd.mpr hAodd)
+    · exact hm
+  -- `m ≠ 0` (else `|N| = 1`), so `m ≥ 2`; hence `|N| - 1 = |A|·m ≥ 2|A|`.
+  have hApos : 0 < Nat.card ↥A := Nat.card_pos
+  have hm_pos : 0 < m := by
+    rcases Nat.eq_zero_or_pos m with h0 | hp
+    · rw [h0, Nat.mul_zero] at hm; omega
+    · exact hp
+  have hm2 : 2 ≤ m := Nat.le_of_dvd hm_pos hm_even.two_dvd
+  have hge : Nat.card ↥A * 2 ≤ Nat.card ↥A * m := Nat.mul_le_mul_left _ hm2
+  omega
+
 end OddOrder.Isaacs.Ch06
