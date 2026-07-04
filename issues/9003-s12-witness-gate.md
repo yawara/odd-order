@@ -634,3 +634,71 @@ tractable 例外 DpsiH/(12.5) を完済済)**:
 残る全 pin は (a) deep BG§14-15 type-P2/III-IV geometry (other-cluster)、(b) §8-§11 type-analysis gated、
 (c) (7.9)/(11.8) char (lane a) gated、(d) DadeNotation de-scaffold 設計判断。
 → loop cadence を heartbeat (20min) に落とし、user 方向指示 / 他レーン (BG§14-15, 7.9/11.8) unblock を待つ。
+
+## ✅ HUB/ユーザー裁定 (2026-07-04, loop¹⁹² frontier 枯渇への回答): b を BG§14-15 type-P2 geometry へ再配分
+
+lane b の loop¹⁹² 精査「(12.5) 完済で ungated tractable work 枯渇、残 type-P engine P2 は deep BG§14-15
+type-P2 geometry に gated」に対し、**ユーザー裁定 = b は自 engine P2 を gate している BG§14-15 type-P2
+geometry を正面 build する** (heartbeat 待機でなく、深いゲートを foundation 構築で開ける)。
+
+**具体 target** (b の loop¹⁹² 分析より):
+- **`escaping_typePA_mem_A1`** (type-P 8.13.b) — type-P escaping 元が A_1 に属する。
+- **`escaping_typePA_signalizer_structure`** (type-P σ-geometry) — type-P2 の signalizer 構造。
+- これらが `dadeSupportHypotheses_typeP` の **typePA P2** (S10:2509) / **typePA0 P2** (S10:2500, V^M
+  exceptional support) を un-gate する。
+
+**運用**:
+- BG§14-15 の type-P2 geometry lemma は **BG/** (shared foundation) に build 可** (Theorem B(4)(5) 完成の
+  前例と同型: b が BG を extend、ユーザー承認済)。**BG は "完了・共有凍結" だが type-P2 geometry は未形式化ゆえ
+  additive extension は許容** (既存 BG 宣言の statement 改変は要 flag)。原文は BG §14-15 + Gorenstein 行間
+  (coq/theories/BGsection14.v/15.v コメント併読)。
+- type-P2 の反例 (loop¹⁰⁹: M'∖M_σ の U-元は C_{M_σ}=1 で A_1 に落ちない) を踏まえ、type-I の clean analogue
+  でない deep geometry を honest に build (feedback-no-avoiding-hard-parts)。
+- 完成で type-P engine P2 → `dadeSupportHypotheses_typeP` 全 field discharge → §12 Dade tower endgame へ。
+- **(12.15) DadeNotation de-scaffold は今回は保留** (type-P engine P2 を優先; 必要になれば別途裁定)。
+- b は着手前に本裁定 + loop¹⁰⁷ de-risked plan + loop¹⁰⁹ reconciliation を再読。
+
+**⚠ 下記 loop¹⁹³ で refine**: BG §14 σ-theory foundation は issue 9000 で **別レーンが claim 済・能動 build 中**
+と b が判明 → b は σ-theory foundation を**重複 build しない** (claim-before-build)。本裁定の「BG§14-15 type-P2
+geometry を build」は、**b 所有部分 = type-P2 の CLOSE (`escaping_typePA_mem_A1` + S10 engine mirror、b の
+carve-out)** に読み替え、σ-foundation が merge-main で揃い次第 engage する (それまで heartbeat)。σ-foundation
+自体は 9000 claim レーンが build。⟹ hub は BG §14 の σ-theory build が停滞していないか (9000 レーンの生存) を注視。
+
+## loop¹⁹³ (2026-07-04, heartbeat) — type-P2 obstruction を精密特定: typePA の K-part は BG A0Set escape lemma 範囲外
+
+heartbeat 起動、main に他レーン進捗無し (gate 未解除)。type-P2 の deep 度を精密検証:
+- **BG escape lemma `mem_sigmaSharp_of_mem_aSet_of_escape` (S16) は type-general** (K=kappa-Hall 引数)、
+  escaping 点 (of ASet or A0Set) → M_σ#。→ 機構は存在。
+- **しかし `A0Set M K = hatMsigma M \ conjClassSet(sharpSubgroup K)` は K-part を除外**。
+  一方 **`typePA = (M')# = sharpSubgroup(derivedInG M)` は K-part を含む** (K ⊆ M')。
+  ⟹ typePA の K-元 (kappa#) は A0Set にも ASet にも入らず、escape lemma の射程外。
+- **∴ type-P2 typePA case は BG §14-15 type-P2 の新 K-structure geometry (V^M / kappa-action /
+  K# の signalizer) を要する** — type-I の clean mirror では**閉じない** (loop¹⁰⁹ の
+  「別物」を set-level で確定: (M')# の K-part が A0Set 除外部)。
+
+**結論 (loop¹⁰⁹ を精密化)**: type-P2 は BG §14-15「III/IV gate」領域の新 geometry を要し、lane-b 単独
+build 圏外 (BG Ch4 cluster 領域、claim-before-build/coordination 要)。→ heartbeat 継続、BG§14-15 進捗 /
+ユーザー方向指示待ち。lane-b の char/support tractable 作業は (12.5) 完済で確定的に枯渇。
+
+**⟳ type-P2 gate は LIVE (別レーンが BG §14 σ-theory を能動 build 中)**: `git log -- BG/Ch4/S14/S15` に
+非常に最近の `feat(BG §14)` 群 (`mem_U_sup_Msigma_iff_isPiElement_kappa_compl` /
+`mem_Msigma_iff_isPiElement_sigma` / `index_U_sup_Msigma_primeFactors_subset_kappa` / Cor 14.10
+σ-length ≤ 2 / fix-W type-P Ẑ ...) = type-P2 K-part geometry の前提。issue 9000
+(sigma-theory-typep-galois-foundation) で claim 済。→ **type-P2 は idle-gate でなく別レーン能動作業に
+gated**。claim-before-build ゆえ lane-b は BG §14 を重複 build しない。heartbeat が正: merge-main で
+BG §14 進捗を拾い、σ-foundation 揃い次第 type-P2 close (escaping_typePA_mem_A1 + engine mirror) を engage。
+
+## 🔎 HUB 明確化 (2026-07-04, loop¹⁹³ の待機前提を訂正): σ-foundation は in-main、b は今 engage せよ
+
+hub 検証: b の loop¹⁹³「別レーンが BG §14 σ-theory を能動 build 中ゆえ heartbeat 待機」の前提は**不正確**。
+- b が参照する σ-theory 補題 (`mem_U_sup_Msigma_iff_isPiElement_kappa_compl` / `mem_Msigma_iff_isPiElement_sigma` /
+  `index_U_sup_Msigma_primeFactors_subset_kappa` 等) は**既に main の `BG/Ch4_FamilyOfMaximal/S14_TypePCounting.lean`
+  に存在** (以前の σ-theory build で landing 済)。
+- **現在 BG §14 σ-theory を能動 build しているレーンは無い** (全レーン `main..lane`=0; issue 9000 は lane a 承継だが
+  a は §7 S09 に集中中)。⟹ b が「σ-foundation 揃うのを待つ」= 進行していない build を待つことになる。
+- ⟹ **ユーザー裁定どおり b は今 engage せよ** (heartbeat 待機でなく): 既存 σ-foundation を cite しつつ、type-P2 の
+  K-structure geometry (typePA K-part = A0Set 除外部の新 geometry: V^M / kappa-action / K# signalizer +
+  `escaping_typePA_mem_A1` (8.13.b) + engine mirror) を **shared BG-foundation / S10 carve-out で正面 build**。
+  追加で要る σ-lemma (Cor 14.10 σ-length≤2 等が未 landing なら) も同じく shared BG に additive build (Theorem B 前例)。
+- b の loop¹⁹³ 技術分析 (typePA K-part が escape lemma 射程外 = 新 geometry 要) は**正しい**; 訂正点は「別レーンが
+  それを build 中」の部分のみ (実際は誰も build しておらず b が担当)。
