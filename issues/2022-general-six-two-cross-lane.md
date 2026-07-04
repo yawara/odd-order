@@ -324,3 +324,11 @@ coherent_S_of_coherent_SH0C。(11.6) 消費側の再点検 or (5.7) 配線が次
   (fixedPoints ⊓ actionCommutator = ⊥)。4 clause 全実証明。
 - 次 (文書順): (11.7) H_elementaryAbelian (|H|=p^q, H₀=1)。
   quotient_order |H| = p^q·|H₀| + (11.6) H₀=H' + p-群機構が材料。
+
+## 2026-07-05 lane-a (loop 21): (5.7) instance 配線完了
+
+- `secondDerived_coherent` 実証明: `SOf_secondDerived_eq` (S(M'') = 次数-w₁ 既約
+  部分族; (8.4.d) inertia + kernel⟺linear) → `SHC_isCoherent` transport。
+- 残 sharp sorry: `charValue_one_eq_one_of_commutator_le_ker` (G' ⊆ ker → 次数 1、
+  汎用) — 次 iteration。その先: (11.3) coherent_S_of_coherent_SH0C (6.3-route) /
+  (11.7) H₀=1 (symplectic) / sixTwoDecompositionData。commit e07728c0。
