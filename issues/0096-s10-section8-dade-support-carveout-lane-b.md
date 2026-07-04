@@ -994,3 +994,23 @@ Fact-A 後も **Clifford partition (step 5)** が残る = (12.5) は multi-itera
 **次 iteration = step 4 build** (generic 「等次数 constituents of Ind_N^H λ, H/N abelian」lemma、
 Gallagher+extension で組む — 独立 reusable Clifford 定理)。以降 step 3-full→step 5→assemble。
 `rho_constant_on_H_minus_Hprime` は ρψ に restate 要 (現 plain-ψ は誤 statement、consumer 無)。
+
+### loop¹⁶⁰⁻¹⁶⁵ — 一般 Peterfalvi (1.7.b) tower **完成** (12.5 step-4 前提)
+
+**milestone**: 一般 (1.7.b) equal-degree (**coprimality 不要**、abelian inertia quotient) を
+bottom-up で完成。全 build-green・多くは first-try。reusable §1 char theory (repo 欠落を補充):
+1. `induce_restrict_mul` (射影公式 Frobenius–Nakayama, CharacterProduct)
+2. `induce_trivial_eq_sum_linearClassFunction` (Ind 1_H = ∑_β Inf(β), Gallagher)
+3. `induce_restrict_eq_mul_sum_linearClassFunction` (Ind(Res ψ)=ψ·∑Inf, Gallagher)
+4. `restrict_eq_restrictionMultiplicity_smul_of_invariant` (Res ψ=e·θ, invariant Clifford, CliffordSingleOrbit)
+5a. `induce_smul_eq_mul_sum_of_invariant` (e·Ind θ=ψ·∑Inf, 新 file InducedInvariantConstituent)
+5b. `induce_invariant_constituent_apply_one_eq` (**capstone**: Ind_H^K θ の全既約 constituent が degree ψ(1))
++ helper `ClassFunction.sum_apply`/`mul_sum` (ClassFunction は Mul のみ非 semiring → 分配を手証明)
+
+**残り (12.5) への path**:
+- **(1.7.a) Clifford corr lift**: inertia I=I_H(λ) で 5b 適用 (λ は I-invariant) → Ind_{H'}^H λ = Ind_I^H(Ind_{H'}^I λ)、
+  constituent φ_i=Ind_I^H ψ_i, degree [H:I]·ψ_i(1) 全等。CliffordCorrespondence.lean 参照。
+- **(12.5) DpsiH assembly**: partition P (trivIset/cover, CliffordSingleOrbit) + degree-determined
+  coefficient (5b + ρ-adjoint Fact A) + step-6 bricks (`sum_smul_induce_apply_eq_zero_of_not_mem_normal`)。
+- **ρ-adjoint Fact A (o_rpsi_S)**: `inner_psi_coherent_extension_eq_zero` + chiRho_adjoint + Sset_diff support (既 landed)。
+`rho_constant_on_H_minus_Hprime` は ρψ (chiRhoCF) に restate 要 (現 plain-ψ 誤、consumer 無)。
