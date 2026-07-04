@@ -2284,6 +2284,79 @@ theorem Hypothesis.card_univ_split [Fintype G] (hG : OddOrder.BG.IsMinimalSimple
   rw [Nat.card_eq_fintype_card]
   exact h
 
+/-- **`T` normalizes `Q^#`** — the `T`-side mirror of `S_normalizes_H_sharp`, via
+`normalizer_Q_eq_T`. -/
+theorem T_normalizes_Q_sharp [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hyp : Hypothesis (G := G)) :
+    ∀ (l : hyp.T) ⦃a : G⦄, a ∈ OddOrder.Peterfalvi.S04.sharp (hyp.Q : Set G) →
+      (l : G) * a * (l : G)⁻¹ ∈ OddOrder.Peterfalvi.S04.sharp (hyp.Q : Set G) := by
+  have hnorm : Subgroup.normalizer (hyp.Q : Set G) = hyp.T := normalizer_Q_eq_T hG hyp
+  intro l a ha
+  rw [OddOrder.Peterfalvi.S04.mem_sharp] at ha ⊢
+  obtain ⟨haQ, ha1⟩ := ha
+  have hlnorm : (l : G) ∈ Subgroup.normalizer (hyp.Q : Set G) := by
+    rw [hnorm]; exact l.2
+  refine ⟨(Subgroup.mem_set_normalizer_iff.mp hlnorm a).mp haQ, ?_⟩
+  intro heq
+  refine ha1 ?_
+  calc a = (l : G)⁻¹ * ((l : G) * a * (l : G)⁻¹) * (l : G) := by group
+    _ = 1 := by rw [heq]; group
+
+/-- **The (13.8)-for-`T` Dade hypothesis for the TI-subset `(T, Q^#)`** — the `T`-side mirror of
+`H_sharp_dadeHypothesis`, from the proven `Q_sharp_isTISubset` (type V excluded by `vd ≠ 1`).
+The foundation of the `T`-side (13.5) ρ-machinery consumed by `exists_caseB_data_eta10_T`. -/
+noncomputable def Q_sharp_dadeHypothesis [Fintype G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hyp : Hypothesis (G := G)) (hvd : hyp.v * hyp.d ≠ 1) :
+    OddOrder.Peterfalvi.S04.Hypothesis G (OddOrder.Peterfalvi.S04.sharp (hyp.Q : Set G)) hyp.T := by
+  have hQT : hyp.Q ≤ hyp.T := by
+    rw [hyp.Q_eq_TF]; exact OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_le hyp.T
+  refine OddOrder.Peterfalvi.S04.Hypothesis.of_isTISubset ?_ ?_ (T_normalizes_Q_sharp hG hyp)
+    (Q_sharp_isTISubset hG hyp hvd)
+  · intro x hx
+    exact OddOrder.Peterfalvi.S04.mem_sharp.mpr
+      ⟨Set.mem_univ x, (OddOrder.Peterfalvi.S04.mem_sharp.mp hx).2⟩
+  · intro x hx
+    exact hQT (OddOrder.Peterfalvi.S04.mem_sharp.mp hx).1
+
+/-- The `(T, Q^#)` Dade datum is conjugation-invariant (`H(a) = ⊥` for the TI construction). -/
+theorem Q_sharp_hconj [Fintype G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hyp : Hypothesis (G := G)) (hvd : hyp.v * hyp.d ≠ 1) :
+    (Q_sharp_dadeHypothesis hG hyp hvd).HConjInvariant :=
+  OddOrder.Peterfalvi.S04.Hypothesis.HConjInvariant.of_forall_H_eq_bot _ (fun _ => rfl)
+
+open scoped OddOrder.Peterfalvi.S15.FiniteInduce in
+/-- The (7.1) ρ-hypothesis for `(T, Q^#)` — mirror of `H_sharp_hypothesis71`. -/
+noncomputable def Q_sharp_hypothesis71 [Fintype G] [Invertible (Nat.card G : ℂ)]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hyp : Hypothesis (G := G)) (hvd : hyp.v * hyp.d ≠ 1) :
+    OddOrder.Peterfalvi.S09.Hypothesis71 G (OddOrder.Peterfalvi.S04.sharp (hyp.Q : Set G)) hyp.T :=
+  { hyp := Q_sharp_dadeHypothesis hG hyp hvd
+    τ := ((Q_sharp_dadeHypothesis hG hyp hvd).fullDadeIsometryData
+      (Q_sharp_hconj hG hyp hvd)).toDadeIsometryData.toDadeMap
+    isDadeMap := ((Q_sharp_dadeHypothesis hG hyp hvd).fullDadeIsometryData
+      (Q_sharp_hconj hG hyp hvd)).toDadeIsometryData.isDadeMap
+    hConjInvariant := Q_sharp_hconj hG hyp hvd }
+
+open scoped OddOrder.Peterfalvi.S15.FiniteInduce in
+/-- The (7.6) coherent-family datum for `(T, Q^#)` — mirror of `H_sharp_hypothesis76`; the
+datum on which the `T`-side (13.5.a) point formula is read off. -/
+noncomputable def Q_sharp_hypothesis76 [Fintype G] [Invertible (Nat.card G : ℂ)]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hyp : Hypothesis (G := G)) (hvd : hyp.v * hyp.d ≠ 1) :
+    OddOrder.Peterfalvi.S09.Hypothesis76 G
+      (OddOrder.Peterfalvi.S04.sharp (hyp.Q : Set G)) hyp.T := by
+  refine OddOrder.Peterfalvi.S09.Cert.hypothesis76OfDade (Q_sharp_hypothesis71 hG hyp hvd)
+    (((Q_sharp_dadeHypothesis hG hyp hvd).fullDadeIsometryData
+      (Q_sharp_hconj hG hyp hvd)).toDadeIsometryData.isDadeIsometry) hyp.Q ?_ ?_ rfl
+  · rw [hyp.Q_eq_TF]; exact OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_le hyp.T
+  · intro l h hh
+    have := T_normalizes_Q_sharp hG hyp
+    -- `T` normalizes `Q` itself (not just `Q^#`): via the normalizer identity.
+    have hnorm : Subgroup.normalizer (hyp.Q : Set G) = hyp.T := normalizer_Q_eq_T hG hyp
+    have hlnorm : (l : G) ∈ Subgroup.normalizer (hyp.Q : Set G) := by
+      rw [hnorm]; exact l.2
+    exact (Subgroup.mem_set_normalizer_iff.mp hlnorm h).mp hh
+
 /-- **`G₀` is cyclic-closed**: closed under `x ↦ x^k` for `k` coprime to `|G|` — the hypothesis
 shape of the Galois integrality `exists_nat_sum_normSq_of_mem_ZIrr_of_cyclicClosed` (and of
 [Is] Lemma 3.14) that makes the (13.10) atoms `slam`/`seta` rational.  The coprime power is
