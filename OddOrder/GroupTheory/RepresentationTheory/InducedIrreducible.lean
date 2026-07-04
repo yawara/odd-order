@@ -252,6 +252,21 @@ theorem card_mul_inner_self_induce_eq_card_inertia (θ : IrreducibleCharacter H)
   rw [Finset.sum_congr rfl fun x _ => hterm x, Finset.sum_boole, ← Fintype.card_subtype,
     Nat.card_eq_fintype_card]
 
+open scoped Classical in
+/-- **The conjugate-orbit sum is a virtual character**: each summand of the orbit
+`{θ^{x⁻¹} : x ∈ G}` is (the coercion of) an irreducible character of `H`
+(`IrreducibleCharacter.conjBy`), so the sum lies in `ℤ[Irr H]`.  Together with
+`card_smul_restrict_induce_eq_inertia_smul_orbitSum` this makes
+`(1/‖Ind θ‖²)·Res_H(Ind θ)` a genuine (ℕ-combination) character — the integrality carrier of
+Peterfalvi (13.5.a). -/
+theorem orbitSum_mem_ZIrr [Finite H] (θ : IrreducibleCharacter H) :
+    (∑ ψ ∈ Finset.univ.image
+        (fun x : G => ClassFunction.conjBy x⁻¹ (θ : ClassFunction ↥H ℂ)), ψ) ∈ ZIrr ↥H := by
+  refine Submodule.sum_mem _ (fun ψ hψ => ?_)
+  obtain ⟨x, -, rfl⟩ := Finset.mem_image.mp hψ
+  rw [← IrreducibleCharacter.coe_conjBy]
+  exact (IrreducibleCharacter.conjBy x⁻¹ θ).2.mem_ZIrr
+
 /-- **Induced irreducibles coincide iff the sources are `G`-conjugate.**  For `θ, ψ ∈ Irr H`
 (`H ⊴ G`), `Ind_H^G θ = Ind_H^G ψ` exactly when some `G`-conjugate of `θ` equals `ψ`.
 
