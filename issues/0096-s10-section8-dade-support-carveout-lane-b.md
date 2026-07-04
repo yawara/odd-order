@@ -1014,3 +1014,24 @@ bottom-up で完成。全 build-green・多くは first-try。reusable §1 char 
   coefficient (5b + ρ-adjoint Fact A) + step-6 bricks (`sum_smul_induce_apply_eq_zero_of_not_mem_normal`)。
 - **ρ-adjoint Fact A (o_rpsi_S)**: `inner_psi_coherent_extension_eq_zero` + chiRho_adjoint + Sset_diff support (既 landed)。
 `rho_constant_on_H_minus_Hprime` は ρψ (chiRhoCF) に restate 要 (現 plain-ψ 誤、consumer 無)。
+
+### loop¹⁶⁶⁻¹⁷⁰ — 一般 Peterfalvi (1.7.b) **完全版**完成 (inertia + full-group lift)
+
+**milestone**: 一般 (1.7.b) H-level equal-degree (coprimality 不要、full-group) を完成。
+inertia-level (5b) を Clifford correspondence + induction-in-stages で full-group に lift。
+InducedInvariantConstituent.lean:
+- `induce_smul_eq_sum_induce_mul_of_invariant_inertia`: `e·Ind_N^L θ = ∑_β Ind_T^L(ψ·Inf β)`
+  (transport-heavy、stages `induce_induce_subgroupOf` + inertia 5a + `induce_sum`)。
+- `induce_inertia_constituent_apply_one_eq`: **完全版** — Ind_N^L θ の全 constituent が degree
+  [L:T]·ψ(1) (Clifford corr irreducibility `isIrreducibleCharacter_induce_of_liesOver_of_inertia_eq`
+  + `restrict_mul_of_apply_eq_one` (Res(ψ·Inf β)=Res ψ) + `induce_apply_one` degree)。
+
+**(12.5) への残り path** (1.7.b は完済、以下が残):
+- **(12.5) DpsiH assembly**: partition P (trivIset/cover via CliffordSingleOrbit
+  `exists_conj_of_common_induce_constituent`) + degree-determined coefficient (完成 1.7.b equal-degree
+  + ρ-adjoint Fact A) + step-6 bricks (`sum_smul_induce_apply_eq_zero_of_not_mem_normal`)。
+  → `Res_H(ρψ) = ∑_λ a_λ Ind_{H'}^H λ + a·1_H`、H−H' で定数。
+- **ρ-adjoint Fact A (o_rpsi_S)**: `inner_psi_coherent_extension_eq_zero` + `chiRho_adjoint` 相互律
+  + `extends_on_supported` + `Sset_diff_vanishes_off_H_sharp` (全 landed、要 wiring)。
+- **statement 修正**: `rho_constant_on_H_minus_Hprime` を ρψ=`hyp.toHypothesis71.chiRhoCF psi` に restate
+  (現 plain-ψ 誤、consumer 無)。

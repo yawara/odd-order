@@ -1903,6 +1903,27 @@ theorem Sset_diff_vanishes_off_H_sharp {L : Subgroup G} (hyp : Hypothesis L)
   · rw [Sset_vanishes_off_H hyp hχ₁ hxH, Sset_vanishes_off_H hyp hχ₂ hxH, sub_zero]
   · subst hx1; rw [hdeg, sub_self]
 
+open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
+/-- **Peterfalvi (12.5) support, packaged for the Dade isometry** (the Frobenius witness case): the
+difference `χ₁ − χ₂` of two equal-degree members of `S` is supported in `A(L) = ambientA` (as
+`supportInSubgroup ambientA L`), so it is a `SupportedClassFunctions` to which the Dade isometry and
+the `chiRho_adjoint` reciprocity apply.  From `Sset_diff_vanishes_off_H_sharp`
+(`χ₁ − χ₂` vanishes off `H^# = H ∖ {1}`) and `hAH : A(L) = H^#`
+(`mem_supportInSubgroup_sharp_subgroupOf_iff`).  Feeds the `A1xi12` step of the (12.5) `o_rpsi_S`
+Fact-A. -/
+theorem Sset_diff_support_subset_ambientA {L : Subgroup G} (hyp : Hypothesis L)
+    {χ₁ χ₂ : ClassFunction ↥L ℂ} (hχ₁ : χ₁ ∈ hyp.Sset) (hχ₂ : χ₂ ∈ hyp.Sset)
+    (hdeg : χ₁ (1 : ↥L) = χ₂ (1 : ↥L))
+    (hAH : hyp.ambientA = ((hyp.typeI.typeF.H) : Set G) \ {1}) :
+    (χ₁ - χ₂).support ⊆ OddOrder.Peterfalvi.S04.supportInSubgroup hyp.ambientA L := by
+  intro x hx
+  rw [ClassFunction.mem_support] at hx
+  have hnot : ¬((x : G) ∉ hyp.H ∨ x = 1) := fun h =>
+    hx (Sset_diff_vanishes_off_H_sharp hyp hχ₁ hχ₂ hdeg h)
+  push_neg at hnot
+  exact (OddOrder.Peterfalvi.S09.Cert.mem_supportInSubgroup_sharp_subgroupOf_iff
+    hyp.typeI.typeF.H hAH x).mpr ⟨Subgroup.mem_subgroupOf.mpr hnot.1, hnot.2⟩
+
 open scoped Classical in
 /-- **General TI-induction self-value** (Isaacs 7.x / Peterfalvi (3.2.c) value half), generalized
 from `TICyclicHypothesis.induce_apply_eq_self_of_mem_V` to an arbitrary TI subset.  For a TI subset
