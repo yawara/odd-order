@@ -26,6 +26,34 @@ namespace OddOrder.RepresentationTheory
 
 variable {G : Type*} [Group G] [Finite G]
 
+section InnerConj
+
+variable [Fintype G] [Invertible (Nat.card G : ℂ)]
+
+/-- **Conjugation identity for the inner product**: `⟨φ, ψ̄⟩ = star ⟨φ̄, ψ⟩`.  Both sides equal
+`⅟|G| ∑_g φ(g) ψ(g)` (unfolding `star` on the conjugates).  For **real** `φ` (`φ̄ = φ`) this gives
+`⟨φ, ψ̄⟩ = star ⟨φ, ψ⟩`, the Fourier-coefficient symmetry used in the (7.9) parity argument. -/
+theorem inner_conj_right (φ ψ : ClassFunction G ℂ) :
+    ClassFunction.inner φ ψ.conj = star (ClassFunction.inner φ.conj ψ) := by
+  have hstar_inv : star (⅟(Nat.card G : ℂ)) = ⅟(Nat.card G : ℂ) := by
+    rw [invOf_eq_inv, star_inv₀, star_natCast]
+  simp only [ClassFunction.inner_eq_inv_card_mul_innerSum, ClassFunction.innerSum,
+    ClassFunction.conj_apply, star_mul', star_sum, hstar_inv, star_star]
+
+/-- For a **real** virtual character `φ` and `χ ∈ Irr G`, the Fourier coefficient of the conjugate
+`⟨φ, χ̄⟩` equals `⟨φ, χ⟩` (real, since `φ ∈ ℤ[Irr]`).  This makes the summand `⟨φ,χ⟩⟨ψ,χ⟩` invariant
+under the conjugation involution `χ ↦ χ̄`. -/
+theorem inner_conjPerm_eq_of_real {φ : ClassFunction G ℂ} (hφZ : φ ∈ ZIrr G)
+    (hφR : ClassFunction.IsReal φ) (χ : IrreducibleCharacter G) :
+    ClassFunction.inner φ (IrreducibleCharacter.conjPerm G χ : ClassFunction G ℂ) =
+      ClassFunction.inner φ (χ : ClassFunction G ℂ) := by
+  rw [IrreducibleCharacter.conjPerm_apply_coe, inner_conj_right, hφR]
+  -- `⟨φ, χ⟩` is a real integer, so `star ⟨φ, χ⟩ = ⟨φ, χ⟩`.
+  obtain ⟨m, hm⟩ := ClassFunction.inner_mem_ZIrr_int hφZ χ.property.mem_ZIrr
+  rw [hm, star_intCast]
+
+end InnerConj
+
 /-- **The conjugation involution's only fixed point is the trivial character** (odd order).  Combines
 `IrreducibleCharacter.conjPerm_eq_self_iff` (fixed point ↔ real) with Peterfalvi (1.1)
 `not_isReal_of_ne_trivial_of_odd_card'` (odd order ⟹ only the trivial irreducible is real).  This is
