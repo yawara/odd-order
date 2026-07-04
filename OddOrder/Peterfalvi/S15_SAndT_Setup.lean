@@ -3031,16 +3031,199 @@ theorem lambda_alphaFun_inner_zero [Fintype G] [Invertible (Nat.card G : ℂ)]
 
 open scoped Classical in
 open scoped FiniteInduce in
+/-- **`λ` vanishes on the mixed products `W₂·W₁^#`** (Peterfalvi (13.6) proof, "`λ(xy) = 0`"):
+`λ = ζ_{i₁}` is a member of the (7.6) family induced from `H` (`exists_lambda_index`), the
+family vanishes off `H` (`zeta_eq_zero_of_not_mem_H`), and `x·y ∉ H` — `q` divides
+`orderOf (x·y) = orderOf x · q` (commuting factors of coprime prime orders) while `q ∤ |H|`
+(`q_not_dvd_card_H`). -/
+theorem lambda_apply_mul_eq_zero [Fintype G] [Invertible (Nat.card G : ℂ)]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {hyp : Hypothesis (G := G)}
+    (chars : CharacterDegreeData hyp) (hlam : chars.lambda_induced_from_PC_linear)
+    {x y : G} (hx : x ∈ hyp.W2) (hy : y ∈ hyp.W1) (hy1 : y ≠ 1)
+    (hxyS : x * y ∈ hyp.S) :
+    chars.lambda ⟨x * y, hxyS⟩ = 0 := by
+  obtain ⟨i₁, -, -, hi₁eq, -, -⟩ := exists_lambda_index hG chars hlam
+  rw [← hi₁eq]
+  refine (H_sharp_hypothesis76 hG hyp).zeta_eq_zero_of_not_mem_H i₁ _ (fun hmem => ?_)
+  have hmem' : x * y ∈ hyp.H := by
+    rwa [show (H_sharp_hypothesis76 hG hyp).H = hyp.H from rfl] at hmem
+  -- `orderOf y = q`
+  have hyq : orderOf y = hyp.q := by
+    have h2 : orderOf y = orderOf (⟨y, hy⟩ : ↥hyp.W1) :=
+      orderOf_injective hyp.W1.subtype Subtype.coe_injective ⟨y, hy⟩
+    have h1 : orderOf (⟨y, hy⟩ : ↥hyp.W1) ∣ hyp.q := by
+      rw [hyp.q_eq_card_W1]; exact orderOf_dvd_natCard _
+    rcases (Nat.dvd_prime hyp.q_prime).mp h1 with h | h
+    · exact absurd (congrArg Subtype.val (orderOf_eq_one_iff.mp h)) hy1
+    · rw [h2, h]
+  -- `orderOf x ∣ p`
+  have hxord : orderOf x ∣ hyp.p := by
+    have h2 : orderOf x = orderOf (⟨x, hx⟩ : ↥hyp.W2) :=
+      orderOf_injective hyp.W2.subtype Subtype.coe_injective ⟨x, hx⟩
+    rw [h2, hyp.p_eq_card_W2]
+    exact orderOf_dvd_natCard _
+  -- `q ∣ orderOf (x·y)`
+  have hcomm : Commute y x := hyp.W1_commutes_W2 y hy x hx
+  have hcop : Nat.Coprime (orderOf y) (orderOf x) := by
+    rw [hyq]
+    exact Nat.Coprime.coprime_dvd_right hxord
+      ((Nat.coprime_primes hyp.q_prime hyp.p_prime).mpr (Ne.symm (hyp.p_ne_q)))
+  have hqdvd : hyp.q ∣ orderOf (x * y) := by
+    rw [show x * y = y * x from hcomm.eq.symm,
+      hcomm.orderOf_mul_eq_mul_orderOf_of_coprime hcop, hyq]
+    exact dvd_mul_right _ _
+  -- ... but every `H`-element has order prime to `q`
+  have hdvdH : orderOf (x * y) ∣ Nat.card ↥hyp.H := by
+    have h2 : orderOf (x * y) = orderOf (⟨x * y, hmem'⟩ : ↥hyp.H) :=
+      orderOf_injective hyp.H.subtype Subtype.coe_injective ⟨x * y, hmem'⟩
+    rw [h2]; exact orderOf_dvd_natCard _
+  exact hyp.q_not_dvd_card_H hG (hqdvd.trans hdvdH)
+
+open scoped Classical in
+open scoped FiniteInduce in
+/-- **`λ^{τ₁}` vanishes on the mixed products `W₂^#·W₁^#`** (Peterfalvi (13.6) proof, "by
+(3.2.d), (5.3.b) and (5.5), `λ^{τ₁}(xy) = 0`"): the coherence extension `τ₁` sends `ℤ[𝒮]`
+to class functions whose values on the regular section `xy ∈ Ŵ` are controlled by the
+`η`-grid, and `λ^{τ₁}` has no `η`-component there.  Faithful producer; gated on the
+(13.2.d)/(5.3.b)/(5.5) coherence-support analysis (the same (13.3)-cluster gate as
+`exists_lambda_index`). -/
+theorem lambda_tau1_apply_mul_eq_zero [Fintype G] [Invertible (Nat.card G : ℂ)]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {hyp : Hypothesis (G := G)}
+    (chars : CharacterDegreeData hyp) (_hlam : chars.lambda_induced_from_PC_linear)
+    {x y : G} (hx : x ∈ hyp.W2) (hy : y ∈ hyp.W1) (hx1 : x ≠ 1) (hy1 : y ≠ 1) :
+    chars.tau1S chars.lambda (x * y) = 0 := by
+  sorry
+
+open scoped Classical in
+open scoped FiniteInduce in
+/-- **`α(1) ∈ ℤ` for the `λ`-package** (the (13.5) framing "`α(1) = qb` with `b` an integer",
+integrality half): `α(1) = ∑_{P ⊆ ker ζᵢ} c̄ᵢ·ζᵢ(1)/‖ζᵢ‖²` with `cᵢ = ⟨τψᵢ, λ^{τ₁}⟩ ∈ ℤ`
+(both virtual characters — `λ^{τ₁} ∈ ℤ[Irr G]` is `lambda_tau1_norm_one.1`, the `τψᵢ`
+via `preserves_virtualCharacters` as in `eta10_cCoeff_int`) and `ζᵢ(1)/‖ζᵢ‖² = [S : I_S(θᵢ)]`
+(the inertia-index identity `card_mul_inner_self_induce_eq_card_inertia` /
+`card_smul_restrict_induce_eq_inertia_smul_orbitSum`).  Faithful producer; assembly pending
+the per-index inertia bookkeeping. -/
+theorem lambda_alphaFun_one_int [Fintype G] [Invertible (Nat.card G : ℂ)]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) {hyp : Hypothesis (G := G)}
+    (chars : CharacterDegreeData hyp) (_hlam : chars.lambda_induced_from_PC_linear) :
+    ∃ m : ℤ, H_sharp_alphaFun hG hyp (chars.tau1S chars.lambda) 1 = (m : ℂ) := by
+  sorry
+
+open scoped Classical in
+open scoped FiniteInduce in
 /-- **`α(1) ≡ 0 (mod q)` for the `λ`-package** (Peterfalvi (13.6) proof, the (1.10) congruence):
 `λ(x) ≡ λ^{τ₁}(x) ≡ 0 (mod 1−ε)` on `W₂^#`, so `α(1) = α(x) = λ^{τ₁}(x) − λ(x) ≡ 0 (mod q)`.
 Faithful producer; gated on the (1.10)/(3.2) grid congruences. -/
 theorem exists_lambda_alphaFun_one_qb [Fintype G] [Invertible (Nat.card G : ℂ)]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) {hyp : Hypothesis (G := G)}
     (chars : CharacterDegreeData hyp)
-    (_hlam : chars.lambda_induced_from_PC_linear) :
+    (hlam : chars.lambda_induced_from_PC_linear) :
     ∃ b : ℤ, H_sharp_alphaFun hG hyp (chars.tau1S chars.lambda) 1
       = (hyp.q : ℂ) * (b : ℂ) := by
-  sorry
+  classical
+  -- `α(1) = m ∈ ℤ` (integrality producer)
+  obtain ⟨m, hm⟩ := lambda_alphaFun_one_int hG chars hlam
+  -- the distinguished index and the norm normalizations
+  obtain ⟨i₁, hi₁pos, hi₁ker, hi₁eq, hi₁c, hmiddle⟩ := exists_lambda_index hG chars hlam
+  obtain ⟨hZtau, -, hnormLam⟩ := lambda_tau1_norm_one hG chars hlam
+  -- pick `x ∈ W₂^#`, `y ∈ W₁^#`
+  obtain ⟨x', hx'⟩ : ∃ x' : ↥hyp.W2, x' ≠ 1 := by
+    haveI : Nontrivial ↥hyp.W2 := Finite.one_lt_card_iff_nontrivial.mp
+      (by rw [← hyp.p_eq_card_W2]; exact hyp.p_prime.one_lt)
+    exact exists_ne 1
+  obtain ⟨y', hy'⟩ : ∃ y' : ↥hyp.W1, y' ≠ 1 := by
+    haveI : Nontrivial ↥hyp.W1 := Finite.one_lt_card_iff_nontrivial.mp
+      (by rw [← hyp.q_eq_card_W1]; exact hyp.q_prime.one_lt)
+    exact exists_ne 1
+  have hxW2 : (x' : G) ∈ hyp.W2 := x'.2
+  have hyW1 : (y' : G) ∈ hyp.W1 := y'.2
+  have hx1 : (x' : G) ≠ 1 := fun h => hx' (Subtype.ext h)
+  have hy1 : (y' : G) ≠ 1 := fun h => hy' (Subtype.ext h)
+  -- memberships: `x ∈ P ≤ H ≤ S`, `y ∈ W₁ ≤ W ≤ S`
+  have hxP : (x' : G) ∈ hyp.P := W2_le_P hG hyp hxW2
+  have hPS : hyp.P ≤ hyp.S := by
+    rw [hyp.P_eq_SF]; exact OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_le hyp.S
+  have hxS : (x' : G) ∈ hyp.S := hPS hxP
+  have hxH : (x' : G) ∈ hyp.H := (le_sup_left : hyp.P ≤ hyp.H) hxP
+  have hWS : hyp.W ≤ hyp.S := by rw [hyp.W_eq_inter]; exact inf_le_left
+  have hW1W : hyp.W1 ≤ hyp.W := by rw [hyp.W_eq_join]; exact le_sup_left
+  have hyS : (y' : G) ∈ hyp.S := hWS (hW1W hyW1)
+  -- the point formula at `x`: `λ^{τ₁}(x) = λ(x) + α(x)` (with `c₁ = 1`, `‖ζ₁‖² = 1`)
+  have hns : (H_sharp_hypothesis76 hG hyp).zetaNormSq i₁ = 1 := by
+    rw [show (H_sharp_hypothesis76 hG hyp).zetaNormSq i₁
+      = ClassFunction.inner ((H_sharp_hypothesis76 hG hyp).zeta i₁)
+        ((H_sharp_hypothesis76 hG hyp).zeta i₁) from rfl, hi₁eq]
+    exact hnormLam
+  have hpf : chars.tau1S chars.lambda ((x' : G))
+      = chars.lambda ⟨(x' : G), hxS⟩
+        + H_sharp_alphaFun hG hyp (chars.tau1S chars.lambda) ⟨(x' : G), hxS⟩ := by
+    have h := H_sharp_point_formula hG hyp (chars.tau1S chars.lambda) i₁ hi₁pos hi₁ker
+      hmiddle ⟨(x' : G), hxS⟩
+      (by rw [OddOrder.Peterfalvi.S04.mem_sharp]; exact ⟨hxH, hx1⟩)
+    rwa [hi₁c, hns, star_one, div_one, one_mul, hi₁eq] at h
+  -- `λ = ζ_{i₁} ∈ ℤ[Irr ↥S]` (for the `↥S`-level (1.10.a))
+  have hZlam : chars.lambda ∈ ZIrr ↥hyp.S := by
+    rw [← hi₁eq]
+    obtain ⟨θ, hθ⟩ := (H_sharp_hypothesis76 hG hyp).zeta_induced i₁
+    rw [hθ]
+    exact OddOrder.RepresentationTheory.ClassFunction.induce_mem_ZIrr _ (θ.2.mem_ZIrr)
+  -- the primitive `q`-th root and the two (1.10.a) congruences at `x` vs `yx`
+  have hε : IsPrimitiveRoot (Complex.exp (2 * Real.pi * Complex.I / hyp.q)) hyp.q :=
+    Complex.isPrimitiveRoot_exp hyp.q hyp.q_prime.pos.ne'
+  set ε : ℂ := Complex.exp (2 * Real.pi * Complex.I / hyp.q) with hεdef
+  have hyq : (y' : G) ^ hyp.q = 1 := by
+    have h1 : y' ^ hyp.q = 1 := by
+      rw [hyp.q_eq_card_W1]; exact pow_card_eq_one'
+    have h2 := congrArg Subtype.val h1
+    rwa [SubmonoidClass.coe_pow, OneMemClass.coe_one] at h2
+  have hcommG : Commute ((y' : G)) ((x' : G)) := hyp.W1_commutes_W2 _ hyW1 _ hxW2
+  -- τ₁-side (`G`-level): `λ^{τ₁}(x) = λ^{τ₁}(yx) − (1−ε)z₂ = −(1−ε)z₂`
+  obtain ⟨z₂, hz₂int, hz₂⟩ :=
+    OddOrder.RepresentationTheory.exists_integral_apply_sub_of_commute hyp.q_prime.pos hε
+      hZtau hyq hcommG
+  have htau0 : chars.tau1S chars.lambda ((y' : G) * (x' : G)) = 0 := by
+    rw [hcommG.eq]
+    exact lambda_tau1_apply_mul_eq_zero hG chars hlam hxW2 hyW1 hx1 hy1
+  -- λ-side (`↥S`-level): `λ(x) = λ(yx) − (1−ε)z₁ = −(1−ε)z₁`
+  have hyqS : (⟨(y' : G), hyS⟩ : ↥hyp.S) ^ hyp.q = 1 := by
+    apply Subtype.ext
+    rw [SubmonoidClass.coe_pow, OneMemClass.coe_one]
+    exact hyq
+  have hcommS : Commute (⟨(y' : G), hyS⟩ : ↥hyp.S) (⟨(x' : G), hxS⟩ : ↥hyp.S) :=
+    Subtype.ext hcommG.eq
+  obtain ⟨z₁, hz₁int, hz₁⟩ :=
+    OddOrder.RepresentationTheory.exists_integral_apply_sub_of_commute hyp.q_prime.pos hε
+      hZlam hyqS hcommS
+  have hlam0 : chars.lambda ((⟨(y' : G), hyS⟩ : ↥hyp.S) * ⟨(x' : G), hxS⟩) = 0 := by
+    have hmulS : ((⟨(y' : G), hyS⟩ : ↥hyp.S) * ⟨(x' : G), hxS⟩ : ↥hyp.S)
+        = ⟨(x' : G) * (y' : G), mul_mem hxS hyS⟩ := Subtype.ext hcommG.eq
+    rw [hmulS]
+    exact lambda_apply_mul_eq_zero hG chars hlam hxW2 hyW1 hy1 _
+  -- combine: `α(1) = α(x) = λ^{τ₁}(x) − λ(x) = (1−ε)(z₁ − z₂)`
+  have hconst := H_sharp_alphaFun_const_on_P hG hyp (chars.tau1S chars.lambda)
+    ⟨(x' : G), hxS⟩ (Subgroup.mem_subgroupOf.mpr hxP)
+  have hcast : ((m : ℤ) : ℂ) = (1 - ε) * (z₁ - z₂) := by
+    rw [htau0, zero_sub] at hz₂
+    rw [hlam0, zero_sub] at hz₁
+    have e1 : chars.tau1S chars.lambda ((x' : G)) = -((1 - ε) * z₂) := by
+      linear_combination -hz₂
+    have e2 : chars.lambda ⟨(x' : G), hxS⟩ = -((1 - ε) * z₁) := by
+      linear_combination -hz₁
+    have e3 : H_sharp_alphaFun hG hyp (chars.tau1S chars.lambda) ⟨(x' : G), hxS⟩
+        = (1 - ε) * (z₁ - z₂) := by
+      have e4 := hpf
+      rw [e1, e2] at e4
+      linear_combination -e4
+    rw [← hm, ← hconst, e3]
+  -- (1.10.b): `q ∣ m`
+  have hdvd : (hyp.q : ℤ) ∣ m :=
+    OddOrder.RepresentationTheory.int_dvd_of_one_sub_primRoot_dvd hyp.q_prime hε
+      (hz₁int.sub hz₂int) hcast
+  obtain ⟨b, hb⟩ := hdvd
+  refine ⟨b, ?_⟩
+  rw [hm, hb]
+  push_cast
+  ring
 
 open scoped Classical in
 open scoped FiniteInduce in
