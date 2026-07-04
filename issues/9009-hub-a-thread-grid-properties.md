@@ -93,3 +93,12 @@ build-error** → build-RED。⟹ b が field を足すには a が**同時に**
 - issue 3002 (grid-property-carrier-enrichment) — a-side spec + b 訂正節 (2026-07-04) + fix-owner を 2026-07-04 再々編に更新
 - `notes/peterfalvi/s15_s_and_t.md` 2026-07-04 lane b LIVE STATUS
 - (13.10) `analytic_inequality` は b が de-opacify 済 (commit f17fdbcd) — 実 `u/c` bound は theorem 化
+
+## 🧾 HUB 裁定更新 (2026-07-05, 統合セッション — 選択肢 2 に変更)
+
+**threading の実施 owner を a → b に変更** (正本 = `ft_lane_reallocation_2026_06_28.md`
+「3 レーン役割更新 (2026-07-05)」節)。理由: a は (11.8) capstone assembly 完了により S12 の 3 named gates
+(τ₂/S₂ coherence 最深) に専念すべき負荷状況、b は本 threading が唯一の unblock 手段で飢餓中。
+**b に `FeitThompson.lean` の `Section16Inputs`/constructor block への一時編集権を承認** (選択肢 2、
+先例 `S_U_commutative`/`Sdata_W2_eq` 方式)。additive な field 追加に限定し、conflict は hub が merge で調整。
+b の実施順: S15.Hypothesis grid fields (自所有) → FeitThompson 供給 → engine wiring → terminal 1298。

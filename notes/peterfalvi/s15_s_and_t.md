@@ -1040,3 +1040,13 @@ s15_s_and_t/
 
 **作成**: 2026-05-22. **出典**: `references/peterfalvi/04.15_pp_75_86_The_Subgroups_S_and_T.mmd` (365 行, 17 結果). §14, §16 ノートのクロス参照確認済.
 
+
+---
+
+## 🧾 HUB 回答 (2026-07-05, 統合セッション) — 上記 LIVE STATUS の方針確認への裁定
+
+**A+B 両方を b が実施** (C 再配分は不要、3 レーン維持): 3002 threading は S15.Hypothesis fields (自所有) +
+`FeitThompson.lean` Section16Inputs block (一時編集権承認、9009 更新) の両半分とも b。その後 engine wiring →
+terminal 1298 → c_eq_one assembly (hu = 9000 producer を sorried-cite 可)。S15 閉塞後の継続 frontier =
+**Wave 2: S10 §8 facts (carve-out 0096) → S14 witness 3 本** (all-type-I branch は honest FT の必要部品)。
+正本 = `ft_lane_reallocation_2026_06_28.md`「3 レーン役割更新 (2026-07-05)」節。

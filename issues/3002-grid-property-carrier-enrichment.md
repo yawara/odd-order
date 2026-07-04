@@ -136,3 +136,9 @@ norm-cascade が cross-lane threading 待ちの間、solo build-green な keysto
 - **b-side (build-green solo)**: `GridProperties (hyp)` carrier + sorried producer で cascade wrapper を engine から
   実証明 (wiring は a threading 後も再利用、producer sorry のみ hyp 新 field で discharge)。a threading と pair。
 - 詳細 = `notes/peterfalvi/s15_s_and_t.md` の 2026-07-04 lane b LIVE STATUS (訂正済)。
+
+## 🧾 fix-owner 再更新 (2026-07-05 hub)
+
+**threading 両半分とも lane b が実施** (S15.Hypothesis fields = 自所有 + `FeitThompson.lean`
+`Section16Inputs`/constructor = 一時編集権、9009 裁定更新参照)。a は S12 (11.8) 3 named gates に専念。
+正本 = `ft_lane_reallocation_2026_06_28.md`「3 レーン役割更新 (2026-07-05)」。

@@ -231,3 +231,49 @@ signature を cite (待たない)。
 
 **原則 (不変)**: off-path/vestigial は**証明しない** (S-side cascade・T-side carrier・a の §10-13 local)。
 各レーンは on-path の最深 body を正面から (feedback-no-avoiding-hard-parts)。doneness は carrier 構成可能性で判定。
+
+## 3 レーン役割更新 (2026-07-05, ユーザー委任「役割レビュー + FT 完成までの計画」— hub 裁定)
+
+**契機**: b が 2026-07-05 handoff で「closed-sorry solo work 枯渇」を flag (§15 cascade は engine 完備
+sorry-free だが、grid 仮説の供給 = issue 3002 threading が a 側未実施のため terminal 1298 を閉じられない)。
+同時に a は (11.8) を capstone assembly まで landing (bare sorry → 3 named gates に分解、大きな前進) し、
+S12 深部 + §9 + threading + 9000 assembly が a に集中 = **a 過負荷 / b 飢餓の非対称**が発生。
+
+**統合時の検証 (hub, 2026-07-05)**: a/b/c 全 merge 後 full build green (3917 jobs, 128s)。実 sorry census
+(comment-strip):
+- **F1 (S12 = 11.8 残 gate)**: `charParam_d_modEq_one` (d=u bridge、Coq route 特定済) /
+  `card_SHCSet_filter_eq_charParam_n` (§9 count) / `coherent_Sset_of_column_identities`
+  (**(11.8.6) τ₂ = S₂ coherence、最深**)。
+- **F2 (供給 front)**: 3002 grid property threading (S15.Hypothesis fields + FeitThompson
+  `Section16Inputs`/constructor 供給、omegaS/S05:733/740/S07 から機械的) + 9000 u-bound 残 assembly。
+  これが S15 terminal `analyticInequalityEstimates:1298`・`c_eq_one` (13.12, S16 16× cite)・
+  numeric q=3 を一括 unblock する。
+- **F3 (S16 W-side)**: 7 sorries (`exists_MHypothesis`×2 / `T_typeII_structural_inputs` /
+  `T_side_caseB_facts` / `eta_grid_facts_on_G0` / `caseB_contradiction_data` /
+  `orthogonality_switch_pairing_bounds`)。c は U/V cyclic 実証明化 (Zsygmondy route) で健全に前進中。
+
+**裁定: レーン数は 3 を維持** (独立 front が現に 3 本ある; 07-02 教訓「lane 数 = ungated frontier 供給」)。
+役割の変更は **b のみ**:
+
+| lane | focus (2026-07-05〜) | 変更点 |
+|---|---|---|
+| **a** | **F1 専念**: S12 (11.8) の 3 named gates — τ₂/S₂ coherence capstone (9.11/11.7 gate は S11 で自所有) + §9 count + d=u bridge | threading (9009) を **b へ移管** (a は S12 から離れない) |
+| **b** | **F2 = 供給 front** (再定義): (1) **3002 threading 両半分** — S15.Hypothesis grid fields (自所有) + `FeitThompson.lean` の `Section16Inputs`/constructor block (**一時編集権を hub 承認** = 9009 選択肢 2、先例 `S_U_commutative` 方式; a との conflict は Section16Inputs 追記が additive ゆえ低リスク、merge は hub が調整) → (2) S15 cascade を engine + 供給仮説で閉じる (hu は 9000 producer を sorried-cite 可) + `c_eq_one` assembly → (3) **Wave 2 着手**: S10 §8 facts (carve-out 0096、8.16/8.6.a/8.3/12.8) → S14 witness 3 本 (all-type-I branch) | 「枯渇」の恒久解: threading 完了後も b 所有 territory (S15→S10→S14) に honest 必要 math が連続供給される |
+| **c** | **F3 継続**: S16 W-side (14.x) norm cascade + parity 矛盾 (現行どおり) | 変更なし |
+
+**Wave 2 の位置づけ (honest doneness、忘れない)**: `Section16Inputs.theorem88_caseB` (8.8 trichotomy) の
+honest producer は **all-type-I case を S14 (12.16) 矛盾で殺す枝**を要する。b audit の「witness route は現
+feitThompson path 外」は scaffold 測定であり honest 不要を意味しない (CLAUDE.md「進捗の測り方」)。∴ S14
+witness 3 本 + missing §8 facts は **honest FT の必要部品** = b の Wave 2 (S14/S10 とも b 所有で conflict 無し)。
+同様に `section16CharacterData` の vestigial grid → honest 化は 3002 threading + b/c の §15-16 完成で吸収される。
+
+**FT 完成までの wave 構造 (hub 管理)**:
+- **Wave 1 (now)**: F1 (a) + F2 (b) + F3 (c) — 上記。
+- **Wave 2**: theorem88_caseB honest 化 (b: §8 facts → S14 witness)、S13 residual の on-path 分
+  ((11.7)/(11.3) は proven 済、typeIII downstream は該当時のみ)、`typeV_forces_coherence` (10.10)。
+- **Wave 3 (final assembly)**: scaffold carrier (mp/tp/cd) の free/vestigial field 全数 discharge →
+  `sectionSixteenHypothesis_of_isMinimalSimpleOdd` 実構成 → AxiomsCheck で `feitThompson` sorry-free +
+  allowlist axioms のみを確認。Pf Appendices (Suzuki 等) の残 sorry は cite された時点で on-path 編入。
+
+旧 9009 裁定 (「a が threading」) は本節で**更新** (a 過負荷の実態に合わせ b へ)。issue 9009/3002 の
+fix-owner 注記も同時更新。
