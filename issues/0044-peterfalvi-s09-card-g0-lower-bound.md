@@ -865,3 +865,25 @@ H79.first.zetaDistinct).conj)` を仮説化 (Frobenius 側 Unit B2 で not_isRea
 により discharge)。⟨ζ,ζ.conj⟩=0 は ζ,ζ.conj を `IrreducibleCharacter` に bundle (⟨ζ,hz₁irr⟩) して
 `irreducibleCharacter_inner` (=if χ=ψ then 1 else 0) + hζ₁neconj (bundle 等号は ClassFunction 等号に
 帰着) で。次 turn 冒頭で IrreducibleCharacter の bundling/coe API を 1 回 grep してから純構築。
+
+## 2026-07-04 cont.³¹ — ★ Unit B1 (conjIndex bridge) 完成、残 = Unit B2 (Frobenius refactor)
+
+**Landed** (S09_FrobeniusCrossOrtho.lean, commit c12aeeab, sorry-free, 1.0s):
+`Hypothesis79.zetaImage_cross_eq_zero_of_conjIndex` — 共役 **index** j₁,j₂ (+coherence+irr+
+ζ≠ζ.conj+hab_supp) から hzeta_cross を導出。orthonormality は nu_isometry field で、distinct-irr
+直交は top-level helper `inner_eq_zero_of_ne_of_isIrreducible` で。**perf 教訓**: distinct-irr helper を
+local `have` (∀+instance binder) にすると大 context で isDefEq heartbeat 爆発 (800k でも timeout) →
+top-level private lemma 抽出で 1.0s (maxHeartbeats 不要)。[[lean-local-have-instance-blowup]]。
+
+**残 = Unit B2 (Frobenius refactor)** — opaque `let pf` 解消して conjIndex bridge の残仮説
+(j₁, hj₁, hζ₁ne_conj, hab_supp) を `F.hypothesis78 i` から供給:
+- (a) `S09_FrobeniusHypothesis78.lean` の `hypothesis78` 内 `choose χ...`/`let pf := placedInducedFamily`
+  を named def (`F.sibleyDistinguishedChar i`, `F.sibleyPlacedFamily i`) に抽出、`hypothesis78` 書換
+  (green 維持)。projection `(F.hypothesis78 i).hyp76.zeta = fun j => induce K (θ j)` (rfl 見込み)。
+- (b) 共役 index: `conj_induce` + `pf.cover` で ∃ j₁, zeta j₁ = ζ.conj。hj₁ne_ind (j₁≠ind1H ←
+  ζ.conj≠Ind1 ← ζ≠triv), hζ₁ne_conj (ζ≠ζ.conj ← `not_isReal_of_ne_trivial_of_odd_card'`, L odd ←
+  `Subgroup.card_subgroup_dvd_card`+Odd.of_dvd)。
+- (c) hab_supp: `coherence_hagree_dadeMap` で ν(ζ)−ν(ζ.conj)=τ(ζ−ζ.conj)、`map_eq_zero_of_not_mem_
+  dadeSupport` で support ⊆ dadeSupport。
+- (d) conjIndex bridge 適用で F レベル hzeta_cross → (7.9) conclusion → 𝓑-set → characterEstimateData
+  → card_G0_lower_bound。
