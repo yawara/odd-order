@@ -1209,3 +1209,21 @@ build して最終 assembly:
 
 **次 frontier**: §12 の (12.6) coherence / (12.7) type-I Frobenius (Coq FT_Frobenius_coherence /
 FT_type1)、または §12 downstream の上流未証明項。次 iteration で scan。
+
+### loop¹⁹¹ — (12.5) 後の frontier 再scan: (8.2.c) は既済、次 = (12.15) rhoM_integer_values (12.5 consumer)
+
+(12.5) 完済後、S14 frontier を再scan:
+- **(8.2.c) `typeI_induced_char_constituents` は既に proven** (S14:441-559、sorry-free、
+  `exists_extension_induce_eq_sum_distinct_of_inertia_inf_le` 経由)。loop¹¹¹ note が「S14 最上流 sorry」と
+  記録していたが、その後 (別 loop/merge で) 閉じられていた。frontier 更新。
+- **残 S14 sorry (8 本)**: `sibleyTarget_frobI` (2776、(6.8) TI-case carrier、witness 非-TI ゆえ FT-excluded) /
+  `witness_L_isTypeI` (5030) + `witness_L_complement_isZGroup` (5041) ((12.10) Cluster A、deep §8-§11
+  type-analysis、gated) / `intersection_complement_structure` (5080) / `complement_cyclic_order_dvd` (5519) /
+  **`rhoM_integer_values` (5789、(12.15))** / `exists_counterexample_dade_data` (6023) /
+  `exists_typeICovering` (6738/6773)。
+
+**次 target = (12.15) `rhoM_integer_values` (S14:5789)** — **(12.5) の自然な consumer**:
+`dade.rhoMFormula ∧ (∀ g∈K, g∉K', ∃ z:ℤ, dade.psi g = z)`。K−K' 上定数性は今 proven の
+`rho_constant_on_H_minus_Hprime` (ρψ) で供給できるはず。整数値は rational + algebraic integer。
+lane b の §12 Dade tower 領域 (witness pins の §8-§11 type-analysis より lane-b-appropriate)。
+deep Dade assembly ((12.13)-(12.15)) だが (12.5) を活かす直系の続き。次 iteration で engage。
