@@ -273,3 +273,29 @@ both substantially complete。残 9 S16 leaf を policy (A)「ungated genuine ma
 v-value (174,9000 Galois)/η-grid (2581,3002)/U cyclic (3568,§13 irred)/V cyclic (3651,§13 irred)/
 caseB_contradiction (4493,§3-4 Dade+13.19)/dichotomy (4673,§7.9+8.17.c+7.8.b)/betaGrid (5171,5239,3002)。
 最大 leverage = **b/a の 3002/9009 landing** (η-grid batch 一斉 unblock)。次 iter で main 再取り込み監視。
+
+## 2026-07-04 (同 loop, 続) — ⚡ 訂正: U/V cyclic は §13-gated **でない** (Zsygmondy-lite route)
+
+上記「§13 P-irreducibility gate」結論は **too quick で誤り** (user pushback 正当)。vestigial-binder は dead だが、
+別の **c-ownable non-circular route** が在る:
+
+**機構**: `isSimpleModule_of_isCyclic_faithful_card` (SingerField.lean:199) の証明は cyclicity を
+**generator にしか使わない** (g^N が dim<q の proper constituent を固定 (μ(g)^{p^d-1}=1, (p^d-1)∣N),
+N=p^{(q-1)!}−1 → g^N が M 全体を固定 → g^N=1 (faithful) → |C|∣N 矛盾)。
+**abelian C へ Cauchy で一般化**: |C|=(p^q−1)/(p−1) は p^q−1 の **primitive prime divisor** r
+(ord_r(p)=q; q odd prime で存在) で割れる (r∤p−1 ∵ ord=q>1) → Cauchy で order-r 元 a → **Wilson**
+(q∤(q−1)!) ⟹ q=ord_r(p)∤(q−1)! ⟹ r∤N ⟹ a^N≠1、だが a^N は全 constituent 固定 (同論法) ⟹ a^N=1 矛盾。
+
+**mathlib 在庫確認済**: `sub_one_lt_natAbs_cyclotomic_eval` (|Φ_q(p)|>p−1>q ⟹ Φ_q(p) は q の冪でない
+⟹ primitive prime 存在、LTE `v_q(Φ_q(p))≤1` 併用)、`(isRoot_cyclotomic_iff.mp hroot).eq_orderOf`
+(ord=q)、`ZMod.orderOf_dvd_card_sub_one`、`coprime_of_root_cyclotomic`。証明 pattern =
+`Nat.exists_prime_gt_modEq_one` (PrimesCongruentOne.lean:28-59)。
+
+**build plan (次 iter 以降、c 所有 `GroupTheory/RepresentationTheory/SingerField.lean` に additive)**:
+1. `exists_primitive_prime_dvd_cyclotomic` : q prime, p≥2 ⟹ ∃ r prime, r∣(cyclotomic q ℤ).eval p ∧ orderOf (p:ZMod r)=q ∧ r≠q。
+2. `isSimpleModule_of_abelian_faithful_card` : `[IsCyclic C]`→`[CommGroup C]` に弱め、generator を
+   Cauchy(order-r 元)に差し替え (fix 論法は m∈s 部分そのまま再利用)。
+3. `exists_galoisField_repr` / `exists_pu_field_repr` を abelian 版に re-point、`field_normalizer_of_U_characteristic_of_fpf`
+   内で hu_full+U_commutative+faithful から `haveI : IsCyclic ↥U` を derive → `[IsCyclic ↥U]` binder 全除去。
+   `U_cyclic_and_Q_elemAbelian` の U-cyclic sorry (3568) 消滅 (無条件版は case 9.7.a で偽ゆえ **使わず**
+   full-value context で局所導出)。V cyclic (3651) は dual (|V|=(q^p−1)/(q−1)=v-value 174 landing 後)。
