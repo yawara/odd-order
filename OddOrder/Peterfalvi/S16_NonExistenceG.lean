@@ -163,7 +163,15 @@ dual of (13.12) `c = 1`) and `v` takes its full cyclotomic value (`v = (q^p−1)
 theorem T_side_caseB_facts [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
     (hyp : Hypothesis (G := G)) :
     hyp.base.D = ⊥ ∧
-      hyp.base.v = (hyp.base.q ^ hyp.base.p - 1) / (hyp.base.q - 1) := sorry
+      hyp.base.v = (hyp.base.q ^ hyp.base.p - 1) / (hyp.base.q - 1) := by
+  refine ⟨?_, ?_⟩
+  · -- **Peterfalvi (13.12) dual** `d = 1`: `D = V ⊓ C_G(Q) = ⊥`, the canonical §15 obligation
+    -- `V_inf_centralizer_Q_eq_bot` (`T` type-II from `T_typeII` (14.9)).
+    rw [hyp.base.D_eq]
+    exact OddOrder.Peterfalvi.S15.V_inf_centralizer_Q_eq_bot _hG hyp.base (T_typeII _hG hyp)
+  · -- **Peterfalvi (13.15) dual**: the Singer cyclotomic value `v = (q^p − 1)/(q − 1)` (type-`P`
+    -- Galois structure, issue 9000).
+    sorry
 
 /-- **Peterfalvi (14.4)**: case (9.7.b) holds for `T`, and `v = (q^p - 1) / (q - 1)`.  The numeric
 content (`D = ⊥`, `v` full) is the named §13 obligation `T_side_caseB_facts`; the case-(9.7.b)
@@ -3496,7 +3504,14 @@ dual subgroup `T`).  These two facts bottom out on §9/§11 character theory; `W
 (14.2.a) structural input and is proved unconditionally by `W2_le_P`. -/
 theorem U_cyclic_and_Q_elemAbelian [Finite G]
     (_hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G)) :
-    IsCyclic ↥hyp.base.U ∧ IsElementaryAbelian hyp.base.q ↥hyp.base.Q := sorry
+    IsCyclic ↥hyp.base.U ∧ IsElementaryAbelian hyp.base.q ↥hyp.base.Q := by
+  refine ⟨?_, ?_⟩
+  · -- **Peterfalvi (13.2.a)**: `U` cyclic (the `UW₁` Frobenius complement with abelian kernel `U`,
+    -- `c = 1`); §9/§11 character theory.
+    sorry
+  · -- **Peterfalvi (13.2.b) for `T`**: `Q` elementary abelian — the canonical §15 obligation
+    -- `Q_elementaryAbelian_T` (`T` type-II from `T_typeII` (14.9)).
+    exact OddOrder.Peterfalvi.S15.Q_elementaryAbelian_T _hG hyp.base (T_typeII _hG hyp)
 
 /-- **Peterfalvi (13.2) `S`-side structural inputs for the (14.7) field model.**  The field-model
 construction (14.2.a) needs three §13 structural facts about the type-`P` subgroup `S`: `U` cyclic
