@@ -8,6 +8,47 @@
 
 ---
 
+## ✅ LIVE STATUS (2026-07-05, lane **b** 再開 — frontier 全数の gate を ENGINE レベルで確定)
+
+再開時 `git merge main` (HEAD..main 6→0)。b 所有 territory の全 sorry を精査し、gate の所在を
+**engine レベルまで**確定 (過去の「gated」ラベルの実 gate 検証):
+
+- **coherence infra 完了**: `S07_Coherence*` / `S08_PGroupReduction` / `S09_CertificateDischarge` は
+  実 sorry **0** (comment-strip 検証)。b の group/coherence 貢献は出し尽くし。
+- **§15 char cascade = lane-a upstream に comprehensively gated** (closed-sorry solo work 枯渇):
+  - **norm cascade の真の terminal = `analyticInequalityEstimates` (S15_SAndT_Setup:1287)**。四 estimate
+    (13.6-13.9) を real inequality で述べるが body は engine 未接続の裸 `sorry` (:1298)。中間 wrapper
+    `lambda_norm_lower`/`eta10_norm_lower`/`eta01_norm_lower`/`global_character_bound` (1242-1266) は
+    `∃ data:NormCascadeData, data.<opaqueProp>` の **vacuous placeholder + unconsumed** (analytic_inequality は
+    これらを経由せず analyticInequalityEstimates を直接 cite)。
+  - **engine は完備 sorry-free**: `caseB_lambda_norm_bound` (:840) / `caseB_eta_norm_bound` (:911) /
+    `caseB_eta01_norm_core` (:935) は grid 性質を **明示仮説** (hvanish/hinner/hχ 点公式/hParseval/hs 整数性/
+    hInflation(13.5.c)/hu(2u≤|P|-1)/habelian) で取り real norm bound を産む。
+  - **∴ 1298 の実 gate = これら仮説を hyp.eta/omega/tau3 に対して供給すること**。bare field ゆえ供給不能。
+    threading (S15.Hypothesis field 追加 + FeitThompson.lean 供給) 要 = **issue 3002 (lane a)**。加えて
+    `hu` = **issue 9000** の u-bound (σ-theory engine 完備、残 block 分解 `Hbar=⊕H1^w`+hconst assembly は
+    lane a §9/§11)。arithmetic shortcut 不可を検証: 四 estimate の abstract-ℚ 充足可能性 ⟺ C1≤C2+C3 ⟺
+    analytic inequality 自体 (循環)。
+  - `c_eq_one` (13.12, S16 が **16× cite** = 最高価値) の残 sorry (:1791) = numeric(13.11)+typeP_Galois の
+    PC-Hall 矛盾。numeric q=3 (:1771) も p≥5 (=q<p, S16 downstream) gated。`P_elementaryAbelian` (:351) は
+    (11.7)=`S13.H_elementaryAbelian` が **type III/IV 用で signature 不一致** (S は type-P₂=type II) ゆえ直接
+    cite 不可。
+- **§12 witness route (S14 5043/5064/5135/6425/6468) は endgame 用だが現 `feitThompson` path 外**
+  (AxiomsCheck 6672/6789 確認: feitThompson の唯一 bare sorry = a の 11.8 via scaffold §16;
+  `theorem88_caseB_holds` は「まだ axiom-clean でない」= 将来 endgame 用)。fresh Explore trace:
+  `not_all_maximal_typeI`→`typeI_frobenius`(6592)→`pi_empty`→counterexample route→`witness_L_frobenius`。
+  witness 3 本 (5043/5064/5135) は missing §8 facts (8.16/8.6.a/11.9.c/8.3/12.8) に **genuine BLOCKED**;
+  6425 のみ (7.8) cite で provable だが S14=b cite-only・off b-focus。
+
+**b-solo で残る tractable = 「grid obligation を GridProperties carrier + sorried producer に明示 isolate +
+engine wiring」の incremental de-opacify (closed でなく isolate)。** これは reallocation 自身の flag
+「下流 char cluster (b) は独立 ungated 深さ無く upstream (a) に stall」の実例。9000 note の規定通り
+**cluster-blocked→cross-cluster = hub/user 裁定**案件ゆえ、2026-07-05 に user へ方針確認 (unblock 選択肢
+A=3002 threading 横断 / B=b-side GridProperties wiring 先行 / C=再配分) を提示 → user が session 区切りを選択。
+**次セッションはこの gate map を再導出せず、選ばれた方針から着手**。
+
+---
+
 ## ✅ LIVE STATUS (2026-07-04, lane **b** 再開 — 07-04 reallocation で S15 が c→b 移管後の初手)
 
 **b が S15_SAndT_Setup + S15_SAndT を所有** (07-04 3 レーン再々編、focus = ON-PATH (13.9)-(13.19)
