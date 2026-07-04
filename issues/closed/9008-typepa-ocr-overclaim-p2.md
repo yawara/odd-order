@@ -120,3 +120,8 @@ hub 検証で b の「S-side type-II Dade は off-path/vestigial」を確定:
 lane-b の char/support frontier は本 OCR 訂正で type-P2 phantom が解消し**確定的に枯渇**。残 on-path =
 §8 III/IV (BG§14-15 gate) / (7.9)(11.8) (lane a gate) / §12 endgame (Cluster A gated + DadeNotation
 de-scaffold 設計判断)。次配分は 9003 の frontier map + hub/ユーザー裁定で継続。
+
+## ✅ CLOSED (2026-07-04, lane b): hub 裁定どおり Option B で確定
+
+hub 裁定「Option A 不要・Option B (cefdfc3b) で確定・close 可」を受けて close。type-P2 phantom は
+解消、fix は main 取り込み済 (b2c5e25a)、build green。frontier 再配分 (確認事項 2) は 9003 で継続。

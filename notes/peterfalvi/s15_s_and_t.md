@@ -8,6 +8,40 @@
 
 ---
 
+## ✅ LIVE STATUS (2026-07-04, lane **b** 再開 — 07-04 reallocation で S15 が c→b 移管後の初手)
+
+**b が S15_SAndT_Setup + S15_SAndT を所有** (07-04 3 レーン再々編、focus = ON-PATH (13.9)-(13.19)
+parity/構造/norm)。再開時に `git merge main` (HEAD..main=1→0)、frontier 全数をコード検証。
+
+### ✅ landed: (13.10) `analytic_inequality` de-opacify (commit `f17fdbcd`)
+実 conclusion `u/c > m·p^(q-1)/q` を **bare sorry → 実定理** に。sorry-free 算術核
+`analytic_inequality_arith` に、4 estimates を carry する faithful producer
+`analyticInequalityEstimates` ((13.6)-(13.9)) を供給して discharge。full build 3916 green。
+sorry は producer に isolate (net ±0) だが (13.10) 出力が real theorem 化 (下流 c_eq_one/numeric が cite 可)。
+
+### frontier 精査結論 — b の §15 は「一律 gated」でない (要ニュアンス、過去の pessimism 訂正)
+コード検証で各 sorry の gate を確定 (「上流待ち」の誤ラベルでなく実 gate):
+- **(13.10) 出力**: ✅ de-opacify 済。完全 discharge には η-estimates + λ-estimates + u-bound が要る (下記)。
+- **⚠⚠ 訂正 (同 07-04 loop、初回 claim は誤り)**: 「η-side は hyp.W から honest W-grid 新規構成で ungated」は
+  **誤り**。理由: **spine (`FeitThompson.lean:1319` `omegaS`) が既に honest grid を `mp.certainTypeS.sdiffTICyclicHypothesis`
+  (`S05.TICyclicHypothesis`) から構成済**。だが `S15.Hypothesis` は grid を **bare field** で持ち、`mp`/certainType/
+  TICyclicHypothesis への **structural link を一切 carry しない** (field 精査: omega/eta/tau3/mu/nu/delta は
+  bare、関係 field は `eta_eq_tau_omega`/`mu_definition`/`nu_definition` のみ = 直交性/isometry 無し)。
+  ⟹ b が **fresh grid を組んでも hyp.omega と同定不能** (link 無し) → cascade は hyp の λ (CharacterDegreeData)・
+  (13.5) machinery に tie されるので fresh grid では (13.10)-about-hyp を証明できない。**∴ η-side も含め §15 cascade
+  全体が issue 3002 (grid property を hyp に threading、a の FeitThompson) に uniformly gated**。
+- **honest grid は spine に既存**: `omegaS` orthonormal は S05:733/740、τ isometry は S07。issue 3002 の a-side
+  threading = 「omegaS の直交性 + tau3W isometry を S15.Hypothesis/Section16Inputs の新 field に供給」= 機械的
+  (grid は既に proven、新規構成不要)。
+- **u-bound (13.2.c) `2u≤|P|-1`**: issue 9000 (typeP_Galois、hub/a dedup 中)。
+
+**⟹ b の §15 cascade に solo build-green な深 math は無い** (uniformly gated on issue 3002 [a] + 9000 [hub/a])。
+tractable solo = faithful-producer de-opacify (grid obligation を isolate、consumer-side): `GridProperties` carrier +
+sorried producer で全 wrapper を engine から実証明 → grid property を単一 producer に集約 (a の threading と pair)。
+**最高 leverage = issue 3002 の a-side threading** (b cascade 全体 unblock)。詳細 = issue 3002 の 07-04 b 訂正節。
+
+---
+
 ## ✅✅ MILESTONE (2026-07-01, lane c): (13.16) W₂-side が **gate ゼロで完全 proven**
 
 **(13.16) W₂-confinement 全体が sorry-free** (S15 sorry 12→10、full build 3890 green, AxiomsCheck OK):

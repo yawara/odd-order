@@ -9,6 +9,7 @@ import OddOrder.Peterfalvi.S09_CertificateDischarge
 import OddOrder.Isaacs.Ch06_FrobeniusActions.OddComplement
 import OddOrder.GroupTheory.MaximalSubgroupTypeConj
 import OddOrder.GroupTheory.WielandtFixedPoint
+import OddOrder.Algebra.GaloisRationalInteger
 import Mathlib.Algebra.BigOperators.ModEq
 import Mathlib.FieldTheory.Finite.Basic
 import Mathlib.RingTheory.Polynomial.Cyclotomic.Roots
@@ -1264,13 +1265,36 @@ theorem global_character_bound [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd 
     ∃ data : NormCascadeData hyp, data.global_cover ∧ data.global_norm_lower := by
   sorry
 
-/-- **Peterfalvi (13.10)**: the norm estimates imply `u / c > m p^(q-1) / q`. -/
-theorem analytic_inequality [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
+/-- **Faithful (13.6)–(13.9) norm-estimate inputs to Peterfalvi (13.10)**.
+
+The four estimates are the genuine character-theoretic / counting outputs of the norm cascade,
+stated for the real atoms `slam = (1/|G|)·Σ_{G₀}‖λ^{τ₁}‖²`, `seta = (1/|G|)·Σ_{G₀}‖η₁₀‖²`,
+`g0 = |G₀|/|G|`, `HS = |H#|/|S|` (with the (13.4) counting values `LS = uq/(cp^q)`,
+`TT = 1/p − 1/(p(q−1)) + 1/(p(q−1)q^p)`, `QT = (q−1)/(pq^p)` substituted):
+
+* `h1` — **(13.6)**: Parseval for `λ^{τ₁}` (`‖λ^{τ₁}‖² = 1`) with the norm bound
+  `Σ_{H#}‖λ^{τ₁}‖² ≥ |S| − λ(1)²` (`caseB_lambda_norm_bound`);
+* `h2` — **(13.7)+(13.8)** for `T` with `D = 1` (`caseB_eta_norm_bound`, `caseB_eta01_norm_core`);
+* `h3` — **(13.9.a)**: the disjoint-union cover `G = {1} ⊔ G₀ ⊔ (H#)^G ⊔ (Q#)^G`;
+* `h139b` — **(13.9.b)**: the Galois-integrality bound `|G₀|/|G| ≤ slam + seta`
+  (`sum_ge_card_of_one_le_prod`).
+
+The character-theoretic content of `h1`/`h2`/`h139b` bottoms out at the grid `τ`-isometry /
+`ω`-orthonormality (the bare `omega`/`tau3` fields, **issue 3002**) and the (13.2.c) `u`-bound
+`2u ≤ |P| − 1` (**issue 9000**); it is isolated here as the single faithful producer that the
+(13.10) analytic inequality consumes.  The pure arithmetic that turns the four estimates into the
+`u/c` bound is the `sorry`-free `analytic_inequality_arith`. -/
+theorem analyticInequalityEstimates [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
     (hyp : Hypothesis (G := G)) :
-    ∃ data : NormCascadeData hyp,
-      data.analytic_inequality ∧
-        (hyp.u : ℚ) / (hyp.c : ℚ) >
-          hyp.m * ((hyp.p ^ (hyp.q - 1) : ℕ) : ℚ) / (hyp.q : ℚ) := by
+    ∃ slam seta g0 HS : ℚ,
+      (1 : ℚ) ≥ 1 / (Nat.card G : ℚ) + slam + 1
+          - (hyp.u : ℚ) * (hyp.q : ℚ) / ((hyp.c : ℚ) * (hyp.p : ℚ) ^ hyp.q) ∧
+        (1 : ℚ) ≥ 1 / (Nat.card G : ℚ) + seta + HS
+          + (1 / (hyp.p : ℚ) - 1 / ((hyp.p : ℚ) * ((hyp.q : ℚ) - 1))
+            + 1 / ((hyp.p : ℚ) * ((hyp.q : ℚ) - 1) * (hyp.q : ℚ) ^ hyp.p)) ∧
+        (1 : ℚ) = 1 / (Nat.card G : ℚ) + g0 + HS
+          + ((hyp.q : ℚ) - 1) / ((hyp.p : ℚ) * (hyp.q : ℚ) ^ hyp.p) ∧
+        g0 ≤ slam + seta := by
   sorry
 
 /-- **AM–GM via `log`** (analytic core of [Is] Lemma 3.14): for positive reals whose product is
@@ -1291,6 +1315,22 @@ theorem sum_ge_card_of_one_le_prod {ι : Type*} (s : Finset ι) (f : ι → ℝ)
   have hsum : (0 : ℝ) ≤ ∑ i ∈ s, (f i - 1) := le_trans hprodlog hlog
   rw [Finset.sum_sub_distrib, Finset.sum_const, nsmul_eq_mul, mul_one] at hsum
   linarith
+
+/-- **Peterfalvi (13.9.b) core** ([Is] Lemma 3.14, sum form): for a character `φ` that is nowhere
+zero on a cyclic-closed `Finset A` (closed under `x ↦ x ^ k`, `k` coprime `|G|`), the squared-norm
+sum over `A` is at least `|A|`.  Combines the Galois-integrality product bound
+`one_le_prod_normSq_character_of_cyclicClosed` (`∏_{x∈A} ‖φ(x)‖² ≥ 1`, since the product of the
+Galois conjugates is a nonzero rational integer) with the AM–GM `sum_ge_card_of_one_le_prod`.
+This is the per-cyclic-class building block for the (13.9.b) bound `|G₀|/|G| ≤ slam + seta` in the
+(13.10) analytic inequality (applied on each class to whichever of `λ^{τ₁}`, `η₁₀` is nonzero). -/
+theorem sum_normSq_ge_ncard_of_isCharacter_of_cyclicClosed {H : Type*} [Group H] [Finite H]
+    {φ : ClassFunction H ℂ} (hφ : OddOrder.RepresentationTheory.IsCharacter φ) {A : Finset H}
+    (hclosed : ∀ x ∈ A, ∀ k : ℕ, k.Coprime (Nat.card H) → x ^ k ∈ A)
+    (hne : ∀ x ∈ A, φ x ≠ 0) :
+    (A.card : ℝ) ≤ ∑ x ∈ A, ‖φ x‖ ^ 2 :=
+  sum_ge_card_of_one_le_prod A (fun x => ‖φ x‖ ^ 2)
+    (fun x hx => pow_pos (norm_pos_iff.mpr (hne x hx)) 2)
+    (OddOrder.Algebra.one_le_prod_normSq_character_of_cyclicClosed hφ hclosed hne)
 
 /-- **Peterfalvi (13.10), arithmetic core** (04.15 pp.85–86): the (13.6)–(13.9) norm estimates
 together with the disjoint-union counting `G = {1} ⊔ G₀ ⊔ (H#)^G ⊔ (Q#)^G` and the (13.4) counting
@@ -1357,6 +1397,35 @@ theorem analytic_inequality_arith {p q u c : ℕ} {m gi slam seta g0 LS HS TT QT
     field_simp
   rw [e1, e2] at hStageA
   exact lt_of_mul_lt_mul_right hStageA (le_of_lt hfac)
+
+/-- **Peterfalvi (13.10)**: the norm estimates imply `u / c > m p^(q-1) / q`.
+
+The real inequality conclusion is discharged `sorry`-free from `analytic_inequality_arith` fed by
+the faithful (13.6)–(13.9) estimates `analyticInequalityEstimates`; the opaque `NormCascadeData`
+scaffold flags carry `True`. -/
+theorem analytic_inequality [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hyp : Hypothesis (G := G)) :
+    ∃ data : NormCascadeData hyp,
+      data.analytic_inequality ∧
+        (hyp.u : ℚ) / (hyp.c : ℚ) >
+          hyp.m * ((hyp.p ^ (hyp.q - 1) : ℕ) : ℚ) / (hyp.q : ℚ) := by
+  obtain ⟨chars, _⟩ := character_degree_analysis _hG hyp
+  obtain ⟨slam, seta, g0, HS, h1, h2, h3, h139b⟩ := analyticInequalityEstimates _hG hyp
+  have hc0 : 0 < hyp.c := by rw [hyp.c_eq_card_C]; exact Nat.card_pos
+  have hgi : (0 : ℚ) < 1 / (Nat.card G : ℚ) := by
+    have : 0 < Nat.card G := Nat.card_pos
+    positivity
+  have hpq : ((hyp.p ^ (hyp.q - 1) : ℕ) : ℚ) = (hyp.p : ℚ) ^ (hyp.q - 1) := by push_cast; ring
+  refine ⟨{ chars := chars
+            lambda_norm_lower := True
+            eta10_norm_lower := True
+            eta01_norm_lower := True
+            global_cover := True
+            global_norm_lower := True
+            analytic_inequality := True }, trivial, ?_⟩
+  rw [hpq]
+  exact analytic_inequality_arith hyp.p_prime.two_le hyp.q_prime.two_le hc0
+    h1 h2 h3 h139b hgi rfl rfl rfl hyp.m_eq
 
 /-! ## (13.11)--(13.15): order and divisor determination -/
 
