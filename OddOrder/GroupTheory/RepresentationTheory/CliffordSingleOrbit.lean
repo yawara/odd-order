@@ -241,7 +241,9 @@ theorem exists_induce_constituent_partition [Finite G]
     [Fintype (IrreducibleCharacter G)] :
     ∃ parts : Finset (Finset (IrreducibleCharacter G)),
       (Finset.univ : Finset (IrreducibleCharacter G)) = parts.biUnion id ∧
-      (↑parts : Set (Finset (IrreducibleCharacter G))).PairwiseDisjoint id := by
+      (↑parts : Set (Finset (IrreducibleCharacter G))).PairwiseDisjoint id ∧
+      ∀ A ∈ parts, ∃ ρ : IrreducibleCharacter ↥H, ∀ θ : IrreducibleCharacter G,
+        θ ∈ A ↔ IrreducibleCharacter.LiesOver H θ ρ := by
   classical
   let lam : IrreducibleCharacter G → IrreducibleCharacter ↥H :=
     fun φ => (IrreducibleCharacter.exists_liesOver (H := H) φ).choose
@@ -259,7 +261,7 @@ theorem exists_induce_constituent_partition [Finite G]
     simp only [Finset.mem_univ, true_and]
     exact IrreducibleCharacter.inner_induce_ne_zero_iff_liesOver H θ (lam φ)
   have hself : ∀ φ : IrreducibleCharacter G, φ ∈ cap φ := fun φ => (hmem_cap φ φ).mpr (hlam φ)
-  refine ⟨Finset.univ.image cap, ?_, ?_⟩
+  refine ⟨Finset.univ.image cap, ?_, ?_, ?_⟩
   · ext φ
     simp only [Finset.mem_univ, true_iff, Finset.mem_biUnion, id_eq]
     exact ⟨cap φ, Finset.mem_image_of_mem cap (Finset.mem_univ φ), hself φ⟩
@@ -276,6 +278,10 @@ theorem exists_induce_constituent_partition [Finite G]
       ((IrreducibleCharacter.inner_induce_ne_zero_iff_liesOver H θ (lam φ')).mpr ((hmem_cap φ' θ).mp hθ'))
     ext θ''
     rw [hmem_cap, hmem_cap, ← hg, IrreducibleCharacter.liesOver_conjBy_iff]
+  · intro A hA
+    rw [Finset.mem_image] at hA
+    obtain ⟨φ, -, rfl⟩ := hA
+    exact ⟨lam φ, hmem_cap φ⟩
 
 /-- **Clifford's theorem for an invariant constituent** ([Isaacs] Thm 6.5, invariant case).  For a
 normal `H ⊴ G` and `χ ∈ Irr G` lying over `θ ∈ Irr H` with `θ` **`G`-invariant** (`θ^g = θ` for all
