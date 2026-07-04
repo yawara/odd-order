@@ -1992,6 +1992,79 @@ theorem norm_cascade_contradiction_of_caseB_outputs_main_size_bounds
   exact norm_cascade_contradiction_of_caseB_data_main_size_bounds Tdata Sdata Mdata
     hsize hbound
 
+/-- **Fixed-point-free congruence** (the mod-`p` analogue of the `U⋊W₁` Frobenius congruence,
+group-theoretic core).  If a subgroup `A` of prime order `p` normalizes a finite group `U` and
+acts on it fixed-point-freely by conjugation, then `|U| ≡ 1 (mod p)`.  The conjugation action of
+the `p`-group `A` on `U` has `{1}` as its only fixed point, so the `p`-group fixed-point
+congruence `Nat.card U ≡ Nat.card (fixedPoints) (mod p)` gives `|U| ≡ 1 (mod p)`. -/
+theorem card_modEq_one_of_prime_normalizing_fpf {G : Type*} [Group G] [Finite G]
+    {U A : Subgroup G} {p : ℕ} (hp : p.Prime) (hA_card : Nat.card ↥A = p)
+    (hA_norm : A ≤ Subgroup.normalizer (U : Set G))
+    (hfpf : ∀ a ∈ A, a ≠ 1 → ∀ u ∈ U, u ≠ 1 → (a : G) * u * (a : G)⁻¹ ≠ u) :
+    Nat.card ↥U ≡ 1 [MOD p] := by
+  letI : MulAction ↥A ↥U := MulAction.compHom ↥U (Subgroup.inclusion hA_norm)
+  have hpg : IsPGroup p ↥A := IsPGroup.of_card (by rw [hA_card, pow_one])
+  -- the conjugation `smul` is `a • u = a u a⁻¹`
+  have hsmul : ∀ (a : ↥A) (u : ↥U), ((a • u : ↥U) : G) = (a : G) * (u : G) * (a : G)⁻¹ := by
+    intro a u; rfl
+  -- the only fixed point is `1`
+  haveI : Nontrivial ↥A :=
+    Finite.one_lt_card_iff_nontrivial.mp (by rw [hA_card]; exact hp.one_lt)
+  obtain ⟨a0, ha0⟩ := exists_ne (1 : ↥A)
+  have ha0G : (a0 : G) ≠ 1 := fun h => ha0 (Subtype.ext h)
+  have hfix_eq : MulAction.fixedPoints ↥A ↥U = {(1 : ↥U)} := by
+    ext u
+    simp only [Set.mem_singleton_iff]
+    constructor
+    · intro hu
+      by_contra hune
+      have huG : (u : G) ≠ 1 := fun h => hune (Subtype.ext h)
+      have hfixa : ((a0 • u : ↥U) : G) = (u : G) :=
+        congrArg (Subtype.val) (hu a0)
+      rw [hsmul] at hfixa
+      exact hfpf (a0 : G) a0.2 ha0G (u : G) u.2 huG hfixa
+    · rintro rfl
+      intro a
+      apply Subtype.ext
+      rw [hsmul]
+      simp
+  have hfix_card : Nat.card (MulAction.fixedPoints ↥A ↥U) = 1 := by
+    rw [hfix_eq]
+    haveI := Set.uniqueSingleton (1 : ↥U)
+    exact Nat.card_unique
+  haveI : Fact (Nat.Prime p) := ⟨hp⟩
+  have hcong := hpg.card_modEq_card_fixedPoints (α := ↥U)
+  rwa [hfix_card] at hcong
+
+/-- **A Frobenius complement acts fixed-point-freely on its kernel** (ambient-group form).
+If `↥L` is a Frobenius group with kernel `H.subgroupOf L` and complement `compl`, and `H ≤ L`,
+then every `a ≠ 1` lying — as a `G`-element — in the complement image `compl.map L.subtype`
+conjugates no nontrivial `u ∈ H` to itself: `a * u * a⁻¹ ≠ u`.  This transports
+`IsFrobeniusGroup.conj_frobenius` from `↥L` down to `G` through `L.subtype`. -/
+theorem isFrobeniusGroup_conj_ne_of_mem_map_complement
+    {L H : Subgroup G} {compl : Subgroup ↥L}
+    (hfrob : OddOrder.Isaacs.Ch06.IsFrobeniusGroup ↥L (H.subgroupOf L) compl)
+    (hHL : H ≤ L) {a : G} (ha_mem : a ∈ compl.map L.subtype) (ha_ne : a ≠ 1)
+    {u : G} (hu_mem : u ∈ H) (hu_ne : u ≠ 1) :
+    a * u * a⁻¹ ≠ u := by
+  obtain ⟨a', ha'_compl, ha'_eq⟩ := Subgroup.mem_map.mp ha_mem
+  have ha'_ne : a' ≠ 1 := by
+    intro h
+    rw [h] at ha'_eq
+    exact ha_ne (by simpa using ha'_eq.symm)
+  have hmemL : u ∈ L := hHL hu_mem
+  have hu'_ker : (⟨u, hmemL⟩ : ↥L) ∈ H.subgroupOf L := by
+    rw [Subgroup.mem_subgroupOf]; exact hu_mem
+  have hu'_ne : (⟨u, hmemL⟩ : ↥L) ≠ 1 := fun h => hu_ne (congrArg Subtype.val h)
+  have hconj := hfrob.conj_frobenius a' ha'_compl ha'_ne ⟨u, hmemL⟩ hu'_ker hu'_ne
+  intro hcontra
+  apply hconj
+  apply Subtype.coe_injective
+  show ((a' * ⟨u, hmemL⟩ * a'⁻¹ : ↥L) : G) = ((⟨u, hmemL⟩ : ↥L) : G)
+  rw [MulMemClass.coe_mul, MulMemClass.coe_mul, InvMemClass.coe_inv,
+    show ((a' : G)) = a from ha'_eq]
+  exact hcontra
+
 /-- If `x ≡ 1 (mod p)` with `p` odd and `≥ 2`, `x` odd and `x ≠ 1`, then `x ≥ 2p + 1`.  This is the
 elided "fixed-point-free congruence + oddness" step of Peterfalvi (14.11.1): `x ≡ 1 (mod p)` and
 `x ≠ 1` give `x = pm + 1` with `m ≥ 1`, and `x` odd with `p` odd forces `m` even, hence `m ≥ 2`. -/
@@ -2039,7 +2112,66 @@ theorem main_size_bounds_structural [Finite G] (_hG : OddOrder.BG.IsMinimalSimpl
   have hqp : hyp.base.q < hyp.base.p := hyp.q_lt_p
   -- (14.11.1): `k = v·x`, `x ≡ 1 (mod p)` (`W₂` fixed-point-free on `K`, `V`), `x ≠ 1` (`K ≠ V`) —
   -- the §13/§15 structural datum (13.17); `k > 2 p v` is then arithmetic (`x` odd, so `x ≥ 2p+1`).
-  have hstruct : ∃ x : ℕ, Mdata.k = hyp.base.v * x ∧ x ≡ 1 [MOD hyp.base.p] ∧ x ≠ 1 := sorry
+  have hstruct : ∃ x : ℕ, Mdata.k = hyp.base.v * x ∧ x ≡ 1 [MOD hyp.base.p] ∧ x ≠ 1 := by
+    have hMI : IsTypeI Mdata.M := ⟨Mdata.typeIHyp.typeI⟩
+    have hTII : IsTypeII hyp.base.T := T_typeII _hG hyp
+    -- **(13.17)/(14.11.1)**: `V ≤ K = M_F` (type-I-over-`N_G(V)` Fitting inclusion).
+    have hVK : hyp.base.V ≤ Mdata.K := by
+      rw [Mdata.K_eq_MF]
+      exact OddOrder.Peterfalvi.S15.typeI_overNormalizer_V_le_fitting _hG hyp.base hTII
+        Mdata.M_maximal hMI Mdata.normalizer_V_le_M
+    -- `|V| = v` (`d = 1` from `D = V ⊓ C_G(Q) = ⊥`, (13.12) dual).
+    have hVcard : Nat.card ↥hyp.base.V = hyp.base.v := by
+      have hDbot : hyp.base.D = ⊥ := by
+        rw [hyp.base.D_eq]
+        exact OddOrder.Peterfalvi.S15.V_inf_centralizer_Q_eq_bot _hG hyp.base hTII
+      have hd1 : hyp.base.d = 1 := by rw [hyp.base.d_eq_card_D, hDbot, Subgroup.card_bot]
+      rw [hyp.base.card_V_eq_vd, hd1, mul_one]
+    -- `v ∣ k` from `V ≤ K`; set `x = k / v`.
+    have hvdvdk : hyp.base.v ∣ Mdata.k := by
+      rw [Mdata.k_eq_card_K, ← hVcard]
+      exact Subgroup.card_dvd_of_le hVK
+    obtain ⟨x, hkx⟩ := hvdvdk
+    -- **(13.17)**: type-I Frobenius data with `W₂ ≤ complement`, so `W₂` acts fpf on `K = M_F`.
+    obtain ⟨frob, _hker, hW2E⟩ := OddOrder.Peterfalvi.S15.exists_typeIFrobeniusData_W2_le
+      _hG hyp.base Mdata.M_maximal hMI Mdata.normalizer_V_le_M
+    have hKeq : Mdata.K = frob.typeI.typeF.H := by rw [Mdata.K_eq_MF, frob.typeI.typeF.H_eq]
+    have hW2card : Nat.card ↥hyp.base.W2 = hyp.base.p := hyp.base.p_eq_card_W2.symm
+    have hW2M : hyp.base.W2 ≤ Mdata.M := by
+      intro a ha
+      obtain ⟨x', _, hx'⟩ := Subgroup.mem_map.mp (hW2E ha)
+      rw [← hx']; exact x'.2
+    have hW2normK : hyp.base.W2 ≤ Subgroup.normalizer (Mdata.K : Set G) := by
+      refine hW2M.trans ?_
+      rw [Mdata.K_eq_MF]
+      exact OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_le_normalizer Mdata.M
+    -- `W₂` acts fixed-point-freely on `K` (Frobenius complement on the kernel).
+    have hfpfK : ∀ a ∈ hyp.base.W2, a ≠ 1 → ∀ u ∈ Mdata.K, u ≠ 1 → a * u * a⁻¹ ≠ u := by
+      intro a ha ha_ne u hu hu_ne
+      refine isFrobeniusGroup_conj_ne_of_mem_map_complement frob.frobenius
+        frob.typeI.typeF.H_le (hW2E ha) ha_ne ?_ hu_ne
+      rw [← hKeq]; exact hu
+    -- `k ≡ 1 (mod p)` and `v ≡ 1 (mod p)` (`W₂` fpf on `K` and on `V ≤ K`).
+    have hkmod : Mdata.k ≡ 1 [MOD hyp.base.p] := by
+      rw [Mdata.k_eq_card_K]
+      exact card_modEq_one_of_prime_normalizing_fpf hyp.base.p_prime hW2card hW2normK hfpfK
+    have hvmod : hyp.base.v ≡ 1 [MOD hyp.base.p] := by
+      rw [← hVcard]
+      refine card_modEq_one_of_prime_normalizing_fpf hyp.base.p_prime hW2card
+        hyp.base.W2_normalizes_V ?_
+      intro a ha ha_ne u hu hu_ne
+      exact hfpfK a ha ha_ne u (hVK hu) hu_ne
+    refine ⟨x, hkx, ?_, ?_⟩
+    · -- `x ≡ 1 (mod p)`: from `v x = k ≡ 1` and `v ≡ 1`.
+      have hvx1 : hyp.base.v * x ≡ 1 [MOD hyp.base.p] := hkx ▸ hkmod
+      have hvxx : hyp.base.v * x ≡ x [MOD hyp.base.p] := by simpa using hvmod.mul_right x
+      exact hvxx.symm.trans hvx1
+    · -- `x ≠ 1`: if `x = 1` then `k = v`, so `|K| = |V|` with `V ≤ K`, forcing `V = K` (⊥ `K ≠ V`).
+      intro hx1
+      have hkv : Mdata.k = hyp.base.v := by rw [hkx, hx1, Nat.mul_one]
+      have hKcardV : Nat.card ↥Mdata.K = Nat.card ↥hyp.base.V := by
+        rw [← Mdata.k_eq_card_K, hkv, hVcard]
+      exact hne (Subgroup.eq_of_le_of_card_ge hVK (le_of_eq hKcardV)).symm
   have hk : Mdata.k > 2 * hyp.base.p * hyp.base.v := by
     obtain ⟨x, hkx, hxmod, hxne⟩ := hstruct
     have hk_odd : Odd Mdata.k := by
@@ -3301,50 +3433,6 @@ theorem h_modEq_one_mod_p_and_q [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd
 
 end NonConjugateHypothesis
 
-/-- **Fixed-point-free congruence** (the mod-`p` analogue of the `U⋊W₁` Frobenius congruence,
-group-theoretic core).  If a subgroup `A` of prime order `p` normalizes a finite group `U` and
-acts on it fixed-point-freely by conjugation, then `|U| ≡ 1 (mod p)`.  The conjugation action of
-the `p`-group `A` on `U` has `{1}` as its only fixed point, so the `p`-group fixed-point
-congruence `Nat.card U ≡ Nat.card (fixedPoints) (mod p)` gives `|U| ≡ 1 (mod p)`. -/
-theorem card_modEq_one_of_prime_normalizing_fpf {G : Type*} [Group G] [Finite G]
-    {U A : Subgroup G} {p : ℕ} (hp : p.Prime) (hA_card : Nat.card ↥A = p)
-    (hA_norm : A ≤ Subgroup.normalizer (U : Set G))
-    (hfpf : ∀ a ∈ A, a ≠ 1 → ∀ u ∈ U, u ≠ 1 → (a : G) * u * (a : G)⁻¹ ≠ u) :
-    Nat.card ↥U ≡ 1 [MOD p] := by
-  letI : MulAction ↥A ↥U := MulAction.compHom ↥U (Subgroup.inclusion hA_norm)
-  have hpg : IsPGroup p ↥A := IsPGroup.of_card (by rw [hA_card, pow_one])
-  -- the conjugation `smul` is `a • u = a u a⁻¹`
-  have hsmul : ∀ (a : ↥A) (u : ↥U), ((a • u : ↥U) : G) = (a : G) * (u : G) * (a : G)⁻¹ := by
-    intro a u; rfl
-  -- the only fixed point is `1`
-  haveI : Nontrivial ↥A :=
-    Finite.one_lt_card_iff_nontrivial.mp (by rw [hA_card]; exact hp.one_lt)
-  obtain ⟨a0, ha0⟩ := exists_ne (1 : ↥A)
-  have ha0G : (a0 : G) ≠ 1 := fun h => ha0 (Subtype.ext h)
-  have hfix_eq : MulAction.fixedPoints ↥A ↥U = {(1 : ↥U)} := by
-    ext u
-    simp only [Set.mem_singleton_iff]
-    constructor
-    · intro hu
-      by_contra hune
-      have huG : (u : G) ≠ 1 := fun h => hune (Subtype.ext h)
-      have hfixa : ((a0 • u : ↥U) : G) = (u : G) :=
-        congrArg (Subtype.val) (hu a0)
-      rw [hsmul] at hfixa
-      exact hfpf (a0 : G) a0.2 ha0G (u : G) u.2 huG hfixa
-    · rintro rfl
-      intro a
-      apply Subtype.ext
-      rw [hsmul]
-      simp
-  have hfix_card : Nat.card (MulAction.fixedPoints ↥A ↥U) = 1 := by
-    rw [hfix_eq]
-    haveI := Set.uniqueSingleton (1 : ↥U)
-    exact Nat.card_unique
-  haveI : Fact (Nat.Prime p) := ⟨hp⟩
-  have hcong := hpg.card_modEq_card_fixedPoints (α := ↥U)
-  rwa [hfix_card] at hcong
-
 namespace Hypothesis
 
 /-- **Peterfalvi (14.5)** fixed-point-free cardinal consequence for `U`:
@@ -3392,37 +3480,6 @@ theorem u_modEq_one_mod_p_of_fpf [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd
   rwa [hU_card] at h
 
 end Hypothesis
-
-/-- **A Frobenius complement acts fixed-point-freely on its kernel** (ambient-group form).
-If `↥L` is a Frobenius group with kernel `H.subgroupOf L` and complement `compl`, and `H ≤ L`,
-then every `a ≠ 1` lying — as a `G`-element — in the complement image `compl.map L.subtype`
-conjugates no nontrivial `u ∈ H` to itself: `a * u * a⁻¹ ≠ u`.  This transports
-`IsFrobeniusGroup.conj_frobenius` from `↥L` down to `G` through `L.subtype`; it supplies the
-`hfpf` input of `Hypothesis.u_modEq_one_mod_p_of_fpf` once Peterfalvi (14.5) places `W₂^y` in
-the Frobenius complement of `L` and `U ⊆ H` (13.17.b). -/
-theorem isFrobeniusGroup_conj_ne_of_mem_map_complement
-    {L H : Subgroup G} {compl : Subgroup ↥L}
-    (hfrob : OddOrder.Isaacs.Ch06.IsFrobeniusGroup ↥L (H.subgroupOf L) compl)
-    (hHL : H ≤ L) {a : G} (ha_mem : a ∈ compl.map L.subtype) (ha_ne : a ≠ 1)
-    {u : G} (hu_mem : u ∈ H) (hu_ne : u ≠ 1) :
-    a * u * a⁻¹ ≠ u := by
-  obtain ⟨a', ha'_compl, ha'_eq⟩ := Subgroup.mem_map.mp ha_mem
-  have ha'_ne : a' ≠ 1 := by
-    intro h
-    rw [h] at ha'_eq
-    exact ha_ne (by simpa using ha'_eq.symm)
-  have hmemL : u ∈ L := hHL hu_mem
-  have hu'_ker : (⟨u, hmemL⟩ : ↥L) ∈ H.subgroupOf L := by
-    rw [Subgroup.mem_subgroupOf]; exact hu_mem
-  have hu'_ne : (⟨u, hmemL⟩ : ↥L) ≠ 1 := fun h => hu_ne (congrArg Subtype.val h)
-  have hconj := hfrob.conj_frobenius a' ha'_compl ha'_ne ⟨u, hmemL⟩ hu'_ker hu'_ne
-  intro hcontra
-  apply hconj
-  apply Subtype.coe_injective
-  show ((a' * ⟨u, hmemL⟩ * a'⁻¹ : ↥L) : G) = ((⟨u, hmemL⟩ : ↥L) : G)
-  rw [MulMemClass.coe_mul, MulMemClass.coe_mul, InvMemClass.coe_inv,
-    show ((a' : G)) = a from ha'_eq]
-  exact hcontra
 
 /-- **Part (14.2.b) normalizer conclusion `W₂^y ≤ N_G(U)`, from the structural carrier.**
 The (14.5) complement membership of `W₂^y` already forces `W₂^y ≤ N_G(U)`: each element of `W₂^y`
