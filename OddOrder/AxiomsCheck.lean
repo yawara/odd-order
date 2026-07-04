@@ -6629,6 +6629,22 @@ formula together with the prime computation `coprimeFrobeniusAction_card_eq_prim
 -- genuine (not formal) `τ₃` so that `η = τ₃ ∘ ω` is a real virtual character downstream.  Axiom-clean.
 #assert_only_allowed_axioms OddOrder.Section16CharacterData.tau3W
 
+-- **cd grid property package (issue 3002)** — the (3.2)/(3.3)/(3.4) character-theoretic content of
+-- `tau3W`/`omegaS`, read off the `S05` σ-isometry lemmas (`sigmaIntegral_*`) through the extracted
+-- `tiCyclicW`/`tiCyclicWDadeApp` and the `S05` ω-orthonormality (`omega_inner`) transported along
+-- `gridEquivE` (`ClassFunction.inner_compHom_mulEquiv`).  These discharge the grid property fields
+-- threaded onto `Section16CharacterData` / `Section16Inputs` / `S15.Hypothesis`, which the §15 norm
+-- cascade ((13.5)–(13.10)) consumes.  Axiom-clean.
+#assert_only_allowed_axioms OddOrder.Section16CharacterData.tiCyclicW
+#assert_only_allowed_axioms OddOrder.Section16CharacterData.tiCyclicWDadeApp
+#assert_only_allowed_axioms OddOrder.Section16CharacterData.tau3W_isometry
+#assert_only_allowed_axioms OddOrder.Section16CharacterData.tau3W_trivial
+#assert_only_allowed_axioms OddOrder.Section16CharacterData.tau3W_mem_ZIrr
+#assert_only_allowed_axioms OddOrder.Section16CharacterData.tau3W_apply_of_regular
+#assert_only_allowed_axioms OddOrder.Section16CharacterData.omegaS_inner
+#assert_only_allowed_axioms OddOrder.Section16CharacterData.omegaS_apply_one
+#assert_only_allowed_axioms OddOrder.Section16CharacterData.omegaS_mem_ZIrr
+
 -- **cd producer (POLE-1 `charData`)** — `section16CharacterData_of_isMinimalSimpleOdd` packs the
 -- proven grid building blocks (`omegaS`/`muS`/`nuT`/`deltaS`/`deltaPrimeT`/`tau3W` with the
 -- `(13.1.e)` identities `muS_definition`/`nuT_definition`) into the `Section16CharacterData` carrier.
