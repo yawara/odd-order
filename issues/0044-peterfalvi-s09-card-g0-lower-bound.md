@@ -1051,3 +1051,25 @@ hzeta_cross 完成 (cont.³⁷) で **深部 §1 frontier は完結**。残る e
   lowerBoundTerm_of_characterEstimateData で card_G0_lower_bound へ)。𝓑-set の min-index 選択が残の主眼。
 
 次 iteration: BetaDecomp re-thread (betaDecompOfDade を F.hypothesis78 に適用) から着手。
+
+## 2026-07-04 cont.³⁹ — BetaDecomp 構築の精密プラン (betaDecompOfFacts)
+
+**BetaDecomp は `betaDecompOfFacts` (S09_CertDischarge:2150) が clean 構築** — `(H78 : Hypothesis78)
++ 11 facts → H78.BetaDecomp` (OfDade re-thread 不要、任意 H78 に適用可 → F.hypothesis78 i に直接)。
+11 facts の Frobenius-level 供給:
+- **済/容易**: hzd (rfl), hz0 (zeta 0 (1)=index≠0), hP_real (degree 実 = star_natCast),
+  hzeta0nu (F.hzeta0nu @FrobeniusEstimate:170), hζ0norm (hypothesis78_zeta_irreducible.inner_self_eq_one),
+  hagree (coherence_hagree_dadeMap、FrobeniusEstimate:396 パターン), a/ha (exists_betaDecomp_a @418、
+  hindZ = `ClassFunction.induce_mem_ZIrr` @420)。
+- **要新規証明**: horth (∀i≠j ⟨ζ_i,ζ_j⟩=0、誘導既約の直交; i or j=ind1H 含む — Ind 1_K vs Ind θ),
+  hN (∀i ⟨ζ_i,ζ_i⟩≠0; i=ind1H は Ind 1_K norm=軌道数≠0 via card_mul_inner_self_induce),
+  hzeta_orth_one (∀i≠ind1H ⟨ζ_i,1_L⟩=0、Frobenius 相反 ⟨Ind θ,1_L⟩=⟨θ,1_K⟩=0 for θ≠triv),
+  hβ1 (⟨β,1_G⟩=1、(7.8.a); FrobeniusEstimate/hBD 系に既存の可能性 — 要確認)。
+- **注意**: F.hypothesis78 i の defeq (proof-irrelevance) — betaDecompOfFacts は H78 引数なので
+  F.hypothesis78 i を直接渡せる (OfDade re-thread 不要)。ζ = hyp76.zeta を projection で induce K θ に。
+
+**その後**: BetaDecomp → (7.9) conclusion (hzeta_cross 済 + hdelta_even[parity] + hindZ) → hgood
+(chiRhoNormSq_ge_ratio_of_inner_beta_ne_zero) → CharacterEstimateData (hi 済 exists_chiRhoNormSq_ge +
+hgood + hBsum + hG0sum + 𝓑-set min-index) → card_G0_lower_bound。
+
+次 iteration: betaDecompOfFacts を F.hypothesis78 i に適用、11 facts を供給 (新規 4 facts を証明)。
