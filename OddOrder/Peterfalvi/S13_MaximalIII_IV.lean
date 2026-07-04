@@ -1132,24 +1132,109 @@ centralizes `H`; (6.3.b) from the coherence of `S(H₀C)`; (6.3.c) from (9.6)/(1
 named obligation: the repo's §6 coherence is packaged through the `SibleyDadeHypothesis`
 filtration machinery (`S08_Theorem63`), not as a standalone "subfamily-coherent ⟹ coherent"
 statement, so discharging this is §6 character theory (lane-b). -/
-theorem coherent_S_of_coherent_SH0C [Finite G] [Fintype G]
-    (_hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} [Fintype ↥M]
-    [Invertible (Nat.card ↥M : ℂ)] [Invertible (Nat.card G : ℂ)]
+theorem coherent_S_of_coherent_SH0C [Finite G]
+    (_hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G}
     (hyp : Hypothesis M)
     (_hcoh : Nonempty (OddOrder.Peterfalvi.S07.IsCoherent
       hyp.base.tau (hyp.SOf hyp.H0C) hyp.base.A0)) :
     Nonempty (OddOrder.Peterfalvi.S07.IsCoherent
       hyp.base.tau hyp.base.Sset hyp.base.A0) := by
-  sorry
+  classical
+  -- the (6.3) data: `(K, H, M, H₁) = (M', HC, ⊥, H₀C)`-traces inside `↥M`
+  have hHCleM : hyp.HC ≤ M := hyp.HC_le_derived.trans (Subgroup.map_subtype_le _)
+  have hH0CleM : hyp.H0C ≤ M := hyp.H0C_le_derived.trans (Subgroup.map_subtype_le _)
+  have hH0CleHC : hyp.H0C ≤ hyp.HC :=
+    sup_le (hyp.H0_lt_H.le.trans le_sup_left) le_sup_right
+  -- instances for the oracle
+  haveI : IsSolvable ↥M := _hG.solvable_of_lt_top M (lt_top_iff_ne_top.mpr hyp.base.maximal.1)
+  haveI : IsSolvable ↥((derivedInG M).subgroupOf M) := inferInstance
+  haveI hHCnil : Group.IsNilpotent ↥(hyp.HC.subgroupOf M) := by
+    haveI := hyp.HC_isNilpotent
+    exact nilpotent_of_surjective
+      (Subgroup.subgroupOfEquivOfLe hHCleM).symm.toMonoidHom
+      (Subgroup.subgroupOfEquivOfLe hHCleM).symm.surjective
+  haveI hH₁n : (hyp.H0C.subgroupOf M).Normal := hyp.H0C_subgroupOf_normal
+  have hHnorm : (hyp.HC.subgroupOf M).Normal := hyp.HC_subgroupOf_normal
+  -- strictness `H₀C-trace < HC-trace`
+  have hH₁H : hyp.H0C.subgroupOf M < hyp.HC.subgroupOf M := by
+    refine lt_of_le_of_ne (Subgroup.subgroupOf_mono M hH0CleHC) ?_
+    intro heq
+    have hamb : hyp.H0C = hyp.HC := by
+      have h1 := congrArg (Subgroup.map M.subtype) heq
+      rwa [Subgroup.map_subgroupOf_eq_of_le hH0CleM,
+        Subgroup.map_subgroupOf_eq_of_le hHCleM] at h1
+    exact hyp.H_not_le_H0C (hamb ▸ (le_sup_left : hyp.base.typeP.H ≤ hyp.HC))
+  have hHK : hyp.HC.subgroupOf M ≤ (derivedInG M).subgroupOf M :=
+    Subgroup.subgroupOf_mono M hyp.HC_le_derived
+  -- numerical bound (6.3.c): `4q² + 1 < p^q`
+  have hbound : 4 * ((derivedInG M).subgroupOf M).index ^ 2 + 1
+      < Nat.card (↥(hyp.HC.subgroupOf M)
+          ⧸ (hyp.H0C.subgroupOf M).subgroupOf (hyp.HC.subgroupOf M)) := by
+    have hidx : ((derivedInG M).subgroupOf M).index = hyp.q :=
+      hyp.base.typeP.card_W1_eq_derived_index.symm
+    have hcardq : Nat.card (↥(hyp.HC.subgroupOf M)
+        ⧸ (hyp.H0C.subgroupOf M).subgroupOf (hyp.HC.subgroupOf M))
+        = hyp.p ^ hyp.q := by
+      rw [← Subgroup.index_eq_card,
+        show ((hyp.H0C.subgroupOf M).subgroupOf (hyp.HC.subgroupOf M)).index
+          = (hyp.H0C.subgroupOf M).relIndex (hyp.HC.subgroupOf M) from rfl,
+        Subgroup.relIndex_subgroupOf hHCleM]
+      exact hyp.H0C_relIndex_HC _hG
+    rw [hidx, hcardq]
+    obtain ⟨hp', hq', hpo, hqo, hne⟩ := hyp.p_q_distinct_odd_primes _hG
+    exact prime_pow_gt_four_mul_sq_add_one hp' hq' hpo hqo hne
+  -- assemble via the (6.3) oracle
+  have hmain := OddOrder.Peterfalvi.S08.six_three_of_six_two_oracle
+    (L := M) (K := (derivedInG M).subgroupOf M) (H := hyp.HC.subgroupOf M)
+    (M := ⊥) (H₁ := hyp.H0C.subgroupOf M) hHnorm bot_le hH₁H hHK
+    hyp.base.tau hyp.base.A0
+    (fun X => OddOrder.Peterfalvi.S08.inducedKernelFamily ((derivedInG M).subgroupOf M) X)
+    ?_ (by
+      show Nonempty (OddOrder.Peterfalvi.S07.IsCoherent hyp.base.tau
+        (OddOrder.Peterfalvi.S08.inducedKernelFamily ((derivedInG M).subgroupOf M)
+          (hyp.H0C.subgroupOf M)) hyp.base.A0)
+      rw [← hyp.SOf_eq]
+      exact _hcoh) hbound
+  · have hSset : hyp.base.Sset
+        = OddOrder.Peterfalvi.S08.inducedKernelFamily
+            ((derivedInG M).subgroupOf M) (⊥ : Subgroup ↥M) := by
+      unfold OddOrder.Peterfalvi.S12.Hypothesis.Sset
+      exact OddOrder.Peterfalvi.S12.inducedFamily_eq_inducedKernelFamily_bot
+    rw [hSset]
+    exact hmain
+  · -- the (5.6) break-member oracle `h56` = the §11 dichotomy producer
+    intro A B hAnorm hBnorm hBA hAH₁ _hcentral hAcoh hBncoh
+    haveI := hAnorm
+    haveI := hBnorm
+    haveI : (A.subgroupOf ((derivedInG M).subgroupOf M)).Normal := hAnorm.subgroupOf _
+    haveI : (B.subgroupOf ((derivedInG M).subgroupOf M)).Normal := hBnorm.subgroupOf _
+    have hAne : A.subgroupOf ((derivedInG M).subgroupOf M) ≠ ⊤ := by
+      intro htop
+      exact absurd (hHK.trans ((Subgroup.subgroupOf_eq_top.mp htop).trans hAH₁))
+        (not_le_of_gt hH₁H)
+    have hBne : B.subgroupOf ((derivedInG M).subgroupOf M) ≠ ⊤ := by
+      intro htop
+      exact absurd (hHK.trans ((Subgroup.subgroupOf_eq_top.mp htop).trans (hBA.trans hAH₁)))
+        (not_le_of_gt hH₁H)
+    have hAcoh' : Nonempty (OddOrder.Peterfalvi.S07.IsCoherent
+        (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap hyp.base.dadeData.dade
+          (hyp.base.dadeData.dade.fullDadeIsometryData hyp.base.hconj))
+        (OddOrder.Peterfalvi.S08.inducedKernelFamily ((derivedInG M).subgroupOf M) A)
+        hyp.base.A0) := hAcoh
+    have hBncoh' : ¬ Nonempty (OddOrder.Peterfalvi.S07.IsCoherent
+        (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap hyp.base.dadeData.dade
+          (hyp.base.dadeData.dade.fullDadeIsometryData hyp.base.hconj))
+        (OddOrder.Peterfalvi.S08.inducedKernelFamily ((derivedInG M).subgroupOf M) B)
+        hyp.base.A0) := fun h => hBncoh h
+    exact hyp.base.exists_source_of_coherence_dichotomy _hG hAne hBne hAcoh' hBncoh'
 
 /-- **Peterfalvi (11.3)**: `S(H_0 C)` is not coherent.
 
 If it were, Theorem (6.3) (`coherent_S_of_coherent_SH0C`) would make the full family `S` coherent,
 contradicting Theorem (10.8) (`S12.S_not_coherent`).  The theorem is thereby reduced, with no
 `sorry` of its own, to those two cited results. -/
-theorem S_H0C_not_coherent [Finite G] [Fintype G]
-    (_hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} [Fintype ↥M]
-    [Invertible (Nat.card ↥M : ℂ)] [Invertible (Nat.card G : ℂ)]
+theorem S_H0C_not_coherent [Finite G]
+    (_hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G}
     (hyp : Hypothesis M) :
     ¬ Nonempty (OddOrder.Peterfalvi.S07.IsCoherent
       hyp.base.tau (hyp.SOf hyp.H0C) hyp.base.A0) :=
