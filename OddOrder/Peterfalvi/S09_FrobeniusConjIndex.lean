@@ -333,6 +333,34 @@ theorem hypothesis78_sourceSet_eq [Fintype G] [Invertible (Nat.card G : ℂ)]
         (F.sibleyPlacedFamily i hodd hnilp C hFrob).triv]
     · rw [congrFun (F.hypothesis78_hyp76_zeta_eq i hodd hnilp C hFrob) j]; exact hj'
 
+/-- **`F.coherence` as an `IsCoherent` over the `(7.8)` `sourceSet`.**  Transports the Sibley
+coherence (over `S`) to `sourceSet = S` (`hypothesis78_sourceSet_eq`), keeping the same
+`extension = ν` — so `hnu` stays `hypothesis78_nu_eq`.  The `hcoh` input of
+`zetaImage_cross_eq_zero_of_conjIndex`. -/
+noncomputable def hypothesis78_isCoherent_sourceSet [Fintype G] [Invertible (Nat.card G : ℂ)]
+    (F : FrobeniusFamily G k) (i : Fin k) (hodd : Odd (Nat.card G))
+    [Fintype ↥(F.L i)] [Invertible (Nat.card ↥(F.L i) : ℂ)]
+    [Invertible (Nat.card ↥((F.H i).subgroupOf (F.L i)) : ℂ)]
+    [((F.H i).subgroupOf (F.L i)).Normal]
+    (hnilp : Group.IsNilpotent ↥((F.H i).subgroupOf (F.L i)))
+    (C : Subgroup ↥(F.L i))
+    (hFrob : OddOrder.Isaacs.Ch06.IsFrobeniusGroup ↥(F.L i) ((F.H i).subgroupOf (F.L i)) C) :
+    OddOrder.Peterfalvi.S07.IsCoherent
+      (F.sibleyDadeHypothesis_of_frobenius i hodd hnilp C hFrob).tau
+      (F.hypothesis78 i hodd hnilp C hFrob).sourceSet
+      (OddOrder.Peterfalvi.S04.supportInSubgroup
+        (OddOrder.Peterfalvi.S08.sharpImage ((F.H i).subgroupOf (F.L i))) (F.L i)) := by
+  have hS := F.hypothesis78_sourceSet_eq i hodd hnilp C hFrob
+  exact
+    { nonzero := hS.symm ▸ (F.coherence i hodd hnilp C hFrob).nonzero
+      extension := (F.coherence i hodd hnilp C hFrob).extension
+      extension_inner_eq := fun φ ψ hφ hψ =>
+        (F.coherence i hodd hnilp C hFrob).extension_inner_eq φ ψ (hS ▸ hφ) (hS ▸ hψ)
+      extends_on_supported := fun φ hφ =>
+        (F.coherence i hodd hnilp C hFrob).extends_on_supported φ (hS ▸ hφ)
+      extension_mem_ZIrr := fun φ hφ =>
+        (F.coherence i hodd hnilp C hFrob).extension_mem_ZIrr φ (hS ▸ hφ) }
+
 end FrobeniusFamily
 
 end OddOrder.Peterfalvi.S09
