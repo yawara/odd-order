@@ -10,6 +10,7 @@ import OddOrder.Isaacs.Ch06_FrobeniusActions.OddComplement
 import OddOrder.GroupTheory.MaximalSubgroupTypeConj
 import OddOrder.GroupTheory.WielandtFixedPoint
 import OddOrder.Algebra.GaloisRationalInteger
+import OddOrder.GroupTheory.TISubsetCounting
 import Mathlib.Algebra.BigOperators.ModEq
 import Mathlib.FieldTheory.Finite.Basic
 import Mathlib.RingTheory.Polynomial.Cyclotomic.Roots
@@ -472,6 +473,12 @@ structure CharacterDegreeData (hyp : Hypothesis (G := G)) where
   lambda_irreducible : Prop
   lambda_degree : lambda 1 = ((hyp.u * hyp.q : ℕ) : ℂ)
   lambda_induced_from_PC_linear : Prop
+  /-- **Peterfalvi (13.3.b) WLOG** (cf. the (13.12) proof: "By (13.3.b), we may assume that the
+  hypothesis of (13.10) holds"): the distinguished `λ` *is* induced from a linear character of
+  `PC` — the (13.3.b) case split is resolved into this branch, the other branch being handled by
+  the `S ↔ T` symmetry upstream.  Carried as a `_holds` field so the (13.4)-dependent counting
+  ((13.9.a), `|Q| = q^p`, the `|T|`-decomposition) can consume (13.4). -/
+  lambda_induced_from_PC_linear_holds : lambda_induced_from_PC_linear
   mu_j_linear_induced : Prop
   mu_j_linear_induced_holds : mu_j_linear_induced
   no_lambda_forces_caseB_S : Prop
@@ -493,11 +500,16 @@ theorem character_degree_analysis [Finite G]
 
 /-- **Peterfalvi (13.4)**: if `S` contains a degree-`u q` character induced
 from a linear character of `P C`, then case (9.7.b) holds for `T`, with
-`D = 1` and `v = (q^p - 1) / (q - 1)`. -/
+`D = 1` and `v = (q^p - 1) / (q - 1)`.
+
+The third conjunct `|Q| = q^p` is the kernel-order component of "case (9.7.b) holds for `T`"
+(the (9.7.b) field model identifies `Q̄` with a field of cardinality `q^p`); it is what the
+(13.10) counting reads off ((13.10.3) computes `|Q^#|/|T| = (q^p−1)/(pq^p v)`). -/
 theorem lambda_forces_T_caseB [Finite G]
     (_hG : OddOrder.BG.IsMinimalSimpleOdd G) {hyp : Hypothesis (G := G)}
     (chars : CharacterDegreeData hyp) (hlambda : chars.lambda_induced_from_PC_linear) :
-    hyp.D = ⊥ ∧ hyp.v = (hyp.q ^ hyp.p - 1) / (hyp.q - 1) := by
+    hyp.D = ⊥ ∧ hyp.v = (hyp.q ^ hyp.p - 1) / (hyp.q - 1) ∧
+      Nat.card ↥hyp.Q = hyp.q ^ hyp.p := by
   sorry
 
 /-! ## (13.5)--(13.10): norm estimates -/
@@ -1327,6 +1339,522 @@ theorem normSqSumQ_spec {H : Type*} [Group H] {A : Finset H} {χ : ClassFunction
 noncomputable def Hypothesis.eta10 (hyp : Hypothesis (G := G)) : ClassFunction G ℂ :=
   hyp.eta ⟨1, hyp.q_prime.one_lt⟩ ⟨0, hyp.p_prime.pos⟩
 
+/-! ### The (13.9)/(13.10) counting layer
+
+The Parseval estimates (13.10.1)/(13.10.2) and the disjoint-cover count (13.10.3) rest on one
+counting skeleton: `G` splits as `{1} ⊔ G₀ ⊔ (H^#)^G ⊔ (Q^#)^G` — the two saturations are
+disjoint (element orders: `q ∤ |H|` while every nonidentity element of `Q` has order a positive
+power of `q`) — and a conjugation-invariant sum over a saturation collapses to `[G : N]` times
+the local sum (`IsTISubset.sum_conjClassSet`, issue 9010).  The `H`-side TI input is the proven
+`H_sharp_isTISubset`; the `Q`-side is its `T`-mirror below. -/
+
+section CountingLayer
+
+open OddOrder.GroupTheory
+
+/-- Under **Peterfalvi (13.1)**, the prime parameters are distinct: `W₁` and `W₂` are nontrivial
+subgroups of the *cyclic* `W` with trivial intersection, so if `p = q` the `q`-element count of
+`W` would exceed `φ(q)` (`IsCyclic.card_orderOf_eq_totient`): `W₁^#` supplies `q − 1` elements of
+order `q` and `W₂^#` a further one outside `W₁`. -/
+theorem Hypothesis.p_ne_q [Finite G] (hyp : Hypothesis (G := G)) : hyp.p ≠ hyp.q := by
+  intro hpq
+  have hW1W : hyp.W1 ≤ hyp.W := by rw [hyp.W_eq_join]; exact le_sup_left
+  have hW2W : hyp.W2 ≤ hyp.W := by rw [hyp.W_eq_join]; exact le_sup_right
+  haveI : IsCyclic ↥hyp.W := hyp.W_cyclic
+  haveI : Fintype ↥hyp.W := Fintype.ofFinite _
+  classical
+  set W1' : Subgroup ↥hyp.W := hyp.W1.subgroupOf hyp.W with hW1def
+  set W2' : Subgroup ↥hyp.W := hyp.W2.subgroupOf hyp.W with hW2def
+  have hc1 : Nat.card ↥W1' = hyp.q := by
+    rw [hW1def, Nat.card_congr (Subgroup.subgroupOfEquivOfLe hW1W).toEquiv, ← hyp.q_eq_card_W1]
+  have hc2 : Nat.card ↥W2' = hyp.q := by
+    rw [hW2def, Nat.card_congr (Subgroup.subgroupOfEquivOfLe hW2W).toEquiv, ← hpq,
+      ← hyp.p_eq_card_W2]
+  have hinf : W1' ⊓ W2' = ⊥ := by
+    ext a
+    simp only [Subgroup.mem_inf, Subgroup.mem_bot, Subgroup.mem_subgroupOf, hW1def, hW2def]
+    constructor
+    · rintro ⟨h1, h2⟩
+      have hmem : (a : G) ∈ hyp.W1 ⊓ hyp.W2 := ⟨h1, h2⟩
+      rw [hyp.W1_inf_W2_eq_bot, Subgroup.mem_bot] at hmem
+      exact OneMemClass.coe_eq_one.mp hmem
+    · rintro rfl; exact ⟨one_mem _, one_mem _⟩
+  -- Nonidentity elements of an order-`q` subgroup have order `q`.
+  have horder : ∀ (V : Subgroup ↥hyp.W), Nat.card ↥V = hyp.q →
+      ∀ a : ↥hyp.W, a ∈ V → a ≠ 1 → orderOf a = hyp.q := by
+    intro V hV a ha ha1
+    have hdvd : orderOf a ∣ hyp.q := by
+      have h1 : orderOf (⟨a, ha⟩ : ↥V) ∣ Nat.card ↥V := orderOf_dvd_natCard _
+      rwa [Subgroup.orderOf_mk a ha, hV] at h1
+    rcases (Nat.dvd_prime hyp.q_prime).mp hdvd with h1 | hq
+    · exact absurd (orderOf_eq_one_iff.mp h1) ha1
+    · exact hq
+  -- The order-`q` element count of the cyclic `W` is `φ(q) = q − 1`.
+  have hqdvd : hyp.q ∣ Fintype.card ↥hyp.W := by
+    rw [← Nat.card_eq_fintype_card, ← hc1]
+    exact Subgroup.card_subgroup_dvd_card W1'
+  have htot := IsCyclic.card_orderOf_eq_totient (α := ↥hyp.W) hqdvd
+  -- ... but `W₁^# ∪ {y}` (`y ∈ W₂^#`) already has `q` elements of order `q`.
+  obtain ⟨y', hy'⟩ : ∃ y' : ↥W2', y' ≠ 1 := by
+    haveI : Nontrivial ↥W2' := Finite.one_lt_card_iff_nontrivial.mp
+      (by rw [hc2]; exact hyp.q_prime.one_lt)
+    exact exists_ne 1
+  have hy1 : (y' : ↥hyp.W) ≠ 1 := by
+    intro h
+    exact hy' (OneMemClass.coe_eq_one.mp h)
+  have hyW2 : (y' : ↥hyp.W) ∈ W2' := y'.2
+  set F : Finset ↥hyp.W :=
+    insert (y' : ↥hyp.W) ((Finset.univ.filter (· ∈ W1')).erase 1) with hFdef
+  have hynotin : (y' : ↥hyp.W) ∉ (Finset.univ.filter (· ∈ W1')).erase 1 := by
+    intro hmem
+    have hyW1 : (y' : ↥hyp.W) ∈ W1' := (Finset.mem_filter.mp (Finset.mem_erase.mp hmem).2).2
+    have : (y' : ↥hyp.W) ∈ W1' ⊓ W2' := ⟨hyW1, hyW2⟩
+    rw [hinf] at this
+    exact hy1 this
+  have hW1card : (Finset.univ.filter (· ∈ W1')).card = hyp.q := by
+    rw [← hc1, Nat.card_eq_fintype_card]
+    simp [Fintype.card_subtype]
+  have hFcard : F.card = hyp.q := by
+    rw [hFdef, Finset.card_insert_of_notMem hynotin,
+      Finset.card_erase_of_mem (Finset.mem_filter.mpr ⟨Finset.mem_univ _, W1'.one_mem⟩),
+      hW1card]
+    have := hyp.q_prime.two_le
+    omega
+  have hFsub : F ⊆ Finset.univ.filter (fun a => orderOf a = hyp.q) := by
+    intro a ha
+    rw [hFdef, Finset.mem_insert] at ha
+    refine Finset.mem_filter.mpr ⟨Finset.mem_univ _, ?_⟩
+    rcases ha with rfl | ha
+    · exact horder W2' hc2 _ hyW2 hy1
+    · obtain ⟨ha1, hamem⟩ := Finset.mem_erase.mp ha
+      exact horder W1' hc1 a (Finset.mem_filter.mp hamem).2 ha1
+  have hle : hyp.q ≤ hyp.q.totient := by
+    calc hyp.q = F.card := hFcard.symm
+      _ ≤ (Finset.univ.filter (fun a => orderOf a = hyp.q)).card := Finset.card_le_card hFsub
+      _ = hyp.q.totient := htot
+  rw [Nat.totient_prime hyp.q_prime] at hle
+  have := hyp.q_prime.two_le
+  omega
+
+/-- `Q = T_F` is nontrivial: any type-`P` witness on `T` (available from `T_nonI` via
+`typePData_of_isTypeNonI`) records `H = T_F` noncyclic, and `⊥` is cyclic. -/
+theorem Hypothesis.Q_ne_bot [Finite G] (hyp : Hypothesis (G := G)) : hyp.Q ≠ ⊥ := by
+  obtain ⟨tpd⟩ := OddOrder.GroupTheory.typePData_of_isTypeNonI hyp.T_nonI
+  intro hbot
+  apply tpd.H_noncyclic
+  rw [tpd.H_eq, ← hyp.Q_eq_TF, hbot]
+  infer_instance
+
+/-- **`N_G(Q) = T`** — the `T`-side mirror of the (8.5.a) normalizer identity: `Q = T_F` is a
+nontrivial `T`-normal subgroup of the maximal `T` of the minimal simple `G`, hence
+self-normalizing at `T` (`normalizer_eq_self_of_subgroupOf_normal_of_ne_bot`). -/
+theorem normalizer_Q_eq_T [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hyp : Hypothesis (G := G)) :
+    Subgroup.normalizer (hyp.Q : Set G) = hyp.T := by
+  refine OddOrder.BG.Ch4.S16.normalizer_eq_self_of_subgroupOf_normal_of_ne_bot hG
+    hyp.T_maximal ?_ ?_ hyp.Q_ne_bot
+  · rw [hyp.Q_eq_TF]; exact OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_le hyp.T
+  · rw [hyp.Q_eq_TF]; exact OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_subgroupOf_normal hyp.T
+
+/-- Elements of the set-normalizer of `(K : Set G)` stabilize the sharp `K^# = K − 1` under
+conjugation — the `hstab` input shape of `IsTISubset.sum_conjClassSet`. -/
+theorem conj_smul_sharpSubgroup_eq {K N : Subgroup G}
+    (hnorm : Subgroup.normalizer (K : Set G) = N) {l : G} (hl : l ∈ N) :
+    MulAut.conj l • sharpSubgroup K = sharpSubgroup K := by
+  have hlnorm : l ∈ Subgroup.normalizer (K : Set G) := hnorm ▸ hl
+  rw [Subgroup.mem_set_normalizer_iff] at hlnorm
+  ext x
+  simp only [Set.mem_smul_set, MulAut.smul_def, MulAut.conj_apply, sharpSubgroup, Set.mem_diff,
+    Set.mem_singleton_iff, SetLike.mem_coe]
+  constructor
+  · rintro ⟨v, ⟨hvK, hv1⟩, rfl⟩
+    refine ⟨(hlnorm v).mp hvK, fun heq => hv1 ?_⟩
+    calc v = l⁻¹ * (l * v * l⁻¹) * l := by group
+      _ = 1 := by rw [heq]; group
+  · rintro ⟨hxK, hx1⟩
+    refine ⟨l⁻¹ * x * l, ⟨?_, fun heq => hx1 ?_⟩, by group⟩
+    · have := (hlnorm (l⁻¹ * x * l)).mpr
+      rw [show l * (l⁻¹ * x * l) * l⁻¹ = x from by group] at this
+      exact this hxK
+    · calc x = l * (l⁻¹ * x * l) * l⁻¹ := by group
+        _ = 1 := by rw [heq]; group
+
+/-- **`N_G(H) = S`** (Peterfalvi (8.5.a)): `H = PC = F(S)` (`H_eq_fittingInG`) and
+`N_G(F(S)) = S` (`normalizer_fittingInAmbient_eq_self`). -/
+theorem normalizer_H_eq_S [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hyp : Hypothesis (G := G)) :
+    Subgroup.normalizer (hyp.H : Set G) = hyp.S := by
+  have hHF : hyp.H = OddOrder.BG.Ch2.S08.fittingInG hyp.S := hyp.H_eq_fittingInG
+  have hnorm : Subgroup.normalizer (OddOrder.BG.Ch4.S15.fittingInAmbient hyp.S : Set G) = hyp.S :=
+    OddOrder.BG.Ch4.S16.normalizer_fittingInAmbient_eq_self hG hyp.S_maximal
+  rw [hHF]; exact hnorm
+
+/-- **T-side type-`P` structure reconciled to the abstract `V`/`W₂`** (the honest replacement for the
+withdrawn `Tdata` spine carrier; HUB tick² 2026-06-30).  `T` is type non-I (`T_nonI`), hence type-`P`,
+and the §16-chosen complement `V` (κ-Hall-invariant) / cyclic factor `W₂` form a type-`P`
+decomposition of `T`: there is a `TypePData T` with `.U = V`, `.W1 = W₂`, and `.W2 = W₁` (the dual
+cyclic factor `C_{T'}(W₂#)` of `T`'s type-`P` structure is exactly the shared `W₁`).
+
+This is the genuine §13 reconciliation — **TRUE**, and the right §13-level statement: it asserts only
+the *general* type-`P` structure of `T` (available from `T_nonI` at §13), reconciled to the abstract
+`V`/`W₂`.  (The sharper `IsTypeP2 T` is *equivalent* to the (14.9) conclusion `IsTypeII T` by the BG
+type dictionary `proposition_type_classification` — `IsTypeII M ↔ IsTypeP2 M` — but is not needed for
+the reconciliation itself, so this stays a clean §13 obligation.)  It lives **off the FT spine**: the
+`V`-side helpers cite this obligation, keeping `section16TypePStructure_of_isMinimalSimpleOdd`
+sorry-free.  Gated on §13; declared sorried.  (Relocated from `S15_SAndT` for the (13.9)/(13.10)
+counting layer — the type-V exclusion of `Q_sharp_isTISubset` and the `|T|` decomposition read it.) -/
+theorem reconciled_typePData_T [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hyp : Hypothesis (G := G)) :
+    ∃ data : TypePData hyp.T, data.U = hyp.V ∧ data.W1 = hyp.W2 ∧ data.W2 = hyp.W1 := by
+  -- `W₂, W₁ ≤ W` from the (13.1) join `W = W₁ ⊔ W₂`, and `W ≤ T` from `W = S ⊓ T`.
+  have hW2W : hyp.W2 ≤ hyp.W := by rw [hyp.W_eq_join]; exact le_sup_right
+  have hW1W : hyp.W1 ≤ hyp.W := by rw [hyp.W_eq_join]; exact le_sup_left
+  have hWT : hyp.W ≤ hyp.T := by rw [hyp.W_eq_inter]; exact inf_le_right
+  haveI hWcyc : IsCyclic ↥hyp.W := hyp.W_cyclic
+  -- Cyclic factors: a subgroup of the cyclic `W` is cyclic (transport along `subgroupOfEquivOfLe`).
+  have hW2cyc : IsCyclic ↥hyp.W2 :=
+    isCyclic_of_surjective _ (Subgroup.subgroupOfEquivOfLe hW2W).surjective
+  have hW1cyc : IsCyclic ↥hyp.W1 :=
+    isCyclic_of_surjective _ (Subgroup.subgroupOfEquivOfLe hW1W).surjective
+  refine ⟨{
+    H := hyp.Q
+    U := hyp.V
+    W1 := hyp.W2
+    W2 := hyp.W1
+    W := hyp.W
+    H_eq := hyp.Q_eq_TF
+    H_le := by rw [hyp.T_deriv_eq_QV]; exact le_sup_left
+    U_le := by rw [hyp.T_deriv_eq_QV]; exact le_sup_right
+    W1_le := hW2W.trans hWT
+    -- The following are the genuine §13/§14 type-`P` structure of `T` (the `T`-side analogue of what
+    -- `Section16TypePStructure` establishes for `S` when it builds `Sdata`).  No `T`-side carrier
+    -- exists by design (`FeitThompson:276`), so these stay gated on the §13/§14 σ-structure theory.
+    W2_le := sorry
+    W_eq := by rw [hyp.W_eq_join, sup_comm]
+    W_cyclic := hyp.W_cyclic
+    W1_nontrivial := by
+      intro h; have hp := hyp.p_prime.one_lt
+      rw [hyp.p_eq_card_W2, h, Subgroup.card_bot] at hp; exact absurd hp (by norm_num)
+    W2_nontrivial := by
+      intro h; have hq := hyp.q_prime.one_lt
+      rw [hyp.q_eq_card_W1, h, Subgroup.card_bot] at hq; exact absurd hq (by norm_num)
+    W1_cyclic := hW2cyc
+    W2_cyclic := hW1cyc
+    M_complement := sorry
+    W1_normalizes_U := hyp.W2_normalizes_V
+    U_nilpotent := sorry
+    derived_complement := sorry
+    H_noncyclic := by
+      -- `H := Q = maxNilpotentNormalHall T` is the *intrinsic* Fitting Hall (choice-independent),
+      -- so `¬ IsCyclic ↥Q` is read off any type-`P` datum on `T`.  The §13-level producer
+      -- `typePData_of_isTypeNonI T_nonI` supplies one (no `T_typeII`/(14.9) needed, keeping this a
+      -- clean §13 obligation): its `H_noncyclic` is `¬ IsCyclic` of the same subgroup `Q`.
+      obtain ⟨tpd0⟩ := OddOrder.GroupTheory.typePData_of_isTypeNonI hyp.T_nonI
+      have hHeq : tpd0.H = hyp.Q := by rw [tpd0.H_eq, hyp.Q_eq_TF]
+      exact hHeq ▸ tpd0.H_noncyclic
+    secondDerived_le_fitting := sorry
+    fitting_eq := sorry
+    centralizer_W1 := sorry
+    normalizer_V := by
+      -- The `W`-exceptional-set normalizer `N_G(X) = W` is symmetric in `W₁`/`W₂`, so it is read off
+      -- the S-side carrier `Sdata.normalizer_V` (same fact as `base_W_normalizer_V`, inlined since S15
+      -- is upstream of S16).  The exceptional set `W − (W₂ ∪ W₁) = W − (W₁ ∪ W₂)` is `union_comm`.
+      have hWeq : hyp.Sdata.W = hyp.W := by
+        rw [hyp.Sdata.W_eq, hyp.Sdata_W1_eq, hyp.Sdata_W2_eq]; exact hyp.W_eq_join.symm
+      intro X hX hXsub
+      rw [← hWeq]
+      refine hyp.Sdata.normalizer_V X hX ?_
+      rw [hWeq, hyp.Sdata_W1_eq, hyp.Sdata_W2_eq, Set.union_comm]
+      exact hXsub
+  }, rfl, rfl, rfl⟩
+
+/-- **`Q^#` is a TI-subset of `G` with normalizer `T`** — the `T`-side mirror of
+`H_sharp_isTISubset`, feeding the (13.10.2)/(13.10.3) `Q`-orbit counting.  For `T` of type
+II/III/IV the TI property is the `TypePNontrivialCore` field of the type datum (Peterfalvi
+(8.6.a)), with the bound pinned to `T` by `normalizer_Q_eq_T`; type V is excluded by `|V| ≠ 1`
+(a type-V witness has `U = ⊥`, and `|V| = |tpd.U|` for the reconciled datum by the
+witness-independence `card_U_eq_index`). -/
+theorem Q_sharp_isTISubset [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hyp : Hypothesis (G := G)) (hvd : hyp.v * hyp.d ≠ 1) :
+    IsTISubset (sharpSubgroup hyp.Q) hyp.T := by
+  classical
+  have hQnorm : Subgroup.normalizer (hyp.Q : Set G) = hyp.T := normalizer_Q_eq_T hG hyp
+  have hcore : ∀ tpd : TypePData hyp.T, TypePNontrivialCore hyp.T tpd →
+      IsTISubset (sharpSubgroup hyp.Q) hyp.T := by
+    intro tpd hcore
+    have hTI := hcore.2.2
+    rw [← hyp.Q_eq_TF] at hTI
+    rwa [hQnorm] at hTI
+  rcases hyp.T_nonI with h | h | h | h
+  · exact hcore h.some.typeP h.some.common
+  · exact hcore h.some.typeP h.some.common
+  · exact hcore h.some.typeP h.some.common
+  · -- Type V: excluded by `v·d = |V| ≠ 1`.
+    exfalso
+    obtain ⟨tpd, hU, -, -⟩ := reconciled_typePData_T hG hyp
+    have vdata := h.some
+    have hcardU : Nat.card ↥tpd.U = Nat.card ↥vdata.typeP.U := by
+      rw [tpd.card_U_eq_index, vdata.typeP.card_U_eq_index]
+    rw [hU, vdata.U_eq_bot, Subgroup.card_bot, hyp.card_V_eq_vd] at hcardU
+    exact hvd hcardU
+
+/-- **`q ∤ |H|`** — the order-theoretic core of the `(H^#)^G ∩ (Q^#)^G = ∅` disjointness:
+`H = PC ≤ S' = PU` has order dividing `|P|·|U|` (`derived_complement`), `q ∤ |P| = p^q`
+(`p ≠ q`), and `q ∤ |U|` (the `U W₁` Frobenius structure has coprime kernel and complement,
+`|W₁| = q`). -/
+theorem Hypothesis.q_not_dvd_card_H [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hyp : Hypothesis (G := G)) : ¬ hyp.q ∣ Nat.card ↥hyp.H := by
+  intro hdvd
+  -- `|H| ∣ |S'| = |P|·|U|`.
+  have hHle : hyp.H ≤ derivedInG hyp.S := by
+    show hyp.P ⊔ hyp.C ≤ derivedInG hyp.S
+    rw [hyp.S_deriv_eq_PU]
+    exact sup_le le_sup_left (le_trans (hyp.C_eq ▸ inf_le_left) le_sup_right)
+  have hcard_deriv : Nat.card ↥hyp.P * Nat.card ↥hyp.U = Nat.card ↥(derivedInG hyp.S) := by
+    have h := hyp.Sdata.derived_complement.card_mul
+    have hPeq : hyp.Sdata.H = hyp.P := by rw [hyp.Sdata.H_eq, hyp.P_eq_SF]
+    rwa [Nat.card_congr (Subgroup.subgroupOfEquivOfLe (hPeq ▸ hyp.Sdata.H_le)).toEquiv,
+      Nat.card_congr (Subgroup.subgroupOfEquivOfLe hyp.Sdata.U_le).toEquiv, hPeq,
+      hyp.Sdata_U_eq] at h
+  have hdvd' : hyp.q ∣ Nat.card ↥hyp.P * Nat.card ↥hyp.U := by
+    rw [hcard_deriv]
+    exact hdvd.trans (Subgroup.card_dvd_of_le hHle)
+  rcases (Nat.Prime.dvd_mul hyp.q_prime).mp hdvd' with hq | hq
+  · -- `q ∤ |P| = p^q` since `p ≠ q`.
+    rw [hyp.card_P_eq hG hyp.Sdata_W2_eq] at hq
+    have hqp : hyp.q ∣ hyp.p := Nat.Prime.dvd_of_dvd_pow hyp.q_prime hq
+    exact hyp.p_ne_q ((Nat.prime_dvd_prime_iff_eq hyp.q_prime hyp.p_prime).mp hqp).symm
+  · -- `q ∤ |U|`: `U W₁` Frobenius has coprime kernel/complement.
+    -- `U ≠ ⊥` via the type-II witness on `S` (as in `basic_structure`).
+    have hSII : IsTypeII hyp.S :=
+      OddOrder.BG.Ch4.S16.isTypeII_of_isTypeP2 hG hyp.S_maximal hyp.S_typeP2
+    have tdata : TypeIIData hyp.S := hSII.some
+    have hSdataUne : hyp.Sdata.U ≠ ⊥ := by
+      intro hbot
+      have h1 : Nat.card ↥hyp.Sdata.U = Nat.card ↥tdata.typeP.U := by
+        rw [hyp.Sdata.card_U_eq_index, tdata.typeP.card_U_eq_index]
+      rw [hbot, Subgroup.card_bot] at h1
+      exact tdata.common.1 (Subgroup.card_eq_one.mp h1.symm)
+    have hfrob := OddOrder.Peterfalvi.S11.typeP_uW1_frobenius hyp.Sdata hSdataUne
+    have hcop := hfrob.coprime_card_kernel_complement
+    rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe (le_sup_left :
+        hyp.Sdata.U ≤ hyp.Sdata.U ⊔ hyp.Sdata.W1)).toEquiv,
+      Nat.card_congr (Subgroup.subgroupOfEquivOfLe (le_sup_right :
+        hyp.Sdata.W1 ≤ hyp.Sdata.U ⊔ hyp.Sdata.W1)).toEquiv,
+      hyp.Sdata_U_eq, hyp.Sdata_W1_eq, ← hyp.q_eq_card_W1] at hcop
+    exact hyp.q_prime.ne_one (Nat.eq_one_of_dvd_one (hcop ▸ Nat.dvd_gcd hq dvd_rfl))
+
+/-- **`(H^#)^G` and `(Q^#)^G` are disjoint**: a common element would be conjugate both to a
+nonidentity element of `H` (order dividing `|H|`, so prime to `q` by `q_not_dvd_card_H`) and to
+a nonidentity element of `Q` (order a positive power of `q`, `|Q| = q^p`). -/
+theorem disjoint_conjClassSet_sharp_H_Q [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hyp : Hypothesis (G := G)) (hcardQ : Nat.card ↥hyp.Q = hyp.q ^ hyp.p) :
+    ∀ x : G, x ∈ conjClassSet (sharpSubgroup hyp.H) →
+      x ∈ conjClassSet (sharpSubgroup hyp.Q) → False := by
+  intro x hxH hxQ
+  obtain ⟨a, ⟨haH, ha1⟩, g, rfl⟩ := mem_conjClassSet.mp hxH
+  obtain ⟨b, ⟨hbQ, hb1⟩, h, hab⟩ := mem_conjClassSet.mp hxQ
+  -- Conjugation preserves orders: `orderOf a = orderOf b`.
+  have horder : orderOf a = orderOf b := by
+    have h1 : orderOf (g * a * g⁻¹) = orderOf a := by
+      rw [show g * a * g⁻¹ = (MulAut.conj g) a from rfl]
+      exact orderOf_injective (MulAut.conj g).toMonoidHom (MulAut.conj g).injective a
+    have h2 : orderOf (h * b * h⁻¹) = orderOf b := by
+      rw [show h * b * h⁻¹ = (MulAut.conj h) b from rfl]
+      exact orderOf_injective (MulAut.conj h).toMonoidHom (MulAut.conj h).injective b
+    rw [← h1, ← hab, h2]
+  -- `orderOf b` is a positive power of `q`, so `q ∣ orderOf a ∣ |H|`.
+  have hbdvd : orderOf b ∣ hyp.q ^ hyp.p := by
+    have h1 : orderOf (⟨b, hbQ⟩ : ↥hyp.Q) ∣ Nat.card ↥hyp.Q := orderOf_dvd_natCard _
+    rwa [Subgroup.orderOf_mk b hbQ, hcardQ] at h1
+  obtain ⟨i, hip, hbord⟩ := (Nat.dvd_prime_pow hyp.q_prime).mp hbdvd
+  have hi0 : i ≠ 0 := by
+    intro hi0
+    rw [hi0, pow_zero] at hbord
+    exact hb1 (orderOf_eq_one_iff.mp hbord)
+  have hqdvd_a : hyp.q ∣ orderOf a := by
+    rw [horder, hbord]
+    exact dvd_pow_self hyp.q hi0
+  have hadvd : orderOf a ∣ Nat.card ↥hyp.H := by
+    have h1 : orderOf (⟨a, SetLike.mem_coe.mp haH⟩ : ↥hyp.H) ∣ Nat.card ↥hyp.H :=
+      orderOf_dvd_natCard _
+    rwa [Subgroup.orderOf_mk a (SetLike.mem_coe.mp haH)] at h1
+  exact hyp.q_not_dvd_card_H hG (hqdvd_a.trans hadvd)
+
+open scoped Classical in
+/-- **The four-piece split of a conjugation-invariant sum** (the (13.10) counting skeleton):
+for a conjugation-invariant `f`,
+
+  `∑_G f = f(1) + ∑_{G₀} f + [G:S]·∑_{H^#} f + [G:T]·∑_{Q^#} f`.
+
+`G` is the disjoint union of `{1}`, `G₀`, `(H^#)^G`, and `(Q^#)^G` (the saturations are disjoint
+by `disjoint_conjClassSet_sharp_H_Q` and miss `1`; `G₀` is *defined* as the complement), and each
+saturation sum collapses by `IsTISubset.sum_conjClassSet` (issue 9010) via the proven TI
+structure (`H_sharp_isTISubset` / `Q_sharp_isTISubset`).  Instantiations: `f = ‖χ(·)‖²` gives the
+Parseval splits (13.10.1)/(13.10.2); `f = 1` the cover count (13.10.3). -/
+theorem Hypothesis.sum_univ_split [Fintype G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hyp : Hypothesis (G := G)) {M : Type*} [AddCommMonoid M] (f : G → M)
+    (hf : ∀ g x : G, f (g * x * g⁻¹) = f x)
+    (hcardQ : Nat.card ↥hyp.Q = hyp.q ^ hyp.p) (hvd : hyp.v * hyp.d ≠ 1) :
+    ∑ x : G, f x
+      = f 1 + (∑ x ∈ hyp.G0Finset, f x)
+        + hyp.S.index • ∑ x ∈ (Set.toFinite (sharpSubgroup hyp.H)).toFinset, f x
+        + hyp.T.index • ∑ x ∈ (Set.toFinite (sharpSubgroup hyp.Q)).toFinset, f x := by
+  classical
+  -- TI structure and stabilization on both sides.
+  have hTIH : OddOrder.GroupTheory.IsTISubset (sharpSubgroup hyp.H) hyp.S :=
+    H_sharp_isTISubset hG hyp
+  have hTIQ : OddOrder.GroupTheory.IsTISubset (sharpSubgroup hyp.Q) hyp.T :=
+    Q_sharp_isTISubset hG hyp hvd
+  have hstabH : ∀ l ∈ hyp.S, MulAut.conj l • sharpSubgroup hyp.H = sharpSubgroup hyp.H :=
+    fun l hl => conj_smul_sharpSubgroup_eq (normalizer_H_eq_S hG hyp) hl
+  have hstabQ : ∀ l ∈ hyp.T, MulAut.conj l • sharpSubgroup hyp.Q = sharpSubgroup hyp.Q :=
+    fun l hl => conj_smul_sharpSubgroup_eq (normalizer_Q_eq_T hG hyp) hl
+  -- The four Finset pieces.
+  set CH : Finset G := (Set.toFinite (conjClassSet (sharpSubgroup hyp.H))).toFinset with hCHdef
+  set CQ : Finset G := (Set.toFinite (conjClassSet (sharpSubgroup hyp.Q))).toFinset with hCQdef
+  have hmemCH : ∀ x : G, x ∈ CH ↔ x ∈ conjClassSet (sharpSubgroup hyp.H) := fun x =>
+    (Set.toFinite _).mem_toFinset
+  have hmemCQ : ∀ x : G, x ∈ CQ ↔ x ∈ conjClassSet (sharpSubgroup hyp.Q) := fun x =>
+    (Set.toFinite _).mem_toFinset
+  have hmemG0 : ∀ x : G, x ∈ hyp.G0Finset ↔ x ∈ hyp.G0 := fun x =>
+    (Set.toFinite _).mem_toFinset
+  -- Nonidentity: conjugates of nonidentity elements are nonidentity.
+  have hne1 : ∀ (K : Subgroup G) (x : G), x ∈ conjClassSet (sharpSubgroup K) → x ≠ 1 := by
+    rintro K x hx rfl
+    obtain ⟨a, ⟨-, ha1⟩, g, hg⟩ := mem_conjClassSet.mp hx
+    refine ha1 ?_
+    show a = 1
+    have ha : a = g⁻¹ * (g * a * g⁻¹) * g := by group
+    rw [ha, hg]
+    group
+  have hne1H : ∀ x ∈ CH, x ≠ 1 := fun x hx => hne1 hyp.H x ((hmemCH x).mp hx)
+  have hne1Q : ∀ x ∈ CQ, x ≠ 1 := fun x hx => hne1 hyp.Q x ((hmemCQ x).mp hx)
+  -- `G₀` misses `1` and both saturations (definitional).
+  have hG0iff : ∀ x : G, x ∈ hyp.G0 ↔
+      x ≠ 1 ∧ x ∉ conjClassSet (sharpSubgroup hyp.H) ∧ x ∉ conjClassSet (sharpSubgroup hyp.Q) := by
+    intro x
+    show x ∈ sharpSubgroup (⊤ : Subgroup G) \ _ ↔ _
+    simp only [sharpSubgroup, Set.mem_diff, Set.mem_singleton_iff, SetLike.mem_coe,
+      Subgroup.mem_top, true_and, Set.mem_union, not_or]
+  -- The partition: `univ = {1} ∪ G₀ ∪ CH ∪ CQ`, pairwise disjoint.
+  have hcover : (Finset.univ : Finset G) = insert 1 (hyp.G0Finset ∪ CH ∪ CQ) := by
+    ext x
+    simp only [Finset.mem_univ, Finset.mem_insert, Finset.mem_union, true_iff]
+    by_cases hx1 : x = 1
+    · exact Or.inl hx1
+    · refine Or.inr ?_
+      by_cases hxH : x ∈ conjClassSet (sharpSubgroup hyp.H)
+      · exact Or.inl (Or.inr ((hmemCH x).mpr hxH))
+      · by_cases hxQ : x ∈ conjClassSet (sharpSubgroup hyp.Q)
+        · exact Or.inr ((hmemCQ x).mpr hxQ)
+        · exact Or.inl (Or.inl ((hmemG0 x).mpr ((hG0iff x).mpr ⟨hx1, hxH, hxQ⟩)))
+  have hdisjHQ : Disjoint CH CQ := by
+    rw [Finset.disjoint_left]
+    intro x hx hx'
+    exact disjoint_conjClassSet_sharp_H_Q hG hyp hcardQ x ((hmemCH x).mp hx) ((hmemCQ x).mp hx')
+  have hdisjG0 : Disjoint hyp.G0Finset (CH ∪ CQ) := by
+    rw [Finset.disjoint_left]
+    intro x hx hx'
+    obtain ⟨-, hxH, hxQ⟩ := (hG0iff x).mp ((hmemG0 x).mp hx)
+    rcases Finset.mem_union.mp hx' with h | h
+    · exact hxH ((hmemCH x).mp h)
+    · exact hxQ ((hmemCQ x).mp h)
+  have hone_notin : (1 : G) ∉ hyp.G0Finset ∪ CH ∪ CQ := by
+    intro hmem
+    rcases Finset.mem_union.mp hmem with h | h
+    · rcases Finset.mem_union.mp h with h' | h'
+      · exact ((hG0iff 1).mp ((hmemG0 1).mp h')).1 rfl
+      · exact hne1H 1 h' rfl
+    · exact hne1Q 1 h rfl
+  -- Assemble the split.
+  rw [hcover, Finset.sum_insert hone_notin, Finset.union_assoc, Finset.sum_union hdisjG0,
+    Finset.sum_union hdisjHQ, hCHdef, hCQdef,
+    OddOrder.GroupTheory.IsTISubset.sum_conjClassSet f hTIH hstabH hf,
+    OddOrder.GroupTheory.IsTISubset.sum_conjClassSet f hTIQ hstabQ hf]
+  abel
+
+/-- `|S'| = |P|·|U|` — the (13.1.b) `S' = P ⋊ U` order decomposition
+(`Sdata.derived_complement`). -/
+theorem Hypothesis.card_deriv_S_eq [Finite G] (hyp : Hypothesis (G := G)) :
+    Nat.card ↥(derivedInG hyp.S) = Nat.card ↥hyp.P * Nat.card ↥hyp.U := by
+  have h := hyp.Sdata.derived_complement.card_mul
+  have hPeq : hyp.Sdata.H = hyp.P := by rw [hyp.Sdata.H_eq, hyp.P_eq_SF]
+  rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hyp.Sdata.H_le).toEquiv,
+    Nat.card_congr (Subgroup.subgroupOfEquivOfLe hyp.Sdata.U_le).toEquiv, hPeq,
+    hyp.Sdata_U_eq] at h
+  exact h.symm
+
+/-- `|S| = |S'|·q` — the (13.1.b) `S = S' ⋊ W₁` order decomposition (`Sdata.M_complement`). -/
+theorem Hypothesis.card_S_eq_deriv_mul_q [Finite G] (hyp : Hypothesis (G := G)) :
+    Nat.card ↥hyp.S = Nat.card ↥(derivedInG hyp.S) * hyp.q := by
+  have hle : derivedInG hyp.S ≤ hyp.S := Subgroup.map_subtype_le _
+  have h := hyp.Sdata.M_complement.card_mul
+  rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hle).toEquiv,
+    Nat.card_congr (Subgroup.subgroupOfEquivOfLe hyp.Sdata.W1_le).toEquiv,
+    hyp.Sdata_W1_eq, ← hyp.q_eq_card_W1] at h
+  exact h.symm
+
+/-- **`|S| = p^q·(uc)·q`** — the (13.2)-level order value of `S`, assembling
+`card_S_eq_deriv_mul_q`, `card_deriv_S_eq`, `card_P_eq` (`|P| = p^q`), and `|U| = uc`. -/
+theorem Hypothesis.card_S_val [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hyp : Hypothesis (G := G)) :
+    Nat.card ↥hyp.S = hyp.p ^ hyp.q * (hyp.u * hyp.c) * hyp.q := by
+  rw [hyp.card_S_eq_deriv_mul_q, hyp.card_deriv_S_eq, hyp.card_P_eq hG hyp.Sdata_W2_eq,
+    hyp.card_U_eq_uc]
+
+/-- `|T| = |Q|·(vd)·p` — the `T`-side order decomposition, read off the reconciled type-`P`
+datum (`M_complement`/`derived_complement` of `reconciled_typePData_T`) with `|V| = vd` and
+`|W₂| = p`. -/
+theorem Hypothesis.card_T_eq [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hyp : Hypothesis (G := G)) :
+    Nat.card ↥hyp.T = Nat.card ↥hyp.Q * (hyp.v * hyp.d) * hyp.p := by
+  obtain ⟨tpd, hU, hW1, -⟩ := reconciled_typePData_T hG hyp
+  -- `|T| = |T'|·p`.
+  have hle : derivedInG hyp.T ≤ hyp.T := Subgroup.map_subtype_le _
+  have h1 := tpd.M_complement.card_mul
+  rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe hle).toEquiv,
+    Nat.card_congr (Subgroup.subgroupOfEquivOfLe tpd.W1_le).toEquiv,
+    hW1, ← hyp.p_eq_card_W2] at h1
+  -- `|T'| = |Q|·|V| = |Q|·(vd)`.
+  have h2 := tpd.derived_complement.card_mul
+  rw [Nat.card_congr (Subgroup.subgroupOfEquivOfLe tpd.H_le).toEquiv,
+    Nat.card_congr (Subgroup.subgroupOfEquivOfLe tpd.U_le).toEquiv, tpd.H_eq, ← hyp.Q_eq_TF,
+    hU, hyp.card_V_eq_vd] at h2
+  rw [← h1, ← h2]
+
+open scoped Classical in
+/-- `|K^#| = |K| − 1`, `Finset` form. -/
+theorem card_sharp_toFinset [Fintype G] (K : Subgroup G) :
+    (Set.toFinite (sharpSubgroup K)).toFinset.card = Nat.card ↥K - 1 := by
+  classical
+  have h : (Set.toFinite (sharpSubgroup K)).toFinset
+      = (Finset.univ.filter (· ∈ K)).erase 1 := by
+    ext x
+    rw [Set.Finite.mem_toFinset, Finset.mem_erase, Finset.mem_filter]
+    show x ∈ (K : Set G) \ {1} ↔ _
+    rw [Set.mem_diff, Set.mem_singleton_iff]
+    exact ⟨fun ⟨h1, h2⟩ => ⟨h2, Finset.mem_univ _, h1⟩, fun ⟨h2, _, h1⟩ => ⟨h1, h2⟩⟩
+  rw [h, Finset.card_erase_of_mem (Finset.mem_filter.mpr ⟨Finset.mem_univ _, K.one_mem⟩)]
+  congr 1
+  rw [Nat.card_eq_fintype_card]
+  simp [Fintype.card_subtype]
+
+/-- **Peterfalvi (13.10.3), ℕ form**: `|G| = 1 + |G₀| + [G:S]·|H^#| + [G:T]·|Q^#|` — the
+`f = 1` instance of the four-piece split. -/
+theorem Hypothesis.card_univ_split [Fintype G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hyp : Hypothesis (G := G))
+    (hcardQ : Nat.card ↥hyp.Q = hyp.q ^ hyp.p) (hvd : hyp.v * hyp.d ≠ 1) :
+    Nat.card G = 1 + hyp.G0Finset.card
+      + hyp.S.index * (Nat.card ↥hyp.H - 1) + hyp.T.index * (Nat.card ↥hyp.Q - 1) := by
+  have h := hyp.sum_univ_split hG (fun _ => (1 : ℕ)) (fun _ _ => rfl) hcardQ hvd
+  simp only [← Finset.card_eq_sum_ones, Finset.card_univ, smul_eq_mul,
+    card_sharp_toFinset] at h
+  rw [Nat.card_eq_fintype_card]
+  exact h
+
+end CountingLayer
+
 /-! ### The four (13.6)–(13.9) estimate producers
 
 Each is a *faithful* statement of one textbook estimate in terms of the shared atoms; together
@@ -1365,13 +1893,97 @@ theorem analyticEstimate_eta [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
 
 /-- **Peterfalvi (13.9.a), atom form**: the disjoint-cover counting
 `1 = 1/|G| + |G₀|/|G| + |H#|/|S| + |Q#|/|T|` with `|Q#|/|T|` collapsed to its (13.4) value
-`(q−1)/(pq^p)`. -/
+`(q−1)/(pq^p)`.
+
+Assembled from the ℕ-count `card_univ_split` (the `f = 1` four-piece split over the TI
+saturations), Lagrange (`card_mul_index` on `S` and `T`), the `|T|`-decomposition `card_T_eq`,
+and the (13.4) values (`lambda_forces_T_caseB`: `D = 1`, `v = (q^p−1)/(q−1)`, `|Q| = q^p`). -/
 theorem analyticCounting_disjointCover [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
     (hyp : Hypothesis (G := G)) :
     (1 : ℚ) = 1 / (Nat.card G : ℚ) + (hyp.G0Finset.card : ℚ) / (Nat.card G : ℚ)
         + ((Nat.card hyp.H - 1 : ℕ) : ℚ) / (Nat.card hyp.S : ℚ)
         + ((hyp.q : ℚ) - 1) / ((hyp.p : ℚ) * (hyp.q : ℚ) ^ hyp.p) := by
-  sorry
+  classical
+  haveI : Fintype G := Fintype.ofFinite G
+  -- (13.4) values.
+  obtain ⟨chars, -, -, -⟩ := character_degree_analysis _hG hyp
+  obtain ⟨hD, hv, hQ⟩ :=
+    lambda_forces_T_caseB _hG chars chars.lambda_induced_from_PC_linear_holds
+  have hd1 : hyp.d = 1 := by rw [hyp.d_eq_card_D, hD, Subgroup.card_bot]
+  have hq3 : 3 ≤ hyp.q := hyp.three_le_q
+  have hp3 : 3 ≤ hyp.p := hyp.three_le_p
+  -- `v ≥ 2` (so `vd ≠ 1`, excluding type V in the counting layer).
+  have hqp_ge : hyp.q * hyp.q ≤ hyp.q ^ hyp.p := by
+    calc hyp.q * hyp.q = hyp.q ^ 2 := (sq hyp.q).symm
+      _ ≤ hyp.q ^ hyp.p := Nat.pow_le_pow_right (by omega) (by omega)
+  have hv2 : 2 ≤ hyp.v := by
+    rw [hv, Nat.le_div_iff_mul_le (by omega : 0 < hyp.q - 1)]
+    have h3q : 3 * hyp.q ≤ hyp.q * hyp.q := Nat.mul_le_mul_right _ hq3
+    omega
+  have hvd : hyp.v * hyp.d ≠ 1 := by rw [hd1, mul_one]; omega
+  -- The ℕ-count, cast to ℚ.
+  have hsplit := hyp.card_univ_split _hG hQ hvd
+  have key : (Nat.card G : ℚ) = 1 + (hyp.G0Finset.card : ℚ)
+      + (hyp.S.index : ℚ) * ((Nat.card ↥hyp.H - 1 : ℕ) : ℚ)
+      + (hyp.T.index : ℚ) * ((Nat.card ↥hyp.Q - 1 : ℕ) : ℚ) := by
+    exact_mod_cast hsplit
+  -- Nonvanishing.
+  have hG0 : (0 : ℚ) < (Nat.card G : ℚ) := by exact_mod_cast Nat.card_pos (α := G)
+  have hS0 : (0 : ℚ) < (Nat.card ↥hyp.S : ℚ) := by exact_mod_cast Nat.card_pos (α := ↥hyp.S)
+  have hT0 : (0 : ℚ) < (Nat.card ↥hyp.T : ℚ) := by exact_mod_cast Nat.card_pos (α := ↥hyp.T)
+  have hSidx : (hyp.S.index : ℚ) * (Nat.card ↥hyp.S : ℚ) = (Nat.card G : ℚ) := by
+    exact_mod_cast mul_comm (Nat.card ↥hyp.S) hyp.S.index ▸ hyp.S.card_mul_index
+  have hTidx : (hyp.T.index : ℚ) * (Nat.card ↥hyp.T : ℚ) = (Nat.card G : ℚ) := by
+    exact_mod_cast mul_comm (Nat.card ↥hyp.T) hyp.T.index ▸ hyp.T.card_mul_index
+  have hSidx0 : (hyp.S.index : ℚ) ≠ 0 := by
+    intro h; rw [h, zero_mul] at hSidx; exact hG0.ne' hSidx.symm
+  have hTidx0 : (hyp.T.index : ℚ) ≠ 0 := by
+    intro h; rw [h, zero_mul] at hTidx; exact hG0.ne' hTidx.symm
+  -- `v(q−1) = q^p − 1` in ℚ (exact ℕ-division).
+  have hq1 : (1 : ℕ) ≤ hyp.q := by omega
+  have hqp1 : (1 : ℕ) ≤ hyp.q ^ hyp.p := Nat.one_le_pow _ _ (by omega)
+  have hdvd : (hyp.q - 1) ∣ (hyp.q ^ hyp.p - 1) := by
+    simpa only [one_pow] using Nat.sub_dvd_pow_sub_pow hyp.q 1 hyp.p
+  have hvq : (hyp.v : ℚ) * ((hyp.q : ℚ) - 1) = (hyp.q : ℚ) ^ hyp.p - 1 := by
+    have h := Nat.div_mul_cancel hdvd
+    rw [← hv] at h
+    have := congrArg (Nat.cast (R := ℚ)) h
+    push_cast [Nat.cast_sub hq1, Nat.cast_sub hqp1] at this
+    convert this using 2 <;> push_cast <;> ring
+  -- `|T| = q^p·v·p` in ℚ.
+  have hTval : (Nat.card ↥hyp.T : ℚ)
+      = (hyp.q : ℚ) ^ hyp.p * (hyp.v : ℚ) * (hyp.p : ℚ) := by
+    have h := hyp.card_T_eq _hG
+    rw [hQ, hd1, mul_one] at h
+    exact_mod_cast h
+  -- `|Q^#|` in ℚ.
+  have hQ1 : ((Nat.card ↥hyp.Q - 1 : ℕ) : ℚ) = (hyp.q : ℚ) ^ hyp.p - 1 := by
+    rw [hQ, Nat.cast_sub hqp1]
+    push_cast
+    ring
+  -- Term conversions: `S.index·(|H|−1)/|G| = (|H|−1)/|S|`, and the `Q`-term collapses to the
+  -- (13.4) value.
+  have hterm3 : ((Nat.card ↥hyp.H - 1 : ℕ) : ℚ) / (Nat.card ↥hyp.S : ℚ)
+      = (hyp.S.index : ℚ) * ((Nat.card ↥hyp.H - 1 : ℕ) : ℚ) / (Nat.card G : ℚ) := by
+    rw [← hSidx, mul_div_mul_left _ _ hSidx0]
+  have hv0 : (hyp.v : ℚ) ≠ 0 := by
+    have : (2 : ℚ) ≤ (hyp.v : ℚ) := by exact_mod_cast hv2
+    linarith
+  have hq10 : (hyp.q : ℚ) - 1 ≠ 0 := by
+    have : (3 : ℚ) ≤ (hyp.q : ℚ) := by exact_mod_cast hq3
+    linarith
+  have hp0 : (hyp.p : ℚ) ≠ 0 := by
+    have : (3 : ℚ) ≤ (hyp.p : ℚ) := by exact_mod_cast hp3
+    linarith
+  have hqp0 : (hyp.q : ℚ) ^ hyp.p ≠ 0 := by
+    have : (1 : ℚ) ≤ (hyp.q : ℚ) ^ hyp.p := by exact_mod_cast hqp1
+    linarith
+  have hterm4 : ((hyp.q : ℚ) - 1) / ((hyp.p : ℚ) * (hyp.q : ℚ) ^ hyp.p)
+      = (hyp.T.index : ℚ) * ((Nat.card ↥hyp.Q - 1 : ℕ) : ℚ) / (Nat.card G : ℚ) := by
+    rw [hQ1, ← hvq, ← hTidx, hTval]
+    field_simp
+  -- Assemble.
+  rw [hterm3, hterm4, ← add_div, ← add_div, ← add_div, ← key, div_self hG0.ne']
 
 /-- **Peterfalvi (13.9.b), atom form**: `|G₀|/|G| ≤ slam + seta`. -/
 theorem analyticEstimate_galois [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
