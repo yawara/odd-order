@@ -961,3 +961,25 @@ Frobenius kernel 誘導で既約), `hypothesis78_zeta_ne_conj` (ζ≠ζ̄: 奇�
   (両族 i,j に hcoh/hnu/hz_irr/j/hjne_ind/hj/hζne_conj/hab_supp 供給) → F レベル hzeta_cross。
   hcoh は F.coherence i の再パッケージ、hij で i≠j。→ (7.9) conclusion producer (別途 hindZ/hBD 等) →
   hgood → 𝓑-set → characterEstimateData → card_G0_lower_bound。
+
+## 2026-07-04 cont.³⁵ — ★ ζ−ζ̄ A-support 完了 (hypothesis78_zeta_sub_conj_support)
+
+**Landed** (S09_FrobeniusConjIndex.lean, sorry-free): `hypothesis78_zeta_sub_conj_support` —
+`(ζ_zd − ζ_j₁).support ⊆ supportInSubgroup (sharpImage K) L` (equal-degree; conj は H外消失+degree
+[L:K]実で 1消失; `S04.mem_sharp` で H^# membership)。
+
+**残 = hab_supp の coherence connection + assembly**:
+- **hab_supp 本体**: `(ν(ζ_zd)−ν(ζ_j₁)).support ⊆ dadeSupport`。
+  - hnu: `hypothesis78_nu_eq` (h78.nu = F.coherence.extension、rfl)。
+  - S membership: ζ_zd, ζ_j₁ ∈ F.coherence の S (= sibleyDade.S)。hypothesis78 内 `hSmem` パターン
+    (S09_FrobeniusHypothesis78:171 `hSmem j hj : induce K (θ j) ∈ sibleyDade.S` for j≠ind1H) を
+    Frobenius-level に露出 or 再証明。ζ_zd: zetaDistinct(=0)≠ind1H。ζ_j₁: j₁≠ind1H (exists_conjIndex より)。
+  - `coherence_hagree_dadeMap (sibleyDade.dade) (.hconj) (F.coherence) (S-mem ζ_zd) (S-mem ζ_j₁)
+    (m0:=1)(mi:=1)(by norm_num)(di=1)(A-support)` → `toDadeMap ⟨ζ_zd − ζ_j₁, _⟩ = ν(ζ_zd) − 1•ν(ζ_j₁)`。
+  - `IsDadeMap.map_eq_zero_of_not_mem_dadeSupport` で toDadeMap image の support ⊆ dadeSupport。
+  - ※ h78.hyp76.hyp71.hyp = sibleyDade.dade (sibleyToHypothesis71.hyp より) → dadeSupport 一致。
+    toDadeMap = (dade.fullDadeIsometryData hconj).toDadeMap; その isDadeMap は fullDadeIsometryData
+    から。1•ν = ν (one_smul)。
+- **assembly**: `zetaImage_cross_eq_zero_of_conjIndex` を `F.hypothesis79 i j hij ...` に適用、両族に
+  hcoh(=F.coherence 再パッケージ)/hnu/hz_irr/j/hjne_ind/hj/hζne_conj/hab_supp 供給 → hzeta_cross →
+  (7.9) conclusion → card_G0_lower_bound。
