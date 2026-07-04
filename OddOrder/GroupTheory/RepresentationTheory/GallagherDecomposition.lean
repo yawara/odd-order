@@ -241,4 +241,31 @@ theorem induce_trivial_eq_sum_linearClassFunction [Finite K] [Fintype K]
   ext y
   rw [ClassFunction.mul_apply, trivialClassFunction_apply, one_mul]
 
+open scoped commutatorElement in
+/-- **The abelian-quotient restriction–induction identity** `Ind_H^K(Res_H ψ) = ∑_β ψ·Inf(β)`.
+Combines the projection formula (`ClassFunction.induce_restrict_mul`, with `χ = 1_H`, using
+`Res_H ψ · 1_H = Res_H ψ`) and `induce_trivial_eq_sum_linearClassFunction`.
+
+For `ψ ∈ Irr K` lying over `θ ∈ Irr H` this exhibits `Ind_H^K(Res ψ)` as `ψ` times the sum of the
+`[K:H]` linear characters of `K/H`; distributing (each `ψ·Inf(β)` has degree `ψ(1)`, `Inf(β)`
+linear) gives the constituent list of the general Peterfalvi (1.7.b), all constituents of common
+degree `ψ(1)`.  With `Res_H ψ = e·θ` (Clifford), `Ind_H^K(Res ψ) = e·Ind_H^K θ`, giving the
+equal-degree decomposition of `Ind_H^K θ` for an abelian quotient `K/H` — the fact Peterfalvi (12.5)
+needs at the `H'/H` level (`K/H` abelian automatic since `H' = [H,H]`), where the coprime Gallagher
+case does not apply.  (`ClassFunction` carries only `Mul`, not a semiring, so the sum is kept
+factored as `ψ · ∑`; downstream distribution is pointwise.) -/
+theorem induce_restrict_eq_mul_sum_linearClassFunction [Finite K] [Fintype K]
+    [Invertible (Nat.card K : ℂ)] [Invertible (Nat.card ↥H : ℂ)]
+    [Fintype ((K ⧸ H) →* ℂˣ)] (hab : ∀ x y : K, ⁅x, y⁆ ∈ H) (ψ : ClassFunction K ℂ) :
+    ClassFunction.induce H (ClassFunction.restrict H ψ)
+      = ψ * ∑ β : (K ⧸ H) →* ℂˣ, linearClassFunction (β.comp (QuotientGroup.mk' H)) := by
+  have key := ClassFunction.induce_restrict_mul (H := H) ψ (trivialClassFunction ↥H)
+  have e1 : ClassFunction.induce H (ClassFunction.restrict H ψ)
+      = ψ * ClassFunction.induce H (trivialClassFunction ↥H) := by
+    rw [← key]
+    congr 1
+    ext h
+    simp [ClassFunction.mul_apply, trivialClassFunction_apply]
+  rw [e1, induce_trivial_eq_sum_linearClassFunction hab]
+
 end OddOrder.RepresentationTheory
