@@ -4,6 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Yawara Ishida
 -/
 import OddOrder.Peterfalvi.S08_SixTwoGeneral
+import OddOrder.Peterfalvi.S13_SixTwoBridge
 import OddOrder.Peterfalvi.S12_MaximalIII_IV_V
 import OddOrder.GroupTheory.ElementaryAbelian
 
@@ -121,6 +122,11 @@ structure Hypothesis (M : Subgroup G) where
   /-- **(11.2)**: `C = C_U(H)`, the centralizer of `H` in `U`. -/
   C_eq_centralizer :
     C = base.typeP.U ⊓ Subgroup.centralizer (base.typeP.H : Set G)
+  /-- **(8.5.a) normality of `C`**: `M` normalizes `C`.  Discharge route for the producer:
+  `C` is the `π(H)`-complement `O_{π(H)'}(F(M))` of the Hall part `H = M_F` in the Fitting
+  subgroup `F(M) = H·C` (`TypePData.fitting_eq` + `C_eq_centralizer`), hence characteristic
+  in `F(M)` and normal in `M`. -/
+  C_normalized_by_M : M ≤ Subgroup.normalizer (C : Set G)
   Hprime : Subgroup G
   Hprime_eq : Hprime = derivedInG base.typeP.H
   Uprime : Subgroup G
@@ -187,6 +193,121 @@ theorem derivedU_le_C {M : Subgroup G} (hyp : Hypothesis M) :
   rw [show derivedInG hyp.base.typeP.U = ⁅hyp.base.typeP.U, hyp.base.typeP.U⁆
         from Subgroup.map_subtype_commutator hyp.base.typeP.U]
   exact OddOrder.Peterfalvi.S11.typeP_commutator_U_centralizes_H hyp.base.typeP
+
+/-- `H₀C ≤ M'`: both joinands lie in the derived subgroup (`H₀ ≤ H ≤ M'`, `C ≤ U ≤ M'`). -/
+theorem H0C_le_derived {M : Subgroup G} (hyp : Hypothesis M) :
+    hyp.H0C ≤ derivedInG M := by
+  refine sup_le ?_ (hyp.C_le_U.trans hyp.base.typeP.U_le)
+  have h1 : hyp.chief.H0 ≤ hyp.s11Setup.typeP.H := hyp.chief.H0_lt_H.le
+  rw [hyp.setup_typeP_eq] at h1
+  exact h1.trans hyp.base.typeP.H_le
+
+/-- `HC ≤ M'`. -/
+theorem HC_le_derived {M : Subgroup G} (hyp : Hypothesis M) :
+    hyp.HC ≤ derivedInG M :=
+  sup_le hyp.base.typeP.H_le (hyp.C_le_U.trans hyp.base.typeP.U_le)
+
+/-- **`M` normalizes `H₀C`** (`H₀ ⊴ M` from the chief data, `C ⊴ M` from (8.5.a)). -/
+theorem H0C_normalized_by_M {M : Subgroup G} (hyp : Hypothesis M) :
+    M ≤ Subgroup.normalizer ((hyp.H0C : Subgroup G) : Set G) :=
+  le_trans (le_inf hyp.chief.H0_normalized_by_M hyp.C_normalized_by_M)
+    (Subgroup.normalizer_inf_normalizer_le_normalizer_sup _ _)
+
+/-- **`M` normalizes `H = M_F`** (the maximal nilpotent normal Hall subgroup). -/
+theorem H_normalized_by_M [Finite G] {M : Subgroup G} (hyp : Hypothesis M) :
+    M ≤ Subgroup.normalizer ((hyp.H : Subgroup G) : Set G) := by
+  have h := (Subgroup.normal_subgroupOf_iff_le_normalizer
+    (OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_le M)).mp
+    (OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_subgroupOf_normal M)
+  show M ≤ Subgroup.normalizer ((hyp.base.typeP.H : Subgroup G) : Set G)
+  rw [hyp.base.typeP.H_eq]
+  exact h
+
+/-- **`M` normalizes `HC`**. -/
+theorem HC_normalized_by_M [Finite G] {M : Subgroup G} (hyp : Hypothesis M) :
+    M ≤ Subgroup.normalizer ((hyp.HC : Subgroup G) : Set G) :=
+  le_trans (le_inf hyp.H_normalized_by_M hyp.C_normalized_by_M)
+    (Subgroup.normalizer_inf_normalizer_le_normalizer_sup _ _)
+
+/-- `(H₀C).subgroupOf M` is normal in `↥M`. -/
+theorem H0C_subgroupOf_normal {M : Subgroup G} (hyp : Hypothesis M) :
+    ((hyp.H0C.subgroupOf M)).Normal :=
+  (Subgroup.normal_subgroupOf_iff_le_normalizer
+    (hyp.H0C_le_derived.trans (Subgroup.map_subtype_le _))).mpr hyp.H0C_normalized_by_M
+
+/-- `(HC).subgroupOf M` is normal in `↥M`. -/
+theorem HC_subgroupOf_normal [Finite G] {M : Subgroup G} (hyp : Hypothesis M) :
+    ((hyp.HC.subgroupOf M)).Normal :=
+  (Subgroup.normal_subgroupOf_iff_le_normalizer
+    (hyp.HC_le_derived.trans (Subgroup.map_subtype_le _))).mpr hyp.HC_normalized_by_M
+
+/-- `H ⊓ U = ⊥` (the `derived_complement` disjointness, ambient form). -/
+theorem H_inf_U_eq_bot {M : Subgroup G} (hyp : Hypothesis M) :
+    hyp.base.typeP.H ⊓ hyp.base.typeP.U = ⊥ := by
+  have hdisj := hyp.base.typeP.derived_complement.disjoint
+  rw [eq_bot_iff]
+  intro x hx
+  have hxM' : x ∈ derivedInG M := hyp.base.typeP.H_le hx.1
+  have h1 := hdisj.le_bot (⟨hx.1, hx.2⟩ :
+    (⟨x, hxM'⟩ : ↥(derivedInG M)) ∈ hyp.base.typeP.H.subgroupOf (derivedInG M) ⊓
+      hyp.base.typeP.U.subgroupOf (derivedInG M))
+  rw [Subgroup.mem_bot] at h1 ⊢
+  exact congrArg Subtype.val h1
+
+/-- The chief inequality `H₀ < H`, transported to the `base` type-`P` structure. -/
+theorem H0_lt_H {M : Subgroup G} (hyp : Hypothesis M) :
+    hyp.chief.H0 < hyp.base.typeP.H := by
+  have h : hyp.chief.H0 < hyp.s11Setup.typeP.H := hyp.chief.H0_lt_H
+  rwa [hyp.setup_typeP_eq] at h
+
+/-- **`H ⊄ H₀C`** — the (11.4)/(11.3) properness input: if `H ≤ H₀C` then, decomposing along
+the normal factor `H₀.subgroupOf M` inside `↥M` (`Subgroup.normal_mul`), any `h ∈ H ∖ H₀`
+splits as `h = a·b` with `a ∈ H₀`, `b ∈ C ⊓ H ≤ U ⊓ H = ⊥`, so `h = a ∈ H₀` — contradiction
+with the chief nontriviality `H₀ < H`. -/
+theorem H_not_le_H0C {M : Subgroup G} (hyp : Hypothesis M) :
+    ¬ hyp.base.typeP.H ≤ hyp.H0C := by
+  intro hle
+  haveI hH0n : ((hyp.chief.H0).subgroupOf M).Normal :=
+    (Subgroup.normal_subgroupOf_iff_le_normalizer
+      (hyp.H0_lt_H.le.trans (hyp.base.typeP.H_le.trans (Subgroup.map_subtype_le _)))).mpr
+      hyp.chief.H0_normalized_by_M
+  obtain ⟨h, hhH, hhH0⟩ := SetLike.exists_of_lt hyp.H0_lt_H
+  have hhM : h ∈ M :=
+    hyp.base.typeP.H_le.trans (Subgroup.map_subtype_le _) hhH
+  have hH0le : hyp.chief.H0 ≤ M :=
+    hyp.H0_lt_H.le.trans (hyp.base.typeP.H_le.trans (Subgroup.map_subtype_le _))
+  have hCle : hyp.C ≤ M :=
+    (hyp.C_le_U.trans hyp.base.typeP.U_le).trans (Subgroup.map_subtype_le _)
+  -- the trace of `h` lies in `H₀-trace ⊔ C-trace = H₀-trace · C-trace`
+  have hmem : (⟨h, hhM⟩ : ↥M) ∈
+      (hyp.chief.H0).subgroupOf M ⊔ hyp.C.subgroupOf M := by
+    rw [← Subgroup.subgroupOf_sup hH0le hCle]
+    exact Subgroup.mem_subgroupOf.mpr (hle hhH)
+  rw [← SetLike.mem_coe, Subgroup.normal_mul, Set.mem_mul] at hmem
+  obtain ⟨a, ha, b, hb, hab⟩ := hmem
+  -- `b = a⁻¹·h ∈ C ⊓ H = ⊥`
+  have hbC : ((b : ↥M) : G) ∈ hyp.C := Subgroup.mem_subgroupOf.mp hb
+  have haH0 : ((a : ↥M) : G) ∈ hyp.chief.H0 := Subgroup.mem_subgroupOf.mp ha
+  have hbH : ((b : ↥M) : G) ∈ hyp.base.typeP.H := by
+    have hbeq : (b : ↥M) = (a : ↥M)⁻¹ * ⟨h, hhM⟩ := by
+      rw [← hab]; group
+    have : ((b : ↥M) : G) = ((a : ↥M) : G)⁻¹ * h := by rw [hbeq]; rfl
+    rw [this]
+    exact Subgroup.mul_mem _ (Subgroup.inv_mem _ (hyp.H0_lt_H.le haH0)) hhH
+  have hbU : ((b : ↥M) : G) ∈ hyp.base.typeP.U := hyp.C_le_U hbC
+  have hb1 : ((b : ↥M) : G) = 1 := by
+    have := hyp.H_inf_U_eq_bot.le ⟨hbH, hbU⟩
+    rwa [Subgroup.mem_bot] at this
+  -- hence `h = a ∈ H₀`, contradiction
+  refine hhH0 ?_
+  have hha : h = ((a : ↥M) : G) := by
+    have h1 : (⟨h, hhM⟩ : ↥M) = a * b := hab.symm
+    have h2 : h = ((a * b : ↥M) : G) := congrArg Subtype.val h1
+    rw [h2]
+    show ((a : ↥M) : G) * ((b : ↥M) : G) = ((a : ↥M) : G)
+    rw [hb1, mul_one]
+  rw [hha]
+  exact haH0
 
 end Hypothesis
 
