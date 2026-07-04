@@ -497,3 +497,18 @@ coeff (X ∈ ℤ[R]) / Y ⊥ R。
   muGrid-def (toCertainTypeHypothesis 経由) に沿って評価)。
   成功すれば columnSum_diff の coh-free 版 → columnImageFamily' → named 2 点。
   PFsection9 FTtypeP_subcoherent の該当証明部を並走参照。
+
+### 追記 7 (loop 32 続): ★★ (4.8)(3) は §6 で coh-free 完全証明済み
+
+- `certainType_diff_dade_eq` (S06_CertainTypeIsometry:643):
+  **(μ_ij − μ_ik)^τ = δ_j·(ω_ij^σ − ω_ik^σ) — 証明済・coherence 不要**
+  (σ-係数 grid の (3.7)/(3.8) trichotomy で ψ=0; host h.tau.toDadeMap 版)。
+- よって残 plumbing の核心 = **host τ ↔ hyp.tau の橋**:
+  hyp.muGrid/alignedOmegaSigmaGrid は toCertainTypeHypothesis-host で定義済 →
+  certainType_diff_dade_eq を hyp.tau 版
+  `tau_muGrid_row_diff_cohFree` に翻訳する agreement lemma
+  (h.tau.toDadeMap vs dadeIntegralCharacterMap hyp.dadeData — 既存の
+  agreement を grep: tau_muGrid_columnSum_diff の証明が結局
+  何で host-τ を hyp.tau に接続していたかを alpha_tau_image 内部で確認)。
+- その後: 列和へ Finset.sum (既存 columnSum_diff の骨格流用) →
+  columnImageFamily の coh-free 版 → ofProjection → named 2 点閉。
