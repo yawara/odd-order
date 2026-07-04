@@ -1131,3 +1131,49 @@ core `constant_off_normal_of_inner_block_const` / `exists_induce_constituent_par
   core は inner(g,θ)、θ-coeff は inner(θ,restrict); g=restrict ゆえ inner(g,θ)=conj inner(θ,g))。
 - hmult: 等次数(helper) → Brick A。
 - 翻訳: g(x)=(chiRhoCF psi)(x:L) via restrict_apply; x∉H_core ⟺ h∉Hprime (bridge)。
+
+### loop¹⁸⁶⁻¹⁸⁹ — (12.5) 全 ingredient 完成 (bridge+self-constituent+orthogonality) — 残 = main restate のみ
+
+**この iteration (3 commit)**: (12.5) wiring の残り material を全 landing (全 green)。
+- `mem_commutator_subgroupOf_iff` (S14): x∈commutator ↥(H.subgroupOf L) ↔ (x:G)∈derivedInG H (bridge、一発 green)。
+- `Sset_self_mem_constituents` (S14): Frobenius χ∈S は自身の constituent (∃φ∈constituents, ↑φ=χ)。
+- `Sset_inner_coherent_extension_eq_zero` (S14): ψ⊥R(χ) ⟹ ⟨ψ,coh.extension χ⟩=0 (orthogonality 供給)。
+  **注**: FiniteInduce scoped instance で coh を inner_psi_... と一致させる (open scoped ... in は docstring 前)。
+
+**(12.5) ingredient 全リスト (全 committed・green)**:
+RepTheory: `constant_off_normal_of_inner_block_const` (core) / `exists_induce_constituent_partition` (block char付) /
+`inner_induce_constituent_eq_of_apply_one_eq` (等mult) / `commutator_induce_constituents_apply_one_eq` (等次数) /
+`exists_liesOver_of_subgroup` (ψ存在)。
+S14: `mem_commutator_subgroupOf_iff` (bridge) / `Sset_self_mem_constituents` / `Sset_inner_coherent_extension_eq_zero` /
+`chiRhoCF_restrict_inner_eq_of_equal_degree` (θ-coeff)。
+
+**残 = main restate のみ** (`rho_constant_on_H_minus_Hprime`、unconsumed 確認済 ⟹ 旧 2683 削除 + helper 群の後へ新設):
+```
+新 signature (open scoped FiniteInduce in、helper 群の後に配置):
+  (hyp) (coh : IsCoherent hyp.tau hyp.Sset hyp.A) (hAH : ambientA = (hyp.H:Set G)\{1})
+  {C} (hfrob : IsFrobeniusGroup ↥L ((hyp.typeI.typeF.H).subgroupOf L) C)
+  (data) {psi} (horth : ∀χ∈Sset,∀α∈Rset,inner psi α=0) :
+  ∀ h1∈H, h1∉Hprime, ∀ h2∈H, h2∉Hprime,
+    (chiRhoCF psi)⟨h1,H_le _⟩ = (chiRhoCF psi)⟨h2,H_le _⟩
+証明:
+  set HH := (hyp.H).subgroupOf L; G_c := ↥HH; H_c := commutator ↥HH; g := restrict HH (chiRhoCF psi)
+  haveI 群: Finite/Fintype ↥HH, Invertible(card ↥HH:ℂ), Fintype(Irr ↥HH),
+           Fintype/Invertible ↥(commutator ↥HH) (ofFinite/invertibleOfNonzero)
+  x := ⟨⟨h1,hh1L⟩, mem_subgroupOf.mpr hh1⟩ : ↥HH; 同 y
+  hx : x∉commutator via (mem_commutator_subgroupOf_iff H_le x).not ← h1∉Hprime ((x:↥L:G)=h1)
+  goal (chiRhoCF psi)⟨h1⟩=(chiRhoCF psi)⟨h2⟩ を restrict_apply で g x = g y へ
+  refine constant_off_normal_of_inner_block_const g ?hcoeff ?hmult hx hy
+  hcoeff θ₁ θ₂ ρ hne1 hne2 hlo1 hlo2:
+    hdeg := commutator_induce_constituents_apply_one_eq ρ θ₁ θ₂ hlo1 hlo2 (θ₁(1)=θ₂(1))
+    hχᵢmem := ⟨θᵢ, hneᵢ, rfl⟩ : induce HH θᵢ ∈ Sset
+    hdegχ: induce_apply_one → (induce HH θ₁)(1)=(induce HH θ₂)(1)
+    horthᵢ := Sset_inner_coherent_extension_eq_zero hyp coh hfrob data horth hχᵢmem
+    hθcoeff := chiRhoCF_restrict_inner_eq_of_equal_degree hyp coh hχ₁mem hχ₂mem hdegχ hAH horth1 horth2 rfl rfl
+      : inner θ₁ (restrict HH (chiRhoCF psi)) = inner θ₂ (...)  [= inner θᵢ g]
+    core は inner g θ ⟹ conj 変換: inner g θ = conj(inner θ g) (inner_conj_symm) 両辺
+  hmult θ₁ θ₂ ρ hlo1 hlo2:
+    hdeg := commutator_induce_constituents_apply_one_eq ρ θ₁ θ₂ hlo1 hlo2
+    inner_induce_constituent_eq_of_apply_one_eq hlo1 hlo2 hdeg  [N=commutator ↥HH, Brick A]
+```
+**要検証**: (a) x:↥HH の (x:↥L:G)=h1 coercion; (b) restrict_apply で g x=(chiRhoCF psi)(x:↥L);
+(c) inner 変換 conj (core=inner g θ vs θ-coeff=inner θ g); (d) instance 解決 (特に Fintype(Irr ↥HH))。
