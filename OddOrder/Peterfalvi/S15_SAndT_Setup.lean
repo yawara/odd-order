@@ -2481,6 +2481,55 @@ theorem lambda_tau1_sharp_norm_lower [Finite G] (_hG : OddOrder.BG.IsMinimalSimp
   rwa [sum_apply_erase_one_filter_subgroupOf hHS
     (fun y => ‖chars.tau1S chars.lambda y‖ ^ 2)] at hengine
 
+open scoped Classical in
+/-- `F`-parameterized form of `sum_filter_erase_one_normSq_eq` (instance-free interface): any
+`Finset` with the sharp-membership characterization works. -/
+theorem sum_finset_sharp_normSq_eq {L : Type*} [Group L] [Fintype L]
+    {K : Subgroup L} [Fintype ↥K] [Invertible (Nat.card ↥K : ℂ)]
+    (F : Finset L) (hF : ∀ x : L, x ∈ F ↔ (x ∈ K ∧ x ≠ 1))
+    (f : L → ℂ) (ψ : ClassFunction ↥K ℂ) (hagree : ∀ k : ↥K, f ↑k = ψ k)
+    {n : ℕ} (hn : ClassFunction.inner ψ ψ = (n : ℂ)) :
+    ∑ x ∈ F, ‖f x‖ ^ 2 = (Nat.card ↥K : ℝ) * (n : ℝ) - ‖f 1‖ ^ 2 := by
+  classical
+  have hFeq : F = (Finset.univ.filter (· ∈ K)).erase 1 := by
+    ext x
+    rw [hF, Finset.mem_erase, Finset.mem_filter]
+    exact ⟨fun ⟨h1, h2⟩ => ⟨h2, Finset.mem_univ _, h1⟩, fun ⟨h2, _, h1⟩ => ⟨h1, h2⟩⟩
+  rw [hFeq]
+  exact sum_filter_erase_one_normSq_eq f ψ hagree hn
+
+open scoped Classical in
+/-- `F`-parameterized form of `sum_apply_erase_one_filter_subgroupOf` (instance-free
+interface). -/
+theorem sum_finset_sharp_transport [Finite G] {M : Type*} [AddCommMonoid M]
+    {K L : Subgroup G} [Fintype ↥L] (hKL : K ≤ L)
+    (F : Finset ↥L) (hF : ∀ x : ↥L, x ∈ F ↔ ((x : G) ∈ K ∧ x ≠ 1))
+    (f : G → M) :
+    ∑ x ∈ F, f ↑x = ∑ x ∈ (Set.toFinite (sharpSubgroup K)).toFinset, f x := by
+  classical
+  have hFeq : F = (Finset.univ.filter (· ∈ K.subgroupOf L)).erase 1 := by
+    ext x
+    rw [hF, Finset.mem_erase, Finset.mem_filter, Subgroup.mem_subgroupOf]
+    exact ⟨fun ⟨h1, h2⟩ => ⟨h2, Finset.mem_univ _, h1⟩, fun ⟨h2, _, h1⟩ => ⟨h1, h2⟩⟩
+  rw [hFeq]
+  exact sum_apply_erase_one_filter_subgroupOf hKL f
+
+open scoped OddOrder.Peterfalvi.S15.FiniteInduce Classical in
+/-- `F`-parameterized form of `H_sharp_alphaFun_inflation` (instance-free interface). -/
+theorem H_sharp_alphaFun_inflation_finset [Fintype G] [Invertible (Nat.card G : ℂ)]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
+    (χ : ClassFunction G ℂ)
+    (F : Finset ↥hyp.S) (hF : ∀ x : ↥hyp.S, x ∈ F ↔ ((x : G) ∈ hyp.H ∧ x ≠ 1)) :
+    ((hyp.p ^ hyp.q - 1 : ℕ) : ℝ) * ‖H_sharp_alphaFun hG hyp χ 1‖ ^ 2
+      ≤ ∑ x ∈ F, ‖H_sharp_alphaFun hG hyp χ x‖ ^ 2 := by
+  classical
+  have hFeq : F = (Finset.univ.filter (· ∈ hyp.H.subgroupOf hyp.S)).erase 1 := by
+    ext x
+    rw [hF, Finset.mem_erase, Finset.mem_filter, Subgroup.mem_subgroupOf]
+    exact ⟨fun ⟨h1, h2⟩ => ⟨h2, Finset.mem_univ _, h1⟩, fun ⟨h2, _, h1⟩ => ⟨h1, h2⟩⟩
+  rw [hFeq]
+  exact H_sharp_alphaFun_inflation hG hyp χ
+
 open scoped OddOrder.Peterfalvi.S15.FiniteInduce Classical in
 /-- **The (13.5) orthogonality hypothesis for `χ = η₁₀`** (Peterfalvi (13.7), first step):
 `η₁₀` is orthogonal to `S^{τ₁}` by (5.3.b)+(5.5)+(13.3.c), so *every* `P`-non-kernel (7.7.a)
@@ -2599,7 +2648,151 @@ theorem exists_caseB_data_eta10 [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd
       (∑ x ∈ (Set.toFinite (sharpSubgroup hyp.H)).toFinset, ‖α x‖ ^ 2 = (s : ℝ)) ∧
       1 ≤ n ∧ s + d ^ 2 = Nat.card ↥hyp.H * n ∧
       (hyp.p ^ hyp.q - 1) * d ^ 2 ≤ s ∧ (n = 1 → d ^ 2 = 1) := by
-  sorry
+  haveI : Fintype G := Fintype.ofFinite G
+  haveI : Invertible (Nat.card G : ℂ) :=
+    invertibleOfNonzero (Nat.cast_ne_zero.mpr Nat.card_pos.ne')
+  set αS : ↥hyp.S → ℂ := H_sharp_alphaFun _hG hyp hyp.eta10 with hαSdef
+  have hHS : hyp.H ≤ hyp.S := by
+    have hUS : hyp.U ≤ hyp.S := by
+      have h1 : hyp.U ≤ derivedInG hyp.S := by rw [hyp.S_deriv_eq_PU]; exact le_sup_right
+      exact le_trans h1 (Subgroup.map_subtype_le _)
+    show hyp.P ⊔ hyp.C ≤ hyp.S
+    refine sup_le ?_ ?_
+    · rw [hyp.P_eq_SF]; exact OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_le hyp.S
+    · rw [hyp.C_eq]; exact le_trans inf_le_left hUS
+  refine ⟨fun g => if h : g ∈ hyp.S then αS ⟨g, h⟩ else 0, ?_⟩
+  set K : Subgroup ↥hyp.S := (H_sharp_hypothesis76 _hG hyp).H.subgroupOf hyp.S with hKdef
+  haveI : Fintype ↥K := FiniteInduce.finiteSubFintype K
+  -- The single sharp `Finset` all bookkeeping runs through.
+  set F : Finset ↥hyp.S := (Finset.univ.filter (· ∈ K)).erase 1 with hFdef
+  have hFK : ∀ x : ↥hyp.S, x ∈ F ↔ (x ∈ K ∧ x ≠ 1) := fun x => by
+    rw [hFdef, Finset.mem_erase, Finset.mem_filter]
+    exact ⟨fun ⟨h1, _, h2⟩ => ⟨h2, h1⟩, fun ⟨h2, h1⟩ => ⟨h1, Finset.mem_univ _, h2⟩⟩
+  have hFH : ∀ x : ↥hyp.S, x ∈ F ↔ ((x : G) ∈ hyp.H ∧ x ≠ 1) := fun x => by
+    rw [hFK]
+    exact and_congr_left (fun _ => Subgroup.mem_subgroupOf)
+  set ψ : ClassFunction ↥K ℂ :=
+    ClassFunction.restrict K (H_sharp_alphaCF _hG hyp hyp.eta10) with hψdef
+  have hψZ : ψ ∈ ZIrr ↥K :=
+    H_sharp_alphaCF_restrict_mem_ZIrr _hG hyp hyp.eta10 (eta10_cCoeff_int _hG hyp)
+  obtain ⟨n, hn⟩ := exists_nat_inner_self_of_mem_ZIrr hψZ
+  obtain ⟨z, hz⟩ := OddOrder.Algebra.exists_int_apply_one_of_mem_ZIrr hψZ
+  have hψ1 : ψ 1 = αS 1 := by
+    rw [hψdef, ClassFunction.restrict_apply, OneMemClass.coe_one, H_sharp_alphaCF_apply]
+  have hcardK : Nat.card ↥K = Nat.card ↥hyp.H := by
+    rw [hKdef]
+    exact Nat.card_congr (Subgroup.subgroupOfEquivOfLe
+      (show (H_sharp_hypothesis76 _hG hyp).H ≤ hyp.S from hHS)).toEquiv
+  set d : ℕ := z.natAbs with hddef
+  have hagree : ∀ k : ↥K, αS ↑k = ψ k := fun k => by
+    rw [hψdef, ClassFunction.restrict_apply, H_sharp_alphaCF_apply]
+  -- Bookkeeping over `F`.
+  have hbook := sum_finset_sharp_normSq_eq (K := K) F hFK αS ψ hagree hn
+  have hα1 : ‖αS 1‖ ^ 2 = (d : ℝ) ^ 2 := by
+    have h2 : ((d : ℕ) : ℝ) ^ 2 = ((z : ℝ)) ^ 2 := by
+      rw [hddef]
+      have h0 : (((z.natAbs ^ 2 : ℕ) : ℤ) : ℝ) = ((z ^ 2 : ℤ) : ℝ) := by
+        exact_mod_cast Int.natAbs_sq z
+      push_cast at h0
+      rw [Int.cast_natAbs, Int.cast_abs]
+      exact h0
+    rw [← hψ1, hz, Complex.norm_intCast, sq_abs, ← h2]
+  have hsharp_nonneg : (0 : ℝ) ≤ ∑ x ∈ F, ‖αS x‖ ^ 2 :=
+    Finset.sum_nonneg (fun x _ => by positivity)
+  have hd2n : d ^ 2 ≤ Nat.card ↥hyp.H * n := by
+    have h0 := hsharp_nonneg
+    rw [hbook] at h0
+    have h1 : (d : ℝ) ^ 2 ≤ (Nat.card ↥hyp.H : ℝ) * (n : ℝ) := by
+      rw [← hα1, ← hcardK]
+      linarith [h0]
+    exact_mod_cast h1
+  set s : ℕ := Nat.card ↥hyp.H * n - d ^ 2 with hsdef
+  have hsval : (s : ℝ) = (Nat.card ↥hyp.H : ℝ) * (n : ℝ) - (d : ℝ) ^ 2 := by
+    rw [hsdef, Nat.cast_sub hd2n]
+    push_cast
+    ring
+  have hFsum : ∑ x ∈ F, ‖αS x‖ ^ 2 = (s : ℝ) := by
+    rw [hbook, hα1, hsval, hcardK]
+  -- Transport to the ambient sharp set.
+  have hglue := sum_finset_sharp_transport (K := hyp.H) (L := hyp.S) hHS F hFH
+    (fun g : G => ‖if h : g ∈ hyp.S then αS ⟨g, h⟩ else 0‖ ^ 2)
+  have hGside : ∑ x ∈ (Set.toFinite (sharpSubgroup hyp.H)).toFinset,
+      ‖if h : x ∈ hyp.S then αS ⟨x, h⟩ else 0‖ ^ 2 = (s : ℝ) := by
+    rw [← hglue, ← hFsum]
+    refine Finset.sum_congr rfl (fun x hx => ?_)
+    have hxS : ((x : ↥hyp.S) : G) ∈ hyp.S := x.2
+    rw [dif_pos hxS]
+  refine ⟨d, n, s, ?_, hGside, ?_, ?_, ?_, ?_⟩
+  · -- The point formula: `η₁₀ = α` on `H^#`.
+    intro x hx
+    obtain ⟨hxH, hx1⟩ := (Set.Finite.mem_toFinset _).mp hx
+    have hxS : x ∈ hyp.S := hHS hxH
+    show hyp.eta10 x = if h : x ∈ hyp.S then αS ⟨x, h⟩ else 0
+    rw [dif_pos hxS]
+    have hxsharp : ((⟨x, hxS⟩ : ↥hyp.S) : G) ∈
+        OddOrder.Peterfalvi.S04.sharp (hyp.H : Set G) :=
+      OddOrder.Peterfalvi.S04.mem_sharp.mpr ⟨hxH, hx1⟩
+    have hpt := H_sharp_point_formula_kernel_only _hG hyp hyp.eta10
+      (eta10_cCoeff_orthogonal _hG hyp) ⟨x, hxS⟩ hxsharp
+    rw [hpt]
+    rfl
+  · -- `1 ≤ n`: else `ψ = 0` pointwise, contradicting `α(1) ≠ 0`.
+    by_contra hn0
+    push_neg at hn0
+    have hn00 : n = 0 := by omega
+    subst hn00
+    have hzero : ∑ k : ↥K, ‖ψ k‖ ^ 2 = 0 := by
+      have h := sum_normSq_eq_card_mul_inner (H := ↥K) ψ
+      rw [hn] at h
+      have h0 : ((∑ k : ↥K, ‖ψ k‖ ^ 2 : ℝ) : ℂ) = 0 := by rw [h]; push_cast; ring
+      exact_mod_cast h0
+    have hψ10 : ψ 1 = 0 := by
+      have h1 : ‖ψ 1‖ ^ 2 = 0 := by
+        have hle : ‖ψ 1‖ ^ 2 ≤ ∑ k : ↥K, ‖ψ k‖ ^ 2 :=
+          Finset.single_le_sum (f := fun k : ↥K => ‖ψ k‖ ^ 2)
+            (fun k _ => by positivity) (Finset.mem_univ 1)
+        have hge : (0 : ℝ) ≤ ‖ψ 1‖ ^ 2 := by positivity
+        linarith [hzero ▸ hle]
+      have h2 := pow_eq_zero_iff (n := 2) (by norm_num) |>.mp h1
+      simpa using h2
+    refine eta10_alphaCF_one_ne_zero _hG hyp ?_
+    rw [hψdef, ClassFunction.restrict_apply, OneMemClass.coe_one,
+      H_sharp_alphaCF_apply] at hψ10
+    rw [← H_sharp_alphaCF_apply _hG hyp hyp.eta10 1] at hψ10
+    exact hψ10
+  · -- Parseval: `s + d² = |H|·n`.
+    omega
+  · -- Inflation: `(p^q − 1)·d² ≤ s`.
+    have hinfl := H_sharp_alphaFun_inflation_finset _hG hyp hyp.eta10 F hFH
+    have h1 : ((hyp.p ^ hyp.q - 1 : ℕ) : ℝ) * (d : ℝ) ^ 2 ≤ (s : ℝ) := by
+      rw [← hα1, ← hFsum]
+      exact hinfl
+    exact_mod_cast h1
+  · -- `n = 1 → d² = 1`: `ψ` is `±` an irreducible of the abelian `K`, hence linear.
+    intro hn1
+    subst hn1
+    have hn' : ClassFunction.inner ψ ψ = 1 := by rw [hn]; norm_num
+    obtain ⟨ε, ξ, hε, hψeq⟩ :=
+      OddOrder.RepresentationTheory.exists_zsmul_irreducibleCharacter_of_inner_self_one hψZ hn'
+    haveI : IsMulCommutative ↥K := by
+      have hH := hyp.H_mulCommutative _hG
+      have e := Subgroup.subgroupOfEquivOfLe
+        (show (H_sharp_hypothesis76 _hG hyp).H ≤ hyp.S from hHS)
+      exact ⟨⟨fun a b => e.injective (by
+        rw [map_mul, map_mul]
+        exact hH.is_comm.comm (e a) (e b))⟩⟩
+    have hξ1 : (ξ : ClassFunction ↥K ℂ) 1 = 1 :=
+      OddOrder.RepresentationTheory.IsIrreducibleCharacter.apply_one_eq_one_of_isMulCommutative
+        ξ.2
+    have hz2 : (z : ℂ) = (ε : ℂ) := by
+      rw [← hz, hψeq,
+        show ((ε • (ξ : ClassFunction ↥K ℂ)) 1) = (ε : ℂ) * (ξ : ClassFunction ↥K ℂ) 1 from by
+          rw [← Int.cast_smul_eq_zsmul ℂ, ClassFunction.smul_apply],
+        hξ1, mul_one]
+    have hzε : z = ε := by exact_mod_cast hz2
+    rcases hε with h | h <;>
+      · rw [hddef, hzε, h]
+        rfl
 
 /-- **Peterfalvi (13.7), textbook form**: `∑_{x∈H^#}|η₁₀(x)|² ≥ |H^#|`, as a sum over the
 ambient sharp `H^# ⊂ G`.
