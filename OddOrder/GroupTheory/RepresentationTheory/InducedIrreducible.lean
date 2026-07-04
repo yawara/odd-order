@@ -541,6 +541,22 @@ theorem apply_one_ne_zero_of_mem_ZIrr_of_inner_self_one
   · rcases hε with h | h <;> subst h <;> norm_num
   · exact_mod_cast hd.ne'
 
+/-- A norm-`1` virtual character has degree of absolute value at least `1`: `φ = ε • ξ` with
+`ε = ±1` and `ξ` irreducible, so `‖φ(1)‖ = ξ(1) ≥ 1`.  The quantitative form of
+`apply_one_ne_zero_of_mem_ZIrr_of_inner_self_one`, feeding the `‖φ(1)‖²/|G| ≥ 1/|G|` term of the
+Peterfalvi (13.10.1)/(13.10.2) Parseval estimates. -/
+theorem one_le_normSq_apply_one_of_mem_ZIrr_of_inner_self_one
+    {φ : ClassFunction Γ ℂ} (hφ : φ ∈ ZIrr Γ)
+    (hφn : ClassFunction.inner φ φ = 1) : 1 ≤ ‖φ (1 : Γ)‖ ^ 2 := by
+  obtain ⟨ε, ξ, hε, rfl⟩ := exists_zsmul_irreducibleCharacter_of_inner_self_one hφ hφn
+  obtain ⟨d, hd, hd1⟩ := irreducibleCharacter_apply_one_eq_pos_natCast ξ
+  rw [← Int.cast_smul_eq_zsmul ℂ ε (ξ : ClassFunction Γ ℂ), ClassFunction.smul_apply, hd1,
+    norm_mul]
+  have hε1 : ‖(ε : ℂ)‖ = 1 := by rcases hε with h | h <;> subst h <;> norm_num
+  rw [hε1, one_mul, Complex.norm_natCast]
+  have hd' : (1 : ℝ) ≤ (d : ℝ) := by exact_mod_cast hd
+  nlinarith
+
 /-- Two signed irreducibles with nonzero inner product are equal up to that inner product:
 `ψ = ⟨φ, ψ⟩ • φ`.  (Writing `φ = ε•a`, `ψ = ε'•b`, the inner product `εε'·(a = b)` is nonzero only
 if `a = b`, in which case `⟨φ,ψ⟩ = εε'` and `εε'·ε = ε'` since `ε² = 1`.) -/
