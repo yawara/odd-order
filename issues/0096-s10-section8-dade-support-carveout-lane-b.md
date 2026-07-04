@@ -934,3 +934,38 @@ h_psix の実 route は ρL。
 (M の adjointAverageFun + norm 下界 + cyclotomic) で結合、hA-C は §7。**sustained focused work 要**
 (rapid /loop でなく dedicated session 向き)。**session milestones (strong)**: (12.14) sorry-free +
 reusable toolkit + h_psix cyclotomic。残 = ρM machinery build (multi-session)。measured pace 継続。
+
+### loop¹⁵⁶ — (12.5) へ上流ピボット: Fact-A 材料は**全て存在**、3 component landed
+
+**方針転換 (上流優先+文書順)**: 深い (12.16) を grind し続けず、**より上流の (12.5)
+`rho_constant_on_H_minus_Hprime`** (文書順 12.5 < 12.15) に降りた。原文+Coq PFsection12
+(`FtypeI_invDade_ortho_constant` L417) 精読で真の証明構造を確定:
+- **step 3 (o_rpsi_S)**: coherence + Dade 相互律 ⟹ `⟨ρψ, χ₁−χ₂⟩=0` (等次数)、∴ `⟨ρψ,θ⟩` は θ(1) のみ依存。
+- **step 5 (DpsiH)**: `Res_H(ρψ) = Σ_λ a_λ Ind_{H'}^H λ + a·1_H` (Clifford partition P、trivIset/cover)。
+- **step 6**: Ind_{H'}^H λ は H−H' で消える ⟹ 定数。
+
+**重要訂正**: 従来 docstring の **InHKernel (L-level) γ/β 分割は dead-end** — Peterfalvi は Irr H で
+分解 (Irr L 分割でない)、Res_H φ (off-L-kernel) は H−H' 構造を尊重しない。β const は full 結論と等価
+(循環)。かつ statement は plain `psi` だが Coq は `rho psi`(=invDade=chiRhoCF)を結論 — **要 restate**
+(consumer 無し ⟹ 自由)。
+
+**Fact-A 材料は全て存在** (過度悲観を再訂正、(12.14) unblock と同型):
+- 相互律 `chiRho_adjoint` (S09_NonexistenceCertain:353): `⟨τα,χ⟩_G = ⟨α, χ^ρ⟩_L`、ρ=`H71.chiRhoCF`
+  (=`hyp.toHypothesis71.chiRhoCF`)。**proven**。
+- `coherent_extension_constituent_mem_span_Rset` (S14:1808): `coh.extension φ ∈ ℤ[Rset]`。
+- `IsCoherent.extends_on_supported`: `extension φ = hyp.tau φ` (φ ∈ zSupportedSpan)。
+- **NEW landed this iter**: `inner_psi_coherent_extension_eq_zero` (S14) = `⟨ψ, coh.extension φ⟩=0`
+  (ψ⊥Rset)。step-3 の `'[psi,tau2 xi]=0` 相当。
+
+**this iter landed (build-green, 2 commit)**:
+1. `sum_smul_induce_apply_eq_zero_of_not_mem_normal` (InducedCharacter) — step 6、Σ Ind vanish off normal。
+2. `apply_eq_of_eq_sum_smul_induce_add_const` (InducedCharacter) — step 6 reduction (const off normal)。
+   (12.5) と (12.15) rhoM 両方の endgame。
+3. `inner_psi_coherent_extension_eq_zero` (S14) — Fact-A の直交 component。
+
+**次 iteration = full Fact-A build** `⟨ρψ,χ₁⟩=⟨ρψ,χ₂⟩` (等次数): 上記材料を wire。
+**残る wiring 課題** (careful, fresh context 向き): (a) χ₁−χ₂ を `SupportedClassFunctions ℂ A L`
+に構成 (等次数 ⟹ degree-0、supported on A=H^#)、(b) **τ-層 bridging** `H71.τ`(DadeMap) ↔ `hyp.tau`
+(IntegralCharacterMap) ↔ `coh.extension` via extends_on_supported、(c) **A-set 型** `chiRho_adjoint` の
+A:Set G (typeIA) vs `IsCoherent` の A:Set ↥L (supportInSubgroup) の橋渡し。
+Fact-A 後も **Clifford partition (step 5)** が残る = (12.5) は multi-iteration (材料は揃った)。
