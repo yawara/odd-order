@@ -1229,3 +1229,31 @@ of_zeta_irreducible_of_isCoherent_parity` (S09_Nonex:4094, 他 input 全済) →
 の Bsum_le field** (5 field bundle: i/hmin/B/B_avoids_min/Bsum_le/base_estimate; S09_Nonex:5560) → hdata →
 `card_G0_lower_bound` (6561 の sorry)。定量 assembly (min-index 選択 + 𝓑-set + base_estimate via (7.5))
 は別 strand で残る。
+
+---
+
+## cont.⁴⁶ — generic delta_isReal DONE (commit); hbeta_conj_sub 完全 mapped (全 bridge 所在確認)
+
+**commit (delta_isReal)**: generic `Hypothesis78.delta_isReal` (S09_FrobeniusConjIndex, sorry-free)。
+`hbeta_conj_sub : β̄−β = νζ−νζ̄` と `hnu_conj : (νζ)‾=ν(ζ̄)` から純代数で `Δ=β−1_G+νζ` real:
+`Δ̄−Δ = (β̄−β)+((νζ)‾−νζ) = (νζ−νζ̄)+(νζ̄−νζ) = 0` (conj_add/conj_sub + abel、1_G real は drop)。
+delta-reality の代数核を wrapper-plumbing から分離。2 input は Frobenius caller 供給。
+
+**残 = Frobenius `hbeta_conj_sub` (`β̄−β = νζ_dist − νζ_dist.conj`) — 全 bridge 所在確認済、~80 行 multi-defeq**:
+route (additivity 要ゆえ dadeIntegralCharacterMap LinearMap 経由):
+- `beta = dadeIntegralCharacterMap hyp dade (ζ_ind−ζ_dist)` — bridge:
+  `sibleyToHypothesis71.τ = (fullDadeIsometryData hconj).toDadeIsometryData.toDadeMap`
+  `= hyp.dadeMap` (**`Hypothesis.dadeIsometryData_toDadeMap` S04:4124** + toDadeIsometryData defeq S04:4317)
+  `= dadeIntegralCharacterMap hyp dade ·` (**`dadeIntegralCharacterMap_apply_of_support`** S07)
+- `beta.conj = dadeIntegralCharacterMap hyp dade (ζ_ind−ζ̄)` — **`dadeIntegralCharacterMap_mapRingEquiv_comm`**
+  (S07_CoherenceGalois:51) at conjAe + ζ_ind real (`induce_apply_one_star` / Ind 1_H real) + bridge
+  `X.conj = mapRingEquiv conjAe X`
+- `β̄−β = dadeIntegralCharacterMap hyp dade ((ζ_ind−ζ̄)−(ζ_ind−ζ_dist)) = ·(ζ_dist−ζ̄)` — **`LinearMap.map_sub`**
+- `·(ζ_dist−ζ̄) = νζ_dist − νζ_dist.conj` — **`coherence_hagree_dadeMap`** (ζi=ζ_dist, ζ0=ζ̄, di=1 ∵ 等次数;
+  ζ_dist,ζ̄∈S ✓ ∵ `exists_conjIndex_hypothesis78`+`S_closedUnderConjugate`) + `hypothesis78_nu_eq` +
+  support `hypothesis78_zeta_sub_conj_support` (S09_FrobeniusConjIndex:224)
+注意: ζ_ind∉S ゆえ agreement を ζ_ind に直接使えない → additivity で ζ_dist−ζ̄ (両∈S) に畳む route が必須。
+
+**その後**: hbeta_conj_sub + hnu_conj ((B) via nu_eq) → delta_isReal (両 family) + delta_orth_one →
+`cfdot_real_vchar_even` → hdelta_even → (7.9) conclusion → hgood → CharacterEstimateData.Bsum_le →
+hdata → card_G0_lower_bound。定量 assembly (min-index/𝓑-set/base_estimate via (7.5)) は別 strand。
