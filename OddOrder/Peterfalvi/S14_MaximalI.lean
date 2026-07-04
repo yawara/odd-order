@@ -2641,6 +2641,30 @@ theorem orthogonal_character_constant_on_coset {L : Subgroup G} [Finite G]
   have hgx : gf xL = psi x := by rw [hgf, ClassFunction.restrict_apply]
   rw [← hgxh, ← hgx]; exact key
 
+/-- **Commutator bridge for the (12.5) core.**  For `H ≤ L` (subgroups of `G`), an element `x` of
+`↥(H.subgroupOf L)` lies in the derived subgroup `[G_core, G_core]` of `G_core := ↥(H.subgroupOf L)`
+iff its underlying `G`-element lies in `derivedInG H = [H, H]`.  Via the `MulEquiv`
+`subgroupOfEquivOfLe : ↥(H.subgroupOf L) ≃* ↥H` (which preserves the commutator subgroup) and
+`(derivedInG H).subgroupOf H = commutator ↥H`.  Lets the generic `DpsiH` core (whose `H_core` is
+`commutator G_core`) translate its `x ∉ H_core` conclusion back to `h ∉ Hprime`. -/
+theorem mem_commutator_subgroupOf_iff {L H : Subgroup G} (hHL : H ≤ L)
+    (x : ↥(H.subgroupOf L)) :
+    x ∈ commutator ↥(H.subgroupOf L) ↔ ((x : ↥L) : G) ∈ derivedInG H := by
+  have hcomm_H : (derivedInG H).subgroupOf H = commutator ↥H := by
+    rw [derivedInG, Subgroup.subgroupOf,
+      Subgroup.comap_map_eq_self_of_injective H.subtype_injective]
+  set e := Subgroup.subgroupOfEquivOfLe hHL with he
+  have hmap : commutator ↥H = (commutator ↥(H.subgroupOf L)).map e.toMonoidHom := by
+    rw [commutator, commutator, Subgroup.map_commutator,
+      Subgroup.map_top_of_surjective _ e.surjective]
+  have hcoe : ((e x : ↥H) : G) = ((x : ↥L) : G) := rfl
+  have hstep1 : x ∈ commutator ↥(H.subgroupOf L) ↔ e x ∈ commutator ↥H := by
+    rw [hmap]
+    exact (Subgroup.mem_map_iff_mem e.injective).symm
+  have hstep2 : e x ∈ commutator ↥H ↔ ((e x : ↥H) : G) ∈ derivedInG H := by
+    rw [← hcomm_H, Subgroup.mem_subgroupOf]
+  rw [hstep1, hstep2, hcoe]
+
 open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
 /-- **Peterfalvi (12.5)**: after the rho-reduction, a class function `ψ` orthogonal
 to every type-I family `R(χ)` is **constant on `H − H'`** (any two points of `H ∖ H'` take the
