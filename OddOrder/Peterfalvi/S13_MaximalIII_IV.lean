@@ -5,6 +5,7 @@ Authors: Yawara Ishida
 -/
 import OddOrder.Peterfalvi.S08_SixTwoGeneral
 import OddOrder.Peterfalvi.S13_SixTwoBridge
+import OddOrder.GroupTheory.MaximalSubgroupTypeConj
 import OddOrder.Peterfalvi.S12_MaximalIII_IV_V
 import OddOrder.GroupTheory.ElementaryAbelian
 
@@ -548,6 +549,37 @@ theorem HC_trace_index [Finite G] {M : Subgroup G} (hyp : Hypothesis M) :
     exact this.symm
   change hyp.HC.relIndex M = hyp.base.w1 * hyp.C.relIndex hyp.U
   rw [← htower, hyp.HC_relIndex_derived, hq, Nat.mul_comm]
+
+end Hypothesis
+
+/-- **`M` normalizes `M''`** (`secondDerivedInAmbient` is conjugation-equivariant and `M`
+normalizes itself). -/
+theorem le_normalizer_secondDerived [Finite G] {M : Subgroup G} :
+    M ≤ Subgroup.normalizer ((secondDerivedInAmbient M : Subgroup G) : Set G) := by
+  intro m hm
+  rw [← OddOrder.BG.AppB.map_conj_eq_iff_mem_normalizer]
+  have h1 : (MulAut.conj m) • M = M := by
+    have h2 : M.map (MulAut.conj m).toMonoidHom = M :=
+      OddOrder.BG.AppB.map_conj_eq_iff_mem_normalizer.mpr (Subgroup.le_normalizer hm)
+    rw [pointwise_mulAut_smul_eq_map]
+    exact h2
+  have hgoal : (MulAut.conj m) • secondDerivedInAmbient M = secondDerivedInAmbient M := by
+    rw [secondDerivedInAmbient_pointwise_smul _ _, h1]
+  have h3 := (pointwise_mulAut_smul_eq_map (MulAut.conj m) (secondDerivedInAmbient M)).symm
+  exact h3.trans hgoal
+
+namespace Hypothesis
+
+/-- **Peterfalvi (5.7) instance: `S(M'')` is coherent** (named obligation).  `M'/M''` is
+abelian, so every member of `S(M'')` is induced from a *linear* character of `M'/M''` and the
+family has the constant degree `q = |M:M'|`; the equal-degree coherence engine
+(`coherentEqualDegree_fromDade`, `S07_Coherence`) then applies over the Dade data.  Wiring
+that engine to the pinned family is the remaining §5 plumbing (issue 2022). -/
+theorem secondDerived_coherent [Finite G]
+    (_hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} (hyp : Hypothesis M) :
+    Nonempty (OddOrder.Peterfalvi.S07.IsCoherent
+      hyp.base.tau (hyp.SOf (secondDerivedInAmbient M)) hyp.base.A0) := by
+  sorry
 
 end Hypothesis
 
