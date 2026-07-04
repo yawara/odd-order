@@ -411,4 +411,32 @@ theorem constant_off_normal_of_inner_block_const {G : Type*} [Group G] [Finite G
     refine Finset.sum_eq_zero fun θ hθA => ?_
     rw [hnt θ hθA]; simp
 
+/-- **Equal degree of the constituents of `Ind_N^L θ`** (Peterfalvi (1.7.b), the exact form the
+(12.5) `DpsiH` decomposition consumes).  Immediate from `induce_inertia_constituent_apply_one_eq`
+applied to `φ₁, φ₂` with the *same* Clifford correspondent `ψ`: both degrees equal `[L:T]·ψ(1)`.
+With `T/N` abelian (the `H'/H = [H,H]/H` case), this is the coprimality-free equal degree feeding the
+`DpsiH` block coefficient/multiplicity constancy. -/
+theorem induce_inertia_constituents_apply_one_eq
+    {L : Type*} [Group L] [Finite L] [Fintype L] [Invertible (Nat.card L : ℂ)]
+    {N T : Subgroup L} [N.Normal] [(N.subgroupOf T).Normal] (hNT : N ≤ T)
+    [Fintype ↥N] [Fintype ↥T] [Fintype ↥(N.subgroupOf T)]
+    [Invertible (Nat.card ↥N : ℂ)] [Invertible (Nat.card ↥T : ℂ)]
+    [Invertible (Nat.card ↥(N.subgroupOf T) : ℂ)]
+    [Fintype (IrreducibleCharacter ↥(N.subgroupOf T))] [Fintype ((↥T ⧸ N.subgroupOf T) →* ℂˣ)]
+    (hab : ∀ x y : ↥T, ⁅x, y⁆ ∈ N.subgroupOf T)
+    (θ : IrreducibleCharacter ↥N)
+    (hinertia : ClassFunction.inertia (G := L) (θ : ClassFunction ↥N ℂ) = T)
+    (ψ : IrreducibleCharacter ↥T)
+    (hover : ClassFunction.restrictionMultiplicity (N.subgroupOf T) (ψ : ClassFunction ↥T ℂ)
+        (ClassFunction.compHom (Subgroup.subgroupOfEquivOfLe hNT).toMonoidHom
+          (θ : ClassFunction ↥N ℂ)) ≠ 0)
+    (φ₁ φ₂ : IrreducibleCharacter L)
+    (hφ₁ : ClassFunction.inner (ClassFunction.induce N (θ : ClassFunction ↥N ℂ))
+        (φ₁ : ClassFunction L ℂ) ≠ 0)
+    (hφ₂ : ClassFunction.inner (ClassFunction.induce N (θ : ClassFunction ↥N ℂ))
+        (φ₂ : ClassFunction L ℂ) ≠ 0) :
+    (φ₁ : ClassFunction L ℂ) (1 : L) = (φ₂ : ClassFunction L ℂ) (1 : L) := by
+  rw [induce_inertia_constituent_apply_one_eq hNT hab θ hinertia ψ hover φ₁ hφ₁,
+    induce_inertia_constituent_apply_one_eq hNT hab θ hinertia ψ hover φ₂ hφ₂]
+
 end OddOrder.RepresentationTheory
