@@ -3748,6 +3748,17 @@ theorem Hypothesis.exists_coherentImage_SHC [Finite G] {M : Subgroup G}
   · -- cardinality: injective on `s`
     exact Finset.card_image_of_injOn hinjOn
 
+open scoped Classical FiniteInduce in
+/-- **`S(HC) = S₁` is orthonormal** (Peterfalvi (11.8), the `S₁` side of the (11.8.6) union).
+Every member of `S(HC)` is an irreducible character of `M` (`SHCSet` filters `inducedFamily` by
+`IsIrreducibleCharacter`), so `⟨φ, ψ⟩ = [φ = ψ]` by `irr_cf_inner`.  This is the orthonormal-`X`
+input the (6.8.1) union glue `exists_integralCharacterMap_glue_of_orthonormal` takes for `S₁` in the
+(11.8.6) τ₂ union (`coherent_Sset_of_column_identities`). -/
+theorem Hypothesis.SHCSet_orthonormal [Finite G] {M : Subgroup G} (hyp : Hypothesis M)
+    {φ ψ : ClassFunction ↥M ℂ} (hφ : φ ∈ hyp.SHCSet) (hψ : ψ ∈ hyp.SHCSet) :
+    ClassFunction.inner φ ψ = if φ = ψ then (1 : ℂ) else 0 :=
+  irr_cf_inner (mem_irreducibleCharacters.mpr hφ.2.1) (mem_irreducibleCharacters.mpr hψ.2.1)
+
 open scoped FiniteInduce in
 /-- **Peterfalvi (11.8.1), `δ = 1`** (§9 count, named obligation).  The (10.3) column sign `δ`
 equals `1`.  `(U/C) ⋊ W₁` is a Frobenius group with abelian kernel `U/C`, so `u = |U/C| ≡ 1 (mod q)`;
