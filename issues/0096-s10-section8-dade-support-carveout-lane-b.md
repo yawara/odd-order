@@ -1055,3 +1055,28 @@ InducedInvariantConstituent.lean:
 - block 内 equal-degree (完成 1.7.b、H'/H instantiation)
 - step-6 bricks (`sum_smul_induce_apply_eq_zero_of_not_mem_normal`、Ind_{H'} vanish off H')
 - statement を ρψ=`toHypothesis71.chiRhoCF ψ` に restate (現 plain-ψ 誤、consumer 無)。
+
+### loop¹⁷⁶⁻¹⁷⁸ — (12.5) DpsiH: multiplicity-e 2 brick 完成 + assembly 4-brick 計画確定
+
+**Peterfalvi (12.5) 原文 + Coq `FtypeI_invDade_ortho_constant` (PFsection12.v:417-484) 精読で証明構造を確定。**
+結論は **ψ^ρ (= `toHypothesis71.chiRhoCF ψ`) が H−H' で定数** (現 S14 の plain-`psi` 文は誤、consumer 無 → restate 安全)。
+現行 proof の InHKernel γ/β split (L-level、hβconst sorry @2701) は (12.4) 用の別物 → **H-level Ind_{H'} block 分解に置換**する。
+
+**証明 (Coq mirror)**: f := Res_H(ρψ)。h1,h2 ∈ H−H' に対し
+f(h1)−f(h2) = ∑_{θ∈Irr H} ⟨f,θ⟩(θ(h1)−θ(h2)) を **Ind_{H'} block P で regroup** → 各 block = 0。
+block A (= constt Ind_N λ, N:=H'.subgroupOf H) 内: ⟨f,θ⟩ は θ≠1_H で定数 c_A (θ-coeff)、1_H 項は θ(h1)−θ(h2)=0 で落ちる →
+= c_A ∑_{θ∈A}(θ(h1)−θ(h2)) = c_A/e·(Ind_N λ(h1)−Ind_N λ(h2)) = c_A/e·(0−0) = 0 (Ind_N λ は H−H' で消える、H'⊴H)。
+
+**brick A 完成 (この iteration、2 commit)**:
+- `restrictionMultiplicity_eq_of_liesOver_of_apply_one_eq` (CliffordSingleOrbit) — equal-degree ⟹ equal restriction mult (degree formula の共通因子 [G:I(ρ)]·ρ(1) を mul_right_cancel₀ 2 段)。
+- `inner_induce_constituent_eq_of_apply_one_eq` (InducedInvariantConstituent) — 上を `inner_induce_coe_eq_restrictionMultiplicity` で ⟨Ind_N λ,φ⟩ 形へ持ち上げ (= block の共通 mult e)。
+
+**残 assembly (次 iteration、brick B→C→D→restate、各 build-green commit)**:
+- **B. H-level block partition** (generic, RepTheory): `∃ parts : Finset (Finset (Irr H)), univ = parts.biUnion id ∧ PairwiseDisjoint`。
+  cap: φ ↦ constt(Ind_N λ(φ)) (λ(φ) = `exists_liesOver` で選ぶ Res_N φ の constituent)、partition = univ.image cap。
+  PairwiseDisjoint: 別 block が θ 共有 ⟹ `exists_conj_of_common_induce_constituent` (CliffordSingleOrbit:175) で λ conj ⟹ Ind_N λ = Ind_N λ' (induce-conj-invariance 要確認/新設) ⟹ block 一致。
+  cover: φ ∈ constt(Ind_N λ(φ)) ⟺ λ(φ) ∈ constt(Res_N φ) (Frobenius `inner_induce_ne_zero_iff_liesOver`)。L-level `exists_offKernel_constituent_partition` (S14:2508) を template に。
+- **C. block-sum-zero** (generic): block A + coeff-const(θ≠1) + equal-mult(brick A) ⟹ ∑_{θ∈A}⟨g,θ⟩(θ(h1)−θ(h2))=0。
+  Ind_N λ = e∑θ (Fourier + brick A の all-mults-equal) + `induce_apply_eq_zero_of_not_mem_normal` (Ind vanish off N)。1_H 項は (θ(h1)−θ(h2))=0 で処理。
+- **D. assemble + restate**: `sum_inner_irreducibleCharacter_smul` Fourier-difference + B の biUnion regroup + C。
+  `rho_constant_on_H_minus_Hprime` を ρψ 文へ restate、θ-coeff = `chiRhoCF_restrict_inner_eq_of_equal_degree` (S14:1995)、block equal-degree = `induce_inertia_constituent_apply_one_eq` (H'/H instantiation、H/H' abelian ⟹ inertia quotient abelian)。

@@ -284,4 +284,25 @@ theorem induce_inertia_constituent_apply_one_eq
   rw [hcoe, ClassFunction.induce_apply_one, ClassFunction.mul_apply, linearClassFunction_apply,
     map_one, Units.val_one, mul_one]
 
+/-- **Equal-degree constituents of `Ind_N^H λ` have equal multiplicity in it.**  Lifts
+`restrictionMultiplicity_eq_of_liesOver_of_apply_one_eq` through
+`inner_induce_coe_eq_restrictionMultiplicity` (`⟨Ind_N λ, φ⟩ = restrictionMultiplicity N φ λ`).  For
+`N ⊴ H`, `λ ∈ Irr N` and constituents `φ₁, φ₂` of `Ind_N^H λ` (both lying over `λ`) with equal degree
+`φ₁(1) = φ₂(1)`, `⟨Ind_N λ, φ₁⟩ = ⟨Ind_N λ, φ₂⟩`.  Combined with the general (1.7.b) equal degree of
+*all* constituents, this is the **common multiplicity `e`** of the Peterfalvi (12.5) `DpsiH` block
+`Ind_N λ = e·∑_{φ constituent} φ`. -/
+theorem inner_induce_constituent_eq_of_apply_one_eq {H : Type*} [Group H]
+    [Fintype H] [Invertible (Nat.card H : ℂ)]
+    {N : Subgroup H} [hN : N.Normal] [Fintype ↥N] [Invertible (Nat.card ↥N : ℂ)]
+    [Fintype (IrreducibleCharacter ↥N)]
+    {φ₁ φ₂ : IrreducibleCharacter H} {ρ : IrreducibleCharacter ↥N}
+    (h₁ : IrreducibleCharacter.LiesOver (G := H) (H := N) φ₁ ρ)
+    (h₂ : IrreducibleCharacter.LiesOver (G := H) (H := N) φ₂ ρ)
+    (hdeg : (φ₁ : ClassFunction H ℂ) 1 = (φ₂ : ClassFunction H ℂ) 1) :
+    ClassFunction.inner (ClassFunction.induce N (ρ : ClassFunction ↥N ℂ)) (φ₁ : ClassFunction H ℂ)
+      = ClassFunction.inner (ClassFunction.induce N (ρ : ClassFunction ↥N ℂ))
+          (φ₂ : ClassFunction H ℂ) := by
+  rw [inner_induce_coe_eq_restrictionMultiplicity, inner_induce_coe_eq_restrictionMultiplicity]
+  exact restrictionMultiplicity_eq_of_liesOver_of_apply_one_eq h₁ h₂ hdeg
+
 end OddOrder.RepresentationTheory
