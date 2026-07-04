@@ -1306,3 +1306,28 @@ ungated 上流は §9 count carrier (`card_G0_lower_bound` 7.10 = issue 0044、o
 その後 attack order = (11.8.4 landed 10.9)→(11.8.2 CS 不等式)→(11.8.3 β real)→(11.8.5 a=0)→
 (11.8.6 (9.11)+(11.3) 矛盾)。§9 (9.8/9.9/9.11) gate は S11 (a 所有) で並行に埋める。
 これは deep multi-session effort。scaffold/仮説 hoist はしない (carrier 構成可能性で doneness 判定)。
+
+## 2026-07-04 frontier 精査 (重要更新) — infrastructure ~90% 済、gap = (11.8.6) capstone (τ₂)
+
+**判明**: (11.8) は「from-scratch deep」でなく **既に ~90% landed**。sorry は **final assembly**。
+- **τ₁ producer 済**: `Hypothesis.SHC_isCoherent hG : IsCoherent hyp.tau hyp.SHCSet hyp.A0`
+  (`noncomputable def` S12:1087、無条件構成)。`SHCSet` = `{φ∈S | irr, φ(1)=w₁}` (abbrev, concrete)。
+  extension conj-compat = `SHC_extension_conj` (S12:1213)。
+- **(11.8.2-11.8.5) lemma 群 landed** (S12): `muGridAlpha_tau_proj_a_mem` (a∈{0,1,2}) /
+  `beta_column_eq_zeroRow` (β indep) / `sum_alignedOmegaSigma_zeroColumn_isReal` (β real) /
+  `muGridAlpha_a_eq_inner_sumOmegaSigma_beta` (a=(∑ω,β)) / `charParam_a_eq_zero_of_residualEq`
+  (11.8.5 a=0) / `residualCoeff_eq_zero` (S12:3495) / `tau_muColumnSum_sub_zeta_eq_of_alphaImage`
+  (S12:3564、11.8.6 の μ_j^τ=∑ω−dζ^{τ₁} identity)。
+- **矛盾到達点の訂正**: (11.3) `S13.S_H0C_not_coherent` は **downstream (S13 imports S12)** ゆえ sorry
+  から cite 不可。実際は **upstream `S12.S_not_coherent` (10.8)** に full-S coherence を渡して False。
+  経路: μ_j^τ identity → S(H₀C) coherence → **`coherent_S_of_coherent_SH0C` (6.3、S13:206 で言及)** で
+  full S coherent → `S_not_coherent` → False。
+
+**残 gap = (11.8.6) capstone のみ**: μ_j^τ=∑ω identity (landed) から **τ₂ = S₂=S(C)−S(HC) coherence**
+を構成 (§9 (9.11)/(11.7) gate、S11 = a 所有) + S₁^{τ₁}⊥S₂^{τ₂} (5.3.b/5.5) で **S(C) coherent** →
+(6.3) lift → S_not_coherent。この τ₂ 構成 + union が唯一の deep 残部。
+
+**次 iteration = build 着手** (3 iter 精査終、以後 assembly): sorry 内で
+(1) `coh := hyp.SHC_isCoherent hG`、(2) `_h_orth` → (11.8.4) form (landed (10.9)
+`residual_alignedOmegaSigma_inner_eq_zero_of_w1_lt_w2` 経由)、(3) charParam_a_eq_zero chain →
+μ_j^τ identity、(4) τ₂ capstone (§9 gate、必要なら sorried skeleton で前倒し) → S_not_coherent。
