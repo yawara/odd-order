@@ -1525,3 +1525,25 @@ tractable (恐れていた大 §9 char 解析でない)。
 
 **評価上方修正**: §9 counts は「大 §9 formalization」でなく、mkSection11CharacterData で degree access 済。
 残 = correspondence (char transport) + |Ū|≡1 (Frobenius quotient, action-instance 注意) + caseA + threading。
+
+## 2026-07-05 update¹¹ (lane-a) — **update¹⁰ 点 2「|Ū|≡1 mod q」LANDED (reusable Frobenius infra)**
+
+update¹⁰ の残 4 点のうち **点 2 (|Ū|≡1 mod q) を完全実証明化** (2 lemma、full build green 3856 jobs、
+新 axiom 無し、既存 sorry 4 本 = 3900/3941/3959/4048 不変)。
+
+- **一般補題 `IsFrobeniusGroup.card_range_comp_subtype_modEq_one`** (Ch06 `FrobeniusGroup.lean`, sorry-free):
+  有限 Frobenius 群 `G = N⋊A` で **任意の準同型 `φ : G →* X` に対し `|φ(N)| ≡ 1 (mod |A|)`**。
+  証明 = Noether I (`φ(N) ≅ N/ker(φ|_N)`) + `ker(φ|_N)` の A-不変性 (φ が G 全体の hom ゆえ共役と交換) +
+  `IsFrobeniusAction.quotient` (Isaacs 6.2) で A が `N/ker` に f.p.f. 作用 → `card_modEq_one` (6.1)。
+  **update¹⁰ 点 2 の「action-instance snag」(conjugation MulDistribMulAction が非 default) は本一般補題が吸収** —
+  type-P 側で letI 内部 setup / hK 再定式化は不要になった (`toFrobeniusAction` の conjNormal instance を
+  補題内部に閉じ込め、K=ker の A-不変性は `congrArg φ hcoe` の 1 行で片付く)。汎用 (Ch06、upstream 適)。
+- **type-P 適用 `Hypothesis.mkSection11CharacterData_u_modEq_one`** (S12, sorry-free):
+  `(mkSection11CharacterData data chief).u ≡ 1 [MOD Nat.card W1]`。φ = `quotientMulAutHom chief.N_aInvariant`
+  (U W₁ の H̄ への作用)、N = U.subgroupOf(U⊔W1)、A = W1.subgroupOf(U⊔W1) で上記一般補題を適用、modulus を
+  `subgroupOfEquivOfLe le_sup_right` で `|W1|` に。`.u` は定義上 `Nat.card(composite.range)` ゆえ defeq で一致。
+
+**charParam_d_modEq_one (3900) の残 (次 iteration)**: update¹⁰ 点 1/3/4 = **d=|Ū| correspondence** (char
+transport、μ_j ∈ chars.SOf(H₀C') で q·d=q·u ⟹ d=u) + **caseA branch** + **type III/IV + TypePNontrivialCore
+threading** (hyp → data/chief 構成、V 除外、8.6.a core)。congruence 半分 (点 2) は済 ⟹ 残は「d を u に繋ぐ」+
+threading のみ。correspondence が最上流の次手 (`caseB_degree_qu` 出力 q·u と μ-grid column q·d の同定)。
