@@ -983,3 +983,26 @@ Frobenius kernel 誘導で既約), `hypothesis78_zeta_ne_conj` (ζ≠ζ̄: 奇�
 - **assembly**: `zetaImage_cross_eq_zero_of_conjIndex` を `F.hypothesis79 i j hij ...` に適用、両族に
   hcoh(=F.coherence 再パッケージ)/hnu/hz_irr/j/hjne_ind/hj/hζne_conj/hab_supp 供給 → hzeta_cross →
   (7.9) conclusion → card_G0_lower_bound。
+
+## 2026-07-04 cont.³⁶ — ★ hab_supp 完了 (全 conjIndex-bridge input 完備)
+
+**Landed** (S09_FrobeniusConjIndex.lean, sorry-free): `hypothesis78_nu_zeta_sub_conj_support` (hab_supp)
+— ν(ζ)−ν(ζ̄) = τ(ζ−ζ̄) (coherence_hagree_dadeMap, di=1, S-membership via inj) → Dade image が
+dadeSupport 外で消失 (fullDadeIsometryData.toDadeIsometryData.isDadeMap.map_eq_zero_of_not_mem_dadeSupport)。
+これで conjIndex bridge の全 input (hz_irr / j₁/hj₁ne_ind/hj₁ / hζne_conj / hab_supp) が Frobenius
+レベルで揃った。
+
+**残 = 最終 assembly (sourceSet↔S 接続 + bridge 適用)**:
+- **sourceSet = sibleyDade.S** (sub-lemma): sourceSet = {ζ_i | i≠ind1H} = {induce K θ_i | θ_i≠triv};
+  sibleyDade.S = {induce K φ | φ≠triv}。⊆: θ_i≠triv (i≠ind1H)。⊇: cover で induce K φ = induce K θ_j、
+  φ≠triv → induce K φ≠induce K triv=ζ_ind1H → j≠ind1H (inj) → ∈sourceSet。
+- **F.coherence を sourceSet に transport**: `IsCoherent τ S A` + (S = sourceSet) → `IsCoherent τ
+  sourceSet A` (Eq.mpr/▸)。※ IsCoherent (S07_Coherence:1659) の S 依存を確認。τ = sibleyDade.tau =
+  dadeIntegralCharacterMap (bridge の要求 τ と一致、hypothesis78 discharge で確認済)。A_prime =
+  supportInSubgroup (sharpImage H) L。
+- **hnu** (H79.first.nu = hcoh.extension): hypothesis78_nu_eq (H79.first = F.hypothesis78 i)。
+- **bridge 適用**: `H79 := F.hypothesis79 i j hij hodd ...`; `zetaImage_cross_eq_zero_of_conjIndex H79
+  hcoh₁ hnu₁ hcoh₂ hnu₂ (hz_irr i) (hz_irr j) hj₁ne_ind hj₁ hζne_conj_i ... (hab_supp i) (hab_supp j)`
+  → `⟨H79.firstZetaImage, H79.secondZetaImage⟩ = 0` = F レベル hzeta_cross。
+- → (7.9) conclusion producer (別途 hindZ/hzeta_irr/hBD 供給) → hgood → 𝓑-set →
+  characterEstimateData → card_G0_lower_bound (endpoint sorry @S09_NonexistenceCertain:6552)。
