@@ -89,6 +89,7 @@ import OddOrder.GroupTheory.RepresentationTheory.ZIrrFourier
 import OddOrder.GroupTheory.SCN
 import OddOrder.GroupTheory.SemiDihedral
 import OddOrder.GroupTheory.TISubset
+import OddOrder.GroupTheory.TISubsetCounting
 import OddOrder.GroupTheory.ZGroup
 import OddOrder.Mathlib.SchurZassenhausConj
 import OddOrder.Mathlib.SemidirectProduct
