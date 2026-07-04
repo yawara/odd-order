@@ -659,6 +659,24 @@ theorem conj_mem_P (hyp : Hypothesis (G := G)) (v : ↥hyp.base.U) (x : ↥hyp.b
   have hv : (v : G) ∈ Subgroup.normalizer hyp.base.P := U_le_normalizer_P hyp v.2
   exact (Subgroup.mem_normalizer_iff.mp hv (x : G)).mp x.2
 
+/-- `V` normalizes `Q` (`T`-side dual of `U_le_normalizer_P`): `Q = F(T)` is normal in `T` and
+`V ≤ T' = Q V ≤ T` (`T_deriv_eq_QV`). -/
+theorem V_le_normalizer_Q (hyp : Hypothesis (G := G)) :
+    hyp.base.V ≤ Subgroup.normalizer hyp.base.Q := by
+  have hV_le_deriv : hyp.base.V ≤ derivedInG hyp.base.T := by
+    rw [hyp.base.T_deriv_eq_QV]; exact le_sup_right
+  have hderiv_le_T : derivedInG hyp.base.T ≤ hyp.base.T := Subgroup.map_subtype_le _
+  have hT_le_norm : hyp.base.T ≤ Subgroup.normalizer hyp.base.Q := by
+    rw [hyp.base.Q_eq_TF]
+    exact OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_le_normalizer hyp.base.T
+  exact (hV_le_deriv.trans hderiv_le_T).trans hT_le_norm
+
+/-- `T`-side dual of `conj_mem_P`: conjugating a point of `Q` by an element of `V` stays in `Q`. -/
+theorem conj_mem_Q (hyp : Hypothesis (G := G)) (v : ↥hyp.base.V) (x : ↥hyp.base.Q) :
+    (v : G) * (x : G) * (v : G)⁻¹ ∈ hyp.base.Q := by
+  have hv : (v : G) ∈ Subgroup.normalizer hyp.base.Q := V_le_normalizer_Q hyp v.2
+  exact (Subgroup.mem_normalizer_iff.mp hv (x : G)).mp x.2
+
 /-- **(14.7) `hPU_disj` input**: `P ∩ U = 1`.  Since `P` is elementary abelian it
 centralizes itself, so `P ⊓ U ≤ U ⊓ C_G(P) = C = 1` by (13.12) `c = 1`.  Cites the
 (sorried) §13 producers `basic_structure` and `c_eq_one`. -/
