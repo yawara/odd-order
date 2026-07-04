@@ -3772,6 +3772,22 @@ theorem Hypothesis.SHCSet_inner_diff_eq_zero [Finite G] {M : Subgroup G} (hyp : 
   have hne : x ≠ y := fun h => hy.2 (h ▸ hx)
   exact inducedFamily_pairwiseOrthogonal hx.1 hy.1 hne
 
+/-- **Bridge to the §9 (repo S11) character analysis.**  A §10 type-III/IV `Hypothesis` yields the
+§9 `TypesIIIIIIVSetup` on the same `M`, sharing the type-`P` structure `(H, U, W₁, W₂)`.  This is the
+`Hypothesis` → `Section11CharacterData` bridge the (11.8.1) §9 counts need: with it,
+`exists_chiefFactorData` produces the chief factor `H̄ = H/H₀`, and the §9 results (`caseB_degree_qu`
+for `μ_j(1) = qu`, `coherent_H0C_commutator` for the (9.11) `S(H₀C')` coherence) apply to the §10
+character parameters.  `type_alt` restricts to III/IV (type V is eliminated separately by
+`no_typeV_maximal`); the `nontrivial` core (`U ≠ ⊥`, `|W₁|` prime, the `M_F`-TI condition) is the §8
+structural input, threaded as `hnt`. -/
+def Hypothesis.toTypesIIIIIIVSetup [Finite G] {M : Subgroup G} (hyp : Hypothesis M)
+    (htype : IsTypeIII M ∨ IsTypeIV M) (hnt : TypePNontrivialCore M hyp.typeP) :
+    OddOrder.Peterfalvi.S11.TypesIIIIIIVSetup M where
+  maximal := hyp.maximal
+  typeP := hyp.typeP
+  nontrivial := hnt
+  type_alt := htype.elim (fun h => Or.inr (Or.inl h)) (fun h => Or.inr (Or.inr h))
+
 open scoped FiniteInduce in
 /-- **Peterfalvi (11.8.1), `δ = 1`** (§9 count, named obligation).  The (10.3) column sign `δ`
 equals `1`.  `(U/C) ⋊ W₁` is a Frobenius group with abelian kernel `U/C`, so `u = |U/C| ≡ 1 (mod q)`;
