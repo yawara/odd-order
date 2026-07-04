@@ -339,3 +339,26 @@ faithful=D⊥ (proven)、V abelian=S15.isMulCommutative_V、|V|=v (card_V_eq_vd+
 両者は type-P Galois/(9.7) dichotomy foundation (issue 9000, lane a/d 領域) — c 単独 build は不可。
 ∴ V_cyclic closure で c の abelian-Singer machinery による S16 leaf 消化は一段落。残 S16 leaf
 (T_typeII/caseB_contradiction/dichotomy/betaGrid/eta_grid) は §3-13 char/grid で other-lane gated。
+
+## 2026-07-05 (loop 継続²) — 🎯 (14.14) orthogonality_switch_pairing_bounds 完全実証明化 → F3 残は全て cross-lane gate
+
+**本 session の landing** (詳細 = notes cont.⁵⁴): (14.14) の bare sorry を新 leaf 2 本
+(S16_PairingCoherence 1057 行 / S16_PairingBessel 584 行, 全 sorry-free) + S16 instantiation で
+完全実証明化。commits 339e1f52 / d5e13a98 / a6c06957 / 60b9b6b6 / 40d2cdcc。
+cont.⁵² の「(8.17.c)/(7.9) は他レーン gated」は **phantom だった** (S10/S09 に proven 済) — 
+cont.⁵³ 教訓の再適用が (14.14) 全体を unlock した。S16 real sorry 7→6。
+
+**F3 残 6 sorry の再検証結果 (全て真 gate、再攻略しない)**:
+- 80 `T_typeII_structural_inputs`: b §13 T-side (base に Tdata withdrawn 確認済)。
+- 175 `T_side_caseB_facts` (v-value) / 5347 `main_size_bounds`: issue 9000、a claim
+  (§9 block 分解 assembly 残、2026-07-03 節)。
+- 2599 `eta_grid_facts_on_G0` / 4604 `caseB_contradiction_data` / 5415 `betaGrid`:
+  η-grid (3.9.a/c)。b の 3002 threading (3dc9306e, 7 primitives 供給済) の後続
+  「S15 内導出定理」待ち — **c-side consumer spec を issue 3002 に追記済 (2026-07-05 節)**。
+  (3.9.c) は carried 7 fields のみからは導出不可 (Galois 同変 witness が S05 σ-package 側に
+  ある; ω₀₀=1_W の同定も未 carry) を確認。
+- card_G0 (0044) は 2026-07-04 off-path 判定 (再攻略しない)。betaM_vanish 等の c-solo 分は
+  既に実証明済。
+
+**c の現 mode**: b (η-grid 導出 or S15 cascade) / a (9000 assembly) の main 合流を監視し、
+supply 着き次第 2599→5415→4604 (文書順) を組立。それまで S16 W-side に ungated solo work なし。

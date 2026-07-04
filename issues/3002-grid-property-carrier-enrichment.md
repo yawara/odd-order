@@ -176,3 +176,29 @@ self-flag 済) を step 1.5 逸脱として保留 → **ユーザー裁定 = 受
 b の一時編集権に含める。**3002 供給完了で失効**。正本 = `notes/meta/merge_monitor.md` の
 carve-out (3002 供給編集権) ブロック。threading 両半分 (3dc9306e) + (13.10) atom 分解 (a39ca309)
 は 2026-07-05 監視 tick で main 合流済 (merge 88a3bdd1)。
+
+## 📋 c-side consumer spec (2026-07-05, lane c — S16 の η-grid 需要の精密形)
+
+(14.14) `orthogonality_switch_pairing_bounds` 実証明化 (60b9b6b6) 後の S16 残 sorry のうち
+3 本が本 issue の導出定理待ち。b が「S15 内で導出」を実装する際の consumer 形 (S16 が cite する
+正確な statement) を先に固定しておく:
+
+1. **S16:2599 `eta_grid_facts_on_G0`** (hyp : Hypothesis, Mdata : MHypothesis) — 3 成分:
+   - `eta_int` : ∀ g ∈ Mdata.G0, ∀ i j, ∃ m : ℤ, hyp.base.eta i j g = (m : ℂ) — (3.9.c)。
+     G0 → order prime to pq は Mdata.G0_orbit_cover 経由 (c が接続可)。**b 供給の核 =
+     「g の order が pq と素 → η_ij(g) ∈ ℤ」形の S15 導出定理** (σ-Galois: S05 の
+     `exists_intCast_sigma_omega_apply` (3.9.c) を cd の tau3W=σ witness で instantiate し、
+     S15.Hypothesis レベルの statement に落とす)。
+   - `eta_pair` : η_{−i,−j}(g) = η_ij(g) on G0 — (3.9.a) 共役対称。同様に S05
+     `sigma_mapRingEquiv_comm` 系から。
+   - `eta_principal` : η₀₀(g) = 1 on G0 — ω₀₀ = 1_W (grid の trivial 位置) + tau3_trivial。
+     **ω₀₀ = trivialClassFunction の identification が carried fields に無い** — 供給要
+     (omega_apply_one は値 1 のみで ω₀₀ の同定はしない)。
+   - 注: 4 成分目 betaM_vanish は c が実証明済 (`eta_generic_data`)。
+2. **S16:5415 `exists_MHypothesis` の betaGrid** : 1_G + Δ = Σ ε_ij η_ij ((13.1.d)/(14.11.2)
+   K=V 側)。(13.19.a/b/c) 相当の grid orthogonality/counting が要る (b の cascade 供給圏)。
+3. **S16:4604 `caseB_contradiction_data`** ((14.16)): β_L^τ の signed η 展開 + η_ij ⊥ ψ^{τ₁}
+   ((5.3.b)/(5.5) 系) + χ_L 直交 — (14.11.2) の L-side dual。同上。
+
+c 側はこれら 3 cite の組立 (G0→order-prime 接続、(14.11.2) dual の assembly) を supply 着き次第
+実施する。form が上と乖離する場合は本節を更新してから landing を (コンフリクト回避)。

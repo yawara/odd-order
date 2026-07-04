@@ -231,6 +231,7 @@ import OddOrder.Peterfalvi.S10_MinimalSimpleStructure
 import OddOrder.Peterfalvi.S10_BGInterface
 import OddOrder.Peterfalvi.S11_MaximalII_III_IV
 import OddOrder.Peterfalvi.S12_MaximalIII_IV_V
+import OddOrder.Peterfalvi.S13_SixTwoBridge
 import OddOrder.Peterfalvi.S13_MaximalIII_IV
 import OddOrder.Peterfalvi.S14_MaximalI
 import OddOrder.Peterfalvi.S15_SAndT
