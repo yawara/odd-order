@@ -2500,11 +2500,69 @@ open scoped OddOrder.Peterfalvi.S15.FiniteInduce Classical in
 virtual character `ψ_i = ζ_i − d_i ζ_0`, Peterfalvi (2.10)).  Faithful producer; the residual
 is the `τ`-image virtuality (the (2.10) inclusion–exclusion is a `ℤ`-combination of
 `Ind_{M(B)} α_B ∈ ℤ[Irr G]`, `induce_alphaB_mem_ZIrr`). -/
-theorem eta10_cCoeff_int [Fintype G] [Invertible (Nat.card G : ℂ)]
+theorem eta10_cCoeff_int [Finite G] [Fintype G] [Invertible (Nat.card G : ℂ)]
     (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G)) :
     ∀ i : Fin ((H_sharp_hypothesis76 hG hyp).n + 1),
       ∃ z : ℤ, (H_sharp_hypothesis76 hG hyp).cCoeff hyp.eta10 i = (z : ℂ) := by
-  sorry
+  classical
+  intro i
+  set K : Subgroup ↥hyp.S := (H_sharp_hypothesis76 hG hyp).H.subgroupOf hyp.S with hKdef
+  haveI hKnorm : K.Normal := H_sharp_subgroupOf_normal hyp
+  -- `K ≅ H` is abelian, so every `θ_j` is linear and all `ζ_j` have degree `[S:K]`.
+  have hHS : hyp.H ≤ hyp.S := by
+    have hUS : hyp.U ≤ hyp.S := by
+      have h1 : hyp.U ≤ derivedInG hyp.S := by rw [hyp.S_deriv_eq_PU]; exact le_sup_right
+      exact le_trans h1 (Subgroup.map_subtype_le _)
+    show hyp.P ⊔ hyp.C ≤ hyp.S
+    refine sup_le ?_ ?_
+    · rw [hyp.P_eq_SF]; exact OddOrder.BG.Ch4.S15.maxNilpotentNormalHall_le hyp.S
+    · rw [hyp.C_eq]; exact le_trans inf_le_left hUS
+  haveI hKcomm : IsMulCommutative ↥K := by
+    have hH := hyp.H_mulCommutative hG
+    have e := Subgroup.subgroupOfEquivOfLe
+      (show (H_sharp_hypothesis76 hG hyp).H ≤ hyp.S from hHS)
+    exact ⟨⟨fun a b => e.injective (by
+      rw [map_mul, map_mul]
+      exact hH.is_comm.comm (e a) (e b))⟩⟩
+  -- Degrees: `ζ_j(1) = [S:K]` for every `j`, so the degree ratio is `1`.
+  have hzeta_one : ∀ j : Fin ((H_sharp_hypothesis76 hG hyp).n + 1),
+      (H_sharp_hypothesis76 hG hyp).zeta j 1 = (K.index : ℂ) := by
+    intro j
+    obtain ⟨θ, hθ⟩ := (H_sharp_hypothesis76 hG hyp).zeta_induced j
+    have hθ1 : (θ : ClassFunction ↥K ℂ) 1 = 1 :=
+      OddOrder.RepresentationTheory.IsIrreducibleCharacter.apply_one_eq_one_of_isMulCommutative
+        θ.2
+    rw [hθ, OddOrder.RepresentationTheory.ClassFunction.induce_apply_one, hθ1, mul_one]
+  have hidx0 : (K.index : ℂ) ≠ 0 := by
+    exact_mod_cast Subgroup.index_ne_zero_of_finite (H := K)
+  have hd1 : (H_sharp_hypothesis76 hG hyp).d i = 1 := by
+    have h := (H_sharp_hypothesis76 hG hyp).zeta_one_eq_d_mul i
+    rw [hzeta_one i, hzeta_one 0] at h
+    field_simp at h
+    exact h.symm
+  -- `ψ_i = ζ_i − ζ_0 ∈ ℤ[Irr S]`.
+  have hzetaZ : ∀ j : Fin ((H_sharp_hypothesis76 hG hyp).n + 1),
+      (H_sharp_hypothesis76 hG hyp).zeta j ∈ ZIrr ↥hyp.S := by
+    intro j
+    obtain ⟨θ, hθ⟩ := (H_sharp_hypothesis76 hG hyp).zeta_induced j
+    rw [hθ]
+    exact OddOrder.RepresentationTheory.ClassFunction.induce_mem_ZIrr K (θ.2.mem_ZIrr)
+  have hψZ : ((H_sharp_hypothesis76 hG hyp).psiSupp i : ClassFunction ↥hyp.S ℂ)
+      ∈ ZIrr ↥hyp.S := by
+    rw [OddOrder.Peterfalvi.S09.Hypothesis76.psiSupp_coe, hd1, one_smul]
+    exact Submodule.sub_mem _ (hzetaZ i) (hzetaZ 0)
+  -- The Dade image is a virtual character ((2.10) `preserves_virtualCharacters`).
+  have hτeq : (H_sharp_hypothesis76 hG hyp).hyp71.τ
+      = ((H_sharp_dadeHypothesis hG hyp).fullDadeIsometryData
+          (H_sharp_hconj hG hyp)).toDadeIsometryData.toDadeMap := rfl
+  have hpres : (H_sharp_hypothesis76 hG hyp).hyp71.τ
+      ((H_sharp_hypothesis76 hG hyp).psiSupp i) ∈ ZIrr G := by
+    rw [hτeq]
+    exact ((H_sharp_dadeHypothesis hG hyp).fullDadeIsometryData
+      (H_sharp_hconj hG hyp)).preserves_virtualCharacters _ hψZ
+  -- `c_i = ⟨τψ_i, η₁₀⟩ ∈ ℤ`.
+  rw [OddOrder.Peterfalvi.S09.Hypothesis76.cCoeff]
+  exact ClassFunction.inner_mem_ZIrr_int hpres hyp.eta10_mem_ZIrr
 
 open scoped OddOrder.Peterfalvi.S15.FiniteInduce Classical in
 /-- **The (13.7) correction is nonzero at `1`**: `α(1) ≡ 1 (mod q)` by the (1.10) congruence
