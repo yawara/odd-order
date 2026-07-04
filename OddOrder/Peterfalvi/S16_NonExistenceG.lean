@@ -4409,14 +4409,153 @@ theorem caseB_contradiction_of_full_u_card_congruences
 
 end OrthogonalitySwitchData
 
-/-- **Peterfalvi (14.14)**: either the `beta_M`--`phi` pairing is nonzero and
-`(h - 1) / p q <= p q - 1`, or the `beta_L`--`psi` pairing is nonzero and
-`(q,p) = (3,5)`. -/
+/-- For `p ≥ 7`, `p² ≤ 3^(p-3)`: the monotonicity input for the `p = 5` step of Peterfalvi (14.14.b).
+The paper's `f(x) = 3^(x-3)/x²` is increasing for `x ≥ 2` (`f(x+1)/f(x) = 3(1 − 1/(x+1))² > 1`); this
+is the integer form `p² ≤ 3^(p-3)` proved by induction from `p = 7` (`7² = 49 ≤ 81 = 3⁴`). -/
+private theorem sq_le_three_pow_sub_three {p : ℕ} (hp : 7 ≤ p) : p ^ 2 ≤ 3 ^ (p - 3) := by
+  induction p, hp using Nat.le_induction with
+  | base => norm_num
+  | succ p hp ih =>
+      have hsucc : 3 ^ (p + 1 - 3) = 3 * 3 ^ (p - 3) := by
+        rw [show p + 1 - 3 = (p - 3) + 1 by omega, pow_succ]; ring
+      rw [hsucc]
+      calc (p + 1) ^ 2 ≤ 3 * p ^ 2 := by nlinarith [hp]
+        _ ≤ 3 * 3 ^ (p - 3) := by gcongr
+
+namespace Hypothesis
+
+/-- **Peterfalvi (14.14.b)/(14.15) arithmetic core**: in case (b) of the orthogonality switch, the
+`(β_L, ψ)`-pairing bound `(v−1)/(pq) ≤ pq−1` together with the (14.4) cyclotomic value
+`v = (q^p−1)/(q−1)` and the (14.8.a) exponential comparison `q^(p+1) > p^(q+1)` force the
+exceptional primes `q = 3` and `p = 5`.
+
+Proof (Pf p.91): `(v−1)/(pq) < pq` gives `q^(p−1) ≤ v−1 < p²q²`, hence `q^(p−3) < p²`.  By (14.8.a)
+`q^(p+1) > p^(q+1)` and `q < p`, one gets `q^(p−3) > p^(q−3)`, so `p^(q−3) < p²`, whence `q = 3`.
+Then `3^(p−3) < p²`, contradicting `p² ≤ 3^(p−3)` for `p ≥ 7`, so `p = 5`. -/
+theorem caseB_forces_q_three_and_p_five (hyp : Hypothesis (G := G))
+    (hv : hyp.base.v = (hyp.base.q ^ hyp.base.p - 1) / (hyp.base.q - 1))
+    (hbound : ((hyp.base.v - 1 : ℕ) : ℚ) / ((hyp.base.p * hyp.base.q : ℕ) : ℚ) ≤
+      ((hyp.base.p * hyp.base.q - 1 : ℕ) : ℚ)) :
+    hyp.base.q = 3 ∧ hyp.base.p = 5 := by
+  have hp_prime := hyp.base.p_prime
+  have hq_prime := hyp.base.q_prime
+  have hqp : hyp.base.q < hyp.base.p := hyp.q_lt_p
+  have hq3le : 3 ≤ hyp.base.q := by
+    rcases hyp.base.q_odd with ⟨k, hk⟩; have := hq_prime.two_le; omega
+  have hp5le : 5 ≤ hyp.base.p := by rcases hyp.base.p_odd with ⟨k, hk⟩; omega
+  -- Step 1: `v − 1 < p² q²` from the case-(b) bound.
+  have hpq_pos : 0 < hyp.base.p * hyp.base.q := Nat.mul_pos hp_prime.pos hq_prime.pos
+  have hpqQ : (0 : ℚ) < ((hyp.base.p * hyp.base.q : ℕ) : ℚ) := by exact_mod_cast hpq_pos
+  have hv1_le : (hyp.base.v - 1 : ℕ) ≤
+      (hyp.base.p * hyp.base.q - 1) * (hyp.base.p * hyp.base.q) := by
+    have h := (div_le_iff₀ hpqQ).mp hbound
+    exact_mod_cast h
+  have hv1_lt : hyp.base.v - 1 < hyp.base.p ^ 2 * hyp.base.q ^ 2 := by
+    have hlt : (hyp.base.p * hyp.base.q - 1) * (hyp.base.p * hyp.base.q)
+        < (hyp.base.p * hyp.base.q) * (hyp.base.p * hyp.base.q) :=
+      mul_lt_mul_of_pos_right (by omega) hpq_pos
+    calc hyp.base.v - 1
+        ≤ (hyp.base.p * hyp.base.q - 1) * (hyp.base.p * hyp.base.q) := hv1_le
+      _ < (hyp.base.p * hyp.base.q) * (hyp.base.p * hyp.base.q) := hlt
+      _ = hyp.base.p ^ 2 * hyp.base.q ^ 2 := by ring
+  -- Step 2: `q^(p−1) ≤ v − 1` from the geometric-sum lower bound.
+  have hlow : hyp.base.q ^ (hyp.base.p - 1) ≤ hyp.base.v - 1 := by
+    have h := cyclotomic_quotient_sub_one_ge_pow_pred hq_prime.two_le hp_prime.two_le
+    rw [← hv] at h
+    exact_mod_cast h
+  -- Step 3: `q^(p−3) < p²`.
+  have hqpm3 : hyp.base.q ^ (hyp.base.p - 3) < hyp.base.p ^ 2 := by
+    have he : hyp.base.q ^ (hyp.base.p - 1)
+        = hyp.base.q ^ (hyp.base.p - 3) * hyp.base.q ^ 2 := by
+      rw [← pow_add]; congr 1; omega
+    have hlt : hyp.base.q ^ (hyp.base.p - 3) * hyp.base.q ^ 2
+        < hyp.base.p ^ 2 * hyp.base.q ^ 2 :=
+      calc hyp.base.q ^ (hyp.base.p - 3) * hyp.base.q ^ 2
+          = hyp.base.q ^ (hyp.base.p - 1) := he.symm
+        _ ≤ hyp.base.v - 1 := hlow
+        _ < hyp.base.p ^ 2 * hyp.base.q ^ 2 := hv1_lt
+    exact lt_of_mul_lt_mul_right hlt (Nat.zero_le _)
+  -- Step 4: `p^(q−3) < q^(p−3)` from (14.8.a).
+  have hkey : hyp.base.p ^ (hyp.base.q + 1) < hyp.base.q ^ (hyp.base.p + 1) := hyp.q_pow_gt_p_pow
+  have hgt : hyp.base.p ^ (hyp.base.q - 3) < hyp.base.q ^ (hyp.base.p - 3) := by
+    by_contra hle
+    rw [not_lt] at hle
+    have e1 : hyp.base.q ^ (hyp.base.p + 1)
+        = hyp.base.q ^ (hyp.base.p - 3) * hyp.base.q ^ 4 := by
+      rw [← pow_add]; congr 1; omega
+    have e2 : hyp.base.p ^ (hyp.base.q + 1)
+        = hyp.base.p ^ (hyp.base.q - 3) * hyp.base.p ^ 4 := by
+      rw [← pow_add]; congr 1; omega
+    have hq4p4 : hyp.base.q ^ 4 < hyp.base.p ^ 4 := Nat.pow_lt_pow_left hqp (by norm_num)
+    have hppos : 0 < hyp.base.p ^ (hyp.base.q - 3) := pow_pos hp_prime.pos _
+    have h1 : hyp.base.q ^ (hyp.base.p - 3) * hyp.base.q ^ 4
+        ≤ hyp.base.p ^ (hyp.base.q - 3) * hyp.base.q ^ 4 := by gcongr
+    have h2 : hyp.base.p ^ (hyp.base.q - 3) * hyp.base.q ^ 4
+        < hyp.base.p ^ (hyp.base.q - 3) * hyp.base.p ^ 4 :=
+      mul_lt_mul_of_pos_left hq4p4 hppos
+    have hchain := lt_of_le_of_lt h1 h2
+    rw [← e1, ← e2] at hchain
+    omega
+  -- Step 5: `q = 3`.
+  have hq3 : hyp.base.q = 3 := by
+    have hplt : hyp.base.p ^ (hyp.base.q - 3) < hyp.base.p ^ 2 := lt_trans hgt hqpm3
+    have hexp : hyp.base.q - 3 < 2 := by
+      by_contra hge
+      rw [not_lt] at hge
+      exact absurd hplt (not_lt.mpr (Nat.pow_le_pow_right (by omega) hge))
+    rcases hyp.base.q_odd with ⟨k, hk⟩
+    omega
+  refine ⟨hq3, ?_⟩
+  -- Step 6: `p = 5`.
+  rw [hq3] at hqpm3
+  by_contra hp_ne
+  have hp7 : 7 ≤ hyp.base.p := by rcases hyp.base.p_odd with ⟨k, hk⟩; omega
+  have := sq_le_three_pow_sub_three hp7
+  omega
+
+end Hypothesis
+
+/-- **Peterfalvi (14.14) character dichotomy** — the genuine §7/§8 content of the orthogonality
+switch.  By (8.17.c) the Dade supports `Ã₁(L)` and `Ã₁(M)` are disjoint, so by (7.9) either the
+`M`-side pairing `(β_M^τ, φ^τ₁) ≠ 0` or the `L`-side pairing `(β_L^τ, ψ^τ₁) ≠ 0`.  In the first
+case the (7.8.b) coherence-norm bound on the `β_M`-expansion `β_M^τ = a Σ aᵢ φᵢ^{τ₁} + Δ` gives
+`Σ aᵢ² ≤ pq − 1`, i.e. `(h−1)/pq ≤ pq−1`; in the second the same estimate on the `β_L`-expansion
+gives `(v−1)/pq ≤ pq−1`.  This isolates the character-theoretic input to `orthogonality_switch`;
+the case-(b) passage to `q = 3`, `p = 5` is the arithmetic
+`Hypothesis.caseB_forces_q_three_and_p_five`. -/
+theorem orthogonality_switch_pairing_bounds [Finite G]
+    (_hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
+    (nc : NonConjugateHypothesis hyp) :
+    (((nc.h - 1 : ℕ) : ℚ) / (hyp.base.p * hyp.base.q : ℚ) ≤
+        ((hyp.base.p * hyp.base.q - 1 : ℕ) : ℚ)) ∨
+      (((hyp.base.v - 1 : ℕ) : ℚ) / ((hyp.base.p * hyp.base.q : ℕ) : ℚ) ≤
+        ((hyp.base.p * hyp.base.q - 1 : ℕ) : ℚ)) :=
+  sorry
+
+/-- **Peterfalvi (14.14)**: either the case-(a) bound `(h − 1)/pq ≤ pq − 1` holds (the
+`β_M`--`φ` pairing is nonzero), or the case-(b) exceptional primes `q = 3`, `p = 5` hold (the
+`β_L`--`ψ` pairing is nonzero).
+
+Assembled from the (7.9)+(8.17.c) character dichotomy `orthogonality_switch_pairing_bounds`, whose
+two branches supply the case-(a) norm bound and the case-(b) `(v−1)/pq ≤ pq−1` bound; in case (b)
+the arithmetic `caseB_forces_q_three_and_p_five` ((14.15)/(14.8.a)) turns that bound, together with
+the (14.4) cyclotomic value of `v`, into `q = 3`, `p = 5`.  The abstract `caseA`/`caseB` props of
+`OrthogonalitySwitchData` are taken to be the case-(a) bound and the `(q,p)=(3,5)` conclusion
+themselves, so the downstream (14.15)/(14.16) machinery reads them off directly. -/
 theorem orthogonality_switch [Finite G]
     (_hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis (G := G))
     (nc : NonConjugateHypothesis hyp) :
     ∃ data : OrthogonalitySwitchData nc, data.caseA ∨ data.caseB := by
-  sorry
+  obtain ⟨_Tdata, _, hv⟩ := caseB_for_T _hG hyp
+  refine ⟨{
+    caseA := ((nc.h - 1 : ℕ) : ℚ) / (hyp.base.p * hyp.base.q : ℚ) ≤
+      ((hyp.base.p * hyp.base.q - 1 : ℕ) : ℚ)
+    caseA_bound := fun h => h
+    caseB := hyp.base.q = 3 ∧ hyp.base.p = 5
+    caseB_params := fun h => h }, ?_⟩
+  rcases orthogonality_switch_pairing_bounds _hG hyp nc with hA | hB
+  · exact Or.inl hA
+  · exact Or.inr (hyp.caseB_forces_q_three_and_p_five hv hB)
 
 /-- **Peterfalvi (14.14)--(14.15)**: the full `u` value once the
 cardinality consequences of (14.5) have been materialized.  The case-(b)
