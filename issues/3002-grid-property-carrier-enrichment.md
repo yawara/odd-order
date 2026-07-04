@@ -84,3 +84,38 @@ lane c は 2026-06-29 に **carrier-free な norm-cascade arithmetic toolkit を
 - `notes/peterfalvi/s16_w4_char_cascade.md` cont.⁴⁶ (2026-07-03 frontier 収束の記録)
 - `OddOrder/FeitThompson.lean:1861` — `sectionSixteenHypothesis_of_inputs` (constructor) / `:96` `Section16Inputs`
 - issue 3001 (Sdata.W2 reconciliation、同系の carrier 不足)、issue 4003 (η-値性質、統合対象)
+
+## ✅ 2026-07-04 (lane c) 検証: norm-cascade engine は完備 — 残は cross-lane threading のみ
+
+再開時の再検証 (main sync 後、grid-property field は現 main で **0 hits** = 依然 live) で、
+**character-level engine が既に完備・sorry-free** と確定 (前記「算術 engine 完備」を engine 層まで拡張):
+
+- **算術核** (sorry-free): `caseB_lambda_norm_core` (S15_SAndT_Setup:808)・`caseB_eta_norm_core` (:868)・
+  `caseB_eta01_norm_core` (:934)・`caseB_quadratic_nonneg` (:787)・`analytic_inequality_arith` (:1316)。
+- **character-level engine** (sorry-free、grid 性質を**明示仮説**として取り real norm bound を産む):
+  `caseB_lambda_norm_bound` (:839、hvanish/hinner/hχ/hParseval/hInflation を仮説に |S|−λ(1)² ≤ Σ_{H#}|χ|²)・
+  `caseB_eta_norm_bound` (:910、hχ 点公式/hs 整数性/hParseval/hInflation で |H|−1 ≤ Σ_A|χ|²)。
+
+⟹ **norm-cascade の solo build-green work は完全に枯渇**。残るのは本 issue の cross-lane threading のみ:
+1. `S15.Hypothesis` に grid 性質 field 追加 (lane c) — ただし engine の仮説に合わせた形が要る
+   (`eta_orthonormal` だけでなく、engine が消費する **点公式 (hχ)・Parseval (hParseval)・整数性 (hs)・
+   inflation (hInflation)** を供給する field 群。正確な形 = 各 `caseB_*_norm_bound` の仮説シグネチャ)。
+2. `sectionSixteenHypothesis_of_inputs` (FeitThompson.lean:1861、`base := { … }` where-block) で
+   sorried supply → **小 bridge** (数行、`eta_orthonormal := sorry` 等)。**FeitThompson = lane a 所有ゆえ
+   hub/issue 経由承認合流** (CLAUDE.md/reallocation §2「carrier field 追加は hub 経由」)。
+3. `NormCascadeData`/`CharacterDegreeData` の opaque `Prop` field を real inequality に de-opacify し、
+   wrapper (`lambda_norm_lower`/`eta10_norm_lower`/… + `analytic_inequality` assembly) を engine に wire (lane c)。
+
+**∴ lane c 単独では build-green で本 issue を前進できない** (field 追加が FeitThompson constructor を破る、
+threading = lane a 承認要)。engine 完備を確認した以上、次の実質前進には **lane a の Section16Inputs/constructor
+threading** が先決。lane c は本 issue の lane-c 部 (field 形の確定 + wrapper wiring) を threading 合流と同時に実施可能。
+
+## ✅ 2026-07-04 (lane c) 併行: keystone `reconciled_typePData_T` の `H_noncyclic` を実証明化 (13/20)
+
+norm-cascade が cross-lane threading 待ちの間、solo build-green な keystone 進捗として
+`reconciled_typePData_T` (S15_SAndT) の `H_noncyclic` free-field sorry を実証明に置換 (12/20 → 13/20):
+`H := Q = maxNilpotentNormalHall T` は intrinsic (choice-independent) ゆえ、§13-level producer
+`typePData_of_isTypeNonI hyp.T_nonI` の `H_noncyclic` を同一 subgroup `Q` に transport ((14.9) `T_typeII`
+不要 = clean §13)。残 7 axiom (`W2_le`/`M_complement`/`U_nilpotent`/`derived_complement`/`secondDerived_le_fitting`/
+`fitting_eq`/`centralizer_W1`) は complement 一致 (V=type-P U) の reconciliation crux に gated
+(§13 では `T_typeII` が import 下流 S16:87 ゆえ使えず、genuine に §13/§14 σ-structure 要 = 正しく sorried)。

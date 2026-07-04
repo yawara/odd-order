@@ -1311,7 +1311,14 @@ theorem reconciled_typePData_T [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd 
     W1_normalizes_U := hyp.W2_normalizes_V
     U_nilpotent := sorry
     derived_complement := sorry
-    H_noncyclic := sorry
+    H_noncyclic := by
+      -- `H := Q = maxNilpotentNormalHall T` is the *intrinsic* Fitting Hall (choice-independent),
+      -- so `¬ IsCyclic ↥Q` is read off any type-`P` datum on `T`.  The §13-level producer
+      -- `typePData_of_isTypeNonI T_nonI` supplies one (no `T_typeII`/(14.9) needed, keeping this a
+      -- clean §13 obligation): its `H_noncyclic` is `¬ IsCyclic` of the same subgroup `Q`.
+      obtain ⟨tpd0⟩ := OddOrder.GroupTheory.typePData_of_isTypeNonI hyp.T_nonI
+      have hHeq : tpd0.H = hyp.Q := by rw [tpd0.H_eq, hyp.Q_eq_TF]
+      exact hHeq ▸ tpd0.H_noncyclic
     secondDerived_le_fitting := sorry
     fitting_eq := sorry
     centralizer_W1 := sorry
