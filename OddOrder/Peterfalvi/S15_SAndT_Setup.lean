@@ -1345,7 +1345,7 @@ The Parseval estimates (13.10.1)/(13.10.2) and the disjoint-cover count (13.10.3
 counting skeleton: `G` splits as `{1} ⊔ G₀ ⊔ (H^#)^G ⊔ (Q^#)^G` — the two saturations are
 disjoint (element orders: `q ∤ |H|` while every nonidentity element of `Q` has order a positive
 power of `q`) — and a conjugation-invariant sum over a saturation collapses to `[G : N]` times
-the local sum (`IsTISubset.sum_conjClassSet`, issue 9010).  The `H`-side TI input is the proven
+the local sum (`IsTISubset.sum_conjClassSet`, issue 9011).  The `H`-side TI input is the proven
 `H_sharp_isTISubset`; the `Q`-side is its `T`-mirror below. -/
 
 section CountingLayer
@@ -1697,7 +1697,7 @@ for a conjugation-invariant `f`,
 
 `G` is the disjoint union of `{1}`, `G₀`, `(H^#)^G`, and `(Q^#)^G` (the saturations are disjoint
 by `disjoint_conjClassSet_sharp_H_Q` and miss `1`; `G₀` is *defined* as the complement), and each
-saturation sum collapses by `IsTISubset.sum_conjClassSet` (issue 9010) via the proven TI
+saturation sum collapses by `IsTISubset.sum_conjClassSet` (issue 9011) via the proven TI
 structure (`H_sharp_isTISubset` / `Q_sharp_isTISubset`).  Instantiations: `f = ‖χ(·)‖²` gives the
 Parseval splits (13.10.1)/(13.10.2); `f = 1` the cover count (13.10.3). -/
 theorem Hypothesis.sum_univ_split [Fintype G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)

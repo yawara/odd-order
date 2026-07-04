@@ -12,7 +12,7 @@ import Mathlib.Algebra.BigOperators.GroupWithZero.Action
 /-!
 # Conjugation-invariant sums over the saturation of a TI-subset
 
-`OddOrder.GroupTheory` shared module (issue 9010): for a TI-subset `A ⊆ G` with
+`OddOrder.GroupTheory` shared module (issue 9011): for a TI-subset `A ⊆ G` with
 stabilizing normalizer-bound `L`, the conjugacy saturation `𝒞_G(A) = A^G` is the
 disjoint union of the `[G : L]` conjugates `g • A`, so a conjugation-invariant
 function sums over it to `[G : L]` times its `A`-sum:
@@ -46,7 +46,7 @@ namespace IsTISubset
 
 open scoped Pointwise
 
-/-- **Conjugation-invariant sums over a TI-saturation** (issue 9010): for a TI-subset `A`
+/-- **Conjugation-invariant sums over a TI-saturation** (issue 9011): for a TI-subset `A`
 with normalizer-bound `L` that stabilizes it (`A^l = A` for `l ∈ L`), and a
 conjugation-invariant `f`, the sum of `f` over the saturation `𝒞_G(A) = A^G` is `[G : L]`
 times the sum over `A`.  The saturation is the disjoint union of the conjugates `g • A`

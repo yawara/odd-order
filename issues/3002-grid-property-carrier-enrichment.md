@@ -160,6 +160,13 @@ hub 裁定 (9009 選択肢 2) どおり b が両半分を実施、full build 391
 - **残 (consumer-side, lane b)**: cascade wrapper wiring — (13.5) machinery + hyp の carried
   properties から `analyticInequalityEstimates` (S15_SAndT_Setup:1298) の 4 estimates を実証明。
   hu (2u≤|P|-1) は issue 9000 producer を sorried-cite。
+- **✅ 2026-07-05 後半 (lane b): consumer wiring 第 2 段完了** — 4 producer 全て実 assembly 化
+  (commits `a39ca309`〜`09b1ad39`)。(13.9.a) は完全実証明 (TI counting = issue 9011 +
+  counting layer)。(13.6)/(13.7+8)/(13.9.b) は Parseval/Galois/counting 側が全 real、残 sorry は
+  教科書番号どおりの 5 producer (13.6/13.7/13.8-T sharp bounds + 13.9.a dichotomy + λτ₁
+  coherence facts) に isolate。η-side norm-one facts は本 issue の grid fields から**実導出済**
+  (`eta10_mem_ZIrr`/`eta10_inner_self_one`) = threading の payoff 実証。詳細 =
+  notes/peterfalvi/s15_s_and_t.md LIVE STATUS (2026-07-05 後半)。
 
 ## 🧾 ユーザー裁定 (2026-07-05 監視 tick): S05 `omega_inner` 受理 + 供給編集権明文化
 
