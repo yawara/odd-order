@@ -150,3 +150,41 @@ enumeration が整った — これが (5.2.d) R(χ)-構造 discharge の素材�
    閉じ、(11.5)/(11.6) を assembly。
 4. gate 2 n-count: (11.6) U/C abelian order u + M/HC Frobenius (`frobMtilde` 相当は
    `typeP_uW1_frobenius` 系) + Ind-linear irreducibility で S1 count = (u−1)/q = n。
+
+## 2026-07-05 lane-a: h56 producer 完成 — `exists_source_index_le_two_psi_of_break` (S08_SixTwoGeneral)
+
+**abstract 層は閉じた。** 新 leaf `OddOrder/Peterfalvi/S08_SixTwoGeneral.lean` (全実証明 sorry-free +
+axiom-clean, commits 51d1d54f / 10a7e8f4 / 32c7ece4 / 82d570f3):
+
+- `inducedKernelFamily K X` = S(X) (Coq seqIndD): mem/antitone/finite/conj-closed/anchor +
+  **直交性・実正 norm・real-freeness (奇数位数)** — 可約 μ-column member 込みで全部実証明。
+- `exists_coherentBreakPair_union`: **A'/B 包含なし** の first-obstruction ((11.4) の
+  (H₁,H₀C) 対応; chain を Sa ∪ Sb 上で走らせ IsCoherent.subset で落とす)。
+- P1 `inducedKernelFamily_degreeSqNormReBound_of_break_k`: weighted engine
+  (`coherentDegreeSqNormBound_of_not_coherentW_k`, 既存・完成済だった) への plumbing 全 discharge
+  (Gram / deg 比 / K^#-support / ZIrr integrality / 生成 2 条)。
+- P2 `inducedKernelFamily_SA_sum_le_two_psi_k`: + B2 → |L:K|(|K:A'|−1) ≤ 2ψ(1)χ₁(1)。
+- **P3 `exists_source_index_le_two_psi_of_break` = h56 producer**: 結論が
+  `six_three_of_six_two_oracle`/`six_two_general` の h56 oracle と一致
+  (∃θ ∈ Irr K trivial-on-B, |K:A'|−1 ≤ 2(Ind θ)(1).re)。
+
+**残 = S13 instantiation のみ (次 frontier)**。P3 の §11-side hypotheses:
+1. **hanchor**: irreducible degree-|L:K| member of S(A') — W₁ が K/A' の linear char に非自明に
+   作用する事実 (K=M', L=M, |L:K|=q)。Frobenius W₁-action (8.4.d 系) から。
+2. **hdatum**: break Da + per-member R(χ)-分解 (coherent extension と両立、Da family と直交)。
+   - irreducible member: `memberExtensionDecomposition` (CorePart1) の適用で一般 discharge
+     可能な見込み (per-member 事実は family 層で証明済) — まずここから。
+   - **μ-column member: 本丸。** hS₁coh.extension(μⱼ) の multiplicity-free 性 = (11.8.6)/(5.8) 型
+     uniqueness。S12 muGrid (`muGrid_column_sum_mem_sOf_H0_and_reducible` ほか) +
+     grid 直交性が素材。任意の coherent extension に対する statement が要る点に注意
+     (hdatum は witness ∀-quantified)。
+3. routine: hKsupp (K^# ⊆ Dade support set — §9/§10 の A(M) 定義確認), h1A, hSBne
+   (= B ⊊ K solvable の linear char, `exists_inducedKernelFamily_member_degree_index` 流用),
+   hodd (M ≤ G 奇数)。
+4. S13 の SOf free field を `inducedKernelFamily (M'.subgroupOf M)`-形に pin
+   (§9 の sOf は「H ⊄ ker」filter 付き = S − S(H); §11 の S は full family — S(H) 部分の
+   合流に注意, (11.2) remark)。τ free field = dadeIntegralCharacterMap の形に pin
+   (S12 側の (9.5)/(10.x) Dade hypothesis instance を確認)。
+
+作業順 (上流優先): 2 の irreducible-member 分枝 → 3 routine pins → 1 anchor → 2 の μ-column
+(最深, S12 grid 併用) → 4 pin + (11.3)/(11.4) 閉じ。
