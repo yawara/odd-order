@@ -269,3 +269,9 @@ index 算術 + (11.4) glue → その後 μ-column datum。
 
 H0C_trace_ne_top / commutator_mem_H0 (elementary abelian 経由) / commutator_HC_mem_H0C
 (H·C 分解 + Commute swap)。残 (11.4): hcentral wrapper + H₁-trace-ne-⊤ + index 算術 + glue。
+
+## 2026-07-05 lane-a (loop 10): hcentral 完了 — (11.4) 残は index 算術 + glue のみ
+
+trace_ne_top_of_lt_derived / HC_quotient_H0C_comm / HC_central_condition (Normal は
+instance-arg)。(11.4) glue の全数学的前提が揃った — 残 = relIndex 変換 (relIndex_subgroupOf /
+relIndex_mul_relIndex / card_W1_eq_derived_index) + |HC| = |H||C| (disjoint sup card) + 適用。
