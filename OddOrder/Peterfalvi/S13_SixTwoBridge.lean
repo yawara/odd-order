@@ -545,6 +545,74 @@ theorem exists_source_index_le_two_psi_of_ne_top
   exact OddOrder.Peterfalvi.S08.inducedKernelFamily_nonempty_of_commutator_ne_top
     (hyp.commutator_quotient_ne_top hG hBne)
 
+/-- **μ-column break decomposition** (named obligation, Peterfalvi (5.2.d)/(11.8.6)): the
+full decomposition clause for a *reducible* break member `ψ` — a μ-grid column sum
+(`muGrid_column_sum_mem_sOf_H0_and_reducible`).  The `Da`-data comes from the grid
+`α`-parameters and the member `D`s from (5.8) extension-uniqueness. -/
+theorem sixTwoDecompositionData_of_reducible_break [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis M)
+    (A' B : Subgroup ↥M)
+    (S₁ : Set (ClassFunction ↥M ℂ))
+    (hS₁conj : OddOrder.Peterfalvi.S03.ClosedUnderConjugate S₁)
+    (hsub : S₁ ⊆ S08.inducedKernelFamily ((derivedInG M).subgroupOf M) A' ∪
+      S08.inducedKernelFamily ((derivedInG M).subgroupOf M) B)
+    (hS₁coh : OddOrder.Peterfalvi.S07.IsCoherent
+      (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap hyp.dadeData.dade
+        (hyp.dadeData.dade.fullDadeIsometryData hyp.hconj))
+      S₁ hyp.A0)
+    (ψ : ClassFunction ↥M ℂ)
+    (hψB : ψ ∈ S08.inducedKernelFamily ((derivedInG M).subgroupOf M) B)
+    (hψnotS1 : ψ ∉ S₁) (hψcnotS1 : ψ.conj ∉ S₁)
+    (χ₁ : ClassFunction ↥M ℂ) (hχ₁S₁ : χ₁ ∈ S₁)
+    (a : ℕ) (hψdeg : ψ 1 = (a : ℂ) * χ₁ 1)
+    (hbreak : ¬ Nonempty (OddOrder.Peterfalvi.S07.IsCoherent
+      (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap hyp.dadeData.dade
+        (hyp.dadeData.dade.fullDadeIsometryData hyp.hconj))
+      (S₁ ∪ {ψ, ψ.conj}) hyp.A0))
+    (hψred : ¬ IsIrreducibleCharacter ψ) :
+    ∃ Da : OddOrder.Peterfalvi.S07.CharacterPsiDecomposition (L := ↥M) (G := G)
+        (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap hyp.dadeData.dade
+          (hyp.dadeData.dade.fullDadeIsometryData hyp.hconj)) ψ (a • χ₁),
+      Da.tau1 = OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap hyp.dadeData.dade
+        (hyp.dadeData.dade.fullDadeIsometryData hyp.hconj) ∧
+      ∀ χ ∈ S₁, ∃ D : OddOrder.Peterfalvi.S07.CharacterPsiDecomposition (L := ↥M) (G := G)
+          (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap hyp.dadeData.dade
+            (hyp.dadeData.dade.fullDadeIsometryData hyp.hconj)) χ 0,
+        D.imageFamily.Orthogonal Da.imageFamily ∧
+        D.tau1 χ = hS₁coh.extension χ := by
+  sorry
+
+/-- **μ-column member decomposition** (named obligation, Peterfalvi (11.8.6)/(5.8)): the
+member clause for a *reducible* `χ ∈ S₁` (μ-grid column sum) against an irreducible break
+`Da`. -/
+theorem sixTwoMemberDatum_of_reducible_member [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis M)
+    {A' B : Subgroup ↥M}
+    {S₁ : Set (ClassFunction ↥M ℂ)}
+    (hS₁conj : OddOrder.Peterfalvi.S03.ClosedUnderConjugate S₁)
+    (hS₁sub : S₁ ⊆ S08.inducedKernelFamily ((derivedInG M).subgroupOf M) ⊥)
+    (hS₁coh : OddOrder.Peterfalvi.S07.IsCoherent
+      (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap hyp.dadeData.dade
+        (hyp.dadeData.dade.fullDadeIsometryData hyp.hconj))
+      S₁ hyp.A0)
+    {ψ : ClassFunction ↥M ℂ}
+    (hψB : ψ ∈ S08.inducedKernelFamily ((derivedInG M).subgroupOf M) B)
+    (hψirr : IsIrreducibleCharacter ψ)
+    (hψnotS1 : ψ ∉ S₁) (hψcnotS1 : ψ.conj ∉ S₁)
+    {χ₁ : ClassFunction ↥M ℂ} (hχ₁S₁ : χ₁ ∈ S₁)
+    {a : ℕ} (hψdeg : ψ 1 = (a : ℂ) * χ₁ 1)
+    {χ : ClassFunction ↥M ℂ} (hχS₁ : χ ∈ S₁)
+    (hχred : ¬ IsIrreducibleCharacter χ) :
+    ∃ D : OddOrder.Peterfalvi.S07.CharacterPsiDecomposition (L := ↥M) (G := G)
+        (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap hyp.dadeData.dade
+          (hyp.dadeData.dade.fullDadeIsometryData hyp.hconj)) χ 0,
+      D.imageFamily.Orthogonal
+        (S08.inducedKernelFamily_breakDa_of_irreducible hyp.dadeData.dade hyp.hconj
+          (card_odd_of_isMinimalSimpleOdd hG hyp) hyp.mderivSharp_subset_A0 hS₁sub hψB hψirr
+          hψnotS1 hψcnotS1 hχ₁S₁ hψdeg).1.imageFamily ∧
+      D.tau1 χ = hS₁coh.extension χ := by
+  sorry
+
 /-- **The (5.2.d) decomposition data for the §11 family — the single remaining grid obligation
 of the h56 chain** (issue 2022).  For any intermediate coherent set `S₁` between the `S(A')` and
 `S(B)` layers and any break `ψ ∈ S(B)` with anchor ratio `a`, supplies the break decomposition
@@ -588,7 +656,29 @@ theorem sixTwoDecompositionData [Finite G]
               (hyp.dadeData.dade.fullDadeIsometryData hyp.hconj)) χ 0,
           D.imageFamily.Orthogonal Da.imageFamily ∧
           D.tau1 χ = hS₁coh.extension χ := by
-  sorry
+  intro S₁ hS₁conj hsub hS₁coh ψ hψB hψnotS1 hψcnotS1 χ₁ hχ₁S₁ a hψdeg hbreak
+  have hS₁sub : S₁ ⊆ S08.inducedKernelFamily ((derivedInG M).subgroupOf M) ⊥ := by
+    intro φ hφ
+    rcases hsub hφ with h | h
+    · exact S08.inducedKernelFamily_antitone bot_le h
+    · exact S08.inducedKernelFamily_antitone bot_le h
+  have hodd := card_odd_of_isMinimalSimpleOdd hG hyp
+  by_cases hψirr : IsIrreducibleCharacter ψ
+  · -- irreducible break: the S08 general discharge
+    set bd := S08.inducedKernelFamily_breakDa_of_irreducible
+      hyp.dadeData.dade hyp.hconj hodd hyp.mderivSharp_subset_A0 hS₁sub hψB hψirr
+      hψnotS1 hψcnotS1 hχ₁S₁ hψdeg with hbd
+    refine ⟨bd.1, bd.2.1, ?_⟩
+    intro χ hχS₁
+    by_cases hχirr : IsIrreducibleCharacter χ
+    · exact S08.inducedKernelFamily_memberDatum_orthogonal_breakDa_of_irr_irr
+        hyp.dadeData.dade hyp.hconj hodd hyp.mderivSharp_subset_A0 hS₁sub hS₁conj hS₁coh
+        hψB hψirr hψnotS1 hψcnotS1 hχ₁S₁ hψdeg hχS₁ hχirr
+    · exact sixTwoMemberDatum_of_reducible_member (A' := A') hG hyp hS₁conj hS₁sub hS₁coh hψB hψirr
+        hψnotS1 hψcnotS1 hχ₁S₁ hψdeg hχS₁ hχirr
+  · -- reducible (μ-column) break: the named grid obligation
+    exact sixTwoDecompositionData_of_reducible_break hG hyp A' B S₁ hS₁conj hsub hS₁coh
+      ψ hψB hψnotS1 hψcnotS1 χ₁ hχ₁S₁ a hψdeg hbreak hψirr
 
 /-- **The h56 oracle for the §11 context, complete modulo the grid datum**: from the coherence
 dichotomy alone (proper traces `A', B ⊊ M'`), a source `θ ∈ Irr M'` trivial on `B` with
