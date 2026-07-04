@@ -1865,6 +1865,27 @@ theorem coherent_extension_constituent_orthogonal_Rset_of_nonconjugate {L M : Su
     OddOrder.Peterfalvi.S07.IntegralCharacterMap.inner_eq_zero_of_mem_zSpan hαperp h55
   rw [inner_conj_symm α (coh_L.extension (φ_L : ClassFunction ↥L ℂ)), h0, star_zero]
 
+open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
+/-- **Peterfalvi (12.5), the `o_rpsi_S` orthogonality component**: a class function `ψ` orthogonal
+to `R(χ) = Rset data` is orthogonal to the coherent Dade image `coh.extension φ` of every
+constituent `φ ∈ S(χ)` that lies in `S`.  Immediate from (5.5)
+`coherent_extension_constituent_mem_span_Rset` (`coh.extension φ ∈ ℤ[R(χ)]`) and
+`inner_eq_zero_of_mem_zSpan`.
+
+This is the same-`L` specialization of
+`coherent_extension_constituent_orthogonal_Rset_of_nonconjugate` with `ψ` an arbitrary
+`R(χ)`-orthogonal function in place of a second coherent image, and is the `'[psi, tau2 xi] = 0`
+step of the Coq (12.5) `o_rpsi_S` proof (`opsiR`). -/
+theorem inner_psi_coherent_extension_eq_zero {L : Subgroup G} [Finite G]
+    (hyp : Hypothesis L) (coh : OddOrder.Peterfalvi.S07.IsCoherent hyp.tau hyp.Sset hyp.A)
+    {chi : ClassFunction ↥L ℂ} (data : CharacterDecompositionData hyp chi)
+    {φ : IrreducibleCharacter ↥L} (hφ : φ ∈ data.constituents)
+    (hφmem : (φ : ClassFunction ↥L ℂ) ∈ hyp.Sset) {psi : ClassFunction G ℂ}
+    (horth : ∀ α ∈ Rset data, ClassFunction.inner psi α = 0) :
+    ClassFunction.inner psi (coh.extension (φ : ClassFunction ↥L ℂ)) = 0 :=
+  OddOrder.Peterfalvi.S07.IntegralCharacterMap.inner_eq_zero_of_mem_zSpan horth
+    (coherent_extension_constituent_mem_span_Rset hyp coh data hφ hφmem)
+
 open scoped Classical in
 /-- **General TI-induction self-value** (Isaacs 7.x / Peterfalvi (3.2.c) value half), generalized
 from `TICyclicHypothesis.induce_apply_eq_self_of_mem_V` to an arbitrary TI subset.  For a TI subset
