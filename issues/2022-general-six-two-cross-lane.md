@@ -282,3 +282,11 @@ bare sorry 撤去 (依存 = sixTwoDecompositionData のみ)。index 算術 (card
 HC_relIndex_derived / HC_trace_index) + glue。instance desync は legacy binder 削除で解決。
 次候補: (11.5) HC_le_secondDerived ((11.4) 消費、(5.7)+(11.1)/(9.6) 算術) or (11.3) 6.3-route
 or μ-column datum 本体。
+
+## 2026-07-05 lane-a (loop 12): (11.5) 準備 — M''-正規性 + (5.7) named
+
+le_normalizer_secondDerived (pointwise_smul 既存活用) + secondDerived_coherent (named sorried;
+配線先 = coherentEqualDegree_fromDade)。(11.5) 残: FPF-dvd (W1_dvd_index_of_fixedPoints_le
+再利用可、hfix = W2_le 直) + C<U (U_noncentral_on_quotient 経由) + tower + glue。
+open named sorries: sixTwoDecompositionData (μ-column) / secondDerived_coherent ((5.7) 配線) /
+coherent_S_of_coherent_SH0C ((11.3) = 6.3-route、producer 部品は全て揃済)。
