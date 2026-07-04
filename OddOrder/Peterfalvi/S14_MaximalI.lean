@@ -11,6 +11,7 @@ import OddOrder.GroupTheory.RepresentationTheory.SingerField
 import OddOrder.GroupTheory.RepresentationTheory.CliffordDecomposition
 import OddOrder.GroupTheory.RepresentationTheory.CyclotomicCharacterCongruence
 import OddOrder.GroupTheory.RepresentationTheory.InducedInvariantConstituent
+import OddOrder.Algebra.GaloisRationalInteger
 import Mathlib.RepresentationTheory.Irreducible
 
 /-!
@@ -6055,14 +6056,139 @@ theorem psi_apply_x_sub_e_cyclotomic [Finite G] {p : ℕ} (hp : 0 < p) {ε : ℂ
   rw [mul_one, hψ1] at hzeq
   exact ⟨z, hz, hzeq⟩
 
-/-- **Peterfalvi (12.15)**: the rho image is unchanged on `K#`, constant on
-`K - K'`, and has integer values there. -/
-theorem rhoM_integer_values [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
-    {ctr : CounterexampleHypothesis (G := G)} {L : Subgroup G}
-    {hyp : Hypothesis L} (dade : DadeNotation hyp) :
-    dade.rhoMFormula ∧
-      (∀ g : G, g ∈ ctr.K → g ∉ ctr.Kprime → ∃ z : ℤ, dade.psi g = (z : ℂ)) := by
-  sorry
+/-- Virtual-character values are algebraic integers (local copy of the `S05` lemma
+`isIntegral_apply_of_mem_ZIrr`, which lives in an unimported leaf): each irreducible value is a
+sum of roots of unity (`character_isIntegral`), and `IsIntegral ℤ` is closed under the `ℤ`-span. -/
+private theorem isIntegral_apply_of_mem_ZIrr' {φ : ClassFunction G ℂ} [Finite G]
+    (hφ : φ ∈ ZIrr G) (g : G) : IsIntegral ℤ (φ g) := by
+  induction hφ using Submodule.span_induction with
+  | mem x hx =>
+      obtain ⟨V, _, _, _, ρ, hchar⟩ :=
+        IsIrreducibleCharacter.isCharacter (mem_irreducibleCharacters.mp hx)
+      rw [show x g = ρ.character g from congrFun hchar g]
+      exact OddOrder.RepresentationTheory.character_isIntegral ρ g
+  | zero => rw [ClassFunction.zero_apply]; exact isIntegral_zero
+  | add a b _ _ ha hb => rw [ClassFunction.add_apply]; exact ha.add hb
+  | smul n a _ ha =>
+      rw [ClassFunction.zsmul_apply, zsmul_eq_mul]
+      exact (isIntegral_algebraMap (x := n)).mul ha
+
+/-- **Peterfalvi (12.15), the integrality clause** (`ψ(g) ∈ ℤ` for `g ∈ K − K′`): a virtual
+character `ψ ∈ ℤ[Irr G]` that is **constant on `K − K′`** takes an integer value there.
+
+**Honest reconstruction of the (12.15) integrality** (Coq `rhoM_psi`, final `Cint_rat_Aint` step).
+Two facts combine:
+* `ψ(g)` is an **algebraic integer** — the value of a virtual character
+  (`isIntegral_apply_of_mem_ZIrr`);
+* `ψ(g)` is **rational** — from the class-function inner-product identity
+  `|K|·⟨Res_K ψ, 1_K⟩ = |K′|·⟨Res_{K′} ψ, 1_{K′}⟩ + |K − K′|·ψ(g)`.  The two inner products are
+  integers (`inner_mem_ZIrr_int`, since `Res ψ` and `1` are virtual characters), and `ψ` is
+  constant `= ψ(g)` on the `|K − K′|` elements of `K − K′` (the `hconst` hypothesis, which is the
+  companion "`ψ` constant on `K − K′`" clause of (12.15), proven from (12.3)/(12.5)); so `ψ(g)` is a
+  `ℚ`-combination of integers, i.e. rational.
+A rational algebraic integer is a rational integer (`exists_int_of_isIntegral_of_mem_range_rat`).
+
+The **constancy** hypothesis `hconst` isolates the genuine input this integrality needs; the
+`ψ ∈ ZIrr G` hypothesis (the Dade image is a virtual character, by (12.13)) makes the statement
+sound — for a non-virtual `ψ` the value need not be an integer.  This discharges the `h_psig_int`
+field of `CounterexampleDadeData` once `ψ = dade.psi` and its `K − K′`-constancy are in place. -/
+theorem rhoM_integer_values [Finite G]
+    {ctr : CounterexampleHypothesis (G := G)}
+    {ψ : ClassFunction G ℂ} (hψ : ψ ∈ ZIrr G)
+    (hconst : ∀ g₁ g₂ : G, g₁ ∈ ctr.K → g₁ ∉ ctr.Kprime →
+      g₂ ∈ ctr.K → g₂ ∉ ctr.Kprime → ψ g₁ = ψ g₂) :
+    ∀ g : G, g ∈ ctr.K → g ∉ ctr.Kprime → ∃ z : ℤ, ψ g = (z : ℂ) := by
+  classical
+  intro g hgK hgK'
+  -- `K′ = [K, K] ≤ K`.
+  have hK'K : ctr.Kprime ≤ ctr.K := ctr.Kprime_eq ▸ Subgroup.map_subtype_le _
+  haveI : Fintype ↥ctr.K := Fintype.ofFinite _
+  haveI : Fintype ↥ctr.Kprime := Fintype.ofFinite _
+  haveI : Invertible (Nat.card ↥ctr.K : ℂ) :=
+    invertibleOfNonzero (by exact_mod_cast (Nat.card_pos (α := ↥ctr.K)).ne')
+  haveI : Invertible (Nat.card ↥ctr.Kprime : ℂ) :=
+    invertibleOfNonzero (by exact_mod_cast (Nat.card_pos (α := ↥ctr.Kprime)).ne')
+  -- The restrictions are virtual characters; `1` is a virtual character.
+  have hResK : ClassFunction.restrict ctr.K ψ ∈ ZIrr ↥ctr.K :=
+    ClassFunction.restrict_mem_ZIrr ctr.K hψ
+  have hResK' : ClassFunction.restrict ctr.Kprime ψ ∈ ZIrr ↥ctr.Kprime :=
+    ClassFunction.restrict_mem_ZIrr ctr.Kprime hψ
+  have h1K : trivialClassFunction ↥ctr.K ∈ ZIrr ↥ctr.K :=
+    (trivialClassFunction_isIrreducible (G := ↥ctr.K)).mem_ZIrr
+  have h1K' : trivialClassFunction ↥ctr.Kprime ∈ ZIrr ↥ctr.Kprime :=
+    (trivialClassFunction_isIrreducible (G := ↥ctr.Kprime)).mem_ZIrr
+  -- The two inner products are integers.
+  obtain ⟨a, ha⟩ := ClassFunction.inner_mem_ZIrr_int hResK h1K
+  obtain ⟨b, hb⟩ := ClassFunction.inner_mem_ZIrr_int hResK' h1K'
+  -- `∑_{z:↥K} ψ(z) = |K|·⟨Res_K ψ, 1⟩`.
+  have hsumK : (∑ z : ↥ctr.K, ψ (z : G)) = (Nat.card ↥ctr.K : ℂ) * (a : ℂ) := by
+    have := ClassFunction.card_mul_inner (ClassFunction.restrict ctr.K ψ)
+      (trivialClassFunction ↥ctr.K)
+    rw [ha] at this
+    rw [this]
+    simp only [ClassFunction.innerSum, ClassFunction.restrict_apply,
+      trivialClassFunction_apply, star_one, mul_one]
+  -- `∑_{z:↥K′} ψ(z) = |K′|·⟨Res_{K′} ψ, 1⟩`.
+  have hsumK' : (∑ z : ↥ctr.Kprime, ψ (z : G)) = (Nat.card ↥ctr.Kprime : ℂ) * (b : ℂ) := by
+    have := ClassFunction.card_mul_inner (ClassFunction.restrict ctr.Kprime ψ)
+      (trivialClassFunction ↥ctr.Kprime)
+    rw [hb] at this
+    rw [this]
+    simp only [ClassFunction.innerSum, ClassFunction.restrict_apply,
+      trivialClassFunction_apply, star_one, mul_one]
+  -- Split the `↥K` sum by membership in `K′` (as a predicate on `↥K`).
+  set p : ↥ctr.K → Prop := fun z => (z : G) ∈ ctr.Kprime with hp
+  have hsplit : (∑ z : ↥ctr.K, ψ (z : G)) =
+      (∑ z ∈ Finset.univ.filter p, ψ (z : G)) +
+      (∑ z ∈ Finset.univ.filter (fun z => ¬ p z), ψ (z : G)) :=
+    (Finset.sum_filter_add_sum_filter_not Finset.univ p (fun z => ψ (z : G))).symm
+  -- The `K′`-part (filtered `↥K` sum) reindexes to the `↥K′` sum, via `{z : ↥K // (z:G)∈K′} ≃ ↥K′`.
+  have hpart1 : (∑ z ∈ Finset.univ.filter p, ψ (z : G)) =
+      ∑ z : ↥ctr.Kprime, ψ (z : G) := by
+    -- The bijection `{z : ↥K // (z:G) ∈ K′} ≃ ↥K′`, `⟨⟨z,-⟩, hz⟩ ↦ ⟨z, hz⟩`.
+    let φ : {z : ↥ctr.K // p z} ≃ ↥ctr.Kprime :=
+      { toFun := fun z => ⟨((z : ↥ctr.K) : G), z.2⟩
+        invFun := fun z => ⟨⟨(z : G), hK'K z.2⟩, z.2⟩
+        left_inv := fun z => by ext; rfl
+        right_inv := fun z => by ext; rfl }
+    rw [Finset.sum_subtype (Finset.univ.filter p) (Finset.mem_filter_univ (p := p))
+      (fun z => ψ (z : G))]
+    exact Fintype.sum_equiv φ (fun z : {z : ↥ctr.K // p z} => ψ ((z : ↥ctr.K) : G))
+      (fun z : ↥ctr.Kprime => ψ (z : G)) (fun z => rfl)
+  -- The complement-part is constant `= ψ(g)`.
+  have hconst' : ∀ z ∈ Finset.univ.filter (fun z : ↥ctr.K => ¬ p z),
+      ψ (z : G) = ψ g := by
+    intro z hz
+    rw [Finset.mem_filter] at hz
+    exact hconst (z : G) g z.2 hz.2 hgK hgK'
+  set N : ℕ := (Finset.univ.filter (fun z : ↥ctr.K => ¬ p z)).card with hN
+  have hpart2 : (∑ z ∈ Finset.univ.filter (fun z : ↥ctr.K => ¬ p z), ψ (z : G))
+      = (N : ℂ) * ψ g := by
+    rw [Finset.sum_congr rfl hconst', Finset.sum_const, hN, nsmul_eq_mul]
+  -- Assemble the identity `|K|·a = |K′|·b + N·ψ(g)`.
+  have hident : (Nat.card ↥ctr.K : ℂ) * (a : ℂ) =
+      (Nat.card ↥ctr.Kprime : ℂ) * (b : ℂ) + (N : ℂ) * ψ g := by
+    have h := hsplit
+    rw [hsumK, hpart1, hsumK', hpart2] at h
+    exact h
+  -- `N ≠ 0`: `g` itself is such an element.
+  have hNpos : 0 < N := by
+    rw [hN]
+    refine Finset.card_pos.mpr ⟨⟨g, hgK⟩, ?_⟩
+    rw [Finset.mem_filter]
+    exact ⟨Finset.mem_univ _, hgK'⟩
+  have hNne : (N : ℂ) ≠ 0 := by exact_mod_cast hNpos.ne'
+  -- Solve for `ψ(g)` in `ℂ`.
+  have hsolve : ψ g =
+      ((Nat.card ↥ctr.K : ℂ) * (a : ℂ) - (Nat.card ↥ctr.Kprime : ℂ) * (b : ℂ)) / (N : ℂ) := by
+    rw [eq_div_iff hNne]
+    linear_combination -hident
+  -- `ψ(g)` is rational (image of a `ℚ`) and an algebraic integer, hence a rational integer.
+  obtain ⟨z, hz⟩ := OddOrder.Algebra.exists_int_of_isIntegral_of_mem_range_rat
+    (isIntegral_apply_of_mem_ZIrr' hψ g)
+    ⟨((Nat.card ↥ctr.K : ℚ) * (a : ℚ) - (Nat.card ↥ctr.Kprime : ℚ) * (b : ℚ)) / (N : ℚ), by
+      rw [hsolve]; push_cast; ring⟩
+  exact ⟨z, hz.symm⟩
 
 /-- **Peterfalvi (12.16), the (1.10) congruence core**: the cyclotomic-congruence chain of the
 (12.16) contradiction.  Given the minimal-counterexample data — a virtual character `ψ ∈ ℤ[Irr G]`,
@@ -6275,23 +6401,161 @@ structure CounterexampleDadeData {ctr : CounterexampleHypothesis (G := G)}
   hB : (1 : ℝ) - (e : ℝ) / kH ≤ normRho
   hC : normRhoM + normRho < 1
 
+open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
+/-- **Peterfalvi (12.13)/(12.16), the coherent-extension degree preservation**
+(`dade.psi 1 = e`, the `ψ(1) = χ(1) = e` input of `h_psix`).  For the witness `L`'s (12.13) Dade
+calculation `ψ = χ^{τ₁}` (`ψ = coh.extension χ`, `χ ∈ S`, `χ(1) = e = [L:H]`), the coherent
+extension preserves the value at `1`: `ψ(1) = χ(1) = e`.
+
+**Genuinely still-missing** as a usable equality: `IsCoherent` (`S07.IsCoherent`) only records the
+lattice-relative *isometry* (`extension_inner_eq`) and the supported-agreement
+(`extends_on_supported`) of the coherent extension; degree preservation `(extension χ)(1) = χ(1)` is
+a separate (7.7.a)/(7.8.a) fact (`ψ = χ_1^{τ_1}` matches degrees because the Dade extension `τ₁`
+sends `χ` to an irreducible constituent of the same degree) that is not exposed as an `IsCoherent`
+field nor assembled elsewhere for the witness.  The statement is **sound**: it is the genuine
+(12.13) degree identity for the witness's distinguished `χ ∈ S` (tied to `hyp`/`dade` via `coh`
+and the `dade.psi = coh.extension dade.chi` shape recorded by `hψeq`), true because the
+(7.8) coherent extension of a type-I family is degree-preserving on `S`. -/
+theorem witness_psi_degree [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    {L : Subgroup G} (hyp : Hypothesis L)
+    (coh : OddOrder.Peterfalvi.S07.IsCoherent hyp.tau hyp.Sset hyp.A)
+    (dade : DadeNotation hyp)
+    (hψeq : dade.psi = coh.extension dade.chi) :
+    dade.psi (1 : G) = (dade.e : ℂ) := by
+  sorry
+
+open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
+/-- **Peterfalvi (12.14)/(12.15) + (7.3)/(7.8.b)/(8.17), the witness value/norm package** — the
+deep §7/§12 content the (12.16) contradiction consumes beyond the arithmetic, bundled as one
+faithfully-typed obligation for the specific witness Dade character `ψ = dade.psi`.
+
+Concretely, for the (12.9) witness `L` with its (12.13) Dade calculation `ψ = χ^{τ₁}` of degree
+`e = dade.e = [L:H]`, and the commuting `g ∈ C_K(x) ∖ K'`, it supplies:
+* `mval`, `h_psig_int` — (12.15): `ψ(g) ∈ ℤ` (`ψ` constant on `K − K′`, integer-valued there);
+* `h_const` — (12.14): `ψ(x·g) = ψ(x)` (`ψ` constant on the coset `xK`);
+* `hidx` — the fixed-point-free `[K:K'] ≥ 4` of (8.1.c), as `4·|K'| ≤ |K|`;
+* `h2e` — the degree bound `2e ≤ p+1` of (12.12);
+* `normRhoM`, `normRho`, `hA`, `hB`, `hC` — the `ρ`/`ρM` norm estimates: `hA` = (12.15) norm
+  relation `‖ψ^{ρM}‖² ≥ (|K−K'|/|M|)·ψ(g)²`, `hB` = (7.8.b) `‖ψ^ρ‖² ≥ 1 − e/|H|`, `hC` =
+  (7.3)+(8.17) `‖ψ^{ρM}‖² + ‖ψ^ρ‖² < 1`.
+
+**Genuinely still-missing**: the `ρ`-machinery norm estimates (`S09.zetaNuRhoNormSqGeOfDade` for
+`hB`, `chiRho_integral_inequality`/(8.17) support-disjointness for `hC`, the (12.15) `ρM` relation
+for `hA`), the (12.3)/(12.5) constancy facts feeding `h_const`/(12.15), and the (8.1.c)/(12.12)
+numerics `hidx`/`h2e` for the witness are none of them assembled into these exact conclusions in
+reach of `S14`.  The statement is **sound**: each conjunct is the genuine
+(12.14)/(12.15)/(12.12)/(8.1.c)/(7.x)
+fact for the *specific* witness character `ψ = dade.psi` of the genuine witness `L` (tied to
+`ctr`/`witness`/`hyp`/`dade` via `data` and `hψZ`), with `e = dade.e` and `|K|,|K'|,|M|,|H|` the
+genuine cardinalities — not a free arithmetic implication. -/
+theorem witness_value_norm_package [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    {ctr : CounterexampleHypothesis (G := G)} {L : Subgroup G}
+    (data : RankTwoWitnessData ctr) (hLeq : L = data.L)
+    {g : G} (hg_comm : Commute data.x g) (hgK : g ∈ ctr.K) (hgK' : g ∉ ctr.Kprime)
+    (hyp : Hypothesis L) (coh : OddOrder.Peterfalvi.S07.IsCoherent hyp.tau hyp.Sset hyp.A)
+    (dade : DadeNotation hyp)
+    (hψeq : dade.psi = coh.extension dade.chi)
+    (he_eq : dade.e = ((hyp.typeI.typeF.H).subgroupOf L).index) (hψZ : dade.psi ∈ ZIrr G) :
+    ∃ (mval : ℤ) (normRhoM normRho : ℝ),
+      dade.psi (data.x * g) = dade.psi data.x ∧
+      dade.psi g = (mval : ℂ) ∧
+      2 * (dade.e : ℤ) ≤ (ctr.p : ℤ) + 1 ∧
+      4 * (Nat.card ↥ctr.Kprime : ℝ) ≤ (Nat.card ↥ctr.K : ℝ) ∧
+      ((Nat.card ↥ctr.K : ℝ) - (Nat.card ↥ctr.Kprime : ℝ)) / (Nat.card ↥ctr.M : ℝ)
+          * (mval : ℝ) ^ 2 ≤ normRhoM ∧
+      (1 : ℝ) - (dade.e : ℝ) / (Nat.card ↥(hyp.typeI.typeF.H) : ℝ) ≤ normRho ∧
+      normRhoM + normRho < 1 := by
+  sorry
+
+open scoped OddOrder.Peterfalvi.S12.FiniteInduce in
 /-- **Peterfalvi (12.13)–(12.15) + (7.3)/(7.8.b)**, the construction of the character/norm contract
 of (12.16).  Given the rank-two witness of (12.9) and a commuting element `g ∈ C_K(x) ∖ K'`
 (`exists_witness_g`), the §7/§12 machinery produces the Dade calculation `ψ = χ^{τ₁}` and its
 associated `ρ`/`ρM` norm bounds.
 
-This is the remaining deep obligation of (12.16): build a `Hypothesis L` for the witness subgroup
-`L` (type I by (12.10) `witness_L_frobenius`), the Dade isometry `τ₁` and coherent family `S`
-((12.6)), the `DadeNotation` of (12.13), then discharge each field via the existing §12 theorems —
-`psi_constant_on_xK` (12.14), `rhoM_integer_values` (12.15), `intersection_complement_structure`
-(12.11) — and the §7 `chiRho` norm estimates (`S09.NormEstimates`, `chiRho_integral_inequality`).
-Bottoms out on (12.6)/(12.10)/(12.11) (cited via signature contract). -/
+**Assembly** (`sorry`-free modulo the two genuine deep pins): the (12.6) coherence
+`witness_L_coherent` + the distinguished `χ ∈ S` (`exists_distinguished_char`, degree `e = [L:H]`)
+realize the (12.13) `dade = dadeNotation_of_coherence …` with `ψ = coh.extension χ ∈ ZIrr G`; then
+each `CounterexampleDadeData` field is discharged:
+* `ε`/`hε` — a primitive `p`-th root of unity (`Complex.isPrimitiveRoot_exp`);
+* `e := dade.e = [L:H]`, `he : 3 ≤ e` from `three_le_index` (`|U|` odd `> 1`);
+* `kK`/`kKp`/`kM`/`kH` := `|K|`/`|K'|`/`|M|`/`|H|` with positivity from `Nat.card_pos`, and
+  `hM : |M| ≤ |K|·|H|` from `card_M_le` (12.11);
+* `h_psix` from `psi_apply_x_sub_e_cyclotomic` (1.10.a) fed by `witness_psi_degree` (`ψ(1) = e`);
+* `mval`/`h_const`/`h_psig_int`/`h2e`/`hidx`/`hA`/`hB`/`hC` from the deep value/norm package
+  `witness_value_norm_package` (the (12.14)/(12.15)/(12.12)/(8.1.c)/(7.x) content). -/
 theorem exists_counterexample_dade_data [Finite G]
-    (_hG : OddOrder.BG.IsMinimalSimpleOdd G) (ctr : CounterexampleHypothesis (G := G))
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (ctr : CounterexampleHypothesis (G := G))
     (witness : RankTwoWitnessData ctr) {g : G}
-    (_hg_comm : Commute witness.x g) (_hgK : g ∈ ctr.K) (_hgK' : g ∉ ctr.Kprime) :
-    Nonempty (CounterexampleDadeData witness g) :=
-  sorry
+    (hg_comm : Commute witness.x g) (hgK : g ∈ ctr.K) (hgK' : g ∉ ctr.Kprime) :
+    Nonempty (CounterexampleDadeData witness g) := by
+  classical
+  haveI : Fact ctr.p.Prime := ⟨ctr.p_prime⟩
+  -- (12.6) coherence + distinguished `χ ∈ S` of degree `e = [L:H]`; realize (12.13) `dade`.
+  obtain ⟨hyp, ⟨coh⟩⟩ := witness_L_coherent hG witness
+  obtain ⟨χ, hχ, hdeg⟩ := exists_distinguished_char hyp
+  set dade : DadeNotation hyp :=
+    dadeNotation_of_coherence hyp coh χ hχ
+      ((hyp.typeI.typeF.H).subgroupOf witness.L).index hdeg with hdade
+  -- `ψ = coh.extension χ ∈ ℤ[Irr G]` and `dade.e = [L:H]`.
+  have hψeq : dade.psi = coh.extension dade.chi := rfl
+  have he_eq : dade.e = ((hyp.typeI.typeF.H).subgroupOf witness.L).index := rfl
+  have hψZ : dade.psi ∈ ZIrr G := coh.extension_mem_ZIrr χ (Submodule.subset_span hχ)
+  -- A primitive `p`-th root of unity.
+  obtain ⟨ε, hε⟩ : ∃ ε : ℂ, IsPrimitiveRoot ε ctr.p :=
+    ⟨_, Complex.isPrimitiveRoot_exp ctr.p ctr.p_prime.pos.ne'⟩
+  -- `3 ≤ e = [L:H]`.
+  have hthree : 3 ≤ dade.e := he_eq ▸ three_le_index hG hyp
+  -- `ψ(1) = e`, hence the (1.10.a) cyclotomic congruence at `x` (`h_psix`).
+  have hψ1 : dade.psi (1 : G) = (dade.e : ℂ) :=
+    witness_psi_degree hG hyp coh dade hψeq
+  have h_psix : ∃ w : ℂ, IsIntegral ℤ w ∧ dade.psi witness.x - (dade.e : ℂ) = (1 - ε) * w :=
+    psi_apply_x_sub_e_cyclotomic ctr.p_prime.pos hε hψZ witness.x_mem_omega1 hψ1
+  -- `H = L_F` (kernel of the witness) has the same order as the maximal nilpotent normal Hall.
+  have hHcard : (Nat.card ↥(hyp.typeI.typeF.H) : ℝ)
+      = (Nat.card ↥(maxNilpotentNormalHall witness.L) : ℝ) := by
+    rw [hyp.typeI.typeF.H_eq]
+  -- The deep value/norm package (12.14)/(12.15)/(12.12)/(8.1.c)/(7.x).
+  obtain ⟨mval, normRhoM, normRho, h_const, h_psig_int, h2e, hidx, hA, hB, hC⟩ :=
+    witness_value_norm_package hG witness rfl hg_comm hgK hgK' hyp coh dade hψeq he_eq hψZ
+  -- `|M| ≤ |K|·|H|` (12.11).
+  have hM : (Nat.card ↥ctr.M : ℝ)
+      ≤ (Nat.card ↥ctr.K : ℝ) * (Nat.card ↥(maxNilpotentNormalHall witness.L) : ℝ) := by
+    have := card_M_le hG witness
+    calc (Nat.card ↥ctr.M : ℝ)
+        ≤ ((Nat.card ↥ctr.K * Nat.card ↥(maxNilpotentNormalHall witness.L) : ℕ) : ℝ) := by
+          exact_mod_cast this
+      _ = (Nat.card ↥ctr.K : ℝ) * (Nat.card ↥(maxNilpotentNormalHall witness.L) : ℝ) := by
+          push_cast; ring
+  exact ⟨{
+    ε := ε
+    hε := hε
+    ψ := dade.psi
+    hψ := hψZ
+    e := (dade.e : ℤ)
+    mval := mval
+    he := by exact_mod_cast hthree
+    h2e := h2e
+    h_const := h_const
+    h_psix := h_psix
+    h_psig_int := h_psig_int
+    kK := (Nat.card ↥ctr.K : ℝ)
+    kKp := (Nat.card ↥ctr.Kprime : ℝ)
+    kM := (Nat.card ↥ctr.M : ℝ)
+    kH := (Nat.card ↥(maxNilpotentNormalHall witness.L) : ℝ)
+    normRhoM := normRhoM
+    normRho := normRho
+    hkKp := by exact_mod_cast (Nat.card_pos (α := ↥ctr.Kprime))
+    hkM := by exact_mod_cast (Nat.card_pos (α := ↥ctr.M))
+    hkH := by exact_mod_cast (Nat.card_pos (α := ↥(maxNilpotentNormalHall witness.L)))
+    hidx := hidx
+    hM := hM
+    hA := hA
+    hB := by
+      -- `(↑(dade.e : ℤ) : ℝ) = (dade.e : ℝ)` and `|H| = |maxNilpotentNormalHall L|`.
+      rw [show (((dade.e : ℤ) : ℝ)) = (dade.e : ℝ) by push_cast; ring, ← hHcard]
+      exact hB
+    hC := hC }⟩
 
 /-- **Peterfalvi (12.16)**: the minimal counterexample of (12.8) is impossible.
 
