@@ -10,6 +10,25 @@
 
 ## ✅ LIVE STATUS (2026-07-05 後半, lane **b** — (13.10) 4 producer 全 discharge、residual = 教科書番号 5 本)
 
+### cont. (07-05 loop it.2-4): sharp 3 本 engine wiring 完了 + (13.5.a/c) 具体化、次 = H-side 整数性
+
+- **(13.6)/(13.7)/(13.8-T) sharp 全て engine assembly 化** (`631c4538`/`d8ea58d0`): 残 =
+  (13.5)-package producer 3 本 (`exists_caseB_data_lambda` / `_eta10` / `_eta10_T`)。
+  `two_mul_u_le`/`two_mul_v_le` 実証明 (u/v-bound は 9000 非依存に)。engine 適用の
+  DecidableEq instance 差は convert+congr! bridge (Subtype vs Classical)。
+- **(13.5.a) a=0 variant + 具体 α 実証明** (`f4afa84a`): `H_sharp_point_formula_kernel_only` /
+  `H_sharp_alphaFun` (P-kernel tail) / `_const_on_P` / `_eq_zero_of_not_mem` /
+  `_inflation` ((13.5.c) 実証明)。
+- **次 unit = H-side 整数性** (eta10-package の hs/hParseval/hn/habelian)。ルート確定済
+  (部品は全て既存): (i) cᵢ ∈ ℤ ← `inner_mem_ZIrr_int` (InducedCharacter:855) + τψᵢ ∈ ZIrr;
+  (ii) Res ζᵢ/‖ζᵢ‖² = orbit-sum of θᵢ ← `card_smul_restrict_induce` (Mackey, |H|·Res∘Ind =
+  Σ_x θ^{x⁻¹}) + `card_mul_inner_self_induce_eq_card_inertia` (InducedIrreducible:172、
+  |H|‖Indθ‖² = |inertia|) + 既約直交で orbit 集計; (iii) α ∈ ℤ[Irr H] → ⟨α,α⟩ ∈ ℕ、
+  α(1) ∈ ℤ (span induction、isIntegral_apply_of_mem_ZIrr の 1-値版); (iv) habelian ←
+  `exists_zsmul_irreducibleCharacter_of_inner_self_one` + H abelian (13.2.a,b) linear。
+  (1.10) 合同 α(1) ≡ 1 mod q (n≥1 用) のみ grid-gated で sorried のまま。
+
+
 3002 threading の consumer wiring を完遂。`analyticInequalityEstimates` (旧 terminal) は
 **4 atom producer から sorry-free assembly** になり、4 producer も全て実 assembly 化:
 
