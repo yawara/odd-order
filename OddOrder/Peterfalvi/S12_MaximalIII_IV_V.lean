@@ -3673,6 +3673,81 @@ theorem Hypothesis.tau_muColumnSum_sub_dzeta_eq_of_residualData [Finite G] {M : 
     · exact halpha_ne i hi0
   exact hyp.tau_muColumnSum_sub_zeta_eq_of_alphaImage hG hodd coh j hd halpha h114
 
+open scoped Classical FiniteInduce in
+/-- **The orthonormal coherent image `R = coh.extension '' S(HC)`** (Peterfalvi (11.8.1)/(5.7)):
+the image of the degree-`w₁` irreducible subfamily `S(HC)` under an `S(HC)`-coherent extension `coh`
+is a Finset of mutually orthonormal virtual characters in `ℤ[Irr G]`.  The `extension` isometry
+(`extension_inner_eq`) carries the orthonormal irreducibles of `S(HC)` (`irr_cf_inner`) to an
+orthonormal set — also giving injectivity, so `|R| = |S(HC)|` — and lands them in `ℤ[Irr G]`
+(`extension_mem_ZIrr`).  This materializes the `R` data (`hZ`/`horth`/`hRmem`/`hRrev`) the (11.8.5)
+`residualCoeff_eq_zero`/`tau_muColumnSum_sub_dzeta_eq_of_residualData` consume; only the cardinality
+value `|S(HC)| = n` remains the §9 (11.8.1) count (`caseB_degree_qu` + Frobenius `(u−1)/q`). -/
+theorem Hypothesis.exists_coherentImage_SHC [Finite G] {M : Subgroup G}
+    (hyp : Hypothesis M)
+    (coh : OddOrder.Peterfalvi.S07.IsCoherent hyp.tau hyp.SHCSet hyp.A0) :
+    ∃ R : Finset (ClassFunction G ℂ),
+      (∀ β ∈ R, β ∈ ZIrr G) ∧
+      (∀ α ∈ R, ∀ β ∈ R, ClassFunction.inner α β = if α = β then (1 : ℂ) else 0) ∧
+      (∀ φ : ClassFunction ↥M ℂ, φ ∈ inducedFamily M → IsIrreducibleCharacter φ →
+        φ 1 = (hyp.w1 : ℂ) → coh.extension φ ∈ R) ∧
+      (∀ β ∈ R, ∃ φ : ClassFunction ↥M ℂ,
+        φ ∈ inducedFamily M ∧ IsIrreducibleCharacter φ ∧
+        φ 1 = (hyp.w1 : ℂ) ∧ β = coh.extension φ) ∧
+      R.card = (Finset.univ.filter (fun χ : IrreducibleCharacter ↥M =>
+        (χ : ClassFunction ↥M ℂ) ∈ inducedFamily M ∧
+          ((χ : ClassFunction ↥M ℂ) : ↥M → ℂ) 1 = (hyp.w1 : ℂ))).card := by
+  haveI := hyp.finiteG
+  classical
+  set p : IrreducibleCharacter ↥M → Prop := fun χ =>
+    (χ : ClassFunction ↥M ℂ) ∈ inducedFamily M ∧
+      ((χ : ClassFunction ↥M ℂ) : ↥M → ℂ) 1 = (hyp.w1 : ℂ) with hp
+  set s : Finset (IrreducibleCharacter ↥M) := Finset.univ.filter p with hs_def
+  have hmem_s : ∀ χ, χ ∈ s ↔ p χ := fun χ => by
+    rw [hs_def, Finset.mem_filter]; exact and_iff_right (Finset.mem_univ _)
+  -- each `χ ∈ s` is a member of `S(HC) = SHCSet`, hence lies in `zSpan SHCSet`
+  have hspan : ∀ χ : IrreducibleCharacter ↥M, χ ∈ s →
+      (χ : ClassFunction ↥M ℂ) ∈ OddOrder.Peterfalvi.S07.zSpan hyp.SHCSet := fun χ hχ =>
+    Submodule.subset_span ⟨((hmem_s χ).mp hχ).1, χ.2, ((hmem_s χ).mp hχ).2⟩
+  set f : IrreducibleCharacter ↥M → ClassFunction G ℂ :=
+    fun χ => coh.extension (χ : ClassFunction ↥M ℂ) with hf
+  -- the extension isometry carries the orthonormal `χ ∈ s` to an orthonormal image
+  have hiso : ∀ χ χ' : IrreducibleCharacter ↥M, χ ∈ s → χ' ∈ s →
+      ClassFunction.inner (f χ) (f χ') = if χ = χ' then (1 : ℂ) else 0 := by
+    intro χ χ' hχ hχ'
+    rw [hf, coh.extension_inner_eq _ _ (hspan χ hχ) (hspan χ' hχ'),
+      irr_cf_inner (mem_irreducibleCharacters.mpr χ.2) (mem_irreducibleCharacters.mpr χ'.2)]
+    simp only [Subtype.coe_inj]
+  have hinjOn : ∀ χ ∈ s, ∀ χ' ∈ s, f χ = f χ' → χ = χ' := by
+    intro χ hχ χ' hχ' hfeq
+    by_contra hne
+    have h1 : ClassFunction.inner (f χ) (f χ') = 0 := by rw [hiso χ χ' hχ hχ', if_neg hne]
+    have h2 : ClassFunction.inner (f χ) (f χ') = 1 := by
+      rw [hfeq, hiso χ' χ' hχ' hχ', if_pos rfl]
+    rw [h1] at h2; exact one_ne_zero h2.symm
+  refine ⟨s.image f, ?_, ?_, ?_, ?_, ?_⟩
+  · -- hZ
+    intro β hβ
+    obtain ⟨χ, hχ, rfl⟩ := Finset.mem_image.mp hβ
+    exact coh.extension_mem_ZIrr _ (hspan χ hχ)
+  · -- horth
+    intro α hα β hβ
+    obtain ⟨χ, hχ, rfl⟩ := Finset.mem_image.mp hα
+    obtain ⟨χ', hχ', rfl⟩ := Finset.mem_image.mp hβ
+    rw [hiso χ χ' hχ hχ']
+    by_cases hc : χ = χ'
+    · rw [if_pos hc, if_pos (by rw [hc])]
+    · rw [if_neg hc, if_neg (fun h => hc (hinjOn χ hχ χ' hχ' h))]
+  · -- hRmem
+    intro φ hφS hφirr hφ1
+    exact Finset.mem_image.mpr ⟨⟨φ, hφirr⟩, (hmem_s _).mpr ⟨hφS, hφ1⟩, rfl⟩
+  · -- hRrev
+    intro β hβ
+    obtain ⟨χ, hχ, rfl⟩ := Finset.mem_image.mp hβ
+    obtain ⟨hφS, hφ1⟩ := (hmem_s χ).mp hχ
+    exact ⟨(χ : ClassFunction ↥M ℂ), hφS, χ.2, hφ1, rfl⟩
+  · -- cardinality: injective on `s`
+    exact Finset.card_image_of_injOn hinjOn
+
 open scoped FiniteInduce in
 /-- **Peterfalvi (11.8), the genuine non-orthogonality** (lane-b W3 obligation, issue 2020).
 
