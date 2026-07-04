@@ -570,16 +570,119 @@ theorem le_normalizer_secondDerived [Finite G] {M : Subgroup G} :
 
 namespace Hypothesis
 
-/-- **Peterfalvi (5.7) instance: `S(M'')` is coherent** (named obligation).  `M'/M''` is
-abelian, so every member of `S(M'')` is induced from a *linear* character of `M'/M''` and the
-family has the constant degree `q = |M:M'|`; the equal-degree coherence engine
-(`coherentEqualDegree_fromDade`, `S07_Coherence`) then applies over the Dade data.  Wiring
-that engine to the pinned family is the remaining §5 plumbing (issue 2022). -/
+/-- `M''`-trace inside `↥M` is the commutator of the `M'`-trace: `(M'').subgroupOf M = ⁅K, K⁆`
+for `K = M'.subgroupOf M`. -/
+theorem secondDerived_subgroupOf_eq_commutator [Finite G] {M : Subgroup G} :
+    (secondDerivedInAmbient M).subgroupOf M
+      = ⁅(derivedInG M).subgroupOf M, (derivedInG M).subgroupOf M⁆ := by
+  have h1 : secondDerivedInAmbient M
+      = Subgroup.map M.subtype ⁅(derivedInG M).subgroupOf M, (derivedInG M).subgroupOf M⁆ := by
+    rw [Subgroup.map_commutator]
+    have h2 : ((derivedInG M).subgroupOf M).map M.subtype = derivedInG M :=
+      Subgroup.map_subgroupOf_eq_of_le (Subgroup.map_subtype_le _)
+    rw [h2, secondDerivedInAmbient]
+    exact Subgroup.map_subtype_commutator (derivedInG M)
+  rw [h1, Subgroup.subgroupOf, Subgroup.comap_map_eq_self_of_injective M.subtype_injective]
+
+/-- **Irreducible characters trivial on the commutator are linear** (degree 1): such a
+character factors through the abelianization, and irreducible characters of abelian groups
+have degree 1.  Stated for any finite group. -/
+theorem charValue_one_eq_one_of_commutator_le_ker {H : Type*} [Group H] [Finite H]
+    (θ : OddOrder.RepresentationTheory.IrreducibleCharacter H)
+    (hker : ((_root_.commutator H : Subgroup H) : Set H)
+      ⊆ OddOrder.Peterfalvi.S03.characterKernel (θ : ClassFunction H ℂ)) :
+    (θ : ClassFunction H ℂ) 1 = 1 := by
+  sorry
+
+/-- Conversely, linear characters kill the commutator subgroup. -/
+theorem commutator_le_ker_of_charValue_one {H : Type*} [Group H] [Finite H]
+    (θ : OddOrder.RepresentationTheory.IrreducibleCharacter H)
+    (hθ1 : (θ : ClassFunction H ℂ) 1 = 1) :
+    ((_root_.commutator H : Subgroup H) : Set H)
+      ⊆ OddOrder.Peterfalvi.S03.characterKernel (θ : ClassFunction H ℂ) := by
+  intro n hn
+  rw [OddOrder.Peterfalvi.S03.mem_characterKernel,
+    OddOrder.Peterfalvi.S03.characterDegree_def, hθ1]
+  have hn' : n ∈ Subgroup.closure (commutatorSet H) := by
+    rwa [SetLike.mem_coe, _root_.commutator_eq_closure] at hn
+  refine Subgroup.closure_induction
+    (p := fun g _ => (θ : ClassFunction H ℂ) g = 1) ?_ ?_ ?_ ?_ hn'
+  · rintro _ ⟨a, b, rfl⟩
+    exact θ.isIrreducible.apply_commutatorElement_eq_one_of_apply_one_eq_one hθ1 a b
+  · exact hθ1
+  · intro a b _ _ ha hb
+    rw [θ.isIrreducible.map_mul_of_apply_one_eq_one hθ1, ha, hb, one_mul]
+  · intro a _ ha
+    have hai := θ.isIrreducible.map_mul_of_apply_one_eq_one hθ1 a a⁻¹
+    rw [mul_inv_cancel, hθ1, ha, one_mul] at hai
+    exact hai.symm
+
+/-- **`S(M\'\')` is the degree-`w₁` irreducible subfamily of `S`** ((11.8.1)-adjacent):
+its members are the inductions of nontrivial *linear* characters of `M\'` (the kernel
+condition `M\'\' ⊆ ker θ` is equivalent to linearity), which are irreducible by the
+(8.4.d) inertia theorem and have degree `|M : M\'| = w₁`. -/
+theorem SOf_secondDerived_eq [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    {M : Subgroup G} (hyp : Hypothesis M) :
+    hyp.SOf (secondDerivedInAmbient M)
+      = {φ : ClassFunction ↥M ℂ | φ ∈ OddOrder.Peterfalvi.S12.inducedFamily M ∧
+          IsIrreducibleCharacter φ ∧ ((φ : ↥M → ℂ) 1 = (hyp.base.w1 : ℂ))} := by
+  classical
+  haveI : Fintype G := Fintype.ofFinite _
+  -- the trace `K = M\'.subgroupOf M` has index `w₁` (complement `M = M\' ⋊ W₁`)
+  have hidx : ((derivedInG M).subgroupOf M).index = hyp.base.w1 := by
+    rw [hyp.base.typeP.M_complement.symm.index_eq_card]
+    exact Nat.card_congr
+      (Subgroup.subgroupOfEquivOfLe hyp.base.typeP.W1_le).toEquiv
+  have hidx0 : (((derivedInG M).subgroupOf M).index : ℂ) ≠ 0 := by
+    rw [hidx]
+    exact_mod_cast Nat.card_pos.ne'
+  -- the kernel condition of `S(M\'\')` is the commutator of the trace
+  have hXcomm : ((secondDerivedInAmbient M).subgroupOf M).subgroupOf
+      ((derivedInG M).subgroupOf M)
+      = _root_.commutator ↥((derivedInG M).subgroupOf M) := by
+    rw [secondDerived_subgroupOf_eq_commutator]
+    exact OddOrder.Peterfalvi.S08.commutator_subgroupOf_self _
+  ext φ
+  rw [hyp.SOf_eq]
+  constructor
+  · rintro ⟨θ, hθne, hθker, rfl⟩
+    have hkerC : ((_root_.commutator ↥((derivedInG M).subgroupOf M) : Subgroup _) : Set _)
+        ⊆ OddOrder.Peterfalvi.S03.characterKernel
+          (θ : ClassFunction ↥((derivedInG M).subgroupOf M) ℂ) := by
+      intro x hx
+      rw [← hXcomm] at hx
+      exact hθker hx
+    have hθdeg := charValue_one_eq_one_of_commutator_le_ker θ hkerC
+    refine ⟨?_, ?_, ?_⟩
+    · rw [OddOrder.Peterfalvi.S12.inducedFamily_eq_inducedKernelFamily_bot]
+      exact OddOrder.Peterfalvi.S08.inducedKernelFamily_antitone bot_le ⟨θ, hθne, hθker, rfl⟩
+    · exact OddOrder.RepresentationTheory.isIrreducibleCharacter_induce_of_inertia_eq θ
+        (hyp.base.inertia_eq_derived_of_linear hG hθne hθdeg)
+    · rw [ClassFunction.induce_apply_one, hθdeg, mul_one, hidx]
+  · rintro ⟨hφS, hφirr, hφdeg⟩
+    rw [OddOrder.Peterfalvi.S12.inducedFamily_eq_inducedKernelFamily_bot] at hφS
+    obtain ⟨θ, hθne, -, rfl⟩ := hφS
+    have hθdeg : (θ : ClassFunction ↥((derivedInG M).subgroupOf M) ℂ) 1 = 1 := by
+      have h1 := ClassFunction.induce_apply_one ((derivedInG M).subgroupOf M)
+        (θ : ClassFunction ↥((derivedInG M).subgroupOf M) ℂ)
+      rw [show ((ClassFunction.induce ((derivedInG M).subgroupOf M)
+          (θ : ClassFunction ↥((derivedInG M).subgroupOf M) ℂ) : ClassFunction ↥M ℂ) : ↥M → ℂ) 1
+          = (hyp.base.w1 : ℂ) from hφdeg, ← hidx] at h1
+      exact mul_left_cancel₀ hidx0 (by rw [← h1, mul_one])
+    refine ⟨θ, hθne, ?_, rfl⟩
+    intro x hx
+    rw [hXcomm] at hx
+    exact commutator_le_ker_of_charValue_one θ hθdeg hx
+
+/-- **Peterfalvi (5.7) instance: `S(M'')` is coherent.**  `S(M'')` is the degree-`w₁`
+irreducible subfamily of `S` (`SOf_secondDerived_eq`), whose coherence is
+`S12.Hypothesis.SHC_isCoherent` (the (11.8)/(5.7) equal-degree producer). -/
 theorem secondDerived_coherent [Finite G]
     (_hG : OddOrder.BG.IsMinimalSimpleOdd G) {M : Subgroup G} (hyp : Hypothesis M) :
     Nonempty (OddOrder.Peterfalvi.S07.IsCoherent
       hyp.base.tau (hyp.SOf (secondDerivedInAmbient M)) hyp.base.A0) := by
-  sorry
+  rw [hyp.SOf_secondDerived_eq _hG]
+  exact ⟨hyp.base.SHC_isCoherent _hG⟩
 
 /-- **`C ⊊ U`**: `U` does not centralize the chief factor `H̄` (`U_noncentral_on_quotient`),
 but `C = C_U(H)` acts trivially on it. -/
