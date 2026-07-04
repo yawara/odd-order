@@ -40,19 +40,25 @@ tractable solo = faithful-producer de-opacify (grid obligation を isolate、con
 sorried producer で全 wrapper を engine から実証明 → grid property を単一 producer に集約 (a の threading と pair)。
 **最高 leverage = issue 3002 の a-side threading** (b cascade 全体 unblock)。詳細 = issue 3002 の 07-04 b 訂正節。
 
-### ⚠⚠ 2026-07-04 loop 続報 — b は §12 (S14) + §15 (S15) 両クラスタとも a の §8-§13 に comprehensive gated
-loop で b の全所有ファイルを精査した結論 (「exhausted と即断」でなく code+issue 検証):
-- **S14_MaximalI (= Pf §12) に実 sorry 9 本** (reallocation の「S14 finished」は不正確)。だが **全て gated**
-  (issue 9003 が map 済): **Cluster A** (12.10 `witness_L_isTypeI`/`_complement_isZGroup` → 12.11/12.12) は
-  §8-§11 型解析 ((8.16)/(8.6.a)/(9.7.b)/(10.10)/(11.9.c)/(11.6)) を要すが**これらは未形式化** (S10/S11 に grep
-  不在) ゆえ cite 不能 = 真の gate。**Cluster B** (8.18.c `nonconjugate_diffImage_inner_zero` → 12.3 → 12.16
-  `exists_counterexample_dade_data`) は `S10.support_mutual_exclusion` (a 領域、sorried) gated。
-- **∴ b の on-path 2 クラスタ (§12 S14 + §15 S15) は共に a の §8-§13 (型解析 + §10 support + grid) に gated**。
-  b の ungated solo work は完了: (12.6) coherence tower DONE (9003) / (13.9.b) core (`sum_normSq_ge_ncard...`,
-  commit 9c9b6ad4) / (13.10) 出力 de-opacify (f17fdbcd)。
-- **これは 07-04 reallocation の想定 (b が §15 で solo 前進) に反する検証結果** = 大規模 cross-lane scope の
-  strategic 判断が要る (b を a の §8-§13 応援に再配置 / b に grid-threading 承認 / a の §8-§13 進捗待ち)。
-  gate は hub 化済 (9003 §12 + 9009 grid)。
+### ⚠⚠ 2026-07-04 loop 続報 — 【訂正】「comprehensively gated」は誤り。§12 は substantial-but-UNGATED
+**先の「§12+§15 とも a に comprehensive gated」結論は誤り** (ユーザー指摘 "cite して進められないの?" + 再検証)。
+2 つの誤り: (1) **stale な issue 9003 (07-02) の「§8-§11 は grep 不在」を鵜呑み**にした。実際は多くが**その後
+形式化済**: `no_typeV_maximal`/`typeV_forces_coherence` (10.10, S12:3742/3726)・`typeI_or_typeII_centralizer_unique`
+(8.16, S10:407)・`typeII_centralizer_U_eq_bot` (11.6, S11:530)・`typeIIIorIV_W2_prime` (S11:588)・
+`final_typeIII_conclusions` (S13:483) 等。(2) **cite-sorried-upstream モデルを適用しなかった** (欠けている
+§8-§11 は consumer が sorried で pin して cite すればよい = 真の gate でない)。
+- **∴ (12.10) `witness_L_isTypeI` [+ 12.11/12.12 downstream] は substantial-but-UNGATED** (available §8-§11 を
+  cite + 型解析 assembly で証明可; 欠け分は sorried pin)。b の genuine 構造 work。**現在 subagent が着手中**。
+- **§15 cascade**: b-solo build-green は **cite-sorried-producer** で可 ((13.10) `analytic_inequality` が先例、
+  f17fdbcd)。⚠ **field-approach (S15.Hypothesis に grid property field 追加) は build-red**:
+  `sectionSixteenHypothesis_of_inputs` に `#assert_only_allowed_axioms` (AxiomsCheck.lean:3221) があり、
+  sorried-default field が a の constructor を sorryAx 依存にして assertion を破る。**⟹ 9009 HUB 裁定の
+  「sorried default で build-green」機構は不成立** (a が値 supply + assertion 調整するまで field 追加不可)。
+  b-solo は producer 経由。詳細 = issue 9009 の訂正。
+- b の done: (12.6) coherence tower (9003) / (13.9.b) core (9c9b6ad4) / (13.10) de-opacify (f17fdbcd)。
+- **教訓**: 「gated」と結論する前に (a) 上流 signature を**今**再 grep (notes の gate map は rot する)、
+  (b) cite-sorried モデルを適用せよ ([[feedback-cite-sorried-lemmas-if-signature-correct]]
+  [[verify-port-state-by-number-not-coq-name]] [[feedback-dont-mislabel-formalization-as-research]])。
 
 ---
 
