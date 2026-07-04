@@ -245,3 +245,31 @@ cont.⁵¹ の「solo work 枯渇」を訂正し (14.14) の genuine arithmetic 
 — dichotomy `orthogonality_switch_pairing_bounds` の (7.9)=§7 coherence (b) / (7.8.b)=a / (8.17.c)=§8 (b)、
 η-grid=issue 3002 (b field+a threading)、U/V cyclic・T_typeII=b §13、v-value=9000。W-side assembly は
 全 proven、leaves は precise faithful obligation で pin 済 (signature-contract 成立)。前進は b/a/9000 上流供給が先決。
+
+## 2026-07-04 lane-c (loop cont.) — U-cyclic "vestigial binder" 仮説 = 検証済 NEGATIVE
+
+main +7 取り込み (a=11.8 §9-bridge / b=§12 witness、S15/S16 未変更 ⟹ 3002/9009 grid field **未 landing**)。
+9002 (constructive Clifford) は **完了確認** (`✅ lane b 完了 loop¹¹⁴`: `typeI_induced_char_constituents`
+一般ケース landed、全 RepTheory Clifford/ext leaf = 0 sorry)。⟹ c の 2 mandate (S16 assembly / 9002) は
+both substantially complete。残 9 S16 leaf を policy (A)「ungated genuine math へ降りる」で正面攻略:
+
+**U cyclic (3568) の field-repr 経由 discharge を試行 → REVERTED (genuine gate 確定)**:
+- 仮説: `exists_pu_field_repr`/`_W2`/`field_normalizer_of_U_characteristic_of_inputs`/`_of_fpf` の
+  `[IsCyclic ↥U]` binder は **vestigial** (body は `data.U_commutative` (abelian) + `hfaith` を使用、
+  coq `PFsection14.v:574 cUU: abelian U` と一致)。μ:U↪𝔽_{p^q}^× 単射 ⟹ U cyclic は **consequence**。
+- **反証**: `exists_galoisField_repr` (SingerField.lean:297) は `section Irreducibility` (190-191
+  `variable [CommGroup C] [IsCyclic C] [Finite C]`) 内 ⟹ `isSimpleModule_of_isCyclic_faithful_card`
+  (199) 経由で **`[IsCyclic C]` を genuine に要求** (Singer irreducibility の確立に cyclic を使う)。
+  binder 除去 → build-RED (777: failed to synthesize instance)。∴ **U cyclic は field-repr で false gate でない**。
+- **代替 singer-adapter 経路** (`singerAdapter_isCyclic_card_dvd` S11:3841、abelian+faithful+**irreducible**
+  ⟹cyclic): U abelian ✓ / faithful ✓ だが **P U-irreducibility** が要 → norm-one 設定で循環
+  (irreducibility of norm-one action は field embedding を要す)。かつ P は S=P⋊(U⋊W₁) の minimal normal ゆえ
+  **U⋊W₁-irreducible であって U-irreducible とは限らない** ⟹ A=U の singer 直接適用は unsound。
+- **結論**: U cyclic (と dual の V cyclic 3651) は genuine §13 type-P 構造 (chief-factor / P-irreducibility)
+  に gated = **b 領域**。precise 化: 旧「§9/§11 char」→「§13: P(resp Q) の U(resp V)-irreducibility + abelian」。
+  **この route は再攻略しない** (field-repr は cyclic 必須、singer は irreducibility 循環)。
+
+**S16 全 9 leaf = cross-lane gated 再確認** (assembly は full proven、build 3880 green): T_typeII (79,§13)/
+v-value (174,9000 Galois)/η-grid (2581,3002)/U cyclic (3568,§13 irred)/V cyclic (3651,§13 irred)/
+caseB_contradiction (4493,§3-4 Dade+13.19)/dichotomy (4673,§7.9+8.17.c+7.8.b)/betaGrid (5171,5239,3002)。
+最大 leverage = **b/a の 3002/9009 landing** (η-grid batch 一斉 unblock)。次 iter で main 再取り込み監視。

@@ -3772,6 +3772,55 @@ theorem Hypothesis.SHCSet_inner_diff_eq_zero [Finite G] {M : Subgroup G} (hyp : 
   have hne : x ≠ y := fun h => hy.2 (h ▸ hx)
   exact inducedFamily_pairwiseOrthogonal hx.1 hy.1 hne
 
+open scoped FiniteInduce in
+/-- **`ℤ[S(HC)] ⊥ ℤ[S₂]`** (span-level `hsrc_ortho` for the (11.8.6) union): the `ℤ`-lattices spanned
+by `S(HC)` and `S₂ = S(C) − S(HC)` are orthogonal, lifted from the set-level
+`SHCSet_inner_diff_eq_zero` by bi-additivity of the inner product (`span_induction` on both
+arguments).  This is the exact `hsrc_ortho` hypothesis
+`coherentUnion_of_glued_of_generator_mixed_inner_eq_withDiagonal` takes for the τ₂ union. -/
+theorem Hypothesis.span_inner_SHCSet_diff_eq_zero [Finite G] {M : Subgroup G} (hyp : Hypothesis M)
+    {u v : ClassFunction ↥M ℂ}
+    (hu : u ∈ Submodule.span ℤ hyp.SHCSet) (hv : v ∈ Submodule.span ℤ (hyp.Sset \ hyp.SHCSet)) :
+    ClassFunction.inner u v = 0 := by
+  haveI := hyp.finiteG
+  have hright : ∀ x ∈ hyp.SHCSet, ∀ w ∈ Submodule.span ℤ (hyp.Sset \ hyp.SHCSet),
+      ClassFunction.inner x w = 0 := by
+    intro x hx w hw
+    induction hw using Submodule.span_induction with
+    | mem y hy => exact hyp.SHCSet_inner_diff_eq_zero hx hy
+    | zero => rw [ClassFunction.inner_zero_right]
+    | add y z _ _ ihy ihz => rw [ClassFunction.inner_add_right, ihy, ihz, add_zero]
+    | smul a y _ ih =>
+        rw [← Int.cast_smul_eq_zsmul ℂ a y,
+          OddOrder.RepresentationTheory.inner_smul_right, ih, mul_zero]
+  induction hu using Submodule.span_induction with
+  | mem x hx => exact hright x hx v hv
+  | zero => rw [ClassFunction.inner_zero_left]
+  | add x z _ _ ihx ihz => rw [ClassFunction.inner_add_left, ihx, ihz, add_zero]
+  | smul a x _ ih =>
+      rw [← Int.cast_smul_eq_zsmul ℂ a x, ClassFunction.inner_smul_left, ih, mul_zero]
+
+open OddOrder.Isaacs.Ch04.OddOrder.Isaacs.Ch03.IsAInvariant (quotientMulAutHom) in
+/-- **Construct the §9 `Section11CharacterData` from the §10 `Hypothesis`** (the key unblocker for
+the (11.8.1) §9 counts).  Given the §9 setup `data` (`toTypesIIIIIIVSetup`) and a chief factor
+`chief` (`exists_chiefFactorData`), the §9 character datum's *character* fields are all derived from
+`data`/`chief` (the families `𝒳 = xiSet`, `𝒮 = Ind_{HU}^M 𝒳`, `𝒮(Y)`); the only genuine fields are
+`u = |Ū|` (pinned to the `U`-action image on the chief factor, `rfl`) and the degree-irrelevant
+`tau`/`H0CprimeSupport`/`quotientSemidirectFrobenius` (used only by the (9.11) coherence, not by the
+degree fact `caseB_degree_qu`).  So the §9 *degree* analysis — `clifford_dichotomy` (9.7) and the
+`μ_j(1) = qu` of (9.8)/(9.9) — becomes available on the §10 `Hypothesis`.  (`tau := hyp.tau` records
+the genuine Dade map for the coherence use; the support/`Prop` are placeholders for the count use.) -/
+noncomputable def Hypothesis.mkSection11CharacterData [Finite G] {M : Subgroup G} (hyp : Hypothesis M)
+    (data : OddOrder.Peterfalvi.S11.TypesIIIIIIVSetup M)
+    (chief : OddOrder.Peterfalvi.S11.ChiefFactorData data) :
+    OddOrder.Peterfalvi.S11.Section11CharacterData data chief where
+  u := Nat.card ↥(((quotientMulAutHom (N := chief.N) chief.N_aInvariant).comp
+      (data.typeP.U.subgroupOf (data.typeP.U ⊔ data.typeP.W1)).subtype).range)
+  u_eq_card_quotient := rfl
+  H0CprimeSupport := ∅
+  tau := hyp.tau
+  quotientSemidirectFrobenius := True
+
 /-- **Bridge to the §9 (repo S11) character analysis.**  A §10 type-III/IV `Hypothesis` yields the
 §9 `TypesIIIIIIVSetup` on the same `M`, sharing the type-`P` structure `(H, U, W₁, W₂)`.  This is the
 `Hypothesis` → `Section11CharacterData` bridge the (11.8.1) §9 counts need: with it,
