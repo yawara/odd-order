@@ -934,3 +934,30 @@ sibleyPlacedFamily.cover + conj_induce + conjPerm で j₁ 構成、j₁≠ind1H
 4. **assembly**: `F.hypothesis79 i j hij ...` に `zetaImage_cross_eq_zero_of_conjIndex` 適用
    (両族 i,j の 1-3 を供給) → F レベル hzeta_cross → (7.9) conclusion producer → hgood → 𝓑-set →
    characterEstimateData → card_G0_lower_bound (endpoint sorry @S09_NonexistenceCertain:6552)。
+
+## 2026-07-04 cont.³⁴ — ★ 既約性+非実性 完了、残 hab_supp + assembly
+
+**Landed** (S09_FrobeniusConjIndex.lean, sorry-free): `hypothesis78_zeta_irreducible` (ζ_0=Ind K θ_0 が
+Frobenius kernel 誘導で既約), `hypothesis78_zeta_ne_conj` (ζ≠ζ̄: 奇位数 L の非自明既約 [degree
+[L:K]>1, kernel proper via ne_bot_complement+isComplement.disjoint] → not_isReal (1.1))。
+`exists_conjIndex_hypothesis78` と合わせ conjIndex bridge の hz_irr/hζne_conj/j₁/hj₁ne_ind/hj₁ 済。
+
+**残 = hab_supp (最大の残ピース) + assembly**:
+- **hab_supp**: `(ν(ζ_zd) − ν(ζ_j₁)).support ⊆ dadeSupport` (H79.first level, ζ_j₁=(ζ_zd).conj)。
+  - `coherence_hagree_dadeMap` (S09_CertDischarge:2559): `toDadeMap ⟨ζi−di•ζ0, hsupp⟩ =
+    coh.extension ζi − di•coh.extension ζ0`。di=1 (equal degree), ζi=ζ_zd, ζ0=ζ_j₁。
+    → ν(ζ_zd)−ν(ζ_j₁) = toDadeMap ⟨ζ_zd−ζ_j₁, _⟩ (Dade image)。
+  - support ⊆ dadeSupport: `IsDadeMap.map_eq_zero_of_not_mem_dadeSupport` (S04:3425)。
+  - **要 plumbing**: (a) F.coherence i の IsCoherent が coherence_hagree_dadeMap の要求形
+    `IsCoherent (dadeIntegralCharacterMap hyp (fullDadeIsometryData hconj)) S (supportInSubgroup A L)`
+    に一致することの確認 (F.coherence の定義 = sibleySetup_is_coherent、S09_FrobeniusSibley:125)。
+    hnu (nu=coh.extension) = `hypothesis78_nu_eq` (S09_FrobeniusHypothesis79:94、= rfl)。
+    (b) ζ_zd, ζ_j₁ ∈ sourceSet (= S \ {Ind 1_H})。ζ_zd: zetaDistinct_mem_sourceSet。ζ_j₁: j₁≠ind1H →
+    zeta_mem_sourceSet。(c) **equal-degree A-support**: (ζ_zd − ζ_j₁).support ⊆ supportInSubgroup A L。
+    ζ_j₁=(ζ_zd).conj は同次数 (conj は degree 保存) → 差は 1 で消える; さらに両者 H 上 supported
+    (induced from H) → 差 H\{1}=A supported。※ conj の induce/H-support は conj_induce +
+    zeta_eq_zero_of_not_mem_H。
+- **assembly**: `F.hypothesis79 i j hij hodd ...` に `zetaImage_cross_eq_zero_of_conjIndex` 適用
+  (両族 i,j に hcoh/hnu/hz_irr/j/hjne_ind/hj/hζne_conj/hab_supp 供給) → F レベル hzeta_cross。
+  hcoh は F.coherence i の再パッケージ、hij で i≠j。→ (7.9) conclusion producer (別途 hindZ/hBD 等) →
+  hgood → 𝓑-set → characterEstimateData → card_G0_lower_bound。
