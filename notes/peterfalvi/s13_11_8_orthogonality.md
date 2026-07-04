@@ -1499,3 +1499,29 @@ tractable (恐れていた大 §9 char 解析でない)。
 5. **chars.SOf(H₀⊔C') と S12 μ-grid の関係** (= chars.S が inducedFamily/μ-grid と一致するか、要 §9 study)。
 6. Frobenius u≡1 mod q (`typeP_uW1_frobenius` + `dvd_card_sub_one_of_free_off_unique_fixed`) → δ=1。
 残 deep = step 3 (support/tau/Prop) + step 5 (degree 対応)。hnt (TypePNontrivialCore) の導出も sub-task。
+
+## 2026-07-04 update¹⁰ (lane-a) — §9-count BREAKTHROUGH: mkSection11CharacterData tractable
+
+**重大進展**: 恐れていた「§9 posited char-data 構成」は tractable と判明。
+- **`mkSection11CharacterData` (S12, committed)**: S12.Hypothesis + data + chief → Section11CharacterData。
+  char families (𝒳/𝒮/𝒮(Y)) は data/chief から **derived** (field でない)、genuine field は u=|Ū| (pinned rfl)
+  のみ、tau/H0CprimeSupport/quotientSemidirectFrobenius は degree-irrelevant (placeholder 可、caseB_degree_qu
+  は使わない; (9.11) coherence だけが使う)。
+- **`forall_sOf_H0Cprime_degree_qu_caseB` (committed)**: `clifford_dichotomy` (9.7 proven) + `caseB_degree_qu`
+  で §9 degree qu が Hypothesis 上で reachable と validate。
+- **`clifford_dichotomy` は proven** (caseA∨caseB を Section11CharacterData から、`clifford_caseB_data`/
+  `clifford_caseA_data` constructor 経由)。⟹ case data も blocker でない。
+
+**§9 count 残 (d≡1 mod q = charParam_d_modEq_one)**:
+1. **μ-grid ↔ §9-family correspondence**: `sSet = Ind_{HU}^M xiSet ⊆ inducedFamily` (huSub=M' proven、
+   xiSet=H-nontrivial)。character transport along huSub=M' (Subgroup.equivOfEq) が fiddly。μ_j ∈ chars.SOf(H₀C')
+   で q·d=q·|Ū| ⟹ **d=|Ū|**。
+2. **|Ū|≡1 mod q**: `IsFrobeniusAction.quotient` (Isaacs 6.2) + `card_modEq_one` を typeP_uW1_frobenius に、
+   K=ker(uActionHom)=C_U(H̄) で。**snag**: conjugation MulDistribMulAction が default instance でなく、
+   K/hK の `•` が signature で未合成 (card_kernel_modEq_one 流に letI 内部 setup + hK 再定式化が要る)。
+   uActionHom kernel の W1-invariance が最終 input。
+3. **caseA branch**: `caseA_reducible_induceHU_apply_one_eq_qu` (degree qu も caseA で成立か要確認)。
+4. **type III/IV + TypePNontrivialCore threading** (capstone まで ripple; TypePNontrivialCore は 8.6.a、要導出)。
+
+**評価上方修正**: §9 counts は「大 §9 formalization」でなく、mkSection11CharacterData で degree access 済。
+残 = correspondence (char transport) + |Ū|≡1 (Frobenius quotient, action-instance 注意) + caseA + threading。
