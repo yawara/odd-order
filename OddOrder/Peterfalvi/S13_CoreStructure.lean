@@ -13,7 +13,7 @@ T. Peterfalvi, *Character Theory for the Odd Order Theorem* (LMS LNS 272,
 
 Split from `S13_MaximalIII_IV` (which keeps Hypothesis (11.2) and the
 commutator chain (11.3)--(11.5)): this leaf carries the core-structure
-theorems — `H` is a `p`-group, `U` centralizes `H₀`, `H₀ = H\'`, `C = U\'`
+theorems — `H` is a `p`-group, `U` centralizes `H₀`, `H₀ = H'`, `C = U'`
 ((11.6)), `H` elementary abelian of order `p^q` and `H₀ = 1` ((11.7)), and the
 orthogonality calculation (11.8).
 -/
@@ -161,14 +161,14 @@ theorem opCore_map_le_centralizer [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOd
   rw [hK, Subgroup.subgroupOf_map_subtype]
   exact inf_le_left.trans inf_le_right
 
-/-- The `p`-complement `O_{p\'}(H)` of the nilpotent `H` — the join of the `q\'`-cores over
-the primes `q\' ≠ p` of `|H|` — as a subgroup of `↥H`. -/
+/-- The `p`-complement `O_{p'}(H)` of the nilpotent `H` — the join of the `q'`-cores over
+the primes `q' ≠ p` of `|H|` — as a subgroup of `↥H`. -/
 noncomputable def pComplementCore [Finite G] {M : Subgroup G} (hyp : Hypothesis M) :
     Subgroup ↥hyp.H :=
   ⨆ (j : (Nat.card ↥hyp.H).primeFactors) (_ : (j : ℕ) ≠ hyp.p),
     OddOrder.Isaacs.Ch01.opCore (j : ℕ) ↥hyp.H
 
-/-- The ambient `p`-complement `R = O_{p\'}(H) ≤ G`. -/
+/-- The ambient `p`-complement `R = O_{p'}(H) ≤ G`. -/
 noncomputable def pComplement [Finite G] {M : Subgroup G} (hyp : Hypothesis M) : Subgroup G :=
   hyp.pComplementCore.map hyp.H.subtype
 
@@ -176,7 +176,7 @@ theorem pComplement_le_H [Finite G] {M : Subgroup G} (hyp : Hypothesis M) :
     hyp.pComplement ≤ hyp.H :=
   Subgroup.map_subtype_le _
 
-/-- The `p`-complement is characteristic in `H` (join of the characteristic `q\'`-cores). -/
+/-- The `p`-complement is characteristic in `H` (join of the characteristic `q'`-cores). -/
 theorem pComplementCore_characteristic [Finite G] {M : Subgroup G} (hyp : Hypothesis M) :
     hyp.pComplementCore.Characteristic := by
   rw [Subgroup.characteristic_iff_map_eq]
@@ -187,7 +187,7 @@ theorem pComplementCore_characteristic [Finite G] {M : Subgroup G} (hyp : Hypoth
     Subgroup.characteristic_iff_map_eq.mp
       (OddOrder.Isaacs.Ch01.opCore.characteristic (j : ℕ) ↥hyp.H) φ
 
-/-- **`U` centralizes the `p`-complement** — each `q\'`-core lies in `C_G(U)`
+/-- **`U` centralizes the `p`-complement** — each `q'`-core lies in `C_G(U)`
 (`opCore_map_le_centralizer`), hence so does the join. -/
 theorem pComplement_le_centralizer [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     {M : Subgroup G} (hyp : Hypothesis M) :
@@ -230,7 +230,7 @@ theorem isPGroup_of_pComplementCore_eq_bot [Finite G]
     IsPGroup hyp.p ↥hyp.H := by
   classical
   haveI hHnil : Group.IsNilpotent ↥hyp.H := hyp.H_isNilpotent
-  -- every prime factor `q\' ≠ p` has trivial core, hence trivial Sylow — impossible
+  -- every prime factor `q' ≠ p` has trivial core, hence trivial Sylow — impossible
   have hsub : (Nat.card ↥hyp.H).primeFactors ⊆ {hyp.p} := by
     intro q' hq'
     rw [Finset.mem_singleton]
@@ -340,8 +340,8 @@ theorem pKernel_normalized_by_M [Finite G] {M : Subgroup G} (hyp : Hypothesis M)
     (@OddOrder.Isaacs.Ch03.IsAInvariant.of_characteristic _ _ _ _ _ N₀ hchar)
 
 
-/-- **(11.6) key bound**: `M\'\' ≤ K₀ ⊔ U\'` where `K₀ = O_p(H)·⁅R,R⁆`.  Commutator
-generators `⁅a,b⁆` of `M\'\'` decompose as `a = o·r·u` (`M\' = H·U` along the normal `H`,
+/-- **(11.6) key bound**: `M'' ≤ K₀ ⊔ U'` where `K₀ = O_p(H)·⁅R,R⁆`.  Commutator
+generators `⁅a,b⁆` of `M''` decompose as `a = o·r·u` (`M' = H·U` along the normal `H`,
 then `H = O_p·R` by the nilpotent splitting); mod `K₀` the `o`-parts die, the `r`-images
 are central (`⁅R,R⁆ ≤ K₀` and `[R,U] = 1`), so `⁅a,b⁆ ≡ ⁅u_a,u_b⁆ (mod K₀)`. -/
 theorem secondDerived_le_pKernel_sup_derivedU [Finite G]
@@ -513,9 +513,9 @@ theorem H_le_normalizer_opCore_map [Finite G] {M : Subgroup G} (hyp : Hypothesis
   rwa [Subgroup.normalizer_eq_top_iff.mpr inferInstance, ← MonoidHom.range_eq_map,
     Subgroup.range_subtype] at h
 
-/-- **(11.6) trap**: the `p`-complement is trivial.  `R ≤ H ≤ HC = M\'\' ≤ K₀ ⊔ U\'`
+/-- **(11.6) trap**: the `p`-complement is trivial.  `R ≤ H ≤ HC = M'' ≤ K₀ ⊔ U'`
 ((11.5) + the key bound); splitting an `r ∈ R` along the two sups leaves `r ∈ ⁅R,R⁆`
-(the `U\'`-part dies in `H ⊓ U = ⊥`, the `O_p`-part in `O_p ⊓ R = ⊥`), so `R` is
+(the `U'`-part dies in `H ⊓ U = ⊥`, the `O_p`-part in `O_p ⊓ R = ⊥`), so `R` is
 perfect — but `R` is nilpotent, hence trivial. -/
 theorem pComplementCore_eq_bot [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     {M : Subgroup G} (hyp : Hypothesis M) :
@@ -537,7 +537,7 @@ theorem pComplementCore_eq_bot [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G
       exact Subgroup.mem_sup_left (hyp.pComplement_le_H hr)
     have hrKU : r ∈ hyp.pKernel ⊔ derivedInG hyp.base.typeP.U :=
       hyp.secondDerived_le_pKernel_sup_derivedU hG hrM''
-    -- split off the `U\'`-part
+    -- split off the `U'`-part
     have hKleM : hyp.pKernel ≤ M := hyp.pKernel_le_H.trans hHleM
     have hU'leM : derivedInG hyp.base.typeP.U ≤ M :=
       (Subgroup.map_subtype_le _).trans (hyp.base.typeP.U_le.trans (Subgroup.map_subtype_le _))
@@ -620,6 +620,163 @@ theorem H_isPGroup [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     {M : Subgroup G} (hyp : Hypothesis M) :
     IsPGroup hyp.p ↥hyp.H :=
   hyp.isPGroup_of_pComplementCore_eq_bot (hyp.pComplementCore_eq_bot hG)
+
+
+/-- The (11.6) `H₀`-kernel `K₁ = ⁅H, M'⁆` (ambient).  It contains `H' = ⁅H,H⁆` and
+`⁅H,U⁆`, and `M'' ≤ K₁ ⊔ U'` by the mod-`K₁` collapse. -/
+noncomputable def hKernel {M : Subgroup G} (hyp : Hypothesis M) : Subgroup G :=
+  ⁅hyp.base.typeP.H, derivedInG M⁆
+
+theorem hKernel_le_H [Finite G] {M : Subgroup G} (hyp : Hypothesis M) :
+    hyp.hKernel ≤ hyp.base.typeP.H := by
+  rw [hKernel, Subgroup.commutator_le]
+  intro g₁ hg₁ g₂ hg₂
+  have hg₂M : g₂ ∈ M := (Subgroup.map_subtype_le _) hg₂
+  have hconj : g₂ * g₁⁻¹ * g₂⁻¹ ∈ hyp.base.typeP.H := by
+    have := (Subgroup.mem_set_normalizer_iff.mp (hyp.H_normalized_by_M hg₂M)) g₁⁻¹
+    exact this.mp (Subgroup.inv_mem _ hg₁)
+  have : g₁ * (g₂ * g₁⁻¹ * g₂⁻¹) ∈ hyp.base.typeP.H := Subgroup.mul_mem _ hg₁ hconj
+  convert this using 1
+  group
+
+theorem derivedH_le_hKernel [Finite G] {M : Subgroup G} (hyp : Hypothesis M) :
+    ⁅hyp.base.typeP.H, hyp.base.typeP.H⁆ ≤ hyp.hKernel := by
+  rw [hKernel]
+  exact Subgroup.commutator_mono le_rfl hyp.base.typeP.H_le
+
+theorem hKernel_normalized_by_M [Finite G] {M : Subgroup G} (hyp : Hypothesis M) :
+    M ≤ Subgroup.normalizer (hyp.hKernel : Set G) := by
+  intro m hm
+  rw [← OddOrder.BG.AppB.map_conj_eq_iff_mem_normalizer, hKernel,
+    Subgroup.map_commutator]
+  have h1 : (hyp.base.typeP.H).map (MulAut.conj m).toMonoidHom = hyp.base.typeP.H :=
+    OddOrder.BG.AppB.map_conj_eq_iff_mem_normalizer.mpr (hyp.H_normalized_by_M hm)
+  have h2 : (derivedInG M).map (MulAut.conj m).toMonoidHom = derivedInG M := by
+    rw [show derivedInG M = ⁅M, M⁆ from Subgroup.map_subtype_commutator M,
+      Subgroup.map_commutator,
+      OddOrder.BG.AppB.map_conj_eq_iff_mem_normalizer.mpr (Subgroup.le_normalizer hm)]
+  rw [h1, h2]
+
+/-- **(11.6) `H₀`-side bound**: `M'' ≤ ⁅H,M'⁆ ⊔ U'`.  Mod `K₁ = ⁅H,M'⁆` every
+`H`-image is central in `M'/K₁`, so commutator generators collapse to their `U`-parts. -/
+theorem secondDerived_le_hKernel_sup_derivedU [Finite G]
+    {M : Subgroup G} (hyp : Hypothesis M) :
+    secondDerivedInAmbient M ≤ hyp.hKernel ⊔ derivedInG hyp.base.typeP.U := by
+  classical
+  have hHle : hyp.base.typeP.H ≤ M := hyp.base.typeP.H_le.trans (Subgroup.map_subtype_le _)
+  have hUle : hyp.base.typeP.U ≤ M := hyp.base.typeP.U_le.trans (Subgroup.map_subtype_le _)
+  have hKle : hyp.hKernel ≤ M := hyp.hKernel_le_H.trans hHle
+  have hM'eq : derivedInG M = hyp.base.typeP.H ⊔ hyp.base.typeP.U := by
+    rw [hyp.base.typeP.derivedInG_eq_fitting_sup_U, hyp.base.typeP.H_eq]
+  haveI hKn : (hyp.hKernel.subgroupOf M).Normal :=
+    (Subgroup.normal_subgroupOf_iff_le_normalizer hKle).mpr hyp.hKernel_normalized_by_M
+  set φ := QuotientGroup.mk' (hyp.hKernel.subgroupOf M) with hφ
+  -- mod-`K₁` commutation from ambient commutator membership
+  have hswK : ∀ x y : ↥M, ((x * y * x⁻¹ * y⁻¹ : ↥M) : G) ∈ hyp.hKernel →
+      Commute (φ x) (φ y) := by
+    intro x y hxy
+    have h1 : φ (x * y * x⁻¹ * y⁻¹) = 1 := by
+      rw [QuotientGroup.mk'_apply, QuotientGroup.eq_one_iff]
+      exact Subgroup.mem_subgroupOf.mpr hxy
+    have h2 : φ x * φ y * (φ x)⁻¹ * (φ y)⁻¹ = 1 := by
+      rw [← map_inv, ← map_inv, ← map_mul, ← map_mul, ← map_mul]
+      exact h1
+    have := congrArg (· * (φ y * φ x)) h2
+    simpa [mul_assoc] using this
+  rintro x hx
+  rw [secondDerivedInAmbient, derivedInG] at hx
+  obtain ⟨c, hc, rfl⟩ := hx
+  rw [commutator_eq_closure] at hc
+  induction hc using Subgroup.closure_induction with
+  | one =>
+      simpa using Subgroup.one_mem (hyp.hKernel ⊔ derivedInG hyp.base.typeP.U)
+  | mul y z _ _ hy hz =>
+      rw [map_mul]
+      exact Subgroup.mul_mem _ hy hz
+  | inv y _ hy =>
+      rw [map_inv]
+      exact Subgroup.inv_mem _ hy
+  | mem cel hcel =>
+      obtain ⟨a, b, hab⟩ := hcel
+      have hcel_eq : cel = a * b * a⁻¹ * b⁻¹ := hab.symm
+      have haM' : ((a : ↥(derivedInG M)) : G) ∈ hyp.base.typeP.H ⊔ hyp.base.typeP.U := by
+        rw [← hM'eq]; exact a.2
+      have hbM' : ((b : ↥(derivedInG M)) : G) ∈ hyp.base.typeP.H ⊔ hyp.base.typeP.U := by
+        rw [← hM'eq]; exact b.2
+      obtain ⟨ha', hha', ua, hua, haeq⟩ :=
+        exists_mul_of_mem_sup_of_normalized hHle hUle hyp.H_normalized_by_M haM'
+      obtain ⟨hb', hhb', ub, hub, hbeq⟩ :=
+        exists_mul_of_mem_sup_of_normalized hHle hUle hyp.H_normalized_by_M hbM'
+      have haMm : ((a : ↥(derivedInG M)) : G) ∈ M := (Subgroup.map_subtype_le _) a.2
+      have hbMm : ((b : ↥(derivedInG M)) : G) ∈ M := (Subgroup.map_subtype_le _) b.2
+      set A : ↥M := ⟨((a : ↥(derivedInG M)) : G), haMm⟩ with hA
+      set B : ↥M := ⟨((b : ↥(derivedInG M)) : G), hbMm⟩ with hB
+      set HA : ↥M := ⟨ha', hHle hha'⟩ with hHA
+      set HB : ↥M := ⟨hb', hHle hhb'⟩ with hHB
+      set UA : ↥M := ⟨ua, hUle hua⟩ with hUA
+      set UB : ↥M := ⟨ub, hUle hub⟩ with hUB
+      have hAeq : A = HA * UA := by
+        ext; rw [haeq]; rfl
+      have hBeq : B = HB * UB := by
+        ext; rw [hbeq]; rfl
+      -- `H`-parts are mod-`K₁` central among `M'`-images
+      have hmemM' : ∀ g ∈ hyp.base.typeP.H ⊔ hyp.base.typeP.U, g ∈ derivedInG M := by
+        intro g hg; rwa [hM'eq]
+      have hswHU : ∀ (h u : ↥M), (h : G) ∈ hyp.base.typeP.H → (u : G) ∈ derivedInG M →
+          Commute (φ u) (φ h) := by
+        intro h u hh hu
+        refine (hswK h u ?_).symm
+        rw [hKernel]
+        exact Subgroup.commutator_mem_commutator hh hu
+      have hkey : φ A * φ B * (φ A)⁻¹ * (φ B)⁻¹
+          = φ UA * φ UB * (φ UA)⁻¹ * (φ UB)⁻¹ := by
+        rw [hAeq, hBeq, map_mul, map_mul]
+        rw [commutator_mul_of_commute
+          (hswHU HB UA (by exact hhb') (hmemM' _ (Subgroup.mem_sup_right hua)))
+          (hswHU HA UA (by exact hha') (hmemM' _ (Subgroup.mem_sup_right hua)))
+          (hswHU HA UB (by exact hha') (hmemM' _ (Subgroup.mem_sup_right hub)))
+          (hswHU HB UB (by exact hhb') (hmemM' _ (Subgroup.mem_sup_right hub)))]
+        have hHH1 : φ HA * φ HB * (φ HA)⁻¹ * (φ HB)⁻¹ = 1 := by
+          have hsw : Commute (φ HA) (φ HB) := by
+            refine hswK HA HB ?_
+            rw [hKernel]
+            refine Subgroup.commutator_mem_commutator (by exact hha') ?_
+            exact hyp.base.typeP.H_le hhb'
+          rw [hsw.eq]
+          group
+        rw [hHH1, one_mul]
+      have hratio : (A * B * A⁻¹ * B⁻¹) * (UA * UB * UA⁻¹ * UB⁻¹)⁻¹
+          ∈ hyp.hKernel.subgroupOf M := by
+        have hmapped : φ ((A * B * A⁻¹ * B⁻¹) * (UA * UB * UA⁻¹ * UB⁻¹)⁻¹)
+            = (φ A * φ B * (φ A)⁻¹ * (φ B)⁻¹)
+              * (φ UA * φ UB * (φ UA)⁻¹ * (φ UB)⁻¹)⁻¹ := by
+          simp only [map_mul, map_inv]
+        have h1 : φ ((A * B * A⁻¹ * B⁻¹) * (UA * UB * UA⁻¹ * UB⁻¹)⁻¹) = 1 := by
+          rw [hmapped, hkey]
+          group
+        exact (QuotientGroup.eq_one_iff
+          (N := hyp.hKernel.subgroupOf M) _).mp h1
+      have hcomm_coe : (((derivedInG M).subtype) cel : G)
+          = ((A * B * A⁻¹ * B⁻¹ : ↥M) : G) := by
+        rw [hcel_eq]; exact rfl
+      have hsplit : ((A * B * A⁻¹ * B⁻¹ : ↥M) : G)
+          = (((A * B * A⁻¹ * B⁻¹) * (UA * UB * UA⁻¹ * UB⁻¹)⁻¹ : ↥M) : G)
+            * ((UA * UB * UA⁻¹ * UB⁻¹ : ↥M) : G) := by
+        push_cast
+        group
+      rw [hcomm_coe, hsplit]
+      refine Subgroup.mul_mem _ (Subgroup.mem_sup_left ?_) (Subgroup.mem_sup_right ?_)
+      · exact Subgroup.mem_subgroupOf.mp hratio
+      · have hUcomm : ua * ub * ua⁻¹ * ub⁻¹ ∈ derivedInG hyp.base.typeP.U := by
+          rw [show derivedInG hyp.base.typeP.U
+              = ⁅hyp.base.typeP.U, hyp.base.typeP.U⁆
+            from Subgroup.map_subtype_commutator hyp.base.typeP.U]
+          exact Subgroup.commutator_mem_commutator hua hub
+        have hcoe : ((UA * UB * UA⁻¹ * UB⁻¹ : ↥M) : G) = ua * ub * ua⁻¹ * ub⁻¹ := by
+          push_cast
+          rfl
+        rw [hcoe]
+        exact hUcomm
 
 end Hypothesis
 
@@ -775,6 +932,206 @@ theorem U_centralizes_H0 [Finite G] {M : Subgroup G} (hyp : Hypothesis M) :
   rw [← hyp.setup_typeP_eq]
   exact chief_W2_inf_H0_eq_bot hyp
 
+/-- **Peterfalvi (11.6), `H₀ = H'`**: `H' ≤ H₀` since `H/H₀` is elementary abelian;
+conversely `H₀ ≤ H ≤ HC = M'' ≤ ⁅H,M'⁆ ⊔ U'` ((11.5) + the `K₁` bound), the
+`U'`-part dies in `H ⊓ U = ⊥`, and in `H̄ = H/H'` the image of `⁅H,M'⁆` lies in the
+`U`-action commutator while the image of `H₀` is `U`-fixed ((9.6)/(9.1) conjunct 2);
+`C_{H̄}(U) ⊓ [H̄,U] = ⊥` (coprime Fitting on the abelian `H̄`, BG 1.6(d)) kills it. -/
+theorem Hypothesis.H0_eq_Hprime [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    {M : Subgroup G} (hyp : Hypothesis M) :
+    hyp.chief.H0 = hyp.Hprime := by
+  classical
+  rw [hyp.Hprime_eq,
+    show derivedInG hyp.base.typeP.H = ⁅hyp.base.typeP.H, hyp.base.typeP.H⁆
+      from Subgroup.map_subtype_commutator _]
+  have hHH : hyp.s11Setup.typeP.H = hyp.base.typeP.H := by
+    rw [hyp.s11Setup.typeP.H_eq, hyp.base.typeP.H_eq]
+  have hH0le : hyp.chief.H0 ≤ hyp.base.typeP.H := hHH ▸ hyp.chief.H0_lt_H.le
+  have hHle : hyp.base.typeP.H ≤ M := hyp.base.typeP.H_le.trans (Subgroup.map_subtype_le _)
+  have hUleM : hyp.base.typeP.U ≤ M := hyp.base.typeP.U_le.trans (Subgroup.map_subtype_le _)
+  refine le_antisymm ?_ ?_
+  · -- `H₀ ≤ H'`
+    intro h₀ hh₀
+    -- (c) trap: `h₀ ∈ ⁅H,M'⁆`
+    have hh₀K : h₀ ∈ hyp.hKernel := by
+      have hM'' : h₀ ∈ secondDerivedInAmbient M := by
+        rw [secondDerived_eq_HC hG hyp]
+        exact Subgroup.mem_sup_left (hH0le hh₀)
+      have hKU := hyp.secondDerived_le_hKernel_sup_derivedU hM''
+      have hKleM : hyp.hKernel ≤ M := hyp.hKernel_le_H.trans hHle
+      have hU'leM : derivedInG hyp.base.typeP.U ≤ M :=
+        (Subgroup.map_subtype_le _).trans hUleM
+      obtain ⟨k, hk, u', hu', hru⟩ := exists_mul_of_mem_sup_of_normalized hKleM hU'leM
+        hyp.hKernel_normalized_by_M hKU
+      have hu'H : u' ∈ hyp.base.typeP.H := by
+        have h1 : u' = k⁻¹ * h₀ := by rw [hru]; group
+        rw [h1]
+        exact Subgroup.mul_mem _ (Subgroup.inv_mem _ (hyp.hKernel_le_H hk)) (hH0le hh₀)
+      have hu'U : u' ∈ hyp.base.typeP.U := (Subgroup.map_subtype_le _) hu'
+      have hu'1 : u' = 1 := by
+        have := hyp.H_inf_U_eq_bot.le ⟨hu'H, hu'U⟩
+        rwa [Subgroup.mem_bot] at this
+      rw [hru, hu'1, mul_one]
+      exact hk
+    -- (d) the `H̄ = H/H'` argument
+    set φU : ↥hyp.base.typeP.U →* MulAut ↥hyp.base.typeP.H :=
+      (OddOrder.Peterfalvi.S11.typeP_conjAction hyp.base.typeP).comp
+        (Subgroup.inclusion le_sup_left) with hφU
+    have hinv : OddOrder.Isaacs.Ch03.IsAInvariant φU
+        (_root_.commutator ↥hyp.base.typeP.H) :=
+      OddOrder.Isaacs.Ch03.IsAInvariant.of_characteristic _
+    set φbar := OddOrder.Isaacs.Ch04.OddOrder.Isaacs.Ch03.IsAInvariant.quotientMulAutHom hinv with hφbar
+    -- coprimality `(|U|, |H̄|) = 1`
+    have hUne : hyp.base.typeP.U ≠ ⊥ := by
+      rw [← hyp.setup_typeP_eq]; exact hyp.s11Setup.nontrivial.1
+    have hcopHU : Nat.Coprime (Nat.card ↥hyp.base.typeP.H)
+        (Nat.card ↥(hyp.base.typeP.U ⊔ hyp.base.typeP.W1)) :=
+      OddOrder.Peterfalvi.S11.typeP_coprime_H_uW1 hyp.base.typeP hUne
+    have hcop : Nat.Coprime (Nat.card ↥hyp.base.typeP.U)
+        (Nat.card (↥hyp.base.typeP.H ⧸ _root_.commutator ↥hyp.base.typeP.H)) := by
+      have h1 : Nat.card ↥hyp.base.typeP.U
+          ∣ Nat.card ↥(hyp.base.typeP.U ⊔ hyp.base.typeP.W1) :=
+        Subgroup.card_dvd_of_le le_sup_left
+      have h2 : Nat.card (↥hyp.base.typeP.H ⧸ _root_.commutator ↥hyp.base.typeP.H)
+          ∣ Nat.card ↥hyp.base.typeP.H :=
+        ⟨Nat.card ↥(_root_.commutator ↥hyp.base.typeP.H),
+          Subgroup.card_eq_card_quotient_mul_card_subgroup _⟩
+      exact ((hcopHU.symm.coprime_dvd_left h1).coprime_dvd_right h2)
+    -- `π(H₀)` is `U`-fixed
+    set π := QuotientGroup.mk' (_root_.commutator ↥hyp.base.typeP.H) with hπ
+    have hfix : π ⟨h₀, hH0le hh₀⟩ ∈ Subgroup.fixedPointsOfMulAut φbar := by
+      intro û
+      rw [hφbar, OddOrder.Isaacs.Ch04.OddOrder.Isaacs.Ch03.IsAInvariant.quotientMulAutHom_apply_mk']
+      have heq : φU û ⟨h₀, hH0le hh₀⟩ = ⟨h₀, hH0le hh₀⟩ := by
+        refine Subtype.ext ?_
+        have hcoe : ((φU û ⟨h₀, hH0le hh₀⟩ : ↥hyp.base.typeP.H) : G)
+            = (û : G) * h₀ * (û : G)⁻¹ :=
+          OddOrder.Peterfalvi.S11.typeP_conjAction_apply hyp.base.typeP _ _
+        rw [hcoe]
+        have hcent := Subgroup.mem_centralizer_iff.mp
+          (U_centralizes_H0 hyp (show (û : G) ∈ hyp.U from û.2)) h₀ hh₀
+        rw [← hcent]
+        group
+      rw [heq]
+    -- `π(⁅H,M'⁆)` lies in the `U`-action commutator
+    have hM'eq : derivedInG M = hyp.base.typeP.H ⊔ hyp.base.typeP.U := by
+      rw [hyp.base.typeP.derivedInG_eq_fitting_sup_U, hyp.base.typeP.H_eq]
+    have hgen : ∀ x, x ∈ hyp.hKernel → ∀ hx : x ∈ hyp.base.typeP.H,
+        π ⟨x, hx⟩ ∈ OddOrder.Isaacs.Ch04.actionCommutator φbar := by
+      intro x hxK
+      have hxK' : x ∈ ⁅hyp.base.typeP.H, derivedInG M⁆ := hxK
+      rw [Subgroup.commutator_def] at hxK'
+      clear hxK
+      induction hxK' using Subgroup.closure_induction with
+      | one =>
+          intro h1
+          have h2 : (⟨(1 : G), h1⟩ : ↥hyp.base.typeP.H) = 1 := rfl
+          rw [h2, map_one]
+          exact Subgroup.one_mem _
+      | mul a b ha hb iha ihb =>
+          intro habH
+          have haH : a ∈ hyp.base.typeP.H := hyp.hKernel_le_H (by rwa [hKernel,
+            Subgroup.commutator_def])
+          have hbH : b ∈ hyp.base.typeP.H := hyp.hKernel_le_H (by rwa [hKernel,
+            Subgroup.commutator_def])
+          have h2 : (⟨a * b, habH⟩ : ↥hyp.base.typeP.H) = ⟨a, haH⟩ * ⟨b, hbH⟩ := rfl
+          rw [h2, map_mul]
+          exact Subgroup.mul_mem _ (iha haH) (ihb hbH)
+      | inv a ha iha =>
+          intro hainvH
+          have haH : a ∈ hyp.base.typeP.H := hyp.hKernel_le_H (by rwa [hKernel,
+            Subgroup.commutator_def])
+          have h2 : (⟨a⁻¹, hainvH⟩ : ↥hyp.base.typeP.H) = (⟨a, haH⟩ : ↥hyp.base.typeP.H)⁻¹ :=
+            rfl
+          rw [h2, map_inv]
+          exact Subgroup.inv_mem _ (iha haH)
+      | mem g hg =>
+          intro hgH
+          obtain ⟨g₁, hg₁, g₂, hg₂, hab⟩ := hg
+          have hab' : g = g₁ * g₂ * g₁⁻¹ * g₂⁻¹ := hab.symm
+          have hg₂' : g₂ ∈ hyp.base.typeP.H ⊔ hyp.base.typeP.U := by
+            rw [← hM'eq]; exact hg₂
+          obtain ⟨h', hh', u, hu, hg₂eq⟩ :=
+            exists_mul_of_mem_sup_of_normalized hHle hUleM hyp.H_normalized_by_M hg₂'
+          have hw : u * g₁⁻¹ * u⁻¹ ∈ hyp.base.typeP.H := by
+            have h1 := (Subgroup.mem_set_normalizer_iff.mp
+              (hyp.H_normalized_by_M (hUleM hu))) g₁⁻¹
+            exact h1.mp (Subgroup.inv_mem _ hg₁)
+          set x₁ : ↥hyp.base.typeP.H := ⟨g₁, hg₁⟩ with hx₁
+          set x' : ↥hyp.base.typeP.H := ⟨h', hh'⟩ with hx'
+          set w : ↥hyp.base.typeP.H := ⟨g₁ * (u * g₁⁻¹ * u⁻¹),
+            Subgroup.mul_mem _ hg₁ hw⟩ with hwdef
+          have hgelt : (⟨g, hgH⟩ : ↥hyp.base.typeP.H)
+              = (x₁ * x' * x₁⁻¹ * x'⁻¹) * (x' * w * x'⁻¹) := by
+            refine Subtype.ext ?_
+            show g = g₁ * h' * g₁⁻¹ * h'⁻¹ * (h' * (g₁ * (u * g₁⁻¹ * u⁻¹)) * h'⁻¹)
+            rw [hab', hg₂eq]
+            group
+          rw [hgelt, map_mul]
+          refine Subgroup.mul_mem _ ?_ ?_
+          · have hmem : (x₁ * x' * x₁⁻¹ * x'⁻¹) ∈ _root_.commutator ↥hyp.base.typeP.H :=
+              Subgroup.commutator_mem_commutator (Subgroup.mem_top _) (Subgroup.mem_top _)
+            have h1 : π (x₁ * x' * x₁⁻¹ * x'⁻¹) = 1 := by
+              rw [hπ, QuotientGroup.mk'_apply, QuotientGroup.eq_one_iff]
+              exact hmem
+            rw [h1]
+            exact Subgroup.one_mem _
+          · have hratio : (x' * w * x'⁻¹) * w⁻¹ ∈ _root_.commutator ↥hyp.base.typeP.H := by
+              have h1 : (x' * w * x'⁻¹) * w⁻¹ = x' * w * x'⁻¹ * w⁻¹ := by group
+              rw [h1]
+              exact Subgroup.commutator_mem_commutator (Subgroup.mem_top _)
+                (Subgroup.mem_top _)
+            have hπeq : π (x' * w * x'⁻¹) = π w := by
+              have h1 : π ((x' * w * x'⁻¹) * w⁻¹) = 1 := by
+                rw [hπ, QuotientGroup.mk'_apply, QuotientGroup.eq_one_iff]
+                exact hratio
+              rw [map_mul, map_inv] at h1
+              exact mul_inv_eq_one.mp h1
+            rw [hπeq]
+            set û : ↥hyp.base.typeP.U := ⟨u, hu⟩ with hû
+            have hwgen : w = x₁ * φU û x₁⁻¹ := by
+              refine Subtype.ext ?_
+              have hcoe : ((φU û x₁⁻¹ : ↥hyp.base.typeP.H) : G) = u * g₁⁻¹ * u⁻¹ := by
+                rw [hφU]
+                have h2 := OddOrder.Peterfalvi.S11.typeP_conjAction_apply hyp.base.typeP
+                  (Subgroup.inclusion le_sup_left û) x₁⁻¹
+                simpa using h2
+              push_cast
+              rw [hcoe]
+            rw [hwgen, map_mul]
+            exact Subgroup.subset_closure ⟨π x₁, û, rfl⟩
+    -- combine: the image is in the trivial intersection
+    have hcommMem := hgen h₀ hh₀K (hH0le hh₀)
+    have hbot := @OddOrder.Isaacs.Ch04.fixedPoints_inf_actionCommutator_eq_bot_of_abelian
+      (↥hyp.base.typeP.U) (↥hyp.base.typeP.H ⧸ _root_.commutator ↥hyp.base.typeP.H)
+      (inferInstanceAs (CommGroup (Abelianization ↥hyp.base.typeP.H))) _ _ _ φbar hcop
+    have hmem1 : π ⟨h₀, hH0le hh₀⟩
+        ∈ Subgroup.fixedPointsOfMulAut φbar ⊓ OddOrder.Isaacs.Ch04.actionCommutator φbar :=
+      ⟨hfix, hcommMem⟩
+    rw [hbot, Subgroup.mem_bot] at hmem1
+    have hker : (⟨h₀, hH0le hh₀⟩ : ↥hyp.base.typeP.H)
+        ∈ _root_.commutator ↥hyp.base.typeP.H := by
+      rwa [hπ, QuotientGroup.mk'_apply, QuotientGroup.eq_one_iff] at hmem1
+    have hss := OddOrder.Peterfalvi.S08.commutator_subgroupOf_self hyp.base.typeP.H
+    rw [← hss] at hker
+    exact Subgroup.mem_subgroupOf.mp hker
+  · -- `H' ≤ H₀`: the chief quotient `H/H₀` is (elementary) abelian
+    rw [Subgroup.commutator_le]
+    intro g₁ hg₁ g₂ hg₂
+    have hg₁' : g₁ ∈ hyp.s11Setup.typeP.H := by rw [hHH]; exact hg₁
+    have hg₂' : g₂ ∈ hyp.s11Setup.typeP.H := by rw [hHH]; exact hg₂
+    have hcomm := hyp.chief.quotient_elementaryAbelian.1
+      (QuotientGroup.mk (⟨g₁, hg₁'⟩ : ↥hyp.s11Setup.H))
+      (QuotientGroup.mk (⟨g₂, hg₂'⟩ : ↥hyp.s11Setup.H))
+    have hmemN : (⟨g₁, hg₁'⟩ : ↥hyp.s11Setup.H) * ⟨g₂, hg₂'⟩ * (⟨g₁, hg₁'⟩ : ↥hyp.s11Setup.H)⁻¹
+        * (⟨g₂, hg₂'⟩ : ↥hyp.s11Setup.H)⁻¹ ∈ hyp.chief.N := by
+      rw [← QuotientGroup.eq_one_iff (N := hyp.chief.N)]
+      rw [QuotientGroup.mk_mul, QuotientGroup.mk_mul, QuotientGroup.mk_mul,
+        QuotientGroup.mk_inv, QuotientGroup.mk_inv, hcomm]
+      group
+    rw [hyp.chief.H0_eq]
+    exact ⟨_, hmemN, rfl⟩
+
 /-- **Peterfalvi (11.6)**: `H` is a `p`-group, `U` centralizes `H_0`, `H_0 = H'`, and `C = U'`.
 
 The second clause `U` centralizes `H_0` is **unconditional** (`U_centralizes_H0`, via (9.6)/(9.1)),
@@ -790,8 +1147,8 @@ theorem core_structure [Finite G] (_hG : OddOrder.BG.IsMinimalSimpleOdd G)
   refine ⟨?_, U_centralizes_H0 hyp, ?_, ?_⟩
   · -- `H` is a `p`-group: (9.3) [`U` centralizes `O_{p'}(H)`] + (11.5), via `H_isPGroup`.
     exact hyp.H_isPGroup _hG
-  · -- `H_0 = H'`: `[BG]` Proposition 1.6(d) + (11.5).
-    sorry
+  · -- `H_0 = H'`: BG 1.6(d) (coprime Fitting on `H̄`) + (11.5), via `H0_eq_Hprime`.
+    exact hyp.H0_eq_Hprime _hG
   · -- `C = U'`: `U' ⊆ C` is `derivedU_le_C`; the reverse is `C ≤ M'' ≤ H ⊔ U'` via (11.5).
     rw [hyp.Uprime_eq]
     exact C_eq_derivedU _hG hyp
