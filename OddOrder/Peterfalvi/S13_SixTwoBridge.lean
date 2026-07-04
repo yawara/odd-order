@@ -2,7 +2,7 @@
 Copyright (c) 2026 The Odd Order Project. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
-import OddOrder.Peterfalvi.S12_MaximalIII_IV_V_Core
+import OddOrder.Peterfalvi.S12_MaximalIII_IV_V
 import OddOrder.Peterfalvi.S08_SixTwoGeneral
 
 /-!
@@ -39,6 +39,13 @@ open scoped FiniteInduce
 
 variable {G : Type*} [Group G] {M : Subgroup G}
 
+/-- `M' = (derivedInG M).subgroupOf M` is normal in `↥M` (it is `commutator ↥M` under
+`comap_map_eq_self`). -/
+instance : ((derivedInG M).subgroupOf M).Normal := by
+  rw [derivedInG, Subgroup.subgroupOf,
+    Subgroup.comap_map_eq_self_of_injective M.subtype_injective]
+  infer_instance
+
 namespace Hypothesis
 
 /-- **`hKsupp` pin: `(M')^# ⊆ A₀(M)` inside `M`.**  Peterfalvi's type-`P` support satisfies
@@ -68,6 +75,311 @@ theorem one_notMem_A0 (hyp : Hypothesis M) : (1 : ↥M) ∉ hyp.A0 := by
 theorem card_odd_of_isMinimalSimpleOdd [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
     (_hyp : Hypothesis M) : Odd (Nat.card ↥M) :=
   hG.odd.of_dvd_nat (Subgroup.card_subgroup_dvd_card M)
+
+/-- Under `IsMinimalSimpleOdd`, the §11 hypothesis forces type III or IV: type V is eliminated
+by Peterfalvi (10.10) (`no_typeV_maximal`). -/
+theorem isTypeIIIorIV [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G)
+    (hyp : Hypothesis M) : IsTypeIII M ∨ IsTypeIV M := by
+  haveI : Fintype G := Fintype.ofFinite _
+  rcases hyp.type_alt with h | h | h
+  · exact Or.inl h
+  · exact Or.inr h
+  · exact absurd ⟨M, hyp.maximal, h⟩ (no_typeV_maximal hG)
+
+/-- **`|W₁|` is coprime to `|M'|`** (types III/IV): `M' = H ⋊ U` with
+`(|H|, |U·W₁|) = 1` (Peterfalvi (8.4), `typeP_coprime_H_uW1`) killing the `H`-side, and
+`U ⋊ W₁` Frobenius (`typeP_uW1_frobenius`) killing the `U`-side
+(`coprime_card_kernel_complement`).  This is the coprimality input of the `W₁`-fixed-point
+lifting on `M'/M''` behind the h56 anchor (Peterfalvi (8.4.d)). -/
+theorem coprime_card_W1_derived [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis M) :
+    Nat.Coprime (Nat.card ↥hyp.W1) (Nat.card ↥(derivedInG M)) := by
+  haveI : Fintype G := Fintype.ofFinite _
+  have hnt : TypePNontrivialCore M hyp.typeP :=
+    typePNontrivialCore_of_isTypeIIIorIV (hyp.isTypeIIIorIV hG) hyp.typeP
+  have hU : hyp.typeP.U ≠ ⊥ := hnt.1
+  -- `q` is coprime to `|H|`: `(|H|, |U ⊔ W₁|) = 1` and `|W₁| ∣ |U ⊔ W₁|`.
+  have hcopH : Nat.Coprime (Nat.card ↥hyp.W1) (Nat.card ↥hyp.typeP.H) := by
+    refine Nat.Coprime.coprime_dvd_left ?_ (OddOrder.Peterfalvi.S11.typeP_coprime_H_uW1
+      hyp.typeP hU).symm
+    exact Subgroup.card_dvd_of_le le_sup_right
+  -- `q` is coprime to `|U|`: `U ⋊ W₁` is Frobenius with kernel `U`, complement `W₁`.
+  have hcopU : Nat.Coprime (Nat.card ↥hyp.W1) (Nat.card ↥hyp.typeP.U) := by
+    have hF := OddOrder.Peterfalvi.S11.typeP_uW1_frobenius hyp.typeP hU
+    have hc := hF.coprime_card_kernel_complement
+    have h1 : Nat.card ↥(hyp.typeP.U.subgroupOf (hyp.typeP.U ⊔ hyp.typeP.W1))
+        = Nat.card ↥hyp.typeP.U :=
+      Nat.card_congr (Subgroup.subgroupOfEquivOfLe le_sup_left).toEquiv
+    have h2 : Nat.card ↥(hyp.typeP.W1.subgroupOf (hyp.typeP.U ⊔ hyp.typeP.W1))
+        = Nat.card ↥hyp.typeP.W1 :=
+      Nat.card_congr (Subgroup.subgroupOfEquivOfLe le_sup_right).toEquiv
+    have : Nat.Coprime (Nat.card ↥hyp.typeP.U) (Nat.card ↥hyp.typeP.W1) := by
+      rw [← h1, ← h2]; exact hc
+    exact this.symm
+  -- combine over `|M'| = |H| · |U|` (`derived_complement`).
+  have hcard : Nat.card ↥(derivedInG M)
+      = Nat.card ↥hyp.typeP.H * Nat.card ↥hyp.typeP.U := by
+    have hmul := hyp.typeP.derived_complement.card_mul
+    rw [← hmul,
+      Nat.card_congr (Subgroup.subgroupOfEquivOfLe hyp.typeP.H_le).toEquiv,
+      Nat.card_congr (Subgroup.subgroupOfEquivOfLe hyp.typeP.U_le).toEquiv]
+  rw [hcard]
+  exact Nat.Coprime.mul_right hcopH hcopU
+
+/-- **Nonidentity `↥K`-elements commuting with a nonidentity `W₁`-element lie in
+`commutator ↥K`** — the `hfix` translation of Peterfalvi (8.4.d): such an element lands in
+`M' ⊓ C_G(w) = W₂` (`TypePData.centralizer_W1`) and `W₂ ≤ M''` (`W2_le`), and `M''` pulls back
+to `commutator ↥K` across `↥K ≃* ↥M'`. -/
+theorem mem_commutator_of_commute_W1 [Finite G] (hyp : Hypothesis M)
+    {v : ↥M} (hv : v ∈ hyp.W1.subgroupOf M) (hvne : v ≠ 1)
+    {x : ↥((derivedInG M).subgroupOf M)}
+    (hcomm : (v : ↥M) * (x : ↥M) = (x : ↥M) * (v : ↥M)) :
+    x ∈ commutator ↥((derivedInG M).subgroupOf M) := by
+  -- `(x:G)` commutes with `(v:G)`, so lies in `M' ⊓ C_G(v) = W₂ ≤ M''`.
+  have hvG : ((v : ↥M) : G) ∈ hyp.W1 := Subgroup.mem_subgroupOf.mp hv
+  have hvGne : ((v : ↥M) : G) ≠ 1 := fun h => hvne (by ext; exact h)
+  have hxG : ((x : ↥M) : G) ∈ derivedInG M := Subgroup.mem_subgroupOf.mp x.2
+  have hxcen : ((x : ↥M) : G) ∈ Subgroup.centralizer ({((v : ↥M) : G)} : Set G) := by
+    refine Subgroup.mem_centralizer_singleton_iff.mpr ?_
+    have := congrArg (fun m : ↥M => (m : G)) hcomm
+    simpa using this.symm
+  have hxW2 : ((x : ↥M) : G) ∈ hyp.typeP.W2 := by
+    rw [← hyp.typeP.centralizer_W1 _ hvG hvGne]
+    exact ⟨hxG, hxcen⟩
+  have hxM'' : ((x : ↥M) : G) ∈ secondDerivedInAmbient M := (hyp.typeP.W2_le hxW2).2
+  -- pull `M'' = derivedInG M'` back to `commutator ↥K` across `e : ↥K ≃* ↥M'`.
+  rw [secondDerivedInAmbient, derivedInG] at hxM''
+  obtain ⟨c, hc, hcx⟩ := hxM''
+  set e := Subgroup.subgroupOfEquivOfLe
+    (Subgroup.map_subtype_le (commutator ↥M) : derivedInG M ≤ M) with he
+  have hex : e x = c := by
+    ext
+    exact hcx.symm
+  have hcmem : e.symm c ∈ commutator ↥((derivedInG M).subgroupOf M) := by
+    have hmap : (commutator ↥(derivedInG M)).map e.symm.toMonoidHom
+        ≤ commutator ↥((derivedInG M).subgroupOf M) := by
+      have h1 : (commutator ↥(derivedInG M)).map e.symm.toMonoidHom
+          = ⁅(⊤ : Subgroup ↥(derivedInG M)).map e.symm.toMonoidHom,
+              (⊤ : Subgroup ↥(derivedInG M)).map e.symm.toMonoidHom⁆ :=
+        Subgroup.map_commutator ⊤ ⊤ _
+      rw [h1]
+      exact Subgroup.commutator_mono le_top le_top
+    exact hmap (Subgroup.mem_map_of_mem _ hc)
+  rw [← hex, MulEquiv.symm_apply_apply] at hcmem
+  exact hcmem
+
+/-- **A nontrivial linear character of `M'` has inertia group exactly `M'`** — Peterfalvi's
+(8.4.d) at the character level, the heart of the h56 anchor.
+
+If some `w ∈ M ∖ M'` fixed `θ`, its `W₁`-component `v ≠ 1` (through `M = M' ⋊ W₁`,
+`M_complement`; the `M'`-component is absorbed by `ClassFunction.subgroup_le_inertia`) would fix
+`θ` too.  The
+`W₁`-conjugation action on `M'/M''` is fixed-point-free (`quotient_of_fixedPoints_le`, from
+`(|W₁|, |M'|) = 1` (`coprime_card_W1_derived`) and `C_{M'}(v) = W₂ ≤ M''`
+(`mem_commutator_of_commute_W1`)), so `x ↦ (v•x)·x⁻¹` is injective, hence *surjective* on the
+finite `M'/M''`.  Every `y ∈ M'` is then `(v•x)·x⁻¹` mod `M''`; a `v`-fixed multiplicative `θ`
+(trivial on `M''` by multiplicativity) evaluates to `θ(v•x)·θ(x)⁻¹ = 1` on it — so `θ = 1`,
+a contradiction. -/
+theorem inertia_eq_derived_of_linear [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis M)
+    {θ : IrreducibleCharacter ↥((derivedInG M).subgroupOf M)}
+    (hθne : θ ≠ trivialIrreducibleCharacter ↥((derivedInG M).subgroupOf M))
+    (hθdeg : (θ : ClassFunction ↥((derivedInG M).subgroupOf M) ℂ) 1 = 1) :
+    ClassFunction.inertia (θ : ClassFunction ↥((derivedInG M).subgroupOf M) ℂ)
+      = (derivedInG M).subgroupOf M := by
+  classical
+  haveI : Fintype G := Fintype.ofFinite _
+  refine le_antisymm ?_ (ClassFunction.subgroup_le_inertia _)
+  intro w hw
+  by_contra hwK
+  -- decompose `w = k · v` through the complement `M = M' ⋊ W₁`; `v ≠ 1` since `w ∉ M'`.
+  obtain ⟨⟨k, v⟩, hkv, -⟩ := hyp.typeP.M_complement.existsUnique (w : ↥M)
+  have hvI : (v : ↥M) ∈ ClassFunction.inertia
+      (θ : ClassFunction ↥((derivedInG M).subgroupOf M) ℂ) := by
+    have hkI : (k : ↥M) ∈ ClassFunction.inertia
+        (θ : ClassFunction ↥((derivedInG M).subgroupOf M) ℂ) :=
+      ClassFunction.subgroup_le_inertia _ k.2
+    have hveq : (v : ↥M) = (k : ↥M)⁻¹ * w := by
+      rw [← hkv]; group
+    rw [hveq]
+    exact Subgroup.mul_mem _ (Subgroup.inv_mem _ hkI) hw
+  have hvne : (v : ↥M) ≠ 1 := by
+    intro hv1
+    refine hwK ?_
+    have hwk : w = (k : ↥M) := by rw [← hkv, hv1, mul_one]
+    rw [hwk]; exact k.2
+  have hvfix : ClassFunction.conjBy (v : ↥M)
+      (θ : ClassFunction ↥((derivedInG M).subgroupOf M) ℂ)
+      = (θ : ClassFunction ↥((derivedInG M).subgroupOf M) ℂ) := hvI
+  -- rebind the complement component as a subgroup-subtype element for the action.
+  have hvW1s : (v : ↥M) ∈ hyp.W1.subgroupOf M := v.2
+  -- the `W₁`-conjugation action on `↥M'` and its fixed-point-free quotient action mod `M''`.
+  letI act : MulDistribMulAction ↥(hyp.W1.subgroupOf M) ↥((derivedInG M).subgroupOf M) :=
+    MulDistribMulAction.compHom _
+      ((MulAut.conjNormal (H := (derivedInG M).subgroupOf M)).comp
+        (hyp.W1.subgroupOf M).subtype)
+  have hsmul : ∀ (a : ↥(hyp.W1.subgroupOf M)) (x : ↥((derivedInG M).subgroupOf M)),
+      ((a • x : ↥((derivedInG M).subgroupOf M)) : ↥M)
+      = (a : ↥M) * (x : ↥M) * (a : ↥M)⁻¹ := by
+    intro a x
+    change ((MulAut.conjNormal (H := (derivedInG M).subgroupOf M)
+      ((hyp.W1.subgroupOf M).subtype a)) x : ↥M) = _
+    rw [MulAut.conjNormal_apply]; rfl
+  have hMinv : ∀ a : ↥(hyp.W1.subgroupOf M),
+      ∀ m ∈ commutator ↥((derivedInG M).subgroupOf M),
+      a • m ∈ commutator ↥((derivedInG M).subgroupOf M) := by
+    intro a m hm
+    have hmap := Subgroup.characteristic_iff_map_eq.mp
+      (inferInstance : (commutator ↥((derivedInG M).subgroupOf M)).Characteristic)
+      (MulDistribMulAction.toMulAut _ _ a)
+    have hmem : (MulDistribMulAction.toMulAut _ _ a).toMonoidHom m
+        ∈ commutator ↥((derivedInG M).subgroupOf M) := by
+      rw [← hmap]; exact Subgroup.mem_map_of_mem _ hm
+    simpa using hmem
+  have hfixle : ∀ a : ↥(hyp.W1.subgroupOf M), a ≠ 1 →
+      ∀ x : ↥((derivedInG M).subgroupOf M), a • x = x →
+      x ∈ commutator ↥((derivedInG M).subgroupOf M) := by
+    intro a ha x hax
+    have haMne : (a : ↥M) ≠ 1 := fun h => ha (Subtype.ext h)
+    refine mem_commutator_of_commute_W1 hyp a.2 haMne (x := x) ?_
+    have h1 := hsmul a x
+    rw [hax] at h1
+    exact mul_inv_eq_iff_eq_mul.mp h1.symm
+  have hCop : Nat.Coprime (Nat.card ↥(hyp.W1.subgroupOf M))
+      (Nat.card ↥((derivedInG M).subgroupOf M)) := by
+    have h1 : Nat.card ↥(hyp.W1.subgroupOf M) = Nat.card ↥hyp.W1 :=
+      Nat.card_congr (Subgroup.subgroupOfEquivOfLe hyp.typeP.W1_le).toEquiv
+    have h2 : Nat.card ↥((derivedInG M).subgroupOf M) = Nat.card ↥(derivedInG M) :=
+      Nat.card_congr (Subgroup.subgroupOfEquivOfLe
+        (Subgroup.map_subtype_le (commutator ↥M) : derivedInG M ≤ M)).toEquiv
+    rw [h1, h2]
+    exact hyp.coprime_card_W1_derived hG
+  have hFrob := OddOrder.Isaacs.Ch06.IsFrobeniusAction.quotient_of_fixedPoints_le
+    hCop (commutator ↥((derivedInG M).subgroupOf M)) hMinv hfixle
+  letI actQ := OddOrder.Isaacs.Ch06.IsFrobeniusAction.invariantQuotientMulDistribMulAction
+    (N := ↥((derivedInG M).subgroupOf M)) (commutator ↥((derivedInG M).subgroupOf M)) hMinv
+  -- `x ↦ (v•x)·x⁻¹` is injective mod `M''` (fixed-point-freeness), hence surjective.
+  set v' : ↥(hyp.W1.subgroupOf M) := ⟨(v : ↥M), hvW1s⟩ with hv'
+  have hvne' : v' ≠ 1 := fun h => hvne (congrArg Subtype.val h)
+  have hinj : Function.Injective
+      (fun q : (↥((derivedInG M).subgroupOf M)
+        ⧸ commutator ↥((derivedInG M).subgroupOf M)) => (v' • q) * q⁻¹) := by
+    intro q₁ q₂ h12
+    simp only at h12
+    have hstep : v' • (q₂⁻¹ * q₁) = q₂⁻¹ * q₁ := by
+      have h2 := mul_inv_eq_iff_eq_mul.mp h12
+      rw [smul_mul', smul_inv']
+      have h3 : v' • q₁ = (v' • q₂) * q₂⁻¹ * q₁ := by rw [← h2]
+      rw [h3]
+      group
+    by_contra hne
+    refine hFrob v' hvne' (q₂⁻¹ * q₁) (fun h => hne ?_) hstep
+    have h4 : q₁ = q₂ * (q₂⁻¹ * q₁) := by group
+    rw [h4, h, mul_one]
+  have hsurj := Finite.surjective_of_injective hinj
+  -- `θ` is multiplicative, trivial on `M''`, and `v`-conjugation-invariant.
+  have hmul := θ.isIrreducible.map_mul_of_apply_one_eq_one hθdeg
+  have hinv : ∀ x : ↥((derivedInG M).subgroupOf M),
+      (θ : ClassFunction ↥((derivedInG M).subgroupOf M) ℂ) x⁻¹
+      = ((θ : ClassFunction ↥((derivedInG M).subgroupOf M) ℂ) x)⁻¹ := by
+    intro x
+    have h1 : (θ : ClassFunction ↥((derivedInG M).subgroupOf M) ℂ) x
+        * (θ : ClassFunction ↥((derivedInG M).subgroupOf M) ℂ) x⁻¹ = 1 := by
+      rw [← hmul, mul_inv_cancel]; exact hθdeg
+    exact eq_inv_of_mul_eq_one_left (by rw [mul_comm]; exact h1)
+  have hval_ne : ∀ x : ↥((derivedInG M).subgroupOf M),
+      (θ : ClassFunction ↥((derivedInG M).subgroupOf M) ℂ) x ≠ 0 := by
+    intro x h0
+    have h1 : (θ : ClassFunction ↥((derivedInG M).subgroupOf M) ℂ) x
+        * (θ : ClassFunction ↥((derivedInG M).subgroupOf M) ℂ) x⁻¹ = 1 := by
+      rw [← hmul, mul_inv_cancel]; exact hθdeg
+    rw [h0, zero_mul] at h1
+    exact one_ne_zero h1.symm
+  have hN1 : ∀ n ∈ commutator ↥((derivedInG M).subgroupOf M),
+      (θ : ClassFunction ↥((derivedInG M).subgroupOf M) ℂ) n = 1 := by
+    intro n hn
+    rw [commutator_eq_closure] at hn
+    induction hn using Subgroup.closure_induction with
+    | mem x hx =>
+        obtain ⟨a, b, rfl⟩ := hx
+        change (θ : ClassFunction ↥((derivedInG M).subgroupOf M) ℂ) (a * b * a⁻¹ * b⁻¹) = 1
+        rw [hmul, hmul, hmul, hinv, hinv]
+        field_simp [hval_ne a, hval_ne b]
+    | one => exact hθdeg
+    | mul x y _ _ hx hy => rw [hmul, hx, hy, one_mul]
+    | inv x _ hx => rw [hinv, hx, inv_one]
+  -- every `y ∈ M'` is `(v•x)·x⁻¹ · n`, so `θ y = θ(v•x)·θ(x)⁻¹ = 1`.
+  have hall : ∀ y : ↥((derivedInG M).subgroupOf M),
+      (θ : ClassFunction ↥((derivedInG M).subgroupOf M) ℂ) y = 1 := by
+    intro y
+    obtain ⟨q, hq⟩ := hsurj (QuotientGroup.mk y)
+    obtain ⟨x, rfl⟩ := QuotientGroup.mk_surjective q
+    have hmk : (QuotientGroup.mk ((v' • x) * x⁻¹) :
+        ↥((derivedInG M).subgroupOf M) ⧸ commutator ↥((derivedInG M).subgroupOf M))
+        = QuotientGroup.mk y := by
+      rw [← hq]; rfl
+    have hmem := (QuotientGroup.eq (s := commutator ↥((derivedInG M).subgroupOf M))).mp hmk
+    have hyeq : y = (v' • x) * x⁻¹ * (((v' • x) * x⁻¹)⁻¹ * y) := by group
+    have hθvsx : (θ : ClassFunction ↥((derivedInG M).subgroupOf M) ℂ) (v' • x)
+        = (θ : ClassFunction ↥((derivedInG M).subgroupOf M) ℂ) x := by
+      have hcoe : ((v' • x : ↥((derivedInG M).subgroupOf M)) : ↥M)
+          = (v : ↥M) * (x : ↥M) * (v : ↥M)⁻¹ := hsmul v' x
+      have h5 := congrArg
+        (fun f : ClassFunction ↥((derivedInG M).subgroupOf M) ℂ => f x) hvfix
+      simp only [ClassFunction.conjBy_apply] at h5
+      rw [← h5]
+      exact congrArg _ (Subtype.ext hcoe)
+    rw [hyeq, hmul, hmul, hθvsx, hinv, hN1 _ hmem]
+    field_simp [hval_ne x]
+  -- contradiction: `θ` is the trivial character.
+  refine hθne (Subtype.ext ?_)
+  ext x
+  rw [hall x]
+  rfl
+
+/-- **The h56 anchor, fully discharged for the §11 context**: for any `A' ≤ M'` (normal trace,
+proper-commutator quotient — automatic for `A' ⊊ M'` by solvability), `S(A')` contains an
+*irreducible* member of degree `|M : M'|`.  A nontrivial linear source `θ` trivial on `A'`
+exists by `exists_irreducibleCharacter_ne_trivial_subset_kernel_of_commutator_ne_top`; its
+inertia group is exactly `M'` (`inertia_eq_derived_of_linear`, Peterfalvi (8.4.d)), so
+`Ind_{M'}^M θ` is irreducible of degree `|M:M'|` ([Is] 6.34,
+`exists_anchor_of_linear_of_inertia_eq`). -/
+theorem exists_anchor [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis M)
+    {A' : Subgroup ↥M} [(A'.subgroupOf ((derivedInG M).subgroupOf M)).Normal]
+    (hA'comm : commutator (↥((derivedInG M).subgroupOf M)
+      ⧸ A'.subgroupOf ((derivedInG M).subgroupOf M)) ≠ ⊤) :
+    ∃ χ₁ ∈ OddOrder.Peterfalvi.S08.inducedKernelFamily ((derivedInG M).subgroupOf M) A',
+      IsIrreducibleCharacter χ₁ ∧
+      χ₁ 1 = ((((derivedInG M).subgroupOf M)).index : ℂ) := by
+  obtain ⟨θ, hθne, hθker, hθdeg⟩ :=
+    S08.exists_irreducibleCharacter_ne_trivial_subset_kernel_of_commutator_ne_top
+      (A'.subgroupOf ((derivedInG M).subgroupOf M)) hA'comm
+  exact OddOrder.Peterfalvi.S08.exists_anchor_of_linear_of_inertia_eq θ hθne hθker hθdeg
+    (hyp.inertia_eq_derived_of_linear hG hθne hθdeg)
+
+/-- **Solvable-quotient commutator pin**: for a proper trace `X ⊓ M' ≠ M'`, the quotient
+`M'/(X ⊓ M')` is a nontrivial solvable group, so its commutator subgroup is proper.  This is the
+hypothesis feeding both the anchor (`exists_anchor`) and the `S(X)`-nonemptiness
+(`inducedKernelFamily_nonempty_of_commutator_ne_top`); `M` is solvable as a proper subgroup of
+the minimal counterexample (`solvable_of_lt_top`). -/
+theorem commutator_quotient_ne_top [Finite G]
+    (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis M)
+    {X : Subgroup ↥M} [(X.subgroupOf ((derivedInG M).subgroupOf M)).Normal]
+    (hXne : X.subgroupOf ((derivedInG M).subgroupOf M) ≠ ⊤) :
+    commutator (↥((derivedInG M).subgroupOf M)
+      ⧸ X.subgroupOf ((derivedInG M).subgroupOf M)) ≠ ⊤ := by
+  haveI : IsSolvable ↥M := hG.solvable_of_lt_top M (lt_top_iff_ne_top.mpr hyp.maximal.1)
+  haveI : IsSolvable ↥((derivedInG M).subgroupOf M) := inferInstance
+  haveI : IsSolvable (↥((derivedInG M).subgroupOf M)
+      ⧸ X.subgroupOf ((derivedInG M).subgroupOf M)) := inferInstance
+  haveI : Nontrivial (↥((derivedInG M).subgroupOf M)
+      ⧸ X.subgroupOf ((derivedInG M).subgroupOf M)) := by
+    obtain ⟨y, hy⟩ : ∃ y, y ∉ X.subgroupOf ((derivedInG M).subgroupOf M) := by
+      by_contra hall
+      push Not at hall
+      exact hXne ((Subgroup.eq_top_iff' _).mpr hall)
+    exact ⟨QuotientGroup.mk y, 1, fun h => hy ((QuotientGroup.eq_one_iff y).mp h)⟩
+  exact (IsSolvable.commutator_lt_top_of_nontrivial _).ne
 
 end Hypothesis
 
@@ -170,6 +482,68 @@ theorem exists_source_index_le_two_psi
   exact OddOrder.Peterfalvi.S08.exists_source_index_le_two_psi_of_break
     hyp.dadeData.dade hyp.hconj (hyp.card_odd_of_isMinimalSimpleOdd hG)
     hyp.mderivSharp_subset_A0 hyp.one_notMem_A0 hanchor hSBne hdatum hAcoh hBncoh
+
+/-- **The h56 producer with anchor and nonemptiness auto-discharged**: only the coherence
+dichotomy and the grid-backed (5.2.d) decomposition data (`hdatum`) remain.  The anchor comes
+from `exists_anchor` (Peterfalvi (8.4.d)) and `S(B)`-nonemptiness from the solvable-quotient
+linear character, both via `commutator_quotient_ne_top` at the proper traces `A', B ⊊ M'`. -/
+theorem exists_source_index_le_two_psi_of_ne_top
+    [Finite G] (hG : OddOrder.BG.IsMinimalSimpleOdd G) (hyp : Hypothesis M)
+    {A' B : Subgroup ↥M} [A'.Normal]
+    [(A'.subgroupOf ((derivedInG M).subgroupOf M)).Normal]
+    [(B.subgroupOf ((derivedInG M).subgroupOf M)).Normal]
+    (hA'ne : A'.subgroupOf ((derivedInG M).subgroupOf M) ≠ ⊤)
+    (hBne : B.subgroupOf ((derivedInG M).subgroupOf M) ≠ ⊤)
+    (hdatum : ∀ (S₁ : Set (ClassFunction ↥M ℂ)),
+      OddOrder.Peterfalvi.S03.ClosedUnderConjugate S₁ →
+      S₁ ⊆ S08.inducedKernelFamily ((derivedInG M).subgroupOf M) A' ∪
+        S08.inducedKernelFamily ((derivedInG M).subgroupOf M) B →
+      ∀ (hS₁coh : OddOrder.Peterfalvi.S07.IsCoherent
+        (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap hyp.dadeData.dade
+          (hyp.dadeData.dade.fullDadeIsometryData hyp.hconj))
+        S₁ hyp.A0),
+      ∀ (ψ : ClassFunction ↥M ℂ),
+        ψ ∈ S08.inducedKernelFamily ((derivedInG M).subgroupOf M) B →
+        ψ ∉ S₁ → ψ.conj ∉ S₁ →
+      ∀ (χ₁ : ClassFunction ↥M ℂ), χ₁ ∈ S₁ →
+      ∀ (a : ℕ), ψ 1 = (a : ℂ) * χ₁ 1 →
+      ¬ Nonempty (OddOrder.Peterfalvi.S07.IsCoherent
+        (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap hyp.dadeData.dade
+          (hyp.dadeData.dade.fullDadeIsometryData hyp.hconj))
+        (S₁ ∪ {ψ, ψ.conj}) hyp.A0) →
+      ∃ Da : OddOrder.Peterfalvi.S07.CharacterPsiDecomposition (L := ↥M) (G := G)
+          (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap hyp.dadeData.dade
+            (hyp.dadeData.dade.fullDadeIsometryData hyp.hconj)) ψ (a • χ₁),
+        Da.tau1 = OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap hyp.dadeData.dade
+          (hyp.dadeData.dade.fullDadeIsometryData hyp.hconj) ∧
+        ∀ χ ∈ S₁, ∃ D : OddOrder.Peterfalvi.S07.CharacterPsiDecomposition (L := ↥M) (G := G)
+            (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap hyp.dadeData.dade
+              (hyp.dadeData.dade.fullDadeIsometryData hyp.hconj)) χ 0,
+          D.imageFamily.Orthogonal Da.imageFamily ∧
+          D.tau1 χ = hS₁coh.extension χ)
+    (hAcoh : Nonempty (OddOrder.Peterfalvi.S07.IsCoherent
+      (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap hyp.dadeData.dade
+        (hyp.dadeData.dade.fullDadeIsometryData hyp.hconj))
+      (S08.inducedKernelFamily ((derivedInG M).subgroupOf M) A') hyp.A0))
+    (hBncoh : ¬ Nonempty (OddOrder.Peterfalvi.S07.IsCoherent
+      (OddOrder.Peterfalvi.S07.dadeIntegralCharacterMap hyp.dadeData.dade
+        (hyp.dadeData.dade.fullDadeIsometryData hyp.hconj))
+      (S08.inducedKernelFamily ((derivedInG M).subgroupOf M) B) hyp.A0)) :
+    ∃ θ : IrreducibleCharacter ↥((derivedInG M).subgroupOf M),
+      (↑(B.subgroupOf ((derivedInG M).subgroupOf M)) :
+          Set ↥((derivedInG M).subgroupOf M)) ⊆
+        OddOrder.Peterfalvi.S03.characterKernel
+          (θ : ClassFunction ↥((derivedInG M).subgroupOf M) ℂ) ∧
+      (Nat.card (↥((derivedInG M).subgroupOf M) ⧸
+          A'.subgroupOf ((derivedInG M).subgroupOf M)) : ℝ) - 1 ≤
+        2 * (ClassFunction.induce ((derivedInG M).subgroupOf M)
+          (θ : ClassFunction
+            ↥((derivedInG M).subgroupOf M) ℂ) 1).re := by
+  haveI := hyp.finiteG
+  refine hyp.exists_source_index_le_two_psi hG
+    (hyp.exists_anchor hG (hyp.commutator_quotient_ne_top hG hA'ne)) ?_ hdatum hAcoh hBncoh
+  exact OddOrder.Peterfalvi.S08.inducedKernelFamily_nonempty_of_commutator_ne_top
+    (hyp.commutator_quotient_ne_top hG hBne)
 
 end Hypothesis
 
